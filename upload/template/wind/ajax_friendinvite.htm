@@ -1,0 +1,364 @@
+<!--<?php
+if($step == 'email'){
+print <<<EOT
+-->
+<div class="popTop" onmousedown="read.move(event)" style="cursor:move"><span class="fr" style="margin-top:2px;cursor:pointer" onclick="closep();"><img src="$imgpath/close.gif" /></span>导入我的邮件联系人</div>
+<div class="p15">
+<div id="message"></div>
+<form action="$normalUrl" method="post" name="EMAIL" onsubmit="return false">
+<input type="hidden" name="step" value="addressList" id="step"/>
+	<!--<p class="rightTip">请放心，网站不会记录你的邮箱信息</p>-->
+	<table width="100%">
+    	<tr>
+        	<td width="50" height="40">邮箱</td>
+            <td width="165"><input id="username" name="username" type="text" class="input input_wa"></td>
+            <td>&nbsp;
+            <select class="select_wa" name="type" id="type">
+                <option value="gmail">@gmail.com</option>
+                <option value="163">@163.com</option>
+                <option value="126">@126.com</option>
+            </select>
+            </td>
+        </tr>
+        <tr>
+        	<td height="40">密码</td>
+            <td><input id="password" name="password" type="password" class="input input_wa"></td>
+            <td>&nbsp;</td>
+        </tr>
+        <tr>
+        	<td>&nbsp;</td>
+            <td class="tar"><span class="btn2"><span><button onclick="getMailList()">导入</button></span></span></td>
+            <td>&nbsp;</td>
+        </tr>
+    </table>
+</form>
+</div>
+<!--
+EOT;
+} elseif ($step == 'msn') {print <<<EOT
+-->
+<div class="popTop" onmousedown="read.move(event)" style="cursor:move"><span class="fr" style="margin-top:2px;cursor:pointer" onclick="closep();"><img src="$imgpath/close.gif" /></span>导入我的MSN联系人</div>
+<div class="p15">
+<div id="message"></div>
+<form action="$normalUrl" method="post" name="EMAIL" onsubmit="return false">
+<input type="hidden" value="msn"  name="type" id="type"/>
+<input type="hidden" name="step" value="addressList" id="step"/>
+<div class="mb10">
+	<table width="100%">
+    	<!--<tr>
+        	<td width="50" height="40">&nbsp;</td>
+            <td><span class="mr20"><label for="msn"><input name="" id="msn" type="radio" value="">MSN</label></span>
+            <label for="talk"><input name="" id="talk" type="radio" value="">Gtalk</label></td>
+            <td>&nbsp;</td>
+        </tr>
+    	--><tr>
+        	<td width="50" height="40">帐号</td>
+            <td><input id="username" name="username"  type="text" class="input input_wa"></td>
+            <td>&nbsp;
+            </td>
+        </tr>
+        <tr>
+        	<td height="40">密码</td>
+            <td><input id="password" name="password" type="password" class="input input_wa"></td>
+            <td>&nbsp;
+
+            </td>
+        </tr>
+        <tr>
+        	<td>&nbsp;</td>
+            <td><span class="btn2"><span><button onclick="getMailList()">导入</button></span></span></td>
+            <td>&nbsp;
+
+            </td>
+        </tr>
+    </table>
+</div>
+</form>
+</div>
+<!--
+EOT;
+} elseif ($step == 'csv'){print <<<EOT
+-->
+<div class="popTop" onmousedown="read.move(event)" style="cursor:move"><span class="fr" style="margin-top:2px;cursor:pointer" onclick="closep();"><img src="$imgpath/close.gif" /></span>导入我的邮件联系人</div>
+<div class="p15">
+<div id="message"></div>
+<form action="$normalUrl" method="post" enctype="multipart/form-data" name="EMAIL"  onsubmit="return false">
+	<input type="hidden" name="step" value="addressList" id="step"/>
+	<input type="hidden" name="type" value="csv" id="type"/>
+	<table width="100%">
+    	<tr>
+        	<td width="120" height="40">上传csv格式地址簿</td>
+            <td width="200"><input name="csv" id="csv" type="file" class="input input_wa"></td>
+            <td>&nbsp;
+            </td>
+        </tr>
+        <tr>
+        	<td>&nbsp;</td>
+          		<td><span class="btn2"><span><button onclick="getMailList()">导入</button></span></span></td>
+            <td>&nbsp;
+            </td>
+        </tr>
+    </table>
+</form>
+</div>
+<!--
+EOT;
+} elseif ($step == 'simple') {print <<<EOT
+-->
+<div style="width:380px;">
+<div class="popTop" onmousedown="read.move(event)" style="cursor:move"><span class="fr" style="margin-top:2px;cursor:pointer" onclick="closep();"><img src="$imgpath/close.gif" /></span>发送邀请邮件</div>
+<div class="p15">
+<div id="message"></div>
+	<input type="hidden" value="{$invcode}" name="invcodes" id="invcodes"/>
+    <h6 class="mb5">邀请邮件正文,限200字节</h6>
+		<textarea class="textareaA mb10" name="extranote" id="extranote">{$email_content}</textarea>
+	 <h6 class="mb5">好友Email &nbsp;(同时发送多个邮箱时，每行一个)</h6>
+	 <textarea class="textareaA" id="emailcontent"></textarea>
+</div>
+     <div class="p10 tac">
+		<span class="btn2"><span><button  onclick="simpleInvite()">发送邀请</button></span></span>
+     </div>
+</div>
+<!--
+EOT;
+} elseif ($step == 'addressList') {
+$userListDisplay = empty($userList) ? 'style="display: none"' : '';
+$emailListDisplay = empty($userList) ? '' : 'style="display: none"';
+$_count = $friendCount + $notFriendCount;
+print <<<EOT
+-->
+<div>
+<div class="popTop" onmousedown="read.move(event)" style="cursor:move"><span class="fr" style="cursor:pointer" onclick="closep();"><img src="$imgpath/close.gif" /></span>导入我的邮件联系人</div>
+<div class="mailFri p15">
+<!--
+EOT;
+if($emailCount == 0){print <<<EOT
+-->
+	<div id="error">
+       <div class="m_height">
+          <div class="m_height">
+	               <table width="100%">
+	               		<tr><td colspan="3"><div class="p10">导出的联系人列表为空，请确认您输入了正确的邮箱名和密码</div></td></tr>
+	               </table>
+	      </div>
+       </div>
+   </div>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+   <div id="message"></div>
+   <div id="m_list1" $userListDisplay>
+   <h6>你的联系人中有<em>{$_count}</em>位已经在phpwind注册，其中<em>{$friendCount}</em>位已经是你的好友。以下<em>{$notFriendCount}</em>位你可以加为好友</h6>
+	   <div class="m_list">
+		   <div class="m_all"><label for="m_all"><input name="friend_all" id="friend_all" type="checkbox" value="" onclick="checkAll(this,'friend[]')">全选</label></div>
+	       <div class="m_height">
+	           <ul class="half cc">
+<!--
+EOT;
+foreach($userList as $key => $value){
+print <<<EOT
+-->
+					<li><label for="$key">
+					<dl>
+						<dt><a href="u.php?uid={$value[uid]}" class="img_50"><i><img src="{$value[face]}"></i></a></dt>
+						<dd><input name="friend[]" type="checkbox" id="$key" value="$key" class="fr">
+						<p><a href="u.php?uid={$value[uid]}">{$value[username]}</a></p>
+						<p>{$value[signature]}</p>
+						</dd>
+					</dl></label>
+					</li>
+	<!--
+EOT;
+}print <<<EOT
+-->
+	           </ul>
+	       </div>
+	   </div>
+	   <div class="p10 tac">
+		<span class="bt2 fr"><span><button onclick = "display('m_list1','m_list2')">跳 过</button></span></span>
+	    <span class="btn"><span><button onclick="emailInvite('friend[]','addfriend')">加为好友</button></span></span>
+	   </div>
+   </div>
+   <div id="m_list2" $emailListDisplay>
+		<div class="m_list">
+	       	<div class="m_all"><label for="m_all"><input name="email_all" id="email_all" type="checkbox" value="" class="mr15" onclick="checkAll(this,'email[]')">全选</label></div>
+	           <div class="m_height">
+	               <table width="100%" class="tA">
+<!--
+EOT;
+foreach($emailList as $key => $value){
+print <<<EOT
+-->
+	               	<tr>
+	                   	<td width="25"><input name="email[]" type="checkbox" value="$key"></td>
+	                    <td>{$value}</td>
+	                    <td>{$key}</td>
+	                </tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+	               </table>
+	           </div>
+    	</div>
+		<h6>邀请邮件正文</h6>
+		<textarea class="textareaA" style="width:593px;" name="extranote" id="extranote">{$inv_linkcontent}</textarea>
+		<div id="message"></div>
+        <div class="p10 tac">
+			 <span class="btn2"><span><button onclick="emailInvite('email[]','sendmail')">发送邀请</button></span></span>
+        </div>
+   </div>
+<!--
+EOT;
+}print <<<EOT
+-->
+</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+<script type="text/javascript">
+function checkAll(obj,dst){
+	var dst = document.getElementsByName(dst);
+		for(var i = 0;i<dst.length;i++){
+			dst[i].checked = obj.checked ?  true : false;
+		}
+}
+function getMailList(){
+	var type = getObj('type').value;
+	var step = getObj('step').value;
+	var from = document.EMAIL;
+	if("" == type){
+		showTips('请选择邮箱类型');
+		return false;
+	}
+	if("" == step){
+		showTips('非法操作');
+		return false;
+	}
+	if("csv" == type){
+		var csv = getObj('csv');
+		if("" ==csv.value){
+			showTips('请上传csv格式文件');
+			return false;
+		}
+	}else{
+		username = getObj('username').value;
+		password = getObj('password').value;
+		if("" == username){
+			showTips('用户名不能为空');
+			return false;
+		}
+		if("" == password){
+			showTips('密码不能为空');
+			return false;
+		}
+	}
+	var url = '$normalUrl&step='+step+'&type='+type;
+	showTips('正在加载中，请稍后...','message',1);
+	ajax.send(url,from,function(){
+		ajax.get();
+	});
+}
+
+function display(hide,block){
+	var hide = getObj(hide);
+	var block = getObj(block);
+	hide.style.display = 'none';
+	block.style.display = 'block';
+
+}
+/*发送邮件邀请*/
+function emailInvite(ckname,step){
+	var url = '$normalUrl&step='+step;
+	var checkBox = document.getElementsByName(ckname);
+	var operateMessage = getObj('message');
+	var value = '';
+	var data = '';
+	for(var i=0;i<checkBox.length;i++){
+		if(checkBox[i].checked){
+			value += value != '' ? ','+checkBox[i].value : checkBox[i].value;
+		}
+	}
+	if(value == ''){
+		if(step == 'addfriend'){
+			showTips('请选择一个要添加的好友');
+		}else if(step == 'sendmail'){
+			showTips('请选择要发送的邮箱');
+		}
+		return false;
+	}
+	if(step == 'sendmail'){
+		data = "extranote=" + getObj('extranote').value;
+	}
+	function callback(){
+		var status = ajax.request.responseText;
+		if(step == 'addfriend'){
+			operateMessage.innerHTML = "";
+			display('m_list1','m_list2');
+		}else if(step == 'sendmail'){
+			var status = ajax.request.responseText;
+			if(status == 'mail_is_empty'){
+				showTips('邮件地址不能为空');
+			}else if(status == 'success'){
+				showTips('发送好友邀请成功!','message',1);
+			}else if(status == 'mail_limit'){
+				showTips('邮件数超过上限20');
+			}else if(status == 'mode_o_extra_toolang'){
+				showTips('邮件正文过长');
+			}
+		}
+	}
+	data = data == '' ? 'value='+value : 'value='+value+'&'+data;
+	ajax.send(url,data,callback,'','',true);
+}
+function simpleInvite(form){
+	var email = getObj('emailcontent').value;
+	if('' == email){
+		showTips('请输入邮箱');
+		return false;
+	}
+	var email = email.replace(/\\n/ig,',').replace(/\\r/ig,',');
+	var type = '$rg_allowregister';
+	var step = '';
+	var data = 'value='+email;
+	if(type == 1){
+		step = 'sendmail';
+		data += "&extranote=" + getObj('extranote').value;
+	}else{
+		step = 'sendinvitecode';
+		data += "&extranote=" + getObj('extranote').value;
+		data += "&invcodes=" + getObj('invcodes').value;
+	}
+	url = '$normalUrl&step='+ step;
+	ajax.send(url,data,function(){
+		var status = ajax.request.responseText;
+		if(status == 'mail_is_empty'){
+			showTips('邮件地址不能为空');
+		}else if(status == 'success'){
+			showTips('发送好友邀请成功!','message',1);
+		}else if(status == 'mail_limit'){
+			showTips('邮件数超过上限20');
+		}else if(status == 'mode_o_extra_toolang'){
+			showTips('邮件正文过长,限200字节');
+		}
+	});
+}
+function showTips(message,mid,type){
+	if(!message) return false;
+	var mdiv = mid ? getObj(mid) : getObj('message');
+	mdiv.innerHTML = message;
+	if(type){
+		mdiv.className = "rightTip mb10";
+	}else{
+		mdiv.className = "wrongTip mb10";
+	}
+	mdiv.style.visibility = '';
+	return this;
+}
+
+</script>
+<!--
+EOT;
+?>-->

@@ -1,0 +1,406 @@
+<!--<?php print <<<EOT
+-->
+<div id="breadCrumb">
+		<img src="$imgpath/$stylepath/thread/home-old.gif" align="absmiddle" />&nbsp;<a href="$db_bfn" title="$db_bbsname">$db_bbsname</a><em>&gt;</em><a href="searcher.php">搜索</a>
+</div>
+<style type="text/css">
+.forum-search{width:580px;margin:20px auto;background:$forumcolortwo;border:1px solid $tdcolor;padding:10px 20px;}
+.forum-search table{border:0;}
+.s-mb{margin-bottom:1px;}
+.forum-search span{padding-right:1em;}
+</style>
+<div id="pw_content">
+<div class="pd15" style="padding:15px;">
+$db_searchinfo
+<form name="sF" action="searcher.php?#submit" method="post">
+<input type="hidden" name="step" value="2" />
+<div class="t">
+	<table width="100%" cellspacing="0" cellpadding="0">
+		<!--<tr>
+			<td class="h" colspan="2">搜索目标</td>
+		</tr>
+		<tr class="tr2">
+			<td colspan="2">&nbsp;</td>
+		</tr>-->
+		<tr class="tr3">
+			<td colspan="2">
+				<div class="forum-search">
+					<div class="tac">
+					<span class="b f14">关键字</span><input class="input" type="text" id="keyword" name="keyword" value="$skeyword" size="40" style="padding:5px 0 0 2px;height:21px;font-size:14px;" />
+					<input class="btn b" type="submit" name="submit" value="搜索" style="width:70px;height:27px;font-size:14px;" />
+					<a style="cursor:pointer;" onclick="showAdvancedSearch();">高级搜索</a>
+					</div>
+				</div>
+				<div class="forum-search" id="advanced_search" style="display:none;">
+					<table width="100%" cellspacing="0" cellpadding="0">
+						<tr>
+							<td class="b">用户名</td>
+							<td><span><input type="text" name="pwuser" value="$pwuser" class="input"></span></td>
+						<tr>
+							<td class="b">关键字匹配方式</td>
+							<td>
+								<span><input type="radio" name="method" class="s-mb" value="AND" $checked_and/> 完全匹配(2个字节以上,多关键词用'|'或空格分开)</span>
+								<span><input type="radio" name="method" class="s-mb" value="OR" $checked_or /> 部分匹配</span>
+							</td>
+						</tr>
+						<tr>
+							<td class="b">帖子范围</td>
+							<td>
+<!--
+EOT;
+if($_G[allowsearch]==2 && ($p_table || $t_table)){print <<<EOT
+-->
+								<span><input type="radio" name="sch_area" value="0" onclick="gettable(this.value);" $checked_0 />主题标题</span>
+								<span><input type="radio" name="sch_area" value="1" onclick="gettable(this.value);" $checked_1/>主题标题与主题内容</span>
+								<span id="ttable" style="display:none;">$t_table</span>
+								<span><input type="radio" name="sch_area" value="2" onclick="gettable(this.value);" $checked_2/>回复标题与回复内容</span>
+								<span id="ptable" style="display:none;">$p_table</span>
+<script language="JavaScript">
+var sch_area = '$sch_area';
+function gettable(value){
+	var ttable = document.getElementById("ttable");
+	var ptable = document.getElementById("ptable");
+	if (value==2) {
+		ptable.style.display = '';
+		ttable.style.display = 'none';
+	} else if (value==1) {
+		ttable.style.display = '';
+		ptable.style.display = 'none';
+	} else {
+		ptable.style.display = 'none';
+		ttable.style.display = 'none';
+	}
+}
+if (sch_area == 1 || sch_area == 2) {
+	gettable(sch_area);
+}
+</script>
+<!--
+EOT;
+} else {print <<<EOT
+-->
+								<span><input type="radio" name="sch_area" class="s-mb" value="0" checked /> 主题标题</span>
+								<span><input type="radio" name="sch_area" class="s-mb" value="1" $disable /> 主题标题与主题内容</span>
+								<span><input type="radio" name="sch_area" class="s-mb" value="2" $disable />回复标题与回复内容</span>
+<!--
+EOT;
+}print <<<EOT
+-->
+								<input type="checkbox" name="digest" class="s-mb" value="1" $checked_disget/>精华
+							</td>
+						</tr>
+						<tr>
+							<td class="b">所在版块</td>
+							<td>
+								<select name="f_fid" >
+								<option value="all">全部版块分类</option>
+								$forumcache
+<!--
+EOT;
+if($forumadd){print <<<EOT
+-->
+								<option value=''>>> 隐藏版块</option>
+								$forumadd
+<!--
+EOT;
+}print <<<EOT
+-->
+								</select>
+							</td>
+						</tr>
+						<tr>
+							<td class="b">发帖时间</td>
+							<td>
+								<select name="sch_time">
+<!--
+EOT;
+if($_G['schtime'] == 'all'){print <<<EOT
+-->
+								<option value="all" $time_all>所有主题帖</option>
+<!--
+EOT;
+}print <<<EOT
+-->
+								<option value="newatc" $time_newatc>最新主题帖</option>
+<!--
+EOT;
+$schtimedb = array(
+'86400' => "<option value=\"86400\" $time_86400>1天内的主题</option>",
+'172800' => "<option value=\"172800\" $time_172800>2天内的主题</option>",
+'604800' => "<option value=\"604800\" $time_604800>1星期内的主题</option>",
+'2592000' => "<option value=\"2592000\" $time_2592000>1个月内的主题</option>",
+'5184000' => "<option value=\"5184000\" $time_5184000>2个月内的主题</option>",
+'7776000' => "<option value=\"7776000\" $time_7776000>3个月内的主题</option>",
+'15552000' => "<option value=\"15552000\" $time_15552000>6个月内的主题</option>",
+'31536000' => "<option value=\"31536000\" $time_31536000>1年内的主题</option>"
+);
+foreach($schtimedb as $key => $value){
+if ($_G['schtime'] == 'all' || $key <= $_G['schtime']) {print <<<EOT
+-->
+$value
+<!--
+EOT;
+}}print <<<EOT
+-->
+								</select>
+							</td>
+						</tr>
+						<tr>
+							<td class="b">结果排序</td>
+							<td>
+								<span><select name="orderway">
+								<option value="lastpost" $order_lastpost>按最后回复</option>
+								<option value="replies" $order_replies>按回复次数</option>
+								<option value="hits" $order_hits>按人气</option>
+								<option value="favors" $order_favors>按收藏次数</option>
+								</select></span>
+								<span><input type="radio" name="asc" value="ASC" class="s-mb" $asc_ASC /> 正序</span>
+								<input type="radio" name="asc" value="DESC" class="s-mb" $asc_DESC /> 倒序
+							</td>
+						</tr>
+					</table>
+				</div>
+			</td>
+		</tr>
+	</table>
+</div>
+</form>
+<script language="JavaScript">
+window.onunload = function(){document.sF.submit?document.sF.submit.disabled = false:0;};
+function showAdvancedSearch(){
+	if (getObj('advanced_search').style.display == 'none'){
+		getObj('advanced_search').style.display = '';
+	} else {
+		getObj('advanced_search').style.display = 'none';
+	}
+}
+<!--
+EOT;
+if ($advanced == 1){print <<<EOT
+-->
+	showAdvancedSearch();
+<!--
+EOT;
+}print <<<EOT
+-->
+</script>
+<!--
+EOT;
+if ($step == 2){print <<<EOT
+-->
+<div class="t3 cc mb10">$pages</div>
+<!--
+EOT;
+if($admincheck || $superRight ){print <<<EOT
+-->
+<form action="mawhole.php" method="post" id="dosearch" name="dosearch">
+<input type="hidden" name="fid" value="$seekfid" />
+<!--
+EOT;
+}print <<<EOT
+-->
+<div class="t">
+<table width="100%" cellspacing="0" cellpadding="0">
+<tr><td colspan="7" class="h">主题列表</td></tr>
+<tr class="tr2 tac">
+<td width="5%">状态</td>
+<td width="*">标题</td>
+<td width="15%">版块</td>
+<td width="13%">作者</td>
+<td width="6%">回复</td>
+<td width="6%">人气</td>
+<td width="20%">最后发表</td>
+</tr>
+<!--
+EOT;
+foreach($schdb as $sch){print <<<EOT
+-->
+<tr class="tr3 tac" id="search_$sch[fid]_$sch[tid]"><td class="y-style"><img src="$imgpath/$stylepath/thread/$sch[status].gif" border="0"></td>
+<th class="y-style tal">
+<!--
+EOT;
+if(!$admincheck && ($isGM || $superRight)){print <<<EOT
+-->
+<input type="checkbox" name="tidarray[]" value="$sch[fid]_$sch[tid]" />
+<!--
+EOT;
+}elseif($admincheck){print <<<EOT
+-->
+<input type="checkbox" name="tidarray[]" value="$sch[tid]" />
+
+<!--
+EOT;
+}if($sch['topped']){print <<<EOT
+-->
+<img src="$imgpath/$stylepath/file/headtopic_$sch[topped].gif" alt="置顶帖标志" />
+<!--
+EOT;
+}print <<<EOT
+-->
+&nbsp;<a href="read.php?tid=$sch[tid]$htmlurl" target="_blank">$sch[subject]</a>
+<!--
+EOT;
+if($admincheck && $pwSystem['deltpcs'] || $superEdit){
+print <<<EOT
+-->
+&nbsp;[<a href="post.php?action=modify&fid={$sch[fid]}&tid={$sch[tid]}&pid=tpc&article=0" target="_blank">编辑</a>]
+<!--
+EOT;
+}
+print <<<EOT
+-->
+<!--
+EOT;
+if($sch[digest]){print <<<EOT
+-->
+<img src="$imgpath/$stylepath/file/digest_$sch[digest].gif" alt="精华帖标志" />
+<!--
+EOT;
+}print <<<EOT
+-->
+</th>
+<td class="y-style">
+<a href="thread.php?fid=$sch[fid]">$sch[forumname]</a></td>
+<td class="smalltxt y-style"><a href="u.php?uid=$sch[authorid]">$sch[author]</a><br />$sch[postdate]</td>
+<td class="y-style">$sch[replies]</td>
+<td class="y-style">$sch[hits]</td>
+<td class="y-style">
+<a href="read.php?tid=$sch[tid]&page=e#a" target="_blank">
+$sch[lastpost]</a>
+<br />by: $sch[lastposter]
+</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+<tr><td style="height:8px;"></td></tr>
+</table></div>
+<!--
+EOT;
+if($admincheck){print <<<EOT
+-->
+<table cellpadding="1" cellspacing="1" align="center" width="$tablewidth">
+<tr align="center"><td>
+管理选项:
+<!--
+EOT;
+if($isGM || $pwSystem[topped]){print <<<EOT
+-->
+		<input name="action" type="radio" value="headtopic" />置顶
+<!--
+EOT;
+}if($isGM || $pwSystem[digestadmin]){print <<<EOT
+-->
+		<input name="action" type="radio" value="digest" />精华
+<!--
+EOT;
+}if($isGM || $pwSystem[lockadmin]){print <<<EOT
+-->
+		<input name="action" type="radio" value="lock" />锁定
+<!--
+EOT;
+}if($isGM || $pwSystem[pushadmin]){print <<<EOT
+-->
+		<input name="action" type="radio" value="pushtopic" />提前
+<!--
+EOT;
+}if($isGM || $pwSystem[downadmin]){print <<<EOT
+-->
+		<input name="action" type="radio" value="downtopic" />压帖
+<!--
+EOT;
+}if($isGM || $pwSystem[coloradmin]){print <<<EOT
+-->
+		<input name="action" type="radio" value="edit" />加亮
+<!--
+EOT;
+}if($isGM || $pwSystem[tpccheck]){print <<<EOT
+-->
+		<input name="action" type="radio" value="type" />主题分类
+<!--
+EOT;
+}if($isGM || $pwSystem[moveatc]){print <<<EOT
+-->
+		<input name="action" type="radio" value="move" />移动
+<!--
+EOT;
+}if($isGM || $pwSystem[copyatc]){print <<<EOT
+-->
+		<input name="action" type="radio" value="copy" />复制
+<!--
+EOT;
+}if($isGM || $pwSystem[delatc]){print <<<EOT
+-->
+		<input name="action" type="radio" value="del" checked />删除
+<!--
+EOT;
+}print <<<EOT
+-->
+<br /><br />
+<input class="btn" type="button" name="chkall" value="全 选" onclick="CheckAll(this.form)" />
+<input class="btn" type="reset" name="Reset" value="重 置" />
+<input class="btn" type="submit" name="hello" value="提 交" />
+</td></tr></table></form>
+<!--
+EOT;
+}print <<<EOT
+-->
+<div class="fr">共搜索到了{$total}条信息[ {$db_perpage} 条/页]</div>
+$pages
+<div class="c"></div>
+<!--
+EOT;
+if(!$admincheck && $superRight ){print <<<EOT
+-->
+<div class="tac" style="margin-bottom:10px;">
+<input type="hidden" name="tidarray[]" value="" />
+<span class="bt"><span><button class="btn" type="button" name="chkall" onclick="CheckAll(this.form)" >全 选</button></span></span>
+<span class="bt"><span><button class="btn" type="button" name="confirm" value="删除" onclick="Alert(this.form);">删除</button></span></span>
+</div></form>
+<!--
+EOT;
+}print <<<EOT
+-->
+<script language="JavaScript">
+function CheckAll(form){
+	var len = {$admincheck} ? form.elements.length-12 : form.elements.length;
+	for (var i=0;i<len;i++){
+		var e = form.elements[i];
+		e.checked == true ? e.checked = false : e.checked = true;
+	}
+}
+function Alert(form){
+	showDialog("confirm","你选择的帖子将直接删除，请确认",0,function(){
+		deleteThreadsHandler();
+	});
+	return false;
+}
+
+function deleteThreadsHandler(){
+	var tids = '';
+	var del = [];
+	var obj = document.dosearch["tidarray[]"];
+	for(var i=0;i<obj.length;i++){
+		if(obj[i].checked === true){
+			var v = obj[i].value;
+			tids += v+"|";
+			del.push(v);
+		}
+	}
+	if(tids == ""){
+		showDialog("error","你还没有选择需要删除的帖子");
+	}
+	var data = "&fid=all&step=2&verify={$verifyhash}&tidarray="+tids;
+	ajax.send("mawhole.php?action=delall",data,function(){
+		for(i=0;i<del.length;i++){
+			document.getElementById("search_"+del[i]).innerHTML="";
+		}
+		var response = ajax.request.responseText;
+		showDialog('success',response,1);
+	});
+}
+</script>
+</div></div>
+<!--
+EOT;
+}?>-->

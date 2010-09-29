@@ -1,0 +1,191 @@
+<!--<?php print <<<EOT
+-->
+<script language="javascript">
+	var charset = '$db_charset';
+	var imgpath   = '$imgpath';
+	var stylepath = '$stylepath';
+	function addsmile(NewCode){
+	    document.FORM.atc_content.value += ' [s:'+NewCode+'] ';
+	}
+	
+	var version = navigator.appVersion.split(";");
+	version = version[1].replace(/[ ]/g,"");
+	if (navigator.appName == "Microsoft Internet Explorer" && version=="MSIE6.0") {
+		window.onerror = function () {return true;}
+	}
+	function showEmotion() {
+		showDefault();
+		setTimeout(function(){
+		document.getElementById('pw_box').onclick=function(e)
+		{
+			if ( e && e.preventDefault )
+				e.stopPropagation();
+			else
+				window.event.cancelBubble = true;
+		};
+		document.body.onclick=function(){
+			closep();
+			document.body.onclick=null;
+			document.getElementById('pw_box').onclick=null;
+		};},100);
+		return false;
+	};
+</script>
+<!--
+EOT;
+if(R_P==D_P){print <<<EOT
+-->
+					<script language="JavaScript" src="data/bbscache/face.js"></script>
+<!--
+EOT;
+}else{
+$facedb=readover(D_P."data/bbscache/face.js");
+print <<<EOT
+-->
+					<script language="JavaScript">
+					$facedb
+					</script>
+<!--
+EOT;
+}print <<<EOT
+-->
+<div id="menu_show" style="display:none;"></div>
+<div id="menu_face" class="menu" style="display:none;"></div>
+<script language="JavaScript" src="js/post.js"></script>
+<div id="comment_container">
+<style type="text/css" media="screen">
+	@import url($imgpath/post/minieitor/minieitor.css);
+</style>
+<form method="POST" name="FORM" action="" onsubmit="return false;">
+    <div class="minieitor_pw cc">
+        <ul class="miniUl">
+            <li><a href="javascript:" title="插入url链接" class="milink_pw" onClick="createLinkBox();" id="createlinkid">插入url链接</a></li>
+            <li><a href="javascript:" title="添加表情" class="mishow_pw" id="td_face" onClick="return showEmotion();" unselectable="on">添加表情</a></li>
+        </ul>
+        <div class="minitextarea">
+            <textarea maxlength="200" id="comm_input_{$comment_type}_{$comment_typeid}_0" name="atc_content"></textarea>
+        <div class="c"></div>
+        </div>
+        <div class="c"></div>
+    </div>
+    <span class="btn" style="margin:0 15px 0 0;"><span><button type="submit" onclick="PW_Comment.sendComment('$comment_type',$comment_typeid,0,2);">提 交</button></span></span>
+</form>
+<div class="c mb20">&nbsp;</div>
+<div id="linkbox" style="display:none;"></div>
+	<div class="dlA" id="dlA">
+		<div id="createcommentbox"></div>
+<!--
+EOT;
+foreach ($commentdb as $key => $comment) {print <<<EOT
+-->
+            <dl class="cc dl" id="comment_{$comment[id]}">
+                <dt class="dt"><a href="u.php?uid=$comment[uid]" target="_blank" class="img_50"><img src="$comment[face]" width="48" height="48"/></a></dt>
+                <dd class="dd">
+<!--
+EOT;
+if ($comment[uid]==$winduid || $ifadmin) { print <<<EOT
+-->
+                    <a id="commentdel_{$comment[id]}" style="cursor: pointer;display:none;" onclick="pwConfirm('是否确定删除本条回复',this,function(){ajax.send('apps.php?q=ajax&a=commdel','id=$comment[id]',PW_Comment.delOneCommentResponse);});" title="删除" class="adel">删除</a>
+<!--
+EOT;
+} print <<<EOT
+-->
+                    <p class="title"><a href="u.php?uid=$comment[uid]" target="_blank" class="mr5">$comment[username]</a>
+                    $comment[title]
+                    </p>
+                    <cite class="gray">$comment[postdate]</cite> - 
+                    <a style="cursor:pointer;" class="reA" onclick="PW_Comment.createCommentInput('$comment_type',$comment_typeid,$comment[id])">回复</a>
+						<div class="c mb10">&nbsp;</div>
+                        <div id="commentbox_{$comment_typeid}_{$comment[id]}">
+                        <div id="subcommentlist_{$comment_type}_{$comment[id]}">							
+<!--
+EOT;
+foreach ($subcommentdb[$comment['id']] as $k => $subcomment) {print <<<EOT
+-->
+                        <dl class="cc dl" id="comment_{$subcomment[id]}">
+                            
+                            <dt class="dt"><a href="u.php?uid=$subcomment[uid]" target="_blank" class="img_50"><img src="$subcomment[face]" width="48" height="48"/></a></dt>
+                            <dd class="dd">
+<!--
+EOT;
+if ($subcomment[uid]==$winduid || $ifadmin) { print <<<EOT
+-->
+                                <a id="commentdel_{$subcomment[id]}" style="cursor: pointer;display:none;" onclick="pwConfirm('是否确定删除本条回复',this,function(){ajax.send('apps.php?q=ajax&a=commdel','id=$subcomment[id]',PW_Comment.delOneCommentResponse);});" title="删除" class="adel">删除</a>
+<!--
+EOT;
+} print <<<EOT
+-->
+                            <p class="title"><a href="u.php?uid=$subcomment[uid]" target="_blank" class="mr5">$subcomment[username]</a>
+                                $subcomment[title]
+                            </p>
+                            <cite class="gray">$subcomment[postdate]</cite>
+
+                            </dd>
+                        </dl>
+<!--
+EOT;
+}print <<<EOT
+-->
+                        </div>
+                        <div id="comment_input_{$comment_type}_{$comment_typeid}_{$comment[id]}" style="display:none;">
+                        	<dl class="cc dl">
+                            	<dd class="d">
+                                <p class="mb5"><textarea id="comm_input_{$comment_type}_{$comment_typeid}_{$comment[id]}" name="title" maxlength="200"></textarea></p>
+                                <span class="btn2" style="margin:0;"><span><button type="button" onclick="PW_Comment.sendComment('$comment_type','$comment_typeid','$comment[id]','3');">回复</button></span></span></dd>
+                            </dl>
+                        </div>
+                    </div>
+                </dd>
+            </dl>
+<!--
+EOT;
+}print <<<EOT
+-->
+	</div>
+<div class="mt10 cc">$pages</div>
+</div>
+<SCRIPT LANGUAGE="JavaScript">
+function delload(){
+	var commentdls = getElementsByClassName('cc dl',getObj('dlA'));
+	for (var i=0;i<commentdls.length ; i++ ){
+		var stamp = commentdls[i].id.substr(0,8);
+		if (stamp == 'comment_'){
+			commentdls[i].onmouseover = function (){
+				var delObj = getElementsByClassName('adel',this);
+				if(delObj.length> 0 && delObj[0].id.substr(0,11) == 'commentdel_'){
+					delObj[0].style.display='';
+				}
+			}
+			commentdls[i].onmouseout = function (){
+				var delObj = getElementsByClassName('adel',this);
+				if(delObj.length>0 && delObj[0].id.substr(0,11) == 'commentdel_'){
+					delObj[0].style.display='none';
+				}
+			}
+		}
+	}
+
+	var subcommentdls = getElementsByClassName('cc dl',getObj('dlA'));
+	for (var i=0;i<subcommentdls.length ; i++ ){
+		var stamp = commentdls[i].id.substr(0,11);
+		if (stamp == 'subcomment_'){
+			subcommentdls[i].onmouseover = function (){
+				var delObj = getElementsByClassName('adel',this);
+				if(delObj.length> 0 && delObj[0].id.substr(0,14) == 'subcommentdel_'){
+					delObj[0].style.display='';
+				}
+			}
+			commentdls[i].onmouseout = function (){
+				var delObj = getElementsByClassName('adel',this);
+				if(delObj.length>0 && delObj[0].id.substr(0,14) == 'subcommentdel_'){
+					delObj[0].style.display='none';
+				}
+			}
+		}
+	}
+}
+window.onReady(delload);
+</SCRIPT>
+<!--
+EOT;
+?>

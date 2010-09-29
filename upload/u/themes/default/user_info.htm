@@ -1,0 +1,204 @@
+<!--<?php
+require_once(uTemplate::printEot('header'));
+print<<<EOT
+-->
+<style type="text/css" media="screen">
+@import url(u/images/usercenter.css);
+</style>
+		<div class="sideA">
+<!--
+EOT;
+$data = $newSpace->getSpaceData(array('info'=>1));
+require_once(uTemplate::printEot('space_model'));
+$spacetemplate->info($data['info']);
+print <<<EOT
+-->
+		</div>
+		<div class="sideD">
+<!--
+EOT;
+if(!$indexRight && $indexValue =='1'){print <<<EOT
+-->
+<div class="boxA">
+	<table width="100%">
+		<tr><td height="400">
+			<div class="space_msg"><img src="u/images/space/report.png" align="absmiddle" />由于对方的隐私设置，容许好友可见！立即 <a href="$db_bbsurl/pw_ajax.php?action=addfriend&touid={$space['uid']}" onclick="return ajaxurl(this);">加为好友</a></div>
+		</td></tr>
+	</table>
+</div>
+<!--
+EOT;
+}elseif(!$indexRight && $indexValue =='2'){print <<<EOT
+-->
+<div class="boxA">
+	<table width="100%">
+		<tr><td height="400">
+			<div class="space_msg"><img src="u/images/space/report.png" align="absmiddle" />对方设置了隐私，您没有权限查看</div>
+		</td></tr>
+	</table>
+</div>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+			<div class="boxB">
+				<div class="p15">
+					<h5 class="h5 mb10"><strong>基本信息</strong></h5>
+					<table class="lh_24 mb15 vt" style="table-layout:fixed;" width="100%">
+						<tr>
+							<td width="100">性别</td>
+							<td>
+<!--
+EOT;
+if ($space['gender'] == 1) {print <<<EOT
+-->
+						男
+<!--
+EOT;
+} elseif ($space['gender'] == 2) {print <<<EOT
+-->
+						女
+<!--
+EOT;
+} else {print <<<EOT
+-->
+						保密
+<!--
+EOT;
+}print <<<EOT
+-->
+							</td>
+						</tr>
+						<tr>
+							<td>生日</td>
+							<td>$space[bday]</td>
+						</tr>
+						<tr>
+							<td>来自</td>
+							<td>$space[location]</td>
+						</tr>
+						<tr>
+							<td>个人主页</td>
+							<td>$space[site]</td>
+						</tr>
+						<tr>
+							<td>个性签名</td>
+							<td>$space[honor]</td>
+						</tr>
+						<tr>
+							<td>自我介绍</td>
+							<td>$space[introduce]</td>
+						</tr>
+						<tr>
+							<td>帖子签名</td>
+							<td>$space[signature]</td>
+						</tr>
+					</table>
+
+					<h5 class="h5 mb10"><strong>社区信息</strong></h5>
+					<table class="lh_24 mb15 vt" style="table-layout:fixed;" width="100%">
+						<tr>
+							<td width="100">精华帖子</td>
+							<td>$space[digests]</td>
+						</tr>
+						<tr>
+							<td width="100">平均日发帖</td>
+							<td>$space[averagepost] (今日：$space[todaypost])</td>
+						</tr>
+						<tr>
+							<td width="100">在线时间</td>
+							<td>$space[onlinetime_s] 小时</td>
+						</tr>
+						<tr>
+							<td width="100">注册时间</td>
+							<td>$space[regdate]</td>
+						</tr>
+						<tr>
+							<td width="100">最后登录</td>
+							<td>$space[lastvisit_s]</td>
+						</tr>
+						<tr>
+							<td width="100">会员头衔</td>
+							<td>{$ltitle[$space['memberid']]}</td>
+						</tr>
+<!--
+EOT;
+if ($space['groupid'] != -1) {print <<<EOT
+-->
+						<tr>
+							<td width="100">系统头衔</td>
+							<td>{$ltitle[$space['groupid']]}</td>
+						</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+						<tr>
+							<td width="100">UID</td>
+							<td>$space[uid]</td>
+						</tr>
+					</table>
+
+					<h5 class="h5 mb10"><strong>联系方式</strong></h5>
+					<table class="lh_24 mb15 vt" style="table-layout:fixed;" width="100%">
+						<tr>
+							<td width="100">QQ</td>
+							<td>$space[oicq]</td>
+						</tr>
+						<tr>
+							<td>阿里旺旺</td>
+							<td>$space[aliww]</td>
+						</tr>
+						<tr>
+							<td>yahoo</td>
+							<td>$space[yahoo]</td>
+						</tr>
+						<tr>
+							<td>msn</td>
+							<td>$space[msn]</td>
+						</tr>
+					</table>
+<!--
+EOT;
+if ($customfield) {print <<<EOT
+-->
+					<h5 class="h5 mb10"><strong>扩展资料</strong></h5>
+					<table class="lh_24 mb15 vt" style="table-layout:fixed;" width="100%">
+<!--
+EOT;
+foreach($customfield as $value){
+$field = 'field_' . $value['id'];
+if ($value['type'] == '3') {
+	$options = getOptions($value['options']);
+	$fieldvalue = $options[$space[$field]];
+} else {
+	$fieldvalue = $space[$field];
+}
+print <<<EOT
+-->
+						<tr>
+							<td width="100">$value[title]</td>
+							<td>$fieldvalue</td>
+						</tr>
+<!--
+EOT;
+}}print <<<EOT
+-->
+					</table>
+<!--
+EOT;
+}print <<<EOT
+-->
+				</div>
+			</div>
+		</div>
+<script type="text/javascript" src="js/spacedrag.js"></script>
+<script type="text/javascript">
+window.onload = function() {
+	drag.init('boxA',['sideA','sideD'],'h2');
+}
+</script>
+<!--
+EOT;
+require_once(uTemplate::printEot('footer'));
+?>-->

@@ -1,0 +1,286 @@
+<!--<?php
+include_once PrintEot('left');
+print <<<EOT
+-->
+<div class="admin_info mb10">
+	<h3 class="h1"><b>提示信息</b></h3>
+	<div class="legend">预设帖子格式说明功能:您可以设定帖子格式，以便于发此类帖子时可以省时省力，比如发出租信息等。(支持html代码)</div>
+</div>
+<!--
+EOT;
+if(!$action){ print <<<EOT
+-->
+<form action="$basename" method="post" name="FORM">
+<h2 class="h1"><span class="fl mr10">预设帖子格式</span>
+<a class="btn_add fl" href="$basename&action=add" hidefocus="true"><i>添加帖子格式</i></a></h2>
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+	<tr class="tr2 td_bgB">
+		<td width="30"><span onclick="CheckAll(document.FORM)" class="cp">全选</span></td>
+		<td>帖子格式标题</td>
+		<td>操作</td>
+	</tr>
+<!--
+EOT;
+if (empty($setformdb)) {print <<<EOT
+-->
+<tr><td class="p10" colspan="3"><div class="admin_tips">啊哦，没有你要的信息！</div></td></tr>
+<!--
+EOT;
+}else{
+foreach($setformdb as $key=>$val){
+$checked = ${'c_'.$val[id]};
+print <<<EOT
+-->
+	<tr class="tr1 vt">
+		<td class="td2">&nbsp;<input type="checkbox" name="selid[]" value="$val[id]" onclick="pwJsCheck(this)" $checked/></td>
+		<td class="td2">$val[name]</td>
+		<td class="td2"><a title="编辑" href="$basename&action=edit&id=$val[id]">[编辑]</a> <a title="删除" href="$basename&action=delete&id=$val[id]">[删除]</a></td>
+	</tr>
+<!--
+EOT;
+}}print <<<EOT
+-->
+</table>
+</div>
+<input type="hidden" name="action" value="ifopen" />
+<div class="tac mb10">
+	<span class="btn"><span><button type="submit">启 用</button></span></span>
+</div>
+</form>
+<!--
+EOT;
+}elseif($action=='add' || $action=='edit'){print <<<EOT
+-->
+<style type="text/css">
+.checkon{background:#CAFFC0;}
+</style>
+<form action="$basename" name="setform" method="post" onsubmit="return checkform();">
+<h2 class="h1">
+<!--
+EOT;
+if($action=='add'){print <<<EOT
+-->
+		<span class="mr10">添加帖子格式</span>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+		<span class="mr10">编辑帖子格式</span>
+<!--
+EOT;
+}print <<<EOT
+-->
+<a href="$basename" class="linka">返回上一级<span class="f9">▲</span></a></h2>
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+	<tr class="tr1 vt">
+		<td class="td1">标题</td>
+		<td class="td2"><input type="text" class="input" name="name" value="$name" size="40" onchange="ShowTitle();" /></td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">帖子格式</td>
+		<td class="td2">
+			<fieldset id="tagmenu" style="border:1px solid $tdcolor;width:250px;padding:0 3px;float:right">
+				<legend>栏目编辑器</legend>
+				<div style="padding:5px">
+					<table>
+						<tr>
+							<td>栏目名称:</td>
+							<td><input class="input input_wa" type="text" name="title" /></td>
+						</tr>
+						<tr>
+							<td>栏目类型:</td>
+							<td>
+								<select name="type" onchange="ShowType(this.value);">
+									<option value="0">文本输入框</option>
+									<option value="1">下拉选择框</option>
+								</select>
+							</td>
+						</tr>
+						<tr id="e_content" style="display:none;">
+							<td>选项内容:<br />(一行一个)</td>
+							<td><textarea name="content" class="textarea" style="height:50px;width:150px;"></textarea></td>
+						</tr>
+					</table>
+					<div class="tac" style="padding-top:10px">
+						<span class="btn2"><span><button type="button" value="添 加" onclick="addcol('1');">添 加</button></span></span>
+						<span class="bt2"><span><button type="button" value="修 改" onclick="addcol('2');">修 改</button></span></span>
+						<span class="bt2"><span><button type="button" value="删 除" onclick="delcol();">删 除</button></span></span>
+					</div>
+				</div>
+			</fieldset>
+			<div class="admin_table_c">
+			<table width="350" cellspacing="0" cellpadding="0">
+				<tr class="head" onclick="clearselid();">
+					<td colspan="2" id="s_title"></td>
+				</tr>
+				<tbody id="s_table">
+<!--
+EOT;
+if($action=='edit'){
+foreach($setform as $k=>$v){print <<<EOT
+-->
+				<tr id="col_$k" class="tr1 vt" onclick="editcol(this.id);">
+					<td>$v[0]</td>
+					<td>
+<!--
+EOT;
+if($v[1]){
+$option = explode(',',$v[1]);
+print <<<EOT
+--><select><!--
+EOT;
+foreach($option as $v1){print <<<EOT
+--><option>$v1</option><!--
+EOT;
+}print <<<EOT
+--></select><!--
+EOT;
+}else{print <<<EOT
+--><input type="text" class="input" /><!--
+EOT;
+}print <<<EOT
+-->
+					</td>
+				</tr>
+<!--
+EOT;
+}}print <<<EOT
+-->
+				</tbody>
+			</table>
+			</div>
+		</td>
+	</tr>
+</table>
+</div>
+<input type="hidden" name="action" value="$action" />
+<input type="hidden" name="id" value="$id" />
+<input type="hidden" name="step" value="3" />
+<div class="tac mb10"><span class="btn"><span><button type="submit">提 交</button></span></span></div> </form><br/>
+<script language="JavaScript">
+var colnum = '$num';
+var selid  = '';
+function ShowTitle(){
+	var v = document.setform.name.value;
+	getObj('s_title').innerHTML = v ? v : '';
+}
+function ShowType(id){
+	document.setform.type.options[id].selected = true;
+	getObj('e_content').style.display = id==1 ? '' : 'none';
+}
+function addcol(id){
+	if(id==1){
+		var s = document.createElement('tr');
+		s.className		= 'tr1 vt';
+		s.id			= 'col_' + colnum;
+		s.onmouseover	= function(){if(this.className!='checkon'){this.className='tr1 vt';};};
+		s.onmouseout	= function(){if(this.className!='checkon'){this.className='tr1 vt';};};
+		s.onclick		= function(){editcol(this.id);};
+		if(selid==''){
+			getObj('s_table').appendChild(s);
+		} else{
+			getObj('s_table').insertBefore(s,getObj(selid));
+		}
+		colnum ++;
+	} else{
+		if(selid == '')return;
+		var s = getObj(selid);
+		while(s.hasChildNodes()){
+			s.removeChild(s.firstChild);
+		}
+	}
+	var d = document.createElement('td');
+	d.innerHTML = document.setform.title.value;
+	s.appendChild(d);
+	var d = document.createElement('td');
+	var type = document.setform.type.value;
+	if(type==0){
+		d.innerHTML = '<input type="text" class="input" />';
+	} else{
+		var content = document.setform.content.value.split("\\n");
+		var html    = "<select name=''>";
+		for(var i=0;i<content.length;i++){
+			html   += '<option>'+content[i]+'</option>';
+		}
+		html       += "</select>";
+		d.innerHTML = html;
+	}
+	s.appendChild(d);
+}
+function editcol(id){
+	selid = id;
+	var ds = get_tags(getObj('s_table'),'tr');
+	for(var i=0;i<ds.length;i++){
+		ds[i].className = id==ds[i].id ? 'checkon' : 'tr1 vt';
+	}
+	var o	= getObj(id);
+	var td1 = o.firstChild;
+	var td2 = o.lastChild;
+	document.setform.title.value = td1.innerHTML;
+	if(td2.firstChild.tagName.toLowerCase() == 'input'){
+		ShowType('0');
+	} else{
+		ShowType('1');
+		var sel  = td2.firstChild.options;
+		var html = '';
+		for(var i=0;i<sel.length;i++){
+			html += (html ? "\\n" : '')+sel[i].text;
+		}
+		document.setform.content.value = html;
+	}
+}
+function delcol(){
+	if(selid!=''){
+		getObj('s_table').removeChild(getObj(selid));
+		selid = '';
+	}
+}
+function clearselid(){
+	selid = '';
+	var ds = get_tags(getObj('s_table'),'tr');
+	for(var i=0;i<ds.length;i++){
+		ds[i].className = 'tr1 vt';
+	}
+}
+function checkform(){
+	if(document.setform.name.value == ''){
+		alert('标题不能为空');
+		return false;
+	}
+	var s = getObj('s_table');
+	if(s.hasChildNodes()){
+		var ds = get_tags(s,'tr');
+		var input;
+		for(var i=0;i<ds.length;i++){
+			input		= document.createElement('input');
+			input.type	= 'hidden';
+			input.name	= 'value['+i+']';
+			input.value	= ds[i].firstChild.innerHTML;
+			document.setform.appendChild(input);
+			if(ds[i].lastChild.firstChild.tagName.toLowerCase() == 'select'){
+				input	= document.createElement('input');
+				input.type	= 'hidden';
+				input.name	= 'descipt['+i+']';
+				var sel  = ds[i].lastChild.firstChild.options;
+				var html = '';
+				for(var j=0;j<sel.length;j++){
+					html += (html ? "," : '')+sel[j].text;
+				}
+				input.value	= html;
+				document.setform.appendChild(input);
+			}
+		}
+		return true;
+	} else{
+		alert('您没有添加相关栏目');
+		return false;
+	}
+}
+ShowTitle();
+</script>
+<!--
+EOT;
+}include_once PrintEot('adminbottom');
+?>-->

@@ -1,0 +1,196 @@
+<!--<?php
+require_once(uTemplate::printEot('header'));
+require_once(uTemplate::printEot('space_appleft'));
+print<<<EOT
+-->
+<script type="text/javascript">
+function wordlength(target,maxLength){
+	var val = target.value;
+	var n = 2*val.length-val.replace(/[\u4e00-\u9fa5]/g,'').length;
+	var val=target.value;
+	while(n>maxLength)
+	{
+		var key = val.substr(-1);
+		target.value=val.substr(0,val.length-1);
+		val = target.value;
+		n -= /[\u4e00-\u9fa5]/.test(key)?2:1;
+	}
+	str='('+n+'/'+maxLength+')';
+	var tip = getObj('span_'+target.name);
+	tip.innerHTML = str;
+	if(n==maxLength){
+		tip.className='s3';
+	}else{
+		tip.className="s6";
+	}
+}
+</script>
+<div class="sideB" style="width:750px;">
+	<div class="boxA">
+	<table width="100%"><tr><td class="vt" height="436">
+			<div class="p15">
+      	<h4 class="site"><img src="u/images/module/set.png" class="mr10" /><span>空间装扮</span></h4>
+				<div class="navC mb10">
+					<ul id="tabList">
+						<li id="tab_basic"{$sel_basic}><a href="javascript:" hidefocus="true">基本设置</a></li>
+						<li id="tab_skin"{$sel_skin}><a href="javascript:" hidefocus="true">风格皮肤</a></li>
+						<li id="tab_model"{$sel_model}><a href="javascript:" hidefocus="true">首页模块设置</a></li>
+					</ul>
+				</div>
+				<form action="u.php?a=set" method="post" enctype="multipart/form-data">
+				<input type="hidden" name="step" value="3" />
+				<div id="set_basic" style="display:$style_basic">
+				<div class="p10">
+					<table width="100%" class="setTable">
+						<tr>
+							<th class="th">空间名称</th>
+							<td class="td">
+								<input name="name" id="name" type="text" class="input input_wb" value="$space[name]" onkeyup="wordlength(this,80)" />
+								<span class="s6" id="span_name">($space[namelength]/80)</span>
+							</td>
+						</tr>
+						<tr>
+							<th class="th">空间简介</th>
+							<td class="td">
+								<textarea name="descript"  class="textareaA fl mr10"  onkeyup="wordlength(this,255)">$space[descript]</textarea>
+								<span id="span_descript" class="fl">($space[desclength]/255)</span>
+							</td>
+						</tr>
+						<tr>
+							<th class="th">背景图片</th>
+							<td class="td">
+								<input name="banner" id="banner" type="file" class="input input_wa mb5" onchange="uploadbanner();">
+								<script type="text/javascript">
+									function uploadbanner(){
+										var atm=getObj('banner');
+										var path = getObj('banner').value;
+										var maxUploadSize;
+										if('$maxuploadsize'){
+										 	maxUploadSize=parseInt('$maxuploadsize'.split('M')[0])*1024*1024;
+										}else{
+											maxUploadSize=2048000;
+										}
+										if(atm.files)
+										{
+											filesize =atm.files[0].fileSize;
+										}
+										else if (window.navigator.userAgent.indexOf("MSIE 6") > 0 && !window.XMLHttpRequest) {
+												var img = new Image();
+												img.dynsrc =path;
+												filesize =img.fileSize;
+										}
+										if(filesize && filesize>maxUploadSize){
+											showDialog('warning','附件大小不能超过'+ maxUploadSize/1024/1024 +'M');
+											atm.value=null;
+											if(is_ie){
+												atm.select();
+												document.execCommand('delete');
+											}else
+													atm.value=null;
+													return false;
+										}
+									}
+								</script>
+<!--
+EOT;
+if ($space['banner']) {print <<<EOT
+-->
+								<div class="fileImg1" id="dellogo"><img src="$space[banner_s]" width="400" /> <a href="pw_ajax.php?action=delspacelogo" onclick="return dellogo(this.href);">[删]</a></div>
+<script type="text/javascript">
+function dellogo(url) {
+	ajax.send(url, '', function() {
+		if (ajax.request.responseText == 'ok') {
+			getObj('dellogo').style.display = 'none';
+		} else {
+			ajax.guide();
+		}
+	});
+	return false;
+}
+</script>
+<!--
+EOT;
+}print <<<EOT
+-->
+							</td>
+						</tr>
+						<!-- <tr>
+							<th class="th">空间域名</th>
+							<td class="td">
+								$db_bbsurl/u/ <input name="domain" type="text" class="input input_wc" value="$space[domain]" />
+							</td>
+						</tr> -->
+						<tr>
+							<th class="th">
+								空间类型
+							</th>
+							<td class="td">
+								<ul class="lh_24">
+									<li><label><input name="spacetype" type="radio" value="0"{$ifcheck_0} /> 交友型空间</label></li>
+									<li><label><input name="spacetype" type="radio" value="1"{$ifcheck_1} /> 博客型空间</label></li>
+								</ul>
+							</td>
+						</tr>
+					</table>
+				</div>
+				</div>
+				<div id="set_skin" style="display:$style_skin">
+					<h5 class="h5 mb10"><strong>选择你喜欢的风格</strong></h5>
+					<ul style="width:550px;margin:20px auto;">
+<!--
+EOT;
+foreach ($o_uskin as $key => $value) {
+$ifcheck = ($key == $space['skin']) ? ' checked' : '';
+print <<<EOT
+-->
+						<li class="cc mb10"><label><input type="radio" name="spaceskin" value="$key" class="mr5" {$ifcheck} /><img src="u/themes/$key/images/preview.jpg" width="400" class="mr10" style="vertical-align:middle" /><span class="f14 b s4">$value</span></label></li>
+<!--
+EOT;
+}print <<<EOT
+-->
+					</ul>
+				</div>
+				<div id="set_model" style="display:$style_model">
+					<div class="moduleList mb15">
+						<ul class="cc">
+							<!-- <li>
+								<div class="cc">
+									<span class="fl icon"><img src="u/images/module/info.png" /></span>
+									<h4 class="fl f14 b"><a href="javascript:;">我的资料</a></h4>
+									<span class="fr"><label><input class="checkbox" type="checkbox" checked disabled />显示</label></span>
+								</div>
+								<p class="lh_22">&nbsp;<label class="fl">隐私</label><select name=""><option value="">登录后任何人可见</option></select></p>
+							</li> -->
+<!--
+EOT;
+foreach ($spaceModel as $key) {
+$value = $lang_model[$key];
+$ifcheck = $space['modelset'][$key]['ifopen'] ? ' checked' : '';
+print <<<EOT
+-->
+							<li>
+								<div class="cc">
+									<span class="fl icon"><img src="u/images/module/$value[2].png" /></span>
+									<h4 class="fl f14 b"><a href="javascript:;">$value[0]</a></h4>
+									<span class="fr"><label><input type="checkbox" name="ifopen[$key]" value="1"{$ifcheck} />显示</label></span>
+								</div>
+								<p class="lh_22"><!--label class="fl">隐私</label><select name=""><option value="">登录后任何人可见</option></select--><label class="fl">&nbsp;</label>&nbsp;展示&nbsp;<input type="text" name="shownum[$key]" class="input mr5" value="{$space['modelset'][$key]['num']}" size="1" />$value[1]</p>
+							</li>
+<!--
+EOT;
+}print <<<EOT
+-->
+						</ul>
+					</div>
+				</div>
+				<div class="tac p10"><span class="btn"><span><button type="submit">保 存</button></span></span></div>
+				</form>
+				</div>
+	</td></tr></table>
+	</div>
+</div>
+<script type="text/javascript">window.onReady(function(){new pwTab('tabList', 'tab_', 'set_', 'spacemodeset');});</script>
+<!--
+EOT;
+require_once(uTemplate::printEot('footer'));
+?>-->

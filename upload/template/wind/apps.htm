@@ -1,0 +1,110 @@
+<!--<?php
+if($q=='blooming'){print <<<EOT
+-->
+<form action="apps.php?ajax=1&q=updata" method="post" onsubmit="return false;">
+<input type="hidden" name="tid" value="$tid" />
+<table width="100%" cellspacing="1" cellpadding="5">
+	<tr><th colspan="6" class="h" style="cursor:move" onmousedown="read.move(event);"><span class="fr" style="margin-top:2px;cursor:pointer" onclick="closep();"><img src="$imgpath/close.gif" /></span>帖子交换</th></tr>
+	<tr>
+		<td>选择分类:
+			<select name="cid" style="width:120px;">
+<!--
+EOT;
+foreach($openclass as $key=>$value){
+print<<<EOT
+-->
+				<option value="$value[cid]" />$value[name]</option>
+<!--
+EOT;
+}print <<<EOT
+-->
+			</select>
+		</td>
+	</tr>
+</table>
+<input type="hidden" name="step" value="2" />
+<ul><li style="text-align:center;padding:4px 0;"><input type="button" class="btn" onclick="ajax.submit(this.form);" value="提 交" /></li></ul></form>
+<!--
+EOT;
+}elseif($q=='survey'){print<<<EOT
+-->
+<div class="t">
+	<table width="100%" align="center" cellspacing="0" cellpadding="0">
+		<tr><td class="h" colspan="4"><b>问卷列表</b></td></tr>
+		<tr class="tr3 tac">
+<!--
+EOT;
+foreach($survey_cache as $item){
+$j+=1;
+if($j%4!='0'){
+print<<<EOT
+-->
+			<td width="25%"><a href="survey.php?itemid=$item[itemid]">$item[subject]</a></td>
+<!--
+EOT;
+}else{
+print<<<EOT
+-->
+		</tr>
+		<tr>
+<!--
+EOT;
+}}print<<<EOT
+-->
+		</tr>
+	</table>
+</div>
+<div>
+	<center>
+		<iframe frameborder="0" scrolling="auto" style="width:100%;height:{$survey[frameheight]}px;border:none" src="{$survey[url]}"></iframe>
+	</center>
+</div>
+<!--
+EOT;
+}elseif ($q=='appthread') {
+if ($do) {
+print <<<EOT
+-->
+<table width="400" cellspacing="0" cellpadding="5">
+<tr><th colspan="2" class="h" style="cursor:move" onmousedown="read.move(event);"><span class="fr" style="margin-top:2px;cursor:pointer" onclick="closep();"><img src="$imgpath/close.gif" /></span>充实内容</th></tr>
+<tr><td colspan="2">
+<iframe id="pwthread" name="pwthread" scrolling="no" width="650" src="$app_url" frameborder="0"></iframe>
+</td></tr></table>
+<!--
+EOT;
+}else {
+print <<<EOT
+-->
+<table width="400" cellspacing="0" cellpadding="5">
+<tr><th colspan="2" class="h" style="cursor:move" onmousedown="read.move(event);"><span class="fr" style="margin-top:2px;cursor:pointer" onclick="closep();"><img src="$imgpath/close.gif" /></span>精品下载</th></tr>
+<tr>
+<td align="center">
+<a style="margin-left:40px;" href="javascript:;" id="" onclick="sendmsg('apps.php?q=appthread&do=good&forumid=$forumid','',this.id)" title="">批量导入精品帖</a></td>
+<td>
+<a style="margin-left:20px;" href="javascript:;" id="" onclick="sendmsg('apps.php?q=appthread&do=pack&forumid=$forumid','',this.id)" title="">批量导入主题精品包</a>
+</td></tr>
+</table>
+<!--
+EOT;
+}}else{
+require_once(uTemplate::printEot('header'));
+//require_once(uTemplate::printEot('user_appleft'));
+print<<<EOT
+-->
+<script type="text/javascript" src="{$db_server_url}/js/global.js"></script>
+<script language="JavaScript">
+var server = new PwJs.Server("pwapp");
+server.registHandler('setTitle');
+server.start();
+
+function setTitle(title) {
+	document.title = title + ' $webPageTitle - Powered by phpwind.net';
+}
+</script>
+<div class="contUser">
+	<iframe id="pwapp" name="pwapp" frameborder="0" width="100%" height="800" scrolling="no" src="{$url}"></iframe>
+</div>
+<!--
+EOT;
+require_once(uTemplate::printEot('footer'));
+}?>-->

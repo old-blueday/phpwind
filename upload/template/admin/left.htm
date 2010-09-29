@@ -1,0 +1,31 @@
+<!--<?php
+include_once PrintEot('css');print <<<EOT
+-->
+<script type="text/javascript">
+var manageclass = {
+	superdel : function (obj,forumid,step){
+		var form = getObj(forumid);
+		form.step.value = step;
+		var page = obj.getAttribute("page");
+		if(!page){
+			page = getObj("input_page").value;
+		}
+		page = (page) ? page : 1;
+		form.page.value = page;
+		setTimeout(function(){
+			form.submit();
+		},0);
+	}
+}
+window.onload = function(){
+	if(parent.adminNavClass){
+		parent.adminNavClass.initTips();
+	}
+}
+</script>
+</head>
+<body>
+<div class="wrap">
+<!--
+EOT;
+?>

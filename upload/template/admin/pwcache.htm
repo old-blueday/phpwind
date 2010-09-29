@@ -1,0 +1,106 @@
+<!--<?php
+include_once PrintEot('left');
+print <<<EOT
+-->
+<div class="admin_info mb10">
+  <h3 class="h1"><b>提示信息</b></h3>
+  <div class="legend"><ol><li>PW缓存库主要用于各种站点模式的不同应用</li>
+	<li>请根据各个元素的使用情况而选择需要开启的缓存</li></ol></div>
+</div>
+<form action="$basename&" method="post">
+  <input type="hidden" name="step" value="2">
+  <h2 class="h1"><span class="mr20">PW缓存库设置</span><span class="linka">勾选缓存项，提交后完成开启。<font color="red">开启后，请务必点击后面的更新缓存按钮</font></span></h2>
+  <div class="admin_table mb10">
+    <table cellpadding="0" cellspacing="0" width="100%">
+    <tr class="tr1 vt">
+        <td class="td2" width="20"><input type="checkbox" value="1" name="config[ifpwcache][]" $ifpwcache_1></td>
+        <td class="td3"> 会员信息(总发帖,本月发帖,今日发帖,在线时间,会员积分)</td>
+        <td class="td2">
+            <span class="bt2"><span><button type="button" onclick="window.location=('$basename&action=update&type=usersort');">更新缓存</button></span></span>
+        </td>
+    </tr>
+    <tr class="tr1 vt">
+        <td class="td2"><input type="checkbox" value="2" name="config[ifpwcache][]" $ifpwcache_2></td>
+        <td class="td3"> 热门帖(总回复数)<br /></td>
+        <td class="td2">
+            <span class="bt2"><span><button type="button" onclick="window.location=('$basename&action=update&type=replysort');">更新缓存</button></span></span>
+        </td>
+    </tr>
+    <tr class="tr1 vt">
+        <td class="td2"><input type="checkbox" value="4" name="config[ifpwcache][]" $ifpwcache_4></td>
+        <td class="td3"> 热门帖(每天回复数)<br /></td>
+        <td class="td2">
+            <span class="bt2"><span><button type="button" onclick="window.location=('$basename&action=update&type=replysortday');">更新缓存</button></span></span>
+        </td>
+    </tr>
+    <tr class="tr1 vt">
+        <td class="td2"><input type="checkbox" value="8" name="config[ifpwcache][]" $ifpwcache_8></td>
+        <td class="td3"> 热门帖(每周回复数)<br /></td>
+        <td class="td2">
+            <span class="bt2"><span><button type="button" onclick="window.location=('$basename&action=update&type=replysortweek');">更新缓存</button></span></span>
+        </td>
+    </tr>
+    <tr class="tr1 vt">
+        <td class="td2"><input type="checkbox" value="16" name="config[ifpwcache][]" $ifpwcache_16></td>
+        <td class="td3"> 人气帖(总点击数)<br /></td>
+        <td class="td2">
+            <span class="bt2"><span><button type="button" onclick="window.location=('$basename&action=update&type=hitsort');">更新缓存</button></span></span>
+        </td>
+    </tr>
+    <tr class="tr1 vt">
+        <td class="td2"><input type="checkbox" value="32" name="config[ifpwcache][]" $ifpwcache_32></td>
+        <td class="td3"> 人气帖(每天点击数)<br /></td>
+        <td class="td2">
+            <span class="bt2"><span><button type="button" onclick="window.location=('$basename&action=update&type=hitsortday');">更新缓存</button></span></span>
+        </td>
+    </tr>
+    <tr style="display:none" class="tr1 vt">
+        <td class="td2"><input type="checkbox" value="64" name="config[ifpwcache][]" $ifpwcache_64></td>
+        <td class="td3"> 人气帖(每周点击数)<br /></td>
+        <td class="td2">
+            <span class="bt2"><span><button type="button" onclick="window.location=('$basename&action=update&type=hitsortweek');">更新缓存</button></span></span>
+        </td>
+    </tr>
+    <tr style="display:none" class="tr1 vt">
+        <td class="td2"><input type="checkbox" value="128" name="config[ifpwcache][]" $ifpwcache_128></td>
+        <td class="td3"> 最新帖<br /></td>
+        <td class="td2">
+            <span class="bt2"><span><button type="button" onclick="window.location=('$basename&action=update&type=newsubject');">更新缓存</button></span></span>
+        </td>
+    </tr>
+    <tr style="display:none" class="tr1 vt">
+        <td class="td2"><input type="checkbox" value="256" name="config[ifpwcache][]" $ifpwcache_256></td>
+        <td class="td3"> 最新回复<br /></td>
+        <td class="td2">
+            <span class="bt2"><span><button type="button" onclick="window.location=('$basename&action=update&type=newreply');">更新缓存</button></span></span>
+        </td>
+    </tr>
+    <tr class="tr1 vt">
+        <td class="td2"><input type="checkbox" value="512" name="config[ifpwcache][]" $ifpwcache_512></td>
+        <td class="td3"> 最新图片<br /></td>
+        <td class="td2">
+            <span class="bt2"><span><button type="button" onclick="window.location=('$basename&action=update&type=newpic');">更新缓存</button></span></span>
+        </td>
+    </tr>
+    <tr class="tr1 vt">
+        <td class="td2"><input type="checkbox" value="1024" name="config[ifpwcache][]" $ifpwcache_1024></td>
+        <td class="td3"> 热门收藏<br /></td>
+        <td class="td2">
+            <span class="bt2"><span><button type="button" onclick="window.location=('$basename&action=update&type=hotfavor');">更新缓存</button></span></span>
+        </td>
+    </tr>
+      <tr class="tr1 vt">
+      	<td class="td2">&nbsp;</td>
+        <td class="td3">缓存库入库数目</td>
+        <td class="td2"><input class="input input_wa" value="$db_cachenum" name="config[cachenum]"></td>
+      </tr>
+    </table>
+  </div>
+  <div class="mb10 tac">
+  	<span class="btn"><span><button type="submit"  value="提 交">提 交</button></span></span>
+  </div>
+</form>
+<!--
+EOT;
+include_once PrintEot('adminbottom');
+?>-->

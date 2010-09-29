@@ -1,0 +1,451 @@
+<!--<?php print <<<EOT
+-->
+<div id="breadCrumb">
+		<img src="$imgpath/$stylepath/thread/home-old.gif" align="absmiddle" />&nbsp;<a href="$db_bfn?m=bbs" title="$db_bbsname">$db_bbsname</a><em>&gt;</em><a href="$basename">勋章中心</a>
+</div>
+<div style="margin-top:10px">
+<table width="100%" align="center" cellpadding="0" cellspacing="0">
+<tr>
+<td width="22%" valign="top">
+<div class="t" style="margin-right:10px;">
+<table width="100%" cellspacing="0" cellpadding="0" align="center">
+	<tr>
+		<td class="h">
+			操作
+		</td>
+	</tr>
+	<tr class="tr3">
+		<td>
+			<a href="$basename">勋章介绍</a>
+		</td>
+	</tr>
+<!--
+EOT;
+if($md_ifapply && strpos($md_appgroups,",$groupid,")!==false){print <<<EOT
+-->
+	<tr class="tr3">
+		<td>
+			<a href="$basename&action=apply">申请勋章</a>
+		</td>
+	</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+	<tr class="tr3">
+		<td>
+			<a href="$basename&action=list">获得勋章名单</a>
+		</td>
+	</tr>
+	<tr class="tr3">
+		<td>
+			<a href="$basename&action=log">勋章颁发情况</a>
+		</td>
+	</tr>
+
+<!--
+EOT;
+if(strpos($md_groups,",$groupid,")!==false){print <<<EOT
+-->
+	<tr class="tr3">
+		<td>
+			<a href="$basename&action=award">颁发勋章</a>
+		</td>
+	</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+<!--
+EOT;
+if($md_ifapply && strpos($md_groups,",$groupid,")!==false){print <<<EOT
+-->
+	<tr class="tr3">
+		<td>
+			<a href="$basename&action=approve">审核申请</a>
+		</td>
+	</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+</table>
+</div>
+<div class="t" style="margin-right:10px;">
+<table width="100%" cellpadding="0" cellspacing="0">
+	<tr>
+		<td class="h">您获得的勋章</td>
+	</tr>
+	<tr class="tr1">
+		<th style="text-align:center">
+			$userface<br /><br />
+<!--
+EOT;
+if($userdb['medals']){
+foreach($userdb['medals'] as $key=>$value){
+if($_MEDALDB[$value][picurl]){print <<<EOT
+-->
+			<img src="$hkimg/{$_MEDALDB[$value][picurl]}" title="{$_MEDALDB[$value][name]}"/>
+<!--
+EOT;
+}}}else{print <<<EOT
+-->
+			<br/>您还没有勋章
+<!--
+EOT;
+}print <<<EOT
+-->
+		</th>
+	</tr>
+</table>
+</div>
+</td>
+<td valign="top">
+<!--
+EOT;
+if(!$action){print <<<EOT
+-->
+<div class="t">
+<table width="100%" cellspacing="0" cellpadding="0" align="center">
+	<tr><td class="h" colspan="4">勋章介绍</td></tr>
+	<tr class="tr2 tac">
+		<td width="5%">ID</td>
+		<td width="15%">勋章名称</td>
+		<td width="*">勋章说明</td>
+		<td width="15%">勋章图片</td>
+	</tr>
+<!--
+EOT;
+$num=0;
+foreach($_MEDALDB as $key => $value){
+if($md_ifapply && strpos($md_appgroups,",$groupid,")!==false && !in_array($key,$userdb['medals'])){
+	$value[name] = "<a href=\"$basename&action=apply&id=$value[id]\" title=\"申请此勋章\">".$value[name]."</a>";
+}
+$num++;
+print <<<EOT
+-->
+	<tr class="tr3 tr tac">
+		<td>$num</td>
+		<td>$value[name]</td>
+		<th>$value[intro]</th>
+		<td><img src="$hkimg/$value[picurl]" /></td>
+	</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+</table></div>
+<!--
+EOT;
+}elseif($action=='list'){print <<<EOT
+-->
+<div class="t">
+<table width="100%" cellspacing="0" cellpadding="0" align="center">
+	<tr><td class="h" colspan="4">获得勋章名单</td></tr>
+	<tr class="tr2 tac">
+		<td width="5%">ID</td>
+		<td>用户名</td>
+		<td>所获勋章</td>
+	</tr>
+<!--
+EOT;
+$num=($page-1)*$db_perpage;
+foreach($listdb as $key=>$value){
+$num++;
+print <<<EOT
+-->
+	<tr class="tr3 tr tac">
+		<td>$num</td>
+		<td><a href="u.php?uid=$value[uid]" target="_blank">$value[username]</a></td>
+		<td>$value[medals]</td>
+	</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+</table></div>
+<div class="t cc">
+	$pages
+</div>
+<!--
+EOT;
+}elseif($action=='award'){print <<<EOT
+-->
+<form method="post" action="$basename&action=award&">
+<input type="hidden" name="step" value="2" />
+<div class="t">
+<table width="100%" cellspacing="0" cellpadding="0" align="center">
+	<tr><td class="h" colspan="4">颁发勋章</td></tr>
+	<tr class="tr3 tr">
+		<td style="text-align:right" width="30%">用户名: </td>
+		<th><input class="input" type="text" name="pwuser" size="40" value="$pwuser"/>(多个用户可用","号隔开)</th>
+	</tr>
+	<tr class="tr3 tr">
+		<td style="text-align:right">选择操作: </td>
+		<th>
+			<input type="radio" name="type" value="1" $type_1 /> 颁发
+			<input type="radio" name="type" value="2" $type_2/> 收回
+		</th>
+	</tr>
+	<tr class="tr3 tr">
+		<td style="text-align:right">选择勋章: </td>
+		<th>
+			<select name="medal">
+				<option>选择勋章</option>
+<!--
+EOT;
+foreach($_MEDALDB as $key=>$value){
+if($medal){
+	$selected = $medal==$key ? "selected=\"selected\"":"";
+}else{
+	$selected = "";
+}
+print <<<EOT
+-->
+				<option value="$key" $selected>$value[name]</option>
+<!--
+EOT;
+}print <<<EOT
+-->
+			</select>
+		</th>
+	</tr>
+	<tr class="tr3 tr">
+		<td style="text-align:right">有效期:</td>
+		<th>
+			<select name="timelimit">
+				<option value="0">永久</option>
+				<option value="1">一个月</option>
+				<option value="3">三个月</option>
+				<option value="6">六个月</option>
+				<option value="12">一年</option>
+			</select>
+		</th>
+	</tr>
+	<tr class="tr3 tr">
+		<td style="text-align:right">操作理由: </td>
+		<th><input class="input" type="text" name="reason" size="50" /></th>
+	</tr>
+</table></div>
+<div style="text-align:center;margin-bottom:25px"><input class="btn" type="submit" value="提 交" /></div>
+</form>
+<!--
+EOT;
+}elseif($action=='log'){print <<<EOT
+-->
+<div class="t">
+<table width="100%" cellspacing="0" cellpadding="0" align="center">
+	<tr><td class="h" colspan="9">勋章颁发情况</td></tr>
+	<tr class="tr2 tac">
+		<td width="5%">ID</td>
+		<td width="12%">用户名</td>
+		<td width="12%">管理员</td>
+		<td width="10%">勋章名称</td>
+		<td width="7%">操作</td>
+		<td><div style="table-layout:fixed;word-wrap:break-word;">操作原因</div></td>
+		<td width="15%">操作时间</td>
+		<td width="7%">有效期</td>
+<!--
+EOT;
+if($groupid==3){print <<<EOT
+-->
+		<td width="6%">删除</td>
+<!--
+EOT;
+}print <<<EOT
+-->
+	</tr>
+<!--
+EOT;
+$num=($page-1)*$db_perpage;
+foreach($logdb as $key=>$value){
+$num++;
+print <<<EOT
+-->
+	<tr class="tr3 tac">
+		<td>$num</td>
+		<td>$value[awardee]</td>
+		<td>$value[awarder]</td>
+		<td>{$_MEDALDB[$value[level]][name]}<br /></td>
+<!--
+EOT;
+if($value[action]==1){print <<<EOT
+-->
+		<td>颁发</td>
+<!--
+EOT;
+}elseif($value[action]==2){print <<<EOT
+-->
+		<td>收回</td>
+<!--
+EOT;
+}print <<<EOT
+-->
+		<td>$value[why]<br /></td>
+		<td>$value[awardtime]</td>
+<!--
+EOT;
+if($value[action]==1){
+if($value[timelimit]<1){print <<<EOT
+-->
+		<td>永久</td>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+		<td>$value[timelimit] 个月</td>
+<!--
+EOT;
+}}else{ print <<<EOT
+-->
+		<td>--</td>
+<!--
+EOT;
+}if($groupid==3){
+if($value['action']==1 && $value['state']==0 && $value['timelimit']>0){print <<<EOT
+-->
+		<td>--</td>
+<!--
+EOT;
+}else{ print <<<EOT
+-->
+		<td><a href="$basename&action=log&job=del&id=$value[id]">删除</a></td>
+<!--
+EOT;
+}}print <<<EOT
+-->
+	</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+</table></div>
+<div class="t cc" style="width:98%;margin-right:0;border:none;">
+	$pages
+</div>
+<!--
+EOT;
+}elseif($action=='apply'){
+print <<<EOT
+-->
+<form method="post" action="$basename&action=apply&">
+<input type="hidden" name="step" value="2" />
+<div class="t">
+<table width="100%" cellspacing="0" cellpadding="0" align="center">
+	<tr><td class="h" colspan="4">申请勋章</td></tr>
+	<tr class="tr3 tr">
+		<td style="text-align:right" width="30%">选择勋章: </td>
+		<th>
+			<select name="medal">
+				<option>选择勋章</option>
+<!--
+EOT;
+foreach($_MEDALDB as $key=>$value){
+$selected = $key==$id ? "selected='selected'":'';
+print <<<EOT
+-->
+				<option value="$key" $selected>$value[name]</option>
+<!--
+EOT;
+}print <<<EOT
+-->
+			</select>
+		</th>
+	</tr>
+	<tr class="tr3 tr">
+		<td style="text-align:right">有效期:</td>
+		<th>
+			<select name="timelimit">
+				<option value="0">永久</option>
+				<option value="1">一个月</option>
+				<option value="3">三个月</option>
+				<option value="6">六个月</option>
+				<option value="12">一年</option>
+			</select>
+		</th>
+	</tr>
+	<tr class="tr3 tr">
+		<td style="text-align:right">申请理由: </td>
+		<th><input class="input" type="text" name="reason" size="50" /></th>
+	</tr>
+</table></div>
+<div style="text-align:center;margin-bottom:25px"><input class="btn" type="submit" value="提 交" /></div>
+</form>
+<!--
+EOT;
+}elseif($action=='approve'){
+print <<<EOT
+-->
+<form action="$basename&action=approve&" method="post">
+<div class="t">
+<table width="100%" cellspacing="0" cellpadding="0" align="center">
+	<tr><td class="h" colspan="8">勋章申请列表</td></tr>
+	<tr class="tr2 tac">
+		<td width="5%">选择</td>
+		<td width="5%">ID</td>
+		<td width="12%">用户名</td>
+		<td width="10%">勋章名称</td>
+		<td><div style="table-layout:fixed;word-wrap:break-word;">操作原因</div></td>
+		<td width="15%">申请时间</td>
+		<td width="7%">有效期</td>
+		<td width="10%">操作</td>
+	</tr>
+<!--
+EOT;
+$num=($page-1)*$db_perpage;
+foreach($appdb as $key=>$value){
+$value[awardee1]=urlencode($value[awardee]);
+$num++;
+print <<<EOT
+-->
+	<tr class="tr3 tac">
+		<td><input name="id[]" value="$value[id]" type="checkbox"></td>
+		<td>$num</td>
+		<td><a href="u.php?username=$value[awardee]" target="_blank" >$value[awardee]</a></td>
+		<td>{$_MEDALDB[$value[level]][name]}<br /></td>
+		<td>$value[why]<br /></td>
+		<td>$value[awardtime]</td>
+<!--
+EOT;
+if($value[timelimit]<1){print <<<EOT
+-->
+		<td>永久</td>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+		<td>$value[timelimit] 个月</td>
+<!--
+EOT;
+}print <<<EOT
+-->
+		<td><a href="$basename&action=approve&job=del&id=$value[id]">删除</a>|<a href="$basename&action=approve&job=pass&id=$value[id]">通过</a></td>
+	</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+</table>
+</div>
+<center>
+	<input class="btn" name="chkall" value="全选" onclick="CheckAll(this.form)" type="button">
+	<input class="btn" value="提交" type="submit">
+	<input name="job" value="pass" type="radio">通过
+	<input name="job" value="del" checked="checked" type="radio">删除
+</center>
+</form>
+<div class="t cc">
+	$pages
+</div>
+<SCRIPT type="text/javascript" LANGUAGE="JavaScript" src="js/core/friendlist.js"></SCRIPT>
+
+<!--
+EOT;
+}print <<<EOT
+-->
+</td>
+</tr>
+</table></div>
+<!--
+EOT;
+?>-->

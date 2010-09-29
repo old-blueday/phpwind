@@ -1,0 +1,54 @@
+<!--<?php
+print <<<EOT
+-->
+<script type="text/javascript">
+function clearMessage(){
+	var type = document.getElementsByName('clear[]');
+	var checked = false;
+	for(var i=0;i<type.length;i++){
+		if(type[i].checked){
+			checked = true;
+			break;
+		}
+	}
+	if(!checked){
+		MC.showFailTips("请选择要清空的消息类别");
+		MC.fadeTips();
+		return false;
+	}
+	MC.tips('confirm','清空后消息永久删除<br/>是否要清空？',0,function(){document.FORM.submit()});
+}
+
+
+</script>
+<div id='hiddenMessage' style="display:none"></div>
+<div class="contUser" id="content">
+    <div class="p15">
+  	<h4 class="site"><span>消息中心设置</span></h4>
+	<div class="navC mb10">
+    	<ul>
+        	<li><a href="{$baseUrl}?type=shield">消息屏蔽</a></li>
+            <li class="current"><a href="{$baseUrl}?type=clear">消息清理</a></li>
+        </ul>
+    </div>
+   <div id="showmessage"></div>
+   <div class="tac p15">$tip</div>
+   <div class="p10">
+  	  <form method="post" id="mainForm" name="FORM" action="$normalUrl&verify=$verifyhash" enctype = "multipart/form-data">
+  	  		<input type="hidden" name="step" value="2"/>
+            <ul class="mb20 ulC cc">              
+                 <li><input name="clear[]"  type='checkbox' value='sms'	>站内信</li>
+                 <li><input name="clear[]" type='checkbox' value='notice' >通知</li>
+                 <li><input name="clear[]" type='checkbox' value='groupsms' >群消息</li>
+                 <li><input name="clear[]" type='checkbox' value='request' >请求</li>
+                 <li><input name="clear[]" type='checkbox' value='history' >历史消息</li>
+             </ul>
+            <div class="tac"><span class="btn"><span><button onclick="clearMessage()" type="button">清空</button></span></span></div>
+       </form> 
+	  </div>
+      </div>
+</div>
+<!--
+EOT;
+require_once(uTemplate::printEot('footer'));
+?>-->

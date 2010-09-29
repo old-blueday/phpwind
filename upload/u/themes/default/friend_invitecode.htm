@@ -1,0 +1,188 @@
+<!--<?php
+print <<<EOT
+-->
+<div class="fr sidebarB">
+<form action="{$thisbase}type=inviteCode" method="post" name="ADDINVITECOD" onsubmit="return addInviCode(document.ADDINVITECOD)">
+<div class="boxC">
+<table class="tA mb10" width="100%">
+	<tr class="tr">
+		<td colspan="2">购买邀请码</td>
+	</tr>
+	<tr>
+		<td width="46%">有效期限</td>
+		<td>{$inv_days}天</td>
+	</tr>
+	<tr>
+		<td>购买时间间隔</td>
+		<td>{$inv_limitdays}天</td>
+	</tr>
+	<tr>
+		<td>价格</td>
+		<td>{$inv_costs} {$usrecredit}</td>
+	</tr>
+	<tr>
+		<td>我的积分</td>
+		<td>{$creditto[$inv_credit]} {$usrecredit}</td>
+	</tr>
+	<tr>
+		<td>购买权限</td>
+		<td><!--
+EOT;
+if($allowinvite){print <<<EOT
+--> 有 <!--
+EOT;
+}else{print <<<EOT
+--> 无 <!--
+EOT;
+}print <<<EOT
+--></td>
+	</tr>
+	<!--
+EOT;
+if($inv_onlinesell){print <<<EOT
+-->
+	<!--<tr class="tr3">
+					<td>在线购买邀请码</td>
+					<td>已开启</td>
+				</tr>
+				<tr class="tr3">
+					<td>在线支付费用</td>
+					<td>{$inv_price} RMB</td>
+				</tr>
+-->
+	<!--
+EOT;
+}print <<<EOT
+-->
+	<tr>
+		<td>购买数量</td>
+		<td><input name="invnum" id="invnum" type="text" class="input input_wc"></td>
+	</tr>
+</table>
+<div class="tac mb10"><span class="btn2"><span>
+<button type="submit">购买</button>
+</span></span></div>
+</div>
+</form>
+</div>
+<div class="fl" style="width:70%;">
+<div class="p10">
+<!--
+EOT;
+if(!empty($invdb) || !empty($t)){
+print <<<EOT
+-->
+<h5 class="h5"><strong class="mr20">邀请码管理</strong>
+<ul class="tab">
+	<li id="t_"><a href="{$thisbase}type=inviteCode">全部</a></li>
+	<li id="t_notused"><a href="{$thisbase}type=inviteCode&t=notused">未使用</a></li>
+	<li id="t_register"><a href="{$thisbase}type=inviteCode&t=register">已注册</a></li>
+	<li id="t_overtime"><a href="{$thisbase}type=inviteCode&t=overtime">已过期</a></li>
+</ul>
+</h5>
+<script language="JavaScript">
+	setCurrent('t_$t','t_','current');
+</script>
+<!--
+EOT;
+}
+if(!empty($invdb)){
+print <<<EOT
+-->
+<form action="{$thisbase}type=inviteCode" method="post" name="INVITECODE" onsubmit="return delInviCode(document.INVITECODE)">
+<table width="100%" class="tA mb10">
+	<tr class="tr">
+		<td width="20"><input name="" type="checkbox" value="all"
+			onclick="CheckAll(this.form)"></td>
+		<td width="130">邀请码</td>
+		<td width="120">失效日期</td>
+		<td>注册用户</td>
+		<td>注册日期</td>
+		<td>状态</td>
+	</tr>
+<!--
+EOT;
+$userService = L::loadClass('UserService', 'user');
+foreach($invdb as $key => $value){
+$userdb = $userService->getByUserName($value[receiver]);
+print <<<EOT
+-->
+	<tr>
+		<td><input name="invcode" type="checkbox" value="{$value[id]}"></td>
+		<td>{$value[invcode]}</td>
+		<td>{$value[overtime]}</td>
+		<td><a href="u.php?uid={$userdb['uid']}">{$value[receiver]}</a></td>
+		<td>{$value[usetime]}</td>
+		<td>{$value[used]}</td>
+	</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+</table>
+<div class="mb10 cc">$pages</div>
+<div class="tac mb10"><span class="bt2"><span>
+<button type="submit">删除</button>
+</span></span></div>
+</form>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+</div>
+</div>
+<script type="text/javascript">
+function delInviCode(form){
+	var delids = '';
+	for (var i = 0; i < form.elements.length; i++) {
+		var e = form.elements[i];
+		if (e.type == 'checkbox' && e.checked == true) {
+			delids += e.value + ',';
+		}
+	}
+	if(delids == '' || delids == 'undefined' || delids == null){
+		showDialog('error','请选择要删除的邀请码',0);
+		return false;
+	}
+	var url = "pw_ajax.php?action=friendinvite&step=delInvCode&invcode="+delids;
+	showDialog('confirm','确定要删除选中的邀请码？',0,function(){
+		ajax.send(url,'',function(){
+			showDialog('',ajax.request.responseText,5);
+			window.setTimeout(function(){
+			for (var i = 0; i < form.elements.length; i++) {
+				var e = form.elements[i];
+				if (e.type == 'checkbox') {
+					e.checked = false;
+				}
+			}
+			location.reload()},400);
+		});
+	});
+	return false;
+}
+function addInviCode(form){
+	var invnum = getObj('invnum').value;
+	if(invnum == '' || invnum == 0 || invnum == 'undefined' || invnum == null){
+		showDialog('error','请输入购买数量',0);
+	}
+	var url = "pw_ajax.php?action=friendinvite&step=addInvCode&invnum="+invnum;
+	showDialog('confirm','确定要购买邀请码？',0,function(){
+		ajax.send(url,'',function(){
+			showDialog('success',ajax.request.responseText,1);
+			window.setTimeout(function(){
+			for (var i = 0; i < form.elements.length; i++) {
+				var e = form.elements[i];
+				if (e.type == 'checkbox') {
+					e.checked = false;
+				}
+			}
+			location.reload()},500);
+		});
+	});
+	return false;
+}
+</script>
+<!--
+EOT;
+?>-->

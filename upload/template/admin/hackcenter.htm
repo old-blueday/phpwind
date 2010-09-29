@@ -1,0 +1,81 @@
+<!--<?php
+include_once PrintEot('left');print <<<EOT
+-->
+<div class="admin_info mb10">
+	<h3 class="h1">插件安装步骤</h3>
+    <div class="legend"><ol><li>将插件文件上传到<b>插件目录(hack/)</b></li><li>在“<b>未安装插件</b>”列表中选择安装您需要的插件</li><li>插件前台导航名称及显示位置修改请到“<b>运营工具 ->导航菜单管理 ->顶部底部导航</b>”</li></ol></div>
+</div>
+<form action="$basename" method="post">
+  <input type="hidden" name="action" value="edit">
+  <h2 class="h1">已安装插件</h2>
+  <div class="admin_table mb10">
+	<table cellpadding="0" cellspacing="0" width="100%">
+        <tr class="tr2 vt td_bgB">
+          <td>插件名称</td>
+          <td>插件目录</td>
+          <td>操作</td>
+        </tr>
+<!--
+EOT;
+foreach ($installdb['index'] as $key => $value) {
+$value[2] = $value[2]==2 ? '直接显示' :($value[2]==1 ? '下拉菜单显示' : '不显示');print <<<EOT
+-->
+        <tr class="tr1 vt">
+          <td class="td2"><input class="input input_wa" name="hackname[$value[1]]" value="$value[0]"></td>
+          <td class="td2">/hack/$value[1]</td>
+          <td class="td2"><a href="$admin_file?adminjob=hack&hackset=$value[1]" title="点击管理此插件" class="mr20">[设置]</a><a href="$value[4]" onclick="return checkhackset()" title="卸载">[卸载]</a></td>
+        </tr>
+<!--
+EOT;
+}foreach ($installdb['noindex'] as $key => $value) {
+$value[2] = $value[2]==2 ? '直接显示' :($value[2]==1 ? '下拉菜单显示' : '不显示');print <<<EOT
+-->
+        <tr class="tr1 vt">
+          <td class="td2"><input class="input input_wa" name="hackname[$value[1]]" value="$value[0]"></td>
+          <td class="td2">/hack/$value[1]</td>
+          <td class="td2"><a href="$admin_file?adminjob=hack&hackset=$value[1]" title="点击管理此插件" class="mr20">[设置]</a><a href="$value[4]" onclick="return checkhackset()" title="卸载">[卸载]</a></td>
+        </tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+      </table>
+  </div>
+  <div class="mb10 tac">
+    <span class="btn"><span><button type="submit">提 交</button></span></span>
+   </div>
+</form>
+<script language="JavaScript">
+function checkhackset(){
+	return confirm("卸载插件将同时删除插件相关的数据，您确定要卸载此插件吗?");
+}
+</script>
+<h2 class="h1">未安装插件</h2>
+<div class="admin_table mb10">
+	<table cellpadding="0" cellspacing="0" width="100%">
+      <tr class="tr2 vt td_bgB">
+        <td>插件名称</td>
+        <td>插件目录</td>
+        <td>操作</td>
+      </tr>
+<!--
+EOT;
+foreach ($uninstalldb as $value) {
+$value[2] = $value[2]==2 ? '直接显示' :($value[2]==1 ? '下拉菜单显示' : '不显示');print <<<EOT
+-->
+      <tr class="tr1 vt">
+        <td class="td2">$value[0]</td>
+        <td class="td2">/hack/$value[1]</td>
+        <!--<td class="td2">$value[2]</td>-->
+        <td class="td2"><a href="$value[3]">安装</a></td>
+      </tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+    </table>
+</div>
+<!--
+EOT;
+include_once PrintEot('adminbottom');
+?>-->

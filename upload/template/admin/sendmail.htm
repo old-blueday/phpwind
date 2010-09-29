@@ -1,0 +1,190 @@
+<!--<?php
+include_once PrintEot('left');
+if(empty($action)){
+if($resume){
+$j_url = EncodeUrl("$basename&action=erase");
+print <<<EOT
+-->
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+	<tr class="tr1">
+		<td class="td2">	存在未完成的邮件群发任务，最后发送时间为<span class="s2">$pwSendmail[lasttime]</span>
+	[<a href="$basename&action=confirm">查看</a>]　[<a href="$j_url">删除</a>]</td>
+	</tr>
+</table>
+</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+<script language="JavaScript" src="js/wind_editor.js"></script>
+<form name='FORM' action="$basename" method="post">
+<h2 class="h1">邮件群发</h2>
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+	<tr class="tr1 vt">
+		<td class="td1">&nbsp;</td>
+		<td class="td2">
+			<ul class="list_A">
+				<li><input type='radio' name='by' value='0' onclick="sendtype(0)" checked>按用户组</li>
+				<li><input type='radio' name='by' value='1' onclick="sendtype(1)">在线用户</li>
+				<li><input type='radio' name='by' value='2' onclick="sendtype(2)">按注册时间</li>
+			</ul>
+		</td>
+	</tr>
+	<tbody id="group_0">
+		<tr class="tr1 vt">
+			<td class="td1">接收用户</td>
+			<td class="td2">
+				<ul class="list_A list_120 cc mb10" style="width:480px;">
+<!--
+EOT;
+$num=0;
+foreach($ltitle as $key=>$value){
+if($key=='1' || $key=='2' || isset($lneed[$key]))continue;
+$num++;
+print <<<EOT
+-->
+					<li><input type='checkbox' name='sendto[]' value='$key'>$value</li>
+<!--
+EOT;
+}print <<<EOT
+-->
+					<li><input type='checkbox' name='sendto[]' value='-1'>普通会员</li>
+				</ul>
+				<span class="bt2"><span><button onclick="CheckAll(this.form)" value="全 选" name="chkall" onfocus="blur();" type="button">全 选</button></span></span>
+			</td>
+		</tr>
+	</tbody>
+	<tbody id="group_2" style="display:none">
+		<tr class="tr1 vt">
+			<td class="td1">接收用户</td>
+			<td class="td2"><div class="input_img fl"><i onclick="this.nextSibling.onclick()" class="input_time" title="选择时间"></i><input name="starttime" id="starttime" value="" onclick="ShowCalendar(this.id);" type="text"></div><span class="p_lr_10 fl">至</span><div class="input_img fl"><i class="input_time" title="选择时间"></i><input name="endtime" id="endtime" value="" onclick="ShowCalendar(this.id);" type="text"></div>
+			<div class="help_a" style="display: block;">&nbsp;格式:yyyy-mm-dd，会员注册时间范围</div></td>
+		</tr>
+	</tbody>
+	<tr class="tr1 vt">
+		<td class="td1">每批发送个数</td>
+		<td class="td2"><input class="input input_wa" type="text" name="percount" /></td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">主题</td>
+		<td class="td2"><input type="text" class="input input_wb" name="subject" /></td>
+	</tr>
+	<tr class="tr1 vt" valign="top">
+		<td class="td1">内容</td>
+		<td class="td2"><textarea name="atc_content" class="textarea fl mr10" style="height:150px;"></textarea><div class="fl p10 mr10" style="border:1px solid #ccc;background:#fff;width:200px;height:136px;">\$email:表示用户的邮件地址<br />\$windid:表示用户名<br />\$winduid:表示用户UID</div></td>
+	</tr>
+</table>
+</div>
+<input type="hidden" name="action" value="send">
+<div class="tac mb10">
+	<span class="btn"><span><button type="submit">提 交</button></span></span>
+	<span class="bt"><span><button type="reset">重 置</button></span></span>
+</div>
+</form>
+
+<script type="text/javascript" src="js/date.js"></script>
+<SCRIPT LANGUAGE="JavaScript">
+function sendtype(ID){
+	for(var i=0;i<3;i++){
+		try{
+		if(i==ID)document.getElementById("group_"+ID).style.display = "";
+		else document.getElementById("group_"+i).style.display = "none";
+		}catch(e){}
+	}
+}
+</SCRIPT>
+<!--
+EOT;
+} elseif ($action == 'send' || $action == 'confirm') {print <<<EOT
+-->
+<h2 class="h1">邮件群发确认</h2>
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+	<tr class="tr1 vt">
+		<td class="td1">接收用户总数</td>
+		<td class="td2"><span class="s3">$pwSendmail[count]</span>　人</td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">每批发送</td>
+		<td class="td2">$pwSendmail[num]　封</td>
+	</tr>
+<!--
+EOT;
+if ($action != 'send') {print <<<EOT
+-->
+	<tr class="tr1 vt">
+		<td class="td1">已完成发送</td>
+		<td class="td2">$pwSendmail[sent]　封</td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">最后发送时间</td>
+		<td class="td2">$pwSendmail[lasttime]</td>
+	</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+	<tr class="tr1 vt">
+		<td class="td1">邮件接收用户</td>
+		<td class="td2">
+<!--
+EOT;
+if($pwSendmail[by]==0){
+foreach($pwSendmail[info] as $value){
+print <<<EOT
+-->
+&nbsp;$ltitle[$value]
+<!--
+EOT;
+}}elseif($pwSendmail[by]==1){print <<<EOT
+-->
+当前在线的会员
+<!--
+EOT;
+}elseif($pwSendmail[by]==2){
+$stime=get_date($pwSendmail[info][stime],'Y-m-d');
+$etime=get_date($pwSendmail[info][etime],'Y-m-d');
+print <<<EOT
+-->
+注册时间在 {$stime}　至　{$etime} 之间的会员
+<!--
+EOT;
+}print <<<EOT
+-->
+		</td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">邮件标题</td>
+		<td class="td2">$pwSendmail[subject]</td></tr>
+	<tr class="tr1 vt">
+		<td class="td1">邮件内容</td>
+		<td class="td2"><textarea class="textarea" disabled>$pwSendmail[content]</textarea></td>
+	</tr>
+
+</table>
+</div>
+<div class="tac mb10">
+<!--
+EOT;
+$j_url = EncodeUrl("$basename&action=erase");
+if ($action == 'send') {print <<<EOT
+-->
+	<span class="btn"><span><button type="button" onClick="javascript:window.location='$basename&action=groupsend'">开始发送</button></span></span>
+	[<a href="$j_url">取消</a>]　[<a href="javascript:history.go(-1)">返回</a>]
+<!--
+EOT;
+}else{print <<<EOT
+-->
+	<span class="btn"><span><button type="button" onClick="javascript:window.location='$basename&action=groupsend'">继续发送</button></span></span>
+	[<a href="$j_url">取消</a>]　[<a href="javascript:history.go(-1)">返回</a>]
+<!--
+EOT;
+}print <<<EOT
+-->
+</div>
+<!--
+EOT;
+}include_once PrintEot('adminbottom');
+?>-->

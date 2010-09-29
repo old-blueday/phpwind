@@ -1,0 +1,520 @@
+<!--
+<?php
+print <<<EOT
+-->
+<link rel="stylesheet" type="text/css" href="{$pwModeImg}/area_read_style.css" />
+<!--
+EOT;
+if($N_allowtypeopen || $N_allowtopicopen || $N_allowpostcateopen){
+print <<<EOT
+-->
+	<a href="post.php?fid=$fid" class="c_received fr" target="_blank" id="td_post">我要投稿</a>
+<!--
+EOT;
+}if($N_allowtypeopen || $N_allowtopicopen || $N_allowpostcateopen){print <<<EOT
+-->
+<div id="menu_post" class="pw_menu" style="display:none;">
+	<ul class="menuList" style="width:48px;">
+<!--
+EOT;
+if($foruminfo['allowtype'] & 1){print <<<EOT
+-->
+		<li><a href="post.php?fid=$fid" title="新 帖" hidefocus="true">新帖</a></li>
+<!--
+EOT;
+}if($foruminfo['allowtype'] & 2 && $_G[allownewvote]){print <<<EOT
+-->
+		<li><a href="post.php?fid=$fid&special=1" title="投 票" hidefocus="true">投票</a></li>
+<!--
+EOT;
+}if($foruminfo['allowtype'] & 4 && $_G[allowactive]){print <<<EOT
+-->
+		<li><a href="post.php?fid=$fid&special=2" title="活 动" hidefocus="true">活动</a></li>
+<!--
+EOT;
+}if($foruminfo['allowtype'] & 8 && $_G['allowreward']){print<<<EOT
+-->
+		<li><a href="post.php?fid=$fid&special=3" title="悬 赏" hidefocus="true">悬赏</a></li>
+<!--
+EOT;
+}if($foruminfo['allowtype'] & 16 && $_G['allowgoods']){print <<<EOT
+-->
+		<li><a href="post.php?fid=$fid&special=4" title="商 品" hidefocus="true">商品</a></li>
+<!--
+EOT;
+}if($foruminfo['allowtype'] & 32 && $_G['allowdebate']){print <<<EOT
+-->
+		<li><a href="post.php?fid=$fid&special=5" title="辩 论" hidefocus="true">辩论</a></li>
+<!--
+EOT;
+}
+if($_G['allowmodelid']){
+foreach($modelids as $value){
+if(isset($postTopic->topicmodeldb[$value]) && $postTopic->topicmodeldb[$value][ifable] && $postTopic->topiccatedb[$postTopic->topicmodeldb[$value][cateid]][ifable]){
+print <<<EOT
+-->
+		<li><a href="post.php?fid=$fid&modelid=$value" hidefocus="true">{$postTopic->topicmodeldb[$value][name]}</a></li>
+<!--
+EOT;
+}}}
+foreach($pcids as $value){
+if(isset($postCate->postcatedb[$value]) && $postCate->postcatedb[$value][ifable]){
+if(strpos(','.$_G['allowpcid'].',',','.$value.',') !== false){
+print <<<EOT
+-->
+		<li><a href="post.php?fid=$fid&pcid=$value" hidefocus="true">{$postCate->postcatedb[$value][name]}</a></li>
+<!--
+EOT;
+}}}print <<<EOT
+-->
+	</ul>
+</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+	<div id="breadCrumb">
+    	<a href="$db_bbsurl/index.php?m=area">首页</a>
+    	&raquo; <a href="cate.php?cateid=$cateid">{$forum[$cateid]['name']}</a>
+		&raquo; $guidename
+    </div>
+
+    <div class="cate_menubar">
+    	<div class="cc"><span class="fl">筛选：</span>
+        <span class="menubar_tab fl">
+	    <a id="pc_all" href="thread.php?fid=$fid">全部</a>
+<!--
+EOT;
+if($modelid > 0){
+	$a = 'model_'.$modelid;
+} elseif ($pcid > 0) {
+	$a = 'pcid_'.$pcid;
+}
+if ($foruminfo['modelid']){
+foreach($modelids as $value){
+if(isset($postTopic->topicmodeldb[$value]) && $postTopic->topicmodeldb[$value][ifable] && $postTopic->topiccatedb[$postTopic->topicmodeldb[$value][cateid]][ifable]){
+print<<<EOT
+-->
+		<a id="pc_model_$value" href="thread.php?fid=$fid&modelid=$value">{$postTopic->topicmodeldb[$value][name]}</a>
+<!--
+EOT;
+}}}
+if($foruminfo['pcid']){
+foreach($pcids as $value){
+if(isset($postCate->postcatedb[$value]) && $postCate->postcatedb[$value][ifable]){
+print<<<EOT
+-->
+		<a id="pc_pcid_$value" href="thread.php?fid=$fid&pcid=$value">{$postCate->postcatedb[$value][name]}</a>
+<!--
+EOT;
+}}}print <<<EOT
+-->
+
+        </span></div>
+<script language="JavaScript">
+setCurrent('pc_$a','pc_all','current');
+</script>
+<!--
+EOT;
+if ($modelid>0 || $pcid>0){
+print<<<EOT
+-->
+        <div class="c"></div>
+        <div class="menubar_box cc">
+		$initSearchHtml
+        </div>
+
+<!--
+EOT;
+}print<<<EOT
+-->
+    </div>
+
+    <div class="cate_content fl">
+<!--
+EOT;
+if($t_typedb){
+print <<<EOT
+-->
+    	<div class="tabB mb10 pr">
+			<ul id="t_typedb">
+				<li id="thread_type_all" $li_class><a href="thread.php?fid=$fid#c">全部</a></li>
+<!--
+EOT;
+if(!$modelid && !$pcid){
+$i = 1;
+foreach($t_typedb as $key=>$value){
+$i++;
+$ctypename = html_entity_decode($value[name]);
+print <<<EOT
+-->
+				<li id="thread_type_$key" $li_class><a href="thread.php?fid=$fid&type=$key">$ctypename</a></li>
+<!--
+EOT;
+}}print <<<EOT
+-->
+			</ul>
+<!--
+EOT;
+if($i > $db_maxtypenum){print <<<EOT
+-->
+	<div style="padding:8px 0 0 10px;">
+		<span title="上一页" style="cursor:pointer;"><img src="$pwModeImg/btLeft.gif" onclick="showTypeTab(-$db_maxtypenum,$db_maxtypenum,'li');" /></span>&nbsp;
+		<span title="下一页" style="cursor:pointer;"><img src="$pwModeImg/btRight.gif" onclick="showTypeTab($db_maxtypenum,$db_maxtypenum,'li');" /></span>
+	</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+		</div>
+<!--
+EOT;
+if($t_child){print<<<EOT
+-->
+    	<div class="content_box_A" style="margin-bottom:10px;">
+        <table width="100%">
+            <tr class="cate_tr_B">
+               <td style="border-bottom:0;">
+			 	<ul class="tabC">
+<!--
+EOT;
+foreach($t_child as $k => $value){
+$childtypename = html_entity_decode($value);
+print<<<EOT
+-->
+				  <li id="t_child_$k"><a href="thread.php?fid=$fid{$viewbbs}&type=$k#c">$childtypename</a></li>
+<!--
+EOT;
+}print <<<EOT
+-->
+			 	</ul>
+               </td>
+            </tr>
+        </table>
+        </div>
+<!--
+EOT;
+}print <<<EOT
+-->
+<script language="javascript">
+<!--
+EOT;
+if($i > $db_maxtypenum){print<<<EOT
+-->
+function setCurrentType(id,n,tag){
+	var o = getObj('t_typedb');
+	var f = o.getElementsByTagName(tag);
+	var s = 0;
+	var page = 0;
+	for(i=0; i<f.length; i++){
+		if(f[i].id == id){
+			s = i;break;
+		}
+	}
+	page = Math.floor(s/n);
+	for(i=0; i<f.length; i++){
+		if(i>=page*n && i<(page+1)*n){
+			f[i].style.display = 'inline';
+		}else{
+			f[i].style.display = 'none';
+		}
+	}
+}
+function showTypeTab(p,n,tag){
+	var o = getObj('t_typedb');
+	var f = o.getElementsByTagName(tag);
+	var s = 0;
+	for(i=0;i<f.length;i++)
+		if(f[i].style.display != "none"){s = i;break;}
+	s += p;
+	if(s<0 || s>f.length)return;
+	for(i=0;i<f.length;i++){
+		if(i>=s && i<s+n){
+			f[i].style.display = "inline";
+		} else{
+			f[i].style.display = "none";
+		}
+	}
+	return;
+}
+setCurrentType('thread_type_$pwSelectType',$db_maxtypenum,'li');
+<!--
+EOT;
+}print<<<EOT
+-->
+setCurrent('thread_type_$pwSelectType','thread_type_all','current');
+setCurrent('t_child_$type','','current');
+</script>
+<!--
+EOT;
+}print <<<EOT
+-->
+
+    	<div class="content_box_A">
+            <table>
+                <tr class="cate_tr_A">
+                    <td>&nbsp;</td>
+                    <td>文章</td>
+<!--
+EOT;
+foreach ($fielddb as $key => $value) {
+if(!$value['threadshow']) continue;
+print<<<EOT
+-->
+					<td>$value[name]</td>
+<!--
+EOT;
+}print<<<EOT
+-->
+                </tr>
+<!--
+EOT;
+foreach ($threaddb as $key => $thread) {
+$tmp_img = "new";
+$tmp_title = '';
+if($thread['topped']) {
+	$tmp_img = "top" . $thread['topped'];
+	$tmp_title = "置顶帖标志";
+} elseif ($thread['status'] == "topichot") {
+	$tmp_img = "hot";
+	$tmp_title = "热门主题";
+}
+print <<<EOT
+-->
+				<tr class="cate_tr_B">
+                    <th><img src="$pwModeImg/$tmp_img.gif" title="$tmp_title" /></th>
+                    <td>
+<!--
+EOT;
+if(($thread['special']>20 || $thread['modelid']>0) && (!$thread['topped'] || $thread['topped']==1)){
+$thread['pcid']= $thread['special'] - 20;
+if(isset($postCate->postcatedb[$thread['pcid']])){
+print <<<EOT
+-->
+					<a class="f14 s3 b" href="thread.php?fid=$fid&pcid=$thread[pcid]">[{$postCate->postcatedb[$thread[pcid]][name]}]</a>
+<!--
+EOT;
+}if(isset($postTopic->topicmodeldb[$thread['modelid']])){print <<<EOT
+-->
+					<a class="f14 s3 b" href="thread.php?fid=$fid&modelid=$thread[modelid]">[{$postTopic->topicmodeldb[$thread[modelid]][name]}]</a>
+<!--
+EOT;
+}}print <<<EOT
+-->
+					<a href="{$thread['tpcurl']}" title="{$thread['src_subject']}" class="f14">{$thread[subject]}</a>
+<!--
+EOT;
+if (isset($thread['colony'])) {
+print <<<EOT
+-->
+					[<a class="f14" title="来自群：{$thread[colony][cname]}" target="_blannk" href="apps.php?q=group&a=thread&cyid={$thread[colony][cyid]}">{$thread[colony][cname]}</a>]
+<!--
+EOT;
+}
+if($timestamp-$thread[lastpost]<=$db_newtime){
+print <<<EOT
+-->
+					<img src="$imgpath/$stylepath/file/new.gif" align="absmiddle" title="新帖标志" />
+<!--
+EOT;
+}
+if($forumset['inspect'] && $thread['inspect']){print <<<EOT
+-->
+					<span class="w"><font color="red">[{$thread[inspect][1]} 阅至 {$thread[inspect][0]}楼]</font></span>
+<!--
+EOT;
+}
+if($thread['lastpost']){
+$tmp_lastpost = get_date($thread['lastpost'], "Y-m-d H:i");
+print <<<EOT
+-->
+					<span class="gray2">$tmp_lastpost</span>
+<!--
+EOT;
+}print <<<EOT
+-->
+                    </td>
+<!--
+EOT;
+foreach($threadshowfield as $key => $value){
+$value[fieldvalue] = $thread[topic][$value[fieldname]];
+$value['rules'] && $value['rules'] = unserialize($value['rules']);
+if ($value['type'] == 'radio') {
+	$newradio = array();
+	foreach($value['rules'] as $rk => $rv){
+		list($rv_value,$rv_name) = explode("=",$rv);
+		$newradio[$rv_value] = $rv_name;
+	}
+	$topicvalue = "{$newradio[$value[fieldvalue]]}";
+
+} elseif ($value['type'] == 'checkbox') {
+	$newcheckbox = array();
+	foreach($value['rules'] as $ck => $cv){
+		list($cv_value,$cv_name) = explode("=",$cv);
+		$newcheckbox[$cv_value] = $cv_name;
+	}
+	$topicvalues = '';
+	foreach (explode(",",$value['fieldvalue']) as $value) {
+		if ($value) {
+			$topicvalues .= $topicvalues ? ",".$newcheckbox[$value] : $newcheckbox[$value];
+		}
+	}
+	$topicvalue = $topicvalues;
+
+} elseif ($value['type'] == 'select') {
+	$newselect = array();
+	foreach($value['rules'] as $sk => $sv){
+		list($sv_value,$sv_name) = explode("=",$sv);
+		$newselect[$sv_value] = $sv_name;
+	}
+	$topicvalue = "{$newselect[$value[fieldvalue]]}";
+} elseif ($value['type'] == 'url') {
+	$topicvalue = "<a href=\"$value[fieldvalue]\" target=\"_blank\">$value[fieldvalue]</a>";
+} elseif ($value['type'] == 'img') {
+	$topicvalue = "<img src=\"$value[fieldvalue]\">";
+} elseif ($value['type'] == 'calendar') {
+	$topicvalue = get_date($value['fieldvalue'],'Y-n-d');
+} else {
+	$topicvalue = "$value[fieldvalue]";
+}
+if ($value['fieldname'] == 'limitnum' && !$value[fieldvalue]) {
+	$topicvalue = '不限制';
+}
+print <<<EOT
+-->
+					<td>{$topicvalue}</td>
+<!--
+EOT;
+}print <<<EOT
+-->
+                </tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+            </table>
+<!--
+EOT;
+if($managecheck){
+print <<<EOT
+-->
+            <div class="cate_list_admin">
+            <a href="thread.php?fid=$fid&viewbbs=1" target="_blank">跳转到管理页面</a>
+            </div>
+<!--
+EOT;
+}print <<<EOT
+-->
+			<div class="cc" style="padding:0 0 10px 10px;">$pages</div>
+        </div>
+    </div>
+    <div class="cate_sidebar fr">
+<!--
+EOT;
+if ($thread_children && $forumdb) {
+print <<<EOT
+-->
+			<div class="sidebar_box">
+				<h2><span>子版块</span></h2>
+<!--
+EOT;
+	foreach ($forumdb as $key=>$foruminfo) {
+		list(, , $lastpost_time, ) = explode("\t", $foruminfo['lastpost']);
+		$lastpost_time = $lastpost_time ? get_date($lastpost_time, "Y-m-d H:i") : "";
+print <<<EOT
+-->
+				<div class="cc bor-b">
+<!--
+EOT;
+		if ($foruminfo['logo']) {
+print <<<EOT
+-->
+				<a href="thread.php?fid={$foruminfo['fid']}" class="mr10 b f14 blue"><img src="{$foruminfo['logo']}" width="60" class="mr10 fl" /></a>
+<!--
+EOT;
+		}
+print <<<EOT
+-->
+
+					<div class="fl">
+						<a href="thread.php?fid={$foruminfo['fid']}" class="mr10 b f14 blue">{$foruminfo['name']}</a>
+						<span class="red">({$foruminfo['tpost']})</span>
+						<br />
+						主题：{$foruminfo['topics']}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;回复：{$foruminfo['article']}<br />
+						最近发布：<a href="u.php?username={$foruminfo['au']}">{$foruminfo['au']}</a><br />
+						{$lastpost_time}
+					</div>
+				</div>
+<!--
+EOT;
+	}
+print <<<EOT
+-->
+			</div>
+
+<!--
+EOT;
+}
+list($htmlAdvert,$arrayAdvert) = pwAdvert('Mode.Forum.Layer.area.ThreadBtm',$fid,$num,$SCR);
+if($htmlAdvert){print <<<EOT
+-->
+			<div class="box-bar">$htmlAdvert</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+    	<div class="sidebar_box">
+        	<h2><span>热门主题</span></h2>
+            <ul>
+<!--
+EOT;
+foreach ($hot_threads as $thread) {
+print <<<EOT
+-->
+					<li><a href="{$thread['url']}">{$thread['title']}</a></li>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+            </ul>
+        </div>
+<!--
+EOT;
+list($htmlAdvert,$arrayAdvert) = pwAdvert('Mode.Forum.Layer.area.ThreadBtm',$fid,$num,$SCR);
+if($htmlAdvert){print <<<EOT
+-->
+			<div class="box-bar">$htmlAdvert</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+        <div class="sidebar_box">
+        	<h2><span>相关主题</span></h2>
+            <ul>
+<!--
+EOT;
+foreach ($related_threads as $thread) {
+print <<<EOT
+-->
+	<li><a href="{$thread['url']}">{$thread['title']}</a></li>
+<!--
+EOT;
+}print <<<EOT
+-->
+            </ul>
+        </div>
+<!--
+EOT;
+list($htmlAdvert,$arrayAdvert) = pwAdvert('Mode.Forum.Layer.area.ThreadBtm',$fid,$num,$SCR);
+if($htmlAdvert){print <<<EOT
+-->
+			<div class="box-bar">$htmlAdvert</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+    </div>
+<!--
+EOT;
+?>-->

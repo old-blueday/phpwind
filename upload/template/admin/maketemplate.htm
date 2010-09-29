@@ -1,0 +1,111 @@
+<!--<?php
+include_once PrintEot('left');
+print <<<EOT
+-->
+<!--
+EOT;
+if(!$action){print <<<EOT
+-->
+<h2 class="h1">
+	<div class="tab_A" style="padding-top:3px;">
+		<ul class="cc">
+<!--
+EOT;
+if(!$ftype){print <<<EOT
+-->
+			<li class="current"><a href="$basename"><b class="b s2">所有</b></a></li>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+			<li><a href="$basename"><b class="b s2">所有</b></a></li>
+<!--
+EOT;
+}foreach($ftypes as $key=>$value){
+$class = $key==$ftype? 'current':'';
+print <<<EOT
+-->
+			<li class="$class"><a href="$basename&ftype=$key">$value[name]</a></li>
+<!--
+EOT;
+}print <<<EOT
+-->
+		</ul>
+    </div>
+</h2>
+<div class="admin_table mb10">
+	<table width="100%" style="table-layout:fixed;">
+    	<tr class="tr2">
+            <td width="160">效果图</td>
+            <td><span class="s3">模块名称不可重复</span></td>
+        </tr>
+<!--
+EOT;
+foreach($tpls as $tpl){print <<<EOT
+-->
+		<tr class="tr1 vt">
+            <td class="td2"><p class="f14 b mb5">$tpl[name]</p><img src="$imgpath/tpl/$tpl[image]" class="mb10" /><p class="gray mb10">$tpl[descrip]</p></td>
+            <td class="td2">
+            	<p class="mb10">
+                	<span class="mr20"><input id="ifloop_{$tpl[tplid]}" type="checkbox" />循环模块</span>
+                </p>
+            	<p class="mb10">
+            		模块名称
+                	<input class="input input_wa" id="invokename_{$tpl[tplid]}" type="text" value="" />
+                	<span class="bt2"><span><button id="button_{$tpl[tplid]}" type="button" onclick="creatInvokeCode('$tpl[tplid]')">创建模块</button></span></span>
+                </p>
+                <p style="display:none" id="warning_{$tpl[tplid]}"><span class="s1">请将下面代码复制到模板里面</span></p>
+                <div id="text_{$tpl[tplid]}"  style="background:#eee; border:1px solid #ccc;width:320px;height:70px; padding:8px; color:#888;"></div>
+            </td>
+        </tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+    </table>
+</div>
+<div class="cc mb10">$pages</div>
+<script src="js/pw_ajax.js"></script>
+<script language="JavaScript">
+function creatInvokeCode(id){
+	var invokename = getObj('invokename_'+id);
+	if (invokename.value =='') {
+		alert("请填写模块名称");
+		return false;
+	}
+	var ifloop = 0;
+	if (getObj('ifloop_'+id) && getObj('ifloop_'+id).checked==true) {
+		ifloop = 1;
+	}
+	var url = '$ajax_basename';
+	ajax.send(url,'action=creatinvoke&invokename='+invokename.value,function(){
+		if (ajax.request.responseText == 'success') {
+			getObj('warning_'+id).style.display = '';
+			getObj('invokename_'+id).disabled=true;
+			getObj('button_'+id).disabled = true;
+			if (ifloop==1) {
+				getObj('text_'+id).innerHTML=char_cv('<loop id="'+invokename.value+'">'+''+'<pw id="'+invokename.value+'" tplid="'+id+'" />'+''+'</loop>');
+			} else {
+				getObj('text_'+id).innerHTML=char_cv('<pw id="'+invokename.value+'" tplid="'+id+'" />');
+			}
+		} else {
+			alert(ajax.request.responseText);
+		}
+	});
+}
+function char_cv(str){
+	if (str != ''){
+		str = str.replace(/</g,'&lt;');
+		str = str.replace(/%3C/g,'&lt;');
+		str = str.replace(/>/g,'&gt;');
+		str = str.replace(/%3E/g,'&gt;');
+		str = str.replace(/'/g,'&#39;');
+		str = str.replace(/"/g,'&quot;');
+	}
+	return str;
+}
+</script>
+<!--
+EOT;
+}include_once PrintEot('adminbottom');
+?>-->

@@ -1,0 +1,47 @@
+.acSummary a{background:url(acSummary.png) 999px 999px  no-repeat;padding-left:20px;display:inline-block;line-height:16px;height:17px;}
+a.viewMore{ background-position:0 -32px;}
+a.acDel{ background-position:-16px -17px;}
+a.acRecommend{background-position:-32px 0;}
+
+/*list*/
+.list-50{padding:10px;}
+.list-50 li{width:50%;float:left;line-height:23px;}
+.list-50 li a{padding-left:5px;}
+/*  社区活动  */
+.aa_title{height:36px; overflow:hidden; line-height:36px; padding:0 12px; color:#333; background-color:#fffaf1;}
+.aa_title h3{font-weight:800; display:inline; font-size:14px;}
+.aa_title select{width:125px;}
+.aa_title .fr{_padding-top:8px;}
+
+.aa_list{}
+.aa_list .item{position:relative; padding:0 195px 10px 10px; min-height:85px; _height:85px; margin-bottom:10px; color:#888; border-bottom:1px dashed #e0e0e0}
+.aa_list .item .summary{}
+.aa_list .item .summary h4{font-weight:bold; font-size:14px; line-height:22px;}
+.aa_list .item .summary h4 em{font-style:normal; font-weight:normal; font-size:12px;}
+.aa_list .item .summary .view_more a{display:inline-block; margin-right:15px; padding:2px 0 2px 18px; color:#f50; background:url(view_more.png) no-repeat 0 50%}
+.aa_list .item .others{position:absolute; top:0; right:0; width:175px; line-height:20px;}
+.aa_list .item .others p{margin-top:5px;}
+
+.aa_group{}
+.aa_group h3{padding:5px 10px; margin-bottom:6px; background-color:#f7f7f7;}
+.aa_group .item{border-bottom:none; margin-bottom:0;}
+
+.aa_my .item .summary .view_more a.del{background-image:url(del.png)}
+.aa_my .item .summary .view_more a.recommend{background-image:url(recommend.png)}
+
+.table_cost{border:1px solid #9fb7e7; text-align:center; color:#454545;}
+.table_cost thead th{background-color:#e1f2fa; border-bottom:1px solid #a9d5e9; height:30px; text-align:center; color:#069}
+.table_cost td{padding:3px 18px;border-left:1px solid #d5e6ed; border-top:1px solid #d5e6ed}
+.table_cost td.name_id{border-left: none;}
+.table_cost td.a_time{font-size:11px; font-family:Arial}
+
+
+/* AA button */
+.aa_btn{width:100px; height:25px; line-height:25px; overflow:hidden; text-align:center; color:#fff; border:none; background-color:#338bca; cursor:pointer;}
+.aa_btn[disabled]{background-color:#bbb;}
+.disabled{background-color:#bbb;}
+
+.aa_sbtn{width:57px; height:24px; overflow:hidden; padding:0; border:none; cursor:pointer; text-align:center; line-height:24px; color:#454545; background:url(aa_sbtn.png) no-repeat 0 0}
+
+/*AA strong color*/
+.aa_s{color:#f14a10}

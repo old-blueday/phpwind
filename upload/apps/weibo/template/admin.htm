@@ -1,0 +1,367 @@
+<!--<?php
+include_once PrintEot('left');
+print<<<EOT
+-->
+<h2 class="h1 mb10"><a href="$admin_file?adminjob=app&admintype=appslist">返回基础应用列表</a></h2>
+<div class="nav3 mb10">
+	<ul class="cc">
+<!--
+EOT;
+if(!$action){print <<<EOT
+-->	
+<!--
+EOT;
+} else {print <<<EOT
+-->	
+		<li $nav[weibo]><a href="$admin_file?adminjob=apps&admintype=app_weibo&action=weibo">新鲜事管理</a></li>
+		<li $nav[comment]><a href="$admin_file?adminjob=apps&admintype=app_weibo&action=comment">评论管理</a></li>	
+<!--
+EOT;
+}print <<<EOT
+-->
+	</ul>
+</div>
+<!--
+EOT;
+if(!$action){print <<<EOT
+-->
+<form action="$basename&" method="post">
+  <input type="hidden" name="step" value="3">
+  <h2 class="h1">新鲜事基本设置</h2>
+  <div class="admin_table mb10">
+  <table width="100%" cellspacing="0" cellpadding="0">
+	<tr class="tr1 vt">
+      <td class="td1">新鲜事发布框</td>
+      <td class="td2">
+      	<div class="list_A list_80">
+           <ul class="cc">
+               <li><input type="radio" name="weibopost" value="1" $weibopost_Y />开启</li>
+              <li><input type="radio" name="weibopost" value="0" $weibopost_N />关闭</li>
+          </ul>
+        </div>
+      </td>
+      <td class="td2">开启后，可发布、转发新鲜事</td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">添加图片功能</td>
+      <td class="td2">
+      	<div class="list_A list_80">
+           <ul class="cc">
+               <li><input type="radio" name="weibophoto" value="1" $weibophoto_Y />开启</li>
+              <li><input type="radio" name="weibophoto" value="0" $weibophoto_N />关闭</li>
+          </ul>
+        </div>
+      </td>
+      <td class="td2"></td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">添加链接功能</td>
+      <td class="td2">
+      	<div class="list_A list_80">
+           <ul class="cc">
+              <li><input type="radio" name="weibourl" value="1" $weibourl_Y />开启</li>
+              <li><input type="radio" name="weibourl" value="0" $weibourl_N />关闭</li>
+          </ul>
+        </div>
+      </td>
+      <td class="td2"></td>
+    </tr>
+	<tr class="tr1 vt">
+      <td class="td1">允许发表新鲜事的用户组</td>
+      <td class="td2">$creategroup</td>
+      <td class="td2">全不选则允许所有用户组发表</td>
+    </tr>
+  </table>
+  </div>
+
+  <h3 class="h1"><span class="mr20">新鲜事积分奖惩设置</span><span class="linka">注:<b>威望积分</b>支持小数点后一位，其他积分只允许整数！</span></h3>
+  <div class="admin_table mb10">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <tr class="tr2">
+      <td>积分名称</td>
+      <td>发表新鲜事(+)</td>
+      <td>删除新鲜事(-)</td>
+    </tr>
+<!--
+EOT;
+foreach($credit->cType as $key => $value){print <<<EOT
+-->
+    <tr class="tr1 vt">
+      <td class="td2">$value</td>
+      <td class="td2"><input name="creditset[Post][$key]" value="{$creditset[Post][$key]}" class="input input_wc" /></td>
+      <td class="td2"><input name="creditset[Delete][$key]" value="{$creditset[Delete][$key]}" class="input input_wc" /></td>
+    </tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+  </table>
+  </div>
+  <h3 class="h1"><span class="mr20">新鲜事积分流通记录</span><span class="linka">此功能可以详细记录某种积分的流通情况，帮助站长更加清晰地掌握论坛的积分状况！</span></h3>
+  <div class="admin_table mb10">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <tr class="tr2">
+      <td>积分名称</td>
+      <td>发表新鲜事</td>
+      <td>删除新鲜事</td>
+    </tr>
+    <!--
+EOT;
+foreach($credit->cType as $key => $value){print <<<EOT
+-->
+    <tr class="tr1 vt">
+      <td class="td2">$value</td>
+      <td class="td2"><input type="checkbox" name="creditlog[Post][$key]" value="1" {$creditlog[Post][$key]} /></td>
+      <td class="td2"><input type="checkbox" name="creditlog[Delete][$key]" value="1" {$creditlog[Delete][$key]} /></td>
+    </tr>
+    <!--
+EOT;
+}print <<<EOT
+-->
+  </table>
+  </div>
+  <div class="mb10 tac">
+    <span class="btn"><span><button type="submit">提 交</button></span></span>
+   </div>
+</form>
+<!--
+EOT;
+}elseif($action == 'weibo'){
+print <<<EOT
+-->
+<script language="JavaScript" src="js/date.js"></script>
+<form method="POST" action="$basename&action=weibo">
+  <h2 class="h1">新鲜事搜索</h2>
+  <div class="admin_table mb10">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <tr class="tr1 vt">
+      <td class="td1">新鲜事内容</td>
+      <td class="td2"><input type="text" name="content" value="$content" class="input input_wa"></td>
+      <td class="td2" width="100"><!--记录内容（可使用通配符“*”）--></td>
+    </tr>
+      <tr class="tr1 vt">
+      <td class="td1">新鲜事类型</td>
+      <td class="td2">
+          <select name="weibotype" class="select_wa">
+		    <option value="-1"  $weibotypeSelect[please]>新鲜事类型</option>
+<!--
+EOT;
+foreach($weiboTypeDesc as $key => $value) {
+print <<<EOT
+-->
+		    <option value="$key" $weibotypeSelect[$key]>$value</option>
+<!--
+EOT;
+}print <<<EOT
+-->	    
+		   </select>
+      </td>
+      <td class="td2"></td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">作者名称</td>
+      <td class="td2"><input type="text" name="username" value="$username" class="input input_wa"></td>
+      <td class="td2"></td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">发表日期</td>
+      <td class="td2">
+      	<div class="input_img fl"><i onclick="this.nextSibling.onclick()" class="input_time" title="选择时间">选择时间</i><input type="text" name="postdate_s" value="$postdateStartString" id="postdate_s" onclick="javascript:ShowCalendar(this.id)"></div><span class="p_lr_10 fl">至</span><div class="input_img fl"><i class="input_time" title="选择时间">选择时间</i><input type="text" name="postdate_e" id="postdate_e" value="$postdateEndString" onclick="javascript:ShowCalendar(this.id)"></div>
+        </td>
+        <td class="td2">&nbsp;</td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">顺序</td>
+      <td class="td2"><span class="cc  fl"></span>
+     		 <ul class="cc list_80 list_A mr20 fl">
+                	<li><input type="radio" name="ordertype" value="asc" $ascChecked>正序</li>
+                    <li><input type="radio" name="ordertype" value="desc" $descChecked>倒序</li>
+             </ul>
+        </td>
+        <td class="td2">&nbsp;</td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">每页显示条数</td>
+      <td class="td2"><input type="text" name="lines" value="$lines" class="input input_wa"></td>
+      <td class="td2">&nbsp;</td>
+    </tr>
+  </table>
+  </div>
+  <div class="mb10 tac">
+    <span class="btn"><span><button type="submit">提 交</button></span></span>
+   </div>
+</form>
+
+<form method="POST" action="$basename&action=weibo&" name="FORM">
+  <input type="hidden" name="job" value="delete">
+  <input type="hidden" name="content" value="$content">
+  <input type="hidden" name="username" value="$username">
+  <input type="hidden" name="weibotype" value="$weibotype">
+  <input type="hidden" name="postdate_s" value="$postdate_s">
+  <input type="hidden" name="postdate_e" value="$postdate_e">
+  <input type="hidden" name="ordertype" value="$ordertype">
+  <input type="hidden" name="page" value="$page">
+  <input type="hidden" name="lines" value="$lines">
+  <h2 class="h1"><span class="mr10">新鲜事列表</span></h2>
+
+  <div class="admin_table mb10">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <tr class="tr2">
+	  <td width="30"><span onclick="CheckAll(document.FORM)" class="cp">全选</span></td>
+      <td>新鲜事内容</td>
+      <td>作者</td>
+      <td>发表时间</td>
+      <td>新鲜事类型</td>
+      <td>评论数</td>
+      <td>转发数</td>
+    </tr>
+<!--
+EOT;
+if (empty($weibos)) {print <<<EOT
+-->
+<tr><td class="p10" colspan="6"><div class="admin_tips">啊哦，没有你要的信息！</div></td></tr>
+<!--
+EOT;
+}else{
+foreach ($weibos as $key => $weibo) {
+$type = $weiboService->getTypeDescript($weibo['type']);
+print <<<EOT
+-->
+    <tr class="tr1 vt">
+      <td class="td2"><input type="checkbox" name="mids[]" value="$weibo[mid]"></td>
+      <td class="td2">$weibo[content]</td>
+      <td class="td2"><a href="u.php?uid=$weibo[uid]" target="_blank">$weibo[username]</a></td>
+      <td class="td2" title="$weibo[postdate_s]">{$weibo[lastdate]}</td>
+      <td class="td2">$type</td>
+      <td class="td2">$weibo[replies]</td>
+      <td class="td2">$weibo[transmit]</td>
+    </tr>
+    <!--
+EOT;
+}}print<<<EOT
+-->
+  </table>
+  </div>
+  <div class="cc">$pages</div>
+  <div class="mb10 tac">
+    <span class="btn"><span><button type="submit" onclick="return checkdel();">删除</button></span></span>
+   </div>
+</form>
+<script language="JavaScript">
+function checkdel(){
+	if(confirm("确定要删除所选记录吗？" )){
+		return true;
+	}else{
+		return false;
+	}
+}
+</script>
+<!--
+EOT;
+}elseif($action == 'comment'){
+print <<<EOT
+-->
+<script language="JavaScript" src="js/date.js"></script>
+<form method="POST" action="$basename&action=comment">
+  <h2 class="h1">评论搜索</h2>
+  <div class="admin_table mb10">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <tr class="tr1 vt">
+      <td class="td1">评论内容</td>
+      <td class="td2"><input type="text" name="content" value="$content" class="input input_wa"></td>
+      <td class="td2" width="100"></td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">作者名称</td>
+      <td class="td2"><input type="text" name="username" value="$username" class="input input_wa"></td>
+      <td class="td2"></td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">发表日期</td>
+      <td class="td2">
+      	<div class="input_img fl"><i onclick="this.nextSibling.onclick()" class="input_time" title="选择时间">选择时间</i><input type="text" name="postdate_s" value="$postdateStartString" id="postdate_s" onclick="javascript:ShowCalendar(this.id)"></div><span class="p_lr_10 fl">至</span><div class="input_img fl"><i class="input_time" title="选择时间">选择时间</i><input type="text" name="postdate_e" id="postdate_e" value="$postdateEndString" onclick="javascript:ShowCalendar(this.id)"></div>
+        </td>
+        <td class="td2">&nbsp;</td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">顺序</td>
+      <td class="td2"><span class="cc  fl"></span>
+     		 <ul class="cc list_80 list_A mr20 fl">
+                	<li><input type="radio" name="ordertype" value="asc" $ascChecked>正序</li>
+                    <li><input type="radio" name="ordertype" value="desc" $descChecked>倒序</li>
+             </ul>
+        </td>
+        <td class="td2">&nbsp;</td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">每页显示条数</td>
+      <td class="td2"><input type="text" name="lines" value="$lines" class="input input_wa"></td>
+      <td class="td2">&nbsp;</td>
+    </tr>
+  </table>
+  </div>
+  <div class="mb10 tac">
+    <span class="btn"><span><button type="submit">提 交</button></span></span>
+   </div>
+</form>
+
+<form method="POST" action="$basename&action=comment&" name="FORM">
+  <input type="hidden" name="job" value="delete">
+  <input type="hidden" name="content" value="$content">
+  <input type="hidden" name="username" value="$username">
+  <input type="hidden" name="postdate_s" value="$postdate_s">
+  <input type="hidden" name="postdate_e" value="$postdate_e">
+  <input type="hidden" name="ordertype" value="$ordertype">
+  <input type="hidden" name="page" value="$page">
+  <input type="hidden" name="lines" value="$lines">
+  <h2 class="h1"><span class="mr10">评论列表</span></h2>
+
+  <div class="admin_table mb10">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <tr class="tr2">
+	  <td width="30"><span onclick="CheckAll(document.FORM)" class="cp">全选</span></td>
+      <td>评论内容</td>
+      <td>评论者</td>
+      <td>评论时间</td>
+    </tr>
+<!--
+EOT;
+if (empty($comments)) {print <<<EOT
+-->
+<tr><td class="p10" colspan="6"><div class="admin_tips">啊哦，没有你要的信息！</div></td></tr>
+<!--
+EOT;
+}else{
+foreach ($comments as $key => $comment) {
+print <<<EOT
+-->
+    <tr class="tr1 vt">
+      <td class="td2"><input type="checkbox" name="cids[]" value="$comment[cid]"></td>
+      <td class="td2">$comment[content]</td>
+      <td class="td2"><a href="u.php?uid=$comment[uid]" target="_blank">$comment[username]</a></td>
+      <td class="td2" title="$comment[postdate_s]">{$comment[lastdate]}</td>
+    </tr>
+    <!--
+EOT;
+}}print<<<EOT
+-->
+  </table>
+  </div>
+  <div class="cc">$pages</div>
+  <div class="mb10 tac">
+    <span class="btn"><span><button type="submit" onclick="return checkdel();">删除</button></span></span>
+   </div>
+</form>
+<script language="JavaScript">
+function checkdel(){
+	if(confirm("确定要删除所选记录吗？" )){
+		return true;
+	}else{
+		return false;
+	}
+}
+</script>
+<!--
+EOT;
+}include_once PrintEot('adminbottom');
+?>-->

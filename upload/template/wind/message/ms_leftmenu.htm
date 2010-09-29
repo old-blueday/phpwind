@@ -1,0 +1,62 @@
+<!--<?php
+print <<<EOT
+-->
+<style type="text/css">
+.headTrgB{border-bottom:9px $uskin_appBgTop solid;}
+.main{background:url(u/themes/$uskin/images/$uskin_appBg) -1px 0 repeat-y;}
+.contUser{float:right;width:800px;overflow:hidden;}
+/*兼容:老版本-8.0beta-APP左右分栏样式*/
+</style>
+<script type="text/javascript" src="js/message.js"></script>
+<div class="menubar">
+    <div class="navB">
+	<a href="{$baseUrl}?type=post" class="postMes">写新消息</a>
+        <ul class="one" style="padding-top:0;">
+            <li id="left_sms"><img src="u/images/message/sms.png">&nbsp;<a href="{$baseUrl}?type=sms">站内信</a><em>{$messageNumber}</em></li>
+            <li id="left_notice"><img src="u/images/message/notice.png">&nbsp;<a href="{$baseUrl}?type=notice">通知</a><em>{$noticeNumber}</em></li>
+            <li id="left_request"><img src="u/images/message/request.png">&nbsp;<a href="{$baseUrl}?type=request">请求</a><em>{$requestNumber}</em></li>
+            <li id="left_groupsms"><img src="u/images/message/groupsms.png">&nbsp;<a href="{$baseUrl}?type=groupsms">群消息</a><em>{$groupsmsNumber}</em></li>
+<!-- 
+EOT;
+if($db_history){
+print <<<EOT
+-->			
+			<li id="left_history"><img src="u/images/message/history.png">&nbsp;<a href="{$baseUrl}?type=history">历史消息</a><em></em></li>
+<!-- 
+EOT;
+}
+print <<<EOT
+-->				
+        </ul>
+    </div>
+<script type="text/javascript">
+	MC.setCurrent('','left_{$subtype}','current');
+</script>
+<div class="c mb10"></div>
+<!--<?php
+EOT;
+if($_G['maxmsg']){
+print <<<EOT
+-->
+    <div class="mb10" style="padding:0 20px;">
+        <p class="mb5">空间使用</p>
+        <div class="perCent"><i>$percent</i><div class="perValue" style="width:$percent;"></div></div>
+    </div>
+<!--<?php
+EOT;
+}print <<<EOT
+-->
+	<div class="tac"><a href="{$baseUrl}?type=shield">消息设置</a><span class="p_lr_10">|</span><a href="{$baseUrl}?type=search">消息搜索</a></div>
+<!--
+EOT;
+if (empty($_COOKIE['clearmsg_guide'])) {print <<<EOT
+-->
+	<div style="padding:5px;margin:5px;background:#fcfae3;border:1px solid #b8b5a6;" id="tag_message"><div class="fl"><div class="spaceTiptri"></div></div><div class="cc"><a href="javascript:;" class="adel" onclick="javascript:getObj('tag_message').style.display ='none';SetCookie('clearmsg_guide', 1);">关闭</a>点击这里可以清理消息</div></div>
+<!--
+EOT;
+}print <<<EOT
+-->
+</div>
+<!--
+EOT;
+?>-->

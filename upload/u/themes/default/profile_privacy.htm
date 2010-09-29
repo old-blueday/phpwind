@@ -1,0 +1,169 @@
+<!--<?php
+require_once uTemplate::PrintEot('header');
+require_once uTemplate::PrintEot('profile_left');
+print <<<EOT
+-->
+<div class="contUser">
+	<div class="p15">
+		<h4 class="site"><span>隐私</span></h4>
+		<div class="navC">
+			<ul>
+				<li{$privacyCurrent}><a href="profile.php?action=privacy" hidefocus="true">隐私设置</a></li>
+				<li{$weiboCurrent}><a href="profile.php?action=privacy&t=weibo" hidefocus="true">新鲜事设置</a></li>
+			</ul>
+		</div>
+<!--
+EOT;
+if (empty($t)) {print <<<EOT
+-->
+		<form action="profile.php?action=$action" method="post">
+		<input type="hidden" name="verify" value="$verifyhash" />
+		<input type="hidden" name="step" value="2" />
+		<div class="p15">
+			<div class="b f14 s7 mb10"><a name="space"></a>个人空间隐私</div>
+			<table width="100%" class="setTable">
+				<tr>
+					<th class="th" style="width:180px;">个人空间</th>
+					<td class="td">
+						<select class="select_wa" name="privacy[index]">
+							<option value="0" $index_0 >任何人可见</option>
+							<option value="1" $index_1 >仅朋友可见</option>
+							<option value="2" $index_2 >仅自己可见</option>
+						</select>
+					</td>
+				</tr>
+				<tr>
+					<th class="th">空间留言</th>
+					<td class="td"><select class="select_wa" name="privacy[msgboard]">
+						<option value="0" $msgboard_0 >任何人可见</option>
+						<option value="1" $msgboard_1 >仅朋友可见</option>
+						<option value="2" $msgboard_2 >仅自己可见</option>
+					</select></td>
+				</tr>
+			</table>
+			<div class="b f14 s7 mb10"><a name="friend"></a>加好友隐私</div>
+			<table width="100%" class="setTable">
+				<tr>
+					<th class="th" style="width:180px;">加我为好友时身份验证</th>
+					<td class="td">
+						<ul>
+							<li class="lh_24"><label for="friendcheck0"><input type="radio" name="friendcheck" id="friendcheck0" value="0" $friend_0 /> 允许任何人加我为好友</label></li>
+							<li class="lh_24"><label for="friendcheck1"><input type="radio" name="friendcheck" id="friendcheck1" value="1" $friend_1 /> 需要身份验证才能加我为好友</label></li>
+							<li class="lh_24"><label for="friendcheck2"><input type="radio" name="friendcheck" id="friendcheck2" value="2" $friend_2 /> 不允许任何人加我为好友</label></li>
+						</ul>
+					</td>
+				</tr>
+			</table>
+			<div class="b f14 s7 mb10"><a name="friend"></a>加关注隐私</div>
+			<table width="100%" class="setTable">
+				<tr>
+					<th class="th" style="width:180px;">黑名单设置</th>
+					<td class="td">
+						<div class="mb5"><textarea name="attentionblacklist" class="textareaA">$names</textarea></div>
+						<div class="mb5">你可以添加对象到黑名单，被列为黑名单的用户，将不能关注你，不能给你发评论，也不能提到你。</div>
+						<div class="mb20">多个用户用英文状态下的逗号隔开，如：张三，李四 </div>
+					</td>
+				</tr>
+			</table>
+			<div class="tac" style="padding:1em">
+				<span class="btn"><span><button type="submit">提 交</button></span></span>
+			</div>
+		</div>
+		</form>
+<!--
+EOT;
+} else {print <<<EOT
+-->
+		<form action="profile.php?action=$action&t=$t" method="post">
+		<input type="hidden" name="verify" value="$verifyhash" />
+		<input type="hidden" name="step" value="2" />
+		<div class="p15">
+			<div class="b f14 s7 mb15"><a name="space"></a>我产生的新鲜事</div>
+			<div class="mb5">通过设置，下面这些信息的更新将产生新鲜事</div>
+				<div class="p10 bgA mb20">
+					<label class="mr20"><input type="checkbox" name="article_isfeed" value="1"{$article_isfeed} />帖子</label>
+					<label class="mr20"><input type="checkbox" name="diary_isfeed" value="1"{$diary_isfeed} />日志</label>
+					<label class="mr20"><input type="checkbox" name="photos_isfeed" value="1"{$photos_isfeed} />相册</label>
+					<label class="mr20"><input type="checkbox" name="group_isfeed" value="1"{$group_isfeed} />群组</label>
+			</div>
+			<div class="b f14 s7 mb15"><a name="friend"></a>我关注的新鲜事</div>
+			<div class="mb5">通过设置，系统会帮你在众多新鲜事中筛选出你最关注的类型。</div>
+				<div class="p15 bgA mb20">
+					<div class="mb10">
+						关系：
+						<label class="mr20"><input type="checkbox" name="self_isfollow" value="1"{$self_isfollow} />自己</label>
+						<label class="mr20"><input type="checkbox" name="friend_isfollow" value="1"{$friend_isfollow} />好友</label>
+						<label class="mr20"><input type="checkbox" name="cnlesp_isfollow" value="1"{$cnlesp_isfollow} />关注的人</label>
+					</div>
+					<div>
+						来源：
+						<label class="mr20"><input type="checkbox" name="article_isfollow" value="1"{$article_isfollow} />帖子</label>
+						<label class="mr20"><input type="checkbox" name="diary_isfollow" value="1"{$diary_isfollow} />日志</label>
+						<label class="mr20"><input type="checkbox" name="photos_isfollow" value="1"{$photos_isfollow} />相册</label>
+						<label class="mr20"><input type="checkbox" name="group_isfollow" value="1"{$group_isfollow} />群组</label>
+<!--
+EOT;
+	if ($db_sinaweibo_status) {
+print <<<EOT
+-->
+						<label class="mr20"><input type="checkbox" name="sinaweibo_isfollow" value="1"{$sinaweibo_isfollow} />新浪微博</label>
+<!--
+EOT;
+	}
+print <<<EOT
+-->
+					</div>
+				</div>
+			<div class="tac mb20">
+				<span class="btn"><span><button type="submit">提 交</button></span></span>
+			</div>
+
+<!--sinaWeibo-->
+<!--
+EOT;
+if ($db_sinaweibo_status) {
+print <<<EOT
+-->
+			<div class="b f14 s7 mb15"><a name="friend"></a>新鲜事同步设置</div>
+			<div class="mb10">绑定新浪微博帐号，就可以随时随地同步你的新鲜事，让更多的朋友分享你的生活！</div>
+<!--
+EOT;
+	if ($isBindWeibo) {
+print <<<EOT
+-->
+			<div class="mb10">
+				<img src="u/images/expand/sina_n.png" align="absmiddle" class="mr10" />
+				已同步到新浪微博 <a class="s3 mr20" target="_blank" href="http://t.sina.com.cn/{$bindInfo[info][id]}">{$bindInfo[info][name]}</a>
+				<!-- <span class="s3 mr20"></span> -->
+				<a href="profile.php?action=privacy&t=unbind">取消同步&gt;&gt;</a>
+			</div>
+<!--
+EOT;
+	} else {
+print <<<EOT
+-->
+			<div class="mb10">
+				同步到 <img src="u/images/expand/sina.png" align="absmiddle" class="mr10" />
+				<a href="javascript:;" onclick="window.open('$bindSinaWeiboUrl', 'sinaWeiboBind', 'height=520, width=850, toolbar=no, menubar=no, scrollbars=no, resizable=no, location=no, status=no');">去新浪上设置同步&gt;&gt;</a>
+			</div>
+<!--
+EOT;
+	}
+}
+print <<<EOT
+-->
+<!--sinaWeibo end-->
+			
+		</div>
+		</form>
+
+<!--
+EOT;
+}print <<<EOT
+-->
+	</div>
+</div>
+<!--
+EOT;
+require_once uTemplate::printEot('footer');
+?>-->

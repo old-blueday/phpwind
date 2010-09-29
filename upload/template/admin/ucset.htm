@@ -1,0 +1,97 @@
+<!--<?php
+include_once PrintEot('left');
+print <<<EOT
+-->
+<div class="admin_info mb10">
+	<h3 class="h1">提示信息</h3>
+    <div class="legend">
+    	<ol>
+        	<li>此处用于设置多个系统间的用户信息共享，并实现各系统间用户资料、操作等的同步</li>
+    		<li>独立系统—表示系统没有跟其他系统共享用户信息</li>
+    		<li>用户中心服务端—表示系统为用户中心主站，设置过程中其本身的数据将不受影响；设置完成后，需要到《应用管理》中添加附站信息</li>
+    		<li>用户中心客户端—表示系统为用户中心附站，设置完成后，其用户信息将被主站覆盖（设置需谨慎）</li>
+        </ol>
+    </div>
+</div>
+<form action="$basename" method="post">
+<h2 class="h1">用户中心</h2>
+<div class="admin_table mb10">
+    <table cellspacing="0" cellpadding="0" width="100%">
+        <tr class="tr1 vt">
+            <td class="td1">将本系统作为</td>
+            <td class="td2">
+            	<ul class="list_A">
+                	<li><input type="radio" name="uc_server" value="0" onclick="showset(this.value);" $ifcheck_0 />独立系统</li>
+                	<li><input type="radio" name="uc_server" value="1" onclick="showset(this.value);" $ifcheck_1 />用户中心服务端</li>
+                	<li><input type="radio" name="uc_server" value="2" onclick="showset(this.value);" $ifcheck_2 />用户中心客户端（用户中心的一个子应用）</li>
+                </ul>
+            </td>
+        </tr>
+        <tbody id="uc_set_appid" style="display:none">
+        <tr class="tr1 vt">
+            <td class="td1">本应用id</td>
+            <td class="td2"><input type="text" name="uc_appid" value="$uc_appid" class="input input_wa" /></td>
+        </tr>
+        </tbody>
+        <tbody id="uc_set_key" style="display:none">
+        <tr class="tr1 vt">
+            <td class="td1">本应用密钥</td>
+            <td class="td2">
+            	<input type="text" name="uc_key" value="$uc_key" id="uc_key" class="input input_wa mr5" />
+            	<span class="bt2"><span><button type="button" onclick="randomChar(20)">随机生成密钥</button></span></span>
+            </td>
+        </tr>
+        </tbody>
+        <tbody id="uc_set_server" style="display:none">
+        <tr class="tr1 vt">
+            <td class="td1">服务端数据库主机名 或 IP 地址</td>
+            <td class="td2"><input type="text" name="uc_dbhost" value="$uc_dbhost" class="input input_wa" /></td>
+        </tr>
+        <tr class="tr1 vt">
+            <td class="td1">服务端数据库用户名</td>
+            <td class="td2"><input type="text" name="uc_dbuser" value="$uc_dbuser" class="input input_wa" /></td>
+        </tr>
+        <tr class="tr1 vt">
+            <td class="td1">服务端数据库密码</td>
+            <td class="td2"><input type="text" name="uc_dbpw" value="$uc_dbpw" class="input input_wa" /></td>
+        </tr>
+        <tr class="tr1 vt">
+            <td class="td1">服务端数据库名</td>
+            <td class="td2"><input type="text" name="uc_dbname" value="$uc_dbname" class="input input_wa" /></td>
+        </tr>
+        <tr class="tr1 vt">
+            <td class="td1">服务端数据库表前缀</td>
+            <td class="td2"><input type="text" name="uc_dbpre" value="$uc_dbpre" class="input input_wa" /></td>
+        </tr>
+        <tr class="tr1 vt">
+            <td class="td1">服务端数据库表字符编码</td>
+            <td class="td2"><input type="text" name="uc_dbcharset" value="$uc_dbcharset" class="input input_wa" /></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+<div class="tac mb10">
+	<input type="hidden" name=action value='unite'>
+	<span class="btn"><span><button type="submit">提 交</button></span></span>
+</div>
+</form>
+<script language="JavaScript">
+function randomChar(len) {
+	var x = "0123456789qwertyuioplkjhgfdsazxcvbnm";
+	var tmp = "";
+	for (var i = 0; i < len; i++) {
+		tmp += x.charAt(Math.ceil(Math.random() * 100000000) % x.length);
+	}
+	getObj('uc_key').value = tmp;
+}
+function showset(id) {
+	getObj('uc_set_key').style.display = (id != '0') ? '' : 'none';
+	getObj('uc_set_server').style.display = (id == '2') ? '' : 'none';
+	getObj('uc_set_appid').style.display = (id == '2') ? '' : 'none';
+}
+showset('$uc_server');
+</script>
+<!--
+EOT;
+include_once PrintEot('adminbottom');
+?>-->

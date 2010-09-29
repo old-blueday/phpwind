@@ -1,0 +1,50 @@
+<!--<?php
+if ($action == 'level') {print <<<EOT
+-->
+<script type="text/javascript" id="level_del">
+function level_del() {
+	var rText = ajax.request.responseText.split('\t');
+	if (rText[0] == 'ok') {
+		getObj('gtr_' + rText[1]).style.display = 'none';
+	} else {
+		ajax.guide();
+	}
+}
+</script>
+<form action="$basename&action=level&job=del&id=$id&verify=$posthash" onsubmit="return false;" method="post">
+<input type="hidden" name="step" value="3" />
+<div style="width:200px;" class="cc">
+	<div class="p10 b f14">您确定要删除该等级吗？</div>
+	<div class="p10 tar">
+	<span class="button"><span><button type="button" onclick="ajax.submit(this.form,level_del)">删 除</button></span></span>
+	<span class="button2"><span><button type="button" onclick="closep();">取消</button></span></span>
+	</div>
+</div>
+</form>
+<!--
+EOT;
+} elseif ($action == 'active') {print <<<EOT
+-->
+<script type="text/javascript" id="active_del">
+function level_del() {
+	var rText = ajax.request.responseText.split('\t');
+	if (rText[0] == 'ok') {
+		getObj('gtr_' + rText[1]).style.display = 'none';
+	} else {
+		ajax.guide();
+	}
+}
+</script>
+<form action="$basename&action=active&job=del&selid=$id&ajax=1&verify=$posthash" onsubmit="return false;" method="post">
+<input type="hidden" name="step" value="3" />
+<div style="width:200px;" class="cc">
+	<div class="p10 b f14">您确定要删除该群组吗？</div>
+	<div class="p10 tar">
+	<span class="button"><span><button type="button" onclick="ajax.submit(this.form,level_del)">删 除</button></span></span>
+	<span class="button2"><span><button type="button" onclick="closep();">取消</button></span></span>
+	</div>
+</div>
+</form>
+<!--
+EOT;
+}?>-->

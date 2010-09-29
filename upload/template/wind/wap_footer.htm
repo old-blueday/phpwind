@@ -1,0 +1,31 @@
+<!--<?php
+print <<<EOT
+-->
+<p>
+<!--
+EOT;
+if($prog!='index'){print <<<EOT
+-->
+<anchor>返回<prev/></anchor> <a href="index.php">首页</a><br/>
+<!--
+EOT;
+}
+if($prog!='login' && $prog!='quit'){
+if($windid){print <<<EOT
+-->
+<a href="index.php?prog=quit">$windid 退出</a>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+<a href="index.php?prog=login">登录</a>
+<!--
+EOT;
+}}print <<<EOT
+-->
+</p>
+<p><small><b>phpwind</b> V$wind_version</small></p>
+</card></wml>
+<!--
+EOT;
+?>-->

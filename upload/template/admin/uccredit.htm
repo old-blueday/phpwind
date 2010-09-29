@@ -1,0 +1,187 @@
+<!--<?php
+include_once PrintEot('left');
+if (empty($action)) {print <<<EOT
+-->
+<div class="nav3 mb10">
+    <ul class="cc">
+        <li class="current"><a href="$basename">同步积分列表</a></li>
+        <li><a href="$basename&action=create">新建同步积分</a></li>
+    </ul>
+</div>
+<h3 class="h1">同步积分列表</h3>
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+	<tr class="tr2">
+		<td>同步积分名称</td>
+		<td>操作</td>
+        <td>&nbsp;</td>
+	</tr>
+<!--
+EOT;
+foreach ($uc_syncredit as $key => $value) {print <<<EOT
+-->
+	<tr class="tr1">
+		<td class="td2">$credittype[$key]</td>
+		<td class="td2"><a href="$basename&action=edit&cid=$key" class="mr20">[编辑]</a><a href="$basename&action=del&cid=$key">[删除]</a></td>
+        <td class="td2"><div class="help_a"></div></td>
+	</tr>
+	<tbody>
+<!--
+EOT;
+foreach ($value as $k => $v) {print <<<EOT
+-->
+	<tr class="tr1">
+		<td class="td2"><i class="lower"></i>{$uc_credits[$k][$v]} (应用：{$applist[$k][name]})</td>
+		<td class="td2"><!-- <a href="$basename&action=import&cid=$value[cid]&id=$v[id]">导入</a> --> -- </td>
+		<td class="td2"><div class="help_a"></div></td>
+	</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+	</tbody>
+<!--
+EOT;
+}print <<<EOT
+-->
+</table>
+</div>
+<!--
+EOT;
+} elseif ($action == 'create' || $action == 'edit') {print <<<EOT
+-->
+<div class="nav3 mb10">
+	<ul class="cc">
+		<li><a href="$basename">同步积分列表</a></li>
+<!--
+EOT;
+if ($action == 'create') {print <<<EOT
+-->
+		<li class="current"><a href="$basename&action=create">新建同步积分</a></li>
+<!--
+EOT;
+} else {print <<<EOT
+-->
+		<li><a href="$basename&action=create">新建同步积分</a></li>
+		<li clsas="current"><a href="$basename&action=edit&cid=$cid">编辑同步积分</a></li>
+<!--
+EOT;
+}print <<<EOT
+-->
+	</ul>
+</div>
+<h3 class="h1">积分信息</h3>
+<form action="$basename" method="post" name="appForm">
+<input type="hidden" name="action" id="s_action" value="$action" />
+<input type="hidden" name="step" value="2" />
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+	<tr class="tr1 vt">
+		<td class="td1">同步积分名称</td>
+		<td class="td2">
+			<select name="cid" id="credit_cid">
+<!--
+EOT;
+foreach ($credittype as $key => $value) {print <<<EOT
+-->
+				<option value="$key">$value</option>
+<!--
+EOT;
+}print <<<EOT
+-->
+			</select> (本站)
+		</td>
+        <td class="td2"><div class="help_a"></div></td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">选择同步积分</td>
+		<td class="td2">
+<!--
+EOT;
+foreach ($applist as $key => $value) {
+if ($key != $uc_appid) {print <<<EOT
+-->
+				<select name="ctype[$key]" id="credit_cid$key" class="select_wa mb5">
+					<option value="">选择同步积分</option>
+<!--
+EOT;
+foreach ($uc_credits[$key] as $k => $v) {print <<<EOT
+-->
+					<option value="$k">$v</option>
+<!--
+EOT;
+}print <<<EOT
+-->
+				</select><p class="gray">应用站点：$value[name]</p>
+<!--
+EOT;
+}}print <<<EOT
+-->
+		</td>
+        <td class="td2"><div class="help_a"></div></td>
+	</tr>
+</table>
+</div>
+<div class="tac mb10">
+	<span class="bt"><span><button type="button" onclick="setcredit();">更新应用积分设置</button></span></span>
+    <span class="btn"><span><button type="submit">提 交</button></span></span>
+</div>
+</form>
+<script language="JavaScript">
+function setcredit() {
+	document.getElementById('s_action').value = 'setcredit';
+	document.appForm.submit();
+}
+(function() {
+	var setv = {{$setv}};
+	for (var i in setv) {
+		getObj('credit_' + i).value = setv[i];
+	}
+})();
+</script>
+<!--
+EOT;
+} elseif ($action == 'del') {print <<<EOT
+-->
+<div class="nav3 mb10">
+    <ul class="cc">
+        <li><a href="$basename">同步积分列表</a></li>
+        <li><a href="$basename&action=create">新建同步积分</a></li>
+        <li class="current"><a href="$basename&action=del&cid=$cid">删除积分</a></li>
+    </ul>
+</div>
+<h3 class="h1">删除积分</h3>
+<form action="$basename" method="post">
+<input type="hidden" name="action" value="del" />
+<input type="hidden" name="step" value="3" />
+<input type="hidden" name="cid" value="$cid" />
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+	<tr class="tr2">
+		<td>删除积分</td>
+		<td>$credittype[$cid]</td>
+	</tr>
+	<tr class="tr1">
+		<td class="td1">关联积分</td>
+		<td class="td2">
+<!--
+EOT;
+foreach ($uc_syncredit[$cid] as $key => $value) {print <<<EOT
+-->
+			{$uc_credits[$key][$value]} (应用:{$applist[$key][name]})
+<!--
+EOT;
+}print <<<EOT
+-->
+		</td>
+	</tr>
+</table>
+</div>
+<div class="tac mb10">
+    <span class="btn"><span><button type="submit">确认删除</button></span></span>
+</div>
+</form>
+<!--
+EOT;
+}include_once PrintEot('adminbottom');
+?>-->

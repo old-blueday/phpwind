@@ -1,0 +1,122 @@
+<!--<?php
+include_once PrintEot('left');print <<<EOT
+-->
+<!--
+EOT;
+if(!$action){print <<<EOT
+-->
+<div class="admin_info mb10">
+	<h3 class="h1"><b>提示信息</b></h3>
+	<div class="legend">
+	<ol><li>创始人拥有后台所有权限，若无特殊情况请勿更改</li>
+<li>您可以添加新创始人，删除和修改其他创始人信息</li></ol>
+	</div>
+</div>
+<h2 class="h1">创始人管理</h2>
+<div class="admin_table mb10">
+    <table width="100%" cellspacing="0" cellpadding="0">
+        <tr class="tr2">
+            <td>用户名</td>
+            <td>操 作</td>
+            <td></td>
+        </tr>
+<!--
+EOT;
+foreach($manager as $value){
+$rawuser = rawurlencode($value);print <<<EOT
+-->
+        <tr class="tr1">
+            <td class="td1">$value</td>
+            <td class="td2"><a class="mr20" href="$basename&action=edit&oldname=$rawuser" title="编辑">[编辑]</a><a href="$basename&action=delete&oldname=$rawuser" title="删除">[删除]</a></td>
+            <td class="td2"></td>
+        </tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+    </table>
+</div>
+<form action="$basename&" method="post">
+<input type="hidden" name="action" value="add">
+<h2 class="h1">添加创始人</h2>
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+	<tr class="tr1">
+		<td class="td1">用户名</td>
+		<td class="td2"><input type="text" class="input input_wa" name="username" /></td>
+	</tr>
+	<tr class="tr1">
+		<td class="td1">密码</td>
+		<td class="td2"><input type="text" class="input input_wa" name="password" /></td>
+	</tr>
+	<tr class="tr1">
+		<td class="td1">确认密码</td>
+		<td class="td2"><input type="text" class="input input_wa" name="check_pwd" /></td>
+	</tr>
+</table>
+</div>
+<div class="tac mb10"><span class="btn"><span><button type="submit" onfocus="blur();">提 交</button></span></span></div>
+</form>
+<form action="$basename&" method="post">
+<input type="hidden" name="action" value="ifopen">
+<h2 class="h1">后台操作记录</h2>
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+	<tr class="tr1 vt">
+		<td class="td1">管理员操作记录</td>
+		<td class="td2">
+        	<ul class="list_A list_80">
+            	<li><input type="radio" name="config[adminrecord]" value="1" $adminrecord_Y />开启</li>
+				<li><input type="radio" name="config[adminrecord]" value="0" $adminrecord_N />关闭</li>
+            </ul>
+		</td>
+        <td class="td2"><div class="help_a">当开启此设置后，管理员在后台操作时会被要求输入操作理由 <br />
+	历史操作可在 <a href="javascript:;" onclick="parent.PW.Dialog({id:'adminrecord',url:'$admin_file?adminjob=adminrecord',name:'后台操作记录'});">后台操作记录</a> 进行查看</div></td>
+	</tr>
+</table>
+</div>
+<div class="tac mb10"><span class="btn"><span><button type="submit" onfocus="blur();">提 交</button></span></span></div>
+</form>
+<!--
+EOT;
+}elseif($action=='edit'){print <<<EOT
+-->
+<div class="admin_info mb10">
+	<h3 class="h1"><b>提示信息</b></h3>
+	<div class="legend">
+	<ol><li>创始人拥有后台所有权限，若无特殊情况请勿更改</li>
+<li>您可以添加新创始人，删除和修改其他创始人信息</li><li><font color=red>如不需要更改密码，“新密码”、“确认密码” 请留空</font></li></ol>
+	</div>
+</div>
+<form action="$basename&" method="post">
+<input type="hidden" name="action" value="edit">
+<input type="hidden" name="oldname" value="$oldname" />
+<input type="hidden" name="step" value="2">
+<h2 class="h1">编辑创始人</h2>
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+	<tr class="tr1">
+		<td class="td1">用户名</td>
+		<td class="td2"><input type="text" class="input input_wa" name="username" value="$oldname" /></td>
+	</tr>
+	<tr class="tr1">
+		<td class="td1">新密码</td>
+		<td class="td2"><input type="text" class="input input_wa" name="password" /></td>
+	</tr>
+	<tr class="tr1">
+		<td class="td1">确认密码</td>
+		<td class="td2"><input type="text" class="input input_wa" name="check_pwd" /></td>
+	</tr>
+</table>
+</div>
+<div class="tac mb10"><span class="btn"><span><button type="submit" onfocus="blur();">提 交</button></span></span></div>
+</form>
+<!--
+EOT;
+}print <<<EOT
+-->
+
+<!--
+EOT;
+include_once PrintEot('adminbottom');
+?>-->

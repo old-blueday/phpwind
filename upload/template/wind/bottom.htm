@@ -1,0 +1,337 @@
+<!--<?php
+if (!defined('AJAX')) {print <<<EOT
+--><div style="height:25px;">&nbsp;</div><link rel="stylesheet" type="text/css" href="images/toolbar.css?2010412" media="all" />
+<div class="startbar-wrapper fixed">
+<!--[if IE 6]>
+<iframe frameborder="0" style="position:absolute;width:98%;height:25px;filter:Alpha(opacity=0);" scrolling="no"></iframe>
+<![endif]-->
+<!--
+EOT;
+}
+if ($_COOKIE['toolbarhide'] && !defined('AJAX')) {print <<<EOT
+-->
+<div id="wholetoolbar" style="_height:0;_overflow:hidden">
+	<div class="startbar-close fl" id="startbar-open" onclick="ajaxShowToolBar();" title="显示快捷栏"></div>
+</div>
+</div>
+<script language="Javascript">
+function ajaxShowToolBar(){
+	ajax.send('pw_ajax.php?action=showbottom','',responseAjaxShowToolBar);
+}
+
+function responseAjaxShowToolBar(){
+	var rText = ajax.runscript(ajax.request.responseText);
+	getObj('wholetoolbar').innerHTML = rText;
+	var date = new Date();
+	document.cookie="toolbarhide=1;expires=" + date.toGMTString() + " path=/";
+}
+</script>
+<!--
+EOT;
+}else{
+	if($GLOBALS['pwForumList']){
+		$pwForumList = $GLOBALS['pwForumList'];
+	} else {
+		$pwForumList = array();
+		include(D_P.'data/bbscache/forumlist_cache.php');
+		if ($pwForumAllList && $GLOBALS['groupid'] == 3) {
+			$pwForumList = array_merge($pwForumList,$pwForumAllList);
+		}
+	}
+print <<<EOT
+-->
+<div id="menu_forumlist" style="display:none;">
+	<div class="sbar-box-a" style="width:700px;">
+		<div class="sbar-title" style="cursor:pointer" onclick="try{pw_bottom.hiddenTab();read.close();}catch(e){read.close();}">
+				<span class="adel">隐藏</span>
+				<span id="title_forumlist" class="b">快速浏览</span>
+		</div>
+		<div class="sbar-box-b">
+			<div class="forum-list-popout">
+<!--
+EOT;
+	foreach ($pwForumList as $key=>$value) {
+		if (isset($value['child']) && is_array($value['child']) && count($value['child'])) {
+print <<<EOT
+-->
+			<dl class="cc">
+				<dt>
+<!--
+EOT;
+			if ($GLOBALS['m']) {
+print<<<EOT
+-->
+				<a href="index.php?cateid=$key" target="_blank">$value[name]</a>
+<!--
+EOT;
+			} else {
+print<<<EOT
+-->
+				<a href="index.php?cateid=$key">$value[name]</a>
+<!--
+EOT;
+			}
+print<<<EOT
+-->
+				</dt>
+				<dd class="cc">
+<!--
+EOT;
+			foreach ($value['child'] as $k=>$v) {
+				if($GLOBALS['m']) {
+print <<<EOT
+-->
+					<a href="thread.php?fid=$k" target="_blank" onclick="return pwForumList(true,gIsPost,$k,'',true);">$v</a>
+<!--
+EOT;
+				} else {
+print<<<EOT
+-->
+					<a href="thread.php?fid=$k" onclick="return pwForumList(true,gIsPost,$k);">$v</a>
+<!--
+EOT;
+				}
+			}
+print <<<EOT
+-->
+				</dd>
+			</dl>
+<!--
+EOT;
+		}
+	}
+print <<<EOT
+-->
+			</div>
+		</div>
+	</div>
+</div>
+	<div class="startbar-close fl" id="startbar-open" onclick="pw_bottom.showToolBar('open');" $openbarstyle title="显示快捷栏"></div>
+	<a class="startbar-open fl" id="startbar-close" onclick="pw_bottom.showToolBar('close');" $closebarstyle title="隐藏快捷栏"></a>
+	<div class="startbar" id="startbar" $toolbarstyle>
+		<div class="startbar-ui cc">
+			<span class="fr">
+				<span class="fl" style="display:none">
+					<span class="app-f app-current" style="margin-right:-1px" onclick="pw_bottom.hiddenTab('pwb_friend')">在线好友</span>
+				</span>
+				<span class="app-f fl" id="pwb_friend">在线好友</span>
+			</span>
+			<span class="fr">
+<!--
+EOT;
+	if($winddb[newpm]>0 && $_G[maxmsg]>0){print <<<EOT
+-->
+				<span class="fl" style="display:none">
+					<span class="app-m app-m-new app-current" style="margin-left:-1px;" onclick="pw_bottom.hiddenTab('pwb_message')">消息</span>
+				</span>
+				<span class="app-m app-m-new fl" id="pwb_message" title="查看最新末读消息">消息</span>
+<!--
+EOT;
+	} else {print <<<EOT
+-->
+				<span class="fl" style="display:none">
+					<span class="app-m app-current" style="margin-left:-1px;" onclick="pw_bottom.hiddenTab('pwb_message')">消息</span>
+				</span>
+				<span class="app-m fl" id="pwb_message" title="查看最新末读消息">消息</span>
+<!--
+EOT;
+	}print <<<EOT
+-->
+			</span>
+			<span class="fl">
+				<span class="fl" style="display:none">
+					<span class="app-butt app-current" style="margin-left:-1px;" onclick="pw_bottom.hiddenTab('pwb_app')">我的菜单</span>
+				</span>
+				<span class="app-butt fl" id="pwb_app">我的菜单</span>
+			</span>
+			<div class="app-using">
+				<span>
+					<span style="display:none;float:left;margin-top:-1px;">
+						<a href="javascript:;" class="app-forum app-us-current" title="浏览版块"  onclick="pw_bottom.hiddenTab('pwb_forumlist')" >浏览</a>
+					</span>
+					<span id="pwb_forumlist"><a href="javascript:;" class="app-forum" title="浏览版块" style="cursor: pointer;">浏览</a></span>
+				</span>
+				<span>
+					<span style="display:none;float:left;margin-top:-1px;">
+						<a href="javascript:;" class="app-thread app-us-current" title="发帖"  onclick="pw_bottom.hiddenTab('pwb_postlist')" >发帖</a>
+					</span>
+					<span id="pwb_postlist"><a href="javascript:;" class="app-thread" title="发帖" style="cursor: pointer;">发帖</a></span>
+				</span>
+<!--
+EOT;
+	if (isset($db_modes[o][ifopen]) && $db_modes[o][ifopen]) {
+		if($GLOBALS['db_dopen']){print <<<EOT
+-->			 <span>
+					<span style="display:none;float:left;margin-top:-1px;">
+					<a href="javascript:;" class="app-diary app-us-current" title="写日志" onclick="pw_bottom.hiddenTab()" >写日志</a>
+					</span>
+				<span id="pwb_diary"><a href="javascript:;" onclick="return false;" title="日志" class="app-diary">写日志</a></span>
+			</span>
+<!--
+EOT;
+		}print <<<EOT
+-->			  <span>
+					<span style="display:none;float:left;margin-top:-1px;">
+					<a href="javascript:;" class="app-blog app-us-current" title="新鲜事" onclick="pw_bottom.hiddenTab()" >新鲜事</a>
+					</span>
+				<span id="pwb_weibo"><a href="javascript:;" onclick="return false;" title="新鲜事" class="app-blog">新鲜事</a></span>
+			</span>
+<!--
+EOT;
+		if($GLOBALS['db_phopen']){print <<<EOT
+-->			  <span>
+					<span style="display:none;float:left;margin-top:-1px;">
+					<a href="javascript:;" class="app-photo app-us-current" title="传照片" onclick="pw_bottom.hiddenTab()" >传照片</a>
+					</span>
+				<span id="pwb_photo"><a href="javascript:;" onclick="event.returnValue=false;return false;" title="传照片" class="app-photo">传照片</a></span>
+			</span>
+<!--
+EOT;
+		}
+	}print <<<EOT
+-->
+				<div class="c"></div>
+			</div>
+
+		</div>
+	</div>
+<div id="pwd_app_hidden" style="display:none;">
+	<div class="sbar-title cc" style="cursor: pointer;padding:5px 10px;" onclick = "pw_bottom.hiddenTab();">
+	<span class="fr closeicon"><img src="$imgpath/wind/index/cate_open.gif" alt="收起" /></span>
+		<span class="b">我的菜单&nbsp;</span>
+	</div>
+	<h6 class="gray">我的书签</h6>
+	<div class="listAppItem">
+		<ul class="cc">
+<!--
+EOT;
+	$shortcutforum = pwGetShortcut();
+	$isMyBookMark = ($GLOBALS['winddb']['shortcut']);
+	foreach ($shortcutforum as $key=>$value) {
+		$value = substrs($value, 28);
+		if ($isMyBookMark){print <<<EOT
+-->
+			<li id="shortcut_$key" onmouseover="getObj('shortcut_del_$key').style.display='';" onmouseout="getObj('shortcut_del_$key').style.display='none';">
+<!--
+EOT;
+		}else{print <<<EOT
+-->
+			<li id="shortcut_$key">
+<!--
+EOT;
+		}
+		if ($isMyBookMark) {print <<<EOT
+-->
+			<span id="shortcut_del_$key" class="fr gray" style="display:none;cursor:pointer;" onclick="pw_bottom.delShortCut($key);" >删除</span>
+<!--
+EOT;
+		}print <<<EOT
+-->
+			<a href="thread.php?fid=$key">$value</a></li>
+<!--
+EOT;
+	}print <<<EOT
+-->
+		</ul>
+	</div>
+<!--
+EOT;
+	if (isset($db_modes[o][ifopen]) && $db_modes[o][ifopen] && trim($winddb['appshortcut'],',')) {print <<<EOT
+-->
+	<h6 class="gray"><a href="u.php?a=myapp&action=my" class="fr">管理</a>个人中心应用</h6>
+	<div class="listAppItem">
+		<ul class="cc">
+<!--
+EOT;
+		if (strpos($winddb['appshortcut'],'article')) {print <<<EOT
+-->
+			<li><img src="u/images/icon/posts.png" align="absmiddle" alt="posts" /> <a href="apps.php?q=article">我的帖子</a></li>
+<!--
+EOT;
+		}
+		if($GLOBALS['db_phopen'] && strpos($winddb['appshortcut'],'photos') !== false){print <<<EOT
+-->
+			<li><img src="u/images/icon/albums.png" align="absmiddle" alt="albums" /> <a href="apps.php?q=photos">相册</a></li>
+<!--
+EOT;
+		}
+		if (strpos($winddb['appshortcut'],'weibo')) {print <<<EOT
+-->
+			<li><img src="u/images/icon/record.png" align="absmiddle" alt="weibo" /> <a href="apps.php?q=weibo">新鲜事</a></li>
+<!--
+EOT;
+		}
+		if($GLOBALS['db_dopen']  && strpos($winddb['appshortcut'],'diary') !== false){print <<<EOT
+-->
+			<li><img src="u/images/icon/log.png" align="absmiddle" alt="log" /> <a href="apps.php?q=diary">日志</a></li>
+<!--
+EOT;
+		}
+		if($GLOBALS['db_groups_open']  && strpos($winddb['appshortcut'],'groups') !== false){print <<<EOT
+-->
+			<li><img src="u/images/icon/groups.png" align="absmiddle" alt="groups" /> <a href="apps.php?q=groups">群组</a></li>
+<!--
+EOT;
+}if ($bottom_appshortcut) {
+foreach ($bottom_appshortcut as $key => $value) {
+$appurl = "apps.php?id=$key";
+print <<<EOT
+-->
+			<li><img src="{$GLOBALS[db_server_url]}/images/icon/s{$key}.png" align="absmiddle" alt="s{$key}" /> <a href="$appurl"> $value</a></li>
+<!--
+EOT;
+}}
+print <<<EOT
+-->
+
+		</ul>
+	</div>
+<!--
+EOT;
+	}else{print <<<EOT
+-->
+	<h6 class="gray" style="background:{$GLOBALS['forumcolortwo']};">快捷链接</h6>
+	<div class="listAppItem">
+		<ul class="cc">
+			<li><img src="u/images/icon/posts.png" align="absmiddle" alt="posts" /> <a href="apps.php?q=article&">我的帖子</a></li>
+		</ul>
+	</div>
+<!--
+EOT;
+	}print <<<EOT
+-->
+<div style="padding:5px 10px;border-top:1px solid #dedede;"><a href="profile.php" class="fr" target="_blank">我的设置</a><a href="$db_bbsurl">返回首页</a></div>
+</div>
+<script language="JavaScript" src="js/bottom.js"></script>
+<script language="JavaScript">
+function submitwrite(o) {
+	if (getObj('writetext').value == '' || getObj('writetext').value == '想说点什么?') {
+		showDialog('error','记录内容必须在3～255个字节之间');
+		return false;
+	}
+	ajax.submit(o);
+	return true;
+}
+EOT;
+
+	if (!defined('AJAX')) {print <<<EOT
+
+var pw_bottom = new app_bottom({app:'pwb_app',friend:'pwb_friend',message:'pwb_message',postlist:'pwb_postlist',forumlist:'pwb_forumlist',diary:'pwb_diary',weibo:'pwb_weibo',photo:'pwb_photo'});
+
+EOT;
+	} else {print <<<EOT
+
+var pw_bottom = null;
+setTimeout(function(){pw_bottom = new app_bottom({app:'pwb_app',friend:'pwb_friend',message:'pwb_message',postlist:'pwb_postlist',forumlist:'pwb_forumlist',diary:'pwb_diary',weibo:'pwb_weibo',photo:'pwb_photo'});},300);
+
+EOT;
+	}print <<<EOT
+</script>
+<!--
+EOT;
+}print <<<EOT
+-->
+</div>
+<!--
+EOT;
+?>

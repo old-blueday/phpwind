@@ -1,0 +1,449 @@
+<!--<?php print <<<EOT
+-->
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>{$db_bbsname} - powered by phpwind.net</title>
+<meta http-equiv="Content-Type" content="text/html; charset=$db_charset">
+<meta http-equiv="expires" content="0">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Cache-Control" content="no-cache">
+<style type="text/css">
+/*全局*/
+body{padding:0;margin:0;font-size:12px;background:#fff url($imgpath/admin/navbg.gif) 0 3px repeat-x;;font-family:Verdana;color:#333;}
+img{border:0}
+table{ border-collapse:collapse;}
+th{ text-align:left;font-size:12px;}
+td{font-size:12px;}
+html{height:100%}
+*{margin:0;padding:0;}
+ul{list-style-type:none;}
+a{color:#067098;text-decoration:none;}
+a:hover{color:#FF6600;}
+.input{border: 1px solid;border-color: #c0c0c0 #ededed #ededed #c0c0c0;padding:2px 0px 1px 1px;font-size:1.0em;vertical-align:middle;color:#000;}
+.btn{background:#d9d9d9;border-width:1px;vertical-align:middle;height:21px;padding-left:0.15em;padding-right:0.15em;border: 1px solid; border-color: #c0c0c0 #555 #555 #c0c0c0;}
+.fr{float:right}
+.fl{float:left}
+.c{clear:both;height:0;overflow:hidden;}
+.cc{clear:both;margin-right:1em;border-top:1px solid #91c900;height:10px;}
+/*字体颜色*/
+.s1{color:#006699;} /*蓝*/
+.s2{color:#1e5494;} /*深蓝*/
+.s3{color:#da8030;}
+/*头部*/
+#header{border-top:3px solid #3ca1d6;height:80px;position:absolute;top:0px;left:0px;width:100%;overflow:hidden;}
+#guide{overflow:hidden;margin-top:45px;}
+#guide a:hover{text-decoration:underline;}
+#guide ul{height:35px;line-height:32px;margin-right:1em;}
+#guide ul li{float:left;margin-right:.5em;padding-left:1.5em;background:url($imgpath/admin/toptool-li.png) .3em .7em no-repeat;}
+#guide ul .home{background:none;padding-left:.5em;}
+#showmenu {z-index:2000; position: absolute;margin-top:13px;}
+#showmenu dl{display:block; line-height: 15px;width:115px;*width:119px; padding:0 1px 1px; background:#ffffff;border:#b9e6f5 1px solid;border-top:0px;}
+#showmenu dl dd{padding:5px 0;background:#e6f5ff url($imgpath/admin/showmenu.gif) center top repeat-x;}
+#showmenu dd a{margin:0 2px;border:#e6f5ff 1px solid;color:#666;display: list-item;list-style:none;padding:3px 8px 2px; height:auto!important; height:12px;}
+#showmenu dd a:hover{background:#fff; text-decoration:none; color:#006699;border:#b9e6f5 1px solid;margin:0 2px;}
+/*logo*/
+.logo{background:url($imgpath/admin/logo.gif) left top no-repeat;width:160px;}
+.logo .png{height:43px;}
+.logo .lun{line-height:35px;height:36px;text-align:center;color:#067098;}
+/*一级导航*/
+.nav{height:35px;padding-top:.8em;position:absolute;left:159px;width:838px;}
+.nav li{float:left; height:35px; line-height:35px; width:65px; text-align:center;}
+.nav li a{color:#FFFFFF; text-decoration:none; letter-spacing:2px; background:url($imgpath/admin/nav_main_bg.png) no-repeat left top; width:65px; height:35px; display:block;}
+.nav li a:hover{ color:#000000; font-weight:bold; background:url($imgpath/admin/nav_main_bg.png) no-repeat left -35px;}
+.nav .home{width:60px;}
+.nav .home a{width:60px; height:35px; display:block; background:url($imgpath/admin/nav_home_bg.png) no-repeat left top;}
+.nav .home a:hover{background:url($imgpath/admin/nav_home_bg.png) no-repeat left -35px;}
+.nav .more{width:60px;}
+.nav .more a{width:60px; height:35px; display:block; background:url(images/admin/nav_more_bg.jpg) no-repeat left top;letter-spacing:normal; color:#FFFFFF; font-weight:normal;}
+.nav .more a:hover{background:url($imgpath/admin/nav_more_bg.jpg) no-repeat left -35px; letter-spacing:normal; color:#FFFFFF; font-weight:normal;}
+/*位置*/
+.wei{height:32px;line-height:30px;padding-left:1em;}
+/*搜索*/
+.value{margin:.3em 1em;_margin:.3em 1em 0;}
+.value input{width:80px;*height:20px;}
+/*左边*/
+#main-fl{background:#fff url($imgpath/admin/main-left.gif) right top repeat-y;width:160px;}
+#left{margin:.2em 0 1em 1em;}
+#left h1{float:left;font-size:12px;height:30px;line-height:32px;padding:0 .8em 0 .8em;border-bottom:3px solid #91c900;color:#376585;}
+#left h2{font-size:12px;height:25px;line-height:25px;text-align:center;color:#888;}
+#left ul{padding:0 0 .8em 0;margin:0px;}
+#left ul li{height:24px;line-height:24px;}
+#left a{display:block;background:url($imgpath/admin/main-left-a.gif) 1.5em .7em no-repeat;padding-left:2.8em;color:#555;}
+#left a:hover{background:url($imgpath/admin/main-left-hover.gif) 6px top no-repeat;}
+#left ul .one{height:24px;}
+#left ul .one a,#left ul .one a:hover{height:24px;background:url($imgpath/admin/main-left-home.gif) 6px top no-repeat;}
+/*menu*/
+#menubg{filter: alpha(opacity=20);opacity:0.2; top: 0px; bottom:0px; left:0; right: 0; background:#000; position: absolute; height:100%; width:100%; z-index:1002}
+#menu {top:20px;z-index: 1003;position:absolute;width:98%;height: auto; left:1%; right: 1%; background: #fff;border:3px solid #b0cee6;width:1000px;}
+#menu div{border:1px solid #85a6cf;}
+#menu div div{border:1px solid #fff;background:#f3f3f3;padding:1em;}
+#menu div .c{padding:0px;border:0;}
+#menu h1{font-size:12px;font-weight:normal;height:25px;line-height:25px;color:#256f00;}
+#menu h3{font-size:12px;height:22px;line-height:24px;color:#588db7;font-weight:700;border-top:0px;border-bottom:1px dotted #acbccc;}
+#menu dl{ float: left;padding:.5em 0 .5em 0;width:9em;display:block;color:#333;}
+#menu dl dt{ color:#005681;padding:0px 1px;}
+#menu dl a{ display: list-item; list-style: none;color:#222;word-break:keep-all;height:20px;line-height:20px;border-bottom:1px dotted #acbccc;border-top:1px dotted #fff;}
+#menu dl a:hover{color:#006699;}
+#menu dl dd{ padding-left:.5em;}
+</style>
+</head>
+<body scroll="no" onkeydown="keyCodes('menu',event);">
+<table width="100%" height="100%"  border="0" cellpadding="0" cellspacing="0">
+<tr><td colspan="2" height="80" valign="top">
+<div id="header">
+<div class="logo fl">
+<div class="png"><a href="javascript:;"><img src="$imgpath/admin/logo.png" /></a></div>
+<div class="lun">
+<a href="index.php" target="_blank">站点首页</a>&nbsp;&#8211;&nbsp;<a href="$admin_file">后台首页</a></div>
+</div>
+<!--重点导航-->
+  <ul class="nav">
+<li class="home"><a href="$admin_file">首页</a></li>
+<!--
+EOT;
+foreach($headdb as $key => $value){print <<<EOT
+-->
+    <li id="$key" onMouseOver="showguide(this.id);"><a style="cursor:pointer" href="javascript:;" onClick="return initguide('$key');">$value</a></li>
+<!--
+EOT;
+}print <<<EOT
+-->
+    <li class="more"><a href="javascript:;" onClick="return showmenu();">菜单</a></li>
+        </ul>
+<!--头部信息导航-->
+<div id="guide"></div>
+<!--头部信息导航结束-->
+</div>
+</td></tr>
+<tr><td valign="top" id="main-fl">
+<div id="left"></div>
+</div>
+</td>
+<td valign="top" id="mainright">
+<!--右边开始-->
+<iframe name="main" width="100%" height="100%" frameborder="0" scrolling="yes" style="overflow: visible;"></iframe>
+</td></tr>
+</table>
+<iframe name="notice" frameborder="0" style="height:0;width:0;"></iframe>
+<div id="menu" style="display:none"></div><div id="showmenu" style="display:none"></div>
+<script language="JavaScript">
+var agt = navigator.userAgent.toLowerCase();
+var is_ie = ((agt.indexOf('msie')!=-1) && (agt.indexOf('opera')==-1));
+var is_gecko= (navigator.product == "Gecko");
+var is_ns = (document.layers);
+var is_w3 = (document.getElementById && !is_ie);
+var sch = 0;
+var guides = {{$guides}}
+var titles = {{$titles}}
+var cate   = '$dfcate';
+var action = '';
+var type   = '';
+/*
+var type   = '$dftype';
+var dfurl   = '$dfurl';
+*/
+document.getElementById('mainright');
+function showguide(id){
+	var obj = document.getElementById('showmenu');
+	var guide = guides[id];
+	var html  = '<dl>';
+	for(i in guide){
+		var subs = guide[i];
+		html += '<dd>';
+		for(j in subs){
+			var sub = subs[j];
+			html += '<a href="javascript:;" onclick="return initguide(\''+id+'\',\''+j+'\')">'+sub[0]+'</a>';
+		}
+		html += '</dd>';
+	}
+	obj.innerHTML = html + '</dl>';
+	var obj1  = document.getElementById(id);
+	var left  = findPosX(obj1) + getLeft();
+	var top   = findPosY(obj1) + getTop() + 22;
+	obj.style.display = "";
+	obj.style.top	= top + 'px';
+	obj.style.left	= left + 'px';
+	addEvent(document,"mouseout",doc_mouseout);
+}
+function closeguide(){
+	var obj = document.getElementById('showmenu');
+	obj.style.display = "none";
+	removeEvent(document,"mouseout",doc_mouseout);
+}
+function upleft(t){
+	var obj  = document.getElementById('left');
+	var objli = obj.getElementsByTagName('li');
+	var obja = obj.getElementsByTagName('a');
+	for(var i=0;i<obja.length;i++){
+		objli[i].className = obja[i].id==t ? 'one' : '';
+	}
+}
+function showleft(id,t,url){
+	cate = id;
+	var obj = document.getElementById('left');
+
+	var html = '';
+	var guide = guides[id];
+	url = typeof url != 'undefined' ? url : '';
+	type = typeof t != 'undefined' ? t : '';
+
+	for(i in guide){
+		var subs = guide[i];
+		html += '<h1>' + titles[i] + '</h1><div class="cc2"></div><ul>';
+		for(j in subs){
+			var sub = subs[j];
+			html += '<li><a id="'+j+'" href="javascript:;" onclick="return initguide(\''+id +'\',\''+j+'\')">'+sub[0]+'</a></li>';
+			if(url==''){
+				if(type == ''){
+					url = sub[1];
+					type = j;
+				} else if(j == type){
+					url = sub[1];
+				}
+				action = i;
+			}
+		}
+		html += '</ul>';
+		if (i=='diy') {
+			html += '<h2 style="cursor:pointer" onclick="return initguide(\'initiator\',\'diyoption\')">常用功能定制</h2>';
+		}
+	}
+	obj.innerHTML = html;
+	upleft(type);
+	if (is_ie && sch>0) sch = 0;
+	parent.main.location = url;
+	return false;
+}
+function showtitle(){
+	var obj = document.getElementById('guide');
+	var guide = guides[cate];
+	var html = '';
+	if (cate && action && type) {
+		if (cate=='common') {
+			html += '<div class="wei fl"><a href="$admin_file">首页</a> &raquo; <a href="javascript:;" onclick="return initguide(cate,type,\'$admin_file?adminjob=admin\')">'+titles[action]+'</a> &raquo; <a href="javascript:;">'+guide[action][type][0]+'</a></div>';
+		} else {
+			html += '<div class="wei fl"><a href="$admin_file">首页</a> &raquo; <a href="javascript:;" onclick="return initguide(\''+cate+'\')">'+titles[action]+'</a> &raquo; <a href="javascript:;" onclick="return initguide(\''+cate+'\',\''+type+'\')">'+guide[action][type][0]+'</a></div>';
+		}
+	}
+	html += '<ul class="fr"><li class="home">用户名:{$admin_name}</li><li>级别:{$admin_level}</li><li><a class="s0" style="cursor:pointer" onclick="parent.main.location.reload();" title="刷新主页面">刷新</a></li><li><a class="s0" style="cursor:pointer" onclick="parent.main.history.go(-1);" title="后退到前一页">后退</a></li><li><a href="$admin_file?adminjob=quit">注销</a></li></ul>';
+	if (is_ie || is_ns || is_w3 && agt.indexOf('opera')==-1) {
+		/*html += '<div class="value fr"><a href="$admin_file?adskin=2"><font color="red">体验新风格</font></a><input type="text" class="input" id="schstring" onfocus="document.getElementById(\'schbt\').disabled = false;" onclick="this.select();" />&nbsp;<input class="btn" type="button" id="schbt" value="查找" onclick="PwFindInPage();" /></div>';
+		 */
+		html += '<div class="value fr"><a href="$admin_file?adskin=0"><font color="red">体验新风格</font></a><input type="text" class="input" id="keyword" onfocus="document.getElementById(\'schbt\').disabled = false;" onclick="this.select();" />&nbsp;<input class="btn" type="button" id="schbt" value="查找" onclick="adminSearch();" /></div>';
+	}
+	obj.innerHTML = html;
+}
+function initguide(id,t,url){
+	showleft(id,t,url);
+	showtitle();
+	return false;
+}
+function adminSearch(){
+	var keyword = document.getElementById('keyword').value;
+	window.frames.main.location = "$admin_file?adminjob=search&keyword=" + keyword;
+}
+function showmenu(){
+	var obj = document.getElementById('menu');
+	top.main.showselect('hidden');
+	if(!IsElement('menubg')){
+		var html = '<div><div><a style="cursor:pointer;" onclick="closemenu();" class="fr"><img src="images/close.gif" /></a><h1>按"ESC"键关闭或开启此菜单</h1>';
+		for(i in guides){
+			if(i=='common') continue;
+			var guide = guides[i];
+			html += "<dl>";
+			for(j in guide){
+				html += "<dt><h3>" + titles[j] + "</h3></dt><dd>";
+				var subs = guide[j];
+				for(k in subs){
+					var sub = subs[k];
+					html += '<a href="javascript:;" onclick="return toguide(\''+i+'\',\''+k+'\')">'+sub[0]+'</a>';
+				}
+				html += "</dd>";
+			}
+			html += '</dl>';
+		}
+		html += '<div class="c"></div></div></div>';
+		obj.innerHTML = html;
+		var obj2 = document.createElement("div");
+		obj2.id = "menubg";
+		obj.parentNode.insertBefore(obj2,obj);
+	} else {
+		var obj2 = document.getElementById('menubg');
+		obj2.style.display = "";
+	}
+	obj.style.display = "";
+	addEvent(document,"mousedown",doc_mousedown);
+}
+function closemenu(){
+	var obj = document.getElementById('menu');
+	obj.style.display = "none";
+	var obj2 = document.getElementById('menubg');
+	obj2.style.display = "none";
+	removeEvent(document,"mousedown",doc_mousedown);
+	top.main.showselect('');
+}
+function toguide(id,t){
+	closemenu();
+	initguide(id,t);
+	return false;
+}
+function doc_mousedown(e){
+	var e = is_ie ? event: e;
+	obj	= document.getElementById("menu");
+	_x	= is_ie ? e.x : e.pageX;
+	_y	= is_ie ? e.y + getTop() : e.pageY;
+	_x1 = obj.offsetLeft;
+	_x2 = obj.offsetLeft + obj.offsetWidth;
+	_y1 = obj.offsetTop - 20;
+	_y2 = obj.offsetTop + obj.offsetHeight;
+
+	if(_x<_x1 || _x>_x2 || _y<_y1 || _y>_y2){
+	   closemenu();
+	}
+}
+function doc_mouseout(e){
+	var e = is_ie ? event: e;
+	obj	= document.getElementById("showmenu");
+	_x	= is_ie ? e.x : e.pageX;
+	_y	= is_ie ? e.y + getTop() : e.pageY;
+	_x1 = obj.offsetLeft + 2;
+	_x2 = obj.offsetLeft + obj.offsetWidth;
+	_y1 = obj.offsetTop - 20;
+	_y2 = obj.offsetTop + obj.offsetHeight;
+
+	if(_x<_x1 || _x>_x2 || _y<_y1 || _y>_y2){
+		closeguide();
+	}
+}
+function IsElement(id){
+	return document.getElementById(id)!=null ? true : false;
+}
+function addEvent(el,evname,func){
+	if(is_ie){
+		el.attachEvent("on" + evname,func);
+	} else{
+		el.addEventListener(evname,func,true);
+	}
+};
+function removeEvent(el,evname,func){
+	if(is_ie){
+		el.detachEvent("on" + evname,func);
+	} else{
+		el.removeEventListener(evname,func,true);
+	}
+};
+function findPosX(obj){
+	var curleft = 0;
+	if (obj.offsetParent){
+		while (obj.offsetParent){
+			curleft += obj.offsetLeft
+			obj = obj.offsetParent;
+		}
+	}
+	else if (obj.x)
+		curleft += obj.x;
+	return curleft - getLeft();
+}
+function findPosY(obj){
+	var curtop = 0;
+	if (obj.offsetParent){
+		while (obj.offsetParent){
+			curtop += obj.offsetTop
+			obj = obj.offsetParent;
+		}
+	} else if (obj.y){
+		curtop += obj.y;
+	}
+	return curtop - getTop();
+}
+function ietruebody(){
+	return (document.compatMode && document.compatMode!="BackCompat")? document.documentElement : document.body;
+}
+function getTop() {
+	return typeof window.pageYOffset != 'undefined' ? window.pageYOffset:ietruebody().scrollTop;
+}
+function getLeft() {
+	return (typeof window.pageXOffset != 'undefined' ? window.pageXOffset:ietruebody().scrollLeft)
+}
+function keyCodes(id,e){
+	if (e.keyCode==27) {
+		if (IsElement(id) && document.getElementById(id).style.display=='') {
+			closemenu();
+		} else {
+			try{
+				showmenu();
+			} catch(e){}
+		}
+	} else if (is_ie && (e.keyCode==116 || (e.ctrlKey && e.keyCode==82))) {
+		e.keyCode = 0;
+		e.returnValue = false;
+		parent.main.location.reload();
+	}
+	return false;
+}
+function PwFindInPage(){
+	if (document.getElementById('schstring').value!='') {
+		FindInPage(document.getElementById('schstring').value);
+		document.getElementById('schbt').disabled = false;
+	} else {
+		document.getElementById('schbt').disabled = true;
+	}
+}
+function FindInPage(str){
+	if (!str) {
+		alert('未找到指定内容');
+		return false;
+	}
+	if (is_w3 || is_ns) {
+		if (!parent.main.find(str)) {
+			alert('到达页尾，从页首继续');
+			while (1) {
+				if (!parent.main.find(str,false,true)) break;
+			}
+			return false;
+		}
+	} else if (is_ie) {
+		var found;
+		var txt = parent.main.document.body.createTextRange();
+		for (var i = 0; i <= sch && (found = txt.findText(str)) != false; i++) {
+			txt.moveStart('character',1);
+			txt.moveEnd('textedit');
+		}
+		if (found) {
+			sch++;
+			txt.moveStart('character',-1);
+			txt.findText(str);
+			try {
+				txt.select();
+				txt.scrollIntoView();
+			} catch(e) {FindInPage(str);}
+		} else {
+			if (sch > 0) {
+				sch = 0;
+				alert('到达页尾，从页首继续');
+				FindInPage(str);
+			} else {
+				alert('未找到指定内容');
+			}
+			return false;
+		}
+	}
+	return true;
+}
+function getPageHeight(){
+	if (self.innerHeight) {
+		return self.innerHeight;
+	} else if (document.documentElement && document.documentElement.clientHeight) {
+		return document.documentElement.clientHeight;
+	} else if (document.body) {
+		return document.body.clientHeight;
+	}
+}
+initguide(cate,type,'$admin_file?adminjob=admin');
+</script>
+</body>
+</html>
+<!--
+EOT;
+?>-->

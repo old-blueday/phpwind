@@ -1,0 +1,487 @@
+<!--<?php
+$posturl = "post.php?fid=$fid".($psot_sta ? "&action=$psot_sta" : '').($tid ? "&tid=$tid" : '');
+$fastDo = $psot_sta ? '回复' : '发帖';
+$tmpVerify = GetVerify($onlineip.$GLOBALS['winddb']['regdate'].$fid.$tid);
+print <<<EOT
+-->
+<script type="text/javascript" language="JavaScript" src="js/pw_ajax.js"></script>
+<link rel="stylesheet" type="text/css" href="$imgpath/post/fast_editor.css" media="all" />
+<table cellPadding="0" cellSpacing="0" style="display:none">
+	<tbody id="att_mode"><tr>
+		<td width="220"><input class="input" type="file" name="attachment_" style="width:155px;" autocomplete="off" /></td>
+		<td>描述 <input class="input" type="text" name="atc_desc" size="18" autocomplete="off" /></td>
+		<td></td></tr>
+	</tbody>
+</table>
+<div class="cc">
+	<form name="FORM" method="post" action="post.php?fid=$fid" enctype="multipart/form-data" onsubmit="return checkpost(document.FORM);" id="anchor">
+	<input type="hidden" name="atc_usesign" value="1" />
+	<input type="hidden" name="replytouser" value="" />
+	<input type="hidden" name="atc_convert" value="1" />
+	<input type="hidden" value="2" name="step" />
+	<input type="hidden" value="" name="type" />
+	<input type="hidden" value="$psot_sta" name="action" />
+	<input type="hidden" value="$fid" name="fid" />
+	<input type="hidden" value="$cyid" name="cyid" />
+	<input type="hidden" value="$tid" name="tid" />
+	<input type="hidden" name="stylepath" value="$stylepath" />
+	<input type="hidden" name="verify" value="$verifyhash" />
+	<input type="hidden" value="cn0zz" name="_hexie" />
+  <div class="h b">快速$fastDo</div>
+	<table width="100%" class="floot" style="table-layout:inherit;">
+		<tr class="vt">
+			<td class="floot_left">
+				<div class="floot_leftdiv">
+					<div>
+<!--
+EOT;
+if ($action != 'modify' && getstatus($winddb['userstatus'],12)) {print <<<EOT
+-->
+					<div class="cc menu_userA" id="div_userinfomore"><a href="javascript:;" hidefocus="true" onclick="userBinding.get('div_userinfomore');"><b>{$windid}</b><img src="$imgpath/pwicon/switch.gif" class="cp" alt="切换" align="absmiddle" /><i>切换帐号</i>　</a></div>
+<script language="JavaScript">
+var userinfomorediv = {
+	open : function() {
+		$('div_userinfomore').className = 'cc menu_userA menu_userAcur';
+	},
+	close : function () {
+		$('div_userinfomore').className = 'cc menu_userA';
+	}
+}
+</script>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+					<p class="b">$windid</p>
+<!--
+EOT;
+}$fp_face = showfacedesign($winddb['icon']);
+print <<<EOT
+-->
+					</div>
+					<div class="cc">
+						<div class="face_img">{$fp_face}</div>
+					</div>
+				</div>
+			</td>
+			<td style="background:#fff;">
+				<div class="fp_content">
+					<div class="cc mb5">
+						<div class="pr fl mr5"><input type="text" class="input" id="atc_title" name="atc_title" value="$titletop1" size="40" /><span id="atc_title_warn" class="gray pd5" style="display:none; position:absolute;top:-20px;right:0;background:#fffff3;">限 $db_titlemax 字节</span></div>
+<!--
+EOT;
+if(!$psot_sta && ($t_per>0 || $admincheck) && $t_exits==1){
+	if ($t_sub_exits == 1) {print <<<EOT
+-->
+						<select name="p_type" style="width:75px;" class="mr5" onchange="getSubType(this.value);">
+<!--
+EOT;
+	} else {print <<<EOT
+-->
+						<select name="p_type" style="width:75px;" class="mr5">
+<!--
+EOT;
+	}print <<<EOT
+-->
+							<option value="0">不分类</option>
+<!--
+EOT;
+foreach($t_typedb as $key=>$value){
+if($value){print <<<EOT
+-->
+							<option value="$key">$value[name]</option>
+<!--
+EOT;
+}}print <<<EOT
+-->
+						</select>
+<!--
+EOT;
+if ($t_sub_exits == 1) {print <<<EOT
+-->
+						<select name="p_sub_type" id="p_sub_type" style="width:75px" class="mr5"><option value="">不分类</option></select>
+<!--
+EOT;
+}print <<<EOT
+-->
+<script language="JavaScript">
+function getSubType(id){
+	var selobj = getObj('p_sub_type');
+	selobj.options.length=0;
+	selobj.options.add(new Option("不分类","0"));
+	var t_subtypedb = JSONParse('$t_subtypedb');
+	for (var temp in t_subtypedb) {
+		if (temp == id) {
+			for (var temp2 in t_subtypedb[temp]) {
+				if (typeof sel_subid != "undefined" && sel_subid == temp2) {
+					selobj.options.add(new Option(t_subtypedb[temp][temp2],temp2));
+				} else {
+					selobj.options.add(new Option(t_subtypedb[temp][temp2],temp2));
+				}
+			}
+		}
+	}
+}
+</script>
+<!--
+EOT;
+}elseif($special === 'read_debate'){print <<<EOT
+-->
+						<select name="standpoint" id="standpoint" class="mr5">
+							<option value="0" $debate_0>闲聊一下</option>
+<!--
+EOT;
+if($debatestand != 2){print <<<EOT
+-->
+							<option value="1" $debate_1>正方观点</option>
+<!--
+EOT;
+}if($debatestand != 1){
+print <<<EOT
+-->
+							<option value="2" $debate_2>反方观点</option>
+<!--
+EOT;
+}print <<<EOT
+-->
+						</select>
+<!--
+EOT;
+}print <<<EOT
+-->
+					</div>
+<!--
+EOT;
+if(isset($db_sitemsg['reply']['0']) && $db_sitemsg['reply']['0'] && $psot_sta){
+print<<<EOT
+-->
+					<div style="background:#fffeed;padding:5px 10px;margin:0 0 5px;">{$db_sitemsg[reply][array_rand($db_sitemsg[reply])]}</div>
+<!--
+EOT;
+}elseif(isset($db_sitemsg['post']['0']) && $db_sitemsg['post']['0']){print<<<EOT
+-->
+					<div style="background:#fffeed;padding:5px 10px;margin:0 0 5px;">{$db_sitemsg[post][array_rand($db_sitemsg[post])]}</div>
+<!--
+EOT;
+}print<<<EOT
+-->
+					<div class="fp_editor cc" id="fp_editor" onclick="loadEditor(event);">
+						<div class="fp_editor_but cc">
+							<a href="javascript:gotoEditor();" class="fr" hidefocus="true" id="gotoedit">进入高级模式</a>
+							<div>
+								<a href="javascript:;" title="加粗" id="wy_bold" hidefocus="true">加粗</a>
+								<a href="javascript:;" title="字体颜色" id="wy_forecolor" hidefocus="true">字体颜色</a>
+								<a href="javascript:;" title="背景" id="wy_hilitecolor" hidefocus="true">背景颜色</a>
+								<a href="javascript:;" title="插入链接" id="wy_createlink" hidefocus="true">插入链接</a>
+								<a href="javascript:;" title="图片" id="wy_insertimage" hidefocus="true">图片</a>
+							</div>
+						</div>
+						<div style="padding:0.5% 0 0 0.5%;width:99.5%;display:inline;float:left;">
+							<textarea id="textarea" name="atc_content" style="width:100%;height:140px;" onkeydown="quickpost(event)"></textarea>
+							<span id="autosave"></span><div id="menu_editor" class="wy_menu_B" style="display: none;"></div>
+						</div>
+					</div>
+<!--
+EOT;
+if($db_allowupload && $_G['allowupload']){
+$_G['uploadtype'] && $db_uploadfiletype = $_G['uploadtype'];
+$db_uploadfiletype = (is_array($db_uploadfiletype) ? $db_uploadfiletype : unserialize($db_uploadfiletype));
+$uploadfiletype = $uploadfilesize = ' ';
+foreach($db_uploadfiletype as $key=>$value)	{
+	$uploadfiletype .= $key.' ';
+	$uploadfilesize .= $key.':'.$value.'KB; ';
+}
+print <<<EOT
+-->
+					<div class="c mb10"></div>
+					<table width="100%">
+						<tbody id="attach"></tbody>
+					</table>
+<script type="text/javascript" language="JavaScript" src="js/upload.js"></script>
+<script language="javascript">
+var titlemax = '$db_titlemax';
+var postmax = '$db_postmax';
+var allowmutinum = parseInt('$db_attachnum');
+var allow_ext = '$uploadfiletype';
+var allow_size = '$uploadfilesize';
+/* tmp_attachnum,ajax post时attachnum错误引起可上传附件数量错误*/
+var tmp_attachnum = attachnum = parseInt('$db_attachnum');
+newAtt.create();
+initCheckTextNum('atc_title','atc_title_warn',titlemax);
+initCheckTextNum('atc_content','atc_content_warn',postmax);
+</script>
+<!--
+EOT;
+}print <<<EOT
+-->
+					<div class="mb10">
+<!--
+EOT;
+if(($db_gdcheck & 4) && $winddb['postnum'] < $db_postgd){print <<<EOT
+-->
+						<dl class="cc">
+							<dt class="dtA">认证码: </dt>
+							<dd><input class="input" type="text" name="gdcode" size="5" tabindex="6" onfocus="try{opencode('menu_gd',this)}catch(e){}" id="fs_gdcode"/><br />
+							<div class="menu" id="menu_gd" style="visibility:hidden;"><img src="ck.php?" align="absmiddle" style="cursor:pointer;" id="ckcode" alt="看不清楚，换一张" />
+							</div>
+							</dd>
+						</dl>
+<!--
+EOT;
+}list(,,$postq,,$showq)=explode("\t",$db_qcheck);
+empty($winddb[postnum]) && $winddb[postnum]=0;
+if($winddb[postnum] < $postq && $db_question){
+$qkey = array_rand($db_question);
+$q_a = sprintf("{$db_question[$qkey]}%s",$showq?" 正确答案:{$db_answer[$qkey]}":'');
+print <<<EOT
+-->
+<style type="text/css">
+.dtA{width:75px;margin-right:5px;}
+.fpbtn{margin-left:80px;}
+</style>
+						<dl class="cc">
+							<dt class="dtA">验证问题:</dt>
+							<dd><input class="input" type="text" name="qanswer" /> <input type="hidden" name="qkey" value="$qkey" />$q_a</dd>
+						</dl>
+<!--
+EOT;
+}print <<<EOT
+-->
+					</div>
+					<div><span class="mr20"><span class="btn" style="margin:0;"><span><button title="Ctrl+Enter快速发布" type="submit" name="Submit">提 交</button></span></span></span>
+					
+<!--
+EOT;
+if(0 != $tid){
+print <<<EOT
+-->					
+					
+					<input id="go_lastpage" type="checkbox" title="选定" name="go_lastpage">&nbsp;回复后跳转到最后一页
+					
+<!--
+EOT;
+}
+print <<<EOT
+-->							
+					</div>
+				</div>
+			</td>
+			<td style="width:250px;">
+				<div id="fp_face" class="fp_show">
+					<div class="fp_show_tab">
+						<b id="doleft" style="display:none" class="tab_left fl" onclick="PwFace.showTab(-1)" title="上一个">上一个</b>
+						<b id="doright" style="display:none" class="tab_right fr" onclick="PwFace.showTab(1)" title="下一个">下一个</b>
+						<ul id="face_tab"></ul>
+					</div>
+					<div class="fp_show_cont">
+                    	<div class="fp_show_height">
+						<ul class="cc" id="face_main"></ul>
+                        </div>
+                        <div id="face_page" class="fp_show_pages cc"></div>
+					</div>
+				</div>
+			</td>
+		</tr>
+	</table>
+	</form>
+</div>
+<script type="text/javascript">
+document.FORM._hexie.value = '$tmpVerify';
+var charset='$db_charset';
+var bbsurl ="{$B_url}";
+var editor = null;
+function WysiwygConfig() {
+	this.baseURL = document.baseURI || document.URL;
+	if (this.baseURL && this.baseURL.match(/(.*)\/([^\/]?)/)) {
+		this.baseURL = RegExp.$1 + "/";
+	}
+	this.imgURL = imgpath + "/post/c_editor/";
+
+	this.btnList = {
+		bold: [ true, editorcode, true ],
+		forecolor: [ true, showcolor, false ],
+		hilitecolor: [ true, showcolor, false ],
+		createlink: [ true, showcreatelink, false ],
+		unlink: [ true, editorcode, false ],
+		insertimage: [ true, insertImage, false ]
+	};
+	this.selList = [];
+};
+function loadEditor(e) {
+	var e = is_ie ? event : e;
+	var o = e.srcElement || e.target;
+	if (o.id == 'gotoedit') return;
+
+	$('fp_editor').onclick = '';
+	loadjs('js/wind_c_editor.js', '', '', function() {
+		editor = new WYSIWYD();
+		editor.config = new WysiwygConfig();
+		editor.init();
+		if (o.id && o.id.match(/^wy\_/)) {
+			var key = o.id.substr(3);
+			if (typeof editor.config.btnList[key]) {
+				var cmd = editor.config.btnList[key][1];
+				cmd(key);
+			}
+		}
+	});
+}
+var dataStorage = {
+	save : function() {
+		if (PwStorage.save('msg', document.FORM.atc_content.value)) {
+			PwStorage.save('title', document.FORM.atc_title.value, 1);
+			SetCookie('ds', 1);
+			return true;
+		}
+		return false;
+	},
+	load : function() {
+		document.FORM.atc_title.value = PwStorage.load('title') || '';
+		var msg = PwStorage.load('msg');
+		if (msg) {
+			document.FORM.atc_content.value = msg;
+			document.FORM.atc_content.focus();
+		}
+		SetCookie('ds', 0);
+	}
+}
+function gotoEditor() {
+	dataStorage.save();
+	location.href = '$posturl';
+}
+</script>
+<!--
+EOT;
+$facedb = '';
+if(R_P != D_P){
+$facedb = readover(D_P.'data/bbscache/face.js');
+}else{print <<<EOT
+-->
+<script language="JavaScript" src="data/bbscache/face.js"></script>
+<!--
+EOT;
+}print <<<EOT
+-->
+<script language="JavaScript" src="js/post.js"></script>
+<script language="javascript">
+document.FORM.Submit.disabled = false;
+var charset = '$db_charset';
+var stylepath = '$stylepath';
+var cate = '$db_forcetype';
+var cnt = 0;
+
+{$facedb}
+PwFace.init('face_tab', 'face_main', 3, 16);
+function checkpost(obj){
+	var action =  "{$psot_sta}";
+	if(cate==1 && obj.p_type!=null && obj.p_type.value==0){
+		showDialog("error","没有选择主题分类",2);
+		obj.p_type.focus();
+		return false;
+	}
+	if(obj.atc_title.value==""){
+		if (action != 'reply'){
+			showDialog("error","标题不能为空",2);
+			obj.atc_title.focus();
+			return false;
+		}
+	} else if(strlen(obj.atc_title.value)>$db_titlemax){
+		showDialog("error","标题超过最大长度 $db_titlemax 个字节",2);
+		obj.atc_title.focus();
+		return false;
+	}
+	if(strlen(obj.atc_content.value)<$db_postmin){
+		showDialog("error","文章内容少于 $db_postmin 个字节",2);
+		obj.atc_content.focus();
+		return false;
+	} else if(strlen(obj.atc_content.value)>$db_postmax){
+		showDialog("error","文章内容大于 $db_postmax 个字节",2);
+		obj.atc_content.focus();
+		return false;
+	}
+	document.FORM.Submit.disabled = true;
+	cnt++;
+	if(cnt!=1){
+		showDialog("warning","Submission Processing. Please Wait");
+		return false;
+	}
+	//Begin Add by liaohu for addfloor
+	if (false == document.FORM['go_lastpage'].checked && 0 != document.FORM['tid'].value) {
+		document.FORM['type'].value = "ajax_addfloor";
+		postfloor();
+		return false;
+	};
+	//End Add by liaohu for addfloor
+	if (is_ie && newAtt.aid < 2) {
+		document.FORM.encoding = "application/x-www-form-urlencoded";
+	}	
+	return true;
+}
+//Begin Add by liaohu for addfloor
+function postfloor(){
+	var url = 'post.php?fid=$fid';
+	ajax.send(url, document.FORM, function() {
+		var rText = ajax.runscript(ajax.request.responseText);		
+		if (rText.indexOf('read_t') !== -1) {
+			document.forms['delatc'].innerHTML += rText;
+			/*请求成功后删除附件行多余列 zph*/
+			var attachRows = getObj('attach');
+			if (attachRows) {
+				while(attachRows.childNodes.length > 1){
+					attachRows.removeChild(attachRows.childNodes[1]);
+				}
+				attachnum = tmp_attachnum-1;
+			}
+			/* end */
+			loadFloor.showHidden(tid);
+		} else {
+			showDialog("warning",rText);
+		}
+		cnt = 0;
+		document.FORM.reset();
+		document.FORM.Submit.disabled = false;
+		document.FORM.target = '';
+		
+		if (getObj('creditlocation')) {
+			setTimeout(function() {
+				getObj('creditlocation').parentNode.removeChild(getObj('creditlocation'));;
+			},1000);
+		};
+	});
+}
+//End Add by liaohu for addfloor
+function checklength(theform,postmaxchars){
+	if(postmaxchars != 0){
+		message = '<br />系统限制最大字节数:'+postmaxchars+' 字节';
+	} else{
+		message = '';
+	}
+	showDialog("warning",'您的信息已有字节数: '+strlen(theform.atc_content.value)+' 字节'+message);
+}
+function addsmile(NewCode){
+    $('textarea').value += ' [s:'+NewCode+'] ';
+}
+window.onbeforeunload = function() {
+	saveData('msg', document.FORM.atc_content.value);
+}
+if (FetchCookie('ds') == 1) {
+	try{dataStorage.load();}catch(e){}
+}
+
+function showFace() {
+	var menus = getObj("face_tab").getElementsByTagName('li');
+	if(menus){
+		showTabBtn(menus.length);
+	}
+}
+
+if (document.all) {
+	window.attachEvent('onload', showFace); //对于IE
+} else {
+	window.addEventListener('load', showFace,false); //对于FireFox
+}
+
+</script>
+<!--
+EOT;
+?>

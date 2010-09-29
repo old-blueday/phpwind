@@ -1,0 +1,309 @@
+ <!--<?php print <<<EOT
+-->
+<div id="breadCrumb">
+		<img src="$imgpath/$stylepath/thread/home-old.gif" align="absmiddle" />&nbsp;<a href="$db_bfn" title="$db_bbsname">$db_bbsname</a><em>&gt;</em>{$lang_action[$action]}
+</div>
+<form name="form1" method="post" action="mawholecolony.php?{$viewbbs}">
+<input type="hidden" name="verify" value="$verifyhash" />
+<input type="hidden" name="action" value="$action" />
+<input type="hidden" name="cyid"    value="$cyid" />
+<input type="hidden" name="step"   value="2" />
+<!--
+EOT;
+if($threaddb){print <<<EOT
+-->
+<div class="t">
+<table width="100%" cellspacing="0" cellpadding="0" align="center">
+	<tr>
+		<td class="h" style="text-align:center" width="5%">ID</td>
+		<td class="h" style="text-align:center">标题</td>
+		<td class="h" style="text-align:center" width="15%">版块</td>
+		<td class="h" style="text-align:center" width="15%">作者</td>
+		<td class="h" style="text-align:center" width="8%">回复</td>
+		<td class="h" style="text-align:center" width="15%">发表时间</td>
+	</tr>
+<!--
+EOT;
+$id=0;
+foreach($threaddb as $key=>$val){
+$id++;
+print <<<EOT
+-->
+	<tr class="tr3 tac">
+		<td><input type="checkbox" name="tidarray[]" value="$val[tid]" checked /></td>
+		<th>
+			<a href="read.php?tid=$val[tid]" target="_blank">$val[subject]</a>
+		</th>
+		<td>
+			<a href="thread.php?fid=$val[fid]" target="_blank">{$forum[$val[fid]][name]}</a>
+		</td>
+		<td>
+<!--
+EOT;
+if($val['anonymous'] && !$ifTopicAdmin){ print <<<EOT
+-->
+			$db_anonymousname
+<!--
+EOT;
+}else{ print <<<EOT
+-->
+			<a href="u.php?username=$val[author]" target="_blank">$val[author]</a>
+<!--
+EOT;
+} print <<<EOT
+-->
+		</td>
+		<td>$val[replies]</td>
+		<td>$val[date]</td>
+	</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+</table></div>
+<!--
+EOT;
+}print <<<EOT
+-->
+<div class="t">
+<script language="JavaScript" src="js/date.js"></script>
+<script language="JavaScript" src="js/desktop/Compatibility.js"></script>
+<table width="100%" cellspacing="0" cellpadding="0" align="center">
+	<tr><td class="h" colspan="2">管理选项:</td></tr>
+<!--
+EOT;
+if($action=='toptopic'){print <<<EOT
+-->
+	<tr class="tr3">
+		<th width="20%" style="text-align:right;">管理选项:</th>
+		<td class="td"><script language="JavaScript" src="js/desktop/Compatibility.js"></script>
+			<label for="topped0" class="mr20"><input type="radio" id="topped0" name="topped" value="0" $topped_0 /> 取消置顶</label>
+			<label for="topped1"><input type="radio" id="topped1" name="topped" value="1" $topped_1 /> 置顶</label>
+		</td>
+	</tr>
+    <tr class="tr3">
+    	<td width="20%" style="text-align:right;">有效期至:</td>
+    	<td class="td"><input class="input input_wa" type="text" name="timelimit" readonly="readonly" id="timelimit" onclick="ShowCalendar(this.id,1);" /></td></tr>
+<!--
+EOT;
+}elseif($action=='digest'){print <<<EOT
+-->
+	<tr class="tr3">
+	<th width="20%" style="text-align:right;">管理选项:</th>
+	<td class="td">
+		<label for="digest0" class="mr20"><input type="radio" id="digest0" name="digest" value="0" $digest_0 />取消精华</label>
+		<label for="digest1" class="mr20"><input type="radio" id="digest1" name="digest" value="1" $digest_1 />精华</label>
+	</td>
+	</td>
+<!--
+EOT;
+}elseif($action=='lock'){print <<<EOT
+-->
+	<tr class="tr3">
+	<th width="20%" style="text-align:right;">管理选项:</th>
+	<td class="td">
+		<label for="locked0" class="mr20"><input type="radio" id="locked0" name="locked" value="0" $lock_0 />解除锁定/解除关闭</label>
+		<label for="locked1" class="mr20"><input type="radio" id="locked1" name="locked" value="1" $lock_1 />锁定</label>
+		<label for="locked2" class="mr20"><input type="radio" id="locked2" name="locked" value="2" $lock_2 />关闭</label>
+	</td>
+	</tr>
+<!--
+EOT;
+}elseif($action=='pushtopic'){print <<<EOT
+-->
+	<tr class="tr3">
+    	<th width="20%" style="text-align:right;">提前时间:</th>
+		<td class="td"><input type="text" class="input input_wc" name="pushtime" value="0" /> (时)</td>
+	</tr>
+	<tr class="tr3">
+		<th width="20%" style="text-align:right;">管理选项:</th>
+		<td class="td">提前帖子</td>
+	</tr>
+<!--
+EOT;
+}elseif($action=='downtopic'){print <<<EOT
+-->
+	<tr class="tr3">
+    	<th width="20%" style="text-align:right;">压后时间:</th>
+		<td class="td"><input type="text" class="input input_wc" name="timelimit" value="24" /> (时)</td>
+	</tr>
+	<tr class="tr3">
+    	<th width="20%" style="text-align:right;">允许上浮:</th>
+		<td class="td">
+        	<label for="ifpush0" class="mr20"><input type="radio" id="ifpush0" name="ifpush" value="0" $lock_0 />是</label>
+			<label for="ifpush1" class="mr20"><input type="radio" id="ifpush1" name="ifpush" value="1" $lock_1 />否</label>
+        </td>
+	</tr>
+<!--
+EOT;
+}elseif($action=='highlight'){print <<<EOT
+-->
+<style type="text/css">
+.pwnew span{float:left;margin-left:5px;}
+.pwnew a{padding:0;margin:0;display:block;height:16px;width:16px;float:left;line-height:16px;border:1px solid #dbe4e9;color:#333333;cursor:pointer;}
+.pwnew a:hover{border:1px solid #b0c8e0;background:#f9f9f9;color:#333333;}
+.pwnew .one,.pwnew .one:hover{border: 1px solid #333333;background:#cde2f6;color:#333333;}
+.pwnew b:hover,.pwnew i:hover{text-decoration:none;}
+.pwnew .two{background:url($imgpath/menu-down.gif) right center no-repeat;width:30px;cursor:pointer;}
+.pwnew .two:hover{background:$forumcolortwo url($imgpath/menu-down.gif) right center no-repeat;text-decoration:none;}
+</style>
+<script type="text/javascript" language="JavaScript" src="js/color_picker.js"></script>
+<script type="text/javascript">
+function pickReback(color){
+	getObj('color_show').style.backgroundColor = color;
+}
+function styleOnclick(e,obj){
+	var objclass = e.className;
+	var temp = objclass.split(' ');
+	var newclass = '';
+	for (var n=0; n<temp.length; n++){
+		if (temp[n]=='one') {
+			continue;
+		}
+		newclass += ' ' + temp[n];
+	}
+	if (objclass.match(/one/)) {
+		e.className = newclass;
+		getObj(obj).value = '';
+	} else {
+		e.className = newclass + ' one';
+		getObj(obj).value = 1;
+	}
+}
+function colorCancel(){
+	getObj('color_show').style.backgroundColor='#FFFFFF';
+	getObj('title1').value='';
+}
+</script>
+	<tr class="tr3">
+		<th width="20%" style="text-align:right;">管理选项:</th>
+		<th>
+			<div class="pwnew tac">
+				<span title="粗体字"><b><a onclick="styleOnclick(this,'title2')" class="$stylename[1]">B</a></b></span>
+				<span title="斜体字"><i><a onclick="styleOnclick(this,'title3')" class="$stylename[2]">I</a></i></span>
+				<span title="下划线"><u><a onclick="styleOnclick(this,'title4')" class="$stylename[3]">U</a></u></span>
+				<span id="color_show" style="width:30px;margin-top:1px;border:1px solid $tablecolor;float:left;height:14px;background:$titlecolor;cursor:pointer;" title="点击取消颜色" onclick="colorCancel()"></span>
+				<span title="颜色选择"><a class="two tal" onclick="showColorPicker(this,document.form1.title1,function(){pickReback(color_picker)})"><img src="$imgpath/pickcolor.gif"  /></a></span>
+				<input id="title1" name="title1" type="hidden" value="$titlecolor" />
+				<input id="title2" name="title2" type="hidden" value="{$titledetail[1]}" />
+				<input id="title3" name="title3" type="hidden" value="{$titledetail[2]}" />
+				<input id="title4" name="title4" type="hidden" value="{$titledetail[3]}" />
+			</div>
+		</th>
+	</tr>
+	<tr class="tr3"><th width="20%" style="text-align:right;">有效时间:</th><td class="td"><input class="input" type="text" name="timelimit" size="4" /> 天</td></tr>
+<!--
+EOT;
+}elseif($action=='del'){print <<<EOT
+-->
+	<tr class="tr3">
+        <th width="20%" style="text-align:right;">扣除积分:</th>
+		<th>
+			<input type="radio" id="ifdel1" name="ifdel" value="1" />是
+			<input type="radio" id="ifdel0" name="ifdel" value="0" checked />否
+		</th>
+	</tr>
+<!--
+EOT;
+}elseif($action=='type'){print <<<EOT
+-->
+<tr class="tr3">
+		<th width="20%" style="text-align:right;">选择主题分类:</th>
+		<th>
+<!--
+EOT;
+if ($t_sub_exits == 1) {print <<<EOT
+-->
+		<select name="type" onchange="getSubType(this.value)";><option value="">不分类</option>
+<!--
+EOT;
+} else {print <<<EOT
+-->
+		<select name="type"><option value="">不分类</option>
+<!--
+EOT;
+}
+foreach($t_typedb as $key=>$value){
+if($value){print <<<EOT
+-->
+			<option value="$key">$value[name]</option>
+<!--
+EOT;
+}}print <<<EOT
+-->
+		</select>
+<!--
+EOT;
+if ($t_sub_exits == 1) {print <<<EOT
+-->
+		<select name="subtype" id="subtype" style="width:75px"><option value="">不分类</option></select>
+<!--
+EOT;
+}print <<<EOT
+-->
+		</th>
+	</tr>
+<script language="JavaScript">
+function getSubType(id){
+	var options = '<option value=\"0\">不分类</option>';
+	var t_subtypedb = JSONParse('$t_subtypedb');
+	for (var temp in t_subtypedb) {
+		if (temp == id) {
+			for (var temp2 in t_subtypedb[temp]) {
+				options += '<option value=\"'+temp2+'\">'+t_subtypedb[temp][temp2]+'</option>';
+			}
+		}
+	}
+	getObj('subtype').innerHTML = options;
+}
+
+function getSubType(id){
+	selobj = getObj('subtype');
+	var t_subtypedb = JSONParse('$t_subtypedb');
+	for (var temp in t_subtypedb){
+		if (temp == id) {
+			for (var temp2 in t_subtypedb[temp]) {
+				selobj.options.add(new Option(t_subtypedb[temp][temp2],temp2));
+			}
+		}
+	}
+}
+</script>
+<!--
+EOT;
+}print <<<EOT
+-->
+	<tr class="tr3">
+		<th width="20%" style="text-align:right;">消息通知:</th>
+		<th>
+			<input type="radio" name="ifmsg" value="1" checked />开启
+			<input type="radio" name="ifmsg" value="0" />关闭
+		</th>
+	</tr>
+	<tr class="tr3">
+		<th style="text-align:right;">操作原因:</th>
+		<th>			<textarea name="atc_content" rows="8" cols="80"></textarea>
+<!--
+EOT;
+if($db_adminreason){print <<<EOT
+-->
+			<select name="" size="8" multiple onchange="this.form.atc_content.value=this.value">
+				<option value="">自定义</option>
+				<option value="">-------</option>
+				$reason_sel
+			</select>
+<!--
+EOT;
+}print <<<EOT
+-->
+
+		</th>
+	</tr>
+	<tr class="tr3"><td class="td"></td><td class="td">
+	<span class="btn"><span><button type="submit" name="Submit">提 交</button></span></span>&nbsp;<a class="cp" type="button" onclick="javascript:history.go(-1)" />返 回</a>
+	</td></tr>
+</table></div>
+</form>
+<!--
+EOT;
+?>-->

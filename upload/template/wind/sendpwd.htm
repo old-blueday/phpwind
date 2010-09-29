@@ -1,0 +1,82 @@
+<!--<?php print <<<EOT
+-->
+<div id="breadCrumb">
+		<img src="$imgpath/$stylepath/thread/home-old.gif" align="absmiddle" />&nbsp;<a href="$db_bfn" title="$db_bbsname">$db_bbsname</a><em>&gt;</em>找回密码
+</div>
+<div id="pw_content">
+	<div class="p20">
+		<div class="regTitle cc">
+			<h5>密码发送程序</h5>
+		</div>
+		<table width="100%"><tr><td class="vt" height="300" style="padding-bottom:30px;">
+		<form action="sendpwd.php?" method="POST">
+		<input type="hidden" value="2" name="step" />
+		<div class="regForm">
+			<dl class="cc">
+				<dt>用户名</dt>
+				<dd class="ip"><div><input type="text" name="pwuser" /></div></dd>
+			</dl>
+			<dl class="cc">
+				<dt>Email</dt>
+				<dd class="ip"><div><input type="text" name="email" /></div></dd>
+			</dl>
+<!--
+EOT;
+if($db_ifsafecv){print <<<EOT
+-->
+			<dl class="cc">
+				<dt>安全问题</dt>
+				<dd class="ip">
+					<select name="question" onchange="showcustomquest_0(this.value)" style="width:230px;margin-top:3px;">
+						<option value="0">无安全问题</option><option value="1">我爸爸的出生地</option><option value="2">我妈妈的出生地</option><option value="3">我的小学校名</option><option value="4">我的中学校名</option><option value="5">我最喜欢的运动</option><option value="6">我最喜欢的歌曲</option><option value="7">我最喜欢的电影</option><option value="8" >我最喜欢的颜色</option><option value="-1">自定义问题</option>
+					</select>
+				</dd>
+			</dl>
+			<dl class="cc" id="customquest_o" style="display:none">
+				<dt>自定义问题</dt>
+				<dd class="ip">
+        	<div><input type="text" name="customquest" /></div>
+				</dd>
+      </dl>
+			<dl class="cc">
+				<dt>您的答案</dt>
+				<dd class="ip">
+        	<div><input type="text" name="answer" /></div>
+				</dd>
+				<dd><div class="p5 s6">如果您设置了安全问题，需要填写正确的答案才能找回密码</div></dd>
+      </dl>
+<!--
+EOT;
+}if($db_gdcheck & 16){print <<<EOT
+-->
+			<dl class="cc">
+				<dt>认证码</dt>
+				<dd class="ip ck">
+					<div><input id="gdcode" name="gdcode" value="" /></div>
+					<span id="menu_gd"></span>
+					<img src="ck.php?nowtime=$timestamp" align="top" onclick="try{opencode('',this,'register_ckcode')}catch(e){}" class="cp mb10" id="register_ckcode" alt="看不清楚，换一张" title="看不清楚，换一张" />
+				</dd>
+				<dd></dd>
+			</dl>
+<!--
+EOT;
+}print <<<EOT
+-->
+			<dl class="cc">
+				<dt>&nbsp;</dt>
+				<dd><span class="btn"><span><button type="submit">提 交</button></span></span></dd>
+			</dl>
+			
+		</div>
+		</form>
+		</td></tr></table>
+	</div>
+</div>
+<script language="JavaScript1.2">
+function showcustomquest_0(qid){
+	getObj("customquest_o").style.display = qid==-1 ? '' : 'none';
+}
+</script>
+<!--
+EOT;
+?>-->

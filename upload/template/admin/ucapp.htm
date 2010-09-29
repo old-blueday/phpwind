@@ -1,0 +1,137 @@
+<!--<?php
+include_once PrintEot('left');
+if (empty($action)) {print <<<EOT
+-->
+<div class="nav3 mb10">
+    <ul class="cc">
+        <li class="current"><a href="$basename">应用列表</a></li>
+        <li><a href="$basename&action=add">添加应用</a></li>
+    </ul>
+</div>
+<form method="post" action="$basename&">
+<input type="hidden" name="action" value="del" />
+<h2 class="h1">应用列表</h2>
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+	<tr class="tr2">
+		<td width="5%">删?</td>
+		<td>应用ID</td>
+		<td width="12%">应用名称</td>
+		<td width="20%">应用URL</td>
+		<td width="8%">通信情况</td>
+		<td width="8%">操作</td>
+	</tr>
+<!--
+EOT;
+$s_lang = array(
+	'-2' => '<span class="s3">正常</span>',
+	'-1' => '<span class="s1">通信失败</span>',
+	'1'  => '<span class="gray">接口关闭</span>',
+	'2'  => '<span class="s1">密钥错误</span>',
+	'3'  => '<span class="s2">未知错误</span>'
+);
+foreach ($apps as $key => $value) {print <<<EOT
+-->
+	<tr class="tr1">
+		<td class="td2"><input type="checkbox" name="selid[]" value="$value[id]" /></td>
+		<td class="td2">$value[id]</td>
+		<td class="td2">
+			$value[name]
+<!--
+EOT;
+if ($value['id'] == $uc_appid) {print <<<EOT
+-->
+			(<span class="s1">本站</span>)
+<!--
+EOT;
+}print <<<EOT
+-->
+		</td>
+		<td class="td2">$value[siteurl]</td>
+		<td class="td2">{$s_lang[$value[status]]}</td>
+		<td class="td2"><a href="$basename&action=edit&id=$value[id]">[编辑]</a></td>
+	</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+</table>
+</div>
+<div class="tac mb10">
+    <span class="bt"><span><button type="button" name="chkall" onclick="CheckAll(this.form)">全 选</button></span></span>
+	<span class="btn"><span><button type="submit" name="delete">提 交</button></span></span>
+</div>
+</form>
+<!--
+EOT;
+} elseif ($action == 'add' || $action == 'edit') {print <<<EOT
+-->
+<div class="nav3 mb10">
+	<ul class="cc">
+		<li><a href="$basename">应用列表</a></li>
+<!--
+EOT;
+if ($action == 'add') {print <<<EOT
+-->
+		<li class="current"><a href="$basename&action=add">添加应用</a></li>
+<!--
+EOT;
+} else {print <<<EOT
+-->
+		<li><a href="$basename&action=add">添加应用</a></li>
+		<li class="current"><a href="$basename&action=edit&id=$id">编辑应用</a></li>
+<!--
+EOT;
+}print <<<EOT
+-->
+	</ul>
+</div>
+<form action="$basename" method="post">
+<input type="hidden" name="action" value="$action" />
+<input type="hidden" name="step" value="3" />
+<input type="hidden" name="id" value="$id" />
+<h2 class="h1">应用信息</h2>
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+	<tr class="tr1">
+		<td class="td1">应用名称</td>
+		<td class="td2"><input type="text" name="name" value="$app[name]" class="input input_wa" /></td>
+	</tr>
+	<tr class="tr1">
+		<td class="td1">应用的URL</td>
+		<td class="td2"><input type="text" name="siteurl" value="$app[siteurl]" class="input input_wa" /></td>
+	</tr>
+	<tr class="tr1">
+		<td class="td1">应用密钥</td>
+		<td class="td2">
+        	<input type="text" name="secretkey" value="$app[secretkey]" id="secretkey" class="input input_wa mr5" />
+            <span class="bt2"><span><button type="button" onclick="randomChar(20)">随机生成密钥</button></span></span>
+        </td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">接口文件</td>
+		<td class="td2">
+        	<input type="text" name="interface" value="$app[interface]" class="input input_wa mb5" />
+            <p>此处留空，将默认调用 pw_api.php 文件</p>
+        </td>
+	</tr>
+</table>
+</div>
+<div class="tac mb10">
+	<span class="btn"><span><button type="submit" name="delete">提 交</button></span></span>
+</div>
+</form>
+<script language="JavaScript">
+function randomChar(len) {
+	var x = "0123456789qwertyuioplkjhgfdsazxcvbnm";
+	var tmp = "";
+	for (var i = 0; i < len; i++) {
+		tmp += x.charAt(Math.ceil(Math.random() * 100000000) % x.length);
+	}
+	getObj('secretkey').value = tmp;
+}
+</script>
+<!--
+EOT;
+}include_once PrintEot('adminbottom');
+?>-->

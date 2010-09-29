@@ -1,0 +1,75 @@
+<!--<?php
+include_once PrintEot('left');
+if (empty($action)){
+print <<<EOT
+-->
+<div class="admin_info mb10">
+	<h2 class="h1"><b>提示信息</b></h2>
+	<div class="legend">phpwind 提供了一套灵活的等级提升方案，可以根据<b>综合积分</b>来划分用户等级，设定一个好的等级提升方案能更好的体现站点等级系统的价值<br /><b>综合积分:</b>综合积分是按照<b>会员组提升方案</b>中设定的积分比率来计算的<br />计算方法:各项积分*比率的和为综合积分的值<br />如等级提升方案设置<br />发帖数: 1<br />威&nbsp;&nbsp;望: 0.5<br />金&nbsp;&nbsp;钱: -1<br />其&nbsp;&nbsp;他: 0<br />综合积分计算方法如下:<br />发帖数*1 + 威望*0.5 + 金钱*(-1)</div>
+</div>
+
+<form action="$basename" method=post>
+<input type=hidden name=action value='delete'>
+<h2 class="h1"><b>会员组提升方案</b></h2>
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+	<tr class="tr2 vt">
+		<td>类别</td>
+		<td>系数</td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">发帖数</td>
+		<td class="td2"><input type="text" class="input input_wc" name="upgrade[postnum]" value="$db_upgrade[postnum]" /></td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">精华</td>
+		<td class="td2"><input type="text" class="input input_wc" name="upgrade[digests]" value="$db_upgrade[digests]" /></td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">{$db_rvrcname}</td>
+		<td class="td2"><input type="text" class="input input_wc" name="upgrade[rvrc]" value="$db_upgrade[rvrc]" /></td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">{$db_moneyname}</td>
+		<td class="td2"><input type="text" class="input input_wc" name="upgrade[money]" value="$db_upgrade[money]" /></td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">{$db_creditname}</td>
+		<td class="td2"><input type="text" class="input input_wc" name="upgrade[credit]" value="$db_upgrade[credit]" /></td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">{$db_currencyname}</td>
+		<td class="td2"><input type="text" class="input input_wc" name="upgrade[currency]" value="$db_upgrade[currency]" /></td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">会员的历史在线时间</td>
+		<td class="td2"><input type="text" class="input input_wc" name="upgrade[onlinetime]" value="$db_upgrade[onlinetime]" /></td>
+	</tr>
+<!--
+EOT;
+foreach($_CREDITDB as $key=>$val){print <<<EOT
+-->
+	<tr class="tr1 vt">
+		<td class="td1">$val[0]</td>
+		<td class="td2"><input type="text" class="input input_wc" name="upgrade[$key]" value="$db_upgrade[$key]" /></td>
+	</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+	
+</table>
+<table width="100%" cellspacing="0" cellpadding="0">
+<tr class="tr2">
+	<td class="td2" colspan="2">综合积分 = {$uprules}</td>
+</tr>
+</table>
+</div>
+<div class="tac mb10">
+	<span class="btn"><span><button type="submit">提 交</button></span></span>
+</div>
+</form>
+<!--
+EOT;
+}include_once PrintEot('adminbottom');
+?>-->

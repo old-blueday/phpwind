@@ -1,0 +1,216 @@
+<!--<?php
+$smsTypeName = $smstype ? $messageServer->getReverseConst($smstype) : $action;
+${'smsTypeSelect_'.$smsTypeName} = 'selected';
+print <<<EOT
+-->
+<div id='hiddenMessage' style="display:none"></div>
+<div class="contUser" id="content">
+<table width="100%"><tr class="vt"><td height="400">
+	<div class="p15">
+        <h4 class="site mb5"><span>站内信</span>(共{$smsAllCount}条，<a href="$normalUrl&action=unread" class="s2"><b>{$notReadCount}</b>条未读消息</a>)</h4>
+<!--
+EOT;
+if ($action == 'info' || $action == 'next' || $action == 'previous') {
+$map = array(
+	$messageServer->getConst('sms_message')=>'message',
+	$messageServer->getConst('sms_rate')=>'rate',
+	$messageServer->getConst('sms_comment')=>'comment',
+	$messageServer->getConst('sms_guestbook')=>'guestbook'
+);
+$upaction=$map[$smstype];
+$deltype = $redirect ? '' : $upaction;
+print <<<EOT
+-->
+ 		<div class="cc mb10">
+			<span class="fr">
+				<a href="$normalUrl&action=previous&smstype=$smstype&rid={$message[rid]}&redirect=$redirect">上一条</a>&nbsp;&nbsp;|&nbsp;&nbsp;
+				<a href="$normalUrl&action=next&smstype=$smstype&rid={$message[rid]}&redirect=$redirect">下一条</a>
+			</span>
+				<a href="$normalUrl&page=$page&action=$upaction&redirect=$redirect">&lt;&lt;返回</a>
+        </div>
+    <div id="showmessageTip"></div>
+
+<!--
+EOT;
+if($smstype == $messageServer->getConst('sms_rate')){
+	require messageEot('sms_rateinfo');
+}elseif($smstype == $messageServer->getConst('sms_comment')){
+	require messageEot('sms_cominfo');
+}elseif($smstype == $messageServer->getConst('sms_guestbook')){
+	require messageEot('sms_guestinfo');
+}else{
+	require messageEot('sms_smsinfo');
+}
+//列表页
+} else { print <<<EOT
+-->
+<script type="text/javascript">
+function getSmsList(rType){
+	location.href='$normalUrl&action='+rType+'&smstype=$smstype';
+}
+</script>
+<form action="$normalUrl" method="post" name="FORM">
+<input type="hidden" name="ajax" value="1"/>
+			<div class="cc mb10">
+				<span class="mr5"><label><input id="checkall" name="checkall" type="checkbox" value="" onclick="MC.CheckAll(this.form,this)">&nbsp;全选</label></span>
+				<span class="bt2"><span><button onclick="MC.mSubmit(this.form,'mark','sms','$action','$page','showmessageTip')" type="button">标记已读</button></span></span>
+				<span class="bt2"><span><button onclick="MC.mSubmit(document.FORM,'del','sms','$action','$page','showmessageTip')"  type="button">删除</button></span></span>
+				<span style="margin:0 3px 0 6px;">筛选：<select onchange="selectSmsType(this.value)">
+					<option value="0">全部站内信</option>
+					<option $smsTypeSelect_sms_message  value="message">短消息</option>
+					<option $smsTypeSelect_sms_rate value="rate">评分</option>
+					<option $smsTypeSelect_sms_comment value="comment">评论</option>
+					<option $smsTypeSelect_sms_guestbook value="guestbook">留言</option>
+					<option $smsTypeSelect_sms_reply value="reply">帖子回复</option>
+				</select></span>
+<!--
+EOT;
+if(!empty($smstype)){
+$_self = "我发起的消息";
+$_other = "我收到的消息";
+if($smstype == $messageServer->getConst('sms_rate')){
+$_self = "我发起的帖子评分";
+$_other = "我收到的帖子评分";
+}elseif($smstype == $messageServer->getConst('sms_share')){
+$_self = "我对别人的分享";
+$_other = "别人对我的分享";
+}elseif($smstype == $messageServer->getConst('sms_comment')){
+$_self = "我对别人的评论";
+$_other = "别人对我的评论";
+}elseif($smstype == $messageServer->getConst('sms_guestbook')){
+$_self = "我对别人的留言";
+$_other = "别人对我的留言";
+}
+$selected_all = $selected_self = $selected_other = '';
+$selected_all = $action == '' || $action == 'all' ? 'selected' : '';
+$selected_self = $action == 'self' ? 'selected' : '';
+$selected_other = $action == 'other' ? 'selected' : '';
+print <<<EOT
+-->
+					<select onchange="getSmsList(this.value)">
+						<option value="all" $selected_all>全部</option>
+						<option value="self" $selected_self>{$_self}</option>
+						<option value="other" $selected_other>{$_other}</option>
+					</select>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+		 </div>
+       <div id="showmessageTip"></div>
+       <table width="100%" class="mb10">
+<!--
+EOT;
+if($emptyListTip){
+print <<<EOT
+-->
+			<tr><td class="tac p15 f14">{$emptyListTip}</td></tr>
+<!--
+EOT;
+}else{
+$_unReadCol = getUnReadHtml();
+print <<<EOT
+-->
+			{$_unReadCol}
+<!--
+EOT;
+}foreach($smsList as $key => $value){
+list($_img,$_b,$_tip) = getMessageIconByStatus($value);
+$_col = getSubListHtml($value);
+$value[modified_time] = get_date($value[modified_time]);
+$value['content'] = strip_tags($value['content']);
+$_title = getMessageIconTips($value['typeid'],$value['create_uid']);
+$_sendtype = $winduid == $value['create_uid'] ? '发送给' : '来自于';
+print <<<EOT
+-->			
+			{$_col}		
+			<tr class="tr3" id="sms_{$value[rid]}">
+      	<td class="pick"><input name="rids" type="checkbox" value="{$value[rid]}"></td>
+				<td class="icon"><img src="u/images/message/{$_img}" title="{$_title}"/></td>
+				<td class="face"><a href="u.php?uid={$value[uid]}" class="img_30"><img src="{$value[face]}" width="30" height="30" /></a></td>
+				 <td class="name"><p>{$_sendtype}:
+<!--
+EOT;
+if($winduid == $value['create_uid']) {print<<<EOT
+-->
+				 <a href="u.php?uid={$value[extra][0]}">{$value[extra][0]}</a>
+<!--
+EOT;
+}else{print<<<EOT
+-->
+				<a href="u.php?uid={$value[uid]}">{$value[create_username]}</a>
+<!--
+EOT;
+}print<<<EOT
+-->
+				 </p><em><span title="$value[modified_time]">{$value[modified_time_format]}</span></em></td>
+				 <td class="value">
+				 	<h4 $_b><a href="$normalUrl&action=info&page=$page&smstype={$value[typeid]}&rid={$value[rid]}&mid={$value[mid]}&redirect=$redirect">{$value[title]}</a></h4>
+				 	<p class="lh_18">{$value[content]}</p>
+					<em class="s2">{$_tip}</em>
+				</td>
+				<td class="del"><a id="del_{$value[rid]}" href="javascript:;" onclick="MC.del('$value[rid]','sms','$action','$page','showmessageTip')" class="adel">删除</a></td>
+			</tr>
+<!--
+EOT;
+}print <<<EOT
+-->           	
+		</table>
+		<div id="showmessage"></div>
+		<div class="mb10">
+			<div class="fr" style="_width:500px;">{$pages}</div>
+<!--
+EOT;
+if(count($smsList) >= $perpage){
+print <<<EOT
+-->
+      <span class="mr5"><label><input id="checkall" name="checkall"  type="checkbox" value="" onclick="MC.CheckAll(this.form,this)">&nbsp;全选</label></span>
+	   	<span class="bt2"><span><button onclick="MC.mSubmit(this.form,'mark','sms','$action','$page','showmessage')" type="button">标记已读</button></span></span>
+      <span class="bt2"><span><button onclick="MC.mSubmit(document.FORM,'del','sms','$action','$page','showmessage')"  type="button">删除</button></span></span>
+<!--
+EOT;
+}print <<<EOT
+-->
+			</div>  
+</form>                               
+<!--
+EOT;
+}print <<<EOT
+-->    
+	</div>
+</td></tr></table>
+</div>
+<script>
+(function(){
+	try{
+	var sms_line=getObj('smsListTable').getElementsByTagName('tr');
+	var l = sms_line.length;
+	for(var i=0;i<l;i++)
+	{
+		sms_line[i].onmouseover=function(){
+			var a = getElementsByClassName('send_message',this);
+			a.length&&(a[0].style.display = '');
+		};
+		sms_line[i].onmouseout=function(){
+			var a=getElementsByClassName('send_message',this);
+			a.length&&(a[0].style.display = 'none');
+		};
+	}
+	}catch(e){};
+})();
+
+function selectSmsType(type) {
+	if(type) {
+		window.location.href = '{$normalUrl}&action='+type;
+	} else {
+		window.location.href = '{$normalUrl}';
+	}
+}
+</script>
+<!--
+EOT;
+if(!defined('AJAX')){
+	require_once(uTemplate::printEot('footer'));
+}
+?>-->

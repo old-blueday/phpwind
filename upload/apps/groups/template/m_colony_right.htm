@@ -1,0 +1,163 @@
+<!--<?php
+$o_styledb = L::config('o_styledb', 'o_config');
+$styleName = ($o_styledb[$colony['styleid']]['cname']) ? $o_styledb[$colony['styleid']]['cname'] : '末分类';
+print <<<EOT
+-->
+	<div class="g_tA mb10">
+		<h2 class="g_hB">{$colony[cname]}</h2>
+		<div class="p10">
+			<div class="tac mb10"><img src="$colony[cnimg]" class="img" width="120" height="120" /></div>
+			<ul class="half cc mb5 ul_lh18">
+				<li><span class="fl">分类：</span><a href="apps.php?q=groups&a=all&styleid={$colony[styleid]}" class="lh_18 fl" style="width:62px;" title="{$styleName}">{$styleName}</a></li>
+				<li>成员：<a href="apps.php?q=group&a=member&cyid=$cyid">$colony[members]</a></li>
+				<li>创建：<span class="f10">$colony[createtime_s]</span></li>
+				<li>积分：<span class="f10">$colonyNums</span></li>
+			</ul>
+<!--
+EOT;
+if ($colony['ifcyer']) {
+if ($windid != $colony['admin']) {print <<<EOT
+-->
+            <span class="bt2"><span><button type="button" id="button_out" onclick="sendmsg('apps.php?q=group&a=out&cyid=$cyid','',this.id);">退出群组</button></span></span>
+<!--
+EOT;
+}} else {print <<<EOT
+-->
+			<span class="bt2"><span><button type="button" id="button_join" onclick="sendmsg('apps.php?q=group&a=join&cyid=$cyid','',this.id);">申请加入</button></span></span>
+<!--
+EOT;
+}if ($ifadmin) {print <<<EOT
+-->
+			 <span class="bt2"><span><button type="button" onclick="location.href='apps.php?q=group&a=set&cyid=$cyid';">管理群组</button></span></span>
+<!--
+EOT;
+}print <<<EOT
+-->
+        </div>
+    </div>
+	<div class="g_tA mb10">
+		<h2 class="g_hB">
+<!--
+EOT;
+if($managerNum > 9){print<<<EOT
+-->
+		<a class="fr fn f12" href="{$basename}a=member&cyid={$cyid}&group=1">更多</a>
+<!--
+EOT;
+}print<<<EOT
+-->
+		管理员
+		<span class="fn f12">(共{$managerNum}人)</span>
+		</h2>
+        <div class="ulB p10">
+			<ul class="cc">
+<!--
+EOT;
+foreach ($magdb as $value) {print <<<EOT
+-->
+			<li><a href="u.php?uid=$value[uid]" target="_blank" class="i" title="$value[username]"><img src="{$udb[$value[uid]][faceurl]}" height="44" width="44" /></a><p class="n"><a href="u.php?uid=$value[uid]" target="_blank">$value[username]</a></p>
+<!--
+EOT;
+if ($value['username'] == $colony['admin']) {print <<<EOT
+-->
+				<p class="s1">群主</p>
+<!--
+EOT;
+} else {print <<<EOT
+-->
+				<p class="s2">管理员</p>
+<!--
+EOT;
+}print <<<EOT
+-->
+			</li>
+<!--
+EOT;
+}print <<<EOT
+-->
+			</ul>
+        </div>
+	</div>
+	<div class="g_tA mb10">
+		<h2 class="g_hB">
+<!--
+EOT;
+if($memdbNum == 10){print<<<EOT
+-->
+			<a class="fr fn f12" href="{$basename}a=member&cyid={$cyid}">更多</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+			成员
+			<span class="fn f12">(共{$colony[members]}人)</span>
+		</h2>
+        <div class="ulB p10">
+		<ul class="cc">
+<!--
+EOT;
+foreach ($memdb as $value) {print <<<EOT
+-->
+			<li><a href="u.php?uid=$value[uid]" target="_blank" class="i" title="$value[username]"><img src="{$udb[$value[uid]][faceurl]}" height="44" width="44" /></a><p class="n"><a href="u.php?uid=$value[uid]" title="$value[username]" target="_blank">$value[username]</a></p></li>
+<!--
+EOT;
+}print <<<EOT
+-->
+		</ul>
+        </div>
+	</div>
+	<div class="g_tA mb10">
+		<h2 class="g_hB">
+<!--
+EOT;
+if($newvisitnum > 9){print<<<EOT
+-->
+		<a class="fr fn f12" href="{$basename}a=member&cyid={$cyid}&group=4">更多</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+		最近访客</h2>
+        <div class="ulB p10">
+			<ul class="cc">
+<!--
+EOT;
+foreach ($newvisit as $key => $value) {
+$visittime = get_date($value, 'm月d日');
+print <<<EOT
+-->
+				<li><a href="u.php?uid=$key" target="_blank" class="i"  title="{$udb[$key][username]}"><img src="{$udb[$key][faceurl]}" height="44" width="44" /></a><p class="n"><a href="u.php?uid=$key" title="{$udb[$key][username]}" target="_blank">{$udb[$key][username]}</a></p><p class="t">$visittime</p></li>
+<!--
+EOT;
+}print <<<EOT
+-->
+			</ul>
+        </div>
+	</div>
+	<div class="g_tA mb10">
+		<h2 class="g_hB">成员还喜欢去的群组</h2>
+		<div class="p10">
+			<div class="dlC mb10">
+<!--
+EOT;
+foreach ($likegroup as $key => $value) {print <<<EOT
+-->
+				<dl class="cc dl">
+					<dt class="dt">
+						<a href="apps.php?q=group&cyid=$value[id]" class="img_50"><img src="$value[cnimg]" width="44" height="44" /></a>
+					</dt>
+					<dd class="dd2">
+						<p><a href="apps.php?q=group&cyid=$value[id]" class="b">$value[cname]</a></p>
+						<p><span class="mr20">成员：$value[members]</span>积分：$value[colonyNums]</p>
+					</dd>
+				</dl>
+<!--
+EOT;
+}print <<<EOT
+-->
+			</div>
+		</div>
+	</div>
+<!--
+EOT;
+?>

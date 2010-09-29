@@ -1,0 +1,128 @@
+<!--<?php
+include_once PrintEot('left');
+print <<<EOT
+-->
+<div class="admin_info mb10">
+	<h3 class="h1">印戳设置</h3>
+	<div class="legend">
+	添加印戳图片：<br />
+	1. 上传印戳图片文件到程序images/overprint文件夹下<br />
+	2. 在添加印戳栏目下点击“选图”打开印戳图片列表，点选需要的图片，然后填写印戳名称、选择关联操作<br />
+	<br />
+	印戳分布：<br />
+	1. 关联到精华、置顶等具体操作的印戳将随对应的帖子操作共同生效或失效<br />
+	2. 未关联操作的印戳将出现在主题帖操作功能栏的印戳列表中<br />
+	3. 设置为不启用的印戳将不会出现在帖子操作中<br />
+	注意：每个帖子操作功能只能被关联一次，程序会记录最后一次为有效设置<br />
+	</div>
+</div>
+<h2 class="h1">添加印戳</h2>
+<form action="$basename&action=add" method="post" >
+<div class="admin_table mb10">
+<table width="100%" cellpadding="0" cellspacing="0">
+	<tr class="tr2 td_bgB">
+		<td width="24">&nbsp;</td>
+		<td width="100">图片</td>
+		<td width="60">选图</td>
+		<td width="180">印戳名称</td>
+		<td width="80">关联操作</td>
+		<td width="80">状态</td>
+		<td>&nbsp;</td>
+	</tr>
+	<tr class="tr1">
+		<td class="td2">&nbsp;</td>
+		<td class="td2"><img src="$iconPath/$icons[0]" id="iconpath_x"><input type="hidden" name="icon" value="$icons[0]"  id="iconinput_x" /></td>
+		<td class="td2"><a href="javascript:;" id="selecticon_x">选图</a></td>
+		<td class="td2"><input type="text" name="title" value="" class="input input_wa" /></td>
+		<td class="td2">$relatedSelect</td>
+		<td class="td2">$isOpenSelect</td>
+		<td class="td2"><span class="bt2"><span><button type="submit" value="添加">添加</button></span></span></td>
+	</tr>
+</table>
+</div>
+</form>
+<h2 class="h1">管理设置</h2>
+<form action="$basename&action=manage" method="post" name="FORM">
+<div class="admin_table mb10">
+<table width="100%" cellpadding="0" cellspacing="0">
+	<tr class="tr2 td_bgB">
+		<td width="30"><span onclick="CheckAll(document.FORM)" class="cp">启用</span></td>
+		<td width="100">图片</td>
+		<td width="60">选图</td>
+		<td width="180">印戳名称</td>
+		<td width="80">关联操作</td>
+		<td>操作</td>
+	</tr>
+<!--
+EOT;
+if($overprintlists){
+foreach($overprintlists as $list){
+print <<<EOT
+-->
+	<tr class="tr1">
+		<td class="td2">&nbsp;<input type="checkbox" name="list[$list[id]][check]" value="1" title="$list[isopen]" $list[open] /></td>
+		<td class="td2"><img src="$iconPath/$list[icon]" id="iconpath_$list[id]"><input type="hidden" name="list[$list[id]][icon]" value="$list[icon]" id="iconinput_$list[id]" /></td>
+        <td class="td2"><a href="javascript:;" id="selecticon_$list[id]">重新选图</a></td>
+		<td class="td2"><input type="text" class="input input_wa" name="list[$list[id]][title]" value="$list[title]" /></td>
+        <td class="td2">$list[select]</td>
+        <td class="td2"><a href="javascript:;" id="delete_$list[id]" url="$basename&action=delete&id=$list[id]">[删除]</a></td>
+	</tr>
+<!--
+EOT;
+}}else{print <<<EOT
+-->
+<tr><td class="p10" colspan="6"><div class="admin_tips">啊哦，没有你要的信息！</div></td></tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+</table>
+</div>
+<div class="tac mb10">
+	<span class="btn"><span><button type="submit">提 交</button></span></span>
+</div>
+</form>
+<div id="iconlist" class="menu t" style="display:none;border:5px solid #abc8ea;width:360px;">
+	<div class="h1"><a href="javascript:;" id="closebox" class="fr" style="margin-top:5px;"><img src="images/close.gif" /></a>选择图片</div>
+	<div style="height:360px;overflow:auto;width:350px;">
+<!--
+EOT;
+if($icons){
+print <<<EOT
+-->
+		<input type="hidden" name="current" vaule="" id="current"/>
+		<ul class="list_A list_80 cc">
+<!--
+EOT;
+foreach($icons as $k=>$icon){
+print <<<EOT
+-->
+			<li style="height:80px; padding:3px 15px; text-align:center;"><a href="javascript:;" id="popusericon_$k"><img src="$iconPath/$icon" id="popiconpath_$k" path="$icon" /></a></li>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+		</ul>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+	</div>
+</div>
+<script type="text/javascript" language="JavaScript" src="js/desktop/adminoverprint.js"></script>
+<script type="text/javascript">
+var iconPath = "$iconPath";
+window.onload = function(){
+	if(parent.adminNavClass){
+		parent.adminNavClass.initTips();
+	}
+	adminoverprint.init();
+}
+</script>
+<!--
+EOT;
+include_once PrintEot('adminbottom');
+?>
+-->

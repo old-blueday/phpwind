@@ -1,0 +1,122 @@
+<!--<?php
+print <<<EOT
+-->
+<script type="text/javascript" src="js/pw_search.js"></script>
+<div class="contUser" id="content">
+<table width="100%"><tr class="vt"><td height="400">
+	<div class="p15">
+<!--
+EOT;
+if(!empty($action)){
+print <<<EOT
+-->
+	   <h4 class="site"><span>消息中心搜索</span></h4>
+	   <div class="tips">
+			<a href="javascript:history.go(-1);">&lt;&lt;返回</a>
+       </div>
+        
+<!--
+EOT;
+if($smstype == $messageServer->getConst('sms_comment')){
+	require messageEot('sms_cominfo');
+}elseif($smstype == $messageServer->getConst('sms_guestbook')){
+	require messageEot('sms_guestinfo');
+}elseif($smstype == $messageServer->getConst('sms_message')){
+	require messageEot('sms_smsinfo');
+}else{
+	require messageEot('sms_rateinfo');
+}
+//列表页
+}else{print <<<EOT
+-->
+	  <h4 class="site"><span>消息中心搜索</span>
+<!--
+EOT;
+if($countSmsSearch){
+print <<<EOT
+-->
+		(共{$countSmsSearch}条)
+<!--
+EOT;
+}print <<<EOT
+-->
+	  </h4>
+	  <div class="bdA">
+		   <div id='showmessage' style="display:none"></div>
+	       <div class="mb10">
+	       		<div class="input_img cc fl mr5" onclick="getObj('usernames').focus();">
+                    <em class="input_down" onclick="pwSearch.selectInit(event,'popout','message.php?type=ajax','action=friend',0)">选择好友</em>
+                    <div id="get_friend"><input type="text" max="1" id="usernames" name="usernames" onblur="pwSearch.blur()" onfocus="pwSearch.init('message.php?type=ajax','action=friend&actionType=list&uid=$winduid','resultd','searchResult')" onkeydown="pwSearch.move(event)" onkeyup="pwSearch.searchResult(event,200);" autocomplete=off disableautocomplete></div>
+                </div>
+	       <form action="$normalUrl" method="post" onsubmit="return MC.submitSearch(document.SEARCH)" name="SEARCH">
+                <div class="search_select">
+                <select name="smstype">
+	        		<option value="all">全部</option>
+	        		<option value="sms_message">短消息</option>
+	        		<option value="sms_rate">评分</option>
+	        		<option value="sms_comment">评论</option>
+	        		<option value="sms_guestbook">留言</option>
+	        		<option value="sms_reply">帖子回复</option>
+	        	</select>
+                </div>
+	        	<span class="btn"><span><button type="submit">搜索</button></span></span>
+	        </form>
+	        </div>
+	    </div>
+<!--
+EOT;
+if(!$countSmsSearch){
+print <<<EOT
+-->
+		<div class="p10">暂无任何搜索结果</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+		<table width="100%" class="mb10">
+<!--
+EOT;
+foreach($searchList as $key => $value){
+$_name = $value['typeid'] == $messageServer->getConst('groupsms_colony') ? $value['cname'] : $value['create_username'];
+$_url = $value['typeid'] == $messageServer->getConst('groupsms_colony') ? "apps.php?q=group&cyid={$value['colonyid']}" : "u.php?uid={$value['uid']}";
+$_icon = $value['typeid'] == $messageServer->getConst('groupsms_colony') ? $value['cnimg'] : $value['face'];
+$_link = "{$baseUrl}?action=info&type=sms&subtype=search&rid={$value[rid]}&mid={$value[mid]}&smstype={$value[typeid]}";
+list($_img,$_b,$_tip) = getMessageIconByStatus($value);
+$value['content'] = strip_tags($value['content']);
+print <<<EOT
+-->
+		    <tr class="tr3">
+		        <td class="icon"><img src="u/images/message/{$_img}" /></td>
+		        <td class="face"><a href="{$_url}" class="img_50"><i><img src="{$_icon}" width="48" height="48" /></i></a></td>
+		        <td class="name">
+		            <p><a href="{$_url}">{$_name}</a></p>
+		            <em>{$value[modified_time_format]}</em>
+		        </td>
+		        <td class="value">
+		            <h4 $_b><a href="{$_link}">{$value[title]}</a></h4><em class="s2">{$_tip}</em>
+		            <p class="lh_18">{$value[content]}</p>
+		        </td>
+		    </tr>
+<!--
+EOT;
+}print <<<EOT
+-->		    
+		    
+		</table>
+		<div class="mb10">
+            <div class="fr" style="_width:500px;">
+                {$pages}
+            </div>
+            <div class="c"></div>
+        </div>
+<!--
+EOT;
+}print <<<EOT
+-->
+	</div>
+</td></tr></table>
+</div>
+<!--
+EOT;
+require_once(uTemplate::printEot('footer'));
+?>-->

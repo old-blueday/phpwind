@@ -1,0 +1,66 @@
+<!--<?php
+include_once PrintEot('left');
+print <<<EOT
+-->
+<form action="$basename&" method="post">
+  <input type="hidden" name="action" value="search">
+  <h2 class="h1">{$db_currencyname}日志管理</h2>
+  <div class="admin_table mb10">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <tr class="tr1 vt">
+      <td class="td1">关键词:</td>
+      <td class="td2"><input type="text" class="input input_wa mr20" name="keyword"><!--input type="submit" class="btn" value="提 交"-->
+      <span class="bt2"><span><button type="submit" value="提 交">提 交</button></span></span></td>
+    </tr>
+  </table>
+  </div>
+</form>
+<form action="$basename" method="post">
+  <input type="hidden" name="action" value="del">
+  <div class="cc mb10">$pages</div>
+  <h2 class="h1">{$db_currencyname}日志管理</h2>
+  <div class="admin_table mb10">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <tr class="tr2">
+      <td>ID</td>
+      <td>操 作</td>
+      <td>描述</td>
+      <td>价格</td>
+      <td>数量</td>
+      <td>IP</td>
+      <td>时间</td>
+      <td>删除</td>
+    </tr>
+<!--
+EOT;
+$id=($page-1)*$db_perpage;
+foreach($logdb as $key => $value){
+$id++;
+print <<<EOT
+-->
+    <tr class="tr1 vt">
+      <td class="td2">$id</td>
+      <td class="td2">$value[type]</td>
+      <td class="td2">$value[descrip]</td>
+      <td class="td2">$value[money]</td>
+      <td class="td2">$value[nums]</td>
+      <td class="td2">$value[ip]</td>
+      <td class="td2">$value[time]</td>
+      <td class="td2"><input type="checkbox" name="selid[]" value="$value[id]" onclick="pwJsCheck(this)" /></td>
+    </tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+  </table>
+  </div>
+<div class="mb10 tac">
+    <span class="bt"><span><button type="button" name="btn" id="btn" onclick="javascript:history.go(-1);">返回继续操作</button></span></span>
+    <span class="btn"><span><button type="submit">提 交</button></span></span>
+</div>
+</form>
+<!--
+EOT;
+include_once PrintEot('adminbottom');
+?>
+-->

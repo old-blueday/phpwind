@@ -1,0 +1,97 @@
+<!--<?php
+if ($db_toolbar) {
+	if ($_COOKIE['toolbarhide']) {
+		$toolbarstyle = 'style="display:none"';
+		$openbarstyle = '';
+		$closebarstyle = 'style="display:none"';
+	} else {
+		$toolbarstyle = '';
+		$openbarstyle = 'style="display:none"';
+		$closebarstyle = '';
+		if ($db_appifopen) {
+			$appshortcut = trim($winddb['appshortcut'], ',');
+			if (!empty($appshortcut) && $db_siteappkey) {
+				$appshortcut = explode(',', $appshortcut);
+				$bottom_appshortcut = array();
+				$appclient = L::loadClass('appclient');
+				$bottom_appshortcut = $appclient->userApplist($winduid, $appshortcut, 1);
+			}
+		}
+	}
+}
+
+$wind_spend = '';
+if ($db_footertime == 1) {
+	$totaltime = number_format((pwMicrotime() - $P_S_T), 6);
+	$wind_spend = "Total $totaltime(s)";
+}
+$ft_gzip = $db_obstart ? 'Gzip enabled' : 'Gzip disabled';
+$ft_time = get_date($timestamp, 'm-d H:i');
+$db_icp && $db_icp = "<a href=\"http://www.miibeian.gov.cn\" target=\"_blank\">$db_icp</a>";
+$db_menuinit = trim($db_menuinit, ',');
+print<<<EOT
+-->
+	<div class="c"></div>
+    </div>
+	<div class="foot">
+    	<div class="bottom cc tal">
+        	<a href="javascript:scroll(0,0)" class="fr">返回顶部</a>
+            <ul>
+<!--
+EOT;
+$navConfigService = L::loadClass('navconfig', 'site');
+$_Navbar['foot'] = $navConfigService->findValidNavListByTypeAndPostion(PW_NAV_TYPE_FOOT, 'o');
+foreach($_Navbar['foot'] as $key => $value){
+	$html = buildNavLinkHtml($value['data']);
+print <<<EOT
+-->
+				<li>$html</li>
+<!--
+EOT;
+}print <<<EOT
+-->
+                <li><a href="job.php?action=erasecookie&verify=$loginhash">清除Cookies</a></li>
+            </ul>
+        </div>
+		$wind_spend, Time now is:$ft_time, $ft_gzip $db_icp<br>
+		Powered by <a href="http://www.phpwind.net/" target="_blank">phpwind</a> <a href="http://www.phpwind.net/" target="_blank"><span class="b s2">v$wind_version</span></a> <a href="http://www.phpwind.com/certificate.php?host={$pwServer['HTTP_HOST']}">Certificate</a> Code &copy;2003-2010 <a href="http://www.phpwind.com/" target="_blank">phpwind.com</a> Corporation <span id="stats"></span>$db_statscode
+    </div>
+</div>
+<!--
+EOT;
+if($GLOBALS['groupid'] != 'guest' && $GLOBALS['groupid'] != '' && $GLOBALS['db_toolbar'] && SCR != 'profile' && SCR != 'jobcenter' && SCR != 'message' && SCR != 'userpay'){
+include_once PrintEot('bottom');
+}print <<<EOT
+-->
+<script language="JavaScript" src="js/global.js"></script>
+<script language="JavaScript" src="js/app_global.js"></script>
+<!--
+EOT;
+if ($GLOBALS['__pwPortalEot'] && checkPortalRight()) {
+print <<<EOT
+-->
+<script language="JavaScript" src="js/date.js"></script>
+<script language="JavaScript" src="mode/area/js/adminview.js"></script>
+<script language="javascript" src="mode/area/js/tagrelate.js"></script>
+<script language="JavaScript" src="js/color_picker.js"></script>
+<script language="JavaScript">
+window.onReady(function(){
+	frontadmin = New(frontAdmin,['main','view-hover']);
+});
+</script>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+</body>
+</html>
+<script language="JavaScript">
+var openmenu = {{$GLOBALS['db_menuinit']}};
+window.onReady(function(){read.InitMenu();});
+WINDOW_LOADED=1;
+</script>
+<!--
+EOT;
+?>
+-->

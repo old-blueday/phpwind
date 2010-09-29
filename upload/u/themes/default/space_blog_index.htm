@@ -1,0 +1,100 @@
+<!--<?php
+require_once(uTemplate::printEot('header'));
+print<<<EOT
+-->
+<div class="sideAll">
+<!--
+EOT;
+if ($winduid == $space['uid']) {
+if (!Char_cv($_COOKIE['modelguidehide'])) {
+	Cookie('modelguidehide','',0,false);
+}
+if (!$_COOKIE['modelguidehide']) {print <<<EOT
+--> 
+        <div class="spaceTip mb10 cc" id="modelguide">
+					<a href="javascript:;" class="adel" onclick="closeGuide();">关闭</a><label for="ifshow" class="mr10 fr"><input type="checkbox" name="ifshow" id="ifshow" />&nbsp;知道了以后不再显示</label><span class="mr10">鼠标移至每个标题栏处，当鼠标出现十字箭头时即可拖动</span>
+       </div>
+<script language="javascript" type="text/javascript">
+	function closeGuide() {
+		if (getObj('ifshow').checked == true) {
+			var date = new Date();
+			date.setTime(date.getTime()+86400000000);
+			document.cookie = "modelguidehide=1;expires=" + date.toGMTString() + " path=/";	
+		}
+		getObj('modelguide').style.display = 'none';	
+	}
+	
+</script>
+<!--
+EOT;
+}print <<<EOT
+-->
+		 <div class="spaceTip mb10 cc" style="display:none" id="modelupdate"><span class="fr"><span class="btn2"><span><button onClick="drag.save()">保存布局</button></span></span><span class="bt2"><span><button onClick="drag.reset()">取消</button></span></span></span><span class="mr20">你当前可以移动模块位置，需要保存才能生效。（隐藏和添加模块请到<a href="u.php?a=set&tab=model">模块设置</a>中管理）</span></div>
+<!--
+EOT;
+}print <<<EOT
+-->	
+
+		<div class="sideA">
+<!--
+EOT;
+require_once(uTemplate::printEot('space_model'));
+if ($data[0]) {
+	foreach ($data[0] as $key => $value) {
+		$spacetemplate->$key($value);
+	}
+}print <<<EOT
+-->
+		</div>
+		<div class="sideB" style="width:750px;">
+<!--
+EOT;
+if (!$indexRight) {print <<<EOT
+-->
+			<div class="boxA">
+				<table width="100%">
+					<tr><td height="400">
+<!--
+EOT;
+	if ($indexValue =='1') {print <<<EOT
+-->
+						<div class="space_msg"><img src="u/images/space/report.png" align="absmiddle" />由于对方的隐私设置，容许好友可见！立即 <a href="$db_bbsurl/pw_ajax.php?action=addfriend&touid={$space['uid']}" onclick="return ajaxurl(this);">加为好友</a></div>
+<!--
+EOT;
+	} else {print <<<EOT
+-->
+						<div class="space_msg"><img src="u/images/space/report.png" align="absmiddle" />对方设置了隐私，您没有权限查看</div>
+<!--
+EOT;
+	}
+print <<<EOT
+-->
+					</td></tr>
+				</table>
+			</div>
+<!--
+EOT;
+} else {
+	if ($data[1]) {
+		foreach ($data[1] as $key => $value) {
+			$spacetemplate->$key($value);
+		}
+	}
+}print <<<EOT
+-->
+		</div>
+<!--
+EOT;
+if ($winduid == $space['uid']) {print<<<EOT
+-->
+<script type="text/javascript" src="js/spacedrag.js"></script>
+<script type="text/javascript">
+window.onload = function() {
+	drag.init('boxA',['sideA','sideB'],'h2');
+}
+</script>
+</div>
+<!--
+EOT;
+}require_once(uTemplate::printEot('footer'));
+?>-->

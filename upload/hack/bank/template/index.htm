@@ -1,0 +1,268 @@
+<!--<?php print <<<EOT
+-->
+<style >
+.sidebar{width:180px;border-right:1px solid #e4eff5;}
+.content_thread{margin-left:180px;border-left:1px solid #e4eff5;_float:left;_margin:0;}
+.sidebar ul{line-height:1.8;padding-left:2px;}
+.bank_jj li{height:20px;line-height:20px;overflow:hidden; cursor:pointer;}
+.bank_jj li.current div{color:#666; cursor:default;}
+.bank_jj li.current{height:auto;}
+</style>
+<div id="breadCrumb">
+		<img src="$imgpath/$stylepath/thread/home-old.gif" align="absmiddle" />&nbsp;<a href="$db_bfn?m=bbs" title="$db_bbsname">$db_bbsname</a><!--
+EOT;
+if($action=='log'){print <<<EOT
+-->
+<em>&gt;</em><a href="$basename">银行</a><em>&gt;</em>银行日志
+<!--
+EOT;
+}else{print <<<EOT
+-->
+<em>&gt;</em><a href="$basename">银行</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+</div>
+<div id="pw_content">
+	<div class="f_two cc">
+		<div class="sidebar">
+			<div class="p15" style="padding-right:10px;">
+<!--
+EOT;
+if(!$action){print <<<EOT
+-->
+				<h4 class="f14 b">用户信息</h4>
+				<ul class="mb10">
+					<li>用户名:$windid</li>
+					<li>{$credit->cType[rvrc]}:$userrvrc {$credit->cUnit[rvrc]}</li>
+					<li>{$credit->cType[money]}:$winddb[money] {$credit->cUnit[money]}</li>
+					<li>{$credit->cType[credit]}:$winddb[credit] {$credit->cUnit[credit]}</li>
+
+<!--
+EOT;
+foreach($showdb as $show){
+print <<<EOT
+-->
+					<li>$show[0]:$show[1] 点</li>
+<!--
+EOT;
+}print <<<EOT
+-->
+					<li>总资产: $allmoney $db_moneyunit</li>
+				</ul>
+				<h4 class="f14 b">活期存款:$bankdb[deposit] $db_moneyunit</h4>
+        <ul class="mb20">
+					<li>利　息:$accrual $db_moneyunit</li>
+					<li>存款时间:$bankdb[savetime]</li>
+				</ul>
+				<h4 class="f14 b">定期存款:$bankdb[ddeposit] $db_moneyunit</h4>
+        <ul class="mb20">
+					<li>利　息:$daccrual $db_moneyunit</li>
+					<li>存款时间:$bankdb[dsavetime]</li>
+					<li>到期时间:$endtime</li>
+				</ul>
+<!--
+EOT;
+}print <<<EOT
+-->
+				<h4 class="f14 b">银行功能简介</h4>
+				<ul class="bank_jj" id="bank_jj">
+					<li class="current">
+						1. 存、取款 (活期和定期)
+						<div class="mb10">
+							活期为每日计算利息,可随时存取<br />
+							定期为只有当存款时间到达存款期限后开始计算利息，在到存款期限前取款不计算利息
+						</div>
+					</li>
+					<li>2. 银行转帐
+						<div class="mb10">不同用户之间可进行银行转帐，银行收取一定的手续费</div>
+					</li>
+					<li>3. 排行榜
+						<div class="mb10">系统将定期更新排行榜数据</div>
+					</li>
+					<li>4. 银行操作日志
+						<div class="mb10">帮您清晰地记录每一笔交易信息，方便查询，<a href="$basename&action=log" class="s4">查看日志</a></div>
+					</li>
+				</ul>
+			</div>
+<script type="text/javascript">
+var li = document.getElementById("bank_jj");
+var tt = li.getElementsByTagName("li");
+for(i=0; i<tt.length; i++){
+	tt[i].onclick= function(){
+		for(j=0; j<tt.length; j++){
+			tt[j].className = "";
+			this.className  = "current";
+		}
+	}
+}
+</script>
+		</div>
+		<div class="content_thread cc">
+			<div class="content_ie" style="min-height:800px;_height:800px;">
+<!--
+EOT;
+if(!$action){print <<<EOT
+-->
+			<div class="hB" style="padding-left:0;">
+				<ul class="tabB cc fl mr20">
+					<li class="current"><a href="javascript:;">银行储蓄</a></li>
+				</ul><span class="mr10">日利息</span><span class="mr10">活期：$bk_rate%</span>定期：$bk_drate%
+			</div>
+			<div class="p15">
+				<table width="100%" style="table-layout:fixed" class="mb20">
+					<tr class="vt">
+						<td>
+							<form name="form1" method="post" action="$basename&" onsubmit="this.submit.disabled=true;"><input type="hidden" name="action" value="save" />
+							<div class="mb10">存款：<label class="mr20"><input name="btype" type="radio" value="1" checked /> 活期</label><label><input name="btype" type="radio" value="2" /> 定期</label></div>
+							<div>存款金额($db_moneyunit)：<input name="savemoney" class="input input_wc mr10" type="text" /><span class="btn2"><span><button type="submit" name="submit">提 交</button></span></span></div>
+							</form>
+						</td>
+						<td>
+							<form name="form2" method="post" action="$basename&" onsubmit="this.submit.disabled=true;"><input type="hidden" name="action" value="draw" />
+							<div class="mb10">取款：<label class="mr20"><input name="btype" type="radio" value="1" checked /> 活期</label><label><input name="btype" type="radio" value="2" /> 定期</label></div>
+							<div>取款金额($db_moneyunit)：<input name="drawmoney" class="input input_wc mr10" type="text" id="drawmoney" /><span class="btn2"><span><button type="submit" name="submit">提 交</button></span></span></div>
+							</form>
+						</td>
+					</tr>
+				</table>
+<!--
+EOT;
+if($bk_virement=='1'){print <<<EOT
+-->
+				<form name="form3" method="post" action="$basename&" onsubmit="this.submit.disabled=true;">
+				<input type="hidden" name="action" value="virement" />
+				<table width="100%" class="mb10">
+						<tr><td class="h" colspan="2">银行转帐(手续费$bk_virerate%)</td></tr>
+						<tr class="tr3"><td width="100" style="padding-left:10px;">对方用户名：</td>
+						<td><input name="pwuser" class="input input_wa" type="text" size="35" /></td></tr>
+						<tr class="tr3"><td style="padding-left:10px;">转帐金额：</td>
+						<td><input name="to_money" class="input input_wa mr10" type="text" size="35" /><span class="gray">[最低转帐金额: $bk_virelimit $db_moneyunit]</span></td></tr>
+						<tr class="tr3"><td style="padding-left:10px;">转帐附言：</td>
+						<td><textarea name="memo" class="textareaA"></textarea></td></tr>
+						<tr class="tr3"><td>&nbsp;</td><td><span class="btn2"><span><button type="submit" name="submit">提 交</button></span></span></td></tr>
+				</table>
+				</form>
+<!--
+EOT;
+}print <<<EOT
+-->
+			<table width="100%" cellspacing="0" cellpadding="0">
+				<tr><td colspan="2" class="h"><b>银行存款排行</b></td></tr>
+				<tr><td width="50%" valign="top">
+					<div class="t3" style="width:100%;margin:0px auto 5px">
+						<table width="100%" cellspacing="0" cellpadding="0" align="center">
+							<tr class="tr2 tac"><td colspan="4">活期存款</td></tr>
+<!--
+EOT;
+$id=0;
+foreach($_DESPOSTDB as $thread){
+if($thread[2]){
+$id++;
+$class=$id%2==0 ? "f_two" : "f_one";
+print <<<EOT
+-->
+															<tr class="tr3 $class">
+																	<td style="border-right:0" width="10%">$id</td>
+																	<td style="border-right:0" width="25%"><a href="u.php?uid=$thread[0]">$thread[1]</a></td>
+																	<td style="border-right:0" width="*">$thread[2] $db_moneyunit</td>
+																	<td style="border-right:0" class="smalltxt">$thread[3]</td>
+															</tr>
+<!--
+EOT;
+}}print <<<EOT
+-->
+													</table>
+					</div>
+					</td>
+					<td valign="top">
+						<div class="t3" style="width:100%;margin:0px auto 5px">
+							<table width="100%" cellpadding="0" cellspacing="0">
+								<tr class="tr2 tac"><td colspan="4">定期存款</td></tr>
+<!--
+EOT;
+$id=0;
+foreach($_DDESPOSTDB as $thread){
+if($thread[2]){
+$id++;
+$class=$id%2==0 ? "f_two" : "f_one";
+print <<<EOT
+-->
+																	<tr class="tr3 $class">
+																			<td style="border-right:0" width="10%">$id</td>
+																			<td style="border-right:0" width="25%"><a href="u.php?uid=$thread[0]">$thread[1]</a></td>
+																			<td style="border-right:0" width="*">$thread[2] $db_moneyunit</td>
+																			<td style="border-right:0" class="smalltxt">$thread[3]</td>
+																	</tr>
+<!--
+EOT;
+}}print <<<EOT
+-->
+							</table>
+						</div>
+					</td>
+				</tr>
+			</table>
+		</div>
+<!--
+EOT;
+}elseif($action=='log'){print <<<EOT
+-->
+			<div class="t">
+				<table width="100%" cellpadding="0" cellspacing="0">
+					<tr><td class="h" colspan="5" style="border-top:0;">
+                    	<div class="fl"><a href="$basename&action=log">我的操作记录</a> | <a href="$basename&action=log&to=1">对我的操作记录</a></div>
+                        <div class="fr"><select name="type" onchange="Bjump(this.options[this.selectedIndex].value)">
+                        <option value="all">全部</option>
+                        <option value="bk_save" $select[bk_save]>{$lang[logtype][bk_save]}</option>
+                        <option value="bk_draw" $select[bk_draw]>{$lang[logtype][bk_draw]}</option>
+                        <option value="bk_vire" $select[bk_vire]>{$lang[logtype][bk_vire]}</option>
+                        </select></div>
+						</td>
+					</tr>
+                    <tr class="tr2 tac">
+                    <td width="5%">ID</td>
+                    <td width="6%">类型</td>
+                    <td width="*">描述</td>
+                    <td width="16%">操作日期</td>
+                    <td width="15%">IP</td></tr>
+<!--
+EOT;
+$num=($page-1)*$db_perpage;
+foreach($logdb as $key => $value){
+$num++;
+print <<<EOT
+-->
+                    <tr class="tr3 tac">
+                    <td>$num</td>
+                    <td>{$lang[logtype][$value[type]]}</td>
+                    <td><div style="TABLE-LAYOUT: fixed;WORD-WRAP: break-word" align="left">$value[descrip]</div></td>
+                    <td>$value[date]</td>
+                    <td>$value[ip]</td></tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+					</table>
+				</div>
+<div style="margin-left:12px;margin-bottom:15px" class="cc">$pages</div>
+<script language="JavaScript">
+function Bjump(value){
+	if(value!= '') {
+		window.location=('$basename&action=log&&to=$to&type='+value);
+	}
+}
+</script>
+<!--
+EOT;
+}print <<<EOT
+-->
+		</div>
+	</div>
+</div>
+	</div>
+</div>
+<!--
+EOT;
+?>-->

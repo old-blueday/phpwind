@@ -1,0 +1,44 @@
+<!--
+<?php 
+print <<<EOT
+-->
+<div class="nav4 mb10">
+	<ul class="cc">
+		<li><a href="$stopic_admin_url&job=stman">专题内容管理</a></li>
+		<li><a href="$stopic_admin_url&job=cgman">专题分类管理</a></li>
+		<li class="current"><a href="$stopic_admin_url&job=bgman">背景图片管理</a></li>
+	</ul>
+</div>
+<h2 class="h1">背景图片管理</h2>
+<form action="$stopic_admin_url&job=$job" method="post">
+<input type="hidden" name="action" value="modify">
+	<div class="list_D mb10">
+		<ul class="cc">
+<!--
+EOT;
+if($bool){
+foreach($backgroundLists as $list){
+print <<<EOT
+-->
+			<li><img src="$list[thumb_url]" />
+			<p>$list[select_html]<br /><input name="background_check[$list[id]]"
+				type="checkbox" value="1" style="vertical-align: middle;" />已使用{$list[num]}</p>
+			</li>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+		</ul>
+	</div>
+	<div class="tac mb10">
+		<span class="btn"><span><button name="background_update" type="submit" onfocus="blur();">确认分类</button></span></span>
+		<span class="bt"><span><button name="background_delete" type="submit" onfocus="blur();">删除所选</button></span></span>
+	</div>
+</form>
+$backgroundpages
+<!--
+EOT;
+}
+?>
+-->

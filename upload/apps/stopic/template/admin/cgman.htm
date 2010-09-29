@@ -1,0 +1,67 @@
+<!--
+<?php 
+
+print <<<EOT
+-->
+<div class="nav4 mb10">
+	<ul class="cc">
+		<li><a href="$stopic_admin_url&job=stman">专题内容管理</a></li>
+		<li class="current"><a href="$stopic_admin_url&job=cgman">专题分类管理</a></li>
+		<li><a href="$stopic_admin_url&job=bgman">背景图片管理</a></li>
+	</ul>
+</div>
+<div class="admin_info mb10">
+	<h3 class="h1">功能说明</h3>
+	<div class="legend">
+		默认分类不可编辑删除，自定义分类留空提交即可删除，删除后原分类下背景图片可供其他所有分类调用
+	</div>
+</div>
+<form action="$stopic_admin_url&job=$job" method="post" name="">
+<input type="hidden" name="action" value="modify">
+<h2 class="h1">专题分类管理</h2>
+<div class="admin_table mb10">
+<table width="100%">
+<!-- 
+EOT;
+//分类循环开始
+foreach($categoryLists as $list){
+//显示默认分类
+if($list['status'] == 1){
+
+print <<<EOT
+ -->
+	<tr class="tr1">
+		<td class="td2">$list[title]</td>
+	</tr>
+<!-- 
+EOT;
+//显示自定义分类
+}else{
+
+print <<<EOT
+ -->
+	<tr class="tr1">
+		<td class="td2"><input name="category_title[$list[id]]" type="text" value="$list[title]" class="input input_wa" /> <a href="$stopic_admin_url&job=$job&action=delete&categoryid=$list[id]">删除</a></td>
+	</tr>
+<!-- 
+EOT;
+
+}
+//分类循环开始
+}
+
+print <<<EOT
+ -->
+	<tr class="tr1">
+		<td class="td2"><input name="new_category_title" type="text" value="" class="input input_wa" /></td>
+	</tr>
+	<tr class="tr1">
+		<td class="td2"><span class="btn"><span><button type="submit" onfocus="blur();">提 交</button></span></span></td>
+	</tr>
+</table>
+</div>
+</form>
+<!--
+EOT;
+?>
+-->

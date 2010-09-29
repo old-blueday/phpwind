@@ -1,0 +1,81 @@
+<!--<?php
+if ($action == 'buytopic') {
+print <<<EOT
+-->
+<!--
+EOT;
+	if ($type == 'record') {print <<<EOT
+-->
+<div style="width:350px;">
+	<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><a class="adel" onclick="closep();" href="javascript:;">关闭</a>记录
+    </div>
+    <table width="100%" cellspacing="0" cellpadding="0" class="mb5">
+<!--
+EOT;
+if (!$buyers) {print <<<EOT
+-->
+    			<tr class="tr3 vt">
+                    <td>还没有人买过此帖</td>
+                </tr>
+<!--
+EOT;
+} else {print <<<EOT
+-->             
+                <tr class="tr3" style="background:#f7f7f7;">
+                    <td>用户名</td>
+                    <td>金额</td>
+                    <td width="150">时间</td>
+                </tr>
+<!--
+EOT;
+foreach ($buyers as $value) {
+print <<<EOT
+-->
+                <tr class="tr3 vt">
+                    <td><a href="u.php?uid={$value[uid]}" target="_blank" class="s4">{$value[username]}</a></td>
+                    <td>{$value[cost]}{$value[ctype]}</td>
+                    <td>{$value[createdtime]}</td>
+                </tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+<!--
+EOT;
+}print <<<EOT
+-->
+    </table>
+    <div class="popBottom">
+    	<span class="bt2"><span><button type="button" name="ajaxsubmit" onclick="closep();">关闭</button></span></span>
+    </div>
+</div>
+<!--
+EOT;
+	} elseif ($type == 'buy') {print <<<EOT
+-->
+	<div style="width:300px;">
+	<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><a class="adel" onclick="closep();" href="javascript:;">关闭</a>记录
+    </div>
+    <form action="{$basename}" method="post">
+    <input type="hidden" name="verify" value="$verifyhash" />
+	<input type="hidden" name="step" value="2" />
+    <div class="p10">
+    	购买帖子需花费<font color="#FF6600">{$creditvalue}{$creditname}</font>，您确定要购买吗？
+        <div class='cc'></div>
+        您的当前积分：<font color="#FF6600">{$userCredit}{$creditname}</font>
+    </div>
+    <div class="popBottom">
+    	<span class="btn2"><span><button type="button" onclick="ajax.submit(this.form)">确定</button></span></span>
+    	<span class="bt2"><span><button type="button" name="ajaxsubmit" onclick="closep();">关闭</button></span></span>
+    </div>
+    </form>
+</div>
+<!--
+EOT;
+	}print <<<EOT
+-->
+<!--
+EOT;
+}
+?>
+-->

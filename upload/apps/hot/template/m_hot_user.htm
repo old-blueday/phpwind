@@ -1,0 +1,37 @@
+<!--<?php
+$title = $subMenu[$sub];
+if($result){
+print <<<EOT
+-->
+<table width="100%"><tr class="vt"><td height="400">
+	<div class="p5">
+		<h5 class="h5 mb10">
+		<div class="fr"><form action="{$basename}action=$action&sub=$sub&rand=$randnum" method="post">
+		$result[fType]
+		$result[fTime]
+		</form></div>
+		<strong>$title[type_name]</strong></h5>
+	<div class="dlC">
+<!--
+EOT;
+foreach($result[data] as $key => $value){
+print <<<EOT
+-->
+		<dl class="cc dl fl dl3">
+			<dt class="dt"><a class="img_50" href="$value[url]" target="_blank"><i><img height="44" width="44" src="$value[image]"/></i></a></dt>
+      <dd class="dd">
+				<p><a class="f14" href="$value[url]" target="_blank">$value[title]</a></p>
+				<p>$value[value] $result[unit]</p>
+				最后登录：$value[lastDate]
+			</dd>
+		</dl>
+<!--
+EOT;
+}print <<<EOT
+-->
+	</div>
+	</div>
+</td></tr></table>
+<!--
+EOT;
+}?>-->

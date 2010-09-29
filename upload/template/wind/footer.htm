@@ -1,0 +1,127 @@
+<!--<?php print <<<EOT
+--></div></div><!--.main-wrap,#main End-->
+<div class="footer-wrap">
+<div class="c"></div>
+<div id="bottom"></div>
+<!--
+EOT;
+list($htmlAdvert,$arrayAdvert) = pwAdvert('Site.Footer',$fid);
+if($htmlAdvert){print<<<EOT
+-->
+<div class="mb5 tac">$htmlAdvert</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+<div class="c"></div>
+<div id="footer">
+<div id="mode-footer" class="mt">
+	<div class="bottom cc tac">
+<!--
+EOT;
+if($GLOBALS['SCR'] != 'searcher' || count($_Navbar['foot'])){
+	print <<<EOT
+-->
+		<ul>
+<!--
+EOT;
+
+foreach($_Navbar['foot'] as $key => $value){
+	$html = buildNavLinkHtml($value['data']);
+print <<<EOT
+-->
+			<li>$html</li>
+<!--
+EOT;
+};
+print <<<EOT
+-->
+			<li><a href="job.php?action=erasecookie&verify=$GLOBALS[loginhash]">清除Cookies</a></li>
+			<li><a href="javascript:scroll(0,0)">返回顶部</a></li>
+		</ul>
+<!--
+EOT;
+};
+print <<<EOT
+-->
+	</div>
+	<div class="f9 gray tac"><span id="windspend">$wind_spend Time now is:$ft_time, $ft_gzip $db_icp</span><br />
+	Powered by <a href="http://www.phpwind.net/" target="_blank">phpwind</a> <a href="http://www.phpwind.net/" target="_blank"><span class="b s2">v$wind_version</span></a> <a href="http://www.phpwind.com/certificate.php?host={$pwServer['HTTP_HOST']}">Certificate</a> Code &copy;2003-2010 <a href="http://www.phpwind.com/" target="_blank">phpwind.com</a> Corporation <span id="stats"></span>$db_statscode
+<!--
+EOT;
+if($db_ystats_ifopen=='0'){print <<<EOT
+-->
+<script type="text/javascript" src="http://js.tongji.linezing.com/{$db_ystats_unit_id}/tongji.js"></script>
+<noscript>
+	<a href="http://www.linezing.com" target="_blank"><img alt="tongji" src="http://img.tongji.linezing.com/{$db_ystats_unit_id}/tongji.gif"/></a>
+</noscript>
+<!--
+EOT;
+}print <<<EOT
+-->
+	</div></div></div></div>
+</div>
+<!--
+EOT;
+if($GLOBALS['groupid'] != 'guest' && $GLOBALS['groupid'] != '' && $GLOBALS['db_toolbar'] && SCR != 'profile' && SCR != 'jobcenter' && SCR != 'message' && SCR != 'userpay'){
+include_once PrintEot('bottom');
+}print <<<EOT
+-->
+<script language="JavaScript" src="js/global.js"></script>
+<!--
+EOT;
+$db_ifcredit && $credit_pop && require PrintEot('credit_pop');print <<<EOT
+-->
+<!--
+EOT;
+if ($GLOBALS['__pwPortalEot'] && checkPortalRight()) {
+print <<<EOT
+-->
+<script language="JavaScript" src="js/date.js"></script>
+<script language="JavaScript" src="mode/area/js/adminview.js"></script>
+<script language="javascript" src="mode/area/js/tagrelate.js"></script>
+<script language="JavaScript" src="js/color_picker.js"></script>
+<script language="JavaScript">
+window.onReady(function(){
+	frontadmin = New(frontAdmin,['main','view-hover']);
+});
+</script>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+</body></html>
+<!--
+EOT;
+if(defined('A_P')){
+print <<<EOT
+-->
+<script language="JavaScript" src="js/app_global.js"></script>
+<!--
+EOT;
+}if($db_job_isopen && $winduid){print <<<EOT
+-->
+<script type="text/javascript" language="JavaScript" src="js/pw_jobcenter.js"></script>
+<!--
+EOT;
+if($winddb['jobnum'] > 0 && $db_job_ispop && !GetCookie('jobpop') && !in_array(SCR,array("jobcenter","searcher"))){
+print <<<EOT
+-->
+<script type="text/javascript">
+window.onReady(function() {
+	setTimeout(openjobpop,200);
+});
+</script>
+<!--
+EOT;
+}}print <<<EOT
+-->
+<script language="JavaScript">
+var openmenu = {{$GLOBALS['db_menuinit']}};
+window.onReady(function(){read.InitMenu();});
+WINDOW_LOADED=1;
+</script>
+<!--
+EOT;
+?>-->

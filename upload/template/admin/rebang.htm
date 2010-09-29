@@ -1,0 +1,324 @@
+<!--<?php
+include_once PrintEot('left');
+print <<<EOT
+-->
+<div class="admin_info mb10">
+    <h3 class="h1"><b>提示信息</b></h3>
+    <div class="legend">
+    	<ol>
+    		<li>本功能模块只控制论坛内容推送模块的显示与否，具体的模块内容管理，可以直接在前台管理，或者进入<a href="javascript:;" onclick="parent.PW.Dialog({id:'area_pushdata',url:'$admin_file?adminjob=mode&admintype=area_pushdata',name:'内容推送管理'});">内容推送管理</a></li>
+    		<li>如果希望某用户拥有论坛推送模块的前台管理权限，请先在<a href="javascript:;" onclick="parent.PW.Dialog({id:'area_level_manage',url:'$admin_file?adminjob=mode&admintype=area_level_manage',name:'权限管理'});">权限管理</a>分配权限</li>
+    	</ol>
+    </div>
+</div>
+<!--
+EOT;
+if($action=='rebang'){
+$column = '<optgroup label="帖子信息"><option value="newpic">图片轮播</option><option value="newpost">最新帖子</option><option value="newreply">最新回复</option><option value="digest">精华帖子</option><option value="hits">人气排行</option><option value="replies">回复排行</option><option value="newfavor">最新收藏</option><option value="hotfavor">热门收藏</option></optgroup><optgroup label="会员信息"><option value="new">最新会员</option><option value="postnum">总发帖排行</option><option value="monthpost">本月发帖排行</option><option value="todaypost">今日发帖排行</option><option value="onlinetime">在线时间排行</option></optgroup><optgroup label="版块信息"><option value="topic">主题排行</option><option value="article">文章排行</option><option value="tpost">今日发帖排行</option></optgroup><optgroup label="积分信息">';
+foreach ($credit->cType as $key=>$val){
+	$column .= "<option value=\"$key\">{$val}排行</option>";
+}
+$column .='</optgroup><optgroup label="其他信息"><option value="info">站点信息</option><option value="custom">自定义栏目</option></optgroup>';
+print <<<EOT
+-->
+<form action="$basename&" method="post">
+  <input type="hidden" name="action" value="$action">
+  <input type="hidden" name="job" value="config">
+  <h2 class="h1">可视化设置</h2>
+  <div class="admin_table mb10">
+  <table width="100%" cellpadding="0" cellspacing="0">
+    <tr class="tr1 vt">
+      <td class="td1">首页多栏展现</td>
+      <td class="td2">
+    	 <ul class="cc list_80 list_A">
+           <li><input type=radio value=1 $newinfoifopen_Y name="newinfoifopen">开启</li>
+           <li><input type=radio value=0 $newinfoifopen_N name="newinfoifopen">关闭</li>
+         </ul>
+         <span><a href="javascript:;" onclick="parent.PW.Dialog({id:'area_pushdata',url:'$admin_file?adminjob=mode&admintype=area_pushdata&alias=bbsindex',name:'内容推送管理'});">管理内容</a></span>
+      </td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">帖子阅读页顶部</td>
+      <td class="td2">
+    	 <ul class="cc list_80 list_A">
+           <li><input type=radio value=1 $bbsradioifopen_Y name="bbsradioifopen">开启</li>
+           <li><input type=radio value=0 $bbsradioifopen_N name="bbsradioifopen">关闭</li>
+         </ul>
+         <span><a href="javascript:;" onclick="parent.PW.Dialog({id:'area_pushdata',url:'$admin_file?adminjob=mode&admintype=area_pushdata&alias=bbsradio',name:'内容推送管理'});">管理内容</a></span>
+      </td>
+    </tr>
+	<!--
+    <tr class="tr1 vt">
+      <td class="td1">显示位置</td>
+      <td class="td2">
+      		<ul class="cc list_80 list_A">
+              <li><input type=radio value=1 $position_1 name="position">版块上侧</li>
+              <li><input type=radio value=2 $position_2 name="position">版块下侧</li>
+              <li><input type=radio value=3 $position_3 name="position">版块左侧</li>
+              <li> <input type=radio value=4 $position_4 name="position">版块右侧</li>
+            </ul>
+        </td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">标题长度</td>
+      <td class="td2"><input class="input input_wa" value="$nf_config[titlelen]" name="titlelen"></td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">内容调用条数</td>
+      <td class="td2"><input class="input input_wa" value="$nf_config[shownum]" name="shownum"></td>
+    </tr>
+	-->
+  </table>
+  </div>
+    <div class="mb10 tac">
+    <span class="btn"><span><button type="submit">提 交</button></span></span>
+  </div>
+</form>
+<div style="display:none">
+<form action="$basename" method="post" name="cateForm">
+  <input type="hidden" name="action" value="$action">
+  <input type="hidden" name="job" value="cate">
+  <h2 class="h1"><span class="fl mr10">栏目管理</span><a class="btn_add fl mr10" onclick="return addinput();"><i>添加</i></a><span class="linka fl"><a href="$basename&action=update">[更新热榜缓存]</a></span>
+</h2>
+<div class="admin_table mb10">
+  <table width="100%" cellpadding="0" cellspacing="0">
+    <tr class="tr2">
+      <td>ID</td>
+      <td>栏目标题名称</td>
+      <td>栏目内容类型</td>
+      <td>显示权值(0关闭)</td>
+      <td>操作</td>
+    </tr>
+    <tbody id="cate">
+<!--
+EOT;
+foreach($nf_order as $key=>$val){
+$tmpcolumn = str_replace("<option value=\"$val[type]\">","<option value=\"$val[type]\" selected>",$column);
+$style = $val[order] ? '' : 'style="background:#f1f1f1"';
+print <<<EOT
+-->
+      <tr id="ip_$key" class="tr1 vt" $style>
+        <td class="td2"><input type="text" class="input input_wc" name="cate[$key][id]" value="$key" />
+          <input type="hidden" name="cate[$key][flag]" value="$key"/></td>
+        <td class="td2"><input type="text" class="input input_wa" id="name_$key" name="cate[$key][name]" value="$val[name]" /></td>
+        <td class="td2"><select name="cate[$key][type]" onchange="setname('name_$key',this.options[this.selectedIndex].innerHTML);prompt('prompt_$key');"  class="select_wa">
+            $tmpcolumn
+          </select></td>
+        <td class="td2"><input type="text" class="input input_wc" name="cate[$key][order]" value="$val[order]" size="10" /></td>
+        <td class="td2"><span id="prompt_$key" class="fr" style="display:none"><span class="s1">(*)</span></span>
+        <a onClick="javascript:window.location='$basename&action=setting&type=$val[type]&orderid=$key';return false;" href="javascript:void(0);" class="mr10" title="设置">[编辑]</a><a title="删除" onClick="javascript:if(delinput('ip_$key'))cateForm.submit();" href="javascript:;">[删除]</a>
+        </td>
+      </tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+    </tbody>
+  </table>
+  </div>
+  <div class="mb10 tac">
+    <span class="btn"><span><button type="submit">提 交</button></span></span>
+  </div>
+</form>
+</div>
+<script language="JavaScript">
+var ip=1000;
+
+function setname(id,text){
+	getObj(id).value = text;
+}
+function prompt(id){
+	getObj(id).style.display = 'block';
+}
+function delinput(id){
+	if (confirm("您确定要删除此栏目吗?")) {
+		getObj('cate').removeChild(getObj(id));
+		return true;
+	}
+	return false;
+}
+function addinput(){
+	ip++;
+	tr = document.createElement('tr');
+	tr.id = 'ip_'+ip;
+	tr.className = 'tr1';
+	td0 = document.createElement('td');
+	td1 = document.createElement('td');
+	td2 = document.createElement('td');
+	td3 = document.createElement('td');
+	td4 = document.createElement('td');
+	td0.className = 'td2';
+	td1.className = 'td2';
+	td2.className = 'td2';
+	td3.className = 'td2';
+	td4.className = 'td2';
+
+	td0.innerHTML ='<input type="text" class="input input_wc" name="cate['+ip+'][id]" value=""/><input type="hidden" name="cate['+ip+'][flag]" value=""/>';
+	td1.innerHTML = '<input type="text" class="input input_wa" name="cate['+ip+'][name]" value="" id="name_'+ip+'"/>';
+	td2.innerHTML = '<select class="select_wa" name="cate['+ip+'][type]" onchange="setname(\'name_'+ip+'\',this.options[this.selectedIndex].innerHTML);">$column</select>';
+	td3.innerHTML = '<input type="text" class="input input_wc" name="cate['+ip+'][order]" value="0" />';
+	td4.innerHTML = '<span id="prompt_'+ip+'"><span class="s1 mr20">(*)</span></span>[<a style="cursor:pointer;" onClick="javascript:delinput(\'ip_'+ip+'\')">删除</a>]&nbsp;';
+	tr.appendChild(td0);
+	tr.appendChild(td1);
+	tr.appendChild(td2);
+	tr.appendChild(td3);
+	tr.appendChild(td4);
+	getObj('cate').appendChild(tr);
+}
+</script>
+<!--
+EOT;
+}elseif($action=='setting'){print <<<EOT
+-->
+<form action="$basename" method="post">
+  <input type="hidden" name="action" value="$action">
+  <input type="hidden" name="type" value="$type">
+  <input type="hidden" name="step" value="2">
+  <input type="hidden" name="orderid" value="$orderid">
+  <h2 class="h1">{$nf_order[$orderid][name]}</h2>
+  <div class="admin_table mb10">
+  <table width="100%" cellpadding="0" cellspacing="0">
+    <tr class="tr1 vt">
+      <td class="td1">更新缓存时间</td>
+      <td class="td2"><input type="text" class="input input_wa" name="updatetime" value="{$nf_order[$orderid][updatetime]}" /></td>
+      <td class="td2"><!--更新缓存时间(默认时间=0,单位:秒)--></td>
+    </tr>
+<!--
+EOT;
+if($type=='newpic'){print <<<EOT
+-->
+    <tr class="tr1 vt">
+      <td class="td1">图片选取方式</td>
+      <td class="td2">
+     	  <ul class="cc list_A">
+               <li><input type="radio" value="0" name="picmode" onclick="seltype('0')" $picmode_1 />最新图片</li>
+              <li><input type="radio" value="1" name="picmode" onclick="seltype('1')" $picmode_2 />自定义图片</li>
+            </ul>
+         </td>
+         <td class="td2">&nbsp;</td>
+    </tr>
+    </table>
+    </div>
+    <div  id="custom" style="display:none">
+    <h2 class="h1"><b>自定义图片</b></h2>
+      <div class="admin_table mb10">
+      <table width="100%" cellpadding="0" cellspacing="0">
+      <tr class="tr2">
+        <td>图片地址</td>
+        <td>图片标题</td>
+        <td>外部链接</td>
+      </tr>
+<!--
+EOT;
+for($i=0;$i<$nf_config[shownum];$i++){
+if($nf_newinfodb[$orderid][$i]){print <<<EOT
+-->
+      <tr class="tr1 vt">
+        <td class="td2"><input type="text" class="input input_wa" name="urls[]" value="{$nf_newinfodb[$orderid][$i][value]}" /></td>
+        <td class="td2"><input type="text" class="input input_wa" name="title[]" value="{$nf_newinfodb[$orderid][$i][name]}" /></td>
+        <td class="td2">
+<!--
+EOT;
+if (is_numeric($nf_newinfodb[$orderid][$i][id])) {
+print <<<EOT
+-->
+          <input type="text" class="input input_wa" name="links[]" value="" />
+<!--
+EOT;
+}else{print <<<EOT
+-->
+          <input type="text" class="input input_wa" name="links[]" value="{$nf_newinfodb[$orderid][$i][id]}" />
+<!--
+EOT;
+}print <<<EOT
+-->
+          <input type="hidden" value="{$nf_newinfodb[$orderid][$i][id]}" name="idlinks[]" /></td>
+      </tr>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+      <tr class="tr1 vt">
+        <td class="td2"><input type="text" class="input input_wa" name="urls[]" /></td>
+        <td class="td2"><input type="text" class="input input_wa" name="title[]" /></td>
+        <td class="td2"><input type="text" class="input input_wa" name="links[]" /></td>
+      </tr>
+<!--
+EOT;
+}}print <<<EOT
+-->
+    </table>
+    </div>
+    </div>
+    <script language="JavaScript">
+function seltype(show){
+	document.getElementById('custom').style.display = show == '1' ? '' : 'none';
+}
+seltype('{$nf_order[$orderid][mode]}');
+</script>
+<!--
+EOT;
+}elseif($type=='custom'){
+print <<<EOT
+-->
+    <tr class="tr1 vt">
+      <td class="td1">标题</td>
+      <td class="td2" >链接地址</td>
+    </tr>
+<!--
+EOT;
+for($i=0;$i<$nf_config[shownum];$i++){
+if($nf_newinfodb[$orderid][$i]){
+print <<<EOT
+-->
+    <tr class="tr1 vt">
+      <td class="td1"><input type="text" class="input input_wb" name="titles[]" value="{$nf_newinfodb[$orderid][$i][name]}" /></td>
+      <td class="td2"><input type="text" class="input input_wb" name="links[]" value="{$nf_newinfodb[$orderid][$i][id]}" /></td>
+    </tr>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+    <tr class="tr1 vt">
+      <td class="td1"><input type="text" class="input input_wb" name="titles[]" /></td>
+      <td class="td2"><input type="text" class="input input_wb" name="links[]" /></td>
+    </tr>
+<!--
+EOT;
+}}}elseif($type=='info'){
+print <<<EOT
+-->
+    <tr class="tr1 vt">
+      <td class="td1">首页热榜显示项目</td>
+      <td class="td2">
+      	 <ul class="cc list_120 fl">
+         	<li><input type="checkbox" value="newmember" name="info[]" $newmember>最新注册会员<br /></li>
+            <li><input type="checkbox" value="totalmember" name="info[]" $totalmember>站点会员总数<br /></li>
+            <li><input type="checkbox" value="topic" name="info[]" $topic>站点主题总数<br /></li>
+            <li><input type="checkbox" value="article" name="info[]" $article>站点帖子总数<br /></li>
+            <li><input type="checkbox" value="tposts" name="info[]" $tposts>今日发帖数<br /></li>
+            <li><input type="checkbox" value="yposts" name="info[]" $yposts>昨日发帖数<br /></li>
+            <li><input type="checkbox" value="hposts" name="info[]" $hposts>最高日发帖数<br /></li>
+            <li><input type="checkbox" value="users" name="info[]" $users>当前在线会员数<br /></li>
+            <li><input type="checkbox" value="guest" name="info[]" $guest>当前在线游客数<br /></li>
+            <li><input type="checkbox" value="usertotal" name="info[]" $usertotal>当前在线总数<br /></li>
+            <li><input type="checkbox" value="higholnum" name="info[]" $higholnum>最高在线人数<br /></li>
+            <li><input type="checkbox" value="higholtime" name="info[]" $higholtime>最高在线发生时间<br /></li>
+         </ul>
+         </td>
+    </tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+  </table>
+ </div> 
+  <div class="mb10 tac">
+    <span class="btn"><span><button type="submit">提 交</button></span></span>
+  </div>
+</form>
+
+<!--
+EOT;
+}include_once PrintEot('adminbottom');
+?>-->

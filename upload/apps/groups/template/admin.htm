@@ -1,0 +1,2446 @@
+<!--<?php
+include_once PrintEot('left');
+print<<<EOT
+-->
+<h2 class="h1 mb10"><a href="$admin_file?adminjob=app&admintype=appslist">返回基础应用列表</a></h2>
+<!--
+EOT;
+if(!$action){print <<<EOT
+-->
+<div class="nav3 mb10">
+  <ul class="cc">
+  <li class="current"><a href="$basename">基本设置</a></li>
+	<li><a href="$basename&action=style">群组分类</a></li>
+	<li><a href="$basename&action=class">关联版块</a></li>
+	<li><a href="$basename&action=colony">群组管理</a></li>
+	<li><a href="$basename&action=mergecolony">合并群组</a></li>
+	<li><a href="$basename&action=level">群组等级</a></li>
+	<li><a href="$basename&action=colonystyle">群组风格</a></li>
+	<li><a href="$basename&action=cache">更新缓存</a></li>
+  </ul>
+</div>
+<form action="$basename&" method="post">
+  <input type="hidden" name="step" value="3">
+  <h2 class="h1">基本设置</h2>
+  <div class="admin_table mb10">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <tr class="tr1 vt">
+      <td class="td1">群组</td>
+      <td class="td2">
+        <div class="list_A list_80">
+             <ul class="cc">
+                  <li><input type="radio" name="groups_open" value="1" $groups_open_Y>开启</li>
+                <li><input type="radio" name="groups_open" value="0" $groups_open_N>关闭</li>
+             </ul>
+         </div>
+       </td> <td class="td2"><div class="help_a"></div></td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">允许创建新群组</td>
+      <td class="td2">
+      <div class="list_A list_80">
+             <ul class="cc">
+                  <li><input type="radio" name="config[newcolony]" value="1" $newcolony_Y>开启</li>
+                <li><input type="radio" name="config[newcolony]" value="0" $newcolony_N>关闭</li>
+             </ul>
+         </div>
+		</td><td class="td2"><div class="help_a"></div></td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">创建群组认证码</td>
+      <td class="td2">
+      <div class="list_A list_80">
+             <ul class="cc">
+                  <li><input type="radio" name="config[groups_gdcheck]" value="1" $groups_gdcheck_Y />开启</li>
+                <li><input type="radio" name="config[groups_gdcheck]" value="0" $groups_gdcheck_N />关闭</li>
+             </ul>
+         </div>
+        </td><td class="td2"><div class="help_a"></div></td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">发表新帖认证码</td>
+      <td class="td2">
+      <div class="list_A list_80">
+             <ul class="cc">
+                  <li><input type="radio" name="config[groups_p_gdcheck]" value="1" $groups_p_gdcheck_Y />开启</li>
+                <li><input type="radio" name="config[groups_p_gdcheck]" value="0" $groups_p_gdcheck_N />关闭</li>
+             </ul>
+         </div>
+        </td><td class="td2"><div class="help_a"></div></td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">创建群组验证问题</td>
+      <td class="td2">
+      <div class="list_A list_80">
+             <ul class="cc">
+                  <li><input type="radio" name="config[groups_qcheck]" value="1" $groups_qcheck_Y />开启</li>
+                <li><input type="radio" name="config[groups_qcheck]" value="0" $groups_qcheck_N />关闭</li>
+             </ul>
+         </div>
+        </td><td class="td2"><div class="help_a"></div></td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">发表新帖验证问题</td>
+      <td class="td2">
+      <div class="list_A list_80">
+             <ul class="cc">
+                  <li><input type="radio" name="config[groups_p_qcheck]" value="1" $groups_p_qcheck_Y />开启</li>
+                <li><input type="radio" name="config[groups_p_qcheck]" value="0" $groups_p_qcheck_N />关闭</li>
+             </ul>
+         </div>
+        </td><td class="td2"><div class="help_a"></div></td>
+    </tr>
+    <!-- <tr class="tr1 vt">
+      <td class="td1">创建群组的个数限制</td>
+      <td class="td2"><input name="config[allowcreate]" class="input input_wa" value="$o_allowcreate">
+        </td>
+		<td class="td2"><div class="help_a">每个会员最多能创建群组的个数。0 或 留空 表示没限制</div></td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">加入群组的个数限制</td>
+      <td class="td2"><input name="config[allowjoin]" class="input input_wa" value="$o_allowjoin">
+        </td>
+		<td class="td2"><div class="help_a">每个会员最多能加入群组的个数。0 或 留空 表示没限制</div></td>
+    </tr> -->
+    <tr class="tr1 vt">
+      <td class="td1">群组标志图片最大尺寸</td>
+      <td class="td2"><input name="config[imgsize]" class="input input_wa" value="$o_imgsize">
+        </td>
+		<td class="td2"><div class="help_a">单位KB，0 或 留空 则按<a href="admin.php?adminjob=settings&admintype=att">附件设置</a>配置</div></td>
+    </tr>
+    <!-- <tr class="tr1 vt"><td>群组标志图片宽高范围[像素]</td>
+<td><input name="config[imgwidth]" size="8" class="input" value="$o_imgwidth"> 宽
+<input name="config[imgheight]" size="8" class="input" value="$o_imgheight"> 高 0 或 留空 表示没限制</td></tr> -->
+    <tr class="tr1 vt">
+      <td class="td1">允许创建群组的用户组</td>
+      <td class="td2">$creategroup</td>
+	  <td class="td2"><div class="help_a">全不选则允许所有用户组创建</div></td>
+    </tr>
+  </table>
+  </div>
+  <h3 class="h1"><span class="mr20">群组积分奖惩设置</span><span class="linka">注:<b>威望积分</b>支持小数点后一位，其他积分只允许整数！</span></h3>
+  <div class="admin_table mb10">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <tr class="tr2">
+      <td class="td2">积分名称</td>
+      <td class="td2">创建群组(-)</td>
+      <td class="td2">加入群组(-)</td>
+      <td class="td2">创建相册(-)</td>
+      <td class="td2">上传照片(+)</td>
+      <td class="td2">删除照片(-)</td>
+      <!-- <td>发表主题(+)</td>
+		<td>发表回复(+)</td>
+		<td>删除主题(-)</td>
+		<td>删除回复(-)</td> -->
+    </tr>
+<!--
+EOT;
+$creditset = (array)$creditset;
+foreach($credit->cType as $key => $value){print <<<EOT
+-->
+    <tr class="tr1 vt">
+      <td class="td2">$value</td>
+      <td class="td2"><input name="creditset[Creategroup][$key]" value="{$creditset[Creategroup][$key]}" size="8" class="input" /></td>
+      <td class="td2"><input name="creditset[Joingroup][$key]" value="{$creditset[Joingroup][$key]}" size="8" class="input" /></td>
+      <td class="td2"><input name="creditset[Createalbum][$key]" value="{$creditset[Createalbum][$key]}" size="8" class="input" /></td>
+      <td class="td2"><input name="creditset[Uploadphoto][$key]" value="{$creditset[Uploadphoto][$key]}" size="8" class="input" /></td>
+      <td class="td2"><input name="creditset[Deletephoto][$key]" value="{$creditset[Deletephoto][$key]}" size="8" class="input" /></td>
+      <!-- <td><input name="creditset[Post][$key]" value="{$creditset[Post][$key]}" size="8" class="input" /></td>
+		<td><input name="creditset[Reply][$key]" value="{$creditset[Reply][$key]}" size="8" class="input" /></td>
+		<td><input name="creditset[Delete][$key]" value="{$creditset[Delete][$key]}" size="8" class="input" /></td>
+		<td><input name="creditset[Deleterp][$key]" value="{$creditset[Deleterp][$key]}" size="8" class="input" /></td> -->
+    </tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+  </table>
+  </div>
+  <h3 class="h1"><span class="mr20">群组积分流通记录</span><span class="linka">此功能可以详细记录某种积分的流通情况，帮助站长更加清晰地掌握论坛的积分状况！</span></h3>
+  <div class="admin_table mb10">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <tr class="tr2">
+      <td class="td2">积分名称</td>
+      <td class="td2">创建群组</td>
+      <td class="td2">加入群组</td>
+      <td class="td2">创建相册</td>
+      <td class="td2">上传照片</td>
+      <td class="td2">删除照片</td>
+      <!-- <td>发表主题</td>
+		<td>发表回复</td>
+		<td>删除主题</td>
+		<td>删除回复</td> -->
+    </tr>
+<!--
+EOT;
+foreach($credit->cType as $key => $value){print <<<EOT
+-->
+    <tr class="tr1 vt">
+      <td class="td2">$value</td>
+      <td class="td2"><input type="checkbox" name="creditlog[Creategroup][$key]" value="1" {$creditlog[Creategroup][$key]} /></td>
+      <td class="td2"><input type="checkbox" name="creditlog[Joingroup][$key]" value="1" {$creditlog[Joingroup][$key]} /></td>
+      <td class="td2"><input type="checkbox" name="creditlog[Createalbum][$key]" value="1" {$creditlog[Createalbum][$key]} /></td>
+      <td class="td2"><input type="checkbox" name="creditlog[Uploadphoto][$key]" value="1" {$creditlog[Uploadphoto][$key]} /></td>
+      <td class="td2"><input type="checkbox" name="creditlog[Deletephoto][$key]" value="1" {$creditlog[Deletephoto][$key]} /></td>
+      <!-- <td><input type="checkbox" name="creditlog[Post][$key]" value="1" {$creditlog[Post][$key]} /></td>
+		<td><input type="checkbox" name="creditlog[Reply][$key]" value="1" {$creditlog[Reply][$key]} /></td>
+		<td><input type="checkbox" name="creditlog[Delete][$key]" value="1" {$creditlog[Delete][$key]} /></td>
+		<td><input type="checkbox" name="creditlog[Deleterp][$key]" value="1" {$creditlog[Deleterp][$key]} /></td> -->
+    </tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+  </table>
+  </div>
+  <div class="mb10 tac">
+    <span class="btn"><span><button type="submit">提 交</button></span></span>
+   </div>
+</form>
+<!--
+EOT;
+}elseif($action=='class'){print <<<EOT
+-->
+<div class="nav3 mb10">
+    <ul class="cc">
+		<li><a href="$basename">基本设置</a></li>
+		<li><a href="$basename&action=style">群组分类</a></li>
+		<li class="current"><a href="$basename&action=class">关联版块</a></li>
+		<li><a href="$basename&action=colony">群组管理</a></li>
+		<li><a href="$basename&action=mergecolony">合并群组</a></li>
+		<li><a href="$basename&action=level">群组等级</a></li>
+		<li><a href="$basename&action=colonystyle">群组风格</a></li>
+		<li><a href="$basename&action=cache">更新缓存</a></li>
+    </ul>
+</div>
+<form action="$basename&" method="post">
+  <input type="hidden" name="action" value="class" />
+  <input type="hidden" name="step" value="2" />
+  <h2 class="h1">关联版块</h2>
+  <div class="admin_table mb10">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <tr class="tr2">
+      <td width="30">开启</td>
+      <td>关联版块别名</td>
+      <td width="80">群组个数</td>
+    </tr>
+<!--
+EOT;
+foreach($o_classdb as $key => $value){print <<<EOT
+-->
+    <tr class="tr1 vt">
+      <td class="td2"><input type="checkbox" name="" disabled /></td>
+      <td class="td2">{$forum[$key][name]}（分类）</td>
+      <td class="td2">--</td>
+    </tr>
+    <tbody>
+<!--
+EOT;
+foreach ($value as $k => $v){
+$ifcheck = in_array($v,$isclass) ? ' checked' : '';
+isset($classdb[$v]['cnsum']) || $classdb[$v]['cnsum'] = 0;
+print <<<EOT
+-->
+      <tr class="tr1 vt">
+        <td class="td2"><input type="checkbox" name="selid[]" value="$v"{$ifcheck} /></td>
+        <td class="td2"><input type="text" name="cname[$v]" value="{$classdb[$v][cname]}"  class="input input_wa mr5" />(版块：{$forum[$v][name]})</td>
+        <td class="td2">{$classdb[$v][cnsum]}</td>
+      </tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+    </tbody>
+<!--
+EOT;
+}print <<<EOT
+-->
+  </table>
+  </div>
+  <div class="mb10 tac">
+    <span class="btn"><span><button type="submit">提 交</button></span></span>
+   </div>
+</form>
+<!--
+EOT;
+} elseif ($action == 'credit') {print <<<EOT
+-->
+<div class="nav3 mb10">
+    <ul class="cc">
+      <li><a href="$basename">基本设置</a></li>
+      <li><a href="$basename&action=class">群组分类</a></li>
+      <li><a href="$basename&action=colony">群组管理</a></li>
+      <li><a href="$basename&action=level">群组等级</a></li>
+      <li><a href="$basename&action=cache">更新缓存</a></li>
+    </ul>
+</div>
+<form action="$basename&" method="post">
+  <input type="hidden" name="action" value="credit" />
+  <input type="hidden" name="fid" value="$fid" />
+  <input type="hidden" name="step" value="2" />
+  <h2 class="h1"><span class="mr20">积分策略></span><span class="linka">注:<b>威望积分</b>支持小数点后一位，其他积分只允许整数！</span></h2>
+  <div class="admin_table mb10">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <tr class="tr2">
+      <td>积分名称</td>
+      <td>创建群组(-)</td>
+      <td>加入群组(-)</td>
+      <td>创建相册(-)</td>
+      <td>上传照片(+)</td>
+      <td>删除照片(-)</td>
+      <td>发表主题(+)</td>
+      <td>发表回复(+)</td>
+      <td>删除主题(-)</td>
+      <td>删除回复(-)</td>
+    </tr>
+<!--
+EOT;
+foreach($credit->cType as $key => $value){print <<<EOT
+-->
+    <tr class="tr1 vt">
+      <td class="td2">$value</td>
+      <td class="td2"><input name="creditset[Creategroup][$key]" value="{$creditset[Creategroup][$key]}" class="input input_wc" /></td>
+      <td class="td2"><input name="creditset[Joingroup][$key]" value="{$creditset[Joingroup][$key]}" class="input input_wc" /></td>
+      <td class="td2"><input name="creditset[Createalbum][$key]" value="{$creditset[Createalbum][$key]}" class="input input_wc" /></td>
+      <td class="td2"><input name="creditset[Uploadphoto][$key]" value="{$creditset[Uploadphoto][$key]}" class="input input_wc" /></td>
+      <td class="td2"><input name="creditset[Deletephoto][$key]" value="{$creditset[Deletephoto][$key]}" class="input input_wc" /></td>
+      <td class="td2"><input name="creditset[Post][$key]" value="{$creditset[Post][$key]}" class="input input_wc" /></td>
+      <td class="td2"><input name="creditset[Reply][$key]" value="{$creditset[Reply][$key]}" class="input input_wc" /></td>
+      <td class="td2"><input name="creditset[Delete][$key]" value="{$creditset[Delete][$key]}" class="input input_wc" /></td>
+      <td class="td2"><input name="creditset[Deleterp][$key]" value="{$creditset[Deleterp][$key]}" class="input input_wc" /></td>
+    </tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+  </table>
+  </div>
+  <div class="mb10 tac">
+    <span class="btn"><span><button type="submit">提 交</button></span></span>
+   </div>
+</form>
+<!--
+EOT;
+}elseif($action=='colony'){print <<<EOT
+-->
+<div class="nav3 mb10">
+    <ul class="cc">
+		<li><a href="$basename">基本设置</a></li>
+		<li><a href="$basename&action=style">群组分类</a></li>
+		<li><a href="$basename&action=class">关联版块</a></li>
+		<li class="current"><a href="$basename&action=colony">群组管理</a></li>
+		<li><a href="$basename&action=mergecolony">合并群组</a></li>
+		<li><a href="$basename&action=level">群组等级</a></li>
+		<li><a href="$basename&action=colonystyle">群组风格</a></li>
+		<li><a href="$basename&action=cache">更新缓存</a></li>
+    </ul>
+</div>
+<h2 class="h1">搜索内容</h2>
+<form method="POST" action="$basename&action=colony">
+<div class="admin_table mb10">
+    <table width="100%" cellspacing="0" cellpadding="0">
+        <tr class="tr1 vt">
+          <td class="td1">关联版块</td>
+          <td class="td2"><select name="cid" class="select_wa mr20">$options</select></td>
+        </tr>
+		<tr class="tr1 vt">
+          <td class="td1" >所属分类</td>
+          <td class="td2" >
+		   <select name="firstgradestyle" id="firstgradestyle" onchange="setSecondstyle(this.value);" class="select_wa mr5">
+		    <option value="">不分类</option>
+<!--
+EOT;
+foreach ($o_style_relation as $key => $value){print<<<EOT
+-->
+			<option value="$key">{$o_styledb[$key]['cname']}</option>
+<!--
+EOT;
+}print<<<EOT
+-->
+			 </select>
+			 <select name="secondgradestyle" id="secondgradestyle" class="select_wa" style="display:none">
+             </select>
+		  </td>
+		</tr>
+        <tr class="tr1 vt">
+          <td class="td1">等级头衔</td>
+          <td class="td2"><select name="level" class="select_wa mr20"><option></option><option value="-1">普通等级</option>$leveloptions</select></td>
+        </tr>
+        <tr class="tr1 vt">
+          <td class="td1">群组名称</td>
+          <td class="td2"><input name="cname" class="input input_wa mr20" value="$cname">（可使用通配符*）</td>
+        </tr>
+        <tr class="tr1 vt">
+          <td class="td1">创始人</td>
+          <td class="td2"><input name="admin" class="input input_wa mr20" value="$admin">（可使用通配符*）</td>
+        </tr>
+     </table>
+ </div>
+ <div class="mb10 tac">
+    <span class="btn"><span><button type="submit">提 交</button></span></span>
+   </div>
+</form>
+<form action="$basename&action=colony" method="post">
+  <input type="hidden" name="step" value="3">
+  <h2 class="h1">群组管理</h2>
+  <div class="admin_table mb10">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <tr class="tr2">
+      <td>群组名称</td>
+      <td>创始人</td>
+      <td>等级头衔</td>
+      <td>所属分类</td>
+	  <td>关联版块</td>
+	  <td>版块中显示顺序</td>
+	  <td>显示在版块</td>
+	  <td>图文显示</td>
+      <td>操作</td>
+    </tr>
+<!--
+EOT;
+if (empty($colonys)) {print <<<EOT
+-->
+<tr><td class="p10" colspan="9"><div class="admin_tips">啊哦，没有你要的信息！</div></td></tr>
+<!--
+EOT;
+}else{
+foreach($colonys as $value){
+$ifcheck = $value['ifshow'] ? ' checked' : '';
+$checked3 = $value[ifshowpic] == 1 ? 'checked' : '';
+print <<<EOT
+-->
+    <tr class="tr1 vt">
+      <td class="td2"><a href="apps.php?q=group&cyid=$value[id]" target="_blank">$value[cname]</a></td>
+      <td class="td2"><a href="u.php?username=$value[admin]" target="_blank">$value[admin]</a></td>
+      <td class="td2">{$o_groups_level[$value[speciallevel]]}</td>
+	  <td class="td2">{$o_styledb[$value[styleid]]['cname']}</td>
+      <td class="td2">{$value[classname]}</td>
+	  <td class="td2"><input class="input" size="2" name="vieworder[$value[id]]" value="$value[vieworder]" type="text"></td>
+	  <td class="td2"><input type="checkbox" name="ifshow[$value[id]]" value="1" {$ifcheck}/> <input type="hidden" name="selid[]" value="$value[id]" /></td>
+	  <td class="td2"><input type="checkbox" name="ifshowpic[$value[id]]" value="1" $checked3></td>
+      <td class="td2"><a href="$basename&action=editcolony&cyid=$value[id]" class="mr20">[编辑]</a>
+      <a href="$basename&action=delcolony&cyid=$value[id]" onclick="return checkdel();" title="删除">[删除]</a>
+      <input name="ids[$value[id]]" type="hidden" value="$value[id]"></td>
+    </tr>
+<!--
+EOT;
+}}print <<<EOT
+-->
+  </table>
+  </div>
+  <div class="cc">$pages</div>
+  <div class="mb10 tac">
+    <span class="btn"><span><button type="submit">提 交</button></span></span>
+  </div>
+</form>
+<script language="JavaScript" src="js/pw_ajax.js"></script>
+<script language="JavaScript" src="js/global.js"></script>
+<script language="JavaScript">
+function checkdel() {
+	if (confirm('您确定要删除这个群组吗？')) {
+		return true;
+	}
+	return false;
+}
+function setSecondstyle(id) {
+	var jsStyle = JSONParse('$jsStyle');
+	var jsStyleRelation = JSONParse('$jsStyleRelation');
+
+	if (typeof jsStyle[id] == 'undefined') {
+		getObj('secondgradestyle').style.display = 'none';
+	} else {
+		if (jsStyle[id]['upid'] == '0') {
+			if (jsStyleRelation[id].length == 0) {
+				getObj('secondgradestyle').style.display = 'none';
+			} else {
+				getObj('secondgradestyle').style.display = '';
+				getObj('secondgradestyle').length = 0;
+				
+				getObj('secondgradestyle').options.add(new Option('全部', 0));
+				
+				for (var i = 0; i < jsStyleRelation[id].length; i++) {
+					getObj('secondgradestyle').options.add(new Option(jsStyle[jsStyleRelation[id][i]]['cname'], jsStyleRelation[id][i]));
+				}
+			}
+			getObj('firstgradestyle').value = id;
+		} else {
+			var parentId = jsStyle[id]['upid'];
+			getObj('firstgradestyle').value = parentId;
+			getObj('secondgradestyle').style.display = '';
+			getObj('secondgradestyle').length = 0;
+			getObj('secondgradestyle').options.add(new Option('全部', 0));
+			for (var i = 0; i < jsStyleRelation[parentId].length; i++) {
+				getObj('secondgradestyle').options.add(new Option(jsStyle[jsStyleRelation[parentId][i]]['cname'], jsStyleRelation[parentId][i]));
+			}
+			getObj('secondgradestyle').value = id;
+		}
+	}
+}
+setSecondstyle('$styleid');
+</script>
+<!--
+EOT;
+} elseif($action == 'editcolony') {print <<<EOT
+-->
+<div class="nav3 mb10">
+<ul class="cc">
+	<li><a href="$basename">基本设置</a></li>
+	<li><a href="$basename&action=style">群组分类</a></li>
+	<li><a href="$basename&action=class">关联版块</a></li>
+	<li class="current"><a href="$basename&action=colony">群组管理</a></li>
+	<li><a href="$basename&action=mergecolony">合并群组</a></li>
+	<li><a href="$basename&action=level">群组等级</a></li>
+	<li><a href="$basename&action=colonystyle">群组风格</a></li>
+	<li><a href="$basename&action=cache">更新缓存</a></li>
+</ul>
+</div>
+<link rel="stylesheet" type="text/css" href="images/g/g_style.css" />
+<script type="text/javascript" LANGUAGE="JavaScript" src="js/core/core.js"></script>
+<script type="text/javascript" LANGUAGE="JavaScript" src="js/global.js"></script>
+<script type="text/javascript" LANGUAGE="JavaScript" src="js/mini_editor.js"></script>
+<form action="$basename&" method="post" enctype="multipart/form-data">
+  <input type="hidden" name="action" value="editcolony" />
+  <input type="hidden" name="cyid" value="$cyid" />
+  <input type="hidden" name="step" value="3" />
+
+  <h2 class="h1">群组基本信息</h2>
+<div class="admin_table mb10">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <tr class="tr1 vt">
+      <td class="td1">群组名称 <span class="s1">*</span></td>
+      <td class="td2" ><input type="text" class="input input_wa" name="cname" id="cname" value="$colony[cname]" />
+        &nbsp;<span id="cname_warn">限 20 字节</span></td>
+			<td class="td2"></td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1" >创始人</td>
+      <td class="td2" ><input type="text" class="input input_wa" name="admin" value="$colony[admin]" /></td>
+			<td class="td2"></td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1" >群组等级</td>
+      <td class="td2" ><select name="speciallevel" class="select_wa"><option value="0">普通等级</option>{$leveloptions}</select></td>
+			<td class="td2"></td>
+    </tr>
+	<tr class="tr1 vt">
+      <td class="td1" >所属分类 <span class="s1">*</span></td>
+      <td class="td2" >
+		 <select name="firstgradestyle" id="firstgradestyle" onchange="setSecondstyle(this.value);" class="select_wa mr5">
+		    <option value="">请选择分类</option>
+<!--
+EOT;
+foreach ($o_style_relation as $key => $value){print<<<EOT
+-->
+			<option value="$key">{$o_styledb[$key]['cname']}</option>
+<!--
+EOT;
+}print<<<EOT
+-->
+		 </select>
+		 <select name="secondgradestyle" id="secondgradestyle" class="select_wa" style="display:none"></select>
+		 <td class="td2"></td>
+	  </td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1" >关联版块</td>
+      <td class="td2" >
+      	<select name="cid" class="select_wa" onchange="onchage();" id="cid">
+          $options
+        </select>
+        </td>
+				<td class="td2"><div class="help_a">修改关联版块，将同时移动群组所属帖子到相应版块，请慎用</div></td>
+    </tr>
+	<tr class="tr1 vt" id="showforums" style="$cidDisplay">
+      <td class="td1" >话题在版块中显示</td>
+      <td class="td2" >
+				<ul class="list_A list_80">
+					<li><input type="radio" name="iftopicshowinforum" value="1" $iftopicshowinforum_Y />开启</li>
+					<li><input type="radio" name="iftopicshowinforum" value="0" $iftopicshowinforum_N />关闭</li>
+				</ul>
+        </td>
+				<td class="td2"><div class="help_a">修改此选项，将同时移动群组所属帖子，请慎用</div></td>
+    </tr>
+	<tr class="tr1 vt" id="showview" style="$cidDisplay">
+      <td class="td1" >显示视图形式</td>
+      <td class="td2" >
+		<ul class="list_A">
+			<li><input type="radio" name="viewtype" value="0" {$viewtype_0} > 群组视图和论坛视图</li>
+			<li><input type="radio" name="viewtype" value="1" {$viewtype_1} > 论坛视图</li>
+			<li><input type="radio" name="viewtype" value="2" {$viewtype_2} > 群组视图</li>
+		</ul>
+	  </td>
+		<td class="td2"></td>
+    </tr>
+<script language="javascript">
+	function onchage() {
+		if ( getObj('cid').value != 0) {
+			getObj('showforums').style.display = '';
+			getObj('showview').style.display = '';
+		} else {
+			getObj('showforums').style.display = 'none';
+			getObj('showview').style.display = 'none';
+		}
+
+	}
+</script>
+    <tr class="tr1 vt">
+      <td class="td1" >加入权限</td>
+      <td class="td2" ><select name="ifcheck">
+          <option value="2" $ifcheck_2>允许任何人加入该群组</option>
+          <option value="1" $ifcheck_1>需要管理员审核才能加入该群组</option>
+          <option value="0" $ifcheck_0>不允许任何人加入该群组</option>
+        </select>
+      </td>
+			<td class="td2"></td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1" >群组简介</td>
+      <td class="td2" >
+		<div class="mb5 g_operation " style="overflow:hidden;">
+			<h5>
+				<span class="g_link cp" title="插入url链接" onClick="editor.createLinkBox(this.id);" id="createlinkid" unselectable="on">插入url链接</span>
+				<span class="g_B cp" title="加粗" onClick="editor.bold();" id="createb2" unselectable="on">加粗</span>
+				<span class="g_color cp" title="加颜色" onClick="editor.createcolor(this.id);" id="createcolorid" unselectable="on">加颜色</span>
+			</h5>
+			<p><textarea maxlength="200" id="mini_descrip" name="descrip" class="p5">{$colony[descrip]}</textarea>
+			<input type="hidden" id="board_uid" value="$u"></p>
+			<script type="text/javascript">var editor = new MiniEditor('mini_descrip');</script>
+		</div>
+        <p id="descrip_warn">限 255 字节</p> </td>
+				<td class="td2"></td>
+    </tr>
+		<tr class="tr1 vt">
+		<td class="td1" >群组公告</td>
+		<td class="td2" >
+			<div class="mb5 g_operation">
+				<h5>
+					<span class="g_link cp" title="插入url链接" onClick="editor2.createLinkBox(this.id);" id="createlinkid2" unselectable="on">插入url链接</span>
+					<span class="g_B cp" title="加粗" onClick="editor2.bold();" unselectable="on">加粗</span>
+					<span class="g_color cp" title="加颜色" onClick="editor2.createcolor(this.id);" unselectable="on" id="createcolorid2">加颜色</span>
+				</h5>
+				<p><textarea maxlength="200" id="editor_annouce" name="annouce">{$colony[annouce]}</textarea><input type="hidden" id="board_uid" value="$u"></p>
+				<script type="text/javascript">var editor2 = new MiniEditor('editor_annouce');</script>
+			</div>
+			<p id="annouce_warn">限 50000 字节</p>
+		</td>
+		<td class="td2"></td>
+	</tr>
+	<tr class="tr1 vt">
+    <td class="td1">群组图标</td>
+    <td class="td2" width="410"><input type="hidden" name="q_1" id="q_1" value="" />
+            	<img width="48px" height="48px" style="filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod=image);" id="preview_1" src="$colony[cnimg]" class="fr" />
+				<!--div id="preview_1" style="width:48px;height:48px;filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod=scale);"></div-->
+				<p class="mb5"><input type="file" class="input mr10" id="p_1" name="cnimg_1" accept="image/*" onchange="preview_img(1);" /><a href="javascript:void(0);" onclick="show_image('1','images/g/groupnopic.gif');" >使用默认图标</a></p>
+                <p class="gray">推荐尺寸120px*120px，</p>
+            </td>
+						<td class="td2">可上传类型：
+<!--
+EOT;
+foreach($cnimg_1 as $key => $value){print<<<EOT
+-->
+						{$key}:{$value}KB;
+<!--
+EOT;
+}print<<<EOT
+-->
+						
+						</td>
+        </tr>
+				<tr class="tr1 vt">
+            <td class="td1">群组背景</td>
+            <td class="td2"><input type="hidden" name="q_2" id="q_2" value="" />
+				<p class="mb5"><input type="file" class="input mr10" id="p_2" name="cnimg_2" accept="image/*" onchange="preview_img(2);" /><a href="javascript:void(0);" onclick="show_image('2','images/g/skin_default/preview.jpg');">使用默认背景</a></p>
+                <img width="355px" height="75px" style="filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod=image);" id="preview_2" src="{$set_banner}" />
+            </td>
+						<td class="td2">可上传类型：
+<!--
+EOT;
+foreach($cnimg_2 as $key => $value){print<<<EOT
+-->
+						{$key}:{$value}KB;
+<!--
+EOT;
+}print<<<EOT
+-->
+						</td>
+						
+        </tr>
+  <!--<h2>群组自定义积分设置</h2>
+<table width="100%" cellspacing="0" cellpadding="0">
+	<tr class="tr3" align="center">
+		<td width="25%">积分名称</td>
+		<td>积分单位</td>
+		<td>积分说明</td>
+		<td><a style="color:blue;cursor:pointer;" onclick="addtbody('cdiymode','cdiybody');">[添加]</a></td>
+	</tr>
+	<tbody id="cdiymode" style="display:none"><tr class="tr3" align="center">
+		<td><input name="cdiy_name[]" size="30" class="input" /></td>
+		<td><input name="cdiy_unit[]" size="30" class="input" /></td>
+		<td><input name="cdiy_desc[]" size="30" class="input" /></td>
+		<td><a style="color:orange;cursor:pointer" onclick="deltbody(this);">[删除]</a></td>
+	</tr></tbody>-->
+<!--
+EOT;
+foreach ($g_credits as $key => $value) {print <<<EOT
+-->
+<!--  <tr class="tr1 vt" align="center">
+    <td class="td2" ><input name="credit_name[$key]" value="{$value[name]}" size="30" class="input" /></td>
+    <td class="td2" ><input name="credit_unit[$key]" value="{$value[unit]}" size="30" class="input" /></td>
+    <td class="td2" ><input name="credit_desc[$key]" value="{$value[description]}" size="30" class="input" /></td>
+    <td class="td2" ><a style="color:orange;cursor:pointer" onclick="deltbody(this);">[删除]</a></td>
+  </tr>-->
+<!--
+EOT;
+}print <<<EOT
+-->
+  <tbody id="cdiybody"></tbody>
+<!--
+  <h2 class="h1">群组积分奖惩设置</h2>
+  <div class="admin_table mb10">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <tr class="tr2">
+      <td class="td2">积分名称</td>
+      <td class="td2">加入群组(-)</td>
+      <td class="td2">创建相册(-)</td>
+      <td class="td2">上传照片(+)</td>
+      <td class="td2">删除照片(-)</td>
+      <td class="td2">发表主题(+)</td>
+      <td class="td2">发表回复(+)</td>
+      <td class="td2">删除主题(-)</td>
+      <td class="td2">删除回复(-)</td>
+    </tr> -->
+<!--
+EOT;
+foreach($g_all as $key => $value){print <<<EOT
+-->
+    <tr class="tr1 vt">
+      <td class="td2">$value</td>
+      <td class="td2"><input name="creditset[Joingroup][$key]" value="{$creditset[Joingroup][$key]}" class="input input_wc" /></td>
+      <td class="td2"><input name="creditset[Createalbum][$key]" value="{$creditset[Createalbum][$key]}" class="input input_wc" /></td>
+      <td class="td2"><input name="creditset[Uploadphoto][$key]" value="{$creditset[Uploadphoto][$key]}" class="input input_wc" /></td>
+      <td class="td2"><input name="creditset[Deletephoto][$key]" value="{$creditset[Deletephoto][$key]}" class="input input_wc" /></td>
+      <td class="td2"><input name="creditset[Post][$key]" value="{$creditset[Post][$key]}" class="input input_wc" /></td>
+      <td class="td2"><input name="creditset[Reply][$key]" value="{$creditset[Reply][$key]}" class="input input_wc" /></td>
+      <td class="td2"><input name="creditset[Delete][$key]" value="{$creditset[Delete][$key]}" class="input input_wc" /></td>
+      <td class="td2"><input name="creditset[Deleterp][$key]" value="{$creditset[Deleterp][$key]}" class="input input_wc" /></td>
+    </tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+  </table>
+  </div>
+  <div class="mb10 tac">
+    <span class="btn"><span><button type="submit">保存设置</button></span></span>
+   </div>
+</form>
+<script LANGUAGE="JavaScript" src="js/pw_ajax.js"></script>
+<script language="JavaScript">
+function addtbody(mode,tbody){
+	if (getObj(mode)) {
+		var s = getObj(mode).firstChild.cloneNode(true);
+		getObj(tbody).appendChild(s);
+	}
+}
+function show_image(id,pic_url) {
+	getObj('q_' + id).value = 1;
+	getObj('p_' + id).value = "";
+	if(is_ie){
+		getObj('p_' + id).outerHTML=getObj('p_' + id).outerHTML;
+	}
+	getObj("preview_" + id).src = pic_url;
+}
+function deltbody(obj){
+	var o = obj.parentNode.parentNode;
+	o.parentNode.removeChild(o);
+}
+addtbody('cdiymode','cdiybody');
+
+function setSecondstyle(id) {
+	var jsStyle = JSONParse('$jsStyle');
+	var jsStyleRelation = JSONParse('$jsStyleRelation');
+
+	if (typeof jsStyle[id] == 'undefined') {
+		getObj('secondgradestyle').style.display = 'none';
+	} else {
+		if (jsStyle[id]['upid'] == '0') {
+			if (jsStyleRelation[id].length == 0) {
+				getObj('secondgradestyle').style.display = 'none';
+			} else {
+				getObj('secondgradestyle').style.display = '';
+				getObj('secondgradestyle').length = 0;
+				for (var i = 0; i < jsStyleRelation[id].length; i++) {
+					getObj('secondgradestyle').options.add(new Option(jsStyle[jsStyleRelation[id][i]]['cname'], jsStyleRelation[id][i]));
+				}
+			}
+			getObj('firstgradestyle').value = id;
+		} else {
+			var parentId = jsStyle[id]['upid'];
+			getObj('firstgradestyle').value = parentId;
+			getObj('secondgradestyle').style.display = '';
+			getObj('secondgradestyle').length = 0;
+			for (var i = 0; i < jsStyleRelation[parentId].length; i++) {
+				getObj('secondgradestyle').options.add(new Option(jsStyle[jsStyleRelation[parentId][i]]['cname'], jsStyleRelation[parentId][i]));
+			}
+			getObj('secondgradestyle').value = id;
+		}
+	}
+}
+setSecondstyle('{$colony[styleid]}');
+
+initCheckTextNum('mini_descrip','descrip_warn',255);
+initCheckTextNum('editor_annouce','annouce_warn',50000);
+</script>
+<!--
+EOT;
+} elseif ($action == 'mergecolony') {print <<<EOT
+-->
+<div class="nav3 mb10">
+<ul class="cc">
+	<li><a href="$basename">基本设置</a></li>
+	<li><a href="$basename&action=style">群组分类</a></li>
+	<li><a href="$basename&action=class">关联版块</a></li>
+	<li><a href="$basename&action=colony">群组管理</a></li>
+	<li class="current"><a href="$basename&action=mergecolony">合并群组</a></li>
+	<li><a href="$basename&action=level">群组等级</a></li>
+	<li><a href="$basename&action=colonystyle">群组风格</a></li>
+	<li><a href="$basename&action=cache">更新缓存</a></li>
+</ul>
+</div>
+<div class="c"></div>
+
+<form action="$basename&action=$action" method="post">
+<input type="hidden" name="step" value="3" />
+<h2 class="h1">合并群组</h2>
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+
+	<tr class="tr1 vt">
+		<td class="td2" colspan="2">说明：将原群组的所有数据合并到目标群组中，同时删除原群组的数据</td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">源群组</td>
+		<td class="td2"><input name="fromcname" class="input input_wa" /></td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">目标群组</td>
+		<td class="td2"><input name="tocname" class="input input_wa" /></td>
+	</tr>
+</table>
+</div>
+<br />
+   <div class="mb10 tac">
+    <span class="btn"><span><button type="submit">提交</button></span></span>
+   </div>
+</form>
+<!--
+EOT;
+}elseif($action=='log'){print <<<EOT
+-->
+<div class="nav3 mb10">
+    <ul class="cc">
+      <li><a href="$basename">基本设置</a></li>
+      <li><a href="$basename&action=class">群组分类</a></li>
+      <li><a href="$basename&action=colony">群组管理</a></li>
+      <li><a href="$basename&action=level">群组等级</a></li>
+      <li><a href="$basename&action=log">日志管理</a></li>
+      <li><a href="$basename&action=cache">更新缓存</a></li>
+    </ul>
+</div>
+<form action="$basename&" method="post">
+  <h2 class="h1">描述搜索</h2>
+  <div class="admin_table mb10">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <tr class="tr2">
+      <td class="td1">关键字</td>
+      <td class="td2"><input name="keyword" class="input input_wa mr20"><span class="bt2"><span><button type="submit" value="提 交">提 交</button></span></span></td>
+    </tr>
+  </table>
+  </div>
+</form>
+<form action="$basename&" method="post" name="FORM">
+  <input type="hidden" name="action" value="log">
+  <input type="hidden" name="step" value="del">
+  <h2 class="h1">操作记录</h2>
+  <div class="admin_table mb10">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <tr class="tr2">
+	  <td width="30"><span onclick="CheckAll(document.FORM)" class="cp">全选</span></td>
+      <td>类型</td>
+      <td>群组</td>
+      <td>用户名</td>
+      <td>描述</td>
+      <td>日期</td>
+    </tr>
+<!--
+EOT;
+if (empty($logdb)) {print <<<EOT
+-->
+<tr><td class="p10" colspan="6"><div class="admin_tips">啊哦，没有你要的信息！</div></td></tr>
+<!--
+EOT;
+}else{
+foreach($logdb as $value){print <<<EOT
+-->
+    <tr class="tr1 vt">
+      <td class="td2"><input type="checkbox" name="selid[]" value="$value[id]"></td>
+      <td class="td2">{$lang[logtype][$value[type]]}</td>
+      <td class="td2"><a href="hack.php?H_name=colony&cyid=$value[field2]&job=view&id=$value[field2]" target="_blank">$value[field3]</a></td>
+      <td class="td2">$value[username1]</td>
+      <td class="td2">$value[descrip]</td>
+      <td class="td2">$value[timestamp]</td>
+    </tr>
+<!--
+EOT;
+}}print <<<EOT
+-->
+  </table>
+  </div>
+  <div class="cc">$pages</div>
+  <div class="mb10 tac">
+    <span class="btn"><span><button type="submit">删除</button></span></span>
+   </div>
+</form>
+<script language=JavaScript>
+function CheckAll(form,len){
+	for (var i=0;i<form.elements.length-len;i++){
+		var e = form.elements[i];
+		e.checked == true ? e.checked = false : e.checked = true;
+	}
+}
+</script>
+<!--
+EOT;
+} elseif ($action == 'level') {print <<<EOT
+-->
+<div class="nav3">
+    <ul class="cc">
+        <li><a href="$basename">基本设置</a></li>
+        <li><a href="$basename&action=style">群组分类</a></li>
+        <li><a href="$basename&action=class">关联版块</a></li>
+        <li><a href="$basename&action=colony">群组管理</a></li>
+        <li><a href="$basename&action=mergecolony">合并群组</a></li>
+        <li class="current"><a href="$basename&action=level">群组等级</a></li>
+        <li><a href="$basename&action=colonystyle">群组风格</a></li>
+        <li><a href="$basename&action=cache">更新缓存</a></li>
+    </ul>
+</div>
+<!--
+EOT;
+if (empty($job)) {print <<<EOT
+-->
+<div class="nav4 mb10">
+    <ul class="cc">
+        <li><a href="$basename&action=level&job=upgrade">群组等级提升方案</a></li>
+        <li class="current"><a href="$basename&action=level">群组等级</a></li>
+        <li><a href="$basename&action=level&job=sort">群组等级统计</a></li>
+    </ul>
+</div>
+<script type="text/javascript" src="js/pw_ajax.js"></script>
+<script type="text/javascript" src="js/global.js"></script>
+<form action="$basename&action=level&" method="post">
+	<input type="hidden" name="job" value="add" />
+	<input type="hidden" name="ltype" value="common" />
+	<h2 class="h1">普通等级编辑</h2>
+	<div class="admin_table mb10">
+		<table width="100%" cellspacing="0" cellpadding="0">
+			<tr class="tr2">
+				<td width="15%">ID</td>
+				<td width="25%">等级头衔</td>
+				<td width="25%">群组综合积分</td>
+				<td width="40">操作</td>
+				<td><br /></td>
+			</tr>
+<!--
+EOT;
+$i=0;
+foreach ($cnLevel['common'] as $key => $value) {$i++;print <<<EOT
+-->
+			<tr class="tr1 vt" id="gtr_{$value['id']}">
+				<td class="td2">$value[id]</td>
+				<td class="td2"><input type="text" class="input" name="ltitle[{$value['id']}]" value="{$value['ltitle']}" /></td>
+				<td class="td2">
+<!--
+EOT;
+if($i == 1){print<<<EOT
+-->
+				<input type="hidden" name="lpoint[{$value['id']}]" value="0" />
+<!--
+EOT;
+}else{print<<<EOT
+-->
+				<input type="text" class="input" name="lpoint[{$value['id']}]" value="{$value['lpoint']}" />
+<!--
+EOT;
+}print <<<EOT
+--></td>
+				<td class="td2"><a href="$basename&action=level&job=edit&id={$value['id']}">[编辑]</a></td>
+                <td class="td2"><a href="$basename&action=level&job=del&id={$value['id']}" id="glevel_{$value['id']}" onclick="sendmsg(this.href,'',this.id);return false;">[删除]</a></td>
+			</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+			<tbody id="clevel_mode" style="display:none"><tr class="tr3 td_bgA">
+				<td class="td2"><a href="javascript:" onclick="addtbody('clevel_mode','clevel_body')"><i class="expand expand_c" title="添加">添加</i>添加</a></td>
+				<td class="td2"><input type="text" class="input" name="ltitle_add[]" /></td>
+				<td class="td2"><input type="text" class="input" name="lpoint_add[]" /></td>
+				<td class="td2"><br /></td>
+				<td class="td2"><a href="javascript:" onclick="deltbody(this)">[删除]</a></td>
+			</tr></tbody>
+			<tbody id="clevel_body"></tbody>
+		</table>
+	</div>
+	<div class="mb10 tac">
+	<span class="btn"><span><button type="submit">提 交</button></span></span>
+	</div>
+</form>
+<form action="$basename&action=level&" method="post">
+	<input type="hidden" name="job" value="add" />
+	<input type="hidden" name="ltype" value="special" />
+	<h2 class="h1">特殊等级编辑</h2>
+	<div class="admin_table mb10">
+		<table width="100%" cellspacing="0" cellpadding="0">
+			<tr class="tr2">
+				<td width="15%">ID</td>
+				<td width="50%">等级头衔</td>
+				<td width="40">操作</td>
+				<td><br /></td>
+			</tr>
+<!--
+EOT;
+foreach ($cnLevel['special'] as $key => $value) {print <<<EOT
+-->
+			<tr class="tr1 vt" id="gtr_{$value['id']}">
+				<td class="td2">$value[id]</td>
+				<td class="td2"><input type="text" class="input" name="ltitle[{$value['id']}]" value="{$value['ltitle']}" /></td>
+				<td class="td2"><a href="$basename&action=level&job=edit&id={$value['id']}">[编辑]</a></td>
+				<td class="td2"><a href="$basename&action=level&job=del&id={$value['id']}" id="glevel_{$value['id']}" onclick="sendmsg(this.href,'',this.id);return false;">[删除]</a></td>
+			</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+			<tbody id="clevel2_mode" style="display:none"><tr class="tr3 td_bgA">
+				<td class="td2"><a href="javascript:" onclick="addtbody('clevel2_mode','clevel2_body')"><i class="expand expand_c" title="添加">添加</i>添加</a></td>
+				<td class="td2"><input type="text" class="input" name="ltitle_add[]" /></td>
+				<td class="td2"><br /></td>
+				<td class="td2"><a href="javascript:" onclick="deltbody(this)">[删除]</a></td>
+			</tr></tbody>
+			<tbody id="clevel2_body"></tbody>
+		</table>
+	</div>
+	<div class="mb10 tac">
+		<span class="btn"><span><button type="submit">提 交</button></span></span>
+	</div>
+</form>
+<script type="text/javascript">
+function addtbody(mode,tbody){
+	if (getObj(mode)) {
+		var s = getObj(mode).firstChild.cloneNode(true);
+		getObj(tbody).appendChild(s);
+	}
+}
+function deltbody(obj){
+	var o = obj.parentNode.parentNode;
+	if (o.parentNode.childNodes.length > 1) {
+		o.parentNode.removeChild(o);
+	}
+}
+addtbody('clevel_mode','clevel_body');
+addtbody('clevel2_mode','clevel2_body');
+</script>
+<!--
+EOT;
+} elseif ($job == 'edit') {print <<<EOT
+-->
+<div class="nav4 mb10">
+    <ul class="cc">
+        <li><a href="$basename&action=level&job=upgrade">群组等级提升方案</a></li>
+        <li class="current"><a href="$basename&action=level">群组等级</a></li>
+        <li><a href="$basename&action=level&job=sort">群组等级统计</a></li>
+    </ul>
+</div>
+<form action="$basename&action=level&" method="post">
+	<input type="hidden" name="job" value="edit" />
+	<input type="hidden" name="step" value="3" />
+
+	<h2 class="h1">权限设置</h2>
+	<div class="admin_table mb10">
+		<table width="100%" cellspacing="0" cellpadding="0">
+			<tr class="tr1 vt">
+				<td class="td1">等级头衔</td>
+				<td class="td2"><select name="id" onchange="location.href='$basename&action=level&job=edit&id=' + this.value" class="select_wa">$options</select></td>
+			</tr>
+			<tr class="tr1 vt">
+				<td class="td1">最多拥有的相册数</td>
+				<td class="td2"><input type="text" name="config[albumnum]" class="input input_wa" value="{$rt['albumnum']}" /> （0 或 留空 表示没限制）</td>
+			</tr>
+			<tr class="tr1 vt">
+				<td class="td1">单相册最多可容纳图片数</td>
+				<td class="td2"><input type="text" name="config[maxphotonum]" class="input input_wa" value="{$rt['maxphotonum']}" /> （0 或 留空 表示没限制）</td>
+			</tr>
+			<tr class="tr1 vt">
+				<td class="td1">群组容纳成员最大值</td>
+				<td class="td2"><input type="text" name="config[maxmember]" class="input input_wa" value="{$rt['maxmember']}" /> （0 或 留空 表示没限制）</td>
+			</tr>
+			<tr class="tr1 vt">
+				<td class="td1">群主合并群组</td>
+				<td class="td2">
+                	<ul class="list_A list_80">
+                    	<li><input type="radio" name="config[allowmerge]" value="1" $allowmerge_Y />开启</li>
+                        <li><input type="radio" name="config[allowmerge]" value="0" $allowmerge_N />关闭</li>
+                    </ul>
+                </td>
+			</tr>
+			<tr class="tr1 vt">
+				<td class="td1">群主转让群组</td>
+				<td class="td2">
+                	<ul class="list_A list_80">
+                    	<li><input type="radio" name="config[allowattorn]" value="1" $allowattorn_Y />开启</li>
+                        <li><input type="radio" name="config[allowattorn]" value="0" $allowattorn_N />关闭</li>
+                    </ul>
+                </td>
+			</tr>
+			<tr class="tr1 vt">
+				<td class="td1">群主解散群组</td>
+				<td class="td2">
+                	<ul class="list_A list_80">
+                    	<li><input type="radio" name="config[allowdisband]" value="1" $allowdisband_Y />开启</li>
+                        <li><input type="radio" name="config[allowdisband]" value="0" $allowdisband_N />关闭</li>
+                    </ul>
+                </td>
+			</tr>
+			<tr class="tr1 vt">
+				<td class="td1">群组风格主题</td>
+				<td class="td2">
+                	<ul class="list_A list_80">
+                    	<li><input type="radio" name="config[allowstyle]" value="1" $allowstyle_Y />开启</li>
+                        <li><input type="radio" name="config[allowstyle]" value="0" $allowstyle_N />关闭</li>
+                    </ul>
+                </td>
+			</tr>
+		</table>
+	</div>
+
+	<h2 class="h1">话题管理功能</h2>
+	<div class="admin_table mb10">
+		<table width="100%" cellspacing="0" cellpadding="0">
+			<tr class="tr1 vt">
+				<td class="td1">删除</td>
+				<td class="td2">
+                	<ul class="list_A list_80">
+                    	<li><input type="radio" name="config[topicadmin][del]" value="1" $ta_del_Y />开启</li>
+                        <li><input type="radio" name="config[topicadmin][del]" value="0" $ta_del_N />关闭</li>
+                    </ul>
+                 </td>
+			</tr>
+			<tr class="tr1 vt">
+				<td class="td1">加亮</td>
+				<td class="td2">
+                	<ul class="list_A list_80">
+                    	<li><input type="radio" name="config[topicadmin][highlight]" value="1" $ta_highlight_Y />开启</li>
+                        <li><input type="radio" name="config[topicadmin][highlight]" value="0" $ta_highlight_N />关闭</li>
+                    </ul>
+                </td>
+			</tr>
+			<tr class="tr1 vt">
+				<td class="td1">锁帖</td>
+				<td class="td2">
+                	<ul class="list_A list_80">
+                    	<li><input type="radio" name="config[topicadmin][lock]" value="1" $ta_lock_Y />开启</li>
+                        <li><input type="radio" name="config[topicadmin][lock]" value="0" $ta_lock_N />关闭</li>
+                    </ul>
+                </td>
+			</tr>
+			<tr class="tr1 vt">
+				<td class="td1">提前</td>
+				<td class="td2">
+                	<ul class="list_A list_80">
+                    	<li><input type="radio" name="config[topicadmin][pushtopic]" value="1" $ta_pushtopic_Y />开启</li>
+                        <li><input type="radio" name="config[topicadmin][pushtopic]" value="0" $ta_pushtopic_N />关闭</li>
+                    </ul>
+                </td>
+			</tr>
+			<tr class="tr1 vt">
+				<td class="td1">压帖</td>
+				<td class="td2">
+                	<ul class="list_A list_80">
+                    	<li><input type="radio" name="config[topicadmin][downtopic]" value="1" $ta_downtopic_Y />开启</li>
+                        <li><input type="radio" name="config[topicadmin][downtopic]" value="0" $ta_downtopic_N />关闭</li>
+                    </ul>
+                </td>
+			</tr>
+			<tr class="tr1 vt">
+				<td class="td1">置顶</td>
+				<td class="td2">
+                	<ul class="list_A list_80">
+                    	<li><input type="radio" name="config[topicadmin][toptopic]" value="1" $ta_toptopic_Y />开启</li>
+                        <li><input type="radio" name="config[topicadmin][toptopic]" value="0" $ta_toptopic_N />关闭</li>
+                    </ul>
+                </td>
+			</tr>
+			<tr class="tr1 vt">
+				<td class="td1">精华</td>
+				<td class="td2">
+                	<ul class="list_A list_80">
+                    	<li><input type="radio" name="config[topicadmin][digest]" value="1" $ta_digest_Y />开启</li>
+                        <li><input type="radio" name="config[topicadmin][digest]" value="0" $ta_digest_N />关闭</li>
+                    </ul>
+                </td>
+			</tr>
+		</table>
+	</div>
+
+	<h2 class="h1">设置功能模块</h2>
+	<div class="admin_table mb10">
+		<table width="100%" cellspacing="0" cellpadding="0">
+			<tr class="tr2">
+				<td class="td2">开启</td>
+				<td class="td2">顺序</td>
+				<td class="td2">别名</td>
+				<td class="td2">功能名称</td>
+			</tr>
+			<tr class="tr1 vt">
+				<td class="td2"><input type="checkbox" name="config[modeset][thread][ifopen]" value="1" $modesetThreadOpen /></td>
+				<td class="td2"><input type="text" name="config[modeset][thread][vieworder]" value="{$modeset['thread']['vieworder']}" class="input" size="5" /></td>
+				<td class="td2"><input type="text" name="config[modeset][thread][title]" value="{$modeset['thread']['title']}" class="input" /></td>
+				<td class="td2">话题</td>
+			</tr>
+			<tr class="tr1 vt">
+				<td class="td2"><input type="checkbox" name="config[modeset][write][ifopen]" value="1" $modesetWriteOpen /></td>
+				<td class="td2"><input type="text" name="config[modeset][write][vieworder]" value="{$modeset['write']['vieworder']}" class="input" size="5" /></td>
+				<td class="td2"><input type="text" name="config[modeset][write][title]" value="{$modeset['write']['title']}" class="input" /></td>
+				<td class="td2">新鲜事</td>
+			</tr>
+			<tr class="tr1 vt">
+				<td class="td2"><input type="checkbox" name="config[modeset][active][ifopen]" value="1" $modesetActiveOpen /></td>
+				<td class="td2"><input type="text" name="config[modeset][active][vieworder]" value="{$modeset['active']['vieworder']}" class="input" size="5" /></td>
+				<td class="td2"><input type="text" name="config[modeset][active][title]" value="{$modeset['active']['title']}" class="input" /></td>
+				<td class="td2">活动</td>
+			</tr>
+			<tr class="tr1 vt">
+				<td class="td2"><input type="checkbox" name="config[modeset][galbum][ifopen]" value="1" $modesetGalbumOpen /></td>
+				<td class="td2"><input type="text" name="config[modeset][galbum][vieworder]" value="{$modeset['galbum']['vieworder']}" class="input" size="5" /></td>
+				<td class="td2"><input type="text" name="config[modeset][galbum][title]" value="{$modeset['galbum']['title']}" class="input" /></td>
+				<td class="td2">相册</td>
+			</tr>
+			<tr class="tr1 vt">
+				<td class="td2"><input type="hidden" name="config[modeset][member][ifopen]" value="1" /></td>
+				<td class="td2"><input type="text" name="config[modeset][member][vieworder]" value="{$modeset['member']['vieworder']}" class="input" size="5" /></td>
+				<td class="td2"><input type="text" name="config[modeset][member][title]" value="{$modeset['member']['title']}" class="input" /></td>
+				<td class="td2">成员</td>
+			</tr>
+		</table>
+	</div>
+
+	<h2 class="h1">群首页模块布局</h2>
+	<div class="admin_table mb10">
+		<table width="100%" cellspacing="0" cellpadding="0">
+			<tr class="tr2">
+				<td class="td2">显示</td>
+				<td class="td2">顺序</td>
+				<td class="td2">显示数量</td>
+				<td class="td2">功能名称</td>
+			</tr>
+			<tr class="tr1 vt">
+				<td class="td2"><input type="checkbox" name="config[layout][thread][ifopen]" value="1" $layoutThreadOpen /></td>
+				<td class="td2"><input type="text" name="config[layout][thread][vieworder]" value="{$layout['thread']['vieworder']}" class="input" size="5" /></td>
+				<td class="td2"><select name="config[layout][thread][num]"><option value="5"{$layoutThreadNum_5}>5</option><option value="10"{$layoutThreadNum_10}>10</option><option value="15"{$layoutThreadNum_15}>15</option><option value="20"{$layoutThreadNum_20}>20</option><option value="30"{$layoutThreadNum_30}>30</option></select></td>
+				<td class="td2">话题</td>
+			</tr>
+			<tr class="tr1 vt">
+				<td class="td2"><input type="checkbox" name="config[layout][write][ifopen]" value="1" $layoutWriteOpen /></td>
+				<td class="td2"><input type="text" name="config[layout][write][vieworder]" value="{$layout['write']['vieworder']}" class="input" size="5" /></td>
+				<td class="td2"><select name="config[layout][write][num]"><option value="5"{$layoutWriteNum_5}>5</option><option value="10"{$layoutWriteNum_10}>10</option><option value="15"{$layoutWriteNum_15}>15</option><option value="20"{$layoutWriteNum_20}>20</option><option value="30"{$layoutWriteNum_30}>30</option></select></td>
+				<td class="td2">新鲜事</td>
+			</tr>
+			<tr class="tr1 vt">
+				<td class="td2"><input type="checkbox" name="config[layout][active][ifopen]" value="1" $layoutActiveOpen /></td>
+				<td class="td2"><input type="text" name="config[layout][active][vieworder]" value="{$layout['active']['vieworder']}" class="input" size="5" /></td>
+				<td class="td2"><select name="config[layout][active][num]"><option value="4"{$layoutActiveNum_4}>4</option><option value="8"{$layoutActiveNum_8}>8</option><option value="12"{$layoutActiveNum_12}>12</option><option value="16"{$layoutActiveNum_16}>16</option><option value="20"{$layoutActiveNum_20}>20</option></select></td>
+				<td class="td2">活动</td>
+			</tr>
+			<tr class="tr1 vt">
+				<td class="td2"><input type="checkbox" name="config[layout][galbum][ifopen]" value="1" $layoutGalbumOpen /></td>
+				<td class="td2"><input type="text" name="config[layout][galbum][vieworder]" value="{$layout['galbum']['vieworder']}" class="input" size="5" /></td>
+				<td class="td2"><select name="config[layout][galbum][num]"><option value="5"{$layoutGalbumNum_5}>5</option><option value="10"{$layoutGalbumNum_10}>10</option><option value="15"{$layoutGalbumNum_15}>15</option><option value="20"{$layoutGalbumNum_20}>20</option><option value="25"{$layoutGalbumNum_25}>25</option></select></td>
+				<td class="td2">相册照片</td>
+			</tr>
+		</table>
+	</div>
+	<div class="mb10 tac">
+		<span class="btn"><span><button type="submit">提 交</button></span></span>
+	</div>
+</form>
+<!--
+EOT;
+} elseif ($job == 'upgrade') {print <<<EOT
+-->
+<div class="nav4 mb10">
+    <ul class="cc">
+        <li class="current"><a href="$basename&action=level&job=upgrade">群组等级提升方案</a></li>
+        <li><a href="$basename&action=level">群组等级</a></li>
+        <li><a href="$basename&action=level&job=sort">群组等级统计</a></li>
+    </ul>
+</div>
+<form action="$basename&action=level&" method="post">
+	<input type="hidden" name="job" value="upgrade" />
+	<input type="hidden" name="step" value="3" />
+	<h2 class="h1">积分方案</h2>
+	<div class="admin_table mb10">
+		<table width="100%" cellspacing="0" cellpadding="0">
+			<tr class="tr2">
+				<td class="td1">积分因素</td>
+				<td class="td2">系数</td>
+			</tr>
+			<tbody id ="group_creditset">
+			<tr class="tr1 vt">
+				<td class="td1">主题数</td>
+				<td class="td2"><input type="text" class="input" name="upgrade[tnum]" value="{$o_groups_upgrade['tnum']}" onchange="calculateCredit()" /></td>
+			</tr>
+			<tr class="tr1 vt">
+				<td class="td1">回复数</td>
+				<td class="td2"><input type="text" class="input" name="upgrade[pnum]" value="{$o_groups_upgrade['pnum']}" onchange="calculateCredit()" /></td>
+			</tr>
+			<tr class="tr1 vt">
+				<td class="td1">成员数</td>
+				<td class="td2"><input type="text" class="input" name="upgrade[members]" value="{$o_groups_upgrade['members']}" onchange="calculateCredit()" /></td>
+			</tr>
+			<tr class="tr1 vt">
+				<td class="td1">相册数</td>
+				<td class="td2"><input type="text" class="input" name="upgrade[albumnum]"  value="{$o_groups_upgrade['albumnum']}" onchange="calculateCredit()" /></td>
+			</tr>
+			<tr class="tr1 vt">
+				<td class="td1">图片数</td>
+				<td class="td2"><input type="text" class="input" name="upgrade[photonum]" value="{$o_groups_upgrade['photonum']}" onchange="calculateCredit()" /></td>
+			</tr>
+			<tr class="tr1 vt">
+				<td class="td1">新鲜事数</td>
+				<td class="td2"><input type="text" class="input" name="upgrade[writenum]" value="{$o_groups_upgrade['writenum']}" onchange="calculateCredit()" /></td>
+			</tr>
+			<tr class="tr1 vt">
+				<td class="td1">活动数</td>
+				<td class="td2"><input type="text" class="input" name="upgrade[activitynum]" value="{$o_groups_upgrade['activitynum']}" onchange="calculateCredit()" /></td>
+			</tr>
+			</tbody>
+
+		</table>
+		<table width="100%" cellspacing="0" cellpadding="0">
+			<tr class="tr1 vt">
+				<td class="td2 s3" colspan="2">群组综合积分 = <span id="show_creditset"></span></td>
+			</tr>
+		</table>
+	</div>
+	<div class="mb10 tac">
+		<span class="btn"><span><button type="submit">提 交</button></span></span>
+	</div>
+</form>
+<script type="text/javascript">
+function mathRound(v,e) {
+	var t=1;
+	for (;e>0;t*=10,e--);
+	for (;e<0;t/=10,e++);
+	return Math.round(v*t)/t;
+}
+function calculateCredit() {
+	var trs = getObj('group_creditset').getElementsByTagName('tr');
+	var html = '';
+	for (var i = 0; i < trs.length; i++) {
+		var v = mathRound(trs[i].getElementsByTagName('input')[0].value, 2);
+		if (v != 0) {
+			html += (html ? ' + ' : '') + trs[i].getElementsByTagName('td')[0].innerHTML + '*' + v;
+		}
+	}
+	getObj('show_creditset').innerHTML = html;
+}
+calculateCredit();
+</script>
+<!--
+EOT;
+} elseif ($job == 'sort') {print <<<EOT
+-->
+<div class="nav4 mb10">
+    <ul class="cc">
+        <li><a href="$basename&action=level&job=upgrade">群组等级提升方案</a></li>
+        <li><a href="$basename&action=level">群组等级</a></li>
+        <li class="current"><a href="$basename&action=level&job=sort">群组等级统计</a></li>
+	</ul>
+</div>
+<h2 class="h1">等级统计</h2>
+<div class="admin_table mb10">
+	<table width="100%" cellspacing="0" cellpadding="0">
+<!--
+EOT;
+foreach ($o_groups_level as $key => $value) {
+$num = isset($o_groups_levelneed[$key]) ? $commomGroup[$key] : $specialGroup[$key];
+$num || $num = 0;
+print <<<EOT
+-->
+		<tr class="tr1 vt">
+			<td class="td2" width="200">$value</td>
+			<td class="td2" width="80"><a href="$basename&action=colony&level=$key">$num(个)</a></td>
+			<td class="td2"><a href="$basename&action=colony&level=$key">查看</a></td>
+		</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+	</table>
+</div>
+<!--
+EOT;
+}} elseif ($action == 'colonystyle') {print <<<EOT
+-->
+<div class="nav3 mb10">
+	<ul class="cc">
+		<li><a href="$basename">基本设置</a></li>
+		<li><a href="$basename&action=style">群组分类</a></li>
+		<li><a href="$basename&action=class">关联版块</a></li>
+		<li><a href="$basename&action=colony">群组管理</a></li>
+		<li><a href="$basename&action=mergecolony">合并群组</a></li>
+		<li><a href="$basename&action=level" >群组等级</a></li>
+		<li class="current"><a href="$basename&action=colonystyle">群组风格</a></li>
+		<li><a href="$basename&action=cache">更新缓存</a></li>
+	</ul>
+</div>
+
+<form action="$basename&action=colonystyle" method='post'>
+<input type="hidden" name="step" value="2">
+<div class="admin_info mb10">
+	<h3 class="h1">群组风格说明</h3>
+	<div class="legend">
+		<ul>
+			<li>添加风格:请上传你的群组风格文件夹至目录images/g/下</li>
+			<li>启用风格:在相应的风格下添加群组风格的自定义名称，点击提交即可启用</li>
+		</ul>
+	</div>
+</div>
+<h2 class="h1">群组风格设置</h2>
+<div class="admin_table mb10">
+	<table width="100%" cellspacing="0" cellpadding="0">
+		<tr class="tr1">
+			<td class="td1"><span class="xia2">风格目录名</span></td>
+			<td class="td2">风格自定义名称</td>
+		</tr>
+<!--
+EOT;
+foreach ($array as $kk => $vv) {print <<<EOT
+-->
+		<tr class="tr3">
+			<td class="td1"><span class="xia2">{$vv}</span></td>
+			<td class="td2">
+				<input type="hidden" name="name[]" value="{$vv}" />
+				<input name="style_name[]" class="input input_wa" value="{$names[$vv]}" />
+			</td>
+		</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+	</table>
+</div>
+<div class="mb10 tac">
+	<span class="btn"><span><button type="submit">提 交</button></span></span>
+</div>
+</form>
+<!--
+EOT;
+} elseif ($action == 'cache'){print <<<EOT
+-->
+<div class="nav3 mb10">
+<ul class="cc">
+	<li><a href="$basename">基本设置</a></li>
+	<li><a href="$basename&action=style">群组分类</a></li>
+	<li><a href="$basename&action=class">关联版块</a></li>
+	<li><a href="$basename&action=colony">群组管理</a></li>
+	<li><a href="$basename&action=mergecolony">合并群组</a></li>
+	<li><a href="$basename&action=level">群组等级</a></li>
+	<li><a href="$basename&action=colonystyle">群组风格</a></li>
+	<li class="current"><a href="$basename&action=cache">更新缓存</a></li>
+</ul>
+</div>
+  <h2 class="h1">缓存更新</h2>
+  <div class="admin_table mb10">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <form action="$basename&" method="post">
+    	<input type="hidden" name="action" value="setting">
+    	<input type="hidden" name="step" value="updatecache">
+      <tr class="tr1 vt">
+        <td class="td1">更新分类管理</td>
+        <td class="td2"><span class="bt2"><span><button type="submit" value="提 交">提 交</button></span></span></td>
+		 <td class="td2"><div class="help_a">  </div></td>
+      </tr>
+    </form>
+    <form action="$basename&" method="post">
+      <input type="hidden" name="action" value="cache">
+      <input type="hidden" name="step" value="updatecache">
+      <tr class="tr1 vt">
+        <td class="td1">更新群组分类统计数</td>
+        <td class="td2"><span class="bt2"><span><button type="submit" value="提 交">提 交</button></span></span></td>
+		 <td class="td2"><div class="help_a">当群组分类统计不准确时，可用此功能重新统计</div></td>
+      </tr>
+    </form>
+     <form action="$basename&" method="post">
+      <input type="hidden" name="action" value="thread">
+      <input type="hidden" name="step" value="updatecache">
+      <tr class="tr1 vt">
+        <td class="td1">更新群组话题统计数</td>
+        <td class="td2">
+        <input type="text" onclick="this.value=''" value="请输入群组ID" name="cyid" class="input input_wa" id="cyid">
+        <span class="bt2"><span>
+        <button type="submit" value="提 交">提 交</button></span></span></td>
+		 <td class="td2"><div class="help_a">当群组话题数统计不准确时，可用此功能重新统计</div></td>
+      </tr>
+    </form>
+    <!--<form action="$basename&" method="post" onsubmit="if(confirm('此功能将删除没有进行分类的群组，删除后不能再恢复。若只是修改群组分类，请到“群组管理”处修改分类。 请确定是否清除？')){ return true;} else {return false;}">
+    --> <!--input type="hidden" name="action" value="cache">
+      <!--input type="hidden" name="step" value="delcolony">
+     <!--  <tr class="tr1 vt">
+        <td class="td1">清除没有分类的群组</td>
+        <td class="td2"><span class="bt2"><span><button type="submit" value="提 交">提 交</button></span></span></td>
+		 <td class="td2"><div class="help_a">此功能将删除没有进行分类的群组，删除后不能再恢复!若只是修改群组分类，请到<a href="$basename&action=colony" class="xia">群组管理</a> 处修改分类 </div></td>
+      </tr> -->
+      </table>
+  </div>
+<!--
+EOT;
+}elseif($action == 'argument'){print <<<EOT
+-->
+<div class="nav3 mb10">
+	<ul class="cc">
+		<li class="current"><a href="$basename&action=argument">帖子管理</a></li>
+		<li><a href="$basename&action=album">相册管理</a></li>
+		<li><a href="$basename&action=photos">照片管理</a></li>
+		<li><a href="$basename&action=write">新鲜事管理</a></li>
+		<li><a href="$basename&action=active">群活动管理</a></li>
+	</ul>
+</div>
+
+<script language="JavaScript" src="js/date.js"></script>
+<form action="$basename&action=argument" method="post" name="FORM">
+  <h2 class="h1">帖子搜索</h2>
+  <div class="admin_table mb10">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <tr class="tr1 vt">
+      <td class="td1">关键字</td>
+      <td class="td2"><input name="keyword" class="input input_wa mr20 fl" value="$keyword">
+        $keywordTypeSelection
+        <ul class="cc list_80 fl list_A">
+          <li><input type="checkbox" name="ckkeyword" value="1" $ckkeywordChecked>精确匹配</li>
+        </ul>
+      </td>
+      <td class="td2"><!--关键字: (可使用通配符 "*")--></td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">类型</td>
+      <td class="td2">$searchTypeSelection
+        <span id="table_1" style="display:none;">$threadTableSelection</span>
+        <span id="table_2" style="display:none;">$postTableSelection</span>
+      </td>
+      <td class="td2"><!--类型:--></td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">作者</td>
+      <td class="td2"><input name="author" class="input input_wa mr20 fl" value="$author">
+     		<ul class="cc list_80 fl list_A">
+                <li><input type="checkbox" name="ckauthor" value="1" $ckauthorChecked />精确匹配</li>
+            </ul>
+        </td>
+        <td class="td2"><!--作 者: (可使用通配符 "*")--></td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">关联版块 </td>
+      <td class="td2">
+        $colonySelection
+      </td>
+      <td class="td2"><!--群组分类:--></td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">群组名称</td>
+      <td class="td2"><input type="text" name="cname" value="$cname"  class="input input_wa"></td>
+      <td class="td2"><!--群组名称: (可使用通配符 "*")--></td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">发表日期</td>
+      <td class="td2">
+      <div class="input_img fl"><i onclick="this.nextSibling.onclick()" class="input_time" title="选择时间">选择时间</i><input type="text" name="postdate_s" value="$postdateStartString" id="postdate_s" onclick="javascript:ShowCalendar(this.id)"></div><span class="p_lr_10 fl">至</span><div class="input_img fl"><i class="input_time" title="选择时间">选择时间</i> <input type="text" name="postdate_e" id="postdate_e" value="$postdateEndString" onclick="javascript:ShowCalendar(this.id)"></div>
+       </td>
+        <td class="td2"><!--发表日期: (格式 yyyy-mm-dd)--></td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">排序</td>
+      <td class="td2">$orderTypeSelection
+        <ul class="cc list_80 fl list_A">
+            <li><input type="radio" name="sc" value="ASC" $ascChecked />正序</li>
+            <li><input type="radio" name="sc" value="DESC" $descChecked />倒序</li>
+         </ul>
+        </td>
+        <td class="td2"><!--排序:--></td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">每页显示条数 </td>
+      <td class="td2"><input name="perpage" class="input input_wa" value="$perpage"></td>
+      <td class="td2"><!--每页显示条数--></td>
+    </tr>
+  </table>
+  </div>
+  <div class="mb10 tac">
+    <span class="btn"><span><button type="submit">提 交</button></span></span>
+  </div>
+</form>
+<script language="JavaScript">
+function seltable(v) {
+	getObj('table_1').style.display = (v == 1) ? '' : 'none';
+	getObj('table_2').style.display = (v == 2) ? '' : 'none';
+}
+seltable(document.FORM.ttype.value);
+</script>
+
+<form action="$basename&action=argument" method="post" name="FORM">
+  <input type="hidden" name="step" value="delete" />
+  <input type="hidden" name="ttype" value="$ttype" />
+  <input type="hidden" name="ttable" value="$ttable" />
+  <input type="hidden" name="ptable" value="$ptable" />
+  <h2 class="h1">文章列表</h2>
+  <div class="admin_table mb10">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <tr class="tr2 vt td_bgB">
+      <td width="30"><span onclick="CheckAll(document.FORM)" class="cp">全选</span></td>
+      <td>标 题</td>
+      <td>作 者</td>
+      <td>所属群组</td>
+      <td>发表日期</td>
+      <td>类型</td>
+    </tr>
+<!--
+EOT;
+if (empty($argumentdb)) {print <<<EOT
+-->
+<tr><td class="p10" colspan="6"><div class="admin_tips">啊哦，没有你要的信息！</div></td></tr>
+<!--
+EOT;
+}else{
+foreach($argumentdb as $value){
+$j_lang = isset($value['pid']) ? '回复' : '主题';
+print <<<EOT
+-->
+    <tr class="tr1 vt">
+      <td class="td2"><input type="checkbox" name="delid[]" value="$value[delid]"></td>
+      <td class="td2"><a href="apps.php?q=group&cyid=$value[cyid]&a=read&tid=$value[tid]" target="_blank">$value[subject]</a></td>
+      <td class="td2"><a href="u.php?uid=$value[authorid]" target="_blank">$value[author]</a></td>
+      <td class="td2"><a href="apps.php?q=group&cyid=$value[cyid]" target="_blank">$value[cname]</a></td>
+      <td class="td2">$value[postdate]</td>
+      <td class="td2">$j_lang</td>
+    </tr>
+<!--
+EOT;
+}}print <<<EOT
+-->
+  </table>
+  </div>
+  <div class="cc">$pages</div>
+  <div class="mb10 tac">
+    <span class="btn"><span><button type="submit" onclick="return Checkdel();">删除</button></span></span>
+   </div>
+</form>
+<script language="JavaScript">
+function Checkdel(){
+	if (!confirm("您确定要删除选中项吗?")) {
+		return false;
+	}else{
+		return true;
+	}
+}
+</script>
+
+<!--
+EOT;
+} elseif ($action == 'album') {print <<<EOT
+-->
+<div class="nav3 mb10">
+    <ul class="cc">
+      <li><a href="$basename&action=argument">帖子管理</a></li>
+      <li class="current"><a href="$basename&action=album">相册管理</a></li>
+      <li><a href="$basename&action=photos">照片管理</a></li>
+	  <li><a href="$basename&action=write">新鲜事管理</a></li>
+	  <li><a href="$basename&action=active">群活动管理</a></li>
+    </ul>
+</div>
+<!--
+EOT;
+if ($job == 'edit'){print <<<EOT
+-->
+<form action="$basename&action=album&job=edit" method="post">
+  <input type="hidden" name="step" value="2">
+  <input type="hidden" name="aid" value="$aid">
+  <input type="hidden" name="url_cname" value="$cname">
+  <input type="hidden" name="url_aname" value="$aname">
+  <input type="hidden" name="url_owner" value="$owner">
+  <input type="hidden" name="url_cid" value="$cid">
+  <input type="hidden" name="url_crtime_s" value="$crtime_s">
+  <input type="hidden" name="url_crtime_e" value="$crtime_e">
+  <input type="hidden" name="url_lasttime_s" value="$lasttime_s">
+  <input type="hidden" name="url_lasttime_e" value="$lasttime_e">
+  <input type="hidden" name="url_private" value="$private">
+  <input type="hidden" name="url_lines" value="$lines">
+  <input type="hidden" name="url_orderway" value="$orderway">
+  <input type="hidden" name="url_ordertype" value="$ordertype">
+  <input type="hidden" name="url_page" value="$page">
+  <h2 class="h1">相册编辑</h2>
+  <div class="admin_table mb10">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <tr class="tr1 vt">
+      <td class="td1">相册名称</td>
+      <td class="td2"><input class="input input_wa" name="aname" value="$album[aname]" ></td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">相册描述</td>
+      <td class="td2"><textarea name="aintro" cols="30"  class="textarea">$album[aintro]</textarea></td>
+    </tr>
+    <tr class="tr1 vt">
+        <td class="td1">可见度</td>
+        <td class="td2">
+        <select name="private" class="select_wa">
+        <option value="0" $private_0>全站可见</option>
+        <option value="1" $private_1>仅成员可见</option></select>
+        </td>
+    </tr>
+  </table>
+  </div>
+  <div class="mb10 tac">
+    <span class="btn"><span><button type="submit" name="chkall" onclick="CheckAll(this.form)">提 交</button></span></span>
+    <span class="bt"><span><button type="button" onclick="javascript:history.go(-1);">返 回</button></span></span>
+   </div>
+</form>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+<script language="JavaScript" src="js/date.js"></script>
+<form action="$basename&action=album&" method="post">
+  <h2 class="h1">相册搜索</h2>
+  <div class="admin_table mb10">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <tr class="tr1 vt">
+      <td class="td1">相册名称</td>
+      <td class="td2"><input type="text" name="aname" value="$aname" class="input input_wa"></td>
+      <td class="td2"><!--相册名称（可使用通配符“*”）--></td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">关联版块</td>
+      <td class="td2">$colonySelection</td>
+      <td class="td2">&nbsp;</td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">群组名称</td>
+      <td class="td2">
+        <input type="text" name="cname" value="$cname" class="input input_wa">
+      </td>
+      <td class="td2"><!--群组名称（可使用通配符“*”）--></td>
+    </tr>
+
+    <tbody id="advanceSearchBody" style="display:$searchDisplay;">
+    <tr class="tr1 vt">
+      <td class="td1">创建时间</td>
+      <td class="td2">
+      <div class="input_img fl"><i onclick="this.nextSibling.onclick()" class="input_time" title="选择时间">选择时间</i><input type="text" name="crtime_s" value="$crtimeStartString" id="crtime_s" onclick="javascript:ShowCalendar(this.id)"></div><span class="p_lr_10 fl">至</span><div class="input_img fl"><i class="input_time" title="选择时间">选择时间</i><input type="text" name="crtime_e" id="crtime_e" value="$crtimeEndString" onclick="javascript:ShowCalendar(this.id)"></div>
+        </td>
+        <td class="td2">&nbsp;</td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">最后更新日期</td>
+      <td class="td2">
+      <div class="input_img fl"><i onclick="this.nextSibling.onclick()" class="input_time" title="选择时间">选择时间</i><input type="text" name="lasttime_s" id="lasttime_s" value="$lasttimeStartString" onclick="javascript:ShowCalendar(this.id)"></div><span class="p_lr_10 fl">至</span><div class="input_img fl"><i class="input_time" title="选择时间">选择时间</i><input type="text" name="lasttime_e" id="lasttime_e" value="$lasttimeEndString" onclick="javascript:ShowCalendar(this.id)"></div>
+        </td>
+        <td class="td2">&nbsp;</td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">可见度</td>
+      <td class="td2">$privateSelection</td>
+        <td class="td2">&nbsp;</td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">排序</td>
+      <td class="td2">$orderwaySelection
+          <ul class="cc list_80 fl list_A">
+             <li><input type="radio" name="ordertype" value="asc" $ascChecked>正序</li>
+             <li><input type="radio" name="ordertype" value="desc" $descChecked>倒序</li>
+           </ul>
+        </td>
+        <td class="td2">&nbsp;</td>
+    </tr>
+    </tbody>
+
+    <tr class="tr1 vt">
+      <td class="td1">每页显示个数</td>
+      <td class="td2"><input type="text" name="lines" value="$lines" class="input input_wa"></td>
+      <td class="td2">&nbsp;</td>
+    </tr>
+  </table>
+  </div>
+  <div class="mb10 tac">
+    <span class="mr10"><span class="btn"><span><button type="submit">提 交</button></span></span></span>
+    <a href="javascript:;" id="advanceSearchButton">高级搜索<input type="hidden" id="searchDisplay" name="searchDisplay" value="$searchDisplay"></a>
+   </div>
+</form>
+<script type="text/javascript">
+getObj('advanceSearchButton').onclick = function() {
+	displayElement('advanceSearchBody','advanceSearchButton');
+	getObj('searchDisplay').value = getObj('advanceSearchBody').style.display;
+};
+</script>
+
+<form action="$basename&action=album&" method="post" name="FORM">
+  <input type="hidden" name="job" value="delete">
+  <input type="hidden" name="cname" value="$cname">
+  <input type="hidden" name="aname" value="$aname">
+  <input type="hidden" name="owner" value="$owner">
+  <input type="hidden" name="cid" value="$cid">
+  <input type="hidden" name="crtime_s" value="$crtime_s">
+  <input type="hidden" name="crtime_e" value="$crtime_e">
+  <input type="hidden" name="lasttime_s" value="$lasttime_s">
+  <input type="hidden" name="lasttime_e" value="$lasttime_e">
+  <input type="hidden" name="private" value="$private">
+  <input type="hidden" name="lines" value="$lines">
+  <input type="hidden" name="orderway" value="$orderway">
+  <input type="hidden" name="ordertype" value="$ordertype">
+  <input type="hidden" name="page" value="$page">
+  <h2 class="h1">相册列表</h2>
+  <div class="admin_table mb10">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <tr class="tr2">
+      <td width="30"><span onclick="CheckAll(document.FORM)" class="cp">全选</span></td>
+      <td>相册名</td>
+      <td>所属群组</td>
+      <td>创始人</td>
+      <td width="90">创建时间</td>
+      <td width="90">最后更新时间</td>
+      <td width="60">可见度</td>
+      <td width="36">照片数</td>
+      <td width="90">操作</td>
+    </tr>
+<!--
+EOT;
+if (empty($albumdb)) {print <<<EOT
+-->
+<tr><td class="p10" colspan="9"><div class="admin_tips">啊哦，没有你要的信息！</div></td></tr>
+<!--
+EOT;
+}else{
+foreach ($albumdb as $key => $album) {
+if(!$album['aname'])continue;
+print <<<EOT
+-->
+    <tr class="tr1 vt">
+      <td class="td2"><input type="checkbox" name="selid[]" value="$album[aid]"></td>
+      <td class="td2"><a href="apps.php?q=galbum&a=album&cyid=$album[ownerid]&aid=$album[aid]" target="_blank" title="$album[aname]">$album[s_aname]</a></td>
+      <td class="td2"><p class="lh_18"><a href="apps.php?q=group&cyid=$album[ownerid]" target="_blank" title="$album[cname]">$album[cname]</a></p></td>
+      <td class="td2"><a href="u.php?username=$album[admin]" target="_blank">$album[admin]</a></td>
+      <td class="td2">$album[crtime]</td>
+      <td class="td2">$album[lasttime]</td>
+      <td class="td2">
+<!--
+EOT;
+if ($album['private'] == 0) {print <<<EOT
+-->
+        全站可见
+<!--
+EOT;
+}elseif($album['private'] == 1) {print <<<EOT
+-->
+        仅成员可见
+<!--
+EOT;
+}print <<<EOT
+-->
+      </td>
+      <td class="td2">$album[photonum]</td>
+      <td class="td2"><a href="$basename&action=album&job=edit&aid=$album[aid]$urladd&page=$page" class="mr10">[编辑]</a>
+      <a href="$basename&action=photos&job=list&aid=$album[aid]">[管理]</a></td>
+    </tr>
+<!--
+EOT;
+}}print <<<EOT
+-->
+  </table>
+  </div>
+  <div class="cc">$pages</div>
+  <div class="mb10 tac">
+    <span class="btn"><span><button type="submit" onclick="return checkdel();">删除</button></span></span>
+   </div>
+</form>
+<script language="JavaScript">
+function checkdel(){
+	if(confirm("确定要删除所选相册吗？" )){
+		return true;
+	}else{
+		return false;
+	}
+}
+</script>
+
+<!--
+EOT;
+}}elseif($action == 'photos'){print<<<EOT
+-->
+<div class="nav3 mb10">
+    <ul class="cc">
+      <li><a href="$basename&action=argument">帖子管理</a></li>
+      <li><a href="$basename&action=album">相册管理</a></li>
+      <li class="current"><a href="$basename&action=photos">照片管理</a></li>
+	  <li><a href="$basename&action=write">新鲜事管理</a></li>
+	  <li><a href="$basename&action=active">群活动管理</a></li>
+    </ul>
+</div>
+
+<script language="JavaScript" src="js/date.js"></script>
+<form action="$basename&action=photos&" method="post">
+  <h2 class="h1">照片搜索</h2>
+  <div class="admin_table mb10">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <tr class="tr1 vt">
+      <td class="td1">关联版块</td>
+      <td class="td2">$colonySelection</td>
+      <td class="td2">&nbsp;</td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">群组名称</td>
+      <td class="td2"><input type="text" name="cname" value="$cname" class="input input_wa"></td>
+      <td class="td2"><!--群组名称（可使用通配符“*”）--></td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">所属相册名称</td>
+      <td class="td2"><input type="text" name="aname" value="$aname" class="input input_wa"></td>
+      <td class="td2"><!--所属相册名称（可使用通配符“*”）--></td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">作者名称</td>
+      <td class="td2"><input type="text" name="uploader" value="$uploader" class="input input_wa"></td>
+      <td class="td2"><!--作者名称（可使用通配符“*”）--></td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">描述</td>
+      <td class="td2"><input type="text" name="pintro" value="$pintro" class="input input_wa"></td>
+      <td class="td2"><!--描述（可使用通配符“*”）--></td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">上传日期</td>
+      <td class="td2">
+      	<div class="input_img fl"><i onclick="this.nextSibling.onclick()" class="input_time" title="选择时间">选择时间</i><input type="text" name="uptime_s" value="$uptimeStartString" id="uptime_s" onclick="javascript:ShowCalendar(this.id)"></div><span class="p_lr_10 fl">至</span><div class="input_img fl"><i class="input_time" title="选择时间">选择时间</i> <input type="text" name="uptime_e" id="uptime_e" value="$uptimeEndString" onclick="javascript:ShowCalendar(this.id)"></div>
+       </td>
+        <td class="td2"><!--上传日期--></td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">排序</td>
+      <td class="td2">$orderwaySelection
+        	<ul class="cc list_80 fl list_A">
+                <li><input type="radio" name="ordertype" value="asc" $ascChecked />正序</li>
+                <li><input type="radio" name="ordertype" value="desc" $descChecked />倒序</li>
+            </ul>
+        </td>
+        <td class="td2">&nbsp;</td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">每页显示张数</td>
+      <td class="td2"><input type="text" name="lines" value="$lines" class="input input_wa"></td>
+      <td class="td2">&nbsp;</td>
+    </tr>
+  </table>
+  </div>
+  <div class="mb10 tac">
+    <span class="btn">
+		<span>
+			<button type="submit">提 交</button>
+		</span>
+	</span>
+   </div>
+</form>
+
+<style>
+.admin_appimg li{float:left;width:150px;height:200px;line-height:18px;}
+.admin_appimg li img{width:100px;height:100px;padding:5px;border:1px solid #ccc;background:#fff;margin-bottom:3px;}
+</style>
+<form action="$basename&action=photos&" method="post" name="FORM">
+  <input type="hidden" name="job" value="delete">
+  <input type="hidden" name="aid" value="$aid">
+  <input type="hidden" name="cid" value="$cid">
+  <input type="hidden" name="aname" value="$aname">
+  <input type="hidden" name="cname" value="$cname">
+  <input type="hidden" name="pintro" value="$pintro">
+  <input type="hidden" name="uptime_s" value="$uptime_s">
+  <input type="hidden" name="uptime_e" value="$uptime_e">
+  <input type="hidden" name="orderway" value="$orderway">
+  <input type="hidden" name="ordertype" value="$ordertype">
+  <input type="hidden" name="lines" value="$lines">
+  <input type="hidden" name="page" value="$page">
+  <h2 class="h1 mb10">照片列表</h2>
+  <div class="mb10">
+<!--
+EOT;
+if (empty($cnpho)) {print <<<EOT
+-->
+<div class="admin_tips">啊哦，没有你要的信息！</div>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+    <ul class="admin_appimg">
+<!--
+EOT;
+foreach ($cnpho as $key => $photo) {print <<<EOT
+-->
+      <li> <a href="apps.php?q=galbum&a=view&pid=$photo[pid]&cyid=$photo[ownerid]" target="_blank"><img src="$photo[path]" border="0" width="100" height="100" title="$photo[aname]"/> </a>
+        <p class="lh_18">所属群组:<a href="apps.php?q=group&cyid=$photo[ownerid]" target="_blank" title="$photo[cname]">$photo[cname]</a></p>
+        <p class="lh_18">所属相册:<a href="$basename&action=photos&job=list&aid=$photo[aid]" title="$photo[aname]">$photo[s_aname]</a></p>
+        <!-- <p>
+			<a href="$admin_file?adminjob=mode&admintype=o_comments&job=list&type=photo&typeid=$photo[pid]">照片评论（$photo[c_num]）</a></p> -->
+        <p>选中
+          <input type="checkbox" name="selid[]" value="$photo[pid]">
+        </p>
+      </li>
+<!--
+EOT;
+}print <<<EOT
+-->
+    </ul>
+<!--
+EOT;
+}print <<<EOT
+-->
+  </div>
+  <div class="c"></div>
+  <div class="cc">$pages</div>
+  <div class="mb10 tac">
+    <span class="bt"><span><button type="button" name="chkall" onclick="CheckAll(this.form)">全 选</button></span></span>
+    <span class="btn"><span><button type="submit" onclick="return checkdel();">删 除</button></span></span>
+   </div>
+</form>
+
+<script language="JavaScript">
+function checkdel(){
+	if(confirm("确定要删除所选照片吗？" )){
+		return true;
+	}else{
+		return false;
+	}
+}
+</script>
+
+<!--
+EOT;
+} elseif ($action=='style'){print <<<EOT
+-->
+<script language="JavaScript">
+function addSubType(id) {
+	var inputs = getObj('t_sub_mode').getElementsByTagName('input');
+	inputs[0].name = "new_t_sub_view_db\["+id+"\]\[\]";
+	inputs[1].name = "new_t_sub_db\["+id+"\]\[\]";
+	var s = getObj('t_sub_mode').firstChild.cloneNode(true);
+	getObj('t_sub_body_'+id).appendChild(s);
+}
+</script>
+<div class="nav3 mb10">
+	<ul class="cc">
+		<li><a href="$basename">基本设置</a></li>
+		<li class="current"><a href="$basename&action=style">群组分类</a></li>
+		<li><a href="$basename&action=class">关联版块</a></li>
+		<li><a href="$basename&action=colony">群组管理</a></li>
+		<li><a href="$basename&action=mergecolony">合并群组</a></li>
+		<li><a href="$basename&action=level">群组等级</a></li>
+		<li><a href="$basename&action=colonystyle">群组风格</a></li>
+		<li><a href="$basename&action=cache">更新缓存</a></li>
+	</ul>
+</div>
+<div class="c"></div>
+<h2 class="h1">添加群组分类</h2>
+<form action="$basename&" method="post">
+<input type="hidden" name="action" value="style" />
+<input type="hidden" name="job" value="addstyle" />
+<div class="admin_table mb10">
+	<table width="100%" cellspacing="0" cellpadding="0">
+		<tr class="tr1 vt">
+        	<td class="td1">分类名称</td>
+			<td class="td2">
+				<input name="cname" class="input_wa input mr5" value="">
+				<span class="bt2">
+					<span><button value="提 交" type="submit">提 交</button></span>
+				</span>
+			</td>
+		</tr>
+	</table>
+</div>
+</form>
+<form action="$basename&" method="post">
+<input type="hidden" name="action" value="style" />
+<input type="hidden" name="step" value="2" />
+<h3 class="h1">群组分类</h3>
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+	<tr class="tr2 vt td_bgB">
+		<td width="30">开启</td>
+		<td>分类名称</td>
+		<td>群组个数</td>
+    <td>删除分类</td>
+	</tr>
+<!--
+EOT;
+foreach($firstGradeStyleIds as $id){
+$ifcheck = $openStyles[$id] ? ' checked' : '';
+print <<<EOT
+-->
+	<tr class="tr1 vt">
+		<td class="td2"><input type="checkbox" name="selid[]" value="$id" {$ifcheck} /></td>
+		<td class="td2"><input type="text" name="cname[$id]" value="{$allStyles[$id]['cname']}" class="input_wa input mr10" /><a href="javascript:;" onclick="addSubType({$id})">添加二级分类</a></td>
+		<td class="td2">{$allStyles[$id]['csum']}</td>
+        <td class="td2"><input type="checkbox" name="delid[]" value="$id" /></td>
+	</tr>
+<!--
+EOT;
+foreach($secondGradeStyles[$id] as $subId => $style){
+$ifcheck2 = $openStyles[$subId] ? ' checked' : '';
+print <<<EOT
+-->
+	<tr class="tr1 vt">
+		<td class="td2"><input type="checkbox" name="selid[]" value="$style[id]" {$ifcheck2} /></td>
+		<td class="td2"><i class="lower"></i><input type="text" name="cname[$style[id]]" value="{$style['cname']}" class="input_wa input mr10" /></td>
+		<td class="td2">{$style['csum']}</td>
+		<td class="td2"><input type="checkbox" name="delid[]" value="$style[id]" /></td>
+    </tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+	<tr>
+		<td colspan="4">
+			<div id="t_sub_body_{$id}"></div>
+		</td>
+	</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+</table>
+</div>
+<div id="t_sub_mode" style="display:none"><div><table width="100%"><tr class="tr1 vt"><td class="td2" width="30">&nbsp;</td><td class="td2" colspan="4"><i class="lower"></i><input type="text" class="input mr10" size="1" name="new_t_sub_view_db"><input type="text" class="input" size="30" value="" name="new_t_sub_db" /></td></tr></table></div></div>
+<div class="mb10 tac">
+<span class="btn">
+	<span>
+		<button type="submit">提 交</button>
+	</span>
+</span>
+</div>
+</form>
+<!--
+EOT;
+} elseif ($action =='write') {print <<<EOT
+-->
+<div class="nav3 mb10">
+	<ul class="cc">
+		<li><a href="$basename&action=argument" >帖子管理</a></li>
+		<li><a href="$basename&action=album">相册管理</a></li>
+		<li><a href="$basename&action=photos">照片管理</a></li>
+		<li class="current"><a href="$basename&action=write">新鲜事管理</a></li>
+		<li><a href="$basename&action=active">群活动管理</a></li>
+	</ul>
+</div>
+
+<script language="JavaScript" src="js/date.js"></script>
+<form method="POST" action="$basename&action=write">
+  <h2 class="h1">记录搜索</h2>
+  <div class="admin_table mb10">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <tr class="tr1 vt">
+      <td class="td1">新鲜事内容</td>
+      <td class="td2"><input type="text" name="content" value="$content" class="input input_wa"></td>
+      <td class="td2" width="500">记录内容（可使用通配符“*”）</td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">作者名称</td>
+      <td class="td2"><input type="text" name="username" value="$username" class="input input_wa"></td>
+      <td class="td2">作者名称（可使用通配符“*”）</td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">关联版块 </td>
+      <td class="td2">
+        $colonySelection
+      </td>
+      <td class="td2"><!--群组分类:--></td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">群组名称</td>
+      <td class="td2"><input type="text" name="cname" value="$cname"  class="input input_wa"></td>
+      <td class="td2"><!--群组名称: (可使用通配符 "*")--></td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">发表日期</td>
+      <td class="td2">
+      	<div class="input_img fl"><i onclick="this.nextSibling.onclick()" class="input_time" title="选择时间">选择时间</i><input type="text" name="postdate_s" value="$postdateStartString" id="postdate_s" onclick="javascript:ShowCalendar(this.id)"></div><span class="p_lr_10 fl">至</span><div class="input_img fl"><i class="input_time" title="选择时间">选择时间</i><input type="text" name="postdate_e" id="postdate_e" value="$postdateEndString" onclick="javascript:ShowCalendar(this.id)"></div>
+        </td>
+        <td class="td2">&nbsp;</td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">顺序</td>
+      <td class="td2"><span class="cc  fl"></span>
+     		 <ul class="cc list_80 list_A mr20 fl">
+                	<li><input type="radio" name="ordertype" value="asc" $ascChecked>正序</li>
+                    <li><input type="radio" name="ordertype" value="desc" $descChecked>倒序</li>
+             </ul>发表时间
+        </td>
+        <td class="td2">&nbsp;</td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">每页显示条数</td>
+      <td class="td2"><input type="text" name="lines" value="$lines" class="input input_wa"></td>
+      <td class="td2">&nbsp;</td>
+    </tr>
+  </table>
+  </div>
+  <div class="mb10 tac">
+    <span class="btn"><span><button type="submit">提 交</button></span></span>
+   </div>
+</form>
+
+<script type="text/javascript" src="js/core/core.js"></script>
+<script type="text/javascript" src="js/pw_ajax.js"></script>
+<script type="text/javascript" src="js/global.js"></script>
+<form action="$basename&action=$action&" method="post" name="FORM">
+<input type="hidden" name="job" value="del" />
+<input type="hidden" name="step" value="3" />
+<input type="hidden" name="urladd" value="$url_add" />
+<h2 class='h1'>新鲜事列表</h2>
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+	<tr class="tr2 vt td_bgB">
+	  <td width="30"><span onclick="CheckAll(document.FORM)" class="cp">全选</span></td>
+      <td>内容</td>
+      <td>所属群组</td>
+      <td>作者</td>
+      <td>发表时间</td>
+      <td>来源</td>
+      <td>评论数</td>
+	</tr>
+<!--
+EOT;
+if (empty($writedb)) {print <<<EOT
+-->
+<tr><td class="p10" colspan="6"><div class="admin_tips">啊哦，没有你要的信息！</div></td></tr>
+<!--
+EOT;
+}else{
+$db_blogsource = array('web'=>'网页','signature'=>'个性签名','other'=>'其他');
+foreach ($writedb as $key => $write) {
+if(!$write['content'])continue;
+print <<<EOT
+-->
+    <tr class="tr1 vt">
+      <td class="td2"><input type="checkbox" name="selid[]" value="$write[id]"></td>
+      <td class="td2">$write[s_content]</td>
+      <td class="td2"><a href="apps.php?q=group&cyid=$write[cyid]" target="_blank">$write[cname]</a></td>
+      <td class="td2"><a href="u.php?uid=$write[uid]" target="_blank">$write[username]</a></td>
+      <td class="td2">$write[postdate]</td>
+      <td class="td2">群组</td>
+      <td class="td2">
+<!--
+EOT;
+if ($write['c_num'] > 0) {print <<<EOT
+-->
+        <a href="$admin_file?adminjob=mode&admintype=o_comments&job=list&type=write&typeid=$write[id]">$write[c_num]</a>
+<!--
+EOT;
+} else {print <<<EOT
+-->
+        0
+<!--
+EOT;
+}print <<<EOT
+-->
+      </td>
+    </tr>
+<!--
+EOT;
+}}print<<<EOT
+-->
+  </table>
+  </div>
+<div class="cc">$pages</div>
+<div class="mb10 tac">
+	<span class="btn"><span><button type="submit" onclick="return Checkdel();">删除</button></span></span>
+</div>
+</form>
+<script language="JavaScript">
+function Checkdel() {
+	if (!confirm("您确定要删除选中项吗?")) {
+		return false;
+	} else{
+		return true;
+	}
+}
+</script>
+
+<!--
+EOT;
+} elseif ($action =='active') {print <<<EOT
+-->
+<div class="nav3 mb10">
+<ul class="cc">
+	<li><a href="$basename&action=argument" >帖子管理</a></li>
+	<li><a href="$basename&action=album">相册管理</a></li>
+	<li><a href="$basename&action=photos">照片管理</a></li>
+	<li><a href="$basename&action=write">新鲜事管理</a></li>
+	<li class="current"><a href="$basename&action=active">群活动管理</a></li>
+</ul>
+</div>
+
+<script language="JavaScript" src="js/date.js"></script>
+<form method="post" action="{$basename}&action=$action">
+<h2 class="h1">活动搜索</h2>
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+	<tr class="tr1 vt">
+		<td class="td1">活动名称</td>
+		<td class="td2"><input type="text" name="title" value="$title" class="input input_wa" /></td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">活动状态</td>
+		<td class="td2">
+			$activeState
+		</td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">活动类型</td>
+		<td class="td2">
+			$activeTypeSelection
+		</td>
+	</tr>
+
+	<tr class="tr1 vt">
+		<td class="td1">所属群组 </td>
+		<td class="td2"><input type="text" name="cname" value="$cname" class="input input_wa" />&nbsp;&nbsp;可使用通配符“*”</td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">发布者</td>
+		<td class="td2"><input type="text" name="cadmin" value="$cadmin" class="input input_wa" />&nbsp;&nbsp;可使用通配符“*”</td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">发布日期</td>
+		<td class="td2">
+		<div class="input_img fl"><i onclick="this.nextSibling.onclick()" class="input_time" title="选择时间">选择时间</i><input type="text" name="createtime_s" value="$createtime_s" id="createtime_s" onclick="javascript:ShowCalendar(this.id)"></div><span class="p_lr_10 fl">至</span><div class="input_img fl"><i class="input_time" title="选择时间">选择时间</i> <input type="text" name="createtime_e" id="createtime_e" value="$createtime_e" onclick="javascript:ShowCalendar(this.id)"></div>
+		</td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">排序</td>
+		<td class="td2">
+		$orderwayTypeSelection
+		<ul class="cc list_80 fl list_A">
+            <li><input type="radio" name="ordertype" value="asc" $ascChecked />正序</li>
+            <li><input type="radio" name="ordertype" value="desc" $descChecked />倒序</li>
+         </ul>
+		</td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">每页显示条数</td>
+		<td class="td2"><input type="text" name="limit" value="$limit" class="input input_wa" size="5"></td>
+	</tr>
+</table>
+</div>
+<br />
+<div class="mb10 tac">
+	<span class="btn"><span><button type="submit">提 交</button></span></span>
+</div>
+</form>
+
+<script type="text/javascript" src="js/core/core.js"></script>
+<script type="text/javascript" src="js/pw_ajax.js"></script>
+<script type="text/javascript" src="js/global.js"></script>
+<form action="$basename&action=$action&" method="post" name="FORM">
+<input type="hidden" name="job" value="del" />
+<input type="hidden" name="step" value="3" />
+<input type="hidden" name="urladd" value="$url_add" />
+<h2 class='h1'>活动列表</h2>
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+	<tr class="tr2 vt td_bgB">
+		<td width="30"><span onclick="CheckAll(document.FORM)" class="cp">全选</span></td>
+		<td>活动名称</td>
+		<td width="110">所属群组</td>
+		<td width="60">活动类型</td>
+		<td width="80">活动状态</td>
+		<td width="90">发布者</td>
+		<td width="110">发布时间</td>
+	</tr>
+<!--
+EOT;
+if (empty($activedb)) {print <<<EOT
+-->
+<tr><td class="p10" colspan="7"><div class="admin_tips">啊哦，没有你要的信息！</div></td></tr>
+<!--
+EOT;
+}else{
+foreach ($activedb as $key => $value) {print <<<EOT
+-->
+	<tr class="tr1 vt">
+		<td class="td2"><input type="checkbox" name="selid[]" value="$value[id]" /></td>
+		<td class="td2"><p class="lh_18"><a href="apps.php?q=group&a=active&job=view&cyid=$value[cid]&id=$value[id]" target="_blank">{$value[title]}</a></p></td>
+		<td class="td2"><a href="apps.php?q=group&cyid=$value[cid]" target="_blank">{$colonys[$value['cid']]}</a></td>
+		<td class="td2">{$activeTypes[$value['type']]}</td>
+		<td class="td2">
+<!--
+EOT;
+if ($timestamp > $value['endtime']) {print <<<EOT
+-->
+		<span class="gray">活动已结束</span>
+<!--
+EOT;
+} elseif ($timestamp > $value['deadline'] && $timestamp > $value['begintime']) {print <<<EOT
+-->
+		<span class="s3">活动进行中</span>
+<!--
+EOT;
+} elseif ($timestamp > $value['deadline']) {print <<<EOT
+-->
+		<span class="s1">报名已截止</span>
+<!--
+EOT;
+} elseif ($value['limitnum'] && $value['members'] >= $value['limitnum']) {print <<<EOT
+-->
+		<span class="s1">人员已满</span>
+<!--
+EOT;
+} else {print <<<EOT
+-->
+		<span class="s3">可以报名</span>
+<!--
+EOT;
+}print <<<EOT
+-->
+		</td>
+		<td class="td2">{$users[$value['uid']]}</td>
+		<td class="td2">{$value['createtime']}</td>
+	</tr>
+<!--
+EOT;
+}}print <<<EOT
+-->
+</table>
+</div>
+<div class="cc">$pages</div>
+<div class="mb10 tac">
+	<span class="btn"><span><button type="submit" onclick="return Checkdel();">删除</button></span></span>
+</div>
+</form>
+<script language="JavaScript">
+function Checkdel() {
+	if (!confirm("您确定要删除选中项吗?")) {
+		return false;
+	} else{
+		return true;
+	}
+}
+</script>
+
+<!--
+EOT;
+}
+include_once PrintEot('adminbottom');
+?>-->

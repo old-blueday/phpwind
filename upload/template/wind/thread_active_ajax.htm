@@ -1,0 +1,55 @@
+<!--<?php
+if ($job == 'join'){print <<<EOT
+-->
+<form action="{$basename}a=$a&job=$job&cyid=$cyid" method="post" onsubmit="return false;">
+<input type="hidden" name="verify" value="$verifyhash" />
+<input type="hidden" name="id" value="$id">
+<input type="hidden" name="step" value="1">
+<table width="100%" cellspacing="0" cellpadding="5">
+	<tr>
+		<th class="h" colspan="3" style="cursor:move" onmousedown="read.move(event);"><span class="fr" style="margin-top:2px;cursor:pointer" onclick="closep();"><span class="tanchu2close" valign="top"><a style="margin-top:5px;*margin-top:5px;">&nbsp;</a></span></span>活动报名</th>
+	</tr>
+	<tr><td align="right">说明： </td><td>带<font color="red">*</font>为必填选项</td></tr>
+	<tr><td align="right">真实姓名：<font color="red">*</font></td><td><input type="text" name="realname" class="input" /></td></tr>
+	<tr><td align="right">手机：<font color="red">*</font></td><td><input type="text" name="phone" class="input" /></td></tr>
+	<tr><td align="right">电话： </td><td><input type="text" name="mobile" class="input" /></td></tr>
+	<tr><td align="right">地址： </td><td><input type="text" name="address" class="input" /></td></tr>
+	<tr><td align="right">匿名： </td><td><input type="checkbox" name="anonymous" value="1" /><span class="gray">(仅发起人可见)</span></td></tr>
+</table>
+<div style="background:#eee; padding:5px;">
+<center><input type="button" class="btn" name="ajaxsubmit" onclick="ajax.submit(this.form);" value="确认报名" /></center></div>
+<!--
+EOT;
+} elseif ($job == 'quit') {print <<<EOT
+-->
+<form action="{$basename}a=$a&job=$job&cyid=$cyid" method="post" onsubmit="return false;">
+<input type="hidden" name="verify" value="$verifyhash" />
+<input type="hidden" name="id" value="$id">
+<input type="hidden" name="step" value="1">
+<div style="width:350px;" class="cc">
+	<div class="p10 b f14">退出活动后，你的报名信息将被删除。如需退款请与活动发起人联系。</div>
+	<div class="p10 fr">
+	<span class="button"><span><button type="button" onclick="ajax.submit(this.form)">退 出</button></span></span>
+	<span class="button2"><span><button type="button" onclick="closep();">取消</button></span></span>
+	</div>
+</div>
+</form>
+<!--
+EOT;
+} elseif ($job == 'del') {print <<<EOT
+-->
+<form action="{$basename}a=$a&job=$job&cyid=$cyid" method="post">
+<input type="hidden" name="verify" value="$verifyhash" />
+<input type="hidden" name="id" value="$id">
+<input type="hidden" name="step" value="1">
+<div style="width:350px;" class="cc">
+	<div class="p10 b f14">取消活动后，活动的所有信息将被删除!</div>
+	<div class="p10 fr">
+	<span class="button"><span><button type="submit">确 定</button></span></span>
+	<span class="button2"><span><button type="button" onclick="closep();">取消</button></span></span>
+	</div>
+</div>
+</form>
+<!--
+EOT;
+}?>-->

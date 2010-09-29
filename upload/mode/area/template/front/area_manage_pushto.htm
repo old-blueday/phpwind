@@ -1,0 +1,78 @@
+<!--
+<?php 
+print <<<EOT
+-->
+<div>
+<form action="$baseUrl&action={$action}" method="post" enctype="multipart/form-data" >
+	<input type="hidden" name="step" value="2" />
+	<input type="hidden" name="pushkey" value="$selid" />
+	<script type="text/javascript">
+	var doing = '$action';
+	</script>
+	<div class="pwC_nav_a">
+<!--
+EOT;
+$pushCurrent = 'class="current"';
+$recommendCurrent = '';
+if ($action =='recommend') {
+	$recommendCurrent = 'class="current"';
+	$pushCurrent = '';
+}
+print <<<EOT
+--> 
+        <ul class="cc">
+            <li $pushCurrent><a href="$baseUrl&action=pushto&selid=$selid">内容推送</a></li>
+          	<li $recommendCurrent><a href="$baseUrl&action=recommend&selid=$selid">内容推荐</a></li>
+        </ul>
+    </div>
+	<div id="scrollCtn" class="pwC_content_a" onscroll="moveCal(this)">
+<!-- 
+EOT;
+if($action == 'recommend'){
+print <<<EOT
+-->         
+       <div class="pw_tips">推荐的内容需要审核后才能在前台显示</div>
+<!-- 
+EOT;
+}
+print <<<EOT
+-->  
+		<div class="admin_table">
+			<table width="100%" class="">
+				<tr class="tr1 vt">
+					<td class="td1">频道</td>
+					<td class="td2">$channelsSelect</td>
+				</tr>
+				<tr class="tr1">
+					<td class="td1">模块</td>
+					<td class="td2">
+						{$invokesSelect}
+						{$subInvokesSelect}
+					</td>
+				</tr>
+				<tr class="tr1 vt">
+					<td class="td1">排序等级</td>
+					<td class="td2">
+						<ul class="link_A list_80">
+							<li><label><input type="radio" name="offset" value="0" checked="checked" />普通</label></li>
+							<li><label><input type="radio" name="offset" value="1" />一等级</label></li>
+							<li><label><input type="radio" name="offset" value="2" />二等级</label></li>
+							<li><label><input type="radio" name="offset" value="3" />三等级</label></li>
+							<li><label><input type="radio" name="offset" value="4" />四等级</label></li>
+							<li><label><input type="radio" name="offset" value="5" />五等级</label></li>
+						</ul>
+					</td>
+				</tr>
+			 </table>
+			 <div id="portalbox"></div>
+		</div>
+	</div>
+	<div class="tac" style="padding-top:5px;text-align:center;">
+		<span class="btn2"><span><button type="submit">提交</button></span></span>
+	</div>
+</form>
+</div>
+<!--
+EOT;
+?>
+-->

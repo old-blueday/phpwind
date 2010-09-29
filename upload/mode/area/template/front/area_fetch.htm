@@ -1,0 +1,287 @@
+<!--<?php
+print <<<EOT
+-->
+<table width="100%">
+<!--
+EOT;
+if($inputs){print <<<EOT
+-->
+
+		<tr class="tr1 vt">
+			<td class="td1">$inputs[title]</td>
+			<td class="td2">$inputs[html]</td>
+		</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+
+<!--
+EOT;
+foreach ($invokepiece[param] as $key=>$value) {
+if ($key=='tagrelate') {
+	$iftagrelate = 1;
+	continue;
+}
+$name = $dataSourceService->getSourceLang($key,$invokepiece['action']);
+if (is_numeric($value)) {
+
+$add = 'onKeyUp="countlen(this,\''.$value.'\');"';
+
+} else {
+$add = '';
+}
+print <<<EOT
+-->
+
+<!--
+EOT;
+if($key=='image'){print <<<EOT
+-->
+		<tr class="tr1 vt">
+			<td class="td1">图片选择</td>
+			<td class="td2">
+				<p id="imagetype_ul" class="mb10">
+					<span id="imagetype_upload" class="mr10"><label><input checked="checked" name="select_imagetype" type="radio" />图片上传</label></span>
+<!--
+EOT;
+if ($selectImages) {
+print <<<EOT
+-->				    
+				    <span id="imagetype_select" class="mr10"><label><input name="select_imagetype" type="radio" />帖子附件图片</label></span>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+					<span id="imagetype_input" class="mr10"><label><input name="select_imagetype" type="radio" />图片链接</label></span>
+				</p>
+			<div id="imagetype_upload_div">
+	            <dl>
+			        <dt>
+			        	<input id="uploadpic" type="file" class="mr10" name="uploadpic" onchange="checkFileType()" />
+			            <p>允许类型: jpg，jpeg，gif，png(文件大小不得大于2M)<span id="fileTypeError" style="display:none;"><font color="red">请选择正确的文件类型</font></span></p>
+			        </dt>
+			    </dl>
+			
+			</div>
+			<div id="imagetype_input_div" style="display:none;">
+				<input id="image" name="param[image]" value="$default[image]" size="40" class="input" type="text" />
+            </div>
+<!--
+EOT;
+if ($selectImages) {
+print <<<EOT
+-->	
+<style type="text/css">
+.imgListA_pw{padding-bottom:10px;}
+.imgListA_pw li{border:1px solid #fff;cursor:pointer;height:60px;width:60px;margin-right:20px; text-align:center;float:left;overflow:hidden;}
+.imgListA_pw li:hover{border:1px solid #98ba2a;}
+.imgListA_pw .current {position:relative;_position:inherit;}
+.imgListA_pw .current div{width:60px;height:60px;background: url(apps/stopic/image/group-current.gif) no-repeat;position:absolute;top:0;_position:inherit;_margin-top:-60px;}
+</style>
+            <div id="imagetype_select_div" style="display:none;">
+                <ul class="imgListA_pw cc">
+<!--
+EOT;
+foreach ($selectImages as $k=>$val) {
+print <<<EOT
+-->
+			 		<li>
+                        <img width="60" height="60" src="$val"/><div></div>
+                    </li>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+                </ul>
+            </div>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+			</td>
+		</tr>
+		
+<!--
+EOT;
+}else{print <<<EOT
+-->
+		<tr class="tr1 vt">
+			<td class="td1">{$name}</td>
+			<td class="td2">
+<!--
+EOT;
+if($key=='descrip'){print <<<EOT
+-->
+				<textarea name="param[$key]" style="width:260px;height:92px" $add >$default[$key]</textarea>
+<!--
+EOT;
+} elseif ($key=='title') {
+print <<<EOT
+-->
+			<div class="mb5"><input type="text" class="input" size="40" name="param[$key]" value="$default[$key]" $add></div>
+			<div class="pwnew tac">
+          <span title="粗体字"><a onclick="styleOnclick(this,'css[b]')" class="$stylename[b]">加粗</a></span>
+					<span title="斜体字"><a onclick="styleOnclick(this,'css[i]')" class="$stylename[i]">倾斜</a></span>
+					<span title="下划线"><a onclick="styleOnclick(this,'css[u]')" class="$stylename[u]">下划线</a></span>
+					<span id="color_show" title="点击取消颜色" style="background:{$stylename[color]};" onclick="colorCancel()"></span>
+					<span title="颜色选择"><a class="two tal" onclick="showColorPicker(this,'css[color]',function(){pickReback(color_picker)})"><img src="$imgpath/pickcolor.gif"  /></a></span>
+					<span>时间:<input name="css[endtime]" id="css[endtime]" size="15" class="input" type="input" value="{$stylename[endtime]}" onclick="ShowCalendar(this.id,1);getCurrentDatePos();" /></span>
+					<input id="css[color]" name="css[color]" type="hidden" value="$stylename[color]" />
+					<input id="css[b]" name="css[b]" type="hidden" value="{$push['titlecss']['b']}" />
+					<input id="css[i]" name="css[i]" type="hidden" value="{$push['titlecss']['i']}" />
+					<input id="css[u]" name="css[u]" type="hidden" value="{$push['titlecss']['u']}" />
+			</div>
+<!--
+EOT;
+} elseif ($key=='url') {
+$cmsvalue=$default[cmsurl]?$default[cmsurl]:$default[$key];
+print <<<EOT
+-->
+				<input type="text" id="push_url" class="input" size="40" name="param[$key]" value="$cmsvalue" >
+<!--
+EOT;
+if($default[cmsurl]){
+print <<<EOT
+-->
+				<input type="radio" name="push_url_radio" onclick="getObj('push_url').value='$default[$key]'" >帖子链接  <input type="radio" name="push_url_radio" onclick="getObj('push_url').value='$default[cmsurl]'" checked>CMS链接  
+<!--
+EOT;
+}
+print <<<EOT
+-->
+<!--
+EOT;
+}else{
+print <<<EOT
+-->
+				<input type="text" class="input" size="40" name="param[$key]" value="$default[$key]" $add>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+			</td>
+		</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+
+<!--
+EOT;
+}
+print <<<EOT
+-->
+
+		<tr class="tr1 vt">
+			<td class="td1">开始日期</td>
+			<td class="td2"><input type="text" class="input" size="15" name="starttime" id="starttime" onclick="ShowCalendar(this.id,1);getCurrentDatePos()"> (留空则立即显示)</td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">商业推荐</td>
+			<td class="td2"><input type="radio" value="1" name="ifbusiness" />是 <input type="radio" value="0" name="ifbusiness" checked />否</td>
+		</tr>
+<!--
+EOT;
+if ($iftagrelate) {
+print<<<EOT
+-->
+		<tr>
+			<td colspan="2" style="0">
+				<table width="100%">
+					<tbody id="tagrelate">
+						<tr class="tr1 vt">
+							<td colspan="2"><h2>关联文章</h2></td>
+							<td colspan="2"><a href="#" class="fr" onclick="New(addTagRelate,['tagrelate','tagrelatedata']);return false;">添加</a></td>
+						</tr>
+						<tr class="tr1 vt">
+							<td width="40">顺序</td>
+							<td>标题</td>
+							<td>链接地址</td>
+							<td width="45">&nbsp;</td>
+						</tr>
+						<tr class="tr1 vt">
+							<td><input type="text" size="2" name="tagrelate[index][]" class="input"></td>
+							<td><input type="text" size="16" name="tagrelate[title][]" value="" class="input"></td>
+							<td><input type="text" size="22" name="tagrelate[url][]" value="http://" class="input"></td>
+							<td><a href="#" onclick="delTr(this);">删除</a></td>
+						</tr>
+					</tbody>
+				</table>
+			</td>
+		</tr>
+<!--
+EOT;
+}print<<<EOT
+-->
+
+<!-- 
+EOT;
+if( 1 == $ifpush ){
+print <<<EOT
+-->
+<!-- 
+EOT;
+if($creditselect){
+print <<<EOT
+-->
+		 <tr class="tr1 vt">
+			<td class="td1">积分奖励</td>
+			<td class="td2">
+				<table width="100%" border="0" cellpadding="0" cellspacing="0">
+					<tbody id="pingfen">
+						<tr class="tr1 vt">
+							<td>
+				<select name="cids[]">$creditselect</select>
+				<input class="input" type="text" name="addpoints[]" size="5" /> 点<span style="margin-left:80px"><a style="cursor:pointer" onclick="addPingFen();return false;">添加其他积分</a></span>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</td>
+		</tr>
+<!-- 
+EOT;
+}
+print <<<EOT
+-->
+		<tr class="tr1 vt"><td class="td1">短消息通知</td>
+		<td class="td2">
+		<input type="radio" name="ifmsg" value="1" checked />是
+		<input type="radio" name="ifmsg" value="0" />否</td></tr>
+		<tr class="tr3 vt"><td class="td1">评分理由:</td>
+		<td>
+		<select class="mb5" onchange="this.form.atc_content.value=this.value" style="width:334px;">
+			<option value="">自定义</option>
+			<option value="">-------</option>
+			$reason_sel
+		</select>
+		<p><textarea name="atc_content" id="atc_content" rows="8" class="textareaA mb5">$atc_content</textarea></p>
+		<div id="atc_content_warn" class="gray">限100字节</div>
+		</td></tr>
+</table>
+<table width="100%" border="0" cellpadding="0" cellspacing="0" style="display:none">
+	<tbody id="clonetr">
+		<tr>
+			<td>
+<select name="cids[]">$creditselect</select>
+<input class="input" type="text" name="addpoints[]" size="5" /> 点
+<span style="margin-left: 80px;">
+	<a onclick="delThisTr(this);return false;" style="cursor: pointer;">删除</a>
+</span>
+			</td>
+		</tr>
+<!-- 
+EOT;
+}
+print <<<EOT
+-->
+	</tbody>
+</table>
+<!--
+EOT;
+?>-->

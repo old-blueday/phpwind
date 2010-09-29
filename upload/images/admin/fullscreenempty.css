@@ -1,0 +1,7 @@
+html { *padding:97px 0 0;}
+#admin_menubar{width:145px;}
+#admin_contont{left:145px;*left:0;top:97px;*top:0px;}
+.admin_head{height:70px;display:block;}
+#admin_menubar_top{width:145px;}
+.admin_menubar_top{padding:3px 20px 0 10px;overflow:hidden;width:115px;display:block;}
+.admin_guide{display:block;}

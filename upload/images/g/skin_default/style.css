@@ -1,0 +1,26 @@
+/*alink*/
+body{color:#2b2b2b;}
+a{color:#005eac;}
+a:hover{text-decoration:underline;}
+/*banner*/
+#banner_class{background:url(preview.jpg) no-repeat;width:960px; height:200px; position:relative;overflow:hidden;margin-bottom:10px;}
+.bannerBg{background:#fff;filter:alpha(opacity=50);opacity:0.5;-moz-opacity:0.5;width:500px;height:140px;margin:15px;}
+.sub{ position:absolute;left:45px;top:30px;right:30px;}
+#banner_class h2{font-size:20px;margin-bottom:5px;font-family: "Microsoft YaHei";}
+#banner_class p{margin-top:5px;line-height:18px;width:450px;max-height:36px;overflow:hidden;}
+/*nav*/
+.g_navA{height:29px;border-bottom:1px solid #79a4ce;position:relative;}
+.g_navA ul{position:absolute;bottom:-1px;_bottom:-2px;padding-right:20px;}
+.g_navA li,.g_navA li a{background:url(navA.png) 999px 999px no-repeat;float:left;line-height:29px;display:block;}
+.g_navA li{ background-position:left 0;margin-right:5px;}
+.g_navA li a{margin-left:5px;background-position:right 0;padding:0 17px 0 12px;color:#000000;font-size:14px;outline:none;_display:inline;}
+.g_navA li a:hover{color:#005eac; text-decoration:none;}
+.g_navA .current{ background-position:0 -34px;}
+.g_navA .current a{ font-weight:700; background-position:right -34px;color:#005eac; padding:0 20px 0 15px;}
+.g_navA .one{ background-position:left -70px;margin-left:10px;}
+.g_navA .one a,.g_navA .one a:hover{ background-position:right -70px;font-size:12px;color:#cc3300;}
+.g_navA .fr{margin-top:5px;}
+/*box*/
+.g_tA{border:1px solid #aacbee;padding:1px;}
+.g_tA .bt2{margin:0;}
+.g_hB{background:#ebf3fb url(hB.png) right top no-repeat;border-bottom:1px solid #aacbee;font-weight:700;}

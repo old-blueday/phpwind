@@ -1,0 +1,47 @@
+<!--<?php
+print<<<EOT
+-->
+<div id="urlContainer" style="display:none;position:absolute;z-index:1;" class="popout" onclick="stopPropagation(event)"><table border="0" cellspacing="0" cellpadding="0"><tbody><tr><td class="bgcorner1"></td><td class="pobg1"></td><td class="bgcorner2"></td></tr><tr><td class="pobg4"></td><td>
+<div class="popoutContent">
+    <div class="popshow">
+    	<b class="triangle"></b>
+    	<a href="javascript:;" class="adel">关闭</a>
+        <div class="p10">
+        	请输入网页、视频、音乐、Flash的链接
+			<input id="urlInput" type="text" class="input" name="urlInput" value="http://" style="font-size:12px;width:255px;margin:4px 0 0 5px;"/>
+            <span class="btn4"><span><button type="button" id="sumbitUrl">确定</button></span></span>
+        </div>
+    </div>
+</div>
+</td><td class="pobg2"></td></tr><tr><td class="bgcorner4"></td><td class="pobg3"></td><td class="bgcorner3"></td></tr></tbody></table></div>
+<script language="javascript">
+function applyUrl(addUrlCallback) {
+	var urlContainerObj = getObj('urlContainer');
+	var sumbitUrl = getObj('sumbitUrl');
+	var text = getObj('urlInput');
+	urlContainerObj.getElementsByTagName('a')[0].onclick = function() {displayElement('urlContainer', false);};
+	sumbitUrl.onclick = function() {
+		var codeText = text.value + ' ';
+		var preg = /^http\:\/\/.{4,255}$/;
+		if (!preg.test(codeText)) {
+			showDialog('error','链接地址出错，链接地址必须以:http://开头');
+			return false;
+		}
+		addUrlCallback(codeText);
+		displayElement('urlContainer', false);
+	};
+}
+function stopPropagation(evt){
+	var e=(evt)?evt:window.event; 
+	if (window.event) { 
+		e.cancelBubble=true; 
+	}else{ 
+		e.stopPropagation();
+	}
+}
+</script>
+
+<!--
+EOT;
+?>
+-->

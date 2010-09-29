@@ -1,0 +1,259 @@
+<!--
+<?php 
+print <<<EOT
+-->
+<script type="text/javascript">
+window.onload = function(){
+	initPortal();
+}
+</script>
+<form action="{$baseUrl}action={$action}&" method="post"  enctype="multipart/form-data" >
+<input type="hidden" name="step" value="2" />
+<input type="hidden" name="pushdataid" value="$pushdataid" />
+<div><!--切换div-->
+	<div id="scrollCtn" class="pwC_content_a" onscroll="moveCal(this)">
+		<div class="admin_table">
+			<table width="100%">
+				<tr class="tr1">
+					<td class="td1">模块</td>
+					<td class="td2">
+						<span style="display:none;">{$channelsSelect}</span>
+<!-- 
+EOT;
+$isShow = (3==$ifpush) ? "inline" : "none";
+print <<<EOT
+-->
+						<span style="display:{$isShow};">{$invokesSelect}</span>
+						{$subInvokesSelect}
+					</td>
+				</tr>
+				<tr class="tr1 vt">
+					<td class="td1">排序等级</td>
+					<td class="td2">
+						<ul class="link_A list_80">
+							<li><label><input type="radio" name="offset" value="0" {$offsets[0]} />普通</label></li>
+							<li><label><input type="radio" name="offset" value="1" {$offsets[1]} />一等级</label></li>
+							<li><label><input type="radio" name="offset" value="2" {$offsets[2]} />二等级</label></li>
+							<li><label><input type="radio" name="offset" value="3" {$offsets[3]} />三等级</label></li>
+							<li><label><input type="radio" name="offset" value="4" {$offsets[4]} />四等级</label></li>
+							<li><label><input type="radio" name="offset" value="5" {$offsets[5]} />五等级</label></li>
+						</ul>
+					</td>
+				</tr>
+			</table>
+			<div id="portalbox">
+			<table width="100%">
+				<tbody id="param">
+<!--
+EOT;
+if($inputs){print <<<EOT
+-->
+
+		<tr class="tr1 vt">
+			<td class="td1">$inputs[title]</td>
+			<td class="td2">$inputs[html]</td>
+		</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+<!--
+EOT;
+foreach ($invokepiece['param'] as $k=>$val) {
+$value = $push[data][$k];
+if ($k=='tagrelate') {
+	$iftagrelate = 1;
+	continue;
+}
+$name = $dataSourceService->getSourceLang($k,$invokepiece['action']);
+if (is_numeric($invokepiece[param][$k])) {
+	$add = 'onKeyUp="countlen(this,\''.$val.'\');"';
+} else {
+	$add = '';
+}
+print <<<EOT
+-->
+				<tr class="tr1 vt">
+					<td class="td1">{$name}</td>
+					<td class="td2">
+<!--
+EOT;
+if($k=='descrip'){print <<<EOT
+-->
+						<textarea name="param[$k]" style="width:260px;height:92px" $add >{$value}</textarea>
+<!--
+EOT;
+} elseif ($k=='title') {
+$value = strip_tags($value);
+print <<<EOT
+-->
+						<input type="text" class="input" size="40" name="param[$k]" value="{$value}" $add> 
+						<div class="pwnew tac">
+							<span title="粗体字"><a onclick="styleOnclick(this,'css[b]')" class="{$stylename[b]}">加粗</a></span>
+							<span title="斜体字"><a onclick="styleOnclick(this,'css[i]')" class="{$stylename[i]}">倾斜</a></span>
+							<span title="下划线"><a onclick="styleOnclick(this,'css[u]')" class="{$stylename[u]}">下划线</a></span>
+							<span id="color_show" style="background:{$stylename[color]};" title="点击取消颜色" onclick="colorCancel()"></span>
+							<span title="颜色选择"><a class="two tal" onclick="showColorPicker(this,'css[color]',function(){pickReback(color_picker)})"><img src="$imgpath/pickcolor.gif"  /></a></span>
+							<span>时间:<input name="css[endtime]" id="css[endtime]" size="15" class="input" type="input" value="{$stylename[endtime]}" onclick="ShowCalendar(this.id,1);getCurrentDatePos();" /></span>
+							<input id="css[color]" name="css[color]" type="hidden" value="$stylename[color]" />
+							<input id="css[b]" name="css[b]" type="hidden" value="{$push['titlecss']['b']}" />
+							<input id="css[i]" name="css[i]" type="hidden" value="{$push['titlecss']['i']}" />
+							<input id="css[u]" name="css[u]" type="hidden" value="{$push['titlecss']['u']}" />
+						</div>
+<!--
+EOT;
+} elseif ($k=='image') {
+if ($value) {
+	$urlChecked = 'checked="checked"';
+	$urlStyle = '';
+	$uploadChecked = '';
+	$uploadStyle = 'style="display:none;"';
+} else {
+	$urlChecked = '';
+	$urlStyle = 'style="display:none;"';
+	$uploadChecked = 'checked="checked"';
+	$uploadStyle = '';
+}
+print <<<EOT
+-->
+
+<style type="text/css">
+.imgListA_pw{padding-bottom:10px;}
+.imgListA_pw li{float:left;width:60px;margin-right:20px; text-align:center;}
+.imgListA_pw li{border:1px solid #fff;cursor:pointer;height:60px;width:60px;}
+.imgListA_pw li:hover{border:1px solid #98ba2a;}
+.imgListA_pw .current{cursor:pointer; position:relative;}
+.imgListA_pw .current div{width:60px;height:60px;background: url(apps/stopic/image/group-current.gif) no-repeat; position:absolute;}
+</style>
+
+
+						<p id="imagetype_ul" class="mb10">
+							<span id="imagetype_upload" class="mr10"><input $uploadChecked name="select_imagetype" type="radio" />图片上传</span>
+							<span id="imagetype_input" class="mr10"><input $urlChecked name="select_imagetype" type="radio" />图片链接</span>
+						</p>
+						<div id="imagetype_input_div" $urlStyle>
+							<div style="background:#f7f7f7;border:1px solid #ccc;width:40px;height:40px;margin-right:10px;" class="fl">
+								<img src="$value" width="40" height="40" />
+							</div>
+							<input id="image" name="param[image]" value="{$value}" size="40" class="input" type="text" />
+						</div>
+						<div id="imagetype_upload_div" $uploadStyle>
+							<dl>
+								<dt>
+									<input id="uploadpic" type="file" name="uploadpic" onchange="checkFileType()" />
+									 <p>允许类型: jpg，jpeg，gif，png(文件大小不得大于2M)<span id="fileTypeError" style="display:none;"><font color="red">请选择正确的文件类型</font></span></p>
+								</dt>
+							</dl>
+						</div>
+
+            
+<script language="JavaScript" src="mode/area/js/imagetype.js"></script>
+<script language="javascript">
+var imageTypeImp = New(imageType,['imagetype_ul']);
+</script>
+
+<!--
+EOT;
+}else{
+print <<<EOT
+-->
+						<input type="text" class="input" size="40" name="param[$k]" value="{$value}" $add>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+			</td>
+		</tr>
+<!--
+EOT;
+}
+$ifbusiness_N =!$ifbusiness_Y && !$ifbusiness_N?'checked':$ifbusiness_N;
+print <<<EOT
+-->
+
+		<tr class="tr1 vt">
+			<td class="td1">开始日期</td>
+			<td class="td2"><input class="input" type="text" size="15" name="starttime" id="starttime" onclick="ShowCalendar(this.id,1);getCurrentDatePos();" value="$push[starttime]"> (留空则立即显示)</td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">商业推荐</td>
+			<td class="td2"><input type="radio" value="1" name="ifbusiness" $ifbusiness_Y/>是 <input type="radio" value="0" name="ifbusiness" $ifbusiness_N/>否</td>
+		</tr>
+<!--
+EOT;
+if ($iftagrelate) {
+print<<<EOT
+-->
+		<tr class="tr1 vt">
+			<td colspan="2">
+				<table width="100%">
+					<tbody id="tagrelate">
+						<tr class="tr1 vt">
+							<td colspan="2"><h2>关联文章</h2></td>
+							<td colspan="2"><a href="#" class="fr" onclick="New(addTagRelate,['tagrelate','tagrelatedata']);return false;">添加</a></td>
+						</tr>
+						<tr class="tr1 vt">
+							<td width="40">顺序</td>
+							<td>标题</td>
+							<td>链接地址</td>
+							<td width="45">&nbsp;</td>
+						</tr>
+<!--
+EOT;
+foreach ($push[data][tagrelate] as $relate) {
+print<<<EOT
+-->
+						<tr class="tr1 vt">
+							<td><input type="text" size="2" name="tagrelate[index][]" value="$relate[index]"  class="input"></td>
+							<td><input type="text" size="16" name="tagrelate[title][]" value="$relate[title]" class="input"></td>
+							<td><input type="text" size="22" name="tagrelate[url][]" value="$relate[url]" class="input"></td>
+							<td><a href="#" onclick="delTr(this);">删除</a></td>
+						</tr>
+<!--
+EOT;
+}print<<<EOT
+-->
+						<tr class="tr1 vt">
+							<td><input type="text" size="2" name="tagrelate[index][]" class="input"></td>
+							<td><input type="text" size="16" name="tagrelate[title][]" value="" class="input"></td>
+							<td><input type="text" size="22" name="tagrelate[url][]" value="http://" class="input"></td>
+							<td><a href="#" onclick="delTr(this);">删除</a></td>
+						</tr>
+					</tbody>
+				</table>
+			</td>
+		</tr>
+<!--
+EOT;
+}print<<<EOT
+-->
+	</tbody>
+</table>
+			</div>
+		</div>
+		<div class="hr_bottom"></div>
+	</div>
+    <div class="tac p10" style="text-align:center;">
+<!--
+EOT;
+if ($push[ifverify]) {print<<<EOT
+-->
+        <input name="" type="submit" value="审核并提交" class="btn" />
+<!--
+EOT;
+} else {print<<<EOT
+-->
+		<input name="" type="submit" value="提交" class="btn" />
+<!--
+EOT;
+}print<<<EOT
+-->
+	</div>
+</div>
+</form>
+
+<!--
+EOT;
+?>
+-->

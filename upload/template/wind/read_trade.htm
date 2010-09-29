@@ -1,0 +1,261 @@
+<!--<?php
+print <<<EOT
+-->
+<style type="text/css">
+/*商品*/
+.read-buy-img{overflow: hidden;}
+.read-buy-img img{width:250px;border:1px solid $forumcolortwo;padding:2px;text-align:center;background:$forumcolorone;}
+.read-buy-s{font-size:20px;font-weight:700;}
+.read-buy-s2{font-size:16px;font-weight:700;text-decoration:line-through;}
+.readbuy a{text-indent:-2000em;display:block;height:32px;width:157px;}
+.readbuy{background:url($imgpath/post/readbuy.png) left top no-repeat;width:157px;height:32px;margin:5px 0;}
+</style>
+<div class="t5 f_one">
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+<tr><td rowspan="8" style="width:270px;padding:10px;border-bottom:0px;"><div class="read-buy-img"><img src="$tradedb[icon]"></div></td>
+	<td>商品名称 :<span class="f14 b">$tradedb[name]</span></td></tr>
+	<tr>
+		<td>一 口 价 :<span class="read-buy-s s3">$tradedb[costprice]</span>市 场 价 :<span class="read-buy-s2 s3">$tradedb[price]</span></span></td>
+	</tr>
+	<tr>
+		<td>运　　费 :
+<!--
+EOT;
+if ($tradedb['transport']) {print <<<EOT
+-->
+			平邮: $tradedb[mailfee]元<span>&nbsp;</span>快递:$tradedb[expressfee]元<span>&nbsp;</span>EMS:$tradedb[emsfee]元
+<!--
+EOT;
+} else {print <<<EOT
+-->
+			卖家承担
+<!--
+EOT;
+}print <<<EOT
+-->
+		</td>
+	</tr>
+	<tr>
+		<td>付款方式 :
+<!--
+EOT;
+if ($tradedb['paymethod'] & 1) {print <<<EOT
+-->
+			线下交易<span></span>
+<!--
+EOT;
+}if ($tradedb['paymethod'] & 2) {print <<<EOT
+-->
+			支付宝交易
+<!--
+EOT;
+}print <<<EOT
+-->
+		</td>
+	</tr>
+	<tr>
+		<td>累计售出 :$tradedb[salenum] 件
+<!--
+EOT;
+if ($tradedb['aliww']) {print <<<EOT
+-->
+			<span>&nbsp;</span>联系卖家:<a id="alitalkId0" onclick='sendMessage("cntaobao$tradedb[aliww]","cntaobao")'></a>
+<script language="JavaScript" type="text/javascript" src="http://img.im.alisoft.com/webim/js/website.js" charset='utf-8'></script>
+<iframe name="aliwangwangSendmsgShowFrame" id="showFrame" width=0 height=0 src="about:blank"></iframe>
+<script language="javascript">
+var OnLine = -1;
+</script>
+<script language="javascript"src="http://amos.im.alisoft.com/userstatus3.aw?uid=$tradedb[aliww]&site=cntaobao"></script>
+<script language="javascript">
+function showLamp() {
+	var obj = null;
+	obj = document.getElementById("alitalkId0");
+	if (OnLine == 1) {
+		obj.innerHTML = '<img src="http://img.im.alisoft.com/webim/images/myt_16_on.gif" border="0" width="16" height="16" align="absbottom" style="cursor:hand">';
+	} else {
+		obj.innerHTML = '<img src="http://img.im.alisoft.com/webim/images/myt_16_off.gif" border="0" width="16" height="16" align="absbottom" style="cursor:hand">';
+	}
+}
+showLamp();
+function sendMessage(talkId,userId) {
+	var p = "loginid=" + getSiteLoginId(talkId);
+	sendClientMsg( getSite(userId), getSiteLoginId(userId), getSite(talkId), getSiteLoginId(talkId), OnLine, p);
+}
+</script>
+<!--
+EOT;
+}print <<<EOT
+-->
+		</td>
+	</tr>
+	<tr>
+		<td>商品类型 :
+<!--
+EOT;
+if ($tradedb['degree']) {print <<<EOT
+-->
+			二手
+<!--
+EOT;
+} else {print <<<EOT
+-->
+			全新
+<!--
+EOT;
+}print <<<EOT
+-->
+		<span>&nbsp;</span>所 在 地 :$tradedb[locus]</td>
+	</tr>
+	<tr>
+		<td>商品数量 : $tradedb[num]件<span>&nbsp;</span>浏 览 量 :$tradedb[hits]次</td>
+	</tr>
+	<tr>
+		<td style="border-bottom:0px;"><div class="readbuy"><a href="trade.php?action=buy&tid=$tid">我要购买</a></div></td>
+	</tr>
+</table>
+</div>
+<!--
+EOT;
+if($action=='apply'){ print <<<EOT
+-->
+<form action="active.php" method="post">
+<div class="t">
+<table width="100%" align="center" cellspacing="0" cellpadding="0">
+<tr><th class="h" colspan="2">活动申请</th></tr>
+<tr class="tr3 tr">
+	<th width="20%">联系方式</th>
+	<th><input type="text" name="contact" /> &nbsp;Tel、QQ、Email 等</th>
+</tr>
+<tr class="tr3 tr">
+	<th width="20%">留言：</th>
+	<th><textarea name="message" rows="5" wrap="hard" cols="60"></textarea></th>
+</tr>
+</table></div>
+<div style="text-align:center;margin-bottom:25px;"><input type="hidden" name="action" value="apply" />
+<input type="hidden" name="verify" value="$verifyhash" />
+<input type="hidden" name="step" value="2" />
+<input type="hidden" name="tid" value="$tid" />
+<input class="btn" type="submit" value="提 交" /></div></form>
+<!--
+EOT;
+}elseif($action=='view'){ print <<<EOT
+-->
+<form action="active.php" method="post">
+<input type="hidden" name="verify" value="$verifyhash" />
+<div class="t">
+<table width="100%" align="center" cellspacing="0" cellpadding="0">
+<tr><td class="h" colspan="8">活动成员</td></tr>
+<tr class="tr2">
+	<td width="8%">序号</td>
+	<td width="12%">姓名</td>
+	<td width="6%">性别</td>
+	<td width="12%">状态</td>
+	<td width="18%">申请时间</td>
+	<td width="12%">联系方式</td>
+	<td width="*">留言</td>
+<!--
+EOT;
+if($admincheck){ print <<<EOT
+-->
+	<td width="5%"></td>
+<!--
+EOT;
+} print <<<EOT
+-->
+</tr>
+<!--
+EOT;
+$i=0;
+foreach($actdb as $key=>$value){
+$i++;
+print <<<EOT
+-->
+<tr class="tr3">
+	<td>$i</td>
+	<td><a href="u.php?uid=$value[winduid]">$value[username]</a></td>
+<!--
+EOT;
+if($value[gender]==1){ print <<<EOT
+-->
+	<td>男</td>
+<!--
+EOT;
+}elseif($value[gender]==2){ print <<<EOT
+-->
+	<td>女</td>
+<!--
+EOT;
+}else{ print <<<EOT
+-->
+	<td>保密</td>
+<!--
+EOT;
+}if($value[state]==1){ print <<<EOT
+-->
+	<td><font color="blue">已审核</font></td>
+<!--
+EOT;
+}elseif($value[state]==2){ print <<<EOT
+-->
+	<td><font color="red">已拒绝</font></td>
+<!--
+EOT;
+}else{ print <<<EOT
+-->
+	<td>未审核</td>
+<!--
+EOT;
+}print <<<EOT
+-->
+	<td>$value[applydate]</td>
+	<td>$value[contact]</td>
+	<td>$value[message]</td>
+<!--
+EOT;
+if($admincheck){ print <<<EOT
+-->
+	<td><input type="checkbox" name="selid[]" value="$value[id]" /></td>
+<!--
+EOT;
+} print <<<EOT
+-->
+</tr>
+<!--
+EOT;
+} print <<<EOT
+-->
+</table></div>$pages<div class="c"></div>
+<input type="hidden" name="tid" value="$tid" />
+<!--
+EOT;
+if($admincheck){ print <<<EOT
+-->
+<div style="text-align:center;margin-bottom:25px;">
+管理选项:<input type="radio" name="action" value="pass" checked />批准
+<input type="radio" name="action" value="unpass" />拒绝
+<input type="radio" name="action" value="cancle" />取消活动<br><br>
+<input class="btn" type='button' name='chkall' value='全 选' onclick='CheckAll(this.form)' />
+<input class="btn" type='submit' value='提 交' /></div>
+<!--
+EOT;
+}else{ print <<<EOT
+-->
+<div style="text-align:center;margin-bottom:25px;"><input type="hidden" name="action" value="exit" />
+<input class="btn" type='submit' value='取消参加' /></div>
+<!--
+EOT;
+} print <<<EOT
+-->
+</form>
+<script language=JavaScript>
+function CheckAll(form){
+	for (var i=0;i<form.elements.length-5;i++){
+		var e = form.elements[i];
+		e.checked == true ? e.checked = false : e.checked = true;
+	}
+}
+</script>
+<!--
+EOT;
+}
+?>

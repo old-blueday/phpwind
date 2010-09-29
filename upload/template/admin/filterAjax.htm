@@ -1,0 +1,671 @@
+<!--<?php
+print <<<EOT
+-->
+<script language="javascript">
+function closep(){
+	read.menu.style.display = 'none';
+}
+
+function actionClass()
+{
+	if (getObj('newclass').style.display!=''){
+		getObj('newclass').style.display='';
+		getObj('class').style.display='none';
+		getObj('prompt').innerHTML='选择分类';
+	}else{
+		getObj('newclass').style.display='none';
+		getObj('class').style.display='';
+		getObj('newclass').value='';
+		getObj('prompt').innerHTML='新建分类';
+	}
+}
+
+function getUpdate()
+{
+	var classid = getObj('class').value;
+	var newclass = getObj('newclass').value;
+	var state = 0;
+	if(classid == 0 && newclass == ''){
+		alert('请选择分类');
+		return '';
+	}
+	if (getObj('enabled').checked == true) {
+		state = 1;
+	}
+	sendmsg('{$basename}&action=synchronous&job=update&class='+classid+'&newclass='+newclass+'&state='+state);
+}
+</script>
+<!--
+EOT;
+if ($action == 'setting') {
+if ($job == 'add') {
+print <<<EOT
+-->
+<script language="javascript">
+function checkWord(str)
+{
+   if(str.match(/\|+/ig)) {
+      alert("敏感词不能包含'|'符号！");
+      getObj('word').value = '';
+      getObj('word').focus();
+      return false;
+   } else {
+      return true;
+   }
+}
+
+function postSubmit()
+{
+	var word = getObj('word').value;
+	if (getObj('newclass').style.display!=''){
+		var newclass = '';
+	} else {
+		var newclass = getObj('newclass').value;
+	}
+
+	if (word != '') {
+		ajax.send('$post_basename','word=' + word + '&newclass='+newclass+'&step=2',function() {
+			var prompt = ajax.request.responseText;
+			if(prompt == ''){
+				document.form1.action="$ajax_basename";
+				document.form1.method = "POST";
+				document.form1.submit();
+			}else{
+				alert(prompt);
+			}
+        });
+	} else {
+		alert('请输入敏感词');
+        getObj('word').focus();
+        return false;
+	}
+}
+</script>
+<form action="$ajax_basename" method="post" name="form1" id="form1" onsubmit="return postSubmit();">
+<input type="hidden" name="step" value="2">
+<h2 class="h1">添加敏感词</h2>
+<div class="admin_table" style="width:340px">
+      <table width="100%" border="0" cellspacing="0" cellpadding="0">
+        <tr class="tr1 vt">
+            <td class="td2" width="60">敏感词</td>
+            <td class="td2"><textarea name="word" id="word" style="width:154px;" class="textarea mb5"></textarea><p class="gray">可批量添加，一行一个</p></td>
+        </tr>
+        <tr class="tr1 vt">
+            <td class="td2">等级</td>
+            <td class="td2">
+                <select name="type" id="type" class="select_wa" onchange="if (this.value == 3){getObj('rpobj').style.display='';}else{getObj('rpobj').style.display='none';}">
+                    <option value="1">禁用</option>
+                    <option value="2">审核</option>
+                    <option value="3">替换</option>
+                </select>
+            </td>
+        </tr>
+        <tr class="tr1">
+            <td class="td2">分类</td>
+            <td class="td2">
+                <select name="class" id="class" class="select_wa">
+                	<option value="0">请选择</option>
+<!--
+EOT;
+foreach($classdb as $key=>$value){
+print <<<EOT
+-->
+        			<option value="$key">$value[title]</option>
+<!--
+EOT;
+} print <<<EOT
+-->
+            	</select>
+            	<input name="newclass" id="newclass" class="input input_wa" type="text" value="" style="display:none;"/>
+            	<a onclick="actionClass()" style="cursor:pointer;"><span id="prompt">新建分类</span></a>
+            </td>
+        </tr>
+        <tr id="rpobj" class="tr1 vt" style="display:none">
+            <td class="td2">替换为</td>
+            <td class="td2"><input name="repword" id="repword" type="text" value="" class="input input_wa" /></td>
+        </tr>
+</table>
+</div>
+<div class="p10 tac">
+	<span class="btn2"><span><button type="button" onclick="postSubmit()">确 认</button></span></span>
+    <span class="bt2"><span><button type="button" onclick="closep();">取 消</button></span></span>
+</div>
+</form>
+<!--
+EOT;
+} elseif ($job == 'edit') {
+$stylecss = $word['type'] == 3 ? '' : 'style="display:none"';
+print <<<EOT
+-->
+<form action="$ajax_basename" method="post">
+<input name="id" id="id" type="hidden" value="{$word['id']}"/>
+<input type="hidden" name="step" value="2">
+<h2 class="h1">修改敏感词</h2>
+<div class="admin_table" style="width:340px">
+    <table width="100%" border="0" cellspacing="0" cellpadding="0">
+        <tr class="tr1 vt">
+            <td class="td2" width="60">敏感词</td>
+            <td class="td2"><input name="word" id="word" type="text" class="input input_wa" value="{$word['word']}" disabled="disabled" /></td>
+        </tr>
+        <tr class="tr1 vt">
+            <td class="td2">等级</td>
+            <td class="td2">
+                <select name="type" id="type" class="select_wa" onchange="if (this.value == 3){getObj('rpobj').style.display='';}else{getObj('rpobj').style.display='none';}">
+                {$selected}
+                </select>
+            </td>
+        </tr>
+        <tr class="tr1 vt">
+            <td class="td2">分类</td>
+            <td class="td2">
+                <select name="class" id="class" class="select_wa">
+                    {$class_selected}
+                </select>
+           		<input name="newclass" id="newclass" type="text" value="" class="input input_wa" style="display:none;"/>
+                <a onclick="actionClass()" style="cursor:pointer;"><span id="prompt">新建分类</span></a>
+            </td>
+        </tr>
+        <tr class="tr1 vt" id="rpobj" $stylecss>
+            <td class="td2">替换为</td>
+            <td class="td2"><input name="repword" id="repword" class="input input_wa" type="text" value="{$word['wordreplace']}"/></td>
+        </tr>
+    </table>
+</div>
+<div class="p10 tac">
+	<span class="btn2"><span><button type="submit">确 认</button></span></span>
+    <span class="bt2"><span><button type="button" onclick="closep();">取 消</button></span></span>
+</div>
+</form>
+<!--
+EOT;
+} elseif ($job == 'batchedit') {
+$stylecss = $word['type'] == 3 ? '' : 'style="display:none"';
+print <<<EOT
+-->
+<form action="$ajax_basename" method="post">
+<input name="id" id="id" type="hidden" value="{$wid}"/>
+<input type="hidden" name="step" value="2">
+<h2 class="h1">修改敏感词</h2>
+<div class="admin_table" style="width:340px">
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr class="tr1 vt">
+    	<td class="td2" width="60">敏感词</td>
+    	<td class="td2"><div style="height:70px;overflow-y:scroll;line-height:1.5;border:1px solid #ccc;padding:5px;background:#fff;">
+			<ul>
+<!--
+EOT;
+foreach($list as $value){
+print <<<EOT
+-->
+        		<li>{$value}</li>
+<!--
+EOT;
+}print <<<EOT
+-->
+            </ul>
+        </div>
+        </td>
+    </tr>
+    <tr class="tr1 vt">
+        <td class="td2">等级</td>
+        <td class="td2">
+            <select name="type" class="select_wa" id="type" onchange="if (this.value == 3){getObj('rpobj').style.display='';}else{getObj('rpobj').style.display='none';}">
+                <option value="1">禁用</option>
+                <option value="2">审核</option>
+                <option value="3">替换</option>
+            </select>
+        </td>
+    </tr>
+    <tr class="tr1 vt">
+    <td class="td2">分类</td>
+        <td class="td2">
+            <select name="class" id="class" class="select_wa">
+                <option value="0">请选择</option>
+<!--
+EOT;
+foreach($classdb as $key=>$value){
+print <<<EOT
+-->
+                <option value="$key">$value[title]</option>
+<!--
+EOT;
+} print <<<EOT
+-->
+            </select>
+            <input name="newclass" id="newclass" type="text" value="" class="input input_wa" style="display:none"/>
+            <a onclick="actionClass()" style="cursor:pointer;"><span id="prompt">新建分类</span></a>
+        </td>
+    </tr>
+    <tr class="vt tr1" id="rpobj" $stylecss>
+        <td class="td2">替换为</td>
+        <td class="td2"><input name="repword" class="input input_wa"id="repword" type="text" value=""/></td>
+    </tr>
+</table>
+</div>
+<div class="p10 tac">
+	<span class="btn2"><span><button type="submit">确 认</button></span></span>
+    <span class="bt2"><span><button type="button" onclick="closep();">取 消</button></span></span>
+</div>
+</form>
+<!--
+EOT;
+} elseif ($job == 'del') {
+print <<<EOT
+-->
+<form action="$ajax_basename" method="post">
+<input name="id" id="id" type="hidden" value="{$wid}"/>
+<input type="hidden" name="step" value="2">
+<h2 class="h1"><span class="mr20">删除敏感词</span><span class="linka">敏感词(共{$count}个)</span></h2>
+<div style="height:170px;overflow-y:scroll;width:300px;line-height:1.5;" class="p10">
+	<ul>
+<!--
+EOT;
+foreach($list as $value){
+print <<<EOT
+-->
+        <li>{$value}</li>
+<!--
+EOT;
+}print <<<EOT
+-->
+	</ul>
+</div>
+<!--p>确认删除以上敏感词？</p-->
+<div class="p10 tac">
+	<span class="btn2"><span><button type="submit">确 认</button></span></span>
+    <span class="bt2"><span><button type="button" onclick="closep();">取 消</button></span></span>
+</div>
+</form>
+<!--
+EOT;
+}
+}elseif ($action == 'check') {
+print <<<EOT
+-->
+<form action="$ajax_basename" method="post">
+<input type="hidden" name="step" value="2">
+<input type="hidden" name="type" value="{$type}">
+<h2 class="h1">所有审核全部通过</h2>
+<div class="p10">共{$count}个{$title}，确认全部通过审核？</div>
+<div class="p10 tac">
+	<span class="btn2"><span><button type="submit">确 认</button></span></span>
+    <span class="bt2"><span><button type="button" onclick="closep();">取 消</button></span></span>
+</div>
+</form>
+<!--
+EOT;
+}elseif ($action == 'synchronous') {
+if ($job == 'confirm') {
+print <<<EOT
+-->
+<h2 class="h1">确认同步</h2>
+<div class="admin_table" style="width:340px">
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr class="tr1 vt">
+    	<td class="td2" colspan="2">共新增{$ft_update_num}个敏感词，确认同步吗？</td>
+    </tr>
+    <tr class="tr1 vt">
+    	<td class="td2" width="60">分类</td>
+    	<td class="td2">
+			<select name="class" id="class" class="select_wa">
+    		<option value="0">请选择</option>
+<!--
+EOT;
+foreach($classdb as $key=>$value){
+print <<<EOT
+-->
+				<option value="$key">$value[title]</option>
+<!--
+EOT;
+} print <<<EOT
+-->
+            </select>
+            <input name="newclass" id="newclass" type="text" value="" class="input_wa input" style="display:none"/>
+            <a onclick="actionClass()" style="cursor:pointer;"><span id="prompt">新建分类</span></a>
+        </td>
+    </tr>
+    <tr class="tr1 vt">
+    	<td class="td2">分类状态</td>
+    	<td class="td2">
+        	<ul class="list_A list_80">
+        		<li><input name="state" id="enabled" type="radio" value="1" />启用</li>
+        		<li><input name="state" id="disable" type="radio" value="0" checked/>停用</li>
+            </ul>
+        </td>
+    </tr>
+</table>
+</div>
+<div class="p10 tac">
+	<span class="btn2"><span><button type="button" onclick="getUpdate();">确 认</button></span></span>
+    <span class="bt2"><span><button type="button" onclick="closep();">取 消</button></span></span>
+</div>
+<!--
+EOT;
+} elseif ($job == 'update') {
+print <<<EOT
+-->
+<h2 class="h1">同步结果</h2>
+<div class="admin_table" style="width:340px">
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+	<tr class="tr1">
+    	<td colspan="2" class="td2">同步成功，共新增{$i}个敏感词</td>
+    </tr>
+    <tr class="tr1 vt">
+        <td class="td2" width="150">敏感词</td>
+        <td class="td2">敏感词级别</td>
+    </tr>
+</table>
+</div>
+<div style="height:170px;overflow-y:scroll;width:300px;line-height:1.5;" class="p10">
+<table width="400" border="0" cellspacing="0" cellpadding="0">
+<!--
+EOT;
+foreach($list as $value){
+print <<<EOT
+-->
+    <tr class="tr1 vt">
+        <td class="td2" width="150">{$value['word']}</td>
+        <td class="td2">{$level[$value['level']]}</td>
+    </tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+</table>
+</div>
+<div class="admin_table" style="width:340px">
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr class="tr1 vt">
+        <td class="td2" width="150">分类</td>
+        <td class="td2">{$class_title}</td>
+    </tr>
+    <tr class="tr1 vt">
+        <td class="td2" width="150">状态</td>
+        <td class="td2">
+<!--
+EOT;
+if($state){
+print <<<EOT
+-->
+		启用
+<!--
+EOT;
+}else{
+print <<<EOT
+-->
+		停用
+<!--
+EOT;
+}
+print <<<EOT
+-->
+        </td>
+    </tr>
+</table>
+</div>
+<div class="p10 tac">
+	<span class="btn2"><span><button type="button" onclick="location.href='{$basename}&action=setting'">确 认</button></span></span>
+</div>
+<!--
+EOT;
+} elseif ($job == 'notupdate') {
+print <<<EOT
+-->
+<h2 class="h1">同步中心词库</h2>
+<p class="p10">暂时没有新词库可以同步</p>
+<div class="p10 tac">
+	<span class="btn2"><span><button type="button" onclick="closep()">确 定</button></span></span>
+</div>
+<!--
+EOT;
+}
+}elseif($action == 'show') {
+print <<<EOT
+-->
+<script language="javascript">
+function confirmSkip(action, type)
+{
+	if (confirm('您确认要进行此操作吗?')) {
+		if(action == 'pass') {
+			if(type == 'thread') {
+				location.href='{$basename}&action=check&job=pass&tid={$content[tid]}&pid={$content[pid]}&type='+type;
+			} else {
+				location.href='{$basename}&action=check&id=$objid&ptable=$ptable&job=pass&tid={$content[tid]}&pid={$content[pid]}&type='+type;
+			}
+		}else if(action == 'del'){
+			if(type == 'thread') {
+				location.href='{$basename}&action=check&job=del&tid={$content[tid]}&pid={$content[pid]}&type='+type;
+			} else {
+				location.href='{$basename}&action=check&job=del&tid={$content[tid]}&pid={$content[pid]}&type='+type;
+			}
+		}
+    }else{
+	    return false;
+    }
+}
+</script>
+<!--
+EOT;
+if($job == 'thread'){
+print <<<EOT
+-->
+<h2 class="h1">
+	<a href="javascript:;" onclick="closep();" class="del_img fr">关闭</a>
+    <span class="mr20">$content[author]</span><span class="linka gray">发表于: $content[date]</span>
+</h2>
+<div style="width:600px; min-height:300px; height:350px; overflow:auto;padding:0 10px 10px">
+    <div class="p10 f14">$content[subject]</div>
+    <div class="tpc_content">
+        <div id="p_tpc" class="c"></div>
+        <div class="f14" id="read_tpc"> $content[content] </div>
+    </div>
+</div>
+<!--
+EOT;
+if($type == 'check'){
+print <<<EOT
+-->
+<div class="p10 tac">
+	<span class="btn2"><span><button type="button" onclick="confirmSkip('pass', '{$job}');">通 过</button></span></span>
+    <span class="bt2"><span><button type="button" onclick="confirmSkip('del', '{$job}');">删 除</button></span></span>
+    <span class="bt2"><span><button type="button" onclick="closep();">取 消</button></span></span>
+</div>
+<!--
+EOT;
+}
+}else{
+print <<<EOT
+-->
+<h2 class="h1">
+	<a href="javascript:;" onclick="closep();" class="del_img fr">关闭</a>
+    <span class="mr20">$content[author]</span><span class="linka gray">发表于: {$tid}|{$pid}$content[date]</span>
+</h2>
+<div style="width:600px; min-height:300px; height:350px; overflow:auto;padding:0 10px 10px">
+    <div class="p10 f14">$content[subject]</div>
+    <div class="tpc_content">
+        <div id="p_tpc" class="c"></div>
+        <div class="f14" id="read_tpc"> $content[content] </div>
+    </div>
+</div>
+<!--
+EOT;
+if($type == 'check'){
+print <<<EOT
+-->
+<div class="p10 tac">
+	<span class="btn2"><span><button type="button" onclick="confirmSkip('pass', '{$job}');">通 过</button></span></span>
+    <span class="bt2"><span><button type="button" onclick="confirmSkip('del', '{$job}');">删 除</button></span></span>
+    <span class="bt2"><span><button type="button" onclick="closep();">取 消</button></span></span>
+</div>
+<!--
+EOT;
+}
+}
+}elseif($action == 'class') {
+	if($job == 'add'){
+print <<<EOT
+-->
+<form action="$ajax_basename" method="post">
+<input type="hidden" name="step" value="2">
+<h2 class="h1">新建分类</h2>
+<div class="admin_table" style="width:300px;">
+	    <table width="100%" border="0" cellspacing="0" cellpadding="0">
+			<tr class="tr1 vt">
+				<td class="td2">分类名称</td>
+				<td class="td2"><input name="title" id="title" type="text" class="input input_wa mb5" value=""/><p class="gray">最多输入8个中文</p></td>
+			</tr>
+		</table>
+</div>
+<div class="p10 tac">
+	<span class="btn2"><span><button type="submit">确 认</button></span></span>
+    <span class="bt2"><span><button type="button" onclick="closep();">取 消</button></span></span>
+</div>
+</form>
+<!--
+EOT;
+	}elseif($job == 'edit'){
+print <<<EOT
+-->
+<form action="$ajax_basename" method="post">
+<input type="hidden" name="step" value="2">
+<input type="hidden" name="id" value="$class[id]">
+<h2 class="h1">编辑分类</h2>
+<div class="admin_table" style="width:300px;">
+    <table width="100%" border="0" cellspacing="0" cellpadding="0">
+        <tr class="tr1 vt">
+            <td class="td2">分类名称</td>
+            <td class="td2"><input name="title" id="title" type="text" value="$class[title]" class="input input_wa mb5" /><br /><span class="mgccfq">最多输入8个中文</span></td>
+        </tr>
+    </table>
+</div>
+<div class="p10 tac">
+	<span class="btn2"><span><button type="submit">确 认</button></span></span>
+    <span class="bt2"><span><button type="button" onclick="closep();">取 消</button></span></span>
+</div>
+</form>
+<!--
+EOT;
+	}elseif ($job == 'del'){
+print <<<EOT
+-->
+<form action="$ajax_basename" method="post">
+<input type="hidden" name="step" value="2">
+<input type="hidden" name="class" value="{$class}">
+<h2 class="h1">删除分类</h2>
+<p class="p10">分类：{$title}&nbsp;词库：{$count}个</p>
+<p class="p_lr_10">确认删除此分类及分类下的词库？</p>
+<div class="p10 tac">
+	<span class="btn2"><span><button type="submit">确 认</button></span></span>
+    <span class="bt2"><span><button type="button" onclick="closep();">取 消</button></span></span>
+</div>
+</form>
+<!--
+EOT;
+	}elseif ($job == 'import'){
+print <<<EOT
+-->
+<form action="$ajax_basename" method="post" enctype="multipart/form-data">
+<input type="hidden" name="step" value="2">
+<h2 class="h1">导入词库</h2>
+<div class="admin_table" style="width:340px;">
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr class="tr1 vt">
+        <td class="td2" width="60">词库文件</td>
+        <td class="td2"><input class="input input_wa" type="file" name="upload"/></td>
+    </tr>
+    <tr class="tr1 vt">
+        <td class="td2">导入分类</td>
+        <td class="td2">
+        <select name="class" id="class" class="select_wa">
+        <option value="0">请选择</option>
+<!--
+EOT;
+foreach($classdb as $key=>$value){
+print <<<EOT
+-->
+        <option value="$key">$value[title]</option>
+<!--
+EOT;
+} print <<<EOT
+-->
+        </select>
+        <input name="newclass" id="newclass" type="text" value="" style="display:none;" class="input input_wa" />
+        <a onclick="actionClass()" style="cursor:pointer;"><span id="prompt">新建分类</span></a>
+        </td>
+    </tr>
+</table>
+</div>
+<div class="p10 tac">
+	<span class="btn2"><span><button type="submit">确 认</button></span></span>
+    <span class="bt2"><span><button type="button" onclick="closep();">取 消</button></span></span>
+</div>
+</form>
+<!--
+EOT;
+	}elseif($job == 'importshow'){
+print <<<EOT
+-->
+<input type="hidden" name="step" value="2">
+<input type="hidden" name="class" value="{$class}">
+<h2 class="h1">导入完成</h2>
+<p class="p10">新增：{$success}个&nbsp;已存在：{$fail}个</p>
+<div class="p10 tac">
+    <span class="bt2"><span><button type="button" onclick="closep();">确 认</button></span></span>
+</div>
+<!--
+EOT;
+	}elseif ($job == 'export'){
+print <<<EOT
+-->
+<form action="$ajax_basename" method="post">
+<input type="hidden" name="step" value="2">
+<input type="hidden" name="class" value="{$class}">
+<h2 class="h1">导出词库</h2>
+<p class="p10">分类：{$title}&nbsp;词库：{$count}个</p>
+<p class="p_lr_10 mb10">确认导出此类敏感词？</p>
+<p class="p_lr_10"><input name="dict_name" id="dict_name" type="text" class="input_wa input" value="{$title}"/>.txt</p>
+<div class="p10 tac">
+	<span class="btn2"><span><button type="submit" onclick="closep();">确 认</button></span></span>
+    <span class="bt2"><span><button type="button" onclick="closep();">取 消</button></span></span>
+</div>
+</form>
+<!--
+EOT;
+	}elseif ($job == 'exportall'){
+print <<<EOT
+-->
+<form action="$ajax_basename" method="post">
+<input type="hidden" name="step" value="2">
+<input type="hidden" name="class" value="{$class}">
+<input type="hidden" name="dict_name" value="{$title}"/>
+<h2 class="h1">导出词库</h2>
+<p class="p10">确认导出所有敏感词？</p>
+<p class="p_lr_10">共{$count}个。</p>
+<div class="p10 tac">
+	<span class="btn2"><span><button type="submit" onclick="closep();">确 认</button></span></span>
+    <span class="bt2"><span><button type="button" onclick="closep();">取 消</button></span></span>
+</div>
+</form>
+<!--
+EOT;
+	}elseif ($job == 'switch'){
+print <<<EOT
+-->
+<form action="$ajax_basename" method="post">
+<input type="hidden" name="step" value="2">
+<input type="hidden" name="class" value="{$class}">
+<input type="hidden" name="state" value="{$state}">
+<h2 class="h1">{$show}分类</h2>
+<p class="p10">分类：{$title}&nbsp;词库：{$count}个</p>
+<p class="p_lr_10 mb10">确认{$show}此分类？</p>
+<p class="p_lr_10">{$prompt}</p>
+<div class="p10 tac">
+	<span class="btn2"><span><button type="submit">确 认</button></span></span>
+    <span class="bt2"><span><button type="button" onclick="closep();">取 消</button></span></span>
+</div>
+</form>
+<!--
+EOT;
+}
+}
+?>-->

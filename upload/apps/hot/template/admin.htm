@@ -1,0 +1,219 @@
+<!--<?php
+include_once PrintEot('left');
+print<<<EOT
+-->
+<h2 class="h1 mb10"><a href="$admin_file?adminjob=app&admintype=appslist">返回基础应用列表</a></h2>
+<!--
+EOT;
+if(!$action){print <<<EOT
+-->
+<div class="nav3 mb10">
+  <ul class="cc">
+    <li class="current"><a href="$basename">基本设置</a></li>
+    <li><a href="$basename&action=hotTypeSet">排行类型设置</a></li>
+  </ul>
+</div>
+  <form action="$basename" method="post" >
+    <input type="hidden" value="baseSet" name="hot_baseSet"/>
+    <h2 class="h1">热榜基本设置</h2>
+    <div class="admin_table mb10">
+    <table width="100%" cellspacing="0" cellpadding="0">
+      <tr class="tr1 vt">
+        <td class="td1">热榜功能</td>
+        <td class="td2">
+          	<div class="list_A list_80">
+                    <ul class="cc">
+                        <li><input type="radio" name="config[hot_open]" value="1" $hot_open_Y/>开启</li>
+                        <li><input type="radio" name="config[hot_open]" value="0" $hot_open_N>关闭</li>
+                    </ul>
+             </div>
+          </td><td class="td2"> </td>
+      </tr>
+      <tr class="tr1 vt">
+        <td class="td1"><span class="xia2">浏览权限</span></td>
+        <td class="td2">$hot_userGroup</td>
+		<td class="td2">勾选允许浏览的用户组，全不选表示全开放</td>
+      </tr>
+    </table>
+    </div>
+    <div class="mb10 tac">
+    <span class="btn"><span><button type="submit">提 交</button></span></span>
+   </div>
+  </form>
+<!--
+EOT;
+}if($action=="hotTypeSet"){print <<<EOT
+-->
+<div class="nav3 mb10">
+  <ul class="cc">
+    <li><a href="$basename">基本设置</a></li>
+    <li class="current"><a href="$basename&action=hotTypeSet">排行类型设置</a></li>
+  </ul>
+</div>
+  <form action="$basename&action=hotTypeSet" method="post">
+    <input type="hidden" name="updateAll" value="updateAll"/>
+  <h2 class="h1">热榜排行类型设置</h2>
+  <div class="admin_table mb10">
+    <table width="100%" cellspacing="0" cellpadding="0">
+      <tr class="tr2">
+        <td width="55">启用</td>
+        <td>顺序</td>
+        <td>类型（自定义名称）</td>
+        <td>筛选类别</td>
+        <td>筛选时间</td>
+        <td>显示在热榜首页</td>
+        <td width="40">操作</td>
+      </tr>
+<!-- 
+EOT;
+if($htmlHotList){
+foreach($htmlHotParentList as $parent => $parentV){ print <<<EOT
+-->
+      <tr class="tr1 vt">
+        <td class="td2"><input type="checkBox" value="$parentV[id]" name="active[{$parentV[id]}]"  $parentV[active]/></td>
+        <td class="td2"><input id="test_1" type="text" value=$parentV[sort] name="sort[{$parentV[id]}]" class="input input_wd"></td>
+        <td class="td2"><input type="text" value=$parentV[typeName] name="type_name[{$parentV[id]}]" class="input input_wa"></td>
+        <td class="td2">$parentV[filterType]</td>
+        <td class="td2">$parentV[filterTime]</td>
+        <td class="td2"><input type="checkBox" value="$parentV[id]" name="display[{$parentV[id]}]" $parentV[display] /></td>
+        <td class="td2"><a href="$basename&action=hotEdit&hotId=$parentV[id] ">[操作]</a></td>
+        </td>
+      </tr>
+<!--
+EOT;
+foreach($htmlHotList as $key => $value){
+if($value["parent"]==$parentV["id"]){
+print <<<EOT
+-->
+      <tr class="tr1 vt">
+        <td class="td2"><i class="lower"></i><input type="checkBox" value="$value[id]" name="active[{$value[id]}]"  $value[active]/></td>
+        <td class="td2"><input type="text" value=$value[sort] name="sort[{$value[id]}]" class="input input_wd"></td>
+        <td class="td2"><input type="text" value=$value[typeName] name="type_name[{$value[id]}]" class="input input_wa"></td>
+        <td class="td2">$value[filterType]</td>
+        <td class="td2">$value[filterTime]</td>
+        <td class="td2"><input type="checkBox" value="$value[id]" name="display[{$value[id]}]" $value[display] /></td>
+        <td class="td2"><a href="$basename&action=hotEdit&hotId=$value[id] ">[操作]</a></td>
+        </td>
+      </tr>
+<!-- 
+EOT;
+}}}}print <<<EOT
+ -->
+    </table>
+    </div>
+    <div class="mb10 tac">
+    <span class="btn"><span><button type="submit">提 交</button></span></span>
+    <span class="bt"><span><button type="button" name="default" onclick="javascript:location.href='$basename&action=hotTypeSet&updateAll=default'">恢复默认</button></span></span>
+   </div>
+  </form>
+<!--
+EOT;
+}if($action=="hotEdit"){print <<<EOT
+-->
+<div class="nav3 mb10">
+  <ul class="cc">
+    <li><a href="$basename">基本设置</a></li>
+    <li class="current"><a href="$basename&action=hotTypeSet">排行类型设置</a></li>
+  </ul>
+</div>
+  <form action="$basename&action=hotEdit" method="post">
+    <input type="hidden" name="updateHot" value="updateHot" />
+    <input type="hidden" name="id" value="$rt[id]"/>
+    <input type="hidden" name="currentFilterType" value="$filterTypeData[current]"/>
+    <input type="hidden" name="currentFilterTime" value="$filterTimeData[current]"/>
+    <input type="hidden" name="tag" value="$rt[tag]"/>
+    <h2 class="h1"><span class="mr20">显示设置</span><span class="linka">(提示：默认显示条数为20，如果设置的显示条数大于20或者为空，则默认显示20条)</span></h2>
+    <div class="admin_table mb10">
+    <table width="100%" cellspacing="0" cellpadding="0">
+      <tr class="tr1 vt">
+        <td class="td1">类型名称</td>
+        <td class="td2"><input type="text" size="20" name="typeName" value="$rt[type_name]" class="input" /></td>
+      </tr>
+      <tr class="tr1 vt">
+        <td class="td1">启用</td>
+        <td class="td2"><input type="checkbox" name="active" value="1" $active/></td>
+      </tr>
+      <tr class="tr1 vt">
+        <td class="td1">显示在热榜首页</td>
+        <td class="td2"><input type="checkbox" name="display" value="1" $display/></td>
+      </tr>
+<!--
+EOT;
+if(!$htmlFilterType && !$htmlFilterTime && $rt['parent_id']){print <<<EOT
+-->
+      <tr class="tr1 vt">
+        <td class="td1">设置显示条数</td>
+        <td class="td2"><input type="text" name="itemsCount" value="$itemsCount" class="input input_wa mr5"/>条</td>
+      </tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+	</table>
+</div>
+<!-- 
+EOT;
+if($htmlFilterType){
+print <<< EOT
+-->
+	<h2 class="h1"><span class="mr20">筛选类别</span><span class="linka">(提示：如果全不选，保存为当前首选项)</span></h2>
+	<div class="admin_table mb10">
+    	<table width="100%" cellspacing="0" cellpadding="0">
+<!--
+EOT;
+foreach($htmlFilterType as $key => $value){
+print <<< EOT
+-->
+                <tr class="tr1 vt">
+                  <td class="td2" width="30"><input type="checkBox" name="fFilterType[]" value="$value[fAction]" $value[checked] /></td>
+                  <td class="td2" width="140">$value[typeName]</td>
+                  <td class="td2" width="30">显示</td>
+                  <td class="td2"><input type="text" class="input input_wc mr5"  name="$value[itemName]" value="$value[itemValue]"/>条</td>
+                </tr>
+<!-- 
+EOT;
+}print <<< EOT
+-->
+           </table>
+      </div>
+<!-- 
+EOT;
+}print <<< EOT
+-->
+<!-- 
+EOT;
+if($htmlFilterTime){
+print <<< EOT
+-->
+		<h2 class="h1"><span class="mr20">筛选时间</span><span class="linka">（提示：如果全不选，保存为当前首选项）</span></h2>
+        <div class="admin_table mb10">
+    		<table width="100%" cellspacing="0" cellpadding="0">
+<!--
+EOT;
+foreach($htmlFilterTime as $key => $value){
+print <<< EOT
+-->
+                <tr class="tr1 vt">
+                  <td class="td2" width="30"><input type="checkBox" name="fFilterTime[]" value="$value[fAction]" $value[checked] /></td>
+                  <td class="td2" width="140">$value[typeName]</td>
+                  <td class="td2" width="30">显示</td>
+                  <td class="td2"><input type="text" class="input input_wc mr5" name="$value[itemName]" value="$value[itemValue]"/>条</td>
+                </tr>
+<!-- 
+EOT;
+}print <<< EOT
+-->
+        </table>
+    </div>
+<!-- 
+EOT;
+}print <<< EOT
+-->
+    <div class="mb10 tac">
+    <span class="btn"><span><button type="submit">提 交</button></span></span>
+   </div>
+  </form>
+<!--
+EOT;
+}include_once PrintEot('adminbottom');
+?>-->

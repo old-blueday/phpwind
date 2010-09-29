@@ -1,0 +1,793 @@
+<!--<?php
+class spaceModelTemplate {
+
+	var $space = array();
+
+	function spaceModelTemplate(&$space) {
+		$this->space =& $space;
+	}
+
+	function getAppById($app,$appid){
+		$appInfo = array();
+		foreach($app as $key=>$value){
+			if($value['appid'] == $appid ){
+				$appInfo = $value;
+				break;
+			}
+		}
+		return $appInfo;
+	}
+
+	function getApps($app,$appids){
+		global $db_server_url;
+		$li = '';
+		foreach($appids as $key => $value){
+			$appinfo = $this->getAppById($app,$value['appid']);
+			!empty($appinfo) && $li .= "<li><img src='$db_server_url/images/icon/s{$appinfo[appid]}.png' class='mr5' /><a href='apps.php?id={$appinfo[appid]}'>{$appinfo[appname]}</a></li>";
+		}
+		return $li;
+	}
+
+	function info($value) {//个人资料模块
+    	global $isGM, $db_adminfile, $db_menuinit,$db_showonline,$imgpath,$db_appifopen,$db_siteappkey;
+	    /*** userapp **/
+		$app_array = array();
+		$appclient = L::loadClass('appclient');
+		$app_array = $appclient->userApplist($this->space['uid']);
+        
+        $attentionService = L::loadClass('Attention', 'friend'); /* @var $attentionService PW_Attention */
+		$isAttention = $attentionService->isFollow($GLOBALS['winduid'], $this->space['uid']);
+        settype($this->space['follows'], "integer");
+        settype($this->space['fans'], "integer");
+        settype($this->space['visits'], "integer");
+		/*** userapp **/
+print<<<EOT
+-->
+<div id="space_info" class="boxA">
+	<h2 style="display:none;"></h2>
+	<div class="face tac mb5"><img src="$value[faceurl]" width="120" height="120" /></div>
+	<p class="tac lh_24 mb5"><strong class="f14 b">{$this->space['username']}</strong><!--
+EOT;
+		if ($db_showonline) {
+			if (checkOnline($value['thisvisit'])){print <<<EOT
+--><img src="$imgpath/online.png" title="在线" alt="在线" style="vertical-align:middle" /><!--
+EOT;
+			} else {
+print<<<EOT
+--><img src="$imgpath/stealth.png" title="离线" alt="离线" style="vertical-align:middle" />
+<!--
+EOT;
+			}
+		}
+print <<<EOT
+-->
+	</p>
+	<p class="mb5">{$this->space['honor']}</p>
+	<ul class="cc ulInfoA">
+		<li class="none"><a href="javascript:;" hidefocus="true" style="cursor:default;"><em>{$this->space['follows']}</em>关注</a></li><li><a href="javascript:;" hidefocus="true" style="cursor:default;"><em>{$this->space['fans']}</em>被关注</a></li><li><a href="javascript:;" hidefocus="true" style="cursor:default;"><em>{$this->space['visits']}</em>累计访客</a></li>
+	</ul>
+<!--
+EOT;
+		if (!$this->space['isMe']) {print <<<EOT
+-->
+	<div class="cc mb5 tac pd5 bgA">
+<!--
+EOT;
+			if (!$isAttention) {print <<<EOT
+--><a href="javascript:;" onclick="Attention.add(this,'{$this->space['uid']}',0)" class="follow">加关注</a>
+<!--
+EOT;
+			} else {print <<<EOT
+--><a href="javascript:;" class="following gray">关注中</a>，<a href="javascript:;" class="s7" onclick="pwConfirm('是否取消关注？',this,function(){Attention.del('{$this->space['uid']}')})">取消</a>
+<!--
+EOT;
+			}print <<<EOT
+-->
+	</div>
+	<ul class="appList cc">
+		<li><img src="u/images/space/si_1.png" class="mr5" /><!--
+EOT;
+			if ($GLOBALS['newSpace']->isFriend($GLOBALS['winduid'])) {print <<<EOT
+-->
+			<a href="javascript:;" onclick="pwConfirm('是否确认解除?',this,function(){delFriend('{$this->space['uid']}')});">解除好友</a>
+			<script src="u/js/friend.js"></script><!--
+EOT;
+			} else {print <<<EOT
+-->
+			<a href="pw_ajax.php?action=addfriend&touid={$this->space['uid']}" onclick="return ajaxurl(this);">加为好友</a>
+<!--
+EOT;
+			}print <<<EOT
+-->
+		</li>
+<!--
+EOT;
+			$li = '';
+			$displayApp = array(
+					array('appid'=>2),
+					array('appid'=>6),
+			);
+			if ($db_appifopen && $db_siteappkey){
+				$li = $this->getApps($app_array,$displayApp);
+			}
+print <<<EOT
+-->
+		<!-- <li><img src="u/images/space/si_5.png" class="mr5" /><a href="javascript:;" id="share_user" onclick="sendmsg('operate.php?action=share&ajax=1&type=user&id={$this->space['uid']}','',this.id);">分享用户</a></li> -->
+		$li
+		<li><img src="u/images/space/si_6.png" class="mr5" /><a href="pw_ajax.php?action=msg&touid={$this->space['uid']}" onclick="return ajaxurl(this);">发消息</a></li>
+		
+		<li><img src="u/images/space/report.png" class="mr5" /><a id="report_user" href="javascript:;" onclick="sendmsg('pw_ajax.php?action=report&type=user&tid={$this->space['uid']}','',this.id);">举报</a></li>
+	</ul>
+<!--
+EOT;
+		}
+		print <<<EOT
+-->
+	<div class="line"></div>
+	<ul>
+		<li><span>等级：</span><span class="s5">{$value['memtitle']}</span></li>
+<!--
+EOT;
+		if ($value['systitle']) {print <<<EOT
+-->
+		<li><span>身份：</span><span class="s5">{$value['systitle']}</span></li>
+<!--
+EOT;
+		}print <<<EOT
+-->
+		<li><span>总积分：</span><span class="s2 b">{$value['totalcredit']}</span></li>
+	</ul>
+<!--
+EOT;
+		if ($GLOBALS['newSpace']->viewRight('index')) {print <<<EOT
+-->
+	<div class="line"></div>
+	<ul class="mb5">
+		<li class="s5"><!--
+EOT;
+			if ($value['gender'] == 1) {print <<<EOT
+-->
+			男
+<!--
+EOT;
+			} elseif ($value['gender'] == 2) {print <<<EOT
+-->
+			女
+<!--
+EOT;
+			} else {print <<<EOT
+-->
+			保密
+<!--
+EOT;
+			}print <<<EOT
+-->，{$value['bday']}
+		</li>
+<!--
+EOT;
+			if ($value['location']) {print <<<EOT
+-->
+		<li class="s5">
+			{$value['location']}
+		</li>
+<!--
+EOT;
+			}print <<<EOT
+-->
+	</ul>
+	<p class="gray mb5">最后登录：{$value[lastvisit_s]}</p>
+	<p class="cc">
+		<span class="fr"><a class="s6" href="u.php?a=info&uid={$this->space[uid]}">更多资料</a></span>
+<!--
+EOT;
+			if ($isGM) {
+			$db_menuinit .= ",'td_spaceAmdin' : 'menu_spaceAmdin'";
+			$tmpName = rawurlencode($this->space['username']);
+print <<<EOT
+-->
+		<a href="javascript:;" id="td_spaceAmdin">[管理快捷方式]</a>
+		<div class="pw_menu" style="position:absolute;display:none;" id="menu_spaceAmdin">
+			<ul class="menu-half cc" style="width:16em;">
+				<li><a href="{$db_adminfile}?adminjob=setuser&action=edit&uid={$this->space['uid']}" target="_blank">编辑用户</a></li>
+				<li><a href="{$db_adminfile}?adminjob=banuser&username={$tmpName}" target="_blank">会员禁言</a></li>
+				<li><a href="{$db_adminfile}?adminjob=superdel&admintype=article&action=deltpc&fid=-1&ifkeep=1&author={$tmpName}&lines=30&ttable=auto" target="_blank">删除主题</a></li>
+				<li><a href="{$db_adminfile}?adminjob=thread&action=replylist&author={$tmpName}&nums=30" target="_blank">删除回复</a></li>
+				<li><a href="{$db_adminfile}?adminjob=superdel&admintype=delmember&action=del&schname={$tmpName}&groupid={$this->space['groupid']}&regdate=all&schlastvisit=all&item=14" target="_blank">清除用户</a></li>
+			</ul>
+		</div>
+	</p>
+<!--
+EOT;
+			}
+		}print <<<EOT
+-->
+</div>
+<!--
+EOT;
+	}
+
+	function photos($value) {//相册
+print <<<EOT
+-->
+<div class="boxA" id="space_photos">
+	<h2>
+<!--
+EOT;
+if ($value) {print <<<EOT
+-->
+		<em><a href="apps.php?q=photos&uid={$this->space['uid']}">更多</a></em>
+<!--
+EOT;
+}print <<<EOT
+-->
+		<span>相册</span>
+	</h2>
+<!--
+EOT;
+if ($value) {print <<<EOT
+-->
+	<div class="g_listA">
+		<ul class="cc">
+<!--
+EOT;
+foreach ($value as $k => $v) {print <<<EOT
+-->
+			<li class="fl"><a href="apps.php?q=photos&a=view&pid=$v[pid]&uid={$this->space['uid']}" class="aimg"><img src="$v[path]" /></a></li>
+<!--
+EOT;
+}print <<<EOT
+-->
+		</ul>
+	</div>
+<!--
+EOT;
+} else {print <<<EOT
+-->
+	<div class="p10 f14">暂无照片！</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+</div>
+<!--
+EOT;
+}
+	function friend($value) {//好友
+print <<<EOT
+-->
+<div class="boxA" id="space_friend">
+	<h2>
+<!--
+EOT;
+		if ($value) {print <<<EOT
+-->
+		<em><a href="u.php?a=friend&uid={$this->space['uid']}">更多</a></em>
+<!--
+EOT;
+		}print <<<EOT
+-->
+		<span>朋友</span>
+	</h2>
+<!--
+EOT;
+		if ($value) {print <<<EOT
+-->
+	<div class="p10 spFriend">
+<!--
+EOT;
+			foreach ($value as $k => $v) {print <<<EOT
+-->
+		<table width="100%" class="mb15" style="table-layout:fixed;">
+			<tr class="vt">
+				<td width="60">
+					<a href="u.php?uid=$v[uid]" class="img_50"><i><img src="$v[icon]" width="48" height="48" /></i></a>
+				</td>
+				<td>
+					<p class="mb10">
+						<a href="u.php?uid=$v[uid]" class="b f14">$v[username]</a><!--
+EOT;
+				if ($GLOBALS['db_showonline'] && $v['thisvisit'] + $GLOBALS['db_onlinetime']*1.5 > $GLOBALS['timestamp']) {print <<<EOT
+--><img src="images/online.png" alt="在线" title="在线" style="vertical-align:middle" />
+<!--
+EOT;
+				} else {print <<<EOT
+--><img src="images/stealth.png" alt="离线" title="离线" style="vertical-align:middle" />
+<!--
+EOT;
+				}
+print <<<EOT
+-->
+					</p>
+					<p class="lh_18">$v[honor]</p>
+				</td>
+			</tr>
+		</table>
+<!--
+EOT;
+			}print<<<EOT
+-->
+	</div>
+<!--
+EOT;
+		} else {print <<<EOT
+-->
+	<div class="p10 f14">暂无朋友！</div>
+<!--
+EOT;
+		}
+print <<<EOT
+-->
+</div>
+<!--
+EOT;
+	}	
+
+	function article($value) {//帖子
+print <<<EOT
+-->
+<div class="boxA" id="space_article">
+	<h2>
+<!--
+EOT;
+		if ($value) {print <<<EOT
+-->
+		<em><a href="apps.php?q=article&uid={$this->space['uid']}">更多</a></em>
+<!--
+EOT;
+		}print <<<EOT
+-->
+		<span>帖子</span>
+	</h2>
+<!--
+EOT;
+		if ($value) {print <<<EOT
+-->
+	<div class="">
+		<ul class="ulA">
+<!--
+EOT;
+			foreach ($value as $v) {print <<<EOT
+-->
+			<li><span class="fr">$v[postdate]</span><a href="read.php?tid=$v[tid]">$v[subject]</a></li>
+<!--
+EOT;
+			}
+print <<<EOT
+-->
+		</ul>
+	</div>
+<!--
+EOT;
+		} else {print <<<EOT
+-->
+	<div class="p10 f14">暂无帖子！</div>
+<!--
+EOT;
+		}print <<<EOT
+-->
+</div>
+<!--
+EOT;
+	}
+
+	function weibo($value) {//新鲜事
+		include_once PrintEot("writesmile");
+print <<<EOT
+-->
+<div class="boxA" id="space_weibo">
+	<h2>
+<!--
+EOT;
+		if (!empty($value)) {print <<<EOT
+-->
+		<em><a href="apps.php?q=weibo&uid={$this->space['uid']}">更多</a></em>
+<!--
+EOT;
+		}print <<<EOT
+-->
+		<span>新鲜事</span>
+	</h2>
+<!--
+EOT;
+		if (!empty($value)) {
+			require_once uTemplate::printEot('weibo_model');
+			$weiboModelTemplate->photoPop();
+			$weiboService = L::loadClass('weibo', 'sns');
+print <<<EOT
+-->
+	<script language="javascript">var transmitAction = 'my';</script>
+	<script type="text/javascript" src="js/pw_weibo.js"></script>
+	<script type="text/javascript" src="apps/weibo/js/post.js"></script>
+	<div class="spaceSideB">
+	<div class="conFeed" id="weiboFeed">
+<!--
+EOT;
+			foreach ($value as $key => $v) {
+				$method = $weiboService->getType($v['type']);
+				$weiboModelTemplate->$method($v);
+			}
+print <<<EOT
+-->
+	</div>
+	</div>
+<!--
+EOT;
+		} else {print <<<EOT
+-->
+	<div class="p10 f14">这家伙好懒，一条新鲜事都没留下！</div>
+<!--
+EOT;
+		}print <<<EOT
+-->
+</div>
+<!--
+EOT;
+	}
+
+	function colony($value) {//群组
+print <<<EOT
+-->
+<div class="boxA" id="space_colony">
+	<h2>
+<!--
+EOT;
+		if ($value) {print <<<EOT
+-->
+		<em><a href="apps.php?q=groups&uid={$this->space['uid']}">更多</a></em>
+<!--
+EOT;
+		}
+print <<<EOT
+-->
+		<span>群组</span>
+	</h2>
+<!--
+EOT;
+		if ($value) {print <<<EOT
+-->
+	<div class="p10">
+		<div class="dlC colony cc">
+<!--
+EOT;
+			foreach ($value as $v) {print <<<EOT
+-->
+			<dl class="cc dl mb10">
+				<dt class="dt">
+					<a class="img_50" href="apps.php?q=group&cyid=$v[id]"><i><img width="48" height="48" src="$v[cnimg]" /></i></a>
+				</dt>
+				<dd class="dd">
+					<p class="titleB"><a class="mr10 f14" href="apps.php?q=group&cyid=$v[id]">$v[cname]</a></p>
+					<p>$v[descrip]</p>
+					<p>
+						<span class="mr15">分类：{$v[stylename]}</span>
+						<span class="mr15">成员：$v[members]</span>
+						<span class="mr20">积分：$v[colonyNums]</span>
+						<span>创建：$v[createtime]</span>
+					</p>
+				</dd>
+			</dl>
+<!--
+EOT;
+			}
+print <<<EOT
+-->
+		</div>
+	</div>
+<!--
+EOT;
+		} else {print <<<EOT
+-->
+	<div class="p10 f14">还没有加入群组！</div>
+<!--
+EOT;
+		}
+print <<<EOT
+-->
+</div>
+<!--
+EOT;
+	}
+
+	function messageboard($value) {//留言板
+    	global $db_charset,$imgpath,$stylepath;
+print <<<EOT
+-->
+<script language="JavaScript" src="js/app_comment.js"></script>
+<script language="JavaScript" src="u/js/board.js"></script>
+<div class="boxA" id="space_messageboard">
+    <h2>
+<!--
+EOT;
+		if ($value[0]) {print <<<EOT
+-->
+		<em><a href="u.php?a=board&uid={$this->space['uid']}">更多</a></em>
+<!--
+EOT;
+		}
+print <<<EOT
+-->
+		<span>留言板</span>
+	</h2>
+	<div id="board_container" class="p10">
+		<form method="post" name="FORM" action="apps.php?q=ajax&a=commreply" onsubmit="return false;">
+		<div class="minieitor_pw cc">
+			<ul class="miniUl">
+				<li><a href="javascript:" title="插入url链接" class="milink_pw" onClick="createLinkBox();" id="createlinkid">插入url链接</a></li>
+				<li><a href="javascript:" title="添加表情" class="mishow_pw" id="td_face" onClick="showDefault();resetPos(this);" unselectable="on">添加表情</a></li>
+			</ul>
+			<div class="minitextarea">
+				<textarea maxlength="200" id="board" name="atc_content"></textarea>
+				<input type="hidden" id="board_uid" value="$GLOBALS[uid]" />
+				<div class="c"></div>
+			</div>
+			<div class="c"></div>
+		</div>
+		<span class="btn" style="margin:0;"><span><button type="submit" onclick="postBoard();">留言</button></span></span>
+		<div id="linkbox" style="display:none;"></div>
+		</form>
+		<div class="mb10 c">&nbsp;</div>
+		<div class="dlA">
+			<div id="createboardbox"></div>
+<!--
+EOT;
+		foreach ($value[0] as $value1) { print <<<EOT
+-->
+			<dl class="cc dl" id="board_{$value1[id]}">
+				<dt class="dt"><a href="u.php?uid=$value1[uid]" class="img_50"><i><img src="$value1[face]" /></i></a></dt>
+				<dd class="dd">
+<!--
+EOT;
+			if ($value1['uid']==$GLOBALS['winduid'] || $GLOBALS['winduid'] == $this->space['uid'] || $GLOBALS['groupid']==3) { print <<<EOT
+-->
+					<a href="javascript:;" onclick="pwConfirm('是否确定删除本条留言',this,function(){delBoard('$value1[id]')})" title="删除" class="adel">删除</a>
+<!--
+EOT;
+			} print <<<EOT
+-->
+					<p class="title"><a href="u.php?uid=$value1[uid]" class="atitle">$value1[username]：</a>$value1[title]</p>
+					<cite class="gray">$value1[postdate]</cite><span> - </span>
+<!--
+EOT;
+			if ($value1['uid']==$GLOBALS['winduid'] || $GLOBALS['winduid'] == $this->space['uid'] || $GLOBALS['groupid']==3) { print <<<EOT
+-->
+					<a href="javascript:;" onclick="PW_Comment.createCommentInput('board',$value1[id],0)" class="reA s7">回复</a>
+<!--
+EOT;
+			} print <<<EOT
+-->
+					<div id="commentbox_$value1[id]_0">
+						<div id="subcommentlist_board_{$value1[id]}">
+<!--
+EOT;
+			if ($value[1][$value1['id']]) {
+				foreach ($value[1][$value1['id']] as $comment) {print <<<EOT
+-->
+							<dl class="cc dl2" id="comment_{$comment[id]}">
+								<dt><a href="u.php?uid=$comment[uid]"><img src="$comment[face]" width="30" height="30" /></a></dt>
+								<dd>
+			                                 			
+<!--
+EOT;
+					if ($comment['uid'] == $GLOBALS['winduid'] || $GLOBALS['groupid'] == 3) {print <<<EOT
+-->
+									<a href="javascript:;" class="adel" onclick="pwConfirm('是否确定删除本条评论',this,function(){ajax.send('apps.php?q=ajax&a=commdel','id=$comment[id]',PW_Comment.delOneCommentResponse);});" >删除</a>
+<!--
+EOT;
+					}print <<<EOT
+-->
+									<p class="mb5 f14"><a href="u.php?uid=$comment[uid]">$comment[username]</a>：$comment[title]</p>
+									<cite class="gray">$comment[postdate]</cite>
+								</dd>
+							</dl>
+<!--
+EOT;
+				}
+			}
+print <<<EOT
+-->									
+						</div>
+						<div id="comment_input_board_{$value1[id]}_0" style="display:none;">
+							<dl class="cc dl2"><dd style="padding-left:0;"><input type="text" id="comm_input_board_{$value1[id]}_0" class="input input_wb" name="title" maxlength="200" /><span class="btn2"><span><button  type="button" onclick="PW_Comment.sendComment('board','$value1[id]','0','4');">回复</button></span></span></dd></dl>
+						</div>
+					</div>
+				</dd>
+			</dl>
+<!--
+EOT;
+		}print <<<EOT
+-->
+		</div>
+	</div>
+</div>
+ <script language="javascript">
+var charset = '$db_charset';
+var imgpath   = '$imgpath';
+var stylepath = '$stylepath';
+function addsmile(NewCode){
+	getObj('board').value += ' [s:'+NewCode+'] ';
+}
+function resetPos(o){
+	$('pw_box').style.top = o.getBoundingClientRect().top+ietruebody().scrollTop-227+'px'
+}
+</script>
+<!--
+EOT;
+		if (R_P == D_P) {print <<<EOT
+-->
+<script language="JavaScript" src="data/bbscache/face.js"></script>
+<!--
+EOT;
+		} else {
+			$facedb=readover(D_P."data/bbscache/face.js");
+print <<<EOT
+-->
+<script language="JavaScript">
+$facedb
+</script>
+<!--
+EOT;
+		}
+print <<<EOT
+-->
+<script language="JavaScript" src="js/post.js"></script>
+<div id="menu_face" class="menu" style="display:none;"></div>
+<!--
+EOT;
+	}
+
+	function diary($value) {//日志列表
+print <<<EOT
+-->
+<div class="boxA" id="space_diary">
+	<h2>
+<!--
+EOT;
+		if ($value) {print <<<EOT
+-->
+		<em><a href="apps.php?q=diary&uid={$this->space['uid']}">更多</a></em>
+<!--
+EOT;
+		}print <<<EOT
+-->
+		<span>日志</span>
+	</h2>
+<!--
+EOT;
+		if ($value) {print <<<EOT
+-->
+	<div class="p10 space_diary">
+		<div class="dlB">
+<!--
+EOT;
+			foreach ($value as $k => $v) {
+				$dtid = !$v['dtid'] ? '-1' : $v['dtid'];
+				$typename = !$v['name'] ? '默认分类' : $v['name'];
+print <<<EOT
+-->
+			<dl class="dl">
+				<dt class="dt"><a href="apps.php?q=diary&a=detail&did=$v[did]&uid=$v[uid]" class="f16 b">$v[subject]</a></dt>
+				<dd class="dd">
+					<p class="mb10">
+						<span class="mr10">$v[content]</span>
+						<a href="apps.php?q=diary&a=detail&did=$v[did]&uid=$v[uid]" class="f12 s7">阅读全文&raquo;</a>
+					</p>
+					<cite><a href="apps.php?q=diary&uid=$v[uid]&dtid=$dtid" class="s7">$typename</a> - $v[postdate]</cite>
+				</dd>
+			</dl>
+<!--
+EOT;
+			}print <<<EOT
+-->
+		</div>
+	</div>
+<!--
+EOT;
+		} else {print <<<EOT
+-->
+	<div class="p10 f14">暂无日志！</div>
+<!--
+EOT;
+		}print <<<EOT
+-->
+</div>
+<!--
+EOT;
+	}
+
+	function visitor($value) {//最近访客
+print <<<EOT
+-->
+<div class="boxA" id="space_visitor">
+	<h2><span>最近访客</span></h2>
+<!--
+EOT;
+		if ($value) {print <<<EOT
+-->
+	<div class="ulB">
+		<ul class="cc">
+<!--
+EOT;
+			foreach ($value as $v) {
+				if (is_array($v)) {print <<<EOT
+-->
+			<li>
+				<a href="u.php?uid=$v[uid]" class="i"><img src="$v[icon]" width="48" height="48" /></a>
+				<p class="n"><a href="u.php?uid=$v[uid]">$v[username]</a></p>
+				<p class="lh_18">$v[honor]</p>
+<!--
+EOT;
+					if ($this->space['uid'] == $GLOBALS['winduid']) {print <<<EOT
+-->
+				<p class="t gray" title="$v[visittime_s]"><a href="u.php?uid=$v[uid]" class="fr s7">回访</a>$v[visittime]</p>
+<!--
+EOT;
+					}
+print <<<EOT
+-->
+			</li>
+<!--
+EOT;
+				}
+			}print <<<EOT
+-->
+		</ul>
+	</div>
+<!--
+EOT;
+		} else {print <<<EOT
+-->
+	<div class="p10 f14">暂无访客！</div>
+<!--
+EOT;
+		}print <<<EOT
+-->
+</div>
+<!--
+EOT;
+	}
+
+	function visit($value) {//访问过
+print <<<EOT
+-->
+<div class="boxA" id="space_visit">
+	<h2><span>访问过</span></h2>
+<!--
+EOT;
+		if ($value) {print <<<EOT
+-->
+	<div class="ulB">
+		<ul class="cc">
+<!--
+EOT;
+			foreach ($value as $v) {
+				if (is_array($v)) {print <<<EOT
+-->
+			<li>
+				<a href="u.php?uid=$v[uid]" class="i"><img src="$v[icon]" width="48" height="48" /></a>
+				<p class="n"><a href="u.php?uid=$v[uid]">$v[username]</a></p>
+				<p class="lh_18">$v[honor]</p>
+				<p class="t gray" title="$v[visittime_s]">$v[visittime]</p>
+			</li>
+<!--
+EOT;
+				}
+			}print <<<EOT
+-->
+		</ul>
+	</div>
+<!--
+EOT;
+		} else {print <<<EOT
+-->
+	<div class="p10 f14">暂无访问他人空间！</div>
+<!--
+EOT;
+		}print <<<EOT
+-->
+</div>
+<!--
+EOT;
+	}
+}
+$spacetemplate = new spaceModelTemplate($space);
+?>

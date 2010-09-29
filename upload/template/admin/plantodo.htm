@@ -1,0 +1,433 @@
+<!--<?php
+include_once PrintEot('left');
+if (empty($action)){print <<<EOT
+-->
+<div class="admin_info mb10">
+	<h2 class="h1"><b>提示信息</b></h2>
+	<div class="legend">
+		<ol>
+			<li>计划任务是一项使系统在规定时间自动执行某些特定任务的功能</li>
+<li>合理设置执行时间，能有效地为服务器减轻负担</li><li>对于如“期限头衔自动回收”此类需每天更新的计划任务建议不设置月和周的更新时间，否则对于购买一或几天的头衔的用户可能在一周或者一月内都无法回收头衔</li>
+		</ol>
+	</div>
+</div>
+<form action="$basename&" method="POST" name="FORM">
+	<input type="hidden" name="action" value="unsubmit" />
+	<h2 class="h1">
+		<span class="fl mr10">计划任务管理</span>
+		<a class="btn_add fl" href="$basename&action=add" hidefocus="true"><i>添加计划</i></a>		
+	</h2>
+	<div class="admin_table mb10">
+	<table width="100%" cellspacing="0" cellpadding="0">
+		<tr class="tr2 vt td_bgB">
+			<td width="30"><span onclick="CheckAll(document.FORM)" class="cp">全选</span></td>
+			<td width="180">任务标题</td>
+			<td width="180">任务周期</td>
+			<td width="90">上次执行时间</td>
+			<td width="90">下次执行时间</td>
+			<td>操 作</td>
+		</tr>
+<!--
+EOT;
+if (empty($plandb)) {print <<<EOT
+-->
+<tr><td class="p10" colspan="6"><div class="admin_tips">啊哦，没有你要的信息！</div></td></tr>
+<!--
+EOT;
+}else{
+$cnWeek = array(
+	'1'	=> '星期一',
+	'2'	=> '星期二',
+	'3'	=> '星期三',
+	'4'	=> '星期四',
+	'5'	=> '星期五',
+	'6'	=> '星期六',
+	'7'	=> '星期天',
+);
+foreach($plandb as $key=>$value){
+print <<<EOT
+-->
+		<tr class="tr1 vt">
+<td class="td2">
+<!--
+EOT;
+if($value[id]>7){ print <<<EOT
+-->
+				<input type="checkbox" name="selid[]" value="$value[id]" />
+<!--
+EOT;
+}else{ print <<<EOT
+-->
+				--
+<!--
+EOT;
+} print <<<EOT
+-->
+			</td>
+			<td class="td2">$value[subject]</td>
+			<td class="td2">
+<!--
+EOT;
+if($value['todo'] == 'm') {print <<<EOT
+-->
+				每月&nbsp;$value[month]&nbsp;日&nbsp;$value[day]&nbsp;点&nbsp;$value[hour]&nbsp;分
+<!--
+EOT;
+}elseif($value['todo'] == 'w') {print <<<EOT
+-->
+				每周&nbsp;{$cnWeek[$value[week]]}&nbsp;$value[day]&nbsp;点&nbsp;$value[hour]&nbsp;分
+<!--
+EOT;
+}elseif($value['todo'] == 'd') {print <<<EOT
+-->
+				每天&nbsp;$value[day]&nbsp;点&nbsp;$value[hour]&nbsp;分
+<!--
+EOT;
+}elseif($value['todo'] == 'h') {print <<<EOT
+-->
+				每小时&nbsp;$value[hour]&nbsp;分
+<!--
+EOT;
+}print <<<EOT
+-->
+			</td>
+			<td class="td2">$value[usetime]</td>
+			<td class="td2">$value[nexttime]</td>
+			<td class="td2"><a href="javascript:void(0);" onclick="window.location.href=('$basename&action=planset&id='+$value[id]); return false" title="设置">[设置]</a></td>
+		</tr>
+<!--
+EOT;
+}}print <<<EOT
+-->
+	</table>
+	</div>
+	<div class="tac mb10">
+		<span class="btn"><span><button type="submit" onclick="return check();">删 除</button></span></span>
+	</div>
+</form>
+<script language="JavaScript">
+function check(){
+	if(confirm("确定要删除所选项吗？")){
+		return true;
+	}else{
+		return false;
+	}
+}
+</script>
+<!--
+EOT;
+}elseif($action=='planset'){
+print <<<EOT
+-->
+<form action="$basename&" method="POST">
+	<input type="hidden" name="action" value="planset" />
+	<input type="hidden" name="step" value="3" />
+	<input type="hidden" name="id" value="$id" />
+	<h2 class="h1">
+		<span class="mr10">计划任务设置</span><a href="$basename" class="linka">返回上一级<span class="f9">▲</span></a>
+	</h2>
+	<div class="admin_table mb10">
+	<table width="100%" cellspacing="0" cellpadding="0">
+		<tr class="tr1 vt">
+			<td class="td1">任务标题</td>
+			<td class="td2"><input type="text" name="title" value="$rt[subject]" class="input input_wa" /></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">任务周期</td>
+			<td class="td2">
+				<ul class="list_A">
+					<li><input type="radio" name="todo" onclick="showTodo('mTodo');" $todo_m />月</li>
+					<li><input type="radio" name="todo" onclick="showTodo('wTodo');" $todo_w />周</li>
+					<li><input type="radio" name="todo" onclick="showTodo('dTodo');" $todo_d />日</li>
+					<li><input type="radio" name="todo" onclick="showTodo('hTodo');" $todo_h />时</li>
+				</ul>
+			</td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">具体执行时间</td>
+			<td id="iTodo" class="td2">每月&nbsp;
+				<select name="month">
+					$month
+				</select>
+				&nbsp;日&nbsp;
+				<select name="day">
+					$day
+				</select>
+				&nbsp;点
+				（
+				<select name="hours[]">
+					$hours[0]
+				</select>
+				&nbsp;分　或　
+				<select name="hours[]">
+					$hours[1]
+				</select>
+				&nbsp;分　或　
+				<select name="hours[]">
+					$hours[2]
+				</select>
+				&nbsp;分　或　
+				<select name="hours[]">
+					$hours[3]
+				</select>
+				&nbsp;分）执行
+			</td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">是否开启该计划任务</td>
+			<td class="td2">
+				<ul class="list_A list_80 cc">
+					<li><input type="radio" name="ifopen" value="1" $ifopen_Y>开启</li>
+					<li><input type="radio" name="ifopen" value="0" $ifopen_N>关闭</li>
+				</ul>
+			</td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">执行文件名<br />(在./require/plan/目录下)</td>
+			<td class="td2"><input type="text" class="input" name="filename" value="$rt[filename]"> .php</td>
+		</tr>
+<!--
+EOT;
+if(file_exists(R_P.'template/admin/'.$rt['filename'].'_set.htm')){print <<<EOT
+-->
+		<tr class="tr1 vt">
+			<td class="td1">详细设置</td>
+			<td class="td2"><input type="button" class="btn" value="设置" onclick="window.location=('$basename&action=detail&id=$id')" /></td>
+		</tr>
+<!--
+EOT;
+} print <<<EOT
+-->
+	</table>
+	</div>
+	<div class="tac mb10">
+		<span class="btn"><span><button type="submit">提 交</button></span></span>
+		<span class="bt"><span><button type="reset" value="重 置">重 置</button></span></span>
+	</div>
+</form>
+<table style="display:none">
+	<tbody>
+		<tr class="tr1 vt">
+			<td id="mTodo">每月&nbsp;
+				<select name="month">
+					$month
+				</select>
+				&nbsp;日&nbsp;
+				<select name="day">
+					$day
+				</select>
+				&nbsp;点
+				（
+				<select name="hours[]">
+					$hours[0]
+				</select>
+				&nbsp;分　或　
+				<select name="hours[]">
+					$hours[1]
+				</select>
+				&nbsp;分　或　
+				<select name="hours[]">
+					$hours[2]
+				</select>
+				&nbsp;分　或　
+				<select name="hours[]">
+					$hours[3]
+				</select>
+				&nbsp;分）执行</td>
+			<td id="wTodo">每周&nbsp;
+				<select name="week">
+					<option value="*">*</option>
+					<option value="1" $week_1>星期一</option>
+					<option value="2" $week_2>星期二</option>
+					<option value="3" $week_3>星期三</option>
+					<option value="4" $week_4>星期四</option>
+					<option value="5" $week_5>星期五</option>
+					<option value="6" $week_6>星期六</option>
+					<option value="7" $week_7>星期天</option>
+				</select>
+				&nbsp;
+				<select name="day">
+					$day
+				</select>
+				&nbsp;点
+				（
+				<select name="hours[]">
+					$hours[0]
+				</select>
+				&nbsp;分　或　
+				<select name="hours[]">
+					$hours[1]
+				</select>
+				&nbsp;分　或　
+				<select name="hours[]">
+					$hours[2]
+				</select>
+				&nbsp;分　或　
+				<select name="hours[]">
+					$hours[3]
+				</select>
+				&nbsp;分）执行</td>
+			<td id="dTodo">每天&nbsp;
+				<select name="day">
+					$day
+				</select>
+				&nbsp;点
+				（
+				<select name="hours[]">
+					$hours[0]
+				</select>
+				&nbsp;分　或　
+				<select name="hours[]">
+					$hours[1]
+				</select>
+				&nbsp;分　或　
+				<select name="hours[]">
+					$hours[2]
+				</select>
+				&nbsp;分　或　
+				<select name="hours[]">
+					$hours[3]
+				</select>
+				&nbsp;分）执行</td>
+			<td id="hTodo">每小时&nbsp;
+				<select name="hours[]">
+					$hours[0]
+				</select>
+				&nbsp;分　或　
+				<select name="hours[]">
+					$hours[1]
+				</select>
+				&nbsp;分　或　
+				<select name="hours[]">
+					$hours[2]
+				</select>
+				&nbsp;分　或　
+				<select name="hours[]">
+					$hours[3]
+				</select>
+				&nbsp;分　执行</td>
+		</tr>
+	</tbody>
+</table>
+<script type="text/javascript">
+function showTodo(T) {
+	getObj('iTodo').innerHTML = getObj(T).innerHTML;
+}
+showTodo('{$todo}Todo');
+</script>
+<!--
+EOT;
+}elseif($action=='add'){print <<<EOT
+-->
+<div class="admin_info mb10">
+	<h2 class="h1"><b>提示信息</b></h2>
+	<div class="legend">
+		<ol>
+			
+<li>计划任务是一项使系统在规定时间自动执行某些特定任务的功能</li>
+<li>计划任务与系统核心紧密关联，上传不当的文件可能造成站点无法正常运行</li>
+<li>关于计划任务的添加，您需要上传相应执行文件到 ./require/plan/目录下，如果需要进行详细设置的，还需要上传相应的设置文件和模板文件
+(模板文件上传到 ./template/admin/ 目录下，文件名为 *_set.htm；设置文件上传到 ./require/plan/ 目录下，文件名为 *_set.php)</li>
+		</ol>
+	</div>
+</div>
+<form action="$basename&" method="POST">
+	<input type="hidden" name="action" value="add">
+	<input type="hidden" name="step" value="2">
+	<h2 class="h1">
+		<span class="mr10">添加新的计划任务</span><a href="$basename" class="linka">返回上一级<span class="f9">▲</span></a>
+	</h2>
+	<div class="admin_table mb10">
+	<table width="100%" cellspacing="0" cellpadding="0">
+		<tr class="tr1 vt">
+			<td class="td1">任务标题</td>
+			<td class="td2"><input class="input input_wa" type="text" name="title" size="40"></td>
+		<td class="td2"><div class="help_a"></div></td></tr>
+		<tr class="tr1 vt">
+			<td class="td1">每月几号执行</td>
+			<td class="td2">
+				<select name="month">
+					$month
+				</select>
+			</td><td class="td2"><div class="help_a"></div></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">每周星期几执行</td>
+			<td class="td2">
+				<select name="week">
+					<option value="*">*</option>
+					<option value="1">星期一</option>
+					<option value="2">星期二</option>
+					<option value="3">星期三</option>
+					<option value="4">星期四</option>
+					<option value="5">星期五</option>
+					<option value="6">星期六</option>
+					<option value="7">星期天</option>
+				</select>
+			</td><td class="td2"><div class="help_a"></div></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">每日几点执行</td>
+			<td class="td2">
+				<select name="day">
+					$day
+				</select>
+			</td><td class="td2"><div class="help_a"></div></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">每小时几分钟执行</td>
+			<td class="td2">
+				<select name="hours[]">
+					$hour
+				</select>
+				&nbsp;
+				<select name="hours[]">
+					$hour
+				</select>
+				&nbsp;
+				<select name="hours[]">
+					$hour
+				</select>
+				&nbsp;
+				<select name="hours[]">
+					$hour
+				</select>
+			</td><td class="td2"><div class="help_a"></div></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">开启该计划任务</td>
+			<td class="td2">
+				<ul class="list_A list_80 cc">
+					<li><input type="radio" name="ifopen" value="1" checked>开启</li>
+					<li><input type="radio" name="ifopen" value="0">关闭</li>
+				</ul>
+			</td><td class="td2"> </td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">执行文件名</td>
+			<td class="td2"><input type="text" class="input" name="filename"> .php</td>
+			<td class="td2"><div class="help_a">存放于./require/plan/目录下</div></td>
+		</tr>
+	</table>
+	</div>
+	<div class="tac mb10">
+		<span class="btn"><span><button type="submit">提 交</button></span></span>
+		<span class="bt"><span><button type="reset">重 置</button></span></span>
+	</div>
+</form>
+<!--
+EOT;
+}elseif($action=='detail'){print <<<EOT
+-->
+<div class="nav3 mb10">
+	<ul class="cc">
+		<li class="current"><a href="$basename">计划任务</a></li>
+		<li><a href="$basename&action=add">添加计划</a></li>
+	</ul>
+</div>
+<!--
+EOT;
+if(file_exists(PrintEot($filename.'_set'))){
+include_once PrintEot($filename.'_set');
+}}include_once PrintEot('adminbottom');
+?>-->

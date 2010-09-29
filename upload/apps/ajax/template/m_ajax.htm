@@ -1,0 +1,906 @@
+<!--<?php
+if ($a == 'del') {print <<<EOT
+-->
+<script language="JavaScript" id="o_del">
+function o_del() {
+	var rText = ajax.request.responseText.split('\\t');
+	if (rText[0] == 'del') {
+		getObj('lou_' + rText[1]).parentNode.removeChild(getObj('lou_' + rText[1]));
+	} else if (rText[0] == 'jump') {
+		window.location.href = '{$basename}cyid=$cyid&a=thread';
+	} else {
+		ajax.guide();
+	}
+}
+</script>
+	<form action="{$basename}a=$a&cyid=$cyid" onsubmit="return false;" method="post">
+	<input type="hidden" name="tid" value="$tid" />
+	<input type="hidden" name="step" value="3" />
+	<div style="width:200px;" class="cc">
+		<div class="p10 b f14">您确定要删除该帖吗？</div>
+		<div class="popBottom">
+		<span class="btn2"><span><button type="button" onclick="ajax.submit(this.form,o_del)">删 除</button></span></span>
+		<span class="bt2"><span><button type="button" onclick="closep();">取消</button></span></span>
+		</div>
+	</div>
+	</form>
+<!--
+EOT;
+} elseif ($a == 'edit') {print <<<EOT
+-->
+<script language="JavaScript" id="o_edit">
+function o_edit() {
+	var rText = ajax.request.responseText.split('\\t');
+	if (rText[0] == 'edit') {
+		if (typeof rText[3] == 'undefined') {
+			getObj('read_' + rText[1]).innerHTML = rText[2];
+		} else {
+			getObj('subject_tpc').innerHTML = rText[2];
+			getObj('read_' + rText[1]).innerHTML = rText[3];
+		}
+	} else {
+		ajax.guide();
+	}
+}
+</script>
+	<form action="{$basename}a=$a&cyid=$cyid" onsubmit="return false;" method="post">
+	<input type="hidden" name="tid" value="$tid" />
+	<input type="hidden" name="step" value="3" />
+	<div class="cc" style="width:450px">
+		<div class="pdD"><input class="input input_wb" type="text" name="subject" value="$rt[subject]" /></div>
+		<div class="p10"><textarea name="content" class="textareaA">{$rt[content]}</textarea></div>
+		<div class="popBottom">
+		<span class="btn2"><span><button type="button" onclick="ajax.submit(this.form,o_edit)">提 交</button></span></span>
+		<span class="bt2"><span><button type="button" onclick="closep();">取消</button></span></span>
+		</div>
+	</div>
+	</form>
+<!--
+EOT;
+} elseif ($a == 'join') {print <<<EOT
+-->
+	<form action="{$basename}&a=$a&cyid=$cyid" onsubmit="return false;" method="post">
+	<input type="hidden" name="step" value="3" />
+	<div style="width:200px;">
+		<div class="p10 f14">您确定要加入该群组吗？</div>
+		<div class="popBottom">
+		<span class="btn2"><span><button type="button" onclick="ajax.submit(this.form)">加 入</button></span></span>
+		<span class="bt2"><span><button type="button" onclick="closep();">取消</button></span></span>
+		</div>
+	</div>
+	</form>
+<!--
+EOT;
+} elseif ($a == 'out') {print <<<EOT
+-->
+	<form action="{$basename}&a=$a&cyid=$cyid" onsubmit="return false;" method="post">
+	<input type="hidden" name="step" value="3" />
+	<div style="width:200px;">
+		<div class="p10 f14">
+<!--
+EOT;
+if ($colony['admin'] == $windid) {print <<<EOT
+-->
+			您是该群组的创建者，您确定要解散该群组吗？
+<!--
+EOT;
+} else {print <<<EOT
+-->
+			您确定要退出该群组吗？
+<!--
+EOT;
+}print <<<EOT
+-->
+		</div>
+		<div class="popBottom">
+		<span class="btn2"><span><button type="button" onclick="ajax.submit(this.form)">确 定</button></span></span>
+		<span class="bt2"><span><button type="button" onclick="closep();">取消</button></span></span>
+	</div>
+	</div>
+	</form>
+<!--
+EOT;
+} elseif ($a == 'delalbum') {print <<<EOT
+-->
+	<form action="{$basename}&a=$a&cyid=$cyid" onsubmit="return false;" method="post">
+	<input type="hidden" name="aid" value="$aid" />
+	<input type="hidden" name="step" value="3" />
+	<div style="width:300px;" class="cc">
+		<div class="b f14 p10">删除相册将同时删除所有照片<br />您确定要删除吗？</div>
+		<div class="popBottom">
+		<span class="btn2"><span><button type="button" onclick="ajax.submit(this.form)">删 除</button></span></span>
+		<span class="bt2"><span><button type="button" onclick="closep();">取消</button></span></span>
+	</div>
+	</div>
+	</form>
+<!--
+EOT;
+} elseif ($a == 'editalbum') {print <<<EOT
+-->
+	<form action="{$baseUrl}q=photos&a=editalbum" onSubmit="return false;" method="POST">
+		<input type="hidden" name="step" value="3" />
+		<input type="hidden" name="aid" value="$aid" />
+		<table cellpadding="0" cellspacing="0" width="450px">
+			<tr>
+				<td width="14%" align="right">相册名</td>
+				<td><input type="text" id="ajax_aname" name="aname" value="$albumInfo[aname]" />&nbsp; <span id="ajax_aname_warn">限 24 字节</span></td>
+			</tr>
+			<tr>
+				<td align="right">描述</td>
+				<td>
+					<textarea id="ajax_aintro" name="aintro" style="width:350px;height:70px">{$$albumInfo[aintro]}</textarea>
+					<span id="ajax_aintro_warn" class="fr" style="margin-right:15px;"> 限 255 字节</span>
+				</td>
+			</tr>
+			<tr>
+				<td align="right">可见度</td>
+				<td>
+					<select name="private" onchange="optionsel(this.value);">
+						<option value="0" $select_0>全站用户可见</option>
+						<option value="1" $select_1>仅好友可见</option>
+						<option value="2" $select_2>仅自己可见</option>
+						<option value="3" $select_3>需要密码访问</option>
+					</select>
+<!--
+EOT;
+if($select_3 == 'selected'){print<<<EOT
+-->
+					<span id="resetpwd_$albumInfo[aid]" onclick="resetpwd();" style="cursor:pointer">重设密码</span>
+<!--
+EOT;
+}else{print<<<EOT
+-->
+					<span id="resetpwd_$albumInfo[aid]"></span>
+<!--
+EOT;
+}print <<<EOT
+-->
+				</td>
+			</tr>
+			<tbody id="photo_pwd" style="display:none">
+			<tr>
+				<td align="right">输入密码</td>
+				<td>
+					<input type="password" name="pwd" id="c_ajax_pwdinfo" />&nbsp;<span id="c_ajax_pwdinfo_warn">最小长度:3 最大长度:15</span>
+				</td>
+			</tr>
+			<tr>
+				<td align="right">确认密码</td>
+				<td>
+					<input type="password" name="repwd" id="repwd_info" />
+				</td>
+			</tr>
+			</tbody>
+		</table>
+		<div class="popBottom"><span class="btn2"><span><button type="submit" onclick="ajax.submit(this.form)">编辑相册</button></span></span><span class="bt2"><span><button type="button" onclick="closep();">取消</button></span></span></div>
+	</form>
+<script language="JavaScript">
+var charset = '$db_charset';
+setTimeout(function(){initCheckTextNum('ajax_aname','ajax_aname_warn',24);},300);
+setTimeout(function(){initCheckTextNum('ajax_aintro','ajax_aintro_warn',255);},300);
+function resetpwd() {
+	getObj('resetpwd_$albumInfo[aid]').style.display = 'none';
+	getObj('photo_pwd').style.display = '';
+}
+function optionsel(id) {
+	var pwdobj = getObj('photo_pwd');
+	var resetpwdid = getObj('resetpwd_$albumInfo[aid]');
+	resetpwdid.style.display = 'none';
+	if (isNaN(id)) {
+		showDialog('error','非法操作');
+	}
+	if (id == '3') {
+		pwdobj.style.display = '';
+	} else {
+		pwdobj.style.display = 'none';
+	}
+}
+</script>
+<!--
+EOT;
+} elseif ($a == 'uintro') {print <<<EOT
+-->
+<div style="width:400px;">
+	<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><a class="adel" href="javascript:;" onclick="closep();">关闭</a>通讯资料</div>
+	<table cellpadding="0" cellspacing="0" width="100%">
+		<tr>
+			<td width="30%">用户</td>
+			<td>
+				$uinfo[username]
+<!--
+EOT;
+if ($winduid == $uinfo['uid']) {print <<<EOT
+-->
+				[<a href="{$basename}a=$a&cyid=$cyid&job=set">编辑我的通讯录</a>]
+<!--
+EOT;
+}print <<<EOT
+-->
+			</td>
+		</tr>
+		<tr>
+			<td>真实姓名</td>
+			<td>$uinfo[realname]</td>
+		</tr>
+		<tr>
+			<td>性别</td>
+			<td>
+<!--
+EOT;
+if ($uinfo['gender'] == '1') {print <<<EOT
+-->
+				男
+<!--
+EOT;
+} elseif ($uinfo['gender'] == '2') {print <<<EOT
+-->
+				女
+<!--
+EOT;
+} else {print <<<EOT
+-->
+				保密
+<!--
+EOT;
+}print <<<EOT
+-->
+			</td>
+		</tr>
+		<tr>
+			<td>电话</td>
+			<td>$uinfo[tel]</td>
+		</tr>
+		<tr>
+			<td>邮箱</td>
+			<td>$uinfo[email]</td>
+		</tr>
+		<tr>
+			<td>联系地址</td>
+			<td>$uinfo[address]</td>
+		</tr>
+		<tr>
+			<td>介绍说明</td>
+			<td>$uinfo[introduce]</td>
+		</tr>
+	</table>
+</div>
+<!--
+EOT;
+}elseif($a=='recommend'){print <<<EOT
+-->
+<div class="tal">
+<form method="post" name="FORM" action="operate.php?action=share&ajax=1" onsubmit="return false;">
+<input type="hidden" name="step" value="2" />
+<input type="hidden" name="type" value="$type" />
+<table width="100%" cellspacing="0" cellpadding="5">
+	<tr><th colspan="2" class="h" style="cursor:move" onmousedown="read.move(event);">推荐</th></tr>
+	<tr>
+		<td width="24%" align="center">推荐方式:</td>
+		<td>消息推荐</td>
+	</tr>
+	<tr>
+		<td align="center">对方姓名:</td>
+		<td><input type="text" class="input" name="sendtoname" size="25" value="" />
+<!--
+EOT;
+if($frienddb){print <<<EOT
+-->
+		<span class="bta" onClick="if (getObj('tofriend').style.display=='none'){getObj('tofriend').style.display='';}else{getObj('tofriend').style.display='none';}" style="cursor:pointer;">好友列表</span>
+<!--
+EOT;
+}print <<<EOT
+-->
+		</td>
+	</tr>
+	<tr id="tofriend" style="display:none">
+		<td align="center">好友选择:</td>
+		<td>
+			<div class="fri-list pr">
+							<div class="fri-top">
+								<span class="fr">
+									<select name="friendtype" onchange="showFriendList(this.value);">
+										<option value="-1">全部好友</option>
+<!--
+EOT;
+foreach ($friendtype as $key => $value) {print <<<EOT
+-->
+										<option value="$key">$value[name]</option>
+<!--
+EOT;
+}print <<<EOT
+-->
+									</select>
+								</span>
+								<span class="btn2"><span><button type="submit" onclick="CheckAll(this.form)">全选</button></span></span>
+							</div>
+							<div class="fri-bot" id="friendlist">
+								<ul class="list-wid cc listC">
+<!--
+EOT;
+foreach ($friendtype as $key => $value) {print <<<EOT
+-->
+									<div id="ftid_$value[ftid]">
+<!--
+EOT;
+foreach ($frienddb[$value[ftid]] as $k => $v) {print <<<EOT
+-->
+										<li><input type="checkbox" name="touid[]" value="$v[uid]" {$checked[$v[uid]]}> $v[username]</li>
+<!--
+EOT;
+}print <<<EOT
+-->
+									</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+								</ul>
+							</div>
+						</div>
+<SCRIPT type="text/javascript" LANGUAGE="JavaScript" src="js/core/friendlist.js"></SCRIPT>
+
+		</td>
+	</tr>
+	<tr>
+		<td align="center">标题:</td>
+		<td><input type="text" class="input" name="subject" size="44" value="&quot;{$windid}&quot;$atc_name" /></td>
+	</tr>
+	<tr><td align="center">内容:</td>
+		<td>
+<!--
+EOT;
+if($type == 'user') {print <<<EOT
+-->
+					<textarea rows="6" style="width:300px" name="atc_content" onkeydown="ajax.quickpost(event,this.form)">我很喜欢用户[url={$db_bbsurl}/u.php?uid={$uid}]{$username}[/url]的个人空间，特别推荐。\n\n他（她）的用户名:\n$title\n\n希望你能喜欢。</textarea>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+					<textarea rows="6" style="width:300px" name="atc_content" onkeydown="ajax.quickpost(event,this.form)">
+EOT;
+$uid || $uid = $u;print <<<EOT
+我在用户[url={$db_bbsurl}/u.php?uid={$uid}]{$username}[/url]的个人空间发现这个信息，认为很有价值，特别推荐。\n\n主要信息:\n$title\n\n描述:\n$descrip\n\n希望你能喜欢。</textarea>
+<!--
+EOT;
+}print <<<EOT
+-->
+		</td>
+	</tr>
+</table><ul><li style="text-align:center;padding:5px 0;">
+<span class="btn2"><span><button type="button" name="ajaxsubmit" style="width:80px;" onclick="ajax.submit(this.form);">提 交</button></span></span>
+<span class="bt2"><span><button type="button" onclick="closep();">取消</button></span></span>
+</li></ul></form>
+</div>
+<script language="javascript">
+var ifcheck = true;
+function CheckAll(form,match) {
+	for (var i = 0; i < form.elements.length; i++) {
+		var e = form.elements[i];
+		if (e.type == 'checkbox' && (typeof match == 'undefined' || e.name.match(match))) {
+			e.checked = ifcheck;
+		}
+	}
+	ifcheck = ifcheck == true ? false : true;
+}
+</script>
+<!--
+EOT;
+} elseif ($a == 'feedsetting') {print <<<EOT
+-->
+<form action="{$baseUrl}q=ajax&a=feedsetting" onSubmit="return false;" method="POST">
+	<input type="hidden" name="step" value="2" />
+	<div class="fri-list pr" style="border:0;">
+		<div class="popTop cc">
+			<span class="fr f12">
+				<select name="friendtype" onchange="showFriendList(this.value);">
+					<option value="-1">全部好友</option>
+<!--
+EOT;
+foreach ($friendtype as $key => $value) {print <<<EOT
+-->
+					<option value="$key">$value[name]</option>
+<!--
+EOT;
+}print <<<EOT
+-->
+				</select>
+			</span>
+			<span class="f12">
+			<span class="bt2"><span><button type="submit" onclick="CheckAll(this.form)">全选</button></span></span>
+			<span class="btn2"><span><button type="submit" onclick="ajax.submit(this.form)">确定</button></span></span>
+			<span class="bt2"><span><button type="button" onclick="closep();">取消</button></span></span>
+			</span>
+		</div>
+	<div class="fri-bot" id="friendlist">
+	<div>
+<!--
+EOT;
+foreach ($friendtype as $key => $value) {print <<<EOT
+-->
+						<ul id="ftid_$value[ftid]">
+<!--
+EOT;
+foreach ($frienddb[$value[ftid]] as $k => $v) {print <<<EOT
+-->
+								<li><label><input type="checkbox" name="selid[]" value="$v[uid]" {$checked[$v[uid]]}> $v[username]</label></li>
+<!--
+EOT;
+}print <<<EOT
+-->
+						</ul>
+<!--
+EOT;
+}print <<<EOT
+-->
+	</div>
+</div>
+</div>
+</form>
+<SCRIPT type="text/javascript" LANGUAGE="JavaScript" src="js/core/friendlist.js"></SCRIPT>
+
+<!--
+EOT;
+}elseif ($a == 'copydiary') {print <<<EOT
+-->
+	<form action="{$baseUrl}q=diary&a=copydiary" onSubmit="return false;" method="POST">
+		<input type="hidden" name="step" value="2" />
+		<input type="hidden" name="did" value="$did" />
+		<table cellpadding="0" cellspacing="0" width="350px">
+			<tr>
+				<td colspan="2" class="h">日志转载</td>
+			</tr>
+			<tr>
+				<td width="24%" align="left">日志分类</td>
+				<td>
+					<select id="dtidsel" name="dtid">
+						<option value="0">默认分类</option>
+						$dtsel
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td align="left">隐私设置</td>
+				<td>
+					<select id="prisel" name="privacy">
+						<option value="0">全站可见</option>
+						<option value="1">仅好友可见</option>
+						<option value="2">仅自己可见</option>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td></td>
+				<td>
+				<span class="btn2"><span><button type="button" onclick="copyurl();return false;">提 交</button></span></span>
+				<span class="bt2"><span><button type="button" onclick="closep();">取消</button></span></span>
+				</td>
+			</tr>
+		</table>
+	</form>
+<script language="JavaScript">
+function copyurl() {
+	var dtid = getObj('dtidsel').value;
+	var privacy = getObj('prisel').value;
+	Copydiary('$did',dtid,privacy);
+}
+</script>
+<!--
+EOT;
+}elseif ($a == 'viewalbum') {print <<<EOT
+-->
+	<form action="{$baseUrl}q=photos&a=viewalbum" onSubmit="return false;" method="POST">
+		<input type="hidden" name="aid" id="aidvalue" value="$aid" />
+		<input type="hidden" name="space" id="spacevalue" value="$space" />
+		<input type="hidden" name="uid" id="uidvalue" value="$u" />
+		<table cellpadding="0" cellspacing="0" width="300px">
+			<tr>
+				<td width="25%" align="right">输入密码</td>
+				<td><input type="password" name="viewpwd" id="pwdvalue" maxlength="15" /></td>
+			</tr>
+			<tr>
+				<td></td>
+				<td>
+				<span class="btn2"><span><button type="submit" style="width:80px;" onclick="tourl();">提 交</button></span></span>
+				<span class="bt2"><span><button type="button" onclick="closep();">取消</button></span></span>
+				</td>
+			</tr>
+		</table>
+	</form>
+<script language="JavaScript">
+function tourl() {
+	var aid = getObj('aidvalue').value;
+	var viewpwd = getObj('pwdvalue').value;
+	var space = getObj('spacevalue').value;
+	var uid = getObj('uidvalue').value;
+	ajax.send("{$baseUrl}q=photos&a=album",'checkpwd=1&aid=' + aid + '&viewpwd=' + viewpwd,function(){
+		var rText = ajax.request.responseText;
+		if (rText == 'fail') {
+			showDialog('error','密码错误,请重新输入',2);
+		} else if (rText == 'empty') {
+			showDialog('error','密码不能为空,请重新输入',2);
+		} else if (rText == 'success') {
+			window.location.href = "{$baseUrl}q=photos&a=album&aid=" + aid + "&viewpwd=" + viewpwd + "&space=" + space + "&u=" + uid;
+		} else {
+			showDialog('error','数据链接出错',2);
+		}
+	});
+}
+</script>
+<!--
+EOT;
+} elseif ($a == 'createajax') {
+print <<<EOT
+-->
+	<table cellpadding="0" cellspacing="0" width="450px">
+		<tr>
+			<td width="14%" align="right">相册名</td>
+			<td><input type="text" id="c_ajax_aname" name="aname" />&nbsp; <span id="c_ajax_aname_warn">限 24 字节</span></td>
+		</tr>
+		<tr>
+			<td align="right">描述</td>
+			<td>
+				<textarea id="c_ajax_aintro" name="aintro" style="width:350px;height:70px"></textarea>
+				<span id="c_ajax_aintro_warn" class="fr" style="margin-right:15px;"> 限 255 字节</span>
+			</td>
+		</tr>
+		<tr>
+			<td align="right">可见度</td>
+			<td>
+				<select name="private" id="private_info" onchange="optionsel(this.value)">
+					<option value="0">全站用户可见</option>
+					<option value="1">仅好友可见</option>
+					<option value="2">仅自己可见</option>
+					<option value="3">需要密码访问</option>
+				</select>
+			</td>
+		</tr>
+		<tbody id="photopwd" style="display:none">
+		<tr>
+			<td align="right">输入密码</td>
+			<td>
+				<input type="password" name="pwd" id="c_ajax_pwdinfo" />&nbsp;<span id="c_ajax_pwdinfo_warn">最小长度:3 最大长度:15</span>
+			</td>
+		</tr>
+		<tr>
+			<td align="right">确认密码</td>
+			<td>
+				<input type="password" name="repwd" id="repwd_info" />
+			</td>
+		</tr>
+		</tbody>
+		<!--
+EOT;
+if ($o_photos_gdcheck) {print <<<EOT
+-->
+		<tr>
+			<td>&nbsp;</td>
+			<td>
+				<div>认证码:</div>
+				<img id="ckcode" style="cursor:pointer;display:none;margin-bottom:5px;" onclick="this.src='ck.php?nowtime='+new Date().getTime();" alt="看不清楚，换一张" /><br />
+				<input class="input" onfocus="showCK();" type="text" name="gdcode" id="gdcode" style="width:50px;" tabindex="3"  />
+			</td>
+		</tr>
+<script language="JavaScript">
+function showCK(){
+	getObj('ckcode').style.display="";
+	if (getObj('ckcode').src.indexOf('ck.php') == -1) {
+		getObj('ckcode').src = 'ck.php?nowtime=' + new Date().getTime();
+	}
+}
+</script>
+<!--
+EOT;
+}if($o_photos_qcheck){print <<<EOT
+-->
+		<tr>
+			<td>&nbsp;</td>
+			<td>
+			<div>验证问题: {$db_question[$qkey]} （正确答案:{$db_answer[$qkey]}）</div>
+			<input class="input" name="qanswer" id="qanswer" size="25" tabindex="7" />
+			<input type="hidden" name="qkey" id="qkey" value="$qkey" />
+			</td>
+		</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+		<tr>
+			<td></td>
+			<td>
+			<span class="btn2"><span><button type="submit" style="width:80px;" onclick="fetchvalue();">提 交</button></span></span>
+			<span class="bt2"><span><button type="button" onclick="closep();">取消</button></span></span>
+			</td>
+		</tr>
+	</table>
+<script language="JavaScript">
+var charset = '$db_charset';
+setTimeout(function(){initCheckTextNum('c_ajax_aname','c_ajax_aname_warn',24);},300);
+setTimeout(function(){initCheckTextNum('c_ajax_aintro','c_ajax_aintro_warn',255);},300);
+setTimeout(function(){initCheckTextNum('c_ajax_pwdinfo','c_ajax_pwdinfo_warn',15);},300);
+
+function optionsel(id) {
+	pwdobj = getObj('photopwd');
+	if (isNaN(id)) {
+		showDialog('error','非法操作');
+	}
+	if (id == '3') {
+		pwdobj.style.display = '';
+	} else {
+		pwdobj.style.display = 'none';
+	}
+}
+function fetchvalue() {
+	var aname = getObj('c_ajax_aname').value;
+	var aintro = getObj('c_ajax_aintro').value;
+	var privated = getObj('private_info').value;
+	var pwd = getObj('c_ajax_pwdinfo').value;
+	var repwd = getObj('repwd_info').value;
+	if (IsElement('gdcode')){
+		var gdcode = getObj('gdcode').value;
+	}
+	if (IsElement('qanswer')){
+		var qanswer = getObj('qanswer').value;
+	}
+	if (IsElement('qkey')){
+		var qkey = getObj('qkey').value;
+	}
+	ajax.send("{$baseUrl}q=photos&a=create",'step=2&checkpwd=1&aname=' + aname + '&aintro=' + aintro + '&pwd=' + pwd + '&repwd=' + repwd + '&private=' + privated + '&gdcode=' + gdcode + '&qanswer=' + qanswer + '&qkey=' + qkey,function(){
+		var rText = ajax.request.responseText.split('\t');
+		if (rText[0] == 'success') {
+			var aidsel = getObj('aidsel_info');
+			var option = elementBind('option');
+			option.innerHTML = aname;
+			option.value = rText[1];
+			option.selected = 'selected';
+			aidsel.insertBefore(option,null);
+			var job = '$job';
+			if (job == 'flash') {
+				photoflashAtt.getaid(aidsel.value);
+			}
+			getObj('allowflash').innerHTML = '您还可以上传20张照片';
+			showDialog('success','相册添加成功!',2);
+		} else if (rText[0] == 'limit_num') {
+			showDialog('error','您创建的相册已经达到'+rText[1]+'个',2);
+		} else {
+			showDialog('error',rText[1] != '' ? rText[1] : '非法错误',2);
+		}
+		read.menu.style.top="300px";
+
+	});
+
+}
+</script>
+<!--
+EOT;
+} elseif ($a == 'showcommlist') {
+if($type == 'groupwrite') {print<<<EOT
+-->
+<div class="redlA">
+	<div id="comm_list_{$type}_{$id}">
+		<div id="commlist_{$type}_{$id}">
+		
+<!--
+EOT;
+foreach($comment as $key => $value){print<<<EOT
+-->
+        <dl class="cc" id="comment_{$value[id]}">
+            <dd class="d">
+<!--
+EOT;
+if($value['ifshowdel']){print<<<EOT
+-->
+            	<a id="del_{$value[id]}" href="javascript:;" class="adel fr cmt" style="display:none;" onclick="pwConfirm('你确定要删除吗？',this,function(){ajax.send('apps.php?q=ajax&a=commdel','id=$value[id]',PW_Comment.delOneCommentResponse);});">删除</a>
+<!--
+EOT;
+}print<<<EOT
+-->
+				<a href="javascript:;" class="fr mr10" style="display:none;" onclick="PW_Comment.simpleReply('$type','$id','{$value[username]}');" >回复</a><div class="title">$value[title]&nbsp;-&nbsp;<a href="u.php?uid={$value[uid]}" class="mr5 w">{$value[username]}</a><span class="s6 w">$value[postdate]</span>&nbsp;</div>
+            </dd>
+        </dl>
+<!--
+EOT;
+}print<<<EOT
+-->
+		</div>
+        <dl class="cc">
+            <dd class="d">
+            	<!--input type="text"  class="replyip" -->
+                <p class="mb5"><textarea id="comm_input_{$type}_{$id}_0" name="title"></textarea></p>
+            	<span class="btn2"><span><button onclick="PW_Comment.sendComment('$type','$id','0','5');" type="button">回复</button></span></span>
+            </dd>
+        </dl>
+	</div>
+
+	<div id="comment_short_box_$id" style="display:none;">
+<!--
+EOT;
+if($count>0){print<<<EOT
+-->
+		<dl class="cc" id="commentreplay_{$lastcomment[id]}">
+			<dd class="d"><div class="title"><span>{$lastcomment[title]}</span>&nbsp;-&nbsp;<a href="u.php?uid={$lastcomment[uid]}" class="mr5 w">{$lastcomment[username]}</a><span class="s6 w">{$lastcomment[postdate]}</span></div></dd>
+		</dl>
+		<dl class="cc">
+			<dd class="d"><a id="com_$value[id]" href="javascript:;" class="s6" onclick="PW_Comment.showCommList('groupwrite','$id',getObj('a_write_{$id}'))">全部{$count}条回复&raquo;</a></dd>
+		</dl>
+<!--
+EOT;
+}else{print<<<EOT
+-->
+		<dl style="display:none;"></dl><dl style="display:none;"></dl>
+<!--
+EOT;
+}print<<<EOT
+-->
+	</div>
+</div>
+<script type="text/javascript">
+function getonmouseout(){
+	var type = '$type';
+	var id = '$id';
+	try {
+		setTimeout(function() {
+			var objTrs = getElementsByClassName('cc',getObj('commlist_'+type+'_'+id));
+			for (var i=0;i<objTrs.length; i++ ){
+				objTrs[i].onmouseover = function (){
+					var delObj = getElementsByClassName('adel fr cmt',this);
+					if(delObj.length>0){
+						delObj[0].style.display='';
+					}
+					var replyObj = getElementsByClassName('fr mr10',this);
+					if(replyObj.length>0){
+						replyObj[0].style.display='';
+					}
+				}
+				objTrs[i].onmouseout = function (){
+					var delObj = getElementsByClassName('adel fr cmt',this);
+					if(delObj.length>0){
+						delObj[0].style.display='none';
+					}
+					var replyObj = getElementsByClassName('fr mr10',this);
+					if(replyObj.length>0){
+						replyObj[0].style.display='none';
+					}
+				}
+		}}, 300);
+	} catch(e){}
+};
+getonmouseout();
+</script>
+<!--
+EOT;
+} else {print<<<EOT
+-->
+<div class="redlA">
+	<div id="comm_list_{$type}_{$id}">
+<!--
+EOT;
+foreach($comment as $key => $value){print<<<EOT
+-->
+        <dl class="cc" id="comment_{$value[id]}">
+            <dt><a href="u.php?uid={$value[uid]}" class="img_25"><i><img src="{$value[face]}" width="18" height="18" /></i></a></dt>
+            <dd>
+<!--
+EOT;
+if($winduid == $value['uid'] || $groupid == 3){print<<<EOT
+-->	
+			<a href="javascript:;" onclick="pwConfirm('你确定要删除吗？',this,function(){ajax.send('apps.php?q=ajax&a=commdel','id=$value[id]',PW_Comment.delOneCommentResponse);});" class="adel fr" id="del_$value[id]">删除</a>
+<!--
+EOT;
+}print<<<EOT
+-->
+            <p class="title"><a id="huifu_{$value[id]}" class="arep fr cp" style="display: none;">回复</a>
+            <span class="gray mr5 fr">$value[postdate]</span><a href="u.php?uid={$value[uid]}" class="mr5">{$value[username]}</a>$value[title]</p></dd>
+        </dl>
+<!--
+EOT;
+}print<<<EOT
+-->
+	</div>
+		<dl class="cc dl">
+        <dd class="d" id="comm_p_{$type}_{$id}_0">
+            <input name="title" type="text" maxlength="200" id="comm_input_{$type}_{$id}_0" class="replyip">
+            <span class="btn2"><span><button onclick="PW_Comment.sendComment('$type','$id','0','1');" type="button">回复</button></span></span>
+        </dd>
+    </dl>
+</div>
+<!--
+EOT;
+}} elseif ($a == 'commreply') {
+if($position == 1){
+	list($postdate) = getLastDate($timestamp, 0);
+print <<<EOT
+-->
+<div class="redlA">
+    <dl class="cc" id="comment_$insertid">
+        <dt><a href="u.php?uid={$winduid}" class="img_25"><i><img src="$face" width="18" height="18" /></i></a></dt>
+        <dd>
+        	<a href="javascript:;" onclick="pwConfirm('你确定要删除吗？',this,function(){ajax.send('apps.php?q=ajax&a=commdel','id=$insertid',PW_Comment.delOneCommentResponse);});" class="adel fr" id="del_{$insertid}">删除</a>
+        	<span class="gray mr5 fr">$postdate</span>
+        	<a href="u.php?uid={$winduid}" class="mr5">{$windid}</a>：$title
+        </dd>
+    </dl>
+</div>
+<!--
+EOT;
+} elseif ($position == 2) {print <<<EOT
+-->
+    <dl class="cc dl" id="comment_$insertid">
+        <dt class="dt"><a href="u.php" class="img_50"><i><img src="$face" width="48" height="48" /></i></a></dt>
+        <dd class="dd">
+        	<a href="javascript:;" onclick="pwConfirm('你确定要删除吗？',this,function(){ajax.send('apps.php?q=ajax&a=commdel','id=$insertid',PW_Comment.delOneCommentResponse);});" class="adel" id="del_{$insertid}">删除</a>
+        	<p class="title"><a href="u.php" class="mr5">{$windid}</a>$title</p><cite class="gray">{$postdate}</cite> - 
+            <a style="cursor:pointer;" class="reA" onclick="PW_Comment.createCommentInput('$type','$id','$insertid')">回复</a>
+			<div class="c mb10">&nbsp;</div>
+			<div id="commentbox_{$id}_{$insertid}">
+			<div id="subcommentlist_{$type}_{$insertid}">
+			</div></div>
+			<div id="comment_input_{$type}_{$id}_{$insertid}" style="display:none;">
+			<dl class="cc dl2">
+				<dd style="padding-left:0;"><input type="text" id="comm_input_{$type}_{$id}_{$insertid}" class="input input_wb" name="title" maxlength="200"><span class="btn2"><span><button  type="button" onclick="PW_Comment.sendComment('$type','$id','$insertid','3');">回复</button></span></span>
+				</dd>
+			</dl>
+			</div>
+        </dd>
+    </dl>
+<!--
+EOT;
+} elseif ($position == 3) {print <<<EOT
+-->
+<dl class="cc dl" id="comment_$insertid">
+		<dt class="dt"><a href="u.php" class="img_50"><img src="$face" width="48" height="48"/></a></dt>
+		<dd class="dd">
+			<a onclick="pwConfirm('你确定要删除吗？',this,function(){ajax.send('apps.php?q=ajax&a=commdel','id=$insertid',PW_Comment.delOneCommentResponse);});" class="adel fr" href="javascript:;">删除</a>
+			<p class="title"><a href="u.php" class="mr5" target="_blank">{$windid}</a>$title</p><cite class="gray">{$postdate}</cite>
+		</dd>
+</dl>
+<!--
+EOT;
+} elseif ($position == 4) {print <<<EOT
+-->
+<div class="cc dl2">
+    <dl class="cc" id="comment_$insertid">
+        <dt><a href="u.php"><img src="$face" width="30" height="30" /></a></dt>
+        <dd>
+        	<a onclick="pwConfirm('你确定要删除吗？',this,function(){ajax.send('apps.php?q=ajax&a=commdel','id=$insertid',PW_Comment.delOneCommentResponse);});" class="adel" href="javascript:;">删除</a>
+					<p class="mb5 f14"><a href="u.php?uid=$comment[uid]">{$windid}</a>：$title</p>
+				<cite class="gray">{$postdate}</cite>
+        </dd>
+    </dl>
+</div>
+<!--
+EOT;
+} elseif ($position == 5) {print <<<EOT
+-->
+<div class="redlA">
+    <dl class="cc" id="comment_$insertid">
+        <dd class="d">
+			<a class="adel fr" href="javascript:;" onclick="pwConfirm('你确定要删除吗？',this,function(){ajax.send('apps.php?q=ajax&a=commdel','id=$insertid',PW_Comment.delOneCommentResponse);});" id="del_$insertid">删除</a>
+        	<div class="title">$title&nbsp;-&nbsp;<a href="u.php?uid=$winduid" class="mr5 w">{$windid}</a><span class="s6 w">{$postdate}</span></div>
+        </dd>
+    </dl>
+</div>
+<!--
+EOT;
+}} elseif ($a == 'postboard'){
+print <<<EOT
+-->
+<dl class="cc dl" id="board_{$thisid}">
+	<dt class="dt"><a href="u.php?uid={$winduid}" class="img_50"><i><img src="{$myface}" /></i></a></dt>
+    <dd class="dd">
+    	<a href="javascript:;" onclick="pwConfirm('是否确定删除本条留言',this,function(){delBoard('{$thisid}')})" title="删除" class="adel">删除</a>
+    	<p class="title"><a href="u.php?uid={$winduid}" class="atitle">{$windid}</a>：{$title}</p>
+	    <cite class="gray">{$postdate}</cite><span> - </span>
+    	<a href="javascript:;" onclick="PW_Comment.createCommentInput('board',{$thisid},0)" class="reA">回复</a>
+        <div id="commentbox_{$thisid}_0">
+        <div id="subcommentlist_board_{$thisid}">
+        </div>
+        <div id="comment_input_board_{$thisid}_0" style="display:none;">
+        <dl class="cc dl2"><dd style="padding-left:0;"><input type="text" id="comm_input_board_{$thisid}_0" class="input input_wb" name="title" maxlength="200" /><span class="btn2"><span><button  type="button" onclick="PW_Comment.sendComment('board','{$thisid}','0','4');">回复</button></span></span></dd></dl>
+        
+        </div>
+        </div>
+    </dd>
+</dl>
+<!--
+EOT;
+}?>-->

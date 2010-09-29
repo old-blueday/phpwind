@@ -1,0 +1,530 @@
+<!--<?php
+class CollectionModelTemplate {
+	var $_maxPhoto = 4;
+	
+	function web($value) {//网页
+print <<<EOT
+-->
+    <tr class="tr3 vt" id="collection_{$value['id']}">
+    <td width="20"><input type="checkbox" name="idarray[]" value="{$value['id']}" id="idarray[]"/></td>
+    <td>
+    <a class="adel cp" onclick="pwConfirm('你确认要删除这条收藏吗？',this,function(){collection.del('{$value['id']}')})">删除</a>
+    <div class="mb5 gray" id="title_{$value['id']}">{$value['title']}</div>
+    <div class="lh_22">
+<!--
+EOT;
+if ($value['content']['username']) {print <<<EOT
+-->
+    <span><a href="u.php?uid={$value['content']['uid']}">{$value['content']['username']}</a>：</span>
+<!--
+EOT;
+}print <<<EOT
+-->
+    <a href="{$value['content']['link']}" target="_blank">{$value['content']['link']}</a></div>
+    </td>
+    </tr>		
+<!--
+EOT;
+	}
+	function weibo($value) {//
+		$weiboService = L::loadClass('weibo', 'sns'); /* @var $weiboService PW_Weibo */
+        $extra = $value['content']['extra'] ? unserialize($value['content']['extra']) : array();
+        $content = $value['content']['content'];
+    	$content = $weiboService->parseContent($content,$extra);	
+print <<<EOT
+-->
+	<tr class="tr3 vt" id="collection_{$value['id']}">
+    <td width="20"><input type="checkbox" name="idarray[]" value="{$value['id']}" id="idarray[]"/></td>
+    <td>
+    <a class="adel cp" onclick="pwConfirm('你确认要删除这条收藏吗？',this,function(){collection.del('{$value['id']}')})">删除</a>
+    <div class="mb10 gray" id="title_{$value['id']}">{$value['title']}</div>
+<!--
+EOT;
+if ($value['content']['username']) {print <<<EOT
+-->
+    <span class="fl"><a href="u.php?uid={$value['content']['uid']}">{$value['content']['username']}</a>：</span>
+<!--
+EOT;
+}print <<<EOT
+-->
+<!--
+EOT;
+		if ($value['content']['type'] == 'weibo' || $value['content']['type'] == 'sendweibo') {//普通新鲜事
+print <<<EOT
+-->
+    		<div class="s5 mb10">{$content}</div>
+<!--
+EOT;
+			if ($extra['photos']) $this->_showPhotos($extra['photos']);
+			if ($extra['_hasVideo']) $this->_showVideo($extra['_hasVideo']);
+print <<<EOT
+-->  
+<!--
+EOT;
+		 } elseif ($value['content']['type'] == 'transmit') {
+         	$value['transmit'] = $value['content']['transmit'] ? unserialize($value['content']['transmit']) : '';
+         
+print <<<EOT
+-->
+				<div class="s5 mb10"><a href="u.php?uid={$value['content']['authorid']}">{$value['username']}</a> 转发：{$content}</div>
+<!--
+EOT;
+			if ($extra['_hasVideo']) $this->_showVideo($extra['_hasVideo']);
+print <<<EOT
+-->
+		<div class="forward mb10">
+<!--
+EOT;
+	if($value['transmit']['username']) {
+			$this->_transmit($value['transmit']);
+     }else {
+print <<<EOT
+-->
+		呀，原新鲜事已被删除了 
+<!--
+EOT;
+	}print <<<EOT
+-->
+		</div>
+
+<!--
+EOT;
+        } elseif ($value['content']['type'] == 'diary') {
+print <<<EOT
+-->
+            <div class="title">
+            <a href="apps.php?q=diary&a=detail&did={$value['content']['objectid']}&uid={$value['content']['authorid']}">{$extra['title']}</a>
+            </div>
+            <div class="mb10">
+           {$content}
+            </div>
+<!--
+EOT;
+		} elseif ($value['content']['type'] == 'photos') {
+print <<<EOT
+-->
+		分享照片
+<!--
+EOT;
+			$this->_showPhotos($extra['photos']);
+            
+print <<<EOT
+-->
+<!--
+EOT;
+		} elseif ($value['content']['type'] == 'group_article') {
+print <<<EOT
+-->
+			 
+            <div class="title">
+            <a href="apps.php?q=group&a=read&cyid={$extra['cyid']}&tid={$value['content']['objectid']}">{$extra['title']}</a>
+            </div>
+            <div class="mb10">
+                {$content}
+            </div>
+<!--
+EOT;
+		} elseif ($value['content']['type'] == 'group_photos') {
+print <<<EOT
+-->
+			分享照片
+<!--
+EOT;
+			$this->_showPhotos($extra['photos']);
+            
+print <<<EOT
+-->
+<!--
+EOT;
+		} elseif ($value['content']['type'] == 'group_active') {
+print <<<EOT
+-->
+			<div class="title">
+            <a href="apps.php?q=group&a=active&job=view&cyid={$extra['cyid']}&id={$value['content']['objectid']}">{$extra['title']}</a>
+            </div>
+            <div class="mb10">{$content}</div>
+<!--
+EOT;
+		} elseif ($value['content']['type'] == 'group_write') {
+print <<<EOT
+-->
+			<div class="mb10">{$content}</div>
+<!--
+EOT;
+		} elseif ($value['content']['type'] == 'article') {
+print <<<EOT
+-->
+			<div class="title">
+            <a href="read.php?tid={$value['content']['objectid']}">			{$extra['title']}</a>
+            </div>
+		<div class="mb10">{$content}</div>
+<!--
+EOT;
+		}
+print <<<EOT
+-->
+    </td>
+    </tr>
+<!--
+EOT;
+	}
+   
+	function _transmit($value) {
+        $value['extra'] = $value['extra']? unserialize($value['extra']) : '';
+        $weiboService = L::loadClass('weibo', 'sns'); /* @var $weiboService PW_Weibo */
+        $value['content'] = $weiboService->parseContent($value['content'],$value['extra']);	
+		static $identify = 1;
+		if (in_array($value['type'], array('article', 'diary', 'group_article', 'group_active'))) {
+			if ($value['type'] == 'article') {
+				$url = "read.php?tid={$value['objectid']}";
+			} elseif ($value['type'] == 'diary') {
+				$url = "apps.php?q=diary&a=detail&did={$value['objectid']}&uid={$value['authorid']}";
+			} elseif ($value['type'] == 'group_article') {
+				$url = "apps.php?q=group&a=read&cyid={$value['extra']['cyid']}&tid={$value['objectid']}";
+			} else {
+				$url = "apps.php?q=group&a=active&job=view&cyid={$value['extra']['cyid']}&id={$value['objectid']}";
+			}
+print <<<EOT
+-->
+<div class="title">
+	<a href="u.php?uid={$value['uid']}">{$value['username']}</a>：<a href="$url">{$value['extra']['title']}</a>
+</div>
+<div>
+	{$value['content']}
+</div>
+<!--
+EOT;
+		} else {
+			($value['type'] == 30 || $value['type'] == 41) && $value['content'] = '分享照片';
+print <<<EOT
+-->
+<div class="lh_22">
+	<a href="u.php?uid={$value['uid']}">{$value['username']}</a>：{$value['content']}
+</div>
+<!--
+EOT;
+		}
+		if ($value['extra']['photos']) $this->_showPhotos($value['extra']['photos']);
+		if ($value['extra']['_hasVideo']) $this->_showVideo($value['extra']['_hasVideo']);
+print <<<EOT
+-->
+<!--
+EOT;
+$identify++;
+	}   
+    
+    function _showPhotos($value) {
+    static $kNum = 0;
+    $kNum++;
+    $photolist = array();
+    foreach ($value as $photovalue) {
+        $photovalue['s_path'] = getphotourl($photovalue['path']);
+        $photovalue['path']	= getphotourl($photovalue['path'], $photovalue['ifthumb']);
+        $photolist[] = $photovalue;
+    }
+    $count = count($photolist);
+    $photos = pwJsonEncode($photolist);
+print <<<EOT
+-->
+<script type="text/javascript">
+weibo.push("$kNum", $photos);
+</script>
+<div class="ddPhoto mb10 cc">
+<!--
+EOT;
+if ($count > $this->_maxPhoto) {print <<<EOT
+-->
+	<div class="pre"><a href="javascript:void(0)" onclick='weibo.prev("$kNum")'>上一页</a></div>
+<!--
+EOT;
+}
+$rect_width = $this->_maxPhoto*116;
+$ul_width = count($photolist)*116;
+print <<<EOT
+-->
+	<div class="fl" id="photolist_{$kNum}" style="width:{$rect_width}px;overflow:hidden;">
+		<ul class="fl" style="width:{$ul_width}px">
+<!--
+EOT;
+$i=0;
+foreach ($photolist as $photo) {
+$photo['path'] = $photo['path'] == 'n' ? 'images/imgdel.jpg' : $photo['path'];
+
+print <<<EOT
+--> 
+           <li><img src="{$photo['path']}" onclick="weibo.showPhoto('{$photo[pid]}','{$photo[s_path]}','$kNum','$i')" onerror="this.src='$GLOBALS[imgpath]/imgdel.jpg'" /></li>
+            
+<!--
+EOT;
+$i++;
+}print <<<EOT
+-->
+		</ul>
+	</div>
+<!--
+EOT;
+if ($count > $this->_maxPhoto) {print <<<EOT
+-->
+	<div class="next"><a href="javascript:void(0)" onclick='weibo.next("$kNum")'>下一页</a></div>
+<!--
+EOT;
+}print <<<EOT
+-->
+</div>
+<!--
+EOT;
+	}
+    
+    
+	function photo($value) {
+    	$value['content']['album'] && $photoType = 'album';
+    	$value['content']['photo'] && $photoType = 'photo';
+    	if (strpos($value['content']['link'],'space=1') !== false) {		
+				$value['content']['link'] = str_replace('space=1',"uid=".$value['content'][$photoType]['uid'],$value['content']['link']);				
+		}
+    //照片
+print <<<EOT
+-->
+    <tr class="tr3 vt" id="collection_{$value['id']}">
+    <td width="20"><input type="checkbox" name="idarray[]" value="{$value['id']}" id="idarray[]"/></td>
+    <td>
+    <a class="adel cp" onclick="pwConfirm('你确认要删除这条收藏吗？',this,function(){collection.del('{$value['id']}')})">删除</a>
+    <div class="mb10 gray" id="title_{$value['id']}">{$value['title']}</div>
+    <div class="mb5">
+<!--
+EOT;
+if ($value['content']['username']) {print <<<EOT
+-->
+    <span><a href="u.php?uid={$value['content']['uid']}">{$value['content']['username']}</a>：</span>
+<!--
+EOT;
+}print <<<EOT
+-->    
+    <a href="{$value['content']['link']}"><img style="vertical-align:middle;" src="{$value['content'][$photoType]['image']}" onload="if(this.width>100){this.width = 100;} else if(this.height>100){this.height=100;}" class="img" /></a></div>
+<!--
+EOT;
+		if ($photoType != 'photo') {print <<<EOT
+-->
+       {$value['content'][$photoType]['aname']}
+<!--
+EOT;
+		} else {print <<<EOT
+-->		
+<!--
+EOT;
+			if ($value['content'][$photoType]['aname']) {print <<<EOT
+-->
+				{$value['content'][$photoType]['pintro']}<br />所属:{$value['content'][$photoType]['aname']}
+<!--
+EOT;
+			}print <<<EOT
+-->
+<!--
+EOT;
+		}print <<<EOT
+-->
+    </td>
+    </tr>
+<!--
+EOT;
+	}
+
+	function group($value) {//群组
+print <<<EOT
+-->
+    <tr class="tr3 vt" id="collection_{$value['id']}">
+    <td width="20"><input type="checkbox" name="idarray[]" value="{$value['id']}" id="idarray[]"/></td>
+    <td>
+    <a class="adel cp" onclick="pwConfirm('你确认要删除这条收藏吗？',this,function(){collection.del('{$value['id']}')})">删除</a>
+    <div class="mb10 gray" id="title_{$value['id']}">{$value['title']}</div>
+    <div class="mb5">
+<!--
+EOT;
+if ($value['content']['username']) {print <<<EOT
+-->
+    <span><a href="u.php?uid={$value['content']['uid']}">{$value['content']['username']}</a>：</span>
+<!--
+EOT;
+}print <<<EOT
+-->
+    <a href="{$value['content']['link']}"><img src="{$value['content']['group']['image']}" onload="if(this.width>100){this.width = 100;} else if(this.height>100){this.height=100;}" class="img" /></a>
+    <a href="{$value['content']['link']}" target="_blank">{$value['content']['group']['name']}</a>
+    </div>
+    </td>
+    </tr>	
+<!--
+EOT;
+	}
+
+	function active($value) {//活动
+print <<<EOT
+-->
+    <tr class="tr3 vt" id="collection_{$value['id']}">
+    <td width="20"><input type="checkbox" name="idarray[]" value="{$value['id']}" id="idarray[]"/></td>
+    <td>
+    <a class="adel cp" onclick="pwConfirm('你确认要删除这条收藏吗？',this,function(){collection.del('{$value['id']}')})">删除</a>
+    <div class="mb5 gray" id="title_{$value['id']}">{$value['title']}</div>
+    <div class="s5 mb5"></div>
+    <div class="mb5">
+<!--
+EOT;
+if ($value['content']['username']) {print <<<EOT
+-->
+    <span><a href="u.php?uid={$value['content']['uid']}">{$value['content']['username']}</a>：</span>
+<!--
+EOT;
+}print <<<EOT
+-->
+    <a href="{$value['content']['link']}"><img src="{$value['content']['active']['image']}" onload="if(this.width>100){this.width = 100;} else if(this.height>100){this.height=100;}" style="background:#fff;border:1px solid #e4e4e4;padding:3px;" /></a>
+    
+    <a href="{$value['content']['link']}" target="_blank">{$value['content']['active']['name']}</a>
+    </div>
+    </td>
+    </tr>		
+<!--
+EOT;
+	}
+
+	function multimedia($value) { //多媒体
+print <<<EOT
+-->
+	<tr class="tr3 vt" id="collection_{$value['id']}">
+
+                <td width="20"><input type="checkbox" name="idarray[]" value="{$value['id']}" id="idarray[]"/></td>
+                <td>
+								<a class="adel cp" onclick="pwConfirm('你确认要删除这条收藏吗？',this,function(){collection.del('{$value['id']}')})">删除</a>
+                <div class="mb10 gray" id="title_{$value['id']}">{$value['title']}</div>
+                <div class="mb10"><a href="{$value['content']['link']}" target="_blank">
+<!--
+EOT;
+if ($value['content']['username']) {print <<<EOT
+-->
+    <span><a href="u.php?uid={$value['content']['uid']}">{$value['content']['username']}</a>：</span>
+<!--
+EOT;
+}print <<<EOT
+-->
+                {$value['content']['link']}</a></div>
+		<div class="mb5">
+
+<!--
+EOT;
+			if($value['content']['type'] == 'video'){print <<<EOT
+-->
+		<img title="播放" src="u/images/share_v.png" class="vthumb cp" onclick="javascript:showCollection('{$value['content']['video']['host']}','{$value['content']['video']['hash']}',this,'{$value[id]}')"/>
+<!--
+EOT;
+			}elseif($value['content']['type'] == 'music'){
+            print <<<EOT
+-->
+		<img title="播放" class="cp" src="u/images/music.png" onclick="javascript:showCollection('music','{$value['content']['link']}',this,'{$value[id]}')"/>
+<!--
+EOT;
+			}elseif($value['content']['type'] == 'flash'){print <<<EOT
+-->
+		<img title="播放" class="cp" src="u/images/musicplay.gif" onclick="javascript:showCollection('flash','{$value['content']['link']}',this,'{$value[id]}')"/>
+<!--
+EOT;
+			}print <<<EOT
+-->
+		</div>
+            </td>
+       </tr>
+<!--
+EOT;
+}
+	
+	function diary($value) {
+    	if (strpos($value['content']['link'],'space=1&u') !== false) {      
+      		$value['content']['link'] = str_replace('space=1&u',"a=detail&uid",$value['content']['link']);            
+   		}
+    
+    //日志
+print <<<EOT
+-->
+    <tr class="tr3 vt" id="collection_{$value['id']}">
+    <td width="20"><input type="checkbox" name="idarray[]" value="{$value['id']}" id="idarray[]"/></td>
+    <td>
+    <a class="adel cp" onclick="pwConfirm('你确认要删除这条收藏吗？',this,function(){collection.del('{$value['id']}')})">删除</a>
+    <div class="mb10 gray" id="title_{$value['id']}">{$value['title']}</div>
+    <div class="mb5">
+<!--
+EOT;
+if ($value['content']['username']) {print <<<EOT
+-->
+    <span><a href="u.php?uid={$value['content']['uid']}">{$value['content']['username']}</a>：</span>
+<!--
+EOT;
+}print <<<EOT
+-->
+    <a href="{$value['content']['link']}" target="_blank">{$value['content']['diary']['subject']}</a>
+    </div>
+    </td>
+    </tr>	
+<!--
+EOT;
+	}
+
+	function cms($value) {//cms
+print <<<EOT
+-->
+    <tr class="tr3 vt" id="collection_{$value['id']}">
+    <td width="20"><input type="checkbox" name="idarray[]" value="{$value['id']}" id="idarray[]"/></td>
+    <td>
+    <a class="adel cp" onclick="pwConfirm('你确认要删除这条收藏吗？',this,function(){collection.del('{$value['id']}')})">删除</a>
+    <div class="mb10 gray" id="title_{$value['id']}">{$value['title']}</div>
+    <div class="mb5">
+<!--
+EOT;
+if ($value['content']['username']) {print <<<EOT
+-->
+    <span><a href="u.php?uid={$value['content']['uid']}">{$value['content']['username']}</a>：</span>
+<!--
+EOT;
+}print <<<EOT
+-->
+    <a href="{$value['content']['link']}" target="_blank">{$value['content']['cms']['subject']}</a></div>
+    </td>
+    </tr>	
+<!--
+EOT;
+	}
+    
+   
+   function _showVideo($value) {
+print <<<EOT
+-->
+		<div class="mb10"><img src="u/images/share_v.png" class="vthumb cp" id="showVideo_{$value[0]}" onclick="mediaPlayer.showVideo('{$value[1]}','{$value[0]}')"/></div>
+<!--
+EOT;
+	}
+    
+    function photoPop() {
+print <<<EOT
+-->
+<div id="photo_pop_mask" onclick="weibo.hidePhoto()" class="popImgbg" style="position:absolute;background:#000;filter:alpha(opacity=50);display:none;-moz-opacity:0.5;opacity:0.5;left:0;right:0;top:0;bottom:0;z-index:1;"></div>
+<div id="photo_pop" class="popImg" style="position:absolute;z-index:2;display:none;">
+	<div class="p10 tac pr bgA">
+		<span class="popImgdel cp" onclick="weibo.hidePhoto()">关闭</span>
+		<table width="400" cellpadding="0" cellspacing="0">
+			<tr>
+				<td>
+					<div class="fl" id="prephoto">
+						<span  onclick="weibo.prevPhoto()" class="aPre" title="上一张"></span>
+					</div>
+					<div class="fl" id="nextphoto">
+						<span  onclick="weibo.nextPhoto()" class="aNext" title="下一张"></span>
+					</div>
+					<img src="javascript://" id="photo_path"/></td>
+			</tr>
+		</table>
+	</div>
+</div>
+<!--
+EOT;
+	}
+    
+    
+}
+$collectionModelTemplate = new CollectionModelTemplate();
+?>

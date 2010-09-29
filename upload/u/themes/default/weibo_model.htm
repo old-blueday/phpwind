@@ -1,0 +1,744 @@
+<!--<?php
+class weiboModelTemplate {
+	
+	var $_maxPhoto = 4;
+	var $_isGM;
+	
+	function weiboModelTemplate() {
+		global $windid,$manager,$groupid,$SYSTEM;
+		$this->_isGM = ($SYSTEM['delweibo'] || CkInArray($windid, $manager));
+	}
+
+	function _isManager($uid) {
+		global $winduid;
+		return ($uid == $winduid || $this->_isGM);
+	}
+
+	function sendweibo($value){
+		$this->weibo($value);
+	}
+
+	function honor($value) {
+		$this->weibo($value);
+	}
+
+	function post($nextDo = '') {
+print <<<EOT
+-->
+<div class="userInfo">
+	<div class="userInfoweek">
+		<div class="limit tar mb5" id="weibo_contentlimit">你还可以输入<em>255</em>个字节</div>
+		<form id="weibo_form" name="weibo_form" action="apps.php?q=weibo&do=post&ajax=1" method="post" onsubmit="return false">
+        <input type="hidden" name="verify" value="{$GLOBALS['verifyhash']}" />
+		<div class="homeSk">
+			<div class="fl"><div id="submitSuccess" class="success" style="margin:20px 0 0 90px;display:none;">发布成功</div></div>
+			<textarea id="weibo_content" name="atc_content" class="homeText" onkeydown = "ctrlEnter(event,getObj('weibo_form'),function(){pw_weiboPost.post();})"></textarea>
+			<div class="c"></div>
+			<div id="uploadPicDiv" class="homeSk_input fl" style="display:none;"></div>
+		</div>
+		</form>
+		<div class="p5">
+			<span id="writebutton" class="fr"><button class="button cp" id="weibo_submit">发表</button></span>
+			<span id="weibo_smile" class="sk_show cp">表情</span>
+<!--
+EOT;
+$display = $GLOBALS['o_weibourl'] != '0' ? '' : 'none'; 
+print <<<EOT
+-->
+			<span id="weibo_url" class="sk_share cp" style="display:$display">链接</span>
+<!--
+EOT;
+$display = ($GLOBALS['o_weibophoto'] != '0' && $GLOBALS['db_phopen']) ? '' : 'none'; 
+print <<<EOT
+-->
+			<span id="uploadPic" style="display:$display">
+				<span id="uploadPicload" class="file fr" >
+				<span class="sk_img cp">图片</span>
+				<form id="uploadPicForm" name="uploadPicForm" method="post" action="pw_ajax.php?action=uploadwritepic" enctype="multipart/form-data">
+					<input id="writePic" name="writePic" type="file" hidefocus="true" />
+				</form>
+				</span>
+				<span id="uploadPicLoadding" class="fl" style="display:none;width:200px;position:relative;line-height:20px;">正在上传中.......</span>
+			</span>
+			<img src="javascript://" id="imgPreview" style="display:none;position:absolute;z-index:1;" />
+		</div>
+	</div>
+<!--
+EOT;
+include printEot('writesmile');
+include printEot('writeurl');
+print <<<EOT
+-->
+<script type="text/javascript" language="JavaScript" src="apps/weibo/js/post.js"></script>
+<script language="javascript">
+var pw_weiboPost = new weibo_post({form:'weibo_form',content:'weibo_content',smile:'weibo_smile',url:'weibo_url',photo:'weibo_photo',nextdo:'{$nextDo}'});
+</script>
+</div>
+<!--
+EOT;
+	}
+
+	function weibo($value) {//普通新鲜事
+print <<<EOT
+-->
+<dl class="dl cc">
+	<dt class="dt">
+		<a href="apps.php?q=weibo&uid={$value['authorid']}" class="img_50"><img src="{$value['icon']}" width="44" height="44" alt="{$value['username']}" /></a>
+	</dt>
+	<dd class="dd">
+		<div class="title">
+			<span class="uname"><a href="u.php?uid={$value['authorid']}">{$value['username']}</a>：</span>{$value['content']}
+		</div>
+<!--
+EOT;
+if ($value['extra']['photos']) $this->_showPhotos($value['extra']['photos']);
+if ($value['extra']['_hasVideo']) $this->_showVideo($value['extra']['_hasVideo']);
+print <<<EOT
+-->
+		<div class="gray">
+<!--
+EOT;
+$this->_operateButton($value);
+print <<<EOT
+-->
+			<cite title="{$value['postdate_s']}">{$value['lastdate']} [<a href="apps.php?uid={$value['authorid']}&q=weibo">新鲜事</a>]</cite>
+		</div>
+		<div id="comment_{$value['mid']}"></div>
+	</dd>
+</dl>
+<!--
+EOT;
+	}
+
+	function transmit($value) {//新鲜事转发
+print <<<EOT
+-->
+<dl class="dl cc">
+	<dt class="dt">
+		<a href="apps.php?q=weibo&uid={$value['authorid']}" class="img_50"><img src="{$value['icon']}" width="44" height="44" alt="{$value['username']}" /></a>
+	</dt>
+	<dd class="dd">
+		<div class="title">
+			<span class="uname"><a href="u.php?uid={$value['authorid']}">{$value['username']}</a> </span>转发：{$value['content']}
+		</div>
+<!--
+EOT;
+if ($value['extra']['_hasVideo']) $this->_showVideo($value['extra']['_hasVideo']);
+print <<<EOT
+-->
+		<div class="forward mb10">
+<!--
+EOT;
+$this->_transmit($value['transmits']);
+print <<<EOT
+-->
+		</div>
+		<div class="gray">
+<!--
+EOT;
+$this->_operateButton($value);
+print <<<EOT
+-->
+			<cite title="{$value['postdate_s']}">{$value['lastdate']} [<a href="apps.php?uid={$value['authorid']}&q=weibo">新鲜事</a>]</cite>
+		</div>
+		<div id="comment_{$value['mid']}"></div>
+	</dd>
+</dl>
+<!--
+EOT;
+	}
+
+	function _transmit($value) {
+		if (empty($value)) {print <<<EOT
+-->
+			呀，原新鲜事已被删除了
+<!--
+EOT;
+		} else {
+			static $identify = 1;
+			$id = $value['mid'] . '_' . $identify;
+			if (in_array($value['type'], array(3,10, 20, 40, 42))) {
+				if ($value['type'] == 10) {
+					$url = "read.php?tid={$value['objectid']}";
+				} elseif($value['type'] == 3) {
+                	$url = "mode.php?m=cms&q=view&id={$value['objectid']}";
+                }elseif ($value['type'] == 20) {
+					$url = "apps.php?q=diary&a=detail&did={$value['objectid']}&uid={$value['authorid']}";
+				} elseif ($value['type'] == 40) {
+					$url = "apps.php?q=group&a=read&cyid={$value['extra']['cyid']}&tid={$value['objectid']}";
+				} else {
+					$url = "apps.php?q=group&a=active&job=view&cyid={$value['extra']['cyid']}&id={$value['objectid']}";
+				}
+print <<<EOT
+-->
+<div class="title">
+	<a href="u.php?uid={$value['authorid']}">{$value['username']}</a>：<a href="$url">{$value['extra']['title']}</a>
+</div>
+<div class="mb10">{$value['content']}</div>
+<!--
+EOT;
+			} else {
+				($value['type'] == 30 || $value['type'] == 41) && $value['content'] = '分享照片';
+print <<<EOT
+-->
+<div class="mb10">
+	<a href="u.php?uid={$value['uid']}">{$value['username']}</a>：{$value['content']}
+</div>
+<!--
+EOT;
+			}
+			if ($value['extra']['photos']) $this->_showPhotos($value['extra']['photos']);
+			if ($value['extra']['_hasVideo']) $this->_showVideo($value['extra']['_hasVideo']);
+print <<<EOT
+-->
+<div class="unForward">
+	<a href="apps.php?q=weibo&do=transmit&ajax=1&mid={$value['mid']}" onclick="return ajaxurl(this)" class="s7">原文转发({$value['transmit']})</a>&nbsp;|&nbsp;
+	<a href="javascript:void(0);" class="s7"  onclick="getcomments('comment',{$value[mid]},'',{$identify});return false;">原文评论<span id="commentnum_{$id}">({$value['replies']})</span></a>
+</div>
+<div id="comment_{$id}"></div>
+<!--
+EOT;
+		$identify++;
+		}
+	}
+
+	function photos($value) {//相册
+print <<<EOT
+-->
+<dl class="dl cc">
+	<dt class="dt">
+		<a href="apps.php?q=weibo&uid={$value['authorid']}" class="img_50"><img src="{$value['icon']}" width="44" height="44" alt="{$value['username']}" /></a>
+	</dt>
+	<dd class="dd">
+		<div class="title">
+			<span class="uname"><a href="u.php?uid={$value['authorid']}">{$value['username']}</a>：</span><!--
+EOT;
+if ($value['content']) {print <<<EOT
+-->{$value['content']}<!--
+EOT;
+} else {print <<<EOT
+-->分享照片<!--
+EOT;
+}print <<<EOT
+-->
+		</div>
+<!--
+EOT;
+if ($value['extra']['photos']) $this->_showPhotos($value['extra']['photos']);
+print <<<EOT
+-->
+		<div class="gray">
+<!--
+EOT;
+$this->_operateButton($value);
+print <<<EOT
+-->
+			<cite title="{$value['postdate_s']}">{$value['lastdate']}  [<a href="apps.php?q=photos&uid={$value['authorid']}&a=album&aid={$value['extra']['aid']}">来自相册</a>]</cite>
+		</div>
+		<div id="comment_{$value['mid']}"></div>
+	</dd>
+</dl>
+<!--
+EOT;
+	}
+
+	function group_photos($value) {//相册
+print <<<EOT
+-->
+<dl class="dl cc">
+	<dt class="dt">
+		<a href="apps.php?q=weibo&uid={$value['authorid']}" class="img_50"><img src="{$value['icon']}" width="44" height="44" alt="{$value['username']}" /></a>
+	</dt>
+	<dd class="dd">
+		<div class="title">
+			<span class="uname"><a href="u.php?uid={$value['authorid']}">{$value['username']}</a>：</span>分享照片
+		</div>
+<!--
+EOT;
+$this->_showPhotos($value['extra']['photos']);
+print <<<EOT
+-->
+		<div class="gray">
+<!--
+EOT;
+$this->_operateButton($value);
+print <<<EOT
+-->
+			<cite title="{$value['postdate_s']}">{$value['lastdate']}  [来自群组 - <a href="apps.php?q=galbum&cyid={$value['extra']['cyid']}&a=album&aid={$value['extra']['aid']}">{$value['extra']['cname']}</a>]</cite>
+		</div>
+		<div id="comment_{$value['mid']}"></div>
+	</dd>
+</dl>
+<!--
+EOT;
+	}
+
+	function group_active($value) {//群组活动
+print <<<EOT
+-->
+<dl class="dl cc">
+	<dt class="dt">
+		<a href="apps.php?q=weibo&uid={$value['authorid']}" class="img_50"><img src="{$value['icon']}" width="44" height="44" alt="{$value['username']}" /></a>
+	</dt>
+	<dd class="dd">
+		<div class="title">
+			<span class="uname"><a href="u.php?uid={$value['authorid']}">{$value['username']}</a>：</span><a href="apps.php?q=group&a=active&job=view&cyid={$value['extra']['cyid']}&id={$value['objectid']}" target="_blank">{$value['extra']['title']}</a>
+		</div>
+		<div class="mb10">
+			{$value['content']}
+		</div>
+		<div class="gray">
+<!--
+EOT;
+$this->_operateButton($value);
+print <<<EOT
+-->
+			<cite title="{$value['postdate_s']}">{$value['lastdate']} [来自群组 - <a href="apps.php?q=group&a=active&cyid={$value['extra']['cyid']}">{$value['extra']['cname']}</a>]</cite>
+		</div>
+		<div id="comment_{$value['mid']}"></div>
+	</dd>
+</dl>
+<!--
+EOT;
+	}
+
+	function group_article($value) {//群组话题
+print <<<EOT
+-->
+<dl class="dl cc">
+	<dt class="dt">
+		<a href="apps.php?q=weibo&uid={$value['authorid']}" class="img_50"><img src="{$value['icon']}" width="44" height="44" alt="{$value['username']}" /></a>
+	</dt>
+	<dd class="dd">
+		<div class="title">
+			<span class="uname"><a href="u.php?uid={$value['authorid']}">{$value['username']}</a>：</span><a href="apps.php?q=group&a=read&cyid={$value['extra']['cyid']}&tid={$value['objectid']}" target="_blank">{$value['extra']['title']}</a>
+		</div>
+		<div class="mb10">
+			{$value['content']}
+		</div>
+		<div class="gray">
+<!--
+EOT;
+$this->_operateButton($value);
+print <<<EOT
+-->
+			<cite title="{$value['postdate_s']}">{$value['lastdate']} [来自群组 - <a href="apps.php?q=group&a=thread&cyid={$value['extra']['cyid']}">{$value['extra']['cname']}</a>]</cite>
+		</div>
+		<div id="comment_{$value['mid']}"></div>
+	</dd>
+</dl>
+<!--
+EOT;
+	}
+
+	function group_write($value) {//群组记录
+print <<<EOT
+-->
+<dl class="dl cc">
+	<dt class="dt">
+		<a href="apps.php?q=weibo&uid={$value['authorid']}" class="img_50"><img src="{$value['icon']}" width="44" height="44" alt="{$value['username']}" /></a>
+	</dt>
+	<dd class="dd">
+		<div class="title">
+			<span class="uname"><a href="u.php?uid={$value['authorid']}">{$value['username']}</a>：</span>{$value['content']}
+		</div>
+		<div class="gray">
+<!--
+EOT;
+$this->_operateButton($value);
+print <<<EOT
+-->
+			<cite title="{$value['postdate_s']}">{$value['lastdate']} [来自群组 - <a href="apps.php?q=group&a=write&cyid={$value['extra']['cyid']}">{$value['extra']['cname']}</a>]</cite>
+		</div>
+		<div id="comment_{$value['mid']}"></div>
+	</dd>
+</dl>
+<!--
+EOT;
+	}
+
+	function diary($value) {//日志
+print <<<EOT
+-->
+<dl class="dl cc">
+	<dt class="dt">
+		<a href="apps.php?q=weibo&uid={$value['authorid']}" class="img_50"><img src="{$value['icon']}" width="44" height="44" alt="{$value['username']}" /></a>
+	</dt>
+	<dd class="dd">
+		<div class="title">
+			<span class="uname"><a href="u.php?uid={$value['authorid']}">{$value['username']}</a>：</span><a href="apps.php?q=diary&a=detail&did={$value['objectid']}&uid={$value['authorid']}" target="_blank">{$value['extra']['title']}</a>
+		</div>
+		<div class="mb10">
+			{$value['content']}
+		</div>
+		<div class="gray">
+<!--
+EOT;
+$this->_operateButton($value);
+print <<<EOT
+-->
+			<cite title="{$value['postdate_s']}">{$value['lastdate']} [<a href="apps.php?uid={$value['authorid']}&q=diary">来自日志</a>]</cite>
+		</div>
+		<div id="comment_{$value['mid']}"></div>
+	</dd>
+</dl>
+<!--
+EOT;
+	}
+
+	function article($value) {//帖子
+print <<<EOT
+-->
+<dl class="dl cc">
+	<dt class="dt">
+		<a href="apps.php?q=weibo&uid={$value['authorid']}" class="img_50"><img src="{$value['icon']}" width="44" height="44" alt="{$value['username']}" /></a>
+	</dt>
+	<dd class="dd">
+		<div class="title">
+			<span class="uname"><a href="u.php?uid={$value['authorid']}">{$value['username']}</a>：</span><a href="read.php?tid={$value['objectid']}" target="_blank">{$value['extra']['title']}</a>
+		</div>
+		<div class="mb10">
+			{$value['content']}
+		</div>
+<!--
+EOT;
+if ($value['extra']['_hasVideo']) $this->_showVideo($value['extra']['_hasVideo']);
+print <<<EOT
+-->
+		<div class="gray">
+<!--
+EOT;
+$this->_operateButton($value);
+print <<<EOT
+-->
+			<cite title="{$value['postdate_s']}">{$value['lastdate']} [来自帖子 - <a href="thread.php?fid={$value['extra']['fid']}" class="gray">{$value['extra']['fname']}</a>]</cite>
+		</div>
+		<div id="comment_{$value['mid']}"></div>
+	</dd>
+</dl>
+<!--
+EOT;
+	}
+    
+    function cms($value) {//文章
+print <<<EOT
+-->
+<dl class="dl cc">
+	<dt class="dt">
+		<a href="apps.php?q=weibo&uid={$value['authorid']}" class="img_50"><img src="{$value['icon']}" width="44" height="44" alt="{$value['username']}" /></a>
+	</dt>
+	<dd class="dd">
+		<div class="title">
+			<span class="uname"><a href="u.php?uid={$value['authorid']}">{$value['username']}</a>：</span><a href="mode.php?m=cms&q=view&id={$value['objectid']}" target="_blank">{$value['extra']['title']}</a>
+		</div>
+		<div class="mb10">
+			{$value['content']}
+		</div>
+<!--
+EOT;
+if ($value['extra']['_hasVideo']) $this->_showVideo($value['extra']['_hasVideo']);
+print <<<EOT
+-->
+		<div class="gray">
+<!--
+EOT;
+$this->_operateButton($value);
+print <<<EOT
+-->
+			<cite title="{$value['postdate_s']}">{$value['lastdate']} [来自文章 - <a href="mode.php?m=cms&q=list&column={$value['extra']['cid']}" class="gray">{$value['extra']['cname']}</a>]</cite>
+		</div>
+		<div id="comment_{$value['mid']}"></div>
+	</dd>
+</dl>
+<!--
+EOT;
+	}
+	
+	function sinaweibo($value) {
+print <<<EOT
+-->
+<dl class="dl cc">
+	<dt class="dt">
+		<a href="apps.php?q=weibo&uid={$value['authorid']}" class="img_50"><img src="{$value['icon']}" width="44" height="44" alt="{$value['username']}" /></a>
+	</dt>
+	<dd class="dd">
+		<div class="title">
+			<span class="uname"><a href="u.php?uid={$value['authorid']}">{$value['username']}</a>：</span>{$value['content']}
+		</div>
+<!--
+EOT;
+if ($value['extra']['sinaPhotos']) {
+	$extraPhotos = array();
+	foreach ($value['extra']['sinaPhotos'] as $tmpValue) {
+		$extraPhotos[] = array('path'=>$tmpValue['thumb'], 's_path'=>$tmpValue['middle']);
+	}
+	$this->_showPhotos($extraPhotos, false);
+}
+if ($value['extra']['_hasVideo']) $this->_showVideo($value['extra']['_hasVideo']);
+print <<<EOT
+-->
+		<div class="gray">
+<!--
+EOT;
+$this->_operateButton($value);
+$sinaUserUrl = 'http://t.sina.com.cn/';
+$sinaUserUrl .= isset($value['sinaWeiboUserInfo']['id']) ? $value['sinaWeiboUserInfo']['id'] : '';
+print <<<EOT
+-->
+			<cite title="{$value['postdate_s']}">{$value['lastdate']} [来自 - <a target="_blank" href="$sinaUserUrl">新浪微博</a>]</cite>
+		</div>
+		<div id="comment_{$value['mid']}"></div>
+	</dd>
+</dl>
+<!--
+EOT;
+	}
+
+	function _operateButton($value) {
+		global $do,$page,$USCR,$transmitAction;
+		$do = $do ? $do : 'filterweibo';
+		if(in_array($USCR,array('space_index','square_weibo'))){
+			$do = 'reload';
+		}
+		$page = $page ? $page : 1;
+		$isGM = $this->_isManager($value['authorid']);
+		$id = $value['mid'];
+print <<<EOT
+-->
+	<div class="fr">
+<!--
+EOT;
+if($isGM){print <<<EOT
+-->
+		<a href="javascript:void(0);" class="s7" onclick="deleteweibo('{$value['mid']}','$do','$page','weiboFeed');return false;">删除</a>&nbsp;|&nbsp;<!--
+EOT;
+}
+if ($GLOBALS['o_weibopost'] != '0') {
+print <<<EOT
+--><a href="javascript:;" onclick="transmitWeibo({$value['mid']});return false;" class="s7">转发<!--
+EOT;
+if ($value['transmit'] > 0) {print <<<EOT
+-->({$value['transmit']})<!--
+EOT;
+}print <<<EOT
+--></a>&nbsp;|&nbsp;<!--
+EOT;
+}print <<<EOT
+--><a href="javascript:void(0);" class="s7" onclick="getcomments('comment','{$value['mid']}','');return false;">评论<span id="commentnum_{$id}"><!--
+EOT;
+if ($value['replies'] > 0) {print <<<EOT
+-->({$value['replies']})<!--
+EOT;
+}print <<<EOT
+--></span></a>&nbsp;|&nbsp;<a href="apps.php?q=collection&a=favor&type=weibo&ajax=1&id={$value['mid']}" onclick="return ajaxurl(this)" class="s7">收藏</a></div>
+<!--
+EOT;
+	}
+
+	function _showPhotos($value, $isLocalPhoto = true) {
+		static $kNum = 0;
+		if ($isLocalPhoto) {
+			$photolist = array();
+			foreach ($value as $photovalue) {
+				$photovalue['s_path'] = getphotourl($photovalue['path'], false, 'imgdel.jpg');
+				$photovalue['path']	= getphotourl($photovalue['path'], $photovalue['ifthumb'], 'imgdel.jpg');
+				$photolist[] = $photovalue;
+			}
+		} else {
+			$photolist = $value;
+		}
+		$count = count($photolist);
+		$photos = pwJsonEncode($photolist);
+print <<<EOT
+-->
+<script type="text/javascript">
+weibo.push("$kNum", $photos);
+</script>
+<div class="ddPhoto mb10 cc">
+<!--
+EOT;
+if ($count > $this->_maxPhoto) {print <<<EOT
+-->
+	<div class="pre"><a href="javascript:void(0)" onclick='weibo.prev("$kNum");return false;'>上一页</a></div>
+<!--
+EOT;
+}$rect_width = $this->_maxPhoto*116;
+$ul_width = count($photolist)*116;
+print <<<EOT
+-->
+	<div class="fl" id="photolist_{$kNum}" style="width:{$rect_width}px;overflow:hidden;">
+		<ul class="fl" style="width:{$ul_width}px">
+<!--
+EOT;
+$i=0;
+foreach ($photolist as $photo) {print <<<EOT
+-->
+			<li><img src="{$photo['path']}" onclick="weibo.showPhoto('{$photo[pid]}','{$photo[s_path]}','$kNum','$i')" onerror="this.src='$GLOBALS[imgpath]/imgdel.jpg'" /></li>
+<!--
+EOT;
+$i++;
+}print <<<EOT
+-->
+		</ul>
+	</div>
+<!--
+EOT;
+if ($count > $this->_maxPhoto) {print <<<EOT
+-->
+	<div class="next"><a href="javascript:void(0)" onclick='weibo.next("$kNum");return false;'>下一页</a></div>
+<!--
+EOT;
+}print <<<EOT
+-->
+</div>
+<!--
+EOT;
+		$kNum++;
+	}
+
+	function _showVideo($value) {
+print <<<EOT
+-->
+		<div class="mb10"><img src="u/images/share_v.png" class="vthumb cp" id="showVideo_{$value[0]}" onclick="mediaPlayer.showVideo('{$value[1]}','{$value[0]}')"/></div>
+<!--
+EOT;
+	}
+
+	function photoPop() {
+print <<<EOT
+-->
+<div id="photo_pop_mask" onclick="weibo.hidePhoto()" class="popImgbg" style="display:none;position:absolute;background:#000;filter:alpha(opacity=50);-moz-opacity:0.5;opacity:0.5;left:0;right:0;top:0;bottom:0;z-index:1;"></div>
+<div id="photo_pop" class="popImg" style="display:none;position:absolute;z-index:2;">
+	<div class="p10 tac pr bgA">
+		<span class="popImgdel cp" onclick="weibo.hidePhoto()">关闭</span>
+		<table width="400" cellpadding="0" cellspacing="0">
+			<tr>
+				<td>
+					<div class="fl" id="prephoto">
+						<span onclick="weibo.prevPhoto()" class="aPre" title="上一张" style="filter:alpha(opacity=0);"></span>
+					</div>
+					<div class="fl" id="nextphoto">
+						<span onclick="weibo.nextPhoto()" class="aNext" title="下一张" style="filter:alpha(opacity=0);"></span>
+					</div>
+					<img src="javascript://" id="photo_path"/></td>
+			</tr>
+		</table>
+	</div>
+</div>
+<!--
+EOT;
+	}
+    
+    function live($list) {
+print <<<EOT
+-->
+	<a href="javascript:;" class="fl preLive">上一页</a>
+	<a href="javascript:;" class="fr nextLive">下一页</a>
+	<div class="ulLive">
+	<ul class="cc">
+<!--
+EOT;
+if (!$list || !is_array($list)) return false;
+foreach ($list as $value) {
+print <<<EOT
+-->
+		<li>
+			<a href="apps.php?q=weibo&uid={$value['authorid']}" class="img_50 mr10"><img src="{$value['icon']}" alt="{$value['username']}" /></a>
+			<p><span class="f14"><a href="u.php?uid={$value['authorid']}">{$value['username']}:</a> </span><!--
+EOT;
+if ($value['type'] == 10) {
+$url = "read.php?tid={$value['objectid']}";
+}elseif($value['type'] == 3) {
+$url = "mode.php?m=cms&q=view&id={$value['objectid']}";
+}elseif ($value['type'] == 20) {
+$url = "apps.php?q=diary&a=detail&did={$value['objectid']}&uid={$value['authorid']}";
+} elseif ($value['type'] == 40) {
+$url = "apps.php?q=group&a=read&cyid={$value['extra']['cyid']}&tid={$value['objectid']}";
+} elseif ($value['type'] == 42) {
+$url = "apps.php?q=group&a=active&job=view&cyid={$value['extra']['cyid']}&id={$value['objectid']}";
+}
+if($url) {print <<<EOT
+-->
+			<a href="$url" target="_blank">{$value['extra']['title']}</a>
+<!--
+EOT;
+}print <<<EOT
+-->     
+            {$value['content']}</p>
+		</li>
+<!--
+EOT;
+}print <<<EOT
+-->
+	</ul>
+    
+<script type="text/javascript">
+(function(){
+	function moveElement(elem, final_x, final_y, interval)
+	{
+		if (!elem.style.left) elem.style.left = "0px";
+		if (!elem.style.top) elem.style.top = "0px";
+		var xpos = parseInt(elem.style.left);
+		var ypos = parseInt(elem.style.top);
+		if (xpos == final_x && ypos == final_y){ if (elem.movement) clearTimeout(elem.movement);return true;}
+		if (xpos < final_x) {var dist = Math.ceil((final_x - xpos) / 2);xpos = xpos + dist;}
+		if (xpos > final_x) {var dist = Math.ceil((xpos - final_x) / 2);xpos = xpos - dist;}
+		if (ypos < final_y) {var dist = Math.ceil((final_y - ypos) / 10);ypos = ypos + dist;}
+		if (ypos > final_y) {var dist = Math.ceil((ypos - final_y) / 10);ypos = ypos - dist;}
+		elem.style.left = xpos + "px";elem.style.top = ypos + "px";
+		elem.movement = setTimeout(function(){moveElement(elem, final_x, final_y, interval)}, interval);
+	}
+	var moveElem = getElementsByClassName("cc","J_feedLive")[0];
+	var prevElem = getElementsByClassName("preLive","J_feedLive")[0];
+	var nextElem = getElementsByClassName("nextLive","J_feedLive")[0];
+	var lis = moveElem.getElementsByTagName("li");
+	if(lis.length%3!=0){
+		for(var i=0;i<lis.length%2;i++)
+		{
+			moveElem.removeChild(lis[0]);
+		}
+	}
+	var width = lis[0].offsetWidth;
+	var currentNum = 0;moveElem.style.left = 0;
+	moveElem.style.width = width*lis.length+"px";
+	prevElem.onclick = function(){
+		if(currentNum==0){
+			var oFragment = document.createDocumentFragment();
+			while(lis.length!=3){
+				var node = lis[lis.length-1];
+				oFragment.insertBefore(node.cloneNode(true),oFragment.childNodes[0]);
+				moveElem.removeChild(node);
+			}
+			moveElem.insertBefore(oFragment,lis[0]);
+			moveElem.style.left = -width*(lis.length-3)+"px";
+			currentNum = 6;
+			}
+			moveElement(moveElem,parseInt(moveElem.style.left)+width*3,0,0);
+			currentNum-=3;
+	};
+	nextElem.onclick = function(){
+		if(currentNum==lis.length-3){
+			var oFragment = document.createDocumentFragment();
+			while(lis.length!=3){
+				var node = lis[0];
+				oFragment.appendChild(lis[0].cloneNode(true));
+				moveElem.removeChild(lis[0]);
+			}
+			moveElem.appendChild(oFragment);
+			moveElem.style.left = 0;
+			currentNum = 0;
+			}
+		moveElement(moveElem,parseInt(moveElem.style.left)-width*3,0,0);
+		currentNum+=3;
+	};
+	window.nextElem = nextElem;
+	setInterval("nextElem.onclick()",5000);
+})();
+</script>
+	</div>
+<!--
+EOT;
+	}    
+}
+$weiboModelTemplate = new weiboModelTemplate();
+?>

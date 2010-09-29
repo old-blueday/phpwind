@@ -1,0 +1,151 @@
+<!--<?php
+if (!defined('AJAX')) include_once PrintEot('left');
+if(empty($action)){
+$_recycle = $_default = '';
+if(!empty($type)) {
+	$_recycle = 'class="current"'; 
+}else{
+	$_default = 'class="current"';
+}
+print <<<EOT
+-->
+<script src="js/global.js" language="JavaScript"></script>
+<script src="js/pw_ajax.js" language="JavaScript"></script>
+<div class="nav3 mb10">
+    <ul class="cc">
+        <li {$_default}><a hidefocus="true" href="$baseurl&">文章管理</a></li>
+        <li {$_recycle}><a hidefocus="true" href="$baseurl&type=recycle">回收站</a></li>
+    </ul>
+</div>
+<div class="cc">
+<form action="$basename" method="post">
+<h2 class="h1"><span class="mr10 fl">搜索条件</span></h2>
+<input type="hidden" value="$type" name="type"/>
+<div class="admin_table mb10">
+	<table width="100%" cellpadding="0" cellspacing="0">
+		<tr class="tr1 vt">
+			<td class="td2">
+				所属栏目：<select name="cid" id="columnIds">{$columnSelect}</select> 
+				标题： <input type="text" class="input input_wc" value="$title" name="title"/>
+				发布：<input type="text" class="input input_wc" value="$user" name="user">
+				原创：<input type="text" class="input input_wc" value="$author" name="author">
+				<span class="bt2"><span><button type="submit">查找</button></span></span>
+			</td>
+		</tr>
+	</table>
+</div>
+</form>
+<form action="$basename" method="post" name="ARTICLEFORM">
+<input type="hidden" value="$type" name="type"/>
+<input type="hidden" value="$cid" name="cid"/>
+<h2 class="h1"><span class="mr10 fl">文章列表</span>
+<!--
+EOT;
+if($type=='recycle'){
+print <<<EOT
+-->
+	<span class="linka"><a id="addcolumn" href="$basename&action=cleanRecycle&type=$type" class="btn_add" onclick="return confirm('确定要清空回收站？')"><i>清空回收站</i></a></span>
+<!--
+EOT;
+}print <<<EOT
+-->
+</h2>
+<div class="admin_table mb10">
+	<table width="100%">
+		<tr class="tr2">
+			<td><a href="javascript:;" onclick="CheckAll(document.ARTICLEFORM)">全选</a></td>
+			<td>标题</td>
+			<td>所属栏目</td>
+			<td>发布</td>
+			<td>发布时间</td>
+			<td>操作</td>
+		</tr>
+<!--
+EOT;
+if(empty($articles)){
+print <<<EOT
+-->	
+		<tr class="tr1 vt">
+			<td class="p10" colspan="6"><div class="admin_tips">啊哦，没有你要的信息！</div></td>
+		</tr>	
+<!--
+EOT;
+}foreach($articles as $key => $article){
+$_column = $columns[$article['column_id']]['name'];
+print <<<EOT
+-->
+		<tr class="tr1 vt">
+			<td class="td2"><input type="checkbox" value="{$article[article_id]}" name="aids[]"/></td>
+			<td class="td2"><a href="mode.php?m=cms&q=view&id={$article[article_id]}" target="_blank">{$article[subject]}</a></td>
+			<td class="td2">{$_column}</td>
+			<td class="td2"><a href="u.php?uid={$article[userid]}" target="_blank">{$article[username]}</a></td>
+			<td class="td2">{$article['postdate']}</td>
+			<td class="td2">
+				<a href="mode.php?m=cms&q=post&action=edit&id={$article[article_id]}&page=1" target="_blank">[编辑]</a>
+<!--
+EOT;
+if($type == 'recycle'){
+print <<<EOT
+-->
+				<a href="$basename&action=del&aids[]={$article[article_id]}&cid=$cid" onclick="return confirm('确定要继续删除操作？')">[删除]</a>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+				<a href="$basename&action=recycle&aids[]={$article[article_id]}&cid=$cid" onclick="return confirm('是否确认删除，删除后数据进入回收站？')">[删除]</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+			</td>
+		</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+	</table>
+</div>
+</div>
+<div class="mb10 tac">{$pages}</div>
+<br><br>
+<div class="mb10 tac">
+操作：
+<!--
+EOT;
+if($type == 'recycle'){
+print <<<EOT
+-->
+	<label><input type="radio" name="action" value="revert" checked="checked"/>还原</label>
+	<lable><input type="radio" name="action" value="del"/>彻底删除</lable>
+<!--
+EOT;
+}else{print <<<EOT
+-->	
+	<label><input type="radio" name="action" value="move" checked="checked" />&nbsp;移动到 </label>
+	<select name="column_id">{$columnSelect}</select>&nbsp;&nbsp;
+	<label><input type="radio" name="action" value="recycle" />&nbsp;删除 </label>
+<!--
+EOT;
+}print <<<EOT
+-->
+</div>
+<div class="mb10 tac"><span class="btn"><span><button type="submit" onclick="return confirm('确定要继续该操作？')">提 交</button></span></span></div>
+</form>
+<script type="text/javascript">
+function selectedColumn(selectObj,columnId){
+	if(selectObj == null) return false;
+	var l = selectObj.options.length;
+	for(var i=0; i<l; i++){
+		if(selectObj.options[i].value==columnId){
+			selectObj.options[i].selected='selected';
+		}
+	}	
+}
+var selectObj = document.getElementById("columnIds");
+selectedColumn(selectObj,'$cid');
+</script>
+<!--
+EOT;
+}
+if (!defined('AJAX')) include_once PrintEot('adminbottom');
+?>-->

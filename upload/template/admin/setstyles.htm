@@ -1,0 +1,387 @@
+<!--<?php
+include_once PrintEot('left');
+if(!$action){print <<<EOT
+-->
+<div class="nav3 mb10 ta">
+  <ul class="cc">
+    <li class="current"><a href="$basename">风格列表</a></li>
+    <li><a href="$basename&action=add">添加风格</a></li>
+  </ul>
+</div>
+<h3 class="h1">css设置</h3>
+<form action="$basename" method="post">
+  <input type="hidden" name="action" value="setcss" />
+  <div class="admin_table mb10">
+    <table cellspacing="0" cellpadding="0" width="100%">
+      <tr class="tr1 vt">
+        <td class="td1">css显示方式设置</td>
+        <td class="td2"><ul class="cc">
+            <li>
+              <input type="radio" value="0" name="showcss" $showcss_N>
+              直接 html 显示</li>
+            <li>
+              <input type="radio" value="1" name="showcss" $showcss_Y>
+              以 link 方式外部引用样式</li>
+          </ul></td>
+		       </tr>
+    </table>
+  </div>
+  <div class="mb10 tac"> <span class="btn"><span>
+    <button type="submit" value="提 交">提 交</button>
+    </span></span> </div>
+</form>
+<form action="$basename" method="post">
+  <input type="hidden" name="action" value="listedit" />
+  <h2 class="h1">风格列表</h2>
+  <div class="admin_table mb10">
+    <table cellspacing="0" cellpadding="0" width="100%">
+      <tr class="tr2">
+        <td>ID</td>
+        <td>风格文件名</td>
+        <td>自定义风格名</td>
+        <td>开启</td>
+        <td>默认</td>
+        <td>操作</td>
+      </tr>
+<!--
+EOT;
+$i=0;
+foreach($allstyles as $key => $value){
+$i++;
+$checked = $value[1] == '1' ? "checked=CHECKED" : "";
+$disabled = ($value[1] == '1' || $key == 'wind') ? '' : "disabled=true";
+$rdchecked = $db_defaultstyle == $key ? "checked=CHECKED" : "";
+$j_url = EncodeUrl("$basename&action=del&sid=$key");
+print <<<EOT
+-->
+      <tr class="tr1 vt">
+        <td class="td2">$i</td>
+        <td class="td2">$key</td>
+        <td class="td2"><input type="text" class="input input_wa" name="customname[$key]" value="$value[0]"></td>
+        <td class="td2"><input type="checkbox" $checked name="ifopen[$key]" value="1"></td>
+        <td class="td2"><input type="radio" name="defaultstyle" value="$key" $disabled $rdchecked></td>
+        <td class="td2"><a href="$basename&action=edit&sid=$key" title="编辑" class="mr20">[编辑]</a><a title="删除" href="$j_url">[删除]</a></td>
+<!--
+EOT;
+if($key!='wind'){print <<<EOT
+-->
+        <a title="删除" href="$j_url"></a>
+<!--
+EOT;
+}print <<<EOT
+-->
+      </tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+    </table>
+  </div>
+  <div class="mb10 tac"> <span class="btn"><span>
+    <button type="submit" value="提 交">提 交</button>
+    </span></span> </div>
+</form>
+<!--
+EOT;
+}elseif($action=='edit' || $action=='add'){print <<<EOT
+-->
+<script type="text/javascript" language="JavaScript">
+function findPosX(obj) {
+	var curleft = 0;
+	if (obj.offsetParent) {
+		while (obj.offsetParent) {
+			curleft += obj.offsetLeft
+			obj = obj.offsetParent;
+		}
+	} else if (obj.x) {
+		curleft += obj.x;
+	}
+	return curleft - getLeft();
+}
+function findPosY(obj) {
+	var curtop = 0;
+	if (obj.offsetParent) {
+		while (obj.offsetParent) {
+			curtop += obj.offsetTop
+			obj = obj.offsetParent;
+		}
+	} else if (obj.y) {
+		curtop += obj.y;
+	}
+	return curtop - getTop();
+}
+function pickReback(obj,color){
+	if (typeof obj == 'string') {
+		obj = getObj(obj);
+	}
+	obj.style.color = color;
+}
+</script>
+<script type="text/javascript" language="JavaScript" src="js/global.js"></script>
+<script type="text/javascript" language="JavaScript" src="js/pw_ajax.js"></script>
+<script type="text/javascript" language="JavaScript" src="js/color_picker.js"></script>
+<div class="nav3 mb10 ta">
+  <ul class="cc">
+    <li><a href="$basename">风格列表</a></li>
+<!--
+EOT;
+if($action=='add'){ print <<<EOT
+-->
+    <li class="current"><a href="$basename&action=$action">添加风格</a></li>
+<!--
+EOT;
+}else{ print <<<EOT
+-->
+    <li><a href="$basename&action=add">添加风格</a></li>
+    <li class="current"><a href="$basename&action=$action">编辑风格</a></li>
+<!--
+EOT;
+}print <<<EOT
+-->
+  </ul>
+</div>
+<form action="$basename" method="post">
+  <input type="hidden" name="action" value="$action" />
+  <input type="hidden" name="step" value="3" />
+  <h2 class="h1"><b>风格核心文件编辑</b></h2>
+  <div class="admin_table mb10">
+    <table cellspacing="0" cellpadding="0" width="100%">
+      <input type="hidden" name="sid" value="$sid" />
+      <tr class="tr1 vt">
+        <td class="td1">风格名称</td>
+        <td class="td2">$sid</td>
+		<td class="td2"><div class="help_a">编辑的风格名称</div></td>
+      </tr>
+      <tr class="tr1 vt">
+        <td class="td1">image下的风格文件夹</td>
+        <td class="td2"><input value="$stylepath" class="input input_wa" name="setting[0]" /></td>
+		<td class="td2"><div class="help_a">此风格在image目录下的文件夹名称<br ／>请不要随意修改,如果需要请先手动修改image下的目录名</div></td>
+      </tr>
+      <tr class="tr1 vt">
+        <td class="td1">template下的风格文件夹</td>
+        <td class="td2"><input value="$tplpath" class="input input_wa" name="setting[1]" /></td>
+		<td class="td2"><div class="help_a">此风格在template目录下的风格文件夹名称</div></td>
+      </tr>
+    </table>
+  </div>
+  <h2 class="h1">整体风格设置</h2>
+  <div class="admin_table mb10">
+    <table cellspacing="0" cellpadding="0" width="100%">
+      <tr class="tr1 vt">
+        <td class="td1">表格内部样式</td>
+        <td class="td2"><ul class="cc list_80 list_A mr10 fl">
+            <li>
+              <input type="radio" value="1" name="setting[2]" $yes_Y />
+              竖线风格</li>
+            <li>
+              <input type="radio" value="0" name="setting[2]" $yes_N />
+              横线风格</li>
+          </ul></td>
+		  <td class="td2"><div class="help_a"></div></td>
+      </tr>
+      <tr class="tr1 vt">
+        <td class="td1">表格宽度</td>
+        <td class="td2"><input value="$tablewidth" class="input input_wa" name="setting[7]" /></td>
+		<td class="td2"><div class="help_a">填写百分比或像素值。例: 98% 或 960px</div></td>
+      </tr>
+      <tr class="tr1 vt">
+        <td class="td1">头尾部表格宽度</td>
+        <td class="td2"><input value="$mtablewidth" class="input input_wa" name="setting[8]" /></td>
+		<td class="td2"><div class="help_a">填写百分比或像素值。例: 98% 或 960px</div></td>
+      </tr>
+      <tr class="tr1 vt">
+        <td class="td1">全局背景颜色</td>
+        <td class="td2"><div class="input_img fl mr5"><i title="选择颜色" class="input_color" onclick="showColorPicker(this,'bgcolor',function(){pickReback('bgcolor_s',color_picker)})">选择颜色</i>
+            <input id="bgcolor" value="$bgcolor" name="setting[3]" />
+          </div>
+          <span id='bgcolor_s' style="color:$bgcolor">■■■■</span> </td>
+		  <td class="td2"><div class="help_a"></div></td>
+      </tr>
+      <tr class="tr1 vt">
+        <td class="td1">全局链接颜色</td>
+        <td class="td2"><div class="input_img fl mr5"> <i title="选择颜色" class="input_color" onclick="showColorPicker(this,'linkcolor',function(){pickReback('linkcolor_s',color_picker)})">选择颜色</i>
+            <input id="linkcolor" value="$linkcolor" name="setting[4]" />
+          </div>
+          <span id="linkcolor_s" style="color:$linkcolor">■■■■</span> </td>
+		  <td class="td2"><div class="help_a"></div></td>
+      </tr>
+      <tr class="tr1 vt">
+        <td class="td1">表格外边框颜色</td>
+        <td class="td2"><div class="input_img fl mr5"> <i title="选择颜色" class="input_color" onclick="showColorPicker(this,'tablecolor',function(){pickReback('tablecolor_s',color_picker)})">选择颜色</i>
+            <input id="tablecolor" value="$tablecolor" name="setting[5]" />
+          </div>
+          <span id="tablecolor_s" style="color:$tablecolor">■■■■</span></td>
+		  <td class="td2"><div class="help_a"></div></td>
+      </tr>
+      <tr class="tr1 vt">
+        <td class="td1">表格内边框颜色</td>
+        <td class="td2"><div class="input_img fl mr5"> <i title="选择颜色" class="input_color" onclick="showColorPicker(this,'tdcolor',function(){pickReback('tdcolor_s',color_picker)})">选择颜色</i>
+            <input id="tdcolor" value="$tdcolor" name="setting[6]" />
+          </div>
+          <span id="tdcolor_s" style="color:$tdcolor">■■■■</span></td>
+		  <td class="td2"><div class="help_a"></div></td>
+      </tr>
+    </table>
+  </div>
+  <h2 class="h1">表格样式颜色设置</h2>
+  <div class="admin_table mb10">
+    <table cellspacing="0" cellpadding="0" width="100%">
+      <tr class="tr1 vt">
+        <td class="td1">表格标题栏颜色</td>
+        <td class="td2"><div class="input_img fl mr5"> <i title="选择颜色" class="input_color" onclick="showColorPicker(this,'headcolor',function(){pickReback('headcolor_s',color_picker)})">选择颜色</i>
+            <input id="headcolor" value="$headcolor" name="setting[9]" />
+          </div>
+          <span id="headcolor_s" style="color:$headcolor">■■■■</span></td>
+		   <td class="td2"><div class="help_a"></div></td>
+      </tr>
+      <tr class="tr1 vt">
+        <td class="td1">表格标题栏下边框颜色</td>
+        <td class="td2"><div class="input_img fl mr5"> <i title="选择颜色" class="input_color" onclick="showColorPicker(this,'headborder',function(){pickReback('headborder_s',color_picker)})">选择颜色</i>
+            <input id="headborder" value="$headborder" name="setting[10]" />
+          </div>
+          <span id="headborder_s" style="color:$headborder">■■■■</span></td>
+		   <td class="td2"><div class="help_a"></div></td>
+      </tr>
+      <tr class="tr1 vt">
+        <td class="td1">标题栏主要字体链接颜色</td>
+        <td class="td2"><div class="input_img fl mr5"> <i title="选择颜色" class="input_color" onclick="showColorPicker(this,'headfontone',function(){pickReback('headfontone_s',color_picker)})">选择颜色</i>
+            <input id="headfontone" value="$headfontone" name="setting[11]" />
+          </div>
+          <span id="headfontone_s" style="color:$headfontone">■■■■</span></td>
+		  <td class="td2"><div class="help_a"></div></td>
+      </tr>
+      <tr class="tr1 vt">
+        <td class="td1">标题栏次要字体链接颜色</td>
+        <td class="td2"><div class="input_img fl mr5"> <i title="选择颜色" class="input_color" onclick="showColorPicker(this,'headfonttwo',function(){pickReback('headfonttwo_s',color_picker)})">选择颜色</i>
+            <input id="headfonttwo" value="$headfonttwo" name="setting[12]" />
+          </div>
+          <span id="headfonttwo_s" style="color:$headfonttwo">■■■■</span></td>
+		  <td class="td2"><div class="help_a"></div></td>
+      </tr>
+      <tr class="tr1 vt">
+        <td class="td1">表格副标题栏颜色</td>
+        <td class="td2"><div class="input_img fl mr5"> <i title="选择颜色" class="input_color" onclick="showColorPicker(this,'cbgcolor',function(){pickReback('cbgcolor_s',color_picker)})">选择颜色</i>
+            <input id="cbgcolor" value="$cbgcolor" name="setting[13]" />
+          </div>
+          <span id="cbgcolor_s" style="color:$cbgcolor">■■■■</span></td>
+<td class="td2"><div class="help_a"></div></td>
+      </tr>
+      <tr class="tr1 vt">
+        <td class="td1">表格副标题栏下边框颜色</td>
+        <td class="td2"><div class="input_img fl mr5"> <i title="选择颜色" class="input_color" onclick="showColorPicker(this,'cbgborder',function(){pickReback('cbgborder_s',color_picker)})">选择颜色</i>
+            <input id="cbgborder" value="$cbgborder" name="setting[14]" />
+          </div>
+          <span id="cbgborder_s" style="color:$cbgborder">■■■■</span></td>
+		  <td class="td2"><div class="help_a"></div></td>
+      </tr>
+      <tr class="tr1 vt">
+        <td class="td1">表格副标题栏字体颜色</td>
+        <td class="td2"><div class="input_img fl mr5"> <i title="选择颜色" class="input_color" onclick="showColorPicker(this,'cbgfont',function(){pickReback('cbgfont_s',color_picker)})">选择颜色</i>
+            <input id="cbgfont" value="$cbgfont" name="setting[15]" />
+          </div>
+          <span id="cbgfont_s" style="color:$cbgfont">■■■■</span></td>
+		  <td class="td2"><div class="help_a"></div></td>
+      </tr>
+      <tr class="tr1 vt">
+        <td class="td1">论坛列表颜色一</td>
+        <td class="td2"><div class="input_img fl mr5"> <i title="选择颜色" class="input_color" onclick="showColorPicker(this,'forumcolorone',function(){pickReback('forumcolorone_s',color_picker)})">选择颜色</i>
+            <input id="forumcolorone" value="$forumcolorone" name="setting[16]" />
+          </div>
+          <span id="forumcolorone_s" style="color:$forumcolorone">■■■■</span></td>
+		  <td class="td2"><div class="help_a"></div></td>
+      </tr>
+      <tr class="tr1 vt">
+        <td class="td1">论坛列表颜色二</td>
+        <td class="td2"><div class="input_img fl mr5"> <i title="选择颜色" class="input_color" onclick="showColorPicker(this,'forumcolortwo',function(){pickReback('forumcolortwo_s',color_picker)})">选择颜色</i>
+            <input id="forumcolortwo" value="$forumcolortwo" name="setting[17]" />
+          </div>
+          <span id="forumcolortwo_s" style="color:$forumcolortwo">■■■■</span></td>
+		  <td class="td2"><div class="help_a"></div></td>
+      </tr>
+      <tr class="tr1 vt">
+        <td class="td1">自定义css样式</td>
+        <td class="td2"><textarea name="setting[18]" class="textarea">$extcss</textarea></td>
+		 <td class="td2"><div class="help_a"></div></td>
+      </tr>
+    </table>
+  </div>
+  <div class="mb10 tac"> <span class="btn"><span>
+    <button type="submit" value="提 交">提 交</button>
+    </span></span> </div>
+</form>
+<!--
+EOT;
+if(0 && $action=='edit'){print <<<EOT
+-->
+<form action="$basename&" method="post">
+<h2 class="h1"><span class="mr20">编辑风格($sid)的CSS样式</span><span class="linka">CSS样式文件 (“data/style/{$tplpath}_css.htm”) 不存在或不可写，请将其设为777可写模式</span></h2>
+<div class="admin_table mb10">
+<table width="100%" cellpadding="0" cellspacing="0">
+<!--
+EOT;
+if($css_777){print <<<EOT
+-->
+  <tr class="tr1 vt">
+    <td class="td2"><!--.toptool　　顶端自定义导航样式
+.guide　　　导航栏样式
+.t 　　　　 为表格外边框样式，
+            表格外边框颜色在此设置
+.h 　　　　 为表格正标题栏样式，
+            设置背景颜色，边框样式，字体样式
+.tr2 　　　 为副标题栏样式，即原.cbg样式，
+            可使用背景图片等css样式
+.f9--.f14　 为字体大小控制，不建议修改
+.s1--.s5　　细节字体颜色
+.gray　　　 次要文字颜色
+h2　　　　　首页版块列表(index.php)版块名称样式
+h3　　　　　主题列表页文章标题名称样式
+h4          为帖子标题的字体大小
+.tpc_content帖子内容样式
+blockquote  引用内容样式
+.pages      翻页模块样式，建议只修改颜色
+.menu td与.menu li 下拉菜单内容背景色
+.f_one,.f_two, 版块列表(首页)表格背景
+.t_one,.t_two, 主题列表(thread.php)表格背景
+.r_one,.r_two, 帖子页面(read.php)表格背景
+.btn   按钮样式
+.input,textarea 输入框样式-->&nbsp;</td>
+    <td class="td2">
+    <textarea name="style_css" class="textarea" style="width:98%;height:420px;" title="请慎重,这里的一举一动将改变站点整个风格">{$style_css}</textarea>
+    </td>
+  </tr>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+  <!--
+EOT;
+}print <<<EOT
+-->
+</table>
+</div>
+<input type="hidden" name="action" value="editcss" />
+<input type="hidden" name="sid" value="$sid" />
+<div class="mb10 tac"> <span class="btn"><span>
+  <button type="submit" value="提 交">提 交</button>
+  </span></span> </div>
+</form>
+<!--
+EOT;
+}print <<<EOT
+-->
+<script language="JavaScript">
+var bgcolor = getObj('bgcolor').value;
+if(bgcolor.search(/\#[a-fA-F0-9]{6}/) != -1){
+	var color = bgcolor.substr(bgcolor.search(/\#[a-fA-F0-9]{6}/),7);
+	getObj('bgcolor_s').style.color=color;
+}else if(bgcolor.search(/\#[a-fA-F0-9]{3}/) != -1){
+	var color = bgcolor.substr(bgcolor.search(/\#[a-fA-F0-9]{3}/),4);
+	getObj('bgcolor_s').style.color=color;
+}else{
+	getObj('bgcolor_s').style.color='#FFFFFF';
+}
+</script>
+<!--
+EOT;
+}include_once PrintEot('adminbottom');
+?>-->

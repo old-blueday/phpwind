@@ -1,0 +1,148 @@
+<!--<?php
+include_once PrintEot('left');
+print <<<EOT
+-->
+<h2 class="h1"><b>附件统计</b></h2>
+<div class="admin_table mb10">
+    <table cellspacing="0" cellpadding="0" width="100%">
+        <tr class="tr1">
+            <td class="td1">附件总计[个]</td>
+            <td class="td2">$A_count</td>
+        </tr>
+        <tr class="tr1">
+            <td class="td1">附件占用空间[KB]</td>
+            <td class="td2">$A_size</td>
+        </tr>
+        <tr class="tr1">
+            <td class="td1">附件平均大小[KB]</td>
+            <td class="td2">$average</td>
+        </tr>
+        <tr class="tr1">
+            <td class="td1">总计下载次数[次]</td>
+            <td class="td2">$A_hits</td>
+        </tr>
+    </table>
+</div>
+<form action=$basename method=post>
+<input type=hidden name=action value='delete'> 
+<h2 class="h1"><b>前二十个最热门附件</b></h2>
+<div class="admin_table mb10">
+    <table cellspacing="0" cellpadding="0" width="100%">
+    <tr class="tr2">
+    	<td width="40">附件ID</td>
+        <td width="28%">附件名称</td>
+        <td>附件下载</td>
+        <td>附件大小</td>
+        <td width="60">下载次数</td>
+        <td>所在版块</td>
+    	<td>删</td>
+    </tr>
+<!--
+EOT;
+$num=0;
+foreach($M_hits as $thread){
+$num++;
+print <<<EOT
+-->
+    <tr class="tr1">
+    	<td class="td2">$num</td>
+    	<td class="td2">$thread[name]</td>
+    	<td class="td2">
+<!--
+EOT;
+    if ('' != $thread['imgurl']) {
+print <<<EOT
+-->
+    			<a href="$thread[imgurl]" target="_blank">$thread[url]</a>
+<!--
+EOT;
+    } else {
+print <<<EOT
+-->
+    			<a href="javascript:void(0);" onclick="alert('附件不存在');">$thread[url]</a>
+<!--
+EOT;
+    }
+print <<<EOT
+-->
+    	</td>
+        <td class="td2">$thread[size](KB)</td>
+   	 	<td class="td2">$thread[hits]</td>
+    	<td class="td2"><a href='thread.php?fid=$thread[fid]'>$thread[forum]</a></td>
+    	<td class="td2"><input type='checkbox' name='urlarray[$thread[aid]]' value=$thread[url]></td>
+     </tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+    </table>
+</div>
+<div class="mb10 tac">
+	<span class="bt"><span><button type="button" name="chkall" onclick="CheckAll(this.form)">全 选</button></span></span>
+	<span class="btn"><span><button type="submit" onfocus="blur();">提 交</button></span></span>
+</div>
+</form>
+<form action=$basename method=post>
+<input type=hidden name=action value='delete'> 
+<h2 class="h1"><b>前二十个最大附件</b></h2>
+<div class="admin_table mb10">
+    <table cellspacing="0" cellpadding="0" width="100%">
+        <tr class="tr2">
+        	<td width="40">附件ID</td>
+            <td width="28%">附件名称</td>
+            <td>附件下载</td>
+            <td>附件大小</td>
+            <td width="60">下载次数</td>
+            <td>所在版块</td>
+			<td>删</td>
+        </tr>
+<!--
+EOT;
+$num=0;
+foreach($M_size as $thread){
+$num++;
+print <<<EOT
+-->
+        <tr class="tr1">
+            <td class="td2">$num</td>
+            <td class="td2">$thread[name]</td>
+            <td class="td2">
+<!--
+EOT;
+    if ('' != $thread['imgurl']) {
+print <<<EOT
+-->
+        		<a href="$thread[imgurl]" target="_blank">$thread[url]</a>
+<!--
+EOT;
+    } else {
+print <<<EOT
+-->
+        		<a href="javascript:void(0);" onclick="alert('附件不存在');">$thread[url]</a>
+<!--
+EOT;
+    }
+print <<<EOT
+-->
+        	</td>
+            <td class="td2">$thread[size](KB)</td>
+        	<td class="td2">$thread[hits]</td>
+        	<td class="td2"><a href='thread.php?fid=$thread[fid]'>$thread[forum]</a></td>
+        	<td class="td2"><input type='checkbox' name='urlarray[$thread[aid]]' value=$thread[url]></td>
+        </tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+    </table>
+</div>
+<div class="mb10 tac">
+	<span class="bt"><span><button type="button" name="chkall" onclick="CheckAll(this.form)">全 选</button></span></span>
+	<span class="btn"><span><button type="submit" name="hello" onfocus="blur();">提 交</button></span></span>
+</div>
+</form>
+<!--
+EOT;
+include_once PrintEot('adminbottom');
+?>
+-->

@@ -1,0 +1,902 @@
+<!--<?php
+if ($a == 'del') {print <<<EOT
+-->
+<div style="width:200px;" class="cc">
+	<div class="p15">您确定要删除该帖吗？</div>
+	<div class="popBottom">
+	<span class="btn2"><span>
+<!--
+EOT;
+if($pid){print<<<EOT
+-->
+	<button type="button" onclick="ajax.send('apps.php?q=group&a=del&cyid=$cyid&tid=$tid&pid=$pid','step=2',ajax.get)">删 除</button>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+	<button type="button" onclick="ajax.send('apps.php?q=topicadmin&action=del&ajax=1&cyid=$cyid&seltid=$seltid','step=2',ajax.get)">删 除</button>
+<!--
+EOT;
+}print <<<EOT
+-->
+	</span></span>
+	<span class="bt2"><span><button type="button" onclick="closep();">取消</button></span></span>
+	</div>
+</div>
+<!--
+EOT;
+} elseif ($a == 'toptopic') {
+if($topped == 1){print <<<EOT
+-->
+<div style="width:200px;" class="cc">
+	<div class="p15">您确定要置顶该帖吗？</div>
+	<div class="popBottom">
+	<span class="btn2"><span><button type="button" onclick="ajax.send('apps.php?q=topicadmin&action=toptopic&topped=1&ajax=1&cyid=$cyid&seltid=$seltid','step=2',ajax.get)">确定</button></span></span>
+	<span class="bt2"><span><button type="button" onclick="closep();">取消</button></span></span>
+	</div>
+</div>
+<!--
+EOT;
+} else {print <<<EOT
+-->
+<div style="width:200px;" class="cc">
+	<div class="p15">您确定要取消置顶该帖吗？</div>
+	<div class="popBottom">
+	<span class="btn2"><span><button type="button" onclick="ajax.send('apps.php?q=topicadmin&action=toptopic&topped=0&ajax=1&cyid=$cyid&seltid=$seltid','step=2',ajax.get)">确定</button></span></span>
+	<span class="bt2"><span><button type="button" onclick="closep();">取消</button></span></span>
+	</div>
+</div>	
+<!--
+EOT;
+}} elseif ($a == 'digest') {
+if($digest == 1){print <<<EOT
+-->
+<div style="width:200px;" class="cc">
+	<div class="p15">您确定要加精该帖吗？</div>
+	<div class="popBottom">
+	<span class="btn2"><span><button type="button" onclick="ajax.send('apps.php?q=topicadmin&action=digest&digest=1&ajax=1&cyid=$cyid&seltid=$seltid','step=2',ajax.get)">确定</button></span></span>
+	<span class="bt2"><span><button type="button" onclick="closep();">取消</button></span></span>
+	</div>
+</div>
+<!--
+EOT;
+} else {print <<<EOT
+-->
+<div style="width:200px;" class="cc">
+	<div class="p15">您确定要取消加精该帖吗？</div>
+	<div class="popBottom">
+	<span class="btn2"><span><button type="button" onclick="ajax.send('apps.php?q=topicadmin&action=digest&digest=0&ajax=1&cyid=$cyid&seltid=$seltid','step=2',ajax.get)">确定</button></span></span>
+	<span class="bt2"><span><button type="button" onclick="closep();">取消</button></span></span>
+	</div>
+</div>
+<!--
+EOT;
+}} elseif ($a == 'writedel') {print <<<EOT
+-->
+<form action="{$basename}&a=$a&cyid=$cyid&id=$id" onsubmit="return false;" method="post">
+<input type="hidden" name="step" value="2" />
+<div style="width:200px;" class="cc">
+	<div class="p15">您确定要删掉该记录吗？</div>
+	<div class="popBottom">
+	<span class="btn2"><span><button type="button" onclick="ajax.submit(this.form)">确 定</button></span></span>
+	<span class="bt2"><span><button type="button" onclick="closep();">取消</button></span></span>
+	</div>
+</div>
+</form>
+<!--
+EOT;
+} elseif ($a == 'ajaxedit') {print <<<EOT
+-->
+<div style="width:400px">
+<script language="JavaScript" id="o_edit">
+function o_edit() {
+	var str = ajax.request.responseText.split("\t");
+	if (str[0] == 'success') {
+		var id  = read.obj.id;
+		id = id.substr(id.lastIndexOf('_')+1);
+		getObj('subject_'+id).innerHTML	= str[1];
+		getObj('read_'+id).innerHTML	= str[2];
+	} else {
+		ajax.guide();
+	}
+}
+</script>
+	<form action="apps.php?q=group&a=$a&cyid=$cyid" onsubmit="return false;" method="post">
+	<input type="hidden" name="tid" value="$tid" />
+	<input type="hidden" name="pid" value="$pid" />
+	<input type="hidden" name="step" value="3" />
+	<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><a class="adel" href="javascript:;" onclick="closep();">关闭</a>编辑话题</div>
+	<table width="100%" class="vt">
+		<tr><td width="40">标题</td><td><input class="input input_wa" type="text" name="atc_title" value="$atc_title" /></td></tr>
+		<tr><td >内容</td><td><textarea name="atc_content" class="textareaA">$atc_content</textarea></td></tr>
+	</table>
+	<div class="popBottom"><span class="bt2"><span><button type="button" onclick="window.location.href='apps.php?q=group&a=edit&cyid=$cyid&tid=$tid&pid=$pid&article=$article'">进入高级模式</button></span></span><span class="btn2"><span><button type="button" onclick="ajax.submit(this.form,o_edit)">提 交</button></span></span>
+	</div>
+	</form>
+</div>
+<!--
+EOT;
+} elseif ($a == 'active') {
+if ($job == 'join'){print <<<EOT
+-->
+<div style="width:320px">
+<form action="{$basename}a=$a&job=$job&cyid=$cyid" method="post" onsubmit="return false;">
+<input type="hidden" name="verify" value="$verifyhash" />
+<input type="hidden" name="id" value="$id">
+<input type="hidden" name="step" value="1">
+<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><a class="fr adel" href="javascript:;" onclick="closep();">关闭</a>活动报名</div>
+<table width="100%" cellspacing="0" cellpadding="0">
+	<tr><td>真实姓名：<span class="s1">*</span></td><td><input type="text" name="realname" class="input input_wa" /></td></tr>
+	<tr><td>手机：<span class="s1">*</span></td><td><input type="text" name="mobile" class="input input_wa" /></td></tr>
+	<tr><td>电话：</td><td><input type="text" name="phone" class="input input_wa" /></td></tr>
+	<tr><td>地址：</td><td><input type="text" name="address" class="input input_wa" /></td></tr>
+	<tr><td>匿名：</td><td><label for="anonymous"><input id="anonymous" type="checkbox" name="anonymous" value="1" />仅管理人员可见</label></td></tr>
+</table>
+<div class="popBottom">
+	<span class="btn2"><span><button name="ajaxsubmit" onclick="ajax.submit(this.form);" type="button">确认报名</button></span></span>
+</div>
+</form>
+</div>
+<!--
+EOT;
+} elseif ($job == 'del') {print <<<EOT
+-->
+<form action="{$basename}a=$a&job=$job&cyid=$cyid" method="post">
+<input type="hidden" name="verify" value="$verifyhash" />
+<!--
+EOT;
+if($frombbs == 1){print<<<EOT
+-->
+<input type="hidden" name="frombbs" value="1" />
+<!--
+EOT;
+}print<<<EOT
+-->
+<input type="hidden" name="id" value="$id">
+<input type="hidden" name="step" value="1">
+<div style="width:250px;">
+	<div class="p15">取消活动后，活动的所有信息将被删除!</div>
+    <div class="popBottom">
+        <span class="btn2"><span><button type="submit">确 定</button></span></span>
+        <span class="bt2"><span><button type="button" onclick="closep();">取消</button></span></span>
+    </div>
+</div>
+</form>
+<!--
+EOT;
+} elseif ($job == 'quit') {print <<<EOT
+-->
+<form action="{$basename}a=$a&job=$job&cyid=$cyid" method="post" onsubmit="return false;">
+<input type="hidden" name="verify" value="$verifyhash" />
+<input type="hidden" name="id" value="$id">
+<input type="hidden" name="step" value="1">
+<div style="width:250px;">
+	<div class="p15">退出活动后，你的报名信息将被删除。<br />如需退款请与活动发起人联系。</div>
+    <div class="popBottom">
+	<span class="btn2"><span><button type="button" onclick="ajax.submit(this.form)">退 出</button></span></span>
+	<span class="bt2"><span><button type="button" onclick="closep();">取消</button></span></span>
+	</div>
+</div>
+</form>
+<!--
+EOT;
+} elseif ($job == 'delmember') {print <<<EOT
+-->
+<form action="{$basename}a=$a&job=$job&cyid=$cyid" method="post" onsubmit="return false;">
+<input type="hidden" name="verify" value="$verifyhash" />
+<input type="hidden" name="id" value="$id">
+<input type="hidden" name="uid" value="$uid">
+<input type="hidden" name="step" value="1">
+<div style="width:250px;">
+	<div class="p15">确定要删除该报名用户吗?</div>
+    <div class="popBottom">
+	<span class="btn2"><span><button type="button" onclick="ajax.submit(this.form)">确 定</button></span></span>
+	<span class="bt2"><span><button type="button" onclick="closep();">取消</button></span></span>
+	</div>
+</div>
+</form>
+<!--
+EOT;
+} elseif ($job == 'sendmsg') {print <<<EOT
+-->
+<form action="apps.php?q=group&cyid=$cyid&a=active&job=$job" method="post" onsubmit="return false;">
+<input type="hidden" name="verify" value="$verifyhash" />
+<input type="hidden" name="step" value="2" />
+<input type="hidden" name="id" value="$id" />
+<div class="h" style="cursor:move" onmousedown="read.move(event);"><span class="fr" style="margin-top:2px;cursor:pointer" onclick="closep();"><img src="$imgpath/close.gif" /></span>群发短消息</div>
+<table cellspacing="0" cellpadding="0" width="440">
+	<tbody>
+	<tr><td align="center">标题</td><td><input type="text" class="input" name="subject" maxlength="100" size="50"/></td></tr>
+	<tr><td align="center">内容</td><td><textarea name="atc_content" rows="8" style="width:330px"></textarea></td></tr>
+	</tbody>
+</table>
+<div class="p10 tac"><span class="btn2"><span><button type="button" name="ajaxsubmit" onclick="ajax.submit(this.form);">提 交</button></span></span></div>
+</form>
+<!--
+EOT;
+}
+} elseif ($a == 'out') {print <<<EOT
+-->
+<form action="{$basename}&a=$a&cyid=$cyid" onsubmit="return false;" method="post">
+<input type="hidden" name="step" value="3" />
+	<div style="width:250px;">
+		<div class="p15">
+<!--
+EOT;
+if ($colony['admin'] == $windid) {print <<<EOT
+-->
+			您是该群组的创建者，您确定要解散该群组吗？
+<!--
+EOT;
+} else {print <<<EOT
+-->
+			您确定要退出该群组吗？
+<!--
+EOT;
+}print <<<EOT
+-->
+		</div>
+		<div class="popBottom">
+		<span class="btn2"><span><button type="button" onclick="ajax.submit(this.form)">确 定</button></span></span>
+		<span class="bt2"><span><button type="button" onclick="closep();">取消</button></span></span>
+	</div>
+	</div>
+	</form>
+<!--
+EOT;
+} elseif ($a == 'fanoutmsg') {print <<<EOT
+-->
+<div style="width:450px;">
+	<form action="{$basename}a=fanoutmsg&cyid=$cyid" onsubmit="return false;" method="post">
+	<input type="hidden" name="step" value="3" />
+	<input type="hidden" name="group" value="$group" />
+	<input type="hidden" name="uids" value="$uids" />
+	<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><a class="fr adel" href="javascript:;" onclick="closep();">关闭</a>群发消息</div>
+	<table cellpadding="0" cellspacing="0" width="100%" class="vt">
+		<tr>
+			<td width="70">群发对象</td>
+			<td> $usernames
+<!--
+EOT;
+if (!$selid && $total > 3) {
+$s_lang = array(
+	'0' => '群员',
+	'1' => '管理成员',
+	'2' => '普通成员',
+	'3' => '未验证会员'
+);
+print <<<EOT
+-->
+				等 {$total} 位{$s_lang[$group]}
+<!--
+EOT;
+}print <<<EOT
+-->
+			</td>
+		</tr>
+		<tr>
+			<td>标题</td>
+			<td><input type="text" class="input input_wa" name="subject" /></td>
+		</tr>
+		<tr>
+			<td>内容</td>
+			<td><textarea name="content" class="textareaA"></textarea></td>
+		</tr>
+		<tr>
+			<td>&nbsp;</td>
+			<td><span class="btn2"><span><button type="button" onclick="ajax.submit(this.form);">提 交</button></span></span></td>
+		</tr>
+	</table>
+	</form>
+</div>
+<!--
+EOT;
+} elseif ($a == 'delalbum') {print <<<EOT
+-->
+	<form action="{$basename}&a=$a&cyid=$cyid" onsubmit="return false;" method="post">
+	<input type="hidden" name="aid" value="$aid" />
+	<input type="hidden" name="step" value="3" />
+	<input type="hidden" name="from" value="$from" />
+	<div style="width:200px;">
+		<div class="p15">删除相册将同时删除所有照片<br />您确定要删除吗？</div>
+		<div class="popBottom">
+		<span class="btn2"><span><button type="button" onclick="ajax.submit(this.form)">删 除</button></span></span>
+		<span class="bt2"><span><button type="button" onclick="closep();">取消</button></span></span>
+	</div>
+	</div>
+	</form>
+<!--
+EOT;
+} elseif ($a == 'editalbum') {print <<<EOT
+-->
+	<form action="{$baseUrl}q=photos&a=editalbum" onSubmit="return false;" method="POST">
+		<input type="hidden" name="step" value="3" />
+		<input type="hidden" name="aid" value="$aid" />
+		<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><a class="adel" href="javascript:;" onclick="closep();">关闭</a>编辑相册</div>
+		<table cellpadding="0" cellspacing="0" width="450px">
+			<tr>
+				<td width="14%">相册名</td>
+				<td><input type="text" id="ajax_aname" name="aname" value="$rt[aname]" />&nbsp; <span id="ajax_aname_warn">限 24 字节</span></td>
+			</tr>
+			<tr>
+				<td>描述</td>
+				<td>
+					<textarea id="ajax_aintro" name="aintro" style="width:350px;height:70px">{$rt[aintro]}</textarea>
+					<span id="ajax_aintro_warn" class="fr" style="margin-right:15px;"> 限 255 字节</span>
+				</td>
+			</tr>
+			<tr>
+				<td>可见度</td>
+				<td>
+					<select name="private" onchange="optionsel(this.value);">
+						<option value="0" $select_0>全站用户可见</option>
+						<option value="1" $select_1>仅好友可见</option>
+						<option value="2" $select_2>仅自己可见</option>
+						<option value="3" $select_3>需要密码访问</option>
+					</select>
+<!--
+EOT;
+if($select_3 == 'selected'){print<<<EOT
+-->
+					<span id="resetpwd_$rt[aid]" onclick="resetpwd();" style="cursor:pointer">重设密码</span>
+<!--
+EOT;
+}else{print<<<EOT
+-->
+					<span id="resetpwd_$rt[aid]"></span>
+<!--
+EOT;
+}print <<<EOT
+-->
+				</td>
+			</tr>
+			<tbody id="photo_pwd" style="display:none">
+			<tr>
+				<td>输入密码</td>
+				<td>
+					<input type="password" name="pwd" id="c_ajax_pwdinfo" />&nbsp;<span id="c_ajax_pwdinfo_warn">最小长度:3 最大长度:15</span>
+				</td>
+			</tr>
+			<tr>
+				<td>确认密码</td>
+				<td>
+					<input type="password" name="repwd" id="repwd_info" />
+				</td>
+			</tr>
+			</tbody>
+		</table>
+		<div class="popBottom"><span class="btn2"><span><button type="submit" onclick="ajax.submit(this.form)">编辑相册</button></span></span><span class="bt2"><span><button type="button" onclick="closep();">取消</button></span></span></div>
+	</form>
+<script language="JavaScript">
+var charset = '$db_charset';
+setTimeout(function(){initCheckTextNum('ajax_aname','ajax_aname_warn',24);},300);
+setTimeout(function(){initCheckTextNum('ajax_aintro','ajax_aintro_warn',255);},300);
+function resetpwd() {
+	getObj('resetpwd_$rt[aid]').style.display = 'none';
+	getObj('photo_pwd').style.display = '';
+}
+function optionsel(id) {
+	var pwdobj = getObj('photo_pwd');
+	var resetpwdid = getObj('resetpwd_$rt[aid]');
+	resetpwdid.style.display = 'none';
+	if (isNaN(id)) {
+		showDialog('error','非法操作');
+	}
+	if (id == '3') {
+		pwdobj.style.display = '';
+	} else {
+		pwdobj.style.display = 'none';
+	}
+}
+</script>
+<!--
+EOT;
+} elseif ($a == 'uintro') {
+if ($job != 'set') {print <<<EOT
+-->
+<div style="width:400px;">
+	<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><a class="adel" href="javascript:;" onclick="closep();">关闭</a>通讯资料</div>
+	<table cellpadding="0" cellspacing="0" width="100%" class="z">
+		<tr class="tr3">
+			<td width="80">用户</td>
+			<td>
+				$uinfo[username]
+<!--
+EOT;
+if ($winduid == $uinfo['uid']) {print <<<EOT
+-->
+				[<a href="apps.php?q=group&a=uintro&cyid=$cyid&job=set" onclick="ajax.send(this.href,'',ajax.get);return false;">编辑我的通讯录</a>]
+<!--
+EOT;
+}print <<<EOT
+-->
+			</td>
+		</tr>
+		<tr class="tr3">
+			<td>真实姓名</td>
+			<td>$uinfo[realname]</td>
+		</tr>
+		<tr class="tr3">
+			<td>性别</td>
+			<td>
+<!--
+EOT;
+if ($uinfo['gender'] == '1') {print <<<EOT
+-->
+				男
+<!--
+EOT;
+} elseif ($uinfo['gender'] == '2') {print <<<EOT
+-->
+				女
+<!--
+EOT;
+} else {print <<<EOT
+-->
+				保密
+<!--
+EOT;
+}print <<<EOT
+-->
+			</td>
+		</tr>
+		<tr class="tr3">
+			<td>电话</td>
+			<td>$uinfo[tel]</td>
+		</tr>
+		<tr class="tr3">
+			<td>邮箱</td>
+			<td>$uinfo[email]</td>
+		</tr>
+		<tr class="tr3">
+			<td>联系地址</td>
+			<td>$uinfo[address]</td>
+		</tr>
+		<tr class="tr3">
+			<td>介绍说明</td>
+			<td>$uinfo[introduce]</td>
+		</tr>
+	</table>
+</div>
+<!--
+EOT;
+} else {print <<<EOT
+-->
+<div style="width:500px">
+	<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><a class="adel" href="javascript:;" onclick="closep();">关闭</a>编辑通讯资料</div>
+	<form action="apps.php?q=group&a=$a" method="post" onsubmit="return false">
+	<input type="hidden" name="step" value="3" />
+	<input type="hidden" name="cyid" value="$cyid" />
+	<table cellpadding="0" cellspacing="0" width="100%" class="mb5 vt">
+		<tr class="tr3">
+				<td width="80">用户</td>
+				<td>$uinfo[username]</td>
+		</tr>
+		<tr class="tr3">
+				<td>真实姓名</td>
+				<td><input type="text" class="input input_wa mr5" name="realname" id="realname" value="$uinfo[realname]" /><span id="realname_warn" class="s6">限 20 字节</span></td>
+		</tr>
+		<tr class="tr3">
+				<td>性别</td>
+				<td>
+						<select name="gender" class="select_wa">
+								<option value="0" $select_0>保密</option>
+								<option value="1" $select_1>男</option>
+								<option value="2" $select_2>女</option>
+						</select>
+				</td>
+		</tr>
+		<tr class="tr3">
+				<td>电话</td>
+				<td><input type="text" class="input input_wa" name="tel" value="$uinfo[tel]" /></td>
+		</tr>
+		<tr class="tr3">
+				<td>邮箱</td>
+				<td><input type="text" class="input input_wa" name="email" value="$uinfo[email]" /></td>
+		</tr>
+		<tr class="tr3">
+				<td>联系地址</td>
+				<td><input type="text" class="input input_wb mb5" name="address" id="address" value="$uinfo[address]" /><p id="address_warn" class="s6">限 255 字节</p></td>
+		</tr>
+		<tr class="tr3">
+				<td>介绍说明</td>
+				<td><textarea name="introduce" id="introduce" class="textareaA mb5">$uinfo[introduce]</textarea><p id="introduce_warn" class="s6">限 255 字节</p></td>
+		</tr>
+	</table>
+	<div class="popBottom"><span class="btn2"><span><button type="button" onclick="ajax.submit(this.form)">提 交</button></span></span></div>
+	</form>
+</div>
+<script language="JavaScript">
+var charset = '$db_charset';
+setTimeout(function(){initCheckTextNum('realname','realname_warn',20);},300);
+setTimeout(function(){initCheckTextNum('address','address_warn',255);},300);
+setTimeout(function(){initCheckTextNum('introduce','introduce_warn',255);},300);
+</SCRIPT>
+<!--
+EOT;
+}}elseif($a=='recommend'){print <<<EOT
+-->
+<div style="width:440px;">
+<form method="post" name="FORM" action="operate.php?action=share&ajax=1" onsubmit="return false;">
+<input type="hidden" name="step" value="2" />
+<input type="hidden" name="type" value="groups" />
+<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><a class="adel" href="javascript:;" onclick="closep();">关闭</a>推荐</div>
+<table width="100%" class="vt mb5">
+	<tr class="tr3">
+		<td width="80">推荐方式:</td>
+		<td>消息推荐</td>
+	</tr>
+	<tr class="tr3">
+		<td>对方姓名:</td>
+		<td><input type="text" class="input input_wa" name="sendtoname" value="" />
+<!--
+EOT;
+if($frienddb){print <<<EOT
+-->
+		<span class="bta" onClick="if (getObj('tofriend').style.display=='none'){getObj('tofriend').style.display='';}else{getObj('tofriend').style.display='none';}" style="cursor:pointer;">好友列表</span>
+<!--
+EOT;
+}print <<<EOT
+-->
+		</td>
+	</tr>
+	<tr id="tofriend" style="display:none" class="tr3 vt">
+		<td align="center">好友选择:</td>
+		<td>
+			<div class="fri-list pr">
+							<div class="fri-top">
+								<span class="fr">
+									<select name="friendtype" onchange="showFriendList(this.value);">
+										<option value="-1">全部好友</option>
+<!--
+EOT;
+foreach ($friendtype as $key => $value) {print <<<EOT
+-->
+										<option value="$key">$value[name]</option>
+<!--
+EOT;
+}print <<<EOT
+-->
+									</select>
+								</span>
+								<span class="btn2"><span><button type="submit" onclick="CheckAll(this.form)">全选</button></span></span>
+							</div>
+							<div class="fri-bot" id="friendlist">
+								<ul class="list-wid cc listC">
+<!--
+EOT;
+foreach ($friendtype as $key => $value) {print <<<EOT
+-->
+									<div id="ftid_$value[ftid]">
+<!--
+EOT;
+foreach ($frienddb[$value[ftid]] as $k => $v) {print <<<EOT
+-->
+										<li><input type="checkbox" name="touid[]" value="$v[uid]" {$checked[$v[uid]]}> $v[username]</li>
+<!--
+EOT;
+}print <<<EOT
+-->
+									</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+								</ul>
+							</div>
+						</div>
+<SCRIPT type="text/javascript" LANGUAGE="JavaScript" src="js/core/friendlist.js"></SCRIPT>
+
+		</td>
+	</tr>
+	<tr class="tr3">
+		<td>标题:</td>
+		<td><input type="text" class="input input_wb" name="subject" value="&quot;{$windid}&quot;$atc_name" /></td>
+	</tr>
+	<tr class="tr3">
+		<td>内容:</td>
+		<td>
+<!--
+EOT;
+if($type == 'user') {print <<<EOT
+-->
+					<textarea class="textareaA" name="atc_content" onkeydown="ajax.quickpost(event,this.form)">我很喜欢用户[url={$db_bbsurl}/u.php?uid={$uid}]{$username}[/url]的个人空间，特别推荐。\n\n他（她）的用户名:\n$title\n\n希望你能喜欢。</textarea>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+					<textarea class="textareaA" name="atc_content" onkeydown="ajax.quickpost(event,this.form)">
+EOT;
+$uid || $uid = $u;print <<<EOT
+我在用户[url={$db_bbsurl}/u.php?uid={$uid}]{$username}[/url]的个人空间发现这个信息，认为很有价值，特别推荐。\n\n主要信息:\n$title\n\n描述:\n$descrip\n\n希望你能喜欢。</textarea>
+<!--
+EOT;
+}print <<<EOT
+-->
+		</td>
+	</tr>
+</table>
+<div class="popBottom"><span class="btn2"><span><button type="button" name="ajaxsubmit" style="width:80px;" onclick="ajax.submit(this.form);">提 交</button></span></span><span class="bt2"><span><button type="button" onclick="closep();">取消</button></span></span></div>
+</form>
+</div>
+<script language="javascript">
+var ifcheck = true;
+function CheckAll(form,match) {
+	for (var i = 0; i < form.elements.length; i++) {
+		var e = form.elements[i];
+		if (e.type == 'checkbox' && (typeof match == 'undefined' || e.name.match(match))) {
+			e.checked = ifcheck;
+		}
+	}
+	ifcheck = ifcheck == true ? false : true;
+}
+</script>
+<!--
+EOT;
+} elseif ($a == 'feedsetting') {print <<<EOT
+-->
+<form action="{$baseUrl}q=ajax&a=feedsetting" onSubmit="return false;" method="POST">
+	<input type="hidden" name="step" value="2" />
+	<div class="fri-list pr">
+		<div class="fri-top">
+			<span class="fr">
+				<select name="friendtype" onchange="showFriendList(this.value);">
+					<option value="-1">全部好友</option>
+<!--
+EOT;
+foreach ($friendtype as $key => $value) {print <<<EOT
+-->
+					<option value="$key">$value[name]</option>
+<!--
+EOT;
+}print <<<EOT
+-->
+				</select>
+			</span>
+			<span class="bt2"><span><button type="submit" onclick="CheckAll(this.form)">全选</button></span></span>
+			<span class="btn2"><span><button type="submit" onclick="ajax.submit(this.form)">确定</button></span></span>
+			<span class="bt2"><span><button type="button" onclick="closep();">取消</button></span></span>
+		</div>
+	<div class="fri-bot" id="friendlist">
+	<div>
+<!--
+EOT;
+foreach ($friendtype as $key => $value) {print <<<EOT
+-->
+						<ul class="cc" id="ftid_$value[ftid]">
+<!--
+EOT;
+foreach ($frienddb[$value[ftid]] as $k => $v) {print <<<EOT
+-->
+								<li><input type="checkbox" name="selid[]" value="$v[uid]" {$checked[$v[uid]]}> $v[username]</li>
+<!--
+EOT;
+}print <<<EOT
+-->
+						</ul>
+<!--
+EOT;
+}print <<<EOT
+-->
+	</div>
+</div>
+</div>
+</form>
+<SCRIPT type="text/javascript" LANGUAGE="JavaScript" src="js/core/friendlist.js"></SCRIPT>
+
+<!--
+EOT;
+}elseif ($a == 'copydiary') {print <<<EOT
+-->
+<div style="width:350px;">
+	<form action="{$baseUrl}q=diary&a=copydiary" onSubmit="return false;" method="POST">
+		<input type="hidden" name="step" value="2" />
+		<input type="hidden" name="did" value="$did" />
+		<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><a class="adel" href="javascript:;" onclick="closep();">关闭</a>日志转载</div>
+		<table width="100%" class="mb5 vt">
+			<tr class="tr3">
+				<td width="80">日志分类</td>
+				<td>
+					<select id="dtidsel" name="dtid" class="select_wa">
+						<option value="0">默认分类</option>
+						$dtsel
+					</select>
+				</td>
+			</tr>
+			<tr class="tr3">
+				<td>隐私设置</td>
+				<td>
+					<select id="prisel" name="privacy" class="select_wa">
+						<option value="0">全站可见</option>
+						<option value="1">仅好友可见</option>
+						<option value="2">仅自己可见</option>
+					</select>
+				</td>
+			</tr>
+		</table>
+		<div class="popBottom"><span class="btn2"><span><button type="button" onclick="copyurl();return false;">提 交</button></span></span><span class="bt2"><span><button type="button" onclick="closep();">取消</button></span></span></div>
+	</form>
+</div>
+<script language="JavaScript">
+function copyurl() {
+	var dtid = getObj('dtidsel').value;
+	var privacy = getObj('prisel').value;
+	Copydiary('$did',dtid,privacy);
+}
+</script>
+<!--
+EOT;
+}elseif ($a == 'viewalbum') {print <<<EOT
+-->
+	<form action="{$baseUrl}q=photos&a=viewalbum" onSubmit="return false;" method="POST">
+		<input type="hidden" name="aid" id="aidvalue" value="$aid" />
+		<input type="hidden" name="space" id="spacevalue" value="$space" />
+		<input type="hidden" name="uid" id="uidvalue" value="$u" />
+		<table cellpadding="0" cellspacing="0" width="300px">
+			<tr>
+				<td width="25%">输入密码</td>
+				<td><input type="password" name="viewpwd" id="pwdvalue" maxlength="15" /></td>
+			</tr>
+			<tr>
+				<td></td>
+				<td>
+				<span class="btn2"><span><button type="submit" style="width:80px;" onclick="tourl();">提 交</button></span></span>
+				<span class="bt2"><span><button type="button" onclick="closep();">取消</button></span></span>
+				</td>
+			</tr>
+		</table>
+	</form>
+<script language="JavaScript">
+function tourl() {
+	var aid = getObj('aidvalue').value;
+	var viewpwd = getObj('pwdvalue').value;
+	var space = getObj('spacevalue').value;
+	var uid = getObj('uidvalue').value;
+	ajax.send("{$baseUrl}q=photos&a=album",'checkpwd=1&aid=' + aid + '&viewpwd=' + viewpwd,function(){
+		var rText = ajax.request.responseText;
+		if (rText == 'fail') {
+			showDialog('error','密码错误,请重新输入',2);
+		} else if (rText == 'empty') {
+			showDialog('error','密码不能为空,请重新输入',2);
+		} else if (rText == 'success') {
+			window.location.href = "{$baseUrl}q=photos&a=album&aid=" + aid + "&viewpwd=" + viewpwd + "&space=" + space + "&u=" + uid;
+		} else {
+			showDialog('error','数据链接出错',2);
+		}
+	});
+}
+</script>
+<!--
+EOT;
+} elseif ($a == 'createajax') {
+print <<<EOT
+-->
+<div style="width:450px;">
+	<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><a class="adel" href="javascript:;" onclick="closep();">关闭</a>创建相册</div>
+	<form name="form" method="POST" action="apps.php?q=galbum&a=create&ajax=1&cyid=$cyid">
+	<input type="hidden" name="step" value="2">
+	<table class="vt">
+		<tr>
+			<td width="75">相册名称<span class="s1">*</span></td>
+			<td><input type="text" id="c_ajax_aname" name="aname" class="input input_wa" />&nbsp; <span id="c_ajax_aname_warn" class="s6">限 24 字节</span></td>
+		</tr>
+		<tr>
+			<td>描述</td>
+			<td>
+				<textarea id="c_ajax_aintro" name="aintro" class="textareaA mb5"></textarea>
+				<p id="c_ajax_aintro_warn" class="s6"> 限 255 字节</p>
+			</td>
+		</tr>
+		<tr>
+			<td>可见度</td>
+			<td> 
+				<select name="private" id="private_info" class="select_wa">
+					<option value="0">全站用户可见</option>
+					<option value="1">仅成员可见</option>
+				</select>
+			</td>
+		</tr>
+		<tr>
+        	<td>群成员上传</td>
+            <td>
+				<select name="memopen" class="select_wa"><option value="1" ${'select2_1'}>允许</option><option value="0" ${'select2_0'}>不允许</option></select>
+			</td>
+        </tr>
+<!--
+EOT;
+if ($o_photos_gdcheck) {print <<<EOT
+-->
+		<tr>
+			<td>认证码</td>
+			<td>
+				<input class="input input_wc" onfocus="showCK();" type="text" name="gdcode" id="gdcode" tabindex="3"  /><br /><img id="ckcode" style="cursor:pointer;display:none;margin-bottom:5px;" onclick="this.src='ck.php?nowtime='+new Date().getTime();" alt="看不清楚，换一张" />
+			</td>
+		</tr>
+<script language="JavaScript">
+function showCK(){
+	getObj('ckcode').style.display="";
+	if (getObj('ckcode').src.indexOf('ck.php') == -1) {
+		getObj('ckcode').src = 'ck.php?nowtime=' + new Date().getTime();
+	}
+}
+</script>
+<!--
+EOT;
+}if($o_photos_qcheck){
+$qkey = array_rand($db_question);
+print <<<EOT
+-->
+		<tr>
+			<td>验证问答</td>
+			<td>
+			{$db_question[$qkey]}(正确答案:{$db_answer[$qkey]})<br />
+			<input class="input input_wc" name="qanswer" id="qanswer" size="25" tabindex="7" />
+			<input type="hidden" name="qkey" id="qkey" value="$qkey" />
+			</td>
+		</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+		<tr>
+			<td></td>
+			<td>
+			<span class="btn2"><span><button type="button" onclick="ajax.submit(this.form,createAlbumResponse);">提 交</button></span></span>
+			</td>
+		</tr>
+	</table>
+	</form>
+</div>
+<script language="JavaScript">
+
+var charset = '$db_charset';
+var maxphotonum = '$maxphotonum';
+setTimeout(function(){initCheckTextNum('c_ajax_aname','c_ajax_aname_warn',24);},300);
+setTimeout(function(){initCheckTextNum('c_ajax_aintro','c_ajax_aintro_warn',255);},300);
+setTimeout(function(){initCheckTextNum('c_ajax_pwdinfo','c_ajax_pwdinfo_warn',15);},300);
+
+function createAlbumResponse() {
+	var rText = ajax.request.responseText.split('\t');
+	if(rText[0] == 'success') {
+		var aidsel = getObj('aidsel_info');
+		var option = elementBind('option');
+		option.innerHTML = rText[2];
+		option.value = rText[1];
+		option.selected = 'selected';
+		aidsel.insertBefore(option,null);
+		if (rText[3] == 'flash') {
+			photoflashAtt.getaid(aidsel.value);
+		}
+		getObj('allowflash').innerHTML = '您还可以上传'+maxphotonum+'张照片';
+		showDialog('success','相册添加成功!',2);
+	} else {
+		ajax.guide();
+	}
+	read.menu.style.top="300px";
+}
+</script>
+<!--
+EOT;
+} elseif ($a == 'editphoto') {print <<<EOT
+-->
+<div style="width:450px;">
+<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><a class="adel" href="javascript:;" onclick="closep();">关闭</a>编辑照片</div>
+<form action="apps.php?q=galbum&a=editphoto&cyid=$cyid" method="post">
+	<input type="hidden" name="step" value="3" />
+	<input type="hidden" name="pid" value="$pid" />
+    <table class="vt mb5">
+    	<tr>
+        	<td width="60">选择相册</td>
+            <td><select name="aid" class="select_wa">{$options}</select></td>
+        </tr>
+        <tr>
+        	<td>描述</td>
+            <td><textarea name="pintro" class="textareaA">$photo[pintro]</textarea></td>
+        </tr>
+    </table>
+<div class="popBottom"><span class="btn2"><span><button type="button" onclick="ajax.submit(this.form)">编辑照片</button></span></span></div>
+</form>
+</div>
+<!--
+EOT;
+}?>-->

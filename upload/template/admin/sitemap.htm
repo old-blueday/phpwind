@@ -1,0 +1,32 @@
+<!--<?php
+include_once PrintEot('left');
+print <<<EOT
+-->
+<div class="admin_info mb10">
+	<h3 class="h1"><b>提示信息</b></h3>
+	<div class="legend">网站地图功能(Sitemaps)使您能够告知搜索引擎您网站中可供抓取的网址，以便搜索引擎可以更智能地收录您的网站信息，适用于各种大小的网站</div>
+</div>
+<form action="$basename" method="post">
+	<input type="hidden" name="action" value="baidu" />
+	<h2 class="h1">网站地图设置</h2>
+	<div class="admin_table mb10">
+		<table width="100%" cellspacing="0" cellpadding="0">
+			<tr class="tr1 vt">
+				<td class="td1">更新周期[小时]</td>
+				<td class="td2"><input class="input input_wa" type="text" name="config[updatePeri]" value="$sm_updatePeri" /></td><td class="td2"><div class="help_a">建议值:12小时</div></td>
+			</tr>
+			<tr class="tr1 vt">
+				<td class="td1">生成列表数目</td>
+				<td class="td2"><input class="input input_wa" type="text" name="config[num]" value="$sm_num" /></td><td class="td2"><div class="help_a">建议值:1000</div></td>
+			</tr>
+		</table>
+	</div>
+	<div class="tac">
+		<span class="btn"><span><button type="submit">提 交</button></span></span>
+		<span class="bt"><span><button type="button" onclick="window.location.href='$basename&action=create'">重新生成网站地图</button></span></span>
+	</div>
+</form>
+<!--
+EOT;
+include_once PrintEot('adminbottom');
+?>-->

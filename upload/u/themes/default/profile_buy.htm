@@ -1,0 +1,150 @@
+<!--<?php
+require_once uTemplate::PrintEot('header');
+print <<<EOT
+-->
+<!--
+EOT;
+require_once uTemplate::PrintEot('profile_left');
+print <<<EOT
+-->
+	<div class="contUser">
+        <div class="p15">
+            <h4 class="site"><span>权限</span></h4>
+            <div class="navC mb10">
+                <ul>
+					<li><a style="cursor:pointer" href="profile.php?action=permission" hidefocus="true">权限查看</a></li>
+					<li class="current"><a style="cursor:pointer" hidefocus="true">特殊组购买</a></li>
+                </ul>
+            </div>
+			<table width="100%" height="450">
+				<tr><td class="vt"><div>
+<!--
+EOT;
+if (!$job) {print<<<EOT
+-->
+						<table width="100%" class="mb10 tA">
+							<tr class="s3">
+								<td>用户组头衔</td>
+								<td>日价格(积分)</td>
+								<td>日价格(RMB)</td>
+								<td>最短购买天数</td>
+								<td>到期时间</td>
+								<td>购买</td>
+							</tr>
+<!--
+EOT;
+foreach ($specialdb as $key => $val) {print <<<EOT
+-->
+							<tr>
+								<td>$val[grouptitle]</td>
+								<td>{$val[sellprice]} {$val[selltype]}/天</td>
+								<td>{$val[rmbprice]} /天</td>
+								<td>{$val[selllimit]}</td>
+								<td>$val[enddate]</td>
+								<td>
+<!--
+EOT;
+if(!$val['startdate'] || $timestamp > $val['startdate'] + $val['days']*86400){print <<<EOT
+-->
+									<a href="profile.php?action=buy&job=buy&gid=$val[gid]">购买</a>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+									-
+<!--
+EOT;
+}print <<<EOT
+-->
+								</td>
+							</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+						</table>
+<!--
+EOT;
+} elseif ($job == 'buy') {print <<<EOT
+-->
+						<form method="post" action="profile.php?action=buy&">
+						<input type="hidden" name="verify" value="$verifyhash" />
+						<input type="hidden" name="job" value="buy" />
+						<input type="hidden" name="step" value="2" />
+						<input type="hidden" name="gid" value="$gid" />
+						<div class="p_lr_10">
+						<table width="100%" class="mb10 setTable">
+							<tr>
+								<th class="th" style="width:150px;">用户组头衔</th>
+								<td class="td"><span class="mr20 s2">{$rt[grouptitle]}</span><span class="gray">{$rt[sright][sellinfo]}</span></td>
+							</tr>
+							<tr>
+								<th class="th">购买方式</th>
+								<td class="td" id="checkradio">
+<!--
+EOT;
+if ($rt['sright']['sellprice'] > 0) {print <<<EOT
+-->
+									<label><input type="radio" name="buymethod" value="0" onclick="showpwd(this.value)" />积分购买 ({$rt[sright][sellprice]} {$rt[sright][selltype]}/天)</label>
+<!--
+EOT;
+}if ($rt['sright']['rmbprice'] > 0) {print <<<EOT
+-->
+									<label><input type="radio" name="buymethod" value="1" onclick="showpwd(this.value)" />现金购买 ({$rt[sright][rmbprice]} RMB/天)</label>
+<!--
+EOT;
+}print <<<EOT
+-->
+								</td>
+							</tr>
+							<tr>
+								<th class="th">购买天数</th>
+								<td class="td">
+									<input class="input" type="text" name="days" size="20" />
+									<span class="gray">最少 {$rt[sright][selllimit]} 天</span>
+								</td>
+							</tr>
+							<tr id="showpwd" style="display:none">
+								<th class="th">请输入密码</th>
+								<td class="td"><input class="input" type="password" name="pwpwd" size="20" /></td>
+							</tr>
+							<tr>
+								<th class="th" style="width:150px;">将该用户组头衔作为</th>
+								<td class="td">
+									<label class="mr10"><input type="radio" name="options" value="1" checked />站点显示头衔</label>
+									<label><input type="radio" name="options" value="2" />附加头衔</label>
+								</td>
+							</tr>
+						</table>
+						</div>
+						<div class="tac" style="padding:1em">
+							<span class="btn"><span><button type="submit">提 交</button></span></span>
+						</div>
+						</form>
+<script language="JavaScript">
+function checkradio() {
+	var radio = getObj('checkradio').getElementsByTagName('input');
+	if (radio.length > 0) {
+		radio[0].checked = true;
+		showpwd(radio[0].value);
+	}
+}
+function showpwd(v) {
+	getObj('showpwd').style.display = v == 1 ? 'none' : '';
+}
+checkradio();
+</script>
+<!--
+EOT;
+}print<<<EOT
+-->
+					</div>
+				</td></tr>
+			</table>
+		</div>
+   
+    </div>
+<!--
+EOT;
+require_once(uTemplate::printEot('footer'));
+?>-->

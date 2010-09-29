@@ -1,0 +1,69 @@
+<!--
+<?php
+
+if ('show' == $block_job) {
+print <<<EOT
+-->
+<div class="banner">
+	<img src="{$block_data[image]}" />
+<!--
+EOT;
+	if ('' != $block_data['title']) {
+print <<<EOT
+-->
+	<h1 style="left:{$block_data[title_left]}px;top:{$block_data[title_top]}px; font:{$block_data[title_size]}px Arial; color:{$block_data[title_color]};">{$block_data[title]}</h1>
+<!--
+EOT;
+	}
+print <<<EOT
+-->
+</div>
+
+<!--
+EOT;
+} else {
+	if (empty($block_data['image'])) $block_data['image'] = $stopic_data['layout_config']['bannerurl'];
+	if (empty($block_data['title_left'])) $block_data['title_left'] = 50;
+	if (empty($block_data['title_top'])) $block_data['title_top'] = 50;
+	if (empty($block_data['title_size'])) $block_data['title_size'] = 50;
+print <<<EOT
+-->
+<tbody>
+	<tr class="tr1 vt">
+        	<td class="td2" width="80">模块名称</td>
+            <td class="td2"><input type="text" name="block_title" value="$block[title]" class="input input_wa"></td>
+	</tr>
+	<tr class="tr1 vt">
+        	<td class="td2">横幅图片</td>
+            <td class="td2"><input type="text" id="{$block_id}_banner_image" name="banner_image" value="{$block_data[image]}" class="input input_wb"></td>
+	</tr>
+	<tr class="tr1 vt">
+        	<td class="td2">文字标题</td>
+            <td class="td2"><input name="banner_title" type="text" class="input input_wa" value="{$block_data[title]}" /></td>
+	</tr>
+	<tr class="tr1 vt">
+        	<td class="td2">文字位置</td>
+            <td class="td2">
+            	<ul class="list_C">
+                	<li>距离左边&nbsp;<input name="postion_left" type="text" class="input input_wc" value="{$block_data[title_left]}" />&nbsp;px</li>
+            		<li>距离顶部&nbsp;<input name="postion_top" type="text" class="input input_wc" value="{$block_data[title_top]}" />&nbsp;px</li>
+                </ul>
+            </td>
+	</tr>
+	<tr class="tr1 vt">
+       	<td class="td2">文字样式</td>
+       	<td class="td2">
+           	<ul class="list_C">
+               	<li>大小&nbsp;<input name="font_size" type="text" class="input" size="5" value="{$block_data[title_size]}" />&nbsp;px</li>
+                   <li><span class="fl">颜色&nbsp;</span><div class="input_img fl mr10 mt5"><i class="input_color" title="选择颜色" onclick="showColorPicker(this,'{$block_id}_font_color',function(){pickReback('{$block_id}_font_color_span',color_picker)})">选择颜色</i><input id="{$block_id}_font_color" name="font_color" value="{$block_data[title_color]}" type="text" /></div>
+                   <span id="{$block_id}_font_color_span" style="color:{$block_data[title_color]};">■■■■</span>
+                </li>
+            </ul>
+        </td>
+	</tr>
+</tbody>
+<!--
+EOT;
+}
+?>
+-->

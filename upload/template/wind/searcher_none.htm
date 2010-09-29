@@ -1,0 +1,43 @@
+<!--<?php print <<<EOT
+-->
+		<div class="content fl">
+        	<div class="p20 f14">
+        	<p class="f16 mb20">抱歉，没有找到与"<span class="s1">$keyword</span>"相关的{$types[$type]}。 </p>
+            <p class="mb10">相关建议：</p> 
+            <p class="mb5">&nbsp;&nbsp;&nbsp;看看输入的文字是否有误</p>
+            <p class="mb5">&nbsp;&nbsp;&nbsp;去掉可能不必要的字词，如“的”、“什么”等</p>
+            <p class="mb5">&nbsp;&nbsp;&nbsp;阅读<a href="#">帮助</a></p>
+			</div>
+        </div>
+        <div class="sidebar fr">
+<!--
+EOT;
+if($hotwords){
+print <<<EOT
+-->         
+        	<div class="p15 s_boxA">
+            	<h2>一周热门搜索</h2>
+                <ul>
+<!-- 
+EOT;
+foreach($hotwords as $hotword){
+print <<<EOT
+-->                
+                	<li><a href="searcher.php?keyword={$hotword}&type=thread">$hotword</a></li>
+<!-- 
+EOT;
+}
+print <<<EOT
+-->                 	
+                </ul>
+            </div>
+<!-- 
+EOT;
+}
+print <<<EOT
+-->   
+        </div>
+        <div class="c">&nbsp;</div>
+<!--
+EOT;
+?>

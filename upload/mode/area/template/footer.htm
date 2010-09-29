@@ -1,0 +1,122 @@
+<!--<?php print <<<EOT
+-->
+</div>
+<div class="footer-wrap">
+<div class="c"></div>
+<div id="bottom"></div>
+<!--
+EOT;
+list($htmlAdvert,$arrayAdvert) = pwAdvert('Site.Footer',$fid);
+if($htmlAdvert){print <<<EOT
+-->
+<center style="margin:5px 0;">$htmlAdvert</center>
+<!--
+EOT;
+}print <<<EOT
+-->
+<div class="c"></div>
+<div id="footer">
+<div id="mode-footer" class="mt">
+	<div class="bottom tac footNav">
+		<ul>
+<!--
+EOT;
+
+foreach($_Navbar['foot'] as $key => $value){
+	$html = buildNavLinkHtml($value['data']);
+print <<<EOT
+-->
+			<li>$html</li>
+<!--
+EOT;
+}print <<<EOT
+-->
+			<li><a href="javascript:scroll(0,0)">返回顶部</a></li>
+		</ul>
+	</div>
+	<div id="footInfo" class="tac">
+	Powered by <a href="http://www.phpwind.net/" target="_blank">phpwind</a> <a href="http://www.phpwind.net/" target="_blank" class="s1">v$wind_version</a> <a href="http://www.phpwind.com/certificate.php?host={$pwServer['HTTP_HOST']}">Certificate</a> <span id="windspend">$db_icp</span><br />
+ Code &copy;2003-2010 <a href="http://www.phpwind.com/" target="_blank">phpwind.com</a> Corporation <span id="stats"></span>$db_statscode
+<!--
+EOT;
+if($db_ystats_ifopen=='0'){print <<<EOT
+-->
+<script type="text/javascript" src="http://js.tongji.linezing.com/{$db_ystats_unit_id}/tongji.js"></script>
+<noscript>
+	<a href="http://www.linezing.com" target="_blank"><img src="http://img.tongji.linezing.com/{$db_ystats_unit_id}/tongji.gif"/></a>
+</noscript>
+<!--
+EOT;
+}print <<<EOT
+-->
+	</div></div></div></div>
+<script language="JavaScript" src="js/global.js"></script>
+<!--
+EOT;
+if($GLOBALS[ifEditAdmin] && !defined('AREA_STATIC')){
+print <<<EOT
+-->
+<script language="JavaScript" src="js/date.js"></script>
+<script language="JavaScript" src="mode/area/js/adminview.js"></script>
+<script language="javascript" src="mode/area/js/tagrelate.js"></script>
+<script language="JavaScript" src="js/color_picker.js"></script>
+<script language="JavaScript">
+
+window.onReady(function () {
+	frontadmin = New(frontAdmin,['main','view-hover']);
+});
+function pickReback(color){
+	getObj('color_show').style.backgroundColor = color;
+}
+function styleOnclick(e,obj){
+	var objclass = e.className;
+	var temp = objclass.split(' ');
+	var newclass = '';
+	for (var n=0; n<temp.length; n++){
+		if (temp[n]=='one') {
+			continue;
+		}
+		newclass += ' ' + temp[n];
+	}
+	if (objclass.match(/one/)) {
+		e.className = newclass;
+		getObj(obj).value = '';
+	} else {
+		e.className = newclass + ' one';
+		getObj(obj).value = 1;
+	}
+}
+function colorCancel(){
+	getObj('color_show').style.backgroundColor='#FFFFFF';
+	getObj('title1').value='';
+}
+</script>
+<!--
+EOT;
+}print <<<EOT
+-->
+<!--
+EOT;
+if($GLOBALS['SCR']=='index' && $GLOBALS['area_statictime']){print <<<EOT
+-->
+<img height="0" width="0" src="mode.php?m=area&q=static&type=autostatic&alias=$alias" />
+<!--
+EOT;
+}print <<<EOT
+-->
+</body></html>
+<script language="JavaScript">
+var openmenu = {{$GLOBALS['db_menuinit']}};
+read.InitMenu();
+</script>
+
+<!--
+EOT;
+if($GLOBALS['groupid'] != 'guest' && $GLOBALS['groupid'] != '' && $GLOBALS['db_toolbar']){print <<<EOT
+-->
+<!--[if IE 6]>
+<SCRIPT type="text/javascript" LANGUAGE="JavaScript" src="js/core/bottomforie6.js"></SCRIPT>
+<![endif]-->
+<!--
+EOT;
+}?>-->

@@ -1,0 +1,150 @@
+<!--<?php
+include_once PrintEot('left');
+if (empty($action)) {print <<<EOT
+-->
+<div class="nav3 mb10 ta">
+    <ul class="cc">
+      <li class="current"><a href="$basename">未处理会员举报</a></li>
+      <li><a href="$basename&action=deal">已处理会员举报</a></li>
+    </ul>
+</div>
+<div class="admin_info mb10">
+	<h2 class="h1">功能说明</h2>
+	<div class="legend">
+    	<ol>
+        	<li>标记已处理:标记后系统会发送短消息提醒举报的用户</li>
+            <li>删除:没有理由或者理由无效或者链接页面不存在，建议用删除</li>
+        </ol>
+    </div>
+</div>
+<form action="$basename" method="post" name="FORM">
+  <input type="hidden" name="action" value="del">
+  <h2 class="h1">未处理会员举报列表<span class="linka">类型&nbsp;<select name="type" onchange="report_jump(this.value,'');">
+    <option value="">全部</option>
+    <option value="topic" $select_topic>帖子</option>
+    <option value="diary" $select_dirary>日志</option>
+    <option value="photo" $select_photo>照片</option>
+    <option value="group" $select_group>群组</option>
+    <option value="grouptopic" $select_grouptopic>群组帖子</option>
+    <option value="groupphoto" $select_groupphoto>群组照片</option>
+    <option value="user" $select_user>用户</option></select></span></h2>
+  <div class="admin_table mb10">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <tr class="tr2">
+	  <td width="30"><span onclick="CheckAll(document.FORM)" class="cp">全选</span></td>
+      <td width="60">类型</td>
+      <td width="110">反映用户</td>
+      <td>原因</td>
+      <td width="50">链接来源</td>
+    </tr>
+<!--
+EOT;
+if (empty($reportdb)) {print <<<EOT
+-->
+<tr><td class="p10" colspan="5"><div class="admin_tips">啊哦，没有你要的信息！</div></td></tr>
+<!--
+EOT;
+}else{
+foreach($reportdb as $report){print <<<EOT
+-->
+    <tr class="tr1 vt">
+      <td class="td2"><input type="checkbox" name="selid[]" value="$report[id]"></td>
+      <td class="td2">{$report[type]}</td>
+      <td class="td2"><a href="u.php?uid=$report[uid]" target="_blank">$report[username]</a></td>
+      <td class="td2">$report[reason]</td>
+      <td class="td2"><a href="{$report[url]}" target="_blank">进入</a></td>
+    </tr>
+<!--
+EOT;
+}}print <<<EOT
+-->
+  </table>
+  </div>
+  <div class="cc mb10">$pages</div>
+  <div class="tac mb10"><p>
+  <input type="radio" name="action" value="done" checked>&nbsp;标记已处理 &nbsp;
+  <input type="radio" name="action" value="del">&nbsp;删除　　　</p>
+    </div>
+    <div class="tac mb10">
+    <span class="btn"><span><button type="submit" name="hello">提 交</button></span></span>
+    </div>
+</form>
+
+<!--
+EOT;
+} elseif ($action == 'deal') {print <<<EOT
+-->
+<div class="nav3 mb10 ta">
+    <ul class="cc">
+      <li><a href="$basename">未处理会员举报</a></li>
+      <li class="current"><a href="$basename&action=deal">已处理会员举报</a></li>
+    </ul>
+ </div>
+<form action="$basename&" method="post" name="FORM">
+<h2 class="h1"><span class="mr20">已处理会员举报列表</span><span class="linka">类型&nbsp;<select name="type" onchange="report_jump(this.value,'{$action}');">
+    <option value="">全部</option>
+    <option value="topic" $select_topic>帖子</option>
+    <option value="diary" $select_dirary>日志</option>
+    <option value="photo" $select_photo>照片</option>
+    <option value="group" $select_group>群组</option>
+    <option value="grouptopic" $select_grouptopic>群组帖子</option>
+    <option value="groupphoto" $select_groupphoto>群组照片</option>
+    <option value="user" $select_user>用户</option></select></span></h2>
+    <div class="admin_table mb10">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <tr class="tr2">
+		<td width="30"><span onclick="CheckAll(document.FORM)" class="cp">全选</span></td>
+        <td> 类型</td>
+        <td>反映用户</td>
+        <td>原因</td>
+        <td> 链接来源</td>
+    </tr>
+<!--
+EOT;
+if (empty($reportdb)) {print <<<EOT
+-->
+<tr><td class="p10" colspan="5"><div class="admin_tips">啊哦，没有你要的信息！</div></td></tr>
+<!--
+EOT;
+}else{
+foreach($reportdb as $report){print <<<EOT
+-->
+    <tr class="tr1 t">
+        <td class="td2"><input type="checkbox" name="selid[]" value="$report[id]"></td>
+        <td class="td2">{$report[type]}</td>
+        <td class="td2"><a href="u.php?uid=$report[uid]" target="_blank">$report[username]</a></td>
+        <td class="td2">$report[reason]</td>
+        <td class="td2"><a href="{$report[url]}" target="_blank">进入</a></td>
+    </tr>
+<!--
+EOT;
+}}print <<<EOT
+-->
+  </table>
+</div>
+  <div class="cc">$pages</div>
+    <input type="hidden" name="action" value="del">
+    <div class="tac mb10">
+    <span class="btn"><span><button type="submit" name="hello">删除</button></span></span>
+    </div>
+</form>
+<!--
+EOT;
+}print <<<EOT
+-->
+<script language="JavaScript">
+var basename = '$basename';
+function report_jump(type,action){
+	if (!action) {
+		location.href = basename+"&type="+type;
+		return false;	
+	}
+	location.href = basename+"&action="+action+"&type="+type;
+	return true;
+}
+</script>
+<!--
+EOT;
+include_once PrintEot('adminbottom');
+?>
+-->

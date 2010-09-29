@@ -1,0 +1,4004 @@
+<!--<?php
+if($action=='leaveword'){print <<<EOT
+-->
+<form action="pw_ajax.php?action=$action" method="post" onsubmit="return false;">
+<input type="hidden" name="verify" value="$verifyhash" />
+<div style="width:440px;">
+	<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="adel cp" onclick="closep();">关闭</span>楼主留言</div>
+	<table width="100%">
+		<tr>
+			<td width="70">消息通知:</td>
+			<td><label vlsdd="mr20"><input type="radio" name="ifmsg" value="1" />开启</label><label><input type="radio" name="ifmsg" value="0" checked />关闭</label></td></tr>
+		<tr class="vt">
+			<td>留言内容:</td><td>
+<!--
+EOT;
+if($db_adminreason){print <<<EOT
+-->
+		<p class="mb5"><select name="" onchange="this.form.atc_content.value=this.value" style="width:320px;">
+			<option value="">自定义</option>
+			<option value="">-------</option>
+			$reason_sel
+		</select></p>
+<!--
+EOT;
+}print <<<EOT
+-->
+		<textarea name="atc_content" onkeydown="ajax.quickpost(event,this.form)" class="textareaA">$rt[leaveword]</textarea>
+	</td></tr>
+</table>
+<input type="hidden" name="step" value="2" />
+<input type="hidden" name="tid" value="$tid" />
+<input type="hidden" name="pid" value="$pid" />
+<div class="popBottom"><span class="btn2"><span><button type="button" name="ajaxsubmit" onclick="ajax.submit(this.form,worded);">提 交</button></span></span></div>
+</div>
+</form>
+<!--
+EOT;
+}elseif($action=='favor'){print <<<EOT
+-->
+<div style="width:150px;">
+	<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="adel cp" onclick="closep();">关闭</span>选择分类</div>
+	<table width="100%">
+<!--
+EOT;
+foreach($typeid as $key=>$value){
+if ($key == '0') {
+print <<<EOT
+-->
+		<tr><td><a onclick="favor('0');" href="javascript:">默认分类</a></td></tr>
+<!--
+EOT;
+} else {print <<<EOT
+-->
+		<tr><td><a onclick="favor('$key');return false;" href="javascript:">$value</a></td></tr>
+<!--
+EOT;
+}}print <<<EOT
+-->
+	</table>
+</div>
+<!--
+EOT;
+}elseif($action=='relatetag'){print <<<EOT
+-->
+<div class="popTop cc" style="cursor:move" onmousedown="read.move(event);"><span class="fl w">标签:$tagname</span><span class="adel cp" onclick="closep();">关闭</span></div>
+<table cellspacing="0" cellpadding="5" width="100%">
+	<tr><td>
+	<ul class="pw_ulB" style="padding:0 10px 0 0;">
+<!--
+EOT;
+foreach($readdb as $key=>$value){print <<<EOT
+-->
+	<li style=""><a href="read.php?tid=$value[tid]" class="a6">$value[subject]</a></li>
+<!--
+EOT;
+}print <<<EOT
+-->
+	</ul></td></tr>
+</table>
+<div class="popBottom cc"><a class="s7 fr" href="link.php?action=tag&tagname=$tagname">更多内容</a></div>
+<!--
+EOT;
+}elseif($action=='draft'){print <<<EOT
+-->
+<div style="width:420px;">
+	<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="adel cp" onclick="closep();">关闭</span>草稿箱</div>
+	<table width="100%">
+<!--
+EOT;
+$i=($page-1)*$db_showperpage;
+foreach($drdb as $key=>$value){
+$i++;
+print <<<EOT
+-->
+		<tr>
+			<td class="p10"><textarea class="textareaA mr10">{$value[content]}</textarea> <img style="cursor:pointer" src="$imgpath/post/c_editor/insert.gif" onclick="draft.insert(this)" alt="插入" title="插入" /> <img style="cursor:pointer" src="$imgpath/post/c_editor/save.gif" onclick="draft.update(this,'$value[did]')" alt="保存" title="保存" /> <img style="cursor:pointer" src="$imgpath/post/c_editor/del.gif" alt="删除" onclick="draft.del('$value[did]','$page')" title="删除" /></td>
+		</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+</table>
+<!--
+EOT;
+if($maxpage>1){print <<<EOT
+-->
+		<div class="popBottom cc">
+<!--
+EOT;
+if($page>1){print <<<EOT
+-->
+		<a class="fl cp" onclick="draft.prev('$page');">上一页</a>
+<!--
+EOT;
+}if($page<$maxpage){print <<<EOT
+-->
+		<a class="cp fr" onclick="draft.next('$page');">下一页</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+		</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+</div>
+<!--
+EOT;
+}if($action=='login'){print <<<EOT
+-->
+<a href="u.php"><img src="$faceurl" onmouseout="clearTimeout(mt);read.close();"  onmouseover="mt=setTimeout('read.open(\'showface\',\'sf\',\'4\');',700);" style="float:left; margin-top:.4em;width:40px;height:40px;"/></a>
+						<div style="padding:0 0 0 1em;margin:0 0 0 45px">
+							<span id="sf" style="position:absolute; *margin:0 0 0 -.5em;"></span> <span class="user-infotwo" id="showface" style="display:none"> <span class="user-infoWraptwo"> <span class="co"></span>
+							<a href="profile.php?action=modify&info_type=face" target="_blank">更换头像</a><br />
+							UID: $winduid <br />
+							$db_rvrcname: <span class="s2 f10">$userrvrc $db_rvrcunit</span><br />
+							$db_moneyname: <span class="s3 f10">$winddb[money] $db_moneyunit</span><br />
+							$db_creditname: <span class="s3 f10">$winddb[credit] $db_creditunit</span><br />
+							<span class="gray f10"> 最后登录 {$lastlodate}<br />
+							登录IP: $onlineip<br />
+							</span> </span> </span>
+						</div>
+						<div style="margin-left:50px; line-height:180%">
+						<div class="fl" style="width:100%">
+							<div class="gray" style="float:left;clear:right"><span class="fl">等级:$gp_grouptitle, 帖子: $winddb[postnum], <a href="apps.php?q=article" class="link5">我的主题</a> <a href="apps.php?q=article&see=post" class="link5">我的回复</a>&nbsp;</span><div class="fl" style="margin:.4em 1em 0 0"><a class="dropB" id="td_u">更多</a></div><span class="fl">
+<!--
+EOT;
+if (SCR == 'index' && ($groupid == 3 || $groupid == 4)) {print <<<EOT
+-->
+								<a style="cursor:pointer" onclick="if (typeof MgMode == 'function') {mgm.showMenu(this);} else {KSHBJ=this;loadjs('js/mgmode.js');}">可视化布局</a>
+<!--
+EOT;
+}if($db_replysitemail && getstatus($winddb['userstatus'],6)){print <<<EOT
+-->
+							| <a id="newrp" onclick="sendmsg('pw_ajax.php','action=newrp',this.id)" style="cursor:pointer;" class="s3">您的帖子有人回复</a>
+<script language="JavaScript">
+function newrp() {
+	ajax.guide();
+	ajax.send('pw_ajax.php','action=newrp',function(){
+		if (ajax.request.responseText.indexOf('<') != -1) {
+			read.menu.innerHTML = ajax.request.responseText;
+		} else {
+			closep();
+			getObj('newrp').parentNode.removeChild(getObj('newrp'));
+		}
+	});
+}
+</script>
+<!--
+EOT;
+}print <<<EOT
+-->
+							</span></div>
+<!--
+EOT;
+if($_G[allowhonor]){print <<<EOT
+-->						<div class="c"></div>
+							<span id="honor">
+<!--
+EOT;
+if($winddb['honor']){print <<<EOT
+-->
+									{$winddb[honor]}
+<!--
+EOT;
+}else{print <<<EOT
+-->
+您还没有设置个性签名
+<!--
+EOT;
+}print <<<EOT
+-->
+							</span>
+							<a id="sethonor" onclick="sendmsg('pw_ajax.php','action=honor',this.id)" class="gray" style="cursor:pointer">编辑</a>
+							<div class="c"></div>
+<script language="JavaScript">
+function honor() {
+	var str = ajax.request.responseText.split("\t");
+	if (str[0] == 'success') {
+		getObj('honor').innerHTML = '&nbsp;' + (str[1] ? str[1] : '您还没有设置个性签名') + '&nbsp;';
+	} else {
+		ajax.guide();
+	}
+}
+</script>
+<!--
+EOT;
+}print <<<EOT
+-->
+
+						</div></div>
+	<split />
+<!--
+EOT;
+if($groupid=='guest'){print <<<EOT
+-->
+							<a href="$loginurl" style="color:#c3e4f5">登录</a> &nbsp;<a href="$regurl" style="color:#c3e4f5">注册</a>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+							<a href="u.php" style="color:#fff; font-weight:700">$windid</a> <a id="td_msg" href="message.php?type=sms" target="_blank">
+<!--
+EOT;
+if($winddb[newpm]>0 && $_G[maxmsg]>0){print <<<EOT
+-->
+								<img src="$imgpath/pwicon/meg.gif" align="absmiddle"/>
+<!--
+EOT;
+} else {print <<<EOT
+-->
+								<img src="$imgpath/pwicon/meg-read.gif" align="absmiddle"/>
+<!--
+EOT;
+}print <<<EOT
+-->
+							</a>
+							<a href="profile.php" style="color:#c3e4f5" target="_blank">设置</a> <a href="$loginouturl" style="color:#c3e4f5">退出</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+	<split />
+	<li id="h_index"><a href="$db_bbsurl">讨论区</a></li>
+<!--
+EOT;
+if($winduid){
+if($db_menu){
+print <<<EOT
+-->
+	<li id="h_profile"><a id="td_profile" style="cursor:pointer;" onmouseover="read.open('menu_profile','td_profile');">用户中心</a></li>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+	<li id="h_profile"><a id="td_profile" href="profile.php" target="_blank">用户中心</a></li>
+<!--
+EOT;
+}}if($_G[allowsort]){
+if($db_menu){
+print <<<EOT
+-->
+	<li id="h_sort"><a style="cursor:pointer;" id="td_sort" onmouseover="read.open('menu_sort','td_sort');">统计排行</a></li>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+	<li id="h_sort"><a id="td_sort" href="sort.php">统计排行</a></li>
+<!--
+EOT;
+}}if($_G[allowmember]){print <<<EOT
+-->
+	<li id="h_member"><a href="member.php">会员</a></li>
+<!--
+EOT;
+}if($_G['show']){print <<<EOT
+-->
+	<li id="h_show"><a href="show.php">展区</a></li>
+<!--
+EOT;
+}if($db_iftag){print <<<EOT
+-->
+	<li id="h_job"><a href="link.php?action=taglist">标签</a></li>
+<!--
+EOT;
+}print <<<EOT
+-->
+	<li id="h_push"><a href="push.php?fid=$fid">推荐</a></li>
+	<li id="h_search"><a href="searcher.php">搜索</a></li>
+	<li id="h_hack"><a style="cursor:pointer;" id="td_hack" onmouseover="read.open('menu_hack','td_hack');">社区服务</a></li>
+<!--
+EOT;
+foreach($db_hackdb as $key=>$hack){
+if($hack[2]=='2' && file_exists(R_P."hack/$key/index.php")){print <<<EOT
+-->
+	<li><a href="hack.php?H_name=$hack[1]">$hack[0]</a></li>
+<!--
+EOT;
+}}if($db_ifbookinfo){
+$rawbbsname=rawurlencode($db_bbsname);
+$rawbbsurl=rawurlencode($db_bbsurl);
+$rawuser=rawurlencode($windid);
+$pushurl="http://push.phpwind.net/book.php?tocharset=$db_charset&bbsname=$rawbbsname&bbsurl=$rawbbsurl&user=$rawuser";
+if($tid){
+$rawtitle=rawurlencode($subject);
+print <<<EOT
+-->
+	<li><a href="$pushurl&tid=$tid&title=$rawtitle" target="_blank">订阅本帖更新</a></li>
+<!--
+EOT;
+}elseif($fid){
+$rawforumname=rawurlencode($forumname);
+print <<<EOT
+-->
+	<li><a href="$pushurl&fid=$fid&forumname=$rawforumname" target="_blank">订阅本版更新</a></li>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+	<li><a href="$pushurl" target="_blank">订阅全站新帖</a></li>
+<!--
+EOT;
+}}if(CkInArray($windid,$manager) || $SYSTEM['allowadmincp']){print <<<EOT
+-->
+	<li><a href="$db_adminfile" target="_blank">系统设置</a></li>
+<!--
+EOT;
+}}elseif($action=='msg'){print <<<EOT
+-->
+<div style="width:440px;">
+<form action="pw_ajax.php?action=$action" method="post" onsubmit="return false;">
+<input type="hidden" name="verify" value="$verifyhash" />
+<input type="hidden" name="step" value="2" />
+<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="adel cp" onclick="closep();">关闭</span>发送消息</div>
+<table class="vt" width="100%">
+	<tbody>
+	<tr><td width="15%">用户</td><td><input type="text" class="input input_wb" name="pwuser" value="$reinfo[username]" /></td></tr>
+	<tr><td>标题</td><td><input type="text" class="input input_wb" name="msg_title" maxlength="100" value="$subject" /></td></tr>
+<!--
+EOT;
+if($db_gdcheck & 8){print <<<EOT
+-->
+	<tr><td>认证码</td><td><img src="ck.php?nowtime=1" align="absmiddle" onclick="this.src='ck.php?nowtime=' + new Date().getTime();" style="cursor:pointer;" /><br /><input class="input" type="text" name="gdcode" size="8" /></td></tr>
+<!--
+EOT;
+}if($msgq && $db_question){
+$qkey = array_rand($db_question);
+print <<<EOT
+-->
+	<!--
+	<tr><td>验证问题：</td>
+		<td><input class="input" type="text" name="qanswer" /><input type="hidden" name="qkey" value="$qkey" /> 问题$db_question[$qkey] &nbsp;正确答案:{$db_answer[$qkey]}</td></tr>
+	 -->
+<!--
+EOT;
+}print <<<EOT
+-->
+	<tr><td>内容</td><td><textarea name="atc_content" onkeydown="ajax.quickpost(event,this.form)" class="textareaA">$atc_content</textarea></td></tr>
+	</tbody>
+</table>
+<div class="popBottom"><span class="btn2"><span><button type="button" name="ajaxsubmit" onclick="ajax.submit(this.form);">提 交</button></span></span></div>
+</form>
+</div>
+<!--
+EOT;
+}elseif($action=='usetool'){print <<<EOT
+-->
+<div style="width:200px;">
+<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="adel cp" onclick="closep();">关闭</span>道具中心</div>
+<table width="100%">
+<!--
+EOT;
+foreach($tooldb as $key=>$value){print <<<EOT
+-->
+<tr>
+	<td><a class="cp" onclick="usetool('{$value[0][id]}')" title="{$value[0][descrip]}">{$value[0][name]}({$value[0][nums]})</a></td>
+	<td>
+<!--
+EOT;
+if($value[1][name]){print <<<EOT
+-->
+		<a class="cp" onclick="usetool('{$value[1][id]}')" title="{$value[1][descrip]}">{$value[1][name]}({$value[1][nums]})</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+	</td>
+</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+</table>
+</div>
+<!--
+EOT;
+}elseif($action=='usertool'){print <<<EOT
+-->
+<div style="width:200px;">
+<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="adel cp" onclick="closep();">关闭</span>道具中心</div>
+<table width="100%">
+<!--
+EOT;
+foreach($tooldb as $key=>$value){print <<<EOT
+-->
+<tr>
+	<td><a class="cp" onclick="usertool('$uid','{$value[0][id]}')" title="{$value[0][descrip]}">{$value[0][name]}({$value[0][nums]})</a></td>
+	<td>
+<!--
+EOT;
+if($value[1][name]){print <<<EOT
+-->
+		<a class="cp" onclick="usertool('$uid','{$value[1][id]}')" title="{$value[1][descrip]}">{$value[1][name]}({$value[1][nums]})</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+	</td>
+</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+</table>
+</div>
+<!--
+EOT;
+}elseif($action=='extend'){
+if($type=='pwcode'){print <<<EOT
+-->
+<div style="padding:1px;">
+<!--
+EOT;
+foreach($code as $key=>$value){print <<<EOT
+-->
+<span class="button" id="wy_$value[name]" title="$value[title]" onmouseover="this.className='button buttonHover'" onmouseout="this.className='button'" onmousedown="this.className='button buttonActive'" onclick="this.className='button';upcode(this.id,'$value[param]');"><img style="width:20px;height:20px" src="$imgpath/post/c_editor/$value[icon]" /><span style="display:none">$value[descrip]</span></span>
+<!--
+EOT;
+}print <<<EOT
+-->
+</div>
+<!--
+EOT;
+}else{
+if(!$setform){print <<<EOT
+-->
+<ul style="width:80px" class="tac f12">
+<!--
+EOT;
+foreach($setformdb as $key=>$value){print <<<EOT
+-->
+<li><a href="javascript:onclick=showform('$value[id]')">$value[name]</a></li>
+<!--
+EOT;
+}print <<<EOT
+-->
+</ul>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+<div>
+<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="cp adel" onclick="closep();read.obj=null;">关闭</span>$setform[name]</div>
+<table width="100%" id="formstyle">
+<!--
+EOT;
+foreach($setform[value] as $k=>$v){print <<<EOT
+-->
+<tr><td align="center">$v[0]</td><td><!--
+EOT;
+if($v[1]){
+$s=explode(',',$v[1]);
+print <<<EOT
+--><select><!--
+EOT;
+foreach($s as $k1=>$v1){print <<<EOT
+--><option value="$v1">$v1</option><!--
+EOT;
+}print <<<EOT
+--></select><!--
+EOT;
+}else{print <<<EOT
+--><input type="text" class="input"/><!--
+EOT;
+}print <<<EOT
+--></td></tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+</table>
+<div class="popBottom"><span class="btn2"><span><button type="button" onclick="insertform('$setform[name]');">提 交</button></span></span><span class="bt2"><span><button type="button" onclick="closep();read.obj=null;">取消</button></span></span></div>
+</div>
+<!--
+EOT;
+}}}elseif($action=='sharelink'){print <<<EOT
+-->
+<div style="width:260px">
+<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="cp adel" onclick="closep();">关闭</span>友情链接申请</div>
+<form action="pw_ajax.php?action=$action" method="post" onsubmit="return false;">
+<input type="hidden" name="verify" value="$verifyhash" />
+<table width="100%">
+	<tr>
+		<td>站点名称</td>
+		<td><input title="站点名称" name="linkname" class="input input_wa"></td>
+	</tr>
+	<tr>
+		<td>站点URL</td>
+		<td><input title="站点URL" name="linkurl" class="input input_wa"></td>
+	</tr>
+	<tr>
+		<td>站点说明</td>
+		<td><input title="站点说明" name="linkdescrip" class="input input_wa"></td>
+	</tr>
+	<tr>
+		<td>站点LOGO</td>
+		<td><input title="站点LOGO" name="linklogo" class="input input_wa"></td>
+	</tr>
+</table>
+<input type="hidden" name="step" value="2" />
+<div class="popBottom"><span class="btn2"><span><button type="button" onclick="ajax.submit(this.form);">提 交</button></span></span></div>
+</form>
+</div>
+<!--
+EOT;
+}elseif($action=='newrp'){print <<<EOT
+-->
+<div style="width:500px;">
+<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="cp adel" onclick="closep();">关闭</span>回复提醒</div>
+<table width="100%">
+<tr class="tr2 tac">
+	<td width="20%">版块名称</td>
+	<td>标题</td>
+	<td width="20%">回复时间</td>
+	<td width="6%">删</td>
+</tr>
+<!--
+EOT;
+foreach($replydb as $key=>$val){print <<<EOT
+-->
+<tr class="tr3">
+	<td><a href="thread.php?fid=$val[fid]" target="_blank">$val[fname]</a></td>
+	<td class="tal"><a href="read.php?tid=$val[tid]" target="_blank">$val[subject]</a></td>
+	<td><a>$val[lastpost]</a></td>
+	<td><img src="$imgpath/post/c_editor/del.gif" style="cursor:pointer" onclick="ajax.send('pw_ajax.php','action=delnewrp&tid=$val[tid]',newrp);" /></td>
+</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+</table>
+</div>
+<!--
+EOT;
+}elseif($action=='showface'){print <<<EOT
+-->
+<div class="mb10">
+	<a onclick="showSystemIcon($pre_page);" href="javascript:;" class="mr20">上一页</a>
+	<a onclick="showSystemIcon($next_page);" href="javascript:;">下一页</a>
+</div>
+<div class="profileFace">
+	<ul class="cc">
+<!--
+EOT;
+if (empty($imgname_array)) {print <<<EOT
+-->
+		<li style="width:100%;">已是最后一页</li>
+<!--
+EOT;
+} else {
+foreach ($imgname_array as $key => $value) {print <<<EOT
+-->
+		<li onclick="showimage('$imgpath','$value')"><img src='$imgpath/face/$value' width="50" height="50" class="img"></li>
+<!--
+EOT;
+}
+}print <<<EOT
+-->
+	</ul>
+</div>
+<!--
+EOT;
+}elseif($action=='modify'){print <<<EOT
+-->
+<div style="width:400px;">
+<form action="ajax.php?action=$action" method="post" onsubmit="return false;">
+<input type="hidden" name="verify" value="$verifyhash" />
+<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="cp adel" onclick="closep();">关闭</span>编辑帖子</div>
+<table width="100%" class="vt">
+	<tr><td width="50">作者:</td><td>$atcdb[author]</td></tr>
+	<tr><td>标题:</td><td><input class="input input_wb" type="text" name="atc_title" value="$atc_title" /></td></tr>
+<!--
+EOT;
+if(($db_gdcheck & 4) && $winddb['postnum'] < $db_postgd){print <<<EOT
+-->
+	<tbody><tr><td>认证码：</td>
+		<td><img src="ck.php?nowtime=1" align="absmiddle" onclick="this.src='ck.php?nowtime=' + new Date().getTime();" style="cursor:pointer;" /><br /><input class="input" type="text" name="gdcode" size="6" tabindex="2" maxlength="4" /></td></tr></tbody>
+<!--
+EOT;
+}if($winddb['postnum'] < $postq && $db_question){
+$qkey = array_rand($db_question);
+print <<<EOT
+-->
+	<tbody><tr><td>验证问题：</td>
+		<td><input class="input" type="text" name="qanswer" /><input type="hidden" name="qkey" value="$qkey" /> 问题$db_question[$qkey] &nbsp;正确答案:{$db_answer[$qkey]}</td></tr></tbody>
+<!--
+EOT;
+}print <<<EOT
+-->
+	<tr><td>内容</td><td>
+		<textarea name="atc_content" onkeydown="ajax.quickpost(event,this.form)" class="textareaA" style="height:120px;">$atc_content</textarea>
+	</td></tr>
+</table>
+<input type="hidden" name="step" value="2" />
+<input type="hidden" name="fid" value="$fid" />
+<input type="hidden" name="tid" value="$tid" />
+<input type="hidden" name="pid" value="$pid" />
+<input type="hidden" value="$article" name="article" />
+<input type="hidden" value="1" name="atc_convert" />
+<div class="popBottom"><span class="btn2"><span><button type="button" name="ajaxsubmit" onclick="ajax.submit(this.form,edited);">提 交</button></span></span><span class="bt2"><span><button type="button" onclick="window.location.href='post.php?action=modify&fid=$fid&tid=$tid&pid=$pid&article=$article'">进入高级模式</button></span></span></div>
+</form>
+</div>
+<!--
+EOT;
+}elseif($action=='quote'){print <<<EOT
+-->
+<div style="width:400px">
+<form action="post.php?" method="post" name="quoteFORM">
+<input type="hidden" name="verify" value="$verifyhash" />
+<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="cp adel" onclick="closep();">关闭</span>引用帖子</div>
+<table class="vt" width="100%">
+	<tr><td width="50">标题</td><td><input class="input input_wb" type="text" name="atc_title" value="$atc_title" /></td></tr>
+<!--
+EOT;
+if(($db_gdcheck & 4) && $winddb['postnum'] < $db_postgd){print <<<EOT
+-->
+	<tbody><tr><td>认证码：</td>
+		<td><img src="ck.php?nowtime=1" align="absmiddle" onclick="this.src='ck.php?nowtime=' + new Date().getTime();" style="cursor:pointer;" /><br /><input class="input" type="text" name="gdcode" size="6" tabindex="2" maxlength="4" /></td></tr></tbody>
+<!--
+EOT;
+}if($winddb['postnum'] < $postq && $db_question){
+$qkey = array_rand($db_question);
+print <<<EOT
+-->
+	<tbody><tr><td>验证问题：</td>
+		<td><input class="input" type="text" name="qanswer" /><input type="hidden" name="qkey" value="$qkey" /> 问题$db_question[$qkey] &nbsp;正确答案:{$db_answer[$qkey]}</td></tr></tbody>
+<!--
+EOT;
+}print <<<EOT
+-->
+	<tr><td>内容</td><td>
+		<textarea name="atc_content" onkeydown="ajax.quickpost(event,this.form)" class="textareaA" style="height:120px;">$atc_content</textarea>
+	</td></tr>
+</table>
+<input type="hidden" value="2" name="step" />
+<input type="hidden" value="$pid" name="pid" />
+<input type="hidden" name="replytouser" value="$replytouser" />
+<input type="hidden" value="$action" name="action" />
+<input type="hidden" value="$fid" name="fid" />
+<input type="hidden" value="$tid" name="tid" />
+<input type="hidden" value="$article" name="article" />
+<input type="hidden" value="1" name="atc_usesign" />
+<input type="hidden" value="1" name="atc_convert" />
+<input type="hidden" value="cn0zz" name="_hexie" id="_hexiequote" />
+<div class="popBottom"><span class="btn2"><span><button type="submit" name="ajaxsubmit">提 交</button></span></span><span class="bt2"><span><button type="button" onclick="window.location.href='post.php?action=quote&fid=$fid&tid=$tid&pid=$pid&article=$article&page=$page'">进入高级模式</button></span></span></div>
+</form>
+</div>
+<script language="JavaScript">
+<!--
+EOT;
+$tmpVerify = GetVerify($onlineip.$GLOBALS['winddb']['regdate'].$fid.$tid);print <<<EOT
+-->
+setTimeout(function(){getObj('_hexiequote').value='$tmpVerify';},500);
+</script>
+<!--
+EOT;
+}elseif($action=='honor'){print <<<EOT
+-->
+<form action="pw_ajax.php?action=$action" method="post" onsubmit="return false;">
+<input type="hidden" name="verify" value="$verifyhash" />
+<input type="hidden" name="step" value="3" />
+<table width="250" cellspacing="0" cellpadding="5">
+	<tr><th class="h" colspan="2" style="cursor:move" onmousedown="read.move(event);"><span class="fr" style="margin-top:2px;cursor:pointer" onclick="closep();"><img src="$imgpath/close.gif" /></span>个性签名编辑</th></tr>
+	<tr><td align="center"><textarea name="content" style="width:95%;height:60px">{$winddb[honor]}</textarea></td></tr>
+</table><ul><li style="text-align:center;padding:4px 0;"><input type="button" class="btn" onclick="ajax.submit(this.form,honor);" value=" 提 交 " /></li></ul></form>
+<!--
+EOT;
+}elseif($action=='readlog'){print <<<EOT
+-->
+<div class="popTop cc"><span class="fl w">最近浏览的帖子</span><span class="adel cp" onclick="closep();">关闭</span></div>
+<table class="z">
+<!--
+EOT;
+foreach($readb as $key=>$val){
+$i=$key+1;
+print <<<EOT
+-->
+<tr class="tr3 tac">
+	<td class="tal"><a href="read.php?tid=$val[tid]" target="_blank">$val[subject]</a></td>
+</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+</table>
+<!--
+EOT;
+}elseif($action=='threadlog'){print <<<EOT
+-->
+<div class="popTop cc"><span class="fl w">最近浏览的版块</span><span class="adel cp" onclick="closep();">关闭</span></div>
+<table class="z">
+<!--
+EOT;
+foreach($threaddb as $key=>$value){print <<<EOT
+-->
+<tr class="tr3"><td><a href="thread.php?fid=$key">$value</a></td></tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+</table>
+<!--
+EOT;
+}elseif($action=='mgmode'){print <<<EOT
+-->
+<div id="mgmode">
+<table border="0" cellspacing="0" cellpadding="0"><tbody><tr><td class="bgcorner1"></td><td class="pobg1"></td><td class="bgcorner2"></td></tr><tr><td class="pobg4"></td><td><div class="popoutContent">
+<div class="popTop cc"><span class="fl mr10 w">可视化布局</span><span class="adel cp" onclick="closep();">关闭</span></div>
+	<table width="120" class="z">
+<!--
+EOT;
+if($rightset['setforum']){print <<<EOT
+-->
+		<tr class="tr3"><td><a class="cp" onclick="mf = new mgm.forder();" title="可视化修改版块布局">版块排序</a></td></tr>
+		<tr class="tr3"><td><a class="cp" onclick="mf = new mgm.fsetname();" title="点击版块名称进行修改">版块名称修改</a></td></tr>
+<!--
+EOT;
+}if($rightset['setstyles']){print <<<EOT
+-->
+		<tr class="tr3"><td><a class="cp" onclick="mf = new mgm.style();" title="前台可视化修改风格">风格设置</a></td></tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+	</table>
+</div></td><td class="pobg2"></td></tr><tr><td class="bgcorner4"></td><td class="pobg3"></td><td class="bgcorner3"></td></tr></tbody></table>
+</div>
+<!--
+EOT;
+}elseif($action=='setstyle'){print <<<EOT
+--><div style="width:550px;">
+<form action="pw_ajax.php?action=$action" method="post" onsubmit="return false;">
+<input type="hidden" name="verify" value="$verifyhash" />
+<div class="popTop"><span class="adel cp" onclick="closep();">关闭</span>风格设置</div>
+<table id="mgmode" width="100%" class="mb5">
+	<tr>
+		<td valign="top" style="padding:0;">
+			<table class="z">
+			<tr class="tr2">
+				<td colspan="2">整体风格设置</td>
+			</tr>
+			<tr class="tr3">
+				<td width="50%">表格宽度</td>
+				<td><input class="input" type="text" name="set[tablewidth]" value="$tablewidth" onblur="mf.setcss(this);" /></td>
+			</tr>
+			<tr class="tr3">
+				<td>头部和尾部表格宽度</td>
+				<td><input class="input" type="text" name="set[mtablewidth]" value="$mtablewidth" onblur="mf.setcss(this);" /></td>
+			</tr>
+			<tr class="tr3">
+				<td>全局背景颜色</td>
+				<td><input class="input" type="text" name="set[bgcolor]" value="$bgcolor" onblur="mf.setcss(this);" /></td>
+			</tr>
+			<tr class="tr3">
+				<td>全局链接颜色</td>
+				<td><input class="input" type="text" name="set[linkcolor]" value="$linkcolor" onblur="mf.setcss(this);" /></td>
+			</tr>
+			<tr class="tr3">
+				<td>表格外边框颜色</td>
+				<td><input class="input" type="text" name="set[tablecolor]" value="$tablecolor" onblur="mf.setcss(this);" /></td>
+			</tr>
+			<tr class="tr3">
+				<td>表格内边框颜色</td>
+				<td><input class="input" type="text" name="set[tdcolor]" value="$tdcolor" onblur="mf.setcss(this);" /></td>
+			</tr>
+			</table>
+		</td>
+		<td valign="top" style="padding:0;">
+			<table class="z">
+			<tr class="tr2"><td colspan="2">表格样式颜色设置</td></tr>
+			<tr class="tr3">
+				<td>表格标题栏颜色</td>
+				<td><input class="input" type="text" name="set[headcolor]" value="$headcolor" onblur="mf.setcss(this);" /></td>
+			</tr>
+			<tr class="tr3">
+				<td>表格标题栏下边框颜色</td>
+				<td><input class="input" type="text" name="set[headborder]" value="$headborder" onblur="mf.setcss(this);" /></td>
+			</tr>
+			<tr class="tr3">
+				<td>标题栏主要字体链接颜色</td>
+				<td><input class="input" type="text" name="set[headfontone]" value="$headfontone" onblur="mf.setcss(this);" /></td>
+			</tr>
+			<tr class="tr3">
+				<td>标题栏次要字体链接颜色</td>
+				<td><input class="input" type="text" name="set[headfonttwo]" value="$headfonttwo" onblur="mf.setcss(this);" /></td>
+			</tr>
+			<tr class="tr3">
+				<td>表格副标题栏颜色</td>
+				<td><input class="input" type="text" name="set[cbgcolor]" value="$cbgcolor" onblur="mf.setcss(this);" /></td>
+			</tr>
+			<tr class="tr3">
+				<td>表格副标题栏下边框颜色</td>
+				<td><input class="input" type="text" name="set[cbgborder]" value="$cbgborder" onblur="mf.setcss(this);" /></td>
+			</tr>
+			<tr class="tr3">
+				<td>表格副标题栏字体颜色</td>
+				<td><input class="input" type="text" name="set[cbgfont]" value="$cbgfont" onblur="mf.setcss(this);" /></td>
+			</tr>
+			<tr class="tr3">
+				<td>论坛列表颜色一</td>
+				<td><input class="input" type="text" name="set[forumcolorone]" value="$forumcolorone" onblur="mf.setcss(this);" /></td>
+			</tr>
+			<tr class="tr3">
+				<td>论坛列表颜色二</td>
+				<td><input class="input" type="text" name="set[forumcolortwo]" value="$forumcolortwo" onblur="mf.setcss(this);" /></td>
+			</tr>
+			</table>
+		</td>
+	</tr>
+</table>
+<input type="hidden" name="step" value="2" />
+<input type="hidden" name="setskin" value="$skin" />
+<div class="popBottom"><span class="btn2"><span><button type="button" name="ajaxsubmit" onclick="ajax.submit(this.form,mf.submit);">提 交</button></span></span></div></form>
+</div>
+<!--
+EOT;
+}elseif($action=='addfriend'){print <<<EOT
+-->
+<form action="pw_ajax.php?action=$action" method="post" onsubmit="return false;">
+<input type="hidden" name="verify" value="$verifyhash" />
+<input type="hidden" name="job" value="add" />
+<input type="hidden" name="step" value="2" />
+<input type="hidden" name="touid" value="$friend[uid]" />
+<!--
+EOT;
+if ($reload) {print <<<EOT
+-->
+<input type="hidden" name="reload" value="1" />
+<!--
+EOT;
+}print <<<EOT
+-->
+<div style="width:300px;">
+	<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><a class="adel" onclick="closep();" href="javascript:;">关闭</a>好友验证信息</div>
+	<p class="p10">你确定要加{$friend[username]}为好友吗？</p>
+<table id="mgmode" width="100%">
+	<tr class="vt">
+		<td width="80" class="tac">
+		<a href="javascript:;"><img src="$faceurl" width="44" height="44" class="mb5" /></a><p>$friend[username]</p></td>
+		<td>
+<!--
+EOT;
+if ($friendcheck == 1){print <<<EOT
+-->
+			<div class="mb10"><div class="mb5">发送请求信息</div>
+			<input class="input input_wa" type="text" name="checkmsg" /></div>
+<!--
+EOT;
+}print <<<EOT
+-->
+			<div class="mb10"><select name="friendtype" id="friendtype" style="margin-right:3px;width:100px;">
+				<option value="0">不分组</option>
+<!--
+EOT;
+foreach ($types as $key => $value){print <<<EOT
+-->
+				<option value="$key">$value</option>
+<!--
+EOT;
+}print <<<EOT
+-->
+			</select> <a style="cursor:pointer;" onclick="addFriendType();">增加分组</a></div>
+			<span style="display:none;" id="typeinputbox"><input name="typename" id="typename" class="input" style="width:92px;"><span class="bt2"><span><button type="button" onclick="submitAddFriendType()" name="addtypebutton">添加</button></span></span></span>
+		</td>
+	</tr>
+</table>
+<div class="popBottom"><span class="btn2"><span><button type="button" name="ajaxsubmit" onclick="ajax.submit(this.form);">提 交</button></span></span></div>
+</div>
+</form>
+<script language="JavaScript">
+
+function addFriendType(){
+	var typeinputbox = getObj('typeinputbox');
+	if (typeinputbox.style.display == 'none') {
+		typeinputbox.style.display = '';
+	} else {
+		typeinputbox.style.display = 'none';
+	}
+}
+
+function submitAddFriendType(){
+	var typeinputbox = getObj('typeinputbox');
+	var typenamebox = getObj('typename');
+	var typename = typenamebox.value;
+	var typename_length = typename.length;
+	if (typename_length < 1) {
+		showDialog('error','好友分类名称的长度为1～20','2');
+		return false;
+	} else if (typename_length >= 20) {
+		showDialog('error','好友分类名称的长度为1～20','2');
+		return false;
+	}
+	ajax.send('pw_ajax.php?action=addfriendtype&','typename='+typename,function(){
+		var rText = ajax.request.responseText.split('\t');	
+		if (rText[0] == 'success') {
+			var friendtype = getObj('friendtype');
+			friendtype.options.add(new Option(rText[2],rText[1]))
+			var select_length = friendtype.options.length;
+			friendtype.options[select_length-1].selected = 'selected';
+			typenamebox.value = '';
+			typeinputbox.style.display = 'none';
+		} else {
+			showDialog('error',rText);
+		}
+	});
+}
+</script>
+<!--
+EOT;
+} elseif ($action =='addattention') {
+$callback = '';
+if ($recommend) {
+$callback = ', recommendAddattention';
+print <<<EOT
+-->
+<script type="text/javascript" id="recommendAddattention">
+function recommendAddattention() {
+	var responseText = ajax.request.responseText;
+	if (responseText.match('操作成功!')) {
+		var o = read.obj;
+		if (o.tagName.toLowerCase() == 'a' && o.href.match('addattention')) {
+			o.parentNode.parentNode.style.display = 'none';
+		}
+	} else {
+		ajax.guide();
+	}
+}
+</script>
+<!--
+EOT;
+}print <<<EOT
+-->
+<form action="pw_ajax.php?action=$action&touid=$touid" onsubmit="return false;" method="post">
+	<input type="hidden" name="step" value="2" />
+	<input type="hidden" name="recommend" value="$recommend" />
+    <input type="hidden" name="verify" value="$verifyhash" />
+	<div style="width:200px;">
+		<div class="p10 b f14">您确定要关注{$member['username']}吗？</div>
+		<div class="popBottom">
+		<span class="btn2"><span><button type="button" onclick="ajax.submit(this.form{$callback})">确定</button></span></span>
+		<span class="bt2"><span><button type="button" onclick="closep();">取消</button></span></span>
+		</div>
+	</div>
+</form>
+<!--
+EOT;
+} elseif ($action =='delattention') {print <<<EOT
+-->
+<form action="pw_ajax.php?action=$action&touid=$touid" onsubmit="return false;" method="post">
+	<input type="hidden" name="step" value="2" />
+    <input type="hidden" name="verify" value="$verifyhash" />
+	<div style="width:200px;">
+		<div class="p10 b f14">您确定要取消对{$member['username']}关注吗？</div>
+		<div class="popBottom">
+		<span class="btn2"><span><button type="button" onclick="ajax.submit(this.form)">确定</button></span></span>
+		<span class="bt2"><span><button type="button" onclick="closep();">取消</button></span></span>
+		</div>
+	</div>
+</form>
+<!--
+EOT;
+} elseif ($action == 'pushto') {print<<<EOT
+-->
+<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="adel cp" onclick="closep();">关闭</span>推送位置选择</div>
+	<table width="100%" class="z">
+<!--
+EOT;
+$id=0;
+foreach ($pushs as $key => $value){
+if($id == '0'){print<<<EOT
+-->
+		<tr class="tr3">
+<!--
+EOT;
+}$id++;print<<<EOT
+-->
+		<td><a onclick="return sendurl(this,1,'push')" href="mawhole.php?action=push&pushto=$value[id]&fid=$fid&seltid=$seltid" >$value[name]</a></td>
+<!--
+EOT;
+if($id == 2){$id=0;print<<<EOT
+-->
+		</tr>
+<!--
+EOT;
+}}print<<<EOT
+-->
+	</table>
+<!--
+EOT;
+}elseif ($action == 'debate') {print<<<EOT
+--><div style="width:430px;">
+<form action="pw_ajax.php?action=debate" method="post" onsubmit="return false;">
+<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="adel cp" onclick="closep();">关闭</span>结束辩论，裁判点评</div>
+<table width="100%" class="z vt mb5">
+	<tr class="tr3">
+		<td width="60">辩论结果:</td>
+		<td>
+<!--
+EOT;
+if($debate[judge]==1){print<<<EOT
+-->
+正方胜(支持数: $debate[obvote] 辩手:$debate[obposts])
+<!--
+EOT;
+}elseif($debate[judge]==2){print<<<EOT
+-->
+平局
+<!--
+EOT;
+}elseif($debate[judge]==3){print<<<EOT
+-->
+反方胜(支持数: $debate[revote] 辩手:$debate[reposts])
+<!--
+EOT;
+}else{print<<<EOT
+-->
+			<p class="mb5"><label><input type="radio" name="judge" value="1" />正方胜(支持数:$debate[obvote]&nbsp;辩手:$debate[obposts])</label></p>
+			<p class="mb5"><label><input type="radio" name="judge" value="2" checked/>平局</label></p>
+			<p class="mb5"><label><input type="radio" name="judge" value="3" />反方胜(支持数:$debate[revote]&nbsp;辩手:$debate[reposts])</label></p>
+<!--
+EOT;
+}print<<<EOT
+-->
+		</td>
+	</tr>
+	<tr class="tr3">
+		<td>最佳辩手:</td>
+		<td>
+<!--
+EOT;
+if($debate[debater]){print<<<EOT
+-->
+			<a href="u.php?username=$debate[debater]" target="_blank">$debate[debater]</a>
+<!--
+EOT;
+}else{print<<<EOT
+-->
+			<input class="input input_wa" id="debater" type="text" name="debater">
+			<select onchange="if(this.value)getObj('debater').value=this.value;" class="select_wa">
+			<option value="">推荐辩手(支持数)</option>
+<!--
+EOT;
+foreach($debater as $val){print<<<EOT
+-->
+			<option value="$val[username]">$val[username]($val[vote])</option>
+<!--
+EOT;
+}print<<<EOT
+-->
+			</select>
+<!--
+EOT;
+}print<<<EOT
+-->
+		</td>
+	</tr>
+	<tr class="tr3">
+		<td>裁判点评:</td>
+		<td><textarea class="textareaA" name="umpirepoint">$debate[umpirepoint]</textarea></td>
+	</tr>
+</table>
+<input type="hidden" name="verify" value="$verifyhash" />
+<input type="hidden" name="step" value="2" />
+<input type="hidden" name="do" value="judge" />
+<input type="hidden" name="tid" value="$tid" />
+<div class="popBottom"><span class="btn2"><span><button type="button" name="ajaxsubmit" onclick="ajax.submit(this.form);">提 交</button></span></span></div>
+</form></div>
+<!--
+EOT;
+} elseif ($action == 'readmessage') {print <<<EOT
+-->
+<table cellspacing="0" cellpadding="5" width="450px">
+	<tbody>
+	<tr><th class="h" colspan="2" style="cursor:move" onmousedown="read.move(event);"><span class="fr" style="margin-top:2px;cursor:pointer" onclick="closep();"><img src="$imgpath/close.gif" /></span>
+<!--
+EOT;
+if ($type == 'personal') {print <<<EOT
+-->
+	个人消息
+<!--
+EOT;
+} elseif ($type == 'system') {print <<<EOT
+-->
+	系统消息
+<!--
+EOT;
+} elseif ($type == 'public') {print <<<EOT
+-->
+	群发消息
+<!--
+EOT;
+}print <<<EOT
+-->
+	</th></tr>
+	<tr><td width="20%">发件人:</td><td> $msginfo[username]</td></tr>
+	<tr><td>标题</td><td> $msginfo[title]</td></tr>
+	<tr><td>时间:</td><td> $msginfo[mdate]</td></tr>
+	<tr><td>内容</td><td> $msginfo[content]</td></tr>
+	<tr><td>选项: </td><td>
+<!--
+EOT;
+if ($type == 'personal') {print <<<EOT
+-->
+
+	<!-- [<a href="message.php?action=chatlog&withuid=$msginfo[withuid]" target="_blank">通信记录</a>] -->
+	<!-- [<a style="cursor:pointer;" onclick="sendmsg('pw_ajax.php?action=unread&mid=$msginfo[mid]')">标记未读</a>] -->
+	<!-- [<a style="cursor:pointer;" onclick="sendmsg('pw_ajax.php?action=msg&remid=$msginfo[mid]')">回复</a>] -->
+	<!-- [<a style="cursor:pointer;" onclick="sendmsg('pw_ajax.php?action=msg&transmit=$msginfo[mid]')">转发</a>] -->
+	<!-- [<a style="cursor:pointer;" onclick="sendmsg('pw_ajax.php?action=delmessage&type=$type&delid=$msginfo[mid]')">删除</a>] -->
+
+<!--
+EOT;
+} elseif ($type == 'system'){print <<<EOT
+-->
+	[<a style="cursor:pointer;" onclick="sendmsg('pw_ajax.php?action=delmessage&type=$type&delid=$msginfo[mid]')">删除</a>]
+<!--
+EOT;
+} elseif ($type == 'public'){print <<<EOT
+-->
+	[<a style="cursor:pointer;" onclick="sendmsg('pw_ajax.php?action=delmessage&type=$type&delid=$msginfo[mid]')">删除</a>]
+<!--
+EOT;
+}print <<<EOT
+-->
+	</td></tr>
+	</tbody>
+</table>
+<!--
+EOT;
+} elseif ($action == 'report') {
+$sendtitle = $type == 'topic' ? '发信息通知版主' : '发信息通知管理员';
+print <<<EOT
+-->
+<form action="pw_ajax.php?action=$action" method="post" onsubmit="return false;">
+<input type="hidden" name="verify" value="$verifyhash" />
+<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="adel" onclick="closep();">删除</span>{$ch_type}举报</div>
+<table width="380" cellspacing="0" cellpadding="0">
+<tr><td>
+感谢您能一起协助我们管理站点，我们会尽快处理您的举报内容！
+</td></tr>
+<tr>
+<td><div class="p10"><textarea id="reason" name="reason" class="textareaA"></textarea></div>
+</td></tr>
+<tr>
+<td><div style="margin-left:5px"><label><input type="checkbox"  name="ifsendmessage" checked value="1"/>{$sendtitle}</label></div>
+</td></tr>
+</table>
+<input type="hidden" name="step" value="2" />
+<input type="hidden" name="tid" value="$tid" />
+<input type="hidden" name="pid" value="$pid" />
+<input type="hidden" name="type" value="$type" />
+
+<div class="popBottom"><span class="btn2"><span><button type="button" onclick="ajax.submit(this.form);">提 交</button></span></span></div>
+</form>
+<!--
+EOT;
+} elseif ($action == 'showfriends') {print <<<EOT
+-->
+<form action="pw_ajax.php?action=showfriends&" onsubmit="return false;" method="POST">
+	<input type="hidden" name="step" value="2" />
+	<div class="fri-list pr">
+		<div class="fri-top" style="cursor:move" onmousedown="read.move(event);">
+			<span class="fr">
+				<select name="friendtype" onchange="showFriendList(this.value);">
+					<option value="-1">全部好友</option>
+<!--
+EOT;
+foreach ($friendtype as $key => $value) {print <<<EOT
+-->
+					<option value="$key">$value[name]</option>
+<!--
+EOT;
+}print <<<EOT
+-->
+				</select>
+			</span>
+			<span class="bt2"><span><button type="submit" name="Submit" onclick="CheckAll(this.form)">全选</button></span></span>
+			<span class="btn2"><span><button type="submit" name="Submit" onclick="ajax.submit(this.form,$recall)">确定</button></span></span>
+			<span class="bt2"><span><button type="button" onclick="closep();">取消</button></span></span>
+		</div>
+	<div class="fri-bot" id="friendlist">
+	<ul class="list-wid cc listC">
+<!--
+EOT;
+foreach ($friendtype as $key => $value) {print <<<EOT
+-->
+						<div id="ftid_$value[ftid]">
+<!--
+EOT;
+foreach ($frienddb[$value[ftid]] as $k => $v) {print <<<EOT
+-->
+							<li><input type="checkbox" name="selid[]" value="$v[uid]"> $v[username]</li>
+<!--
+EOT;
+}print <<<EOT
+-->
+						</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+	</ul>
+</div>
+</div>
+</form>
+<script type="text/javascript" language="JavaScript" src="js/core/friendlist.js"></script>
+<!--
+EOT;
+}elseif ($action == 'showcard') {print <<<EOT
+-->
+<div class="pop-card" id="cardmenu_$info[uid]" onmouseover="clearTimeout(userCard.t2);" onmouseout="movecard(event,this.id);">
+	<div class="pop-card-bg">
+		<div class="pop-card-info">
+			<dl class="cc">
+				<dt><img src="$info[icon]" class="card-face" /></dt>
+				<dd>
+					<p class="card-title cc"><a href="u.php?uid=$info[uid]" class="fl b">$info[username]</a>
+<!--
+EOT;
+if($db_showonline && checkOnline($info['thisvisit'])){print <<<EOT
+-->
+					<span class="card-online" title="在线">在线</span>
+<!--
+EOT;
+}else{print<<<EOT
+-->
+					<span class="card-offline" title="离线">离线</span>
+<!--
+EOT;
+}print <<<EOT
+-->
+<!--
+EOT;
+if ($winduid != $uid) {
+	if ($info[isMyAttention]) {print <<<EOT
+-->
+			<a href="javascript:;" onclick="pwConfirm('是否取消关注？',this,function(){Attention.del('{$info[uid]}')})" title="取消关注" class="fr gray following">关注中</a>
+<!--
+EOT;
+	} else {print <<<EOT
+-->
+			<a href="javascript:;" onclick="Attention.add(this,'{$info['uid']}',0)" class="follow fr">加关注</a>
+<!--
+EOT;
+	}
+} print <<<EOT
+-->
+					</p>
+					<p class="gray2"><span class="mr20">级别：{$info[memtitle]}</span></p>
+					<p class="card-write">
+<!--
+EOT;
+if($info['honor']){print<<<EOT
+-->
+						<span class="mr20">$info[honor]</span><!--<span class="gray2">- $write[posttime]</span>-->
+<!--
+EOT;
+}else{print<<<EOT
+-->
+						<span class="mr20">暂无签名</span>
+<!--
+EOT;
+}print<<<EOT
+-->
+					</p>
+         	<p class="fr">
+<!--
+EOT;
+if(isset($db_hackdb['blog'][2]) && $db_hackdb['blog'][2] && $bg_ifopen){print <<<EOT
+-->
+					<a href="$bg_blogurl/blog.php?bbsuid=$info[uid]" target="_blank" class="card-blog" title="个人博客">个人博客</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+					<!--<a href="u.php?uid=$info[uid]" class="card-profile" title="个人资料">个人资料</a>-->
+<!--
+EOT;
+if($groupid!='guest' && isset($db_hackdb['toolcenter']) && $db_toolifopen){print <<<EOT
+-->
+					<a href="javascript:;" class="card-magic" title="使用道具" onclick="sendmsg('pw_ajax.php?action=usertool&uid=$info[uid]','','sf_$info[lou]')" style="cursor:pointer">使用道具</a>
+<!--
+EOT;
+}if($info['oicq']){print <<<EOT
+-->
+					<a title="QQ:$info[oicq]" href="http://wpa.qq.com/msgrd?V=1&Uin=$info[oicq]&Site=$db_bbsname&Menu=yes" target="_blank" class="card-qq">QQ</a>
+<!--
+EOT;
+}if ($info['aliww']) {print <<<EOT
+-->
+					<a title="阿里旺旺:$info[aliww]" href="http://amos.im.alisoft.com/msg.aw?uid=$info[aliww]&site=cntaobao" target="_blank" class="card-ww">淘宝旺旺</a>
+<!--
+EOT;
+}if($winduid){print <<<EOT
+-->
+					<a href="javascript:;" onclick="sendmsg('pw_ajax.php?action=msg&touid=$info[uid]');" class="card-mail" title="发送消息">发送消息</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+<!--
+EOT;
+if ($winduid != $uid) {
+	if($info[ismyfriend] && $winduid){print <<<EOT
+-->
+					<a href="javascript:;" onclick="sendmsg('pw_ajax.php?action=addfriend&touid=$info[uid]')" class="card-fri">加为好友</a>
+<!--
+EOT;
+	}else{print <<<EOT
+-->
+					<a href="javascript:;" onclick="pwConfirm('是否确认解除？',this,function(){delFriend('$info[uid]')});" class="card-fri-out">解除好友</a>
+<!--
+EOT;
+}}print <<<EOT
+-->
+           </p>
+				</dd>
+			</dl>
+		</div>
+		<div class="card-app">
+			<div class="p10">
+				<p class="mb10"><span class="mr20">他的朋友：<a href="u.php?uid=$info[uid]">{$info[f_num]}</a></span>&nbsp;&nbsp;&nbsp;
+				<span class="mr20">来访：<a href="u.php?uid=$info[uid]">{$info[visits]}</a></span>&nbsp;&nbsp;&nbsp;
+				<span>访问过：<a href="u.php?uid=$info[uid]">{$info[tovisits]}</a></span></p>
+				<p class="b">
+					<a href="apps.php?q=weibo&uid=$info[uid]">新鲜事</a><!--
+EOT;
+if($info['appcount']['owrite']){print <<<EOT
+--><span class="card-new">new</span>
+<!--
+EOT;
+}print <<<EOT
+-->
+					&nbsp;&nbsp;<a href="apps.php?q=diary&uid=$info[uid]">日志</a><!--
+EOT;
+if($info['appcount']['diary']){print <<<EOT
+--><span class="card-new">new</span>
+<!--
+EOT;
+}print <<<EOT
+-->
+					&nbsp;&nbsp;<a href="apps.php?q=photos&uid=$info[uid]">相册</a><!--
+EOT;
+if($info['appcount']['photo']){print <<<EOT
+--><span class="card-new">new</span>
+<!--
+EOT;
+}print <<<EOT
+-->
+					&nbsp;&nbsp;<a href="apps.php?q=article&uid=$info[uid]">帖子</a><!--
+EOT;
+if($info['appcount']['topic']){print <<<EOT
+--><span class="card-new">new</span>
+<!--
+EOT;
+}print <<<EOT
+-->
+					&nbsp;&nbsp;<a href="apps.php?q=groups&uid=$info[uid]">群组</a><!--
+EOT;
+if($info['appcount']['group']){print <<<EOT
+--><span class="card-new">new</span>
+<!--
+EOT;
+}print <<<EOT
+-->
+				</p>
+			</div>
+			<div class="card-app-bot cc">
+<!--
+EOT;
+if($info['app']){print<<<EOT
+-->
+				<span id="t_typedb" class="card-bot-icon">
+<!--
+EOT;
+$i = 1;
+foreach($info['app'] as $val){
+$i++;
+$appurl = "apps.php?id=$val[appid]";
+if ($val[ifshow]) {print <<<EOT
+-->
+				<a href="$appurl"><img src="{$db_server_url}/images/icon/s{$val[appid]}.png" title="{$appsdb[$val[appid]][name]}" align="absmiddle" /></a>
+<!--
+EOT;
+}else{print<<<EOT
+-->
+				<a href="$appurl"><img src="{$db_server_url}/images/icon/s_{$val[appid]}.png" title="{$appsdb[$val[appid]][name]}" align="absmiddle" /></a>
+<!--
+EOT;
+}}print<<<EOT
+-->
+				</span>
+<!--
+EOT;
+if($i > $db_maxnum){print<<<EOT
+-->
+				<span class="card-right-down fr" title="下一页" onclick="showTypeTab($db_maxnum,$db_maxnum,'a');">下一页</span>
+				<span class="card-left-down fr" title="上一页" onclick="showTypeTab(-$db_maxnum,$db_maxnum,'a');" >上一页</span>
+<!--
+EOT;
+}}print<<<EOT
+-->
+			</div>
+		</div>
+<!--
+EOT;
+if($info['appinfo']){print<<<EOT
+-->
+		<div class="card-content p10" style="/*display:none;*/">
+<!--
+EOT;
+$i=0;
+foreach ($info['appinfo'] as $key => $value) {
+if($i>=2) continue;
+$i++;
+if ($key == 'cardtopic') {print<<<EOT
+-->
+			<p class="card-title">帖子：<a href="read.php?tid=$value[tid]" target="_blank" class="mr20">{$value[subject]}</a><span class="gray2">$value[postdate_s]</span></p>
+			<p>{$value[content]}</p>
+<!--
+EOT;
+if ($value['attimages']) {print<<<EOT
+-->
+			<ul class="card-photo cc">
+<!--
+EOT;
+foreach ($value['attimages'] as $v) {print<<<EOT
+-->
+				<li><a href="read.php?tid=$value[tid]" target="_blank"><img src="$v" /></a></li>
+<!--
+EOT;
+}print<<<EOT
+-->
+			</ul>
+<!--
+EOT;
+}print<<<EOT
+-->
+			<div class="card-cont-hr"></div>
+<!--
+EOT;
+} elseif ($key == 'carddiary'){print<<<EOT
+-->
+			<p class="card-title">日志：<a href="apps.php?q=diary&uid=$value[uid]&a=detail&did=$value[did]" target="_blank" class="mr20">{$value[subject]}</a><span class="gray2">$value[postdate_s]</span></p>
+			<p>{$value[content]}</p>
+<!--
+EOT;
+if ($value['attimages']) {print<<<EOT
+-->
+			<ul class="card-photo cc">
+<!--
+EOT;
+foreach ($value['attimages'] as $v) {print<<<EOT
+-->
+				<li><a href="apps.php?q=diary&uid=$value[uid]&a=detail&did=$value[did]" target="_blank"><img src="$v" /></a></li>
+<!--
+EOT;
+}print<<<EOT
+-->
+			</ul>
+<!--
+EOT;
+}print<<<EOT
+-->
+			<div class="card-cont-hr"></div>
+<!--
+EOT;
+} elseif ($key == 'cardphoto') {print<<<EOT
+-->
+			<p class="card-title">照片：<a href="apps.php?q=photos&uid={$value[uid]}&a=album&aid={$value[aid]}" class="mr20">《{$value[aname]}》</a><span class="gray2">{$value[postdate_s]}</span></p>
+			<ul class="card-photo cc">
+<!--
+EOT;
+foreach ($value['photo'] as $photo) {print<<<EOT
+-->
+				<li><a href="apps.php?q=photos&uid=$value[uid]&a=view&pid=$photo[pid]"><img src="$photo[path]" /></a></li>
+<!--
+EOT;
+}print<<<EOT
+-->
+			</ul>
+			<div class="card-cont-hr"></div>
+<!--
+EOT;
+}elseif($value[type]=='write'){print<<<EOT
+-->
+			<span class="mr20">记录：{$value[value][content]}</span><span class="gray2">$k</span>
+			<div class="card-cont-hr"></div>
+<!--
+EOT;
+}}print<<<EOT
+-->
+		</div>
+<!--
+EOT;
+}print<<<EOT
+-->
+	</div>
+</div>
+<!--
+EOT;
+print <<<EOT
+-->
+<script language="javascript">
+function showTypeTab(p, n, tag){
+	var o = getObj('t_typedb');
+	var f = o.getElementsByTagName(tag);
+	var s = 0;
+	for(i=0;i<f.length;i++)
+		if(f[i].style.display != "none"){s = i;break;}
+	s += p;
+	if(s<0 || s>f.length)return;
+	for(i=0;i<f.length;i++){
+		if(i>=s && i<s+n){
+			f[i].style.display = "inline";
+		} else{
+			f[i].style.display = "none";
+		}
+	}
+	return;
+}
+function delFriend(u){
+	ajax.send('apps.php?q=ajax&a=delfriend&u='+u,'',function(){
+		var rText = ajax.request.responseText.split('|');
+		if (rText[0] == 'success') {
+			showDialog('success','操作成功!',1);
+		} else {
+			ajax.guide();
+		}
+	});
+}
+if (typeof(HTMLElement) != "undefined") {
+	HTMLElement.prototype.contains = function(obj) {
+		while (obj!=null && typeof(obj.tagName) != "undefind"){
+			if (obj == this)  return true;
+			obj = obj.parentNode;
+		}
+		return false;
+	};
+}
+function movecard(theEvent, id){
+	if (theEvent){
+		if (is_ie) {
+			if (document.getElementById(id).contains(event.toElement)) {
+				return false;
+			}
+		} else {
+			if (document.getElementById(id).contains(theEvent.relatedTarget)) {
+				return false;
+			}
+		}
+	}
+	try{userCard.menu.close();}catch(e){}
+}
+verifyhash = "$verifyhash";
+</script>
+<!--
+EOT;
+}elseif($action == 'asearch'){
+if($modelid){print<<<EOT
+-->
+<form action="thread.php?fid=$fid&modelid=$modelid" method="post">
+<!--
+EOT;
+}elseif($pcid){print<<<EOT
+-->
+<form action="thread.php?fid=$fid&pcid=$pcid" method="post">
+<!--
+EOT;
+}else{print<<<EOT
+-->
+<form action="thread.php?fid=$fid&actmid=$actmid&allactmid=$allactmid" method="post">
+<!--
+EOT;
+}
+print<<<EOT
+-->
+<input type="hidden" name="topicsearch" value="1">
+<table width="350px" cellspacing="0" cellpadding="5">
+	<tr><th class="h" colspan="2" style="cursor:move" onmousedown="read.move(event);"><span class="fr" style="margin-top:2px;cursor:pointer" onclick="closep();"><img src="$imgpath/close.gif" /></span>高级搜索</th></tr>
+
+<!--
+EOT;
+$vieworder_mark = 0;
+foreach($asearchdb as $key => $value){
+if($vieworder_mark != 0 && $vieworder_mark != $value['vieworder']){print<<<EOT
+-->
+
+<!--
+EOT;
+}
+if ($value['vieworder'] == 0) {
+if($actmid || $allactmid){print<<<EOT
+print<<<EOT
+-->
+					<tr><td width="30%">{$value[name][0]}：</td><td>{$value[name][1]}$value[searchhtml]{$value[name][2]}</td></tr>
+<!--
+EOT;
+}else{print<<<EOT
+-->
+					<tr><td width="30%">$value[name1]：</td><td>$value[searchhtml]$value[name2]</td></tr>
+<!--
+EOT;
+}}else{
+if($vieworder_mark != $value['vieworder']){
+if($actmid || $allactmid){print<<<EOT
+print<<<EOT
+-->
+					<tr><td width="30%">{$value[name][0]}：</td><td>{$value[name][1]}$value[searchhtml]{$value[name][2]}
+<!--
+EOT;
+}else{print<<<EOT
+-->
+					<tr><td width="30%">$value[name1]：</td><td>$value[searchhtml]$value[name2]
+<!--
+EOT;
+}}else{
+if($actmid || $allactmid){print<<<EOT
+-->
+					{$value[name][0]}{$value[name][1]}$value[searchhtml]{$value[name][2]}
+<!--
+EOT;
+}else{print<<<EOT
+-->
+					$value[name1]$value[searchhtml]$value[name2]
+<!--
+EOT;
+}}}
+$vieworder_mark = $value['vieworder'];
+}
+if($vieworder_mark != 0){print<<<EOT
+-->
+				</td></tr>
+<!--
+EOT;
+}print<<<EOT
+-->
+				<tr><td colspan="2"><center><input type="submit" name="submit" value="搜索"></center></td></tr>
+</table>
+</form>
+<!--
+EOT;
+}elseif($action == 'pcjoin'){print<<<EOT
+-->
+<form action="pw_ajax.php?action=$action" method="post" onsubmit="return false;">
+<input type="hidden" name="verify" value="$verifyhash" />
+<input type="hidden" name="tid" value="$tid">
+<!--
+EOT;
+if($thelast != '1'){
+if($isU){
+if($fieldvalue['limitnum']){
+	$limitnum = "还剩{$morenum}";
+}else{
+	$limitnum = '无限制';
+}
+if ($pcid == '2') {
+	$signjoin = '活动报名';
+} elseif ($pcid == '1') {
+	$signjoin = '团购报名';
+}
+print<<<EOT
+--><div style="width:380px;">
+<input type="hidden" name="step" value="1">
+<input type="hidden" name="pcid" value="$pcid">
+<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="adel cp" onclick="closep();">关闭</span>$signjoin</div>
+<table width="100%" class="z mb5">
+	<tr class="tr2"><td colspan="2">说明：带<span class="s1">*</span>为必填选项</td></tr>
+<!--
+EOT;
+if($pcid == '2'){print<<<EOT
+-->
+	<tr class="tr3"><td width="80">报名人数：<span class="s1">*</span></td><td><input type="text" name="nums" class="input input_wa"> 人({$limitnum})</td></tr>
+<!--
+EOT;
+}elseif($pcid == '1'){print<<<EOT
+-->
+	<tr class="tr3"><td>购买数量：<span class="s1">*</span></td><td><input type="text" name="nums" class="input input_wa"> 个({$limitnum})</td></tr>
+<!--
+EOT;
+}print<<<EOT
+-->
+	<tr class="tr3"><td width="80">真实姓名：<span class="s1">*</span></td><td><input type="text" name="name" class="input input_wa"></td></tr>
+	<tr class="tr3"><td>手机：<span class="s1">*</span></td><td><input type="text" name="mobile" class="input input_wa"></td></tr>
+	<tr class="tr3"><td>电话：</td><td><input type="text" name="phone" class="input input_wa"></td></tr>
+	<tr class="tr3"><td>地址：</td><td><input type="text" name="address" class="input input_wa"></td></tr>
+<!--
+EOT;
+if($pcid == '1'){print<<<EOT
+-->
+	<tr class="tr3"><td>邮编：</td><td><input type="text" name="zip" class="input input_wa"></td></tr>
+	<tr class="tr3"><td>给卖家留言：</td><td><textarea name="message" class="textareaA" style="width:150px;"></textarea>
+	<br />可选项，可以告诉卖家你对商品的特殊要求，如尺寸、颜色等</td></tr>
+<!--
+EOT;
+}print<<<EOT
+-->
+	<tr class="tr3"><td>匿名：</td><td><label><input type="checkbox" name="extra" value="1">&nbsp;仅发起人可见</label></td></tr>
+</table>
+<div class="popBottom">
+<!--
+EOT;
+if($payway==1){print<<<EOT
+-->
+	<span class="btn2"><span><button type="button" name="ajaxsubmit" onclick="ajax.submit(this.form);">下一步</button></span></span>
+<!--
+EOT;
+}elseif($payway==2){print<<<EOT
+-->
+	<span class="btn2"><span><button type="button" name="ajaxsubmit" onclick="ajax.submit(this.form);">确认报名</button></span></span>
+<!--
+EOT;
+}print<<<EOT
+-->
+</div>
+</div>
+<!--
+EOT;
+}else{print<<<EOT
+-->
+<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="adel cp" onclick="closep();">关闭</span>报名</div>
+<div class="p10">对不起，发起人限制只有其好友可报名，是否加他为好友？</div>
+<div class="popBottom"><span class="btn2"><span><button type="button" onclick="sendmsg('pw_ajax.php?action=addfriend&touid=$authorid','',this.id);">加为好友</button></span></span></div>
+<!--
+EOT;
+}}elseif($thelast == '1'){print<<<EOT
+-->
+<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="adel cp" onclick="closep();">关闭</span>支付金额</div>
+<table width="100%" class="z mb5">
+<!--
+EOT;
+if($pcid == '2'){print<<<EOT
+-->
+	<tr class="tr3"><td>需付费用 {$deposit} 元/人，你的报名人数为 {$nums} 人</td></tr>
+<!--
+EOT;
+}elseif($pcid == '1'){print<<<EOT
+-->
+	<tr class="tr3"><td>需付费用 {$deposit} 元/个，你的购买数量为 {$nums} 个</td></tr>
+<!--
+EOT;
+}print<<<EOT
+-->
+	<tr class="tr3"><td>共计经费：{$totalcash}元</td></tr>
+<!--
+EOT;
+if($payway==2){print<<<EOT
+-->
+	<tr class="tr3"><td>注：此次交易为现金支付，请及时联系卖家确认支付方式。</td></tr>
+<!--
+EOT;
+}print<<<EOT
+-->
+</table>
+<div class="popBottom">
+<!--
+EOT;
+if($payway==1){print<<<EOT
+-->
+	<a href="$alipayurl">去支付宝支付</a>
+<!--
+EOT;
+}print<<<EOT
+-->
+	<span><span><button type="button" onclick="pc_join();" name="ajaxsubmit">关闭</button></span></span>
+</div>
+<!--
+EOT;
+}}elseif($action == 'pcmember'){print<<<EOT
+-->
+<div id="g_info" style="margin:10px 0;">
+<!--
+EOT;
+if(empty($memberdb)){print <<<EOT
+-->
+<div style="padding:8px 15px;margin:0;" class="f12 blockquote">没有相关记录!</div>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+<div class="t">
+<table width="100%" class="f12">
+	<tr>
+		<td colspan="7" class="h">
+<!--
+EOT;
+if($jointype==1 || $jointype==2){print<<<EOT
+-->
+			<span class="fr"><a href="job.php?action=pcexport&tid=$tid&pcid=$pcid">导出报名信息</a>&nbsp;&nbsp;&nbsp;<a id="pcsendmsg" href="javascript:;" onclick="sendmsg('pw_ajax.php?action=pcsendmsg&tid=$tid&pcid=$pcid','',this.id);">+群发消息</a></span>
+<!--
+EOT;
+}print<<<EOT
+-->
+			<b>
+<!--
+EOT;
+if($isviewright){
+if($pcid == '2'){print<<<EOT
+-->
+			报名人数共计{$sum}人，已支付经费数：{$paysum}人
+<!--
+EOT;
+}elseif($pcid == '1'){print<<<EOT
+-->
+			购买数量共计{$sum}个，已支付经费数：{$paysum}个
+<!--
+EOT;
+}}else{
+if($pcid == '2'){print<<<EOT
+-->
+			报名人数共计{$sum}人
+<!--
+EOT;
+}elseif($pcid == '1'){print<<<EOT
+-->
+			购买数量共计{$sum}个
+<!--
+EOT;
+}}print<<<EOT
+-->
+			</b>
+		</td>
+	</tr>
+<!--
+EOT;
+if($isviewright){print<<<EOT
+-->
+	<tr class="tr2">
+		<td>用户</td>
+		<td>手机</td>
+<!--
+EOT;
+if($pcid == '2'){print<<<EOT
+-->
+		<td>报名人数</td>
+<!--
+EOT;
+}elseif($pcid == '1'){print<<<EOT
+-->
+		<td>购买数量</td>
+<!--
+EOT;
+}print<<<EOT
+-->
+		<td>费用</td>
+		<td>支付情况</td>
+		<td>操作</td>
+	</tr>
+<!--
+EOT;
+foreach($memberdb as $val){
+if($val[ifpay]==1){
+	$ifpay='已支付';
+}else{
+	$ifpay='未支付';
+}
+if ($jointype == 3) {
+	$mobile = $val['extra'] && $winduid!=$val[uid] ? '保密' : $val['mobile'];
+	$val[username] = $val['extra'] && $winduid!=$val[uid] ? '匿名' : $val[username];
+	$touidurl = $val['extra'] && $winduid!=$val[uid] ? 'javascript:;' : "u.php?uid=$val[uid]";
+} else {
+	$mobile = $val['mobile'];
+	$touidurl = "u.php?uid=$val[uid]";
+}
+print <<<EOT
+-->
+	<tr class="tr3">
+		<td><a href="$touidurl">$val[username]</a>
+<!--
+EOT;
+if ($jointype == 1 || $jointype == 2) {print<<<EOT
+-->
+		<a href="javascript:;" id="message" onclick="sendmsg('pw_ajax.php?action=msg&touid=$val[uid]','','message')"><img src="$imgpath/email.gif"></a>
+<!--
+EOT;
+}print<<<EOT
+-->
+		</td>
+		<td>$mobile</td>
+		<td>$val[nums]</td>
+		<td>$val[totalcash]</td>
+		<td>$ifpay</td>
+		<td>
+			<a href="javascript:;" id="pcshow_$val[pcmid]" onclick="sendmsg('pw_ajax.php?action=pcshow&pcmid=$val[pcmid]&tid=$tid&pcid=$val[pcid]','',this.id)">详情</a>
+<!--
+EOT;
+if ($jointype == 1) {
+if(!$val[ifpay]){
+if ($winduid!=$val[uid]) {
+print <<<EOT
+-->
+			<a href="javascript:;" id="pcpay_$val[pcmid]" onclick="sendmsg('pw_ajax.php?action=pcpay&pcmid=$val[pcmid]&pcid=$val[pcid]&tid=$tid&jointype=$jointype&payway=$payway','',this.id)">确认支付</a>
+<!--
+EOT;
+}print<<<EOT
+-->
+			<a href="javascript:;" onclick="if (confirm('确认删除吗')) {pc_del('$val[pcmid]','$val[pcid]','$jointype','$payway')}">删除</a>
+<!--
+EOT;
+}}
+if($winduid==$val[uid] && !$ifend){
+if($val[ifpay]==1){print<<<EOT
+-->
+			<a id="ifpay_1_$val[pcmid]" href="javascript:;" onclick="sendmsg('pw_ajax.php?action=pcmodify&pcmid=$val[pcmid]&pcid=$val[pcid]&jointype=$jointype&tid=$tid&ifpay=1&payway=$payway','',this.id);">修改</a>
+<!--
+EOT;
+}else{
+if($payway == 1 && $val[totalcash] > 0){print<<<EOT
+-->
+			<a id="alipay_$val[pcmid]" href="javascript:;" class="s1" onclick="sendmsg('pw_ajax.php?action=pcalipay&pcmid=$val[pcmid]&pcid=$val[pcid]&tid=$tid&pcid=$val[pcid]','',this.id);">马上支付</a>
+<!--
+EOT;
+}print<<<EOT
+-->
+			<a id="ifpay_0_$val[pcmid]" href="javascript:;" onclick="sendmsg('pw_ajax.php?action=pcmodify&pcmid=$val[pcmid]&pcid=$val[pcid]&jointype=$jointype&tid=$tid&ifpay=0&payway=$payway','',this.id);">修改</a>
+<!--
+EOT;
+}}print<<<EOT
+-->
+		</td>
+	</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+	<tr>
+		<td colspan="7" style="padding:5px;">$pages</td>
+	</tr>
+	<tr>
+		<td colspan="7" style="height:8px;">
+		</td>
+	</tr>
+<!--
+EOT;
+}print<<<EOT
+-->
+</table>
+</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+</div>
+<!--
+EOT;
+}elseif($action == 'pcmodify'){print<<<EOT
+-->
+<form action="pw_ajax.php?action=$action" method="post" onsubmit="return false;">
+<input type="hidden" name="verify" value="$verifyhash" />
+<input type="hidden" name="tid" value="$tid">
+<input type="hidden" name="pcid" value="$pcid">
+<input type="hidden" name="pcmid" value="$pcmid">
+<input type="hidden" name="jointype" value="$jointype">
+<input type="hidden" name="ifpay" value="$ifpay">
+<input type="hidden" name="payway" value="$payway">
+<input type="hidden" name="step" value="2">
+<div style="width:340px;">
+<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="adel cp" onclick="closep();">关闭</span>编辑信息</div>
+<table width="100%" class="z mb5">
+	<tr class="tr2"><td colspan="2">说明:带<span class="s1">*</span>为必填选项</td></tr>
+<!--
+EOT;
+if(!$ifpay){
+if($pcid == '2'){print<<<EOT
+-->
+	<tr class="tr3"><td width="80">报名人数:<span class="s1">*</span></td><td><input type="text" name="nums" class="input input_wa" value="$rt[nums]"> 人</td></tr>
+<!--
+EOT;
+}elseif($pcid == '1'){print<<<EOT
+-->
+	<tr class="tr3"><td>购买数量：<span class="s1">*</span></td><td><input type="text" name="nums" class="input input_wa" value="$rt[nums]"> 个</td></tr>
+<!--
+EOT;
+}}print<<<EOT
+-->
+	<tr class="tr3"><td width="80">真实姓名：<span class="s1">*</span></td><td><input type="text" name="name" class="input input_wa" value="$rt[name]"></td></tr>
+	<tr class="tr3"><td>手机：<span class="s1">*</span></td><td><input type="text" name="mobile" class="input input_wa" value="$rt[mobile]"></tr>
+	<tr class="tr3"><td>电话：</td><td><input type="text" name="phone" class="input input_wa" value="$rt[phone]"></tr>
+	<tr class="tr3"><td>地址：</td><td><input type="text" name="address" class="input input_wa" value="$rt[address]"></td></tr>
+<!--
+EOT;
+if($pcid == '1'){print<<<EOT
+-->
+	<tr class="tr3"><td>邮编：</td><td><input type="text" name="zip" class="input input_wa" value="$rt[zip]"></td></tr>
+	<tr class="tr3"><td>给卖家留言：</td><td><textarea name="message" class="textareaA" style="width:150px;">$rt[message]</textarea>
+	<br />选项，可以告诉卖家你对商品的特殊要求，如尺寸、颜色等</td></tr>
+<!--
+EOT;
+}print<<<EOT
+-->
+	<tr><td>匿名：</td><td><label><input type="checkbox" name="extra" value="1" $checked>&nbsp;仅发起人可见</label></td></tr>
+</table>
+<div class="popBottom"><span class="btn2"><span><button type="button" name="ajaxsubmit" onclick="ajax.submit(this.form,pc_modify);">提交</button></span></span></div>
+</div>
+</form>
+<!--
+EOT;
+}elseif($action == 'pcalipay'){print<<<EOT
+-->
+<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="adel cp" onclick="closep();">关闭</span>支付金额</div>
+<table width="100%" class="mb5 z">
+<!--
+EOT;
+if($pcid == '2'){print<<<EOT
+-->
+	<tr class="tr3"><td>需付费用 {$deposit} 元/人，你的报名人数为 {$nums} 人</td></tr>
+<!--
+EOT;
+}elseif($pcid == '1'){print<<<EOT
+-->
+	<tr class="tr3"><td>需付费用 {$deposit} 元/个，你的购买数量为 {$nums} 个</td></tr>
+<!--
+EOT;
+}print<<<EOT
+-->
+	<tr class="tr3"><td>共计经费：{$totalcash}元</td></tr>
+</table>
+<div class="popBottom"><a href="$alipayurl">去支付宝支付</a></div>
+<!--
+EOT;
+}elseif($action=='pcsendmsg'){print <<<EOT
+--><div style="width:400px;">
+<form action="pw_ajax.php?action=$action" method="post" onsubmit="return false;">
+<input type="hidden" name="verify" value="$verifyhash" />
+<input type="hidden" name="step" value="2" />
+<input type="hidden" name="tid" value="$tid" />
+<input type="hidden" name="pcid" value="$pcid" />
+<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="adel cp" onclick="closep();">关闭</span>群发短消息</div>
+<table width="100%">
+	<tr class="tr3"><td>标题</td><td><input type="text" class="input input_wb" name="subject" maxlength="100" /></td></tr>
+	<tr class="tr3"><td>内容</td><td><textarea name="atc_content" class="textareaA"></textarea></td></tr>
+</table>
+<div class="popBottom"><span class="btn2"><span><button type="button" name="ajaxsubmit" onclick="ajax.submit(this.form);">提 交</button></span></span></div>
+</form></div>
+<!--
+EOT;
+}elseif($action == 'pcpay'){print<<<EOT
+--><div style="width:300px;">
+<form action="pw_ajax.php?action=$action" method="post" onsubmit="return false;">
+<input type="hidden" name="verify" value="$verifyhash" />
+<input type="hidden" name="step" value="2" />
+<input type="hidden" name="pcmid" value="$pcmid" />
+<input type="hidden" name="pcid" value="$pcid" />
+<input type="hidden" name="tid" value="$tid" />
+<input type="hidden" name="jointype" value="$jointype" />
+<input type="hidden" name="payway" value="$payway" />
+<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="adel cp" onclick="closep();">关闭</span>支付金额</div>
+<div class="p15">
+	<p class="mb5">该用户目前是未支付状态，如果你确认用户已经通过其他的方式支付了费用，请点击“确认”，否则，请点击“取消”。</p>
+	确认后不可撤销，请慎重操作！
+</div>
+<div class="popBottom">
+	<span class="btn2"><span><button type="button" name="ajaxsubmit" onclick="ajax.submit(this.form,pc_modify);">确认</button></span></span>
+	<span class="bt2"><span><button type="button" onclick="closep();">取消</button></span></span>
+</div>
+</form>
+<!--
+EOT;
+}elseif($action == 'pcshow'){
+if($pcmember[ifpay]==1){
+	$ifpay='<span class="s3">已支付</span>';
+}else{
+	$ifpay='<span class="s1">未支付</span>';
+}
+if ($pcmember['extra'] && !$isadminright && $pcmember['uid']!=$winduid) {
+	$phone = $mobile = $address = $name = $zip = '保密';
+	$username = '匿名';
+} else {
+	$phone		= $pcmember['phone'];
+	$mobile		= $pcmember['mobile'];
+	$address	= $pcmember['address'];
+	$name		= $pcmember['name'];
+	$zip		= $pcmember['zip'];
+	$username	= $pcmember['username'];
+}
+print<<<EOT
+--><div style="width:300px;">
+<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="adel cp" onclick="closep();">关闭</span>{$username}的报名信息</div>
+<table width="100%" class="z mb5">
+<!--
+EOT;
+if($pcid == '2'){print<<<EOT
+-->
+	<tr class="tr3"><td width="80">报名人数：</td><td>$pcmember[nums]</td></tr>
+<!--
+EOT;
+}elseif($pcid == '1'){print<<<EOT
+-->
+	<tr class="tr3"><td>购买数量：</td><td>$pcmember[nums]</td></tr>
+<!--
+EOT;
+}print<<<EOT
+-->
+	<tr class="tr3"><td width="80">费用：</td><td>$pcmember[totalcash]</td></tr>
+	<tr class="tr3"><td>真实姓名：</td><td>$name</td></tr>
+	<tr class="tr3"><td>手机：</td><td>$mobile</td></tr>
+	<tr class="tr3"><td>电话：</td><td>$phone</td></tr>
+	<tr class="tr3"><td>地址：</td><td>$address</td></tr>
+<!--
+EOT;
+if($pcid == '1'){print<<<EOT
+-->
+	<tr class="tr3"><td>邮编：</td><td>$zip</td></tr>
+<!--
+EOT;
+if($isadminright || $pcmember['uid'] == $winduid){print<<<EOT
+-->
+	<tr class="tr3"><td>给卖家留言：</td><td>$pcmember[message]</td></tr>
+<!--
+EOT;
+}}print<<<EOT
+-->
+	<tr class="tr3"><td>支付情况：</td><td>$ifpay</td></tr>
+</table>
+</div>
+<!--
+EOT;
+} elseif ($action == 'pingpage') {
+	foreach ($ping_db as $pingdata) {
+print <<<EOT
+-->
+<!-- splitTr --><!-- pingId:{$pingdata['id']} -->
+<span id="pingUserShow_{$pingdata['id']}"></span><img src="{$pingdata['icon']}" width="16" height="16" id="card_pingUserShow_{$pingdata[id]}" onmouseover="setTimeout(function(){showcard('{$pingdata['id']}','{$pingdata['uid']}','pingUserShow_')}, 700)" />
+<!-- split -->
+<a target="_blank" href="u.php?username={$pingdata['pinger']}">{$pingdata['pinger']}</a>
+<!-- split -->
+{$pingdata['name']}
+<!-- split -->
+<b>{$pingdata['point']}</b>
+<!-- split -->
+<span class="gray">{$pingdata['pingtime']}</span>
+<!-- split -->
+{$pingdata['record']}
+<!-- split -->
+<!--
+EOT;
+		if ($admincheck || ($_G['markable'] && $pingdata['pinger'] == $windid)) {
+			$pidstr = $pid ? $pid : 'tpc';
+print <<<EOT
+-->
+&nbsp;<a style="display:none;" id="pingDel_{$pingdata['id']}" href="javascript:void(0);" onclick="delPingLog('$fid', '$tid', '$pidstr', '{$pingdata['id']}')"><img src="$imgpath/close.gif" /></a>
+<!--
+EOT;
+		}
+print <<<EOT
+-->
+
+<!--
+EOT;
+	}
+	if (!count($ping_db) || ($page >= $total)) {
+print <<<EOT
+-->
+								<!-- __pingPageOver__ -->
+<!--
+EOT;
+	}
+} elseif ($action == 'clearpinglog') {
+print <<<EOT
+-->
+<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="adel cp" onclick="closep();">关闭</span>清空我的评分动态</div>
+<!--
+EOT;
+	if ($user_has_ping) {
+print <<<EOT
+-->
+<div class="p10"><p class="mb5">你确定要删除在本楼的所有评分动态吗？</p><a target="_blank" href="operate.php?action=showping&fid=$fid&tid=$tid&selid=$pid" class="s2">我想撤消评分</a></div>
+<div class="popBottom">
+	<span class="btn2"><span><button type="button" id="delMyAllPingLog" onclick="closep();setTimeout(function(){sendmsg('pw_ajax.php?action=doclearpinglog','fid=$fid&tid=$tid&pid=$pid',this.id);},200);">确认</button></span></span>
+	<span class="bt2"><span><button type="button" onclick="closep();">取消</button></span></span>
+</div>
+<!--
+EOT;
+	} else {
+print <<<EOT
+-->
+<div class="p10"><p class="mb5">你还没有对此楼进行评分哦～</p><a target="_blank" href="operate.php?action=showping&tid=$tid&pid=$pid" class="s2">我要评分</a></div>
+<div class="popBottom"><span class="bt2"><span><button type="button" onclick="closep();">取消</button></span></span></div>
+<!--
+EOT;
+	}
+print <<<EOT
+-->
+<!--
+EOT;
+} elseif ($action == 'showuserbinding') {print <<<EOT
+-->
+<div style="padding:0 5px 0 0;width:312px;">
+<div class="menu_userlist">
+<ul class="cc">
+<!--
+EOT;
+foreach ($arr as $key => $value) {print <<<EOT
+-->
+	<li onclick="userBinding.change('$value[uid]')"><a href="javascript:;" hidefocus="true">$value[username]</a></li>
+<!--
+EOT;
+}print <<<EOT
+-->
+</ul>
+</div>
+</div>
+<!--
+EOT;
+} elseif ($action == 'showrandcolonys') {print <<<EOT
+-->
+<ul>
+<!--
+EOT;
+foreach($randColonys as $key => $value) {print<<<EOT
+-->
+	<li>
+		<a href="apps.php?q=group&cyid={$value[id]}" target="_blank"><img class="fl" src="{$value[cnimg]}" width="64" height="64" /></a>
+		<h4><a href="apps.php?q=group&cyid={$value[id]}"  target="_blank">{$value[cname]}</a></h4>
+		<p>{$value[descrip]}</p>
+	</li>
+<!--
+EOT;
+}print<<<EOT
+-->
+</ul>
+<!--
+EOT;
+}elseif ($action == 'activity'){
+if($job == 'upload'){print<<<EOT
+-->
+<form action="pw_ajax.php?action=activity&job=upload&actmid=$actmid" method="post" onsubmit="return false;" enctype="multipart/form-data">
+<table width="300px" height="100px" cellspacing="0" cellpadding="5">
+	<tr><td>主图上传：<input type="file" value="" class="input" name="act_picture"></td></tr>
+	<tr><td align="center"><input class="btn" name="step" type="hidden" value="2"><input class="btn" onclick="ajax.submit(this.form, callback)" type="submit" value="提交"><input class="btn" type="button" value="关闭" onclick="closep();"></td></tr>
+</table>
+</form>
+<script  language="javascript">
+var db_ifftp = '$db_ifftp';
+var db_ftpweb = '$db_ftpweb';
+var attachpath;
+if (db_ifftp == 1 && db_ftpweb) {
+	attachpath = '$db_ftpweb';
+} else {
+	attachpath = '$attachpath';
+}
+function callback(){
+	var str = ajax.request.responseText.split("\t");
+	if (str[0] == 'success') {
+		//showDialog('success','上传成功！',2);
+		for(var i=1; i<=5; i++){
+			var element_name = "act[picture" + i +"]";
+			var element_value = document.getElementsByName(element_name)[0].value;
+			if (element_value != ""){
+				continue;
+			} else {
+				document.getElementsByName(element_name)[0].value = str[1];
+				$("img_picture_" +i).children[0].src = attachpath + "/" + str[1] ;
+				$("img_picture_" +i).style.display = "";
+				$("img_picture_0").style.display = "none";
+				break;
+			}
+		}
+	} else if (str[0] == 'error') {
+		showDialog('error','请上传文件',3);
+	} else {
+		showDialog('error','上传失败！请确认图片大小及格式正确',3);
+	}
+}
+</script>
+<!--
+EOT;
+}elseif($job=='memberlist'){print<<<EOT
+-->
+<div id="g_info" style="margin:10px 0;">
+<!--
+EOT;
+if(!$count){print <<<EOT
+-->
+<span class="aa_tip mt10"><img src="$imgpath/activity/alert.png" align="absmiddle" /> <strong>暂时没有报名记录!</strong></span>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+<div class="t">
+<table width="100%" class="f12">
+	<tr>
+		<td colspan="7" class="h">
+<!--
+EOT;
+if ($isAdminright) {
+print <<<EOT
+-->
+			<span class="fr">
+				<a href="job.php?action=activity&job=export&tid=$tid&actmid=$actmid">导出报名信息</a>&nbsp;&nbsp;&nbsp;
+				<a id="sendmsg" href="javascript:;" onclick="sendmsg('pw_ajax.php?action=activity&job=sendmsg&tid=$tid&actmid=$actmid&authorid=$authorid','',this.id);">+群发消息</a>
+			</span>
+<!--
+EOT;
+}print <<<EOT
+-->
+			<b>报名人数共计{$orderMemberNums}人
+<!--
+EOT;
+if(!$isFree){print<<<EOT
+-->
+			，已支付人数：{$payMemberNums}人
+<!--
+EOT;
+}print <<<EOT
+-->
+			</b>
+		</td>
+	</tr>
+<!--
+EOT;
+if ($winduid) {
+print <<<EOT
+-->
+	<tr class="tr2">
+		<td class="tal">用户</td>
+		<td>手机</td>
+		<td>报名人数</td>
+		<td class="tal">费用(元)</td>
+		<td>创建时间</td>
+		<td>
+<!--
+EOT;
+if(!$isFree){
+print <<<EOT
+-->支付
+<!--
+EOT;
+}print <<<EOT
+-->状态</td>
+		<td>操作</td>
+	</tr>
+<!--
+EOT;
+foreach($memberlistdb as $value){
+if($value[ifpay]==0){
+	$ifpay='未支付';
+}elseif($value[ifpay]==3){
+	$ifpay='费用关闭';
+}else{
+	$ifpay='已支付';
+}
+$value[rowspannum] = $value[rowspannum] + 1;
+print <<<EOT
+-->
+	<tr class="tr3">
+<!--
+EOT;
+if (!$isAdminright && $value[uid] != $winduid && $value[ifanonymous]) {
+print <<<EOT
+-->
+		<td rowspan="$value[rowspannum]">
+			<a href="javascript:;">匿名</a>
+		</td>
+		<td rowspan="$value[rowspannum]">保密</td>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+		<td rowspan="$value[rowspannum]">
+			<a href="u.php?uid=$value[uid]">$value[username]</a>
+			<a href="javascript:;" id="message" onclick="sendmsg('pw_ajax.php?action=msg&touid=$value[uid]','','message')"><img src="$imgpath/email.gif"></a>
+		</td>
+<!--
+EOT;
+if ($isAdminright || $value[uid] == $winduid) {
+print <<<EOT
+-->
+		<td rowspan="$value[rowspannum]">$value[mobile]</td>
+<!--
+EOT;
+}else{
+$beforenum = substr($value[mobile],0,3);
+$lastnum = substr($value[mobile],-4);
+if($value[mobile]){
+print<<<EOT
+-->
+		<td rowspan="$value[rowspannum]">{$beforenum}****{$lastnum}</td>
+<!--
+EOT;
+}else{print<<<EOT
+-->
+		<td rowspan="$value[rowspannum]"></td>
+<!--
+EOT;
+}
+}
+}print <<<EOT
+-->
+		<td rowspan="$value[rowspannum]">$value[signupmember]</td>
+		<td class="bl1">
+<!--
+EOT;
+if(!$value[isadditional]){print <<<EOT
+-->
+		$value[totalcash]
+<!--
+EOT;
+}else{print <<<EOT
+-->
+
+		$value[totalcash]&nbsp;<span class="s3">(追加)</span>
+<!--
+EOT;
+}print <<<EOT
+-->
+		</td>
+		<td>$value[signuptime]</td>
+<!--
+EOT;
+if(!$isFree){
+print <<<EOT
+-->
+		<td>$ifpay</td>
+<!--
+EOT;
+}else{
+if($value[ifpay]==3){
+	$ifFreepay='关闭';
+}else{
+	$ifFreepay='正常';
+}
+print <<<EOT
+-->
+		<td>$ifFreepay</td>
+<!--
+EOT;
+}print <<<EOT
+-->
+		<td class="a_option">
+<!--
+EOT;
+if(!$value[isadditional] && !$value[isrefund] && ($isAdminright || $value[uid] == $winduid)){print <<<EOT
+-->
+			<a href="javascript:;" id="detailshow_$value[actuid]" onclick="sendmsg('pw_ajax.php?action=activity&job=detailshow&actmid=$actmid&actuid=$value[actuid]&authorid=$authorid&tid=$tid&fid=$fid&paymethod=$paymethod','',this.id)">详情</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+
+<!--
+EOT;
+if ($endtimeStatus > 0) {
+if ($authorid == $winduid && $value[ifpay] == 0) {
+if(!$isFree){
+print <<<EOT
+-->
+			<a href="javascript:;" id="confirmpay_$value[actuid]" onclick="sendmsg('pw_ajax.php?action=activity&job=confirmpay&actuid=$value[actuid]&actmid=$actmid&authorid=$authorid&tid=$tid','',this.id)">确认支付</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+			<a href="javascript:;" id="close_$value[actuid]" onclick="sendmsg('pw_ajax.php?action=activity&job=close&tid=$tid&actuid=$value[actuid]&paymethod=$paymethod','',this.id)">关闭</a>
+<!--
+EOT;
+}if ($value[uid] == $winduid && !$value[isadditional]) {
+print <<<EOT
+-->
+			<a id="detailmodify_$value[actuid]" href="javascript:;" onclick="sendmsg('pw_ajax.php?action=activity&job=modify&actuid=$value[actuid]&actmid=$actmid&tid=$tid','',this.id);">修改</a>
+<!--
+EOT;
+}if ($paymethod == 1 && !$isFree) {
+if ($value[ifpay] == 0 && $value[uid] == $winduid && !$iscancel) {
+print <<<EOT
+-->
+			<a id="alipay_$value[actuid]" href="javascript:;" class="s1" onclick="sendmsg('pw_ajax.php?action=activity&job=toalipay&actuid=$value[actuid]&actmid=$actmid&tid=$tid&signuper=$value[uid]','',this.id);">立即支付</a>
+<!--
+EOT;
+}elseif ($authorid != $winduid && $value[ifpay] == 0 && $value[uid] != $winduid && !$iscancel && (!$value[ifanonymous] || $isAdminright)) {print <<<EOT
+-->
+			<a id="alipay_$value[actuid]" href="javascript:;" class="s1" onclick="sendmsg('pw_ajax.php?action=activity&job=toalipay&actuid=$value[actuid]&actmid=$actmid&tid=$tid&signuper=$value[uid]','',this.id);">帮TA支付</a>
+<!--
+EOT;
+}if ($authorid == $winduid && $value[ifpay] == 1) {
+print <<<EOT
+-->
+			<a id="alipay_$value[actuid]" href="javascript:;" class="s1" onclick="sendmsg('pw_ajax.php?action=activity&job=refund&actuid=$value[actuid]&actmid=$actmid&tid=$tid&authorid=$authorid','',this.id);">退款</a>
+<!--
+EOT;
+}if($authorid == $winduid && !$iscancel && !$value[isadditional]){print <<<EOT
+-->
+			<a id="alipay_$value[actuid]" href="javascript:;" class="s1" onclick="sendmsg('pw_ajax.php?action=activity&job=additional&tid=$tid&actmid=$actmid&actuid=$value[actuid]&authorid=$authorid','',this.id);">追加费用</a>
+<!--
+EOT;
+}}}print <<<EOT
+-->
+
+		</td>
+	</tr>
+<!--
+EOT;
+if($paymethod==1 && !$isFree){
+foreach($refundmemberlistdb[$value[actuid]] as $refund){
+print <<<EOT
+-->
+	<tr class="tr3">
+		<td class="bl1">$refund[totalcash]&nbsp;<span class="s1">(退款)</span></td>
+		<td>$refund[signuptime]</td>
+		<td>已退款</td>
+		<td>&nbsp;</td>
+	</tr>
+<!--
+EOT;
+}
+foreach($addmemberlistdb[$value[actuid]] as $val){
+if($val[ifpay]==0){
+	$ifpay='未支付';
+}elseif($val[ifpay]==3){
+	$ifpay='费用关闭';
+}else{
+	$ifpay='已支付';
+}
+print <<<EOT
+-->
+	<tr class="tr3">
+		<td class="bl1">$val[totalcash]&nbsp;<span class="s3">(追加)</span></td>
+		<td>$val[signuptime]</td>
+		<td>$ifpay</td>
+		<td class="a_option">
+<!--
+EOT;
+if ($endtimeStatus > 0) {
+if ($authorid == $winduid && $val[ifpay] == 0) {
+print <<<EOT
+-->
+			<a href="javascript:;" id="confirmpay_$val[actuid]" onclick="sendmsg('pw_ajax.php?action=activity&job=confirmpay&actuid=$val[actuid]&authorid=$authorid&tid=$tid','',this.id)">确认支付</a>
+			<a href="javascript:;" id="close_$val[actuid]" onclick="sendmsg('pw_ajax.php?action=activity&job=close&tid=$tid&actuid=$val[actuid]&paymethod=$paymethod','',this.id)">关闭</a>
+<!--
+EOT;
+}
+if ($val[uid] == $winduid && $val[ifpay] == 0 && !$iscancel) {
+print <<<EOT
+-->
+			<a id="alipay_$val[actuid]" href="javascript:;" class="s1" onclick="sendmsg('pw_ajax.php?action=activity&job=toalipay&actuid=$val[actuid]&actmid=$actmid&tid=$tid&signuper=$val[uid]','',this.id);">立即支付</a>
+<!--
+EOT;
+}elseif ($authorid != $winduid && $val[ifpay] == 0 && $val[uid] != $winduid && !$iscancel && (!$val[ifanonymous] || $isAdminright)) {print <<<EOT
+-->
+			<a id="alipay_$val[actuid]" href="javascript:;" class="s1" onclick="sendmsg('pw_ajax.php?action=activity&job=toalipay&actuid=$val[actuid]&actmid=$actmid&tid=$tid&signuper=$val[uid]','',this.id);">帮TA支付</a>
+<!--
+EOT;
+}if ($authorid == $winduid && $val[ifpay] == 1) {
+print <<<EOT
+-->
+			<a id="alipay_$val[actuid]" href="javascript:;" class="s1" onclick="sendmsg('pw_ajax.php?action=activity&job=refund&actuid=$val[actuid]&actmid=$actmid&tid=$tid&authorid=$authorid','',this.id);">退款</a>
+<!--
+EOT;
+}}print <<<EOT
+-->
+		</td>
+	</tr>
+<!--
+EOT;
+foreach($refundmemberlistdb[$val[actuid]] as $ref){
+print <<<EOT
+-->
+	<tr class="tr3">
+		<td class="bl1">$ref[totalcash]&nbsp;<span class="s1">(退款)</span></td>
+		<td>$ref[signuptime]</td>
+		<td>已退款</td>
+		<td>&nbsp;</td>
+	</tr>
+<!--
+EOT;
+}}}}
+if ($pages) {
+print <<<EOT
+-->
+	<tr>
+		<td colspan="7" style="padding:5px;">$pages</td>
+	</tr>
+<!--
+EOT;
+}}print<<<EOT
+-->
+</table>
+</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+</div>
+<!--
+EOT;
+}elseif($job == 'signup'){
+if($thelast != '1'){
+if($isU){
+$limitnum = '';
+if($theMoreNum){
+	$limitnum = "还可报名{$theMoreNum}人";
+}
+print<<<EOT
+-->
+<form action="pw_ajax.php?action=$action&job=$job&" method="post" onsubmit="return false;">
+<input type="hidden" name="verify" value="$verifyhash" />
+<input type="hidden" name="tid" value="$tid">
+<input type="hidden" name="step" value="2">
+<input type="hidden" name="actmid" value="$actmid">
+<input type="hidden" name="authorid" value="$authorid">
+<table width="100%" cellspacing="0" cellpadding="5">
+<tbody>
+	<tr>
+		<th onmousedown="read.move(event);" style="cursor: move; font-weight:bold;" colspan="2" class="h"><span onclick="closep();" style="margin-top: 2px; cursor: pointer;" class="fr"><img src="$imgpath/close.gif" /></span>活动报名</th>
+	</tr>
+	<tr>
+		<td style="padding:0; width:456px;">
+			<div class="aa_alert410" style="padding:0; width:100%">
+			<table class="reg_infos" cellpadding="0" cellspacing="0">
+				<tr><td class="tar"></td><td><span class="gray">说明：带<font color="#FF0000">*</font>为必填选项</span></td></tr>
+				<tr>
+					<tr>
+						<td width="90" class="tar"><span style="color:red">*</span>报名人数：</td>
+						<td>
+<!--
+EOT;
+if($signupType){
+foreach($signupType as $key => $value){print<<<EOT
+-->
+						$value&nbsp;<input type="text" name="signup[]" class="input mr10" size="3" onblur="messageCheck('1','signupnumCheck');" />
+<!--
+EOT;
+}}else{print<<<EOT
+-->
+						<input type="text" name="signup[]" class="input mr10" style="color:#999" size="3" onblur="messageCheck('1','signupnumCheck');" />
+<!--
+EOT;
+}print<<<EOT
+-->
+					&nbsp;<span id="signupnumCheck">{$limitnum}</span></td>
+					</tr>
+					<tr>
+						<td class="tar"><span style="color:red">*</span>称呼：</td>
+						<td><input type="text" name="nickname" id="nickname" class="input" size="25" value="$memberdb[nickname]" onblur="messageCheck('2','nicknameCheck');" >&nbsp;<span id="nicknameCheck"></span></td>
+					</tr>
+					<tr>
+						<td class="tar"><span style="color:red">*</span>手机：</td>
+						<td><input type="text" name="mobile" id="mobile" class="input" size="25" value="$memberdb[mobile]" onblur="messageCheck('3','mobileCheck');">&nbsp;<span id="mobileCheck"></span></td>
+					</tr>
+					<tr>
+						<td class="tar">电话：</td>
+						<td><input type="text" class="input" name="telephone" size="25" /></td>
+					</tr>
+					<tr>
+						<td class="tar">地址：</td>
+						<td><input type="text" class="input" name="address" id="address" value="" size="55" onblur="messageCheck('4','addressCheck');"/>&nbsp;<span id="addressCheck"></span></td>
+					</tr>
+					<tr class="vt">
+						<td class="tar">备注：</td>
+						<td><textarea name="message" style="width:210px; height:70px;"></textarea></td>
+					</tr>
+					<tr>
+						<td class="tar">匿名：</td>
+						<td><input type="checkbox" name="ifanonymous" value="1" /> 仅发起人可见 </td>
+					</tr>
+				</tr>
+			</table>
+			<div class="tac">
+<!--
+EOT;
+if($paymethod==1){print<<<EOT
+-->
+				<input type="button" class="btn" name="ajaxsubmit" id="ajaxsubmit" onclick="messageCheck(this.form,'all');" value="下一步" />
+<!--
+EOT;
+}elseif($paymethod==2){print<<<EOT
+-->
+				<input type="button" class="btn" name="ajaxsubmit" id="ajaxsubmit" onclick="messageCheck(this.form,'all');" value="确认报名" />
+<!--
+EOT;
+}print<<<EOT
+-->
+			</div>
+			</div>
+		</td>
+	</tr>
+</tbody>
+</table>
+</form>
+<script language="javascript">
+function messageCheck(frm,checkid) {
+	setTimeout(function(){
+		var message = '';
+		var submitdisabled = false;
+		var theMoreNum = parseInt('$theMoreNum');
+
+		if (objCheck($('signupnumCheck')) && (checkid == 'all' || checkid == 'signupnumCheck')) {
+			var signupnum = 0;
+			var signup = document.getElementsByName('signup[]');
+
+			for (i = 0; i < signup.length; i++) {
+				if (signup[i].value.match(/^[+]?\d+$/) == null && signup[i].value) {
+					message = '<font color="red">报名人数输入有误，请重新输入</font>';
+					submitdisabled = true;
+				}
+				signupnum += signup[i].value - "0";
+			}
+			if (message == '') {
+				signupnum = parseInt(signupnum);
+				if (signupnum <= 0) {
+					message = '<font color="red">请输入报名人数</font>';
+					submitdisabled = true;
+				} else if (signupnum > 65000) {
+					message = '<font color="red">您输入的人数过大，请重新输入</font>';
+					submitdisabled = true;
+				} else if (signupnum > theMoreNum) {
+					message = '<font color="red">您的报名人数已超过总人数，请重新输入</font>';
+					submitdisabled = true;
+				} else if (signupnum) {
+					if (theMoreNum) {
+						var num = theMoreNum - signupnum;
+						message = '还可报名'+num+'人';
+					} else {
+						message = '';
+					}
+				} else {
+					message = '<font color="red">报名人数输入有误，请重新输入</font>';
+					submitdisabled = true;
+				}
+			}
+			$('signupnumCheck').innerHTML = message;
+		}
+		if (objCheck($('nicknameCheck')) && (checkid == 'all' || checkid == 'nicknameCheck')) {
+			if ($('nickname').value == '') {
+				message = '<font color="red">请输入称呼</font>';
+				submitdisabled = true;
+			} else {
+				message = '';
+			}
+			$('nicknameCheck').innerHTML = message;
+		}
+		if (objCheck($('mobileCheck')) && (checkid == 'all' || checkid == 'mobileCheck')) {
+			if ($('mobile').value == '') {
+				message = '<font color="red">请输入手机号码</font>';
+				submitdisabled = true;
+			} else if ($('mobile').value.match(/^1(3|5|8)\d{9}$/) == null && $('mobile').value) {
+				message = '<font color="red">输入手机号码有误，请重新输入</font>';
+				submitdisabled = true;
+			} else {
+				message = '';
+			}
+			$('mobileCheck').innerHTML = message;
+		}
+		if (objCheck($('addressCheck')) && (checkid == 'all' || checkid == 'addressCheck')) {
+			if ($('address').value.match(/^[-\+]?\d+$/) != null && $('address').value) {
+				message = '<font color="red">地址不能为全数字，请重新输入</font>';
+				submitdisabled = true;
+			} else {
+				message = '';
+			}
+			$('addressCheck').innerHTML = message;
+		}
+
+		if (submitdisabled == false && checkid == 'all') {
+			ajax.submit(frm);
+		} else {
+			return false;
+		}
+	},100);
+}
+</script>
+<!--
+EOT;
+}else{print<<<EOT
+-->
+<table width="100%" cellspacing="0" cellpadding="5">
+	<tr>
+		<th class="h" colspan="3" style="cursor:move" onmousedown="read.move(event);"><span class="fr" style="margin-top:2px;cursor:pointer" onclick="closep();"><img src="$imgpath/close.gif" /></span>报名限制</th>
+	</tr>
+	<tr><td>对不起，发起人限制只有其好友可报名，是否加他为好友？<a href="javascript:;" style="cursor: pointer;" onclick="sendmsg('pw_ajax.php?action=addfriend&touid=$authorid','',this.id);" title="加为好友">+加为好友</a></td></tr>
+</table>
+<!--
+EOT;
+}}elseif($thelast == '1'){print<<<EOT
+-->
+<table width="100%" cellspacing="0" cellpadding="5">
+<tbody>
+	<tr>
+		<th onmousedown="read.move(event);" style="cursor: move; font-weight:bold;" colspan="2" class="h"><span onclick="loadMemberList();" style="margin-top: 2px; cursor: pointer;" class="fr"><img src="$imgpath/close.gif" /></span>支付费用</th>
+	</tr>
+	<tr>
+		<td style="padding:0; width:456px;">
+			<form action="act_alipay_push.php?action=confirm_aa_detail_payment&" method="post" target="_blank">
+			<input type="hidden" name="verify" value="$verifyhash" />
+			<input type="hidden" name="actuid" value="$actuid" />
+			<input type="hidden" name="fromuid" value="-1" />
+			<input type="hidden" name="actmid" value="$actmid" />
+			<input type="hidden" name="tid" value="$tid" />
+			<div class="aa_alert410" style="padding:0; width:100%">
+			<table class="reg_infos" cellpadding="0" cellspacing="0">
+				<tr>
+					<td width="95" class="tar">活动费用：</td>
+					<td>$fees</td>
+				</tr>
+				<tr>
+					<td width="95" class="tar">报名人数：</td>
+<!--
+EOT;
+if($signupdetail){print<<<EOT
+-->
+					<td>{$signupdetail}，总计 {$totalsignupnums} 人</td>
+<!--
+EOT;
+}else{print<<<EOT
+-->
+					<td>总计 {$totalsignupnums} 人</td>
+<!--
+EOT;
+}print<<<EOT
+-->
+				</tr>
+				<tr>
+					<td width="95" class="tar">共计费用：</td>
+					<td>{$totalcash}元</td>
+				</tr>
+<!--
+EOT;
+if($paymethod==2){print<<<EOT
+-->
+				<tr class="s3 last-tr">
+					<td width="95" class="tar">注意：</td>
+					<td>此次活动为现金支付，请及时联系活动发起者确认支付</td>
+				</tr>
+<!--
+EOT;
+}print<<<EOT
+-->
+			</table>
+			<div class="tac">
+<!--
+EOT;
+if($paymethod==1 && !$isFree){print<<<EOT
+-->
+				<input type="submit" class="btn" value="去支付宝付款" />&nbsp;
+<!--
+EOT;
+}print<<<EOT
+-->
+				<input type="button" class="btn" name="ajaxsubmit" onclick="loadMemberList();" value="关闭" />
+			</div>
+		</div>
+		</form>
+		</td>
+	</tr>
+</tbody>
+</table>
+<!--
+EOT;
+}}elseif($job == 'detailshow'){
+if($detailinfo[ifpay]==0){
+	$ifpay='<span class="s3">(未支付)</span>';
+}elseif($detailinfo[ifpay]==3){
+	$ifpay='<span class="gray">(费用关闭)</span>';
+}else{
+	$ifpay='<span class="gray">(已支付)</span>';
+}
+print<<<EOT
+-->
+<table width="100%" cellspacing="0" cellpadding="5">
+<tbody>
+	<tr>
+		<th onmousedown="read.move(event);" style="cursor: move; font-weight:bold;" colspan="2" class="h"><span onclick="closep();" style="margin-top: 2px; cursor: pointer;" class="fr"><img src="$imgpath/close.gif" /></span><strong class="s3">{$detailinfo[username]}</strong>的报名信息：</th>
+	</tr>
+	<tr>
+		<td style="padding:0; width:456px;"><div class="aa_alert410" style="padding:0; width:100%">
+			<table class="reg_infos" cellpadding="0" cellspacing="0">
+				<tr>
+					<td width="90" class="tar">报名人数：</td>
+					<td>$detailinfo[signupmember]</td>
+				</tr>
+				<tr>
+					<td class="tar">称呼：</td>
+					<td>$detailinfo[nickname]</td>
+				</tr>
+				<tr>
+					<td class="tar">手机：</td>
+					<td>$detailinfo[mobile]</td>
+				</tr>
+				<tr>
+					<td class="tar">电话：</td>
+					<td>$detailinfo[telephone]</td>
+				</tr>
+				<tr>
+					<td class="tar">地址：</td>
+					<td>$detailinfo[address]</td>
+				</tr>
+				<tr>
+					<td class="tar">备注：</td>
+					<td>$detailinfo[message]</td>
+				</tr>
+				<tr>
+					<td class="tar">费用：</td>
+					<td>
+<!--
+EOT;
+if(!$isFree){print<<<EOT
+-->
+					<span class="b s3">$detailinfo[totalcash]</span>元 {$ifpay}
+<!--
+EOT;
+if ($authorid == $winduid && $detailinfo[ifpay] == 0 && $endtimeStatus > 0) {
+print <<<EOT
+-->
+					&nbsp;<a href="javascript:;" style="color:#1b72af;text-decoration:underline;" onclick="sendmsg('pw_ajax.php?action=activity&job=confirmpay&actuid=$detailinfo[actuid]&actmid=$actmid&authorid=$authorid&tid=$tid','',this.id)">确认支付</a>
+<!--
+EOT;
+}}else{print <<<EOT
+-->
+					免费
+<!--
+EOT;
+}print <<<EOT
+-->
+					</td>
+				</tr>
+<!--
+EOT;
+if ($addmemberlistdb && !$isFree) {
+print <<<EOT
+-->
+				<tr class="vt">
+					<td class="tar">追加费用：</td>
+					<td>
+<!--
+EOT;
+foreach($addmemberlistdb as $add){
+if($add[ifpay]==0){
+	$ifpay='<span class="s3">(未支付)</span>';
+}elseif($add[ifpay]==3){
+	$ifpay='<span class="gray">(费用关闭)</span>';
+}else{
+	$ifpay='<span class="gray">(已支付)</span>';
+}
+print <<<EOT
+-->
+					<p><span class="b s3">$add[totalcash]</span>元 {$ifpay}
+<!--
+EOT;
+if ($authorid == $winduid && $add[ifpay] == 0 && $endtimeStatus > 0) {
+print <<<EOT
+-->
+					&nbsp;<a href="javascript:;" style="color:#1b72af;text-decoration:underline;" onclick="sendmsg('pw_ajax.php?action=activity&job=confirmpay&actuid=$add[actuid]&actmid=$actmid&authorid=$authorid&tid=$tid','',this.id)">确认支付</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+					</p>
+<!--
+EOT;
+}print <<<EOT
+-->
+					</td>
+				</tr>
+<!--
+EOT;
+}
+if ($refundmemberlistdb && !$isFree) {
+print <<<EOT
+-->
+				<tr>
+					<td class="tar">退款：</td>
+					<td>
+<!--
+EOT;
+foreach($refundmemberlistdb as $refund){
+print <<<EOT
+-->
+						<p><span class="b s3">$refund[totalcash]</span>元 <span class="gray">(已退款)</span></p>
+<!--
+EOT;
+}print <<<EOT
+-->
+					</td>
+				</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+			</table>
+		</div></td>
+	</tr>
+</tbody>
+</table>
+<!--
+EOT;
+}elseif($job == 'modify'){
+$limitnum = '';
+if($theMoreNum){
+	$limitnum = "还可报名{$theMoreNum}人";
+}print<<<EOT
+-->
+<form action="pw_ajax.php?action=$action&job=$job&" method="post" onsubmit="return false;">
+<input type="hidden" name="verify" value="$verifyhash" />
+<input type="hidden" name="tid" value="$tid">
+<input type="hidden" name="actmid" value="$actmid">
+<input type="hidden" name="actuid" value="$actuid">
+<input type="hidden" name="ownernums" value="$ownernums">
+<input type="hidden" name="step" value="2">
+<table width="100%" cellspacing="0" cellpadding="5">
+<tbody>
+	<tr>
+		<th onmousedown="read.move(event);" style="cursor: move; font-weight:bold;" colspan="2" class="h"><span onclick="closep();" style="margin-top: 2px; cursor: pointer;" class="fr"><img src="$imgpath/close.gif" /></span>报名修改</th>
+	</tr>
+	<tr>
+		<td style="padding:0; width:456px;">
+			<div class="aa_alert410" style="padding:0; width:100%">
+			<table class="reg_infos" cellpadding="0" cellspacing="0">
+				<tr><td class="tar"></td><td><span class="gray">说明：带<font color="#FF0000">*</font>为必填选项</span></td></tr>
+				<tr>
+					<table width="100%">
+					<tr>
+						<td width="90" class="tar"><span style="color:red">*</span>报名人数：</td>
+						<td>
+<!--
+EOT;
+if($signupinfo['ifpay'] != 0){
+foreach($signupType as $key => $value){print<<<EOT
+-->
+							$value&nbsp;{$signupinfo[signupdetail][$key]}人&nbsp;<input type="hidden" name="signup[]" class="input" size="3" value="{$signupinfo[signupdetail][$key]}" />
+<!--
+EOT;
+}}else{
+if($signupType){
+foreach($signupType as $key => $value){print<<<EOT
+-->
+							$value&nbsp;<input type="text" name="signup[]" class="input" size="3" value="{$signupinfo[signupdetail][$key]}" onblur="messageCheck('1','signupnumCheck');"/>
+<!--
+EOT;
+}}else{print<<<EOT
+-->
+							&nbsp;<input type="text" name="signup[]" class="input" size="3" value="{$signupinfo[signupnum]}" onblur="messageCheck('1','signupnumCheck');"/>
+<!--
+EOT;
+}}print<<<EOT
+-->
+						&nbsp;<span id="signupnumCheck">{$limitnum}</span></td>
+					</tr>
+					<tr>
+						<td class="tar"><span style="color:red">*</span>称呼：</td>
+						<td><input type="text" name="nickname" id="nickname" class="input" value="$signupinfo[nickname]" onblur="messageCheck('2','nicknameCheck');" >&nbsp;<span id="nicknameCheck"></span></td>
+					</tr>
+					<tr>
+						<td class="tar"><span style="color:red">*</span>手机：</td>
+						<td><input type="text" name="mobile" id="mobile" class="input" value="$signupinfo[mobile]" onblur="messageCheck('3','mobileCheck');">&nbsp;<span id="mobileCheck"></span></td>
+					</tr>
+					<tr>
+						<td class="tar">电话：</td>
+						<td><input type="text" name="telephone" class="input" value="$signupinfo[telephone]"></td>
+					</tr>
+					<tr>
+						<td class="tar">地址：</td>
+						<td><input type="text" name="address" id="address" class="input" value="$signupinfo[address]" onblur="messageCheck('4','addressCheck');">&nbsp;<span id="addressCheck"></span></td>
+					</tr>
+					<tr>
+						<td class="tar">备注：</td>
+						<td><textarea name="message" style="width:200px;height:45px;" class="input">$signupinfo[message]</textarea></td>
+					</tr>
+					<tr>
+						<td class="tar">匿名：</td>
+						<td><input type="checkbox" name="ifanonymous" value="1" $checked>&nbsp;(仅发起人可见)</td>
+					</tr>
+					</table>
+				</tr>
+			</table>
+			<div class="tac">
+				<input type="button" class="btn" name="ajaxsubmit" onclick="messageCheck(this.form,'all');" value="提 交" />
+			</div>
+			</div>
+		</td>
+	</tr>
+</tbody>
+</table>
+</form>
+<script language="javascript">
+function messageCheck(frm,checkid) {
+	setTimeout(function(){
+		var message = '';
+		var submitdisabled = false;
+		var theMoreNum = parseInt('$theMoreNum');
+		var ownernums = parseInt('$ownernums');
+
+		if (objCheck($('signupnumCheck')) && (checkid == 'all' || checkid == 'signupnumCheck')) {
+			var signupnum = 0;
+			var signup = document.getElementsByName('signup[]');
+
+			for (i = 0; i < signup.length; i++) {
+				if (signup[i].value.match(/^[+]?\d+$/) == null && signup[i].value) {
+					message = '<font color="red">报名人数输入有误，请重新输入</font>';
+					submitdisabled = true;
+				}
+				signupnum += signup[i].value - "0";
+			}
+			if (message == '') {
+				signupnum = parseInt(signupnum);
+				if (signupnum <= 0) {
+					message = '<font color="red">请输入报名人数</font>';
+					submitdisabled = true;
+				} else if (signupnum > 65000) {
+					message = '<font color="red">您输入的人数过大，请重新输入</font>';
+					submitdisabled = true;
+				} else if (signupnum > theMoreNum + ownernums) {
+					message = '<font color="red">您的报名人数已超过总人数，请重新输入</font>';
+					submitdisabled = true;
+				} else if (signupnum) {
+					if (theMoreNum) {
+						var num = theMoreNum - signupnum + ownernums;
+						message = '还可报名'+num+'人';
+					} else {
+						message = '';
+					}
+				} else {
+					message = '<font color="red">报名人数输入有误，请重新输入</font>';
+					submitdisabled = true;
+				}
+			}
+			$('signupnumCheck').innerHTML = message;
+		}
+		if (objCheck($('nicknameCheck')) && (checkid == 'all' || checkid == 'nicknameCheck')) {
+			if ($('nickname').value == '') {
+				message = '<font color="red">请输入称呼</font>';
+				submitdisabled = true;
+			} else {
+				message = '';
+			}
+			$('nicknameCheck').innerHTML = message;
+		}
+		if (objCheck($('mobileCheck')) && (checkid == 'all' || checkid == 'mobileCheck')) {
+			if ($('mobile').value == '') {
+				message = '<font color="red">请输入手机号码</font>';
+				submitdisabled = true;
+			} else if ($('mobile').value.match(/^1(3|5|8)\d{9}$/) == null && $('mobile').value) {
+				message = '<font color="red">输入手机号码有误，请重新输入</font>';
+				submitdisabled = true;
+			} else {
+				message = '';
+			}
+			$('mobileCheck').innerHTML = message;
+		}
+		if (objCheck($('addressCheck')) && (checkid == 'all' || checkid == 'addressCheck')) {
+			if ($('address').value.match(/^[-\+]?\d+$/) != null && $('address').value) {
+				message = '<font color="red">地址不能为全数字，请重新输入</font>';
+				submitdisabled = true;
+			} else {
+				message = '';
+			}
+			$('addressCheck').innerHTML = message;
+		}
+
+		if (submitdisabled == false && checkid == 'all') {
+			ajax.submit(frm,signupModify);
+		} else {
+			return false;
+		}
+	},100);
+}
+</script>
+<!--
+EOT;
+}elseif($job == 'confirmpay'){print<<<EOT
+-->
+<form action="pw_ajax.php?action=$action&job=$job&" method="post" onsubmit="return false;">
+<input type="hidden" name="verify" value="$verifyhash" />
+<input type="hidden" name="step" value="2" />
+<input type="hidden" name="actuid" value="$actuid" />
+<input type="hidden" name="authorid" value="$authorid" />
+<input type="hidden" name="tid" value="$tid" />
+<table width="100%" cellspacing="0" cellpadding="5">
+<tbody>
+	<tr>
+		<th onmousedown="read.move(event);" style="cursor: move; font-weight:bold;" colspan="2" class="h"><span onclick="closep();" style="margin-top: 2px; cursor: pointer;" class="fr"><img src="images/close.gif" /></span>确认支付</th>
+	</tr>
+	<tr>
+		<td><div class="aa_alert410">
+			<p>用户：<span class="mr20">$memberdb[username]</span> 共计费用：<span>$memberdb[totalcash]元</span></p>
+			<p class="gray">该用户目前是<span class="s3">未支付状态</span>，如果您确认用户已经通过其他的方式支付了费用，请点击“确定”，否则请点击“取消”。<br />确认后不可撤消，请慎重操作！</p>
+			<div class="tac">
+				<input type="button" class="btn" name="ajaxsubmit" onclick="ajax.submit(this.form,signupModify);" value="确认" />
+				<input type="button" class="bt" onclick="closep();" value="取消" />
+			</div>
+		</div></td>
+	</tr>
+</tbody>
+</table>
+</form>
+<!--
+EOT;
+}elseif($job=='close'){print <<<EOT
+-->
+<form action="pw_ajax.php?action=$action&job=$job&" method="post" onsubmit="return false;">
+<input type="hidden" name="verify" value="$verifyhash" />
+<input type="hidden" name="step" value="2" />
+<input type="hidden" name="actuid" value="$actuid" />
+<input type="hidden" name="paymethod" value="$paymethod" />
+<input type="hidden" name="tid" value="$tid" />
+<table width="100%" cellspacing="0" cellpadding="5">
+<tbody>
+	<tr>
+		<th onmousedown="read.move(event);" style="cursor: move; font-weight:bold;" colspan="2" class="h"><span onclick="closep();" style="margin-top: 2px; cursor: pointer;" class="fr"><img src="$imgpath/close.gif" /></span>提示</th>
+	</tr>
+	<tr>
+		<td>
+			<div class="aa_alert220">
+<!--
+EOT;
+if($isadditional){print<<<EOT
+-->
+				<p><img src="$imgpath/activity/icon_loss.png" align="absmiddle" class="mr10" />确定关闭该笔费用吗？</p>
+<!--
+EOT;
+}else{print<<<EOT
+-->
+				<p>您将从本活动中关闭该条报名记录。<br />确定关闭吗？</p>
+<!--
+EOT;
+}print<<<EOT
+-->
+				<div class="tac">
+					<input type="button" class="btn" name="ajaxsubmit" onclick="ajax.submit(this.form,signupClose);" value="确定" />
+					<input type="button" class="bt" name="ajaxsubmit" onclick="closep();" value="取消" />
+				</div>
+			</div>
+		</td>
+	</tr>
+</tbody>
+</table>
+</form>
+<!--
+EOT;
+}elseif($job=='sendmsg'){print <<<EOT
+-->
+<form action="pw_ajax.php?action=$action&job=$job&" method="post" onsubmit="return false;">
+<input type="hidden" name="verify" value="$verifyhash" />
+<input type="hidden" name="step" value="2" />
+<input type="hidden" name="tid" value="$tid" />
+<input type="hidden" name="actmid" value="$actmid" />
+<input type="hidden" name="authorid" value="$authorid" />
+<table cellspacing="0" cellpadding="0" width="440">
+	<tbody>
+	<tr><th class="h" colspan="2" style="cursor:move" onmousedown="read.move(event);"><span class="fr" style="margin-top:2px;cursor:pointer" onclick="closep();"><img src="$imgpath/close.gif" /></span>群发短消息</th></tr>
+	<tr><td align="center">标题</td><td><input type="text" class="input" name="subject" maxlength="100" size="50"/></td></tr>
+	<tr><td align="center">内容</td><td><textarea name="atc_content" rows="8" style="width:330px"></textarea></td></tr>
+	</tbody>
+</table>
+<ul><li style="text-align:center;padding:4px 0;"><input type="button" class="btn" name="ajaxsubmit" onclick="ajax.submit(this.form);" value="提 交" /></li></ul>
+</form>
+<!--
+EOT;
+}elseif($job=='refund'){
+if($thelast != '1'){print <<<EOT
+-->
+<form action="pw_ajax.php?action=$action&job=$job&" method="post" onsubmit="return false;">
+<input type="hidden" name="verify" value="$verifyhash" />
+<input type="hidden" name="step" value="2" />
+<input type="hidden" name="actuid" value="$actuid" />
+<input type="hidden" name="authorid" value="$authorid" />
+<input type="hidden" name="actmid" value="$actmid" />
+<input type="hidden" name="tid" value="$tid" />
+<table width="100%" cellspacing="0" cellpadding="5">
+<tbody>
+	<tr>
+		<th onmousedown="read.move(event);" style="cursor: move; font-weight:bold;" colspan="2" class="h"><span onclick="closep();" style="margin-top: 2px; cursor: pointer;" class="fr"><img src="$imgpath/close.gif" /></span>退款</th>
+	</tr>
+	<tr>
+		<td><div class="aa_alert410">
+			<p><img src="$imgpath/activity/alert.png" align="absmiddle" class="mr10" />您可以在参与者付款后的1个月内进行退款</p>
+			<table class="add_cost" cellpadding="0" cellspacing="0">
+				<tr>
+					<td width="95" class="tar"><span class="s3">*</span>&nbsp;我要给TA退款：</td>
+					<td><span class="mr5">$memberdb[username] </span><input type="text" class="input mr5" name="cost" id="costvalue" size="3" style="color:#999" onblur="messageCheck('1','personalcost');"/><span class="mr5">元</span> <span class="gray">(最多{$morecost}元)</span></td>
+				</tr>
+				<tr class="vt">
+					<td class="tar"><span class="s3">*</span>&nbsp;退款原因：</td>
+					<td><textarea name="reason" style="width:225px; height:80px; color:#666" class="gray" id="reason" onblur="messageCheck('2','reason');" onkeydown="checkAdditionalReasonLength();" title="请输入您的退款原因或费用说明，最多128个字"></textarea><br /><span id="wordtip"></span></td>
+				</tr>
+				<tr>
+					<td class="tar"></td>
+					<td><span id="reasonhtml"></span><span id="personalcost"></span></td>
+				</tr>
+			</table>
+			<div class="tac">
+				<input type="button" id="ajaxsubmit" class="btn" name="ajaxsubmit" onclick="messageCheck(this.form,'all');" value="退款" />
+			</div>
+		</div></td>
+	</tr>
+</tbody>
+</table>
+</form>
+<script language="javascript">
+function messageCheck(frm,checkid) {
+	setTimeout(function(){
+		var submitdisabled = false;
+		var reasonShow = true;
+		var morecost = '$morecost';
+		var message = '';
+
+		if (objCheck($('personalcost'))) {
+			var thecost = $('costvalue').value - "0";
+			var costtest = /^(([1-9]\d*)|0)(\.\d{0,2})?$/;
+			if (!costtest.test(thecost) || thecost == 0){
+				message = '<font color="red">退款费用必须为整数或小数，小数点后不超过2位</font>';
+				submitdisabled = true;
+				reasonShow = false;
+			} else if (thecost > morecost) {
+				message = '<font color="red">退款费用不得高于最多费用：'+morecost+'元</font>';
+				submitdisabled = true;
+				reasonShow = false;
+			} else if (thecost) {
+				message = '退款费用<span class="b s3" id="">'+$('costvalue').value+'</span>元</span>';
+			} else {
+				message = '';
+			}
+		}
+		if ($('reason').value == '' && reasonShow == true && (checkid == 'all' || checkid == 'reason')) {
+			message = '<font color="red">请输入您的退款原因或费用说明，最多128个字</font>';
+			submitdisabled = true;
+		}
+		$('personalcost').innerHTML = message;
+
+		if (submitdisabled == false && checkid == 'all') {
+			ajax.submit(frm);
+		} else {
+			return false;
+		}
+
+	},100);
+}
+
+function checkAdditionalReasonLength(){
+	setTimeout(function(){
+		$('ajaxsubmit').disabled = false;
+		var l = strlen($('reason').value);
+		if(l < 128 && l > 0) {
+			$('wordtip').innerHTML='剩余'+(128-l)+'个字';
+			$('wordtip').style.backgroundColor='#fffeed';
+			$('wordtip').style.display='inline';
+		} else if (l == 128) {
+			$('wordtip').innerHTML='已经达到最大字数限制';
+			$('wordtip').style.backgroundColor='#ffd9d9';
+			$('wordtip').style.display='inline';
+		} else if (l >= 128) {
+			$('wordtip').innerHTML='已经超过最大字数限制！';
+			$('wordtip').style.backgroundColor='#ff9999';
+			$('wordtip').style.display='inline';
+			$('ajaxsubmit').disabled = true;
+		} else {
+			$('wordtip').style.display='none';
+		}
+	},100);
+}
+</script>
+<!--
+EOT;
+}elseif($thelast == '1'){print<<<EOT
+-->
+<div style="width:356px;">
+	<div class="popTop" onmousedown="read.move(event);" style="cursor: move;">
+		<span onclick="loadMemberList();" class="adel cp">关闭</span>
+		支付费用
+	</div>
+	<form action="act_alipay_push.php?action=refund_aa_payment&" method="post" target="_blank">
+	<input type="hidden" name="verify" value="$verifyhash" />
+	<input type="hidden" name="actuid" value="$actuid" />
+	<input type="hidden" name="actmid" value="$actmid" />
+	<input type="hidden" name="tid" value="$tid" />
+	<div class="aa_alert410" style="padding:0; width:100%">
+	<table class="reg_infos" cellpadding="0" cellspacing="0">
+		<tr>
+			<td width="105" class="tar">您的退款金额为：</td>
+			<td>$cost 元</td>
+		</tr>
+		<tr class="s3 last-tr">
+			<td width="105" class="tar">注意：</td>
+			<td>确定需要退款吗？</td>
+		</tr>
+	</table>
+	</div>
+	<div class="popBottom">
+		<span class="btn2" onclick="closep();"><span><button type="submit">确认去退款</button></span></span>
+		<span class="bt2" onclick="closep();"><span><button type="button" name="ajaxsubmit">关闭</button></span></span>
+	</div>
+</form>
+</div>
+<!--
+EOT;
+}}elseif($job=='additional'){print <<<EOT
+-->
+<form action="pw_ajax.php?action=$action&job=$job&" method="post" onsubmit="return false;">
+<input type="hidden" name="verify" value="$verifyhash" />
+<input type="hidden" name="step" value="2" />
+<input type="hidden" name="actuid" value="$actuid" />
+<input type="hidden" name="tid" value="$tid" />
+<input type="hidden" name="more" value="$more" />
+<table width="100%" cellspacing="0" cellpadding="5">
+<tbody>
+	<tr>
+		<th onmousedown="read.move(event);" style="cursor: move; font-weight:bold;" colspan="2" class="h"><span onclick="closep();" style="margin-top: 2px; cursor: pointer;" class="fr"><img src="$imgpath/close.gif" /></span>追加费用</th>
+	</tr>
+<!--
+EOT;
+if(empty($more)){print <<<EOT
+-->
+	<tr>
+		<td><div class="aa_alert410">
+			<p><img src="$imgpath/activity/alert.png" align="absmiddle" class="mr10" />您可以追加一定的费用，每人2000元以内</p>
+			<table class="add_cost" cellpadding="0" cellspacing="0">
+				<tr>
+					<td width="85" class="tar"><span class="s3">*</span>&nbsp;我要追加TA：</td>
+					<td><a href="javascript:;" class="fr" onclick="sendmsg('pw_ajax.php?action=activity&job=additional&tid=$tid&actuid=$actuid&authorid=$authorid&more=1','',this.id);">批量追加费用》</a><span class="mr5">$memberdb[username] </span><input type="text" class="input mr5" name="totalcost" id="costvalue" size="3"  onblur="messageCheck('1','personalcost');"/>元</td>
+				</tr>
+				<tr class="vt">
+					<td class="tar"><span class="s3">*</span>&nbsp;追加原因：</td>
+					<td><textarea name="additionalreason" style="width:225px; height:80px; color:#666" class="gray" id="reason" onblur="messageCheck('2','reason');" onkeydown="checkAdditionalReasonLength();" title="请输入您的追加原因或费用说明，最多250个字"></textarea><br /><span id="wordtip"></span></td>
+				</tr>
+				<tr>
+					<td class="tar"></td>
+					<td><span id="personalcost"></span></td>
+				</tr>
+			</table>
+			<div class="tac">
+				<input type="button" id="ajaxsubmit" class="btn" name="ajaxsubmit" onclick="messageCheck(this.form,'all');" value="追加费用" />
+			</div>
+<script language="javascript">
+function messageCheck(frm,checkid) {
+	setTimeout(function(){
+		var submitdisabled = false;
+		var reasonShow = true;
+		var message = '';
+
+		if (objCheck($('personalcost'))) {
+			var thecost = $('costvalue').value - "0";
+			var costtest = /^(([1-9]\d*)|0)(\.\d{0,2})?$/;
+			if (!costtest.test(thecost) || thecost == 0){
+				message = '<font color="red">追加费用必须为整数或小数，小数点后不超过2位</font>';
+				submitdisabled = true;
+				reasonShow = false;
+			} else if (thecost > 2000) {
+				message = '<font color="red">单人单笔费用不能超过2000元</font>';
+				submitdisabled = true;
+				reasonShow = false;
+			} else if (thecost) {
+				message = '费用<span class="b s3" id="">'+$('costvalue').value+'</span>元</span>';
+			} else {
+				message = '';
+			}
+		}
+		if ($('reason').value == '' && reasonShow == true && (checkid == 'all' || checkid == 'reason')) {
+			message = '<font color="red">请输入您的退款原因或费用说明，最多128个字</font>';
+			submitdisabled = true;
+		}
+		$('personalcost').innerHTML = message;
+
+		if (submitdisabled == false && checkid == 'all') {
+			ajax.submit(frm,additional);
+		} else {
+			return false;
+		}
+
+	},100);
+}
+</script>
+<!--
+EOT;
+}elseif($more==1){print <<<EOT
+-->
+	<tr>
+		<td><div class="aa_alert410 add_more_cost">
+			<p><img src="$imgpath/activity/alert.png" align="absmiddle" />您可以追加一定的费用，每人2000元以内</p>
+			<p><em class="s3">*</em>我要追加TA们费用：
+				<select name="selectvalue" id="selectvalue" class="mr5" style="color:#999;" onchange="calculateCost();">
+					<option value="personal">每人</option>
+					<option value="total">总共</option>
+				</select>
+				<input type="text" class="input" name="totalcost" id="costvalue" size="4" style="color:#999" onblur="calculateCost();" onkeydown="calculateCost();" /> 元
+			</p>
+			<div class="name_list">
+				<ul id="newmemberhtml">
+<!--
+EOT;
+foreach($memberlist as $key => $value){
+print<<<EOT
+-->
+					<li>
+						<input type="checkbox" name="uids[]" id="box_$key" value="$key" onclick="messageCheck('1','totalcostHtml');" checked/>&nbsp;<label for="name1">$value</label> &nbsp;<input type="text" name="cost_[$key]" id="$key" class="input" size="4" style="color:#999" onblur="messageCheck('1','totalcostHtml');"/> <span> &nbsp;元</span>
+					</li>
+<!--
+EOT;
+}print <<<EOT
+-->
+				</ul>
+			</div>
+			<p><input type="text" class="input mr5 gray" value="请输入社区ID" id="newid" onfocus="Checktext(this,1);" onblur="Checktext(this,1);" size="25" style="color:#999" />
+			<button class="aa_btn_add" onclick="addNewMember();">添加新成员</button>
+				<br /><span id="errordesc"></span>
+			</p>
+			<p><em class="s3">*</em>追加原因：<span id="wordtip"></span><br />
+				<textarea name="additionalreason" class="gray" style="width:242px; height:80px; color:#999" id="reason" onblur="messageCheck('2','reason');" onkeydown="checkAdditionalReasonLength();" title="请输入您的追加原因或费用说明，最多250个字"></textarea>
+			</p>
+			<p class="tac" id="totalcostHtml"></p>
+			<div class="tac">
+				<input type="button" id="ajaxsubmit" class="btn" name="ajaxsubmit" onclick="messageCheck(this.form,'all');" value="追加费用" />
+			</div>
+<script language="javascript">
+function addNewMember() {
+	var username = $('newid').value;
+	var elements = document.getElementsByTagName('input');
+
+	ajax.send("pw_ajax.php?action=activity&job=addnewmember",'username=' + username+'&tid='+'$tid',function(){
+		var rText = ajax.request.responseText.split('\t');
+		if (rText[0] == 'success') {
+			for (var i = 0,len = elements.length; i < len; i++) {
+				if (elements[i].name.indexOf('uids') != -1) {
+					if (elements[i].value == rText[1]) {
+						$('errordesc').innerHTML = '<font color="red">用户名已在报名列表中</font>';
+						return false;
+					}
+				}
+			}
+			var aidsel = $('newmemberhtml');
+			var option = elementBind('li');
+			option.innerHTML = '<input type="checkbox" name="uids[]" id="box_'+rText[1]+'" value="'+rText[1]+'" onclick="calculateOtherCost();" checked/>&nbsp;<label for="name1">'+rText[2]+'</label> &nbsp;<input type="text" name="cost_['+rText[1]+']" id="'+rText[1]+"\" class=\"input\" size=\"4\" style=\"color:#999\" onblur=\"messageCheck('1','totalcostHtml');\" /> <span> &nbsp;元</span>";
+			aidsel.insertBefore(option,null);
+			$('errordesc').innerHTML = '';
+		} else if (rText[0] == 'authorerror') {
+			$('errordesc').innerHTML = '<font color="red">无法添加自己</font>';
+			return false;
+		} else if (rText[0] == 'exist') {
+			$('errordesc').innerHTML = '<font color="red">用户名已在报名列表中</font>';
+			return false;
+		} else if (rText[0] == 'error') {
+			$('errordesc').innerHTML = '<font color="red">用户名不存在或为空</font>';
+			return false;
+		} else {
+			$('errordesc').innerHTML = '<font color="red">非法操作</font>';
+			return false;
+		}
+	});
+}
+
+function calculateCost() {
+	setTimeout(function(){
+		var thecost = $('costvalue').value - "0";
+		var costtest = /^(([1-9]\d*)|0)(\.\d{0,2})?$/;
+		var totalcost = 0;//总额
+		var message = '';
+
+		if (thecost != '' && !costtest.test(thecost)){
+			$('totalcostHtml').innerHTML = '<font color="red">追加费用必须为整数或小数，小数点后不超过2位</font>';
+			$('ajaxsubmit').disabled = true;
+			return false;
+		}
+		var elements = document.getElementsByTagName('input');
+		var count = 0;//选中个数
+
+		for (var i = 0,len = elements.length; i < len; i++) {
+			if (elements[i].name.indexOf('uids') != -1 && elements[i].checked == true) {
+				count ++;
+			}
+		}
+		for (var i = 0,len = elements.length; i < len; i++) {
+			if (elements[i].name.indexOf('cost_') != -1 && $('box_'+elements[i].id).checked == true) {
+				if ($('selectvalue').value == 'personal' && thecost) {//每个人
+					elements[i].value = thecost;
+					if (thecost > 2000) {
+						message = '<font color="red">单人单笔费用不能超过2000元</font>';
+						$('ajaxsubmit').disabled = true;
+					}
+				} else if ($('selectvalue').value == 'total' && thecost) {//总共
+					elements[i].value = (thecost/count).toFixed(2) - "0";
+					if (elements[i].value > 2000) {
+						message = '<font color="red">单人单笔费用不能超过2000元</font>';
+						$('ajaxsubmit').disabled = true;
+					}
+				}
+			}
+		}
+		if (message) {
+			$('totalcostHtml').innerHTML = message;
+			return false;
+		}
+
+		if ($('selectvalue').value == 'personal') {//每个人
+			totalcost = count*thecost;
+		} else if ($('selectvalue').value == 'total') {//总共
+			totalcost = thecost;
+		}
+		$('totalcostHtml').innerHTML = '共<span class="b s3">'+count+'</span>人，总额<span class="b s3">'+totalcost.toFixed(2)+'</span>元';
+		if (totalcost && totalcost == 0) {
+			$('totalcostHtml').innerHTML = '<font color="red">追加费用必须为整数或小数，小数点后不超过2位</font>';
+			$('ajaxsubmit').disabled = true;
+		} else if (!totalcost) {
+			$('totalcostHtml').innerHTML = '';
+		} else {
+			$('ajaxsubmit').disabled = false;
+		}
+	},100);
+}
+
+function messageCheck(frm,checkid) {
+	setTimeout(function(){
+		var costtest = /^(([1-9]\d*)|0)(\.\d{0,2})?$/;
+		var totalcost = 0;//总额
+		var count = 0;//选中个数
+		var tempcost;
+		var submitdisabled = false;
+		var reasonShow = true;
+		var message = '';
+
+		if (objCheck($('totalcostHtml'))) {
+			var elements = document.getElementsByTagName('input');
+			for (var i = 0,len = elements.length; i < len; i++) {
+				if (elements[i].name.indexOf('uids') != -1 && elements[i].checked == true) {
+					count ++;
+				} else if (elements[i].name.indexOf('cost_') != -1 && $('box_'+elements[i].id).checked == true) {
+					tempcost = elements[i].value - "0";
+					if (tempcost != '' && !costtest.test(tempcost)){
+						message = '<font color="red">追加费用必须为整数或小数，小数点后不超过2位</font>';
+						reasonShow = false;
+					} else if (tempcost > 2000) {
+						message = '<font color="red">单人单笔费用不能超过2000元</font>';
+						reasonShow = false;
+					}
+					if (message == '') {
+						totalcost += tempcost;
+					}
+				}
+			}
+
+			if (message) {
+				submitdisabled = true;
+			} else if (totalcost == 0) {
+				message = '<font color="red">追加费用必须为整数或小数，小数点后不超过2位</font>';
+				submitdisabled = true;
+				reasonShow = false;
+			} else {
+				message = '共<span class="b s3">'+count+'</span>人，总额<span class="b s3">'+totalcost.toFixed(2)+'</span>元';
+			}
+		}
+		if ($('reason').value == '' && reasonShow == true && (checkid == 'all' || checkid == 'reason')) {
+			message = '<font color="red">请输入您的退款原因或费用说明，最多128个字</font>';
+			submitdisabled = true;
+		}
+		$('totalcostHtml').innerHTML = message;
+
+		if (submitdisabled == false && checkid == 'all') {
+			ajax.submit(frm,additional);
+		} else {
+			return false;
+		}
+	},100);
+}
+</script>
+<!--
+EOT;
+}print <<<EOT
+-->
+		</div></td>
+	</tr>
+</tbody>
+</table>
+</form>
+<script language="javascript">
+function Checktext(obj,id){
+	if (obj.className.indexOf('gray')!=-1) {
+		obj.value = '';
+		obj.className = obj.className.replace('gray', 'black');
+	} else if (obj.value == '') {
+		if (id == 1) {
+			obj.value = '请输入社区ID';
+		} else if (id == 2) {
+			obj.value = '请输入您的追加原因或费用说明，最多250 个字';
+		}
+
+		if (obj.className.indexOf('black') == -1) {
+			obj.className += ' gray';
+		} else {
+			obj.className = obj.className.replace('black', 'gray');
+		}
+	}
+}
+
+function checkAdditionalReasonLength(){
+	setTimeout(function(){
+		$('ajaxsubmit').disabled = false;
+		var l = strlen($('reason').value);
+		if(l < 250 && l > 0) {
+			$('wordtip').innerHTML='剩余'+(250-l)+'个字';
+			$('wordtip').style.backgroundColor='#fffeed';
+			$('wordtip').style.display='inline';
+		} else if (l == 250) {
+			$('wordtip').innerHTML='已经达到最大字数限制';
+			$('wordtip').style.backgroundColor='#ffd9d9';
+			$('wordtip').style.display='inline';
+		} else if (l >= 250) {
+			$('wordtip').innerHTML='已经超过最大字数限制！';
+			$('wordtip').style.backgroundColor='#ff9999';
+			$('wordtip').style.display='inline';
+			$('ajaxsubmit').disabled = true;
+		} else {
+			$('wordtip').style.display='none';
+		}
+	},100);
+}
+</script>
+<!--
+EOT;
+}elseif($job == 'toalipay'){print<<<EOT
+-->
+<form action="act_alipay_push.php?action=confirm_aa_detail_payment&" method="post" target="_blank">
+<input type="hidden" name="verify" value="$verifyhash" />
+<input type="hidden" name="actuid" value="$actuid" />
+<input type="hidden" name="fromuid" value="$fromuid" />
+<input type="hidden" name="actmid" value="$actmid" />
+<input type="hidden" name="tid" value="$tid" />
+<table width="100%" cellspacing="0" cellpadding="5">
+<tbody>
+	<tr>
+		<th onmousedown="read.move(event);" style="cursor: move; font-weight:bold;" colspan="2" class="h"><span onclick="closep();" style="margin-top: 2px; cursor: pointer;" class="fr"><img src="$imgpath/close.gif" /></span>支付费用</th>
+	</tr>
+	<tr>
+		<td style="padding:0; width:330px;">
+		<div class="aa_alert410" style="padding:0; width:100%">
+			<table class="reg_infos" cellpadding="0" cellspacing="0">
+<!--
+EOT;
+if($signupdetail){print <<<EOT
+-->
+				<tr>
+					<td width="95" class="tar">需付费用：</td>
+					<td>$fees</td>
+				</tr>
+				<tr>
+<!--
+EOT;
+if($fromuid=='-1'){print <<<EOT
+-->
+					<td width="95" class="tar">您的报名人数：</td>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+					<td width="95" class="tar">TA的报名人数：</td>
+<!--
+EOT;
+}print <<<EOT
+-->
+					<td>$signupdetail</td>
+				</tr>
+				<tr>
+					<td width="95" class="tar">共计费用：</td>
+					<td>{$totalcash}元</td>
+				</tr>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+				<tr>
+<!--
+EOT;
+if($fromuid=='-1'){print <<<EOT
+-->
+					<td width="95" class="tar">追加费用：</td>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+					<td width="95" class="tar">TA的追加费用：</td>
+<!--
+EOT;
+}print <<<EOT
+-->
+					<td>{$totalcash}元</td>
+				</tr>
+				<tr>
+					<td width="95" class="tar">追加理由：</td>
+					<td>$additionalreason</td>
+				</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+				<tr class="s3 last-tr">
+					<td class="tar" colspan="2">费用将直接转到发起人账户，请确认活动的真实性!</td>
+				</tr>
+			</table>
+			<div class="tac">
+<!--
+EOT;
+if($fromuid=='-1'){print <<<EOT
+-->
+				<input type="submit" class="btn" value="去支付宝付款" onclick="closep();"/>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+				<input type="submit" class="btn" value="去支付宝帮TA付款" onclick="closep();"/>
+<!--
+EOT;
+}print <<<EOT
+-->
+			</div>
+		</div>
+		</td>
+	</tr>
+</tbody>
+</table>
+</form>
+<!--
+EOT;
+}} elseif ($action == 'attachbuy') {print <<<EOT
+-->
+	<!--
+EOT;
+	if ($type == 'record') { print <<<EOT
+-->
+<div style="width:400px;">
+	<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><a class="adel" onclick="closep();" href="javascript:;">关闭</a>记录
+    </div>
+    <table width="100%" cellspacing="0" cellpadding="0">
+<!--
+EOT;
+if (!$buy) {print <<<EOT
+-->
+    			<tr class="tr1 vt">
+                    <td class="td2">还没有人买过此附件</td>
+                </tr>
+<!--
+EOT;
+} else {print <<<EOT
+-->
+                <tr class="tr2">
+                    <td width="90">用户名</td>
+                    <td width="60">金额</td>
+                    <td>时间</td>
+                </tr>
+<!--
+EOT;
+foreach ($buy as $value) {print <<<EOT
+-->
+                <tr class="tr1 vt">
+                    <td class="td2"><a href="u.php?uid={$value[uid]}" target="_blank">{$value[username]}</a></td>
+                    <td class="td2">{$value[cost]}{$value[ctype]}</td>
+                    <td class="td2 f10">{$value[createdtime]}</td>
+                </tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+<!--
+EOT;
+}print <<<EOT
+-->
+    </table>
+    <div class="popBottom">
+    	<span class="bt2"><span><button type="button" name="ajaxsubmit" onclick="closep();">关闭</button></span></span>
+    </div>
+</div>
+<!--
+EOT;
+	} elseif ($type == 'download') {print <<<EOT
+-->
+	<div style="width:300px;">
+	<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><a class="adel" onclick="closep();" href="javascript:;">关闭</a>提示
+    </div>
+    <form action="job.php?action=attachbuy&type=download&aid=$aid" method="post">
+    <input type="hidden" name="verify" value="$verifyhash" />
+	<input type="hidden" name="step" value="2" />
+    <div class="p10">
+<!--
+EOT;
+    if ($msg == 'job_attach_error') {print <<<EOT
+ -->
+		附件不存在
+<!--
+EOT;
+	} elseif ($msg == 'forum_purview_erro') {print <<<EOT
+-->
+		版块权限限制，无权限下载附件
+<!--
+EOT;
+	} elseif ($msg == 'notenough') {print <<<EOT
+-->
+        您的积分不足，需要充值。
+        <div class='cc'></div>
+        下载附件需扣除：{$creditdata['needrvrc']}<br />您的当前积分：{$creditdata['usercredit']}
+<!--
+EOT;
+	} elseif ($msg == 'specialAttach') {print <<<EOT
+-->
+		本附件为特殊附件，游客不能下载！
+
+<!--
+EOT;
+	} elseif ($msg == 'pass') {print <<<EOT
+-->
+        下载附件需扣除：{$creditdata['needrvrc']}，您确定要下载吗？
+        <div class='cc'></div>
+        您的当前积分：{$creditdata['usercredit']}
+<!--
+EOT;
+	} elseif ($msg =='forumpass') {print <<<EOT
+-->
+		 下载附件需扣除：{$creditdata['needrvrc']}<br />
+         版块下载附件需扣除：{$creditdata['downloadmoney']}<br />
+<!--
+EOT;
+	if($creditdata['totalMoney']) {print <<<EOT
+-->
+		共需要<b style="color:#F00">{$creditdata['totalMoney']}</b><br />
+<!--
+EOT;
+	}print <<<EOT
+-->
+        <div class='cc'></div>
+        您的当前积分：{$creditdata['usercredit']}
+<!--
+EOT;
+    } elseif($msg == 'forumnotenough') {print <<<EOT
+-->
+		 您的积分不足，需要充值。<br />
+         
+		 下载附件需扣除：{$creditdata['needrvrc']}<br />
+         版块下载附件需扣除：{$creditdata['downloadmoney']}<br />
+<!--
+EOT;
+	if($creditdata['totalMoney']) {print <<<EOT
+-->
+		共需要<b style="color:#F00">{$creditdata['totalMoney']}</b><br />
+<!--
+EOT;
+	}print <<<EOT
+-->
+        <div class='cc'></div>
+        您的当前积分：{$creditdata['usercredit']}
+<!--
+EOT;
+	} elseif ($msg == 'payment') {print <<<EOT
+-->
+		 已经支付过，你要继续下载吗？
+<!--
+EOT;
+	} elseif ($msg == 'undefined_action') {print <<<EOT
+-->
+		非法操作,请返回
+<!--
+EOT;
+	} elseif ($msg == 'ifadmin') {print <<<EOT
+-->
+		管理员和作者，无需扣除积分，请下载
+<!--
+EOT;
+}print <<<EOT
+-->
+    </div>
+    <div class="popBottom">
+
+<!--
+EOT;
+if ($msg == 'notenough' || $msg == 'forumnotenough') {print <<<EOT
+-->
+	<span class="btn2"><span><button type="button" onclick="window.open ('userpay.php?action=buy')";>充值</button></span></span>
+<!--
+EOT;
+} elseif ($msg == 'pass' || $msg == 'payment' || $msg == 'ifadmin' || $msg == 'forumpass') { print <<<EOT
+-->
+
+    	<span class="btn2"><span><button type="button" onclick="javascript: location.href = 'job.php?action=attachbuy&type=download&aid=$aid&step=2';closep();">确定</button></span></span>
+<!--
+EOT;
+}print <<<EOT
+-->
+    	<span class="bt2"><span><button type="button" onclick="closep();">取消</button></span></span>
+    </div>
+	</form>
+
+
+</div>
+<!--
+EOT;
+	}print <<<EOT
+-->
+<!--
+EOT;
+}
+?>-->

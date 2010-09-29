@@ -1,0 +1,145 @@
+<!--<?php
+if(!$step){print <<<EOT
+-->
+<div class="main fr">
+      <div id="showlist" class="h">
+		<a id="install" style="cursor:pointer;" onClick="showdivlist('install')">$lang[log_upto_t]</a>
+	  </div>
+      <div class="m-content" id="installdiv" style="display:none;">
+		$lang[log_upto]
+      </div>
+      <center>
+		<form action="$basename?" method="post">
+		<input type="hidden" name="step" value="1">
+		<input type="submit" class="btn5" value="" />
+		</form>
+      </center>
+    </div>
+    <div class="sidebar fl link3">
+      <dl class="siderbar_dl">
+        $lang[left_info]
+      </dl>
+    </div>
+
+<script language="JavaScript">
+showdivlist('install');
+function showdivlist(showid){
+	var obj  = document.getElementById('showlist');
+	var objs = obj.getElementsByTagName('a');
+	
+	for (var i=0;i<objs.length;i++) {
+		if (objs[i].id==showid) {
+			if (document.getElementById(showid + 'div').style.display == 'none') {
+				document.getElementById(showid).className = 'y';
+				document.getElementById(showid + 'div').style.display = '';
+			} else {
+				return false;
+			}
+		} else {
+			document.getElementById(objs[i].id).className = '';
+			document.getElementById(objs[i].id + 'div').style.display = 'none';
+		}
+	}
+	return false;
+}
+</script>
+<!--
+EOT;
+}else{
+if($step == 'resources'){print <<<EOT
+-->
+<div class="main fr">
+	<div class="h">$lang[update_3]</div>
+        
+	<div class="m-content">
+		<div class="sp-lineheight">$lang[log_resources]</div>
+	</div>
+
+	<center>
+		  <form id="install" action="$basename?" method="post">
+			<input type="hidden" name="step" value="finish">
+		 </form>
+		<input type="button" class="btn2" value="$stepright" onClick="document.getElementById('install').submit();"/>
+	</center>
+      </div>  
+      
+        
+	<div class="st-sidebar fl link3">
+		<ul class="step">
+			<li class="step-normal"><span class="step-num">1</span>&nbsp;&nbsp;$lang[update_1]</li>
+			<li class="step-normal"><span class="step-num">2</span>&nbsp;&nbsp;$lang[update_2]</li>
+			<li class="step-on"><span class="step-num_on">3</span>&nbsp;&nbsp;$lang[update_3]</li>
+			<li class="step-sec">$lang[update_finish]</li>
+		</ul>
+		<div class="set-faq">
+			$lang[step_problem]
+		</div>   
+	</div>
+
+ 
+<!--
+EOT;
+}elseif($step == 'finish'){print <<<EOT
+-->
+<div class="main fr">
+	<div class="h">$lang[success]</div>
+        
+	<div class="m-content">
+		<div class="finish">
+		<h4><span class="fr h4-zy fi">$lang[success_upto]</span>
+		<p class="fr fi fi-2 ">$lang[link_index]： <a href="index.php" target="_blank">$bbsurl/index.php</a></p>
+		<p class="fr fi fi-2">$lang[link_admin]： <a href="admin.php" target="_blank">$bbsurl/admin.php</a></p>
+		<p class="fr fi fi-2">$lang[link_phpwind]： <a href="http://www.phpwind.net" target="_blank">http://www.phpwind.net</a></p>
+		<span class="fl"><img src="lang/images/wc.gif" align="top" class="fi-img"/> </span></h4>
+		</div>
+
+	</div>
+
+	<center>
+		 <input type="button" class="btn2" value="$lang[finish_exit]" onClick="closewindows();"/>
+		 <img src="http://nt.phpwind.net/src/upto_stats.php?url=$bbsurl&version=$wind_version&type=bbs&charsets=$lang[db_charset]&c=$ceversion" width="0" height="0"></div>
+	</center>
+      </div>  
+      
+        
+	<div class="st-sidebar fl link3">
+		<ul class="step">
+			<li class="step-normal"><span class="step-num">1</span>&nbsp;&nbsp;$lang[update_1]</li>
+			<li class="step-normal"><span class="step-num">2</span>&nbsp;&nbsp;$lang[update_2]</li>
+			<li class="step-normal"><span class="step-num">3</span>&nbsp;&nbsp;$lang[update_3]</li>
+			<li class="step-sec-on">$lang[update_finish]</li>
+		</ul>
+		<div class="set-faq">
+			$lang[step_problem]
+		</div>
+		<div class="set-faq" style="text-align:left;">
+			$lang[step_deldir]
+		</div>   
+	</div>
+<script language="JavaScript">
+function closewindows(){
+	var agt = navigator.userAgent.toLowerCase();
+	var is_ie = ((agt.indexOf("msie") != -1) && (agt.indexOf("opera") == -1));
+	if (is_ie) {
+		var ieversion = parseFloat(agt.substring(agt.indexOf("msie")+5,agt.indexOf(';',agt.indexOf("msie"))));
+		if (ieversion < 5.5) {
+			var str  = '<object id="notipclose" classid="clsid:adb880a6-d8ff-11cf-9377-00aa003b7a11"><param name="command" value="close"></object>';
+			document.body.insertadjacenthtml(beforeend,str);
+			document.all.notipclose.click();
+		} else {
+			window.opener = null;
+			window.close();
+		}
+	} else {
+		window.close();
+	}
+}
+</script>
+<!--
+EOT;
+}print <<<EOT
+-->
+</div>
+<!--
+EOT;
+}?>-->

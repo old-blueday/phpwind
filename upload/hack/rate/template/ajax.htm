@@ -1,0 +1,48 @@
+<!--
+<?php 
+
+print <<<EOT
+-->
+<div style="position:relative;width:360px;height:240px;">
+<h2 class="h1">添加评价选项</h2>
+<iframe style="height:210px;width:360px;" frameborder=no></iframe>
+<form action="{$default_handler_url}" method="post">
+<input type="hidden" name="action" value="{$show}">
+<input type="hidden" name="id" value="{$id}">
+<div style="position:absolute;left:0;top:25px;">
+    <div class="admin_table mb10" style="width:360px;">
+        <table width="360" style="table-layout:fixed;">
+            <tr class="tr1 vt">
+                <td class="td2" width="60">名称：</td>
+                <td class="td2"><input type="text" class="input_wa input" name="rateconfig[title]" value="$rateConfig[title]"> 限6个字节</td>
+            </tr>
+            <tr class="tr1 vt">
+                <td class="td2">类别：</td>
+                <td class="td2">{$typeSelect}</td>
+            </tr>
+            <tr class="tr1 vt">
+                <td class="td2">图标名：</td>
+                <td class="td2"><input type="text" class="input_wa input" name="rateconfig[icon]" value="$rateConfig[icon]"></td>
+            </tr>
+            <tr class="tr1 vt">
+                <td class="td2">&nbsp;</td>
+                <td class="td2">
+                	<ul class="list_A list_80">
+                		<li><input type="radio" value="1" name="rateconfig[isopen]" {$isopen[1]}>开启</li>
+                        <li><input type="radio" value="0" name="rateconfig[isopen]" {$isopen[0]}>关闭</li>
+                    </ul>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div class="tac mb10">
+    	<span class="btn2"><span><button type="submit">提 交</button></span></span>
+        <span class="bt2"><span><button type="button" onclick="closep();">取 消</button></span></span>
+    </div>
+</div>
+</form>
+</div>
+<!--
+EOT;
+?>
+-->

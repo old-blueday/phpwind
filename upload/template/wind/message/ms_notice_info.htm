@@ -1,0 +1,45 @@
+<!--<?php
+$postTime = get_date($message['created_time']);
+print <<<EOT
+-->
+<table width="100%" class="mb10 vt">
+	<tr class="tr3">
+		<td width="100" style="height:1px;padding:0;"></td>
+		<td style="height:1px;padding:0;"></td>
+	</tr>	    
+	<tr class="tr3">
+		<td>
+			发件人：
+		</td>
+		<td class="s5"><a class="adel" href="javascript:;" onclick="MC.del('{$message[rid]}','$subtype','$deltype','$page')">删除</a>
+			系统
+		</td>
+	</tr>
+	<tr class="tr3" >
+		<td>
+			标&nbsp;题：
+		</td>
+		<td class="s5">
+			$message[title]
+		</td>
+	</tr>
+	<tr class="tr3">
+		<td>
+			时&nbsp;间：
+		</td>
+		<td class="s5">
+			$postTime
+		</td>
+	</tr>
+	<tr class="tr3">
+		<td style="vertical-align:top">
+			内&nbsp;容：                  
+		</td>
+		<td class="s5">
+			$message[content]                	
+		</td>
+	</tr>
+</table>
+<!--
+EOT;
+?>-->

@@ -1,0 +1,59 @@
+<?php
+print <<<EOT
+<!doctype html>
+<html>
+<head>$expires
+<meta http-equiv="Content-Type" content="text/html; charset=$db_charset" />
+<title>{$webPageTitle}提示信息 - Powered by phpwind</title>
+<meta name="generator" content="phpwind $wind_version" />
+<meta http-equiv="refresh" content="$statime;url=$URL">
+<base id="headbase" href="$db_bbsurl/" />
+<style type="text/css">
+body{ font-size:12px;}
+a{ text-decoration:none;color:$headfonttwo;}
+a:hover{ text-decoration:underline;}
+ol{list-style-type:decimal;margin-left:24px;color:#888;}
+.fl{float:left;}
+.fr{float:right;}
+.mt10{margin-top:10px;}
+.lh3{line-height:3;}
+.tip-page{width:600px;margin:100px auto 30px;}
+.tip-table{margin:0 1px;background:#ffffff;width:598px;}
+.tip-top{background:url($imgpath/tip-top.png) center no-repeat;height:50px;}
+.tip-bgA,.tip-bgB,.tip-bgC,.tip-bgC {background:$headfonttwo;}
+.tip-bgA,.tip-bgB{height:1px;overflow:hidden;}
+.tip-bgA{margin:0 2px;}
+.tip-bgB{margin:0 1px;}
+.tip-bgC{padding-top:1px;}
+.tip-content{padding:0 0 0 67px;}
+.tip-content tr td{padding:5px 10px 5px 0;line-height:25px;}
+
+.show-back{ text-decoration:underline;display:block;padding-right:25px;line-height:22px;overflow:hidden;background:url($imgpath/tips-back.gif) right 0 no-repeat;height:20px;}
+.show-back:hover{ background-position:right -20px;}
+</style>
+</head>
+<body>
+<div class="tip-page">
+<div class="tip-bgA"></div>
+<div class="tip-bgB"></div>
+	<div class="tip-bgC">
+	<div class="tip-top"></div>
+	<table cellpadding="0" cellspacing="0" class="tip-table">
+		<tr><td height="170">
+		<div class="tip-content">
+			<div class="lh3">
+				<span class="f14">$content</span><br />
+				<div class="cc" style="padding:0 20px 20px 0;">
+					<a href="$URL" class="show-back fl" tabindex="20">如果您的浏览器没有自动跳转,请点击这里</a>
+				</div><br />
+			</div>
+		</div>
+		</td></tr>
+	</table>
+	</div>
+<div class="tip-bgB"></div>
+</div>
+</body>
+</html>
+EOT;
+?>

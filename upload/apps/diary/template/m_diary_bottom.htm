@@ -1,0 +1,249 @@
+<!--<?php
+print<<<EOT
+--><!doctype html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=$db_charset" />
+<title>写日志</title>
+<meta name="generator" content="phpwind $wind_version" />
+<meta name="description" content="phpwind" />
+<meta name="keywords" content="phpwind" />
+<base id="headbase" href="$db_bbsurl/" />
+<link rel="stylesheet" type="text/css" href="images/pw_core.css" media="all" />
+<link rel="stylesheet" type="text/css" href="u/images/style.css" media="all" />
+<link rel="stylesheet" type="text/css" href="images/post/minieitor/minieitor.css" media="all" />
+<SCRIPT type="text/javascript" LANGUAGE="JavaScript" src="js/core/core.js"></SCRIPT>
+<script type="text/javascript" language="JavaScript" src="js/pw_ajax.js"></script>
+<script language="JavaScript">
+var imgpath = '$imgpath';
+var verifyhash = '$verifyhash';
+var winduid = '$winduid';
+var windid	= '$windid';
+var groupid	= '$groupid';
+var charset = '$db_charset';
+var basename = '$basename';
+var temp_basename = '$temp_basename';
+</script>
+<style>html,body{padding:0;margin:0;background:#fff;overflow:hidden;}</style>
+</head>
+<body onKeyDown="try{keyCodes(event);}catch(e){}">
+<!--
+EOT;
+if ($a == 'write' || $a == 'edit') {print <<<EOT
+-->
+		<div id="content" style="overflow:hidden;width:615px;">
+			<script type="text/javascript">
+			if(getObj('upPanel'))
+			{
+				getObj('upPanel').style.overflow="hidden";
+				getObj('upPanel').style.overflowY="hidden";
+			}
+			</script><iframe style="width:0;height:0;overflow:hidden; visibility:hidden;" name="formTarget" src="javascript:;" onLoad="iDiaryForm(this)"></iframe>
+			<form action="{$basename}a=$a" method="post" enctype="multipart/form-data" onSubmit="return checkpost(document.FORM);" name="FORM" id="FORM" target="formTarget" />
+			<input type="hidden" name="did" value="$did" />
+			<input type="hidden" name="dtided" value="$diary[dtid]" />
+			<input type="hidden" name="privacyed" value="$diary[privacy]" />
+			<input type="hidden" name="atc_autourl" value="1" />
+			<input type="hidden" name="step" value="2" />
+			<input type="hidden" name="verify" value="$verifyhash" />
+			<div style="padding-left:15px;">
+			<div><input type="text" class="input" name="atc_title" id="atc_title" value="$diary[subject]" size="70"/>&nbsp;<span id="atc_title_warn" class="gray">限 $db_titlemax 字节</span></div>
+			<div id="menu_face" class="menu" style="display:none;"></div>
+			<div style="padding:10px 0 0;">
+<script language="javascript">
+	var imgpath   = 'images';
+	var stylepath = 'wind';
+	function addsmile(NewCode){
+	    document.FORM.atc_content.value += ' [s:'+NewCode+'] ';
+	}
+	window.onerror=function()
+	{
+	return true;
+	};
+</script>
+<script language="JavaScript" src="data/bbscache/face.js"></script>
+<script language="JavaScript" src="js/global.js"></script>
+<script language="JavaScript" src="js/app_global.js"></script>
+					<div id="menu_show" style="display:none;"></div>
+					<div id="menu_face" class="menu" style="display:none;"></div>
+					<script language="JavaScript" src="js/post.js"></script>
+							<div id="linkbox" style="display:none;"></div>
+                            <div class="minieitor_pw cc">
+                                <ul class="miniUl">
+                                	<li><a href="javascript:" title="插入url链接" class="milink_pw" onClick="createLinkBox();" id="createlinkid">插入url链接</a></li>
+                                	<li><a href="javascript:" title="添加表情" class="mishow_pw" id="td_face" onClick="showDefault();" unselectable="on">添加表情</a></li>
+                                </ul>
+                                <div class="minitextarea">
+                                    <textarea maxlength="200" id="comm_input_diary_5294_0" name="atc_content"></textarea>
+                                    <div class="c"></div>
+                                </div>
+                            	<div class="c"></div>
+                            </div>
+
+				</div>
+				<div class="c"></div>
+<!--
+EOT;
+if ($o_diary_gdcheck) {print <<<EOT
+-->
+				<div class="mb10">
+					认证码:
+<input class="input" type="text" name="gdcode" size="5" tabindex="12" onFocus="try{opencode('menu_gd',this)}catch(e){}" /><span style="cursor:pointer; margin-left:3px" onClick="this.previousSibling.focus();">点此显示验证码</span>
+					<div class="menu" id="menu_gd" style="display:none;">
+						<img src="ck.php?" align="absmiddle" style="cursor:pointer;" id="ckcode" alt="看不清楚，换一张" />
+					</div>
+				</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+<!--
+EOT;
+if($o_diary_qcheck){print <<<EOT
+-->
+				<div>
+				<table cellpadding="0" cellspacing="0" width="600">
+					<tr class="f12">
+						<td>验证问题:</td>
+						<td>
+						{$db_question[$qkey]} （正确答案:{$db_answer[$qkey]}）
+						<input class="input" name="qanswer" id="qanswer" size="25" tabindex="7" />
+						<input type="hidden" name="qkey" id="qkey" value="$qkey" />
+						</td>
+					</tr>
+				</table>
+				</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+		<div style="display:block;padding:10px 0;" class="cc">
+        		<div class="cc">
+				<div class="mr10 fl lh_24">隐私设置</div>
+				<div class="dropdown mr20"><select name="privacy" id="dtid_pvc" onChange="optionsel(this.value,'{$sendWeiboPrivacy}')">
+					<option value="0" $privacy_0>全站可见</option>
+					<option value="1" $privacy_1>仅好友可见</option>
+					<option value="2" $privacy_2>仅自己可见</option>
+				</select></div>
+				<span style="display:none;">
+				<input type="checkbox" name="atc_convert" id="atc_convert" value="1" checked/>Wind Code自动转换
+				</span>
+                
+                <div class="fl">
+                <label for="if_copy" class="mr10 fl">
+                <input id="if_copy" type="checkbox" name="ifcopy" value="1" $checked $disabled>&nbsp;允许转载
+                </label>
+<!--
+EOT;
+if ($sendWeiboPrivacy) {print <<<EOT
+-->
+                <label for="if_sendweibo" class="mr10" $weibodisplay id="lab_weibo">
+                <input id="if_sendweibo" type="checkbox" name="ifsendweibo" value="1" checked="checked">&nbsp;同时发送到新鲜事
+                </label>
+<!--
+EOT;
+}print <<<EOT
+-->
+                </div>
+             </div>
+               <div style="display:block;padding:10px 0;" class="cc">
+				<div class="mr10 fl lh_24">日志分类</div><div class="dropdown"><select name="dtid" id="dtid_add">
+					<option value="0" $dtid_0>默认分类</option>
+					$dtsel
+				</select></div>
+				</div>
+				<span class="btn" style="margin:0;"><span><button name="Submit" type="submit">提 交</button></span></span>
+			</div>
+			</form>
+	</div>
+<!--
+EOT;
+if($a == 'edit'){print <<<EOT
+-->
+<script language="JavaScript">setTimeout("editor.gotoEnd();",50);</script>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+<script language="JavaScript">setTimeout("document.FORM.atc_title.focus()",50);</script>
+<!--
+EOT;
+}print <<<EOT
+-->
+<script language="JavaScript">var stylepath = 'wind';</script>
+<!--
+EOT;
+if(R_P!=D_P){
+$facedb = readover(D_P.'data/bbscache/face.js');
+print <<<EOT
+-->
+<script language="javascript">
+{$facedb}
+</script>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+<script language="JavaScript" src="data/bbscache/face.js"></script>
+<!--
+EOT;
+}print <<<EOT
+-->
+<script language="JavaScript">
+var cnt  = 0;
+document.FORM.Submit.disabled = false;
+function checkpost(obj) {
+	if (obj.atc_title.value == "") {
+		showDialog("error","标题不能为空",2);
+		SETTOP();
+		obj.atc_title.focus();
+		return false;
+	} else if (strlen(obj.atc_title.value) > $db_titlemax) {
+		showDialog("error","标题超过最大长度 $db_titlemax 个字节",2);
+		obj.atc_title.focus();
+		SETTOP();
+		return false;
+	}
+	if (strlen(obj.atc_content.value) < $db_postmin) {
+		showDialog("error","文章内容少于 $db_postmin 个字节",2);
+		SETTOP();
+		return false;
+	} else if (strlen(obj.atc_content.value) > $db_postmax) {
+		showDialog("error","文章内容大于 $db_postmax 个字节",2);
+		SETTOP();
+		return false;
+	}
+	document.FORM.Submit.disabled = true;
+	cnt++;
+	return true;
+}
+</script>
+<script language="JavaScript" src="js/post.js"></script>
+<!--
+
+EOT;
+}print <<<EOT
+-->
+<script language="JavaScript" src="apps/$appdir/js/diarytype.js"></script>
+<script language="JavaScript" src="js/app_comment.js"></script>
+<SCRIPT type="text/javascript" LANGUAGE="JavaScript" src="js/core/friendlist.js"></SCRIPT>
+
+<!--
+EOT;
+if((empty($a) || $a == 'privacy' || $a == 'friend') && !empty($sum)) {print <<<EOT
+-->
+<SCRIPT type="text/javascript" LANGUAGE="JavaScript" src="js/core/space.js"></SCRIPT>
+<!--
+EOT;
+}print <<<EOT
+-->
+<script type="text/javascript" src="js/select.js"></script>
+<script type="text/javascript">
+var ld=window.onload;
+new sSelect(getObj('dtid_add'));
+new sSelect(getObj('dtid_pvc'));
+</script>
+</body></html>
+<!--
+EOT;
+?>-->

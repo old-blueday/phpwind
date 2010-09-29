@@ -1,0 +1,681 @@
+<!--<?php print <<<EOT
+-->
+<div style="width:450px;">
+<form action="mawhole.php?action=$action&ajax=1" method="post" onsubmit="return false;" name="ajaxfm">
+<input type="hidden" name="verify" value="$verifyhash" />
+<input type="hidden" name="fid" value="$fid" />
+<!--
+EOT;
+if ($singleAction) {print <<<EOT
+-->
+<input type="hidden" name="seltid" value="$seltid" />
+<!--
+EOT;
+} else {
+	foreach ($threaddb as $key => $value) {print <<<EOT
+-->
+<input type="hidden" name="tidarray[]" value="$value[tid]" />
+<!--
+EOT;
+	}
+}print <<<EOT
+-->
+<input type="hidden" name="step" value="2" />
+<input type="hidden" name="type" value="$type" />
+<!--
+EOT;
+if($action=='headtopic'){print <<<EOT
+-->
+<script language="JavaScript">
+function changeForums(toptype,self,tright){
+	var seldiv = getObj('forumsDiv');
+	if (toptype == 0) {
+		seldiv.style.display = 'none';
+		return;
+	}else{
+		seldiv.style.display = '';
+		var defaultSelF = getObj('defaultSelForums');
+		var selForums = new Array();
+		var selForumsIndexs = new Array();
+		defaultSelF.value = '';
+		var selectedForums = '';
+		if(toptype==1){
+			selForumsIndexs = JSONParse('$top_1_index');
+			selForums = JSONParse('$top_1');
+		}else if(toptype==2){
+			selForumsIndexs = JSONParse('$top_2_index');
+			selForums = JSONParse('$top_2');
+		}else if(toptype==3){
+			selForumsIndexs = JSONParse('$top_3_index');
+			selForums = JSONParse('$top_3');
+		}
+		selectedForums = getAllIndexFromArray(selForums,toptype);
+		if(tright == 4 && toptype!=3){
+			selForumsIndexs = JSONParse('$top_3_index');
+			selForums = JSONParse('$top_3');
+		}
+		var selObj = getObj('selForums');
+		selObj.options.length=0;
+		selObj.onchange = selectAllForums;
+		var option = new Option(htmlDecode('&gt;&gt; 全选 &lt;&lt;'),'all');
+		selObj.options.add(option);
+		for (var temp in selForumsIndexs) {
+			var _index = selForumsIndexs[temp];
+			defaultSelF.value += temp + ',';
+			var option = new Option(htmlDecode(selForums[_index]),_index);
+			if(self){
+				option.selected = getSelected(_index,self);
+			}else{
+				option.selected = getSelected(_index,selectedForums);
+			}
+			selObj.options.add(option);
+		}
+	}
+}
+
+function getAllIndexFromArray(arg1,type){
+	var indexs = ',';
+	for (var temp in arg1) {
+		if(type == 1){
+			indexs += temp + ',';
+			break;
+		}else{
+			indexs += temp + ',';
+		}
+	}
+	return indexs;
+}
+
+function getSelected(current,forums){
+	var selected = '';
+	if((forums && forums.match(","+current+","))){
+		selected = 'selected';
+	}else{
+		selected = '';
+	}
+	return selected;
+}
+
+function htmlDecode (str){
+	var div = document.createElement("div");
+	div.innerHTML = str;
+	return document.all?div.innerText:div.textContent;
+}
+
+function selectAllForums(){
+	var options = this.options;
+	if(this.value == 'all'){
+		options[this.selectedIndex].selected = false;
+		for (var i = 0 ; i < options.length; i++) {
+			options[i].selected = true;
+		}
+		options[this.selectedIndex].selected = false;
+	}
+}
+</script>
+<script language="JavaScript" src="js/date.js"></script>
+<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="adel cp" onclick="closep();">关闭</span>置顶操作</div>
+<table width="100%" class="vt z">
+<tr class="tr3">
+	<td width="80">管理选项:</td>
+<!--
+EOT;
+$_tight = pwRights($isBM,'topped');
+print <<<EOT
+-->
+	<td>
+		<label class="mr20 w"><input type="radio" name="topped" value="0" $topped_0 onclick="changeForums(this.value,'$selforums','$_tight')" /> 取消置顶</label><label class="mr20 w"><input type="radio" name="topped" value="1" $topped_1 onclick="changeForums(this.value,'$selforums','$_tight')" /> 版块置顶</label><br />
+<!--
+EOT;
+if(!$isGM && pwRights($isBM,'topped')==2){print <<<EOT
+--><label class="mr20 w"><input type="radio" name="topped" value="2" $topped_2 onclick="changeForums(this.value,'$selforums','$_tight')" /> 分类置顶</label>
+<!--
+EOT;
+}elseif($isGM || pwRights($isBM,'topped')==3 || pwRights($isBM,'topped')==4){print <<<EOT
+--><label class="mr20 w"><input type="radio" name="topped" value="2" $topped_2 onclick="changeForums(this.value,'$selforums','$_tight')" /> 分类置顶</label><label class="mr20 w"><input type="radio" name="topped" value="3" $topped_3 onclick="changeForums(this.value,'$selforums','$_tight')" /> 全局置顶</label>
+<!--
+EOT;
+}print <<<EOT
+-->
+	</td>
+</tr>
+<tr class="tr3 vt" id="forumsDiv" style="display: none">
+		<td>选择置顶版块:<br>（按Ctrl可多选）</td>
+		<th>
+			<input type="hidden" value="" name="defaultSelForums" id="defaultSelForums"/>
+			<select multiple="multiple" size="10" name="selForums[]" id="selForums" style="min-width: 300px;" class="select_wa"></select>
+		</th>
+	</tr>
+<script language="JavaScript">
+setTimeout(function(){changeForums('$deftopped','$selforums','$_tight');},200);
+</script>
+<!--
+EOT;
+if($forumset['overprint'] && ($isGM || pwRights($isBM,'overprint')==1 ) && checkRelated('headtopic')){
+print <<<EOT
+-->
+<tr class="tr3">
+	<td>印戳设置:</td>
+	<td>
+		<label><input type="checkbox" name="overprint" value="1"  /> 同时显示印戳</label>
+	</td>
+</tr>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+<tr class="tr3"><td>到期时间:</td>
+<td><input class="input input_wa" type="text" name="timelimit" id="timelimit" onclick="ShowCalendar(this.id,1);" value="$timelimit"/></td></tr>
+</table>
+<!--
+EOT;
+}elseif($action=='digest'){print <<<EOT
+-->
+<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="adel cp" onclick="closep();">关闭</span>精华操作</div>
+<table width="100%" class="vt z">
+<tr class="tr3"><td width="80">管理选项:</td>
+	<td>
+		<label class="mr20"><input type="radio" name="digest" value="0" $digest_0 />取消精华</label>
+		<label class="mr20"><input type="radio" name="digest" value="1" $digest_1 />精华I</label>
+		<label class="mr20"><input type="radio" name="digest" value="2" $digest_2 />精华II</label>
+	</td>
+</tr>
+<!--
+EOT;
+if($forumset['overprint'] && ($isGM || pwRights($isBM,'overprint')==1 ) && checkRelated('digest')){
+print <<<EOT
+-->
+<tr class="tr3">
+<td>印戳设置:</td>
+	<td>
+		<label><input type="checkbox" name="overprint" value="1"  /> 同时显示印戳</label>
+	</td>
+</tr>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+</table>
+<!--
+EOT;
+}elseif($action=='lock'){print <<<EOT
+-->
+<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="adel cp" onclick="closep();">关闭</span>锁定操作</div>
+<table width="100%" class="vt z">
+<tr class="tr3">
+	<td width="80">管理选项:</td>
+	<td>
+		<label class="mr20"><input type="radio" name="locked" value="0" $lock_0 />解除锁定</label>
+		<label class="mr20"><input type="radio" name="locked" value="1" $lock_1 />锁定</label>
+		<label class="mr20"><input type="radio" name="locked" value="2" $lock_2 />关闭</label>
+	</td>
+</tr>
+<!--
+EOT;
+if($forumset['overprint'] && ($isGM || pwRights($isBM,'overprint')==1 ) && checkRelated('lock')){
+print <<<EOT
+-->
+<tr class="tr3">
+	<td>印戳设置:</td>
+	<td>
+		<label><input type="checkbox" name="overprint" value="1"  /> 同时显示印戳</label>
+	</td>
+</tr>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+</table>
+<!--
+EOT;
+}elseif($action=='pushtopic'){print <<<EOT
+-->
+<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="adel cp" onclick="closep();">关闭</span>提前操作</div>
+<table width="100%" class="vt z">
+<tr class="tr3"><td width="80">提前时间:</td><td>
+	<label class="mr20"><input type="text" name="pushtime" value="0" size="3" class="input" /> 小时</label>
+<!--
+EOT;
+if($pushtime_top){print <<<EOT
+-->
+		{$pushtime_top}小时以内
+<!--
+EOT;
+}print <<<EOT
+-->
+</td></tr>
+<tr class="tr3">
+	<td>管理选项:</td>
+	<td>提前帖子</td>
+</tr>
+<!--
+EOT;
+if($forumset['overprint'] && ($isGM || pwRights($isBM,'overprint')==1 ) && checkRelated('pushtopic')){
+print <<<EOT
+-->
+<tr class="tr3">
+	<td>印戳设置:</td>
+	<td>
+		<label><input type="checkbox" name="overprint" value="1"  /> 同时显示印戳</label>
+	</td>
+</tr>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+</table>
+<!--
+EOT;
+}elseif($action=='downtopic'){print <<<EOT
+-->
+<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="adel cp" onclick="closep();">关闭</span>压帖操作</div>
+<table width="100%" class="vt z">
+<tr class="tr3"><td width="80">压后时间:</td><td><label class="mr20"><input type="text" name="timelimit" value="24" size="3" class="input" /> 时</label></td></tr>
+<tr class="tr3"><td>允许上浮:</td><td>
+<label class="mr20"><input type="radio" name="ifpush" value="0" $lock_0 />开启</label>
+<label class="mr20"><input type="radio" name="ifpush" value="1" $lock_1 />关闭</label>
+</td></tr>
+<!--
+EOT;
+if($forumset['overprint'] && ($isGM || pwRights($isBM,'overprint')==1 ) && checkRelated('downtopic')){
+print <<<EOT
+-->
+<tr class="tr3">
+<td>印戳设置:</td>
+	<td>
+		<label><input type="checkbox" name="overprint" value="1"  /> 同时显示印戳</label>
+	</td>
+</tr>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+</table>
+<!--
+EOT;
+}elseif($action=='edit'){print <<<EOT
+-->
+<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="adel cp" onclick="closep();">关闭</span>加亮操作</div>
+<table width="100%" class="vt z">
+<tr class="tr3"><td width="80">管理选项:</td>
+	<td>
+		<div class="pwnew tac">
+			<span title="粗体字"><a onclick="styleOnclick(this,'title2')" class="$stylename[1]">加粗</a></span>
+			<span title="斜体字"><a onclick="styleOnclick(this,'title3')" class="$stylename[2]">斜体</a></span>
+			<span title="下划线"><a onclick="styleOnclick(this,'title4')" class="$stylename[3]">下划线</a></span>
+			<span id="color_show" title="点击取消颜色" onclick="colorCancel()"></span>
+			<span title="颜色选择"><a class="two tal" onclick="showColorPicker(this,document.ajaxfm.title1,function(){pickReback(color_picker)})"><img src="$imgpath/pickcolor.gif"  /></a></span>
+			<input id="title1" name="title1" type="hidden" value="$titlecolor" />
+			<input id="title2" name="title2" type="hidden" value="{$titledetail[1]}" />
+			<input id="title3" name="title3" type="hidden" value="{$titledetail[2]}" />
+			<input id="title4" name="title4" type="hidden" value="{$titledetail[3]}" />
+		</div>
+	</td>
+</tr>
+<!--
+EOT;
+if($forumset['overprint'] && ($isGM || pwRights($isBM,'overprint')==1 ) && checkRelated('headlight')){
+print <<<EOT
+-->
+<tr class="tr3">
+<td>印戳设置:</td>
+	<td>
+		<label><input type="checkbox" name="overprint" value="1"  /> 同时显示印戳</label>
+	</td>
+</tr>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+<tr class="tr3"><td>有效时间:</td><td><input type="text" name="timelimit" size="4" class="input" /> 天</td></tr>
+</table>
+<script id="ajax_color" language="JavaScript" src="js/color_picker.js"></script>
+<script type="text/javascript" id="ajax_edit">
+function pickReback(color){
+	getObj('color_show').style.backgroundColor = color;
+}
+function styleOnclick(e,obj){
+	var objclass = e.className;
+	var temp = objclass.split(' ');
+	var newclass = '';
+	for (var n=0; n<temp.length; n++){
+		if (temp[n]=='one') {
+			continue;
+		}
+		newclass += ' ' + temp[n];
+	}
+	if (objclass.match(/one/)) {
+		e.className = newclass;
+		getObj(obj).value = '';
+	} else {
+		e.className = newclass + ' one';
+		getObj(obj).value = 1;
+	}
+}
+function colorCancel(){
+	getObj('color_show').style.backgroundColor='#FFFFFF';
+	getObj('title1').value='';
+}
+</script>
+<!--
+EOT;
+}elseif($action=='del'){print <<<EOT
+-->
+<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="adel cp" onclick="closep();">关闭</span>删除操作</div>
+<table width="100%" class="vt z">
+<tr class="tr3"><td width="80">扣除积分:</td>
+	<td>
+		<label class="mr20"><input type="radio" name="ifdel" value="1" checked />开启</label><label class="mr20"><input type="radio" name="ifdel" value="0" />关闭</label>
+	</td>
+</tr>
+</table>
+<!--
+EOT;
+}elseif($action=='move' || $action=='copy'){print <<<EOT
+-->
+<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="adel cp" onclick="closep();">关闭</span>
+<!--
+EOT;
+if($action=='move'){print <<<EOT
+-->移动操作
+<!--
+EOT;
+}else{print <<<EOT
+-->复制操作
+<!--
+EOT;
+}print <<<EOT
+-->
+</div>
+<table width="100%" class="vt z">
+<tr class="tr3">
+	<td width="80">目的版块:</td>
+	<td><select name="to_id" id="to_id" onchange="getThreadCates(this.value)">$forumcache
+<!--
+EOT;
+if($forumadd){print <<<EOT
+-->
+		<option value="">>> 隐藏版块</option>
+		$forumadd
+<!--
+EOT;
+}if(trim($cmscache)){print <<<EOT
+-->
+		<option value=""></option>
+		<option value="">文章分类</option>
+		$cmscache
+<!--
+EOT;
+}print <<<EOT
+-->
+		</select>
+	</td>
+</tr>
+<tr class="tr3">
+	<td>主题分类:</td>
+	<td>
+		<div id="innerselect" class="fl mr10">
+			<select name="to_threadcate" id="to_threadcate" onchange="getSubType(this.value)">
+				<option value="">无主题分类</option>
+			</select>
+		</div>
+		<div id="subtypeselect"></div>
+<script>
+function getThreadCates(fid){
+	var selobj = getObj('to_threadcate');
+	selobj.options.length=0;
+	selobj.options.add(new Option("不分类","0"));
+	var t_typedb = JSONParse('$t_typedb');
+	for (var temp in t_typedb) {
+		if (temp == fid) {
+			for (var temp2 in t_typedb[temp]) {
+				selobj.options.add(new Option(t_typedb[temp][temp2],temp2));
+			}
+		}
+	}
+	//getObj('to_threadcate').appendChild(selobj);
+	getObj('subtypeselect').innerHTML = '';
+}
+
+function getSubType(id){
+	var ishave = 0;
+	var fid = getObj('to_id').value;
+	var selobj = elementBind('select');
+	selobj.setAttribute('name','to_subtype');
+	selobj.options.add(new Option("不分类","0"));
+	var t_subtypedb = JSONParse('$t_subtypedb');
+	for (var temp in t_subtypedb) {
+		if (temp == fid) {
+			for (var temp2 in t_subtypedb[temp]) {
+				if (temp2 == id) {
+					for (var temp3 in t_subtypedb[temp][temp2]) {
+						ishave++;
+						selobj.options.add(new Option(t_subtypedb[temp][temp2][temp3],temp3));
+					}
+				}
+			}
+		}
+	}
+	if (ishave > 0) {
+		getObj('subtypeselect').innerHTML = '';
+		getObj('subtypeselect').appendChild(selobj);
+	} else {
+		getObj('subtypeselect').innerHTML = '';
+	}
+}
+</script>
+	</td>
+</tr>
+</table>
+<!--
+EOT;
+}elseif($action=='unite'){print <<<EOT
+-->
+<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="adel cp" onclick="closep();">关闭</span>合并操作</div>
+<table width="100%" class="vt z">
+<tr class="tr3">
+	<td width="80">合并帖子:</td>
+	<td><input class="input" type="text" name="unitetid" size="10" /> (输入来源帖子的tid,多个用“,”分开)</td>
+</tr>
+</table>
+<!--
+EOT;
+}elseif($action == 'push'){print<<<EOT
+-->
+<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="adel cp" onclick="closep();">关闭</span>推送操作</div>
+<table width="100%" class="vt z">
+<tr class="tr3">
+	<td width="80">推送位置:</td>
+	<td><b>{$pushs[$pushto][name]}</b></td>
+</tr>
+<!--
+EOT;
+if($params[title]){print<<<EOT
+-->
+<tr class="tr3">
+	<td class="tar">标题:</td>
+	<td><input type="text" name="subject" value="$subject" size="30" class="input" /></td>
+</tr>
+<!--
+EOT;
+}if($params[url]){print<<<EOT
+-->
+<tr class="tr3">
+	<td class="tar">链接:</td>
+	<td><input type="text" name="url" value="$url" size="30" class="input" /></td>
+</tr>
+<!--
+EOT;
+}if($params[image]){print<<<EOT
+-->
+<!--
+EOT;
+if($imgdb){print<<<EOT
+-->
+<tr class="tr3">
+	<td class="tar">图片选择:</td>
+	<td>
+<!--
+EOT;
+$i = 0;
+foreach($imgdb as $key => $value){
+$checked = $i == 0 ? 'checked' : '';$i++;
+print<<<EOT
+-->
+	<span class="fl" style="white-space:nowrap;margin-right:5px;"><img src="$value" style="width:60px;height:60px;margin-bottom:3px;" align="absmiddle">
+	<center><input type="radio" name="attachurl" value="$key" $checked></center></span>
+<!--
+EOT;
+}print<<<EOT
+-->
+	</td>
+</tr>
+<!--
+EOT;
+}print<<<EOT
+-->
+<tr class="tr3">
+	<td class="tar">自定义图片:</td>
+	<td><input type="text" name="cimgurl" value="" size="30" class="input" />(如果设置自定义图片地址，以自定义图片为准)</td>
+</tr>
+<!--
+EOT;
+}if($params[value]){print<<<EOT
+-->
+<tr class="tr3">
+	<td class="tar">摘要:</td>
+	<td><textarea name="content" value="$content" style="width:260px;height:92px" />$content</textarea></td>
+</tr>
+<!--
+EOT;
+}print<<<EOT
+-->
+</table>
+<input type="hidden" name="tid" value="$tid" />
+<input type="hidden" name="fid" value="$fid" />
+<input type="hidden" name="oldsubject" value="$subject" />
+<input type="hidden" name="postdate" value="$postdate" />
+<input type="hidden" name="author" value="$author" />
+<input type="hidden" name="pushto" value="$pushto" />
+<!--
+EOT;
+} elseif ($action=='type') {print <<<EOT
+-->
+<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="adel cp" onclick="closep();">关闭</span>转移主题分类</div>
+<table width="100%" class="vt z">
+<tr class="tr3">
+	<td width="80">选择主题分类:</td>
+		<td>
+<!--
+EOT;
+if ($t_sub_exits == 1) {print <<<EOT
+-->
+		<select name="type" onchange="changeSubType(this.value)";>
+		<option value="">分类</option>
+<!--
+EOT;
+} else {print <<<EOT
+-->
+		<select name="type">
+		<option value="">分类</option>
+<!--
+EOT;
+}
+foreach($t_typedb as $key=>$value){
+if($value){
+print <<<EOT
+-->
+			<option value="$key">$value[name]</option>
+<!--
+EOT;
+}}print <<<EOT
+-->
+		</select>
+<!--
+EOT;
+if ($t_sub_exits == 1) {
+print <<<EOT
+-->
+		<select name="subtype" id="subtype" style="width:85px"><option value="">分类</option></select>
+<script type="text/javascript">
+function changeSubType(id){
+	var selobj = getObj('subtype');
+	for(var i = 1; i<selobj.options.length; i++){
+		selobj.remove(i);
+	}
+	var t_subtypedb = JSONParse('$t_subtypedb');
+	for (var temp in t_subtypedb[id]) {
+		selobj.options.add(new Option(t_subtypedb[id][temp],temp));
+	}
+}
+</script>
+<!--
+EOT;
+}print <<<EOT
+-->
+	</td>
+</tr>
+</table>
+<input type="hidden" name="seltid" value="$seltid" />
+<!--
+EOT;
+}print <<<EOT
+-->
+<table width="100%" class="mb5 vt z">
+<tr class="tr3"><td width="80">消息通知:</td>
+	<td><label class="mr20"><input type="radio" name="ifmsg" value="1" checked />开启</label><label><input type="radio" name="ifmsg" value="0" />关闭</label></td>
+</tr>
+<tr class="tr3">
+	<td>操作原因:</td>
+	<td>
+<!--
+EOT;
+if($db_adminreason){print <<<EOT
+-->
+		<div class="mb5"><select name="" onchange="this.form.atc_content.value=this.value" style="width:320px">
+			<option value="">自定义</option>
+			<option value="">-------</option>
+			$reason_sel
+		</select></div>
+<!--
+EOT;
+}print <<<EOT
+-->
+		<textarea name="atc_content" onkeydown="ajax.quickpost(event,this.form)" class="textareaA"></textarea>
+	</td>
+</tr>
+<!--
+EOT;
+if(($action=='edit' || $action=='digest' || $action=='headtopic' || $action=='pushtopic') && $seltid){
+${$action.'_N'}="disabled";
+print <<<EOT
+-->
+<tr class="tr3">
+	<td>后续操作:</td>
+	<td>
+		<label class="mr20"><input type="radio" name="nextto" value="digest" $digest_N />精华</label>
+		<label class="mr20"><input type="radio" name="nextto" value="headtopic" $headtopic_N />置顶</label>
+		<label class="mr20"><input type="radio" name="nextto" value="edit" $edit_N />加亮</label>
+		<label class="mr20"><input type="radio" name="nextto" value="pushtopic" $pushtopic_N />提前</label>
+		<label><input type="radio" name="nextto" value="" checked />无</label>
+	</td>
+</tr>
+<!--
+EOT;
+} print <<<EOT
+-->
+</table>
+<div class="popBottom">
+<span class="btn2"><span><button type="button" name="ajaxsubmit" onclick="postManager.ajaxsubmit(this.form,'$db_enterreason','$type');">提 交</button></span></span>
+</div>
+</form>
+</div>
+<!--
+EOT;
+?>-->

@@ -1,0 +1,14 @@
+.xdwrap{background:url(bg.png); width:612px; height:312px;}
+.xdmain{padding:25px 20px;}
+.xdmain h5{color:#46a600; font-size:18px; font-family:'Microsoft YaHei'; font-weight:bold;}
+.xdmain h6{color:#000;font-size:16px; font-family:'Microsoft YaHei'; font-weight:bold; margin-bottom:6px}
+.xdmain1{background:url(bgspet.png) 0 0;}
+.stepcontent{width:380px;}
+.graystep{color:#7f929f;}
+.step1{background:url(bgspet.png) no-repeat 0 0; width:180px; height:140px; display:block;}
+.step2{background:url(bgspet.png) no-repeat 0 -160px; width:180px; height:140px; display:block;}
+.step3{background:url(bgspet.png) no-repeat 0 -355px; width:180px; height:140px; display:block;}
+.step4{background:url(bgspet.png) no-repeat 0 -587px; width:180px; height:140px; display:block;}
+.step5{background:url(bgspet.png) no-repeat 0 -811px; width:180px; height:140px; display:block;}
+.stepfoot a{color:#46a600; background:url(cion.png) right bottom no-repeat; padding:5px 70px 5px 0;}
+.stepbtn{background:url(cion.png) no-repeat 0 0; width:72px; height:30px; line-height:32px;color:#615e5e; border:0; cursor:pointer; font-weight:bold; vertical-align:middle;}

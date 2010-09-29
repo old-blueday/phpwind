@@ -1,0 +1,43 @@
+<!--<?php
+include_once PrintEot('left');print <<<EOT
+-->
+<form action="$basename&" method="post">
+  <input type="hidden" name="step" value="2">
+  <h2 class="h1">个人中心设置</h2>
+  <div class="admin_table mb10">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <tr class="tr1 vt">
+      <td class="td1">广场模块</td>
+      <td class="td2">
+       <ul class="cc list_80 fl list_A">
+           <li><input type="radio" name="config[browseopen]" value="1" $browseopen_Y>开启</li>
+           <li><input type="radio" name="config[browseopen]" value="0" $browseopen_N>关闭</li>
+         </ul>
+      </td><td class="td2"><div class="help_a">开启后，会员可通过广场页面查看到更多的内容</div></td>
+    </tr>
+    <!-- <tr class="tr1 vt">
+      <td class="td1">未登录状态圈子首页</td>
+      <td class="td2">
+          <ul class="cc list_160 list_A">
+              <li><input type="checkbox" value="2" name="indexset[]" $indexset_1 />最新照片</li>
+              <li><input type="checkbox" value="4" name="indexset[]" $indexset_2 />站点热门</li>
+              <li><input type="checkbox" value="8" name="indexset[]" $indexset_3 />最新动态</li>
+              <li> <input type="checkbox" value="16" name="indexset[]" $indexset_4 />活跃会员</li>
+              <li><input type="checkbox" value="32" name="indexset[]" $indexset_5 />记录</li>
+              <li><input type="checkbox" value="64" name="indexset[]" $indexset_6 />分享</li>
+              <li><input type="checkbox" value="128" name="indexset[]" $indexset_7 />相册</li>
+              <li><input type="checkbox" value="256" name="indexset[]" $indexset_8 />群组</li>
+              <li><input type="checkbox" value="512" name="indexset[]" $indexset_9 />日志</li>
+          </ul>
+     </td><td class="td2"><div class="help_a">勾选以开启未登录状态个人中心首页展示的内容模块</div></td>
+    </tr> -->
+  </table>
+  </div>
+  <div class="mb10 tac">
+    <span class="btn"><span><button type="submit" value="提 交">提 交</button></span></span>
+  </div>
+</form>
+<!--
+EOT;
+include_once PrintEot('adminbottom');
+?>-->

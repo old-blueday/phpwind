@@ -1,0 +1,356 @@
+<!--<?php
+include_once PrintEot('left');
+print<<<EOT
+-->
+<h2 class="h1 mb10"><a href="$admin_file?adminjob=app&admintype=appslist">返回基础应用列表</a></h2>
+<!--
+EOT;
+if(!$action){print <<<EOT
+-->
+<form action="$basename&" method="post">
+  <input type="hidden" name="step" value="3">
+  <h2 class="h1">日志基本设置</h2>
+  <div class="admin_table">
+      <table width="100%" cellspacing="0" cellpadding="0">
+        <tr class="tr1 vt">
+          <td class="td1">日志功能</td>
+          <td class="td2">
+          		<div class="list_A list_80">
+                    <ul class="cc">
+                        <li><input type="radio" name="dopen" value="1" $dopen_Y />开启</li>
+                        <li><input type="radio" name="dopen" value="0" $dopen_N />关闭</li>
+                    </ul>
+                </div>
+            </td>
+            <td class="td2">&nbsp;</td>
+        </tr>
+        <tr class="tr1 vt">
+          <td class="td1">认证码</td>
+          <td class="td2">
+         	 <div class="list_A list_80">
+                    <ul class="cc">
+                        <li><input type="radio" name="config[diary_gdcheck]" value="1" $diary_gdcheck_Y />开启</li>
+                        <li><input type="radio" name="config[diary_gdcheck]" value="0" $diary_gdcheck_N />关闭</li>
+                    </ul>
+                </div>
+		  </td>
+          <td class="td2">&nbsp;</td>
+        </tr>
+        <tr class="tr1 vt">
+         <td class="td1">验证问题</td>
+          <td class="td2">
+         	 <div class="list_A list_80">
+                    <ul class="cc">
+                        <li><input type="radio" name="config[diary_qcheck]" value="1" $diary_qcheck_Y />开启</li>
+                        <li><input type="radio" name="config[diary_qcheck]" value="0" $diary_qcheck_N />关闭</li>
+                    </ul>
+                </div>
+          </td>
+          <td class="td2">&nbsp;</td>
+        </tr>
+        <tr class="tr1 vt">
+         <td class="td1">允许发表日志的用户组</td>
+          <td class="td2">
+            	$creategroup
+          </td>
+          <td class="td2">&nbsp;</td>
+        </tr>
+        <tr class="tr1 vt">
+         <td class="td1">最多允许发表日志</td>
+          <td class="td2"><input type="text" name="config[diarylimit]" class="input input_wa" value="$o_diarylimit"></td>
+          <td class="td2">&nbsp;</td>
+        </tr>
+        <tr class="tr1 vt">
+         <td class="td1">日志灌水预防</td>
+          <td class="td2"><input type="text" name="config[diarypertime]" class="input input_wa" value="$o_diarypertime"></td>
+          <td class="td2">&nbsp;</td>
+        </tr>
+        <tr class="tr1 vt">
+         <td class="td1">列表页日志内容显示字节</td>
+          <td class="td2"><input type="text" name="config[shownum]" class="input input_wa" value="$o_shownum"></td>
+          <td class="td2">&nbsp;</td>
+        </tr>
+        <tr class="tr1 vt">
+         <td class="td1">上传附件</td>
+          <td class="td2">
+          	<div class="admin_table_b">
+                <table cellpadding="0" cellspacing="0">
+                  <tr>
+                    <td>后缀名(小写)</td>
+                    <td>最大尺寸(KB)</td>
+                    <td>&nbsp;</td>
+                  </tr>
+                  <tr>
+                    <td><input name="" type="text"  value="jpg"class="input input_wc" /></td>
+                    <td><input name="uploadsize[jpg]" value="$uploadsize[jpg]" class="input input_wc" /></td>
+                    <td>&nbsp;</td>
+                  </tr>
+                  <tr>
+                    <td><input name="" type="text"  value="jpeg"class="input input_wc" /></td>
+                    <td><input name="uploadsize[jpeg]" value="$uploadsize[jpeg]" class="input input_wc" /></td>
+                    <td>&nbsp;</td>
+                  </tr>
+                  <tr>
+                    <td><input name="" type="text"  value="png"class="input input_wc" /></td>
+                    <td><input name="uploadsize[png]" value="$uploadsize[png]" class="input input_wc" /></td>
+                    <td>&nbsp;</td>
+                  </tr>
+                  <tr>
+                    <td><input name="" type="text"  value="gif"class="input input_wc" /></td>
+                    <td><input name="uploadsize[gif]" value="$uploadsize[gif]" class="input input_wc" /></td>
+                    <td>&nbsp;</td>
+                  </tr>
+                  <tr>
+                    <td><input name="" type="text"  value="bmp"class="input input_wc" /></td>
+                    <td><input name="uploadsize[bmp]" value="$uploadsize[bmp]" class="input input_wc"></td>
+                    <td>&nbsp;</td>
+                  </tr>
+                </table>
+            </div>
+          </td>
+          <td class="td2">&nbsp;</td>
+        </tr>
+        <tr class="tr1 vt">
+       	  <td class="td1">附件保存方式</td>
+          <td class="td2">
+          	<select name="config[attachdir]" class="select_wa">
+              <option value="0" $attachdir_ck[0]>全部存入同一目录(默认)</option>
+              <option value="1" $attachdir_ck[1]>按类型存入不同目录</option>
+              <option value="2" $attachdir_ck[2]>按月份存入不同目录</option>
+              <option value="3" $attachdir_ck[3]>按天存入不同目录</option>
+            </select>
+          </td>
+          <td class="td2">&nbsp;</td>
+        </tr>
+      </table>
+  </div>
+  <div class="admin_table">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <tr class="tr2 td_bgB">
+	  <td colspan="3"><span class="mr20 b">日志积分奖惩设置</span><span class="linka">注:<b>威望积分</b>支持小数点后一位，其他积分只允许整数！</span></td>
+	</tr>
+    <tr class="tr2">
+      <td class="td2">积分名称</td>
+      <td class="td2">发表日志(+)</td>
+      <td class="td2">删除日志(-)</td>
+    </tr>
+<!--
+EOT;
+foreach($credit->cType as $key => $value){print <<<EOT
+-->
+    <tr class="tr1 vt">
+      <td class="td2">$value</td>
+      <td class="td2"><input name="creditset[Post][$key]" value="{$creditset[Post][$key]}" class="input input_wc" /></td>
+      <td class="td2"><input name="creditset[Delete][$key]" value="{$creditset[Delete][$key]}" class="input input_wc" /></td>
+    </tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+  </table>
+  </div>
+  <div class="admin_table mb10">
+  <table width="100%" cellspacing="0" cellpadding="0">
+	  <tr class="tr2 td_bgB">
+	    <td colspan="3"><span class="mr20 b">日志积分流通记录</span><span class="linka">此功能可以详细记录某种积分的流通情况，帮助站长更加清晰地掌握论坛的积分状况！</span></td>
+	  </tr>
+    <tr class="tr2">
+      <td class="td2">积分名称</td>
+      <td class="td2">发表日志</td>
+      <td class="td2">删除日志</td>
+    </tr>
+<!--
+EOT;
+foreach($credit->cType as $key => $value){print <<<EOT
+-->
+    <tr class="tr1 vt">
+      <td class="td2">$value</td>
+      <td class="td2"><input type="checkbox" name="creditlog[Post][$key]" value="1" {$creditlog[Post][$key]} /></td>
+      <td class="td2"><input type="checkbox" name="creditlog[Delete][$key]" value="1" {$creditlog[Delete][$key]} /></td>
+    </tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+  </table>
+  </div>
+  <div class="mb10 tac">
+    <span class="btn"><span><button type="submit">提 交</button></span></span>
+   </div>
+</form>
+<!--
+EOT;
+}elseif($action=='cp'){
+print<<<EOT
+-->
+<script language="JavaScript" src="js/date.js"></script>
+<form action="$basename&action=$action" method="post">
+  <h2 class="h1">日志搜索</h2>
+  <div class="admin_table mb10">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <tr class="tr1 vt">
+      <td class="td1">关键字</td>
+      <td class="td2"><input name="keyword" class="input input_wa mr20" value="$keyword"></td>
+      <td class="td2">&nbsp;</td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">作者</td>
+      <td class="td2"><input name="author" class="input input_wa mr20" value="$author">可使用通配符 "*"</td>
+      <td class="td2">&nbsp;</td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">用户组</td>
+      <td class="td2">$creategroup
+      </td>
+      <td class="td2">&nbsp;</td>
+    </tr>
+
+    <tbody id="advanceSearchBody" style="display:$searchDisplay;">
+    <tr class="tr1 vt">
+      <td class="td1">发表日期</td>
+      <td class="td2">
+      <div class="input_img fl"><i onclick="this.nextSibling.onclick()" class="input_time" title="选择时间">选择时间</i> <input type="text" name="postdate_s" value="$postdate_s" id="postdate_s" onclick="javascript:ShowCalendar(this.id)"></div><span class="p_lr_10 fl">至</span><div class="input_img fl"><i class="input_time" title="选择时间">选择时间</i><input type="text" name="postdate_e" id="postdate_e" value="$postdate_e" onclick="javascript:ShowCalendar(this.id)"></div>
+        </td>
+        <td class="td2">&nbsp;</td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">浏览人数小于</td>
+      <td class="td2"><input type="text" class="input input_wa mr20" maxlength=14 name="hits" value="$hits"><!-- 的日志 --></td>
+      <td class="td2">&nbsp;</td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">回复人数小于</td>
+      <td class="td2"><input type="text" class="input input_wa mr20" maxlength=14 name="replies" value="$replies"><!-- 的日志 --></td>
+      <td class="td2">&nbsp;</td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">内容长度[字节]</td>
+      <td class="td2">大于&nbsp;<input type="text" class="input input_wc" name="tcounts" value="$tcounts">&nbsp;或&nbsp;小于&nbsp;<input type="text" class="input input_wc" name="counts" value="$counts">
+	  </td>
+      <td class="td2">&nbsp;</td>
+    </tr>
+    </tbody>
+
+    <tr class="tr1 vt">
+      <td class="td1">排序</td>
+      <td class="td2"><select name="orderby" class="select_wa fl mr20">
+          <option value="postdate">发表日期</option>
+        </select>
+       		 <ul class="cc list_80 fl list_A">
+                	<li><input type="radio" name="sc" value="desc" $descChecked>倒序</li>
+                    <li><input type="radio" name="sc" value="asc" $ascChecked>正序</li>
+             </ul>
+        </td>
+        <td class="td2">&nbsp;</td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">每页显示条数</td>
+      <td class="td2"><input name="perpage" class="input input_wa mr20" value="$perpage"></td>
+      <td class="td2">&nbsp;</td>
+    </tr>
+  </table>
+  </div>
+  <div class="mb10 tac">
+    <span class="mr10"><span class="btn"><span><button type="submit">提 交</button></span></span></span>
+    <a href="javascript:;" id="advanceSearchButton">高级搜索<input type="hidden" id="searchDisplay" name="searchDisplay" value="$searchDisplay"></a>
+   </div>
+</form>
+<script type="text/javascript">
+getObj('advanceSearchButton').onclick = function() {
+	displayElement('advanceSearchBody','advanceSearchButton');
+	getObj('searchDisplay').value = getObj('advanceSearchBody').style.display;
+};
+</script>
+
+<form action="$basename&" method="post" name="FORM">
+  <input type="hidden" name="action" value="$action">
+  <input type="hidden" name="step" value="delete">
+  <input type="hidden" name="groupid" value="$groupid">
+  <input type="hidden" name="author" value="$author">
+  <input type="hidden" name="keyword" value="$keyword">
+  <input type="hidden" name="postdate1" value="$postdate1">
+  <input type="hidden" name="postdate2" value="$postdate2">
+  <input type="hidden" name="hits" value="$hits">
+  <input type="hidden" name="replies" value="$replies">
+  <input type="hidden" name="tcounts" value="$tcounts">
+  <input type="hidden" name="counts" value="$counts">
+  <input type="hidden" name="orderby" value="$orderby">
+  <input type="hidden" name="sc" value="$sc">
+  <input type="hidden" name="perpage" value="$perpage">
+  <input type="hidden" name="page" value="$page">
+  <h2 class="h1"><span class="mr10">文章列表</span></h2>
+  <div class="admin_table mb10">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <tr class="tr2 vt td_bgB">
+      <td width="30"><span onclick="CheckAll(document.FORM)" class="cp">全选</span></td>
+      <td>标 题</td>
+      <td>作 者</td>
+      <td>隐私权限</td>
+      <td>发表日期</td>
+      <td>浏览数</td>
+      <td>评论数</td>
+    </tr>
+<!--
+EOT;
+if (empty($diarydb)) {print <<<EOT
+-->
+<tr><td class="p10" colspan="9"><div class="admin_tips">啊哦，没有你要的信息！</div></td></tr>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+<!--
+EOT;
+foreach($diarydb as $value){
+$privacy = array('全站用户可见','仅好友可见','仅自己可见');
+print <<<EOT
+-->
+    <tr class="tr1 vt">
+      <td class="td2"><input type="checkbox" name="selid[]" value="$value[did]"></td>
+      <td class="td2"><a href="apps.php?q=diary&a=detail&did=$value[did]&uid=$value[uid]" target="_blank">$value[subject]</a></td>
+      <td class="td2"><a href="u.php?uid=$value[uid]" target="_blank">$value[username]</td>
+      <td class="td2">{$privacy[$value[privacy]]}</td>
+      <td class="td2">$value[postdate]</td>
+      <td class="td2">$value[r_num]</td>
+      <td class="td2">
+<!--
+EOT;
+if ($value['c_num'] > 0) {print <<<EOT
+-->
+        <a href="$admin_file?adminjob=mode&admintype=o_comments&job=list&type=diary&typeid=$value[did]">$value[c_num]</a>
+<!--
+EOT;
+} else {print <<<EOT
+-->
+        0
+<!--
+EOT;
+}print <<<EOT
+-->
+      </td>
+    </tr>
+<!--
+EOT;
+}}print <<<EOT
+-->
+  </table>
+  </div>
+  <div class="mt10 cc">$pages</div>
+  <div class="mb10 tac">
+      <span class="btn"><span><button type="submit" onclick="return Checkdel();">删 除</button></span></span>
+   </div>
+</form>
+<script language="JavaScript">
+function Checkdel(){
+	if (!confirm("您确定要删除选中项吗?")) {
+		return false;
+	}else{
+		return true;
+	}
+}
+</script>
+
+<!--
+EOT;
+}include_once PrintEot('adminbottom');
+?>-->

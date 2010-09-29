@@ -1,0 +1,171 @@
+<!--<?php
+$webPageTitle = '广场';
+$windid && $webPageTitle .= ' - ' . $windid;
+print<<<EOT
+--><!doctype html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=$db_charset" />
+<title>$webPageTitle - Powered by phpwind</title>
+<meta name="generator" content="phpwind $wind_version" />
+<meta name="description" content="$metaDescription" />
+<meta name="keywords" content="$metaKeywords" />
+<base id="headbase" href="$db_bbsurl/" />
+<link rel="stylesheet" type="text/css" href="images/pw_core.css" media="all" />
+<link rel="stylesheet" type="text/css" href="u/images/style.css" media="all" />
+<link rel="stylesheet" type="text/css" href="u/images/visit/style.css" media="all" />
+<!--
+EOT;
+$uskin = 'default';
+require_once(uTemplate::printEot('css'));
+print <<<EOT
+-->
+<script type="text/javascript" language="JavaScript" src="js/pw_ajax.js"></script>
+<script type="text/javascript" LANGUAGE="JavaScript" src="js/core/core.js"></script>
+<script type="text/javascript" LANGUAGE="JavaScript" src="js/core/tab.js"></script>
+<script language="JavaScript">
+var imgpath = '$imgpath';
+var verifyhash = '$verifyhash';
+var winduid = '$winduid';
+var windid	= '$windid';
+var groupid	= '$groupid';
+var charset = '$db_charset';
+var basename = '$basename';
+var temp_basename = '$temp_basename';
+var modeimg = '$pwModeImg';
+</script>
+</head>
+<body>
+<div class="warp">
+	<div class="header">
+	<div class="topbar">
+		<div class="topwarp cc">
+			<a href="index.php" class="logo"><img src="u/themes/$uskin/images/logo.png" title="$o_sitename" /></a>
+			<div class="fl">
+				<a href="u.php">个人中心</a>
+				<i>&nbsp;</i>
+				<a href="mode.php?m=o">广场</a>
+<!--
+EOT;
+$db_menuinit .= ",'td_omainNav' : 'menu_omainNav'";print <<<EOT
+-->
+				<i>&nbsp;</i>	
+				<a id="td_omainNav" href="index.php" class="menudown">返回社区首页</a>
+<!--
+EOT;
+print <<<EOT
+-->
+			</div>
+			<div class="fr">
+<!--
+EOT;
+if ($winduid) {print <<<EOT
+-->
+				<a href="u.php" class="b">$windid</a>
+				<a href="$loginouturl" class="mr10">退出</a><i>&nbsp;</i>
+<!--
+EOT;
+	if($winddb['newpm']>0 && $_G['maxmsg']>0){
+print <<<EOT
+-->
+				<a href="message.php" class="newmes">消息($winddb[newpm])</a>
+<!--
+EOT;
+	}else{print <<<EOT
+-->
+				<a href="message.php">消息</a>
+<!--
+EOT;
+	}
+	if($db_job_isopen){
+		$jobnum = ($winddb['jobnum']>0) ? "(".$winddb['jobnum'].")" : "";
+print <<<EOT
+-->
+         <a href="jobcenter.php">任务<span>$jobnum</span></a>
+<!--
+EOT;
+	}
+	if($db_toolifopen){
+print <<<EOT
+-->
+				<a href="profile.php?action=toolcenter">道具</a>
+<!--
+EOT;
+	}
+	$db_menuinit .= ",'td_profile' : 'menu_profile'";print <<<EOT
+-->
+				<a id="td_profile" href="profile.php" class="mr10 menudown">设置</a><i>&nbsp;</i>
+<!--
+EOT;
+	if (CkInArray($windid, $manager) || $SYSTEM['allowadmincp']) {print <<<EOT
+-->
+				<a href="$db_adminfile" target="_blank">系统设置</a>
+<!--
+EOT;
+	}
+} else {print <<<EOT
+-->
+				<a href="$loginurl" class="mr10">登录</a><i>&nbsp;</i><a href="$regurl" class="mr10">注册</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+			</div>
+		</div>
+	</div>
+ <!--head begin-->
+	<div class="headB cc">
+		<div class="place">
+			<div>
+			<img src="u/images/module/visit.png" /><h2>广场</h2><a href="u.php" class="s7">返回个人中心</a>
+			</div>
+		</div>
+	</div>
+<!--
+EOT;
+if ($winduid) {print <<<EOT
+-->
+	<div id="menu_profile" style="display:none;">
+		<div style="margin-right:-6px;">
+		<div class="pw_menu" style="width:45px; position:relative;">
+			<h6 style="left:-1px;"><a href="profile.php" class="down">设置</a></h6>
+			<ul class="menuList" style="width:43px;">
+				<li><a href="profile.php?action=modify">帐号</a></li>
+				<li><a href="profile.php?action=privacy">隐私</a></li>
+				<li><a href="userpay.php">积分</a></li>
+				<li><a href="profile.php?action=permission">权限</a></li>
+			</ul>
+		</div>
+		</div>
+	</div>
+	<div id="menu_omainNav" style="display:none;">
+		<div style="margin-left:-6px;">
+		<div class="pw_menu" style="width:93px; position:relative;">
+			<h6 style="left:-1px;"><a href="$_mainUrl" class="down">返回社区首页</a></h6>
+			<ul class="menuList" style="width:91px;">
+<!--
+EOT;
+$navConfigService = L::loadClass('navconfig', 'site');
+foreach($navConfigService->findValidNavListByTypeAndPostion(PW_NAV_TYPE_MAIN, 'o') as $key => $value) {
+print<<<EOT
+-->
+				<li><a href="{$value[data][link]}"><span>{$value[data][title]}</span></a></li>
+<!--
+EOT;
+}print <<<EOT
+-->
+			</ul>
+		</div>
+		</div>
+	</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+	</div>
+	<div class="main mainB" style="background:#fff;">
+		<span class="headTrgA"></span><span class="headTrgB"></span>
+		<div class="c"></div>
+<!--
+EOT;
+?>

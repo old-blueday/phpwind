@@ -1,0 +1,296 @@
+<!--<?php
+include_once PrintEot('left');print <<<EOT
+-->
+<div class="nav3 mb10">
+    <ul class="cc">
+		<li $cls_config><a href="$basename&action=config">基本设置</a></li>
+		<li $cls_report><a href="$basename&action=report">数据报告</a></li>
+<!--
+EOT;
+if($action=='config'){print <<<EOT
+-->
+	</ul>
+</div>
+<div class="admin_info mb10">
+	<h3 class="h1">统计说明</h3>
+	<div class="legend">量子恒道统计是一款第三方免费网站流量统计分析系统<br />
+		通过统计分析大量数据, 结合网络营销,为您提供运营, 广告投放, 推广等决策依据<br />
+		用户包括个人站长, 个人博主, 网站管理者, 第三方统计等<br />
+<!--
+EOT;
+if($db_ystats_unit_id && empty($db_ystats_ymail)){print <<<EOT
+-->
+	绑定雅虎帐号可以登录雅虎平台，查看更详细的数据报告，你还没有绑定雅虎帐号，<a href="$basename&action=bind" style="color:blue">现在绑定</a><br />
+<!--
+EOT;
+}elseif($db_ystats_unit_id && $db_ystats_ymail){print <<<EOT
+-->
+	你已经绑定雅虎帐号,现在就可以登录量子恒道平台，查看更详细的数据报告，<a href="http://www.linezing.com" style="color: blue" target="_blank">现在登录</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+	</div>
+</div>
+<form name="FORM" action="$basename" method="post">
+	<input type="hidden" name="action" value="config" />
+	<input type="hidden" name="step" value="2" />
+	<h2 class="h1">开启量子恒道统计</h2>
+	<div class="admin_table mb10">
+	<table cellpadding="0" cellspacing="0" width="100%">
+		<tr class="tr1 vt">
+			<td class="td1"><span class="xia2">量子恒道统计</span></td>
+			<td class="td2">
+				<ul class="list_A list_80 cc">
+					<li><input name="config[ifopen]" type="radio" value="0" {$ifopen_N} />开启</li>
+					<li><input name="config[ifopen]" type="radio" value="1" {$ifopen_Y} />关闭</li>
+				</ul></td><td class="td2"><div class="help_a"></div>
+			</td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">统计标识</td>
+			<td class="td2">
+				<ul class="list_A cc">
+					<li><input name="config[style]" type="radio" value="1" $style_1><img height="22" style="vertical-align:top" src="$imgpath/admin/ystaticon.gif"></li>
+					<li><input name="config[style]" type="radio" value="2" $style_2>量子恒道</li>
+					<li><input name="config[style]" type="radio" value="4" $style_4>LinezingStat</li>
+					<li><input name="config[style]" type="radio" value="5" $style_5>不显示图标或文字</li>
+				</ul>
+			</td><td class="td2"><div class="help_a">选择前台标识显示的样式，但可能会存在延时问题。</div>
+			</td>
+		</tr>
+	</table>
+	</div>
+	<div class="tac">
+		<span class="btn"><span><button type="submit">提 交</button></span></span>
+	</div>
+</form>
+<!--
+EOT;
+}elseif($action=='report'){print <<<EOT
+-->
+	</ul>
+</div>
+<form name="FORM" action="$basename" method="post">
+	<input type="hidden" name="action" value="report" />
+	<h2 class="h1">数据报告</h2>
+	<div class="admin_table mb10">
+	<table width="100%" cellspacing="0" cellpadding="0">
+		<tr class="tr1 vt">
+			<td class="td1">选择时段:</td>
+			<td class="td2">
+				<ul class="list_A list_80 fl mr10 cc">
+					<li><input type="radio" name="view" onClick="javascript:document.FORM.submit();" value="colligate" $colligate />综合报告</li>
+					<li><input type="radio" name="view" onClick="javascript:document.FORM.submit();" value="thisweek" $thisweek />本周</li>
+					<li><input type="radio" name="view" onClick="javascript:document.FORM.submit();" value="lastweek" $lastweek />上周</li>
+					<li><input type="radio" name="view" onClick="javascript:document.FORM.submit();" value="thismonth" $thismonth />本月</li>
+					<li><input type="radio" name="view" onClick="javascript:document.FORM.submit();" value="last30" $last30 />最近30天</li>
+					<li style="width:auto"><input type="radio" name="view" value="other" id="other" $other />任意月
+						<select name="year" onClick="javascript:getObj('other').checked = true;">
+<!--
+EOT;
+for($i=2007;$i<=$pwDate[year];$i++){print <<<EOT
+-->
+							<option value="$i" ${'year_'.$i}>$i</option>
+<!--
+EOT;
+}print <<<EOT
+-->
+						</select>
+						<select name="month" onClick="javascript:getObj('other').checked=true;">
+							<option value="01" $month_01>01</option>
+							<option value="02" $month_02>02</option>
+							<option value="03" $month_03>03</option>
+							<option value="04" $month_04>04</option>
+							<option value="05" $month_05>05</option>
+							<option value="06" $month_06>06</option>
+							<option value="07" $month_07>07</option>
+							<option value="08" $month_08>08</option>
+							<option value="09" $month_09>09</option>
+							<option value="10" $month_10>10</option>
+							<option value="11" $month_11>11</option>
+							<option value="12" $month_12>12</option>
+						</select>
+						<span class="bt2"><span><button type="button" onfocus="blur();" value="查看" onClick="javascript:getObj('other').checked=true;document.FORM.submit();">查看</button></span></span>
+					</li>
+				</ul>
+			</td>
+		</tr>
+	</table>
+	</div>
+</form>
+<!--
+EOT;
+if($view=='colligate'){print <<<EOT
+-->
+<h2 class="h1">综合报告</h2>
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+	<tr class="tr1 vt">
+<!--
+EOT;
+if($ystats[date_list]){print <<<EOT
+-->
+		<td class="td2"><object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=7,0,19,0" width="740" height="260">
+				<param name="movie" value="$imgpath/admin/ystats.swf" />
+				<param name="FlashVars" value="data=$basename" />
+				<param name="quality" value="high" />
+				<param name="wmode" value="transparent">
+				<embed WMODE="transparent" src="$imgpath/admin/ystats.swf" FlashVars="data=$basename" quality="high" pluginspage="http://www.macromedia.com/go/getflashplayer" type="application/x-shockwave-flash" width="740" height="260"></embed>
+			</object></td>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+		<td class="td2 tac"><p class="b s4">对不起，该时段内无数据</p></td>
+<!--
+EOT;
+}print <<<EOT
+-->
+	</tr>
+</table>
+</div>
+
+<h2 class="h1">网站流量</h2>
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+	<tr class="tr2 vt td_bgB">
+		<td>&nbsp;</td>
+		<td>PV</td>
+		<td>UV</td>
+		<td>IP</td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">今日</td>
+		<td class="td2">{$ystats[today][pv]}</td>
+		<td class="td2">{$ystats[today][uv]}</td>
+		<td class="td2">{$ystats[today][ip]}</td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">昨日此时</td>
+		<td class="td2">{$ystats[yestoday_att][pv]}</td>
+		<td class="td2">{$ystats[yestoday_att][uv]}</td>
+		<td class="td2">{$ystats[yestoday_att][ip]}</td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">昨日:</td>
+		<td class="td2">{$ystats[yestoday][pv]}</td>
+		<td class="td2">{$ystats[yestoday][uv]}</td>
+		<td class="td2">{$ystats[yestoday][ip]}</td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">预计今日</td>
+		<td class="td2">{$ystats[today_expect][pv]}</td>
+		<td class="td2">{$ystats[today_expect][uv]}</td>
+		<td class="td2">{$ystats[today_expect][ip]}</td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">平均每日</td>
+		<td class="td2">{$ystats[average_day][pv]}</td>
+		<td class="td2">{$ystats[average_day][uv]}</td>
+		<td class="td2">{$ystats[average_day][ip]}</td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">本月合计</td>
+		<td class="td2">{$ystats[sum_month][pv]}</td>
+		<td class="td2">{$ystats[sum_month][uv]}</td>
+		<td class="td2">{$ystats[sum_month][ip]}</td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">总量</td>
+		<td class="td2">{$ystats[sum_all][pv]}</td>
+		<td class="td2">{$ystats[sum_all][uv]}</td>
+		<td class="td2">{$ystats[sum_all][ip]}</td>
+	</tr>
+</table>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+<h2 class="h1">时段$sdate - $edate</h2>
+<div class="admin_table mb10">
+	<table width="100%" cellspacing="0" cellpadding="0">
+		<tr class="tr1 vt">
+<!--
+EOT;
+if($ystats[date_list]){print <<<EOT
+-->
+			<td class="td2"><object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=7,0,19,0" width="740" height="260">
+					<param name="movie" value="$imgpath/admin/ystats.swf" />
+					<param name="FlashVars" value="data=$basename&action=draw" />
+					<param name="quality" value="high" />
+					<param name="wmode" value="transparent">
+					<embed WMODE="transparent" src="$imgpath/admin/ystats.swf" FlashVars="data=$basename&action=draw" quality="high" pluginspage="http://www.macromedia.com/go/getflashplayer" type="application/x-shockwave-flash" width="740" height="260"></embed>
+				</object></td>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+			<td class="td2 tac"><p class="s1 b">对不起，该时段内无数据</p></td>
+<!--
+EOT;
+}print <<<EOT
+-->
+		</tr>
+	</table>
+</div>
+
+<h2 class="h1">报表解读</h2>
+<div class="admin_table mb10">
+	<table width="100%" cellspacing="0" cellpadding="0">
+		<tr class="tr2 vt td_bgB">
+			<td>日期</td>
+			<td>PV(总访问量)</td>
+			<td>UV(总访客数)</td>
+			<td>IP</td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">总计</td>
+			<td class="td2">$sum_pv</td>
+			<td class="td2">$sum_uv</td>
+			<td class="td2">$sum_ip</td>
+		</tr>
+<!--
+EOT;
+foreach($ystats['date_list'] as $list){print <<<EOT
+-->
+		<tr class="tr1 vt">
+			<td class="td1">$list[value]</td>
+			<td class="td2">$list[pv]</td>
+			<td class="td2">$list[uv]</td>
+			<td class="td2">$list[ip]</td>
+		</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+	</table>
+</div>
+<!--
+EOT;
+}}elseif($action=='bind'){print <<<EOT
+-->
+		<li><a href="$basename&action=bind" $cls_bind>绑定账号</a></li>
+	</ul>
+</div>
+
+<form name="FORM" action="$basename" method="post">
+	<input type="hidden" name="action" value="bind" />
+	<input type="hidden" name="step" value="2" />
+	<h2 class="h1">绑定量子恒道帐号</h2>
+	<div class="admin_tanle mb10">
+	<table width="100%" cellspacing="0" cellpadding="0">
+		<tr class="tr1 vt">
+			<td class="td1"><span class="xia2">雅虎邮箱地址</span><br />请输入 yahoo.com.cn或yahoo.cn 邮箱地址</td>
+			<td class="td2"><input name="ymail" class="input input_wa" size="35"></td>
+		</tr>
+	</table>
+	</div>
+	<div class="tac">
+		<span class="btn"><span><button type="submit"> 我要绑定 </button></span></span>
+	</div>
+</form>
+<!--
+EOT;
+}include_once PrintEot('adminbottom');
+?>-->

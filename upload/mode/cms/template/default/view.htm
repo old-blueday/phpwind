@@ -1,0 +1,280 @@
+<!--<?php print <<<EOT
+-->
+<link rel="stylesheet" type="text/css" href="$pwModeImg/style.css" media="all" />
+<div class="cmsbreadCrumb mb10">
+	$pagePosition
+</div>
+<div class="cmsBgbor">&nbsp;</div>
+	<div class="cmsBg">
+	<div id="content" class="fl">
+		<div class="cmsBoxA">
+			<table width="100%" style="table-layout:fixed;"><tr><td class="vt" height="600">
+				<h1 class="tac f24 b">{$articleModule->subject}</h1>
+				<div class="cmsTips tac mb20">
+<!--
+EOT;
+if($articleModule->user){
+print <<<EOT
+-->
+					<span class="mr10">作者：<a href="u.php?uid={$articleModule->userId}" target="_blank">{$articleModule->user}</a></span>
+<!--
+EOT;
+}if($articleModule->author){
+print <<<EOT
+-->					
+					<span class="mr10">原创作者：{$articleModule->author}</span>
+<!--
+EOT;
+}if(isURL($articleModule->fromUrl)){
+print <<<EOT
+-->					
+					<span class="mr10">来源：<a href="{$articleModule->fromUrl}" target="_blank">{$articleModule->fromInfo}</a></span>
+<!--
+EOT;
+}elseif($articleModule->fromInfo){print <<<EOT
+-->
+					<span class="mr10">来源：{$articleModule->fromInfo}</span>
+<!--
+EOT;
+}print <<<EOT
+-->
+					<span class="mr10 f10">$postdate</span>
+<!--
+EOT;
+if (checkEditPurview($windid,$articleModule->columnId)) {
+print <<<EOT
+-->					
+					<a href="{$basename}q=post&action=edit&id=$id&page=$page" class="mr5">[编辑]</a><a href="javascript:;" onclick="deleteArticle('$id','$articleModule->columnId');return false;">[删除]</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+				</div>
+				<div class="summary mb10">
+				{$articleModule->descrip}
+				</div>
+				<div class="cmsContent" id="cmsContent">
+					{$content}
+				</div>
+				<div class="cc mb20">$pages</div>
+				<!--<div class="mb20">关键词：<a href="#" class="mr10 s2">汽车</a><a href="#" class="mr10 s2">宝马</a><a href="#" class="mr10 s2">北京车展</a></div>-->
+				<div class="cmsTips mb10">
+					<div class="fr">
+						<a href="apps.php?q=collection&a=favor&type=cms&ajax=1&id=$id" class="mr20 allCollect" onclick="return ajaxurl(this);">收藏</a><a href="javascript:;" onclick="sendmsg('operate.php?action=toweibo&ajax=1&type=cms&id=$id','',this.id);" class="allForward">新鲜事</a>
+					</div>
+					<span class="mr10">已有<span class="s2">{$articleModule->hits}</span>人阅读</span>
+<!--
+EOT;
+if ($sourceUrl) {print <<<EOT
+-->	
+					<a href="$sourceUrl">看看大家怎么评论&gt;&gt;</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+				</div>
+<!--
+EOT;
+if ($articleModule->relate) {print <<<EOT
+-->	
+				<div class="reReading mb10">
+					<h2 class="f14 b">相关阅读</h2>
+					<div class="cmsListA cmsIconA">
+						<ul>
+<!--
+EOT;
+foreach ($articleModule->relate as $value) {print <<<EOT
+-->	
+							<li><a href="$value[url]" target="_blank">$value[subject]</a></li>
+<!--
+EOT;
+}print <<<EOT
+-->
+						</ul>
+					</div>
+				</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+
+<!--
+EOT;
+if ($sourceUrl) {
+print <<<EOT
+-->	
+				<div class="gotoForum tac f14 b">
+					<a href="$sourceUrl" target="_blank">进入{$articleModule->fromInfo}讨论</a>
+				</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+			</td></tr></table>
+		</div>
+	</div>
+	<div id="sideBar" class="fr">
+		<div class="cmsBoxB">
+<!--
+EOT;
+$_columnName = $column && $columns['parent'][name] ? $columns['parent'][name] : '栏目';
+print <<<EOT
+-->
+			<h2>$_columnName</h2>
+			<ul class="cmsForumlist cc cmslistB">
+<!--
+EOT;
+foreach($columns['sub'] as $var){
+$_current = $var['column_id'] == $articleModule->columnId ? 'class="current"' : '' ;
+$url = getColumnUrl($var[column_id]);
+print <<<EOT
+-->
+				<li {$_current}><a href="$url">{$var[name]}</a></li>
+<!--
+EOT;
+}print <<<EOT
+-->
+			</ul>
+		</div>
+		<div class="cmsBoxbar">&nbsp;</div>
+		<div class="cmsBoxB">
+			<h2>24小时人气排行</h2>
+			<div class="cmsListA cmsIconB">
+				<ul>
+<!--
+EOT;
+foreach ($pageCache->getData('hotArticle') as $value) {print <<<EOT
+-->
+					<li><a href="{$value[url]}" target="_blank">{$value[subject]}</a></li>
+<!--
+EOT;
+}print <<<EOT
+-->
+				</ul>
+			</div>
+		</div>
+		<div class="cmsBoxbar">&nbsp;</div>
+		<div class="cmsBoxB">
+			<h2>最新文章</h2>
+			<div class="cmsListA cmsIconA">
+				<ul>		
+<!--
+EOT;
+$i = 0;
+foreach ($pageCache->getData('newArticle') as $value) {
+$i++;
+print <<<EOT
+-->
+
+					<li><a href="{$value[url]}" target="_blank">{$value[subject]}</a></li>
+<!--
+EOT;
+if ($i==5) {print <<<EOT
+-->
+				</ul>
+				<div class="cmsHr">&nbsp;</div>
+				<ul>
+<!--
+EOT;
+}print <<<EOT
+-->
+
+<!--
+EOT;
+}print <<<EOT
+-->
+				</ul>
+			</div>
+		</div>
+		<div class="cmsBoxbar">&nbsp;</div>
+		<div class="cmsBoxB">
+			<h2>热门帖子</h2>
+			<div class="cmsListA cmsIconA">
+				<ul>		
+<!--
+EOT;
+$i = 0;
+foreach ($pageCache->getData('hotSubject') as $value) {
+$i++;
+print <<<EOT
+-->
+
+					<li><a href="{$value[url]}" target="_blank">{$value[title]}</a></li>
+<!--
+EOT;
+if ($i==5) {print <<<EOT
+-->
+				</ul>
+				<div class="cmsHr">&nbsp;</div>
+				<ul>
+<!--
+EOT;
+}print <<<EOT
+-->
+
+<!--
+EOT;
+}print <<<EOT
+-->
+			</ul>
+			</div>
+		</div>
+		<div class="cmsBoxbar">&nbsp;</div>
+		<div class="cmsBoxB">
+			<h2>最新帖子</h2>
+			<div class="cmsListA cmsIconA">
+				<ul>		
+<!--
+EOT;
+$i = 0;
+foreach ($pageCache->getData('newSubject') as $value) {
+$i++;
+print <<<EOT
+-->
+
+					<li><a href="{$value[url]}" target="_blank">{$value[title]}</a></li>
+<!--
+EOT;
+if ($i==5) {print <<<EOT
+-->
+				</ul>
+				<div class="cmsHr">&nbsp;</div>
+					<ul>
+<!--
+EOT;
+}print <<<EOT
+-->
+
+<!--
+EOT;
+}print <<<EOT
+-->
+				</ul>
+			</div>
+		</div>
+	</div>
+	<div class="c">&nbsp;</div>
+	</div>
+	<div class="cmsBgbor">&nbsp;</div>
+<script type="text/javascript" language="JavaScrip" src="$pwModeJs/cms.js" ></script>
+<script type="text/javascript">
+var images = getObj('cmsContent').getElementsByTagName('img');
+var imgLoader = setTimeout(imgLoad,200);
+function imgLoad(){
+	var l = images.length,maxWidth=550,n=false;
+	for(var i = 0; i < l; i++){
+		if(images[i].width > maxWidth){
+			images[i].width = maxWidth;
+		}
+		if(images[i].width == 0){
+			n=true;
+		}
+		if(n){
+			imgLoader = setTimeout(imgLoad, 200);
+		}
+	}
+}
+</script>
+<!--
+EOT;
+?>-->

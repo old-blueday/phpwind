@@ -1,0 +1,112 @@
+<!--<?php
+include_once PrintEot('left');
+if($admintype=='checkemail'){print <<<EOT
+-->
+<div class="admin_info mb10">
+	<h3 class="h1"><b>提示信息</b></h3>
+	<div class="legend">需要email验证的用户如果无法通过email激活帐号，管理员可使用此功能激活用户帐号</div>
+</div>
+<div class="mb10 cc">$pages</div>
+<form action=$basename method=post>
+<input type=hidden name=action value='check'>
+<h2 class="h1">需要验证的用户</h2>
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+	<tr class="tr2 td_bgB">
+		<td width="24">ID</td>
+		<td width="160">用户名</td>
+		<td>注册时间</td>
+		<td>Email</td>
+		<td width="50">&nbsp;</td>
+	</tr>
+<!--
+EOT;
+$num=($page-1)*$db_perpage;
+foreach($memdb_E as $mem){
+$num++;
+print <<<EOT
+-->
+	<tr class="tr1 vt">
+		<td class="td2">$num</td>
+		<td class="td2"><a href="$admin_file?adminjob=setuser&action=edit&uid=$mem[uid]">$mem[username]</a></td>
+		<td class="td2">$mem[regdate]</td>
+		<td class="td2">$mem[email]</td>
+		<td class="td2"><input type='checkbox' name='yzmem[]' value=$mem[uid]></td>
+	</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+</table>
+</div>
+<div class="tac mb10">
+	<label class="mr10"><input type="radio" name="type" value="del" />删除</label>
+  <label><input type="radio" name="type" checked='checked' value="pass" />通过</label>
+</div>
+<div class="tac mb10">
+	<span class="bt"><span><button type="button" name="chkall" onclick="CheckAll(this.form)">全 选</button></span></span>
+	<span class="btn"><span><button type="submit" name="hello">提 交</button></span></span>
+</div>
+</form>
+<!--
+EOT;
+}elseif($admintype=='checkreg'){print <<<EOT
+-->
+<div class="admin_info mb10">
+	<h3 class="h1"><b>提示信息</b></h3>
+	<div class="legend">此功能可将未验证会员组的用户编入普通会员组</div>
+</div>
+<div class="mb10 cc">$pages</div>
+<form action="$basename" method="post">
+<input type="hidden" name=action value='check'>
+<h2 class="h1">需要验证的用户</h2>
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+	<tr class="tr2 td_bgB">
+		<td width="24">ID</td>
+		<td width="120">用户名</td>
+		<td width="150">注册时间</td>
+		<td width="130">Email</td>
+		<td></td>
+		<td width="50">&nbsp;</td>
+	</tr>
+<!--
+EOT;
+$num=($page-1)*$db_perpage;
+foreach($memdb_R as $mem){
+$num++;
+print <<<EOT
+-->
+	<tr class="tr1 vt">
+		<td class="td2">$num</td>
+		<td class="td2"><a href="$admin_file?adminjob=setuser&action=edit&uid=$mem[uid]">$mem[username]</a></td>
+		<td class="td2">$mem[regdate]</td>
+		<td class="td2">$mem[email]</td>
+		<td class="td2">
+			<table style='TABLE-LAYOUT: fixed;WORD-WRAP: break-word'>
+				<tr>
+					<td>$mem[regreason]</td>
+				</tr>
+			</table>
+		</td>
+		<td class="td2"><input type='checkbox' name='yzmem[]' value=$mem[uid]></td>
+	</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+</table>
+</div>
+<div class="tac mb10">
+    <label class="mr10"><input type=radio name="type" value=del />删除</label>
+    <label><input type=radio name="type" checked='checked' value="pass" />通过</label>
+</div>
+<div class="tac mb10">
+	<span class="bt"><span><button type="button" name="chkall" onclick="CheckAll(this.form)">全 选</button></span></span>
+	<span class="btn"><span><button type="submit" name="hello">提 交</button></span></span>
+</div>
+</form>
+<!--
+EOT;
+}include_once PrintEot('adminbottom');
+?>-->

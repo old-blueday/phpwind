@@ -1,0 +1,669 @@
+<!--<?php
+if($action == 'index'){print <<<EOT
+-->
+<div class="main fr">
+	<div id="showlist" class="h">
+		<a id="install" style="cursor:pointer;" onClick="showdivlist('install')">$lang[log_install_t]</a>
+	</div>
+	<div class="m-content" id="installdiv" style="display:none;">
+		$lang[log_install]
+	</div>
+	<center>
+		<form action="$basename" method="post">
+			<input type="hidden" name="action" value="readme">
+			<input type="submit" class="btn" value="" />
+		</form>
+	</center>
+</div>
+<div class="sidebar fl link3">
+	<dl class="siderbar_dl">
+		$lang[left_info]
+	</dl>
+</div>
+
+<script language="JavaScript">
+showdivlist('install');
+function showdivlist(showid){
+	var obj  = document.getElementById('showlist');
+	var objs = obj.getElementsByTagName('a');
+
+	for (var i=0;i<objs.length;i++) {
+		if (objs[i].id==showid) {
+			if (document.getElementById(showid + 'div').style.display == 'none') {
+				document.getElementById(showid).className = 'y';
+				document.getElementById(showid + 'div').style.display = '';
+			} else {
+				return false;
+			}
+		} else {
+			document.getElementById(objs[i].id).className = '';
+			document.getElementById(objs[i].id + 'div').style.display = 'none';
+		}
+	}
+	return false;
+}
+</script>
+<!--
+EOT;
+}else{
+if($action == 'readme'){print <<<EOT
+-->
+<div class="main fr">
+	<div class="h">$stepmsg</div>
+
+	<div class="m-content">
+		$wind_licence
+	</div>
+
+	<center>
+		<form action="$basename" method="post">
+			<input type="hidden" name="action" value="$next">
+			<input type="submit" class="btn2" value="$stepright" />
+		</form>
+	</center>
+</div>
+
+
+<div class="st-sidebar fl link3">
+	<ul class="step">
+		<li class="step-on"><span class="step-num_on">1</span>&nbsp;&nbsp;$lang[install_1]</li>
+		<li class="step-normal"><span class="step-num">2</span>&nbsp;&nbsp;$lang[install_2]</li>
+		<!-- <li class="step-normal"><span class="step-num">3</span>&nbsp;&nbsp;$lang[install_3]</li> -->
+		<li class="step-normal"><span class="step-num">3</span>&nbsp;&nbsp;$lang[install_4]</li>
+		<!-- <li class="step-normal"><span class="step-num">5</span>&nbsp;&nbsp;$lang[install_5]</li> -->
+		<!-- <li class="step-normal"><span class="step-num">4</span>&nbsp;&nbsp;$lang[install_6]</li> -->
+		<li class="step-sec">$lang[install_finish]</li>
+	</ul>
+	<div class="set-faq">
+		$lang[step_problem]
+	</div>
+</div>
+<!--
+EOT;
+}elseif($action == 'database'){print <<<EOT
+-->
+<div class="main fr">
+	<div class="h">$stepmsg</div>
+
+	<div class="m-content sp-lineheight">
+		<form id="install" action="$basename?" method="post">
+		<input type="hidden" name="action" value="$action">
+		<input type="hidden" name="step" value="2">
+		<div style="width:57%; float:left">
+		  <h3>$lang[step_2]</h3>
+		  <table class="dlA">
+			<tr>
+			  <td>$lang[dbhost]</td>
+			  <td><input type="text" name="dbhost" value="localhost" class="inputA" /></td>
+			</tr>
+			<tr>
+			  <td>$lang[dbuser]</td>
+			  <td><input type="text" name="dbuser" value="root" class="inputA" /></td>
+			</tr>
+			<tr>
+			  <td>$lang[dbpw]</td>
+			  <td><input type="text" name="dbpw" value="" class="inputA" /></td>
+			</tr>
+			<tr>
+			  <td>$lang[dbname]</td>
+			  <td><input type="text" name="dbname" value="" class="inputA" /></td>
+			</tr>
+
+<!--
+EOT;
+if ($mysqlichecked) {print <<<EOT
+-->
+			<tr>
+			  <td>$lang[database]</td>
+			  <td>
+				<input type="radio" name="database" value="mysqli" $mysqlichecked /> MySQLi
+				<input type="radio" name="database" value="mysql" /> MySQL
+			  </td>
+			</tr>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+			<input type="hidden" name="database" value="mysql" />
+<!--
+EOT;
+}print <<<EOT
+-->
+			<tr>
+			  <td>$lang[dbpres]</td>
+			  <td><input type="text" name="PW" value="pw_" class="inputA" /></td>
+			</tr>
+		  </table>
+		</div>
+		<div style="margin-left:56%;">
+		  <h3>$lang[managermsg]</h3>
+		  <table class="dlA dlB">
+			<tr>
+			  <td style="padding-left:10px">$lang[name]</td>
+			  <td><input type="text" name="manager" value="admin" class="inputA" /></td>
+			</tr>
+			<tr>
+			  <td style="padding-left:10px">$lang[pwd]</td>
+			  <td><input type="text" name="manager_pwd" class="inputA" /></td>
+			</tr>
+			<tr>
+			  <td style="padding-left:10px">$lang[ckpwd]</td>
+			  <td><input type="text" name="manager_ckpwd" class="inputA" /></td>
+			</tr>
+			<tr>
+			  <td style="padding-left:10px">Email</td>
+			  <td><input type="text" name="manager_email" class="inputA" value="admin@admin.com" /></td>
+			</tr>
+		  </table>
+		</div>
+		</form>
+	</div>
+
+	<div class="s-to">
+	<form action="$basename?" method="post">
+		<input type="hidden" name="step" value="$next">
+		<input type="button" class="btn4" value="$lang[step_pre]" title="$stepleft" onClick='window.location.href="javascript:history.go(-1)";'>
+		<input type="button" class="btn2" title="$stepright" value="$lang[step_next]" onClick="postcheck();" />
+	</form>
+	</div>
+
+  </div>
+
+
+	<div class="st-sidebar fl link3">
+		<ul class="step">
+			<li class="step-normal"><span class="step-num">1</span>&nbsp;&nbsp;$lang[install_1]</li>
+			<li class="step-on"><span class="step-num_on">2</span>&nbsp;&nbsp;$lang[install_2]</li>
+			<!-- <li class="step-normal"><span class="step-num">3</span>&nbsp;&nbsp;$lang[install_3]</li> -->
+			<li class="step-normal"><span class="step-num">3</span>&nbsp;&nbsp;$lang[install_4]</li>
+			<!-- <li class="step-normal"><span class="step-num">5</span>&nbsp;&nbsp;$lang[install_5]</li> -->
+			<!-- <li class="step-normal"><span class="step-num">4</span>&nbsp;&nbsp;$lang[install_6]</li> -->
+			<li class="step-sec">$lang[install_finish]</li>
+		</ul>
+		<div class="set-faq">
+			$lang[step_problem]
+		</div>
+	</div>
+</div>
+<script language="JavaScript">
+function postcheck(){
+	var obj = document.getElementById('install');
+	if (!obj.dbhost.value) {
+		alert('$lang[error_dbhost]');
+		obj.dbhost.focus();
+		return false;
+	} else if (!obj.dbuser.value) {
+		alert('$lang[error_dbuser]');
+		obj.dbuser.focus();
+		return false;
+	} else if (!obj.dbname.value) {
+		alert('$lang[error_dbname]');
+		obj.dbname.focus();
+		return false;
+	} else if (!obj.manager.value) {
+		alert('$lang[error_adminname]');
+		obj.manager.focus();
+		return false;
+	} else if (!obj.manager_pwd.value) {
+		alert('$lang[error_adminpwd]');
+		obj.manager_pwd.focus();
+		return false;
+	} else if (obj.manager_pwd.value != obj.manager_ckpwd.value) {
+		alert('$lang[error_ckpwd]');
+		obj.manager_ckpwd.focus();
+		return false;
+	} else if (!obj.manager_email.value) {
+		alert('$lang[error_adminemail]');
+		obj.manager_email.focus();
+		return false;
+	} else if (!obj.dbpw.value && !confirm('$lang[error_dbpw]')) {
+		return false;
+	}
+	obj.submit();
+}
+</script>
+<!--
+EOT;
+}elseif($action == 'hack'){print <<<EOT
+-->
+<div class="main fr">
+	<div class="h">$lang[hacklist]</div>
+
+	<div class="m-content">
+		<form id="install" action="$basename?" method="post">
+		  <input type="hidden" name="step" value="2">
+		  <input type="hidden" name="action" value="$action">
+		  <table class="dlC" width="90%">
+			<tr>
+			  <td>
+<!--
+EOT;
+foreach($uninstalldb as $value){print <<<EOT
+-->
+				<li style="background:none;width:38%;"><input type='checkbox' name="hackdb[]" value="$value[1]" CHECKED> $value[0]</li>
+<!--
+EOT;
+}print <<<EOT
+-->
+			  </td>
+			</tr>
+		  </table>
+		  </form>
+	</div>
+
+		<div class="s-to">
+			<input type="button" class="btn4" value="$lang[step_pre]" title="$stepleft" onClick='window.location.href="javascript:history.go(-1)";'>
+			<input type="button" class="btn2" title="$stepright" value="$lang[step_next]" onClick="document.getElementById('install').submit();" />
+		</div>
+    </div>
+
+
+	<div class="st-sidebar fl link3">
+		<ul class="step">
+			<li class="step-normal"><span class="step-num">1</span>&nbsp;&nbsp;$lang[install_1]</li>
+			<li class="step-normal"><span class="step-num">2</span>&nbsp;&nbsp;$lang[install_2]</li>
+			<!-- <li class="step-on"><span class="step-num_on">3</span>&nbsp;&nbsp;$lang[install_3]</li> -->
+			<li class="step-normal"><span class="step-num">4</span>&nbsp;&nbsp;$lang[install_4]</li>
+			<!-- <li class="step-normal"><span class="step-num">5</span>&nbsp;&nbsp;$lang[install_5]</li> -->
+			<!-- <li class="step-normal"><span class="step-num">4</span>&nbsp;&nbsp;$lang[install_6]</li> -->
+			<li class="step-sec">$lang[install_finish]</li>
+		</ul>
+		<div class="set-faq">
+			$lang[step_problem]
+		</div>
+	</div></div>
+<!--
+EOT;
+}elseif($action == 'view'){print <<<EOT
+-->
+<div class="main fr">
+	<div class="h">$stepmsg
+	<!-- 图片不可删除 -->
+	<img src="$basename?action=initdata&step=2" width="0" height="0" />
+	</div>
+	<div class="m-content" id="log">
+	</div>
+
+		<div class="s-to">
+			<form id="install" action="$basename?" method="post">
+				<input type="hidden" name="action" value="$next">
+			</form>
+			<input type="button" class="btn4" value="$lang[step_pre]" title="$stepleft" onClick='window.location.href="javascript:history.go(-1)";'>
+			<input type="button" class="btn2" title="$stepright" value="$lang[step_next]" id="finish" style="cursor:pointer;display:none;" onClick="document.getElementById('install').submit();" />
+		</div>
+
+      </div>
+
+
+	<div class="st-sidebar fl link3">
+		<ul class="step">
+			<li class="step-normal"><span class="step-num">1</span>&nbsp;&nbsp;$lang[install_1]</li>
+			<li class="step-normal"><span class="step-num">2</span>&nbsp;&nbsp;$lang[install_2]</li>
+			<!-- <li class="step-normal"><span class="step-num">3</span>&nbsp;&nbsp;$lang[install_3]</li> -->
+			<li class="step-on"><span class="step-num_on">3</span>&nbsp;&nbsp;$lang[install_4]</li>
+			<!-- <li class="step-normal"><span class="step-num">5</span>&nbsp;&nbsp;$lang[install_5]</li> -->
+			<!-- <li class="step-normal"><span class="step-num">4</span>&nbsp;&nbsp;$lang[install_6]</li> -->
+			<li class="step-sec">$lang[install_finish]</li>
+		</ul>
+		<div class="set-faq">
+			$lang[step_problem]
+		</div>
+	</div></div>
+<script language="JavaScript">
+var log = "$log";
+var n = 0;
+var timer = 0;
+log = log.split('<wind>');
+setIntervals();
+function GoPlay(){
+	if (n > log.length-1) {
+		n=-1;
+		clearIntervals();
+	}
+	if (n > -1) {
+		postcheck(n);
+		n++;
+	}
+}
+function postcheck(n){
+	document.getElementById('log').innerHTML += log[n] + '<br /><a name="last"></a>';
+	document.getElementById('log').scrollTop = document.getElementById('log').scrollHeight;
+}
+function setIntervals(){
+	timer = setInterval('GoPlay()',50);
+}
+function clearIntervals(){
+	clearInterval(timer);
+	document.getElementById('finish').style.display = '';
+}
+</script>
+<!--
+EOT;
+}elseif($action == 'mode'){print <<<EOT
+-->
+<div class="main fr">
+	<div class="h">$stepmsg</div>
+	<div class="m-content">
+		<form id="install" action="$basename?" method="post">
+		<input type="hidden" name="step" value="2">
+		<input type="hidden" name="action" value="$action">
+
+		  <table  style="text-align:left; line-height:26px;" style=" position:relative; top:40px; left:200px; font-weight:bold; font-size:14px;">
+			<tr>
+			  <td width="130px" style="font-weight:normal;">模式名称</td>
+			  <td style="font-weight:normal;">选择默认</td>
+			</tr>
+			<tr>
+			  <td>论坛模式</td>
+			  <td><input type="radio" name="db_mode" value="" checked/></td>
+			</tr>
+			<tr>
+			  <td>门户模式</td>
+			  <td><input type="radio" name="db_mode" value="area" /></td>
+			</tr>
+			<tr>
+			  <td>个人中心</td>
+			  <td><input type="radio" name="db_mode" value="o" /></td>
+			</tr>
+		  </table>
+		</form>
+	</div>
+
+	<div class="s-to">
+		<input type="button" class="btn4" value="$lang[step_pre]" title="$stepleft" onClick='window.location.href="javascript:history.go(-1)";'>
+		<input type="button" class="btn2" title="$stepright" value="$lang[step_next]" onClick="document.getElementById('install').submit();" />
+	</div>
+  </div>
+
+
+	<div class="st-sidebar fl link3">
+		<ul class="step">
+			<li class="step-normal"><span class="step-num">1</span>&nbsp;&nbsp;$lang[install_1]</li>
+			<li class="step-normal"><span class="step-num">2</span>&nbsp;&nbsp;$lang[install_2]</li>
+			<!-- <li class="step-normal"><span class="step-num">3</span>&nbsp;&nbsp;$lang[install_3]</li> -->
+			<li class="step-normal"><span class="step-num">4</span>&nbsp;&nbsp;$lang[install_4]</li>
+			<!-- <li class="step-on"><span class="step-num_on">5</span>&nbsp;&nbsp;$lang[install_5]</li> -->
+			<!-- <li class="step-normal"><span class="step-num">4</span>&nbsp;&nbsp;$lang[install_6]</li> -->
+			<li class="step-sec">$lang[install_finish]</li>
+		</ul>
+		<div class="set-faq">
+			$lang[step_problem]
+		</div>
+	</div></div>
+<!--
+EOT;
+}elseif($action == 'resources'){print <<<EOT
+-->
+<div class="main fr">
+	<div class="h">$stepmsg</div>
+
+	<div class="m-content">
+		<div class="sp-lineheight">$log_resources</div>
+	</div>
+
+		<div class="s-to">
+			<form id="install" action="$basename?" method="post">
+				 <input type="hidden" name="action" value="finish">
+			</form>
+			<input type="button" class="btn4" value="完成"  onClick="document.getElementById('install').submit();">
+			<!-- <input type="button" class="btn2" title="$stepleft" value="$stepleft" onClick="javascript:window.location.href='$basename?step=6'" /> -->
+			<input type="button" class="btn2" value="添加体验数据并完成安装" onClick="javascript:window.location.href='$basename?action=testdata'" />
+		</div>
+      </div>
+
+
+	<div class="st-sidebar fl link3">
+		<ul class="step">
+			<li class="step-normal"><span class="step-num">1</span>&nbsp;&nbsp;$lang[install_1]</li>
+			<li class="step-normal"><span class="step-num">2</span>&nbsp;&nbsp;$lang[install_2]</li>
+			<!-- <li class="step-normal"><span class="step-num">3</span>&nbsp;&nbsp;$lang[install_3]</li> -->
+			<li class="step-normal"><span class="step-num">3</span>&nbsp;&nbsp;$lang[install_4]</li>
+			<!-- <li class="step-normal"><span class="step-num">5</span>&nbsp;&nbsp;$lang[install_5]</li> -->
+			<!-- <li class="step-on"><span class="step-num_on">4</span>&nbsp;&nbsp;$lang[install_6]</li> -->
+			<li class="step-sec">$lang[install_finish]</li>
+		</ul>
+		<div class="set-faq">
+			$lang[step_problem]
+		</div>
+	</div></div>
+<!--
+EOT;
+}elseif($action == 'app'){print <<<EOT
+-->
+	<div class="s-main fr">
+      <div class="s-h">$lang[forumsmsg]</div>
+      <div class="c-content">
+		  <form id="install" action="$basename?" method="post">
+		  <input type="hidden" name="step" value="app">
+		  <table class="dlA">
+<!--
+EOT;
+if($mysqlimsg){print <<<EOT
+-->
+			<tr>
+			  <td colspan="2"><strong>$mysqlimsg</strong></td>
+			</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+			<tr>
+			  <td><strong>$lang[forums1]</strong></td>
+			  <td><input type="text" name="forums1" value="phpwind board" class="inputA" /></td>
+			</tr>
+			<tbody id="FTable">
+				<tr>
+					<td style="padding-left:2em">
+						<a href="javascript:void(0)" onclick="addRecord('addforum','FTable')">+</a>
+						<a href="javascript:void(0)" onclick="delRecord('addforum','FTable',this)">-</a>
+						$lang[app_1]
+					</td>
+					<td style="padding-left:2em"><input class="inputA" type="text" name="forums2[name][]" value="$lang[default_forum]" />
+					<td style="padding-left:2em">$lang[app_2]
+						<select name="forums2[cid][]">
+							<option value=""></option>
+<!--
+EOT;
+foreach($backdatadb as $val){
+if($val[cup]){
+print<<<EOT
+-->
+							<option value="$val[cid]">$val[name]</option>
+<!--
+EOT;
+}}print<<<EOT
+-->
+						</select>
+					</td>
+					<td style="padding-left:2em">$lang[app_3] <input class="inputA" type="text" size="5" name="forums2[nums][]" />
+					</td>
+				</tr>
+				<tr id="addforum" style="display:none">
+					<td style="padding-left:2em">
+						<a href="javascript:void(0)" onclick="addRecord('addforum','FTable')">+</a>
+						<a href="javascript:void(0)" onclick="delRecord('addforum','FTable',this)">-</a>
+						$lang[app_1]
+					</td>
+					<td style="padding-left:2em"><input class="inputA" type="text" name="forums2[name][]" value="" />
+					</td>
+					<td style="padding-left:2em">$lang[app_2]
+						<select name="forums2[cid][]">
+							<option value=""></option>
+<!--
+EOT;
+foreach($backdatadb as $val){
+if($val[cup]){print<<<EOT
+-->
+							<option value="$val[cid]">$val[name]</option>
+<!--
+EOT;
+}}print<<<EOT
+-->
+						</select>
+					</td>
+					<td style="padding-left:2em">$lang[app_3] <input class="inputA" type="text" size="5" name="forums2[nums][]" />
+					</td>
+				</tr>
+			</tbody>
+			<tr>
+			  <td><strong>$lang[forums3]</strong></td>
+			  <td><input type="text" name="forums3" value="" class="inputA" /></td>
+			</tr>
+			<tbody id="FTable2">
+				<tr>
+					<td style="padding-left:2em">
+						<a href="javascript:void(0)" onclick="addRecord('addforum2','FTable2')">+</a>
+						<a href="javascript:void(0)" onclick="delRecord('addforum2','FTable2',this)">-</a>
+						$lang[app_1]
+					</td>
+					<td style="padding-left:2em"><input class="inputA" type="text" name="forums4[name][]" value="" />
+					</td>
+					<td style="padding-left:2em">$lang[app_2]
+						<select name="forums4[cid][]">
+							<option value=""></option>
+<!--
+EOT;
+foreach($backdatadb as $val){
+if($val[cup]){print<<<EOT
+-->
+							<option value="$val[cid]">$val[name]</option>
+<!--
+EOT;
+}}print<<<EOT
+-->
+						</select>
+					</td>
+					<td style="padding-left:2em">$lang[app_3] <input class="inputA" type="text" size="5" name="forums4[nums][]" />
+					</td>
+				</tr>
+				<tr id="addforum2" style="display:none">
+					<td style="padding-left:2em">
+						<a href="javascript:void(0)" onclick="addRecord('addforum2','FTable2')">+</a>
+						<a href="javascript:void(0)" onclick="delRecord('addforum2','FTable2',this)">-</a>
+						$lang[app_1]
+					</td>
+					<td style="padding-left:2em"><input class="inputA" type="text" name="forums4[name][]" value="" />
+					</td>
+					<td style="padding-left:2em">$lang[app_2]
+						<select name="forums4[cid][]">
+							<option value=""></option>
+<!--
+EOT;
+foreach($backdatadb as $val){
+if($val[cup]){print<<<EOT
+-->
+							<option value="$val[cid]">$val[name]</option>
+<!--
+EOT;
+}}print<<<EOT
+-->
+						</select>
+					</td>
+					<td style="padding-left:2em">$lang[app_3] <input class="inputA" type="text" size="5" name="forums4[nums][]" />
+					</td>
+				</tr>
+			</tbody>
+		  </table>
+		  </form>
+			<table class="dlA">
+				<tr>
+					<td colspan="2">$lang[app_4]</td>
+				</tr>
+				<tr>
+					<td colspan="2" class="s-pa">$lang[app_5]</td>
+				</tr>
+			</table>
+      </div>
+	  <div class="s-to">
+		<input type="button" class="btn4" value="$stepleft" title="$stepleft" onClick="javascript:window.location.href='$basename?step=finish&app=1'">
+		<input type="button" class="btn2" title="$stepright" value="$stepright" onClick="postcheck();" />
+	  </div>
+    </div>
+    <div class="c"></div>
+
+	</div>
+  </div></div>
+<script language="JavaScript">
+function getObj(id) {
+	return document.getElementById(id);
+}
+function addRecord(s,t) {
+	var l = getObj(t).lastChild;
+	var n = getObj(s).cloneNode(true);
+	n.style.display = '';
+	n.id = '';
+	getObj(t).insertBefore(n,l);
+}
+function delRecord(s,t,o) {
+	getObj(t).removeChild(o.parentNode.parentNode);
+	if (getObj(t).getElementsByTagName('TR').length<=1)addRecord(s,t);
+}
+function postcheck(){
+	var obj = document.getElementById('install');
+	if (!obj.forums1.value) {
+		alert('$lang[error_forums1]');
+		return false;
+	}
+	obj.submit();
+}
+</script>
+<!--
+EOT;
+}elseif($action == 'finish'){print <<<EOT
+-->
+<div class="main fr">
+	<div class="h">$stepmsg</div>
+
+	<div class="m-content">
+		<div class="finish">
+		<h4><span class="fr h4-zy fi">$lang[success_install]</span>
+		<p class="fr fi fi-2 ">$lang[link_index]： <a href="index.php" target="_blank">$bbsurl/index.php</a></p>
+		<p class="fr fi fi-2">$lang[link_admin]： <a href="admin.php" target="_blank">$bbsurl/admin.php</a></p>
+		<p class="fr fi fi-2">$lang[link_phpwind]： <a href="http://www.phpwind.net" target="_blank">http://www.phpwind.net</a></p>
+		<span class="fl"><img src="lang/images/wc.gif" align="top" class="fi-img"/> </span></h4>
+		</div>
+	</div>
+
+	<center>
+		 <input type="button" class="btn2" value="$lang[finish_exit]" onClick="closewindows();"/>
+		 <img src="http://nt.phpwind.net/src/install_stats.php?url=$bbsurl&version=$wind_version&type=bbs&charsets=$lang[db_charset]&c=$ceversion&from=$wind_from" width="0" height="0">
+	</center>
+      </div>
+
+
+	<div class="st-sidebar fl link3">
+		<ul class="step">
+			<li class="step-normal"><span class="step-num">1</span>&nbsp;&nbsp;$lang[install_1]</li>
+			<li class="step-normal"><span class="step-num">2</span>&nbsp;&nbsp;$lang[install_2]</li>
+			<!-- <li class="step-normal"><span class="step-num">3</span>&nbsp;&nbsp;$lang[install_3]</li> -->
+			<li class="step-normal"><span class="step-num">3</span>&nbsp;&nbsp;$lang[install_4]</li>
+			<!-- <li class="step-normal"><span class="step-num">5</span>&nbsp;&nbsp;$lang[install_5]</li> -->
+			<!-- <li class="step-normal"><span class="step-num">4</span>&nbsp;&nbsp;$lang[install_6]</li> -->
+			<li class="step-sec-on">$lang[install_finish]</li>
+		</ul>
+		<div class="set-faq">
+			$lang[step_problem]
+		</div>
+	</div></div>
+<script language="JavaScript">
+function closewindows(){
+	var agt = navigator.userAgent.toLowerCase();
+	var is_ie = ((agt.indexOf("msie") != -1) && (agt.indexOf("opera") == -1));
+	if (is_ie) {
+		var ieversion = parseFloat(agt.substring(agt.indexOf("msie")+5,agt.indexOf(';',agt.indexOf("msie"))));
+		if (ieversion < 5.5) {
+			var str  = '<object id="notipclose" classid="clsid:adb880a6-d8ff-11cf-9377-00aa003b7a11"><param name="command" value="close"></object>';
+			document.body.insertadjacenthtml(beforeend,str);
+			document.all.notipclose.click();
+		} else {
+			window.opener = null;
+			window.close();
+		}
+	} else {
+		window.close();
+	}
+}
+</script>
+<!--
+EOT;
+}}?>-->

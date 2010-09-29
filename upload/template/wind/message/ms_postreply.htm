@@ -1,0 +1,84 @@
+<!--<?php
+list($face) = showfacedesign($winddb['icon'],1,'m');
+print <<<EOT
+-->
+<div class="c mb10"></div>
+<div id="showmessage"></div>
+<form action="$baseUrl?&type=ajax&action=postReply" name="REPLY" method="post"  onsubmit="return MC.sendPostReply('',document.REPLY)">
+<table width="100%" style="table-layout:fixed;">
+	<tr class="tr3 vt">
+    	<td class="face" style="vertical-align:top;"><a class="img_50" href="u.php?uid=$winduid"><i><img width="48" height="48" src="{$face}"></i></a></td>
+        <td>
+        	<div class="p_lr_10">
+            <div class="replyEditor mb10">
+                <ul>
+                    <li><a href="javascript:;" id="td_face" onclick="return simpleEmotion();" class="sk_show">表情</a></li>
+                </ul>
+                <input type="hidden" id="rid" name="rid" value="{$message[rid]}"/>
+                <input type="hidden" id="parentMid" name="parentMid" value="{$message[mid]}"/>
+                <div class="textarea"><textarea id="textarea" name="atc_content"></textarea></div>
+                <div class="c"></div>
+            </div>
+<!--
+EOT;
+if($db_gdcheck & 8){
+print <<<EOT
+-->            
+			<div class="mb10">
+	          	<input class="input" type="text" name="gdcode" id="gdinput" size="5" onfocus="try{opencode('menu_gd',this)}catch(e){}" /><span class="mr5 cp" onclick="this.previousSibling.focus();">&nbsp;点此显示验证码</span>
+				<div class="menu" id="menu_gd" style="display:none;"><img src="ck.php?" align="absmiddle" style="cursor:pointer;" id="ckcode" alt="看不清楚，换一张" /></div>
+			</div>
+<!--
+EOT;
+}
+print <<<EOT
+-->              
+            <span class="btn" style="margin:0;"><span><button type="button" onclick="return MC.sendPostReply('$baseUrl?&type=ajax&action=postReply',document.REPLY)">发送</button></span></span>
+            </div>
+		</td>
+	</tr>
+</table>
+</form>
+<div style="display: none;" id="autosave"></div>
+<div style="display: none;" class="wy_menu" id="menu_face"></div>
+<script type="text/javascript" src="js/wind_c_editor.js"></script>
+<script type="text/javascript" src="js/post.js"></script>
+<script type="text/javascript" src="data/bbscache/face.js"></script>
+<script type="text/javascript">
+var charset='gbk';
+var editor = null;
+var bbsurl = '$db_bbsurl';
+function WysiwygConfig() {
+	this.baseURL = document.baseURI || document.URL;
+	if (this.baseURL && this.baseURL.match(/(.*)\/([^\/]?)/)) {
+		this.baseURL = RegExp.$1 + "/";
+	}
+	this.imgURL = imgpath + "/post/c_editor/";
+
+	this.btnList = {
+		media: [ true, rming, false ],
+		quote: [ true, code, false ],
+		code: [ true, code, false ],
+		post: [ true, code, false ],
+		sell: [true, sell, false ],
+		pwcode: [true, extend , false ],
+		setform: [true, extend , false ]
+	};
+};
+window.onReady(function(){
+	editor = new WYSIWYD();
+	editor.config = new WysiwygConfig();
+	editor.init('wysiwyg',0);
+})
+function simpleEmotion(){   
+  var rect = getObj('td_face').getBoundingClientRect();  
+  showEmotion(); 
+  var pw_box = getObj('pw_box');
+  pw_box.style.left = rect.left+'px';
+  pw_box.style.top = rect.top + ietruebody().scrollTop - 240 + 'px';	    
+  return false;
+}
+</script>
+<!--
+EOT;
+?>-->

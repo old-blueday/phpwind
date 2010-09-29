@@ -1,0 +1,506 @@
+<!--<?php
+print <<<EOT
+-->
+<div id="breadCrumb" class="cc">$msg_guide</div>
+<div id="pw_content">
+<!--
+EOT;
+$tmpStyle = $_COOKIE['toggle']!=='0' ? 'f_tree cc' : 'f_tree cc sideClose';print <<<EOT
+-->
+	<div id="sidebar" class="$tmpStyle">
+<!--
+EOT;
+$db_threadsidebarifopen && require_once(PrintEot('thread_side'));
+print <<<EOT
+-->
+        <div class="content_thread cc">
+            <div class="content_ie">
+<!--
+EOT;
+require_once PrintEot('thread_group');
+$check = (GetCookie('iftongbu') == 1) ? ' checked' : '';
+print <<<EOT
+-->
+<div class="g_navB gray">
+	<a href="{$basename}" $basic id="set_default">基本信息</a>
+	| <a href="{$basename}&t=privacy" $privacy id="set_privacy">隐私设置</a>
+<!--
+EOT;
+if ($windid == $colony['admin'] && $groupRight['allowmerge']) {print <<<EOT
+-->
+	| <a href="{$basename}&t=merge" $merge id="set_merge">合并群组</a>
+<!--
+EOT;
+}if ($windid == $colony['admin'] && $groupRight['allowattorn']) {print <<<EOT
+-->
+	| <a href="{$basename}&t=attorn" $attorn id="set_attorn">转让群组</a>
+<!--
+EOT;
+}if ($windid == $colony['admin'] && $groupRight['allowdisband']) {print <<<EOT
+-->
+	| <a href="{$basename}&t=disband" $disband id="set_disband">解散群组</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+</div>
+<!--
+EOT;
+if (empty($t)) {print <<<EOT
+-->
+<style type="text/css">
+	@import url($imgpath/post/minieitor/minieitor.css);
+</style>
+<script type="text/javascript" language="JavaScript" src="js/color_picker.js"></script>
+<script type="text/javascript" language="JavaScript" src="js/mini_editor.js"></script>
+<script type="text/javascript">
+function pickReback(color){
+	getObj('color_show').style.backgroundColor = color;
+}
+function styleOnclick(e,obj){
+	var objclass = e.className;
+	var temp = objclass.split(' ');
+	var newclass = '';
+	for (var n=0; n<temp.length; n++){
+		if (temp[n]=='one') {
+			continue;
+		}
+		newclass += ' ' + temp[n];
+	}
+	if (objclass.match(/one/)) {
+		e.className = newclass;
+		getObj(obj).value = '';
+	} else {
+		e.className = newclass + ' one';
+		getObj(obj).value = 1;
+	}
+}
+function colorCancel(){
+	getObj('color_show').style.backgroundColor='#FFFFFF';
+	getObj('title1').value='';
+}
+</script>
+<div id="id1" class="setpd">
+	<form action="{$basename}" enctype="multipart/form-data" method="post" name="FORM">
+	<input type="hidden" name="step" value="3" />
+	<input type="hidden" name="cyid" value="$cyid" />
+	<p class="g_hD mb15">基本信息</p>
+    <table width="90%" class="setTable vt">
+        <tr>
+            <th class="th">群组名称&nbsp;<span class="s1">*</span></th>
+            <td class="td">
+				<input type="text" class="input fl mr10 mb5" name="cname" id="cname" value="$colony[cname]" size="35" />
+				<div class="pwnew tac fl">
+					<span><a onclick="styleOnclick(this,'title2')" class="$stylename[1]">加粗</a></span>
+					<span><a onclick="styleOnclick(this,'title3')" class="$stylename[2]">斜体</a></span>
+					<span><a onclick="styleOnclick(this,'title4')" class="$stylename[3]">下划线</a></span>
+					<span id="color_show" style="background:$titlecolor;cursor:pointer;" title="点击取消颜色" onclick="colorCancel()"></span>
+					<span title="颜色选择"><a class="two tal" onclick="showColorPicker(this,document.FORM.title1,function(){pickReback(color_picker)})"><img src="$imgpath/pickcolor.gif"  /></a></span>
+					<input id="title1" name="title1" type="hidden" value="$titlecolor" />
+					<input id="title2" name="title2" type="hidden" value="{$titledetail[1]}" />
+					<input id="title3" name="title3" type="hidden" value="{$titledetail[2]}" />
+					<input id="title4" name="title4" type="hidden" value="{$titledetail[3]}" />
+				</div>
+				<div class="c"></div>
+				<span id="cname_warn" class="gray">限 20 字节</span>
+            </td>
+        </tr>
+        <tr>
+            <th class="th">群组简介</th>
+            <td class="td">
+            	<div style="width:340px;" class="fl mr10">
+                    <div class="minieitor_pw cc">
+                        <ul class="miniUl">
+                            <li><a href="javascript:" title="插入url链接" class="milink_pw" onClick="editor.createLinkBox(this.id);" id="createlinkid" unselectable="on">插入url链接</a></li>
+                            <li><a href="javascript:" title="字体加粗" class="mistrong_pw" onClick="editor.bold();" id="createb2" unselectable="on">字体加粗</a></li>
+                            <li><a href="javascript:" title="加颜色" class="micolor_pw" onClick="editor.createcolor(this.id);" id="createcolorid" unselectable="on">加颜色</a></li>
+                        </ul>
+                        <div class="minitextarea">
+                            <textarea maxlength="200" id="mini_descrip" name="descrip">{$colony[descrip]}</textarea><input type="hidden" id="board_uid" value="$u">
+                            <script type="text/javascript">var editor = new MiniEditor('mini_descrip');</script>
+                        <div class="c"></div>
+                        </div>
+                        <div class="c"></div>
+                    </div>
+                </div>
+                <span class="gray">限255字节</span>
+            </td>
+        </tr>
+        <tr>
+            <th class="th">群组公告</th>
+            <td class="td">
+            	<div style="width:340px;" class="fl mr10">
+                    <div class="minieitor_pw cc">
+                        <ul class="miniUl">
+                            <li><a href="javascript:" title="插入url链接" class="milink_pw" onClick="editor2.createLinkBox(this.id);" id="createlinkid2" unselectable="on">插入url链接</a></li>
+                            <li><a href="javascript:" title="字体加粗" class="mistrong_pw" onClick="editor2.bold();" unselectable="on">字体加粗</a></li>
+                            <li><a href="javascript:" title="加颜色" class="micolor_pw" onClick="editor2.createcolor(this.id);" unselectable="on" id="createcolorid2">加颜色</a></li>
+                        </ul>
+                        <div class="minitextarea">
+                            <textarea  maxlength="200" id="editor_annouce" name="annouce">{$colony[annouce]}</textarea><input type="hidden" id="board_uid" value="$u">
+                            <script type="text/javascript">var editor2 = new MiniEditor('editor_annouce');</script>
+                        <div class="c"></div>
+                        </div>
+                        <div class="c"></div>
+                    </div>
+                </div>
+                <span class="gray">限50000字节</span>
+            </td>
+        </tr>
+       <tr>
+            <th class="th">群组分类&nbsp;<span class="s1">*</span></th>
+			<td class="td">
+				<select name="firstgradestyle" id="firstgradestyle" onchange="setSecondstyle(this.value);">
+				<option value="">不分类</option>
+<!--
+EOT;
+foreach ($o_style_relation as $key => $value){print<<<EOT
+-->
+				<option value="$key">{$o_styledb[$key]['cname']}</option>
+<!--
+EOT;
+}print<<<EOT
+-->
+			  </select>
+			  <select name="secondgradestyle" id="secondgradestyle" style="display:none"></select>
+            </td>
+        </tr>
+        <tr>
+            <th class="th">群组图标</th>
+            <td class="td"><input type="hidden" name="q_1" id="q_1" value="" />
+            	<img width="48px" height="48px" style="filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod=image);" id="preview_1" src="$colony[cnimg]" class="fr" />
+				<p class="mb5"><input type="file" class="input mr10" id="p_1" name="cnimg_1" accept="image/*" onchange="preview_img(1);" /><a href="javascript:void(0);" onclick="show_image('1','images/g/groupnopic.gif');" >使用默认图片</a></p>
+                <p class="gray">推荐尺寸120px*120px，</span><a href="javascript:;" class="help_a"><span class="gray cp">可上传类型</span><i>
+<!--
+EOT;
+foreach($cnimg_1 as $key => $value){print<<<EOT
+-->
+<span class="w fl mr10">{$key}:{$value}KB;</span>
+<!--
+EOT;
+}print<<<EOT
+--></i></a></p>
+            </td>
+        </tr>
+        <tr style="display:none">
+            <th class="th">群组背景</th>
+            <td class="td"><input type="hidden" name="q_2" id="q_2" value="" />
+				<p class="mb5"><input type="file" class="input mr10" id="p_2" name="cnimg_2" accept="image/*" onchange="preview_img(2);" /><a href="javascript:void(0);" onclick="show_image('2','images/g/skin_default/preview.jpg');">使用默认背景</a></p>
+                <p class="mb5"><a href="javascript:;" class="help_a"><span class="gray cp">可上传类型</span><i class="cc">
+<!--
+EOT;
+foreach($cnimg_2 as $key => $value){print<<<EOT
+-->
+<span class="w fl mr10">{$key}:{$value}KB;</span>
+<!--
+EOT;
+}print<<<EOT
+--></i></a></p>
+                <img width="355px" height="75px" style="filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod=image);" id="preview_2" src="{$set_banner}" />
+            </td>
+        </tr>
+        <tr>
+            <th class="th">&nbsp;</th>
+            <td class="td"><span class="btn"><span><button type="submit">保存设置</button></span></span></td>
+        </tr>
+    </table>
+	</form>
+</div>
+<script language="JavaScript">
+var charset = '$db_charset';
+initCheckTextNum('cname','cname_warn',20);
+initCheckTextNum('annouce','annouce_warn',500);
+initCheckTextNum('descrip','descrip_warn',255);
+
+function show_image(id,pic_url) {
+	getObj('q_' + id).value = 1;
+	getObj("preview_" + id).src = pic_url;
+}
+
+function preview_img(id) {
+	var photype = getObj('p_'+id);
+	var patn = /\.jpg$|\.jpeg$|\.png|\.bmp|\.gif$/i;
+	if (patn.test(photype.value)) {
+		getObj('q_' + id).value = '';
+		var Preview = getObj('preview_'+id);
+		if (is_gecko) {
+			Preview.src = photype.files[0].getAsDataURL();
+		} else if (is_ie) {
+			try {
+				Preview.filters.item("DXImageTransform.Microsoft.AlphaImageLoader").src = photype.value;
+				Preview.filters.item("DXImageTransform.Microsoft.AlphaImageLoader").sizingMethod = 'scale';
+			} catch(e){}
+		}
+	} else {
+		showDialog('error','您选择的似乎不是图像文件。',2);
+	}
+}
+
+function setSecondstyle(id) {
+	var jsStyle = JSONParse('$jsStyle');
+	var jsStyleRelation = JSONParse('$jsStyleRelation');
+
+	if (typeof jsStyle[id] == 'undefined') {
+		getObj('secondgradestyle').style.display = 'none';
+	} else {
+		if (jsStyle[id]['upid'] == '0') {
+			if (jsStyleRelation[id].length == 0) {
+				getObj('secondgradestyle').style.display = 'none';
+			} else {
+				getObj('secondgradestyle').style.display = '';
+				getObj('secondgradestyle').length = 0;
+				for (var i = 0; i < jsStyleRelation[id].length; i++) {
+					getObj('secondgradestyle').options.add(new Option(jsStyle[jsStyleRelation[id][i]]['cname'], jsStyleRelation[id][i]));
+				}
+			}
+			getObj('firstgradestyle').value = id;
+		} else {
+			var parentId = jsStyle[id]['upid'];
+			getObj('firstgradestyle').value = parentId;
+			getObj('secondgradestyle').style.display = '';
+			getObj('secondgradestyle').length = 0;
+			for (var i = 0; i < jsStyleRelation[parentId].length; i++) {
+				getObj('secondgradestyle').options.add(new Option(jsStyle[jsStyleRelation[parentId][i]]['cname'], jsStyleRelation[parentId][i]));
+			}
+			getObj('secondgradestyle').value = id;
+		}
+	}
+}
+setSecondstyle('{$colony[styleid]}');
+</script>
+<!--
+EOT;
+} elseif ($t == 'style') {print <<<EOT
+-->
+<div id="id4">
+    <div class="setpd">
+        <p class="g_hD mb15">选择你喜欢的主题</p>
+        <div id="successinfo" style="color:red;display:none;">主题设置成功</div>
+        <form id="set_option" action="apps.php?q=group&a=set&cyid=$cyid" method="post" name="set_option">
+        <input type="hidden" name="step" value="4" />
+        <input type="hidden" name="t" value="$t" />
+        <table width="100%" class="setTable vt">
+<!--
+EOT;
+foreach ($names as $k => $v) {
+$checked = $colony['colonystyle'] == $k ? ' checked' : '';
+print <<<EOT
+-->
+            <tr>
+                <td class="td"><label for="{$k}"><input id="{$k}" type="radio" name="colonystyle" value="{$k}" align="absmiddle" onclick='change(this.value);' {$checked}/>
+                <img src="images/g/$k/preview.jpg" style="vertical-align:middle;" width="400" class="mr20" /><span class="f14 b" align="absmiddle;">{$v}</span></label></td>
+            </tr>
+<!--
+EOT;
+}print<<<EOT
+-->
+            <tr>
+                <td class="td" style="padding-left:110px;"><span class="btn"><span><button type="submit" name="ajaxsubmit">保存设置</button></span></span></td>
+            </tr>
+        </table>
+        </form>
+    </div>
+</div>
+<script type="text/javascript">
+function change(style) {
+	if (style == "default") {
+		style = "default";
+	}
+	document.getElementById('change2').href="images/g/"+style+"/style.css";
+	document.getElementById('banner_class').style.background='';
+}
+</script>
+<!--
+EOT;
+} elseif ($t == 'privacy') {print <<<EOT
+-->
+<div id="id2" class="setpd">
+    <form action="{$basename}" enctype="multipart/form-data" method="post">
+    <input type="hidden" name="step" value="3" />
+    <input type="hidden" name="cyid" value="$cyid" />
+    <input type="hidden" name="t" value="$t" />
+    <p class="g_hD mb10">隐私设置</p>
+    <table width="100%" class="setTable">
+        <tr>
+            <th class="th">加入权限</th>
+            <td class="td">
+                <select name="ifcheck">
+                    <option value="2" $ifcheck_2>允许任何人加入该群组</option>
+                    <option value="1" $ifcheck_1>需要管理员审核才能加入该群组</option>
+                    <option type="radio" value="0" $ifcheck_0> 不允许任何人加入该群组</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <th class="th">话题浏览权限</th>
+            <td class="td">
+                <label for="ifopen1" class="mr20"><input name="ifopen" id="ifopen1" type="radio" value="1" $ifopen_Y /> 任何人</label>
+                <label for="ifopen0"><input name="ifopen" id="ifopen0" type="radio" value="0" $ifopen_N /> 仅群组成员</label>
+            </td>
+        </tr>
+        <tr>
+            <th class="th">记录浏览权限</th>
+            <td class="td">
+                <label for="ifwriteopen1" class="mr20"><input id="ifwriteopen1" name="ifwriteopen" type="radio" value="1" $ifwriteopen_Y /> 任何人</label>
+                <label for="ifwriteopen0"><input id="ifwriteopen0" name="ifwriteopen" type="radio" value="0" $ifwriteopen_N /> 仅群组成员</label>
+            </td>
+        </tr>
+        <tr>
+            <th class="th">成员浏览权限</th>
+            <td class="td">
+                <label for="ifmemberopen1" class="mr20"><input id="ifmemberopen1" name="ifmemberopen" type="radio" value="1" $ifmemberopen_Y /> 任何人</label>
+                <label for="ifmemberopen0"><input id="ifmemberopen0" name="ifmemberopen" type="radio" value="0" $ifmemberopen_N /> 仅群组成员</label>
+            </td>
+        </tr>
+        <tr>
+            <th class="th">公告浏览权限</th>
+            <td class="td">
+                <label for="ifannouceopen1" class="mr20"><input id="ifannouceopen1" name="ifannouceopen" type="radio" value="1" $ifannouceopen_Y /> 任何人</label>
+                <label for="ifannouceopen0" class="mr20"><input id="ifannouceopen0" name="ifannouceopen" type="radio" value="0" $ifannouceopen_N /> 仅群组成员</label>
+            </td>
+        </tr>
+        <tr>
+            <th class="th">&nbsp;</th>
+            <td class="td"><span class="btn"><span><button type="submit">保存设置</button></span></span></td>
+        </tr>
+    </table>
+    </form>
+</div>
+<!--
+EOT;
+} elseif ($t == 'merge') {print <<<EOT
+-->
+	<div class="setpd">
+		<form action="{$basename}" method="post">
+		<input type="hidden" name="step" value="3" />
+		<input type="hidden" name="cyid" value="$cyid" />
+		<input type="hidden" name="t" value="$t" />
+		<p class="mt10 f14 b g_hD">合并群组</p>
+		<div class="g_hD_box p10 mb10">
+			<p>合并说明：</p>
+			<p class="red">此操作不可撤销请谨慎操作。</p>
+			<p>只允许群积分低的群组并入群积分高的群组。</p>
+		</div>
+        <table width="100%" class="setTable">
+            <tr>
+                <th class="th" style="width:130px;">源群组</th>
+                <td class="td">$colony[cname]</td>
+            </tr>
+            <tr>
+                <th class="th">目标群组</th>
+                <td class="td">
+                    <select name="tocid" class="select_wa">
+<!--
+EOT;
+foreach ($groupList as $key => $value) {
+if ($value['id'] != $cyid) {print <<<EOT
+-->
+					<option value="$value[id]">$value[cname]</option>
+<!--
+EOT;
+}}print <<<EOT
+-->
+					</select>
+                </td>
+            </tr>
+            <tr>
+                <th class="th">请输入登录密码</th>
+                <td class="td">
+                    <input name="password" type="password" class="input input_wa" />
+                </td>
+            </tr>
+            <tr>
+                <th class="th">&nbsp;</th>
+                <td class="td"><span class="btn2"><span><button type="submit">保存设置</button></span></span></td>
+            </tr>
+        </table>
+
+		</form>
+	</div>
+<!--
+EOT;
+} elseif ($t == 'attorn') {print <<<EOT
+-->
+	<div class="setpd">
+		<p class="mt10 f14 b g_hD">转让群组</p>
+		<div class="g_hD_box p10 mb10">
+			<p class="b">接受转让能够资格：</p>
+			<p>具备可再创建新群组的资格。</p>
+			<p>是本群组管理员。</p>
+			<p class="b mt20">温馨提示：</p>
+			<p>群组转让成功后，无法要回，需被接收者主动操作才可以再次转回，请谨慎操作。</p>
+		</div>
+		<div class="c"></div>
+<!--
+EOT;
+if ($groupManager) {print <<<EOT
+-->
+		<form action="$basename" method="post">
+		<input type="hidden" name="step" value="3" />
+		<input type="hidden" name="cyid" value="$cyid" />
+		<input type="hidden" name="t" value="$t" />
+		<table width="100%" class="mb20">
+<!--
+EOT;
+foreach ($groupManager as $key => $value) {print <<<EOT
+-->
+			<tr>
+				<td width="45px"><input name="newmanager" type="radio" value="{$value['uid']}" /></td>
+				<td class="p10" width="70"><a href="javascript:;" class="img_50"><img src="$value[faceurl]" width="48" height="48" /></a></td>
+				<td width="215px"><a href="u.php?uid=$value[uid]" target="_blank">$value[username]</a><p class="s2">管理员</p></td>
+				<!--td  width="210px" class="s6">最后发言：2010-12-12</td-->
+				<td><p><a href="pw_ajax.php?action=msg&touid=$value[uid]" onclick="return ajaxurl(this);">发送短信</a></p><p><a href="pw_ajax.php?action=addfriend&touid=$value[uid]" onclick="return ajaxurl(this);">加为好友</a></p>
+              </td>
+			</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+		</table>
+		<p><span>请输入登录密码</span> <input name="password" type="password" class="input" size="20" /> <span class="btn2"><span><button type="submit">转让群组</button></span></span></p>
+		</form>
+<!--
+EOT;
+} else {print <<<EOT
+-->
+		<div class="g_hD_box p10 mb10">没有找到可以转让的人！</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+	</div>
+<!--
+EOT;
+} elseif ($t == 'disband') {print <<<EOT
+-->
+	<form action="$basename" method="post">
+	<input type="hidden" name="step" value="3" />
+	<input type="hidden" name="cyid" value="$cyid" />
+	<input type="hidden" name="t" value="$t" />
+	<div class="setpd">
+		<p class="mt10 f14 b g_hD">解散群组</p>
+		<div class="g_hD_box p10 mb10">
+			<p class="b">注意：</p>
+			<p>·解散群组是一个不可逆操作，解散群组将解除群组内所有的群友关系，同时删除群组内所有资料</p>
+			<p>·请提前通知群成员备份资料。</p>
+		</div>
+		<div class="c"></div>
+		<div class="mt10">
+			<p class="mt10">请输入登录密码 <input name="password" type="password" class="input" size="20" /> <span class="btn2"><span><button type="submit">解散群组</button></span></span>
+		</div>
+	</div>
+	</form>
+<!--
+EOT;
+}print <<<EOT
+-->
+<SCRIPT LANGUAGE="JavaScript">
+setCurrent('set_{$t}','set_default','current');
+</SCRIPT>
+            </div>
+        </div>
+	</div>
+</div>
+<!--
+EOT;
+?>

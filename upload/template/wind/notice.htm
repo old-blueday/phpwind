@@ -1,0 +1,83 @@
+<!--<?php print <<<EOT
+-->
+<!--
+EOT;
+if(!$db_toolbar && $pwForumList){print <<<EOT
+-->
+<div id="menu_forumlist" style="display:none;">
+	<div class="sbar-box-a" style="width:700px;">
+		<div class="sbar-title" style="cursor:pointer" onclick="try{pw_bottom.hiddenTab();read.close();}catch(e){read.close();}">
+				<span class="adel">隐藏</span>
+				<span id="title_forumlist" class="b">快速浏览</span>
+		</div>
+		<div class="sbar-box-b">
+			<div class="forum-list-popout">
+<!--
+EOT;
+foreach($pwForumList as $key=>$value){print <<<EOT
+-->
+			<dl class="cc">
+				<dt><a href="index.php?cateid=$key">$value[name]</a></dt>
+				<dd class="cc">
+<!--
+EOT;
+foreach($value['child'] as $k=>$v){print <<<EOT
+-->
+					<a href="thread.php?fid=$k" onclick="return pwForumList(true,gIsPost,$k);"><span>$v</span></a><!--
+EOT;
+}print <<<EOT
+-->
+				</dd>
+			</dl>
+<!--
+EOT;
+}print <<<EOT
+-->
+			</div>
+		</div>
+	</div>
+</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+<div id="breadCrumb">
+		$msg_guide<!--
+EOT;
+if($fid=='-1'){print <<<EOT
+-->
+<em>&gt;</em><a href="notice.php">公告</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+</div>
+<div id="pw_content">
+<div class="p15">
+<!--
+EOT;
+foreach($noticedb as $value){print <<<EOT
+-->
+<div class="f_one mb10">
+<table width="100%" cellspacing="0" cellpadding="3">
+<tr>
+<td class="h"><a name="$value[aid]"></a>$value[subject]</td></tr>
+<tr>
+<th class="tal fn" style="padding:15px;">$value[content]</th></tr>
+<tr><td>
+<div class="fr">
+作者：<a href="u.php?username=$value[rawauthor]">$value[author]</a>
+&nbsp;&nbsp;时间：$value[startdate]
+</div>
+</td></tr>
+</table>
+</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+</div>
+</div>
+<!--
+EOT;
+?>-->

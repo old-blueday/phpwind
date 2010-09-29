@@ -1,0 +1,360 @@
+<!--<?php
+include_once PrintEot('left');
+if($admintype == 'invite'){
+print <<<EOT
+-->
+<div class="nav3 mb10">
+    <ul class="cc">
+        <li $nav><a href="$basename">基本设置</a></li>
+        <li $nav[manager]><a href="$basename&action=manager">邀请码管理</a></li>
+    </ul>
+</div>
+<!--
+EOT;
+if(empty($action)){
+print <<<EOT
+-->
+
+<form action="$basename" method="post">
+<input type="hidden" name="step" value="2">
+<h2 class="h1">基本设置</h2>
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+
+	<tr class="tr1 vt">
+		<td class="td1">有效期限[天]</td>
+		<td class="td2"><input type="text" class="input input_wa" name="config[days]" value="$inv_days"></td>
+        <td class="td2"><div class="help_a">设置邀请码有效期限，如果购买有没有在有效期内使用，则失效</div></td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">购买时间间隔[天]</td>
+		<td class="td2"><input type="text" class="input input_wa" name="config[limitdays]" value="$inv_limitdays"></td>
+        <td class="td2"><div class="help_a">购买一次邀请码后，需要相隔多久才可以再次购买,如果设置为0,则不限制</div></td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">消耗积分</td>
+		<td class="td2"><input type="text" class="input input_wa" name="config[costs]" value="$inv_costs"></td>
+        <td class="td2"><div class="help_a">购买一个邀请码需要消耗的积分数值</div></td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">积分类型</td>
+		<td class="td2">
+        	<select name="config[credit]" class="select_wa">
+<!--
+EOT;
+foreach($credit->cType as $key => $value){
+$selected = $key == $inv_credit ? 'selected' : '';
+print <<<EOT
+-->
+                <option value="$key" $selected>$value</option>
+<!--
+EOT;
+}print <<<EOT
+-->
+			</select>
+		</td>
+        <td class="td2"><div class="help_a">指定购买邀请码的积分类型</div></td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">允许购买的用户组</td>
+		<td class="td2"><ul class="list_A list_120">$usergroup</ul></td>
+        <td class="td2"><div class="help_a">设置允许哪些用户组购买邀请码</div></td>
+	</tr>
+    <tr class="tr1 vt">
+		<td class="td1">发送邀请码邮件内容</td>
+		<td class="td2">
+			
+<!-- 
+EOT;
+	if(empty($inv_email)){
+		print <<<EOT
+-->
+<textarea class="textarea" name="config[email]">
+嗨！我是\$username，\$sitename是一个非常不错的网站，推荐你注册，下面是注册邀请码：
+\$invitecode
+
+你也可以通过下面的链接进入我的个人空间
+http://test.phpwind.com/u.php?uid=\$uid
+</textarea>
+<!--
+EOT;
+	}else{
+		print <<<EOT
+-->
+<textarea class="textarea" name="config[email]">
+$inv_email
+</textarea>
+<!-- 
+EOT;
+}
+print <<<EOT
+-->
+			</td>
+        <td class="td2"><div class="help_a">设置通过邮箱发送邀请链接的默认邮件内容。\$username为用户名，\$sitename为站点名称，\$invitecode为邀请码，\$uid为用户id</div></td>
+	</tr>	
+	<tr class="tr1 vt">
+		<td class="td1">邀请码在线支付功能</td>
+		<td class="td2">
+        	<ul class="list_A list_80">
+            	<li><input type="radio" value="1" $onlinesell_Y name="config[onlinesell]" />开启</li>
+                <li><input type="radio" value="0" $onlinesell_N name="config[onlinesell]" />关闭</li>
+            </ul>
+        </td>
+        <td class="td2"><div class="help_a">此功能允许注册者通过网上支付一定费用获得邀请码<br />开启此功能需:<br />1. 系统已开启网上支付功能<br />2. 系统已开启邮件发送功能</div></td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">支付金额[元]</td>
+		<td class="td2"><input type="text" class="input input_wa" name="config[price]" value="$inv_price" /></td>
+        <td class="td2"><div class="help_a"></div></td>
+	</tr>
+</table>
+</div>
+<div class="tac mb10"><span class="btn"><span><button type="submit">提 交</button></span></span></div></form>
+<!--
+EOT;
+}elseif($action=='manager'){print <<<EOT
+-->
+<form action="$basename&action=$action" method="post">
+<h2 class="h1">
+	<span class="mr10">搜索</span>
+</h2>
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+	<tr class="tr2">
+	<td width="5%">状态</td>
+	<td width="10%"> 
+	    <select name="type"  class="select_wa">
+	    	<option value="0" $sel[0]>全部</option>
+	        <option value="1" $sel[1]>未使用</option>
+	        <option value="2" $sel[2]>已过期</option>
+	        <option value="3" $sel[3]>已注册</option>
+	    </select>
+	</td>
+	<td width="10%">
+		购买用户
+	</td>
+	<td width="10%">
+		<input type="text" class="input input_wa" name="username" id="username" value="$username" />
+	</td>
+	<td><button name="add" >查找</button></td>
+	</tr>
+</table>
+</div>
+</form>
+<br/>
+<form action="$basename" method="post">
+<input type="hidden" name="step" value="3">
+<h2 class="h1">
+	<span class="mr10">邀请码管理</span>
+</h2>
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+	<tr class="tr2">
+		<td width="8%">序号</td>
+		<td width="*">邀请码</td>
+		<td width="12%">购买用户</td>
+		<td width="20%">购买时间</td>
+		<td width="8%">状态</td>
+		<td width="12%">注册用户</td>
+<!--
+EOT;
+if($type!='1' &&  $type != '0'){
+print <<<EOT
+-->
+		<td width="5%">&nbsp;</td>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+	</tr>
+<!--
+EOT;
+foreach($invdb as $key=>$value){
+print <<<EOT
+-->
+	<tr class="tr1">
+		<td class="td2">$value[num]</td>
+		<td class="td2">$value[invcode]</td>
+		<td class="td2">$value[username]</td>
+		<td class="td2">$value[createtime]</td>
+		<td class="td2 gray">$value[used]</td>
+		<td class="td2"><a href="u.php?username={$value[receiver]}" target="blank">$value[receiver]</a></td>
+<!--
+EOT;
+if($type!='1' && $type != '0'){
+print <<<EOT
+-->
+		<td class="td2"><input type="checkbox" name="selid[]" value="$value[id]" /></td>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+	</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+</table>
+</div>
+<div class="cc mb10">$pages</div>
+<!--
+EOT;
+if($type!='1' && $type != '0'){
+print <<<EOT
+-->
+<div class="tac mb10">
+	<span class="btn"><span><button type="button" name="chkall" onclick="CheckAll(this.form)">全 选</button></span></span>
+	<span class="btn"><span><button type="submit">删除所选项</button></span></span>
+</div>
+<!--
+EOT;
+}}
+print <<<EOT
+-->
+</form>
+<!--
+EOT;
+}elseif($admintype == 'propagateset'){print <<<EOT
+-->
+
+<div class="nav3 mb10">
+    <ul class="cc">
+        <li $nav><a href="$basename">宣传设置</a></li>
+        <li $nav[manager]><a href="$basename&action=statics">宣传统计</a></li>
+    </ul>
+</div>
+<!--
+EOT;
+if(empty($action)){
+print <<<EOT
+-->
+<div class="admin_info mb10">
+    <h3 class="h1"><b>提示信息</b></h3>
+    <div class="legend">
+1.功能说明: 通过这个功能，可以鼓励会员积极宣传网站。只要用户把网站的 url 推荐给其他朋友，并引导其他人访问网站。那他的积分数值将会根据设置增加， 会员通过这种方式获得的积分越多，表明该会员对网站的宣传力度越大!<br />
+2.使用方法: 在站点任意一动态页面的 url 后加上 a=用户名 或 u=用户数字ID.比如以下方法均正确(用户名 yuling 数字ID: 3558)<br />
+&nbsp;&nbsp;http://www.phpwind.net/index.php?a=yuling<br />
+&nbsp;&nbsp;http://www.phpwind.net/index.php?u=3558<br />
+&nbsp;&nbsp;http://www.phpwind.net/read.php?tid=217205&a=yuling<br />
+&nbsp;&nbsp;http://www.phpwind.net/read.php?tid=217205&u=3558<br />
+3.通过邮箱联系人、MSN联系人邀请好友功能需php_curl.dll扩展支持
+</div></div>
+<form action="$basename" method="post">
+<input type="hidden" name="step" value="2">
+<h2 class="h1">宣传设置</h2>
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+	<tr class="tr1 vt">
+		<td class="td1">宣传奖励功能</td>
+		<td class="td2">
+        	<ul class="list_A list_80">
+            	<li><input type="radio" value="1" $linkopen_Y name="config[linkopen]" />开启</li>
+                <li><input type="radio" value="0" $linkopen_N name="config[linkopen]" />关闭</li>
+            </ul>
+        </td>
+        <td class="td2"><div class="help_a">开启后，用户可以复制个人中心-朋友-邀请好友中的宣传链接,发给你熟悉的人,来自每个ip的访问，可以赚取一定的宣传奖励</div></td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">宣传奖励类型</td>
+		<td class="td2">
+        	<ul class="list_A list_80">
+            	<li><input type="radio" value="1" $linktype_Y name="config[linktype]" />完成注册</li>
+                <li><input type="radio" value="0" $linktype_N name="config[linktype]" />独立ip访问</li>
+            </ul>
+        </td>
+        <td class="td2">
+        	<div class="help_a">
+        		独立IP访问:表示只要引导其他用户访问网站，宣传会员就会增加积分，但一个IP一天只奖励一次；<br/>完成注册:表示被引导访问的用户需要注册之后，宣传会员才会增加积分
+			</div>
+		</td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">宣传积分奖励类型</td>
+		<td class="td2">
+        	<select name="config[linkcredit]" class="select_wa">
+<!--
+EOT;
+foreach($credit->cType as $key => $value){
+$selected = $key == $inv_linkcredit ? 'selected' : '';
+print <<<EOT
+-->
+                <option value="$key" $selected>$value</option>
+<!--
+EOT;
+}print <<<EOT
+-->
+			</select>
+		</td>
+        <td class="td2"><div class="help_a"></div></td>
+	</tr>
+    <tr class="tr1 vt">
+		<td class="td1">宣传积分奖励分数</td>
+		<td class="td2"><input type="text" class="input input_wa" name="config[linkscore]" value="$inv_linkscore"></td>
+        <td class="td2"><div class="help_a"></div></td>
+	</tr>
+    <tr class="tr1 vt">
+		<td class="td1">宣传链接默认内容</td>
+		<td class="td2"><textarea class="textarea" name="config[linkcontent]">$inv_linkcontent</textarea></td>
+        <td class="td2"><div class="help_a"></div></td>
+	</tr>
+</table>
+</div>
+<div class="tac mb10"><span class="btn"><span><button type="submit">提 交</button></span></span></div></form>
+<!--
+EOT;
+}elseif($action=='statics'){print <<<EOT
+-->
+<form action="$basename" method="post">
+<input type="hidden" name="step" value="3">
+<h2 class="h1">
+	<span class="mr10">宣传统计</span>
+</h2>
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+	<tr class="tr2">
+		<td>用户名</td>
+		<td>累计访问</td>
+		<td>累计注册</td>
+		<td>奖励</td>
+		<td>时间</td>
+		<td>描述</td>
+
+	</tr>
+<!--
+EOT;
+foreach($invdb as $key=>$value){
+print <<<EOT
+-->
+	<tr class="tr1">
+		<td class="td2">$value[username]</td>
+		<td class="td2">$value[visitnum]</td>
+		<td class="td2">$value[registernum]</td>
+		<td class="td2">$value[reward]</td>
+		<td class="td2">$value[create_time]</td>
+		<td class="td2">$value[type]</td>
+	</tr>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+</table>
+</div>
+<div class="cc mb10">$pages</div>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+</form>
+
+<!--
+EOT;
+}print <<<EOT
+-->
+<!--
+EOT;
+include_once PrintEot('adminbottom');
+?>-->

@@ -1,0 +1,186 @@
+<!--<?php
+if($nf_config[position]<3){
+	$topList=$nf_config[position]==1 ? 'topList_1' : 'topList_2';
+	$pn=0;
+	foreach($nf_order as $val){
+		$val[order] && $pn++;
+	}
+	$pw=floor(100/$pn);
+print <<< EOT
+-->
+<style>
+#{$topList}{ height:auto;}
+#{$topList} .t{ width:{$pw}%; float:left; border:0; padding:0; overflow:hidden ;margin-bottom:0;}
+#{$topList} .t table {border:0;table-layout:fixed}
+#{$topList} td.tguide{line-height:110%;border-right:1px solid $tdcolor}
+#{$topList} .lt .tguide{ border-right:0}
+#{$topList} .lt{float:none; width:auto;}
+.toplist{ margin:0; padding:.3em 0 .1em; list-style:none}
+.toplist li{ padding:0 .6em; line-height:25px;height:25px;overflow:hidden; border-bottom:1px dashed $tdcolor}
+</style>
+<!--[if ie 6]>
+<style>
+#{$topList}{padding:0; }
+#{$topList} .lt{ float:none; width:auto;}
+#{$topList} .lt{ _float:left;}
+.contentc{clear:both;font:0/0 a;height:0}
+</style>
+<![endif]-->
+<!--
+EOT;
+}else{
+	$lr  = $nf_config[position]==3 ? 'left' : 'right';
+	$lr2 = $nf_config[position]==3 ? 'right' : 'left';
+	$topList='topList_1';
+print <<< EOT
+-->
+<style>
+#{$topList}{ width:220px; float:$lr; border:none;}
+#{$topList} .t table {border:0;table-layout:fixed}
+#content{ margin-$lr:225px; }
+td.tguide{  border-bottom:1px solid $tdcolor}
+.toplist{ margin:0; padding:.3em 0 .5em; list-style:none}
+.toplist li{ padding:0 .6em; line-height:25px;height:25px;overflow:hidden; border-bottom:1px dashed $tdcolor}
+.t table tr.tr2 td.f{width:16em;}
+.t table tr.tr2 td.e{width:9em;}
+.t table tr.tr3 td.e{padding-left:3px;padding-right:3px}
+</style>
+<!--[if ie]>
+<style>
+.contentwrap{ float:$lr2; padding-$lr:5px}
+</style>
+<![endif]-->
+<!--
+EOT;
+}print <<< EOT
+-->
+<div class="t cc" id="$topList">
+<!--
+EOT;
+$langinfo = array(
+	'newmember' => '最新注册会员',
+	'totalmember' => '站点会员总数',
+	'topic' => '站点主题总数',
+	'article' => '站点帖子总数',
+	'tposts' => '今日发帖数',
+	'yposts' => '昨日发帖数',
+	'hposts' => '最高日发帖数',
+	'users' => '当前在线会员数',
+	'guest' => '当前在线游客数',
+	'usertotal' => '当前在线总数',
+	'higholnum' => '最高在线人数',
+	'higholtime' => '最高在线发生时间',
+);
+$tmpCount = 0 ;
+foreach($nf_order as $key=>$val){
+	if(!$val['order']){
+		continue;
+	}
+	$ii++;
+	$lt=$ii==$pn ? 'lt' : '';
+	if($val[type]=='newpic'){
+		$ss=!$ss ? 's2' : ($ss=='s5' ? 's3' : 's5');
+		if($nf_newinfodb[$key]){
+			$imgnum=0;
+			if($nf_config[position]==3 || $nf_config[position]==4){
+				$imgheight = 170;
+			}else{
+				empty($nf_config[shownum]) && $nf_config[shownum] = 7;
+				$imgheight = intval(26*$nf_config[shownum]);
+			}
+print <<< EOT
+-->
+<style type="text/css">
+.pwSlide {background:#fff;position:relative;width:100%;height:{$imgheight}px;overflow:hidden;text-align:left;}
+.pwSlide a:hover{text-decoration:none;}
+.pwSlide .bg {position:absolute;left:0;bottom:0;width:100%;height:40px;background:$linkcolor;filter:alpha(opacity=39);-moz-opacity:0.39;opacity:0.39;}
+.pwSlide h3 {position:absolute;left:10px;bottom:15px;_bottom:1px;width:95%;height:20px;line-height:16px;z-index:2;color:#fff;}
+.pwSlide ul {margin:0;padding:0;position:absolute;right:5px;bottom:5px;_bottom:2px;z-index:2;}
+.pwSlide ul li {list-style:none;float:left;width:18px;height:13px;line-height:15px;text-align:center;margin-left:1px;background: url($imgpath/focus1.gif) no-repeat;}
+.pwSlide ul li a {display:block;width:18px;height:13px;font-size:10px;font-family:Tahoma;color:#FFFFFF;}
+.pwSlide ul li a:hover, .pwSlide ul li a.sel {color:#fff;text-decoration:none;background: url($imgpath/focus2.gif) no-repeat;}
+</style>
+<div class="t $lt">
+	<table cellspacing="0" cellpadding="0" width="100%">
+	<tr><td class="h"><strong class="$ss">{$val[name]}</strong></td></tr>
+	<tr><td style="padding:1px 1px 0 1px;">
+
+<div id="pwSlidePlayer" class="pwSlide">
+<!--
+EOT;
+foreach($nf_newinfodb[$key] as $k=>$v){
+	if($v[value]){
+		$imglink = is_numeric($v[id]) ? "read.php?tid=$v[id]" : $v[id];
+		$tmpStyle = $tmpCount ? 'style="display:none;"' : '';
+		$tmpCount++;
+print <<< EOT
+-->
+<div class="tac" $tmpStyle>
+	<a href="$imglink"><img class="pwSlideFilter" src="$v[value]" title="$v[name]" height="$imgheight" width="100%" />
+	<h3 class="fn f12 tal">$v[name]</h3></a>
+</div>
+<!--
+EOT;
+}}print <<< EOT
+-->
+<ul id="SwitchNav"></ul><div class="bg"></div></div>
+</td></tr></table></div>
+<!--
+EOT;
+}}else{
+$ss=!$ss ? 's2' : ($ss=='s5' ? 's3' : 's5');
+print <<< EOT
+-->
+<div class="t $lt">
+	<table cellspacing="0" cellpadding="0" width="100%">
+	<tr><td class="h"><strong class="$ss">{$val[name]}</strong></td></tr>
+	<tr><td><ul class="toplist">
+<!--
+EOT;
+if($nf_newinfodb[$key]){
+foreach($nf_newinfodb[$key] as $k=>$v){
+if($val[type]=='info'){
+	$k=='higholtime' && $v=get_date($v,'Y-m-d H:i');
+print <<< EOT
+-->
+	<li><span class="fr">$v</span>$langinfo[$k]</li>
+<!--
+EOT;
+}else{
+if(is_numeric($v[id])){
+	if(in_array($val[type],array('newpost','newreply','digest','hits','replies','newfavor','hotfavor'))){
+		$v[id] = "read.php?tid=$v[id]";
+	}elseif(in_array($val[type],array('topic','article','tpost'))){
+		$v[id] = "thread.php?fid=$v[id]";
+	}else{
+		$v[id] = "u.php?uid=$v[id]";
+	}
+}
+if (in_array($nf_order[$key]['type'],array('new','newpost','newreply','digest'))) {
+	$v['value'] = '';
+}
+print <<< EOT
+-->
+		<li><span class="fr">$v[value]</span><a href="$v[id]" target="_blank">$v[name]</a></li>
+<!--
+EOT;
+}}}print <<< EOT
+-->
+		</ul></td></tr>
+	</table>
+</div>
+<!--
+EOT;
+}}print <<< EOT
+-->
+<div class="c"></div>
+</div>
+<!--
+EOT;
+if(!empty($tmpCount)){print <<< EOT
+-->
+<script language="JavaScript" src="js/sliderplayer.js"></script>
+<script language="JavaScript">pwSliderPlayers("pwSlidePlayer");</script>
+<!--
+EOT;
+}?>

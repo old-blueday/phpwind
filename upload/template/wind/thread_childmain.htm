@@ -1,0 +1,13 @@
+<!--<?php print <<<EOT
+-->
+<div id="breadCrumb">
+		$msg_guide
+</div>
+<!--
+EOT;
+$thread_children && require_once PrintEot($thread_children);
+if ($foruminfo['cnifopen'] && $cnGroups) {
+	require_once PrintEot('thread_colonys');
+}
+$thread_online && require_once PrintEot($thread_online);
+?>

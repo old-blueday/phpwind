@@ -1,0 +1,231 @@
+<!--<?php
+if($action !='add' && $action !='edit') {
+	include_once PrintEot('left');
+}
+print <<<EOT
+-->
+
+<!--
+EOT;
+if(empty($action)) {print <<<EOT
+-->
+<script language="JavaScript" src="js/global.js"></script>
+<script language="JavaScript" src="js/pw_ajax.js"></script>
+<div class="admin_info mb10">
+	<h3 class="h1">提示信息</h3>
+    <div class="legend">
+    	<ol>
+    		<li>如果需要新增模板，请将模板文件上传至mode/area/themes下</li>
+			<li>频道创建后，需要手动更新一下频道静态页</li>
+        	<li>英文别名只允许英文字母和数字</li>
+        	<li>删除频道之后，相应的数据均会被删除</li>
+			<li>可以通过创建一个blank风格的频道来制作新的风格</li>
+        </ol>
+    </div>
+</div>
+<form action="$basename" method="post">
+<h2 class="h1"><span class="mr5 fl">频道管理</span><a href="javascript:;" class="btn_add" onclick="sendmsg('$addUrl','','this.id')"><i>添加频道</i></a></h2>
+<div class="admin_table mb10">
+	<table width="100%">
+    	<tr class="tr2">
+    		<td>顺序</td>
+        	<td>频道名称</td>
+            <td>英文别名</td>
+            <td>绑定域名</td>
+            <td>默认首页</td>
+            <td><span>操作</span><span style="margin-left:30px"><a href="javascript:;" onclick="updateAllStatic();return false;" title="更新页面缓存">更新全部页面</a></span></td>
+        </tr>
+<!--
+EOT;
+foreach($channel_list as $val){
+$checked = $val['alias'] == $area_default_alias ? 'checked="checked"' : '';
+print <<<EOT
+-->
+        <tr class="tr1">
+        	<td class="td2"><input name="channels[$val[id]][queue]" type="text" class="input input_wd mr5" value="$val[queue]" /></td>
+        	<td class="td2">$val[name]</td>
+            <td class="td2">$val[alias]</td>
+            <td class="td2"><input name="channels[$val[id]][domain_band]" type="text" class="input input_wa" value="$val[domain_band]" /></td>
+            <td class="td2"><input name="defaultalias" $checked value="$val[alias]" type="radio" /></td>
+            <td class="td2">
+				<a href="javascript:;" class="mr10" onclick="sendmsg('{$editUrl}&id=$val[id]','','this.id')">[编辑]</a>
+				<a href="index.php?m=area&alias=$val[alias]" target="_blank" class="mr10">[访问]</a>
+				<a href="javascript:;" onclick="parent.PW.Dialog({'id': 'area_module','name': '模块管理','url': '$admin_file?adminjob=mode&admintype=area_module&alias=$val[alias]','max': false});return false;" class="mr10">[模块管理]</a>
+				<a href="javascript:;" class="mr10" onclick="updateCache('$val[alias]');return false;" title="更新页面缓存">[更新静态]</a>
+				<a href="javascript:;" onclick="delChannel($val[id]);" class="mr10">[删除]</a>
+			</td>
+        </tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+    </table>
+</div>
+<div class="tac mb10">
+    <span class="btn"><span><button type="submit">提 交</button></span></span>
+</div>
+<input name="default_step" type="hidden" value=1>
+<div class="c"></div>
+</form>
+<!--
+EOT;
+}elseif($action =='add') {print <<<EOT
+-->
+<!--下面这个是设置属性的弹窗-->
+<form action="$actionUrl" method="post" onsubmit="return false;">
+<div class="admin_table" style="width:380px;">
+	<h2 class="h1" style="cursor:move" onmousedown="read.move(event);"><a href="javascript:closep();" class="del_img fr" title="关闭">关闭</a>添加频道</h2>
+	<table width="100%" class="mb10">
+        <tr class="tr1">
+        	<td class="td1">频道名称</td>
+            <td class="td2"><input name="channel_name" maxlength="20" type="text" class="input input_wa" value="" /></td>
+        </tr>
+        <tr class="tr1">
+        	<td class="td1">风格模板</td>
+            <td class="td2"><select name="channel_theme" class="select_wa">
+<!--
+EOT;
+foreach($themes_array as $val){
+$selected=($val=='default')?'selected':'';
+print <<<EOT
+-->
+			<option value="$val" $selected>$val</option>
+<!--
+EOT;
+}print <<<EOT
+-->
+			</select></td>
+        </tr>
+        <tr class="tr1">
+        	<td class="td1">英文别名</td>
+            <td class="td2"><input name="channel_alias" type="text" class="input input_wa" value="" /></td>
+        </tr>
+        <tr class="tr1">
+        	<td class="td1">域名绑定</td>
+            <td class="td2"><input name="channel_domain" type="text" class="input input_wa" /></td>
+        </tr>
+    </table>
+    <div class="tac mb10">
+	<input name="action" type="hidden" value="add">
+	<input name="add_step" type="hidden" value="1">
+	<input name="ifreplace" type="hidden" value="0">
+    	<span class="btn2"><span><button type="button" onclick="checkReplace(this.form)">提 交</button></span></span>
+    </div>
+</div>
+</form>
+<!--
+EOT;
+}elseif($action =='edit') {print <<<EOT
+-->
+<!--下面这个是设置属性的弹窗-->
+<form action="$actionUrl" method="post">
+<div class="admin_table" style="width:480px;">
+	<h2 class="h1" style="cursor:move" onmousedown="read.move(event);"><a href="javascript:closep();" class="del_img fr" title="关闭">关闭</a>编辑频道</h2>
+	<table width="100%" class="mb10">
+        <tr class="tr1">
+        	<td class="td1">频道名称</td>
+            <td class="td2"><input name="channel_name" type="text" class="input input_wa" value="$channel_info[name]" /></td>
+        </tr>
+        <tr class="tr1">
+        	<td class="td1">风格模板</td>
+            <td class="td2"><input type="text" class="input input_wa" readonly disabled value="$channel_info[relate_theme]" />
+            
+            </td>
+        </tr>
+        <tr class="tr1">
+        	<td class="td1">英文别名</td>
+            <td class="td2"><input name="channel_alias" type="text" class="input input_wa" value="$channel_info[alias]" disabled readonly /></td>
+        </tr>
+        <tr class="tr1">
+        	<td class="td1">域名绑定</td>
+            <td class="td2"><input name="channel_domain" type="text" class="input input_wa" value="$channel_info[domain_band]" /></td>
+        </tr>
+        <tr class="tr1">
+        	<td class="td1">动态地址</td>
+            <td class="td2"><a href="{$channel_info[activeUrl]}" target="_blank">{$channel_info[activeUrl]}</a></td>
+        </tr>
+        <tr class="tr1">
+        	<td class="td1">静态地址</td>
+            <td class="td2"><a href="{$channel_info[url]}" target="_blank">{$channel_info[url]}</a></td>
+        </tr>
+    </table>
+    <div class="tac mb10">
+    	<span class="btn2"><span><button type="submit">提 交</button></span></span>
+    </div>
+	<input name="edit_step" type="hidden" value=1>
+	<input name="id" type="hidden" value="$channel_info[id]">
+	<input name="action" type="hidden" value="edit">
+	<div class="c"></div>
+</div>
+</form>
+<!--
+EOT;
+}print <<<EOT
+-->
+</form>
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+	function delChannel(id) {
+		if(!confirm('删除频道将同时删除下属模块和历史推送数据，不可恢复，是否确认删除？')) {
+			return false;
+		}
+		setTimeout(function(){
+			window.location.href = '{$delUrl}&id='+id;
+		},0);
+	}
+	//更新静态
+	function updateCache(alias) {
+		var url = '$actionUrl';
+		ajax.send(url,'action=static&alias='+alias,ajax.get);
+	}
+	function updateAllStatic() {
+		var url = '$actionUrl';
+		ajax.send(url,'action=static_all',ajax.get);
+	}
+
+	function checkReplace(form) {
+		var url = '$actionUrl';
+		var channel = form.channel_alias.value;
+		var channelName = form.channel_name.value;
+		if (!channelName) {
+			alert('频道名称不能为空');
+			return false;
+		}
+		if (!channel) {
+			alert('频道别名不能为空');
+			return false;
+		}
+		ajax.send(url,'action=addcheck&ckalias='+channel,function() {
+				var text = ajax.request.responseText;
+				if (text=='error') {
+					if (confirm('频道模板文件已经存在，是否覆盖?')) {
+						form.ifreplace.value=1;
+						form.submit();
+					}
+					return false;
+				} else if (text=='havechannel') {
+					alert('频道名称已经存在');
+					return false;
+				}
+				form.submit();
+			}
+		);
+		return false;
+		
+	}
+	function countlen(element,num) {
+		var temp = strlen(element.value);
+		if (temp>num){
+			alert('超过字数限制');
+			element.value = substr(element.value,num);
+		}
+		return true;
+	}
+//-->
+</SCRIPT>
+<!--
+EOT;
+if($action !='add' && $action !='edit') {
+	include_once PrintEot('adminbottom');
+}
+?>-->

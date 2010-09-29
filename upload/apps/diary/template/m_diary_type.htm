@@ -1,0 +1,70 @@
+<!--<?php
+$fuid && $basename .= "a=friendlist&fuid={$fuid}&";
+$uid = $fuid ? $fuid : $winduid;
+print <<<EOT
+-->
+<div class="boxC" style="margin-top:10px;">
+            <h3>日志分类</h3>
+            <div class="ulE cc">
+                <ul id="dt_ul">
+                	<li id="dt_all"><a href="{$basename}">全部日志</a> <cite>[{$diaryNums}]</cite></li>
+<!--
+EOT;
+$dtype = $dtid;
+foreach($diaryType as $value){
+print <<<EOT
+-->                    
+                    
+                    <li id="dt_{$value[dtid]}">
+<!--
+EOT;
+if ($winduid == $uid || $groupid == 3) {print <<<EOT
+-->						
+                    
+                   <a class="adel cp mr10" onclick="pwConfirm('是否确认删除？',this,function(){delDiaryType('$value[dtid]','$uid')})">删除</a>
+                   <a class="aedit mr5 cp" onclick="showEidt('$value[dtid]','$uid');" >编辑</a> 
+<!--
+EOT;
+}print <<<EOT
+-->
+                    <a href="{$basename}dtid={$value[dtid]}">$value[name]</a> <cite id="dnum_{$value[dtid]}">[{$value[num]}]</cite>           
+                    </li>
+                    
+                    
+                    
+                    
+                    
+<!--
+EOT;
+}print <<<EOT
+-->					
+       
+                    <li id="dt_-1"><a href="{$basename}dtid=-1" id="dtype_null"  class="black uline">默认分类</a> <cite>[{$defaultTypeNum}]</cite></li>
+<!--
+EOT;
+if (!$fuid) {print <<<EOT
+-->
+                     <li id="dt_-2"><a href="{$basename}dtid=-2"  class="black uline">私密日志</a> <cite>[{$privacyNum}]</cite></li>
+<!--
+EOT;
+}print <<<EOT
+-->
+
+                </ul>
+<!--
+EOT;
+if ($winduid == $uid || $groupid == 3) {print <<<EOT
+-->
+								<div class="pd5"><span class="cp addImg" onclick="addType('dt_ul','$uid')">添加分类</span></div>
+<!--
+EOT;
+}print <<<EOT
+-->
+            </div>
+			<script language="javascript">
+            setCurrent('dt_$dtype','dt_all','current');
+            </script>	        
+            </div>
+<!--
+EOT;
+?>

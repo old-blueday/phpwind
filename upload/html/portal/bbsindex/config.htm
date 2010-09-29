@@ -1,0 +1,88 @@
+<pw id="社区焦点@论坛首页" />
+<dl class="newHotA">
+<list num="1" action="diary" cachetime="1800" ifpushonly="0" title="焦点头条1" />
+<loop>
+	<dt><a href="{url}" class="b s2 f16">{title,50}</a></dt>
+	<dd class="s6">{descrip,320}</dd>
+</loop>
+</dl>
+<div class="newHotB">
+	<ul class="cc">
+		<list num="16" action="diary" cachetime="1800" ifpushonly="0" title="帖子列表1" />
+		<loop>
+			<li><em><a href="{forumurl}">【{forumname,6}】</a></em><a href="{url}">{title,50}</a></li>
+		</loop>
+	</ul>
+</div>
+<pw id="最新动态@论坛首页" />
+
+<dl class="newHotA">
+
+<list num="1" action="subject" cachetime="1800" ifpushonly="0" title="焦点头条2" />
+
+<loop>
+
+	<dt><a href="{url}" class="b s2 f16">{title,50}</a></dt>
+
+	<dd class="s6">{descrip,320}</dd>
+
+</loop>
+
+</dl>
+
+<div class="newHotB">
+
+	<ul class="cc">
+
+	<list num="16" action="subject" cachetime="1800" ifpushonly="0" title="帖子列表2" />
+		<loop>
+
+			<li><em><a href="{forumurl}">【{forumname,8}】</a></em><a href="{url}">{title,50}</a></li>
+		</loop>
+
+	</ul>
+
+</div>
+<pw id="热门推荐@论坛首页" />
+<dl class="newHotA">
+<list num="1" action="subject" cachetime="1800" ifpushonly="0" title="焦点头条3" />
+<loop>
+	<dt><a href="{url}" class="b s2 f16">{title,50}</a></dt>
+	<dd class="s6">{descrip,320}</dd>
+</loop>
+</dl>
+<div class="newHotB">
+	<ul class="cc">
+		<list num="16" action="subject" cachetime="1800" ifpushonly="0" title="帖子列表3" />
+		<loop>
+			<li><em><a href="{forumurl}">【{forumname,6}】</a></em><a href="{url}">{title,50}</a></li>
+		</loop>
+	</ul>
+</div>
+<pw id="幻灯片@论坛首页" />
+<div class="newflash pr">
+	<ul class="flashimg" id="SlayerA_1">
+	<list num="1" action="image" cachetime="1800" ifpushonly="0" title="图片播放器" />
+<!--# $temp =array();#-->
+	<loop>
+<!--# $temp[] =$key+1;#-->
+		<li class="switchItem" style="display:none"><a href="{url}"><img width="360" height="240" src="{image,360,240}" /></a><p><a href="{url}">{title,30}</a></p></li>
+	</loop>
+	</ul>
+	<div class="flashBg"></div>
+	<ul class="an" id="SlayerA_2">
+<!--# foreach ($temp as $value) {#-->
+		<li class="switchNavItem"><a href="javascript:;">$value</a></li>
+<!--# }#-->
+	</ul>
+</div>
+<script>
+ddSliderPlayers('SlayerA_1','SlayerA_2',6,'current');
+</script>
+
+<pw id="A2471bbsindex" />
+<li class="switchNavItem"><a href="javascript:;">社区焦点</a></li>
+<li class="switchNavItem"><a href="javascript:;">最新动态</a></li>
+<li class="switchNavItem"><a href="javascript:;">热门推荐</a></li>
+<pw id="T839bbsindex" />
+今日热门

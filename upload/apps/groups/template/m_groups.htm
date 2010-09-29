@@ -1,0 +1,788 @@
+<!--<?php
+require_once(uTemplate::printEot('header'));
+//require_once(uTemplate::printEot('user_appleft'));
+print <<<EOT
+-->
+<div class="homeBg cc">
+<!--
+EOT;
+if (empty($a)) {print <<<EOT
+-->
+<div class="homeCont fl">
+	<div class="p15">
+		<div class="navC">
+			<ul>
+				<li><a href="{$basename}a=friend">朋友的群</a></li>
+				<li class="current"><a href="{$basename}">我的群组</a></li>
+				<li><a href="{$basename}a=all">所有群组</a></li>
+			</ul>
+<!--
+EOT;
+if($o_newcolony){print<<<EOT
+-->
+			<span class="btn_add fl"><span><button onClick="location.href='{$basename}a=create';" type="button">创建群组</button></span></span>
+<!--
+EOT;
+}print<<<EOT
+-->
+		</div>
+		<div>
+<!--
+EOT;
+if($weiboList){print <<<EOT
+-->
+<script type="text/javascript" language="JavaScript" src="apps/weibo/js/post.js"></script>
+<script language="JavaScript" src="js/pw_weibo.js"></script>
+<table width="100%">
+<tr>
+<td height="400" class="vt">
+<div class="conFeed" id="weiboFeed">
+<!--
+EOT;
+include printEot('writesmile');
+require_once uTemplate::printEot('weibo_model');
+$weiboModelTemplate->photoPop();
+foreach ($weiboList as $key => $value) {
+	$method = $weiboService->getType($value['type']);
+	$weiboModelTemplate->$method($value);
+}
+if ($count >= $perpage) {print <<<EOT
+print <<<EOT
+-->
+		<div class="cc p10">
+			<div class="pages" style="float:right"><a href="javascript:;" onclick="getWeiboList('conloy', 2,'weiboFeed');">下一页</a></div>
+		</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+</div>
+</td>
+</tr>
+</table>	
+<!--
+EOT;
+}else{print <<<EOT
+-->
+	<div class="f14 tac p15">暂无群组新鲜事</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+		</div>
+	</div>
+</div>
+<div class="homeSide fr">
+	<div class="p10">
+<!--
+EOT;
+if (!empty($apply)) {print <<<EOT
+-->
+		<div class="mb10">
+			<h3 class="h5 s5"><strong>我申请加入的群组</strong></h3>
+			<div class="dlC p10">
+<!--
+EOT;
+foreach ($apply as $key => $value) {print <<<EOT
+-->
+				<dl class="cc dl">
+					<dt class="dt">
+						<a class="img_50" href="apps.php?q=group&cyid=$value[id]"><i><img width="48" height="48" src="$value[cnimg]" /></i></a>
+					</dt>
+					<dd class="dd">
+						<p class="lh_18"><a href="apps.php?q=group&cyid=$value[id]">$value[cname]</a></p>
+						<p class="s5">申请时间:$value[addtime]</p>
+						<p class="s5">群主：<a href="u.php?uid=$value[uid]" target="_blank" class="s7">$value[admin]</a></p>
+					</dd>
+				</dl>
+<!--
+EOT;
+}print <<<EOT
+-->
+			</div>
+		</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+		<div>
+			<h3 class="h5 s5"><strong>我加入的群组</strong></h3>
+			<div class="dlC p10">
+<!--
+EOT;
+if (!empty($colonyids)) {
+foreach ($group_own as $key => $value) {print <<<EOT
+-->
+				<dl class="cc dl">
+					<dt class="dt">
+						<a class="img_50" href="apps.php?q=group&cyid=$value[id]"><i><img width="48" height="48" src="$value[cnimg]" /></i></a>
+					</dt>
+					<dd class="dd">
+						<p class="lh_18"><a href="apps.php?q=group&cyid=$value[id]">$value[cname]</a></p>
+						<p class="s5">$value[addtime] 创建</p>
+						<p class="s5">群主：<a href="u.php?uid=$value[uid]" target="_blank" class="s7">$value[admin]</a></p>
+					</dd>
+				</dl>
+<!--
+EOT;
+}
+foreach ($group_other as $key => $value) {print <<<EOT
+-->
+				<dl class="cc dl">
+					<dt class="dt">
+						<a class="img_50" href="apps.php?q=group&cyid=$value[id]"><i><img width="48" height="48" src="$value[cnimg]" /></i></a>
+					</dt>
+					<dd class="dd">
+						<p class="lh_18"><a href="apps.php?q=group&cyid=$value[id]">$value[cname]</a></p>
+						<p class="s5">$value[addtime] 加入</p>
+						<p class="s5">群主：<a href="u.php?uid=$value[uid]" target="_blank" class="s7">$value[admin]</a></p>
+					</dd>
+				</dl>
+<!--
+EOT;
+}} else {print <<<EOT
+-->
+				<div>还没有加入任何群组</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+			</div>
+		</div>
+		<div class="tar"><a href="{$basename}a=my">查看我加入的所有群组&raquo;&raquo;</a></div>
+	</div>
+</div>
+<div class="c"></div>
+<!--
+EOT;
+} elseif ($a == 'my') {print <<<EOT
+-->
+	<div class="p15" style="background:$uskin_boxA;min-height:400px;">
+		<div class="navC">
+			<ul>
+				<li><a href="{$basename}a=friend">朋友的群</a></li>
+				<li class="current"><a href="{$basename}">我的群组</a></li>
+				<li><a href="{$basename}a=all">所有群组</a></li>
+			</ul>
+<!--
+EOT;
+if($o_newcolony){print<<<EOT
+-->
+			<span class="btn_add fl"><span><button onClick="location.href='{$basename}a=create';" type="button">创建群组</button></span></span>
+<!--
+EOT;
+}print<<<EOT
+-->
+		</div>
+<div class="tips">
+<!--
+EOT;
+if (!$total['sum']) {print <<<EOT
+-->
+		您还没加入任何群组！
+<!--
+EOT;
+} else {
+$extra = '我';
+if ($total['creates']) {print <<<EOT
+-->
+		我创建了{$total[creates]}个群
+<!--
+EOT;
+$extra = '，';
+}if($total['adds']){print <<<EOT
+-->
+		{$extra}加入了{$total[adds]}个群
+<!--
+EOT;
+}}print <<<EOT
+-->
+		&nbsp;&nbsp;<a href="{$basename}">返回</a>
+</div>
+	<div>
+	<ul id="list-groups" class="cc list-box-a">
+<!--
+EOT;
+if ($group) {
+foreach ($group as $value) {print <<<EOT
+-->
+		<li>
+		<dl>
+		<dt><div><table style="height:100%;width:100%;"><tr><td class="tac"><a href="apps.php?q=group&cyid=$value[id]"><img src="$value[cnimg]" onload="imgResize(this,100)" /></a></td></tr></table></div></dt>
+		<dd><a href="apps.php?q=group&cyid=$value[id]" class="b f14">$value[cname]</a>
+			<div>已有$value[members]人加入</div>
+<!--
+EOT;
+if ($value['admin'] == $windid) {print <<<EOT
+-->
+			我是群主
+<!--
+EOT;
+}print <<<EOT
+-->
+		</dd>
+		</dl>
+		</li>
+<!--
+EOT;
+}}print <<<EOT
+-->
+	</ul>
+	<div class="mb10 cc">$pages</div>
+    </div>
+	</div>
+<!--
+EOT;
+} elseif ($a == 'friend') {print <<<EOT
+-->
+	<div class="p15" style="background:$uskin_boxA;min-height:400px;">
+		<div class="navC">
+			<ul>
+				<li class="current"><a href="{$basename}a=friend">朋友的群</a></li>
+				<li><a href="{$basename}">我的群组</a></li>
+				<li><a href="{$basename}a=all">所有群组</a></li>
+			</ul>
+<!--
+EOT;
+if($o_newcolony){print<<<EOT
+-->
+			<span class="btn_add fl"><span><button onClick="location.href='{$basename}a=create';" type="button">创建群组</button></span></span>
+<!--
+EOT;
+}print<<<EOT
+-->
+		</div>
+	<div class="tips">
+<!--
+EOT;
+if ($total) {print <<<EOT
+-->
+	好友共加入了{$total}个群
+<!--
+EOT;
+} else {print <<<EOT
+-->
+	您还没有好友加入群组
+<!--
+EOT;
+}print <<<EOT
+-->
+	</div>
+	<div>
+	<ul id="list-groups" class="cc list-box-a">
+<!--
+EOT;
+if ($group) {
+foreach ($group as $value) {print <<<EOT
+-->
+		<li>
+		<dl>
+		<dt><div><table style="height:100%;width:100%;"><tr><td class="tac"><a href="apps.php?q=group&cyid=$value[id]"><img src="$value[cnimg]" onload="imgResize(this,100)" /></a></td></tr></table></div></dt>
+		<dd><a href="apps.php?q=group&cyid=$value[id]" class="b f14">$value[cname]</a>
+			<div>该群好友：
+<!--
+EOT;
+$extra = '';
+foreach ($value['friends'] as $k => $v) {print <<<EOT
+-->
+				$extra<a href="u.php?uid=$k" target="_blank" class="s7">$v</a>
+<!--
+EOT;
+$extra = '，';
+}if ($value['ifadd']){print <<<EOT
+-->
+				，以及我
+<!--
+EOT;
+}print <<<EOT
+-->
+			</div>
+			群主：<a href="u.php?username=$value[admin]" target="_blank" class="s7">$value[admin]</a>
+		</dd>
+		</dl>
+		</li>
+<!--
+EOT;
+}}print <<<EOT
+-->
+	</ul>
+	<div class="mb10 cc">$pages</div>
+<script language="JavaScript" src="js/core/changeview.js"></script>
+<script language="JavaScript">
+var frist = New(changView,['list-groups','li',1]);
+</script>
+<div class="c"></div>
+	</div>
+	</div>
+<!--
+EOT;
+} elseif ($a == 'all') {print <<<EOT
+-->
+	<div class="homeCont fl">
+	<div class="p15">
+		<div class="navC">
+			<ul>
+				<li><a href="{$basename}a=friend">朋友的群</a></li>
+				<li><a href="{$basename}">我的群组</a></li>
+				<li class="current"><a href="{$basename}a=all">所有群组</a></li>
+			</ul>
+<!--
+EOT;
+if($o_newcolony){print<<<EOT
+-->
+			<span class="btn_add fl"><span><button onClick="location.href='{$basename}a=create';" type="button">创建群组</button></span></span>
+<!--
+EOT;
+}print<<<EOT
+-->
+		</div>
+		<div class="p10">
+		<div class="dlC">
+<!--
+EOT;
+if (!empty($group)) {
+foreach ($group as $key => $value) {print <<<EOT
+-->
+			<dl class="cc dl mb10">
+				<dt class="dt">
+					<a class="img_50" href="apps.php?q=group&cyid=$value[id]"><i><img width="48" height="48" src="$value[cnimg]" /></i></a>
+				</dt>
+				<dd class="dd">
+					<p class="titleB">
+<!--
+EOT;
+if(isset($cMembers[$key])){print <<<EOT
+-->
+						<a href="apps.php?q=group&a=out&cyid=$value[id]" onclick="return ajaxurl(this);" class="fr s7">退出该群</a>
+						<span class="rightTip mr20">
+<!--
+EOT;
+if ($cMembers[$key] == '-1') {print <<<EOT
+-->
+							申请已提交，管理员审核中
+<!--
+EOT;
+} else {print <<<EOT
+-->
+							你已经加入该群
+<!--
+EOT;
+}print <<<EOT
+-->
+						</span>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+						<a href="apps.php?q=group&a=join&cyid=$value[id]" onclick="return ajaxurl(this);" class="fr s7">加入该群</a>
+<!--
+EOT;
+}print<<<EOT
+-->
+						<a class="mr10 f14" href="apps.php?q=group&cyid=$value[id]">{$value[cname]}</a>
+					</p>
+					<p>{$value[descrip]}</p>
+					<p>
+						<span class="mr15">分类：{$o_styledb[$value['styleid']]['cname']}</span>
+						<span class="mr15">成员：{$value[members]}</span>
+						<span class="mr20">积分：{$value[colonyNums]}</span>
+						<span>创建：{$value[createtime]}</span>
+					</p>
+				</dd>
+			</dl>
+<!--
+EOT;
+}}print <<<EOT
+-->
+			<div class="mb10 cc">$pages</div>
+		</div>
+		</div>
+	</div>
+	</div>
+	<div class="homeSide fr">
+		<div class="p10">
+		<h5 class="h5 s5"><strong>搜索群组</strong></h5>
+		<div class="p10 mb10">
+		<form action="{$basename}a=$a" method="post">
+		<input type="hidden" name="styleid" value="{$styleid}"/>
+		<input type="text" class="input" size="12" value="{$keyword}" name="keyword" /><span class="mr10"><span class="btn2"><span><button type="submit">搜索</button></span></span></span><a id="id_search" onClick="read.open('menu_search',this.id,2)" style="cursor: pointer;">高级</a>
+		</form>
+		<div id="menu_search" style="display:none">
+			<div class="popout"><table border="0" cellspacing="0" cellpadding="0"><tbody><tr><td class="bgcorner1"></td><td class="pobg1"></td><td class="bgcorner2"></td></tr><tr><td class="pobg4"></td><td><div class="popoutContent">
+				<form action="{$basename}&a=$a" method="post">
+				<div class="popTop" style="cursor:move;width:300px;" onmousedown="read.move(event);"><a class="adel" href="javascript:;" onclick="closep();">关闭</a>群高级搜索</div>
+				<table width="100%">
+					<tr>
+						<td width="60">群名称</td>
+						<td><input type="text" name="keyword" class="input input_wa" /></td>
+					</tr>
+					<tr>
+						<td>类别</td>
+						<td>
+							<select name="styleid" class="select_wa">
+<!--
+EOT;
+foreach ($o_style_relation as $key => $value) {
+if (empty($value)) {print <<<EOT
+-->	
+<option value="$key">+<strong>{$o_styledb[$key]['cname']}</strong></option>
+<!--
+EOT;
+} else {print <<<EOT
+-->
+		<option value="$key">+<strong>{$o_styledb[$key]['cname']}</strong></option>
+<!--
+EOT;
+foreach ($value as $k => $v) {print <<<EOT
+-->
+				<option value="$v">&nbsp;&nbsp;&nbsp;{$o_styledb[$v]['cname']}</option>
+<!--
+EOT;
+}print <<<EOT
+-->
+
+<!--
+EOT;
+}}print <<<EOT
+-->
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<td>成员数</td>
+						<td><input type="text" name="members" class="input input_wa" /> 以上</td>
+					</tr>
+					<tr>
+						<td>&nbsp;</td>
+						<td><label><input type="checkbox" name="friends" value="1" /> 好友加入的群</label></td>
+					</tr>
+				</table>
+				<div class="popBottom"><span class="btn2"><span><button type="submit">提 交</button></span></span></div>
+				</form>
+			</div></td><td class="pobg2"></td></tr><tr><td class="bgcorner4"></td><td class="pobg3"></td><td class="bgcorner3"></td></tr></tbody></table></div>
+		</div>
+		</div>
+		<div class="mb10">
+			<h5 class="h5 s5"><strong>浏览群组分类</strong></h5>
+			<ul class="ulE">
+				<li id="cid_all"><a class="fn" href="{$basename}a=all">所有分类</a> [共{$total}个群]</li>
+<!--
+EOT;
+foreach ($o_style_relation as $key => $value) {
+if (empty($value)) {print <<<EOT
+-->	
+				<li id="cid_$key"><cite>+</cite>&nbsp;<a href="{$basename}q=$q&a=all&styleid=$key">{$o_styledb[$key]['cname']}</a></li>
+<!--
+EOT;
+} else {print <<<EOT
+-->
+				<li id="cid_$key"><cite>+</cite>&nbsp;{$o_styledb[$key]['cname']}</li>
+<!--
+EOT;
+foreach ($value as $k => $v) {print <<<EOT
+-->
+				<li id="cid_$v">&nbsp;&nbsp;&nbsp;&nbsp;<a href="{$basename}q=$q&a=all&styleid=$v">{$o_styledb[$v]['cname']}</a></li>
+<!--
+EOT;
+}print <<<EOT
+-->
+<!--
+EOT;
+}}print <<<EOT
+-->
+			</ul>
+		</div>
+		</div>
+	</div>
+<script language="JavaScript">
+setCurrent('cid_$styleid','cid_all','current');
+</script>
+	<div class="c"></div>
+<!--
+EOT;
+} elseif ($a == 'create') {print <<<EOT
+-->
+<script type="text/javascript" language="JavaScript" src="js/color_picker.js"></script>
+<script type="text/javascript" language="JavaScript" src="js/mini_editor.js"></script>
+<div class="homeCont">
+<div class="p15">
+	<div class="navC mb10">
+		<ul>
+			<li><a href="{$basename}a=friend">朋友的群</a></li>
+			<li><a href="{$basename}">我的群组</a></li>
+			<li><a href="{$basename}a=all">所有群组</a></li>
+			<li class="current"><a href="{$basename}a=create">创建新群组</a></li>
+		</ul>
+<!--
+EOT;
+if($o_newcolony){print<<<EOT
+-->
+		<span class="btn_add fl"><span><button onClick="location.href='{$basename}a=create';" type="button">创建群组</button></span></span>
+<!--
+EOT;
+}print<<<EOT
+-->
+	</div>
+<script type="text/javascript">
+function pickReback(color){
+	getObj('color_show').style.backgroundColor = color;
+}
+function styleOnclick(e,obj){
+	var objclass = e.className;
+	var temp = objclass.split(' ');
+	var newclass = '';
+	for (var n=0; n<temp.length; n++){
+		if (temp[n]=='one') {
+			continue;
+		}
+		newclass += ' ' + temp[n];
+	}
+	if (objclass.match(/one/)) {
+		e.className = newclass;
+		getObj(obj).value = '';
+	} else {
+		e.className = newclass + ' one';
+		getObj(obj).value = 1;
+	}
+}
+function colorCancel(){
+	getObj('color_show').style.backgroundColor='#FFFFFF';
+	getObj('title1').value='';
+}
+
+var cost = '$costs';
+var dosubmit = function(form){
+	if(cost){
+		showDialog("confirm","创建一个群组需要支付 "+cost+",您确定要创建吗?",0,function(){
+			form.submit();
+		});
+	}else{
+		form.submit();
+	}
+}
+</script>
+	<div class="p10">
+<form action="{$basename}a=$a" method="post" name="FORM" enctype="multipart/form-data" onsubmit="return checkpost(document.FORM);">
+<input type="hidden" name="step" value="3" />
+<input type="hidden" name="verify" value="$verifyhash" />
+<table cellpadding="0" cellspacing="0" width="100%" class="setTable vt">
+	<tr>
+		<th class="th">群组名称<span class="s1">*</span></th>
+		<td class="td">
+			<input class="input input_wa mr10 fl" type="text" name="cname" id="cname" />
+			<div class="pwnew tac fl">
+				<span><a onclick="styleOnclick(this,'title2')" class="$stylename[1]">加粗</a></span>
+				<span><a onclick="styleOnclick(this,'title3')" class="$stylename[2]">斜体</a></span>
+				<span><a onclick="styleOnclick(this,'title4')" class="$stylename[3]">下划线</a></span>
+				<span id="color_show" style="background:$titlecolor;cursor:pointer;" title="点击取消颜色" onclick="colorCancel()"></span>
+				<span title="颜色选择"><a class="two tal" onclick="showColorPicker(this,document.FORM.title1,function(){pickReback(color_picker)})"><img src="$imgpath/pickcolor.gif"  /></a></span>
+				<input id="title1" name="title1" type="hidden" value="$titlecolor" />
+				<input id="title2" name="title2" type="hidden" value="{$titledetail[1]}" />
+				<input id="title3" name="title3" type="hidden" value="{$titledetail[2]}" />
+				<input id="title4" name="title4" type="hidden" value="{$titledetail[3]}" />
+			</div>
+			<div class="c mb5"></div>
+			<span id="cname_warn" class="gray">限 50 字节</span>
+	    </td>
+	</tr>
+	<tr>
+		<th class="th">群组简介</th>
+		<td class="td">
+		<div style="width:340px;" class="fl mr10">
+			<div class="minieitor_pw cc">
+				<ul class="miniUl">
+					<li><a href="javascript:" title="插入url链接" class="milink_pw" onClick="editor.createLinkBox(this.id);" id="createlinkid" unselectable="on">插入url链接</a></li>
+					<li><a href="javascript:" title="字体加粗" class="mistrong_pw" onClick="editor.bold();" id="createb2" unselectable="on">字体加粗</a></li>
+					<li><a href="javascript:" title="加颜色" class="micolor_pw" onClick="editor.createcolor(this.id);" id="createcolorid" unselectable="on">加颜色</a></li>
+				</ul>
+				<div class="minitextarea">
+					<textarea maxlength="200" id="mini_descrip" name="descrip"></textarea><input type="hidden" id="board_uid" value="$u">
+					<script type="text/javascript">var editor = new MiniEditor('mini_descrip');</script>
+				<div class="c"></div>
+				</div>
+				<div class="c"></div>
+			</div>
+		</div>
+		<span class="gray" id="mini_descrip_warn">限 255 字节</span>
+		</td>
+	</tr>
+	<tr>
+		<th class="th">群组分类<span class="s1">*</span></th>
+		<td class="td">
+			<select name="firstgradestyle" id="firstgradestyle" onchange="setSecondstyle(this.value);" class="select_wa mr5">
+				<option value="">请选择</option>
+<!--
+EOT;
+foreach ($o_style_relation as $key => $value){print<<<EOT
+-->
+				<option value="$key">{$o_styledb[$key]['cname']}</option>
+<!--
+EOT;
+}print<<<EOT
+-->
+			</select>
+			<select name="secondgradestyle" id="secondgradestyle" class="select_wa" style="display:none"></select>
+		</td>
+	</tr>
+	<tr>
+		<th class="th">群组图标</th>
+		<td class="td"><img width="48px" height="48px" style="filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod=image);" id="preview_1" src="images/g/groupnopic.gif" class="fr mr20" />
+			<input  type="hidden" name="q_1" id="q_1" value="" />
+			<p class="mb5">
+				<input type="file"  class="input mr10" id="p_1"  name="cnimg_1"   accept="image/*"  onchange="preview_img(1);"/><a href="javascript:void(0);" onclick="show_image('1','images/g/groupnopic.gif');" >使用默认图标</a>
+			</p>
+			<span class="gray">推荐尺寸120px*120px，</span><a href="javascript:;" class="help_a"><span class="gray cp">可上传类型</span><i><!--
+EOT;
+foreach($cnimg_1 as $key => $value){print<<<EOT
+-->
+<span class="w fl mr10">{$key}:{$value}KB;</span>
+<!--
+EOT;
+}print<<<EOT
+--></i></a>
+						
+           <script language="JavaScript">
+            function show_image(id,pic_url) {
+				getObj('q_' + id).value = 1;
+				getObj('p_' + id).value = "";
+				if(is_ie){
+					getObj('p_' + id).outerHTML=getObj('p_' + id).outerHTML;
+				}
+				getObj("preview_" + id).src = pic_url;
+			}
+            </script>
+	</td>
+	</tr>
+<!--
+EOT;
+if ($o_groups_gdcheck) {print <<<EOT
+-->
+	<tr>
+		<th class="th">认证码<span class="s1">*</span></th>
+		<td class="td">
+			<img id="ckcode" style="cursor:pointer;display:none;margin-bottom:1px;" onclick="this.src='ck.php?nowtime='+new Date().getTime();" alt="看不清楚，换一张" />
+			<div><input class="input" onfocus="showCK();" type="text" name="gdcode" id="gdcode" style="width:50px;" tabindex="3"  /></div>
+<script language="JavaScript">
+function showCK(){
+	getObj('ckcode').style.display="";
+	if (getObj('ckcode').src.indexOf('ck.php') == -1) {
+		getObj('ckcode').src = 'ck.php?nowtime=' + new Date().getTime();
+	}
+}
+</script>
+		</td>
+	</tr>
+<!--
+EOT;
+}if($o_groups_qcheck){print <<<EOT
+-->
+	<tr>
+		<th class="th">验证问题<span class="s1">*</span></th>
+		<td class="td">
+			<div> {$db_question[$qkey]} （正确答案:{$db_answer[$qkey]}）</div>
+			<input class="input input_wa" name="qanswer" id="qanswer" tabindex="7" />
+			<input type="hidden" name="qkey" id="qkey" value="$qkey" />
+		</td>
+	</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+	<tr>
+		<th class="th"></th>
+		<td class="td"><span class="btn"><span><button type="submit" name="Submit">创建新群组</button></span></span></td>
+	</tr>
+</table>
+</form>
+	</div>
+<script language="JavaScript">
+var charset = '$db_charset';
+initCheckTextNum('cname','cname_warn',50);
+initCheckTextNum('descrip','descrip_warn',255);
+
+function setSecondstyle(id) {
+	var jsStyle = JSONParse('$jsStyle');
+	var jsStyleRelation = JSONParse('$jsStyleRelation');
+
+	if (typeof jsStyle[id] == 'undefined') {
+		getObj('secondgradestyle').style.display = 'none';
+	} else {
+		if (jsStyle[id]['upid'] == '0') {
+			if (jsStyleRelation[id].length == 0) {
+				getObj('secondgradestyle').style.display = 'none';
+			} else {
+				getObj('secondgradestyle').style.display = '';
+				getObj('secondgradestyle').length = 0;
+				for (var i = 0; i < jsStyleRelation[id].length; i++) {
+					getObj('secondgradestyle').options.add(new Option(jsStyle[jsStyleRelation[id][i]]['cname'], jsStyleRelation[id][i]));
+				}
+			}
+			getObj('firstgradestyle').value = id;
+		} else {
+			var parentId = jsStyle[id]['upid'];
+			getObj('firstgradestyle').value = parentId;
+			getObj('secondgradestyle').style.display = '';
+			getObj('secondgradestyle').length = 0;
+			for (var i = 0; i < jsStyleRelation[parentId].length; i++) {
+				getObj('secondgradestyle').options.add(new Option(jsStyle[jsStyleRelation[parentId][i]]['cname'], jsStyleRelation[parentId][i]));
+			}
+			getObj('secondgradestyle').value = id;
+		}
+	}
+}
+
+document.FORM.Submit.disabled = false;
+function checkpost(obj) {
+	var cname = obj.cname.value;
+	if (cname){
+		ajax.send("apps.php?q=groups&a=checkcname&cname="+cname,'',function(){
+			var rText = ajax.request.responseText;
+			if (!rText){
+				obj.cname.focus();
+				showDialog("error","您输入的群组名称已经存在，请选择另一个名称。",2);
+				return false;
+			}
+		});
+	}
+	if (obj.cname.value == "") {
+		obj.cname.focus();
+		showDialog("error","群组名称不能为空",2);
+		return false;
+	}　else if (obj.cname.value.length > 50) {
+		obj.cname.focus();
+		showDialog("error","群组名称不能大于50个字节",2);
+		return false;
+	}　else if (obj.descrip.value.length > 255) {
+		obj.descrip.focus();
+		showDialog("error","群组简介不能大于255个字节",2);
+		return false;
+	}　else if (!obj.firstgradestyle.value) {
+		showDialog("error","请选择群组分类",2);
+		return false;
+	} 
+	document.FORM.Submit.disabled = true;
+	cnt++;
+	if (cnt != 1) {
+		showDialog("warning","Submission Processing. Please Wait");
+		return false;
+	}
+	return true;
+}
+
+var firstgradestyle = getObj('firstgradestyle').value;
+if (firstgradestyle != ''){
+	setSecondstyle(firstgradestyle);
+}
+</script>
+</div>
+</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+</div>
+</div>
+<!--
+EOT;
+require_once(uTemplate::printEot('footer'));
+?>-->

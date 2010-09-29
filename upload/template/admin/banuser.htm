@@ -1,0 +1,116 @@
+<!--<?php
+include_once PrintEot('left');
+if (empty($action)){
+print <<<EOT
+-->
+<div class="admin_info mb10">
+	<h3 class="h1"><b>提示信息</b></h3>
+	<div class="legend"><ol>
+	<li><span class="xia">自动禁言</span>:自动禁言在管理员给会员评分时起作用<br />如:后台设定{$db_rvrcname}小于 0 时自动禁言 1 天，那么当管理员扣除会员的{$db_rvrcname}至小于 0 时，则该会员就会被自动禁言 1 天</li>
+	<li><span class="xia">禁言用户</span>:禁言单个用户，输入用户名，选择禁言类型和期限完成禁言</li>
+	<li><span class="xia">解除禁言</span>:输入用户名，解除用户的禁言</li>
+	<li><font color=blue>强制禁言</font>:使用此功能禁言用户同时将禁言该用户的其他帐号的发表权限</li></ol>
+	<br />注:此功能可有效控制某些用户使用多个帐号破坏站点秩序</div>
+</div>
+<form action="$basename&" method=post>
+<input type="hidden" name="action" value="autoban">
+<h2 class="h1"><b>自动禁言设置</b></h2>
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+	<tr class="tr1 vt">
+		<td class="td1">是否使用此功能</td>
+		<td class="td2">
+			<ul class="list_A list_80 cc">
+				<li><input type=radio name=ban[autoban] value=1 $autoban_Y />开启</li>
+				<li><input type=radio name=ban[autoban] value=0 $autoban_N />关闭</li>
+			</ul>
+		</td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">积分依据</td>
+		<td class="td2">
+			<select name=ban[banby]>
+				<option value=1 $select[1]>发帖</option>
+				<option value=2 $select[2]>{$db_rvrcname}</option>
+				<option value=3 $select[3]>{$db_moneyname}</option>
+			</select>
+		</td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">类型</td>
+		<td class="td2">
+			<ul class="list_A ">
+				<li><input type=radio name=ban[bantype] value=1 $bantype_1 />定期禁言</li>
+				<li><input type=radio name=ban[bantype] value=2 $bantype_2 />永久禁言(不需要设定禁言期限)</li>
+			</ul>
+		</td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">禁言期限[天]</td>
+		<td class="td2"><input type="text" class="input input_wa"  name='ban[banlimit]' value='$db_banlimit' /></td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">积分小于</td>
+		<td class="td2"><input type="text" class="input input_wa" name='ban[banmax]' value='$db_banmax' /></td>
+	</tr>
+</table>
+</div>
+<div class="tac mb10">
+	<span class="btn"><span><button type="submit">提 交</button></span></span>
+</div>
+</form>
+
+<form action="$basename&" method=post>
+<h2 class="h1"><b>会员禁言</b></h2>
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+	<tr class="tr1 vt">
+		<td class="td1">用户名</td>
+		<td class="td2"><input type="text" class="input" size=20 maxlength=14 name="username" value="$username" /></td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">类型</td>
+		<td class="td2">
+			<ul class="list_A">
+				<li><input type=radio name="type" value=1 checked="checked" />定期禁言</li>
+				<li><input type=radio name="type" value=2 />永久禁言(不需要设定禁言期限)</li>
+				<li><input type=radio name="type" value=3 />强制禁言</li>
+			</ul>
+		</td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">禁言期限[天]</td>
+		<td class="td2"><input type="text" class="input input_wa"  name='limit' /></td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">禁言理由</td>
+		<td class="td2"><textarea class="textarea" name="ban_reason"></textarea></td>
+	</tr>
+</table>
+</div>
+<div class="tac mb10">
+	<span class="btn"><span><button type="submit">提 交</button></span></span>
+</div>
+<input type="hidden" name="action" value='banuser' />
+</form>
+
+<form action="$basename&" method=post>
+<h2 class="h1"><b>解除禁言</b></h2>
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+	<tr class="tr1 vt">
+		<td class="td1">用户名</td>
+		<td class="td2"><input type="text" class="input input_wa" maxlength="14" name="username" /></td>
+	</tr>
+</table>
+</div>
+<div class="tac mb10">
+	<span class="btn"><span><button type="submit">提 交</button></span></span>
+</div>
+<input type=hidden name=action value='freeuser' />
+</form>
+<!--
+EOT;
+}include_once PrintEot('adminbottom');
+?>
+-->

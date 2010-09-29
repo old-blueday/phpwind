@@ -1,0 +1,27 @@
+<!--<?php
+$title = $subMenu[$sub];
+if($result){
+print <<<EOT
+-->
+	<div class="p5">
+	<h5 class="h5"><strong>$title[type_name]</strong></h5>
+		<table width="100%">
+<!--
+EOT;
+foreach($result['data'] as $key => $value){
+print <<<EOT
+-->
+		<tr class="tr3">
+		<td width="60"><span class="replay-bg"><div class="b s1 f16">$value[value]</div>$result[unit]</span></td>
+		<td><a class="b f14" href="thread.php?fid=$value[id]" target="_blank">$value[title]</a></td>
+		<td width="200"><a href="$value[url]" target="_blank" class="s7">$value[desc]</a><br>作者：<a href="u.php?username=$value[author]" target="_blank" class="s7">$value[author]</a><br/>最后发帖：$value[lastDate]</td>
+		</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+		</table>
+	</div>
+<!--
+EOT;
+}?>-->

@@ -1,0 +1,82 @@
+<!--<?php
+include_once PrintEot('left');print <<<EOT
+-->
+<div class="tip_wind" style="left:50%;margin-left:-200px;top:25%;">
+    <dl>
+    	<dt>&nbsp;</dt>
+        <dd>
+        	<h4>$msg</h4>
+<!--
+EOT;
+if($ifjump){print <<<EOT
+-->
+        	$ifjump
+<!--
+EOT;
+}print <<<EOT
+-->
+<!--
+EOT;
+if($adminmsg == '1'){print <<<EOT
+-->
+        	<a href="$basename">返回继续操作</a>
+<!--
+EOT;
+}elseif($adminmsg == '2'){print <<<EOT
+-->
+<script type="text/javascript">
+	var messageClass = {
+		obj : null,
+		defaultValue : "输入操作理由",
+		init : function(){
+			 this.obj = document.getElementById("message");
+		},
+		focus : function(){
+			this.init();
+			if(this.obj.value == this.defaultValue){
+				this.obj.value = "";
+			}
+			this.obj.className = "input input_wa";
+		},
+		blur : function(){
+			this.init();
+			if(this.obj.value == ""){
+				this.obj.className = "input input_wa gray";
+				this.obj.value = this.defaultValue;
+			}
+		},
+		keyup : function(evt){
+			var keycode = window.event ? window.event.keyCode : evt.which;
+			if(keycode == 13 ){
+				document.FORM.submit();
+			}
+		}
+	}
+</script>
+            <form action="$admin_file?adminjob=adminrecord&" method="post" name="FORM">
+            <input type="hidden" name="admintype" value="add">
+            <input type="hidden" name="jumpurl" value="$basename">
+                <div class="mb10"><input id="message" name="content" type="text" class="input input_wa gray" value="输入操作理由"  onfocus="messageClass.focus();" onblur="messageClass.blur();" onkeyup="messageClass.keyup(event);" />
+                <span class="bt2"><span><button type="submit" onclick="if (getObj('message').value=='输入操作理由')getObj('message').value = '';">确定</button></span></span></div>
+                <a href="$basename">返回继续操作</a>
+            </form>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+            <form action="$basename&" method=post>
+                <div class="mb10">$inputmsg</div>
+                <span class="btn2"><span><button type="submit">确定</button></span></span>
+                <span class="bt2"><span><button type="button" onclick="javascript:history.go(-1);return false;">返回</button></span></span>
+            </form>
+<!--
+EOT;
+}print <<<EOT
+-->
+        </dd>
+    </dl>
+    <div class="c"></div>
+</div>
+<!--
+EOT;
+?>-->

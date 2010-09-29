@@ -1,0 +1,232 @@
+<!--<?php
+include_once PrintEot('left');
+if ($admintype == 'msphinx') {
+print <<<EOT
+-->
+<div class="nav3 mb10">
+    <ul class="cc">
+        <li class="current"><a href="$admin_file?adminjob=advanced&admintype=msphinx">Sphinx全文索引配置</a></li>
+        <li><a href="$admin_file?adminjob=advanced&admintype=mmemcache">Memcache 缓存配置</a></li>
+    </ul>
+</div>
+<div class="admin_info mb10">
+    <h3 class="h1">介绍说明</h3>
+    <div class="legend">Sphinx是一个基于SQL的全文检索引擎，可以结合MySQL,PostgreSQL做全文搜索，它可以提供比数据库本身更专业的搜索功能，
+ 使得应用程序更容易实现专业化的全文检索。Sphinx特别为一些脚本语言设计搜索API接口，如PHP,Python,Perl,Ruby等，同时为MySQL也设计了一个存储引擎插件。<a href="http://www.sphinxsearch.com/" target="_blank">http://www.sphinxsearch.com/</a>
+    </div>
+</div>
+<h2 class="h1">全文索引服务器配置</h2>
+<form action="{$baseUrl}" method="post" >
+<input type="hidden" name="step" value="2" />
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+	<tr class="tr1 vt">
+		<td class="td1">全文索引</td>
+		<td class="td2">
+        	<ul class="list_A list_80">
+            	<li><input type="radio" name="isopen" value="1" {$isopenCheck[1]}/>开启</li>
+                <li><input type="radio" name="isopen" value="0" {$isopenCheck[0]}/>关闭</li>
+            </ul>
+        </td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">服务器主机地址</td>
+		<td class="td2"><input type="text" name="host" value="{$configure[host]}" id="host"  class="input input_wa" /></td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">服务器端口号</td>
+		<td class="td2"><input type="text" name="port" value="{$configure[port]}" id="port"  class="input input_wa" /></td>
+	</tr>
+</table>
+</div>
+<h2 class="h1 cc"><span class="fl mr5">全文索引高级配置</span><i onclick="sphinx.show();" class="hide hide_a">展开</i></h2>
+<div id="sphinxAdvanced" style="display:none;">
+        <div class="admin_table">
+        <table width="100%" cellspacing="0" cellpadding="0">
+			<tr class="tr1 vt">
+				<td class="td2" colspan="2">
+					 <p class="mb10">全文索引高级配置将直接影响查询方式和搜索结果，建议使用默认配置，如果需要修改，请严格参考官方文档。</p>
+            <p>一，设置全文索引评分模式</p>
+            <ol class="mb10">
+                <li>SPH_RANK_PROXIMITY_BM25， 默认模式，同时使用词组评分和BM25评分，并且将二者结合。[默认]</li>
+                <li>SPH_RANK_BM25，统计相关度计算模式，仅使用BM25评分计算（与大多数全文检索引擎相同）。这个模式比较快，但是可能使包含多个词的查询的结果质量下降。</li>
+                <li>SPH_RANK_NONE，禁用评分的模式，这是最快的模式。实际上这种模式与布尔搜索相同。所有的匹配项都被赋予权重1。</li>
+            </ol>
+            <p>二，设置全文索引分组属性</p>
+            <ol class="mb10">
+                <li>SPH_GROUPBY_DAY，从时间戳中按YYYYMMDD格式抽取年、月、日。</li>
+                <li>SPH_GROUPBY_WEEK，从时间戳中按YYYYNNN格式抽取年份和指定周数（自年初计起）的第一天。</li>
+                <li>SPH_GROUPBY_MONTH，从时间戳中按YYYYMM格式抽取月份。</li>
+                <li>SPH_GROUPBY_YEAR，从时间戳中按YYYY格式抽取年份。</li>
+                <li>SPH_GROUPBY_ATTR，使用属性值自身进行分组。[默认]</li>
+            </ol>
+            <p>三，自定义索引名称<br />
+    主要是有于创建自定义的索引名称，可用于快速切换索引（如备份索引）等，支持帖子标题，标题加内容，回复索引名称自定义<br />
+    更详细的介绍与说明请参考全文索引官方文档</p>
+				</td>
+			</tr>
+            <tr class="tr1 vt">
+                <td class="td1">设置全文索引评分模式</td>
+                <td class="td2">
+                    <select name="rank" id="rank" class="select_wa">
+                        <option value="SPH_RANK_PROXIMITY_BM25" {$rankSelects[1]}>SPH_RANK_PROXIMITY_BM25</option>
+                        <option value="SPH_RANK_BM25" {$rankSelects[2]}>SPH_RANK_BM25</option>
+                        <option value="SPH_RANK_NONE" {$rankSelects[3]}>SPH_RANK_NONE</option>
+                    </select>
+                </td>
+            </tr>
+            <tr class="tr1 vt">
+                <td class="td1">设置全文索引分组属性</td>
+                <td class="td2">
+                    <select name="group" id="group" class="select_wa">
+                        <option value="SPH_GROUPBY_DAY" {$groupSelects[1]}>SPH_GROUPBY_DAY</option>
+                        <option value="SPH_GROUPBY_WEEK" {$groupSelects[2]}>SPH_GROUPBY_WEEK</option>
+                        <option value="SPH_GROUPBY_MONTH" {$groupSelects[3]}>SPH_GROUPBY_MONTH</option>
+                        <option value="SPH_GROUPBY_YEAR" {$groupSelects[4]}>SPH_GROUPBY_YEAR</option>
+                        <option value="SPH_GROUPBY_ATTR" {$groupSelects[5]}>SPH_GROUPBY_ATTR</option>
+                    </select>
+                </td>
+            </tr>
+            <tr class="tr1 vt">
+                <td class="td1">[主题索引]名称</td>
+                <td class="td2"><input type="text" name="tindex" value="$configure[tindex]"  id="tindex" class="input input_wa" /></td>
+            </tr>
+            <tr class="tr1 vt">
+                <td class="td1">[主题+内容索引]名称 </td>
+                <td class="td2"><input type="text" name="tcindex" value="$configure[tcindex]"  id="tcindex" class="input input_wa" /></td>
+            </tr>
+            <tr class="tr1 vt">
+                <td class="td1">[回复索引]名称 </td>
+                <td class="td2"><input type="text" name="pindex" value="$configure[pindex]"  id="pindex" class="input input_wa" /></td>
+            </tr>
+        </table>
+    </div>
+</div>
+<div class="tac p10">
+    <span class="bt"><span><button type="button" name="test" onclick="pingTest();">测 试</button></span></span>
+    <span class="btn"><span><button type="submit" name="save">保 存</button></span></span>
+	<span class="bt"><span><button type="button" name="re" onclick="sphinx.recover();" style="display:none;" id="recover">默认设置</button></span></span>
+</div>
+</form>
+<!--
+EOT;
+}elseif($admintype == 'mmemcache'){print <<<EOT
+-->
+<div class="nav3 mb10">
+    <ul class="cc">
+        <li><a href="$admin_file?adminjob=advanced&admintype=msphinx">Sphinx全文索引配置</a></li>
+        <li class="current"><a href="$admin_file?adminjob=advanced&admintype=mmemcache">Memcache 缓存配置</a></li>
+    </ul>
+</div>
+<div class="admin_info mb10">
+<h3 class="h1">介绍说明</h3>
+    <div class="legend">
+        memcached是以LiveJournal旗下Danga Interactive公司的Brad Fitzpatric为首开发的一款开源软件。
+        现在已成为从多服务中提高Web应用扩展性的重要因素。许多Web应用都将数据保存到RDBMS中,应用服务器从中读取数据并在浏览器中显示。
+        但随着数据量的增大、访问的集中，就会出现RDBMS的负担加重、数据库响应恶化、网站显示延迟等重大影响。memcached是高性能的分布式内存缓存服务器。
+        一般的使用目的是，通过缓存数据库查询结果，减少数据库访问次数，以提高动态Web应用的速度、提高可扩展性。
+        Memcache官方网站：<a href="http://www.danga.com/memcached" target="_blank">http://www.danga.com/memcached</a> 。
+    </div>
+</div>
+<h2 class="h1">Memcache 缓存配置</h2>
+<form action="{$baseUrl}" method="post" >
+<input type="hidden" name="step" value="2" />
+<!--
+EOT;
+if(!$mcache->exists()){print <<<EOT
+-->
+	<div class="p10">服务器环境不支持Memcache客户端,请安装</div>
+<!--
+EOT;
+} else {print <<<EOT
+-->
+<div class="admin_table">
+<table width="100%" cellspacing="0" cellpadding="0">
+	<tr class="tr1 vt">
+		<td class="td1">Memcache</td>
+		<td class="td2">
+        	<ul class="list_A list_80">
+            	<li><input type="radio" name="isopen" value="1" {$isopenCheck[1]}/>开启</li>
+				<li><input type="radio" name="isopen" value="0" {$isopenCheck[0]}/>关闭</li>
+            </ul>
+		</td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">服务器主机地址</td>
+		<td class="td2"><input type="text" name="host" value="{$configure[host]}" id="host" class="input input_wa" /></td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">服务器端口号</td>
+		<td class="td2"><input type="text" name="port" value="{$configure[port]}" id="port" class="input input_wa" /></td>
+	</tr>
+</table>
+</div>
+<div class="tac p10">
+    <span class="bt"><span><button type="button" name="test" onclick="pingTest();">测 试</button></span></span>
+    <span class="btn"><span><button type="submit" name="save">保 存</button></span></span>
+</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+</form>
+<!--
+EOT;
+}print <<<EOT
+-->
+<script language="JavaScript" src="js/global.js"></script>
+<script language="JavaScript" src="js/pw_ajax.js"></script>
+<script type="text/javascript">
+function pingTest(){
+	var host = getObj("host").value;
+	var port = getObj("port").value;
+	var data = 'ajax=1&host='+host+'&port='+port;
+	sendmsg('{$baseUrl}',data);
+}
+
+var sphinx = {
+
+	/*ID选择器*/
+	$ : function(id){
+		return document.getElementById(id);
+	},
+
+	show : function(){
+		var obj = this.$("sphinxAdvanced");
+		var recover = this.$("recover");
+		if(obj.style.display == ""){
+			obj.style.display = "none";
+			recover.style.display = "none";
+		}else{
+			obj.style.display = "";
+			recover.style.display = "";
+		}
+	},
+
+	recover : function(){
+		this.$("tindex").value = "threadsindex";
+		this.$("tcindex").value = "tmsgsindex";
+		this.$("pindex").value = "postsindex";
+		var ranks = this.$("rank").getElementsByTagName("option");
+		for(var i=0;i<ranks.length;i++){
+			if(ranks[i].value == "SPH_RANK_PROXIMITY_BM25" ){
+				ranks[i].selected = "selected";
+			}else{
+				ranks[i].selected = "";
+			}
+		}
+		var groups = this.$("group").getElementsByTagName("option");
+		for(var i=0;i<groups.length;i++){
+			if(groups[i].value == "SPH_GROUPBY_ATTR" ){
+				groups[i].selected = "selected";
+			}else{
+				groups[i].selected = "";
+			}
+		}
+	}
+
+}
+</script>
+<!--
+EOT;
+?>-->

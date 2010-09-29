@@ -1,0 +1,146 @@
+<!--<?php
+include_once PrintEot('left');
+print <<<EOT
+-->
+<style type="text/css">
+html{overflow-x:hidden;}
+.tr3 .wid{width:40px;text-align:left;}
+.open,.close{width:12px;height:12px;margin:6px 6px 6px 0;cursor:pointer;overflow:hidden;}
+.open{background:url($imgpath/admin/setfourm/fourm.gif) 0 0 no-repeat;}
+.close{background:url($imgpath/admin/setfourm/fourm.gif) 0 -12px no-repeat;}
+.fourm-two{float:left;}
+
+.popoutContent{background:#fff;border:1px solid #8B8B8B;}
+.bgcorner1,.bgcorner2,.bgcorner3,.bgcorner4,.pobg1,.pobg2,.pobg3,.pobg4{filter:Alpha(opacity=20);_filter:Alpha(opacity=20);opacity:.2;overflow:hidden; z-index:1005; line-height:0 }
+.bgcorner1,.bgcorner2,.bgcorner3,.bgcorner4{width:5px;height:5px;background:#000;}
+.bgcorner1{background-position: 0 0 }
+.bgcorner2{background-position: -5px 0 }
+.bgcorner3{background-position: -5px -5px}
+.bgcorner4{background-position:0 -5px}
+.pobg1,.pobg2,.pobg3,.pobg4{ background:#000;}
+.pobg1{height:5px; }
+.pobg2{width:5px;}
+.pobg3{height:5px;}
+.pobg4{width:5px;}
+.popoutContent td{padding:.5em .6em;border-bottom:1px solid $tdcolor;}
+
+.h{border-bottom:1px solid $headborder;background:$headcolor;text-align:left;color:$headfontone;padding:2px .5em 0; line-height:220%;}
+.h span{font-weight:normal;}
+.h h2{font-weight:bold}
+.h a{font-family:Arial;color:$headfontone}
+.h span a,.h span{color:$headfonttwo;}
+
+.mode-one{padding:10px;width:700px;border:1px solid #eeeeee;background:#fff;margin-top:10px;}
+.mode-one dt{float:left;width:380px; text-align:right;padding-right:10px;}
+.mode-one dd{float:left;;line-heigh:24px;width:305px;}
+.mode-one dd strong{ font-weight:700;}
+.mode-one dd .fr a{margin-left:2em;}
+.mode-one dd li{padding:4px 0;}
+
+.popoutContent table th.h{background:#336699; color:#fff; font-weight:700; padding:4px 10px;}
+.popoutContent ul{background:#eee; padding:4px 0}
+.popoutContent ul li input.bt{background:#cccccc;color:#333; padding:3px 5px;  border:0; cursor:pointer;margin-right:5px;overflow:visible;}
+.popoutContent ul li input.btn{background:#336699;color:#fff; padding:3px 5px; border:0; cursor:pointer;overflow:visible;}
+/*tanchubtn*/
+.popoutContent span{margin-left:5px;}
+.popoutContent span.button button{color:#ffffff; background:#369;}
+.popoutContent span.button2 button{color:#333; background:#ccc;}
+</style>
+
+<!--
+EOT;
+if ($action == 'doset') {
+print <<<EOT
+-->
+
+<!--
+EOT;
+} else {
+print <<<EOT
+-->
+<!--
+EOT;
+print <<<EOT
+-->
+
+<h2><div style="float:left"><b>静态门户频道页面更新</b></div><div style="float:right;margin-right:120px"><a href="#" onclick="updateCache('all');return false;" title="更新页面缓存">更新全部页面</a></div></h2>
+<table width="100%" cellspacing="0" cellpadding="0" style="line-height:25px;">
+	<tbody>
+		<tr class="tr3">
+			<td><b>静态门户名:</b></td>
+			<td><b>更新</b></td>
+		</tr>
+<!--
+EOT;
+foreach($channelsArray as $key=>$val) {
+print <<<EOT
+-->
+<tr class="tr3">
+	<td class="tal"><span class="fl">频道：</span> <span class="fl">$val[name]</span></td>
+	<td><a href="#" class="fourm-two" onclick="updateCache('$key');return false;" title="更新页面缓存"><span class="update"></span></a></td>
+</tr>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+	</tbody>
+	
+</table>
+
+<div style="display:none">
+<ul class="nav3">
+<li><a href="$basename" class="two">门户首页静态化</a></li>
+</ul>
+<div class="c"></div>
+<h3><b>提示信息</b></h3>
+<div class="tr5">
+注意：开启门户模式静态化后，门户模式首页的底部导航条将被隐藏。
+</div>
+<div class="c"></div>
+<h2>配置门户模式静态化&nbsp;</h2>
+<form action="$basename" method="post">
+<table width="100%" cellspacing="0" cellpadding="0" style="line-height:25px;">
+	<tbody>
+		<tr class="tr3">
+			<td class="tal" width="30%">是否开启门户模式静态化</td>
+			<td>
+				<input type="radio" name="area_static[ifon]" value="1" $if_on_checked />开启
+				&nbsp;&nbsp;&nbsp;&nbsp;
+				<input type="radio" name="area_static[ifon]" value="0" $if_noton_checked />关闭
+				&nbsp;&nbsp;&nbsp;&nbsp;
+				<a href="$basename&action=dorefresh" onclick="if(confirm('你确定要刷新门户首页么？')){return true;}else{return false;}">立即刷新门户首页</a>
+			</td>
+		</tr>
+		<tr class="tr3">
+			<td class="tal">静态化页面更新时间</td>
+			<td>
+				<input type="text" name="area_static[step]" value="$area_static_step" size="5" />（分钟）
+			</td>
+		</tr>
+		<tr>
+			<td colspan="2">
+				<center>
+					<input type="hidden" name="action" value="doset" />
+					<input type="submit" value="提交" class="btn" />
+				</center>
+			</td>
+		</tr>
+	</tbody>
+</table>
+</form>
+</div>
+<script src="js/pw_ajax.js" language="JavaScript"></script>
+<script src="js/global.js" language="JavaScript"></script>
+<script language="javascript">
+function updateCache(alias){
+	var url = 'areastatic/index.php?alias='+alias;
+	ajax.send(url,'',ajax.get);
+}
+</script>
+
+<!--
+EOT;
+}
+include_once PrintEot('adminbottom');
+?>-->

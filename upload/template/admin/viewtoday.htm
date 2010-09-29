@@ -1,0 +1,50 @@
+<!--<?php
+include_once PrintEot('left');
+if (empty($action)) {
+if ($db_today == 0) {
+print <<<EOT
+-->
+<div class="admin_info mb10">
+  <h3 class="h1"><b>提示信息</b></h3>
+  <div class="legend">请在 <a href="$admin_file?adminjob=settings&admintype=basic"  onClick="parent.PW.Dialog({id:'basic',url:'$admin_file?adminjob=settings&admintype=basic',name:'常规设置'});return false;">核心设置->常规设置->全局参数</a> 开启今日到访统计才能使用此功能!</div>
+</div>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+<h2 class="h1">今日到访会员</h2>
+<div class="admin_table mb10">
+  <table cellspacing="0" cellpadding="0" width="100%">
+    <tr class="tr2 s3">
+      <td>用户名</td>
+      <td>登录时间</td>
+      <td>活动时间</td>
+      <td>来自</td>
+      <td>发帖</td>
+      <td>{$db_rvrcname}</td>
+    </tr>
+<!--
+EOT;
+foreach($inbbsdb as $inbbs){
+print <<<EOT
+-->
+    <tr class="tr1 vt">
+      <td class="td2"><a href="u.php?username=$inbbs[rawuser]" target="_blank">$inbbs[user]</a></td>
+      <td class="td2">$inbbs[logintime]</td>
+      <td class="td2">$inbbs[intime]</td>
+      <td class="td2">$inbbs[ipfrom]</td>
+      <td class="td2">$inbbs[post]</td>
+      <td class="td2">$inbbs[rvrc]</td>
+    </tr>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+  </table>
+</div>
+<div class="cc mb10">$pages</div>
+<!--
+EOT;
+}}include_once PrintEot('adminbottom');
+?>-->

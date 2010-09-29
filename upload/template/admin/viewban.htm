@@ -1,0 +1,123 @@
+<!--<?php
+include_once PrintEot('left');
+print <<<EOT
+-->
+<div class="admin_info mb10">
+	<h3 class="h1"><b>提示信息</b></h3>
+	<div class="legend">禁言用户列表，管理员可使用此功能解除禁言用户</div>
+</div>
+<form action="$basename&" method="post">
+<script language="javascript" src="js/date.js"></script>
+<h2 class="h1">搜索</h2>
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+	<tr class="tr1 vt">
+		<td class="td2" width="150">禁言类型:
+			<select name="bantype">
+				<option value="">全部类型</option>
+				<option value="1">定期禁言</option>
+				<option value="2">永久禁言</option>
+				<option value="3">强制禁言</option>
+			</select>
+		</td>
+		<td class="td2" width="135">用户名:
+			<input type="text" class="input input_wc" name="banuser" />
+		</td>
+		<td class="td2" width="135">管理员:
+			<input type="text" class="input input_wc" name="adminban" />
+		</td>
+		<td class="td2" width="260">禁言时间:
+			<input type="text" class="input input_wc" id="starttime" name="starttime" onClick="javascript:ShowCalendar(this.id)" /> -
+			<input type="text" class="input input_wc" id="endtime" name="endtime" onClick="javascript:ShowCalendar(this.id)" />
+		</td>
+		<td class="td2"><span class="bt2"><span><button type="submit" value="提 交">提 交</button></span></span></td>
+	</tr>
+</table>
+</div>
+</form>
+
+<form action="$basename&" method="post">
+<input type="hidden" name="action" value="freeban">
+<h2 class="h1">禁言用户</h2>
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+	<tr class="tr2 td_bgB">
+		<td width="24">ID</td>
+		<td width="80">用户名</td>
+		<td width="60">禁言范围</td>
+		<td width="60">禁言类型</td>
+		<td width="110">禁言时间</td>
+		<td width="50">禁言天数</td>
+		<td width="50">管理员</td>
+		<td>禁言原因</td>
+		<td width="35">解禁?</td>
+	</tr>
+<!--
+EOT;
+$num=($page-1)*$db_perpage;
+foreach($bandb as $ban){
+$num++;
+print <<<EOT
+-->
+	<tr class="tr1 vt">
+		<td class="td2">$num</td>
+		<td class="td2"><a href="u.php?uid=$ban[uid]" target="_blank">$ban[username]</a></td>
+		<td class="td2">
+<!--
+EOT;
+if($ban['fid']){print <<<EOT
+-->
+			<a href="thread.php?fid=$ban[fid]">{$forum[$ban[fid]][name]}</a>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+			全局禁言
+<!--
+EOT;
+}print <<<EOT
+-->
+		</td>
+		<td class="td2">
+<!--
+EOT;
+if($ban['type']==1){print <<<EOT
+-->
+			定期禁言
+<!--
+EOT;
+}elseif($ban['type']==2){print <<<EOT
+-->
+			永久禁言
+<!--
+EOT;
+}elseif($ban['type']==3){print <<<EOT
+-->
+			强制禁言
+<!--
+EOT;
+}print <<<EOT
+-->
+		</td>
+		<td class="td2">$ban[date]</td>
+		<td class="td2">$ban[days]</td>
+		<td class="td2">$ban[admin]</td>
+		<td class="td2"><p class="lh_18" title="$ban[reason]">$ban[reason]</p></td>
+		<td class="td2">&nbsp;<input type="checkbox" name="free[]" value="$ban[uid]" onclick="pwJsCheck(this)" /></td>
+	</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+</table>
+</div>
+<div class="mb10 cc">$pages</div>
+<div class="tac mb10">
+	<span class="bt"><span><button type="button" name="chkall" onclick="CheckAll(this.form)">全 选</button></span></span>
+	<span class="btn"><span><button type="submit" name="hello">提 交</button></span></span>
+</div>
+</form>
+<!--
+EOT;
+include_once PrintEot('adminbottom');
+?>-->

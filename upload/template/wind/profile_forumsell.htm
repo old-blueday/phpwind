@@ -1,0 +1,146 @@
+<!--<?php
+include_once PrintEot('profile_header');
+print <<<EOT
+-->
+<div id="user-main">
+	<div class="u-m-bg"></div>
+	<div class="u-m-bg-c cc">
+		<div class="p10">
+			<div class="u-nav-2 cc">
+				<ul>
+					<li><a style="cursor:pointer" href="profile.php?action=permission" hidefocus="true">权限查看</a></li>
+					<li><a style="cursor:pointer" href="profile.php?action=buy" hidefocus="true">特殊组购买</a></li>
+					<li class="current"><a style="cursor:pointer" hidefocus="true">版块访问权限</a></li>
+				</ul>
+			</div>
+			<div class="u-cont-bg-c">
+			<table width="100%" height="450">
+				<tr><td class="vt">
+					<div class="p15">
+<!--
+EOT;
+if ($date && isset($forumset['sellprice'][$date])) {print <<<EOT
+-->
+						
+						<form action="profile.php?action=forumsell" method="post">
+						<input type="hidden" name="verify" value="$verifyhash" />
+						<input type="hidden" name="fid" value="$fid" />
+						<input type="hidden" name="step" value="2" />
+						<input type="hidden" name="date" value="$date">
+						<table width="100%" class="mt10 bor-t-c">
+							<tr class="user-tr"><td colspan="2">版块访问权限购买</td></tr>
+							<tr class="user-tr">
+								<td width="20%">购买版块</td>
+								<td>{$forum[$fid][name]}</td>
+							</tr>
+							<tr class="user-tr">
+								<td>购买期限</td>
+								<td>$date 天</td>
+							</tr>
+							<tr class="user-tr">
+								<td>购买方式</td>
+								<td id="checkradio">
+<!--
+EOT;
+if ($forumset['sellprice'][$date]['cprice'] > 0) {print <<<EOT
+-->
+									<div><input type="radio" name="buymethod" value="0" />积分购买 (支付:<span class="s4">{$forumset[sellprice][$date][cprice]} {$credit->cType[$f[forumsell]]}</span>)</div>
+<!--
+EOT;
+}if ($forumset['sellprice'][$date]['rprice'] > 0) {print <<<EOT
+-->
+									<div><input type="radio" name="buymethod" value="1" />现金购买 (支付:<span class="s3">￥{$forumset[sellprice][$date][rprice]}</span>，通过支付宝交易)</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+								</td>
+							</tr>
+						</table>
+						<div style="text-align:center;margin-top:1em">
+							<span class="button"><span><button type="submit">提 交</button></span></span>
+						</div>
+						</form>
+<script language="JavaScript">
+function checkradio() {
+	var radio = getObj('checkradio').getElementsByTagName('input');
+	if (radio.length > 0) {
+		radio[0].checked = true;
+	}
+}
+checkradio();
+</script>
+<!--
+EOT;
+} else {print <<<EOT
+-->
+						<table width="100%" class="mt10 bor-t-c">
+							<tr class="user-tr b"><td colspan="5">版块访问权限购买</td></tr>
+							<tr class="user-tr">
+								<td width="20%">版块名称</td>
+								<td>购买期限[天]</td>
+								<td>价格({$credit->cType[$f[forumsell]]})</td>
+								<td>价格(RMB)</td>
+								<td>购买</td>
+							</tr>
+<!--
+EOT;
+foreach ($forumset['sellprice'] as $key => $value) {print <<<EOT
+-->
+							<tr class="user-tr">
+								<td>{$forum[$fid][name]}</td>
+								<td>$key</td>
+								<td>$value[cprice]</td>
+								<td>$value[rprice]</td>
+								<td><a href="profile.php?action=forumsell&date=$key&fid=$fid">购买</a></td>
+							</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+						</table>
+						<table width="100%" class="mt10 bor-t-c">
+							<tr class="user-tr b"><td colspan="5">我的购买记录</td></tr>
+							<tr class="user-tr">
+								<td></td>
+								<td>版块名称</td>
+								<td></td>
+								<td>到期日期</td>
+								<td>花费</td>
+							</tr>
+<!--
+EOT;
+$i=($page-1)*10;
+foreach($buydb as $key=>$value){
+$i++;
+print <<<EOT
+-->
+							<tr class="user-tr">
+								<td>$i</td>
+								<td><a href="thread.php?fid=$value[fid]">{$forum[$value[fid]][name]}</a></td>
+								<td>$value[buydate]</td>
+								<td>$value[overdate]</td>
+								<td>$value[cost] {$credit->cType[$value[credit]]}</td>
+							</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+						</table>
+						<div class="mt10 cc">$pages</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+					</div>
+				</td></tr>
+			</table>
+			</div>
+			</form>
+		</div>
+	</div>
+	<div class="u-m-bg"></div>
+</div>
+<!--
+EOT;
+?>-->

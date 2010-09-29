@@ -1,0 +1,1809 @@
+<!--<?php print <<<EOT
+-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" id="html">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=$db_charset" />
+<title>$webPageTitle - Powered by phpwind</title>
+<meta name="generator" content="phpwind $wind_version" />
+<meta name="description" content="$metaDescription" />
+<meta name="keywords" content="$metaKeywords" />
+<meta http-equiv="x-ua-compatible" content="ie=7" />
+<link rel='archives' title='$db_bbsname' href='$db_bbsurl/simple' />
+<base id="headbase" href="$db_bbsurl/" />
+<link rel="stylesheet" type="text/css" href="$imgpath/set/set-style.css" />
+<link rel="stylesheet" type="text/css" href="$imgpath/set/wind-reset.css" />
+<script type="text/javascript" language="JavaScript" src="js/pw_ajax.js"></script>
+<SCRIPT type="text/javascript" LANGUAGE="JavaScript" src="js/core/core.js"></SCRIPT>
+<SCRIPT type="text/javascript" LANGUAGE="JavaScript" src="js/core/tab.js"></SCRIPT>
+<script language="JavaScript">
+var imgpath = '$imgpath';
+var verifyhash = '$verifyhash';
+var winduid = '$winduid';
+var windid	= '$windid';
+var groupid	= '$groupid';
+</script>
+</head>
+<body onkeydown="try{keyCodes(event);}catch(e){}">
+<!--
+EOT;
+if($GLOBALS['groupid'] != 'guest' && $GLOBALS['groupid'] != '' && $GLOBALS['db_toolbar']){print <<<EOT
+-->
+<!--[if IE 6]>
+<div id="upPanel" name="upPanel">
+<div id="upPanelWrap" class="cc">
+<![endif]-->
+<!--
+EOT;
+}print <<<EOT
+-->
+<div class="set-wrap">
+	<div id="header">
+    <div class="c bg-setting" style="margin:0 3px; height:1px;"></div>
+    <div class="c bg-setting" style="margin:0 1px; height:2px;"></div>
+    <div class="header-set-wrap bg-setting">
+		<div class="fr">
+<img src="$faceurl" id="iconimg" width="16" height="16" align="absbottom" /> <a href="u.php" id="td_userinfo_more" class="b mr10">$windid</a>
+<a href="message.php?type=sms" title="消息" class="mr10">消息中心</a>
+<a href="$loginouturl">退出</a>
+		</div>
+    <table border="0" cellpadding="0" cellspacing="0"><tr><td><a href=""><img src="$imgpath/set/logo-setting.png" align="baseline" /></a></td><td class="pl10 tar">
+		</td></tr></table>
+	</div>
+  </div>
+  <div id="main" class="w960 cc">
+	<div id="menu-bar" class="w170 fl">
+      <h2>设置中心</h2>
+      <ul id="edittab">
+		<li id="pro_modify">
+			<a href="profile.php?action=modify"><img src="$imgpath/set/pro_modify.gif" align="absmiddle" /> 帐户设置</a>
+		</li>
+<!--
+EOT;
+if($db_modes['o']['ifopen']){print <<<EOT
+-->
+		<li id="pro_privacy">
+			<a href="profile.php?action=privacy"><img src="$imgpath/set/pro_privacy.gif" align="absmiddle" /> 隐私设置</a>
+		</li>
+<!--
+EOT;
+}print <<<EOT
+-->
+		<li id="pro_bbsset">
+			<a href="profile.php?action=bbsset"><img src="$imgpath/set/pro_bbsset.gif" align="absmiddle" /> 站点设置</a>
+		</li>
+		<li id="pro_permission">
+			<a href="profile.php?action=permission"><img src="$imgpath/set/pro_permission.gif" align="absmiddle" /> 权限查看</a>
+		</li>
+<!--
+EOT;
+if($_G['atclog']){print <<<EOT
+-->
+		<li id="pro_log">
+			<a href="profile.php?action=log"><img src="$imgpath/set/pro_log.gif" align="absmiddle" /> 操作记录</a>
+		</li>
+<!--
+EOT;
+}print <<<EOT
+-->
+		<li>
+			<a href="userpay.php"><img src="$imgpath/set/pro_cp.gif" align="absmiddle" /> 积分管理</a>
+		</li>
+		<li>
+			<a href="userpay.php?action=buy"><img src="$imgpath/set/pro_pay.gif" align="absmiddle" /> 积分充值</a>
+		</li>
+		<li id="pro_change">
+			<a href="profile.php?action=change"><img src="$imgpath/set/pro_change.gif" align="absmiddle" /> 积分转换</a>
+		</li>
+		<li id="pro_buy">
+			<a href="profile.php?action=buy"><img src="$imgpath/set/pro_buy.gif" align="absmiddle" /> 特殊组购买</a>
+		</li>
+<!--
+EOT;
+if($_G['maxcstyles'] && !defined('M_P')){print<<<EOT
+-->
+		<li id="pro_style">
+			<a href="profile.php?action=style"><img src="$imgpath/set/pro_theme.gif" align="absmiddle" /> 自定义风格</a>
+		</li>
+<!--
+EOT;
+}print<<<EOT
+-->
+      </ul>
+    </div>
+<script language="javascript">
+setCurrent('pro_$action','','current');
+</script>
+<!--
+EOT;
+if($action=='modify'){print<<<EOT
+-->
+<div id="content" class="w780 fr">
+	<div class="tabB cc"><a href="u.php" class="fr">预览我的资料页面&raquo;</a>
+        <ul id="infolist">
+          <li id="base"><a style="cursor:pointer" onclick="showTabs('infolist','base','li','current')">基本资料</a></li>
+          <li id="trade"><a style="cursor:pointer" onclick="showTabs('infolist','trade','li','current')">交易信息</a></li>
+          <li id="link"><a style="cursor:pointer" onclick="showTabs('infolist','link','li','current')">联系方式</a></li>
+          <li id="face"><a style="cursor:pointer" onclick="showTabs('infolist','face','li','current')">修改头像</a></li>
+          <li id="safe"><a style="cursor:pointer" onclick="showTabs('infolist','safe','li','current')">密码安全</a></li>
+<!--
+EOT;
+if($customfield){print <<<EOT
+-->
+		  <li id="other"><a style="cursor:pointer" onclick="showTabs('infolist','other','li','current')">扩展资料</a></li>
+<!--
+EOT;
+}print <<<EOT
+-->
+        </ul>
+      </div>
+	<div id="set-content-wrap" class="cc set-table">
+			<form id="creator" name="creator" action="profile.php?action=modify&" method="post" enctype="multipart/form-data">
+				<input type="hidden" name="verify" value="$verifyhash" />
+				<input type="hidden" id="info_type" name="info_type" value="info_base" />
+					<div style="display:none" id="info_base">
+						<table width="100%" border="0" cellpadding="0" cellspacing="0">
+<!--
+EOT;
+if($groupselect){print <<<EOT
+-->
+							<tr>
+								<td>头衔选择</td>
+								<td><select name="newgroupid">$groupselect</select> 选择一个用户组头衔作为你在站点上的头衔</td>
+							</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+							<tr>
+								<td width="120"> 性别</td>
+								<td><input type="radio" name="progender" value="0" $sexselect[0] /> 保密
+									<input type="radio" name="progender" value="1" $sexselect[1] /> 男
+									<input type="radio" name="progender" value="2" $sexselect[2] /> 女
+								</td>
+							</tr>
+							<tr>
+								<td> 生日</td>
+								<td>
+									<select name="proyear">
+<!--
+EOT;
+if($rg_timestart < $rg_timeend){
+for($i=$rg_timestart;$i<=$rg_timeend;$i++){print <<<EOT
+-->
+									<option value="$i" $yearslect[$i]>$i</option>
+<!--
+EOT;
+}}else{
+for($i=$rg_timestart;$i>=$rg_timeend;$i--){print <<<EOT
+-->
+									<option value="$i" $yearslect[$i]>$i</option>
+<!--
+EOT;
+}}print <<<EOT
+-->
+									</select>年
+									<select name="promonth">
+<!--
+EOT;
+for($i=1;$i<=12;$i++){print <<<EOT
+-->
+										<option value="$i" $monthslect[$i]>$i</option>
+<!--
+EOT;
+}print <<<EOT
+-->
+									</select>月
+									<select name="proday">
+<!--
+EOT;
+for($i=1;$i<=31;$i++){print <<<EOT
+-->
+										<option value="$i" $dayslect[$i]>$i</option>
+<!--
+EOT;
+}print <<<EOT
+-->
+									</select>日
+								</td>
+							</tr>
+<!--
+EOT;
+foreach($custominfo as $key => $value){print <<<EOT
+-->
+							<tr>
+								<td>$value[0]</td>
+								<td><input class="input" type="text" size="20" name="customdata[$key]" value="{$customdata[$key]}" /></td>
+							</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+							<tr>
+								<td>来自</td>
+								<td><input class="input" type="text" size="20" maxlength="14" name="profrom" value="$userdb[location]" /></td>
+							</tr>
+							<tr>
+								<td> 个人主页</td>
+								<td><input class="input" type="text" size="50" maxlength="75" name="prohomepage" value="$userdb[site]" /></td>
+							</tr>
+<!--
+EOT;
+if($_G[allowhonor]){print <<<EOT
+-->
+							<tr>
+								<td>个性签名</td>
+								<td>
+									<input class="input" type="text" size="40" name="prohonor" value="$userdb[honor]" />（将在我的首页和帖子页面用户信息处显示）
+								</td>
+							</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+							<tr>
+								<td>自我简介</td>
+								<td><textarea name="prointroduce" id="prointroduce" rows="4" cols="50">$userdb[introduce]</textarea><br /><span id="prointroduce_warn">限500字节</span> </td>
+							</tr>
+							<tr>
+								<td>帖子签名</td>
+								<td><textarea name="prosign" id="prosign" rows="4" cols="50">$userdb[signature]</textarea><br />（将在每个帖子下方显示，<span id="prosign_warn">限{$_G[signnum]}字节</span>）</td>
+							</tr>
+						</table>
+<script language="JavaScript">
+var charset = '$db_charset';
+var signnum = '$_G[signnum]';
+initCheckTextNum('prointroduce','prointroduce_warn',500);
+initCheckTextNum('prosign','prosign_warn',signnum);
+</script>
+						<div class="tac" style=" padding:1em">
+							<span class="button"><span><button type="submit">保存资料</button></span></span>
+							<input type="hidden" value="2" name="step" />
+						</div>
+					</div>
+					<div style="display:none" id="info_trade">
+						<table width="100%" border="0" cellpadding="0" cellspacing="0">
+							<tr>
+								<td width="120">支付宝帐号</td>
+								<td><input class="input" type="text" size="20" name="alipay" value="$trade[alipay]" /></td>
+							</tr>
+							<tr class="vt">
+								<td>个人商品分类</td>
+								<td>
+									<table width="240">
+										<tr>
+											<td width="60%">分类名</td>
+											<td><a style="color:blue;cursor:pointer" onclick="addtrade();">[添加]</a></td>
+										</tr>
+										<tbody id="trade_mode" style="display:none"><tr>
+											<td><input class="input" type="text" name="tradetype[]" size="18" /></td>
+											<td><a style="color:orange;cursor:pointer" onclick="removetrade(this);">[删除]</a></td>
+										</tr></tbody>
+										<tbody id="trade_c">
+<!--
+EOT;
+if ($trade['tradetype']) {
+foreach ($trade['tradetype'] as $key => $value) {print <<<EOT
+-->
+										<tr>
+											<td><input class="input" type="text" name="tradetype[$key]" value="$value" size="18" /></td>
+											<td><a style="color:orange;cursor:pointer" onclick="removetrade(this);">[删除]</a></td>
+										</tr>
+<!--
+EOT;
+}}print <<<EOT
+-->
+										</tbody>
+									</table>
+								</td>
+							</tr>
+						</table>
+						<div class="tac" style=" padding:1em">
+							<span class="button"><span><button type="submit">保存资料</button></span></span>
+							<input type="hidden" value="2" name="step" />
+						</div>
+<script language="JavaScript">
+function addtrade() {
+	var s = getObj('trade_mode').firstChild.cloneNode(true);
+	getObj('trade_c').appendChild(s);
+}
+function removetrade(obj) {
+	var o = obj.parentNode.parentNode;
+	o.parentNode.removeChild(o);
+}
+addtrade();
+</script>
+					</div>
+					<div style="display:none" id="info_link">
+						<table width="100%" border="0" cellpadding="0" cellspacing="0">
+							<tr>
+								<td width="120">QQ</td>
+								<td><input class="input" type="text" size="25" maxlength="14" name="prooicq" value="$userdb[oicq]" /></td>
+							</tr>
+							<tr>
+								<td>阿里旺旺</td>
+								<td><input class="input" type="text" size="25" maxlength="30" name="proaliww" value="$userdb[aliww]" /></td>
+							</tr>
+							<tr>
+								<td>Yahoo</td>
+								<td><input class="input" type="text" size="25" name="proyahoo" value="$userdb[yahoo]" /></td>
+							</tr>
+							<tr>
+								<td>Msn</td>
+								<td><input class="input" type="text" size="25" name="promsn" value="$userdb[msn]" /></td>
+							</tr>
+						</table>
+						<div class="tac" style=" padding:1em">
+							<span class="button"><span><button type="submit">保存资料</button></span></span>
+							<input type="hidden" value="2" name="step" />
+						</div>
+					</div>
+					<div style="display:none" id="info_face">
+						<table width="100%" border="0" cellpadding="0" cellspacing="0">
+							<tr class="vt">
+								<td width="120">
+									<img src="$iconurl?$timestamp" $iconsize name="useravatars" style="width:120px;height:120px;" />
+								</td>
+								<td>
+									<div id="openchang">
+										<div style="float:left;margin-right:1%;">
+											<input type="radio" name="facetype" value="1" onclick="CkFaceType(this.value)">系统头像
+										</div>
+<!--
+EOT;
+if($_G[allowportait]){print <<<EOT
+-->
+										<div style="float:left;margin-right:1%;">
+											<input type="radio" name="facetype" value="2" onclick="CkFaceType(this.value)">头像链接
+										</div>
+<!--
+EOT;
+}if($db_ifupload && $_G[upload]){print <<<EOT
+-->
+										<div style="float:left;">
+											<input type="radio" name="facetype" value="3" onclick="CkFaceType(this.value)">头像上传
+										</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+										<div class="c"></div>
+										<div id="face1" style="display:none;">
+											<div id="iconbox">
+												<div style="width:310px;margin:5px 0;">
+													<a class="fr" onclick="showSystemIcon(2);" style="cursor:pointer">下一页</a><a onclick="showSystemIcon(0);" style="cursor:pointer">上一页</a>
+												</div>
+												<div style="width:310px;">
+<!--
+EOT;
+foreach ($imgname_array as $key => $value) {print <<<EOT
+-->
+													<span onClick="showimage('$imgpath','$value')" class="fl face"><img src='$imgpath/face/$value' width="50" height="50"></span>
+<!--
+EOT;
+}print <<<EOT
+-->
+												</div>
+											</div>
+											<input type="hidden" name="proicon" value="$iconfile" />
+										</div>
+										<div id="face2" style="width:100%;margin-top:1%;display:none;">
+										<table cellpadding="0" cellspacing="0">
+											<tr>
+												<td>头像链接 <input name="httpurl[0]" value="$httpurl" class="input" type="text" size="40" /> 必须以 http://开头</td>
+											</tr>
+											<tr>
+												<td>头像宽度 <input name="httpurl[1]" value="$width2" class="input" size="4" maxlength="3" /> 必须是 1 -- $db_imgwidth 之间的一个整数。</td>
+											</tr>
+											<tr>
+												<td>头像高度 <input name="httpurl[2]" value="$height2" class="input" size="4" maxlength="3" /> 必须是 1 -- $db_imgheight 之间的一个整数。</td>
+											</tr>
+										</table>
+										</div>
+										<div id="face3" style="display:none;">
+											<object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" codebase=" http://fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=7,0,0,0" width="560" height="450" id="FlashVars" align="middle">
+												<param name="movie" value="js/face.swf" />
+												<param name="FlashVars" value="$icon_encode_url" />
+												<embed  width="560" height="450" src="js/face.swf" FlashVars="$icon_encode_url" pluginspage="http://www.macromedia.com/shockwave/download/index.cgi?P1_Prod_Version=ShockwaveFlash"  type="application/x-shockwave-flash" />
+											</object>
+										</div>
+									</div>
+								</td>
+							</tr>
+						</table>
+						<div class="tac" style=" padding:1em" id="face_button">
+							<span class="button"><span><button type="submit">保存资料</button></span></span>
+							<input type="hidden" value="2" name="step" />
+						</div>
+					</div>
+					<div style="display:none" id="info_safe">
+						<table width="100%" border="0" cellpadding="0" cellspacing="0">
+<!--
+EOT;
+if($ifppt){print <<<EOT
+-->
+							<tr>
+								<td width="120">原密码</td>
+								<td><input class="input" type="password" size="20" maxlength="75" name="oldpwd" value="" /> 修改密码或邮箱时需要密码验证</td>
+							</tr>
+							<tr>
+								<td>新密码</td>
+								<td><input class="input" type="password" size="20" maxlength="75" name="propwd" value="" /></td>
+							</tr>
+							<tr>
+								<td>确认密码</td>
+								<td><input class="input" type="password" size="20" maxlength="75" name="check_pwd" value="" /></td>
+							</tr>
+							<tr>
+								<td>E-MAIL</td>
+								<td><input class="input" type="text" size="20" maxlength="75" name="proemail" value="$userdb[email]" />
+								<input type="checkbox" name="propublicemail" value="1" $ifpublic />公开邮箱</td>
+							</tr>
+<!--
+EOT;
+if($db_ifsafecv){print <<<EOT
+-->
+							<tr>
+								<td>安全问题</td>
+								<td>
+									<select name="question" onchange="showcustomquest(this.value)">
+										<option value="-2">不修改安全问题和答案</option>
+										<option value="0">无安全问题</option><option value="1">我爸爸的出生地</option><option value="2">我妈妈的出生地</option><option value="3">我的小学校名</option><option value="4">我的中学校名</option><option value="5">我最喜欢的运动</option><option value="6">我最喜欢的歌曲</option><option value="7">我最喜欢的电影</option><option value="8" >我最喜欢的颜色</option><option value="-1">自定义问题</option>
+									</select>
+									<input id="customquest" style="display:none" type="text" name="customquest" class="input">
+								</td>
+							</tr>
+							<tr>
+								<td>您的答案</td>
+								<td><input type="text" name="answer" class="input"></td>
+							</tr>
+<!--
+EOT;
+}}else{print <<<EOT
+-->
+							<tr><td colspan="2" style="padding:10px 0">站点开启通行证功能，修改用户密码，请登录 <a href="$db_pptserverurl">$db_pptserverurl</a></td></tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+						</table>
+<!--
+EOT;
+if ($ifppt) {print <<<EOT
+-->
+						<div class="tac" style=" padding:1em">
+							<span class="button"><span><button type="submit">保存资料</button></span></span>
+							<input type="hidden" value="2" name="step" />
+						</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+					</div>
+<!--
+EOT;
+if($customfield){print <<<EOT
+-->
+					<div style="margin:1em 2em;display:none" id="info_other">
+						<table width="100%" border="0" cellpadding="0" cellspacing="0">
+<!--
+EOT;
+foreach($customfield as $value){
+$value[required] && $value[descrip].='（必填内容）';
+$editable=(!$userdb[$value[field]]||$value[editable])?'':'disabled';
+if($value[type]=='1'){
+$field_type="<input class=\"input\" type=\"text\" size=\"30\" name=\"$value[field]\" value=\"{$userdb[$value[field]]}\" $editable />";
+}elseif($value[type]=='2'){
+$field_type="<textarea name=\"$value[field]\" rows=\"5\" class=\"input\" cols=\"50\" $editable>{$userdb[$value[field]]}</textarea>";
+}elseif($value[type]=='3'){
+$field_type='';
+foreach($value[options] as $v){
+list($k,$v)=explode('=',$v);
+$selected=$userdb[$value[field]]==$k?'selected':'';
+$field_type.="<option value=\"$k\" $selected>$v</option>";
+}$field_type="<select name=\"$value[field]\" $editable>$field_type</select>";
+}print <<<EOT
+-->
+							<tr>
+								<td width="25%">$value[title]</td>
+								<td>$field_type $value[descrip]</td>
+							</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+						</table>
+						<div class="tac" style=" padding:1em">
+							<span class="button"><span><button type="submit">保存资料</button></span></span>
+							<input type="hidden" value="2" name="step" />
+						</div>
+					</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+		</form>
+		</div>
+<!-- <iframe id="hideframe" name="hideframe" width="0" height="0" marginwidth="0" frameborder="0" src="about:blank"></iframe> -->
+<script language="JavaScript">
+var display = '$display';
+function CkFaceType(value){
+	var facetype = document.getElementsByName('facetype');
+	for(i=0;i<facetype.length;i++){
+		if(facetype[i].value == value){
+			facetype[i].checked = true;
+			if (value == '3'){
+				getObj('face_button').style.display = 'none';
+			}
+			getObj('face' + value).style.display = '';
+		} else {
+			getObj('face_button').style.display = '';
+			getObj('face' + facetype[i].value).style.display = 'none';
+		}
+	}
+}
+CkFaceType('$icontype');
+function showimage(imgpath,value){
+	var path = imgpath + '/face/';
+	facepath(path,value,false);
+}
+function facepath(iconurl,iconfile,showmsg,iconwidth,iconheight){
+	/*
+	if (showmsg) {
+		if (showmsg == 'success') {
+			ajax.time = setTimeout(function(){
+				closep();
+				showDialog('success','上传成功!',1);
+			},1500);
+			getObj('reupload').innerHTML = '<input class="input file" type="file" id="upload" name="upload" /><a class="bta" unselectable="on" onclick="UpLoadFace()">上传</a>';
+		} else if (showmsg == 'undefined_action') {
+			ajax.time = setTimeout(function(){
+				closep();
+				showDialog('error','非法操作');
+			},1500);
+			return false;
+		} else {
+			ajax.time = setTimeout(function(){
+				closep();
+				showDialog("error",showmsg);
+			},1500);
+			return false;
+		}
+	}
+	*/
+	document.images.useravatars.src = iconurl + iconfile + '?' + new Date().getTime();
+	if (iconwidth>0) document.images.useravatars.width = iconwidth;
+	if (iconheight>0) document.images.useravatars.height = iconheight;
+	document.creator.proicon.value = iconfile;
+	return false;
+}
+function procheck(formct){
+	if(formct.prointroduce.value.length>500){
+		showDialog("error","最短购买天数");
+		return false;
+	}
+}
+function showcustomquest(qid){
+	getObj('customquest').style.display = qid==-1 ? '' : 'none';
+}
+/*
+function UpLoadFace(){
+	if (getObj('upload').value != '') {
+		var uploadform = getObj('creator');
+		var oldaction = uploadform.action;
+		var oldonSubmit = uploadform.onSubmit;
+		uploadform.action = 'profile.php?action=ajaxface';
+		uploadform.onSubmit = '';
+		uploadform.target = 'hideframe';
+		uploadform.submit();
+		uploadform.action = oldaction;
+		uploadform.onSubmit = oldonSubmit;
+		uploadform.target = '';
+		read.obj = getObj('upload');
+		read.guide();
+		document.onmouseout = '';
+	} else {
+		showDialog("error","请选择要上传附件");
+	}
+}
+*/
+function initStyleType(){
+	if (display == '1') {
+		getObj('tpskin1').style.display = '';
+	} else {
+		getObj('tpskin2').style.display = '';
+	}
+}
+
+function ckStyleType(value){
+	if (value == 'system') {
+		getObj('tpskin1').style.display = '';
+		getObj('tpskin2').style.display = 'none';
+	} else {
+		getObj('tpskin1').style.display = 'none';
+		getObj('tpskin2').style.display = '';
+	}
+}
+
+function showSystemIcon(page) {
+	getObj('iconbox').innerHTML = '<div style="width:272px;"><div class="tac p10"><img src="'+imgpath+'/loading.gif" align="absmiddle" /> 正在加载数据...</div></div>';
+	ajax.send('pw_ajax.php','action=showface&page='+page,getIcon);
+}
+
+function getIcon() {
+	var iconlist = ajax.request.responseText;
+	setTimeout(function(){getObj('iconbox').innerHTML = iconlist;},300);
+}
+<!--
+EOT;
+if($_G['maxcstyles'] && $customstyles){print<<<EOT
+-->
+initStyleType();
+<!--
+EOT;
+}print<<<EOT
+-->
+function showTabs(id,select,element,css){
+	var o = getObj(id);
+	var t = o.getElementsByTagName(element);
+	for (var i=0;i<t.length;i++) {
+		if (t[i].id) {
+			var oo = getObj(t[i].id);
+			if (t[i].id == select) {
+				getObj(t[i].id).className = css;
+				getObj('info_'+t[i].id).style.display = '';
+			} else {
+				getObj(t[i].id).className = '';
+				getObj('info_'+t[i].id).style.display = 'none';
+			}
+		}
+	}
+	getObj('info_type').value=select;
+	return false;
+}
+setTimeout(function(){showTabs('infolist','$info_type','li','current');},500);
+</script>
+</div>
+<!--
+EOT;
+}elseif($action=='bbsset'){print <<<EOT
+-->
+<div id="content" class="w780 fr">
+	<div class="tabB cc"><a href="u.php" class="fr">预览我的资料页面&raquo;</a>
+        	<ul id="infolist">
+              <li id="fancy"><a style="cursor:pointer" onclick="showTabs('infolist','fancy','li','current')">个人喜好</a></li>
+              <li id="friend"><a style="cursor:pointer" onclick="showTabs('infolist','friend','li','current')">好友设置</a></li>
+              <li id="msg"><a style="cursor:pointer" onclick="showTabs('infolist','msg','li','current')">消息设置</a></li>
+            </ul>
+         </div>
+		<div id="set-content-wrap" class="cc set-table">
+				<form action="profile.php?action=bbsset" method="post">
+					<input type="hidden" name="verify" value="$verifyhash" />
+					<div class="set-tab-box">
+						<div style="display:none" id="info_fancy">
+							<table width="100%" border="0" cellpadding="0" cellspacing="0">
+								<tr>
+									<td width="35%">选择风格</td>
+									<td>
+										<select name="tpskin">
+											<option value="">使用默认</option>
+											$choseskin
+										</select>
+									</td>
+								</tr>
+<!--
+EOT;
+if ($ifsign) {print <<<EOT
+-->
+								<tr>
+									<td>签名展示设置</td>
+									<td>
+
+<!--
+EOT;
+if (!$days) {print <<<EOT
+-->
+										(<font color="red">您的{$credit->cType[$db_signcurtype]}不足，无法展示帖子签名</font>)
+<!--
+EOT;
+}print <<<EOT
+-->
+									</td>
+								</tr>
+								<tr>
+									<td>签名展示功能</td>
+									<td>
+										<input type="radio" name="showsign" value="1" $showsign_Y />开启
+										<input type="radio" name="showsign" value="0" $showsign_N />关闭
+									</td>
+								</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+								<tr>
+									<td>选择默认使用的编辑器</td>
+									<td>
+										<input type="radio" name="editor" value="1" $editor_Y /> 所见即所得
+										<input type="radio" name="editor" value="0" $editor_N /> code 模式
+									</td>
+								</tr>
+								<tr>
+									<td>选择您所在的时区<br />将时间显示为您当地时间</td>
+									<td>
+										<select name="timedf">
+											<option value="0">使用默认</option>
+<!--
+EOT;
+include(R_P.'template/admin/timezone.htm');print <<<EOT
+-->
+										</select>
+									</td>
+								</tr>
+								<tr>
+									<td>时间格式(格式如:yyyy-mm-dd,yy-m-d)<br />yyyy:4位数年份,yy:2位数年份<br />mm:有前导零01-12,m:没前导零1-12<br />dd:有前导零01-31,d:没前导零1-31</td>
+									<td>
+										<input type="radio" name="d_type" value="0" $d_type_0 />使用默认<br />
+										<input type="radio" name="d_type" value="1" $d_type_1 />自定义
+										<input class="input" type="text" name="date_f" value="$userdb[datefm]" />
+										<input type="radio" name="time_f" value="24" $check_24 />24
+										<input type="radio" name="time_f" value="12" $check_12 />12
+									</td>
+								</tr>
+								<tr>
+									<td>主题列表每页个数(设置为0使用默认)</td>
+									<td>
+										<select name="t_num"><option value="0">0</option>
+<!--
+EOT;
+foreach ($t_num as $value) {
+$selected = ${'T_'.$value} ? ${'T_'.$value} : '';
+print <<<EOT
+-->
+											<option value="$value" $selected>$value</option>
+<!--
+EOT;
+}print <<<EOT
+-->
+										</select>
+									</td>
+								</tr>
+								<tr><td>文章列表每页个数(设置为0使用默认)</td>
+									<td>
+										<select name="p_num"><option value="0">0</option>
+<!--
+EOT;
+foreach ($p_num as $value) {
+$selected = ${'P_'.$value} ? ${'P_'.$value} : '';
+print <<<EOT
+-->
+											<option value="$value" $selected>$value</option>
+<!--
+EOT;
+}print <<<EOT
+-->
+										</select>
+									</td>
+								</tr>
+								<tr>
+									<td> 是否接受邮件</td>
+									<td>
+										<input type="radio" name="proreceivemail" value="1" $email_Y /> 接收邮件
+										<input type="radio" name="proreceivemail" value="0" $email_N /> 不接收邮件
+									</td>
+								</tr>
+							</table>
+						</div>
+						<div style="display:none" id="info_friend">
+							<table width="100%" border="0" cellpadding="0" cellspacing="0">
+								<tr>
+									<td width="35%">加我为好友时身份验证</td>
+									<td>
+										<input type="radio" name="friendcheck" value="0" $friend_0 /> 允许任何人加我为好友<br /><input type="radio" name="friendcheck" value="1" $friend_1 /> 需要身份验证才能加我为好友<br /><input type="radio" name="friendcheck" value="2" $friend_2 /> 不允许任何人加我为好友
+									</td>
+								</tr>
+							</table>
+						</div>
+						<div style="display:none" id="info_msg">
+							<table width="100%" border="0" cellpadding="0" cellspacing="0">
+<!--
+EOT;
+if($_G['msggroup']){print <<<EOT
+-->
+								<tr>
+									<td width="35%">可设置屏蔽指定用户组的消息:<br />如选中“{$mylevel}”，则表示不接收来自“{$mylevel}”用户组的短信，全不选择则表示接收来自所有用户组的短信</td>
+									<td><div>$usergroup</div></td>
+								</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+								<tr>
+									<td width="35%">屏蔽多个用户时用逗号 "," 隔开<br />(如:张三,李四,王五等)。<br />当这些被添加的屏蔽用户给您发送消息时将不予接收。</td>
+									<td><textarea name="banidinfo" rows="6" cols="80">$userdb[banpm]</textarea></td>
+								</tr>
+							</table>
+						</div>
+						<div class="tac" style=" padding:1em">
+							<span class="button"><span><button type="submit">保存设置</button></span></span>
+							<input type="hidden" value="2" name="step" />
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+<script language="JavaScript">
+setTimeout(function(){showTabs('infolist','$info_type','li','current');},500);
+</script>
+<!--
+EOT;
+}elseif($action=='change'){print<<<EOT
+-->
+<div id="content" class="w780 fr">
+	<div class="tabB cc"><a href="u.php" class="fr">预览我的资料页面&raquo;</a>
+            <ul>
+              <li class="current"><a href="javascript:;">积分转换</a></li>
+            </ul>
+         </div>
+		<div id="set-content-wrap" class="cc set-table">
+						<div style="width:180px;float:right;margin-top:20px;">
+							<h5 class="f12 b" style="padding:0 0 10px 10px">用户积分数</h5>
+							<table width="100%" border="0" cellspacing="0" cellpadding="0">
+								<tr>
+									<td style="height:0px"></td>
+									<td width="60%"></td>
+								</tr>
+								<tr>
+									<td>$db_rvrcname</td>
+									<td>$userrvrc $db_rvrcunit</td>
+								</tr>
+								<tr>
+									<td>$db_creditname</td>
+									<td>$winddb[credit] $db_creditunit</td>
+								</tr>
+								<tr>
+									<td>$db_moneyname</td>
+									<td>$winddb[money] $db_moneyunit</td>
+								</tr>
+								<tr>
+									<td>$db_currencyname</td>
+									<td>$winddb[currency] $db_currencyunit</td>
+								</tr>
+<!--
+EOT;
+foreach($_CREDITDB as $key => $value){print <<<EOT
+-->
+								<tr>
+									<td>$value[0]</td>
+									<td>{$creditdb[$key]} $value[1]</td>
+								</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+							</table>
+						</div>
+						<div style="padding-right:200px">
+							<div style="width:100%;float:left">
+								<table width="100%" border="0" cellspacing="0" cellpadding="0" style="line-height:200%">
+<!--
+EOT;
+foreach($jf as $key=>$value){print <<<EOT
+-->
+								<form method="post" action="profile.php?action=change&">
+								<input type="hidden" name="step" value="3" />
+								<input type="hidden" name="type" value="$key" />
+								<input type="hidden" name="verify" value="$verifyhash" />
+									<tr>
+										<td class="b" width="25%">{$value[0]} <span class="gray">-&gt;</span> {$value[1]}</td>
+										<td>输入{$value[0]}数<span class="gray">(必须为{$value[2]}的整数倍)</span><br />
+											<input name="change" type="text" class="input" /> <span class="button"><span><button type="submit">兑换成{$value[1]}</button></span></span>
+											<br />
+											<span class="gray">行情:</span> {$value[2]}{$value[0]}={$value[3]}{$value[1]}
+										</td>
+									</tr>
+								</form>
+<!--
+EOT;
+}print <<<EOT
+-->
+								</table>
+							</div>
+						</div>
+		</div>
+</div>
+<!--
+EOT;
+}elseif($action=='permission'){
+$_P = array('0'=>'<font color="red" size="+">&#215;</font>','1'=>'<font color="green" size="+">&#8730;</font>');print<<<EOT
+-->
+<div id="content" class="w780 fr">
+	<div class="tabB cc"><a href="u.php" class="fr">预览我的资料页面&raquo;</a>
+            <ul>
+<!--
+EOT;
+if($fid){print<<<EOT
+-->
+              <li class="current"><a href="profile.php?action=permission&fid=$fid">版块权限<span style="font-weight:normal;font-size:small">（$per[name]）</span></a></li>
+
+              <li><a href="profile.php?action=permission">查看用户权限</a>（{$gp_grouptitle}）</li>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+              <li class="current"><a href="profile.php?action=permission">用户权限</a>（现使用的级别为：{$gp_grouptitle}）</li>
+<!--
+EOT;
+}print <<<EOT
+-->
+            </ul>
+      	</div>
+		<div id="set-content-wrap" class="cc set-table">
+<!--
+EOT;
+if($fid){print<<<EOT
+-->
+					<table cellspacing="0" cellpadding="0" width="100%" style="TABLE-LAYOUT: fixed;WORD-WRAP: break-word;">
+						<tr><td colspan="5"><b>版块基本权限</b></td></tr>
+						<tr>
+							<td>浏览版块</td>
+							<td>发表主题</td>
+							<td>回复主题</td>
+							<td>上传附件</td>
+							<td>下载附件</td>
+						</tr>
+						<tr>
+							<td>{$_P[$per[visit]]}</td>
+							<td>{$_P[$per[post]]}</td>
+							<td>{$_P[$per[rp]]}</td>
+							<td>{$_P[$per[down]]}</td>
+							<td>{$_P[$per[upload]]}</td>
+						</tr>
+					</table>
+					<table cellspacing="0" cellpadding="0" width="100%" style="TABLE-LAYOUT: fixed;WORD-WRAP: break-word;">
+					<tr><td colspan="7"><b>版块积分设置</b></td></tr>
+					<tr>
+						<td width="8%">积分名称</td>
+						<td width="15%">精华主题</td>
+						<td width="15%">取消精华</td>
+						<td width="15%">发表主题</td>
+						<td width="15%">删除主题</td>
+						<td>发表回复</td>
+						<td>删除回复</td>
+					</tr>
+<!--
+EOT;
+foreach($forumright as $key=>$val){print <<<EOT
+-->
+	<tr>
+		<td>{$credit->cType[$key]}</td>
+		<td>{$val[Digest]}</td>
+		<td>{$val[Undigest]}</td>
+		<td>{$val[Post]}</td>
+		<td>{$val[Delete]}</td>
+		<td>{$val[Reply]}</td>
+		<td>{$val[Deleterp]}</td>
+	</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+</table>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+						<table style="width:100%;">
+<!--
+EOT;
+if(!empty($_gmember)){print <<<EOT
+-->
+							<tr><td style="line-height:2;">
+							<b>会员组权限查看</b>
+<!--
+EOT;
+foreach($_gmember as $key => $value){print <<<EOT
+-->
+										<span class="w mr10" style="width:175px;float:left;"><a href="profile.php?action=permission&gid=$key">$value[title]</a>：$value[post]</span>
+<!--
+EOT;
+}print <<<EOT
+-->
+									</td></tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+							<tr><td>
+								<span class="b">我拥有的权限有</span>：
+<!--
+EOT;
+foreach($mygpdb as $key => $value){print <<<EOT
+-->
+										<a href="profile.php?action=permission&gid=$key" class="mr10 w">$value</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+								</td></tr>
+							<tr><td>
+									综合积分：$totalcredit&nbsp;(&nbsp;
+												综合积分&nbsp;=&nbsp;发帖数*$upgradeset[postnum] + 精华*$upgradeset[digests] + {$credit->cType[rvrc]}*$upgradeset[rvrc] + {$credit->cType[money]}*$upgradeset[money] + {$credit->cType[credit]}*$upgradeset[credit] + 会员的历史在线时间*$upgradeset[onlinetime]
+<!--
+EOT;
+foreach($_CREDITDB as $key => $value){
+$upgradeset[$key] = (int)$upgradeset[$key];print <<<EOT
+-->
+									+ $value[0]*{$upgradeset[$key]}
+<!--
+EOT;
+}print <<<EOT
+-->)
+									</td></tr>
+<!--
+EOT;
+if(!empty($_gsystem)){print <<<EOT
+-->
+
+							<tr><td>系统组权限查看</td></tr>
+							<tr><td>
+<!--
+EOT;
+foreach($_gsystem as $key => $value){print <<<EOT
+-->
+										&nbsp;&nbsp;<a href="profile.php?action=permission&gid=$key" style="white-space:nowrap;">$value[title]</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+									</td></tr>
+
+<!--
+EOT;
+}if(!empty($_gspecial)){print <<<EOT
+-->
+							<tr><td>特殊组权限查看</td></tr>
+							<tr><td>
+<!--
+EOT;
+foreach($_gspecial as $key => $value){print <<<EOT
+-->
+<a href="profile.php?action=permission&gid=$key" style="white-space:nowrap;">$value[title]</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+							</td></tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+						</table>
+						<table width="100%" cellspacing="0" cellpadding="0" style="table-layout:fixed">
+									<tr><td colspan="8" class="b">资料权限</td></tr>
+									<tr>
+										<td>隐身登录</td>
+										<td>浏览帖子</td>
+										<td>搜索权限</td>
+										<td>会员列表</td>
+										<td>会员资料</td>
+										<td>展区功能</td>
+										<td>报告功能</td>
+										<td>头像上传</td>
+									</tr>
+									<tr>
+										<td>{$_P[$per[hide]]}</td>
+										<td>{$_P[$per[read]]}</td>
+										<td>{$_P[$per[search]]}</td>
+										<td>{$_P[$per[member]]}</td>
+										<td>{$_P[$per[profile]]}</td>
+										<td>{$_P[$per[show]]}</td>
+										<td>{$_P[$per[report]]}</td>
+										<td>{$_P[$per[upload]]}</td>
+									</tr>
+									<tr>
+										<td>自定义头像</td>
+										<td>荣誉头衔</td>
+										<td>统计排行</td>
+										<td>发消息</td>
+										<td>消息上限</td>
+										<td>收藏夹容量</td>
+										<td>草稿箱容量</td>
+										<td>签名大小上限</td>
+									</tr>
+									<tr>
+										<td>{$_P[$per[portait]]}</td>
+										<td>{$_P[$per[honor]]}</td>
+										<td>{$_P[$per[sort]]}</td>
+										<td>{$_P[$per[messege]]}</td>
+										<td>{$per[maxmsg]}</td>
+										<td>{$per[maxfavor]}</td>
+										<td>{$per[maxgraft]}</td>
+										<td>{$per[signnum]}</td>
+									</tr>
+									<tr><td colspan="8" class="b">版块权限</td></tr>
+									<tr>
+										<td>发表主题</td>
+										<td>回复主题</td>
+										<td>发起投票</td>
+										<td>参与投票</td>
+										<td>查看投票</td>
+										<td>发html帖</td>
+										<td>发隐藏帖</td>
+										<td>发出售帖</td>
+									</tr>
+									<tr>
+										<td>{$_P[$per[post]]}</td>
+										<td>{$_P[$per[rp]]}</td>
+										<td>{$_P[$per[newvote]]}</td>
+										<td>{$_P[$per[vote]]}</td>
+										<td>{$_P[$per[vwvt]]}</td>
+										<td>{$_P[$per[html]]}</td>
+										<td>{$_P[$per[hidden]]}</td>
+										<td>{$_P[$per[sell]]}</td>
+									</tr>
+									<tr>
+										<td>评分权限</td>
+										<td>发活动帖</td>
+										<td>发悬赏帖</td>
+										<td>发匿名帖</td>
+										<td>楼主留言</td>
+										<td colspan="3"></td>
+									</tr>
+									<tr>
+										<td>{$_P[$per[mark]]}</td>
+										<td>{$_P[$per[active]]}</td>
+										<td>{$_P[$per[reward]]}</td>
+										<td>{$_P[$per[anonymous]]}</td>
+										<td>{$_P[$per[leaveword]]}</td>
+										<td colspan="3"></td>
+									</tr>
+									<tr><td colspan="8" class="b">附件权限</td></tr>
+									<tr>
+										<td>上传附件</td>
+										<td>下载附件</td>
+										<td>附件个数</td>
+										<td>附件大小上限</td>
+										<td colspan="4" class="tal">附件允许后缀</td>
+									</tr>
+									<tr>
+										<td>{$_P[$per[attach]]}</td>
+										<td>{$_P[$per[down]]}</td>
+										<td>$per[allownum]</td>
+										<td>$per[uploadmaxsize]</td>
+										<td colspan="4" class="tal">$per[uptype]</td>
+									</tr>
+								</table>
+<!--
+EOT;
+}print <<<EOT
+-->
+		</div>
+</div>
+<!--
+EOT;
+}elseif($action=='log'){print<<<EOT
+-->
+<div id="content" class="w780 fr">
+	<div class="tabB cc"><a href="u.php" class="fr">预览我的资料页面&raquo;</a>
+            <ul>
+              <li class="current"><a href="profile.php?action=log">操作记录</a></li>
+            </ul>
+        </div>
+		<div id="set-content-wrap" class="cc set-table">
+						<table width="100%" cellspacing="0" cellpadding="0">
+							<tr>
+								<td width="8%">ID</td>
+								<td width="8%">类型</td>
+								<td width="12%">管理员</td>
+								<td width="18%">版块</td>
+								<td width="15%">操作日期</td>
+								<td>
+									<span class="fr">
+										<select name="type" onchange="window.location=('profile.php?action=log&type='+this.options[this.selectedIndex].value)">
+										<option value="all">全 部</option>
+										<option value="topped" $type_sel[topped]>{$lang[logtype][topped]}</option>
+										<option value="digest" $type_sel[digest]>{$lang[logtype][digest]}</option>
+										<option value="highlight" $type_sel[highlight]>{$lang[logtype][highlight]}</option>
+										<option value="push" $type_sel[push]>{$lang[logtype][push]}</option>
+										<option value="locked" $type_sel[locked]>{$lang[logtype][locked]}</option>
+										<option value="delete" $type_sel[delete]>{$lang[logtype][delete]}</option>
+										<option value="move" $type_sel[move]>{$lang[logtype][move]}</option>
+										<option value="copy" $type_sel[copy]>{$lang[logtype][copy]}</option>
+										<option value="edit" $type_sel[edit]>{$lang[logtype][edit]}</option>
+										<option value="credit" $type_sel[credit]>{$lang[logtype][credit]}</option>
+										<option value="remind" $type_sel[remind]>{$lang[logtype][remind]}</option>
+										</select>
+									</span>
+									描述
+								</td>
+							</tr>
+<!--
+EOT;
+$style='f_two';
+$num=($page-1)*$db_perpage;
+foreach($logdb as $key => $value){
+$num++;
+$style=$style=='f_one' ? 'f_two' : 'f_one';
+print <<<EOT
+	-->
+								<tr>
+									<td>$num</td>
+									<td>{$lang[logtype][$value[type]]}</td>
+									<td><a href="profile.php?action=show&username=$value[username2]" target="_blank">$value[username2]</a></td>
+									<td><a href="thread.php?fid=$value[field1]" target="_blank">{$forum[$value[field1]][name]}</a></td>
+									<td>$value[date]</td>
+									<td><div style="TABLE-LAYOUT: fixed;WORD-WRAP: break-word" align="left">$value[descrip]</div></td>
+								</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+							</table>
+		</div>
+		<div class="mt10 cc">$pages</div>
+<script language="JavaScript">
+function Bjump(value){
+	if(value!= '') {
+		window.location=('$basename&action=log&type='+value);
+	}
+}
+</script>
+</div>
+<!--
+EOT;
+}elseif($action=='buy'){print<<<EOT
+-->
+<div id="content" class="w780 fr">
+	<div class="tabB cc"><a href="u.php" class="fr">预览我的资料页面&raquo;</a>
+            <ul>
+              <li class="current"><a href="profile.php?action=buy">购买</a></li>
+            </ul>
+         </div>
+		<div id="set-content-wrap" class="cc set-table">
+<!--
+EOT;
+if (!$job) {print<<<EOT
+-->
+						<table cellspacing="0" cellpadding="0" width="100%">
+							<tr>
+								<td>用户组头衔</td>
+								<td>日价格(积分)</td>
+								<td>日价格(RMB)</td>
+								<td>最短购买天数</td>
+								<td>到期时间</td>
+								<td>购买</td>
+							</tr>
+<!--
+EOT;
+foreach ($specialdb as $key => $val) {print <<<EOT
+-->
+							<tr>
+								<td>$val[grouptitle]</td>
+								<td>{$val[sellprice]} {$val[selltype]}/天</td>
+								<td>{$val[rmbprice]} /天</td>
+								<td>{$val[selllimit]}</td>
+								<td>$val[enddate]</td>
+								<td>
+<!--
+EOT;
+if(!$val['startdate'] || $timestamp > $val['startdate'] + $val['days']*86400){print <<<EOT
+-->
+									<a href="profile.php?action=buy&job=buy&gid=$val[gid]">购买</a>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+									-
+<!--
+EOT;
+}print <<<EOT
+-->
+								</td>
+							</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+						</table>
+<!--
+EOT;
+} elseif ($job == 'buy') {print <<<EOT
+-->
+					<form method="post" action="profile.php?action=buy&">
+						<input type="hidden" name="verify" value="$verifyhash" />
+						<input type="hidden" name="job" value="buy" />
+						<input type="hidden" name="step" value="2" />
+						<input type="hidden" name="gid" value="$gid" />
+							<table cellspacing="0" cellpadding="0" width="100%">
+								<tr>
+									<td>用户组头衔</td>
+									<td><b>{$rt[grouptitle]}</b><br /><span class="gray">{$rt[sright][sellinfo]}</span></td>
+								</tr>
+								<tr>
+									<td>购买方式</td>
+									<td id="checkradio">
+<!--
+EOT;
+if ($rt['sright']['sellprice'] > 0) {print <<<EOT
+-->
+										<div><input type="radio" name="buymethod" value="0" onclick="showpwd(this.value)" />积分购买 ({$rt[sright][sellprice]} {$rt[sright][selltype]}/天)</div>
+<!--
+EOT;
+}if ($rt['sright']['rmbprice'] > 0) {print <<<EOT
+-->
+										<div><input type="radio" name="buymethod" value="1" onclick="showpwd(this.value)" />现金购买 ({$rt[sright][rmbprice]} RMB/天)</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+									</td>
+								</tr>
+								<tr>
+									<td>购买天数</td>
+									<td>
+										<input class="input" type="text" name="days" size="20" />
+										<span class="gray"> {$rt[sright][selllimit]} 天</span>
+									</td>
+								</tr>
+								<tr id="showpwd" style="display:none">
+									<td>请输入密码</td>
+									<td><input class="input" type="password" name="pwpwd" size="20" /></td>
+								</tr>
+								<tr>
+									<td>将该用户组头衔作为</td>
+									<td>
+										<input type="radio" name="options" value="1" checked />站点显示头衔
+										<input type="radio" name="options" value="2" />附加头衔
+									</td>
+								</tr>
+							</table>
+						<div class="tac" style=" padding:1em">
+						<span class="button"><span><button type="submit">提 交</button></span></span>
+						</div>
+					</form>
+<script language="JavaScript">
+function checkradio() {
+	var radio = getObj('checkradio').getElementsByTagName('input');
+	if (radio.length > 0) {
+		radio[0].checked = true;
+		showpwd(radio[0].value);
+	}
+}
+function showpwd(v) {
+	getObj('showpwd').style.display = v == 1 ? 'none' : '';
+}
+checkradio();
+</script>
+<!--
+EOT;
+}print<<<EOT
+-->
+</div></div>
+<!--
+EOT;
+}elseif($action == 'privacy' && $db_modes['o']['ifopen']){print <<<EOT
+-->
+<div id="content" class="w780 fr">
+	<div class="tabB cc"><a href="u.php" class="fr">预览我的资料页面&raquo;</a>
+            <ul>
+              <li class="current"><a>隐私设置</a></li>
+            </ul>
+          </div>
+		<div id="set-content-wrap" class="cc set-table">
+					<form action="profile.php?action=$action" method="post">
+						<input type="hidden" name="verify" value="$verifyhash" />
+						<input type="hidden" name="step" value="2" />
+							<table cellspacing="0" cellpadding="0" width="100%">
+								<tr>
+									<td width="25%">个人空间</td>
+									<td><select name="privacy[index]">
+										<option value="0" $index_0 >任何人可见</option>
+										<option value="1" $index_1 >仅朋友可见</option>
+										<option value="2" $index_2 >仅自己可见</option>
+									</select></td>
+								</tr>
+<!-- 								<tr>
+									<td width="25%">基本资料</td>
+									<td><select name="privacy[profile]">
+										<option value="0" $profile_0 >任何人可见</option>
+										<option value="1" $profile_1 >仅朋友可见</option>
+										<option value="2" $profile_2 >仅自己可见</option>
+									</select></td>
+								</tr>
+								<tr>
+									<td width="25%">个人信息</td>
+									<td><select name="privacy[info]">
+										<option value="0" $info_0 >任何人可见</option>
+										<option value="1" $info_1 >仅朋友可见</option>
+										<option value="2" $info_2 >仅自己可见</option>
+									</select></td>
+								</tr>
+								<tr>
+									<td width="25%">个人积分</td>
+									<td><select name="privacy[credit]">
+										<option value="0" $credit_0 >任何人可见</option>
+										<option value="1" $credit_1 >仅朋友可见</option>
+										<option value="2" $credit_2 >仅自己可见</option>
+									</select></td>
+								</tr>
+								<tr>
+									<td width="25%">记录</td>
+									<td><select name="privacy[owrite]">
+										<option value="0" $owrite_0 >任何人可见</option>
+										<option value="1" $owrite_1 >仅朋友可见</option>
+										<option value="2" $owrite_2 >仅自己可见</option>
+									</select></td>
+								</tr> -->
+								<tr>
+									<td width="25%">空间留言</td>
+									<td><select name="privacy[msgboard]">
+										<option value="0" $msgboard_0 >任何人可见</option>
+										<option value="1" $msgboard_1 >仅朋友可见</option>
+										<option value="2" $msgboard_2 >仅自己可见</option>
+									</select></td>
+								</tr>
+							</table>
+						<div class="tac" style=" padding:1em">
+						<span class="button"><span><button type="submit">提 交</button></span></span>
+						</div>
+					</form>
+		</div>
+</div>
+<!--
+EOT;
+}elseif($action=='forumsell'){print<<<EOT
+-->
+<div id="content" class="w780 fr">
+	<div class="tabB cc"><a href="u.php" class="fr">预览我的资料页面&raquo;</a>
+            <ul>
+              <li class="current"><a href="profile.php?action=forumsell&fid=$fid">购买版块</a></li>
+            </ul>
+         </div>
+		<div id="set-content-wrap" class="cc set-table">
+<!--
+EOT;
+if ($date && isset($forumset['sellprice'][$date])) {print <<<EOT
+-->
+					<form action="profile.php?action=forumsell" method="post">
+						<input type="hidden" name="verify" value="$verifyhash" />
+						<input type="hidden" name="fid" value="$fid" />
+						<input type="hidden" name="step" value="2" />
+						<input type="hidden" name="date" value="$date">
+							<table width="100%" cellspacing="0" cellpadding="0">
+								<tr><td colspan="2">版块访问权限购买</td></tr>
+								<tr>
+									<td width="20%">购买版块</td>
+									<td>{$forum[$fid][name]}</td>
+								</tr>
+								<tr>
+									<td>购买期限</td>
+									<td>$date 天</td>
+								</tr>
+								<tr>
+									<td>购买方式</td>
+									<td id="checkradio">
+<!--
+EOT;
+if ($forumset['sellprice'][$date]['cprice'] > 0) {print <<<EOT
+-->
+										<div><input type="radio" name="buymethod" value="0" />积分购买 (支付:<span class="s4">{$forumset[sellprice][$date][cprice]} {$credit->cType[$f[forumsell]]}</span>)</div>
+<!--
+EOT;
+}if ($forumset['sellprice'][$date]['rprice'] > 0) {print <<<EOT
+-->
+										<div><input type="radio" name="buymethod" value="1" />现金购买 (支付:<span class="s3">￥{$forumset[sellprice][$date][rprice]}</span>，通过支付宝交易)</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+									</td>
+								</tr>
+							</table>
+						<div style="text-align:center">
+						<span class="button"><span><button type="submit">提 交</button></span></span>
+						</div>
+					</form>
+<script language="JavaScript">
+function checkradio() {
+	var radio = getObj('checkradio').getElementsByTagName('input');
+	if (radio.length > 0) {
+		radio[0].checked = true;
+	}
+}
+checkradio();
+</script>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+							<table width="100%" cellspacing="0" cellpadding="0">
+								<tr><td colspan="5">版块访问权限购买</td></tr>
+								<tr>
+									<td width="20%">版块名称</td>
+									<td>购买期限[天]</td>
+									<td>价格({$credit->cType[$f[forumsell]]})</td>
+									<td>价格(RMB)</td>
+									<td>购买</td>
+								</tr>
+<!--
+EOT;
+foreach ($forumset['sellprice'] as $key => $value) {print <<<EOT
+-->
+								<tr>
+									<td>{$forum[$fid][name]}</td>
+									<td>$key</td>
+									<td>$value[cprice]</td>
+									<td>$value[rprice]</td>
+									<td><a href="profile.php?action=forumsell&date=$key&fid=$fid">购买</a></td>
+								</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+							</table>
+							<table width="100%" cellspacing="0" cellpadding="0">
+								<tr><td colspan="5">我的购买记录</td></tr>
+								<tr>
+									<td></td>
+									<td>版块名称</td>
+									<td></td>
+									<td>到期日期</td>
+									<td>花费</td>
+								</tr>
+<!--
+EOT;
+$i=($page-1)*10;
+foreach($buydb as $key=>$value){
+$i++;
+print <<<EOT
+-->
+								<tr>
+									<td>$i</td>
+									<td><a href="thread.php?fid=$value[fid]">{$forum[$value[fid]][name]}</a></td>
+									<td>$value[buydate]</td>
+									<td>$value[overdate]</td>
+									<td>$value[cost] {$credit->cType[$value[credit]]}</td>
+								</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+							</table>
+						<div class="mt10 cc">$pages</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+	</div>
+</div>
+<!--
+EOT;
+}elseif($action=='style'){
+${'current_'.$job} = 'current';
+print<<<EOT
+-->
+<div id="content" class="w780 fr">
+	<div class="tabB cc"><a href="u.php" class="fr">预览我的资料页面&raquo;</a>
+		<ul>
+          <li id="list" class="$current_"><a href="profile.php?action=style" style="cursor:pointer" >风格列表</a></li>
+          <li id="add" class="$current_add"><a href="profile.php?action=style&job=add" style="cursor:pointer;font-size:12px;">添加自定义风格</a></li>
+<!--
+EOT;
+if ($job == 'modify') {print<<<EOT
+-->
+          <li id="modify" class="$current_modify">修改自定义风格</li>
+<!--
+EOT;
+}print<<<EOT
+-->
+        </ul>
+	</div>
+		<div id="set-content-wrap" class="cc set-table">
+<!--
+EOT;
+if(empty($job)){print<<<EOT
+-->
+		<div id="info_fancy">
+			<table width="100%" border="0" cellpadding="0" cellspacing="0">
+				<tbody>
+					<tr>
+	  					<td>风格ID</td><td>自定义名称</td><td>所属原始风格</td><td>创建时间</td><td>最后修改时间</td><td>状态</td><td>操作</td>
+					</tr>
+<!--
+EOT;
+$id = 0;
+foreach($stylelistdb as $key => $value){
+$id++;
+print<<<EOT
+-->
+					<tr>
+						<td>$id</td>
+						<td>$value[customname]</td>
+						<td>$value[name]</td>
+						<td>$value[createtime]</td>
+						<td>$value[lastmodify]</td>
+<!--
+EOT;
+if ($value[useing] == 1) {print<<<EOT
+-->
+						<td><span style="color:red;">使用中</span>&nbsp;[<a href="profile.php?action=style&skinco=$value[name]">还原</a>]</td>
+<!--
+EOT;
+} else {print<<<EOT
+-->
+						<td>未使用</td>
+<!--
+EOT;
+}print<<<EOT
+-->
+						<td><a href="profile.php?action=style&job=use&sid=$value[sid]">使用</a>|<a href="profile.php?action=style&job=modify&sid=$value[sid]">修改</a>|<a href="profile.php?action=style&job=del&sid=$value[sid]" onclick="return confirmdel();">删除</a></td>
+					</tr>
+<!--
+EOT;
+}print<<<EOT
+-->
+	  			</tbody>
+	  	</table>
+			<div class="mt10 cc">$pages</div>
+		</div>
+<!--
+EOT;
+}elseif($job=='modify' || $job=='add'){print<<<EOT
+-->
+<style>
+.color_input{float:left;border:1px solid #fff;height:19px;width:105px;}
+.color_image{float:left;padding-right:1px;padding-top:1px}
+</style>
+<script type="text/javascript" language="JavaScript">
+function pickReback(obj,color){
+	if (typeof obj == 'string') {
+		obj = getObj(obj);
+	}
+	obj.style.color = color;
+}
+</script>
+<script type="text/javascript" language="JavaScript" src="js/color_picker.js"></script>
+<form name="FORM" method="post" action="profile.php?">
+<input type="hidden" name="verify" value="$verifyhash" />
+<input type="hidden" name="action" value="style" />
+<input type="hidden" name="job" value="save" />
+<input type="hidden" name="do" value="$job" />
+<input type="hidden" name="sid" value="$customdb[sid]">
+	<div id="info_fancy">
+		<table width="100%" border="0" cellpadding="0" cellspacing="0">
+			<tbody>
+<!--
+EOT;
+if($job=='add'){print<<<EOT
+-->
+				<tr>
+					<td colspan="2">原始风格选择:&nbsp;<select name="systemname" onchange="return Addjump(this.value);">$opsystemstyle</select></td>
+				</tr>
+<!--
+EOT;
+}print<<<EOT
+-->
+				<tr>
+					<td colspan="2"><b>整体风格设置</b></td></tr>
+				<tr>
+					<td style="width:300px;">自定义风格名称</td>
+					<td><input type="text" class="input" name="customname" value="$customdb[customname]"></td>
+				</tr>
+				<tr>
+					<td>表格内部样式:</td>
+					<td><input type="radio" value="1" name="css[yeyestyle]" $yes_Y /> 竖线风格 <input type="radio" value="0" name="css[yeyestyle]" $yes_N /> 横线风格</td>
+				</tr>
+				<tr>
+					<td>表格宽度:(例: 98% 或 960px)</td>
+					<td><input class="input" value="$customdb[tablewidth]" name="css[tablewidth]" /></td>
+				</tr>
+				<tr>
+					<td>头部和尾部表格宽度:(例: 98% 或 960px)</td>
+					<td><input class="input" value="$customdb[mtablewidth]" name="css[mtablewidth]" /></td>
+				</tr>
+				<tr>
+					<td>全局背景颜色:</td>
+					<td><div class="input fl" style="padding:0px;"><input id="bgcolor" class="color_input" value="$bgcolor" name="css[bgcolor]" /><img  class="color_image" src="$imgpath/select_arrow.gif" onmouseover="this.src=imgpath+'/select_arrow_over.gif'" onmouseout="this.src=imgpath+'/select_arrow.gif'" onclick="showColorPicker(this,'bgcolor',function(){pickReback('bgcolor_s',color_picker)})"></div> <span id="bgcolor_s" style="color:$bgcolor">■■■■</span></td>
+				</tr>
+				<tr>
+					<td>全局背景图片:</td>
+					<td><input class="input" value="$bgimg" name="css[bgimg]" />&nbsp;<select name="css[imgtype]"><option value="no-repeat" $imgtype_1>单图</option><option value="repeat" $imgtype_2>重复</option></select></td>
+				</tr>
+				<tr>
+					<td>全局链接颜色:</td>
+					<td><div class="input fl" style="padding:0px;"><input id="linkcolor" class="color_input" value="$customdb[linkcolor]" name="css[linkcolor]" /><img  class="color_image" src="$imgpath/select_arrow.gif" onmouseover="this.src=imgpath+'/select_arrow_over.gif'" onmouseout="this.src=imgpath+'/select_arrow.gif'" onclick="showColorPicker(this,'linkcolor',function(){pickReback('linkcolor_s',color_picker)})"></div> <span id="linkcolor_s" style="color:$customdb[linkcolor]">■■■■</span></td>
+				</tr>
+				<tr>
+					<td>表格外边框颜色:</td>
+					<td><div class="input fl" style="padding:0px;"><input id="tablecolor" class="color_input" value="$customdb[tablecolor]" name="css[tablecolor]" /><img  class="color_image" src="$imgpath/select_arrow.gif" onmouseover="this.src=imgpath+'/select_arrow_over.gif'" onmouseout="this.src=imgpath+'/select_arrow.gif'" onclick="showColorPicker(this,'tablecolor',function(){pickReback('tablecolor_s',color_picker)})"></div> <span id="tablecolor_s" style="color:$customdb[tablecolor]">■■■■</span></td>
+				</tr>
+				<tr>
+					<td>表格内边框颜色:</td>
+					<td><div class="input fl" style="padding:0px;"><input id="tdcolor" class="color_input" value="$customdb[tdcolor]" name="css[tdcolor]" /><img  class="color_image" src="$imgpath/select_arrow.gif" onmouseover="this.src=imgpath+'/select_arrow_over.gif'" onmouseout="this.src=imgpath+'/select_arrow.gif'" onclick="showColorPicker(this,'tdcolor',function(){pickReback('tdcolor_s',color_picker)})"></div> <span id="tdcolor_s" style="color:$customdb[tdcolor]">■■■■</span></td>
+				</tr>
+			</tbody>
+		</table>
+		<table width="100%" border="0" cellpadding="0" cellspacing="0">
+			<tbody>
+			  	<tr><td colspan="2"><b>表格样式颜色设置</b></td></tr>
+				<tr>
+					<td style="width:300px;">表格标题栏颜色:</td>
+					<td><div class="input fl" style="padding:0px;"><input id="headcolor" class="color_input" value="$customdb[headcolor]" name="css[headcolor]" /><img  class="color_image" src="$imgpath/select_arrow.gif" onmouseover="this.src=imgpath+'/select_arrow_over.gif'" onmouseout="this.src=imgpath+'/select_arrow.gif'" onclick="showColorPicker(this,'headcolor',function(){pickReback('headcolor_s',color_picker)})"></div> <span id="headcolor_s" style="color:$customdb[headcolor]">■■■■</span></td>
+				</tr>
+				<tr>
+					<td>表格标题栏下边框颜色:</td>
+					<td><div class="input fl" style="padding:0px;"><input id="headborder" class="color_input" value="$customdb[headborder]" name="css[headborder]" /><img  class="color_image" src="$imgpath/select_arrow.gif" onmouseover="this.src=imgpath+'/select_arrow_over.gif'" onmouseout="this.src=imgpath+'/select_arrow.gif'" onclick="showColorPicker(this,'headborder',function(){pickReback('headborder_s',color_picker)})"></div> <span id="headborder_s" style="color:$customdb[headborder]">■■■■</span></td>
+				</tr>
+				<tr>
+					<td>标题栏主要字体链接颜色:</td>
+					<td><div class="input fl" style="padding:0px;"><input id="headfontone" class="color_input" value="$customdb[headfontone]" name="css[headfontone]" /><img  class="color_image" src="$imgpath/select_arrow.gif" onmouseover="this.src=imgpath+'/select_arrow_over.gif'" onmouseout="this.src=imgpath+'/select_arrow.gif'" onclick="showColorPicker(this,'headfontone',function(){pickReback('headfontone_s',color_picker)})"></div> <span id="headfontone_s" style="color:$customdb[headfontone]">■■■■</span></td>
+				</tr>
+				<tr>
+					<td>标题栏次要字体链接颜色:</td>
+					<td><div class="input fl" style="padding:0px;"><input id="headfonttwo" class="color_input" value="$customdb[headfonttwo]" name="css[headfonttwo]" /><img  class="color_image" src="$imgpath/select_arrow.gif" onmouseover="this.src=imgpath+'/select_arrow_over.gif'" onmouseout="this.src=imgpath+'/select_arrow.gif'" onclick="showColorPicker(this,'headfonttwo',function(){pickReback('headfonttwo_s',color_picker)})"></div> <span id="headfonttwo_s" style="color:$customdb[headfonttwo]">■■■■</span></td>
+				</tr>
+				<tr>
+					<td>表格副标题栏颜色:</td>
+					<td><div class="input fl" style="padding:0px;"><input id="cbgcolor" class="color_input" value="$customdb[cbgcolor]" name="css[cbgcolor]" /><img  class="color_image" src="$imgpath/select_arrow.gif" onmouseover="this.src=imgpath+'/select_arrow_over.gif'" onmouseout="this.src=imgpath+'/select_arrow.gif'" onclick="showColorPicker(this,'cbgcolor',function(){pickReback('cbgcolor_s',color_picker)})"></div> <span id="cbgcolor_s" style="color:$customdb[cbgcolor]">■■■■</span></td>
+				</tr>
+				<tr>
+					<td>表格副标题栏下边框颜色:</td>
+					<td><div class="input fl" style="padding:0px;"><input id="cbgborder" class="color_input" value="$customdb[cbgborder]" name="css[cbgborder]" /><img  class="color_image" src="$imgpath/select_arrow.gif" onmouseover="this.src=imgpath+'/select_arrow_over.gif'" onmouseout="this.src=imgpath+'/select_arrow.gif'" onclick="showColorPicker(this,'cbgborder',function(){pickReback('cbgborder_s',color_picker)})"></div> <span id="cbgborder_s" style="color:$customdb[cbgborder]">■■■■</span></td>
+				</tr>
+				<tr>
+					<td>表格副标题栏字体颜色:</td>
+					<td><div class="input fl" style="padding:0px;"><input id="cbgfont" class="color_input" value="$customdb[cbgfont]" name="css[cbgfont]" /><img  class="color_image" src="$imgpath/select_arrow.gif" onmouseover="this.src=imgpath+'/select_arrow_over.gif'" onmouseout="this.src=imgpath+'/select_arrow.gif'" onclick="showColorPicker(this,'cbgfont',function(){pickReback('cbgfont_s',color_picker)})"></div> <span id="cbgfont_s" style="color:$customdb[cbgfont]">■■■■</span></td>
+				</tr>
+				<tr>
+					<td>论坛列表颜色一:</td>
+					<td><div class="input fl" style="padding:0px;"><input id="forumcolorone" class="color_input" value="$customdb[forumcolorone]" name="css[forumcolorone]" /><img  class="color_image" src="$imgpath/select_arrow.gif" onmouseover="this.src=imgpath+'/select_arrow_over.gif'" onmouseout="this.src=imgpath+'/select_arrow.gif'" onclick="showColorPicker(this,'forumcolorone',function(){pickReback('forumcolorone_s',color_picker)})"></div> <span id="forumcolorone_s" style="color:$customdb[forumcolorone]">■■■■</span></td>
+				</tr>
+				<tr>
+					<td>论坛列表颜色二:</td>
+					<td><div class="input fl" style="padding:0px;"><input id="forumcolortwo" class="color_input" value="$customdb[forumcolortwo]" name="css[forumcolortwo]" /><img  class="color_image" src="$imgpath/select_arrow.gif" onmouseover="this.src=imgpath+'/select_arrow_over.gif'" onmouseout="this.src=imgpath+'/select_arrow.gif'" onclick="showColorPicker(this,'forumcolortwo',function(){pickReback('forumcolortwo_s',color_picker)})"></div> <span id="forumcolortwo_s" style="color:$customdb[forumcolortwo]">■■■■</span></td>
+				</tr>
+			</tbody>
+		</table>
+	  	<div class="tac" style="padding: 1em;">
+			<span class="button"><span><button name="prosubmit" type="submit">修改此风格</button></span></span>
+		</div>
+</div></form>
+<!--
+EOT;
+}print<<<EOT
+-->
+</div></div>
+<script language="JavaScript">
+function checkset(chars){
+	if (!confirm("还原该风格，该风格设置的内容将不能还原，确定要还原吗？")) {
+		return false;
+	}
+	location.href = chars;
+}
+
+function Addjump(value){
+	if (!confirm("如果已修改此风格，请确认已保存，否则跳转至其他风格后对此风格的设置将失效！")){
+		return false;
+	}
+	if(value!= ''){
+		window.location=('profile.php?action=style&job=add&selstyle='+value);
+	}
+}
+
+function confirmdel(chars){
+	if (!confirm("确定要删除此风格吗？")){
+		return false;
+	}
+}
+</script>
+<!--
+EOT;
+}print <<<EOT
+-->
+</div>
+<div class="c bg-border" style="margin:0 1px; height:1px;"></div>
+</div>
+<!--
+EOT;
+?>-->

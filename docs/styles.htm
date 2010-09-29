@@ -1,0 +1,125 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>PHPWind用户安装说明书</title>
+<link href="phpwind_help.css" type="text/css" rel="stylesheet" />
+
+</head>
+<body>
+<div id="wrap">
+    <div id="wrap2">
+        
+		<script language="JavaScript" src="header.js"></script> 
+        <div id="main">   
+		
+ <div class="place">您所在的位置：<a href="index.html">PHPWind 安装说明</a> ><A href="styles.htm">高级应用</a> > <a href="styles.htm">界面风格与模板定制</a></div>
+
+			<div id="left">
+			<!--左菜单栏 begin-->
+			  				<UL>
+		         <LI><A href="index.htm">简介</A></LI>
+
+				  <LI><A href="install.htm">安装指南</a>
+				    <UL>
+					<LI><A href="install.htm">系统环境说明</A></LI>
+					<LI><A href="install_steps.htm">程序安装流程</A></LI>
+					<LI><A href="install_files.htm">文件及目录结构</A></LI>
+					<LI><A href="upgrade.htm">程序升级流程</A></LI>
+					<LI><A href="upgrades_change.htm">版本说明</A></LI>
+					<LI><A href="install_space.htm">安装集成包介绍</A></LI>
+					</UL>
+				 </LI>
+				
+				 <LI><A href="basic.htm">功能使用</A></LI> 
+				  
+				 <LI><A href="basic_que.htm">常见问题</A></LI>
+				  
+				 <LI><A href="styles.htm">高级应用</a>
+                    <UL>
+				    <LI><a href="styles.htm">界面风格与模板定制</a></LI>
+                    <LI><a href="Sub-forum.htm">使用PHPWind分论坛</a></LI>
+					<LI><A href="plugins.htm">插件相关</A></LI>
+					<LI><a href="shifting.htm">论坛系统的搬迁和转移</a></LI>
+					<LI><A href="tools.htm">转换工具</A></LI>
+				    </UL>
+				  </LI>
+				  <LI><A href="about_seo_7items.htm">SEO技巧</a>
+                    <UL>
+				    <LI><a href="about_seo_7items.htm">搜索引擎优化</a></LI>
+                    <LI><a href="about_lable_seo.htm">网页标题收录</a></LI>
+					<LI><A href="urlrewrite.htm">伪静态的使用</A></LI>
+					</UL>
+				  </LI>
+			
+			</UL>
+				<!--左菜单栏 end-->
+            </div>
+			
+       		
+          		<div class="viewnew">
+<h3 style="text-align:center">风格安装</h3><br>
+<p class="gray" style=" text-align:center; text-indent:0;font-size:12px; border-bottom:1px dotted #d7d7d7">
+
+<h4>风格安装</h4>
+<p>本文通过三个步骤，将帮助您熟悉PHPWind 论坛的风格使用
+<br><b>1、预备工作：下载新风格</b> PHPWind已有千款风格，更有风格不断添加中。相信多种多样绚丽变幻的风格可以满足您的需求。
+<br>风格包里面 首先要有3个重要文件夹
+<br>风格图片目录 -- images/ 
+<br>风格模版目录 -- template/ 
+<br>风格核心文件 -- data/style/ 
+<br><有些风格只是调整色调的话 只有data/style/ 或者template/ 和data/style/ 或者是data/style/ 和images/风格名> 
+<p><b>2、安装风格安装方法：</b>
+<br>进入FTP 
+<br>1) 把风格包中的 images 内的 风格文件夹 上传到论坛目录下 images 目录内 
+<br>2) 把风格包中的 template 内的 风格文件夹 上传到论坛目录下 template 目录内 
+<br>3) 把风格包中的 风格名.php 以及 风格名_css.htm 上传到论坛目录下 data/style 目录内 
+<p><b>3、编辑风格</b>
+<br>所有风格上传后，在后台->风格插件->风格模板中均可进行编辑或删除等管理。您可以随心所欲的编辑论坛风格，调出自己喜欢的色彩和界面样式。
+
+<h4>模板制作</h4><br>
+(一)模版主要文件<ul>
+<li>phpwind 模板设置存于 mysql 中.需要进入 后台风格模板 进行添加新风格
+<li>phpwind 模板所有图片文件放在 images/风格目录/ 目录中,默认的是images/wind/ 目录下
+<li>phpwind 模板所有*.htm文件放在 template/模版目录/ 目录中,默认的是template/wind/ 目录下
+</ul>
+
+<br>(二)建议与如何创建模板套系
+<p>如果需新增了自己的模板套系,强烈建议不要修改默认模版目录wind里的*.htm文件和图片!
+这将给维护和升级带来巨大的方便!!!
+<br>
+<br>因此要建立新模版套系请按以下步骤进行:
+<br>例：
+<br>目的是:创建一个属于自己的风格 名称为 fengyu(必须为英文)
+<br><ul>
+<li>风格插件->风格模板->添加风格 进行新风格的添加 
+<li>在图片目录(默认为images)下创建一个名称为fengyu的目录,然后把 images/wind/ 目录中的图片 全部复制到 images/新风格目录/ 此目录中 ,如果你要改图片尽情在新模版的图片目录下修改吧!
+<li>在template/ 目录中创建一个名称为 fengyu 的目录,此目录中只需包含你所修改过的 *.htm文件  文件即可,因为未被包含的模板文件,系统会自动读取默认模板中的*.htm文件
+</ul>
+
+<p>(三)更换风格方法<ul>
+<li>可在后台核心设置处设置论坛默认风格
+<li>会员可在控制面版中选择论坛提供的风格
+<li>可通过URL 链接实现风格更换 比如 : http://www.phpwind.net/index.php?skinco=wind
+</ul>
+
+
+<p>(四)PHPwind模版技术
+<br>PHPwind采用独创的模版编译体系,解决了模版判断,和循环等逻辑问题,同时解决了速度的瓶颈问题!逻辑信息主要采用了html 的注释符号 <!-- -->,对于绝大多数用户,不要修改模板的逻辑信息,更不要移动逻辑信息的位置,否则可能会导致错误,如果您的模板不慎修改损坏,请用原始模板覆盖,即可恢复!
+
+<p>(五)PHPwind模版主要特色
+<br>主要有以下特色:<ul>
+<li>修改论坛风格变得非常容易!
+<li>一个论坛可以拥有多个完全不同的模板套系,后台可以设置默认的模版;
+<li>单个模版可以在后台进行配色,和css自定义;
+<li>每个分论坛可以使用不同的界面风格,用户也选择自己的风格界面;
+<li>可使用多风格实现多语言环境
+</ul>
+<p>再次强烈建议您不要修改默认模板的内容,不当的修改默认模板可能导致整个系统的运行故障.如果需要新增界面和修改模板,请使用后台新增模板的方法来实现,这将给日后维护和升级带来方便。
+          	</div>
+      </div>
+      <div class="clear"></div>   
+	  <script language="JavaScript" src="footer.js"></script>
+</div>
+</body>
+</html>

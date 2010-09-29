@@ -1,0 +1,421 @@
+<!--<?php
+include_once PrintEot('left');
+print <<<EOT
+-->
+<div class="nav3 mb10 ta">
+    <ul class="cc">
+<!--
+EOT;
+if ($type == 'topic'){print <<<EOT
+-->
+      <li class="current"><a href="$basename&type=topic">主题回收站</a></li>
+      <li><a href="$basename&type=reply">回复回收站</a></li>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+      <li><a href="$basename&type=topic">主题回收站</a></li>
+      <li class="current"><a href="$basename&type=reply">回复回收站</a></li>
+<!--
+EOT;
+}print <<<EOT
+-->
+    </ul>
+</div>
+<div class="admin_info mb10">
+    <h3 class="h1"><b>提示信息</b></h3>
+    <div class="legend">
+      <ol>
+      <li>还原:可将被删除的帖子主题或回复还原到原来的版块帖子中。</li><li>删除:将帖子主题或回复从回收站中彻底删除,不可恢复</li><li>清空:删除所有回收站帖子</li><li>删除记录:删除回收站的记录,但并没有彻底删除帖子内容,不可恢复</li>
+      </ol>
+    </div>
+ </div>
+<!--
+EOT;
+if ($type == 'topic'){print <<<EOT
+-->
+<form action="$basename&type=topic&" method=post>
+  <h3 class="h1">搜索帖子</h3>
+  <div class="admin_table mb10">
+      <table width="100%" cellspacing="0" cellpadding="0">
+		<tr class="tr1 vt">
+           <td class="td1"> 关键字 </td>
+		   <td class="td2">
+				<input type="text" class="input input_wa mr20" name="keyword">（可使用通配符*）
+		   </td>
+		</tr>
+		<tr class="tr1 vt">
+           <td class="td1"> 来源 </td>
+		   <td class="td2">
+				<select name="from" class="select_wa mr20" onchange="changeFrom(this.value);">
+					<option value="0" {$fromSelect[0]}>所有来源</option>
+					<option value="1" {$fromSelect[1]}>版块</option>
+					<option value="2" {$fromSelect[2]}>群组</option>
+				</select>
+		   </td>
+		</tr>
+		<tr class="tr1 vt" style="display:none;" id="fromforum">
+          <td class="td1">所属版块 </td>
+		  <td class="td2">
+            <select name="fid" class="select_wa mr20">
+              <option>选择分类</option>
+              $forumcache
+            </select>
+		  </td>
+	    </tr>
+		<tr class="tr1 vt" style="display:none;" id="fromcolony">
+          <td class="td1">群组名称</td>
+		  <td class="td2">
+            <input type="text" class="input input_wa mr20" name="cname">
+		  </td>
+	    </tr>
+		<tr class="tr1 vt">
+           <td class="td1"> 作者 </td>
+		   <td class="td2">
+				<input type="text" class="input input_wa mr20" name="username">
+		   </td>
+		</tr>
+		<tr class="tr1 vt">
+            <td class="td1">删除人</td>
+			<td class="td2">
+				<input type="text" class="input input_wa mr20" name="admin">
+			</td>
+        </tr>
+      </table>
+  </div>
+<div class="mb10 tac">
+	<span class="btn"><span><button type="submit">提 交</button></span></span>
+</div>
+</form>
+<SCRIPT LANGUAGE="JavaScript">
+var typefrom = '$from';
+function changeFrom(value) {
+	var fromforum = getObj('fromforum');
+	var fromcolony = getObj('fromcolony');
+	if(value == 1) {
+		fromforum.style.display = '';
+		fromcolony.style.display = 'none';
+	} else if (value == 2){
+		fromforum.style.display = 'none';
+		fromcolony.style.display = '';
+	} else {
+		fromforum.style.display = 'none';
+		fromcolony.style.display = 'none';
+	}
+}
+window.onload = function(){
+	changeFrom(typefrom);
+}
+</SCRIPT>
+<form action="$basename&type=topic&" method="post" name="form1">
+  <h3 class="h1">帖子列表</h3>
+  <div class="admin_table mb10">
+  <table width="100%" cellspacing="0" cellpadding="0">
+	  <tr class="tr2"><td width="30"><span onclick="CheckAll(document.form1)" class="cp">全选</span></td>
+      <td>标题</td>
+<!--
+EOT;
+if ($from == 2) {print<<<EOT
+-->
+	 <td>群组名称</td>
+<!--
+EOT;
+} elseif ($from == 1) {print<<<EOT
+-->
+	 <td>版块</td>
+<!--
+EOT;
+}else{print<<<EOT
+-->
+	<td>来源</td>
+<!--
+EOT;
+}print<<<EOT
+-->
+
+      <td>作者</td>
+      <td>删除人</td>
+      <td>时间</td>
+    </tr>
+<!--
+EOT;
+if (empty($recycledb)) {print <<<EOT
+-->
+<tr><td class="p10" colspan="6"><div class="admin_tips">啊哦，没有你要的信息！</div></td></tr>
+<!--
+EOT;
+}else{
+foreach($recycledb as $key => $value){
+print <<<EOT
+-->
+    <tr class="tr1 vt">
+      <td class="td2"><input type='checkbox' name='selid[$value[tid]]' value="$value[fid]"></td>
+      <td class="td2" onclick="content('$value[tid]');">$value[subject]</td>
+      <td class="td2">
+<!--
+EOT;
+if ($from == 2) {print<<<EOT
+-->
+	 <a href="apps.php?q=group&cyid=$value[cyid]" target="_blank">$value[cname]</a>
+<!--
+EOT;
+} elseif ($from == 1) {print<<<EOT
+-->
+	  <a href="thread.php?fid=$value[fid]" target="_blank">$value[fname]</a>
+<!--
+EOT;
+}else{
+if($value[cyid]){print<<<EOT
+-->
+	[群组]<a href="apps.php?q=group&cyid=$value[cyid]" target="_blank">$value[cname]</a>
+<!--
+EOT;
+}if ($value[fid]) {print<<<EOT
+-->
+	[版块]<a href="thread.php?fid=$value[fid]" target="_blank">$value[fname]</a>
+<!--
+EOT;
+}}print<<<EOT
+-->
+	  </td>
+      <td class="td2"><a href="u.php?uid=$value[authorid]" target="_blank">$value[author]</a></td>
+      <td class="td2">$value[admin]</td>
+      <td class="td2">$value[deltime]</td>
+    </tr>
+    <tr id="content_$value[tid]" style="display:none;" class="tr1 vt">
+      <td class="td2" colspan="7">$value[content]</td>
+    </tr>
+<!--
+EOT;
+}}print <<<EOT
+-->
+  </table>
+  </div>
+  <div class="fr"><span class="bt2"><span><button type="button" value="清空草稿箱" onclick="Recycle.Confirm('topic');">清空回收站</button></span></span></div>
+  <div class="cc mb10">$pages</div>
+  <div class="mb10 tac">
+  	<p><input type="radio" name="action" value="revert" checked> 还原帖子&nbsp;
+        <input type="radio" name="action" value="del" > 删除帖子&nbsp;
+        <input type="radio" name="action" value="clear"> 删除记录</p>
+  </div>
+<div class="tac mb10">
+    <span class="btn"><span><button type="submit" name="hello" onclick="return confirm('您确认要进行此操作吗?');">提 交</button></span></span>
+</div>
+</form>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+<form action="$basename&type=reply&" method=post>
+<h3 class="h1">搜索回复</h3>
+  <div class="admin_table mb10">
+      <table width="100%" cellspacing="0" cellpadding="0">
+		<tr class="tr1 vt">
+           <td class="td1"> 关键字 </td>
+		   <td class="td2">
+				<input type="text" class="input input_wa mr20" name="keyword">（可使用通配符*）
+		   </td>
+		</tr>
+		<tr class="tr1 vt">
+           <td class="td1"> 来源 </td>
+		   <td class="td2">
+				<select name="from" class="select_wa mr20" onchange="changeFrom(this.value);">
+					<option value="0">所有来源</option>
+					<option value="1">版块</option>
+					<option value="2">群组</option>
+				</select>
+		   </td>
+		</tr>
+		<tr class="tr1 vt" style="display:none;" id="fromforum">
+          <td class="td1">所属版块 </td>
+		  <td class="td2">
+            <select name="fid" class="select_wa mr20">
+              <option>选择分类</option>
+              $forumcache
+            </select>
+		  </td>
+	    </tr>
+		<tr class="tr1 vt" style="display:none;" id="fromcolony">
+          <td class="td1">群组名称</td>
+		  <td class="td2">
+            <input type="text" class="input input_wa mr20" name="cname">
+		  </td>
+	    </tr>
+		<tr class="tr1 vt">
+           <td class="td1"> 作者 </td>
+		   <td class="td2">
+				<input type="text" class="input input_wa mr20" name="username">
+		   </td>
+		</tr>
+		<tr class="tr1 vt">
+            <td class="td1">删除人</td>
+			<td class="td2">
+				<input type="text" class="input input_wa mr20" name="admin">
+			</td>
+        </tr>
+      </table>
+  </div>
+<input type="hidden" name="ptable" id="ptable" value="">
+<div class="mb10 tac">
+	<span class="btn"><span><button type="submit">提 交</button></span></span>
+</div>
+</form>
+<SCRIPT LANGUAGE="JavaScript">
+var typefrom = '$from';
+function changeFrom(value) {
+	var fromforum = getObj('fromforum');
+	var fromcolony = getObj('fromcolony');
+	if(value == 1) {
+		fromforum.style.display = '';
+		fromcolony.style.display = 'none';
+	} else if (value == 2){
+		fromforum.style.display = 'none';
+		fromcolony.style.display = '';
+	} else {
+		fromforum.style.display = 'none';
+		fromcolony.style.display = 'none';
+	}
+}
+window.onload = function(){
+	var ptable = getObj('select_ptable').value;
+	getObj('ptable').value = ptable;
+	changeFrom(typefrom);
+}
+</SCRIPT>
+<form action="$basename&type=reply&" method="post" name="form1">
+<h3 class="h1"><span class="mr10">回复列表</span>
+<!--
+EOT;
+if($db_plist && count($db_plist)>1){print <<<EOT
+-->
+        <select onchange="window.location=('$basename&type=reply&ptable='+this.value);" name="select_ptable" id="select_ptable">
+          $p_table
+        </select>
+<!--
+EOT;
+}print <<<EOT
+-->
+        </h3>
+  <div class="admin_table mb10">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <tr class="tr2">
+	  <tr class="tr2"><td width="30"><span onclick="CheckAll(document.form1)" class="cp">全选</span></td>
+      <td>标题</td>
+<!--
+EOT;
+if ($from == 2) {print<<<EOT
+-->
+	 <td>群组名称</td>
+<!--
+EOT;
+} elseif ($from == 1) {print<<<EOT
+-->
+	 <td>版块</td>
+<!--
+EOT;
+}else{print<<<EOT
+-->
+	<td>来源</td>
+<!--
+EOT;
+}print<<<EOT
+-->
+      <td>作者</td>
+      <td>删除人</td>
+      <td>时间</td>
+    </tr>
+<!--
+EOT;
+if (empty($recycledb)) {print <<<EOT
+-->
+<tr><td class="p10" colspan="6"><div class="admin_tips">啊哦，没有你要的信息！</div></td></tr>
+<!--
+EOT;
+}else{
+foreach($recycledb as $key => $value){
+print <<<EOT
+-->
+    <tr class="tr1 vt">
+      <td class="td2"><input type='checkbox' name='selid[$value[pid]]' value="$value[fid]"></td>
+      <td class="td2" onclick="content('$value[pid]');">$value[subject](<a href="read.php?tid=$value[tid]" target="_blank">查看主题帖</a>)</td>
+	  <td class="td2">
+<!--
+EOT;
+if ($from == 2) {print<<<EOT
+-->
+	  <a href="apps.php?q=group&cyid=$value[cyid]" target="_blank">{$colonydb[$value[tid]][cname]}</a>
+<!--
+EOT;
+} elseif ($from == 1) {print<<<EOT
+-->
+	  <a href="thread.php?fid=$value[fid]" target="_blank">$value[fname]</a>
+<!--
+EOT;
+}else{
+if($colonydb[$key][cyid]){print<<<EOT
+-->
+	[群组]<a href="apps.php?q=group&cyid={$colonydb[$key][cyid]}" target="_blank">{$colonydb[$value[tid]][cname]}</a>
+<!--
+EOT;
+}if ($value[fid]) {print<<<EOT
+-->
+	[版块]<a href="thread.php?fid=$value[fid]" target="_blank">$value[fname]</a>
+<!--
+EOT;
+}}print<<<EOT
+-->
+      </td>
+      <td class="td2"><a href="u.php?uid=$value[authorid]" target="_blank">$value[author]</a></td>
+      <td class="td2">$value[admin]</td>
+      <td class="td2">$value[deltime]</td>
+    </tr>
+    <tr id="content_$value[pid]" class="tr1 vt" style="display:none;">
+      <td class="td2" colspan="7">$value[content]</td>
+    </tr>
+<!--
+EOT;
+}}print <<<EOT
+-->
+  </table>
+  </div>
+  <div class="fr"><span class="bt2"><span><button type="button" value="清空回收站" onclick="Recycle.Confirm('reply');">清空回收站</button></span></span></div>
+  <div class="cc mb10">$pages</div>
+  <div class="mb10 tac">
+  	<p><input type="radio" name="action" value="revert"> 还原回复&nbsp;
+        <input type="radio" name="action" value="del" checked> 删除回复&nbsp;
+        <input type="radio" name="action" value="clear"> 删除记录</p>
+  </div>
+  <div class="tac mb10">
+    <span class="btn"><span><button type="submit" name="hello" onclick="return confirm('您确认要进行此操作吗?');">提 交</button></span></span>
+ </div>
+</form>
+<!--
+EOT;
+}print <<<EOT
+-->
+<script language="JavaScript">
+function content(id){
+	var o = getObj('content_'+id);
+	o.style.display = o.style.display == 'none' ? '' : 'none';
+}
+
+var Recycle = {
+	Confirm : function (type){
+		if(confirm("清空后回收站内所有数据将不能被恢复！确认要清空回收站么？")){
+			var form = document.form1;
+			for(var i=0;i<form.elements.length;i++){
+				if(form.elements[i].type == "radio" && form.elements[i].checked){
+					form.elements[i].value = "empty";
+				}
+			}
+			form.submit();
+		}
+		return false;
+	}
+}
+
+</script>
+<!--
+EOT;
+include_once PrintEot('adminbottom');
+?>-->

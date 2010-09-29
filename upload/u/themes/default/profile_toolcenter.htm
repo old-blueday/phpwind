@@ -1,0 +1,930 @@
+<!--<?php
+if(!defined('AJAX')) {
+require_once uTemplate::PrintEot('header');
+//require_once uTemplate::PrintEot('profile_left');
+print <<<EOT
+-->
+<div class="contUser">
+	<div class="p15">            	
+<!--
+EOT;
+if (empty($job)) {
+print <<<EOT
+-->
+		<div class="navC mb10">
+			<ul id="infolist">
+				<li class="current"><a href="profile.php?action=toolcenter">道具交易</a></li>
+				<li><a href="profile.php?action=toolcenter&job=mytool">我的道具箱</a></li>
+			</ul>
+		</div>
+		<div class="bdB pb10 mb10 p_lr_10">
+			<a href="profile.php?action=toolcenter" class="s5 b">道具商店</a>&nbsp;|&nbsp;<a href="profile.php?action=toolcenter&job=user">二手市场</a>
+		</div>
+				<table width="100%" cellspacing="0" cellpadding="0" class="vt">
+<!--
+EOT;
+if ($tooldb) {print <<<EOT
+-->
+					<tr>
+<!--
+EOT;
+$num=0;
+foreach ($tooldb as $key => $value) {
+$id = $value[id];
+$num++;
+print <<<EOT
+-->
+						<td width="50%">
+						
+							<div class="toolItem">
+							<table width="100%" cellspacing="0" cellpadding="0">
+							<tr>
+							<td rowspan="4" width="115" class="toolPic">
+<!--
+EOT;
+if ($value[logo]) {
+print <<<EOT
+-->
+							<a href="profile.php?action=toolcenter&job=buy&id=$id"><img src="u/images/toolcenter/tool/$value[logo]" /></a>
+<!--
+EOT;
+} else {
+print <<<EOT
+-->
+							<span class="gray">暂无图片</span>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+							</td>
+							<th colspan="3"><a href="profile.php?action=toolcenter&job=buy&id=$id">$value[name]</a></th>
+							</tr>
+							<tr>
+								<td colspan="3" class="infos gray"><div class="lh_18">$value[descrip]</div></td>
+							</tr>
+							<tr>
+							<td width="14%" class="tit">价格：</td>
+							<td colspan="2"><span class="f14 s1 b">$value[price]</span> [{$credit->cType[$value[creditype]]}]
+<!--
+EOT;
+if ($value['rmb'] > 0 ) {
+print <<<EOT
+-->
+							/ <span class="s3">￥$value[rmb]</span>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+							</td>
+							</tr>
+							<tr>
+								<td class="tit">库存：</td>
+								<td width="80">$value[stock] 个</td>
+								<td><a href="profile.php?action=toolcenter&job=buy&id=$id" class="toolbuy">购买</a></td>
+							</tr>
+							</table>
+							</div>
+						</td>
+<!--
+EOT;
+if ($num == 2) {
+$num=0;
+print <<<EOT
+-->
+					</tr>
+					<tr>
+<!--
+EOT;
+}
+} //endforeach
+print <<<EOT
+-->
+					</tr>
+<!--
+EOT;
+} else {print <<<EOT
+-->
+					<tr><td><div class="p10 f14 tac">暂无道具交易</div></td></tr>
+<!--
+EOT;
+}print <<<EOT
+-->				</table>
+<!--
+EOT;
+} elseif($job == 'user') {print <<<EOT
+-->
+		<div class="navC mb10">
+			<ul id="infolist">
+<!--
+EOT;
+if ($uid == $winduid) {print <<<EOT
+-->
+				<li><a href="profile.php?action=toolcenter">道具交易</a></li>
+				<li  class="current"><a href="profile.php?action=toolcenter&job=mytool">我的道具箱</a></li>
+<!--
+EOT;
+} else {print <<<EOT
+-->
+				<li class="current"><a href="profile.php?action=toolcenter">道具交易</a></li>
+				<li><a href="profile.php?action=toolcenter&job=mytool">我的道具箱</a></li>
+<!--
+EOT;
+}print <<<EOT
+-->
+			</ul>
+		</div>
+		<div class="bdB pb10 mb10 p_lr_10">
+<!--
+EOT;
+if ($uid == $winduid && count($tooldb)) {print <<<EOT
+-->
+			<span class="fr">共出售&nbsp;<span class="f14 b s2">{$total_tool_nums['sell_nums']}</span>&nbsp;个道具</span>
+<!--
+EOT;
+}print <<<EOT
+-->
+
+<!--
+EOT;
+if ($uid == $winduid) {print <<<EOT
+-->
+			<a href="profile.php?action=toolcenter&job=mytool">我拥有的</a>&nbsp;|&nbsp;<a href="profile.php?action=toolcenter&job=user&uid=$winduid"  class="s5 b">我转让的</a>
+<!--
+EOT;
+} else {print <<<EOT
+-->
+			<a href="profile.php?action=toolcenter">道具商店</a>&nbsp;|&nbsp;<a class="s5 b" href="profile.php?action=toolcenter&job=user">二手市场</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+		</div>              
+<!--
+EOT;
+print <<<EOT
+-->
+				<table width="100%" cellspacing="0" cellpadding="0" class="vt">
+					<tr>
+<!--
+EOT;
+if (!is_array($tooldb) || !count($tooldb)) {
+$tmp_msg = "暂无道具转让";
+print <<<EOT
+-->
+						<td><div class="p10 f14 tac">$tmp_msg</div>
+</td>
+<!--
+EOT;
+}
+$num=0;
+foreach($tooldb as $key => $value) {
+$id=$value[toolid];
+$num++;
+print <<<EOT
+-->
+						<td width="50%">
+							<div class="toolItem">
+								<table width="100%" cellspacing="0" cellpadding="0">
+									<tr>
+										<td rowspan="5" width="115" class="toolPic">
+<!--
+EOT;
+if ($value[logo]) {print <<<EOT
+-->
+										<img src="u/images/toolcenter/tool/$value[logo]" />
+<!--
+EOT;
+} else {
+print <<<EOT
+-->
+										<span class="gray">暂无图片</span>
+<!--
+EOT;
+} print <<<EOT
+-->
+										</td>
+										<th colspan="2">$value[name]</th>
+									</tr>
+									<tr>
+										<td colspan="3" class="infos gray"><div class="lh_18">$value[descrip]</div></td>
+									</tr>
+									<tr><td width="65" class="tit">出售者：</td><td colspan="2">$value[username]</td></tr>
+									<tr><td class="tit">转让价格：</td><td colspan="2"><span class="f14 s1 b">$value[sellprice]</span> [{$credit->cType[$value[creditype]]}]</td></tr>
+									<tr>
+										<td class="tit">转让数量：</td>
+										<td width="50">$value[sellnums] 个</td>
+										<td>
+<!--
+EOT;
+if ($value['uid'] == $winduid) {print <<<EOT
+-->
+										<a href="profile.php?action=toolcenter&job=unsell&id={$id}" class="canceltran" onclick="return confirm('该操作将取消转让此道具，您确定要继续么？')">取消转让</a>
+<!--
+EOT;
+} else {
+print <<<EOT
+-->
+										<a href="profile.php?action=toolcenter&job=buyuser&id=$id&uid=$value[uid]" class="toolbuy">购买</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+										</td>
+									</tr>
+								</table>
+							</div>
+						</td>
+<!--
+EOT;
+if ($num == 2) {
+$num=0;
+print <<<EOT
+-->
+					</tr>
+				<tr>
+<!--
+EOT;
+}} //endforeach
+print <<<EOT
+-->
+				</tr>
+				</table>
+<!--
+EOT;
+} elseif ($job == 'buyuser') {print <<<EOT
+-->
+		<div class="navC mb10">
+				<ul id="infolist">
+					<li class="current"><a href="profile.php?action=toolcenter">道具交易</a></li>
+					<li><a href="profile.php?action=toolcenter&job=mytool">我的道具箱</a></li>
+				</ul>
+		</div>
+		<div class="bdB pb10 mb10 p_lr_10">
+			<a href="profile.php?action=toolcenter">道具商店</a>&nbsp;|&nbsp;<a href="profile.php?action=toolcenter&job=user"  class="s5 b">二手市场</a>
+		</div>
+				<form action="profile.php?action=toolcenter&" method="post" onsubmit="if(checkSubmit()){this.submit.disabled=true;}else{return false;}">
+					<input type="hidden" name="job" value="buyuser" />
+					<input type="hidden" name="step" value="2" />
+					<input type="hidden" name="id" value="$id" />
+					<input type="hidden" name="uid" value="$uid" />
+					<div class="toolItem" style="border-bottom:none; margin-bottom:0">
+					<table width="100%" cellspacing="0" cellpadding="0" class="vt">
+						<tr>
+						<td class="toolPic" rowspan="7" width="20%">
+<!--
+EOT;
+if ($rt['logo']) {print <<<EOT
+-->
+						<img src="u/images/toolcenter/tool/$rt[logo]" />
+<!--
+EOT;
+} else {print <<<EOT
+-->
+						<span class="gray">暂无图片</span>
+<!--
+EOT;
+}print <<<EOT
+-->
+						</td>
+						<th colspan="2" class="f14 s2">$rt[name]</th>
+						</tr>
+						<tr>
+						<th class="tit" width="11%">功能：</th>
+						<td>$rt[descrip]</td>
+						</tr>
+						<tr>
+						<th class="tit">转让价格：</th>
+						<td><span class="s1 b">$rt[sellprice]</span> [{$credit->cType[$rt[creditype]]}]</td>
+						</tr>
+						<tr><th class="tit">转让数量：</th><td>$rt[sellnums]</td></tr>
+						<tr><th class="tit">购买数量：</th><td><input id="nums" type="text"  class="input" name="nums" value="1" /></td></tr>
+						<tr><td colspan="2"><span class="btn2"><span><button type="submit">购买</button></span></span></td></tr>
+					</table>
+				</div>	
+					<table width="100%" class="toolInfo">
+						<tr>
+							<th colspan="2" class="toolTitle">使用积分限制</th>
+						</tr>
+						<tr><th width="160">发帖</th><td>{$condition[credit][postnum]}</td></tr>
+						<tr><th>精华</th><td>{$condition[credit][digests]}</td></tr>
+						<tr><th>{$db_rvrcname}</th><td>{$condition[credit][rvrc]}</td></tr>
+						<tr><th>{$db_moneyname}</th><td>{$condition[credit][money]}</td></tr>
+						<tr><th>{$db_creditname}</th><td>{$condition[credit][credit]}</td></tr>
+<!--
+EOT;
+foreach ($_CREDITDB as $key => $value) {print <<<EOT
+-->
+						<tr><th>$value[0]</th><td>{$condition[credit][$key]}</td></tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+						<tr><th colspan="2" class="toolTitle">用户组与版块限制</th></tr>
+						<tr><th>允许使用道具的用户组</th>
+						<td>
+<!--
+EOT;
+if ($usergroup) {print <<<EOT
+-->
+						<table cellspacing="0" cellpadding="0" width="100%"><tr>$usergroup</tr></table>
+<!--
+EOT;
+} else {print <<<EOT
+-->
+						所有用户组
+<!--
+EOT;
+}print <<<EOT
+-->
+						</td>
+						</tr>
+						<tr>
+						<th>允许使用道具的版块</th>
+						<td>
+<!--
+EOT;
+if ($usergroup) {print <<<EOT
+-->
+						<table cellspacing="0" cellpadding="0" width="100%"><tr>$forumcheck</tr></table>
+<!--
+EOT;
+} else {print <<<EOT
+-->
+						所有版块
+<!--
+EOT;
+}print <<<EOT
+-->
+						</td>
+						</tr>
+						</table>
+				</form>
+<script language="JavaScript">
+function checkSubmit() {
+if (1 * getObj('nums').value <= 0) {
+	alert("请您输入要购买的个数");
+	return false;
+} else {
+	return confirm("该操作将购买该道具 " + getObj('nums').value + " 个，您确定么？");
+}
+return false;
+}
+checkradio();
+</script>
+<!--
+EOT;
+} elseif ($job == 'mytool') {print <<<EOT
+-->
+		<div class="navC mb10">
+			<ul id="infolist">
+				<li><a href="profile.php?action=toolcenter">道具交易</a></li>
+				<li class="current"><a href="profile.php?action=toolcenter&job=mytool">我的道具箱</a></li>
+			</ul>
+		</div>
+		<div class="bdB pb10 mb10 p_lr_10">
+			<div class="fr">共有&nbsp;<span class="f14 b s2">{$total_tool_nums['valid_nums']}</span>&nbsp;个可用道具</div>
+			<a class="s5 b" href="profile.php?action=toolcenter&job=mytool">我拥有的</a>&nbsp;|&nbsp;<a href="profile.php?action=toolcenter&job=user&uid=$winduid">我转让的</a>
+		</div>
+			<table width="100%" cellspacing="0" cellpadding="0" align="center">
+				<tr>
+				
+<!--
+EOT;
+if (empty($tooldb)) {print <<<EOT
+-->
+				<td class="p10 f14 tac">对不起，您还没有任何道具</td>
+<!--
+EOT;
+}print <<<EOT
+-->
+<!--
+EOT;
+$num=0;
+foreach ($tooldb as $key => $value) {
+$id=$value[toolid];
+$num++;
+print <<<EOT
+-->
+					<td width="50%">
+						<div class="toolItem">
+							<table width="100%" border="0" cellspacing="0" cellpadding="0">
+								<tr>
+									<td rowspan="4" width="115" class="toolPic">
+<!--
+EOT;
+if ($value[logo]) {print <<<EOT
+-->
+										<img src="u/images/toolcenter/tool/$value[logo]" />
+<!--
+EOT;
+} else {print <<<EOT
+-->
+										<span class="gray">暂无图片</span>
+<!--
+EOT;
+} print <<<EOT
+-->
+									</td>
+									<th colspan="3">$value[name]</th>
+								</tr>
+								<tr>
+									<td colspan="3">价格 <span class="f14 s1 b">$value[price]</span> {$credit->cType[$value[creditype]]}</td>
+								</tr>
+								<tr>
+									<td>拥有数量 <span class="f14 s3 b">$value[nums]</span> 个</td>
+									<td>
+<!--
+EOT;
+if ($value['nums'] > 0) {
+if($value[type] == 1) {print <<<EOT
+-->
+										<a href="profile.php?action=toolcenter&job=use&toolid=$id" class="usetool" onclick="alert('对不起，帖子相关道具请您到帖子页面使用');return false;">使用道具</a>
+<!--
+EOT;
+} else {
+if($value['toolid'] == 18){print <<<EOT
+-->
+										<a href="profile.php?action=toolcenter&job=use&uid=$winduid&toolid=$id" class="usetool" onclick="return checkset('要让他人头像变猪头，请在浏览帖子时的头像名片中使用。在这里使用会让自己头像变猪头，')">使用道具</a>
+<!--
+EOT;
+} else {print <<<EOT
+-->
+
+										<a href="profile.php?action=toolcenter&job=use&uid=$winduid&toolid=$id" class="usetool" onclick="return checkset('{$value[descrip]}')">使用道具</a>
+<!--
+EOT;
+}}}print <<<EOT
+-->
+									</td>
+									<td>
+<!--
+EOT;
+if ($value[nums] > 0) {print <<<EOT
+-->
+										<a href="profile.php?action=toolcenter&job=sell&id=$id" class="canclesale">转让</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+									</td>
+								</tr>
+								<tr>
+									<td colspan="2">转让中 <a href="profile.php?action=toolcenter&job=user&uid=$winduid"><span class="f14 s1 b">$value[sellnums]</span></a> 个</td>
+									<td>
+<!--
+EOT;
+if ($value[sellnums] > 0) { print <<<EOT
+-->
+<!--
+EOT;
+}print <<<EOT
+-->
+									</td>
+								</tr>
+							</table>
+						</div>
+					</td>
+<!--
+EOT;
+if ($num == 2) {
+$num=0;
+print <<<EOT
+-->
+				</tr>
+				<tr>
+<!--
+EOT;
+}} //endforeach
+print <<<EOT
+-->
+				</tr>
+			</table>
+<script language="javascript">
+	function checkset(tool_msg){
+		if(!confirm('使用该道具' +tool_msg+' 确认要使用这个道具？')){
+			return false;
+		}
+	}
+</script>
+<!--
+EOT;
+} elseif ($job == 'buy') {print <<<EOT
+-->
+		<div class="navC mb10">
+				<ul id="infolist">
+					<li class="current"><a href="profile.php?action=toolcenter">道具交易</a></li>
+					<li><a href="profile.php?action=toolcenter&job=mytool">我的道具箱</a></li>
+				</ul>
+		</div>
+		<div class="bdB pb10 mb10 p_lr_10">
+			<a class="s5 b" href="profile.php?action=toolcenter">道具商店</a>&nbsp;|&nbsp;<a href="profile.php?action=toolcenter&job=user">二手市场</a>
+		</div>
+				<form action="profile.php?action=toolcenter&" method="post" onsubmit="return checkSubmit()">
+					<input type="hidden" name="job" value="buy" />
+					<input type="hidden" name="step" value="2" />
+					<input type="hidden" name="id" value="$id" />
+					<div class="toolItem" style="margin-bottom:0; border-bottom:none;">
+						<table width="100%" cellspacing="0" cellpadding="0" class="vt">
+							<tr>
+							<td class="toolPic" rowspan="7" width="20%">
+<!--
+EOT;
+if ($rt['logo']) {
+print <<<EOT
+-->
+							<img src="u/images/toolcenter/tool/$rt[logo]" />
+<!--
+EOT;
+} else {print <<<EOT
+-->
+							<span class="gray">暂无图片</span>
+<!--
+EOT;
+}print <<<EOT
+-->
+							</td>
+							<th colspan="2" class="f14 s2">$rt[name]</th>
+							</tr>
+							<tr>
+							<th class="tit" width="12%">价格：</th>
+							<td><span class="s1 b">$rt[price]</span> {$credit->cType[$rt[creditype]]}
+<!--
+EOT;
+if ($rt['rmb'] > 0) {
+print <<<EOT
+-->
+							/ <span class="s3">￥$rt[rmb]</span>
+<!--
+EOT;
+}print <<<EOT
+-->
+							</td>
+							</tr>
+							<tr><th class="tit">库存：</th><td>$rt[stock]</td></tr>
+							<tr>
+							<th class="tit">功能：</th>
+							<td>$rt[descrip]</td>
+							</tr>
+							<tr>
+							<th class="tit">购买方式：</th>
+							<td id="checkradio">
+<!--
+EOT;
+if ($rt['price'] > 0) {print <<<EOT
+-->
+							<div class="lh_18"><input type="radio" name="buymethod" value="0" />积分购买 (单价：<span class="s1 b">$rt[price]</span> {$credit->cType[$rt[creditype]]})</div>
+<!--
+EOT;
+}
+if ($rt['rmb'] > 0) {print <<<EOT
+-->
+							<div class="lh_18"><input type="radio" name="buymethod" value="1" />现金购买 (单价：<span class="s3">￥$rt[rmb]</span>，通过支付宝交易)</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+							</td>
+							</tr>
+							<tr><th class="tit">购买数量：</th><td><input id="nums" type="text"  class="input" name="nums" value="1" /></td></tr>
+							<tr><td colspan="2"><span class="btn2"><span><button type="submit">购买</button></span></span></td></tr>
+						</table>
+					</div>
+					<table width="100%" class="toolInfo">
+						<tr><th colspan="2" class="toolTitle">使用积分限制</th></tr>
+						<tr><th width="30%">发帖</th><td>{$condition[credit][postnum]}</td></tr>
+						<tr><th>精华</th><td>{$condition[credit][digests]}</td></tr>
+						<tr><th>{$db_rvrcname}</th><td>{$condition[credit][rvrc]}</td></tr>
+						<tr><th>{$db_moneyname}</th><td>{$condition[credit][money]}</td></tr>
+						<tr><th>{$db_creditname}</th><td>{$condition[credit][credit]}</td></tr>
+<!--
+EOT;
+foreach ($_CREDITDB as $key => $value) {print <<<EOT
+-->
+						<tr><th>$value[0]</th><td>{$condition[credit][$key]}</td></tr>
+<!--
+EOT;
+} print <<<EOT
+-->
+						<tr><td colspan="2" class="toolTitle">用户组与版块限制</td></tr>
+						<tr>
+							<th>允许使用道具的用户组</th>
+							<td>
+<!--
+EOT;
+if ($usergroup) {print <<<EOT
+-->
+							<table cellspacing="0" cellpadding="0" width="100%"><tr>$usergroup</tr></table>
+<!--
+EOT;
+} else {print <<<EOT
+-->
+							所有用户组
+<!--
+EOT;
+}print <<<EOT
+-->
+							</td>
+						</tr>
+						<tr>
+							<th>允许使用道具的版块</th>
+							<td>
+<!--
+EOT;
+if ($forumcheck) {print <<<EOT
+-->
+							<table cellspacing="0" cellpadding="0" width="100%"><tr>$forumcheck</tr></table>
+<!--
+EOT;
+} else {print <<<EOT
+-->
+							所有版块
+<!--
+EOT;
+}print <<<EOT
+-->
+							</td>
+						</tr>
+					</table>
+				</form>
+<script language="JavaScript">
+function checkradio() {
+	var radio = getObj('checkradio').getElementsByTagName('input');
+	if (radio.length > 0) {
+		radio[0].checked = true;
+	}
+}
+function checkSubmit() {
+	var nums = $('nums');
+	var re   =  /^[0-9]*[1-9][0-9]*$/;
+	if (!re.test(nums.value))
+	{
+		alert("您输入的数字为非法数字，请输入一个大于 “0” 的“整数”");
+		nums.focus();
+		return false;
+	}
+
+	return confirm("该操作将购买该道具 " + getObj('nums').value + " 个，您确定么？");
+}
+
+checkradio();
+</script>         
+<!--
+EOT;
+} elseif ($job == 'sell') {print <<<EOT
+-->
+		<div class="navC mb10">
+			<ul id="infolist">
+				<li><a href="profile.php?action=toolcenter">道具交易</a></li>
+				<li class="current"><a href="profile.php?action=toolcenter&job=mytool">我的道具箱</a></li>
+			</ul>
+		</div>
+		<div class="bdB pb10 mb10 p_lr_10">
+			<a class="s5 b" href="profile.php?action=toolcenter&job=mytool">我拥有的</a>&nbsp;|&nbsp;<a href="profile.php?action=toolcenter&job=user&uid=$winduid">我转让的</a>
+		</div>
+<script>
+				function checkForm()
+				{
+					var nums = $('nums');
+					var re   =  /^[0-9]*[1-9][0-9]*$/;
+					if (!re.test(nums.value))
+					{
+						alert("您输入的数字为非法数字，请输入一个大于 “0” 的“整数”");
+						nums.focus();
+						return false;
+					}
+				} 
+</script>
+				<form action="profile.php?action=toolcenter&" method="post" onsubmit="return checkForm()">
+					<input type="hidden" name="job" value="sell" />
+					<input type="hidden" name="step" value="2" />
+					<input type="hidden" name="id" value="$id" />
+					<div class="toolItem">
+						<table width="100%" cellspacing="0" cellpadding="0" class="vt">
+							<tr>
+<!--
+EOT;
+if($rt[logo]){
+print <<<EOT
+-->
+								<td rowspan="3" class="toolPic" width="20%"><img src="u/images/toolcenter/tool/$rt[logo]" /></td>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+								<th width="12%">名称：</th><td style="vertical-align:middle">$rt[name]</td>
+							</tr>
+							<tr>
+								<th>转让价格：</th><td style="vertical-align:middle"><input type="text"  class="input" name="price" value="$rt[price]" /> [{$credit->cType[$rt[creditype]]}]</td>
+							</tr>
+							<tr>
+								<th>转让数量：</th><td style="vertical-align:middle"><input type="text"  class="input" name="nums" value="1"  id="nums"/></td>
+							</tr>
+						</table>
+					</div>
+					<div class="tac"><span class="btn"><span><button type="submit">转让</button></span></span></div>
+				</form>             
+<!--
+EOT;
+} elseif ($job == 'use') {print <<<EOT
+-->			
+		<div class="navC mb10">
+			<ul id="infolist">
+				<li><a href="profile.php?action=toolcenter">道具交易</a></li>
+				<li class="current"><a href="profile.php?action=toolcenter&job=mytool">我的道具箱</a></li>
+			</ul>
+		</div>
+		<div class="bdB pb10 mb10 p_lr_10">
+			<a class="s5 b" href="profile.php?action=toolcenter&job=mytool">我拥有的</a>&nbsp;|&nbsp;<a href="profile.php?action=toolcenter&job=user&uid=$winduid">我转让的</a>
+		</div>
+<!--
+EOT;
+if (!$toolid) {print <<<EOT
+-->
+                <table width="100%" cellspacing="0" cellpadding="0" align="center">
+                <tr>
+<!--
+EOT;
+$num=0;
+foreach ($tooldb as $key => $value) {
+$id=$value[id];
+$num++;
+print <<<EOT
+-->
+                <td width="50%">
+                <div class="t" style="margin:0 1px;">
+                <table width="100%" cellspacing="0" cellpadding="0">
+                <tr>
+<!--
+EOT;
+if ($value[logo]) {print <<<EOT
+-->
+                <td rowspan="5" width="40%"><a href="profile.php?action=toolcenter&job=buy&id=$id"><img src="u/images/toolcenter/tool/$value[logo]" /></a></td>
+<!--
+EOT;
+}print <<<EOT
+-->
+                <th colspan="2"><a href="profile.php?action=toolcenter&job=buy&id=$id"><b>$value[name]</b></a></th>
+                </tr>
+                <tr>
+                <td colspan="2">$value[descrip]</td>
+                </tr>
+                <tr><td width="20%">价格</td><td>$value[price] [{$credit->cType[$value[creditype]]}]
+<!--
+EOT;
+if ($value['rmb'] > 0) {print <<<EOT
+-->
+                        / <span class="s3">￥$value[rmb]</span>
+<!--
+EOT;
+}print <<<EOT
+-->
+                </td></tr>
+                <tr><td>库存</td><td>$value[stock]</td></tr>
+                <tr><td colspan="2"><a href="profile.php?action=toolcenter&job=buy&id=$id"><img src="u/images/toolcenter/toolbuy.gif" /></a></td></tr>
+                </table></div>
+                </td>
+<!--
+EOT;
+if($num == 2) {
+$num=0;
+print <<<EOT
+-->
+                </tr><tr>
+<!--
+EOT;
+}}print <<<EOT
+-->
+                </tr>
+                </table>              
+<script language="JavaScript">
+function checkset(tool_msg){
+	if(!confirm('使用该道具' +tool_msg+'，确认要使用这个道具！')){
+		return false;
+	}
+}
+</script>
+<!--
+EOT;
+} elseif ($toolid == 3) {print <<<EOT
+-->
+        <form action="profile.php?action=toolcenter&job=use&" method="post">
+            <input type="hidden" name="tid" value="$tid" />
+            <input type="hidden" name="toolid" value="$toolid" />
+            <input type="hidden" name="step" value="2" />
+            <div class="t" style="margin-top:15px;">
+                <table width="100%" cellspacing="0" cellpadding="0" align="center">
+                <tr><td class="h b">道具使用</td></tr>
+                <tr class="tr1">
+                <th>
+                <input type="checkbox" name="title2" value="1" /><img src="$imgpath/post/editor/bold.gif" />
+                <input type="checkbox" name="title3" value="1" /><img src="$imgpath/post/editor/italic.gif" />
+                <input type="checkbox" name="title4" value="1" /><img src="$imgpath/post/editor/underline.gif" />
+                <br /><br />
+                &nbsp;颜色
+                <input name="title1" type="radio" value="" />不使用
+                <input name="title1" type="radio" value="red" /><font color="red">红色</font>
+                <input name="title1" type="radio" value="blue" /><font color="blue">蓝色</font>
+                <input name="title1" type="radio" value="green" /><font color="green">绿色</font>
+                <input name="title1" type="radio" value="orange" /><font color="orange">橙色</font>
+                <input name="title1" type="radio" value="silver" /><font color="silver">银色</font>
+                </th></tr>
+                </table>
+            </div>
+            <div style="text-align:center;margin-bottom:25px">
+                <input class="btn" type="submit" value="提 交" />
+            </div>
+        </form>
+
+<!--
+EOT;
+} elseif ($toolid == 8) {print <<<EOT
+-->
+        <form action="profile.php?action=toolcenter&job=use&" method="post">
+            <input type="hidden" name="toolid" value="$toolid" />
+            <input type="hidden" name="step" value="2" />
+            <div class="t" style="margin-top:15px">
+                <table width="100%" cellspacing="0" cellpadding="0">
+                <tr><td class="h b" colspan="2">道具使用</td></tr>
+                <tr><th width="15%">请输入新的用户名</th><td><input type="text"  class="input" name="pwuser" /></td></tr>
+                </table>
+            </div>
+            <div style="text-align:center;margin-bottom:25px">
+            	<input class="btn" type="submit" value="提 交" />
+            </div>
+        </form>
+<!--
+EOT;
+}}} elseif($job == 'ajax') {print <<<EOT
+-->
+
+
+<!--
+EOT;
+if ($toolid == 3) {print <<<EOT
+-->
+            <form action="profile.php?action=toolcenter&job=ajax" method="post">
+                <input type="hidden" name="tid" value="$tid" />
+                <input type="hidden" name="toolid" value="$toolid" />
+                <input type="hidden" name="step" value="2" />
+                <table width="340" cellspacing="1" cellpadding="5">
+                    <tr><th class="h" style="cursor:move" onmousedown="read.move(event);"><span class="fr" style="margin-top:2px;cursor:pointer" onclick="read.close();"><img src="$imgpath/close.gif" /></span><b>道具使用</b></th></tr>
+                    <tr><td>
+                    <input type="checkbox" name="title2" value="1" /><img src="$imgpath/post/editor/bold.gif" />
+                    <input type="checkbox" name="title3" value="1" /><img src="$imgpath/post/editor/italic.gif" />
+                    <input type="checkbox" name="title4" value="1" /><img src="$imgpath/post/editor/underline.gif" />
+                    <br /><br />
+                    &nbsp;颜色
+                    <input name="title1" type="radio" value="" />不使用
+                    <input name="title1" type="radio" value="red" /><font color="red">红色</font>
+                    <input name="title1" type="radio" value="blue" /><font color="blue">蓝色</font>
+                    <input name="title1" type="radio" value="green" /><font color="green">绿色</font>
+                    <input name="title1" type="radio" value="orange" /><font color="orange">橙色</font>
+                    <input name="title1" type="radio" value="silver" /><font color="silver">银色</font>
+                    </td></tr>
+                </table>
+                <ul>
+                	<li style="text-align:center;padding:4px 0;"><input type="button" class="btn" onclick="ajax.submit(this.form);" value="提 交" /></li>
+                </ul>
+            </form>
+<!--
+EOT;
+} elseif ($toolid == 8) {print <<<EOT
+-->
+            <form action="profile.php?action=toolcenter&job=ajax&" method="post">
+                <input type="hidden" name="toolid" value="$toolid" />
+                <input type="hidden" name="step" value="2" />
+                <table width="340" cellspacing="0" cellpadding="0">
+                	<tr>
+                    	<th class="h" colspan="2" style="cursor:move" onmousedown="read.move(event);"><span class="fr" style="margin-top:2px;cursor:pointer" onclick="read.close();"><img src="$imgpath/close.gif" /></span><b>道具使用</b></th>
+                    </tr>
+                	<tr>
+                	<td width="35%" align="center"> 请输入新的用户名：</td><td><input type="text" class="input" name="pwuser" /></td>
+                    </tr>
+                </table>
+                <ul>
+                	<li style="text-align:center;padding:4px 0;"><input type="button" class="btn" onclick="ajax.submit(this.form);" value="提 交" /></li>
+                </ul>		
+           </form>
+
+<!--
+EOT;
+}print <<<EOT
+-->
+<!--
+EOT;
+}print <<<EOT
+-->
+<!--
+EOT;
+if (!defined('AJAX')) {print <<<EOT
+-->
+            </div>
+        </div>
+<!--
+EOT;
+require_once uTemplate::printEot('footer');
+}
+?>-->

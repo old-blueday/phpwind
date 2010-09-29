@@ -1,0 +1,97 @@
+<!--<?php
+$smileService = L::loadClass('smile', 'smile');
+$smiles = $smileService->findByType();
+print<<<EOT
+-->
+<div id="smileContainer" style="display:none;position:absolute;z-index:12;" class="popout" onmousedown="stopPropagation(event)"><table border="0" cellspacing="0" cellpadding="0"><tbody><tr><td class="bgcorner1"></td><td class="pobg1"></td><td class="bgcorner2"></td></tr><tr><td class="pobg4"></td><td>
+<div class="popoutContent">
+<!--
+EOT;
+if (!empty($smiles)) {
+print <<<EOT
+-->
+<div class="popshow">
+<b class="triangle"></b>
+<a href="javascript:;" class="adel">关闭</a>
+<ul class="cc">
+<!--
+EOT;
+	foreach ($smiles as $smile) {
+print <<<EOT
+-->
+	<li><a href="javascript:;" title="{$smile[name]}"><img src="{$smile[url]}"></a></li>
+<!--
+EOT;
+	}
+print <<<EOT
+-->
+</ul>
+<div class="face_pages"></div>
+</div>
+<!--
+EOT;
+} else {
+print <<<EOT
+-->
+<div class="p10">没有可选择的表情</div>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+</div>
+</td><td class="pobg2"></td></tr><tr><td class="bgcorner4"></td><td class="pobg3"></td><td class="bgcorner3"></td></tr></tbody></table></div>
+<script language="javascript">
+var smile_form_id = 'weiboPostForm';
+function applySmile(addSmileCallback) {
+	smileContainerObj = getObj('smileContainer');
+	var smiles = smileContainerObj.getElementsByTagName('a');
+	if (smiles.length) {
+		smiles[0].onclick = function() {displayElement('smileContainer', false);};
+		for (i=1; i<smiles.length; i++) {
+			smiles[i].onclick = function() {
+				var codeText = '[s:' + this.title + ']';
+				addSmileCallback(codeText,getObj(smile_form_id));
+				displayElement('smileContainer', false);
+			}
+		}
+	}
+}
+function stopPropagation(evt) {
+	var e=(evt)?evt:window.event;
+	if (window.event) {
+		e.cancelBubble=true;
+	} else {
+		e.stopPropagation();
+	}
+}
+var miniSmile = {
+	show : function(srcObj) {
+		displayElement('smileContainer');
+		var rect = srcObj.getBoundingClientRect();
+		getObj('smileContainer').style.left = rect.left+ietruebody().scrollLeft+'px';
+		getObj('smileContainer').style.top = rect.top + ietruebody().scrollTop + 20 +'px';
+		document.body.onmousedown = miniSmile.hide;
+	},
+	hide : function() {
+		document.body.onmousedown = null;
+		getObj('smileContainer').style.display = 'none';
+	},
+	apply : function(addSmileCallback, textArea) {
+		var smiles = getObj('smileContainer').getElementsByTagName('a');
+		if (smiles.length) {
+			smiles[0].onclick = function() {displayElement('smileContainer', false);};
+			for (i=1; i<smiles.length; i++) {
+				smiles[i].onclick = function() {
+					var codeText = '[s:' + this.title + ']';
+					addSmileCallback(codeText, textArea);
+					miniSmile.hide();
+				}
+			}
+		}
+	}
+}
+</script>
+<!--
+EOT;
+?>-->

@@ -1,0 +1,183 @@
+<!--<?php print <<<EOT
+-->
+<div id="breadCrumb" class="cc">
+<form action="show.php?" method="post" name="show">
+<input type="hidden" name="uid" value="$uid" />
+		<div class="fr" style="margin-top:2px;">
+		用户名: <input class="input" type="text" name="pwuser" size="10" />
+		<input class="btn" type="submit" value="提 交" />
+		<select name="fid" onchange="javascript:submit()">
+		<option value=''>分类</option>
+		$forumcache
+		</select>
+		<select name="type" onchange="javascript:submit()">
+		<option value=''>类型</option>
+		<option value="1" $type_1>图片</option>
+		<option value="2" $type_2>文件</option>
+		</select>
+		</div>
+</form>
+		<img src="$imgpath/$stylepath/thread/home-old.gif" align="absmiddle" />&nbsp;<a href="$db_bfn" title="$db_bbsname">$db_bbsname</a><em>&gt;</em>
+<!--
+EOT;
+if(!$owner){
+print <<<EOT
+-->
+		<a href="show.php">站点展区</a>
+<!--
+EOT;
+}else{
+print <<<EOT
+-->
+		<a href="show.php">站点展区</a>
+<!--
+EOT;
+if($type==1 || $action=='pic'){print <<<EOT
+-->
+		{$owner} 的个人展区(图片)
+<!--
+EOT;
+}elseif($type==2){print <<<EOT
+-->
+		{$owner} 的个人展区(文件)
+<!--
+EOT;
+}else{print <<<EOT
+-->
+		{$owner} 的个人展区
+<!--
+EOT;
+}}print <<<EOT
+-->
+</div>
+
+<!--
+EOT;
+if(!$action){print <<<EOT
+-->
+<div class="t" style="margin:8px auto">
+<style type="text/css">
+.showA{height:130px;text-align:center;vertical-align:middle;display:table-cell;overflow:hidden;}
+.showB{display:inline-block;vertical-align:middle;}
+.showC{width:0;height:100%;}
+</style>
+<table width="100%" cellspacing="0" cellpadding="0" align="center" style='table-layout:fixed;word-wrap: break-word'>
+<tr><td class="h" colspan="4"><b>站点展区</b></td></tr>
+<tr class="tr3 f_one">
+<!--
+EOT;
+$num=0;
+foreach($showdb as $key => $value){
+$id=$value[id];
+$num++;
+print <<<EOT
+-->
+<td>
+	<div class="tiptop tac showA">
+		<span class="showB showC"></span>
+		<span class="showB">
+<!--
+EOT;
+if($value['type']=='img'){
+if($value['a_url']=='imgurl'){
+$imgurl="job.php?action=showimg&tid={$value[tid]}&pid={$value[pid]}&fid={$value[fid]}&aid={$value[aid]}&verify=".md5("showimg{$value[tid]}{$value[pid]}{$value[fid]}{$value[aid]}{$db_hash}");print <<<EOT
+-->
+		<img src="$imgpath/$stylepath/file/img.gif" />&nbsp;
+		<a href="$imgurl" target="_blank">$value[name]</a>
+<!--
+EOT;
+}elseif($value[a_url]=='none'){print <<<EOT
+-->
+		<img src="$imgpath/none.gif" />
+<!--
+EOT;
+}else{print <<<EOT
+-->
+		<a href="show.php?action=pic&aid=$value[aid]&tid=$value[tid]"><img src="$value[a_url]" onload="if(this.width>'150')this.width='150';if(this.height>'120')this.height='120';" /></a>
+<!--
+EOT;
+}}else{
+if($value[a_url]=='none'){ print <<<EOT
+-->
+		<img src="$imgpath/none.gif" />
+<!--
+EOT;
+}else{print <<<EOT
+-->
+		<img src="$imgpath/$stylepath/file/zip.gif" />
+		<a href="job.php?action=download&aid=$value[aid]" target="_blank">
+		&nbsp;$value[name]</a>
+<!--
+EOT;
+}}if($value[a_url]=='none'){ print <<<EOT
+-->
+	  </span>
+	</div>
+	<div style="text-align:left;margin-top:5px">
+	版块 : <a href="thread.php?fid=$value[fid]" target="_blank">$value[fname]</a><br />
+	</div>
+<!--
+EOT;
+}else{ print <<<EOT
+-->
+	  </span>
+	</div>
+	<div style="text-align:left;margin-top:5px">
+	作者 : <a href="u.php?uid=$value[uid]" target="_blank">$value[username]</a><br />
+	版块 : <a href="thread.php?fid=$value[fid]" target="_blank">$value[fname]</a><br />
+	说明 : <a href="read.php?tid=$value[tid]" target="_blank">$value[descrip]</a><br />
+	</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+</td>
+<!--
+EOT;
+if($num==4){
+$num=0;
+print <<<EOT
+-->
+</tr><tr class="tr3 f_one">
+<!--
+EOT;
+}}print <<<EOT
+-->
+</tr></table></div>$pages
+<div class="c"></div>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+<div class="t" style="margin-top:8px;"><table width="100%" cellspacing="0" cellpadding="0">
+	<tr class="tr2 tac"><td style="padding:5px">
+
+<!--
+EOT;
+if(!$nopre){print <<<EOT
+-->
+				<div class="fl"><a href="job.php?action=redirect&goto=pre&aid=$aid">上一张</a></div>
+<!--
+EOT;
+}print <<<EOT
+-->
+<!--
+EOT;
+if(!$nonext){print <<<EOT
+-->
+				<div class="fr"><a href="job.php?action=redirect&goto=next&aid=$aid">下一张</a></div>
+<!--
+EOT;
+}print <<<EOT
+-->
+			<a href="read.php?tid=$rt[tid]#$rt[pid]" target="_blank">$rt[subject]</a>
+	</td></tr>
+	<tr class="f_one" style="padding:10px">
+		<td align="center">
+			<a href="$rt[a_url]" target="_blank"><img src="$rt[a_url]" onload="if(this.width>850)this.width=850;"></a>
+			<p>$rt[descrip]</p>
+	</td></tr>
+</table></div>
+<!--
+EOT;
+}?>-->

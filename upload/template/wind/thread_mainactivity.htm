@@ -1,0 +1,224 @@
+<!--<?php print <<<EOT
+-->
+<table width="100%" style="table-layout:fixed;">
+	<tbody id="threadlist">
+	<tr class="tr4">
+<!--
+EOT;
+if($thread[adminbox] && $managecheck){print <<<EOT
+-->
+		<td class="adminbox"></td>
+<!--
+EOT;
+}print <<<EOT
+-->
+		<td class="icon">&nbsp;</td>
+		<td class="subject">文章</td>
+<!--
+EOT;
+foreach ($threadColumnName as $key => $value) {
+print<<<EOT
+-->
+		<td class="tal">$value</td>
+<!--
+EOT;
+}print<<<EOT
+-->
+	</tr>
+<!--
+EOT;
+$tpc_topped=0;
+$searchname && $target= '_blank';
+foreach($threaddb as $key => $thread){
+$thread['postdate'] = get_date($thread['postdate'],'Y-m-d');
+$thread['lstptime'] = get_date($thread['lastpost']);
+print <<<EOT
+-->
+	<tr class="tr3">
+<!--
+EOT;
+if($thread[adminbox] && $managecheck){print <<<EOT
+-->
+	<td class="adminbox">$thread[adminbox]</td>
+<!--
+EOT;
+}print <<<EOT
+-->
+    <td class="icon"><a title="打开新窗口" href="$thread[tpcurl]" target="_blank">$thread[status]</a></td>
+	<td class="subject" id="td_$thread[tid]" width="400">
+<!--
+EOT;
+if($thread[digest]){print <<<EOT
+-->
+			<img class="fr" src="$imgpath/$stylepath/file/digest_$thread[digest].gif" align="absmiddle" style="margin-top:4px;" title="精华帖标志" />
+<!--
+EOT;
+}if($thread[toolinfo]){print <<<EOT
+-->
+    		<span class="f14 s3">[$thread[toolinfo]]</span>
+<!--
+EOT;
+}if($thread[topped]){print <<<EOT
+-->
+			<img src="$imgpath/$stylepath/file/headtopic_$thread[topped].gif" style="margin-right:5px;" align="absmiddle" title="置顶帖标志"/>
+<!--
+EOT;
+}print <<<EOT
+-->
+			$thread[useriocn]
+<!--
+EOT;
+if($forumset['addtpctype'] && $t_db[$thread['type']] && $thread['fid']==$fid){
+if ($upid = $t_db[$thread['type']]['upid']) {print <<<EOT
+-->
+			<a href="thread.php?fid=$fid&type=$upid" class="f14">[{$t_db[$upid][name]}]</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+			<a href="thread.php?fid=$fid&type=$thread[type]" class="f14">[{$t_db[$thread[type]][name]}]</a>
+<!--
+EOT;
+}if($thread['state'] == 0 && $thread['rewcredit'] > 0){print <<<EOT
+-->
+			<span class="s1 subject"> &#8212; 悬赏金额:$thread[rewcredit] &#8212; </span>
+<!--
+EOT;
+}print <<<EOT
+-->
+			<a href="$thread[tpcurl]" id="a_ajax_$thread[tid]" target="$target" class="f14">$thread[subject]</a>&nbsp; $thread[ifmark] $thread[titleadd] $thread[recommendadd]
+<!--
+EOT;
+if(isset($thread['colony'])){print <<<EOT
+-->
+			<span class="gray w">[来自群：<a href="apps.php?q=group&cyid={$thread[colony][cyid]}">{$thread[colony][cname]}</a>]</span>
+<!--
+EOT;
+}if($timestamp-$thread[lastpost]<=$db_newtime){print <<<EOT
+-->
+			<img src="$imgpath/$stylepath/file/new.gif" align="absmiddle" title="新帖标志" />
+<!--
+EOT;
+}if($forumset['inspect'] && $thread['inspect']){print <<<EOT
+-->
+			<span class="w"><font color="red">[{$thread[inspect][1]} 阅至 {$thread[inspect][0]}楼]</font></span>
+<!--
+EOT;
+}if($thread[ispage]){print <<<EOT
+-->
+			<span class="w">$thread[ispage]</span>
+<!--
+EOT;
+}print <<<EOT
+-->
+	</td>
+<!--
+EOT;
+foreach($threadshowfield as $key => $value){
+$topicvalue = $thread['topic'][$key];
+print<<<EOT
+-->
+	<td class="tal">$topicvalue</td>
+<!--
+EOT;
+}print<<<EOT
+-->
+	</tr>
+<!--
+EOT;
+if($managemode==1){
+$managemode_colspan = $colspannum -2;
+if($db_ajax & 1){print <<<EOT
+-->
+    <tr class="tr3"><td></td><td>
+	<div class="fr s8">[
+<!--
+EOT;
+if($isGM || $pwSystem[digestadmin]){print <<<EOT
+-->
+		<a id="digest_$thread[tid]" style="cursor:pointer" onclick="sendmsg('mawhole.php?ajax=1&action=digest&fid=$thread[fid]&seltid=$thread[tid]','',this.id)" title="加入精华帖">精</a>
+<!--
+EOT;
+}if($isGM || $pwSystem[lockadmin]){print <<<EOT
+-->
+		<a id="lock_$thread[tid]" style="cursor:pointer" onclick="sendmsg('mawhole.php?ajax=1&action=lock&fid=$thread[fid]&seltid=$thread[tid]','',this.id)" title="锁定帖子不让会员再回复帖子">锁定</a>
+<!--
+EOT;
+}if($isGM || $pwSystem[pushadmin]){print <<<EOT
+-->
+		<a id="pushtopic_$thread[tid]" style="cursor:pointer" onclick="sendmsg('mawhole.php?ajax=1&action=pushtopic&fid=$thread[fid]&seltid=$thread[tid]','',this.id)" title="提前帖子">提</a>
+<!--
+EOT;
+}if($isGM || $pwSystem[downadmin]){print <<<EOT
+-->
+		<a id="downtopic_$thread[tid]" style="cursor:pointer" onclick="sendmsg('mawhole.php?ajax=1&action=downtopic&fid=$thread[fid]&seltid=$thread[tid]','',this.id)" title="将帖子往后压">压帖</a>
+<!--
+EOT;
+}if($isGM || $pwSystem[coloradmin]){print <<<EOT
+-->
+		<a id="edit_$thread[tid]" style="cursor:pointer" onclick="sendmsg('mawhole.php?ajax=1&action=edit&fid=$thread[fid]&seltid=$thread[tid]','',this.id)" title="编辑标题">亮</a>
+<!--
+EOT;
+}if($isGM || $pwSystem[topped]){print <<<EOT
+-->
+<a id="headtopic_$thread[tid]" style="cursor:pointer" onclick="sendmsg('mawhole.php?ajax=1&action=headtopic&fid=$thread[fid]&seltid=$thread[tid]','',this.id)" title="置顶主题:将主题置顶,以便会员查看">顶</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+] </div><td colspan="4"></td></td></tr>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+    <tr class="tr3"><td></td><td>
+	<div class="fr s8"> [
+<!--
+EOT;
+if($isGM || $pwSystem['digestadmin']){print <<<EOT
+-->
+		<a id="digest_$thread[tid]" href="mawhole.php?action=digest&fid=$thread[fid]&seltid=$thread[tid]" title="加入精华帖">精</a>
+<!--
+EOT;
+}if($isGM || $pwSystem['lockadmin']){print <<<EOT
+-->
+		<a id="lock_$thread[tid]" href="mawhole.php?action=lock&fid=$thread[fid]&seltid=$thread[tid]" title="锁定帖子不让会员再回复帖子">锁定</a>
+<!--
+EOT;
+}if($isGM || $pwSystem['pushadmin']){print <<<EOT
+-->
+		<a id="pushtopic_$thread[tid]" href="mawhole.php?action=pushtopic&fid=$thread[fid]&seltid=$thread[tid]" title="提前帖子">提</a>
+<!--
+EOT;
+}if($isGM || $pwSystem['downadmin']){print <<<EOT
+-->
+		<a id="downtopic_$thread[tid]" href="mawhole.php?action=downtopic&fid=$thread[fid]&seltid=$thread[tid]" title="将帖子往后压">压帖</a>
+<!--
+EOT;
+}if($isGM || $pwSystem['coloradmin']){print <<<EOT
+-->
+		<a id="edit_$thread[tid]" href="mawhole.php?action=edit&fid=$thread[fid]&seltid=$thread[tid]" title="编辑标题">亮</a>
+<!--
+EOT;
+}if($isGM || $pwSystem[topped]){print <<<EOT
+-->
+	<a id="headtopic_$thread[tid]" href="mawhole.php?action=headtopic&fid=$thread[fid]&seltid=$thread[tid]" title="置顶主题:将主题置顶,以便会员查看">顶</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+		] </div><td colspan="$managemode_colspan"></td></td></tr>
+<!--
+EOT;
+}}print <<<EOT
+-->
+
+<!--
+EOT;
+}print <<<EOT
+-->
+	</tbody>
+</table>
+<!--
+EOT;
+?>

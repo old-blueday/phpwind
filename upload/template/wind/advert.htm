@@ -1,0 +1,69 @@
+<!--<?php
+print <<<EOT
+-->
+<script src="js/float.js" language="javascript"></script>
+<script language="javascript" defer>
+var oldWindowOnloadFunc = window.onload;
+
+window.onload = function () {
+	if (oldWindowOnloadFunc != undefined) {
+		oldWindowOnloadFunc();
+	}
+
+	var LeftCode = RightCode = '';
+/*
+EOT;
+$ShowFloat = false;
+list($htmlAdvert,$arrayAdvert) = pwAdvert('Site.FloatLeft',$fid);
+if($htmlAdvert){
+	$ShowFloat = true;
+	$htmlAdvert = str_replace(array("\r","\n","'"),array('','<br />',"\'"),$htmlAdvert);
+print <<<EOT
+*/
+	var LeftCode = '$htmlAdvert';
+/*
+EOT;
+}
+list($htmlAdvert,$arrayAdvert) = pwAdvert('Site.FloatRight',$fid);
+if($htmlAdvert){
+	$ShowFloat = true;
+	$htmlAdvert = str_replace(array("\r","\n","'"),array('','<br />',"\'"),$htmlAdvert);
+print <<<EOT
+*/
+	var RightCode = '$htmlAdvert';
+/*
+EOT;
+}if ($ShowFloat) {print <<<EOT
+*/
+	ShowFloat(LeftCode, RightCode);
+/*
+EOT;
+}
+list($htmlAdvert,$arrayAdvert) = pwAdvert('Site.FloatRand',$fid);
+if($htmlAdvert){
+$htmlAdvert=str_replace(array("\r","\n","'"),array('','<br />',"\'"),$htmlAdvert);
+print <<<EOT
+*/
+	var floatCode = '$htmlAdvert';
+	ShowAd(floatCode);
+/*
+EOT;
+}
+list($htmlAdvert,$arrayAdvert) = pwAdvert('Site.PopupNotice',$fid);
+if($htmlAdvert){
+$htmlAdvert=str_replace(array("\r","\n","'"),array('','<br />',"\'"),$htmlAdvert);
+print <<<EOT
+*/
+	var popParam={$arrayAdvert[0]['other']};
+	var popCode='{$htmlAdvert}';
+	ShowPop(popParam,popCode);
+/*
+EOT;
+}print <<<EOT
+*/
+imgloops.imginit();/*多图片轮播*/
+}
+</script>
+<!--
+EOT;
+?>-->

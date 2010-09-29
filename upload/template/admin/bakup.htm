@@ -1,0 +1,220 @@
+<!--<?php
+include_once PrintEot('left');
+if($job=='bakout'){print <<<EOT
+-->
+<div class="nav3 mb10">
+	<ul class="cc">
+		<li class="current"><a href="$admin_file?adminjob=bakup">数据维护</a></li>
+		<li><a href="$admin_file?adminjob=bakup&job=bakin">数据恢复</a></li>
+	</ul>
+</div>
+
+<div class="admin_info mb10">
+    <h3 class="h1"><b>提示信息</b></h3>
+    <div class="legend">您可以根据自己的需要选择需要备份的数据库表,导出的数据文件可用"数据恢复"功能<br />为了数据安全,备份文件采用时间戳命名保存,如果备份数据超过设定的大小程序会自动采用分卷备份功能，请耐心等待直到程序提示全部备份完成<br />附件的备份只需手工转移附件目录和文件即可,风格备份也同! phpwind不提供单独备份</div>
+</div>
+<!--
+EOT;
+}elseif($job=='bakin'){print <<<EOT
+-->
+<div class="nav3 mb10">
+	<ul class="cc">
+		<li><a href="$admin_file?adminjob=bakup">数据维护</a></li>
+		<li class="current"><a href="$admin_file?adminjob=bakup&job=bakin">数据恢复</a></li>
+	</ul>
+</div>
+
+<div class="admin_info mb10">
+    <h3 class="h1"><b>提示信息</b></h3>
+    <div class="legend">本功能在恢复备份数据的同时,将覆盖原有数据,请确定是否需要恢复,以免造成数据损失<br />数据恢复功能只能恢复由当前版本导出的数据文件,其他软件导出格式可能无法识别<br />如果一个备份文件有多个分卷，您只需任选一个备份文件导入，程序会自动导入其他分卷</div>
+</div>
+<!--
+EOT;
+}
+if($job=='bakout'){
+if ($action == 'repair' || $action == 'optimize') {print <<<EOT
+-->
+<h2 class="h1">
+<span class="mr10"><b>数据库优化信息</b></span><a href="$basename" class="linka">返回上一级<span class="f9">▲</span></a>
+</h2>
+<div class="admin_table mb10">
+    <table width="100%" cellspacing="0" cellpadding="0">
+        <tr class="tr2 vt td_bgB">
+            <td>数据库表</td>
+            <td>操作</td>
+            <td>信息</td>
+        </tr>
+<!--
+EOT;
+foreach($msgdb as $msg){
+print <<<EOT
+-->
+        <tr class="tr1 vt">
+            <td class="td2">$msg[Table]</td>
+            <td class="td2">$msg[Op]</td>
+            <td class="td2">$msg[Msg_type]:$msg[Msg_text]</td>
+        </tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+    </table>
+</div>
+<!--
+EOT;
+} else {print <<<EOT
+-->
+<form action="$basename&" method="post" name="FORM">
+<h2 class="h1">
+<!--
+EOT;
+if($type == 'pw'){print <<<EOT
+-->
+phpwind数据库表
+<!--
+EOT;
+} elseif ($type == 'other'){print <<<EOT
+-->
+其他数据库表
+<!--
+EOT;
+} else {print <<<EOT
+-->
+数据库表
+<!--
+EOT;
+}print <<<EOT
+-->
+<span class="linka"><a href="$basename">所有</a> / <a href="$basename&t=pw">PW表</a> / <a href="$basename&t=other">非PW表</a></span></h2>
+<div class="admin_table mb10">
+    <table width="100%">
+        <tr class="tr2 vt td_bgB">
+			<td width="70"><span onclick="CheckAll(document.FORM)" class="cp">全选</span></td>
+            <td width="200">数据库表</td>
+            <td>描述</td>
+        </tr>
+<!--
+EOT;
+foreach($tables as $key=>$value){print <<<EOT
+-->
+        <tr class="tr1 vt">
+            <td class="td2" width="70">
+<!--
+EOT;
+if (isset($existTables[$value])) {
+print <<<EOT
+-->
+        	<input type="checkbox" name="tabledb[]" value="$value" onclick="pwJsCheck(this)" />
+<!--
+EOT;
+} else {print <<<EOT
+-->
+          	<span class="s1"> PW表丢失 </span>
+<!--
+EOT;
+}
+$dkey = $PW != 'pw_' ? str_replace($PW,'pw_',$value) : $value;
+print <<<EOT
+-->
+            </td>
+            <td class="td2">$value</td>
+            <td class="td2">{$lang[dbtable][$dkey]}</td>
+        </tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+	</table>
+</div>
+<h2 class="h1"><b>分卷备份</b></h2>
+<div class="admin_table mb10">
+	<table width="100%" align=center cellspacing="0" cellpadding="0">
+        <tr class="tr1 vt">
+            <td class="td2"><input type="text" class="input input_wa" name="sizelimit" value="2048">&nbsp;每个分卷文件长度</td>
+        </tr>
+    </table>
+</div>
+<div class="tac mb10">
+	<p class="mb10">
+		<span>选中操作:</span>
+		<input type="radio" name="action" value="bak" checked />&nbsp;备份&nbsp;
+		<input type="radio" name="action" value="repair" />&nbsp;修复&nbsp;
+		<input type="radio" name="action" value="optimize" />&nbsp;优化&nbsp;
+	</p>
+	<p>
+	<span class="btn"><span><button type="submit" onclick="return confirm('您确认要进行此操作吗?');">提 交</button></span></span></p>
+</div>
+</form>
+<!--
+EOT;
+}}elseif($job=='bakin'){
+if(!$action){print <<<EOT
+-->
+<form method="post" action="$basename" name="FORM">
+<input type="hidden" name="action" value="del">
+<h2 class="h1"><b>站点备份文件</b></h2>
+<div class="admin_table mb10">
+    <table width="100%" align=center cellspacing="0" cellpadding="0">
+    <tr class="tr2 vt td_bgB">
+		<td width="30"><span onclick="CheckAll(document.FORM)" class="cp">全选</span></td>
+        <td>文件名</td>
+        <td>版本</td>
+        <td>备份时间</td>
+        <td>卷号</td>
+        <td>导入</td>
+    </tr>
+<!--
+EOT;
+foreach($filedb as $id=>$bakfile){
+print <<<EOT
+-->
+    <tr class="tr1 vt">
+        <td class="td2"><input name="delfile[]" type="checkbox" value="$bakfile[name]" onclick="pwJsCheck(this)" /></td>
+        <td class="td2"><a href="data/$bakfile[name]">$bakfile[name]</a></td>
+        <td class="td2">$bakfile[version]</td>
+        <td class="td2">$bakfile[time]</td>
+        <td class="td2">$bakfile[num]</td>
+        <td class="td2"><a href="$basename&action=bakincheck&pre=$bakfile[pre]">导入</a></td>
+    </tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+    </table>
+</div>
+<!--<input name="action" type="hidden" value="del">-->
+<div class="mb10 tac">
+    <span class="bt"><span><button type="submit" name="delete" onclick="return checkset('此功能不可恢复,您确认要删除选中的备份文件！');">删除备份</button></span></span>
+</div>
+</form>
+<script language=JavaScript>
+function checkset(confirm_info)
+{
+	if(confirm(confirm_info)){
+		return true;
+	} else {
+		return false;
+	}
+}
+</script>
+<!--
+EOT;
+}elseif($action=='bakincheck'){
+print <<<EOT
+-->
+<form action="$basename&action=bakin&pre=$pre" method="post">
+<h2 class="h1"><b>提示信息</b></h2>
+<div class="admin_table mb10">
+    <table width="100%" cellspacing="0" cellpadding="0">
+        <tr class="tr1 vt">
+            <td class="td2"><font color="blue">备份恢复功能将覆盖原来的数据,您确认要导入备份数据！</font></td>
+            <td class="td2"><span class="btn2"><span><button type="submit">确认导入备份</button></span></span></td>
+        </tr>
+    </table>
+</div>
+<div class="mb10 tac"><span class="bt"><span><button type="pw_msg_back" onclick='javascript:history.go(-1);'>返回继续操作</button></span></span></div>
+</form>
+<!--
+EOT;
+}}include_once PrintEot('adminbottom');
+?>-->

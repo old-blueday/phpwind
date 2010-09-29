@@ -1,0 +1,274 @@
+<!--<?php
+include_once PrintEot('left');
+print <<<EOT
+-->
+<script type="text/javascript">
+var goback = function(){
+	window.location.href = '$baseUrl';
+}
+var deleteAreaUser = function(uid){
+	var url = '$baseUrl&action=delete&uid='+uid;
+	if(confirm("确认删除该用户的门户管理权限吗?")){
+		setTimeout(function(){
+			window.location.href = url;
+		},0);
+	}
+	return false;
+}
+var checkboxClass = {
+	$ : function(id){
+		return document.getElementById(id);
+	},
+	checkAll : function(obj,boxid){
+		var boxs = this.$(boxid).getElementsByTagName("input");
+		if (boxid != 'arealevel') {
+			this.$('super').checked=false;//取消全选项
+		}
+		if(!boxs){
+			return false;
+		}
+		var status = (obj.checked) ? true : false;
+		for(var i=0,length=boxs.length;i<length;i++){
+			if(boxs[i].type == 'checkbox'){
+				boxs[i].checked = status;
+			}
+		}
+	},
+	checkOne : function(obj,relatedid){
+		var related = this.$(relatedid);
+		if(!related){
+			return false;
+		}
+		this.$('super').checked=false;//取消全选项
+		related.checked = true;
+	},
+	init : function(){
+		var obj = this.$("arealevel");
+		if(!obj){
+			return false;
+		}
+		var boxs = obj.getElementsByTagName("input");
+		if(!boxs){
+			return false;
+		}
+		for(var i=0,length=boxs.length;i<length;i++){
+			if(boxs[i].type == 'checkbox' ){
+				var next = boxs[i].nextSibling;
+				next.onclick = function(){
+					this.previousSibling.click();
+				}
+			}
+		}
+	}
+}
+function checkBoxs(obj,boxid){
+	checkboxClass.checkAll(obj,boxid);
+}
+function checkBox(obj,relatedid){
+	checkboxClass.checkOne(obj,relatedid);
+}
+window.onload = function(){
+	checkboxClass.init();	
+}
+</script>
+<!-- 
+EOT;
+if( empty($action) || "find" == $action){
+print <<<EOT
+-->
+<div class="mb10">
+	<h3 class="h1">提示信息</h3>
+    <div class="legend">
+    	<ol>
+        	<li>可以给用户分配频道，各个模块的前台管理权限</li>
+			<li>设置模块属性、编辑模板的权限，建议只分配给网站管理人员</li>
+			<li>如果其他模式使用到门户推送功能，比如论坛首页推送，权限也在这里分配</li>
+        </ol>
+    </div>
+</div>
+<!-- 
+EOT;
+if("find" == $action){
+print <<<EOT
+-->
+<a href="$baseUrl">返回上一级</a>
+<!-- 
+EOT;
+}
+print <<<EOT
+-->
+<form action="$baseUrl&action=find" method="post">
+<h2 class="h1">查找用户</h2>
+<div class="admin_table mb10">
+	<table width="100%">
+    	<tr class="tr1">
+        	<td class="td2"><input type="text" name="username" value="" class="input input_wa mr5" />
+        	<span class="bt2"><span><button type="submit">提 交</button></span></span></td>
+        </tr>
+</table>
+</div>
+</form>
+
+
+<h2 class="h1"><span class="mr5 fl">用户列表</span><a href="$baseUrl&action=add" class="btn_add"><i>添加</i></a></h2>
+<div class="admin_table mb10">
+	<table width="100%">
+<!-- 
+EOT;
+if($areaUsers){
+print <<<EOT
+-->
+    	<tr class="tr2">
+            <td>用户名</td>
+            <td>前台设置模块属性</td>
+            <td>前台编辑模块</td>
+            <td>负责版块</td>
+            <td>操作</td>
+        </tr>
+<!-- 
+EOT;
+foreach($areaUsers as $areaUser){
+$channel = buildChannel($areaUser['super'],$areaUser['level']);
+print <<<EOT
+-->
+        <tr class="tr1">
+            <td class="td2">$areaUser[username]</td>
+            <td class="td2">$areaUser[hasattr]</td>
+            <td class="td2">$areaUser[hasedit]</td>
+            <td class="td2">$channel</td>
+            <td class="td2">
+            	<a href="$baseUrl&action=edit&uid=$areaUser[uid]" class="mr10">[编辑]</a>
+            	<a href="javascript:;" onclick="return deleteAreaUser($areaUser[uid]);" class="mr10">[删除]</a>
+            </td>
+        </tr>
+<!-- 
+EOT;
+}} else {
+$showTitle = $username ? '对不起，没有你要查找的用户' : '目前还没有设置门户管理员';
+print <<<EOT
+-->
+		<tr class="tr1">
+            <td class="td2">$showTitle</td>
+        </tr>
+<!-- 
+EOT;
+}
+print <<<EOT
+-->  
+    </table>
+</div>
+$pager
+
+<!-- 
+EOT;
+}elseif ("add" == $action || "edit" == $action){
+print <<<EOT
+-->
+<h2 class="h1">$haystack[name]用户权限</h2>
+<form action="$baseUrl" method="post">
+<input type="hidden" name="action" value="$haystack[action]" />
+<input type="hidden" name="step" value="2" />
+<input type="hidden" name="uid" value="$userLevel[uid]" />
+<div class="admin_table mb10">
+	<table width="100%">
+    	<tr class="tr1">
+        	<td class="td1">用户名</td>
+            <td class="td2"><input name="username" type="text" class="input input_wa mr5" value="$userLevel[username]"  tabindex="1" $disable /></td>
+            <td class="td2"><!-- 
+EOT;
+if ("add" == $action){print <<<EOT
+-->
+			<span>可输入多个用户，用英文“,”隔开</span>
+<!-- 
+EOT;
+}print <<<EOT
+-->
+			</td>
+        </tr>
+        <tr class="tr1">
+        	<td class="td1">前台设置模块属性</td>
+            <td class="td2">
+				<ul class="list_A list_80">
+					<li><input name="hasattr" type="radio" value="1" $hasAttrCheck[1] />开启</li>
+                    <li><input name="hasattr" type="radio" value="0" $hasAttrCheck[0] />关闭</li>
+                </ul>
+            </td>
+            <td class="td2">开启后，可以在有权限管理的模块同时设置模块属性</td>
+        </tr>
+        <tr class="tr1">
+        	<td class="td1">前台编辑模块</td>
+            <td class="td2">
+            	<ul class="list_A list_80">
+                	<li><input name="hasedit" type="radio" value="1" $hasEditCheck[1] />开启</li>
+                    <li><input name="hasedit" type="radio" value="0" $hasEditCheck[0] />关闭</li>
+                </ul>
+            </td>
+            <td class="td2">开启后，可以在有权限管理的模块同时编辑模版</td>
+        </tr>
+        <tr class="tr1 vt">
+        	<td class="td1">负责频道</td>
+            <td class="td2">
+            
+				<div class="admin_table_c" style="width:auto;" id="arealevel">
+				<table cellpadding="0" cellspacing="0">
+				
+					<tr class="vt">
+						<th class="s4" style="width:80px;"><input onclick="checkBoxs(this,'arealevel');" name="super" id="super" type="checkbox" value="1" $superCheck  /><span>全部权限</span></th>
+						<td>
+						</td>
+					</tr>
+<!-- 
+EOT;
+if($channels){
+foreach($channels as $k=>$channel){
+$channelCheck = ($userLevel['super'] || isset($level[$k])) ? "checked=checked" : "";
+print <<<EOT
+-->					
+					<tr class="vt">
+						<th class="s4" style="width:80px;"><input id="channel_$k" onclick="checkBoxs(this,'invokes_$k');" name="level[$k][name]" type="checkbox" value="$channel[name]" $channelCheck /><span>$channel[name]</span></th>
+						<td>
+							<ul class="cc list_A list_120" id="invokes_$k">
+<!-- 
+EOT;
+if($channel[invokes]){
+foreach($channel[invokes] as $j=>$invoke){
+$invokeCheck = ($userLevel['super'] || (isset($level[$k]) && isset($level[$k][invokes]) &&  in_array($invoke,$level[$k][invokes]))) ? "checked=checked" : "";
+print <<<EOT
+-->		
+								<li><input onclick="checkBox(this,'channel_$k')"; name="level[$k][invokes][$j]" type="checkbox" value="$invoke" $invokeCheck /><span title="$invoke">$invoke</span></li>
+<!-- 
+EOT;
+}}
+print <<<EOT
+-->		
+							</ul>
+						</td>
+					</tr>
+<!-- 
+EOT;
+}}
+print <<<EOT
+-->					
+				</table>
+				</div>
+
+            </td>
+            <td class="td2"></td>
+        </tr>
+    </table>
+</div>
+<div class="tac mb10">
+    <span class="btn"><span><button type="submit">提 交</button></span></span>
+    <span class="bt"><span><button type="button" onclick="goback();">返回列表</button></span></span>
+</div>
+</form>
+<!-- 
+EOT;
+}
+print <<<EOT
+-->
+
+<!--
+EOT;
+include_once PrintEot('adminbottom');
+?>-->

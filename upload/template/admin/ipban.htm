@@ -1,0 +1,34 @@
+<!--<?php
+include_once PrintEot('left');
+print <<<EOT
+-->
+<div class="nav3 mb10">
+  <ul class="cc">
+    <li class="current"><a href="$admin_file?adminjob=ipban">IP 禁止</a></li>
+    <li><a href="$admin_file?adminjob=ipban&job=ipstates">IP 统计</a></li>
+    <li><a href="$admin_file?adminjob=ipban&job=ipsearch">IP 检索</a></li>
+  </ul>
+</div>
+<div class="admin_info mb10">
+  <h3 class="h1"><b>提示信息</b></h3>
+  <div class="legend">禁止后，指定的IP将无法访问站点。<br />可用于禁止某个具体IP，如：192.0.0.1<br />可用于禁止某个IP网段，如：192.0.0<br />多个IP信息，请使用换行符或回车键进行分隔</div>
+</div>
+<form action=$basename method=post name="submit">
+  <h2 class="h1"><b>以下为被禁止的IP:</b></h2>
+  <div class="admin_table mb10">
+    <table width="100%" cellspacing="0" cellpadding="0">
+      <tr class="tr1 vt">
+        <td class="td2"><textarea name="baninfo" class="textarea">$baninfo</textarea></td>
+      </tr>
+    </table>
+  </div>
+  <input type=hidden name="action" value="unsubmit">
+  <div class="mb10 tac"><span class="btn"><span>
+    <button type="submit" name="submit" value="提 交">提 交</button>
+    </span></span></div>
+</form>
+<!--
+EOT;
+include_once PrintEot('adminbottom');
+?>
+-->

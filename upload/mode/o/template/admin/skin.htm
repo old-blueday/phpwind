@@ -1,0 +1,45 @@
+<!--<?php
+include_once PrintEot('left');print <<<EOT
+-->
+<form action="$basename" method="post">
+<input type="hidden" name="step" value="2" />
+<div class="admin_info mb10">
+	<h3 class="h1">个人中心风格说明</h3>
+	<div class="legend">
+		<ul>
+			<li>添加风格:请上传你的个人空间风格模版文件夹至目录 u/themes/ 下</li>
+			<li>启用风格:在相应的风格下添加个人空间风格的自定义名称，点击提交即可启用</li>
+		</ul>
+	</div>
+</div>
+<h2 class="h1">个人中心风格设置</h2>
+<div class="admin_table mb10">
+	<table width="100%" cellspacing="0" cellpadding="0">
+		<tr class="tr1">
+			<td class="td1"><span class="xia2">风格目录名</span></td>
+			<td class="td2">风格自定义名称</td>
+		</tr>
+<!--
+EOT;
+foreach ($skindb as $key => $value) {print <<<EOT
+-->
+		<tr class="tr3">
+			<td class="td1"><span class="xia2">{$value}</span></td>
+			<td class="td2">
+				<input name="style_name[$value]" class="input input_wa" value="{$o_uskin[$value]}" />
+			</td>
+		</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+	</table>
+</div>
+<div class="mb10 tac">
+	<span class="btn"><span><button type="submit">提 交</button></span></span>
+</div>
+</form>
+<!--
+EOT;
+include_once PrintEot('adminbottom');
+?>-->

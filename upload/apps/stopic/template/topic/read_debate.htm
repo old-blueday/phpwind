@@ -1,0 +1,213 @@
+<!--<?php
+print <<<EOT
+-->
+
+<style type="text/css">
+/*其他主题类型样式*/
+#main{width:98%;}
+.s8,.s8 a,.s8 a:hover{color:#1bb9ea;}
+.s9{line-height:25px;padding:0 .8em;}
+.dig2{height:25px;line-height:25px;display:block;font-size:12px;background:#ffffee;width:80px;cursor: pointer;margin:.5em 0;color:#666;border:1px solid #ffd0a8;}
+.dig2:hover{text-decoration:none;border:1px solid #f5a25c;color:#ff6600;}
+.gogo{height:35px;line-height:30px;color:#777;}
+.tab2{background:#e4e4e4;margin-top:4px;height:100px;}
+.tab2 .one{background:url($imgpath/post/vote/tab-one.gif) left center repeat-y;width:50px;}
+.tab2 .two{background:url($imgpath/post/vote/tab-two.gif) left center repeat-y;width:50px;}
+
+.dig3,.dig4,.dig5{margin:10px 15px 0;line-height:25px;}
+.dig3 span,.dig3 div,.dig4 span,.dig4 div,.dig5{height:25px;}
+.dig3{border:1px solid #ee6821;}
+.dig3 span{background:#ee6821;color:#fff;padding:0 .5em;}
+.dig3 div,.dig4 div{cursor:pointer;padding:0 .5em;background:#fff;}
+.dig4{border:1px solid #23bceb;}
+.dig4 span{background:#23bceb;color:#fff;padding:0 .5em;}
+.dig5{background:#ffffee;border:1px solid #f5a25c;color:#ff6600;width:80px;}
+
+.vote{margin:10px auto;background:#f7fbff;width:90%;padding:5px 8px;border:1px solid #dae7f2;line-height:22px;}
+.vs-new{background:url($imgpath/post/vote/vs-new.png) no-repeat;width:110px;height:110px;}
+.vs-old{background:url($imgpath/post/vote/vs-old.png) no-repeat;width:110px;height:110px;}
+</style>
+
+<div class="c"></div>
+<div>
+
+	<div style="margin:auto;width:800px;">
+		<div class="gogo tac">
+<!--
+EOT;
+if($debate[judge]){print <<<EOT
+-->
+此辩论已结束，裁判 <b><a target="_blank" href="u.php?username=$debate[umpire]">$debate[umpire]</a></b> 宣布:
+<!--
+EOT;
+	if($debate[judge]==1){print <<<EOT
+-->
+<b class="s3">正方胜</b>
+<!--
+EOT;
+	}elseif($debate[judge]==3){print <<<EOT
+-->
+<b class="s8">反方胜</b>
+<!--
+EOT;
+	}else{print <<<EOT
+-->
+<b class="s1">平局</b>
+<!--
+EOT;
+	}print <<<EOT
+-->
+，最佳辩手:<a href="u.php?username=$debate[debater]" target="_blank"><b class="s7">$debate[debater]</b></a>
+<!--
+EOT;
+}elseif($debate['endtime'] < $timestamp){print <<<EOT
+-->
+此辩论已结束，等待裁判宣布辩论结果。。。
+<!--
+EOT;
+}else{
+	$debate['endtime'] = get_date($debate['endtime'],"Y-m-d H:i");
+print <<<EOT
+-->
+辩论结束时间 <b>$debate[endtime]</b> -- 裁判:<b><a target="_blank" href="u.php?username=$debate[umpire]">$debate[umpire]</a></b>
+<!--
+EOT;
+}
+
+if($windid==$debate[umpire]){print <<<EOT
+-->
+<input id="judgedebate" type="button" value="裁判点评" class="bta" onClick="sendmsg('pw_ajax.php?action=debate&do=judge&tid=$tid','','judgedebate')"/>
+<!--
+EOT;
+}
+$tmpVotes = $debate[revote]+$debate[obvote];
+$tmpob = round($debate[obvote]/$tmpVotes,2)*100;
+$tmpre = round($debate[revote]/$tmpVotes,2)*100;
+print <<<EOT
+-->
+		</div>
+<table border="0" cellspacing="0" cellpadding="0" width="100%;">
+<tr><td width="40%">
+<table border="0" cellspacing="0" cellpadding="0" width="100%;">
+<tr>
+<td style="width:100px;" class="tac">
+<center>
+<div>- <b><span id="obvote" class="s3">$debate[obvote]</span></b> 票 -</div>
+<table class="tab2" border="0" cellspacing="0" cellpadding="0" width="50">
+<tr><td id="obimgre" class="no" height="$tmpre%"></td></tr>
+<tr><td id="obimgob" class="one tac" height="$tmpob%"></td></tr>
+</table>
+<div class="c"></div>
+<a href="javascript:void(0)" onClick="dodebate('y',$tid)" class="dig2">支持正方</a> </center>
+</td><td valign="top">
+<div class="vote">
+<span class="s3">正方观点:</span><br /> $debate[obtitle]
+</div>
+<span class="gray" style="margin-left:1em;">辩手:$debate[obposts] 人</span>
+</td></tr>
+</table>
+</td>
+<td width="10%">
+<!--
+EOT;
+if($debate[judge]){print <<<EOT
+-->
+<div class="vs-old"></div>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+<div class="vs-new"></div>
+<!--
+EOT;
+}print <<<EOT
+-->
+</td>
+<td width="40%">
+<table border="0" cellspacing="0" cellpadding="0" width="100%;">
+<tr>
+<td valign="top">
+<div class="vote">
+<span class="s8">反方观点:</span><br /> $debate[retitle]
+</div>
+<span class="gray" style="margin-left:1em;">辩手:$debate[reposts] 人</span>
+</td>
+<td style="width:100px;" class="tac">
+<center>
+<div>- <b><span id="revote" class="s8">$debate[revote]</span></b> 票 -</div>
+<table class="tab2" border="0" cellspacing="0" cellpadding="0" width="50">
+<tr><td id="reimgob" class="no" height="$tmpob%"></td></tr>
+<tr><td id="reimgre" class="two tac" height="$tmpre%"></td></tr>
+</table>
+<div class="c"></div>
+<a href="javascript:void(0)" onClick="dodebate('n',$tid)" class="dig2">支持反方</a>
+ </center>
+</td></tr>
+</table>
+</tr>
+</table>
+
+<!--
+EOT;
+if($debate[judge] && $debate[umpirepoint]){print <<<EOT
+-->
+<div class="vote"><span class="s1">裁判点评 ：</span>$debate[umpirepoint]</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+</div>
+<!--
+EOT;
+print <<<EOT
+-->
+<table border="0" cellspacing="0" cellpadding="0" width="100%;">
+<tr class="tac"><td style="padding:5px;">
+<a target="_blank" href="read.php?tid=$tid">全部参与人员</a>
+ | <a target="_blank" href="read.php?tid=$tid&stand=1">正方支持者</a>
+ | <a target="_blank" href="read.php?tid=$tid&stand=3">中立者</a>
+ | <a target="_blank" href="read.php?tid=$tid&stand=2">反方支持者</a></td></tr></table>
+</div>
+<div class="c"></div>
+<script type="text/javascript">
+function dodebate(id,tid,pid) {
+	var url;
+	if (typeof pid == 'undefined') {
+		url = 'pw_ajax.php?action=debate&do=vote&tid='+tid+'&q='+id;
+	} else {
+		url = 'pw_ajax.php?action=debate&do=agree&tid='+tid+'&pid='+pid;
+	}
+	ajax.send(url,'',function(){
+		var str = ajax.request.responseText.split("\t");
+
+		if (typeof str[1] != 'undefined') {
+			if (str[1] == 'TID') {
+				getObj('obvote').innerHTML = str[2];
+				getObj('revote').innerHTML = str[3];
+				getObj('obimgob').height = str[4]+'%';
+				getObj('reimgob').height = str[4]+'%';
+				getObj('obimgre').height = str[5]+'%';
+				getObj('reimgre').height = str[5]+'%';
+<!--
+EOT;
+if($fastpost && $groupid != 'guest'){print <<<EOT
+-->
+				var i = str[6] == 1 ? 2 : 1;
+				document.FORM.standpoint.options[i].disabled = true;
+				document.FORM.standpoint.options[str[6]].selected = true;
+<!--
+EOT;
+}print <<<EOT
+-->
+			} else {
+				getObj(id).innerHTML = str[1];
+			}
+		}
+		ajax.guide();
+	});
+}
+</script>
+<!--
+EOT;
+?>
+-->

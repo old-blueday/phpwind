@@ -1,0 +1,108 @@
+<!--<?php
+print <<<EOT
+-->
+<div id='hiddenMessage' style="display:none"></div>
+<div class="contUser" id="content">
+<table width="100%"><tr class="vt"><td height="400">
+    <div class="p15">
+	<h4 class="site mb5"><span>请求</span>(共{$requestAllCount}条，<a href="$normalUrl&action=unread" class="s2"><b>{$notReadCount}</b>条未处理请求</a>)</h4>
+<form action="$normalUrl&" method="post" name="FORM">
+ 		<div class="mb10 bdA" style="padding-bottom:10px;">
+            <span class="mr5"><input type="checkbox" value="" onclick="MC.CheckAll(this.form,this)" id="allup" name="all" />&nbsp;全选</span>
+            <span class="bt2"><span><button onclick="MC.changeStatus('$baseUrl?&type=ajax&action=overlook','','ignoreTip','all')" type="button">忽略</button></span></span>
+            <span class="bt2"><span><button onclick="MC.mSubmit(document.FORM,'del','request','$action','$page')" type="button">删除</button></span></span>
+						<span style="margin:0 6px;">筛选：<select onchange="MC.getTypeList('request',this.value)">
+            	<option value="" $selected>全部</option>
+                <option value="friend" $selected[friend]>好友请求</option>
+                <option value="group" $selected[group]>群组请求</option>
+                <option value="app" $selected[app]>应用请求</option>
+            </select></span>
+        </div><div id="showmessage"></div>
+        {$emptyListTip}
+        <div class="dlC fl" style="width:100%;">
+<!--
+EOT;
+foreach($requestList as $key => $value){
+$type = $messageServer->getReverseConst($value['typeid']);
+$type = explode('_',$type);
+if($action == 'group' || $type[1] == 'group'){
+  	$cyid  = '&cyid='.$value['extra']['cyid'];
+  	$ifcheck = $value['extra']['check'];
+  	$check = $ifcheck == 1 ? '&check=1' : '';
+}
+if($action == 'friend' || $type[1] == 'friend'){
+  	$fuid = '&fuid='.$value['create_uid'];
+}
+$value[created_time] = get_date($value[created_time]);
+$requestDesc = getRequestTypeDes($value['typeid'],'',$ifcheck);
+print <<<EOT
+-->
+    		<h6 class="h6"><b><input type="checkbox" value="{$value[rid]}" name="rids" />&nbsp;{$requestDesc[descript]}</b><em><span title="$value[created_time]">{$value[created_time_format]}</span></em></h6>
+        	<div class="p_lr_25">
+	        <dl class="dl">
+               <dt class="dt">
+                   <a class="img_50" href="u.php?uid={$value[create_uid]}"><i><img width="48" height="48" src="{$value[face]}"></i></a>
+               </dt>
+               <dd class="dd2">
+                   <p class="titleB"><a class="mr10" href="u.php?uid={$value[create_uid]}">{$value[username]}</a>{$value[title]}</p>
+                   <p class="quote">{$value[content]}<img src="u/images/quoteB.png"></p>
+<!--
+EOT;
+if(in_array($value['status'],array(0,4,5))){
+$class = $value['status'] == 4 ? 'ignoreTip' : 'rightTip';
+$statusInfo = $requestDesc[$value['status']];
+print <<<EOT
+-->
+					<input type="hidden" value="true" name="skip_{$value[rid]}" id="skip_{$value[rid]}" />
+					<p id='status_{$value[rid]}_{$value[status]}'></p>
+					<p class="$class">$statusInfo</p>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+					<input type="hidden" value="false" name="skip_{$value[rid]}" id="skip_{$value[rid]}" />
+					<p id="tip_$value[rid]" name="tips"></p>
+					<p id="opt_$value[rid]" name="opts"><span class="btn2"><span><button onclick="MC.changeStatus('$baseUrl?&type=ajax&action=agree&typeid=$value[typeid]&fid[]=$value[create_uid]&rids[]=$value[rid]{$cyid}{$check}','{$value[rid]}','rightTip');" type="button">同意</button></span></span>
+                    <span class="bt2"><span><button onclick="MC.changeStatus('$baseUrl?&type=ajax&action=overlook&typeid=$value[typeid]&rids[]=$value[rid]{$fuid}{$cyid}','{$value[rid]}','ignoreTip')" type="button">忽略</button></span></span></p>
+<!--
+EOT;
+}print <<<EOT
+-->
+				</dd></dl>
+			</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+		</div>
+<!--
+EOT;
+if(count($requestList) >= $perpage){
+print <<<EOT
+-->
+		<div id="showmessageTip"></div>
+		<div class="mb10">
+            <span class="mr5"><input type="checkbox" value="" onclick="MC.CheckAll(this.form,this)" name="all" id="alldown" />&nbsp;全选</span>
+            <span class="bt2"><span><button onclick="MC.changeStatus('$baseUrl?&type=ajax&action=overlook','','ignoreTip','all','showmessageTip')" type="button">忽略</button></span></span>
+            <span class="bt2"><span><button onclick="MC.mSubmit(document.FORM,'del','request','$action','$page','showmessageTip')" type="button">删除</button></span></span>
+        </div>
+<!--
+EOT;
+}print <<<EOT
+-->
+</form>    
+	<div class="mb10">
+	    <div class="fr" style="_width:500px;">
+	        {$pages}
+	    </div>
+	    <div class="c"></div>
+    </div>  
+    </div>
+</td></tr></table>
+</div>
+<!--
+EOT;
+if(!defined('AJAX')){
+	require_once(uTemplate::printEot('footer'));
+}
+?>-->

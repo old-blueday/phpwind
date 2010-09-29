@@ -1,0 +1,444 @@
+<!--<?php
+class colonyModelTemplate {
+	var $cyid;
+	var $colony = array();
+	var $groupRight = array();
+	var $ifadmin;
+	
+	function colonyModelTemplate() {
+		global $colony,$groupRight,$cyid,$ifadmin;
+		$this->colony =& $colony;
+		$this->groupRight =& $groupRight;
+		$this->cyid = $cyid;
+		$this->ifadmin = $ifadmin;
+	}
+
+	function galbum($newphoto) {
+print <<<EOT
+-->
+
+	<h5 class="g_hA"><a href="apps.php?q=galbum&cyid={$this->cyid}" class="f12 fn fr">进入{$this->groupRight['modeset']['galbum']['title']}>></a><span class="b f14 mr10">{$this->groupRight['modeset']['galbum']['title']}</span><span class="gray">(共{$this->colony['photonum']}张照片)</span></h5>
+<!--
+EOT;
+if ($newphoto) {print <<<EOT
+-->
+	<div class="g_listA g_listAA">
+		<ul class="cc">
+<!--
+EOT;
+foreach ($newphoto as $value) {print <<<EOT
+-->
+			<li><div class="aimg"><span><a href="apps.php?q=galbum&a=view&cyid={$this->cyid}&pid=$value[pid]"><img src="$value[path]" /></a></span></div></li>
+<!--
+EOT;
+}print <<<EOT
+--> 
+		</ul>
+	</div>
+<!--
+EOT;
+} elseif ($this->ifadmin || ($this->colony['ifcyer'] && $this->colony['ifadmin'] != '-1')) {print <<<EOT
+-->
+	<div class="p15 f14 tac">
+		暂无照片，我来第一个<a href="apps.php?q=galbum&cyid={$this->cyid}&a=upload&job=flash" class="line s2">上传照片</a>吧！
+	</div>
+	<div class="c"></div>
+<!--
+EOT;
+} elseif ($this->colony['photonum'] > 0) {print <<<EOT
+-->
+	<div class="p15 f14 tac">
+		非成员不能浏览。<a href="apps.php?q=group&cyid={$this->cyid}&a=join" onclick="return ajaxurl(this)" class="line s2">申请加入</a>吧！
+	</div>
+	<div class="c"></div>
+<!--
+EOT;
+} else {print <<<EOT
+-->
+	<div class="p15 f14 tac">
+		暂无照片！
+	</div>
+	<div class="c"></div>
+<!--
+EOT;
+}
+	}
+	function thread($argdb) {
+		global $digest,$udb,$lastposters;
+		$this->colony['count'] = (int)$this->colony['count'];
+		if ($this->colony['ifopen'] || $this->ifadmin || ($this->colony['ifcyer'] && $this->colony['ifadmin'] != '-1')) {
+			if ($digest == 1) {
+				$digest = 'class="current" style="font-weight:bolder"';
+				$all = '';
+			} else {
+				$digest = '';
+				$all = 'class="current" style="font-weight:bolder"';
+			}
+print <<<EOT
+-->
+    <h5 class="g_hA">
+		<span class="fr">
+			<a href="apps.php?q=group&cyid={$this->cyid}" $all>全部</a>&nbsp;|&nbsp;<a href="apps.php?q=group&cyid={$this->cyid}&digest=1" $digest>精华</a>
+		</span>
+		<span class="b f14 mr10">{$this->groupRight['modeset']['thread']['title']}</span><span class="gray">(共{$this->colony['count']}篇话题)</span>
+    </h5>
+	<table width="100%" border="0" cellspacing="0" cellpadding="0" class="g_tableA mb10">
+<!--
+EOT;
+if ($argdb) {print <<<EOT
+-->
+		<tr class="tr3">
+			<td>标题&nbsp;</td>
+			<td width="120">发布者&nbsp;</td>
+			<td width="75" class="tac">回复/阅读</td>
+			<td width="105">最后回复&nbsp;</td>
+		</tr>
+<!--
+EOT;
+foreach ($argdb as $key => $value) {
+if ($key%2==0) {
+	$style = 'class= "tr5"';
+} else {
+	$style = 'class="tr5 g_bgA"';
+}
+$date = explode(' ',$value[lastpost]);
+if ($date[0] == date('m-d')) {
+	$lastposttime = $date[1];
+} else {
+	$lastposttime = $date[0];
+}
+$author = substrs($value[author],10,'..');
+$lastposter = $value[lastposter];
+print <<<EOT
+-->
+		<tr $style>
+			<td>
+<!--
+EOT;
+if ($value['digest']) {print <<<EOT
+-->
+				<img class="fr" src="$GLOBALS[imgpath]/g/digest.gif" style="margin-top:4px;" />
+<!--
+EOT;
+}print <<<EOT
+-->
+				<a href="apps.php?q=group&a=read&cyid={$this->cyid}&tid=$value[tid]" class="f14" title="{$value['subject']}">{$value['sub_subject']}</a>
+			</td>
+            <td><a href="u.php?uid=$value[authorid]" title="$value[author]" class="userCard img_25 mr10" target="_blank"><img src="{$udb[$value[authorid]][faceurl]}" width="18" height="18" align="absmiddle" /></a><a href="u.php?uid=$value[authorid]" title="$value[author]" target="_blank">$author</a>
+			</td>
+            <td class="tac s6"><span class="s2">$value[replies]</span>&nbsp;/&nbsp;$value[hits]</td>
+            <td class="s6"><a href="u.php?username=$value[lastposter]" title="$value[lastposter]" class="userCard img_25 mr10" target="_blank"><img src="{$lastposters[$lastposter][faceurl]}" width="18" height="18" align="absmiddle" /></a>$lastposttime</td>
+		</tr>
+<!--
+EOT;
+}} elseif ($digest) {print <<<EOT
+-->
+		<tr><td colspan="4"><div class="p15 f14 tac">暂无精华话题！</div></td></tr>
+<!--
+EOT;
+} else {print <<<EOT
+-->
+		<tr><td colspan="4"><div class="p15 f14 tac">暂无话题，我来第一个<a href="apps.php?q=group&a=post&cyid={$this->cyid}" class="line s2">发表话题</a>吧！</div></td></tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+	</table>
+	<div class="tar mb15">
+<!--
+EOT;
+if ($this->colony['ifcyer']) {print <<<EOT
+--><a href="apps.php?q=group&a=post&cyid={$this->cyid}">发表话题</a>&nbsp;|&nbsp;<!--
+EOT;
+}print<<<EOT
+--><a href="apps.php?q=group&a=thread&cyid={$this->cyid}">进入{$this->groupRight['modeset']['thread']['title']}>></a>
+	</div>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+	<h5 class="g_hA">
+		<span class="b f14 mr10">{$this->groupRight['modeset']['thread']['title']}</span> <span class="gray">(共 {$this->colony[tnum]} 篇话题)</span>
+    </h5>
+	<div class="p15 f14 tac">
+		非成员不能浏览，<a href="apps.php?q=group&a=join&cyid={$this->cyid}" onclick="return ajaxurl(this);">申请加入</a>吧！
+	</div>
+	<div class="c"></div>
+<!--
+EOT;
+}
+	}
+	function write($writedata) {
+		global $winduid,$faceurl;
+if ($this->colony['ifwriteopen'] || $this->ifadmin || ($this->colony['ifcyer'] && $this->colony['ifadmin'] != '-1')) {
+$check = ($_COOKIE['iftongbu'] == 1) ? " checked" : '';
+print <<<EOT
+-->
+	<h5 class="g_hA">
+		<a href="apps.php?q=group&a=write&cyid={$this->cyid}" class="fr fn f12">进入{$this->groupRight['modeset']['write']['title']}>></a>
+		<span class="b f14 mr10">{$this->groupRight['modeset']['write']['title']}</span>
+		<span class="gray">(共{$this->colony['writenum']}篇)</span>
+	</h5>
+	<div class="dlA mb10">
+		<form method="post" action="apps.php?q=group&cyid={$this->cyid}&ajax=1&a=writepost" onsubmit="return false;" name="FORM">
+		<div class="c mb10"></div>
+		<table width="100%">
+			<tr class="vt">
+				<td width="65"><span class="img_50"><img src="$faceurl" width="48" height="48" /></span></td>
+			<td>
+				<div class="sk">
+				<div class="one"><div class="two"><div class="tree"><div class="four">
+					<div class="sktextarea"><textarea name="text" id="writetext" onfocus="if(this.value == oldvalue)this.value=''">来，说两句吧…</textarea><div class="c"></div></div>
+					<div class="sk_open">
+						<span id="writebutton" class="btn3 fr"><span><button class="button" type="submit" onclick="submitwrite(document.forms['FORM'])" id="write_button">发表</button></span></span>
+						<!--<span class="tosign"><label for="writetosign"><input id="writetosign" name="tosign" type="checkbox" value="1" onclick="if(this.checked == true){SetCookie('iftongbu','1');}else{SetCookie('iftongbu','0');}" {$check}>&nbsp;同步至我的记录</label></span>-->
+						<span id="showSmile" class="sk_show cp">表情</span>
+						<div style="position:absolute;display:none;width:100px;" id="smile" class="face_menu"></div>
+						<span id="writetext_warn" class="s6">限 255 字节</span>
+					</div>
+				</div></div></div></div>
+				</div>
+			</td>
+			</tr>
+		</table>
+		</form>
+<!--
+EOT;
+include printEot('writesmile');
+print <<<EOT
+-->
+<script language="JavaScript">
+var charset = '$GLOBALS[db_charset]';
+initCheckTextNum('writetext','writetext_warn',255);
+function write_quickpost(event){
+	if((event.ctrlKey && event.keyCode == 13) || (event.altKey && event.keyCode == 83)){
+		getObj('write_button').click();
+	}
+}
+var oldvalue;
+function submitwrite(o) {
+	if (getObj('writetext').value == '' || getObj('writetext').value == oldvalue) {
+		showDialog('error','记录内容必须在3～255个字节之间');
+		return false;
+	}
+	ajax.submit(o);
+	return true;
+}
+~function getOldValue(){
+	oldvalue = getObj('writetext').value;
+	if (oldvalue != '来，说两句吧…') {
+		getObj('writetext').value = '';
+	}
+}();
+
+getObj('showSmile').onclick = function(e) {
+	stopPropagation(e);
+	displayElement('smileContainer');
+	document.body.onclick=function(){
+		getObj('smileContainer').style.display='none';
+		document.body.onclick=null;
+	};
+	getObj('writetext').focus();
+	var rect = getObj('showSmile').getBoundingClientRect();
+	getObj('smileContainer').style.left = rect.left+ietruebody().scrollLeft+'px';
+	getObj('smileContainer').style.top = rect.top + ietruebody().scrollTop + 20 +'px';
+}
+applySmile(function(codeText) {
+	insertContentToTextArea(getObj('writetext'), codeText);
+});
+</script>
+<!--
+EOT;
+if (!empty($writedata)) {print <<<EOT
+-->
+		<div id="writebox" class="mb10">
+<!--
+EOT;
+$db_blogsource = array('web'=>'网页','signature'=>'个性签名','other'=>'其他');
+$i=0;
+foreach ($writedata as $key => $value) {
+$value['content']=str_replace($face_array,$img_array,$value['content']);
+print <<<EOT
+-->
+			<dl class="dl cc" id="write_$value[id]">
+<!--
+EOT;
+if ($value['icon']) {print <<<EOT
+-->
+				<dt class="dt">
+					<a href="u.php?uid=$value[uid]" target="_blank" class="userCard img_50"  id="card_write_{$i}_{$value[uid]}"><img src="$value[icon]" width="48" height="48" /></a><span id="write_{$i}" style="height:1px" class="fr"></span>
+				</dt>
+				<dd class="dd">
+<!--
+EOT;
+if ($this->ifadmin || $value['uid'] == $winduid) {print <<<EOT
+-->
+
+					<a href="apps.php?q=group&a=writedel&ajax=1&id=$value[id]&cyid={$this->cyid}" id="del_$value[id]" class="adel fr write" onclick="ajaxurl(this);return false;" title="删除" style="display:none;">删除</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+					<p class="mb15 f14"><a href="u.php?uid=$value[uid]" target="_blank" class="mr5">$value[username]</a>$value[content]</p>
+					<p class="mb10"><span class="gray mr10">{$value[postdate]}</span><span id="com_write_$value[id]"><a href="javascript:;" id='a_write_{$value[id]}' onclick="PW_Comment.showCommList('groupwrite','$value[id]',this);return false;">回复({$value[c_num]})</a></span></p>
+					<div class="redlA" id="combox_groupwrite_{$value[id]}">
+
+<!--
+EOT;
+}if ($value['replayuid']) {print <<<EOT
+-->
+						<dl class="cc" id="commentreplay_{$value[id]}">
+							<dd class="d"><div class="title">{$value[replaytitle]}&nbsp;-&nbsp;<a href="apps.php?&q=user&u={$value[replayuid]}" class="mr5 w">{$value[replayusername]}</a><span class="s6 w">{$value[replaypoastdate]}</span></div></dd>
+						</dl>
+<!--
+EOT;
+if($value[c_num]>1){print <<<EOT
+-->
+						<dl class="cc">
+							<dd class="d"><a id="com_$value[id]" style="cursor: pointer;" onclick="PW_Comment.showCommList('groupwrite','$value[id]',this);return false;" class="s6">全部{$value[c_num]}条回复&raquo;</a></dd>
+						</dl>
+<!--
+EOT;
+}else{
+print <<<EOT
+-->
+						<dl class="cc">
+							<dd class="d"><a id="com_$value[id]" style="cursor: pointer;" onclick="PW_Comment.showCommList('groupwrite','$value[id]',this);return false;" class="s6">添加回复&raquo;</a></dd>
+						</dl>
+						<div id="combox_groupwrite_{$value[id]}"></div>
+<!--
+EOT;
+}print <<<EOT
+-->
+<!--
+EOT;
+}print <<<EOT
+-->
+					</div>
+				</dd>
+			</dl>
+<!--
+EOT;
+$i++;
+}print <<<EOT
+-->
+		</div>
+<script language="JavaScript" src="js/app_comment.js"></script>
+<script type="text/javascript">
+function showshow(id) {
+	if (document.getElementById('commentreplay_'+id)) {
+		if(document.getElementById('commentreplay_'+id).style.display=="block"||document.getElementById('commentreplay_'+id).style.display==""){
+			document.getElementById('commentreplay_'+id).style.display="none";
+			document.getElementById('com_'+id).style.display ="none";
+		} else if(document.getElementById('commentreplay_'+id).style.display=="none") {
+			document.getElementById('commentreplay_'+id).style.display="block";
+			document.getElementById('com_'+id).style.display ="block";
+		}
+	}
+}
+function delload(){
+	var objTrs = getElementsByClassName('dl cc',getObj('writebox'));
+	for (var i=0;i<objTrs.length ; i++ ){
+		var stamp = objTrs[i].id.substr(0,6);
+		if (stamp == 'write_'){
+			objTrs[i].onmouseover = function (){
+				var delObj = getElementsByClassName('adel fr write',this);
+				if(delObj.length>0){
+					delObj[0].style.display='';
+				}
+			}
+			objTrs[i].onmouseout = function (){
+				var delObj = getElementsByClassName('adel fr write',this);
+				if(delObj.length>0){
+					delObj[0].style.display='none';
+				}
+			}
+		}
+	}
+}
+window.onReady(delload);
+</script>
+<!--
+EOT;
+}print <<<EOT
+-->
+	</div>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+	<h5 class="g_hA"><span class="b f14 mr10">{$this->groupRight['modeset']['write']['title']}</span> <span class="gray">(共 {$this->colony['writenum']} 篇)</span></h5>
+	<div class="p15 f14 tac">
+		非成员不能浏览，<a href="apps.php?q=group&a=join&cyid={$this->cyid}" onclick="return ajaxurl(this);">申请加入</a>吧！
+	</div>
+	<div class="c"></div>
+<!--
+EOT;
+}
+	}
+	function active($activedb) {
+print <<<EOT
+-->
+	<h5 class="g_hA"><a href="apps.php?q=group&cyid={$this->cyid}&a=active" class="fr">进入{$this->groupRight['modeset']['active']['title']}>></a><span class="b f14 mr10">{$this->groupRight['modeset']['active']['title']}</span><span class="gray">(共 {$this->colony[activitynum]} 个活动)</span></h5>
+<!--
+EOT;
+if ($activedb) {print <<<EOT
+-->
+	<div class="p10">
+		<div class="dlC">
+			<ul class="half cc">
+<!--
+EOT;
+foreach ($activedb as $key => $value) {
+$value['begintime'] = get_date($value['begintime'], 'm月d日');
+$value['endtime'] = get_date($value['endtime'], 'm月d日');
+$value['title'] = substrs($value['title'],38);
+print <<<EOT
+-->
+				<li>
+					<dl class="cc dl">
+						<dt class="dt">
+							<a href="apps.php?q=group&cyid={$this->cyid}&a=active&job=view&id=$value[id]"><img src="$value[poster_img]" width="50" class="img" /></a>
+						</dt>
+						<dd class="dd4">
+							<p><a href="apps.php?q=group&cyid={$this->cyid}&a=active&job=view&id=$value[id]" class="b">$value[title]</a></p>
+							<p>{$value['begintime']}&nbsp;-&nbsp;{$value['endtime']}</p>
+							<p class="s2"><span class="mr20">$value[members]人参加</span>热度：$value[hits]</p>
+						</dd>
+					</dl>
+				</li>
+<!--
+EOT;
+}print <<<EOT
+-->
+			</ul>
+		</div>
+	</div>
+<!--
+EOT;
+} else {print <<<EOT
+-->
+	<div class="p15 f14 tac">
+<!--
+EOT;
+if ($this->ifadmin) {print <<<EOT
+-->
+		暂无活动，我来第一个<a href="apps.php?q=group&cyid={$this->cyid}&a=active&job=post" class="line s2">发起活动</a>吧！
+<!--
+EOT;
+}else{print <<<EOT
+-->
+		暂无活动!
+<!--
+EOT;
+}print <<<EOT
+-->
+	</div>
+	<div class="c"></div>
+<!--
+EOT;
+}
+	}
+}
+$colonytemplate = new colonyModelTemplate();
+?>

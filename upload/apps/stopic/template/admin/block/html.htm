@@ -1,0 +1,54 @@
+<!--
+<?php
+
+if ('show' == $block_job) {
+	foreach ($block_data as $v) {
+		$v[html] = str_replace(array('&lt;','&gt;'), array('<','>'), $v[html]);
+print <<<EOT
+-->
+
+{$v[html]}
+
+<!--
+EOT;
+	}
+} else {
+print <<<EOT
+-->
+	<tr class="tr1 vt">
+		<td class="td2" width="50">标题</td>
+		<td class="td2"><input type="text" name="block_title" value="$block[title]" class="input input_wa mr5">
+        	<span class="bt2"><span><button type="button" onclick="javascript:New(addFildData,['fildbody','filddata','tid']);">添加HTML代码块</button></span></span>
+		</td>
+        <td class="td2" width="55">&nbsp;</td>
+	</tr>
+    <tbody id="fildbody">
+<!--
+EOT;
+	foreach ($block_data as $v) {
+		$v[html] = str_replace(array('<','>'), array('&lt;','&gt;'), $v[html]);
+print <<<EOT
+-->
+	<tr class="tr1 vt">
+    	<td class="td2">内容</td>
+		<td class="td2"><textarea class="textarea" name="html[]" >{$v[html]}</textarea></td>
+        <td class="td2"><a href="javascript:void(0);" onclick="delTr(this);">[删除]</a></td>
+	</tr>
+<!--
+EOT;
+	}
+print <<<EOT
+-->
+</tbody>
+<tbody id="filddata" style="display:none;">
+    <tr class="tr1 vt">
+    	<td class="td2">内容</td>
+        <td class="td2"><textarea class="textarea" name="html[]" ></textarea></td>
+        <td class="td2"><a href="javascript:void(0);" onclick="delTr(this);">[删除]</a></td>
+    </tr>
+</tbody>
+<!--
+EOT;
+}
+?>
+-->

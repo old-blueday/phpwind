@@ -1,0 +1,329 @@
+<!--<?php
+if($action=='banuser'){print <<<EOT
+--><div style="width:450px;">
+<form action="masingle.php?action=banuser&ajax=1" method="post">
+<input type="hidden" name="verify" value="$verifyhash" />
+<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="adel cp" onclick="closep();">关闭</span>会员禁言</div>
+<table width="100%" class="mb5 z vt">
+	<tr class="tr3"><td width="70">禁言对象：</td>
+		<td>
+<!--
+EOT;
+if($userdb['anonymous'] && !$isGM && !pwRights($isBM,'anonyhide')){ print <<<EOT
+-->
+			$db_anonymousname
+<!--
+EOT;
+}else{ print <<<EOT
+-->
+			$userdb[username]
+<!--
+EOT;
+}print <<<EOT
+-->
+		</td>
+	</tr>
+	<tr class="tr3">
+		<td>禁言范围:</td>
+		<td><label class="mr20"><input type="radio" name="range" value="0" checked />{$forum[$fid][name]}</label>
+<!--
+EOT;
+if($isGM || pwRights($isBM,'banuser')==2){print <<<EOT
+-->
+				<label class="mr20"><input type="radio" name="range" value="1" />全局禁言</label>
+				<label><input type="checkbox" name="banip" value="1" /> 禁止该 IP</label>
+<!--
+EOT;
+}print <<<EOT
+-->
+		</ul>
+		</td>
+	</tr>
+	<tr class="tr3">
+		<td>禁言类型：</td>
+		<td><label class="mr20"><input type="radio" name="type" value="1" checked />定期禁言</label>
+<!--
+EOT;
+if($isGM || pwRights($isBM,'bantype')){print <<<EOT
+-->
+			<label><input type="radio" name="type" value="2" />永久禁言</label>
+<!--
+EOT;
+}print <<<EOT
+-->
+		</td>
+	</tr>
+	<tr class="tr3">
+		<td>禁言时间：</td>
+		<td><input class="input" type="text" name="limit" value="1" size="5" /> 天(最大天数<span class="s1">$pwBanMax</span>天)</td>
+	</tr>
+	<tr class="tr3">
+		<td>消息通知</td>
+		<td>
+			<label class="mr20"><input type="radio" name="ifmsg" value="1" checked />开启</label>
+			<label><input type="radio" name="ifmsg" value="0" />关闭</label>
+		</td>
+	</tr>
+	<tr class="tr3">
+		<td>禁言理由：</td>
+		<td><textarea name="atc_content" onkeydown="ajax.quickpost(event,this.form)" class="textareaA"></textarea></td>
+	</tr>
+</table>
+<input type="hidden" name="fid" value="$fid" />
+<input type="hidden" name="tid" value="$tid" />
+<input type="hidden" name="pid" value="$pid" />
+<input type="hidden" name="step" value="3" />
+<div class="popBottom"><span class="btn2"><span><button type="button"  name="ajaxsubmit" onclick="ajax.submit(this.form);">提 交</button></span></span></div></form>
+</div>
+<!--
+EOT;
+}elseif($action=='shield'){print <<<EOT
+--><div style="width:450px;">
+<form action="masingle.php?action=shield&ajax=1" method="post">
+<input type="hidden" name="verify" value="$verifyhash" />
+<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="adel cp" onclick="closep();">关闭</span>单帖屏蔽</div>
+<table width="100" class="mb5 vt z">
+	<tr class="tr3"><td width="70">屏蔽对象：</td>
+<!--
+EOT;
+if($readdb['anonymous'] && !$isGM && !pwRights($isBM,'anonyhide')){ print <<<EOT
+-->
+		<td>$db_anonymousname</td>
+<!--
+EOT;
+}else{ print <<<EOT
+-->
+		<td>$readdb[username]</td>
+<!--
+EOT;
+} print <<<EOT
+-->
+	</tr>
+	<tr class="tr3">
+		<td>操作类型:</td>
+		<td><label class="mr20"><input type="radio" name="step" value="3" $check_Y />单帖屏蔽</label>
+			<label><input type="radio" name="step" value="5" $check_N />取消屏蔽</label>
+		</td>
+	</tr>
+	<tr class="tr3">
+		<td>消息通知</td>
+		<td><label class="mr20"><input type="radio" name="ifmsg" value="1" checked />开启</label>
+			<label><input type="radio" name="ifmsg" value="0" />关闭</label>
+		</td>
+	</tr>
+	<tr class="tr3">
+		<td>操作原因:</td>
+		<td>
+			<div class="mb5"><select style="width:320px;" onchange="this.form.atc_content.value=this.value">
+				<option value="">自定义</option>
+				<option value="">-------</option>
+				$reason_sel
+			</select></div>
+			<textarea name="atc_content" onkeydown="ajax.quickpost(event,this.form)" class="textareaA"></textarea>
+		</td>
+	</tr>
+</table>
+<input type="hidden" name="fid" value="$fid" />
+<input type="hidden" name="tid" value="$tid" />
+<input type="hidden" name="pid" value="$pid" />
+<input type="hidden" name="page" value="$page" />
+<div class="popBottom"><span class="btn2"><span><button type="button"  name="ajaxsubmit" onclick="ajax.submit(this.form);">提 交</button></span></span></div></form>
+</div>
+<!--
+EOT;
+}elseif($action=='remind'){ print <<<EOT
+--><div style="width:450px;">
+<form action="masingle.php?action=remind&ajax=1" method="post">
+<input type="hidden" name="verify" value="$verifyhash" />
+<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="adel cp" onclick="closep();">关闭</span>帖子管理提示</div>
+<table width="100%" class="mb5 vt z">
+	<tr class="tr3"><td width="70">提醒对象：</td>
+<!--
+EOT;
+if($readdb['anonymous'] && !$isGM && !pwRights($isBM,'anonyhide')){ print <<<EOT
+-->
+		<td>$db_anonymousname</td>
+<!--
+EOT;
+}else{ print <<<EOT
+-->
+		<td>$readdb[username]</td>
+<!--
+EOT;
+} print <<<EOT
+-->
+	</tr>
+	<tr class="tr3">
+		<td>操作类型:</td>
+		<td>
+			<label class="mr20"><input type="radio" name="step" value="3" checked />提醒管理</label>
+			<label><input type="radio" name="step" value="5" />取消提醒</label>
+		</td>
+	</tr>
+	<tr class="tr3">
+		<td>消息通知</td>
+		<td>
+			<label class="mr20"><input type="radio" name="ifmsg" value="1" checked />开启</label>
+			<label><input type="radio" name="ifmsg" value="0" />关闭</label>
+		</td>
+	</tr>
+	<tr class="tr3">
+		<td>操作原因:</td>
+		<td><div class="mb5"><select style="width:320px;" onchange="this.form.atc_content.value=this.value">
+				<option value="">自定义</option>
+				<option value="">-------</option>
+				$reason_sel
+			</select></div>
+			<textarea name="atc_content" onkeydown="ajax.quickpost(event,this.form)" class="textareaA">$remindinfo</textarea>
+		</td>
+	</tr>
+</table>
+<input type="hidden" name="fid" value="$fid" />
+<input type="hidden" name="tid" value="$tid" />
+<input type="hidden" name="pid" value="$pid" />
+<input type="hidden" name="page" value="$page" />
+<div class="popBottom"><span class="btn2"><span><button type="button"  name="ajaxsubmit" onclick="ajax.submit(this.form,reminded);">提 交</button></span></span></div></form></div>
+<!--
+EOT;
+}elseif($action=='delatc'){print <<<EOT
+--><div style="width:450px;">
+<form action="masingle.php?action=delatc&ajax=1" method="post">
+<input type="hidden" name="verify" value="$verifyhash" />
+<input type="hidden" name="tid" value="$tid" />
+<input type="hidden" name="fid" value="$fid" />
+<input type="hidden" name="step" value="3" />
+<!--
+EOT;
+foreach($threaddb as $key=>$val){print <<<EOT
+-->
+<input type="hidden" name="selid[]" value="$val[pid]" />
+<!--
+EOT;
+}print <<<EOT
+-->
+<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="adel cp" onclick="closep();">关闭</span>删除回复操作</div>
+<table width="100%" class="mb5 vt z">
+	<tr class="tr3"><td width="70">删除数量:</td><td>$count 篇</td></tr>
+	<tr class="tr3">
+		<td>扣除积分:</td>
+		<td>
+			<label class="mr20"><input type="radio" name="ifdel" value="1" checked />开启</label>
+			<label><input type="radio" name="ifdel" value="0" />关闭</label>
+		</td>
+	</tr>
+	<tr class="tr3">
+		<td>消息通知</td>
+		<td>
+			<label class="mr20"><input type="radio" name="ifmsg" value="1" checked />开启</label>
+			<label><input type="radio" name="ifmsg" value="0" />关闭</label>
+		</td>
+	</tr>
+	<tr class="tr3"><td>操作原因:</td>
+		<td><div class="mb5"><select style="width:320px;" onchange="this.form.atc_content.value=this.value">
+				<option value="">自定义</option>
+				<option value="">-------</option>
+				$reason_sel
+			</select></div>
+			<textarea name="atc_content" onkeydown="ajax.quickpost(event,this.form)" class="textareaA"></textarea>
+		</td>
+	</tr>
+</table>
+<div class="popBottom"><span class="btn2"><span><button type="button" name="ajaxsubmit" onclick="ajax.submit(this.form,ajax.get);">提 交</button></span></span></div></form>
+</div>
+<!--
+EOT;
+}elseif($action=='pingcp'){print <<<EOT
+--><div style="width:580px;">
+<form action="masingle.php?action=$action&ajax=1" method="post">
+<input type="hidden" name="verify" value="$verifyhash" />
+<input type="hidden" name="tid" value="$tid" />
+<input type="hidden" name="pid" value="$pid" />
+<input type="hidden" name="fid" value="$fid" />
+<input type="hidden" name="page" value="$page" />
+<input type="hidden" name="step" value="2" />
+<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="adel cp" onclick="closep();">关闭</span>管理评分记录 (注:只允许更改评分理由，不允许删除评分记录)</div>
+<div style="max-height:400px;overflow:hidden;overflow-y:auto;">
+<table width="100%" class="mb5 vt z">
+	<tr class="tr2">
+		<td width="20"><!--选择--></td>
+		<td width="90">操作者</td>
+		<td width="90">积分情况</td>
+		<td width="23%">评分时间</td>
+		<td>评分理由</td>
+	</tr>
+<!--
+EOT;
+foreach($pingdb as $val){print<<<EOT
+-->
+	<tr class="tr3">
+		<td><input type="checkbox" id="s_$val[id]" name="selid[]" value="$val[id]" onclick="editrecord('$val[id]','$val[record]')"></td>
+		<td>$val[pinger]</td>
+		<td>$val[name] $val[point]</td>
+		<td>$val[pingdate]</td>
+		<td><span id="ping_$val[id]">$val[record]</span></td>
+	</tr>
+<!--
+EOT;
+}print<<<EOT
+-->
+</table>
+</div>
+<div class="popBottom"><span class="btn2"><span><button type="button" name="ajaxsubmit" onclick="ajax.submit(this.form,marked);">提 交</button></span></span></div></form>
+<script language="JavaScript">
+function editrecord(id,record){
+	var s = getObj('s_' + id);
+	var r = getObj('ping_' + id);
+	if (s.checked == true) {
+		r.innerHTML = '<input type="text" class="input input_wa" name="record[' + id + ']" value="' + record + '">';
+	} else {
+		r.innerHTML = record;
+	}
+	
+}
+</script>
+</div>
+<!--
+EOT;
+} elseif ($action == 'inspect') {print <<<EOT
+--><div style="width:450px;">
+<form method="POST" action="masingle.php?action=inspect&ajax=1">
+<input type="hidden" name="verify" value="$verifyhash">
+<input type="hidden" name="step" value="2">
+<input type="hidden" name="fid" value="$fid" />
+<input type="hidden" name="tid" value="$tid" />
+<input type="hidden" name="pid" value="$pid" />
+<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="adel cp" onclick="closep();">关闭</span>版主已阅操作</div>
+<table width="100%" class="mb5 vt z">
+	<tr class="tr3"><td width="70">消息通知</td>
+		<td>
+			<label class="mr20"><input type="radio" name="ifmsg" value="1" checked />开启</label>
+			<label><input type="radio" name="ifmsg" value="0" />关闭</label>
+		</td>
+	</tr>
+	<tr class="tr3"><td>操作原因:</td>
+		<td><div class="mb5"><select style="width:320px;" class="mb5" onchange="this.form.atc_content.value=this.value">
+				<option value="">自定义</option>
+				<option value="">-------</option>
+				$reason_sel
+			</select></div>
+			<textarea name="atc_content" onkeydown="ajax.quickpost(event,this.form)" class="textareaA"></textarea>
+		</td>
+	</tr>
+<!--
+EOT;
+if ($iftypeavailable == 1) {print <<<EOT
+-->
+	<tr class="tr3"><td>后续操作:</td>
+		<td><label><input type="checkbox" name="nextto" value="type">&nbsp;转移主题分类</label></td>
+	</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+</table>
+<div class="popBottom"><span class="btn2"><span><button type="button" name="ajaxsubmit" onclick="ajax.submit(this.form);">提 交</button></span></span></div>
+</form>
+</div>
+<!--
+EOT;
+}?>-->

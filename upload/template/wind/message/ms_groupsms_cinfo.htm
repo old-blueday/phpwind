@@ -1,0 +1,90 @@
+<!--<?php
+$listCount = count($smsInfo);
+print <<<EOT
+-->
+<table width="100%" style="table-layout:fixed;">
+    <tr class="tr2">
+        <td colspan="3" class="fn">
+        参与者：{$userListHtml}			
+        </td>
+    </tr>
+</table>
+<table width="100%" id="smsListTable" style="table-layout:fixed;">
+<!--
+EOT;
+$index = 0;
+foreach($smsInfo as $key => $value){
+$_linkUrl = "u.php?uid=" . $value['uid']; 
+$index++;
+if($index == 1){
+print <<<EOT
+-->
+		<tr class="tr3 vt">
+			<td class="face"><a class="img_50" href="{$_linkUrl}"><i><img
+				width="48" height="48" src="{$value[face]}"></i></a></td>
+			<td class="name">
+			<p><a href="{$_linkUrl}">{$value[username]}</a>
+<!--
+EOT;
+if(checkOnline($value[thisvisit]) && $value[create_uid] != $winduid){
+print <<<EOT
+-->
+							<img src="images/online.png" alt="在线" title="在线" style="vertical-align:middle" />
+<!--
+EOT;
+}if($value[create_uid] != $winduid){
+print <<<EOT
+-->
+							<a class="send_message" href="$baseUrl?type=post&username={$value[create_username]}">[发消息]</a>
+<!--
+EOT;
+}print <<<EOT
+-->						
+			</p>
+			<em><span title="$value[created_time_detail]">{$value[created_time_format]}</span></em>
+			<td>
+        <a class="adel" href="javascript:;" onclick="MC.del('{$message[rid]}','$subtype','','$page','showmessageTip')">删除</a>
+<!--
+EOT;
+if($listCount > 10){
+print <<<EOT
+-->
+        <a class="fr fn mr10" href="javascript:;" onclick="MC.showDetailMsg('','all')" id="openAll">全部展开</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+			<div class="textMes"><h1>{$value[title]}</h1>{$value[content]}</div>
+<!--
+EOT;
+foreach($attachs as $k => $attach){
+print <<<EOT
+-->
+							附件：<img src="u/images/message/zip.gif" align="absmiddle"> 
+							<a href="job.php?action=download&type=message&aid={$attach[aid]}">{$attach[name]}</a><br>
+<!--
+EOT;
+}print <<<EOT
+-->
+			</td>
+		</tr>
+<!--
+EOT;
+}else{
+	$chatType = 'm';
+	require messageEot('mchat');
+}}print <<<EOT
+-->
+</table>
+<!--
+EOT;
+if($message['typeid'] != $messageServer->getConst('groupsms_colony')){
+	require messageEot('postreply');
+}
+print <<<EOT
+-->
+
+
+<!--
+EOT;
+?>-->

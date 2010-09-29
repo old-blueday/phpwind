@@ -1,0 +1,119 @@
+<!--<?php
+print <<<EOT
+-->
+<form action="active.php?action=apply" method="post">
+<div class="t5 f_one" style="margin-bottom:0;">
+<table width="100%" align="center" cellspacing="0" cellpadding="0">
+<tr class="tr3"><th>活动标题:</th><td style="text-align:left;padding-left:1em;">$subject
+<!--
+EOT;
+if($endtime < $timestamp){print<<<EOT
+-->
+<span style="color:red;">（活动已结束）</span>
+<!--
+EOT;
+}print<<<EOT
+-->
+</td></tr>
+<tr class="tr3">
+	<th>活动时间:</th>
+	<td>$active_starttime &nbsp;-&nbsp; $active_endtime</td>
+</tr>
+<tr class="tr3">
+	<th>活动地点:</th>
+	<td>$active_location</td>
+</tr>
+<tr class="tr3">
+	<th>人数限制:</th>
+	<td>$active_num</td>
+</tr>
+<tr class="tr3">
+	<th>已确认参加人数:</th>
+	<td>$act_y 人，[共计报名:$act_total]
+<!--
+EOT;
+if($authorid==$winduid){ print <<<EOT
+-->
+[<a href="active.php?action=view&tid=$tid"><font color="red">管理</font></a>]
+<!--
+EOT;
+} print <<<EOT
+-->
+	</td>
+</tr>
+<tr class="tr3">
+	<th>性别要求:</th>
+<!--
+EOT;
+if($active_sexneed=='1'){ print <<<EOT
+-->
+	<td>仅限男性</td>
+<!--
+EOT;
+}elseif($active_sexneed=='2'){ print <<<EOT
+-->
+	<td>仅限女性</td>
+<!--
+EOT;
+}else{ print <<<EOT
+-->
+	<td>男女不限</td>
+<!--
+EOT;
+} print <<<EOT
+-->
+</tr>
+<tr class="tr3">
+	<th>活动费用:</th>
+	<td>$active_costs 元</td>
+</tr>
+<tr class="tr3">
+	<th>报名截止日期:</th>
+	<td>$active_deadline</td>
+</tr>
+<tr class="tr3">
+	<th>已参加活动成员:</th>
+	<td>
+<!--
+EOT;
+foreach($actuserdb as $key => $value){print<<<EOT
+-->
+	<a href="u.php?uid=$value[winduid]">{$value[username]}</a>&nbsp;
+<!--
+EOT;
+}print<<<EOT
+-->&nbsp;
+</td>
+</tr>
+<tr class="tr2"><td style="border-bottom:0;">&nbsp;</td><td style="border-bottom:0;">
+<!--
+EOT;
+if(!$actmen){print <<<EOT
+-->
+<input type="hidden" name="tid" value="$tid" />
+<input type="hidden" name="fpage" value="$fpage" />
+<input class="btn" type="submit" value="我要参加" />
+<!--
+EOT;
+}elseif($actmen['state']==0){print <<<EOT
+-->
+<div>您的申请已提交，请等候回音！</div>
+<!--
+EOT;
+}elseif($actmen['state']==1){ print <<<EOT
+-->
+<div>您已被批准参加此次活动，<a href="active.php?action=view&tid=$tid"><font color="blue">查看详情</font></a></div>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+<div>您的申请没有通过！</div>
+<!--
+EOT;
+} print <<<EOT
+--></td></tr>
+</table></div>
+</form>
+<!--
+EOT;
+?>

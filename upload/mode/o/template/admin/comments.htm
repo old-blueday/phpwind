@@ -1,0 +1,114 @@
+<!--<?php
+include_once PrintEot('left');
+if (!$action) {
+print <<<EOT
+-->
+<script language="JavaScript" src="js/date.js"></script>
+<form method="POST" action="$basename&job=list&">
+  <h2 class="h1">评论搜索</h2>
+  <div class="admin_table mb10">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <tr class="tr1 vt">
+      <td class="td1">评论内容</td>
+      <td class="td2"><input type="text" name="title" value="$title" class="input input_wa mr20">可使用通配符“*”</td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">评论类型</td>
+      <td class="td2">$commentTypeSelections</td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">作者名称</td>
+      <td class="td2"><input type="text" name="username" value="$username" class="input input_wa mr20">可使用通配符“*”</td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">发表日期</td>
+      <td class="td2">
+      <div class="input_img fl"><i onclick="this.nextSibling.onclick()" class="input_time" title="选择时间">选择时间</i><input type="text" name="postdate_s" value="$postdateStartString" id="postdate_s" onclick="javascript:ShowCalendar(this.id)"></div><span class="p_lr_10 fl">至</span><div class="input_img fl"><i class="input_time" title="选择时间">选择时间</i><input type="text" name="postdate_e" id="postdate_e" value="$postdateEndString" onclick="javascript:ShowCalendar(this.id)"></div>
+      </td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">排序</td>
+      <td class="td2">
+         	<ul class="list_80 list_A fl mr20">
+               <li><input type="radio" name="ordertype" value="asc" $ascChecked>正序</li>
+               <li><input type="radio" name="ordertype" value="desc" $descChecked>倒序</li>
+            </ul>按发表时间排序
+        </td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">每页显示条数</td>
+      <td class="td2"><input type="text" name="lines" value="$lines" class="input input_wa"></td>
+    </tr>
+  </table>
+  </div>
+  <div class="tac mb10">
+    <span class="btn"><span><button type="submit" value="提 交">提 交</button></span></span>
+    </div>
+</form>
+
+<form method="POST" action="$basename&" name="FORM">
+  <input type="hidden" name="job" value="delete">
+  <input type="hidden" name="title" value="$title">
+  <input type="hidden" name="type" value="$type">
+  <input type="hidden" name="typeid" value="$typeid">
+  <input type="hidden" name="username" value="$username">
+  <input type="hidden" name="postdate_s" value="$postdate_s">
+  <input type="hidden" name="postdate_e" value="$postdate_e">
+  <input type="hidden" name="ordertype" value="$ordertype">
+  <input type="hidden" name="page" value="$page">
+  <input type="hidden" name="lines" value="$lines">
+  <h2 class="h1"><span class="mr10">评论列表</span></h2>
+
+  <div class="admin_table mb10">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <tr class="tr2">
+	  <td width="30"><span onclick="CheckAll(document.FORM)" class="cp">全选</span></td>
+      <td>内容</td>
+      <td>作者</td>
+      <td>发表时间</td>
+      <td>所属类型</td>
+    </tr>
+<!--
+EOT;
+if (empty($commentdb)) {print <<<EOT
+-->
+<tr><td class="p10" colspan="5"><div class="admin_tips">啊哦，没有你要的信息！</div></td></tr>
+<!--
+EOT;
+}else{
+foreach ($commentdb as $key => $comment) {
+if(!$comment['title'])continue;
+print <<<EOT
+-->
+    <tr class="tr1 vt">
+      <td class="td2"><input type="checkbox" name="selid[]" value="$comment[id]"></td>
+      <td class="td2">$comment[s_title]</td>
+      <td class="td2"><a href="u.php?uid=$comment[uid]" target="_blank">$comment[username]</a></td>
+      <td class="td2">$comment[postdate]</td>
+      <td class="td2">$comment[ch_type]</td>
+    </tr>
+<!--
+EOT;
+}}print<<<EOT
+-->
+  </table>
+  </div>
+  <div class="cc">$pages</div>
+  <div class="tac mb10">
+    <span class="btn"><span><button type="submit" value="提 交" onclick="return checkdel();">删除</button></span></span>
+    </div>
+</form>
+<script language="JavaScript">
+function checkdel(){
+	if(confirm("确定要删除所选评论吗？" )){
+		return true;
+	}else{
+		return false;
+	}
+}
+</script>
+
+<!--
+EOT;
+}include_once PrintEot('adminbottom');
+?>-->

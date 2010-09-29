@@ -1,0 +1,4 @@
+/* CSS Document */
+body{font-family:Verdana;color:#333;background:#fff;}
+#header,#main,#footer{width:960px;margin:0 auto;}
+#main{margin-bottom:10px;}

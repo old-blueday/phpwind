@@ -1,0 +1,97 @@
+<!--<?php
+include_once PrintEot('profile_header');
+print <<<EOT
+-->
+<div id="user-main">
+	<div class="u-m-bg"></div>
+	<div class="u-m-bg-c cc">
+		<div class="p10">
+			<div class="u-nav-2 cc">
+				<ul>
+					<li class="current"><a style="cursor:pointer" hidefocus="true">隐私设置</a></li>
+				</ul>
+			</div>
+			<form action="profile.php?action=$action" method="post">
+			<input type="hidden" name="verify" value="$verifyhash" />
+			<input type="hidden" name="step" value="2" />
+			<div class="u-cont-bg-c">
+			<table width="100%" height="450">
+				<tr><td class="vt">
+					<div class="p15">
+						<table width="100%" class="mt10 bor-t-c">
+							<tr class="user-tr">
+								<td colspan="2" class="b f14 green"><a name="space"></a>个人空间隐私</td>
+							</tr>
+							<tr class="user-tr">
+								<td width="180">个人空间</td>
+								<td><select name="privacy[index]">
+									<option value="0" $index_0 >任何人可见</option>
+									<option value="1" $index_1 >仅朋友可见</option>
+									<option value="2" $index_2 >仅自己可见</option>
+								</select></td>
+							</tr>
+<!-- 						<tr>
+								<td width="25%">基本资料</td>
+								<td><select name="privacy[profile]">
+									<option value="0" $profile_0 >任何人可见</option>
+									<option value="1" $profile_1 >仅朋友可见</option>
+									<option value="2" $profile_2 >仅自己可见</option>
+								</select></td>
+							</tr>
+							<tr>
+								<td width="25%">个人信息</td>
+								<td><select name="privacy[info]">
+									<option value="0" $info_0 >任何人可见</option>
+									<option value="1" $info_1 >仅朋友可见</option>
+									<option value="2" $info_2 >仅自己可见</option>
+								</select></td>
+							</tr>
+							<tr>
+								<td width="25%">个人积分</td>
+								<td><select name="privacy[credit]">
+									<option value="0" $credit_0 >任何人可见</option>
+									<option value="1" $credit_1 >仅朋友可见</option>
+									<option value="2" $credit_2 >仅自己可见</option>
+								</select></td>
+							</tr>
+							<tr>
+								<td width="25%">记录</td>
+								<td><select name="privacy[owrite]">
+									<option value="0" $owrite_0 >任何人可见</option>
+									<option value="1" $owrite_1 >仅朋友可见</option>
+									<option value="2" $owrite_2 >仅自己可见</option>
+								</select></td>
+							</tr> -->
+							<tr class="user-tr">
+								<td>空间留言</td>
+								<td><select name="privacy[msgboard]">
+									<option value="0" $msgboard_0 >任何人可见</option>
+									<option value="1" $msgboard_1 >仅朋友可见</option>
+									<option value="2" $msgboard_2 >仅自己可见</option>
+								</select></td>
+							</tr>
+							<tr class="user-tr">
+								<td colspan="2" class="b f14 green"><a name="friend"></a>加好友隐私</td>
+							</tr>
+							<tr class="user-tr">
+								<td>加我为好友时身份验证</td>
+								<td>
+									<input type="radio" name="friendcheck" value="0" $friend_0 /> 允许任何人加我为好友<br /><input type="radio" name="friendcheck" value="1" $friend_1 /> 需要身份验证才能加我为好友<br /><input type="radio" name="friendcheck" value="2" $friend_2 /> 不允许任何人加我为好友
+								</td>
+							</tr>
+						</table>
+						<div class="tac" style=" padding:1em">
+							<span class="button"><span><button type="submit">提 交</button></span></span>
+						</div>
+					</div>
+				</td></tr>
+			</table>
+			</div>
+			</form>
+		</div>
+	</div>
+	<div class="u-m-bg"></div>
+</div>
+<!--
+EOT;
+?>-->

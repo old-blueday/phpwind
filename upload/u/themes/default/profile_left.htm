@@ -1,0 +1,40 @@
+<!--<?php
+$b = $pro_tab;
+print <<<EOT
+-->
+<style type="text/css">
+.headTrgB{border-bottom:9px $uskin_appBgTop solid;}
+.main{background:url(u/themes/$uskin/images/$uskin_appBg) -1px 0 repeat-y;}
+.contUser{float:left;width:800px;}
+/*兼容:老版本-8.0beta-APP左右分栏样式*/
+</style>
+	<div class="menubar">
+		<div class="navB">
+			<ul class="one">
+				<li id="a_modify"><img src="u/images/set/modify.png">&nbsp;<a href="profile.php?action=modify">帐号</a></li>
+				<li id="a_privacy"><img src="u/images/set/privacy.png">&nbsp;<a href="profile.php?action=privacy">隐私</a></li>
+				<li id="a_userpay"><img src="u/images/set/userpay.png">&nbsp;<a href="userpay.php">积分</a></li>
+				<li id="a_permission"><img src="u/images/set/permission.png">&nbsp;<a href="profile.php?action=permission">权限</a></li>
+<!--
+EOT;
+if ($_G['atclog']) {print <<<EOT
+-->
+				 <li id="a_log"><img src="u/images/set/modify.png">&nbsp;<a href="profile.php?action=log">操作记录</a></li>
+<!--
+EOT;
+}print <<<EOT
+-->
+			</ul>
+			<!--ul class="two">
+				<li><img src="u/images/set/remind.png">&nbsp;<a href="javascript:;">提醒</a></li>
+				<li id="a_toolcenter"><img src="u/images/set/toolcenter.png">&nbsp;<a href="profile.php?action=toolcenter">道具</a></li>
+				<li id="a_job"><img src="u/images/set/jobcenter.png">&nbsp;<a href="jobcenter.php?action=applied">任务</a></li>
+			</ul-->
+		</div>
+	</div>
+<script language="JavaScript">
+setCurrent('a_$b','a_modify','current');
+</script>
+<!--
+EOT;
+?>-->

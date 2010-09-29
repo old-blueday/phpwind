@@ -1,0 +1,232 @@
+<!--<?php print <<<EOT
+--><div style="width:450px;">
+<form action="mawholecolony.php?action=$action&ajax=1" method="post" onsubmit="return false;" name="ajaxfm">
+<input type="hidden" name="verify" value="$verifyhash" />
+<input type="hidden" name="cyid" value="$cyid" />
+<input type="hidden" name="seltid" value="$seltid" />
+<input type="hidden" name="step" value="2" />
+<!--
+EOT;
+if($action=='toptopic'){print <<<EOT
+-->
+<script language="JavaScript" src="js/date.js"></script>
+<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="adel cp" onclick="closep();">关闭</span>置顶操作</div>
+<table width="100%" class="vt z">
+<tr class="tr3">
+	<td width="80">管理选项:</td>
+	<td>
+		<label class="mr20 w"><input type="radio" id="topped0" name="topped" value="0" $topped_0 /> 取消置顶</label><label class="mr20 w"><input type="radio" id="topped1" name="topped" value="1" $topped_1 /> 置顶</label>
+	</td>
+</tr>
+<tr class="tr3"><td>到期时间:</td>
+<td><input class="input input_wa" type="text" name="timelimit" readonly="readonly" id="timelimit" onclick="ShowCalendar(this.id,1);" /></td></tr>
+</table>
+<!--
+EOT;
+}elseif($action=='digest'){print <<<EOT
+-->
+<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="adel cp" onclick="closep();">关闭</span>精华操作</div>
+<table width="100%" class="vt z">
+<tr class="tr3"><td width="80">管理选项:</td>
+	<td>
+		<label for="digest0" class="mr20"><input type="radio" id="digest0" name="digest" value="0" $digest_0 />取消精华</label>
+		<label for="digest1" class="mr20"><input type="radio" id="digest1" name="digest" value="1" $digest_1 />精华</label>
+	</td>
+</tr>
+</table>
+<!--
+EOT;
+}elseif($action=='lock'){print <<<EOT
+-->
+<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="adel cp" onclick="closep();">关闭</span>锁定操作</div>
+<table width="100%" class="vt z">
+<tr class="tr3">
+	<td width="80">管理选项:</td>
+	<td>
+		<label for="locked0" class="mr20"><input type="radio" id="locked0" name="locked" value="0" $lock_0 />解除锁定/解除关闭</label>
+		<label for="locked1" class="mr20"><input type="radio" id="locked1" name="locked" value="1" $lock_1 />锁定</label>
+		<label for="locked2" class="mr20"><input type="radio" id="locked2" name="locked" value="2" $lock_2 />关闭</label>
+	</td>
+</tr>
+</table>
+<!--
+EOT;
+}elseif($action=='pushtopic'){print <<<EOT
+-->
+<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="adel cp" onclick="closep();">关闭</span>提前操作</div>
+<table width="100%" class="vt z">
+<tr class="tr3"><td width="80">提前时间:</td><td>
+	<input type="text" class="input input_wc" name="pushtime" value="0" /> (时)
+</td></tr>
+<tr class="tr3">
+	<td>管理选项:</td>
+	<td>提前帖子</td>
+</tr>
+</table>
+<!--
+EOT;
+}elseif($action=='downtopic'){print <<<EOT
+-->
+<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="adel cp" onclick="closep();">关闭</span>压帖操作</div>
+<table width="100%" class="vt z">
+<tr class="tr3"><td width="80">压后时间:</td><td><label class="mr20"><input type="text" name="timelimit" value="24" size="3" class="input" /> 时</label></td></tr>
+<tr class="tr3"><td>允许上浮:</td><td>
+<label class="mr20"><input type="radio" name="ifpush" value="0" $lock_0 />开启</label>
+<label class="mr20"><input type="radio" name="ifpush" value="1" $lock_1 />关闭</label>
+</td></tr>
+</table>
+<!--
+EOT;
+}elseif($action=='highlight'){print <<<EOT
+-->
+<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="adel cp" onclick="closep();">关闭</span>加亮操作</div>
+<table width="100%" class="vt z">
+<tr class="tr3"><td width="80">管理选项:</td>
+	<td>
+		<div class="pwnew tac">
+			<span title="粗体字"><a onclick="styleOnclick(this,'title2')" class="$stylename[1]">加粗</a></span>
+			<span title="斜体字"><a onclick="styleOnclick(this,'title3')" class="$stylename[2]">斜体</a></span>
+			<span title="下划线"><a onclick="styleOnclick(this,'title4')" class="$stylename[3]">下划线</a></span>
+			<span id="color_show" title="点击取消颜色" onclick="colorCancel()"></span>
+			<span title="颜色选择"><a class="two tal" onclick="showColorPicker(this,document.ajaxfm.title1,function(){pickReback(color_picker)})"><img src="$imgpath/pickcolor.gif"  /></a></span>
+			<input id="title1" name="title1" type="hidden" value="$titlecolor" />
+			<input id="title2" name="title2" type="hidden" value="{$titledetail[1]}" />
+			<input id="title3" name="title3" type="hidden" value="{$titledetail[2]}" />
+			<input id="title4" name="title4" type="hidden" value="{$titledetail[3]}" />
+		</div>
+	</td>
+</tr>
+<tr class="tr3"><td>有效时间:</td><td><input type="text" name="timelimit" size="4" class="input" /> 天</td></tr>
+</table>
+<script id="ajax_color" language="JavaScript" src="js/color_picker.js"></script>
+<script type="text/javascript" id="ajax_edit">
+function pickReback(color){
+	getObj('color_show').style.backgroundColor = color;
+}
+function styleOnclick(e,obj){
+	var objclass = e.className;
+	var temp = objclass.split(' ');
+	var newclass = '';
+	for (var n=0; n<temp.length; n++){
+		if (temp[n]=='one') {
+			continue;
+		}
+		newclass += ' ' + temp[n];
+	}
+	if (objclass.match(/one/)) {
+		e.className = newclass;
+		getObj(obj).value = '';
+	} else {
+		e.className = newclass + ' one';
+		getObj(obj).value = 1;
+	}
+}
+function colorCancel(){
+	getObj('color_show').style.backgroundColor='#FFFFFF';
+	getObj('title1').value='';
+}
+</script>
+<!--
+EOT;
+}elseif($action=='del'){print <<<EOT
+-->
+<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="adel cp" onclick="closep();">关闭</span>删除操作</div>
+<table width="100%" class="vt z">
+<tr class="tr3"><td width="80">扣除积分:</td>
+	<td>
+		<label class="mr20"><input type="radio" name="ifdel" value="1" checked />开启</label><label class="mr20"><input type="radio" name="ifdel" value="0" />关闭</label>
+	</td>
+</tr>
+</table>
+<!--
+EOT;
+} elseif ($action=='type') {print <<<EOT
+-->
+<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="adel cp" onclick="closep();">关闭</span>转移主题分类</div>
+<table width="100%" class="vt z">
+<tr class="tr3">
+	<td width="80">选择主题分类:</td>
+		<td>
+<!--
+EOT;
+if ($t_sub_exits == 1) {print <<<EOT
+-->
+		<select name="type" onchange="getSubType(this.value)";>
+<!--
+EOT;
+} else {print <<<EOT
+-->
+		<select name="type">
+<!--
+EOT;
+}
+foreach($t_typedb as $key=>$value){
+if($value){print <<<EOT
+-->
+			<option value="$key">$value[name]</option>
+<!--
+EOT;
+}}print <<<EOT
+-->
+		</select>
+<!--
+EOT;
+if ($t_sub_exits == 1) {print <<<EOT
+-->
+		<select name="subtype" id="subtype" style="width:75px"><option value="">分类</option></select>
+<!--
+EOT;
+}print <<<EOT
+-->
+	</td>
+</tr>
+</table>
+<input type="hidden" name="tidarray[]" value="$seltid">
+<!--
+EOT;
+}print <<<EOT
+-->
+<table width="100%" class="mb5 vt z">
+<tr class="tr3"><td width="80">消息通知:</td>
+	<td><label class="mr20"><input type="radio" name="ifmsg" value="1" checked />开启</label><label><input type="radio" name="ifmsg" value="0" />关闭</label></td>
+</tr>
+<tr class="tr3">
+	<td>操作原因:</td>
+	<td>
+<!--
+EOT;
+if($db_adminreason){print <<<EOT
+-->
+		<select name="" onchange="this.form.atc_content.value=this.value" style="width:320px" class="mb5">
+			<option value="">自定义</option>
+			<option value="">-------</option>
+			$reason_sel
+		</select><br>
+<!--
+EOT;
+}print <<<EOT
+-->
+		<textarea name="atc_content" onkeydown="ajax.quickpost(event,this.form)" class="textareaA"></textarea>
+	</td>
+</tr>
+</table>
+<div class="popBottom">
+<!--
+EOT;
+if($db_enterreason){print <<<EOT
+-->
+<span class="btn2"><span><button type="button" name="ajaxsubmit" onclick="if(this.form.atc_content.value){ajax.submit(this.form);}else{alert('请输入操作理由！')}">提 交</button></span></span>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+<span class="btn2"><span><button type="button" name="ajaxsubmit" onclick="ajax.submit(this.form);">提 交</button></span></span>
+<!--
+EOT;
+}print <<<EOT
+-->
+</div>
+</form>
+<!--
+EOT;
+?>-->

@@ -1,0 +1,55 @@
+<!--<?php
+if($listCount <= 10){
+	$sms_0 = "style=\"display: none;\"";
+	$sms_1 = "style=\"display: '';\"";
+}else{
+	$sms_0 = $relation[actived_time] <= $value[created_time] || ($index > $listCount-1)  ? "style=\"display: none;\"" : "style=\"display: '';\"";
+	$sms_1 = $relation[actived_time] <= $value[created_time] || ($index > $listCount-1)  ? "style=\"display: '';\"" : "style=\"display: none;\"";
+}
+$value['content1'] = strip_tags($value['content']);
+print <<<EOT
+-->
+<tr class="tr3" id="sms_0_{$value[id]}" $sms_0 onclick="MC.showDetailMsg('{$value[id]}',1)">
+	<td class="face">&nbsp;</td>
+	<td><a href="{$_linkUrl}">{$value[create_username]}</a></td>
+	<td><p class="lh_18 imgnone">{$value[content1]}</p></td>
+</tr>
+<tr class="tr3 vt" id="sms_1_{$value[id]}" $sms_1
+	onclick="MC.showDetailMsg('{$value[id]}',2)">
+	<td class="face" style="vertical-align:top;"><a class="img_50" href="{$_linkUrl}"><i><img width="48" height="48" src="{$value[face]}"></i></a></td>
+	<td class="name" style="vertical-align:top;width:120px;"><p><a href="{$_linkUrl}">{$value[create_username]}</a>
+<!--
+EOT;
+if(checkOnline($value['thisvisit']) && $value[create_uid] != $winduid){
+print <<<EOT
+--><img src="images/online.png" alt="在线" title="在线" style="vertical-align:middle" />
+<!--
+EOT;
+}if($value[create_uid] != $winduid){
+print <<<EOT
+--><a class="send_message" href="$baseUrl?type=post&username={$value[create_username]}">[发消息]</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+</p><span title="$value[created_time_detail]">{$value[created_time_format]}</span>
+<!--
+EOT;
+if($value[status] == '1' && $value[create_uid] == $winduid && $chatType != 'm'){
+print <<<EOT
+--><img title="对方未读" src="u/images/message/otherun.png" align="absmiddle" />
+<!--
+EOT;
+}elseif($value[create_uid] == $winduid && $chatType != 'm'){
+print <<<EOT
+--><img title="对方已读" src="u/images/message/otheread.png" align="absmiddle" />
+<!--
+EOT;
+}print <<<EOT
+-->
+</em></td>
+<td><div class="textMes">{$value[content]}</div></td>
+</tr>
+<!--
+EOT;
+?>-->

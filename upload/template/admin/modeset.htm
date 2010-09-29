@@ -1,0 +1,188 @@
+<!--<?php
+include_once PrintEot('left');
+if (!$action) {
+print <<<EOT
+-->
+<div class="admin_info mb10">
+    <h3 class="h1"><b>提示信息</b></h3>
+    <div class="legend"> <ol><li>可以根据自己站点的定位来选择合适自己的社区模式</li><li>二级域名设置，如：bbs.phpwind.net。为了统一登录，请到 <a href="javascript:;" onclick="parent.PW.Dialog({id:'basic',url:'$admin_file?adminjob=settings&admintype=basic',name:'常规设置'});">全局参数</a> 中配置Cookie作用域</li><li>修改主导航中的模式名及显示顺序请到 <a href="javascript:;" onclick="parent.PW.Dialog({id:'navmain',url:'$admin_file?adminjob=customnav&admintype=navmain',name:'社区主导航'});">社区主导航</a></li></ol> </div>
+</div>
+<form action="$basename&" method="post">
+  <input type="hidden" name="action" value="set">
+  <h2 class="h1">社区模式选择</h2>
+  <div class="admin_table mb10">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <tr class="tr2">
+      <td width="80">模式名称</td>
+      <td width="170">模式别名</td>
+      <td width="170">二级域名</td>
+      <td width="60">选择默认</td>
+      <td width="80">开启</td>
+      <td>操作</td>
+    </tr>
+	<tr class="tr1 vt">
+      <td class="td2"><i id="bt_o" onclick="dmopen('o')" class="expand expand_d"></i>{$db_modes[o][m_name]}</td>
+      <td class="td2"><input type="text" name="title[o]" value="{$db_modes[o][title]}" class="input input_wa"></td>
+      <td class="td2"><input type="text" name="domain[o]" value="{$db_modedomain[o]}" class="input input_wa"></td>
+      <td class="td2"><input type="radio" name="defaultmode" value="o"{$checkArr[o]} /></td>
+      <td class="td2"><input type="hidden" name="ifopen[]" value="o" /></td>
+      <td class="td2"><a title="更新缓存" href="$basename&action=fourmtypecache&m=o" class="mr20">[更新]</a></td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td2"><!--<span id="bt_bbs" class="close fl" onclick="cateopen('$key')"></span>-->
+      <i id="bt_bbs" onclick="cateopen('$key')" class="expand expand_d"></i>论坛模式
+      </td>
+      <td class="td2"><input type="text" name="title[bbs]" value="{$db_modes['bbs']['title']}" class="input input_wa"></td>
+      <td class="td2">&nbsp;</td>
+      <td class="td2"><input type="radio" name="defaultmode" value=''{$checkArr[bbs]} /></td>
+      <td class="td2"><input type="hidden" name="ifopen[]" value="bbs" /></td>
+      <td class="td2">&nbsp;</td>
+    </tr>
+<!--
+EOT;
+foreach($db_modes as $key => $mode){
+if ($key == 'bbs' || $key == 'o') continue;
+$ifopen = $mode[ifopen]==1 ? 'checked="checked"' : '';
+$tmpstyle = isset($dm_array[$key]) ? 'expand expand_a' : 'expand expand_d';
+print <<<EOT
+-->
+    <tr class="tr1 vt">
+      <td class="td2"><i id="bt_$key" onclick="dmopen('$key')" class="$tmpstyle"></i>{$mode[m_name]}</td>
+      <td class="td2"><input type="text" name="title[$key]" value="{$mode[title]}" class="input input_wa"></td>
+      <td class="td2"><input type="text" name="domain[$key]" value="{$db_modedomain[$key]}" class="input input_wa"></td>
+      <td class="td2"><input type="radio" name="defaultmode" value="$key"{$checkArr[$key]} /></td>
+      <td class="td2">
+<!--
+EOT;
+if ($key != 'area') {
+print <<<EOT
+-->
+      	<input type="checkbox" name="ifopen[]" value="$key" $ifopen/>
+<!--
+EOT;
+} else {print <<<EOT
+-->
+		<input type="checkbox" name="ifopen[]" value="1" checked="checked" readonly="readonly" disabled />
+<!--
+EOT;
+}print <<<EOT
+-->
+      </td>
+      <td class="td2">
+      	<a title="更新缓存" href="$basename&action=fourmtypecache&m=$key" class="mr20">[更新]</a>
+<!--
+EOT;
+if ($key != 'area') {
+print <<<EOT
+-->
+      	<a href="$basename&action=uninstall&m=$key" onclick="return confirmdel();">[卸载]</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+      </td>
+    </tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+  </table>
+</div>  
+<div class="mb10 tac">
+    <span class="btn"><span><button type="submit">提 交</button></span></span>
+  </div>
+</form>
+<!--
+EOT;
+if ($uninstall) {
+print <<<EOT
+-->
+<h2 class="h1">未安装模式</h2>
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+  <tr class="tr2">
+    <td>模式名称</td>
+    <td>模式说明</td>
+    <td>模式目录</td>
+    <td>管理选项:</td>
+  </tr>
+<!--
+EOT;
+foreach($uninstall as $mode){
+print <<<EOT
+-->
+  <tr class="tr1 vt">
+    <td class="td2">$mode[0]</td>
+    <td class="td2">$mode[1]</td>
+    <td class="td2">$mode[2]</td>
+    <td class="td2"><a href="$basename&action=install&mode=$mode[2]">安装</a></td>
+  </tr>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+</table>
+</div>
+<!--
+EOT;
+}}print <<<EOT
+-->
+</div>
+<script language="javascript">
+function showListFid(fid){
+	if (getObj('type_'+fid)) {
+		var showfid = getObj('type_'+fid);
+		if (showfid.style.display == 'none') {
+			showfid.style.display = '';
+			getObj('cate_'+fid).className = 'expand expand_b';
+		} else {
+			showfid.style.display = 'none';
+			getObj('cate_'+fid).className = 'expand expand_a';
+		}
+	}
+}
+function confirmdel(){
+	if (!confirm("卸载了之后本模式的数据也会清空，确定要卸载本模式？")){
+		return false;
+	}
+}
+var Cookie = {
+	set : function(name,value) {
+		expires = new Date();
+		expires.setTime(expires.getTime()+(86400*365));
+		document.cookie=name+"="+escape(value)+"; expires="+expires.toGMTString()+"; path=/";
+	},
+	get : function(name) {
+		var start = document.cookie.indexOf(name);
+		var end = document.cookie.indexOf(";",start);
+		return start==-1 ? null : unescape(document.cookie.substring(start+name.length+1,(end>start ? end : document.cookie.length)));
+	},
+	del : function(name) {
+		var exp = new Date();
+		exp.setTime(exp.getTime() - 1);
+		var cval=Cookie.get(name);
+		if(cval) document.cookie= name + "="+cval+";expires="+exp.toGMTString();
+	}
+}
+function dmopen(id) {
+	var o = getObj('dm_' + id);
+	if (o == null) return;
+	if (o.style.display == 'none') {
+		o.style.display = '';
+		getObj('bt_' + id).className = 'expand expand_b';
+		Cookie.set('dm_cate', 1);
+	} else {
+		o.style.display = 'none';
+		getObj('bt_' + id).className = 'expand expand_a';
+		Cookie.del('dm_cate');
+	}
+}
+if (Cookie.get('dm_cate')) {
+	dmopen('area');
+}
+</script>
+<!--
+EOT;
+include_once PrintEot('adminbottom');
+?>-->

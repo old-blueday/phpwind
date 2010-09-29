@@ -1,0 +1,30 @@
+<!--<?php
+include_once PrintEot('left');
+print <<<EOT
+-->
+<style type="text/css">
+.mode-forum-list li{float:left;margin:10px 10px 10px 0;width:140px;height:180px;display:inline;}
+.mode-forum-list li img{padding:3px;border:1px solid #e4e4e4;background:#fff;display:block;}
+.mode-forum-list li p{line-height:25px;height:25px;width:130px;}
+</style>
+<div class="nav3">
+	<ul class="cc">
+        <li class="current"><a href="javascript:;">模板中心</a></li>
+    </ul>
+</div>
+<div class="c"></div>
+<ul class="mode-forum-list cc">
+<!--
+EOT;
+foreach($tplLib as $value){print <<<EOT
+-->
+<li><img src="$value[preview]" width="120" height="160"/><p class="tac">$value[dir]</p></li>
+<!--
+EOT;
+}print <<<EOT
+-->
+</ul>
+<!--
+EOT;
+include_once PrintEot('adminbottom');
+?>-->

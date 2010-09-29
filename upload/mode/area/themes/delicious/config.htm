@@ -1,0 +1,377 @@
+
+
+
+<pw id="A1频道导航@美食" />
+	<li class="switchNavItem"><a href="" target="_blank" >美食DIY</a> |</li>
+	<li class="switchNavItem"><a href="" target="_blank" >美食快讯</a> |</li>
+	<li class="switchNavItem"><a href="" target="_blank" >美食探店</a> |</li>
+	<li class="switchNavItem"><a href="" target="_blank" >外地美食</a> |</li>
+	<li class="switchNavItem"><a href="" target="_blank" >吃喝玩乐团</a></li>
+
+
+
+<pw id="A2@美食" />
+<div class="pwSlideWrap" style="padding-bottom:0">
+	<!--pwSlidePlayer 有特殊样式，不可换；其他播放器ID任意--->
+	<div id="pwSlidePlayer" class="pwSlide">
+		<ul class="switch" id="PicPlayer1_A">
+			<list cachetime="1800" action="image" num="4" title="A1播放器1A" />
+			<loop>
+				<li class="switchItem" style="display:none"><a href="{url}"  target="_blank" ><img src="{image,290,280}" width="290" height="280" />
+					<div class="txt">
+						<h3>{title,30}</h3>
+						<p>{descrip,40}</p>
+					</div>
+					</a></li>
+			</loop>
+		</ul>
+		<div class="pwSlide-bg"></div>
+		<ul class="SwitchNav" id="PicPlayer1_B">
+<!--#foreach($pwresult as $value){#-->
+			<li class="switchNavItem"><a href="$value[url]"  target="_blank"><img src="$value[image]" width="47" height="47" /></a></li>
+<!--#}#-->
+		</ul>
+	</div>
+</div>
+<script language="javascript" src="mode/area/js/ddsliderplayer.js"></script>
+<script>ddSliderPlayers('PicPlayer1_A','PicPlayer1_B',4,'current');</script>
+
+
+
+<pw id="A3标题@美食" />
+热门活动
+
+
+<pw id="A4图文列表@美食" />
+<ul class="subjectList" style="padding-bottom:0">
+	<list cachetime="1800" action="image" num="2" title="标题摘要" />
+	<loop>
+		<li class="subject mb10"> <a href="{url}"  target="_blank" ><img src="{image,105,52}" width="105" height="52" class="fl" /></a>
+			<h4><a href="{url}"  target="_blank" >{title,5040}</a></h4>
+			<p>{descrip,45}</p>
+		</li>
+	</loop>
+</ul>
+
+
+
+<pw id="A5标题@美食" />
+最新帖子
+
+
+<pw id="A6标题摘要@美食" />
+<ul class="tops">
+	<list cachetime="1800" action="subject" num="2" title="第一屏头条" />
+	<loop>
+		<li>
+			<h2 class="s1"><a href="{url}"  target="_blank" >{title,40}</a></h2>
+			<p>{descrip,140}<a class="s1" href="{url}"  target="_blank" >（阅读全文）</a></p>
+		</li>
+	</loop>
+</ul>
+
+
+
+<pw id="A7标题列表@美食" />
+<ul class="list list_f14">
+	<list cachetime="1800" action="subject" num="8" title="标题列表" />
+	<loop>
+		<li><a href="{url}"  target="_blank" ><em class="s1">[{forumname,8}]</em>{title,30}</a></li>
+	</loop>
+</ul>
+
+
+
+<pw id="A8图片列表@美食" />
+<ul class="imgList cc">
+	<list cachetime="1800" action="image" num="3" title="图片列表" />
+	<loop>
+		<li><a href="{url}"  target="_blank" ><img src="{image,100,90}" width="100" height="90" />{title,16}</a></li>
+	</loop>
+</ul>
+
+
+
+<pw id="A9标题@美食" />
+享乐指南
+
+
+<pw id="A10连接列表@美食" />
+<list cachetime="1800" action="tag" num="20" title="链接标签" />
+&nbsp;
+<loop> <a class="s1" href="{url}"  target="_blank" >{title,12}</a>&nbsp; | &nbsp; </loop>
+
+
+
+<pw id="A11标题@美食" />
+热点专题
+
+
+<pw id="A12图文列表@美食" />
+<list cachetime="1800" action="image" num="2" title="图文列表" />
+<loop>
+	<div class="subject cc mb10"> <a href="{url}"  target="_blank" ><img src="{image,60,60}" class="fl" width="60" height="60" /></a>
+		<h4><a href="{url}"  target="_blank" >{title,16}</a></h4>
+		<p>{descrip,30}<a href="{url}"  target="_blank"  class="s1"> [详细]</a></p>
+	</div>
+</loop>
+
+
+
+<pw id="A13标题列表@美食" />
+<ul class="list">
+	<list cachetime="1800" action="subject" num="6" title="标题列表" />
+	<loop>
+		<li><a href="{url}"  target="_blank" >{title,30}</a></li>
+	</loop>
+</ul>
+
+
+
+<pw id="A14广告@美食" /> <a href="{url}"  target="_blank" ><img src="areastatic/delicious/temp/ad708x70.png" width="708" height="70" class="fl" /></a> <a href="{url}"  target="_blank" ><img src="areastatic/delicious/temp/ad242x70.png" width="242" height="70" class="fr" /></a>
+
+
+<pw id="B1模块标题@美食" />
+探店情报
+
+
+<pw id="B2图片标题@美食" />
+<list cachetime="1800" num="8" action="image" ifpushonly="0" title="图片列表" />
+<loop>
+	<li><a href="{url}"  target="_blank" ><img src="{image,65,55}" width="65" height="55" />{title,10}</a></li>
+</loop>
+
+
+
+<pw id="B3模块标题@美食" />
+店铺排行
+
+
+<pw id="b4标题列表@美食" />
+<ol class="rankingList fl">
+	<list cachetime="1800" num="8" action="subject" ifpushonly="0" title="标题列表" />
+	<loop>
+		<li><a href="{url}"  target="_blank" >{title,30}</a></li>
+	</loop>
+</ol>
+
+
+
+<pw id="b5模块标题@美食" />
+美食DIY
+
+
+<pw id="b6标题摘要@美食" />
+<list cachetime="1800" action="image" num="1" title="图文模块" />
+<loop>
+	<div class="subject cc"> <a href="{url}"  target="_blank" ><img src="{image,130,155}" width="130" height="155" class="fl" /></a>
+		<h4><a href="{url}"  target="_blank" >{title,18}</a></h4>
+		<p>{descrip,120}</p>
+	</div>
+</loop>
+
+
+
+<pw id="b7标题列表@美食" />
+<ul class="list fl">
+	<list cachetime="1800" action="subject" num="8" title="标题列表" />
+	<loop>
+		<li><a href="{url}"  target="_blank" >【<span class="s2">{forumname}</span>】{title,20}</a></li>
+	</loop>
+</ul>
+
+
+
+<pw id="b8标题@美食" />
+新店开张
+
+
+<pw id="b9标题列表@美食" />
+<ul class="imgList cc">
+	<list cachetime="1800" action="image" num="4" title="图文列表" />
+	<loop>
+		<li><a href="{url}"  target="_blank" ><img src="{image,90,65}" width="90" height="65" />{title,15}</a></li>
+	</loop>
+</ul>
+
+
+
+<pw id="b10标题列表@美食" />
+<ul class="list" style="margin-top:8px;">
+	<list cachetime="1800" action="subject" num="10" title="标题列表" />
+	<loop>
+		<li><a href="{url}"  target="_blank" >{title,25}</a></li>
+	</loop>
+</ul>
+
+
+
+<pw id="b11广告@美食" /> <a href="{url}"  target="_blank" ><img src="areastatic/delicious/temp/ad960x70.png" width="960" height="70" /></a>
+
+
+<pw id="c1模块标题@美食" />
+探店情报
+
+
+<pw id="c2用户列表@美食" />
+<ul class="userList">
+	<list cachetime="1800" action="image" num="4" title="图文列表" />
+	<loop>
+		<li><a href="{url}"  target="_blank" ><img src="{image,65,65}" width="65" height="65" /></a>
+			<h4><a href="{url}"  target="_blank"  class="s2">{title,20}</a></h4>
+			<p>{descrip,40}</p>
+		</li>
+	</loop>
+</ul>
+
+
+
+<pw id="c3标题@美食" />
+食尚养生
+
+
+<pw id="c4图文列表@美食" />
+<list cachetime="1800" action="image" num="2" title="图文列表" />
+<loop>
+	<div class="subject cc mb10"> <a href="{url}"  target="_blank" ><img src="{image,100,75}" width="100" height="75" class="fl" /></a>
+		<h4><a href="{url}"  target="_blank" >{title,30}</a></h4>
+		<p>{descrip,58}</p>
+	</div>
+</loop>
+
+
+
+<pw id="c5标题列表@美食" />
+<ul class="list fl">
+	<list cachetime="1800" action="subject" num="8" title="标题列表" />
+	<loop>
+		<li><a href="#">【<span class="s2">{forumname}</span>】{title,22}</a></li>
+	</loop>
+</ul>
+
+
+
+<pw id="c6标题@美食" />
+折扣优惠
+
+
+<pw id="c7标题列表@美食" />
+<ul class="subjectList2 cc">
+	<list cachetime="1800" action="image" num="5" title="图文列表" />
+	<loop>
+		<li><a href="{url}"  target="_blank" ><img src="{image,65,65}" width="65" height="65" class="fl" /></a>
+			<h4><a class="s1" href="{url}"  target="_blank" >{title,20}</a></h4>
+			<p>{descrip,50}</p>
+		</li>
+		</li>
+	</loop>
+</ul>
+
+
+
+<pw id="c8广告@美食" /> <a href="{url}"  target="_blank" ><img src="areastatic/delicious/temp/ad708x70.png" width="708" height="70" class="fl" /></a> <a href="{url}"  target="_blank" ><img src="areastatic/delicious/temp/ad242x70.png" width="242" height="70" class="fr" /></a>
+
+
+<pw id="d1标题@美食" />
+火热推荐
+
+
+<pw id="d2列表@美食" />
+<li class="switchNavItem"><a href="#"  target="_blank">休闲娱乐</a></li>
+<li class="switchNavItem"><a href="#"  target="_blank">朋友聚餐 </a></li>
+<li class="switchNavItem"><a href="#"  target="_blank">狂欢派对</a></li>
+<li class="switchNavItem"><a href="#"  target="_blank">宾馆酒店</a></li>
+
+
+
+<pw id="d3图文列表@美食" />
+<ul class="subjectList3 cc">
+	<list cachetime="1800" action="image" num="6" title="图文列表" />
+	<loop>
+		<li class="subject"> <a href="{url}"  target="_blank" ><img src="{image,95,75}" width="95" height="75" class="fl" /></a>
+			<h4><a class="s1 b" href="{url}"  target="_blank" >{title,14}</a></h4>
+			<p>{descrip,50}</p>
+		</li>
+	</loop>
+</ul>
+
+
+
+<pw id="d4图文列表@美食" />
+<ul class="subjectList3 cc">
+	<list cachetime="1800" action="image" num="6" title="图文列表" />
+	<loop>
+		<li class="subject"> <a href="{url}"  target="_blank" ><img src="{image,95,75}" width="95" height="75" class="fl" /></a>
+			<h4><a class="s1 b" href="{url}"  target="_blank" >{title,14}</a></h4>
+			<p>{descrip,50}</p>
+		</li>
+	</loop>
+</ul>
+
+
+
+<pw id="d5图文模块@美食" />
+<ul class="subjectList3 cc">
+	<list cachetime="1800" action="image" num="6" title="图文列表" />
+	<loop>
+		<li class="subject"> <a href="{url}"  target="_blank" ><img src="{image,95,75}" width="95" height="75" class="fl" /></a>
+			<h4><a class="s1 b" href="{url}"  target="_blank" >{title,14}</a></h4>
+			<p>{descrip,50}</p>
+		</li>
+	</loop>
+</ul>
+
+
+
+<pw id="d6图文列表@美食" />
+<ul class="subjectList3 cc">
+	<list cachetime="1800" action="image" num="6" title="图文列表" />
+	<loop>
+		<li class="subject"> <a href="{url}"  target="_blank" ><img src="{image,95,75}" width="95" height="75" class="fl" /></a>
+			<h4><a class="s1 b" href="{url}"  target="_blank" >{title,14}</a></h4>
+			<p>{descrip,50}</p>
+		</li>
+	</loop>
+</ul>
+
+
+
+<pw id="d7标题@美食" />
+美食盛宴
+
+
+<pw id="d9图片列表@美食" />
+<div class="listWrap" id="ddhSlider2">
+	<ul class="imgList cc">
+		<list cachetime="1800" action="image" num="8" title="图文列表" />
+		<loop>
+			<li><a href="{url}"  target="_blank" ><img src="{image,105,130}" width="105" height="130" />{title,14}</a></li>
+		</loop>
+	</ul>
+</div>
+
+
+
+<pw id="d10标题@美食" />
+名菜名点
+
+
+<pw id="d11图片列表@美食" />
+<ul class="subjectList2 cc">
+	<list cachetime="1800" num="4" action="image" ifpushonly="0" title="图文列表" />
+	<loop>
+		<li> <a href="{url}"  target="_blank" ><img src="{image,65,45}" width="65" height="45" class="fl" /></a>
+			<h4><a href="{url}"  target="_blank"  class="s1">{title,15}</a></h4>
+			<p>{descrip,35}</p>
+		</li>
+	</loop>
+</ul>
+
+
+
+<pw id="d12标签连接@美食" />
+<list cachetime="1800" action="tag" num="18" title="标签" />
+&nbsp;
+<loop>
+<a class="s1" href="{url}"  target="_blank" >{title,10}</a>&nbsp;&nbsp;| &nbsp;
+</loop>

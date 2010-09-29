@@ -1,0 +1,56 @@
+<!--<?php print <<<EOT
+-->
+<div class="c"></div>
+</div>
+<!--
+EOT;
+if($GLOBALS['poweredby']){
+$charset = strtoupper($GLOBALS['db_charset']);print <<<EOT
+-->
+<div class="bottom">
+<a class="fr" href="$admin_file?adminjob=admin&job=notice" onclick="openNewUrl('default','关于phpwind','$admin_file?adminjob=admin&job=notice');return false;" >关于phpwind</a>
+Powered by&nbsp;&nbsp;<a href="http://www.phpwind.net/" target="_blank"><b>phpwind</b> v$wind_version ({$charset})</a>&nbsp;&copy;2003-2010,<b style="color: #FF9900">phpwind.com</b>
+<!--
+EOT;
+if($db_debug){print <<<EOT
+-->
+Query {$db->query_num}
+<!--
+EOT;
+}print <<<EOT
+-->
+</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+<script type="text/javascript" src="js/desktop/plugin.js"></script>
+<script type="text/javascript">
+var allInputs = document.getElementsByTagName('input');
+if(allInputs && allInputs.length>0){
+	for(var i=0; i<allInputs.length;i++)
+	{
+		var ipt = allInputs[i].parentNode;
+		if(ipt.tagName=='LI'&& allInputs[i].type=='radio')
+		{
+			allInputs[i].checked && (ipt.className='current');
+			ipt.onclick = function(){radioWithWords(this)};
+		}
+	}
+}
+</script>
+</body></html>
+<!--
+EOT;
+if ($GLOBALS['adminjob'] == 'admin') {
+$s_url = rawurlencode($pwServer['HTTP_HOST']);
+$rawbbsname = rawurlencode($db_bbsname);
+$ystat = $db_ystats_ifopen ? '0' : '1';
+$hash = md5($pwServer['HTTP_HOST'].$pwServer['HTTP_USER_AGENT'].$totalmember.$threads.$posts.$wind_version.$wind_repair.$db_charset);print <<<EOT
+-->
+<script language="JavaScript" src="http://nt.phpwind.net/notice.php?bbsname=$rawbbsname&totalmember=$totalmember&threads=$threads&posts=$posts&hits=$hits&yposts=$yposts&version=$wind_version&repair=$wind_repair&charset=$db_charset&c=$ceversion&u=$u&sysversion=$sysversion&dbversion=$dbversion&url=$s_url&ystat=$ystat&hash=$hash&from=$wind_from"></script>
+<!--
+EOT;
+}if(!$showafooter){
+afooter(true);
+}?>-->

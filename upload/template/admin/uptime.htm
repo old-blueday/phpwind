@@ -1,0 +1,188 @@
+<!--<?php
+include_once PrintEot('left');
+if(empty($action)){ print <<<EOT
+-->
+<div class="nav3 mb10">
+	<ul class="cc">
+		<li class="current"><a href="$basename">系统组列表</a></li>
+		<li><a href="$basename&action=setlevel">有效期设置</a></li>
+	</ul>
+</div>
+<div class="admin_info mb10">
+	<h3 class="h1"><b>提示信息</b></h3>
+	<div class="legend">可以给所有系统组成员指定有效期，到期自动收回头衔!</div>
+</div>
+<form action="$basename" method="post">
+<h2 class="h1">搜索</h2>
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+	<tr class="tr1">
+		<td class="td2" width="220">用户名&nbsp;<input class="input input_wa" type="text" name="username" /></td>
+		<td class="td2" width="180">用户组&nbsp;<select name="gid"><option value="">不限制</option>$grouplist</select></td>
+		<td class="td2"><span class="bt2"><span><button type="submit" value="提 交">提 交</button></span></span></td>
+	</tr>
+</table>
+</div>
+</form>
+<form action="$basename" method="post" name="FORM">
+<h2 class="h1">系统组列表</h2>
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+	<tr class="tr2 td_bgB">
+		<td width="30"><span onclick="CheckAll(document.FORM)" class="cp">全选</span></td>
+		<td width="100">用户名</td>
+		<td width="100">限期头衔</td>
+		<td width="100">到期用户组变为</td>
+		<td width="100">开始日期</td>
+		<td width="100">有效期限</td>
+		<td>&nbsp;</td>
+	</tr>
+<!--
+EOT;
+if (empty($memberdb)) {print <<<EOT
+-->
+<tr><td class="p10" colspan="7"><div class="admin_tips">啊哦，没有你要的信息！</div></td></tr>
+<!--
+EOT;
+}else{
+foreach($memberdb as $key=>$member){
+print <<<EOT
+-->
+	<tr class="tr1 vt">
+		<td class="td2"><input type="checkbox" name="selid[$member[gid]][]" value="$member[uid]" onclick="pwJsCheck(this)" /></td>
+		<td class="td2">$member[username]</td>
+		<td class="td2">$member[slevel]</td>
+		<td class="td2">$member[tolevel]</td>
+		<td class="td2">$member[startdate]</td>
+		<td class="td2">$member[days] </td>
+		<td class="td2"><a href="$basename&action=edit&uid=$member[uid]&gid=$member[gid]">编辑</a></td>
+	</tr>
+<!--
+EOT;
+}}print <<<EOT
+-->
+</table>
+</div>
+<div class="mb10 cc">$pages</div>
+<input type="hidden" name="action" value="del"/>
+<div class="tac mb10">
+	<span class="btn"><span><button type="submit">删 除</button></span></span>
+</div>
+</form>
+<!--
+EOT;
+}elseif($action=='setlevel'){ print <<<EOT
+-->
+<div class="nav3 mb10">
+	<ul class="cc">
+		<li><a href="$basename">系统组列表</a></li>
+		<li class="current"><a href="$basename&action=$action">有效期设置</a></li>
+	</ul>
+</div>
+<!--
+EOT;
+if(!$_POST['step']){ print <<<EOT
+-->
+<form action="$basename" method="post">
+<h2 class="h1">有效期设置</h2>
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+	<tr class="tr1">
+		<td class="td1">用户名</td>
+		<td class="td2"><input class="input input_wa" type="text" name="username" /></td>
+	</tr>
+</table>
+</div>
+<input type="hidden" name="action" value="setlevel" />
+<input type="hidden" name="step" value="1" />
+<div class="tac mb10">
+	<span class="btn"><span><button type="submit">提 交</button></span></span>
+</div>
+</form>
+<!--
+EOT;
+}elseif($_POST['step']==1){
+print <<<EOT
+-->
+<form action="$basename" method="post">
+<h2 class="h1">有效期设置</h2>
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+	<tr class="tr2 td_bgB">
+		<td width="80">用户名</td>
+		<td width="100">限期用户组</td>
+		<td width="100">到期用户组变为</td>
+		<td>有效期限</td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td2">$rt[username]</td>
+		<td class="td2">
+			<select name="gid">$groupstitle</select>
+		</td>
+		<td class="td2">
+			<select name="togid">
+				<option value=""></option>
+				$groupstitle
+			</select>
+		</td>
+		<td class="td2"><input type="text" name="days" class="input input_wa" value="30" /> </td>
+	</tr>
+</table>
+</div>
+<input type="hidden" name="action" value="setlevel" />
+<input type="hidden" name="step" value="2" />
+<input type="hidden" name="uid" value="$rt[uid]" />
+<div class="tac mb10">
+	<span class="btn"><span><button type="submit">提 交</button></span></span>
+</div>
+</form>
+<!--
+EOT;
+}}elseif($action=='edit'){print <<<EOT
+-->
+<div class="nav3 mb10">
+	<ul class="cc">
+		<li><a href="$basename">系统组列表</a></li>
+		<li class="current"><a href="$basename&action=$action">有效期设置</a></li>
+	</ul>
+</div>
+<form action="$basename" method="post">
+<h2 class="h1">有效期设置</h2>
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+	<tr class="tr2 td_bgB">
+		<td width="80">用户名</td>
+		<td width="100">限期用户组</td>
+		<td width="100">到期用户组变为</td>
+		<td>有效期限</td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td2">$men[username]</td>
+		<td class="td2">
+			<select name="gid">$grouplist</select>
+		</td>
+		<td class="td2">
+			<select name="togid">
+				<option value=""></option>
+				$togrouplist
+			</select>
+		</td>
+		<td class="td2">
+			<input type="text" class="input input_wc" name="days" value="$men[days]">
+			<input type="checkbox" name="treset" value="1">时间重设(该用户头衔有效期从当前时间重新开始)
+		</td>
+	</tr>
+</table>
+</div>
+<input type="hidden" name="action" value="edit" />
+<input type="hidden" name="step" value="3" />
+<input type="hidden" name="uid" value="$uid" />
+<div class="tac mb10">
+	<span class="btn"><span><button type="submit">提 交</button></span></span>
+</div>
+</form>
+<!--
+EOT;
+}include_once PrintEot('adminbottom');
+?>
+-->

@@ -1,0 +1,43 @@
+<!--<?php
+include_once PrintEot('left');
+print <<<EOT
+-->
+<div class="admin_info mb10">
+    <h3 class="h1"><b>提示信息</b></h3>
+    <div class="legend"><b>功能说明:</b><br />此功能把站点的URL转换成更容易被搜索引擎收录的形式，普通用户只需开启静态目录部署功能即可，URL形式如:http://www.phpwind.net/thread.php?fid-2.html，不过这种形式中包含有(.php?), 可能会被某些搜索引擎判定为是动态页面, 而降低网站内容被收录的机率，为了能更好的提高您的网站被搜索引擎收录的机率，可以使用参照下面的方法对服务器进行相关设置</div>
+</div>
+<form action="$basename&" method="post">
+<input type=hidden name="step" value="2">
+<h2 class="h1">静态目录部署</h2>
+<div class="admin_table mb10">
+    <table width="100%" cellspacing="0" cellpadding="0">
+        <tr class="tr1">
+            <td class="td1">静态目录部署功能</td>
+            <td class="td2">
+            	<ul class="list_A list_80">
+                	<li><input type="radio" name="config[htmifopen]" value="1" $htmifopen_Y>开启</li>
+                    <li><input type="radio" name="config[htmifopen]" value="0" $htmifopen_N>关闭</li>
+                </ul>
+            </td>
+        </tr>
+        <tr class="tr1">
+            <td class="td1">静态目录</td>
+            <td class="td2"><input class="input input_wa" value="$db_dir" name="config[dir]"></td>
+        </tr>
+        <tr class="tr1">
+            <td class="td1">静态目录扩展名设置</td>
+            <td class="td2"><input class="input input_wa" value="$db_ext" name="config[ext]"></td>
+        </tr>
+    </table>
+</div>
+<div class="tac mb10">
+	<span class="btn"><span><button type="submit">提 交</button></span></span>
+</div>
+<h3 class="h1">使用方法:</h3>
+<div class="legend">以apache服务器为例介绍使用方法.<ol>
+	<li>在<b>静态目录部署</b>中，开启静态目录部署功能，将静态目录设置为"<font color="red"><b>-htm-</b></font>"，将静态目录扩展名设置为:"<font color="red"><b>.html</b></font>"<br/>&nbsp;&nbsp;默认的URL形式为 "http://www.phpwind.net/thread<font color="red"><b>.php?</b></font>fid=2"<br/>&nbsp;&nbsp;新的URL形式为&nbsp; &nbsp; "http://www.phpwind.net/thread<font color="red"><b>-htm-</b></font>fid-2<font color="red"><b>.html</b></font>"<br/>&nbsp;&nbsp;这种纯静态形式的URL更易被搜索引擎收录</li>
+	<li>Apache Web Server 的配置<br/>&nbsp;&nbsp;首先确定加载了 Mod_rewrite 模块，方法: 检查 conf/httpd.conf 中是否存在以下两段代码 (具体路径可能会有所不同，但形式基本是一样的):<br/><br/>(一)LoadModule rewrite_module     libexec/mod_rewrite.so<br/> (二)AddModule mod_rewrite.c<br/><br/> 如果存在，那么在配置文件（通常就是conf/httpd.conf）中加入如下代码。此时须注意，如果网站使用通过虚拟主机来定义，请务必加到虚拟主机配置中去，否则可能无法使用。改好后然后将 Apache 重启. <br/><br/>&lt;IfModule mod_rewrite.c&gt;<br/> RewriteEngine On<br/> RewriteRule ^(.*)<font color="red"><b>-htm-</b></font>(.*)$ $1.php?$2<br/>&lt;/IfModule&gt;</li></ol></div>
+<!--
+EOT;
+include_once PrintEot('adminbottom');
+?>-->

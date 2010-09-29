@@ -1,0 +1,241 @@
+<!--<?php
+if(empty($action) || $action=='center'){
+$num = 0;
+foreach($result as $key => $value){
+	foreach($value['sub'] as $k => $v){
+		$num++;
+		$b = $num%2;
+if($b!=0){
+print <<<EOT
+-->
+			  <div class="cc mb10">
+<!--
+EOT;
+}
+		switch($value['tag']){
+			case 'memberHot':
+print <<<EOT
+-->
+				<div class="w-390 fl">
+					<div class="p10">
+						<h5 class="h5"><a href="{$basename}action=$value[tag]&sub=$v[tag]" class="fr">更多</a><strong>用户$v[cTime]$v[title]</strong></h5>
+						<div id="list_$num" class="img-list-a">
+<!--
+EOT;
+foreach($v['data'] as $k1 => $v1){
+print <<<EOT
+-->
+							<dl class="cc">
+							<dt class="fl"><a href="$v1[url]" target="_blank"><img height="20" align="absmiddle" width="20" src="$v1[image]" class="mr10"/></a><span class="fl"><a href="$v1[url]" class="link-w" target="_blank">$v1[title]</a>
+							<span class="none">最后登录: $v1[lastDate]</span></span>
+							</dt>
+							<dd class="fr">$v[cType] $v1[value]$v[unit]</dd>
+							</dl>
+<!--
+EOT;
+}print <<<EOT
+-->
+						</div>
+						<script language="JavaScript">New(changeView,['list_$num','dl']);</script>
+					</div>
+				</div>
+<!--
+EOT;
+			break;
+			case 'threadHot':
+print <<<EOT
+-->
+				<div class="w-390 fl">
+					<div class="p10">
+						<h5 class="h5"><a href="{$basename}action=$value[tag]&sub=$v[tag]" class="fr">更多</a><strong>帖子$v[cTime]$v[title]</strong></h5>
+						<table width="100%">
+<!--
+EOT;
+foreach($v['data'] as $k1 => $v1){
+print <<<EOT
+-->
+						<tr class="tr3">
+						<td width="60"><span class="replay-bg"><div class="b s1 f16">$v1[value]</div>
+<!--
+EOT;
+if($v[tag]=="threadRate"){print <<<EOT
+-->
+		&nbsp;<a href="javascript:;" onclick="quickRateRequest('$v1[id]','1','$v[action]')" class="s7">评价</a>
+<!--
+EOT;
+}elseif($v[tag]=="threadFav"){print <<<EOT
+-->
+		&nbsp;<a id="favor" title="收藏为私有" href="javascript:;" onclick="sendmsg('pw_ajax.php?action=favor&tid=$v1[id]&fid=$v1[fid]','',this.id)" class="s7">收藏</a>
+<!--
+EOT;
+}elseif($v[tag]=="threadShare"){print <<<EOT
+-->
+<!--
+EOT;
+}else{print <<<EOT
+-->
+		&nbsp;$v[unit]
+<!--
+EOT;
+}print <<<EOT
+-->
+						</span></td>
+						<td class="lh_22"><p><a class="line" href="$v1[url]" target="_blank">$v1[title]</a></p>作者：<a href="u.php?username=$v1[author]" target="_blank" class="s7">$v1[author]</a><p>发帖：<span class="f10">$v1[postdate]</span></p></td>
+						</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+						</table>
+					</div>
+				</div>
+<!--
+EOT;
+			break;
+			case 'diaryHot':
+print <<<EOT
+-->
+				<div class="w-390 fl">
+					<div class="p10">
+						<h5 class="h5"><a href="{$basename}action=$value[tag]&sub=$v[tag]" class="fr">更多</a><strong>日志$v[cTime]$v[title]</strong></h5>
+						<table width="100%">
+<!--
+EOT;
+foreach($v['data'] as $k1 => $v1){
+print <<<EOT
+-->
+						<tr class="tr3">
+						<td width="60"><span class="replay-bg"><div class="b s1 f16">$v1[value]</div>
+<!--
+EOT;
+if($v[tag]=="diaryRate"){print <<<EOT
+-->
+		&nbsp;<a href="javascript:;" onclick="quickRateRequest('$v1[id]','2','$v[action]')" class="s7">评价</a>
+<!--
+EOT;
+}elseif($v[tag]=="diaryFav"){print <<<EOT
+-->
+	    &nbsp;<a id="diaryFav" href="javascript:;" onclick="sendmsg('operate.php?action=share&ajax=1&type=diary&id=$v1[id]','',this.id);" class="s7">收藏</a>
+<!--
+EOT;
+}elseif($v[tag]=="diaryShare"){print <<<EOT
+-->
+		&nbsp;<a id="diaryShare" href="javascript:;" onclick="sendmsg('operate.php?action=share&ajax=1&type=diary&id=$v1[id]','',this.id);" class="s7">分享</a>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+		&nbsp;$v[unit]
+<!--
+EOT;
+}print <<<EOT
+-->
+						</span></td>
+						<td class="lh_22"><a class="line" href="$v1[url]" target="_blank">$v1[title]</a>
+						<p>作者：<a href="u.php?username=$v1[author]" target="_blank" class="s7">$v1[author]</a></p>
+						<span class="f10">$v1[posttime]</span></td>
+						</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+						</table>
+					</div>
+				</div>
+<!--
+EOT;
+			break;
+			case 'forumHot':
+print <<<EOT
+-->
+				<div class="w-390 fl">
+					<div class="p10">
+						<h5 class="h5"><a href="{$basename}action=$value[tag]&sub=$v[tag]" class="fr">更多</a><strong>版块$v[title]</strong></h5>
+						<table width="100%">
+<!--
+EOT;
+foreach($v['data'] as $k1 => $v1){
+print <<<EOT
+-->
+						<tr class="tr3">
+						<td width="60"><span class="replay-bg"><div class="b s1 f16">$v1[value]</div>$v[unit]</span></td>
+						<td class="lh_22"><a class="f14 line" href="thread.php?fid=$v1[id]" target="_blank">$v1[title]</a>
+						<p>最后发帖：<a href="$v1[url]" target="_blank" class="s7">$v1[desc]</a></p><span class="f10">$v1[lastDate]</span></td>
+						</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+						</table>
+					</div>
+				</div>
+<!--
+EOT;
+			break;
+		}
+if($b == 0){
+print <<<EOT
+-->
+		</div>
+<!--
+EOT;
+}
+
+if('picHot' == $value['tag']){
+if( $b != 0){
+print <<<EOT
+-->
+</div>
+<!--
+EOT;
+$num=0;
+}print <<<EOT
+-->
+	<div class="p10">
+		<h5 class="h5"><a href="{$basename}action=$value[tag]&sub=$v[tag]" class="fr">更多</a><strong>照片$v[cTime]$v[title]</strong></h5>
+		<ul class="img-list-b cc">
+<!--
+EOT;
+foreach($v['data'] as $k1 => $v1){
+$v1[image] = getphotourl($v1[image],$v1['ifthumb']);
+print <<<EOT
+-->
+		<li><a href="$v1[url]" target="_blank" class="aimg"><span><img src="$v1[image]" /></span></a>
+		<p><span class="mr10">$v[unit]数：$v1[value]</span>
+<!--
+EOT;
+if($v[tag]=="picRate"){print <<<EOT
+-->
+		<a onclick="quickRateRequest($v1[id],'3','$v[action]');" href="javascript:;" class="s7">评价</a>
+<!--
+EOT;
+}elseif($v[tag]=="picFav"){print <<<EOT
+-->
+		<a  onclick="sendmsg('operate.php?action=share&ajax=1&type=photo&id=$v1[id]','',this.id);" href="javascript:;" class="s7">收藏</a>
+<!--
+EOT;
+}elseif($v[tag]=="picShare"){print <<<EOT
+-->
+		<a  onclick="sendmsg('operate.php?action=share&ajax=1&type=photo&id=$v1[id]','',this.id);" href="javascript:;" class="s7">分享</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+		</p>
+		</li>
+<!--
+EOT;
+}print <<<EOT
+-->
+		</ul>
+	</div>
+<!--
+EOT;
+}}}
+if( $b != 0 && $num!=0){
+print <<<EOT
+-->
+</div>
+<!--
+EOT;
+}}?>-->

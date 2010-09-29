@@ -1,0 +1,77 @@
+<!--<?php print <<<EOT
+-->
+<div class="main fr">
+	<div class="h">$lang[showmsg]</div>
+	<div class="m-content">
+		$msg
+	</div>
+
+	<center>
+<!--
+EOT;
+if($gojs || $jump){print <<<EOT
+-->
+<script language="JavaScript">
+setTimeout(function(){{$url}},2000);
+</script>
+<!--
+EOT;
+}print <<<EOT
+-->
+<form id="install" action="$basename?" method="post">
+	<input type="hidden" name="step" value="$tostep">
+	<input type="hidden" name="action" value="$toaction">
+	<input type="hidden" name="from" value="prompt">$input
+</form>
+<!--
+EOT;
+if(!$jump){
+if($toaction){print <<<EOT
+-->
+
+	<input type="button" class="btn4" value="$lang[step_pre]" title="$stepleft" onClick='window.location.href="javascript:history.go(-1)";'>
+<!--
+EOT;
+}print <<<EOT
+-->
+	<input type="button" class="btn2" title="$lang[step_next]" value="$lang[last]" onClick="$url" />
+<!--
+EOT;
+}print <<<EOT
+-->
+	</center>
+      </div>
+
+	<div class="st-sidebar fl link3">
+		<ul class="step">
+<!--
+EOT;
+if (strpos("$basename","up") !== false || strpos("$basename","repair") !== false){print<<<EOT
+-->
+		    <li class="step-normal"><span class="step-num">1</span>&nbsp;&nbsp;$lang[update_1]</li>
+			<li class="step-on"><span class="step-num_on">2</span>&nbsp;&nbsp;$lang[update_2]</li>
+			<li class="step-normal"><span class="step-num">3</span>&nbsp;&nbsp;$lang[update_3]</li>
+			<li class="step-sec">$lang[update_finish]</li>
+<!--
+EOT;
+}elseif(strpos("$basename","install.php") !== false){print<<<EOT
+-->
+			<li class="step-normal"><span class="step-num">1</span>&nbsp;&nbsp;$lang[install_1]</li>
+			<li class="step-normal"><span class="step-num">2</span>&nbsp;&nbsp;$lang[install_2]</li>
+			<!-- <li class="step-normal"><span class="step-num">3</span>&nbsp;&nbsp;$lang[install_3]</li> -->
+			<li class="step-on"><span class="step-num_on">3</span>&nbsp;&nbsp;$lang[install_4]</li>
+			<!-- <li class="step-normal"><span class="step-num">5</span>&nbsp;&nbsp;$lang[install_5]</li> -->
+			<!-- <li class="step-normal"><span class="step-num">4</span>&nbsp;&nbsp;$lang[install_6]</li> -->
+			<li class="step-sec">$lang[install_finish]</li>
+<!--
+EOT;
+}print<<<EOT
+-->
+		</ul>
+		<div class="set-faq">
+			$lang[step_problem]
+		</div>
+	</div>
+<!--
+EOT;
+?>-->

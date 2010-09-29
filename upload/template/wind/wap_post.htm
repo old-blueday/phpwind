@@ -1,0 +1,68 @@
+<!--<?php
+if ($action == 'new') {print <<<EOT
+-->
+<p><b>发表新主题</b></p>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+<p><b>回复</b>$tp[subject]</p>
+<!--
+EOT;
+}print <<<EOT
+-->
+<p>标题:<input name="subject" type="text" /><br />
+内容:<input name="content" type="text" />
+<!--
+EOT;
+if($action=='new'){print <<<EOT
+-->
+<br />
+版块:
+<!--
+EOT;
+if(!$fid){print <<<EOT
+-->
+<select name="fid">
+$cates
+</select>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+$forumname
+<!--
+EOT;
+}}print <<<EOT
+-->
+</p>
+<p>
+<anchor title="确定">确定
+<go href="$refer" method="post">
+<postfield name="subject" value="$(subject)" />
+<postfield name="content" value="$(content)" />
+<!--
+EOT;
+if($action=='new' && !$fid){print <<<EOT
+-->
+<postfield name="fid" value="$(fid)" />
+<!--
+EOT;
+}print <<<EOT
+-->
+</go></anchor>
+</p>
+<p>
+<!--
+EOT;
+if($fid){print <<<EOT
+-->
+<a href="list.php?fid=$fid">主题</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+&#160;<a href="index.php?prog=cate">版块</a></p>
+<!--
+EOT;
+?>-->

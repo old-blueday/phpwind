@@ -1,0 +1,180 @@
+<!--<?php
+include_once PrintEot('left');
+if(!$action){print <<<EOT
+-->
+<div class="admin_info mb10">
+	<h3 class="h1"><b>提示信息</b></h3>
+	<div class="legend">自定义代码功能说明:<ol><li>自定义代码是 Wind Code 代码功能的扩展和延伸,仅对帖子有效</li>
+	<li>需在<a href="$admin_file?adminjob=settings&admintype=member"><font color="blue">信息发布</font></a>处开启后方可使用</li></ol></div>
+</div>
+<form action="$basename" method="post" name="FORM">
+<input type="hidden" name="action" value="submit" />
+<h2 class="h1">
+<span class="fl mr10">自定义代码格式</span>
+<a class="btn_add fl" href="$basename&action=add" hidefocus="true"><i>添加代码格式</i></a>
+</h2>
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+	<tr class="tr2 td_bgB">
+		<td width="30"><span onclick="CheckAll(document.FORM)" class="cp">全选</span></td>
+		<td width="80">标签代码</td>
+		<td width="200">标题</td>
+		<td width="80">图标</td>
+		<td width="80">类型</td>
+		<td>操作</td>
+	</tr>
+<!--
+EOT;
+if (empty($codedb)) {print <<<EOT
+-->
+<tr><td class="p10" colspan="6"><div class="admin_tips">啊哦，没有你要的信息！</div></td></tr>
+<!--
+EOT;
+}else{
+foreach($codedb as $key=>$value){print <<<EOT
+-->
+	<tr class="tr1 vt">
+		<td class="td2"><input type="checkbox" name="selid[]" value="$value[id]" /></td>
+		<td class="td2">$value[name]</td>
+		<td class="td2">$value[title]</td>
+		<td class="td2"><img src="$imgpath/post/c_editor/$value[icon]" /></td>
+		<td class="td2">
+<!--
+EOT;
+if ($value['param'] == 0) {print <<<EOT
+-->
+ 只允许字符 
+<!--
+EOT;
+} elseif ($value['param'] == 1) {print <<<EOT
+-->
+ 字符和数字 
+<!--
+EOT;
+} elseif ($value['param'] == 2) {print <<<EOT
+-->
+ 只允许数字
+<!--
+EOT;
+}print <<<EOT
+-->
+		</td>
+		<td class="td2"><a href="$basename&action=edit&id=$value[id]" title="编辑">[编辑]</a></td>
+	</tr>
+<!--
+EOT;
+}}print <<<EOT
+-->
+</table>
+</div>
+<div class="tac mb10">
+	<span class="btn"><span><button type="submit">删除</button></span></span>
+</div>
+</form>
+<!--
+EOT;
+}elseif($action=='add' || $action=='edit'){print <<<EOT
+-->
+<form name="R" action="$basename" method="post">
+<input type="hidden" name="action" value="$action" />
+<input type="hidden" name="step" value="2" />
+<input type="hidden" name="id" value="$id" />
+<h2 class="h1">
+<!--
+EOT;
+if($action=='add'){print <<<EOT
+-->
+	<span class="mr10">添加自定义代码</span>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+	<span class="mr10">编辑自定义代码</span>
+<!--
+EOT;
+}print <<<EOT
+-->
+<a href="$basename" class="linka">返回上一级<span class="f9">▲</span></a></h2>
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+	<tr class="tr1 vt">
+		<td class="td1">标签代码</td>
+		<td class="td2"><input type="text" name="name" value="$rt[name]" class="input input_wa" /></td>
+	 <td class="td2"><div class="help_a">填写方括号中的标签代码，如 [tag] 的标签为 <font color="red">tag</font> </div></td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">标题</td>
+	<td class="td2"><input type="text" name="title" value="$rt[title]" class="input input_wb" /></td>
+	 <td class="td2"><div class="help_a">填写标签标题</div></td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">图标文件名</td>
+		<td class="td2"><input type="text" name="icon" value="$rt[icon]" class="input input_wb" /></td>
+		<td class="td2"><div class="help_a">将图片文件上传至根目录下images/post/c_editor中，然后在此填写文件名</div></td>
+	</tr>
+	<tr class="tr1 vt">
+			<td class="td1">搜索模式</td>
+		<td class="td2">
+			<select name="param" size="6" multiple="multiple" onchange="showparam(this.value)">
+				<option value="1" $s_1>[tag]{1}[/tag]</option>
+				<option value="2" $s_2>[tag={1}]{2}[/tag]</option>
+				<option value="3" $s_3>[tag={1},{2}]{3}[/tag]</option>
+			</select>
+			 <td class="td2"><div class="help_a">选择内容搜索规则</div></td>
+		</td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">参数类型</td>
+		<td class="td2">
+<!--
+EOT;
+for($i=0;$i<3;$i++){
+$j=$i+1;
+$t_0=${'r_'.$i.'_0'};
+$t_1=${'r_'.$i.'_1'};
+$t_2=${'r_'.$i.'_2'};
+print <<<EOT
+-->
+		<div id="pat_$i" class="cc" style="display:none">
+			<span class="fl mr10"><b>参数{{$j}}:</b></span>
+			<ul class="list_A list_80 fl">
+				<li><input type="radio" name="pattern[$i]" value="0" $t_0 /> 只允许字符 </li>
+				<li><input type="radio" name="pattern[$i]" value="1" $t_1 /> 字符和数字 </li>
+				<li><input type="radio" name="pattern[$i]" value="2" $t_2 /> 只允许数字</li>
+			</ul>
+		</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+		</td>
+		 <td class="td2"><div class="help_a">选择参数类型</div></td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">替换规则</td>
+		<td class="td2"><textarea name="replace" class="textarea">$rt[replacement]</textarea></td>
+		 <td class="td2"><div class="help_a">填写使用此标签以后得到的内容</div></td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">提示语言</td>
+	<td class="td2"><textarea name="descrip" class="textarea">$rt[descrip]</textarea></td>
+	 <td class="td2"><div class="help_a">填写各个参数时的提示<br />每行一个,分别针对{1},{2},{3}</div></td>
+	</tr>
+</table>
+</div>
+<div class="tac mb10">
+	<span class="btn"><span><button type="submit">提 交</button></span></span>
+</div>
+</form>
+<script language="JavaScript">
+function showparam(id){
+	for(var i=0;i<3;i++){
+		document.getElementById('pat_'+i).style.display = i<id ? '' : 'none';
+	}
+}
+showparam(document.R.param.value);
+</script>
+<!--
+EOT;
+}include_once PrintEot('adminbottom');
+?>-->

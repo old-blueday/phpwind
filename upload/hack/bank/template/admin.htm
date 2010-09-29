@@ -1,0 +1,169 @@
+<!--<?php
+include_once PrintEot('left');print <<<EOT
+-->
+<div class="mb10"><a href="$admin_file?adminjob=hackcenter">插件中心</a>&raquo; <a href="javascript:;">{$db_hackdb[bank][0]}</a></div>
+<!--
+EOT;
+if(empty($action)){print <<<EOT
+-->
+<div class="nav3 mb10">
+      <ul class="cc">
+      <li class="current"><a href="$basename">银行设置</a></li>
+      <li><a href="$basename&action=log">日志管理</a></li>
+    </ul>
+</div>
+<div class="admin_info mb10">
+	<h3 class="h1">提示信息</h3>
+    <div class="legend">银行设置:可开启关闭银行功能，以及设置银行基本参数</div>
+</div>
+<form action="$basename" method="post">
+  <input type="hidden" name="action" value="unsubmit" />
+  <h2 class="h1">银行参数设置</h2>
+  <div class="admin_table mb10">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <tr class="tr1 vt">
+      <td class="td1">银行功能</td>
+      <td class="td2">
+      	<ul class="cc list_80 list_A">
+            <li><input type="radio" value=1 $bk_open_1 name="config[open]" />开启</li>
+            <li><input type="radio" value="0" $bk_open_0 name="config[open]" />关闭</li>
+          </ul>
+		  <td class="td2"><div class="help_a">需要到插件中心 管理中同时启用该插件方为有效</div></td>
+        </td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">转帐功能</td>
+      <td class="td2">
+        <ul class="cc list_80 list_A">
+            <li><input type="radio" value="1" $bk_virement_1 name="config[virement]" />开启</li>
+            <li><input type="radio" value="0" $bk_virement_0 name="config[virement]" />关闭</li>
+          </ul>
+        </td>
+		<td class="td2"><div class="help_a"></div></td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">银行排行榜更新时间设置</td>
+      <td class="td2"><input class="input input_wa" value="$bk_per" name="config[per]" /></td>
+	  <td class="td2"><div class="help_a"></div></td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">银行排行榜显示个数</td>
+      <td class="td2"><input class="input input_wa" value="$bk_num" name="config[num]" /></td>
+	  <td class="td2"><div class="help_a"></div></td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">银行转帐手续费[%]</td>
+      <td class="td2"><input class="input input_wa" value="$bk_virerate" name="config[virerate]" /></td>
+	  <td class="td2"><div class="help_a"></div></td>
+	      </tr>
+    <tr class="tr1 vt">
+      <td class="td1">银行转帐最低限制</td>
+      <td class="td2"><input class="input input_wa" value="$bk_virelimit" name="config[virelimit]" /></td>
+	  <td class="td2"><div class="help_a"></div></td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">银行交易时间间隔[秒]</td>
+      <td class="td2"><input class="input input_wa" value="$bk_timelimit" name="config[timelimit]" /></td><td class="td2"><div class="help_a"></div></td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">银行活期存款利率[%]</td>
+      <td class="td2"><input class="input input_wa" value="$bk_rate" name="config[rate]" /></td>
+	  <td class="td2"><div class="help_a"></div></td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">银行定期存款利率[%]</td>
+      <td class="td2"><input class="input input_wa" value="$bk_drate" name="config[drate]" /></td>
+	  <td class="td2"><div class="help_a"></div></td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">银行定期存款期限[月]</td>
+      <td class="td2"><input class="input input_wa" value="$bk_ddate" name="config[ddate]" /></td>
+	  <td class="td2"><div class="help_a"></div></td>
+    </tr>
+  </table>
+  </div>
+  <div class="mb10 tac">
+    <span class="btn"><span><button type="submit">提 交</button></span></span>
+   </div>
+</form>
+
+<!--
+EOT;
+}elseif($action=='log'){print <<<EOT
+-->
+<div class="nav3 mb10">
+  <ul class="cc">
+      <li><a href="$basename">银行设置</a></li>
+      <li class="current"><a href="$basename&action=log">日志管理</a></li>
+    </ul>
+</div>
+<div class="admin_info mb10">
+	<h3 class="h1">提示信息</h3>
+    <div class="legend">银行日志：清晰地记录用户每一笔交易信息，方便查询</div>
+ </div>
+<form action="$basename&action=log&" method="post">
+  <h2 class="h1">搜索</h2>
+  <div class="admin_table mb10">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <tr class="tr1 vt">
+      <td class="td2">用户名:
+        <input type="text" class="input input_wa" name="username1" value="$username1" /></td>
+      <td class="td2">关键字:
+        <input type="text" class="input input_wa" name="keyword" value="$keyword" /></td>
+      <td class="td2"><select name="type"  class="select_wa">
+          <option value="all">全部</option>
+          <option value="bk_save" $select[bk_save]>{$lang[logtype][bk_save]}</option>
+          <option value="bk_draw" $select[bk_draw]>{$lang[logtype][bk_draw]}</option>
+          <option value="bk_vire" $select[bk_vire]>{$lang[logtype][bk_vire]}</option>
+          <option value="bk_credit" $select[bk_credit]>{$lang[logtype][bk_credit]}</option>
+        </select>
+      </td>
+      <td class="td2"><span class="bt2"><span><button type="submit" value="提 交">提 交</button></span></span></td>
+    </tr>
+</table>
+</div> 
+</form>
+<div class="cc mb10">$pages</div>
+<form action="$basename&" method="post">
+  <input type="hidden" name="action" value="dellog" />
+  <h2  class="h1">银行操作日志</h2>
+  <div class="admin_table mb10">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <tr class="tr2">
+      <td>ID</td>
+      <td>类型</td>
+      <td>描述</td>
+      <td>操作日期</td>
+      <td>IP</td>
+      <td>删除</td>
+    </tr>
+<!--
+EOT;
+$num=($page-1)*$db_perpage;
+foreach($logdb as $key => $value){
+$num++;
+print <<<EOT
+-->
+    <tr class="tr1 vt">
+      <td class="td2">$num</td>
+      <td class="td2">{$lang[logtype][$value[type]]}</td>
+      <td class="td2">$value[descrip]</td>
+      <td class="td2">$value[date]</td>
+      <td class="td2">$value[ip]</td>
+      <td class="td2"><input type="checkbox" name="selid[]" value="$value[id]" /></td>
+    </tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+  </table>
+  </div>
+  <div class="mb10 tac">
+    <span class="bt"><span><button type="button" name="chkall" onclick="CheckAll(this.form)">全 选</button></span></span>
+    <span class="btn"><span><button type="submit"  name="hello">提 交</button></span></span>
+   </div>
+</form>
+<!--
+EOT;
+}include_once PrintEot('adminbottom');
+?>-->

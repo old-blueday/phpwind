@@ -1,0 +1,486 @@
+<!--<?php
+include_once PrintEot('left');
+print <<<EOT
+-->
+<!--
+EOT;
+if(empty($action) || $action =='viewverify') {print <<<EOT
+-->
+<script language="JavaScript" src="js/global.js"></script>
+<script language="JavaScript" src="js/pw_ajax.js"></script>
+<div class="nav3 mb10">
+	<ul class="cc">
+<!--
+EOT;
+if(empty($action)) {print <<<EOT
+-->
+        <li class="current"><a href="$basename">推送内容管理</a></li>
+        <li><a href="$basename&action=viewverify">审核内容</a></li>
+<!--
+EOT;
+} else {print <<<EOT
+-->
+		<li><a href="$basename">推送内容管理</a></li>
+        <li class="current"><a href="$basename&action=viewverify">审核内容</a></li>
+<!--
+EOT;
+}print <<<EOT
+-->
+    </ul>
+</div>
+<h2 class="h1">搜索条件</h2>
+<div class="admin_table mb10">
+<form action="$basename" method="post">
+	<input type="hidden" name="action" value="$action" />
+    <table cellpadding="0" cellspacing="0" width="100%">
+    	<tr class="tr1">
+        	<td class="td2">
+            	所属频道:<select name="alias" id="alias" class="select_wa mr10">
+				<option value=""></option>
+<!--
+EOT;
+foreach($portalPages as $key=>$val){
+$selected = $alias == $key ? 'selected="selected"' : '';
+print <<<EOT
+-->
+			<option value="$key" $selected>$val[name]</option>
+<!--
+EOT;
+}print <<<EOT
+-->
+				</select>
+				所属模块:<select name="invoke" id="invoke"  class="mr10">
+				<option value=""></option>
+<!--
+EOT;
+foreach($invokes as $key=>$val){
+$selected = $key == $invoke ? 'selected="selected"' : '';
+print <<<EOT
+-->
+			<option value="$key" $selected>$val[title]</option>
+<!--
+EOT;
+}print <<<EOT
+-->
+				</select>
+				<select name="invokepiece" id="invokepiece" class="mr10">
+				<option value=""></option>
+<!--
+EOT;
+foreach($invokepieces as $key=>$val){
+$selected = $key == $invokepiece ? 'selected="selected"' : '';
+print <<<EOT
+-->
+			<option value="$key" $selected>$val</option>
+<!--
+EOT;
+}print <<<EOT
+-->
+				</select>
+				<!-- 
+            	标题:<input name="keyword" value="$keyword" type="text" class="input input_wa" />
+            	 -->
+                <span class="bt2"><span><button type="submit">提 交</button></span></span>
+            </td>
+        </tr>
+    </table>
+</form>
+</div>
+<script language="JavaScript" src="js/global.js"></script>
+<script language="JavaScript" src="js/pw_ajax.js"></script>
+<script language="JavaScript" src="js/core/core.js"></script>
+<script language="JavaScript" src="mode/area/js/invokechange.js"></script>
+<script language="javascript">
+var changeItem = New(change,['alias','invoke','invokepiece','$ajax_basename','$invokesForJs']);
+</script>
+<h2 class="h1"><span class="mr5 fl">推送内容管理</span></h2>
+<form action="$basename" method="post" name="FORM">
+<div class="admin_table mb10">
+	<table width="100%">
+    	<tr class="tr2">
+    		<td width="25"><span onclick="CheckAll(document.FORM)" class="cp">全选</span></td>
+			<td>标题</td>
+			<td width="60">所属频道</td>
+			<td width="180">所属模块</td>
+			<td width="60">排序等级</td>
+			<td width="90">推荐人</td>
+			<td width="130">显示时间</td>
+			<td width="130">操作</td>
+       </tr>
+<!--
+EOT;
+foreach($pushdatas as $value){
+$temp_channel = $portalPages[$value['sign']]['name'];
+$value[starttime] = get_date($value[starttime],'Y-m-d H:i:s');
+$u_link=$value[data][url];
+$add_star=$value[ifbusiness] ==1 ?'<img src="images/star.png" height="13" style="vertical-align:middle">&nbsp;':'';
+print <<<EOT
+-->
+        <tr class="tr1">
+        	<td class="td2"><input type="checkbox" name="selid[]" value="$value[id]" /></td>
+            <td class="td2">
+<!--
+EOT;
+if('' == $u_link) {print <<<EOT
+-->
+	{$add_star}{$value[data][title]}</td>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+		<a href="$u_link" target="_blank">{$add_star}{$value[data][title]}</a></td>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+    
+			<td class="td2">{$temp_channel}</td>
+            <td class="td2">$value[invoketitle]</td>
+            <td class="td2">$value[grade]</td>
+            <td class="td2">$value[editor]</td>
+<!--
+EOT;
+if ($value[starttime]>$timestamp) {print <<<EOT
+-->
+			<td class="td2" title="该内容为提前推荐，只有到设置时间后，才会在模块显示">$value[starttime]</td>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+			<td class="td2">$value[starttime]</td>
+<!--
+EOT;
+}print <<<EOT
+-->
+            <td class="td2">
+<!--
+EOT;
+if($value[invokename]) {print <<<EOT
+--><a href="$editUrl&action=edit&pushdataid=$value[id]" class="mr5">[编辑]</a><!--
+EOT;
+}if($action) {print <<<EOT
+--><a href="javascript:;" onclick="verifyPushdata($value[id]);" class="mr5">[审核]</a><!--
+EOT;
+}print <<<EOT
+--><a href="javascript:;" onclick="delPushdata($value[id]);" class="mr5">[删除]</a>
+            </td>
+        </tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+		<tr class="tr2">
+    		<td colspan="8"><span onclick="CheckAll(document.FORM)" class="cp">全选</span></td>
+        </tr>
+    </table>
+</div>
+<div class="cc mb10">$pages</div>
+<div class="tac mb10">
+	<p class="mb10">
+		<span>选中操作:</span>
+		<input type="radio" name="action" value="dels" />&nbsp;删除&nbsp;
+	</p>
+	<p>
+	<span class="btn"><span><button type="submit" onclick="return confirm('您确认要进行此操作吗?');">提 交</button></span></span></p>
+</div>
+</form>
+<script src="js/pw_ajax.js" language="JavaScript"></script>
+<script src="js/global.js" language="JavaScript"></script>
+<script>
+
+function delPushdata(id){
+	if (!confirm("确定要删除此数据吗？")){
+		return false;
+	}
+	var url = "$ajax_basename";
+	ajax.send(url,'action=del&id='+id,ajax.get);
+}
+function verifyPushdata(id) {
+	var url = "$ajax_basename";
+	ajax.send(url,'action=verify&id='+id,ajax.get);
+}
+
+</script>
+<!--
+EOT;
+}elseif($action =='edit') {print <<<EOT
+-->
+<script type="text/javascript" src="js/core/core.js"></script>
+<script type="text/javascript" src="js/global.js"></script>
+<script type="text/javascript" src="js/pw_ajax.js"></script>
+<script src="js/date.js" language="JavaScript"></script>
+<script language="JavaScript" src="mode/area/js/invokechange.js"></script>
+<div class="nav3 mb10">
+	<ul class="cc">
+        <li><a href="$basename">推送内容管理</a></li>
+        <li><a href="$basename&action=viewverify">审核内容</a></li>
+        <li class="current"><a href="javascript:;">编辑内容</a></li>
+    </ul>
+</div>
+<h2 class="h1"><span class="mr5 fl">编辑内容</span></h2>
+<form action="$basename&action=edit" method="post" onsubmit="return false;"  enctype="multipart/form-data" >
+	<input type="hidden" name="step" value="2" />
+	<input type="hidden" name="pushdataid" value="$pushdataid" />
+	
+	<input type="hidden" name="page" value="$page" />
+	<input type="hidden" name="alias" value="$alias" />
+	<input type="hidden" name="invoke" value="$invoke" />
+	<input type="hidden" name="invokepiece" value="$temp_invokepiece" />
+
+    <div class="admin_table">
+    	<table width="100%">
+            <tr class="tr1">
+                <td class="td1">模块</td>
+                <td class="td2">
+                	所属频道:<select id="select_alias" class="select_wa mr10">
+			<option value=""></option>
+<!--
+EOT;
+foreach($portalPages as $key=>$val){
+$selected = $channelAlias == $key ? 'selected="selected"' : '';
+print <<<EOT
+-->
+			<option value="$key" $selected>$val[name]</option>
+<!--
+EOT;
+}print <<<EOT
+-->
+				</select>
+		所属模块:<select id="select_invoke" class="select_wa mr10">
+					<option value=""></option>
+<!--
+EOT;
+foreach($invokes as $key=>$val){
+$selected = $key == $invokename ? 'selected="selected"' : '';
+print <<<EOT
+-->
+					<option value="$key" $selected>$key</option>
+<!--
+EOT;
+}print <<<EOT
+-->
+				</select>
+				<select name="invokepieceid" id="select_invokepiece" class="select_wa mr10">
+					<option value=""></option>
+<!--
+EOT;
+foreach($invokepieces as $key=>$val){
+$selected = $key == $invokepieceid ? 'selected="selected"' : '';
+print <<<EOT
+-->
+					<option value="$key" $selected>$val</option>
+<!--
+EOT;
+}print <<<EOT
+-->
+				</select>
+           </td>
+       </tr>
+       <tr class="tr1 vt">
+           <td class="td1">排序等级</td>
+           <td class="td2">
+           	<ul class="link_A list_80">
+                   <li><label><input type="radio" name="offset" value="0" {$offsets[0]} />普通</label></li>
+                   <li><label><input type="radio" name="offset" value="1" {$offsets[1]} />一等级</label></li>
+                   <li><label><input type="radio" name="offset" value="2" {$offsets[2]} />二等级</label></li>
+                   <li><label><input type="radio" name="offset" value="3" {$offsets[3]} />三等级</label></li>
+                   <li><label><input type="radio" name="offset" value="4" {$offsets[4]} />四等级</label></li>
+                   <li><label><input type="radio" name="offset" value="5" {$offsets[5]} />五等级</label></li>
+               </ul>
+           </td>
+       </tr>
+	</table>
+<div id="portalbox">
+	<table width="100%">
+		<tbody id="param">
+<!--
+EOT;
+foreach ($push[data] as $k=>$val) {
+if ($k=='tagrelate') {
+	$iftagrelate = 1;
+	continue;
+}
+$name = $dataSourceService->getSourceLang($k,$invokepiece['action']);
+if (is_numeric($invokepiece[param][$k])) {
+if($k=='descrip'){
+$add = 'onKeyUp="countlen(this,\''.$invokepiece[param][$k].'\');"';
+}else{
+$add = 'maxlength="'.$invokepiece[param][$k].'"';
+}
+} else {
+$add = '';
+}
+print <<<EOT
+-->
+		<tr class="tr1 vt">
+			<td class="td1">{$name}</td>
+			<td class="td2">
+<!--
+EOT;
+if($k=='descrip'){print <<<EOT
+-->
+				<textarea name="param[$k]" style="width:260px;height:92px" $add >$val</textarea>
+<!--
+EOT;
+} elseif ($k=='title') {
+$val = strip_tags($val);
+print <<<EOT
+-->
+				<input type="text" class="input" size="40" name="param[$k]" value="$val" $add> 
+			<div class="pwnew tac">
+                    <span title="粗体字"><a onclick="styleOnclick(this,'css[b]')" class="{$stylename[b]}">加粗</a></span>
+					<span title="斜体字"><a onclick="styleOnclick(this,'css[i]')" class="{$stylename[i]}">倾斜</a></span>
+					<span title="下划线"><a onclick="styleOnclick(this,'css[u]')" class="{$stylename[u]}">下划线</a></span>
+					<span id="color_show" style="background:{$stylename[color]};" title="点击取消颜色" onclick="colorCancel()"></span>
+					<span title="颜色选择"><a class="two tal" onclick="showColorPicker(this,'css[color]',function(){pickReback(color_picker)})"><img src="$imgpath/pickcolor.gif"  /></a></span>
+					<span>时间:<input name="css[endtime]" id="css[endtime]" size="15" class="input" type="input" value="{$stylename[endtime]}" onclick="ShowCalendar(this.id,1);" /></span>
+					<input id="css[color]" name="css[color]" type="hidden" value="$stylename[color]" />
+					<input id="css[b]" name="css[b]" type="hidden" value="{$push['titlecss']['b']}" />
+					<input id="css[i]" name="css[i]" type="hidden" value="{$push['titlecss']['i']}" />
+					<input id="css[u]" name="css[u]" type="hidden" value="{$push['titlecss']['u']}" />
+			</div>
+<!--
+EOT;
+} elseif ($k=='image') {
+print <<<EOT
+-->
+				<style type="text/css">
+.imgListA_pw{padding-bottom:10px;}
+.imgListA_pw li{float:left;width:60px;margin-right:20px; text-align:center;}
+.imgListA_pw li{border:1px solid #fff;cursor:pointer;height:60px;width:60px;}
+.imgListA_pw li:hover{border:1px solid #98ba2a;}
+.imgListA_pw .current{cursor:pointer; position:relative;}
+.imgListA_pw .current div{width:60px;height:60px;background: url(apps/stopic/image/group-current.gif) no-repeat; position:absolute;}
+</style>
+
+
+			<p id="imagetype_ul" class="mb10">
+				<span id="imagetype_input" class="mr10"><input checked="checked" name="select_imagetype" type="radio" />图片链接</span>
+			    <span id="imagetype_upload" class="mr10"><input name="select_imagetype" type="radio" />图片上传</span>
+			</p>
+			<div id="imagetype_input_div">
+				<div style="background:#f7f7f7;border:1px solid #ccc;width:40px;height:40px;margin-right:10px;" class="fl">
+					<img src="$val" width="40" height="40" />
+				</div>
+				<input id="image" name="param[image]" value="$val" size="40" class="input" type="text" />
+            </div>
+			<div id="imagetype_upload_div" style="display:none;">
+	            <dl>
+			        <dt>
+			        	<input id="uploadpic" type="file" name="uploadpic" onchange="checkFileType()" />
+			            <p>允许类型: jpg，jpeg，gif，png<span id="fileTypeError" style="display:none;"><font color="red">请选择正确的文件类型</font></span></p>
+			        </dt>
+			    </dl>
+			</div>
+
+            
+<script language="JavaScript" src="mode/area/js/imagetype.js"></script>
+<script language="javascript">
+var imageTypeImp = New(imageType,['imagetype_ul']);
+</script>
+<!--
+EOT;
+}else{
+print <<<EOT
+-->
+				<input type="text" class="input" size="40" name="param[$k]" value="$val" $add>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+			</td>
+		</tr>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+
+		<tr class="tr1 vt">
+			<td class="td1">开始日期</td>
+			<td class="td2"><input type="text" class="input" size="15" name="starttime" id="starttime" onclick="ShowCalendar(this.id,1);" value="$push[starttime]"> (留空则立即显示)</td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">商业推荐</td>
+			<td class="td2"><input type="radio" value="1" name="ifbusiness" $ifbusiness_Y/>是 <input type="radio" value="0" name="ifbusiness" $ifbusiness_N/>否</td>
+		</tr>
+<!--
+EOT;
+if ($iftagrelate) {
+print<<<EOT
+-->
+		<tr class="tr1 vt">
+			<td colspan="2">
+				<table width="100%">
+					<tbody id="tagrelate">
+						<tr class="tr1 vt">
+							<td colspan="2"><h2>关联文章</h2></td>
+							<td colspan="2"><a href="#" class="fr" onclick="New(addTagRelate,['tagrelate','tagrelatedata']);return false;">添加</a></td>
+						</tr>
+						<tr class="tr1 vt">
+							<td width="40">顺序</td>
+							<td>标题</td>
+							<td>链接地址</td>
+							<td width="45">&nbsp;</td>
+						</tr>
+<!--
+EOT;
+foreach ($push[data][tagrelate] as $relate) {
+print<<<EOT
+-->
+						<tr class="tr1 vt">
+							<td><input type="text" size="2" name="tagrelate[index][]" value="$relate[index]"  class="input"></td>
+							<td><input type="text" size="16" name="tagrelate[title][]" value="$relate[title]" class="input"></td>
+							<td><input type="text" size="22" name="tagrelate[url][]" value="$relate[url]" class="input"></td>
+							<td><a href="#" onclick="delTr(this);">删除</a></td>
+						</tr>
+<!--
+EOT;
+}print<<<EOT
+-->
+						<tr class="tr1 vt">
+							<td><input type="text" size="2" name="tagrelate[index][]" class="input"></td>
+							<td><input type="text" size="16" name="tagrelate[title][]" value="" class="input"></td>
+							<td><input type="text" size="22" name="tagrelate[url][]" value="http://" class="input"></td>
+							<td><a href="#" onclick="delTr(this);">删除</a></td>
+						</tr>
+					</tbody>
+				</table>
+			</td>
+		</tr>
+<!--
+EOT;
+}print<<<EOT
+-->
+	</tbody>
+</table>
+</div>
+
+    <div class="tac p10">
+<!--
+EOT;
+$submitName = $push['ifverify'] ? '审核并提交':'提交';
+print<<<EOT
+-->
+		<span class="btn"><span><button onclick="if(!getObj('select_invokepiece').value){alert('请选择模块');return false;}else{this.form.submit()}" onfocus="blur();" type="submit">$submitName</button></span></span>
+    </div>
+</div>
+</form>
+<script language="javascript">
+var pushdataid = '$pushdataid';
+var changeItem = New(editChange,['select_alias','select_invoke','select_invokepiece','$ajax_basename','$invokesForJs','portalbox']);
+</script>
+<script language="JavaScript" src="js/color_picker.js"></script>
+<!--
+EOT;
+} elseif ($action=='fetch') {print<<<EOT
+-->
+
+
+<!--
+EOT;
+}
+include_once PrintEot('adminbottom');
+?>-->

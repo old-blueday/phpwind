@@ -1,0 +1,129 @@
+<!--<?php
+include_once PrintEot('left');
+print <<<EOT
+-->
+<div class="admin_info mb10">
+	<h3 class="h1"><b>提示信息</b></h3>
+    <div class="legend"> 
+<b>使用网上支付相关说明:</b><ol><li>开启网上支付功能即被视为接受“phpwind”相关协议，如有任何疑义，请关闭此功能</li>
+<li>支付过程出现问题请及时和phpwind 官方取得联系</li>
+<li>因使用网站自身安全原因引起的非法支付phpwind 不负任何责任</li></ol></div>
+</div>
+<form action="$basename&" method="post">
+  <input type="hidden" name="action" value="currrate">
+  <h3 class="h1">网上支付设置</h3>
+  <div class="admin_table mb10">
+      <table width="100%" cellspacing="0" cellpadding="0">
+        <tr class="tr1 vt">
+          <td class="td1">网上支付功能</td>
+          <td class="td2">
+           		<div class="list_A list_80">
+                    <ul class="cc">
+                        <li><input type="radio" name="userpay[ol_onlinepay]" value="1" $onlinepay_Y>开启</li>
+                        <li><input type="radio" name="userpay[ol_onlinepay]" value="0" $onlinepay_N>关闭</li>
+                    </ul>
+                </div>
+            </td>
+        </tr>
+        <tr class="tr1 vt">
+          <td class="td1">网上支付功能关闭原因</td>
+          <td class="td2"><textarea name="userpay[ol_whycolse]"  class="textarea">$ol_whycolse</textarea></td>
+        </tr>
+    </table>
+  </div>
+  <h3 class="h1">支付宝信息</h3>
+  <div class="admin_table mb10">
+      <table width="100%" cellspacing="0" cellpadding="0">
+        <tr class="tr1 vt">
+          <td class="td1">支付宝帐号</td>
+          <td class="td2" width="160"><input type="text" class="input input_wa" name="userpay[ol_payto]" value="$ol_payto"></td>
+          <td class="td2"><a href="https://www.alipay.com/user/user_register.htm" target="_blank" >请点击这里注册 <span class="xia">支付宝</span> 帐号</a></td>
+        </tr>
+        <tr class="tr1 vt">
+          <td class="td1">合作者身份(partnerID)</td>
+          <td class="td2"><input type="text" class="input input_wa" name="userpay[ol_alipaypartnerID]" value="$ol_alipaypartnerID"></td>
+          <td class="td2"><a href="https://www.alipay.com/himalayas/practicality_customer.htm?customer_external_id=C4335324344127901113&market_type=from_agent_contract&pro_codes=26A533A9D11BD074727C1991119AA03E" target="_blank">签约地址</a> (您可以通过 phpwind 提供的签约入口来免费获得一个支付宝的合作者身份ID，拥有该ID，您可以在支付宝网站上查询到该ID产生的所有交易历史。如果您没有签约或者签约合同尚未生效，将无法正常使用支付宝虚拟交易支付接口)</td>
+        </tr>
+        <tr class="tr1 vt">
+          <td class="td1">交易安全校验码(key)</td>
+          <td class="td2"><input type="text" class="input input_wa" name="userpay[ol_alipaykey]" value="$ol_alipaykey" size="50" /></td>
+          <td class="td2">您可以登录您的支付宝账号页面，进入“商家服务”查看您的“交易安全校验码”</p></td>
+        </tr>
+     </table>
+   </div>
+   <h3 class="h1">财付通信息</h3>
+    <div class="admin_table mb10">
+      <table width="100%" cellspacing="0" cellpadding="0">
+        <tr class="tr1 vt">
+          <td class="td1">商户号</td>
+          <td class="td2" width="160"><input type="text" class="input input_wa" name="userpay[ol_tenpay]" value="$ol_tenpay"></td>
+           <td class="td2"><a href="http://union.tenpay.com/mch/mch_register.shtml?posid=125&actid=84&opid=50&whoid=31&sp_suggestuser=AD125"  >点击这里申请 <span class="xia">财付通</span> 商户帐号</a></td>
+        </tr>
+        <tr class="tr1 vt">
+          <td class="td1">商户密钥</td>
+          <td class="td2"><input type="text" class="input input_wa" name="userpay[ol_tenpaycode]" value="$ol_tenpaycode"></td>
+          <td class="td2">&nbsp;</td>
+        </tr>
+       </table>
+     </div>
+     <h3 class="h1">贝宝信息</h3>
+     <div class="admin_table mb10">
+      <table width="100%" cellspacing="0" cellpadding="0">
+        <tr class="tr1 vt">
+          <td class="td1">贝宝帐号</td>
+          <td class="td2" width="160"><input type="text" class="input input_wa" name="userpay[ol_paypal]" value="$ol_paypal"></td>
+          <td class="td2"><a href="https://www.paypal.com/cn/cgi-bin/webscr?cmd=_registration-run" target="_blank" >注册 <span class="xia">贝宝</span> 帐号</a></td>
+        </tr>
+        <tr class="tr1 vt">
+          <td class="td1">贝宝公共密钥</td>
+          <td class="td2"><input type="text" class="input input_wa" name="userpay[ol_paypalcode]" value="$ol_paypalcode" size="50"></td>
+          <td class="td2">&nbsp;</td>
+        </tr>
+       </table>
+      </div>
+      <h3 class="h1">快钱信息</h3>
+      <div class="admin_table mb10">
+      <table width="100%" cellspacing="0" cellpadding="0">
+        <tr class="tr1 vt">
+          <td class="td1">商户编号</td>
+          <td class="td2" width="160"><input type="text" class="input input_wa" name="userpay[ol_99bill]" value="$ol_99bill"></td>
+          <td class="td2"><a href="https://www.99bill.com/webapp/jsp/AccountManage/accountRegAction.do?cmd=initializtion&genID=php3" target="_blank" >注册 <span class="xia">快钱</span> 帐号</a></td>
+        </tr>
+        <tr class="tr1 vt">
+          <td class="td1">快钱密钥</td>
+          <td class="td2"><input type="text" class="input input_wa" name="userpay[ol_99billcode]" value="$ol_99billcode"></td>
+          <td class="td2">&nbsp;</td>
+        </tr>
+        </table>
+       </div>
+  <div class="mb10 tac"><span class="btn"><span><button type="submit">提 交</button></span></span></div>
+</form>
+<div class="mb10">
+	<h3 class="h1">具体步骤</h3>
+    <div class="legend">
+    <b>（一）开通支付宝支付步骤:</b><ol><li>
+如果您已经拥有一个支付宝帐号，在下面“支付宝帐号”栏填写您的支付宝帐号即可开通支付宝支付功能</li><li>
+如果您还没有支付宝帐号，请先注册一个支付宝帐号，
+
+
+<a href="https://www.alipay.com/user/user_register.htm" target="_blank" style="margin-left:1em;">请点击这里注册 <span class="xia">支付宝帐号</span></a></li></ol>
+
+<br />注:除官方论坛另行通知以外，phpwind 提供的支付宝支付服务每笔交易收取 1.5% 的手续费。<br /> 
+  	<b>（二）开通财付通支付步骤:</b><ol><li>申请财付通商户帐号，<a href="http://union.tenpay.com/mch/mch_register.shtml?posid=125&actid=84&opid=50&whoid=31&sp_suggestuser=AD125"><span class="xia">点
+击这里申请财付通商户帐号</span></a>
+</li><li>申请成功后将商户号和商户密钥填入下面对应的文本框</li></ol><br /> 
+  	<b>（三）开通贝宝支付步骤:</b><ol><li>注册一个贝宝帐号，
+
+<a href="https://www.paypal.com/cn/cgi-bin/webscr?cmd=_registration-run" target="_blank">注册 <span class="xia">贝宝帐号</span></a></li><li>将贝宝帐号填写到下面对应的文本框</li><li>开启贝宝“即时付款通知”<br />
+&nbsp;&nbsp; 登录贝宝网站:进入 我的贝宝 &raquo; 用户信息 &raquo; 即时付款通知习惯设定 &raquo; 编辑 开启“即时付款通知”并填写“通知URL”<br />
+&nbsp;&nbsp; 通知URL是 您的站点网址 + '/paypal.php?verifycode=' + 贝宝公共密钥<br />
+&nbsp;&nbsp; 格式如:<font color=blue>http://www.phpwind.net/paypal.php?verifycode=贝宝公共密钥</font></li></ol><br />
+  	<b>（四）开通快钱支付步骤:</b><ol><li>注册一个快钱帐号，
+<a href="https://www.99bill.com/webapp/jsp/AccountManage/accountRegAction.do?cmd=initializtion&genID=php3" target="_blank" style="margin-left:1em;">注册 <span class="xia">快钱</span> 帐号</a>
+</li><li>将“快钱商户号”和“快钱密钥”填入下面相应的文本框中</li></ol>
+  </div>
+</div>
+<!--
+EOT;
+include_once PrintEot('adminbottom');
+?>-->

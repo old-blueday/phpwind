@@ -1,0 +1,150 @@
+<!--<?php
+if (!defined('AJAX')) include_once PrintEot('left');
+if(empty($action)){
+print <<<EOT
+-->
+<script src="js/global.js" language="JavaScript"></script>
+<script src="js/pw_ajax.js" language="JavaScript"></script>
+<form action="$basename" method="post">
+<input type="hidden" value="editOrder" name="action">
+<div class="cc">
+<h2 class="h1"><span class="mr10 fl">栏目管理</span><span class="linka"><a id="addcolumn"
+	onclick="sendmsg('$basename&action=add','',this.id); return false" href="javascript:;" class="btn_add"><i>添加栏目</i></a></span></h2>
+<div class="admin_table mb10">
+<table width="100%" id="columntable">
+	<tr class="tr2">
+		<td>[顺序]栏目名称</td>
+		<td>操作</td>
+	</tr>
+<!--
+EOT;
+foreach($result as $c1){
+$_html = getColumnLevelHtml($c1['level'],$c1['column_id']);
+$_id = $c1[column_id];
+print <<<EOT
+-->
+	<tr class="vt tr1" id="column_{$c1[parent_id]}_{$c1[column_id]}">
+		<td class="td3 tdcur">
+			{$_html}
+			<input class="input input_wd mr5" type="text" value="{$c1[order]}" name="orders[{$_id}]"/>
+			<span id="column_{$c1[column_id]}" class="forum_name">{$c1[name]}</span>
+		</td>
+        <td class="td2">
+        	<a href="javascript:;" onclick="sendmsg('$basename&action=edit&cid={$c1[column_id]}','',this.id); return false" href="javascript:;"">[编辑]</a>
+        	<a href="javascript:;" onclick="parent.PW.Dialog({'id': 'cms_article','name': '文章内容管理','url': '$admin_file?adminjob=mode&admintype=cms_article&cid={$c1[column_id]}','max': false});return false;">[内容管理]</a>
+        	<a href="mode.php?m=cms&q=list&column={$c1[column_id]}" target="_blank">[访问]</a>
+        	<a href="$basename&action=delete&cid={$c1[column_id]}" onclick="return confirm('是否要删除该栏目')">[删除]</a>
+        </td>
+	</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+</table>
+</div>
+</div>
+<div class="mb10 tac"><span class="btn"><span><button type="submit">提 交</button></span></span></div>
+</form>
+<script type="text/javascript">
+function closeAllSubColumns(parentid){
+	var columntable = getObj('columntable');
+	var trs = columntable.getElementsByTagName('tr');
+	var bt = getObj('column_'+parentid);
+	if(bt != null){
+		if(bt.className == 'expand expand_a') bt.className = 'expand expand_b';
+		if(bt.className == 'expand expand_b') bt.className = 'expand expand_a';
+	}
+	for(var i = 0 ; i < trs.length ; i++){
+		var trid = trs[i].id;
+		if(trid.match('_'+parentid+'_')){
+			var obj = getObj(trid);
+			var subid = trid.substr(trid.lastIndexOf('_') + 1);
+			closeAllSubColumns(subid);
+			if(obj != null){
+				if(obj.style.display == 'none') {
+					obj.style.display = '';
+				}else{
+					obj.style.display = 'none';
+				}
+			}
+		}
+	}
+}
+</script>
+<!--
+EOT;
+}elseif(($action == 'add' || $action == 'edit' ) && defined('AJAX')){
+$_mTitle =  ($action == 'add') ? "添加" : "编辑";
+print <<<EOT
+-->
+<form action="$basename&action=$_action" method="post" name="form">
+<input type="hidden" value="$column[column_id]" name="cid"/>
+<div class="popoutContent">
+   	<h2 class="h1" style="cursor:move" onmousedown="read.move(event);"><a class="del_img fr" href="javascript:;" onclick="closep();">关闭</a>{$_mTitle}栏目</h2>
+  	<div style="height: 380px; width: 450px; overflow-y: auto;">
+      	<div class="admin_table mb10">
+      		<table width="100%" cellspacing="0" cellpadding="0" style="table-layout: auto;">
+      			<tbody>
+      				<tr class="tr1 vt">
+      					<td class="td2">栏目名称</td>
+      					<td class="td2"><input class="input input_wa mr5" type="text" value="{$column[name]}" name="name" /> </td>
+      				</tr>
+      				<tr class="tr1 vt">
+      					<td class="td2">上级栏目</td>
+      					<td class="td2"><select name="parentId" id="parentId">{$options}</select>
+      					</td>
+      				</tr>
+      				<tr class="tr1 vt">
+      					<td class="td2">投稿</td>
+      					<td class="td2">
+      						<input type="radio" name="allowoffer" value="1" $allowoffer_Y> 开启
+      						<input type="radio" name="allowoffer" value="0" $allowoffer_N> 关闭
+      					</td>
+      				</tr>
+      				<tr class="tr1 vt">
+      					<td class="td2">显示顺序</td>
+      					<td class="td2"><input type="text" class="input input_wc" name="order" value="{$column[order]}"/> </td>
+      				</tr>
+      				<tr class="tr1 vt">
+      					<td class="td2">SEO设置</td>
+      					<td class="td2">可在<a href="javascript:;" onclick="parent.PW.Dialog({'id': 'seoset','name': 'SEO优化','url': '$admin_file?adminjob=seoset&mode=cms','max': false});return false;">SEO优化</a>中进行统一设置</td>
+      				</tr>
+      				<tr class="tr1 vt">
+      					<td class="td2">Title</td>
+      					<td class="td2"><input type="text" class="input input_wa" name="seotitle" value="{$column[seotitle]}"/> </td>
+      				</tr>
+      				<tr class="tr1 vt">
+      					<td class="td2">Meta Description</td>
+      					<td class="td2"><input type="text" class="input input_wa" name="seodesc" value="{$column[seodesc]}"/> </td>
+      				</tr>
+      				<tr class="tr1 vt">
+      					<td class="td2">Meta Keywords</td>
+      					<td class="td2"><input type="text" class="input input_wa" name="seokeywords" value="{$column[seokeywords]}"/> </td>
+      				</tr>
+      			</tbody>
+      		</table>
+      	</div>
+      	<div class="mb10 tac"><span class="btn"><span><button type="button" onclick="ajax.submit(this.form)" onfocus="blur()">提 交</button></span></span></div>
+    </div>
+</div>
+</form>
+<script type="text/javascript">
+function selectedColumn(columnId){
+	var selectObj = document.getElementById('parentId');
+	if(selectObj == null) return false;
+	var l = selectObj.options.length;
+	for(var i=0; i<l; i++){
+		if(selectObj.options[i].value==columnId){
+			selectObj.options[i].selected='selected';
+		}
+	}
+}
+window.setTimeout(function(){
+	selectedColumn('$column[parent_id]');
+},10);
+</script>
+<!--
+EOT;
+}
+if (!defined('AJAX')) include_once PrintEot('adminbottom');
+?>-->

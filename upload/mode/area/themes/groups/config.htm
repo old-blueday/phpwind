@@ -1,0 +1,173 @@
+
+<pw id="群组标题" />
+	<li onmouseover="return swap_tab(1,4);" id="tab_t1" class="current"><a href="javascript:;">推荐群组</a></li>
+	<li onmouseover="return swap_tab(2,4);" id="tab_t2"><a href="javascript:;">热门群组</a></li>
+	<li onmouseover="return swap_tab(3,4);" id="tab_t3"><a href="javascript:;">最新群组</a></li>
+	<li onmouseover="return swap_tab(4,4);" onclick="ajax.send('pw_ajax.php?action=showrandcolonys','',showRandColonys)" id="tab_t4"><a href="javascript:;">随机群组</a></li>
+<script language="JavaScript">
+function showRandColonys(){
+	var randColonysHTML = ajax.request.responseText;
+	getObj('tab_4').innerHTML = randColonysHTML;
+}
+</script>
+
+
+
+<pw id="群组列表_1" />
+<list cachetime="1800" num="12" action="group" ifpushonly="0" title="群组列表" />
+<ul>
+	<loop>
+	<li>
+		<a href="{url}" target="_blank"><img class="fl" src="{image,64,64}" width="64" height="64" /></a>
+		<h4><a href="{url}" target="_blank">{title,18}</a></h4>
+		<p>{descrip,38}</p>
+	</li>
+	</loop>
+</ul>
+
+<pw id="群组列表_2" />
+<list cachetime="1800" num="12" action="group" ifpushonly="0" title="群组列表" />
+<ul>
+	<loop>
+	<li>
+		<a href="{url}" target="_blank"><img class="fl" src="{image,64,64}" width="64" height="64" /></a>
+		<h4><a href="{url}" target="_blank">{title,18}</a></h4>
+		<p>{descrip,38}</p>
+	</li>
+	</loop>
+</ul>
+
+<pw id="群组列表_3" />
+<list cachetime="1800" num="12" action="group" ifpushonly="0" title="群组列表" />
+<ul>
+	<loop>
+	<li>
+		<a href="{url}" target="_blank"><img class="fl" src="{image,64,64}" width="64" height="64" /></a>
+		<h4><a href="{url}" target="_blank">{title,18}</a></h4>
+		<p>{descrip,38}</p>
+	</li>
+	</loop>
+</ul>
+
+
+
+
+<pw id="业主小区hd" />
+<a href="javascript:;">业主小区</a> <span>(0)</span>
+
+<pw id="业主小区bd" />
+<list cachetime="1800" num="12" title="群组列表" action="group" />
+<loop>
+<a href="{url}" target="_blank" title="{title}">{title,16}</a>
+</loop>
+<pw id="爱车一族hd" />
+<a href="javascript:;">爱车一族</a> <span>(0)</span>
+
+<pw id="爱车一族bd" />
+<list cachetime="1800" num="12" title="群组列表" action="group" />
+<loop>
+<a href="{url}" target="_blank" title="{title}">{title,16}</a>
+</loop>
+
+
+
+
+<pw id="运动和爱好hd" />
+<a href="javascript:;">运动和爱好</a> <span>(0)</span>
+
+<pw id="运动和爱好bd" />
+<list cachetime="1800" num="12" title="群组列表" action="group" />
+<loop>
+<a href="{url}" target="_blank" title="{title}">{title,16}</a>
+</loop>
+<pw id="拉风汽车hd" />
+<a href="javascript:;">拉风汽车</a> <span>(0)</span>
+
+<pw id="拉风汽车bd" />
+<list cachetime="1800" num="12" title="群组列表" action="group" />
+<loop>
+<a href="{url}" target="_blank" title="{title}">{title,16}</a>
+</loop>
+<pw id="top20" />
+
+<ol class="ranking">
+<list cachetime="1800" num="20" action="group" ifpushonly="0" title="群组列表" />
+<loop>
+<!--#
+$creditclass = $key%2 == 0 ? '' : 'odd';
+$tempKey = $key+1<10 ? '0'.($key+1) : $key+1;
+#-->
+	<li class="$creditclass">
+		<a href="{url}" target="_blank"><em>$tempKey</em><span class="title">{title}</span><span class="order">{credit}</span></a>
+	</li>
+</loop>
+</ol>
+
+<pw id="最热最新" />
+<ul>
+	<li onmouseover="return swap_tab2(1,2);" id="tab2_t1" class="current"><a href="javascript:;">热门话题</a></li>
+	<li onmouseover="return swap_tab2(2,2);" id="tab2_t2"><a href="javascript:;">最新话题</a></li>
+</ul>
+			
+
+<pw id="群组最热" />
+<list cachetime="1800" num="10" action="grouparticle" ifpushonly="0" title="群组帖子列表" />
+<table cellpadding="0" cellspacing="0">
+<thead>
+	<tr>
+		<th class="title">主题</th>
+		<th class="groups" width="120">所属群组</th>
+		<th class="author" width="110">作者(回复/人气)</th>
+		<th class="lastReply" width="90">最后回复</th>
+	</tr>
+</thead>
+<tbody>
+<loop>
+<!--#
+$creditclass = $key%2 == 0 ? '' : 'odd';
+#-->
+	<tr class="$creditclass vt">
+		<td class="title">
+			<p><a href="{url}" target="_blank">{title,50}</a></p>
+		</td>
+		<td><a href="apps.php?q=group&cyid={cyid}" target="_blank">{cname}</a></td>
+		<td><a href="u.php?uid={authorid}" target="_blank">{author}</a><br />{replies}/{hits}</td>
+		<td><a href="u.php?username={lastposter}" target="_blank">{lastposter}</a><br />{lastpost,Y-m-d}</td>
+	</tr>
+</loop>
+</tbody>
+</table>
+
+
+<pw id="群组最新" />
+<list cachetime="1800" num="10" action="grouparticle" ifpushonly="0" title="群组帖子列表" />
+<table cellpadding="0" cellspacing="0">
+<thead>
+	<tr>
+		<th class="title">主题</th>
+		<th class="groups" width="120">所属群组</th>
+		<th class="author" width="90">作者(回复/人气)</th>
+		<th class="lastReply" width="90">最后回复</th>
+	</tr>
+</thead>
+<tbody>
+<loop>
+<!--#
+$creditclass = $key%2 == 0 ? '' : 'odd';
+#-->
+	<tr class="$creditclass vt">
+		<td class="title">
+			<p><a href="{url}" target="_blank">{title,50}</a></p>
+		</td>
+		<td><a href="apps.php?q=group&cyid={cyid}" target="_blank">{cname}</a></td>
+		<td><a href="u.php?uid={authorid}" target="_blank">{author}</a><br />{replies}/{hits}</td>
+		<td><a href="u.php?username={lastposter}" target="_blank">{lastposter}</a><br />{lastpost,Y-m-d}</td>
+	</tr>
+</loop>
+</tbody>
+</table>
+					
+<pw id="群组排行" />
+<h3>群组排行</h3>
+
+

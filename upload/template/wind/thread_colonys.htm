@@ -1,0 +1,73 @@
+<!--<?php
+print <<<EOT
+-->
+<div class="h">相关群组</div>
+<div class="mb10">
+<!--
+EOT;
+if($forumset['ifcolonycate']){
+include_once(D_P . 'data/bbscache/o_config.php');
+print<<<EOT
+-->
+		<div id="cn_group" class="pw_ulB">
+<!--
+EOT;
+foreach($cnGroups as $styleid => $group){print<<<EOT
+-->
+			<div class="b mb5">{$o_styledb[$styleid][cname]}</div>
+			<ul class="cc">
+<!--
+EOT;
+foreach($group as $key => $value){
+if($value['ifshowpic'] && $value['cnimg']){print<<<EOT
+-->
+				<li class="two"><a href="thread.php?cyid=$value[id]" title="$value[cname]"><img src="$value[cnimg]" width="90" height="90" /><p>$value[cname]</p></a></li>
+
+<!--
+EOT;
+}else{print <<<EOT
+-->
+				<li class="one"><a href="thread.php?cyid=$value[id]" title="$value[cname]">$value[cname]</a></li>		
+<!--
+EOT;
+}}print <<<EOT
+-->
+			</ul>
+<!--
+EOT;
+}print <<<EOT
+-->
+		</div>
+
+<!--
+EOT;
+} else {print<<<EOT
+-->
+		<div id="cn_group" class="pw_ulB">
+			<ul class="cc">
+<!--
+EOT;
+foreach($cnGroups as $key => $value){
+if($value['ifshowpic'] && $value['cnimg']){print<<<EOT
+-->
+		
+				<li class="two"><a href="thread.php?cyid=$value[id]" title="$value[cname]"><img src="$value[cnimg]" width="90" height="90" /><p>$value[cname]</p></a></li>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+				<li class="one"><a href="thread.php?cyid=$value[id]" title="$value[cname]">$value[cname]</a></li>		
+<!--
+EOT;
+}}print <<<EOT
+-->
+			</ul>
+		</div>
+<!--
+EOT;
+}print <<<EOT
+-->  
+</div>
+<!--
+EOT;
+?>

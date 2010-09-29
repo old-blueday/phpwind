@@ -1,0 +1,698 @@
+<!--<?php
+include_once PrintEot('profile_header');
+print <<<EOT
+-->
+<style type="text/css">
+.user-tr:hover{background:#fff;}
+</style>
+<div id="user-main">
+	<div class="u-m-bg"></div>
+	<div class="u-m-bg-c cc">
+		<div class="p10">
+			<div class="u-nav-2 cc">
+				<ul id="infolist">
+					<li id="base"><a style="cursor:pointer" hidefocus="true" onclick="selectTab('base')">基本资料</a></li>
+					<li id="trade"><a style="cursor:pointer" hidefocus="true" onclick="selectTab('trade')">交易信息</a></li>
+					<li id="link"><a style="cursor:pointer" hidefocus="true" onclick="selectTab('link')">联系方式</a></li>
+					<li id="face"><a style="cursor:pointer" hidefocus="true" onclick="selectTab('face')">修改头像</a></li>
+					<li id="safe"><a style="cursor:pointer" hidefocus="true" onclick="selectTab('safe')">密码安全</a></li>
+<!--
+EOT;
+if ($_G['userbinding'] || $ubinding) {print <<<EOT
+-->
+					<li id="binding"><a style="cursor:pointer" hidefocus="true" onclick="selectTab('binding')">多帐号绑定</a></li>
+<!--
+EOT;
+}if ($customfield) {print <<<EOT
+-->
+					<li id="other"><a style="cursor:pointer" hidefocus="true" onclick="selectTab('other')">扩展资料</a></li>
+<!--
+EOT;
+}print <<<EOT
+-->
+				</ul>
+			</div>
+			<div class="u-cont-bg-c">
+			<table width="100%" height="450">
+				<tr><td class="vt">
+					<form id="creator" name="creator" action="profile.php?action=modify&" method="post" onsubmit="return setFaceLen()">
+					<input type="hidden" name="verify" value="$verifyhash" />
+					<input type="hidden" value="2" name="step" />
+					<input type="hidden" id="info_type" name="info_type" value="info_base" />
+					<div class="p15" style="display:none" id="info_base">
+						<table width="100%" class="mt10 bor-t-c">
+<!--
+EOT;
+if($groupselect){print <<<EOT
+-->
+							<tr class="user-tr">
+								<td>头衔选择</td>
+								<td><select name="newgroupid">$groupselect</select> 选择一个用户组头衔作为你在站点上的头衔</td>
+							</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+							<tr class="user-tr">
+								<td width="150"> 性别</td>
+								<td><input type="radio" name="progender" value="0" $sexselect[0] /> 保密
+									<input type="radio" name="progender" value="1" $sexselect[1] /> 男
+									<input type="radio" name="progender" value="2" $sexselect[2] /> 女
+								</td>
+							</tr>
+							<tr class="user-tr">
+								<td> 生日</td>
+								<td>
+									<select name="proyear">
+<!--
+EOT;
+if($rg_timestart < $rg_timeend){
+for($i=$rg_timestart;$i<=$rg_timeend;$i++){print <<<EOT
+-->
+									<option value="$i" $yearslect[$i]>$i</option>
+<!--
+EOT;
+}}else{
+for($i=$rg_timestart;$i>=$rg_timeend;$i--){print <<<EOT
+-->
+									<option value="$i" $yearslect[$i]>$i</option>
+<!--
+EOT;
+}}print <<<EOT
+-->
+									</select>年
+									<select name="promonth">
+<!--
+EOT;
+for($i=1;$i<=12;$i++){print <<<EOT
+-->
+										<option value="$i" $monthslect[$i]>$i</option>
+<!--
+EOT;
+}print <<<EOT
+-->
+									</select>月
+									<select name="proday">
+<!--
+EOT;
+for($i=1;$i<=31;$i++){print <<<EOT
+-->
+										<option value="$i" $dayslect[$i]>$i</option>
+<!--
+EOT;
+}print <<<EOT
+-->
+									</select>日
+								</td>
+							</tr>
+<!--
+EOT;
+foreach($custominfo as $key => $value){print <<<EOT
+-->
+							<tr class="user-tr">
+								<td>$value[0]</td>
+								<td><input class="input" type="text" size="20" name="customdata[$key]" value="{$customdata[$key]}" /></td>
+							</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+							<tr class="user-tr">
+								<td>来自</td>
+								<td><input class="input" type="text" size="20" maxlength="14" name="profrom" value="$userdb[location]" /></td>
+							</tr>
+							<tr class="user-tr">
+								<td> 个人主页</td>
+								<td><input class="input" type="text" size="50" maxlength="75" name="prohomepage" value="$userdb[site]" /></td>
+							</tr>
+<!--
+EOT;
+if($_G[allowhonor]){print <<<EOT
+-->
+							<tr class="user-tr">
+								<td>个性签名</td>
+								<td>
+									<input class="input" type="text" size="40" name="prohonor" value="$userdb[honor]" />（将在我的首页和帖子页面用户信息处显示）
+								</td>
+							</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+							<tr class="user-tr">
+								<td>自我简介</td>
+								<td><textarea name="prointroduce" id="prointroduce" rows="4" cols="50">$userdb[introduce]</textarea><br /><span id="prointroduce_warn">限500字节</span> </td>
+							</tr>
+							<tr class="user-tr">
+								<td>帖子签名</td>
+								<td><textarea name="prosign" id="prosign" rows="4" cols="50">$userdb[signature]</textarea><br />（将在每个帖子下方显示，<span id="prosign_warn">限{$_G[signnum]}字节</span>）</td>
+							</tr>
+<!--
+EOT;
+if($db_signmoney && false!==strpos($db_signgroup,",$groupid,")){print <<<EOT
+-->
+							<tr class="user-tr">
+								<td>签名展示功能</td>
+								<td>
+									<input type="radio" name="showsign" value="1" $prosign_Y /> 开启
+									<input type="radio" name="showsign" value="0" $prosign_N /> 关闭
+
+	（签名显示一天需要相应{$credit->cType[$db_signcurtype]}<b>$db_signmoney</b>{$credit->cUnit[$db_signcurtype]}）
+
+								</td>
+							</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+							<tr class="user-tr">
+								<td>选择您所在的时区<br />将时间显示为您当地时间</td>
+								<td>
+									<select name="timedf">
+										<option value="0">使用默认</option>
+<!--
+EOT;
+include(R_P.'template/admin/timezone.htm');print <<<EOT
+-->
+									</select>
+								</td>
+							</tr>
+							<tr class="user-tr">
+								<td> 是否接受邮件</td>
+								<td>
+									<input type="radio" name="proreceivemail" value="1" $email_Y /> 接收邮件
+									<input type="radio" name="proreceivemail" value="0" $email_N /> 不接收邮件
+								</td>
+							</tr>
+						</table>
+						<div class="tac" style=" padding:1em">
+							<span class="button"><span><button type="submit">保存资料</button></span></span>
+						</div>
+<script language="JavaScript">
+var charset = '$db_charset';
+var signnum = '$_G[signnum]' * 1;
+initCheckTextNum('prointroduce', 'prointroduce_warn', 500);
+if (signnum) {
+	initCheckTextNum('prosign','prosign_warn', signnum);
+} else {
+	getObj('prosign_warn').innerHTML = '不限字数';
+}
+</script>
+					</div>
+					<div class="p15" style="display:none" id="info_trade">
+						<table width="100%" class="mt10 bor-t-c">
+							<tr class="user-tr">
+								<td width="150">支付宝帐号</td>
+								<td><input class="input" type="text" size="20" name="alipay" value="$trade[alipay]" /></td>
+							</tr>
+							<tr class="user-tr">
+								<td style=" vertical-align:top;">个人商品分类</td>
+								<td>
+									<table width="240" class="user-tr-table">
+										<tr>
+											<td width="60%">分类名</td>
+											<td><a style="color:blue;cursor:pointer" onclick="addtrade();">[添加]</a></td>
+										</tr>
+										<tbody id="trade_mode" style="display:none"><tr>
+											<td><input class="input" type="text" name="tradetype[]" size="18" /></td>
+											<td><a style="color:orange;cursor:pointer" onclick="removetrade(this);">[删除]</a></td>
+										</tr></tbody>
+										<tbody id="trade_c">
+<!--
+EOT;
+if ($trade['tradetype']) {
+foreach ($trade['tradetype'] as $key => $value) {print <<<EOT
+-->
+										<tr>
+											<td><input class="input" type="text" name="tradetype[$key]" value="$value" size="18" /></td>
+											<td><a style="color:orange;cursor:pointer" onclick="removetrade(this);">[删除]</a></td>
+										</tr>
+<!--
+EOT;
+}}print <<<EOT
+-->
+										</tbody>
+									</table>
+								</td>
+							</tr>
+						</table>
+						<div class="tac" style=" padding:1em">
+							<span class="button"><span><button type="submit">保存资料</button></span></span>
+						</div>
+<script language="JavaScript">
+function addtrade() {
+	var s = getObj('trade_mode').firstChild.cloneNode(true);
+	getObj('trade_c').appendChild(s);
+}
+function removetrade(obj) {
+	var o = obj.parentNode.parentNode;
+	o.parentNode.removeChild(o);
+}
+addtrade();
+</script>
+					</div>
+					<div class="p15" style="display:none" id="info_link">
+						<table width="100%" class="mt10 bor-t-c">
+							<tr class="user-tr">
+								<td width="150">QQ</td>
+								<td><input class="input" type="text" size="25" maxlength="14" name="prooicq" value="$userdb[oicq]" /></td>
+							</tr>
+							<tr class="user-tr">
+								<td>阿里旺旺</td>
+								<td><input class="input" type="text" size="25" maxlength="30" name="proaliww" value="$userdb[aliww]" /></td>
+							</tr>
+							<tr class="user-tr">
+								<td>Yahoo</td>
+								<td><input class="input" type="text" size="25" name="proyahoo" value="$userdb[yahoo]" /></td>
+							</tr>
+							<tr class="user-tr">
+								<td>Msn</td>
+								<td><input class="input" type="text" size="25" name="promsn" value="$userdb[msn]" /></td>
+							</tr class="user-tr">
+						</table>
+						<div class="tac" style=" padding:1em">
+							<span class="button"><span><button type="submit">保存资料</button></span></span>
+						</div>
+					</div>
+					<div class="p15" style="display:none" id="info_face">
+						<table width="100%" class="mt10 bor-t-c">
+							<tr class="user-tr">
+								<td width="120" style="vertical-align:top">
+									<img src="$iconurl?$timestamp" $iconsize name="useravatars" />
+								</td>
+								<td style="vertical-align:top">
+									<div id="openchang">
+										<div style="float:left;margin-right:1%;">
+											<input type="radio" name="facetype" value="1" onclick="CkFaceType(this.value)">系统头像
+										</div>
+<!--
+EOT;
+if($_G[allowportait]){print <<<EOT
+-->
+										<div style="float:left;margin-right:1%;">
+											<input type="radio" name="facetype" value="2" onclick="CkFaceType(this.value)">头像链接
+										</div>
+<!--
+EOT;
+}if($db_ifupload && $_G[upload]){print <<<EOT
+-->
+										<div style="float:left;">
+											<input type="radio" name="facetype" value="3" onclick="CkFaceType(this.value)">头像上传
+										</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+										<div class="c"></div>
+										<div id="face1" style="display:none;">
+											<div id="iconbox">
+												<div style="width:310px;margin:10px 0 0;">
+													<a class="fr" onclick="showSystemIcon(2);" style="cursor:pointer">下一页</a><a onclick="showSystemIcon(0);" style="cursor:pointer">上一页</a>
+												</div>
+												<div style="width:310px;" class="mt10">
+<!--
+EOT;
+foreach ($imgname_array as $key => $value) {print <<<EOT
+-->
+													<span onClick="showimage('$imgpath','$value')" class="fl face"><img src='$imgpath/face/$value' width="50" height="50"></span>
+<!--
+EOT;
+}print <<<EOT
+-->
+												</div>
+											</div>
+											<input type="hidden" name="proicon" value="$iconfile" />
+										</div>
+										<div id="face2" style="width:100%;margin-top:1%;display:none;">
+										<table cellpadding="0" cellspacing="0">
+											<tr>
+												<td>头像链接 <input name="httpurl[0]" id="httpurl_url" value="$httpurl" class="input" type="text" size="40" /> 必须以 http://开头</td>
+											</tr>
+											<tr>
+												<td>头像宽度 <input name="httpurl[1]" value="$iconwidth" class="input" size="4" maxlength="3" /> 必须是 1 -- $db_imgwidth 之间的一个整数。</td>
+											</tr>
+											<tr>
+												<td>头像高度 <input name="httpurl[2]" value="$iconheight" class="input" size="4" maxlength="3" /> 必须是 1 -- $db_imgheight 之间的一个整数。</td>
+											</tr>
+										</table>
+										<input type="hidden" id="httpurl_w" name="httpurl[3]" />
+										<input type="hidden" id="httpurl_h" name="httpurl[4]" />
+										</div>
+										<div id="face3" style="display:none;">
+<!--
+EOT;
+if($db_bbsifopen != 1){print <<<EOT
+-->
+<div class="blockquote3">
+抱歉，站点正处于内部开放状态，只有在完全开放状态下，才能使用头像上传功能。<br />
+<span class="gray">（站点状态的后台设置路径：核心设置 &#187; 常规设置）</span>
+</div>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+											<object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" codebase=" http://fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=7,0,0,0" width="560" height="450" id="FlashVars" align="middle">
+												<param name="movie" value="js/face.swf" />
+												<param name="FlashVars" value="$icon_encode_url" />
+												<embed  width="560" height="450" src="js/face.swf" FlashVars="$icon_encode_url" pluginspage="http://www.macromedia.com/shockwave/download/index.cgi?P1_Prod_Version=ShockwaveFlash"  type="application/x-shockwave-flash" />
+											</object>
+<!--
+EOT;
+}print <<<EOT
+-->
+										</div>
+									</div>
+								</td>
+							</tr>
+						</table>
+						<div class="tac" style=" padding:1em" id="face_button">
+							<span class="button"><span><button type="submit">保存资料</button></span></span>
+						</div>
+					</div>
+					<div style="display:none" id="info_safe">
+					<div class="p15">
+						<table width="100%" class="mt10 bor-t-c">
+<!--
+EOT;
+if($ifppt){print <<<EOT
+-->
+							<tr class="user-tr">
+								<td width="150">原密码</td>
+								<td><input class="input" type="password" size="20" maxlength="75" name="oldpwd" value="" /> 修改密码或邮箱时需要密码验证</td>
+							</tr>
+							<tr class="user-tr">
+								<td>新密码</td>
+								<td><input class="input" type="password" size="20" maxlength="75" name="propwd" value="" /></td>
+							</tr>
+							<tr class="user-tr">
+								<td>确认密码</td>
+								<td><input class="input" type="password" size="20" maxlength="75" name="check_pwd" value="" /></td>
+							</tr>
+							<tr class="user-tr">
+								<td>E-MAIL</td>
+								<td><input class="input" type="text" size="20" maxlength="75" name="proemail" value="$userdb[email]" />
+								<input type="checkbox" name="propublicemail" value="1" $ifpublic />公开邮箱</td>
+							</tr>
+<!--
+EOT;
+if($db_ifsafecv){print <<<EOT
+-->
+							<tr class="user-tr">
+								<td>安全问题</td>
+								<td>
+									<select name="question" onchange="showcustomquest(this.value)">
+										<option value="-2">不修改安全问题和答案</option>
+										<option value="0">无安全问题</option><option value="1">我爸爸的出生地</option><option value="2">我妈妈的出生地</option><option value="3">我的小学校名</option><option value="4">我的中学校名</option><option value="5">我最喜欢的运动</option><option value="6">我最喜欢的歌曲</option><option value="7">我最喜欢的电影</option><option value="8" >我最喜欢的颜色</option><option value="-1">自定义问题</option>
+									</select>
+									<input id="customquest" style="display:none" type="text" name="customquest" class="input">
+								</td>
+							</tr>
+							<tr class="user-tr">
+								<td>您的答案</td>
+								<td><input type="text" name="answer" class="input"></td>
+							</tr>
+<!--
+EOT;
+}}else{print <<<EOT
+-->
+							<tr class="user-tr"><td colspan="2" style="padding:10px 0">站点开启通行证功能，修改用户密码，请登录 <a href="$db_pptserverurl">$db_pptserverurl</a></td></tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+						</table>
+					</div>
+<!--
+EOT;
+if ($ifppt) {print <<<EOT
+-->
+						<div class="tac" style=" padding:1em">
+							<span class="button"><span><button type="submit">保存资料</button></span></span>
+						</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+					</div>
+					<div style="display:none" id="info_binding"></div>
+<!--
+EOT;
+if($customfield){print <<<EOT
+-->
+					<div class="p15" style="display:none" id="info_other">
+						<table width="100%" class="mt10 bor-t-c">
+<!--
+EOT;
+foreach($customfield as $value){
+$value[required] && $value[descrip].='（必填内容）';
+$editable=(!$userdb[$value[field]]||$value[editable])?'':'disabled';
+if($value[type]=='1'){
+$field_type="<input class=\"input\" type=\"text\" size=\"30\" name=\"$value[field]\" value=\"{$userdb[$value[field]]}\" $editable />";
+}elseif($value[type]=='2'){
+$field_type="<textarea name=\"$value[field]\" rows=\"5\" class=\"input\" cols=\"50\" $editable>{$userdb[$value[field]]}</textarea>";
+}elseif($value[type]=='3'){
+$field_type='';
+foreach($value[options] as $v){
+list($k,$v)=explode('=',$v);
+$selected=$userdb[$value[field]]==$k?'selected':'';
+$field_type.="<option value=\"$k\" $selected>$v</option>";
+}$field_type="<select name=\"$value[field]\" $editable>$field_type</select>";
+}print <<<EOT
+-->
+							<tr class="user-tr">
+								<td width="25%">$value[title]</td>
+								<td>$field_type $value[descrip]</td>
+							</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+						</table>
+						<div class="tac" style=" padding:1em">
+							<span class="button"><span><button type="submit">保存资料</button></span></span>
+						</div>
+					</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+					</form>
+					<div id="userbinding-node" style="display:none">
+<!--
+EOT;
+if (($_G['userbinding'] || $ubinding) && $ubindingneedupdatepwd) {
+print <<<EOT
+-->
+						<form action="profile.php?action=modify&" method="post">
+						<input type="hidden" name="verify" value="$verifyhash" />
+						<input type="hidden" value="5" name="step" />
+						<div class="p15">
+							<table width="100%" class="mt10 bor-t-c">
+                                <tr class="user-tr">
+                                    <td colspan="2" class="b f14 green">您的帐号密码与帐号绑定中的密码不一致，请输入帐号密码来更新帐号绑定中的密码</td>
+                                </tr>
+								<tr class="user-tr">
+									<td>帐号密码</td>
+									<td><input type="password" name="bindpassword" class="input" /></td>
+								</tr>
+								<tr class="user-tr">
+									<td></td>
+									<td><span class="button"><span><button type="submit">更新</button></span></span></td>
+								</tr>
+							</table>
+						</div>
+						</form>
+<!--
+EOT;
+}
+
+if ($_G['userbinding'] && !$ubindingneedupdatepwd) {print <<<EOT
+-->
+						<form action="profile.php?action=modify&" method="post">
+						<input type="hidden" name="verify" value="$verifyhash" />
+						<input type="hidden" value="3" name="step" />
+						<div class="p15">
+							<table width="100%" class="mt10 bor-t-c">
+                                <tr class="user-tr">
+                                    <td colspan="2" class="b f14 green">添加其他帐号</td>
+                                </tr>
+								<tr class="user-tr">
+									<td width="150">用户名</td>
+									<td><input type="text" name="username" class="input" /></td>
+								</tr>
+								<tr class="user-tr">
+									<td>密码</td>
+									<td><input type="password" name="password" class="input" /></td>
+								</tr>
+<!--
+EOT;
+	if ($db_ifsafecv) {
+print <<<EOT
+-->
+								<tr class="user-tr">
+									<td>安全问题</td>
+									<td><select name="question" onchange="showcustomquest(this.value,'customquest2')"><option value="0">无安全问题</option><option value="1">我爸爸的出生地</option><option value="2">我妈妈的出生地</option><option value="3">我的小学校名</option><option value="4">我的中学校名</option><option value="5">我最喜欢的运动</option><option value="6">我最喜欢的歌曲</option><option value="7">我最喜欢的电影</option><option value="8" >我最喜欢的颜色</option><option value="-1">自定义问题</option></select> <input id="customquest2" style="display:none" type="text" name="customquest" class="input" size="17" tabindex="5" /></td>
+								</tr>
+								<tr class="user-tr">
+									<td>您的答案</td>
+									<td><input type="text" name="answer" class="input" /></td>
+								</tr>
+<!--
+EOT;
+	}
+print <<<EOT
+-->
+								<tr class="user-tr">
+									<td></td>
+									<td><span class="button"><span><button type="submit">添 加</button></span></span></td>
+								</tr>
+							</table>
+						</div>
+						</form>
+<!--
+EOT;
+}
+if ($ubinding && !$ubindingneedupdatepwd) {
+	$ltitle = L::config('ltitle', 'level');
+print <<<EOT
+-->
+						<form action="profile.php?action=modify&" method="post">
+						<input type="hidden" name="verify" value="$verifyhash" />
+						<input type="hidden" value="4" name="step" />
+						<div class="p15">
+							<table width="100%" class="mt10 bor-t-c">
+                                <tr class="user-tr">
+                                    <td colspan="5" class="b f14 green">已绑定帐户</td>
+                                </tr>
+								<tr class="user-tr">
+									<!-- <td>uid</td> -->
+									<td>用户名</td>
+									<td>用户组</td>
+									<td>注册时间</td>
+									<td>发帖数</td>
+									<td>选择</td>
+								</tr>
+<!--
+EOT;
+	foreach ($ubinding as $key => $value) {print <<<EOT
+-->
+								<tr class="user-tr">
+									<!-- <td>$value[uid]</td> -->
+									<td><a href="u.php?uid=$value[uid]" target="_blank">$value[username]</a></td>
+									<td>{$ltitle[$value[groupid]]}</td>
+									<td>$value[regdate]</td>
+									<td><a href="apps.php?q=article&u=$value[uid]" target="_blank">$value[postnum]</a></td>
+									<td><input type="checkbox" name="selid[]" value="$value[uid]" /></td>
+								</tr>
+<!--
+EOT;
+	}
+print <<<EOT
+-->
+							</table>
+							<div style="text-align:center;margin-top:1em"><span class="button2"><span><button type="button" onclick="CheckAll(this.form)">全 选</button></span></span>
+							<span class="button"><span><button type="submit">解除绑定</button></span></span></div>
+						</div>
+						</form>
+
+<!--
+EOT;
+}
+print <<<EOT
+-->
+					</div>
+				</td></tr>
+			</table>
+			</div>
+		</div>
+	</div>
+	<div class="u-m-bg"></div>
+</div>
+<script language="JavaScript">
+var display = '$display';
+function CkFaceType(value) {
+	var facetype = document.getElementsByName('facetype');
+	for (i = 0; i < facetype.length; i++) {
+		if (facetype[i].value == value) {
+			facetype[i].checked = true;
+			if (value == '3') {
+				getObj('face_button').style.display = 'none';
+			}
+			getObj('face' + value).style.display = '';
+		} else {
+			getObj('face_button').style.display = '';
+			getObj('face' + facetype[i].value).style.display = 'none';
+		}
+	}
+}
+CkFaceType('$icontype');
+function showimage(imgpath,value) {
+	var path = imgpath + '/face/';
+	facepath(path,value,false);
+}
+function facepath(iconurl,iconfile,showmsg,iconwidth,iconheight) {
+	document.images.useravatars.src = iconurl + iconfile + '?' + new Date().getTime();
+	if (iconwidth>0) document.images.useravatars.width = iconwidth;
+	if (iconheight>0) document.images.useravatars.height = iconheight;
+	document.creator.proicon.value = iconfile;
+	return false;
+}
+function showSystemIcon(page) {
+	getObj('iconbox').innerHTML = '<div class="tac" style="width:272px;padding:30px 0 0;"><div><img src="'+imgpath+'/loading.gif" align="absmiddle" /> 正在加载数据...</div></div>';
+	ajax.send('pw_ajax.php','action=showface&page='+page,getIcon);
+}
+
+function getIcon() {
+	var iconlist = ajax.request.responseText;
+	setTimeout(function(){getObj('iconbox').innerHTML = iconlist;},300);
+}
+
+function SetCookie(name,value) {
+	expires = new Date();
+	expires.setTime(expires.getTime()+(86400*365));
+	document.cookie=name+"="+escape(value)+"; expires="+expires.toGMTString()+"; path=/";
+}
+
+function DelCookie(name) {
+	expires = new Date();
+	expires.setTime(expires.getTime()-(86400*365));
+	document.cookie=name+"=; expires="+expires.toGMTString()+"; path=/";
+}
+
+function FetchCookie(name) {
+	var start = document.cookie.indexOf(name);
+	var end = document.cookie.indexOf(";",start);
+	return start==-1 ? null : unescape(document.cookie.substring(start+name.length+1,(end>start ? end : document.cookie.length)));
+}
+
+function setFaceLen() {
+	var v = 0;
+	var facetype = document.getElementsByName('facetype');
+	for (i = 0; i < facetype.length; i++) {
+		if (facetype[i].checked === true) {
+			v = facetype[i].value;break
+		}
+	}
+	if (v == 2) {
+		var img = new Image();
+		img.src = getObj('httpurl_url').value;
+		getObj('httpurl_w').value = img.width;
+		getObj('httpurl_h').value = img.height;
+	}
+	return true;
+}
+function selectTab(tab) {
+	showTabs('infolist', tab, 'li', 'current');
+	$('userbinding-node').style.display = (tab == 'binding') ? '' : 'none';
+}
+
+~function() {
+	var info_type = FetchCookie('pro_modify');
+	DelCookie('pro_modify');
+	if (!info_type) info_type = '$info_type';
+	selectTab(info_type);
+}();
+</script>
+<!--
+EOT;
+?>-->

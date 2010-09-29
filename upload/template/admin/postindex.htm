@@ -1,0 +1,144 @@
+<!--<?php
+include_once PrintEot('left');
+if(!empty($sub)){
+print <<<EOT
+-->
+<div class="nav3 mb10">
+  <ul class="cc">
+    <li><a href="$basename">帖子索引设置</a></li>
+    <li class="current"><a href="$basename&sub=y">添加帖子索引</a></li>
+  </ul>
+</div>
+<h3 class="h1">按回复数查询帖子</h3>
+<form method="post" action="{$basename}&sub=y&action=search">
+  <div class="admin_table mb10">
+    <table cellpadding="0" cellspacing="0" width="100%">
+      <tr class="tr1 vt">
+        <td class="td1">根据回复数</td>
+        <td class="td2"><ul class="cc list_A list_80 mr10 fl">
+<!--
+EOT;
+!$replies && $replies = $repliesArray[0];
+foreach ($repliesArray as $value) {
+$checked = $value == $replies ? 'checked' : '';
+print <<< EOT
+-->
+		<li><input type="radio" value="$value" name="replies" $checked/>大于$value</li>
+<!--
+EOT;
+}print <<< EOT
+-->
+          </ul>
+          
+          <span class="bt2"><span>
+          <button type="submit" value="查 询"  name="submit">查 询</button>
+          </span></span>
+          </td>
+      </tr><tr class="tr1 vt">
+        <td class="td1">根据帖子ID查找：</td>
+        <td class="td2">
+          <input type="text"  value="$tid" name="tid" class=" input_wa mr5"/>
+          <span class="bt2"><span>
+          <button type="submit" value="查 询"  name="submit">查 询</button>
+          </span></span></td>
+      </tr>
+    </table>
+  </div>
+</form>
+<form action="{$basename}&sub=y&action=update" method="post">
+  <h2 class="h1">帖子列表</h2>
+  <div class="admin_table mb10">
+    <table width="100%" cellspacing="0" cellpadding="0">
+      <tr class="tr2 vt td_bgB">
+        <td>ID</td>
+        <td>主题</td>
+        <td>回复数</td>
+        <td>发帖日期</td>
+        <td>选择</td>
+      </tr>
+<!--
+EOT;
+$num=0;
+foreach ($threads[data] as $key => $value) {
+$_disable = $value['replies'] > 0 ? "" : "disabled";
+$num++;
+print <<< EOT
+-->
+      <tr class="tr1 vt">
+        <td class="td2">$num</td>
+        <td class="td2"><a href="read.php?fid=$value[fid]&tid=$value[tid]" target="_blank">$value[subject]</a></td>
+        <td class="td2">$value[replies]</td>
+        <td class="td2">$value[postdate]</td>
+        <td class="td2"><input type="checkbox" name="threads[]" value="$value[tid]" $_disable/>
+        </td>
+      </tr>
+<!--
+EOT;
+}
+print <<< EOT
+-->
+    </table>
+  </div>
+  <input type="hidden" name="page" value="$page"/>
+  <input type="hidden" name="replies" value="$replies"/>
+  <input type="hidden" name="tid" value="$tid"/>
+  $threads[pages]
+  <div class="mb10 tac"> <span class="btn"><span>
+    <button type="submit" value="添加索引" name="submit">添加索引</button>
+    </span></span></div>
+</form>
+</div>
+<!--
+EOT;
+}else{
+print <<< EOT
+-->
+<div class="nav3 mb10">
+  <ul class="cc">
+    <li class="current"><a href="$basename">帖子索引设置</a></li>
+    <li><a href="$basename&sub=y">添加帖子索引</a></li>
+  </ul>
+</div>
+<form action="{$basename}&action=delete" method="post" name="postIndex" onsubmit="if(!confirm('真的要删除吗？')){return false;}">
+  <h2 class="h1">帖子列表</h2>
+  <div class="admin_table mb10">
+    <table width="100%" cellspacing="0" cellpadding="0">
+      <tr class="tr2 vt td_bgB">
+        <td>ID</td>
+        <td>主题</td>
+        <td>回复数</td>
+        <td>发帖日期</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+<!--
+EOT;
+foreach($threads['data'] as $key => $value){
+$num++;
+print <<< EOT
+-->
+      <tr class="tr1 vt">
+        <td class="td2"><input type="checkbox" value="$value[tid]" name="tids[]"/></td>
+        <td class="td2">$num</td>
+        <td class="td2"><a href="read.php?fid=$value[fid]&tid=$value[tid]" target="_blank">$value[subject]</a></td>
+        <td class="td2">$value[replies]</td>
+        <td class="td2">$value[postdate]</td>
+        <td class="td2"><input type="button" name="resest" value="重新建立索引" onclick="location.href='{$basename}&action=reset&tid=$value[tid]&page=$page'" class="btn" $disable/>
+        </td>
+      </tr>
+<!--
+EOT;
+}print <<< EOT
+-->
+    </table>
+  </div>
+  $threads[pages]
+  </center>
+  <div class="mb10 tac"> <span class="btn"><span>
+    <button type="submit" value="删除选中" name="submit">删除选中</button>
+    </span></span></div>
+</form>
+<!--
+EOT;
+}include_once PrintEot('adminbottom');
+?>-->

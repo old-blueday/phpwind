@@ -1,0 +1,137 @@
+<!--
+<?php
+$rand = rand(1000,9999);
+print <<<EOT
+-->
+<form action="$baseUrl&action=editconfig&alias=$alias" method="post">
+	<input type="hidden" name="rnd" value="$rand" />
+    <input type="hidden" name="step" value="2" />
+    <input type="hidden" name="pageinvokeid" value="$invokedata[id]">
+    <div><!--切换div-->
+        <div class="pwC_content_a">
+            <div class="admin_table">
+            <!--**************新版的直接使用即可**************-->
+				<div class="admin_table mb10">
+				<table width="100%">
+					<tr class="tr1 vt"><td colspan="2" class="td1"><h2 class="h1" style="border-top:0;">模块属性设置</h2></td></tr>
+					<tr class="tr1 vt">
+			        	<td class="td1">模块id</td>
+			            <td class="td2">$invokename</td>
+			        </tr>
+			       	<tr class="tr1 vt">
+			        	<td class="td1">开启推荐审核</td>
+			            <td class="td2"><input type="radio" value="1" name="ifverify" $ifverify_Y />是&nbsp;&nbsp;&nbsp;<input type="radio" value="0" name="ifverify" $ifverify_N />否</td>
+			        </tr>
+			        <tr class="tr1 vt">
+			        	<td class="td1">模块名称</td>
+			            <td class="td2"><input class="input input_wa" type="text" value="$invokedata[title]" name="title" /></td>
+			        </tr>
+				</table>
+				<table width="100%">
+<!--
+EOT;
+foreach($invokepieces as $piece){
+if ($piece['ifpushonly']) {
+	$check_Y = 'checked';
+	$check_N = '';
+} else {
+	$check_Y = '';
+	$check_N = 'checked';
+}
+print <<<EOT
+-->
+						<tr class="tr1 vt">
+							<td colspan="2"  class="td1"><h2 class="h1" style="border-top:0;">$piece[title]</h2></td>
+						</tr>
+						<tr class="tr1 vt">
+				        	<td class="td1">调用选项</td>
+				            <td class="td2">
+				            	<table width="100%">
+				            		<tr class="tr3">
+							        	<td>{$piece[p_action][title]} : {$piece[p_action][html]}</td>
+							        </tr>
+									<tr>
+										<td>
+										<div id="piece_{$piece[id]}">
+										<table width="100%">
+											<tbody>
+<!--
+EOT;
+foreach($piece[config] as $key=>$value){
+print <<<EOT
+-->
+												<tr class="tr3">
+													<td>$value[title] : $value[html]</td>
+												</tr>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+											</tbody>
+										</table>
+										</div>
+										</td>
+									</tr>
+				            	</table>
+				            </td>
+				        </tr>
+						
+				        <tr class="tr1 vt">
+				        	<td class="td1">调用个数</td>
+				            <td class="td2"><input type="text" value="$piece[num]" name="num[$piece[id]]" class="input input_wa"></td>
+				        </tr>
+				        <tr class="tr1 vt">
+				        	<td class="td1">缓存更新时间[秒]</td>
+				            <td class="td2"><input type="text" value="$piece[cachetime]" name="cachetime[$piece[id]]" class="input input_wa mr5">0表示关闭更新</td>
+				        </tr>
+				        <tr class="tr1 vt">
+				        	<td class="td1">只调用推送数据</td>
+				            <td class="td2"><input type="radio" value="1" name="ifpushonly[$piece[id]]" $check_Y />是&nbsp;&nbsp;&nbsp;<input type="radio" value="0" name="ifpushonly[$piece[id]]" $check_N />否</td>
+				        </tr>
+<!--
+EOT;
+foreach($piece[param] as $value){print <<<EOT
+-->
+			$value
+<!--
+EOT;
+}}print <<<EOT
+-->
+				    </table>
+				</div>
+				<div class="hr_bottom"></div>
+            </div>
+        </div>
+        <div class="tac p10" style="text-align:center;">
+			<span class="btn2"><span><button type="submit">提交</button></span></span>
+        </div>
+    </div>
+    </form>
+
+<script src="js/pw_ajax.js" language="JavaScript"></script>
+<script src="js/global.js" language="JavaScript"></script>
+<script>
+var agt = navigator.userAgent.toLowerCase();
+var is_ie = ((agt.indexOf('msie')!=-1) && (agt.indexOf('opera')==-1));
+
+function pieceActionChange(pieceId,sourcetype) {
+	pieceId = pieceId-0;
+	if (!pieceId) return false;
+	var url = "$baseUrl";
+	ajax.send(url,'action=source&id='+pieceId+'&sourcetype='+sourcetype,function() {
+			var text = ajax.request.responseText;
+			var pieceObj = getObj('piece_'+pieceId);
+			if (text!='error') {
+				pieceObj.innerHTML = text;
+			}
+			
+		}
+	);
+}
+</script>
+
+<!--
+EOT;
+?>
+-->

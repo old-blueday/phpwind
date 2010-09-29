@@ -1,0 +1,160 @@
+<!--<?php
+include_once PrintEot('left');
+if (empty($action)) {print <<<EOT
+-->
+<div class="nav3 mb10">
+    <ul class="cc">
+        <li class="current"><a href="$basename">通知队列</a></li>
+        <li><a href="$basename&action=syncredit">同步积分更新</a></li>
+    </ul>
+</div>
+<form method="post" action="$basename&">
+<input type="hidden" name="action" value="del" />
+<h2 class="h1">通知队列</h2>
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+	<tr class="tr2">
+		<td width="5%">删?</td>
+		<td width="10%">ID</td>
+		<td width="12%">动作</td>
+		<td width="20%">时间</td>
+<!--
+EOT;
+foreach ($applist as $key => $app) {print <<<EOT
+-->
+		<td>$app[name]</td>
+<!--
+EOT;
+}print <<<EOT
+-->
+	</tr>
+<!--
+EOT;
+$s_lang = array(
+	'updatesyncredit' => '更新同步积分设置',
+	'altername'	=> '修改用户名',
+	'deluser' => '删除用户'
+);
+foreach ($notifydb as $key => $value) {print <<<EOT
+-->
+	<tr class="tr1">
+		<td class="td2"><input type="checkbox" name="selid[]" value="$value[nid]" /></td>
+		<td class="td2">$value[nid]</td>
+		<td class="td2">{$s_lang[$value[action]]}</td>
+		<td class="td2">$value[timestamp]</td>
+<!--
+EOT;
+foreach ($applist as $key => $app) {print <<<EOT
+-->
+		<td class="td2">
+<!--
+EOT;
+if ($value['app'.$key]) {print <<<EOT
+-->
+		<span class="s3">通知成功 </span>
+<!--
+EOT;
+} else {print <<<EOT
+-->
+		<a href="$basename&action=send&nid=$value[nid]&appid=$key" class="s1">未通知</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+		</td>
+<!--
+EOT;
+}print <<<EOT
+-->
+	</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+</table>
+</div>
+<div class="tac mb10">
+    <span class="bt"><span><button type="button" name="chkall" onclick="CheckAll(this.form)">全 选</button></span></span>
+	<span class="btn"><span><button type="submit" name="delete">提 交</button></span></span>
+</div>
+</form>
+<!--
+EOT;
+} elseif ($action == 'syncredit') {print <<<EOT
+-->
+<div class="nav3 mb10">
+    <ul class="cc">
+        <li><a href="$basename">通知队列</a></li>
+        <li class="current"><a href="$basename&action=syncredit">同步积分更新</a></li>
+    </ul>
+</div>
+<form method="post" action="$basename&">
+<input type="hidden" name="action" value="syncredit" />
+<input type="hidden" name="step" value="3" />
+<h2 class="h1">同步积分更新</h2>
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+	<tr class="tr2">
+		<td width="5%">删?</td>
+		<td width="10%">UID</td>
+		<td width="12%">用户名</td>
+<!--
+EOT;
+foreach ($applist as $key => $app) {
+if (!$app['uc']) {print <<<EOT
+-->
+		<td>$app[name]</td>
+<!--
+EOT;
+}}print <<<EOT
+-->
+	</tr>
+<!--
+EOT;
+foreach ($creditdb as $key => $value) {print <<<EOT
+-->
+	<tr class="tr1">
+		<td class="td2"><input type="checkbox" name="selid[]" value="$value[uid]" /></td>
+		<td class="td2">$value[uid]</td>
+		<td class="td2">$value[username]</td>
+<!--
+EOT;
+foreach ($applist as $key => $app) {
+if (!$app['uc']) {print <<<EOT
+-->
+		<td class="td2">
+<!--
+EOT;
+if ($value['app'.$key]) {print <<<EOT
+-->
+			<span class="s3">通知成功 </span>
+<!--
+EOT;
+} else {print <<<EOT
+-->
+			<a href="$basename&action=synupdate&uid=$value[uid]&appid=$key" class="s1">未通知</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+		</td>
+<!--
+EOT;
+}}print <<<EOT
+-->
+	</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+</table>
+</div>
+<div class="tac mb10">
+    <span class="bt"><span><button type="button" name="chkall" onclick="CheckAll(this.form)">全 选</button></span></span>
+	<span class="btn"><span><button type="submit" name="delete">提 交</button></span></span>
+</div>
+</form>
+<!--
+EOT;
+}include_once PrintEot('adminbottom');
+?>-->

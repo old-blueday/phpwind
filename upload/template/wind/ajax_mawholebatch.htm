@@ -1,0 +1,142 @@
+<!--<?php print <<<EOT
+-->
+<div style="width:320px;" id="postbatch">
+	<div class="popTop" style="cursor:move;" onmousedown = "read.move(event);">
+		<a href="javascript:void(0)" class="adel" onclick="closep()">关闭</a>
+		<span class="mr20">选中<span class="b s2" id="select_count">1</span>篇</span>
+	</div>
+	<div class="p10 cc pr">
+<!--
+EOT;
+if ($colony) {
+if($newColony->right['topicadmin']['toptopic'] && $ifcolonyadmin || $ifbbsadmin || $pwSystem['forumcolonyright']) {print<<<EOT
+-->
+	<a title="置顶帖子" href="mawhole.php?ajax=1&action=toptopic&fid=$fid&type=batch" onclick="return postManager.action(this,1)" id="toptopic" class="bta fl">置顶</a>
+<!--
+EOT;
+}if($newColony->right['topicadmin']['digest'] && $ifcolonyadmin || $ifbbsadmin || $pwSystem['forumcolonyright']){print<<<EOT
+-->
+   <a title="精华帖子" href="mawhole.php?ajax=1&action=digest&fid=$fid&type=batch" onclick="return postManager.action(this,1)" id="digest" class="bta fl">精华</a>
+<!--
+EOT;
+}if($newColony->right['topicadmin']['lock'] && $ifcolonyadmin || $ifbbsadmin || $pwSystem['forumcolonyright']){print<<<EOT
+-->
+	<a title="锁定帖子" href="mawhole.php?ajax=1&action=lock&fid=$fid&type=batch" onclick="return postManager.action(this,1)" id="lock" class="bta fl">锁定</a>
+<!--
+EOT;
+}if($newColony->right['topicadmin']['pushtopic'] && $ifcolonyadmin || $ifbbsadmin || $pwSystem['forumcolonyright']){print<<<EOT
+-->
+	<a title="提前帖子" href="mawhole.php?ajax=1&action=pushtopic&fid=$fid&type=batch" onclick="return postManager.action(this,1)" id="pushtopic" class="bta fl">提前</a>	
+<!--
+EOT;
+}if($newColony->right['topicadmin']['downtopic'] && $ifcolonyadmin || $ifbbsadmin || $pwSystem['forumcolonyright']){print<<<EOT
+-->
+    <a title="压帖帖子" href="mawhole.php?ajax=1&action=downtopic&fid=$fid&type=batch" onclick="return postManager.action(this,1)" id="pushtopic" class="bta fl">压帖</a>	
+<!--
+EOT;
+}if($newColony->right['topicadmin']['highlight'] && $ifcolonyadmin || $ifbbsadmin || $pwSystem['forumcolonyright']){print<<<EOT
+-->
+	<a title="加亮帖子" href="mawhole.php?ajax=1&action=highlight&fid=$fid&type=batch" onclick="return postManager.action(this,1)" id="highlight" class="bta fl">加亮</a>	
+<!--
+EOT;
+}if($ifcolonyadmin || $ifbbsadmin || $pwSystem['forumcolonyright']){print<<<EOT
+-->
+	<a title="分类帖子" href="mawhole.php?ajax=1&action=type&fid=$fid&type=batch" onclick="return postManager.action(this,1)" id="type" class="bta fl">分类</a>	
+<!--
+EOT;
+}if($newColony->right['topicadmin']['del'] && $ifcolonyadmin || $ifbbsadmin || $pwSystem['forumcolonyright']){print<<<EOT
+-->
+	<a title="删除帖子" href="mawhole.php?ajax=1&action=del&fid=$fid&type=batch" onclick="return postManager.action(this,1)" id="del" class="bta fl">删除</a>	
+<!--
+EOT;
+}print <<<EOT
+-->
+<!--
+EOT;
+}else{print <<<EOT
+-->
+		<div class="cc mb10">
+<!--
+EOT;
+if($foruminfo['f_check'] && $search=='check' && ($isGM || $pwSystem['tpccheck'])){print <<<EOT
+-->
+    <a title="验证帖子" href="mawhole.php?ajax=1&action=check&fid=$fid&type=batch" onclick="return postManager.action(this,1)" id="check" class="bta fl">验证</a>	
+<!--
+EOT;
+}if($isGM || $pwSystem[topped]){print <<<EOT
+-->
+    <a title="置顶帖子" href="mawhole.php?ajax=1&action=headtopic&fid=$fid&type=batch" onclick="return postManager.action(this,1)" id="headtopic" class="bta fl">置顶</a>
+<!--
+EOT;
+}if($isGM || $pwSystem['digestadmin']){print <<<EOT
+-->
+    <a title="精华帖子" href="mawhole.php?ajax=1&action=digest&fid=$fid&type=batch" onclick="return postManager.action(this,1)" id="digest" class="bta fl">精华</a>
+<!--
+EOT;
+}if($isGM || $pwSystem['lockadmin']){print <<<EOT
+-->
+   <a title="锁定帖子" href="mawhole.php?ajax=1&action=lock&fid=$fid&type=batch" onclick="return postManager.action(this,1)" id="lock" class="bta fl">锁定</a>	
+<!--
+EOT;
+}if($isGM || $pwSystem['pushadmin']){print <<<EOT
+-->
+   <a title="提前帖子" href="mawhole.php?ajax=1&action=pushtopic&fid=$fid&type=batch" onclick="return postManager.action(this,1)" id="pushtopic" class="bta fl">提前</a>	
+    
+<!--
+EOT;
+}if($isGM || $pwSystem['downadmin']){print <<<EOT
+-->
+    <a title="压帖帖子" href="mawhole.php?ajax=1&action=downtopic&fid=$fid&type=batch" onclick="return postManager.action(this,1)" id="pushtopic" class="bta fl">压帖</a>
+<!--
+EOT;
+}if($isGM || $pwSystem['coloradmin']){print <<<EOT
+-->
+    <a title="加亮帖子" href="mawhole.php?ajax=1&action=edit&fid=$fid&type=batch" onclick="return postManager.action(this,1)" id="edit" class="bta fl">加亮</a>	
+<!--
+EOT;
+}print <<<EOT
+-->
+		</div>
+		<div class="cc">
+<!--
+EOT;
+if($isGM || $pwSystem[tpctype]){print <<<EOT
+-->
+    <a title="分类帖子" href="mawhole.php?ajax=1&action=type&fid=$fid&type=batch" onclick="return postManager.action(this,1)" id="type" class="bta fl">分类</a>	
+<!--
+EOT;
+}if($isGM || $pwSystem[moveatc]){print <<<EOT
+-->
+    <a title="移动帖子" href="mawhole.php?ajax=1&action=move&fid=$fid&type=batch" onclick="return postManager.action(this,1)" id="move" class="bta fl">移动</a>	
+<!--
+EOT;
+}if($isGM || $pwSystem[copyatc]){print <<<EOT
+-->
+    <a title="复制帖子" href="mawhole.php?ajax=1&action=copy&fid=$fid&type=batch" onclick="return postManager.action(this,1)" id="copy" class="bta fl">复制</a>	
+<!--
+EOT;
+}if($isGM || $pwSystem[unite]){print <<<EOT
+-->
+    <a title="合并帖子" href="mawhole.php?ajax=1&action=unite&fid=$fid&type=batch" onclick="return postManager.action(this,1)" id="unite" class="bta fl">合并</a>	
+<!--
+EOT;
+}if($isGM || $pwSystem[delatc]){print <<<EOT
+-->
+	<a title="删除帖子" href="mawhole.php?ajax=1&action=del&fid=$fid&type=batch" onclick="return postManager.action(this,1)" id="del" class="bta fl">删除</a>	
+<!--
+EOT;
+}print <<<EOT
+-->
+		</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+	</div>
+	<div class="popBottom cc">
+		<label class="fl"><input name="ajaxall" id="ajaxall" type="checkbox" value=""  onclick="postManager.checkall(this);"/>全选</label>
+	</div>
+</div>
+<!--
+EOT;
+?>-->

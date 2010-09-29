@@ -1,0 +1,166 @@
+<!--<?php
+require_once(uTemplate::printEot('header'));
+//require_once(uTemplate::printEot('user_appleft'));
+$nav = $action ? array($action=>'class = current') : 'class=current';
+print <<<EOT
+-->
+<div id="content" class="contUser">
+	<div class="p15">
+        <div class="navC mb10">
+			<ul>
+<!--
+EOT;
+if ($db_appifopen && $db_siteappkey) {print <<<EOT
+-->
+				<li $nav><a href="{$basename}">应用列表</a></li>
+<!--
+EOT;
+}print <<<EOT
+-->
+				<li $nav[$action]><a href="{$basename}action=my">应用管理</a></li>
+			</ul>
+    	</div>
+<!--
+EOT;
+if (empty($action)) {print <<<EOT
+-->
+<div>
+<script type="text/javascript" src="{$db_server_url}/js/global.js"></script>
+<script language="JavaScript">
+var server = new PwJs.Server("pwapp");
+server.start();
+</script>
+<iframe id="pwapp" name="pwapp" frameborder="0" width="100%" height="400" scrolling="no" src="{$url}"></iframe>
+</div>
+<!--
+EOT;
+} elseif ($action == 'my') {print <<<EOT
+-->	
+	<script language="JavaScript">
+function ajaxurl(o) {
+	showDialog('confirm','您确定要删除该应用吗？', 0, function() {
+		ajax.send(o.href,'',function() {
+			if (ajax.request.responseText == 'ok') {
+				o.parentNode.parentNode.style.display = 'none';
+			} else {
+				ajax.guide();
+			}
+		});
+	});
+	return false;
+}
+</script>
+<div>
+<form action="{$basename}action=edit" method="POST">
+	<table  width="100%" class="tA">
+		<tr class="s3">
+			<td width="70">应用属性</td>
+			<td>应用名称</td>
+<!--
+EOT;
+if ($db_toolbar == 1) {print <<<EOT
+-->
+			<td width="110">显示在我的菜单</td>
+<!--
+EOT;
+}print <<<EOT
+-->
+			<td width="180">隐私</td>
+			<td></td>
+		</tr>
+<!--
+EOT;
+$i = 0;
+foreach ($basic_app_array as $key => $value) {
+$i++;
+print <<<EOT
+-->
+
+		
+<!--
+EOT;
+if($i == 1){print <<<EOT
+-->
+		<tr>
+			<td class="b" colspan="6">基础应用</td>		
+		</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+		<tr>
+			<td>
+			</td>
+			<td>$value[name]</td>
+<!--
+EOT;
+if ($db_toolbar == 1) {print <<<EOT
+-->
+			<td><input type="checkbox" name="show[$key]" value="1" $value[showchecked]></td>
+<!--
+EOT;
+}print <<<EOT
+-->
+			<td>
+<!--
+EOT;
+if (in_array($key,$basic_app_with_privacy)) {print <<<EOT
+-->
+			
+				<select name="privacy[$key]" class="select_wa">
+					<option value="0" ${'privace_'.$key.'_0'} > 任何人可见</option>
+					<option value="1" ${'privace_'.$key.'_1'} > 好友可见</option>
+					<option value="2" ${'privace_'.$key.'_2'} > 仅自己可见</option>
+				</select>
+<!--
+EOT;
+}print <<<EOT
+-->
+			</td>
+			<td></td>
+		</tr>
+<!--
+EOT;
+} if ($db_appifopen && $db_siteappkey) {print <<<EOT
+-->
+		<tr>
+			<td class="b" colspan="6">娱乐应用</td>		
+		</tr>
+<!--
+EOT;
+foreach ($app_array as $key => $value) {print <<<EOT
+-->
+		<tr>
+			<td></td>
+			<td><a href="apps.php?id=$value[appid]">$value[appname]</a></td>
+<!--
+EOT;
+if ($db_toolbar == 1) {print <<<EOT
+-->
+			<td><input type="checkbox" name="show[$value[appid]]" value="1" $value[showchecked]></td>
+<!--
+EOT;
+}print <<<EOT
+-->
+			<td></td>
+			<td><a href="{$basename}action=del&id=$value[appid]" onclick="return ajaxurl(this);">移除</a></td>
+		</tr>
+<!--
+EOT;
+}}print <<<EOT
+-->
+	</table>
+	<div class="tac p10"><span class="btn"><span><button type="submit">提 交</button></span></span></div>
+</form>
+</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+     	<div class="c"></div>
+     </div>
+</div>
+<!--
+EOT;
+require_once(uTemplate::printEot('footer'));
+?>-->

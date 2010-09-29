@@ -1,0 +1,59 @@
+<!--<?php print <<<EOT
+-->
+		<div class="content fl">
+        	<div class="s_dlA">
+<!-- 
+EOT;
+foreach($forums as $forum){
+print <<<EOT
+-->             
+	            <dl>
+	               <dd class="img"><a href="thread.php?fid={$forum[fid]}" target="_blank"><img src="$forum[logo]" width="44" height="44"></a></dd><dt><a href="thread.php?fid={$forum[fid]}" target="_blank">$forum[name]</a></dt>
+	               <dd>$forum[descrip]</dd>
+	            </dl>
+<!-- 
+EOT;
+}
+print <<<EOT
+-->  
+                <div class="pages">
+                    $pager
+                </div>
+                <div class="c">&nbsp;</div>
+            </div>
+            <div class="h">
+         
+            </div>
+        </div>
+        <div class="sidebar fr">
+<!--
+EOT;
+if($hotwords){
+print <<<EOT
+-->         
+        	<div class="p15 s_boxA">
+            	<h2>一周热门搜索</h2>
+                <ul>
+<!-- 
+EOT;
+foreach($hotwords as $hotword){
+print <<<EOT
+-->                
+                	<li><a href="searcher.php?keyword={$hotword}&type=thread">$hotword</a></li>
+<!-- 
+EOT;
+}
+print <<<EOT
+-->                 	
+                </ul>
+            </div>
+<!-- 
+EOT;
+}
+print <<<EOT
+-->              
+        </div>
+        <div class="c">&nbsp;</div>
+<!--
+EOT;
+?>

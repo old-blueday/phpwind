@@ -1,0 +1,43 @@
+<!--<?php
+include_once PrintEot('left');
+print <<<EOT
+-->
+<div class="admin_info mb10">
+	<h3 class="h1"><b>提示信息</b></h3>
+	<div class="legend">
+		<ul>
+			<li>功能说明:<br />就是鼓励会员宣传网站的功能。只要用户把您站点的 url 推荐给其他朋友，并引导其他人访问您的网站。那他的{$db_creditname}数值将会加一点， {$db_creditname}越大越是表明某会员对网站的宣传力度越大!<br />使用方法: 在站点任意一动态页面的 url 后加上 a=用户名 或 u=用户数字ID <br /> 比如以下方法均正确(用户名 yuling 数字ID: 3558)<br /> </li>
+			<li>http://www.phpwind.net/index.php?a=yuling</li>
+			<li>http://www.phpwind.net/index.php?u=3558</li>
+			<li>http://www.phpwind.net/read.php?tid=217205&a=yuling </li>
+			<li>http://www.phpwind.net/read.php?tid=217205&u=3558 </li>
+			<li>注意:<font color='blue'>需要注册</font>是指:会员引导的朋友需要注册之后， 会员才会增加贡献值；而<font color='blue'>勿需注册</font>则不限制，只要引导其他人访问该网站，就会增加!</li>
+		</ul>
+	</div>
+</div>
+<form action="$basename" method=post name=creat>
+	<h2 class="h1"><b>功能设置</b></h2>
+	<div class="admin_table mb10">
+		<table width="100%" cellspacing="0" cellpadding="0">
+			<tr class="tr1 vt">
+				<td class="td1">使用宣传代码</td>
+				<td class="td2">
+					<ul class="list_A cc">
+						<li><input type="radio" value="2" $ads_2 name="ads">需要注册</li>
+						<li><input type="radio" value="1" $ads_1 name="ads">勿需注册</li>
+						<li><input type="radio" value="0" $ads_0 name="ads">关闭</li>
+					</ul>
+				</td>
+			</tr>
+		</table>
+	</div>
+	<input type="hidden" name="action" value="submit">
+	<div class="tac">
+	<span class="btn"><span><button type="submit">提 交</button></span></span>
+	</div>
+</form>
+<!--
+EOT;
+include_once PrintEot('adminbottom');
+?>
+-->

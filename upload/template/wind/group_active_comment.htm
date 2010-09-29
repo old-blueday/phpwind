@@ -1,0 +1,137 @@
+<!--<?php print <<<EOT
+-->
+
+<script language="JavaScript" src="js/post.js"></script>
+<style type="text/css">
+.g_commnet dl{border-bottom:1px solid #e7e7e7; padding:10px 0}
+.g_commnet dt{float:left; margin-right:10px;}
+.g_commnet dd{float:left;margin:0;padding:4px 0 10px; width:600px;}
+.hd h3{float:left; padding:0 12px; font-weight:800; margin-right:5px; background-color:#E8F3FD;}
+.lh24{line-height:24px;}
+.mb15{margin-bottom:15px;}
+.g_btn{background:#005eac;color:#fff;border:0;cursor:pointer;padding:.3em .8em;*padding:0 1em;font-size:9pt; line-height:180%; overflow:visible;}
+</style>
+					<div id="comment_container">
+					<div>
+					   <div id="linkbox" style="display:none;"></div>						
+						<div class="g_commnet">
+								<div class="hd lh24 mb15"><h3>我的回应</h3><a href="#" class="orange">（已有{$count}份回应）</a></div>
+								<div id="createcommentbox" class=" mt10"></div>
+<!--
+EOT;
+foreach ($commentdb as $key => $comment) {print <<<EOT
+-->
+								<dl class="cc" id="commnet_{$comment[id]}">
+									<dt><img src="$comment[face]" width="44" height="44" /></dt>
+									<dd onmouseover="showObj('reply_$comment[id]');showObj($comment[id]);" onmouseout="hiddenObj('reply_$comment[id]');hiddenObj($comment[id]);">
+<!--
+EOT;
+if ($comment[uid]==$winduid || $winduid==$u || $groupid==3) { print <<<EOT
+-->
+									<span class="fr">
+									<a style="cursor: pointer;display:none;" onclick="pwConfirm('是否确定删除本条留言',this,function(){delComment('$comment[id]','0')})" title="删除"  id="$comment[id]" >删除</a>
+                                    </span>
+<!--
+EOT;
+} print <<<EOT
+-->
+									<a href="u.php?uid=$comment[uid]" class="b">$comment[username]</a> <span class="gray">$comment[postdate] </span>
+									<p class="f12"> $comment[title] <a class="ml10 f12" onclick="createCommnetInput('$comment_type',$comment_typeid,$comment[id])" id="reply_$comment[id]">回复</a></p>
+										
+											<div id="commentbox_{$comment_typeid}_{$comment[id]}">
+<!--
+EOT;
+foreach ($subcommentdb[$comment['id']] as $k => $subcomment) {
+if ($subcomment['uid'] == $winduid || $groupid == 3) {print <<<EOT
+-->
+											<div class="o_write_asjtop2"  id="topsubcommnet_{$subcomment[id]}" onmouseover="showObj($subcomment[id]);" onmouseout="hiddenObj($subcomment[id]);">
+<!--
+EOT;
+}else{print<<<EOT
+-->
+											<div class="o_write_asjtop2" id="topsubcommnet_{$subcomment[id]}">
+<!--
+EOT;
+}print<<<EOT
+-->
+											<dl class="cc"  id="subcommnet_{$subcomment[id]}">
+												<dt class="fl mr10"><img src="$subcomment[face]" class="fl img-35" /></dt>
+												<dd>
+<!--
+EOT;
+if ($subcomment['uid'] == $winduid || $groupid == 3) {print <<<EOT
+-->
+<a href="javascript:;" class="del fr" id="$subcomment[id]" onclick="delComment($subcomment[id],'1')" style="display:none;" >删除</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+												<a href="u.php?uid=$subcomment[uid]" class="mr10">$subcomment[username]:</a><span class="mr10 gray">$subcomment[title]</span><br />
+											<span class="gray mr10 f10">$subcomment[postdate]</span>	
+											</dd>
+											</dl>
+											</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+
+										</div>
+									</dd>
+
+								</dl>
+<!--
+EOT;
+}print <<<EOT
+-->
+<dl>
+                    <dt><!--<img src="$windicon" width="44" height="44" />--></dt>
+                    <dd>
+                    <form method="POST" name="FORM" action="" onsubmit="return false;">
+						<div style="margin-bottom:10px;">
+                            <div class="o-editor" style="width:510px;overflow:hidden;margin-bottom:10px;">
+                               <div class="fl"><textarea maxlength="200" id="comm_input_{$comment_type}_{$comment_typeid}_0" name="atc_content"/></textarea></div>
+                            </div>
+                            <span style="margin:0;"><span><button class="g_btn" type="submit" onclick="postComment('$comment_type',$comment_typeid,0,this.form);">提交</button></span></span>
+					   </div>
+					<script language="JavaScript" src="mode/o/js/smile.js"></script>
+                    <div style="position:absolute;display:none;width:100px;" id="smile" class="face_menu">
+                    </div>
+					   </form>
+                    </dd>
+                    </dl>
+						</div>
+<div class="mt10">$pages</div>
+</div>
+</div>
+<script language="JavaScript">
+var charset = '$db_charset';
+var imgpath   = '$imgpath';
+var stylepath = '$stylepath';
+/*
+~function()
+{
+	for (s in smiledb)
+	{
+		new Image().src= smiledb[s][0];
+	}
+}();
+*/
+function showSmile(id){
+	var smilebox = getObj('smile');
+	var innerHTML = '';
+	for(s in smiledb){
+		var imgObj = '<img src=\"'+smiledb[s][0]+'\" onclick=\"addsmile2('+s+')\">';
+		innerHTML +=  imgObj;
+	}
+	smilebox.innerHTML = innerHTML;
+	read.open('smile',id);
+}
+function addsmile2(id){
+	document.FORM.atc_content.value += '[s:'+id+']';
+	closep();
+}
+</script>
+<!--
+EOT;
+?>

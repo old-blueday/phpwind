@@ -1,0 +1,18 @@
+.mood{line-height:24px;}
+.mood a{text-decoration:none;}
+.mood-bg{}
+.mood-bg2{padding-bottom:10px;}
+.mood-bg2 table img{width:32px;}
+.mood-title a,.mood-bg ul a{text-decoration:underline;color:#3366cc;}
+.mood td{padding:0 5px 0 0;}
+.mood-one{background:#ff4200 url(mood-one.png) no-repeat;width:20px;height:40px;margin:0 auto 5px;border:1px solid #fff;overflow:hidden;}
+.mood-two{background:#e5e5e5 url(mood-two.png) no-repeat;width:20px;overflow:hidden;}
+.mood-title{ text-align:left;padding:10px 0 0 0;}
+.mood-bg2 li{ text-align:left;list-style:none;}
+.mood-hover a,.mood-hover2 a{display:block;padding:5px;color:#333333;font-size:12px;text-align:center;width:40px;}
+.mood-hover a:hover{background:#ffffff;border:1px solid #9ccbe9;padding:4px;text-decoration:none;}
+.mood-hover2 a{cursor:default;}
+.mood-hover2 a:hover{text-decoration:none;}
+.rewardbg{background:#ff6a09;padding:4px 8px 8px;position:relative;left:-5px;top:-5px;border:1px solid #d35705;color:#ffdfc3;}
+.reward{background:#dddddd;position:absolute;}
+.st2{color:#ffffff;}

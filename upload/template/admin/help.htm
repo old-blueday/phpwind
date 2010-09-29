@@ -1,0 +1,135 @@
+<!--<?php
+include_once PrintEot('left');
+if(!$action){
+$addurl = $hid ? "&hid=$hid" : '';print <<<EOT
+-->
+<div class="admin_info mb10">
+    <h3 class="h1"><b>提示信息</b></h3>
+    <div class="legend">帮助操作注意事项:<ol><li>标题不能为空</li><li>内容支持html</li><li>无限级项目，随意创建、删除。删除会将下级项目下所有帮助删除，请小心操作</li></ol></div>
+</div>
+<form action="$basename" method="post">
+<input type="hidden" name="action" value="update" />
+<h2 class="h1">
+<!--
+EOT;
+if ($nav){print <<<EOT
+-->
+<span class="fl mr10"><a href="$basename">站点帮助中心</a><span class="linka">$nav</span></span>
+<!--
+EOT;
+} else {print <<<EOT
+-->
+<span class="fl mr10">站点帮助中心</span>
+<!--
+EOT;
+}print <<<EOT
+-->
+<a class="btn_add fl" href="$basename&action=add$addurl" hidefocus="true"><i>添加帮助项目</i></a></h2>
+<div class="admin_table mb10">
+    <table width="100%" cellspacing="0" cellpadding="0">
+        <tr class="tr2">
+            <td width="50%">标题</td>
+            <td width="20%">前台显示顺序</td>
+            <td width="30%">操 作</td>
+        </tr>
+<!--
+EOT;
+foreach($listdb as $value){
+$value[ifchild] && $value[title] = "<a href=\"$basename&hid=$value[hid]\" class=\"xia2\" style=\"text-decoration:underline;\">$value[title]</a>";print <<<EOT
+-->
+    	<tr class="tr1">
+        	<td class="td3">$value[add]$value[title]</td>
+            <td class="td2"><input class="input input_wc" name="selid[$value[hid]]" value="$value[order]"></td>
+            <td class="td2">
+                <a class="mr20" href="$basename&action=add&hup=$value[hid]">[添加子项目]</a>
+            	<a class="mr20" href="$basename&action=edit&hup=$value[hup]&hid=$value[hid]" title="编辑">[编辑]</a>
+            	<a href="$basename&action=delete&hid=$value[hid]" title="删除">[删除]</a>
+           </td>
+      	</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+    </table>
+</div>
+<div class="tac mb10">
+	<span class="btn"><span><button type="submit" onfocus="blur();">提 交</button></span></span>
+</div>
+<!--
+EOT;
+}elseif($action=='delete'){print <<<EOT
+-->
+<form action="$basename" method="post">
+<input type="hidden" name="action" value="delete" />
+<input type="hidden" name="hid" value="$hid" />
+<input type="hidden" name="step" value="2" />
+<div class="admin_info mb10">
+    <h3 class="h1">确认删除</h3>
+    <div class="legend">您确定删除名为“{$dtitle}” 的帮助项目？<br /><font color="#FF0000">请注意: 删除此项目会同时移去其所有子项目。</font></div>
+</div>
+<div class="tac mb10">
+	<span class="btn"><span><button type="submit" onfocus="blur();">提 交</button></span></span>
+    <span class="bt"><span><button type="button" onclick="window.location = '$basename'">返 回</button></span></span>
+</div>
+</form>
+<!--
+EOT;
+}elseif($action=='add' || $action=='edit'){print <<<EOT
+-->
+<form action="$basename" method="post">
+<input type="hidden" name="step" value="2" />
+<input type="hidden" name="action" value="$action" />
+<input type="hidden" name="hid" value="$hid" />
+<h2 class="h1">
+<!--
+EOT;
+if($action=='add'){print <<<EOT
+-->
+<span class="mr10">添加帮助项目</span>
+<!--
+EOT;
+} else {print <<<EOT
+-->
+<span class="mr10">编辑帮助项目</span>
+<!--
+EOT;
+}print <<<EOT
+-->
+<a href="$basename" class="linka">返回上一级<span class="f9">▲</span></a></h2>
+<div class="admin_table mb10">
+    <table width="100%" cellspacing="0" cellpadding="0">
+        <tr class="tr1 vt">
+        	<td class="td1">上级项目</td>
+        	<td class="td2"><select name="hup" class="select_wa"><option value="0">作为顶级</option>{$helpslt}</select></td>
+			<td class="td2"><div class="help_a">选择项目等级</div></td>
+        </tr>
+        <tr class="tr1 vt">
+        	<td class="td1">前台显示顺序</td>
+        	<td class="td2"><input type="text" class="input input_wa" name="vieworder" value="$vieworder" /></td>
+			<td class="td2"><div class="help_a"><!-- 前台显示顺序 --></div></td>
+        </tr>
+        <tr class="tr1 vt">
+        	<td class="td1">标题</td>
+        	<td class="td2"><input type="text" class="input input_wa" name="title" value="$title" /></td>
+			<td class="td2"><div class="help_a"><!-- 标题 --></div></td>
+        </tr>
+        <tr class="tr1 vt">
+            <td class="td1">URL链接</td>
+            <td class="td2"><input type="text" class="input input_wa" name="url" value="$url" /></td>
+        <td class="td2"><div class="help_a">填写已经完善的帮助链接。<font color="blue">注:填写此处，内容无须填写</font></div></td>
+		</tr>
+        <tr class="tr1 vt">
+            <td class="td1">内容</td>
+            <td class="td2"><textarea name="content" class="textarea">$content</textarea></td>
+        <td class="td2"><div class="help_a">填写帮助内容。支持html代码</div></td>
+		</tr>
+    </table>
+</div>
+<div class="tac mb10">
+	<span class="btn"><span><button type="submit" onfocus="blur();">提 交</button></span></span>
+</div>
+</form>
+<!--
+EOT;
+}include_once PrintEot('adminbottom');
+?>-->

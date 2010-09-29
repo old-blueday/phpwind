@@ -1,0 +1,91 @@
+<!--<?php
+include_once PrintEot('left');
+if(empty($action)){print <<<EOT
+-->
+<form name='FORM' action="$basename" method="post" onreset="mreset()">
+<h2 class="h1">消息群发</h2>
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+	<tr class="tr1 vt">
+		<td class="td1">&nbsp;</td>
+		<td class="td2">
+			<ul class="list_A list_80 cc">
+				<li><input type="radio" name="by" value="1" onclick="sendtype(0)" checked="checked" />用户组</li>
+				<li><input type="radio" name="by" value="2" onclick="sendtype(1)" />在线用户</li>
+			</ul>
+		</td>
+	</tr>
+	<tr class="tr1 vt" id="group">
+		<td class="td1">接收用户</td>
+		<td class="td2">
+			<ul class="list_A list_120 cc mb10" style="width:480px;">
+<!--
+EOT;
+$num=0;
+foreach($ltitle as $key=>$value){
+if($key=='1' || $key=='2' || isset($lneed[$key]))continue;
+$num++;
+print <<<EOT
+-->
+				<li><input type='checkbox' name='sendto[]' value='$key'>$value</li>
+<!--
+EOT;
+}print <<<EOT
+-->
+				<li><input type='checkbox' name='sendto[]' value='-1'>普通会员</li>
+			</ul>
+			<span class="bt2"><span><button onclick="CheckAll(this.form)" value="全 选" name="chkall" onfocus="blur();" type="button">全 选</button></span></span>
+		</td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">主题</td>
+		<td class="td2"><input type="text" class="input input_wb" name="subject" /></td></tr>
+	<tr class="tr1 vt">
+		<td class="td1">内容</td>
+		<td class="td2">
+<!--
+EOT;
+require_once PrintEot('wysiwyg_editor');
+print <<<EOT
+-->
+		</td>
+	</tr>
+</table>
+</div>
+
+<script type="text/javascript" LANGUAGE="JavaScript" src="js/core/core.js"></script>
+<script type="text/javascript" language="JavaScript" src="js/pw_ajax.js"></script>
+<script language="JavaScript" src="js/post.js"></script>
+<script language="JavaScript" src="js/global.js"></script>
+
+<script language="JavaScript" src="data/bbscache/face.js"></script>
+<div id="menu_face" class="menu" style="display:none;"></div>
+<div id="menu_generalface" class="menu" style="display:none;"></div>
+
+<script type="text/javascript">editor.init('wysiwyg', 0);</script>
+
+<input type="hidden" name="action" value="send" />
+<div class="tac mb10">
+	<span class="btn"><span><button type="submit">提 交</button></span></span>
+	<span class="bt"><span><button type="reset">重 置</button></span></span>
+</div>
+</form>
+<SCRIPT LANGUAGE="JavaScript">
+function sendtype(ID){
+	var group = document.getElementById("group");
+	if (ID==0){
+		group.style.display = "";
+	}else if (ID==1){
+		group.style.display = "none";
+	}
+}
+function mreset(){
+	editor._textArea.value='';
+	editor._doc.body.innerHTML='';
+	return true;
+}
+</SCRIPT>
+<!--
+EOT;
+}include_once PrintEot('adminbottom');
+?>-->

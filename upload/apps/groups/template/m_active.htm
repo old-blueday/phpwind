@@ -1,0 +1,1058 @@
+<!--<?php
+print <<<EOT
+-->
+<div class="g_navB mb10">
+<span class="fr">
+<!--
+EOT;
+$tmp = '';
+if ($ifadmin && $job != 'post') {print<<<EOT
+-->
+<span class="btn_add"><span><button onClick="location.href='apps.php?q=group&a=active&cyid=$cyid&job=post';">发起活动</button></span></span>
+<!--
+EOT;
+$tmp = '&nbsp;|&nbsp; ';
+}if ($job == 'post' || $job == 'view') {print<<<EOT
+-->
+{$tmp}<a href="apps.php?q=group&a=active&cyid=$cyid">返回活动列表</a>
+<!--
+EOT;
+} elseif (in_array($job, array('membermanage', 'actmember', 'edit'))) {print<<<EOT
+-->
+{$tmp}<a href="apps.php?q=group&a=active&cyid=$cyid&job=view&id=$id">返回活动</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+</span>
+<span class="mr20">
+<!--
+EOT;
+if(in_array($job, array('membermanage', 'actmember'))){print<<<EOT
+-->
+	共{$active[members]}人参加活动
+<!--
+EOT;
+} else {print<<<EOT
+-->
+	共{$colony['activitynum']}个活动
+<!--
+EOT;
+}print<<<EOT
+-->
+</span></div>
+<!--
+EOT;
+if (empty($job)) {print <<<EOT
+-->
+    <div class="g_contentA fl">
+    	<div class="p10">
+    	<table class="vt mb10" width="100%" style="table-layout:fixed;">
+<!--
+EOT;
+if ($activedb) {
+$key_lang = array(1=>'出游',2=>'聚餐 ',3=>'舞会',4=>'户外',5=>'烧烤',6=>'其他');
+foreach ($activedb as $key => $value) {print <<<EOT
+-->
+        	<tr>
+            	<td width="145">
+                	<a href="{$basename}a=$a&job=view&cyid=$cyid&id=$value[id]"><img src="$value[poster_img]" class="img" width="120" height="160" /></a>
+                </td>
+                <td>
+                	<div style="min-height:170px;_height:170px;">
+                	<p class="mb10 f14 b">
+<!--
+EOT;
+if ($timestamp > $value['endtime']) {print <<<EOT
+-->
+					<span class="bt fr" style="cursor:text;"><span><button type="button" style="cursor:text;" disabled>活动已结束</button></span></span>
+<!--
+EOT;
+} elseif ($timestamp > $value['deadline'] && $timestamp > $value['begintime']) {print <<<EOT
+-->
+					<span class="bt fr" style="cursor:text;"><span><button type="button" style="cursor:text;" disabled>活动进行中</button></span></span>
+<!--
+EOT;
+} elseif ($timestamp > $value['deadline']) {print <<<EOT
+-->
+					<span class="bt fr" style="cursor:text;"><span><button type="button" style="cursor:text;" disabled>报名已截止</button></span></span>
+<!--
+EOT;
+} elseif ($value['limitnum'] && $value['members'] >= $value['limitnum']) {print <<<EOT
+-->
+					<span class="bt fr" style="cursor:text;"><span><button type="button" style="cursor:text;" disabled>人员已满</button></span></span>
+<!--
+EOT;
+} else {print <<<EOT
+-->
+					<span class="btn fr"><span><button type="button" id="active_join_$value[id]" onclick="sendmsg('{$basename}a=$a&job=join&cyid=$cyid&id=$value[id]','',this.id)">我要报名</button></span></span>
+<!--
+EOT;
+}print <<<EOT
+-->
+
+<!--
+EOT;
+if ($value['type']) {print <<<EOT
+-->
+										<span class="s2 mr5">[{$key_lang[$value['type']]}]</span>
+<!--
+EOT;
+}print <<<EOT
+-->
+                    <a href="{$basename}a=$a&job=view&cyid=$cyid&id=$value[id]">$value[title]</a></p>
+                    <p class="mb10"><span class="s6">简介：</span>$value[introduction]</p>
+                    <p class="mb10"><span class="s6">时间：</span>$value[begintime_s]&nbsp;至&nbsp;$value[endtime_s]</p>
+                    <p class="mb10"><span class="s6">地点：</span>$value[address]</p>
+                    <p class="mb10"><span class="mr10"><strong class="act_num">$value[members]</strong>人参加</span><a href="{$basename}a=$a&job=view&cyid=$cyid&id=$value[id]">查看详情</a></p>
+                    </div>
+                    <div class="hrA">&nbsp;</div>
+                </td>
+            </tr>
+<!--
+EOT;
+}
+} else {print <<<EOT
+-->
+			<tr><td class="p10"><div class="f14 tac">
+<!--
+EOT;
+if($ifadmin){print <<<EOT
+-->
+			暂无活动，我来第一个<a href="apps.php?q=group&a=active&cyid=$cyid&job=post" class="line s2">发起活动</a>吧！
+<!--
+EOT;
+} else {print <<<EOT
+-->
+			暂无活动
+<!--
+EOT;
+}print <<<EOT
+-->
+			</div></td></tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+        </table>
+        <div class="p10">$pages</div>
+        </div>
+    </div>
+	<div class="g_sidebarA fr">
+<!--
+EOT;
+if ($newactivedb) {print <<<EOT
+-->
+		<div class="g_tA mb10">
+			<h2 class="g_hB">社区最新活动</h2>
+            <div class="p10">
+                <div class="dlD">
+<!--
+EOT;
+foreach ($newactivedb as $key => $value) {
+$value['begintime'] = get_date($value['begintime'], 'n月j日');
+$value['endtime'] = get_date($value['endtime'], 'n月j日');
+print <<<EOT
+-->
+                    <dl class="dl mb10">
+                        <dt class="dt f14"><h3><a href="{$basename}a=active&cyid=$value[cid]&job=view&id=$value[id]">$value[title]</a></h3></dt>
+<!--
+EOT;
+if ($value['address']) {print <<<EOT
+-->
+						<dd class="dd2">$value[address]</dd>
+<!--
+EOT;
+}print <<<EOT
+-->
+                        <dd class="dd">{$value['begintime']} - {$value['endtime']}</dd>
+                        <dd class="dd2 s2"><span class="mr20">{$value[members]}人参加</span>热度：$value[hits]</dd>
+                    </dl>
+<!--
+EOT;
+}print <<<EOT
+-->
+                </div>
+            </div>
+		</div>
+<!--
+EOT;
+}if ($hotactivedb) {print <<<EOT
+-->
+		<div class="g_tA mb10">
+			<h2 class="g_hB">社区热门活动</h2>
+            <div class="p10">
+                <div class="dlD">
+<!--
+EOT;
+foreach ($hotactivedb as $key => $value) {
+$value['begintime'] = get_date($value['begintime'], 'n月j日');
+$value['endtime'] = get_date($value['endtime'], 'n月j日');
+print <<<EOT
+-->
+					<dl class="dl mb10">
+						<dt class="dt f14"><h3><a href="{$basename}a=active&cyid=$value[cid]&job=view&id=$value[id]">$value[title]</a></h3></dt>
+<!--
+EOT;
+if ($value['address']) {print <<<EOT
+-->
+						<dd class="dd2">$value[address]</dd>
+<!--
+EOT;
+}print <<<EOT
+-->
+                        <dd class="dd">{$value['begintime']} - {$value['endtime']}</dd>
+                        <dd class="dd2 s2"><span class="mr20">{$value[members]}人参加</span>热度：$value[hits]</dd>
+					</dl>
+<!--
+EOT;
+}print <<<EOT
+-->
+				</div>
+            </div>
+		</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+	</div>
+<!--
+EOT;
+} elseif ($job == 'view') {
+$key_lang = array(1=>'出游',2=>'聚餐 ',3=>'舞会',4=>'户外',5=>'烧烤',6=>'其他');
+print <<<EOT
+-->
+	<div class="fl g_contentA">
+    	<div class="g_tA">
+		<div class="p10" style="min-height:950px;_height:950px;">
+        	<table width="100%" class="mb10" style="table-layout:fixed;">
+            	<tr class="vt">
+                	<td width="195"><img src="$active[poster_img]" width="180" height="240" /></td>
+                    <td>
+                    <h1 class="mb10">
+<!--
+EOT;
+if ($active['type']) {print <<<EOT
+-->
+							<a href="{$basename}a=$a&cyid=$cyid&type=$active[type]" class="s2">[{$key_lang[$active['type']]}]</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+						$active[title]</h1>
+                        <p class="g_hF cc">
+													<span class="fr">
+													<a href="apps.php?q=collection&a=favor&type=groupactive&ajax=1&id={$active[id]}" onclick="return ajaxurl(this)" class="mr10 allCollect">收藏</a>
+<!--
+EOT;
+print <<<EOT
+-->
+													<a href="javascript:;" onclick="sendmsg('operate.php?action=toweibo&ajax=1&type=groupactive&id=$active[id]','',this.id);" class="allForward mr20">新鲜事</a></span>
+                        	<strong>发起人：</strong><a href="u.php?uid=$active[uid]" target="_blank" class="img_25 mr10"><i><img src="$active[icon]" align="absmiddle" /></i></a><a href="u.php?uid=$active[uid]" target="_blank">$active[username]</a>
+                        </p>
+                        <p class="g_hF cc"><strong>活动时间：</strong>$active[begintime_s] - $active[endtime_s]</p>
+                        <p class="g_hF cc"><strong>报名截止：</strong>$active[deadline_s]</p>
+                        <p class="g_hF cc"><strong>地点：</strong>$active[address]</p>
+                        <p class="g_hF cc"><strong>费用估计：</strong>
+<!--
+EOT;
+if ($active['price'] == '0.00') {print <<<EOT
+-->
+									免费
+<!--
+EOT;
+} else {print <<<EOT
+-->
+									{$active['price']}
+<!--
+EOT;
+}print <<<EOT
+-->
+                        </p>
+                        <p class="g_hF cc">
+<!--
+EOT;
+if ($timestamp > $active['endtime']) {print<<<EOT
+-->
+						<span class="mr10"><span class="bt2" style="cursor:text;"><span><button type="button" style="cursor:text;" disabled>活动已结束</button></span></span></span>
+<!--
+EOT;
+} elseif ($timestamp > $active['deadline'] && $timestamp > $active['begintime']) {print <<<EOT
+-->
+						<span class="mr10"><span class="bt2" style="cursor:text;"><span><button type="button" style="cursor:text;" disabled>活动进行中</button></span></span></span>
+<!--
+EOT;
+} elseif ($timestamp > $active['deadline']) {print <<<EOT
+-->
+						<span class="mr10"><span class="bt2" style="cursor:text;"><span><button type="button" style="cursor:text;" disabled>报名已截止</button></span></span></span>
+
+<!--
+EOT;
+} elseif ($active['limitnum'] && $active['members'] >= $active['limitnum']) {print <<<EOT
+-->
+						<span class="mr10"><span class="bt2" style="cursor:text;"><span><button type="button" style="cursor:text;" disabled>人员已满</button></span></span></span>
+
+<!--
+EOT;
+} if ($active['objecter'] == 1 && !$colony['ifcyer'] && !$isJoin) {print <<<EOT
+-->
+						参加活动请先<a href="{$basename}a=join&cyid=$cyid" onclick="return ajaxurl(this)">加入群组</a>
+
+<!--
+EOT;
+} elseif ($active['deadline'] > $timestamp && !$newActive->isJoin($id, $winduid)) {print <<<EOT
+-->
+						<span class="mr10"><span class="btn"><span><button type="button" id="active_join" onclick="sendmsg('{$basename}a=active&job=join&cyid=$cyid&id=$id','',this.id)">我要参加</button></span></span></span>
+<!--
+EOT;
+} elseif ($newActive->isJoin($id, $winduid) && $winduid != $active['uid']) {print <<<EOT
+-->
+						<span class="bt2"><span><button type="button" id="active_quit" onclick="sendmsg('apps.php?q=group&a=$a&job=quit&cyid=$cyid&id=$id', '', this.id);">退出活动</button></span></span>
+<!--
+EOT;
+} if ($winduid == $active['uid'] || $ifadmin) {print <<<EOT
+-->
+						<span class="bt2"><span><button onClick="location.href='{$basename}a=$a&job=edit&cyid=$cyid&id=$id';">编辑活动</button></span></span>
+						<span class="bt2"><span><button id="del_active" onClick="sendmsg('apps.php?q=group&a=active&job=del&cyid=$cyid&id=$id','',this.id)">取消活动</button></span></span>
+<!--
+EOT;
+} if ($active['deadline'] > $timestamp) {print <<<EOT
+-->
+						<span class="btn4"><span><button onClick="location.href='apps.php?q=group&cyid=$cyid&a=invite&type=groupactive&id=$id';">邀请朋友参加</button></span></span>
+<!--
+EOT;
+} if ($newActive->isJoin($id, $winduid)) {print <<<EOT
+-->
+						<a href="{$basename}a=active&cyid=$cyid">查看其它活动</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+                        </p>
+                    </td>
+                </tr>
+            </table>
+            <h3 class="g_hA b">
+            	活动详情
+            </h3>
+			<div class="p15 mb10 f14" style="line-height:2">
+					$active[content]
+<!--
+EOT;
+if($active['pic']){
+	foreach($active['pic'] as $pic){
+		if($pic){
+print <<<EOT
+-->
+							<div class="mb10" id="att_$pic[aid]">
+<!--
+EOT;
+			if($pic['desc']){
+print <<<EOT
+-->
+								描述:$pic[desc]<br />
+<!--
+EOT;
+			}
+print <<<EOT
+-->
+								图片: $pic[img]
+<!--
+EOT;
+			if($pic['dfadmin']){
+print <<<EOT
+-->
+								[<a style="cursor:pointer" onclick="delatt('$read[pid]','$pic[aid]','active');">删除</a>]
+<!--
+EOT;
+			}
+print <<<EOT
+-->
+							</div>
+<!--
+EOT;
+		}
+	}
+}if($active['downattach']){
+	foreach($active['downattach'] as $attach){
+		if($attach){
+print <<<EOT
+-->
+							<div class="mb10" id="att_$attach[aid]">
+<!--
+EOT;
+			if($attach['desc']){
+print <<<EOT
+-->
+								描述:$attach[desc]<br />
+<!--
+EOT;
+			}
+			$att_id = $db_attfg ? "id=\"fg_$attach[aid]\"" : '';
+print <<<EOT
+-->
+								附件: <img src="$imgpath/wind/file/$attach[type].gif" align="absmiddle" />
+<!--
+EOT;
+if($attach['ext'] == 'swf'){print<<<EOT
+-->
+						<a $att_id style="cursor:pointer" onclick="openatt('$attach[aid]');"> <font color="red">$attach[name]</font></a>
+<!--
+EOT;
+}else{print<<<EOT
+-->
+						<a $att_id href="job.php?action=download&type=active&aid=$attach[aid]" target="_blank"> <font color="red">$attach[name]</font></a>
+<!--
+EOT;
+}print<<<EOT
+-->
+								($attach[size] K) 下载次数:$attach[hits]
+<!--
+EOT;
+			if ($attach['needrvrc']) {
+				$at_lang = $attach['special'] == 2 ? '售价' : '需要';
+				//{$at_lang}:{$attach[needrvrc]}{$attach[cname]}
+print <<<EOT
+-->
+								该附件被加密,需要{$attach[needrvrc]}{$attach[cname]}以上积分才能下载
+<!--
+EOT;
+			}elseif(in_array($attach['ext'],array('mp3','wma','wmv','rm','swf'))){
+print <<<EOT
+-->
+								[<a style="cursor:pointer" onclick="playatt('$attach[aid]');">试播</a>]
+<!--
+EOT;
+			}if($attach['ext'] == 'swf'){print<<<EOT
+-->
+								[<a href="job.php?action=download&type=active&aid=$attach[aid]" target="_blank">下载</a>]
+<!--
+EOT;
+
+			}if($attach['dfadmin']){
+print <<<EOT
+-->
+								[<a style="cursor:pointer" onclick="delatt('$read[pid]','$attach[aid]','active');">删除</a>]
+<!--
+EOT;
+			}
+print <<<EOT
+-->
+							</div>
+<!--
+EOT;
+		}
+	}
+}print <<<EOT
+-->
+			</div>
+            <h3 class="g_hA">
+<!--
+EOT;
+if ($active['members'] >= 20) {print <<<EOT
+-->
+				<a href="{$basename}a=$a&job=actmember&cyid=$cyid&id=$id" class="fr">更多>></a>
+<!--
+EOT;
+}print <<<EOT
+-->
+            	<b class="mr10">已有{$active[members]}人报名</b>
+<!--
+EOT;
+if ($active['members'] > 0 && ($ifadmin || $active['uid'] == $winduid)) {print <<<EOT
+-->
+				<a href="apps.php?q=group&cyid=$cyid&a=active&job=membermanage&id=$id">管理</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+            </h3>
+			<div class="p10 mb10">
+                <ul class="ulB cc">
+<!--
+EOT;
+foreach ($actMembers as $key => $value) {
+if ($key > 0 && ($key % 5 == 0)) {print <<<EOT
+-->
+
+<!--
+EOT;
+}
+if ($value['anonymous'] == 1 && !$ifadmin && $winduid !=$value['uid']) {print <<<EOT
+-->
+
+                    <li><a href="javascript:;" class="i"><img src="images/face/none.gif" class="img_60" /></a><p class="n">匿名</p></li>
+<!--
+EOT;
+} else {print <<<EOT
+-->
+                    <li><a href="u.php?uid=$value[uid]" target="_blank" class="i"><img src="$value[icon]" width="44" height="44" /></a><p class="n"><a href="u.php?uid=$value[uid]" title="$value[username]" target="_blank">$value[username]</a></p></li>
+<!--
+EOT;
+}}print <<<EOT
+-->
+                </ul>
+			</div>
+			<script language="JavaScript" src="js/app_comment.js"></script>
+			<div>
+<!--
+EOT;
+require_once PrintEot('m_active_comment');print <<<EOT
+-->
+			</div>
+			<div class="c"></div>
+		</div>
+        </div>
+	</div>
+	<div class="g_sidebarA fr">
+<!--
+EOT;
+if ($relateactivedb) {print <<<EOT
+-->
+		<div class="g_tA mb10">
+			<h2 class="g_hB">参加这个活动的人也参加了</h2>
+            <div class="p10">
+                <div class="dlD">
+<!--
+EOT;
+foreach ($relateactivedb as $key => $value) {
+$value['begintime'] = get_date($value['begintime'], 'n月j日');
+$value['endtime'] = get_date($value['endtime'], 'n月j日');
+print <<<EOT
+-->
+					<dl class="dl mb10">
+						<dt class="dt f14"><h3><a href="{$basename}a=active&cyid=$value[cid]&job=view&id=$value[id]">$value[title]</a></h3></dt>
+<!--
+EOT;
+if ($value['address']) {print <<<EOT
+-->
+						<dd class="dd2">$value[address]</dd>
+<!--
+EOT;
+}print <<<EOT
+-->
+						<dd class="dd">{$value['begintime']} - {$value['endtime']}</dd>
+						<dd class="dd2 s2"><span class="mr20">{$value[members]}人参加</span>热度：$value[hits]</dd>
+					</dl>
+<!--
+EOT;
+}print <<<EOT
+-->
+				</div>
+            </div>
+		</div>
+<!--
+EOT;
+}if ($newactivedb) {print <<<EOT
+-->
+		<div class="g_tA mb10">
+			<h2 class="g_hB">最新活动</h2>
+            <div class="p10">
+                <div class="dlD">
+<!--
+EOT;
+foreach ($newactivedb as $key => $value) {
+$value['begintime'] = get_date($value['begintime'], 'n月j日');
+$value['endtime'] = get_date($value['endtime'], 'n月j日');
+print <<<EOT
+-->
+					<dl class="dl mb10">
+						<dt class="dt f14"><h3><a href="{$basename}a=active&cyid=$value[cid]&job=view&id=$value[id]">$value[title]</a></h3></dt>
+<!--
+EOT;
+if ($value['address']) {print <<<EOT
+-->
+						<dd class="dd2">$value[address]</dd>
+<!--
+EOT;
+}print <<<EOT
+-->
+						<dd class="dd">{$value['begintime']} - {$value['endtime']}</dd>
+						<dd class="dd2 s2"><span class="mr20">{$value[members]}人参加</span>热度：$value[hits]</dd>
+					</dl>
+<!--
+EOT;
+}print <<<EOT
+-->
+				</div>
+            </div>
+		</div>
+<!--
+EOT;
+}if ($hotactivedb) {print <<<EOT
+-->
+		<div class="g_tA mb10">
+			<h2 class="g_hB">社区热门活动</h2>
+            <div class="p10">
+                <div class="dlD">
+<!--
+EOT;
+foreach ($hotactivedb as $key => $value) {
+$value['begintime'] = get_date($value['begintime'], 'n月j日');
+$value['endtime'] = get_date($value['endtime'], 'n月j日');
+print <<<EOT
+-->
+					<dl class="dl mb10">
+						<dt class="dt f14"><h3><a href="{$basename}a=active&cyid=$value[cid]&job=view&id=$value[id]">$value[title]</a></h3></dt>
+<!--
+EOT;
+if ($value['address']) {print <<<EOT
+-->
+						<dd class="dd2">$value[address]</dd>
+<!--
+EOT;
+}print <<<EOT
+-->
+						<dd class="dd">{$value['begintime']} - {$value['endtime']}</dd>
+						<dd class="dd2 s2"><span class="mr20">{$value[members]}人参加</span>热度：$value[hits]</dd>
+					</dl>
+<!--
+EOT;
+}print <<<EOT
+-->
+				</div>
+            </div>
+		</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+	</div>
+<!--
+EOT;
+} elseif ($job == 'actmember') {print <<<EOT
+-->
+	<div class="g_box">
+		<div class="bd">
+			<table class="g_tableB" width="100%" cellpadding="0" cellspacing="0">
+				<tr class="vt">
+<!--
+EOT;
+foreach ($actMembers as $key => $value) {
+if ($key > 0 && ($key % 5 == 0)) {print <<<EOT
+-->
+				</tr>
+				<tr class="vt">
+<!--
+EOT;
+}
+if ($value['anonymous'] == 1 && $groupid != 3 && $active['uid'] != $winduid && $value['username'] != $windid) {print <<<EOT
+-->
+
+					<td><img src="images/face/none.gif" class="img_60" /><br />匿名</td>
+<!--
+EOT;
+} else {print <<<EOT
+-->
+					<td><a href="u.php?uid=$value[uid]"  target="_blank"><img src="$value[icon]" class="img_60" /><br />$value[username]</a></td>
+<!--
+EOT;
+}}print <<<EOT
+-->
+
+				</tr>
+			</table>
+		</div>
+	</div>
+	<div class="p10">$pages</div>
+<!--
+EOT;
+} elseif ($job == 'membermanage') {print <<<EOT
+-->
+	<h3>
+		<a href="apps.php?q=group&cyid=$cyid&a=active&job=sendmsg&id=$id" class="fr" onclick="return ajaxurl(this)">群发信息</a>
+		<a href="apps.php?q=group&cyid=$cyid&a=active&job=exportmember&id=$id" class="fr mr10">导出报名信息</a>
+	</h3>
+	<div class="g_box">
+		<div class="bd">
+			<table class="g_tableB" width="100%" cellpadding="0" cellspacing="0">
+				<tr class="vt g_bgB">
+					<td width="15%">用户名</td>
+					<td width="15%">手机</td>
+					<td width="15%">电话</td>
+					<td>地址</td>
+					<td width="8%">操作</td>
+				</tr>
+<!--
+EOT;
+foreach ($actMembers as $key => $value) {print <<<EOT
+-->
+				<tr class="vt">
+					<td>$value[username] ($value[realname])</td>
+					<td>$value[phone]</td>
+					<td>$value[mobile]</td>
+					<td>$value[address]</td>
+					<td><a href="apps.php?q=group&cyid=$cyid&a=active&job=delmember&id=$id&uid=$value[uid]" onclick="return ajaxurl(this);">删除</a></td>
+				</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+			</table>
+		</div>
+	</div>
+	<div class="p10">$pages</div>
+<!--
+EOT;
+} elseif ($job == 'post' || $job == 'edit') {print <<<EOT
+-->
+<style type="text/css">
+.w_editor_up{background-color:#f8f8f8;padding:5px;}
+.w_editor_up td{padding:2px 0 2px 10px;}
+.w_editor_up .w_tab_a{padding-left:10px;position:absolute;}
+.w_editor_up .w_tab_a li{float:left;margin-right:5px;color:#666;}
+.w_editor_up .w_tab_a li a{float:left;display:block;line-height:22px;padding:0 15px;border:1px solid #ddd;color:#666;background-color:#fbf9fa;}
+.w_editor_up .w_tab_a li a:hover{background-color:#fff;text-decoration:none;}
+.w_editor_up .w_tab_a .none_css a{border:none;background-color:none;line-height:18px;margin-top:2px;}
+.w_editor_up .w_tab_a .none_css a:hover{background-color:#f8f8f8;color:#3366cc;}
+.w_editor_up .w_tab_a .none_css .wy_tips:hover{color:#666;}
+.wy_tips{background:url($imgpath/post/c_editor/w_edit_but.png) right center no-repeat;float:left;}
+.wy_tips i{display:none;}
+.wy_tips:hover{color:#333;_position:relative;text-decoration:none;}
+.wy_tips:hover i{display:block; position:absolute;border:1px solid #f8ad48;background:#fffeed;padding:2px 5px;color:#333;font-style:normal;line-height:130%;word-break:keep-all;word-wrap:no-wrap;}
+.w_editor_up .w_tab_a .current a{background:#fff;border-bottom:none;color:#333;padding-bottom:1px;}
+.w_editor_up_con{background-color:#ffffff;padding:10px;border-top:1px solid #ddd;}
+</style>
+<!--
+EOT;
+if ($isGM || ($db_allowupload && $_G['allowupload']) || $attach) {print <<<EOT
+-->
+<table cellPadding="0" cellSpacing="0" style="display:none" width="100%">
+	<tbody id="att_mode"><tr>
+		<td class="review_bg"><input class="input" type="file" name="attachment_" style="width:200px;overflow:hidden;"/></td><td><input class="input" type="text" name="atc_desc" size="25" /></td>
+		<td style="display:none;"><select name="att_special" onchange="newAtt.sel(this);" style="width:60px;"><option value="0"></option><option value="1">加密</option><option value="2">出售</option></select></td>
+		<td style="display:none;"><select name="att_ctype" style="width:60px;">{$alltype}</select></td>
+		<td style="display:none;"><input class="input" type="text" name="atc_needrvrc" value="0" size="1" /></td>
+		<td></td></tr>
+	</tbody>
+</table>
+<script language="JavaScript">
+var allowmutinum = parseInt('$db_attachnum');
+var allow_ext = '$uploadfiletype';
+var allow_size = '$uploadfilesize';
+var attachnum = parseInt('$db_attachnum');
+</script>
+<script type="text/javascript" language="JavaScript" src="js/swfobject.js"></script>
+<script type="text/javascript" language="JavaScript" src="js/upload.js"></script>
+<!--
+EOT;
+}print <<<EOT
+-->
+<script type="text/javascript" src="js/post.js"></script>
+<script type="text/javascript" src="js/date.js"></script>
+	<div style="padding:0 40px;">
+		<div class="mt30 f14 b g_hD ">发起活动</div>
+		<div class="p10 mt10">
+		<form action="{$basename}a=$a&job=$job&cyid=$cyid" method="post" enctype="multipart/form-data" name="FORM" onsubmit="return checkpost(document.FORM);" >
+		<input type="hidden" name="step" value="3" />
+		<input type="hidden" name="id" value="$id" />
+			<table width="100%" border="0" cellspacing="0" cellpadding="0" class="g_table2 vt">
+				<tr>
+					<td width="120px">活动名称&nbsp;<span class="s1">*</span></td>
+					<td>
+						<input type="text" class="input input_wb" name="title" id="title" value="{$active[title]}" />
+						<span id="title_warn" class="s6">限 $db_titlemax 字节</span>
+					</td>
+				</tr>
+				<tr>
+					<td>活动类型&nbsp;<span class="s1">*</span></td>
+					<td>
+						<label for="type1" class="mr10"><input type="radio" id="type1" name="type" value="1" $typeCheck_1 />&nbsp;出游</label>
+						<label for="type2" class="mr10"><input type="radio" id="type2" name="type" value="2" $typeCheck_2 />&nbsp;聚餐 </label>
+						<label for="type3" class="mr10"><input type="radio" id="type3" name="type" value="3" $typeCheck_3 />&nbsp;舞会</label>
+						<label for="type4" class="mr10"><input type="radio" id="type4" name="type" value="4" $typeCheck_4 />&nbsp;户外</label>
+						<label for="type5" class="mr10"><input type="radio" id="type5" name="type" value="5" $typeCheck_5 />&nbsp;烧烤</label>
+						<label for="type6"><input type="radio" id="type6" name="type" value="6" $typeCheck_6 />&nbsp;其他</label>
+					</td>
+				</tr>
+				<tr>
+					<td>活动时间&nbsp;<span class="s1">*</span></td>
+					<td>
+						<input type="text" class="input input_wa" name="begintime" value="$active[begintime_s]" id="begintime" onClick="ShowCalendar(this.id, 1)" /><span class="p_lr_10">至</span><input type="text" class="input input_wa" name="endtime" value="$active[endtime_s]" id="endtime" onClick="ShowCalendar(this.id, 1)" />
+					</td>
+				</tr>
+				<tr>
+					<td>报名截止&nbsp;<span class="s1">*</span></td>
+					<td><input type="text" class="input input_wa" name="deadline" value="$active[deadline_s]" id="deadline" onClick="ShowCalendar(this.id, 1)" /></td>
+				</tr>
+				<tr>
+					<td>活动地点</td>
+					<td>
+						<input type="text" class="input input_wb" name="address" id="address" value="{$active[address]}" size="40" />
+						<span id="address_warn" class="s6">限 $db_titlemax 字节</span>
+					</td>
+				</tr>
+				<tr>
+					<td>人数上限</td>
+					<td><input type="text" class="input input_wa mr10" name="limitnum" value="$active[limitnum]" />(留空即是不限制)</td>
+				</tr>
+				<tr>
+					<td>报名限制</td>
+					<td>
+						<label for="objecterCheck_0" class="mr20"><input type="radio" id="objecterCheck_0" name="objecter" value="0" $objecterCheck_0 />所有用户</label>
+						<label for="objecterCheck_1"><input type="radio" id="objecterCheck_1" name="objecter" value="1" $objecterCheck_1 />限本群组成员</label>
+					</td>
+				</tr>
+				<tr>
+					<td>活动费用</td>
+					<td><input type="text" class="input input_wa mr10" name="price" value="$active[price]" />(留空即是免费)</td>
+				</tr>
+				<tr>
+					<td>活动海报</td>
+					<td>
+						<input type="file" class="input input_wb" name="poster" value="" />
+<!--
+EOT;
+if ($active['poster']) {print <<<EOT
+-->
+						<img style="height:80px" src="{$active['poster_img']}" />
+<!--
+EOT;
+}print <<<EOT
+-->
+					</td>
+				</tr>
+				<tr>
+					<td>活动介绍&nbsp;<span class="s1">*</span></td>
+					<td>
+						<textarea name="introduction" id="introduction" class="textareaA">$active[introduction]</textarea>
+						<p id="introduction_warn" class="s6">限制 130 字节</p>
+					</td>
+				</tr>
+				<tr>
+					<td>活动详情&nbsp;<span class="s1">*</span></td>
+					<td>
+<!--
+EOT;
+require_once PrintEOT('wysiwyg_editor');
+if($isGM || $db_allowupload && $_G['allowupload']){print <<<EOT
+-->
+							<div class="c mb10"></div>
+							<div class="w_editor_up">
+								<div style="height:23px;">
+									<div style="line-height:18px;padding:5px 0 0 10px;*padding:3px 0 0 10px;" class="fr"></div>
+									<ul class="w_tab_a cc">
+										<li class="current" id="formUploadBtn"><a href="javascript:;" hidefocus="true">普通上传</a></li>
+										<li id="batUploadBtn"><a href="javascript:;" hidefocus="true">批量上传</a></li>
+<!--
+EOT;
+if ($mutiupload > 0) {print <<<EOT
+-->
+										<li id="flashAtt_use" class="none_css"><a href="javascript:;" onclick="flashAtt.use();" hidefocus="true" style="padding-right:0;">已有附件($mutiupload)</a></li>
+										<li id="flashAtt_clear" class="none_css"><a href="javascript:;" onclick="flashAtt.clear();" hidefocus="true">清空已有附件&nbsp;</a></li>
+<!--
+EOT;
+}print <<<EOT
+-->
+										<!-- <li style="width:150px;"><table class="fl"><tr><td style="padding:5px 0 0 10px;*padding:0 0 0 10px;width:16px;"><input align="absbottom" name="atc_hideatt" type="checkbox" value="1" $htmlatt /></td><td style="padding:2px 0 0 0;">隐藏附件(回复可见)</td></tr></table></li> -->
+										<li class="none_css"><a href="javascript:;" class="wy_tips" style="padding-right:14px;">&nbsp;可上传类型<i style="width:250px;">$uploadfilesize</i></a></li>
+									</ul>
+								</div>
+<script type="text/javascript">
+$('formUploadBtn').onclick = function() {
+	var a=$('attach').getElementsByTagName("tr");
+	$('batUpload').style.display='none'
+	a[a.length-1].style.display='';
+	$('batUploadBtn').className="";
+	this.className="current";
+};
+$('batUploadBtn').onclick = function() {
+	var a=$('attach').getElementsByTagName("tr");
+	$('batUpload').style.display=''
+	a[a.length-1].style.display='none';
+	$('formUploadBtn').className="";
+	this.className="current";
+};
+initCheckTextNum('title','title_warn','$db_titlemax');
+initCheckTextNum('address','address_warn','$db_titlemax');
+initCheckTextNum('introduction','introduction_warn',130);
+
+</script>
+
+								<div class="w_editor_up_con">
+<!--
+EOT;
+if($attach){print <<<EOT
+-->
+									<div class="cc">该帖包含附件<span class="gray">(不想保留的附件去掉√)</span> :
+										<table class="tr_p10">
+											<tr class="gray">
+												<td width="11"></td>
+												<td width="220">附件</td>
+												<td width="180">描述</td>
+												<td width="65" style="display:none;">售/密</td>
+												<td width="65" style="display:none;">积分</td>
+												<td width="60" style="display:none;">价格</td>
+												<td width="100"></td>
+											</tr>
+											<tbody id="ajaxtable"></tbody>
+										</table>
+									</div>
+<script language="JavaScript">
+var attachs = {{$attach}};
+oldAtt.init();
+</script>
+<!--
+EOT;
+}print <<<EOT
+-->
+									<div class="cc">
+										<table id="uploadFileInfo" class="uploadFileInfo" style="display:none;margin-bottom:10px;">
+											<tr class="s1">
+												<td>文件名</td><td width="15%">大小</td><td width="20%">上传进度</td><td width="5%">删</td>
+											</tr>
+											<tbody id="qlist"></tbody>
+										</table>
+										<table class="tr_p10">
+											<tr valign="top" id="formUpload" class="gray">
+												<td width="250">上传附件 (图片、文件等)</td>
+												<td width="180">描述</td>
+												<td width="65" style="display:none;">售/密</td>
+												<td width="65" style="display:none;">积分</td>
+												<td width="60" style="display:none;">价格</td>
+												<td width="100">&nbsp;</td>
+											</tr>
+											<tbody id="attach"></tbody>
+										</table>
+										<div id="viewimg" class="menu menu_img" style="display:none;"></div>
+									</div>
+									<div id="batUpload" style="display:none;">
+										<div style="display:none">批量上传附件 <!-- <span id="attsize">(有效文件类型:$uploadfilesize)</span> --></div>
+										<!--  <div class="c"></div> -->
+										<!-- <div>批量上传附件 (图片、文件等，可多选)</div> -->
+										<div style="width:100%;padding:0 0 2px 10px;">
+											<div id="flashUploadPanel" style="width:196px;height:24px;"></div>
+										</div>
+									</div>
+									<div class="c"></div>
+								</div>
+							</div>
+<script language="JavaScript">
+var mutiupload = '$mutiupload';
+flashAtt.init();
+newAtt.create();
+</script>
+<!--
+EOT;
+}print <<<EOT
+-->
+					</td>
+				</tr>
+                <tr>
+                	<td></td>
+                    <td>	<span class="btn"><span><button type="submit" name="Submit" >发 布</button></span></span></td>
+                </tr>
+			</table>
+        </form>
+		</div>
+	</div>
+<SCRIPT LANGUAGE="JavaScript">
+document.FORM.Submit.disabled = false;
+function checkpost(obj) {
+	if (obj.title.value == "") {
+		obj.title.focus();
+		showDialog("error","活动名称不能为空",2);
+		return false;
+	}　else if (obj.type.value == "") {
+		obj.title.focus();
+		showDialog("error","请选择活动类型",2);
+		return false;
+	}　else if (obj.limitnum.value && obj.limitnum.value != parseInt(obj.limitnum.value)) {
+		obj.limitnum.focus();
+		showDialog("error","人数上限类型为数字!",2);
+		return false;
+	}　else if (obj.price.value && obj.price.value != parseFloat(obj.price.value)) {
+		obj.price.focus();
+		showDialog("error","活动费用类型为数字!",2);
+		return false;
+	}　else if (!obj.begintime.value|| !obj.endtime.value) {
+		obj.begintime.focus();
+		showDialog("error","请填写活动开始时间和结束时间!",2);
+		return false;
+	}　else if (compTime(obj.begintime.value,obj.endtime.value) == 1 || compTime(obj.begintime.value,obj.endtime.value) == 0) {
+		obj.title.focus();
+		showDialog("error","活动开始时间不能大于结束时间!",2);
+		return false;
+	}　else if (obj.deadline.value == "") {
+		obj.deadline.focus();
+		showDialog("error","请填写报名截止时间!",2);
+		return false;
+	}　else if (compTime(obj.deadline.value,obj.endtime.value) == 1 || compTime(obj.deadline.value,obj.endtime.value) == 0) {
+		obj.deadline.focus();
+		showDialog("error","报名截止时间不能大于活动结束时间!",2);
+		return false;
+	}　else if (obj.introduction.value == "") {
+		obj.introduction.focus();
+		showDialog("error","请填写活动介绍!",2);
+		return false;
+	}　else if (obj.content.value == "") {
+		obj.content.focus();
+		showDialog("error","活动详情不为空!",2);
+		return false;
+	}
+	document.FORM.Submit.disabled = true;
+	cnt++;
+
+	if (cnt != 1) {
+		showDialog("warning","Submission Processing. Please Wait");
+		return false;
+	}
+	return true;
+}
+//时间比较函数
+function compTime(beginTime, endTime) {
+
+    var beginTimes = beginTime.split(' ');
+    var endTimes = endTime.split(' ');
+
+    var beginTimes_0 = beginTimes[0].split('-');
+    var endTimes_0 = endTimes[0].split('-');
+
+    //parse方法要求短日期可以使用“/”或“-”作为分隔符，但是必须用月/日/年的格式来表示
+    //使用"/"兼容 IE和Firefox
+
+    beginTime = beginTimes_0[1] + '/' + beginTimes_0[2] + '/' + beginTimes_0[0] + '/ ' + beginTimes[1];
+    endTime = endTimes_0[1] + '/' + endTimes_0[2] + '/' + endTimes_0[0] + '/ ' + endTimes[1];
+
+    var parseBeginTime = Date.parse(beginTime);
+    var parseEedTime = Date.parse(endTime);
+    if (parseBeginTime > parseEedTime) {
+        return 1;
+    } else if (parseBeginTime < parseEedTime) {
+        return -1;
+    } else if (parseBeginTime == parseEedTime) {
+        return 0;
+    } else {
+        return 'exception'
+    }
+}
+</SCRIPT>
+<!--
+EOT;
+if (R_P != D_P) {
+$facedb = readover(D_P.'data/bbscache/face.js');
+print <<<EOT
+-->
+<script language="javascript">
+{$facedb}
+</script>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+<script language="JavaScript" src="data/bbscache/face.js"></script>
+<!--
+EOT;
+}print <<<EOT
+-->
+	<div id="menu_face" class="menu" style="display:none;"></div>
+	<div id="menu_generalface" class="menu" style="display:none;"></div>
+	<script type="text/javascript">editor.init('$editor', 0);</script>
+<!--
+EOT;
+}print <<<EOT
+-->
+<div class="c">&nbsp;</div>
+<!--
+EOT;
+?>

@@ -1,0 +1,219 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>PHPWind用户安装说明书</title>
+<link href="phpwind_help.css" type="text/css" rel="stylesheet" />
+<SCRIPT src="min.js" type=text/javascript></SCRIPT>
+<SCRIPT src="event.js" type=text/javascript></SCRIPT>
+<SCRIPT src="hc-menu-source.js" type=text/javascript></SCRIPT>
+</head>
+<body>
+<div id="wrap">
+    <div id="wrap2">
+        
+		<script language="JavaScript" src="header.js"></script> 
+        <div id="main">   
+		
+ <div class="place">您所在的位置：<a href="index.html">PHPWind 安装说明</a> > <A href="basic_que.htm">常见问题</A></div>
+
+			<div id="left">
+			<!--左菜单栏 begin-->
+			  				<UL>
+		         <LI><A href="index.htm">简介</A></LI>
+
+				  <LI><A href="install.htm">安装指南</a>
+				    <UL>
+					<LI><A href="install.htm">系统环境说明</A></LI>
+					<LI><A href="install_steps.htm">程序安装流程</A></LI>
+					<LI><A href="install_files.htm">文件及目录结构</A></LI>
+					<LI><A href="upgrade.htm">程序升级流程</A></LI>
+					<LI><A href="upgrades_change.htm">版本说明</A></LI>
+					<LI><A href="install_space.htm">安装集成包介绍</A></LI>
+					</UL>
+				 </LI>
+				
+				 <LI><A href="basic.htm">功能使用</A></LI> 
+				  
+				 <LI><A href="basic_que.htm">常见问题</A></LI>
+				  
+				 <LI><A href="styles.htm">高级应用</a>
+                    <UL>
+				    <LI><a href="styles.htm">界面风格与模板定制</a></LI>
+                    <LI><a href="Sub-forum.htm">使用PHPWind分论坛</a></LI>
+					<LI><A href="plugins.htm">插件相关</A></LI>
+					<LI><a href="shifting.htm">论坛系统的搬迁和转移</a></LI>
+					<LI><A href="tools.htm">转换工具</A></LI>
+				    </UL>
+				  </LI>
+				  <LI><A href="about_seo_7items.htm">SEO技巧</a>
+                    <UL>
+				    <LI><a href="about_seo_7items.htm">搜索引擎优化</a></LI>
+                    <LI><a href="about_lable_seo.htm">网页标题收录</a></LI>
+					<LI><A href="urlrewrite.htm">伪静态的使用</A></LI>
+					</UL>
+				  </LI>
+			
+			</UL>
+				<!--左菜单栏 end-->
+            </div>
+			
+       		
+          		<div class="viewnew">
+<h3 style="text-align:center">常见问题解答</h3><br>
+<p class="gray" style=" text-align:center; text-indent:0;font-size:12px; border-bottom:1px dotted #d7d7d7">
+
+<p>说明:本文常见问题并非是一个PHPwind完整的问题库，而是期望以常见问题解答的形式，对部分已有用户提到的最常见的功能或问题作以介绍，能给您使用过程中碰到的问题解决带来启示，抛砖引玉。目前PHPWind已有较为完善的FAQ系统，如果此处没有您需要的答案，可到<a href="http://faq.phpwind.net/">FAQ帮助中心</a>搜索答案，同时PHPWind也在官方论坛上提供技术支持，针对性解答您的问题。
+<p>
+<h5>日常使用问题&nbsp;&nbsp;<font size=2 color="#888888">点标题可查看详情</font></h5>
+<br>
+<UL id=qMenu_1>
+<li class="current" style="cursor:pointer" ><B>-</B> 忘记安全问题,进不了后台
+	<ul class=qMenu_2>
+		<li>找到data/bbscache/config.php</LI>
+		<li>把$db_ifsafecv='1';</LI>
+		<li>改成$db_ifsafecv='0'; 然后用创始人进入后台修改安全问题即可</LI>
+	</ul>
+</li>
+<li class="current" style="cursor:pointer" title ="详情请点击"><B>-</B> 论坛无法登陆，后台无法显示等问题
+	<ul class=qMenu_2>
+		<li>查看是不是因为设置了安全问题而无法进入?</LI>
+		<li>检查下是不是风格原因引起的（查看wind风格下是否正常）
+		<br>风格的安装需要对应版本，否则也会出错。</LI>
+		<li>进后台查看核心设置-论坛地址-论坛地址 
+		<br>COOKIE有效目录 设为 \ 
+		<br>COOKIE有效域名 清空 
+		<br>二级目录/域名功能 不使用</LI>
+		<li>文件修改错误：
+		<br>到http://www.phpwind.com/download.php下载对应编码的安装包， 
+		<br>解压程序包,把upload里面的所有文件覆盖到空间上,即保证程序完整性.</li>
+	</ul>
+</li>
+<li class="current" style="cursor:pointer" title ="详情请点击"><B>-</B> 帖子插入多媒体（视频,flash,wmv,flv,swf,）无法播放
+	<ul class=qMenu_2>
+		<li>【后台】->【用户】->【用户组权限】->【发布多媒体是否允许自动播放】->是
+		<li>【后台】->【核心】->【会员相关】->【帖子中 Wind Flash功能(建议关闭)】->打开 【关闭则flash不能自动播放】
+		<li>【后台】->【核心】->【会员相关】->【帖子中 Wind (wmv,asf,ra,ram,rm)功能】->打开
+	</ul>
+</li>
+
+<li class="current" style="cursor:pointer" title ="详情请点击"><B>-</B> 统计代码放哪？
+	<ul class=qMenu_2>
+		<li>【后台】->【创始人】->【雅虎统计】，直接开启就可以 </li>
+		<li>若是其他代码，可将代码插入到 template/wind/footer.htm 中。
+		<br>打开template/风格名/footer.htm
+		<br>找到 &lta href=&quotjavascript:scroll(0,0)&quot&gtTop&lt/a&gt 
+		<br>统计代码就加在这个后面,当然其他位置也可以</li>
+	</ul>
+</li>
+
+<li class="current" style="cursor:pointer" title ="详情请点击"><B>-</B> 传附件失败，造成的原因可能有:附件目录不可写(777)
+	<ul class=qMenu_2>
+		<li>请先检查attachment目录是否可写,如果是linux服务器的话可以直接在ftp里面对着attachment目录右键属性(CHMOD),然后设置成777</li> 
+		<li>如果还有问题的话,就是服务器问题了
+		<br>解决办法一、把 php.ini 屏蔽下 ;open_basedir =
+		<br>解决办法二、把php.ini 屏蔽 ;upload_tmp_dir =??或将 upload_tmp_dir =?? 的实际目录放到php的安装目录下
+		<br>例如d:\php为安装目录 那么??upload_tmp_dir =d:\php\temp 权限给予users权限??即可</li>
+		<li>修改后重启web服务 即可</li>
+	</ul>
+</li>
+
+<li class="current" style="cursor:pointer" title ="详情请点击"><B>-</B> 如何显示用户详细信息？
+	<ul class=qMenu_2>
+		个人资料显示方式控制：【后台】->【核心】->【常规设置】->【全局参数】->【弹出式菜单显示】，个人信息前打钩弹出显示，空着直接显示
+	</ul>	
+</li>
+
+<li class="current" style="cursor:pointer" title ="详情请点击"><B>-</B> 勋章未回收时删除了勋章，导致勋章位置显示xx
+	<ul class=qMenu_2>
+		<li>清除所有会员勋章：UPDATE pw_members SET medals=0?</li>
+		<li>清除单个会员勋章 (例 uid=1）：UPDATE pw_members SET medals=0? where? `uid` = '1';
+		<br>参考教程：
+		<br><a href="http://www.phpwind.net/read-htm-tid-643151.html">http://www.phpwind.net/read-htm-tid-643151.html</a>
+		<br><a href="http://www.phpwind.net/read-htm-tid-591169.html">http://www.phpwind.net/read-htm-tid-591169.html</a></li>
+	</ul>
+</li>
+
+<li class="current" style="cursor:pointer" title ="详情请点击"><B>-</B> 论坛出现字体很大，文字颜色不对的错误
+	<ul class=qMenu_2>
+		通常情况都是公告或者版块名称里填写的 html 代码 没有填写 </font> 之类的闭合符号引起了。
+		<br>检查公告或者版块名称里的html代码，正确填写完闭合符号。
+	</ul>
+</li>
+
+<li class="current" style="cursor:pointer" title ="详情请点击"><B>-</B> 我的论坛程序文件images 为何会自动变成数字文件？
+	<ul class=qMenu_2>
+		<li>【后台】->【核心】->【安全与优化】->【动态目录】，选择关闭 自动不定期更改图片链
+		<li>填写上面的图片保存目录。</li>
+	</ul>
+</li>
+
+<li class="current" style="cursor:pointer" title ="详情请点击"><B>-</B> 首页热榜或者10格等图片出不来
+	<ul class=qMenu_2>
+		<li>请检查有没上传附件，因为只有附件里面的图片才可以被调用显示，外链无效</li> 
+		<li>请检查10格的文件没有上传完整，因为大部分是用的flash调用图片，所以如果10格文件下的images/pic.swf没有上传的话，图片flash轮播就不会存在了</li> 
+		<li>【后台】->【核心】->【安全与优化】，关闭 清除页面冗余内容 </li> 
+	</ul>
+</li>
+
+<li class="current" style="cursor:pointer" title ="详情请点击"><B>-</B> 发帖或者回帖空白的解决方法
+	<ul class=qMenu_2>
+	根目录下的post.php文件是发帖的主要文件。
+		<br>require下以post开头的三个文件postnew.php, postreply.php,postmodify.php,分别负责发帖，回帖，编辑帖子
+		<li>如果发主题正常，发回复帖空白。下载同版本最新安装包，覆盖postmodify.php即可</li> 
+		<li>如果回复帖正常，发主题帖空白，下载同版本最新安装包，覆盖postnew.php即可</li> 
+		<li>如发主题帖和回复帖都空白，下载同版本最新安装包，尝试覆盖Post.php，postmodify.php，postnew.php</li> 
+		<li>如果这三个文件覆盖了还无效，可能是由热榜文件发生损坏引起，可以尝试把 data/bbscache/newinfo_config.php文件删除，(可能性较低) 
+		<br>如果这三个文件覆盖了还无效，可能是服务器的php环境引起，需要重新安装php环境，(可能性较低)</li>
+	</ul>
+</li>
+
+<li class="current" style="cursor:pointer" title ="详情请点击"><B>-</B> 出现 Cannot use database 的问题
+	<ul class=qMenu_2>
+		打开论坛出现如下错误信息。
+		<br>Cannot use database
+		<br>The URL Is:
+		<br>http://yourname/index.php?
+		<br>MySQL Server Error:
+		<br>Access denied for user 'root'@'phpwind' (using password: YES) ( 1045 )
+		<br>You Can Get Help In:
+		<br>http://www.phpwind.net
+		<br>解决方案
+		<li>检查mysql数据库是否运行正常。</li>
+		<li>检查phpwind论坛所使用的数据库是否存在。</li>
+		<li>查看data/sql_config.php 文件的数据库用户名，数据库密码，数据库名是否配置正确。</li>
+	</ul>
+</li>
+
+<li class="current" style="cursor:pointer" title ="详情请点击"><B>-</B> 我想修改模板，该怎么做？
+	<ul class=qMenu_2>
+		您可以在系统设置中修改（要求相关模板文件和目录可写，属性 777)或在本地修改好模板文件后通过 FTP 上传到相应目录。 
+	</ul>
+</li>
+
+<li class="current" style="cursor:pointer" title ="详情请点击"><B>-</B> 更换风格后，刚打开的时候是更换后的风格，但是用户登陆进去后看到的界面还是原来的？
+	<ul class=qMenu_2>
+		<li>清除cookie 重新登陆 </li>
+		<li>检查控制面版，个人信息->设置->论坛设置，风格是不是选择默认。</li>
+	</ul>
+</li>
+
+<li class="current" style="cursor:pointer" title ="详情请点击"><B>-</B> 安装风格插件后，论坛出现乱码等
+	<ul class=qMenu_2>
+		安装风格和插件时必须注意编码和版本的选择必须要与您安装的论坛版本、编码一致。
+	</ul>
+</li>
+
+</ul>
+
+风格和模板的安装请看此安装手册说明中的《高级应用》。
+<p>
+<p>更多问题,请访问<a href=http://faq.phpwind.net/>PHPWind FAQ</a>进行搜索。
+<br>如果搜索没有解决，请移步 <a href=http://www.phpwind.net/thread-htm-fid-2.html>官网讨论区</a>发贴求助。
+          	</div>
+      </div>
+      <div class="clear"></div>   
+	  <script language="JavaScript" src="footer.js"></script>
+</div>
+</body>
+</html>

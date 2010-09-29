@@ -1,0 +1,1869 @@
+<!--<?php
+include_once PrintEot('left');
+if (empty($action)) {print <<<EOT
+-->
+<h2 class="h1">快捷操作</h2>
+<div class="admin_table mb10">
+    <table cellspacing="0" cellpadding="0" width="100%">
+        <tr class="tr1 vt">
+            <td class="td2"><ul><li>说明:可以添加新分类，新版块</li></ul></td>
+        </tr>
+        <tr class="tr1 vt">
+            <td class="td2">
+                <form action="$basename&" method="post">
+                <input class="" type="hidden" name="action" value="addforum" />
+                <input type="hidden" name="forumtype" value="category" />
+                <b>添加新分类</b>&nbsp;新分类名称
+                <input type="text" class="input_wa input mr10" name="name" />
+                <span class="bt2"><span><button type="submit" value="提 交">提 交</button></span></span>
+                </form>
+            </td>
+        </tr>
+        <tr class="tr1 vt">
+            <td class="td2">
+                <form action="$basename&" method="post" id="forum_form">
+                <input type="hidden" name="action" value="addforum" />
+                <input type="hidden" name="step" value="2" />
+                <input type="hidden" name="addtype" value="1" />
+                <b>添加新版块</b>&nbsp;新版块名称&nbsp;<input type="text" class="input input_wa mr10" name="name[]">
+                选择父版块&nbsp;
+                <select name="fup" class="select_wa">$fup_forumcache</select> <input type="checkbox" name="ifsave" value="1" />
+                继承父版块设置
+                <span class="bt2"><span><button type="submit" value="提 交">提交</button></span></span>
+                </form>
+            </td>
+        </tr>
+    </table>
+</div>
+<div class="search tar mb10">
+    <span class="linka">版块搜索&nbsp;<input class="input input_wa" name="forumname" id="forumname">
+    	<span class="bt2">
+        	<span><button type="button" value="搜索" onclick="searchForum();">搜索</button></span>
+        </span>
+    </span>
+</div>
+<div id="searchForumSelection" class="searchDown" style="display:none;">
+</div>
+<h2 class="h1"><span  class="mr10">编辑版块</span> <span class="linka"><a onclick="setall('open');" href="javascript:;">全部展开</a> | <a onclick="setall('close');" href="javascript:;">全部关闭</a></span></h2>
+<form action="$basename&" method="post">
+<input type="hidden" name="action" value="editforum" />
+<div class="admin_table mb10">
+<table id="ftable" cellspacing="0" cellpadding="0" width="100%">
+    <tr class="tr2">
+        <td>[顺序]版块名称</td>
+        <td width="160">版主</td>
+        <td>操作</td>
+    </tr>
+<!--
+EOT;
+foreach ($catedb as $cate) {
+$tmpStyle = $threaddb[$cate['fid']] ? 'expand expand_b' : 'expand expand_d';
+print <<<EOT
+-->
+	<tr class="vt tr1" onmouseover="showAdd('$cate[fid]')" onmouseout="hiddenAdd('$cate[fid]')">
+		<td class="td3 tdcur">
+			<i id="bt_$cate[fid]" class="$tmpStyle" onclick="cateopen('$cate[fid]')"></i>
+			<input class="input input_wd mr5" name="order[$cate[fid]]" value="$cate[vieworder]" type="text">
+			<span class="fourm_name" title="双击修改名称" id="fourm_$cate[fid]">$cate[name]</span>
+			<span class="fourm_name" id="fourm_edit_box_$cate[fid]"></span>
+			<font class="gray mr20">FID:$cate[fid]</font>&nbsp;&nbsp;
+            <a href="$basename&action=addforum&fup=$cate[fid]" id="addbt_$cate[fid]" title="添加新版块" style="display:none;">添加新版块</a>
+		</td>
+		<td class="td2"><input  class="input input_wa" name="forumadmin[$cate[fid]]" value="$cate[forumadmin]" type="text"></td>
+        <td class="td2">
+            <a href="$basename&action=edit&fid=$cate[fid]" class="mr10">[编辑]</a>
+            <a href="$basename&action=delete&fid=$cate[fid]">[删除]</a>
+        </td>
+	</tr>
+<!--
+EOT;
+if ($threaddb[$cate['fid']]) {print <<<EOT
+-->
+	<tbody id="cate_$cate[fid]">
+<!--
+EOT;
+foreach ($threaddb[$cate['fid']] as $thread) {
+$isspace = str_repeat($space,$thread['type'] == 'forum' ? 0 : ($thread['type'] == 'sub' ? 1 : 2));
+print <<<EOT
+-->
+	<tr class="vt tr1" onmouseover="showAdd('$thread[fid]')" onmouseout="hiddenAdd('$thread[fid]')">
+		<td class="td3">
+			{$isspace}
+                <i class="lower"></i>
+                <input class="input input_wd mr5" name="order[$thread[fid]]" value="$thread[vieworder]" type="text">
+                <span title="双击修改名称" id="fourm_$thread[fid]" class="fourm_name">$thread[name]</span>
+                <span id="fourm_edit_box_$thread[fid]" class="fourm_name"></span>
+                <font class="gray">FID:$thread[fid]</font>
+<!--
+EOT;
+if($thread['type'] != 'sub2'){print<<<EOT
+-->
+<a href="$basename&action=addforum&fup=$thread[fid]" id="addbt_$thread[fid]" title="添加子版块" style="display:none;">添加子版块</a>
+<!--
+EOT;
+}print<<<EOT
+-->
+		</td>
+		<td class="td2"><input class="input_wa input" name="forumadmin[$thread[fid]]" value="$thread[forumadmin]" type="text"></td>
+		<td class="td2">
+            <a href="$basename&action=edit&fid=$thread[fid]" class="mr10">[编辑]</a>
+            <a href="$basename&action=delete&fid=$thread[fid]">[删除]</a>
+        </td>
+	</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+	</tbody>
+<!--
+EOT;
+}}if ($forum_L) {print <<<EOT
+-->
+	<tr class="tr1 vt">
+		<td class="td2" colspan="6">
+        	<i id="bt_error" class="expand expand_a" onclick="cateopen('error')" ></i><span class="s1 mr10">异常版块</span>(重新设置上级版块可以恢复正常)
+        </td>
+	</tr>
+	<tbody id="cate_error">
+<!--
+EOT;
+foreach ($forum_L as $key => $thread) {
+$isspace = str_repeat($space,$thread['type'] == 'forum' ? 0 : ($thread['type'] == 'sub' ? 1 : 2));
+print <<<EOT
+-->
+	<tr class="tr1 vt">
+		<td class="td3">
+			<div class="fourm"><i class="lower"></i>
+				<input class="input input_wd" name="order[$thread[fid]]" value="$thread[vieworder]" type="text">
+				$thread[name]
+				<font class="gray">FID:$thread[fid]</font>
+			</div>
+		</td>
+		<td class="td2"><input class="input input_wa" name="forumadmin[$thread[fid]]" value="$thread[forumadmin]" type="text"></td>
+		<td class="td2">
+            <a href="$basename&action=edit&fid=$thread[fid]" class="mr10">[编辑]</a>
+            <a href="$basename&action=delete&fid=$thread[fid]">[删除]</a>
+        </td>
+	</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+	</tbody>
+<!--
+EOT;
+}print <<<EOT
+-->
+</table>
+</div>
+<div class="mb10 tac"><span class="btn"><span><button type="submit">提 交</button></span></span></div>
+</form>
+<script language="JavaScript" src="js/pw_ajax.js"></script>
+<script language="JavaScript">
+function cateopen(id) {
+	var o = getObj('cate_' + id);
+	if (o == null) return;
+	if (o.style.display == 'none') {
+		o.style.display = '';
+		getObj('bt_' + id).className = 'expand expand_b';
+	} else {
+		o.style.display = 'none';
+		getObj('bt_' + id).className = 'expand expand_a';
+	}
+}
+function setall(t) {
+	var tbs = getObj('ftable').getElementsByTagName('tbody');
+	for (var i = 0; i < tbs.length; i++) {
+		if (!tbs[i].id.match(/^cate/)) {
+			continue;
+		}
+		var id = tbs[i].id.substr(5);
+		if (t == 'open') {
+			tbs[i].style.display = '';
+			getObj('bt_' + id).className = 'expand expand_a';
+		} else {
+			tbs[i].style.display = 'none';
+			getObj('bt_' + id).className = 'expand expand_b';
+		}
+	}
+}
+function IsElement(id){
+	return document.getElementById(id)!=null ? true : false;
+}
+function showAdd(id){
+	if (IsElement('addbt_' + id)) {
+		getObj('addbt_' + id).style.display = '';
+	}
+}
+function hiddenAdd(id){
+	if (IsElement('addbt_' + id)) {
+		getObj('addbt_' + id).style.display = 'none';
+	}
+}
+function adminCFname(){
+
+}
+adminCFname.prototype = {
+	init : function(){
+		var cfname = this;
+		cfname.spans = {};
+		var span = document.getElementsByTagName('span');
+		for (var i=0;i<span.length;i++) {
+			if (span[i].className=='fourm_name'){
+				cfname.spans[span[i].id] = span[i].innerHTML.replace(/[\"\']/g,'');
+				span[i].ondblclick = function(){
+					cfname.spans[this.id] = this.innerHTML.replace(/[\"\']/g,'');
+					cfname.doubleclick(this.id);
+				};
+			}
+		}
+	},
+	doubleclick : function(o){
+		if (typeof o =='string') {
+			o = getObj(o);
+		}
+		var cfname = this;
+		var temp = o.id.split('_');
+		var fid = temp[1];
+		var fourm_edit_box = getObj('fourm_edit_box_'+fid);
+		if (fid) {
+			var edit_box = document.createElement('span');
+			edit_box.className = 'fourm_name';
+			edit_box.id = 'fourm_edit_'+fid;
+			var input = document.createElement('input');
+			input.type = 'text';
+			input.value = this.spans[o.id];
+			input.className = 'input';
+			edit_box.appendChild(input);
+			input.focus();
+			var b_save = document.createElement('input');
+			b_save.type = 'button';
+			b_save.value = '保存';
+			b_save.className = 'btn2';
+			b_save.onclick = function(){cfname.save(o);};
+			edit_box.appendChild(b_save);
+			var b_cancel = document.createElement('input');
+			b_cancel.type = 'button';
+			b_cancel.value = '取消';
+			b_cancel.className = 'btn2';
+			b_cancel.onclick = function(){cfname.cancel(o);};
+			edit_box.appendChild(b_cancel);
+			fourm_edit_box.appendChild(edit_box);
+			o.style.display = 'none';
+		}
+	},
+	save : function(o){
+		if (typeof o =='string') {
+			o = getObj(o);
+		}
+		var cfname = this;
+		var temp = o.id.split('_');
+		var fid = temp[1];
+		var edit_box = getObj('fourm_edit_'+fid);
+		var input = edit_box.getElementsByTagName('input');
+		var text = input[0];
+		var url = '$ajaxurl';
+		var data = 'action=changename&fid='+fid+'&fname='+text.value;
+		ajax.send(url,data,function(){
+			cfname.spans[o.id] = text.value.replace(/[\"\']/g,'');;
+			cfname.cancel(o);
+		});
+
+	},
+	cancel : function(o){
+		if (typeof o =='string') {
+			o = getObj(o);
+		}
+		var temp = o.id.split('_');
+		var fid = temp[1];
+		var edit_box = getObj('fourm_edit_'+fid);
+		delElement(edit_box);
+		o.innerHTML = this.spans[o.id];
+		o.style.display = '';
+	}
+};
+var fourmname = new adminCFname();
+fourmname.init();
+
+function searchForum(){
+	var is_ie = ((agt.indexOf('msie')!=-1) && (agt.indexOf('opera')==-1));
+	var is_ns = (document.layers);
+	var is_w3 = (document.getElementById && !is_ie);
+	var searchname = getObj('forumname').value;
+	var forumtable = getObj('ftable');
+	var span = forumtable.getElementsByTagName('span');
+	for (var i=0;i<span.length;i++) {
+		var ocateid = span[i].parentNode.parentNode.parentNode;
+		var cateid = ocateid.id;
+		if (span[i].innerHTML != '' && span[i].innerHTML.indexOf(searchname) != -1 && cateid != 'ftable') {
+			var cid = cateid.substr(5);
+			if (ocateid.style.display == 'none') {
+				ocateid.style.display = '';
+				getObj('bt_' + cid).className = 'close fl';
+			}
+			if (is_w3 || is_ns) {
+				var m = 0;
+				while(m<2){
+					m++;
+					parent.find(searchname);
+				}
+			} else if (is_ie) {
+				var txt = parent.document.body.createTextRange();
+				if (txt.findText(searchname)){
+					txt.select();
+				}
+			}
+			span[i].scrollIntoView();
+			return true;
+		}
+	}
+	alert('找不到到您搜索的版块！');
+}
+
+var searchSelector = {
+	oldKeyword : '',
+	keyword : '',
+	elementId : '',
+	selectionElementId : '',
+	requestUrl : '',
+	listData : false,
+
+	init : function(elementId, selectionElementId, requestUrl) {
+		this.elementId = elementId;
+		this.selectionElementId = selectionElementId;
+		this.requestUrl = requestUrl;
+
+		var _searchSelector = this;
+		getObj(this.elementId).onkeyup = function() {
+			_searchSelector.generateSelections.call(_searchSelector);
+		}
+	},
+
+	generateSelections : function() {
+		if (this._isNeedSearch()) {
+			this._initSelection();
+			this._drawSelectionList();
+		}
+	},
+
+	_isNeedSearch : function() {
+		this.keyword = getObj(this.elementId).value;
+		this.keyword = this.keyword.replace(/(^\s*)|(\s*$)/g, "");
+		var needSearch = (this.oldKeyword != this.keyword) && ('' != this.keyword);
+		if ('' == this.keyword) {
+			this._hideSelection();
+		}
+		this.oldKeyword = this.keyword;
+		return needSearch;
+	},
+
+	_drawSelectionList : function() {
+		var _searchSelector = this;
+		ajax.send(this.requestUrl, 'action=searchforum&keyword=' + this.keyword, function () {
+			var gotText = ajax.request.responseText.split('\t');
+			if ('success' == gotText[0]) {
+				var gotData = JSONParse(gotText[1]);
+				var generateHtml = '<ul>';
+				for(i=0; i<gotData.length; i++) {
+					generateHtml += '<li><a href="'+gotData[i].url+'">'+gotData[i].forumName+'</a></li>';
+				}
+				getObj(_searchSelector.selectionElementId).innerHTML = generateHtml + '</ul>';
+				_searchSelector._showSelection();
+			}
+			if (0 == gotData.length || 'success' != gotText[0]) {
+				_searchSelector._hideSelection();
+			}
+		});
+	},
+
+	_initSelection : function() {
+		var rect = getObj(this.elementId).getBoundingClientRect();
+		getObj(this.selectionElementId).style.left = rect.left + (is_ie ? 1 : 3) +'px';
+		getObj(this.selectionElementId).style.top = rect.top + (is_ie ? 21 : 23) + 'px';
+	},
+
+	_hideSelection : function() {
+		getObj(this.selectionElementId).style.display = 'none';
+	},
+
+	_showSelection : function() {
+		getObj(this.selectionElementId).style.display = '';
+	}
+};
+
+searchSelector.init('forumname', 'searchForumSelection', '$ajaxurl');
+
+</script>
+<!--
+EOT;
+}elseif($action == 'addforum') {print<<<EOT
+-->
+<div class="admin_info mb10">
+    <h3 class="h1"><b>提示信息</b></h3>
+    <div class="legend"><ol><li>版块关键字:有利于搜索引擎(50字节以内)
+</li><li>版块简介，[支持 html 代码](250字节以内) 同时也有利于搜索引擎</li></ol></div>
+</div>
+<form action="$basename&action=addforum" method="post">
+<input type="hidden" name="step" value="2" />
+<input type="hidden" name="fup" value="$fup" />
+<h2 class="h1 cc"><span class="fl mr10">添加版块(上级分类或版块:{$forum[$fup][name]})</span><i onclick="addforum();" class="expand expand_c" title="添加更多">添加</i><span onclick="addforum();" class="cp fn f12">添加更多</span></h2>
+<div class="admin_table mb10">
+    <table width="100%" cellpadding="0" cellspacing="0">
+        <tr class="tr2">
+            <td>顺序</td>
+            <td>版块名称</td>
+            <td>版主</td>
+            <td>默认同核心设置</td>
+            <td>关键字</td>
+            <td>简介</td>
+            <td>图标</td>
+<!--
+EOT;
+if($forum[$fup]['type'] != 'category') {print<<<EOT
+-->
+            <td>继承</td>
+<!--
+EOT;
+}print<<<EOT
+-->
+        </tr>
+<!--
+EOT;
+for ($i=0;$i<$forumnum;$i++) {print<<<EOT
+-->
+        <tr class="vt tr1">
+            <td class="td2"><input type="text" class="input input_wd" name="vieworder[]" value=""></td>
+            <td class="td2"><input type="text" class="input input_wa" name="name[]" value=""></td>
+            <td class="td2"><input type="text" class="input input_wc" name="forumadmin[]" value=""></td>
+            <td class="td2"><select name="style[]"><option value="0">--使用默认--</option> $setfid_style</select></td>
+            <td class="td2"><input type="text" class="input input_wc" name="keywords[]" value=""></td>
+            <td class="td2"><input type="text" class="input input_wc" name="descrip[]" value=""></td>
+            <td class="td2"><input type="text" class="input input_wc" name="logo[]" value=""></td>
+<!--
+EOT;
+if($forum[$fup]['type'] != 'category') {print<<<EOT
+-->
+            <td class="td2"><input type="checkbox" name="ifsave[]" value="1" $checked/></td>
+<!--
+EOT;
+}print<<<EOT
+-->
+        </tr>
+<!--
+EOT;
+}print<<<EOT
+-->
+        <tbody id="fbody"></tbody>
+        <tbody id="fmode" style="display:none;"><tr class="vt tr1"><td class="td2"><input type="text" class="input input_wd" name="vieworder[]" value=""></td><td class="td2"><input type="text" class="input input_wa" name="name[]" value=""></td><td class="td2"><input type="text" class="input input_wc" name="forumadmin[]" value=""></td><td class="td2"><select name="style[]"><option value="0">--使用默认--</option>$setfid_style</select></td><td class="td2"><input class="input input_wc" type="text" name="keywords[]" value=""></td><td class="td2"><input class="input input_wc" type="text" name="descrip[]" value=""></td><td class="td2"><input class="input input_wc" type="text" name="logo[]" value=""></td><!--
+EOT;
+if($forum[$fup]['type'] != 'category') {print<<<EOT
+--><td class="td2"><input type="checkbox" name="ifsave[]" value="1"/></td>
+<!--
+EOT;
+}print<<<EOT
+--></tr></tbody>
+    </table>
+</div>
+<div class="mb10 tac">
+    <span class="btn"><span><button type="submit">提 交</button></span></span>
+    <span class="bt"><span><button type="reset">重 置</button></span></span>
+</div>
+<script language="JavaScript">
+function addforum(){
+	var s = getObj('fmode').firstChild.cloneNode(true);
+	getObj('fbody').appendChild(s);
+}
+</script>
+<!--
+EOT;
+}elseif($action=='delete'){print <<<EOT
+-->
+<form action="$basename&action=delete&fid=$fid" method="post">
+<input type="hidden" name="step" value="2" />
+<div class="admin_info mb10">
+    <h3 class="h1"><b>提示信息</b></h3>
+    <div class="legend">将删除该版块的所有文章, 与该版块相关的所有信息, 该版块的版主职务也将免除, 请确认!</div>
+</div>
+<div class="tac">
+	<span class="btn"><span><button type="submit">确认删除</button></span></span>
+	<span class="bt"><span><button type="button" onclick="javascript:history.go(-1);">点击这里返回上一页</button></span></span>
+</div>
+</form>
+<!--
+EOT;
+}elseif($action=='edit'){print <<<EOT
+-->
+<!--
+EOT;
+if(!$fid){print <<<EOT
+-->
+<h2 class="h1"><span class="mr10">请选择需要设置的版块</span><a href="$basename" class="linka">返回上一级<span class="f9">▲</span></a></h2>
+<div class="admin_table mb10">
+    <table cellspacing="0" cellpadding="0" width="100%">
+    <tr class="tr1 vt">
+        <td class="td2"><select id="fid">$forumcache</select>
+            <span class="bt2">
+            <span><button type="submit" value="提 交" onclick="self.location='$basename&fid='+document.getElementById('fid').value">提 交</button></span>
+            </span>
+        </td>
+    </tr>
+    </table>
+</div>
+<!--
+EOT;
+}else{
+if($type!='category'){print <<<EOT
+-->
+<div class="nav3 mb10 cc">
+    <ul class="fl mr10" id="tab3_eidt">
+		<li id="basic" onclick="showtab('tab3_eidt','basic')" class="current"><a href="javascript:;">版块属性</a></li>
+		<li id="property" onclick="showtab('tab3_eidt','property')"><a href="javascript:;">基本设置</a></li>
+		<li id="recommended" onclick="showtab('tab3_eidt','recommended')"><a href="javascript:;">版主推荐</a></li>
+		<li id="threadtype" onclick="showtab('tab3_eidt','threadtype')"><a href="javascript:;">主题分类</a></li>
+		<li id="usergroup" onclick="showtab('tab3_eidt','usergroup')"><a href="javascript:;">用户组权限</a></li>
+        <li id="usercredit" onclick="showtab('tab3_eidt','usercredit')"><a href="javascript:;">积分相关</a></li>
+    </ul>
+    <a href="$basename" class="fl mt5 ">返回上一级<span class="f9">▲</span></a>
+</div>
+<div class="c"></div>
+<!--
+EOT;
+}print <<<EOT
+-->
+<form action="$basename&" method="post" enctype="multipart/form-data">
+<input type="hidden" name="action" value="edit" />
+<input type="hidden" name="step" value="2" />
+<input type="hidden" name="fid" value="$fid" />
+<input type="hidden" id="c_type" name="c_type" value="c_base" />
+<div class="admin_table mb10">
+	<h2 class="h1">
+<!--
+EOT;
+if($type!='category'){print <<<EOT
+-->
+	版块设置
+<!--
+EOT;
+}else{print <<<EOT
+-->
+<span class="mr10">分类版块设置</span><a href="$basename" class="linka">返回上一级<span class="f9">▲</span></a>
+<!--
+EOT;
+}print <<<EOT
+-->
+	</h2>
+    <table cellspacing="0" cellpadding="0" width="100%" class="mb10">
+        <tr class="tr1 vt">
+            <td class="td1">版块名称</td>
+            <td class="td2" width="160"><input type="text" class="input input_wa" value="$name" name="name" /></td>
+    		<td class="td2"><div class="help_a">支持html代码</div></td>
+    		<td class="td2 tar">
+<!--
+EOT;
+if($type!='category'){
+print <<<EOT
+-->
+    			<a id="linkCtrlCrossConfig" href="javascript:;">横向扩展</a>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+    		</td>
+        </tr>
+	</table>
+</div>
+
+<div id="addform">
+
+<div id="c_basic" style="display:none" class="admin_table mb10">
+	<h2 class="h1">基本属性</h2>
+    <table cellspacing="0" cellpadding="0" width="100%" class="mb10">
+        <tr class="tr1 vt">
+            <td class="td1">顺序</td>
+            <td class="td2"><input type="text" class="input input_wa" name="vieworder" value="$vieworder" /></td>
+            <td class="td2"><div class="help_a">顺序</div></td>
+            <td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[vieworder]" value="1" /></div></td>
+        </tr>
+        <tr class="tr1 vt">
+            <td class="td1">版块风格</td>
+            <td class="td2">
+                <select name="style" class="select_wa">
+                    <option value="0">--使用默认--</option>
+                    $setfid_style
+                </select>
+            </td>
+            <td class="td2"><div class="help_a">默认同核心设置</div></td>
+            <td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[style]" value="1" /></div></td>
+        </tr>
+        <tr class="tr1 vt">
+            <td class="td1">版块横排</td>
+            <td class="td2"><input type="text" class="input input_wa" name="across" value="$across" /></td>
+            <td class="td2"><div class="help_a">版块横排(填写每排显示版块个数，0或留空表示不限制)</div></td>
+            <td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[across]" value="1" /></div></td>
+        </tr>
+<!--
+EOT;
+if($type=='category'){print <<<EOT
+-->
+        <tr class="tr1 vt">
+            <td class="td1">二级目录/域名设置</td>
+            <td class="td2"><input type="text" class="input input_wa" name="dirname" value="$dirname" /></td>
+            <td class="td2"><div class="help_a">版块二级域名/二级目录设置<br />(启用二级目录功能需要到<a href="admin.php?adminjob=settings&admintype=basic&action=global&admin_keyword=二级目录">核心设置</a>处开启)</div></td>
+            <td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[dirname]" value="1" /></div></td>
+        </tr>
+</table>
+</div>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+	<tr class="tr1 vt">
+		<td class="td1">选择上级版块</td>
+		<td class="td2"><select name="ffup" class="select_wa"><option value="">选择上级版块</option>$fup_forumcache</select><!--站点版块--></td>
+        <td class="td2"><!--选择上级版块--></td>
+        <td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[fup]" value="1" /></div></td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">版块关键字</td>
+		<td class="td2"><textarea name="keywords" class="textarea">{$keywords}</textarea></td>
+        <td class="td2"><div class="help_a">设置版块关键字，有利于搜索引擎(250字节以内)<br />也可在 核心设置->SEO优化中进行设置</div></td>
+        <td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[keywords]" value="1" /></div></td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">版块Meta描述</td>
+		<td class="td2"><textarea class="textarea" name="metadescrip">{$metadescrip}</textarea></td>
+        <td class="td2"><div class="help_a">有利于搜索引擎(250字节以内)<br />也可在 核心设置->SEO优化中进行设置</div></td>
+        <td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[descrip]" value="1" /></div></td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">版块简介</td>
+		<td class="td2"><textarea class="textarea" name="descrip">{$descrip}</textarea></td>
+        <td class="td2"><div class="help_a">支持html代码</div></td>
+        <td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[descrip]" value="1" /></div></td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">版块图标</td>
+		<td class="td2">
+			<dl>
+				<dt class="fl">
+<!--
+EOT;
+	if ($logoimg) {print <<<EOT
+-->
+		<p class="mr20"><img src="$logoimg" width="32" /></p>
+<!--
+EOT;
+	}
+	if ($logotype == 'upload') {print <<<EOT
+-->
+        <input type="checkbox" name="ifdellogo" value="1" style="margin-top:-5px;">&nbsp;删除
+<!--
+EOT;
+	}print<<<EOT
+-->
+				</dt>
+				<dd class="fl" style="width:340px;">
+            <ul class="cc list_80 mb5 cc list_A">
+                <li><input type="radio" name="logotype" value="url" onclick="changeLogoType('url');" $logotype_url>外链</li>
+                <li><input type="radio" name="logotype" value="upload" onclick="changeLogoType('upload');" $logotype_upload>上传</li>
+            </ul>
+		<p class="mb5">
+		<span id="logo_upload"><input type="file" name="logo_upload" value="" /></span>
+		<span id="logo_url"><input type="text" class="input input_wb" name="logo_url" value="$logo" /></span>
+		</p>
+				</dd>
+			</dl>
+		</td>
+        <td class="td2"><div class="help_a">此处设置只有在“论坛模式”->“界面设置”->“首页细节设置”处选择为自定义才有效</div></td>
+        <td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[logo]" value="1" /></div></td>
+	</tr>
+<!--
+EOT;
+	if($type=='forum' && $cms=='0'){ print <<<EOT
+-->
+	<tr class="tr1 vt">
+		<td class="td1">显示子版块</td>
+		<td class="td2">
+            <ul class="cc list_80 fl list_A">
+                <li><input type="radio" name="showsub" value="1" $showsub_Y />开启</li>
+                <li><input type="radio" name="showsub" value="0" $showsub_N />关闭</li>
+            </ul>
+        </td>
+        <td class="td2"><div class="help_a">开启后，在论坛首页显示子版块信息。（仅当父版块不使用版块横排时有效）</div></td>
+        <td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[showsub]" value="1" /></div></td>
+	</tr>
+<!--
+EOT;
+	}
+	$ifcms_selected = $ifcms ? "selected" : "";
+	$ifcms_display = $ifcms ? "" : "none";
+	$ifcmshideinbbs_checked = $ifcms == 2 ? "checked" : "";
+print<<<EOT
+-->
+	<tr class="tr1 vt">
+		<td class="td1">版块内容展示方式</td>
+		<td class="td2">
+			<select id="ifcms" class="select_wa" name="ifcms" onchange="if(getObj('ifcms').value == '1'){getObj('ifcms_show').style.display='';}else{getObj('ifcms_show').style.display='none';getObj('ifcms_hide').checked=false;}">
+				<option value="0">传统论坛模式</option>
+				<option value="1" $ifcms_selected>社区门户模式</option>
+			</select>&nbsp;
+			<span id="ifcms_show" style="display:$ifcms_display;"><input id="ifcms_hide" type="checkbox" name="ifcms" style="margin-top:-5px"  value="2" $ifcmshideinbbs_checked>&nbsp;在论坛模式中隐藏</span>
+		</td>
+        <td class="td2"><div class="help_a">当选择社区门户模式时，建议开启主题审核功能</div></td>
+        <td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[ifcms]" value="1" /></div></td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">版块类别</td>
+		<td class="td2">
+            <ul class="list_A">
+                <li><input type="radio" name="f_type" value="forum" $ftype_forum />开放版块</li>
+                <li><input type="radio" name="f_type" value="former" $ftype_former />正规版块</li>
+                <li><input type="radio" name="f_type" value="hidden" $ftype_hidden />隐藏版块</li>
+            </ul>
+		</td>
+		<td class="td2"><div class="help_a">版块隐藏时需要到版块用户组权限处进行详细设置</div></td>
+		<td class="td2" width="40"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[f_type]" value="1" /></div></td>
+
+	</tr>
+  </table>
+  <h2 class="h1">版块访问权限出售设置</h2>
+  <table cellspacing="0" cellpadding="0" width="100%">
+    <tr class="tr1 vt">
+        <td class="td1">版块密码</td>
+        <td class="td2"><input type="text" class="input input_wa mb5" value="$password" name="password"></td>
+        <td class="td2"><div class="help_a">不加密请留空!如果版块已加密,显示的密码为32位MD5密码,不必再修改!</div></td>
+        <td class="td2" width="40"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[password]" value="1" /></div></td>
+    </tr>
+    <tr class="tr1 vt">
+        <td class="td1">版块访问权限出售积分</td>
+        <td class="td2"><select name="forumsell"class="select_wa"><option value="">不设置</option>
+<!--
+EOT;
+	foreach($credit->cType as $key => $value){
+		$selected = $key == $forumsell ? 'selected' : '';
+print <<<EOT
+-->
+        <option value="$key" $selected>$value</option>
+<!--
+EOT;
+	}print <<<EOT
+-->
+        </select>
+        </td>
+        <td class="td2"><!--版块访问权限出售积分--></td>
+       <td class="td2" width="40"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[forumsell]" value="1" /></div></td>
+    </tr>
+    <tr class="tr1 vt">
+    <td class="td1">版块访问权限出售价格</td>
+        <td class="td2">
+          <div class="admin_table_b">
+                <table cellpadding="0" cellspacing="0">
+					<tbody id="smode" style="display:none"><tr><td><input name="sdate[]" type="text" class="input input_wc" /></td><td><input name="cprice[]" type="text" class="input input_wc" /></td><td><input name="rprice[]" type="text" class="input input_wc" /></td><td><a class="cp" onclick="dels(this);">[删除]</a></td></tr></tbody>
+                	<tr>
+                    	<td>期限[天]</td>
+                        <td>积分价格</td>
+                        <td>RMB价格</td>
+                        <td><a class="cp s3" onclick="adds();">[添加]</a></td>
+                    </tr>
+<!--
+EOT;
+	foreach ($forumset['sellprice'] as $key => $value) {print <<<EOT
+-->
+					<tr>
+						<td><input class="input input_wc" name="sdate[]" value="$key" /></td>
+						<td><input class="input input_wc" name="cprice[]" value="$value[cprice]" /></td>
+						<td><input class="input input_wc" name="rprice[]" value="$value[rprice]" /></td>
+						<td><a class="cp" onclick="dels(this);">[删除]</a></td>
+					</tr>
+<!--
+EOT;
+	}print <<<EOT
+-->
+					<tbody id="sbody"></tbody>
+                </table>
+           </div>
+       </td>
+       <td class="td2">&nbsp;</td>
+       <td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[forumsetdb][sellprice]" value="1" /></div></td>
+    </tr>
+</table>
+<script language="JavaScript">
+function adds() {
+	var s = getObj('smode').firstChild.cloneNode(true);
+	getObj('sbody').appendChild(s);
+}
+function dels(obj) {
+	var o = obj.parentNode.parentNode;
+	o.parentNode.removeChild(o);
+}
+function changeLogoType(type) {
+	if (type == 'upload') {
+		getObj('logo_upload').style.display = '';
+		getObj('logo_url').style.display = 'none';
+	} else {
+		getObj('logo_url').style.display = '';
+		getObj('logo_upload').style.display = 'none';
+	}
+}
+adds();
+changeLogoType('$logotype');
+</script>
+</div>
+
+<div id="c_property" style="display:none" class="admin_table mb10">
+<h2 class="h1">版块基本权限设置</h2>
+<table cellspacing="0" cellpadding="0" width="100%" class="mb10">
+<tr class="tr1 vt">
+	<td class="td1">版块链接</td>
+	<td class="td2"><input type="text" class="input input_wa mr5" name="forumsetdb[link]" value="$forumset[link]" /></td>
+	<td class="td2"><div class="help_a">版块链接 (填写此项，当进入版块时将转向您填写的链接地址)</div></td>
+	<td class="td2" width="40"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[forumsetdb][link]" value="1" /></div></td>
+</tr>
+<tr class="tr1 vt">
+	<td class="td1">锁定主题不允许回复</td>
+	<td class="td2"><input type="text" class="input input_wa mr5" name="forumsetdb[lock]" value="$forumset[lock]" /></td>
+	<td class="td2"><div class="help_a">锁定多少天以前发表的主题不允许回复 (0或留空表示不限制)</div></td>
+	<td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[forumsetdb][lock]" value="1" /></div></td>
+</tr>
+<tr class="tr1 vt">
+	<td class="td1">主题列表标题显示字节数</td>
+	<td class="td2"><input type="text" class="input input_wa mr5" name="forumsetdb[cutnums]" value="$forumset[cutnums]" /></td>
+	<td class="td2"><div class="help_a">一个汉字占两个字节，0或留空表示不限制)</div></td>
+	<td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[forumsetdb][cutnums]" value="1" /></div></td>
+</tr>
+<tr class="tr1 vt">
+	<td class="td1">主题列表显示主题个数</td>
+	<td class="td2"><input type="text" class="input input_wa mr5" name="forumsetdb[threadnum]" value="$forumset[threadnum]" /></td>
+	<td class="td2"><div class="help_a">留空使用“论坛模式->界面设置->帖子列表页设置”中设定的值</div></td>
+	<td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[forumsetdb][threadnum]" value="1" /></div></td>
+</tr>
+<tr class="tr1 vt">
+	<td class="td1">浏览帖子显示文章个数</td>
+	<td class="td2"><input type="text" class="input input_wa mr5" name="forumsetdb[readnum]" value="$forumset[readnum]" /></td>
+	<td class="td2"><div class="help_a">留空使用“论坛模式->界面设置->帖子阅读页设置”中设定的值</div></td>
+	<td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[forumsetdb][readnum]" value="1" /></div></td>
+</tr>
+<tr class="tr1 vt">
+	<td class="td1">新帖图片标识时间[分钟]</td>
+	<td class="td2"><input type="text" class="input input_wa mr5" name="forumsetdb[newtime]" value="$forumset[newtime]" /></td>
+	<td class="td2"><div class="help_a">留空使用“论坛模式->界面设置->帖子列表页设置”中设定的值</div></td>
+	<td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[forumsetdb][newtime]" value="1" /></div></td>
+</tr>
+<tr class="tr1 vt">
+	<td class="td1">默认主题排序关键字</td>
+	<td class="td2"><select name="forumsetdb[orderway]" class="select_wa">
+		<option value="lastpost" $sel_lastpost>最后发表</option>
+		<option value="postdate" $sel_postdate>发表时间</option>
+		<option value="hits" $sel_hits>人气</option>
+		<option value="replies" $sel_replies>回复</option>
+		</select>
+	</td>
+	<td class="td2"><div class="help_a">影响效率，建议使用‘最后发表’排序</div></td>
+	<td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[forumsetdb][orderway]" value="1" /></div></td>
+</tr>
+<tr class="tr1 vt">
+	<td class="td1">版块默认主题排序方式</td>
+	<td class="td2"><select name="forumsetdb[asc]" class="select_wa">
+		<option value="DESC" $sel_DESC>倒序</option>
+		<option value="ASC" $sel_ASC>正序</option>
+		</select>
+	</td>
+	 <td class="td2"><div class="help_a"></div></td>
+	<td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[forumsetdb][asc]" value="1" /></div></td>
+</tr>
+<tr class="tr1 vt">
+	<td class="td1">默认回复排序方式</td>
+	<td class="td2">
+		<select name="forumsetdb[replayorder]" class="select_wa">
+		<option value="1" $replayorder_asc>正序</option>
+		<option value="2" $replayorder_desc>倒序</option>
+		</select>
+	</td>
+	<td class="td2"><div class="help_a"></div></td>
+	<td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[forumsetdb][replayorder]" value="1" /></div></td>
+</tr>
+<tr class="tr1 vt">
+    <td class="td1">允许版主回收站管理</td>
+    <td class="td2">
+    	<ul class="cc list_80 list_A">
+            <li><input type="checkbox" name="forumsetdb[recycle][]" value="2" $recycle_2 />&nbsp;删除</li>
+            <li><input type="checkbox" name="forumsetdb[recycle][]" value="4" $recycle_4 />&nbsp;还原</li>
+            <li><input type="checkbox" name="forumsetdb[recycle][]" value="8" $recycle_8 />&nbsp;清空</li>
+        </ul>
+    </td>
+    <td class="td2"><div class="help_a"></div></td>
+    <td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[forumsetdb][recycle]" value="1"></div></td>
+</tr>
+<!--
+EOT;
+	if($type=='forum' && trim($cmscache)){print <<<EOT
+-->
+<tr class="tr1 vt">
+    <td class="td1">在文章系统中显示</td>
+    <td class="td2">
+        <input type="radio" name="ifhide" value="0" $ifhide_N />开启
+        <input type="radio" name="ifhide" value="1" $ifhide_Y />关闭
+    </td>
+    <td class="td2"><div class="help_a"><!--<font color="#0000FF">在文章系统中显示</font><br />将出现在文章系统首页左下方，主题列表和文章页面右下方的"<font color="#0000FF">社区推荐</font>"中--></div></td>
+    <td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[ifhide]" value="1"></div></td>
+</tr>
+<!--
+EOT;
+	}else{print <<<EOT
+-->
+<!--
+EOT;
+	}print <<<EOT
+-->
+<tr class="tr1 vt">
+	<td class="td1">允许发帖类型[多选]</td>
+	<td class="td2" colspan="2">
+    	<div class="admin_table_c">
+    	<table cellpadding="0" cellspacing="0" width="100%">
+        	<tr>
+            	<td width="70" class="s4">发帖类别</td>
+				<td>
+                    <ul class="list_A list_120 cc">
+                        <li><input type="checkbox" name="allowtype[]" value="1" $allowtype_1 />普通</li>
+                        <li><input type="checkbox" name="allowtype[]" value="2" $allowtype_2 />投票</li>
+                        <!--<li><input type="checkbox" name="allowtype[]" value="4" $allowtype_4 />活动</li>-->
+                        <li><input type="checkbox" name="allowtype[]" value="8" $allowtype_8 />悬赏</li>
+                        <li><input type="checkbox" name="allowtype[]" value="16" $allowtype_16 />商品</li>
+                        <li><input type="checkbox" name="allowtype[]" value="32" $allowtype_32 />辩论</li>
+                    </ul>
+                </td>
+             </tr>
+             <tr>
+             	<td class="s4">团购</td>
+                <td>
+					<ul class="list_A list_120 cc">
+<!--
+EOT;
+	foreach($postcatedb as $val){
+		if($val[ifable]){
+		$checked = '';
+		if (strpos(",$pcid,",",$val[pcid],") !== false) {
+			$checked = 'checked';
+		}
+print <<<EOT
+-->
+						<li><input type="checkbox" name="pcid[]" value="$val[pcid]" $checked />$val[name]</li>
+<!--
+EOT;
+	}}
+print<<<EOT
+-->
+					</ul>
+                </td>
+             </tr>
+<!--
+EOT;
+	foreach($topicdb as $value){
+print <<<EOT
+-->
+             <tr>
+				<td class="s4">$value[name]</td>
+                <td>
+						<ul class="list_A list_120 cc">
+<!--
+EOT;
+		foreach($modeldb[$value[cateid]] as $val){
+			$check = '';
+			if (strpos(",$modelid,",",$val[modelid],") !== false) {
+				$check = 'checked';
+			}
+print <<<EOT
+-->
+							<li><input type="checkbox" name="modelid[]" value="$val[modelid]" $check />$val[name]</li>
+<!--
+EOT;
+		}print<<<EOT
+-->
+						</ul>
+                  </td>
+             </tr>
+<!--
+EOT;
+	}foreach($activitycatedb as $value){
+print <<<EOT
+-->
+             <tr>
+				<td class="s4">$value[name]</td>
+                <td>
+						<ul class="list_A list_120 cc">
+<!--
+EOT;
+	foreach($activitymodeldb[$value[actid]] as $val){
+	$check = '';
+	if (strpos(",$actmids,",",$val[actmid],") !== false) {
+		$check = 'checked';
+	}
+print <<<EOT
+-->
+							<li><input type="checkbox" name="actmid[]" value="$val[actmid]" $check />$val[name]</li>
+<!--
+EOT;
+}print<<<EOT
+-->
+						</ul>
+                  </td>
+             </tr>
+<!--
+EOT;
+	}print <<<EOT
+-->
+		</table>
+        </div>
+	</td>
+    <td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[allowtype]" value="1" /></div></td>
+</tr>
+<script language="JavaScript">
+function selectcate(id) {
+	if (getObj(id).style.display == 'none') {
+		getObj(id).style.display = '';
+	} else {
+		getObj(id).style.display = 'none';
+	}
+}
+
+function display(id){
+	if(id == '0'){
+		getObj('ifthumb_0').style.display = '';
+		getObj('ifthumb_1').style.display = 'none';
+		getObj('ifthumb_2').style.display = 'none';
+		getObj('span_thumb').style.display = 'none';
+	}else if(id == '1'){
+		getObj('ifthumb_0').style.display = 'none';
+		getObj('ifthumb_1').style.display = '';
+		getObj('ifthumb_2').style.display = 'none';
+		getObj('span_thumb').style.display = '';
+	}else if(id == '2'){
+		getObj('ifthumb_0').style.display = 'none';
+		getObj('ifthumb_1').style.display = 'none';
+		getObj('ifthumb_2').style.display = '';
+		getObj('span_thumb').style.display = 'none';
+	}
+}
+
+</script>
+	<tr class="tr1 vt">
+   		<td class="td1">版块页面显示设置</td>
+        <td class="td2">
+			 <ul class="list_A list_120 cc">
+				<li><input type="checkbox" name="viewsub_1" value="1" $viewsub_1 />显示子版</li>
+				<li><input type="checkbox" name="viewsub_2" value="2" $viewsub_2 />帖子列表</li>
+			</ul>
+        </td>
+        <td class="td2"><div class="help_a"></div></td>
+        <td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[viewsub]" value="1"></div></td>
+    </tr>
+	<tr class="tr1 vt">
+    	<td class="td1">显示关联群组</td>
+        <td class="td2">
+            <ul class="cc list_80 fl list_A">
+                <li><input type="radio" value="1" name="forumsetdb[viewcolony]" $viewcolony_Y />开启</li>
+                <li><input type="radio" value="0" name="forumsetdb[viewcolony]" $viewcolony_N />关闭</li>
+            </ul>
+        </td>
+        <td class="td2"><div class="help_a"></div></td>
+        <td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[forumsetdb][viewcolony]" value="1" /></div></td>
+    </tr>
+	<tr class="tr1 vt">
+    	<td class="td1">关联群组分类显示</td>
+        <td class="td2">
+            <ul class="cc list_80 fl list_A">
+                <li><input type="radio" value="1" name="forumsetdb[ifcolonycate]" $ifcolonycate_Y />开启</li>
+                <li><input type="radio" value="0" name="forumsetdb[ifcolonycate]" $ifcolonycate_N />关闭</li>
+            </ul>
+        </td>
+        <td class="td2"><div class="help_a"></div></td>
+        <td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[forumsetdb][ifcolonycate]" value="1" /></div></td>
+    </tr>
+    <tr class="tr1 vt">
+    	<td class="td1">隐藏帖功能</td>
+        <td class="td2">
+            <ul class="cc list_80 fl list_A">
+                <li><input type="radio" value="1" name="allowhide" $allowhide_Y />开启</li>
+                <li><input type="radio" value="0" name="allowhide" $allowhide_N />关闭</li>
+            </ul>
+        </td>
+        <td class="td2"><div class="help_a">此设置同时受用户组权限限制，开启用户组权限中的发表隐藏帖功能方有效</div></td>
+        <td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[allowhide]" value="1" /></div></td>
+    </tr>
+    <tr class="tr1 vt">
+        <td class="td1">出售帖功能</td>
+        <td class="td2">
+        	<ul class="cc list_80 fl list_A">
+               	<li><input type="radio" value="1" name="allowsell" $allowsell_Y />开启</li>
+                <li><input type="radio" value="0" name="allowsell" $allowsell_N />关闭</li>
+            </ul>
+        </td>
+        <td class="td2"><div class="help_a">此设置同时受用户组权限限制，开启用户组权限中的发表出售帖功能方有效</div></td>
+        <td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[allowsell]" value="1" /></div></td>
+    </tr>
+    <tr class="tr1 vt">
+    	<td class="td1">加密帖功能</td>
+        <td class="td2">
+        	<ul class="cc list_80 fl list_A">
+                <li><input type="radio" value="1" name="forumsetdb[allowencode]" $allowencode_Y />开启</li>
+                <li><input type="radio" value="0" name="forumsetdb[allowencode]" $allowencode_N />关闭</li>
+            </ul>
+        </td>
+        <td class="td2"><div class="help_a">此设置同时受用户组权限限制，开启用户组权限中的发表加密帖功能方有效</div></td>
+        <td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[forumsetdb][allowencode]" value="1" /></div></td>
+    </tr>
+    <tr class="tr1 vt">
+    	<td class="td1">匿名帖功能</td>
+        <td class="td2">
+        	<ul class="cc list_80 fl list_A">
+                <li><input type="radio" value="1" name="forumsetdb[anonymous]" $anonymous_Y />开启</li>
+                <li><input type="radio" value="0" name="forumsetdb[anonymous]" $anonymous_N />关闭</li>
+            </ul>
+        </td>
+        <td class="td2"><div class="help_a">此设置同时受用户组权限限制，开启用户组权限中的发表匿名帖功能方有效</div></td>
+      	<td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[forumsetdb][anonymous]" value="1" /></div></td>
+    </tr>
+    <tr class="tr1 vt">
+        <td class="td1">帖子评价</td>
+        <td class="td2">
+        	<ul class="cc list_80 fl list_A">
+                <li><input type="radio" value="0" name="forumsetdb[rate]" $rate_N />开启</li>
+                <li><input type="radio" value="1" name="forumsetdb[rate]" $rate_Y />关闭</li>
+        	</ul>
+        </td>
+        <td class="td2">
+            <!--div class="help_a">是否开启帖子评价功能  <font color="blue"> 注:使用时，请确认[<a href="$admin_file?adminjob=hack&hackset=rate&typeid=100">评价控件</a>]已开启控件功能。</font></div-->
+        </td>
+        <td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[forumsetdb][rate]" value="1"></div></td>
+    </tr>
+    <tr class="tr1 vt">
+   	 	<td class="td1">帖子推荐</td>
+        <td class="td2">
+        	<ul class="cc list_80 fl list_A">
+                <li><input type="radio" value="1" name="forumsetdb[dig]" $dig_Y />开启</li>
+                <li><input type="radio" value="0" name="forumsetdb[dig]" $dig_N />关闭</li>
+            </ul>
+        </td>
+        <td class="td2"><div class="help_a">帖子推荐功能</div></td>
+        <td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[forumsetdb][dig]" value="1"></div></td>
+    </tr>
+    <tr class="tr1 vt">
+        <td class="td1">版主标记已阅</td>
+        <td class="td2">
+        	<ul class="cc list_80 fl list_A">
+                <li><input type="radio" value="1" name="forumsetdb[inspect]" $inspect_Y />开启</li>
+                <li><input type="radio" value="0" name="forumsetdb[inspect]" $inspect_N />关闭</li>
+            </ul>
+        </td>
+        <td class="td2"><div class="help_a">开启后，版主可对楼层标注已阅，并显示于主题列表页</div></td>
+        <td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[forumsetdb][inspect]" value="1" /></div></td>
+    </tr>
+    <tr class="tr1 vt">
+        <td class="td1">使用水印功能</td>
+        <td class="td2">
+        	<ul class="cc list_80 fl list_A">
+                <li><input type="radio" value="1" name="forumsetdb[watermark]" $watermark_Y />开启</li>
+                <li><input type="radio" value="0" name="forumsetdb[watermark]" $watermark_N />关闭</li>
+            </ul>
+        </td>
+        <td class="td2"><div class="help_a">开启后，版块内图片将使用核心设置->附件设置->水印设置的配置</div></td>
+        <td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[forumsetdb][watermark]" value="1" /></div></td>
+    </tr>
+    <tr class="tr1 vt">
+        <td class="td1">内容防复制</td>
+        <td class="td2">
+        	<ul class="cc list_80 fl list_A">
+                <li><input type="radio" value="1" name="copyctrl" $copyctrl_Y />开启</li>
+                <li><input type="radio" value="0" name="copyctrl" $copyctrl_N />关闭</li>
+            </ul>
+        </td>
+        <td class="td2"><div class="help_a">在帖子的段落末尾加上随机字符串，防止帖子内容被复制</div></td>
+        <td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[copyctrl]" value="1" /></div></td>
+    </tr>
+    <tr class="tr1 vt">
+    	<td class="td1">发帖审核设置</td>
+        <td class="td2">
+            <ul class="list_A">
+                <li><input type="radio" value="0" name="f_check" $check_0 />无</li>
+                <li><input type="radio" value="1" name="f_check" $check_1 />审核主题</li>
+                <li><input type="radio" value="2" name="f_check" $check_2 />审核回复</li>
+                <li><input type="radio" value="3" name="f_check" $check_3 />审核主题和回复</li>
+            </ul>
+        </td>
+        <td class="td2"><div class="help_a">开启后,用户发表的主题或回复需要通过审核后才能在前台显示<br />管理员不受此限制</div></td>
+        <td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[f_check]" value="1" /></div></td>
+    </tr>
+    <tr class="tr1 vt">
+    	<td class="td1">主题印戳功能</td>
+        <td class="td2">
+        	<ul class="cc list_80 fl list_A">
+                <li><input type="radio" value="1" name="forumsetdb[overprint]" $overprint_Y />开启</li>
+                <li><input type="radio" value="0" name="forumsetdb[overprint]" $overprint_N />关闭</li>
+            </ul>
+        </td>
+        <td class="td2"><!--是否开启主题印戳功能--></td>
+        <td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[forumsetdb][overprint]" value="1" /></div></td>
+    </tr>
+    <tr class="tr1 vt">
+    	<td class="td1">游客浏览图片/附件控制</td>
+        <td class="td2">
+        	<ul class="cc list_80 fl list_A">
+                <li><input type="radio" value="1" name="forumsetdb[viewpic]" $viewpic_Y />开启</li>
+                <li><input type="radio" value="0" name="forumsetdb[viewpic]" $viewpic_N />关闭</li>
+            </ul>
+        </td>
+        <td class="td2"><div class="help_a">开启后，用户只有登录后，才能看帖子中的图片和附件</div></td>
+        <td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[forumsetdb][viewpic]" value="1" /></div></td>
+    </tr>
+    <tr class="tr1 vt">
+    	<td class="td1">缩略图控制</td>
+        <td class="td2">
+       		<select name="forumsetdb[ifthumb]" class="select_wa" onchange="display(this.value);">
+               	<option value="0" $thumbSelect[0]>统一设置</option>
+               	<option value="1" $thumbSelect[1] >独立设置 </option> 
+               	<option value="2" $thumbSelect[2]>不缩略</option>
+             </select>
+             <span style="$style" id="span_thumb">
+            	宽 <input type="text" class="input input_wc" name="forumsetdb[thumbwidth]" value="$forumset[width]" /> 
+            	高 <input type="text" class="input input_wc" name="forumsetdb[thumbheight]" value="$forumset[height]" />
+             </span>
+        </td>
+        <td class="td2">
+        <div class="help_a">
+        	<span id="ifthumb_0" $thumbstyle[0]>选择统一设置，则使用附件设置-图片缩略中的统一设置</span>
+       		<span id="ifthumb_1" $thumbstyle[1]>选择独立设置，则独立设置本版块图片缩略大小</span>
+       		<span id="ifthumb_2" $thumbstyle[2]>选择不缩略，则本版块图片不缩略。</span>
+        </div>
+        </td>
+        <td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[forumsetdb][ifthumb]" value="1" /></div></td>
+    </tr>
+   </table>
+<h2 class="h1">主题相关</h2>
+<table cellspacing="0" cellpadding="0" width="100%" class="mb10">
+    <tr class="tr1 vt">
+        <td class="td1">阅读页主题相关功能</td>
+        <td class="td2">
+            <ul class="cc list_80 fl list_A">
+                <li><input type="radio" value="1" name="forumsetdb[ifrelated]" $ifrelated_Y />开启</li>
+                <li><input type="radio" value="0" name="forumsetdb[ifrelated]" $ifrelated_N />关闭</li>
+            </ul>
+        </td>
+        <td class="td2"><div class="help_a">将在每个帖子主题内容下方出现相关信息</div></td>
+        <td class="td2" width="40"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[forumsetdb][ifrelated]" value="1" /></div></td>
+    </tr>
+    <tr class="tr1 vt">
+        <td class="td1">显示条数</td>
+        <td class="td2"><input type="text" class="input input_wa mr5" name="forumsetdb[relatednums]"  value="$forumset[relatednums]" /></td>
+        <td class="td2"><div class="help_a">自定义匹配条件不受此限制</div></td>
+        <td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[forumsetdb][relatednums]" value="1" /></div></td>
+    </tr>
+    <tr class="tr1 vt">
+        <td class="td1">相关匹配条件</td>
+        <td class="td2">
+            <select class="select_wa" name="forumsetdb[relatedcon]" onchange="relatedsel(this.value);">
+<!--
+EOT;
+	if($db_modes['o']['ifopen']){print<<<EOT
+-->
+			<optgroup label="作者相关"><option value="ownpost" $r_ownpost>最新帖子</option><option value="owndigest" $r_owndigest>精华帖子</option><option value="ownhits" $r_ownhits>人气帖子</option><option value="ownreply" $r_ownreply>热门回复</option><option value="oinfo" $r_oinfo>个人中心动态</option></optgroup><optgroup label="Tags相关"><option value="pictags" $r_pictags>主题帖Tags</option><option value="hottags" $r_hottags>最热tags</option><optgroup label="版块相关"><option value="forumpost" $r_forumpost>最新帖子</option><option value="forumdigest" $r_forumdigest>精华帖子</option><option value="forumhits" $r_forumhits>人气帖子</option><option value="forumreply" $r_forumreply>热门回复</option></optgroup><optgroup label="整站相关"><option value="allpost" $r_allpost>最新帖子</option><option value="alldigest" $r_alldigest>精华帖子</option><option value="allhits" $r_allhits>人气帖子</option><option value="allreply" $r_allreply>热门回复</option></optgroup><optgroup label="其他相关"><option value="custom" $r_custom>自定义信息</option></optgroup>
+<!--
+EOT;
+	}else{print<<<EOT
+-->
+			<optgroup label="作者相关"><option value="ownpost" $r_ownpost>最新帖子</option><option value="owndigest" $r_owndigest>精华帖子</option><option value="ownhits" $r_ownhits>人气帖子</option><option value="ownreply" $r_ownreply>热门回复</option></optgroup><optgroup label="Tags相关"><option value="pictags" $r_pictags>主题帖Tags</option><option value="hottags" $r_hottags>最热tags</option><optgroup label="版块相关"><option value="forumpost" $r_forumpost>最新帖子</option><option value="forumdigest" $r_forumdigest>精华帖子</option><option value="forumhits" $r_forumhits>人气帖子</option><option value="forumreply" $r_forumreply>热门回复</option></optgroup><optgroup label="整站相关"><option value="allpost" $r_allpost>最新帖子</option><option value="alldigest" $r_alldigest>精华帖子</option><option value="allhits" $r_allhits>人气帖子</option><option value="allreply" $r_allreply>热门回复</option></optgroup><optgroup label="其他相关"><option value="custom" $r_custom>自定义信息</option></optgroup>
+<!--
+EOT;
+	}print<<<EOT
+-->
+			</select>
+        </td>
+        <td class="td2"><div class="help_a">选择Tags相关必须开启标签功能才有效</div></td>
+       <td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[forumsetdb][relatedcon]" value="1" /></div></td>
+    </tr>
+    <tbody id="related" style="display:none">
+    <tr class="tr1 vt">
+        <td class="td1">&nbsp;</td>
+        <td class="td2">自定义标题</td>
+        <td class="td2">自定义链接 <a style="cursor:pointer;color:blue" onclick="addrelated();">[添加]</a></td>
+        <td class="td2">&nbsp;</td>
+    </tr>
+<!--
+EOT;
+	if($forumset[relatedcustom]){
+		foreach ($forumset[relatedcustom] as $key => $value){
+print <<<EOT
+-->
+    <tr class="tr1 vt">
+        <td class="td1">&nbsp;</td>
+        <td class="td2"><input type="text" class="input input_wb" name="forumsetdb[relatedcustom][title][]" value="{$value[title]}"></td>
+        <td class="td2"><input type="text" class="input input_wb" name="forumsetdb[relatedcustom][linkurl][]" value="{$value[linkurl]}"></td>
+        <td class="td2">&nbsp;</td>
+    </tr>
+<!--
+EOT;
+		}
+	}else{
+		$i=0;
+		for($i;$i<8;$i++){print<<<EOT
+-->
+    <tr class="tr1 vt">
+        <td class="td1">&nbsp;</td>
+        <td class="td2"><input type="text" class="input input_wb" name="forumsetdb[relatedcustom][title][]"></td>
+        <td class="td2"><input type="text" class="input input_wb" name="forumsetdb[relatedcustom][linkurl][]"></td>
+        <td class="td2">&nbsp;</td>
+    </tr>
+<!--
+EOT;
+		}
+	}print<<<EOT
+-->
+    </tbody>
+    <tbody id="relatedmode" style="display:none">
+        <tr class="tr1 vt">
+            <td class="td1">&nbsp;</td>
+            <td class="td2"><input type="text" class="input input_wb" name="forumsetdb[relatedcustom][title][]"></td>
+            <td class="td2"><input type="text" class="input input_wb" name="forumsetdb[relatedcustom][linkurl][]">
+                <a style="cursor:pointer;color:#FA891B" onclick="delrelated(this);">[删除]</a>
+            </td>
+            <td class="td2">&nbsp;</td>
+        </tr>
+    </tbody>
+   <tbody id="relatedbody"></tbody>
+</table>
+<script language="JavaScript">
+function relatedsel(id){
+	if (id == 'custom') {
+		getObj('related').style.display = '';
+		getObj('relatedbody').style.display = '';
+	} else {
+		getObj('related').style.display = 'none';
+		getObj('relatedbody').style.display = 'none';
+	}
+}
+var relatedcon = '$forumset[relatedcon]';
+if (relatedcon == 'custom') {
+	setTimeout('relatedsel("custom");',50);
+}
+function addrelated() {
+	var s = getObj('relatedmode').firstChild.cloneNode(true);
+	getObj('relatedbody').appendChild(s);
+}
+function delrelated(obj) {
+	var o = obj.parentNode.parentNode;
+	o.parentNode.removeChild(o);
+}
+
+</script>
+<h2 class="h1">版块发帖时间域限制</h2>
+<table cellspacing="0" cellpadding="0" width="100%">
+    <tr class="tr1 vt">
+        <td class="td1">允许发帖的时间域</td>
+        <td class="td2" width="450">
+        	<ul class="list_A list_80">
+<!--
+EOT;
+	for($i=0;$i<24;$i++){
+		$checked = strpos($forumset[allowtime],",$i,")!==false ? 'checked' : '';
+print <<<EOT
+-->
+            <li><input type="checkbox" name="allowtime[]" value="$i" $checked />$i 点</li>
+<!--
+EOT;
+	}print <<<EOT
+ -->
+ 			</ul>
+        </td>
+        <td class="td2"><div class="help_a">允许发帖的时间域<br />(全不选则不限制)</div></td>
+        <td class="td2" width="40"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[forumsetdb][allowtime]" value="1" /></div></td>
+    </tr>
+</table>
+</div>
+<div id="c_recommended" style="display:none" class="admin_table mb10">
+<h2 class="h1">版主推荐</h2>
+<table cellspacing="0" cellpadding="0" width="100%">
+    <tr class="tr1 vt">
+        <td class="td1">版主推荐功能</td>
+        <td class="td2">
+        	<ul class="cc list_80 fl list_A">
+               <li><input type="radio" value="1" name="forumsetdb[commend]" $commend_Y />开启</li>
+                <li><input type="radio" value="0" name="forumsetdb[commend]" $commend_N />关闭</li>
+            </ul>
+        </td>
+        <td class="td2"><!--版主推荐--></td>
+        <td class="td2" width="40"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[forumsetdb][commend]" value="1" /></div></td>
+    </tr>
+    <tr class="tr1 vt">
+        <td class="td1">推荐自动功能</td>
+        <td class="td2">
+        	<select name="forumsetdb[autocommend]" class="select_wa">
+                <option value="0" $autocommend_0>不生成</option>
+                <option value="1" $autocommend_1>按发帖时间</option>
+                <option value="2" $autocommend_2>按最后回复时间</option>
+                <option value="3" $autocommend_3>按点击率</option>
+                <option value="4" $autocommend_4>按回复数</option>
+                <option value="5" $autocommend_5>按精华帖</option>
+            </select>
+        </td>
+        <td class="td2"><div class="help_a">当推荐列表不足设置的最大显示条数时，将按所选排序方式自动生成</div></td>
+        <td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[forumsetdb][autocommend]" value="1" /></div></td>
+    </tr>
+    <tr class="tr1 vt">
+        <td class="td1">推荐列帖子列表</td>
+        <td class="td2"><input type="text" class="input input_wa" name="forumsetdb[commendlist]" value="$forumset[commendlist]" /></td>
+        <td class="td2"><div class="help_a"></div></td>
+        <td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[forumsetdb][commendlist]" value="1" /></div></td>
+    </tr>
+    <tr class="tr1 vt">
+        <td class="td1">推荐列表最大显示条数</td>
+        <td class="td2"><input type="text" class="input input_wa" name="forumsetdb[commendnum]" value="$forumset[commendnum]" /></td>
+        <td class="td2"><div class="help_a"></div></td>
+        <td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[forumsetdb][commendnum]" value="1" /></div></td>
+    </tr>
+    <tr class="tr1 vt">
+        <td class="td1">标题最大字节数</td>
+        <td class="td2"><input type="text" class="input input_wa" name="forumsetdb[commendlength]" value="$forumset[commendlength]" /></td>
+        <td class="td2"><div class="help_a"></div></td>
+        <td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[forumsetdb][commendlength]" value="1" /></div></td>
+    </tr>
+    <tr class="tr1 vt">
+        <td class="td1">推荐列表缓存间隔[秒]</td>
+        <td class="td2"><input type="text" class="input input_wa" name="forumsetdb[commendtime]" value="$forumset[commendtime]" /></td>
+        <td class="td2"><div class="help_a">当开启推荐列表自动生成功能时，定期更新推荐列表(建议值 3600，0为不更新)</div></td>
+        <td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[forumsetdb][commendtime]" value="1" /></div></td>
+    </tr>
+</table>
+</div>
+<div id="c_threadtype" style="display:none" class="admin_table mb10">
+<h2 class="h1">版块主题分类</h2>
+<table cellspacing="0" cellpadding="0" width="100%">
+
+    <tr class="tr1 vt">
+        <td class="td1">主题分类控制</td>
+        <td class="td2">
+        	<ul class="cc list_80 list_A mb10">
+                <li><input type="radio" value="2" name="t_type" $t_type_2 />强制分类</li>
+                <li><input type="radio" value="1" name="t_type" $t_type_1 />允许分类</li>
+                <li><input type="radio" value="0" name="t_type" $t_type_0 />关闭分类</li>
+            </ul>
+			<div class="c"></div>
+
+        </td>
+        <td class="td2"><div class="help_a">设置发帖时是否需要选择主题分类。管理员、分栏版主、本版版主不受此限制。</div></td>
+        <td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[t_type]" value="1" /></div></td>
+    </tr>
+	   
+
+	   <tr class="tr1 vt">
+        <td class="td1">主题分类管理</td>
+        <td class="td2">
+                        <div class="admin_table_c">
+            	<table cellpadding="0" cellspacing="0" style="table-layout:auto;">
+                	<tr>
+                    	<td width="60">顺序</td>
+                    	<td width="95">名称</td>
+                        <td width="95">图标URL</td>
+                        <td><a class="cp s3" onclick="addtype();">[添加一级分类]</a></td>
+                    </tr>
+<!--
+EOT;
+	foreach ($typedb as $key => $value){
+print <<<EOT
+-->
+                    <tr id="ttype_$value[id]">
+                    	<td><input type="text" class="input input_wd" value="$value[vieworder]" name="t_view_db[$key]"></td>
+                        <td><input type="text" class="input input_wc" value="$value[name]" name="t_db[$key]" /></td>
+                        <td><input type="text" class="input input_wc" value="$value[logo]" name="t_logo_db[$key]" /></td>
+                        <td><a href="javascript:;" onclick="addSubType($value[id]);" class="mr10">[添加二级分类]</a><a href="javascript:;" onclick="delTtype('$value[id]','top');">[删除]</a></td>
+                    </tr>
+<!--
+EOT;
+		foreach ($subtypedb as $k => $v){
+			if ($key == $v['upid']){
+print <<<EOT
+-->
+                    <tr id="ttype_$v[id]">
+                        <td>┠&nbsp;<input type="text" class="input input_wd" name="t_view_db[{$v[id]}]" value="$v[vieworder]"></td>
+                        <td><input type="text" class="input input_wc" value="$v[name]" name="t_db[{$v[id]}]" /></td>
+                        <td><input type="text" class="input input_wc" value="$v[logo]" name="t_logo_db[{$v[id]}]" /></td>
+                        <td><a href="javascript:;" onclick="delTtype('$v[id]','sub');">[删除]</a></td>
+                    </tr>
+<!--
+EOT;
+			}
+		}print <<<EOT
+-->
+					<tr><td colspan="4" style="padding:0;"><tbody id="t_sub_body_$value[id]"></tbody></td></tr>
+<!--
+EOT;
+	}print <<<EOT
+-->
+					<tbody id="tbody"></tbody>
+					<tbody id="tmode" style="display:none"><tr><td><input type="text" class="input input_wd mr5" name="new_t_view_db[]"></td><td><input type="text" class="input input_wc" value="" name="new_t_db[]" /></td><td><input type="text" class="input input_wc" name="new_t_logo_db[]" /></td><td>&nbsp;</td></tr></tbody>
+					<tbody id="t_sub_mode" style="display:none"><tr><td width="60">┠&nbsp;<input type="text" class="input input_wd mr5" name="new_t_sub_view_db"></td><td width="95"><input type="text" class="input input_wc" value="" name="new_t_sub_db" /></td><td width="95"><input type="text" class="input input_wc" name="new_t_sub_logo_db" /></td><td>&nbsp;</td></tr></tbody>
+            	</table>
+            </div>
+        </td>
+        <td class="td2"><div class="help_a">图标URL支持外链（http://开头）</div></td>
+        <td class="td2" width="40"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[t_typemain]" value="1" /></div></td>
+    </tr>
+        
+        
+        <tr class="tr1 vt">
+        <td class="td1">帖子列表分类显示</td>
+        <td class="td2">
+            <ul class="cc list_80 fl list_A">
+                <li><input type="radio" value="1" name="forumsetdb[addtpctype]" $addtpctype_Y />开启</li>
+                <li><input type="radio" value="0" name="forumsetdb[addtpctype]" $addtpctype_N />关闭</li>
+            </ul>
+        </td>
+        <td class="td2"><div class="help_a">开启后，帖子列表页将显示主题分类名称。如果分类设置了图标URL，则显示分类图标</div></td>
+        <td class="td2" width="40"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[forumsetdb][addtpctype]" value="1" /></div></td>
+    </tr>
+</table>
+<script language="JavaScript" src="js/pw_ajax.js"></script>
+<script language="JavaScript">
+function addtype(){
+	var s = getObj('tmode').firstChild.cloneNode(true);
+	getObj('tbody').appendChild(s);
+}
+
+function addSubType(id) {
+	var inputs = getObj('t_sub_mode').getElementsByTagName('input');
+	inputs[0].name = "new_t_sub_view_db\["+id+"\]\[\]";
+	inputs[1].name = "new_t_sub_db\["+id+"\]\[\]";
+	inputs[2].name = "new_t_sub_logo_db\["+id+"\]\[\]";
+	var s = getObj('t_sub_mode').firstChild.cloneNode(true);
+	getObj('t_sub_body_'+id).appendChild(s);
+}
+
+
+function delTtype(id,type) {
+	var url = '$ajaxurl';
+	if (type == 'top') {
+		if (!confirm("确定要删除此主题分类吗？删除此主题分类将同时删除其二级分类")) return false;
+	} else if (type == 'sub') {
+		if (!confirm("确定要删除此主题分类吗？")) return false;
+	}
+	var data = 'action=delttype&type='+type+'&id='+id+'&';
+	setTimeout("ajax.send('" + url + "','" + data + "',delTtypeR)",200);
+}
+
+function delTtypeR(){
+	var ids = ajax.request.responseText.split("\t");
+	if (ids[0] == 'success') {
+		for (var i = 1;i<ids.length;i++) {
+			delElement('ttype_'+ids[i]);
+		}
+	} else {
+		alert("删除错误！");
+	}
+}
+addtype();
+</script>
+</div>
+
+<div id="c_usercredit" style="display:none" class="admin_table mb10">
+	<h2 class="h1"><span class="mr20">版块积分设置</span><span class="linka">注:<font color="blue">威望积分</font>支持小数点后一位，其他积分只允许整数，留空则使用“核心设置-积分设置”处的默认值 ！</span></h2>
+    <table cellspacing="0" cellpadding="0" width="100%" class="mb10">
+        <tr class="tr2">
+            <td width="60">积分名称</td>
+            <td>精华主题 ( + ) </td>
+            <td>发表主题 ( + ) </td>
+            <td >发表回复 ( + ) </td>
+            <td>取消精华 ( - ) </td>
+            <td>删除主题 ( - ) </td>
+            <td>删除回复 ( - ) </td>
+        </tr>
+<!--
+EOT;
+	foreach($credit->cType as $key => $value){print <<<EOT
+-->
+        <tr class="vt tr1">
+            <td class="td2">$value</td>
+            <td class="td2"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[creditset][Digest][$key]" value="1" />
+                <input type="text" class="input input_wc" name="creditdb[Digest][$key]" value="{$creditset[Digest][$key]}" />
+            </td>
+            <td class="td2"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[creditset][Post][$key]" value="1" />
+                <input type="text" class="input input_wc" name="creditdb[Post][$key]" value="{$creditset[Post][$key]}" />
+            </td>
+            <td class="td2"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[creditset][Reply][$key]" value="1" />
+                <input type="text" class="input input_wc" name="creditdb[Reply][$key]" value="{$creditset[Reply][$key]}" />
+            </td>
+            <td class="td2"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[creditset][Undigest][$key]" value="1" />
+                <input type="text" class="input input_wc" name="creditdb[Undigest][$key]" value="{$creditset[Undigest][$key]}" />
+            </td>
+            <td class="td2"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[creditset][Delete][$key]" value="1" />
+                <input type="text" class="input input_wc" name="creditdb[Delete][$key]" value="{$creditset[Delete][$key]}" />
+            </td>
+            <td class="td2"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[creditset][Deleterp][$key]" value="1" />
+                <input type="text" class="input input_wc" name="creditdb[Deleterp][$key]" value="{$creditset[Deleterp][$key]}" />
+            </td>
+        </tr>
+<!--
+EOT;
+	}print <<<EOT
+-->
+    </table>
+<h2 class="h1">版块访问积分限制</h2>
+<table cellspacing="0" cellpadding="0" width="100%" class="mb10">
+    <tr class="tr1 vt">
+        <td class="td1">至少需要{$db_rvrcname}</td>
+        <td class="td2"><input type="text" class="input input_wa" name="forumsetdb[rvrcneed]"  value="$forumset[rvrcneed]" /></td>
+        <td class="td2"><div class="help_a"></div></td>
+        <td class="td2" width="40"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[forumsetdb][rvrcneed]" value="1" /></div></td>
+    </tr>
+    <tr class="tr1 vt">
+        <td class="td1">至少需要{$db_moneyname}</td>
+        <td class="td2"><input type="text" class="input input_wa" name="forumsetdb[moneyneed]"  value="$forumset[moneyneed]" /></td>
+        <td class="td2"><div class="help_a"></div></td>
+        <td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[forumsetdb][moneyneed]" value="1" /></div></td>
+    </tr>
+    <tr class="tr1 vt">
+        <td class="td1">至少需要{$db_creditname}</td>
+        <td class="td2"><input type="text" class="input input_wa" name="forumsetdb[creditneed]"  value="$forumset[creditneed]" /></td>
+        <td class="td2"><div class="help_a"></div></td>
+        <td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[forumsetdb][creditneed]" value="1" /></div></td>
+    </tr>
+    <tr class="tr1 vt">
+    	<td class="td1">至少需要发帖数</td>
+        <td class="td2"><input type="text" class="input input_wa" name="forumsetdb[postnumneed]"  value="$forumset[postnumneed]" /></td>
+        <td class="td2"><div class="help_a"></div></td>
+        <td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[forumsetdb][postnumneed]" value="1" /></div></td>
+    </tr>
+</table>
+<h2 class="h1">其他积分相关</h2>
+<table cellspacing="0" cellpadding="0" width="100%" class="mb10">
+    <tr class="tr1 vt">
+        <td class="td1">悬赏帖积分设置</td>
+        <td class="td2">
+            <div class="admin_table_c">
+                <table cellpadding="0" cellspacing="0" width="100%">
+                	<tr>
+                        <td width="80">有效时间:</td>
+                         <td><input type="text" class="input input_wa mr10" name="rewarddb[0]" value="$rw_time" />[天]</td>
+                    </tr>
+                    <tr>
+                        <td>最佳答案:</td>
+                        <td><input type="text" class="input input_wa mr10" name="rewarddb[1]" value="$rw_b_val" />[最小积分]</td>
+                    </tr>
+                    <tr>
+                        <td>热心助人:</td>
+                        <td><input type="text" class="input input_wa mr10" name="rewarddb[2]" value="$rw_a_val" />[最小积分]</td>
+                    </tr>
+                    <tr class="vt">
+                        <td>悬赏积分:</td>
+                        <td>
+                            <ul class="cc list_A list_80">
+<!--
+EOT;
+	foreach ($credit->cType as $key => $val) {
+		$checked = in_array($key,$rw_credit) ? 'checked' : '';
+print <<<EOT
+-->
+		 						<li><input type="checkbox" name="rewarddb[3][]" value="$key" $checked />&nbsp;$val</li>
+<!--
+EOT;
+	}print <<<EOT
+-->
+                            </ul>
+                        </td>
+                    </tr>
+                </table>
+              </div>
+        </td>
+        <td class="td2"><div class="help_a"><!-- 悬赏帖设置 --></div></td>
+        <td class="td2" width="40"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[forumsetdb][rewarddb]" value="1" /></div></td>
+	</tr>
+    <tr class="tr1 vt">
+       <td class="td1">附件积分控制</td>
+        <td class="td2">
+            <div class="admin_table_c">
+                <table cellpadding="0" cellspacing="0" width="100%">
+                	<tr>
+                        <td width="120">附件积分类型设置:</td>
+                         <td><select name="uploadset[credit]" class="select_wa">
+<!--
+EOT;
+	foreach ($credit->cType as $key => $val) {
+		if ($key == $uploadcredit) {print <<<EOT
+-->
+                            <option value="$key" selected>{$val}</option>
+<!--
+EOT;
+		}else{print <<<EOT
+-->
+                            <option value="$key">{$val}</option>
+<!--
+EOT;
+		}
+	}print <<<EOT
+-->
+                            </select>
+                         </td>
+                    </tr>
+                    <tr>
+                        <td>上传附件奖励积分:</td>
+                        <td><input type="text" class="input input_wa" name="uploadset[upload]" value="$uplodmoney" />&nbsp;小于0表示扣除积分</td>
+                    </tr>
+                    <tr>
+                        <td>下载附件扣除积分:</td>
+                        <td><input type="text" class="input input_wa" name="uploadset[download]" value="$downloadmoney" />&nbsp;小于0表示奖励积分</td>
+                    </tr>
+                    <tr>
+                        <td>浏览图片扣除积分:</td>
+                        <td>
+                            <ul class="cc list_80 list_A">
+                                <li><input type="radio" name="uploadset[type]" value="1" $img_Y /> 开启</li>
+                                <li><input type="radio" name="uploadset[type]" value="0" $img_N /> 关闭</li>
+                            </ul>
+                        </td>
+                    </tr>
+                </table>
+              </div>
+        </td>
+        <td class="td2"><div class="help_a">上传附件与下载附件积分控制<br />浏览图片扣除积分开启后跟随下载附件的积分设置，图片附件只有下载后才能查看</div></td>
+        <td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[forumsetdb][uploadset]" value="1" /></div></td>
+    </tr>
+	</table>
+</div>
+<div class="admin_table mb10" id="c_usergroup" style="display:none">
+<h2 class="h1">版块权限--全不选则默认为开放版块</h2>
+<table cellspacing="0" cellpadding="0" width="100%">
+    <tr class="tr1 vt">
+        <td class="td1">允许浏览版块</td>
+        <td class="td2">$viewvisit</td>
+        <td class="td2"><div class="help_a"></div></td>
+        <td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[allowvisit]" value="1" /></div></td>
+    </tr>
+    <tr class="tr1 vt">
+        <td class="td1">允许浏览帖子</td>
+        <td class="td2">$viewread </td>
+        <td class="td2"><div class="help_a"></div></td>
+        <td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[allowread]" value="1" /></div></td>
+    </tr>
+    <tr class="tr1 vt">
+        <td class="td1">发表主题</td>
+        <td class="td2">$viewpost </td>
+        <td class="td2"><div class="help_a">关联板块的群组成员不受限制</div></td>
+        <td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[allowpost]" value="1" /></div></td>
+    </tr>
+    <tr class="tr1 vt">
+        <td class="td1">发表回复</td>
+        <td class="td2">$viewrp </td>
+        <td class="td2"><div class="help_a">关联板块的群组成员不受限制</div></td>
+        <td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[allowrp]" value="1" /></div></td>
+    </tr>
+    <tr class="tr1 vt">
+        <td class="td1">允许上传附件</td>
+        <td class="td2">$viewupload</td>
+        <td class="td2"><div class="help_a"></div></td>
+        <td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[allowupload]" value="1" /></div></td>
+    </tr>
+    <tr class="tr1 vt">
+        <td class="td1">允许下载附件</td>
+        <td class="td2">$viewdownload</td>
+        <td class="td2"><div class="help_a"></div></td>
+        <td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[allowdownload]" value="1" /></div></td>
+    </tr>
+</table>
+</div>
+
+
+<div class="admin_table mb10">
+<h2 id="headCtrlCrossConfig" class="h1 cp">高级设置</h2>
+<div class="admin_table mb10 none_pw">
+<table cellspacing="0" cellpadding="0" width="100%" class="mb10">
+    <tr class="tr1 vt">
+        <td class="td1" valign="top">版块设置横向操作<!--利用此功能可将一个或多个设置同时应用到其它版块中，不再需要逐个版块设置，使操作更加简便<br />操作说明:<ol><li><font color=blue>选中</font>需要进行横向操作的<font color=blue>权限设置后面的复选框</font></li><li>在左边的复选框中<font color=blue>选择</font>需要进行横向操作的<font color=blue>版块</font></li><li>然后提交即可完成版块权限横向操作</li></ol>注:<ol><li>选择版块时可使用 ‘Ctrl’ 键进行多选，也可使用 ‘Shift’ 键或拖动鼠标连续选择多个版块</li><li>不使用此功能，请不要选中<font color=blue>权限设置后面的复选框</font>和左边的复选框中<font color=blue>版块</font></li></ol>--></td>
+        <td class="td2"><select  class="select_wa" name="otherfid[]" size="16" multiple>$forumcache</select></td>
+        <td class="td2"><div class="help_a">利用此功能可将一个或多个设置同时应用到其它版块中，不再需要逐个版块设置，使操作更加简便<br />操作说明:<ol><li><font color=blue>选中</font>需要进行横向操作的<font color=blue>权限设置后面的复选框</font></li><li>在左边的复选框中<font color=blue>选择</font>需要进行横向操作的<font color=blue>版块</font></li><li>然后提交即可完成版块权限横向操作</li></ol>注:<ol><li>选择版块时可使用 ‘Ctrl’ 键进行多选，也可使用 ‘Shift’ 键或拖动鼠标连续选择多个版块</li><li>不使用此功能，请不要选中<font color=blue>权限设置后面的复选框</font>和左边的复选框中<font color=blue>版块</font></li></ol></div></td>
+    </tr>
+</table>
+</div>
+</div>
+
+</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+<div class="mb10 tac">
+    <span class="btn"><span><button type="submit" onfocus="blur();">提 交</button></span></span>
+    <span class="bt"><span><button type="reset" onfocus="blur();">重 置</button></span></span>
+</div>
+</form>
+
+<script type="text/javascript">
+function showtab(t,a){
+	if (getObj(t)) {
+		var hasCurrent = false;
+		var obj = getObj(t).getElementsByTagName('li');
+		for (var i=0;i<obj.length;i++) {
+			try{
+			if (obj[i].id==a) {
+				getObj(obj[i].id).className = 'current';
+				getObj('c_'+a).style.display = '';
+				setCookie('thisPWTabs',a);
+				hasCurrent = true;
+			} else {
+				getObj(obj[i].id).className = '';
+				getObj('c_'+obj[i].id).style.display = 'none';
+			}
+			}catch(e){}
+		}
+		if (!hasCurrent) {
+			getObj('basic').className = 'current';
+			getObj('c_basic').style.display = '';
+			setCookie('thisPWTabs','basic');
+		}
+	}
+}
+function DelCookie(name) {
+	expires = new Date();
+	expires.setTime(expires.getTime()-(86400*365));
+	document.cookie=name+"=; expires="+expires.toGMTString()+"; path=/";
+}
+
+function FetchCookie(name) {
+	var start = document.cookie.indexOf(name);
+	var end = document.cookie.indexOf(";",start);
+	return start==-1 ? null : unescape(document.cookie.substring(start+name.length+1,(end>start ? end : document.cookie.length)));
+}
+~function() {
+	
+	var c_type = FetchCookie('thisPWTabs');
+	DelCookie('thisPWTabs');
+	if (c_type)c_type = '$c_type';
+	showtab('tab3_eidt',c_type);
+}();
+<!--
+EOT;
+if($type!='category'){print <<<EOT
+-->
+//showtab('tab3_eidt','$thisPWTabs');
+<!--
+EOT;
+} else {print <<<EOT
+-->
+	getObj('c_basic').style.display = '';
+<!--
+EOT;
+}print <<<EOT
+-->
+
+function displayCrossConfigDiv() {
+	var frm = document.getElementById('addform');
+	frm.className = (frm.className=='addform') ? '' : 'addform';
+}
+getObj('linkCtrlCrossConfig').onclick = displayCrossConfigDiv;
+getObj('headCtrlCrossConfig').onclick = displayCrossConfigDiv;
+</script>
+<!--
+EOT;
+}print <<<EOT
+-->
+<!--
+EOT;
+}include_once PrintEot('adminbottom');
+?>-->

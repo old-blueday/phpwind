@@ -1,0 +1,181 @@
+<!--<?php 
+print <<<EOT
+--><!doctype html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=$db_charset" />
+<meta http-equiv="x-ua-compatible" content="ie=7" />
+<title>上传照片</title>
+<base id="headbase" href="$db_bbsurl/" />
+<link rel="stylesheet" type="text/css" href="images/pw_core.css" media="all" />
+<link rel="stylesheet" type="text/css" href="u/images/style.css" media="all" />
+<script type="text/javascript" language="JavaScript" src="js/pw_ajax.js"></script>
+<script type="text/javascript" LANGUAGE="JavaScript" src="js/core/core.js"></script>
+<script type="text/javascript" LANGUAGE="JavaScript" src="js/core/tab.js"></script>
+<script language="JavaScript">
+var imgpath = '$imgpath';
+var verifyhash = '$verifyhash';
+var winduid = '$winduid';
+var windid	= '$windid';
+var groupid	= '$groupid';
+var charset = '$db_charset';
+var basename = '$basename';
+var temp_basename = '$temp_basename';
+</script>
+</head>
+<style type="text/css">
+html,body{background:#fff;overflow:hidden;}
+.s1{color:#f00;}/*red*/
+.s2{color:#f50;}/*org*/
+.s3{color:#080;}/*green*/
+.s4{color:#369;}/*blue*/
+.s5{color:#333;}/*black*/
+.s6{color:#666;}
+.s7{color:#6fb0d6;}
+.gray{color:#999;}
+</style>
+<body>
+<div style="background:#fff;height:600px;">
+<script language="JavaScript">
+function ajaxurl(o) {
+	read.obj = o;
+	ajax.send(o.href,'',ajax.get);
+	return false;
+}
+</script>
+<!--
+EOT;
+if($a == 'upload') {
+$shortcut=$_GET['s']?' target=formiframe ':'';
+$formiframe=$shortcut?"<iframe src=javascript:; style='display:none;' width=0 height=0 name='formiframe' onload=\"iPhotoForm(this)\"></iframe>":"";
+if (empty($job)) {
+print <<<EOT
+-->
+<div class="p10">
+$formiframe
+<form action="{$basename}a=$a&job=$job" id="uploadPhotoForm" enctype="multipart/form-data" method="post" $shortcut >
+<input type="hidden" name="step" value="3" />
+<input type="hidden" name="verify" value="$verifyhash" />
+	<div class="mb10">
+<!--
+EOT;
+if ($options) {print <<<EOT
+-->
+		<select name="aid" id="aidsel_info" class="mr10" onChange="getallowflash(this.value);">{$options}</select>
+<!--
+EOT;
+}print <<<EOT
+-->
+		<span id="allowflash" class="mr10">请选择相册</span><span class="gray">(单张照片不得大于{$o_maxfilesize}kb)</span>
+	</div>
+	<div class="photoup">
+		<dl class="cc" style="height:130px;">
+			<dt><span><img id="preview_1" style="filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod=image);border:1px solid #ccc;" width="90" height="90" src="$imgpath/90.png"></span></dt>
+			<dd><p><input type="file" class="input" name="photo_1" id="p_1" accept="image/*" onChange="preview_img(1);"/></p>
+			<p style="margin-top:8px;"><textarea id="pintro_1" name="pintro[1]" class="textareaA mb5"></textarea></p>
+			<span class="s6" id="pintro_1_warn">限255字节</span>
+			</dd>
+		</dl>
+		<dl class="cc" style="height:130px;">
+			<dt><span><img id="preview_2" style="filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod=image);border:1px solid #ccc;" width="90" height="90" src="$imgpath/90.png"></span></dt>
+			<dd><p><input type="file" class="input" name="photo_2" id="p_2" accept="image/*" onChange="preview_img(2);"/></p>
+			<p style="margin-top:8px;"><textarea id="pintro_2" name="pintro[2]" class="textareaA mb5"></textarea></p>
+			<span class="s6" id="pintro_2_warn">限255字节</span>
+			</dd>
+		</dl>
+	</div>
+<!--
+EOT;
+if ($o_photos_gdcheck) {print <<<EOT
+-->
+	<div class="mb10">认证码: <input class="input mr5" onFocus="showCK();" type="text" name="gdcode" id="gdcode" size="5" tabindex="3"  /><img id="ckcode" style="cursor:pointer;display:none; vertical-align:top;" onClick="this.src='ck.php?nowtime='+new Date().getTime();" alt="看不清楚，换一张" align="absmiddle" />
+<script language="JavaScript">
+function showCK(){
+	getObj('ckcode').style.display="";
+	if (getObj('ckcode').src.indexOf('ck.php') == -1) {
+		getObj('ckcode').src = 'ck.php?nowtime=' + new Date().getTime();
+	}
+}
+</script>
+	</div>
+<!--
+EOT;
+}if($o_photos_qcheck){print <<<EOT
+-->
+	<div class="mb10">验证问答: {$db_question[$qkey]} （正确答案:{$db_answer[$qkey]}）
+		<input class="input" name="qanswer" id="qanswer" size="25" tabindex="7" />
+		<input type="hidden" name="qkey" id="qkey" value="$qkey" />
+	</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+	<span class="btn" style="margin-left:0;"><span><button type="submit">开始上传</button></span></span>
+</form>
+</div>
+<script language="JavaScript">
+var charset = '$db_charset';
+initCheckTextNum('pintro_1','pintro_1_warn',255);
+initCheckTextNum('pintro_2','pintro_2_warn',255);
+initCheckTextNum('pintro_3','pintro_3_warn',255);
+</script>
+<!--
+EOT;
+}print<<<EOT
+-->
+<script language="JavaScript">
+function getallowflash(aid) {
+	ajax.send('{$basename}a=getallowflash&aid='+aid,'',function() {
+		var rText = ajax.request.responseText.split('\\t');
+		if (rText[0] == 'ok') {
+			if (rText[1]) {
+				getObj('allowflash').innerHTML = '您还可以上传'+rText[1]+'张照片';
+			} else {
+				getObj('allowflash').innerHTML = '请选择相册';
+			}
+		} else {
+			ajax.guide();
+		}
+	});
+	return false;
+}
+window.onload=function()
+{
+getallowflash(getObj('aidsel_info').value);
+};
+</script>
+<!--
+EOT;
+}print <<<EOT
+-->
+<script language="JavaScript">
+function ajaxdel(pid) {
+	ajax.send('{$basename}a=delphoto&pid='+pid,'',function() {
+		var rText = ajax.request.responseText.split('\\t');
+		if (rText[0] == 'ok') {
+			window.location = '{$basename}a=album&aid='+rText[1];
+		} else {
+			ajax.guide();
+		}
+	});
+	return false;
+}
+function ajaxSetCover(pid){
+	ajax.send('{$basename}a=setcover&pid='+pid,'',function() {
+		var rText = ajax.request.responseText.split('\\t');
+		if (rText[0] == 'ok') {
+			showDialog('succes','设置封面成功!',1);
+		} else {
+			ajax.guide();
+		}
+	});
+	return false;
+}
+</script>
+</div>
+<script language="JavaScript" src="js/global.js"></script>
+<script language="JavaScript" src="js/app_global.js"></script>
+</body></html>
+<!--
+EOT;
+?>-->

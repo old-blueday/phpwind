@@ -1,0 +1,93 @@
+<!--
+<?php 
+
+
+if ("showbg" == $jobact) {
+print <<<EOT
+-->
+		<ul class="zt-list cc">
+<!--
+EOT;
+	if (!count($bg_list)) {
+print <<<EOT
+-->
+			该分类下暂无背景图片
+<!--
+EOT;
+	}
+	foreach ($bg_list as $bg) {
+		$checked = $bgid == $bg['id'] ? 'checked' : '';
+print <<<EOT
+-->
+			<li>
+				<img src="{$bg['thumb_url']}" style="width:60px;height:60px;" />
+				<p><input name="bg_id" type="radio" value="{$bg['id']}" $checked />&nbsp;</p>
+			</li>
+<!--
+EOT;
+	}
+print <<<EOT
+-->
+		</ul>
+<!--
+EOT;
+	if ($is_lastpage) {
+print <<<EOT
+-->
+		<input type="hidden" id="bgLastPage">
+<!--
+EOT;
+	}
+print <<<EOT
+-->
+<!--
+EOT;
+} elseif ("showcopy" == $jobact) {
+print <<<EOT
+-->
+		<ul class="zt-list cc">
+<!--
+EOT;
+	if (!count($useful_stopics)) {
+print <<<EOT
+-->
+			该分类下暂无素材
+<!--
+EOT;
+	}
+	foreach ($useful_stopics as $stopic) {
+		$cut_title = substrs($stopic['title'],5);
+print <<<EOT
+-->
+			<li>
+<!--
+EOT;
+		if ($stopic['thumb_url']) {
+print <<<EOT
+-->
+				<img src="{$stopic['thumb_url']}" title="{$stopic['title']}" />
+<!--
+EOT;
+		} else {
+print <<<EOT
+-->
+				<div class="nopic"></div>
+<!--
+EOT;
+		}
+print <<<EOT
+-->
+				<p title="{$stopic['title']}"><input name="copy_stopic_id" type="radio" value="{$stopic['stopic_id']}" onclick="selectLayoutOrCopy('copy');" />$cut_title</p>
+			</li>
+<!--
+EOT;
+	}
+print <<<EOT
+-->
+		</ul>
+<!--
+EOT;
+}
+
+?>
+-->

@@ -1,0 +1,119 @@
+<!--
+<?php
+print <<<EOT
+-->
+<form action="$ajaxurl" method="post" onsubmit="return false;">
+<h2 class="h1" style="cursor:move" onmousedown="read.move(event);"><a class="fr del_img" href="javascript:;" onclick="closep();" title="关闭">关闭</a>修改“{$block_name}”模块的内容</h2>
+<div class="admin_table mb10">
+<table cellspacing="0" cellpadding="0" width="500" style="table-layout:auto;">
+
+EOT;
+
+include stopic_use_block($block_type);
+
+print <<<EOT
+
+</table>
+</div>
+<div class="tac mb10">
+	<input type="hidden" name="job" value="editblock">
+	<input type="hidden" name="step" value="2">
+	<input type="hidden" name="block_id" value="$block_id">
+	<input type="hidden" name="stopic_id" value="$stopic_id">
+    <span class="btn2"><span><button type="button" onfocus="blur();" onclick="ajax.submit(this.form,updateHTML)">提 交</button></span></span>
+</div>
+</form>
+
+<script language="javascript">
+function delTr (e) {
+	while (e && e.tagName.toLowerCase() != 'tr') {
+		e = e.parentNode;
+	}
+	if (e.tagName.toLowerCase() == 'tr') {
+		delElement(e);
+	}
+}
+
+function updateHTML () {
+	var rText = ajax.request.responseText.split('\t');
+	if (rText[0] == 'success') {
+		var itemid = '$block_id';
+		if (rText[1] != '') {
+			var data =  JSONParse(rText[1]);
+			if (typeof(data)=='object') {
+				dragItemImpl.setItemContent(itemid,data['content']);
+				dragItemImpl.setItemTitle(itemid,data['title']);
+			}
+		}
+	} else {
+		ajax.guide();
+	}
+}
+
+var addFildData = Class({},{
+	Create	: function (fildbody,filddata,tid) {
+		this._setTid(tid);
+		this._setFildBody(fildbody);
+		this._setCloneNode(filddata);
+		this.appendToFildBody();
+	},
+	
+	appendToFildBody	: function () {
+		this._getTidContent();
+		this.fildBody.appendChild(this.clonenode);
+	},
+
+	_setFildBody	: function (fildbody) {
+		this.fildBody	= getObj(fildbody);
+	},
+
+	_setTid	: function (tid) {
+		if (getObj(tid)) {
+			var tid = getObj(tid).value;
+			tid = tid - 0;
+			this.tid	= tid;
+		}
+	},
+
+	_setCloneNode	: function (filddata) {
+		var nodes = getObj(filddata).getElementsByTagName('tr');
+		this.clonenode	= nodes[0].cloneNode(true);
+	},
+
+	_getTidContent	: function () {
+		if (!this.tid) return false;
+		var ajaxurl = '$ajaxurl';
+		var block_id= '$block_id';
+		var self	= this;
+		ajax.send(ajaxurl,'job=gettidcontent&tid='+this.tid+'&block_id='+block_id,function () {
+			var rText = ajax.request.responseText.split('\t');
+			if (rText[0] == 'success') {
+				if (rText[1] != '') {
+					var data =  JSONParse(rText[1]);
+					if (typeof(data)=='object') {
+						for (var i in data) {
+							var fild = self._getFildName(i);
+							if (fild) {
+								fild.value = data[i];
+							}
+						}
+					}
+				}
+			}
+		});
+	},
+	_getFildName	: function (fild) {
+		var filds = this.clonenode.getElementsByTagName('input');
+		for (var i=0;i<filds.length;i++) {
+			if (filds[i].name.indexOf(fild)!=-1) {
+				return filds[i];
+			}
+		}
+		return false;
+	}
+});
+</script>
+<!--
+EOT;
+?>
+-->

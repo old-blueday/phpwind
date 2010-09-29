@@ -1,0 +1,65 @@
+<!--
+<?php
+
+if ('show' == $block_job) {
+	foreach ($block_data as $v) {
+print <<<EOT
+-->
+
+<ul>
+<li><a href="{$v[url]}" target="_blank">{$v[title]}</a></li>
+</ul>
+
+<!--
+EOT;
+	}
+} else {
+print <<<EOT
+-->
+	<tr class="tr1 vt">
+		<td class="td2" width="170">模块标题</td>
+        <td class="td2" colspan="2"><input type="text" name="block_title" value="$block[title]" class="input input_wa"></td>
+    </tr>
+	<tr class="tr1 vt">
+		<td class="td2">帖子tid[选填]</td>
+		<td class="td2" colspan="2">
+        	<input type="text" id="tid" class="input input_wa mr5">
+			<span class="bt2"><span><button type="button" onclick="javascript:New(addFildData,['fildbody','filddata','tid']);">添加帖子</button></span></span>
+		</td>
+	</tr>
+	<tr class="tr2 td_bgA">
+		<td>链接地址</td>
+		<td>标题<span class="s1">*</span></td>
+		<td>&nbsp;</td>
+	</tr>
+
+<tbody id="fildbody">
+<!--
+EOT;
+	foreach ($block_data as $v) {
+print <<<EOT
+-->
+	<tr class="tr1 vt">
+		<td class="td2"><input type="text" name="url[]" class="input input_wa" value="{$v[url]}"></td>
+		<td class="td2"><input type="text" name="title[]" class="input input_wa" value="{$v[title]}"></td>
+		<td class="td2"><a href="javascript:void(0);" onclick="delTr(this);">[删除]</a></td>
+	</tr>
+<!--
+EOT;
+	}
+print <<<EOT
+-->	
+</tbody>
+<tbody id="filddata" style="display:none;">
+	<tr class="tr1 vt">
+		<td class="td2"><input type="text" name="url[]" value="" class="input input_wa"></td>
+		<td class="td2"><input type="text" name="title[]" value="" class="input input_wa"></td>
+		<td class="td2"><a href="javascript:void(0);" onclick="delTr(this);">[删除]</a></td>
+	</tr>
+</tbody>
+
+<!--
+EOT;
+}
+?>
+-->

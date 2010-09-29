@@ -1,0 +1,19 @@
+.wy_menu{border:1px solid #c4e7fc;padding:1px;background:#fff; position:absolute;width:308px}
+.wy_menu .wy_title{line-height:22px;padding:0 5px;background: url(editor_bg.png) 0 -120px repeat-x;color:#2054ce;cursor:move}
+.wy_title .down_left,.wy_title .down_right{width:0;height:0;overflow:hidden; text-indent:-2000em;line-height:0;border-top:5px transparent dotted;border-bottom:5px transparent dotted;margin-top:5px; cursor:pointer;}
+.wy_title .down_left{border-right:5px #0086de solid;border-left:0;}
+.wy_title .down_right{border-left:5px #0086de solid;border-right:0;}
+.wy_title ul{float:left;margin:1px 5px 0;padding-top:1px;}
+.wy_title li{float:left;line-height:21px;padding:0 5px; cursor:pointer;}
+.wy_title .current{border-left:1px solid #abd1e5;border-right:1px solid #abd1e5;border-top:2px solid #3ca61a;background:#fff;line-height:18px;color:#0066cc;}
+.wy_title li i{font-style:normal;float:left;}
+
+.face_main{height:200px;overflow-Y:auto}
+.face_main ul{padding:5px 0 0 5px;}
+.face_main li{float:left;width:40px;margin:7px 7px 0;display:inline;}
+.face_main li img{max-width:32px;max-height:32px;padding:3px;}
+.face_main li a{border:1px solid #fff;display:block;float:left;}
+.face_main li a:hover{border:1px solid #76daff;}
+.face_pages{padding:10px 0 10px 10px;}
+.face_pages a,.face_pages b{float:left;border:1px solid #e0e0e0;background:#fff;color:#505050; font-size:11px;padding:0 5px;margin-right:1px;}
+.face_pages a:hover,.face_pages b{background:#808080;color:#fff; text-decoration:none;}

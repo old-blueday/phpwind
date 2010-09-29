@@ -1,0 +1,34 @@
+<!--<?php
+print <<<EOT
+-->
+<style type="text/css">
+.birth a{padding: 3px; width: 15%; float: left;}
+</style>
+<div id="breadCrumb">
+		<img src="$imgpath/$stylepath/thread/home-old.gif" align="absmiddle" />&nbsp;<a href="$db_bfn" title="$db_bbsname">$db_bbsname</a><em>&gt;</em>生日会员
+</div>
+<div class="c"></div>
+<div class="t" style="margin-top:8px">
+<table width="100%" cellspacing="0" cellpadding="0" align="center">
+	<tr><td class="h">生日会员</td></tr>
+	<tr class="tr3 f_one birth"><td>
+<!--
+EOT;
+if(!$brithcache){print <<<EOT
+-->
+今天站点里没有人过生日
+<!--
+EOT;
+}else{print <<<EOT
+-->
+				$brithcache
+<!--
+EOT;
+}print <<<EOT
+-->
+	</td></tr>
+</table></div>
+<!--
+EOT;
+?>
+-->

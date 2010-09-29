@@ -1,0 +1,42 @@
+<!--<?php
+include_once PrintEot('left');
+print <<<EOT
+-->
+<div class="admin_info mb10">
+  <h3 class="h1"><b>提示信息</b></h3>
+  <div class="legend"><ol><li><span class=s3>777属性通过</span>:文件属性正常</li><li><span class=s1>需要设置777属性</span>:没有设置777属性，需要管理员使用FTP工具手动设置777属性，否则程序可能无法正常运行</li><li><span class=gray>文件不存在</span>:文件不存在，请检查文件是否上传完整</li></ol></div>
+</div>
+<h2 class="h1"><b>文件属性检查</b></h2>
+<div class="admin_table mb10">
+  <table width="100%" cellspacing="0" cellpadding="0">
+<!--
+EOT;
+foreach($filepath as $key => $value){
+if($filemode[$key]==1){
+$chmod="<span class=gray>文件不存在</span>";
+}elseif($filemode[$key]==2){
+$chmod="<span class=s1>需要设置777属性</span>";
+}else{
+$chmod="<span class=s3>777属性通过</span>";
+}$value=str_replace(array(R_P,D_P),'',$value);
+print <<<EOT
+-->
+    <tr class="tr1 vt">
+      <td class="td1">$value</td>
+      <td class="td2">$chmod</td>
+      <td class="td2">&nbsp;</td>
+    </tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+    </td>
+    
+    </tr>
+    
+  </table>
+</div>
+<!--
+EOT;
+include_once PrintEot('adminbottom');
+?>-->

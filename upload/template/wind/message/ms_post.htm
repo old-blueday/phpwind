@@ -1,0 +1,430 @@
+<!--<?php
+print <<<EOT
+-->
+<style type="text/css" media="screen">
+	@import url(images/post/c_editor/editor.css);
+	@import url(images/post/c_editor/upload.css);
+</style>
+<!--
+EOT;
+print <<<EOT
+-->
+<script type="text/javascript">
+	var stylepath = '{$skin}';
+	var totalmsg = $totalMessage;
+	var maxmsg = $max;
+	var mSubmit = function(form) {
+		scrollTo(0,246);
+		var unames = document.getElementsByName('_usernames[]');
+		if(maxmsg > 0 && totalmsg >= maxmsg){
+			MC.showFailTips("消息已满,发送失败.请及时清理");
+			return false;
+		}
+		if(!unames || !unames.length){
+			MC.showFailTips("收件人不能为空");
+			return false;
+		}
+		var atc_title = MC.$("atc_title").value;
+		var atc_content = htmltocode(editor.getHTML());
+		editor._textArea.value=atc_content;
+
+		if("" == atc_title){
+			MC.showFailTips("标题不能为空");
+			return false;
+		}
+		if(atc_content==''){
+			MC.showFailTips("内容不能为空");
+			return false;
+		}
+		var formele = document.FORM;
+		var newuname = [];
+		for(var i=unames.length-1;i>=0;i--){
+			var item = unames[i].cloneNode(true);
+			formele.appendChild(item);
+			newuname.push(item);
+		}
+		MC.post("{$baseUrl}?type=ajax&action=post",form,function(){
+				MC.showFailTips(ajax.request.responseText,'showmessage');
+			},function(){
+			//清除用户
+			for(var i=newuname.length-1;i>=0;i--){
+				formele.removeChild(newuname[i]);
+			}
+			var friends = MC.$("get_friend");
+			var spans=friends.getElementsByTagName('span');
+			for(var i=spans.length-1;i>=0;i--){
+				friends.removeChild(spans[i]);
+			}
+			MC.$("usernames").value = "";
+			var gdinput = MC.$("gdinput");
+			if(gdinput){
+				gdinput.value = "";
+			}
+			//清除标题
+			MC.$("atc_title").value = "";
+			wordlength(MC.$("atc_title"));
+			//清除内容
+			editor._textArea.value='';
+			editor._doc.body.innerHTML='';
+			//清除附件
+			var tbody = document.getElementById('attach').getElementsByTagName('tbody')[0];
+			while(tbody.rows.length){
+				tbody.deleteRow(0);
+			}
+			uploader.countFile();
+			totalmsg++;
+			//锚点
+		},function(){
+			//清除用户
+			for(var i=newuname.length-1;i>=0;i--){
+				formele.removeChild(newuname[i]);
+			}
+		});
+		return false;
+	}
+</script>
+<div class="contUser">
+	<div class="p15">
+        <h4 class="site bdA mb10"><span>写新消息</span></h4>
+        <div id="showmessage" class="wrongTip" style="display:none">隐藏</div>
+        <table width="700"><tbody>
+            <tr class="tr5 vt">
+                <td width="80" class="lh_22">收件人： </td>
+                <td>
+                    <div class="input_img mb5 cc" onclick="getObj('usernames').focus();">
+                        <em class="input_down" onclick="pwSearch.selectInit(event,'popout','message.php?type=ajax','action=friend',0)">选择好友</em>
+                        <div id="get_friend">
+<!-- 
+EOT;
+if($username){
+print <<<EOT
+-->
+                        <span><a href="javascript://"><i>$username<input type="hidden" value="$username" id="_usernames[]" name="_usernames[]"><del class="x">删除</del></i></a></span>
+<!-- 
+EOT;
+}
+print <<<EOT
+-->
+                        <input type="text" max="20" id="usernames" name="usernames" value="" onblur="pwSearch.blur()" onfocus="pwSearch.init('message.php?type=ajax','action=friend','resultd','searchResult')" onkeydown="pwSearch.move(event)" onkeyup="pwSearch.searchResult(event,200);" autocomplete=off disableautocomplete></div>
+                    </div>
+                    <p class="s6">请输入收件人名称（好友名称支持拼音首字母）</p>
+                </td>
+            </tr></tbody></table>
+        <form method="post" id="mainForm" name="FORM" action="$baseUrl?type=ajax&action=post" enctype = "multipart/form-data" onsubmit="return mSubmit(document.FORM);">
+        <input type="hidden" name="step" value="2" /><table width="700"><tbody>
+            <tr class="tr5 vt">
+                <td width="80" class="lh_22">标题： </td>
+                <td><input class="input mr5 input_wb" type="text" name="atc_title" id="atc_title" onkeyup="wordlength(this)" maxlength="200"  autocomplete=off disableautocomplete /><span class="s6">(0/200)</span></td>
+            </tr>
+            <tr class="tr5 vt">
+                <td class="lh_22">内容： </td>
+                <td>
+                    <div id="replyEditorBtn" class="replyEditor cc">
+                    	<a href="javascript://" onclick="toggleMode(1);" class="fr">高级模式</a>
+                        <ul>
+                            <li><a href="javascript:;" onclick="return simpleEmotion();" class="sk_show">表情</a></li>
+                        </ul>
+                    </div>
+                <div class="wind_editor_con cc mb10">
+                       <div id="w_editor_but" class="w_editor_but" style="display:none">
+                        <ul class="cc fl">
+                            <li>
+                                <div id="wy_fontname" style="width: 77px;" class="wy_select">字体</div>
+                                <div id="wy_fontsize" style="width: 15px;" class="wy_select">2</div>
+                                <div class="c">&nbsp;</div>
+                                <a title="粗体" id="wy_bold" href="javascript:">粗体</a>
+                                <a title="斜体" id="wy_italic" href="javascript:">斜体</a>
+                                <a title="下划线" id="wy_underline" href="javascript:">下划线</a>
+                                            <a title="删除线" id="wy_strikethrough" href="javascript:">删除线</a>
+                                <a title="字体颜色" id="wy_forecolor" href="javascript:">字体颜色</a>
+                                <a title="背景颜色" id="wy_hilitecolor" href="javascript:">背景颜色</a>
+                            </li>
+                            <li>
+                                <div class="cc fl">
+                                    <a title="对齐" id="wy_justify" href="javascript:">对齐</a>
+                                    <a title="列表" id="wy_insertlist" href="javascript:">列表</a>
+                                    <a title="缩进" id="wy_indent" href="javascript:">缩进</a>
+                                    <a title="水平线" id="wy_inserthorizontalrule" href="javascript:">水平线</a>
+                                    <a title="引用" id="wy_quote" href="javascript:">引用</a>
+                                    <div class="c">&nbsp;</div>
+                                    <a title="去除字体格式" id="wy_removeformat" href="javascript:">去除字体格式</a>
+                                    <a title="插入链接" id="wy_createlink" href="javascript:">插入链接</a>
+                                    <a title="清除链接" id="wy_unlink" href="javascript:">清除链接</a>
+                                    <a title="表格" id="wy_inserttable" href="javascript:">表格</a>
+                                    <a title="代码" id="wy_code" href="javascript:">代码</a><a title="分页" href="javascript://" onclick="pageCut()">分页</a>
+                                </div>
+                            </li>
+                            <li class="li_icon_big">
+                                <div>
+                                    <a title="图片" id="wy_insertimage" href="javascript:">图片</a>
+                                    <a title="多媒体" id="wy_media" href="javascript:">多媒体</a>
+                                    <a onclick="return showEmotion();" unselectable="on" href="javascript:" title="表情" id="td_face">表情</a>
+                                    
+                                </div>
+                                <div class="c"></div>
+                            </li>
+                            <li class="li_bg_none">
+                                <a style="display: none;" title="自定义代码" id="wy_pwcode" href="javascript:">自定义代码</a>
+                                <a style="display: none;" title="帖子格式" id="wy_setform" href="javascript:">帖子格式</a>
+                                <div class="c">&nbsp;</div>
+                            </li>
+                        </ul>
+                        <div class="fr windcode">
+                            <a href="javascript://" onclick="toggleMode(0)">简单模式</a>
+                        </div>
+                    </div>
+                    	<textarea id="textarea" name="atc_content" style="height:150px;width:600px;" onkeydown="quickpost(event)"></textarea>
+                        <div class="wy_menu_B" id="menu_editor" style="display:none;"></div>
+                        <div style="display:none"><span id="autosave"></span></div>
+                    <div class="c"></div>
+                    <div class="pr" style="height:12px;" onmousedown="editor.flex(event);">
+                        <div style="cursor:s-resize;position:absolute;bottom:-10px;height:12px;width:100%;padding-bottom:10px;" class="cc">
+                            <div class="post-flex">拉动</div>
+                        </div>
+                    </div>
+				</div>
+                <div>
+                       <div class="c"></div>
+<!-- 
+EOT;
+if($db_allowupload && $_G['allowupload']){
+print <<<EOT
+-->                       
+<div class="w_editor_up">
+  <div style="height: 23px;">
+    <div class="fr" style="line-height: 18px; padding: 5px 0pt 0pt 10px;"></div>
+    <ul class="w_tab_a cc">
+      <li id="formUploadBtn" class="current"><a hidefocus="true" href="javascript:uploader.singleTab();">普通上传</a></li>
+      <li id="batUploadBtn"><a hidefocus="true" href="javascript:uploader.mutiTab();">批量上传</a></li>
+<!--
+EOT;
+if ($mutiupload > 0) {print <<<EOT
+-->
+      <li id="flashAtt_use" class="none_css"><a hidefocus="true" href="javascript:uploader.init();" style="padding-right:0;">已有附件($mutiupload)</a></li>
+      <li id="flashAtt_clear" class="none_css"><a hidefocus="true" href="javascript:uploader.clear();">清空已有附件&nbsp;</a></li>
+<!--
+EOT;
+}print <<<EOT
+-->
+      <li class="none_css"><a style="padding-right: 14px;" class="wy_tips" href="javascript:;">&nbsp;可上传类型<i style="width: 250px;">{$filetypeinfo}</i></a></li>
+    </ul>
+  </div>
+  <div class="w_editor_up_con">
+    <div class="cc">
+<!--已包含的附件的列表-->
+
+       <table id="attach" class="tr_p10">
+        <thead>
+          <tr valign="top" class="gray" id="formUpload">
+            <td width="200">上传附件 (图片、文件等)</td>
+            <td width="180">描述</td>
+            <td width="100">&nbsp;</td>
+          </tr>
+        </thead>
+        <tbody>
+        </tbody>
+        <!--模板-->
+        <tfoot id="singleUploadMod">
+        	<tr>
+            	<td class="uploadfilename" width="200"><input type="file" name="attachment" onchange="uploader.insert(this)" /></td>
+           		<td width="180"><input type="text" name="atc_desc" /></td>
+            	<td width="100">&nbsp;</td>
+            </tr>
+        </tfoot>
+      </table>
+<!--待批量上传的文件-->
+      <table style="margin-bottom: 10px;" class="uploadFileInfo" id="uploadFileInfo">
+        <thead>
+          <tr>
+            <td width="60%">文件名</td>
+            <td width="15%">大小</td>
+            <td width="20%">上传进度</td>
+            <td width="5%">删</td>
+          </tr>
+        </thead>
+        <tbody id="qlist">
+        </tbody>
+      </table>
+      <div class="menu menu_img" id="viewimg"></div>
+    </div>
+    <div id="batUpload">
+      <div style="width: 100%;">
+        <div id="flashUploadPanel"></div>
+      </div>
+    </div>
+    <div class="c"></div>
+  </div>
+</div>
+<!-- 
+EOT;
+}
+print <<<EOT
+-->
+                    
+            </div>
+                </td>
+            </tr>
+<!--
+EOT;
+if($db_gdcheck & 8){
+print <<<EOT
+-->            
+            <tr class="tr5 vt">
+                <td>认证码：</td>
+                <td><input class="input" type="text" name="gdcode" id="gdinput" size="5" onfocus="try{opencode('menu_gd',this)}catch(e){}" /><span class="cp" onclick="this.previousSibling.focus();">&nbsp;点此刷新验证码</span>
+			<div class="menu" id="menu_gd" style="display:none;"><img src="ck.php?" align="absmiddle" style="cursor:pointer;" id="ckcode" alt="看不清楚，换一张" /></div></td>
+            </tr>
+<!--
+EOT;
+}
+print <<<EOT
+-->              
+            <tr class="tr5 vt">
+                <td>&nbsp;</td>
+                <td><span class="btn"><span><button type="submit" name="Submit">发送</button></span></span><span class="s3">Ctrl + Enter 快速发布</span></td>
+            </tr></tbody>
+        </table>
+                </form>
+            </div>
+        </div>
+<table width="100%" cellspacing="0" cellpadding="0" style="display: none;">
+	<tbody id="att_mode"><tr>
+		<td class="review_bg"><input type="file" style="width: 200px; overflow: hidden;" name="attachment_" class="input"></td><td><input type="text" size="25" name="atc_desc" class="input"></td>
+		<td></td></tr>
+	</tbody>
+</table>
+<div id="menu_face" class="menu" style="display:none;"></div>
+<div id="menu_generalface" class="menu" style="display:none;"></div>
+<script type="text/javascript" src="js/desktop/plugin.js"></script>
+<script type="text/javascript" src="js/pw_search.js"></script>
+<script type="text/javascript" src="js/lang/zh_cn.js"></script>
+<script type="text/javascript" src="js/post.js"></script>
+<script type="text/javascript" src="data/bbscache/face.js"></script>
+<script type="text/javascript" src="js/wind_c_editor.js"></script>
+<script type="text/javascript" src="js/uploader.js"></script>
+<script type="text/javascript">
+var editor = null;
+function WysiwygConfig() {
+this.baseURL = document.baseURI || document.URL;
+if (this.baseURL && this.baseURL.match(/(.*)\/([^\/]?)/)) {
+	this.baseURL = RegExp.$1 + "/";
+}
+this.imgURL = imgpath + "/post/c_editor/";
+
+this.btnList = {
+	removeformat:[ true, editorcode, false ],
+	bold: [ true, editorcode, true ],
+	italic: [ true, editorcode, true ],
+	underline: [ true, editorcode, true ],
+	strikethrough: [ true, editorcode, true ],
+	justify : [true, showJustify, false],
+	insertlist : [true, showList, false],
+	indent: [ true, showDent, false ],
+	forecolor: [ true, showcolor, false ],
+	hilitecolor: [ true, showcolor, false ],
+	inserthorizontalrule: [ true, editorcode, false ],
+	createlink: [ true, showcreatelink, false ],
+	unlink: [ true, editorcode, false ],
+	insertimage: [ true, insertImage, false ],
+	music: [ true, insertMusic, false ],
+	inserttable: [ true, showTable, false ],
+	windcode: [ true, editorcode, false ],
+	undo: [ true, editorcode, false ],
+	redo: [ true, editorcode, false ],
+	media: [ true, rming, false ],
+	quote: [ true, code, false ],
+	code: [ true, code, false ],
+	pwcode: [true, extend , false ],
+	setform: [true, extend , false ]
+};
+this.fontname = {
+	"default": "字体",
+	"宋体":	'宋体',
+	"新宋体":	'新宋体',
+	"楷体_GB2312":	'楷体_GB2312',
+	"黑体":	'黑体',
+	"Arial":	   'arial,helvetica,sans-serif',
+	"Courier New":	   'courier new,courier,monospace',
+	"Georgia":	   'georgia,times new roman,times,serif',
+	"Tahoma":	   'tahoma,arial,helvetica,sans-serif',
+	"Times New Roman": 'times new roman,times,serif',
+	"Verdana":	   'verdana,arial,helvetica,sans-serif',
+	"impact":	   'impact'
+};
+this.fontsize = {
+	"default": "2",
+	"1":  "1",
+	"2": "2",
+	"3": "3",
+	"4": "4",
+	"5": "5",
+	"6": "6",
+	"7": "7"
+};
+this.formatblock = {
+	"default": "格式",
+	"普通": "p",
+	"标题一": "h1",
+	"标题二": "h2",
+	"标题三": "h3",
+	"标题四": "h4",
+	"标题五": "h5",
+	"标题六": "h6"
+};
+this.selList = ['fontname','fontsize'];
+};
+editor = new WYSIWYD();
+editor.config = new WysiwygConfig();
+editor.init('wysiwyg', 0);
+var maxLength=200;
+function wordlength(target)
+{
+	var val = target.value;
+	var n = 2*val.length-val.replace(/[\u4e00-\u9fa5]/g,'').length;
+	var val=target.value;
+	while(n>maxLength)
+	{
+		var key = val.substr(-1);
+		target.value=val.substr(0,val.length-1);
+		val = target.value;
+		n -= /[\u4e00-\u9fa5]/.test(key)?2:1;
+	}
+	str='('+n+'/'+maxLength+')';
+	var next = target.nextSibling;
+	next.innerHTML=str;
+	if(n==maxLength){
+		next.className='s3';
+		target.maxLength = val.length;
+	}else{
+		next.className="s6";
+		target.maxLength = maxLength;
+	}
+}
+function toggleMode(mode)
+{
+if(mode){
+	getObj('replyEditorBtn').style.display="none";
+	getObj('w_editor_but').style.display='';
+}else{
+	getObj('replyEditorBtn').style.display="";
+	getObj('w_editor_but').style.display='none';
+}
+}
+var mutiupload = '0';
+var allowmutinum = '{$db_attachnum}';
+var allow_ext = '{$filetype}';
+uploader.maxLength = {$db_attachnum};
+window.onReady(function(){uploader.init()});
+function simpleEmotion(){   
+  var rect = getObj('replyEditorBtn').getBoundingClientRect();  
+  showEmotion(); 
+  var pw_box = getObj('pw_box');
+  pw_box.style.left = rect.left+'px';
+  pw_box.style.top = rect.top + ietruebody().scrollTop - 240 + 'px';	    
+  return false;
+}
+</script>
+<!--
+EOT;
+require_once(uTemplate::printEot('footer'));
+?>-->

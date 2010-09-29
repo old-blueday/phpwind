@@ -1,0 +1,153 @@
+<!--<?php print <<<EOT
+-->
+<html>
+<head>
+<title>发布软件</title>
+<script type="text/javascript" src="js/dialog.js"></script>
+<script language="JavaScript">
+window.resizeTo(530, 90);
+function Init() {
+  __dlg_init();
+};
+function info() {
+	var code;
+	var required = {
+		"links": "下载地址不能为空。",
+		"descrip": "软件描述不能为空。"
+	};
+	for (var i in required) {
+		var el = document.getElementById(i);
+		if (!el.value) {
+			alert(required[i]);
+			el.focus();
+			return false;
+		}
+	}
+	dm=document.form;
+	code  = '[download]';
+	code += '(size)' + dm.softsize.value + '(/size)';
+	code += '(language)' + dm.language.value + '(/language)';
+	code += '(type)' + dm.type.value + '(/type)';
+	code += '(os)' + dm.os.value + '(/os)';
+	code += '(date)' + dm.date.value + '(/date)';
+	code += '(author)' + dm.author.value + '(/author)';
+	code += '(level)' + dm.level.value + '(/level)';
+	code += '(publish)' + dm.publish.value + '(/publish)';
+	code += '(publishlink)' + dm.publishlink.value + '(/publishlink)';
+	code += '(preview)' + dm.preview.value + '(/preview)';
+	code += '(links)' + dm.links.value + '(/links)';
+	code += '(descrip)' + dm.descrip.value + '(/descrip)';
+	code += '[/download]';
+	__dlg_close(code);
+	return false;
+}
+</script>
+<style type="text/css">
+html, body {
+  background: ButtonFace;
+  color: ButtonText;
+  font: 11px Tahoma,Verdana,sans-serif;
+  margin: 0px;
+  padding: 0px;
+}
+body { padding: 5px; }
+table { font: 11px Tahoma,Verdana,sans-serif;}
+select, input, button { font: 11px Tahoma,Verdana,sans-serif; }
+button { width: 70px; }
+form { padding: 0px; margin: 0px; }
+</style>
+</head>
+<body onload="Init()">
+<form name="form">
+<table cellspacing="4" cellpadding="0" align="center">
+<tr>
+	<td width="20%"><b>软件大小:</b></td>
+	<td><input type="text" size="10" name="softsize" /></td>
+	<td><b>更新时间:</b></td>
+	<td><input type="text" size="20" name="date" value="$adddate" /></td>
+</tr>
+<tr>
+	<td><b>软件添加:</b></td>
+	<td><input type="text" size="20" name="author" /></td>
+	<td><b>界面预览:</b></td>
+	<td><input type="text" size="20" name="preview" /></td>
+</tr>
+<tr>
+	<td><b>开发商名称:</b></td>
+	<td><input type="text" size="20" name="publish" /></td>
+	<td><b>开发商链接:</b></td>
+	<td><input type="text" size="20" name="publishlink" /></td>
+</tr>
+<tr>
+	<td><b>软件等级:</b></td>
+	<td>
+		<select name="level">
+<!--
+EOT;
+if(is_array($softconf[level])){
+foreach($softconf[level] as $key=>$value){
+print <<<EOT
+-->
+			<option value="$value">$value</option>
+<!--
+EOT;
+}}print <<<EOT
+-->
+		</select>
+	</td>
+	<td><b>软件语言:</b></td>
+	<td>
+		<select name="language">
+<!--
+EOT;
+if(is_array($softconf[language])){
+foreach($softconf[language] as $key=>$value){print <<<EOT
+-->
+			<option value="$value">$value</option>
+<!--
+EOT;
+}}print <<<EOT
+-->
+		</select>
+	</td>
+</tr>
+<tr>
+	<td><b>软件类别:</b></td>
+	<td colspan="3">
+		<input type="text" name="type" size="20" />
+		<select onchange="this.form.type.value=this.value">
+			<option></option>
+<!--
+EOT;
+if(is_array($softconf[type])){
+foreach($softconf[type] as $key=>$value){print <<<EOT
+-->
+			<option value="$value">$value</option>
+<!--
+EOT;
+}}print <<<EOT
+-->
+		</select>
+	</td>
+</tr>
+<tr>
+	<td><b>运行环境:</b></td>
+	<td colspan="3"><input type="text" size="20" name="os" /></td>
+</tr>
+<tr>
+	<td><b>下载地址:</b><br />可以直接填写下载地址，多个下载地址用‘,’号分隔，格式:<font color="red">名称|url地址</font><br />也可以使用上传附件功能上传软件</td>
+	<td colspan="3"><textarea id="links" name="links" rows="5" cols="30"></textarea></td>
+</tr>
+<tr>
+	<td><b>软件描述:</b></td>
+	<td colspan="3"><textarea id="descrip" name="descrip" rows="5" cols="30"></textarea></td>
+</tr>
+</table>
+<center>
+<input type="button" onclick="return info();" value="确 认" />
+<input type="button" onclick="window.returnValue ='' ;window.close();" value="取消" />
+</center>
+</form></body></html>
+<!--
+EOT;
+?>-->

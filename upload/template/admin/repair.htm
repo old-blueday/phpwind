@@ -1,0 +1,107 @@
+<!--<?php
+include_once PrintEot('left');
+if (empty($action)){print <<<EOT
+-->
+<div class="admin_info mb10">
+    <h3 class="h1"><b>提示信息</b></h3>
+    <div class="legend">修复表 : 此操作可修复数据库在进行查询，删除，更新等操作时产生的错误<br />优化表 : 此操作可优化数据库表结构，以获得更好的数据库运行效率</div>
+</div>
+<form action="$basename&" method=post>
+<h2 class="h1">数据库优化</h2>
+<div class="admin_table mb10">
+    <table width="100%" align=center cellspacing="0" cellpadding="0">
+    <tr class="tr2 vt td_bgB">
+        <td width="30">ID</td>
+        <td>数据库表</td>
+        <td width="30">选择</td>
+    </tr>
+<!--
+EOT;
+$id=0;
+foreach($pwdb as $key => $value){
+if($tabledb[$key]!='pw_online'){
+$id++;print <<<EOT
+-->
+    <tr class="tr1 vt">
+        <td class="td2">$id</td>
+        <td class="td2">$value</td>
+        <td class="td2"><input type="checkbox" name="tabledb[]" value="$tabledb[$key]"></td>
+    </tr>
+<!--
+EOT;
+}}print <<<EOT
+-->
+    </table>
+</div>
+<div class="mb10 tac">
+	<input type="radio" name="action" value="repair"> 修复表
+	<input type="radio" name="action" value="optimize" checked> 优化表
+    <span class="bt"><span><button type="button" name="chkall" onclick="CheckAll(this.form)">全 选</button></span></span>
+    <span class="btn"><span><button type="submit" name="delete">提 交</button></span></span>
+</div>
+</form>
+<form action="$basename&" method=post>
+<h2 class="h1">非phpwind数据库表 (站点插件或其他系统的数据库表)</h2>
+<div class="admin_table mb10">
+    <table width="100%" align=center cellspacing="0" cellpadding="0">
+    <tr  class="tr2 vt td_bgB">
+        <td width="30">ID</td>
+        <td>数据库表</td>
+        <td width="30">选择</td>
+    </tr>
+<!--
+EOT;
+$id=0;
+foreach($otherdb as $value){
+$id++;print <<<EOT
+-->
+    <tr class="tr1 vt">
+        <td class="td2">$id</td>
+        <td class="td2">$value</td>
+        <td class="td2"><input type="checkbox" name="tabledb[]" value="$value"></td>
+    </tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+    </table>
+</div>
+<div class="mb10 tac">
+	<input type="radio" name="action" value="repair"> 修复表
+	<input type="radio" name="action" value="optimize" checked> 优化表
+    <span class="bt"><span><button type="button" name="chkall" onclick="CheckAll(this.form)">全 选</button></span></span>
+    <span class="btn"><span><button type="submit" name="delete">提 交</button></span></span>
+</div>
+</form>
+<!--
+EOT;
+} else{print <<<EOT
+-->
+<h2 class="h1"><b>数据库优化信息</b></h2>
+<div class="admin_table mb10">
+    <table width="100%" cellspacing="0" cellpadding="0">
+        <tr class="tr2 vt td_bgB">
+            <td>数据库表</td>
+            <td>操作</td>
+            <td>信息</td>
+        </tr>
+<!--
+EOT;
+foreach($msgdb as $msg){
+print <<<EOT
+-->
+        <tr class="tr1 vt">
+            <td class="td2">$msg[Table]</td>
+            <td class="td2">$msg[Op]</td>
+            <td class="td2">$msg[Msg_type]:$msg[Msg_text]</td>
+        </tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+    </table>
+</div>
+<!--
+EOT;
+}include_once PrintEot('adminbottom');
+?>-->

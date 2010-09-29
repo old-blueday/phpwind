@@ -1,0 +1,212 @@
+<!--<?php
+include_once PrintEot('profile_header');
+print <<<EOT
+-->
+<div id="user-main">
+	<div class="u-m-bg"></div>
+	<div class="u-m-bg2"></div>
+	<div class="u-m-bg-c cc">
+		<!--左边栏-->
+		<div id="user-sidebar" class="fl">
+			<div class="p10">
+				<div class="u-face"><img src="$m_faceurl" /></div>
+				<div class="tac" style="padding:10px 0"><img src="$imgpath/edit-portrait.png" align="absmiddle" /><a href="profile.php?action=modify&info_type=face">修改头像</a>&nbsp;&nbsp;&nbsp;<img src="$imgpath/user-home.png"  align="absmiddle" /><a href="u.php">个人空间</a></div>
+				<ul class="lh24 bor-t-a pt10">
+					<li>系统等级:
+<!--
+EOT;
+if ($groupid == '-1') {print <<<EOT
+-->
+					普通成员
+<!--
+EOT;
+} else {print <<<EOT
+-->
+					$ltitle[$groupid]
+<!--
+EOT;
+}print <<<EOT
+-->
+					</li>
+					<li>会员头衔: {$ltitle[$winddb[memberid]]}</li>
+					<li>UID: $winduid</li>
+				</ul>
+				<div class="c mt10"></div>
+				<ul class="lh24 bor-t-a pt10">
+					<li>注册时间: $regdate</li>
+					<li>最后登录: $lastvisit</li>
+					<li>在线时间: {$onlinetime}小时</li>
+					<li>最后登录IP:{$winddb[onlineip]}</li>
+				</ul>
+			</div>
+		</div>
+		<!--右边内容-->
+		<div id="user-content" class="fr">
+			<div class="u-cont-bg"></div>
+			<div class="u-cont-bg2"></div>
+			<div class="u-cont-bg-c p10" style="border:none;">
+				<table width="100%" height="450">
+					<tr><td class="vt">
+						<div id="u-cont-m" class="fl">
+							<h1 class="f20 b p10">{$windid}你好,欢迎回来!</h1>
+<!--
+EOT;
+if ($messageNumber||$noticeNumber||$requestNumber||$groupsmsNumber) {print <<<EOT
+-->
+							<div class="p10">
+								<div class="u-box-a">
+									<span class="f14 b lh24">最新消息</span>&nbsp;&nbsp;&nbsp;&nbsp;<a href="message.php" class="green">进入短消息中心&nbsp;&gt;&gt;</a>
+									<ul class="pt10 lh24 bor-t-b mt5">
+<!--
+EOT;
+if ($messageNumber){print <<<EOT
+-->
+									<li><a href="message.php?type=sms" target="_blank">{$messageNumber}条站内信</a></li>
+<!--
+EOT;
+}if($noticeNumber){print <<<EOT
+-->
+									<li><a href="message.php?type=notice" target="_blank">{$noticeNumber}条通知</a></li>
+<!--
+EOT;
+}if($requestNumber){print <<<EOT
+-->
+									<li><a href="message.php?type=request" target="_blank">{$requestNumber}条请求</a></li>
+<!--
+EOT;
+}if($groupsmsNumber){print <<<EOT
+-->
+									<li><a href="message.php?type=groupsms" target="_blank">{$groupsmsNumber}条群组消息</a></li>
+<!--
+EOT;
+}print <<<EOT
+-->
+
+
+									</ul>
+								</div>
+							</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+							<div class="p10">
+								<div class="u-box-a">
+									<span class="f14 b lh24">我的积分</span>&nbsp;&nbsp;&nbsp;&nbsp;<a href="userpay.php?action=buy" class="green">积分充值&nbsp;&gt;&gt;</a>
+									<div class="lh24 bor-t-b mt5">
+										<ul class="pt10 list-half cc">
+											<li>我的积分：$totalcredit</li>
+											<li>&nbsp;</li>
+<!--
+EOT;
+foreach ($credit->cType as $key => $value) {
+isset($usercredit[$key]) || $usercredit[$key] = 0;
+print <<<EOT
+-->
+											<li>$value: $usercredit[$key] {$credit->cUnit[$key]}</li>
+<!--
+EOT;
+}print <<<EOT
+-->
+										</ul>
+									</div>
+								</div>
+							</div>
+							<div class="p10">
+								<div class="u-box-a">
+									<span class="f14 b lh24">我的资料</span>&nbsp;&nbsp;&nbsp;&nbsp;<a href="profile.php?action=modify" class="green">修改资料&nbsp;&gt;&gt;</a>
+									<div class="lh24 bor-t-b mt5">
+										<ul class="pt10 list-half cc">
+											<li>生日：{$winddb[bday]}</li>
+											<li>来自：{$winddb[location]}</li>
+											<li>精华帖子：{$winddb[digests]}</li>
+											<li>E-mail：{$winddb[email]}</li>
+											<li>平均发帖：{$averagepost}（今日：{$winddb[todaypost]}）</li>
+											<li>个人主页：{$winddb[site]}</li>
+											<li style="height:auto;width:100%;">自我简介：<p class="lh18">{$winddb[introduce]}</p></li>
+										</ul>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div id="u-cont-sidebar" class="fr">
+							<div class="u-box-b mt5">
+								<div class="u-box-b-bg">
+									<h2><span class="b">我的隐私</span>&nbsp;&nbsp;&nbsp;&nbsp;<a href="profile.php?action=privacy" class="green">设置隐私&nbsp;&gt;&gt;</a></h2>
+									<div class="p10">
+										<dl>
+											<dt><a href="profile.php?action=privacy#space" class="unline">个人空间隐私</a></dt>
+											<dd>
+<!--
+EOT;
+if ($winddb['index_privacy'] == 1) {print <<<EOT
+-->
+												仅朋友可见
+<!--
+EOT;
+} elseif ($winddb['index_privacy'] == 2) {print <<<EOT
+-->
+												仅自己可见
+<!--
+EOT;
+} else {print <<<EOT
+-->
+												任何人可见
+<!--
+EOT;
+}print <<<EOT
+-->
+											</dd>
+										</dl>
+										<dl>
+											<dt><a href="profile.php?action=privacy#friend" class="unline">加好友隐私</a></dt>
+											<dd>
+<!--
+EOT;
+if ($friendcheck == 1) {print <<<EOT
+-->
+												需要身份验证才能加我为好友
+<!--
+EOT;
+} elseif ($friendcheck == 2) {print <<<EOT
+-->
+												不允许任何人加我为好友
+<!--
+EOT;
+} else {print <<<EOT
+-->
+												允许任何人加我为好友
+<!--
+EOT;
+}print <<<EOT
+-->
+											</dd>
+										</dl>
+										<!-- <dl>
+											<dt><a href="#" class="unline">应用隐私</a></dt>
+											<dd>相册、日志、记录设置了隐私</dd>
+										</dl>
+										<dl>
+											<dt><a href="#" class="unline">动态隐私</a></dt>
+											<dd>发新贴、分享、上传照片、加入群组等设置了隐私</dd>
+										</dl>
+										<dl>
+											<dt><a href="#" class="unline">黑名单</a></dt>
+											<dd>目前还没有设置黑名单成员</dd>
+										</dl> -->
+									</div>
+								</div>
+							</div>
+						</div>
+					</td></tr>
+				</table>
+			</div>
+			<div class="u-cont-bg2"></div>
+			<div class="u-cont-bg"></div>
+		</div>
+	</div>
+	<div class="u-m-bg"></div>
+</div>
+<!--
+EOT;
+?>-->

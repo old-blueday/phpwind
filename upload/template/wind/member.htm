@@ -1,0 +1,110 @@
+<!--<?php print <<<EOT
+-->
+<style>
+.tr3 td, .tr3 th{ padding-left:10px} /*wind8待后期调整*/
+</style>
+
+<div id="breadCrumb">
+		<img src="$imgpath/$stylepath/thread/home-old.gif" align="absmiddle" />&nbsp;<a href="$db_bfn" title="$db_bbsname">$db_bbsname</a><em>&gt;</em>会员列表
+</div>
+<div id="pw_content">
+<div class="pd15" style="padding-top:15px; padding-bottom:15px;">
+
+<div class="t3 mb10">
+<span class="fr" style="padding-top:3px">
+<form action="member.php?" method="post">
+<b>排序:</b>
+<select name="orderway">
+<option value="1">注册时间</option>
+<option value="2">用户名</option>
+<option value="4">发帖</option>
+</select>
+<select name="asc">
+<option value="DESC">倒序</option>
+<option value="ASC">正序</option>
+</select>
+<span class="bt2" ><span><button type="submit" >提 交</button></span></span>
+</form></span>
+<span class="fl">$pages</span>
+<div class="c"></div>
+</div>
+
+<div class="t"><table width="100%" cellspacing="0" cellpadding="0">
+<tr><td class="h" colspan="12">会员列表</td></tr>
+<tr class="tr2">
+<td>用户名</td>
+<td class="tal y-style">性别</td>
+<td class="tal y-style">Email</td>
+<td class="tal y-style" width="8%">来自</td>
+<td class="tal y-style" width="12%">QQ</td>
+<td class="tal y-style">注册时间</td>
+<td class="tal y-style">最后登录</td>
+<td class="tal y-style">发帖</td>
+<td class="tal y-style">精华</td>
+<td class="tal y-style">$db_rvrcname</td>
+<td class="tal y-style">$db_moneyname</td>
+</tr>
+<!--
+EOT;
+$i=0;
+foreach($memberdb as $member){
+$i++;
+$class=$i%2==0 ? "f_two" : "f_one";
+print <<<EOT
+-->
+<tr class="tr3 $class">
+<td><a href="u.php?uid=$member[uid]" target="_blank" class="s7">
+<b>$member[username]</b></a></td>
+<td class="tal y-style">
+<!--
+EOT;
+if($member[gender]==1){print <<<EOT
+-->
+男
+<!--
+EOT;
+}elseif($member[gender]==2){print <<<EOT
+-->
+女
+<!--
+EOT;
+}else{print <<<EOT
+-->
+保密
+<!--
+EOT;
+}print <<<EOT
+-->
+</td>
+<td class="tal y-style"><a href="sendemail.php?uid=$member[uid]">
+<img src="$imgpath/email.gif" /></a></td>
+<td class="tal y-style">$member[location]<br /></td>
+<td class="tal y-style">$member[oicq]<br /></td>
+<td class="tal y-style">$member[regdate]</td>
+<td class="tal y-style">$member[thisvisit]</td>
+<td class="tal y-style">$member[postnum]</td>
+<td class="tal y-style">$member[digests]</td>
+<td class="tal y-style">$member[rvrc]</td>
+<td class="tal y-style">$member[money]</td></tr>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+</table></div>
+<!--Pages list begin-->
+<div class="t3">
+<span class="fl">$pages</span>
+<form name="seach" action="profile.php" method="post">
+<span class="fr">
+用户名 <input class="input" type="text" name="username" size="12" maxlength="50" />
+<span class="btn2"><span><button class="bt" type="submit" name="submit" >提 交</button></span></span>
+<input type="hidden" value="show" name="action" />
+</span></form>
+<div class="c"></div>
+</div>
+</div>
+</div>
+<!--
+EOT;
+?>-->

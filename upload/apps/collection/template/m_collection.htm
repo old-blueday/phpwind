@@ -1,0 +1,225 @@
+<!--<?php
+require_once(uTemplate::printEot('header'));
+print <<<EOT
+-->
+<script type="text/javascript" src="js/pw_weibo.js"></script>
+<div class="contUser">
+	<div class="p15 cc">
+		<div class="p_lr_10 mb10">
+			<p class="mb5">收藏网页、视频、音乐、Flash</p>
+				<form action="{$baseUrl}q=collection" method="post" name="shareform" onsubmit="return false;">
+				<input type="hidden" name="verify" value="$verifyhash" />
+				<input type="hidden" name="a" value="post" />
+						<div class="mb10">
+							<input id="shareLinkInput" type="text" class="input input_wb mr5" name="link" value="http://" />
+							<span class="mr5"><span class="btn2"><span><button type="submit" onclick="collection.post(this.form)">收藏为私有</button></span></span></span>
+							<a href="javascript:;" class="help_a">如何收藏<i><p class="b">如何收藏视频?</p>
+							<p class="mb10">填写视频网址。(目前支持优酷、YouTube、新浪、搜狐)</p>
+							<p class="b">如何收藏音乐？</p>
+							<p class="mb10">填写音乐文件的网址。(后缀需要是mp3或者wma)</p>
+							<p class="b">如何收藏Flash？</p>
+							<p>填写 Flash 文件的网址。(后缀需要是swf)</p></i></a>
+						</div>
+				</form>
+		</div>
+<!--
+EOT;
+if($type == 'postfavor'){
+print <<<EOT
+-->
+	<div id="sidebar" class="sidebar fr">
+		<div class="boxC" style="margin-top:30px;">
+		<h3>收藏分类</h3>
+		<ul class="ulE">
+			<li><a href="{$basename}type=$type&ftype=0" id="ftype_all">所有分类</a></li>
+<!--
+EOT;
+foreach ($ftypeid as $key => $value) {
+$k = $key + 1;
+print <<<EOT
+-->
+			<li id="uf_$k" onmouseover="getObj('del_$k').style.display='';" onmouseout="getObj('del_$k').style.display='none';"><span><a href="{$basename}a=list&type=$type&job=deltype&ftype=$k&verify=$verifyhash" style="display:none;" class="adel mr10" id="del_$k" onclick="return Checkinfo();" title="删除目录">删除</a></span><a href="{$basename}type=$type&ftype=$k" id="ftype_$k">$value</a></li>
+<!--
+EOT;
+}print <<<EOT
+-->
+			<li id="uf_def"><a href="{$basename}type=$type&ftype=-1" id="ftype_def">默认分类</a></li>
+		</ul>
+
+			<form method="post" name="form" action="{$basename}type=$type&">
+			<input type="hidden" name="verify" value="$verifyhash" />
+			<input type="hidden" name="job" value="addtype" />
+			<div class="pd5"><input name="ftype" type="text" size="8" class="input mr5" /><span class="btn2"><span><button type="submit">提 交</button></span></span></div>
+			</form>
+		</div>
+	</div>
+<script language="javascript">
+setCurrent('ftype_$ftype','ftype_all','current');
+function Checkinfo() {
+	if (confirm('确定要删除该分类吗?')) {
+		return true;
+	} else {
+		return false;
+	}
+}
+</script>
+<!--
+EOT;
+}print <<<EOT
+-->
+		<div class="contentB">
+			<div class="p10 cc">
+				<div class="gray mb5">
+				<a id="type_all" href="{$basename}a=$a">全部</a>&nbsp;|&nbsp;<a id="type_postfavor" href="{$basename}a=$a&type=postfavor">帖子</a>&nbsp;|&nbsp;<a id="type_weibo" href="{$basename}a=$a&type=weibo">新鲜事</a>&nbsp;|&nbsp;<a id="type_cms" href="{$basename}a=$a&type=cms">文章</a><!--
+EOT;
+if($db_dopen){print <<<EOT
+-->&nbsp;|&nbsp;<a id="type_diary" href="{$basename}a=$a&type=diary">日志</a><!--
+EOT;
+}if($db_phopen){print <<<EOT
+-->&nbsp;|&nbsp;<a id="type_photo" href="{$basename}a=$a&type=photo">照片</a><!--
+EOT;
+}if($db_groups_open){print <<<EOT
+-->&nbsp;|&nbsp;<a id="type_group" href="{$basename}a=$a&type=group">群组</a><!--
+EOT;
+}print <<<EOT
+-->&nbsp;|&nbsp;<a id="type_active" href="{$basename}a=$a&type=active">活动</a>&nbsp;|&nbsp;<a id="type_web" href="{$basename}a=$a&type=web">网页</a>&nbsp;|&nbsp;<a id="type_multimedia" href="{$basename}a=$a&type=multimedia">多媒体</a>
+				</div>
+<script language="JavaScript">
+setCurrent('type_$type','type_all','b s5');
+</script>
+<!--
+EOT;
+if($collectionDb){
+require_once(printEot('m_collection_model'));
+$collectionModelTemplate->photoPop();
+print <<<EOT
+-->
+		<form method="post" name="docollection" id="docollection" action="apps.php?q=collection&type=$type" onsubmit="return checkdel()">
+        	<input type="hidden" name="verify" value="$verifyhash" />
+            <input type="hidden" name="a" value="dels" />
+            <div class="bgA p5"><span class="fr">共<span id="collectionNumTop">{$count}</span>条收藏</span><label class="mr20"><input type="checkbox" onclick="CheckAll(this.form)" />&nbsp;全选</label><span class="bt2"><span><button type="submit">删除</button></span></span></div>
+            <table width="100%" class="mb10">
+<!--
+EOT;
+foreach($collectionDb as $value){
+	$method = $value['type'];
+    if (!in_array($method, array('weibo','diary', 'photo', 'group', 'active', 'web', 'multimedia','cms')))
+	    continue;
+	$collectionModelTemplate->$method($value);
+}
+print <<<EOT
+-->            	
+            </table>
+<script language="javascript">
+function  checkdel() {
+	var obj = document.docollection["idarray[]"];
+	var ar = obj.length ? obj:[obj];
+		for(var i=0;i<ar.length;i++){
+			if(ar[i].checked === true){
+				if (confirm('确定删除吗？')) {
+					return true;
+				}
+				return false;
+			}
+		}
+alert('请选择操作对象!')
+return false;
+}
+</script>
+<div class="bgA p5 mb10"><span class="fr">共<span id="collectionNumButtom">{$count}</span>条收藏</span><label class="mr20"><input type="checkbox" onclick="CheckAll(this.form)" />&nbsp;全选</label><span class="bt2"><span><button type="submit">删除</button></span></span></div>
+		</form>
+<div class="mb10 cc">$pages</div>
+<!--
+EOT;
+}elseif($article){
+print <<<EOT
+-->
+<form method="post" action="{$basename}type=postfavor&" onsubmit="return flase" id="postform" name="postform">
+<input type="hidden" name="job" id="job"/>
+<div class="bgA p5"><span class="fr">共{$count}条收藏</span><label class="mr20"><input type="checkbox" onclick="CheckAll(this.form)" />&nbsp;全选</label><span class="bt2"><span><button type="button" onclick="doPostfavor(this.form,'clear');">删除</button></span></span></div>
+				<input type="hidden" name="verify" value="$verifyhash" />
+				<table cellpadding="0" cellspacing="0" width="100%" class="mb10">
+					<tr class="tr2">
+						<td></td>
+						<td>标题</td>
+						<td class="tac">回复/浏览</td>
+						<td width="90">作者</td>
+					</tr>
+<!--
+EOT;
+	foreach ($article as $key => $value) {print <<<EOT
+-->
+					<tr class="tr3">
+						<td width="20"><input type="checkbox" name="selid[]" value="$value[tid]" /></td>
+						<td><a href="read.php?tid=$value[tid]" target="_blank">$value[subject]</a><br /><a href="thread.php?fid=$value[fid]" target="_blank" class="gray">$value[forum]</a></td>
+						<td class="tac"><p class="s2">$value[replies]</p><span class="f10">$value[hits]</span></td>
+						<td><a href="u.php?uid=$value[authorid]">$value[author]</a><br />
+						<span class="f10 gray"  title="$value[posttime]">$value[postdate]</span>
+						</td>
+					</tr>
+<!--
+EOT;
+	}print <<<EOT
+-->
+				</table>
+<div class="bgA p5 mb10"><span class="fr">共{$count}条收藏</span><label class="mr20"><input type="checkbox" onclick="CheckAll(this.form)" />&nbsp;全选</label><span class="bt2"><span><button type="button" onclick="doPostfavor(this.form,'clear');">删除</button></span></span></div>
+
+				<div class="mt10 cc">$pages</div>
+					<div class="mt10 tac">
+						&nbsp;转移到分类
+						$ftypeSelection&nbsp;
+						<span class="btn2"><span><button type="submit" onclick="doPostfavor(this.form,'change');">提 交</button></span></span>
+					</div>
+<script language="javascript">
+function doPostfavor(form,job) {
+	form.job.value = job;
+	if (job == 'clear'){
+		if (confirm('确定删除吗？')) {
+			form.submit();
+		} else {
+			return false;
+		}
+	}
+	form.submit();
+	return false;
+}
+
+</script>
+
+                </form>
+<SCRIPT type="text/javascript" LANGUAGE="JavaScript" src="js/core/friendlist.js"></SCRIPT>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+				<div class="p15 f14 tac">暂无收藏</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+		</div>
+			</div>
+
+	</div>
+</div>
+<!--
+EOT;
+print <<<EOT
+-->
+<script language="JavaScript">
+setCurrent('a_$a','a_self','current');
+</script>
+
+<script language="JavaScript">
+function ajaxurl(o) {
+	read.obj = o;
+	ajax.send(o.href,'',ajax.get);
+	return false;
+}
+</script>
+<script language="javascript" src="apps/$appdir/js/collection.js"></script>
+<script language="JavaScript" src="js/app_comment.js"></script>
+<!--
+EOT;
+require_once(uTemplate::printEot('footer'));
+?>-->

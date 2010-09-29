@@ -1,0 +1,143 @@
+<!--
+<?php
+print <<<EOT
+-->
+<script language="JavaScript" src="js/global.js"></script>
+<script language="JavaScript" src="js/pw_ajax.js"></script>
+<div class="mb10">评价控件管理</div>
+<div class="nav3 mb10 ta">
+    <ul class="cc">
+      <li {$currentClass[thread]}><a href="{$default_handler_url}1">帖子</a></li>
+      <li {$currentClass[blog]}><a href="{$default_handler_url}2">日志</a></li>
+      <li {$currentClass[picture]}><a href="{$default_handler_url}3">照片</a></li>
+      <li {$currentClass[power]}><a href="{$default_handler_url}100">评价权限设置</a></li>
+    </ul>
+ </div>
+<!--
+EOT;
+//评价权限设置部分
+if($typeId == 100){
+print <<<EOT
+-->
+<form action="{$default_handler_url}100" method="post">
+<input type="hidden" value="power" name="action">
+<h2 class="h1">全局权限设置</h2>
+<div class="admin_table mb10">
+  <table width="100%" cellspacing="0" cellpadding="0">
+  <tr class="tr1 vt">
+    <td class="td1">开启评价相应控件</td>
+    <td class="td2">
+     <ul class="list_A">
+        <li><input type="checkbox" value="1" name="power[type][1]" {$currentPower[1]}/>帖子评价</li>
+        <li> <input type="checkbox" value="1" name="power[type][2]" {$currentPower[2]}/>日志评价</li>
+        <li><input type="checkbox" value="1" name="power[type][3]" {$currentPower[3]}/>照片评价</li>
+     </ul>
+    </td>
+  </tr>
+  </table>
+  </div>
+  <h2 class="h1">用户组权限设置[每天最多可允许评价次数]</h2>
+  <div class="admin_table mb10">
+  <table width="100%" cellspacing="0" cellpadding="0">
+  <!--
+EOT;
+foreach($userGroups as $gptype=>$groups){
+print <<<EOT
+-->
+  <tr class="tr2 vt td_bgB">
+    <td width="100">{$userGroupTitles[$gptype]}</td>
+    <td width="160">&nbsp;</td>
+    <td>&nbsp;</td>
+  </tr>
+  <!--
+EOT;
+foreach($groups as $group){
+print <<<EOT
+-->
+  <tr class="tr1 vt">
+    <td class="td2">{$group[grouptitle]}</td>
+    <td class="td2"><img src="{$imageUrl}{$group[groupimg]}.gif" /></td>
+    <td class="td2"><input type="text" value="{$groupSets[$group[gid]]}" name="power[group][$group[gid]]"  class="input input_wc mr5" />次</td>
+  </tr>
+<!--
+EOT;
+}
+}
+print <<<EOT
+-->
+</table>
+</div>
+<div class="mb10 tac">
+<span class="btn"><span><button type="submit">提 交</button></span></span>
+</div>
+<!--
+EOT;
+}else{
+//评价后台配置部分
+print <<<EOT
+-->
+<h2 class="h1"><span class="fl mr10">如果需要自定义上传图标，请上传至目录[/hack/rate/images/]</span><a href="javascript:;"  class="btn_add fl" onclick="sendmsg('{$default_ajax_url}&job=ajax&typeid={$typeId}','',this.id);"><i>添加自定义评价</i></a></h2>
+<form action="{$default_handler_url}{$typeId}" method="post">
+<input type="hidden" value="modify" name="action">
+<div class="admin_table mb10">
+	<table cellpadding="0" cellspacing="0" width="100%">
+    <tr class="tr2">
+      <td width="24">启用</td>
+      <td width="80">名称</td>
+      <td>所属类别</td>
+      <td width="140">调用图标名</td>
+      <td>积分设置</td>
+      <td>评价者</td>
+      <td>作者</td>
+      <td>操作</td>
+    </tr>
+    <!--
+EOT;
+foreach($rateConfigs as $config){
+if($config[isdefault]){
+print <<<EOT
+-->
+    <tr class="tr1 vt">
+      <td class="td2"><input name="rateconfig[$config[id]][isopen]" type="checkbox" value="1" {$config[isopen]}/></td>
+      <td class="td2">{$config[title]}</td>
+      <td class="td2">{$config[typename]}</td>
+      <td class="td2"><input name="rateconfig[$config[id]][icon]" type="text" class="input input_wc" value="$config[icon]" />
+        <img src="{$imageUrl}{$config[icon]}" align="absmiddle" width="32" /></td>
+      <td class="td2">{$config[creditset]} </td>
+      <td class="td2">{$config[voternum]} </td>
+      <td class="td2">{$config[authornum]}</td>
+      <td class="td2">&nbsp;</td>
+    </tr>
+    <!--
+EOT;
+}else{
+print <<<EOT
+-->
+    <tr class="tr1 vt">
+      <td class="td2"><input name="rateconfig[$config[id]][isopen]" type="checkbox" value="1" {$config[isopen]}/></td>
+      <td class="td2"><input name="rateconfig[$config[id]][title]" type="text" class="input input_wc" value="$config[title]" size="10" /></td>
+      <td class="td2">{$config[typename]}</td>
+      <td class="td2"><input name="rateconfig[$config[id]][icon]" type="text" class="input input_wc" value="$config[icon]" size="10" />
+        <img src="{$imageUrl}{$config[icon]}" align="absmiddle" width="32" /></td>
+      <td class="td2">{$config[creditset]} </td>
+      <td class="td2">{$config[voternum]} </td>
+      <td class="td2">{$config[authornum]} </td>
+      <td class="td2"><a href="javascript:;" class="mr20" onclick="sendmsg('{$default_ajax_url}&show=update&job=ajax&id={$config[id]}&typeid={$config[typeid]}','',this.id);">[编辑]</a>&nbsp;&nbsp;&nbsp;<a href="{$default_handler_url}{$typeId}&action=delete&id={$config[id]}">[删除]</a></td>
+    </tr>
+<!--
+EOT;
+}
+}
+print <<<EOT
+-->
+  </table>
+</div>
+<div class="mb10 tac">
+<span class="btn"><span><button type="submit">提 交</button></span></span>
+</div>
+</form>
+<!--
+EOT;
+}
+?>
+-->

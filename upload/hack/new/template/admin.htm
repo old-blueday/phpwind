@@ -1,0 +1,158 @@
+<!--<?php
+include_once PrintEot('left');
+print <<<EOT
+-->
+<div class="mb10"><a href="$admin_file?adminjob=hackcenter">插件中心</a> &raquo; <a href="javascript:;">{$db_hackdb['new'][0]}</a></div>
+<div class="admin_info mb10">
+	<h3 class="h1">提示信息</h3>
+    <div class="legend">
+    	<ol>
+        	<li>使用 phpwind首页调用 功能前需要先在<span class="s1">new.php</span>文件中设置好相关参数，文件里附有说明</li>
+            <li>首页调用方式分为 “论坛版块调用”，“论坛公告调用”，“论坛基本信息调用”，“论坛会员排行调用”，“论坛文章调用” </li>
+            <li>每种调用方式都提供了一系列的参数设置，用户可根据需要自定义设置</li>
+        </ol>
+   </div>
+  </div>
+<form action="$basename&" method="post" name="form">
+  <input type="hidden" name="action" value="demo">
+  <h2 class="h1">首页调用工具</h2>
+  <div class="admin_table mb10">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <tr class="tr1 vt">
+      <td class="td2">演示代码:
+        <input id="code" type="text" class="input input_wb mb5 mr5" name="code" value="$code1" onmouseover="form.code.select();">
+        <span class="btn2 mr5"><span><button type="submit" value="查看效果">查看效果</button></span></span>
+        <span class="bt2"><span><button type="button" value="复制代码" onclick="CopyCode(document.getElementById('code'));">复制代码</button></span></span>
+        <p class="gray">以下为调用效果:</p>
+        <hr size=1>
+        $code2 </td>
+    </tr>
+  </table>
+  </div>
+</form>
+<h2 class="h1">版块调用演示</h2>
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+  <tr class="tr1 vt">
+    <td class="td2">
+      可选参数和参数说明:<br />
+      \$pre : 前缀,可选参数 : 0.&lt;li&gt;，1.◇，2.·，3.○，4.●，5.-，6.□-<br />
+      \$fidin : 版块ID，设置需要调用的版块ID，格式:1_2_3
+      </td>
+  </tr>
+  <tr class="tr1 vt">
+    <td class="td2">演示代码:
+      <input type="text" class="input input_wb mb5 mr5" id="code2" value="&lt;script src=&quot;$db_bbsurl/new.php?action=forum&fidin=2&pre=1&quot;&gt;&lt;/script&gt;">
+      <span class="bt2"><span><button type="button" value="复制代码" onclick="CopyCode(document.getElementById('code2'));">复制代码</button></span></span>
+      <p color="gray">以下为调用效果:</p>
+      <hr size=1>
+      <script src="$db_bbsurl/new.php?action=forum&fidin=2&pre=1"></script>
+    </td>
+  </tr>
+</table>
+</div>
+<h2 class="h1">公告调用演示</h2>
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+  <tr class="tr1 vt">
+    <td class="td2">
+      可选参数和参数说明:<br />
+      \$pre : 前缀,可选参数 : 0.&lt;li&gt;，1.◇，2.·，3.○，4.●，5.-，6.□-<br />
+      \$num : 调用公告个数<br />
+      \$length : 公告标题长度<br />
+      \$date : 显示公告发表日期，可选参数:0，1
+      </td>
+  </tr>
+  <tr class="tr1 vt">
+    <td class="td2">演示代码:
+      <input type="text" class="input input_wb mb5 mr5" id="code3" value="&lt;script src=&quot;$db_bbsurl/new.php?action=notice&num=5&date=1&length=30&quot;&gt;&lt;/script&gt;">
+      <span class="bt2"><span><button type="button" value="复制代码" onclick="CopyCode(document.getElementById('code3'));">复制代码</button></span></span>
+      <p color="gray">以下为调用效果:</p>
+      <hr size=1>
+      <script src="$db_bbsurl/new.php?action=notice&num=5&date=1&length=30"></script>
+    </td>
+  </tr>
+</table>
+</div>
+<h2 class="h1">论坛信息调用演示</h2>
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+  <tr class="tr1 vt">
+    <td class="td2">
+      可选参数和参数说明:<br />
+      \$pre : 前缀,可选参数 : 0.&lt;li&gt;，1.◇，2.·，3.○，4.●，5.-，6.□-<br />
+      \$member : 显示论坛会员总数和最新注册会员，可选参数:0，1<br />
+      \$article : 显示主题数和帖子数，可选参数:0，1<br />
+      \$yesterday : 显示今日、昨日、最高日发帖，可选参数：0，1<br />
+      \$online : 显示在线信息，可选参数:0，1
+      </td>
+  </tr>
+  <tr class="tr1 vt">
+    <td class="td2">演示代码:
+      <input type="text" class="input input_wb mb5 mr5" id="code4" value="&lt;script src=&quot;$db_bbsurl/new.php?action=info&pre=6&member=1&article=1&yesterday=1&online=1&quot;&gt;&lt;/script&gt;">
+      <span class="bt2"><span><button type="button" value="复制代码" onclick="CopyCode(document.getElementById('code4'));">复制代码</button></span></span>
+      <p color="gray">以下为调用效果:</p>
+      <hr size=1>
+      <script src="$db_bbsurl/new.php?action=info&pre=6&member=1&article=1&yesterday=1&online=1"></script>
+    </td>
+  </tr>
+</table>
+</div>
+<h2 class="h1">会员排行调用演示</h2>
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+  <tr class="tr1 vt">
+    <td class="td2">
+      可选参数和参数说明:<br />
+      \$pre : 前缀,可选参数 : 0.&lt;li&gt;，1.◇，2.·，3.○，4.●，5.-，6.□-<br />
+      \$num : 调用会员个数<br />
+      \$order : 排序方式，可选参数: 1.注册日期 2.发帖数 3.精华数 4.{$db_rvrcname} 5.{$db_moneyname} 6.{$db_creditname}
+      </td>
+  </tr>
+  <tr class="tr1 vt">
+    <td class="td2">演示代码:
+      <input type="text" class="input input_wb mb5 mr5" id="code5" value="&lt;script src=&quot;$db_bbsurl/new.php?action=member&num=10&order=2&quot;&gt;&lt;/script&gt;">
+      <span class="bt2"><span><button type="button" value="复制代码" onclick="CopyCode(document.getElementById('code5'));">复制代码</button></span></span>
+      <p color="gray">以下为调用效果:</p>
+      <hr size=1>
+      <script src="$db_bbsurl/new.php?action=member&num=10&order=2"></script>
+    </td>
+  </tr>
+</table>
+</div>
+<h2 class="h1">论坛文章调用演示</h2>
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+  <tr class="tr1 vt">
+    <td class="td2">
+      可选参数和参数说明：<br />
+      \$pre : 前缀,可选参数: 0.&lt;li&gt;，1.◇，2.·，3.○，4.●，5.-，6.□-<br />
+      \$num : 调用主题个数<br />
+      \$length : 文章标题长度<br />
+      \$order : 排序方式，可选参数: 1.最后发表日期 2.主题发表日期 3.回复数 4.查看数<br />
+      \$fidin : 调用文章的版块ID，格式:1_2_3<br />
+      \$fidout : 不调用的版块ID，格式:1_2_3<br />
+      \$digest : 调用精华帖，可选参数:0，1<br />
+      \$postdate : 显示文章发表日期，可选参数:0，1<br />
+      \$author : 显示文章作者，可选参数:0，1<br />
+      \$replies : 显示回复数，可选参数:0，1<br />
+      \$hits : 显示查看数，可选参数:0，1<br />
+      \$fname : 显示版块名称，可选参数:0，1<br />
+      </td>
+  </tr>
+  <tr class="tr1 vt">
+    <td class="td2">演示代码:
+      <input type="text" class="input input_wb mb5 mr5" id="code1" value="&lt;script src=&quot;$db_bbsurl/new.php?action=article&fidin=2&digest=0&postdate=0&author=1&fname=0&hits=0&replies=1&pre=1&num=10&length=35&order=1&quot;&gt;&lt;/script&gt;">
+      <span class="bt2"><span><button type="button" value="复制代码" onclick="CopyCode(document.getElementById('code1'));">复制代码</button></span></span>
+      <p color="gray">以下为调用效果:</p>
+      <hr size=1>
+      <script src="$db_bbsurl/new.php?action=article&fidin=2&digest=0&postdate=0&author=1&fname=0&hits=0&replies=1&pre=1&num=10&length=35&order=1"></script>
+    </td>
+  </tr>
+</table>
+</div>
+<SCRIPT type="text/javascript" LANGUAGE="JavaScript" src="js/core/core.js"></SCRIPT>
+<!--
+EOT;
+include_once PrintEot('adminbottom');
+?>-->

@@ -1,0 +1,107 @@
+<!--
+<?php
+
+print <<<EOT
+-->
+
+<!--
+EOT;
+//是显示评价页还是结果页
+if($showVote){
+print <<<EOT
+-->
+<div id="rate_box">
+<div class="mood tac cc">
+<div class="mood-bg">
+<div class="mood-bg2">
+<div class="mood-title"><b>评价一下你浏览此{$typename}的感受</b></div>
+
+<table class="mood-hover">
+<tr>
+<!--
+EOT;
+foreach($rateConfigs as $config){
+if($config[isopen] == 1){
+print <<<EOT
+-->
+	<td><a href="javascript:;" onclick="rate.voting('{$elementId}', '{$ajaxUrl}','{$objectId}', '{$config[id]}', '{$typeId}','{$authorId}');" title="{$config ['tips']}"><img src="{$imagesUrl}images/{$config[icon]}" /><br />{$config[title]}</a></td>
+<!--
+EOT;
+}
+}
+print <<<EOT
+-->
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<!--
+EOT;
+}else{
+print <<<EOT
+-->
+<div>
+<!--
+EOT;
+//是否显示tips
+if($tips){
+print <<<EOT
+-->
+<div id="ratetips" style="position:absolute;z-index:1003;top:-35px;left:5px;">
+	<div class="reward tac w">
+		<div class="rewardbg">
+			<span class="f14 b st2">{$tips}</span>
+		</div>
+	</div>
+</div>
+
+<!--
+EOT;
+}else{
+
+print <<<EOT
+-->
+<div id="ratetips"></div>
+<!--
+EOT;
+}
+
+print <<<EOT
+-->
+<div class="c"></div>
+<div class="mood tac cc">
+<div class="mood-bg">
+<div class="mood-bg2">
+<div class="mood-title"><b>评价结果</b>&nbsp;&nbsp;&nbsp;&nbsp;共有{$total}人投票&nbsp;&nbsp;<a href="{$hotHref}" target="_blank">{$typeTitle}评价</a></div>
+<table class="mood-hover2">
+<tr>
+	{$rateResultHtml}
+</tr>
+</table>
+<!--
+EOT;
+if($weekHTML){
+print <<<EOT
+-->
+<div class="mood-title"><b>本周{$typeTitle}评价之最</b>&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:;" onClick="rate.showWeekMore();">更多</a></div>
+<div class="c" style="width:20px;"></div>
+<ul>
+{$weekHTML}
+</ul>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+</div>
+</div>
+</div>
+<div class="c"></div>
+</div>
+<!--
+EOT;
+}
+?>
+-->

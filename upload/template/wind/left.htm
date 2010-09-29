@@ -1,0 +1,98 @@
+<!--<?php
+print <<<EOT
+-->
+<html>
+<head>$expires
+<title>$subject $forumname $db_bbsname - powered by phpwind.net</title>
+<meta http-equiv="Content-Type" content="text/html; charset=$db_charset">
+<meta name="keywords" content="$db_metakeyword" />
+<meta name="description" content="$db_metadescrip" />
+<base href="$db_bbsurl/" />
+<style type="text/css">
+body {font-family: verdana;font-size: 12px;margin: 0;color: #000;background:$forumcolorone;
+	scrollbar-face-color: $headcolor ; 
+	scrollbar-highlight-color: #ffffff; 
+	scrollbar-shadow-color: $tablecolor; 
+	scrollbar-3dlight-color: $tablecolor; 
+	scrollbar-arrow-color: $headcolor; 
+	scrollbar-track-color: #ffffff;
+	scrollbar-darkshadow-color: #ffffff;
+	scrollbar-base-color: $tablecolor;
+}
+td {font-family:arial;font-size: 12px;}
+a { text-decoration: none;color: $linkcolor;}
+a:hover{text-decoration: underline;}
+img {border:0;}
+.f_one {background: $forumcolorone;}
+.f_two {background: $forumcolortwo;}
+.t{margin:0px auto 8px;width:100%}
+.t table{border:1px solid $forumcolorone;margin:0 auto;width:99.98%;}
+.h{border-bottom:1px solid $headborder;background:$headcolor;text-align:left;color:$headfontone;padding:2px .5em 0; line-height:220%;}
+.h a{font-family:Arial;color:$headfontone}
+.tr3 td{border-bottom:1px solid $tdcolor;padding:5px 8px}
+</style>
+<script language=javascript>
+function Show(id){
+	var obj=document.getElementById('c_'+id);
+	var img=document.getElementById('img_'+id);
+	if(obj.style.display=="none"){
+		obj.style.display="";
+		img_re=new RegExp("_fold\\.gif$");
+		img.src=img.src.replace(img_re,'_open.gif');
+	}else{
+		obj.style.display="none";
+		img_re=new RegExp("_open\\.gif$");
+		img.src=img.src.replace(img_re,'_fold.gif');
+	}
+}
+</script>
+</head>
+<body vlink="#333333" link="#333333">
+<div style="width:145px">
+			<table width="100%" cellpadding="0" cellspacing="0" border="0" align="center">
+			<tr><td style=" background:url($imgpath/columns/columns-t.gif) no-repeat; height:30px"></td></tr>
+				<tr><td align="center" style="padding:5px 0">
+					<a href="index.php" target="main">站点首页</a> | &nbsp;<a href="profile.php" target="main">控制面板</a> <br />
+					<a href="searcher.php?sch_time=newatc" target="main">查看新帖</a> | &nbsp;<a href="faq.php" target="main">站点帮助</a>
+				</td></tr>
+			</table>
+			<div class="t z">
+			<table width="100%" cellspacing="0" cellpadding="0" border="0">
+<!--
+EOT;
+foreach($catedb as $key=>$cate){
+$id_name='c_'.$key;
+$img_name='img_'.$key;
+print <<<EOT
+-->
+				<tr>
+					<td class="h" style="height:25px;">
+						<a style="cursor:pointer;" onClick="Show($key)">
+							<img id="$img_name" src="$imgpath/$stylepath/index/cate_open.gif" border="0" align="absmiddle" /> $cate[name]
+						</a>
+						<font color="#000000"></font>
+					</td>
+				</tr>
+				<tbody id="$id_name">
+<!--
+EOT;
+foreach($forumdb[$key] as $k=>$forum){ print <<<EOT
+-->
+				<tr class="tr3 one"  onMouseOver="this.className='tr3 f_two'" onMouseOut="this.className='tr3 f_one'"><td><a href="thread.php?fid=$k" target="main">$forum[name]</a></td></tr>
+<!--
+EOT;
+} print <<<EOT
+-->
+				</tbody>
+
+<!--
+EOT;
+} print <<<EOT
+-->
+			</table>
+			</div>
+</div>
+</body></html>
+<!--
+EOT;
+?>-->

@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<mode>
+	<modename>门户模式</modename>
+	<descrip>本模式适用于:学校、小区、城市等地区型论坛</descrip>
+	<ifpwcache>567</ifpwcache>
+	<pages>
+		<item>
+			<name>首页</name>
+			<template>index</template>
+			<scr>index</scr>
+		</item>
+		<item>
+			<name>频道页</name>
+			<template>cate</template>
+			<scr>cate</scr>
+		</item>
+		<item>
+			<name>列表页</name>
+			<template>thread</template>
+			<scr>thread</scr>
+		</item>
+	</pages>
+</mode>

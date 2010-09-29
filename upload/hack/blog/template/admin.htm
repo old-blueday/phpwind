@@ -1,0 +1,69 @@
+<!--<?php
+include_once PrintEot('left');print <<<EOT
+-->
+<div class="mb10"><a href="$admin_file?adminjob=hackcenter">插件中心</a> &raquo; <a href="javascript:;">{$db_hackdb[blog][0]}</a></div>
+<!--
+EOT;
+if(empty($action)){
+print <<<EOT
+-->
+<div class="admin_info mb10">
+	<h3 class="h1">提示信息</h3>
+  <div class="legend">
+  <ol>
+  	<li>此功能为博客与论坛整合设置，使用此功能需要预先安装好博客系统，同时到博客后台进行博客与论坛整合的相关设置</li>
+    <li> 如果您已经安装好博客系统，您必要完成下面的参数设置才能使您的论坛与博客整合</li>
+  </ol>
+  <div class="legend">
+  <p class="s1">注：以下填写的信息必须准确无误，否则可能造成论坛与博客不能整合成功</p>
+      <ul>
+            <li><span class="mr20">博客整合功能 </span> 为您的论坛开启博客功能</li>
+            <li><span class="mr20">博客访问网址 </span>博客访问地址，最后不要加 ‘/’</li>
+            <li><span class="mr20">博客二级域名设置</span>博客后台设置的“二级域名”</li>
+            <li><span class="mr20">博客用户组权限</span>可设置哪些用户组可以使用博客功能（使用此功能建议关闭博客注册功能 ）</li>
+      </ul>
+  </div>
+  </div>
+</div>
+<form action="$basename" method="post">
+  <input type=hidden name="action" value="unsubmit">
+  <h2 class="h1">博客整合设置</h2>
+  <div class="admin_table mb10">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <tr class="tr1 vt">
+      <td class="td1">博客整合功能</td>
+      <td class="td2">
+       			<ul class="cc list_80 list_A mr10 fl">
+                	<li><input type=radio name="config[bg_ifopen]" value="1" $ifopen_Y>开启</li>
+                    <li><input type=radio name="config[bg_ifopen]" value="0" $ifopen_N>关闭</li>
+                </ul>
+        </td>
+<td class="td2"><div class="help_a">需要到插件中心 管理中同时启用该插件方为有效<br /></div></td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">博客访问网址</td>
+      <td class="td2"><input class="input input_wa" name="config[bg_blogurl]" value="$bg_blogurl"></td>
+   <td class="td2"><div class="help_a">注意不要在最后加 /</div></td>
+	</tr>
+    <tr class="tr1 vt">
+      <td class="td1">博客二级域名设置</td>
+      <td class="td2"><input class="input input_wa" name="config[bg_domain]" value="$bg_domain"></td>
+   <td class="td2"><div class="help_a">格式如：phpwind.net</div></td> </tr>
+    <tr class="tr1 vt">
+      <td class="td1">博客用户组权限</td>
+      <td class="td2" colspan="2">
+          <table width="100%" cellspacing="0" cellpadding="0">
+              <tr>$usergroup</tr>
+           </table>
+       </td>
+    </tr>
+  </table>
+  </div>
+  <div class="mb10 tac">
+    <span class="btn"><span><button type="submit">提 交</button></span></span>
+   </div>
+</form>
+<!--
+EOT;
+}include_once PrintEot('adminbottom');
+?>-->

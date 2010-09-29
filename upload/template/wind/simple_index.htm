@@ -1,0 +1,38 @@
+<!--<?php
+print <<<EOT
+-->
+<center><b>查看完整版本: [-- <a href="./" target="_blank">$db_bbsname</a> --]</b></center>
+<br />
+<table cellspacing="1" cellpadding="0" width="$tablewidth" $i_table align="center">
+<tr><td><table cellspacing="0" cellpadding="8" width="100%"><tr><td bgcolor="#FFFFFF">
+<b><a href="$DIR">$db_bbsname</a></b></td><td bgcolor="#FFFFFF" align="right"><B><A HREF="login.php">登录</A> -&gt; <A HREF="$db_registerfile">注册</A></B></td></tr>
+</table></td></tr>
+</table>
+<br />
+<table cellspacing="1" cellpadding="7" width="$tablewidth" $i_table align="center">
+<tr><td bgcolor="#FFFFFF">
+<!--
+EOT;
+foreach($forumdb as $forums){
+if($forums['cate']==1){
+print <<<EOT
+-->
+$forums[li_add]<li><h2>$forums[name]</h2></li>
+<!--
+EOT;
+}else{
+print <<<EOT
+-->
+$forums[li_add]<li><a href="{$DIR}f$forums[fid].html">$forums[name]</a></li>
+<!--
+EOT;
+}
+}print <<<EOT
+-->
+$end_li
+</td></tr>
+</table><br />
+<center><b>查看完整版本: [-- <a href="./" target="_blank">$db_bbsname</a> --] [-- <a href="$DIR#">top</a> --]</b></center>
+<!--
+EOT;
+?>-->

@@ -1,0 +1,120 @@
+<!--<?php
+include_once PrintEot('left');
+print <<<EOT
+-->
+<div class="nav3 mb10">
+  <ul class="cc">
+    <li $cls_topic><a href="$baseurl&type=topic">主题统计</a></li>
+    <li $cls_reply><a href="$baseurl&type=reply">回复统计</a></li>
+    <li $cls_regmen><a href="$baseurl&type=regmen">注册统计</a></li>
+    <li $cls_postmenc><a href="$baseurl&type=postmen">发帖人数统计</a></li>
+  </ul>
+</div>
+<div class="admin_info mb10">
+  <h3 class="h1"><b>提示信息</b></h3>
+  <div class="legend">本功能详细统计网站每日主题、回复、注册和发帖用户数，帮助站长更直观的了解网站的发展状况!</div>
+</div>
+<!--
+EOT;
+if(!$action){
+$slang = array('topic'=>'本月主题数','reply'=>'本月回复数','regmen'=>'本月注册人数','postmen'=>'平均每日发帖人数');
+print <<<EOT
+-->
+<h2 class="h1"><a href="$basename&c_year=$p_year">&laquo;</a>&nbsp; $c_year &nbsp;<a href="$basename&c_year=$n_year">&raquo;</a></h2>
+<div class="admin_table mb10">
+  <table cellspacing="0" cellpadding="0" width="100%">
+    <tr class="tr2 vt td_bgB">
+      <td>月份</td>
+      <td>{$slang[$type]}</td>
+      <td>操作</td>
+    </tr>
+<!--
+EOT;
+foreach($sortdb as $key=>$value){print <<<EOT
+-->
+    <tr class="tr1 vt">
+      <td class="td2"><a href="$basename&action=month&year=$c_year&month=$key">$c_year - $key</a></td>
+      <td class="td2"><img src="$imgpath/post/vote/tab-two.gif" width="$value[w]" height="10" /> {$value[$type]}</td>
+      <td class="td2"><a href="$basename&action=msort&year=$c_year&month=$key" onclick="sort(this);return false;">[统计]</a></td>
+    </tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+  </table>
+</div>
+<div style="padding:13px 30px;display:none;position:absolute;background:#fff;border:1px solid $tablecolor;" id="s_loading"><img src="$imgpath/loading.gif" align="absbottom" /> 正在统计数据...</div>
+<script language="JavaScript">
+function sort(o) {
+	var s = getObj('s_loading');
+	s.style.display = '';
+	s.style.top  = ietruebody().clientHeight/3 + getTop() + 'px';
+	s.style.left = (ietruebody().clientWidth-s.offsetWidth)/2 + 'px';
+	ajax.send(o.href,'',function(){
+		if (ajax.request.responseText == 'success') {
+			location.reload();
+		}	
+	});
+}
+function ietruebody(){
+	return (document.compatMode && document.compatMode!="BackCompat")? document.documentElement : document.body;
+}
+function getTop() {
+	return typeof window.pageYOffset != 'undefined' ? window.pageYOffset:ietruebody().scrollTop;
+}
+function getLeft() {
+	return (typeof window.pageXOffset != 'undefined' ? window.pageXOffset:ietruebody().scrollLeft)
+}
+</script>
+<script src="js/pw_ajax.js"></script>
+<!--
+EOT;
+}elseif($action=='month'){
+$slang = array('topic'=>'今日主题数','reply'=>'今日回复数','regmen'=>'今日注册人数','postmen'=>'今日发帖人数');
+print <<<EOT
+-->
+<h2 class="h1"><a href="$basename&action=month&year=$p_year&month=$p_month">&laquo;</a>&nbsp; <a href="$basename&c_year=$year">$year-$month</a> &nbsp;<a href="$basename&action=month&year=$n_year&month=$n_month">&raquo;</a></h2>
+<div class="admin_table mb10">
+  <table cellspacing="0" cellpadding="0" width="100%">
+    <tr class="tr2 vt td_bgB">
+      <td>月份</td>
+      <td>{$slang[$type]}</td>
+      <td>操作</td>
+    </tr>
+<!--
+EOT;
+foreach($sortdb as $key=>$value){print <<<EOT
+-->
+    <tr class="tr1 vt">
+      <td class="td2">$year-$month-$key</td>
+      <td class="td2"><img src="$imgpath/post/vote/tab-two.gif" width="$value[w]" height="10" /> {$value[$type]}</td>
+      <td class="td2"><a href="$basename&action=dsort&year=$year&month=$month&day=$key" onclick="sort(this);return false;">[统计]</a></td>
+    </tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+  </table>
+</div>
+<div style="padding:13px 30px;display:none;position:absolute;background:#fff;border:1px solid $tablecolor;" id="s_loading"><img src="$imgpath/loading.gif" align="absbottom" /> 正在统计数据...</div>
+<script language="JavaScript">
+function sort(o) {
+	var s = getObj('s_loading');
+	s.style.display = '';
+	s.style.top  = ietruebody().clientHeight/3 + getTop() + 'px';
+	s.style.left = (ietruebody().clientWidth-s.offsetWidth)/2 + 'px';
+	ajax.send(o.href,'',function(){
+		if (ajax.request.responseText == 'success') {
+			window.location.reload();
+		}	
+	});
+}
+function ietruebody(){
+	return (document.compatMode && document.compatMode!="BackCompat")? document.documentElement : document.body;
+}
+</script>
+<script src="js/pw_ajax.js"></script>
+<!--
+EOT;
+}include_once PrintEot('adminbottom');
+?>-->

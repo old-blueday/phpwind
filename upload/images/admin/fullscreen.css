@@ -1,0 +1,8 @@
+html{*padding-top:27px;}
+#admin_header{*margin-top:-27px;}
+#admin_menubar{width:0;}
+#admin_contont{left:0;top:27px;*top:-70px;background:#fff;}
+.admin_head{height:0;overflow:hidden;display:none;}
+#admin_menubar_top{width:0;}
+.admin_menubar_top{widrh:0;display:none;}
+.admin_guide{display:none;}

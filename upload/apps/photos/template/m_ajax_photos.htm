@@ -1,0 +1,302 @@
+<!--<?php
+if ($a == 'delalbum') {print <<<EOT
+-->
+	<form action="{$basename}&a=$a&cyid=$cyid" onsubmit="return false;" method="post">
+	<input type="hidden" name="aid" value="$aid" />
+	<input type="hidden" name="step" value="3" />
+	<div style="width:250px;">
+		<div class="p15 lh_22">删除相册将同时删除所有照片<br />您确定要删除吗？</div>
+		<div class="popBottom">
+		<span class="btn2"><span><button type="button" onclick="ajax.submit(this.form)">删 除</button></span></span>
+		<span class="bt2"><span><button type="button" onclick="closep();">取消</button></span></span>
+	</div>
+	</div>
+	</form>
+<!--
+EOT;
+} elseif ($a == 'editalbum') {print <<<EOT
+-->
+	<form action="{$basename}q=photos&a=editalbum" onSubmit="return false;" method="POST">
+		<input type="hidden" name="step" value="3" />
+		<input type="hidden" name="aid" value="$aid" />
+		<div style="width:450px">
+		<div class="popTop">编辑相册</div>
+		<table cellpadding="0" cellspacing="0" width="100%" class="vt lh_24">
+			<tr>
+				<td width="60">相册名*</td>
+				<td><input type="text" class="input input_wa mr10" id="ajax_aname" name="aname" value="$albumInfo[aname]" /><span id="ajax_aname_warn">限 24 字节</span></td>
+			</tr>
+			<tr>
+				<td>描述</td>
+				<td>
+					<textarea id="ajax_aintro" name="aintro" class="textareaA">{$albumInfo[aintro]}</textarea>
+					<div id="ajax_aintro_warn"> 限 255 字节</div>
+				</td>
+			</tr>
+			<tr>
+				<td>可见度</td>
+				<td>
+					<select name="private" onchange="optionsel(this.value);" class="select_wa">
+						<option value="0" $select_0>全站用户可见</option>
+						<option value="1" $select_1>仅好友可见</option>
+						<option value="2" $select_2>仅自己可见</option>
+						<option value="3" $select_3>需要密码访问</option>
+					</select>
+<!--
+EOT;
+if($select_3 == 'selected'){print<<<EOT
+-->
+					<span id="resetpwd_$albumInfo[aid]" onclick="resetpwd();" class="cp">重设密码</span>
+<!--
+EOT;
+}else{print<<<EOT
+-->
+					<span id="resetpwd_$albumInfo[aid]"></span>
+<!--
+EOT;
+}print <<<EOT
+-->
+				</td>
+			</tr>
+			<tbody id="photo_pwd" style="display:none">
+			<tr>
+				<td>输入密码</td>
+				<td>
+					<input type="password" class="input input_wa mr10" name="pwd" id="c_ajax_pwdinfo" /><span id="c_ajax_pwdinfo_warn">最小长度:3 最大长度:15</span>
+				</td>
+			</tr>
+			<tr>
+				<td>确认密码</td>
+				<td>
+					<input type="password" class="input input_wa" name="repwd" id="repwd_info" />
+				</td>
+			</tr>
+			</tbody>
+		</table>
+		<div class="popBottom"><span class="btn2"><span><button type="submit" onclick="ajax.submit(this.form)">确定</button></span></span><span class="bt2"><span><button type="button" onclick="closep();">取消</button></span></span></div>
+		</div>
+	</form>
+<script language="JavaScript">
+var charset = '$db_charset';
+setTimeout(function(){initCheckTextNum('ajax_aname','ajax_aname_warn',24);},300);
+setTimeout(function(){initCheckTextNum('ajax_aintro','ajax_aintro_warn',255);},300);
+function resetpwd() {
+	getObj('resetpwd_$albumInfo[aid]').style.display = 'none';
+	getObj('photo_pwd').style.display = '';
+}
+function optionsel(id) {
+	var pwdobj = getObj('photo_pwd');
+	var resetpwdid = getObj('resetpwd_$albumInfo[aid]');
+	resetpwdid.style.display = 'none';
+	if (isNaN(id)) {
+		showDialog('error','非法操作');
+	}
+	if (id == '3') {
+		pwdobj.style.display = '';
+	} else {
+		pwdobj.style.display = 'none';
+	}
+}
+</script>
+<!--
+EOT;
+}elseif ($a == 'viewalbum') {print <<<EOT
+--><div style="width:200px;">
+	<form action="{$basename}&a=viewalbum" onSubmit="return false;" method="POST">
+		<input type="hidden" name="aid" id="aidvalue" value="$aid" />
+		<input type="hidden" name="ifspace" id="ifspace" value="$ifspace" />	
+		<input type="hidden" name="uid" id="uid" value="$uid" />
+		<input type="hidden" name="ifriend" id="ifriend" value="$ifriend" />
+		<div class="popTop">输入密码</div>	
+		<div class="p10"><input type="password" class="input input_wa" name="viewpwd" id="pwdvalue" maxlength="15" /></div>
+		<div class="popBottom"><span class="btn2"><span><button type="submit" onclick="tourl();">提 交</button></span></span><span class="bt2"><span><button type="button" onclick="closep();">取消</button></span></span></div>
+	</form></div>
+<script language="JavaScript">
+function tourl() {
+	var aid = getObj('aidvalue').value;
+	var viewpwd = getObj('pwdvalue').value;
+	var ifspace = getObj('ifspace').value;
+	var ifriend = getObj('ifriend').value;
+	var uid = getObj('uid').value;
+	var data = '';
+	if(ifspace == 1 || ifspace == '1'){
+		data = '&uid='+uid;
+	}
+	if(ifriend == 1 || ifriend == '1'){
+		data += '&ifriend='+ifriend;
+	}
+	ajax.send("{$basename}a=albumcheck",'aid=' + aid + '&viewpwd=' + viewpwd+data,function(){
+		var rText = ajax.request.responseText;
+		if (rText == 'fail') {
+			showDialog('error','密码错误,请重新输入',2);
+		} else if (rText == 'empty') {
+			showDialog('error','密码不能为空,请重新输入',2);
+		} else if (rText == 'success') {
+			window.location.href = "{$basename}&a=album&aid=" + aid + data;
+		} else {
+			showDialog('error','数据链接出错',2);
+		}
+	});
+}
+</script>
+<!--
+EOT;
+} elseif ($a == 'createajax') {
+print <<<EOT
+-->
+	<div style="width:450px;">
+	<div class="popTop">创建相册</div>
+	<table class="vt mb5 z" width="100%">
+		<tr class="tr3">
+			<td width="70">相册名*</td>
+			<td><input type="text" class="input input_wa mr5" id="c_ajax_aname" name="aname" /><span id="c_ajax_aname_warn">限 24 字节</span></td>
+		</tr>
+		<tr class="tr3">
+			<td>描述</td>
+			<td>
+				<textarea id="c_ajax_aintro" name="aintro" class="textareaA mb5"></textarea>
+				<p id="c_ajax_aintro_warn" class="gray"> 限 255 字节</p>
+			</td>
+		</tr>
+		<tr class="tr3">
+			<td>可见度</td>
+			<td>
+				<select name="private" id="private_info" onchange="optionsel(this.value)" class="select_wa">
+					<option value="0">全站用户可见</option>
+					<option value="1">仅好友可见</option>
+					<option value="2">仅自己可见</option>
+					<option value="3">需要密码访问</option>
+				</select>
+			</td>
+		</tr>
+		<tbody id="photopwd" style="display:none">
+		<tr class="tr3">
+			<td>输入密码</td>
+			<td>
+				<input type="password" name="pwd" class="input input_wa mr5" id="c_ajax_pwdinfo" /><span id="c_ajax_pwdinfo_warn">最小长度:3 最大长度:15</span>
+			</td>
+		</tr>
+		<tr class="tr3">
+			<td>确认密码</td>
+			<td>
+				<input type="password" name="repwd" class="input input_wa" id="repwd_info" />
+			</td>
+		</tr>
+		</tbody>
+		<!--
+EOT;
+if ($o_photos_gdcheck) {print <<<EOT
+-->
+		<tr class="tr3">
+			<td>认证码:</td>
+			<td>
+				<img id="ckcode" style="cursor:pointer;display:none;margin-bottom:5px;" onclick="this.src='ck.php?nowtime='+new Date().getTime();" alt="看不清楚，换一张" /><br />
+				<input class="input" onfocus="showCK();" type="text" name="gdcode" id="gdcode" style="width:50px;" tabindex="3"  />
+			</td>
+		</tr>
+<script language="JavaScript">
+function showCK(){
+	getObj('ckcode').style.display="";
+	if (getObj('ckcode').src.indexOf('ck.php') == -1) {
+		getObj('ckcode').src = 'ck.php?nowtime=' + new Date().getTime();
+	}
+}
+</script>
+<!--
+EOT;
+}if($o_photos_qcheck){print <<<EOT
+-->
+		<tr class="tr3">
+			<td>验证问题</td>
+			<td>
+			<div>{$db_question[$qkey]} （正确答案:{$db_answer[$qkey]}）</div>
+			<input class="input" name="qanswer" id="qanswer" size="25" tabindex="7" />
+			<input type="hidden" name="qkey" id="qkey" value="$qkey" />
+			</td>
+		</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+	</table>
+	<div class="popBottom"><span class="btn2"><span><button type="submit" onclick="fetchvalue();">提 交</button></span></span><span class="bt2"><span><button type="button" onclick="closep();">取消</button></span></span></div>
+	</div>
+<script language="JavaScript">
+var charset = '$db_charset';
+setTimeout(function(){initCheckTextNum('c_ajax_aname','c_ajax_aname_warn',24);},300);
+setTimeout(function(){initCheckTextNum('c_ajax_aintro','c_ajax_aintro_warn',255);},300);
+setTimeout(function(){initCheckTextNum('c_ajax_pwdinfo','c_ajax_pwdinfo_warn',15);},300);
+
+function optionsel(id) {
+	pwdobj = getObj('photopwd');
+	if (isNaN(id)) {
+		showDialog('error','非法操作');
+	}
+	if (id == '3') {
+		pwdobj.style.display = '';
+	} else {
+		pwdobj.style.display = 'none';
+	}
+}
+function fetchvalue() {
+	var aname = getObj('c_ajax_aname').value;
+	var aintro = getObj('c_ajax_aintro').value;
+	var privated = getObj('private_info').value;
+	var pwd = getObj('c_ajax_pwdinfo').value;
+	var repwd = getObj('repwd_info').value;
+	var albumnum = "$o_maxphotonum";
+	if(albumnum == "" || albumnum == 0 || albumnum == "0"){
+		albumnum = "";
+	}else{
+		albumnum = '您还可以上传'+albumnum+'张照片';
+	}
+	if (IsElement('gdcode')){
+		var gdcode = getObj('gdcode').value;
+	}
+	if (IsElement('qanswer')){
+		var qanswer = getObj('qanswer').value;
+	}
+	if (IsElement('qkey')){
+		var qkey = getObj('qkey').value;
+	}
+    if(IsElement('gdcode') && gdcode == ""){
+        showDialog('error','请输入验证码',2);
+        return false;
+    }
+	if (IsElement('qanswer') && qanswer == ""){
+		showDialog('error','请输入问题答案',2);
+        return false;
+	}
+	ajax.send("{$basename}a=create",'step=2&checkpwd=1&aname=' + aname + '&aintro=' + aintro + '&pwd=' + pwd + '&repwd=' + repwd + '&private=' + privated + '&gdcode=' + gdcode + '&qanswer=' + qanswer + '&qkey=' + qkey,function(){
+		var rText = ajax.request.responseText.split('\\t');
+		if (rText[0] == 'success') {
+			var aidsel = getObj('aidsel_info');
+			var option = elementBind('option');
+			option.innerHTML = aname;
+			option.value = rText[1];
+			option.selected = 'selected';
+
+			//photoselect.vir.getElementsByTagName('h4')[0].innerHTML=aname;
+			aidsel.insertBefore(option,null);
+			var job = '$job';
+			if (job == 'flash') {
+				uploader.setAlbumId(aidsel.value);
+				showDialog('success','相册添加成功!',2,function(){	
+				});
+			}
+			getObj('allowflash').innerHTML = albumnum;
+			showDialog('success','相册添加成功!',2);
+		} else if (rText[0] == 'limit_num') {
+			showDialog('error','您创建的相册已经达到'+rText[1]+'个',2);
+		} else {
+			showDialog('error',rText[1] != '' ? rText[1] : '非法错误',2);
+		}
+		read.menu.style.top="300px";
+
+	});
+
+}
+</script>
+<!--
+EOT;
+}?>-->

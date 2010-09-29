@@ -1,0 +1,52 @@
+<!--<?php
+include_once PrintEot('left');print <<<EOT
+-->
+<form action="$basename" method="post">
+<input type="hidden" name="step"  value="2"/>
+<h3 class="h1">消息中心常规设置</h3>
+<div class="admin_table mb10">
+		<table width="100%" cellspacing="0" cellpadding="0">
+		<tr class="tr1 vt">
+				<td class="td1">消息声音提示</td>
+				<td class="td2">
+					<ul class="list_A list_80">
+						<li><input type="radio" value="1" name="config[db_msgsound]" $db_msgsound_Y />开启</li>
+						<li><input type="radio" value="0" name="config[db_msgsound]" $db_msgsound_N />关闭</li>
+					</ul>
+				</td>
+				<td class="td2"><div class="help_a">开启后，如果发现有新的短信息，则会播放提示声音</div></td>
+		</tr>
+		<tr class="tr1 vt">
+				<td class="td1">帖子回复提醒</td>
+				<td class="td2">
+					<ul class="list_A list_80">
+						<li><input type="radio" value="1" name="config[db_msgreplynotice]" $db_msgreplynotice_Y />开启</li>
+						<li><input type="radio" value="0" name="config[db_msgreplynotice]" $db_msgreplynotice_N />关闭</li>
+					</ul>
+				</td>
+				<td class="td2"><div class="help_a">开启后，如果用户发表的回复被回复以后，会收到消息提示</div></td>
+		</tr>
+	</table>
+</div>
+	<div class="tac mb10"><span id="submit" class="btn"><span><button type="submit" onfocus="blur();">提 交</button></span></span></div>
+</form>
+
+<form action="$basename" method="post">
+<input type="hidden" name="step"  value="3"/>
+<script type="text/javascript" src="js/date.js"></script>
+<h3 class="h1">历史消息</h3>
+<div class="admin_table mb10">
+		<table width="100%" cellspacing="0" cellpadding="0">
+		<tr class="tr1 vt">
+			<td class="td1">历史时间</td>
+			<td class="td2"><input name="config[db_history]" class="input input_wa" onclick="ShowCalendar(this.id,1)" id="config[history]" value="$db_history"/></td>
+			<td class="td2"><div class="help_a">设定时间以前的消息为历史消息。设置历史消息有助于提高新消息读取速度</div></td>
+		</tr>
+	</table>
+</div>
+	<div class="tac mb10"><span id="submit" class="btn"><span><button type="submit" onfocus="blur();">提 交</button></span></span></div>
+</form>
+<!--
+EOT;
+include_once PrintEot('adminbottom');
+?>-->

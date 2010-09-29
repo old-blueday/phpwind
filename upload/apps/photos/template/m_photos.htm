@@ -1,0 +1,868 @@
+<!--<?php
+require_once(uTemplate::printEot('header'));
+//require_once(uTemplate::printEot('user_appleft'));
+print <<<EOT
+-->
+<div class="contUser">
+<script type="text/javascript">
+var imgMaxWidth=600;
+function ImgLoad()
+{
+	var o = document.getElementById("imgview");
+	var pe = document.getElementById('imgpre');
+	if(o==null || pe == null || !pe.width)
+	{
+		setTimeout(ImgLoad, 400);
+	}else
+	{
+		if (pe.width>imgMaxWidth){
+			if (o.style.width){
+				o.style.width="";
+			}
+			o.width=imgMaxWidth;
+			o.removeAttribute("height");
+			o.style.cursor="hand";
+			o.vspace=5;
+			o.resized=1;
+		}
+		else
+		{
+			o.width=pe.width;
+		}
+		o.src=pe.src;
+		setTimeout(function(){
+			getElementsByClassName('aPre')[0].style.height=getElementsByClassName('aNext')[0].style.height=Math.max(o.height,400)+'px';
+		},400);
+	}
+}
+</script>
+<img id="imgpre" src="$photo[path]" style="position:absolute;left:-10000px" onload="ImgLoad()" />
+	<div class="p15">
+		<div class="navC">
+			<ul>
+				<li id="q_index"><a href="{$basename}a=friend">好友相册</a></li>
+				<li id="q_own"><a href="{$basename}a=own">我的相册</a></li>
+			</ul>
+			<span class="btn_add fl"><span><button onClick="location.href='{$basename}a=upload&job=flash';" type="button">上传照片</button></span></span>
+			<span class="btn_add fl"><span><button onClick="location.href='{$basename}a=create';" type="button">创建相册</button></span></span>
+		</div>
+		<div id="content">
+<script language="JavaScript">
+function ajaxurl(o) {
+	read.obj = o;
+	ajax.send(o.href,'',ajax.get);
+	return false;
+}
+setCurrent('q_{$a_key}','q_index','current');
+</script>
+<!--
+EOT;
+if (empty($a) || $a == 'own' || $a == 'friend') {print <<<EOT
+-->
+			<div id="list-box">
+<!--
+EOT;
+if (!empty($albumdb)) {
+foreach ($albumdb as $key => $value) {
+$prviteimg = !$value['private']?'key':'lock';
+if (!$value['private']) {
+	$prviteimg = "";
+} elseif ($value['private'] == 1) {
+	$prviteimg = "<img src=\"u/images/lock.png\" title=\"仅好友可见\" align=\"absmiddle\" />";
+} elseif ($value['private'] == 2) {
+	$prviteimg = "<img src=\"u/images/lock.png\" title=\"仅自己可见\" align=\"absmiddle\" />";
+} elseif ($value['private'] == 3) {
+	$prviteimg = "<img src=\"u/images/key.png\" title=\"需要密码访问\" align=\"absmiddle\" />";
+}
+if ((!$isown || $a == 'friend') && $value['private'] == 3 && !$isGM) {
+	$cookiename = 'albumview_'.$value['aid'];
+	if ($value['albumpwd'] && PwdCode($value['albumpwd']) != GetCookie($cookiename)) {
+		$viewurl = "{$basename}a=viewalbum&aid=$value[aid]{$friendurl}";
+		$ajaxclick = "onclick=\"return ajaxurl(this);\"";
+	} else {
+		$viewurl = "{$basename}a=album&aid=$value[aid]{$friendurl}";
+		$ajaxclick = "";
+	}
+} else {
+	$viewurl = "{$basename}a=album&aid=$value[aid]{$friendurl}";
+	$ajaxclick = "";
+}
+print <<<EOT
+-->
+				<div class="Albumbox cc">
+					<dl class="r_admininfo">
+					<dt class="Album"><a href="$viewurl" $ajaxclick><img src="$value[lastphoto]" onload="if(this.width>100){this.width = 100;} else if(this.height>100){this.height=100;}"  /></a></dt>
+					<dd>
+						<div class="c mb10">&nbsp;</div>
+						<p class="f16 b"><a href="$viewurl" $ajaxclick title="{$value[aname]}">{$value[sub_aname]}</a></p>
+						<p>共{$value[photonum]}张照片 $prviteimg</p>
+						<p>$value[lasttime]更新</p>
+						<span>
+<!--
+EOT;
+if ($value['ownerid'] == $winduid) {print <<<EOT
+--><a href="{$basename}a=upload&job=flash&aid=$value[aid]" class="s7">上传照片</a> | <a href="{$basename}a=editalbum&aid=$value[aid]" onclick="return ajaxurl(this);" class="s7">编辑相册</a>
+<!--
+EOT;
+} else {print <<<EOT
+--><a href="u.php?uid=$value[ownerid]" class="s7">$value[owner]</a><!--
+EOT;
+}if ($value['ownerid'] == $winduid || $SYSTEM['delalbum']) {print <<<EOT
+--> | <a href="{$basename}a=delalbum&aid=$value[aid]" onclick="return ajaxurl(this)" class="s7">删除相册</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+						</span>
+					</dd>
+					</dl>
+				</div>
+<!--
+EOT;
+}} else {print <<<EOT
+-->
+				<div class="p15 f14 tac">相册暂时没有照片</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+				<div class="c"></div>
+				<div class="cc mt10">$pages</div>
+			</div>
+<!--
+EOT;
+} elseif ($a == 'album') {print <<<EOT
+-->
+			<div class="p10 bdB">
+<!--
+EOT;
+if ($isown) {print <<<EOT
+-->
+			<div class="fr">
+<a href="{$basename}a=upload&job=flash&aid=$aid">上传</a>&nbsp;┊&nbsp;
+<a href="{$basename}a=editalbum&aid=$aid" onclick="return ajaxurl(this)">编辑</a>&nbsp;┊&nbsp;
+<a href="{$basename}a=delalbum&aid=$aid" onclick="return ajaxurl(this)" title="删除相册" class="mr20">删除</a>
+<a href="apps.php?q=collection&a=favor&type=photo&ajax=1&id={$aid}" onclick="return ajaxurl(this)" class="mr10 allCollect">收藏</a>
+<!--
+EOT;
+	if ($weiboPriv) {print <<<EOT
+-->
+<a href="javascript:;" onclick="sendmsg('operate.php?action=toweibo&ajax=1&type=album&id=$aid','',this.id);" class="allForward">新鲜事</a>
+<!--
+EOT;
+	}print <<<EOT
+-->
+			</div>
+			<a href="{$basename}" class="b">我的相册</a> &raquo; <span class="s5 b">$album[aname] ($album[photonum])</span>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+<div class="fr">
+<a href="apps.php?q=collection&a=favor&type=photo&ajax=1&id={$aid}" onclick="return ajaxurl(this)" class="mr10 allCollect">收藏</a>
+<!--
+EOT;
+	if ($weiboPriv) {print <<<EOT
+-->
+<a href="javascript:;" onclick="sendmsg('operate.php?action=toweibo&ajax=1&type=album&id={$aid}','',this.id);" class="allForward">新鲜事</a>
+<!--
+EOT;
+	}print <<<EOT
+-->
+</div>
+				<a href="{$basename}a=friend" class="b">好友相册</a> &raquo; <span class="s5 b">$album[owner]的相册</span> &raquo; <span class="s5 b">$album[aname] ($album[photonum])</span>
+<!--
+EOT;
+}print <<<EOT
+-->
+			</div>
+			<div class="g_listA g_listAB">
+<!--
+EOT;
+if ($cnpho) {
+print <<<EOT
+-->
+				<ul class="cc">
+<!--
+EOT;
+foreach ($cnpho as $key => $value) {print <<<EOT
+-->
+					<li style="width:125px"><div class="aimg"><a href="{$basename}a=view&pid=$value[pid]{$friendurl}"><img src="$value[path]" /></a></div><p>
+<!--
+EOT;
+if ($isown || $photoService->isDelRight()) {print <<<EOT
+-->
+					<a href="javascript:;" class="adel" onclick="pwConfirm('是否确认删除?',this,function(){ajaxdel('$value[pid]')});" title="删除">删除</a><a href="{$basename}a=editphoto&pid=$value[pid]" class="aedit mr5" title="编辑">编辑</a>
+<!--
+EOT;
+}print <<<EOT
+-->共{$value[c_num]}条评论</p><p>$value[uptime]</p>
+</li>
+<!--
+EOT;
+}print <<<EOT
+-->
+				</ul>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+				<div class="tac p15 f14">相册暂时没有照片</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+			</div>
+			<div class="p10">$pages</div>
+<!--
+EOT;
+} elseif ($a == 'view') {
+print <<<EOT
+-->
+			<div class="p10 bdB mb10">
+<span class="fr">
+<!--
+EOT;
+if ($isown){print <<<EOT
+-->
+<a href="{$basename}a=upload&job=flash&aid=$photo[aid]">上传</a>&nbsp;┊&nbsp;<a href="{$basename}a=editphoto&pid=$photo[pid]" class="mr20">编辑</a><!--
+EOT;
+}print <<<EOT
+--><a href="apps.php?q=collection&a=favor&type=photo&ajax=1&id=$photo[pid]&ptype=photo" onclick="return ajaxurl(this)" class="mr10 allCollect">收藏</a>
+<!--
+EOT;
+	if ($weiboPriv) {print <<<EOT
+-->
+<a href="javascript:;" onclick="sendmsg('operate.php?action=toweibo&ajax=1&type=photo&id=$photo[pid]','',this.id);" class="allForward">新鲜事</a>
+<!--
+EOT;
+	}print <<<EOT
+-->
+</span>
+<!--
+EOT;
+if ($isown) {print <<<EOT
+-->
+				<a href="{$basename}" class="b">我的相册</a> &raquo; <a href="{$basename}a=album&aid=$photo[aid]{$friendurl}" class="b">$photo[aname]</a> <span class="b s5">($photo[photonum])</span>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+				<a href="{$basename}a=friend" class="b">好友相册</a> &raquo; <span class="s5 b">$photo[owner]的相册</span> &raquo; <a href="{$basename}a=album&aid=$photo[aid]{$friendurl}" class="b">$photo[aname]</a> <span class="b s5">($photo[photonum])</span>
+<!--
+EOT;
+}print <<<EOT
+-->
+			</div>
+			<div class="sidePhoto">
+				<div class="p_lr_10">
+				<div class="galbum_photo" id="imgtop">
+					<div id="img_list">
+<!--
+EOT;
+if($photo[photonum]>5){print<<<EOT
+-->
+						<div class="prePhoto mb5"><a onclick="return ajaxpage('{$basename}a=next&pid=$photo[pid]{$friendurl}','pre');">上一张</a></div>
+<!--
+EOT;
+}print<<<EOT
+-->
+<!--
+EOT;
+foreach($nearphoto as $value){
+$ifsel = ($pid == $value[pid]) ? 'class="current"' : '';
+print <<<EOT
+-->
+							<ul class="g_listA cc" id="imglist_{$value[pid]}">
+<!--
+EOT;
+if($value[pid]=='begin'||$value[pid]=='end'){
+print <<<EOT
+-->
+								<li><div class="aimg"><a href="javascript:;"><img src="$value[path]" /></a></div></li>
+<!--
+EOT;
+} else {print <<<EOT
+-->
+								<li $ifsel><div class="aimg"><a href="{$basename}a=view&pid=$value[pid]{$friendurl}"><img src="$value[path]" onload="if(this.width>100){this.width = 100;} else if(this.height>100){this.height=100;}" /></a></div></li>
+<!--
+EOT;
+}print <<<EOT
+-->
+							</ul>
+<!--
+EOT;
+}print <<<EOT
+-->
+<!--
+EOT;
+if($photo[photonum]>5){print<<<EOT
+-->
+							<div class="nextPhoto"><a onclick="return ajaxpage('{$basename}a=pre&pid=$photo[pid]{$friendurl}','next');">下一张</a></div>
+<!--
+EOT;
+}print <<<EOT
+-->
+					</div>
+				</div>
+				<div class="p10">
+					<div>上传于{$photo[uptime]}</div>
+					<div>浏览（$photo[hits]）</div>
+					<div>评论（$photo[c_num]）</div>
+				</div>
+				</div>
+			</div>
+			<div class="contPhoto">
+			<div class="p_lr_10">
+				<div class="galbum_photo_con mb10">
+					<div class="pr" id="showphoto">
+					<a onclick="return ajaxpage('{$basename}a=next&pid=$photo[pid]{$friendurl}','pre');" class="aPre" title="上一张"></a>
+					<a onclick="return ajaxpage('{$basename}a=pre&pid=$photo[pid]{$friendurl}','next');" class="aNext" title="下一张"></a>
+					<table cellpadding="0" cellspacing="0" width="100%" style="table-layout:fixed;">
+						<tr>
+							<td class="prePhoto">
+								<div class="p15"><a href="javascript:;" class="fl">上一张</a></div>
+							</td>
+							<td height="400" style="vertical-align:middle">
+								<div class="tac p20" id="img-width"><img id="imgview" src="$photo[path]" onload="if(this.width>600){this.width = 600;}" /></div>
+							</td>
+							<td class="nextPhoto">
+								<div class="p15"><a href="javascript:;" class="fr">下一张</a></div>
+							</td>
+						</tr>
+					</table>
+					</div>
+					<div class="onePhototip">
+						<div class="fr s7"><a href="javascript:;" onclick="ImgClick();" class="s7">原图</a>&nbsp;┊&nbsp;<a href="javascript:;" onclick="sendmsg('pw_ajax.php?action=report&type=photo&tid=$pid&pid=$u','',this.id);" id="report_photo" class="s7">举报</a>&nbsp;┊&nbsp;<!--
+EOT;
+if ($isown){print <<<EOT
+--><a href="javascript:;" onclick="pwConfirm('是否将本照片设为封面？',this,function(){ajaxSetCover('$photo[pid]')});" class="s7">设为封面</a>&nbsp;┊&nbsp;<!--
+EOT;
+}if($isown || $photoService->isDelRight()){print <<<EOT
+-->
+<a href="javascript:;" onclick="pwConfirm('是否确认删除?',this,function(){ajaxdel('$photo[pid]')});" title="删除" class="s7">删除</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+						</div>
+						<div>$photo[pintro]</div>
+					</div>
+				</div>
+				<div>
+<!-- 
+EOT;
+$rateSets = unserialize($db_ratepower);
+if($rateSets[3] && isset($db_hackdb['rate'])){
+print <<<EOT
+--><link rel="stylesheet" type="text/css" href="hack/rate/images/rate.css" />
+				<script language="JavaScript" src="js/rate_ajax.js"></script>
+				<script language="javascript">
+				var before = window.onload;
+				window.onload = function() {
+					before ? before():0;
+					rate.getVote("vote_box","{$db_bbsurl}/hack.php?H_name=rate&action=ajax","elementid=vote_box&typeid=3&objectid={$pid}&authorid={$u}");
+				};
+				</script>						
+				<div id="vote_box" class="mt10"></div>
+<!-- 
+EOT;
+}
+print <<<EOT
+-->	
+<script language="JavaScript" src="js/pw_photolist.js"></script>
+<script language="JavaScript">
+var photolist = new photoList('img_list','$pid','$aid');
+
+function toBreakWord(intLen){
+var obj=document.getElementById("ff");
+var strContent=obj.innerHTML;
+var strTemp="";
+while(strContent.length>intLen){
+strTemp+=strContent.substr(0,intLen)+"<br>";
+strContent=strContent.substr(intLen,strContent.length);
+}
+strTemp+=""+strContent;
+obj.innerHTML=strTemp;
+}
+//if(document.getElementById  &&  !document.all)  toBreakWord(100)
+</script>
+<div class="c"></div>
+<script language="JavaScript" src="js/app_comment.js"></script>
+<div class="c mb10">&nbsp;</div>
+<!--
+EOT;
+require_once PrintEot('m_comment');print <<<EOT
+-->
+<script language="JavaScript">
+
+function ImgClick()
+{
+	var url = getObj('imgview');
+	if (url.parentElement){
+		if (url.parentElement.tagName!="A"){
+			if (url.src) window.open(url.src);
+		}
+	}else{
+		if (url.src) window.open(url.src);
+	}
+}
+function ajaxpage(url,type) {
+	var tourl = '{$basename}a=view{$friendurl}';
+	ajax.send(url,'',function() {
+		var rText = ajax.request.responseText.split('\t');
+		if (rText[0] == 'ok') {
+			if (rText[1]) {
+				window.location.href = tourl + '&pid=' + rText[1];
+			} else {			
+				var message = type == 'next' ? '已经是最后一张照片' : '已经是第一张照片';
+				showDialog('warning',message,2);
+			}
+		} else {
+			ajax.guide();
+		}
+	});
+	return false;
+}
+function bbimg()
+{
+	if (event.ctrlKey){
+		var zoom=parseInt(this.style.zoom, 10)||100;
+		zoom+=event.wheelDelta/12;
+		if (zoom>0) this.style.zoom=zoom+'%';
+		return false;
+	}else{
+		return true;
+	}
+}
+</script>
+				</div>
+			</div>
+			</div>
+<!--
+EOT;
+} elseif ($a == 'editphoto') {print <<<EOT
+-->
+<div class="tips">编辑照片<span class="p_lr_10">|</span><a href="{$basename}a=view&pid=$pid">返回照片</a></div>
+<div class="p15">
+								<form action="{$basename}a=$a" method="post">
+								<input type="hidden" name="step" value="3" />
+								<input type="hidden" name="pid" value="$pid" />
+								<table cellpadding="0" cellspacing="0" width="100%" class="setTable">
+										<tr>
+												<th class="th">选择相册</th><td class="td"><div class="dropdown"><select name="aid" id="aidsel_info">{$options}</select></div></td>
+										</tr>
+										<tr>
+												<th class="th">描述</th>
+												<td class="td"><textarea id="pintro" name="pintro" class="textareaA mb5">$photo[pintro]</textarea><div id="pintro_warn" class="gray">限 255 字节</div></td>
+										</tr>
+										<tr class="tr6">
+												<th class="th">&nbsp;</th>
+												<td class="td"><span class="btn"><span><button type="submit">编辑照片</button></span></span>
+												</td>
+										</tr>
+								</table>
+								</form>
+<script language="JavaScript">
+var charset = '$db_charset';
+initCheckTextNum('pintro','pintro_warn',255);
+</script>
+</div>
+<!--
+EOT;
+} elseif ($a == 'upload') {
+print <<<EOT
+-->
+<!--
+EOT;
+$shortcut=@$_GET['s']?' target=formiframe ':'';
+$formiframe=$shortcut?"<iframe src=javascript:; width=0 height=0 name='formiframe' onload=\"if(this.contentWindow.document.body.innerHTML.indexOf('操作完成')>0){showDialog('success','上传成功!')&(read.menu.style.top='400px')&getObj('uploadPhotoForm').reset()}\"></iframe>":"";
+if (empty($job)) {
+print <<<EOT
+-->
+<div class="tips"><a href="{$basename}a=$a&job=flash&aid=$aid" class="current">批量上传</a></div>
+<div class="p15">
+<h5 class="h5 mb15"><strong>上传照片</strong></h5>
+<form action="{$basename}a=$a&job=$job" id="uploadPhotoForm" enctype="multipart/form-data" method="post" $shortcut >
+<input type="hidden" name="step" value="3" />
+<input type="hidden" name="verify" value="$verifyhash" />
+$formiframe
+	<table width="100%" class="setTable vt">
+		<tr>
+			<th class="th">选择相册</th>
+			<td class="td">
+<!--
+EOT;
+if ($options) {print <<<EOT
+-->
+				<div class="dropdown mr20"><select name="aid" id="aidsel_info" onchange="getallowflash(this.value);">{$options}</select></div>
+				<a href="{$basename}a=createajax" onclick="return ajaxurl(this);" class="mr20">创建新相册</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+				<span class="gray" id="allowflash">请选择相册</span>
+			</td>
+		</tr>
+		<tr>
+		<th class="th">选择照片</th>
+			<td class="td">
+				<p class="mb10">单张照片不得大于{$o_maxfilesize}kb</p>
+<!--
+EOT;
+$show2rows=$shortcut?"style=display:none":"";
+print <<<EOT
+-->
+		<div class="photoup">
+			<dl class="cc">
+				<dt><span><img id="preview_1" style="filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod=image);" src="$imgpath/90.png"></span></dt>
+				<dd><p><input type="file" class="input" name="photo_1" id="p_1" accept="image/*" onchange="preview_img(1);"/></p>
+				<p style="margin-top:8px;"><textarea id="pintro_1" name="pintro[1]" class="textareaA mb5"></textarea></p>
+				<span class="s6" id="pintro_1_warn">限255字节</span>
+				</dd>
+			</dl>
+			<dl class="cc">
+				<dt><span><img id="preview_2" style="filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod=image);" src="$imgpath/90.png"></span></dt>
+				<dd><p><input type="file" class="input" name="photo_2" id="p_2" accept="image/*" onchange="preview_img(2);"/></p>
+				<p style="margin-top:8px;"><textarea id="pintro_2" name="pintro[2]" class="textareaA mb5"></textarea></p>
+				<span class="s6" id="pintro_2_warn">限255字节</span>
+				</dd>
+			</dl>
+			<dl class="cc">
+				<dt><span><img id="preview_3" style="filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod=image);" src="$imgpath/90.png"></span></dt>
+				<dd><p><input type="file" class="input" name="photo_3" id="p_3" accept="image/*" onchange="preview_img(3);"/></p>
+				<p style="margin-top:8px;"><textarea id="pintro_3" name="pintro[3]" class="textareaA mb5"></textarea></p>
+				<span class="s6" id="pintro_3_warn">限255字节</span>
+				</dd>
+			</dl>
+		</div>
+<!--
+EOT;
+if ($o_photos_gdcheck) {print <<<EOT
+-->
+			<div class="cc mb10"><div style="width:100px;" class="fl tar mr10">认证码: </div><input class="input" onfocus="showCK();" type="text" name="gdcode" id="gdcode" size="5" tabindex="3"  /> <img id="ckcode" style="cursor:pointer;display:none; vertical-align:top;" onclick="this.src='ck.php?nowtime='+new Date().getTime();" alt="看不清楚，换一张" align="absmiddle" /></div>
+<script language="JavaScript">
+function showCK(){
+	getObj('ckcode').style.display="";
+	if (getObj('ckcode').src.indexOf('ck.php') == -1) {
+		getObj('ckcode').src = 'ck.php?nowtime=' + new Date().getTime();
+	}
+}
+</script>
+<!--
+EOT;
+}if($o_photos_qcheck){print <<<EOT
+-->
+			<div class="cc mb5"><div style="width:100px;height:60px;" class="fl tar mr10">验证问答: </div>
+			<div class="mb5">{$db_question[$qkey]} 
+<!--
+EOT;
+if($showq){print <<<EOT
+-->
+			（正确答案:{$db_answer[$qkey]}）
+<!--
+EOT;
+}print <<<EOT
+-->
+			</div>
+			<input class="input" name="qanswer" id="qanswer" size="25" tabindex="7" />
+			<input type="hidden" name="qkey" id="qkey" value="$qkey" /></div>
+<!--
+EOT;
+}print <<<EOT
+-->
+			</td>
+		</tr>
+	</table>
+	<div class="p10 tac"><span class="btn"><span><button type="submit">开始上传</button></span></span></div>
+</form>
+</div>
+<script language="JavaScript">
+var charset = '$db_charset';
+initCheckTextNum('pintro_1','pintro_1_warn',255);
+initCheckTextNum('pintro_2','pintro_2_warn',255);
+initCheckTextNum('pintro_3','pintro_3_warn',255);
+function preview_img(id){
+	var photype = getObj('p_'+id);
+	var patn = /\.jpg$|\.jpeg$|\.png|\.bmp|\.gif$/i;
+	if(patn.test(photype.value)){
+		var Preview = getObj('preview_'+id);
+		if (is_gecko) {
+			Preview.src = photype.files[0].getAsDataURL();
+		} else if (is_ie) {
+			Preview.filters.item("DXImageTransform.Microsoft.AlphaImageLoader").src = photype.value;
+			Preview.filters.item("DXImageTransform.Microsoft.AlphaImageLoader").sizingMethod = 'scale';
+		}
+	} else {
+		showDialog('error','您选择的似乎不是图像文件。',2);
+	}
+}
+</script>
+<!--
+EOT;
+} elseif ($job == 'flash') {print<<<EOT
+-->
+<div class="tips"><a href="{$basename}a=$a&aid=$aid" class="current">普通上传</a></div>
+<div class="p15">
+<h5 class="h5 mb15"><strong>上传照片</strong></h5>
+<script type="text/javascript" src="js/photouploader.js"></script>
+<script type="text/javascript" src="js/swfobject.js"></script>
+<script type="text/javascript">
+	swfobject.registerObject('mutiupload','10.0.0','js/expressInstall.swf');
+</script>
+	<table width="100%" class="setTable vt">
+		<tr>
+			<th class="th">选择相册</th>
+			<td class="td">
+<!--
+EOT;
+if ($options) {print <<<EOT
+-->
+				<div class="dropdown mr20"><select name="aid" id="aidsel_info" onchange="getallowflash(this.value);">{$options}</select></div>
+				<a href="{$basename}a=createajax&job=flash" onclick="return ajaxurl(this);" class="mr20">创建新相册</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+				<span class="gray" id="allowflash">请选择相册</span>
+			</td>
+		</tr>
+		<tr>
+			<th class="th">选择照片</th>
+			<td class="td">
+				<p>单张照片不得大于{$o_maxfilesize}kb</p>
+				<div class="g_photosbox">
+					<div id="viewimg" class="menu mb10" style="display:none;"></div>
+                    <object id="mutiupload" name="mutiupload" classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" width="250" height="46">
+                      <param name="movie" value="images/uploader.swf" />
+                      <param name="FlashVars" value="url=$db_bbsurl%2Fjob.php%3Faction%3Dmutiuploadphoto"/>
+                      <param name="allowScriptAccess" value="always" />
+                      <param name="wmode" value="transparent" />
+                      <!--[if !IE]>-->
+                      <object type="application/x-shockwave-flash" data="images/uploader.swf" width="250" height="46" FlashVars="url=$db_bbsurl%2Fjob.php%3Faction%3Dmutiuploadphoto"  allowScriptAccess="always">
+                      <!--<![endif]-->
+                        <p>Alternative content</p>
+                      <!--[if !IE]>-->
+                      </object>
+                      <!--<![endif]-->
+                    </object>
+                    <table width="450"><tr><td class="wname">文件名</td><td>描述</td><td width="15%">大小</td><td width="25%">上传进度</td><td width="5%">删</td></tr><tbody id="qlist"></tbody></table>
+					<div id="attsize"></div>
+				</div>
+			</td>
+		</tr>
+	</table>
+<script language="JavaScript">
+var wo=window.onload;
+window.onload=function()
+{
+wo?wo():0;
+uploader.init();
+uploader.baseurl = '$basename';
+};
+</script>
+</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+<script language="JavaScript">
+function getallowflash(aid) {
+	ajax.send('{$basename}a=getallowflash&aid='+aid,'',function() {
+		var job = '$job';
+		if(job == 'flash')
+		   uploader.setAlbumId(aid);
+		var rText = ajax.request.responseText.split('\\t');
+		if (rText[0] == 'ok') {
+			if ( rText[1] == 'infinite') {
+				if(job == "flash")
+					uploader.setLimits(Infinity);
+				getObj('allowflash').innerHTML = '';
+			} else if (rText[1]) {
+				if(job == "flash")
+					uploader.setLimits(rText[1]);
+				getObj('allowflash').innerHTML = '您还可以上传'+rText[1]+'张照片';
+			} else {
+				getObj('allowflash').innerHTML = '请选择相册';
+			}
+		} else {
+			ajax.guide();
+		}
+	});
+	return false;
+}
+var wo2=window.onload;
+window.onload=function()
+{
+	wo2?wo2():0;
+	getallowflash(getObj('aidsel_info').value);
+};
+</script>
+<!--
+EOT;
+} elseif ($a == 'create') {print <<<EOT
+-->
+<div class="p15">
+	<div class="mb10 s5 b">
+<!--
+EOT;
+if ($a == 'create') {print <<<EOT
+-->
+				创建新相册
+<!--
+EOT;
+if ($tips == 1) {print <<<EOT
+-->
+				<span class="s1">* 您还未曾创建相册，请先建立一个！</span>
+<!--
+EOT;
+}} else {print <<<EOT
+-->
+				编辑相册
+<!--
+EOT;
+}print <<<EOT
+-->
+	</div>
+<div class="p5">
+<form action="{$basename}a=$a" method="post">
+<input type="hidden" name="step" value="3" />
+<input type="hidden" name="aid" value="$aid" />
+<input type="hidden" name="verify" value="$verifyhash" />
+<table cellpadding="0" cellspacing="0" width="100%" class="setTable">
+	<tr>
+		<th class="th">相册名<span class="s1">*</span></th><td class="td"><input class="input input_wa mr10" type="text" name="aname" value="{$albumInfo[aname]}" id="aname" autocomplete="off"/><span id="aname_warn" class="gray">限 24 字节</span></td>
+	</tr>
+	<tr>
+		<th class="th">描述</th><td class="td">
+			<textarea id="aintro" name="aintro" class="textareaA mb5">{$albumInfo[aintro]}</textarea>
+			<p id="aintro_warn" class="gray"> 限 255 字节</p>
+		</td>
+	</tr>
+	<tr>
+		<th class="th">可见度</th>
+		<td class="td"><div class="dropdown">
+			<select name="private" onchange="optionsel(this.value)" id="aidsel_info">
+				<option value="0" $select_0>全站用户可见</option>
+				<option value="1" $select_1>仅好友可见</option>
+				<option value="2" $select_2>仅自己可见</option>
+				<option value="3" $select_3>需要密码访问</option>
+			</select></div>
+		</td>
+	</tr>
+	<tbody id="photopwd" style="display:none">
+	<tr>
+		<th class="th">输入密码</th>
+		<td class="td">
+			<input type="password" name="pwd" class="input_wa input mr10" id="pwdinfo" /><span id="pwdinfo_warn" class="gray">最小长度:3 最大长度:15</span>
+		</td>
+	</tr>
+	<tr>
+		<td class="th">确认密码</td>
+		<td class="td">
+			<input type="password" name="repwd" class="input input_wa" />
+		</td>
+	</tr>
+	</tbody>
+<!--
+EOT;
+if ($o_photos_gdcheck) {print <<<EOT
+-->
+	<tr>
+		<th class="th">认证码</th>
+		<td class="td">
+			<input class="input" onfocus="showCK();" type="text" name="gdcode" id="gdcode" style="width:50px;" tabindex="3"  />
+			<img id="ckcode" style="cursor:pointer;display:none; vertical-align:top;" onclick="this.src='ck.php?nowtime='+new Date().getTime();" alt="看不清楚，换一张" />
+<script language="JavaScript">
+function showCK(){
+getObj('ckcode').style.display="";
+if (getObj('ckcode').src.indexOf('ck.php') == -1) {
+getObj('ckcode').src = 'ck.php?nowtime=' + new Date().getTime();
+}
+}
+</script>
+		</td>
+	</tr>
+<!--
+EOT;
+}if($o_photos_qcheck){print <<<EOT
+-->
+	<tr>
+		<th class="th">验证问答</th>
+		<td class="td">
+		<div class="mb5"> {$db_question[$qkey]} （正确答案:{$db_answer[$qkey]}）</div>
+		<input class="input" name="qanswer" id="qanswer" size="25" tabindex="7" />
+		<input type="hidden" name="qkey" id="qkey" value="$qkey" />
+		</td>
+	</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+	<tr>
+		<th class="th">&nbsp;</th>
+		<td class="td">
+		<span class="btn"><span><button type="submit">创建相册</button></span></span>
+		</td>
+	</tr>
+</table>
+</form>
+</div>
+</div>
+<script language="JavaScript">
+var charset = '$db_charset';
+initCheckTextNum('aname','aname_warn',24);
+initCheckTextNum('aintro','aintro_warn',255);
+initCheckTextNum('pwdinfo','pwdinfo_warn',15);
+
+function optionsel(id) {
+	pwdobj = getObj('photopwd');
+	if (isNaN(id)) {
+		showDialog('error','非法操作');
+	}
+	if (id == '3') {
+		pwdobj.style.display = '';
+	} else {
+		pwdobj.style.display = 'none';
+	}
+}
+</script>
+<!--
+EOT;
+}print <<<EOT
+-->
+<script language="JavaScript">
+function ajaxdel(pid) {
+	ajax.send('{$basename}&a=delphoto&pid='+pid,'',function() {
+		var rText = ajax.request.responseText.split('\\t');
+		if (rText[0] == 'ok') {
+			window.location =  basename+'a=album&aid='+rText[1];
+		} else {
+			ajax.guide();
+		}
+	});
+	return false;
+}
+function ajaxSetCover(pid){
+	ajax.send('{$basename}&a=setcover&pid='+pid,'',function() {
+		var rText = ajax.request.responseText.split('\\t');
+		if (rText[0] == 'ok') {
+			showDialog('success','设置封面成功!',1);
+		} else {
+			ajax.guide();
+		}
+	});
+	return false;
+}
+</script>
+</div>
+<script type="text/javascript" src="js/select.js"></script>
+<script type="text/javascript">
+var photoselect = new sSelect(getObj('aidsel_info'));
+</script>
+</div>
+</div>
+<!--
+EOT;
+require_once(uTemplate::printEot('footer'));
+?>-->

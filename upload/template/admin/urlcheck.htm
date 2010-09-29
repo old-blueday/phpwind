@@ -1,0 +1,89 @@
+<!--<?php
+include_once PrintEot('left');
+$ischeck_yes = $db_windpost['checkurl'] ? 'checked' : '';
+$ischeck_no = !$db_windpost['checkurl'] ? 'checked' : '';
+$strategy_empty = $db_urlcheckstrategy == '' ? 'checked' : '';
+$strategy_verify = $db_urlcheckstrategy == 'verify' ? 'checked' : '';
+$strategy_exception = $db_urlcheckstrategy == 'exception' ? 'checked' : '';
+$bl_strategy_empty = $db_blurlcheckstrategy == '' ? 'checked' : '';
+$bl_strategy_exception = $db_blurlcheckstrategy == 'exception' ? 'checked' : '';
+print <<<EOT
+-->
+<div class="admin_info mb10">
+    <h3 class="h1"><b>提示信息</b></h3>
+    <div class="legend">使用此功能可以有效过滤帖子中的链接。你可以设置允许的外链或屏蔽特定的链接<br />请在以下对应的文本框中列出你确定的链接地址，每行一个<br />白名单：可在本站点无限制发表的链接<br />黑名单：禁止在本站点发表的链接</div>
+</div>
+<form action=$basename method=post name="submit">
+  <h3 class="h1">帖子外链提醒及白名单设置</h3>
+  <div class="admin_table mb10">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <tr class="tr1 vt">
+      <td class="td1"> 帖子中开启外链提醒 </td>
+      <td class="td2">
+        <ul class="list_A list_80 cc">
+            <li><input name="ischeckurl" type="radio" value="1" $ischeck_yes>开启</li>
+            <li><input name="ischeckurl" type="radio" value="0" $ischeck_no>关闭</li>
+         </ul>
+        </td><td class="td2"><div class="help_a"></div></td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1"> 白名单链接地址
+        </td>
+      <td class="td2"><textarea name="urlinfo" class="textarea">$urlinfo</textarea></td>
+	  <td class="td2"><div class="help_a"> 如phpwind.net 表示允许该域名下的所有链接<br>
+        abc.phpwind.net 表示允许此二级域名下的所有链接</div></td>
+    </tr>
+  </table>
+  </div>
+  <h3 class="h1">帖子外链审核</h3>
+  <div class="admin_table mb10">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <tr class="tr1 vt">
+      <td  class="td1">帖子外链数量限制</td>
+      <td class="td2"><input type="text" class="input input_wa" name="urlchecklimit" value="$db_urlchecklimit" />
+        个</td><td class="td2"><div class="help_a">白名单中的链接不在计数范围</div></td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">帖子外链审核策略</td>
+      <td class="td2">
+        <ul class="cc list_120 fl list_A">
+            <li><input name="urlcheckstrategy" type="radio" value="" $strategy_empty>直接发表</li>
+            <li><input name="urlcheckstrategy" type="radio" value="verify" $strategy_verify>转为待审核状态</li>
+            <li><input name="urlcheckstrategy" type="radio" value="exception" $strategy_exception>禁止发表</li>
+         </ul>
+        </td><td class="td2"><div class="help_a">当帖子外链数超过限制时才生效</div></td>
+    </tr>
+  </table>
+  </div>
+  <h3 class="h1">帖子外链黑名单</h3>
+  <div class="admin_table mb10">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <tr class="tr1 vt">
+      <td  class="td1"> 帖子外链黑名单 </td>
+      <td class="td2">
+      	<ul class="list_A list_80 cc">
+		 <li><input name="blurlcheckstrategy" type="radio" value="exception" $bl_strategy_exception>开启 </li>
+            <li><input name="blurlcheckstrategy" type="radio" value="" $bl_strategy_empty>关闭</li>
+           
+         </ul>
+        </td><td class="td2"><div class="help_a"></div></td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1"> 黑名单链接地址 <span class="gray">
+       </span> </td>
+      <td class="td2"><textarea class="textarea" name="urlblackinfo">$urlblackinfo</textarea></td>
+	  <td class="td2"><div class="help_a">如phpwind.net 表示禁止该域名下的所有链接<br />
+        abc.phpwind.net 表示禁止此二级域名下的所有链接</div> </td>
+    </tr>
+  </table>
+  </div>
+  <input type=hidden name="action" value="unsubmit">
+  <div class="tac mb10">
+   <span class="btn"><span><button type="submit">提 交</button></span></span>
+ </div>
+</form>
+<!--
+EOT;
+include_once PrintEot('adminbottom');
+?>
+-->

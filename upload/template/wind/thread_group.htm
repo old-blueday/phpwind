@@ -1,0 +1,115 @@
+<!--<?php
+print <<<EOT
+-->
+<script src="js/Deploy.js"></script>
+<link rel="stylesheet" type="text/css" href="$imgpath/g/colony.css" />
+<div class="hB mb10">
+	<a href="thread.php?cyid=$cyid&showtype=member&a=invite" class="mr10 fr">邀请朋友加入</a>
+<!--
+EOT;
+if ($colony['ifcyer']) {
+if ($colony['admin'] != $windid) {print <<<EOT
+-->
+	<a href="apps.php?q=group&a=out&cyid=$cyid" onclick="return ajaxurl(this);" class="mr10 fr">退出群组</a>
+<!--
+EOT;
+}} else {print <<<EOT
+-->
+	<a href="apps.php?q=group&a=join&cyid=$cyid&frombbs=1" onclick="return ajaxurl(this);" class="mr10 fr">+申请加入</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+	<ul class="tabB cc" style="padding-left:0;">
+		<li id="g_colony"><a href="thread.php?cyid=$cyid" hidefocus="true">$colony[cname]</a></li>
+<!--
+EOT;
+foreach ($newColony->right['modeset'] as $key => $value) {
+if ($key != 'thread' && $value['ifopen']) {
+print <<<EOT
+-->
+		<li id="g_{$key}"><a href="thread.php?cyid=$cyid&showtype=$key" hidefocus="true">{$value['title']}</a></li>
+<!--
+EOT;
+}}if ($ifadmin) {print <<<EOT
+-->
+		<li id="g_set"><a href="thread.php?cyid=$cyid&showtype=set" hidefocus="true">管理</a></li>
+<!--
+EOT;
+}$tmpAction = ($showtype == 'galbum') ? 'q=galbum&' : ('q=group&' . (in_array($showtype, array('write','member','active','set')) ? "a=$showtype&" : ''));
+if(empty($colony['viewtype'])){
+print <<<EOT
+-->
+		<li class="forums"><a href="apps.php?{$tmpAction}cyid=$cyid{$tmpUrlAdd}" hidefocus="true"><span class="s2 cp">切换至群组视图</span></a></li>
+<!--
+EOT;
+}print <<<EOT
+-->
+	</ul>
+	<script type="text/javascript">setCurrent('g_{$showtype}','g_colony','current')</script>
+</div>
+<!--
+EOT;
+if (!$showtype) {print <<<EOT
+-->
+<div class="threadInfo mb10">
+    <table>
+        <tr class="vt">
+            <td width="90" class="tar pd15"><img src="$colony[cnimg]" style="width:90px;height:90px;" /></td>
+            <td>
+            	<p class="mb5 f14 b">$colony[cname]</p>
+                <p class="mb5">$colony[descrip]</p>
+                <p class="mb5">分类：<span class="mr20"><a href="apps.php?q=groups&a=all&styleid={$colony['styleid']}" target="_blank" class="s4">{$o_styledb[$colony['styleid']]['cname']}</a></span>创建：<span class="mr20 s4">$colony[createtime_s]</span>成员：<span class="mr20 s4"><a href="thread.php?cyid=$cyid&showtype=member">$colony[members]</a></span>积分：<span class="mr20">$colonyNums</span></p>
+                <p class="mb5">
+					群主：<span class="mr20"><a href="u.php?username=$colony[admin]" target="_blank" title="{$colony[admin]}" class="s4">$colony[admin]</a></span>
+<!--
+EOT;
+if (count($magdb) > 1) {print <<<EOT
+-->
+					管理员：<span class="mr20">
+<!--
+EOT;
+foreach ($magdb as $key => $value) {
+if ($value['username'] != $colony['admin']) {print <<<EOT
+-->
+						<a href="u.php?uid=$key" target="_blank">{$value['username']}</a>
+<!--
+EOT;
+}}print <<<EOT
+-->
+					</span>
+<!--
+EOT;
+}print <<<EOT
+-->
+				</p>
+            </td>
+        </tr>
+    </table>
+</div>
+<!--
+EOT;
+if ($colony['annouce'] && ($colony['ifannouceopen'] || $colony['ifFullMember'])) {print <<<EOT
+-->
+<div class="pd15">
+	<div class="tabA">
+		<a class="fr closeicon" href="javascript:;" onclick="return IndexDeploy('thread',0);"><img alt="展开收起" id="img_thread" src="$imgpath/$stylepath/index/cate_$thread_img.gif" /></a>
+		<ul class="cc">
+			<li id="tab_t1" class="current"><a href="javascript:;">群公告</a></li>
+		</ul>
+	</div>
+	<div id="cate_thread" style="$cate_thread">
+		<div id="tab_1">
+			<table width="100%" style="table-layout:fixed;">
+				<tr>
+					<td>
+						<div class="p10">$annouce</div>
+					</td>
+				</tr>
+			</table>
+		</div>
+	</div>
+</div>
+<!--
+EOT;
+}}?>

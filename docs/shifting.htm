@@ -1,0 +1,107 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>PHPWind用户安装说明书</title>
+<link href="phpwind_help.css" type="text/css" rel="stylesheet" />
+
+</head>
+<body>
+<div id="wrap">
+    <div id="wrap2">
+        
+		<script language="JavaScript" src="header.js"></script> 
+        <div id="main">   
+		
+ <div class="place">您所在的位置：<a href="index.html">PHPWind 安装说明</a> > <A href="styles.htm">高级应用</a> > <a href="shifting.htm">论坛系统的搬迁和转移</a></div>
+
+			<div id="left">
+			<!--左菜单栏 begin-->
+			  				<UL>
+		         <LI><A href="index.htm">简介</A></LI>
+
+				  <LI><A href="install.htm">安装指南</a>
+				    <UL>
+					<LI><A href="install.htm">系统环境说明</A></LI>
+					<LI><A href="install_steps.htm">程序安装流程</A></LI>
+					<LI><A href="install_files.htm">文件及目录结构</A></LI>
+					<LI><A href="upgrade.htm">程序升级流程</A></LI>
+					<LI><A href="upgrades_change.htm">版本说明</A></LI>
+					<LI><A href="install_space.htm">安装集成包介绍</A></LI>
+					</UL>
+				 </LI>
+				
+				 <LI><A href="basic.htm">功能使用</A></LI> 
+				  
+				 <LI><A href="basic_que.htm">常见问题</A></LI>
+				  
+				 <LI><A href="styles.htm">高级应用</a>
+                    <UL>
+				    <LI><a href="styles.htm">界面风格与模板定制</a></LI>
+                    <LI><a href="Sub-forum.htm">使用PHPWind分论坛</a></LI>
+					<LI><A href="plugins.htm">插件相关</A></LI>
+					<LI ><a href="shifting.htm">论坛系统的搬迁和转移</a></LI>
+					<LI><A href="tools.htm">转换工具</A></LI>
+				    </UL>
+				  </LI>
+				  <LI><A href="about_seo_7items.htm">SEO技巧</a>
+                    <UL>
+				    <LI><a href="about_seo_7items.htm">搜索引擎优化</a></LI>
+                    <LI><a href="about_lable_seo.htm">网页标题收录</a></LI>
+					<LI><A href="urlrewrite.htm">伪静态的使用</A></LI>
+					</UL>
+				  </LI>
+			
+			</UL>
+				<!--左菜单栏 end-->
+            </div>
+			
+       		
+          		<div class="viewnew">
+<h3 style="text-align:center">论坛系统的搬迁和转移</h3><br>
+<p class="gray" style=" text-align:center; text-indent:0;font-size:12px; border-bottom:1px dotted #d7d7d7">
+
+<p>PHPWind可以方便实现论坛系统的整体搬迁与转移，下文详细说明!
+<h5>1>>老服务器</h5>
+<p>1、备份数据库
+<br>进pw后台->系统工具->数据备分
+<br>进入页面会看到一个"数据库表",一个"非PHPWind数据库表 (论坛插件或其他系统的数据库表)" 
+<br>"数据库表"里面是PW程序用到的表,包括一些集成的插件都在里面,这个是主要的 
+<br>"非PHPWind数据库表"是这个数据库下的其他表,包括你装的一些其他插件,或者其他程序。
+<br>我们需要备分的是"数据库表"。将"数据库表"拖到最下面,点"全选",再选择"提交" 。
+<br>如果您装了额外插件(非PHPWind集成的)的,就需要备分一下"非PHPWind数据库表" 
+<br>备分好后生成的sql文件在data文件夹下面,形如pw_0722_046e9bc547_1.sql的文件,其中0722为日期,要看准确, 用FTP工具全部下载到本地.
+<p>2.备份附件
+<br>attachment文件夹，用FTP工具全部下载到本地 
+<p>其他如模板之类，可自行选择是否备份。
+
+<h5>2>>新服务器</h5> 
+<p>1、安装论坛
+<br>上传PHPWind安装包，版本与编码要跟之前老服务器上论坛一致，不然会出现乱码等，然后运行 
+你的域名/install.php来安装 
+<br>(如果您是下载的老服务器的所有程序的话,这里只需要上传install.php并且将data下面的install.lock文件删除即可, 这样可以安装,这步的作用是建立数据库,不然原来老的数据也没地方导入)
+<p>2、恢复数据
+<br>用FTP工具把刚才的*.sql文件全部拖到data文件夹里，进pw后台->系统工具->数据恢复 
+<br>点击任一一个导入即可，什么都不需要按，直到导入完成。如果数据比较大的话时间会久一点。
+<p>3、导入完成后，上传附件
+<br>把之前备分到本地的attachment文件夹里面的文件全部上传到新的服务器的attachment文件夹里面 
+<p>4、论坛管理->缓存管理，把每个缓存都更新一遍。 
+
+<h6>技巧及补充说明:</h6>
+<p>对于用户独立主机权限的站长,还有数据量比较大的站(超过400M的数据库时候)
+<br>这种情况用PW后台备分恢复时间会很漫长
+<br>一般情况下，超过200卷的备份，我们都建议用备份数据库源库的方法进行转移，一方面速度比较快，一方面操作更方便。
+<p>如果是windows服务器
+<br>找到mysql的安装目录,>>mysql>>data>>数据库名
+<p>如果是linux服务器
+<br>首先是停止mysql服务,然后直接将这个数据库下的所有打包,然后传到本地并上传到新的服务器上即可
+<br>注意点：
+<br>1.保证下mysql版本的统一就可以
+<br>2.停止mysql服务之后才可打包数据库
+          	</div>
+      </div>
+      <div class="clear"></div>   
+	  <script language="JavaScript" src="footer.js"></script>
+</div>
+</body>
+</html>

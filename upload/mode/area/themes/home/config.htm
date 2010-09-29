@@ -1,0 +1,849 @@
+
+
+<pw id="p8index_第一部分图片播放器" />
+<div id="pwSlidePlayer" class="pwSlide">
+<ul class="switch" id="SlayerA_1">
+	<list cachetime="1800" action="image" num="4" title="图片播放器大图" />
+	<loop>
+		<li class="switchItem" style="display:none"><a href="{url}"  target="_blank"><img src="{image,290,345}" width="290" height="345" />
+			<div class="txt">
+				<h3>{title,30}</h3>
+				<p>{descrip,40}</p>
+			</div>
+		</a></li>
+	</loop>
+</ul>
+<div class="pwSlide-bg"></div>
+<ol class="SwitchNav" id="SlayerA_2">
+<!--#foreach($pwresult as $value){#-->
+	<li class="switchNavItem"><a href="$value[url]"  target="_blank"><img src="$value[image]" width="47" height="47" /></a></li>
+<!--#}#-->
+</ol>
+</div>
+<script>ddSliderPlayers('SlayerA_1','SlayerA_2',2,'current');</script>
+
+
+<pw id="p8index_第一部分2标题" />
+<h3><span class="s1">生活</span>参考</h3>
+
+
+<pw id="p8index_第一部份2内容" />
+
+<div class="subject cc">
+<list cachetime="1800" num="1" action="image" title="图文模块" />
+<loop>
+ <a href="{url}" target="_blank"><img src="{image,90,60}" width="90" height="60" class="fl" style="padding:1px; margin-right:6px;" /></a>
+	<h4><a href="{url}" target="_blank">{title,22}</a></h4>
+	<p>{descrip,52}</p>
+	</loop>
+</div>
+<list cachetime="1800" num="5" action="subject" func="newsubject" rang="" ifpushonly="0" title="标题列表" />
+<ul class="list1 btSolid">
+	<loop>
+	<li><a href="{url}"  target="_blank" >【{forumname}】{title,35}</a></li>
+	</loop>
+</ul>
+
+
+<pw id="p8index_第一部分头条" />
+<list cachetime="1800" num="3" action="subject" ifpushonly="0" title="标题摘要" />
+<ul class="tops cc">
+	<loop>
+		<li>
+			<h2 class="t{$key}"><a href="{url}"  target="_blank" >【{forumname}】{title,10}</a></h2>
+			<p>{descrip,80}<a class="s1" href="{url}">（阅读全文）</a></p>
+		</li>
+	</loop>
+</ul>
+
+
+
+
+<pw id="p8index_第一部分头条标题列表" />
+<list cachetime="1800" action="subject" num="5" title="标题列表" />
+<ul class="list cc">
+	<loop>
+		<li><a href="{url}"><em class="s1">[{forumname}]</em>{title,40}</a></li>
+	</loop>
+</ul>
+
+<pw id="p8index_第一部分下方图文列表" />
+<list cachetime="1800" action="image" num="2" title="图文列表" />
+	<loop>
+		<div class="subject cc mt10"> <a href="{url}"  target="_blank" ><img src="{image,120,90}" width="120" height="90" class="fl" /></a>
+			<h4><a href="{url}"  target="_blank" >{title,25}</a></h4>
+			<p>{descrip,70}<a href="{url}"  target="_blank"  class="s1">[详细]</a></p>
+		</div>
+	</loop>
+
+
+<pw id="p8index_第一部分右侧顶部广告" /> 
+<a href="#"><img src="mode/area/themes/home/temp/ad250x225.png" width="250" height="225" /></a> 
+
+
+
+
+<pw id="p8index_第一部分右侧标题" />
+	<span class="s1">家居</span>生活
+	
+	
+<pw id="p8index_第一部分右侧内容切换按钮" />
+		<li class="switchNavItem"><a href="#">秀场</a></li>
+		<li class="switchNavItem"><a href="#">装修</a></li>
+		<li class="switchNavItem"><a href="#">设计</a></li>
+	
+
+
+
+<pw id="p8index_第一部分右侧切换1" />
+	<div class="switchItem" style="display:none">
+	<list cachetime="1800" num="1" action="image" ifpushonly="0" title="图文模块1" />
+		<div class="image">
+		<loop>
+		<a href="{url}"  target="_blank" ><img src="{image,220,130}" width="220" height="130" /><span>{title,28}</span></a>
+		</loop>
+		</div>
+			<list cachetime="1800" num="10" action="subject" ifpushonly="0" title="标题列表1" />
+		<ul class="list1">
+		<loop>
+			<li><a href="{url}"  target="_blank" >{title,32}</a></li>
+			</loop>
+		</ul>
+	</div>
+	
+<pw id="p8index_第一部分右侧切换2" />
+	<div class="switchItem" style="display:none">
+	<list cachetime="1800" num="1" action="image" ifpushonly="0" title="图文模块1" />
+		<div class="image">
+		<loop>
+		<a href="{url}"  target="_blank" ><img src="{image,220,130}" width="220" height="130" /><span>{title,28}</span></a>
+		</loop>
+		</div>
+			<list cachetime="1800" num="10" action="subject" ifpushonly="0" title="标题列表1" />
+		<ul class="list1">
+		<loop>
+			<li><a href="{url}"  target="_blank" >{title,32}</a></li>
+			</loop>
+		</ul>
+	</div>
+	
+<pw id="p8index_第一部分右侧切换3" />
+	<div class="switchItem" style="display:none">
+	<list cachetime="1800" num="1" action="image" ifpushonly="0" title="图文模块1" />
+		<div class="image">
+		<loop>
+		<a href="{url}"  target="_blank" ><img src="{image,220,130}" width="220" height="130" /><span>{title,28}</span></a>
+		</loop>
+		</div>
+			<list cachetime="1800" num="10" action="subject" ifpushonly="0" title="标题列表1" />
+		<ul class="list1">
+		<loop>
+			<li><a href="{url}"  target="_blank" >{title,32}</a></li>
+			</loop>
+		</ul>
+	</div>
+
+
+
+
+
+<pw id="p8index_第一部分侧栏广告2" /> 
+<a href="#"><img class="fl mr10" src="mode/area/themes/home/temp/ad708x85.png" width="708" height="85" /></a> <a href="#"><img class="fl" src="mode/area/themes/home/temp/ad230x85.png" width="230" height="85" /></a> 
+
+
+
+
+<pw id="p8index_第二部分1标题" /> 
+<span class="s1">精彩活动</span>速递 
+
+
+
+
+<pw id="p8index_第二部分2" />
+<list cachetime="1800" action="image" num="1" title="图文模块" />
+<loop>
+<a href="{url}" target="_blank"><img class="fl" src="{image,105,145}" width="105" height="145" /></a>
+<h4 class="s1"><a href="{url}"  target="_blank" >{title,26}</a></h4>
+<p>{descrip,140}<br />
+	<a href="#" class="s1">报名参加</a></p>
+</loop>
+
+
+<pw id="p8index_第二部分3" />
+<list cachetime="1800" action="subject" num="8" title="标题列表" />
+<loop>
+<li><a href="{url}"  target="_blank" ><em class="gray">[{forumname,8}]</em>{title,44}</a></li>
+</loop>
+
+
+<pw id="p8index_第二部分4" />
+<list cachetime="1800" action="image" num="6" title="图片列表" />
+	<loop>
+		<li><a href="{url}"  target="_blank" ><img src="{image,60,45}" width="60" height="45" />{title,10}</a></li>
+	</loop>
+
+
+<pw id="p8index_第三部分广告1" /> 
+<a href="#"><img src="mode/area/themes/home/temp/ad960x90.png" /></a>
+
+
+<pw id="p8index_第三部分标题" /> 
+<span class="s1">美食频道</span> Food 
+
+
+
+
+<pw id="p8index_第三部分1" />
+<li><a href="#">吃喝玩乐团</a> |</li>
+<li><a href="#">外地美食</a> |</li>
+<li><a href="#">美食探店</a> |</li>
+<li><a href="#">美食快讯</a> |</li>
+<li><a href="#">美食DIY</a> |</li>
+<li><a href="#">美食咨询</a></li>
+
+
+<pw id="p8index_第三部分2图片播放器" />
+<ul class="switch" id="pp1_A">
+<list cachetime="1800" num="4" action="image" func="newpic" rang="" ifpushonly="0" title="幻灯片大图" />
+	<loop>
+		<li  class="switchItem" style="display:none">
+				<a href="{url}" target="_blank">
+					<img src="{image,235,170}" width="235" height="170" />
+					<h3>{title,20}</h3>
+				</a>
+		</li>
+	</loop>
+</ul>
+<div class="pwSlide-bg" style="background:#630"></div>
+<ul class="SwitchNav" id="pp1_B">
+<!--#foreach($pwresult as $key=>$value){
+$tempCount = $key+1;
+#-->
+		<li class="switchNavItem"><a href="{$value[url]}" target="_blank">{$tempCount}</a></li>
+<!--#
+}
+#-->
+</ul>
+<script>ddSliderPlayers('pp1_A','pp1_B',4,'current');</script>
+
+<pw id="p8index_第三部分3标题" /> 
+<span><em>Top</em> 每周排行</span> 
+
+
+<pw id="p8index_第三部分3" />
+<list cachetime="1800" action="subject" num="5" title="标题排行列表" />
+	<loop>
+		<li class="s1"><a href="{url}"  target="_blank" >{title,32}</a></li>
+	</loop>
+
+
+
+
+<pw id="p8index_第三部分5" />
+<list cachetime="1800" action="subject" num="1" title="标题摘要X1" />
+	<loop>
+		<h2><a href="{url}"  target="_blank" >{title,28}</a></h2>
+		<p>{descrip,110} <a href="{url}"  target="_blank"  class="s1">详细>></a></p>
+	</loop>
+
+
+
+<pw id="p8index_第三部分6" />
+<list cachetime="1800" action="subject" num="12" title="标题列表X12" />
+<loop>
+<li><a href="{url}"  target="_blank" >【{forumname,4}】{title,20}</a></li>
+</loop>
+
+
+
+<pw id="p8index_第三部分7" />
+<list cachetime="1800" action="image" num="3" title="图文模块" />
+	<loop>
+		<li><a href="{url}"  target="_blank" ><img src="{image,115,85}" width="115" height="85" />{title,18}</a></li>
+	</loop>
+
+
+
+
+<pw id="p8index_第三部分8标题" />
+<div id="tabtalk_A">
+<h4><i class="l"></i><i class="r"></i><span>博客生活</span></h4>
+</div>
+<a class="option" href="#">我有话说>></a> 
+
+<pw id="p8index_第三部分8" />
+<div id="tabtalk_B">
+<ul class="subjectList cc" >
+<list cachetime="1800" num="4" action="image" func="newpic" rang="" ifpushonly="0" title="图文列表" />
+	<loop>
+		<li class="subject"><a href="{url}"  target="_blank" ><img class="fl" src="{image,60,60}" width="60" height="60" /></a>
+			<p>{descrip,80}<a class="s1" href="{url}"  target="_blank" >[详细]</a></p>
+		</li>
+	</loop>
+</ul>
+
+
+</div>
+
+
+
+
+
+<pw id="p8index_第四部分广告" /> 
+<a href="#"><img src="mode/area/themes/home/temp/ad960x90.png" width="960" height="90" /></a> 
+
+
+
+
+<pw id="p8index_第四部分标题" /> 
+房产频道 <span>Estate</span> 
+
+
+
+
+<pw id="p8index_第四部分小导航" />
+<li><a href="#">楼市杂谈</a> |</li>
+<li><a href="#">买房须知</a> |</li>
+<li><a href="#">租房经历</a> |</li>
+<li><a href="#">求助维权</a> |</li>
+<li><a href="#">楼盘快报</a> |</li>
+<li><a href="#">买房故事</a></li>
+
+
+<pw id="p8index_第四部分1播放器" />
+<ul class="switch" id="pp2_A">
+<list cachetime="1800" action="image" num="4" title="幻灯片大图" />
+	<loop>
+		<li  class="switchItem" style="display:none">
+				<a href="{url}" target="_blank">
+					<img src="{image,235,170}" width="235" height="170" />
+					<h3>{title,20}</h3>
+				</a>
+		</li>
+	</loop>
+</ul>
+<div class="pwSlide-bg" style="background:#033"></div>
+<ul class="SwitchNav" id="pp2_B">
+<!--#foreach($pwresult as $key=>$value){
+$tempCount = $key+1;
+#-->
+		<li class="switchNavItem"><a href="{$value[url]}" target="_blank">{$tempCount}</a></li>
+<!--#
+}
+#-->
+</ul>
+<script>ddSliderPlayers('pp2_A','pp2_B',4,'current');</script>
+
+
+<pw id="p8index_第四部分2标题" /> 
+<i class="l"></i><i class="r"></i><span>地产专题报道</span> 
+
+
+
+
+<pw id="p8index_第四部分2" />
+<list cachetime="1800" action="subject" num="5" title="标题列表" />
+<loop>
+	<li><a href="{url}"  target="_blank" >{title,40}</a></li>
+</loop>
+
+
+
+<pw id="p8index_第四部分3" />
+<list cachetime="1800" num="2" action="subject" func="newsubject" rang="" ifpushonly="0" title="标题摘要" />
+<loop>
+<div class="top1" style="margin-bottom:10px;">
+	<h2><a href="{url}"  target="_blank" >{title,28}</a></h2>
+	<p>{descrip,110} <a href="{url}"  target="_blank"  class="s1">详细>></a></p>
+</div>
+</loop>
+
+
+
+<pw id="p8index_第四部分4" />
+
+<list cachetime="1800" action="subject" num="8" title="标题列表x8" />
+<loop>
+	<li><a href="{url}"  target="_blank" >【{forumname,4}】{title,54}</a></li>
+</loop>
+
+
+
+<pw id="p8index_第四部分5标题" />
+<h4><i class="l"></i><i class="r"></i><span>业主小区</span></h4>
+<a class="option" href="#">我有话说>></a> 
+
+
+
+
+<pw id="p8index_第四部分6" />
+<list cachetime="1800" num="3" action="image" func="newpic" rang="" ifpushonly="0" title="图文列表x3" />
+<loop>
+	<li class="subject"><a href="{url}"  target="_blank" ><img class="fl" src="{image,60,60}" width="60" height="60" /></a>
+	<h4><a href="{url}"  target="_blank"  class="s1">{title,20}</a> </h4>
+	<p>{descrip,60}</p>
+</li>
+</loop>
+
+
+<pw id="p8index_第四部分7" />
+<list cachetime="1800" action="subject" num="3" title="标题列表" />
+<loop>
+<li><a href="{url}"  target="_blank" ><span class="s1">{title,20}</span> - <span class="gray">{descrip,15}</span></a></li>
+</loop>
+
+
+
+
+<pw id="p8index_第五部分广告" /> 
+<a href="#"><img class="fl mr10" src="mode/area/themes/home/temp/ad708x85.png" width="708" height="85" /></a> <a href="#"><img class="fl" src="mode/area/themes/home/temp/ad230x85.png" width="230" height="85" /></a> 
+
+
+
+
+<pw id="p8index_第五部分标题" /> 
+车友频道 <span>Riders</span> 
+
+
+
+
+<pw id="p8index_第五部分小导航" />
+<li><a href="#">杭州车讯</a> |</li>
+<li><a href="#">经验分享</a> |</li>
+<li><a href="#">车坛动态</a> |</li>
+<li><a href="#">测试对比</a> |</li>
+<li><a href="#">试乘试驾</a> |</li>
+<li><a href="#">购车咨询</a> |</li>
+<li><a href="#">购车指南</a></li>
+
+
+<pw id="p8index_第五部1播放器" />
+<ul class="switch" id="pp3_A">
+<list cachetime="1800" action="image" num="4" title="幻灯片大图" />
+	<loop>
+		<li class="switchItem" style="display:none">
+				<a href="{url}" target="_blank">
+					<img src="{image,235,170}" width="235" height="170" />
+					<h3>{title,20}</h3>
+				</a>
+		</li>
+	</loop>
+</ul>
+<div class="pwSlide-bg" style="background:#300"></div>
+<ul class="SwitchNav" id="pp3_B">
+<!--#foreach($pwresult as $key=>$value){
+$tempCount = $key+1;
+#-->
+		<li class="switchNavItem"><a href="{$value[url]}" target="_blank">{$tempCount}</a></li>
+<!--#
+}
+#-->
+</ul>
+<script>ddSliderPlayers('pp3_A','pp3_B',4,'current');</script>
+
+
+<pw id="p8index_第五部分2标题" /> 
+<i class="l"></i><i class="r"></i><span>新车专题报道</span> 
+
+
+
+
+<pw id="p8index_第五部分2" />
+
+<list cachetime="1800" action="subject" num="5" title="标题列表" />
+<loop>
+<li><a href="{url}"  target="_blank" >{title,36}</a></li>
+</loop>
+
+
+<pw id="p8index_第五部分3" />
+<list cachetime="1800" action="subject" num="1" title="标题摘要" />
+<loop>
+<h2><a href="{url}"  target="_blank" >{title,30}</a></h2>
+<p>{descrip,110} <a href="{url}"  target="_blank"  class="s1">详细>></a></p>
+</loop>
+
+
+<pw id="p8index_第五部分4" />
+<list cachetime="1800" action="subject" num="7" title="标题列表" />
+<loop>
+<li><a href="{url}"  target="_blank" >【{forumname,6}】<span class="s1">{title,46}</span></a></li>
+</loop>
+
+<pw id="p8index_第五部分5" />
+
+<list cachetime="1800" action="image" num="3" title="图文列表" />
+<loop>
+<li><a href="{url}"  target="_blank" ><img width="115" height="70" src="{image,115,70}">{title,16}</a></li>
+</loop>
+
+
+
+<pw id="p8index_第五部分6标题" />
+<h4><i class="l"></i><i class="r"></i><span>博客生活</span></h4>
+<a class="option" href="#">我有话说>></a> 
+
+
+
+
+<pw id="p8index_第五部分6" />
+<list cachetime="1800" action="image" num="3" title="图文列表" />
+<loop>
+<li class="subject"><a href="{url}"  target="_blank" ><img class="fl" src="{image,60,60}" width="60" height="60" /></a>
+	<h4><a href="{url}"  target="_blank"  class="s1">{title,26}</a></h4>
+	<p>{descrip,45}</p>
+</li>
+</loop>
+
+
+
+<pw id="p8index_第五部分7" />
+
+<list cachetime="1800" action="subject" num="3" title="标题列表" />
+<loop>
+<li><a href="{url}"  target="_blank" ><span class="s1">{title,12}</span> - <span class="gray">{descrip,15}</span></a></li>
+</loop>
+
+
+
+<pw id="p8index_第六部分广告" /> 
+<a href="#"><img src="mode/area/themes/home/temp/ad960x90.png" width="960" height="90" /></a> 
+
+
+
+
+<pw id="p8index_第六部分标题" /> 
+居家频道 <span>Home</span> 
+
+
+
+
+<pw id="p8index_第六部分小导航" />
+<li><a href="#">装修设计</a> |</li>
+<li><a href="#">家装建材</a> |</li>
+<li><a href="#">家具软装</a> |</li>
+<li><a href="#">家用电器</a> |</li>
+<li><a href="#">家装日记</a> |</li>
+<li><a href="#">家居家饰</a> |</li>
+<li><a href="#">家装设计会所</a></li>
+
+
+<pw id="p8index_第六部分1图片播放器" />
+<ul class="switch" id="pp4_A">
+<list cachetime="1800" action="image" num="4" title="幻灯片大图" />
+	<loop>
+		<li class="switchItem" style="display:none">
+				<a href="{url}" target="_blank">
+					<img src="{image,235,170}" width="235" height="170" />
+					<h3>{title,20}</h3>
+				</a>
+		</li>
+	</loop>
+</ul>
+<div class="pwSlide-bg" style="background:#300"></div>
+<ul class="SwitchNav" id="pp4_B">
+<!--#foreach($pwresult as $key=>$value){
+$tempCount = $key+1;
+#-->
+		<li class="switchNavItem"><a href="{$value[url]}" target="_blank">{$tempCount}</a></li>
+<!--#
+}
+#-->
+</ul>
+<script>ddSliderPlayers('pp4_A','pp4_B',4,'current');</script>
+
+
+<pw id="p8index_第六部分2标题" /> 
+<i class="l"></i><i class="r"></i><span>家装设计会所</span> 
+
+
+
+
+<pw id="p8index_第六部分2" />
+
+<list cachetime="1800" action="subject" num="5" title="标题列表" />
+<loop>
+<li><a href="{url}"  target="_blank" >{title,36}</a></li>
+</loop>
+
+
+<pw id="p8index_第六部分3" />
+<list cachetime="1800" num="2" action="subject" func="newsubject" rang="" ifpushonly="0" title="标题摘要" />
+<loop>
+<div class="top1 mb10">
+	<h2><a href="{url}"  target="_blank"  class="s1">{title,40}</a></h2>
+	<p>{descrip,170}<a href="{url}"  target="_blank"  class="s1">详细>></a></p>
+</div>
+</loop>
+
+
+<pw id="p8index_第六部分4" />
+
+<list cachetime="1800" action="image" num="3" title="图片列表" />
+<loop>
+<li><a href="{url}"  target="_blank" ><img width="115" height="100" src="{image,115,100}">{title,14}</a></li>
+</loop>
+
+
+
+<pw id="p8index_第六部分4标题" />
+<h4><i class="l"></i><i class="r"></i><span>家装日志</span></h4>
+<a class="option" href="#">我要加入>></a> 
+
+
+
+
+<pw id="p8index_第六部分5" />
+<list cachetime="1800" action="image" num="1" title="图文标题x1" />
+<loop>
+<a href="{url}"  target="_blank" ><img src="{image,105,80}" width="105" height="80" class="fl" /></a>
+<h4><a href="{url}"  target="_blank" >{title,20}</a></h4>
+<p class="gray">{descrip,76}</p>
+</loop>
+
+<pw id="p8index_第六部分6" />
+<list cachetime="1800" action="subject" num="10" title="标题列表" />
+<loop>
+<li><a href="{url}"  target="_blank" >【{forumname,8}】<span class="s1">{title,32}</span></a></li>
+</loop>
+
+
+
+
+<pw id="p8index_第七部分广告" /> 
+<a href="#"><img src="mode/area/themes/home/temp/ad960x90.png" width="960" height="90" /></a> 
+
+
+
+
+<pw id="p8index_第七部分标题" /> 
+婚嫁频道 <span>Marry</span> 
+
+
+
+
+<pw id="p8index_第七部分小导航" />
+<li><a href="#">结婚日记</a> |</li>
+<li><a href="#">结婚进行时</a> |</li>
+<li><a href="#">交流咨询</a> |</li>
+<li><a href="#">婚姻生活</a> |</li>
+<li><a href="#">婆媳关系</a> |</li>
+<li><a href="#">边缘婚姻</a></li>
+
+
+<pw id="p8index_第七部分1图片播放器" />
+<ul class="switch" id="pp5_A">
+<list cachetime="1800" action="image" num="4" title="幻灯片大图" />
+	<loop>
+		<li  class="switchItem" style="display:none">
+				<a href="{url}" target="_blank">
+					<img src="{image,235,170}" width="235" height="170" />
+					<h3>{title,20}</h3>
+				</a>
+		</li>
+	</loop>
+</ul>
+<div class="pwSlide-bg" style="background:#903"></div>
+<ul class="SwitchNav" id="pp5_B">
+<!--#foreach($pwresult as $key=>$value){
+$tempCount = $key+1;
+#-->
+		<li class="switchNavItem"><a href="{$value[url]}" target="_blank">{$tempCount}</a></li>
+<!--#
+}
+#-->
+</ul>
+<script>ddSliderPlayers('pp5_A','pp5_B',4,'current');</script>
+
+
+<pw id="p8index_第七部分2标题" /> 
+<i class="l"></i><i class="r"></i><span>婚礼日志</span> 
+
+
+
+
+<pw id="p8index_第七部分2" />
+<list cachetime="1800" action="subject" num="5" title="标题列表" />
+<loop>
+<li><a href="{url}"  target="_blank" >{title,40}</a></li>
+</loop>
+
+
+<pw id="p8index_第七部分3" />
+<list cachetime="1800" action="subject" num="1" title="标题摘要" />
+<loop>
+<h2><a href="{url}"  target="_blank"  class="s1">{title,45}</a></h2>
+<p>{descrip,180}<a href="{url}"  target="_blank"  class="s1">详细>></a></p>
+</loop>
+
+<pw id="p8index_第七部分4" />
+<list cachetime="1800" action="subject" num="10" title="标题列表" />
+<loop>
+<li><a href="{url}"  target="_blank" ><span class="M_s1">【{forumname,8}】</span>{title,20}</a></li>
+</loop>
+
+
+
+<pw id="p8index_第七部分5" />
+<list cachetime="1800" action="image" num="3" title="图片列表" />
+<loop>
+<li><a href="{url}"  target="_blank" ><img width="115" height="100" src="{image,115,100}">{title,16}</a></li>
+</loop>
+
+<pw id="p8index_第七部分6标题" />
+<h4><i class="l"></i><i class="r"></i><span>风尚男女</span></h4>
+<a class="option" href="#">我要加入>></a> 
+
+
+
+
+<pw id="p8index_第七部分6" />
+<list cachetime="1800" num="2" action="image" func="newpic" rang="" ifpushonly="0" title="图文标题摘要" />
+<loop>
+<li class="subject"><a href="{url}"  target="_blank" ><img class="fl" src="{image,60,60}" width="60" height="60" /></a>
+	<h4><a href="{url}"  target="_blank" >{title,22}</a></h4>
+	<p>{descrip,55}<a href="{url}"  target="_blank"  class="s1">[详细]</a></p>
+</li>
+</loop>
+
+
+
+<pw id="p8index_第七部分7" />
+<list cachetime="1800" action="subject" num="7" title="标题列表" />
+<loop>
+<li><a href="{url}"  target="_blank" >{title,45}</a></li>
+</loop>
+
+<pw id="p8index_第八部分广告" /> 
+<a href="#"><img src="mode/area/themes/home/temp/ad960x90.png" width="960" height="90" /></a> 
+
+
+
+
+<pw id="p8index_第八部分标题" /> 
+亲子频道 <span>Family</span> 
+
+
+
+
+<pw id="p8index_第八部分小导航" />
+<li><a href="#">准妈俱乐部</a> |</li>
+<li><a href="#">亲子俱乐部</a> |</li>
+<li><a href="#">无敌宝宝秀</a> |</li>
+<li><a href="#">试用体验</a> |</li>
+<li><a href="#">母婴用品</a> |</li>
+<li><a href="#">母婴亲子</a></li>
+
+
+<pw id="p8index_第八部分1播放器" />
+<ul class="switch" id="pp6_A">
+<list cachetime="1800" action="image" num="4" title="幻灯片大图" />
+	<loop>
+		<li  class="switchItem" style="display:none">
+				<a href="{url}" target="_blank">
+					<img src="{image,235,170}" width="235" height="170" />
+					<h3>{title,20}</h3>
+				</a>
+		</li>
+	</loop>
+</ul>
+<div class="pwSlide-bg" style="background:#330"></div>
+<ul class="SwitchNav" id="pp6_B">
+<!--#foreach($pwresult as $key=>$value){
+$tempCount = $key+1;
+#-->
+		<li class="switchNavItem"><a href="{$value[url]}" target="_blank">{$tempCount}</a></li>
+<!--#
+}
+#-->
+</ul>
+<script>ddSliderPlayers('pp6_A','pp6_B',4,'current');</script>
+
+
+<pw id="p8index_第八部分2标题" /> 
+婚礼日志 
+
+
+
+
+<pw id="p8index_第八部分2" />
+<list cachetime="1800" action="image" num="1" title="图片" />
+<loop>
+<a href="{url}"  target="_blank" ><img src="{image,48,48}" width="48" height="48" class="fl" /></a>
+</loop>
+<list cachetime="1800" action="subject" num="2" title="标题列表" />
+<ul class="list1">
+	<loop>
+<li><a href="{url}"  target="_blank" >{title,40}</a></li>
+</loop>
+</ul>
+
+
+<pw id="p8index_第八部分3" /> 
+<list cachetime="1800" action="image" num="1" title="图片" />
+<loop>
+<a href="{url}"  target="_blank" ><img src="{image,48,48}" width="48" height="48" class="fl" /></a>
+</loop>
+<list cachetime="1800" action="subject" num="2" title="标题列表" />
+<ul class="list1">
+	<loop>
+<li><a href="{url}"  target="_blank" >{title,40}</a></li>
+</loop>
+</ul>
+
+<pw id="p8index_第八部分4" />
+<list cachetime="1800" num="2" action="subject" func="newsubject" rang="" ifpushonly="0" title="标题摘要" />
+<loop>
+<div class="top1 mb10">
+	<h2><a href="{url}"  target="_blank"  clsss="s1">{title,40}</a></h2>
+	<p>{descrip,170}<a href="{url}"  target="_blank"  class="s1">详细>></a></p>
+</div>
+</loop>
+<div class="c"></div>
+
+
+<pw id="p8index_第八部分5" />
+<list cachetime="1800" action="subject" num="7" title="标题列表" />
+<loop>
+<li><a href="{url}"  target="_blank" ><span class="F_s1">【{forumname,8}】</span>{title,50}</a></li>
+</loop>
+
+
+
+<pw id="p8index_第八部分6" />
+<h4><i class="l"></i><i class="r"></i><span>网购卖场</span></h4>
+<a class="option" href="#">我要加入>></a> 
+
+
+
+
+<pw id="p8index_第八部分7" />
+<list cachetime="1800" action="image" num="6" title="图片列表" />
+<loop>
+<li><a href="{url}"  target="_blank" ><img src="{image,78,78}" width="78" height="78" />{title,10}</a></li>
+</loop>
+
+
+
+<pw id="p8index_第八部分8广告" /> 
+<a href="#"><img src="mode/area/themes/home/temp/ad265x60.png" /></a> 
+
+
+
+<pw id="p8index_第九部分1链接" />
+<dl>
+	<dd class="picslink cc">
+	<list cachetime="1800" action="sharelinks" num="10" title="友情链接图片" />
+	<loop>
+		<a href="{url}"  target="_blank"><img src="{image,88,31}" width="88" height="31" /></a>
+	</loop>
+	</dd>
+	<dd class="texslink cc">
+	<list cachetime="1800" action="sharelinks" num="20" title="友情链接文本" />
+	<loop>
+		<a href="{url}" target="_blank" title="title">{title}</a>
+	</loop>
+	</dd>
+</dl>
+
+

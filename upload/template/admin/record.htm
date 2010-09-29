@@ -1,0 +1,115 @@
+<!--<?php
+include_once PrintEot('left');
+print <<<EOT
+-->
+<div class="admin_info mb10">
+    <h3 class="h1"><b>提示信息</b></h3>
+    <div class="legend"><ol><li>为了保证后台的安全性,系统只允许站点创始人和管理员删除操作日记</li><li>系统必须保留前100条后台管理日志</li></ol></div>
+</div>
+<form action="$basename&" method=post>
+<input type=hidden name=action value=search>
+<h2 class="h1">搜索</h2>
+<div class="admin_table mb10">
+    <table cellpadding="0" cellspacing="0" width="100%">
+        <tr class="tr1 vt">
+            <td class="td1">关键字</td>
+            <td class="td2"><input type="text" class="input input_wa mr5" name="keyword"><span class="bt2"><span><button type="submit" value='提 交'>提 交</button></span></span></td>
+        </tr>
+    </table>
+</div>
+</form>
+<h2 class="h1"><b>管理日志</b></h2>
+<div class="admin_table mb10">
+    <table cellpadding="0" cellspacing="0" width="100%" style="table-layout:fixed;">
+<!--
+EOT;
+if($admintype=='adminlog'){
+print <<<EOT
+-->
+    <tr class="tr2">
+        <td width="100">用户名</td>
+        <td>错误密码</td>
+        <td>操作日志</td>
+        <td>IP</td>
+        <td>操作时间</td>
+        <td>其他</td>
+    </tr>
+$adlogfor
+<!--
+EOT;
+}elseif($admintype=='forumlog'){
+print <<<EOT
+-->
+    <tr class="tr1 vt">
+        <td class="td2">管理员</td>
+        <td class="td2">用户名</td>
+        <td class="td2">版块</td>
+        <td class="td2">操作日志</td>
+        <td class="td2">IP</td>
+        <td class="td2">操作时间</td>
+    </tr>
+    $adlogfor
+<!--
+EOT;
+}elseif($admintype=='creditlog'){
+print <<<EOT
+-->
+    <tr class="tr1 vt">
+        <td class="td2">积分名称</td>
+        <td class="td2">作者</td>
+        <td class="td2">点数</td>
+        <td class="td2">查看文章位置</td>
+        <td class="td2">管理员</td>
+        <td class="td2">IP</td>
+        <td class="td2">操作时间</td>
+        <td class="td2">评分理由</td>
+    </tr>
+<!--
+EOT;
+foreach($creditdb as $credit){
+if($credit){
+print <<<EOT
+-->
+    <tr class="tr1 vt">
+        <td class="td2">$credit[name]</td>
+        <td class="td2">$credit[5] </td>
+        <td class="td2">$credit[6]</td>
+        <td class="td2"><a href="read.php?tid=$credit[1]">查看文章位置</a></td>
+        <td class="td2">$credit[3]</td>
+        <td class="td2">$credit[4]</td>
+        <td class="td2">$credit[time]</td>
+        <td class="td2">$credit[8]</td>
+    </tr>
+<!--
+EOT;
+}}}
+print <<<EOT
+-->
+    </table>
+</div>
+<div class="cc mb10">$pages</div>
+<!--
+EOT;
+if($action=='search'){print <<<EOT
+-->
+<center><a href='$basename'><b>查看全部日志</b></a></center>
+<!--
+EOT;
+}if($admin_gid==3){
+$j_url=EncodeUrl("$basename&del=Y");
+print <<<EOT
+-->
+<!--<center class="xia2"><a style="cursor:pointer;" onclick="delRecord();">删除多余管理日志</a></center>-->
+<div class="mb10 tac"><span class="btn"><span><button type="button" onclick="delRecord();">删除多余管理日志</button></span></span></div>
+<script language="JavaScript">
+var j_url = '$j_url';
+function delRecord(){
+	if(!confirm("是否要删除多余日志？"))
+		return false;
+	location.href=j_url;
+}
+</script>
+<!--
+EOT;
+}include_once PrintEot('adminbottom');
+?>-->

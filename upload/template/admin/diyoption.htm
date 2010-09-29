@@ -1,0 +1,62 @@
+<!--<?php
+include_once PrintEot('left');print <<<EOT
+-->
+<form action="$basename&" method="post">
+<input type="hidden" name="action" value="edit">
+<h2 class="h1"><span class="mr20">常用选项定制</span><span class="linka">注:最多定制15条</span></h2>
+<div class="admin_table mb10">
+    <table width="100%" cellspacing="0" cellpadding="0">
+    	$editset
+    </table>
+</div>
+<div class="tac mb10">
+	<span class="bt"><span><button type="button" onclick="CheckForm(this.form)">全 选</button></span></span>
+	<span class="btn"><span><button type="submit">提 交</button></span></span>
+</div>
+</form>
+<script language="JavaScript">
+var allcheck = true;
+var checkvar = {{$checkvar}}
+function CheckForm(obj){
+	if (obj.id) {
+		if (checkvar['chk_'+obj.id]=='undefined') {
+			return false;
+		}
+		var newobj = obj.getElementsByTagName('input');
+		var len = newobj.length;
+		var checkall = checkvar['chk_'+obj.id];
+	} else {
+		var newobj = obj.elements;
+		var len = newobj.length-2;
+		var checkall = allcheck;
+	}
+	for (var i=0;i<len;i++) {
+		if (newobj[i].type=='checkbox') newobj[i].checked = checkall;
+	}
+	if (obj.id) {
+		if (checkall==true) {
+			checkvar['chk_'+obj.id] = false;
+			allcheck = true;
+		} else {
+			checkvar['chk_'+obj.id] = true;
+			allcheck = false;
+		}
+	} else {
+		if (checkall==true) {
+			for (i in checkvar) {
+				checkvar[i] = false;
+			}
+			allcheck = false;
+		} else {
+			for (i in checkvar) {
+				checkvar[i] = true;
+			}
+			allcheck = true;
+		}
+	}
+}
+</script>
+<!--
+EOT;
+include_once PrintEot('adminbottom');
+?>-->

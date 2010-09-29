@@ -1,0 +1,265 @@
+<!--<?php
+if($foruminfo[across]){print <<<EOT
+-->
+<div class="t" id="t_$cate[fid]">
+    <div class="h"><a class="fr closeicon" style="cursor:pointer;" onClick="return IndexDeploy('children',0)"><img id="img_children" alt="展开收起" src="$imgpath/$stylepath/index/cate_$children_img.gif" /></a><h3>子版块</h3></div>
+    <div class="z">
+        <table width="100%" style="table-layout:fixed;">
+        	<tbody id="cate_children" style="$cate_children">
+<!--
+EOT;
+$a=0;
+foreach($forumdb as $key=>$forums){
+if($a==0){print <<<EOT
+-->
+            <tr class="tr3">
+<!--
+EOT;
+}$a++;
+$forums['logo'] && $forums[pic] = '';
+print <<<EOT
+-->
+                <th class="$forums[pic]" id="fid_{$forums[fid]}">
+<!--
+EOT;
+if ($forums['logo']) {print <<<EOT
+-->
+					<img src="$forums[logo]" class="fl mr10" alt="forumlogo" />
+<!--
+EOT;
+}print <<<EOT
+-->
+					<h2 class="mr10"><a href="thread.php?fid=$forums[fid]">$forums[name]</a></h2>
+<!--
+EOT;
+if($db_todaypost && $forums[tpost]){print <<<EOT
+-->
+					<span class="s2">(今日$forums[tpost])</span>
+<!--
+EOT;
+}print <<<EOT
+-->
+					<p><span class="mr20">主题:$forums[topics]</span>帖子:$forums[article]</p>
+<!--
+EOT;
+if($forums[au]){print <<<EOT
+-->
+					<p><a href="$forums[ft]" class="s6">$forums[t]</a></p>
+<!--
+EOT;
+}print <<<EOT
+-->
+                </th>
+<!--
+EOT;
+if($a==$foruminfo[across]){
+$a=0;
+print <<<EOT
+-->
+            </tr>
+<!--
+EOT;
+}}
+if($a!=0){
+for($i=$a;$i<$foruminfo[across];$i++){print <<<EOT
+-->
+			<td>&nbsp;</td>
+<!--
+EOT;
+}print <<<EOT
+-->
+				</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+			</tbody>
+        </table>
+    </div>
+</div>
+<!--
+EOT;
+}else{
+if($threadright){print<<<EOT
+-->
+<script type="text/javascript" src="http://app.phpwind.net/static/js/client.js"></script>
+<script language="JavaScript">
+var server = new PwJs.Server("pwthread");
+server.start();
+</script>
+<!--
+EOT;
+}print<<<EOT
+-->
+<div class="t" id="t_$cate[fid]">
+    <div class="h"><a class="closeicon fr" style="cursor:pointer;" onClick="return IndexDeploy('children',0)"><img id="img_children" alt="展开收起" src="$imgpath/$stylepath/index/cate_$children_img.gif" /></a><h3>子版块</h3></div>
+	<div class="z">
+        <table width="100%" style="table-layout:fixed;">
+            <tbody id="cate_children" style="$cate_children">
+            <!--tr class="tr2"><th>版块</th><td width="120">文章</td><td width="220">最后发表</td></tr-->
+<!--
+EOT;
+foreach($forumdb as $key=>$forums){
+	if ($forums['ifcms']) {
+		continue;
+	}
+print <<<EOT
+-->
+            <tr class="tr3" id="fid_$forums[fid]">
+                <th class="$forums[pic]">                
+<!--
+EOT;
+if($forums[logo]){print <<<EOT
+-->
+					<a href="thread.php?fid=$forums[fid]" target="_blank"><img src="$forums[logo]" alt="forumlogo" class="fl mr10"></a>
+<!--
+EOT;
+}print <<<EOT
+-->
+<!--
+EOT;
+if($threadright && ($threadright[down][admin] || in_array(0,$threadright[down][other]) || in_array($cate[fid],$threadright[down][other]) || in_array($forums[fid],$threadright[down][other])) ){print <<<EOT
+-->
+					<a class="s7" href="javascript:;" id="jh_forum$forums[fid]" onclick="sendmsg('apps.php?q=appthread&forumid=$forums[fid]&do=downall','',this.id)" title="设置特定好友显示动态信息">充实内容</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+                    <h2><a href="thread.php?fid=$forums[fid]" id="fn_$forums[fid]" class="mr10">$forums[name]</a></h2>
+<!--
+EOT;
+if($db_todaypost && $forums[tpost]){print <<<EOT
+-->
+					<span class="s2">(今日$forums[tpost])</span>
+<!--
+EOT;
+}if($forums[descrip]){
+print <<<EOT
+-->
+					<p>$forums[descrip]</p>
+<!--
+EOT;
+}if($forums[forumappinfo][subforum_erect]){
+print <<<EOT
+-->
+					<p>{$forums[forumappinfo][subforum_erect]}</p>
+<!--
+EOT;
+}print <<<EOT
+-->
+                    <p>版主：
+<!--
+EOT;
+if($db_adminshow && $forums[admin]){print <<<EOT
+-->
+		<select name="admin" onchange="Ajump(this.options[this.selectedIndex].value)"><option value="">版主列表</option>$forums[admin]
+		</select>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+		$forums[admin]
+<!--
+EOT;
+}print <<<EOT
+--></p>
+
+                </th>
+                <td class="num" style="width:120px;"><em>$forums[topics]</em>$forums[article]</td>
+                <td class="re" width="220">
+<!--
+EOT;
+if($forums[au]){print <<<EOT
+-->
+		<p><a href="$forums[ft]">$forums[t]</a></p>
+        <p>$forums[au]</p>
+<!--
+EOT;
+}if($forums[pic]=='lock'){print <<<EOT
+-->
+		<p>认证版块</p>
+<!--
+EOT;
+}print <<<EOT
+-->
+                </td>
+            </tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+			</tbody>
+        </table>
+    </div>
+</div>
+<!--
+EOT;
+if((!$db_toolbar || $_COOKIE['toolbarhide'] || $groupid == 'guest') && $pwForumList){print <<<EOT
+-->
+<div id="menu_forumlist" style="display:none;">
+	<div class="sbar-box-a" style="width:700px;">
+		<div class="sbar-title" style="cursor:pointer" onclick="try{pw_bottom.hiddenTab();read.close();}catch(e){read.close();}">
+				<span class="adel">隐藏</span>
+				<span id="title_forumlist" class="b">快速浏览</span>
+		</div>
+		<div class="sbar-box-b">
+			<div class="forum-list-popout">
+<!--
+EOT;
+foreach ($pwForumList as $key => $value) {
+	if (isset($value['child']) && is_array($value['child']) && count($value['child'])) {
+print <<<EOT
+-->
+			<dl class="cc">
+				<dt>
+<!--
+EOT;
+		if ($GLOBALS['m']) {print<<<EOT
+-->
+				<a href="index.php?cateid=$key" target="_blank">$value[name]</a>
+<!--
+EOT;
+		} else {print<<<EOT
+-->
+				<a href="index.php?cateid=$key">$value[name]</a>
+<!--
+EOT;
+		}print<<<EOT
+-->
+				</dt>
+				<dd class="cc">
+<!--
+EOT;
+		foreach ($value['child'] as $k=>$v) {
+			if ($GLOBALS['m']) {print <<<EOT
+-->
+					<a href="thread.php?fid=$k" target="_blank" onclick="return pwForumList(true,gIsPost,$k,'',true);"><span>$v</span></a>
+<!--
+EOT;
+			} else {print<<<EOT
+-->
+					<a href="thread.php?fid=$k" onclick="return pwForumList(true,gIsPost,$k);"><span>$v</span></a>
+<!--
+EOT;
+			}
+		}print <<<EOT
+-->
+				</dd>
+			</dl>
+<!--
+EOT;
+	}
+}
+print <<<EOT
+-->
+			</div>
+		</div>
+	</div>
+</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+<!--
+EOT;
+}?>

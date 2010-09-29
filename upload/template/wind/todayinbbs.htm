@@ -1,0 +1,32 @@
+<!--<?php print <<<EOT
+-->
+<div id="breadCrumb">
+		<img src="$imgpath/$stylepath/thread/home-old.gif" align="absmiddle" />&nbsp;<a href="$db_bfn" title="$db_bbsname">$db_bbsname</a><em>&gt;</em>&raquo; 到访会员(今日到访人数 {$count} )
+</div>
+
+<div class="t"><table cellspacing="0" cellpadding="0" width="100%">
+<tr><td class="h" colspan="7">今日到访会员</td></tr>
+<tr class="tr2 tac">
+<td>用户名</td>
+<td>注册时间</td>
+<td>登录时间</td>
+<td>活动时间</td>
+<td>IP地址</td>
+<td>发帖</td>
+<td>{$db_rvrcname}</td>
+</tr>
+<!--
+EOT;
+foreach($inbbsdb as $inbbs){
+print <<<EOT
+-->
+<tr class="tr3 tac"><td bgcolor="#F8F8F8"><a href="u.php?username=$inbbs[rawuser]">$inbbs[user]</a></td><td bgcolor="#FFFFFF">$inbbs[rgtime]</td><td bgcolor="#FFFFFF">$inbbs[logintime]</td><td bgcolor="#F8F8F8">$inbbs[intime]</td><td bgcolor="#F8F8F8">$inbbs[ip]</td><td bgcolor="#FFFFFF">$inbbs[post]</td><td bgcolor="#FFFFFF">$inbbs[rvrc]</td></tr>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+</table></div>$pages
+<!--
+EOT;
+?>-->

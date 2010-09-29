@@ -1,0 +1,36 @@
+<!--<?php
+print <<<EOT
+-->
+<div id="breadCrumb">
+		<img src="$imgpath/$stylepath/thread/home-old.gif" align="absmiddle" />&nbsp;<a href="$db_bfn" title="$db_bbsname">$db_bbsname</a><em>&gt;</em>报告功能
+</div>
+
+<form name="form1" method="post" action="job.php?tid=$tid&pid=$pid">
+<div class="t" style="margin-top:15px">
+<table width="100%" align="center" cellspacing="0" cellpadding="0">
+<tr><td colspan="2" class="h"><b>报告功能</b></td></tr>
+
+<tr class="tr3 tr"><th width="21%">报告类型:</th>
+<th>
+<input type="radio" name="type" value="1" checked onclick="Addreason('该帖很优秀,建议加为精华帖!')" />优秀帖子
+<input type="radio" name="type" value="0" onclick="Addreason('该帖包含不良信息,请及时处理!')" />不良帖子</th></tr>
+<tr class="tr3 tr"><th>通知版主:</th>
+<th><input type="radio" name="ifmsg" value="1" checked />开启
+<input type="radio" name="ifmsg" value="0" />关闭</th></tr>
+<tr class="tr3 tr"><th>原因</th>
+<th><textarea name="reason" rows="5" cols="80">该帖很优秀,建议加为精华帖!</textarea>
+</th></tr></table></div>
+<input type="hidden" name="action" value="$action" />
+<input type="hidden" name="step" value="2" />
+<div style="text-align:center;margin-bottom:25px">
+<input class="btn" type="submit" name="Submit" value="提 交" /></div></form>
+<script language="JavaScript">
+function Addreason(reason){
+	document.form1.reason.value=reason;
+	document.form1.reason.focus();
+	return;
+}
+</script>
+<!--
+EOT;
+?>-->

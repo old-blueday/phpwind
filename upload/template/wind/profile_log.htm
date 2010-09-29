@@ -1,0 +1,82 @@
+<!--<?php
+include_once PrintEot('profile_header');
+print <<<EOT
+-->
+<div id="user-main">
+	<div class="u-m-bg"></div>
+	<div class="u-m-bg-c cc">
+		<div class="p10">
+			<div class="u-nav-2 cc">
+				<ul>
+					<li class="current"><a style="cursor:pointer" hidefocus="true">帖子操作记录</a></li>
+				</ul>
+			</div>
+			<form action="profile.php?action=$action" method="post">
+			<input type="hidden" name="verify" value="$verifyhash" />
+			<input type="hidden" name="step" value="2" />
+			<div class="u-cont-bg-c">
+			<table width="100%" height="450">
+				<tr><td class="vt">
+					<div class="p15">
+						<table width="100%" class="mt10 bor-t-c">
+							<tr class="user-tr">
+								<td width="4%">ID</td>
+								<td width="8%">类型</td>
+								<td width="12%">管理员</td>
+								<td width="18%">版块</td>
+								<td width="15%">操作日期</td>
+								<td>
+									<span class="fr">
+										<select name="type" onchange="window.location=('profile.php?action=log&type='+this.options[this.selectedIndex].value)">
+										<option value="all">全 部</option>
+										<option value="topped" $type_sel[topped]>{$lang[logtype][topped]}</option>
+										<option value="digest" $type_sel[digest]>{$lang[logtype][digest]}</option>
+										<option value="highlight" $type_sel[highlight]>{$lang[logtype][highlight]}</option>
+										<option value="push" $type_sel[push]>{$lang[logtype][push]}</option>
+										<option value="locked" $type_sel[locked]>{$lang[logtype][locked]}</option>
+										<option value="delete" $type_sel[delete]>{$lang[logtype][delete]}</option>
+										<option value="move" $type_sel[move]>{$lang[logtype][move]}</option>
+										<option value="copy" $type_sel[copy]>{$lang[logtype][copy]}</option>
+										<option value="edit" $type_sel[edit]>{$lang[logtype][edit]}</option>
+										<option value="credit" $type_sel[credit]>{$lang[logtype][credit]}</option>
+										<option value="remind" $type_sel[remind]>{$lang[logtype][remind]}</option>
+										</select>
+									</span>
+									描述
+								</td>
+							</tr>
+<!--
+EOT;
+$style='f_two';
+$num=($page-1)*$db_perpage;
+foreach($logdb as $key => $value){
+$num++;
+$style=$style=='f_one' ? 'f_two' : 'f_one';
+print <<<EOT
+	-->
+							<tr class="user-tr">
+								<td>$num</td>
+								<td>{$lang[logtype][$value[type]]}</td>
+								<td><a href="profile.php?action=show&username=$value[username2]" target="_blank">$value[username2]</a></td>
+								<td><a href="thread.php?fid=$value[field1]" target="_blank">{$forum[$value[field1]][name]}</a></td>
+								<td>$value[date]</td>
+								<td><div style="TABLE-LAYOUT: fixed;WORD-WRAP: break-word" align="left">$value[descrip]</div></td>
+							</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+						</table>
+						<div class="mt10 cc">$pages</div>
+					</div>
+				</td></tr>
+			</table>
+			</div>
+			</form>
+		</div>
+	</div>
+	<div class="u-m-bg"></div>
+</div>
+<!--
+EOT;
+?>-->

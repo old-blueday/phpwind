@@ -1,0 +1,70 @@
+<!--<?php
+include_once PrintEot('left');
+print <<<EOT
+-->
+<div class="admin_info mb10">
+  <h3 class="h1"><b>提示信息</b></h3>
+  <div class="legend"><ol><li>为了保证后台的安全性,系统只允许站点创始人和管理员删除管理记录</li><li>系统必须保留前10000条后台管理记录</li></ol></div>
+</div>
+<form action="$basename&" method=post>
+  <input type=hidden name=action value=search>
+  <h2 class="h1">搜索</h2>
+  <div class="admin_table mb10">
+    <table width=100% cellspacing="0" cellpadding="0">
+      <tr class="tr1 vt">
+        <td class="td1">关键字</td>
+        <td class="td2"><input type="text" class="input" name="keyword">
+          <span class="bt2"><span>
+          <button type="submit" value='提 交'>提 交</button>
+          </span></span> </td>
+      </tr>
+    </table>
+  </div>
+</form>
+<h2 class="h1"><b>管理记录</b></h2>
+<div class="admin_table mb10">
+  <table width="100%" cellspacing="0" cellpadding="0" style="word-break:break-all;">
+    <tr class="tr2">
+      <td class="td2">用户名</td>
+      <td class="td2">IP</td>
+      <td class="td2">操作时间</td>
+      <td class="td2">操作理由</td>
+    </tr>
+<!--
+EOT;
+if (empty($adlogfor)) {print <<<EOT
+-->
+<tr><td class="p10" colspan="4"><div class="admin_tips">啊哦，没有你要的信息！</div></td></tr>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+    $adlogfor
+<!--
+EOT;
+}print <<<EOT
+-->
+  </table>
+</div>
+<div class="cc mb10">$pages</div>
+<!--
+EOT;
+if($admin_gid==3){
+$j_url=EncodeUrl("$basename&admintype=del");
+print <<<EOT
+-->
+<div class="mb10 tac"> <span class="btn"><span>
+  <button type="submit" onclick="return delAdminRecord();" >删除多余管理记录</button>
+  </span></span> </div>
+<script language="JavaScript">
+var j_url = '$j_url';
+function delAdminRecord(){
+	if(!confirm("是否要删除多余管理记录？"))
+		return false;
+	location.href=j_url;
+}
+</script>
+<!--
+EOT;
+}include_once PrintEot('adminbottom');
+?>-->

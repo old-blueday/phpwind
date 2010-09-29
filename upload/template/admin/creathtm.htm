@@ -1,0 +1,76 @@
+<!--<?php
+include_once PrintEot('left');
+print <<<EOT
+-->
+<div class="admin_info mb10">
+    <h3 class="h1"><b>提示信息</b></h3>
+    <div class="legend">功能说明:<ol>
+	<li>采用静态 html 方式来缓存主题内容从而<b>大幅度节约数据库资源,并使浏览速度有质的飞跃</b>.适合于大型网站</li>
+	<li>占用较多服务器空间,一般<b>占用与您RDBMS同等空间</b></li>
+	<li>加密帖(出售,加密,隐藏)不会生成htm页面</li>
+	<li>如果您的空间打开 <b>safe_mode</b> 如果您对此不了解,建议不要使用此功能</li>
+	<li>使用此功能后用户的真实信息将滞后,<b>请不定期重新生成所有 html 文件</b>!</li>
+	<li>使用此功能后请不要采用多种风格.更<b>不能使用图片.附件防盗链功能</b>!</li>
+	<li>使用此功能后将自动启用<b>点击率延迟更新</b>功能<br /></li></ol>
+	<br/>模板管理说明:<ol>
+	<li>可选择一次性生成所有版块的静态模板，也可以选择生成单个版块的静态模板</li>
+	<li>当您取消某版块的静态模板功能时请删除相应的 html 数据,以节约空间!</li></ol></div>
+</div>
+<form action="$basename" method="post" name="creat">
+  <input type="hidden" name="fids" value="$fids" />
+  <h2 class="h1"><b>静态模板功能</b></h2>
+  <div class="admin_table mb10">
+  <table cellspacing="0" cellpadding="0" width="100%">
+    <tr class="tr1 vt">
+      <td class="td1">选择需要使用静态模板<br />功能的版块</td>
+      <td class="td2">$forumcheck</td>
+    </tr>
+  </table>
+  </div>
+  <input type="hidden" name="action" value="submit" />
+  <div class="tac mb10">
+      <span class="bt"><span><button type="button" name="chkall" value="全 选" onclick="CheckAll(this.form)">全 选</button></span></span>
+    <span class="btn"><span><button type="submit">提 交</button></span></span>
+    </div>
+</form>
+<form action="$basename" method="post">
+  <input type="hidden" name="fids" value="$htmfid" />
+  <h2 class="h1"><b>静态模板管理</b></h2>
+  <div class="admin_table mb10">
+      <table cellspacing="0" cellpadding="0" width="100%">
+        <tr class="tr1 vt">
+          <td class="td1">选择创建模板的版块</td>
+          <td class="td2">
+          <select name="creatfid[]" multiple  size="16" class="select_wa">
+              <option value="all" selected>所有版块</option>
+              <option></option>
+              $select
+            </select>
+          </td>
+        <tr class="tr1 vt">
+          <td class="td1">操作类型</td>
+          <td class="td2">
+                <ul class="cc list_80 list_A">
+                     <li><input type="radio" name="action" value="creat" checked />创建</li>
+                     <li><input type="radio" name="action" value="delete" />删除</li>
+                </ul>
+           </td>
+        </tr>
+        <tr class="tr1 vt">
+          <td class="td1">各版块最大主题生成个数</td>
+          <td class="td2"><input name="forumnum" type="text" class="input input_wa mr20" />留空则全部生成</td>
+        </tr>
+        <tr class="tr1 vt">
+          <td class="td1">每批生成主题数</td>
+          <td class="td2"><input name="percount" type="text" class="input input_wa" /></td>
+        </tr>
+      </table>
+  </div>
+  <div class="tac mb10">
+    <span class="btn"><span><button type="submit">提 交</button></span></span>
+    </div>
+</form>
+<!--
+EOT;
+include_once PrintEot('adminbottom');
+?>-->

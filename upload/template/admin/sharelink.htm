@@ -1,0 +1,137 @@
+<!--<?php
+include_once PrintEot('left');
+if(empty($action)){print <<<EOT
+-->
+<div class="admin_info mb10">
+	<h3 class="h1"><b>提示信息</b></h3>
+	<div class="legend"> 友情链接添加说明:<ol><li>特殊链接(显示顺序<0，每行显示一个)</li><li>普通连接(显示顺序>=0)</li></ol></div>
+</div>
+<form method="post" action="$basename&" name="FORM">
+	<h2 class="h1 cc">
+		<span class="linka fr"><select onchange="window.location=('$basename&state='+this.value);">
+			<option value="0" $state_0>所有状态</option>
+			<option value="1" $state_1>已审</option>
+			<option value="2" $state_2>未审</option>
+		</select></span>
+		<span class="fl mr10">友情链接列表</span>
+		<a class="btn_add fl" href="$basename&action=add&state=$state" hidefocus="true"><i>添加友情链接</i></a>
+	</h2>
+	<div class="admin_table mb10">
+	<table width="100%" cellspacing="0" cellpadding="0">
+		<tr class="tr2 vt td_bgB">
+			<td width="30"><span onclick="CheckAll(document.FORM)" class="cp">全选</span></td>
+			<td width="18%">站点名称</td>
+			<td width="8%">顺序</td>
+			<td width="25%">站点URL</td>
+			<td width="*">站点说明</td>
+			<td width="8%">状态</td>
+			<td width="8%">操作</td>
+		</tr>
+<!--
+EOT;
+if (empty($threaddb)) {print <<<EOT
+-->
+<tr><td class="p10" colspan="7"><div class="admin_tips">啊哦，没有你要的信息！</div></td></tr>
+<!--
+EOT;
+}else{
+foreach($threaddb as $key=> $thread){
+$tmpstate=$thread[ifcheck] ? '<span class="s3">已审</span>' : '<span class="s1">未审</span>';
+print <<<EOT
+-->
+		<tr class="tr1 vt">
+			<td class="td2"><input type='checkbox' name='deiaid[]' value="$thread[sid]"></td>
+			<td class="td2"><a href="$basename&action=edit&sid=$thread[sid]">$thread[name]</a></td>
+			<td class="td2">$thread[threadorder]</td>
+			<td class="td2">$thread[url]</td>
+			<td class="td2">$thread[descrip]</td>
+			<td class="td2">{$tmpstate}</td>
+			<td class="td2"><a href="$basename&action=edit&sid=$thread[sid]&state=$state" title="编辑">[编辑]</a></td>
+		</tr>
+		<!--
+EOT;
+}}print <<<EOT
+-->
+	</table>
+	</div>
+	<input name=action type=hidden value="del">
+	<div class="tac mb10">
+        <input name="delete" class="bt3" value="删 除" type="submit" />
+        <input name="unpass" class="bt3" value="未 审" type="submit" />
+        <input name="pass" class="btn3" value="审 核" type="submit" />
+	</div>
+</form>
+<!--
+EOT;
+}elseif($action=='add' || $action=='edit'){print <<<EOT
+-->
+<div class="admin_info mb10">
+	<h3 class="h1"><b>提示信息</b></h3>
+	<div class="legend"> 友情链接添加说明:<ol><li>特殊链接(显示顺序<0，每行显示一个)</li><li>普通连接(显示顺序>=0)</li></ol></div>
+</div>
+<form action="$basename" method=POST>
+	<input type=hidden name="action" value=$action />
+	<input type=hidden name="step" value="2" />
+	<input type=hidden name="sid" value=$sid />
+	<h2 class="h1">
+<!--
+EOT;
+if($action=='edit'){ print <<<EOT
+-->
+		<span class="mr10">编辑友情链接</span>
+<!--
+EOT;
+}else{ print <<<EOT
+-->
+		<span class="mr10">添加友情链接</span>
+<!--
+EOT;
+} print <<<EOT
+-->
+		<a href="$basename&state=$state" class="linka">返回上一级<span class="f9">▲</span></a>
+	</h2>
+	<div class="admin_table mb10">
+	<table cellspacing="0" cellpadding="0" width="100%">
+		<tr class="tr1 vt">
+			<td class="td1">站点名称</td>
+			<td class="td2"><input type="text" class="input input_wa" name="name" value='$name' /></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">显示顺序(默认为0)</td>
+			<td class="td2"><input type="text" class="input input_wa" name="threadorder" value='$threadorder' /></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">站点URL</td>
+			<td class="td2"><input type="text" class="input input_wa" name="url" value='$url' /></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">站点主人</td>
+			<td class="td2"><input type="text" class="input input_wa" name="username" value='$username' /></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">站点说明</td>
+			<td class="td2"><input type="text" class="input input_wb" name="descrip" value='$descrip' /></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">站点LOGO<br />(设置文字链接请留空)</td>
+			<td class="td2"><input type="text" class="input input_wa" name="logo" value='$logo' /></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">状态</td>
+			<td class="td2">
+				<ul class="list_A list_80 cc">
+					<li><input type="radio" name="ifcheck" $ifcheck_Y value="1" />已审</li>
+					<li><input type="radio" name="ifcheck" $ifcheck_N value="0" />未审</li>
+				</ul>
+			</td>
+		</tr>
+	</table>
+	</div>
+	<div class="tac mb10">
+		<span class="btn"><span><button type="submit">提 交</button></span></span>
+	</center>
+</form>
+<!--
+EOT;
+}include_once PrintEot('adminbottom');
+?>-->

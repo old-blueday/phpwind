@@ -1,0 +1,326 @@
+<!--<?php
+
+$tmp = $layout_data['bgrepeat'];
+$checked_bgrepeat_norepeat = $tmp == "no-repeat" ? "checked" : "";
+$checked_bgrepeat_repeatx = $tmp == "repeat-x" ? "checked" : "";
+$checked_bgrepeat_null = (!$checked_bgrepeat_norepeat && !$checked_bgrepeat_repeatx) ? "checked" : "";
+	
+print <<<EOT
+-->
+<style type="text/css">
+body{background:#fff;padding:0;margin:0;}
+.wrap{padding:0;}
+.zt-list li{border:1px solid #fff;cursor:pointer;height:60px;width:60px;}
+.zt-list li:hover{border:1px solid #98ba2a;}
+.zt-list .current{ position:relative; cursor:pointer;}
+.zt-list .current div{ position:absolute;width:60px;height:60px;background: url($db_bbsurl/apps/stopic/image/group-current.gif) no-repeat;}
+</style>
+<form action="{$basename}&job=$job" method="post" enctype="multipart/form-data" id="opAdvanceForm" onsubmit="return checkAdvanceSubmit();">
+<div class="admin_table mb10">
+<table width="100%" style="table-layout:fixed;">
+	<tbody id="opStyleDisplay">
+	<tr class="tr1 vt">
+		<td class="td1">SEO关键字 </td>
+		<td class="td2"><input name="seo_keyword" type="text" class="input input_wb mb5" value="{$stopic_data['seo_keyword']}" /><p>多个词句间用半角","、"|"或空格隔开</p></td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">SEO网页描述</td>
+		<td class="td2"><input name="seo_desc" type="text" class="input input_wb" value="{$stopic_data['seo_desc']}" /></td>
+	</tr>
+	<tr class="tr1 vt">
+    	<td class="td1">背景图片选择</td>
+		<td class="td2">
+			<ul class="list_B list_160 cc" style="width:550px;">
+				<li><input name="is_new_bg" id="notNewBg" type="radio" value="0" onclick="showBgDisplay();" checked />选择全局背景图片</li>
+				<li><input name="is_new_bg" id="uploadBg"type="radio" value="1" onclick="showBgDisplay();" />上传自定义图片</li>
+				<li><input name="bg_id" id="opNoBg" type="radio" value="0"/>无背景图片</li>
+			</ul>
+			<div id="trShowBg">
+				<div style="width:695px;">
+<!--
+EOT;
+	if ($bg_total_page > 1) {
+print <<<EOT
+-->
+				<a href="javascript:void(0);"><img class="fl" style="margin:10px 10px 10px 0;" src="$db_bbsurl/apps/stopic/image/left.png" onclick="pageStopicBg('pre')"></a>
+				<a href="javascript:void(0);"><img class="fr" style="margin:10px 0;" src="$db_bbsurl/apps/stopic/image/right.png" onclick="pageStopicBg('nxt')"></a>
+<!--
+EOT;
+	}
+print <<<EOT
+-->
+					<div id="showBg">
+						<ul class="zt-list cc" id="bgPager">
+<!--
+EOT;
+	if (!count($bg_list)) {
+print <<<EOT
+-->
+			该分类下暂无背景图片
+<!--
+EOT;
+	}
+	foreach ($bg_list as $bg_data) {
+		$checked = '';
+		$liclass = '';
+		if ($stopic_data['bg_id'] == $bg_data['id']) {
+			$checked = 'checked';
+			$liclass = 'current';
+		}
+print <<<EOT
+-->
+                            <li style="display:none;" id="bgLi_{$bg_data[id]}" class="$liclass">
+                                <div></div>
+                                <img src="{$bg_data['thumb_url']}" width="60" height="60" onclick="selectBg('{$bg_data[id]}');" />
+                                <p style="display:none;"><input name="bg_id" id="bgId_{$bg_data[id]}" type="radio" value="{$bg_data[id]}" style=" vertical-align:middle" $checked />&nbsp;</p>
+                            </li>
+<!--
+EOT;
+	}
+print <<<EOT
+-->
+                        </ul>
+                    </div>
+				</div>
+				<input type="hidden" name="bgPageOffset" id="bgPageOffset" value="1" />
+            </div>
+            <div id="trShowUpload" style="display:none;">
+                    <input id="bgFileUpload" type="file" class="input mb5" name="background" onchange="checkFileType()">
+                    <span id="fileTypeError" style="display:none;"><font color="red">请选择正确的文件类型</font></span>
+                    <p>允许类型：jpg，jpeg，gif，png</p>
+            </div>
+		</td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">背景图片展示方式</td>
+		<td class="td2">
+        	<ul class="list_A">
+				<li><input name="layout_set[bgrepeat]" type="radio" style="vertical-align:middle" value="" $checked_bgrepeat_null />平铺</li>
+				<li><input name="layout_set[bgrepeat]" type="radio" style="vertical-align:middle" value="no-repeat" $checked_bgrepeat_norepeat />单张居中</li>
+				<li><input name="layout_set[bgrepeat]" type="radio" style="vertical-align:middle" value="repeat-x" $checked_bgrepeat_repeatx />横向平铺</li>
+            </ul>
+		</td>
+	</tr>
+	<tr class="tr1 vt">
+    	<td class="td1">选择风格样式</td>
+		<td class="td2">
+        <input id="layoutbannerurl" name="layout_set[bannerurl]" type="hidden" value="{$layout_data['bannerurl']}"  />
+        <input id="layoutnavfontcolor" name="layout_set[navfontcolor]" type="hidden" value="{$layout_data['navfontcolor']}" />
+        <input id="layoutnavbgcolor" name="layout_set[navbgcolor]" type="hidden" value="{$layout_data['navbgcolor']}" />
+        <input type="hidden" name="layout_set[selectstyle]" id="opStyleSave" value="{$layout_data['selectstyle']}">
+<!--
+EOT;
+$style_scroll = count($styles) > 5 ? 'overflow-y: scroll;' : '';
+print <<<EOT
+-->
+		<div class="choose" style="margin-bottom:10px;height:149px;width:750px;$style_scroll">
+			<div class="p10" style="padding-bottom:0">
+			<ul class="zt-list3 cc" id="style_ul">
+<!--
+EOT;
+foreach ($styles as $key => $style) {
+	$style_class = $layout_data['selectstyle'] == $key ? 'current' : '';
+print <<<EOT
+-->
+				<li id="style_{$key}" class="$style_class">
+					<a href="javascript:;" hidefocus="true"><img src="{$style[minipreview]}" title="$style[name]" /></a>
+				</li>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+			</ul>
+			</div>
+		</div>
+		</td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">全局背景颜色</td>
+		<td class="td2">
+        	<div class="input_img fl mr10"><i class="input_color" title="选择颜色" onclick="showColorPicker(this,'layoutbgcolor',function(){pickReback('layoutbgcolorspan',color_picker)})">选择颜色</i><input name="layout_set[bgcolor]" value="$layout_data[bgcolor]" id="layoutbgcolor" type="text" /></div>
+			<span id="layoutbgcolorspan" style="color:$layout_data[bgcolor];">■■■■</span>
+		</td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">内容区域背景颜色</td>
+		<td class="td2">
+        	<div class="input_img fl mr10"><i class="input_color" title="选择颜色" onclick="showColorPicker(this,'layoutareabgcolor',function(){pickReback('layoutareabgcolorspan',color_picker)})">选择颜色</i><input id="layoutareabgcolor" name="layout_set[areabgcolor]" value="$layout_data[areabgcolor]" type="text" /></div>
+			<span id="layoutareabgcolorspan" style="color:$layout_data[areabgcolor];">■■■■</span>
+		</td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">全局链接字体颜色</td>
+		<td class="td2">
+        	<div class="input_img fl mr10"><i class="input_color" title="选择颜色" onclick="showColorPicker(this,'layoutfontcolor',function(){pickReback('layoutfontcolorspan',color_picker)})">选择颜色</i><input id="layoutfontcolor" name="layout_set[fontcolor]" value="$layout_data[fontcolor]" type="text" /></div>
+			<span id="layoutfontcolorspan" style="color:$layout_data[fontcolor];">■■■■</span>
+		</td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">css高级设置</td>
+		<td class="td2">
+			<textarea id="layoutothercss" name="layout_set[othercss]" class="textarea" style="width:98%; height: 200px;margin-bottom:5px; font-family:Verdana;">
+$layout_data[othercss]</textarea>
+		</td>
+	</tr>
+	</tbody>
+</table>
+</div>
+<div class="tac mb10">
+			<input type="hidden" name="jobact" value="save" />
+			<input type="hidden" id="stopicId" name="stopic_id" value="" />
+			<input type="hidden" id="stopicTitle" name="stopic_title" value="" />
+			<input type="hidden" id="categoryId" name="category_id" value="" />
+            <span class="btn2"><span><button type="submit" onfocus="blur();">保 存</button></span></span>
+            <span style="display:none; position:absolute;padding-top:4px;" class="s3" id="opSaveOkMessage">保存成功</span>
+</div>
+</form>
+<script type="text/javascript" language="JavaScript" src="js/global.js"></script>
+<script type="text/javascript" language="JavaScript" src="js/pw_ajax.js"></script>
+<script type="text/javascript" language="JavaScript" src="js/color_picker.js"></script>
+<script type="text/javascript" language="javascript" src="apps/stopic/js/changestyle.js"></script>
+
+<script language="javascript">
+
+
+var AJAXURL = '$ajaxurl';
+
+function pageStopicBg(op) {
+	var nowPage = getObj('bgPageOffset').value * 1;
+	var nextPage = (op == 'pre') ? (nowPage - 1) : (nowPage + 1);
+	var totalPage = {$bg_total_page};
+
+	if (nextPage < 1) { alert("已经翻到第一页"); return ;}
+	if (nextPage > totalPage) { alert("已经翻到最后一页"); return ;}
+	getObj('bgPageOffset').value = nextPage;
+
+	showStopicBg(nextPage);
+}
+function showStopicBg(pageNumber) {
+	var bgPerpage = {$bg_perpage};
+	var bgPagerObj = getObj('bgPager');
+	var tagObjs = bgPagerObj.getElementsByTagName("li");
+	if (tagObjs.length == 0) return ;
+	
+	var startOffset = (pageNumber - 1) * bgPerpage;
+	var endOffset = pageNumber * bgPerpage - 1;
+	
+	for(i=0; i<tagObjs.length; i++){
+		if (i >= startOffset && i <= endOffset) {
+			tagObjs[i].style.display = "inline";
+		} else{
+			tagObjs[i].style.display = "none";
+		}
+	}
+	return;
+}
+
+function showBgDisplay() {
+	if (getObj('notNewBg').checked) {
+		getObj('trShowBg').style.display = '';
+		getObj('trShowUpload').style.display = 'none';
+		getObj('opNoBg').checked = false;
+	} else{
+		getObj('trShowBg').style.display = 'none';
+		getObj('trShowUpload').style.display = '';
+		getObj('opNoBg').checked = false;
+	}
+}
+function checkFileType() {
+	var fileName = getObj("bgFileUpload").value;
+	if (fileName != '' && !getObj('notNewBg').checked) {
+		var regTest = /\.(jpe?g|gif|png)$/gi;
+		var arrMactches = fileName.match(regTest);
+		if (arrMactches == null) {
+			getObj('fileTypeError').style.display = '';
+			return false;
+		} else {
+			getObj('fileTypeError').style.display = 'none';
+		}
+	}
+	return true;
+}
+
+
+function pickReback(obj,color){
+	if (typeof obj == 'string') {
+		obj = getObj(obj);
+	}
+	obj.style.color = color;
+}
+
+function getParentInfo() {
+	getObj('stopicId').value = window.parent.document.getElementById('stopicId').value;
+	getObj('stopicTitle').value = window.parent.document.getElementById('stopicTitle').value;
+	getObj('categoryId').value = window.parent.document.getElementById('category').value;
+}
+
+function checkAdvanceSubmit() {
+	getParentInfo();
+	if (checkFileType()) {
+		window.parent.document.getElementById('opShowIframeSaveOk').value = 1;
+		getObj("opAdvanceForm").submit();
+	}
+	return false;
+}
+
+
+getObj("opNoBg").onclick = function() {
+	var obj;
+	obj=document.getElementsByName('is_new_bg');
+	if(obj!=null){
+		var i;
+		for(i=0;i<obj.length;i++){
+			if(obj[i].checked){
+				obj[i].checked = false;
+			}
+		}
+	}
+	changeBgPicClass('0');
+	getObj('trShowBg').style.display = 'none';
+	getObj('trShowUpload').style.display = 'none';
+}
+
+function selectBg(bgId) {
+	getObj('bgId_'+bgId).checked = true;
+	changeBgPicClass(bgId);
+}
+
+function changeBgPicClass(bgId) {
+	var elems = objCheck('bgPager').getElementsByTagName("li");
+	for (var i=0;i<elems.length ;i++ ) {
+		var liTmp = elems[i].id.split('_');
+		elems[i].className = (liTmp[1] != bgId) ? '' : 'current';
+	}
+}
+
+function displaySaveOkMessage(isShow) {
+	getObj('opSaveOkMessage').style.display = isShow ? '' : 'none';
+}
+
+function showSaveOkMessage() {
+	if ('0' != window.parent.document.getElementById('opShowIframeSaveOk').value) {
+		displaySaveOkMessage(true);
+		setTimeout('displaySaveOkMessage(false);', 2000);
+	} else {
+		displaySaveOkMessage(false);
+	}
+	window.parent.document.getElementById('opShowIframeSaveOk').value = 0;
+}
+
+
+window.onload = function() {
+	showBgDisplay();
+	showStopicBg(1);
+	showSaveOkMessage();
+
+	New(changeStyle,['style_ul','opStyleSave']);
+};
+
+
+</script>
+
+<!--
+EOT;
+?>
+-->

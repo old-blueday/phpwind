@@ -1,0 +1,179 @@
+<!--<?php
+print <<<EOT
+-->
+<div id='hiddenMessage' style="display:none"></div>
+<div class="contUser" id="content">
+<table width="100%"><tr class="vt"><td height="400">
+	<div class="p15">
+<!--
+EOT;
+if(!empty($action)){
+print <<<EOT
+-->
+	   <h4 class="site bdA"><span>历史消息</span></h4>
+	   <div class="tips">
+			<a href="javascript:history.go(-1);">&lt;&lt;返回</a>
+       </div>
+<!--
+EOT;
+if($smstype == $messageServer->getConst('sms_rate')){
+	require messageEot('sms_rateinfo');
+}elseif($smstype == $messageServer->getConst('sms_message')){
+	require messageEot('sms_smsinfo');
+}elseif($smstype == $messageServer->getConst('notice_system') ||  
+		$smstype == $messageServer->getConst('notice_postcate') || 
+		$smstype == $messageServer->getConst('notice_active') || 
+		$smstype == $messageServer->getConst('notice_apps')){
+	require messageEot('notice_info');
+}elseif($smstype == $messageServer->getConst('groupsms_colony')){
+	$linkUrl = "u.php?uid=";
+	require messageEot('groupsms_ginfo');
+}elseif($smstype == $messageServer->getConst('groupsms_normal') || 
+		$smstype == $messageServer->getConst('groupsms_shield')){
+	$linkUrl = "apps.php?q=group&cyid=";
+	require messageEot('groupsms_cinfo');
+}
+//列表页
+}else{print <<<EOT
+-->
+	<h4 class="site bdA"><span>历史消息</span>(共{$countHistory}条)</h4>
+<form action="$normalUrl&" method="post" name="FORM">
+	<div class="tips">
+		<span class="mr5"><label><input name="" type="checkbox" value="" onclick="MC.CheckAll(this.form,this)" />&nbsp;全选/不选</label></span>
+        <span class="bt2"><span><button onclick="MC.mSubmit(document.FORM,'del','history','','$page','showmessageTip')"  type="button">删除</button></span></span>
+    </div>
+	<div id="showmessageTip"></div>
+<!--
+EOT;
+if(!$countHistory){
+print <<<EOT
+-->
+	<div class="tac p15 f14">暂无任何历史消息</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+	<table width="100%" class="mb10 z2">
+<!--
+EOT;
+foreach($historyList as $key => $value){
+$value['content'] = strip_tags($value['content']);
+$_name = $value['typeid'] == $messageServer->getConst('groupsms_colony') ? $value['cname'] : $value['create_username'];
+$_url = $value['typeid'] == $messageServer->getConst('groupsms_colony') ? "apps.php?q=group&cyid={$value['colonyid']}" : "u.php?uid={$value['uid']}";
+$_icon = $value['typeid'] == $messageServer->getConst('groupsms_colony') ? $value['cnimg'] : $value['face'];
+$_link = "{$baseUrl}?action=info&subtype=history&rid={$value[rid]}&mid={$value[mid]}&smstype={$value[typeid]}";
+if($value['typeid'] == $messageServer->getConst('sms_message') || 
+	$value['typeid'] == $messageServer->getConst('sms_rate') ||
+	$value['typeid'] == $messageServer->getConst('sms_comment') ||
+	$value['typeid'] == $messageServer->getConst('sms_guestbook')){
+	$_link .= "&type=sms&page=$page"; 
+}elseif($value['typeid'] == $messageServer->getConst('groupsms_colony')){
+	$_link .= "&type=groupsms&page=$page";
+}elseif($value['typeid'] == $messageServer->getConst('groupsms_normal') || 
+		$value['typeid'] == $messageServer->getConst('groupsms_shield')){
+	$_link .= "&type=groupsms";
+}elseif($value['typeid'] == $messageServer->getConst('notice_system') ||  
+		$value['typeid'] == $messageServer->getConst('notice_postcate') || 
+		$value['typeid'] == $messageServer->getConst('notice_active') || 
+		$value['typeid'] == $messageServer->getConst('notice_apps')){
+	$_link .= "&type=notice&page=$page";
+}elseif($value['typeid'] == $messageServer->getConst('request_friend') ||  
+		$value['typeid'] == $messageServer->getConst('request_group') || 
+		$value['typeid'] == $messageServer->getConst('notice_app')){
+        $_link = "javascript:void(0)";
+}
+list($_img,$_b,$_tip) = getMessageIconByStatus($value);
+print <<<EOT
+-->
+		    <tr class="tr3">
+		    	<td class="pick"><input name="rids" type="checkbox" value="{$value[rid]}" /></td>
+		        <td class="icon"><img src="u/images/message/{$_img}" id="icon_{$value[rid]}" /></td>
+		        <td class="face">
+<!--
+EOT;
+if($_icon){
+print <<<EOT
+-->
+		        <a href="{$_url}" class="img_50"><i><img src="{$_icon}" width="48" height="48" /></i></a>
+<!--
+EOT;
+}print <<<EOT
+-->
+				</td>
+		        <td class="name">
+		            <p><a href="{$_url}">{$_name}</a></p>
+		            <em>{$value[modified_time_format]}</em>
+		        </td>
+		        <td class="value">
+		            <h4 $_b><a href="{$_link}">{$value[title]}</a></h4><em class="s2" id="em_{$value[rid]}">{$_tip}</em>
+		
+		            <p class="lh_18">{$value[content]}</p>
+<!--
+EOT;
+if($value['typeid'] == $messageServer->getConst('request_friend') ||  
+		$value['typeid'] == $messageServer->getConst('request_group') || 
+		$value['typeid'] == $messageServer->getConst('notice_app')){
+$requestDesc = getRequestTypeDes($value['typeid'],'');		
+if(in_array($value['status'],array(0,4,5))){
+$class = $value['status'] == 4 ? 'ignoreTip' : 'rightTip';
+$statusInfo = $requestDesc[$value['status']];
+print <<<EOT
+-->
+
+				<input type="hidden" value="true" name="skip_{$value[rid]}" id="skip_{$value[rid]}" />
+				<p id='status_{$value[rid]}_{$value[status]}'></p>
+				<p class="$class">$statusInfo</p>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+				<input type="hidden" value="false" name="skip_{$value[rid]}" id="skip_{$value[rid]}" />
+				<p id="tip_$value[rid]" name="tips"></p>
+				<p id="opt_$value[rid]" name="opts"><span class="btn2"><span><button onclick="MC.changeStatus('$baseUrl?&type=ajax&action=agree&typeid=$value[typeid]&fid[]=$value[create_uid]&rids[]=$value[rid]','{$value[rid]}','rightTip');" type="button">同意</button></span></span>
+                <span class="bt2"><span><button onclick="MC.changeStatus('$baseUrl?&type=ajax&action=overlook&typeid=$value[typeid]&rids[]=$value[rid]{$fuid}','{$value[rid]}','ignoreTip')" type="button">忽略</button></span></span></p>
+<!--
+EOT;
+}}print <<<EOT
+-->
+		            
+		        </td>
+		    </tr>
+<!--
+EOT;
+}print <<<EOT
+-->		    
+	</table>
+	<div id="showmessage"></div>
+<!--
+EOT;
+if(count($historyList) >= $perpage){
+print <<<EOT
+-->
+    <div class="mb10">
+		<span class="mr5"><label><input name="" type="checkbox" value="" onclick="MC.CheckAll(this.form,this)">&nbsp;全选/不选</label></span>
+        <span class="bt2"><span><button onclick="MC.mSubmit(document.FORM,'del','history','','$page','showmessage')"  type="button">删除</button></span></span>
+    </div>
+<!--
+EOT;
+}print <<<EOT
+-->
+</form>
+<div class="mb10">
+    <div class="fr" style="_width:500px;">
+        {$pages}
+    </div>
+    <div class="c"></div>
+</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+	</div>
+</td></tr></table>
+</div>
+<!--
+EOT;
+if(!defined('AJAX')){
+	require_once(uTemplate::printEot('footer'));
+}
+?>-->

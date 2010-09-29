@@ -1,0 +1,53 @@
+<!--<?php
+$title = $subMenu[$sub];
+if($result){
+print <<<EOT
+-->
+<table width="100%"><tr class="vt"><td height="400">
+	<div class="p5">
+	<h5 class="h5 mb10"><div class="fr"><form action="{$basename}action=$action&sub=$sub&rand=$randnum" method="post">
+		$result[fType]
+		$result[fTime]
+		</form></div><strong>$title[type_name]</strong></h5>
+	<div class="mt10">
+		<ul class="img-list-b cc">
+<!--
+EOT;
+foreach($result['data'] as $key => $value){
+$value['image'] = getphotourl($value['image'],$value['ifthumb']);
+print <<<EOT
+-->
+			<li><a href="$value[url]" target="_blank" class="aimg"><span><img src="$value[image]" /></span></a>
+			<p>上传人：<a href="u.php?username=$value[author]" target="_blank">$value[author]</a></p><p>$result[unit]数：
+			<span class="mr10">$value[value]</span>
+<!--
+EOT;
+if($sub=="picRate"){print <<<EOT
+-->
+			<a onclick="quickRateRequest($value[id],'3','$fType');" href="javascript:;">评价</a>
+<!--
+EOT;
+}elseif($sub=="picFav"){print <<<EOT
+-->
+			<a  onclick="sendmsg('operate.php?action=share&ajax=1&type=photo&id=$value[id]','',this.id);" href="javascript:;">收藏</a>
+<!--
+EOT;
+}elseif($sub=="picShare"){print <<<EOT
+-->
+			<a  onclick="sendmsg('operate.php?action=share&ajax=1&type=photo&id=$value[id]','',this.id);" href="javascript:;">分享</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+			</p></li>
+<!--
+EOT;
+}print <<<EOT
+-->
+		</ul>
+	</div>
+	</div>
+</td></tr></table>
+<!--
+EOT;
+}?>-->

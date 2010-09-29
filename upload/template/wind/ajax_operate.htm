@@ -1,0 +1,828 @@
+<!--<?php
+if ($action=='showping') {
+print <<<EOT
+-->
+<form  name="form" action="operate.php?action=$action&ajax=1" method="post" onsubmit="return false;" id="pingForm">
+<input type="hidden" name="verify" value="$verifyhash" />
+<input type="hidden" name="page" value="$page" />
+<input type="hidden" name="tid" value="$tid" />
+<!--
+EOT;
+	foreach ($atcdb as $key=>$value) {
+print <<<EOT
+-->
+<input type="hidden" name="selid[]" value="$key" />
+<!--
+EOT;
+	}
+print <<<EOT
+-->
+<div style="width:450px;">
+<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="adel cp" onclick="closep();">关闭</span>帖子评分</div>
+<table width="100%" class="vt z mb5">
+	<tr class="tr3">
+		<td width="80">操作类型:</td>
+		<td>
+			<label class="mr20"><input type="radio" name="step" value="1" checked onclick="operatesel(1);" id="step"/>评分</label><label><input type="radio" name="step" value="2" onclick="operatesel(2);" id="step"/>取消评分</label>
+		</td>
+	</tr>
+	<tr id="cancel" class="tr3" style="display:none">
+		<td>操作说明:</td>
+		<td>取消评分按自己最近的评分开始取消</td>
+	</tr>
+	<tr class="tr3">
+		<td>评分数量:</td>
+		<td>$count 篇</td>
+	</tr>
+    <tr class="tr3">
+		<td>标题</td>
+		<td>{$subject}</td>
+	</tr>
+	<tr id="ok1" class="tr3">
+		<td>积分名称:</td>
+		<td style="padding:0;">
+			<table>
+				<tr class="tr5">
+					<td>名称</td>
+					<td>点数</td>
+					<td align="center">评分区间</td>
+					<td align="center">剩余</td>
+					<td></td>
+				</tr>
+				<tbody id="c_model"><tr class="tr5">
+					<td><select name="cid[]" onchange="optionsel(this)">$creditselect</select></td>
+					<td><input class="input fl" type="text" name="addpoint[]" value="1" size="3" />
+					<a href="javascript:;" class="select_arrow fl" style="margin:2px 0 0 2px;" onclick="readByRateOpen(this);">下拉</a>
+          </td>
+					<td align="center"></td>
+					<td align="center"></td>
+					<td><a href="javascript:" onclick="addoption()" class="s3">[添加]</a></td>
+				</tr></tbody>
+				<tbody id="c_body"></tbody>
+			</table>
+		</td>
+	</tr>
+	<tr class="tr3">
+		<td>消息通知:</td>
+		<td>
+			<label class="mr20"><input type="radio" name="ifmsg" value="1" $check_Y  id="ifmsg"/>开启</label><label><input type="radio" name="ifmsg" value="0" $check_N  id="ifmsg"/>关闭</label>
+		</td>
+	</tr>
+	<tr id="ok3" class="tr3">
+		<td>评分理由：</td>
+		<td>
+			<div class="mb5">
+			<select onchange="this.form.atc_content.value=this.value" style="width:320px;" class="mb5">
+				<option value="">自定义</option>
+				<option value="">-------</option>
+				$reason_sel
+			</select>
+			</div>
+			<div>
+				<textarea name="atc_content" id="atc_content" onkeydown="ajax.quickpost(event,this.form)" class="textareaA mb5"></textarea>
+				<div id="atc_content_warn" class="gray">限100字节</div>
+			</div>
+		</td>
+	</tr>
+</table>
+<div id="menu_rate" style="display:none;">
+<!--[if IE 6]>
+<iframe frameborder="0" style="position:absolute;width:60px;height:270px;background:#fff;filter:Alpha(opacity=0);" scrolling="no"></iframe>
+<![endif]-->
+    <div class="pw_menu" style="_position:absolute;_z-index:1;">
+        <ul class="menuList" style="width:54px;" onmousedown="getRate(event)">
+<!--
+EOT;
+if ($ratelist) {
+foreach ($ratelist as $rate) {
+print <<<EOT
+-->
+            <li><a href="javascript:;" onmousedown="rateInput('{$rate}');" class="s6">{$rate}</a></li>
+<!--
+EOT;
+}
+} else {print <<<EOT
+-->
+            <li>暂无积分选择</li>
+<!--
+EOT;
+}print <<<EOT
+-->
+        </ul>
+    </div>
+</div>
+<div class="popBottom">
+<span class="btn2"><span>
+<!--button type="button" name="ajaxsubmit" onclick="ajax.submit(this.form,marked);">提 交</button-->
+<button type="button" name="ajaxsubmit" onclick="operateshowping();">提 交</button>
+</span></span></div>
+</div>
+</form>
+<script type="text/javascript">
+function operateshowping() {
+	var thisform = $('pingForm');
+	ajax.submit(thisform, function() {
+	//ajax.send('operate.php?action=showping&ajax=1',postp,function(){
+		var rText = ajax.request.responseText.split('\t');
+		if (rText[0]=='success') {
+			var showping = JSONParse(rText[1]);
+			if (rText[2] != 'cancel') {
+				for (var i in showping) {
+					var m = 0;
+					var createpingbox = $('createpingbox_'+i);
+					var pingNum = $('pingNum_'+i);
+					if (createpingbox) {
+						$('mark_'+i).style.display = '';
+						for (var j in showping[i]) {
+							createpingbox.innerHTML = showPingCommentHTML(createpingbox,showping[i][j]) + createpingbox.innerHTML;
+							m++;
+						}
+					}
+					var pingNums = pingNum.innerHTML ? parseInt(pingNum.innerHTML) : 0;
+					pingNum.innerHTML  = parseInt(m) + pingNums;
+				}
+				showDialog('success','评分成功!',1);
+			} else {
+				for (var i in showping) {
+					var pingLog = $('pingLogTr_'+showping[i]) ? $('pingLogTr_'+showping[i]) : $('createpingLogTr_'+showping[i])
+					var pingNum = $('pingNum_'+i);
+					if (pingLog){
+						pingLog.style.display = 'none';
+						var pingNums = pingNum.innerHTML ? parseInt(pingNum.innerHTML) : 0;
+						pingNum.innerHTML = pingNums > 0 && pingNums-1;
+					}
+				}
+			}
+		} else {
+			ajax.guide();
+		}
+	});
+}
+
+function showPingCommentHTML(element,showping) {
+		return '<table width="100%"><tr id="createpingLogTr_'+showping['pingLogId']+'" class="vt" onmouseover="showPingDelLink(this, true)" onmouseout="showPingDelLink(this, false)"><th class="p_face"><div id="card_pingUserShow_'+showping['pingLogId']+'_'+showping['pingeruid']+'" class="userCard"><img src="'+showping['face']+'" width="16" height="16" /></div><span id="pingUserShow_'+showping['pingLogId']+'"></span></th><td class="p_name"><a target="_blank" href="u.php?username='+showping['pinger']+'">'+showping['pinger']+'</a></td><td  width="60">'+showping['name']+'</td><td class="s2 b" width="40">'+showping['point']+'</td><td width="90">'+showping['pingtime']+'</td><td>'+showping['record']+'</td><td width="20"><a class="adel" style="display:none;" id="pingDel_'+showping['pingLogId']+'" href="javascript:void(0);" onclick=delPingLog("'+showping['fid']+'","'+showping['tid']+'","'+showping['pid']+'","'+showping['pingLogId']+'")>删除</a></td></tr></table>';
+}
+</script>
+
+<script language="JavaScript">
+setTimeout(function() {
+	showoption($('c_model'));
+	initCheckTextNum('atc_content','atc_content_warn', 100);
+}, 100);
+//var readByRate = new PwMenu('raterange');
+
+function addoption() {
+	var s = $('c_model').firstChild.cloneNode(true);
+	var td = s.getElementsByTagName('td');
+	var sel = s.getElementsByTagName('select')[0];
+	optionsel(sel);
+	td[4].innerHTML = '<a href="javascript:" class="s4" onclick="deloption(this)">[删除]</a>';
+	$('c_body').appendChild(s);
+}
+function deloption(o) {
+	$('c_body').removeChild(o.parentNode.parentNode);
+}
+
+var lineNode;
+var ratelist = JSONParse('$ratelist');
+
+function optionsel(o) {
+	var jscredit = JSONParse('$jscredit');
+	var tr = o.parentNode.parentNode;
+	var td = tr.getElementsByTagName('td');
+	var v = o.value;
+	td[2].innerHTML = jscredit[v]['minper'] + '~' + jscredit[v]['maxper'];
+	td[3].innerHTML = '<span class="s2 b">' + jscredit[v]['leavepoint'] + '</span>';
+}
+function showoption(o) {
+	var sel = o.getElementsByTagName('select')[0];
+	optionsel(sel);
+}
+
+function getRate(e)
+{
+	e = e||window.event;
+	//e.cancelBubble = true;
+	if(e.srcElement.tagName=='A'){
+		lineNode.getElementsByTagName('input')[0].value=parseInt(e.srcElement.innerHTML);
+	}
+}
+
+function readByRateOpen(e)
+{
+	var menu_rate = $('menu_rate');
+	lineNode = e.parentNode.parentNode;
+	var ul = getObj('menu_rate').getElementsByTagName('ul')[0];
+	var tr = e.parentNode.parentNode;
+	var d = tr.getElementsByTagName('select')[0].value;
+	var ar = ratelist[d];
+	var l = ar.length;
+	var html='';
+	for(var i=0;i<l;i++){
+		html += '<li><a href="javascript:;">'+ar[i]+'</a></li>';
+	}
+	ul.innerHTML=html;
+	menu_rate.style.display='block';
+	menu_rate.style.position='absolute';
+	menu_rate.style.top = 20+e.getBoundingClientRect().top - $('pw_box').getBoundingClientRect().top + 'px';
+	menu_rate.style.left = e.getBoundingClientRect().left - $('pw_box').getBoundingClientRect().left + 'px';
+	document.body.onmousedown = function(){
+		document.body.onmousedown = null;
+		menu_rate.style.display = 'none';
+	};
+}
+function rateInput(val)
+{
+	var tr = lineNode;
+	tr.getElementsByTagName('input')[0].value = val;
+	$('menu_rate').style.display = 'none';
+	document.body.onmousedown = null;
+}
+</script>
+<script language="javascript" id="showping_js">
+function operatesel (id) {
+	if (id == '1') {
+		objCheck('ok1').style.display = '';
+		objCheck('ok3').style.display = '';
+		objCheck('cancel').style.display = 'none';
+	} else {
+		objCheck('ok1').style.display = 'none';
+		objCheck('ok3').style.display = 'none';
+		objCheck('cancel').style.display = '';
+	}
+}
+var charset = '$db_charset';
+</script>
+
+<!--
+EOT;
+} elseif($action=='postping') {
+print <<<EOT
+-->
+<!--
+EOT;
+} elseif($action=='recommend') {
+print <<<EOT
+-->
+<form method="post" name="FORM" action="operate.php?action=recommend&ajax=1" onsubmit="return false;">
+<input type="hidden" name="verify" value="$verifyhash" />
+<input type="hidden" name="tid" value="$tid" />
+<input type="hidden" name="type" value="$type" />
+<div style="width:450px;">
+<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="adel cp" onclick="closep();">关闭</span>帖子推荐</div>
+<table width="100%" class="vt z mb5">
+	<tr class="tr3">
+		<td class="80">推荐方式:</td>
+		<td><label class="mr20"><input type="radio" name="step" value="1" onclick="getObj('sendemail').style.display='none';getObj('friend').style.display='';" checked />消息推荐</label><label><input type="radio" name="step" value="2" onclick="getObj('sendemail').style.display='';getObj('tofriend').style.display='none';getObj('friend').style.display='none';" />邮件推荐</label></td>
+	</tr>
+	<tr class="tr3">
+		<td align="center">对方姓名:</td>
+		<td><input type="text" class="input mr10" name="sendtoname" value="" />
+<!--
+EOT;
+	if ($friends) {
+print <<<EOT
+-->
+			<span class="bt2"><span><button type="button" onClick="getObj('tofriend').style.display='';" id="friend">好友列表</button></span></span>
+<!--
+EOT;
+	}
+print <<<EOT
+-->
+		</td>
+	</tr>
+	<tr id="tofriend" style="display:none" class="tr3">
+		<td>好友选择:</td>
+		<td>
+			<div style="overflow-y:scroll;width:307px;height:7em;"><ul class="menu-half">
+<!--
+EOT;
+	if ($friends) {
+		foreach ($friends as $key=>$val) {
+print <<<EOT
+-->
+				<li><input type="checkbox" name="touid[]" value="$key" />$val[username]</li>
+<!--
+EOT;
+		}
+print<<<EOT
+-->
+			</ul></div>
+			<span class="bta" style="cursor:pointer;" onClick="CheckAll(document.FORM,'touid')">全 选</span>
+<!--
+EOT;
+	}
+print <<<EOT
+-->
+		</td>
+	</tr>
+	<tbody id="sendemail" style="display:none">
+	<tr class="tr3"><td>对方Email:</td>
+		<td><input type="text" class="input input_wa" name="sendtoemail" value="" /></td>
+	</tr>
+	</tbody>
+	<tr class="tr3">
+		<td align="center">标题：</td>
+		<td><input type="text" class="input input_wa" name="subject" value="$atc_name" /></td>
+	</tr>
+<!--
+EOT;
+	if ($db_gdcheck & 16) {
+print <<<EOT
+-->
+	<tr class="tr3">
+		<td align="center">认证码：</td>
+		<td><img src="ck.php?nowtime=1" align="absmiddle" onclick="this.src='ck.php?nowtime=' + new Date().getTime();" style="cursor:pointer;" /><br />
+			<input type="text" class="input" name="gdcode" size="8" />
+		</td>
+	</tr>
+<!--
+EOT;
+	}
+print <<<EOT
+-->
+	<tr class="tr3"><td align="center">内容：</td>
+		<td><textarea class="textareaA" name="atc_content" onkeydown="ajax.quickpost(event,this.form)">您好！我在$db_bbsname($db_bbsurl/?u=$winduid)\n看到了这篇帖子，认为很有价值，特推荐给您。\n\n作者:$atcinfo[author]\n地址:{$db_bbsurl}/read.php?tid=$tid&u=$winduid\n\n希望您能喜欢。</textarea></td>
+	</tr>
+</table>
+<div class="popBottom"><span class="btn2"><span><button type="button" name="ajaxsubmit" onclick="ajax.submit(this.form);">提 交</button></span></span></div>
+</div>
+</form>
+<SCRIPT type="text/javascript" LANGUAGE="JavaScript" src="js/core/friendlist.js"></SCRIPT>
+<!--
+EOT;
+} elseif($action=='report') {
+print <<<EOT
+-->
+<form action="operate.php?action=$action&ajax=1" method="post" onsubmit="return false;">
+<input type="hidden" name="verify" value="$verifyhash" />
+<div style="width:400px;">
+<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="adel cp" onclick="closep();">关闭</span>报告功能</div>
+<table width="100%" class="vt z mb5">
+	<tr class="tr3">
+		<td width="80">报告类型:</td>
+		<td><label class="mr20"><input type="radio" name="type" value="1" checked onclick="this.form.reason.value='该帖很优秀,建议加为精华帖!'" />优秀帖子</label><label><input type="radio" name="type" value="0" onclick="this.form.reason.value='该帖包含不良信息,请及时处理!'" />不良帖子</label></td>
+	</tr>
+	<tr class="tr3">
+		<td>通知版主:</td>
+		<td><label class="mr20"><input type="radio" name="ifmsg" value="1" checked />开启</label><label><input type="radio" name="ifmsg" value="0" />关闭</label></td>
+	</tr>
+	<tr class="tr3">
+		<td>原因:</td>
+		<td><textarea id="reason" name="reason" class="textareaA">该帖很优秀,建议加为精华帖!</textarea></td>
+	</tr>
+</table>
+<input type="hidden" name="step" value="2" />
+<input type="hidden" name="tid" value="$tid" />
+<input type="hidden" name="pid" value="$pid" />
+<div class="popBottom"><span class="btn2"><span><button type="button" onclick="ajax.submit(this.form);">提 交</button></span></span></div>
+</div>
+</form>
+<!--
+EOT;
+} elseif($action == 'share') {
+	if ($db_share_open) {
+print<<<EOT
+-->
+<div id="share_box">
+	<form name="shareFORM" method="post" action="apps.php?q=sharelink" onsubmit="return false;">
+	<div style="width:480px;">
+		<div class="popTop cc" style="cursor:move" onmousedown="read.move(event);">
+			<ul class="cc">
+				<li class="current"><a href="javascript:;">分享</a></li>
+				<li><a href="javascript:;" onclick="shareOtherType('recommend_box');return false;">推荐</a></li>
+			</ul>
+		</div>
+		<div class="p15">
+<!--
+EOT;
+if ($type != 'topic' && $type != 'reply'){print <<<EOT
+-->
+				<div class="mb5">摘要：</div>
+				<div style="background:#f7fbff;border-bottom:1px solid #e4e4e4;border-top:1px solid #e4e4e4;" class="p10">
+					$share_type_des
+<!--
+EOT;
+			if ($type == 'album' || $type == 'photo') {
+print <<<EOT
+-->
+					<img src="$photourl" width="100">
+<!--
+EOT;
+			} else {
+print <<<EOT
+-->
+					<b>$subject</b>
+<!--
+EOT;
+			}
+print <<<EOT
+-->
+<br />
+					所属： $username
+				</div>
+<!--
+EOT;
+} elseif ($type == 'topic' || $type == 'reply') {print <<<EOT
+-->
+					<div class="mb5">$share_type_des</div>
+					<div style="background:#f7fbff;border-bottom:1px solid #e4e4e4;border-top:1px solid #e4e4e4;" class="p10">
+					<p class="s4 mb5 f14">$subject</p>
+					<p class="gray mb5"><span class="mr20">作者： $username</span>发表时间： $postdate</p>
+					<p>$descrip</p>
+<!--
+EOT;
+			if ($attimages) {
+				foreach ($attimages as $k => $v) {
+print<<<EOT
+-->
+					<p class="mb10"><img src="$v" style="width:60px;height:60px;" align="absmiddle"></p>
+<!--
+EOT;
+				}}
+print<<<EOT
+-->
+				</div>
+<!--
+EOT;
+		}
+print <<<EOT
+-->
+			<div class="c mb10">&nbsp;</div>
+			<div class="mb5">
+			<div class="mb5">说明：</div>
+			<textarea class="textareaA" name="descrip" style="width:440px;"></textarea></div>
+
+		</div>
+		<div class="popBottom">
+<!--
+EOT;
+if ($type != 'topic' && $type != 'reply') {print <<<EOT
+-->
+			<span class="bt2"><span><button type="button" onclick="getObj('ifhidden').value='1';ajax.submit(this.form);">私密收藏</button></span></span>
+<!--
+EOT;
+		}
+print <<<EOT
+-->
+			<span class="btn2"><span><button type="button" style="width:80px;" onclick="ajax.submit(this.form);">分享</button></span></span>
+			<span class="bt2"><span><button type="button" onclick="closep();">取消</button></span></span>
+		</div>
+	</div>
+	<input type="hidden" name="ifhidden" id="ifhidden" value="0">
+	<input type="hidden" name="type" value="$type">
+	<input type="hidden" name="id" value="$id">
+	<input type="hidden" name="verify" value="$verifyhash" />
+<!--
+EOT;
+if ($type == 'reply' || $type == 'topic') {print<<<EOT
+-->
+	<input type="hidden" name="tid" value="$tid" />
+	<input type="hidden" name="cyid" value="$cyid" />
+<!--
+EOT;
+}print<<<EOT
+-->
+	</form>
+</div>
+<!--
+EOT;
+	} else {
+print<<<EOT
+-->
+	<div id="share_box"><div style="width:480px;"></div></div>
+<!--
+EOT;
+	}
+print<<<EOT
+-->
+
+<!--
+EOT;
+if (!$db_share_open) {print<<<EOT
+-->
+<div id="recommend_box">
+<!--
+EOT;
+}else{print<<<EOT
+-->
+<div id="recommend_box" style="display:none">
+<!--
+EOT;
+}print<<<EOT
+-->
+	<form name="recommendFORM" method="post" action="operate.php?action=share&ajax=1" onsubmit="return false;">
+		<input type="hidden" name="step" value="2" />
+		<input type="hidden" name="type" value="$type">
+
+		<div style="width:480px;">
+		<div class="popTop cc" style="cursor:move" onmousedown="read.move(event);">
+			<ul class="cc">
+<!--
+EOT;
+	if ($db_share_open) {
+print<<<EOT
+-->
+					<li><a href="javascript:;" onclick="shareOtherType('share_box');return false;">分享</a></li>
+<!--
+EOT;
+	}
+print<<<EOT
+-->
+					<li class="current"><a href="javascript:;">推荐</a></li>
+			</ul>
+		</div>
+		<div class="c"></div>
+		<div>
+			<table width="100%" cellspacing="0" class="vt mb5 z">
+				<tr class="tr3">
+					<td width="80">推荐方式:</td>
+						<td>消息推荐</td>
+					</tr>
+				<tr class="tr3">
+					<td>对方姓名:</td>
+					<td><input type="text" class="input input_wa" name="sendtoname" value="" />
+
+<!--
+EOT;
+	if ($frienddb) {
+print <<<EOT
+-->
+					<span class="bt2"><span><button type="button" onClick="if (getObj('tofriend').style.display=='none'){getObj('tofriend').style.display='';}else{getObj('tofriend').style.display='none';}">好友列表</button></span></span>
+<!--
+EOT;
+	}
+print <<<EOT
+-->
+					</td>
+				</tr>
+				<tr id="tofriend" class="tr3" style="display:none">
+					<td>好友选择:</td>
+					<td>
+						<div class="fri-list pr">
+							<div class="popTop">
+								<span class="fr">
+									<select name="friendtype" onchange="showFriendList(this.value);">
+										<option value="-1">全部好友</option>
+<!--
+EOT;
+	foreach ($friendtype as $key => $value) {
+print <<<EOT
+-->
+										<option value="$key">$value[name]</option>
+<!--
+EOT;
+	}
+print <<<EOT
+-->
+									</select>
+								</span>
+								<span class="bt2"><span><button type="submit" onclick="CheckAll(this.form)">全选</button></span></span>
+
+							</div>
+							<div class="fri-bot" id="friendlist">
+								<ul class="list-wid cc listC">
+<!--
+EOT;
+	foreach ($friendtype as $key => $value) {
+print <<<EOT
+-->
+									<div id="ftid_$value[ftid]">
+<!--
+EOT;
+		foreach ($frienddb[$value[ftid]] as $k => $v) {
+        	if ($v[uid]) {
+print <<<EOT
+-->
+										<li><label for="$v[uid]"><input type="checkbox" name="touid[]" id="$v[uid]" value="$v[uid]"> $v[username]</label></li>
+<!--
+EOT;
+			}
+        }
+print <<<EOT
+-->
+									</div>
+<!--
+EOT;
+	}
+print <<<EOT
+-->
+								</ul>
+							</div>
+						</div>
+<SCRIPT type="text/javascript" LANGUAGE="JavaScript" src="js/core/friendlist.js"></SCRIPT>
+
+
+					</td>
+				</tr>
+				<tr class="tr3">
+					<td>标题:</td>
+					<td><input type="text" class="input input_wb" name="subject" value="&quot;{$windid}&quot;$atc_name" /></td>
+				</tr>
+				<tr class="tr3"><td>内容:</td>
+					<td>
+<!--
+EOT;
+	if($type == 'user') {
+print <<<EOT
+-->
+					<textarea class="textareaA" name="atc_content" onkeydown="ajax.quickpost(event,this.form)">我很喜欢用户[url={$db_bbsurl}/u.php?uid={$uid}]{$username}[/url]的个人空间，特别推荐。\n\n他（她）的用户名:\n$title\n\n希望你能喜欢。</textarea>
+<!--
+EOT;
+	}elseif($type == 'group') {print <<<EOT
+-->
+					<textarea class="textareaA" name="atc_content" onkeydown="ajax.quickpost(event,this.form)">您好！我发现了一个群组，认为很有价值，特别推荐给你。\n\n群组名称:[url={$db_bbsurl}/apps.php?q=group&cyid={$cyid}]{$subject}[/url]\n\n群组简介:\n\n{$descrip}\n\n希望你能喜欢。</textarea>
+<!--
+EOT;
+	}elseif($type == 'groupactive') {print <<<EOT
+-->
+					<textarea class="textareaA" name="atc_content" onkeydown="ajax.quickpost(event,this.form)">您好！我发现了一个群组活动，认为很有价值，特别推荐给你。\n\n活动名称:[url={$db_bbsurl}/apps.php?q=group&a=active&job=view&cyid={$cyid}&id={$id}]{$subject}[/url]\n\n活动简介:\n\n{$descrip}\n\n希望你能喜欢。</textarea>
+<!--
+EOT;
+	} else {
+print <<<EOT
+-->
+<textarea class="textareaA" name="atc_content" onkeydown="ajax.quickpost(event,this.form)" style="height:120px;"><!--
+EOT;
+if($isAnonymous){
+print <<<EOT
+-->我发现这个信息很有价值，特别推荐给你。\n\n主要信息:\n$title\n\n描述:\n$descrip\n\n希望你能喜欢。
+<!--
+EOT;
+}else{
+print <<<EOT
+-->
+EOT;
+$uid || $uid = $u;print <<<EOT
+我在用户[url={$db_bbsurl}/u.php?uid={$uid}]{$username}[/url]的个人空间发现这个信息，认为很有价值，特别推荐。\n\n主要信息:\n$title\n\n描述:\n$descrip\n\n希望你能喜欢。
+<!--
+EOT;
+}
+print <<<EOT
+--></textarea>
+<!--
+EOT;
+	}
+print <<<EOT
+-->
+					</td>
+				</tr>
+			</table>
+			<div class="popBottom">
+			<span class="btn2"><span><button type="button" style="width:80px;" name="ajaxsubmit" onclick="ajax.submit(this.form);">推荐</button></span></span>
+			<span class="bt2"><span><button type="button" onclick="closep();">取消</button></span></span>
+			</div>
+			</div>
+		</div>
+	</form>
+</div>
+<script language="JavaScript">
+function shareOtherType(id){
+	getObj(id).style.display = '';
+	if (id == 'recommend_box') {
+		getObj('share_box').style.display = 'none';
+	} else if (id == 'share_box') {
+		getObj('recommend_box').style.display = 'none';
+	}
+}
+</script>
+<script language="javascript">
+var ifcheck = true;
+function CheckAll(form,match) {
+	for (var i = 0; i < form.elements.length; i++) {
+		var e = form.elements[i];
+		if (e.type == 'checkbox' && (typeof match == 'undefined' || e.name.match(match))) {
+			e.checked = ifcheck;
+		}
+	}
+	ifcheck = ifcheck == true ? false : true;
+}
+</script>
+<!--
+EOT;
+} elseif($action == 'toweibo') {
+	$typeName = getLangInfo('app',$type);
+print<<<EOT
+-->
+
+	<form name="weibo_form" method="post" action="apps.php?q=weibo&do=post&ajax=1" onsubmit="return false;" id="weibo_form">
+    <input type="hidden" name="verify" value="$verifyhash" />
+    <input type="hidden" name="type" value="sendweibo" />
+<!--
+EOT;
+if ($type == 'album' || $type == 'photo') {
+$pids = $pids ? $pids : array();
+foreach ($pids as $pid) {
+print <<<EOT
+-->
+    		<input type="hidden" name="uploadPic[]" value="$pid" />
+<!--
+EOT;
+}}
+print <<<EOT
+-->
+
+	<div style="width:443px;">
+		<div class="popTop cc" style="cursor:move" onmousedown="read.move(event);">
+			<a href="javascript:;" onclick="closep();" class="adel cp">关闭</a>发送到我的新鲜事
+		</div>
+        <div class="p15 mb5">
+            转发此{$typeName}到我的新鲜事，再补充两句：
+            <div class="limit tar mb5" id="weibo_contentlimit">&nbsp;</div>
+            <textarea class="textareaA mb5" name="atc_content" style="width:400px;" id="weibo_content" onkeyup="pw_weiboPost.checkWordLength();">{$content}</textarea>
+           <div>
+           	<label><input id="ismessage"  name="ismessage" type="checkbox" value="1" onclick="change();"/>同时短消息推荐给好友</label>
+            <div id="showmessage" class="wrongTip" style="display:none; margin-top:15px">隐藏</div>
+            <table width="100%"  id="messagediv" style="display:none"><tbody>
+            <tr class="tr5 vt">
+                <td width="60" class="lh_22" style="padding-left:0;">收件人： </td>
+                <td>
+                    <div class="input_img mb5 cc" onclick="getObj('usernames').focus();">
+                        <em class="input_down" onclick="pwSearch.selectInit(event,'popout','message.php?type=ajax','action=friend',0)">选择好友</em>
+                        <div id="get_friend">
+                        <input type="text" max="20" id="usernames" name="usernames" value="" onblur="pwSearch.blur()" onfocus="pwSearch.init('message.php?type=ajax','action=friend','resultd','searchResult')" onkeydown="pwSearch.move(event)" onkeyup="pwSearch.searchResult(event,200);" autocomplete=off disableautocomplete /></div>
+                    </div>
+                    <p class="s6">请输入收件人名称（好友名称支持拼音首字母）</p>
+                </td>
+            </tr>
+            <tr class="tr5 vt">
+                <td width="60" class="lh_22" style="padding-left:0;">标题： </td>
+                <td><input class="input mr5 input_wb" type="text" name="atc_mctitle" id="atc_mctitle" maxlength="200" autocomplete=off disableautocomplete value='{$mailSubject}'/></td>
+            </tr>
+            <tr class="tr5 vt">
+                <td class="lh_22" style="padding-left:0;">内容： </td>
+                <td> 
+                <textarea id="atc_mccontent" name="atc_mccontent" style="height:70px;width:330px;">{$mailContent}</textarea>			
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        </div>
+
+<script type="text/javascript" src="js/pw_search.js"></script>
+<script type="text/javascript" src="js/message.js"></script>
+<script language="javascript">
+function change() {
+	if (getObj('ismessage').checked == false) {
+		getObj('messagediv').style.display = 'none';
+	} else {
+		getObj('messagediv').style.display = '';
+	}
+	return true;
+}
+
+</script>
+        </div>
+		<div class="popBottom">
+			<span class="btn2"><span><button type="button" style="width:80px;" onclick="post(this.form);">发送</button></span></span>
+			<span class="bt2"><span><button type="button" onclick="closep();">取消</button></span></span>
+		</div>
+	</div>
+	</form>
+<script language="javascript">
+function post(form) {
+	//	scrollTo(0,246);
+	if (getObj('ismessage').checked == true) {
+		var totalmsg = $totalMessage;
+		var maxmsg = $max;
+		if(maxmsg > 0 && totalmsg >= maxmsg){
+			MC.showFailTips("消息已满,发送失败.请及时清理");
+			return false;
+		}
+		var unames = document.getElementsByName('_usernames[]');
+	//		console.log(unames);
+		if(!unames || !unames.length){
+			MC.showFailTips("收件人不能为空");
+			return false;
+		}
+		var atc_mctitle = getObj('atc_mctitle').value;		
+		var atc_mccontent = getObj('atc_mccontent').value;
+		if("" == atc_mctitle){
+			MC.showFailTips("标题不能为空");
+			return false;
+		}
+		if(atc_mccontent==''){
+			MC.showFailTips("内容不能为空");
+			return false;
+		}
+	}
+	ajax.submit(form, function() {
+		var gotText = ajax.request.responseText;
+		if ('发表成功!\treload' != gotText) {
+			showDialog("error", gotText);
+		} else {
+			showDialog('success', '发送成功!',1);
+		}
+	});
+}
+</script>
+<script type="text/javascript" language="JavaScript" src="apps/weibo/js/post.js"></script>
+<script language="javascript">
+var pw_weiboPost = new weibo_post({form:'weibo_form',content:'weibo_content'});
+setTimeout(function(){pw_weiboPost.checkWordLength();}, 300);
+</script>
+<!--
+EOT;
+}
+?>
+-->

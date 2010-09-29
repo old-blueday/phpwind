@@ -1,0 +1,293 @@
+
+<pw id="A2频道导航@旅游" />
+
+		  <li class="switchNavItem current"><a href="" title="自驾游" target="_blank">自驾游</a></li>
+			<li class="switchNavItem"><a href="" title="旅游宝典" target="_blank">旅游宝典</a></li>
+			<li class="switchNavItem"><a href="" title="旅游咨询" target="_blank">旅游咨询</a></li>
+			<li class="switchNavItem"><a href="" title="户外拓展" target="_blank">户外拓展</a></li>
+			<li class="switchNavItem"><a href="" title="图文地理" target="_blank">图文地理</a></li>
+			<li class="switchNavItem"><a href="" title="线路攻略" target="_blank">线路攻略</a></li>
+			<li class="switchNavItem"><a href="" title="游记分享" target="_blank">游记分享</a></li>
+			<li class="switchNavItem"><a href="" title="结伴同游" target="_blank">结伴同游</a></li>
+
+<pw id="B1左边标题@旅游" />
+结伴旅行
+
+<pw id="B2左边图文摘要@旅游" />
+<list cachetime="1800" action="image" num="1" title="图文摘要" />
+			<loop>
+			<a href="{url}" title="{title}"><img src="{image,73,73}" width="73" height="73" class="fl" /></a>
+			<h4><a href="{url}" title="{title}" class="f1">{title,18}</a></h4>
+			<p>{descrip,76}</p>
+			</loop>
+			
+<pw id="B2左边帖子列表@旅游" />
+<list cachetime="1800" action="subject" num="5" title="帖子列表" />
+			<loop>
+				<li><a href="{url}" title="{title}" target="_blank">{title,30}</a></li>
+				</loop>
+				
+
+<pw id="B3图片轮播@旅游" />
+			<list cachetime="1800" action="image" num="4" title="图片" />
+				<ul class="switch" id="PP1_A">
+				<loop>
+					<li class="switchItem" style="display:"><a href="{url}" title="{title}"><img src="{image,680,250}" width="680" height="250" /><h3>{title,48}</h3></a></li>
+					</loop>
+				</ul>
+				<div class="pwSlide-bg"></div>
+				<ul class="SwitchNav" id="PP1_B">
+				<!--#for($i = 1; $i<=$key+1; $i++){#-->					
+				<li class="switchNavItem"><a href="#" onclick="return false;">{$i}</a></li>
+			    <!--#}#-->
+				</ul>
+			<script language="javascript" src="mode/area/js/ddsliderplayer.js"></script>
+		<script>ddSliderPlayers('PP1_A','PP1_B',4,'current');</script>	
+				
+<pw id="C1左边标题@旅游" />
+旅游宝典
+			
+
+<pw id="C2左边图片列表@旅游" />
+<list cachetime="1800" action="image" num="2" title="图片列表" />
+				<ul>
+				<loop>
+					<li><a href="{url}" title="{title}" target="_blank"><img src="{image,113,73}" width="113" height="73" />{title,16}</a></li>
+					</loop>
+				</ul>
+				
+<pw id="C3帖子列表@旅游" />
+<list cachetime="1800" action="subject" num="8" title="帖子列表" />
+               <loop>
+				<li><a href="{url}" title="{title}" target="_blank">{title,30}</a></li>
+				</loop>
+				
+
+<pw id="C4头条新闻@旅游" />
+<list cachetime="1800" action="subject" num="1" title="标题" />
+				<loop>
+				<h2><a href="{url}" title="{title}" target="_blank" class="f1">{title,40}</a></h2>
+				</loop>
+<list cachetime="1800" action="subject" num="5" title="帖子" />
+				<p>
+				<loop>
+				<a href="{url}" title="{title}" target="_blank" class="f2">{title,30}</a>
+				</loop>
+				</p>
+				
+<pw id="C5头条新闻列表@旅游" />
+<list cachetime="1800" action="subject" num="9" title="帖子列表" />
+				<loop>
+				<li><a href="{url}" title="{title}" target="_blank"><em>[{forumname,8}]</em>{title,44}</a></li>
+				</loop>
+				
+<pw id="C6右边标题@旅游" />
+旅游工具箱
+<pw id="C7右边工具箱@旅游" />
+
+					<li class="li1"><a href="{url}" title="{title}" target="_blank">旅游签证</a></li>
+					<li class="li2"><a href="{url}" title="{title}" target="_blank">出境指南</a></li>
+					<li class="li3"><a href="{url}" title="{title}" target="_blank">国际时差</a></li>
+					<li class="li4"><a href="{url}" title="{title}" target="_blank">安全保险</a></li>
+					<li class="li5"><a href="{url}" title="{title}" target="_blank">旅游装备</a></li>
+					<li class="li6"><a href="{url}" title="{title}" target="_blank">天气预报</a></li>
+					<li class="li7"><a href="{url}" title="{title}" target="_blank">电子地图</a></li>
+					<li class="li8"><a href="{url}" title="{title}" target="_blank">邮政区号</a></li>
+					
+
+<pw id="C8右边广告图片1@旅游" />
+<list cachetime="1800" action="image" num="1" title="广告图片" />
+<loop>
+<a href="{url}" title="{title}"><img src="{image,284,50}" width="284" height="50" /></a>
+</loop>
+
+<pw id="C8右边广告图片2@旅游" />
+<list cachetime="1800" action="image" num="1" title="广告图片" />
+<loop>
+<a href="{url}" title="{title}"><img src="{image,284,50}" width="284" height="50" /></a>
+</loop>
+
+<pw id="C9通栏广告@旅游" />
+<list cachetime="1800" action="image" num="1" title="广告图片" />
+<loop>
+<a href="{url}" title="{title}"><img src="{image,284,60}" width="960" height="90" /></a>
+</loop>
+
+<pw id="D1左边标题@旅游" />
+旅游咨询
+<pw id="D2左边帖子列表@旅游" />
+<list cachetime="1800" action="subject" num="8" title="帖子列表" />
+				<loop>
+				<li><a href="{url}" title="{title}" target="_blank">{title,30}</a></li>
+				</loop>				
+
+<pw id="D3左边咨询按钮@旅游" />
+<a href="{url}" title="{title}">我要咨询</a>
+<pw id="D4右边活动标题@旅游" />
+活动推荐
+<pw id="D5右边活动图文摘要@旅游" />
+<list cachetime="1800" action="image" num="2" title="图文摘要" />
+			<loop>
+				<div class="subject2 cc mt15">
+					<a href="{url}" title="{title}"><img src="{image,114,87}" width="114" height="87" class="fl" /></a>
+					<h4><a href="{url}" title="{title}" target="_blank" class="f2">{title,28}</a></h4>
+					<p>{descrip,110}</p>
+				</div>
+				</loop>
+				
+<pw id="D6右边帖子内容@旅游" />
+<list cachetime="1800" action="subject" num="6" title="版块帖子" />
+					<loop>
+					<li><a href="{url}" title="{title}" target="_blank"><em>[{forumname,8}]</em>{title,30}</a></li>
+					</loop>
+					
+<pw id="D7右边广告图片@旅游" />
+<list cachetime="1800" action="image" num="1" title="广告图片" />
+<loop>
+<a href="{url}" title="{title}"><img src="{image,270,67}" width="270" height="67" /></a>
+</loop>
+
+<pw id="E1左边标题@旅游" />
+旅游关键词
+<pw id="E2_1左边列表1@旅游" />
+				<em>境外</em>
+				<list cachetime="1800" action="tag" num="10" title="标签1" />
+				<p>
+				<loop>
+					<a href="{url}" title="{title}" target="_blank">{title}</a>
+					</loop>
+					</p>
+				
+<pw id="E2_2左边列表2@旅游" />
+				<em>国内</em>
+				<list cachetime="1800" action="tag" num="10" title="标签2" />
+				<p>
+				<loop><a href="{url}" title="{title}" target="_blank">{title}</a></loop>
+				</p>
+				
+<pw id="E2_3左边列表3@旅游" />
+				<em>线路</em>
+				<list cachetime="1800" action="subject" num="2" title="帖子" />
+					<ul class="list">
+					<loop>
+						<li><a href="{url}" title="{title}" target="_blank">{title,30}</a></li>
+						</loop>
+					</ul>
+					
+<pw id="F3右边标题@旅游" />
+特别策划
+<pw id="F4右边图文列表@旅游" />
+			<list cachetime="1800" action="image" num="3" title="图文模块" />
+			 	<ul>
+				<loop>
+					<li><a href="{url}" title="{title}" target="_blank"><img src="{image,173,101}" width="173" height="101" /></a>
+					<h4><a href="{url}" title="{title}" target="_blank" class="f1">{title,20}</a></h4>
+					<p>{descrip,60}</p></li>
+					</loop>
+				</ul>
+				
+<pw id="F5左边通栏广告@旅游" />
+<list cachetime="1800" action="image" num="1" title="通栏广告1" />
+<loop>
+<a href="{url}" title="{title}"><img src="{image,267,79}" width="267" height="79" /></a>
+</loop>
+
+<pw id="F6右边通栏广告@旅游" />
+<list cachetime="1800" action="image" num="1" title="通栏广告2" />
+<loop>
+<a href="{url}" title="{title}"><img src="{image,680,78}" width="680" height="78" /></a>
+</loop>
+<pw id="G1左边标题@旅游" />
+人文乡土
+
+<pw id="G2左边图文摘要@旅游" />
+<list cachetime="1800" action="image" num="1" title="图文摘要" />
+			<loop>
+				<a href="{url}" title="{title}"><img src="{image,84,73}" width="84" height="73" class="fl" /></a>
+				<h4><a href="{url}" title="{title}" class="f2">{title,15}</a></h4>
+				<p>{descrip,60}</p>
+				</loop>
+				
+<pw id="G3左边帖子列表@旅游" />
+<list cachetime="1800" action="subject" num="7" title="帖子列表" />
+				<loop>
+				<li><a href="{url}" title="{title}" target="_blank">{title,30}</a></li>
+				</loop>
+				
+<pw id="G4右边标题@旅游" />
+游记策略
+
+<pw id="G5右边图片列表@旅游" />
+<list cachetime="1800" action="image" num="4" title="图片列表" />
+				<loop>
+				<li><a href="{url}" title="{title}"><img src="{image,90,90}" width="90" height="90" />{title,16}</a></li>
+				</loop>
+				
+<pw id="G6_1中间文章摘要1@旅游" />
+<list cachetime="1800" action="subject" num="1" title="文章摘要1" />
+				<loop>
+					<h4><a href="{url}" title="{title}" target="_blank">{title,30}</a></h4>
+					<p>{descrip,60}</p>
+					</loop>
+					
+<pw id="G6_2中间文章摘要2@旅游" />
+<list cachetime="1800" action="subject" num="1" title="文章摘要2" />
+				<loop>
+					<h4><a href="{url}" title="{title}" target="_blank">{title,30}</a></h4>
+					<p>{descrip,60}</p>
+					</loop>
+					
+<pw id="G6_3中间文章摘要3@旅游" />
+<list cachetime="1800" action="subject" num="1" title="文章摘要3" />
+				<loop>
+					<h4><a href="{url}" title="{title}" target="_blank">{title,30}</a></h4>
+					<p>{descrip,60}</p>
+					</loop>
+					
+<pw id="G7右边帖子列表@旅游" />
+<list cachetime="1800" action="subject" num="11" title="帖子列表" />
+				<loop>
+				<li><a href="{url}" title="{title}" target="_blank">{title,26}</a></li>
+				</loop>
+				
+<pw id="H1左边标题@旅游" />
+旅图欣赏
+
+<pw id="H2左边图片列表@旅游" />
+<list cachetime="1800" action="image" num="4" title="图片列表" />
+			<loop>
+				<li><a href="{url}" title="{title}"><img src="{image,113,96}" width="113" height="96" />{title,16}</a></li>
+			</loop>
+			
+<pw id="H3右边标题@旅游" />
+旅游达人
+<pw id="H4右边图文摘要列表@旅游" />
+<list cachetime="1800" action="image" num="3" title="图文摘要列表" />
+			<loop>
+				<div class="subject4 cc mt10">
+					<a href="{url}" title="{title}"><img src="{image,70,71}" width="70" height="71" class="fl" /></a>
+					<h4><a href="{url}" title="{title}">{title,14}</a></h4>
+					<p>{descrip,50}</p>
+				</div>
+				</loop>
+				
+<pw id="H5右边图文摘要@旅游" />
+<list cachetime="1800" action="image" num="1" title="图文摘要" />
+				<loop>
+				<a href="{url}" title="{title}"><img src="{image,122,85}" width="122" height="85" class="fl" /></a>
+				<h4><a href="{url}" title="{title}" class="f1">{title,30}</a></h4>
+				<p>{descrip,110}</p>
+				</loop>
+				
+<pw id="H6右边帖子列表@旅游" />
+<list cachetime="1800" action="subject" num="14" title="帖子列表" />
+					<loop>
+					<li><a href="{url}" title="{title}" target="_blank"><em>[{forumname,8}]</em>{title,20}</a></li>
+					</loop>
+			
+
+<pw id="A1banner@旅游" />
+人生就像一场戏，不必在乎目的地，<br />在乎的，是沿途的风景，以及看风景的心情...
+
+<pw id="A1banner文字@旅游" />
+<p class="fr">人生就像一场戏，不必在乎目的地，<br />在乎的，是沿途的风景，以及看风景的心情...</p>

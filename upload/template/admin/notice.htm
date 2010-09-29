@@ -1,0 +1,247 @@
+<!--<?php
+include_once PrintEot('left');
+if(in_array($action,array('add','edit'))){print <<<EOT
+-->
+<form name="FORM" method="post" action="$basename&">
+	<input type="hidden" name="action" value="$action">
+	<input type="hidden" name="aid" value="$aid">
+	<input type="hidden" name="step" value="2">
+	<h2 class="h1">
+		<span class="mr10">更新公告信息</span><a href="$basename&fid=$fid" class="linka">返回上一级<span class="f9">▲</span></a>	
+	</h2>
+	<div class="admin_table mb10">
+	<table width="100%" cellspacing="0" cellpadding="0">
+	<tr class="tr1 vt">
+		<td class="td1">公告</td>
+		<td class="td2">
+			<ul class="list_A list_80 cc">
+				<li><input type="radio" name="ifopen" value="1" $ifopen_Y>开启</li>
+				<li><input type="radio" name="ifopen" value="0" $ifopen_N>关闭</li>
+			</ul>
+		</td><td class="td2"><div class="help_a"> </div></td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">公告范围</td>
+		<td class="td2"><select name="fid" onchange="return viewdetail();" class="select_wa">$forumcache</select></td><td class="td2">
+		<div class="help_a"> </div></td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">公告标题</td>
+		<td class="td2"><input name="atc_title" class="input input_wa" value="$subject" /></td>
+		<td class="td2"><div class="help_a"> </div></td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">起始日期 - 结束日期</td>
+		<td class="td2">
+        <div class="input_img fl"><i onclick="this.nextSibling.onclick()" class="input_time" title="选择时间">选择时间</i><input id="startdate" name="startdate" value="$startdate" type="text" onclick="ShowCalendar(this.id,1)" /></div>
+        <div class="p_lr_10 fl">-</div>
+        <div class="input_img fl"><i onclick="this.nextSibling.onclick()" class="input_time" title="选择时间">选择时间</i><input id="enddate" name="enddate" value="$enddate" type="text" onclick="ShowCalendar(this.id,1)" /></div></td>
+		<td class="td2"><div class="help_a">
+格式:(YYYY-MM-DD HH:II，如:1983-12-20 00:00)<br />
+起始时间:公告开始发布的时间，留空则使用当前时间<br />
+结束时间:公告结束发布的时间，留空则公告不结束 </div></td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">显示顺序</td>
+		<td class="td2"><input name="vieworder" value="$vieworder" class="input input_wa"></td>
+		<td class="td2"><div class="help_a"> </div></td>
+	</tr>
+	<tbody id="ifurl" onload="return viewdetail();">
+<!--
+EOT;
+if(strpos($ckdisplay,",$fid,")!==false){print <<<EOT
+-->
+		<tr class="tr1 vt">
+			<td class="td1">公告链接</td>
+			<td class="td2"><input name="url" value="$url" class="input input_wb"></td>
+			<td class="td2"><div class="help_a">
+将跳转到指定到某一个链接，如:http://www.phpwind.net/。<br />
+<font color="red">注:若填写此处，内容可不需填写。</font> </div></td>
+		</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+	</tbody>
+	<tr class="tr1 vt"r>
+		<td class="td1">公告内容</td>
+		<td class="td2" colspan="2"><div style="width:650px;background:#ffffff">
+<!--
+EOT;
+require_once PrintEot('wysiwyg_editor');
+print <<<EOT
+-->
+		</div></td>
+	</tr>
+</table>
+</div>
+
+<script type="text/javascript" LANGUAGE="JavaScript" src="js/core/core.js"></script>
+<script type="text/javascript" language="JavaScript" src="js/pw_ajax.js"></script>
+<script language="JavaScript" src="js/post.js"></script>
+<script language="JavaScript" src="js/global.js"></script>
+
+<script language="JavaScript" src="data/bbscache/face.js"></script>
+<div id="menu_face" class="menu" style="display:none;"></div>
+<div id="menu_generalface" class="menu" style="display:none;"></div>
+
+<script type="text/javascript">editor.init('wysiwyg', 0);</script>
+
+<div class="tac mb10">
+	<span class="btn"><span><button type="submit">提 交</button></span></span>
+</div>
+</form>
+<script language="JavaScript" src="js/date.js"></script>
+<script language="JavaScript">
+var ckdisplay = '$ckdisplay';
+function viewdetail(){
+	obj = document.getElementById('ifurl');
+	if (ckdisplay.indexOf(','+document.FORM.fid.value+',')!=-1) {
+		obj.style.display = '';
+	} else {
+		obj.style.display = 'none';
+	}
+}
+</script>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+<div class="admin_info mb10">
+	<h3 class="h1">功能提示</h3>
+	<div class="legend">公告管理:可查看特定 <b>公告范围</b>（全局公告与版块公告）下的所有公告，针对某条公告进行 <b>编辑 删除</b> 操作，设置所有公告的 <b>显示顺序</b><br />
+公告添加:可根据需求，在指定的 <b>公告范围</b> 添加公告信息，公告不允许添加多媒体<br />
+公告状态:每个公告均有是否启用的开关。当在关闭状态下，状态为 <b>已关闭</b>。当在开启状态下，若 <b>当前时间小于开始时间</b>，状态为 <b>未发布</b>；若 <b>当前时间大于结束时间</b>，状态为 <b>已过期</b>；若 <b>当前时间在开始时间与结束时间之间</b>，状态为 <b>已发布</b>。公告仅当在 <b>已发布</b> 状态，前台才显示</div>
+</div>
+<form method="post" action="$basename&">
+<div class="search tar mb10">
+		<!--公告范围:-->
+		位置:
+		<select name="fid" class="select_wa mr10">
+			<option value="0">所有公告</option>
+			$forumcache
+		</select>
+		<!--状态:-->
+		状态:
+		<select name="ifopen" class="select_wa">
+			<option value="-1">&nbsp;</option>
+			<option value="0" $ifopen_0>已关闭</option>
+			<option value="1" $ifopen_1>已发布</option>
+			<option value="2" $ifopen_2>已过期</option>
+			<option value="3" $ifopen_3>未发布</option>
+		</select>
+		<span class="bt2"><span><button type="submit" value="提 交">提 交</button></span></span>
+</div>
+</form>
+<h2 class="h1">
+	<span class="fl mr10"><span class="mr10">公告管理</span><span class="linka">$titledb[$fid]</span></span>
+	<a class="btn_add fl" href="$basename&action=add&fid=$fid" hidefocus="true"><i>公告添加</i></a>
+</h2>
+<form method="post" action="$basename&">
+<input type="hidden" name="action" value="order">
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+<!--
+EOT;
+if (empty($annoucedb)) {print <<<EOT
+-->
+<tr><td class="p10" colspan="9"><div class="admin_tips">啊哦，没有你要的信息！</div></td></tr>
+<!--
+EOT;
+}else{
+$showf = true;
+foreach($annoucedb as $fid => $noticedb){print <<<EOT
+-->
+	<tr class="tr2 vt td_bgB">
+<!--
+EOT;
+if ($showf) {
+$showf = false;print <<<EOT
+-->
+		<td width="30">顺 序</td>
+		<td>
+<!--
+EOT;
+if(!empty($namedb[$fid])){print <<<EOT
+-->
+		<span class="fl b s5"><a href="$basename&fid=$fid">{$namedb[$fid][name]}</a></span>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+&nbsp;以下公告所属的版块不存在
+<!--
+EOT;
+}print <<<EOT
+-->
+		</td>
+		<td width="40">状 态</td>
+		<td width="80">发布者</td>
+		<td width="100">开始时间</td>
+		<td width="100">结束时间</td>
+		<td width="120">操 作</td>
+<!--
+EOT;
+} else {print <<<EOT
+-->
+		<td width="30">&nbsp;</td>
+		<td colspan="6">
+<!--
+EOT;
+if(!empty($namedb[$fid])){print <<<EOT
+-->
+		<span class="fl b s5"><a href="$basename&fid=$fid">{$namedb[$fid][name]}</a></span>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+&nbsp;以下公告所属的版块不存在
+<!--
+EOT;
+}print <<<EOT
+-->
+		</td>
+<!--
+EOT;
+}print <<<EOT
+-->
+	</tr>
+<!--
+EOT;
+foreach($noticedb as $value){
+$value[ifopen] = $value[ifopen] ? ($timestamp<$value[startdate] ? '未发布' : ($value[enddate] && $timestamp>$value[enddate] ? '<span class="gray">已过期</span>' : '<span class="s3">已发布</span>')) : '<span class="s1">已关闭</span>';
+print <<<EOT
+-->
+	<tr class="tr1 vt">
+		<td class="td2"><input name="vieworder[$value[aid]]" class="input input_wd" value="$value[vieworder]"></td>
+		<td class="td2">$value[subject]</td>
+		<td class="td2">$value[ifopen]</td>
+		<td class="td2">$value[author]</td>
+		<td class="td2">$value[starttime]</td>
+		<td class="td2">$value[endtime]</td>
+		<td class="td2"><a class="mr20" href="$basename&action=edit&aid=$value[aid]" title="编辑">[编辑]</a><a title="删除" onclick="return delnotice('$value[aid]')" href="$basename&action=del&aid=$value[aid]">[删除]</a></td>
+	</tr>
+<!--
+EOT;
+}}}print <<<EOT
+-->
+</table>
+</div>
+<div class="mb10 cc">$pages</div>
+<div class="tac mb10">
+	<span class="btn"><span><button type="submit">提 交</button></span></span>
+</div>
+</form>
+<script language="JavaScript">
+function delnotice(aid){
+	if (!aid || !confirm('确定要删除此公告吗？')) {
+		return false;
+	}else
+		return true;
+}
+</script>
+<!--
+EOT;
+}include_once PrintEot('adminbottom');
+?>
+-->

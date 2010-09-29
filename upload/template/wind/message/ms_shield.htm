@@ -1,0 +1,180 @@
+<!--<?php
+print <<<EOT
+-->
+<script type="text/javascript">
+function checkAll(obj,ctrArr,ifself){	
+		var obj = typeof(obj) == "string" ?  document.getElementsByName(obj)[0]:obj;
+		for(var i=0;i<ctrArr.length;i++){
+			var name = obj.name+'['+ctrArr[i]+']';
+			var dstObj = document.getElementsByName(name);
+			if(!obj.checked){
+		 		if(ifself == 'yes'){
+				  dstObj[0].checked = false;
+				  dstObj[0].disabled = true;
+				}else{
+				  dstObj[0].checked = true;
+				  dstObj[0].disabled = false;
+				}
+			}else{
+				if(ifself == 'yes'){
+				   	dstObj[0].checked = true;
+			  		dstObj[0].disabled = false;
+				}else{
+				  	dstObj[0].checked = false;
+				  	dstObj[0].disabled = true;	
+				}
+			 
+			}
+		}
+		obj.checked = ifself == 'yes' ? obj.checked ? true : false : obj.checked ? false : true;
+}
+
+function up(objId,ctrArr,ifself){
+	var checked = false;
+	var obj = document.getElementsByName(objId)[0];
+	var self = ifself == 'yes' ? 'yes':document.getElementsByName(ifself)[0];
+	if(self == 'yes' || (self != 'yes' && obj.checked)){
+		if(self != 'yes'){
+			self.checked = self.checked ? false : true;
+		}
+		for(var i=0;i<ctrArr.length;i++){
+			var name = obj.name+'['+ctrArr[i]+']';
+			var dstObj = document.getElementsByName(name);
+			if(dstObj[0].checked){
+				checked = true;
+				break;
+			}
+		}
+		if(!checked){
+			obj.checked = false;
+			for(var i=0;i<ctrArr.length;i++){
+				var name = obj.name+'['+ctrArr[i]+']';
+				var dstObj = document.getElementsByName(name);	
+				dstObj[0].disabled = true;
+				
+			}	
+		}
+	}
+}
+function singleText(objId){
+	var obj = document.getElementsByName(objId)[0];
+	obj.checked = obj.checked ? false : true;
+}
+</script>
+<div id='hiddenMessage' style="display:none"></div>
+<div class="contUser" id="content">
+    <div class="p15">	
+  	<h4 class="site"><span>消息中心设置</span></h4>
+    <div class="navC mb10">
+    	<ul>
+        	<li class="current"><a href="{$baseUrl}?type=shield">消息屏蔽</a></li>
+            <li><a href="{$baseUrl}?type=clear">消息清理</a></li>
+        </ul>
+    </div>
+    <div id="showmessage"></div>
+    <form method="post" id="mainForm" name="FORM" action="$normalUrl&verify=$verifyhash" enctype = "multipart/form-data">
+    <input type="hidden" name="step" value="2"/>
+    <div class="p10">
+        <div class="mb20">
+            <h5 class="h5 mb10"><strong class="mr10">黑名单</strong><span class="gray">如果你不希望收到某人的消息，你可以把他加入到黑名单</span></h5>
+            <textarea class="textareaA mr10" name="blacklist">$blacklist</textarea>
+            <span class="gray">多个用户用逗号隔开，如：张三，李四，王五，赵六</span>
+        </div>
+<!--
+EOT;
+if($_G['msggroup']){print <<<EOT
+-->
+        <div class="mb20">
+            <h5 class="h5 mb10"><strong class="mr10">用户组屏蔽</strong><span class="gray">如果你不希望接收某用户组的消息，请把选项前的勾去掉</span></h5>
+            <ul class="ulC cc">
+                $usergroup
+            </ul>
+        </div>
+<!--
+EOT;
+}print <<<EOT
+--> 
+
+<!--<?php
+EOT;
+foreach($html as $key => $value){	
+print <<<EOT
+--> 
+        <div class="mb20">
+            <h5 class="h5 mb10"><strong class="mr10">$value[name]</strong><span class="gray">如果你不希望接受某类消息，请把选项前的勾去掉</span></h5>
+<!--<?php
+EOT;
+foreach($value['sub'] as $subkey => $subvalue){	
+print <<<EOT
+--> 
+
+<!--<?php
+EOT;
+if(!$subvalue['sub']){
+$check = $key.'_'.$subkey;
+$check = $allShieldCheck ? 'checked' : $shield[$check] ? 'checked' : '';	
+print <<<EOT
+-->
+            <span class="mr20"><input name="shieldinfo[$key][$subkey]" type="checkbox" value="1" {$check}>&nbsp;<span onclick="singleText('shieldinfo[$key][$subkey]')">$subvalue[name]</span></span>
+<!--
+EOT;
+}else{
+$checked = '';
+foreach($subvalue['sub'] as $thirdkey => $thirdsub){
+$check = $key.'_'.$subkey.'_'.$thirdkey;
+if($allShieldCheck){
+	$checked = 'checked';
+}else{
+	if($shield[$check]){
+		$checked =  'checked';
+	}	
+}
+$jsArray .= $jsArray ? ','."'".$thirdkey."'" : "'".$thirdkey."'";
+}
+print <<<EOT
+-->
+			<div class="c mb10"></div>
+            <p class="mb10"><input name="shieldinfo[$key][$subkey]" type="checkbox" value="1"  onclick="checkAll(this,new Array($jsArray),'yes')" {$checked}>&nbsp;<span onclick="checkAll('shieldinfo[$key][$subkey]',new Array($jsArray),'no')">$subvalue[name]</span></p>
+            <ul class="ulC cc pl40 mb10">
+<!--<?php
+EOT;
+foreach($subvalue['sub'] as $thirdkey => $thirdsub){
+if($checked){
+	$control = $key.'_'.$subkey.'_'.$thirdkey;
+	$control = $allShieldCheck ? 'checked' : $shield[$control] ? 'checked' : '';	
+}else{
+	$control = 'disabled';
+}
+print <<<EOT
+--> 
+				<li><input name="shieldinfo[$key][$subkey][$thirdkey]" type="checkbox" value="1" onclick="up('shieldinfo[$key][$subkey]',new Array($jsArray),'yes')" {$control}>&nbsp;<span onclick="up('shieldinfo[$key][$subkey]',new Array($jsArray),'shieldinfo[$key][$subkey][$thirdkey]')">$thirdsub[name]</span></li>
+<!--
+EOT;
+}
+$jsArray = '';
+print <<<EOT
+-->                     
+            </ul>
+<!--
+EOT;
+}print <<<EOT
+-->
+
+<!--
+EOT;
+}print <<<EOT
+-->
+	</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+    	<div class="tac"><span class="btn"><span><button onclick="" type="submit">设置</button></span></span></div>
+	</div>
+    </form>
+	</div>
+</div>
+<!--
+EOT;
+require_once(uTemplate::printEot('footer'));
+?>-->

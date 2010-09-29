@@ -1,0 +1,558 @@
+<!--<?php print <<<EOT
+--><!doctype html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=$db_charset" />
+<title>$webPageTitle - Powered by phpwind</title>
+<meta name="generator" content="phpwind $wind_version" />
+<meta name="description" content="$metaDescription" />
+<meta name="keywords" content="$metaKeywords" />
+<meta http-equiv="x-ua-compatible" content="ie=7" />
+<link rel='archives' title='$db_bbsname' href='$db_bbsurl/simple/' />
+<base id="headbase" href="$db_bbsurl/" />
+<style type="text/css" media="screen">
+@import url($imgpath/pw_core.css);
+@import url($imgpath/toolbar.css);
+@import url($imgpath/g/g_style.css);
+@import url($imgpath/g/{$colony[colonystyle]}/style.css);
+</style>
+<script type="text/javascript" language="JavaScript" src="js/core/core.js"></script>
+<script type="text/javascript" language="JavaScript" src="js/pw_ajax.js"></script>
+<script language="JavaScript">
+var imgpath = '$imgpath';
+var verifyhash = '$verifyhash';
+var modeimg = '$pwModeImg';
+var modeBase = '$baseUrl';
+var winduid = '$winduid';
+var windid	= '$windid';
+var groupid	= '$groupid';
+var basename = '$basename';
+var temp_basename = '$temp_basename';
+</script>
+<script language="JavaScript">var imgpath = '$imgpath';var verifyhash = '$verifyhash';var modeimg = '$pwModeImg';var modeBase = '$baseUrl';var winduid = '$winduid';var windid	= '$windid';var groupid	= '$groupid';var basename = '$basename';var temp_basename = '$temp_basename';
+function beginInput(e){
+	if(e&&e.stopPropagation)
+	   e.stopPropagation();
+	else
+	   window.event.cancelBubble=true;
+	var write_honor = getObj('write_honor');
+	if(write_honor.className=='l_write l_write_hover')
+		return;
+	write_honor.className='l_write l_write_hover';
+	write_honor.lastChild.value = unescapeHTML(write_honor.firstChild.innerHTML);
+	write_honor.lastChild.select();
+	document.body.onclick = endInput;
+	document.body.onkeydown = function(e){
+		e=window.event||e;
+		var keycode = e.keyCode||e.which;
+		if(keycode==13)
+			endInput();
+	};
+}
+function endInput(){
+	var empty = "还没有签名，写一个吧～";
+	var write_honor = getObj('write_honor');
+	write_honor.firstChild.innerHTML = write_honor.lastChild.value == "" ? empty : escapeHTML(write_honor.lastChild.value);
+	write_honor.className='l_write';
+	document.body.onclick = null;
+	document.body.onkeydown = null;
+	//将用户修改保存进签名
+	if(write_honor.lastChild.value != empty){
+		var url = 'pw_ajax.php?action=honor&';
+		var data = 'step=2&content=' + write_honor.lastChild.value;
+		ajax.send(url,data);
+	}
+}
+function escapeHTML(n) {
+		return n.replace(/&/g,'&amp;').
+			replace(/>/g,'&gt;').
+			replace(/</g,'&lt;').
+			replace(/"/g,'&quot;');
+};
+function unescapeHTML(n) {
+		return n.replace(/&amp;/g,'&').
+			replace(/&gt;/g,'>').
+			replace(/&lt;/g,'<').
+			replace(/&quot;/g,'"');
+};
+</script>
+</head>
+<body onKeyDown="try{keyCodes(event);}catch(e){}">
+$msgsound
+<div id="top">
+	<div class="top">
+    	<span class="fr">
+<!--
+EOT;
+foreach($_Navbar['head_right'] as $key => $value){
+	$html = buildNavLinkHtml($value['data']);
+print <<<EOT
+-->
+            <span class="mr10">$html</span>
+<!--
+EOT;
+	if (is_array($value['subs'])) {
+		$db_menuinit .= ",'nav_key_up_$key' : 'nav_key_sub_$key'"; //register
+print <<<EOT
+-->
+			<div style="display: none;" class="pw_menu" id="nav_key_sub_{$key}">
+			<ul class="menuList">
+<!--
+EOT;
+		foreach ($value['subs'] as $value) {
+			$html = buildNavLinkHtml($value);
+print <<<EOT
+-->
+				<li>$html</li>
+<!--
+EOT;
+		}
+print <<<EOT
+-->
+			</ul>
+			</div>
+<!--
+EOT;
+	}
+
+}
+
+print <<<EOT
+-->
+        </span>
+    	<ul>
+<!--
+EOT;
+foreach($_Navbar['head_left'] as $key => $value){
+	$html = buildNavLinkHtml($value['data']);
+print <<<EOT
+-->
+            <li>$html</li>
+<!--
+EOT;
+	if (is_array($value['subs'])) {
+		$db_menuinit .= ",'nav_key_up_$key' : 'nav_key_sub_$key'"; //register
+print <<<EOT
+-->
+			<div style="display: none;" class="pw_menu" id="nav_key_sub_{$key}">
+			<ul class="menuList">
+<!--
+EOT;
+		foreach ($value['subs'] as $value) {
+			$html = buildNavLinkHtml($value);
+print <<<EOT
+-->
+				<li>$html</li>
+<!--
+EOT;
+		}
+print <<<EOT
+-->
+			</ul>
+			</div>
+<!--
+EOT;
+	}
+
+}
+
+print <<<EOT
+-->
+        </ul>
+    </div>
+</div>
+<div class="warp">
+    <div id="header">
+        <div id="head">
+			<table cellpadding="0" cellspacing="0" width="100%" height="80">
+				<tr>
+					<td><a href="$db_bbsurl/"><img src="$imgpath/wind/logo.png" class="fl" alt="logo" /></a></td>
+					<td id="banner" align="right" class="vt">
+<!--
+EOT;
+require PrintEot('header_login');
+print <<<EOT
+-->
+					</td>
+				</tr>
+			</table>
+		</div>
+       <div class="nav_wrap">
+		  <div id="navA">
+			<div class="navAL fl">&nbsp;</div>
+        	<div class="navAR fr">&nbsp;</div>
+			<div class="navA">
+<!--
+EOT;
+if ($winduid) {
+$db_menuinit .= ",'td_mymenu' : 'menu_mymenu'";
+print <<<EOT
+-->
+				<div id="td_mymenu">我的快捷通道</div>
+				<div id="menu_mymenu" class="pw_menu" style="display:none;">
+					<ul class="menuList" style="width:98px;">
+<!--
+EOT;
+if ($db_modes['o']['ifopen']) {print <<<EOT
+-->
+						<li><a href="u.php" target="_blank"><img src="$imgpath/user-home.png" alt="空间" />个人中心</a></li>
+<!--
+EOT;
+}print <<<EOT
+-->
+						<li><a href="apps.php?q=weibo"><img src="u/images/icon/record.png" alt="新鲜事" />我的新鲜事</a></li>
+<!--
+EOT;
+if ($db_dopen) {print <<<EOT
+-->
+						<li><a href="apps.php?q=diary"><img src="u/images/icon/log.png" alt="日志" />我的日志</a></li>
+<!--
+EOT;
+}if ($db_phopen) {print <<<EOT
+-->
+						<li><a href="apps.php?q=photos"><img src="u/images/icon/albums.png" alt="相册" />我的相册</a></li>
+<!--
+EOT;
+}print <<<EOT
+-->
+						<li><a href="apps.php?q=article"><img src="u/images/icon/posts.png" alt="帖子" />我的帖子</a></li>
+<!--
+EOT;
+if ($db_groups_open) {print <<<EOT
+-->
+						<li><a href="apps.php?q=groups"><img src="u/images/icon/groups.png" alt="群组" />我的群组</a></li>
+<!--
+EOT;
+}print <<<EOT
+-->
+					</ul>
+				</div>
+<!--
+EOT;
+} else {print <<<EOT
+-->
+				<div id="td_mymenu" style="cursor:pointer" onClick="read.open('menu_mymenu_old','td_mymenu',3);">我的快捷通道</div>
+				<div id="menu_mymenu_old" style="display:none;">
+                	<div class="menu-post" style="width:250px;">
+                        <div class="menu-b p10">
+                        	<a href="javascript:;" onClick="read.close();"><img src="$imgpath/close.gif" alt="关闭" class="fr" /></a>
+                            您还没有登录，快捷通道只有在登录后才能使用。
+<!--
+EOT;
+if ($db_ajax & 16) {print <<<EOT
+-->
+							<a onClick="showLoginDiv();return false;" href="login.php" class="s4">立即登录</a>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+							<a href="login.php" class="s4">立即登录</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+                            <div class="card-cont-hr mb10"></div>
+                            还没有帐号？ 赶紧 <a href="$regurl" class="s4">注册一个</a>
+                        </div>
+                    </div>
+				</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+				<ul class="cc">
+<!--
+EOT;
+foreach ($_Navbar['main'] as $key => $value) {
+	if ($key == 'html') continue;
+	$currentClass = $value['data']['iscurrent'] ? 'class="current"' : '';
+	$html = buildNavLinkHtml($value['data']);
+
+	$crossEvent = (!$value['data']['iscurrent'] && 'cross' == $value['data']['floattype'] && $value['subs']) ? " onmouseover=\"ctrlSubMenu('nav_key_up_$key', 'nav_key_sub_$key');\" " : '';
+
+	$verticalEvent = (!$value['data']['iscurrent'] && 'vertical' == $value['data']['floattype'] && $value['subs']) ? " onmouseover=\"tmpHideAllCross('nav_key_sub_$key'); read.open('nav_key_sub_$key', 'nav_key_up_$key', null, 0, window['nav_key_up_$key']); \" " : '';
+
+	$currentEvent = $value['data']['iscurrent'] ? " onmouseover=\"tmpHideAllCross('nav_key_sub_$key'); \" " : '';
+print <<<EOT
+-->
+					<li $currentClass $crossEvent $verticalEvent $currentEvent>$html</li>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+
+				</ul>
+			</div>
+        </div>
+
+        <div id="navB" class="pr">
+<!--
+EOT;
+$showEmptyNav = true;
+foreach ($_Navbar['main'] as $key => $value) {
+	if ($key == 'html') continue;
+	$subs = $value['subs'];
+	$nav = $value['data'];
+
+	if ($subs) {
+
+		if ($nav['iscurrent']) {
+			$showEmptyNav = false;
+			$menuListClass = 'align' == $nav['selflisttype'] ? 'menuListB' : 'menuListC';
+print <<<EOT
+-->
+			<div class="navB">
+				<div class="navBbg">
+                <ul class="$menuListClass cc">
+<!--
+EOT;
+			foreach ($subs as $value) {
+				$html = buildNavLinkHtml($value);
+print <<<EOT
+-->
+                    <li>$html</li>
+<!--
+EOT;
+			}
+print <<<EOT
+-->
+                </ul>
+				</div>
+            </div>
+<!--
+EOT;
+		} elseif ('cross' == $nav['floattype']) {
+			//$db_menuinit .= ",'nav_key_up_$key' : 'nav_key_sub_$key'"; //register
+			$menuListClass = 'space' == $nav['listtype'] ? 'menuListC' : 'menuListB';
+print <<<EOT
+-->
+        	<div id="nav_key_sub_$key" class="navB" style="position:absolute; width:100%; top:0px; z-index:11; display:none;" >
+				<div class="navBbg">
+                <ul class="$menuListClass cc">
+<!--
+EOT;
+			foreach ($subs as $value) {
+				$html = buildNavLinkHtml($value);
+print <<<EOT
+-->
+                    <li>$html</li>
+<!--
+EOT;
+			}
+print <<<EOT
+-->
+                </ul>
+				</div>
+            </div>
+<!--
+EOT;
+		} elseif ('vertical' == $nav['floattype']) {
+			//$db_menuinit .= ",'nav_key_up_$key' : 'nav_key_sub_$key'"; //register
+			$appendClass = 'twocol' == $nav['listtype'] ? 'menuHalf cc' : '';
+			$width = 'twocol' == $nav['listtype'] ? '18' : '9';
+print <<<EOT
+-->
+        	<div id="nav_key_sub_$key" style="display:none;">
+				<div class="pw_menu" style="overflow:hidden;">
+                <ul class="menuList $appendClass" style="width:{$width}em;">
+<!--
+EOT;
+			foreach ($subs as $value) {
+				$html = buildNavLinkHtml($value);
+print <<<EOT
+-->
+                    <li>$html</li>
+<!--
+EOT;
+			}
+print <<<EOT
+-->
+                </ul>
+				</div>
+            </div>
+<!--
+EOT;
+		}
+
+	}
+}
+if ($showEmptyNav) {
+print <<<EOT
+-->
+
+			<div class="navB">
+				<div class="navBbg">
+				</div>
+            </div>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+		</div>
+
+<script language="javascript">
+var timeoutSpecifyId = {};
+
+function tmpClose(elementId) {
+	timeoutSpecifyId[elementId] = setTimeout(function() {
+		getObj(elementId).style.display = 'none';
+	}, 100);
+}
+function tmpHideAllCross(currentSubMenuId) {
+	var elements = getElementsByClassName('navB', getObj('navB'));
+	for (i=0; i<elements.length; i++) {
+		if (elements[i].id != '' && elements[i].id != currentSubMenuId) elements[i].style.display = 'none';
+	}
+}
+
+function ctrlSubMenu(parentId, subMenuId) {
+	clearTimeout(timeoutSpecifyId[subMenuId]);
+
+	tmpHideAllCross(subMenuId);
+	getObj(subMenuId).style.display = '';
+
+	getObj(parentId).onmouseout = function() {
+		tmpClose(subMenuId);
+		getObj(parentId).onmouseout = '';
+	};
+	getObj(subMenuId).onmouseout = function() {
+		tmpClose(subMenuId);
+	};
+	getObj(subMenuId).onmouseover = function() {
+		clearTimeout(timeoutSpecifyId[subMenuId]);
+		getObj(subMenuId).style.display = '';
+	};
+}
+</script>
+
+    </div>
+
+	<div id="searchA">
+    	<div class="searchA_right fr">&nbsp;</div>
+        <div class="searchA cc">
+        	<form action="searcher.php" method="post" onSubmit="return searchInput();">
+	        	<input type="hidden" value="$verifyhash" name="verify">
+	            <input value="2" type="hidden" name="step">
+	            <input value="thread" type="hidden" id="search_type" name="type">
+	            <div class="ip"><input id="search_input" type="text" value="搜索其实很简单！ (^_^)" name="keyword" onFocus="searchFocus(this)" onBlur="searchBlur(this)" /></div>
+	            <div class="s_select" onMouseOut="this.firstChild.style.display='none';" onMouseOver="this.firstChild.style.display='block';"><ul onClick="getSearchType(event)"><li type="thread" style="display:none">帖子</li><li type="diary">日志</li><li type="user">用户</li><li type="forum">版块</li><li type="group">群组</li></ul><h6>帖子</h6></div>
+	            <span class="bts fl"><span><button type="submit">搜 索</button></span></span>
+            </form>
+            <div class="s_tags"><b>热搜：</b>
+<!--
+EOT;
+$hotwords = ($db_hotwords) ? explode(",",$db_hotwords) : array();
+if($hotwords){
+foreach($hotwords as $hotword){
+print <<<EOT
+-->
+                	<a href="searcher.php?keyword={$hotword}&type=thread">$hotword</a>
+<!--
+EOT;
+}}
+print <<<EOT
+-->
+            </div>
+        </div>
+    </div>
+    </div>
+<!--
+EOT;
+$style_banner = $colony['banner'] ? " style=\"background:url({$colony[banner]}) repeat;\"" : '';
+print <<<EOT
+-->
+    <div id="main" class="cc">
+		<script type="text/javascript" src="js/pw_lwd.js"></script>
+		<div id="banner_class"{$style_banner}>
+			<div class="bannerBg"></div>
+			<div class="sub">
+				<span class="btn_add2 fr"><span><button onClick="location.href='apps.php?q=group&cyid=$cyid&a=invite';">邀请朋友加入</button></span></span>
+<!--
+EOT;
+if (!$colony['ifcyer'] && $colony['ifcheck'] > 0) {print <<<EOT
+-->
+				<span class="btn_add2 fr"><span><button id="joincolony" onClick="sendmsg('apps.php?q=group&cyid=$cyid&a=join','',this.id);">申请加入</button></span></span>
+<!--
+EOT;
+}print <<<EOT
+-->
+				<h2>$colony_name</h2>
+				<p>$descrip</p>
+				<cite class="mr5">$db_bbsurl/apps.php?q=group&cyid=$cyid</cite>
+				<a id="bookmarkExplore" href="javascript:;" onClick="Addtoie('$db_bbsurl/apps.php?q=group&cyid=$cyid','群组{$favortitle}首页');" class="mr5">[收藏]</a>
+				<a href="javascript:;" onClick="copyUrl('$db_bbsurl/apps.php?q=group&cyid=$cyid')">[复制]</a>
+			</div>
+		</div>
+		<div class="g_navA" id="g_navA">
+<!--
+EOT;
+if($a == 'thread') {print<<<EOT
+-->
+			<span class="btn_add2 fr" style="margin:-5px 0 0 0;_position:relative;"><span><button type="button" onClick="checkPostRight();">发表话题</button></span></span>
+<SCRIPT LANGUAGE="JavaScript">
+function checkPostRight() {
+	ajax.send('apps.php?q=group&a=checkpostright&cyid=$cyid','',function(){
+		if (ajax.request.responseText == 'ok'){
+			window.location = 'apps.php?q=group&a=post&cyid=$cyid';
+		} else {
+			showDialog('error',ajax.request.responseText);
+		}
+	});
+}
+</SCRIPT>
+<!--
+EOT;
+} else {
+if($db_share_open && !$shareGM && !in_array($a,array('read','view'))){print<<<EOT
+-->
+			<span class="fr"><a href="apps.php?q=collection&a=favor&type=group&ajax=1&id=$cyid" onClick="return ajaxurl(this)" class="shareA">收藏<span>+</span></a></span>
+      
+            
+            
+<!--
+EOT;
+}if($_G['allowreport'] && !in_array($a,array('read','view'))){print <<<EOT
+-->
+			<a href="javascript:;" onClick="sendmsg('pw_ajax.php?action=report&type=group&tid=$cyid&own={$colony[admin]}','',this.id);" class="fr mr10">！举报</a>
+<!--
+EOT;
+}}print<<<EOT
+-->
+			<ul>
+				<li id="g_index"><a href="apps.php?q=group&cyid=$cyid">首页</a></li>
+<!--
+EOT;
+foreach ($groupRight['modeset'] as $key => $value) {
+if ($value['ifopen']) {
+$tmpUrl = ($key == 'galbum') ? "apps.php?q=galbum" : "apps.php?q=group&a=$key";
+print <<<EOT
+-->
+				<li id="g_{$key}"><a href="{$tmpUrl}&cyid=$cyid" hidefocus="true">{$value['title']}</a></li>
+<!--
+EOT;
+}}if ($ifadmin) {print <<<EOT
+-->
+				<li  id="g_set"><a href="apps.php?q=group&a=set&cyid=$cyid">管理</a></li>
+<!--
+EOT;
+}if($cnclass['fid'] && $colony['classid'] && $groupRight['modeset']['thread']['ifopen'] && empty($colony['viewtype'])){print <<<EOT
+-->
+				<li class="one"><a href="$tmpActionUrl" hidefocus="true">切换至论坛视图</a></li>
+<!--
+EOT;
+}print <<<EOT
+-->
+			</ul>
+		</div>
+		<div class="c"></div>
+<script language="JavaScript">
+if(is_webkit)
+	getObj('bookmarkExplore').parentNode.removeChild(getObj('bookmarkExplore'));
+var copyurl = '';
+setCurrent('g_{$a_key}','g_index','current');
+</script>
+<!--
+EOT;
+?>

@@ -1,0 +1,57 @@
+<!--<?php
+$title = $subMenu[$sub];
+if($result){
+print <<<EOT
+-->
+	<div class="p5">
+		<h5 class="h5">
+		<div class="fr"><form action="{$basename}action=$action&sub=$sub&rand=$randnum" method="post">
+		$result[fType]
+		$result[fTime]
+		</form></div>
+		<strong>$title[type_name]</strong></h5>
+		<table width="100%">
+<!--
+EOT;
+foreach($result['data'] as $key => $value){
+print <<<EOT
+-->
+		<tr class="tr3">
+		<td width="60"><span class="replay-bg"><div class="b s1 f16">$value[value]</div>
+<!--
+EOT;
+if($sub=="threadRate"){print <<<EOT
+-->
+		&nbsp;<a href="javascript:;" onclick="quickRateRequest('$value[id]','1','$fType')" class="s7">评价</a>
+<!--
+EOT;
+}elseif($sub=="threadFav"){print <<<EOT
+-->
+		&nbsp;<a id="favor" title="收藏为私有" href="javascript:;" onclick="sendmsg('pw_ajax.php?action=favor&tid=$value[id]&fid=$value[fid]','',this.id)" class="s7">收藏</a>
+<!--
+EOT;
+}elseif($sub=="threadShare"){print <<<EOT
+-->
+<!--
+EOT;
+}else{print <<<EOT
+-->
+		&nbsp;$result[unit]
+<!--
+EOT;
+}print <<<EOT
+-->
+		</span>
+		</td>
+		<td><a class="f14 line" href="$value[url]" target="_blank">$value[title]</a></td>
+		<td width="160">作者：<a href="u.php?username=$value[author]" class="s7" target="_blank">$value[author]</a><br/>发帖：$value[postdate]</td>
+		</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+		</table>
+	</div>
+<!--
+EOT;
+}?>-->

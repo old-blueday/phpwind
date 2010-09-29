@@ -1,0 +1,58 @@
+<!--<?php print <<<EOT
+-->
+<html>
+<head>
+<title>Insert Table</title>
+<script type="text/javascript" src="js/dialog.js"></script>
+<script type="text/javascript">
+window.resizeTo(280, 90);
+
+</script>
+<style type="text/css">
+html, body {
+background: ButtonFace;
+color: ButtonText;
+font: 12px Tahoma,Verdana,sans-serif;
+margin: 0px;
+padding: 0px;
+}
+body { padding: 5px; }
+table { font: 12px Tahoma,Verdana,sans-serif;}
+select, input, button { font: 11px Tahoma,Verdana}
+button { width: 70px; }
+form { padding: 0px; margin: 0px; }
+</style>
+</head>
+<body onload="Init()">
+<form name="form">
+<table border="0" style="padding: 0px; margin: 0px">
+	<tbody>
+	<tr>
+		<td width="45%" align="center">表格行数:：</td>
+		<td><input type="text" name="rows" id="f_rows" size="5" value="2" /></td>
+	</tr>
+	<tr>
+		<td align="center">表格列数:：</td>
+		<td><input type="text" name="cols" id="f_cols" size="5" value="4" /></td>
+	</tr>
+	<tr>
+		<td align="center">表格宽度:：</td>
+		<td><input type="text" name="width" id="f_width" size="5" value="100" />
+			<select size="1" name="unit" id="f_unit">
+			<option value="%">Percent</option>
+			<option value="px">Pixels</option>
+			</select>
+		</td>
+	</tr>
+	</tbody>
+</table>
+<div style="margin:10px 0px 10px 0px; padding:2px; text-align:center;">
+<input type="button" name="ok" onclick="return onOK();" value="提 交" /> 
+<input type="button" name="cancel" onclick="return onCancel();" value="取消" />
+</div>
+</form>
+</body>
+</html>
+<!--
+EOT;
+?>-->

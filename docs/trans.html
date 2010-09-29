@@ -1,0 +1,92 @@
+<!doctype html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>phpwind V8.0 安装说明</title>
+</head>
+<link rel="stylesheet" type="text/css" href="images/style.css" />
+<body>
+    <div id="menubar">
+    	<div class="menubar">
+    		<h1 class="logo"><a href="#">phpwind文档</a></h1>
+            <div class="c"></div>
+            <div class="nav">
+            	<ul>
+                	<li><a href="index.html">产品简介</a></li>
+                    <li><a href="install.html">安装说明</a></li>
+                    <li><a href="func.html">功能使用</a></li>
+                    <li><a href="faq.html">常见问题</a></li>
+                    <li  class="current"><a href="advanced.html">高级应用</a></li>
+                    <li><a href="seo.html">SEO技巧</a></li>
+                    <li><a href="http://faq.phpwind.net/">帮助中心</a></li>
+                </ul>
+            </div>
+            <div class="footer">
+            	杭州德天信息技术有限公司<br />
+                <small>Powered by phpwind<br />Certificate Code &copy; 2003-2010<br />phpwind.com Corporation</small>
+            </div>
+        </div>
+    </div>
+    <div id="content">
+    	<div class="content">
+        <table width="100%">
+        <tr class="vt"><td height="600">
+        <!-- ====================内容开始====================== -->
+        	<h2>系统搬迁</h2>
+            <div class="div_hr"></div>
+            <div class="box">
+        phpwind可以方便实现系统的整体搬迁与转移，下文详细说明! <br /> <br />
+<h3>1>>老服务器</h3>
+<p><b>1、备份数据库</b>  </p>
+<p>操作路径：【后台】->【数据缓存】->【数据库】->【数据维护】
+  <br />进入页面会看到一个"数据库表",一个"非phpwind数据库表 (论坛插件或其他系统的数据库表)" 
+  <br />"数据库表"里面是PW程序用到的表,包括一些集成的插件都在里面,这个是主要的 
+  <br />"非phpwind数据库表"是这个数据库下的其他表,包括你装的一些其他插件,或者其他程序。
+  <br />我们需要备分的是"数据库表"。将"数据库表"拖到最下面,点"全选",再选择"提交" 。
+  <br />如果您装了额外插件(非phpwind集成的)的,就需要备分一下"非phpwind数据库表" 
+  <br />备分好后生成的sql文件在data文件夹下面,形如pw_0722_046e9bc547_1.sql的文件,其中0722为日期,要看准确, 用FTP工具全部下载到本地.
+  <br />
+  <b>2.备份附件</b>
+  <br />attachment文件夹，用FTP工具全部下载到本地 
+  <br />其他如模板之类，可自行选择是否备份。 <br />
+  <br />
+</p>
+<h3>2>>新服务器</h3> 
+<b>1、安装系统</b>
+<br />上传phpwind程序安装包，版本与编码要跟之前老服务器上的一致，不然会出现乱码，然后运行 
+你的域名/install.php来安装 
+<br />(如果您是下载的老服务器的所有程序的话,这里只需要上传install.php并且将data下面的install.lock文件删除即可, 这样可以安装,这步的作用是建立数据库,不然原来老的数据也没地方导入)
+<br /><b>2、恢复数据</b>
+<br />
+用FTP工具把刚才的*.sql文件全部拖到data文件夹里，【后台】->【数据缓存】->【数据库】->【数据维护】
+<br />点击任一一个导入即可，什么都不需要按，直到导入完成。如果数据比较大的话时间会久一点。
+<br /><b>3、导入完成后，上传附件</b>
+<br />把之前备分到本地的attachment文件夹里面的文件全部上传到新的服务器的attachment文件夹里面 
+<br /><b>4、缓存更新</b>
+<br />
+操作路径：【后台】->【数据缓存】->【缓存相关】->【缓存管理】，把每个缓存都更新一遍。 
+<br /><br />
+<h3>技巧及补充说明:</h3>
+对于用户独立主机权限的站长,还有数据量比较大的站(超过400M的数据库时候)
+<br />这种情况用PW后台备分恢复时间会很漫长
+<br />一般情况下，超过200卷的备份，我们都建议用备份数据库源库的方法进行转移，一方面速度比较快，一方面操作更方便。
+<br />如果是windows服务器
+<br />找到mysql的安装目录,>>mysql>>data>>数据库名
+<br />如果是linux服务器
+<br />首先是停止mysql服务,然后直接将这个数据库下的所有打包,然后传到本地并上传到新的服务器上即可
+<br />注意点：
+<br />1.保证mysql版本的统一
+<br />2.停止mysql服务之后才可打包数据库
+
+			<div class="box2">
+			<table border=1px;cellpadding=1px;cellspacing=1px;align=center;>
+			<tr><td width=200px><a href="host.html">上一篇：插件相关</a></td><td width=200px><a href="tool.html">下一篇：转换工具</a></td></tr>
+			</table></div>
+
+            </div>
+        <!-- ====================内容结束====================== -->
+        </td></tr></table>
+        </div>
+    </div>
+</body>
+</html>

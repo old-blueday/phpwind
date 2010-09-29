@@ -1,0 +1,33 @@
+<!--<?php
+print <<<EOT
+-->
+<center><b>查看完整版本: [-- <a href="thread.php?fid=$fid" target="_blank">$forumname</a> --]</b></center>
+<br />
+<table cellspacing="1" cellpadding="0" width="$tablewidth" $i_table align="center">
+<tr><td><table cellspacing="0" cellpadding="8" width="100%"><tr><td bgcolor="#FFFFFF">
+<b><a href="$DIR">$db_bbsname</a> -&gt; <a href="{$DIR}f$fid.html">$forumname</a></b>
+</td><td bgcolor="#FFFFFF" align="right"><B><A HREF="login.php">登录</A> -&gt; <A HREF="$db_registerfile">注册</A> -&gt; <A HREF="post.php?fid=$fid">发表主题</A></B></td></tr>
+</table></td></tr>
+</table>
+<br />
+<table cellspacing="1" cellpadding="7" width="$tablewidth" $i_table align="center">
+<tr><td bgcolor="#FFFFFF">
+<center>$pages</center>
+<ul type="1" start="$startid">
+<!--
+EOT;
+foreach($threaddb as $thread){print <<<EOT
+-->
+<li><a href="{$DIR}t$thread[tid].html">$thread[subject]</a> &nbsp; <span class="smalltxt">($thread[replies] 回复)</span></li>
+<!--
+EOT;
+}print <<<EOT
+-->
+</ul>
+</td></tr>
+</table>
+<br />
+<center><b>查看完整版本: [-- <a href="thread.php?fid=$fid" target="_blank">$forumname</a> --] [-- <a href="{$DIR}f$fid.html#">top</a> --]</b></center>
+<!--
+EOT;
+?>-->

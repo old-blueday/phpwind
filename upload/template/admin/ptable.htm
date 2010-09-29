@@ -1,0 +1,262 @@
+<!--<?php
+include_once PrintEot('left');
+if(empty($action)){
+print <<<EOT
+-->
+<div class="admin_info mb10">
+	<h3 class="h1">功能说明</h3>
+    <div class="legend mb10">数据库分卷技术实现将一个数据量非常大的表拆分成多个数据较小的表，从而提高数据库查询效率，让您的站点在超大数据量下仍然能高效运行<br /><font color="blue">注意:</font><br />当回复表比较大(几百M)的时候，可以使用该功能进行分卷来降低原来的回复表的负载，分卷教程可以到phpwind官方论坛<a href="http://faq.phpwind.net/" target="_blank">FAQ</a>里面查阅一下 </div>
+    <h3 class="h1">主题内容表分卷功能使用步骤</h3>
+    <div class="legend"><ol><li>使用“<span class="xia">创建新主题表</span>”功能创建一张新的主题表 </li><li>设置tid分界点，当tid大于某个表的分界点并且小于下个表的分界点时，新增主题数据将插入到这个表 </li><li>分卷功能设置完成！</li></ol><font color="blue">注意:</font><ol><li>使用分卷功能前请务必先关闭站点 </li><li>当tid范围出现蓝色字体并有“转移”字样时，表明该表的数据与其他表存在重叠区间，应该使用转移功能修复，否则将导致部分主题内容无法显示。</li></ol></div>
+</div>
+<form action="$basename" method="post">
+<input type="hidden" name="step" value="3" />
+<h2 class="h1"><!--<span class="fr w"><input type="button" class="btn" value="创建新主题表" onclick="location.href='$basename&action=create&type=1'" /></span>-->
+	<div class="mb10 fr">
+        <span class="bt2 f12"><span><button type="button" value="创建新主题表" onclick="location.href='$basename&action=create&type=1'">创建新主题表</button></span></span>
+    </div>已有主题内容表信息（pw_tmsgs）
+</h2>
+<div class="admin_table mb10">
+    <table width="100%" cellspacing="0" cellpadding="0">
+        <tr class="tr2">
+            <td>表名</td>
+            <td>记录数</td>
+            <td>数据表大小</td>
+            <td>tid范围</td>
+            <td>创建时间</td>
+            <td>前台显示名称</td>
+            <td>tid分界点</td>
+            <td>删除</td>
+        </tr>
+<!--
+EOT;
+foreach($tmsgdb as $key=>$table){
+print <<<EOT
+-->
+        <tr class="tr1 vt">
+            <td class="td2">$table[Name]</td>
+            <td class="td2">$table[Rows]</td>
+            <td class="td2">$table[Data_length]</td>
+<!--
+EOT;
+if($table[tmin] && ($table[tidmax] && $table[tmax]>$table[tidmax] || $table[tmin]<=$table[tidmin])){print <<<EOT
+-->
+            <td class="td2">$table[tmin] - $table[tmax] [<a href="$basename&action=movetmsg&id=$key">转移</a>]</td>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+            <td class="td2">$table[tmin] - $table[tmax]</td>
+<!--
+EOT;
+}print <<<EOT
+-->
+            <td class="td2">$table[Create_time]</td>
+<!--
+EOT;
+if ($tlistdb){print<<<EOT
+-->
+            <td class="td2"><input type="text" class="input input_wc" name="ttable[$key][2]" value="{$tlistdb[$key][2]}"></td>
+<!--
+EOT;
+} else {print<<<EOT
+-->
+            <td class="td2"> -- </td>
+<!--
+EOT;
+}if(!$key){print <<<EOT
+-->
+            <td class="td2"> -- </td>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+            <td class="td2"><input type="text" class="input input_wc" name="ttable[$key][1]" value="{$tlistdb[$key][1]}" /></td>
+<!--
+EOT;
+}print <<<EOT
+-->
+             <td class="td2">
+<!--
+EOT;
+if(!$table[tmin] && !$table[tmax]){print <<<EOT
+-->
+            <a href="$basename&action=delttable&id=$key">删除</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+            </td>
+        </tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+    </table>
+</div>
+<div class="mb10 tac">
+    <span class="btn"><span><button type="submit">提 交</button></span></span>
+</div>
+</form>
+<div class="admin_info mb10">
+    <h3 class="h1">回复表分卷功能使用步骤</h3>
+    <div class="legend"><ol><li>使用“<b>创建新回复表</b>”功能创建一张新的回复表(系统默认将新创建的表设为“<b>当前回复表</b>”，新增回复数据将记录在“<b>当前回复表</b>”表里)</li><li>回复表分卷功能设置完成！</li></ol><font color="blue">注意:</font><ol><li>使用分卷功能前请务必先关闭站点</li><li>如果您原来的‘回复数据表(pw_posts)’已经非常大，您可以使用‘数据转移’功能，将部分数据转移到新的回复表，来降低原来的回复表的负载</li></ol></div>
+</div>
+<form action="$basename" method="post">
+<input type="hidden" name="step" value="5" />
+<h2 class="h1">
+    <!--<span class="fr">
+        <input type="button" class="btn" value="创建新回复表" onclick="location.href='$basename&action=create&type=2'" />
+        <input type="button" class="btn" value="数据转移" onclick="location.href='$basename&action=movedata'" />
+    </span>-->
+    <div class="mb10 fr">
+        <span class="bt2 f12"><span><button type="button" value="创建新回复表" onclick="location.href='$basename&action=create&type=2'">创建新回复表</button></span></span>
+        <span class="bt2 f12"><span><button type="button" value="数据转移" onclick="location.href='$basename&action=movedata'">数据转移</button></span></span>
+    </div>
+   已有回复表信息（pw_posts）
+</h2>
+<div class="admin_table mb10">
+    <table width="100%" cellspacing="0" cellpadding="0">
+        <tr class="tr2">
+            <td>表名</td>
+            <td>记录数</td>
+            <td>数据表大小</td>
+            <td>tid范围</td>
+            <td>创建时间</td>
+            <td>前台显示名称</td>
+            <td>当前回复表</td>
+            <td>删除</td>
+        </tr>
+<!--
+EOT;
+foreach($postdb as $key=>$table){
+print <<<EOT
+-->
+        <tr class="tr1 vt">
+            <td class="td2">$table[Name]</td>
+            <td class="td2">$table[Rows]</td>
+            <td class="td2">$table[Data_length]</td>
+            <td class="td2">$table[tmin] - $table[tmax]</td>
+            <td class="td2">$table[Create_time]</td>
+<!--
+EOT;
+if (count($plistdb)>1){print<<<EOT
+-->
+            <td class="td2"><input type="text" class="input" size="8" name="plistdb[$key]" value="{$table[name]}" />
+<!--
+EOT;
+}else{print<<<EOT
+-->
+            <td class="td2"> -- </td>
+<!--
+EOT;
+}print<<<EOT
+-->
+            <td class="td2"><input type="radio" name="ktable" value="$key" $table[sel] /></td>
+            <td class="td2">
+<!--
+EOT;
+if(!$table[tmin] && !$table[tmax]){print <<<EOT
+-->
+            <a href="$basename&action=delptable&id=$key">删除</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+            </td>
+        </tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+    </table>
+</div>
+<div class="mb10 tac">
+    <span class="btn"><span><button type="submit">更改当前回复表</button></span></span>
+</div>
+</form>
+<!--
+EOT;
+}elseif($action=='movedata'){ print <<<EOT
+-->
+<div class="admin_info mb10">
+	<h3 class="h1">功能说明</h3>
+    <div class="legend">将“<b>源回复数据表</b>”里指定“<b>tid范围</b>”的回复数据转移到“<b>目标回复数据表</b>”，从而达到降低系统负载的目的，根据服务器负载情况调整“<b>每次转移帖子数</b>”</div>
+</div>
+<form action="$basename" method="post">
+<input type="hidden" name="action" value="$action" />
+<input type="hidden" name="step" value="1" />
+<h2 class="h1">
+	<span class="mr10">数据转移</span><a href="$basename" class="linka">返回上一级<span class="f9">▲</span></a>
+</h2>
+<div class="admin_table mb10">
+	<table cellpadding="0" cellspacing="0" width="100%">
+        <tr class="tr1 vt">
+            <td class="td1">源回复数据表</td>
+            <td class="td2"><select name="tfrom" class="select_wa">$table_sel</select></td>
+        </tr>
+        <tr class="tr1 vt">
+            <td class="td1">目标回复数据表</td>
+            <td class="td2"><select name="tto" class="select_wa">$table_sel</select></td>
+        </tr>
+        <tr class="tr1 vt">
+            <td class="td1">指定 tid 范围</td>
+            <td class="td2">
+                <input type="text" class="input input_wa" name="tstart" />
+                &nbsp;-&nbsp;
+                <input type="text" class="input input_wa" name="tend" />
+            </td>
+        </tr>
+        <tr class="tr1 vt">
+            <td class="td1">每次转移帖子数</td>
+            <td class="td2"><input type="text" class="input input_wa" name="lines" value="200" /></td>
+        </tr>
+    </table>
+</div>
+<div class="mb10 tac"><span class="btn"><span><button type="submit" name="delete">提 交</button></span></span></div>
+</form>
+<!--
+EOT;
+}elseif($action=='movetmsg'){ print <<<EOT
+-->
+<div class="admin_info mb10">
+    <h3 class="h1"><b>提示信息</b></h3>
+    <div class="legend">该功能将会把 $pw_tmsgs 表中不在设定 tid 范围内的数据，转移到相应的数据表中去!<br />
+请根据服务器负载情况适当调整每次转移的帖子数</div>
+</div>
+<form action="$basename" method="post">
+<input type="hidden" name="action" value="$action" />
+<input type="hidden" name="id" value="$id" />
+<input type="hidden" name="step" value="1" />
+<input type="hidden" name="tmin" value="$tmin" />
+<input type="hidden" name="tmax" value="$tmax" />
+<h2 class="h1">数据转移</h2>
+<h2 class="h1">
+	<span class="mr10">数据转移</span><a href="$basename" class="linka">返回上一级<span class="f9">▲</span></a>
+</h2>
+<div class="admin_table mb10">
+    <table width="100%" cellspacing="0" cellpadding="0">
+        <tr class="tr1 vt">
+            <td class="td1">数据表</td>
+            <td class="td2">$pw_tmsgs</td>
+        </tr>
+        <tr class="tr1 vt">
+            <td class="td1">数据表 tid 范围</td>
+            <td class="td2">$tmin - $tmax</td>
+        </tr>
+        <tr class="tr1 vt">
+            <td class="td1">需转移的数据 tid 范围</td>
+            <td class="td2">$tiderror</td>
+        </tr>
+        <tr class="tr1 vt">
+            <td class="td1">每次转移帖子数</td>
+            <td class="td2"><input type="text" class="input input_wa" name="lines" value="5000" /></td>
+        </tr>
+    </table>
+</div>
+<div class="mb10 tac"><span class="btn"><span><button type="submit">确认提交</button></span></span></div>
+</form>
+<!--
+EOT;
+}include_once PrintEot('adminbottom');
+?>-->

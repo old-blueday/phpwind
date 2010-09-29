@@ -1,0 +1,131 @@
+<!--<?php
+print <<<EOT
+-->
+<div style="width:350px;">
+<div class="popTop" onmousedown="read.move(event);" style="cursor:move"><a href="javascript:;" onclick="closep();" class="adel">删除</a>{$descript}</div>
+<form action="login.php?" method="post" name="login"><input
+	type="hidden" value="login.php" name="forward" /> <input type="hidden"
+	value="$jumpurl" name="jumpurl" /> <input type="hidden"
+	value="2" name="step" />
+<div class="p10 mb10">
+<table>
+	<tr class="tr5">
+		<td width="80">
+			<select name="lgt">
+<!--
+EOT;
+if ($db_logintype>0 && $db_logintype < 8) {
+if ($db_logintype & 1) {print <<<EOT
+-->
+				<option value="0">用户名</option>
+<!--
+EOT;
+}if ($db_logintype & 2) {print <<<EOT
+-->
+				<option value="1">UID</option>
+<!--
+EOT;
+}if ($db_logintype & 4) {print <<<EOT
+-->
+				<option value="2">Email</option>
+<!--
+EOT;
+}} else {print <<<EOT
+-->
+				<option value="0">用户名</option>
+<!--
+EOT;
+}print <<<EOT
+-->
+			</select>
+		</td>
+		<td><input name="pwuser" type="text" class="input" tabindex="1" id="poppwuser"/></td>
+	</tr>
+
+	<tr class="tr5">
+		<td>密　码</td>
+		<td><input name="pwpwd" type="password" class="input"  tabindex="2" /></td>
+	</tr>
+
+
+<!--
+EOT;
+if($db_gdcheck & 2){
+$time = time();
+print <<<EOT
+-->
+	<tr class="tr5">
+		<td>认证码</td>
+		<td>
+		<div style="display: none" id="popgdcode"><img src="ck.php?" align="absmiddle" style="cursor:pointer;" id="ckcode" alt="看不清楚，换一张" /></div>
+		<input class="input" type="text" name="gdcode" size="5" onfocus="showgdcode();"  tabindex="3"  />
+		<span style="cursor:pointer; margin-left:3px" onclick="showgdcode();" id="showtips">&nbsp;点此显示验证码</span>
+		</td>
+	</tr>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+
+<!--
+EOT;
+if($db_ifsafecv){
+print <<<EOT
+-->
+	<tr class="tr5">
+		<td>安全问题</td>
+		<td><select name="question" onchange="showcustomquest(this.value)" tabindex="4">
+			<option value="0">无安全问题</option><option value="1">我爸爸的出生地</option><option value="2">我妈妈的出生地</option><option value="3">我的小学校名</option><option value="4">我的中学校名</option><option value="5">我最喜欢的运动</option><option value="6">我最喜欢的歌曲</option><option value="7">我最喜欢的电影</option><option value="8" >我最喜欢的颜色</option><option value="-1">自定义问题</option>
+		</select>&nbsp;<input id="customquest" style="display:none" type="text" name="customquest" class="input" size="17" tabindex="5" /></td>
+	</tr>
+	<tr class="tr5">
+		<td>您的答案</td>
+		<td><input type="text" name="answer" class="input" size="40" tabindex="5" /></td>
+	</tr>
+
+<!--
+EOT;
+}
+print <<<EOT
+-->
+
+<!--
+EOT;
+list(,$loginq)	= explode("\t",$db_qcheck);
+if($loginq && $db_question){
+$qkey = array_rand($db_question);
+print <<<EOT
+-->
+			<tr class="tr5">
+				<td>验证问答</td>
+				<td>问题：{$db_question[$qkey]}<br /><input class="input" type="text" name="qanswer" tabindex="7" /><input type="hidden" name="qkey" value="$qkey" />  正确答案:{$db_answer[$qkey]}</td>
+			</tr>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+	<tr class="tr5">
+		<td>&nbsp;</td>
+		<td><span class="btn2"><span><button type="submit" tabindex="6">登录</button></span></span>&nbsp;&nbsp;<a href="sendpwd.php">忘记密码？</a></td>
+	</tr>
+</table>
+</div>
+<div class="tr5 f14 tac mb10">没有帐号？&nbsp;&nbsp;&nbsp;<a href="$regurl" class="s4">注册一个吧!</a></div>
+<div class="c"></div>
+</form>
+<script language="JavaScript">
+function showgdcode(){
+	getObj('ckcode').src = 'ck.php?nowtime=' + new Date().getTime();
+	getObj("showtips").innerHTML="刷新验证码";
+	getObj("popgdcode").style.display = "block";
+}
+function showcustomquest(qid){
+	getObj("customquest").style.display = qid==-1 ? '' : 'none';
+}
+</script>
+</div>
+<!--
+EOT;
+?>-->

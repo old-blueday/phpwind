@@ -1,0 +1,187 @@
+<!--<?php
+print <<<EOT
+-->
+<style type="text/css">
+#main{width:98%;}
+.vote-ol{margin-left:2.5em;list-style-type:decimal;line-height:2}
+.zt-vote td{line-height:1.5;padding:5px 0;border-bottom:1px dashed #e4e4e4; vertical-align:top;}
+.s3{color:#ff6600;}
+.zt-vote td input{ vertical-align:middle;}
+</style>
+
+<form target="_blank" action="job.php?action=vote" method="post" name="vote">
+	<input type="hidden" name="verify" value="$verifyhash" />
+	<div class="zt-vote">
+	<table width="100%" cellspacing="0" cellpadding="0" style="table-layout:fixed;">
+		<tr><td colspan="2">
+			<a target="_blank" href="read.php?fid=$fid&tid=$tid&viewvoter=$ifview" class="fr">查看投票的会员</a>
+			总共有<b>{$voters}</b>人参与本次投票 发起于:$tpc_date
+<!--
+EOT;
+if ($tpc_endtime) {print <<<EOT
+-->
+ 至 $tpc_endtime 结束
+<!--
+EOT;
+}print <<<EOT
+-->
+		</td></tr>
+		<tr><td colspan="2">
+			<b>投票限制条件:</b>
+			<br />
+				<ol class="vote-ol">
+<!--
+EOT;
+if ($readvote['regdatelimit']) {print <<<EOT
+-->
+				<li>本投票只允许注册日期大于 $regdatelimit 会员投票 </li>
+<!--
+EOT;
+}if ($readvote['multiple'] && $readvote['leastvotes'] > 1) {print <<<EOT
+-->
+				<li>至少选择个数:{$readvote[leastvotes]} </li>
+<!--
+EOT;
+}if ($readvote['multiple'] && $readvote['mostvotes']) {print <<<EOT
+-->
+				<li>最多选择个数:{$readvote[mostvotes]} </li>
+<!--
+EOT;
+}if ($creditlimit) {print <<<EOT
+-->
+				<li>投票积分限制:
+<!--
+EOT;
+foreach ($credit->cType as $key => $value) {
+if (empty($creditlimit[$key])) continue;print <<<EOT
+-->
+{$value}:$creditlimit[$key] &nbsp;
+<!--
+EOT;
+}print <<<EOT
+-->
+				</li>
+<!--
+EOT;
+}if($readvote['postnumlimit']) {print <<<EOT
+-->
+				<li>您的发帖数大于 {$readvote[postnumlimit]} 才能投票</li>
+<!--
+EOT;
+}print <<<EOT
+-->
+			</ol>
+		</td></tr>
+<!--
+EOT;
+$votesum = $votesum ? $votesum : 1;
+
+foreach ($votedb as $key => $vote) {
+	$vote['width'] = floor($vote['num'] * 100 / $votesum);
+print <<<EOT
+-->
+		<tr>
+			<td>
+<!--
+EOT;
+if (!$vote_close && (!$readvote['havevote'] || $action == 'modify')) {print <<<EOT
+-->
+				<input type="$votetype" value="$key" name="voteid[]" onclick="checkVote(this)" />
+<!--
+EOT;
+}print <<<EOT
+-->
+				$vote[name]
+			</td>
+			<td width="40%"><img src="$imgpath/post/vote/tab-two.gif" width="$vote[width]%" height="15" align="absmiddle" />&nbsp;$vote[num]&nbsp;票</td>
+		</tr>
+<!--
+EOT;
+if ($vote['voter']) {print <<<EOT
+-->
+		<tr><td colspan="2" class="gray">&nbsp;&nbsp;$vote[voter]&nbsp;&nbsp;</td></tr>
+<!--
+EOT;
+}}print <<<EOT
+-->
+		<tr><td colspan="2" style="border-bottom:0;">
+<!--
+EOT;
+if ($vote_close) {print <<<EOT
+-->
+<span class="s3">(本次投票已结束)</span>
+<!--
+EOT;
+}print <<<EOT
+-->
+
+<!--
+EOT;
+if ((!$readvote['havevote'] || $readvote['modifiable']) && $vote_close == 0) {print <<<EOT
+-->
+				<div>
+<!--
+EOT;
+if ($readvote['havevote'] && $action != 'modify' && $readvote['modifiable']) {print <<<EOT
+-->
+&nbsp;* <b><a target="_blank" href="read.php?fid=$fid&tid=$tid&action=modify">修改投票</a></b>
+<!--
+EOT;
+} else {
+if ($action == 'modify') {print <<<EOT
+-->
+<input type="hidden" value="modify" name="voteaction" />
+<!--
+EOT;
+} print <<<EOT
+-->
+<input type="hidden" value="$tid" name="tid" /><input class="btn" type="submit" value="提 交" />
+<!--
+EOT;
+}print <<<EOT
+-->
+				</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+			</td>
+		</tr>
+	</table>
+	</div>
+	<div class="c">&nbsp;</div>
+</form>
+<script language="JavaScript">
+var tempnum = 0;
+var voteid = '';
+var multi = '$readvote[mostvotes]';
+function checkVote(obj){
+	if ((obj.type == 'checkbox' || obj.type == 'radio') && multi != 0) {
+		if (!tempnum) {
+			tempnum = 0;
+		}
+		if (!voteid) {
+			voteid = '';
+		}
+		if (obj.checked) {
+			if(obj.type == 'checkbox'){
+				if (tempnum == multi) {
+					obj.checked = false;
+					return;
+				}
+				voteid += (voteid ? '|' : '') + obj.value;
+				tempnum++;
+			} else {
+				voteid = obj.value;
+				tempnum = 1;
+			}
+		} else {
+			tempnum--;
+		}
+	}
+}
+</script>
+<!--
+EOT;
+?>
+-->

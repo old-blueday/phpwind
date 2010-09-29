@@ -1,0 +1,180 @@
+<!--<?php print <<<EOT
+-->
+<link href="images/admin/xiangdao/xiangdao.css" type="text/css" rel="stylesheet" />
+<script src="js/pw_ajax.js"></script>
+<script src="js/desktop/adminguide.js"></script>
+<script type="text/javascript">
+var ajaxurl = '$ajaxurl';
+var isshow = "$db_guideshow";
+window.onReady(function(){
+	(isshow == 1) ? adminguide.step() : 0;
+});
+</script>
+<div id="guide">
+<input name="guideshow" type="hidden" value="$db_guideshow" id="guideshow"/>
+<div id="step1" style="display:none;">
+<div class="xdwrap">
+  <div class="xdmain">
+      <div style="height:50px">
+          <h5 class="fl">欢迎使用新手指南</h5>
+
+          <div class="fr"><a href="javascript:;" id="close"><img src="images/admin/xiangdao/close.png" /></a></div>
+      </div>
+
+    <div class="c"></div>
+    <div class="fl stepcontent">
+      <div style="padding:0 0 0 20px">
+        <h6>第一步：估算初期目标，优化站点负载</h6>
+        <p class="graystep">站点负载，通俗上指站点对访问量的承受能力。通常情况下，高访问量势必带来低访问效果，从而降低用户体验。此设置通过预计站点访问量，不改动现有的硬件设施，从代码上优化站点负载、程序级均衡访问量与访问效果，降低后期运营风险。</p>
+      </div>
+
+      <p style="margin-top:30px"><b>操作步骤:</b></p>
+      <p>创始人->站点优化方案，根据站点访问量优化站点负载。</p>
+    </div>
+    <div class="fr step1"></div>
+    <div class="c"></div>
+    <div style="margin-top:20px">
+      <div class="fl stepfoot"><a href="http://faq.phpwind.net/" target="_blank">更详细解答请查看FAQ</a></div>
+
+      <div class="fr">
+      	<span>1/5</span>
+        <input name="" type="button" value="下一步" class="stepbtn" go="next" />
+        <input name="" type="checkbox" value=""/>
+        下次登录时显示</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div id="step2" style="display:none;">
+<div class="xdwrap">
+  <div class="xdmain">
+  <div style="height:50px">
+  	<h5 class="fl">欢迎使用新手指南</h5>
+    <div class="fr"><a href="javascript:;" id="close"><img src="images/admin/xiangdao/close.png" /></a></div>
+    </div>
+    <div class="c"></div>
+    <div class="fl stepcontent">
+      <div style="padding-left:20px">
+        <h6>第二步：修改站点基本信息</h6>
+        <p class="graystep">站点基本信息，网民从互联网上找到你的必要条件，搜索引擎收入的重要依据。</p>
+      </div>
+      <p style="margin-top:30px"><b>操作步骤:</b></p>
+      <p>1 核心设置->常规设置->站点信息，填写站点名称、地址、ICP等信息</p>
+	  <p>2 核心设置->SEO优化，填写页面title等信息</p>
+    </div>
+    <div class="fr step2"></div>
+    <div class="c"></div>
+    <div style="margin-top:38px">
+      <div class="fl stepfoot"><a href="http://faq.phpwind.net/" target="_blank">更详细解答请查看FAQ</a></div>
+      <div class="fr">
+      	<span>2/5</span>
+        <input name="" type="button" value="上一步" class="stepbtn" go="up"/> <input name="" type="button" value="下一步" class="stepbtn" go="next"/>
+        <input name="" type="checkbox" value="" />
+        下次登录时显示</div>
+    </div>
+  </div>
+</div>
+</div>
+
+
+<div id="step3" style="display:none;">
+<div class="xdwrap">
+  <div class="xdmain">
+  <div style="height:50px">
+   <h5 class="fl">欢迎使用新手指南</h5><div class="fr"><a href="javascript:;" id="close"><img src="images/admin/xiangdao/close.png" /></a></div>
+  </div>
+
+    <div class="c"></div>
+    <div class="fl stepcontent">
+      <div style="padding-left:20px">
+        <h6>第三步：创建版块</h6>
+        <p class="graystep">内容是站点的基础。版块是对站点内容的分类和划分。系统支持4级版块：分类、子版块、二级子版、三级子版。</p>
+      </div>
+      <p style="margin-top:30px"><b>操作步骤:</b></p>
+      <p>1 内容版块->版块管理->管理版块，添加设置版块分类</p>
+      <p>2 内容版块->版块管理->管理版块，添加设置分类子版块</p>
+      <p>3 内容版块->版块管理->管理版块，设置版块版主</p>
+    </div>
+    <div class="fr step3"></div>
+    <div class="c"></div>
+    <div style="margin-top:20px">
+      <div class="fl stepfoot"><a href="http://faq.phpwind.net/" target="_blank">更详细解答请查看FAQ</a></div>
+      <div class="fr">
+      	<span>3/5</span>
+        <input name="" type="button" value="上一步" class="stepbtn" go="up"/>
+        <input name="" type="button" value="下一步" class="stepbtn" go="next"/>
+        <input name="" type="checkbox" value="" />
+        下次登录时显示</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div id="step4" style="display:none;">
+<div class="xdwrap">
+  <div class="xdmain">
+  <div style="height:50px">
+    <h5 class="fl">欢迎使用新手指南</h5>
+    <div class="fr"><a href="javascript:;" id="close"><img src="images/admin/xiangdao/close.png" /></a></div>
+  </div>
+    <div class="c"></div>
+    <div class="fl stepcontent">
+      <div style="padding-left:20px">
+        <h6>第四步：编辑会员组权限</h6>
+        <p class="graystep">如果说内容是站点的基础，那么会员则是站点的根本，因为站点的很多内容都源于会员，会员的积极发言能吸引更多的会员，从而形成站点良性运营，促使站点壮大。系统分为拥有多种等级的普通会员组、具有一定管理权限的系统组、拥有特殊权限的特殊用户组，以及用于扩展的默认组。 </p>
+      </div>
+      <p style="margin-top:4px"><b>操作步骤:</b></p>
+      <p>1 会员权限->会员组管理->会员组权限 设置各种会员组权限</p>
+      <p>2 会员权限->会员组管理->会员组提升方案 设置普通会员组提升方案</p>
+    </div>
+    <div class="fr step4"></div>
+    <div class="c"></div>
+    <div style="margin-top:10px">
+      <div class="fl stepfoot"><a href="http://faq.phpwind.net/" target="_blank">更详细解答请查看FAQ</a></div>
+      <div class="fr">
+      	<span>4/5</span>
+        <input name="" type="button" value="上一步" class="stepbtn" go="up"/>
+        <input name="" type="button" value="下一步" class="stepbtn" go="next"/>
+        <input name="" type="checkbox" value="" />
+        下次登录时显示</div>
+    </div>
+  </div>
+ </div>
+</div>
+
+<div id="step5" style="display:none;">
+<div class="xdwrap">
+  <div class="xdmain">
+   <div style="height:50px">
+    <h5 class="fl">欢迎使用新手指南</h5><div class="fr"><a href="javascript:;" id="close"><img src="images/admin/xiangdao/close.png" /></a></div>
+   </div>
+    <div class="c"></div>
+    <div class="fl stepcontent">
+      <div style="padding-left:20px">
+        <h6>第五步：备份数据</h6>
+        <p class="graystep">数据包括站点内的所有信息，为以防万一，时刻保证站点数据的安全，我们必须养成周期性备份数据的习惯。<br />
+        <p class="graystep">注：如果数据量较大，建议在服务器上直接备份</p>
+        </p>
+      </div>
+      <p style="margin-top:30px"><b>操作步骤:</b></p>
+      <p>数据缓存->数据库->数据备份 选择需要备份的数据表进行备份</p>
+    </div>
+    <div class="fr step5"></div>
+    <div class="c"></div>
+    <div style="margin-top:38px">
+      <div class="fl stepfoot"><a href="http://faq.phpwind.net/" target="_blank">更详细解答请查看FAQ</a></div>
+      <div class="fr">
+      	<span>5/5</span>
+        <input name="" type="button" value="上一步" class="stepbtn" go="up"/>
+        <input name="" type="button" value="完成" class="stepbtn" go="finish"/>
+        <input name="" type="checkbox" value="" />
+        下次登录时显示</div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+<!--
+EOT;
+?>

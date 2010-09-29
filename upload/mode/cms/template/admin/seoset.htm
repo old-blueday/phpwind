@@ -1,0 +1,150 @@
+<!--<?php
+include_once PrintEot('left');
+print <<<EOT
+-->
+<div class="nav3 mb10">
+<ul class="cc">
+	<!--
+EOT;
+empty($mode) && $mode = 'bbs';
+foreach($db_modes as $key => $value){
+if($value['ifopen'] && !in_array($key,$unSeoset)){
+$current_menu = $key == $mode ? 'class="current"' : '';
+print <<<EOT
+-->
+	<li $current_menu><a href="$basename&mode=$key">$value[m_name]</a></li>
+	<!--
+EOT;
+}}print <<<EOT
+-->
+</ul>
+</div>
+<div class="admin_info mb10">
+<h2 class="h1">文章模式 SEO优化设置</h2>
+<div class="legend">
+<ol>
+	<li>文章模式SEO优化设置规则：</li>
+	<li>网站名称:{wzmc}（应用范围：所有位置）</li>
+	<li>栏目名称:{lmmc}（应用范围：列表页和文章阅读页）</li>
+	<li>文章名称:{armc}（应用范围：文章阅读页）</li>
+	<li>文章概要:{wzgy}（应用范围：文章阅读页）</li>
+	<li>文章页面的SEO可以统一设置，各栏目设置如果留空则沿用统一设置</li>
+	<li>以上标签（必须包含大括号"{}"）可以通过添加在下面来优化页面SEO设置，多个标签之间可以用半角连字符"-"、半角","或半角空格隔开。留空为默认SEO设置，如果标签不再应用范围内则不显示此标签。比如某个频道页的title可以设置为：{pdmc}-{wzmc}-让网站更具价值</li>
+</ol>
+</div>
+</div>
+<form action="$basename" method="post"><input type="hidden"
+	name="action" value="update" /> <input type="hidden" name="mode"
+	value="$mode">
+<h2 class="h1">文章列表页
+<!--
+EOT;
+if(!empty($channles)){
+print <<<EOT
+-->
+ <span class="bt2 linka"><span><button onclick="columnopen('details',null)" name="openfordetail" type="button">展开详细设置</button></span></span>
+<!--
+EOT;
+}print <<<EOT
+-->
+</h2>
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+	<tr class="tr1 vt">
+		<td class="td1">Title</td>
+		<td class="td2"><input type="text" class="input input_wb"
+			name="seoset[title][index]" value="{$cms_seoset[title][index]}"
+			maxlength="250" /></td>
+		<td></td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">Meta Description</td>
+		<td class="td2"><input type="text" class="input input_wb"
+			name="seoset[metaDescription][index]"
+			value="{$cms_seoset[metaDescription][index]}" maxlength="250" /></td>
+		<td></td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">Meta Keywords</td>
+		<td class="td2"><input type="text" class="input input_wb"
+			name="seoset[metaKeywords][index]"
+			value="{$cms_seoset[metaKeywords][index]}" maxlength="250" /></td>
+		<td></td>
+	</tr>
+</table>
+<table width="100%" cellspacing="0" cellpadding="0" style="table-layout: fixed; display: none" id="details">
+<tbody>
+<!--
+EOT;
+foreach($channles as $c1){
+$_html = getColumnLevelHtml($c1['level']);
+$_id = $c1[column_id];
+print <<<EOT
+-->
+        <tr class="tr2 td_bgB">
+            <td class="s5" width="140">{$_html}{$c1[name]}</td><td> </td>
+        </tr>
+        <tr class="tr1 vt"  id="column_{$c1[parent_id]}_title">
+            <td class="td1">Title</td>
+            <td class="td2"><input type="text" maxlength="250" value="{$c1[seotitle]}" name="seo[{$_id}][seotitle]" class="input input_wb"></td>
+        </tr>
+        <tr class="tr1 vt"  id="column_{$c1[parent_id]}_descp">
+            <td class="td1">Meta Description</td>
+            <td class="td2"><input type="text" maxlength="250" value="{$c1[seodesc]}" name="seo[{$_id}][seodesc]" class="input input_wb"></td>
+        </tr>
+        <tr class="tr1 vt"  id="column_{$c1[parent_id]}_keyword">
+            <td class="td1">Meta Keywords</td>
+            <td class="td2"><input type="text" maxlength="250" value="{$c1[seokeywords]}" name="seo[{$_id}][seokeywords]" class="input input_wb"></td>
+        </tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+</tbody>
+</table>
+</div>
+<h2 class="h1">文章阅读页</h2>
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+	<tr class="tr1 vt">
+		<td class="td1">Title</td>
+		<td class="td2"><input type="text" class="input input_wb"
+			name="seoset[title][read]" value="{$cms_seoset[title][read]}"
+			maxlength="250" /></td>
+		<td></td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">Meta Description</td>
+		<td class="td2"><input type="text" class="input input_wb"
+			name="seoset[metaDescription][read]"
+			value="{$cms_seoset[metaDescription][read]}" maxlength="250" /></td>
+		<td></td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">Meta Keywords</td>
+		<td class="td2"><input type="text" class="input input_wb"
+			name="seoset[metaKeywords][read]"
+			value="{$cms_seoset[metaKeywords][read]}" maxlength="250" /></td>
+		<td></td>
+	</tr>
+</table>
+</div>
+<div class="tac mb10"><span class="btn"><span>
+<button type="submit">提 交</button>
+</span></span></div>
+</form>
+<script type="text/javascript">
+function columnopen(id,obj) {
+	var o = getObj(id);
+	if (o == null) return;
+	if (o.style.display == 'none') {
+		o.style.display = '';
+	} else {
+		o.style.display = 'none';
+	}
+}
+</script>
+<!--
+EOT;
+include_once PrintEot('adminbottom');
+?>-->

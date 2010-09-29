@@ -1,0 +1,43 @@
+<!--<?php
+print <<<EOT
+-->
+
+<table width="100%" class="mb10" id="smsListTable">
+	<tbody>
+		<tr class="tr3">
+			<td colspan="3">
+			<a class="adel" href="javascript:;" onclick="MC.del('{$message[rid]}','$subtype','','$page','showmessageTip')">删除</a>
+			所在群组：<a href="apps.php?q=group&cyid={$message['colonyid']}">{$message[cname]}</a> 
+<!--
+EOT;
+if(!in_array($message['colonyid'],$groups)){
+print <<<EOT
+-->
+				<a href="javascript:;" onclick="MC.group('确定要屏蔽该条群组消息吗?','action=close&mid=$message[mid]&gid=$message[colonyid]','$type','$page','showmessageTip')">[拒收此群的消息]</a>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+				你已经拒收此群的消息<a href="javascript:;" onclick="MC.group('','action=open&gid=$message[colonyid]&mid=$message[mid]','$type','$page','showmessageTip')">[启动接收]</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+			</td>
+		</tr>
+<!--
+EOT;
+$_linkUrl = $linkUrl . $message['colonyid']; 
+$message['cnimg'] = $message['cnimg'] ?  $db_attachname.'/cn_img/'.$message['cnimg'] : 'images/g/groupnopic.gif';
+print <<<EOT
+-->
+		<tr class="tr3 vt">
+			<td class="face"><a class="img_50" href="{$_linkUrl}"><i><img width="48" height="48" src="{$message[cnimg]}"></i></a></td>
+			<td class="name"><p><a href="{$_linkUrl}">{$message[cname]}</a></p><em><span title="$message[modified_time]">{$message[modified_time_format]}</span></em></td>
+            <td><div class="textMes"><h1>{$message[title]}</h1>{$message[content]}</div></td>
+		</tr>
+	</tbody>
+</table>
+<!--
+EOT;
+?>-->

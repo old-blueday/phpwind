@@ -1,0 +1,53 @@
+<!--<?php
+include_once PrintEot('left');
+print <<<EOT
+-->
+<div class="admin_info mb10">
+    <h3 class="h1"><b>提示信息</b></h3>
+    <div class="legend">说明:<ol> <li>站点{$db_currencyname}是用户在站点进行各种交易的货币，可用于购买会员道具。</li><li>用户的{$db_currencyname}可通过帐户充值或管理员奖励获得。</li></ol></div>
+</div>
+<!--
+EOT;
+if (!$action){print <<<EOT
+-->
+<form action="$basename&" method="post">
+  <input type="hidden" name="action" value="edit">
+  <h2 class="h1"><b>{$db_currencyname}管理</b></h2>
+  <div class="admin_table mb10">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <tr class="tr1 vt">
+      <td class="td1">用户名</td>
+      <td class="td2"><input type="text" class="input input_wa" name="username"></td>
+    </tr>
+  </table>
+  </div>
+  <div class="mb10 tac"><span class="btn"><span><button type="submit">提 交</button></span></span></div>
+</form>
+<!--
+EOT;
+}elseif($action=='edit'){print <<<EOT
+-->
+<form action="$basename" method="post">
+  <input type="hidden" name="action" value="edit">
+  <input type="hidden" name="step" value="2">
+  <input type="hidden" name="uid" value="$rt[uid]">
+  <h2 class="h1"><b>{$db_currencyname}管理</b></h2>
+  <div class="admin_table mb10">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <tr class="tr1 vt">
+      <td class="td1">用户名</td>
+      <td class="td2">$rt[username]</td>
+    </tr>
+    <tr class="tr3">
+      <td width="20%">{$db_currencyname}</td>
+      <td><input class="input input_wa" type="text" name="currency" value="$rt[currency]"></td>
+    </tr>
+  </table>
+  </div>
+  <div class="mb10 tac"><span class="btn"><span><button type="submit">提 交</button></span></span></div>
+</form>
+<!--
+EOT;
+}include_once PrintEot('adminbottom');
+?>
+-->

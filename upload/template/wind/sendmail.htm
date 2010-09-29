@@ -1,0 +1,81 @@
+<!--<?php 
+if($action=='mailto'){
+print <<<EOT
+-->
+<div id="breadCrumb">
+		<img src="$imgpath/$stylepath/thread/home-old.gif" align="absmiddle" />&nbsp;<a href="$db_bfn" title="$db_bbsname">$db_bbsname</a><em>&gt;</em>发送邮件
+</div>
+
+<form method="post" action="sendemail.php?">
+<input type="hidden" name="verify" value="$verifyhash" />
+<input type="hidden" name="action" value="mailto" />
+<input type="hidden" name="step" value="2" />
+<input type="hidden" name="uid" value="$userdb[uid]" />
+<div class="t" style="margin-top:8px">
+<table width="100%" cellspacing="0" cellpadding="0" align="center">
+	<tr>
+		<td colspan="2" class="h"><b>发送邮件</b></td>
+	</tr>
+	<tr class="tr3">
+		<th width="21%">您的名字:</th>
+		<th>
+			<input type="text" class="input" name="fromname" size="25" maxlength="40" value="$windid" readonly />
+		</th>
+	</tr>
+	<tr class="tr3">
+		<th>您的Email:</th>
+		<th><input type="text" class="input" name="fromemail" size="25" value="$winddb[email]" /></th>
+	</tr>
+	<tr class="tr3">
+		<th>对方姓名:</th>
+		<th><input type="text" class="input" name="sendtoname" size="25" value="$to_user" readonly /></th>
+	</tr>
+	<tr class="tr3">
+		<th>对方Email:</th>
+		<th>
+<!--
+EOT;
+if($hiddenmail){print <<<EOT
+-->
+邮箱已设置保密不影响邮件发送
+<!--
+EOT;
+}else{print <<<EOT
+-->
+			<input type="text" class="input" name="sendtoemail" size="25" value="$to_mail" readonly />
+<!--
+EOT;
+}print <<<EOT
+-->
+		</th>
+	</tr>
+	<tr class="tr3">
+		<th>标题</th>
+		<th><input type="text" class="input" name="subject" size="65" value="" /></th>
+	</tr>
+<!--
+EOT;
+if($db_gdcheck & 16){print <<<EOT
+-->
+	<tr class="tr3">
+		<th>认证码</th>
+		<th>
+			<input class="input" type="text" name="gdcode" size="6" onfocus="try{opencode('menu_gd',this)}catch(e){}" /><span style="cursor:pointer; margin-left:3px" onclick="this.previousSibling.focus();">点此显示验证码</span>
+			<div class="menu" id="menu_gd" style="visibility:hidden;"><img src="ck.php?" align="absmiddle" style="cursor:pointer;" id="ckcode" alt="看不清楚，换一张" /></div></th>
+		</th>
+	</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+	<tr class="tr3">
+		<th style="vertical-align: top;border:0;">内容</th>
+		<th style="border:0;"><textarea rows="9" cols="65" name="atc_content"></textarea></th>
+	</tr>
+</table></div>
+<div style="text-align:center;margin-bottom:25px">
+<input class="btn" type="submit" name="sendsubmit" value="提 交" /></div>
+</form>
+<!--
+EOT;
+}?>-->

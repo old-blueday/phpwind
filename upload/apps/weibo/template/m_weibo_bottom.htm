@@ -1,0 +1,64 @@
+<!--<?php
+print<<<EOT
+--><!doctype html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=$db_charset" />
+<title>发微博</title>
+<meta name="generator" content="phpwind $wind_version" />
+<meta name="description" content="phpwind" />
+<meta name="keywords" content="phpwind" />
+<base id="headbase" href="$db_bbsurl/" />
+<link rel="stylesheet" type="text/css" href="images/pw_core.css" media="all" />
+<link rel="stylesheet" type="text/css" href="u/images/style.css" media="all" />
+<style type="text/css">
+/*home info*/
+.userInfo{background:none; position:absolute;height:170px;}
+.userInfoweek{padding:10px;*zoom:1;}
+.userInfoweek:after{content:'\20';display:block;height:0;clear:both;visibility: hidden;}
+.userInfoweek .button{width:87px; font-size:14px;height:29px;border:0;overflow:hidden;vertical-align:middle;padding:0 0 2px 5px;*padding:2px 0 0 5px;margin:0;}
+.limit em{font:16px Georgia;padding:0 2px;}
+.homeSk{height:87px;width:570px;background:none;border:1px solid; border-color: #999999 #e1e1e1 #e1e1e1 #999999;margin-bottom:5px;}
+.homeText{border:0;overflow:auto;margin:4px 5px;width:555px;height:73px; font-size:14px;line-height:1.3;}
+.userInfoweek .button{background:url(u/themes/default/images/pub.png) no-repeat;color:#0e6cac;}
+.userInfoweek .button:hover{text-shadow: 0 1px 0 #fff;}
+.homeSk_input{background:url(u/themes/default/images/homeSk_input.png) no-repeat;}
+.p5{padding:0;}
+.sk_show{ position:absolute;top:10px;left:10px;}
+.sk_share{ position:absolute;top:10px;left:65px;}
+#uploadPicload{ position:absolute;top:10px;left:125px;}
+</style>
+<SCRIPT type="text/javascript" LANGUAGE="JavaScript" src="js/core/core.js"></SCRIPT>
+<script type="text/javascript" language="JavaScript" src="js/pw_ajax.js"></script>
+<script language="JavaScript">
+var imgpath = '$imgpath';
+var verifyhash = '$verifyhash';
+var winduid = '$winduid';
+var windid	= '$windid';
+var groupid	= '$groupid';
+var charset = '$db_charset';
+var basename = '$basename';
+var temp_basename = '$temp_basename';
+</script>
+<style>html,body{padding:0;margin:0;background:#fff;overflow:hidden;}</style>
+</head>
+<body onkeydown="try{keyCodes(event);}catch(e){}">
+<!--
+EOT;
+if ($a == 'post') {print <<<EOT
+-->
+<!--
+EOT;
+require_once uTemplate::printEot('weibo_model');
+$weiboModelTemplate->post($do);
+print <<<EOT
+-->
+<!--
+EOT;
+}print <<<EOT
+-->
+<script language="JavaScript" src="js/app_comment.js"></script>
+</body></html>
+<!--
+EOT;
+?>-->

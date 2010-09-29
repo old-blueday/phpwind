@@ -1,0 +1,223 @@
+<!--<?php print <<<EOT
+-->
+<!-- main start --> 
+    <div class="$className">
+    	<div class="s_home cc">
+        	<div class="s_logo"><a href="searcher.php"><img src="images/wind/logo.png" alt="$db_bbsname" title="$db_bbsname"></a></div>
+            <div class="s_info">
+            <form action="searcher.php" method="post" id="searchform" >
+            <input type="hidden" value="$verifyhash" name="verify">
+            <input value="2" class="s_input" type="hidden" name="step">
+            <input value="thread" class="s_input" type="hidden" name="type" id="hiddenType">
+            	<div class="s_ulA" id="searchType">
+                    <ul>
+                        <li type="thread" class="current"><a href="#">帖子</a></li>
+                        <li type="forum"><a href="javascript:;">版块</a></li>
+                        <li type="group"><a href="javascript:;">群组</a></li>
+                        <li type="diary"><a href="javascript:;">日志</a></li>
+                        <li type="user"><a href="javascript:;">用户</a></li>
+                    </ul>
+                </div>
+            	<div class="s_enter cc">
+                	<input value="$keyword" class="s_input" type="text" name="keyword" >
+                    <button class="s_btn" type="submit">搜 索</button>
+                	<div class="s_other">
+                    	<p><a href="faq.php">帮助</a></p>
+                        <p><a href="javascript:;" id="searchAdvanced" >高级</a></p>
+                    </div>
+                </div>
+                
+                <!-- 帖子高级选项部分 开始 -->
+                <div class="s_more" id="advancedThread" style="display:none;">
+                	<table width="100%">
+                    	<tr class="bgA">
+                        	<th>
+                            	作者
+                            </th>
+                            <td>
+                            	<a href="javascript:;" class="adel" id="close">删除</a>
+                            	<input name="username" type="text" class="input input_wa" value="">
+                            </td>
+                        </tr>
+                    	<tr>
+                        	<th class="vt">
+                            	帖子类型
+                            </th>
+                            <td>
+															<ul>
+                            		<li><label class="mr10"><input name="threadrange" type="radio" value="1" {$threadranges[1]} >&nbsp;主题标题</label></li>
+<!-- 
+EOT;
+if(in_array($_G['allowsearch'],array(2,3))){
+print <<<EOT
+-->                                
+                               	<li><label class="mr10"><input name="threadrange" type="radio" value="2" {$threadranges[2]} onclick="searchertable('ttable');" >&nbsp;主题内容</label>
+<!-- 
+EOT;
+if(!$isSphinx){
+print <<<EOT
+-->
+                               	<span id="ttable" style="display:none;" >$t_table</span>
+<!-- 
+EOT;
+}
+print <<<EOT
+-->                               	
+                               	</li>
+<!-- 
+EOT;
+}
+if($_G['allowsearch'] == 3){
+print <<<EOT
+-->                                 
+                               	<li><label class="mr10"><input name="threadrange" type="radio" value="3" {$threadranges[3]} onclick="searchertable('ptable');" >&nbsp;回复内容</label>
+<!-- 
+EOT;
+if(!$isSphinx){
+print <<<EOT
+-->                               	
+                               	<span id="ptable" style="display:none;" >$p_table</span>
+<!-- 
+EOT;
+}
+print <<<EOT
+-->                               	
+                               	</li>
+<!-- 
+EOT;
+}
+print <<<EOT
+-->
+															</ul>
+                            </td>
+                        </tr>
+                        <tr class="bgA">
+                        	<th>
+                            	所在版块
+                            </th>
+                            <td>
+                                <select class="select_wa" name="fid">
+								<option value=""></option>
+									{$forumcache}
+<!--
+EOT;
+if($forumadd){print <<<EOT
+-->
+								<option value=''>>> 隐藏版块</option>
+									{$forumadd}
+<!--
+EOT;
+}print <<<EOT
+-->									
+								</select>
+                            </td>
+                        </tr>
+                        <tr>
+                        	<th>
+                            	发表时间
+                            </th>
+                            <td>
+                            	<div class="input_img fl"><i id="ts"></i><input name="starttime" type="text" id="starttime" ></div><span class="p_lr_10 fl">至</span><div class="input_img fl"><i id="te"></i><input name="endtime" type="text" id="endtime" ></div>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <!-- 日志高级部分开始 -->
+                <div class="s_more" id="advancedDiary" style="display:none;">
+                	<table width="100%">
+                    	<tr class="bgA">
+                        	<th>
+                            	作者
+                            </th>
+                            <td>
+                            	<a href="javascript:;" class="adel" id="close2">删除</a>
+                            	<input name="diaryusername" type="text" class="input input_wa" value="">
+                            </td>
+                        </tr>
+                    	<tr>
+                        	<th>
+                            	日志类型
+                            </th>
+                            <td>
+                            	<label class="mr20"><input name="diaryrange" type="radio" value="1" {$diaryranges[1]} >&nbsp;仅标题</label>
+                                <label class="mr20"><input name="diaryrange" type="radio" value="2" {$diaryranges[2]} >&nbsp;仅正文</label>
+                                <label class="mr20"><input name="diaryrange" type="radio" value="3" {$diaryranges[3]} >&nbsp;全部</label>
+                            </td>
+                        </tr>
+                        <tr>
+                        	<th>
+                            	发表时间
+                            </th>
+                            <td>
+                            	<div class="input_img fl"><i id="ts2"></i><input name="diarystarttime" type="text" id="diarystarttime" ></div><span class="p_lr_10 fl">至</span><div class="input_img fl"><i id="te2"></i><input name="diaryendtime" type="text" id="diaryendtime" ></div>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                
+                </form>
+            </div>
+            <div class="c"></div>
+        </div> 
+    <!-- main end -->    
+    </div>
+    
+    
+    
+    
+
+<!-- 
+EOT;
+if($keyword || $total ){
+print <<<EOT
+-->   
+	<!-- 搜索结果页 -->
+ 	<div class="main2 cc" id="mainbox">
+    	<div class="h">
+        	<span class="fr">搜索<span class="s1">{$keyword}</span>获得{$total}条查询结果
+<!--
+EOT;
+if($total && $type != 'special'){
+print <<<EOT
+-->          	
+			以下是{$page}-{$perpage}条
+<!-- 
+EOT;
+}
+print <<<EOT
+-->          	
+        	</span>
+            <span class="mr20"><a href="searcher.php">搜索首页</a> &raquo; $types[$type]</span><span class="s6">小提示：多个词用空格分隔，搜索的更准！</span>
+        </div>
+<!--
+EOT;
+if(in_array($type,array("thread","special")) && $threads){
+	require printEOT('searcher_thread');
+}elseif($type == "user" && $users){
+	require printEOT('searcher_user');
+}elseif($type == "diary" && $diarys){
+	require printEOT('searcher_diary');
+}elseif($type == "group" && $groups){
+	require printEOT('searcher_group');
+}elseif($type == "forum" && $forums){
+	require printEOT('searcher_forum');
+}else{
+	require printEOT('searcher_none');
+}
+print <<<EOT
+-->  
+    </div>  
+<!-- 
+EOT;
+}
+print <<<EOT
+-->
+<script type="text/javascript" language="JavaScript" src="js/global.js"></script>
+<script type="text/javascript" language="JavaScript" src="js/date.js"></script>
+<script type="text/javascript" src="js/searcher.js"></script>
+<script type="text/javascript">
+window.onReady(searcherInit,"$type"); 
+</script>  
+<!--
+EOT;
+?>-->

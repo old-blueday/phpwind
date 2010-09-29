@@ -1,0 +1,417 @@
+<!--<?php
+print <<<EOT
+-->
+<div id="breadCrumb" class="cc">$msg_guide</div>
+<div id="pw_content">
+<!--
+EOT;
+$tmpStyle = $_COOKIE['toggle']!=='0' ? 'f_tree cc' : 'f_tree cc sideClose';print <<<EOT
+-->
+	<div id="sidebar" class="$tmpStyle">
+<!--
+EOT;
+$db_threadsidebarifopen && require_once(PrintEot('thread_side'));
+print <<<EOT
+-->
+        <div class="content_thread cc">
+            <div class="content_ie">
+<!--
+EOT;
+require_once PrintEot('thread_group');
+if (empty($a)) {print <<<EOT
+-->
+	<div class="g_navB">
+<!--
+EOT;
+if (empty($group) || $group != 4) {print <<<EOT
+-->
+		<span class="fr">排序方式：
+			<a href="{$basename}&a=$a{$urladd}&orderby=lastvisit"{$order_lastvisit}>最近登录</a>
+			| <a href="{$basename}&a=$a{$urladd}&orderby=lastpost"{$order_lastpost}>最后发表</a>
+		</span>
+<!--
+EOT;
+}print<<<EOT
+-->
+		<span class="mr20">共{$total}名成员</span>
+	</div>
+	<div class="g_contentA fl">
+    	<div class="p15">
+<!--
+EOT;
+if(empty($memdb)) {print<<<EOT
+-->
+		<p class="p15 mb20 tac f14">{$lang_no_member[$group]}</p>
+<!--
+EOT;
+}else{
+if($group != 4){print<<<EOT
+-->
+	<form action="{$basename}&a=$a" method="post" name="uForm">
+<!--
+EOT;
+foreach ($memdb as $key => $value) {print <<<EOT
+-->
+            <table width="100%">
+                <tr>
+<!--
+EOT;
+if ($ifadmin){print <<<EOT
+-->
+					<td width="30">
+<!--
+EOT;
+if ($value[uid] != $winduid){print <<<EOT
+-->
+					<input type="checkbox" name="selid[]" value="$value[uid]" />
+<!--
+EOT;
+}print <<<EOT
+-->
+					</td>
+<!--
+EOT;
+}print <<<EOT
+-->
+                    <td width="70">
+                        <a href="u.php?uid=$value[uid]" target="_blank" class="img_50"><img src="$value[icon]" width="48" height="48" /></a>
+                    </td>
+                    <td>
+                        <p class="mb5 cc">
+								<a href="u.php?uid=$value[uid]" target="_blank" class="b f14 mr5 fl">
+								$value[username]
+<!--
+EOT;
+if ($value[realname]){print <<<EOT
+-->
+								($value[realname])
+<!--
+EOT;
+}print <<<EOT
+-->
+
+								</a>
+<!--
+EOT;
+if($db_showonline){
+if (checkOnline($value['thisvisit'])){print <<<EOT
+-->
+								<span class="card-online" title="在线">在线</span>
+<!--
+EOT;
+}else{print<<<EOT
+-->
+								<span class="card-offline" title="离线">离线</span>
+<!--
+EOT;
+}}print <<<EOT
+-->
+						</p>
+						
+<!--
+EOT;
+if ($value['honor']) {print <<<EOT
+-->
+                        <p class="mb5"><span class="mr20">{$value['honor']}</span></p>				
+<!--
+EOT;
+}
+if ($colony['admin'] == $value['username']) {print <<<EOT
+-->
+	<span class="s1 mr5">群主</span>
+<!--
+EOT;
+} elseif ($value['ifadmin'] == '1') {print <<<EOT
+-->
+	<span class="s2 mr5">管理员</span>
+<!--
+EOT;
+} elseif ($value['ifadmin'] == '-1') {print <<<EOT
+-->
+	<span class="gray mr5">未验证</span>
+<!--
+EOT;
+} else {print <<<EOT
+-->
+	<span class="mr5 s3">群员</span>
+<!--
+EOT;
+}
+if ($value[lastpost]) {
+$time2 = get_date($value[lastpost]);
+print <<<EOT
+-->
+最后发表:{$time2}
+<!--
+EOT;
+}print <<<EOT
+-->
+
+                    </td>
+                    <td width="20">&nbsp;</td>
+                    <td width="70">
+                        <p class="mb5"><a href="apps.php?q=group&cyid=$cyid&a=uintro&uid=$value[uid]" onclick="return ajaxurl(this)" id="guser_{$value[uid]}">通讯录</a></p>
+                        <p class="mb5"><a href="pw_ajax.php?action=addfriend&touid=$value[uid]" onclick="return ajaxurl(this);">加为好友</a></p>
+                        <p><a href="pw_ajax.php?action=msg&touid=$value[uid]" onclick="return ajaxurl(this);">发消息</a></p>
+                    </td>
+                </tr>
+			</table>
+            <div class="hrA"></div>
+<!--
+EOT;
+}print <<<EOT
+-->
+			<div class="cc mb10">$pages</div>
+<!--
+EOT;
+if ($ifadmin && $group != 4) {print <<<EOT
+-->
+	<label for="checkall_button"><input type="checkbox" id="checkall_button" onclick="CheckAll(this.form)"/>&nbsp;全选</label>
+	<span class="bt2"><span><button id="senndmsg" onclick="fanoutMsg();return false;">群发消息</button></span></span>
+	<script language="JavaScript">
+	(function () {
+		fanoutMsg = function() {
+			var d = '';
+			var f = document.uForm;
+			var j = 0;
+			for (var i = 0; i < f.elements.length - 2; i++) {
+				var e = f.elements[i];
+				if (e.type == 'checkbox' && e.name.match(/^selid/ig) && e.checked == true) {
+					d += '&selid[' + j++ + ']=' + e.value;
+				}
+			}
+			sendmsg('apps.php?q=group&a=fanoutmsg&cyid=$cyid&group=$group', d, 'senndmsg');
+		}
+	})()
+	</script>
+	<input type ="text" name ="operateStep" id="operateStep" value="" style="display:none"/>
+<!--
+EOT;
+if ($colony['admin'] == $windid || $groupid == 3) {print <<<EOT
+-->
+               
+                <span class="bt2"><span><button type="submit" onclick="submitStep('addadmin');">设为管理员</button></span></span>
+                <span class="bt2"><span><button type="submit" onclick="submitStep('deladmin');">取消管理员</button></span></span>
+<!--
+EOT;
+}print <<<EOT
+-->
+                <span class="bt2"><span><button type="submit" onclick="submitStep('check');">审核会员</button></span></span>
+                <span class="bt2"><span><button type="submit" onclick="submitStep('del');" >踢出本群</button></span></span>
+<script language="JavaScript">
+var ifcheck = true;
+function CheckAll(form) {
+	for (var i = 0; i < form.elements.length - 2; i++) {
+		var e = form.elements[i];
+		if (e.type == 'checkbox') e.checked = ifcheck;
+	}
+	ifcheck = ifcheck == true ? false : true;
+}
+function submitStep(operateStep) {
+	$('operateStep').value = operateStep;
+}
+</script>
+<!--
+EOT;
+}print <<<EOT
+-->
+	<div class="c mb20"></div>
+	</form>
+<!--
+EOT;
+}else{print<<<EOT
+-->
+			<div class="ulB p10">
+				<ul class="cc">
+<!--
+EOT;
+foreach ($memdb as $key => $value) {
+$visittime = get_date($value[lastvisit], 'm月d日');
+print <<<EOT
+-->
+				<li><a href="u.php?uid=$value[uid]" class="i" target="_blank" title="$value[username]"><img src="{$value[icon]}" height="44" width="44" /></a><p class="n"><a href="u.php?uid=$value[uid]" title="$value[username]">$value[username]</a></p><p class="t">$visittime</p></li>
+<!--
+EOT;
+}print<<<EOT
+-->
+				</ul>
+			</div>
+<!--
+EOT;
+}}print<<<EOT
+-->
+		</div>
+	</div>
+    <div class="g_sidebarA fr">
+    	<div class="p15">
+        <div class="g_tA mb10">
+            <h4 class="g_hB">筛选</h4>
+            <div>
+                <ul class="ulA">
+                    <li id="group_all"><a href="{$basename}&a=$a">全部成员</a></li>
+                    <li id="group_1"><a href="{$basename}&a=$a&group=1">管理员</a></li>
+                    <li id="group_2"><a href="{$basename}&a=$a&group=2">普通成员</a></li>
+                    <li id="group_3"><a href="{$basename}&a=$a&group=3">未验证会员</a></li>
+                    <li id="group_4"><a href="{$basename}&a=$a&group=4">最近访客</a></li>
+                </ul>
+            </div>
+        </div>
+        </div>
+    </div>
+<script language="JavaScript">
+setCurrent('group_{$group}','group_all','current');
+</script>
+<!--
+EOT;
+} elseif ($a == 'invite') {print <<<EOT
+-->
+<div class="cc pd15">
+        <div class="g_contentC fl">
+            <div class="f14 b mb10">方法一：给好友发送 Email 邀请</div>
+            <form action="thread.php?cyid=$cyid&showtype=member&a=invite" method="post" id="inviteForm">
+			<input type="hidden" name="step" value="1">
+			<input type="hidden" name="type" value="$type">
+			<input type="hidden" name="id" value="$id">
+            <p class="mb5">好友的 Email</p>
+            <p class="mb5"><textarea name="emails" id="emails" class="textareaA" onclick="grayChange(this)" >多个 Email 用逗号 (,) 或者换行分隔</textarea></p>
+            <p id="emails_warning" class="maxlength-hint wrongTip" style="display: none;"></p>
+            <div class="c mb20">&nbsp;</div>
+            <p class="mb5">邀请附言</p>
+            <p class="mb5"><textarea name="customdes" id="customdes_textarea" class="textareaA" onChange="changeEmailCustom(this.id);">$customdes</textarea></p>
+            <p id="extra_warning" class="maxlength-hint wrongTip" style="display: none;"></p>
+            <div class="c mb20">&nbsp;</div>
+            <p class="mb5">预览</p>
+            <div class="viewbox mb10">
+                $emailContent
+            </div>
+			<span class="btn" style="margin:0;"><span><button type="submit" onfocus="blur();">邀请</button></span></span>
+            </form>
+        </div>
+        <div class="fr g_sidebarC">
+<script>
+function grayChange(obj) {
+	if (typeof(obj) == 'string') {
+		obj = document.getElementById(obj);
+	}
+	if (obj.className == 'gray') {
+		obj.className = '';
+	}
+	if (obj.value =='多个 Email 用逗号 (,) 或者换行分隔') {
+		obj.value = '';
+	}
+}
+function copyUrl2(o) {
+	if (is_ie) {
+		window.clipboardData.setData("Text",o);
+		showDialog('success','已成功复制',1);
+	} else {
+		prompt('按下 Ctrl+C 复制到剪贴板', o)
+	}
+}
+function changeEmailCustom(id){
+	var customdes = getObj(id).value;
+	customdes = customdes.replace(/\\n/ig,'<br />');
+	getObj('customdes').innerHTML = customdes;
+}
+</script>
+			<div class="f14 b mb10">方法二：发送网址邀请</div>
+            	<p class="mb5">把下面的网址通过MSN、QQ发给好友，邀请他们加入{$objectName}</p>
+                <p class="viewbox mb5"><a href="$invite_url">$invite_url</a></p>
+                <p><a onclick="copyUrl2('{$invite_url}')" href="javascript:;">复制</a></p>
+                <div class="c mb20">&nbsp;</div>
+            <div class="f14 b mb20">方法三：邀请站内好友</div>
+<form name="recommendFORM" method="post" action="thread.php?cyid=$cyid&showtype=member&a=invite" >
+<input type="hidden" name="id" value="$id" />
+<input type="hidden" name="step" value="2" />
+<input type="hidden" name="type" value="$type">
+<table width="100%" cellspacing="0">
+	<tr class="vt">
+		<td width="60">用户名</td>			
+		<td><div class="selector">
+            <span class="toggle" onClick="if (getObj('tofriend').style.display=='none'){getObj('tofriend').style.display='';}else{getObj('tofriend').style.display='none';}" style="cursor:pointer;"></span>
+            <div class="tokenList fl"><input type="text" name="sendtoname" size="25" value="" /></div>					
+<!--
+EOT;
+if ($frienddb) {
+print <<<EOT
+-->				
+            </div>
+<!--
+EOT;
+}print <<<EOT
+-->	
+		</td>
+	</tr>
+	<tr id="tofriend" style="display:none" class="vt">
+		<td>&nbsp;</td>
+		<td>
+			<div class="fri-list pr">
+			<div class="fri-top">
+				<span class="fr">
+					<select name="friendtype" onchange="showFriendList(this.value);">
+					<option value="-1">全部好友</option>
+<!--
+EOT;
+foreach ($friendtype as $key => $value) {
+print <<<EOT
+-->
+					<option value="$key">$value[name]</option>
+<!--
+EOT;
+}print <<<EOT
+-->
+					</select>
+				</span>
+				<span class="bt2"><span><button type="button" onclick="CheckAll(this.form)">全选</button></span></span>
+			</div>
+			<div class="fri-bot" id="friendlist">
+				<ul class="cc">
+<!--
+EOT;
+foreach ($friendtype as $key => $value) {
+print <<<EOT
+-->
+					<div id="ftid_$value[ftid]">
+<!--
+EOT;
+foreach ($frienddb[$value[ftid]] as $k => $v) {
+print <<<EOT
+-->
+					<li><input type="checkbox" name="touid[]" value="$v[uid]"> $v[username]</li>
+<!--
+EOT;
+		}
+print <<<EOT
+-->
+					</div>
+<!--
+EOT;
+	}
+print <<<EOT
+-->
+				 </ul>
+			</div>
+			</div>
+		</td>
+	</tr>
+    <tr>
+			<td align="center">&nbsp;</td>
+       <td class="pt7 vt"><span class="btn2" style="margin:10px 0 0;"><span><button type="submit" onfocus="blur();">邀请</button></span></span></td>
+    </tr>
+</table>
+</form>
+</div>	
+	<div class="c mb20">&nbsp;</div>
+</div>
+<SCRIPT type="text/javascript" LANGUAGE="JavaScript" src="js/core/friendlist.js"></SCRIPT>
+<!--
+EOT;
+}print <<<EOT
+-->
+            </div>
+		</div>
+	</div>
+</div>
+<!--
+EOT;
+?>

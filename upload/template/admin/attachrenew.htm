@@ -1,0 +1,37 @@
+<!--<?php
+include_once PrintEot('left');
+print <<<EOT
+-->
+<div class="mb10">
+    <h2 class="h1">附件记录修复</h2>
+    <div class="legend">
+    本功能清除只存在附件记录而没有附件的冗余数据，帖子中的附件记录也将同时更新<br />使用 ftp 远程转移附件功能.此管理无效
+    </div>
+</div>
+<form action=$basename method=post>
+<input type=hidden name=action value='delete'>
+<div class="mb10 tac">
+	<span class="btn"><span><button type="submit" name="hello" onfocus="blur();">自动修复</button></span></span>
+</div>
+</form>
+
+<form action="$basename&" method="post" name="form2">
+<input type="hidden" name="action" value="delattach">
+<h2 class="h1"><span class="mr20">附件文件修复</span><span class="linka">本功能将搜索整个站点的附件，删除数据库中没有记录而实际存在的附件，可有效清理站点中冗余附件, 从而释放更多的服务器空间.</span></h2>
+<div class="admin_table mb10">
+    <table cellspacing="0" cellpadding="0" width="100%">
+        <tr class="tr1 vt">
+            <td class="td1">每次跳转处理个数</td>
+            <td class="td2"><input type="text" class="input input_wa" name="pernum" value="1000"></td>
+        </tr>
+    </table>
+</div>
+<div class="mb10 tac">
+	<span class="btn"><span><button type="submit" onfocus="blur();">自动修复</button></span></span>
+</div>
+</form>
+<!--
+EOT;
+include_once PrintEot('adminbottom');
+?>
+-->

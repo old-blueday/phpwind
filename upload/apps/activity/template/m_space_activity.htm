@@ -1,0 +1,232 @@
+<!--<?php
+include_once uTemplate::PrintEot('header');
+include_once uTemplate::PrintEot('space_appleft');
+print <<<EOT
+-->
+<link rel="stylesheet" type="text/css" href="apps/activity/images/style.css" media="all" />
+<div class="sideD">
+	<div class="boxA">
+		<h2><span class="mr10">活动</span></h2>
+		<div class="p10 cc">
+			<div class="navD mb10">
+				<ul class="cc">
+					<li id="see_fromforum"><a href="{$basename}"><span>来自版块</span></a></li>
+					<li id="see_fromgroup"><a href="{$basename}see=fromgroup"><span>来自群组</span></a></li>
+				</ul>
+			</div>
+			<div class="aa_title">
+				<span class="fr">
+					<form action="mode.php" method="GET">
+					<input type="hidden" name="m" value="o" />
+					<input type="hidden" name="q" value="activity" />
+					<input type="hidden" name="a" value="$a" />
+					<input type="hidden" name="see" value="$see" />
+					<input type="hidden" name="uid" value="$uid" />
+					<select name="timerange" onchange="submit()">
+						$timeSelectHtml
+					</select>
+<!--
+EOT;
+if (empty($see)) {
+print <<<EOT
+-->
+					<select name="actmid" onchange="submit()">
+						$actmidSelectHtml
+					</select>
+<!--
+EOT;
+}else{print<<<EOT
+-->
+					<select name="type" onchange="submit()">
+						<option value="0" $type_0>所有分类</option>
+						<option value="1" $type_1>出游</option>
+						<option value="2" $type_2>聚餐 </option>
+						<option value="3" $type_3>舞会</option>
+						<option value="4" $type_4>户外</option>
+						<option value="5" $type_5>烧烤</option>
+						<option value="6" $type_6>其他</option>
+					</select>
+<!--
+EOT;
+}print <<<EOT
+-->
+				</form>
+			</span>
+			<h3>$seeTitle</h3>
+			<span class="f14">(共{$count}个)</span>
+			</div>
+<!--
+EOT;
+if (!empty($activities)) {
+print <<<EOT
+-->
+<script language="JavaScript" src="js/global.js"></script>
+<script language="JavaScript" src="js/app_global.js"></script>
+<script language="JavaScript" src="apps/$appdir/js/activitytype.js"></script>
+<script language="javascript">
+function actRecommend(tid, actmid, obj) {
+	ajax.send("pw_ajax.php?action=activity&job=recommend&tid="+tid+"&actmid="+actmid,"",function(){
+		var rText = ajax.request.responseText.split('\t');
+		if (rText[0] == 'success') {
+			var isRecommendOrNot;
+			if (rText[1] != 1) {
+				isRecommendOrNot = '推荐活动';
+			} else {
+				isRecommendOrNot = '取消推荐';
+			}
+			obj.title = isRecommendOrNot;
+			obj.innerHTML = isRecommendOrNot;
+			showDialog('success','操作成功!',2);
+
+		} else if (rText[0] == 'noright') {
+			showDialog('error','您没有推荐活动的权限',2);
+			return false;
+		} else {
+			showDialog('error','操作失败',2);
+			return false;
+		}
+	});
+}
+</script>
+		<ul class="aa_list aa_my mt10">
+<!--
+EOT;
+foreach ($activities as $key => $value) {print <<<EOT
+-->
+		<li class="item" id="activity_$key">
+			<div class="summary">
+				<h4>
+					<em>
+<!--
+EOT;
+if (empty($see)) {
+print <<<EOT
+-->
+						<a href="{$basename}a=$a&see=$see&actmid=$value[actmid]">[{$activity_modeldb[$value[actmid]][name]}]</a>
+<!--
+EOT;
+} else {
+$activitydb = array(
+	'1'=>'出游',
+	'2'=>'聚餐 ',
+	'3'=>'舞会',
+	'4'=>'户外',
+	'5'=>'烧烤',
+	'6'=>'其他',
+);
+print <<<EOT
+-->
+						<a href="{$basename}a=$a&see=$see&type=$value[type]">[{$activitydb[$value[type]]}]</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+					</em>
+<!--
+EOT;
+if (empty($see)) {
+print <<<EOT
+-->
+					<a target="_blank" href="read.php?tid=$value[tid]">$value[subject]</a>
+<!--
+EOT;
+} else {
+print <<<EOT
+-->
+					<a target="_blank" href="apps.php?q=group&a=active&job=view&cyid=$value[cid]&id=$value[id]">$value[title]</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+				</h4>
+				<ul class="attr">
+					<li>活动时间：$value[starttime] - $value[endtime]</li>
+					<li>活动地点：$value[location]</li>
+				</ul>
+				<p class="view_more">
+<!--
+EOT;
+if (empty($see)) {
+print <<<EOT
+-->
+					<a target="_blank" href="read.php?tid=$value[tid]">查看活动详情</a>
+<!--
+EOT;
+} else {
+print <<<EOT
+-->
+					<a target="_blank" href="apps.php?q=group&a=active&job=view&cyid=$value[cid]&id=$value[id]">查看活动详情</a>
+<!--
+EOT;
+}if (empty($see)) {
+	if ($isGM || $SYSTEM['delactive']) {print <<<EOT
+-->
+					<a class="del" href="javascript:;" onclick="pwConfirm('是否确认删除', this, function() {delActivity('$value[tid]')})">删除活动</a>
+<!--
+EOT;
+	}
+	if ($isGM || $SYSTEM['recommendactive']) {
+		$text = $value['recommend'] ? '取消推荐' : '推荐活动';
+print <<<EOT
+-->
+					<a title="$text" class="recommend" href="javascript:;" onclick="actRecommend('$value[tid]', '$value[actmid]', this);">
+					$text
+					</a>
+<!--
+EOT;
+	}
+}print <<<EOT
+-->
+				</p>
+			</div>
+			<div class="others">
+				<ul>
+					<li>发起人：
+<!--
+EOT;
+if ($value[authorid]) {
+print <<<EOT
+-->
+						<a target="_blank" href="u.php?uid=$value[authorid]">$value[author]</a>
+<!--
+EOT;
+} else {
+print <<<EOT
+-->
+						<i>匿名</i>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+					</li>
+					<li>报名人数：$value[signup]</li>
+				</ul>
+				<p>
+					$value[actionButton]
+				</p>
+			</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+			</ul>
+			<div class="p10 cc">$pages</div>
+<!--
+EOT;
+} else {print <<<EOT
+-->
+			<div class="p10 f14 tac">没有活动</div>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+			</div>
+		</div>
+	</div>
+<script language="javascript">setCurrent('see_$see','see_fromforum','current');</script>
+<!--
+EOT;
+require_once(uTemplate::printEot('footer'));
+?>-->

@@ -1,0 +1,106 @@
+<!--<?php
+if($prog=='index'){print <<<EOT
+-->
+<p>
+在线:$total/会员:$userinbbs<br />
+<a href="index.php?prog=cate">站点版块</a><br />
+<a href="post.php">发表文章</a><br />
+<a href="msg.php">消息</a>
+</p>
+<p><b>推荐版块</b><br />
+<!--
+EOT;
+foreach($forum as $key=>$val){
+if(strpos(",$db_wapfids,",",$key,")!==false){
+$val[name]=wap_cv(strip_tags($val[name]));print <<<EOT
+-->
+<a href="list.php?fid=$key">$val[name]</a><br />
+<!--
+EOT;
+}}print <<<EOT
+-->
+</p>
+<p><a href="index.php?prog=bbsinfo">关于本站</a><br />
+<a href="index.php?prog=phone">手机信息</a></p>
+<!--
+EOT;
+}elseif($prog=='cate'){print <<<EOT
+-->
+<p><b>站点版块</b><br />
+<!--
+EOT;
+foreach($forum as $key => $value){
+if(in_array($key,$fids) && !$value['cms']){
+if($value['type'] == 'category'){
+$value[name]=wap_cv(strip_tags($value[name]));print <<<EOT
+-->
+<br />$value[name]<br />
+<!--
+EOT;
+}else{
+$add = $value['type'] == 'forum' ? "|-" : ($forum[$value['fup']]['type'] == 'forum' ? "|-|-" : "|-|-|-");
+$value[name]=wap_cv(strip_tags($value[name]));
+print <<<EOT
+-->
+{$add}<a href="list.php?fid=$key">$value[name]</a><br />
+<!--
+EOT;
+}}}print <<<EOT
+-->
+</p>
+<!--
+EOT;
+}elseif($prog=='bbsinfo'){print <<<EOT
+-->
+<p>在线:$total(会员:{$userinbbs})</p>
+<p>主题数:$topic</p>
+<p>文章数:$article</p>
+<p>会员数:$rt[totalmember]</p>
+<p>最新会员:$rt[newmember]</p>
+<!--
+EOT;
+}elseif($prog=='phone'){print <<<EOT
+-->
+<p>您的手机信息</p>
+<p>语言:{$pwServer['HTTP_ACCEPT_LANGUAGE']}</p>
+<p>浏览器:{$pwServer['HTTP_USER_AGENT']}</p>
+<p>用户名:$windid</p>
+<!--
+EOT;
+}elseif($prog=='login'){print <<<EOT
+-->
+<p>
+<select name="lgt">
+<option value="0">用户名</option>
+<option value="1">UID</option>
+</select>:<input name="pwuser" type="text" /><br />
+密&#160;&#160;码:<input name="pwpwd" type="password" /><br />
+<!--
+EOT;
+if($db_ifsafecv){print <<<EOT
+-->
+安全问题:
+<select name="question">
+<option value="0">无安全问题</option><option value="1">我爸爸的出生地</option><option value="2">我妈妈的出生地</option><option value="3">我的小学校名</option><option value="4">我的中学校名</option><option value="5">我最喜欢的运动</option><option value="6">我最喜欢的歌曲</option><option value="7">我最喜欢的电影</option><option value="8" >我最喜欢的颜色</option><option value="-1">自定义问题</option>
+</select><br />
+自定义问题:<input type="text" name="customquest" /><br />
+您的答案:&#160;&#160;<input type="text" name="answer" /><br />
+<!--
+EOT;
+}print <<<EOT
+-->
+</p>
+<p>
+<anchor title="确定">确定
+<go href="index.php?prog=login" method="post">
+<postfield name="lgt" value="$(lgt)" />
+<postfield name="pwuser" value="$(pwuser)" />
+<postfield name="pwpwd" value="$(pwpwd)" />
+<postfield name="question" value="$(question)" />
+<postfield name="customquest" value="$(customquest)" />
+<postfield name="answer" value="$(answer)" />
+</go></anchor>
+</p>
+<!--
+EOT;
+}?>-->

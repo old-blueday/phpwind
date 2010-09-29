@@ -1,0 +1,106 @@
+<!--<?php
+(!$db_threadsidebarwidth || !is_numeric($db_threadsidebarwidth)) && $db_threadsidebarwidth = 130;
+print <<<EOT
+-->
+<style type="text/css">
+.sidebar{width:{$db_threadsidebarwidth}px;}
+.content_thread{margin-left:{$db_threadsidebarwidth}px;_margin:0;border-left:1px solid $tdcolor;}
+.content_ie{float:left;width:100%;}
+.switch{margin-left:{$db_threadsidebarwidth}px;}
+.sideClose .switch{margin-left:0;}
+.sideClose .fastpost .floot_left{display:inline;background:none;}
+.sideClose .sidebar{display:none;}
+</style>
+		<span class="fl"><a href="javascript:;" class="switch mr10" title="侧栏开关" onclick="toggleSidebar()">侧栏开关</a></span>
+		<div class="sidebar">
+    		<div class="myForum">
+        <h6><a href="javascript:;" class="history" id="readlog" title="最近浏览的帖子" onclick="showViewLog('pw_ajax.php?action=readlog','',this.id);">历史记录</a>我的版块</h6>
+				<ul class="pw_ulD" id="shortcutforum">
+<!--
+EOT;
+$myShortcutforum = pwGetMyShortcut();
+foreach ($shortcutforum as $key => $value) {print <<<EOT
+-->
+					<li id="shortcut_side_{$key}">
+<!--
+EOT;
+	if ($myShortcutforum) {print <<<EOT
+-->
+						<del onclick="unshortCut('{$key}');">删除</del>
+<!--
+EOT;
+	}print <<<EOT
+-->
+						<a href="thread.php?fid=$key">$value</a>
+					</li>
+<!--
+EOT;
+}print <<<EOT
+-->
+				</ul>
+			</div>
+			<div class="sideForum" id="sideForum">
+<!--
+EOT;
+$i = 0;
+foreach ($pwForumList as $key => $value) {
+	if (isset($value['child']) && is_array($value['child']) && count($value['child'])) {
+    $defaultDlClass = !$_COOKIE["hide_$i"] ? 'class="one"' : '';
+print <<<EOT
+-->
+				<dl {$defaultDlClass}>
+					<dt>$value[name]</dt>
+					<dd>
+						<ul class="pw_ulD">
+<!--
+EOT;
+foreach($value['child'] as $k=>$v){
+$className = ($k == $fid) ? 'class="current"' : '';
+print <<<EOT
+-->
+						<li {$className}><a href="thread.php?fid=$k">$v</a></li>
+<!--
+EOT;
+}print <<<EOT
+-->
+						</ul>
+					</dd>
+				</dl>
+<!--
+EOT;
+$i++;
+	}
+}
+print <<<EOT
+-->
+			</div>
+		</div>
+<script type="text/javascript">
+/*侧栏版块展开动态*/
+window.onReady(function(){
+	var div = document.getElementById("sideForum");
+	var tt = div.getElementsByTagName("dt");
+	for(i=0; i<tt.length; i++){
+		tt[i].index = i;
+		tt[i].onclick= function(){
+			document.cookie='hide_'+this.index+'='+(this.parentNode.className == 'one' ? 1 : 0);
+			this.parentNode.className = this.parentNode.className == 'one'?'':'one';
+		}
+	}
+	var sfs = document.getElementById('shortcutforum').getElementsByTagName('li');
+	for (i=0;i<sfs.length;i++) {
+		sfs[i].onmouseover=function(){this.className='hover';}
+		sfs[i].onmouseout=function(){this.className='';}
+	}
+});
+
+function toggleSidebar(){
+	var sidebar = getObj('sidebar');
+	var toggle = (sidebar.className == 'f_tree cc') ? 0: 1;
+	SetCookie('toggle',toggle);	
+	getObj('sidebar').className = (sidebar.className == 'f_tree cc')?"f_tree cc sideClose":'f_tree cc';
+}
+</script>
+<!--
+EOT;
+?>

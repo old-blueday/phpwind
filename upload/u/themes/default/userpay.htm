@@ -1,0 +1,494 @@
+<!--<?php
+require_once uTemplate::PrintEot('header');
+require_once uTemplate::PrintEot('profile_left');
+print <<<EOT
+-->
+	<div class="contUser">
+        	<div class="p15">
+            	<h4 class="site"><span>积分</span></h4>
+                <div class="navC">
+                    <ul>
+                        <li id="pay_begin"><a href="userpay.php" hidefocus="true">我的账户</a></li>
+                        <li id="pay_buy"><a href="userpay.php?action=buy" hidefocus="true">积分充值</a></li>
+                        <li id="pay_virement"><a href="userpay.php?action=virement" hidefocus="true">转 账</a></li>
+                        <li id="pay_list"><a href="userpay.php?action=list" hidefocus="true">订单记录</a></li>
+                        <li id="pay_log"><a href="userpay.php?action=log" hidefocus="true">积分日志</a></li>
+                        <li id="pay_change"><a href="userpay.php?action=change" hidefocus="true">积分转换</a></li>
+<script language="javascript">
+var action = "$action";
+if (action == 'pay') {
+	action = 'buy';
+}
+setCurrent('pay_'+action,'pay_begin','current');
+</script>
+                    </ul>
+                </div>
+					<table width="100%" height="450">
+						<tr><td class="vt"><div class="p15">
+<!--
+EOT;
+if (!$action) {
+if ($paycredit) {print <<<EOT
+-->
+								<dl class="user-account cc">
+									<dt>{$pay_link}</dt>
+									<dd>
+										<p><span class="f14 s2">{$credit->cType[$paycredit]}</span>&nbsp;&nbsp;<span class="f24 b s2 mb5" style="line-height:1.1;font-family:Georgia;">$creditdb[$paycredit]</span></p>
+										<p class="gray f12 lh_24">当前汇率:{$db_creditpay[$paycredit][rmbrate]} {$credit->cType[$paycredit]} = ￥1 </p>
+									</dd>
+								</dl>
+<!--
+EOT;
+}print <<<EOT
+-->
+								<ul class="user-integral s5 cc mb20">
+<!--
+EOT;
+foreach ($credit->cType as $key => $value) {
+if ($key != $paycredit) {
+!isset($creditdb[$key]) && $creditdb[$key] = 0;
+print <<<EOT
+-->
+									<li class="w mb5">{$value}：$creditdb[$key]</li>
+<!--
+EOT;
+}}print <<<EOT
+-->
+								</ul>
+<!--
+EOT;
+if ($orderdb) {print <<<EOT
+-->
+							   <h5 class="h5"><a class="fr" href="userpay.php?action=list">进入订单记录 &gt;&gt;</a><strong>近期订单状态</strong></h5>
+							   <div class="u-box-a mb20">
+									<table width="100%" class="tA">
+										<tr class="tr">
+											<td>订单</td><td width="120">状态</td><td width="125">操作日期</td>
+										</tr>
+<!--
+EOT;
+foreach ($orderdb as $key => $value) {print <<<EOT
+-->
+										<tr>
+											<td>$value[order_no]</td>
+											<td>
+<!--
+EOT;
+if ($value['state'] == 2) {print <<<EOT
+-->
+												已完成订单
+<!--
+EOT;
+} else {print <<<EOT
+-->
+												<span class="s2">未完成订单</span>
+<!--
+EOT;
+}print <<<EOT
+-->
+											</td>
+											<td>$value[date]</td>
+										</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+									</table>
+								</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+<!--
+EOT;
+if ($logdb) {print <<<EOT
+-->
+							   <h5 class="h5"><a class="fr" href="userpay.php?action=log">进入积分日志 &gt;&gt;</a><strong>积分日志</strong></h5>
+							   <div class="u-box-a mb20">
+									<table width="100%" class="tA">
+										<tr class="tr">
+											<td>ID</td>
+											<td>操作</td>
+											<td>奖惩</td>
+											<td>描述</td>
+											<td width="150">时间</td>
+										</tr>
+<!--
+EOT;
+foreach ($logdb as $key => $value) {
+$value[affect] > 0 && $value[affect] = '+'.$value[affect];
+print <<<EOT
+-->
+									<tr>
+										<td class="f10">$value[id]</td>
+										<td>{$lang[logtype][creditlog][$value[logtype]]}</td>
+										<td>{$credit->cType[$value[ctype]]}{$value[affect]}</td>
+										<td>$value[descrip]</td>
+										<td class="gray">$value[adddate]</td>
+									</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+									</table>
+								</div>
+<!--
+EOT;
+}} elseif ($action == 'buy') {print<<<EOT
+-->
+								<form method="post" action="userpay.php?">
+									<input type="hidden" name="action" value="pay" />
+									<input type="hidden" name="verify" value="$verifyhash" />
+									<div class="spaceTip"><div class="b s5">积分充值过程:</div><ol>
+	<li>填写信息:进入积分充值页面，填写充值金额，并选择支付方式，提交进入下一步</li>
+	<li>生成订单:系统自动生成一条充值订单记录，等待用户付款，此时订单状态为“未支付订单”</li>
+	<li>用户付款:进入付款页面，当您付款给成功后，订单信息会变为“已完成订单”状态，同时系统会给您的积分帐户冲入相应的金额</li></ol></div>
+									<div class="p15">
+										<table width="100%" class="setTable">
+											<tr>
+												<th class="th">请选择充值积分:</th>
+												<td class="td">
+													<select name="paycredit" id="paycredit" onchange="payinfo(this.value);" class="select_wa">
+<!--
+EOT;
+foreach ($db_creditpay as $key => $value) {
+$select = $key == $paycredit ? 'selected' : '';
+print <<<EOT
+-->
+														<option value="$key" {$select}>{$credit->cType[$key]}</option>
+<!--
+EOT;
+}print <<<EOT
+-->
+													</select>
+													&nbsp;&nbsp;<span class="s2"><span id="payinfo"></span></span>
+												</td>
+											</tr>
+										<tr>
+											<th class="th">请输入充值金额:</th>
+											<td class="td">
+												<input class="input input_wa" type="text" name="number" value="10" size="8" />&nbsp;元
+											</td>
+										</tr>
+										<tr>
+											<th class="th">支付方式: </th>
+											<td class="td">
+												<label class="mr20"><input type="radio" name="method" value="2" checked /> 支付宝</label>
+<!--
+EOT;
+if($ol_tenpay && $ol_tenpaycode){print <<<EOT
+-->
+												<label class="mr20"><input type="radio" name="method" value="4" /> 财付通</label>
+<!--
+EOT;
+}if($ol_paypal && $ol_paypalcode){print <<<EOT
+-->
+												<label class="mr20"><input type="radio" name="method" value="1" /> 贝宝</label>
+<!--
+EOT;
+}if($ol_99bill && $ol_99billcode){print <<<EOT
+-->
+												<label><input type="radio" name="method" value="3" /> 快钱</label>
+<!--
+EOT;
+}print <<<EOT
+-->
+											</td>
+										</tr>
+										</table>
+										<div class="tac" style="padding:1em;"><span class="btn"><span><button type="submit">提交订单</button></span></span></div>
+									</div>
+								</form>
+							<script language="JavaScript">
+								var creditinfo = $creditinfo;
+								function payinfo(c) {
+									getObj('payinfo').innerHTML = '当前汇率:' + creditinfo[c][0] + ' ' + creditinfo[c][2] + ' = ￥1（最低 ' + creditinfo[c][1] + ' 元人民币 ）';
+								}
+								payinfo(getObj('paycredit').value);
+							</script>
+<!--
+EOT;
+} elseif ($action == 'list') {
+${'statestyle'.$state} = 'current';
+print<<<EOT
+-->
+								<table width="100%" class="mb20 s5">
+									<tr>
+										<td><b>订单状态说明:</b><ol>
+	<li>未支付订单:未充值成功的订单，用户尚未付款成功</li>
+	<li>已完成订单:已充值成功的订单，用户已经完成付款，{$db_currencyname}充值成功.</li></ol></td>
+									</tr>
+								</table>
+								<div class="navD mb10">
+									<ul class="cc">
+										<li class="$statestyle"><a href="userpay.php?action=list"><span>所有订单</span></a></li>
+										<li class="$statestyle2"><a href="userpay.php?action=list&state=2"><span>已完成订单</span></a></li>
+										<li class="$statestyle1"><a href="userpay.php?action=list&state=1"><span>未完成订单</span></a></li>
+									</ul>
+								</div>
+								<table width="100%" class="tA">
+									<tr class="tr">
+										<td>ID</td>
+										<td>订单号</td>
+										<td>支付金额</td>
+										<td>充值积分</td>
+										<td>交易状态</td>
+										<td>交易时间</td>
+									</tr>
+<!--
+EOT;
+$id=($page-1)*$db_perpage;
+foreach($orderdb as $key => $value){
+if($value[state]==0){
+$state='未完成订单';
+}elseif($value[state]==1){
+$state='已支付订单，等待用户确认';
+}elseif($value[state]==2){
+$state='已完成订单';
+}
+$id++;
+print <<<EOT
+-->
+									<tr>
+										<td>$id</td>
+										<td>$value[order_no]</td>
+										<td>$value[price]</td>
+										<td>{$credit->cType[$value[paycredit]]}</td>
+										<td>$state</td>
+										<td>$value[date]</td>
+									</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+								<tr><td colspan="6">$pages</td></tr>
+								</table>
+<!--
+EOT;
+} elseif ($action == 'log') {print<<<EOT
+-->
+								<script src="js/date.js"></script>
+								<form action="userpay.php?action=log" method="post">
+									<div class="p10">
+									<table width="100%">
+										<tr>
+											<td>
+												积分 <select class="input_wc" name="ctype">
+											<option></option>
+<!--
+EOT;
+foreach ($credit->cType as $key => $value) {print <<<EOT
+-->
+											<option value="$key">$value</option>
+<!--
+EOT;
+}print <<<EOT
+-->
+											</select>
+											</td>
+											<td>日期 <input class="input" type="text" name="stime" size="10" id="stime" onclick="ShowCalendar(this.id)" />&nbsp;-&nbsp;<input class="input" type="text" name="etime" size="10" id="etime" onclick="ShowCalendar(this.id)" />
+											</td>
+											<td>操作 <select class="select_wa" name="logtype">
+											<option></option>
+<!--
+EOT;
+foreach($lang['logtype']['creditlog'] as $key => $value){
+if(strpos($key,'_') === false){print <<<EOT
+-->
+											<option value="$key">&#62;&#62; $value</option>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+											<option value="$key"> &nbsp;|- $value</option>
+<!--
+EOT;
+}}print <<<EOT
+-->
+										</select>
+											</td>
+											<td>
+												<span class="btn2"><span><button type="submit">提 交</button></span></span>
+											</td>
+										</tr>
+									</table>
+									</div>
+								</form>
+								<table width="100%" class="tA">
+									<tr class="tr">
+										<td width="20">ID</td>
+										<td width="75">操作</td>
+										<td width="60">奖惩</td>
+										<td>描述</td>
+										<td width="150">时间</td>
+									</tr>
+<!--
+EOT;
+$id=($page-1)*$db_perpage;
+foreach($logdb as $key => $value){
+$value[affect] > 0 && $value[affect] = '+'.$value[affect];
+$id++;
+print <<<EOT
+-->
+									<tr>
+										<td class="f10">$id</td>
+										<td>{$lang[logtype][creditlog][$value[logtype]]}</td>
+										<td>{$credit->cType[$value[ctype]]}{$value[affect]}</td>
+										<td>$value[descrip]</td>
+										<td class="gray">$value[adddate]</td>
+									</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+									<tr><td colspan="6">$pages</td></tr>
+								</table>
+<!--
+EOT;
+} elseif ($action == 'virement') {print<<<EOT
+-->
+								<form method="post" action="userpay.php?">
+									<input type="hidden" name="action" value="virement" />
+									<input type="hidden" name="verify" value="$verifyhash" />
+									<input type="hidden" name="step" value="2" />
+							<div class="mb20">
+									<h5 class="h5 mb10"><strong>我的积分</strong></h5>
+									<ul class="user-integral cc">
+<!--
+EOT;
+foreach ($credit->cType as $key => $value) {
+!isset($creditdb[$key]) && $creditdb[$key] = 0;
+print <<<EOT
+-->
+											<li>{$value}：$creditdb[$key]</li>
+<!--
+EOT;
+}print <<<EOT
+-->
+									</ul>
+							</div>
+									<div class="bor-t-c"></div>
+										<table width="100%" class="setTable">
+											<tr>
+												<th class="th">转帐手续费</th>
+												<td class="td">$db_virerate%</td>
+											</tr>
+											<tr>
+												<th class="th">转入用户名</th>
+												<td class="td"><input class="input input_wa" type="text" name="pwuser" size="20" /></td>
+											</tr>
+											<tr>
+												<th class="th">转帐积分名</th>
+												<td class="td">
+												<select name="vmcredit" class="select_wa">
+<!--
+EOT;
+foreach ($vm_credit as $key => $value) {print <<<EOT
+-->
+													<option value="$value">{$credit->cType[$value]}</option>
+<!--
+EOT;
+}print <<<EOT
+-->
+												</select>
+												</td>
+											</tr>
+											<tr>
+												<th class="th">转帐金额数</th>
+												<td class="td"><input class="input input_wa" type="text" name="paynum" size="20"/>&nbsp;&nbsp;<span class="s2">最低转帐金额:{$db_virelimit}</span></td>
+											</tr>
+											<tr>
+												<th class="th">请输入密码</th>
+												<td class="td"><input class="input input_wa" type="password" name="pwpwd" size="20" value=""/></td>
+											</tr>
+										</table>
+										<div class="tac" style="padding:1em"><span class="btn"><span><button type="submit">确认提交</button></span></span></div>
+								</form>
+<!--
+EOT;
+} elseif ($action == 'pay' && $method == 3) {print<<<EOT
+-->
+								<form action="https://www.99bill.com/gateway/recvMerchantInfoAction.htm" method="POST">
+								$inputMsg
+									<input type="hidden" name="signMsg" value="$signMsg" />
+									<table width="100%" class="setTable">
+										<tr>
+											<th class="th">支付方式</th>
+											<td class="td">快钱支付</td>
+										</tr>
+										<tr>
+											<th class="th">订单号:</th>
+											<td class="td">$order_no</td>
+										</tr>
+										<tr>
+											<th class="th">购买商品:</th>
+											<td class="td">购买站点交易币</td>
+										</tr>
+										<tr>
+											<th class="th">总价格:</th>
+											<td class="td s1">￥$number</td>
+										</tr>
+									</table>
+									<div class="tac" style="padding:1em">
+										<span class="button"><span><button type="submit">提 交</button></span></span>
+									</div>
+								</form>
+<!--
+EOT;
+} elseif ($action == 'change') {print <<<EOT
+-->
+							<div class="mb20">
+									<h5 class="h5 mb10"><strong>我的积分</strong></h5>
+									<ul class="user-integral cc">
+										<li>$db_rvrcname : $userrvrc $db_rvrcunit</li>
+										<li>$db_creditname : $winddb[credit] $db_creditunit</li>
+										<li>$db_moneyname : $winddb[money] $db_moneyunit</li>
+										<li>$db_currencyname : $winddb[currency] $db_currencyunit</li>
+<!--
+EOT;
+foreach($_CREDITDB as $key => $value){
+$creditdb[$key] = intval($creditdb[$key]);
+print <<<EOT
+-->
+										<li>$value[0] : {$creditdb[$key]} $value[1]</li>
+<!--
+EOT;
+}print <<<EOT
+-->
+									</ul>
+							</div>
+								<div class="bor-t-c"></div>
+								<table width="100%" class="setTable">
+<!--
+EOT;
+foreach($jf as $key=>$value){print <<<EOT
+-->
+									<form method="post" action="userpay.php?action=change&">
+										<input type="hidden" name="step" value="3" />
+										<input type="hidden" name="type" value="$key" />
+										<input type="hidden" name="verify" value="$verifyhash" />
+										<tr>
+											<th class="th">{$value[0]} <span class="gray">-&gt;</span> {$value[1]}</th>
+											<td class="td">
+											<input name="change" type="text" class="input" /> <span class="btn2"><span><button type="submit">兑换成{$value[1]}</button></span></span></td>
+											<td class="td"><span class="s2">必须为{$value[2]}的整数倍</span><br />
+											<span class="gray">行情:</span> {$value[2]}{$value[0]}={$value[3]}{$value[1]}</td>
+										</tr>
+									</form>
+<!--
+EOT;
+}print <<<EOT
+-->
+								</table>
+<!--
+EOT;
+}print<<<EOT
+-->
+						</div></td></tr>
+					</table>
+            </div>
+        </div>
+<!--
+EOT;
+require_once uTemplate::PrintEot('footer');
+?>-->

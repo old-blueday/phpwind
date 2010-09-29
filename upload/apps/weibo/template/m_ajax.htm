@@ -1,0 +1,286 @@
+<!--<?php
+if (in_array($do,array('filterweibo','lookround','refer','attention','my','conloy'))) {
+	if ($weiboList) {
+		require_once uTemplate::printEot('weibo_model');
+		foreach ($weiboList as $key => $value) {
+			$method = $weiboService->getType($value['type']);
+			$weiboModelTemplate->$method($value);
+		}
+		if ($count > $perpage) {print <<<EOT
+-->
+					<div class="cc p10">$pages</div>
+<!--
+EOT;
+		}
+	} else {
+		if ($do == 'my') {print <<<EOT
+-->
+					<div class="p15 f14 tac">你这家伙真懒，一条新鲜事都没写哦。</div>
+<!--
+EOT;
+		} elseif ($do == 'attention') {print <<<EOT
+-->
+					<div class="p15 f14 tac">最近没有新动静，试试<a href="u.php?a=friend&type=find">关注更多人</a>，或者去<a href="apps.php?q=weibo&do=lookround">最新新鲜事</a>逛逛吧~~</div>
+<!--
+EOT;
+		} elseif ($do == 'refer') {print <<<EOT
+-->
+					<div class="p15 f14 tac">呀～还没有人@你哦～再等等吧～</div>
+<!--
+EOT;
+		} else {print <<<EOT
+-->
+					<div class="p15 f14 tac">没有搜到内容！</div>
+<!--
+EOT;
+		}
+	}
+} elseif (in_array($do,array('receive'))) {
+	if ($commentList) {
+		require_once uTemplate::printEot('weibo_model');
+		foreach ($commentList as $value) {
+			$id = $value['mid'].'_'.$value['cid'];
+			$weibo = $value['weibo'];
+			$ifmyweibo = $weibo['uid'] == $winduid ? true : false;
+			if ($ifmyweibo) {
+				$value['content'] = $value['extra'] ? $value['content'] : ' : '.$value['content'];
+			} else {
+				$value['content'] = $value['content'];
+			}
+			$ifmycomment = $value['uid'] == $winduid ? false : true;
+			$method = $weiboService->getType($weibo['type']);
+print <<<EOT
+-->				
+					<dl class="dl cc">
+						<dt class="dt"><a href="u.php?uid={$value['uid']}"><img class="img" src="{$value['icon']}" alt="{$value['username']}" width="44" height="44" /></a></dt>
+						<dd class="dd">
+<!--
+EOT;
+			if ($ifmyweibo) {print <<<EOT
+-->
+							<a href="javascript:void(0)"  onclick="deletecommentRefersh({$value['mid']},{$value['cid']},$page)" class="adel">删除</a>
+<!--
+EOT;
+			}print <<<EOT
+-->
+							<div class="title"><a href="u.php?uid={$value['uid']}">{$value['username']}</a>{$value['content']}</div>
+							<div class="gray cc">
+<!--
+EOT;
+			if ($ifmycomment) {print <<<EOT
+-->			
+								<a onclick="getcomments('replay',{$value[mid]},{$value[uid]},{$value[cid]});return false;" href="javascript:void(0)" class="fr">回复</a>
+<!--
+EOT;
+			}print <<<EOT
+-->	
+
+<!--
+EOT;
+			if ($ifmyweibo) {print <<<EOT
+-->								
+								<span class="mr5" title="{$value['postdate_s']}" id="from_{$id}">{$value['lastdate']}</span><a href="javascript:;" onmouseover="read.open('tips_{$id}','from_{$id}',0,21)" onmouseout = "closep()"  class="s7" style="text-decoration:none;" >评论我的新鲜事</a>
+								<div class="fl">
+									<div id="tips_{$id}" class="s5" style="position:absolute;display:none;">
+										<div class="replyTips">
+<!--
+EOT;
+$weiboModelTemplate->$method($weibo);
+print <<<EOT
+-->	
+										</div>
+									</div>
+								</div>
+<!--
+EOT;
+			} else {
+print <<<EOT
+-->	
+								<span class="mr5" title="{$value['postdate_s']}" id="from_{$id}">{$value['lastdate']}</span>回复我的评论--<a onmouseover="read.open('tips_{$id}','from_{$id}',0,21)"  onmouseout = "closep()" class="s7" style="text-decoration:none;">查看原新鲜事</a>
+								<div class="fl">
+									<div id="tips_{$id}" class="s5" style="position:absolute;display:none;">
+										<div class="replyTips">
+<!--
+EOT;
+$weiboModelTemplate->$method($weibo);
+print <<<EOT
+-->		
+										</div>
+									</div>
+								</div>
+<!--
+EOT;
+}print <<<EOT
+-->								
+							</div>
+							<div id="comment_{$id}" class="replyMe"></div>
+						</dd>
+					</dl>
+<!--
+EOT;
+		}
+		if ($count >= $perpage) {print <<<EOT
+-->
+					<div class="cc p10">$pages</div>
+<!--
+EOT;
+		}
+	} else {print <<<EOT
+-->
+					<div class="p15 f14 tac">呀～还没有人评论你哦～再等等吧～</div>
+<!--
+EOT;
+	}
+} elseif ($do == 'transmit') {print <<<EOT
+-->
+<form action="apps.php?q=weibo&do=transmit&ajax=1&mid=$mid" onSubmit="return false;" method="post">
+<input type="hidden" name="step" value="3" />
+<div style="width:365px">
+	<div class="popTop" onmousedown="read.move(event);" style="cursor:move"><span class="adel cp" onclick="closep();">关闭</span>转发到我的新鲜事</div>
+	<div class="p10">
+		<div class="p10 bgA bdB mb10 s5" style="line-height:1.5;">
+			<span class="b s4">{$showInfo['username']}：</span>
+<!--
+EOT;
+if ($showInfo['extra']['title']) {print <<<EOT
+-->		{$showInfo['extra']['title']}
+			<div>{$showInfo['content']}</div>
+<!--
+EOT;
+} else {
+($showInfo['type'] == 30 || $showInfo['type'] == 41) && $showInfo['content'] = '分享照片';
+print <<<EOT
+-->
+			{$showInfo['content']}
+<!--
+EOT;
+}print <<<EOT
+-->
+		</div>
+		<textarea id="atc_content" name="atc_content" class="textareaA mb5" onkeyup="wordlength(this, 255, 'counter_{$id}')">$dString</textarea>
+		<div class="cc">
+			<span onclick="showcommentsmile(this, 'atc_content', 'counter_{$id}')" class="sk_show cp" id="showSmile">表情</span>
+<!--
+EOT;
+if (!$blackList) {print <<<EOT
+-->
+			<label class="fr"><input type="checkbox" name="ifcomment" value="1" />同时给{$weibo['username']}评论</label>
+<!--
+EOT;
+}print <<<EOT
+-->
+			<div id="counter_{$id}">你还可以输入<em>255</em>个字符</div>
+		</div>
+  </div>
+	<div class="popBottom"><span class="btn2"><span>
+    <button type="button" name="ajaxsubmit" onclick="transmitWeiboSubmitForm(this.form,'1','{$weibo['uid']}');">提 交</button>
+</span></span><span class="bt2"><span><button type="button" onclick="closep();">取消</button></span></span></div>
+</div>
+</form>
+<script type="text/javascript">
+//setTimeout(function(){WeiboPost.checkWordLength();}, 300);
+</script>
+<!--
+EOT;
+}elseif($do == 'comment' || $do == 'replay'){
+$iftransmitweibo = $weiboService->groupCheck($groupid);
+list($face) = showfacedesign($winddb['icon'],1,m);  
+print <<<EOT
+--><div class="redlB" id="option_{$id}">
+		<div class="triangle">&nbsp;</div>
+		<form name="FORM_{$id}" id="FORM_{$id}" action="apps.php?q=weibo&do=postcomment&ajax=1" method="post" >
+        <input type="hidden" value="$verifyhash" name="verify">
+		<input type="hidden" name="mid" value="$mid" />
+		<input type="hidden" name="identify" value="$identify" />
+		<input type="hidden" name="commentpage" value="$page" />
+		<input type="hidden" name="uids" value="$uids" />
+		<input type="hidden" name="subdo" value="$do" />
+		<input type="hidden" name="ifreplay" value="0" />
+		<dl class="cc dlA" style="border:none;">
+			<dt class="dtA"><a href="u.php?uid=$winduid"><img class="img" src="$face" alt="$windid" width="35" height="35" /></a></dt>
+			<dd class="ddA">
+				<p class="mb10"><textarea name="writeContent" id="writeContent_{$id}" onkeyup="wordlength(this, 255, 'counter_{$id}')" onkeydown = "ctrlEnter(event,getObj('FORM_{$id}'),postcomment)">$replayusername</textarea></p>
+				<p class="cc mb10">
+					<span onclick="showcommentsmile(this, 'writeContent_{$id}', 'counter_{$id}')" class="sk_show cp" id="showSmile">表情</span>
+					<span class="btn3 fr"><span><button type="button" onclick="postcomment(this.form)" id="comment_submit" name="comment_submit">评论</button></span></span>
+<!--
+EOT;
+if($iftransmitweibo && $o_weibopost != '0'){
+print <<<EOT
+-->						
+					<label class="fr mr20"><input name="ifsendweibo"  type="checkbox" value="1">&nbsp;同时转发到新鲜事</label>
+<!--
+EOT;
+}
+print <<<EOT
+-->						
+					<span class="fr mr20 gray" id="counter_{$id}">你还可以输入<em>255</em>个字节</span>
+				</p>
+			</dd>
+		</dl>
+		</form>
+<!--
+EOT;
+foreach($commentList as $value){
+print <<<EOT
+-->		
+		<dl class="cc dlA">
+			<dt class="dtA"><a href="u.php?uid={$value['uid']}"><img class="img" src="{$value['icon']}" alt="{$value['username']}" width="35" height="35" /></a></dt>
+			<dd class="ddA">
+<!--
+EOT;
+if($isGM || $winduid == $value['uid']){
+print <<<EOT
+-->	
+				<a href="javascript:void(0)" class="fr s7" onclick="deletecomment({$value['cid']},getObj('FORM_{$id}'))">删除</a>
+<!--
+EOT;
+}if($do == 'comment'){
+print <<<EOT
+-->					
+				<a href="javascript:void(0)" class="fr s7 mr10" onclick="replycomment('{$value['username']}',getObj('FORM_{$id}'))">回复</a>
+<!--
+EOT;
+}
+print <<<EOT
+-->					
+				<p class="titleA"><a href="u.php?uid={$value['uid']}">{$value['username']}</a>：<span class="mr20">{$value['content']}</span><span class="w gray" title="{$value['postdate_s']}">{$value['lastdate']}</span></p>
+			</dd>
+		</dl>
+<!--
+EOT;
+}if($count > $perpage){
+print <<<EOT
+-->
+
+<div class="cc">
+    <div class="pages" style="float:right">
+<!--
+EOT;
+$prePage = $page - 1;
+$nextPage = $page + 1;
+if ($page > 1) {
+print <<<EOT
+-->
+		<a href="javascript:;" onclick="refreshcomment('$do','$mid','$uids','$identify','$prePage');return false">上一页</a> 
+<!--
+EOT;
+}
+if ($page < $pageCount) {
+print <<<EOT
+-->
+		<a href="javascript:;" onclick="refreshcomment('$do','$mid','$uids','$identify','$nextPage');return false">下一页</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+    </div>
+</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+</div>
+<!--
+EOT;
+}?>-->

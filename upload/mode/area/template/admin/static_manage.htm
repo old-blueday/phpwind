@@ -1,0 +1,41 @@
+<!--<?php
+include_once PrintEot('left');
+print <<<EOT
+-->
+<!--
+EOT;
+if(empty($action)) {print <<<EOT
+-->
+<div class="nav3 mb10">
+	<ul class="cc">
+        <li class="current"><a href="javascript:;">静态配置</a></li>
+    </ul>
+</div>
+<div class="admin_info mb10">
+    <h3 class="h1"><b>提示信息</b></h3>
+    <div class="legend"> 注意：开启门户模式静态化后，门户模式首页的底部导航条将被隐藏 </div>
+</div>
+<form action="$basename" method="post" >
+<input type="hidden" name="step" value="2">
+<h2 class="h1"><span class="mr5 fl">配置门户模式静态化</span></h2>
+<div class="admin_table mb10">
+	<table width="100%">
+    	<tr class="tr2">
+        	<td>静态页面更新时间[分]</td>
+        	<td><input type="text" class="input input_wa mr10" name="statictime" value="$area_statictime">0或留空则为不自动更新</td>
+        </tr>
+	</table>
+</div>
+<input type="hidden" name="step" value="2">
+<div class="tac p10">
+	<span class="btn"><span><button type="submit" onfocus="blur();">提交</button></span></span>
+</div>
+</form>
+<!--
+EOT;
+}print <<<EOT
+-->
+<!--
+EOT;
+include_once PrintEot('adminbottom');
+?>-->

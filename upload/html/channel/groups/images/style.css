@@ -1,0 +1,138 @@
+/*from g_style.css*/
+body{font-size:9pt;background:#e6f3f9;font-family:Arial;color:#333;line-height: 1.5;}
+body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,form,p,blockquote,th,td{margin: 0;padding: 0;}
+h1,h2,h3,h4,h5,h6{font-size: 100%;font-weight: normal;}
+ol, ul {list-style: none;}
+table {border-collapse: collapse;border-spacing: 0;}
+th{text-align: left;}
+td,th,div{word-break:break-all;word-wrap:break-word}
+form{display:inline;}
+*{outline:none}
+img{border:0;}
+i,cite,em{ font-style:normal;}
+/*Public style*/
+.cc{*zoom:1;}
+.cc:after{content:'\20';display:block;height:0;clear:both;}
+.c{clear:both;font:0px/0px Arial;overflow:hidden;height:0;width:0;}
+.b{ font-weight:700;}
+.w{white-space:nowrap;}
+.tal{text-align:left;}
+.tac{text-align:center;}
+.tar{text-align:right;}
+.fr{float:right;}
+.fl{float:left;}
+.pr{position:relative;}
+.cp{cursor:pointer;}
+.vt,.vt td{vertical-align:top;}
+.f9{font-size:10px;}
+.f10,small,.small{font-size:11px;}
+.f12{font-size:12px;}
+.f14{font-size:14px;}
+.f16{font-size:16px;}
+.f20{font-size:20px;}
+.f24{font-size:24px;}
+.fn,.fn a{font-weight:normal;}
+/*Distance*/
+.mb5{margin-bottom:5px;}
+.mb10{margin-bottom:10px;}
+.mb15{margin-bottom:15px;}
+.mb20{margin-bottom:20px;}
+.mr5{margin-right:5px;}
+.mr10{margin-right:10px;}
+.mr15{margin-right:15px;}
+.mr20{margin-right:20px;}
+.p10{padding:10px;}
+.p15{padding:15px;}
+.p_lr_10{padding:0 10px;}
+.mt10{margin-top:10px}
+/*a link*/
+a{text-decoration:none;color:#333;}
+a:hover{text-decoration:underline; color:#004b92}
+
+/*layout*/
+#header,#main,.foot{width:960px;margin:auto;}
+.foot{padding:10px 0 35px;border-top:1px solid #ccc;font-family:Arial;color:#aebfd6;}
+.foot a{color:#375e93;}
+#main{min-height:600px;margin-bottom:10px;}
+
+/*from g/.../style.css*/
+/*nav*/
+/*Mod for index*/
+.g_navA{height:29px;border-bottom:1px solid #79a4ce; padding:8px 5px 0 0;}
+.g_navA ul{position:relative; float:left; padding-top:1px;margin-bottom:-1px;_margin-bottom:-2px;padding-right:20px;}
+.g_navA li,.g_navA li a{background:url(navA.png) 999px 999px no-repeat;float:left;line-height:29px;display:block;}
+.g_navA li{ background-position:left 0;margin-right:5px;}
+.g_navA li a{margin-left:5px;background-position:right 0;padding:0 17px 0 12px;font-size:14px;color:#004b92;outline:none;_display:inline;}
+.g_navA li a:hover{color:#004b92; text-decoration:none;}
+.g_navA .current{ background-position:0 -34px;}
+.g_navA .current a{background-position:right -34px;color:#333; padding:0 20px 0 15px;}
+.g_navA .btn_add{float:right; margin-top:-8px;}
+
+/*new write by shenjianming */
+
+#borderTop{height:3px; overflow:hidden; background-color:#0b5a93;}
+#mainContent{padding:8px 8px 20px;border:1px solid #c0d0e6; border-top:none; min-height:570px; background-color:#fff;}
+
+.btn_add,.btn_add span{float:left;background:url(button_add.png) no-repeat 100% 0;}
+.btn_add{height:30px; line-height:30px; overflow:hidden; padding-right:5px; font-size:14px; color:#da4901;}
+.btn_add span{padding:0 7px 0 25px; background-position:0 0;}
+.btn_add:hover,.btn_add:hover span{text-decoration:none; color:#da4901}
+
+.content{float:left; width:720px;}
+.sidebar{float:right; width:210px;}
+
+.groups{line-height:18px; margin-bottom:10px;}
+*+html .groups{padding-bottom:18px;}
+.groups li{float:left; display:inline; margin:18px 5px 18px 15px; width:220px; height:64px; overflow:hidden;}
+.groups li img.fl{width:64px; height:64px; margin-right:10px;}
+.groups li h4{font-size:14px; font-weight:700; margin-bottom:3px;}
+.groups li p{color:#999;width:140px;float:left;height:36px;overflow:hidden;}
+
+.group-types{font-size:14px; line-height:28px; margin-bottom:10px;}
+.group-types .hd{height:28px; padding:0 5px 2px; margin:0 2px; border-bottom:1px solid #85add6;}
+.group-types .hd h3{float:left;color:#004b92; font-weight:800;}
+.group-types .hd h3 a{color:#004b92;}
+.group-types .hd .more{float:right; margin-top:3px; font-size:12px; color:#999;}
+.group-types .hd .more a{color:#999}
+.group-types .hd .more em{font-family:Tahoma; color:#f50; padding:0 6px; font-weight:700;}
+.group-types .hd .more a:hover,.group-types .hd .more a:hover em{cursor:pointer; text-decoration:underline}
+.group-types .bd{width:100%; overflow:hidden; position:relative;}
+.group-types .bdWrap{width:110%;}
+.group-types dl{float:left; width:355px; margin:-6px 0 0 -16px; padding:15px 45px 15px 0; border-top:1px solid #ddd;}
+.group-types dl dt,.group-types dl dd{padding:0 0 0 22px; border-left:1px solid #ddd; overflow:hidden;}
+.group-types dl dt,.group-types dl dt a{height:28px;font-weight:700; color:#004b92}
+.group-types dl dt span{font-size:12px; color:#999; font-weight:400}
+.group-types dl dd{height:115px}
+.group-types dl dd a{margin-right:12px; *margin-right:8px;}
+
+.topics{}
+.topics table{width:100%; line-height:20px; color:#999; table-layout:fixed;}
+.topics table thead th{ height:36px; padding:0 10px;font-weight:500; text-align:center; color:#666; background:url(topic.png) repeat-x 0 0;}
+.topics table .title{text-align:left}
+.topics table .groups{width:120px}
+.topics table .author{width:110px}
+.topics table .lastReply{width:90px}
+
+.topics table thead th.title{padding-left:45px}
+.topics table tbody td{padding:4px 10px 8px; *padding:5px 10px 9px; text-align:center; border-bottom:1px solid #ececec}
+.topics table tbody tr.odd td{background-color:#fafafa}
+.topics table tbody td.title{padding-left:25px; background:url(topic.png) no-repeat 12px -41px;}
+
+.side-box{margin-top:10px;}
+.side-box h3{line-height:26px; font-family:Tahoma; padding:0 10px; font-weight:700; border-bottom:1px solid #ccc;}
+.ranking{line-height:24px; *zoom:1; padding-bottom:5px;}
+.ranking li{*float:left; *width:100%; height:24px; overflow:hidden; border-bottom:1px solid #fff;font-family:Tahoma}
+.ranking li em,.ranking li span{float:left; padding: 0 10px; overflow:hidden;}
+.ranking li .title{width:90px; margin-left:5px;}
+.ranking li .order{width:40px; font-size:11px;}
+.ranking li a{color:#666}
+.ranking li a:hover,.ranking li a:hover em,.ranking li a:hover span{cursor:pointer; text-decoration:none; color:#004b92}
+.ranking li.odd{background-color:#eee}
+
+.users{}
+.users li{float:left; width:100%; margin:8px 0; min-height:52px; _height:52px; line-height:16px;}
+.users li img.fl{margin:0 8px; width:48px; height:48px; padding:1px; border:1px solid #999}
+.users li h4,.users li h4 a{line-height:20px; color:#004b92;}
+.users li p{color:#666;}
+
+.chuangjian{float:left;width:71px;height:20px;display:block; text-indent:-2000em;overflow:hidden;background:url(chuangjian.png) no-repeat;margin:2px 0 0 -15px;}

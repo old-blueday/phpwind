@@ -1,0 +1,516 @@
+<!--<?php
+include_once PrintEot('profile_header');
+print <<<EOT
+-->
+<div id="user-main">
+<div class="u-m-bg"></div>
+<div class="u-m-bg-c cc">
+    	<div class="p10">
+    		<!-- 导航 开始 -->
+			<div class="u-nav-2 cc">
+				<ul id="jobnav">
+                    <li class="$current[1]"><a  href="jobcenter.php?action=applied" style="cursor:pointer" hidefocus="true">我申请的</a></li>
+                    <li class="$current[0]"><a href="jobcenter.php?action=list" style="cursor:pointer" hidefocus="true">可申请的</a></li>
+                    <li class="$current[2]"><a  href="jobcenter.php?action=finish" style="cursor:pointer" hidefocus="true">完成的任务</a></li>
+                    <li class="$current[3]"><a  href="jobcenter.php?action=quit" style="cursor:pointer" hidefocus="true">失败的任务</a></li>
+				</ul>
+			</div>
+			<!-- 导航结束 -->
+<!--
+EOT;
+if( $action == "list"){
+print <<<EOT
+-->
+			<div class="u-cont-bg-c">
+			<table width="100%" height="450">
+				<tr><td class="vt">
+					<div class="p15">
+<!--
+EOT;
+if($jobs){
+print <<<EOT
+-->
+						<table width="100%" class="mt10 bor-t-c">
+							<tr class="user-tr">
+								<td class="b gray" width="70">任务名称</td>
+                                <td>&nbsp;</td>
+                                <td class="b gray" width="200">完成奖励</td>
+                                <td width="190">&nbsp;</td>
+							</tr>
+                            <!--点击任务名称后出现的样式-->
+<!--
+EOT;
+foreach($jobs as $job){
+print <<<EOT
+-->
+                            <tr class="user-tr">
+								<td><img src="$job[icon]" width="48" height="48" /></td>
+                                <td class="vam user-t current">
+                                	<a href="javascript:;" class="text_open" hidefocus="true">$job[title]</a>
+                                    <p>$job[prepose]</p>
+                                </td>
+                                <td class="org vam">$job[reward]</td>
+                                <td>$job[btn]</td>
+							</tr>
+							<tr class="tasks_text_tr user-tr" style="display:none;">
+								<td></td>
+								<td style="padding-top:0;">
+									<div class="tasks_text">
+	                                    	<dl class="cc"><dt>任务描述:</dt><dd class="text">$job[description]</dd></dl>
+	                                        <dl class="one cc"><dt>任务周期:</dt><dd>$job[period]</dd></dl>
+<!--
+EOT;
+if($job['usergroup']){print <<<EOT
+-->
+	                                        <dl class="cc"><dt>允许用户组:</dt><dd>$job[usergroup]</dd></dl>
+<!--
+EOT;
+}print <<<EOT
+-->
+<!--
+EOT;
+if($job['number']){print <<<EOT
+-->
+	                                        <dl class="cc"><dt>人数限制:</dt><dd>$job[number]</dd></dl>
+<!--
+EOT;
+}print <<<EOT
+-->
+	                                        <dl class="cc"><dt>完成条件:</dt><dd>$job[condition]</dd></dl>
+	                                </div>
+                                </td>
+                                <td colspan="2"></td>
+							</tr>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+                            <!--结束-->
+						</table>
+<!--
+EOT;
+}else{
+print <<<EOT
+-->
+						<div class="user-tips">还没有可申请的任务</div>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+					</div>
+				</td></tr>
+			</table>
+			</div>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+
+
+<!--
+EOT;
+if(empty($action) || $action == "applied"){
+print <<<EOT
+-->
+			<div class="u-cont-bg-c">
+			<table width="100%" height="450">
+				<tr><td class="vt">
+					<div class="p15">
+<!--
+EOT;
+if($jobs){
+print <<<EOT
+-->
+						<table width="100%" class="mt10 bor-t-c">
+							<tr class="user-tr">
+								<td class="b gray" width="70">任务名称</td>
+                                <td>&nbsp;</td>
+                                <td class="b gray" width="200">完成奖励</td>
+                                <td width="190">&nbsp;</td>
+							</tr>
+                            <!--点击任务名称后出现的样式-->
+<!--
+EOT;
+foreach($jobs as $job){
+print <<<EOT
+-->                         <tbody id="job_$job[id]">
+                            <tr class="user-tr">
+								<td><img src="$job[icon]" width="48" height="48" /></td>
+                                <td class="vam user-t current">
+                                	<a href="javascript:;" class="text_open" hidefocus="true">$job[title]</a>
+                                </td>
+                                <td class="org vam">$job[reward]</td>
+                                <td>$job[btn]</td>
+							</tr>
+							<tr class="tasks_text_tr user-tr" style="display:none;">
+								<td></td>
+								<td style="padding-top:0;">
+									<div class="tasks_text">
+	                                    	<dl class="cc"><dt>任务描述:</dt><dd class="text">$job[description]</dd></dl>
+	                                        <dl class="one cc"><dt>任务周期:</dt><dd>$job[period]</dd></dl>
+	                                        <dl class="one cc"><dt>完成条件:</dt><dd id="job_condition_$job[id]">$job[condition]</dd></dl>
+	                                        <dl class="one"><dt style="padding-top:5px;">$job[qbtn]</dt></dl>
+	                                </div>
+                                </td>
+                                <td colspan="2"></td>
+							</tr>
+							</tbody>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+                            <!--结束-->
+						</table>
+<!--
+EOT;
+}else{
+print <<<EOT
+-->
+					<div class="user-tips">还没有已申请的任务</div>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+					</div>
+				</td></tr>
+			</table>
+			</div>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+
+
+
+<!--
+EOT;
+if($action == "finish"){
+print <<<EOT
+-->
+
+
+<!--
+EOT;
+if($show == "detail"){
+print <<<EOT
+-->
+			<div class="u-cont-bg-c">
+			<table width="100%" height="450">
+				<tr><td class="vt">
+					<div class="p15">
+						<table width="100%" class="mt10 bor-t-c">
+							<tr class="user-tr3">
+								<td width="80">
+                                	<img src="$list[icon]" width="64" height="64" />
+                                </td>
+                                <td>
+                                	<a href="jobcenter.php?action=finish" class="f14 b blue">$list[title]</a> <span class="gray">$list[prepose]</span>
+                                    <div class="tasks_text">
+                                    	<dl class="one cc"><dt>任务描述:</dt><dd class="text">$list[description]</dd></dl>
+                                        <dl class="cc"><dt>任务周期:</dt><dd>$list[period]</dd></dl>
+                                        <dl class="one cc"><dt>任务奖励:</dt><dd><span class="org">$list[reward]</span></dd></dl>
+                                    </div>
+                                </td>
+                                <td width="300">&nbsp;</td>
+							</tr>
+<!--
+EOT;
+if($list['usergroup'] && $list['number']){print <<<EOT
+-->
+							<tr class="user-tr3">
+								<td>&nbsp;</td>
+                                <td style="padding-top:0;">
+                                	<div class="tasks_text">
+<!--
+EOT;
+if($list['usergroup']){print <<<EOT
+-->
+                                    	<dl class="cc"><dt>可申请用户组:</dt><dd>$list[usergroup]</dd></dl>
+<!--
+EOT;
+}print <<<EOT
+-->
+<!--
+EOT;
+if($list['number']){print <<<EOT
+-->
+	                                    <dl class="cc"><dt>人数限制:</dt><dd>$list[number]</dd></dl>
+<!--
+EOT;
+}print <<<EOT
+-->
+                                    </div>
+                                </td>
+                                <td>&nbsp;</td>
+							</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+                            <tr class="user-tr3">
+								<td>&nbsp;</td>
+                                <td>
+                                	<div class="tasks_text">
+                                    	<dl class="one cc"><dt>完成条件:</dt><dd>$list[condition]</dd></dl>
+                                    </div>
+                                </td>
+                                <td>&nbsp;</td>
+							</tr>
+                            <tr class="user-tr3">
+								<td><img src="$list[face]" width="64" height="64" /></td>
+                                <td>
+                                	<b class="f14">我完成的情况:</b> <span class="gray">总共参加 $list[total] 次</span>
+                                	<div class="tasks_text">
+                                        <dl class="cc"><dt>奖励情况:</dt><dd>$list[rewardtotal]</dd></dl>
+                                        <dl class="one cc"><dt>最后一次:</dt><dd>$list[last]</dd></dl>
+                                    </div>
+                                </td>
+                                <td>&nbsp;</td>
+							</tr>
+                            <tr class="user-tr3">
+								<td>&nbsp;</td>
+                                <td>
+<!--
+EOT;
+if($total){
+print <<<EOT
+-->
+                                	<b class="f14"></b> <span class="gray">还有 $total 位会员参与了任务</span>
+                                    <ul class="cc tasks_face_list">
+<!--
+EOT;
+foreach($others as $other){
+print <<<EOT
+-->
+                                    	<li><a href="u.php?uid=$other[uid]"><img src="$other[face]" /></a><p><a href="u.php?uid=$other[uid]" title="$other[username]">$other[username]</a></p></li>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+                                    </ul>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+                                </td>
+                                <td>&nbsp;</td>
+							</tr>
+                        </table>
+						<div class="tac" style=" padding:1em;width:180px;margin:0 auto;">
+<!--
+EOT;
+if($list['isperiod']){
+print <<<EOT
+-->
+							<a href="javascript:;" id="apply_$list[id]"><span class="button"><span><button type="submit">重新申请</button></span></span></a>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+                            <span class="button2"><span><button onclick="top.location='jobcenter.php?action=finish'" type="submit">返回</button></span></span>
+						</div>
+                    </div>
+                </td>
+                </tr>
+            </table>
+            </div>
+<!--
+EOT;
+}else{
+print <<<EOT
+-->
+
+			<div class="u-cont-bg-c">
+			<table width="100%" height="450">
+				<tr><td class="vt">
+					<div class="p15">
+<!--
+EOT;
+if($jobs){
+print <<<EOT
+-->
+						<table width="100%" class="mt10 bor-t-c">
+							<tr class="user-tr">
+								<td class="b gray" width="70">任务名称</td>
+                                <td>&nbsp;</td>
+                                <td class="b gray" width="200">完成奖励</td>
+                                <td width="190">&nbsp;</td>
+							</tr>
+                            <!--点击任务名称后出现的样式-->
+<!--
+EOT;
+foreach($jobs as $job){
+print <<<EOT
+-->
+                            <tr class="user-tr">
+								<td><img src="$job[icon]" width="48" height="48" /></td>
+                                <td class="vam user-t current">
+                                	<a href="javascript:;" class="text_open" hidefocus="true">$job[title]</a> <span class="gray">$job[lastfinish]</span>
+                                    <p>$job[prepose]</p>
+                                </td>
+                                <td class="org vam">$job[reward]</td>
+                                <td>$job[btn]</td>
+							</tr>
+							<tr class="tasks_text_tr user-tr" style="display:none;">
+								<td></td>
+								<td style="padding-top:0;">
+									<div class="tasks_text">
+	                                    	<dl class="cc"><dt>任务描述:</dt><dd class="text">$job[description]</dd></dl>
+	                                        <dl class="cc one"><dt>任务周期:</dt><dd>$job[period]</dd></dl>
+<!--
+EOT;
+if($job['number']){print <<<EOT
+-->
+	                                        <dl class="cc"><dt>人数限制:</dt><dd>$job[number]</dd></dl>
+<!--
+EOT;
+}print <<<EOT
+-->
+	                                        <dl class="cc"><dt>完成条件:</dt><dd>$job[condition]</dd></dl>
+	                                        <dl class="cc one"><dt>&nbsp;</dt><dd><a href="jobcenter.php?action=finish&jobid=$job[id]">详细信息</a></dd></dl>
+	                                </div>
+                                </td>
+                                <td colspan="2"></td>
+							</tr>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+                            <!--结束-->
+						</table>
+<!--
+EOT;
+}else{
+print <<<EOT
+-->
+					<div class="user-tips">还没有已完成的任务，赶快去申请！</div>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+					</div>
+				</td></tr>
+			</table>
+			</div>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+
+<!--
+EOT;
+}
+print <<<EOT
+-->
+
+
+<!--
+EOT;
+if($action == "quit"){
+print <<<EOT
+-->
+			<div class="u-cont-bg-c">
+			<table width="100%" height="450">
+				<tr><td class="vt">
+					<div class="p15">
+<!--
+EOT;
+if($jobs){
+print <<<EOT
+-->
+						<table width="100%" class="mt10 bor-t-c">
+							<tr class="user-tr">
+								<td class="b gray" width="70">任务名称</td>
+                                <td>&nbsp;</td>
+                                <td class="b gray" width="200">完成奖励</td>
+                                <td width="190">&nbsp;</td>
+							</tr>
+                            <!--点击任务名称后出现的样式-->
+<!--
+EOT;
+foreach($jobs as $job){
+print <<<EOT
+-->
+                            <tr class="user-tr">
+								<td><img src="$job[icon]" width="48" height="48" /></td>
+                                <td class="vam user-t current">
+                                	<a href="javascript:;" class="text_open" hidefocus="true">$job[title]</a>  <span class="gray">$job[info]</span>
+                                    <p>$job[prepose]</p>
+                                </td>
+                                <td class="org vam">$job[reward]</td>
+                                <td>$job[btn]</td>
+							</tr>
+							<tr class="tasks_text_tr user-tr" style="display:none;">
+								<td></td>
+								<td style="padding-top:0;">
+									<div class="tasks_text">
+	                                    	<dl class="cc"><dt>任务描述:</dt><dd class="text">$job[description]</dd></dl>
+	                                        <dl class="one cc"><dt>任务周期:</dt><dd>$job[period]</dd></dl>
+<!--
+EOT;
+if($job['number']){print <<<EOT
+-->
+	                                        <dl class="cc"><dt>人数限制:</dt><dd>$job[number]</dd></dl>
+<!--
+EOT;
+}print <<<EOT
+-->
+	                                        <dl class="cc"><dt>完成条件:</dt><dd>$job[condition]</dd></dl>
+	                                </div>
+                                </td>
+                                <td colspan="2"></td>
+							</tr>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+                            <!--结束-->
+						</table>
+<!--
+EOT;
+}else{
+print <<<EOT
+-->
+						<div class="user-tips">还没有失败的任务</div>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+					</div>
+				</td></tr>
+			</table>
+			</div>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+
+
+
+</div>
+<script type="text/javascript" language="JavaScript" src="js/pw_jobcenter.js"></script>
+<script type="text/javascript">
+window.onReady(jobCenterInit);
+window.onReady(PW.accordion,'user-t','tasks_text_tr');
+</script>
+</div>
+<div class="u-m-bg"></div>
+</div>
+<!--
+EOT;
+?>-->

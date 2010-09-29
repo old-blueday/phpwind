@@ -1,0 +1,75 @@
+<!--<?php
+include_once PrintEot('left');
+print <<<EOT
+-->
+<div class="admin_info mb10">
+    <h3 class="h1"><b>提示信息</b></h3>
+    <div class="legend"> <ol><li>为了保证后台的安全性,系统只允许站点创始人和管理员删除操作日记</li><li>系统必须保留前100条后台管理日志.</li></ol> </div>
+</div>
+<form action="$basename" method=post>
+  <input type=hidden name=action value=search>
+  <h2 class="h1">搜索</h2>
+  <div class="admin_table mb10">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <tr class="tr1 vt">
+      <td class="td2">用户名</td>
+      <td class="td2"><input type="text" class="input input_wa" name="username"></td>
+      <td class="td2">管理员</td>
+      <td class="td2"><input type="text" class="input input_wa" name="adminname"></td>
+      <td class="td2"><span class="bt2"><span><button type="submit" value="提 交">提 交</button></span></span></td>
+    </tr>
+  </table>
+  </div>
+</form>
+<h2 class="h1"><b>管理日志</b></h2>
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+  <tr class="tr2">
+    <td>用户名</td>
+    <td>级别</td>
+    <td>发帖</td>
+    <td>注册时间</td>
+    <td>管理员</td>
+  </tr>
+<!--
+EOT;
+foreach($userlogdb as $userlog){
+if($userlog){
+print <<<EOT
+-->
+  <tr class="tr1 vt">
+    <td class="td2">$userlog[1]</td>
+    <td class="td2">$userlog[group]</td>
+    <td class="td2">$userlog[3]</td>
+    <td class="td2">$userlog[regdate]</td>
+    <td class="td2">$userlog[5]</td>
+  </tr>
+<!--
+EOT;
+}}
+print <<<EOT
+-->
+</table>
+</div>
+<div class="tac">
+<!--
+EOT;
+if($action=='search'){print <<<EOT
+-->
+  <a href='$basename'><b>查看全部日志</b></a>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+  <div class="cc mb10">$pages</div>
+<!--
+EOT;
+}if($admin_gid==3){print <<<EOT
+-->
+  <a href="$basename&del=Y"><b class="xia2" style="margin-left:2em;">删除多余管理日志</b></a>
+</div>
+<!--
+EOT;
+}include_once PrintEot('adminbottom');
+?>
+-->

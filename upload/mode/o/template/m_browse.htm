@@ -1,0 +1,35 @@
+<!--<?php
+print <<<EOT
+-->
+<div class="p15">
+<!--
+EOT;
+portalEcho('oindex');
+print<<<EOT
+-->
+<div class="w710 fl">
+<script type="text/javascript" language="JavaScript" src="apps/weibo/js/post.js"></script>
+<script type="text/javascript" language="JavaScript" src="js/pw_weibo.js"></script>
+<script language="javascript">
+var transmitAction = 'lookround';
+</script>
+<div class="conFeed" id="weiboFeed">
+<!--
+EOT;
+include printEot('writesmile');
+require_once uTemplate::printEot('weibo_model');
+$weiboModelTemplate->photoPop();
+foreach ($weiboList as $key => $value) {
+	$method = $weiboService->getType($value['type']);
+	$weiboModelTemplate->$method($value);
+}
+print <<<EOT
+-->
+</div>
+</div>
+<div class="c"></div>
+</div>
+
+<!--
+EOT;
+?>-->

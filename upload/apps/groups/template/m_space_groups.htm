@@ -1,0 +1,47 @@
+<!--<?php
+include_once uTemplate::PrintEot('header');
+include_once uTemplate::PrintEot('space_appleft');
+$privacy = array('全站可见','仅好友可见','仅自己可见');
+print <<<EOT
+-->
+<div class="sideD">
+	<div class="boxA">
+		<h2>
+			<span class="mr10">群组</span>
+		</h2>
+		<div class="p10 cc">
+			<div class="dlC">
+<!--
+EOT;
+if (!empty($group)) {
+foreach ($group as $key => $value) {print <<<EOT
+-->
+				<dl class="cc dl mb10">
+					<dt class="dt">
+						<a class="img_50" href="apps.php?q=group&cyid=$value[id]"><i><img width="48" height="48" src="$value[cnimg]" /></i></a>
+					</dt>
+					<dd class="dd">
+						<p class="titleB">
+							<a class="mr10 f14" href="apps.php?q=group&cyid=$value[id]">{$value[cname]}</a>
+						</p>
+						<p>
+						<span class="mr15">分类：{$o_styledb[$value['styleid']]['cname']}</span>
+						<span class="mr15">成员：{$value[members]}</span>
+						<span class="mr20">积分：{$value[colonyNums]}</span>
+						<span>创建：{$value[createtime]}</span>
+						</p>
+					</dd>
+				</dl>
+<!--
+EOT;
+}}print <<<EOT
+-->
+				$pages
+			</div>
+		</div>
+	</div>
+</div>
+<!--
+EOT;
+require_once uTemplate::printEot('footer');
+?>-->

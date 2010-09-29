@@ -1,0 +1,68 @@
+<!--<?php
+$newString = readover(AREA_PATH.'bbsindex/index.html');
+$isGM = CkInArray($windid,$manager);
+$pwSystem = pwRights();
+print <<<EOT
+-->
+<!--
+EOT;
+if(($SYSTEM['areapush'] || $isGM)){print <<<EOT
+-->
+<div class="fr">
+<a onclick="javascript:updateCache('bbsindex');return false;" class="s1" href="javascript:;" style="position:absolute;line-height:25px;height:25px;margin-left:-86px;">刷新四格静态</a>
+</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+$newString
+<!--
+EOT;
+if($SYSTEM['areapush'] || $isGM){print <<<EOT
+-->
+<script language="JavaScript" src="js/date.js"></script>
+<script language="JavaScript" src="mode/area/js/adminview.js"></script>
+<script language="javascript" src="mode/area/js/tagrelate.js"></script>
+<script language="JavaScript" src="js/color_picker.js"></script>
+<script language="JavaScript">
+window.onReady(function(){
+	frontadmin = New(frontAdmin,['main','view-hover']);
+});
+
+function pickReback(color){
+	getObj('color_show').style.backgroundColor = color;
+}
+function styleOnclick(e,obj){
+	var objclass = e.className;
+	var temp = objclass.split(' ');
+	var newclass = '';
+	for (var n=0; n<temp.length; n++){
+		if (temp[n]=='one') {
+			continue;
+		}
+		newclass += ' ' + temp[n];
+	}
+	if (objclass.match(/one/)) {
+		e.className = newclass;
+		getObj(obj).value = '';
+	} else {
+		e.className = newclass + ' one';
+		getObj(obj).value = 1;
+	}
+}
+function colorCancel(){
+	getObj('color_show').style.backgroundColor='#FFFFFF';
+	getObj('title1').value='';
+}
+function updateCache(alias){
+	var url = 'mode.php?m=area&q=static&alias='+alias;
+	ajax.send(url,'',ajax.get);
+}
+</script>
+<!--
+EOT;
+}print <<<EOT
+-->
+<!--
+EOT;
+?>

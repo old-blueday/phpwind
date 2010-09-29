@@ -1,0 +1,78 @@
+<!--<?php
+include_once PrintEot('left');
+print <<<EOT
+-->
+<form action="$basename" method="post">
+  <h2 class="h1">搜索</h2>
+  <div class="admin_table mb10">
+  <table cellspacing="0" cellpadding="0" width="100%">
+    <tr class="tr1 vt">
+      <td class="td2">用户名:
+        <input type="text" class="input input_wa" name="username"></td>
+      <td class="td2">版块:
+        <select name="fid" class="select_wa">
+          <option>
+          $forumcache
+          </option>
+        </select></td>
+      <td class="td2"><span class="bt2"><span><button type="submit" value="提 交">提 交</button></span></span></td>
+    </tr>
+  </table>
+  </div>
+</form>
+<form action="$basename" method="post">
+  <h2 class="h1">版块出售记录</h2>
+  <div class="admin_table mb10">
+  <table cellspacing="0" cellpadding="0" width="100%">
+    <tr class="tr2">
+      <td>ID</td>
+      <td>版块名称</td>
+      <td>用户名</td>
+      <td>购买日期</td>
+      <td>到期日期</td>
+      <td>花费</td>
+      <td>&nbsp;</td>
+    </tr>
+<!--
+EOT;
+$i=($page-1)*$db_perpage;
+foreach($buydb as $key=>$value){
+$i++;
+print <<<EOT
+-->
+    <tr class="tr1 vt">
+      <td class="td2">$i</td>
+      <td class="td2"><a href="thread.php?fid=$value[fid]" target="_blank">{$forum[$value[fid]][name]}</a></td>
+      <td class="td2"><a href="u.php?uid=$value[uid]" target="_blank">$value[username]</a></td>
+      <td class="td2">$value[buydate]</td>
+      <td class="td2">$value[overtime]
+<!--
+EOT;
+if($value['overdate']<$timestamp){print <<<EOT
+-->
+        <span class="s1">(已到期)</span>
+<!--
+EOT;
+}print <<<EOT
+-->
+      </td>
+      <td class="td2">$value[cost] {$credit->cType[$value[credit]]}</td>
+      <td class="td2"><input type="checkbox" name="selid[]" value="$value[id]" onclick="pwJsCheck(this)" /></td>
+    </tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+  </table>
+  </div>
+  <div class="cc mb10">$pages</div>
+  <input type="hidden" name="action" value="del" />
+  <div class="tac mb10">
+      <span class="bt"><span><button type="button" name="chkall" value="全 选" onclick="CheckAll(this.form)">全 选</button></span></span>
+    <span class="btn"><span><button type="submit">删 除</button></span></span>
+    </div>
+</form>
+<!--
+EOT;
+include_once PrintEot('adminbottom');
+?>-->

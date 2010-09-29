@@ -1,0 +1,168 @@
+<!--<?php
+include_once PrintEot('left');
+print <<<EOT
+-->
+<div class="nav3 mb10">
+    <ul class="cc">
+<!--
+EOT;
+empty($mode) && $mode = 'bbs';
+foreach($db_modes as $key => $value){
+if($value['ifopen'] && !in_array($key,$unSeoset)){
+$current_menu = $key == $mode ? 'class="current"' : '';
+print <<<EOT
+-->
+        <li $current_menu><a href="$basename&mode=$key">$value[m_name]</a></li>
+<!--
+EOT;
+}}print <<<EOT
+-->
+    </ul>
+</div>
+<div class="admin_info mb10">
+	<h2 class="h1">论坛SEO优化设置</h2>
+    <div class="legend">
+        <ol>
+            <li>网页SEO优化设置规则：</li>
+            <li>网站名称:{wzmc}（应用范围：所有位置）</li>
+            <li>版块名称:{bkmc}（应用范围：除首页以外）</li>
+            <li>帖子分类名称:{flmc}（应用范围：除首页以外）</li>
+            <li>帖子名称:{tzmc}（应用范围：帖子阅读页和文章页）</li>
+            <li>tag名称:{tmc}（应用范围：帖子阅读页和文章页）</li>
+            <li>文章概要:{wzgy}（应用范围：帖子阅读页）</li>
+            <li>以上标签（必须包含大括号"{}"）可以通过添加在下面来优化页面SEO设置，多个标签之间可以用半角连字符"-"、半角","或半角空格隔开。留空为默认SEO设置，如果标签不再应用范围内则不显示此标签</li>
+        </ol>
+    </div>
+</div>
+<form action="$basename" method="post" >
+<input type="hidden" name="action" value="update" />
+<input type="hidden" name="mode" value="$mode">
+<h2 class="h1">首页</h2>
+<div class="admin_table mb10">
+    <table width="100%" cellspacing="0" cellpadding="0">
+        <tr class="tr1 vt">
+            <td class="td1">Title </td>
+            <td class="td2"><input type="text" class="input input_wb" name="seoset[title][index]" value="{$db_seoset[title][index]}"  maxlength="250" /></td>
+            <td></td>
+        </tr>
+        <tr class="tr1 vt">
+            <td class="td1">Meta Description </td>
+            <td class="td2"><input type="text" class="input input_wb" name="seoset[metaDescription][index]" value="{$db_seoset[metaDescription][index]}"  maxlength="250" /></td>
+            <td></td>
+        </tr>
+        <tr class="tr1 vt">
+            <td class="td1">Meta Keywords </td>
+            <td class="td2"><input type="text" class="input input_wb" name="seoset[metaKeywords][index]" value="{$db_seoset[metaKeywords][index]}"  maxlength="250" /></td>
+            <td></td>
+        </tr>
+    </table>
+</div>
+<h2 class="h1">
+	帖子列表页
+	<span class="bt2 linka"><span><button type="button" name="openfordetail" onclick="cateopen('bbs',null)">展开详细设置</button></span></span>
+</h2>
+<div class="admin_table mb10">
+    <table width="100%" cellspacing="0" cellpadding="0">
+        <tr class="tr1 vt">
+            <td class="td1">Title：</td>
+            <td class="td2"><input type="text" class="input input_wb" name="seoset[title][thread]" value="{$db_seoset[title][thread]}" maxlength="250"  /></td>
+            <td></td>
+        </tr>
+        <tr class="tr1 vt">
+            <td class="td1">Meta Description：</td>
+            <td class="td2"><input type="text" class="input input_wb" name="seoset[metaDescription][thread]" value="{$db_seoset[metaDescription][thread]}" maxlength="250" /></td>
+            <td></td>
+        </tr>
+        <tr class="tr1 vt">
+            <td class="td1">Meta Keywords：</td>
+            <td class="td2"><input type="text" class="input input_wb" name="seoset[metaKeywords][thread]" value="{$db_seoset[metaKeywords][thread]}" maxlength="250" /></td>
+            <td></td>
+        </tr>
+	</table>
+	<table width="100%" cellspacing="0" cellpadding="0" id="cate_bbs" style="display: none; table-layout:fixed;">
+<!--
+EOT;
+foreach($categorys as $key => $cate){
+$_key = 'bbs_thread_'.$cate[fid];
+print <<<EOT
+-->
+        <tbody>
+        <tr class="tr1 vt">
+            <td class="td1"><i class="expand expand_a" onclick='cateopen($cate[fid],this)' ></i>$cate[name]</td>
+            <td class="td2">&nbsp;</td>
+        </tr>
+        </tbody>
+        <tbody id="cate_$cate[fid]" style="display: none">
+<!--
+EOT;
+foreach($forumList[$cate['fid']] as $forum){
+$_key = 'bbs_thread_'.$forum[fid];
+print <<<EOT
+-->
+        <tr class="tr2 td_bgB">
+            <td class="s5" colspan="2">{$forum[name]}</td>
+        </tr>	
+        <tr class="tr1 vt">
+            <td class="td1">{$forum[limage1]}Title：</td>
+            <td class="td2"><input type="text" class="input input_wb" name="forums[$forum[fid]][title]" value="$forum[title]" maxlength="250" /></td>
+        </tr>
+        <tr class="tr1 vt">
+            <td class="td1">{$forum[limage1]}Meta Description：</td>
+            <td class="td2"><input type="text" class="input input_wb" name="forums[$forum[fid]][descrip]" value="$forum[metadescrip]" maxlength="250"/></td>
+        </tr>
+        <tr class="tr1 vt">
+            <td class="td1">{$forum[limage1]}Meta Keywords：</td>
+            <td class="td2"><input type="text" class="input input_wb" name="forums[$forum[fid]][keywords]" value="$forum[keywords]" maxlength="250"/></td>
+        </tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+        </tbody>
+<!--
+EOT;
+}print <<<EOT
+-->
+	</table>
+</div>
+<h2 class="h1">帖子阅读页</h2>
+<div class="admin_table mb10">
+	<table width="100%" cellspacing="0" cellpadding="0">
+        <tr class="tr1 vt">
+            <td class="td1">Title：</td>
+            <td class="td2"><input type="text" class="input input_wb" name="seoset[title][read]" value="{$db_seoset[title][read]}"  maxlength="250" /></td>
+            <td></td>
+        </tr>
+        <tr class="tr1 vt">
+            <td class="td1">Meta Description：</td>
+            <td class="td2"><input type="text" class="input input_wb" name="seoset[metaDescription][read]" value="{$db_seoset[metaDescription][read]}"  maxlength="250" /></td>
+            <td></td>
+        </tr>
+        <tr class="tr1 vt">
+            <td class="td1">Meta Keywords：</td>
+            <td class="td2"><input type="text" class="input input_wb" name="seoset[metaKeywords][read]" value="{$db_seoset[metaKeywords][read]}"  maxlength="250" /></td>
+            <td></td>
+        </tr>
+	</table>
+</div>
+<div class="tac mb10">
+	<span class="btn"><span><button type="submit">提 交</button></span></span>
+</div>
+</form>
+<script language="JavaScript">
+function cateopen(id,obj) {
+	var o = getObj('cate_' + id);
+	if (o == null) return;
+	if (o.style.display == 'none') {
+		o.style.display = '';
+		if (obj != null) obj.className = 'expand expand_b';
+	} else {
+		o.style.display = 'none';
+		if (obj != null) obj.className = 'expand expand_a';
+	}
+}
+</script>
+<!--
+EOT;
+include_once PrintEot('adminbottom');
+?>-->

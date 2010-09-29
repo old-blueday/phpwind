@@ -1,0 +1,419 @@
+<!--<?php
+include_once PrintEot('left');
+if(empty($action)){print <<<EOT
+-->
+<div class="nav3 mb10">
+  <ul class="cc">
+    <li class="current"><a href="$basename">积分日志</a></li>
+    <li><a href="$basename&action=sort">积分统计</a></li>
+<!--
+EOT;
+if(If_manager || $admin_gid == 3){print <<<EOT
+-->
+    <li><a href="$basename&action=backup">日志备份</a></li>
+<!--
+EOT;
+}print <<<EOT
+-->
+  </ul>
+</div>
+<div class="admin_info mb10">
+  <h3 class="h1"><b>提示信息</b></h3>
+  <div class="legend"><ol><li>积分日志:该功能详细记录某种积分的流通情况，帮助站长更加清晰地掌握论坛的积分状况！</li><li>积分统计:可以统计某个时间段内任何积分的流通总额</li></ol></div>
+</div>
+<script src="js/date.js"></script>
+<form action="$basename&" method="post">
+  <h2 class="h1">搜索</h2>
+  <div class="admin_table mb10">
+    <table width="100%" cellspacing="0" cellpadding="0">
+      <tr class="tr1 vt">
+        <td class="td1">用户名</td>
+        <td class="td2"><input class="input input_wa" type="text" name="username"/></td>
+      </tr>
+      <tr class="tr1 vt">
+        <td class="td1">积分</td>
+        <td class="td2">
+          <select name="ctype" class="select_wa">
+            <option value="">所有积分</option>
+<!--
+EOT;
+foreach($credit->cType as $key => $value){print <<<EOT
+-->
+            <option value="$key">$value</option>
+<!--
+EOT;
+}print <<<EOT
+-->
+          </select>
+        </td>
+      </tr>
+      <tr class="tr1 vt">
+        <td class="td1">日期</td>
+        <td class="td2 ">
+          <div class="input_img fl"><i onclick="this.nextSibling.onclick()" class="input_time" title="选择时间">选择时间</i><input type="text" name="stime" id="stime" onclick="ShowCalendar(this.id)" /></div><span class="p_lr_10 fl">至</span><div class="input_img fl mr20">
+          <i onclick="this.nextSibling.onclick()" class="input_time" title="选择时间">选择时间</i><input type="text" name="etime" id="etime" onclick="ShowCalendar(this.id)" /></div>
+        </td>
+      </tr>
+      <tr class="tr1 vt">
+        <td class="td1">操作</td>
+        <td class="td2">
+          <select name="optype" class="select_wa">
+            <option value="">所有操作</option>
+<!--
+EOT;
+foreach($lang['logtype']['creditlog'] as $key => $value){
+if(strpos($key,'_') === false){print <<<EOT
+-->
+            <option value="$key">&#62;&#62; $value</option>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+            <option value="$key"> &nbsp;|- $value</option>
+<!--
+EOT;
+}}print <<<EOT
+-->
+          </select>
+        </td>
+      </tr>
+      <tr class="tr1 vt">
+        <td class="td1">日志表</td>
+        <td class="td2">
+          <select name="clg" class="select_wa">
+            <option value="">全部</option>
+<!--
+EOT;
+foreach($clgtb as $key => $value){print <<<EOT
+-->
+            <option value="$value">$value</option>
+<!--
+EOT;
+}print <<<EOT
+-->
+          </select>
+        </td>
+      </tr>
+      <tr class="tr1 vt">
+      	<td class="td1">&nbsp;</td>
+        <td class="td2"><span class="btn2"><span>
+          <button type="submit"  value="提 交">提 交</button>
+          </span></span> </td>
+      </tr>
+    </table>
+  </div>
+</form>
+<form action="$basename&" method="post">
+  <input type="hidden" name="action" value="del">
+  <h2 class="h1">积分流通日志</h2>
+  <div class="admin_table mb10">
+    <table width="100%" cellspacing="0" cellpadding="0">
+      <tr class="tr2">
+        <td width="60">类型</td>
+        <td width="80">用户名</td>
+        <td width="50">积分</td>
+        <td width="50">流通值</td>
+        <td>描述</td>
+        <td width="100">操作日期</td>
+        <td width="90">IP</td>
+      </tr>
+<!--
+EOT;
+if (empty($logdb)) {print <<<EOT
+-->
+<tr><td class="p10" colspan="7"><div class="admin_tips">啊哦，没有你要的信息！</div></td></tr>
+<!--
+EOT;
+}else{
+foreach($logdb as $key => $value){
+!isset($lang['logtype']['creditlog'][$value[logtype]]) && $value[logtype] = 'other';
+print <<<EOT
+-->
+      <tr class="tr1 vt">
+        <td class="td2">{$lang[logtype][creditlog][$value[logtype]]}</td>
+        <td class="td2"><a href="u.php?uid=$value[uid]" target="_blank">$value[username]</a></td>
+        <td class="td2">{$credit->cType[$value[ctype]]}</td>
+        <td class="td2">$value[affect]</td>
+        <td class="td2">$value[descrip]</td>
+        <td class="td2">$value[adddate]</td>
+        <td class="td2">$value[ip]</td>
+      </tr>
+<!--
+EOT;
+}}print <<<EOT
+-->
+    </table>
+  </div>
+  <div class="cc">$pages</div>
+</form>
+<!--
+EOT;
+}elseif($action=='sort'){
+if(!empty($_POST['step'])){print <<<EOT
+-->
+<h2 class="h1">统计结果</h2>
+<div class="admin_table mb10">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <tr class="tr2 s3">
+      <td>积分名称</td>
+      <td>积分获得</td>
+      <td>积分消耗</td>
+      <td>总计出入</td>
+      <td>详情</td>
+    </tr>
+<!--
+EOT;
+foreach($sordb as $key=>$value){
+$sign = $value['sum'] > 0 ? '+' : '';
+print <<<EOT
+-->
+    <tr class="tr1 vt">
+      <td class="td2">{$credit->cType[$key]}</td>
+      <td class="td2">+{$value[add]}</td>
+      <td class="td2">$value[reduce]</td>
+      <td class="td2">{$sign}$value[sum]</td>
+      <td class="td2"><a href="$basename{$urladd}&ctype=$key">详情</td>
+    </tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+  </table>
+</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+<div class="nav3 mb10">
+  <ul class="cc">
+    <li><a href="$basename">积分日志</a></li>
+    <li class="current"><a href="$basename&action=sort">积分统计</a></li>
+<!--
+EOT;
+if(If_manager || $admin_gid == 3){print <<<EOT
+-->
+    <li><a href="$basename&action=backup">日志备份</a></li>
+    <!--
+EOT;
+}print <<<EOT
+-->
+  </ul>
+</div>
+<script src="js/date.js"></script>
+<form action="$basename&" method="post">
+  <input type="hidden" name="action" value="sort" />
+  <input type="hidden" name="step" value="3" />
+  <h2 class="h1">统计</h2>
+  <div class="admin_table mb10">
+    <table width="100%" cellspacing="0" cellpadding="0">
+      <tr class="tr1 vt">
+        <td class="td1">用户名</td>
+        <td class="td2"><input type="text" class="input input_wa" name="username" /></td>
+      </tr>
+      <tr class="tr1 vt">
+        <td class="td1">积分</td>
+        <td class="td2"><select name="ctype" class="select_wa">
+            <option value="">全部</option>
+<!--
+EOT;
+foreach($credit->cType as $key => $value){print <<<EOT
+-->
+            <option value="$key">$value</option>
+<!--
+EOT;
+}print <<<EOT
+-->
+          </select>
+        </td>
+      </tr>
+      <tr class="tr1 vt">
+        <td class="td1">操作</td>
+        <td class="td2"><select name="optype[]" size="16" class="select_wa" multiple="multiple">
+            <optgroup label="默认">
+            <option value="all">全部</option>
+<!--
+EOT;
+foreach($lang['logtype']['creditlog'] as $key => $value){
+if(strpos($key,'_') === false){print <<<EOT
+-->
+            </optgroup>
+            <optgroup label="$value">
+<!--
+EOT;
+}else{print <<<EOT
+-->
+            <option value="$key">$value</option>
+<!--
+EOT;
+}}print <<<EOT
+-->
+            </optgroup>
+          </select>
+        </td>
+      </tr>
+      <tr class="tr1 vt">
+        <td class="td1">日期</td>
+        <td class="td2"><input type="text" class="input input_wa" id="stime" onclick="ShowCalendar(this.id)" />
+          &nbsp;-&nbsp;
+          <input type="text" class="input input_wa" name="etime" id="etime" onclick="ShowCalendar(this.id)" />
+        </td>
+      </tr>
+      <tr class="tr1 vt">
+        <td class="td1">日志表</td>
+        <td class="td2"><select name="clg" class="select_wa">
+            <option value="">全部</option>
+<!--
+EOT;
+foreach($clgtb as $key => $value){print <<<EOT
+-->
+            <option value="$value">$value</option>
+<!--
+EOT;
+}print <<<EOT
+-->
+          </select>
+        </td>
+      </tr>
+    </table>
+  </div>
+  <div class="mb10 tac"><span class="btn"><span>
+    <button type="submit"  value="提 交">提 交</button>
+    </span></span></div>
+</form>
+<!--
+EOT;
+}elseif($action == 'backup'){print <<<EOT
+-->
+<div class="nav3 mb10">
+  <ul class="cc">
+    <li><a href="$basename">积分日志</a></li>
+    <li><a href="$basename&action=sort">积分统计</a></li>
+<!--
+EOT;
+if(If_manager || $admin_gid == 3){print <<<EOT
+-->
+    <li class="current"><a href="$basename&action=backup">日志备份</a></li>
+<!--
+EOT;
+}print <<<EOT
+-->
+  </ul>
+</div>
+<form action="$basename&" method="post" onsubmit="if(confirm('您确定要执行此操作吗?')){return true;}else{return false;}">
+  <input type="hidden" name="action" value="backup" />
+  <h2 class="h1">日志表状态</h2>
+  <div class="admin_table mb10">
+    <table width="100%" cellspacing="0" cellpadding="0">
+      <tr class="tr1 vt">
+        <td class="td1">表名</td>
+        <td class="td2">pw_creditlog</td>
+      </tr>
+      <tr class="tr1 vt">
+        <td class="td1">记录数</td>
+        <td class="td2">{$maindb[Rows]}</td>
+      </tr>
+      <tr class="tr1 vt">
+        <td class="td1">数据表大小</td>
+        <td class="td2">{$maindb[Data_length]} M</td>
+      </tr>
+      <tr class="tr1 vt">
+        <td class="td1">记录时间</td>
+        <td class="td2">$maindb[stime] -> $maindb[etime]</td>
+      </tr>
+      <tr class="tr1 vt">
+        <td class="td1">描述</td>
+        <td class="td2"> 
+<!--
+EOT;
+if($maindb['Rows'] > $maxlg){print <<<EOT
+-->
+          <font color="red"></font>
+<!--
+EOT;
+} else{print <<<EOT
+-->
+          <font color="blue"></font>
+<!--
+EOT;
+}print <<<EOT
+-->
+        </td>
+      </tr>
+      <tr class="tr1 vt">
+        <td class="td1">&nbsp;</td>
+        <td class="td2"><ul class="cc list_80 list_A">
+            <li>
+              <input type="radio" name="step" value="3" checked />
+              清空日志表</li>
+            <li>
+              <input type="radio" name="step" value="5" />
+              备份日志表</li>
+          </ul></td>
+      </tr>
+    </table>
+  </div>
+  <div class="mb10 tac"><span class="btn"><span>
+    <button type="submit"  value="提 交">提 交</button>
+    </span></span></div>
+</form>
+<form action="$basename&" method="post" onsubmit="if(confirm('您确定要执行此操作吗?')){return true;}else{return false;}" name="FORM">
+  <input type="hidden" name="action" value="backup" />
+  <input type="hidden" name="step" value="7" />
+  <h2 class="h1">备份日志表</h2>
+  <div class="admin_table mb10">
+    <table width="100%" cellspacing="0" cellpadding="0">
+      <tr class="tr2">
+		<td width="30"><span onclick="CheckAll(document.FORM)" class="cp">全选</span></td>
+        <td>表名</td>
+        <td>类型</td>
+        <td>记录数</td>
+        <td>数据表大小(M)</td>
+        <td>记录时间</td>
+      </tr>
+<!--
+EOT;
+if (empty($clgtb)) {print <<<EOT
+-->
+<tr><td class="p10" colspan="6"><div class="admin_tips">啊哦，没有你要的信息！</div></td></tr>
+<!--
+EOT;
+}else{
+foreach($clgtb as $key => $value){print <<<EOT
+-->
+      <tr class="tr1 vt">
+        <td class="td2"><input type="checkbox" name="selid[]" value="$key" onclick="pwJsCheck(this)" /></td>
+        <td class="td2">{$PW}$key</td>
+        <td class="td2"><!--
+EOT;
+if($key == 'creditlog'){print <<<EOT
+-->
+          <font color="red">主表</font>
+<!--
+EOT;
+} else {print <<<EOT
+-->
+          备份表
+<!--
+EOT;
+}print <<<EOT
+-->
+        </td>
+        <td class="td2">$value[Rows]</td>
+        <td class="td2">$value[Data_length]</td>
+        <td class="td2">$value[stime] -> $value[etime]</td>
+      </tr>
+<!--
+EOT;
+}}print <<<EOT
+-->
+    </table>
+  </div>
+  <div class="mb10 tac">
+    <span class="btn"><span>
+    <button type="submit" name="submit" value="删除">删除</button>
+    </span></span> </div>
+</form>
+<!--
+EOT;
+}include_once PrintEot('adminbottom');
+?>-->

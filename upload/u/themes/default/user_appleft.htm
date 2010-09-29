@@ -1,0 +1,104 @@
+<!--<?php
+print<<<EOT
+-->
+<style type="text/css">
+/*兼容:老版本-8.0beta-APP左右分栏样式*/
+.headTrgB{border-bottom:9px $uskin_appBgTop solid;}
+.main{background:url(u/themes/$uskin/images/$uskin_appBg) -1px 0 repeat-y;}
+.contUser{float:left;width:800px;}
+/*兼容：当站点有侧栏是，相册的内容页展现方式变更*/
+.sidePhoto{width:740px;;float:none;height:120px;}
+.galbum_photo .prePhoto{float:left;}
+.galbum_photo .nextPhoto{float:right;}
+.galbum_photo .g_listA{height:120px;float:left;}
+.galbum_photo .prePhoto,.galbum_photo .nextPhoto{width:20px;margin-top:33px;}
+.galbum_photo .prePhoto a,.galbum_photo .nextPhoto a{width:14px;height:38px;}
+.galbum_photo .prePhoto a{background-position:0 0;}
+.galbum_photo .prePhoto a:hover{ background-position:-40px 0;}
+.galbum_photo .nextPhoto a{background-position:-20px 0;}
+.galbum_photo .nextPhoto a:hover{background-position:-60px 0;}
+</style>
+<div class="menubar">
+	<div class="navB">
+		<ul class="one">
+<!--
+EOT;
+if($db_dopen){print <<<EOT
+-->
+			<li id="app_diary"><span class="btn_add fr"><span><button onClick="location.href='apps.php?q=diary&a=write';" type="button">写日志</button></span></span><img src="u/images/icon/log.png">&nbsp;<a href="apps.php?q=diary">日志</a></li>
+<!--
+EOT;
+}if($db_phopen){print <<<EOT
+-->
+			<li id="app_photos"><span class="btn_add fr"><span><button onClick="location.href='apps.php?q=photos&a=upload&job=flash';" type="button">传照片</button></span></span><img src="u/images/icon/albums.png">&nbsp;<a href="apps.php?q=photos">相册</a></li>
+<!--
+EOT;
+}print <<<EOT
+-->
+			<li id="app_write"><img src="u/images/icon/record.png">&nbsp;<a href="apps.php?q=write">记录</a></li>
+			<li id="app_article"><img src="u/images/icon/posts.png">&nbsp;<a href="apps.php?q=article">帖子</a></li>
+			<li id="app_activity"><img src="u/images/icon/activity.png">&nbsp;<a href="apps.php?q=activity">活动</a></li>
+<!--
+EOT;
+if($db_groups_open){print <<<EOT
+-->
+			<li id="app_groups"><img src="u/images/icon/groups.png">&nbsp;<a href="apps.php?q=groups">群组</a></li>
+<!--
+EOT;
+}if($db_share_open){print <<<EOT
+-->
+			<li id="app_share"><img src="u/images/icon/share.png">&nbsp;<a href="apps.php?q=share">分享</a></li>
+<!--
+EOT;
+}if(!trim($o_hot_groups,',') || strpos($o_hot_groups,','.$winddb[groupid].',') !== false || ($winddb[groupid] == -1 && strpos($o_hot_groups,','.$winddb[memberid].',') !== false)){
+	$popedom = true;
+}else{
+	$popedom = false;
+}
+if($o_hot_open && $popedom){print <<<EOT
+-->
+			<li id="app_hot"><img src="u/images/icon/hot.png">&nbsp;<a href="apps.php?q=hot">热榜</a></li>
+<!--
+EOT;
+}print <<<EOT
+-->
+		</ul>
+<!--
+EOT;
+if($app_array && $db_appifopen){print <<<EOT
+-->
+		<ul>
+<!--
+EOT;
+foreach ($app_array as $key => $value) {print <<<EOT
+-->
+				<li><img src="$db_server_url/images/icon/s{$value[appid]}.png"/><a href="apps.php?id=$value[appid]" >{$value[appname]}</a></li>
+<!--
+EOT;
+}print <<<EOT
+-->
+		</ul>
+<!--
+EOT;
+}print <<<EOT
+-->
+	</div>
+	<div class="p10 tar">
+<!--
+EOT;
+if ($db_appifopen) {print <<<EOT
+-->
+		<a href="u.php?a=myapp">添加</a>&nbsp;&nbsp;|
+<!--
+EOT;
+}print <<<EOT
+-->
+		&nbsp;&nbsp;<a href="u.php?a=myapp&action=my">管理</a>
+	</div>
+</div>
+<script language="JavaScript">
+setCurrent('app_$q','','current');
+</script>
+<!--
+EOT;
+?>

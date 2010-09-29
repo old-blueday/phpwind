@@ -1,0 +1,128 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>PHPWind用户安装说明书</title>
+<link href="phpwind_help.css" type="text/css" rel="stylesheet" />
+
+</head>
+<body>
+<div id="wrap">
+    <div id="wrap2">
+        
+		<script language="JavaScript" src="header.js"></script> 
+        <div id="main">   
+		
+ <div class="place">您所在的位置：<a href="index.html">PHPWind 安装说明</a> > <A href="install.htm">安装指南</a> > <A href="install_steps.htm">论坛安装流程</A> </div>
+
+			<div id="left">
+			<!--左菜单栏 begin-->
+			  				<UL>
+		         <LI><A href="index.htm">简介</A></LI>
+
+				  <LI><A href="install.htm">安装指南</a>
+				    <UL>
+					<LI><A href="install.htm">系统环境说明</A></LI>
+					<LI><A href="install_steps.htm">程序安装流程</A></LI>
+					<LI><A href="install_files.htm">文件及目录结构</A></LI>
+					<LI><A href="upgrade.htm">程序升级流程</A></LI>
+					<LI><A href="upgrades_change.htm">版本说明</A></LI>
+					<LI><A href="install_space.htm">安装集成包介绍</A></LI>
+					</UL>
+				 </LI>
+				
+				 <LI><A href="basic.htm">功能使用</A></LI> 
+				  
+				 <LI><A href="basic_que.htm">常见问题</A></LI>
+				  
+				 <LI><A href="styles.htm">高级应用</a>
+                    <UL>
+				    <LI><a href="styles.htm">界面风格与模板定制</a></LI>
+                    <LI><a href="Sub-forum.htm">使用PHPWind分论坛</a></LI>
+					<LI><A href="plugins.htm">插件相关</A></LI>
+					<LI><a href="shifting.htm">论坛系统的搬迁和转移</a></LI>
+					<LI><A href="tools.htm">转换工具</A></LI>
+				    </UL>
+				  </LI>
+				  <LI><A href="about_seo_7items.htm">SEO技巧</a>
+                    <UL>
+				    <LI><a href="about_seo_7items.htm">搜索引擎优化</a></LI>
+                    <LI><a href="about_lable_seo.htm">网页标题收录</a></LI>
+					<LI><A href="urlrewrite.htm">伪静态的使用</A></LI>
+					</UL>
+				  </LI>
+			
+			</UL>
+				<!--左菜单栏 end-->
+            </div>
+			
+       		
+          		<div class="viewnew">
+<h3 style="text-align:center">安装详细流程</h3>
+<p class="gray" style=" text-align:center; text-indent:0;font-size:12px; border-bottom:1px dotted #d7d7d7">
+
+<br>
+<h5>第一步：确认系统</h5>
+<p>请确认您空间或本机的操作系统，确认已经安装PHP+Mysql运行环境。否则，请参照<a href="install.htm">【系统环境说明】</a>。
+
+<h5>第二步：上传文件</h5>
+<p>解压安装包，并将upload目录下的所有文件拷贝到根目录。
+<br>安装包文件说明：index.htm为安装相关说明；docs目录为用户使用相关文档及最新版的功能更新说明；upload目录为程序文件。 
+<br>注意：如果您使用的是Unix、Linux等非Windows性质的空间、服务器，上传文件时，请确认以下文件属性为777。（上传失败请参见）
+<ul><li>attachment
+<li>attachment/cn_img
+<li>attachment/photo
+<li>attachment/thumb
+<li>attachment/upload
+<li>attachment/mini
+<li>data
+<li>data/bbscache
+<li>data/groupdb
+<li>data/guestcache
+<li>data/tplcache
+<li>data/tmp
+<li>htm_data
+<li>template
+<li>template/admin
+<li>template/wind
+</ul>
+
+<h5>第三步：执行安装</h5>
+<p>请在浏览器中运行 install.php,即 http://您的论坛/install.php 安装程序，填入安装相关信息与资料，完成安装！使用论坛的用户名密码登陆后台进行管理和发布操作!!<B>注意根据实际情况填入数据库信息和创始人信息。</B>
+<table> 
+  <tr><td></td>
+      <td>本地安装</td>
+	  <td>空间安装</td>
+  </tr>
+  <tr><td>数据库服务器</td>
+      <td>localhost </td>
+	  <td>空间IP（or localhost.请咨询空间商）</td> 
+  </tr>
+  <tr><td>数据库用户名</td> 
+      <td>本地数据库用户名</td>
+	  <td>空间数据库用户名（请咨询空间商）</td>	
+  </tr>      
+  <tr><td>数据库密码</td>
+  	  <td>本地数据库密码</td>
+	  <td>空间数据库密码（请咨询空间商）</td>
+  </tr>
+  <tr><td>数据库名 </td>
+	  <td>phpwind（可以随意） </td>
+	  <td>空间数据库名（请咨询空间商）</td>	
+  </tr>
+  <tr><td>数据库类型</td>
+	  <td>Mysql (若支持可以选择mysqli)</td>
+	  <td>Mysql (若支持可以选择mysqli)</td>
+  </tr>         
+</table>
+
+<p>
+<br>如果您是第一次接触,可以看下<a href="http://www.phpwind.net/read-htm-tid-836771-fpage-2.html">PHPWind Forum V7.5 安装图文教程</a> 也可以访问<a href="http://faq.phpwind.net/show_help.php?help_id=334"> PHPWind FAQ</a>
+<br>新手建站推荐<a href="http://www.phpwind.com/easysite/index.php">[建站指南]</a>：10分钟建站教程!
+          	</div>
+      </div>
+      <div class="clear"></div>   
+	  <script language="JavaScript" src="footer.js"></script>
+</div>
+</body>
+</html>

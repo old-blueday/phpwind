@@ -1,0 +1,99 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>PHPWind用户安装说明书</title>
+<link href="phpwind_help.css" type="text/css" rel="stylesheet" />
+
+</head>
+<body>
+<div id="wrap">
+    <div id="wrap2">
+        
+		<script language="JavaScript" src="header.js"></script> 
+        <div id="main">   
+		
+ <div class="place">您所在的位置：<a href="index.html">PHPWind 安装说明</a> > <A href="styles.htm">高级应用</a> > <a href="Sub-forum.htm">使用PHPWind分论坛</a> </div>
+
+			<div id="left">
+			<!--左菜单栏 begin-->
+			  				<UL>
+		         <LI><A href="index.htm">简介</A></LI>
+
+				  <LI><A href="install.htm">安装指南</a>
+				    <UL>
+					<LI><A href="install.htm">系统环境说明</A></LI>
+					<LI><A href="install_steps.htm">程序安装流程</A></LI>
+					<LI><A href="install_files.htm">文件及目录结构</A></LI>
+					<LI><A href="upgrade.htm">程序升级流程</A></LI>
+					<LI><A href="upgrades_change.htm">版本说明</A></LI>
+					<LI><A href="install_space.htm">安装集成包介绍</A></LI>
+					</UL>
+				 </LI>
+				
+				 <LI><A href="basic.htm">功能使用</A></LI> 
+				  
+				 <LI><A href="basic_que.htm">常见问题</A></LI>
+				  
+				 <LI><A href="styles.htm">高级应用</a>
+                    <UL>
+				    <LI><a href="styles.htm">界面风格与模板定制</a></LI>
+                    <LI><a href="Sub-forum.htm">使用PHPWind分论坛</a></LI>
+					<LI><A href="plugins.htm">插件相关</A></LI>
+					<LI class="activeA"><a href="shifting.htm">论坛系统的搬迁和转移</a></LI>
+					<LI><A href="tools.htm">转换工具</A></LI>
+				    </UL>
+				  </LI>
+				  <LI><A href="about_seo_7items.htm">SEO技巧</a>
+                    <UL>
+				    <LI><a href="about_seo_7items.htm">搜索引擎优化</a></LI>
+                    <LI><a href="about_lable_seo.htm">网页标题收录</a></LI>
+					<LI><A href="urlrewrite.htm">伪静态的使用</A></LI>
+					</UL>
+				  </LI>
+			
+			</UL>
+				<!--左菜单栏 end-->
+            </div>
+			
+       		
+          		<div class="viewnew">
+<h3 style="text-align:center">使用PHPWind分论坛</h3><br>
+<p class="gray" style=" text-align:center; text-indent:0;font-size:12px; border-bottom:1px dotted #d7d7d7">
+
+<p>有时候为了更好地优化论坛，让会员们能够更加轻松地使用论坛，需要使用分论坛的功能。这里我们将详细叙述IIS下如何实现分论坛。
+<p><b>请务必确定：</b>
+<br>1.主论坛与分论坛都已安装完成（安装方法请参见安装指南）
+<br>2.分论坛域名已解析到服务器。本文以*.phplove.com解析到主论坛所在服务器IP:61.145.118.219为例。
+
+<br>确认OK，然后进入主论坛的后台进行以下操作。
+
+<p><b>第一步 开启主论坛的二级域名功能</b>
+<br>设置位置：【后台】->【核心】->【常规设置】->【全局参数】,"二级目录/域名功能"后面选择'二级域名'访问。
+
+<p><b>第二步 设置cookie的有效域名</b>
+<br>设置位置：【后台】->【核心】->【常规设置】->【全局参数】，"Cookie 作用域"。就是把主机头部分抠出来，如将 .phplove.com填写到这里，提交。（请根据实际情况进行操作） 注意：请务必填写，否则将出现分论坛现登录不同步现象。 
+
+<p><b>第三步 版块设置 </b>
+<br>如，要增加分论坛winner.phplove.com，首先要增加IIS上的绑定。打开IIS管理器，把要设置的分论坛二级域名添加上去，也就是常说的把子域名绑定到目录。（同样，在Apache环境下把多个域名指定到同一网站就行）<a href="http://faq.phpwind.net/show_help.php?help_id=289">【视频教程】</a>
+<br>1.选择主论坛->【属性】（本主论坛名为：分论坛演示main。请根据实际情况操作），确认IP地址合TCP端口，一般情况下不做改动。
+<br>2.选择【高级】->【添加】，添加您要的分论坛名。本例添加了winner.phplove.com。
+设置完毕后，通过winner.phplove.com就可以访问到分论坛了。 
+
+<p><b>第四步 添加分类板块并进行设置</b>
+<br><font color="blue">注：添加分类板块和添加论坛的操作请参见http://faq.phpwind.net,这里将不在重复叙述。 </font>添加板块完成后，【后台】->【板块】->【板块管理】->【编辑】，对相应的分论坛板块进行设置。如图所示winner.phplove.com在分类板块里的设置： 
+<br>至此，设置完毕。 
+<p><font color="blue">请务必注意以下两点：
+<br>1：分论坛设置不需要修改文件，与网络上流传的方式（通过复制文件或文件夹，并修改D_P等代码）不同，二级域名访问论坛的无须改动任何代码。
+<br>2：一定要注意设置cookie的有效域名，以确保支持绑定多域名和目录，实现同步登陆和退出的功能。</font>
+<br>主论坛演示地址：<a href="http://bbs.phplove.com ">http://bbs.phplove.com</a>
+<br>分论坛演示地址：
+<br>winner:<a href="http://winner.phplove.com">winner:http://winner.phplove.com</a> 
+<br>yuling:<a href="http://yuling.phplove.com">yuling:http://yuling.phplove.com</a> 
+</p>
+          	</div>
+      </div>
+      <div class="clear"></div>   
+	  <script language="JavaScript" src="footer.js"></script>
+</div>
+</body>

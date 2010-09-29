@@ -1,0 +1,333 @@
+<!--<?php print <<<EOT
+-->
+<div id="breadCrumb">
+		<img src="$imgpath/$stylepath/thread/home-old.gif" align="absmiddle" />&nbsp;<a href="$db_bfn" title="$db_bbsname">$db_bbsname</a><em>&gt;</em>管理选项
+</div>
+<div id="pw_content">
+<!--
+EOT;
+if($action=='banuser'){print <<<EOT
+-->
+<form action="masingle.php?action=banuser" method="post">
+<input type="hidden" name="verify" value="$verifyhash" />
+<div class="t">
+<table width="100%" cellspacing="0" cellpadding="0" align="center">
+	<tr><th class="h" colspan="2">会员禁言</th></tr>
+	<tr class="tr3"><td width="15%"  class="tar">禁言对象:</td>
+		<td>
+<!--
+EOT;
+if($userdb['anonymous'] && !$isGM && !pwRights($isBM,'anonyhide')){ print <<<EOT
+-->
+			$db_anonymousname
+<!--
+EOT;
+}else{ print <<<EOT
+-->
+			$userdb[username]
+<!--
+EOT;
+} print <<<EOT
+-->
+		</td>
+	</tr>
+	<tr class="tr3"><td class="tar">禁言范围:</td>
+	<td><input type="radio" name="range" value="0" checked />{$forum[$fid][name]}
+<!--
+EOT;
+if($isGM || pwRights($isBM,'banuser')==2){print <<<EOT
+-->
+	<input type="radio" name="range" value="1" />全局禁言
+	<input type="checkbox" name="banip" value="1" />禁止该 IP
+<!--
+EOT;
+}print <<<EOT
+-->
+	</td></tr>
+	<tr class="tr3"><td class="tar">禁言类型:</td>
+		<td><input type="radio" name="type" value="1" checked />定期禁言
+<!--
+EOT;
+if($isGM || pwRights($isBM,'bantype')){print <<<EOT
+-->
+			<input type="radio" name="type" value="2" />永久禁言
+<!--
+EOT;
+}print <<<EOT
+-->
+		</td>
+	</tr>
+	<tr class="tr3"><td class="tar">禁言时间:</td>
+		<td><input class="input" type="text" name="limit" value="1" size="5" /> 天(最大天数<font color=blue>$pwBanMax</font>天)</td>
+	</tr>
+	<tr class="tr3"><td class="tar">消息通知:</td>
+		<td><input type="radio" name="ifmsg" value="1" checked />开启
+			<input type="radio" name="ifmsg" value="0" />关闭
+		</td>
+	</tr>
+	<tr class="tr3 vt">
+		<td class="tar">操作原因:</td>
+		<td><textarea name="atc_content" style="width:300px;height:124px"></textarea>
+			<select name="" size="8" multiple onchange="this.form.atc_content.value=this.value">
+				<option value="">自定义</option>
+				<option value="">-------</option>
+				$reason_sel
+			</select>
+
+		</td>
+	</tr>
+	<tr><td>&nbsp;</td><td style="padding:5px 6px;"><input class="btn" type="submit" value="提 交" /> <a class="btn3" style="cursor:pointer;" type="button" onclick="javascript:history.go(-1)" />返 回</a></td></tr>
+</table></div>
+<input type="hidden" name="fid" value="$fid" />
+<input type="hidden" name="tid" value="$tid" />
+<input type="hidden" name="pid" value="$pid" />
+<input type="hidden" name="page" value="$page" />
+<input type="hidden" name="step" value="3" />
+</form>
+<!--
+EOT;
+}elseif($action=='shield'){print <<<EOT
+-->
+<form action="masingle.php?action=shield" method="post">
+<input type="hidden" name="verify" value="$verifyhash" />
+<div class="t">
+<table width="100%" cellspacing="0" cellpadding="0" align="center">
+	<tr><th class="h" colspan="2">单帖屏蔽</th>
+	</tr>
+	<tr class="tr3"><td width="15%" class="tar">屏蔽对象:</td>
+<!--
+EOT;
+if($readdb['anonymous'] && !$isGM && !pwRights($isBM,'anonyhide')){ print <<<EOT
+-->
+		<td>$db_anonymousname</td>
+<!--
+EOT;
+}else{ print <<<EOT
+-->
+		<td>$readdb[username]</td>
+<!--
+EOT;
+} print <<<EOT
+-->
+	</tr>
+	<tr class="tr3"><td class="tar">操作类型:</td>
+		<td><input type="radio" name="step" value="3" $check_Y />单帖屏蔽
+			<input type="radio" name="step" value="5" $check_N />取消屏蔽
+		</td>
+	</tr>
+	<tr class="tr3"><td class="tar">消息通知:</td>
+		<td><input type="radio" name="ifmsg" value="1" checked />开启
+			<input type="radio" name="ifmsg" value="0" />关闭
+		</td>
+	</tr>
+	<tr class="tr3 vt">
+		<td class="tar">操作原因:</td>
+		<td><textarea name="atc_content" style="width:300px;height:124px"></textarea>
+		<select name="" size="8" multiple onchange="this.form.atc_content.value=this.value">
+				<option value="">自定义</option>
+				<option value="">-------</option>
+				$reason_sel
+			</select>
+
+		</td>
+	</tr>
+	<tr><td></td><td style="padding:5px 6px;"><input class="btn" type="submit" value="提 交" /> <a class="btn3" style="cursor:pointer;" type="button" onclick="javascript:history.go(-1)" />返 回</a></td></tr>
+</table></div>
+<input type="hidden" name="fid" value="$fid" />
+<input type="hidden" name="tid" value="$tid" />
+<input type="hidden" name="pid" value="$pid" />
+<input type="hidden" name="page" value="$page" />
+</form>
+<!--
+EOT;
+}elseif($action=='remind'){ print <<<EOT
+-->
+<form action="masingle.php?action=remind" method="post">
+<input type="hidden" name="verify" value="$verifyhash" />
+<div class="t">
+<table width="100%" cellspacing="0" cellpadding="0" align="center">
+	<tr><th class="h" colspan="2">帖子管理提示</th></tr>
+	<tr class="tr3"><td width="15%" class="tar">提醒对象:</td>
+<!--
+EOT;
+if($readdb['anonymous'] && !$isGM && !pwRights($isBM,'anonyhide')){ print <<<EOT
+-->
+		<td>$db_anonymousname</td>
+<!--
+EOT;
+}else{ print <<<EOT
+-->
+		<td>$readdb[username]</td>
+<!--
+EOT;
+} print <<<EOT
+-->
+	</tr>
+	<tr class="tr3"><td class="tar">操作类型:</td>
+		<td><input type="radio" name="step" value="3" checked />提醒管理
+			<input type="radio" name="step" value="5" />取消提醒
+		</td>
+	</tr>
+	<tr class="tr3"><td class="tar">消息通知:</td>
+		<td><input type="radio" name="ifmsg" value="1" checked />开启
+			<input type="radio" name="ifmsg" value="0" />关闭
+		</td>
+	</tr>
+	<tr class="tr3 vt"><td class="tar">操作原因:</td>
+		<td><textarea name="atc_content" style="width:300px;height:124px">$remindinfo</textarea><select name="" size="8" multiple onchange="this.form.atc_content.value=this.value">
+				<option value="">自定义</option>
+				<option value="">-------</option>
+				$reason_sel
+			</select>
+		</td>
+	</tr>
+	<tr><td></td><td style="padding:5px 6px;"><input class="btn" type="submit" value="提 交" /> <a class="btn3" style="cursor:pointer;" type="button" onclick="javascript:history.go(-1)" />返 回</a></td></tr>
+</table></div>
+<input type="hidden" name="fid" value="$fid" />
+<input type="hidden" name="tid" value="$tid" />
+<input type="hidden" name="pid" value="$pid" />
+<input type="hidden" name="page" value="$page" /></form>
+<!--
+EOT;
+}elseif($action=='delatc'){print <<<EOT
+-->
+<form action="masingle.php?action=delatc" method="post">
+<input type="hidden" name="verify" value="$verifyhash" />
+<input type="hidden" name="tid" value="$tid" />
+<input type="hidden" name="fid" value="$fid" />
+<input type="hidden" name="step" value="3" />
+<!--
+EOT;
+foreach($threaddb as $key=>$val){print <<<EOT
+-->
+<input type="hidden" name="selid[]" value="$val[pid]" />
+<!--
+EOT;
+}print <<<EOT
+-->
+<div class="t">
+<table width="100%" cellspacing="0" cellpadding="0">
+	<tr><th class="h" colspan="2">删除回复操作</th></tr>
+	<tr class="tr3"><td width="15%" class="tar">删除数量:</td><td>$count 篇</td></tr>
+	<tr class="tr3"><td class="tar">扣除积分:</td>
+		<td><input type="radio" name="ifdel" value="1" checked />开启
+			<input type="radio" name="ifdel" value="0" />关闭
+		</td>
+	</tr>
+	<tr class="tr3"><td class="tar">消息通知:</td>
+		<td><input type="radio" name="ifmsg" value="1" checked />开启
+			<input type="radio" name="ifmsg" value="0" />关闭
+		</td>
+	</tr>
+	<tr class="tr3 vt"><td class="tar">操作原因:</td>
+		<td><textarea name="atc_content" style="width:300px;height:124px"></textarea><select name="" size="8" multiple onchange="this.form.atc_content.value=this.value">
+				<option value="">自定义</option>
+				<option value="">-------</option>
+				$reason_sel
+			</select>
+
+		</td>
+	</tr>
+	<tr><td></td><td style="padding:5px 6px;"><input class="btn" type="submit" value="提 交" /> <a class="btn3" style="cursor:pointer;" type="button" onclick="javascript:history.go(-1)" />返 回</a></td></tr>
+</table></div></form>
+<!--
+EOT;
+}elseif($action=='pingcp'){print <<<EOT
+-->
+<form action="masingle.php?action=$action" method="post">
+<input type="hidden" name="verify" value="$verifyhash" />
+<input type="hidden" name="tid" value="$tid" />
+<input type="hidden" name="pid" value="$pid" />
+<input type="hidden" name="fid" value="$fid" />
+<input type="hidden" name="page" value="$page" />
+<input type="hidden" name="step" value="2" />
+<div class="t">
+<table width="100%" cellspacing="0" cellpadding="0">
+	<tr><th class="h" colspan="5">管理评分记录 (注:只允许更改评分理由，不允许删除评分记录)</th>
+	<tr class="tr3" align="center">
+		<td width="7%">选择</td>
+		<td width="12%">操作者</td>
+		<td width="12%">积分情况</td>
+		<td width="15%">评分时间</td>
+		<td>评分理由</td>
+	</tr>
+<!--
+EOT;
+foreach($pingdb as $val){
+$disabled='';
+$val['ifable'] && $disabled='disabled';
+print<<<EOT
+-->
+	<tr class="tr3" align="center">
+		<td><input type="checkbox" id="s_$val[id]" name="selid[]" value="$val[id]" onclick="editrecord('$val[id]','$val[record]')" $disabled></td>
+		<td>$val[pinger]</td>
+		<td>$val[name] $val[point]</td>
+		<td>$val[pingdate]</td>
+		<td><span id="ping_$val[id]">$val[record]</span></td>
+	</tr>
+<!--
+EOT;
+}print<<<EOT
+-->
+	<tr align="center"><td style="padding:.5em 5em;" colspan="5"><input class="btn" type="submit" value="提 交" /> <a class="btn3" style="cursor:pointer;" type="button" onclick="javascript:history.go(-1)" />返 回</a></td></tr>
+</table></div></form>
+<script language="JavaScript">
+function editrecord(id,record){
+	var s = getObj('s_' + id);
+	var r = getObj('ping_' + id);
+	if (s.checked == true) {
+		r.innerHTML = '<input type="text" name="record[' + id + ']" size="55" value="' + record + '">';
+	} else {
+		r.innerHTML = record;
+	}
+
+}
+</script>
+<!--
+EOT;
+} elseif ($action == 'inspect') {print <<<EOT
+-->
+<form action="masingle.php?action=$action" method="post">
+<input type="hidden" name="verify" value="$verifyhash" />
+<input type="hidden" name="step" value="2">
+<input type="hidden" name="fid" value="$fid" />
+<input type="hidden" name="tid" value="$tid" />
+<input type="hidden" name="pid" value="$pid" />
+<input type="hidden" name="page" value="$page" />
+<input type="hidden" name="p" value="$p" />
+<div class="t">
+<table width="100%" cellspacing="0" cellpadding="0">
+	<tr><th class="h" colspan="2">版主已阅操作</th></tr>
+	<tr class="tr3"><td class="tar"  width="21%">消息通知:</td>
+		<td><input type="radio" name="ifmsg" value="1" checked />开启
+			<input type="radio" name="ifmsg" value="0" />关闭
+		</td>
+	</tr>
+	<tr class="tr3 vt"><td class="tar">操作原因:</td>
+		<td><textarea name="atc_content" style="width:300px;height:124px"></textarea><select name="" size="8" multiple onchange="this.form.atc_content.value=this.value">
+				<option value="">自定义</option>
+				<option value="">-------</option>
+				$reason_sel
+			</select>
+		</td>
+	</tr>
+	<tr><td></td><td style="padding:5px 6px;">
+<!--
+EOT;
+if ($iftypeavailable == 1) {print <<<EOT
+-->
+	<input type="checkbox" name="nextto" value="type">&nbsp;转移主题分类
+<!--
+EOT;
+}print <<<EOT
+--><input class="btn" type="submit" value="提 交" /> <a class="btn3" style="cursor:pointer;" type="button" onclick="javascript:history.go(-1)" />返 回</a></td></tr>
+</table></div>
+</form>
+<!--
+EOT;
+}print <<<EOT
+-->
+</div>
+<!--
+EOT;
+?>-->

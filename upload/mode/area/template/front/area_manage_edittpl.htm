@@ -1,0 +1,55 @@
+<!--
+<?php 
+print <<<EOT
+-->
+<form action="$baseUrl&action=edittpl&alias=$alias" method="post" >
+<input type="hidden" name="step" value="2" />
+<div><!--切换div-->
+	<div class="pwC_content_a">
+		<div class="admin_table">
+			<table width="100%" cellpadding="0" cellspacing="0">
+				<tr class="tr1"><td class="td2">
+				<textarea name="tagcode" style="width:98%;height:360px;line-height:1.4;" >$pieceCode</textarea>
+				</td></tr>
+			</table>
+		</div>
+	</div>
+	
+	<div class="tac p10" style="text-align:center;padding-top:0;">
+		<div class="fl"><span class="bt2" style="position:absolute;"><span><button type="button" onclick="consoleMode()">显示所有模块</button></span></span></div><span class="btn2"><span><button type="submit">提交</button></span></span>
+	</div>
+</div>
+</form>
+<script>
+function consoleMode(){
+    var panel = parent.document.getElementById('consolePanel'), css = parent.document.getElementById('consoleMode');
+	if(css){
+		css.disabled = false;
+	}else{
+		css = parent.document.createElement('link');
+		css.id = 'consoleMode';
+		css.type = 'text/css';
+		css.href= 'mode/area/images/consolePanel.css?100920';
+		css.rel = 'stylesheet';
+		parent.document.body.appendChild(css);
+	}
+	if(panel){
+		panel.style.display = 'block';
+	}else{
+		panel = parent.document.createElement('div');
+		panel.id = 'consolePanel';
+		panel.innerHTML = '此状态为所有模块显示，便于查找隐藏模块。 <span class="bt2"onclick="endConsoleMode()"><span><button type="button">关闭所有显示模块</button></span></span> 或者刷新本页面即可关闭';
+		parent.document.body.appendChild(panel);
+	}
+}
+parent.endConsoleMode = function(){
+    var panel = parent.document.getElementById('consolePanel'), css = parent.document.getElementById('consoleMode');
+		panel && (panel.style.display = 'none');
+		css && (css.disabled = true);
+}
+</script>
+
+<!--
+EOT;
+?>
+-->

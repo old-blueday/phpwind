@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<mode>
+	<modename>个人中心</modename>
+	<descrip>本模式适用于会员互动性强的站点使用</descrip>
+	<ifpwcache>567</ifpwcache>
+	<pages>
+		<item>
+			<name>首页</name>
+			<template>index</template>
+			<scr>index</scr>
+		</item>
+		<item>
+			<name>动态</name>
+			<template>m_home</template>
+			<scr>m_home</scr>
+		</item>
+	</pages>
+</mode>

@@ -1,0 +1,995 @@
+<!--<?php
+include_once PrintEot('left');
+if (empty($action)) {print <<<EOT
+-->
+<div class="nav3 mb10 cc">
+    <ul class="fl mr20">
+        <li class="current"><a href="$basename">用户组设置</a></li>
+    </ul>
+	<div class="mt5 fl">
+		<a href="$basename&action=batch" class="mr10">导入导出</a>
+		<a href="$basename&action=help" class="mr10">详细帮助</a>
+	</div>
+</div>
+<div class="admin_info mb10">
+	<h3 class="h1"><b>提示信息</b></h3>
+    <div class="legend">
+        <a onClick="javascript:scroller('level_1', 800);" class="b cp">会员组</a>:级别按照会员发的帖子数自动进行级别判断并更新。<br />
+<a onClick="javascript:scroller('level_2', 800);" class="b cp">系统组</a>:属于站点管理层，系统组成员由站点管理员设定，管理员可以在 <a href="$admin_file?adminjob=setuser">会员管理</a> 内编辑用户组成员。<br />
+<a onClick="javascript:scroller('level_3', 800);" class="b cp">特殊组</a>:可以设置管理权限的组别，区别于系统组，特殊组可以进行出售<br />
+<a onClick="javascript:scroller('level_4', 800);" class="b cp">默认组</a>:默认组别不可删除，当其他组别未设置权限时，则使用该默认权限<br />
+注:批量添加的用户组权限设置为默认，需要单独进行权限编辑。
+    </div>
+</div>
+<form action="$basename&" method="post">
+<input type="hidden" name="action" value="menedit" />
+<a name="level_1" id="level_1"></a>
+<h2 class="h1"><span class="mr20"><b>会员组编辑</b></span><span class="linka"><a href="javascript:void(0)" class="mr10" title="收起" onclick="showGroup('memBody',0)">[收起]</a><a href="javascript:void(0)" title="展开" onclick="showGroup('memBody',1)">[展开]</a></span></h2>
+<div class="admin_table mb10">
+	<table cellpadding="0" cellspacing="0" width="100%" style="table-layout:fixed;">
+   		<tr class="tr2 vt">
+        	<td style="width:60px;">&nbsp;</td>
+            <td width="180">头衔</td>
+            <td width="200">等级图片号</td>
+            <td width="105">升级点数需求</td>
+            <td>操作</td>
+        </tr>
+		<tbody id="memBody">
+<!--
+EOT;
+foreach ($gdb['member'] as $member) {
+$key = $member[gid];
+$j_url = EncodeUrl("$basename&action=delgroup&delid=$key");
+print <<<EOT
+-->
+        <tr class="tr1">
+        	<td class="td2">组ID$member[gid]</td>
+            <td class="td2"><input type="text" class="input input_wa" name="memtitle[$key]" value="$member[grouptitle]" onchange="pwJsCheck(this,true)" /></td>
+            <td class="td2">
+            	<input type="hidden" class="input input_wd mr10" name="mempic[$key]" value="$member[groupimg]" onchange="getImg(this)" />
+            	<img id="img_member_{$member[gid]}" src="$imgpath/$stylepath/level/$member[groupimg].gif" title="选择等级图片" onclick="showImg(this)" style="cursor:pointer" align="absmiddle" />
+             </td>
+            <td class="td2"><input type="text" class="input input_wc" name="mempost[$key]" value="$member[grouppost]" onchange="pwJsCheck(this,true)" /></td>
+            <td class="td2">
+            	<a href="javascript:;" class="mr20" onclick="location.href='$basename&action=editgroup&gid=$key';return false;">[编辑]</a>
+            	<a href="javascript:;" onclick="return checkgroupset('$j_url')">[删除]</a>
+            </td>
+        </tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+		</tbody>
+        <tbody id="memTable">
+            <tr><td colspan="5"><!--a name="add1"></a--></td></tr>
+            <tr id="addmem" class="tr1 td_bgA" style="display:none">
+            	<td class="td2"><a href="javascript:;" onclick="addRecord('addmem','memTable')"><i class="expand expand_c" style="margin:4px 2px 0 0;"></i>添加</a></td>
+                <td class="td2"><input type="text" class="input input_wa" name="memtitle[add][]" /></td>
+				<td class="td2">
+                	<input type="hidden" class="input input_wd mr10" name="mempic[add][]" value="" onchange="getImg(this)" />
+                	<img id="img_member_{$member[gid]}" src="$imgpath/$stylepath/level/6.gif" title="选择等级图片" onclick="showImg(this)" style="cursor:pointer" align="absmiddle" />
+                </td>
+                <td class="td2"><input name="mempost[add][]" type="text" class="input input_wc" /></td>
+				<td class="td2"><span class="mr20" >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                <a href="javascript:;" class="mr20" onclick="delRecord('addmem','memTable',this)">[删除]</a></td>
+            </tr>
+            <tr class="tr1 td_bgA">
+            	<td class="td2"><a href="javascript:;" onclick="addRecord('addmem','memTable')"><i class="expand expand_c" style="margin:4px 2px 0 0;"></i>添加</a></td>
+                <td class="td2"><input type="text" class="input input_wa" name="memtitle[add][]" /></td>
+				<td class="td2">
+                	<input type="hidden" class="input input_wd mr10" name="mempic[add][]" value="" onchange="getImg(this)" />
+                	<img id="img_member_new" src="$imgpath/$stylepath/level/6.gif" title="选择等级图片" onclick="showImg(this)" style="cursor:pointer" align="absmiddle" />
+                </td>
+                <td class="td2"><input name="mempost[add][]" type="text" class="input input_wc" /></td>
+				<td class="td2"><span class="mr20" >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                <a href="javascript:;" onclick="delRecord('addmem','memTable',this)">[删除]</a></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<div class="mb10 tac"><span class="btn"><span><button type="submit" onfocus="blur();">提 交</button></span></span></div></form>
+<form action="$basename&" method="post">
+<input type="hidden" name="action" value="sysedit" />
+<a name="level_2" id="level_2"></a>
+<h2 class="h1"><span class="mr20"><b>系统组编辑</b></span><span class="linka"><a href="javascript:void(0)" class="mr10" title="收起" onclick="showGroup('sysBody',0)">[收起]</a><a href="javascript:void(0)" title="展开" onclick="showGroup('sysBody',1)">[展开]</a></span></h2>
+<div class="admin_table mb10">
+	<table cellpadding="0" cellspacing="0" width="100%" style="table-layout:fixed;">
+   		<tr class="tr2 vt">
+        	<td style="width:60px;">&nbsp;</td>
+            <td width="180">头衔</td>
+            <td width="200">等级图片号</td>
+            <td width="105">&nbsp;</td>
+            <td>操作</td>
+        </tr>
+		<tbody id="sysBody">
+<!--
+EOT;
+foreach($gdb['system'] as $sys){
+$key = $sys[gid];
+$j_url = EncodeUrl("$basename&action=delgroup&delid=$key");
+print <<<EOT
+-->
+        <tr class="tr1">
+            <td class="td2">组ID$sys[gid]</td>
+            <td class="td2">
+                <input type="text" class="input input_wa" name="systitle[$key]" value="$sys[grouptitle]" onchange="pwJsCheck(this,true)" />
+            </td>
+            <td class="td2">
+                <input type="hidden" class="input input_wd mr10" name="syspic[$key]" value="$sys[groupimg]" onchange="getImg(this)" />
+                <img id="img_system_{$sys[gid]}" src="$imgpath/$stylepath/level/$sys[groupimg].gif" title="选择等级图片" onclick="showImg(this)" style="cursor:pointer" align="absmiddle" />
+            </td>
+            <td class="td2">&nbsp;</td>
+            <td class="td2">
+            	<a href="javascript:;" class="mr20" onclick="location.href='$basename&action=editgroup&gid=$key';return false;">[编辑]</a>
+
+<!--
+EOT;
+if ($key > 7) {print <<<EOT
+-->
+				<a href="javascript:;" onclick="return checkgroupset('$j_url')">[删除]</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+            </td>
+        </tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+		</tbody>
+        <tbody id="sysTable">
+            <tr><td colspan="5"><!--a name="add2"></a--></td></tr>
+            <tr id="addsys" class="tr1 td_bgA" style="display:none">
+            	<td class="td2"><a href="javascript:;" onclick="addRecord('addsys','sysTable')"><i class="expand expand_c" style="margin:4px 2px 0 0;"></i>添加</a></td>
+                <td class="td2"><input type="text" class="input input_wa" name="systitle[add][]" value="" /></td>
+                <td class="td2">
+                    <input type="hidden" class="input input_wd mr10" name="syspic[add][]" value="" onchange="getImg(this)" />
+                    <img id="img_system_$sys[gid]" src="$imgpath/$stylepath/level/6.gif" title="选择等级图片" onclick="showImg(this)" style="cursor:pointer" align="absmiddle" />
+                </td>
+                <td class="td2">&nbsp;</td>
+                <td class="td2">
+                	<span class="mr20" >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                    <a href="javascript:;" onclick="delRecord('addsys','sysTable',this)">[删除]</a>
+                </td>
+            </tr>
+            <tr id="addsys" class="tr1 td_bgA">
+            	<td class="td2"><a href="javascript:;" onclick="addRecord('addsys','sysTable')"><i class="expand expand_c" style="margin:4px 2px 0 0;"></i>添加</a></td>
+                <td class="td2"><input type="text" class="input input_wa" name="systitle[add][]" value="" /></td>
+                <td class="td2">
+                    <input type="hidden" class="input input_wd mr10" name="syspic[add][]" value="" onchange="getImg(this)" />
+                    <img id="img_system_new" src="$imgpath/$stylepath/level/6.gif" title="选择等级图片" onclick="showImg(this)" style="cursor:pointer" align="absmiddle" />
+                </td>
+                <td class="td2">&nbsp;</td>
+                <td class="td2">
+                	<span class="mr20" >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                    <a href="javascript:;" onclick="delRecord('addsys','sysTable',this)">[删除]</a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<div class="mb10 tac"><span class="btn"><span><button type="submit" onfocus="blur();">提 交</button></span></span></div>
+</form>
+<form action="$basename&" method="post">
+<input type="hidden" name="action" value="vipedit" />
+<a name="level_3" id="level_3"></a>
+<h2 class="h1"><span class="mr20"><b>特殊组编辑</b></span><span class="linka"><a href="javascript:void(0)" class="mr10" title="收起" onclick="showGroup('speBody',0)">[收起]</a><a href="javascript:void(0)" title="展开" onclick="showGroup('speBody',1)">[展开]</a></span></h2>
+<div class="admin_table mb10">
+	<table cellpadding="0" cellspacing="0" width="100%" style="table-layout:fixed;">
+   		<tr class="tr2 vt">
+        	<td style="width:60px;">&nbsp;</td>
+            <td width="180">头衔</td>
+            <td width="200">等级图片号</td>
+            <td width="105">&nbsp;</td>
+            <td>操作</td>
+        </tr>
+		<tbody id="speBody">
+<!--
+EOT;
+foreach ($gdb['special'] as $vip) {
+$key = $vip[gid];
+$j_url = EncodeUrl("$basename&action=delgroup&delid=$key");
+print <<<EOT
+-->
+        <tr class="tr1">
+            <td class="td2">组ID$vip[gid]</td>
+            <td class="td2">
+                <input type="text" class="input input_wa" name="viptitle[$key]" value="$vip[grouptitle]" onchange="pwJsCheck(this,true)" />
+            </td>
+            <td class="td2">
+                <input type="hidden" class="input input_wd mr10" name="vippic[$key]" value="$vip[groupimg]" onchange="getImg(this)" />
+                <img id="img_special_{$vip[gid]}" src="$imgpath/$stylepath/level/$vip[groupimg].gif" title="选择等级图片" onclick="showImg(this)" style="cursor:pointer" align="absmiddle" />
+            </td>
+            <td class="td2">&nbsp;</td>
+            <td class="td2">
+            	<a href="javascript:;" class="mr20" onclick="location.href='$basename&action=editgroup&gid=$key';return false;">[编辑]</a>
+                <a href="javascript:;" onclick="return checkgroupset('$j_url')">[删除]</a>
+            </td>
+        </tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+		</tbody>
+        <tbody id="splTable">
+            <tr><td colspan="5"><!--a name="add3"></a--></td></tr>
+            <tr id="addspl" class="tr1 td_bgA" style="display:none">
+                <td class="td2"><a href="javascript:;" onclick="addRecord('addspl','splTable')"><i class="expand expand_c" style="margin:4px 2px 0 0;"></i>添加</a></td>
+                <td class="td2"><input type="text" class="input input_wa" name="viptitle[add][]" value="" /></td>
+                <td class="td2">
+                    <input type="hidden" class="input input_wd mr10" name="vippic[add][]" value="" onchange="getImg(this)" />
+                    <img id="img_special_{$vip[gid]}" src="$imgpath/$stylepath/level/6.gif" title="选择等级图片" onclick="showImg(this)" style="cursor:pointer" align="absmiddle" />
+                </td>
+                <td class="td2">&nbsp;</td>
+                <td class="td2">
+                    <span class="mr20" >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                    <a href="javascript:;" onclick="delRecord('addspl','splTable',this)">[删除]</a>
+                </td>
+            </tr>
+            <tr class="tr1 td_bgA">
+                <td class="td2"><a href="javascript:;" onclick="addRecord('addspl','splTable')"><i class="expand expand_c" style="margin:4px 2px 0 0;"></i>添加</a></td>
+                <td class="td2"><input type="text" class="input input_wa" name="viptitle[add][]" value="" /></td>
+                <td class="td2">
+                    <input type="hidden" class="input input_wd mr10" name="vippic[add][]" value="" onchange="getImg(this)" />
+                    <img id="img_special_new" src="$imgpath/$stylepath/level/6.gif" title="选择等级图片" onclick="showImg(this)" style="cursor:pointer" align="absmiddle" />
+                </td>
+                <td class="td2">&nbsp;</td>
+                <td class="td2">
+                    <span class="mr20" >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                    <a href="javascript:;" onclick="delRecord('addspl','splTable',this)">[删除]</a>
+                </td>
+            </tr>
+        </tbody>
+	</table>
+</div>
+<div class="mb10 tac"><span class="btn"><span><button type="submit" onfocus="blur();">提 交</button></span></span></div>
+</form>
+<form action="$basename&" method="post">
+<input type="hidden" name="action" value="defedit" />
+<a name="level_4" id="level_4"></a>
+<h2 class="h1">默认用户组</h2>
+<div class="admin_table mb10">
+	<table width="100%" cellspacing="0" cellpadding="0" style="table-layout:fixed">
+		<tr class="tr2 vt">
+        	<td style="width:60px;">&nbsp;</td>
+            <td width="180">头衔</td>
+            <td width="200">等级图片号</td>
+            <td width="105">&nbsp;</td>
+            <td>操作</td>
+        </tr>
+<!--
+EOT;
+foreach ($gdb['default'] as $default) {
+$key = $default[gid];
+print <<<EOT
+-->
+        <tr class="tr1">
+            <td class="td2">组ID$default[gid]</td>
+            <td class="td2"><input type="text" class="input input_wa" name='deftitle[$key]' value='$default[grouptitle]' onchange="pwJsCheck(this,true)"></td>
+            <td class="td2">
+                <input type="hidden" class="input input_wd mr10" name='defpic[$key]' value='$default[groupimg]' onchange="getImg(this)" />
+                <img id="img_default_{$default[gid]}" src="$imgpath/$stylepath/level/$default[groupimg].gif" title="选择等级图片" onclick="showImg(this)" style="cursor:pointer" align="absmiddle" />
+            </td>
+            <td class="td2">&nbsp;</td>
+            <td class="td2"><a href="javascript:;" class="mr20" onclick="location.href='$basename&action=editgroup&gid=$key';return false;">[编辑]</a></td>
+        </tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+</table>
+</div>
+<div class="mb10 tac"><span class="btn"><span><button type="submit" onfocus="blur();">提 交</button></span></span></div>
+</form>
+<script type="text/javascript">
+function intval(v) {
+    v = parseInt(v);
+    return isNaN(v) ? 0 : v;
+}
+// 获取元素信息
+function getPos(e) {
+    var l = 0;
+    var t = 0;
+    var w = intval(e.style.width);
+    var h = intval(e.style.height);
+    var wb = e.offsetWidth;
+    var hb = e.offsetHeight;
+    while (e.offsetParent) {
+        l += e.offsetLeft + (e.currentStyle ? intval(e.currentStyle.borderLeftWidth) : 0);
+        t += e.offsetTop + (e.currentStyle ? intval(e.currentStyle.borderTopWidth) : 0);
+        e = e.offsetParent;
+    }
+    l += e.offsetLeft + (e.currentStyle ? intval(e.currentStyle.borderLeftWidth) : 0);
+    t += e.offsetTop + (e.currentStyle ? intval(e.currentStyle.borderTopWidth) : 0);
+    return {
+        x: l,
+        y: t,
+        w: w,
+        h: h,
+        wb: wb,
+        hb: hb
+    };
+}
+// 获取滚动条信息
+function getScroll() {
+    var t, l, w, h;
+    if (document.documentElement && document.documentElement.scrollTop) {
+        t = document.documentElement.scrollTop;
+        l = document.documentElement.scrollLeft;
+        w = document.documentElement.scrollWidth;
+        h = document.documentElement.scrollHeight;
+    } else if (document.body) {
+        t = document.body.scrollTop;
+        l = document.body.scrollLeft;
+        w = document.body.scrollWidth;
+        h = document.body.scrollHeight;
+    }
+    return {
+        t: t,
+        l: l,
+        w: w,
+        h: h
+    };
+}
+// 锚点(Anchor)间平滑跳转
+function scroller(el, duration) {
+    if (typeof el != 'object') {
+        el = document.getElementById(el);
+    }
+    if (!el) return;
+    var z = this;
+    z.el = el;
+    z.p = getPos(el);
+    z.s = getScroll();
+    z.clear = function() {
+        window.clearInterval(z.timer);
+        z.timer = null
+    };
+    z.t = (new Date).getTime();
+    z.step = function() {
+        var t = (new Date).getTime();
+        var p = (t - z.t) / duration;
+        if (t >= duration + z.t) {
+            z.clear();
+            window.setTimeout(function() {
+                z.scroll(z.p.y, z.p.x)
+            },
+            13);
+        } else {
+            st = (( - Math.cos(p * Math.PI) / 2) + 0.5) * (z.p.y - z.s.t) + z.s.t;
+            sl = (( - Math.cos(p * Math.PI) / 2) + 0.5) * (z.p.x - z.s.l) + z.s.l;
+            z.scroll(st, sl);
+        }
+    };
+    z.scroll = function(t, l) {
+        window.scrollTo(l, t)
+    };
+    z.timer = window.setInterval(function() {
+        z.step();
+    },
+    13);
+}
+</script>
+<div id="imgTab" class="menu_level" style="display:none;">
+<h2 onmousedown="read.move(event)" style="cursor:move;" class="h1"><a href="javascript:;" class="del_img fr" onclick="closep()">关闭</a>等级图片选择</h2>
+<ul class="leve">
+<!--
+EOT;
+foreach ($levelImg as $key=>$value) {print <<<EOT
+-->
+<li><img src="$imgpath/$stylepath/level/$value" align="absmiddle" title="点击选择" onclick="selImg('$key')" /> 编号:$key</li>
+<!--
+EOT;
+}print <<<EOT
+-->
+</ul>
+</div>
+<script language="JavaScript">
+var curObj;
+function showImg(_this) {
+	curObj = _this;
+	read.open('imgTab',_this.id,2);
+}
+function selImg(l) {
+	var o=curObj.parentNode;
+	for (var i=0;i<o.childNodes.length;i++) {
+		if (o.childNodes[i].nodeName.toLowerCase() == 'img') {
+			o.childNodes[i].src = "$imgpath/$stylepath/level/"+l+".gif";
+		} else if (o.childNodes[i].nodeName.toLowerCase() == 'input') {
+			o.childNodes[i].value = l;
+		}
+	}
+	pwJsCheck(curObj,true);
+	closep();
+}
+function getImg(_this) {
+	var o=_this.parentNode;
+	for (var i=0;i<o.childNodes.length;i++) {
+		if (o.childNodes[i].nodeName.toLowerCase() == 'img') {
+			o.childNodes[i].src = "$imgpath/$stylepath/level/"+_this.value+".gif";
+			pwJsCheck(_this,true);
+			break;
+		}
+	}
+}
+function addRecord(s,t) {
+	var l = getObj(t).lastChild;
+	var n = getObj(s).cloneNode(true);
+	n.style.display = '';
+	n.id = '';
+	getObj(t).insertBefore(n,l);
+}
+function delRecord(s,t,o) {
+	getObj(t).removeChild(o.parentNode.parentNode);
+	if (getObj(t).getElementsByTagName('TR').length<=2)addRecord(s,t);
+}
+function editGroup(_this,t) {
+	var url = "&gtype="+t;
+	var v = _this.parentNode.parentNode.getElementsByTagName('INPUT');
+
+	for (var i=0;i<v.length;i++) {
+		if (i == 0) {
+			url += "&newtitle="+v[0].value;
+		} else if (i == 1) {
+			url += "&newpic="+v[1].value;
+		} else if (i == 2) {
+			url += "&newpost="+v[2].value;
+		}
+	}
+	window.location = '$basename&action=addgroup'+url;
+}
+function showGroup(id,s) {
+	if (s == 1) {
+		getObj(id).style.display = '';
+	} else {
+		getObj(id).style.display = 'none';
+	}
+}
+</script>
+<script src="js/global.js" language="JavaScript"></script>
+<!--
+EOT;
+} elseif ($action == 'editgroup') {print <<<EOT
+-->
+<!--div class="nav3">
+    <ul class="cc">
+        <li><a href="$basename">用户组设置</a></li>
+		<li class="current"><a href="$basename&action=editgroup&gid=$gid">$gp_grouptitle</a></li>
+	</ul>
+</div-->
+<div class="nav3 mb10 cc">
+	<ul class="fl mr10" id="tab3_editgroup">
+		<li id="basic" onclick="showtab('tab3_editgroup','basic')"><a href="javascript:;">基本权限</a></li>
+		<li id="read" onclick="showtab('tab3_editgroup','read')"><a href="javascript:;">帖子权限</a></li>
+		<li id="att" onclick="showtab('tab3_editgroup','att')"><a href="javascript:;">附件权限</a></li>
+		<li id="group" onclick="showtab('tab3_editgroup','group')"><a href="javascript:;">群组权限</a></li>
+		<li id="message" onclick="showtab('tab3_editgroup','message')"><a href="javascript:;">消息权限</a></li>
+<!--
+EOT;
+if($gp_gptype == 'special'){print <<<EOT
+-->
+		<li id="special" onclick="showtab('tab3_editgroup','special')"><a href="javascript:;">用户组购买</a></li>
+<!--
+EOT;
+}print <<<EOT
+-->
+<!--
+EOT;
+foreach($levelHook->getOtherLevelTitles() as $key=>$value){print <<<EOT
+-->
+		<li id="$key" onclick="showtab('tab3_editgroup','$key')"><a href="javascript:;">$value</a></li>
+<!--
+EOT;
+}print <<<EOT
+-->
+<!--
+EOT;
+if($gp_gptype == 'system' || $gp_gptype == 'special'){print <<<EOT
+-->
+		<li id="system" onclick="showtab('tab3_editgroup','system')"><a href="javascript:;">管理权限</a></li>
+<!--
+EOT;
+}print <<<EOT
+-->
+	</ul>
+    <a href="$basename" class="fl mt5 ">返回上一级<span class="f9">▲</span></a>
+</div>
+<script language="JavaScript">
+function level_jump(admin_file) {
+	var URL = document.mod.selectfid.options[document.mod.selectfid.selectedIndex].value;
+	location.href = admin_file + "?adminjob=level&action=editgroup&gid=" + URL;
+}
+function addcols(mode,ft){
+	var s = getObj(mode).firstChild.cloneNode(true);
+	getObj(ft).appendChild(s);
+}
+function removecols(obj){
+	var o = obj.parentNode.parentNode;
+	o.parentNode.removeChild(o);
+}
+function showGroup(id,s) {
+	if (s == 1) {
+		getObj(id).style.display = '';
+	} else {
+		getObj(id).style.display = 'none';
+	}
+}
+</script>
+
+<div id="addform">
+<form action="$basename&" method="post" name="mod">
+<h2 class="h1">用户组设置</h2>
+<div class="admin_table mb10">
+    <table width="100%" cellspacing="0" cellpadding="0">
+    <tr class="tr1"><td class="td1">用户组头衔</td>
+    <td class="td2" width="160"><input name="grouptitle" type="text" class="input input_wa" value="$grouptitle" />
+    </td>
+    <td class="td2 tar"><a id="linkCtrlCrossConfig" href="javascript:;">横向扩展</a></td>
+    </tr></table>
+</div>
+
+<input type="hidden" name="action" value="editgroup" />
+<input type="hidden" name="gid" value="$gid" />
+<input type="hidden" name="step" value="2" />
+<!--
+EOT;
+foreach ($lang['right'] as $key => $value) {
+if ($key == 'special' && $gp_gptype <> 'special' || $key == 'system' && in_array($gp_gptype,array('member','default'))) {
+	continue;
+}
+print <<<EOT
+-->
+<div id="c_$key" style="display:none">
+<h2 class="h1">{$lang[right_title][$key]}</h2>
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+<!--
+EOT;
+foreach ($value as $k => $v) {
+print <<<EOT
+-->
+	<tr class="tr1 vt">
+		<td class="td1"><a href="$basename&action=setright&rkey=$k&gid=$gid">$v[title]</a></td>
+<!--
+EOT;
+if ($k == 'markset') {
+print <<<EOT
+-->
+		<td class="td2" colspan="2">
+<script>
+function init(ids,cons){
+	getObj(ids).onclick=function(o){onmousOver(o,ids,cons);}//点击激发效果
+}
+function onmousOver(o,ids,cons){
+	var o = o || window.event;
+	var obj=o.target || o.srcElement;
+	/* add by zph, checkbox click handler Aug 12,2010 */
+	if(obj.tagName=='INPUT' && obj.type == 'checkbox'){
+		if(typeof obj.parentNode == 'object') obj = obj.parentNode;
+	}
+	/* end zph*/
+	if (obj.tagName=='LI'){
+		if (obj.className=='current'||obj.id=='more')return;
+		var o=getObj(ids).getElementsByTagName('li');
+		for (var i=0;i<=o.length-1;i++){
+			if (o[i].id != obj.id) {
+				o[i].className='';
+				getObj(cons+'_'+o[i].id).style.display='none';
+			} else {
+				o[i].className='current';
+				getObj(cons+'_'+o[i].id).style.display='';
+			}
+		}
+	}
+}
+</script>
+<div class="cond cc">
+    <ul class="cond_l" id='cond_l'>
+<!--
+EOT;
+$i=0;
+foreach ($v[html] as $keys=>$val) {
+$i=$i+1;
+$tmpstyle = $i == 1 ? 'class="current"' : '';
+$markctype_Y = $_G['markset'][$keys]['markctype'] == $keys ? 'checked' : '';
+print <<<EOT
+-->
+        <li id="l$keys" $tmpstyle><input type="checkbox" name="group[markset][$keys][markctype]" value="$keys" $markctype_Y/>$val</li>
+<!--
+EOT;
+}print <<<EOT
+-->
+    </ul>
+    <div class="cond_r">
+<!--
+EOT;
+$i=0;
+foreach (array_keys($v[html]) as $keys) {
+$i=$i+1;
+$tmpstyle = $i == 1 ? '' : 'style="display:none;"';
+$markdt_Y = $markdt_N = '';
+$_G['markset'][$keys]['markdt'] ? $markdt_Y = 'checked' : $markdt_N = 'checked';
+print <<<EOT
+-->
+        <div class="cond_r_height" id="cond_r_l$keys" $tmpstyle>
+            <div class="admin_table">
+                <table cellpadding="0" cellspacing="0" width="100%" style="table-layout:auto;">
+                	<tr class="vt tr3">
+                		<td colspan="2" align="center" class="s2" id="cond_r_title">{$v['html'][$keys]}评分设置</td>
+                	</tr>
+                    <tr class="vt tr3">
+                        <td width="100">每次评分限制</td>
+                        <td><ul class="cc list_80 list_A">
+                        <li>最小 <input value="{$_G[markset][$keys][marklimit][0]}" name="group[markset][$keys][marklimit][0]" type="text" class="input input_we" /></li><li>最大 <input value="{$_G[markset][$keys][marklimit][1]}" name="group[markset][$keys][marklimit][1]" type="text" class="input input_we" /></li></ul></td>
+                    </tr>
+                    <tr class="vt tr3">
+                        <td>每日评分上限</td>
+                        <td><input value="{$_G[markset][$keys][maxcredit]}" name="group[markset][$keys][maxcredit]" class="input input_wa" /></td>
+                    </tr>
+                    <tr class="vt tr3">
+                        <td>扣除自身相应积分</td>
+                        <td><ul class="cc list_80 list_A"><li><input type="radio" value="1" name="group[markset][$keys][markdt]" $markdt_Y />开启</li><li><input type="radio" value="0" name="group[markset][$keys][markdt]" $markdt_N />关闭</li></ul></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+<!--
+EOT;
+}print <<<EOT
+-->
+    </div>
+<script>
+init('cond_l','cond_r');
+</script>
+</div>
+</td>
+
+<!--
+EOT;
+}else{
+eval("\$v[html] = \"".addcslashes($v['html'],'"')."\";");
+print <<<EOT
+-->
+		<td class="td2">$v[html]</td>
+        <td class="td2"><div class="help_a">$v[desc]</div></td>
+<!--
+EOT;
+}print <<<EOT
+-->
+    	<td class="td2" style="width:40px;"><div class="none_pw"><input type="checkbox" name="othergroup[]" value="$k" onclick="pwJsCheck(this)" /></div></td>
+	</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+<!--
+EOT;
+if ($key == 'system' && $extentSystem) {
+foreach ($extentSystem as $k => $v) {
+print <<<EOT
+-->
+		<tr class="tr1 vt">
+			<td class="td1"><a href="$basename&action=setright&rkey=$k&gid=$gid">$v[name]</a></td>
+			<td class="td2">$v[html]</td>
+       		<td class="td2"><div class="help_a">$v[descrip]</div></td>
+       		<td class="td2" style="width:40px;"><div class="none_pw"><input type="checkbox" name="othergroup[]" value="$k" onclick="pwJsCheck(this)" /></div></td>
+		</tr>
+<!--
+EOT;
+}}print <<<EOT
+-->
+</table>
+</div>
+</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+<!--
+EOT;
+foreach($levelHook->getLevels() as $key=>$value){print <<<EOT
+-->
+<div id="c_$key" style="display:none">
+	<h2 class="h1">{$value[title]}</h2>
+	<div class="admin_table mb10">
+		<table width="100%" cellspacing="0" cellpadding="0">
+<!--
+EOT;
+foreach ($value['field'] as $k => $v) {
+print <<<EOT
+-->
+			<tr class="tr1 vt">
+				<td class="td1"><a href="$basename&action=setright&rkey=$k&gid=$gid">$v[name]</a></td>
+				<td class="td2">$v[html]</td>
+        		<td class="td2"><div class="help_a">$v[descrip]</div></td>
+        		<td class="td2" style="width:40px;"><div class="none_pw"><input type="checkbox" name="othergroup[]" value="$k" onclick="pwJsCheck(this)" /></div></td>
+			</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+		</table>
+	</div>
+</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+
+<div class="admin_table mb10">
+    <h2 id="headCtrlCrossConfig" class="h1 cp">横向扩展</h2>
+    <div class="admin_table mb10 none_pw">
+        <table width="100%" cellspacing="0" cellpadding="0" style="table-layout:fixed">
+            <tr class="tr1 vt">
+                <td class="td1">用户组权限横向设置</td>
+                <td class="td2"><select name="othergid[]" size="16" class="select_wa" multiple>$groupselect</select></td>
+                <td class="td2"><div class="help_a">利用此功能可将一个或多个设置同时应用到其它用户组中，使操作更加简便<br />
+    操作说明:<br />
+    选中需要进行横向操作的权限设置后面的复选框<br />
+    在左边的复选框中选择需要进行横向操作的会员组<br />
+    然后提交即可完成横向操作<br />
+    注:<br />
+    选择用户组时可使用 ‘Ctrl’ 键进行多选，也可使用 ‘Shift’ 键或拖动鼠标连续选择多个版块<br />
+    不使用此功能，请不要选中权限设置后面的复选框和左边的复选框中版块</div></td>
+            </tr>
+        </table>
+    </div>
+</div>
+</div>
+
+<div class="tac mb10"><span class="btn"><span><button type="submit" onfocus="blur();">提 交</button></span></span></div></form>
+<script type="text/javascript">
+function showtab(t,a){
+	if (getObj(t)) {
+		var hasCurrent = false;
+		var obj = getObj(t).getElementsByTagName('li');
+		for (var i=0;i<obj.length;i++) {
+			try{
+			if (obj[i].id==a) {
+				getObj(obj[i].id).className = 'current';
+				getObj('c_'+a).style.display = '';
+				setCookie('thisPWTabs',a);
+				hasCurrent = true;
+			} else {
+				getObj(obj[i].id).className = '';
+				getObj('c_'+obj[i].id).style.display = 'none';
+			}
+			}catch(e){}
+		}
+		if (!hasCurrent) {
+			getObj('basic').className = 'current';
+			getObj('c_basic').style.display = '';
+			setCookie('thisPWTabs','basic');
+		}
+	}
+}
+showtab('tab3_editgroup','$thisPWTabs');
+
+function displayCrossConfigDiv() {
+	var frm = document.getElementById('addform');
+	frm.className = (frm.className=='addform') ? '' : 'addform';
+}
+getObj('linkCtrlCrossConfig').onclick = displayCrossConfigDiv;
+getObj('headCtrlCrossConfig').onclick = displayCrossConfigDiv;
+
+</script>
+<!--
+EOT;
+} elseif ($action == 'setright') {print <<<EOT
+-->
+<div class="nav3 mb10 cc">
+	<ul class="fl mr10">
+		<li><a href="$basename&action=editgroup&gid=$gid&tab=basic">基本权限</a></li>
+		<li><a href="$basename&action=editgroup&gid=$gid&tab=read">帖子权限</a></li>
+		<li><a href="$basename&action=editgroup&gid=$gid&tab=att">附件权限</a></li>
+		<li><a href="$basename&action=editgroup&gid=$gid&tab=group">群组权限</a></li>
+		<li><a href="$basename&action=editgroup&gid=$gid&tab=message">消息权限</a></li>
+<!--
+EOT;
+if($gp_gptype == 'special'){print <<<EOT
+-->
+		<li><a href="$basename&action=editgroup&gid=$gid&tab=special">用户组购买</a></li>
+<!--
+EOT;
+}print <<<EOT
+-->
+<!--
+EOT;
+if($gp_gptype == 'system' || $gp_gptype == 'special'){print <<<EOT
+-->
+		<li><a href="$basename&action=editgroup&gid=$gid&tab=system">管理权限</a></li>
+<!--
+EOT;
+}print <<<EOT
+-->
+<!--
+EOT;
+foreach($levelHook->getOtherLevelTitles() as $key=>$value){print <<<EOT
+-->
+		<li><a href="$basename&action=editgroup&gid=$gid&tab={$key}">$value</a></li>
+<!--
+EOT;
+}print <<<EOT
+-->
+		<li class="current"><a href="javascript:;">权限横向设置</a></li>
+	</ul>
+    <a href="$basename" class="fl mt5 ">返回上一级<span class="f9">▲</span></a>
+</div>
+<script language="JavaScript">
+function addcols(mode,ft){
+	var s = getObj(mode).firstChild.cloneNode(true);
+	getObj(ft).appendChild(s);
+}
+function removecols(obj){
+	var o = obj.parentNode.parentNode;
+	o.parentNode.removeChild(o);
+}
+</script>
+<form action="$basename&action=$action" method="post" name="mod">
+<input type="hidden" name="step" value="3" />
+<input type="hidden" name="rkey" value="$rkey" />
+<h2 class="h1">用户组权限设置</h2>
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+	<tr class="tr1 vt">
+		<td class="td1">用户组</td>
+		<td class="td2">$setdb[title]</td>
+	</tr>
+<!--
+EOT;
+$lang_title = array('default' => '默认用户组','member' => '会员组','system' => '系统组','special' => '特殊组');
+foreach ($gdb as $key => $value) {print <<<EOT
+-->
+	<tr class="tr2 td_bgB">
+		<td>
+			$lang_title[$key]
+		<td>
+	</tr>
+<!--
+EOT;
+foreach ($value as $k => $v) {
+if (is_array($v[1])) {
+print <<<EOT
+-->
+	<tr class="tr1 vt">
+		<td class="td2">$v[0]</td>
+		<td class="td2">
+<!--
+EOT;
+foreach ($v[1] as $keys => $val) {
+$markctype_Y = $markdt_Y = $markdt_N = '';
+$marksetdb[$k][$keys]['markctype'] == $keys && $markctype_Y = 'checked';
+$marksetdb[$k][$keys]['markdt'] ? $markdt_Y = 'checked' : $markdt_N = 'checked';
+print <<<EOT
+-->
+		<input type="checkbox" name="group[$k][markset][$keys][markctype]" value="$keys" $markctype_Y/><b>$val</b> &nbsp;[需打勾方有效]<br />评分总额<font color=blue> 说明:</font>每天允许的最大评分点数:<input type="text" class="input" value="{$marksetdb[$k][$keys][maxcredit]}" name="group[$k][markset][$keys][maxcredit]" /><br />评分限制<font color=blue> 说明:</font>最小 <input type=text size="3" class="input" value="{$marksetdb[$k][$keys][marklimit][0]}" name="group[$k][markset][$keys][marklimit][0]" /> 最大 <input type=text size="3" class="input" value="{$marksetdb[$k][$keys][marklimit][1]}" name="group[$k][markset][$keys][marklimit][1]" />[不可为0]<br />评分扣除自身相应的积分:<input type="radio" value="1" name="group[$k][markset][$keys][markdt]" $markdt_Y />开启 <input type="radio" value="0" name="group[$k][markset][$keys][markdt]" $markdt_N />关闭<br />
+<!--
+EOT;
+}print<<<EOT
+-->
+		</td>
+	</tr>
+<!--
+EOT;
+}else{print<<<EOT
+-->
+	<tr class="tr3 vt">
+		<td class="td1">$v[0]</td>
+		<td class="td2">$v[1]</td>
+	</tr>
+<!--
+EOT;
+}}}print <<<EOT
+-->
+</table>
+</div>
+<div class="tac mb10"><span class="btn"><span><button type="submit" onfocus="blur();">提 交</button></span></span></div>
+</form>
+<!--
+EOT;
+} elseif ($action == 'batch') {print <<<EOT
+-->
+<div class="nav3 mb10 cc">
+    <ul class="fl mr20">
+        <li><a href="$basename">用户组设置</a></li>
+    </ul>
+	<div class="mt5 fl">
+		<a href="$basename&action=batch" class="mr10 s2">导入导出</a>
+		<a href="$basename&action=help" class="mr10">详细帮助</a>
+	</div>
+</div>
+<div class="admin_info mb10">
+    <h3 class="h1"><b>提示信息</b></h3>
+    <div class="legend">
+        批量导入:<br />　　选择需要导入的文件(txt)，点击提交<br />　　内容规则:<br />　　1.a=>b (a 为 用户组ID；b 为用户组头衔)<br />　　2.一行一条记录
+    </div>
+</div>
+<form action="$basename" method="post" enctype="multipart/form-data">
+<input type="hidden" name="action" value="batch" />
+<input type="hidden" name="step" value="3" />
+<h2 class="h1">用户组头衔名称导入</h2>
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+<tr class="tr1"><td class="td1">导入文件</td><td class="td2"><input class="input input_wb" type="file" name="upload" /></td></tr>
+</table>
+</div>
+<div class="tac mb10"><span class="btn"><span><button type="submit" onfocus="blur();">提 交</button></span></span></div>
+</form>
+
+<form action="$basename" method="post">
+<input type="hidden" name="action" value="batch" />
+<input type="hidden" name="step" value="5" />
+<h2 class="h1">导出列表</h2>
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0" style="table-layout:fixed;">
+<tr class="tr2">
+	<td width="20"></td>
+    <td width="55" class="tac">组ID</td>
+    <td width="200">用户组名</td>
+    <td>用户组类型</td>
+    <td>&nbsp;</td>
+</tr>
+<!--
+EOT;
+$gdb = array('member'=>'会员组','system'=>'系统组','special'=>'特殊组');
+foreach($group as $key=>$value){print <<<EOT
+-->
+<tr class="tr1">
+	<td class="td2"><input type="checkbox" name="selid[]" value="$value[gid]" checked /></td>
+    <td class="td2 tac">$value[gid]</td>
+    <td class="td2">$value[grouptitle]</td>
+    <td class="td2">{$gdb[$value[gptype]]}</td>
+    <td class="td2">&nbsp;</td>
+</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+</table>
+</div>
+<div class="tac mb10">
+<span class="bt"><span><button type="button" name="chkall" onfocus="blur();CheckAll(this.form)">全 选</button></span></span>
+<span class="btn"><span><button type="submit" name="submit" onfocus="blur();">提 交</button></span></span>
+</div>
+</form>
+<!--
+EOT;
+}if($action=='help'){print <<<EOT
+-->
+<div class="nav3 mb10 cc">
+    <ul class="fl mr20">
+        <li><a href="$basename">用户组设置</a></li>
+    </ul>
+	<div class="mt5 fl">
+		<a href="$basename&action=batch" class="mr10">导入导出</a>
+		<a href="$basename&action=help" class="mr20 s2">详细帮助</a>
+	</div>
+</div>
+<div class="mb10">
+    <h3 class="h1"><b>提示信息</b></h3>
+    <div class="legend">
+        <b>站点的用户组分为会员组、系统组、特殊组、默认组。</b><br />&nbsp;&nbsp;会员组:级别按照会员发的帖子数自动进行级别判断并更新。<br />
+&nbsp;&nbsp;系统组:属于站点管理层，系统组成员由站点管理员设定，管理员可以在<a href="$admin_file?adminjob=setuser"><font color=blue>会员管理</font></a>内编辑用户组成员。<br />
+&nbsp;&nbsp;特殊组:可以设置管理权限的组别，区别于系统组，特殊组可以进行出售<br />
+&nbsp;&nbsp;默认组:默认组别不可删除，当其他组别未设置权限时，则使用该默认权限<br /><b>默认组说明:</b><br />&nbsp;&nbsp;<b>default</b>:默认权限设置（没设置过权限的用户组使用，可以节约不必要的资源）<br />&nbsp;&nbsp;<b>guest</b>:站点游客权限设置<br />&nbsp;&nbsp;<b>禁言组(banned)</b>:此用户组禁止发言<br />&nbsp;&nbsp;<b>未验证会员(newrg)</b>:等待验证的用户组<br /><b>系统组说明:</b><br />&nbsp;&nbsp;<b>管理员(manager)</b>:由站点创始人在<font color=blue>会员管理</font>内进行设置<br />&nbsp;&nbsp;<b>总版主(superadmin)</b>:前台管理员，拥有前台所有管理权限<br />&nbsp;&nbsp;<b>版主(admin)</b>:负责分版块的管理工作<br /><b>组ID说明:</b><br />&nbsp; &nbsp;所有普通会员组在线标记图片为: 6.gif &nbsp; <img src="$imgpath/wind/group/6.gif"><br />&nbsp; &nbsp;管理组和特殊组在线标记图片名为Gid.gif , 例 :<br />&nbsp; &nbsp;比如组ID为 16,会员在线标记图片为: 16.gif &nbsp; <img src="$imgpath/wind/group/16.gif"><br />&nbsp; &nbsp;比如组ID为 3,会员在线标记图片为: 3.gif &nbsp; <img src="$imgpath/wind/group/3.gif"><br />&nbsp;&nbsp;&nbsp;<font color=blue>注:</font>可以在<a href="./$db_adminfile?adminjob=settings&type=indexset"><font color=blue>核心设置-首页细节</font></a>里选择参与在线显示的用户组
+    </div>
+</div>
+<h2 class="h1">等级图片号说明</h2>
+<div class="p15">
+	<ul class="list_C list_200 cc">
+<!--
+EOT;
+foreach ($levelImg as $key=>$value) {print <<<EOT
+-->
+		<li>$key 代表 <img src="$imgpath/$stylepath/level/$value" align="absmiddle" /></li>
+<!--
+EOT;
+}print <<<EOT
+-->
+	</ul>
+</div>
+<!--
+EOT;
+}include_once PrintEot('adminbottom');
+?>-->

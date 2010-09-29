@@ -1,0 +1,83 @@
+<!--<?php
+$s_url=$B_url.'/wysiwyg.php?type=sale';
+print <<<EOT
+-->
+<div style="margin-bottom:10px">
+字体 
+<select onChange="showfont(this.options[this.selectedIndex].value);this.selectedIndex=0;this.selectedIndex=0" name="font">
+<option value=""></option>
+<option value="宋体">宋体</option>
+<option value="楷体_GB2312">楷体_GB2312</option>
+<option value="新宋体">新宋体</option>
+<option value="黑体">黑体</option>
+<option value="隶书">隶书</option>
+<option value="Andale Mono">Andale Mono</option>
+<option value="Arial">Arial</option>
+<option value="Arial Black">Arial Black</option>
+<option value="Book Antiqua">Book Antiqua</option>
+<option value="Century Gothic">Century Gothic</option>
+<option value="Comic Sans MS">Comic Sans MS</option>
+<option value="Courier New">Courier New</option>
+<option value="Georgia">Georgia</option>
+<option value="Impact">Impact</option>
+<option value="Tahoma">Tahoma</option>
+<option value="Times New Roman">Times New Roman</option>
+<option value="Trebuchet MS">Trebuchet MS</option>
+<option value="Script MT Bold">Script MT Bold</option>
+<option value="Stencil">Stencil</option>
+<option value="Verdana">Verdana</option>
+<option value="Lucida Console">Lucida Console</option></select>
+&nbsp;字号
+<select onChange="showsize(this.options[this.selectedIndex].value);this.selectedIndex=0" name="size">
+<option value=""></option>
+<option value="1">1</option><option value="2">2</option><option value="3">3</option>
+<option value="4">4</option><option value="5">5</option><option value="6">6</option>
+</select>
+&nbsp;字体颜色 
+<select onChange="showcolor(this.options[this.selectedIndex].value);this.selectedIndex=0" name="color">
+<option value=""></option>
+<option value="skyblue" style="background-color:skyblue;color:skyblue">&nbsp; &nbsp; &nbsp;  &nbsp;</option>
+<option value="royalblue" style="background-color:royalblue;color:royalblue"></option>
+<option value="blue" style="background-color:blue"></option>
+<option value="darkblue" style="background-color:darkblue"></option>
+<option value="orange" style="background-color:orange"></option>
+<option value="orangered" style="background-color:orangered"></option>
+<option value="crimson" style="background-color:crimson"></option>
+<option value="red" style="background-color:red"></option>
+<option value="firebrick" style="background-color:firebrick"></option>
+<option value="darkred" style="background-color:darkred"></option>
+<option value="green" style="background-color:green"></option>
+<option value="limegreen" style="background-color:limegreen"></option>
+<option value="seagreen" style="background-color:seagreen"></option>
+<option value="teal" style="background-color:teal"></option>
+<option value="deeppink" style="background-color:deeppink"></option>
+<option value="tomato" style="background-color:tomato"></option>
+<option value="coral" style="background-color:coral"></option>
+<option value="purple" style="background-color:purple"></option>
+<option value="indigo" style="background-color:indigo"></option>
+<option value="burlywood" style="background-color:burlywood"></option>
+<option value="sandybrown" style="background-color:sandybrown"></option>
+<option value="sienna" style="background-color:sienna"></option>
+<option value="chocolate" style="background-color:chocolate"></option>
+<option value="silver" style="background-color:silver"></option></select>
+<br /><br />
+<img onClick="bold()" alt="粗体" src="$imgpath/post/editor/bold.gif" />
+<img onClick="italicize()" alt="斜体" src="$imgpath/post/editor/italic.gif" />
+<img onClick="underline()" alt="下划线" src="$imgpath/post/editor/underline.gif" />
+<img onClick="center()" alt="居中" src="$imgpath/post/editor/center.gif"  />
+<img onClick="rming()" alt="插入rm电影文件" src="$imgpath/post/editor/rm.gif" />
+<img onClick="wmv()" alt="插入wmv在线播放" src="$imgpath/post/editor/mpeg.gif" />
+<img onClick="image()" alt="插入图片" src="$imgpath/post/editor/image.gif" />
+<img onClick="setswf()" alt="插入flash动画" src="$imgpath/post/editor/swf.gif" />
+<img onClick="showurl()" alt="插入url链接" src="$imgpath/post/editor/url.gif" />
+<img onClick="showcode()" alt="插入代码" src="$imgpath/post/editor/code.gif" />
+<img onClick="quoteme()" alt="插入引用" src="$imgpath/post/editor/quote.gif" />
+<img onClick="list()" alt="插入列表" src="$imgpath/post/editor/list_2.gif" />
+<img onClick="setfly()" alt="飞行字" src="$imgpath/post/editor/fly.gif" />
+<img onClick="movesign()" alt="移动字" src="$imgpath/post/editor/move.gif" />
+<img onClick="glow()" alt="发光字" src="$imgpath/post/editor/glow.gif" />
+</div>
+<textarea name="atc_content" id="atc_content" cols="90" rows="25" style="overflow:auto;"  onkeydown="quickpost(event)" onfocus="getActiveText(this)" onclick="getActiveText(this)"  onchange="getActiveText(this)" tabindex="2">{$atc_content}</textarea>
+<!--
+EOT;
+?>

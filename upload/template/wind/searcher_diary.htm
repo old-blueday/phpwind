@@ -1,0 +1,64 @@
+<!--<?php print <<<EOT
+-->
+		<div class="content fl">
+        	<div class="s_dlA">
+<!-- 
+EOT;
+foreach($diarys as $diary){
+$diary[dtid] = $diary[dtid] == 0 ? '-1' : $diary[dtid];
+print <<<EOT
+-->    
+				<dl>
+                <dt><a href="apps.php?q=diary&uid={$diary[uid]}&a=detail&did={$diary[did]}" target="_blank">$diary[subject]</a></dt>
+                    <dd class="text">$diary[content]</dd>
+                    <dd class="cite"><a href="apps.php?q=diary&uid={$diary[uid]}" target="_blank">日志</a>&nbsp;&raquo;&nbsp;<a href="apps.php?q=diary&uid={$diary[uid]}&dtid={$diary[dtid]}" target="_blank" class="mr20">$diary[type]</a>作者：<a href="u.php?uid={$diary[uid]}" target="_blank" class="mr20">$diary[username]</a>
+                    <span class="mr20">$diary[postdate]</span></dd>
+                </dl>
+<!-- 
+EOT;
+}
+print <<<EOT
+-->  
+                <div class="pages">
+                   $pager
+                </div>
+                <div class="c">&nbsp;</div>
+            </div>
+            <div class="h">
+        
+            </div>
+        </div>
+        
+        <div class="sidebar fr">
+<!--
+EOT;
+if($hotwords){
+print <<<EOT
+-->         
+        	<div class="p15 s_boxA">
+            	<h2>一周热门搜索</h2>
+                <ul>
+<!-- 
+EOT;
+foreach($hotwords as $hotword){
+print <<<EOT
+-->                
+                	<li><a href="searcher.php?keyword={$hotword}&type=diary">$hotword</a></li>
+<!-- 
+EOT;
+}
+print <<<EOT
+-->                 	
+                </ul>
+            </div>
+<!-- 
+EOT;
+}
+print <<<EOT
+-->              
+        </div>
+        
+        <div class="c">&nbsp;</div>         
+<!--
+EOT;
+?>

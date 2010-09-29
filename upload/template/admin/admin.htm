@@ -1,0 +1,550 @@
+<!--<?php
+include_once PrintEot('left');
+if (!$job) {print <<<EOT
+-->
+<div id="notice"></div>
+<!--
+EOT;
+if($warnid>0){print <<<EOT
+-->
+<div class="admin_info mb10">
+	<h3 class="h1">安全提示</h3>
+	<div class="legend">
+		<div class="fr" style="padding:1em;"><img src="$imgpath/admin/warnning.png" /></div>
+		<ol>
+<!--
+EOT;
+if($warnid & 1){print <<<EOT
+-->
+			<li>强烈建议您将 data/sql_config.php 文件属性设置为644（linux/unix）或只读（NT） </li>
+<!--
+EOT;
+}if($warnid & 2){print <<<EOT
+-->
+			<li>强烈建议您使用 data目录隐藏功能，此功能可大大提高网站安全性，设置方法请参照相关帮助文档或联系官方寻求帮助 </li>
+<!--
+EOT;
+}if($warnid & 4){print <<<EOT
+-->
+			<li>强烈建议您将PHP配置文件（php.ini）中的 register_globals 设置为Off，可大大提高网站安全性</li>
+<!--
+EOT;
+}if($warnid & 8){print <<<EOT
+-->
+			<li>强烈建议您将 admin.php 文件重新命名，您可以通过“核心设置-安全与优化-安全控制”将 admin.php 重新命名，如:abc.php，然后使用 abc.php 登录后台管理 </li>
+<!--
+EOT;
+}if($warnid & 16){print <<<EOT
+-->
+			<li>强烈建议您开启 安全问题功能（“核心设置-安全与优化-安全控制”），并在 强制使用安全问题用户组设置 中选择管理员、总版主、版主等具有较高管理权限的用户组 </li>
+<!--
+EOT;
+}if($warnid & 32){print <<<EOT
+-->
+			<li>强烈建议您使用 数据库分卷（<a href="$admin_file?adminjob=ptable">工具->数据库分卷</a>） 功能，您的数据库大小已经超过500M</li>
+<!--
+EOT;
+}elseif($warnid & 64){print <<<EOT
+-->
+			<li>建议您使用 数据库分卷 功能，您的数据库大小已经超过300M</li>
+<!--
+EOT;
+}print <<<EOT
+-->
+		</ol>
+	</div>
+</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+<h2>快捷链接</h2>
+<div class="mainnav">
+      <ul>
+        <li><a href="index.php" target="_blank"><img src="$imgpath/admin/main/home.gif" alt="站点首页" />站点首页</a></li>
+        <li><a onclick="openNewUrl('checkreg','审核注册','$admin_file?adminjob=usercheck&admintype=checkreg')" style="cursor:pointer"><img src="$imgpath/admin/main/user.png" alt="审核注册" />审核注册</a></li>
+        <li><a onclick="openNewUrl('checkemail','审核邮件','$admin_file?adminjob=usercheck&admintype=checkemail')" style="cursor:pointer"><img src="$imgpath/admin/main/mail.png" alt="审核邮件" />审核邮件</a></li>
+        <li><a onclick="openNewUrl('tpccheck','帖子审核','$admin_file?adminjob=tpccheck')" style="cursor:pointer"><img src="$imgpath/admin/main/tpc.png" alt="审核主题" />审核主题</a></li>
+        <li><a onclick="openNewUrl('tpccheck','帖子审核','$admin_file?adminjob=tpccheck&action=postcheck')" style="cursor:pointer"><img src="$imgpath/admin/main/post.png" alt="审核回复" />审核回复</a></li>
+        <li><a onclick="openNewUrl('share','审核链接','$admin_file?adminjob=share&state=0')" style="cursor:pointer"><img src="$imgpath/admin/main/share.png" alt="审核链接" />审核链接</a></li>
+        <li><a onclick="openNewUrl('report','帖子报告','$admin_file?adminjob=report')" style="cursor:pointer"><img src="$imgpath/admin/main/report.png" alt="帖子报告" />帖子报告</a></li>
+      </ul>
+</div>
+<div class="c"></div>
+<div class="t">
+<h2>便捷操作</h2>
+<table width="100%">
+<tr class="tr3"><td width="50%">
+	<div style="margin:.5em 2em">
+						<form action="$admin_file?adminjob=setuser&action=search" method="post">
+						<input type="hidden" name="schname_s" value='1'>
+						<input id="schname" class="input" name="schname" value="请输入用户名" onclick="this.value=''" type="text" style="width:170px;margin-bottom:.5em;height:16px;" />
+						<input type="submit" class="btn" value="编辑用户" style="margin:0 0 .5em .8em;"/>
+						</form>
+					</div>
+</td>
+<td>
+<span style="margin-top:.5em">
+						<form action="$admin_file?adminjob=setforum&" method="POST">
+						<input type=hidden name="action" value="addforum">
+						<input type="hidden" name="step" value="2" />
+						<input type="hidden" name="addtype" value="1" />
+						<select name="fup" style="width:170px;">
+							<option>请选择上级版块</option>$forumcache
+						</select> <input class="input" name="name[]" type="text" style="width:100px;margin:0 0 .5em .8em;height:16px;" />
+						<input type="submit" class="btn" value="添加版块" style="margin:.1em 0 .5em .5em;"/>
+						</form>
+					</span>
+</td></tr>
+<tr class="tr3">
+<td width="400px">
+<div style="margin:.5em 2em 0">
+						<select id="selectlv" name="" style="width:172px;">
+							<option>请选择要编辑的用户组</option>$sltlv
+						</select>
+						<input type="button" class="btn" value="编辑用户组" style="margin:0 0 .5em .8em;" onclick="WhereToJump('level','编辑用户组','selectlv','adminjob=level&action=editgroup&gid=');" />
+					</div>
+</td>
+
+<td>
+	<select id="selforum" name="" style="width:170px;">
+							<option>请选择要编辑的版块</option>$forumcache
+						</select>
+						<input type="button" class="btn" value="编辑版块" style="margin:0 0 .5em .8em;" onclick="WhereToJump('setforum','编辑版块','selforum','adminjob=setforum&action=edit&fid=');" />
+</td>
+
+</tr>
+</table>
+</div>
+<!--
+EOT;
+if ($db_adminrecord == 1){print <<<EOT
+-->
+<div class="t">
+<h2>最新管理操作记录</h2>
+<table width="100%">
+<tr class="tr3 tac s3">
+	<td width="10%">用户名</td>
+	<td width="10%">IP</td>
+	<td width="15%">操作时间</td>
+	<td width="30%">操作理由</td>
+</tr>
+$adlogfor
+</table>
+</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+<div class="fl" style="width:50%;height:300px;">
+<h2>便笺</h2>
+<form action="$admin_file?adminjob=updatememo" method="post">
+<input type="hidden" name="mid" value="$mid" />
+<div style="padding:1em;">
+<textarea name="content" style="width:98%;height:200px;overflow:auto">$content</textarea>
+</div>
+<center><input class="btn" type="submit" value="保 存" /></center>
+	  </form>
+</div>
+<div style="margin-left:50%;">
+<h3>当前系统信息</h3>
+<ul class="list">
+<li>PHP程式版本:$sysversion</li>
+<li>MYSQL 版本:$dbversion</li>
+<li>服务器端信息:$sysos</li>
+<li>最大上传限制:$max_upload</li>
+<li>最大执行时间:$max_ex_time</li>
+<li>邮件支持模式:$sys_mail</li>
+<li>Cookie 测试:$ifcookie</li>
+<li>服务器所在时间:$systemtime</li>
+<li>站点显示时间:$altertime</li>
+<li>站点数据库占用:$pw_size M</li>
+<li>非站点数据库占用:$o_size M</li>
+</ul>
+</div>
+<div class="c"></div>
+<h3>商业用户授权查证</h3>
+<div style="line-height:22px;padding:1em;">
+<span class="fr"><a href="http://www.phpwind.com/certificate.php" target="_blank" title="商业授权查询网站地址"><img src="$imgpath/admin/commerce-check.png" /></a></span>如果您已经购买了phpwind 商业用户授权，您可以在phpwind 商业授权查询网站找到您的网站的相关商业授权信息；<br />如果您没有找到您的网站的商业授权信息或者您的网站的商业授权信息与您购买的商业授权类型不符，说明您购买的可能非法的商业授权，请及时与我们取得联系!<br />我们的联系方式: <span class="xia">QQ:80132916，178199933</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="xia">MSN:phpwind@qq.com</span>
+&nbsp;&nbsp;&nbsp;<span class="xia">TEL:0571-81607190-8800</span>
+</div>
+<h3>phpwind 开发团队</h3>
+<div class="taba">
+<table width="100%" cellspacing="0" cellpadding="0" style="line-height:18px;">
+<tr class="tr3"><td width="120" class="tar">主程序开发&nbsp;:&nbsp;</td><td id="cxkf">Noizy、少主、八十后、Sky_hold、ＰＷ顽主、pw_sqj、槛外人、netServer、爬爬</td></tr>
+<tr class="tr3"><td width="120" class="tar">界面及交互设计&nbsp;:&nbsp;</td><td id="jmjh">Heiyo、lwid、papaya、smilee、joey、铁皮、sarabath</td></tr>
+<tr class="tr3"><td width="120" class="tar">官方论坛协助&nbsp;:&nbsp</td><td id="gfxz">Joey、骨头、桃子、lyn</td></tr>
+</table>
+</div>
+<div id="system"></div>
+<script language="JavaScript">
+function WhereToJump(id,name,v,url){
+	if (document.getElementById(v).value) {
+		openNewUrl(id,name,'$admin_file?' + url + document.getElementById(v).value);
+	}
+	return false;
+}
+function openNewUrl(id,name,url){
+	parent.PW.Dialog({
+					'id': id,
+					'name': name,
+					'url': url
+				}).loadIframe(url);
+}
+</script>
+<!--
+EOT;
+} elseif ($job == 'desktop'){print <<<EOT
+-->
+<div id="notice"></div>
+<!--
+EOT;
+if($warnid>0){print <<<EOT
+-->
+<style type="text/css">
+.admin_table .td1,.admin_table .td2{padding:4px 5px 4px 15px;line-height:22px;}
+</style>
+<div class="admin_info mb10">
+	<h4 class="h1">安全提示</h4>
+	<div class="legend">
+<ol>
+<!--
+EOT;
+if($warnid & 1){print <<<EOT
+-->
+	<li>强烈建议您将 data/sql_config.php 文件属性设置为644（linux/unix）或只读（NT） </li>
+<!--
+EOT;
+}if($warnid & 2){print <<<EOT
+-->
+	<li>强烈建议您使用 data目录隐藏功能，此功能可大大提高网站安全性，设置方法请参照相关帮助文档或联系官方寻求帮助 </li>
+<!--
+EOT;
+}if($warnid & 4){print <<<EOT
+-->
+	<li>强烈建议您将PHP配置文件（php.ini）中的 register_globals 设置为Off，可大大提高网站安全性</li>
+<!--
+EOT;
+}if($warnid & 8){print <<<EOT
+-->
+	<li>强烈建议您将 admin.php 文件重新命名，您可以通过“核心设置-安全与优化-安全控制”将 admin.php 重新命名，如:abc.php，然后使用 abc.php 登录后台管理 </li>
+<!--
+EOT;
+}if($warnid & 16){print <<<EOT
+-->
+	<li>强烈建议您开启 安全问题功能（“核心设置-安全与优化-安全控制”），并在 强制使用安全问题用户组设置 中选择管理员、总版主、版主等具有较高管理权限的用户组 </li>
+<!--
+EOT;
+}if($warnid & 32){print <<<EOT
+-->
+	<li>强烈建议您使用 数据库分卷（<a href="$admin_file?adminjob=ptable">工具->数据库分卷</a>） 功能，您的数据库大小已经超过500M</li>
+<!--
+EOT;
+}elseif($warnid & 64){print <<<EOT
+-->
+	<li>建议您使用 数据库分卷 功能，您的数据库大小已经超过300M</li>
+<!--
+EOT;
+}print <<<EOT
+-->
+</ol>
+	</div>
+</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+<div class="cc">
+	<div>
+	<h4 class="h1">您的资料</h4>
+    <div class="admin_table mb10">
+        <table width="100%">
+            <tr class="tr1 vt">
+                <td class="td1">用户名</td>
+                <td class="td2">$admin_name</td>
+            </tr>
+            <tr class="tr1 vt">
+                <td class="td1">级别</td>
+                <td class="td2">$admin_level</td>
+            </tr>
+            <tr class="tr1 vt">
+                <td class="td1">上次登录时间</td>
+                <td class="td2">{$lastinfo[1]['time']}</td>
+            </tr>
+            <tr class="tr1 vt">
+                <td class="td1">上次登录IP</td>
+                <td class="td2">{$lastinfo[1]['ip']}</td>
+            </tr>
+        </table>
+    </div>
+    </div>
+<!--
+EOT;
+if($admin_gid == '3'){print <<<EOT
+-->
+    <div class="fl" style="width:50%; clear:left;">
+	<h4 class="h1">站点管理</h4>
+    <div class="admin_table mb10">
+        <table width="100%">
+            <tr class="tr1 vt">
+                <td class="td1">主题</td>
+                <td class="td2">待审核主题数 {$sysinfo['tcheck']} <a href="javascript:;" onclick="openNewUrl('tpccheck','帖子审核','$admin_file?adminjob=tpccheck');">审核</a></td>
+            </tr>
+            <tr class="tr1 vt">
+                <td class="td1">回复</td>
+                <td class="td2">待审核回复数 {$sysinfo['pcheck']} <a href="javascript:;" onclick="openNewUrl('tpccheck','帖子审核','$admin_file?adminjob=tpccheck&action=postcheck');">审核</a></td>
+            </tr>
+            <tr class="tr1 vt">
+                <td class="td1">会员</td>
+                <td class="td2">未验证会员数 {$sysinfo['M7']} <a href="javascript:;" onclick="openNewUrl('checkreg','会员审核','$admin_file?adminjob=usercheck&admintype=checkreg');">审核</a></td>
+            </tr>
+            <tr class="tr1 vt">
+                <td class="td1">链接</td>
+                <td class="td2">待审核友情链接数 {$sysinfo['sharelinks']} <a href="javascript:;" onclick="openNewUrl('share','友情链接','$admin_file?adminjob=share');">审核</a></td>
+            </tr>
+            <tr class="tr1 vt">
+                <td class="td1">举报</td>
+                <td class="td2">未处理帖子举报数 {$sysinfo['report']} <a href="javascript:;" onclick="openNewUrl('report','举报管理','$admin_file?adminjob=report');">处理</a></td>
+            </tr>
+            <tr class="tr1 vt">
+                <td class="td1">论坛缓存</td>
+                <td class="td2">
+                	<span class="bt2"><span><button type="button" onclick="openNewUrl('updatecache','论坛缓存更新','$admin_file?adminjob=updatecache');">更 新</button></span></span>
+                </td>
+            </tr>
+            <tr class="tr1 vt">
+                <td class="td1">站点公告</td>
+                <td class="td2">
+                	<span class="bt2"><span><button type="button" onclick="openNewUrl('announcement','公告管理','$admin_file?adminjob=announcement');">管 理</button></span></span>
+                </td>
+            </tr>
+            <tr class="tr1 vt">
+                <td class="td1">版块设置</td>
+                <td class="td2">
+                    <select id="selforum" name="" class="select_wa">
+                        <option>请选择版块</option>$forumcache
+                    </select>
+                    <span class="bt2"><span><button type="button" onclick="WhereToJump('setforum','版块设置','selforum','adminjob=setforum&action=edit&fid=');">编 辑</button></span></span>
+                </td>
+            </tr>
+            <tr class="tr1 vt">
+                <td class="td1">编辑会员组</td>
+                <td class="td2">
+                    <select id="selectlv" name="" class="select_wa">
+                        <option>请选择会员组</option>$sltlv
+                    </select>
+                    <span class="bt2"><span><button type="button" onclick="WhereToJump('level','编辑会员组权限','selectlv','adminjob=level&action=editgroup&gid=');">编 辑</button></span></span>
+                </td>
+            </tr>
+            <tr class="tr1 vt">
+                <td class="td1">编辑用户</td>
+                <td class="td2">                    
+                     <input id="schname" class="input input_wa" name="schname" value="请输入用户名" onclick="this.value=''" type="text" />
+                    <span class="bt2"><span><button type="button" onclick="WhereToJump('setuser','编辑用户','schname','adminjob=setuser&action=search&schname_s=1&schname=');">编 辑</button></span></span>
+                    
+                </td>
+            </tr>
+        </table>
+    </div>
+    </div>
+	<div class="fr" style="width:48.5%;margin-left:1.5%; clear:right;">
+	<h4 class="h1">站点信息</h4>
+    <div class="admin_table mb10">
+        <table width="100%">
+            <tr class="tr1 vt">
+                <td class="td1">版块分类</td>
+                <td class="td2">{$sysinfo['category']} 个&nbsp;<a href="javascript:;" onclick="openNewUrl('setforum','管理版块','$admin_file?adminjob=setforum');">查看</a></td>
+            </tr>
+            <tr class="tr1 vt">
+                <td class="td1">论坛版块</td>
+                <td class="td2">{$sysinfo['forumnum']} 个&nbsp;<a href="javascript:;" onclick="openNewUrl('setforum','管理版块','$admin_file?adminjob=setforum');">查看</a></td>
+            </tr>
+            <tr class="tr1 vt">
+                <td class="td1">管理员</td>
+                <td class="td2">{$sysinfo['M3']} 人&nbsp;<a href="javascript:;" onclick="openNewUrl('userstats','成员统计','$admin_file?adminjob=userstats');">查看</a></td>
+            </tr>
+            <tr class="tr1 vt">
+                <td class="td1">总版主</td>
+                <td class="td2">{$sysinfo['M4']} 人&nbsp;<a href="javascript:;" onclick="openNewUrl('userstats','成员统计','$admin_file?adminjob=userstats');">查看</a></td>
+            </tr>
+            <tr class="tr1 vt">
+                <td class="td1">版主</td>
+                <td class="td2">{$sysinfo['M5']} 人&nbsp;<a href="javascript:;" onclick="openNewUrl('userstats','成员统计','$admin_file?adminjob=userstats');">查看</a></td>
+            </tr>
+            <tr class="tr1 vt">
+                <td class="td1">数据库</td>
+                <td class="td2">{$sysinfo['pw_size']} 兆</td>
+            </tr>
+        </table>
+    </div>
+    </div>
+<!--
+EOT;
+}elseif($admin_gid == '4' || $admin_gid == '5'){print <<<EOT
+-->
+    <div>
+	<h4 class="h1">站点管理</h4>
+    <div class="admin_table mb10">
+        <table width="100%">
+            <tr class="tr1 vt">
+                <td class="td1">主题</td>
+                <td class="td2">待审核主题数 {$sysinfo['tcheck']} <a href="javascript:;" onclick="openNewUrl('tpccheck','帖子审核','$admin_file?adminjob=tpccheck');">审核</a></td>
+            </tr>
+            <tr class="tr1 vt">
+                <td class="td1">回复</td>
+                <td class="td2">待审核回复数 {$sysinfo['pcheck']} <a href="javascript:;" onclick="openNewUrl('tpccheck','帖子审核','$admin_file?adminjob=tpccheck&action=postcheck');">审核</a></td>
+            </tr>
+            <tr class="tr1 vt">
+                <td class="td1">举报</td>
+                <td class="td2">未处理帖子举报数 {$sysinfo['report']} <a href="javascript:;" onclick="openNewUrl('report','举报管理','$admin_file?adminjob=report');">处理</a></td>
+            </tr>
+            <tr class="tr1 vt">
+                <td class="td1">版块设置</td>
+                <td class="td2">
+                    <select id="selforum" name="" class="select_wa">
+                        <option>请选择版块</option>$forumcache
+                    </select>
+                    <span class="bt2"><span><button type="button" onclick="WhereToJump('setforum','版块设置','selforum','adminjob=setforum&action=edit&fid=');">编 辑</button></span></span>
+                </td>
+            </tr>
+            <tr class="tr1 vt">
+                <td class="td1">禁止一个IP/IP段</td>
+                <td class="td2">
+                    <input type="text" id="setips" class="input input_wa" />
+                    <span class="bt2"><span><button type="button" onclick="WhereToJump('ipban','禁止IP','setips','adminjob=ipban&action=addone&baninfo=');">提 交</button></span></span>
+                </td>
+            </tr>
+            <tr class="tr1 vt">
+                <td class="td1">词语过滤</td>
+                <td class="td2">
+                    <span class="bt2"><span><button type="button" onclick="openNewUrl('setbwd','词语过滤','$admin_file?adminjob=setbwd');">管 理</button></span></span>
+                </td>
+            </tr>
+            <tr class="tr1 vt">
+                <td class="td1">会员管理</td>
+                <td class="td2">
+                    <span class="bt2"><span><button type="button" onclick="openNewUrl('setuser','会员管理','$admin_file?adminjob=setuser')">管 理</button></span></span>
+                </td>
+            </tr>
+		</table>
+    </div>
+    </div>
+<!--
+EOT;
+}print <<<EOT
+-->
+</div>
+<!--
+EOT;
+if ($db_adminrecord == 1){print <<<EOT
+-->
+<h2 class="h1">最新管理操作记录</h2>
+<div class="admin_table mb10">
+    <table width="100%">
+    <tr class="tr2">
+        <td width="10%">用户名</td>
+        <td width="10%">IP</td>
+        <td width="15%">操作时间</td>
+        <td width="30%">操作理由</td>
+    </tr>
+    $adlogfor
+    </table>
+</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+<script language="JavaScript">
+function WhereToJump(id,name,v,url){
+	if (document.getElementById(v).value) {
+		openNewUrl(id,name,'$admin_file?' + url + document.getElementById(v).value);
+	}
+	return false;
+}
+
+function openNewUrl(id,name,url){
+	parent.PW.Dialog({
+		'id': id,
+		'name': name,
+		'url': url,
+		'max':false
+	}).loadIframe(url);
+}
+</script>
+<div id="system" style="display:none;"></div>
+<!--
+EOT;
+} elseif ($job == 'notice'){print <<<EOT
+-->
+<h2 class="h1">关于phpwind</h2>
+<div class="legend">
+	<ul>
+		<li>phpwind 的使命是让网站更具价值，让更多人从网络社区中享受便利，以提升生活品质</li>
+		<li>phpwind专注于社区价值的发掘和应用的整合，随着互联网的发展，社区的形式将更为丰富，将融合论坛、信息门户、社交网站等更多形式，我们会把这些应用整合到社区当中，并创造最优化的用户体验</li>
+		<li>phpwind认为社区的价值无限，人们可以在网络社区完成获取信息、交流、娱乐、购物等生活需求，社区可提供丰富的应用，满足人们在网络社区的归属感，使得网络社区成为人们的网上家园</li>
+		<li>我们的近期目标是强化社区的媒体价值，并以此为基础，拓展社区娱乐和电子商务应用。在未来，我们认为社区有无限成长的可能</li>
+        <li>phpwind社区世界邀请你加入，无论你是社区网站、普通的网络用户，还是有志于拓展社区应用的技术、营销人才，都将会在这里发现并创造更多的精彩</li>
+</div>
+<h3 class="h1">商业用户授权查证</h3>
+<div class="legend">
+<span class="fr"><a href="http://www.phpwind.com/certificate.php" target="_blank" title="商业授权查询网站地址"><img src="$imgpath/admin/commerce-check.png" /></a></span>如果您已经购买了phpwind 商业用户授权，您可以在phpwind 商业授权查询网站找到您的网站的相关商业授权信息；<br />如果您没有找到您的网站的商业授权信息或者您的网站的商业授权信息与您购买的商业授权类型不符，说明您购买的可能非法的商业授权，请及时与我们取得联系!<br />我们的联系方式: <span class="xia">QQ:80132916，178199933</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="xia">MSN:phpwind@qq.com</span>
+&nbsp;&nbsp;&nbsp;<span class="xia">TEL:0571-81607190-8800</span>
+</div>
+<h3 class="h1">当前系统信息</h3>
+<div class="legend">
+    <ul>
+        <li>社区软件版本：phpwind {$wind_version} ($db_charset) </li>
+        <li>PHP程式版本:$sysversion</li>
+        <li>MYSQL 版本:$dbversion</li>
+        <li>服务器端信息:$sysos</li>
+        <li>最大上传限制:$max_upload</li>
+        <li>最大执行时间:$max_ex_time</li>
+        <li>邮件支持模式:$sys_mail</li>
+        <li>Cookie 测试:$ifcookie</li>
+        <li>服务器所在时间:$systemtime</li>
+        <li>站点显示时间:$altertime</li>
+        <li>站点数据库占用:$pw_size M</li>
+        <li>非站点数据库占用:$o_size M</li>
+    </ul>
+</div>
+<h3 class="h1">phpwind 开发团队</h3>
+<div class="admin_table">
+<table width="100%" cellspacing="0" cellpadding="0">
+<tr class="tr1 vt"><td class="td1">主程序开发</td><td class="td2" id="cxkf">Noizy、少主、八十后、Sky_hold、ＰＷ顽主、pw_sqj、槛外人、netServer、爬爬</td></tr>
+<tr class="tr1 vt"><td class="td1">界面及交互设计</td><td class="td2" id="jmjh">Heiyo、lwid、papaya、smilee、joey、铁皮、sarabath</td></tr>
+<tr class="tr1 vt"><td class="td1">官方论坛协助</td><td class="td2" id="gfxz">Joey、骨头、桃子、lyn</td></tr>
+</table>
+</div>
+<div id="system"></div>
+<!--
+EOT;
+} elseif ($job == 'shortcut'){print <<<EOT
+-->
+<h2 class="h1">后台菜单地图列表</h2>
+<div class="admin_table">
+<table width="100%" cellspacing="0" cellpadding="0">
+<!--
+EOT;
+foreach ($nav_left as $title => $left) {
+	if (count($left['items']) == 0) continue;print <<<EOT
+-->
+	<tr class="tr1 vt"><td class="td1">{$left['name']}</td><td class="td2"><ul class="list_A list_120 cc" style="width:100%;">
+<!--
+EOT;
+	foreach ($left['items'] as $key => $value) {print <<<EOT
+-->
+		<li><a href="{$purview[$key][1]}" onclick="parent.PW.Dialog({id:'$key',url:'{$purview[$key][1]}',name:'$value'});return false;">$value</a></li>
+<!--
+EOT;
+}print <<<EOT
+-->
+	</ul></td></tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+</table>
+</div>
+<!--
+EOT;
+}?>-->

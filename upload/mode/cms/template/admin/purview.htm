@@ -1,0 +1,251 @@
+<!--<?php
+include_once PrintEot('left');
+print <<<EOT
+-->
+<script type="text/javascript">
+var goback = function(){
+	window.location.href = '$baseUrl';
+}
+var deleteColumn = function(username){
+	var url = '{$ajaxUrl}';
+	if(!confirm('确认删除该用户的cms管理权限吗')) {
+		return false;
+	}
+	ajax.send(url,'action=static&alias='+alias,ajax.get);
+	return false;
+}
+var checkboxClass = {
+	$ : function(id){
+		return document.getElementById(id);
+	},
+	checkAll : function(obj,boxid){
+		var boxs = this.$(boxid) != null ?this.$(boxid).getElementsByTagName("input") : null;
+		if(!boxs){
+			return false;
+		}
+		var status = (obj.checked) ? true : false;
+		for(var i=0,length=boxs.length;i<length;i++){
+			if(boxs[i].type == 'checkbox'){
+				boxs[i].checked = status;
+			}
+		}
+	},
+	ifcheckedAll : function(boxid){
+		var boxs = this.$(boxid).getElementsByTagName("input");
+		var obj = this.$('checkallbutton');
+		if(!boxs){
+			return false;
+		}
+		var flag = false;
+		for(var i=0,length=boxs.length;i<length;i++){
+			if(boxs[i].type == 'checkbox'){
+				if(!boxs[i].checked && boxs[i].id != 'checkallbutton'){
+					flag = true;
+					break;
+				}
+			}
+		}
+		if(flag){
+			obj.checked = false;
+		}else{
+			obj.checked = true;
+		}
+	},
+	checkOne : function(obj,relatedid){
+		var related = this.$(relatedid);
+		if(!related){
+			return false;
+		}
+		related.checked = true;
+	},
+	init : function(){
+		var obj = this.$("arealevel");
+		if(!obj){
+			return false;
+		}
+		var boxs = obj.getElementsByTagName("input");
+		if(!boxs){
+			return false;
+		}
+		for(var i=0,length=boxs.length;i<length;i++){
+			if(boxs[i].type == 'checkbox' ){
+				var next = boxs[i].nextSibling;
+				next.onclick = function(){
+					this.previousSibling.click();
+				}
+			}
+		}
+	}
+}
+function checkBoxs(obj,boxid){
+	checkboxClass.checkAll(obj,boxid);
+	checkboxClass.ifcheckedAll('arealevel');
+}
+function checkBox(obj,relatedid){
+	checkboxClass.checkOne(obj,relatedid);
+}
+window.onload = function(){
+	checkboxClass.init();	
+}
+</script>
+<!-- 
+EOT;
+if(empty($action)){
+print <<<EOT
+-->
+<div class="admin_info mb10" style="display: block">
+	<h3 class="h1">提示信息</h3>
+    <div class="legend">
+    	<ol>
+        	<li>分配权限后，用户可以在前台管理栏目文章列表，包括编辑和删除</li>
+        </ol>
+    </div>
+</div>
+
+<form action="{$baseUrl}" method="post">
+<h2 class="h1">查找用户</h2>
+<div class="admin_table mb10">
+	<table width="100%">
+    	<tr class="tr1">
+        	<td class="td2"><input type="text" name="username" value="{$username}" class="input input_wa mr5" />
+        	<span class="bt2"><span><button type="submit">提 交</button></span></span></td>
+        </tr>
+	</table>
+</div>
+</form>
+
+<h2 class="h1"><span class="mr5 fl">用户列表</span><a href="{$baseUrl}&action=add" class="btn_add"><i>添加</i></a></h2>
+<div class="admin_table mb10">
+	<table width="100%">
+    	<tr class="tr2">
+            <td width="100">用户名</td>
+            <td>负责栏目</td>
+            <td width="120">操作</td>
+        </tr>
+<!--
+EOT;
+if(empty($cmsPurviews)){
+print <<<EOT
+-->
+		<tr class="tr1 vt">
+			<td class="p10" colspan="6"><div class="admin_tips">啊哦，没有你要的信息！</div></td>
+		</tr>	
+<!-- 
+EOT;
+}foreach($cmsPurviews as $purview){
+$_cnames =  $purview['super'] ? '所有' : $purviewService->getColumnNameByCIds($purview[columns]);
+$_cnames = empty($_cnames) ? '无' : $_cnames;
+print <<<EOT
+-->
+        <tr class="tr1">
+            <td class="td2"><a href="u.php?username={$purview[username]}" target="_blank">{$purview[username]}</a></td>
+            <td class="td2">{$_cnames}</td>
+            <td class="td2">
+            	<a href="{$baseUrl}&action=add&pid={$purview[purview_id]}" class="mr10">[编辑]</a>
+            	<a href="{$baseUrl}&action=del&pid={$purview[purview_id]}" class="mr10" onclick="return confirm('确定要删除该用户的栏目权限吗？')">[删除]</a>
+            </td>
+        </tr>
+<!-- 
+EOT;
+}
+print <<<EOT
+-->  
+    </table>
+</div>
+$pager
+
+<!-- 
+EOT;
+}elseif ($action == 'add' || $action == 'edit'){
+$disable = $pid ? "readonly=\"readonly\"" : '';
+print <<<EOT
+-->
+<h2 class="h1">用户权限</h2>
+<form action="$basename" method="post">
+<input type="hidden" name="action" value="addsubmit" />
+<input type="hidden" name="pid" value="{$userpurview[purview_id]}" />
+<div class="admin_table mb10">
+	<table width="100%">
+    	<tr class="tr1">
+        	<td class="td1">用户名</td>
+            <td class="td2"><input name="username" type="text" class="input input_wa" value="{$userpurview[username]}"  tabindex="1" $disable /></td>
+            <td class="td2"></td>
+        </tr>
+        <tr class="tr1 vt">
+        	<td class="td1">负责栏目</td>
+            <td class="td2">
+            
+				<div class="admin_table_c" style="width:auto;" id="arealevel">
+				<table cellpadding="0" cellspacing="0" id="columntable">
+					<tr class="vt">
+						<th class="s4" style="width:100px;"><input id="checkallbutton" onclick="checkBoxs(this,'arealevel')" name="super" type="checkbox" value="1" {$superchecked} /><span> 全部权限</span></th>
+					</tr>
+					<tbody>
+<!--
+EOT;
+$_topdiv = 'arealevel';
+foreach($columns as $column){
+$_html = getColumnLevelHtml($column['level'],$column['column_id']);
+$columnCheck = (in_array($column['column_id'],$userpurview['columns']) || $userpurview['super']) ? "checked=checked" : "";
+$_tbody_t = $column['level'] == '0' ? '</tbody><tbody>' : '';
+$_tbody = $column['level'] == '0' ? '</tbody><tbody id="column_' . $column['column_id'] . '_tbody">' : '';
+print <<<EOT
+-->
+	{$_tbody_t}
+	<tr class="vt tr1" id="column_{$column[parent_id]}_{$column[column_id]}">
+		<td class="s4">
+			{$_html}
+			</span><label><input onclick="checkBoxs(this,'column_{$column[column_id]}_tbody')" type="checkbox" name="columnids[]" value="{$column[column_id]}" $columnCheck />
+			{$column[name]}</label>
+		</td>
+	</tr>
+	{$_tbody}
+<!--
+EOT;
+}print <<<EOT
+-->
+				</tbody>
+				</table>
+				</div>
+
+            </td>
+            <td class="td2"></td>
+        </tr>
+    </table>
+</div>
+<div class="tac mb10">
+    <span class="btn"><span><button type="submit">提 交</button></span></span>
+    <span class="bt"><span><button type="button" onclick="goback();">返回列表</button></span></span>
+</div>
+</form>
+<script type="text/javascript">
+function closeAllSubColumns(parentid){
+	var columntable = getObj('columntable'); 
+	var bt = getObj('column_'+parentid);
+	if(bt != null){
+		if(bt.className == 'expand expand_a'){ 
+			bt.className = 'expand expand_b';
+		}else if(bt.className == 'expand expand_b') {
+			bt.className = 'expand expand_a';
+		}
+	}
+	var tbody = getObj('column_'+parentid+'_tbody');
+	if(tbody){
+		if(tbody.style.display == 'none') {
+			tbody.style.display = '';
+		}else{
+			tbody.style.display = 'none';
+		}
+	}
+}
+</script>
+<!-- 
+EOT;
+}
+print <<<EOT
+-->
+
+<!--
+EOT;
+include_once PrintEot('adminbottom');
+?>-->

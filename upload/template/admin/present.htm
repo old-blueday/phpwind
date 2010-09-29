@@ -1,0 +1,117 @@
+<!--<?php
+include_once PrintEot('left');
+if(empty($action)){print <<<EOT
+-->
+<form name='FORM' action="$basename" method="post">
+	<h2 class="h1">节日送礼</h2>
+	<div class="admin_table mb10">
+	<table width="100%" cellspacing="0" cellpadding="0">
+		<tr class="tr1 vt">
+			<td class="td1">&nbsp;</td>
+			<td class="td2">
+				<ul class="list_A">
+					<li><input type="radio" name="by" value="0" onclick="sendtype(0)" checked />按用户组</li>
+					<li><input type="radio" name="by" value="1" onclick="sendtype(1)" />在线用户</li>
+					<li><input type="radio" name="by" value="2" onclick="sendtype(2)" />按用户名</li>
+				</ul>
+			</td>
+		</tr>
+		<tbody id="by_0">
+			<tr class="tr1 vt">
+				<td class="td1">接收用户</td>
+				<td class="td2">
+					<ul class="cc list_A list_120 mb10" style="width:480px">
+<!--
+EOT;
+$num=0;
+foreach($ltitle as $key=>$value){
+if($key=='1' || $key=='2' || isset($lneed[$key]))continue;
+$num++;
+print <<<EOT
+-->
+							<li><input type='checkbox' name='sendto[]' value='$key'>$value</li>
+<!--
+EOT;
+}print <<<EOT
+-->
+							<li><input type="checkbox" name='sendto[]' value='-1'>普通会员</li>
+						</ul>
+						<span class="bt2"><span><button type="button" onfocus="blur();" name="chkall" value="全 选" onclick="CheckAll(this.form)">全 选</button></span></span>
+				</td>
+			</tr>
+		</tbody>
+		<tbody id="by_1" style="display:none">
+		</tbody>
+		<tbody id="by_2" style="display:none">
+			<tr class="tr1 vt">
+				<td class="td1">指定用户名，多个用,分开</td>
+				<td class="td2"><input type="text" name="touser" class="input input_wa" /></td>
+			</tr>
+		</tbody>
+		<tr class="tr2 vt td_bgB">
+			<td colspan="2"><span class="b s5">赠送积分</span></td>
+		</tr>
+<!--
+EOT;
+foreach($credit->cType as $key=>$val){print <<<EOT
+-->
+		<tr class="tr1 vt">
+			<td class="td1">$val</td>
+			<td class="td2"><input type="text" name='present[$key]' class="input input_wa"></td>
+		</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+		<tr class="tr2 vt td_bgB">
+			<td colspan="2"><span class="b s5">消息通知</span></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">每批发送个数</td>
+			<td class="td2"><input type="text" name="percount" class="input input_wa" value="100" /></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">主题</td>
+			<td class="td2"><input type="text" name="subject" class="input input_wb" /></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">内容</td>
+			<td class="td2">
+<!--
+EOT;
+require_once PrintEot('wysiwyg_editor');
+print <<<EOT
+-->
+			</td>
+		</tr>
+	</table>
+	</div>
+
+<script type="text/javascript" LANGUAGE="JavaScript" src="js/core/core.js"></script>
+<script type="text/javascript" language="JavaScript" src="js/pw_ajax.js"></script>
+<script language="JavaScript" src="js/post.js"></script>
+<script language="JavaScript" src="js/global.js"></script>
+
+<script language="JavaScript" src="data/bbscache/face.js"></script>
+<div id="menu_face" class="menu" style="display:none;"></div>
+<div id="menu_generalface" class="menu" style="display:none;"></div>
+
+<script type="text/javascript">editor.init('wysiwyg', 1);</script>
+	
+	<input type="hidden" name="action" value="send" />
+	<div class="tac mb10">
+		<span class="btn"><span><button type="submit">提 交</button></span></span>
+		<span class="bt"><span><button type="reset">重 置</button></span></span>
+	</div>
+</form>
+<script language="JavaScript">
+function sendtype(id) {
+	for (var i = 0; i < 3; i++) {
+		document.getElementById('by_' + i).style.display = (id == i) ? '' : 'none';
+	}
+}
+</script>
+<!--
+EOT;
+}include_once PrintEot('adminbottom');
+?>-->

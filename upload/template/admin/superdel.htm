@@ -1,0 +1,756 @@
+<!--<?php
+include_once PrintEot('left');
+if(empty($action)){
+if($admintype == 'article'){
+print <<<EOT
+-->
+<h2 class="h1 mb10"><a href="$admin_file?adminjob=app&admintype=appslist">返回基础应用列表</a></h2>
+<!--
+EOT;
+}print<<<EOT
+-->
+<div class="admin_info mb10">
+  <h3 class="h1"><b>提示信息</b></h3>
+  <div class="legend">
+    <ul>
+<!--
+EOT;
+if($admintype=='article'){print <<<EOT
+-->
+      <ol><li>删除符合条件的帖子用于清理站点冗余数据,此操作不可恢复,请谨慎使用！</li><li>用户组成员根据用户组权限设置取得相应批量删除权限</li><li>版主拥有所管辖的版块（分类）发布的批量删除的权限<br /><span class="s1">功能说明</span>:<br/>使用<font color=blue>删除主题</font>功能可删除某个会员发表的所有主题(包括回复)<br />使用<font color=blue>删除回复</font>功能可删除某个会员发表的所有回复</li></ol>
+<!--
+EOT;
+}elseif($admintype=='delmember'){
+print <<<EOT
+-->
+      删除符合条件的用户,用于清理站点冗余数据,此操作不可恢复,请谨慎使用！<br />删除项目中的“其他”，包括评分、收藏、朋友等其他行为记录。
+<!--
+EOT;
+}elseif($admintype=='message'){
+print <<<EOT
+-->
+      删除符合条件的消息,用于清理站点冗余数据,此操作不可恢复,请谨慎使用！
+<!--
+EOT;
+}print <<<EOT
+-->
+    </ul>
+  </div>
+</div>
+<!--
+EOT;
+}if($admintype=='article'){
+if(empty($action)){print <<<EOT
+-->
+<script language="JavaScript" src="js/date.js"></script>
+<form action="$basename&" method=post>
+  <input type=hidden name=action value='deltpc'>
+  <h2 class="h1"><b>删除主题</b></h2>
+  <div class="admin_table mb10">
+	<table cellpadding="0" cellspacing="0" width="100%">
+<!--
+EOT;
+if($db_sphinx['isopen'] == 1){
+print <<<EOT
+-->
+    <script type="text/javascript">
+var sphinxControl = {
+	num : 8,
+	$ : function(id){
+		return document.getElementById(id);
+	},
+	check : function(){
+		var checkbox = this.$("sphinxopen");
+		if(checkbox.checked == 1){
+			this.hidden('none');
+		}else{
+			this.hidden('');
+		}
+	},
+
+	hidden : function(show){
+		for(var i=0;i<=this.num;i++){
+			var obj = this.$("condition_"+i);
+			obj ? obj.style.display = show : 0;
+		}
+	}
+}
+window.onload = function(){
+	if(parent.adminNavClass){
+		parent.adminNavClass.initTips();
+	}
+	sphinxControl.check();
+}
+</script>
+    <tr class="tr1 vt">
+      <td class="td1">全文索引搜索(关键字如果为空将使用默认搜索方式)</td>
+      <td class="td2"><input type="checkbox" name="sphinx" id="sphinxopen" value="1" checked onclick="sphinxControl.check();" />开启
+      </td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">全文索引搜索帖子搜索范围</td>
+      <td class="td2">
+        <div class="list_A">
+            <ul>
+                <li><input type="radio" name="sphinxRange" value="1" checked />主题标题</li>
+                <li><input type="radio" name="sphinxRange" value="2"  />主题标题与主题内容</li>
+            </ul>
+        </div>
+      </td>
+    </tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+    <tr class="tr1 vt">
+      <td class="td1">所属版块</td>
+      <td class="td2"><select name="fid"  class="select_wa mr20 fl">
+          <option value='-1'>所有版块</option>
+          $forumcache
+        </select>
+        <input type="checkbox" name="ifkeep" value="1" checked>
+        保留精华置顶
+        </td>
+    </tr>
+<!--
+EOT;
+if($t_table){ print <<<EOT
+-->
+    <tr class="tr1 vt">
+      <td class="td1">分表数据库</td>
+      <td class="td2"><select name="ttable"  class="select_wa">
+          $t_table
+        </select></td>
+    </tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+    <tr class="tr1 vt">
+      <td class="td1">主题发表时间</td>
+      <td class="td2">
+      <div class="input_img fl"><i onclick="this.nextSibling.onclick()" class="input_time" title="选择时间">选择时间</i><input type="text" name="pstarttime" id="pstarttime" onClick="javascript:ShowCalendar(this.id)" /></div><span class="p_lr_10 fl">至</span><div class="input_img fl mr20"><i class="input_time" title="选择时间">选择时间</i><input type="text" name="pendtime" id="pendtime" onClick="javascript:ShowCalendar(this.id)" /></div>可只用单个条件
+      </td>
+    </tr>
+    <tr class="tr1 vt" id="condition_0">
+      <td class="td1">主题最后被回复时间</td>
+      <td class="td2">
+      <div class="input_img fl"><i onclick="this.nextSibling.onclick()" class="input_time" title="选择时间">选择时间</i><input type="text" name="lstarttime" id="lstarttime" onClick="javascript:ShowCalendar(this.id)" /></div><span class="p_lr_10 fl">至</span><div class="input_img fl mr20"><i class="input_time " title="选择时间">选择时间</i><input type="text" name="lendtime" id="lendtime" onClick="javascript:ShowCalendar(this.id)" /></div>只可用单个条件
+      </td>
+    </tr>
+    <tr class="tr1 vt" id="condition_1">
+      <td class="td1">指定 tid 范围</td>
+      <td class="td2">
+      <input type="text" class="input input_wa" name="tstart"><span class="p_lr_10">-</span><input type="text" class="input input_wa mr20" name="tend"> 只可用单个条件
+      </td>
+    </tr>
+    <tr class="tr1 vt" id="condition_2">
+      <td class="td1">浏览人数小于</td>
+      <td class="td2"><input type="text" class="input input_wa mr20" maxlength=14 name="hits"><!-- 的主题 --></td>
+    </tr>
+    <tr class="tr1 vt" id="condition_4">
+      <td class="td1">回复人数小于</td>
+      <td class="td2"><input type="text" class="input input_wa mr20" maxlength=14 name="replies"><!-- 的主题 --></td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">按主题作者删除</td>
+      <td class="td2"><input type="text" class="input input_wa mr20" name="author">可使用通配符 "*"，多个作者用英文半角逗号","分隔</td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">关键字</td>
+      <td class="td2"><input type="text" class="input input_wa mr20" name="keyword">可使用通配符 "*"，多个关键字用英文半角逗号","分隔</td>
+    </tr>
+    <tr class="tr1 vt" id="condition_5">
+      <td class="td1">内容大于[字节]</td>
+      <td class="td2"><input type="text" class="input input_wa mr20" name="tcounts"></td>
+    </tr>
+    <tr class="tr1 vt" id="condition_6">
+      <td class="td1">内容少于[字节]</td>
+      <td class="td2"><input type="text" class="input input_wa mr20" name="counts"></td>
+    </tr>
+    <tr class="tr1 vt" id="condition_7">
+      <td class="td1">根据用户IP查找</td>
+      <td class="td2"><input type="text" class="input input_wa mr20" name="userip">可使用通配符 "*"</td>
+    </tr>
+    <tr class="tr3" id="condition_8">
+      <td class="td1"><div id="info1">每页显示行数</div></td>
+      <td class="td2"><input type="text" class="input input_wa mr20" name="lines" value="30"><input type="checkbox" name="direct" value=1 onclick="deldirect(this.form,'info1','每页显示行数');">
+    直接删除(直接删除符合条件的项目)
+        </td>
+    </tr>
+  </table>
+  </div>
+  <div class="mb10 tac">
+    <span class="btn"><span><button type="submit">提 交</button></span></span>
+    </div>
+</form>
+<form action="$basename&" method=post>
+  <input type=hidden name=action value='delrpl'>
+  <h2 class="h1"><b>删除回复</b></h2>
+  <div class="admin_table mb10">
+	<table cellpadding="0" cellspacing="0" width="100%">
+<!--
+EOT;
+if($db_sphinx['isopen'] == 1){
+print <<<EOT
+-->
+    <script type="text/javascript">
+var sphinxPostControl = {
+	num : 6,
+	$ : function(id){
+		return document.getElementById(id);
+	},
+	check : function(){
+		var checkbox = this.$("sphinxpostopen");
+		if(checkbox.checked == 1){
+			this.hidden('none');
+		}else{
+			this.hidden('');
+		}
+	},
+
+	hidden : function(show){
+		for(var i=0;i<=this.num;i++){
+			var obj = this.$("conditionpost_"+i);
+			obj ? obj.style.display = show : 0;
+		}
+	}
+}
+</script>
+    <tr class="tr1 vt">
+      <td class="td1">全文索引搜索(关键字如果为空将使用默认搜索方式)</td>
+      <td class="td2"><input type="checkbox" name="sphinx" value="1" onclick="sphinxPostControl.check();" id="sphinxpostopen"/>开启</td>
+    </tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+    <tr class="tr1 vt">
+      <td class="td1">所属版块</td>
+      <td class="td2"><select name="fid" class="select_wa">
+          <option value='-1'>所有版块</option>
+          $forumcache
+        </select></td>
+    </tr>
+<!--
+EOT;
+if($p_table){ print <<<EOT
+-->
+    <tr class="tr1 vt">
+      <td class="td1">分表数据库</td>
+      <td class="td2"><select name="ptable" class="select_wa">
+          $p_table
+        </select></td>
+    </tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+    <tr class="tr1 vt" id="conditionpost_0">
+      <td class="td1">所属主题ID</td>
+      <td class="td2"><input type="text" class="input input_wa mr20" name="tid">
+        <span class="s1">用于删除指定主题的所有回复。多个主题ID用英文半角逗号","分隔</span></td>
+    </tr>
+    <tr class="tr1 vt" id="conditionpost_1">
+      <td class="td1">指定 pid 范围</td>
+      <td class="td2"><input type="text" class="input input_wa" name="pstart">
+        -
+        <input type="text" class="input input_wa mr20" name="pend">只可用于单个条件
+      </td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">按作者删除(<font color=blue>回复作者</font>)</td>
+      <td class="td2"><input type="text" class="input input_wa mr20" name="author">可使用通配符 "*"，多个作者用英文半角逗号","分隔</td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">关键字</td>
+      <td class="td2"><input type="text" class="input input_wa mr20" name="keyword">可使用通配符 "*"</td>
+    </tr>
+    <tr class="tr1 vt" id="conditionpost_2">
+      <td class="td1">内容大于[字节]</td>
+      <td class="td2"><input type="text" class="input input_wa mr20" name="tcounts"></td>
+    </tr>
+    <tr class="tr1 vt" id="conditionpost_3">
+      <td class="td1">内容少于[字节]</td>
+      <td class="td2"><input type="text" class="input input_wa mr20" name="counts"></td>
+    </tr>
+    <tr class="tr1 vt" id="conditionpost_4">
+      <td class="td1">根据用户IP查找</td>
+      <td class="td2"><input type="text" class="input input_wa mr20" name="userip">可使用通配符 "*"</td>
+    </tr>
+    <tr class="tr1 vt" id="conditionpost_5">
+      <td class="td1">每批处理的个数</td>
+      <td class="td2"><input type="text" class="input input_wa mr20" name="nums" value="30"><input type="checkbox" name="direct" value=1 onclick="deldirect(this.form,'info2','每批处理的个数');">
+        直接删除(直接删除符合条件的项目)</td>
+    </tr>
+  </table>
+  </div>
+  	<div class="mb10 tac">
+    <span class="btn"><span><button type="submit">提 交</button></span></span>
+    </div>
+</form>
+<!--
+EOT;
+} elseif($action=='deltpc' && empty($step)){print <<<EOT
+-->
+<form action="$basename&" method="post" name="del_tpc_form"  id="del_tpc_form">
+  <input type="hidden" name="action" value="$action">
+  <input type="hidden" name="ttable" value="$ttable">
+  <input type="hidden" name="fid" value="$fid">
+  <input type="hidden" name="ifkeep" value="$ifkeep">
+  <input type="hidden" name="pstarttime" value="$pstarttime">
+  <input type="hidden" name="pendtime" value="$pendtime">
+  <input type="hidden" name="lstarttime" value="$lstarttime">
+  <input type="hidden" name="lendtime" value="$lendtime">
+  <input type="hidden" name="tstart" value="$tstart">
+  <input type="hidden" name="tend" value="$tend">
+  <input type="hidden" name="hits" value="$hits">
+  <input type="hidden" name="replies" value="$replies">
+  <input type="hidden" name="author" value="$author">
+  <input type="hidden" name="keyword" value="$keyword">
+  <input type="hidden" name="userip" value="$userip">
+  <input type="hidden" name="lines" value="$lines">
+  <input type="hidden" name="tcounts" value="$tcounts">
+  <input type="hidden" name="counts" value="$counts">
+  <input type="hidden" name="page" value="$page">
+  <input type="hidden" name="sphinx" value="$sphinx">
+  <input type="hidden" name="sphinxRange" value="$sphinxRange">
+  <input type="hidden" name="step" value="2">
+    <h2 class="h1 mb10"><a href="$admin_file?adminjob=app&admintype=appslist">返回基础应用列表</a></h2>
+    <h3 class="h1"><b>文章列表</b></h3>
+    <div class="admin_table mb10">
+		<table cellpadding="0" cellspacing="0" width="100%">
+          <tr class="tr2 vt td_bgB">
+			<td width="50"><span class="cp" onclick="CheckAll(document.del_tpc_form);">全选</span></td>
+            <td width="200">标题</td>
+            <td width="70">作者</td>
+            <td width="100">发表时间</td>
+            <td width="95">IP</td>
+            <td>版块</td>
+            <td width="24">回复</td>
+            <td width="24">人气</td>
+          </tr>
+<!--
+EOT;
+foreach($topicdb as $key=>$topic){
+if(!$topic[subject])continue;
+print <<<EOT
+-->
+          <tr class="tr1 vt">
+            <td class="td2"><input type="checkbox" name="delid[$topic[tid]]" value="$topic[fid]"></td>
+            <td class="td2"><p class="lh_18"><a href="read.php?fid=$topic[fid]&tid=$topic[tid]" target="_blank" title="$topic[subject]">$topic[subject]</a></p></td>
+            <td class="td2"><a href="u.php?uid=$topic[authorid]" target=_blank>$topic[author]</a></td>
+            <td class="td2">$topic[postdate]</td>
+            <td class="td2">$topic[userip]</td>
+            <td class="td2"><p class="lh_18">$topic[forumname]</p></td>
+            <td class="td2">$topic[replies]</td>
+            <td class="td2">$topic[hits]</td>
+          </tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+        </table>
+    </div>
+  <div class="cc mb10">$pages</div>
+  <div class="mb10 tac">
+    <span class="btn"><span><button type="submit">删除</button></span></span>
+   </div>
+</form>
+<!--
+EOT;
+} elseif($action=='delrpl' && empty($step)){print <<<EOT
+-->
+<form action="$basename&" name="del_rpl_form" method="post" id="del_rpl_form">
+  <input type="hidden" name=action value="$action">
+  <input type="hidden" name="step" value="2">
+  <input type="hidden" name="ptable" value="$ptable">
+  <input type="hidden" name="fid" value="$fid">
+  <input type="hidden" name="tid" value="$tid">
+  <input type="hidden" name="pstart" value="$pstart">
+  <input type="hidden" name="pend" value="$pend">
+  <input type="hidden" name="author" value="$author">
+  <input type="hidden" name="keyword" value="$keyword">
+  <input type="hidden" name="userip" value="$userip">
+  <input type="hidden" name="nums" value="$nums">
+  <input type="hidden" name="tcounts" value="$tcounts">
+  <input type="hidden" name="counts" value="$counts">
+  <input type="hidden" name="page" value="$page">
+  <input type="hidden" name="sphinx" value="$sphinx">
+  <input type="hidden" name="sphinxRange" value="$sphinxRange">
+  <h2 class="h1 mb10"><a href="$admin_file?adminjob=app&admintype=appslist">返回基础应用列表</a></h2>
+  <h3 class="h1"><b>文章列表</b></h3>
+  <div class="admin_table mb10">
+    <table cellpadding="0" cellspacing="0" width="100%">
+    <tr class="tr2 vt td_bgB">
+	  <td width="50"><span class="cp" onclick="CheckAll(document.del_rpl_form)">全选</span></td>
+      <td>作者</td>
+      <td>IP</td>
+      <td>发表时间</td>
+      <td>版块</td>
+      <td>内容</td>
+    </tr>
+<!--
+EOT;
+if (!empty($postdb)) {
+foreach($postdb as $key=>$post){
+if(!$post[content])continue;
+print <<<EOT
+-->
+    <tr class="tr1 vt">
+      <td class="td2"><input type="checkbox" name="delid[$post[pid]]" value="$post[delid]" /></td>
+      <td class="td2"><a href="u.php?uid=$post[authorid]" target=_blank>$post[author]</a></td>
+      <td class="td2">$post[userip]</td>
+      <td class="td2">$post[postdate]</td>
+      <td class="td2">$post[forumname]</td>
+      <td class="td2"><a href="$basename&action=view&tid=$post[tid]&pid=$post[pid]" target=_blank>$post[content]</a></td>
+    </tr>
+<!--
+EOT;
+}}else{print <<<EOT
+-->
+<tr><td class="p10" colspan="6"><div class="admin_tips">啊哦，没有你要的信息！</div></td></tr>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+  </table>
+  </div>
+  <div class="cc mb10">$pages</div>
+  <div class="mb10 tac">
+    <span class="btn"><span><button type="submit">删除</button></span></span>
+  </div>
+</form>
+<!--
+EOT;
+}}elseif($admintype=='delmember'){
+if(empty($action)){print <<<EOT
+-->
+<form action="$basename&" method="post">
+  <h3 class="h1"><b>删除用户</b></h3>
+  <div class="admin_table mb10">
+  <table width=100% cellspacing="0" cellpadding="0">
+    <tr class="tr1 vt">
+      <td class="td1">用户组</td>
+      <td class="td2"><select name="groupid" class="select_wa">
+          $groupselect
+        </select></td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">用户名包含</td>
+      <td class="td2"><input type="text" class="input input_wa mr20" maxlength=16 name="schname">  可使用通配符 "*"</td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">email</td>
+      <td class="td2"><input type="text" class="input input_wa mr20" maxlength=64 name="schemail">
+        可使用通配符 "*"</td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">发帖数小于[帖]</td>
+      <td class="td2"><input type="text" class="input input_wa mr20" maxlength=10 name="postnum">
+      </td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">在线时间小于[时]</td>
+      <td class="td2"><input type="text" class="input input_wa mr20" maxlength=10 name="onlinetime">
+      </td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">根据用户IP查找</td>
+      <td class="td2"><input type="text" class="input input_wa mr20" maxlength=15 name="userip">
+        可使用通配符 "*"</td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">注册时间大于</td>
+      <td class="td2"><select name="regdate" class="select_wa">
+          <option value="all">不限制</option>
+          <option value="86400">一天</option>
+          <option value="172800">二天</option>
+          <option value="604800">一星期</option>
+          <option value="2592000">一个月</option>
+          <option value="7776000">三个月</option>
+          <option value="15552000">六个月</option>
+          <option value="31536000">一年</option>
+        </select></td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">多久未登录</td>
+      <td class="td2"><select name="schlastvisit" class="select_wa">
+          <option value="all">不限制</option>
+          <option value="86400">一天</option>
+          <option value="172800">二天</option>
+          <option value="604800">一星期</option>
+          <option value="2592000">一个月</option>
+          <option value="7776000">三个月</option>
+          <option value="15552000">六个月</option>
+          <option value="31536000">一年</option>
+        </select></td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">排序方式</td>
+      <td class="td2"><select name="orderway" class="select_wa mr20 fl">
+          <option value='lastvisit' checked>最后登录</option>
+          <option value='regdate'> 注册时间</option>
+          <option value='postnum'> 发帖</option>
+        </select>
+       			<ul class="list_80 fl list_A">
+                	<li><input type="radio" size="5" name="asc" value="ASC" checked="checked">正序</li>
+                    <li><input type="radio" size="5" name="asc" value="DESC">倒序</li>
+                </ul>
+        </td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">每页显示行数</td>
+      <td class="td2"><input type="text" class="input input_wa mr20" name="lines" value="30"><input type="checkbox" name="direct" value="1" onclick="deldirect(this.form,'info3','每页显示行数');">
+        直接删除(直接删除符合条件的项目)</td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">删除项目</td>
+      <td class="td2">
+      	<ul class="list_A list_120">
+            <li><input type="checkbox" name="item[]" value="1">用户信息</li>
+            <li><input type="checkbox" name="item[]" value="2">用户主题</li>
+            <li><input type="checkbox" name="item[]" value="4">用户回复</li>
+            <li><input type="checkbox" name="item[]" value="8">用户消息</li>
+            <li><input type="checkbox" name="item[]" value="16">用户相册</li>
+           	<li><input type="checkbox" name="item[]" value="32">用户日志</li>
+            <li><input type="checkbox" name="item[]" value="64">用户新鲜事</li>
+						<li><input type="checkbox" name="item[]" value="128">用户评论</li>
+            <li><input type="checkbox" name="item[]" value="256">其他</li>
+        </ul>
+		</td>
+    </tr>
+  </table>
+  </div>
+  	<div class="mb10 tac">
+    <span class="btn"><span><button type="submit">提 交</button></span></span>
+    </div>
+  <input type="hidden" class="btn" name="action" value="del">
+</form>
+<!--
+EOT;
+} if($action=='del' && empty($step)){print <<<EOT
+-->
+<form action="$basename&" method="post" name="FORM" id="superdel_member">
+  <input type="hidden" name="action" value="$action">
+  <input type="hidden" name="step" value="2">
+  <input type="hidden" name="groupid" value="$groupid">
+  <input type="hidden" name="schname" value="$schname">
+  <input type="hidden" name="schemail" value="$schemail">
+  <input type="hidden" name="postnum" value="$postnum">
+  <input type="hidden" name="onlinetime" value="$onlinetime">
+  <input type="hidden" name="regdate" value="$regdate">
+  <input type="hidden" name="schlastvisit" value="$schlastvisit">
+  <input type="hidden" name="orderway" value="$orderway">
+  <input type="hidden" name="asc" value="$asc">
+  <input type="hidden" name="lines" value="$lines">
+  <input type="hidden" name="page" value="$page">
+  <input type="hidden" name="sphinx" value="$sphinx">
+  <input type="hidden" name="sphinxRange" value="$sphinxRange">
+  <h2 class="h1"><b>用户列表</b></h2>
+  <div class="admin_table mb10">
+	<table cellpadding="0" cellspacing="0" width="100%">
+    <tr class="tr2 vt td_bgB">
+	  <td width="50"><span class="cp" onclick="CheckAll(document.FORM)">全选</span></td>
+      <td width="85">用户名</td>
+      <td width="85">Email</td>
+      <td>系统头衔</td>
+      <td width="85">IP</td>
+      <td>注册时间</td>
+      <td>最后登录</td>
+      <td>发帖</td>
+    </tr>
+<!--
+EOT;
+if (!empty($schdb)) {
+foreach($schdb as $key=>$sch){
+if(!$sch[username])continue;
+print <<<EOT
+-->
+    <tr class="tr1 vt">
+      <td class="td2"><input type="checkbox" name="delid[]" value="$sch[uid]" checked>
+      <td class="td2"><a href="u.php?uid=$sch[uid]" target="_blank">$sch[username]</a></td>
+      <td class="td2">$sch[email]</td>
+      <td class="td2">$sch[group]</td>
+      <td class="td2">$sch[onlineip]</td>
+      <td class="td2">$sch[regdate]</td>
+      <td class="td2">$sch[lastvisit]</td>
+      <td class="td2">$sch[postnum]</td>
+      </td>
+    </tr>
+<!--
+EOT;
+}}else{print <<<EOT
+-->
+<tr><td class="p10" colspan="8"><div class="admin_tips">啊哦，没有你要的信息！</div></td></tr>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+    <tr class="tr1 vt">
+      <td class="td1">删除项目</td>
+       <td class="td2" colspan="8">
+       	<ul class="list_A list_120">
+        	<li><input type="checkbox" name="item[]" value="1" $check_0>用户信息</li>
+            <li><input type="checkbox" name="item[]" value="2" $check_1>用户主题</li>
+            <li><input type="checkbox" name="item[]" value="4" $check_2>用户回复</li>
+            <li><input type="checkbox" name="item[]" value="8" $check_3>用户消息</li>
+             <li><input type="checkbox" name="item[]" value="16">用户相册</li>
+           	<li><input type="checkbox" name="item[]" value="32">用户日志</li>
+            <li><input type="checkbox" name="item[]" value="64">用户新鲜事</li>
+			<li><input type="checkbox" name="item[]" value="128">用户评论</li>
+            <li><input type="checkbox" name="item[]" value="256">其他</li>
+        </ul>
+        </td>
+    </tr>
+  </table>
+  </div>
+  <div class="cc mb10">$pages</div>
+  <div class="mt5 mb10 tac">
+        <span class="btn"><span><button type="submit">提 交</button></span></span>
+  </div>
+</form>
+<!--
+EOT;
+}}elseif($admintype=='message'){
+if(empty($action)){print <<<EOT
+-->
+<script src="js/date.js" language="JavaScript" type="text/javascript"></script>
+<form action="$basename&" method="post">
+  <h2 class="h1">按搜索条件删除</h2>
+  <div class="admin_table mb10">
+      <table width="100%" cellspacing="0" cellpadding="0">
+        <tr class="tr1 vt">
+          <td class="td1">消息时间</td>
+          <td class="td2">
+          	<div class="input_img fl"><i title="选择时间" onclick="this.nextSibling.onclick()" class="input_time">选择时间</i><input type="text" onclick="ShowCalendar(this.id,1);" value="" id="starttime" name="stime"></div>
+          	<span class="p_lr_10 fl">-</span>
+          	<div class="input_img fl mr20"><i title="选择时间" onclick="this.nextSibling.onclick()" class="input_time">选择时间</i><input type="text" onclick="ShowCalendar(this.id,1);" value="" id="endtime" name="etime"></div>
+          	搜索设定时间内的消息
+          </td>
+        </tr>
+        <tr class="tr1 vt">
+          <td class="td1">发件人</td>
+          <td class="td2"><input type="text" class="input input_wa mr20" name="fromuser" /></td>
+        </tr>
+        <tr class="tr1 vt">
+          <td class="td1">关键字</td>
+          <td class="td2"><input type="text" class="input input_wa mr20" name="keyword" /></td>
+        </tr>
+        <tr class="tr1 vt">
+          <td class="td1">每页显示行数</td>
+          <td class="td2">
+          <input type="text" class="input input_wa mr20 fl" name="lines" value="30" />
+            	<ul class="list_A">
+                	<li><input type="checkbox" name="direct" value="1" />直接删除(直接删除符合条件的项目)</li>
+              </ul>
+             </td>
+        </tr>
+      </table>
+  </div>
+  <div class="mb10 tac">
+    <span class="btn"><span><button type="submit">提 交</button></span></span>
+   </div>
+  <input type="hidden" name="action" value="del"/>
+</form>
+<form action="$basename&" method="post" onsubmit=" return confirm('确定要删除选中消息吗？')">
+  <input type="hidden" name="action" value="msglog" />
+  <h3 class="h1">按消息类型删除</h3>
+  <div class="admin_table mb10">
+  <table width="100%" cellspacing="0" cellpadding="0">
+   <tr class="tr1 vt">
+      <td class="td1">消息类型</td>
+      <td class="td2">
+      	<select name="smstype">
+      		<option value="history">历史消息</option>
+      		<option value="sms">站内信</option>
+      		<option value="notice">通知</option>
+      		<option value="request">请求</option>
+      		<option value="groupsms">群消息</option>
+      	</select>&nbsp;&nbsp;<input type="checkbox" name="keepunread" value="1" checked="checked"/>
+      	(保留未读消息)
+      </td>
+      <!-- <td class="td2"><input type="checkbox" name="direct" value="1" />直接删除(直接删除符合条件的项目)</td> -->
+    </tr>
+  </table>
+  </div>
+  <div class="mb10 tac">
+    <span class="btn"><span><button type="submit">提 交</button></span></span>
+   </div>
+</form>
+<!--
+EOT;
+}if(($action == 'del' || $action == 'msglog') && empty($step)){
+print <<<EOT
+-->
+<form action="$basename&" method="post" name="FORM"  onsubmit=" return confirm('确定要删除选中消息吗？')">
+  <input type="hidden" name="action" value="$action">
+  <input type="hidden" name="step" value="2">
+
+  <input type="hidden" name="smstype" value="$smstype">
+  <input type="hidden" name="keepunread" value="$keepunread">
+
+  <input type="hidden" name="etime" value="$etime">
+  <input type="hidden" name="stime" value="$stime">
+  <input type="hidden" name="fromuser" value="$fromuser">
+  <input type="hidden" name="lines" value="$lines">
+  <input type="hidden" name="page" value="$page">
+  <h2 class="h1"><span class="mr10"><b>消息列表</b></span><a href="$basename" class="linka">返回上一级<span class="f9">▲</span></a></h2>
+  <div class="admin_table mb10">
+  <table width="100%" cellspacing="0" cellpadding="0" style="table-layout:auto;">
+    <tr class="tr2 vt td_bgB">
+	  <td width="50"><span class="cp" onclick="CheckAll(document.FORM)">全选</span></td>
+      <td width="200">标题</td>
+      <td width="100">发件人</td>
+      <td>内容</td>
+      <td width="120">时间</td>
+    </tr>
+<!--
+EOT;
+if (!empty($searchList)) {
+foreach($searchList as $key=>$message){
+$message[modified_time] = get_date($message[modified_time]);
+$message['content'] = strip_tags($message['content']);
+$message['create_username'] = in_array($message['create_username'],array('system')) ? $message['create_username'] :'<a href="u.php?username='.$message[create_username].'" target="_blank">'.$message['create_username'].'</a>';
+if(!$message[title])continue;
+print <<<EOT
+-->
+    <tr class="tr1 vt">
+      <td class="td2"><input type="checkbox" name="delid[]" value="$message[mid]"></td>
+      <td class="td2">$message[title]</td>
+
+      <td class="td2">$message[create_username]</td>
+      <td class="td2"><p class="lh_18">$message[content]</p></td>
+      <td class="td2">$message[modified_time]</td>
+    </tr>
+<!--
+EOT;
+}}else{print <<<EOT
+-->
+<tr><td class="p10" colspan="5"><div class="admin_tips">啊哦，没有你要的信息！</div></td></tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+  </table>
+  </div>
+  <div class="cc mb10">$pages</div>
+  <div class="mb10 tac">
+    <span class="btn"><span><button type="submit" value="删除">删除</button></span></span>
+  </div>
+</form>
+<!--
+EOT;
+}}include_once PrintEot('adminbottom');
+?>-->
+<script language="JavaScript">
+function deldirect(form,tar,msg){
+	if (form.direct.checked == true) {
+		document.getElementById(tar).innerHTML = '<b><font color=blue>删除个数</font></b>';
+	} else {
+		document.getElementById(tar).innerHTML = msg;
+	}
+}
+</script>

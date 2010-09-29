@@ -1,0 +1,149 @@
+<!--<?php
+include_once PrintEot('left');
+if (empty($action) || $action=='force'){
+print <<<EOT
+-->
+<div class="nav3 mb10">
+  <ul class="cc">
+    <li><a href="$admin_file?adminjob=ipban">IP 禁止</a></li>
+    <li><a href="$admin_file?adminjob=ipban&job=ipstates">IP 统计</a></li>
+    <li class="current"><a href="$admin_file?adminjob=ipban&job=ipsearch">IP 检索</a></li>
+  </ul>
+</div>
+<div class="admin_info mb10">
+  <h3 class="h1"><b>提示信息</b></h3>
+  <div class="legend">IP搜索工具:<ol><li>可以根据用户名搜索该用户使用过的所有IP</li><li>可以根据IP地址搜索使用过该IP的所有用户(<font color=blue>此项功能存在负载性,大型站点请谨慎使用!</font>)</li></ol></div>
+</div>
+<form action="$basename&" method=post>
+  <input type="hidden" name="action" value="byname">
+  <h2 class="h1">根据用户名搜索</h2>
+  <div class="admin_table mb10">
+    <table width="100%" cellspacing="0" cellpadding="0">
+      <tr class="tr1 vt">
+        <td class="td1">用户名</td>
+        <td class="td2"><input class="input input_wa" type="text" name="username"></td>
+      </tr>
+    </table>
+  </div>
+  <div class="mb10 tac"> <span class="btn"><span>
+    <button type="submit"  value="提 交">提 交</button>
+    </span></span></div>
+</form>
+<form action="$basename&" method=post>
+  <input type="hidden" name="action" value="byip">
+  <h2 class="h1">根据IP地址搜索</h2>
+  <div class="admin_table mb10">
+      <table width="100%" cellspacing="0" cellpadding="0">
+        <tr class="tr1 vt">
+          <td class="td1">IP地址</td>
+          <td class="td2"><input class="input input_wa" type="text" name="userip"></td>
+		  <td class="td2"><div class="help_a">由于该功能具有一定的负载性，会员超过10万，帖子超过30万的站点系统将自动禁止使用该功能</div></td>
+        </tr>
+      </table>
+  </div>
+  <div class="mb10 tac"> <span class="btn"><span>
+    <button type="submit"  value="提 交">提 交</button>
+    </span></span></div>
+</form>
+<!--
+EOT;
+}elseif($action=="byname"){print <<<EOT
+-->
+<div class="mb10 nav3">
+	<ul class="cc">
+	  <li><a href="$admin_file?adminjob=ipban">IP 禁止</a></li>
+	  <li><a href="$admin_file?adminjob=ipban&job=ipstates">IP 统计</a></li>
+	  <li class="current"><a href="$admin_file?adminjob=ipban&job=ipsearch">IP 检索</a></li>
+	</ul>
+</div>
+<div class="mb10">$pages</div>
+<div class="c"></div>
+<h2 class="h1">根据用户名搜索</h2>
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+  <tr class="tr2 vt td_bgB">
+    <td width="15">ID</td>
+    <td>用户名</td>
+    <td>IP</td>
+    <td>使用时间</td>
+  </tr>
+<!--
+EOT;
+for($i=$start;$i<$end;$i++){
+$value=$ipdb[$i];
+$id=$i+1;
+print <<<EOT
+-->
+  <tr class="tr1 vt">
+    <td class="td2">$id</td>
+    <td class="td2"><a href="$admin_file?adminjob=setuser&action=edit&uid=$value[uid]" title="查看用户资料">$value[username]</a></td>
+    <td class="td2"><a href="$basename&action=byip&userip=$value[userip]&type=1" title="搜索该IP相关记录">$value[userip]</a></td>
+    <td class="td2">$value[lasttime]</td>
+  </tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+</table>
+</div>
+<div class="cc">$pages</div>
+<!--
+EOT;
+}elseif($action=="byip"){print <<<EOT
+print <<<EOT
+-->
+<div class="mb10 nav3">
+	<ul class="cc">
+	  <li><a href="$admin_file?adminjob=ipban">IP 禁止</a></li>
+	  <li><a href="$admin_file?adminjob=ipban&job=ipstates">IP 统计</a></li>
+	  <li class="current"><a href="$admin_file?adminjob=ipban&job=ipsearch">IP 检索</a></li>
+	</ul>
+</div>
+<div class="mb10">$pages</div>
+<div class="c"></div>
+<form name="form1">
+  <h2 class="h1">根据IP地址搜索</h2>
+  <div class="admin_table">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <tr class="tr2 vt td_bgB">
+      <td width="15">ID</td>
+      <td width="20%">IP</td>
+      <td width="20%">用户名</td>
+      <td>使用时间</td>
+      <td width="15%">选项</td>
+    </tr>
+<!--
+EOT;
+for($i=$start;$i<$end;$i++){
+$value=$userdb[$i];
+$id=$i+1;
+print <<<EOT
+-->
+    <tr class="tr1 vt">
+      <td class="td2">$id</td>
+      <td class="td2">$value[userip]</td>
+      <td class="td2">$value[username]</td>
+      <td class="td2">$value[lasttime]</td>
+      <td class="td2"><select name="ipoption_$id" onchange="ip_jump('ipoption_$id');">
+          <option></option>
+          <option value="$basename&action=byname&username=$value[username]&type=1">查看该用户使用过IP</option>
+          <option value="$admin_file?adminjob=setuser&action=edit&uid=$value[uid]">查看用户资料</option>
+          <option value="$admin_file?adminjob=superdel&admintype=article&action=deltpc&fid=-1&author=$value[username]"> 查看该用户的主题</option>
+          <option value="$admin_file?adminjob=superdel&admintype=article&action=delrpl&fid=-1&author=$value[username]"> 查看该用户的回复</option>
+        </select>
+      </td>
+    </tr>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+  </table>
+  </div>
+</form>
+<div class="cc mb10">$pages</div>
+<!--
+EOT;
+}include_once PrintEot('adminbottom');
+?>
+-->

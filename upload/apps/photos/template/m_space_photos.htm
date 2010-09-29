@@ -1,0 +1,476 @@
+<!--<?php
+require_once(uTemplate::printEot('header'));
+require_once(uTemplate::printEot('space_appleft'));
+print <<<EOT
+-->
+<div class="sideD">
+<!--
+EOT;
+if(!$indexRight && $indexValue =='1'){print <<<EOT
+-->
+<div class="boxA">
+	<table width="100%">
+		<tr><td height="400">
+			<div class="space_msg"><img src="u/images/space/report.png" align="absmiddle" />由于对方的隐私设置，容许好友可见！立即 <a href="$db_bbsurl/pw_ajax.php?action=addfriend&touid={$space['uid']}" onclick="return ajaxurl(this);">加为好友</a></div>
+		</td></tr>
+	</table>
+</div>
+<!--
+EOT;
+}elseif(!$indexRight && $indexValue =='2'){print <<<EOT
+-->
+<div class="boxA">
+	<table width="100%">
+		<tr><td height="400">
+			<div class="space_msg"><img src="u/images/space/report.png" align="absmiddle" />对方设置了隐私，您没有权限查看</div>
+		</td></tr>
+	</table>
+</div>
+<!--
+EOT;
+}elseif($indexRight && !$newSpace->viewRight('diary')){print <<<EOT
+-->
+<div class="boxA">
+	<table width="100%">
+		<tr><td height="400">
+			<div class="space_msg"><img src="u/images/space/report.png" align="absmiddle" />该空间相册设置隐私，您没有权限查看</div>
+		</td></tr>
+	</table>
+</div>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+	<div class="boxA cc">
+		<h2>
+			<span class="mr10">相册</span>
+		</h2>
+			<div style="min-height:480px;_height:480px;">
+<!--
+EOT;
+if ($a == 'own' || empty($a)) {print <<<EOT
+-->
+	<div id="list-box">
+<!--
+EOT;
+if (!empty($albumdb)) {
+foreach ($albumdb as $key => $value) {
+$prviteimg = !$value['private']?'key':'lock';
+if (!$value['private']) {
+	$prviteimg = "";
+} elseif ($value['private'] == 1) {
+	$prviteimg = "<img src=\"u/images/lock.png\" title=\"仅好友可见\" align=\"absmiddle\"/>";
+} elseif ($value['private'] == 2) {
+	$prviteimg = "<img src=\"u/images/lock.png\" title=\"仅自己可见\" align=\"absmiddle\"/>";
+} elseif ($value['private'] == 3) {
+	$prviteimg = "<img src=\"u/images/key.png\" title=\"需要密码访问\" align=\"absmiddle\"/>";
+}
+if ((!$isown || $a == 'friend') && $value['private'] == 3 && !$isGM) {
+	$cookiename = 'albumview_'.$value['aid'];
+	if ($value['albumpwd'] && PwdCode($value['albumpwd']) != GetCookie($cookiename)) {
+		$viewurl = "{$basename}a=viewalbum&aid=$value[aid]";
+		$ajaxclick = "onclick=\"return ajaxurl(this);\"";
+	} else {
+		$viewurl = "{$basename}a=album&aid=$value[aid]";
+		$ajaxclick = "";
+	}
+} else {
+	$viewurl = "{$basename}a=album&aid=$value[aid]";
+	$ajaxclick = "";
+}
+print <<<EOT
+-->
+<div class="Albumbox cc">
+<dl class="r_admininfo">
+<dt class="Album"><a href="$viewurl" $ajaxclick><img src="$value[lastphoto]" onload="if(this.width>100){this.width = 100;} else if(this.height>100){this.height=100;}" /></a></dt>
+<dd>
+	<div class="c mb10">&nbsp;</div>
+<p class="f16 b"><a href="$viewurl" $ajaxclick title="{$value[aname]}">{$value[sub_aname]}</a></p>
+<p>共{$value[photonum]}张照片 $prviteimg</p>
+<p>$value[lasttime]更新</p>
+<span>
+<!--
+EOT;
+if ($value['ownerid'] == $winduid || $groupid == 3) {print <<<EOT
+--><a href="{$basename}a=editalbum&aid=$value[aid]" onclick="return ajaxurl(this);">编辑相册</a>
+<!--
+EOT;
+}else{print <<<EOT
+--><a href="u.php?uid=$uid">$value[owner]</a><!--
+EOT;
+}if ($value['ownerid'] == $winduid || $SYSTEM['delalbum']) {print <<<EOT
+-->|&nbsp;&nbsp;<a href="{$basename}a=delalbum&aid=$value[aid]" onclick="return ajaxurl(this)">删除相册</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+</span>
+</dd>
+</dl>    
+</div>
+<!--
+EOT;
+}} else {print <<<EOT
+-->
+		<div class="p10 f14 tac">暂无照片！</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+	<div class="c"></div>
+	<div class="cc mt10">$pages</div>
+</div>
+<!--
+EOT;
+} elseif ($a == 'album') {
+print <<<EOT
+-->
+		<div class="p10 bdB">
+<!--
+EOT;
+if ($isown) {print <<<EOT
+-->
+		<div class="fr">
+			<a href="apps.php?q=collection&a=favor&type=photo&ajax=1&id={$aid}" onclick="return ajaxurl(this)" class="mr10 allCollect">收藏</a>     
+<!--
+EOT;
+	if ($weiboPriv) {print <<<EOT
+-->
+			<a href="javascript:;" onclick="sendmsg('operate.php?action=toweibo&ajax=1&type=album&id={$aid}','',this.id);" class="allForward mr20">新鲜事</a>
+<!--
+EOT;
+	}print <<<EOT
+-->
+            <a href="{$basename}a=delalbum&aid=$aid" onclick="return ajaxurl(this)" title="删除相册">删除</a>
+		</div>
+		<a class="b" href="{$basename}q=$q">$album[owner]的相册</a> &raquo; <span class="s5 b">$album[aname] ($album[photonum])</span>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+		<div class="fr">
+			<a href="apps.php?q=collection&a=favor&type=photo&ajax=1&id={$aid}" onclick="return ajaxurl(this)" class="mr10 allCollect">收藏</a>
+<!--
+EOT;
+	if ($weiboPriv) {print <<<EOT
+-->
+<a href="javascript:;" onclick="sendmsg('operate.php?action=toweibo&ajax=1&type=album&id={$aid}','',this.id);" class="allForward mr20">新鲜事</a>
+<!--
+EOT;
+	}print <<<EOT
+-->
+		</div>
+		<a class="b" href="apps.php?q=photos&uid=$space[uid]">$album[owner]的相册</a> &raquo; <span class="s5 b">$album[aname] ($album[photonum])</span>
+<!--
+EOT;
+}print <<<EOT
+-->
+    </div>
+		<div class="g_listA g_listAB" style="padding-left:5px">
+		<ul class="cc">
+<!--
+EOT;
+if ($cnpho) {
+foreach ($cnpho as $key => $value) {print <<<EOT
+-->
+			<li><div class="aimg"><a href="{$basename}a=view&pid=$value[pid]"><img src="$value[path]" /></a></div><p>
+<!--
+EOT;
+if ($isown || $photoService->isDelRight()) {print <<<EOT
+-->
+<a href="javascript:;" class="adel" onclick="pwConfirm('是否确认删除',this,function(){ajaxdel('$value[pid]')});" title="删除">删除</a>
+<!--
+EOT;
+}print <<<EOT
+-->共{$value[c_num]}条评论</p>
+				<p>$value[uptime]</p>
+			</li>
+
+
+<!--
+EOT;
+}}else{print <<<EOT
+-->
+			<li><div class="tac p10 f14">暂无照片！</div></li>
+<!--
+EOT;
+}print <<<EOT
+-->
+		</ul>
+		</div>
+		<div class="p10 mb10 cc">$pages</div>
+		
+<!--
+EOT;
+} elseif ($a == 'view') {
+print <<<EOT
+-->
+<style type="text/css">
+/*兼容：当站点有侧栏是，相册的内容页展现方式变更*/
+.sidePhoto{width:740px;;float:none;height:120px;}
+.galbum_photo .prePhoto{float:left;}
+.galbum_photo .nextPhoto{float:right;}
+.galbum_photo .g_listA{height:120px;float:left;}
+.galbum_photo .g_listA li{display:inline;overflow:hidden;width:120px;}
+.galbum_photo .prePhoto,.galbum_photo .nextPhoto{width:20px;margin-top:33px;}
+.galbum_photo .prePhoto a,.galbum_photo .nextPhoto a{width:14px;height:38px;}
+.galbum_photo .prePhoto a{background-position:0 0;}
+.galbum_photo .prePhoto a:hover{ background-position:-40px 0;}
+.galbum_photo .nextPhoto a{background-position:-20px 0;}
+.galbum_photo .nextPhoto a:hover{background-position:-60px 0;}
+</style>
+		<div class="p10">
+			<div class="fr">
+				<a href="apps.php?q=collection&a=favor&type=photo&ajax=1&id=$photo[pid]&ptype=photo" onclick="return ajaxurl(this)" class="mr10 allCollect">收藏</a>
+<!--
+EOT;
+	if ($weiboPriv) {print <<<EOT
+-->
+                <a href="javascript:;" onclick="sendmsg('operate.php?action=toweibo&ajax=1&type=photo&id={$photo[pid]}','',this.id);" class="allForward mr20">新鲜事</a>
+<!--
+EOT;
+	}print <<<EOT
+-->
+                <!--
+EOT;
+if($isown || $photoService->isDelRight()){print <<<EOT
+--><a onclick="pwConfirm('是否确认删除',this,function(){ajaxdel('$photo[pid]')});" href="javascript:;">删除</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+			</div>
+
+		<a class="b" href="apps.php?q=photos&uid=$space[uid]">$photo[owner]的相册</a> &raquo; <a href="{$basename}a=album&aid=$photo[aid]" class="b">$photo[aname]</a> <span class="s5 b">($photo[photonum])</span>
+</div>
+			<div class="sidePhoto">
+				<div class="p_lr_10">
+				<div class="galbum_photo" id="imgtop">
+					<div id="img_list">
+<!--
+EOT;
+if($photo[photonum]>5){print<<<EOT
+-->
+						<div class="prePhoto mb5"><a onclick="return ajaxpage('{$basename}a=next&pid=$photo[pid]{$friendurl}','pre');">上一张</a></div>
+<!--
+EOT;
+}print<<<EOT
+-->
+<!--
+EOT;
+foreach($nearphoto as $value){
+$ifsel = ($pid == $value[pid]) ? 'class="current"' : '';
+print <<<EOT
+-->
+					<ul class="g_listA cc" id="imglist_{$value[pid]}">
+<!--
+EOT;
+if($value[pid]=='begin'||$value[pid]=='end'){
+print <<<EOT
+-->
+					<li><div class="aimg"><a href="javascript:;"><img src="$value[path]" /></a></div></li>
+<!--
+EOT;
+} else {print <<<EOT
+-->
+					<li $ifsel><div class="aimg"><a href="{$basename}a=view&pid=$value[pid]#imgtop"><img src="$value[path]" onload="if(this.width>100){this.width = 100;} else if(this.height>100){this.height=100;}" /></a></div></li>
+<!--
+EOT;
+}print <<<EOT
+-->
+				</ul>
+<!--
+EOT;
+}print <<<EOT
+-->
+
+<!--
+EOT;
+if($photo[photonum]>5){print<<<EOT
+-->
+							<div class="nextPhoto"><a onclick="return ajaxpage('{$basename}a=pre&pid=$photo[pid]{$friendurl}','next');">下一张</a></div>
+<!--
+EOT;
+}print <<<EOT
+-->
+		
+					</div>
+				</div>
+				</div>
+			</div>
+			<div class="contPhoto" style="width:745px;">
+			<div class="p_lr_10">
+				<div class="galbum_photo_con mb10">
+					<div class="pr">
+					<a id="next" onclick="return ajaxpage('{$basename}a=next&pid=$photo[pid]','pre');" class="aPre" style="cursor:url(u/images/pre.cur),auto;" title="上一张"></a>
+					<a id="pre" onclick="return ajaxpage('{$basename}a=pre&pid=$photo[pid]','next');" class="aNext" style="cursor:url(u/images/next.cur),auto;" title="下一张"></a>
+					<table cellpadding="0" cellspacing="0" width="100%" style="table-layout:fixed;">
+						<tr>
+							<td class="prePhoto">
+								<div class="p15">
+<!--
+EOT;
+if($photo[photonum]>5){print<<<EOT
+-->
+								<a href="javascipt:;" class="fl">上一张</a>
+<!--
+EOT;
+}print<<<EOT
+-->
+								</div>
+							</td>
+							<td height="400" style="vertical-align:middle">
+								<div class="tac p20" id="img-width"><img id="imgview" src="$photo[path]" w="$photo[w]" h="$photo[h]" /></div>
+							</td>
+							<td class="nextPhoto">
+								<div class="p15">
+<!--
+EOT;
+if($photo[photonum]>5){print<<<EOT
+-->
+								<a href="javascipt:;" class="fr">下一张</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+								</div>
+							</td>
+						</tr>
+					</table>
+					</div>
+					<div class="onePhototip">
+						<div class="fr s7"><a href="javascript:;" onclick="ImgClick();" class="s7">原图</a>&nbsp;┊&nbsp;<a href="javascript:;" onclick="sendmsg('pw_ajax.php?action=report&type=photo&tid=$pid&pid=$uid','',this.id);" id="report_photo" class="s7">举报</a>
+						</div>
+						<div><span class="mr20">$photo[pintro]</span><span class="mr20">上传于{$photo[uptime]}</span><span class="mr20">浏览($photo[hits])</span><span class="mr20">评论($photo[c_num])</span></div>
+					</div>
+				</div>
+<!-- 
+EOT;
+$rateSets = unserialize($db_ratepower);
+if($rateSets[3] && isset($db_hackdb['rate'])){
+print <<<EOT
+-->
+<link rel="stylesheet" type="text/css" href="hack/rate/images/rate.css" />
+<script language="JavaScript" src="js/rate_ajax.js"></script>
+<script language="javascript">
+window.onload = function() {
+rate.getVote("vote_box","{$db_bbsurl}/hack.php?H_name=rate&action=ajax","elementid=vote_box&typeid=3&objectid={$pid}&authorid={$u}");
+};
+</script>
+<div id="vote_box" class="mb10"></div>
+<!-- 
+EOT;
+}
+print <<<EOT
+-->	
+<script language="JavaScript" src="js/pw_photolist.js"></script>
+<script language="JavaScript">
+var photolist = new photoList('img_list','$pid','$aid');
+</script>
+<div class="c"></div>
+<script language="JavaScript">
+var imgMaxWidth=600;
+var content = document.getElementById("img-width");
+ImgLoad(content);
+
+function ImgClick()
+{
+	var url = getObj('imgview');
+	if (url.parentElement){
+		if (url.parentElement.tagName!="A"){
+			window.open(url.src);
+		}
+	}else{
+		window.open(url.src);
+	}
+}
+
+function ajaxpage(url,type) {
+	var tourl = '{$basename}a=view';
+	ajax.send(url,'',function() {
+		var rText = ajax.request.responseText.split('\\t');
+		if (rText[0] == 'ok') {
+			if (rText[1]) {
+				window.location.href = tourl + '&pid=' + rText[1]+'#imgtop';
+			} else {
+				var message = type == 'next' ? '已经是最后一张照片' : '已经是第一张照片';
+                showDialog('warning',message,2);
+			}
+		} else {
+			ajax.guide();
+		}
+	});
+	return false;
+}
+
+function bbimg()
+{
+	if (event.ctrlKey){
+		var zoom=parseInt(this.style.zoom, 10)||100;
+		zoom+=event.wheelDelta/12;
+		if (zoom>0) this.style.zoom=zoom+'%';
+		return false;
+	}else{
+		return true;
+	}
+}
+function ImgLoad(obj){
+	for(var i=0;i<obj.getElementsByTagName("img").length;i++){
+		var o=obj.getElementsByTagName("img")[i];
+		if (o.getAttribute('w')>imgMaxWidth){
+			if (o.style.width){
+				o.style.width="";
+			}
+			o.width=imgMaxWidth;
+			o.removeAttribute("height");
+			o.style.cursor="hand";
+			o.vspace=5;
+			o.resized=1;
+		}else{
+			o.width=o.getAttribute('w');
+		}
+		setTimeout(function(){
+			getElementsByClassName('aPre')[0].style.height=getElementsByClassName('aNext')[0].style.height=Math.max(o.height,400)+'px';
+		},400);
+	}
+}
+</script>
+<script language="JavaScript" src="js/app_comment.js"></script>
+<div>
+<!--
+EOT;
+require_once PrintEot('m_comment');print <<<EOT
+-->
+</div>
+			</div>
+		</div>
+<!--
+EOT;
+}}print <<<EOT
+-->
+		</div>
+	</div>
+</div>
+<script language="JavaScript">
+function ajaxdel(pid) {
+	var u = '$u';
+	ajax.send('{$basename}a=delphoto&pid='+pid,'',function() {
+		var rText = ajax.request.responseText.split('\t');
+		if (rText[0] == 'ok') {
+			window.location = '{$basename}a=album&aid='+rText[1];
+		} else {
+			ajax.guide();
+		}
+	});
+	return false;
+}
+function ajaxurl(o) {
+	read.obj = o;
+	ajax.send(o.href,'',ajax.get);
+	return false;
+}
+</script>
+<!--
+EOT;
+require_once(uTemplate::printEot('footer'));
+?>-->

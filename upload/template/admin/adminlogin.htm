@@ -1,0 +1,113 @@
+<!--<?php
+$imgpath || $imgpath = 'images';
+$db_bbsname || $db_bbsname = 'Hi,phpwind!';print <<<EOT
+-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=$db_charset" />
+<title>{$db_bbsname} - powered by phpwind</title>
+<style type="text/css">
+body{padding:0;margin:0px;font-size:12px;color:#555;font-family:Verdana;}
+select{margin-left:1.5em;vertical-align:middle;border:1px solid #b4cceb;height:22px;font-size:12px;}
+#main{width:800px;margin:auto;}
+*{padding:0;margin:0}
+input{font-size:12px;}
+#wrap{background:url($imgpath/admin/login/top_01.png) center bottom no-repeat;height:170px;}
+#wrapb{background:url($imgpath/admin/login/top_02.png) center  top no-repeat;height:15px;}
+#wrapc{background:url($imgpath/admin/login/top_03.png) center  top no-repeat;height:350px;}
+#logo{background:url($imgpath/admin/login/logo.png) center top no-repeat;height:64px;width:210px;}
+.logo{padding:100px 0 0 200px;}
+.login{margin:0 0 0 140px;padding-top:10px;}
+.login th{height:33px;line-height:33px;list-style:none;text-align:right;font-weight:normal;width:200px;font-size:12px;}
+.login td{text-align:left;font-size:12px;}
+.input{font-size:12px;vertical-align:middle;height:17px;margin-top:2px;border:1px solid #fff;color:#666;}
+.logo-icon{border: 1px solid; border-color: #8cb7e1 #e3f0fc #e3f0fc #8cb7e1;float:left;margin-left:1.5em;_margin-left:.7em;background:#fff;padding-right:.5em;}
+.logo-icon div{background:#fff url($imgpath/admin/login/login-icon.gif);width:18px;float:left;margin-top:3px;margin-left:.5em;display:inline;}
+.logo-icon .pw{background-position:1px 1px;width:18px;height:20px;}
+.logo-icon .pwpd{background-position:0 -49px;width:18px;height:20px;}
+.logo-icon .yan{background-position:0 -99px;width:18px;height:20px;}
+.logo-icon .daan{background-position:1px -148px;width:18px;height:20px;}
+.logo-icon .pw2{width:8em;}
+.logo-icon .pwpd2{width:9em;}
+.logo-icon .yan2{width:6em;}
+.bottom{text-align:center;margin:auto;padding-top:1em;color:#888;}
+</style>
+<script src="js/desktop/Compatibility.js"></script>
+
+</head>
+<body>
+<div id="main">
+    <div id="wrap">
+         <div class="logo">
+              <div id="logo"></div>
+         </div>
+    </div>
+    <div id="wrapb"></div>
+    <div id="wrapc">
+         <div class="login">
+<!--
+EOT;
+$REQUEST_URI = trim($REQUEST_URI,'?');
+$verifyurl = EncodeUrl($REQUEST_URI,true);print <<<EOT
+-->
+              <form method="post" name="login" action ="$REQUEST_URI"><!-- action = //逃避自动匹配 -->
+				<INPUT TYPE="hidden" name="Login_f" value=1>
+				<INPUT TYPE="hidden" name="verify" value="$verifyurl">
+                   <table cellpadding="0" cellspacing="0" width="100%">
+                        <tr><th>管理员账号</th><td><div class="logo-icon"><div class="pw"></div><input class="input pw2" name="admin_name" type="text" /></div></td></tr>
+                        <tr><th>密码</th><td><div class="logo-icon"><div class="pwpd"></div><input class="input pwpd2" type="password" name="admin_pwd" /></div></td></tr>
+<!--
+EOT;
+if($db_gdcheck & 32){print <<<EOT
+-->
+                        <tr><th>认证码</th><td><div class="logo-icon"><div class="yan"></div><input class="input yan2" name="lg_num" id="lg_num" onfocus="try{opencode('menu_gd',this)}catch(e){}"  /></div>
+                        <style type="text/css">.menu{position:absolute;background:#666;border:1px solid $tablecolor;}</style>
+                        <div class="menu" id="menu_gd" style="visibility:hidden;"><img src="ck.php?admin=1" align="absmiddle" style="cursor:pointer;" id="ckcode" alt="看不清楚，换一张" /></div>
+                        </td></tr>
+<!--
+EOT;
+}if($db_ifsafecv){print <<<EOT
+-->
+                        <tr><th>安全问题</th><td><select name="question" onchange="showcustomquest(this.value)" style="width:124px">
+                        <option value="0">无安全问题</option><option value="1">我爸爸的出生地</option><option value="2">我妈妈的出生地</option><option value="3">我的小学校名</option><option value="4">我的中学校名</option><option value="5">我最喜欢的运动</option><option value="6">我最喜欢的歌曲</option><option value="7">我最喜欢的电影</option><option value="8" >我最喜欢的颜色</option><option value="-1">自定义问题</option></select></td></tr>
+						<tr id="customquest" style="display:none;"><th></th><td><input style="border: 1px solid; border-color: #8cb7e1 #e3f0fc #e3f0fc #8cb7e1;padding:2px 0 1px 2px;margin-left:1.5em;height:18px;" type="text" name="customquest"></td></tr>
+                        <tr><th>请输入答案</th><td><div class="logo-icon"><div class="daan"></div><input class="input daan2" name="answer" type="text" /></div></td></tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+                        <tr><th></th><td><input name="submit" type="image" src="$imgpath/admin/login/login.gif" style="margin-left:1.5em;margin-top:.5em;width:80px;height:30px;" /></td></tr>
+                   </table>
+              </form>
+         </div>
+    </div>
+</div>
+<div class="bottom">phpwind <span style="color:#FA891B">v$wind_version</span></div>
+</form>
+<script language="JavaScript">
+document.login.admin_name.focus();
+var agt = navigator.userAgent.toLowerCase();
+var is_ie = ((agt.indexOf("msie") != -1) && (agt.indexOf("opera") == -1));
+function getObj(id){
+	return document.getElementById(id);
+}
+function showcustomquest(qid){
+	getObj("customquest").style.display = qid==-1 ? '' : 'none';
+}
+function ietruebody(){
+	return (document.compatMode && document.compatMode!="BackCompat")? document.documentElement : document.body;
+}
+function getTop() {
+	return typeof window.pageYOffset != 'undefined' ? window.pageYOffset:ietruebody().scrollTop;
+}
+function getLeft() {
+	return (typeof window.pageXOffset != 'undefined' ? window.pageXOffset:ietruebody().scrollLeft)
+}
+</script>
+<script src="js/core/core.js"></script>
+<script src="js/global.js"></script>
+</body></html>
+<!--
+EOT;
+?>-->

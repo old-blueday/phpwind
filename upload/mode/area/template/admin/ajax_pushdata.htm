@@ -1,0 +1,139 @@
+<!--<?php
+print <<<EOT
+-->
+<table width="100%" class="">
+<!--
+EOT;
+foreach ($invokepiece[param] as $key=>$value) {
+if ($key=='tagrelate') {
+	$iftagrelate = 1;
+	continue;
+}
+$name = $dataSourceService->getSourceLang($key,$invokepiece['action']);
+if (is_numeric($value)) {
+if($key=='descrip'){
+$add = 'onKeyUp="countlen(this,\''.$value.'\');"';
+}else{
+$add = 'maxlength="'.$value.'"';
+}
+} else {
+$add = '';
+}
+print <<<EOT
+-->
+
+<!--
+EOT;
+if($key=='image'){print <<<EOT
+-->
+		<tr class="tr1 vt">
+			<td class="td1">{$name}</td>
+			<td class="td2"><input type="text" class="input" size="40" id="image" name="param[image]" value="$default[image]" $add></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">上传图片</td>
+			<td class="td2">
+				<input id="uploadpic" type="file" name="uploadpic" onchange="checkFileType()">
+				<p>允许类型: jpg，jpeg，gif，png(文件大小不得大于2M)<span id="fileTypeError" style="display:none;"><font color="red">请选择正确的文件类型</font></span></p>
+			</td>
+		</tr>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+		<tr class="tr1 vt">
+			<td class="td1">{$name}</td>
+			<td class="td2">
+<!--
+EOT;
+if($key=='descrip'){print <<<EOT
+-->
+				<textarea name="param[$key]" style="width:260px;height:92px" $add >$default[$key]</textarea>
+<!--
+EOT;
+} elseif ($key=='title') {
+print <<<EOT
+-->
+				<input type="text" class="input" size="40" name="param[$key]" value="$default[$key]" $add> 
+			<div class="pwnew tac">
+                    <span title="粗体字"><a onclick="styleOnclick(this,'css[b]')" class="$stylename[b]">加粗</a></span>
+					<span title="斜体字"><a onclick="styleOnclick(this,'css[i]')" class="$stylename[i]">倾斜</a></span>
+					<span title="下划线"><a onclick="styleOnclick(this,'css[u]')" class="$stylename[u]">下划线</a></span>
+					<span id="color_show" title="点击取消颜色" style="background:{$stylename[color]};" onclick="colorCancel()"></span>
+					<span title="颜色选择"><a class="two tal" onclick="showColorPicker(this,'css[color]',function(){pickReback(color_picker)})"><img src="$imgpath/pickcolor.gif"  /></a></span>
+					<span>时间:<input name="css[endtime]" id="css[endtime]" size="15" class="input" type="input" value="{$stylename[endtime]}" onclick="ShowCalendar(this.id,1);" /></span>
+					<input id="css[color]" name="css[color]" type="hidden" value="$stylename[color]" />
+					<input id="css[b]" name="css[b]" type="hidden" value="{$push['titlecss']['b']}" />
+					<input id="css[i]" name="css[i]" type="hidden" value="{$push['titlecss']['i']}" />
+					<input id="css[u]" name="css[u]" type="hidden" value="{$push['titlecss']['u']}" />
+			</div>
+<!--
+EOT;
+}else{
+print <<<EOT
+-->
+				<input type="text" class="input" size="40" name="param[$key]" value="$default[$key]" $add>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+			</td>
+		</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+
+<!--
+EOT;
+}
+print <<<EOT
+-->
+
+		<tr class="tr1 vt">
+			<td class="td1">开始日期</td>
+			<td class="td2"><input type="text" size="15" name="starttime" id="starttime" onclick="ShowCalendar(this.id,1);"> (留空则立即显示)</td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">商业推荐</td>
+			<td class="td2"><input type="radio" value="1" name="ifbusiness" />是 <input type="radio" value="0" name="ifbusiness" />否</td>
+		</tr>
+<!--
+EOT;
+if ($iftagrelate) {
+print<<<EOT
+-->
+		<tr>
+			<td colspan="2">
+				<table width="100%">
+					<tbody id="tagrelate">
+						<tr class="tr1 vt">
+							<td colspan="2"><h2>关联文章</h2></td>
+							<td colspan="2"><a href="#" class="fr" onclick="New(addTagRelate,['tagrelate','tagrelatedata']);return false;">添加</a></td>
+						</tr>
+						<tr class="tr1 vt">
+							<td width="40">顺序</td>
+							<td>标题</td>
+							<td>链接地址</td>
+							<td width="45">&nbsp;</td>
+						</tr>
+						<tr class="tr1 vt">
+							<td><input type="text" size="2" name="tagrelate[index][]" class="input"></td>
+							<td><input type="text" size="16" name="tagrelate[title][]" value="" class="input"></td>
+							<td><input type="text" size="22" name="tagrelate[url][]" value="http://" class="input"></td>
+							<td><a href="#" onclick="delTr(this);">删除</a></td>
+						</tr>
+					</tbody>
+				</table>
+			</td>
+		</tr>
+<!--
+EOT;
+}print<<<EOT
+-->
+	</tbody>
+</table>
+<!--
+EOT;
+?>-->

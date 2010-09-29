@@ -1,0 +1,537 @@
+<!--<?php print <<<EOT
+-->
+<link rel="stylesheet" type="text/css" href="$pwModeImg/style.css" media="all" />
+<style type="text/css" media="screen">
+	@import url(images/post/c_editor/editor.css);
+	@import url(images/post/c_editor/upload.css);
+</style>
+<form method="post" id="mainForm" name="FORM" action="{$basename}q=post" enctype = "multipart/form-data" onsubmit="return checkpost(document.FORM);">
+<input type="hidden" name="verify" value="$verifyhash" />
+<input type="hidden" name="step" value="2" />
+<input type="hidden" name="action" value="$action" />
+<input type="hidden" name="id" value="$id" />
+<input type="hidden" name="page" value="$page" />
+<div class="cmsbreadCrumb mb10">
+	<a href="index.php?m=cms" class="b">首页</a> &raquo; 发布文章
+</div>
+<div class="cmsBoxC">
+<!--
+EOT;
+$postTitle = $action == 'edit' ? '编辑文章' : '发表文章';
+$_sourceTitle = $action == 'edit' ? '内容关联' : '内容获取';
+$_sourceTip = $action == 'edit' ? '(关联ID后，可以引导用户进入原帖子或日志)' : '(输入帖子ID或者日志ID后，可以自动获取内容)';
+print <<<EOT
+-->
+	<h2 class="mb10">$postTitle</h2>
+	<div>
+		<table class="cmsTable mb10" width="100%">
+<!--
+EOT;
+if ($hasSource) {print <<<EOT
+-->
+			<tr>
+				<th width="80" class="th">{$_sourceTitle}</th>
+				<td class="td">
+					<select id="sourcetype" name="cms_sourcetype" class="mr5 select_wa">
+<!--
+EOT;
+foreach ($articleModule->getSourceTypeConfig() as $key=>$value) {
+$selected = $articleModule->sourceType == $key ? 'selected="selected"' : '';
+print <<<EOT
+-->
+						<option value="$key" $selected>$value</option>
+<!--
+EOT;
+}print <<<EOT
+-->
+					</select>
+<!--
+EOT;
+if (!$action) {print <<<EOT
+-->
+					<input name="cms_sourceid" class="input input_wa" type="text" onfocus="resetFormOnSubmit(true)" onkeydown="getSourceDataByEnter(event,this.value)" onBlur="getSourceData(this.value)" value="{$articleModule->sourceId}">
+<!--
+EOT;
+}else{print <<<EOT
+-->
+					<input name="cms_sourceid" class="input input_wa" type="text" value="{$articleModule->sourceId}">
+<!--
+EOT;
+}print <<<EOT
+-->
+					<span>{$_sourceTip}</span>
+				</td>
+			</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+			<tr>
+				<th class="th">标题</th>
+				<td class="td"><input name="cms_subject" value="{$articleModule->subject}" class="input input_wb" type="text"></td>
+			</tr>
+			<tr>
+				<th class="th">栏目</th>
+				<td class="td">
+					<select name="cid" class="mr5 select_wa">
+						<option value="0">栏目名称</option>
+<!--
+EOT;
+foreach ($columns as $key=>$value) {
+$value[name] = $value[level] ? ($value[level]==1 ? '&nbsp;|-'.$value[name]:'&nbsp;&nbsp;|-'.$value[name]) : $value[name];
+$selected = $value['column_id'] == $articleModule->columnId ? 'selected="selected"' : '';
+print <<<EOT
+-->
+						<option value="$value[column_id]" $selected>$value[name]</option>
+<!--
+EOT;
+}print <<<EOT
+-->
+					</select>
+				</td>
+			</tr>
+<!--
+EOT;
+if ($action=='edit') {print <<<EOT
+-->
+			<tr>
+				<th class="th">分页</th>
+				<td class="td">
+<!--
+EOT;
+if ($page && $pages && $page!='add' && $page!='all') {print <<<EOT
+-->
+					<a href="#" onclick="showDialog('confirm','删除后不可恢复，是否确认删除','5',deletePage);return false;" class="fr pagedel mr5">删除本页</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+					<a href="mode.php?m=cms&q=post&action=edit&id=$id&page=all" class="fr pagedel mr5">编辑全部</a>
+					<a href="mode.php?m=cms&q=post&action=edit&id=$id&page=add" class="fr pagedel mr5">添加分页</a>
+					$pages
+				</td>
+			</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+		</table>
+		<div class="mb10" style="padding:0 20px;">
+		<!--编辑器开始-->
+			<div class="pr cc mb10">
+				<div class="wind_editor_con cc mb10">
+                       <div id="w_editor_but" class="w_editor_but">
+                       <ul class="cc fl">
+                           <li>
+                               <div id="wy_fontname" style="width: 77px;" class="wy_select">字体</div>
+                               <div id="wy_fontsize" style="width: 15px;" class="wy_select">2</div>
+                               <div class="c">&nbsp;</div>
+                               <a title="粗体" id="wy_bold" href="javascript:">粗体</a>
+                               <a title="斜体" id="wy_italic" href="javascript:">斜体</a>
+                               <a title="下划线" id="wy_underline" href="javascript:">下划线</a>
+                               <a title="删除线" id="wy_strikethrough" href="javascript:">删除线</a>
+                               <a title="字体颜色" id="wy_forecolor" href="javascript:">字体颜色</a>
+                               <a title="背景颜色" id="wy_hilitecolor" href="javascript:">背景颜色</a>
+                           </li>
+                           <li>
+                               <div class="cc fl">
+                                   <a title="对齐" id="wy_justify" href="javascript:">对齐</a>
+                                   <a title="列表" id="wy_insertlist" href="javascript:">列表</a>
+                                   <a title="缩进" id="wy_indent" href="javascript:">缩进</a>
+                                   <a title="水平线" id="wy_inserthorizontalrule" href="javascript:">水平线</a>
+                                   <a title="引用" id="wy_quote" href="javascript:">引用</a>
+                                   <div class="c">&nbsp;</div>
+                                   <a title="去除字体格式" id="wy_removeformat" href="javascript:">去除字体格式</a>
+                                   <a title="插入链接" id="wy_createlink" href="javascript:">插入链接</a>
+                                   <a title="清除链接" id="wy_unlink" href="javascript:">清除链接</a>
+                                   <a title="表格" id="wy_inserttable" href="javascript:">表格</a>
+                                   <a title="代码" id="wy_code" href="javascript:">代码</a>
+                               </div>
+                           </li>
+                           <li class="li_icon_big">
+                               <div>
+                                   <a title="图片" id="wy_insertimage" href="javascript:">图片</a>
+                                   <a title="多媒体" id="wy_media" href="javascript:">多媒体</a>
+                                   <a onclick="return showEmotion();" unselectable="on" href="javascript:" title="表情" id="td_face">表情</a>
+
+                               </div>
+                               <div class="c"></div>
+                           </li>
+                           <li class="li_bg_none">
+                           		<a title="分页符" id="wy_cutpage" unselectable="on" href="javascript:" onclick="return pageCut();" >分页符</a>
+                               <a style="display: none;" title="自定义代码" id="wy_pwcode" href="javascript:">自定义代码</a>
+                               <a style="display: none;" title="帖子格式" id="wy_setform" href="javascript:">帖子格式</a>
+                               <div class="c">&nbsp;</div>
+                           </li>
+                       </ul>
+                       <div class="fr windcode">
+						<input id="wy_windcode" type="checkbox" />Wind代码 {$db_appsdb[11][status]}
+					   </div>
+                   	</div>
+                   	<textarea id="textarea" name="atc_content" style="height:280px;">{$content}</textarea>
+                       <div class="wy_menu_B" id="menu_editor" style="display:none;"></div>
+                       <div style="display:none"><span id="autosave"></span></div>
+                   	<div class="c"></div>
+                   	<div class="pr" style="height:12px;" onmousedown="editor.flex(event);">
+                       <div style="cursor:s-resize;position:absolute;bottom:-10px;height:12px;width:100%;padding-bottom:10px;" class="cc">
+                           <div class="post-flex">拉动</div>
+                       </div>
+                   </div>
+				</div>
+			</div>
+			<div class="w_editor_up">
+				<div style="height: 23px;">
+					<div class="fr" style="line-height: 18px; padding: 5px 0pt 0pt 10px;"></div>
+					<ul class="w_tab_a cc">
+						<li id="formUploadBtn" class="current"><a hidefocus="true" href="javascript:uploader.singleTab();">普通上传</a></li>
+						<li id="batUploadBtn" style="display:none"><a hidefocus="true" href="javascript:uploader.mutiTab();">批量上传</a></li>
+<!--
+EOT;
+if ($mutiupload > 0 && 0) {print <<<EOT
+-->
+					    <li id="flashAtt_use" class="none_css"><a hidefocus="true" href="javascript:uploader.init();" style="padding-right:0;">已有附件($mutiupload)</a></li>
+					    <li id="flashAtt_clear" class="none_css"><a hidefocus="true" href="javascript:uploader.clear();">清空已有附件&nbsp;</a></li>
+<!--
+EOT;
+}print <<<EOT
+-->
+				    	<li class="none_css"><a style="padding-right: 14px;" class="wy_tips" href="javascript:;">&nbsp;可上传类型<i style="width: 250px;">{$filetypeinfo}</i></a></li>
+				   	</ul>
+				</div>
+				<div class="w_editor_up_con">
+<!--
+EOT;
+if($attach){print <<<EOT
+-->
+<table cellPadding="0" cellSpacing="0" style="display:none" width="100%">
+<tbody id="att_mode"><tr>
+    <td><input class="input" type="file" name="attachment_" size="20" /></td><td><input class="input" type="text" name="atc_desc" size="20" /></td>
+    <td><select style="display:none;"><option value="0"></option><option value="1">加密</option><option value="2">出售</option></select></td>
+    <td><select name="att_ctype" style="display:none;">{$alltype}</select></td>
+    <td><input class="input" type="hidden" name="atc_needrvrc" value="0" size="1" /></td>
+    <td></td></tr>
+</tbody>
+</table>
+						<div class="cc">该帖包含附件<span class="gray">(不想保留的附件去掉√)</span> :
+							<table class="tr_p10">
+								<tr class="gray">
+									<td width="11"></td>
+									<td width="186">附件</td>
+									<td width="180">描述</td>
+									<td width="100"></td>
+								</tr>
+								<tbody id="ajaxtable"></tbody>
+							</table>
+						</div>
+<script type="text/javascript" language="JavaScript" src="js/upload.js"></script>
+<script language="JavaScript">
+var stylepath = '$stylepath';
+
+var attachs = {{$attach}};
+oldAtt.init();
+</script>
+<!--
+EOT;
+}print <<<EOT
+-->
+					<div class="cc">
+<!--已包含的附件的列表-->
+						<table id="attach" class="tr_p10">
+							<thead>
+								<tr valign="top" class="gray" id="formUpload">
+									<td width="200">上传附件 (图片、文件等)</td>
+									<td width="180">描述</td>
+									<td width="100">&nbsp;</td>
+								</tr>
+							</thead>
+							<tbody></tbody>
+							<!--模板-->
+							<tfoot id="singleUploadMod">
+								<tr>
+									<td class="uploadfilename" width="200"><input type="file" name="attachment" onchange="uploader.insert(this)" /></td>
+									<td width="180"><input type="text" name="atc_desc" /></td>
+									<td width="100">&nbsp;</td>
+								</tr>
+							</tfoot>
+						</table>
+<!--待批量上传的文件-->
+						<table style="margin-bottom: 10px;" class="uploadFileInfo" id="uploadFileInfo">
+							<thead>
+								<tr>
+									<td width="60%">文件名</td>
+									<td width="15%">大小</td>
+									<td width="20%">上传进度</td>
+									<td width="5%">删</td>
+								</tr>
+							</thead>
+							<tbody id="qlist">
+							</tbody>
+						</table>
+ 						<div class="menu menu_img" id="viewimg"></div>
+					</div>
+					<div id="batUpload">
+						<div style="width: 100%;">
+							<div id="flashUploadPanel"></div>
+						</div>
+					</div>
+					<div class="c"></div>
+				</div>
+			</div>
+			<div id="menu_face" class="menu" style="display:none;"></div>
+<!--编辑器结束-->
+		</div>
+		<table class="cmsTable mb10" width="100%">
+			<tr class="vt">
+				<th width="80" class="th">摘要</th>
+				<td class="td"><textarea name="cms_descrip" cols="" rows="" class="textareaA">{$articleModule->descrip}</textarea></td>
+			</tr>
+			<tr>
+				<th class="th">跳转链接</th>
+				<td class="td"><input name="cms_jumpurl" value="{$articleModule->jumpUrl}" type="text" class="input input_wb">
+				<span>(维护后，点击文章标题将跳转到这个链接)</span></td>
+			</tr>
+			<tr>
+				<th class="th">原作者</th>
+				<td class="td"><input name="cms_author" value="{$articleModule->author}" type="text" class="input input_wa"></td>
+			</tr>
+			<tr>
+				<th class="th">信息来源</th>
+				<td class="td"><input name="cms_frominfo" value="{$articleModule->fromInfo}" type="text" class="input input_wa"></td>
+			</tr>
+			<tr>
+				<th class="th">来源地址</th>
+				<td class="td"><input name="cms_fromurl" value="{$articleModule->fromUrl}" type="text" class="input input_wb"></td>
+			</tr>
+			<tr class="vt">
+				<th class="th">相关文章</th>
+				<td class="td">
+					<div>
+						<table>
+							<tbody id="mode" style="display:none"><tr>
+								<td><input name="cms_relate[subject][]" type="text" class="input input_wa"></td>
+								<td><input name="cms_relate[url][]" type="text" class="input input_wa"></td>
+								<td><a href="#" onclick="removecols(this);return false;" class="s2">删除</a></td>
+							</tr>
+							</tbody>
+
+							<tr>
+								<td width="170">标题</td>
+								<td width="170">链接</td>
+								<td><a href="javascript:;" onclick="addcols('mode','relate');return false;" class="s3 mr5">添加</a></td>
+							</tr>
+							<tbody id="relate">
+<!--
+EOT;
+foreach ($articleModule->relate as $value) {print <<<EOT
+-->
+							<tr>
+								<td><input name="cms_relate[subject][]" value="$value[subject]" type="text" class="input input_wa"></td>
+								<td><input name="cms_relate[url][]" value="$value[url]" type="text" class="input input_wa"></td>
+								<td><a href="javascript:;" onclick="removecols(this);return false;">删除</a></td>
+							</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+							<tr>
+								<td><input name="cms_relate[subject][]" type="text" class="input input_wa"></td>
+								<td><input name="cms_relate[url][]" type="text" class="input input_wa"></td>
+								<td><a href="javascript:;" onclick="removecols(this);return false;">删除</a></td>
+							</tr>
+							</tbody>
+						</table>
+					</div>
+				</td>
+			</tr>
+		</table>
+		<div class="tac mb20"><span class="mr20"><span class="btn"><span><button name="Submit" type="submit">发布</button></span></span></span><label><input name="addnewpage" type="checkbox" value="1">&nbsp;保存后继续编辑新分页内容</label></div>
+		<div class="c">&nbsp;</div>
+	</div>
+</div>
+</form>
+
+
+<script type="text/javascript" src="js/lang/zh_cn.js"></script>
+<script type="text/javascript" src="js/post.js"></script>
+<script type="text/javascript" src="data/bbscache/face.js"></script>
+<script type="text/javascript" src="js/wind_c_editor.js"></script>
+<script type="text/javascript" src="js/uploader.js"></script>
+<script type="text/javascript">
+var editor = null,charset = 'gbk';
+function WysiwygConfig() {
+this.baseURL = document.baseURI || document.URL;
+if (this.baseURL && this.baseURL.match(/(.*)\/([^\/]?)/)) {
+	this.baseURL = RegExp.$1 + "/";
+}
+this.imgURL = imgpath + "/post/c_editor/";
+
+this.btnList = {
+	removeformat:[ true, editorcode, false ],
+	bold: [ true, editorcode, true ],
+	italic: [ true, editorcode, true ],
+	underline: [ true, editorcode, true ],
+	strikethrough: [ true, editorcode, true ],
+	justify : [true, showJustify, false],
+	insertlist : [true, showList, false],
+	indent: [ true, showDent, false ],
+	forecolor: [ true, showcolor, false ],
+	hilitecolor: [ true, showcolor, false ],
+	inserthorizontalrule: [ true, editorcode, false ],
+	createlink: [ true, showcreatelink, false ],
+	unlink: [ true, editorcode, false ],
+	insertimage: [ true, insertImage, false ],
+	music: [ true, insertMusic, false ],
+	inserttable: [ true, showTable, false ],
+	windcode: [ true, editorcode, false ],
+	undo: [ true, editorcode, false ],
+	redo: [ true, editorcode, false ],
+	media: [ true, rming, false ],
+	quote: [ true, code, false ],
+	code: [ true, code, false ],
+	pwcode: [true, extend , false ],
+	setform: [true, extend , false ]
+};
+this.fontname = {
+	"default": "字体",
+	"宋体":	'宋体',
+	"新宋体":	'新宋体',
+	"楷体_GB2312":	'楷体_GB2312',
+	"黑体":	'黑体',
+	"Arial":	   'arial,helvetica,sans-serif',
+	"Courier New":	   'courier new,courier,monospace',
+	"Georgia":	   'georgia,times new roman,times,serif',
+	"Tahoma":	   'tahoma,arial,helvetica,sans-serif',
+	"Times New Roman": 'times new roman,times,serif',
+	"Verdana":	   'verdana,arial,helvetica,sans-serif',
+	"impact":	   'impact'
+};
+this.fontsize = {
+	"default": "2",
+	"1":  "1",
+	"2": "2",
+	"3": "3",
+	"4": "4",
+	"5": "5",
+	"6": "6",
+	"7": "7"
+};
+this.formatblock = {
+	"default": "格式",
+	"普通": "p",
+	"标题一": "h1",
+	"标题二": "h2",
+	"标题三": "h3",
+	"标题四": "h4",
+	"标题五": "h5",
+	"标题六": "h6"
+};
+this.selList = ['fontname','fontsize'];
+};
+editor = new WYSIWYD();
+editor.config = new WysiwygConfig();
+editor.init('textmode', 0);
+var maxLength=200;
+function wordlength(target)
+{
+	var val = target.value;
+	var n = 2*val.length-val.replace(/[\u4e00-\u9fa5]/g,'').length;
+	var val=target.value;
+	while(n>maxLength)
+	{
+		var key = val.substr(-1);
+		target.value=val.substr(0,val.length-1);
+		val = target.value;
+		n -= /[\u4e00-\u9fa5]/.test(key)?2:1;
+	}
+	str='('+n+'/'+maxLength+')';
+	var next = target.nextSibling;
+	next.innerHTML=str;
+	if(n==maxLength){
+		next.className='s3';
+		target.maxLength = val.length;
+	}else{
+		next.className="s6";
+		target.maxLength = maxLength;
+	}
+}
+var mutiupload = '0';
+var allowmutinum = parseInt('$db_attachnum');
+var allow_ext = '{$filetype}';
+
+uploader.maxLength = {$db_attachnum};
+uploader.insertable= true;
+window.onReady(function(){uploader.init();});
+document.FORM.Submit.disabled = false;
+function checkpost(obj) {
+	if (obj.cms_subject.value == "") {
+		showDialog("error","标题不能为空",2);
+		obj.cms_subject.focus();
+		return false;
+	} else if (strlen(obj.cms_subject.value) > 80) {
+		showDialog("error","标题超过最大长度80 个字节",2);
+		obj.cms_subject.focus();
+		return false;
+	}
+	if (strlen(obj.atc_content.value) < 0) {
+		showDialog("error","文章内容不能为空",2);
+		editor.focusEditor();
+		return false;
+	} else if (strlen(obj.atc_content.value) > 50000) {
+		showDialog("error","文章内容大于 50000 个字节",2);
+		editor.focusEditor();
+		return false;
+	}
+	var pattern = /\[url=(\d+)\]/gmi;
+	var str = obj.atc_content.value;
+	var res;
+	while( (res = pattern.exec(str))!=null )
+	{
+		if(getObj('attachment_'+a[1]).value==''){
+			str=str.replace(new RegExp('\\\\[url='+a[i]+'\]','gm'),'');
+		}
+	}
+	obj.atc_content.value = str;
+	return true;
+}
+function addcols(mode,ft){
+	var s = getObj(mode).firstChild.cloneNode(true);
+	getObj(ft).appendChild(s);
+}
+function removecols(obj){
+	var o = obj.parentNode.parentNode;
+	o.parentNode.removeChild(o);
+}
+
+function deletePage() {
+	var url = "{$basename}q=post&action=deletepage&id=$id&page=$page";
+	window.location.href = url;
+}
+
+function getSourceData(id) {
+	id = id - 0;
+	resetFormOnSubmit(false);
+	if (!id) return false;
+	var sourceType = getObj('sourcetype').value;
+	window.location.href = "{$basename}q=post&sourcetype="+sourceType+"&sourceid="+id+"&cid={$cid}";
+}
+
+function resetFormOnSubmit(status){
+	var aform = document.FORM;
+	if(aform == null) return false;
+	if(status==true) {
+		aform.onsubmit = function(){return false};
+	}else{
+		aform.onsubmit = '';
+	}
+}
+
+function getSourceDataByEnter(event,id){
+	event = event ? event : (window.event ? window.event : null);
+	if(event.keyCode == '13'){
+		getSourceData(id);
+	}
+}
+</script>
+<!--
+EOT;
+?>-->

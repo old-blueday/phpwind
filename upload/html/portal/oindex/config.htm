@@ -1,0 +1,123 @@
+
+<pw id="oindexX650" />
+	<ul class="switch" id="PP1_A">
+	<list action="image"  cachetime="1800" num="4" title="图片" />
+	<loop>
+		<li class="switchItem" style="display:">
+			<a href="{url}"><img src="{image,301,327}" width="301" height="327" /><h3>{title,50}</h3></a>
+		</li>
+	</loop>
+	</ul>
+	<div class="pwSlide-bg"></div>
+	<ul class="SwitchNav" id="PP1_B">
+<!--#for($i = 1; $i<=$key+1; $i++){#-->					
+		<li class="switchNavItem"><a href="#" onclick="return false;">{$i}</a></li>
+<!--#}#-->
+	</ul>
+	<script language="javascript" src="mode/area/js/ddsliderplayer.js"></script>
+	<script>ddSliderPlayers('PP1_A','PP1_B',4,'current');</script>
+	
+<pw id="oindexV7501" />
+	<ul class="tops">
+	<list num="3" action="diary" cachetime="1800" ifpushonly="0" title="帖子列表" />
+	<loop>
+<!--#$classKey = $key+1;#-->
+		<li>
+			<h2 class="t{$classKey}"><a href="{url}" target="_blank">{title,40}</a></h2>
+			<p>{descrip,90}</p>
+		</li>
+	</loop>
+	</ul>
+				
+<pw id="oindexA6628" />
+	<ul class="list">
+	<list num="4" action="diary" cachetime="1800" ifpushonly="0" title="帖子列表" />
+	<loop>
+		<li><span class="fr gray">{author}</span><a href="{url}" target="_blank">{title,40}</a></li>
+	</loop>
+	</ul>
+				
+<pw id="oindexR7307" />
+			热门<em>帖子</em>
+
+
+
+<pw id="oindexS9584_A" />
+			<list num="10" action="subject" cachetime="1800" ifpushonly="0" title="帖子列表" />
+			<ul class="list1">
+			<loop>
+				<li><span class="fr gray">{author}</span><a href="{url}" target="_blank">{title,26}</a></li>
+			</loop>
+			</ul>
+			
+			
+			
+<pw id="oindexS9584_B" />
+			<list num="10" action="subject" cachetime="1800" ifpushonly="0" title="帖子列表" />
+			<ul class="list1">
+			<loop>
+				<li><span class="fr gray">{author}</span><a href="{url}" target="_blank">{title,26}</a></li>
+			</loop>
+			</ul>
+					
+<pw id="oindexG6700" />
+	
+	<list num="5" action="photo" cachetime="1800" ifpushonly="0" title="帖子列表" />
+	<loop>
+		<li><a href="{url}" target="_blank"><img src="{image,119,129}" width="119" height="129" /></a></li>
+	</loop>
+				
+<pw id="oindexV6527" />
+<h2><a href="" class="more">more</a>最新<em>新鲜事</em></h2>
+
+
+
+
+
+
+<pw id="oindexE7696" />
+<list num="1" action="image" cachetime="1800" ifpushonly="0" title="帖子列表" />
+<loop>
+	<a href="{url}" target="_blank"><img src="{image,90,64}" width="90" height="64" class="fl" /></a>
+	<h5><a href="{url}" target="_blank">{descrip,70}</a></h5>
+	<p class="gray"><span class="mr10">{author}</span>{postdate,m:d}</p>
+</loop>
+						
+
+
+<pw id="oindexE6879" />
+<h2>社区<em>达人</em></h2>
+<pw id="oindexC2290" />
+<ul class="listimg cc">
+<list num="10" action="user" cachetime="1800" ifpushonly="0" title="帖子列表" />
+<loop>
+	<li><a href="{url}" target="_blank"><img src="{image,64,64}" width="64" height="64" /><p class="lh_18 cp">{title}</p></a></li>
+</loop>
+</ul>
+					
+<pw id="oindexM1136" />
+			<h2>热门<em>群组</em></h2>
+
+<pw id="oindexN3867" />
+<list num="10" action="group" cachetime="1800" ifpushonly="0" title="帖子列表" />
+<loop>
+<div class="subject2 cc">
+	<a href="{url}" target="_blank"><img src="{image,71,71}" width="71" height="71" class="fl" /></a>
+	<h4><a href="{url}" target="_blank">{title,12}</a></h4>
+	<p>{descrip,40}</p>
+</div>
+</loop>				
+
+
+<pw id="oindexH564" />
+<list num="1" action="image" cachetime="1800" ifpushonly="0" title="帖子列表" />
+<loop>
+	<a href="{url}" target="_blank"><img src="{image,90,64}" width="90" height="64" class="fl" /></a>
+	<h5><a href="{url}" target="_blank">{descrip,70}</a></h5>
+	<p class="gray"><span class="mr10">{author}</span>{postdate,m:d}</p>
+</loop>
+
+<pw id="H1130oindex" />
+					<li class="switchNavItem">热门</li>
+					<li class="switchNavItem">最新</li>
+				

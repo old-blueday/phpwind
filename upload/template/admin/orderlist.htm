@@ -1,0 +1,169 @@
+<!--<?php
+include_once PrintEot('left');
+if(!$action){print <<<EOT
+-->
+<h2 class="h1">搜索</h2>
+<form action="{$basename}&action=pay" method="post">
+  <div class="admin_table mb10">
+    <table cellpadding="0" cellspacing="0" width="100%">
+      <tr class="tr1 vt">
+        <td class="td1">订单号</td>
+        <td class="td2"><input type="text" name="order" class="input input_wa mr5"  />
+          <span class="bt2"><span><button type="submit" value="提 交">提 交</button></span></span></td>
+      </tr>
+    </table>
+  </div>
+</form>
+<form action="$basename&" method="post" id="oderList">
+  <input type="hidden" name="action" value="del">
+  <h2 class="h1"><span class="mr20">订单管理</span><span class="linka"><a href="$basename">所有订单</a>&nbsp;|&nbsp; <a href="$basename&state=2">已完成订单</a>&nbsp;|&nbsp; <a href="$basename&state=1">未完成订单</a></span></h2>
+  <div class="admin_table mb10">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <tr class="tr2 vt td_bgB">
+	  <td width="30"><span onclick="CheckAll(document.getElementById('oderList'))" class="cp">全选</span></td>
+      <td>用户名</td>
+      <td>订单类型</td>
+      <td>付款帐号</td>
+      <td>支付金额</td>
+      <td>交易状态</td>
+      <td>交易时间</td>
+      <td></td>
+    </tr>
+<!--
+EOT;
+if (empty($orderdb)) {print <<<EOT
+-->
+<tr><td class="p10" colspan="8"><div class="admin_tips">啊哦，没有你要的信息！</div></td></tr>
+<!--
+EOT;
+}else{
+$order_lang = array('积分充值','道具购买','版块权限购买','特殊组购买','注册码购买');
+foreach($orderdb as $key => $value){
+if($value[state]==0){
+$state='<span class=s1>未完成</span>';
+}elseif($value[state]==1){
+$state='<span class=s2>已支付，等待用户确认</span>';
+}elseif($value[state]==2){
+$state='<span class=s3>已完成</span>';
+}
+print <<<EOT
+-->
+    <tr class="tr1 vt">
+      <td class="td2"><input type="checkbox" name="selid[]" value="$value[id]"></td>
+      <td class="td2">$value[username]</td>
+      <td class="td2">{$order_lang[$value[type]]}</td>
+      <td class="td2">$value[payemail]</td>
+      <td class="td2">$value[fee]</td>
+      <td class="td2">$state</td>
+      <td class="td2">$value[date]</td>
+      <td class="td2"><a href="$basename&action=pay&id=$value[id]">详情</a></td>
+    </tr>
+<!--
+EOT;
+}}print <<<EOT
+-->
+  </table>
+  </div>
+  <div class="cc mb10">$pages</div>
+  <div class="mb10 tac">
+    <span class="btn"><span><button type="submit" name="hello">删除</button></span></span>
+  </div>
+</form>
+
+<!--
+EOT;
+}elseif($action=='pay'){print <<<EOT
+-->
+<div class="admin_info mb10">
+    <h2 class="h1">完成支付说明</h2>
+    <div class="legend">
+    <ol>
+        <li>由于支付宝系统在传输支付状态的过程可能会出现一些不可预料的问题，导致用户实际已经支付成功，但交易币没有充值成功~</li>
+        <li>请核对订单信息后将付款帐号填入下方对应的文本框内，再使用“完成充值”功能完成本次订单的充值</li>
+    </ol>
+    </div>
+</div>
+<form action="$basename&" method="post">
+  <input type="hidden" name="action" value="pay">
+  <input type="hidden" name="step" value="2">
+  <input type="hidden" name="id" value="$rt[id]">
+  <h2 class="h1">订单信息</h2>
+  <div class="admin_table mb10">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <tr class="tr1 vt">
+      <td class="td1">订单号</td>
+      <td class="td2">$rt[order_no]</td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">用户名</td>
+      <td class="td2">$rt[username] (uid:$rt[uid])</td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">支付金额</td>
+      <td class="td2"><font color="orange">￥$rt[fee]</font></td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">付款帐号</td>
+      <td class="td2">
+<!--
+EOT;
+if ($rt['state'] == '2') {print <<<EOT
+-->
+        $rt[payemail]
+<!--
+EOT;
+} else {print <<<EOT
+-->
+        <input type="text"  class="input input_wa" name="payemail" />
+<!--
+EOT;
+}print <<<EOT
+-->
+      </td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">交易状态</td>
+      <td class="td2">
+<!--
+EOT;
+$order_lang = array('积分充值','道具购买','版块权限购买','特殊组购买','注册码购买');
+if ($rt['state'] == '2') {print <<<EOT
+-->
+        已完成订单
+<!--
+EOT;
+} else {print <<<EOT
+-->
+        未支付订单
+<!--
+EOT;
+}print <<<EOT
+-->
+      </td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">订单类型</td>
+      <td class="td2"><span class="mr20">{$order_lang[$rt[type]]}</span>$detail</td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">交易时间</td>
+      <td class="td2">$rt[date]</td>
+    </tr>
+  </table>
+ </div>
+<!--
+EOT;
+if ($rt['state'] < 2) {print <<<EOT
+-->
+  <div class="mb10 tac">
+    <span class="btn"><span><button type="submit" value="完成充值">完成充值</button></span></span>
+  </div>
+<!--
+EOT;
+}print <<<EOT
+-->
+</form>
+<!--
+EOT;
+}include_once PrintEot('adminbottom');
+?>-->

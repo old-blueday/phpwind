@@ -1,0 +1,238 @@
+<!--<?php
+print <<<EOT
+-->
+<div id="breadCrumb" class="cc">$msg_guide</div>
+<div id="pw_content">
+<!--
+EOT;
+$tmpStyle = $_COOKIE['toggle']!=='0' ? 'f_tree cc' : 'f_tree cc sideClose';print <<<EOT
+-->
+	<div id="sidebar" class="$tmpStyle">
+<!--
+EOT;
+$db_threadsidebarifopen && require_once(PrintEot('thread_side'));
+print <<<EOT
+-->
+        <div class="content_thread cc">
+            <div class="content_ie">
+<!--
+EOT;
+require_once PrintEot('thread_group');
+include printEot('writesmile');
+$check = (GetCookie('iftongbu') == 1) ? ' checked' : '';
+print <<<EOT
+-->
+<div class="g_navB">
+	共 $count2 篇新鲜事
+</div>
+<div class="pd15">
+<div style="width:600px;">
+<div class="dlA">
+<form method="post" action="apps.php?q=group&cyid=$cyid&ajax=1&a=writepost" onsubmit="return false;" name="FORM">
+    <dl class="cc dl">
+        <dt class="dt">
+            <span class="img_50"><img src="$faceurl" width="44" height="44" /></span>
+        </dt>
+        <dd class="dd" style="_width:530px;_overflow:hidden;_float:right;_padding-left:0;">
+            <div class="sk">
+           	<div class="one"><div class="two"><div class="tree"><div class="four">
+				<div class="sktextarea"><textarea name="text" id="writetext" onfocus="if(this.value == oldvalue)this.value=''" style="width:495px;">来，说两句吧…</textarea></div>
+                <div class="sk_open">
+                    <span id="writebutton" class="btn3 fr"><span><button class="button" onclick="submitwrite(document.forms['FORM'])" id="write_button">发表</button></span></span>
+<!--
+EOT;
+if($_COOKIE['iftongbu']==1)
+{
+	$check = "checked=true";
+}else 
+{
+	$check ='';
+}
+print <<<EOT
+-->
+                    <!--span class="tosign"><label for="writetosign"><input id="writetosign" name="tosign" type="checkbox" value="1" onclick="if(this.checked == true){SetCookie('iftongbu','1');}else{SetCookie('iftongbu','0');}" {$check}>&nbsp;同步至我的记录</label></span-->
+					<a id="showSmile" href="javascript:;" class="sk_show">表情</a>
+                    <div style="position:absolute;display:none;width:100px;" id="smile" class="face_menu"></div>
+                    <span id="writetext_warn" class="s6">限 255 字节</span>
+                </div>
+            </div></div></div></div>
+        	</div>
+        </dd>
+    </dl>
+	</form>
+<script language="JavaScript">
+var charset = '$db_charset';
+initCheckTextNum('writetext','writetext_warn',255);
+function write_quickpost(event){
+	if((event.ctrlKey && event.keyCode == 13) || (event.altKey && event.keyCode == 83)){
+		getObj('write_button').click();
+	}
+}
+var oldvalue;
+function submitwrite(o) {
+	if (getObj('writetext').value == '' || getObj('writetext').value == oldvalue) {
+		showDialog('error','记录内容必须在3～255个字节之间');
+		return false;
+	}
+	ajax.submit(o);
+	return true;
+}
+~function getOldValue(){
+	oldvalue = getObj('writetext').value;
+	if (oldvalue != '来，说两句吧…') {
+		getObj('writetext').value = '';
+	}
+}();
+getObj('showSmile').onclick = function(e) {
+	stopPropagation(e);
+	displayElement('smileContainer');
+	document.body.onclick=function(){
+		getObj('smileContainer').style.display='none';
+		document.body.onclick=null;
+	};
+	var rect = getObj('showSmile').getBoundingClientRect();
+	getObj('smileContainer').style.left = rect.left+ietruebody().scrollLeft+'px';
+	getObj('smileContainer').style.top = rect.top + ietruebody().scrollTop + 20 +'px';
+}
+applySmile(function(codeText) {
+	insertContentToTextArea(getObj('writetext'), codeText);
+});
+</script>
+<script language="JavaScript" src="mode/o/js/smile.js"></script>
+<script language="JavaScript" src="mode/o/js/showsmile.js"></script>   
+	<div id="writebox" class="mb10">
+<!--
+EOT;
+if (!empty($writedata)) {
+$db_blogsource = array('web'=>'网页','signature'=>'个性签名','other'=>'其他');
+$i=0;
+foreach ($writedata as $key => $value) {
+$value['content']=str_replace($face_array,$img_array,$value['content']);
+print <<<EOT
+-->
+		<dl class="dl cc" id="write_$value[id]" >
+<!--
+EOT;
+if($value[icon]){print <<<EOT
+-->
+ 
+
+		<dt class="dt"><a href="u.php?uid=$value[uid]" target="_blank" class="userCard img_50"  id="card_write_{$i}_{$value[uid]}"><img src="$value[icon]" width="44" height="44" /></a><span id="write_{$i}" style="height:1px" class="fr"></span></dt>
+		<dd class="dd">
+<!--
+EOT;
+if ($ifadmin || $value['uid'] == $winduid) {print <<<EOT
+-->
+				<a href="apps.php?q=group&a=writedel&ajax=1&id=$value[id]&cyid=$cyid" id="del_$value[id]" class="adel wirte" onclick="ajaxurl(this);return false;" title="删除" style="display:none;">删除</a>
+				
+<!--
+EOT;
+}print <<<EOT
+-->
+		<p class="f14 mb15"><a href="u.php?uid=$value[uid]" target="_blank" class="mr5">$value[username]</a>$value[content]</p>
+		<p class="gray mb10"><span class="mr5">{$value[postdate]}</span><!--通过{$db_blogsource[$value[source]]}--><span id="com_write_$value[id]"><a href="javascript:;" id='a_write_{$value[id]}' onclick="PW_Comment.showCommList('groupwrite','$value[id]',this)">回复({$value[c_num]})</a></span> 
+        </p>
+		<div id="combox_groupwrite_{$value[id]}">
+<!--
+EOT;
+}print <<<EOT
+-->
+			<div class="redlA">
+<!--
+EOT;
+if($value['replayuid']){
+print <<<EOT
+-->
+                <dl class="cc" id="commentreplay_{$value[id]}">
+                	<dd class="d"><div class="title"><span>{$value[replaytitle]}</span>&nbsp;-&nbsp;<a href="apps.php?&q=user&u={$value[replayuid]}" class="mr5 w">{$value[replayusername]}</a><span class="s6 w">{$value[replaypoastdate]}</span></div></dd>
+                </dl>
+<!--
+EOT;
+if($value[c_num]>1)
+{print <<<EOT
+-->
+                <dl class="cc">
+                	<dd class="d"><a id="com_$value[id]" href="javascript:;" class="s6" onclick="PW_Comment.showCommList('groupwrite','$value[id]',this)">全部{$value[c_num]}条回复&raquo;</a></dd>
+                </dl>
+<!--
+EOT;
+}else{
+print <<<EOT
+-->
+                <dl class="cc">
+                	<dd class="d"><a id="com_$value[id]" href="javascript:;" class="s6" onclick="PW_Comment.showCommList('groupwrite','$value[id]',this)">添加回复&raquo;</a></dd>
+                </dl>
+<!--
+EOT;
+}print <<<EOT
+-->
+				</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+			</div>
+			</dd>
+		</dl>
+<!--
+EOT;
+$i++;
+}}print <<<EOT
+-->
+	</div>
+	<div>$pages</div>
+<script language="JavaScript" src="js/app_comment.js"></script>
+<script>
+function showshow(id)
+{
+	if(document.getElementById('commentreplay_'+id))
+	{
+		if(document.getElementById('commentreplay_'+id).style.display=="block"||document.getElementById('commentreplay_'+id).style.display=="")
+		{
+			document.getElementById('commentreplay_'+id).style.display="none";
+			document.getElementById('com_'+id).style.display ="none";
+		}else if(document.getElementById('commentreplay_'+id).style.display=="none")
+		{
+			document.getElementById('commentreplay_'+id).style.display="block";
+			document.getElementById('com_'+id).style.display ="block";
+		}
+	}
+}
+
+function delload(){
+	var objTrs = getElementsByClassName('dl cc',getObj('writebox'));
+	for (var i=0;i<objTrs.length ; i++ ){
+		var stamp = objTrs[i].id.substr(0,6);
+		if (stamp == 'write_'){
+			objTrs[i].onmouseover = function (){
+				var delObj = getElementsByClassName('adel wirte',this);
+				//var delObj = this.getElementsByName('deldel');
+				if(delObj.length>0){
+					delObj[0].style.display='';
+				}
+			}
+			//console.log(objTrs[i].onmouseover);
+			objTrs[i].onmouseout = function (){
+				var delObj = getElementsByClassName('adel wirte',this);
+				//var delObj = this.getElementsByName('deldel');
+				if(delObj.length>0){
+					delObj[0].style.display='none';
+				}
+			}
+		}
+	}
+}
+window.onReady(delload);
+</script>
+    </div>
+</div>
+</div>
+
+
+            </div>
+        </div>
+	</div>
+</div>
+<!--
+EOT;
+?>

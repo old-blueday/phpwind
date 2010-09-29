@@ -1,0 +1,15 @@
+<?php
+print <<<EOT
+
+<div style="padding:10px 0;">
+    <form method="post" action="thread.php?">
+        请输入密码&nbsp;
+        <input class="input" type="password" size="20" maxlength="75" name="wind_password" />
+        <input type="hidden" name="fid" value="$fid" />
+        <input type="hidden" name="wind_action" value="wind_fpwd" />
+        <input class="btn" type="submit" value="提 交" />
+    </form>
+</div>
+
+EOT;
+?>

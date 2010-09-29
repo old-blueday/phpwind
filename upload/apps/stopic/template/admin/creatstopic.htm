@@ -1,0 +1,35 @@
+<!--<?php
+print <<<EOT
+-->
+<h2 class="h1" style="cursor:move" onmousedown="read.move(event);"><a class="fr del_img" href="javascript:;" onclick="closep();" title="关闭">关闭</a>操作完成</h2>
+<div class="admin_table">
+<table cellspacing="0" cellpadding="0" width="600">
+	<tbody id="fildbody">
+		<tr class="tr1">
+			<td class="td1">专题链接</td>
+			<td class="td2">
+				<input type="text" value="$stopicUrl" id="123" class="input input_wb mr20"></input><a href="$stopicUrl" target="_blank">预览</a>
+			</td>
+		</tr>
+	</tbody>
+</table>
+<script type="text/javascript">
+document.onselectstart=function(event){
+if(window.event){
+event=window.event;
+}
+try { 
+if (event.srcElement.type == "text") {
+return true;
+}}
+catch(e)
+{
+	return false;
+}
+};
+</script>
+</div>
+<!--
+EOT;
+?>
+-->

@@ -1,0 +1,239 @@
+<!--<?php
+if ($action == 'buy') {print <<<EOT
+-->
+<div id="breadCrumb">
+		<img src="$imgpath/$stylepath/thread/home-old.gif" align="absmiddle" />&nbsp;<a href="$db_bfn" title="$db_bbsname">$db_bbsname</a><em>&gt;</em>商品购买<em>&gt;</em><a href="read.php?tid=$tid">$trade[name]</a>
+</div>
+<form action="trade.php?action=buy" method="post">
+<input type="hidden" name="step" value="3" />
+<input type="hidden" name="tid" value="$tid" />
+<div class="t f_one">
+<table width="100%" cellspacing="0" cellpadding="0" align="center">
+	<tr><td class="h" colspan="2">确认商品交易</td></tr>
+	<tr class="tr3">
+		<th style="width:20%;">商品名称:</th>
+		<td class="s8"><a href="read.php?tid=$tid">$trade[name]</a></td>
+	</tr>
+	<tr class="tr3">
+		<th>当前价格:</th>
+		<td>$trade[costprice]</td>
+	</tr>
+	<tr class="tr3">
+		<th>所 在 地:</th>
+		<td>$trade[locus]</td>
+	</tr>
+	<tr class="tr3">
+		<th>卖　　家:</th>
+		<td><a href="apps.php?q=article&a=goods&uid=$trade[uid]">$trade[username]</a></td>
+	</tr>
+	<tr class="tr3">
+		<th>收货地址:</th>
+		<td><input type="text" class="input" name="address" size="60" /> &nbsp;邮政编码: <input type="text" class="input" name="zip" size="8" /></td>
+	</tr>
+	<tr class="tr3">
+		<th>收 货 人:</th>
+		<td><input type="text" class="input" name="consignee" /></td>
+	</tr>
+	<tr class="tr3">
+		<th>联系电话:</th>
+		<td><input type="text" class="input" name="tel" /></td>
+	</tr>
+	<tr class="tr3">
+		<th>购买数量:</th>
+		<td><input type="text" class="input" name="quantity" value="1" size="6" /></td>
+	</tr>
+<!--
+EOT;
+if ($trade['transport']) {print <<<EOT
+-->
+	<tr class="tr3">
+		<th>运送方式:</th>
+		<td>
+			<input type="radio" name="transport" value="1" /> 平邮:$trade[mailfee] 元<br />
+			<input type="radio" name="transport" value="2" /> 快递:$trade[expressfee] 元<br />
+			<input type="radio" name="transport" value="3" /> EMS：$trade[emsfee] 元<br />
+			<!-- 如果没有运费发生，您可以在拍下该商品后，要求卖家修改运费 -->
+		</td>
+	</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+	<tr class="tr3">
+		<th>给卖家留言:</th>
+		<td><textarea name="descrip" style="width:360px;height:40px"></textarea></td>
+	</tr>
+	<tr class="tr3"><td></td><td><input type="submit" class="btn" value="确认无误，购买" /></td></tr>
+	<tr class="f_one"><td style="height:8px;" colspan="2"></td></tr>
+</table></div>
+</form>
+<!--
+EOT;
+} elseif ($action == 'order') {print <<<EOT
+-->
+<div id="breadCrumb">
+		<img src="$imgpath/$stylepath/thread/home-old.gif" align="absmiddle" />&nbsp;<a href="$db_bfn" title="$db_bbsname">$db_bbsname</a><em>&gt;</em>订单详细信息
+</div>
+<div class="t f_one">
+<table width="100%" cellspacing="0" cellpadding="0">
+	<tr><th class="h" colspan="2">订单详细信息</th></tr>
+	<tr class="tr2"><th>订单商品信息</th><td></td></tr>
+	<tr class="tr3">
+		<th style="width:20%;">商品名称:</th>
+		<td><a href="read.php?tid=$order[tid]">$order[subject]</a></td>
+	</tr>
+	<tr class="tr3">
+		<th>购买数量:</th>
+		<td>$order[quantity]</td>
+	</tr>
+	<tr class="tr3">
+		<th>商品单价:</th>
+		<td>$order[price]</td>
+	</tr>
+	<tr class="tr3">
+		<th>购买日期:</th>
+		<td>$order[buydate]</td>
+	</tr>
+	<tr class="tr3">
+		<th>卖　　家:</th>
+		<td><a href="apps.php?q=article&a=goods&uid=$order[uid]">$order[username]</a></td>
+	</tr>
+	<tr class="tr3">
+		<th>备　　注:</th>
+		<td>$order[descrip]</td>
+	</tr>
+	<tr class="tr2"><th>商品物流信息</th><td></td></tr>
+	<tr class="tr3">
+		<th>运费方式:</th>
+		<td>
+<!--
+EOT;
+if ($order['transport'] && $order['transportfee']) {
+$o_lang = array('1' => '平邮', '2' => '快递', '3' => 'EMS');
+print <<<EOT
+-->
+			{$o_lang[$order[transport]]} $order[transportfee]
+<!--
+EOT;
+} else {print <<<EOT
+-->
+			卖家承担
+<!--
+EOT;
+}print <<<EOT
+-->
+		</td>
+	</tr>
+	<tr class="tr3">
+		<th>收货地址:</th>
+		<td>$order[address]</td>
+	</tr>
+	<tr class="tr3">
+		<th>收 货 人:</th>
+		<td>$order[consignee]</td>
+	</tr>
+	<tr class="tr3">
+		<th>联系电话:</th>
+		<td>$order[tel]</td>
+	</tr>
+	<tr class="tr2"><th>总金额及支付</th><td></td></tr>
+	<tr>
+		<th>总金额:</th>
+		<td>$order[price] * $order[quantity] + $order[transportfee] = $totalpay</td>
+	</tr>
+	<tr class="tr3">
+		<th>交易状态:</th>
+		<td>
+<!--
+EOT;
+if ($order['ifpay'] == 4) {print <<<EOT
+-->
+			<div style="margin:1em 0;color:#f00">交易失败</div>
+<!--
+EOT;
+} elseif ($order['ifpay'] == 3) {print <<<EOT
+-->
+			<div style="margin:1em 0;color:#00f">交易完成</div>
+<!--
+EOT;
+} elseif ($order['ifpay'] == 2) {print <<<EOT
+-->
+			<div style="margin:1em 0;color:#00f">卖家已发货，确认收货</div>
+<!--
+EOT;
+if ($order['buyer'] == $winduid) {
+if ($order['payment'] == 1) {print <<<EOT
+-->
+			<div>
+			卖家已发货，以下是发货信息:<div style="margin:5px 0;border:1px solid #8C8A8C;width:400px;padding:5px">$order[tradeinfo]<br />发货时间:$order[tradedate]</div>
+			请于收到货后，确认收货<br /><br />
+				<form action="trade.php?action=get&oid=$oid" method="post">
+					<div><input type="submit" class="btn" value="确认收货" /></div>
+				</form>
+			</div>
+<!--
+EOT;
+} elseif ($order['payment'] == 2) {print <<<EOT
+-->
+			<div><b>卖家已发货，请于收到货后，<a href="http://www.alipay.com">到支付宝确认收货</a></b><br /><br />
+				如果您的支付宝状态已经更改，但站点状态还没有修改，您也可以手动确认
+				<form action="trade.php?action=get&oid=$oid" method="post" onsubmit="if(confirm('确定收到货了吗?')){ return true;} else {return false;}">
+					<div><input type="submit" class="btn" value="确认收货" /></div>
+				</form>
+			</div>
+<!--
+EOT;
+}}} elseif ($order['ifpay'] == 1) {print <<<EOT
+-->
+			<div style="margin:1em 0;color:#00f">买家已付款，等待卖家发货</div>
+<!--
+EOT;
+if ($order['seller'] == $winduid) {
+if ($order['payment'] == 1) {print <<<EOT
+-->
+			<div>
+			该买家使用线下交易方式付款，以下是付款信息:<div style="margin:5px 0;border:1px solid #8C8A8C;width:400px;padding:5px">$order[tradeinfo]</div>
+				请核对信息后，尽快发货<br /><br />
+				<form action="trade.php?action=send&oid=$oid" method="post">
+				物流公司:<input type="text" name="logistics" /><br />
+				物流单号:<input type="text" name="orderid" /><br />
+					<div style="padding-left:5em"><input type="submit" class="btn" value="确认发货" /></div>
+				</form>
+			</div>
+<!--
+EOT;
+} elseif ($order['payment'] == 2) {print <<<EOT
+-->
+			<div>该买家使用支付宝线上付款，<a href="http://www.alipay.com">您可以马上发货，并到支付宝更新状态</a></div>
+<!--
+EOT;
+}}} elseif ($order['ifpay'] == 0) {print <<<EOT
+-->
+			<div style="margin:1em 0;color:#f00">等待买家付款</div>
+<!--
+EOT;
+if ($winduid == $order['buyer']) {
+if ($order['paymethod'] & 1) {print <<<EOT
+-->
+			<div style="width:350px;float:left">线下交易 (请输入您的付款信息，以便卖家确认) <br />
+				<form action="trade.php?action=pay&oid=$oid&method=1" method="post">
+				<textarea name="tradeinfo" style="width:250px;height:50px"></textarea>
+				<div style="margin:3px 0"><input type="submit" class="btn" value="提 交" /></div>
+				</form>
+			</div>
+<!--
+EOT;
+}if ($order['paymethod'] & 2) {print <<<EOT
+-->
+			<div style="float:left">在线支付 <br /><a href="trade.php?action=pay&oid=$oid&method=2"><img src="$imgpath/post/alipay.gif" /></a></div>
+<!--
+EOT;
+}}}print <<<EOT
+-->
+		</td>
+	</tr>
+</table>
+</div>
+<!--
+EOT;
+}?>-->

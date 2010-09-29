@@ -1,0 +1,333 @@
+<!--<?php
+include_once PrintEot('left');
+print <<<EOT
+-->
+<!--
+EOT;
+if(empty($action)) {print <<<EOT
+-->
+<script language="JavaScript" src="js/global.js"></script>
+<script language="JavaScript" src="js/pw_ajax.js"></script>
+<div class="nav3 mb10">
+	<ul class="cc">
+        <li class="current"><a href="javascript:;">模块管理</a></li>
+    </ul>
+</div>
+<h2 class="h1">搜索条件</h2>
+<div class="admin_table mb10">
+<form action="$basename" method="post">
+    <table cellpadding="0" cellspacing="0" width="100%">
+    	<tr class="tr1">
+        	<td class="td2">
+            	所属频道:<select name="alias"  class="select_wa mr10">
+				<option value=""></option>
+<!--
+EOT;
+foreach($portalPages as $key=>$val){
+$selected = $alias == $key ? 'selected="selected"' : '';
+print <<<EOT
+-->
+			<option value="$key" $selected>$val[name]</option>
+<!--
+EOT;
+}print <<<EOT
+-->
+				</select>
+            	名称:<input name="keyword" value="$keyword" type="text" class="input input_wa" />
+                <span class="bt2"><span><button type="submit">提 交</button></span></span>
+            </td>
+        </tr>
+    </table>
+</form>
+</div>
+<h2 class="h1"><span class="mr5 fl">模块管理</span></h2>
+<div class="admin_table mb10">
+	<table width="100%">
+    	<tr class="tr2">
+        	<td>模块名称</td>
+        	<td>所属频道</td>
+            <td>推荐审核</td>
+            <td>状态</td>
+            <td>操作</td>
+        </tr>
+<!--
+EOT;
+foreach($modules as $module){
+$thisChannel = $portalPages[$module['sign']]['name'];
+$ifverify = $module['ifverify'] ? '开启':'关闭';
+$ifstate = $module['state'] ? '<font color="red">失效</font>':'使用中';
+print <<<EOT
+-->
+        <tr class="tr1">
+        	<td class="td2">$module[title]</td>
+            <td class="td2">$thisChannel</td>
+            <td class="td2">$ifverify</td>
+            <td class="td2">$ifstate</td>
+            <td class="td2">
+<!--
+EOT;
+if (!$module['state'] && $thisChannel!="") {
+print <<<EOT
+-->
+            	<a href="$basename&action=editconfig&alias=$module[sign]&invokename=$module[invokename]&page=$page&keyword=$keyword" class="mr10" onclick="">[设置]</a>
+            	<a href="$basename&action=edittpl&alias=$module[sign]&invokename=$module[invokename]&page=$page&keyword=$keyword" class="mr10">[编辑模板]</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+            	<a href="javascript:;" onclick="parent.PW.Dialog({'id': 'area_pushdata','name': '模块内容管理','url': '$admin_file?adminjob=mode&admintype=area_pushdata&alias=$module[sign]&invoke=$module[invokename]','max': false});return false;" class="mr10">[内容管理]</a>
+<!--
+EOT;
+if ($module['state'] || $thisChannel=="") {
+print <<<EOT
+-->
+            	<a href="javascript:;" onclick="delModule($module[id])" class="mr10">[删除]</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+            </td>
+        </tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+    </table>
+    <div class="p10 cc">$pages</div>
+</div>
+<script src="js/pw_ajax.js" language="JavaScript"></script>
+<script src="js/global.js" language="JavaScript"></script>
+<script>
+
+function delModule(id){
+	if (!confirm("删除模块，将同时删除历史推送数据，是否确认删除？")){
+		return false;
+	}
+	var url = "$ajax_basename";
+	ajax.send(url,'action=del&id='+id,ajax.get);
+}
+
+</script>
+<!--
+EOT;
+}elseif($action =='edittpl') {print <<<EOT
+-->
+<div class="nav3 mb10">
+	<ul class="cc">
+        <li><a href="$beginUrl">模块管理</a></li>
+        <li class="current"><a href="javascript:;">编辑模板</a></li>
+    </ul>
+</div>
+<h2 class="h1">$invokename</h2>
+
+<form action="$basename&action=edittpl" method="post" >
+<div class="admin_table mb10">
+	<table width="100%">
+    	<tr class="tr1 vt">
+            <td class="td2"><textarea name="tagcode" style="width:98%;height:200px;" >$pieceCode</textarea></td>
+        </tr>
+    </table>
+</div>
+	<input type="hidden" name="invokename" value="$invokename">
+	<input type="hidden" name="alias" value="$alias">
+	<input type="hidden" name="keyword" value="$keyword">
+	<input type="hidden" name="page" value="$page">
+	<input type="hidden" name="step" value="2">
+	<div class="tac">
+		<span class="btn"><span><button type="submit" onfocus="blur();">提交</button></span></span>
+	</div>
+</form>
+
+<h3 class="h1">标签说明</h3>
+<div class="legend">
+<textarea style="width:690px;height:1100px;padding:5px;overflow:auto;border:0;color:#676767;line-height:1.5;">
+a) <list >标签，一个<list>代表是一个调用模块： 
+    1)action：代表调用的类型。 
+    subject:调用帖子     user:调用用户     forum:调用版块     tag:调用标签     image:调用图片 
+
+    2) num :代表调用的个数，如上面的num=”8”这代表，我调用8条数据 
+    3) title :模块的名称，注意每个模块里面title必须是唯一的 
+
+b) <loop><li><a href=”{url}” target=”_blank”>{title,32}</a></li></loop>： 
+    i) <loop></loop>标签中间代表的是循环的数据 
+    ii) 标签格式： 
+        1) 针对于action=”subject”模块（帖子） 
+            a) {url} ：代表链接地址 
+            b) {title} ：代表标题 
+                i) {title,32}则代表对于标题截取32个字 
+            c) {image} ：代表图片 
+                i) {image,80,50}代表对图片进行80*50的缩略 
+            d) {forumname} :代表所在版块的名称 
+            e) {forumurl} :代表所在版块的链接地址 
+            f) {descrip} ：代表帖子的描述 
+                i) {descript,60}:代表对于描述截取60个字 
+            g) {author} ：帖子作者 
+            h) {authorid} ：帖子作者的id 
+            i) {tagrelate} ：代表相关主题
+
+        2) 针对于action=”user”模块（用户） 
+            a) {url} :用户的链接地址 
+            b) {title}：用户名 
+            c) {image}：用户头像 
+            d) {value} ：用户某属性的值，如果用户按金钱数排行的，则就调用用户的金钱数 
+
+        3) 针对于 action=”forum” 模块（版块） 
+            a) {url} : 版块链接 
+            b) {title} :版块名称 
+            c) {image}：版块logo 
+            d) {value} :版块的某属性的值，如：主题数，帖子数..等 
+
+        4) 针对于 action=”area” 模块 （按区域划分的房产模块） 
+            a) {url} :链接 
+            b) {title} ：房产名称 
+            c) {aveprice} ：价格
+            d) {area} ：区域
+            e) {opendate} ：开盘时间
+            
+        5) 针对于 action=”price” 模块 （按价格划分的房产模块） 
+            a) {url} :链接 
+            b) {title} ：房产名称 
+            c) {aveprice} ：价格
+            d) {area} ：区域
+            e) {opendate} ：开盘时间
+
+        6) 针对于 action=”image” 模块（图片） 
+            a) 和 action=”subject”相同 
+
+    虽然在模板里面可以定义，调用个数，标题的长度或者图片的截取大小，但是后台还是支持不改动模板而设置这几种属性： 
+
+    缓存更新时间的设置，是以秒为单位，对于需要实时更新的，建议设置5分钟以上(300秒)，对于实时性不高的，可以设置一天（86400秒）以上。(PS:sp3开始，设置为零，则代表不更新) 
+    
+    支持php代码： 对于一些需要用程序做逻辑判断的模块，可在模块里面写php代码
+php写在<!--#  #-->标签中间
+</textarea> 
+</div>
+<!--
+EOT;
+} elseif ($action=='editconfig') {print <<<EOT
+-->
+<div class="nav3 mb10">
+	<ul class="cc">
+        <li><a href="$beginUrl">模块管理</a></li>
+        <li class="current"><a href="javascript:;">模块属性</a></li>
+    </ul>
+</div>
+<form action="$basename&action=editconfig" method="post">
+<div class="admin_table mb10">
+	<table width="100%">
+		<tr><td colspan="2"><h2 class="h1" style="border-top:0;">模块属性设置</h2></td></tr>
+		<tr class="tr1 vt">
+        	<td class="td1">模块id</td>
+            <td class="td2">$invokename</td>
+        </tr>
+       <tr class="tr1 vt">
+        	<td class="td1">开启推荐审核</td>
+            <td class="td2"><input type="radio" value="1" name="ifverify" $ifverify_Y />是&nbsp;&nbsp;&nbsp;<input type="radio" value="0" name="ifverify" $ifverify_N />否</td>
+        </tr>
+        <tr class="tr1 vt">
+        	<td class="td1">模块名称</td>
+            <td class="td2"><input class="input input_wa" type="text" value="$invokedata[title]" name="title" /></td>
+        </tr>
+	</table>
+	<table width="100%">
+<!--
+EOT;
+foreach($invokepieces as $piece){
+if ($piece['ifpushonly']) {
+	$check_Y = 'checked';
+	$check_N = '';
+} else {
+	$check_Y = '';
+	$check_N = 'checked';
+}
+print <<<EOT
+-->
+		<tr><td colspan="2"><h2 class="h1" style="border-top:0;">$piece[title]</h2></td></tr>
+		<tr class="tr1 vt">
+        	<td class="td1">调用选项：</td>
+            <td class="td2">
+            	<table width="100%">
+            		<tr class="tr3">
+			        	<td>{$piece[p_action][title]} : {$piece[p_action][html]}</td>
+			        </tr>
+			       <tr>
+						<td>
+						<div id="piece_{$piece[id]}">
+						<table width="100%">
+<!--
+EOT;
+foreach($piece[config] as $key=>$value){
+print <<<EOT
+-->
+							<tr class="tr3">
+								<td>$value[title] : $value[html]</td>
+							</tr>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+						</table>
+						</td>
+			        </tbody>
+            	</table>
+            </td>
+        </tr>
+		
+        <tr class="tr1 vt">
+        	<td class="td1">调用个数</td>
+            <td class="td2"><input type="text" value="$piece[num]" name="num[$piece[id]]" class="input input_wa"></td>
+        </tr>
+        <tr class="tr1 vt">
+        	<td class="td1">缓存更新时间[秒]</td>
+            <td class="td2"><input type="text" value="$piece[cachetime]" name="cachetime[$piece[id]]" class="input input_wa mr5">0表示关闭更新</td>
+        </tr>
+        <tr class="tr1 vt">
+        	<td class="td1">只调用推送数据</td>
+            <td class="td2"><input type="radio" value="1" name="ifpushonly[$piece[id]]" $check_Y />是&nbsp;&nbsp;&nbsp;<input type="radio" value="0" name="ifpushonly[$piece[id]]" $check_N />否</td>
+        </tr>
+<!--
+EOT;
+foreach($piece[param] as $value){print <<<EOT
+-->
+			$value
+<!--
+EOT;
+}}print <<<EOT
+-->
+    </table>
+</div>
+<input type="hidden" name="pageinvokeid" value="$invokedata[id]">
+<input type="hidden" name="invokename" value="$invokename">
+<input type="hidden" name="alias" value="$alias">
+<input type="hidden" name="keyword" value="$keyword">
+<input type="hidden" name="page" value="$page">
+<input type="hidden" name="step" value="2">
+<div class="tac mb10">
+	<span class="btn"><span><button type="submit">提 交</button></span></span>
+</div>
+</form>
+<script src="js/pw_ajax.js" language="JavaScript"></script>
+<script src="js/global.js" language="JavaScript"></script>
+<script>
+
+function pieceActionChange(pieceId,sourcetype) {
+	pieceId = pieceId-0;
+	if (!pieceId) return false;
+	var url = "$ajax_basename";
+	ajax.send(url,'action=source&id='+pieceId+'&sourcetype='+sourcetype,function() {
+			var text = ajax.request.responseText;
+			var pieceObj = getObj('piece_'+pieceId);
+			if (text!='error') {
+				pieceObj.innerHTML = text;
+			}
+			
+		}
+	);
+}
+</script>
+<!--
+EOT;
+}
+include_once PrintEot('adminbottom');
+?>-->

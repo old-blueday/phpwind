@@ -1,0 +1,65 @@
+<!--<?php
+print <<<EOT
+-->
+<html>
+<head>$expires
+<title>$subject $forumname $db_bbsname - powered by phpwind.net</title>
+<meta http-equiv="Content-Type" content="text/html; charset=$db_charset">
+<meta name="keywords" content="$db_metakeyword" />
+<meta name="description" content="$db_metadescrip" />
+<base href="$db_bbsurl/" />
+<style type="text/css">
+html{overflow:hidden;}
+body{
+	scrollbar-base-color: #ffffff;
+	scrollbar-darkshadow-color: #ffffff;
+	scrollbar-highlight-color: #f0f0f0;
+	overflow:hidden;_overflow:auto;
+	margin:0;
+}
+</style>
+</head>
+<script language=javascript>
+top==self || (location.href='$url');
+function changewin(){
+	var obj=document.getElementById('leftframe');
+	var menu=document.getElementById('menuswitch');
+	if(obj.style.display=='none'){
+		obj.style.display='';
+		menu.innerHTML = "<img src=\"$imgpath/columns/left_close.png\" class=\"cp\">";
+	}else{
+		obj.style.display='none';
+		menu.innerHTML = "<img src=\"$imgpath/columns/left_open.png\" class=\"cp\">";
+	}
+}
+</script>
+<body vlink="#333333" link="#333333" style="MARGIN: 0px;scrolling=no;frameBorder=no noResize">
+<table cellspacing="0" cellpadding="0" width="100%" height="100%" border="0" align="center">
+<tbody>
+	<tr>
+		<td id="leftframe" nowrap class="tac" valign="top" name="fmtitle">
+			<iframe frameborder="0" id="left" name="left" src="left.php" style="height:100%;visibility: inherit; width:145px;z-index:2; margin:0 auto"></iframe>
+		</td>
+	  <td>
+			<table height="100%" cellspacing="0" width="12" cellpadding="0" style=" background:url($imgpath/columns/columns-bg.png) repeat-y;width:5px;">
+			<tbody>
+				<tr>
+					<td></td>
+				</tr>
+				<tr>
+					<td class="tal" id="menuswitch" onClick="changewin();" height="100%"><img src="$imgpath/columns/left_close.png" style="cursor:pointer;"></td>
+				</tr>
+			</tbody>
+			</table>
+		</td>
+		<td style="width:100%">
+			<iframe frameborder="0" id="main" name="main" scrolling="yes" src="$url" style="height:100%;visibility:inherit;width:100%;z-index:1"></iframe>
+		</td>
+	</tr>
+</tbody>
+</table>
+</body>
+</html>
+<!--
+EOT;
+?>-->

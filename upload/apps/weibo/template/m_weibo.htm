@@ -1,0 +1,266 @@
+<!--<?php
+require_once(uTemplate::printEot('header'));
+//require_once(uTemplate::printEot('user_appleft'));
+print <<<EOT
+-->
+<script language="javascript">
+var transmitAction = '{$do}';
+</script>
+<style type="text/css">
+.headTrgB{border-bottom:9px $uskin_homeTop solid;}
+/*兼容:版本之前首页与应用的区别*/
+</style>
+<div class="homeBg cc">
+	<div class="homeCont fl">
+<!--
+EOT;
+require_once uTemplate::printEot('weibo_model');
+$weiboModelTemplate->photoPop();
+$o_weibopost != '0' && $weiboModelTemplate->post($do);
+print <<<EOT
+-->
+		<div class="p15">
+			<div class="navC">
+				<ul>
+					<li {$nav[lookround]}><a href="{$basename}do=lookround">随便看看</a></li>
+					<li {$nav[attention]}><a href="{$basename}do=attention">我关注的新鲜事</a></li>
+					<li {$nav[my]}><a href="{$basename}do=my">我的新鲜事</a></li>
+					<li {$nav[refer]}><a href="{$basename}do=receive">提到我的</a></li>
+				</ul>
+			</div>
+<!--
+EOT;
+if (in_array($do,array('refer','receive'))) {
+	if (!$_COOKIE['atguidehide']) {
+		Cookie('atguidehide','',0,false);
+print <<<EOT
+--> 
+			<div class="spaceTip cc" style="margin-top:10px;" id="atguide">
+				<a href="javascript:;" class="adel" onclick="closeGuide();">关闭</a>
+				<label for="ifshow" class="mr10 fr"><input type="checkbox" name="ifshow" id="ifshow" />&nbsp;知道了以后不再显示</label>
+				<span class="mr10">输入"@+用户名+空格+想说的话"，就能提到对方了哦~</span>
+			</div>
+<script language="javascript" type="text/javascript">
+function closeGuide() {
+	if (getObj('ifshow').checked == true) {
+		var date = new Date();
+		date.setTime(date.getTime()+86400000000);
+		document.cookie = "atguidehide=1;expires=" + date.toGMTString() + " ;path=/";
+	}
+	getObj('atguide').style.display = 'none';
+}
+</script>
+<!--
+EOT;
+	}
+$refertoNum = $winddb['newreferto']>0 ? '<span class="s2">[' . $winddb['newreferto'] . ']</span>' : '';
+$commentNum = $winddb['newcomment']>0 ? '<span class="s2">[' . $winddb['newcomment'] . ']</span>' : '';
+print <<<EOT
+-->
+			<div class="p10 bdB"><a href="{$basename}do=refer" id="type_refer">@我的{$refertoNum}</a>&nbsp;|&nbsp;<a href="{$basename}do=receive" id="type_receive">收到的评论{$commentNum}</a></div>
+			<script language="JavaScript">setCurrent('type_{$do}','type_refer','b s5');</script>
+<!--
+EOT;
+}print <<<EOT
+-->
+			<script type="text/javascript" src="js/pw_weibo.js"></script>
+			<table width="100%"><tr><td height="400" class="vt">
+				<div class="conFeed" id="weiboFeed">			
+<!--
+EOT;
+if (in_array($do, array('lookround', 'attention', 'my', 'refer'))) {
+	if ($weiboList) {
+		foreach ($weiboList as $key => $value) {
+			$method = $weiboService->getType($value['type']);
+			$weiboModelTemplate->$method($value);
+		}
+		if ($count >= $perpage) {print <<<EOT
+-->
+					<div class="cc p10">$pages</div>
+<!--
+EOT;
+		}
+	} else {
+		if ($do == 'my') {print <<<EOT
+-->
+					<div class="p15 f14 tac">你这家伙真懒，一条新鲜事都没写哦。</div>
+<!--
+EOT;
+		} elseif ($do == 'attention') {print <<<EOT
+-->
+					<div class="p15 f14 tac">最近没有新动静，试试<a href="u.php?a=friend&type=find">关注更多人</a>，或者去<a href="apps.php?q=weibo&do=lookround">最新新鲜事</a>逛逛吧~~</div>
+<!--
+EOT;
+		} elseif ($do == 'refer') {print <<<EOT
+-->
+					<div class="p15 f14 tac">呀～还没有人@你哦～再等等吧～</div>
+<!--
+EOT;
+		} else {print <<<EOT
+-->
+					<div class="p15 f14 tac">没有搜到内容！</div>
+<!--
+EOT;
+		}
+	}
+} elseif (in_array($do,array('receive'))) {
+	if ($commentList) {
+		require_once uTemplate::printEot('weibo_model');
+		foreach ($commentList as $value) {
+			$id = $value['mid'].'_'.$value['cid'];
+			$weibo = $value['weibo'];
+			$ifmyweibo = $weibo['uid'] == $winduid ? true : false;
+			if ($ifmyweibo) {
+				$value['content'] = $value['extra'] ? $value['content'] : ' : '.$value['content'];
+			} else {
+				$value['content'] = $value['content'];
+			}
+			$ifmycomment = $value['uid'] == $winduid ? false : true;
+			$method = $weiboService->getType($weibo['type']);
+print <<<EOT
+-->				
+					<dl class="dl cc">
+						<dt class="dt"><a href="u.php?uid={$value['uid']}"><img class="img" src="{$value['icon']}" alt="{$value['username']}" width="44" height="44" /></a></dt>
+						<dd class="dd">
+<!--
+EOT;
+			if ($ifmyweibo) {print <<<EOT
+-->
+							<a href="javascript:void(0)"  onclick="deletecommentRefersh({$value['mid']},{$value['cid']},$page)" class="adel">删除</a>
+<!--
+EOT;
+			}print <<<EOT
+-->
+							<div class="title"><a href="u.php?uid={$value['uid']}">{$value['username']}</a>{$value['content']}</div>
+							<div class="gray cc">
+<!--
+EOT;
+			if ($ifmycomment) {print <<<EOT
+-->			
+								<a onclick="getcomments('replay',{$value[mid]},{$value[uid]},{$value[cid]});return false;" href="javascript:void(0)" class="fr">回复</a>
+<!--
+EOT;
+			}print <<<EOT
+-->	
+
+<!--
+EOT;
+			if ($ifmyweibo) {print <<<EOT
+-->								
+								<span class="mr5" title="{$value['postdate_s']}" id="from_{$id}">{$value['lastdate']}</span><a href="javascript:;" onmouseover="read.open('tips_{$id}','from_{$id}',0,21)" onmouseout = "closep()"  class="s7" style="text-decoration:none;" >评论我的新鲜事</a>
+								<div class="fl">
+									<div id="tips_{$id}" class="s5" style="position:absolute;display:none;">
+										<div class="replyTips">
+<!--
+EOT;
+$weiboModelTemplate->$method($weibo);
+print <<<EOT
+-->	
+										</div>
+									</div>
+								</div>
+<!--
+EOT;
+			} else {
+print <<<EOT
+-->	
+								<span class="mr5" title="{$value['postdate_s']}" id="from_{$id}">{$value['lastdate']}</span>回复我的评论--<a onmouseover="read.open('tips_{$id}','from_{$id}',0,21)"  onmouseout = "closep()" class="s7" style="text-decoration:none;">查看原新鲜事</a>
+								<div class="fl">
+									<div id="tips_{$id}" class="s5" style="position:absolute;display:none;">
+										<div class="replyTips">
+<!--
+EOT;
+$weiboModelTemplate->$method($weibo);
+print <<<EOT
+-->		
+										</div>
+									</div>
+								</div>
+<!--
+EOT;
+}print <<<EOT
+-->								
+							</div>
+							<div id="comment_{$id}" class="replyMe"></div>
+						</dd>
+					</dl>
+<!--
+EOT;
+		}
+		if ($count >= $perpage) {print <<<EOT
+-->
+					<div class="cc p10">$pages</div>
+<!--
+EOT;
+		}
+	} else {print <<<EOT
+-->
+					<div class="p15 f14 tac">呀～还没有人评论你哦～再等等吧～</div>
+<!--
+EOT;
+	}
+}print <<<EOT
+-->
+				</div>
+			</td></tr>
+			</table>
+		</div>
+	</div>
+	<div class="homeSide fr">
+		<div class="p10">
+<!--
+EOT;
+if ($recommendUsers) {print <<<EOT
+-->
+			<h5 class="h5 mb5"><a href="u.php?a=friend&type=find" class="fr s6">更多</a><strong>可能感兴趣的人</strong></h5>
+			<div class="dlB mb20">
+<!--
+EOT;
+foreach ($recommendUsers as $key => $value) {print <<<EOT
+-->
+				<dl class="dl cc">
+					<dt class="dt"><a href="u.php?uid=$value[uid]" class="img_50"><i><img src="$value[face]" width="48" height="48" /></i></a></dt>
+					<dd class="dd3">
+						<p class="mb5"><a href="u.php?uid=$value[uid]">{$value['username']}</a></p>
+						<p class="lh_18"><a href="javascript:;" onclick="return Attention.add(this,'{$value['uid']}',1)" class="s7 follow">加关注</a></p>
+					</dd>
+				</dl>
+<!--
+EOT;
+}print <<<EOT
+-->
+			</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+			<h5 class="h5 mb5"><strong>一周人气排行</strong></h5>
+			<div class="dlB mb20">
+<!--
+EOT;
+foreach ($weiboAuthorSort as $key => $value) {print <<<EOT
+-->
+				<dl class="dl cc">
+					<dt class="dt"><a href="u.php?uid=$value[uid]" class="img_50"><i><img src="$value[icon]" width="48" height="48" /></i></a></dt>
+					<dd class="dd3">
+						<p class="mb5"><a href="u.php?uid=$value[uid]">$value[username]</a></p>
+						<span class="gray">被转次数：</span><strong>$value[counts]</strong>
+					</dd>
+				</dl>
+<!--
+EOT;
+}print <<<EOT
+-->
+			</div>
+		</div>
+	</div>
+</div>
+<!--
+EOT;
+$o_weibopost == '0' && include printEot('writesmile');
+print <<<EOT
+-->
+<!--
+EOT;
+require_once(uTemplate::printEot('footer'));
+?>-->

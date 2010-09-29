@@ -1,0 +1,128 @@
+<!--<?php
+print <<<EOT
+-->
+<div id='hiddenMessage' style="display:none"></div>
+<div class="contUser" id="content">
+<table width="100%"><tr class="vt"><td height="400">
+	<div class="p15">
+	<h4 class="site mb5"><span>通知</span>(共{$noticeAllCount}条，<a href="$normalUrl&action=unread" class="s2"><b>{$notReadCount}</b>条未读通知</a>)</h4> 
+<!--
+EOT;
+if ($action == 'info' || $action == 'next' || $action == 'previous') {
+$map = array(
+	$messageServer->getConst('notice_system')=>'system',
+	$messageServer->getConst('notice_postcate')=>'postcate',
+	$messageServer->getConst('notice_active')=>'active',
+	$messageServer->getConst('notice_apps')=>'apps'
+);
+$upaction=$map[$smstype];
+$deltype = $redirect ? '' : $upaction;
+$message['content'] = convert($message['content'],$db_windpost);
+print <<<EOT
+-->
+ 		<div class="mb10">
+			<span class="fr">
+				<a href="$normalUrl&action=previous&page=$page&smstype=$smstype&mid={$message[mid]}&rid={$message[rid]}&redirect=$redirect">上一条</a>&nbsp;&nbsp;|&nbsp;&nbsp;
+				<a href="$normalUrl&action=next&page=$page&smstype=$smstype&mid={$message[mid]}&rid={$message[rid]}&redirect=$redirect">下一条</a></span>
+			<a href="$normalUrl&page=$page&action=$upaction&redirect=$redirect">&lt;&lt;返回</a>
+		</div>
+    <div id="showmessage"></div>
+<!--
+EOT;
+require messageEot('notice_info');
+} else { print <<<EOT
+-->
+<form action="$normalUrl" method="post" name="FORM">
+<input type="hidden" name="ajax" value="1"/>
+       <div class="mb10">
+           <span class="mr5"><label><input name="" type="checkbox" value="" onclick="MC.CheckAll(this.form,this)">&nbsp;全选</label></span>
+           <span class="bt2"><span><button onclick="MC.mSubmit(this.form,'mark','notice','$action','$page')" type="button">标记已读</button></span></span>
+           <span class="bt2"><span><button onclick="MC.mSubmit(document.FORM,'del','notice','$action','$page')"  type="button">删除</button></span></span>
+					 <span style="margin:0 6px;">筛选：<select onchange="MC.getTypeList('notice',this.value)">
+						<option value="" $selected>全部</option>
+							<option value="system" $selected[system]>系统通知</option>
+							<option value="postcate" $selected[postcate]>团购通知</option>
+							<option value="active" $selected[active]>活动通知</option>
+							<option value="apps" $selected[apps]>应用通知</option>
+					</select></span>
+       </div><div id="showmessage"></div>
+       <table width="100%" class="mb10 z2">
+<!--
+EOT;
+if($noticeCount == 0){
+print <<<EOT
+-->
+		<tr><td class="tac p15 f14">暂无任何{$chineseName[$smstype]}</td></tr>
+<!--
+EOT;
+}else{
+$_unReadCol = getUnReadHtml();
+print <<<EOT
+-->
+		{$_unReadCol}
+<!--
+EOT;
+foreach($noticeList as $key => $value){
+$typeid = $value[typeid];
+$typeName =	$chineseName["$typeid"];
+list($_img,$_b,$_tip) = getMessageIconByStatus($value);
+$_col = getSubListHtml($value);
+$content = stripWindCode($value['content']);
+print <<<EOT
+-->			
+		
+				{$_col}
+				<tr class="tr3">
+            	<td class="pick"><input name="rids" type="checkbox" value="{$value[rid]}" /></td>
+							<td class="icon"><img src="u/images/message/{$_img}"/></td>
+                <td width="100" style="vertical-align:middle;">
+                	<p>$typeName</p>
+                    <em class="gray">{$value[modified_time_format]}</em>
+                </td>
+                <td class="value">
+                	<h4 $_b><a href="$normalUrl&action=info&page=$page&smstype=$value[typeid]&rid={$value[rid]}&mid={$value[mid]}&redirect={$redirect}">{$value[title]}</a></h4>  	
+                    <p class="lh_18">{$content}</p>
+                    <em class="s2">{$_tip}</em>    
+                </td>
+                <td class="del"><a id="del_{$value[rid]}" href="javascript:;" onclick="MC.del('$value[rid]','notice','$action','$page')" class="adel">删除</a></td>
+			</tr>
+<!--
+EOT;
+}}print <<<EOT
+-->           	
+		</table>
+<!--
+EOT;
+if(count($noticeList) >= $perpage){
+print <<<EOT
+-->
+        <div id="showmessageTip"></div>
+        <div class="mb10">
+           <span class="mr5"><label><input name="" type="checkbox" value="" onclick="MC.CheckAll(this.form,this)">&nbsp;全选</label></span>
+           <span class="bt2"><span><button onclick="MC.mSubmit(this.form,'mark','notice','$action','$page','showmessageTip')" type="button">标记已读</button></span></span>
+           <span class="bt2"><span><button onclick="MC.mSubmit(document.FORM,'del','notice','$action','$page','showmessageTip')"  type="button">删除</button></span></span>
+       </div>
+<!--
+EOT;
+}print <<<EOT
+-->
+</form>
+        <div class="mb10">
+            <div class="fr" style="_width:500px;">
+            	$pages
+            </div>
+            <div class="c"></div>
+        </div>                                       
+<!--
+EOT;
+}print <<<EOT
+-->    
+        </div>
+</td></tr></table>
+    </div>
+<!--
+EOT;
+if(!defined('AJAX')){
+	require_once(uTemplate::printEot('footer'));
+}
+?>-->

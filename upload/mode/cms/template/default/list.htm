@@ -1,0 +1,174 @@
+<!--<?php print <<<EOT
+-->
+<link rel="stylesheet" type="text/css" href="$pwModeImg/style.css" media="all" />
+<div class="cmsbreadCrumb mb10">
+<!--
+EOT;
+if(checkEditPurview($windid,$column) || getPostPurview($windid,$_G)){
+print <<<EOT
+-->
+	<span class="bts fr pr" style="margin:-4px 0 0 0;"><span><button type="button" onClick="location.href='mode.php?m=cms&q=post&cid=$column';">发表文章</button></span></span>
+<!--
+EOT;
+}print <<<EOT
+-->	
+	$pagePosition
+</div>
+<div class="cmsBgbor">&nbsp;</div>
+	<div class="cmsBg">
+	<form action="{$basename}q=list&" method="post" name="FORM">
+	<input type="hidden" name="action" value="del" id="action"/>
+	<div id="content" class="fl">
+		<div class="cmsBoxA">
+			<div class="cmsDl mb10">
+<!--
+EOT;
+if(empty($articleList)){
+print <<<EOT
+-->
+				<div class="p15">暂时没有任何可阅读文章！</div>
+<!--
+EOT;
+}
+$_flag = false;
+foreach($articleList as $article){
+$url = getArticleUrl($article[article_id]);
+$_column = $subColumns[$article['column_id']]['name'];
+$columnUrl = getColumnUrl($article[column_id]);
+$article[descrip] = trim($article[descrip]);
+$_href = $article['jumpurl'] ? 'href='.$article['jumpurl'].' target="_blank"' : 'href='.$url;
+print <<<EOT
+-->
+				<dl>
+<!--
+EOT;
+if(checkEditPurview($windid,$article['column_id'])){
+$_flag = true;
+print <<<EOT
+-->
+					<dd class="checkBox"><input name="aids" type="checkbox" value="{$article[article_id]}"></dd>
+<!--
+EOT;
+}print <<<EOT
+-->
+					<dt><span>{$article[postdate]}</span><a {$_href} class="f14 b mr10">{$article[subject]}</a><a href="$columnUrl" class="s2 w">{$_column}</a></dt>
+					<dd><span class="mr20">{$article[descrip]}</span>
+<!--
+EOT;
+if(checkEditPurview($windid,$article['column_id'])){
+print <<<EOT
+--><div class="tar">
+					<a href="{$basename}q=post&action=edit&id={$article[article_id]}" class="s7" target="_blank">[编辑]</a>
+					<a href="javascript:;" onclick="cms_submit({$article[article_id]},'{$article[column_id]}')" class="s7 mr10">[删除]</a></div>
+<!--
+EOT;
+}print <<<EOT
+-->
+					</dd>
+				</dl>
+<!--
+EOT;
+}print <<<EOT
+-->
+			</div>
+			<div class="cc mb10">
+				<div class="pages">{$pages}</div>
+			</div>
+<!--
+EOT;
+if(!empty($articleList) && $_flag){
+print <<<EOT
+-->
+			<div>
+				<label class="mr20"><input name="all" type="checkbox" value="all" onclick="checkAll(document.FORM,this)"> 全选</label>
+				<!--<span class="btn2"><span><button type="button">审核通过</button></span></span>-->
+				<span class="bt2"><span><button type="button" onclick="cms_submit_m(document.FORM,'{$article[column_id]}')">删除</button></span></span>
+			</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+		</div>
+	</div>
+	</form>
+	<div id="sideBar" class="fr">
+		<div class="cmsBoxB">
+<!--
+EOT;
+$_columnName = $column && $columns['parent'][name] ? $columns['parent'][name] : '栏目';
+print <<<EOT
+-->
+			<h2>{$_columnName}</h2>
+			<ul class="cmsForumlist cc cmslistB">
+<!--
+EOT;
+foreach($columns['sub'] as $var){
+$_current = $var['column_id'] == $column ? 'class="current"' : '' ;
+$url = getColumnUrl($var[column_id]);
+print <<<EOT
+-->
+				<li {$_current}><a href="$url">{$var[name]}</a></li>
+<!--
+EOT;
+}print <<<EOT
+-->
+			</ul>
+		</div>
+		<div class="cmsBoxbar">&nbsp;</div>
+		<div class="cmsBoxB">
+			<h2>24小时人气排行</h2>
+			<div class="cmsListA cmsIconB">
+				<ul>
+<!--
+EOT;
+foreach($pageCache->getData('hotArticle') as $article){
+print <<<EOT
+-->
+					<li><a href="{$article[url]}" target="_blank">{$article[subject]}</a></li>
+<!--
+EOT;
+}print <<<EOT
+-->		
+				</ul>
+			</div>
+		</div>
+		<div class="cmsBoxbar">&nbsp;</div>
+		<div class="cmsBoxB">
+			<h2>最新文章</h2>
+			<div class="cmsListA cmsIconA">
+				<ul>
+<!--
+EOT;
+$i = 0;
+foreach ($pageCache->getData('newArticle') as $value) {
+$i++;
+print <<<EOT
+-->
+
+					<li><a href="{$value[url]}" target="_blank">{$value[subject]}</a></li>
+<!--
+EOT;
+if ($i%5==0) {print <<<EOT
+-->
+				</ul>
+				<div class="cmsHr">&nbsp;</div>
+				<ul>
+<!--
+EOT;
+}print <<<EOT
+-->
+
+<!--
+EOT;
+}print <<<EOT
+-->
+			</div>
+		</div>
+	</div>
+	<div class="c">&nbsp;</div>
+	</div>
+<div class="cmsBgbor">&nbsp;</div>
+<script type="text/javascript" language="JavaScrip" src="$pwModeJs/cms.js" ></script>
+<!--
+EOT;
+?>-->

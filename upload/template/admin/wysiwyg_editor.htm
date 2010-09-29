@@ -1,0 +1,158 @@
+<!--<?php
+$style1 = $db_pwcode ? '' : 'none';
+$style2 = $db_setform ? '' : 'none';
+print <<<EOT
+--><div style="display:none;"><link rel="stylesheet" type="text/css" href="$imgpath/post/c_editor/editor.css" /></div>
+<div class="wind_editor_con cc">
+	<div class="w_editor_but">
+		<ul class="cc fl">
+			<li>
+				<div class="wy_select" style="width:77px;" id="wy_fontname">字体</div>
+				<div class="wy_select" style="width:15px;" id="wy_fontsize">2</div>
+				<div class="c">&nbsp;</div>
+				<a id="wy_bold" title="粗体">粗体</a>
+				<a id="wy_italic" title="斜体">斜体</a>
+				<a id="wy_underline" title="下划线">下划线</a>
+                <a id="wy_strikethrough" title="删除线">删除线</a>
+				<a id="wy_forecolor" title="字体颜色">字体颜色</a>
+				<a id="wy_hilitecolor" title="背景颜色">背景颜色</a>
+			</li>
+			<li>
+            	<div class="cc fl">
+                <!--a id="wy_bold" title="粗体">粗体</a-->
+				<a id="wy_justify" title="对齐">对齐</a>
+				<a id="wy_insertlist" title="列表">列表</a>
+				<a id="wy_indent" title="缩进">缩进</a>
+				<a id="wy_inserthorizontalrule" title="水平线">水平线</a>
+
+				<div class="c">&nbsp;</div>
+                <a id="wy_removeformat" title="去除字体格式">去除字体格式</a>
+				<a id="wy_createlink" title="插入链接">插入链接</a>
+				<a id="wy_unlink" title="清除链接">清除链接</a>
+				<a id="wy_inserttable" title="表格">表格</a>
+           </div>
+			</li>
+			<li class="li_icon_big">
+           		<div>
+				<!--a id="wy_paste" title="粘贴">粘贴</a-->
+				<a id="wy_insertimage" title="图片">图片</a>
+				<a id="wy_media" title="多媒体">多媒体</a>
+				<a id="td_face" title="表情" href="javascript:" unselectable="on" onclick="return showEmotion();">表情</a></div>
+				<div class="c"></div>
+			</li>
+			<li class="li_bg_none">
+				<a id="wy_pwcode" title="自定义代码" style="display:$style1">自定义代码</a>
+                <a id="wy_setform" title="帖子格式" style="display:$style2">帖子格式</a>
+				<div class="c">&nbsp;</div>
+				<a id="wy_undo" title="撤销">撤销</a>
+				<a id="wy_redo" title="恢复">恢复</a>
+			</li>
+		</ul>
+		<div class="fr windcode">
+			<input id="wy_windcode" type="checkbox" />Wind代码 {$db_appsdb[11][status]}<div style="padding-top:3px;"><span id="autosave" style="display:none">内容已保存</span><span id="atc_content_warn">{$db_postmax}字节</span></div>
+		</div>
+	</div>
+	<div style="padding:0.5% 0 0 0.5%;width:99.5%;display:inline;float:left;"><div class="wy_menu_B" id="menu_editor" style="display:none;"></div><textarea id="textarea" name="atc_content" style="height:280px;">{$atc_content}</textarea></div>
+    <div class="c"></div>
+    <div class="pr" style="height:12px;" onmousedown="editor.flex(event);"><div style="cursor:s-resize;position:absolute;bottom:-10px;height:12px;width:100%;padding-bottom:10px;" class="cc"><div class="post-flex">拉动</div></div></div>
+</div>
+<div class="wy_tips_A"><a href="javascript:" onclick="loadData('msg');">恢复数据</a> ┊ <a href="javascript:" onclick="opendraft(this.id);" id="newdraft">草稿箱</a></div>
+
+<script language="JavaScript" src="js/wind_c_editor.js"></script>
+
+<script language="JavaScript">
+var charset='$db_charset';
+var editor = null;
+var bbsurl ="{$B_url}";
+function WysiwygConfig() {
+	this.baseURL = document.baseURI || document.URL;
+	if (this.baseURL && this.baseURL.match(/(.*)\/([^\/]?)/)) {
+		this.baseURL = RegExp.$1 + "/";
+	}
+	this.imgURL = imgpath + "/post/c_editor/";
+
+	this.btnList = {
+		removeformat:[ false, editorcode, false ],
+		bold: [ true, editorcode, true ],
+		italic: [ true, editorcode, true ],
+		underline: [ true, editorcode, true ],
+		strikethrough: [ true, editorcode, true ],
+		//subscript: [ true, editorcode, true ],
+		//superscript: [ true, editorcode, true ],
+		justify : [true, showJustify, false],
+		//justifyleft: [ true, editorcode, true ],
+		//justifycenter: [ true, editorcode, true ],
+		//justifyright: [ true, editorcode, true ],
+		//justifyfull: [ true, editorcode, true ],
+		insertlist : [true, showList, false],
+		//insertorderedlist: [ true, editorcode, true ],
+		//insertunorderedlist: [ true, editorcode, true ],
+		//outdent: [ true, editorcode, false ],
+		indent: [ true, showDent, false ],
+		forecolor: [ true, showcolor, false ],
+		hilitecolor: [ true, showcolor, false ],
+		inserthorizontalrule: [ true, editorcode, false ],
+		createlink: [ true, showcreatelink, false ],
+		unlink: [ true, editorcode, false ],
+		insertimage: [ true, insertImage, false ],
+		music: [ true, insertMusic, false ],
+		inserttable: [ false, showTable, false ],
+		windcode: [ true, editorcode, false ],
+		//htmlmode: [ true, editorcode, false ],
+		undo: [ true, editorcode, false ],
+		redo: [ true, editorcode, false ],
+		//cut: [ false, editorcode, false ],
+		//copy: [ false, editorcode, false ],
+		//paste: [ false, editorcode, false ],
+		media: [ true, rming, false ],
+		quote: [ true, code, false ],
+		code: [ true, code, false ],
+		post: [ true, code, false ],
+		sell: [true, sell, false ],
+		//br: [ false, br, false ],
+		//sale: [ true, showsale, false ],
+		pwcode: [true, extend , false ],
+		setform: [true, extend , false ]
+	};
+	this.fontname = {
+		"default": "字体",
+		"宋体":	'宋体',
+		"新宋体":	'新宋体',
+		"楷体_GB2312":	'楷体_GB2312',
+		"黑体":	'黑体',
+		"Arial":	   'arial,helvetica,sans-serif',
+		"Courier New":	   'courier new,courier,monospace',
+		"Georgia":	   'georgia,times new roman,times,serif',
+		"Tahoma":	   'tahoma,arial,helvetica,sans-serif',
+		"Times New Roman": 'times new roman,times,serif',
+		"Verdana":	   'verdana,arial,helvetica,sans-serif',
+		"impact":	   'impact'
+	};
+	this.fontsize = {
+		"default": "2",
+		"1":  "1",
+		"2": "2",
+		"3": "3",
+		"4": "4",
+		"5": "5",
+		"6": "6",
+		"7": "7"
+	};
+	this.formatblock = {
+		"default": "格式",
+		"普通": "p",
+		"标题一": "h1",
+		"标题二": "h2",
+		"标题三": "h3",
+		"标题四": "h4",
+		"标题五": "h5",
+		"标题六": "h6"
+	};
+	this.selList = ['fontname','fontsize'];
+};
+editor = new WYSIWYD();
+editor.config = new WysiwygConfig();
+</script>
+<!--
+EOT;
+?>

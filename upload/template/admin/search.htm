@@ -1,0 +1,101 @@
+<!--<?php
+include_once PrintEot('left');
+print <<<EOT
+-->
+<h2 class="h1 mb10">
+<!--
+EOT;
+if(!$result){print <<<EOT
+-->
+没有找到关于“<span class="s1">$keyword</span>”的操作
+<!--
+EOT;
+}else{
+print <<<EOT
+-->
+有关“<span class="s1">$keyword</span>”的搜索结果
+<!--
+EOT;
+foreach ($result as $key=>$value) {
+$temp = strip_tags($value[name]);
+print <<<EOT
+-->
+</h2>
+<h2 class="h2 mb5"><a href="javascript:;" onclick="openNewUrl('$key','$value[name]','$value[url]&admin_keyword=$keyword')">$value[name]</a></h2>
+<!--
+EOT;
+foreach ($value[lang] as $k=>$val) {
+print <<<EOT
+-->
+<dl class="mb10 search_dl">
+<!--
+EOT;
+if(is_array($val)){
+print <<<EOT
+-->
+<dd>
+<!--
+EOT;
+$i=0;
+foreach($val as $k2=>$v){
+print <<<EOT
+-->
+<!--
+EOT;
+if($i==0){print <<<EOT
+-->
+<p class="f14 mb5"><a style="cursor:pointer;" onclick="openNewUrl('$key','$value[name]','$value[url]&$k&admin_keyword=$keyword')">$v</a></p>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+<div>$v</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+<!--
+EOT;
+$i++;
+}print <<<EOT
+-->
+</dd>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+<dd class="dd1">$val</dd>
+<!--
+EOT;
+}print <<<EOT
+-->
+</dl>
+<!--
+EOT;
+}print <<<EOT
+-->
+
+<!--
+EOT;
+}print <<<EOT
+-->
+
+<!--
+EOT;
+}print <<<EOT
+-->
+<script language="JavaScript">
+function openNewUrl(id,name,url){
+	parent.PW.Dialog({
+			            'id': id,
+			            'name': name,
+			            'url': url
+			        }).loadIframe(url);
+}
+</script>
+	</div>
+<!--
+EOT;
+include_once PrintEot('adminbottom');
+?>
+-->

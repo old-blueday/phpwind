@@ -1,0 +1,103 @@
+<!--<?php print <<<EOT
+--><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" id="html">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=$db_charset" />
+<title>$webPageTitle - Powered by phpwind</title>
+<meta name="generator" content="phpwind $wind_version" />
+<meta name="description" content="$metaDescription" />
+<meta name="keywords" content="$metaKeywords" />
+<meta http-equiv="x-ua-compatible" content="ie=7" />
+<link rel='archives' title='$db_bbsname' href='$db_bbsurl/simple' />
+<base id="headbase" href="$db_bbsurl/" />
+<link rel="stylesheet" type="text/css" href="$imgpath/wind-reset.css" />
+<link rel="stylesheet" type="text/css" href="$imgpath/user/style.css" />
+<script type="text/javascript" language="JavaScript" src="js/pw_ajax.js"></script>
+<script type="text/javascript" LANGUAGE="JavaScript" src="js/core/core.js"></script>
+<script type="text/javascript" LANGUAGE="JavaScript" src="js/core/tab.js"></script>
+<script language="JavaScript">
+var imgpath = '$imgpath';
+var verifyhash = '$verifyhash';
+var winduid = '$winduid';
+var windid	= '$windid';
+var groupid	= '$groupid';
+</script>
+</head>
+<body onkeydown="try{keyCodes(event);}catch(e){}">
+<!--
+EOT;
+if($GLOBALS['groupid'] != 'guest' && $GLOBALS['groupid'] != '' && $GLOBALS['db_toolbar']){print <<<EOT
+-->
+<!--[if IE 6]>
+<div id="upPanel" name="upPanel">
+<div id="upPanelWrap" class="cc">
+<![endif]-->
+<!--
+EOT;
+}print <<<EOT
+-->
+<div id="user-wrap">
+    <div id="user-nav">
+        <div class="cc">
+        <a href="$db_bbsurl/" class="logo" title="返回{$webPageTitle}首页"><h1>{$webPageTitle}管理中心</h1></a>
+        <ul class="user-nav fl">
+        <li id="pro_index"><a href="profile.php" hidefocus="true">管理中心</a></li>
+            <li id="pro_modify"><a href="profile.php?action=modify" hidefocus="true">帐号</a></li>
+            <li id="pro_privacy"><a href="profile.php?action=privacy" hidefocus="true">隐私</a></li>
+            <li id="pro_userpay"><a href="userpay.php" hidefocus="true">积分</a></li>
+            <li id="pro_permission"><a href="profile.php?action=permission" hidefocus="true">权限</a></li>
+<!--
+EOT;
+if ($_G['atclog']) {print <<<EOT
+-->
+            <li id="pro_log"><a href="profile.php?action=log" hidefocus="true">操作记录</a></li>
+<!--
+EOT;
+}print <<<EOT
+-->
+        <li id="pro_message"><a href="message.php?type=sms" hidefocus="true" class="mes">消息</a></li>
+<!--
+EOT;
+if($db_job_isopen){
+print<<<EOT
+-->
+        <li id="pro_job"><a href="jobcenter.php" hidefocus="true" class="mes">任务</a></li>
+<!--
+EOT;
+}$db_menuinit .= ",'td_omainNav' : 'menu_omainNav'";print <<<EOT
+-->
+        </ul>
+        <div class="login_info">
+        	<a href="u.php"><b>$windid</b></a><a href="$loginouturl">退出</a><i></i><a href="u.php">个人空间</a><i></i><a href="faq.php">帮助</a><i></i><span><a id="td_omainNav" href="$_mainUrl" class="o_top_down"><span class="fl cp">返回社区首页</span><span class="f9">▼</span></a></span>
+        </div>
+        </div>
+<script language="JavaScript">setCurrent('pro_{$pro_tab}', 'pro_index', 'current');</script>
+    </div>
+<div id="menu_omainNav" style="display:none;">
+	<div class="o_top_menu" style="width:106px;">
+	<h4><a href="$_mainUrl">返回社区首页<span class="f9">▼</span></a></h4>
+	<ul>
+<!--
+EOT;
+foreach ($db_modes as $key => $value) {
+if ($key!= 'o' && $value['ifopen'] == 1) {
+$this_url = isset($db_modedomain[$key]) ? 'http://'.$db_modedomain[$key] : 'index.php?m='.$key;
+print<<<EOT
+-->
+		<li><a href="$this_url"><span>$value[title]</span></a></li>
+<!--
+EOT;
+}}print <<<EOT
+-->
+	</ul>
+    </div>
+</div>
+<script type="text/javascript">
+var td_omainNav = {
+	open : function(){ $('td_omainNav').parentNode.className = 'current';},
+	close : function(){ $('td_omainNav').parentNode.className = '';}
+};
+</script>
+<!--
+EOT;
+?>

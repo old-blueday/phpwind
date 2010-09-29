@@ -1,0 +1,364 @@
+<!--<?php
+include_once PrintEot('left');
+
+if(empty($action)){print <<<EOT
+-->
+
+<div class="admin_info mb10">
+    <h2 class="h1"><b>提示信息</b></h2>
+    <div class="legend">
+    为了保证空间的可持续发展,请及时清理!附件保存目录为:<span class="xia">$attachpath</span><br /><b class="s2">功能说明</b>: 本功能根据数据库中的附件记录搜索,  删除符合条件的附件和附件记录, 释放更多的数据库空间和服务器空间<br />
+    </div>
+</div>
+
+<div class="nav3 mb10">
+	<ul class="cc">
+		<li class="current"><a href="$basename">版块附件记录</a></li>
+		<li><a href="$basename&action=files">版块附件文件</a></li>
+		<li><a href="$basename&action=msgList">消息中心附件</a></li>
+	</ul>
+</div>
+
+<script language="JavaScript" src="js/date.js"></script>
+<form action="$basename&" method=post name="form1">
+<h3 class="h1">搜索附件记录</h3>
+<div class="admin_table mb10">
+    <table cellspacing="0" cellpadding="0" width="100%">
+        <tr class="tr1 vt">
+        	<td class="td1">所属版块</td>
+        	<td class="td2">
+        	  <select name="fid" class="select_wa">
+        	    <option value=all>所有版块</option>
+        	    $forumcache
+        	  </select>
+        	</td>
+        </tr>
+        <tr class="tr1 vt">
+        	<td class="td1">用户名</td>
+        	<td class="td2"><input type="text" class="input input_wa" name="username" value="$username"></td>
+        </tr>
+        <tr class="tr1 vt">
+        	<td class="td1">文件名包含</td>
+        	<td class="td2"><input type="text" class="input input_wa" name="filename" value="$filename"></td>
+        </tr>
+        <tr class="tr1 vt">
+        	<td class="td1">下载次数</td>
+            <td class="td2">
+                <input type="text" class="input input_wa fl mr20" name="hits" value="$hits">
+                <ul class="list_A list_80 fl">
+                	<li><input type="radio" name="ifmore" value='1' $hitsLessThan>小于</li>
+                	<li><input type="radio" name="ifmore" value='0' $hitsMoreThan>大于</li>
+                </ul>
+            </td>
+        </tr>
+        <tr class="tr1 vt">
+        	<td class="td1">附件大小(K) </td>
+            <td class="td2">
+                <input type="text" class="input input_wa fl mr20" name="filesize" value="$filesize">
+                <ul class="list_A list_80 fl">
+                	<li><input type="radio" name="ifless" value='1' $downloadLessThan>小于</li>
+                	<li><input type="radio" name="ifless" value='0' $downloadMoreThan>大于</li>
+                </ul>
+            </td>
+        </tr>
+        <tr class="tr1 vt">
+        	<td class="td1">上传时间 </td>
+            <td class="td2">
+            	<div class="input_img fl"><i class="input_time" onclick="this.nextSibling.onclick()" title="选择时间">选择时间</i><input id="startdate" name="postdate1" type="text" value="$postdate1" onclick="ShowCalendar(this.id)" /></div>
+                <span class="p_lr_10 fl">-</span>
+            	<div class="input_img fl"><i class="input_time" onclick="this.nextSibling.onclick()" title="选择时间">选择时间</i><input id="enddate" name="postdate2" type="text" value="$postdate2" onclick="ShowCalendar(this.id)" /></div>
+            </td>
+        </tr>
+        <tr class="tr1 vt">
+        	<td class="td1">排序</td>
+            <td class="td2">
+                $orderwaySelection
+                <ul class="list_A list_80 fl">
+                	<li><input type="radio" name="asc" value='ASC' $ascChecked>正序</li>
+                	<li><input type="radio" name="asc" value='DESC' $descChecked>倒序</li>
+                </ul>
+            </td>
+        </tr>
+        <tr class="tr1 vt">
+            <td class="td1"><div id="info1">每页显示个数</div></td>
+            <td class="td2">
+                <input type="text" class="input input_wa mr20" name="pernum" value="$pernum">
+            </td>
+        </tr>
+    </table>
+</div>
+<div class="mb10 tac">
+	<span class="btn"><span><button type="submit" onfocus="blur();">提 交</button></span></span>
+</div>
+</form>
+
+<form action="$basename&" method="post" name="FORM">
+<input type="hidden" name="action" value="delete">
+<input type="hidden" name="fid" value="$fid">
+<input type="hidden" name="uid" value="$uid">
+<input type="hidden" name="filename" value="$filename">
+<input type="hidden" name="ifmore" value='$ifmore'>
+<input type="hidden" name="ifless" value='$ifless'>
+<input type="hidden" name="postdate1" value="$postdate1">
+<input type="hidden" name="postdate2" value="$postdate2">
+<input type="hidden" name="asc" value='$asc'>
+<input type="hidden" name="pernum" value="$pernum">
+<input type="hidden" name="hits" value="$hits">
+<input type="hidden" name="filesize" value="$filesize">
+<input type="hidden" name="orderway" value='$orderway'>
+<input type="hidden" name="page" value='$page'>
+<h2 class="h1">附件记录列表</h2>
+<div class="admin_table mb10">
+    <table cellspacing="0" cellpadding="0" width="100%">
+        <tr class="tr2">
+            <td width="40"><span onclick="CheckAll(document.FORM)" class="cp">全选</span></td>
+            <td width="20%">附件名</td>
+            <td width="15%">附件大小</td>
+            <td width="15%">上传时间</td>
+            <td width="20%">所在主题</td>
+            <td width="20%">所属版块</td>
+        </tr>
+<!--
+EOT;
+	if (!empty($attachdb)) {
+		foreach($attachdb as $key=>$value){
+			$view_topic=$value[tid]?"<a href='read.php?tid=$value[tid]' target='_blank'>所在主题</a>":'-';
+print <<<EOT
+-->
+        <tr class="tr1 vt">
+            <td class="td2"><input type='checkbox' name='aidarray[]' value="$value[aid]"></td>
+            <td class="td2">
+<!--
+EOT;
+			if ('' != $value['imgurl']) {
+print <<<EOT
+-->
+        		<a href="$value[imgurl]" target="_blank">$value[name]</a>
+<!--
+EOT;
+    		} else {
+print <<<EOT
+-->
+        		<a href="javascript:void(0);" onclick="alert('附件不存在');">$value[name]</a>
+<!--
+EOT;
+    		}
+print <<<EOT
+-->
+            </td>
+            <td class="td2">$value[filezie]</td>
+            <td class="td2">$value[uploadtime]</td>
+            <td class="td2">$view_topic</td>
+            <td class="td2"><a href="$value[where]" target="_blank">$value[forum]</a></td>
+        </tr>
+<!--
+EOT;
+		}
+	}else{print <<<EOT
+-->
+<tr><td class="p10" colspan="6"><div class="admin_tips">啊哦，没有你要的信息！</div></td></tr>
+<!--
+EOT;
+	}print <<<EOT
+-->
+    </table>
+</div>
+<div class="cc mb10">$pages</div>
+<div class="mb10 tac">
+	<span class="btn"><span><button type="submit" name="hello" onfocus="blur();" onclick="return Checkdel();">删  除</button></span></span>
+</div>
+</form>
+
+<!--
+EOT;
+}elseif($action=='msgList'){print <<<EOT
+-->
+
+<div class="nav3 mb10">
+	<ul class="cc">
+		<li><a href="$basename">版块附件记录</a></li>
+		<li><a href="$basename&action=files">版块附件文件</a></li>
+		<li class="current"><a href="$basename&action=msgList">消息中心附件</a></li>
+	</ul>
+</div>
+
+<form action="$basename&" method="post" name="MESSAGE">
+	<input type="hidden" name="action" value="msgDel" />
+	<h2 class="h1">消息中心附件</h2>
+	<div class="admin_table mb10">
+		<table cellpadding="0" cellspacing="0" width="100%">
+			<tr class="tr2">
+				<td width="40"><span onclick="CheckAll(document.MESSAGE)" class="cp">全选</span></td>
+				<td>附件名</td>
+				<td>附件大小(k)</td>
+				<td>上传时间</td>
+			</tr>
+<!--
+EOT;
+if (!empty($attachList)) {
+foreach($attachList as $key => $value){
+$value['created_time'] = get_date($value['created_time']);
+print <<<EOT
+-->
+				<tr>
+					<td class="td2"><input type="checkbox" name="mids[]" value="{$value[mid]}"></td>
+					<td class="td2">{$value[name]}</td>
+					<td class="td2">{$value[size]}</td>
+					<td class="td2">{$value[created_time]}</td>
+				</tr>
+<!--
+EOT;
+		}
+	}else{print <<<EOT
+-->
+<tr><td class="p10" colspan="4"><div class="admin_tips">啊哦，没有你要的信息！</div></td></tr>
+<!--
+EOT;
+	}print <<<EOT
+-->
+		</table>
+	</div>
+<div class="cc mb10">$pages</div>
+<div class="mb10 tac">
+	<span class="btn"><span><button type="submit" name="hello" onfocus="blur();" onclick="return Checkdel();">删  除</button></span></span>
+</div>
+</form>	
+<!--
+EOT;
+}elseif($action=='files'){print <<<EOT
+-->
+
+<div class="admin_info mb10">
+	<h2 class="h1"><b>提示信息</b></h2>
+    <div class="legend">
+    <b class="s1">功能说明</b>:本功能可根据附件最后被访问时间搜索整个站点的附件, 选择删除长时间没人访问的附件, 可有效清理站点中冗余附件, 从而释放更多的服务器空间.<br /><b class="s2">注</b>:如果你要删除的附件比较多,可以使用直接删除功能, 直接删除符合搜索条件的附件
+    </div>
+</div>
+
+<div class="nav3 mb10">
+	<ul class="cc">
+		<li><a href="$basename">版块附件记录</a></li>
+		<li class="current"><a href="$basename&action=files">版块附件文件</a></li>
+		<li><a href="$basename&action=msgList">消息中心附件</a></li>
+	</ul>
+</div>
+
+<script language="JavaScript" src="js/date.js"></script>
+<form action="$basename&" method="post" name="form2">
+<input type="hidden" name="action" value="schdir">
+<h3 class="h1"><span class="mr20">搜索附件文件</span><a href="$basename&action=files" class="linka">查看上次搜索结果</a></h3>
+<div class="admin_table mb10">
+    <table cellspacing="0" cellpadding="0" width="100%">
+        <tr class="tr1 vt">
+            <td class="td1">文件名包含</td>
+            <td class="td2"><input type="text" class="input input_wa" name="filename" value="$filename"></td>
+        </tr>
+        <tr class="tr1 vt">
+            <td class="td1">附件大小[K]</td>
+            <td class="td2">
+                <input type="text" class="input input_wa fl mr20" name="filesize" value="$filesize">
+                <ul class="list_A list_80 fl">
+                	<li><input type="radio" name="ifless" value='1' $sizeLessThan>小于</li>
+                	<li><input type="radio" name="ifless" value='0' $sizeMoreThan>大于</li>
+                </ul>
+            </td>
+        </tr>
+        <tr class="tr1 vt">
+            <td class="td1">最后访问时间 </td>
+            <td class="td2">
+                <div class="input_img fl"><i onclick="this.nextSibling.onclick()" class="input_time" title="选择时间">选择时间</i><input id="stimess" name="postdate1" type="text" value="$postdate1" onclick="ShowCalendar(this.id)" /></div>
+                <span class="p_lr_10 fl">-</span>
+                <div class="input_img fl"><i onclick="this.nextSibling.onclick()" class="input_time" title="选择时间">选择时间</i><input id="etimess" name="postdate2" type="text" value="$postdate2" onclick="ShowCalendar(this.id)" /></div>
+            </td>
+        </tr>
+        <tr class="tr1 vt">
+            <td class="td1"><div id="info2">每次跳转处理个数</div></td>
+            <td class="td2">
+                <input type="text" class="input input_wa mr20" name="pernum" value="$pernum">
+            </td>
+        </tr>
+    </table>
+</div>
+<div class="mb10 tac">
+	<span class="btn"><span><button type="submit" onfocus="blur();">提 交</button></span></span>
+</div>
+</form>
+
+<form action="$basename&" method="post" name="FORM">
+<input type="hidden" name="action" value="delfile">
+<input type="hidden" name="filename" value="$filename">
+<input type="hidden" name="filesize" value="$filesize">
+<input type="hidden" name="ifless" value='$ifless'>
+<input type="hidden" name="postdate1" value="$postdate1">
+<input type="hidden" name="postdate2" value="$postdate2">
+<input type="hidden" name="pernum" value="$pernum">
+<h2 class="h1">附件文件列表</h2>
+<div class="admin_table mb10">
+    <table cellspacing="0" cellpadding="0" width="100%">
+        <tr class="tr2">
+            <td width="40"><span onclick="CheckAll(document.FORM)" class="cp">全选</span></td>
+            <td>附件名</td>
+            <td>最后访问时间</td>
+            <td>附件大小(k)</td>
+        </tr>
+<!--
+EOT;
+	if (!empty($attachdb)) {
+		foreach($attachdb as $attach){
+print <<<EOT
+-->
+        <tr class="tr1">
+            <td class="td2">
+<!--
+EOT;
+			if($attach[exists]){print <<<EOT
+-->
+            <input type="checkbox" name="delfile[]" value="$attach[name]">
+<!--
+EOT;
+			}else{print <<<EOT
+-->
+            <span class="s1">已删除</span>
+<!--
+EOT;
+			}print <<<EOT
+-->
+            </td>
+            <td class="td2"><a href="$attachpath/$attach[name]" target="_blank">$attach[name]</a></td>
+            <td class="td2">$attach[time]</td>
+            <td class="td2">$attach[size]</td>
+        </tr>
+<!--
+EOT;
+		}
+	}else{print <<<EOT
+-->
+<tr><td class="p10" colspan="4"><div class="admin_tips">啊哦，没有你要的信息！</div></td></tr>
+<!--
+EOT;
+	}print <<<EOT
+-->
+    </table>
+</div>
+<div class="cc mb10">$pages</div>
+<div class="mb10 tac">
+	<span class="btn"><span><button type="submit" name="hello" onfocus="blur();" onclick="return Checkdel();">删  除</button></span></span>
+</div>
+</form>
+<!--
+EOT;
+}print <<<EOT
+-->
+<script>
+function Checkdel(){
+	if (!confirm("您确定要删除选中项吗?")) {
+		return false;
+	}else{
+		return true;
+	}
+}
+</script>
+<!--
+EOT;
+include_once PrintEot('adminbottom');
+?>-->

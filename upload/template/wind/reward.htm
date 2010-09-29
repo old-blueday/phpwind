@@ -1,0 +1,73 @@
+<!--<?php
+print <<<EOT
+-->
+<div id="breadCrumb">
+		<img src="$imgpath/$stylepath/thread/home-old.gif" align="absmiddle" />&nbsp;<a href="$db_bfn" title="$db_bbsname">$db_bbsname</a><em>&gt;</em>悬赏帖管理
+</div>
+<!--
+EOT;
+if($action=='reward'){ print <<<EOT
+-->
+<form name="FORM" action="job.php?action=reward" method="post">
+<input type="hidden" name="verify" value="$verifyhash" />
+<div class="t" style="margin-top:15px">
+<table width="100%" align="center" cellspacing="0" cellpadding="0">
+<tr><td colspan="2" class="h">悬赏帖管理</td></tr>
+<tr class="tr2"><td colspan="2">评选“最佳答案”前请先评选“热心助人”！<br />
+“最佳答案”的评定意味着悬赏的结束，如您未能在评选“最佳答案”前评选出“热心助人”，则热心助人将按照发帖顺序给分，每楼给1分，直至热心助人分全部用完。</td></tr>
+<tr class="tr3"><th width="21%">操作者</th>
+<th><a href="u.php?uid=$winduid">$windid</a></th></tr>
+<tr class="tr3"><th width="21%">作者</th>
+<th>
+<a href="u.php?uid=$rt[authorid]">$rt[author]</a></th></tr>
+<tr class="tr3"><th width="21%">操作类型:</th>
+<th>
+<input type="radio" name="type" value="1" $sel_1 />最佳答案
+<input type="radio" name="type" value="2" $sel_2 />热心助人
+</th></tr></td></tr>
+<tbody id="ifmsg">
+<tr class="tr3"><th width="21%">消息通知</th>
+<th>
+<input type="radio" name="ifmsg" value="1" checked />开启
+<input type="radio" name="ifmsg" value="0" />关闭</th></tr></tbody>
+</table></div>
+<div style="text-align:center;margin-bottom:25px;">
+<input class="btn" type="button" value="返 回" onclick="javascript:history.go(-1);" />&nbsp;
+<input class="btn" type="submit" value="提 交" /></div>
+<input type="hidden" name="page" value="$page" />
+<input type="hidden" name="pid" value="$pid" />
+<input type="hidden" name="tid" value="$tid" />
+<input type="hidden" name="step" value="3" /></form>
+<!--
+EOT;
+}elseif($action=='endreward'){print <<<EOT
+-->
+<form action="job.php?action=endreward" method="post">
+<input type="hidden" name="verify" value="$verifyhash" />
+<div class="t" style="margin-top:15px">
+<table width="100%" align="center" cellspacing="0" cellpadding="0">
+<tr><td colspan="2" class="h">悬赏帖管理</td></tr>
+<tr class="tr3"><th width="21%">操作者</th>
+<th><a href="u.php?uid=$winduid">$windid</a></th></tr>
+<tr class="tr3"><th width="21%">作者</th>
+<th>
+<a href="u.php?uid=$rt[authorid]">$rt[author]</a></th></tr>
+<tr class="tr3"><th width="21%">操作类型:</th>
+<th>
+<input type="radio" name="type" value="2" checked />强行结案 (强制结束悬赏，不返还用户悬赏的积分)<br />
+<input type="radio" name="type" value="1" />取消悬赏 (取消该悬赏帖，返还用户悬赏的积分)
+</th></tr>
+<tr class="tr3"><th width="21%">消息通知</th>
+<th>
+<input type="radio" name="ifmsg" value="1" checked />开启
+<input type="radio" name="ifmsg" value="0" />关闭</th></tr>
+</table></div>
+<div style="text-align:center;margin-bottom:25px">
+<input class="btn" type="submit" value="提 交" />&nbsp;
+<input class="btn" type="button" value="返 回" onclick="javascript:history.go(-1);" />
+</div>
+<input type="hidden" name="tid" value="$tid" />
+<input type="hidden" name="step" value="3" /></form>
+<!--
+EOT;
+}?>-->

@@ -1,0 +1,1005 @@
+<!--<?php
+if (!defined('AJAX')){
+include_once PrintEot('left');
+}print<<<EOT
+-->
+<style type="text/css">
+.cate_search{}
+.cate_search span{float:left;height:30px;line-height:30px;margin-right:10px;}
+.cate_search span input{ vertical-align:middle;margin:0 3px;}
+.cate_search span select{margin:0 3px;}
+</style>
+<!--
+EOT;
+if (empty($action)) {print <<<EOT
+-->
+<div class="nav3 mb10">
+    <ul class="cc">
+        <li class="current"><a href="$basename">活动分类管理</a></li>
+        <li><a href="$basename&action=topic">活动内容管理</a></li>
+    </ul>
+</div>
+<div class="admin_info mb10">
+    <h3 class="h1">提示信息</h3>
+    <div class="legend">
+        <ol>
+            <li>本功能必须与版块绑定使用，否则会员将不能看到活动。请到 <a href="javascript:;" onclick="parent.PW.Dialog({id:'setforum',url:'$admin_file?adminjob=setforum',name:'管理版块'});">管理版块</a> 中进行关联绑定</li>
+            <li>本功能必须由会员权限支持，否则会员将不能发活动帖。请到 <a href="javascript:;" onclick="parent.PW.Dialog({id:'level',url:'$admin_file?adminjob=level',name:'会员组权限'});">会员组权限</a> 限中设定</li>
+        </ol>
+    </div>
+</div>
+<form action="$basename" method="post">
+<input type="hidden" name="action" value="topiclist" />
+<h2 class="h1 cc"><span class="fl mr10">分类管理</span></h2>
+<div class="admin_table mb10">
+<table cellpadding="0" cellspacing="0" width="100%">
+	<tr class="tr2">
+		<td width="24" class="tac">启用</td>
+		<td style="width:80px;">顺序</td>
+		<td style="width:80px;">分类名称</td>
+		<td>所属版块</td>
+		<td style="width:340px;">操作</td>
+	</tr>
+<!--
+EOT;
+foreach($activity_catedb as $key => $value){
+$ifable = $value[ifable] ? 'checked="checked"' : '';
+$name = $value[ifdel] ? '<input name="name[' . $value[actid] . ']" type="text" class="input input_wc" value="' . $value[name] . '" />' : $value[name];
+print <<<EOT
+-->
+	<tr class="tr1 vt">
+		<td class="td2"><input type="hidden" name="topiclist[$value[actid]]" value="$value[actid]" /><input type="checkbox" name="selid[$value[actid]]" value="1" $ifable /></td>
+		<td class="td2"><input type="text" class="input input_wc" name="vieworder[$value[actid]]" value="$value[vieworder]" /></td>
+		<td class="td2">$name</td>
+		<td class="td2">$value[forum]</td>
+		<td class="td2">
+			<a href="javascript:;" onclick="sendmsg('$value[ajax_basename_edittopic]','',this.id);" id="edittopic" class="mr20">[编辑分类]</a>
+			<a href="javascript:;" onclick="sendmsg('$value[ajax_basename_addmodelname]','',this.id);" id="addmodelname" class="mr20">[添加子分类]</a>
+			<a href="javascript:;" onclick="sendmsg('$value[ajax_basename_editmodelname]','',this.id);" id="editmodelname" class="mr20">[编辑子分类]</a>
+<!--
+EOT;
+if($value[ifdel]){print<<<EOT
+-->
+			<a href="$basename&action=deltopic&actid=$key" onclick="if(!confirm('删除分类将删除所有关联的子分类、变量及其他信息')){return false;}" class="mr20">[删除]</a>
+<!--
+EOT;
+}print<<<EOT
+-->
+		</td>
+	</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+</table>
+</div>
+<div class="mb10 tac"><span class="btn"><span><button type="submit">提 交</button></span></span></div>
+</form>
+<script type="text/javascript" language="JavaScript" src="js/global.js"></script>
+<script type="text/javascript" language="JavaScript" src="js/pw_ajax.js"></script>
+<!--
+EOT;
+} elseif ($action == 'topic') {print <<<EOT
+-->
+<div class="nav3 mb10">
+    <ul class="cc">
+        <li><a href="$basename">活动分类管理</a></li>
+        <li class="current"><a href="$basename&action=topic">活动内容管理</a></li>
+    </ul>
+</div>
+<h2 class="h1 mb10"><span class="mr20">选择分类</span><span class="linka"><select name="actmid" onchange="totopic(this.value)" class="select_wa">
+{$actmidSelectWithoutSelectTagHtml}
+</select></span>
+</h2>
+<script type="text/javascript">
+function totopic(actmid) {
+	window.location.href = '$basename&action=topic&actmid='+actmid;
+}
+</script>
+<!--
+EOT;
+if(1){print<<<EOT
+-->
+<!--
+EOT;
+if($searchhtml || $asearchhtml){print<<<EOT
+-->
+<form action="$basename" method="post">
+<input type="hidden" name="action" value="topic" />
+<input type="hidden" name="step" value="search" />
+<input type="hidden" name="actmid" value="$actmid" />
+<input type="hidden" name="tids" value="$tids" />
+<h2 class="h1">搜索条件</h2>
+<div class="cc mb10 p10 cate_search">$searchhtml<div id="asearch"></div></div>
+<div class="mb10 tac">
+    <span class="btn"><span><button type="submit">提 交</button></span></span>
+    <a id="show" href="javascript:;" onclick="showasearch()">高级搜索</a>
+</div>
+</form>
+<div id="asearchblock" style="display:none;">$asearchhtml</div>
+<script language="JavaScript">
+function showasearch(id){
+	if (getObj('asearch').innerHTML == '') {
+		getObj('asearch').innerHTML = getObj('asearchblock').innerHTML;
+		getObj('show').innerHTML = '简单搜索';
+	} else {
+		getObj('asearch').innerHTML = '';
+		getObj('show').innerHTML = '高级搜索';
+	}
+}
+</script>
+<!--
+EOT;
+}print<<<EOT
+-->
+<!--
+EOT;
+}print<<<EOT
+-->
+<h2 class="h1">搜索结果</h2>
+<form action="$basename" method="post">
+<input type="hidden" name="action" value="delthreads" />
+<input type="hidden" name="alltids" value="$alltids" />
+<input type="hidden" name="actmid" value="$actmid" />
+<div class="admin_table mb10">
+<table cellpadding="0" cellspacing="0" width="100%" style="table-layout:auto;">
+	<tr class="tr2">
+		<td>全选</td>
+		<td>名称</td>
+		<td>分类</td>
+		<td>所属版块</td>
+		<td>发布者</td>
+		<td>发布时间</td>
+		<td>是否推荐</td>
+	</tr>
+<!--
+EOT;
+foreach($topicdb as $key => $value){
+print <<<EOT
+-->
+	<tr class="tr1 vt">
+		<td class="td2"><input type="checkbox" name="selid[]" value="$value[tid]"></td>
+		<td class="td2"><a href="read.php?tid=$value[tid]" target="_blank" class="unline">$value[subject]</a></td>
+		<td class="td2">{$activity_modeldb[$value[actmid]][name]}</td>
+		<td class="td2">{$forum[$value[fid]][name]}</td>
+		<td class="td2"><a href="u.php?uid=$value[authorid]" target="_blank" class="unline">$value[author]</a></td>
+		<td class="td2">$value[postdate]</td>
+		<td class="td2">$value[recommend]</td>
+	</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+</table>
+</div>
+<div class="mb10 cc">$pages</div>
+<div class="mb10 tac">
+	<input type="button" onclick='CheckAll(this.form)' value="全 选" class="bt3" />
+	<input type="submit" name="delthreads" onclick="if(!confirm('是否确认删除帖子？')){return false;}" value="删 除" class="bt3" />
+	<input type="submit" name="setrecommend" value="设为推荐" class="bt3" />
+	<input type="submit" name="removerecommend" value="取消推荐" class="bt3" />
+	<input type="submit" name="sendmsg" value="群发消息" class="btn3" />
+    <!--span class="btn"><span><button type="button" onclick='CheckAll(this.form)'></button></span></span>
+    <span class="bt"><span><button type="submit" >删 除</button></span></span>
+    <span class="bt"><span><button type="submit" name="sendmsg" value="1">群发消息</button></span></span-->
+</div>
+</form>
+<!--
+EOT;
+}elseif($_POST['sendmsg']){print<<<EOT
+-->
+<div class="nav3 mb10">
+    <ul class="cc">
+        <li><a href="$basename">活动分类管理</a></li>
+        <li><a href="$basename&action=topic">活动内容管理</a></li>
+        <li class="current"><a href="javascript:;">群发消息</a></li>
+    </ul>
+</div>
+<form name='FORM' action="$basename" method="post">
+<input type="hidden" name="action" value="sendmsg" />
+<input type="hidden" name="step" value="2" />
+<input type="hidden" name="uids" value="$uids" />
+<h2 class="h1">消息群发</h2>
+<script language="JavaScript" src="js/wind_editor.js"></script>
+<div class="admin_table mb10">
+<table cellpadding="0" cellspacing="0" width="100%">
+	<tr class="tr1 vt">
+		<td width="80" class="td1">主题</td>
+		<td class="td2"><input type="text" class="input input_wb" name="subject" /></td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">内容</td>
+		<td class="td2">
+<!--
+EOT;
+require_once PrintEot('wysiwyg_editor');
+print <<<EOT
+-->
+		</td>
+	</tr>
+</table>
+</div>
+<div class="mb10 tac">
+    <span class="btn"><span><button type="submit">提 交</button></span></span>
+    <span class="bt"><span><button type="reset" value="">重 置</button></span></span>
+</div>
+</form>
+<!--
+EOT;
+}elseif($action == 'edittopic'){print<<<EOT
+--><div style="width:400px;">
+<form name="form" method="post" action="$ajax_basename_add&" onsubmit="return false;">
+<input type="hidden" name="actid" value="$actid">
+<input type="hidden" name="step" value="2">
+<h2 class="h1" style="cursor:move" onmousedown="read.move(event);">编辑分类主题</h2>
+<div class="admin_table mb10">
+<table cellpadding="0" cellspacing="0" width="100%" style="table-layout:auto;">
+	<tr class="tr1 vt">
+		<td class="td2" style="width:75px;">分类主题名称</td>
+		<td class="td2">$nameHtml</td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td2">子分类启用</td>
+		<td class="td2">
+			<ul class="list_80 list_A">
+				$selectmodel
+			</ul>
+		</td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td2">开启分类主题</td>
+		<td class="td2">
+       		<ul class="cc list_80 list_A mr10">
+                <li><input type="radio" name="ifable" value="1" $ifable_Y> 开启</li>
+                <li><input type="radio" name="ifable" value="0" $ifable_N> 关闭</li>
+            </ul>
+		</td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td2">顺序</td>
+		<td class="td2"><input name="vieworder" class="input input_wa" value="$topic[vieworder]"></td>
+	</tr>
+</table>
+</div>
+<div class="tac mb10">
+	<span class="btn2"><span><button type="button" onclick="ajax.submit(this.form,ajax.guide)">提 交</button></span></span>
+	<span class="bt2"><span><button type="button" onclick="closep();">取 消</button></span></span>
+</div>
+</form></div>
+<!--
+EOT;
+}elseif($action == 'editmodel'){print<<<EOT
+-->
+<script language="JavaScript" src="js/desktop/Compatibility.js"></script>
+<div class="nav3 mb10">
+    <ul class="cc">
+        <li class="current"><a href="$basename">活动分类管理</a></li>
+        <li><a href="$basename&action=topic">活动内容管理</a></li>
+    </ul>
+</div>
+<div class="admin_info mb10">
+    <h3 class="h1">提示信息</h3>
+    <div class="legend">
+        <ol>
+            <li>编辑字段时，可以在名称中加入{#}（两个花括号加上一个井号），表示发表和阅读帖子时，标记前后的文字可以分别显示在字段的前后</li>
+            <li>编辑字段时，可以在名称中加入{@}（两个花括号加上一个@号），表示发表和阅读帖子时，标记前的文字为字段的名称</li>
+            <li>当显示顺序数字相同且不为0时，发表和阅读帖子时也会在同一行显示 </li>
+            <li>结合以上三点，可以灵活的编辑字段显示格式。比如“人数限制：最少*人，最多*人”，可以编辑成相同顺序的2个字段，字段名称分别为“人数限制{@}最少{#}人，”、“最多{#}人”</li>
+            <li>如果字段通过前台发帖存在数据，将无法编辑变量</li>
+            <li>上传（upload）类型必填限制无效</li>
+            <li>对于预设的字段（不可删除的），所有活动子分类共用默认查询、高级查询、索引设置</li>
+            <li>其他模块导入：只能对一些自定义字段导入，默认字段无法导入</li>
+        </ol>
+    </div>
+</div>
+<h3 class="h1"><span class="fl mr10">修改 <span class="s2">{$modelname}</span> 字段</span><a href="javascript:;" onclick="sendmsg('$ajax_basename_add','actmid=$actmid&actid=$actid',this.id);" id="addfield" class="btn_add fl"><i>添加字段</i></a></h3>
+<script type="text/javascript" language="JavaScript" src="js/global.js"></script>
+<script type="text/javascript" language="JavaScript" src="js/pw_ajax.js"></script>
+<!--
+EOT;
+if(empty($step)){print<<<EOT
+-->
+<form method="post" action="$basename&">
+<input name="action" type="hidden" value="editmodel">
+<input name="actid" id="actid" type="hidden" value="$actid">
+<input name="actmid" id="actmid" type="hidden" value="$actmid">
+<input name="step" type="hidden" value="2">
+<div class="admin_table mb10">
+<table cellpadding="0" cellspacing="0" width="100%" style="table-layout:auto;">
+	<tr class="tr2">
+		<td width="25">启用</td>
+		<td width="65">顺序</td>
+		<td width="30">区块</td>
+		<td>名称</td>
+		<td width="50">默认查询</td>
+		<td width="50">高级查询</td>
+		<td width="50">列表显示</td>
+		<td width="50">是否必须</td>
+		<td width="80">框体显示长度</td>
+		<td width="200">操作</td>
+	</tr>
+<!--
+EOT;
+foreach($fielddb as $k=>$v){print <<<EOT
+-->
+	<tr id="col_$k"  class="vt tr1">
+        <td class="td2"><input type="hidden" name="fieldlist[$k]" value="$k" /><input type="checkbox" name="ifable[$k]" id="ifable[$k]" value="1" $v[ifable_checked] $v[ifable_disabled] /></td>
+        <td class="td2"><input name="vieworder[$k]" id="vieworder[$k]" value="$v[vieworder]" class="input input_wc" $v[vieworder_disabled] /></td>
+        <td class="td2"><input name="sectionname[$k]" id="sectionname[$k]" value="$v[sectionname]" class="input input_wc" $v[sectionname_disabled] /></td>
+        <td class="td2">$v[nameInDb]</td>
+        <td class="td2"><input type="checkbox" name="ifsearch[$k]" value="1" $v[ifsearch_checked] $v[search_disabled] /></td>
+        <td class="td2"><input type="checkbox" name="ifasearch[$k]" value="1" $v[ifasearch_checked] $v[search_disabled] /></td>
+        <td class="td2"><input type="checkbox" name="threadshow[$k]" value="1" $v[threadshow_checked] $v[threadshow_disabled] /></td>
+        <td class="td2"><input type="checkbox" name="ifmust[$k]" value="1" $v[ifmust_checked] $v[ifmust_disabled] /></td>
+		<td class="td2">
+<!--
+EOT;
+if(in_array($v['type'],array('number','text','textarea','calendar','email','url','img','upload'))){print<<<EOT
+-->
+        <input type="text" name="textwidth[$k]" value="$v[textwidth]" size="5" class="input">
+<!--
+EOT;
+}print<<<EOT
+-->
+		</td>
+        <td class="td2">
+            $v[editLinkHtml]
+            $v[deleteLinkHtml]
+<!--
+EOT;
+if($v['indexstate'] == 1){print<<<EOT
+-->
+            <a href="javascript:;" onclick="editIndex($actmid,$k,'del');return false;">[删除索引]</a>
+<!--
+EOT;
+}elseif($v['indexstate'] == 0 && $v['ifindex']){print<<<EOT
+-->
+            <a href="javascript:;" onclick="editIndex($actmid,$k,'add');return false;">[添加索引]</a>
+<!--
+EOT;
+}else{print<<<EOT
+-->
+        <span></span>
+<!--
+EOT;
+}print<<<EOT
+-->
+	</tr>
+<!--
+EOT;
+}print<<<EOT
+-->
+</table>
+<a name="cols"></a>
+</div>
+<div class="mb10 tac">
+    <!-- <span class="bt"><span><button type="button" oonclick="CheckIfable(this.form,'ifable[')">全 选</button></span></span> -->
+    <span class="btn"><span><button type="submit">提 交</button></span></span>
+	<span class="bt"><span><button type="button" onclick="window.location.href = '$basename'+'&action=editmodel&step=3&actid='+'$actid'+'&actmid='+'$actmid'">预览</button></span></span>
+</div>
+</form>
+<!--
+EOT;
+}elseif($step==3){print<<<EOT
+-->
+<div class="admin_table mb10">
+<table cellpadding="0" cellspacing="0" width="100%">
+$topichtml
+</table>
+</div>
+<div class="mb10 tac">
+	 <span class="btn"><span><button type="button" onclick="window.location.href = '$basename'+'&action=editmodel&step=&actid='+'$actid'+'&actmid='+'$actmid'">返回编辑</button></span></span>
+</div>
+<!--
+EOT;
+}print<<<EOT
+-->
+<script language="JavaScript">
+var basename = '$basename';
+var ajax_basename_edit = '$ajax_basename_edit';
+var ajax_basename_add = '$ajax_basename_add';
+var ajax_basename_showfield = '$ajax_basename_showfield';
+var ajax_basename_delfield = '$ajax_basename_delfield';
+var ajax_basename_editindex = '$ajax_basename_editindex';
+
+function CheckIfable(form,cname){
+	var ifcheck = null;
+	for (var i=0;i<form.elements.length-2;i++){
+		var e = form.elements[i];
+		if(e.type=='checkbox' && e.name.indexOf(cname) != -1){
+			if (ifcheck === null) ifcheck = !e.checked;
+			e.checked = ifcheck;
+			if (typeof e.onclick == 'function') e.onclick();
+		}
+	}
+	return ifcheck;
+}
+
+function delfield(id) {
+	if(confirm('删除字段将同时删除帖子关联数据，确认删除？')) {
+		ajax.send(ajax_basename_delfield,'fieldid='+id,function(){
+				var str = ajax.request.responseText.split("\t");
+				if (str[0] == 'success'){
+					showDialog('success','删除字段成功!');
+					window.location.href = basename+'&action=editmodel&actid=$actid&actmid='+str[1];
+				} else {
+					showDialog('error','删除失败');
+				}
+			}
+		);
+	}
+}
+
+function editIndex(actmid,fieldid,type) {
+	if (type == 'del') {
+		var info = '确认删除索引？';
+	} else if (type == 'add') {
+		var info = '添加索引可以提高活动帖子的查询速度，但如果添加索引过多，效果会下降。建议将常用查询建立索引。确认添加？';
+	}
+	if (confirm(info)){
+		ajax.send(ajax_basename_editindex,'actmid='+actmid+'&fieldid='+fieldid+'&type='+type,function(){
+				var str = ajax.request.responseText.split("\t");
+				if (str[0] == 'success'){
+					showDialog('success','索引操作成功！');
+					window.location.href = basename+'&action=editmodel&actid='+str[1]+'&actmid='+str[2];
+				} else {
+					ajax.guide();
+				}
+			}
+		);
+	}
+}
+
+function ShowType(id){
+	if(id == 'radio' || id == 'checkbox' || id == 'select') {
+		getObj('content_des').innerHTML = '在“选项内容”中设置选项，一个选项一行，格式为“1=***” ，“=”后为要显示的内容，确保“=”前的数字不是相同的';
+	} else if(id == 'number') {
+		getObj('content_des').innerHTML = '数值范围表示发表帖子时，输入框中填写的数字必须在此设置的范围内，留空则不限制';
+	} else if(id == 'calendar') {
+		getObj('content_des').innerHTML = '发帖和搜索时弹出日期选择框';
+	} else if(id == 'text') {
+		getObj('content_des').innerHTML = '输入框，最大字节长度为255';
+	} else if(id == 'url') {
+		getObj('content_des').innerHTML = '该字段内容浏览时会显示成超链接，最大字节长度为255';
+	} else if(id == 'email') {
+		getObj('content_des').innerHTML = '可以控制输入内容符合电子邮件格式，最大字节长度为255';
+	} else if(id == 'textarea') {
+		getObj('content_des').innerHTML = '文本输入框，最大字节长度为6500';
+	} else if (id == 'img') {
+		getObj('content_des').innerHTML = '可以输入图片链接，浏览时将在图片播放器中显示，最大字节长度为255';
+	} else if (id == 'upload') {
+		getObj('content_des').innerHTML = '可上传图片，浏览时将在图片播放器中显示';
+	} else if(id == 'range') {
+		getObj('content_des').innerHTML = '发帖时表现形式为文本框，但搜索时显示为两个文本框，输入最大值和最小值后，可以搜索出范围内的记录。比如发帖时输入100，搜索时输入“1-150”可以查询到结果';
+	}
+
+	getObj('content_box').style.display = '';
+
+	if (id == 'radio' || id == 'checkbox' || id == 'select'){
+		getObj('content_rules').style.display = '';
+		getObj('content_number').style.display = 'none';
+		getObj('content_calendar').style.display = 'none';
+	} else if (id == 'number'){
+		getObj('content_rules').style.display = 'none';
+		getObj('content_number').style.display = '';
+		getObj('content_calendar').style.display = 'none';
+	} else if (id == 'calendar') {
+		getObj('content_rules').style.display = 'none';
+		getObj('content_number').style.display = 'none';
+		getObj('content_calendar').style.display = '';
+	} else {
+		getObj('content_rules').style.display = 'none';
+		getObj('content_number').style.display = 'none';
+		getObj('content_calendar').style.display = 'none';
+	}
+
+	for (var i=0;i<getObj('fieldtype').options.length ; i++ ){
+		if(id==getObj('fieldtype').options[i].value) {
+			getObj('fieldtype').options[i].selected = true;
+		}
+	}
+}
+
+</script>
+<!--
+EOT;
+}elseif($action == 'editmodelname'){print<<<EOT
+-->
+<form method="post" action="$ajax_basename_editmodelname"  onsubmit="return false;">
+<input type="hidden" name="step" value="2">
+<input type="hidden" name="actid" value="$actid">
+<input type="hidden" name="actmid" value="$actmid">
+<h2 class="h1" style="cursor:move" onmousedown="read.move(event);">编辑活动子分类</h2>
+<div style="max-height:260px;_height:260px;overflow:hidden;overflow-y:auto;width:384px;_width:384px;margin-bottom:5px;">
+    <div class="admin_table mb10">
+    <table cellpadding="0" cellspacing="0" width="100%">
+        <tr class="tr2 vt">
+            <td width="60">顺序</td>
+            <td>子分类名称</td>
+            <td width="50">操作</td>
+        </tr>
+<!--
+EOT;
+foreach($modeldb as $key => $value) {
+if ($value['ifdel']) {
+	$activityModelNameHtml = '<input class="input" name="name[' . $key . ']" value="' . $value[name] . '" />';
+	$activityDeleteModelLinkHtml = '<a href="javascript:;" onclick="delmodel('.$key.');return false;" class="mr20">删除</a>';
+} else {
+	$activityModelNameHtml = $value[name];
+	$activityDeleteModelLinkHtml = '';
+}
+print<<<EOT
+-->
+        <tr class="tr1">
+            <td class="td2"><input type="hidden" name="modellist[$key]" value="$key" /><input type="text" name="vieworder[$key]" value="$value[vieworder]" size="3" class="input" /></td>
+            <td class="td2">{$activityModelNameHtml}</td>
+            <td class="td2"><a href="$basename&action=editmodel&actid=$actid&actmid=$key" class="mr20">编辑</a>{$activityDeleteModelLinkHtml}</td>
+        </tr>
+<!--
+EOT;
+}print<<<EOT
+-->
+    </table>
+    </div>
+</div>
+    <div class="mb10 tac">
+        <span class="btn2"><span><button type="button" onclick="ajax.submit(this.form,modeNameEditResponse);">修 改</button></span></span>
+        <span class="bt2"><span><button type="button" onclick="closep();">取 消</button></span></span>
+    </div>
+</form>
+<script language="JavaScript">
+var basename = '$basename';
+function modeNameEditResponse(){
+	str = ajax.request.responseText.split("\t");
+	if (str[0] == 'success'){
+		showDialog('success','活动子分类修改成功!',2);
+	} else if (str[0] == 'model_name_too_long'){
+		showDialog('error','活动子分类名称太长!',2);
+	} else {
+		showDialog('error','修改失败',2);
+	}
+}
+var ajax_basename_delmodel = '$ajax_basename_delmodel';
+function delmodel(actmid){
+	if (confirm('删除该子分类后将清空其下的所有信息，包括帖子信息！是否确认删除该子分类？')) {
+		ajax.send(ajax_basename_delmodel,'actmid='+actmid,function(){
+				var str = ajax.request.responseText.split("\t");
+				if (str[0] == 'success'){
+					showDialog('success','子分类删除成功!',2);
+				} else if (str[0] == 'the_model_not_exist') {
+					showDialog('error','删除失败，子分类不存在',2);
+				} else if (str[0] == 'model_mustone') {
+					showDialog('error','不允许删除最后一个子分类',2);
+				} else {
+					ajax.guide();
+				}
+			}
+		);
+	}
+}
+</script>
+<!--
+EOT;
+}elseif($action == 'addmodelname'){print<<<EOT
+--><div style="width:300px;">
+<form method="post" action="$ajax_basename_addmodelname"  onsubmit="return false;">
+<input type="hidden" name="step" value="2">
+<input type="hidden" name="actid" value="$actid">
+<input type="hidden" name="actmid" value="$actmid">
+<h2 class="h1" style="cursor:move" onmousedown="read.move(event);">添加子分类</h2>
+<div class="admin_table mb10">
+<table width="100%">
+	<tr class="tr1 vt">
+		<td class="td2">子分类名称:</td>
+		<td class="td2"><input type="text" class="input input_wa" name="modename" value=""></td>
+	</tr>
+</table>
+</div>
+<div class="tac mb10">
+    <span class="btn2"><span><button type="button" onclick="ajax.submit(this.form,modeNameAddResponse);">提 交</button></span></span>
+    <span class="bt2"><span><button type="button" onclick="closep();">取 消</button></span></span>
+</div>
+</form></div>
+<script language="JavaScript">
+var basename = '$basename';
+function modeNameAddResponse(){
+	str = ajax.request.responseText.split("\t");
+	if (str[0] == 'success'){
+		window.location.href = basename+'&action=editmodel&actid='+str[1]+'&actmid='+str[2];
+	}else if (str[0] == 'mode_name_too_long'){
+		showDialog('error','名称长度超过30个字节！',2);
+	}else if (str[0] == 'mode_name_empty'){
+		showDialog('error','名称不能为空！',2);
+	}else if (str[0] == 'samename'){
+		showDialog('error','同个活动分类下不能存在相同的子分类名称',2);
+	}else{
+		showDialog('error','添加失败',500);
+	}
+}
+</script>
+<!--
+EOT;
+}elseif($action == 'addfield'){print<<<EOT
+-->
+<div id="add_field_box">
+<form method="post" action="$ajax_basename_add"  onsubmit="return false;">
+<input type="hidden" name="step" value="2">
+<input type="hidden" name="actmid" value="$actmid">
+<input type="hidden" name="actid" value="$actid">
+<h2 class="h1">
+    <div class="tab_A linka" style="margin-top:3px;">
+        <ul class="cc">
+            <li class="current" style="cursor:move" onmousedown="read.move(event);"><a href="javascript:;">添加字段</a></li>
+            <li onclick="changeAddCopyBox('copy_field_box');"><a href="javascript:;">其他分类导入</a></li>
+        </ul>
+    </div>
+</h2>
+<div class="admin_table mb10" style="width:350px;">
+	<table width="100%">
+		<tr class="tr1 vt">
+			<td style="width:80px;" class="td2">名称</td>
+			<td class="td2">
+				<input class="input input_wa" type="text" name="name" id="name"/>
+			</td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td2">描述</td>
+			<td class="td2">
+				<textarea name="descrip"  id="descrip" class="textarea" style="width:153px;"></textarea>
+			</td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td2">字段类型</td>
+			<td class="td2">
+				<select name="fieldtype" id="fieldtype" onchange="ShowType(this.value);" class="select_wa">
+					<option value="0">选择字段类型</option>
+					<option value="number">数字（number）</option>
+					<option value="text">字串（text）</option>
+					<option value="radio">单选（radio）</option>
+					<option value="checkbox">多选（checkbox）</option>
+					<option value="textarea">文本（textarea）</option>
+					<option value="select">选择（select）</option>
+					<option value="calendar">日历（calendar）</option>
+					<option value="email">电子邮件（email）</option>
+					<option value="url">超链接（url）</option>
+					<option value="img">图片（img）</option>
+					<option value="upload">上传（upload）</option>
+					<option value="range">取值范围（range）</option>
+				</select>
+			</td>
+		</tr>
+		<tr class="tr1 vt" id="content_number"  style="display:none;">
+			<td class="td2">数值范围</td>
+			<td class="td2">
+				<input type="text" name="rules[min]" id="rule_min" class="input input_wc" value=""> - <input type="text" name="rules[max]" id="rule_max" class="input input_wc" value="">
+			</td>
+		</tr>
+		<tr id="content_calendar" class="tr1 vt" style="display:none;">
+			<td class="td2">日期精确到</td>
+			<td class="td2">
+				<input type="radio" name="rules[precision]" value="day" checked="checked" />日 <input type="radio" name="rules[precision]" value="minute" />分
+			</td>
+		</tr>
+		<tr class="tr1 vt" id="content_rules"  style="display:none;">
+			<td class="td2">选项内容</td>
+			<td class="td2">
+				<textarea name="rules[selection]" class="textarea" style="width:153px;"></textarea>
+			</td>
+		</tr>
+		<tr class="tr1 vt" id="content_box" style="display:none;">
+			<td class="td2">提示信息</td>
+			<td class="td2"><div id="content_des"></div></td>
+		</tr>
+	</table>
+</div>
+<div class="tac mb10">
+    <span class="btn2"><span><button type="button" onclick="ajax.submit(this.form,ajax.guide)">添 加</button></span></span>
+    <span class="bt2"><span><button type="button" onclick="closep();">取 消</button></span></span>
+</div>
+</form>
+</div>
+<div id="copy_field_box" style="display:none;">
+<form method="post" action="$ajax_basename_copy"  onsubmit="return false;">
+<input type="hidden" name="actmid" value="$actmid">
+<input type="hidden" name="actid" value="$actid">
+<h2 class="h1">
+    <div class="tab_A linka" style="margin-top:3px;">
+        <ul class="cc">
+            <li onclick="changeAddCopyBox('add_field_box');"><a href="javascript:;">添加字段</a></li>
+            <li class="current" style="cursor:move;"><a href="javascript:;">其他模板导入</a></li>
+        </ul>
+    </div>
+</h2>
+<div class="admin_table mb10" style="width:350px;">
+	<table width="100%">
+		<tr class="tr1 vt">
+			<td style="width:80px;" class="td2">选择模板</td>
+			<td class="td2">
+                <select onchange="selectFieldsByMode(this.value)" class="select_wa">
+                <option value="">--</option>
+<!--
+EOT;
+foreach($select_catedb as $key => $value){print<<<EOT
+-->
+				<optgroup label="$value[name]">
+<!--
+EOT;
+foreach ($select_modeldb as $k => $v){
+if($v['actid'] != $key) continue;
+print<<<EOT
+-->
+				<option value="$v[actmid]">$v[name]</option>
+<!--
+EOT;
+}print<<<EOT
+-->
+				</optgroup>
+<!--
+EOT;
+}print<<<EOT
+-->
+				</select>
+           	</td>
+		</tr>
+        <tr class="tr1 vt">
+        	<td class="td2" colspan="2"><div class="add_list"><div id="fieldlist"></div></div></td>
+        </tr>
+	</table>
+</div>
+<div class="tac mb10">
+	<span class="bt2"><span><button type="button" name="chkall" onclick="CheckIfable(this.form,'copyfield[')">全 选</button></span></span>
+    <span class="btn2"><span><button type="button" onclick="ajax.submit(this.form,ajax.guide)">导 入</button></span></span>
+    <span class="bt2"><span><button type="button" onclick="closep();">取 消</button></span></span>
+</div>
+</form>
+</div>
+<script language="JavaScript">
+var ajax_basename_showfield = '$ajax_basename_showfield';
+function changeAddCopyBox(id){
+	if(id == 'add_field_box') {
+		getObj(id).style.display = '';
+		getObj('copy_field_box').style.display = 'none';
+	} else if (id == 'copy_field_box'){
+		getObj(id).style.display = '';
+		getObj('add_field_box').style.display = 'none';
+	}
+}
+
+function selectFieldsByMode(value){
+
+	var currentactmid = getObj('actmid').value;
+	ajax.send(ajax_basename_showfield,'actmid='+value+'&currentactmid='+currentactmid,showFiledsList);
+}
+
+function showFiledsList(){
+
+	var str = ajax.request.responseText.split("\t");
+	var ul = elementBind('ul','ul_fieldlist');
+	var ofieldlist = getObj('fieldlist');
+	if(IsElement('ul_fieldlist')){delElement('ul_fieldlist');}
+	if(IsElement('copyfieldbutton')){delElement('copyfieldbutton');}
+
+	if (str[0] == 'success'){
+		var fielddb = JSONParse(str[1]);
+		for (var temp in fielddb){
+			var check_box = elementBind('input');
+			check_box.type = 'checkbox';
+			check_box.name = 'copyfield[]';
+			check_box.value = temp;
+			var check_name = elementBind('span');
+			check_name.innerHTML = fielddb[temp];
+			var check_li = elementBind('li');
+			check_li.appendChild(check_box);
+			check_li.appendChild(check_name);
+			ul.appendChild(check_li);
+		}
+	} else {
+		var check_li = elementBind('li');
+		ul.appendChild(check_li);
+		check_li.innerHTML = '该模板没有自定义字段';
+	}
+	ofieldlist.appendChild(ul);
+}
+</script>
+<!--
+EOT;
+}elseif($action == 'viewfield'){print<<<EOT
+-->
+<form method="post" action="$ajax_basename_edit"  onsubmit="return false;">
+<input type="hidden" name="step" value="2">
+<input type="hidden" name="fieldid" value="$fieldid">
+<input type="hidden" name="actid" value="$actid">
+<input type="hidden" name="actmid" value="$actmid">
+<h2 class="h1" style="cursor:move" onmousedown="read.move(event);">查看字段</h2>
+<div class="admin_table mb10" style="width:350px;">
+	<table width="100%">
+		<tr class="tr1 vt">
+			<td style="width:80px;" class="td2">名称</td>
+			<td class="td2">
+				$fielddb[nameInDb]
+			</td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td2">描述</td>
+			<td class="td2">
+				$fielddb[descrip]
+			</td>
+		</tr>
+<!--
+EOT;
+$selectdb = array(
+	'number'=>'数字（number）',
+	'text'=>'字串（text）',
+	'radio'=>'单选（radio）',
+	'checkbox'=>'多选（checkbox）',
+	'textarea'=>'文本（textarea）',
+	'select'=>'选择（select）',
+	'calendar'=>'日历（calendar）',
+	'email'=>'电子邮件（email）',
+	'url'=>'超链接（url）',
+	'img'=>'图片（img）',
+	'upload'=>'上传（upload）',
+	'range'=>'取值范围（range）'
+);
+print<<<EOT
+-->
+		<tr class="tr1 vt">
+			<td class="td2">字段类型</td>
+			<td class="td2">
+				{$selectdb[$fielddb[type]]}
+			</td>
+		</tr>
+<!--
+EOT;
+print<<<EOT
+-->
+		<tr id="content_number" class="tr1 vt" style="display:none;">
+			<td class="td2">数值范围</td>
+			<td class="td2">
+				$minnum - $maxnum
+			</td>
+		</tr>
+		<tr id="content_calendar" class="tr1 vt" style="display:none;">
+			<td class="td2">日期精确到</td>
+			<td class="td2">
+				<input type="radio" name="rule_precision" value="day" disabled="disabled" $calendarChecked[day] />日 <input type="radio" name="rule_precision" value="minute" disabled="disabled" $calendarChecked[minute] />分
+			</td>
+		</tr>
+		<tr id="content_rules" class="tr1 vt" style="display:none;">
+			<td class="td2">选项内容</td>
+			<td class="td2">
+				$rule_content
+			</td>
+		</tr>
+		<tr id="content_box" class="tr1 vt" style="display:none;">
+			<td class="td2">提示信息</td>
+			<td class="td2"><div id="content_des"></div></td>
+		</tr>
+	</table>
+</div>
+<div class="tac mb10">
+    <span class="bt2"><span><button type="button" onclick="closep();">关闭</button></span></span>
+</div>
+<script language="JavaScript">
+var type = '$type';
+setTimeout(function(){ShowType(type);},300);
+</script>
+<!--
+EOT;
+}elseif($action == 'editfield'){print<<<EOT
+-->
+<form method="post" action="$ajax_basename_edit"  onsubmit="return false;">
+<input type="hidden" name="step" value="2">
+<input type="hidden" name="fieldid" value="$fieldid">
+<input type="hidden" name="actid" value="$actid">
+<input type="hidden" name="actmid" value="$actmid">
+<h2 class="h1" style="cursor:move" onmousedown="read.move(event);">编辑字段</h2>
+<div class="admin_table mb10" style="width:350px;">
+	<table width="100%">
+		<tr class="tr1 vt">
+			<td style="width:80px;" class="td2">名称</td>
+			<td class="td2">
+				<input class="input input_wa" type="text" name="name" id="name" value="$fielddb[nameInDb]"/>
+			</td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td2">描述</td>
+			<td class="td2">
+				<textarea name="descrip" id="descrip" class="textarea" style="width:153px;">$fielddb[descrip]</textarea>
+			</td>
+		</tr>
+<!--
+EOT;
+if($ifhidden==1){
+$selectdb = array(
+	'number'=>'数字（number）',
+	'text'=>'字串（text）',
+	'radio'=>'单选（radio）',
+	'checkbox'=>'多选（checkbox）',
+	'textarea'=>'文本（textarea）',
+	'select'=>'选择（select）',
+	'calendar'=>'日历（calendar）',
+	'email'=>'电子邮件（email）',
+	'url'=>'超链接（url）',
+	'img'=>'图片（img）',
+	'upload'=>'上传（upload）',
+	'range'=>'取值范围（range）'
+);
+print<<<EOT
+-->
+		<tr class="tr1 vt">
+			<td class="td2">字段类型</td>
+			<td class="td2">
+				<input type="hidden" name="fieldtype" value="$fielddb[type]">
+				<select id="fieldtype" onchange="ShowType(this.value);" class="select_wa">
+					<option>{$selectdb[$fielddb[type]]}</option>
+				</select>
+			</td>
+		</tr>
+<!--
+EOT;
+}else{print<<<EOT
+-->
+		<tr class="tr1 vt">
+			<td class="td2">字段类型</td>
+			<td class="td2">
+				<select name="fieldtype" id="fieldtype" onchange="ShowType(this.value);" class="select_wa">
+					<option value="0">选择字段类型</option>
+					<option value="number">数字（number）</option>
+					<option value="text">字串（text）</option>
+					<option value="radio">单选（radio）</option>
+					<option value="checkbox">多选（checkbox）</option>
+					<option value="textarea">文本（textarea）</option>
+					<option value="select">选择（select）</option>
+					<option value="calendar">日历（calendar）</option>
+					<option value="email">电子邮件（email）</option>
+					<option value="url">超链接（url）</option>
+					<option value="img">图片（img）</option>
+					<option value="upload">上传（upload）</option>
+					<option value="range">取值范围（range）</option>
+				</select>
+			</td>
+		</tr>
+<!--
+EOT;
+}print<<<EOT
+-->
+		<tr id="content_number" class="tr1 vt" style="display:none;">
+			<td class="td2">数值范围</td>
+			<td class="td2">
+				<input type="text" name="rules[min]" id="rule_min" class="input input_wc" value="$minnum"> - <input type="text" name="rules[max]" id="rule_max" class="input input_wc" value="$maxnum">
+			</td>
+		</tr>
+		<tr id="content_calendar" class="tr1 vt" style="display:none;">
+			<td class="td2">日期精确到</td>
+			<td class="td2">
+				<input type="radio" name="rules[precision]" value="day" $calendarChecked[day] />日 <input type="radio" name="rules[precision]" value="minute" $calendarChecked[minute] />分
+			</td>
+		</tr>
+		<tr id="content_rules" class="tr1 vt" style="display:none;">
+			<td class="td2">选项内容</td>
+			<td class="td2">
+				<textarea name="rules[selection]" class="textarea" style="width:153px;">$rule_content</textarea>
+			</td>
+		</tr>
+		<tr id="content_box" class="tr1 vt" style="display:none;">
+			<td class="td2">提示信息</td>
+			<td class="td2"><div id="content_des"></div></td>
+		</tr>
+	</table>
+</div>
+<div class="tac mb10">
+    <span class="btn2"><span><button type="button" onclick="ajax.submit(this.form,ajax.guide)">修 改</button></span></span>
+    <span class="bt2"><span><button type="button" onclick="closep();">取 消</button></span></span>
+</div>
+</form>
+<script language="JavaScript">
+var type = '$type';
+setTimeout(function(){ShowType(type);},300);
+</script>
+<!--
+EOT;
+}if(!defined('AJAX')){
+include_once PrintEot('adminbottom');
+}
+?>-->

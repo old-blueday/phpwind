@@ -1,0 +1,307 @@
+<!--<?php
+require_once uTemplate::PrintEot('header');
+$_P = array('0'=>'<font color="red" size="+">&#215;</font>','1'=>'<font color="green" size="+">&#8730;</font>');
+require_once uTemplate::PrintEot('profile_left');
+print <<<EOT
+-->
+<div class="contUser">
+	<div class="p15">
+		<h4 class="site"><span>权限</span></h4>
+		<div class="navC mb10">
+			<ul>
+				<li class="current"><a style="cursor:pointer" hidefocus="true">权限查看</a></li>
+				<li><a style="cursor:pointer" href="profile.php?action=buy" hidefocus="true">特殊组购买</a></li>
+			</ul>
+		</div>
+		<div class="sidebar fr">
+<!--
+EOT;
+if (empty($fid)) {print <<<EOT
+-->
+			<div class="boxC mb10">
+				<h3>我拥有的权限有</h3>
+				<ul class="ulE">
+<!--
+EOT;
+foreach($mygpdb as $key => $value){print <<<EOT
+-->
+					<li id="myg_$key"><a href="profile.php?action=permission&gid=$key">$value</a></li>
+<!--
+EOT;
+}print <<<EOT
+-->
+				</ul>
+			</div>
+<!--
+EOT;
+if(!empty($_gmember)){print <<<EOT
+-->
+			<div class="boxC mb10">
+				<h3>会员组权限查看</h3>
+				<ul class="ulE">
+<!--
+EOT;
+foreach($_gmember as $key => $value){print <<<EOT
+-->
+					<li id="sg_$key"><a href="profile.php?action=permission&gid=$key">$value[title]</a>：$value[post]</li>
+<!--
+EOT;
+}print <<<EOT
+-->
+				</ul>
+			</div>
+<!--
+EOT;
+}if(!empty($_gsystem)){print <<<EOT
+-->
+			<div class="boxC mb10">
+				<h3>系统组权限查看</h3>
+				<ul class="ulE">
+<!--
+EOT;
+foreach($_gsystem as $key => $value){print <<<EOT
+-->
+					<li id="sg_$key"><a href="profile.php?action=permission&gid=$key">$value[title]</a></li>
+<!--
+EOT;
+}print <<<EOT
+-->
+				</ul>
+			</div>
+<!--
+EOT;
+}if(!empty($_gspecial)){print <<<EOT
+-->
+			<div class="boxC mb10">
+				<h3>特殊组权限查看</h3>
+				<ul class="ulE">
+<!--
+EOT;
+foreach($_gspecial as $key => $value){print <<<EOT
+-->
+					<li id="sg_$key"><a href="profile.php?action=permission&gid=$key">$value[title]</a></li>
+<!--
+EOT;
+}print <<<EOT
+-->
+				</ul>
+			</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+<script language="JavaScript">
+setCurrent('myg_{$gid}', '', 'current');
+setCurrent('sg_{$gid}', '', 'current');
+</script>
+<!--
+EOT;
+}print <<<EOT
+-->
+		</div>
+		<div class="content fl">
+			<div class="p_lr_10">
+				<div class="">
+<!--
+EOT;
+if ($fid) {print<<<EOT
+-->
+					<div class="mb10"><span class="f14 mr20">版块权限：<a href="profile.php?action=permission&fid=$fid" class="s2">$per[name]</a></span>查看用户权限：<a href="profile.php?action=permission">{$gp_grouptitle}</a></li>
+<!--
+EOT;
+} else {print <<<EOT
+-->
+					<div class="mb10"><span class="mr20 f14">现使用的级别为：<span class="s2">{$gp_grouptitle}</span></span><span>可通过 <a href="profile.php?action=modify">帐号设置</a> 来选择默认头衔</span></div>
+<!--
+EOT;
+}print <<<EOT
+-->
+				</div>
+<!--
+EOT;
+if ($fid) {print<<<EOT
+-->
+				<div class="h5"><strong>版块基本权限</strong></div>
+				<table width="100%" class="mb10" style="table-layout:fixed; word-wrap:break-word;">
+					<tr class="tr6">
+						<th width="80">浏览版块</th>
+						<td>{$_P[$per[visit]]}</td>
+						<th width="80">发表主题</th>
+						<td>{$_P[$per[post]]}</td>
+						<th width="80">回复主题</th>
+						<td>{$_P[$per[rp]]}</td>
+					</tr>
+					<tr class="tr6">
+						<th width="80">上传附件</th>
+						<td>{$_P[$per[down]]}</td>
+						<th width="80">下载附件</th>
+						<td>{$_P[$per[upload]]}</td>
+						<th width="80">&nbsp;</th>
+						<td>&nbsp;</td>
+					</tr>
+				</table>
+				<div class="h5"><strong>版块积分设置</strong></div>
+				<table width="100%" class="mb10" style="table-layout:fixed; word-wrap:break-word;">
+					<tr class="tr6">
+						<th>积分名称</th>
+						<th class="tac">精华主题</th>
+						<th class="tac">取消精华</th>
+						<th class="tac">发表主题</th>
+						<th class="tac">删除主题</th>
+						<th class="tac">发表回复</th>
+						<th class="tac">删除回复</th>
+					</tr>
+<!--
+EOT;
+foreach($forumright as $key=>$val){print <<<EOT
+-->
+					<tr class="tr6">
+						<th>{$credit->cType[$key]}</th>
+						<td class="tac">{$val[Digest]}</td>
+						<td class="tac">{$val[Undigest]}</td>
+						<td class="tac">{$val[Post]}</td>
+						<td class="tac">{$val[Delete]}</td>
+						<td class="tac">{$val[Reply]}</td>
+						<td class="tac">{$val[Deleterp]}</td>
+					</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+				</table>
+<!--
+EOT;
+} else {print <<<EOT
+-->
+				<div class="mb10"><span class="mr20 f14">综合积分：$totalcredit</span>(&nbsp;综合积分 =
+<!--
+EOT;
+$cNames = array('postnum' => '发帖数', 'digests' => '精华', 'onlinetime' => '会员的历史在线时间') + $cNames;
+$add = '';
+foreach ($upgradeset as $key => $value) {
+if ($value) {print <<<EOT
+-->
+												$add $cNames[$key]*$value
+<!--
+EOT;
+$add = '+';
+}}print <<<EOT
+-->)
+				</div>
+				<div class="h5"><strong>资料权限</strong></div>
+				<table width="100%" class="mb10" style="table-layout:fixed; word-wrap:break-word;">
+					<tr class="tr6">
+						<th width="80">隐身登录</th>
+						<td>{$_P[$per[hide]]}</td>
+						<th width="80">浏览帖子</th>
+						<td>{$_P[$per[read]]}</td>
+						<th width="80">搜索权限</th>
+						<td>{$_P[$per[search]]}</td>
+					</tr>
+					<tr class="tr6">
+						<th width="80">会员列表</th>
+						<td>{$_P[$per[member]]}</td>
+						<th width="80">展区功能</th>
+						<td>{$_P[$per[show]]}</td>
+						<th width="80">报告功能</th>
+						<td>{$_P[$per[report]]}</td>
+					</tr>
+					<tr class="tr6">
+						<th width="80">头像上传</th>
+						<td>{$_P[$per[upload]]}</td>
+						<th width="80">自定义头像</th>
+						<td>{$_P[$per[portait]]}</td>
+						<th width="80">荣誉头衔</th>
+						<td>{$_P[$per[honor]]}</td>
+					</tr>
+					<tr class="tr6">
+						<th width="80">统计排行</th>
+						<td>{$_P[$per[sort]]}</td>
+						<th width="80">发消息</th>
+						<td>{$_P[$per[messege]]}</td>
+						<th width="80">消息上限</th>
+						<td>{$per[maxmsg]}</td>
+					</tr>
+					<tr class="tr6">
+						<th width="80">收藏夹容量</th>
+						<td>{$per[maxfavor]}</td>
+						<th width="80">草稿箱容量</th>
+						<td>{$per[maxgraft]}</td>
+						<th width="80">签名大小上限</th>
+						<td>{$per[signnum]} [字节]</td>
+					</tr>
+				</table>
+				<div class="h5"><strong>版块权限</strong></div>
+				<table width="100%" class="mb10" style="table-layout:fixed; word-wrap:break-word;">
+					<tr class="tr6">
+						<th width="80">发表主题</th>
+						<td>{$_P[$per[post]]}</td>
+						<th width="80">回复主题</th>
+						<td>{$_P[$per[rp]]}</td>
+						<th width="80">发起投票</th>
+						<td>{$_P[$per[newvote]]}</td>
+					</tr>
+					<tr class="tr6">
+						<th width="80">参与投票</th>
+						<td>{$_P[$per[vote]]}</td>
+						<th width="80">查看投票</th>
+						<td>{$_P[$per[vwvt]]}</td>
+						<th width="80">发html帖</th>
+						<td>{$_P[$per[html]]}</td>
+					</tr>
+					<tr class="tr6">
+						<th width="80">发隐藏帖</th>
+						<td>{$_P[$per[hidden]]}</td>
+						<th width="80">发出售帖</th>
+						<td>{$_P[$per[sell]]}</td>
+						<th width="80">评分权限</th>
+						<td>{$_P[$per[mark]]}</td>
+					</tr>
+					<tr class="tr6">
+						<th width="80">发团购帖</th>
+						<td>{$_P[$per[allowpcid1]]}</td>
+						<th width="80">发活动帖</th>
+						<td>{$_P[$per[allowpcid2]]}</td>
+						<th width="80">发悬赏帖</th>
+						<td>{$_P[$per[reward]]}</td>
+					</tr>
+					<tr class="tr6">
+						<th width="80">发匿名帖</th>
+						<td>{$_P[$per[anonymous]]}</td>
+						<th width="80">楼主留言</th>
+						<td>{$_P[$per[leaveword]]}</td>
+						<th width="80"></th>
+						<td></td>
+					</tr>
+				</table>
+				<div class="h5"><strong>附件权限</strong></div>
+				<table width="100%" class="mb10" style="table-layout:fixed; word-wrap:break-word;">
+					<tr class="tr6">
+						<th width="80">上传附件</th>
+						<td>{$_P[$per[attach]]}</td>
+						<th width="80">附件个数</th>
+						<td>$per[allownum] [1天]</td>
+						<th width="80">下载附件</th>
+						<td>{$_P[$per[down]]}</td>
+					</tr>
+					<tr class="tr6">
+						<th width="80">附件大小上限</th>
+						<td colspan="5">$per[uploadmaxsize] [k]</td>
+					</tr>
+					<tr class="tr6">
+						<th width="80">附件允许后缀</th>
+						<td colspan="5">$per[uptype] [k]</td>
+					</tr>
+				</table>
+<!--
+EOT;
+}print <<<EOT
+-->
+			</div>
+		</div>
+	</div>
+</div>
+<!--
+EOT;
+require_once(uTemplate::printEot('footer'));
+?>-->

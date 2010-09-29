@@ -1,0 +1,28 @@
+<!--<?php print <<<EOT
+-->
+<p><b>$forumname</b></p>
+<p>
+<!--
+EOT;
+foreach($listdb as $key=>$val){print <<<EOT
+-->
+<b>$key#</b> <a href="read.php?tid=$val[tid]">$val[subject]</a><small>(<a href="read.php?tid=$val[tid]&amp;page=e">$val[replies]</a>)<br />
+[$val[author] $val[postdate]] [<a href="post.php?action=reply&amp;tid=$val[tid]">回</a>]</small><br />
+<!--
+EOT;
+}print <<<EOT
+-->
+</p>
+<!--
+EOT;
+if($pages){print <<<EOT
+-->
+<p>$pages</p>
+<!--
+EOT;
+}print <<<EOT
+-->
+<p><a href="post.php?fid=$fid">发表</a> <a href="index.php?prog=cate">版块</a></p>
+<!--
+EOT;
+?>-->

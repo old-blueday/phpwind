@@ -1,0 +1,64 @@
+<!--<?php
+print <<<EOT
+-->
+<div id="breadCrumb" class="cc">
+	<span class="fr"><select name="fid" onchange="location.href='push.php?fid=' + this.value">
+	<option>查看版块推荐主题</option>
+	$forumcache
+	</select>
+	</span>
+	<img src="$imgpath/$stylepath/thread/home-old.gif" align="absmiddle" />&nbsp;<a href="$db_bfn" title="$db_bbsname">$db_bbsname</a><em>&gt;</em><a href="push.php">推荐主题</a>
+</div>
+
+<div class="t" style="margin-top:8px">
+<table width="100%" align="center" cellspacing="0" cellpadding="3">
+<tr><td colspan="3" class="h"><b>热门推荐主题</b></td></tr>
+<tr>
+<!--
+EOT;
+$sort = array('今日热门推荐','本周热门推荐','本月热门推荐');
+foreach($threaddb as $key=>$thread){print <<<EOT
+-->
+<td valign="top" width="33%">
+<div class="t3" style="padding:1px;border:1px solid $tablecolor;width:98%;margin:5px auto">
+<table width="100%" cellspacing="0" cellpadding="0">
+<tr class="tr2 tac"><td colspan="3"> &nbsp; {$sort[$key]}</td></tr>
+<!--
+EOT;
+$id=0;
+foreach($thread as $k=>$value){
+$id=$k+1;
+$class=$id%2==0 ? "f_two" : "f_one";
+print <<<EOT
+-->
+<tr class="tr3 $class">
+<td style="border-right:0;width:30px;" class="tac">$id</td>
+<td style="border-right:0"><a href="read.php?tid=$value[tid]" target="_blank">$value[subject]</a></td>
+<td style="border-right:0;" align="center" width="15%">$value[dig]</td>
+</tr>
+<!--
+EOT;
+}if($id<$cachenum){
+for($i=$id;$i<$cachenum;$i++){
+$id++;
+$class=$id%2==0 ? "f_two" : "f_one";
+print <<<EOT
+-->
+<tr class="tr3 $class">
+<td style="border-right:0;width:30px;" class="tac">$id</td>
+<td style="border-right:0"></td>
+<td style="border-right:0;" width="15%"></td>
+</tr>
+<!--
+EOT;
+}}print <<<EOT
+-->
+</table></div></td>
+<!--
+EOT;
+}print <<<EOT
+-->
+</tr></table></div>
+<!--
+EOT;
+?>-->

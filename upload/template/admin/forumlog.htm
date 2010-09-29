@@ -1,0 +1,116 @@
+<!--<?php
+include_once PrintEot('left');
+print <<<EOT
+-->
+<div class="admin_info mb10">
+    <h3 class="h1"><b>提示信息</b></h3>
+    <div class="legend"><ol><li>为了保证后台的安全性,系统只允许站点创始人和管理员删除操作日记<br /></li><li>系统保留三天的站点管理日志，只允许删除三天前的日志</li></ol></div>
+</div>
+<form action="$basename&" method="post">
+<h2 class="h1">搜索</h2>
+<div class="admin_table mb10">
+    <table cellpadding="0" cellspacing="0" width="100%">
+        <tr class="tr1 vt">
+            <td class="td2">用户名: <input type="text" class="input input_wa mr5" name='username1'></td>
+            <td class="td2">管理员: <input type="text" class="input input_wa mr5" name='username2'></td>
+            <td class="td2">
+			操作:
+			<select name="type" class="select_wa">
+            <option value="all">全 部</option>
+            <option value="topped" $type_sel[topped]>{$lang[logtype][topped]}</option>
+            <option value="digest" $type_sel[digest]>{$lang[logtype][digest]}</option>
+            <option value="highlight" $type_sel[highlight]>{$lang[logtype][highlight]}</option>
+            <option value="push" $type_sel[push]>{$lang[logtype][push]}</option>
+            <option value="locked" $type_sel[locked]>{$lang[logtype][locked]}</option>
+            <option value="remind" $type_sel[remind]>{$lang[logtype][remind]}</option>
+            <option value="shield" $type_sel[shield]>{$lang[logtype][shield]}</option>
+            <option value="down" $type_sel[down]>{$lang[logtype][down]}</option>
+            <option value="delete" $type_sel[delete]>{$lang[logtype][delete]}</option>
+            <option value="move" $type_sel[move]>{$lang[logtype][move]}</option>
+            <option value="copy" $type_sel[copy]>{$lang[logtype][copy]}</option>
+            <option value="edit" $type_sel[edit]>{$lang[logtype][edit]}</option>
+            <option value="credit" $type_sel[credit]>{$lang[logtype][credit]}</option>
+            <option value="deluser" $type_sel[deluser]>{$lang[logtype][deluser]}</option>
+            <option value="recycle" $type_sel[recycle]>{$lang[logtype][recycle]}</option>
+            <option value="unite" $type_sel[unite]>{$lang[logtype][unite]}</option>
+            <option value="banuser" $type_sel[banuser]>{$lang[logtype][banuser]}</option>
+            </select>
+            </td>
+            <td class="td2"><span class="bt2"><span><button type="submit" value='提 交'>提 交</button></span></span></td>
+        </tr>
+    </table>
+</div>
+</form>
+<form action="$basename&" method="post" name="FORM">
+<input type="hidden" name="action" value="del">
+<h2 class="h1">操作日志</h2>
+<div class="admin_table mb10">
+    <table cellpadding="0" cellspacing="0" width="100%">
+        <tr class="tr2">
+			<td width="30"><span onclick="CheckAll(document.FORM)" class="cp">全选</span></td>
+            <td width="30">类型</td>
+            <td width="80">对象</td>
+            <td width="80">管理员</td>
+            <td>版块</td>
+            <td>描述</td>
+            <td width="90">操作日期</td>
+            <td width="90">IP</td>
+        </tr>
+<!--
+EOT;
+if (empty($logdb)) {print <<<EOT
+-->
+<tr><td class="p10" colspan="8"><div class="admin_tips">啊哦，没有你要的信息！</div></td></tr>
+<!--
+EOT;
+}else{
+foreach($logdb as $key => $value){
+print <<<EOT
+-->
+    <tr class="tr1 vt">
+        <td class="td2">
+<!--
+EOT;
+if(($timestamp-$value[timestamp])>259100){print <<<EOT
+-->
+        <input type="checkbox" name="selid[]" value="$value[id]" onclick="pwJsCheck(this)" />
+<!--
+EOT;
+}print <<<EOT
+-->
+        </td>
+        <td class="td2">{$lang[logtype][$value[type]]}</td>
+        <td class="td2"><a href="u.php?username=$value[username1]" target="_blank">$value[username1]</a></td>
+        <td class="td2"><a href="u.php?username=$value[username2]" target="_blank">$value[username2]</a></td>
+        <td class="td2"><a href="thread.php?fid=$value[field1]" target="_blank">{$forum[$value[field1]][name]}</a></td>
+        <td class="td2">$value[descrip]</td>
+        <td class="td2">$value[date]</td>
+        <td class="td2">$value[ip]</td>
+    </tr>
+<!--
+EOT;
+}}
+$j_url=EncodeUrl("$basename&action=delall");
+print <<<EOT
+-->
+    </table>
+</div>
+<div class="cc mb10">$pages</div>
+<div class="mb10 tac">
+    <span class="btn"><span><button type="submit" name="submit" value="删除">删除</button></span></span>
+    <span class="bt"><span><button type="button" onclick="delRecord();">删除多余管理日志</button></span></span>
+</div>
+</form>
+<script language="JavaScript">
+var j_url = '$j_url';
+function delRecord(){
+	if(!confirm("是否要删除多余日志？"))
+		return false;
+	location.href=j_url;
+}
+</script>
+<!--
+EOT;
+include_once PrintEot('adminbottom');
+?>
+-->

@@ -1,0 +1,257 @@
+<!--<?php
+include_once PrintEot('left');
+if(!$action){print <<<EOT
+-->123123
+<div class="nav3 mb10">
+    <ul class="cc">
+<!--
+EOT;
+if($type==0){print <<<EOT
+-->
+    <li class="current"><a href="$basename">替换词语</a></li>
+    <li><a href="$basename&type=1">禁用词语</a></li>
+    <li><a href="$basename&type=2">报警词语</a></li>
+<!--
+EOT;
+}elseif($type==1){ print <<<EOT
+-->
+    <li><a href="$basename">替换词语</a></li>
+    <li class="current"><a href="$basename&type=1">禁用词语</a></li>
+    <li><a href="$basename&type=2">报警词语</a></li>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+    <li><a href="$basename">替换词语</a></li>
+    <li><a href="$basename&type=1">禁用词语</a></li>
+    <li class="current"><a href="$basename&type=2">报警词语</a></li>
+<!--
+EOT;
+}print <<<EOT
+-->
+    <li><a href="$basename&action=add">新增词语</a></li>
+    <li><a href="$basename&action=batch">导入导出</a></li>
+    <li><a href="$basename&action=renew">更新系数</a></li>
+    </ul>
+</div>
+<h3><b>提示信息</b></h3>
+<div class="tr5">
+<!--
+EOT;
+if($type==0){print <<<EOT
+-->
+替换词语:<br />　　在浏览帖子时，会将帖子中的需要替换的词语替换为对应内容<br />
+<!--
+EOT;
+}elseif($type==1){print <<<EOT
+-->
+禁用词语:<br />　　在发表文章时，检查文章内容中是否含有禁用词语，如果含有禁用词语将被禁止发表，已经发表的文章中如果含有禁用词语将被替换为对应的内容<br />
+<!--
+EOT;
+}else{print <<<EOT
+-->
+报警词语:<br />　　在发表文章时，检查文章内容中是否含有报警词语，如果含有报警词语将自动将文章设为需要管理员审核才能查看(<font color=blue>报警词语无需设置替换词</font>)<br />
+<!--
+EOT;
+}print <<<EOT
+-->
+<font color=blue>更新系数</font>:<br />　　更新系数是用来控制帖子内容是否需要替换的一个参数。如果您希望当前词语过滤设置对以前发的帖子也生效，请选中自动更新选项(或者更改更新系数)。更新操作将在此操作后第一次浏览帖子时进行，每个帖子只更新一次。否则当前词语过滤设置只对新发表的帖子有效。<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color=red>注</font>:添加、修改不良词语需要选中更新选项；删除、修改替换词语时无须更新<br />
+</div>
+
+<form action="$basename" method="post">
+<input type="hidden" name="type" value="$type" />
+<h2>搜索</h2>
+<table width="100%" cellspacing="0" cellpadding="0">
+
+<tr class="tac tr3">
+	<td>关键字：<input type="text" class="input" name="keyword">&nbsp;<input type="submit" class="btn" value="提 交"></td>
+</tr>
+</table></form><br/>
+<form action="$basename" method="post" name="submit">
+<input type="hidden" name="action" value="edit" />
+<input type="hidden" name="type" value="$type" />
+<h2>不良词语</h2>
+<table width="100%" cellspacing="0" cellpadding="0">
+<tr class="tr3 tac">
+	<td width="5%">id</td>
+	<td>
+<!--
+EOT;
+if($type==0){print <<<EOT
+-->
+	替换词语
+<!--
+EOT;
+}elseif($type==1){print <<<EOT
+-->
+	禁用词语
+<!--
+EOT;
+}else{print <<<EOT
+-->
+	报警词语
+<!--
+EOT;
+}print <<<EOT
+-->
+	</td>
+	<td>替换为</td>
+	<td>删除</td>
+</tr>
+<!--
+EOT;
+$id=($page-1)*$db_perpage;
+foreach($replacedb as $key=>$value){
+$id++;
+print <<<EOT
+-->
+<tr class="tr3 tac">
+	<td>$id</td>
+	<td><input class="input" name="word[$key]" type="text" size="40" value="$value[word]"></td>
+	<td><input class="input" name="replace[$key]" type="text" size="40" value="$value[wordreplace]"></td>
+	<td><input type="checkbox" name="selid[]" value="$key" /></td></tr>
+<!--
+EOT;
+} print <<<EOT
+-->
+</table>
+<div class="cc mb10">$pages</div>
+<center>更新系数<input type="radio" name="update" value='1' />自动更新 <input type="radio" name="update" value='0' checked />不更新<br /><br /><input type="submit" class="btn" value="提 交" name="submit"></center>
+</form>
+<!--
+EOT;
+}elseif($action=='add'){ print <<<EOT
+-->
+<ul class="nav3">
+<li><a href="$basename">替换词语</a></li>
+<li><a href="$basename&type=1">禁用词语</a></li>
+<li><a href="$basename&type=2">报警词语</a></li>
+<li class="current"><a href="$basename&action=$action">新增词语</a></li>
+<li><a href="$basename&action=batch">导入导出</a></li>
+<li><a href="$basename&action=renew">更新系数</a></li>
+</ul>
+<div class="c"></div>
+<h3><b>提示信息</b></h3>
+<div class="tr5">
+替换词语:<br />　　在浏览帖子时，会将帖子中的需要替换的词语替换为对应内容<br />
+禁用词语:<br />　　在发表文章时，检查文章内容中是否含有禁用词语，如果含有禁用词语将被禁止发表，已经发表的文章中如果含有禁用词语将被替换为对应的内容<br />
+报警词语:<br />　　在发表文章时，检查文章内容中是否含有报警词语，如果含有报警词语将自动将文章设为需要管理员审核才能查看(<font color=blue>报警词语无需设置替换词</font>)<br />
+<font color=blue>更新系数</font>:<br />　　更新系数是用来控制帖子内容是否需要替换的一个参数。如果您希望当前词语过滤设置对以前发的帖子也生效，请选中自动更新选项(或者更改更新系数)。更新操作将在此操作后第一次浏览帖子时进行，每个帖子只更新一次。否则当前词语过滤设置只对新发表的帖子有效。<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color=red>注</font>:添加、修改不良词语需要选中更新选项；删除、修改替换词语时无须更新<br />
+<font color=blue>替换词语、禁用词语、报警词语格式</font>:<br />以a{2}b{3}c这样的格式填写可以替换addbeec,addbeeec等词语，其中2代表a和b之间能有0~2个任意字符，2可以根据自己的需求更改<br />
+</div>
+<form action="$basename" method="post">
+<input type="hidden" name="action" value="add" />
+<input type="hidden" name="step" value="3" />
+<h2>新增词语 <span class="w"><a href="javascript:addact();">[+]</a> <a href="javascript:removeact();">[-]</a></span></h2>
+<table width="100%" cellspacing="0" cellpadding="0">
+<tr class="tr3 tac">
+	<td>不良词语</td>
+	<td>替换为</td>
+</tr>
+<tr class="tr3 tac">
+	<td><input class="input" name="word[1]" type="text" size="40" /></td>
+	<td><input class="input" name="rep[1]" type="text" size="40" /></td>
+</tr>
+<!--
+EOT;
+for($i=2;$i<=10;$i++){
+$id='act_'.$i;
+print <<<EOT
+-->
+<tr class="tr3 tac" id="$id" style="display:none">
+	<td><input class="input" name="word[$i]" type="text" size="40" /></td>
+	<td><input class="input" name="rep[$i]" type="text" size="40" /></td>
+</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+</td></tr>
+</table><br />
+<!-- APP更改内容 type更改 START -->
+<center>词语类型: <input type="radio" name="type" value="1" checked />替换词语 <input type="radio" name="type" value="3" />禁用词语 <input type="radio" name="type" value="2" />报警词语<br/>更新系数<input type="radio" name="update" value="1" />自动更新 <input type="radio" name="update" value="0" checked />不更新<br /><br />
+<!-- APP更改内容 type END -->
+<input type="submit" value="提 交" name="submit" class="btn" /></center><br/>
+</form>
+<script type="text/javascript">
+var act = 1;
+function addact(){
+	if(act < 10){
+		act++;
+		document.getElementById("act_"+act).style.display = "";
+	}
+}
+function removeact(){
+	if(act > 1){
+		document.getElementById("act_"+act).style.display = "none";
+		act--;
+	}
+}
+</script>
+<!--
+EOT;
+}elseif($action=='batch'){print <<<EOT
+-->
+<ul class="nav3">
+<li><a href="$basename">替换词语</a></li>
+<li><a href="$basename&type=1">禁用词语</a></li>
+<li><a href="$basename&type=2">报警词语</a></li>
+<li><a href="$basename&action=add">新增词语</a></li>
+<li class="current"><a href="$basename&action=$action">导入导出</a></li>
+<li><a href="$basename&action=renew">更新系数</a></li>
+</ul>
+<div class="c"></div>
+<h3><b>提示信息</b></h3>
+<div class="tr5">批量导入:<br />　　选择需要导入的文件(txt)，点击提交<br />　　内容规则:<br />　　1、a=>b (将词语a替换成词语b)<br />　　2、a|b|c=>d (将词语a、b、c替换成词语d)<br />　　3、一行一条记录，替换词语不设置时将使用默认词语</div>
+
+<form action="$basename" method="post" enctype="multipart/form-data">
+<input type="hidden" name="action" value="batch" />
+<input type="hidden" name="step" value="3" />
+<h2>批量导入</h2>
+<table width="100%" cellspacing="0" cellpadding="0">
+<tr class="tr3"><td width="20%">导入文件</td><td><input class="input" type="file" name="upload" size="29" style="height:22px;" /></td></tr>
+<tr class="tr3"><td>默认词语</td><td><input name="mrep" class="input" type="text" size="40" /></td></tr>
+<tr class="tr3"><td>词语类型: </td><td><input type="radio" name="type" value="0" checked />替换词语 <input type="radio" name="type" value="1" />禁用词语 <input type="radio" name="type" value="2" />报警词语</td></tr>
+<tr class="tr3"><td>更新系数</td><td><input type="radio" name="update" value='1' />自动更新 <input type="radio" name="update" value='0' checked />不更新</td></tr>
+</table><br />
+<center><input type="submit" value="提 交" name="submit" class="btn"/></center>
+</form><br/>
+
+<form action="$basename" method="post">
+<input type="hidden" name="action" value="batch" />
+<input type="hidden" name="step" value="5" />
+<h2>词语导出</h2>
+<table width="100%" cellspacing="0" cellpadding="0">
+<tr class="tr3"><td width="20%">导出文件名<br />文件路径 /data</td><td><input class="input" type="text" name="filename" size="40" /> .txt (只允许字符数字和下划线)</td></tr>
+<tr class="tr3"><td>词语类型: </td><td><input type="checkbox" name="type[0]" value='1' checked />替换词语 <input type="checkbox" name="type[1]" value='1' checked />禁用词语 <input type="checkbox" name="type[2]" value='1' checked />报警词语</tr>
+</table><br />
+<center><input type="submit" value="提 交" name="submit" class="btn" /></center>
+</form><br/>
+<!--
+EOT;
+}elseif($action=='renew'){ print <<<EOT
+-->
+<ul class="nav3">
+<li><a href="$basename">替换词语</a></li>
+<li><a href="$basename&type=1">禁用词语</a></li>
+<li><a href="$basename&type=2">报警词语</a></li>
+<li><a href="$basename&action=add">新增词语</a></li>
+<li><a href="$basename&action=batch">导入导出</a></li>
+<li class="current"><a href="$basename&action=$action">更新系数</a></li>
+</ul>
+<div class="c"></div>
+<h3><b>提示信息</b></h3>
+<div class="tr5"><font color=blue>更新系数</font>:<br />　　更新系数是用来控制帖子内容是否需要替换的一个参数。如果您希望当前词语过滤设置对以前发的帖子也生效，请选中自动更新选项(或者更改更新系数)。更新操作将在此操作后第一次浏览帖子时进行，每个帖子只更新一次。否则当前词语过滤设置只对新发表的帖子有效。<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color=red>注</font>:添加、修改不良词语需要选中更新选项；删除、修改替换词语时无须更新<br /></div>
+<form action="$basename" method="post">
+<input type="hidden" name="step" value="3" />
+<input type="hidden" name="action" value="renew" />
+<h2>更新系数调整</h2>
+<table width="100%" cellspacing="0" cellpadding="0">
+<tr class="tr3"><td>当前系数:{$db_wordsfb} （当该值发生变化时，将会重新审核帖子内容是否需要替换，范围1~9）</td></tr>
+<tr class="tr3"><td>期望系数:<input type="text" class="input" size="5" name="desvalue" value="$desvalue" /> <input type="submit" class="btn" value="更 新" /></td></tr>
+</table>
+</form><br/>
+<!--
+EOT;
+}include_once PrintEot('adminbottom');
+?>-->

@@ -1,0 +1,95 @@
+<!--<?php
+print <<<EOT
+-->
+<div class="menu_tasksA menu-post" id="jobpop" style="z-index:9">
+	<div class="menu-b">
+    	<div class="menu_tasksA_con cc">
+        	<div class="menu_tasksA_tab">
+            	<a href="javascript:;" class="fr menu_close" hidefocus="true" title="关闭" id="close">关闭</a>
+            	<ul class="cc">
+                	<li class="current dopen"><a href="javascript:;" hidefocus="true">已申请的任务</a></li>
+                    <li class="dopen"><a href="javascript:;" hidefocus="true">去申请任务</a></li>
+                </ul>
+            </div>
+            <div id="tasktab_1" class="tasktab_1">
+            	<!-- ajax -->
+				$appliedHTML
+            </div>
+            <div id="tasktab_2" class="tasktab_1" style="display:none;">
+
+<!--
+EOT;
+if($lists){
+foreach($lists as $list){
+$list[title] = substrs($list['title'],56);
+print <<<EOT
+-->
+                <div class="jobpop_h current"><a href="javascript:;" class="menu_tasksA_title" hidefocus="true"><b></b>$list[title]</a></div>
+                <dl class="cc taskA_dl" style="display:none;">
+                    <dt><img src="$list[icon]" alt="icon" /></dt>
+                    <dd>
+                    	<table width="100%" style="table-layout:fixed;">
+                        	<tr class="vt">
+                            	<td width="80">完成条件:</td>
+                                <td>$list[condition]</td>
+                            </tr>
+<!--
+EOT;
+if($list['usergroup']){print <<<EOT
+-->
+                            <tr class="vt">
+                            	<td>允许用户组:</td>
+                                <td>$list[usergroup]</td>
+                            </tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+<!--
+EOT;
+if($list['number']){print <<<EOT
+-->
+	                         <tr class="vt">
+                            	<td>人数限制:</td>
+                                <td>$list[number]</td>
+                            </tr>
+<!--
+EOT;
+}print <<<EOT
+-->	
+                            <tr class="vt">
+                            	<td>任务周期:</td>
+                                <td>$list[period]</td>
+                            </tr>
+                            <tr class="vt">
+                            	<td>完成奖励:</td>
+                                <td class="s3">$list[reward]</td>
+                            </tr>
+                            <tr class="vt">
+                            	<td>任务描述:</td>
+                                <td>$list[description]</td>
+                            </tr>
+                            <tr>
+                            	<td></td>
+                                <td><span class="fr">$list[btn]</span></td>
+                            </tr>
+                        </table>
+                    </dd>
+                </dl>
+<!--
+EOT;
+}
+}
+print <<<EOT
+-->
+
+            </div>
+            <div class="tasks_join cc">
+            	<a href="javascript:;" id="gotocenter">进入任务中心</a><i>指向</i>
+            </div>
+    	</div>
+    </div>
+</div>
+<!--
+EOT;
+?>-->

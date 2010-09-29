@@ -1,0 +1,133 @@
+<!--<?php print <<<EOT
+-->
+<html>
+<head>
+<title>发表交易帖</title>
+<script type="text/javascript" src="js/dialog.js"></script>
+<script language="JavaScript">
+window.resizeTo(500, 90);
+function Init(){
+	__dlg_init();
+};
+var method='3';
+function setmethod(mode){
+	var tmp=0;
+	method = mode;
+	obj=document.getElementById("setmethod");
+	if(mode==2){
+		if(obj.style.display=="none"){
+			tmp=1;
+		}
+		obj.style.display="";
+	}else{
+		if(obj.style.display==""){
+			tmp=1;
+		}
+		obj.style.display="none";
+	}
+	if(tmp){
+		window.resizeTo(500, 90);
+		__dlg_init();
+	}
+}
+function info(){
+	var code;
+	var required = {
+		"seller": "卖家帐号不能为空。",
+		"subject": "商品名称不能为空。",
+		"price": "商品价格不能为空。"
+	};
+	for (var i in required) {
+		var el = document.getElementById(i);
+		if (!el.value) {
+			alert(required[i]);
+			el.focus();
+			return false;
+		}
+	}
+	dm=document.form;
+	code  = '[payto]';
+	code += '(seller)' + dm.seller.value + '(/seller)';
+	code += '(subject)' + dm.subject.value + '(/subject)';
+	code += '(body)' + dm.body.value + '(/body)';
+	code += '(price)' + dm.price.value + '(/price)';
+	code += '(ordinary_fee)' + dm.ordinary_fee.value + '(/ordinary_fee)';
+	code += '(express_fee)' + dm.express_fee.value + '(/express_fee)';
+	code += '(demo)' + dm.demo.value + '(/demo)';
+	code += '(contact)' + dm.contact.value + '(/contact)';
+	code += '(method)' + method + '(/method)';
+	code += '[/payto]';
+	__dlg_close(code);
+	return false;
+}
+</script>
+<style type="text/css">
+html, body {
+  background: ButtonFace;
+  color: ButtonText;
+  font: 12px Tahoma,Verdana,sans-serif;
+  margin: 0px;
+  padding: 0px;
+}
+body { padding: 5px; }
+table { font: 12px Tahoma,Verdana,sans-serif;}
+select, input, button { font: 11px Tahoma,Verdana,sans-serif; }
+button { width: 70px; }
+form { padding: 0px; margin: 0px; }
+</style>
+</head>
+<body onload="Init()">
+<form name="form">
+<table cellspacing="4" cellpadding="0" align="center">
+<tr>
+	<td width="20%" class="t_one">卖家:</td>
+	<td class="t_one"><input id="seller" name="seller" size="30" /></td>
+</tr>
+<tr>
+	<td width="20%" class="t_one">商品名称:</td>
+	<td class="t_one">
+		<input id="subject" name="subject" size="30" />
+		价格:<input id="price" name="price" size="7" />
+	</td>
+</tr>
+<tr>
+	<td width="20%" class="t_one">商品描述:</td>
+	<td class="t_one"><textarea name="body" rows="5" cols="45"></textarea></td>
+</tr>
+<tbody id="setmethod" style="display:none">
+<tr>
+	<td width="20%" class="t_one">邮费承担方:</td>
+	<td class="t_one">
+		<input type="radio" value="1" name="transport" onclick="this.form.ordinary_fee.disabled=true;this.form.express_fee.disabled=true;" checked /> 卖家承担运费&nbsp;&nbsp; 
+		<input type="radio" value="2" name="transport" onclick="this.form.ordinary_fee.disabled=false;this.form.express_fee.disabled=false;" /> 买家承担运费<br />
+		<input type="hidden" value="3" />
+		平邮&nbsp;<input disabled size="7" name="ordinary_fee" /> 元 &nbsp;&nbsp; 
+		快递&nbsp;<input disabled size="7" name="express_fee" /> 元
+	</td>
+</tr>
+</tbody>
+<tr>
+	<td width="20%" class="t_one">演示地址:</td>
+	<td class="t_one"><input name="demo" size="30" /></td>
+</tr>
+<tr>
+	<td width="20%" class="t_one">联系方式:</td>
+	<td class="t_one"><input name="contact" size="30" /></td>
+</tr>
+<tr>
+	<td width="20%" class="t_one">收款方式</td>
+	<td class="t_one">
+		<input type="radio" name="md" value="2" onclick="setmethod(2);" checked />使用支付宝收款
+		<input type="radio" name="md" value="1" onclick="setmethod(1);" />使用贝宝收款
+		<input type="radio" name="md" value="3" onclick="setmethod(3);" />使用快钱收款
+	</td>
+</tr>
+<tr align="center"><td colspan="2">
+<br />
+<input type="button" onclick="return info();" value="确 认" />
+<input type="button" onclick="window.returnValue ='' ;window.close();" value="取消" />
+</td></tr></table>
+</form></body></html>
+<!--
+EOT;
+?>-->

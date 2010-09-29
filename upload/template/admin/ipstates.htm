@@ -1,0 +1,54 @@
+<!--<?php
+include_once PrintEot('left');
+print <<<EOT
+-->
+<div class="nav3 mb10">
+  <ul class="cc">
+    <li><a href="$admin_file?adminjob=ipban">IP 禁止</a></li>
+    <li class="current"><a href="$admin_file?adminjob=ipban&job=ipstates">IP 统计</a></li>
+    <li><a href="$admin_file?adminjob=ipban&job=ipsearch">IP 检索</a></li>
+  </ul>
+</div>
+<div class="admin_info mb10">
+  <h3 class="h1"><b>提示信息</b></h3>
+  <div class="legend">可以统计每月到访的ip量，每日到访的ip量，站长可以根据统计清楚的了解站点的流量情况。</div>
+</div>
+<form action="$basename" method="post" name="creat">
+  <h2 class="h1">IP统计设置</h2>
+  <div class="admin_table mb10">
+    <table width="100%" cellspacing="0" cellpadding="0">
+      <tr class="tr1 vt">
+        <td class="td1">IP统计</td>
+        <td class="td2">
+        	<ul class="cc list_80 list_A mr10">
+                <li><input type="radio" value="1" $ipstates_Y name="ipstates">开启</li>
+                <li><input type="radio" value="0" $ipstates_N name="ipstates">关闭</li>
+          </ul>
+        </td>
+      </tr>
+    </table>
+  </div>
+  <input type="hidden" name="action" value="submit">
+  <div class="mb10 tac"><span class="btn"><span>
+    <button type="submit"  value="提 交">提 交</button>
+    </span></span></div>
+</form>
+<h2 class="h1">IP 索引</h2>
+<form action="$basename" method="post" name="ipIndex">
+  <input type="hidden" name="action" value="ipIndex"/>
+  <div class="admin_table mb10">
+    <table width="100%" cellspacing="0" cellpadding="0">
+      <tr class="tr1 vt">
+        <td class="td1">创建或更新IP库的索引文件，加快IP解析速度</td>
+        <td class="td2"><span class="bt2"><span>
+          <button type="submit"  value="创建IP索引">创建IP索引</button>
+          </span></span> </td>
+      </tr>
+    </table>
+  </div>
+</form>
+<!--
+EOT;
+include_once PrintEot('adminbottom');
+?>
+-->

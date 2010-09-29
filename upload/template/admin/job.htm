@@ -1,0 +1,138 @@
+<!--<?php
+include_once PrintEot('left');
+print <<<EOT
+-->
+<script type="text/javascript" language="JavaScript" src="js/desktop/adminjob.js"></script>
+<div class="admin_info mb10">
+	<h3 class="h1"><b>提示信息</b></h3>
+    <div class="legend">
+    	<ol>
+        	<li>只有勾选启用后，用户才可以申请任务</li>
+            <li>设置了显示顺序后，所有的任务显示列表都会按这个顺序排序</li>
+            <li>默认提供的任务数据，可以选择使用，也可以作为新增任务的参考</li>
+        </ol>
+    </div>
+</div>
+<form action="$basename&action=setting" method="post">
+<h2 class="h1">基本设置</h2>
+<div class="admin_table mb10">
+	<table cellpadding="0" cellspacing="0" width="100%">
+        <tr class="tr1 vt">
+            <td class="td1">任务中心</td>
+            <td class="td2">
+           	 	<div class="list_A list_80">
+                    <ul class="cc">
+                        <li><input type="radio" value="1" name="isopen" $isopen[1] />开启</li>
+                        <li><input type="radio" value="0" name="isopen" $isopen[0] />关闭</li>
+                    </ul>
+                </div>
+            </td>
+        </tr>
+        <tr class="tr1 vt">
+            <td class="td1">新任务提示框</td>
+            <td class="td2">
+            <div class="list_A list_80">
+                    <ul class="cc">
+                        <li><input type="radio" value="1" name="ispop" $ispop[1] />开启</li>
+                        <li><input type="radio" value="0" name="ispop" $ispop[0] />关闭</li>
+                    </ul>
+                </div>		
+            </td>
+        </tr>
+    </table>
+ </div>
+ <div class="mb10 tac">
+<span class="btn"><span><button type="submit" name="submit">提 交</button></span></span>
+</div>
+</form>
+<h2 class="h1">
+<span class="fl mr10">任务管理</span>
+<a class="btn_add fl" href="$basename&action=add" hidefocus="true"><i>添加任务</i></a>
+</h2>
+<form action="$basename" method="post">
+<input type="hidden" name="step" value="2" />
+<div class="admin_table mb10">
+	<table cellpadding="0" cellspacing="0" width="100%">
+        <tr class="tr2 vt td_bgB">
+            <td>启用</td>
+            <td>顺序</td>
+            <td>名称</td>
+            <td>类型</td>
+            <td>奖励</td>
+            <td>有效时间</td>
+            <td>周期</td>
+            <td>操作</td>
+        </tr>
+<!--
+EOT;
+if($joblists){
+foreach($joblists as $job){
+print <<<EOT
+-->
+        <tr class="tr1 vt">
+            <td class="td2"><input name="joblist[$job[id]][isopen]" type="checkbox" value="1" $job[isopen] /></td>
+            <td class="td2"><input name="joblist[$job[id]][sequence]" type="text" class="input input_wc" value="$job[sequence]"/></td>
+            <td class="td2"><input name="joblist[$job[id]][title]" type="text" class="input input_wa" value="$job[title]" /></td>
+            <td class="td2">$job[jobtype]</td>
+            <td class="td2">$job[reward]</td>
+            <td class="td2">$job[timetips]</td>
+            <td class="td2">$job[period]</td>
+            <td class="td2"><a href="$basename&action=edit&id=$job[id]" class="mr20">[编辑]</a><a href="javascript:;" onclick="deleteJob('$ajaxUrl',$job[id]);">[删除]</a></td>
+        </tr>
+<!--
+EOT;
+}
+}
+print <<<EOT
+-->
+    </table>
+    <div class="cc mb10">$pages</div>
+</div>
+<div class="mb10 tac">
+    <span class="bt"><span><button type="button" id="checkall">全 选</button></span></span>
+    <span class="btn"><span><button type="submit">提 交</button></span></span>
+</div>
+<script type="text/javascript">
+var checkAllJob = function(){
+	var inputs = document.getElementsByTagName("input");
+	var elements = new Array();
+	checked = 0;
+	for(i=0;i<inputs.length;i++){
+		if(inputs[i].type != "checkbox"){
+			continue;
+		}
+		var name = inputs[i].getAttribute("name");
+		if(name.indexOf("joblist")<0){
+			continue;
+		}
+		if(inputs[i].checked){
+			checked++;
+		}
+		elements.push(inputs[i]);
+	}
+	if(checked == elements.length ){
+		for(i=0;i<elements.length;i++){
+			elements[i].checked = "";
+		}
+	}else{
+		for(i=0;i<elements.length;i++){
+			elements[i].checked = "checked";
+		}
+	}
+	return false;
+}
+window.onload = function(){
+	if(parent.adminNavClass){
+		parent.adminNavClass.initTips();
+	}
+	getObj("checkall").onclick=function(){
+		checkAllJob();
+	}
+}
+</script>
+</form>
+<!--
+EOT;
+include_once PrintEot('adminbottom');
+?>
+-->

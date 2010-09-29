@@ -1,0 +1,110 @@
+<!--<?php
+include_once uTemplate::PrintEot('header');
+include_once uTemplate::PrintEot('space_appleft');
+$privacy = array('全站可见','仅好友可见','仅自己可见');
+print <<<EOT
+-->
+<div class="sideD">
+	<div class="boxA">
+		<h2><span class="mr20"><span class="mr10">朋友</span><!--({$count}位)--></span></h2>
+		<div class="p10">
+<!--
+EOT;
+if (!empty($friends)) {
+print <<<EOT
+-->	
+			<ul class="half cc">
+<!--
+EOT;
+foreach ($friends as $key => $value) {
+$value[honor] = substrs($value[honor],50);
+print <<<EOT
+-->
+				<li>
+					<dl class="friDl cc p10 mr10 mb10">
+						<dt class="fl mr10"><a href="u.php?uid=$value[uid]" class="img_50"><img src="$value[face]" width="48" height="48" /></a></dt>
+						<dd>
+							<div><!--
+EOT;
+if (!$value['attention']) {print <<<EOT
+--><a href="javascript:;" onclick="Attention.add(this,{$value[uid]},1);" class="fr follow s7">加关注</a><!--
+EOT;
+} else {print <<<EOT
+--><a href="javascript:;" class="fr following gray">关注中</a>
+<!--
+EOT;
+}print <<<EOT
+--><a href="u.php?uid=$value[uid]" class="b f14 mr5">$value[username]</a><!--
+EOT;
+if(checkOnline($value['thisvisit'])){
+print <<<EOT
+-->
+<img src="images/online.png" alt="在线" title="在线" style="vertical-align:middle" />
+<!--
+EOT;
+} else {print <<<EOT
+-->
+<img src="images/stealth.png" alt="离线" title="离线" style="vertical-align:middle" />
+<!--
+EOT;
+}print <<<EOT
+--></div>
+<!--
+EOT;
+if ($value[honor]) {print <<<EOT
+-->
+							<div class="lh_18">{$value[honor]}</div>
+<!--
+EOT;
+} else {print <<<EOT
+-->
+							<div>该用户暂无签名</div>
+<!--
+EOT;
+}
+$db_menuinit .= ",'td_More{$value[uid]}' : 'menu_More{$value[uid]}'";
+print <<<EOT
+--><!--最近登录: {$value[lastvisit]}-->
+							<div class="cc">
+								<a href="javascript:;" class="adown s7 fr" id="td_More{$value[uid]}">更多操作</a>
+								<div class="pw_menu" style="display:none;" id="menu_More{$value[uid]}">
+									<ul class="menuList" style="width:70px;">
+<!--
+EOT;
+if ($value['is_friend']) {print <<<EOT
+--><li><a href="javascript:;" onclick="pwConfirm('是否确认解除？',this,function(){delFriend('$value[uid]')});">解除好友</a></li><!--
+EOT;
+} else {print <<<EOT
+--><li><a href="pw_ajax.php?action=addfriend&touid={$value[uid]}"  onclick="return ajaxurl(this);" title="加为好友">加为好友</a></li><!--
+EOT;
+}print <<<EOT
+--><li><a href="javascript:;" onclick="sendmsg('pw_ajax.php?action=msg&touid=$value[uid]');" title="发送消息">发送消息</a></li>
+									</ul>
+								</div>
+								最近登录: {$value[lastvisit]}
+							</div>
+						</dd>
+					</dl>
+				</li>
+<!--
+EOT;
+}print <<<EOT
+-->	
+			</ul>
+<!--
+EOT;
+} else {print <<<EOT
+-->
+				<div class="p15 f14 tac">暂无朋友,<a href="u.php?a=friend&type=find">寻找我的朋友</a></div>
+<!--
+EOT;
+}print <<<EOT
+-->				<div class="mb10 cc">$pages</div>
+        </div>
+	</div>
+</div>	
+
+<!--
+EOT;
+require_once uTemplate::printEot('footer');
+?>-->

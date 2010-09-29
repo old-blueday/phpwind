@@ -1,0 +1,47 @@
+<!--<?php
+include_once PrintEot('left');
+print <<<EOT
+-->
+<h2 class="h1">用户组成员统计</h2>
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+<!--
+EOT;
+foreach($groupnum as $group){print <<<EOT
+-->
+	<tr class="tr1 vt">
+		<td class="td1">$group[2]</td>
+		<td class="td2" width="100">$group[0](个)</td>
+		<td class="td2">
+<!--
+EOT;
+if ($group[0]) {
+if($group[1]=='-1'){print <<<EOT
+-->
+			[<a href="$admin_file?adminjob=setuser&action=search&groupid=$group[1]" onclick="parent.PW.Dialog({id:'setuser',url:'$admin_file?adminjob=setuser&action=search&groupid=$group[1]',name:'会员管理'});return false;">查看用户组会员</a>]
+<!--
+EOT;
+}else{ print <<<EOT
+-->
+			[<a href="$admin_file?adminjob=setuser&action=search&groupid=$group[1]&orderway=username" onclick="parent.PW.Dialog({id:'setuser',url:'$admin_file?adminjob=setuser&action=search&groupid=$group[1]&orderway=username',name:'会员管理'});return false;">查看用户组会员</a>]
+<!--
+EOT;
+}}else{ print <<<EOT
+-->
+&nbsp;
+<!--
+EOT;
+}print <<<EOT
+-->
+		</td>
+	</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+</table>
+</div>
+<!--
+EOT;
+include_once PrintEot('adminbottom');
+?>-->

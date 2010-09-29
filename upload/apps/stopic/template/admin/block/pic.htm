@@ -1,0 +1,74 @@
+<!--
+<?php
+
+if ('show' == $block_job) {
+print <<<EOT
+-->
+<ul class="list-img-a cc">
+<!--
+EOT;
+	foreach ($block_data as $v) {
+print <<<EOT
+-->
+	<li>
+		<a href="{$v[url]}" target="_blank">
+			<img src="{$v[image]}" />
+		</a>
+	</li>
+<!--
+EOT;
+	}
+print <<<EOT
+-->
+</ul>
+<!--
+EOT;
+} else {
+print <<<EOT
+-->
+	<tr class="tr1 vt">
+		<td class="td2" width="80">模块标题</td>
+        <td class="td2" colspan="2"><input type="text" name="block_title" value="$block[title]" class="input input_wa"></td>
+	</tr>
+    <tr class="tr1 vt">
+    	<td class="td2">帖子tid[选填]</td>
+        <td class="td2" colspan="2">
+       		<input type="text" id="tid" size="10" class="input input_wa mr5">
+			<span class="bt2"><span><button type="button" onclick="javascript:New(addFildData,['fildbody','filddata','tid']);">添加导航记录</button></span></span>
+		</td>
+        <td>&nbsp;</td>
+	</tr>
+    <tr class="tr2 td_bgA">
+        <td width="160">链接地址</td>
+        <td width="160">图片地址<span class="s1">*</span></td>
+        <td>&nbsp;</td>
+    </tr>
+<tbody id="fildbody">
+<!--
+EOT;
+	foreach ($block_data as $v) {
+print <<<EOT
+-->
+       <tr class="tr1 vt">
+           <td class="td2"><input type="text" name="url[]" value="{$v[url]}" class="input input_wa"></td>
+           <td class="td2"><input type="text" name="image[]" value="{$v[image]}" class="input input_wa"></td>
+           <td class="td2"><a href="javascript:void(0);" onclick="delTr(this);">[删除]</a></td>
+       </tr>
+<!--
+EOT;
+	}
+print <<<EOT
+-->
+</tbody>
+<tbody id="filddata" style="display:none;">
+    <tr class="tr1 vt">
+        <td class="td2"><input type="text" name="url[]" value=""  class="input input_wa"></td>
+        <td class="td2"><input type="text" name="image[]" value=""  class="input input_wa"></td>
+        <td class="td2"><a href="javascript:void(0);" onclick="delTr(this);">[删除]</a></td>
+    </tr>
+</tbody>
+<!--
+EOT;
+}
+?>
+-->

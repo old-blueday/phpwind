@@ -1,0 +1,16 @@
+<!--<?php
+print <<<EOT
+-->
+<link rel="stylesheet" type="text/css" href="u/images/usercenter.css" />
+<div class="sideA">
+<!--
+EOT;
+$data = $newSpace->getSpaceData(array('info'=>1));
+require_once(uTemplate::printEot('space_model'));
+$spacetemplate->info($data['info']);
+print <<<EOT
+-->
+</div>
+<!--
+EOT;
+?>-->

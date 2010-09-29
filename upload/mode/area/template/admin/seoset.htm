@@ -1,0 +1,79 @@
+<!--<?php
+include_once PrintEot('left');
+print <<<EOT
+-->
+<div class="nav3 mb10">
+    <ul class="cc">
+<!--
+EOT;
+foreach($db_modes as $key => $value){
+if($value['ifopen'] && !in_array($key,$unSeoset)){
+$current_menu = $key == $mode ? 'class="current"' : '';
+print <<<EOT
+-->
+        <li $current_menu><a href="$basename&mode=$key">$value[m_name]</a></li>
+<!--
+EOT;
+}}print <<<EOT
+-->
+    </ul>
+</div>
+<div class="admin_info mb10">
+	<h3 class="h1">{$db_modes[$mode][m_name]}SEO优化设置</h3>
+    <div class="legend">
+        <ol>
+            <li>网页SEO优化设置规则：</li>
+            <li>网站名称:{wzmc}</li>
+            <li>频道名称:{pdmc}</li>
+            <li>以上标签（必须包含大括号"{}"）可以通过添加在下面来优化页面SEO设置，多个标签之间可以用半角连字符"-"、半角","或半角空格隔开。留空为默认SEO设置，如果标签不再应用范围内则不显示此标签</li>
+        </ol>
+    </div>
+</div>
+<form action="$basename" method="post" >
+<input type="hidden" name="action" value="update" />
+<input type="hidden" name="mode" value="$mode" />
+<h2 class="h1">{$db_modes[$mode][m_name]}频道SEO</h2>
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+<!--
+EOT;
+if (empty($clist)) {print <<<EOT
+-->
+<tr><td class="p10" colspan="9"><div class="admin_tips">啊哦，没有你要的信息！</div></td></tr>
+<!--
+EOT;
+}else{
+foreach($clist as $key => $cate){print <<<EOT
+-->
+	<tbody>
+        <tr class="tr2">
+        	<td>$cate[name]</td>
+            <td>&nbsp;</td>
+        </tr>
+        <tr class="tr1 vt">
+            <td class="td1">Title</td>
+            <td class="td2"><input type="text" class="input input_wb" name="channellist[$key][metatitle]" value="$cate[metatitle]" maxlength="250" /></td>
+        </tr>
+        <tr class="tr1 vt">
+            <td class="td1">Meta Description</td>
+            <td class="td2"><input type="text" class="input input_wb" name="channellist[$key][metadescrip]" value="$cate[metadescrip]" maxlength="250" /></td>
+        </tr>
+        <tr class="tr1 vt">
+            <td class="td1">Meta Keywords</td>
+            <td class="td2"><input type="text" class="input input_wb" name="channellist[$key][metakeywords]" value="$cate[metakeywords]" maxlength="250" /></td>
+        </tr>
+	</tbody>
+<!--
+EOT;
+}}print <<<EOT
+-->
+	</table>
+</div>
+<div class="tac mb10">
+	<span class="btn"><span><button type="submit">提 交</button></span></span>
+</div>
+</form>
+<!--
+EOT;
+include_once PrintEot('adminbottom');
+?>-->

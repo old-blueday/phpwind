@@ -1,0 +1,279 @@
+<!--<?php
+$posturl = "apps.php?q=group&a=reply&tid=$tid&cyid=$cyid";
+$fastDo = $psot_sta ? '回复' : '发帖';
+$tmpVerify = GetVerify($onlineip.$GLOBALS['winddb']['regdate'].$fid.$tid);
+if(strlen($readdb[0][subject])>77) $readdb[0][subject] = substr($readdb[0][subject],0,77);
+print <<<EOT
+-->
+<table cellPadding="0" cellSpacing="0" style="display:none">
+	<tbody id="att_mode"><tr>
+		<td width="240"><input class="input" type="file" name="attachment_" size="25" /></td>
+		<td>描述 <input class="input" type="text" name="atc_desc" size="18" /></td>
+		<td style="height:25px;line-height:25px;"></td></tr>
+	</tbody>
+</table>
+<link rel="stylesheet" type="text/css" href="$imgpath/post/fast_editor.css" />
+<form name="FORM" method="post" action="{$basename}a=reply&cyid=$cyid" enctype="multipart/form-data" onsubmit="return checkpost(document.FORM);" id="anchor">
+<input type="hidden" name="step" value="3" />
+<input type="hidden" name="tid" value="$tid" />
+<input type="hidden" name="verify" value="$verifyhash" />
+<div class="g_bgB">
+<table width="100%" style="table-layout:fixed">
+    <tr class="vt">
+        <td class="floot_left">
+            <div class="p10">
+<!--
+EOT;
+if($winduid){print<<<EOT
+-->
+                <p class="gName mb5 cc">
+					<a href="u.php?uid=$winduid" target="_blank" class="mr5 fl" target="_blank">$windid</a>
+<!--
+EOT;
+if($db_showonline){
+if (checkOnline($winddb['thisvisit'])){print <<<EOT
+-->
+					<span class="card-online" title="在线">在线</span>
+<!--
+EOT;
+}else{print<<<EOT
+-->
+					<span class="card-offline" title="离线">离线</span>
+<!--
+EOT;
+}}print <<<EOT
+-->
+				</p>
+<!--
+EOT;
+}
+list($fp_face) = showfacedesign($winddb['icon'],1);
+print <<<EOT
+-->
+                <p class="mb10">
+					<a href="u.php?uid=$winduid"  class="gFace" target="_blank">
+					<img src="$fp_face" width="80" height="80" /></a>
+				</p>
+            </div>
+        </td>
+        <td class="floot_right">
+            <div class="fp_content">
+                <div class="cc" style="margin-bottom:12px;">
+                    <div class="pr fl"><input type="text" class="input" id="atc_title" name="atc_title" value="RE:{$resubject}" size="55" />
+                    <div class="w_input_text" id="atc_title_warn" style="display:none;">限 $db_titlemax 字节</div></div>
+                </div>
+
+                <div class="fp_editor cc" id="fp_editor" onclick="loadEditor(event);">
+                    <div class="fp_editor_but cc">
+                    <a href="javascript:gotoEditor();" class="fr" hidefocus="true" id="gotoedit">进入高级模式</a>
+                        <div>
+                            <a href="javascript:;" title="加粗" id="wy_bold" hidefocus="true">加粗</a>
+                            <a href="javascript:;" title="字体颜色" id="wy_forecolor" hidefocus="true">字体颜色</a>
+                            <a href="javascript:;" title="背景" id="wy_hilitecolor" hidefocus="true">背景颜色</a>
+                            <a href="javascript:;" title="插入链接" id="wy_createlink" hidefocus="true">插入链接</a>
+                            <a href="javascript:;" title="图片" id="wy_insertimage" hidefocus="true">图片</a>
+                        </div>
+                    </div>
+                    <div style="padding:0.5% 0 0 0.5%;width:99.5%;display:inline;float:left;">
+                        <textarea id="textarea" name="atc_content" style="width:100%;height:140px;" onkeydown="quickpost(event)"></textarea>
+                        <span id="autosave"></span><div id="menu_editor" class="wy_menu_B" style="display: none;"></div>
+                    </div>
+                </div>
+                <div class="mb10">
+<!--
+EOT;
+if($o_groups_p_gdcheck){print <<<EOT
+-->
+                    <dl class="cc">
+                        <dt class="dtA">认证码: </dt>
+                        <dd><input class="input" type="text" name="gdcode" size="5" tabindex="6" onfocus="try{opencode('menu_gd',this)}catch(e){}" id="fs_gdcode"/><br />
+                        <div class="menu" id="menu_gd" style="visibility:hidden;"><img src="ck.php?" align="absmiddle" style="cursor:pointer;" id="ckcode" alt="看不清楚，换一张" />
+                        </div>
+                        </dd>
+                    </dl>
+<!--
+EOT;
+}if($o_groups_p_qcheck){
+$qkey = array_rand($db_question);
+print <<<EOT
+-->
+<style type="text/css">
+.dtA{width:75px;margin-right:5px;}
+.fpbtn{margin-left:80px;}
+</style>
+                    <dl class="cc">
+                        <dt class="dtA">验证问题:</dt>
+                        <dd><input class="input" type="text" name="qanswer" /> <input type="hidden" name="qkey" value="$qkey" />{$db_question[$qkey]} 正确答案:{$db_answer[$qkey]}</dd>
+                    </dl>
+<!--
+EOT;
+}print <<<EOT
+-->
+                </div>
+                <p><span class="mr10"><span class="btn"><span><button name="Submit" type="submit">写好了，发布</button></span></span></span><span class="s3">Ctrl + Enter 快速发布</span>
+            </div>
+        </td>
+        <td class="floot_right" width="250">
+            <div id="fp_face" class="fp_show">
+                <div class="fp_show_tab">
+                    <b class="tab_left fl" onclick="PwFace.showTab(-1)" title="上一个">上一个</b>
+                    <b class="tab_right fr" onclick="PwFace.showTab(1)" title="下一个">下一个</b>
+                    <ul id="face_tab"></ul>
+                </div>
+                <div class="fp_show_cont">
+                    <div class="fp_show_height">
+                    <ul class="cc" id="face_main"></ul>
+                    </div>
+                    <div id="face_page" class="fp_show_pages cc"></div>
+                </div>
+            </div>
+        </td>
+    </tr>
+</table>
+</div>
+</form>
+<script type="text/javascript">
+var charset='$db_charset';
+var bbsurl ="{$B_url}";
+var editor = null;
+var titlemax = '$db_titlemax';
+
+initCheckTextNum('atc_title','atc_title_warn',titlemax);
+function WysiwygConfig() {
+	this.baseURL = document.baseURI || document.URL;
+	if (this.baseURL && this.baseURL.match(/(.*)\/([^\/]?)/)) {
+		this.baseURL = RegExp.$1 + "/";
+	}
+	this.imgURL = imgpath + "/post/c_editor/";
+
+	this.btnList = {
+		bold: [ true, editorcode, true ],
+		forecolor: [ true, showcolor, false ],
+		hilitecolor: [ true, showcolor, false ],
+		createlink: [ true, showcreatelink, false ],
+		unlink: [ true, editorcode, false ],
+		insertimage: [ true, insertImage, false ]
+	};
+	this.selList = [];
+};
+function loadEditor(e) {
+	var e = is_ie ? event : e;
+	var o = e.srcElement || e.target;
+	if (o.id == 'gotoedit') return;
+
+	$('fp_editor').onclick = '';
+	loadjs('js/wind_c_editor.js', '', '', function() {
+		editor = new WYSIWYD();
+		editor.config = new WysiwygConfig();
+		editor.init();
+		if (o.id && o.id.match(/^wy\_/)) {
+			var key = o.id.substr(3);
+			if (typeof editor.config.btnList[key]) {
+				var cmd = editor.config.btnList[key][1];
+				cmd(key);
+			}
+		}
+	});
+}
+var dataStorage = {
+	save : function() {
+		if (PwStorage.save('msg', document.FORM.atc_content.value)) {
+			PwStorage.save('title', document.FORM.atc_title.value, 1);
+			SetCookie('ds', 1);
+			return true;
+		}
+		return false;
+	},
+	load : function() {
+		document.FORM.atc_title.value = PwStorage.load('title') || '';
+		var msg = PwStorage.load('msg');
+		if (msg) {
+			document.FORM.atc_content.value = msg;
+			document.FORM.atc_content.focus();
+		}
+		SetCookie('ds', 0);
+	}
+}
+function gotoEditor() {
+	dataStorage.save();
+	location.href = '$posturl';
+}
+</script>
+</div>
+<!--
+EOT;
+$facedb = '';
+if(R_P != D_P){
+$facedb = readover(D_P.'data/bbscache/face.js');
+}else{print <<<EOT
+-->
+<script language="JavaScript" src="data/bbscache/face.js"></script>
+<!--
+EOT;
+}print <<<EOT
+-->
+<script language="JavaScript" src="js/post.js"></script>
+<script language="javascript">
+document.FORM.Submit.disabled = false;
+var charset = '$db_charset';
+var stylepath = '$stylepath';
+var cate = '$db_forcetype';
+var cnt = 0;
+
+{$facedb}
+PwFace.init('face_tab', 'face_main', 3, 16);
+/* window.onload = function (){
+ PwFace.init('face_tab', 'face_main', 3, 16);
+ }*/
+function checkpost(obj){
+	if(obj.atc_title.value==""){
+		showDialog("error","标题不能为空",2);
+		obj.atc_title.focus();
+		return false;
+	} else if(strlen(obj.atc_title.value)>$db_titlemax){
+		showDialog("error","标题超过最大长度 $db_titlemax 个字节",2);
+		obj.atc_title.focus();
+		return false;
+	}
+	if(strlen(obj.atc_content.value)<$db_postmin){
+		showDialog("error","文章内容少于 $db_postmin 个字节",2);
+		obj.atc_content.focus();
+		return false;
+	} else if(strlen(obj.atc_content.value)>$db_postmax){
+		showDialog("error","文章内容大于 $db_postmax 个字节",2);
+		obj.atc_content.focus();
+		return false;
+	}
+	document.FORM.Submit.disabled = true;
+	cnt++;
+	if(cnt!=1){
+		showDialog("warning","Submission Processing. Please Wait");
+		return false;
+	}
+	if (is_ie && newAtt.aid < 2) {
+		document.FORM.encoding = "application/x-www-form-urlencoded";
+	}
+	return true;
+}
+
+function checklength(theform,postmaxchars){
+	if(postmaxchars != 0){
+		message = '<br />系统限制最大字节数:'+postmaxchars+' 字节';
+	} else{
+		message = '';
+	}
+	showDialog("warning",'您的信息已有字节数: '+strlen(theform.atc_content.value)+' 字节'+message);
+}
+function addsmile(NewCode){
+    $('textarea').value += ' [s:'+NewCode+'] ';
+}
+window.onbeforeunload = function() {
+	saveData('msg', document.FORM.atc_content.value);
+}
+if (FetchCookie('ds') == 1) {
+	try{dataStorage.load();}catch(e){}
+}
+</script>
+<!--
+EOT;
+?>

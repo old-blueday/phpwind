@@ -1,0 +1,151 @@
+<!--<?php
+include_once PrintEot('left');
+print <<<EOT
+-->
+<div class="nav3 mb10">
+    <ul class="cc">
+      <li class="current"><a href="$admin_file?adminjob=tpccheck">主题审核</a></li>
+      <li><a href="$admin_file?adminjob=tpccheck&action=postcheck">回复审核</a></li>
+    </ul>
+</div>
+<div class="admin_info mb10">
+    <h3 class="h1"><b>提示信息</b></h3>
+    <div class="legend">版块开启 "主题审核" 功能时，只有经过管理员审核的主题才会在前台显示</div>
+</div>
+<form action="$basename&" method="post">
+  <h2 class="h1">搜索帖子</h2>
+  <div class="admin_table mb10">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <tr class="tr1 vt">
+      <td class="td2">所属版块 :
+        <select name="fid" class="select_wa mr20">
+          <option>选择分类</option>
+          $forumcache
+        </select>
+        作者 :
+        <input type="text" class="input input_wa mr20" name="username" value="$username">
+        <span class="bt2"><span><button type="submit" value="提 交">提 交</button></span></span></td>
+    </tr>
+  </table>
+  </div>
+</form>
+<script> 	
+  	
+  	function makeOneChceck(obj){
+  		var el = document.forms['FORM'].elements;
+		var j = 0;
+		var cls = {'pass':'tr1 vt td_bgD','dels':'tr1 vt td_bgC','here':'tr1 vt'};
+		
+		arr = obj.name.split("[");
+		arr[1] = arr[1].split("]")[0];
+		getObj('TR_'+arr[1]).setAttribute('class',cls[arr[0]]);
+		
+		for(var i=0; i<el.length; i++){
+			if(obj.value == el[i].value && 'INPUT' == el[i].tagName && "radio" == el[i].type){
+					el[i].checked = false;
+			}		
+		}
+		obj.checked = true;
+	};
+		
+	function allCheck(ttype){
+		var el = document.forms['FORM'].elements;
+		var regs = {'pass':/^pass\[(\d+)\]$/,'dels':/^dels\[(\d+)\]$/,'here':/^here\[(\d+)\]$/};
+		for(var i=0; i<el.length; i++){	  				
+			if('INPUT' == el[i].tagName && "radio" == el[i].type){						
+					if(regs[ttype].test(el[i].name)){
+							makeOneChceck(el[i]);
+					}
+			}
+		}
+	}  	
+  			
+  </script>
+<form action="$basename&" method="post" name="FORM">
+  <input type=hidden name=job value=search>
+  <input type=hidden name=step value=2>
+  <h2 class="h1">帖子列表</h2>
+  <div class="admin_table mb10">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <!--<tr class="tr2">
+	  <td width="100"><span>操作</span></td>
+      <td>标题</td>
+      <td>作者</td>
+      <td>所属版块</td>
+      <td>发表时间</td>
+    </tr>-->
+<!--
+EOT;
+if (empty($checkdb)) {print <<<EOT
+-->
+<tr><td class="p10" colspan="5"><div class="admin_tips">啊哦，没有你要的信息！</div></td></tr>
+<!--
+EOT;
+}else{
+foreach($checkdb as $check){
+print <<<EOT
+--><!--td_bgD为通过 td_bgC为删除 -->
+    <tr class="tr1 vt" id="TR_$check[tid]">
+      <td class="td1">
+				<ul class="list_A">
+					<li><label><input type="radio" onclick="makeOneChceck(this)" name="pass[$check[tid]]" value="$check[tid]"> 通过</label></li>
+					<li><label><input type="radio" onclick="makeOneChceck(this)" name="dels[$check[tid]]" value="$check[tid]"> 删除</label></li>
+					<li><label><input type="radio" onclick="makeOneChceck(this)" name="here[$check[tid]]" checked="true" value="$check[tid]"> 暂不处理</label></li>
+				</ul>
+      	
+      	<!--<input type="checkbox" name="selid[]" value="$check[tid]" onclick="pwJsCheck(this)" />-->
+      	
+      	</td>
+      	
+      <td class="td2">
+      	
+      	<a href="thread.php?fid=$check[fid]" target="_blank">$check[name]</a>
+      	
+      	<span>>></span>
+      	
+      	<!--<a href="$admin_file?adminjob=content&type=tpc&id=$check[tid]">$check[subject]</a>-->
+      	
+      	<a href="read.php?tid=$check[tid]" target="_blank">$check[subject]</a>
+      	&nbsp;&nbsp;&nbsp;
+      	<a href="post.php?action=modify&fid=$check[fid]&tid=$check[tid]&pic=tpc" target="_blank">编辑主题</a>
+      	
+      	<br/>
+      	
+      	作者：<a href="u.php?uid=$check[authorid]" target="_blank">$check[author]</a>&nbsp;
+      	
+      	发表时间：$check[postdate]
+      	
+      	<br/>
+      	<div class="p10" style="line-height:1.5;border:1px solid #ccc;background:#fff;max-height:140px;overflow-y:auto;">$check[content]</div>
+
+      	
+      	</td>
+      <!--<td class="td2"><a href="u.php?uid=$check[authorid]" target="_blank">$check[author]</a></td>
+      <td class="td2"><a href="thread.php?fid=$check[fid]" target="_blank">$check[name]</a></td>
+      <td class="td2">$check[postdate]</td>-->
+    </tr>
+<!--
+EOT;
+}}print <<<EOT
+-->
+  </table>
+  
+  
+  </div>
+  <div class="cc mb10">$pages</div>
+  <div class="tac mb10" style="float:left">
+  	<span class="bt2"><span><button type="button" onclick="allCheck('pass')">全部通过</button></span></span>
+		<span class="bt2"><span><button type="button" onclick="allCheck('dels')">全部删除</button></span></span>
+		<span class="bt2"><span><button type="button" onclick="allCheck('here')">全部暂不处理</button></span></span>
+		<!--<input type="radio" name="type" value="del"> 删除&nbsp;
+    <input type="radio" name="type" checked='checked' value="pass"> 通过-->
+        
+  </div>
+    <div class="tac mb10">
+        <span class="btn"><span><button type="submit">提 交</button></span></span>
+    </div>
+</form>
+<!--
+EOT;
+include_once PrintEot('adminbottom');
+?>-->

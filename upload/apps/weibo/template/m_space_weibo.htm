@@ -1,0 +1,82 @@
+<!--<?php
+include_once uTemplate::PrintEot('header');
+include_once uTemplate::PrintEot('space_appleft');
+print <<<EOT
+-->
+<script type="text/javascript">
+var space_uid = '$uid';
+var transmitAction = 'my';
+</script>
+<script type="text/javascript" src="js/pw_weibo.js"></script>
+<script type="text/javascript" src="apps/weibo/js/post.js"></script>
+<div class="sideD">
+<!--
+EOT;
+if(!$indexRight && $indexValue =='1'){print <<<EOT
+-->
+<div class="boxA">
+	<table width="100%">
+		<tr><td height="400">
+			<div class="space_msg"><img src="u/images/space/report.png" align="absmiddle" />由于对方的隐私设置，容许好友可见！立即 <a href="$db_bbsurl/pw_ajax.php?action=addfriend&touid={$space['uid']}" onclick="return ajaxurl(this);">加为好友</a></div>
+		</td></tr>
+	</table>
+</div>
+<!--
+EOT;
+}elseif(!$indexRight && $indexValue =='2'){print <<<EOT
+-->
+<div class="boxA">
+	<table width="100%">
+		<tr><td height="400">
+			<div class="space_msg"><img src="u/images/space/report.png" align="absmiddle" />对方设置了隐私，您没有权限查看</div>
+		</td></tr>
+	</table>
+</div>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+	<div class="boxA">
+		<h2><span>新鲜事</span></h2>
+		<div class="cc">
+<!--
+EOT;
+if ($weiboList) {
+	include_once PrintEot("writesmile");
+	require_once uTemplate::printEot('weibo_model');
+	$weiboModelTemplate->photoPop();
+print <<<EOT
+-->
+			<div class="conFeed" id="weiboFeed">
+<!--
+EOT;
+	foreach ($weiboList as $key => $value) {
+		$method = $weiboService->getType($value['type']);
+		$weiboModelTemplate->$method($value);
+	}
+	if ($count > $perpage) {print <<<EOT
+-->
+				<div class="cc p10">$pages</div>
+<!--
+EOT;
+	}
+print <<<EOT
+-->
+			</div>	
+<!--
+EOT;
+} else {print <<<EOT
+-->
+			<div class="f14 tac p15">这家伙好懒，一条新鲜事都没留下！</div>
+<!--
+EOT;
+}}print <<<EOT
+-->
+
+		</div>
+    </div>
+</div>
+<!--
+EOT;
+require_once(uTemplate::printEot('footer'));
+?>-->

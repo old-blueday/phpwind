@@ -1,0 +1,51 @@
+<!--<?php
+$trd_onlineinfo = '';
+$trd_hide = $trd_nothide = 0;
+if($db_online){
+	$query = $db->query("SELECT username,lastvisit,ip,fid,tid,groupid,action,ifhide,uid FROM pw_online WHERE fid='$fid' AND uid>0");
+	while($rt = $db->fetch_array($query)){
+		if($rt['ifhide']){$trd_hide++; continue;} else $trd_nothide++;
+		$rt['img'] = strpos($db_showgroup,",$rt[groupid],")!==false ? $rt['groupid'] : '6';
+		$trd_onlineinfo .= "<td style=\"width:12%;padding:0 0 5px 20px;background:url($imgpath/$stylepath/group/$rt[img].gif) no-repeat\"><a href=\"u.php?uid=$rt[uid]\">$rt[username]</a></td>";
+		$trd_nothide%8==0 && $trd_onlineinfo.="</tr><tr>";
+	}
+} else{
+	$fp=@fopen(D_P.'data/bbscache/online.php',"rb");
+	flock($fp,LOCK_SH);
+	while(feof($fp)===false){
+		$a=fread($fp,97);
+		if(strpos($a,"\t$fid\t")!==false){//"\t$fid\t"
+			$detail=explode("\t",$a);
+			if($detail[3]==$fid){
+				if($foruminfo[allowvisit] && strpos($foruminfo[allowvisit],",$detail[5],")===false) continue;
+				$img = strpos($db_showgroup,",".$detail[5].",")!==false ? $detail[5] : '6';
+				if($detail[9]=='<>') {$trd_hide++; continue;} else $trd_nothide++;
+				$trd_onlineinfo.="<td style=\"width:12%;padding:0 0 5px 20px;background:url($imgpath/$stylepath/group/$img.gif) no-repeat\"><a href=u.php?uid=$detail[8]>$detail[0]</a></td>";
+				$trd_nothide%8==0 && $trd_onlineinfo.="</tr><tr>";
+			}
+		}
+	}
+	fclose($fp);
+}
+$trd_sumonline = $trd_nothide + $trd_hide;
+print <<<EOT
+-->
+<div class="t">
+	<div class="h">在线用户:共{$trd_sumonline}人在线，{$trd_nothide}位会员({$trd_hide}位隐身)</div>
+	<div class="p10">
+<!--
+EOT;
+if($trd_onlineinfo){print <<<EOT
+-->
+		<table width="100%" class="vt">
+			<tr>$trd_onlineinfo</tr>
+		</table>
+<!--
+EOT;
+}print <<<EOT
+-->
+	</div>
+</div>
+<!--
+EOT;
+?>
