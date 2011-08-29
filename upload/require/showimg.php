@@ -55,7 +55,7 @@ function showfacedesign($usericon,$show_a = null,$imgtype = null) {
 		$faceurl = "$imgpath/face/$user_a[0]";
 	}
 	$imglen = '';
-	if ($user_a[1] == 2 || ($user_a[1] == 3 && !$imgtype)) {
+	if ($user_a[1] == 2 || ($user_a[1] == 3 && !$imgtype) || $user_a[1] == 1) {
 		list($user_a[2],$user_a[3]) = getfacelen($user_a[2],$user_a[3]);
 		if ($user_a[2]) $imglen .= " width=\"$user_a[2]\"";
 		if ($user_a[3]) $imglen .= " height=\"$user_a[3]\"";

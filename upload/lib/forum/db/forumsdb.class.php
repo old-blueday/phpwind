@@ -18,6 +18,23 @@ class PW_ForumsDB extends BaseDB {
 	function count(){
 		return $this->_count();
 	}
+
+	function getForumAdmin($fid= 0){
+		$sqlWhere = 'WHERE 1';
+		$sqlWhere .= $fid > 0?" AND fid=$fid":'';
+		$f_admin = array();
+		$query = $this->_db->query("SELECT fid,forumadmin FROM " . $this->_tableName . " $sqlWhere");
+		while ($forum = $this->_db->fetch_array($query)) {
+			$adminarray = explode(",",$forum['forumadmin']);
+			foreach ($adminarray as $k => $v) {
+				$v = trim($v);
+				if ($v) {
+					$f_admin[$v['fid']][] = $v;
+				}
+			}
+		}
+		return $f_admin;
+	}
 	
 	function getsNotCategory(){
 		$query = $this->_db->query ( "SELECT fid,allowvisit,password,name,f_type FROM " . $this->_tableName . " WHERE type<>'category'" );
@@ -28,14 +45,20 @@ class PW_ForumsDB extends BaseDB {
 	 * 注意只提供搜索服务
 	 */
 	function countSearch($keywords){
-		$result = $this->_db->get_one ( "SELECT COUNT(*) as total FROM " . $this->_tableName . " WHERE name like ".pwEscape("%$keywords%")." LIMIT 1" );
+		$result = $this->_db->get_one ( "SELECT COUNT(*) as total FROM " . $this->_tableName . " WHERE name like ".S::sqlEscape("%$keywords%")." LIMIT 1" );
 		return ($result) ? $result['total'] : 0;
 	}
 	/**
 	 * 注意只提供搜索服务
 	 */
 	function getSearch($keywords,$offset,$limit){
-		$query = $this->_db->query ("SELECT * FROM " . $this->_tableName . " WHERE name like ".pwEscape("%$keywords%")." LIMIT ".$offset.",".$limit);
+		$query = $this->_db->query ("SELECT * FROM " . $this->_tableName . " WHERE name like ".S::sqlEscape("%$keywords%")." LIMIT ".$offset.",".$limit);
 		return $this->_getAllResultFromQuery ( $query );
+	}
+	
+	function getFormusByFids($fids) {
+		$fids = is_array($fids) ? $fids : array($fids);
+		$query = $this->_db->query ("SELECT * FROM " . $this->_tableName. " WHERE fid in( ".S::sqlImplode($fids).")");
+		return $this->_getAllResultFromQuery($query, 'fid');
 	}
 }

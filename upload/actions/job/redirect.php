@@ -1,10 +1,10 @@
 <?php
 !defined('P_W') && exit('Forbidden');
 
-InitGP(array(
+S::gp(array(
 	'goto'
 ));
-InitGP(array(
+S::gp(array(
 	'aid'
 ), 'GP', 2);
 

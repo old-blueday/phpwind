@@ -1,6 +1,6 @@
 <?php
 require_once('global.php');
-include_once(D_P.'data/bbscache/ol_config.php');
+include_once pwCache::getPath(D_P.'data/bbscache/ol_config.php');
 if(!$ol_onlinepay){
 	Showmsg($ol_whycolse);
 }
@@ -11,10 +11,10 @@ if ($_GET['verifycode'] != $ol_paypalcode) {
 
 	Showmsg('undefined_action');
 
-} elseif (GetGP('payment_status') == 'Completed') {
+} elseif (S::getGP('payment_status') == 'Completed') {
 
-	InitGP(array('invoice','mc_gross'));
-	$rt = $db->get_one("SELECT c.*,m.username FROM pw_clientorder c LEFT JOIN pw_members m USING(uid) WHERE order_no=".pwEscape($invoice));
+	S::gp(array('invoice','mc_gross'));
+	$rt = $db->get_one("SELECT c.*,m.username FROM pw_clientorder c LEFT JOIN pw_members m USING(uid) WHERE order_no=".S::sqlEscape($invoice));
 	if ($rt['state'] == '0') {
 		if ($rt['number'] != $mc_gross) {
 			Showmsg('gross_error');
@@ -33,7 +33,7 @@ if ($_GET['verifycode'] != $ol_paypalcode) {
 		$credit->set($rt['uid'],$rt['paycredit'],$currency);
 
 		$descrip = getLangInfo('other','paypal_orders');
-		$db->update("UPDATE pw_clientorder SET state=2,descrip=".pwEscape($descrip,false)."WHERE order_no=".pwEscape($invoice));
+		$db->update("UPDATE pw_clientorder SET state=2,descrip=".S::sqlEscape($descrip,false)."WHERE order_no=".S::sqlEscape($invoice));
 		
 		M::sendNotice(
 			array($rt['username']),

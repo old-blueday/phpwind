@@ -2,6 +2,9 @@
 !defined('A_P') && exit('Forbidden');
 $USCR = 'user_photo';
 
+S::gp(array('ajax'));
+if ($ajax == 1) define('AJAX', '1');
+
 $whiteList = array(
 				'own',
 				'albumcheck',
@@ -19,13 +22,12 @@ $whiteList = array(
 				'setcover',
 				'upload',
 				'create',
-				'editphoto',
-				/* for pweditor image insert*/
-				'pweditor'
+				'editphoto'
 			);
 if(!in_array($a,$whiteList)){
 	$a = 'own';
 }
+
 if($ifriend){
 	$friendurl = '&ifriend=1';
 }
@@ -44,8 +46,8 @@ if ($a == 'own') {
 
 } elseif($a == 'albumcheck'){
 
-	InitGP(array('aid'), null, 2);
-	InitGP(array('viewpwd'));
+	S::gp(array('aid'), null, 2);
+	S::gp(array('viewpwd'));
 	$album = $photoService->getAlbumInfo($aid);
 	if (empty($album)) {
 			echo "data_error";
@@ -65,7 +67,7 @@ if ($a == 'own') {
 	ajax_footer();
 	
 }elseif ($a == 'album') {
-	InitGP(array('aid'), null, 2);
+	S::gp(array('aid'), null, 2);
 	$cnpho = array();
 	$result = $photoService->getPhotoListByAid($aid);	
 	if(!is_array($result)){
@@ -86,7 +88,7 @@ if ($a == 'own') {
 	$weiboPriv = false;
 	(!$myOuserData['index_privacy'] && !$myOuserData['photos_privacy'] && !$album['private']) && $weiboPriv = true;
 } elseif ($a == 'view') {
-	InitGP(array('pid'));
+	S::gp(array('pid'));
 	$result = $photoService->viewPhoto($pid);
 	if(!is_array($result)){
 		Showmsg($result);
@@ -100,7 +102,7 @@ if ($a == 'own') {
 	$u = $photo['ownerid'];
 	$username = $photo['owner'];
 	$aid = $photo['aid'];
-	$page = (int)GetGP('page');
+	$page = (int)S::getGP('page');
 	$page < 1 && $page = 1;
 	$url = $basename.'a=view&pid='.$pid;
 	$url .= $ifriend == 1 ? '&ifriend='.$ifriend.'&' : '&';
@@ -116,19 +118,19 @@ if ($a == 'own') {
 
 } elseif ($a == 'next') {
 	define('AJAX',1);
-	InitGP(array('pid'));
+	S::gp(array('pid'));
 	$status = $photoService->getNextPhoto($pid);
 	echo $status;
 	ajax_footer();
 } elseif ($a == 'pre') {
 	define('AJAX',1);
-	InitGP(array('pid'));
+	S::gp(array('pid'));
 	$status = $photoService->getPrevPhoto($pid);
 	echo $status;
 	ajax_footer();
 } elseif ($a == 'editphoto') {
 	banUser();
-	InitGP(array('pid','aid'));
+	S::gp(array('pid','aid'));
 	$photo = $photoService->getPhotoUnionInfo($pid);
 	if (empty($photo) || (!$photoService->isPermission() && !$photoService->isSelf())) {
 		Showmsg('data_error');
@@ -141,8 +143,8 @@ if ($a == 'own') {
 		}
 	} else {
 		require_once(R_P.'require/postfunc.php');
-		InitGP(array('pintro'),'P');
-		InitGP(array('aid'), null, 2);
+		S::gp(array('pintro'),'P');
+		S::gp(array('aid'), null, 2);
 		!$aid && Showmsg('colony_albumclass');
 		if (strlen($pintro)>255) Showmsg('album_pintro_toolang');
 		require_once(R_P.'require/bbscode.php');
@@ -156,7 +158,7 @@ if ($a == 'own') {
 	}
 } elseif ($a == 'delphoto') {
 	define('AJAX','1');
-	InitGP(array('pid'));
+	S::gp(array('pid'));
 	$photo = $photoService->delPhoto($pid);
 	if(empty($photo)){
 		Showmsg('data_error');
@@ -190,7 +192,7 @@ if ($a == 'own') {
 } elseif ($a == 'setcover') {
 
 	define('AJAX','1');
-	InitGP(array('pid'), null, 2);
+	S::gp(array('pid'), null, 2);
 	$photo = $photoService->setCover($pid);
 	if(empty($photo)){
 		Showmsg('data_error');
@@ -200,8 +202,8 @@ if ($a == 'own') {
 
 } elseif ($a == 'upload') {
 	banUser();
-	InitGP(array('aid'));
-	InitGP(array('job'));
+	S::gp(array('aid'));
+	S::gp(array('job'));
 	if($job == 'flash') {
 		if(!$photoService->getAlbumNumByUid()){
 			$data = array(
@@ -226,7 +228,7 @@ if ($a == 'own') {
 	if ($aid > 0) {	
 		$albumInfo = $photoService->getAlbumInfo($aid);
 		$photonums = $albumInfo['photonum'];
-		$o_maxphotonum && $photonums >= $o_maxphotonum && Showmsg('colony_photofull');
+		//if($o_maxphotonum && $photonums >= $o_maxphotonum) Showmsg('colony_photofull');
 		$allowmutinum = $o_maxphotonum - $photonums;
 	}
 	if (empty($job)) {
@@ -237,8 +239,8 @@ if ($a == 'own') {
 				list($isheader,$isfooter,$tplname,$isleft) = array(true,false,"m_photos",true);
 			}
 		} else {
-			PostCheck(1,$o_photos_gdcheck,$o_photos_qcheck);
-			InitGP(array('pintro'),'P');
+			PostCheck(1,$o_photos_gdcheck,$o_photos_qcheck && $db_question);
+			S::gp(array('pintro'),'P');
 			empty($pintro) && $pintro = array();
 			require_once(R_P.'require/bbscode.php');
 			$wordsfb = L::loadClass('FilterUtil', 'filter');
@@ -298,7 +300,7 @@ if ($a == 'own') {
 		}
 	} 
 } elseif ($a == 'create') {
-	InitGP(array('step','tips','checkpwd'));
+	S::gp(array('step','tips','checkpwd'));
 	banUser();
 	// 用户组创建相册权限
 	if ($groupid != 3 && $o_photos_groups && strpos($o_photos_groups,",$groupid,") === false) {
@@ -311,8 +313,8 @@ if ($a == 'own') {
 		list($isheader,$isfooter,$tplname,$isleft) = array(true,true,"m_photos",true);	
 	} else {
 		require_once(R_P.'require/postfunc.php');
-		PostCheck(1,$o_photos_gdcheck,$o_photos_qcheck);
-		InitGP(array('aname','aintro','pwd','repwd','private'));
+		PostCheck(1,$o_photos_gdcheck,$o_photos_qcheck && $db_question);
+		S::gp(array('aname','aintro','pwd','repwd','private'));
 		if(!$aname) {
 			createfail($checkpwd,'colony_aname_empty');
 			Showmsg('colony_aname_empty');
@@ -391,12 +393,14 @@ if ($a == 'own') {
 			echo "success\t$aid";
 			ajax_footer();
 		}
-		refreshto("{$basename}a=own",'operate_success');
+		$url = "{$basename}a=own";
+		$msg = defined('AJAX') ?  "success\t".$url : 'operate_success';
+		refreshto("{$basename}a=own",$msg);
 	}
 } elseif ($a == 'delalbum') {
 	define('AJAX', 1);
 	define('F_M',true);
-	InitGP(array('aid'), null, 2);
+	S::gp(array('aid'), null, 2);
 	$album = $photoService->getAlbumInfo($aid,array('ownerid','photonum'));
 	if (empty($album) || ($album['ownerid'] != $winduid && !$photoService->isDelRight())) {
 		Showmsg('data_error');
@@ -419,7 +423,7 @@ if ($a == 'own') {
 	define('AJAX', 1);
 	define('F_M',true);
 	banUser();
-	InitGP(array('aid'));
+	S::gp(array('aid'));
 	empty($aid) && Showmsg('data_error');
 	$albumInfo = $photoService->getAlbumInfo($aid);
 	if (empty($albumInfo) || $albumInfo['atype'] <> 0 || ($albumInfo['ownerid'] <> $winduid && !$photoService->isPermission())) {
@@ -432,8 +436,8 @@ if ($a == 'own') {
 
 	} else {
 		require_once(R_P.'require/postfunc.php');
-		InitGP(array('aname','aintro','pwd','repwd'),'P');
-		InitGP(array('private'),'P',2);
+		S::gp(array('aname','aintro','pwd','repwd'),'P');
+		S::gp(array('private'),'P',2);
 		!$aname && Showmsg('colony_aname_empty');
 		if (strlen($aname)>24) Showmsg('colony_aname_toolang');
 		if (strlen($aintro)>255) Showmsg('colony_aintro_toolang');
@@ -475,7 +479,7 @@ if ($a == 'own') {
 } elseif ($a == 'viewalbum') {
 	define('AJAX', 1);
 	define('F_M',true);
-	InitGP(array('aid'));
+	S::gp(array('aid'));
 	$aid = (int)$aid;
 	empty($aid) && Showmsg('data_error');
 	require_once PrintEot('m_ajax_photos');
@@ -484,13 +488,13 @@ if ($a == 'own') {
 	define('AJAX', 1);
 	define('F_M',true);
 	banUser();
-	InitGP(array('job'));
+	S::gp(array('job'));
 	require_once PrintEot('m_ajax_photos');
 	ajax_footer();
 } elseif ($a == 'getallowflash') {
 	define('AJAX', 1);
 	define('F_M',true);
-	InitGP(array('aid'));
+	S::gp(array('aid'));
 	$aid = (int)$aid;
 	if ($aid) {
 		$albumInfo = $photoService->getAlbumInfo($aid);
@@ -504,62 +508,6 @@ if ($a == 'own') {
 	}
 	echo "ok\t$allowmutinum";
 	ajax_footer();
-} elseif ($a == 'pweditor') {
-	InitGP(array('action'));
-	/* by zph */	
-	if ($action == 'listphotos') {
-		/* ajax 请求获取相片列表 */
-		define('AJAX', 1);
-		S::GP(array('aid'));
-		$ajaxPhotos = array();
-		$result = $photoService->getPhotoListByAid($aid,false);
-		list(,$photos) = $result;//$albumInfo,$photos
-		if(S::isArray($photos)){
-			foreach($photos as $photo){
-				$lastpos = strrpos($photo['path'],'/');
-				$ajaxPhotos[] = array(
-					'pid' => $photo['pid'],
-					'thumbpath' => $photo['path'],
-					'ifthumb' => $photo['ifthumb'],
-					'path' => dirname($photo['path']).'/'.substr($photo['path'],$lastpos+3),
-					'pintro' => $photo['pintro']
-				);
-			}
-			$ajaxPhotos = pwJsonEncode($ajaxPhotos);
-			echo "success\t{$ajaxPhotos}";
-		}else{
-			Showmsg('data_error');
-		}
-		ajax_footer();
-		exit;
-	}elseif( $action == 'upload'){
-		define('AJAX', 1);
-		InitGP(array('aid'));
-		$result = $photoService->uploadPhoto($aid);
-		if(!is_array($result)){
-			Showmsg($result);
-		}
-		list($albumInfo,$pid,$photoNum,$photos) = $result;
-		
-		$photoNum > 0 or Showmsg('data_error');
-		$photo = getphotourl($photos[0]['path'],0);
-		echo "success\t{$photo}";
-		ajax_footer();
-	}
-
-	$result = $photoService->getAlbumBrowseList();
-	list(,$albums) = $result;//album Count,albums
-	
-	if(S::isArray($albums)){
-		$aid = intval($aid);
-		$aid = $aid? $aid : $albums[0]['aid'];
-	}
-	$photos = array();
-	$aid > 0 && list(,$photos) = $photoService->getPhotoListByAid($aid,false);
-	
-	require_once PrintEot('m_photos_editor');
-	pwOutPut();exit;
-	/* end by zph */
 }
 if($s){ 
 	require_once PrintEot('m_photos_bottom');

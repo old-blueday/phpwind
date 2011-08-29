@@ -1,21 +1,21 @@
 <!--<?php
 include_once PrintEot('left');
-if (empty($action)) {print <<<EOT
+if ($adminitem == 'level'){
+if (empty($action)){
+print <<<EOT
 -->
-<div class="nav3 mb10 cc">
-    <ul class="fl mr20">
-        <li class="current"><a href="$basename">用户组设置</a></li>
-    </ul>
-	<div class="mt5 fl">
-		<a href="$basename&action=batch" class="mr10">导入导出</a>
-		<a href="$basename&action=help" class="mr10">详细帮助</a>
-	</div>
+<div class="nav3 mb10">
+	<ul class="cc">
+		<li class="current"><a href="$admin_file?adminjob=level&adminitem=level">用户组权限</a></li>
+		<li><a href="$admin_file?adminjob=level&adminitem=batch">导入导出</a></li>
+		<li><a href="$admin_file?adminjob=level&adminitem=help">详细帮助</a></li>
+	</ul>
 </div>
 <div class="admin_info mb10">
 	<h3 class="h1"><b>提示信息</b></h3>
     <div class="legend">
         <a onClick="javascript:scroller('level_1', 800);" class="b cp">会员组</a>:级别按照会员发的帖子数自动进行级别判断并更新。<br />
-<a onClick="javascript:scroller('level_2', 800);" class="b cp">系统组</a>:属于站点管理层，系统组成员由站点管理员设定，管理员可以在 <a href="$admin_file?adminjob=setuser">会员管理</a> 内编辑用户组成员。<br />
+<a onClick="javascript:scroller('level_2', 800);" class="b cp">系统组</a>:属于站点管理层，系统组成员由站点管理员设定，管理员可以在 <a href="$admin_file?adminjob=usermanage&adminitem=edit">会员管理</a> 内编辑用户组成员。<br />
 <a onClick="javascript:scroller('level_3', 800);" class="b cp">特殊组</a>:可以设置管理权限的组别，区别于系统组，特殊组可以进行出售<br />
 <a onClick="javascript:scroller('level_4', 800);" class="b cp">默认组</a>:默认组别不可删除，当其他组别未设置权限时，则使用该默认权限<br />
 注:批量添加的用户组权限设置为默认，需要单独进行权限编辑。
@@ -644,7 +644,6 @@ init('cond_l','cond_r');
 </script>
 </div>
 </td>
-
 <!--
 EOT;
 }else{
@@ -716,7 +715,6 @@ EOT;
 EOT;
 }print <<<EOT
 -->
-
 <div class="admin_table mb10">
     <h2 id="headCtrlCrossConfig" class="h1 cp">横向扩展</h2>
     <div class="admin_table mb10 none_pw">
@@ -727,7 +725,7 @@ EOT;
                 <td class="td2"><div class="help_a">利用此功能可将一个或多个设置同时应用到其它用户组中，使操作更加简便<br />
     操作说明:<br />
     选中需要进行横向操作的权限设置后面的复选框<br />
-    在左边的复选框中选择需要进行横向操作的会员组<br />
+    在左边的复选框中选择需要进行横向操作的用户组<br />
     然后提交即可完成横向操作<br />
     注:<br />
     选择用户组时可使用 ‘Ctrl’ 键进行多选，也可使用 ‘Shift’ 键或拖动鼠标连续选择多个版块<br />
@@ -736,8 +734,6 @@ EOT;
         </table>
     </div>
 </div>
-</div>
-
 <div class="tac mb10"><span class="btn"><span><button type="submit" onfocus="blur();">提 交</button></span></span></div></form>
 <script type="text/javascript">
 function showtab(t,a){
@@ -772,7 +768,6 @@ function displayCrossConfigDiv() {
 }
 getObj('linkCtrlCrossConfig').onclick = displayCrossConfigDiv;
 getObj('headCtrlCrossConfig').onclick = displayCrossConfigDiv;
-
 </script>
 <!--
 EOT;
@@ -888,16 +883,14 @@ EOT;
 </form>
 <!--
 EOT;
-} elseif ($action == 'batch') {print <<<EOT
+}} elseif ($adminitem == 'batch') {print <<<EOT
 -->
-<div class="nav3 mb10 cc">
-    <ul class="fl mr20">
-        <li><a href="$basename">用户组设置</a></li>
-    </ul>
-	<div class="mt5 fl">
-		<a href="$basename&action=batch" class="mr10 s2">导入导出</a>
-		<a href="$basename&action=help" class="mr10">详细帮助</a>
-	</div>
+<div class="nav3 mb10">
+	<ul class="cc">
+		<li><a href="$admin_file?adminjob=level&adminitem=level">用户组权限</a></li>
+		<li  class="current"><a href="$admin_file?adminjob=level&adminitem=batch">导入导出</a></li>
+		<li><a href="$admin_file?adminjob=level&adminitem=help">详细帮助</a></li>
+	</ul>
 </div>
 <div class="admin_info mb10">
     <h3 class="h1"><b>提示信息</b></h3>
@@ -955,24 +948,22 @@ EOT;
 </form>
 <!--
 EOT;
-}if($action=='help'){print <<<EOT
+}elseif($adminitem=='help'){print <<<EOT
 -->
-<div class="nav3 mb10 cc">
-    <ul class="fl mr20">
-        <li><a href="$basename">用户组设置</a></li>
-    </ul>
-	<div class="mt5 fl">
-		<a href="$basename&action=batch" class="mr10">导入导出</a>
-		<a href="$basename&action=help" class="mr20 s2">详细帮助</a>
-	</div>
+<div class="nav3 mb10">
+	<ul class="cc">
+		<li><a href="$admin_file?adminjob=level&adminitem=level">用户组权限</a></li>
+		<li><a href="$admin_file?adminjob=level&adminitem=batch">导入导出</a></li>
+		<li class="current"><a href="$admin_file?adminjob=level&adminitem=help">详细帮助</a></li>
+	</ul>
 </div>
 <div class="mb10">
     <h3 class="h1"><b>提示信息</b></h3>
     <div class="legend">
         <b>站点的用户组分为会员组、系统组、特殊组、默认组。</b><br />&nbsp;&nbsp;会员组:级别按照会员发的帖子数自动进行级别判断并更新。<br />
-&nbsp;&nbsp;系统组:属于站点管理层，系统组成员由站点管理员设定，管理员可以在<a href="$admin_file?adminjob=setuser"><font color=blue>会员管理</font></a>内编辑用户组成员。<br />
+&nbsp;&nbsp;系统组:属于站点管理层，系统组成员由站点管理员设定，管理员可以在<a href="$admin_file?adminjob=usermanage&adminitem=edit" onclick="parent.PW.Dialog({id:'usermanage',url:'$admin_file?adminjob=usermanage&adminitem=edit',name:'用户管理'});return false;"><font color=blue>用户管理</font></a>内编辑用户组成员。<br />
 &nbsp;&nbsp;特殊组:可以设置管理权限的组别，区别于系统组，特殊组可以进行出售<br />
-&nbsp;&nbsp;默认组:默认组别不可删除，当其他组别未设置权限时，则使用该默认权限<br /><b>默认组说明:</b><br />&nbsp;&nbsp;<b>default</b>:默认权限设置（没设置过权限的用户组使用，可以节约不必要的资源）<br />&nbsp;&nbsp;<b>guest</b>:站点游客权限设置<br />&nbsp;&nbsp;<b>禁言组(banned)</b>:此用户组禁止发言<br />&nbsp;&nbsp;<b>未验证会员(newrg)</b>:等待验证的用户组<br /><b>系统组说明:</b><br />&nbsp;&nbsp;<b>管理员(manager)</b>:由站点创始人在<font color=blue>会员管理</font>内进行设置<br />&nbsp;&nbsp;<b>总版主(superadmin)</b>:前台管理员，拥有前台所有管理权限<br />&nbsp;&nbsp;<b>版主(admin)</b>:负责分版块的管理工作<br /><b>组ID说明:</b><br />&nbsp; &nbsp;所有普通会员组在线标记图片为: 6.gif &nbsp; <img src="$imgpath/wind/group/6.gif"><br />&nbsp; &nbsp;管理组和特殊组在线标记图片名为Gid.gif , 例 :<br />&nbsp; &nbsp;比如组ID为 16,会员在线标记图片为: 16.gif &nbsp; <img src="$imgpath/wind/group/16.gif"><br />&nbsp; &nbsp;比如组ID为 3,会员在线标记图片为: 3.gif &nbsp; <img src="$imgpath/wind/group/3.gif"><br />&nbsp;&nbsp;&nbsp;<font color=blue>注:</font>可以在<a href="./$db_adminfile?adminjob=settings&type=indexset"><font color=blue>核心设置-首页细节</font></a>里选择参与在线显示的用户组
+&nbsp;&nbsp;默认组:默认组别不可删除，当其他组别未设置权限时，则使用该默认权限<br /><b>默认组说明:</b><br />&nbsp;&nbsp;<b>default</b>:默认权限设置（没设置过权限的用户组使用，可以节约不必要的资源）<br />&nbsp;&nbsp;<b>guest</b>:站点游客权限设置<br />&nbsp;&nbsp;<b>禁言组(banned)</b>:此用户组禁止发言<br />&nbsp;&nbsp;<b>未验证会员(newrg)</b>:等待验证的用户组<br /><b>系统组说明:</b><br />&nbsp;&nbsp;<b>管理员(manager)</b>:由站点创始人在<a href="$admin_file?adminjob=usermanage&adminitem=edit" onclick="parent.PW.Dialog({id:'usermanage',url:'$admin_file?adminjob=usermanage&adminitem=edit',name:'用户管理'});return false;"><font color=blue>用户管理</font></a>内进行设置<br />&nbsp;&nbsp;<b>总版主(superadmin)</b>:前台管理员，拥有前台所有管理权限<br />&nbsp;&nbsp;<b>版主(admin)</b>:负责分版块的管理工作<br /><b>组ID说明:</b><br />&nbsp; &nbsp;所有普通会员组在线标记图片为: 6.gif &nbsp; <img src="$imgpath/wind/group/6.gif"><br />&nbsp; &nbsp;管理组和特殊组在线标记图片名为Gid.gif , 例 :<br />&nbsp; &nbsp;比如组ID为 16,会员在线标记图片为: 16.gif &nbsp; <img src="$imgpath/wind/group/16.gif"><br />&nbsp; &nbsp;比如组ID为 3,会员在线标记图片为: 3.gif &nbsp; <img src="$imgpath/wind/group/3.gif"><br />&nbsp;&nbsp;&nbsp;<font color=blue>注:</font>可以在<a href="$admin_file?adminjob=interfacesettings" onclick="parent.PW.Dialog({id:'interfacesettings',url:'$admin_file?adminjob=interfacesettings',name:'界面设置'});return false;"><font color=blue>论坛模式-界面设置-首页</font></a>里选择参与在线显示的用户组
     </div>
 </div>
 <h2 class="h1">等级图片号说明</h2>

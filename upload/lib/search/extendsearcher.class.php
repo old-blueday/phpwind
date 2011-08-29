@@ -10,6 +10,26 @@ class PW_ExtendSearcher {
 	var $_configs = array();
 	
 	/**
+	 * 扩展自定义搜索服务通用接口
+	 */
+	function extendSearcher($type){
+		static $classes = array ();
+		$type = strtolower ( $type );
+		if (! $classes [$type]) {
+			$filePath = R_P . "lib/search/userdefine/" . $type . "searcher.extend.php";
+			if (! is_file ( $filePath ))
+				return false;
+			if (!class_exists('Search_Base')) require_once (R_P . 'lib/search/search/base.search.php');
+			require_once S::escapePath ( $filePath );
+			$className = 'PW_SearchExtend_' . $type . '_Searcher';
+			if (! class_exists ( $className )) {
+				return false;
+			}
+			$classes [$type] = &new $className ();
+		}
+		return $classes [$type];
+	}
+	/**
 	 * 加载扩展搜索服务
 	 * @param $invoke 
 	 * @param $condition
@@ -86,6 +106,7 @@ class PW_ExtendSearcher {
 	 * 获取扩展搜索配置
 	 */
 	function _setConfigs(){
+		global $db_modes;
 		if(!$this->_configs){
 			require_once R_P.'lib/search/extend/extendconfigs.php';
 			$this->_configs = (S::isArray($configs)) ? $configs : array();

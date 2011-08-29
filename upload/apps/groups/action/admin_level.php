@@ -1,7 +1,7 @@
 <?php
 !function_exists('adminmsg') && exit('Forbidden');
 
-InitGP(array('job'));
+S::gp(array('job'));
 
 if (empty($job)) {
 	
@@ -14,8 +14,8 @@ if (empty($job)) {
 
 } elseif ($_POST['job'] == 'add') {
 	
-	InitGP(array('ltitle_add','ltitle','ltype'));
-	InitGP(array('lpoint_add','lpoint'), 'GP', 2);
+	S::gp(array('ltitle_add','ltitle','ltype'));
+	S::gp(array('lpoint_add','lpoint'), 'GP', 2);
 
 	$ltype <> 'special' && $ltype = 'common';
 	
@@ -30,15 +30,15 @@ if (empty($job)) {
 		}
 	}
 	if ($pwSQL) {
-		$db->update("INSERT INTO pw_cnlevel (ltype,ltitle,lpoint) VALUES " . pwSqlMulti($pwSQL));
+		$db->update("INSERT INTO pw_cnlevel (ltype,ltitle,lpoint) VALUES " . S::sqlMulti($pwSQL));
 	}
 
 	foreach ($ltitle as $key => $value) {
 		if ($value) {
-			$db->update("UPDATE pw_cnlevel SET " . pwSqlSingle(array(
+			$db->update("UPDATE pw_cnlevel SET " . S::sqlSingle(array(
 				'ltitle' => $value,
 				'lpoint' => $ltype == 'common' ? $lpoint[$key] : 0
-			)) . ' WHERE id=' . pwEscape($key));
+			)) . ' WHERE id=' . S::sqlEscape($key));
 		}
 	}
 	$basename .= '&action=level';
@@ -49,9 +49,9 @@ if (empty($job)) {
 
 } elseif ($job == 'edit') {
 
-	InitGP(array('id'));
+	S::gp(array('id'));
 
-	$rt = $db->get_one("SELECT * FROM pw_cnlevel WHERE id=" . pwEscape($id));
+	$rt = $db->get_one("SELECT * FROM pw_cnlevel WHERE id=" . S::sqlEscape($id));
 	empty($rt) && adminmsg('operate_success');
 
 	if (empty($_POST['step'])) {
@@ -98,7 +98,7 @@ if (empty($job)) {
 
 	} else {
 
-		InitGP(array('config'));
+		S::gp(array('config'));
 
 		foreach ($config as $key => $value) {
 			switch ($key) {
@@ -142,7 +142,7 @@ if (empty($job)) {
 					unset($config[$key]);
 			}
 		}
-		$db->update("UPDATE pw_cnlevel SET " . pwSqlSingle($config) . ' WHERE id=' . pwEscape($id));
+		$db->update("UPDATE pw_cnlevel SET " . S::sqlSingle($config) . ' WHERE id=' . S::sqlEscape($id));
 		
 		$basename .= '&action=level&job=edit&id=' . $id;
 		adminmsg('operate_success');
@@ -151,14 +151,14 @@ if (empty($job)) {
 } elseif ($job == 'del') {
 
 	define('AJAX', 1);
-	InitGP(array('id'), 'GP', 2);
+	S::gp(array('id'), 'GP', 2);
 
 	if (empty($_POST['step'])) {
 		$posthash = EncodeUrl("$basename&action=level&job=del&id=$id");
 		require_once PrintApp('admin_ajax');
 	} else {
 
-		$db->update("DELETE FROM pw_cnlevel WHERE id=" . pwEscape($id));
+		$db->update("DELETE FROM pw_cnlevel WHERE id=" . S::sqlEscape($id));
 		echo "ok\t$id";
 	}
 	updateGroupLevel();
@@ -169,7 +169,7 @@ if (empty($job)) {
 		require_once PrintApp('admin');
 	} else {
 
-		InitGP(array('upgrade'), 'GP');
+		S::gp(array('upgrade'), 'GP');
 		if (is_array($upgrade)) {
 			foreach ($upgrade as $key => $value) {
 				$upgrade[$key] = round($value, 2);
@@ -178,8 +178,8 @@ if (empty($job)) {
 		$upgrade = serialize($upgrade);
 		$db->pw_update(
 			"SELECT hk_name FROM pw_hack WHERE hk_name='o_groups_upgrade'",
-			'UPDATE pw_hack SET ' . pwSqlSingle(array('hk_value' => $upgrade, 'vtype' => 'array')) . " WHERE hk_name='o_groups_upgrade'",
-			'INSERT INTO pw_hack SET ' . pwSqlSingle(array('hk_name' => "o_groups_upgrade", 'vtype' => 'array', 'hk_value' => $upgrade))
+			'UPDATE pw_hack SET ' . S::sqlSingle(array('hk_value' => $upgrade, 'vtype' => 'array')) . " WHERE hk_name='o_groups_upgrade'",
+			'INSERT INTO pw_hack SET ' . S::sqlSingle(array('hk_name' => "o_groups_upgrade", 'vtype' => 'array', 'hk_value' => $upgrade))
 		);
 		updatecache_conf('o',true);
 
@@ -217,13 +217,13 @@ function updateGroupLevel() {
 	$upgrade = serialize($upgrade);
 	$db->pw_update(
 		"SELECT hk_name FROM pw_hack WHERE hk_name='o_groups_level'",
-		'UPDATE pw_hack SET ' . pwSqlSingle(array('hk_value' => $array, 'vtype' => 'array')) . " WHERE hk_name='o_groups_level'",
-		'INSERT INTO pw_hack SET ' . pwSqlSingle(array('hk_name' => "o_groups_level", 'vtype' => 'array', 'hk_value' => $array))
+		'UPDATE pw_hack SET ' . S::sqlSingle(array('hk_value' => $array, 'vtype' => 'array')) . " WHERE hk_name='o_groups_level'",
+		'INSERT INTO pw_hack SET ' . S::sqlSingle(array('hk_name' => "o_groups_level", 'vtype' => 'array', 'hk_value' => $array))
 	);
 	$db->pw_update(
 		"SELECT hk_name FROM pw_hack WHERE hk_name='o_groups_levelneed'",
-		'UPDATE pw_hack SET ' . pwSqlSingle(array('hk_value' => $upgrade, 'vtype' => 'array')) . " WHERE hk_name='o_groups_levelneed'",
-		'INSERT INTO pw_hack SET ' . pwSqlSingle(array('hk_name' => "o_groups_levelneed", 'vtype' => 'array', 'hk_value' => $upgrade))
+		'UPDATE pw_hack SET ' . S::sqlSingle(array('hk_value' => $upgrade, 'vtype' => 'array')) . " WHERE hk_name='o_groups_levelneed'",
+		'INSERT INTO pw_hack SET ' . S::sqlSingle(array('hk_name' => "o_groups_levelneed", 'vtype' => 'array', 'hk_value' => $upgrade))
 	);
 	updatecache_conf('o',true);
 }

@@ -33,7 +33,7 @@ for ($i = 1; $i < $count_ol; $i++) {
 		$onlineinfo = "$adminonly&#35770;&#22363;: $onlinedb[6]{$inread}\n&#26102;&#38388;: $onlinedb[7]";
 		$flag++;
 		if ($flag % 7 == 0) $index_whosonline .= '</tr><tr>';
-		$index_whosonline .= "<td style=\"padding:0 0 5px;border:0;width:14%\"><img src='$imgpath/$stylepath/group/$img.gif' align='absmiddle'> <a href=u.php?uid=$onlinedb[8] title='$onlineinfo'>$onlinedb[0]</a></td>";
+		$index_whosonline .= "<td style=\"padding:0 0 5px;border:0;width:14%\"><img src='$imgpath/$stylepath/group/$img.gif' align='absmiddle'> <a href=". USER_URL ."$onlinedb[8] title='$onlineinfo'>$onlinedb[0]</a></td>";
 	}
 }
 unset($onlinearray);

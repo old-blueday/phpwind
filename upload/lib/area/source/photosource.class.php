@@ -24,6 +24,7 @@ class PW_PhotoSource extends SystemData {
 	function _getData($type, $num) {
 		$element = $this->_getElement();
 		switch ($type) {
+			case '':
 			case 'new' :
 				return $element->getDataByAction('photo', 'picNew', $num);
 			case 'comment' :
@@ -35,7 +36,7 @@ class PW_PhotoSource extends SystemData {
 			case 'share' :
 				return $element->getDataByAction('photo', 'picShare', $num);
 			default :
-				return;
+				return array();
 		}
 	}
 
@@ -46,6 +47,7 @@ class PW_PhotoSource extends SystemData {
 	function _getPictureRateTypes() {
 		global $db_ratepower;
 		$rateSets = unserialize($db_ratepower);
+		$_tmp = array();
 		if ($rateSets[3]) {
 			$rate = L::loadClass('rate', 'rate');
 			$_tmp = $rate->getRatePictureHotTypes();
@@ -76,7 +78,11 @@ class PW_PhotoSource extends SystemData {
 		global $db_bbsurl,$attachpath;
 		$data['url'] = $db_bbsurl . '/apps.php?q=photos&a=view&pid=' . $data['pid'];
 		$data['title'] = $data['pintro'];
-		$data['image'] = $attachpath . '/' . $data['path'];
+		if($data['path'] && substr($rt['path'],0,7) != 'http://'){
+				$a_url = geturl($data['path'],'show','1');
+				$data['imgurl'] = is_array($a_url) ? $a_url[0] : $a_url;
+		}
+		$data['image'] = $data['imgurl'];
 		return $data;
 	}
 

@@ -20,7 +20,7 @@ class PW_ChannelService {
 		
 		L::loadClass('fileoperate', 'utility', false);
 
-		PW_FileOperate::createFolder(Pcv($channelPath));
+		PW_FileOperate::createFolder(S::escapePath($channelPath));
 		
 		$this->_createChannelFiles($theme,$alias,$name);
 		
@@ -57,7 +57,7 @@ class PW_ChannelService {
 		$fileString = readover($file);
 		$moduleConfigService = L::loadClass('moduleconfigservice', 'area');
 		$newString	= $moduleConfigService->cookModuleIds($fileString,$name);
-		writeover($file,$newString);
+		pwCache::setData($file,$newString);
 	}
 	
 	function _copyThemesFiles($theme,$alias) {
@@ -166,7 +166,7 @@ class PW_ChannelService {
 	function updateDefaultAlias($alias) {
 		global $db;
 		$update	= array('area_default_alias','string',$alias,'');
-		$db->update("REPLACE INTO pw_hack VALUES (".pwImplode($update).')');
+		$db->update("REPLACE INTO pw_hack VALUES (".S::sqlImplode($update).')');
 		updatecache_conf('area',true);
 		return true;
 	}
@@ -174,14 +174,14 @@ class PW_ChannelService {
 		global $db;
 		$time = (int) $time;
 		$update	= array('area_statictime','string',$time,'');
-		$db->update("REPLACE INTO pw_hack VALUES (".pwImplode($update).')');
+		$db->update("REPLACE INTO pw_hack VALUES (".S::sqlImplode($update).')');
 		updatecache_conf('area',true);
 		return true;
 	}
 	function updateAreaChannels() {
 		global $db;
 		$channels = $this->getChannels();
-		$db->update("REPLACE INTO pw_hack SET hk_name='area_channels',vtype='array',hk_value=".pwEscape(serialize($channels),false));
+		$db->update("REPLACE INTO pw_hack SET hk_name='area_channels',vtype='array',hk_value=".S::sqlEscape(serialize($channels),false));
 		updatecache_conf('area',true);
 		return true;
 	}
@@ -238,13 +238,13 @@ class PW_ChannelService {
 	}
 	
 	function _getTemplateFile($alias) {
-		return $this->getChannelPath($alias).'/main.htm';
+		return $this->getChannelPath($alias).'/'.PW_PORTAL_MAIN;
 	}
 	function _getConfigFile($alias) {
-		return $this->getChannelPath($alias).'/config.htm';
+		return $this->getChannelPath($alias).'/'.PW_PORTAL_CONFIG;
 	}
 	function getChannelPath($alias) {
-		return Pcv(AREA_PATH.$alias);
+		return S::escapePath(AREA_PATH.$alias);
 	}
 
 	function _getChannelDAO() {

@@ -1,13 +1,13 @@
 <?php
 !defined('P_W') && exit('Forbidden');
 
-InitGP(array(
+S::gp(array(
 	'fid',
 	'seltid'
 ));
-@include_once Pcv(D_P . 'data/bbscache/mode_push_config.php');
+@include_once pwCache::getPath(S::escapePath(D_P . 'data/bbscache/mode_push_config.php'));
 $pushs = array();
-if ($groupid == '3' || $groupid == '4' || CkInArray($windid, $manager)) {
+if ($groupid == '3' || $groupid == '4' || S::inArray($windid, $manager)) {
 	$pushs = $PUSH;
 } elseif ($groupid == '5') {
 	foreach ($PUSH as $key => $value) {

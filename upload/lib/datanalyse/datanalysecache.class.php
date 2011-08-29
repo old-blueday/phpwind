@@ -29,7 +29,7 @@ class PW_DatanalyseCache {
 		$cache .= "<?php\r\n";
 		$cache .= "\$_result=" . var_export ( $result, TRUE ) . ";\r\n";
 		$cache .= "?>\r\n";
-		writeover($this->filepath,$cache);
+		pwCache::setData($this->filepath,$cache);
 	}
 	
 	/**

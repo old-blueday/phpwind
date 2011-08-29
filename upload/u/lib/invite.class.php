@@ -88,7 +88,7 @@ class PW_Invite {
 		}
 		$result = array();
 		if (!empty($users) && is_array($users)) {
-			$_sql = "SELECT f.uid FROM pw_friends f WHERE f.uid=" . pwEscape($userId) . " AND f.friendid IN (" . pwImplode(array_keys($users)) . ")";
+			$_sql = "SELECT f.uid FROM pw_friends f WHERE f.uid=" . S::sqlEscape($userId) . " AND f.friendid IN (" . S::sqlImplode(array_keys($users)) . ")";
 			$_query = $this->_db->query($_sql);
 			while ($rt = $this->_db->fetch_array($_query)) {
 				$result[] = $rt;
@@ -124,7 +124,7 @@ class PW_Invite {
 		if (isset($classes[$class])) {
 			return $classes[$class];
 		}
-		include Pcv($filename);
+		include S::escapePath($filename);
 		$classes[$class] = new $class();
 		return $classes[$class];
 	}

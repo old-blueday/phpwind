@@ -2,15 +2,13 @@
 !defined('P_W') && exit('Forbidden');
 
 if (empty($_POST['step'])) {
-	InitGP(array(
-		'recall'
-	));
+	S::gp(array('recall'));
 	$friend = getFriends($winduid);
 	if (empty($friend)) Showmsg('no_friend');
 	foreach ($friend as $key => $value) {
 		$frienddb[$value['ftid']][] = $value;
 	}
-	$query = $db->query("SELECT * FROM pw_friendtype WHERE uid=" . pwEscape($winduid) . " ORDER BY ftid");
+	$query = $db->query("SELECT * FROM pw_friendtype WHERE uid=" . S::sqlEscape($winduid) . " ORDER BY ftid");
 	$friendtype = array();
 	while ($rt = $db->fetch_array($query)) {
 		$friendtype[$rt['ftid']] = $rt;
@@ -24,9 +22,7 @@ if (empty($_POST['step'])) {
 	require_once PrintEot('ajax');
 	ajax_footer();
 } else {
-	InitGP(array(
-		'selid'
-	));
+	S::gp(array('selid'));
 	if ($selid) {
 		$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
 		$memebers = $userService->getByUserIds($selid);

@@ -3,11 +3,11 @@
 
 $basename="$admin_file?adminjob=attachrenew";
 ($attach_url || $db_ifftp) && adminmsg('attachrenew_forbidden');
-InitGP(array('action'));
+S::gp(array('action'));
 if (empty($action)) {
 	include PrintEot('attachrenew');exit;
 } elseif ('delete' == $action) {
-	InitGP(array('step'));
+	S::gp(array('step'));
 	$step	= $step ? (int) $step : 0;
 	$prenum = 10000;
 	$attachDB = L::loadDB('attachs', 'forum');
@@ -23,10 +23,10 @@ if (empty($action)) {
 		}
 	}
 	foreach ($tTables as $table=>$value) {
-		$db->update("UPDATE $table SET aid=1 WHERE tid IN (".pwImplode($value).")");
+		$db->update("UPDATE $table SET aid=1 WHERE tid IN (".S::sqlImplode($value).")");
 	}
 	foreach ($pTables as $table=>$value) {
-		$db->update("UPDATE $table SET aid=1 WHERE pid IN (".pwImplode($value).")");
+		$db->update("UPDATE $table SET aid=1 WHERE pid IN (".S::sqlImplode($value).")");
 	}
 
 	$maxAid = $attachDB->getTableStructs('Auto_increment');
@@ -38,7 +38,7 @@ if (empty($action)) {
 	}
 } elseif ('delattach' == $action) {
 	$pwServer['REQUEST_METHOD']!='POST' && PostCheck($verify);
-	InitGP(array('pernum','start','deltotal'));
+	S::gp(array('pernum','start','deltotal'));
 	if(!$start){
 		$start=0;
 		$deltotal=0;
@@ -47,10 +47,14 @@ if (empty($action)) {
 	$delnum	= 0;
 	!$pernum && $pernum = 1000;
 	$dir1 = opendir($attachdir);
+	$whiteDir = array('upload','photo','cn_img','forumlogo','cms_article','diary','house','pushpic','stopic','products','salepic','salethumbpic','idcard');
+	foreach ($db_modes as $key=>$value) {
+		if (!in_array($key,$whiteDir)) $whiteDir[] = $key;
+	}
 	while(false !== ($file1 = readdir($dir1))){
 		if($file1!='' && $file1!='.' && $file1!='..' && !eregi("\.html$",$file1)){
 			if(is_dir("$attachdir/$file1")){
-				if(in_array($file1,array('upload','photo','cn_img','forumlogo'))){
+				if(in_array($file1,$whiteDir)){
 					continue;
 				}
 				$dir2 = opendir("$attachdir/$file1");
@@ -58,7 +62,7 @@ if (empty($action)) {
 					if(is_file("$attachdir/$file1/$file2") && $file2!='' && $file2!='.' && $file2!='..' && !eregi("\.html$",$file2)){
 						$num++;
 						if($num > $start){
-							$rt = $db->get_one("SELECT aid,ifthumb FROM pw_attachs WHERE attachurl=".pwEscape("$file1/$file2"));
+							$rt = $db->get_one("SELECT aid,ifthumb FROM pw_attachs WHERE attachurl=".S::sqlEscape("$file1/$file2"));
 							if(!$rt){
 								$delnum++;
 								$deltotal++;
@@ -76,7 +80,7 @@ if (empty($action)) {
 			} elseif(is_file("$attachdir/$file1")){
 				$num++;
 				if($num > $start){
-					$rt = $db->get_one("SELECT aid,ifthumb FROM pw_attachs WHERE attachurl=".pwEscape($file1));
+					$rt = $db->get_one("SELECT aid,ifthumb FROM pw_attachs WHERE attachurl=".S::sqlEscape($file1));
 					if(!$rt){
 						$delnum++;
 						$deltotal++;

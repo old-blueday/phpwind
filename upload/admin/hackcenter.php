@@ -28,7 +28,7 @@ if (!$action) {
 					$filedata = readover(R_P."hack/$hackdir/info.xml");
 				}
 				if (preg_match('/\<hackname\>(.+?)\<\/hackname\>\s+\<ifopen\>(.+?)\<\/ifopen\>/is',$filedata,$infodb)) {
-					$infodb[1] && $hackname = Char_cv(str_replace(array("\n"),'',$infodb[1]));
+					$infodb[1] && $hackname = S::escapeChar(str_replace(array("\n"),'',$infodb[1]));
 					$hackopen = (int)$infodb[2];
 				}
 				$hackurl = EncodeUrl("$basename&action=add&hackdir=$hackdir&hackname=".rawurlencode($hackname)."&hackopen=$hackopen");
@@ -41,7 +41,7 @@ if (!$action) {
 	include PrintEot('hackcenter');exit;
 
 } elseif ($action == 'edit') {
-	InitGP(array('hackname'),'GP',0);
+	S::gp(array('hackname'),'GP',0);
 
 	!is_array($hackname) && $hackname = array();
 	foreach ($hackname as $key => $value) {
@@ -56,7 +56,7 @@ if (!$action) {
 
 } elseif ($action == 'delete') {
 
-	InitGP(array('id'));
+	S::gp(array('id'));
 	empty($db_hackdb[$id]) && adminmsg('hackcenter_del');
 	unset($db_hackdb[$id]);
 	$sqlarray = file_exists(R_P."hack/$id/sql.txt") ? FileArray($id) : array();
@@ -71,7 +71,7 @@ if (!$action) {
 
 } elseif ($action == 'add') {
 
-	InitGP(array('hackdir','hackname','hackopen'),'G');
+	S::gp(array('hackdir','hackname','hackopen'),'G');
 	!empty($db_hackdb[$hackdir]) && adminmsg('hackcenter_sign_exists');
 	$sqlarray = file_exists(R_P."hack/$hackdir/sql.txt") ? FileArray($hackdir) : array();
 	!empty($sqlarray) && SQLCreate($sqlarray);

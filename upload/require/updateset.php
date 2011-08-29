@@ -8,7 +8,7 @@ function write_config($newconfig=array()){
 			${$key} = $value;
 		}
 	} else {
-		include D_P.'data/sql_config.php';
+		include pwCache::getPath(D_P.'data/sql_config.php');
 	}
 	$db_hostweb!=0 && $db_hostweb = 1;
 	!$pconnect && $pconnect = 0;
@@ -24,7 +24,7 @@ function write_config($newconfig=array()){
 	}
 	$mg_a = substr($mg_a,1); $mg_p = substr($mg_p,1); $att_url = substr($att_url,1);
 	if (file_exists(R_P."template/admin_$tplpath")) {
-		include Pcv(R_P."template/admin_$tplpath/cp_lang_all.php");
+		include S::escapePath(R_P."template/admin_$tplpath/cp_lang_all.php");
 	} else {
 		include R_P."template/admin/cp_lang_all.php";
 	}
@@ -79,6 +79,6 @@ function write_config($newconfig=array()){
 */
 \$attach_url = array($att_url);
 ".'?>';
-	writeover(D_P.'data/sql_config.php',$writetofile);
+	pwCache::setData(D_P.'data/sql_config.php',$writetofile);
 }
 ?>

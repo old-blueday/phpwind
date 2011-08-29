@@ -64,7 +64,7 @@ var uploader = {
 		//载入flash
 		if(!uploader.flash)
 		{
-			var flashVar = {url:document.getElementById('headbase').href+'job.php?action=mutiupload'};
+			var flashVar = {url:document.getElementById('headbase').href+'job.php?action=mutiupload&random='+Math.floor(Math.random()*100)};
 			var params   = {
 				menu: "false",  
 				scale: "noScale",

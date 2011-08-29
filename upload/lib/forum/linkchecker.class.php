@@ -99,7 +99,7 @@ class PW_LinkChecker {
 			$urlPostion = 2;
 			if ('' == $matches[$urlPostion][$index]) $urlPostion = 3;
 			
-			$parseInfo = parse_url($matches[$urlPostion][$index]);
+			$parseInfo = @parse_url($matches[$urlPostion][$index]);
 			
 			if (isset($parseInfo['host'])) {
 				$domains[] = $parseInfo['host'];

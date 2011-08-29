@@ -2,7 +2,7 @@
 !function_exists('readover') && exit('Forbidden');
 
 require_once(R_P.'require/credit.php');
-@include_once(D_P.'data/bbscache/tm_config.php');
+@include_once pwCache::getPath(D_P.'data/bbscache/tm_config.php');
 
 $gids = 0;
 if (!empty($_tmconf['group'])) {
@@ -42,8 +42,8 @@ foreach ($admindb as $key=>$value) {
 }
 
 $datef	 = get_date($timestamp,'Y - m');
-$msgdata = Char_cv($_tmconf['msgdata']);
-$arousemsg = Char_cv($_tmconf['arousemsg']);
+$msgdata = S::escapeChar($_tmconf['msgdata']);
+$arousemsg = S::escapeChar($_tmconf['arousemsg']);
 
 foreach ($admindb as $username => $value) {
 	$uid = $value['uid'];

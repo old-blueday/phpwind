@@ -1,5 +1,5 @@
 <?php
-!defined('M_P') && exit('Forbidden');
+!defined('P_W') && exit('Forbidden');
 
 class PW_PurviewDB extends BaseDB {
 	var $_tableName = "pw_cms_purview";
@@ -30,7 +30,7 @@ class PW_PurviewDB extends BaseDB {
 
 	function findAll($array, $page, $perPage = 20) {
 		$_sql_add = $this->_getSearchSQL($array);
-		if ($perPage) $limit = pwLimit(($page - 1) * $perPage, $perPage);
+		if ($perPage) $limit = S::sqlLimit(($page - 1) * $perPage, $perPage);
 		$_sql = "SELECT * FROM " . $this->_tableName . " WHERE 1 $_sql_add " . $limit;
 		$temp = array();
 		$query = $this->_db->query($_sql);
@@ -41,7 +41,7 @@ class PW_PurviewDB extends BaseDB {
 	}
 
 	function _getSearchSQL($array) {
-		if ($array['username']) {return ' AND username=' . pwEscape($array['username']);}
+		if ($array['username']) {return ' AND username=' . S::sqlEscape($array['username']);}
 		return ' ';
 	}
 

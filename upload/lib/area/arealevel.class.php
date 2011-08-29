@@ -229,7 +229,7 @@ class PW_AreaLevel {
 	 */
 	function _getGMLevel() {
 		global $manager,$windid;
-		if (!CkInArray($windid, $manager)) return false;
+		if (!S::inArray($windid, $manager)) return false;
 		return array('uid'=>$windid,'hasedit'=>1,'hasattr'=>1,'super'=>1);
 	}
 	/**

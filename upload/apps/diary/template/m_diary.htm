@@ -1,14 +1,13 @@
 <!--<?php
 require_once(uTemplate::printEot('header'));
-//require_once(uTemplate::printEot('user_appleft'));
+require_once(uTemplate::printEot('user_appleft'));
 InitGP('s');
 print <<<EOT
 -->
-<style type="text/css">
-.textareaA{width:312px;height:62px;overflow:auto;background:#fff;line-height:1.4;}
-</style>
 <div class="contUser">
+<table width="100%"><tr><td valign="top" height="500">
 	<div class="p15">
+		<h4 class="site"><img src="u/images/module/diary.png" align="absmiddle" class="mr10" /><span>日志</span></h4>
 		<div class="navC">
 			<ul>
 <!--
@@ -54,8 +53,8 @@ $descrip = $value[subject];
 print <<<EOT
 -->
 		<dl class="dl">
-			<dt class="dt mb10"><a class="adel" href="javascript:;" onclick="pwConfirm('是否确认删除？',this,function(){delDiary('$value[did]','$value[uid]')})">删除</a><a class="aedit mr10" href="{$basename}a=edit&did=$value[did]">编辑</a>
-			<p class="mb5"><a href="{$basename}a=detail&did=$value[did]" class="f16 b">{$value[subject]}</a></p><span class="gray">{$value[postdate]}</span></dt>
+			<dt class="dt mb10">
+			<p class="mb5"><a href="{$basename}a=detail&did=$value[did]" class="b f14">{$value[subject]}</a></p><span class="gray mr5">{$value[postdate]}</span><a class="mr5 s7" href="{$basename}a=edit&did=$value[did]">编辑</a><a href="javascript:;" class="s7" onclick="pwConfirm('是否确认删除？',this,function(){delDiary('$value[did]','$value[uid]')})">删除</a></dt>
 			<dd class="dd">
 				<p class="mb10">{$value[content]}</p>
 				<cite class="gray">
@@ -121,26 +120,27 @@ EOT;
 	</div>
 	<div class="p10">
 					<h1 class="mb10">{$diary[subject]}</h1>
+					<p class="gray mb5"><span class="mr5">{$diary[postdate]}</span>
 <!--
 EOT;
-if($winduid || $SYSTEM['deldiary']){print <<<EOT
--->                         
-						<a class="adel" href="javascript:;" onclick="pwConfirm('是否确认删除？',this,function(){delDiary('$diary[did]','$winduid','read')})">删除</a>
-<!--
-EOT;
-}if ($winduid) {print <<<EOT
+if ($winduid) {print <<<EOT
 -->
-						<a class="mr10 aedit" href="{$basename}a=edit&did=$diary[did]">编辑</a> 
+						<a class="mr5 s7" href="{$basename}a=edit&did=$diary[did]">编辑</a> 
+<!--
+EOT;
+}if($winduid || $SYSTEM['deldiary']){print <<<EOT
+-->                         
+						<a href="javascript:;" class="s7" onclick="pwConfirm('是否确认删除？',this,function(){delDiary('$diary[did]','$winduid','read')})">删除</a>
 <!--
 EOT;
 }print <<<EOT
 -->
-					<p class="gray mb5">{$diary[postdate]}</p>
+					</p>
 <!--
 EOT;
 if($diary[copyurl]){print <<<EOT
 -->
-					<div class="mb20 s5">转载自：<a href="u.php?uid=$diary[copyuid]" target="_blank" class="s2 mr5">$diary[copyer]</a><a href="$diary[url]" target="_blank">$diary[url]</a></div>
+					<div class="mb20 s5">转载自：<a href="{$db_userurl}$diary[copyuid]" target="_blank" class="s2 mr5">$diary[copyer]</a><a href="$diary[url]" target="_blank">$diary[url]</a></div>
 <!--
 EOT;
 }print <<<EOT
@@ -185,7 +185,7 @@ EOT;
 -->
 					</td></tr></table>
 					</div>
-					<div class="mb10 gray">
+					<div class="mb10">
 <!--
 EOT;
 $typename = !$diary[dtid] ?  '默认分类' : $diaryType[$diary[dtid]][name];
@@ -203,9 +203,39 @@ EOT;
 -->				
 
                     </div>
-					<div class="cc mb10 seeMore">
-						<a class="fl" title="下一篇" href="{$basename}a=next&did=$diary[did]" onclick="return ajaxpage(this.href,'next','$winduid','$space');">下一篇</a>
-						<a  class="fr" title="上一篇"href="{$basename}a=pre&did=$diary[did]" onclick="return ajaxpage(this.href,'pre','$winduid','$space');">上一篇</a>
+					<div class="mb10">
+						<p class="mb5">下一篇：
+						<!-- 
+EOT;
+if(empty($diaryNextName)){print <<<EOT
+-->
+<span>无</span>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+						<a href="{$basename}a=next&did=$diary[did]" onclick="return ajaxpage(this.href,'next','$winduid','$space');">{$diaryNextName}</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+</p>
+<p>上一篇：
+<!-- 
+EOT;
+if(empty($diaryPreName)){print <<<EOT
+-->
+<span>无</span>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+<a href="{$basename}a=pre&did=$diary[did]" onclick="return ajaxpage(this.href,'pre','$winduid','$space');">{$diaryPreName}</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+</p>				
 					</div>
 <!--
 EOT;
@@ -235,22 +265,22 @@ foreach($diaryDb as $value){
 $typename = !$value[dtid] ?  '默认分类' : $value[typename];
 $title = '所属:'.$value[username].'&nbsp;'.$value[title];
 $descrip = $value[subject];
-$author = "<a href=\"u.php?uid=$value[uid]\" class=\"f16 b\">$value[username]:</a> ";
+$author = "<a href=\"{$db_userurl}$value[uid]\" class=\"b s5\">$value[username]:</a> ";
 
 print <<<EOT
 -->
 						<dl class="dl">
 							<dt class="dt mb10">
+								<p class="mb5 f14">{$author}<a href="{$basename}a=frienddetail&fuid={$value[uid]}&did=$value[did]" class="b">{$value[subject]}</a></p><span class="gray mr5">{$value[postdate]}</span>
 <!--
 EOT;
 if ($SYSTEM['deldiary']) {print <<<EOT
 -->
-								<a class="adel" href="javascript:;" onclick="pwConfirm('是否确认删除？',this,function(){delDiary('$value[did]','$value[uid]')})">删除</a>
+								<a href="javascript:;" onclick="pwConfirm('是否确认删除？',this,function(){delDiary('$value[did]','$value[uid]')})" class="s7">删除</a>
 <!--
 EOT;
 }print <<<EOT
 -->
-								<p class="mb5">{$author}<a href="{$basename}a=frienddetail&fuid={$value[uid]}&did=$value[did]" class="f16 b s5">{$value[subject]}</a></p><span class="gray">{$value[postdate]}</span>
 							</dt>
 							<dd class="dd">
 								<p class="mb20">{$value[content]}</p>
@@ -325,23 +355,23 @@ foreach($diaryDb as $value){
 $typename = !$value[dtid] ?  '默认分类' : $diaryType[$value[dtid]][name];
 $title = '所属:'.$value[username].'&nbsp;'.$value[title];
 $descrip = $value[subject];
-$author = "<a href=\"u.php?uid=$value[uid]\" class=\"f16 b\">$value[username]:</a> ";
+$author = "<a href=\"{$db_userurl}$value[uid]\" class=\"b s5\">$value[username]:</a> ";
 
 print <<<EOT
 -->
 				<dl class="dl">
 					<dt class="dt mb10">
+						<p class="mb5 f14">{$author}<a href="{$basename}a=frienddetail&fuid={$value[uid]}&did=$value[did]" class="b">{$value[subject]}</a></p>
+						<span class="gray mr5">{$value[postdate]}</span>
 <!--
 EOT;
 if ($SYSTEM['deldiary']) {print <<<EOT
 -->
-						<a class="adel" href="javascript:;" onclick="pwConfirm('是否确认删除？',this,function(){delDiary('$value[did]','$value[uid]')})">删除</a>
+						<a class="s7" href="javascript:;" onclick="pwConfirm('是否确认删除？',this,function(){delDiary('$value[did]','$value[uid]')})">删除</a>
 <!--
 EOT;
 }print <<<EOT
 -->
-						<p class="mb5">{$author}<a href="{$basename}a=frienddetail&fuid={$value[uid]}&did=$value[did]" class="f16 b s5">{$value[subject]}</a></p>
-						<span class="gray">{$value[postdate]}</span>
 					</dt>
 					<dd class="dd">
 						<p class="mb20">{$value[content]}</p>
@@ -413,17 +443,18 @@ EOT;
 }print <<<EOT
 -->
 		</div>
-		<h1 class="mb5"><a href="u.php?uid=$value[uid]" class="f16 b">$diary[username]</a>: {$diary[subject]}</h1>
+		<h1 class="mb5"><a href="{$db_userurl}$value[uid]" class="b s5">$diary[username]</a>: <span class="s4">{$diary[subject]}</span></h1>
+					<p class="mb10 gray"><span class="mr5">{$diary[postdate]}</span>
 <!--
 EOT;
 if($SYSTEM['deldiary']){print <<<EOT
 -->
-							<a class="adel" href="javascript:;" onclick="pwConfirm('是否确认删除？',this,function(){delDiary('$diary[did]','$winduid','read')})">删除</a>
+							<a class="s7" href="javascript:;" onclick="pwConfirm('是否确认删除？',this,function(){delDiary('$diary[did]','$winduid','read')})">删除</a>
 <!--
 EOT;
 }print <<<EOT
 -->
-					<p class="mb10 gray">{$diary[postdate]}</p>
+					</p>
 					<div class="contentText s5 f14 mb20" id="img-width">
 					<table style="table-layout: fixed;"><tr class="vt"><td height="200">
 					<div class="mb10">{$diary[content]}</div>
@@ -513,9 +544,39 @@ print <<<EOT
 -->
 					</div>
 					<div class="c">&nbsp;</div>
-					<div class="cc mb10 seeMore">
-						<a class="fl" title="下一篇" href="{$basename}a=next&fuid={$fuid}&did=$diary[did]" onclick="return ajaxpage(this.href,'next','$fuid','$space');">下一篇</a>
-						<a  class="fr" title="上一篇"href="{$basename}a=pre&fuid={$fuid}&did=$diary[did]" onclick="return ajaxpage(this.href,'pre','$fuid','$space');">上一篇</a>
+					<div class="mb10">
+						<p class="mb5">下一篇：
+<!-- 
+EOT;
+if(empty($friendDiaryNextName)){print <<<EOT
+-->
+<span>无</span>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+						<a href="{$basename}a=next&fuid={$fuid}&did=$diary[did]" onclick="return ajaxpage(this.href,'next','$fuid','$space');">{$friendDiaryNextName}</a>
+	<!--
+EOT;
+}print <<<EOT
+-->
+</p>
+<p>上一篇：
+<!-- 
+EOT;
+if(empty($friendDiaryPreName)){print <<<EOT
+-->
+<span>无</span>
+<!--
+EOT;
+}else{print <<<EOT
+-->					
+						<a href="{$basename}a=pre&fuid={$fuid}&did=$diary[did]" onclick="return ajaxpage(this.href,'pre','$fuid','$space');">{$friendDiaryPreName}</a>
+					<!--
+EOT;
+}print <<<EOT
+-->
+</p>
 					</div>
 <!--
 EOT;
@@ -554,25 +615,24 @@ print <<<EOT
             | <a href="{$basename}">返回我的日志</a>
 	</div>
 	<div class="p15">
-			$formiframe
-			<form action="{$basename}&a=$a" method="post" enctype="multipart/form-data" onsubmit="return checkpost(document.FORM);" name="FORM" id="FORM" $shortcut />
+			<form action="{$basename}a=$a" method="post" enctype="multipart/form-data" onsubmit="return checkpost(document.FORM);" name="FORM" id="FORM" $shortcut />
 			<input type="hidden" name="did" value="$did" />
 			<input type="hidden" name="dtided" value="$diary[dtid]" />
 			<input type="hidden" name="privacyed" value="$diary[privacy]" />
 			<input type="hidden" name="atc_autourl" value="1" />
 			<input type="hidden" name="step" value="2" />
 			<input type="hidden" name="verify" value="$verifyhash" />
+			<input type="hidden" name="diraryAjax" value="1" />
 			<div>
 			<div class="mb10">
 			<input type="text" class="input input_wb mr10" name="atc_title" id="atc_title" value="$diary[subject]"/><span id="atc_title_warn" class="gray">限 $db_titlemax 字节</span>
 			<div id="menu_face" class="menu" style="display:none;"></div>
 			</div>
-			<div class="cc mb10 pr">
 <!--
 EOT;
 require_once PrintEot('wysiwyg_editor');
 print <<<EOT
--->			</div>
+-->
             <table cellpadding="0" cellspacing="0" width="100%" style=" table-layout:fixed;">
                 <tr class="tr3">
                     <td width="62">日志分类</td>
@@ -595,7 +655,7 @@ print <<<EOT
 						</label>
 <!--
 EOT;
-if ($sendWeiboPrivacy) {print <<<EOT
+if ($myAppsData['diary_isfeed']) {print <<<EOT
 -->
 						<label for="if_sendweibo" class="mr10" $weibodisplay id="lab_weibo">
 							<input id="if_sendweibo" type="checkbox" name="ifsendweibo" value="1" $weibocheck >&nbsp;同时发送到新鲜事
@@ -645,7 +705,7 @@ EOT;
 <tr class="tr3">
     <td colspan="2" style="padding:0;border:0;">
         <div class="editor-mwidth">
-            <table class="tr_p10" width="100%">
+            <table class="tr_p10" width="100%" style="table-layout:fixed">
                 <tr>
                     <td width="3%"></td>
                     <td width="240">该帖包含附件<span class="gray">(不想保留的附件去掉√)</span> :</td>
@@ -678,7 +738,7 @@ EOT;
 $shortcut=$_GET['s']?' style="display:none"':'';
 print <<<EOT
 -->
-        <table class="tr_p10" width="100%">
+        <table class="tr_p10" width="100%" style="table-layout:fixed">
             <tr>
                 <td style="padding-right:3em" width="35%">上传图片附件</td>
                 <td>描述</td>
@@ -702,32 +762,40 @@ EOT;
 -->
 <!--
 EOT;
-if ($o_diary_gdcheck) {print <<<EOT
+if ($o_diary_gdcheck) {
+$gdSize = explode("\t",$db_gdsize);
+print <<<EOT
 -->
                 <tr class="tr3 vt">
                     <td>认证码:</td>
                     <td>
-                        <input class="input" onfocus="showCK();" type="text" name="gdcode" id="gdcode" size="5" tabindex="3"  />
-<img id="ckcode" style=" vertical-align:top;cursor:pointer;display:none;margin-top:0px;border:1px solid #ccc;" onclick="this.src='ck.php?nowtime='+new Date().getTime();" alt="看不清楚，换一张" />
+                        <input class="input" onfocus="showgd();" type="text" name="gdcode" id="gdcode" size="5" tabindex="3"  />
+                        <span id="ckcode" style="display:none;">
+<script type="text/javascript" src="js/pw_authcode.js"></script>
+<script>
+var flashWidth = "$gdSize[0]";
+var flashHeight = "$gdSize[1]";
+var gdtype = $db_gdtype;
+showGdCode();
+</script>
+					</span>
                     </td>
                 </tr>
 <!--
 EOT;
-}if($o_diary_qcheck){print <<<EOT
+}if($db_question && $o_diary_qcheck){
+if($db_imagequestion){
+	$question = '<img id="ckquestion" src="ckquestion.php?q='.$qkey.'&t='.$timestamp.'" align="top">';
+}else{
+	$question = $qkey<0 ? getMachineQuestion_1() :  $db_question[$qkey];
+}
+$q_a = $question.($showq && $qkey>0?" 正确答案:".$db_answer[$qkey] : '');
+print <<<EOT
 -->
                 <tr class="tr3">
                     <td>验证问题:</td>
                     <td style="line-height:30px">
-                    {$db_question[$qkey]} 
-<!--
-EOT;
-if($showq){print <<<EOT
--->					
-					（正确答案:{$db_answer[$qkey]}）
-<!--
-EOT;
-}print <<<EOT
--->
+                    {$q_a} 
                     <input class="input" name="qanswer" id="qanswer" size="25" tabindex="7" />
                     <input type="hidden" name="qkey" id="qkey" value="$qkey" />
                     </td>
@@ -750,7 +818,7 @@ EOT;
                     </td>
                 </tr>
             </table>
-			</div>
+			</div><div id="divload"></div>
 			</form>
     </div>
 <!--
@@ -792,37 +860,72 @@ var cnt  = 0;
 document.FORM.Submit.disabled = false;
 function checkpost(obj) {
 	if (obj.atc_title.value == "") {
-		showDialog("error","标题不能为空",2);
+		showDialog("error","日志<span class='warnFontStyle'>标题</span>不能为空",2);
 		obj.atc_title.focus();
 		return false;
 	} else if (strlen(obj.atc_title.value) > $db_titlemax) {
-		showDialog("error","标题超过最大长度 $db_titlemax 个字节",2);
+		showDialog("error","日志<span class='warnFontStyle'>标题</span>不能大于 <span class='warnFontStyle'>$db_titlemax</span> 个字节",2);
 		obj.atc_title.focus();
 		return false;
 	}
 	if (strlen(obj.atc_content.value) < $db_postmin) {
-		showDialog("error","文章内容少于 $db_postmin 个字节",2);
+		showDialog("error","日志<span class='warnFontStyle'>内容</span>不能少于 <span class='warnFontStyle'>$db_postmin</span> 个字节",2);
 		editor.focusEditor();
 		return false;
 	} else if (strlen(obj.atc_content.value) > $db_postmax) {
-		showDialog("error","文章内容大于 $db_postmax 个字节",2);
+		showDialog("error","日志<span class='warnFontStyle'>内容</span>不能大于 <span class='warnFontStyle'>$db_postmax</span> 个字节",2);
 		editor.focusEditor();
 		return false;
 	}
-	//过滤检测上传图片
-	var a = /\[url=(\d)\]/gmi.exec(obj.atc_content.value);
-	for(var i=1;i<a.length;i++)
+	var pattern = /\[url=(\d+)\]/gmi;
+	var str = obj.atc_content.value;
+	var res;
+	while( (res = pattern.exec(str))!=null )
 	{
-		if(getObj('attachment_'+a[i]).value=='')
-			obj.atc_content.value=obj.atc_content.value.replace(new RegExp('\\\\[url='+a[i]+'\]','gm'),'');
+		if(getObj('attachment_'+a[1]).value==''){
+			str=str.replace(new RegExp('\\\\[url='+a[i]+'\]','gm'),'');
+		}
 	}
+	obj.atc_content.value = str;	
+	SubmitAjax(obj);
+	return false;
+}
+//ajax提交数据 
+function SubmitAjax(obj) {
 	document.FORM.Submit.disabled = true;
+	getObj('divload').innerHTML = showLoading();
 	cnt++;
-	if (cnt != 1) {
-		showDialog("warning","Submission Processing. Please Wait");
+	ajax.send("apps.php?q=diary&a=$a", obj, function(){
+		if(undefined == ajax.request.responseText){
+			showDialog({
+				type: 'error',
+				message: '请求超时!'
+			});
+			getObj('divload').innerHTML = "";
+			document.FORM.Submit.disabled = false;
+			return false;
+		}
+		var rText = ajax.request.responseText.split('\t');
+		if (rText[0] == 'success') {
+			window.onbeforeunload = function(){};
+			window.location =  rText[1];
+		} else {
+			showDialog('error', rText[0]);
+		}
+		cnt = 0;
+		document.FORM.Submit.disabled = false;
+		getObj('divload').innerHTML = "";
 		return false;
+	});
+}
+function showLoading(){
+	return "<div id=\"loading\" style=\"padding:20px;width:80%;text-align:center\"><img src=\""+imgpath+"/loading.gif\" align=\"absbottom\" alt=\"loading\" /> 正在加载数据...</div>";
+}
+window.onbeforeunload = function() {
+	var obj = document.FORM;
+	if (obj.atc_title.value !=='' || obj.atc_content.value !=='') {
+		return "你正在编辑的日志没有保存，离开会导致内容丢失，是否确定离开?";
 	}
-	return true;
 }
 </script>
 <script language="JavaScript" src="js/post.js"></script>
@@ -831,6 +934,7 @@ EOT;
 }print <<<EOT
 -->
 <script language="JavaScript" src="apps/diary/js/diarytype.js"></script>
+<script language="JavaScript" src="js/app_type.js"></script>
 <script language="JavaScript" src="js/app_comment.js"></script>
 <script type="text/javascript" src="js/select.js"></script>
 <script language="javascript">
@@ -850,10 +954,13 @@ function CheckAll(form,match)
 </script>
 <div class="c">&nbsp;</div>
 </div>
+</td></tr></table>
 <script type="text/javascript">
 var ld=window.onload;
-new sSelect(getObj('dtid_add'));
-new sSelect(getObj('dtid_pvc'));
+window.onReady(function(){
+	new sSelect(getObj('dtid_add'));
+	new sSelect(getObj('dtid_pvc'));
+});
 </script>
 </div>
 <!--

@@ -3,7 +3,7 @@
 $wind_in = 'toolcenter';
 $USCR = 'set_toolcenter';
 
-require_once(D_P.'data/bbscache/level.php');
+require_once pwCache::getPath(D_P.'data/bbscache/level.php');
 
 if(!$db_hackdb[$wind_in] || !file_exists(R_P."u/require/profile/toolcenter.php")){
 	Showmsg('hack_error');
@@ -11,11 +11,11 @@ if(!$db_hackdb[$wind_in] || !file_exists(R_P."u/require/profile/toolcenter.php")
 
 !$db_toolifopen && Showmsg('toolcenter_close');
 
-InitGP(array('job'));
+S::gp(array('job'));
 if(isset($job) && $job == 'ajax'){
 	define('AJAX','1');
 }
-
+$q = "toolcenter";
 require_once(R_P.'require/credit.php');
 $userdb = array(
 	'money'		=> $winddb['money'],
@@ -30,7 +30,7 @@ $usercreditdb = $userdb;
 
 $total_tool_nums = array('valid_nums'=>0, 'sell_nums'=>0);
 $sell_status = 0;
-$query = $db->query("SELECT nums, sellnums, sellstatus  FROM pw_usertool WHERE uid=".pwEscape($winduid,false));
+$query = $db->query("SELECT nums, sellnums, sellstatus  FROM pw_usertool WHERE uid=".S::sqlEscape($winduid,false));
 while ($rt = $db->fetch_array($query)) {
 	$total_tool_nums['valid_nums'] += $rt['nums'];
 	$total_tool_nums['sell_nums'] += $rt['sellnums'];
@@ -49,7 +49,7 @@ if (empty($job)) {
 	pwOutPut();
 
 } elseif ($job == 'mytool') {
-	$query = $db->query("SELECT u.*,t.name,t.price,t.creditype,t.stock,t.descrip,t.type,t.logo FROM pw_usertool u LEFT JOIN pw_tools t ON t.id=u.toolid WHERE u.uid=".pwEscape($winduid)." AND (u.nums + u.sellnums)>0");
+	$query = $db->query("SELECT u.*,t.name,t.price,t.creditype,t.stock,t.descrip,t.type,t.logo FROM pw_usertool u LEFT JOIN pw_tools t ON t.id=u.toolid WHERE u.uid=".S::sqlEscape($winduid)." AND (u.nums + u.sellnums)>0");
 	while ($rt = $db->fetch_array($query)) {
 		!$rt['creditype'] && $rt['creditype'] = 'currency';
 		$tooldb[] = $rt;
@@ -60,7 +60,7 @@ if (empty($job)) {
 } elseif ($job == 'user') {
 
 	!$db_allowtrade && Showmsg('trade_close');
-	InitGP(array('uid'));
+	S::gp(array('uid'));
 	$sqladd = $owner = '';
 	if (is_numeric($uid)) {
 		$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
@@ -69,11 +69,11 @@ if (empty($job)) {
 			$errorname = '';
 			Showmsg('user_not_exists');
 		}
-		$sqladd = "AND u.uid=".pwEscape($uid);
+		$sqladd = "AND u.uid=".S::sqlEscape($uid);
 	}
 	$query = $db->query("SELECT u.*,t.name,t.descrip,t.logo,t.creditype,m.username FROM pw_usertool u LEFT JOIN pw_members m USING(uid) LEFT JOIN pw_tools t ON t.id=u.toolid WHERE sellnums!=0 $sqladd");
 	while ($rt = $db->fetch_array($query)) {
-		$rt['descrip'] = substrs($rt['descrip'],45);
+		//$rt['descrip'] = substrs($rt['descrip'],45);
 		!$rt['creditype'] && $rt['creditype'] = 'currency';
 		$tooldb[] = $rt;
 	}
@@ -84,11 +84,11 @@ if (empty($job)) {
 } elseif ($job == 'sell') {
 
 	!$db_allowtrade && Showmsg('trade_close');
-	InitGP(array('id'));
+	S::gp(array('id'));
 
 	if (empty($_POST['step'])) {
 
-		$rt = $db->get_one("SELECT u.*,t.name,t.price,t.creditype,t.logo FROM pw_usertool u LEFT JOIN pw_tools t ON t.id=u.toolid WHERE uid=".pwEscape($winduid,false)." AND toolid=".pwEscape($id));
+		$rt = $db->get_one("SELECT u.*,t.name,t.price,t.creditype,t.logo FROM pw_usertool u LEFT JOIN pw_tools t ON t.id=u.toolid WHERE uid=".S::sqlEscape($winduid,false)." AND toolid=".S::sqlEscape($id));
 		!$rt && Showmsg('undefined_action');
 		$rt['nums'] == 0 && Showmsg('unenough_toolnum');
 		!$rt['creditype'] && $rt['creditype'] = 'currency';
@@ -97,16 +97,16 @@ if (empty($job)) {
 
 	} else {
 
-		$rt = $db->get_one("SELECT u.*,t.name FROM pw_usertool u LEFT JOIN pw_tools t ON t.id=u.toolid WHERE uid=".pwEscape($winduid)."AND toolid=".pwEscape($id));
+		$rt = $db->get_one("SELECT u.*,t.name FROM pw_usertool u LEFT JOIN pw_tools t ON t.id=u.toolid WHERE uid=".S::sqlEscape($winduid)."AND toolid=".S::sqlEscape($id));
 		if ($rt) {
-			InitGP(array('nums','price'),'P');
+			S::gp(array('nums','price'),'P');
 			$nums   = (int)$nums;
 			$price  = (int)$price;
 			$price <= 0 && Showmsg('illegal_nums');
 			$nums  <= 0 && Showmsg('illegal_nums');
 			$rt['nums'] < $nums && Showmsg('unenough_nums');
 
-			$db->update("UPDATE pw_usertool SET nums=nums-".pwEscape($nums).",sellnums=sellnums+".pwEscape($nums).",sellprice=".pwEscape($price)."WHERE uid=".pwEscape($winduid)."AND toolid=".pwEscape($id));
+			$db->update("UPDATE pw_usertool SET nums=nums-".S::sqlEscape($nums).",sellnums=sellnums+".S::sqlEscape($nums).",sellprice=".S::sqlEscape($price)."WHERE uid=".S::sqlEscape($winduid)."AND toolid=".S::sqlEscape($id));
 
 			require_once(R_P.'require/tool.php');
 			$logdata = array(
@@ -128,37 +128,37 @@ if (empty($job)) {
 		}
 	}
 } elseif ($job == 'unsell') {
-	InitGP(array('id'));
+	S::gp(array('id'));
 
-	$rt = $db->get_one("SELECT u.*,t.name,t.price,t.creditype,t.logo FROM pw_usertool u LEFT JOIN pw_tools t ON t.id=u.toolid WHERE uid=".pwEscape($winduid,false)." AND toolid=".pwEscape($id));
+	$rt = $db->get_one("SELECT u.*,t.name,t.price,t.creditype,t.logo FROM pw_usertool u LEFT JOIN pw_tools t ON t.id=u.toolid WHERE uid=".S::sqlEscape($winduid,false)." AND toolid=".S::sqlEscape($id));
 	!$rt && Showmsg('undefined_action');
 	$rt['sellnums'] == 0 && Showmsg('neednt_unsell_tool');
 
-	$db->update("UPDATE pw_usertool SET nums=".($rt['nums'] + $rt['sellnums']).", sellnums=0 WHERE uid=".pwEscape($winduid,false)." AND toolid=".pwEscape($id)." LIMIT 1");
+	$db->update("UPDATE pw_usertool SET nums=".($rt['nums'] + $rt['sellnums']).", sellnums=0 WHERE uid=".S::sqlEscape($winduid,false)." AND toolid=".S::sqlEscape($id)." LIMIT 1");
 	refreshto("profile.php?action=toolcenter&job=user&uid=".$winduid,'operate_success');
 } elseif ($job == 'unsellall') {
-	$db->update("UPDATE pw_usertool SET nums=nums + sellnums, sellnums=0 WHERE uid=".pwEscape($winduid,false)." AND sellnums>0");
+	$db->update("UPDATE pw_usertool SET nums=nums + sellnums, sellnums=0 WHERE uid=".S::sqlEscape($winduid,false)." AND sellnums>0");
 	refreshto("profile.php?action=toolcenter&job=user&uid=".$winduid,'operate_success');
 } elseif ($job == 'close') {
 	!$sell_status && Showmsg('neednt_close_toolsell');
 
 	//TODO modify action == 'buy/buyuser', add sellstatus
 	//TODO modify action == 'user', where condition
-	$db->update("UPDATE pw_usertool SET sellstatus=0 WHERE uid=".pwEscape($winduid,false));
+	$db->update("UPDATE pw_usertool SET sellstatus=0 WHERE uid=".S::sqlEscape($winduid,false));
 	refreshto("profile.php?action=toolcenter&job=user&uid=".$winduid,'operate_success');
 } elseif ($job == 'open') {
 	$sell_status && Showmsg('neednt_open_toolsell');
 	(!$total_tool_nums['valid_nums'] && !$total_tool_nums['sell_nums']) && Showmsg('nonetool_cannt_open');
 
-	$db->update("UPDATE pw_usertool SET sellstatus=1 WHERE uid=".pwEscape($winduid,false));
+	$db->update("UPDATE pw_usertool SET sellstatus=1 WHERE uid=".S::sqlEscape($winduid,false));
 	refreshto("profile.php?action=toolcenter&job=user&uid=".$winduid,'operate_success');
 } elseif ($job == 'buyuser') {
 
-	InitGP(array('id','uid'));
+	S::gp(array('id','uid'));
 
 	if (empty($_POST['step'])) {
 
-		$rt = $db->get_one("SELECT * FROM pw_usertool u LEFT JOIN pw_tools t ON t.id=u.toolid WHERE u.toolid=".pwEscape($id)."AND u.uid=".pwEscape($uid));
+		$rt = $db->get_one("SELECT * FROM pw_usertool u LEFT JOIN pw_tools t ON t.id=u.toolid WHERE u.toolid=".S::sqlEscape($id)."AND u.uid=".S::sqlEscape($uid));
 		if ($rt) {
 			$condition = unserialize($rt['conditions']);
 			$groupids  = $condition['group'];
@@ -198,9 +198,9 @@ if (empty($job)) {
 		}
 	} else{
 
-		$toolinfo = $db->get_one("SELECT u.*,t.name,t.creditype,m.username FROM pw_usertool u LEFT JOIN pw_members m USING(uid) LEFT JOIN pw_tools t ON t.id=u.toolid WHERE u.toolid=".pwEscape($id)."AND u.uid=".pwEscape($uid));
+		$toolinfo = $db->get_one("SELECT u.*,t.name,t.creditype,m.username FROM pw_usertool u LEFT JOIN pw_members m USING(uid) LEFT JOIN pw_tools t ON t.id=u.toolid WHERE u.toolid=".S::sqlEscape($id)."AND u.uid=".S::sqlEscape($uid));
 
-		$nums  = (int)GetGP('nums');
+		$nums  = (int)S::getGP('nums');
 		$nums <= 0 && Showmsg('illegal_nums');
 		$price = $toolinfo['sellprice'] * $nums;
 		$toolinfo['sellnums'] < $nums && Showmsg('unenough_sellnum');
@@ -220,7 +220,7 @@ if (empty($job)) {
 				'from'		=>	'',
 			);
 			writetoollog($logdata);
-			$db->update("UPDATE pw_usertool SET nums=nums+".pwEscape($nums).",sellnums=sellnums-".pwEscape($nums)."WHERE uid=".pwEscape($toolinfo['uid'],false)."AND toolid=".pwEscape($id));
+			$db->update("UPDATE pw_usertool SET nums=nums+".S::sqlEscape($nums).",sellnums=sellnums-".S::sqlEscape($nums)."WHERE uid=".S::sqlEscape($toolinfo['uid'],false)."AND toolid=".S::sqlEscape($id));
 		} else {
 			if (procLock('tool_buyuser',$winduid)) {
 
@@ -250,11 +250,11 @@ if (empty($job)) {
 				$credit->runsql();
 
 				$db->pw_update(
-					"SELECT uid FROM pw_usertool WHERE uid=" . pwEscape($winduid) . " AND toolid=" . pwEscape($id),
-					"UPDATE pw_usertool SET nums=nums+" .pwEscape($nums) . " WHERE uid=" . pwEscape($winduid) . " AND toolid=" . pwEscape($id),
-					"INSERT INTO pw_usertool SET " . pwSqlSingle(array('nums' => $nums, 'uid' => $winduid, 'toolid' => $id, 'sellstatus' => $sell_status))
+					"SELECT uid FROM pw_usertool WHERE uid=" . S::sqlEscape($winduid) . " AND toolid=" . S::sqlEscape($id),
+					"UPDATE pw_usertool SET nums=nums+" .S::sqlEscape($nums) . " WHERE uid=" . S::sqlEscape($winduid) . " AND toolid=" . S::sqlEscape($id),
+					"INSERT INTO pw_usertool SET " . S::sqlSingle(array('nums' => $nums, 'uid' => $winduid, 'toolid' => $id, 'sellstatus' => $sell_status))
 				);
-				$db->update("UPDATE pw_usertool SET sellnums=sellnums-".pwEscape($nums)."WHERE uid=".pwEscape($toolinfo['uid'],false)."AND toolid=".pwEscape($id));
+				$db->update("UPDATE pw_usertool SET sellnums=sellnums-".S::sqlEscape($nums)."WHERE uid=".S::sqlEscape($toolinfo['uid'],false)."AND toolid=".S::sqlEscape($id));
 
 				require_once(R_P.'require/tool.php');
 				$logdata = array(
@@ -278,11 +278,11 @@ if (empty($job)) {
 	}
 } elseif ($job == 'buy') {
 	!$db_allowtrade && Showmsg('trade_close');
-	InitGP(array('id'));
+	S::gp(array('id'));
 
 	if (empty($_POST['step'])) {
 
-		$rt = $db->get_one("SELECT * FROM pw_tools WHERE id=" . pwEscape($id));
+		$rt = $db->get_one("SELECT * FROM pw_tools WHERE id=" . S::sqlEscape($id));
 		if (empty($rt)) {
 			Showmsg('data_error');
 		}
@@ -327,8 +327,8 @@ if (empty($job)) {
 
 	} else {
 		if (procLock('tool_buy',$winduid)) {
-			InitGP(array('buymethod','nums'), null, 2);
-			$toolinfo = $db->get_one("SELECT * FROM pw_tools WHERE id=" . pwEscape($id));
+			S::gp(array('buymethod','nums'), null, 2);
+			$toolinfo = $db->get_one("SELECT * FROM pw_tools WHERE id=" . S::sqlEscape($id));
 			if($nums <= 0){
 				procUnLock('tool_buy',$winduid);
 				Showmsg('illegal_nums');
@@ -343,13 +343,13 @@ if (empty($job)) {
 					procUnLock('tool_buy',$winduid);
 					Showmsg('undefined_action');
 				}
-				include_once(D_P.'data/bbscache/ol_config.php');
+				include_once pwCache::getPath(D_P.'data/bbscache/ol_config.php');
 				if (!$ol_onlinepay) {
 					procUnLock('tool_buy',$winduid);
 					Showmsg($ol_whycolse);
 				}
 				$order_no = '1'.str_pad($winduid,10, "0",STR_PAD_LEFT).get_date($timestamp,'YmdHis').num_rand(5);
-				$db->update("INSERT INTO pw_clientorder SET " . pwSqlSingle(array(
+				$db->update("INSERT INTO pw_clientorder SET " . S::sqlSingle(array(
 					'order_no'	=> $order_no,
 					'type'		=> 1,
 					'uid'		=> $winduid,
@@ -393,11 +393,11 @@ if (empty($job)) {
 			));
 			$credit->set($winduid,$toolinfo['creditype'],-$price);
 
-			$db->update("UPDATE pw_tools SET stock=stock-" . pwEscape($nums) . " WHERE id=" . pwEscape($id));
+			$db->update("UPDATE pw_tools SET stock=stock-" . S::sqlEscape($nums) . " WHERE id=" . S::sqlEscape($id));
 			$db->pw_update(
-				"SELECT uid FROM pw_usertool WHERE uid=" . pwEscape($winduid) . " AND toolid=".pwEscape($id),
-				"UPDATE pw_usertool SET nums=nums+" . pwEscape($nums) . " WHERE uid=" . pwEscape($winduid) . " AND toolid=" . pwEscape($id),
-				"INSERT INTO pw_usertool SET " . pwSqlSingle(array('nums' => $nums, 'uid' => $winduid, 'toolid' => $id, 'sellstatus' => $sell_status))
+				"SELECT uid FROM pw_usertool WHERE uid=" . S::sqlEscape($winduid) . " AND toolid=".S::sqlEscape($id),
+				"UPDATE pw_usertool SET nums=nums+" . S::sqlEscape($nums) . " WHERE uid=" . S::sqlEscape($winduid) . " AND toolid=" . S::sqlEscape($id),
+				"INSERT INTO pw_usertool SET " . S::sqlSingle(array('nums' => $nums, 'uid' => $winduid, 'toolid' => $id, 'sellstatus' => $sell_status))
 			);
 			require_once(R_P.'require/tool.php');
 			$logdata = array(
@@ -419,10 +419,10 @@ if (empty($job)) {
 		refreshto("profile.php?action=toolcenter",'operate_success');
 	}
 } elseif ($job == 'use' || $job == 'ajax') {
-	$toolid = (int)GetGP('toolid');
+	$toolid = (int)S::getGP('toolid');
 	if (!$toolid) {
 		$tooldb = array();
-		$query  = $db->query("SELECT * FROM pw_usertool u LEFT JOIN pw_tools t ON t.id=u.toolid WHERE u.uid=".pwEscape($winduid)."ORDER BY vieworder");
+		$query  = $db->query("SELECT * FROM pw_usertool u LEFT JOIN pw_tools t ON t.id=u.toolid WHERE u.uid=".S::sqlEscape($winduid)."ORDER BY vieworder");
 		while ($rt = $db->fetch_array($query)) {
 			$rt['descrip'] = substrs($rt['descrip'],45);
 			$tooldb[] = $rt;
@@ -433,7 +433,7 @@ if (empty($job)) {
 		require_once uTemplate::PrintEot('profile_toolcenter');
 		pwOutPut();
 	}
-	$tooldb = $db->get_one("SELECT u.nums,t.name,t.filename,t.state,t.type,t.conditions FROM pw_usertool u LEFT JOIN pw_tools t ON t.id=u.toolid WHERE u.uid=".pwEscape($winduid)."AND u.toolid=".pwEscape($toolid));
+	$tooldb = $db->get_one("SELECT u.nums,t.name,t.filename,t.state,t.type,t.conditions FROM pw_usertool u LEFT JOIN pw_tools t ON t.id=u.toolid WHERE u.uid=".S::sqlEscape($winduid)."AND u.toolid=".S::sqlEscape($toolid));
 	
 	!$db_toolifopen && Showmsg('toolcenter_close');
 	if (!$tooldb || $tooldb['nums'] <= 0) {
@@ -442,7 +442,7 @@ if (empty($job)) {
 	if ($tooldb['type'] == 1) {
 		!$tid && Showmsg('illegal_tid');
 		$condition = unserialize($tooldb['conditions']);
-		$tpcdb = $db->get_one("SELECT fid,subject,authorid,topped,toolfield FROM pw_threads WHERE tid=" . pwEscape($tid));
+		$tpcdb = $db->get_one("SELECT fid,subject,authorid,topped,toolfield FROM pw_threads WHERE tid=" . S::sqlEscape($tid));
 		if (!$tpcdb) {
 			Showmsg('illegal_tid');
 		}
@@ -453,7 +453,7 @@ if (empty($job)) {
 	require_once(R_P.'require/tool.php');
 	CheckUserTool($winduid,$tooldb);
 	if (file_exists(R_P. 'u/require/profile/toolcenter/'.$tooldb['filename'].'.php')) {
-		require_once Pcv(R_P. 'u/require/profile/toolcenter/'.$tooldb['filename'].'.php');
+		require_once S::escapePath(R_P. 'u/require/profile/toolcenter/'.$tooldb['filename'].'.php');
 	} else {
 		Showmsg('tooluse_not_finished');
 	}

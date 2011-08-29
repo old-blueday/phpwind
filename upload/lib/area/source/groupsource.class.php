@@ -40,6 +40,7 @@ class PW_GroupSource extends SystemData {
 		$data['url'] = $db_bbsurl.'/apps.php?q=group&cyid='.$data['id'];
 		$data['title'] = $data['cname'];
 		$data['image'] = $this->_getGroupImage($data['cnimg']);
+		$data['descrip'] = substrs(strip_tags(stripWindCode($data['descrip'])),100);
 		if ($data['credit']) $data['credit'] = (int) $data['credit'];
 		return $data;
 	}

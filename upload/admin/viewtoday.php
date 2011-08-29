@@ -6,7 +6,7 @@ if (empty($action)) {
 	if ($db_today == 0) {
 		include PrintEot('viewtoday');exit;
 	}
-	InitGP(array('page'),'GP',2);
+	S::gp(array('page'),'GP',2);
 	$page < 1 && $page = 1;
 	$filename = D_P.'data/bbscache/today.php';
 	$dbtdsize = 100+1;

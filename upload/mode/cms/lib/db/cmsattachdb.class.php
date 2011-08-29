@@ -1,5 +1,5 @@
 <?php
-!defined('M_P') && exit('Forbidden');
+!defined('P_W') && exit('Forbidden');
 
 class PW_CmsAttachDB extends BaseDB {
 	var $_tableName = "pw_cms_attach";
@@ -24,7 +24,7 @@ class PW_CmsAttachDB extends BaseDB {
 	}
 	
 	function findArticleAttaches($articleId) {
-		$query = $this->_db->query("SELECT * FROM ".$this->_tableName." WHERE article_id=".pwEscape($articleId));
+		$query = $this->_db->query("SELECT * FROM ".$this->_tableName." WHERE article_id=".S::sqlEscape($articleId));
 		return $this->_getAllResultFromQuery($query);
 	}
 

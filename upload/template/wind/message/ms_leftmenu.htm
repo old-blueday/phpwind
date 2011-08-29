@@ -27,6 +27,7 @@ EOT;
 }
 print <<<EOT
 -->				
+					<li id="left_shield"><img src="u/images/message/history.png">&nbsp;<a href="{$baseUrl}?type=shield">消息设置</a></li>
         </ul>
     </div>
 <script type="text/javascript">
@@ -38,21 +39,11 @@ EOT;
 if($_G['maxmsg']){
 print <<<EOT
 -->
-    <div class="mb10" style="padding:0 20px;">
-        <p class="mb5">空间使用</p>
-        <div class="perCent"><i>$percent</i><div class="perValue" style="width:$percent;"></div></div>
+    <div class="mb10" style="padding:10px 20px;">
+        <p class="mb5"><span class="fr f10">$percent</span>空间使用</p>
+        <div class="perCent"><div class="perValue" style="width:$percent;"></div></div>
     </div>
 <!--<?php
-EOT;
-}print <<<EOT
--->
-	<div class="tac"><a href="{$baseUrl}?type=shield">消息设置</a><span class="p_lr_10">|</span><a href="{$baseUrl}?type=search">消息搜索</a></div>
-<!--
-EOT;
-if (empty($_COOKIE['clearmsg_guide'])) {print <<<EOT
--->
-	<div style="padding:5px;margin:5px;background:#fcfae3;border:1px solid #b8b5a6;" id="tag_message"><div class="fl"><div class="spaceTiptri"></div></div><div class="cc"><a href="javascript:;" class="adel" onclick="javascript:getObj('tag_message').style.display ='none';SetCookie('clearmsg_guide', 1);">关闭</a>点击这里可以清理消息</div></div>
-<!--
 EOT;
 }print <<<EOT
 -->

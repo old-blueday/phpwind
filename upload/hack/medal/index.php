@@ -1,12 +1,12 @@
 <?php
 !function_exists('readover') && exit('Forbidden');
 $wind_in = 'medal';
-include_once(D_P.'data/bbscache/md_config.php');
-include_once(D_P.'data/bbscache/medaldb.php');
+include_once pwCache::getPath(D_P.'data/bbscache/md_config.php');
+include_once pwCache::getPath(D_P.'data/bbscache/medaldb.php');
 include_once(R_P.'require/showimg.php');
 !$md_ifopen && Showmsg('medal_close');
 
-$_cache = getDatastore();
+//* $_cache = getDatastore();
 $userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
 
 $userdb = $userService->get($winduid); //medals,icon
@@ -16,7 +16,7 @@ if ($userdb['medals']) {
 	$userdb['medals'] = '';
 }
 $userface = showfacedesign($userdb['icon'],'','m');
-InitGP(array('action'));
+S::gp(array('action'));
 
 if (!$action) {
 
@@ -31,7 +31,7 @@ if (!$action) {
 		if ($ifunset) {
 			$newmedals = implode(',',$userdb['medals']);
 			$userService->update($winduid, array('medals'=>$newmedals));
-			$_cache->delete('UID_'.$winduid);
+			//* $_cache->delete('UID_'.$winduid);
 			!$newmedals && updatemedal_list();
 		}
 	}
@@ -45,14 +45,15 @@ if (!$action) {
 	}
 	$uids = substr(readover(D_P.'data/bbscache/medals_list.php'),12);
 	if ($uids) {
-		InitGP(array('page'));
+		S::gp(array('page'));
 		(!is_numeric($page) || $page < 1) && $page = 1;
-		$limit = pwLimit(($page-1)*$db_perpage,$db_perpage);
+		$limit = S::sqlLimit(($page-1)*$db_perpage,$db_perpage);
 		$uids = explode(",",$uids);
 		$sum = count($uids);
 		$pages = numofpage($sum,$page,ceil($sum/$db_perpage),"$basename&action=list&");
 		$listdb=array();
 		$userIds = array_slice($uids,($page-1)*$db_perpage,$db_perpage);
+		unset($userIds[0]);
 		$members = $userService->getByUserIds($userIds); //uid,username,medals
 		foreach ($members as $rt) {
 			$medals = '';
@@ -79,7 +80,7 @@ if (!$action) {
 	}
 	if (!$_POST['step']) {
 
-		InitGP(array('type','pwuser','medal'));
+		S::gp(array('type','pwuser','medal'));
 		if ($type == 2) {
 			$type_2 = "checked";
 			$type_1 = "";
@@ -91,11 +92,11 @@ if (!$action) {
 
 	} elseif ($_POST['step'] == "2") {
 
-		InitGP(array('pwuser','reason','medal','type','timelimit'),null,'1');
+		S::gp(array('pwuser','reason','medal','type','timelimit'),null,'1');
 		strpos($pwuser,',') && $pwuser = explode(',',$pwuser);
 		$medal  = (int)$medal;
 		!$medal && Showmsg('medal_nomedal');
-		$reason = Char_cv($reason);
+		$reason = S::escapeChar($reason);
 		!$reason && Showmsg('medal_noreason');
 		$timelimit = (int)$timelimit;
 		if (is_array($pwuser)) {
@@ -114,7 +115,7 @@ if (!$action) {
 		$awardusers = $medaluser = array();
 		$members = $userService->getByUserNames($pwuser); //uid,username,medals
 		foreach ($members as $rt) {
-			Add_S($rt);
+			S::slashes($rt);
 			if ($type == 1) {
 				if ($rt['medals'] && strpos(",$rt[medals],",",$medal,") !== false) {
 					$erroruser = $rt['username'];
@@ -140,7 +141,7 @@ if (!$action) {
 		}
 		
 		//检查是否有申请记录
-		$applies = $db->query("SELECT id FROM pw_medalslogs WHERE awardee IN (".pwImplode($pwuser).") AND action=3 AND level = ".pwEscape($medal));
+		$applies = $db->query("SELECT id FROM pw_medalslogs WHERE awardee IN (".S::sqlImplode($pwuser).") AND action=3 AND level = ".S::sqlEscape($medal));
 		while ($rt = $db->fetch_array($applies)){
 			 Showmsg('medal_haveapp');
 		}
@@ -177,24 +178,24 @@ if (!$action) {
 					);
 				}
 				$timelimit = 0;
-				$db->update("UPDATE pw_medalslogs SET state='1' WHERE awardee=".pwEscape($rt['username'],false)."AND level=".pwEscape($medal));
+				$db->update("UPDATE pw_medalslogs SET state='1' WHERE awardee=".S::sqlEscape($rt['username'],false)."AND level=".S::sqlEscape($medal));
 			} else {
 				Showmsg('illegal_request');
 			}
 			$rt['medals'] == ',' && $rt['medals'] = '';
 			$userService->update($rt['uid'], array('medals'=>$rt['medals']));
-			$_cache->delete('UID_'.$rt['uid']);
+			//* $_cache->delete('UID_'.$rt['uid']);
 			$insertlogs[] = array($rt['username'],$windid,$timestamp,$timelimit,$medal,$type,$reason);
 		}
 		if ($medaluser) {
 			if ($type == 1) {
-				$db->update("INSERT INTO pw_medaluser(uid,mid) VALUES ".pwSqlMulti($medaluser));
+				$db->update("INSERT INTO pw_medaluser(uid,mid) VALUES ".S::sqlMulti($medaluser));
 			} elseif ($type == 2) {
-				$db->update('DELETE FROM pw_medaluser WHERE mid='.pwEscape($medal).' AND uid IN('.pwImplode($medaluser).')');
+				$db->update('DELETE FROM pw_medaluser WHERE mid='.S::sqlEscape($medal).' AND uid IN('.S::sqlImplode($medaluser).')');
 			}
 		}
 		if (count($insertlogs)) {
-			$db->update("INSERT INTO pw_medalslogs(awardee,awarder,awardtime,timelimit,level,action,why) VALUES".pwSqlMulti($insertlogs));
+			$db->update("INSERT INTO pw_medalslogs(awardee,awarder,awardtime,timelimit,level,action,why) VALUES".S::sqlMulti($insertlogs));
 		}
 		updatemedal_list();
 		refreshto("$basename&action=list",'operate_success');
@@ -205,9 +206,9 @@ if (!$action) {
 
 	if (!$_GET['job']) {
 
-		InitGP(array('page'));
+		S::gp(array('page'));
 		(!is_numeric($page) || $page < 1) && $page = 1;
-		$limit = pwLimit(($page-1)*$db_perpage,$db_perpage);
+		$limit = S::sqlLimit(($page-1)*$db_perpage,$db_perpage);
 		$rt    = $db->get_one("SELECT COUNT(*) AS sum FROM pw_medalslogs WHERE action<>3");
 		$pages = numofpage($rt['sum'],$page,ceil($rt['sum']/$db_perpage),"$basename&action=log&");
 
@@ -222,12 +223,12 @@ if (!$action) {
 	} elseif ($_GET['job'] == 'del') {
 
 		$groupid != '3' && Showmsg('medal_dellog');
-		$id = (int)GetGP('id');
-		$rt = $db->get_one("SELECT id,state,action,timelimit FROM pw_medalslogs WHERE id=".pwEscape($id));
+		$id = (int)S::getGP('id');
+		$rt = $db->get_one("SELECT id,state,action,timelimit FROM pw_medalslogs WHERE id=".S::sqlEscape($id));
 		if ($rt['action'] == 1 && $rt['state'] == 0 && $rt['timelimit'] > 0) {
 			Showmsg('medallog_del_error');
 		}
-		$db->update("DELETE FROM pw_medalslogs WHERE id=".pwEscape($id));
+		$db->update("DELETE FROM pw_medalslogs WHERE id=".S::sqlEscape($id));
 		refreshto("$basename&action=log",'operate_success');
 
 	} else {
@@ -239,24 +240,24 @@ if (!$action) {
 	if (strpos($md_appgroups,",$groupid,") === false) {
 		Showmsg('medal_appgroupright');
 	}
-	$appcheck = $db->get_one("SELECT id FROM pw_medalslogs WHERE awardee=".pwEscape($windid)." AND action=3");
+	$appcheck = $db->get_one("SELECT id FROM pw_medalslogs WHERE awardee=".S::sqlEscape($windid)." AND action=3");
 	$appcheck && Showmsg('medal_haveapp');
 
 	if (!$_POST['step']) {
 
-		$id = (int)GetGP('id');
+		$id = (int)S::getGP('id');
 		require_once PrintHack('index');footer();
 
 	} elseif ($_POST['step'] == 2) {
 
-		InitGP(array('reason','medal','timelimit'));
+		S::gp(array('reason','medal','timelimit'));
 		!$reason && Showmsg('medal_noreason');
 		$medal  = (int)$medal;
 		!$medal && Showmsg('medal_nomedal');
-		$reason = Char_cv($reason);
+		$reason = S::escapeChar($reason);
 		$timelimit = (int)$timelimit;
 		$userdb['medals'] && in_array($medal,$userdb['medals']) && Showmsg('medal_alreadyhaveself');
-		$db->update("INSERT INTO pw_medalslogs SET " . pwSqlSingle(array(
+		$db->update("INSERT INTO pw_medalslogs SET " . S::sqlSingle(array(
 			'awardee'	=> $windid,
 			'awardtime'	=> $timestamp,
 			'timelimit'	=> $timelimit,
@@ -286,13 +287,13 @@ if (!$action) {
 	if (strpos($md_groups,",$groupid,") === false) {
 		Showmsg('medal_groupright');
 	}
-	$job = Char_cv(GetGP('job'));
+	$job = S::escapeChar(S::getGP('job'));
 
 	if (!$job) {
 
-		InitGP(array('page'));
+		S::gp(array('page'));
 		(!is_numeric($page) || $page < 1) && $page = 1;
-		$limit = pwLimit(($page-1)*$db_perpage,$db_perpage);
+		$limit = S::sqlLimit(($page-1)*$db_perpage,$db_perpage);
 		$rt    = $db->get_one("SELECT COUNT(*) AS sum FROM pw_medalslogs WHERE action=3");
 		$pages = numofpage($rt['sum'],$page,ceil($rt['sum']/$db_perpage),"$basename&action=approve&");
 
@@ -306,7 +307,7 @@ if (!$action) {
 
 	} elseif ($job == 'pass') {
 
-		$id = GetGP('id');
+		$id = S::getGP('id');
 		if (is_array($id)) {
 			foreach ($id as $key => $val) {
 				$val = (int)$val;
@@ -317,7 +318,7 @@ if (!$action) {
 				}
 			}
 			if (count($id)) {
-				$id = pwImplode($id);
+				$id = S::sqlImplode($id);
 			} else {
 				Showmsg('medal_iderror');
 			}
@@ -353,14 +354,14 @@ if (!$action) {
 			}
 			$medals == ',' && $medals = '';
 			$userService->update($rt['uid'], array('medals'=>$medals));
-			$_cache->delete('UID_'.$rt['uid']);
+			//* $_cache->delete('UID_'.$rt['uid']);
 			if ($medaluser) {
-				$db->update("INSERT INTO pw_medaluser(uid,mid) VALUES ".pwSqlMulti($medaluser));
+				$db->update("INSERT INTO pw_medaluser(uid,mid) VALUES ".S::sqlMulti($medaluser));
 			}
 		}
 		$db->free_result();
 		unset($medal,$medals,$reason);
-		$db->update("UPDATE pw_medalslogs SET " . pwSqlSingle(array(
+		$db->update("UPDATE pw_medalslogs SET " . S::sqlSingle(array(
 			'awarder'	=> $windid,
 			'awardtime'	=> $timestamp,
 			'action'	=> 1
@@ -371,7 +372,7 @@ if (!$action) {
 
 	} elseif ($job == 'del') {
 
-		$id = GetGP('id');
+		$id = S::getGP('id');
 		if (is_array($id)) {
 			foreach($id as $key => $val) {
 				$val = (int)$val;
@@ -382,7 +383,7 @@ if (!$action) {
 				}
 			}
 			if (count($id)) {
-				$id = pwImplode($id);
+				$id = S::sqlImplode($id);
 				if ($md_ifmsg) {
 					$query = $db->query("SELECT awardee,level,why FROM pw_medalslogs WHERE id IN($id)");
 					while ($rt = $db->fetch_array($query)) {
@@ -409,7 +410,7 @@ if (!$action) {
 			$id = (int)$id;
 			!$id && Showmsg('medal_iderror');
 			if ($md_ifmsg) {
-				$rt = $db->get_one("SELECT awardee,level,why FROM pw_medalslogs WHERE id=".pwEscape($id));
+				$rt = $db->get_one("SELECT awardee,level,why FROM pw_medalslogs WHERE id=".S::sqlEscape($id));
 				!$rt && Showmsg('medal_iderror');
 				$medal = $rt['level'];
 				$reason = $rt['why'];
@@ -425,7 +426,7 @@ if (!$action) {
 					)
 				);
 			}
-			$db->update("DELETE FROM pw_medalslogs WHERE id=".pwEscape($id));
+			$db->update("DELETE FROM pw_medalslogs WHERE id=".S::sqlEscape($id));
 		}
 		refreshto("$basename&action=approve",'operate_success');
 	} else {
@@ -442,7 +443,7 @@ function updatemedal_list(){
 	while ($rt = $db->fetch_array($query)) {
 		$medaldb .= ','.$rt['uid'];
 	}
-	writeover(D_P.'data/bbscache/medals_list.php',$medaldb);
+	pwCache::setData(D_P.'data/bbscache/medals_list.php',$medaldb);
 }
 
 ?>

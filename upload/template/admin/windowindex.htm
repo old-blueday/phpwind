@@ -9,6 +9,7 @@
 <meta http-equiv="x-ua-compatible" content="ie=7" />
 <meta http-equiv="Cache-Control" content="no-cache">
 <base />
+<link rel="stylesheet" type="text/css" href="images/admin/style.css" />
 <script src="js/desktop/core.js"></script>
 <script src="js/desktop/Cookie.js"></script>
 <script src="js/desktop/list.js"></script>
@@ -25,7 +26,6 @@
 <script src="js/desktop/dialog.js"></script>
 <script src="js/desktop/resize.js"></script>
 <script src="js/desktop/adminnav.js"></script>
-<link rel="stylesheet" type="text/css" href="images/admin/style.css" />
 <script type="text/javascript">
 	SETTING = {};/*初始化设置对象*/
 	USUALL = $diyjsstr; /*常用的功能模块*/
@@ -109,8 +109,8 @@ EOT;
 				PW.Dialog({
 					id: "search",
 					name: '搜索结果',
-					url: "$admin_file?adminjob=search&keyword=" + keyword
-				}).loadIframe("$admin_file?adminjob=search&keyword=" + keyword).ifr.style.display='';//;
+					url: "$admin_file?adminjob=search&keyword=" + encodeURI(keyword)
+				}).loadIframe("$admin_file?adminjob=search&keyword=" + encodeURI(keyword)).ifr.style.display='';//;
 			} else {
 				if (times <1){
 					alert('至少输入两个字节');
@@ -123,7 +123,12 @@ EOT;
 </head>
 <body>
 <div id="admin_header">
-	<div class="admin_head" id="admin_head"><table width="100%" style="table-layout:fixed"><tr class="vt"><td width="145"><a href="$admin_file" class="admin_logo fl" onClick="PW.Dialog({id:'home',url:'$admin_file?adminjob=admin&job=desktop',name:'后台首页'});return false;"><img src="images/admin/admin_logo.png" alt="logo" /></a></td>
+	<div class="admin_head" id="admin_head"><table width="100%" style="table-layout:fixed">
+		<tr class="vt">
+			<td width="145" height="70" style="vertical-align:middle;" class="tac">
+				<div class="fl"><a href="$admin_file?adskin=0" style=" position:absolute;left:75px;top:48px;color:#666;">体验新后台</a></div>
+				<a href="$admin_file" onClick="PW.Dialog({id:'home',url:'$admin_file?adminjob=admin&job=desktop',name:'后台首页'});return false;"><img src="images/admin/admin_logo.png" /></a>
+			</td>
 	<td style="vertical-align:bottom;" class="admin_nav_bg">
 	<div class="admin_topbar cc">
 	<div style="width:750px;" class="fr">
@@ -170,7 +175,7 @@ EOT;
 				SUB_BLOCK_ITEM[SUB_BLOCK[i].id]=SUB_BLOCK[i];
 			}
 			(function(){
-				var module = '<li class="{id}" id="{id}-shortcut" text="{name}" value="{url}"><a href="javascript:;" hidefocus="true" aid={id} name={name} onclick="PW.ChildDialog(this);" >{name}</a></li>';/*左侧菜单模板*/
+				var module = '<li class="{id}" id="{id}-shortcut" text="{name}" value="{url}"><a href="javascript:;" hidefocus="true" aid={id} name={name} onclick="PW.ChildDialog(this);" ><span class="fl"><img src="mode/{id}/images/admin_icon.png" /></span>{name}</a></li>';/*左侧菜单模板*/
 				var moduleDown = '<li down="1" id="{id}-shortcut" text="{name}" value="{url}"><a class="none" href="javascript:;" hidefocus="true">{name}</a></li>';/*模式部分html代码*/
 				document.write(desk.list.simple(MAIN_BLOCK, module, ''));/*生成左侧菜单*/
 				//document.write("<li id='admin_hr'></li>");/*中间的分隔线*/

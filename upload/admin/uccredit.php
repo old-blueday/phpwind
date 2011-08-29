@@ -2,7 +2,8 @@
 !function_exists('adminmsg') && exit('Forbidden');
 
 if ($uc_server != 1) {
-	$basename = "javascript:parent.getObj('button_uccredit').getElementsByTagName('a')[1].onclick();";
+	$db_adminrecord = 0;
+	$basename = "javascript:parent.closeAdminTab(window);";
 	adminmsg('uc_server_set');
 }
 require_once(R_P . 'uc_client/class_core.php');
@@ -28,7 +29,7 @@ if (empty($action)) {
 
 	} else {
 
-		InitGP(array('cid','ctype'));
+		S::gp(array('cid','ctype'));
 		$basename .= '&action=create';
 		
 		if (!$cid || !isset($credittype[$cid])) {
@@ -60,7 +61,7 @@ if (empty($action)) {
 	}
 } elseif ($action == 'edit') {
 
-	InitGP(array('cid'));
+	S::gp(array('cid'));
 	if (!$cid || !isset($credittype[$cid]) || !isset($uc_syncredit[$cid])) {
 		adminmsg('undefined_action');
 	}
@@ -78,7 +79,7 @@ if (empty($action)) {
 
 	} else {
 		
-		InitGP(array('cid','ctype'));
+		S::gp(array('cid','ctype'));
 	
 		$uc_syncredit[$cid] = array();
 		foreach ($ctype as $key => $value) {
@@ -121,7 +122,7 @@ if (empty($action)) {
 
 } elseif ($action == 'del') {
 	
-	InitGP(array('cid'));
+	S::gp(array('cid'));
 	if (!$cid || !isset($credittype[$cid]) || !isset($uc_syncredit[$cid])) {
 		adminmsg('undefined_action');
 	}

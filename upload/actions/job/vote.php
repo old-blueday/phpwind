@@ -2,7 +2,7 @@
 !defined('P_W') && exit('Forbidden');
 
 PostCheck();
-$rt = $db->get_one('SELECT t.fid,t.tid,t.postdate,t.lastpost,t.state,t.locked,t.ifcheck,p.* FROM pw_polls p LEFT JOIN pw_threads t ON p.tid=t.tid WHERE p.tid=' . pwEscape($tid));
+$rt = $db->get_one('SELECT t.fid,t.tid,t.postdate,t.lastpost,t.state,t.locked,t.ifcheck,p.* FROM pw_polls p LEFT JOIN pw_threads t ON p.tid=t.tid WHERE p.tid=' . S::sqlEscape($tid));
 !$rt && Showmsg('data_error');
 @extract($rt);
 //得到版块基本信息,版块权限验证
@@ -30,7 +30,7 @@ if (!$admincheck && $regdatelimit && $winddb['regdate'] > $regdatelimit) {
 	$regdatelimit = get_date($regdatelimit, 'Y-m-d');
 	Showmsg('job_vote_regdatelimit');
 }
-InitGP(array(
+S::gp(array(
 	'voteid',
 	'voteaction'
 ), 'P');
@@ -57,9 +57,9 @@ $sql_1 = '';
 if ($groupid == 'guest') {
 	$windid = $onlineip;
 	$winduid = 0;
-	$sql_1 = ' AND username=' . pwEscape($windid);
+	$sql_1 = ' AND username=' . S::sqlEscape($windid);
 }
-$sqlw = 'tid=' . pwEscape($tid) . ' AND uid=' . pwEscape($winduid) . $sql_1;
+$sqlw = 'tid=' . S::sqlEscape($tid) . ' AND uid=' . S::sqlEscape($winduid) . $sql_1;
 
 $sql_2 = ',voters=voters+1';
 if ($voteaction == 'modify') {
@@ -95,15 +95,17 @@ foreach ($voteid as $k => $id) {
 	}
 }
 $voteopts = serialize($votearray);
-$db->update('UPDATE pw_polls SET voteopts=' . pwEscape($voteopts, false) . "$sql_2 WHERE tid=" . pwEscape($tid));
+$db->update('UPDATE pw_polls SET voteopts=' . S::sqlEscape($voteopts, false) . "$sql_2 WHERE tid=" . S::sqlEscape($tid));
 if ($pwSQL) {
-	$db->update("INSERT INTO pw_voter (tid,uid,username,vote,time) VALUES " . pwSqlMulti($pwSQL, false));
+	$db->update("INSERT INTO pw_voter (tid,uid,username,vote,time) VALUES " . S::sqlMulti($pwSQL, false));
 }
 if ($locked < 3 && $lastpost < $timestamp) {
-	$db->update('UPDATE pw_threads SET lastpost=' . pwEscape($timestamp) . ' WHERE tid=' . pwEscape($tid));
+	//$db->update('UPDATE pw_threads SET lastpost=' . S::sqlEscape($timestamp) . ' WHERE tid=' . S::sqlEscape($tid));
+	pwQuery::update('pw_threads', 'tid=:tid', array($tid), array('lastpost'=>$timestamp));
 	# memcache refresh
-	$threadList = L::loadClass("threadlist", 'forum');
-	$threadList->updateThreadIdsByForumId($fid, $tid);
+	// $threadList = L::loadClass("threadlist", 'forum');
+	// $threadList->updateThreadIdsByForumId($fid, $tid);
+	Perf::gatherInfo('changeThreadWithForumIds', array('fid'=>$fid));
 }
 if ($foruminfo['allowhtm'] == 1) {
 	$StaticPage = L::loadClass('StaticPage');

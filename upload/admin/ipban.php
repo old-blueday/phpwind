@@ -1,7 +1,7 @@
 <?php
 !function_exists('adminmsg') && exit('Forbidden');
 $basename="$admin_file?adminjob=ipban";
-$job = GetGP('job');
+$job = S::getGP('job');
 if ($job == 'ipstates') {
 	require_once (R_P.'admin/ipstates.php');
 } elseif ($job == 'ipsearch') {
@@ -15,13 +15,13 @@ if ($job == 'ipstates') {
 
 	} elseif($action == "unsubmit") {
 
-		InitGP(array('baninfo'),'P');
+		S::gp(array('baninfo'),'P');
 		$baninfo = str_replace("\n", ",", $baninfo);
 		setConfig('db_ipban', $baninfo);
 		updatecache_c();
 		adminmsg('operate_success');
 	} elseif ($action == "addone") {
-		InitGP(array('baninfo'),'G');
+		S::gp(array('baninfo'),'G');
 		$baninfo = str_replace("\n", ",", $baninfo);
 		$baninfo = $baninfo ? $baninfo.','.$db_ipban : $db_ipban;
 		setConfig('db_ipban', $baninfo);

@@ -80,7 +80,7 @@ EOT;
 foreach ($commentdb as $key => $comment) {print <<<EOT
 -->
             <dl class="cc dl" id="comment_{$comment[id]}">
-                <dt class="dt"><a href="u.php?uid=$comment[uid]" target="_blank" class="img_50"><img src="$comment[face]" width="48" height="48"/></a></dt>
+                <dt class="dt"><a href="{$db_userurl}$comment[uid]" target="_blank" class="img_50"><img src="$comment[face]" width="48" height="48"/></a></dt>
                 <dd class="dd">
 <!--
 EOT;
@@ -91,7 +91,7 @@ if ($comment[uid]==$winduid || $ifadmin) { print <<<EOT
 EOT;
 } print <<<EOT
 -->
-                    <p class="title"><a href="u.php?uid=$comment[uid]" target="_blank" class="mr5">$comment[username]</a>$comment[title]
+                    <p class="title"><a href="{$db_userurl}$comment[uid]" target="_blank" class="mr5">$comment[username]</a>$comment[title]
                     </p>
                     <cite class="gray">$comment[postdate]</cite> - 
                     <a style="cursor:pointer;" class="reA" onclick="PW_Comment.createCommentInput('$comment_type',$comment_typeid,$comment[id])">回复</a>
@@ -103,7 +103,7 @@ EOT;
 foreach ($subcommentdb[$comment['id']] as $k => $subcomment) {print <<<EOT
 -->
                         <dl class="cc dl" id="comment_{$subcomment[id]}">
-                            <dt class="dt"><a href="u.php?uid=$subcomment[uid]" target="_blank" class="img_50"><img src="$subcomment[face]" width="48" height="48"/></a></dt>
+                            <dt class="dt"><a href="{$db_userurl}$subcomment[uid]" target="_blank" class="img_50"><img src="$subcomment[face]" width="48" height="48"/></a></dt>
                             <dd class="dd">
 <!--
 EOT;
@@ -114,7 +114,7 @@ if ($subcomment[uid]==$winduid || $ifadmin) { print <<<EOT
 EOT;
 } print <<<EOT
 -->
-                            <p class="title"><a href="u.php?uid=$subcomment[uid]" target="_blank" class="mr5">$subcomment[username]</a>$subcomment[title]
+                            <p class="title"><a href="{$db_userurl}$subcomment[uid]" target="_blank" class="mr5">$subcomment[username]</a>$subcomment[title]
                             </p>
                             <cite class="gray">$subcomment[postdate]</cite>
 

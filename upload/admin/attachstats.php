@@ -1,7 +1,8 @@
 <?php
 !function_exists('adminmsg') && exit('Forbidden');
 
-include(D_P.'data/bbscache/forum_cache.php');
+include pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
+
 $basename = "$admin_file?adminjob=attachstats";
 
 if(empty($action)){
@@ -35,7 +36,7 @@ if(empty($action)){
 } elseif($_POST['action']=='delete') {
 	$adminmsg = '';
 	$count = $delnum = 0;
-	InitGP(array('urlarray','F_basename'),'P');
+	S::gp(array('urlarray','F_basename'),'P');
 	if (!empty($urlarray)) {
 		$delname = '';
 		$count = count($urlarray);
@@ -46,7 +47,7 @@ if(empty($action)){
 				$delnum++;
 				$delname .= $value.'<br />';
 			}
-			$db->update("DELETE FROM pw_attachs WHERE aid=".pwEscape($key,false));
+			$db->update("DELETE FROM pw_attachs WHERE aid=".S::sqlEscape($key,false));
 		}
 		$delnum>0 && $adminmsg .= '，'.$delnum.'个附件。<br />已删除的文件; <br />'.$delname;
 	}

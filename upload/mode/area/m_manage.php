@@ -6,13 +6,14 @@
  * 支持ajax访问和直接访问
  * @author liuhui @2010-3-10
  */
+define('AREA_PAGE','manage');
 $db_ifjump = 1;
 $portalPageService = L::loadClass('portalpageservice', 'area');
 $levelService = L::loadclass("AreaLevel", 'area');
 $invokeService = L::loadClass('invokeservice', 'area');
 $pageInvokeService = L::loadClass('pageinvokeservice', 'area');
 
-InitGP(array("action","invokename","channelid","invokepieceid","page","selid","subinvoke","step","ifpush"));
+S::gp(array("action","invokename","channelid","invokepieceid","page","selid","subinvoke","step","ifpush"));
 $IS_PROTAL = 0;
 $invokename = trim(strip_tags($invokename));
 
@@ -23,7 +24,6 @@ if (is_numeric($channelid)) {
 	$IS_PROTAL = 1;
 	$pageInvokeInfo = $pageInvokeService->getPageInvokeBySignAndName($channelid, $invokename);
 }
-
 if (!in_array($action, array("pushto","fetch","recommend","success")) && !($userLevel = $levelService->getAreaLevel($winduid, $channelid, $invokename))) {
 	showmsg($levelService->language("area_no_level"));
 }
@@ -46,8 +46,8 @@ if (empty($action) || "verify" == $action) {
 	list($bool, $channels, $invokes, $subInvokes) = $manageService->getFirstGrade($winduid, $channelid, $invokename);
 	$subInvokesSelect = $manageService->buildSelect($subInvokes, 'invokepieceid', 'invokepieceid', $invokepieceid, true, "选择位置");
 	$ifverify = $action ? 1 : 0;
-	$changeUrl = $ifverify ? $baseUrl . "action=verify" : $baseUrl;
-	$pageUrl = $invokepieceid ? $baseUrl.'invokepieceid='.$invokepieceid.'&' : $baseUrl;
+	$changeUrl = $ifverify ? $baseUrl . "action=verify&" : $baseUrl;
+	$pageUrl = $invokepieceid ? $changeUrl.'invokepieceid='.$invokepieceid.'&' : $changeUrl;
 	if ($invokepieceid > 0) {
 		list($lists, $pager) = $manageService->getPushData(array(
 			'invokepiece' => $invokepieceid,
@@ -60,7 +60,7 @@ if (empty($action) || "verify" == $action) {
 		), $page, $pageUrl, 8);
 	}
 } elseif ("verifydata" == $action) {
-	InitGP(array('pushdataid'));
+	S::gp(array('pushdataid'));
 	$pushdataid = intval($pushdataid);
 	if ($pushdataid > 0) {
 		$pushDataService = L::loadclass("PushDataService", 'area');
@@ -69,7 +69,7 @@ if (empty($action) || "verify" == $action) {
 		refreshto($baseUrl, 'operate_success');
 	}
 } elseif ("edit" == $action) {
-	InitGP(array('pushdataid'));
+	S::gp(array('pushdataid'));
 	if (!$step) {
 		$pushdataService = L::loadClass('pushdataservice', 'area');
 		if (!($push = $pushdataService->getPushDataById($pushdataid))) {
@@ -91,7 +91,7 @@ if (empty($action) || "verify" == $action) {
 		$manageService->ifcheck($push['ifbusiness'], 'ifbusiness');
 		$title = "编辑";
 	} else {
-		InitGP(array('param','offset','starttime','css','ifbusiness'), 'GP');
+		S::gp(array('param','offset','starttime','css','ifbusiness'), 'GP');
 		$pushdataService = L::loadClass('pushdataservice', 'area');
 		$pushdataService->editPushdata($pushdataid, array(
 			'invokepieceid' => $subinvoke,
@@ -107,12 +107,13 @@ if (empty($action) || "verify" == $action) {
 		refreshto($baseUrl, 'operate_success');
 	}
 } elseif ("delete" == $action) {
-	InitGP(array('pushdataid'));
+	S::gp(array('pushdataid','ifverify'));
 	$pushdataid = intval($pushdataid);
 	if ($pushdataid > 0) {
 		$pushDataService = L::loadclass("PushDataService", 'area');
 		$pushDataService->deletePushdata($pushdataid);
 		if ($IS_PROTAL)	$portalPageService->setPortalStaticState($channelid,1);
+		if ($ifverify) $baseUrl .= 'action=verify';
 		refreshto($baseUrl, 'operate_success');
 	}
 } elseif ("editconfig" == $action) {
@@ -131,9 +132,9 @@ if (empty($action) || "verify" == $action) {
 		
 		$invokepieces = $invokeService->getInvokePieceForSetConfig($invokename);
 	} else {
-		InitGP(array('alias'));
-		InitGP(array('p_action','config','num','param','cachetime','ifpushonly','invokename','title'), 'GP');
-		InitGP(array('ifverify','pageinvokeid'),'P');
+		S::gp(array('alias'));
+		S::gp(array('p_action','config','num','param','cachetime','ifpushonly','invokename','title'), 'GP');
+		S::gp(array('ifverify','pageinvokeid'),'P');
 		$pageInvokeService->updatePageInvoke($pageinvokeid,array('ifverify'=>(int)$ifverify));
 		
 		$pieces = array();
@@ -166,7 +167,7 @@ if (empty($action) || "verify" == $action) {
 		
 		$pieceCode = $portalPageService->getPiecesCode($alias, $invokename);
 	} else {
-		InitGP(array('alias'));
+		S::gp(array('alias'));
 		$moduleConfigService = L::loadClass('moduleconfigservice', 'area');
 		
 		$tagcode = $moduleConfigService->getTagCodeFromPost($_POST['tagcode']);
@@ -182,7 +183,7 @@ if (empty($action) || "verify" == $action) {
 		refreshto($baseUrl . "action=edittpl", 'operate_success');
 	}
 } elseif ('source' == $action) {
-	InitGP(array('sourcetype','id'), 'P');
+	S::gp(array('sourcetype','id'), 'P');
 	$id = (int) $id;
 
 	$pieceOperate = L::loadClass('pieceoperate', 'area');
@@ -214,7 +215,7 @@ EOT;
 	} elseif (2 == $ifpush) {
 		$inputs = $dataSourceService->getRelateHtmlForView($invokepiece['action']);
 	} elseif (3 == $ifpush) {
-		InitGP(array(
+		S::gp(array(
 			'pushdataid'
 		));
 	} else {
@@ -248,9 +249,9 @@ EOT;
 	require_once areaLoadFrontView('area_fetch');
 	ajax_footer();
 } elseif ("success" == $action) {
-	InitGP(array('tid','ifrecommend'), '', 2);
+	S::gp(array('tid','ifrecommend'), '', 2);
 	if ($tid) {
-		$thread = $db->get_one("SELECT fid FROM pw_threads WHERE tid=" . pwEscape($tid));
+		$thread = $db->get_one("SELECT fid FROM pw_threads WHERE tid=" . S::sqlEscape($tid));
 		$postModifyUrl = 'post.php?action=modify&fid=' . $thread['fid'] . '&tid=' . $tid . '&pid=tpc';
 	}
 	$successLang = $ifrecommend ? '数据已推荐至相应模块！' : '您已成功的实现推送操作！';
@@ -261,7 +262,7 @@ EOT;
  * 公共业务组装 pushto、add和edit 三大业务公共服务 下拉联动
  */
 if (in_array($action, array("pushto","add","edit","recommend"))) {
-	initGP(array("ajax","channelid","doing"));
+	S::gp(array("ajax","channelid","doing"));
 	$ifverify = (in_array("recommend", array($doing,$action))) ? 1 : 0;
 	if (!$step) {
 		$dataSourceService = L::loadClass('datasourceservice', 'area');
@@ -306,8 +307,8 @@ if (in_array($action, array("pushto","add","edit","recommend"))) {
 		}
 		$default = array();
 	} else {
-		InitGP(array('param','offset','starttime','css','ifbusiness'), 'GP');
-		InitGP(array('push_ifcms','pushkey','channel'), 'GP');
+		S::gp(array('param','offset','starttime','css','ifbusiness'), 'GP');
+		S::gp(array('push_ifcms','pushkey','channel'), 'GP');
 		$pushdataService = L::loadClass('pushdataservice', 'area');
 		if (!$subinvoke) refreshto($baseUrl.'action='.$action.'&selid='.$pushkey.'&','请选择模块');
 		$ifverify = $action == 'recommend' ? 1 : 0;
@@ -343,7 +344,7 @@ areaFooter();
 function getSubjectByTid($tid) {
 	global $db;
 	$tid = (int) $tid;
-	return $db->get_one("SELECT t.subject,t.author,p.content FROM pw_threads t LEFT JOIN pw_tmsgs p USING(tid) WHERE t.tid=" . pwEscape($tid));
+	return $db->get_one("SELECT t.subject,t.author,p.content FROM pw_threads t LEFT JOIN pw_tmsgs p USING(tid) WHERE t.tid=" . S::sqlEscape($tid));
 }
 
 function manageActionView($action) {

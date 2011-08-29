@@ -4,11 +4,11 @@ $styleName = ($o_styledb[$colony['styleid']]['cname']) ? $o_styledb[$colony['sty
 print <<<EOT
 -->
 	<div class="g_tA mb10">
-		<h2 class="g_hB">{$colony[cname]}</h2>
+		<h2 class="g_hB" style="overflow:hidden;">{$colony[cname]}</h2>
 		<div class="p10">
 			<div class="tac mb10"><img src="$colony[cnimg]" class="img" width="120" height="120" /></div>
 			<ul class="half cc mb5 ul_lh18">
-				<li><span class="fl">分类：</span><a href="apps.php?q=groups&a=all&styleid={$colony[styleid]}" class="lh_18 fl" style="width:62px;" title="{$styleName}">{$styleName}</a></li>
+				<li><span class="fl">分类：</span><a href="group.php?q=all&styleid={$colony[styleid]}" class="lh_18 fl" style="width:62px;" title="{$styleName}">{$styleName}</a></li>
 				<li>成员：<a href="apps.php?q=group&a=member&cyid=$cyid">$colony[members]</a></li>
 				<li>创建：<span class="f10">$colony[createtime_s]</span></li>
 				<li>积分：<span class="f10">$colonyNums</span></li>
@@ -55,7 +55,7 @@ EOT;
 EOT;
 foreach ($magdb as $value) {print <<<EOT
 -->
-			<li><a href="u.php?uid=$value[uid]" target="_blank" class="i" title="$value[username]"><img src="{$udb[$value[uid]][faceurl]}" height="44" width="44" /></a><p class="n"><a href="u.php?uid=$value[uid]" target="_blank">$value[username]</a></p>
+			<li><a href="{$db_userurl}$value[uid]" target="_blank" class="i" title="$value[username]"><img src="{$udb[$value[uid]][faceurl]}" height="44" width="44" /></a><p class="n"><a href="{$db_userurl}$value[uid]" target="_blank">$value[username]</a></p>
 <!--
 EOT;
 if ($value['username'] == $colony['admin']) {print <<<EOT
@@ -98,7 +98,7 @@ EOT;
 EOT;
 foreach ($memdb as $value) {print <<<EOT
 -->
-			<li><a href="u.php?uid=$value[uid]" target="_blank" class="i" title="$value[username]"><img src="{$udb[$value[uid]][faceurl]}" height="44" width="44" /></a><p class="n"><a href="u.php?uid=$value[uid]" title="$value[username]" target="_blank">$value[username]</a></p></li>
+			<li><a href="{$db_userurl}$value[uid]" target="_blank" class="i" title="$value[username]"><img src="{$udb[$value[uid]][faceurl]}" height="44" width="44" /></a><p class="n"><a href="{$db_userurl}$value[uid]" title="$value[username]" target="_blank">$value[username]</a></p></li>
 <!--
 EOT;
 }print <<<EOT
@@ -106,6 +106,12 @@ EOT;
 		</ul>
         </div>
 	</div>
+<!--
+EOT;
+count($newvisit) == 1 && $onlyVisit = array_keys($newvisit);
+if (!(isset($onlyVisit) && $udb[$onlyVisit[0]][username] == $colony['admin'])) {
+print <<<EOT
+-->
 	<div class="g_tA mb10">
 		<h2 class="g_hB">
 <!--
@@ -123,10 +129,11 @@ EOT;
 <!--
 EOT;
 foreach ($newvisit as $key => $value) {
+if (!isset($udb[$key]['username'])) continue;
 $visittime = get_date($value, 'm月d日');
 print <<<EOT
 -->
-				<li><a href="u.php?uid=$key" target="_blank" class="i"  title="{$udb[$key][username]}"><img src="{$udb[$key][faceurl]}" height="44" width="44" /></a><p class="n"><a href="u.php?uid=$key" title="{$udb[$key][username]}" target="_blank">{$udb[$key][username]}</a></p><p class="t">$visittime</p></li>
+				<li><a href="{$db_userurl}$key" target="_blank" class="i"  title="{$udb[$key][username]}"><img src="{$udb[$key][faceurl]}" height="44" width="44" /></a><p class="n"><a href="{$db_userurl}$key" title="{$udb[$key][username]}" target="_blank">{$udb[$key][username]}</a></p><p class="t">$visittime</p></li>
 <!--
 EOT;
 }print <<<EOT
@@ -134,6 +141,12 @@ EOT;
 			</ul>
         </div>
 	</div>
+<!--
+EOT;
+}
+if (count($likegroup)) {
+print <<<EOT
+-->
 	<div class="g_tA mb10">
 		<h2 class="g_hB">成员还喜欢去的群组</h2>
 		<div class="p10">
@@ -160,4 +173,5 @@ EOT;
 	</div>
 <!--
 EOT;
+}
 ?>

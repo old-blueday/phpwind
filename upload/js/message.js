@@ -177,6 +177,15 @@ var MC = {
 		
 	},
 	nonRefresh : function(dataUrl,message,otherid){
+		if(/{.+}/.test(message)){
+			var rText = eval('(' + message +')');
+			if(null == rText.bool){
+				showDialog({type:'confirm',message:rText.message,okText:'重新登录',onOk:function(){
+					location.href = "login.php";
+				}});
+				return false;
+			};
+		};
 		MC.$('hiddenMessage').innerHTML = message;
 		var timer = window.setTimeout(function(){
 		clearTimeout(timer);

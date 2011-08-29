@@ -8,7 +8,7 @@
 @effect:对特定用户使用。
 
 ****/
-InitGP(array('uid'),'GP',2);
+S::gp(array('uid'),'GP',2);
 if($tooldb['type']!=2){
 	Showmsg('tooluse_type_error');  // 判断道具类型是否设置错误
 }
@@ -21,15 +21,17 @@ $userName = $userService->getUserNameByUserId($uid);
 if(!$userName){
 	Showmsg('tooluse_nobirther');
 }
-$db->update("UPDATE pw_usertool SET nums=nums-1 WHERE uid=".pwEscape($winduid)."AND toolid=".pwEscape($toolid));
-
+$db->update("UPDATE pw_usertool SET nums=nums-1 WHERE uid=".S::sqlEscape($winduid)."AND toolid=".S::sqlEscape($toolid));
 M::sendNotice(
 	array($userName),
 	array(
-		'title' => getLangInfo('writemsg','birth_title'),
-		'content' => getLangInfo('writemsg','birth_content'),
-	)
-);
+		'title' => getLangInfo('writemsg','birth_title',array(
+		'userName'=>$userName
+	)),
+		'content' => getLangInfo('writemsg','birth_content',array(
+		'fromUsername'=>$windid
+	))
+));
 
 $logdata = array(
 	'type'		=>	'use',

@@ -5,7 +5,7 @@ function CheckAll(form){
 	}
 }
 function displayElement(elementId,buttonId,isDisplay) {
-	if (undefined == isDisplay) {
+	if (undefined == isDisplay && typeof buttonId === 'string') {
 		getObj(elementId).style.display = getObj(elementId).style.display == 'none' ? '' : 'none';	
 		getObj(buttonId).innerHTML=getObj(elementId).style.display == ''?'简单搜索' : '高级搜索';
 	} else {

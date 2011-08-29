@@ -20,12 +20,13 @@ $lang['cpmsg'] = array (
 'illegal_username'			=> '用户名太长或包含不可接受字符',
 'illegal_password'			=> '密码包含不可接受字符',
 'illegal_customimg'			=> '非法自定义头像：必须以 http 开头，不可包含此字符\'|\'，必须在(0-185)*(0-200)的大小范围里',
-'illegal_email'				=> 'email格式错误',
+'illegal_email'				=> '电子邮箱格式错误',
 'illegal_fid'				=> '非法版块ID',
 'forum_havesub'				=> '该版块含有子版块，请先转移所有子版块，再进行此操作',
 'forum_descrip'				=> '版块描述字节数不得大于 255',
 'recycle_del'				=> '不能删除回收站，取消回收站功能请到核心设置里取消此功能。',
 'user_not_exists'			=> '用户‘{$GLOBALS[errorname]}’不存在',
+'user_username_empty' 		=> '用户名不能为空',
 'log_min'					=> '管理日志少于100不允许删除!!',
 'log_del'					=> '已删除多余的管理日志',
 'adminrecord_del'			=> '已删除多余的管理记录',
@@ -55,7 +56,7 @@ $lang['cpmsg'] = array (
 'template_error'			=> '该版块没有启用静态模板功能，请先启用',
 'setuser_forumadmin'		=> '设置或取消会员的版主权限，请到<font color="red">论坛版块管理</font>处设置',
 'setuser_ban'				=> '禁言用户和解除禁言请到会员禁言处设置',
-'setuser_empty'				=> '用户名,密码或email为空',
+'setuser_empty'				=> '用户名,密码或电子邮箱为空',
 'setuser_img'				=> '头像网址必须以 \'http\' 开头.',
 'setting_http'				=> '使用跨台图片链必须以http开头',
 'icp_http'				    => 'ICP 备案信息链接地址必须以 \'http\' 开头',
@@ -161,7 +162,7 @@ $lang['cpmsg'] = array (
 'ip_ban'					=> '系统限制了允许进入后台的IP，您的IP无权访问该页面。',
 'module_id_error'			=> '模块ID错误，该模块不存在！',
 'module_adderror'			=> '调用变量名和模块标题不能为空',
-'advert_code_error'			=> '广告代码不能为空或超过1024字符',
+'advert_code_error'			=> '广告代码不能为空',
 'advert_code_hire_error'	=> '广告代码类型不支持出租',
 'advert_txt_error'			=> '文字内容和文字链接不能为空',
 'advert_txt_hire_error'		=> '文字内容不能为空',
@@ -176,6 +177,7 @@ $lang['cpmsg'] = array (
 'advert_creditype_error'	=> '本广告位积分类型有误!',
 'advert_creditype_lack'		=> '本广告位积分类型有误!',
 'advert_time_error'			=> '开始时间不能大于结束时间!',
+'advert_ckey_exists'		=> '广告位标识符已存在',
 'attachrenew_forbidden'		=> '您的网站使用了远程附件功能，附件修复功能失效。',
 'fieldid_error'				=> '您要编辑栏目ID错误。',
 'options_error'				=> '请填写选项内容',
@@ -184,9 +186,11 @@ $lang['cpmsg'] = array (
 'please_settime'			=> '请到计划任务里设置相应的时间，才能正常使用该功能!',
 'uptime_has'				=> '该用户已经设置了系统组有效期限!',
 'help_empty'				=> '标题和内容不能为空，请完整填写!',
+'top_help_empty'			=> '标题不能为空，请完整填写!',
 'help_title'				=> '标题已经存在',
 'hup_error1'				=> '不能将项目本身设置为自己的所属项目',
 'hup_error2'				=> '不能将所属项目设置为自己的子项目',
+'help_maxlv'				=> '最多只能添加4级分类',
 'gid_same'					=> '限期头衔和到期变成头衔不能相同!',
 'right_set'					=> '该用户权限已经设置!',
 'descrip_long'				=> '版块介绍超过限定字符，请删掉一些!',
@@ -208,7 +212,7 @@ $lang['cpmsg'] = array (
 'delete_recycle'			=> '正在清理回收站数据，请稍侯...',
 'all_file_ok'				=> '没有发现可疑文件',
 'safefiles_not_exists'		=> '校验文件不存在!',
-'safecv_prompt'				=> '系统强制您所在的用户组必须设置安全问题，请先到<a href="profile.php?action=modify"><b>控制面板</b></a>'
+'safecv_prompt'				=> '系统强制您所在的用户组必须设置安全问题，请先到<a href="profile.php?action=modify&info_type=safe"><b>密码安全</b></a>'
 								. '设置安全问题后再进行其他操作',
 'manager_error'				=> '<font color="red">如果您确认需要修改创始人信息，请将 data/sql_config.php 文件设置可写模式(777)</font>',
 'update_home'				=> '正在更新缓存，请稍侯...',
@@ -224,7 +228,7 @@ $lang['cpmsg'] = array (
 'bakout_words'				=> '词语导出成功!',
 'bakout_grouptitle'			=> '用户组头衔名称导出成功!',
 'credit_isnum'				=> '积分点数必须为数字',
-'sendemail_failed'			=> '连接邮件服务器失败，请检查：<br />1、服务器地址和端口是否设置正确！ 2、网络是否通畅！',
+'sendemail_failed'			=> '连接电子邮件服务器失败，请检查：<br />1、服务器地址和端口是否设置正确！ 2、网络是否通畅！',
 'no_payemail'				=> '请填写付款帐号',
 'adcode_error'				=> '请输入正确的通用密钥',
 'localhost_error'			=> '本地服务器不支持该操作',
@@ -241,11 +245,11 @@ $lang['cpmsg'] = array (
 
 'ystat_active_account'		=> '量子恒道统计账号未激活,第一次开启量子恒道统计时账号将被自动激活',
 'ystat_ymail_error'			=> '已经绑定量子恒道帐号,请勿重复绑定',
-'ystat_ymail_format'		=> '邮箱格式出错<br />请确认你的输入是 yahoo.com.cn或yahoo.cn 邮箱的完整地址<br />'
-								. '邮箱规则：4至32个字符(包括字母、数字、下划线)，且必须以英文字母开始',
+'ystat_ymail_format'		=> '电子邮箱格式出错<br />请确认你的输入是 yahoo.com.cn或yahoo.cn 邮箱的完整地址<br />'
+								. '电子邮箱规则：4至32个字符(包括字母、数字、下划线)，且必须以英文字母开始',
 'ystat_date_error'			=> '请选择正确时段,时段要小于当前时间',
 'ystat_wrong_request_parameter'	=> '数据请求参数验证错误',
-'ystat_invalid_mail_account'=> '要绑定的邮箱账号非法',
+'ystat_invalid_mail_account'=> '要绑定的电子邮箱账号非法',
 'ystat_inner_db_error'		=> '量子恒道统计内部数据库错误',
 'ystat_add_user_failed'		=> '添加量子恒道统计用户失败',
 'ystat_account_overload'	=> '要绑定的账号已经下属了30个网站（每个账号最多30个）',
@@ -303,7 +307,7 @@ $lang['cpmsg'] = array (
 'settings_stopicdir_error'		=> '专题目录格式错误，请检查目录名以字母或数字或组合。',
 
 'adminrecord_open'				=> '未开启管理员操作记录功能，请在“创始人”->“创始人管理”处开启',
-'email_success' 				=> '邮件发送成功!',
+'email_success' 				=> '电子邮件发送成功!',
 'watermark_error' 				=> '无法生成水印预览，检查设置',
 'athumb_error' 					=> '无法生成缩略预览，检查设置',
 'orderlist_none'				=> '您查询的订单号不存在!',
@@ -412,7 +416,10 @@ $lang['cpmsg'] = array (
 	'filter_class_len'				=> '分类长度超过限制！',
 	'filter_upload_dict_file'		=> '请上传词库文件！',
 	/*****************APP增加语言********************/
-	'illegal_group_cyid'			=> '请输入群组ID'
-	
+	'illegal_group_cyid'			=> '请输入群组ID',
+	/*****************APP增加语言8.3********************/
+	'type_name_long'			=> '分类名称长度为空或过长，请保持在30个字节之内',
+	'type_name_exist'			=> '分类名称已存在',
+	'linkstype_add_success'	    => "友情链接分类添加完成\tjump\t{$GLOBALS[basename]}&action=types",
 );
 ?>

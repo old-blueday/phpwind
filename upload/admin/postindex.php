@@ -4,13 +4,13 @@ include_once (R_P . "require/postindex.php");
 $repliesArray = array ('1000', '5000', '10000', '20000');
 $postIndexDB = new PostIndexDB ( );
 $postIndexDB->setPerpage ( 5 );
-InitGP(array('sub'),'G');
+S::gp(array('sub'),'G');
 if (empty($sub)) {
-	InitGP ( array ('replies', 'page'), 'GP' ); 
+	S::gp ( array ('replies', 'page'), 'GP' ); 
 	if (empty($action) || $action == "search") {
 		$threads = $postIndexDB->getALLIndexedThreads($page);
 	}elseif ($action == "reset") {
-		InitGP ( array ('tid','step','s_step' ), 'G' );
+		S::gp ( array ('tid','step','s_step' ), 'G' );
 		!$step && $step = 1;
 		!$s_step && $s_step = 1;
 		$total = 2;
@@ -26,7 +26,7 @@ if (empty($sub)) {
 			adminmsg ( "operate_success" );
 		}
 	}elseif ($action == "delete") {
-		InitGP ( array ('tids','step','s_step'), 'GP' );
+		S::gp ( array ('tids','step','s_step'), 'GP' );
 		!is_array($tids) && $tids = explode(',',$tids);
 		!$step && $step = 1;
 		!$s_step && $s_step = 1;
@@ -45,7 +45,7 @@ if (empty($sub)) {
 		}
 	} 
 }else{
-	InitGP ( array ('replies', 'page', 'tid' ), 'GP' );
+	S::gp ( array ('replies', 'page', 'tid' ), 'GP' );
 	if ($action == "search") {
 		if ($tid) {
 			$threads = $postIndexDB->getThreadsById($tid);
@@ -53,11 +53,11 @@ if (empty($sub)) {
 			$threads = $postIndexDB->getThreadsByReplies ( $replies, $page );
 		}
 	} elseif ($action == "update") {
-		InitGP ( array ('threads' ), 'GP' );
+		S::gp ( array ('threads' ), 'GP' );
 		if (!is_array($threads)) {
 			$threads = explode(',',$threads); 
 		}
-		InitGP(array('step','t_step'),'GP');
+		S::gp(array('step','t_step'),'GP');
 		!$step && $step = 1;
 		!$t_step && $t_step = 1;
 		$index = $step - 1;

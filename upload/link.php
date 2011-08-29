@@ -3,7 +3,7 @@ define('SCR', 'link');
 require_once ('global.php');
 require_once (R_P . 'require/functions.php');
 
-InitGP(array(
+S::gp(array(
 	'action'
 ));
 

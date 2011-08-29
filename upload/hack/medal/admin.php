@@ -3,13 +3,13 @@
 
 if(!$action){
 	if(!$_POST['step']){
-		include_once(D_P.'data/bbscache/md_config.php');
+		include_once pwCache::getPath(D_P.'data/bbscache/md_config.php');
 		ifcheck($md_ifopen,'ifopen');
 		ifcheck($md_ifmsg,'ifmsg');
 		ifcheck($md_ifapply,'ifapply');
 		require_once PrintHack('admin');
 	} elseif($_POST['step']=='2'){
-		InitGP(array('config','groups','appgroups'),'P');
+		S::gp(array('config','groups','appgroups'),'P');
 		if(is_array($groups)){
 			$config['md_groups'] = ','.implode(',',$groups).',';
 		} else{
@@ -21,11 +21,11 @@ if(!$action){
 			$config['md_appgroups'] = '';
 		}
 		foreach($config as $key=>$value){
-			$rt = $db->get_one("SELECT hk_name FROM pw_hack WHERE hk_name=".pwEscape($key));
+			$rt = $db->get_one("SELECT hk_name FROM pw_hack WHERE hk_name=".S::sqlEscape($key));
 			if($rt){
-				$db->update("UPDATE pw_hack SET hk_value=".pwEscape($value)."WHERE hk_name=".pwEscape($key));
+				$db->update("UPDATE pw_hack SET hk_value=".S::sqlEscape($value)."WHERE hk_name=".S::sqlEscape($key));
 			} else{
-				$db->update("INSERT INTO pw_hack SET hk_name=".pwEscape($key).",hk_value=".pwEscape($value));
+				$db->update("INSERT INTO pw_hack SET hk_name=".S::sqlEscape($key).",hk_value=".S::sqlEscape($value));
 			}
 		}
 		updatecache_md();
@@ -39,18 +39,18 @@ if(!$action){
 		}
 		require_once PrintHack('admin');
 	} elseif($_POST['step']=='2'){
-		InitGP(array('medal'),'P');
+		S::gp(array('medal'),'P');
 		foreach($medal as $key=>$value){
-			$value['name']   = Char_cv($value['name']);
-			$value['intro']  = Char_cv($value['intro']);
-			$value['picurl'] = Char_cv($value['picurl']);
+			$value['name']   = S::escapeChar($value['name']);
+			$value['intro']  = S::escapeChar($value['intro']);
+			$value['picurl'] = S::escapeChar($value['picurl']);
 			$db->update("UPDATE pw_medalinfo"
-				. " SET " . pwSqlSingle(array(
+				. " SET " . S::sqlSingle(array(
 						'name'	=> $value['name'],
 						'intro'	=> $value['intro'],
 						'picurl'=> $value['picurl']
 					))
-				. " WHERE id=".pwEscape($key));
+				. " WHERE id=".S::sqlEscape($key));
 		}
 		$basename="$admin_file?adminjob=hack&hackset=medal&action=edit";
 		updatecache_mddb();
@@ -60,9 +60,9 @@ if(!$action){
 	if(!$_POST['step']){
 		require_once PrintHack('admin');
 	} elseif($_POST['step']=='2'){
-		InitGP(array('newname','newintro','newpicurl'),'P',1);
+		S::gp(array('newname','newintro','newpicurl'),'P',1);
 		$db->update("INSERT INTO pw_medalinfo"
-			. " SET " . pwSqlSingle(array(
+			. " SET " . S::sqlSingle(array(
 				'name'	=> $newname,
 				'intro'	=> $newintro,
 				'picurl'=> $newpicurl
@@ -72,14 +72,14 @@ if(!$action){
 		adminmsg('operate_success');
 	}
 } elseif($action=='del'){
-	InitGP(array('id'));
-	$db->update("DELETE FROM pw_medalinfo WHERE id=".pwEscape($id));
+	S::gp(array('id'));
+	$db->update("DELETE FROM pw_medalinfo WHERE id=".S::sqlEscape($id));
 	$basename="$admin_file?adminjob=hack&hackset=medal&action=edit";
 	updatecache_mddb();
 	adminmsg('operate_success');
 }elseif($action=='selectimg'){
-	require_once D_P.'data/bbscache/medaldb.php';
-	InitGP(array('thisid'));
+	require_once pwCache::getPath(D_P.'data/bbscache/medaldb.php');
+	S::gp(array('thisid'));
 	$medalimgdir = H_P."/image/";
 	$medalimgs	= $haveused = array();
 	foreach($_MEDALDB as $value){

@@ -2,11 +2,12 @@
 define('SCR','trade');
 require_once('global.php');
 
-InitGP(array('action'));
+S::gp(array('action'));
 
 if ($action == 'buy') {
 
-	$trade = $db->get_one("SELECT t.*,m.username FROM pw_trade t LEFT JOIN pw_members m ON t.uid=m.uid WHERE t.tid=".pwEscape($tid));
+	$trade = $db->get_one("SELECT t.*,m.username FROM pw_trade t LEFT JOIN pw_members m ON t.uid=m.uid WHERE t.tid=".S::sqlEscape($tid));
+	!$trade['num'] && Showmsg('该商品已售完!');
 
 	if (empty($_POST['step'])) {
 		if (empty($winduid)) Showmsg('not_login');
@@ -19,10 +20,10 @@ if ($action == 'buy') {
 		if ($trade['uid'] == $winduid) {
 			Showmsg('onlinepay_goodsbuy');
 		}
-		InitGP(array('address','consignee','tel','descrip'));
-		InitGP(array('quantity','zip','transport'), 2);
+		S::gp(array('address','consignee','tel','descrip'));
+		S::gp(array('quantity','zip','transport'), 2);
 
-		if ($quantity < 1) {
+		if ($quantity < 1 || $quantity > $trade['num']) {
 			Showmsg('goods_num_error');
 		}
 		if (!$address || !$consignee || !$tel) {
@@ -45,7 +46,7 @@ if ($action == 'buy') {
 		}
 		$order_no = '1'.str_pad($winduid,10, "0",STR_PAD_LEFT).get_date($timestamp,'YmdHis').num_rand(5);
 
-		$db->update("INSERT INTO pw_tradeorder SET " . pwSqlSingle(array(
+		$db->update("INSERT INTO pw_tradeorder SET " . S::sqlSingle(array(
 			'tid'			=> $tid,
 			'order_no'		=> $order_no,
 			'subject'		=> $trade['name'],
@@ -64,15 +65,16 @@ if ($action == 'buy') {
 			'descrip'		=> $descrip
 		)));
 		$oid = $db->insert_id();
+		$oid && $db->update("UPDATE `pw_trade` SET num=num-".S::sqlEscape($quantity)." WHERE tid=".S::sqlEscape($tid));
 
 		ObHeader("trade.php?action=order&oid=$oid");
 	}
 
 } elseif ($action == 'order') {
 
-	InitGP(array('oid'));
+	S::gp(array('oid'));
 
-	$order = $db->get_one("SELECT td.*,t.paymethod,m.username FROM pw_tradeorder td LEFT JOIN pw_trade t ON td.tid=t.tid LEFT JOIN pw_members m ON td.seller=m.uid WHERE td.oid=".pwEscape($oid));
+	$order = $db->get_one("SELECT td.*,t.paymethod,m.username FROM pw_tradeorder td LEFT JOIN pw_trade t ON td.tid=t.tid LEFT JOIN pw_members m ON td.seller=m.uid WHERE td.oid=".S::sqlEscape($oid));
 
 	if (empty($order) || !in_array($winduid,array($order['buyer'],$order['seller']))) {
 		Showmsg('data_error');
@@ -87,9 +89,9 @@ if ($action == 'buy') {
 
 } elseif ($action == 'pay') {
 
-	InitGP(array('oid','method'));
+	S::gp(array('oid','method'));
 
-	$order = $db->get_one("SELECT t.*,mb.tradeinfo FROM pw_tradeorder t LEFT JOIN pw_memberinfo mb ON t.seller=mb.uid WHERE t.oid=".pwEscape($oid));
+	$order = $db->get_one("SELECT t.*,mb.tradeinfo FROM pw_tradeorder t LEFT JOIN pw_memberinfo mb ON t.seller=mb.uid WHERE t.oid=".S::sqlEscape($oid));
 
 	if (empty($order) || $order['buyer'] <> $winduid) {
 		Showmsg('data_error');
@@ -105,15 +107,15 @@ if ($action == 'buy') {
 
 		case 1:
 
-			InitGP(array('tradeinfo'));
-			$db->update("UPDATE pw_tradeorder SET " . pwSqlSingle(array(
+			S::gp(array('tradeinfo'));
+			$db->update("UPDATE pw_tradeorder SET " . S::sqlSingle(array(
 				'ifpay'		=> 1,
 				'tradedate'	=> $timestamp,
 				'payment'	=> 1,
 				'tradeinfo'	=> $tradeinfo
-			)) . " WHERE oid=".pwEscape($oid));
+			)) . " WHERE oid=".S::sqlEscape($oid));
 
-			$username = $db->get_value("SELECT username FROM pw_members WHERE uid=".pwEscape($order['seller']));
+			$username = $db->get_value("SELECT username FROM pw_members WHERE uid=".S::sqlEscape($order['seller']));
 
 			M::sendNotice(
 				array($username),
@@ -138,7 +140,7 @@ if ($action == 'buy') {
 			if (empty($trade['alipay'])) {
 				Showmsg('onlinepay_alipay');
 			}
-			include_once(D_P.'data/bbscache/ol_config.php');
+			include_once pwCache::getPath(D_P.'data/bbscache/ol_config.php');
 			require_once(R_P.'require/onlinepay.php');
 			$olpay = new OnlinePay($trade['alipay']);
 
@@ -201,9 +203,9 @@ if ($action == 'buy') {
 
 } elseif ($action == 'send') {
 
-	InitGP(array('oid','logistics','orderid'));
+	S::gp(array('oid','logistics','orderid'));
 
-	$order = $db->get_one("SELECT td.*,m.username FROM pw_tradeorder td LEFT JOIN pw_members m ON td.buyer=m.uid WHERE td.oid=".pwEscape($oid));
+	$order = $db->get_one("SELECT td.*,m.username FROM pw_tradeorder td LEFT JOIN pw_members m ON td.buyer=m.uid WHERE td.oid=".S::sqlEscape($oid));
 
 	if (empty($order) || $order['seller'] <> $winduid || $order['ifpay'] <> 1 || $order['payment'] <> 1) {
 		Showmsg('data_error');
@@ -215,11 +217,11 @@ if ($action == 'buy') {
 		'logistics' => $logistics,
 		'orderid'	=> $orderid,
 	));
-	$db->update("UPDATE pw_tradeorder SET " . pwSqlSingle(array(
+	$db->update("UPDATE pw_tradeorder SET " . S::sqlSingle(array(
 		'ifpay'		=> 2,
 		'tradedate'	=> $timestamp,
 		'tradeinfo'	=> $descrip
-	)) . " WHERE oid=".pwEscape($oid));
+	)) . " WHERE oid=".S::sqlEscape($oid));
 
 	M::sendNotice(
 		array($order['username']),
@@ -239,35 +241,35 @@ if ($action == 'buy') {
 
 } elseif ($action == 'get') {
 
-	InitGP(array('oid'));
+	S::gp(array('oid'));
 
-	$order = $db->get_one("SELECT * FROM pw_tradeorder WHERE oid=".pwEscape($oid));
+	$order = $db->get_one("SELECT * FROM pw_tradeorder WHERE oid=".S::sqlEscape($oid));
 
 	if (empty($order) || $order['buyer'] <> $winduid || $order['ifpay'] <> 2) {
 		Showmsg('data_error');
 	}
 
-	$db->update("UPDATE pw_tradeorder SET ".pwSqlSingle(array(
+	$db->update("UPDATE pw_tradeorder SET ".S::sqlSingle(array(
 		'ifpay'		=> 3,
 		'tradedate'	=> $timestamp
-	)) . " WHERE oid=".pwEscape($oid));
-	
-	$order['quantity'] = (int)$order['quantity'];
-  	$db->update("UPDATE pw_trade SET salenum=salenum+". $order['quantity'] ." WHERE tid=".pwEscape($order['tid']));
+	)) . " WHERE oid=".S::sqlEscape($oid));
 
-	//$db->update("UPDATE pw_trade SET salenum=salenum+1 WHERE tid=".pwEscape($order['tid']));
+	$order['quantity'] = (int)$order['quantity'];
+  	$db->update("UPDATE pw_trade SET salenum=salenum+". $order['quantity'] ." WHERE tid=".S::sqlEscape($order['tid']));
+
+	//$db->update("UPDATE pw_trade SET salenum=salenum+1 WHERE tid=".S::sqlEscape($order['tid']));
 
 	refreshto("apps.php?q=article&a=goods",'operate_success');
 } elseif ($action == 'pcalipay') {
-	InitGP(array('tid','pcmid','pcid'),GP,2);
+	S::gp(array('tid','pcmid','pcid'),GP,2);
 
 	$pcvaluetable = GetPcatetable($pcid);
 
-	$order = $db->get_one("SELECT pv.price,pv.deposit,pm.username,pm.nums,pm.phone,pm.mobile,pm.address,pm.ifpay,pm.totalcash,t.author,t.authorid,t.subject FROM pw_pcmember pm LEFT JOIN $pcvaluetable pv ON pm.tid=pv.tid LEFT JOIN pw_threads t ON pv.tid=t.tid WHERE pm.tid=".pwEscape($tid)." AND pm.pcmid=".pwEscape($pcmid)." AND pm.uid=".pwEscape($winduid));
+	$order = $db->get_one("SELECT pv.price,pv.deposit,pm.username,pm.nums,pm.phone,pm.mobile,pm.address,pm.ifpay,pm.totalcash,t.author,t.authorid,t.subject FROM pw_pcmember pm LEFT JOIN $pcvaluetable pv ON pm.tid=pv.tid LEFT JOIN pw_threads t ON pv.tid=t.tid WHERE pm.tid=".S::sqlEscape($tid)." AND pm.pcmid=".S::sqlEscape($pcmid)." AND pm.uid=".S::sqlEscape($winduid));
 
 	$order['zip'] = '100000';
 
-	$order['tradeinfo'] = $db->get_value("SELECT tradeinfo FROM pw_memberinfo WHERE uid=".pwEscape($order['authorid']));
+	$order['tradeinfo'] = $db->get_value("SELECT tradeinfo FROM pw_memberinfo WHERE uid=".S::sqlEscape($order['authorid']));
 
 	if (empty($order)) {
 		Showmsg('data_error');
@@ -284,7 +286,7 @@ if ($action == 'buy') {
 		Showmsg('onlinepay_alipay');
 	}
 
-	include_once(D_P.'data/bbscache/ol_config.php');
+	include_once pwCache::getPath(D_P.'data/bbscache/ol_config.php');
 	require_once(R_P.'require/onlinepay.php');
 	$olpay = new OnlinePay($trade['alipay']);
 

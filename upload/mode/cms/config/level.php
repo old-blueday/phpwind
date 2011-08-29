@@ -10,7 +10,7 @@ return array(
 				'1'=>'开启',
 				'0'=>'关闭'
 			),
-			'descrip' => ''
+			'descrip' => '开启后，此用户组的用户可以发送文章'
 		),
 		/*
 		'cms_postcheck' => array(

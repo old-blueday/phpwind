@@ -1,5 +1,5 @@
 <?php
-!defined('M_P') && exit('Forbidden');
+!defined('P_W') && exit('Forbidden');
 
 /**
  * 文章相关服务类
@@ -120,10 +120,10 @@ class PW_ArticleService {
 	/**
 	 * 获得文章总条数
 	 */
-	function searchArticleCount($cid = array(), $title = '', $author = '', $type = '', $user = '') {
+	function searchArticleCount($cid = array(), $title = '', $author = '', $type = '', $user = '', $postdate = '') {
 		$articleDAO = $this->_getArticleDAO();
 		if (!empty($cid) && !is_array($cid)) $cid = array($cid);
-		return $articleDAO->searchCount($cid, $title, $author, $type, $user);
+		return $articleDAO->searchCount($cid, $title, $author, $type, $user, $postdate);
 	}
 
 	/**
@@ -131,10 +131,10 @@ class PW_ArticleService {
 	 * @param int $start	开始位置
 	 * @param int $perpage  每页显示
 	 */
-	function searchAtricles($cid = array(), $title = '', $author = '', $type = '', $user = '', $start = 0, $perpage = 20) {
+	function searchAtricles($cid = array(), $title = '', $author = '', $type = '', $user = '', $postdate = '', $start = 0, $perpage = 20) {
 		$articleDAO = $this->_getArticleDAO();
 		if (!empty($cid) && !is_array($cid)) $cid = array($cid);
-		return $this->_bulidResult($articleDAO->search($cid, $title, $author, $type, $user ,$start, $perpage));
+		return $this->_bulidResult($articleDAO->search($cid, $title, $author, $type, $user , $postdate , $start, $perpage));
 	}
 
 	function cleanRecycle() {

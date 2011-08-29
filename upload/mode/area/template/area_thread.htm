@@ -2,19 +2,12 @@
 <?php
 print <<<EOT
 -->
-<link rel="stylesheet" type="text/css" href="{$pwModeImg}/area_read_style.css" />
 <!--
 EOT;
-if($N_allowtypeopen || $N_allowtopicopen || $N_allowpostcateopen){
-print <<<EOT
+if($N_allowtypeopen || $N_allowtopicopen || $N_allowpostcateopen){print <<<EOT
 -->
-	<a href="post.php?fid=$fid" class="c_received fr" target="_blank" id="td_post">我要投稿</a>
-<!--
-EOT;
-}if($N_allowtypeopen || $N_allowtopicopen || $N_allowpostcateopen){print <<<EOT
--->
-<div id="menu_post" class="pw_menu" style="display:none;">
-	<ul class="menuList" style="width:48px;">
+<div id="menu_post" class="pw_menu tac" style="display:none;">
+	<ul class="menuList" style="width:70px;">
 <!--
 EOT;
 if($foruminfo['allowtype'] & 1){print <<<EOT
@@ -73,12 +66,19 @@ EOT;
 EOT;
 }print <<<EOT
 -->
-	<div id="breadCrumb">
-    	<a href="$db_bbsurl/index.php?m=area">首页</a>
-    	&raquo; <a href="cate.php?cateid=$cateid">{$forum[$cateid]['name']}</a>
-		&raquo; $guidename
-    </div>
-
+<div id="breadCrumb">
+<!--
+EOT;
+if($N_allowtypeopen || $N_allowtopicopen || $N_allowpostcateopen){
+print <<<EOT
+-->
+	<a href="post.php?fid=$fid" class="c_received fr" target="_blank" id="td_post" style="line-height:18px;padding-top:0;">我要投稿</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+		$msg_guide
+</div>
     <div class="cate_menubar">
     	<div class="cc"><span class="fl">筛选：</span>
         <span class="menubar_tab fl">
@@ -114,6 +114,8 @@ EOT;
 <script language="JavaScript">
 setCurrent('pc_$a','pc_all','current');
 </script>
+    </div>
+    <div class="cate_content fl">
 <!--
 EOT;
 if ($modelid>0 || $pcid>0){
@@ -128,15 +130,13 @@ print<<<EOT
 EOT;
 }print<<<EOT
 -->
-    </div>
-
-    <div class="cate_content fl">
+		
 <!--
 EOT;
 if($t_typedb){
 print <<<EOT
 -->
-    	<div class="tabB mb10 pr">
+    	<div class="tabB pr">
 			<ul id="t_typedb">
 				<li id="thread_type_all" $li_class><a href="thread.php?fid=$fid#c">全部</a></li>
 <!--
@@ -328,7 +328,7 @@ if($thread['lastpost']){
 $tmp_lastpost = get_date($thread['lastpost'], "Y-m-d H:i");
 print <<<EOT
 -->
-					<span class="gray2">$tmp_lastpost</span>
+					<span style="color:#bbb;">$tmp_lastpost</span>
 <!--
 EOT;
 }print <<<EOT
@@ -455,13 +455,18 @@ print <<<EOT
 <!--
 EOT;
 }
-list($htmlAdvert,$arrayAdvert) = pwAdvert('Mode.Forum.Layer.area.ThreadBtm',$fid,$num,$SCR);
+list($htmlAdvert,$arrayAdvert) = pwAdvert('Mode.Forum.Layer.area.ThreadTop',$fid,$num,$SCR);
 if($htmlAdvert){print <<<EOT
 -->
 			<div class="box-bar">$htmlAdvert</div>
 <!--
 EOT;
 }print <<<EOT
+-->
+<!--
+EOT;
+if ($hot_threads) {
+print <<<EOT
 -->
     	<div class="sidebar_box">
         	<h2><span>热门主题</span></h2>
@@ -481,16 +486,11 @@ print <<<EOT
         </div>
 <!--
 EOT;
-list($htmlAdvert,$arrayAdvert) = pwAdvert('Mode.Forum.Layer.area.ThreadBtm',$fid,$num,$SCR);
-if($htmlAdvert){print <<<EOT
--->
-			<div class="box-bar">$htmlAdvert</div>
-<!--
-EOT;
-}print <<<EOT
+}
+print <<<EOT
 -->
         <div class="sidebar_box">
-        	<h2><span>相关主题</span></h2>
+        	<h2><span>最新主题</span></h2>
             <ul>
 <!--
 EOT;
@@ -515,6 +515,72 @@ EOT;
 }print <<<EOT
 -->
     </div>
+<div id="menu_forumlist" style="display:none;">
+	<div class="sbar-box-a" style="width:700px;">
+		<div class="sbar-title" style="cursor:pointer" onclick="try{pw_bottom.hiddenTab();read.close();}catch(e){read.close();}">
+				<span class="adel">隐藏</span>
+				<span id="title_forumlist" class="b">快速跳转</span>
+		</div>
+		<div class="sbar-box-b">
+			<div class="forum-list-popout">
+<!--
+EOT;
+if ($GLOBALS['pwForumList']) {
+	$pwForumList = $GLOBALS['pwForumList'];
+} else {
+	$pwForumList = array();
+	include(D_P.'data/bbscache/forumlist_cache.php');
+	if ($pwForumAllList && $GLOBALS['groupid'] == 3) {
+		$pwForumList = array_merge($pwForumList,$pwForumAllList);
+	}
+}
+foreach($pwForumList as $key=>$value){
+	if (isset($value['child']) && is_array($value['child']) && count($value['child'])) {
+print <<<EOT
+-->
+			<dl class="cc">
+				<dt>
+<!--
+EOT;
+if($GLOBALS['m']){print<<<EOT
+-->
+				<a href="index.php?cateid=$key" target="_blank">$value[name]</a>
+<!--
+EOT;
+}else{print<<<EOT
+-->
+				<a href="index.php?cateid=$key">$value[name]</a>
+<!--
+EOT;
+}print<<<EOT
+-->
+				</dt>
+				<dd class="cc">
+<!--
+EOT;
+foreach($value['child'] as $k=>$v){
+if($GLOBALS['m']){print <<<EOT
+-->
+					<a href="thread.php?fid=$k" target="_blank" onclick="return pwForumList(true,gIsPost,$k,'',true);"><span>$v</span></a>
+<!--
+EOT;
+}else{print<<<EOT
+-->
+					<a href="thread.php?fid=$k" onclick="return pwForumList(true,gIsPost,$k);"><span>$v</span></a>
+<!--
+EOT;
+}}print <<<EOT
+-->
+				</dd>
+			</dl>
+<!--
+EOT;
+}}print <<<EOT
+-->
+			</div>
+		</div>
+	</div>
+</div>
 <!--
 EOT;
 ?>-->

@@ -1,6 +1,6 @@
 <?php
 !function_exists('readover') && exit('Forbidden');
-InitGP ( array ("typeid", "action", "rateconfig", "id","power" ) );
+S::gp ( array ("typeid", "action", "rateconfig", "id","power" ) );
 class AdminAction {
 
 	var $_action;
@@ -187,8 +187,7 @@ class AdminAction {
 	}
 
 	function _getRateService() {
-		require_once L_R . 'rate.class.php';
-		return new PW_Rate ( );
+		return L::loadClass('rate','rate');
 	}
 
 }

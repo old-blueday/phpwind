@@ -96,8 +96,8 @@ class PW_ParseStopicTpl {
 	 */
 	function getLayoutString($layout) {
 		if (!isset($this->layoutStrings[$layout])) {
-			if ($layout && file_exists(Pcv(A_P.'data/layout/'.$layout.'/layout.htm'))) {
-				$this->layoutStrings[$layout] = readover(Pcv(A_P.'data/layout/'.$layout.'/layout.htm'));
+			if ($layout && file_exists(S::escapePath(A_P.'data/layout/'.$layout.'/layout.htm'))) {
+				$this->layoutStrings[$layout] = readover(S::escapePath(A_P.'data/layout/'.$layout.'/layout.htm'));
 			} else {
 				$this->layoutStrings[$layout] = '';
 			}
@@ -116,6 +116,7 @@ class PW_ParseStopicTpl {
 	 * @return string 专题html内容
 	 */
 	function exute($stopic_service,$stopic,$units,$blocks,$ifadmin) {
+		global $ifDelOldUnit;
 		$this->_register($stopic_service,$stopic,$units,$blocks,$ifadmin);
 
 		$content = '';
@@ -125,7 +126,7 @@ class PW_ParseStopicTpl {
 			$tmp = '<div id="'.$layout_id.'" class="layoutDraggable cc" width="100%">'.$head.$tmp.'</div>';
 			$content .= $tmp;
 		}
-		$this->_delOverageUnits();
+		$ifDelOldUnit || $this->_delOverageUnits();
 		return $content;
 	}
 	

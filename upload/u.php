@@ -2,14 +2,17 @@
 define('SCR','u');
 require_once('global.php');
 require_once(R_P . 'u/require/core.php');
-include_once (D_P . 'data/bbscache/o_config.php');
+include_once pwCache::getPath(D_P . 'data/bbscache/o_config.php');
 $o_sitename = $o_sitename ? $o_sitename :  $db_bbsname;
+//导航
+$homenavigation = array();
+$navConfigService = L::loadClass('navconfig', 'site');
+$homenavigation = $navConfigService->userHomeNavigation(PW_NAV_TYPE_MAIN, 'o');
 
-InitGP(array('a', 'uid', 'username'));
-
+S::gp(array('a', 'uid', 'username', 'contenttype'));
 $pwModeImg = "$imgpath/apps";
 if ($a && in_array($a, array('set', 'ajax', 'friend', 'myapp', 'info', 'invite', 'board'))) {
-	require_once Pcv(R_P . 'u/' . $a . '.php');
+	require_once S::escapePath(R_P . 'u/' . $a . '.php');
 } elseif ($uid || $username) {
 	require_once(R_P . 'u/space.php');
 } else {

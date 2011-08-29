@@ -1,15 +1,16 @@
 <?php
 !function_exists('adminmsg') && exit('Forbidden');
 
-$basename = $basename.'&admintype='.$admintype;
-if ($admintype == 'mmemcache') {
+!$adminitem && $adminitem = 'msphinx';
+$basename = $basename.'&adminitem='.$adminitem;
 
+if ($adminitem == 'mmemcache') {
 
 	L::loadClass('memcache', 'utility', false);
 	$mcache = new PW_Memcache(false);
 
 	if ($_POST['step'] == 2) {
-		InitGP ( array ('host', 'port', 'isopen') );
+		S::gp ( array ('host', 'port', 'isopen', 'hash') );
 
 		empty($host) && adminmsg ( "抱歉，服务器主机不能为空" );
 		empty($port) && adminmsg ( "抱歉，服务器端口不能为空" );
@@ -20,31 +21,33 @@ if ($admintype == 'mmemcache') {
 				adminmsg($errormsg[1]);
 			}
 		}
-		$db_memcache = array ('isopen' => $isopen, 'host' => $host, 'port' => $port );
+		$db_memcache = array ('isopen' => $isopen, 'host' => $host, 'port' => $port, 'hash' => $hash );
 		$db_datastore = $db_memcache['isopen'] ? 'memcache' : '';
 		setConfig ( 'db_memcache', $db_memcache );
 		setConfig ( 'db_datastore', $db_datastore );
 		updatecache_c ();
+		$_cacheService = L::loadClass('cacheservice', 'utility');
+		$_cacheService->flush(PW_CACHE_MEMCACHE);		
 		adminmsg("operate_success");
 	} else {
-		$ajax = GetGP('ajax');
+		$ajax = S::getGP('ajax');
 		if ($ajax == 1 && strtolower ( $pwServer ['REQUEST_METHOD'] ) == 'post') {
-			InitGP ( array ('host', 'port') );
+			S::gp ( array ('host', 'port') );
 			$errormsg = testSockopen($host,$port);
 			showError($errormsg[1]);
 		}
 		$baseUrl = EncodeUrl ($basename);
-		$configure =  $db_memcache ? $db_memcache : array('isopen'=>0,'host'=>'localhost','port'=>11211);
+		$configure =  $db_memcache ? $db_memcache : array('isopen'=>0,'host'=>'localhost','port'=>11211, 'hash'=>'');
 		($configure ['isopen'] == 0) ? $isopenCheck [0] = 'checked=checked' : $isopenCheck [1] = 'checked=checked';
 		include PrintEot ('advanced');
 	}
-} elseif ($admintype == 'msphinx') {
+} elseif ($adminitem == 'msphinx') {
 	$searcher = L::loadClass('searcher', 'search');
 	$sphinxSearch = $searcher->sphinxService();
 	$ranks = $sphinxSearch->_getSphinxRanks();
 	$groups = $sphinxSearch->_getSphinxGroups();
 	if ($_POST ['step'] == 2) {
-		InitGP ( array ('host', 'port', 'isopen','rank','group','tindex','tcindex','pindex' ) );
+		S::gp ( array ('host', 'port', 'isopen','rank','group','tindex','tcindex','pindex','dindex','dcindex','cmsindex','wordsegment_mode','sync_data') );
 		empty($host) && adminmsg ( "抱歉，服务器主机不能为空" );
 		empty($port) && adminmsg ( "抱歉，服务器端口不能为空" );
 		$isopen = (isset ( $isopen )) ? $isopen : 0;
@@ -53,6 +56,10 @@ if ($admintype == 'mmemcache') {
 			if ($errormsg[0] != 1) {
 				adminmsg($errormsg[1]);
 			}
+		}
+		$sync_data = (array)$sync_data;
+		if ($sync_data && array_diff($sync_data, array('sync_threads','sync_posts','sync_diarys','sync_members'))){
+			showMsg("抱歉,实时操作记录类型不存在");
 		}
 		$sphinxData = array ('isopen' => $isopen, 
 							 'host' => $host, 
@@ -61,16 +68,21 @@ if ($admintype == 'mmemcache') {
 							 'group'=>trim($group),
 							 'tindex'=>trim($tindex),
 							 'tcindex'=>trim($tcindex),
-							 'pindex'=>trim($pindex)
+							 'pindex'=>trim($pindex),
+							 'dindex'=>trim($dindex),
+							 'dcindex'=>trim($dcindex),
+							 'cmsindex'=>trim($cmsindex),
+							 'wordsegment_mode'=> S::int($wordsegment_mode),
+							 'sync'=>$sync_data,
 						);
 		setConfig ( 'db_sphinx', $sphinxData );
 		updatecache_c ();
 		adminmsg("operate_success");
 
 	} else {
-		$ajax = GetGP('ajax');
+		$ajax = S::getGP('ajax');
 		if ($ajax == 1 && strtolower ( $pwServer ['REQUEST_METHOD'] ) == 'post') {
-			InitGP ( array ('host', 'port') );
+			S::gp ( array ('host', 'port') );
 			$errormsg = testSockopen($host,$port);
 			showError($errormsg[1]);
 		}
@@ -84,6 +96,13 @@ if ($admintype == 'mmemcache') {
 		($configure ['isopen'] == 0) ? $isopenCheck [0] = 'checked=checked' : $isopenCheck [1] = 'checked=checked';
 		$rankSelects = assignSelect($ranks,$configure['rank']);
 		$groupSelects = assignSelect($groups,$configure['group']);
+		$wordsegment_mode[isset($configure['wordsegment_mode']) ? $configure['wordsegment_mode'] : 1] = 'checked';
+		$sync_data = array();
+		if (S::isArray($configure['sync'])){
+			foreach ($configure['sync'] as $v){
+				$sync_data[$v] = 'CHECKED';
+			}
+		}
 		include PrintEot ( 'advanced' );
 	}
 }

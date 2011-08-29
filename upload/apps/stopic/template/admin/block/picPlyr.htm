@@ -43,12 +43,12 @@ print <<<EOT
 		<td class="td2">帖子tid[选填]</td>
 		<td class="td2" colspan="3">
         	<input type="text" id="tid" class="input input_wa mr5">
-			<span class="bt2"><span><button type="button" onclick="javascript:New(addFildData,['fildbody','filddata','tid']);">添 加</button></span></span>
+			<span class="bt2"><span><button type="button" onclick="javascript:New(addFildData,['fildbody','filddata','tid']);changeImguploadName();">添 加</button></span></span>
 		</td>
 	</tr>
 	<tr class="tr2 td_bgA">
 		<td>链接地址</td>
-		<td>图片地址<span class="s1">*</span></td>
+		<td>图片地址</td>
 		<td width="180">标题</td>
 		<td>&nbsp;</td>
 	</tr>
@@ -60,9 +60,9 @@ print <<<EOT
 -->
 	<tr class="tr1 vt">
 		<td class="td2"><input type="text" name="url[]" value="{$v[url]}" class="input input_wc"></td>
-		<td class="td2"><input type="text" name="image[]" value="{$v[image]}" class="input input_wc"></td>
+		<td class="td2"><input type="text" name="image[]" value="{$v[image]}" class="input input_wc mr5"><input size="4" name="image_upload"  class="image_upload input mr5" style="width:110px;display:none" type="file" accept="image/*" /><input type="hidden" name="image_type[]" value="0" /><a  id="modifImgType" href="javascript:" onclick="stopicImgType(0, 1, 2, this)">[上传]</a></td>
 		<td class="td2"><input type="text" name="title[]" value="{$v[title]}" class="input input_wa"></td>
-		<td class="td2"><a href="javascript:void(0);" onclick="delTr(this);">[删除]</a></td>
+		<td class="td2"><a href="javascript:void(0);" onclick="delTr(this);changeImguploadName();">[删除]</a></td>
 	</tr>
 <!--
 EOT;
@@ -73,10 +73,10 @@ print <<<EOT
 </tbody>
 <tbody id="filddata" style="display:none;">
 	<tr class="tr1 vt">
-		<td class="td2"><input type="text" name="url[]" value="" class="input input_wc"></td>
-		<td class="td2"><input type="text" name="image[]" value="" class="input input_wc"></td>
+		<td class="td2"><input type="text" name="url[]" value="http://" class="input input_wc"></td>
+		<td class="td2"><input type="text" name="image[]" value="" class="input input_wc mr5"><input size="4" name="image_upload" class="image_upload input mr5" style="width:110px;display:none" type="file" accept="image/*" /><input type="hidden" name="image_type[]" value="0" /><a  id="modifImgType" href="javascript:" onclick="stopicImgType(0, 1, 2, this)">[上传]</a></td>
 		<td class="td2"><input type="text" name="title[]" value="" class="input input_wa"></td>
-		<td class="td2"><a href="javascript:void(0);" onclick="delTr(this);">[删除]</a></td>
+		<td class="td2"><a href="javascript:void(0);" onclick="delTr(this);changeImguploadName();">[删除]</a></td>
 	</tr>
 </tbody>
 

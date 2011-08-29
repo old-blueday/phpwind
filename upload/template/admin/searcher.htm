@@ -1,0 +1,805 @@
+<!--<?php
+include_once PrintEot('left');
+print <<<EOT
+-->
+<script type="text/javascript" src="js/global.js" ></script>
+<script type="text/javascript" src="js/color_picker.js" ></script>
+<script language="JavaScript">
+function $(id){
+	return document.getElementById(id);
+}
+
+function showSelHtml(d,s) {
+	if(s) $(d).innerHTML = $(s).innerHTML;
+	else $(d).innerHTML = '';
+}
+</script>
+<!--
+EOT;
+if (empty($action)) {
+print <<<EOT
+-->
+	<div class="nav3 mb10">
+	<ul class="cc">
+		<li class="current"><a href="$basename">搜索设置</a></li>
+		<li><a href="$basename&action=forum">版块推荐</a></li>
+		<li><a href="$basename&action=cp">关键字推送</a></li>
+		<li><a href="$basename&action=statistic">搜索统计</a></li>
+	</ul>
+</div>
+<div id="stypestate" style="display:$display;">
+	<h2 class="h1">搜索设置</h2>
+	<form method="post" name="FORM" action="$basename&">
+	<input type="hidden" name="step" value="2">
+	<div class="admin_table mb10">
+	<table width="100%" cellspacing="0" cellpadding="0">
+		<tr class="tr1 vt">
+			<td class="td1">定时搜索</td>
+			<td class="td2">
+				<ul class="list_A list_80 cc fl mar20">
+					<li><input type="radio" value="1" name="schctl[opensch]" $opensch_Y>开启</li>
+					<li><input type="radio" value="0" name="schctl[opensch]" $opensch_N>关闭</li>
+				</ul>
+				<div class="cc"></div>
+				<ul class="list_B list_120 cc">
+					<li>开启于[时]:&nbsp;<input name="schctl[schstart]" value="$db_schstart" class="input input_wd"></li>
+					<li>关闭于[时]:&nbsp;<input name="schctl[schend]" value="$db_schend" class="input input_wd"></li>
+				</ul>
+			</td>
+			<td class="td2"><div class="help_a">设置用户可以使用搜索功能的时间段(24小时制)，支持跨越零点搜索，例如:用户在 每晚22:00 到 次日10:00 这段时间内可以使用搜索，搜索开启于(点)设为:<b>22</b>；搜索关闭于(点)设为:<b>10</b>。<br />管理员与总版主不受此限制</div></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">搜索返回结果数</td>
+			<td class="td2"><input name="config[maxresult]" value="$db_maxresult" class="input input_wa" /></td>
+			<td class="td2"><div class="help_a">搜索一次得到的结果数量</div></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">搜索间隔时间[秒]</td>
+			<td class="td2"><input name="config[schwait]" value="$db_schwait" class="input input_wa" /></td>
+			<td class="td2"><div class="help_a">当搜索占用很大资源时可以设置此项，用于控制全站搜索频次。表示一个用户搜索一次后，自己或其他用户再次进行搜索所需要等待的时间。0或留空表示不限制</div></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">热门搜索关键词</td>
+			<td class="td2"><textarea class="textarea" name="config[hotwords]">$db_hotwords</textarea></td>
+			<td class="td2"><div class="help_a">词语之间用英文逗号","分隔, 建议参考<a href="admin.php?adminjob=searcher&action=statistic">搜索统计</a>后填写</div></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">搜索过滤版块ID</td>
+			<td class="td2"><input name="config[filterids]" value="$db_filterids" class="input input_wa" /></td>
+			<td class="td2"><div class="help_a">输入版块ID,用英文逗号","分隔.设置后,这些版块中的帖子将不显示到搜索结果中</div></td>
+		</tr>
+		
+		<tr class="tr1 vt">
+			<td class="td1">搜索类型扩展</td>
+			<td class="td2">
+				<ul class="list_A list_120">
+					<li><input type="checkbox" value="diary" name="config[search_type_expand][]" {$search_type_expand['diary']} {$search_type_disabled['diary']}/> 日志</li>
+					<li><input type="checkbox" value="group" name="config[search_type_expand][]" {$search_type_expand['group']} {$search_type_disabled['group']}/> 群组</li>
+					<li><input type="checkbox" value="cms" name="config[search_type_expand][]" {$search_type_expand['cms']} /> 文章</li>
+				</ul>
+			</td>
+			<td class="td2"><div class="help_a">开启的搜索类型可以让用户像搜索帖子一样搜索此类型（开启前请确认是否已开启对应应用或模式）
+</div></td>
+		</tr>			
+		<tr class="tr1 vt" style="display:none">
+			<td class="td1">操作行为记录</td>
+			<td class="td2">
+				<ul class="list_A list_120">
+					<li><input type="checkbox" value="log_forums" name="config[operate_log][]" {$operate_log['log_forums']} /> 版块</li>
+					<li><input type="checkbox" value="log_threads" name="config[operate_log][]" {$operate_log['log_threads']} /> 帖子</li>
+					<li><input type="checkbox" value="log_posts" name="config[operate_log][]" {$operate_log['log_posts']} /> 回复</li>
+					<li><input type="checkbox" value="log_diarys" name="config[operate_log][]" {$operate_log['log_diarys']} /> 日志</li>
+					<li><input type="checkbox" value="log_members" name="config[operate_log][]" {$operate_log['log_members']} /> 用户</li>
+				</ul>
+			</td>
+			<td class="td2"><div class="help_a">如果开启操作行为记录,如帖子,将对帖子的新增,删除,更新行为进行记录,用于实现其它功能的扩展</div></td>
+		</tr>		
+	</table>
+	<div class="cc mb10"></div>
+	<div class="tac mb10">
+	<span class="btn"><span><button type="submit">提 交</button></span></span>
+	</div>
+	</div>
+	</form>
+</div>		
+
+
+<!--
+EOT;
+}elseif($action == "cp") {
+if(!$job){print <<<EOT
+-->
+<div class="nav3 mb10">
+	<ul class="cc">
+		<li><a href="$basename">搜索设置</a></li>
+		<li><a href="$basename&action=forum">版块推荐</a></li>
+		<li class="current"><a href="$basename&action=cp">关键字推送</a></li>
+		<li><a href="$basename&action=statistic">搜索统计</a></li>
+	</ul>
+</div>
+<div style="display: block;" class="admin_info mb10">
+<h3 class="h1"><b>提示信息</b></h3>
+<div class="legend"><ol><li>通过关键字的推送可以在帖子、文章、日志搜索结果上部根据关键字显示推送内容。</li></ol></div>
+</div>
+<form action="$basename" method="post">
+<input type="hidden" name="action" value="cp">
+<h2 class="h1">搜索</h2>
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+	<tr class="tr1 vt">
+		<td class="td2">
+            <span class="mr5">关键字:<input type="text" class="input input_wa" name="keyword" value="$keyword"/></span>
+            <span class="bt2"><span><button type="submit" value="搜 索">搜 索</button></span></span>
+        </td>
+	</tr>
+</table>
+</div>
+</form>
+<form method="post" name="FORM" action="$basename&">
+<input type="hidden" name="action" value="cp">
+<h2 class="h1"><span class="fl mr10">关键字推送</span><a class="btn_add fl" href="$basename&action=$action&job=add" hidefocus="true"><i>添加推送</i></a></h2>
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0" style="table-layout:auto;">
+	<tr class="tr2">
+		<td width="28" class="tac"><span onclick="CheckAll(document.FORM)" class="cp">全选</span></td>
+		<td width="200">顺序</td>
+		<td width="300">关键字</td>
+		<td>结束时间</td>
+		<td>状态</td>
+		<td>操作</td>
+	</tr>
+<!--
+EOT;
+if (empty($adverts)) {print <<<EOT
+-->
+<tr><td class="p10" colspan="8"><div class="admin_tips">啊哦，没有你要的信息！</div></td></tr>
+<!--
+EOT;
+}else{
+foreach ($adverts as $value){
+$value[ifshow] = $value[ifshow] ? '<span class="s3">开启</span>' : '<span class="gray">关闭</span>';
+print <<<EOT
+-->
+	<tr class="tr1 vt">
+		<td class="td2">&nbsp;<input type="checkbox" name="selid[]" value="$value[id]" /></td>
+		<td class="td2"><input type="text" class="input input_wc" name="orderby[{$value['id']}]" value="$value[orderby]"></td>
+		<td class="td2">{$value['keyword']}</td>
+		<td class="td2">{$value['endtime']}</td>
+		<td class="td2">{$value['ifshow']}</td>
+		<td class="td2">
+			<a class="mr20" href="$basename&action=$action&job=edit&id=$value[id]" title="编辑">[编辑]</a><a href="$basename&action=$action&job=del&selid[]=$value[id]" onclick="if(!confirm('您确认要删除该广告吗?'))return false;" title="删除">[删除]</a>
+		</td>
+	</tr>
+<!--
+EOT;
+}}print <<<EOT
+-->
+</table>
+</div>
+<input type="hidden" name="job" value="del" id="job"/>
+<div class="mg_pw">
+<span class="fr">$pages</span>
+      <ul>
+           <li><span class="bt2"><span><button type="button" onclick="CheckAll(document.FORM)">全 选</button></span></span></li>
+           <li><input class="bt3" type="submit" value="删除" onclick="getObj('job').value='del';return confirm('您确认要进行此操作吗?');"></li>
+           <li><span class="btn2"><span><button type="submit" onclick="getObj('job').value='commit';">操作</button></span></span></li>
+      </ul>
+</div>
+
+</form>
+
+<!--
+EOT;
+}elseif($job=='add' || $job=='edit'){print <<<EOT
+-->
+<div class="nav3 mb10">
+	<ul class="cc">
+		<li><a href="$basename">搜索设置</a></li>
+		<li><a href="$basename&action=forum">版块推荐</a></li>
+		<li><a href="$basename&action=cp">关键字推送</a></li>
+		<li><a href="$basename&action=statistic">搜索统计</a></li>
+<!--
+EOT;
+if($job=='edit'){print <<<EOT
+-->
+		<li class="current"><a href="$basename&action=$action&job=edit&id=$id">编辑广告</a></li>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+		<li class="current"><a href="$basename&action=$action&job=add">添加推送</a></li>
+<!--
+EOT;
+}print <<<EOT
+-->
+	</ul>
+</div>
+<script type="text/javascript" language="JavaScript" src="js/date.js"></script>
+<form method="post" name="FORM" action="$basename&job=save&" onsubmit="checkData();return false;">
+<input type="hidden" name="action" value="cp">
+<input type="hidden" name="id" value="$id">
+<h2 class="h1">添加推送</h2>
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+	<tr class="tr1 vt">
+		<td class="td1">关键字<span class="s1">*</span></td>
+		<td class="td2">
+			<input type="text" class="input input_wb" name="advert[skey]" value="$advert[skey]" id="skey"> 当用户使用关键字中的任意字搜索帖子或文章或日志时，将显示此条推送内容
+		</td>
+		<td class="td2"><div class="help_a"></div> </td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">顺序<span class="s1"></span></td>
+		<td class="td2">
+			<input type="text" class="input input_wb" name="advert[orderby]" value="$advert[orderby]" id="orderby"> 搜索结果此推送显示顺序，值大的将排在后面
+		</td>
+		<td class="td2"><div class="help_a"></div> </td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">有效时间</td>
+        <td class="td2">
+			<p class="mb10 cc">
+            <div class="input_img fl"><i onclick="this.nextSibling.onclick()" class="input_time" title="选择时间">选择时间</i><input name="advert[starttime]" id="starttime" value="$advert[starttime]" onClick="setAdvert.initDate(this.id);" type="text" /></div><span class="p_lr_10 fl">-</span>
+			<div class="input_img fl mr20"><i onclick="this.nextSibling.onclick()" class="input_time" title="选择时间">选择时间</i><input name="advert[endtime]" id="endtime" value="$advert[endtime]" onClick="setAdvert.initDate(this.id);" type="text" /></div>
+            <p class="gray mb10">格式：yyyy-mm-dd</p>
+            有效时间段设置
+<!--
+EOT;
+if ($showddate) {print <<<EOT
+-->
+			</p><div id='showddate'>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+			<span class="bt2"><span><button type="button" value="设置详细展示时间" onclick="getObj('showddate').style.display='';this.style.display='none';">设置详细展示时间</button></span></span></p>
+			<div id='showddate' style="display:none;">
+<!--
+EOT;
+}print <<<EOT
+-->
+				<div class="admin_table_c" style="width:auto;">
+				<table width="100%" cellspacing="0" cellpadding="0">
+					<tr>
+						<td class="s4" width="60">按日期</td>
+						<td title="有效时间段内的按日期展示"><ul id="ddate_id" class="list_A list_80 cc" style="width:480px;"></ul></td>
+					</tr>
+					<tr>
+						<td class="s4">按星期</td>
+						<td title="有效时间段内的按星期展示"><ul id="dweek_id" class="list_A list_80 cc" style="width:480px;"></ul><p>设置有效时间段内的具体展示日期。两种方式，任选其一，均可生效</p></td>
+					</tr>
+					<tr title="可以设置有效时间段内每天的哪几个时间段显示">
+						<td class="s4">展示时间</td>
+						<td><span id="dtime_id"></span><p>设置每日展示小时段，按Ctrl或Shift进行多选)</p></td>
+					</tr>
+				</table>
+                </div>
+			</div>
+		</td>
+		<td class="td2"><div class="help_a"></div> </td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">显示内容<span class="s1">*</span></td>
+		<td class="td2">
+			<textarea name="advert[code]" class="textarea fl mr10" id="code" style="height:155px;width:300px;">$advert[code]</textarea>
+			<div class="fl" style="width:500px">
+			搜索结果中显示的内容，支持html代码。如：&lt;dl&gt;  &lt;dt&gt;  &lt;a href=&quot;标题连接地址&quot; target=&quot;_blank&quot; class=&quot;tlink&quot;&gt;这里是标题&lt;/a&gt;  &lt;/dt&gt;  &lt;dd&gt;  &lt;div class=&quot;text&quot;&gt;这里是文字简介&lt;/div&gt;  &lt;div class=&quot;author&quot;&gt;&lt;cite&gt;这里是链接地址&lt;/cite&gt;&lt;/div&gt;  &lt;/dd&gt;&lt;/dl&gt;<br />
+			<span class="s1">将显示为如下效果:</span> <div class="cc"><img src="images/admin/tuisongcode.gif">
+</div>
+			
+			</div>
+			
+
+		</td>
+		<td class="td2"><div class="help_a"></div> </td>
+	</tr>
+		<tr class="tr1 vt">
+		<td class="td1">状态<span class="s1"></span></td>
+		<td class="td2">
+			<ul class="list_A list_80 cc fl mar20">
+				<li><input type="radio" name="advert[ifshow]" value="1" $ifshow_Y >开启</li>
+				<li><input type="radio" name="advert[ifshow]" value="0" $ifshow_N >关闭</li>
+			</ul>
+		</td>
+		<td class="td2"><div class="help_a"></div> </td>
+	</tr>
+</table>
+</div>
+<div class="tac mb10">
+	<span class="btn"><span><button type="submit">提 交</button></span></span>
+</div>
+</form>
+<script type="text/javascript">
+function checkData(){
+    if(getObj("skey").value == ""){
+        alert("推送关键字不能为空");
+        return false;
+    }
+	if(getObj("code").value == ""){
+        alert("推送显示内容不能为空");
+        return false;
+    }
+    submit();
+}
+</script>
+
+<script type="text/javascript">
+var setAdvert = {
+    handler : '',
+    initDate : function(id){
+        ShowCalendar(id);
+        setAdvert.handler = setInterval(function(){
+            setAdvert.checkDate(setAdvert.handler);
+        },1000);
+    },
+
+    checkDate : function(){
+        var starttime = getObj("starttime").value;
+        var endtime = getObj("endtime").value;
+        if(endtime == "" || starttime == ""){
+            return false;
+        }
+        var startD  = new Date(Date.parse(starttime.replace(/-/g,"/")));
+        var endD = new Date(Date.parse(endtime.replace(/-/g,"/")));
+        if(startD-endD>0){
+            getObj("endtime").value = "";
+            alert("抱歉，结束时间不能小于开始时间");
+            return false;
+        }
+        var startArray = starttime.split("-");
+        var endArray = endtime.split("-");
+        if(startArray[0]<endArray[0]){
+            return false;
+        }
+        //two month
+        if(endArray[1]-startArray[1] <=2){
+            var dateRange = setAdvert.getDateRange(starttime,endtime);
+        }
+        if(endArray[1]==startArray[1] && endArray[2]==startArray[2]){
+            //
+        }
+        showddate(starttime,endtime);
+        clearInterval(setAdvert.handler);
+    },
+
+    getDateRange : function(starttime,endtime){
+        var unit_day = 86400*1000;
+        var startT = Date.parse(starttime.replace(/-/g,"/"));
+        var endT = Date.parse(endtime.replace(/-/g,"/"));
+        var startN = startT+unit_day;
+        var dateArray = [];
+        var weekArray = [];
+        for(i=startT;i<=endT;i+=unit_day){
+            var startND = new Date(i);
+            var td = startND.getDate();
+            var wd = startND.getDay();
+            dateArray.push(td);
+            weekArray.push(wd);
+        }
+        return {days:dateArray,weeks:weekArray};
+    },
+
+    disableDate : function(valids){
+        var ddate = getObj("ddate_id").getElementsByTagName("input");
+        for(i=0;i<ddate.length;i++){
+            var value = ddate[i].value;
+            if(valids.indexOf(value) == -1){
+                ddate[i].disabled = "disabled";
+            }
+        }
+    },
+
+    disableWeek : function(valids){
+        var dweek = getObj("dweek_id").getElementsByTagName("input");
+        for(i=0;i<dweek.length;i++){
+            var value = dweek[i].value;
+            if(valids.indexOf(value) != -1){
+                dweek[i].disabled = "disabled";
+            }
+        }
+    },
+
+    disableTime : function(valids){
+        var dtime = getObj("dtime_id").getElementsByTagName("option");
+        for(i=0;i<dtime.length;i++){
+             var value = dtime[i].value;
+             if(valids.indexOf(value) != -1){
+                dtime[i].disabled = "disabled";
+             }
+        }
+    }
+
+}
+~function()
+{
+   CheckDate=
+	{
+	   getMaxs:function(begin,end,selected)
+		{
+			selected=selected||{days:{},weeks:{},hours:{}};
+			selected.days=selected.days||{};
+			selected.weeks=selected.weeks||{};
+			selected.hours=selected.hours||{};
+
+			var s=new Date(begin.replace(/\-/g,'/')).getTime();
+			var e=new Date(end.replace(/\-/g,'/')+" 23:59:59").getTime();
+			if(e<s)
+			{
+				return !!alert("结束日期不能比开始日期早！");
+			}
+			var c=24*3600*1000;
+			var maxDays=[];
+			var maxWeekDays=[];
+			var dt;
+			for (var i=s,len=e; i<len; i=i+c)
+			{
+				dt=new Date(i).getDate();
+				(","+maxDays.join(",")+",").indexOf(","+(dt<10?"0"+dt:dt)+",")>=0?0:maxDays.push(dt<10?"0"+dt:""+dt);
+				dt=new Date(i).getDay();
+				(","+maxWeekDays.join(",")+",").indexOf(","+dt+",")>=0?0:maxWeekDays.push(dt);
+				if(maxDays.length>=31&&maxWeekDays.length>=7)
+				{
+					break;
+				}
+			}
+			var d=[];
+			var g=[];
+			maxDays.sort();
+			maxWeekDays.sort();
+			for (var i=0,len=maxDays.length; i<len; i++)
+			{
+				maxDays[i]=maxDays[i].replace(/^0/,'');
+				d[i]="<li><input name='ddate[]' type=checkbox value='"+maxDays[i]+"' "+(selected.days[maxDays[i]]?" checked":"")+">"+maxDays[i]+"</li>";
+			}
+			var w="日一二三四五六".split("");
+			for (var i=0,len=maxWeekDays.length; i<len; i++)
+			{
+				g[i]=[maxWeekDays[i]==0?7:maxWeekDays[i],"<li><input name='dweek[]' type=checkbox value='"+i+"'  "+(selected.weeks[maxWeekDays[i]]?" checked":"")+">星期"+w[maxWeekDays[i]] + "</li>"];
+			}
+			g.sort();
+			for (var i=0,len=g.length; i<len; i++)
+			{
+				g[i]=g[i][1];
+			}
+
+			var h=[];
+			for (var i=1,len=24; i<=len; i++)
+			{
+				h[i]=(i-1<10?"0"+(i-1):i-1)+":00 - "+(i<10?"0"+i:i)+":00";
+				h[i]="<option value='"+i+"' "+(selected.hours[i]?"selected":"")+"> "+h[i]+" </option>";
+			}
+			return {days:d,weeks:g,hours:h};
+		}
+	};
+}
+();
+function showddate(stime,etime,data) {
+	var a=CheckDate.getMaxs(stime,etime,data);
+	getObj('ddate_id').innerHTML = a.days.join("");
+	getObj('dweek_id').innerHTML = a.weeks.join("");
+	getObj('dtime_id').innerHTML = "<select name='dtime[]' class='select_wa mb5' style='height:180px;' multiple><option value=''>&nbsp;</option>"+a.hours.join("")+"</select>";
+}
+
+
+<!--
+EOT;
+if ($showddate) {print <<<EOT
+-->
+showddate('$advert[starttime]','$advert[endtime]',$showddate);
+<!--
+EOT;
+}else{print <<<EOT
+-->
+showddate('$advert[starttime]','$advert[endtime]');
+<!--
+EOT;
+}print <<<EOT
+-->
+</script>
+
+
+<!--
+EOT;
+}
+print <<<EOT
+-->
+<!--
+EOT;
+} elseif ($action == 'forum') {print <<<EOT
+-->
+
+	<div class="nav3 mb10">
+	<ul class="cc">
+		<li><a href="$basename">搜索设置</a></li>
+		<li class="current"><a href="$basename&action=forum">版块推荐</a></li>
+		<li><a href="$basename&action=cp">关键字推送</a></li>
+		<li><a href="$basename&action=statistic">搜索统计</a></li>
+	</ul>
+	</div>
+	<div class="admin_info mb10" style="display: block;">
+	<h3 class="h1"><b>提示信息</b></h3>
+	<div class="legend"><ol><li>推荐的版块将在用户搜索时显示在帖子搜索的左侧</li></ol></div>
+	</div>
+	<h2 class="h1">搜索</h2>
+	<div class="admin_table mb10">
+	<table width="100%" cellspacing="0" cellpadding="0">
+		<tbody><tr class="tr1 vt">
+			<td class="td2">
+				<span class="mr5">版块搜索:<input class="input input_wa" name="forumname" id="forumname"></span>
+				<span class="bt2"><span><button type="button" value="搜索" onclick="searchForum();">搜索</button></span></span>
+			</td>
+		</tr>
+	</tbody></table>
+	</div>
+<h2 class="h1"><span  class="mr10">推荐版块</span> <span class="linka"><a onclick="setall('open');" href="javascript:;">全部展开</a> | <a onclick="setall('close');" href="javascript:;">全部关闭</a></span></h2>
+<form action="$basename&" method="post">
+<input type="hidden" name="action" value="editforum" />
+<div class="admin_table mb10">
+<table id="ftable" cellspacing="0" cellpadding="0" width="100%">
+    <tr class="tr2">
+        <td>[推荐顺序]版块名称</td>
+        <td width="160">是否推荐</td>
+        <td></td>
+    </tr>
+<!--
+EOT;
+foreach ($catedb as $cate) {
+$tmpStyle = $threaddb[$cate['fid']] ? 'expand expand_b' : 'expand expand_d';
+print <<<EOT
+-->
+	<tr class="vt tr1" onmouseover="showAdd('$cate[fid]')" onmouseout="hiddenAdd('$cate[fid]')">
+		<td class="td3 tdcur">
+			<i id="bt_$cate[fid]" class="$tmpStyle" onclick="cateopen('$cate[fid]')"></i>
+			<input class="input input_wd mr5" name="order[$cate[fid]]" value="$cate[vieworder]" type="text">
+			<span class="fourm_name">$cate[name]</span>
+			<span class="fourm_name" id="fourm_edit_box_$cate[fid]"></span>
+			<font class="gray mr20">FID:$cate[fid]</font>&nbsp;&nbsp;
+		</td>
+		<td class="td2">
+						<input type="checkbox" name="fidcommend[$cate[fid]]" {$cate[isrecommend]}>
+		</td>
+        <td class="td2">
+           
+        </td>
+	</tr>
+<!--
+EOT;
+if ($threaddb[$cate['fid']]) {print <<<EOT
+-->
+	<tbody id="cate_$cate[fid]">
+<!--
+EOT;
+foreach ($threaddb[$cate['fid']] as $thread) {
+$isspace = str_repeat($space,$thread['type'] == 'forum' ? 0 : ($thread['type'] == 'sub' ? 1 : 2));
+print <<<EOT
+-->
+	<tr class="vt tr1" onmouseover="showAdd('$thread[fid]')" onmouseout="hiddenAdd('$thread[fid]')">
+		<td class="td3">
+			{$isspace}
+                <i class="lower"></i>
+                <input class="input input_wd mr5" name="order[$thread[fid]]" value="$thread[vieworder]" type="text">
+                <span class="fourm_name">$thread[name]</span>
+                <span id="fourm_edit_box_$thread[fid]" class="fourm_name"></span>
+                <font class="gray">FID:$thread[fid]</font>
+		</td>
+		<td class="td2">
+			<input type="checkbox" name="fidcommend[$thread[fid]]" {$thread[isrecommend]}>
+		</td>
+		<td class="td2">
+            
+        </td>
+	</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+	</tbody>
+<!--
+EOT;
+}}if ($forum_L) {print <<<EOT
+-->
+	<tr class="tr1 vt">
+		<td class="td2" colspan="6">
+        	<i id="bt_error" class="expand expand_a" onclick="cateopen('error')" ></i><span class="s1 mr10">异常版块</span>(重新设置上级版块可以恢复正常)
+        </td>
+	</tr>
+	<tbody id="cate_error">
+<!--
+EOT;
+foreach ($forum_L as $key => $thread) {
+$isspace = str_repeat($space,$thread['type'] == 'forum' ? 0 : ($thread['type'] == 'sub' ? 1 : 2));
+print <<<EOT
+-->
+	<tr class="tr1 vt">
+		<td class="td3">
+			<div class="fourm"><i class="lower"></i>
+				<input class="input input_wd" name="order[$thread[fid]]" value="$thread[vieworder]" type="text">
+				$thread[name]
+				<font class="gray">FID:$thread[fid]</font>
+			</div>
+		</td>
+		<td class="td2"><input class="input input_wa" name="forumadmin[$thread[fid]]" value="$thread[forumadmin]" type="text"></td>
+		<td class="td2">
+            <a href="$basename&action=edit&fid=$thread[fid]" class="mr10">[编辑]</a>
+            <a href="$basename&action=delete&fid=$thread[fid]">[删除]</a>
+        </td>
+	</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+	</tbody>
+<!--
+EOT;
+}print <<<EOT
+-->
+</table>
+</div>
+<div class="mb10 tac"><span class="btn"><span><button type="submit">提 交</button></span></span></div>
+</form>
+
+<script language="JavaScript" src="js/pw_ajax.js"></script>
+<script language="JavaScript">
+function cateopen(id) {
+	var o = getObj('cate_' + id);
+	if (o == null) return;
+	if (o.style.display == 'none') {
+		o.style.display = '';
+		getObj('bt_' + id).className = 'expand expand_b';
+	} else {
+		o.style.display = 'none';
+		getObj('bt_' + id).className = 'expand expand_a';
+	}
+}
+function setall(t) {
+	var tbs = getObj('ftable').getElementsByTagName('tbody');
+	for (var i = 0; i < tbs.length; i++) {
+		if (!tbs[i].id.match(/^cate/)) {
+			continue;
+		}
+		var id = tbs[i].id.substr(5);
+		if (t == 'open') {
+			tbs[i].style.display = '';
+			getObj('bt_' + id).className = 'expand expand_a';
+		} else {
+			tbs[i].style.display = 'none';
+			getObj('bt_' + id).className = 'expand expand_b';
+		}
+	}
+}
+function IsElement(id){
+	return document.getElementById(id)!=null ? true : false;
+}
+function showAdd(id){
+	if (IsElement('addbt_' + id)) {
+		getObj('addbt_' + id).style.display = '';
+	}
+}
+function hiddenAdd(id){
+	if (IsElement('addbt_' + id)) {
+		getObj('addbt_' + id).style.display = 'none';
+	}
+}
+function adminCFname(){
+
+}
+
+function searchForum(){
+	var is_ie = ((agt.indexOf('msie')!=-1) && (agt.indexOf('opera')==-1)),
+		is_ns = (document.layers);
+		is_w3 = (document.getElementById && !is_ie),
+		searchname = getObj('forumname').value,
+		forumtable = getObj('ftable'),
+		span = forumtable.getElementsByTagName('span'),
+		first = null;
+	for (var i=0;i<span.length;i++) {
+		var ocateid = span[i].parentNode.parentNode.parentNode;
+		var cateid = ocateid.id;
+		if(span[i].innerHTML.indexOf('font')){
+			span[i].innerHTML = span[i].innerText || span[i].textContent;
+		}
+		if (span[i].innerHTML != '' && span[i].innerHTML.indexOf(searchname) != -1 && cateid != 'ftable') {
+			span[i].innerHTML = span[i].innerHTML.replace(searchname,'<font style="color:red; background-color:yellow;">'+searchname+'</font>');
+			if(!first){
+				first = span[i];	
+			}
+			var cid = cateid.substr(5);
+			if (ocateid.style.display == 'none') {
+				ocateid.style.display = '';
+				getObj('bt_' + cid).className = 'close fl';
+			}
+			if (is_w3 || is_ns) {
+				var m = 0;
+				while(m<2){
+					m++;
+					parent.find(searchname);
+				}
+			} else if (is_ie) {
+				var txt = parent.document.body.createTextRange();
+				if (txt.findText(searchname)){
+					txt.select();
+				}
+			}
+		}
+		
+	}
+	if(first){
+		first.scrollIntoView();
+	}else{
+		alert('找不到到您搜索的版块！');
+	}
+}
+
+</script>
+	
+<!--
+EOT;
+} elseif ($action == 'statistic') {print <<<EOT
+-->
+<div class="nav3 mb10">
+<ul class="cc">
+	<li><a href="$basename">搜索设置</a></li>
+	<li><a href="$basename&action=forum">版块推荐</a></li>
+	<li><a href="$basename&action=cp">关键字推送</a></li>
+	<li class="current"><a href="$basename&action=statistic">搜索统计</a></li>
+</ul>
+</div>
+<script language="JavaScript" src="js/date.js"></script>
+<form method="post" action="{$basename}&action=$action">
+<h2 class="h1">搜索统计</h2>
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+	<tr class="tr1 vt">
+		<td class="td1">关键字</td>
+		<td class="td2"><input type="text" name="keyword" value="$keyword" class="input input_wa" /> 可使用通配符 "*"，多个作者用英文半角逗号","分隔       </td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">日期</td>
+		<td class="td2">
+		<div class="input_img fl"><i onclick="this.nextSibling.onclick()" class="input_time" title="选择时间">选择时间</i><input type="text" name="createtime_s" value="$createtime_s" id="createtime_s" onclick="javascript:ShowCalendar(this.id)"></div><span class="p_lr_10 fl">至</span><div class="input_img fl"><i class="input_time" title="选择时间">选择时间</i> <input type="text" name="createtime_e" id="createtime_e" value="$createtime_e" onclick="javascript:ShowCalendar(this.id)"></div>
+		</td>
+	</tr>
+</table>
+</div>
+<br />
+<div class="mb10 tac">
+	<span class="btn"><span><button type="submit">提 交</button></span></span>
+</div>
+</form>
+
+<form action="$basename&action=$action&" method="post" name="FORM">
+<h2 class='h1'>统计列表   <span class="linka">仅显示搜索次数最多的前500条！</span></h2>
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+	<tr class="tr2 vt td_bgB">
+		<td width="210">关键字</td>
+		<td>搜索次数</td>
+	</tr>
+<!--
+EOT;
+if (empty($statisticDb)) {print <<<EOT
+-->
+<tr><td class="p10" colspan="7"><div class="admin_tips">啊哦，没有你要的信息！</div></td></tr>
+<!--
+EOT;
+}else{
+foreach ($statisticDb as $key => $value) {print <<<EOT
+-->
+	<tr class="tr1 vt">
+		<td class="td2">{$value['keyword']}</td>
+		<td class="td2">{$value['times']}</td>
+	</tr>
+<!--
+EOT;
+}}print <<<EOT
+-->
+</table>
+<div>$pages</div>
+
+</div>
+</form>
+<!--
+EOT;
+}
+include_once PrintEot('adminbottom');
+?>-->

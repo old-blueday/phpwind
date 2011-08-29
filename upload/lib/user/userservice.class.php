@@ -26,7 +26,10 @@ class PW_UserService {
 	function get($userId, $withMainFields = true, $withMemberDataFields = false, $withMemberInfoFields = false) {
 		$userId = (int) $userId;
 		if ($userId <= 0) return null;
-		
+		if (perf::checkMemcache()){
+			$_cacheService = Perf::gatherCache('pw_members');
+			return $_cacheService->getAllFieldByUserId($userId, $withMainFields, $withMemberDataFields, $withMemberInfoFields);			
+		}
 		$membersDb = $this->_getMembersDB();
 		return $membersDb->getWithJoin($userId, $withMainFields, $withMemberDataFields, $withMemberInfoFields);
 		/*
@@ -57,7 +60,10 @@ class PW_UserService {
 	 */
 	function getByUserIds($userIds) {
 		if (!is_array($userIds) || !count($userIds)) return array();
-		
+		if (perf::checkMemcache()){
+			$_cacheService = Perf::gatherCache('pw_members');
+			return $_cacheService->getMembersByUserIds($userIds);
+		}
 		$membersDb = $this->_getMembersDB();
 		return $membersDb->getUsersByUserIds($userIds);
 	}
@@ -69,7 +75,10 @@ class PW_UserService {
 	 */
 	function getUsersWithMemberDataByUserIds($userIds) {
 		if (!is_array($userIds) || !count($userIds)) return array();
-		
+		if (perf::checkMemcache()){
+			$_cacheService = Perf::gatherCache('pw_members');
+			return $_cacheService->getAllFieldByUserIds($userIds, true, true);
+		}	
 		$membersDb = $this->_getMembersDB();
 		return $membersDb->getUserInfosByUserIds($userIds);
 	}
@@ -149,6 +158,12 @@ class PW_UserService {
 	 * @return string|null
 	 */
 	function getUserNameByUserId($userId) {
+		$userId = S::int($userId);
+		if ($userId < 1) return false;
+		if (perf::checkMemcache()){
+			$_cacheService = Perf::gatherCache('pw_members');
+			return $_cacheService->getUserNameByUserId($userId);
+		}				
 		if (!$data = $this->get($userId)) return null;
 		return $data['username'];
 	}
@@ -161,7 +176,10 @@ class PW_UserService {
 	 */
 	function getUserNamesByUserIds($userIds) {
 		if (!is_array($userIds) || !count($userIds)) return array();
-		
+		if (perf::checkMemcache()){
+			$_cacheService = Perf::gatherCache('pw_members');
+			return $_cacheService->getUserNameByUserIds($userIds);
+		}
 		$userNames = array();
 		$members = $this->getByUserIds($userIds);
 		foreach ($members as $member) {
@@ -383,6 +401,14 @@ class PW_UserService {
 		}
 		return $updates;
 	}
+	/**
+	 * 处理溢出数据
+	 * @param $type	溢出字段
+	 */
+	function updateOverflow($type) {
+		$memberDataDb = $this->_getMemberDataDB();
+		return $memberDataDb->updateOverflow($type);
+	}
 
 	/**
 	 * 设置用户某个类型的状态
@@ -556,7 +582,7 @@ class PW_UserService {
 			return $memberInfoDb->insert($fieldsData);
 		}
 	}
-	
+
 	/**
 	 * get PW_MembersDB
 	 * 

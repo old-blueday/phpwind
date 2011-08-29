@@ -5,7 +5,7 @@ PostCheck();
 if ($groupid != 3 && $groupid != 4) {
 	Showmsg('undefined_action');
 }
-$rightset = $db->get_value("SELECT value FROM pw_adminset WHERE gid=" . pwEscape($groupid));
+$rightset = $db->get_value("SELECT value FROM pw_adminset WHERE gid=" . S::sqlEscape($groupid));
 require_once (R_P . 'require/pw_func.php');
 //$rightset = P_unserialize($rightset);
 if (!$rightset || !(is_array($rightset = unserialize($rightset)))) {
@@ -15,7 +15,7 @@ if (!$rightset || !(is_array($rightset = unserialize($rightset)))) {
 if (!$rightset['setforum']) {
 	Showmsg('undefined_action');
 }
-InitGP(array(
+S::gp(array(
 	'fids',
 	'desc'
 ), 'P', 0);
@@ -33,7 +33,8 @@ if (is_array($desc)) {
 			'&lt;iframe'
 		), $descrip);
 		strlen($descrip) > 250 && Showmsg('descrip_long');
-		$db->update("UPDATE pw_forums SET descrip=" . pwEscape($descrip) . "WHERE fid=" . pwEscape($fid));
+		//$db->update("UPDATE pw_forums SET descrip=" . S::sqlEscape($descrip) . "WHERE fid=" . S::sqlEscape($fid));
+		pwQuery::update('pw_forums', 'fid=:fid', array($fid), array('descrip'=>$descrip));
 	}
 }
 if (is_array($fids)) {
@@ -47,7 +48,8 @@ if (is_array($fids)) {
 			'=',
 			'&lt;iframe'
 		), $name);
-		$db->update("UPDATE pw_forums SET name=" . pwEscape($name) . "WHERE fid=" . pwEscape($fid));
+		//$db->update("UPDATE pw_forums SET name=" . S::sqlEscape($name) . "WHERE fid=" . S::sqlEscape($fid));
+		pwQuery::update('pw_forums', 'fid=:fid', array($fid), array('name'=>$name));
 	}
 	$ifcache = true;
 }

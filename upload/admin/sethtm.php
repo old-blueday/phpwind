@@ -11,7 +11,7 @@ if (!$_POST['step']) {
 
 } elseif ($_POST['step'] == 2) {
 
-	InitGP(array('config'),'P');
+	S::gp(array('config'),'P');
 	foreach ($config as $key => $value) {
 		setConfig('db_'.$key, $value);
 	}

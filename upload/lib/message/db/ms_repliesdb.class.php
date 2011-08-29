@@ -31,12 +31,12 @@ class PW_Ms_RepliesDB extends BaseDB {
 		return $this->_db->affected_rows ();
 	}
 	function updateRepliesByIds($fieldData,$ids){
-		$ids = is_array($ids) ? pwImplode($ids) : $ids;
+		$ids = is_array($ids) ? S::sqlImplode($ids) : $ids;
 		$this->_db->update ( "UPDATE " . $this->_tableName . " SET " . $this->_getUpdateSqlString ( $fieldData ) . "WHERE id in (".$ids.")" );
 		return $this->_db->affected_rows ();
 	}
 	function deleteRepliesByMessageIds($messageIds){
-		$messageIds = is_array($messageIds) ? pwImplode($messageIds) : $messageIds;
+		$messageIds = is_array($messageIds) ? S::sqlImplode($messageIds) : $messageIds;
 		$query = $this->_db->query ( "DELETE FROM " . $this->_tableName. " WHERE parentid in ( ".$messageIds." )");
 		return $this->_db->affected_rows ();
 	}

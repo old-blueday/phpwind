@@ -35,7 +35,7 @@ class PW_Layout {
 	 * @param $template
 	 * @param $viewer
 	 */
-	function display($layout, &$viewer = '', $return = false) {
+	function display($layout, $viewer = '', $return = false) {
 		$layoutFile = $this->_getLayoutFile($layout);
 		if (!$return) {
 			$this->renderFile($layoutFile, $viewer, false);
@@ -45,7 +45,7 @@ class PW_Layout {
 		echo $output;
 	}
 	
-	function renderFile($__file_, &$__viewer_ = '', $__return_ = false) {
+	function renderFile($__file_, $__viewer_ = '', $__return_ = false) {
 		if (!is_file($__file_)) {
 			Error::showError("文件 " . $__file_ . " 不存在");
 		}
@@ -53,10 +53,10 @@ class PW_Layout {
 		if ($__return_) {
 			ob_start();
 			ob_implicit_flush(false);
-			require ($__file_);
+			require S::escapePath($__file_);
 			return ob_get_clean();
 		}
-		require $__file_;
+		require S::escapePath($__file_);
 	}
 	/**
 	 * 获取布局文件
@@ -109,7 +109,7 @@ class PW_Layout {
 	 * 获取模板片段
 	 * @param $segment
 	 */
-	function segment($segment, &$viewer = '', $return = false) {
+	function segment($segment, $viewer = '', $return = false) {
 		$segmentFile = $this->getSegmentFile($segment);
 		if (!$return) {
 			return $this->renderFile($segmentFile,$viewer,false);
@@ -120,7 +120,8 @@ class PW_Layout {
 	
 	function getParamForSegment($segment) {
 		$segmentFile = $this->_getSegmentParamFile($segment);
-		return require $segmentFile;
+		
+		return require S::escapePath($segmentFile);
 	}
 	
 	function _getSegmentParamFile($segment) {

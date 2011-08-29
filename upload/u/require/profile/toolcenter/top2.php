@@ -19,15 +19,18 @@ if($tpcdb['topped'] > 1){
 	Showmsg('toolmsg_5_failed');
 }
 $toolfield = $timestamp + 3600*6;
-$db->update("UPDATE pw_threads SET topped='2',toolinfo=".pwEscape($tooldb['name'],false).",toolfield=".pwEscape($toolfield)."WHERE tid=".pwEscape($tid));
+//$db->update("UPDATE pw_threads SET topped='2',toolinfo=".S::sqlEscape($tooldb['name'],false).",toolfield=".S::sqlEscape($toolfield)."WHERE tid=".S::sqlEscape($tid));
+pwQuery::update('pw_threads', 'tid=:tid', array($tid), array('topped'=>2, 'toolinfo'=>$tooldb['name'], 'toolfield'=>$toolfield));
 $fid = $db->get_value("SELECT fid FROM pw_threads WHERE tid=".intval($tid));
-$threadList = L::loadClass("threadlist", 'forum');
-$threadList->refreshThreadIdsByForumId($fid);
+//* $threadList = L::loadClass("threadlist", 'forum');
+//* $threadList->refreshThreadIdsByForumId($fid);
+Perf::gatherInfo('changeThreadWithForumIds', array('fid'=>$fid));
 require_once(R_P.'require/updateforum.php');
 setForumsTopped($tid,$fid,2,$toolfield);
 updatetop();
+delfcache($fid, $db_fcachenum);
 
-$db->update("UPDATE pw_usertool SET nums=nums-1 WHERE uid=".pwEscape($winduid)."AND toolid=".pwEscape($toolid));
+$db->update("UPDATE pw_usertool SET nums=nums-1 WHERE uid=".S::sqlEscape($winduid)."AND toolid=".S::sqlEscape($toolid));
 $logdata=array(
 	'type'		=>	'use',
 	'nums'		=>	'',

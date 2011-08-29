@@ -116,7 +116,6 @@ class PW_pieceOperate {
 			$string .= '<option value="'.$key.'" '.$selected.'>'.$value.'</option>';
 		}
 		$string .= '</select>';
-
 		return $string;
 	}
 	function _getTextHtml($id,$name,$default='') {
@@ -126,7 +125,9 @@ class PW_pieceOperate {
 	function _getMSelectHtml($id,$name,$config,$default) {
 		$default = !empty($default) ? (array)$default : array('0');
 		$htmlName = $this->_getHtmlName($id,$name);
-		$string = '<select name="'.$htmlName.'[]" multiple="multiple">';
+		$optionCount = count($config) > 10 ? 10 : count($config);
+		$selectHeight = 'style="height:'.($optionCount*20).'px"';
+		$string = '<select name="'.$htmlName.'[]" multiple="multiple" '.$selectHeight.'>';
 		foreach ($config as $key=>$value) {
 			$selected = S::inArray($key,$default) ? 'selected' : '';
 			$string .= '<option value="'.$key.'" '.$selected.'>'.$value.'</option>';

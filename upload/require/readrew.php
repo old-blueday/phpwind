@@ -1,7 +1,7 @@
 <?php
 !function_exists('readover') && exit('Forbidden');
 
-$rewdb = $db->get_one("SELECT * FROM pw_reward WHERE tid=".pwEscape($tid));
+$rewdb = $db->get_one("SELECT * FROM pw_reward WHERE tid=".S::sqlEscape($tid));
 
 $timeleave	= $rewdb['timelimit'] - $timestamp;
 $rewardtype = $read['state'];

@@ -6,7 +6,7 @@ if (!$o_browseopen) {
 	ObHeader('u.php');
 }
 
-$tab = GetGP('tab');
+$tab = S::getGP('tab');
 require_once(R_P . 'u/require/core.php');
 require_once(R_P . 'require/showimg.php');
 

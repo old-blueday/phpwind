@@ -14,6 +14,7 @@ class PW_WeiboSource extends SystemData {
 		$_tmp = $this->_getData($config['weibotype'], $num);
 		foreach ($_tmp as $key => $value) {
 			$_tmp[$key] = $this->_cookData($value);
+			if (empty($_tmp[$key])) unset($_tmp[$key]);
 		}
 		return $_tmp;
 	}
@@ -37,7 +38,7 @@ class PW_WeiboSource extends SystemData {
 			'group_article' => '群组话题',
 			//'group_photos' => '群组相册',
 			'group_active' => '群组活动',
-			'group_write' => '群组记录/讨论'
+			'group_write' => '群组新鲜事'
 		);
 	}
 	
@@ -76,13 +77,22 @@ class PW_WeiboSource extends SystemData {
 	function _cookData($data) {
 		global $db_bbsurl;
 		unset($data['password']);
-		$data['url'] = $db_bbsurl . '/u.php?uid=' . $data['uid'];
-		$data['title'] = strip_tags($data['content']);
-		$data['descrip'] = strip_tags($data['content']);
+		$data['url'] = $db_bbsurl . '/'. USER_URL . $data['uid'];
+		if (!$data['content'] && $data['transmits']) {
+			$data['content'] = '转发：' . $data['transmits']['content'];
+		}
+		$data['title'] = $data['descrip'] = strip_tags($data['content']);
+		if (empty($data['title'])) return array();
 		if ($data['extra']['photos'] && is_array($data['extra']['photos'])) {
 			$image = $data['extra']['photos'][0];
 			$temp = geturl($image['path']);
 			$data['image'] = $temp[0] ? $temp[0] : '';
+		}
+		$pic = showfacedesign($data['icon'],true,'s');
+		if (is_array($pic)) {
+			$data['icon'] = $pic[0];
+		} else {
+			$data['icon'] = '';
 		}
 		return $data;
 	}

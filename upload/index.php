@@ -2,11 +2,8 @@
 define('SCR', 'index');
 require_once ('global.php');
 
-$cateid = (int) GetGP('cateid');
-
-$secdomain = null;
-$m = GetGP('m');
-
+$cateid = (int) S::getGP('cateid');
+$m = S::getGP('m');
 if ($db_channeldomain && $secdomain = array_search($pwServer['HTTP_HOST'], $db_channeldomain)) {
 	$m = 'area';
 	$db_bbsurl = $_mainUrl;
@@ -14,9 +11,8 @@ if ($db_channeldomain && $secdomain = array_search($pwServer['HTTP_HOST'], $db_c
 	define('HTML_CHANNEL', 1);
 }
 selectMode($m);
-
 if (defined('M_P') && file_exists(M_P . 'index.php')) {
-	@include_once Pcv(D_P . 'data/bbscache/' . $db_mode . '_config.php');
+	@include_once pwCache::getPath(S::escapePath(D_P . 'data/bbscache/' . $db_mode . '_config.php'));
 	if (file_exists(M_P . 'require/core.php')) {
 		require_once (M_P . 'require/core.php');
 	}
@@ -25,8 +21,8 @@ if (defined('M_P') && file_exists(M_P . 'index.php')) {
 	exit();
 }
 
-include_once (D_P . 'data/bbscache/cache_index.php');
-include_once (D_P . 'data/bbscache/forum_cache.php');
+include_once pwCache::getPath(D_P . 'data/bbscache/cache_index.php',true);
+include_once pwCache::getPath(D_P . 'data/bbscache/forum_cache.php',true);
 
 //notice
 $noticedb = array();
@@ -41,35 +37,21 @@ $notice_A = $noticedb;
 unset($noticedb);
 $topics = $article = $tposts = 0;
 
-/*
-if (defined('M_P') && file_exists(M_P . 'index.php')) {
-	require_once(M_P.'index.php');
-	$db_newinfoifopen = 0;
-} else {
-*/
-
-/* SEO 设置 */
+//SEO Settings
 bbsSeoSettings('index');
 
 $newpic = (int) GetCookie('newpic');
 $forumdb = $catedb = $showsub = array();
 $c_htm = 0;
-if ($db_forumdir) {
-	require_once (R_P . 'require/dirname.php');
-} elseif ($cateid > 0) {
+$sqlwhere = '';
+if ($cateid > 0) {
 	$catestyle = $forum[$cateid]['style'];
-	if ($catestyle && file_exists(D_P . "data/style/$catestyle.php")) {
-		$skin = $catestyle;
-	}
-	#SEO settings 区分CMS 与   非CMS
-	$_seo = array('title' => $forum[$cateid]['title'], 'metaDescription' => $forum[$cateid]['metadescrip'], 
-						'metaKeywords' => $forum[$cateid]['keywords']);
+	($catestyle && file_exists(D_P . "data/style/$catestyle.php")) && $skin = $catestyle;
+	$_seo = array('title' => $forum[$cateid]['title'], 'metaDescription' => $forum[$cateid]['metadescrip'], 'metaKeywords' => $forum[$cateid]['keywords']);
 	bbsSeoSettings('thread', $_seo, $forum[$cateid]['name'], '');
-	#SEO settings
-	
-
-	$sqlwhere = 'AND (f.fid=' . pwEscape($cateid) . ' OR f.fup=' . pwEscape($cateid) . ')';
-	unset($metakeyword);
+	$sqlwhere = 'AND (f.fid=' . S::sqlEscape($cateid) . ' OR f.fup=' . S::sqlEscape($cateid) . ')';
+} elseif ($db_forumdir) {
+	require_once (R_P . 'require/dirname.php');
 }
 require_once (R_P . 'require/header.php');
 !$db_showcms && $sqlwhere .= " AND f.cms!='1'";
@@ -78,15 +60,13 @@ require_once (R_P . 'require/header.php');
 if ($db_siteappkey && ($db_apps_list['17']['status'] == 1 || is_array($db_threadconfig))) {
 	$appclient = L::loadClass('appclient');
 	if (is_array($db_threadconfig)) {
-		$threadright = array();
-		$threadright = $appclient->getThreadRight();
+		$threadright = (array) $appclient->getThreadRight();
 	}
 }
 /*The app client*/
 
 if ($cookie_deploy = $_COOKIE['deploy']) {
-	$deployfids = explode("\t", $cookie_deploy);
-	$deployfids = array_flip($deployfids);
+	$deployfids = array_flip((array)explode("\t", $cookie_deploy));
 	unset($cookie_deploy);
 } else {
 	$deployfids = array();
@@ -99,22 +79,20 @@ while ($forums = $db->fetch_array($query)) {
 			$showsub[$forums['fid']] = '';
 		}
 		$forums['topics'] = $forums['topic'] + $forums['subtopic'];
-		//$forums['topics'] += $forums['top1'];
-		//$forums['article'] += $forums['top1'];
 		$article += $forums['article'];
 		$topics += $forums['topics'];
 		$tposts += $forums['tpost'];
 		$forums['au'] = $forums['admin'] = '';
-		if (CkInArray($windid, $manager) || (!$forums['password'] && (!$forums['allowvisit'] || allowcheck($forums['allowvisit'], $groupid, $winddb['groups'], $forums['fid'], $winddb['visit'])))) {
+		if (S::inArray($windid, $manager) || (!$forums['password'] && (!$forums['allowvisit'] || allowcheck($forums['allowvisit'], $groupid, $winddb['groups'], $forums['fid'], $winddb['visit'])))) {
 			list($forums['t'], $forums['au'], $forums['newtitle'], $forums['ft']) = explode("\t", $forums['lastpost']);
-			$forums['pic'] = $newpic < $forums['newtitle'] && ($forums['newtitle'] + $db_newtime > $timestamp) ? 'new' : 'old';
+			$forums['pic']      = $newpic < $forums['newtitle'] && ($forums['newtitle'] + $db_newtime > $timestamp) ? 'new' : 'old';
 			$forums['newtitle'] = get_date($forums['newtitle']);
-			$forums['t'] = substrs($forums['t'], 26);
+			$forums['t']        = substrs($forums['t'], 26);
 		} elseif ($forum[$forums['fid']]['f_type'] === 'hidden') {
 			if ($forums['password'] && allowcheck($forums['allowvisit'], $groupid, $winddb['groups'], $forums['fid'], $winddb['visit'])) {
 				$forums['pic'] = 'lock';
 			} else {
-				if (!CkInArray($windid, $manager)) {
+				if (!S::inArray($windid, $manager)) {
 					continue;
 				}
 			}
@@ -168,7 +146,7 @@ while ($forums = $db->fetch_array($query)) {
 						$forums['admin'] .= '...';
 						break;
 					}
-					$forums['admin'] .= '<a href="u.php?username=' . rawurlencode($value) . "\" class=\"cfont\">$value</a> ";
+					$forums['admin'] .= '<a href="u.php?username=' . rawurlencode($value) . '" class="cfont">' . $value . '</a> ';
 				}
 			}
 		}
@@ -179,7 +157,7 @@ $db->free_result($query);
 // View sub
 if (!empty($showsub)) {
 	foreach ($forum as $value) {
-		if (isset($showsub[$value['fup']]) && $value['f_type'] != 'hidden') {
+		if (isset($showsub[$value['fup']]) && $value['f_type'] != 'hidden' && $value['ifcms'] != 2) {
 			$showsub[$value['fup']] .= ($showsub[$value['fup']] ? ' | ' : '') . "<a href=\"thread.php?fid=$value[fid]\">$value[name]</a>";
 		}
 	}
@@ -198,23 +176,28 @@ if ($db_indexshowbirth) {
 	$brithcache = '';
 	require_once (R_P . 'require/birth.php');
 }
-/*
+// get bbsinfo
+if(Perf::checkMemcache()){
+	$_cacheService = Perf::getCacheService();
+	$_bbsInfoResult = $_cacheService->get('bbsinfo_id_1');
+	if(!$_bbsInfoResult){
+		$_bbsInfoService = L::loadClass('BbsInfoService', 'forum'); 
+		$_bbsInfoResult = $_bbsInfoService->getBbsInfoById(1);
+	}
+	extract($_bbsInfoResult);
+}else{
+	extract($db->get_one("SELECT * FROM pw_bbsinfo WHERE id=1"));
 }
-*/
-// Sharing Information
-extract($db->get_one("SELECT * FROM pw_bbsinfo WHERE id=1"));
-//$rt = $db->get_one('SELECT newmember,totalmember,higholnum,higholtime,tdtcontrol,yposts,hposts,hit_tdtime,hit_control,plantime FROM pw_bbsinfo WHERE id=1');
 $newmember = '<a href="u.php?username=' . rawurlencode($newmember) . '" target="_blank">' . $newmember . '</a>';
 
 $article += $o_post;
-$topics += $o_post;
-$tposts += $o_tpost;
+$topics  += $o_post;
+$tposts  += $o_tpost;
 
 // online users
 Update_ol();
-
 if (empty($db_online)) {
-	include_once (D_P . 'data/bbscache/olcache.php');
+	include_once pwCache::getPath(D_P . 'data/bbscache/olcache.php',true);
 } else {
 	$userinbbs = $guestinbbs = 0;
 	$query = $db->query("SELECT uid!=0 as ifuser,COUNT(*) AS count FROM pw_online GROUP BY uid!='0'");
@@ -226,18 +209,24 @@ if (empty($db_online)) {
 		}
 	}
 }
+
+if($last_statistictime == 0 || get_date($timestamp,'G') - get_date($last_statistictime,'G') > 1 ||  $timestamp - $last_statistictime > 3600){
+	$stasticsService = L::loadClass('Statistics', 'datanalyse');
+	$stasticsService->updateOnlineInfo();
+}
+
 $usertotal = $guestinbbs + $userinbbs;
 if ($db_indexonline) {
-	InitGP(array('online'));
+	S::gp(array('online'));
 	empty($online) && $online = GetCookie('online');
 	if ($online == 'yes') {
-		if ($usertotal > 2000 && !CkInArray($windid, $manager)) {
+		if ($usertotal > 2000 && !S::inArray($windid, $manager)) {
 			$online = 'no';
 			Cookie('online', $online);
 		} else {
 			$index_whosonline = '';
 			$db_online = intval($db_online);
-			include_once Pcv(R_P . "require/online_{$db_online}.php");
+			include_once S::escapePath(R_P . "require/online_{$db_online}.php");
 		}
 	}
 }
@@ -251,7 +240,7 @@ if ($db_indexmqshare && $sharelink[1]) {
 if ($db_hostweb == 1 && $groupid != 'guest' && !$cateid && $tdtcontrol < $tdtime && !defined('M_P')) {
 	require_once (R_P . 'require/updateforum.php');
 	updateshortcut();
-	$db->update("UPDATE pw_bbsinfo SET" . pwSqlSingle(array('yposts' => $tposts, 'tdtcontrol' => $tdtime, 'o_tpost' => 0)) . "WHERE id='1'");
+	pwQuery::update('pw_bbsinfo', 'id=:id', array(1), array('yposts' => $tposts, 'tdtcontrol' => $tdtime, 'o_tpost' => 0));
 	$db->update("UPDATE pw_forumdata SET tpost=0 WHERE tpost<>'0'");
 }
 
@@ -268,11 +257,11 @@ if ($c_htm || $db_hithour) {
 }
 
 if ($higholnum < $usertotal) {
-	$db->update("UPDATE pw_bbsinfo SET " . pwSqlSingle(array('higholnum' => $usertotal, 'higholtime' => $timestamp)) . " WHERE id=1");
+	pwQuery::update('pw_bbsinfo', 'id=:id', array(1), array('higholnum' => $usertotal, 'higholtime' => $timestamp));
 	$higholnum = $usertotal;
 }
 if ($hposts < $tposts) {
-	$db->update('UPDATE pw_bbsinfo SET hposts=' . pwEscape($tposts) . ' WHERE id=1');
+	pwQuery::update('pw_bbsinfo', 'id=:id', array(1), array('hposts'=>$tposts));
 	$hposts = $tposts;
 }
 $mostinbbstime = get_date($higholtime);
@@ -284,10 +273,7 @@ if ($plantime && $timestamp > $plantime && procLock('task')) {
 	require_once (R_P . 'require/task.php');
 	procUnLock('task');
 }
-//$db_newinfoifopen && require_once(R_P."require/newinfo.php");
-
 
 require_once PrintEot('index');
-
 footer();
 ?>

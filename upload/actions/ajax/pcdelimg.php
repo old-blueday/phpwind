@@ -1,10 +1,8 @@
 <?php
 !defined('P_W') && exit('Forbidden');
 
-InitGP(array(
-	'pctype'
-));
-InitGP(array(
+S::gp(array('pctype'));
+S::gp(array(
 	'fieldid',
 	'tid',
 	'id'
@@ -13,17 +11,19 @@ if (!$tid || !$id || !$fieldid || !$pctype) {
 	echo 'fail';ajax_footer();
 }
 
+$fieldTable = 'pw_topicfield';
 if ($pctype == 'topic') {
 	$tablename = GetTopcitable($id);
 } elseif ($pctype == 'postcate') {
 	$tablename = GetPcatetable($id);
+	$fieldTable = 'pw_pcfield';
 }
 
-$fieldname = $db->get_value("SELECT fieldname FROM pw_pcfield WHERE fieldid=".pwEscape($fieldid));
+$fieldname = $db->get_value("SELECT fieldname FROM $fieldTable WHERE fieldid=" . S::sqlEscape($fieldid));
 if (!$tablename || !$fieldname) {
 	echo 'fail';ajax_footer();
 }
-$path = $db->get_value("SELECT ".S::sqlMetadata($fieldname)." FROM ".S::sqlMetadata($tablename)." WHERE tid=" . pwEscape($tid));
+$path = $db->get_value("SELECT ".S::sqlMetadata($fieldname)." FROM ".S::sqlMetadata($tablename)." WHERE tid=" . S::sqlEscape($tid));
 
 if (strpos($path, '..') !== false) {
 	echo 'fail';ajax_footer();
@@ -44,7 +44,7 @@ if (!file_exists("$attachpath/$path")) {
 	}
 }
 
-$db->update("UPDATE ".S::sqlMetadata($tablename)." SET ".S::sqlMetadata($fieldname)."='' WHERE tid=" . pwEscape($tid));
+$db->update("UPDATE ".S::sqlMetadata($tablename)." SET ".S::sqlMetadata($fieldname)."='' WHERE tid=" . S::sqlEscape($tid));
 
 echo 'success';
 

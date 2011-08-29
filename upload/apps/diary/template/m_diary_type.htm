@@ -6,7 +6,7 @@ print <<<EOT
 <div class="boxC" style="margin-top:10px;">
             <h3>日志分类</h3>
             <div class="ulE cc">
-                <ul id="dt_ul">
+                <ul class="ulE"  id="dt_ul">
                 	<li id="dt_all"><a href="{$basename}">全部日志</a> <cite>[{$diaryNums}]</cite></li>
 <!--
 EOT;
@@ -15,14 +15,14 @@ foreach($diaryType as $value){
 print <<<EOT
 -->                    
                     
-                    <li id="dt_{$value[dtid]}">
+                    <li id="dt_{$value[dtid]}" onmousemove="isMouseUp({$value[dtid]},0)" onmouseout="isMouseUp({$value[dtid]},1)">
 <!--
 EOT;
 if ($winduid == $uid || $groupid == 3) {print <<<EOT
 -->						
                     
-                   <a class="adel cp mr10" onclick="pwConfirm('是否确认删除？',this,function(){delDiaryType('$value[dtid]','$uid')})">删除</a>
-                   <a class="aedit mr5 cp" onclick="showEidt('$value[dtid]','$uid');" >编辑</a> 
+                   <a id="del_{$value[dtid]}" class="adel cp mr10" style="visibility:hidden" title="删除" onclick="pwConfirm('是否确认删除？',this,function(){delType('$value[dtid]','$uid')})">删除</a>
+                   <a id="edit_{$value[dtid]}" class="aedit mr5 cp" style="visibility:hidden" title="编辑" onclick="showEidt('$value[dtid]','$uid');" >编辑</a> 
 <!--
 EOT;
 }print <<<EOT

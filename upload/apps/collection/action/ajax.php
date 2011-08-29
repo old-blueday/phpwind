@@ -7,7 +7,7 @@ require_once (R_P . 'require/functions.php');
 $collectionService = L::loadClass('Collection', 'collection'); /* @var $collectionService PW_Collection */
 
 if ($a == 'del') {
-	InitGP(array('id'),'',2);
+	S::gp(array('id'),'',2);
 	if (!$id) Showmsg('undefined_action');
 	$collection = $collectionService->get($id);
 	!$collection && Showmsg('收藏不存在');
@@ -35,9 +35,10 @@ if ($a == 'del') {
 //	updateUserAppNum($share['uid'],'share','minus');
 	echo "success\t";ajax_footer();
 } elseif ($a == 'favor') {
-	
-	InitGP(array('id', 'type'));
-	!in_array($type,array('weibo','user','photo','album','group','groupactive','diary','topic','reply','cms')) && Showmsg('undefined_action');
+	$totalCollection = $collectionService->countByUid($winduid);
+	$totalCollection >= $_G['maxfavor'] && Showmsg('已达到用户组允许的收藏上限');
+	S::gp(array('id', 'type'));
+	!in_array($type,array('weibo','user','photo','album','group','groupactive','diary','topic','reply','cms','postfavor')) && Showmsg('undefined_action');
 	!$id && Showmsg('data_error');
 
 	$collection = array();
@@ -73,11 +74,11 @@ if ($a == 'del') {
 		$collection['uid'] = $diary['uid'];
 		$collection['link'] = $db_bbsurl.'/{#APPS_BASEURL#}q=diary&a=detail&uid='.$diary['uid']."&did=".$id;
 		$collection['diary']['subject'] = $diary['subject'];
-		updateDatanalyse($diary['did'],'diaryFav',$timestamp);
+		updateDatanalyse($diary['did'],'diaryFav',1);
 	} elseif ($type == 'photo') {
-		InitGP(array('ptype'));
+		S::gp(array('ptype'));
 		if ($ptype != 'photo') {
-			$album 	= $db->get_one("SELECT aname,ownerid,owner,lastphoto FROM pw_cnalbum WHERE atype='0' AND aid=" . pwEscape($id));
+			$album 	= $db->get_one("SELECT aname,ownerid,owner,lastphoto FROM pw_cnalbum WHERE atype='0' AND aid=" . S::sqlEscape($id));
 			empty($album) && Showmsg('data_error');
 				$collection['type'] =  'album';
 				$collection['link'] =  $db_bbsurl.'/{#APPS_BASEURL#}q=photos&a=album&uid='.$album['ownerid']."&aid=".$id;
@@ -85,7 +86,7 @@ if ($a == 'del') {
 				$collection['uid']	= $album['ownerid'];
 				//$collection['username']	= $album['owner'];
 				$collection['album']['image']	= getphotourl($album['lastphoto']);
-				$query = $db->query("SELECT pid FROM pw_cnphoto WHERE aid=" . pwEscape($id). " LIMIT 10");
+				$query = $db->query("SELECT pid FROM pw_cnphoto WHERE aid=" . S::sqlEscape($id). " LIMIT 10");
 				while ($rt = $db->fetch_array($query)) {
 					$pids[] = $rt['pid'];
 				}				
@@ -96,7 +97,7 @@ if ($a == 'del') {
 				}
 				$db->free_result($query);
 		} else {
-			$photo = $db->get_one("SELECT p.pid,p.pintro,p.aid,p.path,p.uploader,p.ifthumb,a.aname,a.private,a.ownerid FROM pw_cnphoto p LEFT JOIN pw_cnalbum a ON p.aid=a.aid WHERE p.pid=" . pwEscape($id) . " AND a.atype='0'");
+			$photo = $db->get_one("SELECT p.pid,p.pintro,p.aid,p.path,p.uploader,p.ifthumb,a.aname,a.private,a.ownerid FROM pw_cnphoto p LEFT JOIN pw_cnalbum a ON p.aid=a.aid WHERE p.pid=" . S::sqlEscape($id) . " AND a.atype='0'");
 			empty($photo) && Showmsg('data_error');
 			$collection['type'] =  'photo';
 			$collection['uid']	= $photo['ownerid'];
@@ -108,7 +109,7 @@ if ($a == 'del') {
 			updateDatanalyse($photo['pid'],'picFav',$timestamp);
 		}
 	} elseif ($type == 'group') {
-		$group 	= $db->get_one("SELECT id,cname,cnimg,admin FROM pw_colonys WHERE id=" . pwEscape($id));
+		$group 	= $db->get_one("SELECT id,cname,cnimg,admin FROM pw_colonys WHERE id=" . S::sqlEscape($id));
 		empty($group) && Showmsg('data_error');
 		if ($group['cnimg']) {
 			list($cnimg) = geturl("cn_img/$group[cnimg]",'lf');
@@ -151,7 +152,18 @@ if ($a == 'del') {
 		$collection['uid'] = $article['userid'];
 		$collection['link'] = $db_bbsurl.'/mode.php?m=cms&q=view&id='.$id;
 		$collection['cms']['subject'] = $article['subject'];
-	}
+	} elseif ($type == 'postfavor') {
+		//* $threadsService = L::loadClass('Threads' , 'forum'); /* @var $diaryService PW_Diary */
+		//* $favor 	= $threadsService->getThreads($id);
+		$_cacheService = Perf::gatherCache('pw_threads');
+		$favor = $_cacheService->getThreadByThreadId($id);
+		
+		empty($favor) && Showmsg('data_error');
+		$collection['uid'] = $favor['authorid'];
+		$collection['lastpost'] = $favor['lastpost'];
+		$collection['link'] = $db_bbsurl.'/read.php?tid='.$id;
+		$collection['postfavor']['subject'] = $favor['subject'];
+	} 
 	
 	if ($collection['uid']) {
 		$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
@@ -160,7 +172,6 @@ if ($a == 'del') {
 		$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
 		$collection['uid'] = $userService->getUserIdByUserName($collection['username']);
 	}
-	
 	
 	
 	$collectionDate = array(

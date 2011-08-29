@@ -1,7 +1,7 @@
 <?php
 !defined('P_W') && exit('Forbidden');
 
-InitGP(array(
+S::gp(array(
 	'pcid',
 	'pcmid',
 	'tid',
@@ -11,16 +11,16 @@ InitGP(array(
 ), GP, 2);
 
 $pcvaluetable = GetPcatetable($pcid);
-$fieldvalue = $db->get_one("SELECT endtime,limitnum,deposit,price FROM $pcvaluetable WHERE tid=" . pwEscape($tid));
+$fieldvalue = $db->get_one("SELECT endtime,limitnum,deposit,price FROM $pcvaluetable WHERE tid=" . S::sqlEscape($tid));
 if ($fieldvalue['endtime'] < $timestamp) {
 	Showmsg('joinpc_error');
 }
-$rt = $db->get_one("SELECT nums,phone,mobile,address,extra,name,zip,message,ifpay FROM pw_pcmember WHERE pcmid=" . pwEscape($pcmid) . " AND uid=" . pwEscape($winduid));
+$rt = $db->get_one("SELECT nums,phone,mobile,address,extra,name,zip,message,ifpay FROM pw_pcmember WHERE pcmid=" . S::sqlEscape($pcmid) . " AND uid=" . S::sqlEscape($winduid));
 !$ifpay && $ifpay = $rt['ifpay'];
 
 if (empty($_POST['step'])) {
 	
-	//$sign = $db->get_value("SELECT sign FROM pw_postcate WHERE pcid=".pwEscape($pcid));
+	//$sign = $db->get_value("SELECT sign FROM pw_postcate WHERE pcid=" . S::sqlEscape($pcid));
 	$rt['extra'] && $checked = 'checked';
 	
 	require_once PrintEot('ajax');
@@ -28,7 +28,7 @@ if (empty($_POST['step'])) {
 } elseif ($_POST['step'] == 2) {
 	
 	PostCheck();
-	InitGP(array(
+	S::gp(array(
 		'nums',
 		'phone',
 		'mobile',
@@ -48,7 +48,7 @@ if (empty($_POST['step'])) {
 		ajax_footer();
 	}
 	
-	$membernum = $db->get_value("SELECT SUM(nums) FROM pw_pcmember WHERE tid=" . pwEscape($tid));
+	$membernum = $db->get_value("SELECT SUM(nums) FROM pw_pcmember WHERE tid=" . S::sqlEscape($tid));
 	if ($fieldvalue['limitnum'] && $fieldvalue['limitnum'] + $rt['nums'] - $membernum < $nums) {
 		
 		if ($pcid == 1) {
@@ -76,7 +76,7 @@ if (empty($_POST['step'])) {
 	);
 	$nums && $sqlarray['nums'] = $nums;
 	
-	$db->update("UPDATE pw_pcmember SET " . pwSqlSingle($sqlarray) . " WHERE pcmid=" . pwEscape($pcmid) . " AND uid=" . pwEscape($winduid));
+	$db->update("UPDATE pw_pcmember SET " . S::sqlSingle($sqlarray) . " WHERE pcmid=" . S::sqlEscape($pcmid) . " AND uid=" . S::sqlEscape($winduid));
 	echo "success\t$jointype\t$tid\t$payway";
 	ajax_footer();
 }

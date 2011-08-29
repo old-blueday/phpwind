@@ -2,7 +2,9 @@
 !function_exists('adminmsg') && exit('Forbidden');
 
 if ($uc_server != 1) {
-	$basename = "javascript:parent.getObj('button_ucapp').getElementsByTagName('a')[1].onclick();";
+	$db_adminrecord = 0;
+	$basename = "javascript:parent.closeAdminTab(window);";
+	//$basename = "javascript:parent.getObj('button_ucapp').getElementsByTagName('a')[1].onclick();";
 	adminmsg('uc_server_set');
 }
 
@@ -28,10 +30,10 @@ if (empty($action)) {
 
 } elseif ($action == 'del') {
 	
-	InitGP(array('selid'), 'P', 2);
+	S::gp(array('selid'), 'P', 2);
 	
 	if ($selid) {
-		$db->update("DELETE FROM pw_ucapp WHERE id IN (" . pwImplode($selid) . ')');
+		$db->update("DELETE FROM pw_ucapp WHERE id IN (" . S::sqlImplode($selid) . ')');
 		require_once(R_P . 'uc_client/class_core.php');
 		$uc = new UC();
 		$myApp = $uc->load('app');
@@ -48,10 +50,10 @@ if (empty($action)) {
 
 	} else {
 		
-		InitGP(array('name','siteurl','secretkey','interface'));
+		S::gp(array('name','siteurl','secretkey','interface'));
 		$siteurl = rtrim($siteurl,'/');
 
-		$db->update("INSERT INTO pw_ucapp SET " . pwSqlSingle(array(
+		$db->update("INSERT INTO pw_ucapp SET " . S::sqlSingle(array(
 			'name' => $name,
 			'siteurl' => $siteurl,
 			'secretkey' => $secretkey,
@@ -67,8 +69,8 @@ if (empty($action)) {
 	}
 } elseif ($action == 'edit') {
 
-	InitGP(array('id'));
-	$app = $db->get_one("SELECT * FROM pw_ucapp WHERE id=" . pwEscape($id));
+	S::gp(array('id'));
+	$app = $db->get_one("SELECT * FROM pw_ucapp WHERE id=" . S::sqlEscape($id));
 	empty($app) && adminmsg('undefined_action');
 
 	if (empty($_POST['step'])) {
@@ -77,15 +79,15 @@ if (empty($action)) {
 
 	} else {
 
-		InitGP(array('name','siteurl','secretkey','interface'));
+		S::gp(array('name','siteurl','secretkey','interface'));
 		$siteurl = rtrim($siteurl,'/');
 
-		$db->update("UPDATE pw_ucapp SET " . pwSqlSingle(array(
+		$db->update("UPDATE pw_ucapp SET " . S::sqlSingle(array(
 			'name' => $name,
 			'siteurl' => $siteurl,
 			'secretkey' => $secretkey,
 			'interface' => $interface
-		)) . ' WHERE id=' . pwEscape($id));
+		)) . ' WHERE id=' . S::sqlEscape($id));
 
 		if ($app['uc'] && $secretkey != $uc_key) {
 			setConfig('uc_appid', $app['id']);

@@ -4,7 +4,7 @@
 define('F_M',true);
 
 extract(L::style('',$skinco));
-include_once (D_P.'data/bbscache/area_config.php');
+include_once pwCache::getPath(D_P.'data/bbscache/area_config.php');
 
 include_once (M_P.'require/core.php');
 $ifEditAdmin = 0;

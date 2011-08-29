@@ -50,7 +50,7 @@ foreach($reportdb as $report){print <<<EOT
     <tr class="tr1 vt">
       <td class="td2"><input type="checkbox" name="selid[]" value="$report[id]"></td>
       <td class="td2">{$report[type]}</td>
-      <td class="td2"><a href="u.php?uid=$report[uid]" target="_blank">$report[username]</a></td>
+      <td class="td2"><a href="{$db_userurl}$report[uid]" target="_blank">$report[username]</a></td>
       <td class="td2">$report[reason]</td>
       <td class="td2"><a href="{$report[url]}" target="_blank">进入</a></td>
     </tr>
@@ -66,6 +66,7 @@ EOT;
   <input type="radio" name="action" value="del">&nbsp;删除　　　</p>
     </div>
     <div class="tac mb10">
+	<span class="bt"><span><button type="button" onclick="CheckAll(document.FORM)">全 选</button></span></span>
     <span class="btn"><span><button type="submit" name="hello">提 交</button></span></span>
     </div>
 </form>
@@ -112,7 +113,7 @@ foreach($reportdb as $report){print <<<EOT
     <tr class="tr1 t">
         <td class="td2"><input type="checkbox" name="selid[]" value="$report[id]"></td>
         <td class="td2">{$report[type]}</td>
-        <td class="td2"><a href="u.php?uid=$report[uid]" target="_blank">$report[username]</a></td>
+        <td class="td2"><a href="{$db_userurl}$report[uid]" target="_blank">$report[username]</a></td>
         <td class="td2">$report[reason]</td>
         <td class="td2"><a href="{$report[url]}" target="_blank">进入</a></td>
     </tr>
@@ -125,6 +126,7 @@ EOT;
   <div class="cc">$pages</div>
     <input type="hidden" name="action" value="del">
     <div class="tac mb10">
+	<span class="bt"><span><button type="button" onclick="CheckAll(document.FORM)">全 选</button></span></span>
     <span class="btn"><span><button type="submit" name="hello">删除</button></span></span>
     </div>
 </form>

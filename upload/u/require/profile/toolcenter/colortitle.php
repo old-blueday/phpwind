@@ -20,13 +20,19 @@ if(!$_POST['step']){
 	if($tpcdb['authorid'] != $winduid){
 		Showmsg('tool_authorlimit');
 	}
-	InitGP(array('title1','title2','title3','title4','title5','title6'));
+	S::gp(array('title1','title2','title3','title4','title5','title6'));
 	$titlefont = "$title1~$title2~$title3~$title4~$title5~$title6~";
-	$db->update("UPDATE pw_threads SET titlefont=".pwEscape($titlefont).",toolinfo=".pwEscape($tooldb['name'],false)."WHERE tid=".pwEscape($tid));
-	$threads = L::loadClass('Threads', 'forum');
-	$threads->delThreads($tid);
+	//$db->update("UPDATE pw_threads SET titlefont=".S::sqlEscape($titlefont).",toolinfo=".S::sqlEscape($tooldb['name'],false)."WHERE tid=".S::sqlEscape($tid));
+	pwQuery::update('pw_threads', 'tid=:tid', array($tid), array('titlefont'=>$titlefont, 'toolinfo'=>$tooldb['name']));
+	$fid = $db->get_value("SELECT fid FROM pw_threads WHERE tid=".S::sqlEscape($tid));
+	//* $threads = L::loadClass('Threads', 'forum');
+	//$threads->delThreads($tid);
+	Perf::gatherInfo('changeThreadWithForumIds', array('fid'=>$fid));
 
-	$db->update("UPDATE pw_usertool SET nums=nums-1 WHERE uid=".pwEscape($winduid)."AND toolid=".pwEscape($toolid));
+	require_once (R_P . 'require/updateforum.php');
+	delfcache($fid, $db_fcachenum);
+
+	$db->update("UPDATE pw_usertool SET nums=nums-1 WHERE uid=".S::sqlEscape($winduid)."AND toolid=".S::sqlEscape($toolid));
 	$logdata=array(
 		'type'		=>	'use',
 		'nums'		=>	'',

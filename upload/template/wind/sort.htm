@@ -15,7 +15,7 @@ if($cachetime){print <<<EOT
 EOT;
 }print <<<EOT
 -->
-		<img src="$imgpath/$stylepath/thread/home-old.gif" align="absmiddle" />&nbsp;<a href="$db_bfn" title="$db_bbsname">$db_bbsname</a><em>&gt;</em><a href="sort.php">统计信息</a>
+<img src="$imgpath/$stylepath/thread/home.gif" class="breadHome" /><em class="breadEm"></em><a href="$db_bfn" title="$db_bbsname">$db_bbsname</a><em>&gt;</em><a href="sort.php">统计信息</a>
 </div>
 <div class="c"></div>
 <div id="pw_content">
@@ -144,7 +144,7 @@ EOT;
 if($thread[9]=='<>' && $groupid==3){
 print <<<EOT
 -->
-<a href="u.php?uid=$thread[uid]" target="_blank">$thread[username](隐身)</a>
+<a href="{$db_userurl}$thread[uid]" target="_blank">$thread[username](隐身)</a>
 <!--
 EOT;
 }elseif($thread[9]=='<>' && $groupid!=3){
@@ -156,7 +156,7 @@ EOT;
 }else{
 print <<<EOT
 -->
-<a href="u.php?uid=$thread[uid]" target="_blank">$thread[username]</a>
+<a href="{$db_userurl}$thread[uid]" target="_blank">$thread[username]</a>
 <!--
 EOT;
 }print <<<EOT
@@ -212,7 +212,7 @@ foreach($teamdb as $key => $team){
 print <<<EOT
 -->
 <tr class="tr3 tac f_one">
-<td><a href="u.php?uid=$team[uid]" target="_blank">$team[username]</a></td>
+<td><a href="{$db_userurl}$team[uid]" target="_blank">$team[username]</a></td>
 <td>$team[systitle]</td>
 <td>$team[memtitle]</td>
 <td>$team[lastpost]</td>
@@ -247,7 +247,7 @@ EOT;
 <!--
 EOT;
 foreach($forum as $key => $value){
-if($value['cms']=='0' && $forumdb[$key]){
+if($value['ifcms']=='0' && $forumdb[$key]){
 $i=count($forumdb[$key]);
 print <<<EOT
 -->
@@ -267,7 +267,7 @@ EOT;
 }
 print <<<EOT
 -->
-	<td><a href="u.php?uid=$uid" target="_blank">$member[username]</a></td>
+	<td><a href="{$db_userurl}$uid" target="_blank">$member[username]</a></td>
 	<td>$member[systitle]</td>
 	<td>$member[memtitle]</td>
 	<td>$member[lastpost]</td>
@@ -306,7 +306,7 @@ print <<<EOT
 -->
 <tr class="tr3 tac $f_class">
 	<td><a href="$value[url]" target="_blank">$value[title]</a></td>
-	<td><a href="u.php?uid={$value[addition][authorid]}" target="_blank">{$value[addition][author]}</a></td>
+	<td><a href="{$db_userurl}{$value[addition][authorid]}" target="_blank">{$value[addition][author]}</a></td>
 	<td><a href="thread.php?fid=$value[fid]" target="_blank">$value[forum]</a></td>
 	<td>$value[posttime]</td>
 	<td>$value[value]</td>
@@ -350,7 +350,7 @@ $f_class=$f_class=='f_one' ? 'f_two' : 'f_one';
 print <<<EOT
 -->
 <tr class="tr3 tac $f_class">
-	<td><a href="u.php?uid=$admin[uid]" target="_blank">$key</a></td>
+	<td><a href="{$db_userurl}$admin[uid]" target="_blank">$key</a></td>
 	<td>{$ltitle[$admin[gid]]}<br /></td>
 	<td>$admin[highlight]<br /></td>
 	<td>$admin[delete]<br /></td>

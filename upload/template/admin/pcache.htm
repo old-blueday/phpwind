@@ -1,0 +1,102 @@
+<!--<?php
+include_once PrintEot('left');
+print <<<EOT
+-->
+
+<!--
+EOT;
+if ($adminitem == 'threadcache') {print <<<EOT
+-->
+<div class="nav3 mb10">
+	<ul class="cc">
+		<li><a href="$jobUrl">缓存管理</a></li>
+		<li><a href="$jobUrl&adminitem=pwcache">PW缓存库</a></li>
+		<li class="current"><a href="$jobUrl&adminitem=threadcache">主题列表缓存</a></li>
+		<li><a href="$jobUrl&adminitem=guestcache">游客缓存</a></li>
+		<li><a href="$jobUrl&adminitem=guestdir">清空缓存</a></li>
+		<li><a href="$jobUrl&adminitem=blacklist">调用黑名单</a></li>
+	</ul>
+</div>
+<form action="$basename" method="post">
+<input type="hidden" name="step" value="2">
+<h3 class="h1"><span class="mr20">主题列表内容缓存功能</span><span class="linka">主题列表页是站点访问量最高的页面之一(尤其是前面几页)</span></h3>
+<div class="admin_table mb10">
+	<table width="100%" cellspacing="0" cellpadding="0">
+		<tr class="tr1 vt">
+			<td class="td1">缓存页数</td>
+			<td class="td2"><input name="config[fcachenum]" value="$db_fcachenum" class="input input_wa" /></td>
+			<td class="td2"><div class="help_a">设置 0 为关闭，建议值 10，即缓存前10页内容</div></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">缓存更新间隔[秒]</td>
+			<td class="td2"><input name="config[fcachetime]" value="$db_fcachetime" class="input input_wa" /></td>
+			<td class="td2"><div class="help_a">设置 0 为即时更新，即<b>当有新帖发表时</b>更新缓存内容<br />如果发帖较频繁，建议设置 180 - 300，即 3-5 分钟更新一次缓存内容</div></td>
+		 </tr>
+	</table>
+</div>
+
+<!--
+EOT;
+}elseif($adminitem == 'guestcache'){print <<<EOT
+-->
+<div class="nav3 mb10">
+	<ul class="cc">
+		<li><a href="$jobUrl">缓存管理</a></li>
+		<li><a href="$jobUrl&adminitem=pwcache">PW缓存库</a></li>
+		<li><a href="$jobUrl&adminitem=threadcache">主题列表缓存</a></li>
+		<li class="current"><a href="$jobUrl&adminitem=guestcache">游客缓存</a></li>
+		<li><a href="$jobUrl&adminitem=guestdir">清空缓存</a></li>
+		<li><a href="$jobUrl&adminitem=blacklist">调用黑名单</a></li>
+	</ul>
+</div>
+<form action="$basename" method="post">
+<input type="hidden" name="step" value="2">
+<div class="admin_info mb10">
+	<h2 class="h1">功能说明</h2>
+	<div class="legend">一般情况下站点的在线用户70%以上为游客，而游客访问的页面内容在一段时间内是不会有太大变化的，因此将游客访问的页面内容缓存起来可以减少数据库因查询大量相同信息而产生的不必要的资源消耗</div>
+</div>
+<h3 class="h1">游客缓存功能</h3>
+<div class="admin_table mb10">
+	<table width="100%" cellspacing="0" cellpadding="0">
+		<tr class="tr1 vt">
+			<td class="td1">缓存目录</td>
+			<td class="td2"><input name="config[guestdir]" value="$db_guestdir" class="input input_wa" /></td>
+			<td class="td2"><div class="help_a">默认为 data/guestcache 目录，您可以更改为其他目录，请确定您指定的目录有可写权限 </div></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">首页缓存设置[秒]</td>
+			<td class="td2"><input name="config[guestindex]" value="$db_guestindex" class="input input_wa" /></td>
+			<td class="td2"><div class="help_a">设置首页缓存更新时间，0为关闭，建议值:900 </div></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">主题列表页缓存页数</td>
+			<td class="td2"><input name="config[fguestnum]" value="$db_fguestnum" class="input input_wa" /></td>
+			<td class="td2"><div class="help_a">设置 0 为关闭，建议值 10，即缓存前10页内容 </div></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">主题列表页缓存设置[秒]</td>
+			<td class="td2"><input name="config[guestthread]" value="$db_guestthread" class="input input_wa" /></td>
+			<td class="td2"><div class="help_a">设置主题列表页面缓存更新时间，建议值:900 </div></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">帖子页缓存页面</td>
+			<td class="td2"><input name="config[tguestnum]" value="$db_tguestnum" class="input input_wa" /></td>
+			<td class="td2"><div class="help_a">开启此功能，将产生大量缓存数据，设置 0 为关闭，建议值 3，即缓存前3页内容 </div></td>
+				</tr>
+		<tr class="tr1 vt">
+			<td class="td1">帖子页缓存设置[秒]</td>
+			<td class="td2"><input name="config[guestread]" value="$db_guestread" class="input input_wa" /></td>
+			<td class="td2"><div class="help_a">设置阅读帖子页面缓存更新时间，建议值:900</div></td>
+		</tr>
+	</table>
+</div>
+
+<!--
+EOT;
+}print <<<EOT
+-->
+<div class="tac mb10"><span id="submit" class="btn"><span><button type="submit" onfocus="blur();">提 交</button></span></span></div></form>
+<!--
+EOT;
+include_once PrintEot('adminbottom');
+?>-->

@@ -2,7 +2,7 @@
 include_once PrintEot('left');
 if(empty($action)){print <<<EOT
 -->
-<form name='FORM' action="$basename" method="post">
+<form name='FORM' action="$basename" method="post" onsubmit="return checkpost(document.FORM);">
 	<h2 class="h1">节日送礼</h2>
 	<div class="admin_table mb10">
 	<table width="100%" cellspacing="0" cellpadding="0">
@@ -11,14 +11,14 @@ if(empty($action)){print <<<EOT
 			<td class="td2">
 				<ul class="list_A">
 					<li><input type="radio" name="by" value="0" onclick="sendtype(0)" checked />按用户组</li>
-					<li><input type="radio" name="by" value="1" onclick="sendtype(1)" />在线用户</li>
+					<li><input type="radio" name="by" id="online" value="1" onclick="sendtype(1)" />在线用户</li>
 					<li><input type="radio" name="by" value="2" onclick="sendtype(2)" />按用户名</li>
 				</ul>
 			</td>
 		</tr>
 		<tbody id="by_0">
 			<tr class="tr1 vt">
-				<td class="td1">接收用户</td>
+				<td class="td1">接收用户 <span class="s1">*</span></td>
 				<td class="td2">
 					<ul class="cc list_A list_120 mb10" style="width:480px">
 <!--
@@ -44,7 +44,7 @@ EOT;
 		</tbody>
 		<tbody id="by_2" style="display:none">
 			<tr class="tr1 vt">
-				<td class="td1">指定用户名，多个用,分开</td>
+				<td class="td1">用户名，多个用,分开 <span class="s1">*</span></td>
 				<td class="td2"><input type="text" name="touser" class="input input_wa" /></td>
 			</tr>
 		</tbody>
@@ -71,11 +71,11 @@ EOT;
 			<td class="td2"><input type="text" name="percount" class="input input_wa" value="100" /></td>
 		</tr>
 		<tr class="tr1 vt">
-			<td class="td1">主题</td>
+			<td class="td1">主题 <span class="s1">*</span></td>
 			<td class="td2"><input type="text" name="subject" class="input input_wb" /></td>
 		</tr>
 		<tr class="tr1 vt">
-			<td class="td1">内容</td>
+			<td class="td1">内容 <span class="s1">*</span></td>
 			<td class="td2">
 <!--
 EOT;
@@ -96,7 +96,7 @@ print <<<EOT
 <div id="menu_face" class="menu" style="display:none;"></div>
 <div id="menu_generalface" class="menu" style="display:none;"></div>
 
-<script type="text/javascript">editor.init('wysiwyg', 1);</script>
+<script type="text/javascript">editor.init('wysiwyg', 0);</script>
 	
 	<input type="hidden" name="action" value="send" />
 	<div class="tac mb10">
@@ -109,6 +109,34 @@ function sendtype(id) {
 	for (var i = 0; i < 3; i++) {
 		document.getElementById('by_' + i).style.display = (id == i) ? '' : 'none';
 	}
+}
+function checkpost(obj) {
+	var userobj = document.getElementsByName("sendto[]"); 
+	var check=0; 
+	for(var i=0;i <userobj.length;i++){ 
+		  if(userobj[i].checked){ 
+			  check=1; 
+		  } 
+	} 
+
+	if (check == 0 && obj.touser.value == "" && obj.online.checked == false) {
+			obj.touser.setAttribute("hasError", 1);
+			showDialog("error","接受用户不能为空",2);
+			obj.subject.focus();
+			return false;
+	} 
+	if (obj.subject.value == "") {
+			obj.subject.setAttribute("hasError", 1);
+			showDialog("error","主题不能为空",2);
+			obj.subject.focus();
+			return false;
+	} 
+	if (obj.atc_content.value == "") {
+			obj.atc_content.setAttribute("hasError", 1);
+			showDialog("error","内容不能为空",2);
+			obj.subject.focus();
+			return false;
+	} 
 }
 </script>
 <!--

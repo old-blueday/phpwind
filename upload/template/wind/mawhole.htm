@@ -1,7 +1,7 @@
  <!--<?php print <<<EOT
 -->
 <div id="breadCrumb">
-		<img src="$imgpath/$stylepath/thread/home-old.gif" align="absmiddle" />&nbsp;<a href="$db_bfn" title="$db_bbsname">$db_bbsname</a><em>&gt;</em>
+		<img align="absmiddle" src="$imgpath/wind/thread/home.gif" alt="forumlist" class="breadHome" /><em class="breadEm"></em><a href="$db_bfn_temp" title="$db_bbsname">$db_bbsname</a><em>&gt;</em>
 <!--
 EOT;
 if($action=='del'){print <<<EOT
@@ -73,11 +73,27 @@ EOT;
 -->
 </div>
 <div id="pw_content">
-<form name="form1" method="post" action="mawhole.php?{$viewbbs}">
+<!--
+EOT;
+if ($action == 'move') { 
+print <<<EOT
+-->
+<form name="form1" method="post" onsubmit="if(checkThreadCatesType()){return ajax_mawhole(this)};" action="mawhole.php?{$viewbbs}">
+<!--
+EOT;
+} else { 
+print <<<EOT
+-->
+<form name="form1" method="post" action="mawhole.php?{$viewbbs}" onsubmit="return ajax_mawhole(this);">
+<!--
+EOT;
+} print <<<EOT
+-->
 <input type="hidden" name="verify" value="$verifyhash" />
 <input type="hidden" name="action" value="$action" />
 <input type="hidden" name="fid"    value="$fid" />
 <input type="hidden" name="step"   value="2" />
+<input type="hidden" name="ajax"   value="1" />
 <!--
 EOT;
 if($threaddb){print <<<EOT
@@ -238,6 +254,21 @@ if($action=='headtopic'){print <<<EOT
 			options[this.selectedIndex].selected = false;
 		}
 	}
+	
+	checkform = function(obj){
+	    var el = obj.topped;
+	    var flag = false;
+	    for(var i=0; i<el.length; i++){
+	    	if(el[i].checked){
+	    		flag = true;break;
+	    	}
+	    }
+	    if(flag == false){
+	        showDialog({type:'error',message:'请选择管理选项'});
+	        return false;
+	    };   
+	    return true;
+	}
 </script>
 	<tr class="tr3">
 		<th width="20%" style="text-align:right;">管理选项:</th>
@@ -302,6 +333,22 @@ changeForums('$deftopped','$selforums','$_tight');
 EOT;
 }elseif($action=='digest'){print <<<EOT
 -->
+<script type="text/javascript">
+    checkform = function(obj){
+        var el = obj.digest;
+        var flag = false;
+        for(var i=0; i<el.length; i++){
+            if(el[i].checked){
+                flag = true;break;
+            }
+        }
+        if(flag == false){
+            showDialog({type:'error',message:'请选择管理选项'});
+            return false;
+        };   
+        return true;
+    }
+</script>
 	<tr class="tr3">
 	<th width="20%" style="text-align:right;">管理选项:</th>
 	<th>
@@ -330,6 +377,22 @@ print <<<EOT
 EOT;
 }elseif($action=='lock'){print <<<EOT
 -->
+<script type="text/javascript">
+	checkform = function(obj){
+        var el = obj.locked;
+        var flag = false;
+        for(var i=0; i<el.length; i++){
+        	if(el[i].checked){
+        		flag = true;break;
+        	}
+        }
+        if(flag == false){
+            showDialog({type:'error',message:'请选择管理选项'});
+            return false;
+        };   
+        return true;
+	}
+</script>
 	<tr class="tr3">
 	<th width="20%" style="text-align:right;">管理选项:</th>
 	<th>
@@ -495,6 +558,18 @@ function getSubType(id){
 EOT;
 }elseif($action=='move' || $action=='copy'){print <<<EOT
 -->
+<script type="text/javascript">
+checkform = function(){
+    return true;
+}
+</script>
+	<tr class="tr3">
+	<td>
+<div id="move_isforce" style="display:none; margin:5px; padding:5px; padding-left:20px; width:90%; height:15px; background-color:#FFFFCC; border:#CCCCCC solid 1px; color:#FF0000;">
+	<b>提示：目的版块限制必须选择主题分类</b>
+</div>
+</td>
+</tr>
 	<tr class="tr3">
 		<th width="20%" style="text-align:right;">选择目的版块:</th>
 		<th><select name="to_id" id="to_id" onchange="getThreadCates(this.value)">$forumcache
@@ -522,6 +597,46 @@ EOT;
 		</select></div><div id="subtypeselect" ></div></th>
 	</tr>
 <script language="JavaScript">
+//检测是否需要强制主题分类
+function checkThreadCatesType() {
+	var type = document.getElementById('to_id').value;
+	var threadcate = document.getElementById('to_threadcate').value;
+	var typedb = '$t_typedb';
+	var forum_temp = JSONParse('$forum_temp');
+	if(typedb == "") {
+		if(type in forum_temp){
+			if(forum_temp[type] == 0) {
+				ajax.showError("请选择主题分类");
+				//showDialog('error','');
+				return false;
+			}	
+		}
+		return true;
+	}else{
+		var t_typedb = JSONParse(typedb);
+		if(type in t_typedb){
+			if(t_typedb[type][0] == 2) {
+				if(threadcate == 0) {
+					ajax.showError("请选择主题分类");
+					//showDialog('error','');
+					return false;
+				}else{
+					return true;
+				}
+			}else{
+				return true;	
+			}
+		} else {
+			if(forum_temp[type]==0){
+				ajax.showError("请选择主题分类");
+				//showDialog('error','');
+				return false;
+			}else{
+				return true;
+			}
+		}
+	}
+}
 function getThreadCates(fid){
 	var selobj = getObj('to_threadcate');
 	selobj.options.length=0;
@@ -530,7 +645,9 @@ function getThreadCates(fid){
 	for (var temp in t_typedb) {
 		if (temp == fid) {
 			for (var temp2 in t_typedb[temp]) {
-				selobj.options.add(new Option(t_typedb[temp][temp2],temp2));
+				if(temp2 != 0) {
+					selobj.options.add(new Option(t_typedb[temp][temp2],temp2));
+				}
 			}
 		}
 	}
@@ -649,6 +766,7 @@ EOT;
 	<tr class="tr3">
 		<th width="20%" style="text-align:right;">扣除积分:</th>
 		<th>
+			<input  value="{$jumptype}" name="jumptype" type="hidden" />
 			<input type="radio" name="ifdel" value="1" checked />开启
 			<input type="radio" name="ifdel" value="0" />关闭
 		</th>
@@ -669,7 +787,7 @@ if($unitetype == 'from'){print <<<EOT
 EOT;
 } else{print <<<EOT
 -->
-		<input class="input" type="text" name="unitetid" size="15" /> (输入目标帖子tid)
+		<input class="input" type="text" name="unitetid" size="15" /> ((输入来源帖子的tid,多个用“,”分开))
 <!--
 EOT;
 }print <<<EOT
@@ -803,6 +921,41 @@ EOT;
 </table></div>
 </form>
 </div>
+<script type="text/javascript" src="js/pw_post.js"></script>
+<script type="text/javascript" src="js/global.js"></script>
+<script type="text/javascript">
+function ajax_mawhole(obj){
+	if(typeof checkform == 'function'){
+		return checkform(obj);
+	}
+	var dbreason = '$SYSTEM[enterreason]';
+	var cbox = obj['tidarray[]'];
+	var flag = false;
+	if(cbox.length == undefined){
+		if(cbox.checked){
+			flag = true;
+		}
+	};
+	if(cbox.length > 1){
+		for(var i=0; i<cbox.length; i++){
+			if(cbox[i].checked){
+				flag = true;
+				break;
+			}
+			
+		}
+	}	
+	if(flag == false){
+		showDialog({message:'请选择要操作的帖子！',autoHide:3});
+		return false;
+	}
+	if (dbreason == 1 &&　obj.atc_content.value == ''){
+		showDialog({message:'请输入操作原因！',autoHide:3});
+		return false;
+	}
+	return true;
+}
+</script>
 <!--
 EOT;
 ?>-->

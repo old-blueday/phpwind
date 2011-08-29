@@ -124,7 +124,7 @@ EOT;
 -->
 				<a href="apps.php?q=group&a=read&cyid={$this->cyid}&tid=$value[tid]" class="f14" title="{$value['subject']}">{$value['sub_subject']}</a>
 			</td>
-            <td><a href="u.php?uid=$value[authorid]" title="$value[author]" class="userCard img_25 mr10" target="_blank"><img src="{$udb[$value[authorid]][faceurl]}" width="18" height="18" align="absmiddle" /></a><a href="u.php?uid=$value[authorid]" title="$value[author]" target="_blank">$author</a>
+            <td><a href="{$GLOBALS[db_userurl]}$value[authorid]" title="$value[author]" class="userCard img_25 mr10" target="_blank"><img src="{$udb[$value[authorid]][faceurl]}" width="18" height="18" align="absmiddle" /></a><a href="{$GLOBALS[db_userurl]}$value[authorid]" title="$value[author]" target="_blank">$author</a>
 			</td>
             <td class="tac s6"><span class="s2">$value[replies]</span>&nbsp;/&nbsp;$value[hits]</td>
             <td class="s6"><a href="u.php?username=$value[lastposter]" title="$value[lastposter]" class="userCard img_25 mr10" target="_blank"><img src="{$lastposters[$lastposter][faceurl]}" width="18" height="18" align="absmiddle" /></a>$lastposttime</td>
@@ -161,7 +161,7 @@ EOT;
 		<span class="b f14 mr10">{$this->groupRight['modeset']['thread']['title']}</span> <span class="gray">(共 {$this->colony[tnum]} 篇话题)</span>
     </h5>
 	<div class="p15 f14 tac">
-		非成员不能浏览，<a href="apps.php?q=group&a=join&cyid={$this->cyid}" onclick="return ajaxurl(this);">申请加入</a>吧！
+		你还没有加入本群组，<a href="apps.php?q=group&a=join&cyid={$this->cyid}" onclick="return ajaxurl(this);">申请加入</a>吧！
 	</div>
 	<div class="c"></div>
 <!--
@@ -188,7 +188,7 @@ print <<<EOT
 			<td>
 				<div class="sk">
 				<div class="one"><div class="two"><div class="tree"><div class="four">
-					<div class="sktextarea"><textarea name="text" id="writetext" onfocus="if(this.value == oldvalue)this.value=''">来，说两句吧…</textarea><div class="c"></div></div>
+					<div class="sktextarea"><textarea name="text" id="writetext" onkeydown="write_quickpost(event)" onfocus="if(this.value == oldvalue)this.value=''">来，说两句吧…</textarea><div class="c"></div></div>
 					<div class="sk_open">
 						<span id="writebutton" class="btn3 fr"><span><button class="button" type="submit" onclick="submitwrite(document.forms['FORM'])" id="write_button">发表</button></span></span>
 						<!--<span class="tosign"><label for="writetosign"><input id="writetosign" name="tosign" type="checkbox" value="1" onclick="if(this.checked == true){SetCookie('iftongbu','1');}else{SetCookie('iftongbu','0');}" {$check}>&nbsp;同步至我的记录</label></span>-->
@@ -245,6 +245,7 @@ getObj('showSmile').onclick = function(e) {
 }
 applySmile(function(codeText) {
 	insertContentToTextArea(getObj('writetext'), codeText);
+	checkTextNum('writetext','writetext_warn',255,true);
 });
 </script>
 <!--
@@ -257,6 +258,7 @@ EOT;
 $db_blogsource = array('web'=>'网页','signature'=>'个性签名','other'=>'其他');
 $i=0;
 foreach ($writedata as $key => $value) {
+if (!$value['username']) continue;
 $value['content']=str_replace($face_array,$img_array,$value['content']);
 print <<<EOT
 -->
@@ -266,7 +268,7 @@ EOT;
 if ($value['icon']) {print <<<EOT
 -->
 				<dt class="dt">
-					<a href="u.php?uid=$value[uid]" target="_blank" class="userCard img_50"  id="card_write_{$i}_{$value[uid]}"><img src="$value[icon]" width="48" height="48" /></a><span id="write_{$i}" style="height:1px" class="fr"></span>
+					<a href="{$GLOBALS[db_userurl]}$value[uid]" target="_blank" class="userCard img_50"  id="card_write_{$i}_{$value[uid]}"><img src="$value[icon]" width="48" height="48" /></a><span id="write_{$i}" style="height:1px" class="fr"></span>
 				</dt>
 				<dd class="dd">
 <!--
@@ -279,7 +281,7 @@ if ($this->ifadmin || $value['uid'] == $winduid) {print <<<EOT
 EOT;
 }print <<<EOT
 -->
-					<p class="mb15 f14"><a href="u.php?uid=$value[uid]" target="_blank" class="mr5">$value[username]</a>$value[content]</p>
+					<p class="mb15 f14"><a href="{$GLOBALS[db_userurl]}$value[uid]" target="_blank" class="mr5">$value[username]</a>$value[content]</p>
 					<p class="mb10"><span class="gray mr10">{$value[postdate]}</span><span id="com_write_$value[id]"><a href="javascript:;" id='a_write_{$value[id]}' onclick="PW_Comment.showCommList('groupwrite','$value[id]',this);return false;">回复({$value[c_num]})</a></span></p>
 					<div class="redlA" id="combox_groupwrite_{$value[id]}">
 
@@ -369,7 +371,7 @@ EOT;
 -->
 	<h5 class="g_hA"><span class="b f14 mr10">{$this->groupRight['modeset']['write']['title']}</span> <span class="gray">(共 {$this->colony['writenum']} 篇)</span></h5>
 	<div class="p15 f14 tac">
-		非成员不能浏览，<a href="apps.php?q=group&a=join&cyid={$this->cyid}" onclick="return ajaxurl(this);">申请加入</a>吧！
+		你还没有加入本群组，<a href="apps.php?q=group&a=join&cyid={$this->cyid}" onclick="return ajaxurl(this);">申请加入</a>吧！
 	</div>
 	<div class="c"></div>
 <!--
@@ -398,7 +400,7 @@ print <<<EOT
 				<li>
 					<dl class="cc dl">
 						<dt class="dt">
-							<a href="apps.php?q=group&cyid={$this->cyid}&a=active&job=view&id=$value[id]"><img src="$value[poster_img]" width="50" class="img" /></a>
+							<a href="apps.php?q=group&cyid={$this->cyid}&a=active&job=view&id=$value[id]"><img src="$value[poster_img]" width="50" height="65" class="img" /></a>
 						</dt>
 						<dd class="dd4">
 							<p><a href="apps.php?q=group&cyid={$this->cyid}&a=active&job=view&id=$value[id]" class="b">$value[title]</a></p>

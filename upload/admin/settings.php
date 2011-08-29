@@ -1,10 +1,10 @@
 <?php
 !defined('P_W') && exit('Forbidden');
-include_once (D_P . 'data/bbscache/level.php');
+include_once pwCache::getPath(D_P . 'data/bbscache/level.php');
 
 $basename .= '&admintype=' . $admintype;
-$basedb = array('basic', 'safe', 'att', 'credit', 'reg', 'member',
-				'pcache', 'index', 'thread', 'read', 'jsinvoke',
+$basedb = array('basic', 'safe', 'att', 'credit', 'reg',
+				'index', 'thread', 'read', 'jsinvoke',
 				'popinfo', 'wap', 'email', 'searcher'
 				);
 $settingdb = array();
@@ -55,22 +55,8 @@ if ($_POST['step'] != 2) {
 			}
 		}
 		$visitgroup && $visitgroup = '<ul class="cc list_A list_120">' . $visitgroup . '</ul>';
-		//global
-		$sltstyles = '';
-		if ($fp = opendir(D_P . 'data/style/')) {
-			while (($skinfile = readdir($fp)) !== false) {
-				if (preg_match('/([^\.]+?)\.php$/i', $skinfile, $rt) && is_array($db_styledb) && (!empty($db_styledb[$rt[1]]) || $db_styledb[$rt[1]][1])) {
-					$skinname = $db_styledb[$rt[1]][0] ? $db_styledb[$rt[1]][0] : $rt[1];
-					if ($rt[1] == $db_defaultstyle) {
-						$sltstyles .= '<option value="' . $rt[1] . '" SELECTED>' . $skinname . '</option>';
-					} else {
-						$sltstyles .= '<option value="' . $rt[1] . '">' . $skinname . '</option>';
-					}
-				}
-			}
-			closedir($fp);
-		}
-		${'charset_' . str_replace('-', '', $db_charset)} = ${'columns_' . (int) $db_columns} = 'SELECTED';
+
+		${'charset_' . str_replace('-', '', $db_charset)} = 'SELECTED';
 		$temptimedf = str_replace('.', '_', abs($db_timedf));
 		$db_timedf < 0 ? ${'zone_0' . $temptimedf} = 'SELECTED' : ${'zone_' . $temptimedf} = 'SELECTED';
 		${'forumdir_' . (int) $db_forumdir} = $check_24 = 'CHECKED';
@@ -90,7 +76,6 @@ if ($_POST['step'] != 2) {
 		!$db_ckpath && $db_ckpath = '/';
 		$db_cvtime = (int) $db_cvtime;
 		//$db_schwait = (int)$db_schwait;
-		$db_txtadnum = (int) $db_txtadnum;
 		$db_maxmember = (int) $db_maxmember;
 		//$db_maxresult = (int)$db_maxresult;
 		$db_refreshtime = (int) $db_refreshtime;
@@ -99,14 +84,9 @@ if ($_POST['step'] != 2) {
 		ifcheck($db_today, 'today');
 		ifcheck($db_debug, 'debug');
 		ifcheck($db_ifjump, 'ifjump');
-		ifcheck($db_recycle, 'recycle');
 		ifcheck($db_msgsound, 'msgsound');
 		ifcheck($db_ifcredit, 'ifcredit');
-		ifcheck($db_adminset, 'adminset');
-		ifcheck($db_menu, 'menu');
-		ifcheck($db_readinfo, 'readinfo');
 		ifcheck($db_footertime, 'footertime');
-		ifcheck($db_enterreason, 'enterreason');
 		ifcheck($db_forcecharset, 'forcecharset');
 		ifcheck($db_toolbar, 'toolbar');
 		for ($i = 0; $i < 5; $i++) {
@@ -128,22 +108,35 @@ if ($_POST['step'] != 2) {
 		ifcheck($db_lp, 'lp');
 		ifcheck($db_online, 'online');
 		ifcheck($db_redundancy, 'redundancy');
+		ifcheck($db_classfile_compress, 'classfile_compress');
+		ifcheck($db_cachefile_compress, 'cachefile_compress');
+		ifcheck($db_filecache_to_memcache, 'filecache_to_memcache');
+		$unique_strategy_db = $unique_strategy_memcache = $unique_strategy_apc = '';
+		${'unique_strategy_' . ($db_unique_strategy ? $db_unique_strategy : 'db') } = 'CHECKED';
+		$isMemcachOpen = class_exists("Memcache") && $db_memcache['isopen'] ;
+		$isApcOpen = extension_loaded('apc') && function_exists('apc_store');
 		//seo
 		//		!is_array($db_bbstitle) && $db_bbstitle = array('index' => $db_bbstitle,'other' => '');
 		//gdcode
 		${'gdtype_' . (int) $db_gdtype} = 'SELECTED';
+		for ($i = 1; $i <= 3; $i++)
+			${'gdcontent_' . $i} = $db_gdcontent[$i] ? 'CHECKED' : '';
 		for ($i = 0; $i < 7; $i++) {
 			${'gdcheck_' . $i} = ($db_gdcheck & pow(2, $i)) ? 'CHECKED' : '';
+			if($i < 3) ${'ckquestion_' . $i} = ($db_ckquestion & pow(2, $i)) ? 'CHECKED' : '';
 			${'gdstyle_' . $i} = ($db_gdstyle & pow(2, $i)) ? 'CHECKED' : '';
 		}
 		$gdsize = explode("\t", $db_gdsize);
-		list($regq, $loginq, $postq, $msgq,$showq) = explode("\t", $db_qcheck);
+		//list($regq, $loginq, $postq, $msgq,$showq) = explode("\t", $db_qcheck);
+		list($postq,$showq) = explode("\t", $db_qcheck);
 		$postq = (int) $postq;
 		$db_postgd = (int) $db_postgd;
-		ifcheck($msgq, 'msgq');
-		ifcheck($regq, 'regq');
-		ifcheck($loginq, 'loginq');
+		//ifcheck($msgq, 'msgq');
+		//ifcheck($regq, 'regq');
+		//ifcheck($loginq, 'loginq');
 		ifcheck($showq, 'showq');
+		ifcheck($db_imagequestion, 'imagequestion');
+		ifcheck($db_question[-1], 'db_question_1');
 		//dir
 		$imgdisabled = $attdisabled = $htmdisabled = $stopicdisabled = '';
 		if (file_exists($imgdir) && !pwWritable($imgdir)) {
@@ -197,8 +190,8 @@ if ($_POST['step'] != 2) {
 		}
 
 		//pwatermark
-		$pwatermark = GetGP('pwatermark');
-		InitGP(array('config'), 'G');
+		$pwatermark = S::getGP('pwatermark');
+		S::gp(array('config'), 'G');
 		if ($pwatermark == 1) {
 			require_once (R_P . 'require/imgfunc.php');
 			$source = $imgdir . '/water/watermark.jpg';
@@ -217,8 +210,8 @@ if ($_POST['step'] != 2) {
 		}
 
 		//pathumb
-		$pathumb = GetGP('pathumb');
-		InitGP(array('athumbsize'), 'G');
+		$pathumb = S::getGP('pathumb');
+		S::gp(array('athumbsize'), 'G');
 		if ($pathumb == 1) {
 			require_once (R_P . 'require/imgfunc.php');
 			$source = $imgdir . '/water/watermark.jpg';
@@ -295,7 +288,7 @@ if ($_POST['step'] != 2) {
 		ifcheck($db_ifathumbgif, 'ifathumbgif');
 		$db_watermark == 1 ? $watermark_1 = 'checked' : ($db_watermark == 2 ? $watermark_2 = 'checked' : $watermark_0 = 'checked');
 		//ftp
-		@include_once (D_P . 'data/bbscache/ftp_config.php');
+		@include_once pwCache::getPath(D_P . 'data/bbscache/ftp_config.php');
 		(int) $ftp_port < 1 && $ftp_port = '21';
 		(int) $ftp_timeout < 1 && $ftp_timeout = '10';
 		ifcheck($db_ifftp, 'ifftp');
@@ -338,7 +331,7 @@ if ($_POST['step'] != 2) {
 	}
 	if ($admintype == 'reg' || $settingdb['reg']) {
 		require_once (R_P . 'require/credit.php');
-		require_once (D_P . 'data/bbscache/dbreg.php');
+		require_once pwCache::getPath(D_P . 'data/bbscache/dbreg.php');
 		$rg_rgpermit = str_replace(array('<br />', '<br>'), "", $rg_rgpermit);
 		$rg_welcomemsg = str_replace(array('<br />', '<br>'), "\n", $rg_welcomemsg);
 		$rg_whyregclose = str_replace(array('<br />', '<br>'), "\n", $rg_whyregclose);
@@ -377,113 +370,6 @@ if ($_POST['step'] != 2) {
 		$selectweek_option .= "</select>";
 		$selectweek_option = str_replace("<option value=\"" . $rg_regweek . "\">", "<option value=\"" . $rg_selectweek . "\" selected=\"SELECTED\">", $selectweek_option);
 		$rg_registertype == 1 ? $registertype_1 = 'checked' : ($rg_registertype == 2 ? $registertype_2 = 'checked' : $registertype_0 = 'checked');
-	}
-	if ($admintype == 'member' || $settingdb['member']) {
-		if (!$settingdb['member']) {
-			if ($action) {
-				Cookie('admin_member', $action);
-			} else {
-				$action = $_COOKIE['admin_member'];
-			}
-			//$action = $_COOKIE['admin_member'];
-			!$action && $action = 'post';
-		}
-		require_once (R_P . 'require/credit.php');
-		$sellset = $enhideset = $signcurtype = '';
-		foreach ($credit->cType as $key => $value) {
-			//post
-			$sellcked = in_array($key, $db_sellset['type']) ? 'CHECKED' : '';
-			$sellset .= '<li><input type="checkbox" name="sellset[type][]" value="' . $key . '" ' . $sellcked . ' /> ' . $value . '</li>';
-			$enhidechked = in_array($key, $db_enhideset['type']) ? 'CHECKED' : '';
-			$enhideset .= '<li><input type="checkbox" name="enhideset[type][]" value="' . $key . '" ' . $enhidechked . ' /> ' . $value . '</li>';
-			//face
-			if (!is_numeric($key)) {
-				if ($db_signcurtype == $key) {
-					$signcurtype .= '<option value="' . $key . '" SELECTED>' . $value . '</option>';
-				} else {
-					$signcurtype .= '<option value="' . $key . '">' . $value . '</option>';
-				}
-			}
-		}
-		//post
-		$db_cvtimes = (int) $db_cvtimes;
-		$db_postmax = (int) $db_postmax;
-		$db_postmin = (int) $db_postmin;
-		$db_selcount = (int) $db_selcount;
-		$db_titlemax = (int) $db_titlemax;
-		$db_showreplynum = (int) $db_showreplynum;
-		$db_windpost['size'] = (int) $db_windpost['size'];
-		$db_windpost['price'] = (int) $db_windpost['price'];
-		$db_windpost['income'] = (int) $db_windpost['income'];
-		$db_windpost['picwidth'] = (int) $db_windpost['picwidth'];
-		$db_windpost['picheight'] = (int) $db_windpost['picheight'];
-		ifcheck($db_tcheck, 'tcheck');
-		ifcheck($db_pwcode, 'pwcode');
-		ifcheck($db_setform, 'setform');
-		ifcheck($db_autoimg, 'autoimg');
-		ifcheck($db_windmagic, 'windmagic');
-		ifcheck($db_selectgroup, 'selectgroup');
-		ifcheck($db_replysendmail, 'replysendmail');
-		ifcheck($db_replysitemail, 'replysitemail');
-		ifcheck($db_windpost['pic'], 'windpost_pic');
-		ifcheck($db_windpost['mpeg'], 'windpost_mpeg');
-		ifcheck($db_windpost['flash'], 'windpost_flash');
-		ifcheck($db_windpost['iframe'], 'windpost_iframe');
-		ifcheck($db_windpost['checkurl'], 'windpost_checkurl');
-		//face
-		list($db_upload, $db_imglen, $db_imgwidth, $db_imgsize) = explode("\t", $db_upload);
-		list($db_fthumbwidth, $db_fthumbheight) = explode("\t", $db_fthumbsize);
-		$signgroup = '';
-		$num = 0;
-		foreach ($ltitle as $key => $value) {
-			if ($key != 1 && $key != 2) {
-				$num++;
-				$htm_tr = $num % 3 == 0 ? '' : '';
-				$signcked = strpos($db_signgroup, ",$key,") !== false ? 'CHECKED' : '';
-				$signgroup .= '<li><input type="checkbox" name="signgroup[]" value="' . $key . '" ' . $signcked . '> ' . $value . '</li>' . $htm_tr;
-			}
-		}
-		$signgroup && $signgroup = '<ul class="list_A list_120">' . $signgroup . '</ul>';
-		for ($i = 0; $i < 3; $i++) {
-			${'logintype_' . $i} = ($db_logintype & pow(2, $i)) ? 'CHECKED' : '';
-		}
-
-		$db_imglen = (int) $db_imglen;
-		$db_imgsize = (int) $db_imgsize;
-		$db_imgwidth = (int) $db_imgwidth;
-		$db_signmoney = (int) $db_signmoney;
-		$db_signheight = (int) $db_signheight;
-		$db_fthumbwidth = (int) $db_fthumbwidth;
-		$db_fthumbheight = (int) $db_fthumbheight;
-		$db_windpic['size'] = (int) $db_windpic['size'];
-		$db_windpic['picwidth'] = (int) $db_windpic['picwidth'];
-		$db_windpic['picheight'] = (int) $db_windpic['picheight'];
-
-		ifcheck($db_upload, 'upload');
-		ifcheck($db_iffthumb, 'iffthumb');
-		ifcheck($db_signwindcode, 'signwindcode');
-		ifcheck($db_windpic['pic'], 'windpic_pic');
-		ifcheck($db_windpic['flash'], 'windpic_flash');
-	}
-	if ($admintype == 'pcache' || $settingdb['pcache']) {
-		if (!$settingdb['pcache']) {
-			if ($action) {
-				Cookie('admin_pcache', $action);
-			} else {
-				$action = $_COOKIE['admin_pcache'];
-			}
-			//$action = $_COOKIE['admin_pcache'];
-			!$action && $action = 'thread';
-		}
-		//thread
-		$db_fcachenum = (int) $db_fcachenum;
-		$db_fcachetime = (int) $db_fcachetime;
-		//guest
-		$db_fguestnum = (int) $db_fguestnum;
-		$db_tguestnum = (int) $db_tguestnum;
-		$db_guestread = (int) $db_guestread;
-		$db_guestindex = (int) $db_guestindex;
-		$db_guestthread = (int) $db_guestthread;
 	}
 	if ($admintype == 'index' || $settingdb['index']) {
 		${'indexfmlogo_' . (int) $db_indexfmlogo} = 'CHECKED';
@@ -554,7 +440,7 @@ if ($_POST['step'] != 2) {
 		ifcheck($db_showcolony, 'showcolony');
 		ifcheck($db_ifonlinetime, 'ifonlinetime');
 		ifcheck($db_threadrelated, 'threadrelated');
-
+		ifcheck($db_sharesite, 'sharesite');
 	}
 	if ($admintype == 'email' || $settingdb['email']) {
 		if (!$settingdb['email']) {
@@ -566,7 +452,7 @@ if ($_POST['step'] != 2) {
 			//$action = $_COOKIE['admin_email'];
 			!$action && $action = 'email';
 		}
-		include_once (D_P . 'data/bbscache/mail_config.php');
+		include_once pwCache::getPath(D_P . 'data/bbscache/mail_config.php');
 		//mail
 		${'mailmethod_' . (int) $ml_mailmethod} = 'CHECKED';
 		$ml_smtppass = substr($ml_smtppass, 0, 1) . '********' . substr($ml_smtppass, -1);
@@ -659,13 +545,13 @@ if ($_POST['step'] != 2) {
 
 } else {
 
-	InitGP(array('config','siteName'), 'P', 0);
+	S::gp(array('config','siteName'), 'P', 0);
 	if (!pwWritable(D_P . 'data/bbscache/config.php') && !chmod(D_P . 'data/bbscache/config.php', 0777)) {
 		adminmsg('config_777');
 	}
 	if ($admintype == 'basic' || $settingdb['basic']) {
-		InitGP(array('visitgroup', 'postctl', 'schctl', 'cajax'), 'P', 2);
-		InitGP(array('siteName'));
+		S::gp(array('visitgroup', 'postctl', 'schctl', 'cajax'), 'P', 2);
+		S::gp(array('siteName'));
 		foreach ((array) $siteName as $key => $value) {
 			if ($key == 'bbs') {
 				$config['bbsname'] = $value;
@@ -676,6 +562,8 @@ if ($_POST['step'] != 2) {
 		}
 
 		//state
+		$config['adminreason'] = strip_tags($config['adminreason']);
+		$config['admingradereason'] = strip_tags($config['admingradereason']);
 		$config['visitmsg'] = ieconvert($config['visitmsg']);
 		$config['whybbsclose'] = ieconvert($config['whybbsclose']);
 		$postctl['poststart'] > 23 && $postctl['poststart'] = 0;
@@ -702,7 +590,7 @@ if ($_POST['step'] != 2) {
 				$config['datefm'] = str_replace('d', 'j', $config['datefm']);
 			}
 			$config['datefm'] = str_replace(array('yyyy', 'yy'), array('Y', 'y'), $config['datefm']);
-			$config['datefm'] .= GetGP('time_f', 'P') == '12' ? ' h:i A' : ' H:i';
+			$config['datefm'] .= S::getGP('time_f', 'P') == '12' ? ' h:i A' : ' H:i';
 		} else {
 			$config['datefm'] = 'Y-n-j H:i';
 		}
@@ -712,25 +600,57 @@ if ($_POST['step'] != 2) {
 		unset($postctl, $schctl, $cajax);
 	}
 	if ($admintype == 'safe' || $settingdb['safe']) {
-		InitGP(array('answer'), 'P');
-		InitGP(array('question'), 'P', 0);
-		InitGP(array('safegroup', 'gdcheck', 'gdstyle', 'gdsize', 'qcheck'), 'P', 2);
+		S::gp(array('answer'), 'P');
+		S::gp(array('question'), 'P', 0);
+		S::gp(array('safegroup', 'gdcheck', 'ckquestion', 'gdcontent', 'gdstyle', 'gdsize', 'qcheck','imagequestion'), 'P', 2);
 		//speed
 		$config['onlinelmt'] = (int) $config['onlinelmt'] > 0 ? intval($config['onlinelmt']) : 0;
 		$config['obstart'] = (int) $config['obstart'] > 9 ? 9 : intval($config['obstart']);
+		$config['classfile_compress'] = $config['classfile_compress'] ? 1 : 0;
+		$config['cachefile_compress'] = $config['cachefile_compress'] ? 1 : 0;
+		$_packService = pwPack::getPackService ();
+		// 清除类库压缩文件
+		//$_packService->flushClassFiles();
+		// 对类库进行打包
+		if ($config['classfile_compress']){
+			if (! $_packService->packClassFiles ()){
+				adminmsg('抱歉,类库打包失败,请检查/data/package目录是否存在且有写权限');;			
+			}
+		}else {
+			$_packService->flushClassFiles();
+		}
+		// 清除data目录下的缓存文件的压缩包
+		$_packService->flushCacheFiles();
+		$config['filecache_to_memcache'] = $config['filecache_to_memcache'] ? 1 : 0;
+		$config['unique_strategy'] = in_array($config['unique_strategy'], array('db','memcache', 'apc')) ? $config['unique_strategy'] : 'db';
+		if ($config['unique_strategy'] != 'db'){
+			if($config['unique_strategy'] == 'memcache' && !(class_exists("Memcache") && $db_memcache['isopen'])){
+			   	adminmsg('错误，请检测Memcache是否正常运行');
+			}
+			if($config['unique_strategy'] == 'apc' && !(extension_loaded('apc') && function_exists('apc_store'))){
+				adminmsg('错误，请检测APC是否正常运行');
+			}
+			$uniqueService = L::loadClass ('unique', 'utility');
+			$uniqueService->clear($config['unique_strategy']);							
+		}
 		//gdcode
 		$config['gdsize'] = implode("\t", $gdsize);
 		$config['safegroup'] = $safegroup ? ',' . implode(',', $safegroup) . ',' : '';
-		$config['qcheck'] = $qcheck['regq'] . "\t" . $qcheck['loginq'] . "\t" . $qcheck['postq'] . "\t" . $qcheck['msgq']."\t".$qcheck['showq'];
+		//$config['qcheck'] = $qcheck['regq'] . "\t" . $qcheck['loginq'] . "\t" . $qcheck['postq'] . "\t" . $qcheck['msgq']."\t".$qcheck['showq'];
+		$config['qcheck'] = $qcheck['postq'] . "\t" .$qcheck['showq'];
 		$config['gdcheck'] = !empty($gdcheck) ? intval(array_sum($gdcheck)) : 0;
+		$config['ckquestion'] = !empty($ckquestion) ? intval(array_sum($ckquestion)) : 0;
+		$config['imagequestion'] = !empty($imagequestion) ? intval($imagequestion) : 0;
 		$config['gdstyle'] = !empty($gdstyle) ? intval(array_sum($gdstyle)) : 0;
+		$config['gdcontent'] = is_array($gdcontent)?$gdcontent:array();
 		$q_array = $a_array = array();
 		if (is_array($question) && is_array($answer)) {
 			foreach ($question as $key => $value) {
 				$value = trim($value);
+				$key = intval($key);
 				if ($value) {
-					$q_array[] = stripslashes($value);
-					$a_array[] = stripslashes($answer[$key]);
+					$q_array[$key] = stripslashes($value);
+					$a_array[$key] = stripslashes($answer[$key]);
 				}
 			}
 		}
@@ -793,7 +713,7 @@ if ($_POST['step'] != 2) {
 			$config['autochange'] = 0;
 		}
 		//safe
-		$config['iplimit'] = trim($config['iplimit'], ',');
+		$config['iplimit'] = Char_cv($config['iplimit']);
 		if (!$config['registerfile']) {
 			if (file_exists('register.php')) {
 				$config['registerfile'] = 'register.php';
@@ -839,8 +759,8 @@ if ($_POST['step'] != 2) {
 	}
 	if ($admintype == 'att' || $settingdb['att']) {
 		//att
-		InitGP(array('filetype', 'ftp'), 'P');
-		InitGP(array('maxsize', 'athumbsize'), 'P', 2);
+		S::gp(array('filetype', 'ftp'), 'P');
+		S::gp(array('maxsize', 'athumbsize'), 'P', 2);
 
 		$uploadfiletype = array();
 		foreach ($filetype as $key => $value) {
@@ -853,16 +773,16 @@ if ($_POST['step'] != 2) {
 			$config['watermark'] = 0;
 		}
 		$config['athumbsize'] = $athumbsize['athumbwidth'] . "\t" . $athumbsize['athumbheight'];
-		@include_once (D_P . 'data/bbscache/ftp_config.php');
+		@include_once pwCache::getPath(D_P . 'data/bbscache/ftp_config.php');
 		if ($ftp['pass'] == substr($ftp_pass, 0, 1) . '********' . substr($ftp_pass, -1)) {
 			$ftp['pass'] = $ftp_pass;
 		}
 	}
 	if ($admintype == 'credit' || $settingdb['credit']) {
 		require_once (R_P . 'require/credit.php');
-		InitGP(array('creditpay', 'creditset', 'credit_name', 'credit_unit', 'credit_desc', 'cdiy_name', 'cdiy_unit',
+		S::gp(array('creditpay', 'creditset', 'credit_name', 'credit_unit', 'credit_desc', 'cdiy_name', 'cdiy_unit',
 			'cdiy_desc', 'cname1', 'cname2'), 'P');
-		InitGP(array('creditlog', 'ccifopen', 'ccselid', 'cnum1', 'cnum2', 'cifopen'), 'P', 2);
+		S::gp(array('creditlog', 'ccifopen', 'ccselid', 'cnum1', 'cnum2', 'cifopen'), 'P', 2);
 		$config['creditset'] = $config['creditpay'] = $config['creditlog'] = '';
 
 		$rt = $db->get_one("SELECT db_value FROM pw_config WHERE db_name='jf_A'");
@@ -889,9 +809,9 @@ if ($_POST['step'] != 2) {
 		}
 		$value = serialize($jf_A);
 		if ($rt) {
-			$db->update("UPDATE pw_config SET db_value=" . pwEscape($value, false) . " WHERE db_name='jf_A'");
+			$db->update("UPDATE pw_config SET db_value=" . S::sqlEscape($value, false) . " WHERE db_name='jf_A'");
 		} else {
-			$db->update("INSERT INTO pw_config SET db_name='jf_A',db_value=" . pwEscape($value, false));
+			$db->update("INSERT INTO pw_config SET db_name='jf_A',db_value=" . S::sqlEscape($value, false));
 		}
 
 		$delcid = array();
@@ -899,12 +819,12 @@ if ($_POST['step'] != 2) {
 			if (!isset($credit_name[$key])) {
 				$delcid[] = $key;
 			} elseif ($credit_name[$key] && ($value[0] != $credit_name[$key] || $value[1] != $credit_unit[$key] || $value[2] != $credit_desc[$key])) {
-				$db->update("UPDATE pw_credits SET " . pwSqlSingle(array('name' => $credit_name[$key],
-					'unit' => $credit_unit[$key], 'description' => $credit_desc[$key])) . " WHERE cid=" . pwEscape($key));
+				$db->update("UPDATE pw_credits SET " . S::sqlSingle(array('name' => $credit_name[$key],
+					'unit' => $credit_unit[$key], 'description' => $credit_desc[$key])) . " WHERE cid=" . S::sqlEscape($key));
 			}
 		}
 		if (!empty($delcid)) {
-			$delcid = pwImplode($delcid);
+			$delcid = S::sqlImplode($delcid);
 			$config['showcustom'] = array();
 			foreach ($db_showcustom as $value) {
 				strpos($delcid, "'$value'") === false && $config['showcustom'][] = $value;
@@ -919,7 +839,7 @@ if ($_POST['step'] != 2) {
 					$pwSQL[] = array($value, $cdiy_unit[$key], $cdiy_desc[$key]);
 				}
 			}
-			$pwSQL && $db->update("INSERT INTO pw_credits (name,unit,description) VALUES " . pwSqlMulti($pwSQL));
+			$pwSQL && $db->update("INSERT INTO pw_credits (name,unit,description) VALUES " . S::sqlMulti($pwSQL));
 		}
 		if (is_array($creditset) && !empty($creditset)) {
 			foreach ($creditset as $key => $value) {
@@ -947,9 +867,9 @@ if ($_POST['step'] != 2) {
 		if (!pwWritable(D_P . 'data/bbscache/dbreg.php') && !chmod(D_P . 'data/bbscache/dbreg.php', 0777)) {
 			adminmsg('dbreg_777');
 		}
-		InitGP(array('reg'), 'P', 0);
+		S::gp(array('reg'), 'P', 0);
 
-		InitGP(array('namelen', 'pwdlen', 'regcredit'), 'P', 2);
+		S::gp(array('namelen', 'pwdlen', 'regcredit'), 'P', 2);
 		$reg['email'] = trim($reg['email'], ',');
 		$reg['banemail'] = trim($reg['banemail'], ',');
 		$reg['banname'] = trim($reg['banname'], ',');
@@ -987,31 +907,9 @@ if ($_POST['step'] != 2) {
 		}
 		unset($namelen, $pwdlen, $regcredit);
 	}
-	if ($admintype == 'member' || $settingdb['member']) {
-		InitGP(array('sellset', 'enhideset'), 'P');
-		InitGP(array('windpost', 'upload', 'signgroup', 'logintype', 'fthumbsize', 'windpic'), 'P', 2);
-		//post
-		$config['sellset'] = is_array($sellset) ? $sellset : array();
-		$config['windpic'] = is_array($windpic) ? $windpic : array();
-		$config['windpost'] = is_array($windpost) ? $windpost : array();
-		$config['windpost']['checkurl'] = $db_windpost['checkurl'];
-		$config['enhideset'] = is_array($enhideset) ? $enhideset : array();
-		(int) $config['postmax'] < 1 && $config['postmax'] = 50000;
-		//face
-		$upload['imglen'] < 1 && $upload['imglen'] = 160;
-		$upload['imgsize'] < 1 && $upload['imgsize'] = 20;
-		$upload['imgwidth'] < 1 && $upload['imgwidth'] = 160;
-		$config['logintype'] = intval(array_sum($logintype));
-		$config['signgroup'] = $signgroup ? ',' . implode(',', $signgroup) . ',' : '';
-		$config['fthumbsize'] = $fthumbsize['fthumbwidth'] . "\t" . $fthumbsize['fthumbheight'];
-		$config['upload'] = $upload['upload'] . "\t" . $upload['imglen'] . "\t" . $upload['imgwidth'] . "\t" . $upload['imgsize'];
-	}
-	if ($admintype == 'pcache' || $settingdb['pcache']) {
-		//guest
-		substr($config['guestdir'], -1) == '/' && $config['guestdir'] = substr($config['guestdir'], 0, -1);
-	}
+
 	if ($admintype == 'index' || $settingdb['index']) {
-		InitGP(array('gpshow', 'gporder'), 'P', 2);
+		S::gp(array('gpshow', 'gporder'), 'P', 2);
 		if (is_array($gpshow)) {
 			$showgroup = array();
 			foreach ($gpshow as $key => $value) {
@@ -1028,8 +926,8 @@ if ($_POST['step'] != 2) {
 		(int) $config['perpage'] < 1 && $config['perpage'] = 25;
 	}
 	if ($admintype == 'read' || $settingdb['read']) {
-		InitGP(array('showcustom'), 'P');
-		InitGP(array('floorname'), 'P');
+		S::gp(array('showcustom'), 'P');
+		S::gp(array('floorname'), 'P');
 		(int) $config['readperpage'] < 1 && $config['readperpage'] = 10;
 		$config['anonymousname'] = str_replace(array('<', '>'), array('&lt;', '&gt;'), $config['anonymousname']);
 		$config['showcustom'] = $showcustom ? (array) $showcustom : array();
@@ -1060,8 +958,8 @@ if ($_POST['step'] != 2) {
 		$config['floorname'] = is_array($floors) ? $floors : array();
 	}
 	if ($admintype == 'email' || $settingdb['email']) {
-		InitGP(array('mail', 'ajaxaction', 'toemail', 'fromemail', 'sitemsg'), 'P');
-		InitGP(array('wapfids'), 'P', 2);
+		S::gp(array('mail', 'ajaxaction', 'toemail', 'fromemail', 'sitemsg'), 'P');
+		S::gp(array('wapfids'), 'P', 2);
 		if ($ajaxaction == 'emailcheck') {
 			require_once (R_P . 'require/sendemail.php');
 			$sendinfo = sendemail($toemail, 'emailcheck_subject', 'emailcheck_content');
@@ -1072,7 +970,7 @@ if ($_POST['step'] != 2) {
 			}
 		} else {
 			//mail
-			@include_once (D_P . 'data/bbscache/mail_config.php');
+			@include_once pwCache::getPath(D_P . 'data/bbscache/mail_config.php');
 			$s_ml_smtppass = substr($ml_smtppass, 0, 1) . '********' . substr($ml_smtppass, -1);
 			$mail['smtppass'] = $s_ml_smtppass == $mail['smtppass'] ? $ml_smtppass : $mail['smtppass'];
 			(int) $mail['smtpport'] < 1 && $mail['smtpport'] = 25;
@@ -1091,7 +989,7 @@ if ($_POST['step'] != 2) {
 		}
 	}
 	if ($admintype == 'popinfo' || $settingdb['popinfo']) {
-		InitGP(array('sitemsg'), 'P');
+		S::gp(array('sitemsg'), 'P');
 		$config['bindurl'] = trim($config['bindurl'], ',');
 		$sitemsg['reg'] = explode("\n", $sitemsg['reg']);
 		$sitemsg['login'] = explode("\n", $sitemsg['login']);
@@ -1100,11 +998,11 @@ if ($_POST['step'] != 2) {
 		$config['sitemsg'] = is_array($sitemsg) ? $sitemsg : array();
 	}
 	if ($admintype == 'wap' || $settingdb['wap']) {
-		InitGP(array('wapfids'), 'P');
+		S::gp(array('wapfids'), 'P');
 		$config['wapfids'] = implode(',', $wapfids);
 	}
 	if ($admintype == 'searcher' || $settingdb['searcher']) {
-		InitGP(array('schctl'));
+		S::gp(array('schctl'));
 		$schctl['schstart'] > 23 && $schctl['schstart'] = 0;
 		$schctl['schend'] > 23 && $schctl['schend'] = 0;
 		$config['opensch'] = $schctl['opensch'] . "\t" . $schctl['schstart'] . "\t" . $schctl['schend'];
@@ -1123,45 +1021,15 @@ if ($_POST['step'] != 2) {
 			$config['filterids'] = implode(',',$filterids);
 		}
 	}
-	$configdb = array();
-	$temppre = array('config' => 'db_', 'ftp' => 'ftp_', 'reg' => 'rg_', 'mail' => 'ml_');
-	foreach ($temppre as $key => $pre) {
-		$key_a = ${$key};
-		if (is_array($key_a)) {
-			foreach ($key_a as $k => $value) {
-				$var = $pre . $k;
-				$vtype = 'string';
-				if (is_array($value)) {
-					$vtype = 'array';
-					$value = serialize($value);
-				}
-				$configdb[$var] = array($var, $vtype, $value);
-			}
-		}
+	
+	saveConfig();
+	if (!empty($ftp)) {
+		updatecache_ftp();
 	}
-	if (!empty($configdb)) {
-		$names = array_keys($configdb);
-		$query = $db->query('SELECT db_name,vtype,db_value FROM pw_config WHERE db_name IN (' . pwImplode($names, false) . ')');
-		while ($rt = $db->fetch_array($query)) {
-			if (isset($configdb[$rt['db_name']])) {
-				if ($rt['db_value'] != $configdb[$rt['db_name']]) {
-					$db->update("UPDATE pw_config SET " . pwSqlSingle(array(
-						'db_value' => $configdb[$rt['db_name']][2], 'vtype' => $configdb[$rt['db_name']][1])) . ' WHERE db_name=' . pwEscape($rt['db_name']));
-				}
-				$configdb[$rt['db_name']] = '';
-			}
-		}
-		$db->free_result($query);
-		$pwSqlMulti = pwSqlMulti($configdb);
-		$pwSqlMulti && $db->update('INSERT INTO pw_config (db_name,vtype,db_value) VALUES' . $pwSqlMulti);
-		updatecache_c();
-		if (!empty($ftp)) {
-			updatecache_ftp();
-		}
-		if (!empty($mail)) {
-			updatecache_ml();
-		}
+	if (!empty($mail)) {
+		updatecache_ml();
 	}
+	
 	if($adminFileChanged){
 		/*@fix 更改admin_file后引起的的404错误 */
 		echo '<script language="JavaScript">parent.location.href = "'.$config['adminfile'].'";</script>';

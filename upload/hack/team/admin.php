@@ -6,7 +6,7 @@ $rt = $db->get_one("SELECT ifopen,nexttime FROM pw_plan WHERE filename='team'");
 if (empty($action)) {
 
 	require_once(R_P.'require/credit.php');
-	@include_once(D_P.'data/bbscache/tm_config.php');
+	@include_once pwCache::getPath(D_P.'data/bbscache/tm_config.php');
 	ifcheck($rt['ifopen'],'ifopen');
 	ifcheck($_tmconf['ifmsg'],'ifmsg');
 	ifcheck($_tmconf['arouse'],'arouse');
@@ -23,7 +23,7 @@ if (empty($action)) {
 } elseif ($action == 'sort') {
 
 	require_once(R_P.'require/credit.php');
-	@include_once(D_P.'data/bbscache/tm_config.php');
+	@include_once pwCache::getPath(D_P.'data/bbscache/tm_config.php');
 
 	$hours	 = gmdate('G',$timestamp+$db_timedf*3600);
 	$tdtime	 = PwStrtoTime(get_date($timestamp,'Y-m-d'));
@@ -31,7 +31,7 @@ if (empty($action)) {
 
 	$gids = 0;
 	if (!empty($_tmconf['group'])) {
-		$gids = pwImplode($_tmconf['group']);
+		$gids = S::sqlImplode($_tmconf['group']);
 	}
 	$admindb = array();
 	$query = $db->query("SELECT m.uid,m.username,m.groupid,md.monthpost,md.monoltime,md.lastvisit,md.lastpost FROM pw_members m LEFT JOIN pw_memberdata md USING(uid) WHERE groupid IN($gids) ORDER BY groupid");
@@ -47,7 +47,7 @@ if (empty($action)) {
 			'total'		=> 0
 		);
 	}
-	$query = $db->query("SELECT COUNT(*) AS count,username2 AS manager FROM pw_adminlog WHERE timestamp>".pwEscape($montime)."GROUP BY username2");
+	$query = $db->query("SELECT COUNT(*) AS count,username2 AS manager FROM pw_adminlog WHERE timestamp>".S::sqlEscape($montime)."GROUP BY username2");
 
 	while ($rs = $db->fetch_array($query)) {
 		if (isset($admindb[$rs['manager']])) {
@@ -67,7 +67,7 @@ if (empty($action)) {
 
 } elseif ($_POST['action'] == 'set') {
 
-	InitGP(array('set','ifopen'));
+	S::gp(array('set','ifopen'));
 
 	$set['msgtitle'] = stripslashes($set['msgtitle']);
 	foreach ($set['wages'] as $k=>$value) {
@@ -76,7 +76,7 @@ if (empty($action)) {
 		}
 	}
 	$set = serialize($set);
-	$db->Update("REPLACE INTO pw_hack SET hk_name='tm_setting',hk_value=".pwEscape($set,false));
+	$db->Update("REPLACE INTO pw_hack SET hk_name='tm_setting',hk_value=".S::sqlEscape($set,false));
 
 	updatecache_tm();
 
@@ -84,7 +84,7 @@ if (empty($action)) {
 		if ($ifopen && $rt['nexttime'] < $timestamp) {
 			adminmsg('请先到计划任务中开启“管理团队工资发放”');
 		}
-		$db->Update("UPDATE pw_plan SET ifopen=".pwEscape($ifopen)."WHERE filename='team'");
+		$db->Update("UPDATE pw_plan SET ifopen=".S::sqlEscape($ifopen)."WHERE filename='team'");
 		updatecache_plan();
 	}
 
@@ -92,8 +92,8 @@ if (empty($action)) {
 
 } elseif ($_POST['action'] == 'payoff') {
 
-	InitGP(array('paycredit','arouse'));
-	@include_once(D_P.'data/bbscache/tm_config.php');
+	S::gp(array('paycredit','arouse'));
+	@include_once pwCache::getPath(D_P.'data/bbscache/tm_config.php');
 	require_once(R_P.'require/credit.php');
 
 	$gids = array(0);
@@ -107,8 +107,8 @@ if (empty($action)) {
 		$admindb[$rt['uid']] = $rt['username'];
 	}
 	$datef	 = get_date($timestamp,'Y - m');
-	$msgdata = Char_cv($_tmconf['msgdata']);
-	$arousemsg = Char_cv($_tmconf['arousemsg']);
+	$msgdata = S::escapeChar($_tmconf['msgdata']);
+	$arousemsg = S::escapeChar($_tmconf['arousemsg']);
 
 	foreach ($paycredit as $uid => $value) {
 		$addcredit = '';
@@ -138,6 +138,6 @@ function updatecache_tm() {
 	global $db;
 	$rs = $db->get_one("SELECT hk_value FROM pw_hack WHERE hk_name='tm_setting'");
 	$ar = (array)unserialize($rs['hk_value']);
-	writeover(D_P.'data/bbscache/tm_config.php',"<?php\r\n\$_tmconf=".pw_var_export($ar).";\r\n?>");
+	pwCache::setData(D_P.'data/bbscache/tm_config.php',"<?php\r\n\$_tmconf=".pw_var_export($ar).";\r\n?>");
 }
 ?>

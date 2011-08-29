@@ -2,7 +2,7 @@
 define('SCR','sendpwd');
 require_once('global.php');
 require_once(R_P.'require/header.php');
-InitGP(array('action'));
+S::gp(array('action'));
 
 $action != 'getback' && $action = 'sendpwd';
 if ($action=='sendpwd') {
@@ -10,7 +10,7 @@ if ($action=='sendpwd') {
 		require_once(PrintEot('sendpwd'));footer();
 	} else {
 		PostCheck(0,$db_gdcheck & 16);
-		InitGP(array('pwuser', 'email', 'question', 'customquest', 'answer'));
+		S::gp(array('pwuser', 'email', 'question', 'customquest', 'answer'));
 		
 		$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
 		$userarray = $userService->getByUserName($pwuser);
@@ -54,8 +54,8 @@ if ($action=='sendpwd') {
 	}
 }
 if ($action=='getback') {
-	InitGP(array('pwuser', 'submit', 'st'));
-	if (CkInArray($pwuser,$manager) || !$submit || !$st) {
+	S::gp(array('pwuser', 'submit', 'st'));
+	if (S::inArray($pwuser,$manager) || !$submit || !$st) {
 		Showmsg('undefined_action',1);
 	}
 	$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
@@ -70,7 +70,7 @@ if ($action=='getback') {
 				if (empty($_POST['jop'])) {
 					require_once PrintEot('getpwd');footer();
 				} else {
-					InitGP(array('new_pwd','pwdreapt'));
+					S::gp(array('new_pwd','pwdreapt'));
 					if (!$new_pwd || $new_pwd!=$pwdreapt) {
 						Showmsg('password_confirm',1);
 					} else {

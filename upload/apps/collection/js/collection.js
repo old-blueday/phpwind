@@ -8,7 +8,7 @@ var collection = {
 		var link = form.link.value;
 		var preg = /^http\:\/\/.{4,255}$/;
 		if (!preg.test(link)) {
-			this._showMessage('error','链接地址出错，链接地址必须以:http://开头');
+			this._showMessage('error','链接地址出错，链接地址必须以http://开头');
 			return false;
 		}
 		form.submit();
@@ -70,7 +70,8 @@ function showCollection(type,hash,obj,id){
 				break;
 			case 'flash':
 				if (hash.match(/\.swf\??.*$/i)) {
-					var vObject = '<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=7,0,19,0" width="480" height="400"><param name="movie" value="'+hash+'" /><param name="quality" value="high" /><param name="bgcolor" value="#FFFFFF" /><embed width="480" height="400" menu="false" quality="high" src="'+hash+'" type="application/x-shockwave-flash" /></object>';
+					var vObject = '<object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" codebase=" http://fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=10,0,0,0" width="480" height="400"><param name="movie" value="'+hash+'" /><embed width="480" height="400" menu="false" quality="high" src="'+hash+'" type="application/x-shockwave-flash" /></object>';
+					//var vObject = '<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=7,0,19,0" width="480" height="400"><param name="movie" value="'+hash+'" /><param name="quality" value="high" /><param name="bgcolor" value="#FFFFFF" /><embed width="480" height="400" menu="false" quality="high" src="'+hash+'" type="application/x-shockwave-flash" /></object>';
 				} else {
 					alert('type_error');
 					return false;
@@ -113,3 +114,18 @@ function showCollection(type,hash,obj,id){
 	}
 	obj.style.display = 'none';
 }
+
+//自定义类型配置配置
+function getCollectionTypeConfig() {
+	this.createUrl = "apps.php?q=ajax&a=addcollecttype";
+	this.delUrl = "apps.php?q=ajax&a=delcollecttype";
+	this.upUrl = "apps.php?q=ajax&a=editcollecttype";
+}
+var typeConfig = new getCollectionTypeConfig();
+
+
+
+
+
+
+

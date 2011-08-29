@@ -1,0 +1,29 @@
+<!--<?php
+$$info_type = 'class="current"';
+print <<<EOT
+--> 
+<div class="navC">
+                    <ul id="infolist">
+						<li id="base" $base><a href="profile.php?action=modify&info_type=base" hidefocus="true">基本资料</a></li>
+						<li id="link" $link><a href="profile.php?action=modify&info_type=link" hidefocus="true">联系方式</a></li>
+						<li id="face" $face><a href="profile.php?action=modify&info_type=face" hidefocus="true">修改头像</a></li>
+						<li id="safe" $safe><a href="profile.php?action=modify&info_type=safe" hidefocus="true">密码安全</a></li>
+<!--
+EOT;
+if ($_G['userbinding'] || $ubinding) {print <<<EOT
+-->
+						<li id="binding" $binding><a href="profile.php?action=modify&info_type=binding" hidefocus="true">多帐号绑定</a></li>
+<!--
+EOT;
+}if ($customfield) {print <<<EOT
+-->
+						<li id="other" $other><a href="profile.php?action=modify&info_type=other" hidefocus="true">扩展资料</a></li>
+<!--
+EOT;
+}print <<<EOT
+-->
+                    </ul>
+                </div>
+<!--
+EOT;
+?>-->

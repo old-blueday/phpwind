@@ -10,7 +10,7 @@
 file_exists('install.php') && header('Location: ./install.php');
 
 error_reporting(E_ERROR | E_PARSE);
-set_magic_quotes_runtime(0);
+function_exists('set_magic_quotes_runtime') && set_magic_quotes_runtime(0);
 function_exists('date_default_timezone_set') && date_default_timezone_set('Etc/GMT+0');
 
 define('R_P',getdirname(__FILE__));
@@ -22,10 +22,14 @@ defined('SCR') || define('SCR','other');
 $P_S_T	 = pwMicrotime();
 require_once(R_P.'require/common.php');
 S::filter();
-require_once(D_P.'data/bbscache/config.php');
+require_once pwCache::getPath(D_P.'data/bbscache/baseconfig.php',false,false);
+require_once pwCache::getPath(D_P.'data/bbscache/config.php',true);
+
 
 define('AREA_PATH', R_P . $db_htmdir . '/channel/');
 define('PORTAL_PATH', R_P . $db_htmdir . '/portal/');
+$db_userurl = ($db_htmifopen && $db_userurlopen) ? 'u/' : 'u.php?uid='; //url
+define('USER_URL',$db_userurl);
 
 $db_debug && error_reporting(E_ALL ^ E_NOTICE ^ E_DEPRECATED);
 $timestamp = time();
@@ -57,27 +61,27 @@ if ($db_dir && $db_ext) {
 
 foreach ($_POST as $_key => $_value) {
 	if (!in_array($_key,array('atc_content','atc_title','prosign','pwuser','pwpwd'))) {
-		CheckVar($_POST[$_key]);
+		S::checkVar($_POST[$_key]);
 	}
 }
 foreach ($_GET as $_key => $_value) {
-	CheckVar($_GET[$_key]);
+	S::checkVar($_GET[$_key]);
 }
 
 list($wind_version,$wind_repair,$wind_from) = explode(',',WIND_VERSION);
 $db_olsize    = 96;
 
-if (false !== ($dirstrpos = strpos($pwServer['PHP_SELF'],$db_dir))) {
-	$tmp = substr($pwServer['PHP_SELF'],0,$dirstrpos);
+if (false !== ($dirstrpos = strpos($pwServer['SCRIPT_NAME'],$db_dir))) {
+	$tmp = substr($pwServer['SCRIPT_NAME'],0,$dirstrpos);
 	$pwServer['PHP_SELF'] = "$tmp.php";
 	unset($dirstrpos);
 } else {
-	$tmp = $pwServer['PHP_SELF'];
+	$tmp = $pwServer['SCRIPT_NAME'];
 }
 $REQUEST_URI = $pwServer['PHP_SELF'].($pwServer['QUERY_STRING'] ? '?'.$pwServer['QUERY_STRING'] : '');
 
 $_mainUrl = $index_url = $db_bbsurl;
-$R_url = $db_bbsurl = Char_cv("http://".$pwServer['HTTP_HOST'].substr($tmp,0,strrpos($tmp,'/')));
+$R_url = $db_bbsurl = S::escapeChar("http://".$pwServer['HTTP_HOST'].substr($tmp,0,strrpos($tmp,'/')));
 defined('SIMPLE') && SIMPLE && $db_bbsurl = substr($db_bbsurl,0,-7);
 $defaultMode = empty($db_mode) ? 'bbs' : $db_mode;
 $db_mode = 'bbs';
@@ -92,10 +96,10 @@ if ($cookie_lastvisit = GetCookie('lastvisit')) {
 	Cookie('lastvisit',$c_oltime."\t".$timestamp."\t".$REQUEST_URI);
 }
 
-InitGP(array('fid','tid'),'GP',2);
+S::gp(array('fid','tid'),'GP',2);
 $db = $ftp = $credit = null;
 
-require_once(D_P.'data/sql_config.php');
+require_once pwCache::getPath(D_P.'data/sql_config.php');
 !is_array($manager) && $manager = array();
 $newmanager = array();
 foreach ($manager as $key => $value) {
@@ -182,7 +186,7 @@ if (is_numeric($winduid) && strlen($windpwd)>=16) {
 	if ($credit_pop && $db_ifcredit) {//Credit Changes Tips
 		$credit_pop = str_replace(array('&lt;','&quot;','&gt;'),array('<','"','>'),$credit_pop);
 		$creditdb = explode('|',$credit_pop);
-		$credit_pop = Char_cv(GetCreditLang('creditpop',$creditdb['0']));
+		$credit_pop = S::escapeChar(GetCreditLang('creditpop',$creditdb['0']));
 
 		unset($creditdb['0']);
 		foreach ($creditdb as $val) {
@@ -218,15 +222,12 @@ if ($db_ifsafecv && !$safecv && !defined('PRO') && strpos($db_safegroup,",$group
 	Showmsg('safecv_prompt');
 }
 
-include_once(D_P.'data/bbscache/inv_config.php');
-if ($inv_linkopen && $inv_linktype=='1' && !$windid && (is_numeric($_GET['uid']) || ($_GET['a'] && strlen($_GET['a'])<16)) && strpos($pwServer['HTTP_REFERER'],$pwServer['HTTP_HOST'])===false) {
-	InitGP(array('uid','a'));
-	Cookie('userads',"$uid\t$a\t".md5($pwServer['HTTP_REFERER']));
-} elseif ($inv_linkopen && $inv_linktype=='0' && is_numeric($_GET['uid'])) {
-	InitGP(array('uid'));
-	if ((int)$uid>0) {
-		require_once(R_P.'require/userads.php');
-	}
+include_once pwCache::getPath(D_P.'data/bbscache/inv_config.php',true);
+if ($inv_linkopen && !$windid && (is_numeric($_GET['u']) || ($_GET['a'] && strlen($_GET['a'])<16)) && strpos($pwServer['HTTP_REFERER'],$pwServer['HTTP_HOST']) === false) {
+	S::gp(array('u','a'));
+	Cookie('userads',"$u\t$a\t".md5($pwServer['HTTP_REFERER']));
+} elseif ($inv_linkopen && $inv_linktype == '0' && GetCookie('userads')) {
+	require_once(R_P.'require/userads.php');
 }
 unset($u,$a,$cookie_userads);
 
@@ -258,14 +259,14 @@ if ($groupid == 'guest' && $db_guestdir && GetGcache()) {
 PwNewDB();
 unset($db_whybbsclose,$db_whycmsclose,$db_ipban,$db_diy,$dbhost,$dbuser,$dbpw,$dbname,$pconnect,$manager_pwd,$newmanager);
 if ($groupid == 'guest') {
-	require_once(D_P.'data/groupdb/group_2.php');
+	require_once pwCache::getPath(D_P.'data/groupdb/group_2.php');
 } elseif (file_exists(D_P."data/groupdb/group_$groupid.php")) {
-	require_once Pcv(D_P."data/groupdb/group_$groupid.php");
+	require_once pwCache::getPath(S::escapePath(D_P."data/groupdb/group_$groupid.php"));
 } else {
-	require_once(D_P.'data/groupdb/group_1.php');
+	require_once pwCache::getPath(D_P.'data/groupdb/group_1.php');
 }
 visitRightByGroup();
-if ($_G['pwdlimitime'] && !defined('PRO') && !CkInArray($windid,$manager) && $timestamp-86400*$_G['pwdlimitime']>$winddb['pwdctime'] ) {
+if ($_G['pwdlimitime'] && !defined('PRO') && !S::inArray($windid,$manager) && $timestamp-86400*$_G['pwdlimitime']>$winddb['pwdctime'] ) {
 	Showmsg('pwdchange_prompt');
 }
 
@@ -351,12 +352,12 @@ function Showmsg($msg_info, $dejump = 0) {
 	$showlogin = false;
 	if ($dejump != '1' && $groupid == 'guest' && $REQUEST_URI == str_replace(array('register', 'login'), '', $REQUEST_URI) && (!$db_pptifopen || $db_ppttype != 'client')) {
 		if (strpos($REQUEST_URI, 'post.php') !== false || strpos($REQUEST_URI, 'job.php?action=vote') !== false || strpos($REQUEST_URI, 'job.php?action=pcjoin') !== false) {
-			$tmpTid = (int) GetGP('tid', 'GP');
+			$tmpTid = (int) S::getGP('tid', 'GP');
 			$tmpTid && $REQUEST_URI = substr($REQUEST_URI, 0, strrpos($REQUEST_URI, '/')) . "/read.php?tid=$tmpTid&toread=1";
 		}
 		$jumpurl = "http://" . $pwServer['HTTP_HOST'] . $REQUEST_URI;
-		list(, $qcheck) = explode("\t", $db_qcheck);
-		$qkey = $qcheck && $db_question ? array_rand($db_question) : '';
+		//list(, $qcheck) = explode("\t", $db_qcheck);
+		$qkey = $db_ckquestion & 2 && $db_question ? array_rand($db_question) : '';
 		$showlogin = true;
 	}
 	extract(L::style());
@@ -424,21 +425,42 @@ function Ipban() {
  * @return array
  */
 function getUserByUid($uid) {
-	global $db;
-	$sqladd = $sqltab = '';
-	if (in_array(SCR, array('index', 'read', 'thread', 'post'))) {
-		$sqladd = (SCR == 'post') ? ',md.postcheck,sr.visit,sr.post,sr.reply' : ',sr.visit';
-		$sqltab = "LEFT JOIN pw_singleright sr ON m.uid=sr.uid";
+	$uid = S::int($uid);
+	if ($uid < 1) return false;
+	if (perf::checkMemcache()){
+		$_cacheService = Perf::getCacheService();
+		$detail = $_cacheService->get('member_all_uid_' . $uid);
+		if ($detail && in_array(SCR, array('index', 'read', 'thread', 'post'))){
+			$_singleRight = $_cacheService->get('member_singleright_uid_' . $uid);
+			$detail	= ($_singleRight === false) ? false : (array)$detail + (array)$_singleRight;
+		}
+		if ($detail){
+			return $detail && $detail['groupid'] != 0 && isset($detail['md.uid']) ? $detail : false;
+		}
+		$cache = perf::gatherCache('pw_members');
+		if (in_array(SCR, array('index', 'read', 'thread', 'post'))){
+			$detail = $cache->getMembersAndMemberDataAndSingleRightByUserId($uid);
+		} else {
+			$detail = $cache->getAllByUserId($uid, true, true);
+		}
+		return $detail && $detail['groupid'] != 0 && isset($detail['md.uid']) ? $detail : false;
+	}else {
+		global $db;
+		$sqladd = $sqltab = '';
+		if (in_array(SCR, array('index', 'read', 'thread', 'post'))) {
+			$sqladd = (SCR == 'post') ? ',md.postcheck,sr.visit,sr.post,sr.reply' : ',sr.visit';
+			$sqltab = "LEFT JOIN pw_singleright sr ON m.uid=sr.uid";
+		}
+		$detail = $db->get_one("SELECT m.uid,m.username,m.password,m.safecv,m.email,m.bday,m.oicq,m.groupid,m.memberid,m.groups,m.icon,m.regdate,m.honor,m.timedf, m.style,m.datefm,m.t_num,m.p_num,m.yz,m.newpm,m.userstatus,m.shortcut,m.medals,md.lastmsg,md.postnum,md.rvrc,md.money,md.credit,md.currency,md.lastvisit,md.thisvisit,md.onlinetime,md.lastpost,md.todaypost,md.monthpost,md.onlineip,md.uploadtime,md.uploadnum,md.starttime,md.pwdctime,md.monoltime,md.digests,md.f_num,md.creditpop,md.jobnum,md.lastgrab,md.follows,md.fans,md.newfans,md.newreferto,md.newcomment,md.punch $sqladd FROM pw_members m LEFT JOIN pw_memberdata md ON m.uid=md.uid $sqltab WHERE m.uid=" . S::sqlEscape($uid) . " AND m.groupid<>'0' AND md.uid IS NOT NULL");
+		return $detail;
 	}
-	$detail = $db->get_one("SELECT m.uid,m.username,m.password,m.safecv,m.email,m.oicq,m.groupid,m.memberid,m.groups,m.icon,m.regdate,m.honor,m.timedf, m.style,m.datefm,m.t_num,m.p_num,m.yz,m.newpm,m.userstatus,m.shortcut,md.lastmsg,md.postnum,md.rvrc,md.money,md.credit,md.currency,md.lastvisit,md.thisvisit,md.onlinetime,md.lastpost,md.todaypost,md.monthpost,md.onlineip,md.uploadtime,md.uploadnum,md.starttime,md.pwdctime,md.monoltime,md.digests,md.f_num,md.creditpop,md.jobnum,md.lastgrab,md.follows,md.fans,md.newfans,md.newreferto,md.newcomment $sqladd FROM pw_members m LEFT JOIN pw_memberdata md ON m.uid=md.uid $sqltab WHERE m.uid=" . pwEscape($uid) . " AND m.groupid<>'0' AND md.uid IS NOT NULL");
-	return $detail;
 }
 
 /**
  * 获取用户信息
  */
 function User_info() {
-	global $db, $timestamp, $db_onlinetime, $winduid, $windpwd, $safecv, $db_ifonlinetime, $c_oltime, $onlineip, $db_ipcheck, $tdtime, $montime, $db_ifsafecv, $db_ifpwcache, $uc_server;
+	global $db, $timestamp, $db_onlinetime, $winduid, $windpwd, $bday, $safecv, $db_ifonlinetime, $c_oltime, $onlineip, $db_ipcheck, $tdtime, $montime, $db_ifsafecv, $db_ifpwcache, $uc_server;
 	PwNewDB();
 	$detail = getUserByUid($winduid);
 	if (empty($detail) && $uc_server) {
@@ -493,10 +515,14 @@ function User_info() {
 					}
 					$c_oltime = 0;
 				}
-				
+				if(get_date($timestamp,'Y-m-d') > get_date($detail['lastvisit'],'Y-m-d')){
+					/*更新今日登录数*/
+					$stasticsService = L::loadClass('Statistics', 'datanalyse');
+					$stasticsService->login($winduid);
+				}
 				$userService->update($winduid, array(), $updateMemberData);
 				$updateByIncrementMemberData && $userService->updateByIncrement($winduid, array(), $updateByIncrementMemberData);
-				
+
 				$detail['lastvisit'] = $detail['thisvisit'] = $timestamp;
 			}
 		}
@@ -602,23 +628,23 @@ function Sql_ol() {
 	$rand = rand(1,10000);
 	PwNewDB();
 	if ($olid) {
-		$sqladd = $winduid ? '(uid=' . pwEscape($winduid) . ' OR olid=' . pwEscape($olid) . ' AND uid=0 AND ip=' . pwEscape($onlineip) . ')' : 'olid=' . pwEscape($olid) . ' AND ip=' . pwEscape($onlineip);
-		$pwSQL = pwSqlSingle(array('username' => $windid, 'lastvisit' => $timestamp, 'fid' => $fid, 'tid' => $tid,
+		$sqladd = $winduid ? '(uid=' . S::sqlEscape($winduid) . ' OR olid=' . S::sqlEscape($olid) . ' AND uid=0 AND ip=' . S::sqlEscape($onlineip) . ')' : 'olid=' . S::sqlEscape($olid) . ' AND ip=' . S::sqlEscape($onlineip);
+		$pwSQL = S::sqlSingle(array('username' => $windid, 'lastvisit' => $timestamp, 'fid' => $fid, 'tid' => $tid,
 			'groupid' => $groupid, 'action' => $wind_in, 'ifhide' => $ifhide, 'uid' => $winduid, 'ip' => $onlineip,'rand'=>$rand));
 		$db->update("UPDATE pw_online SET $pwSQL WHERE $sqladd");
 		if ($winduid && $db->affected_rows() > 1) {
-			$db->update('DELETE FROM pw_online WHERE uid=' . pwEscape($winduid) . ' AND olid!=' . pwEscape($olid));
+			$db->update('DELETE FROM pw_online WHERE uid=' . S::sqlEscape($winduid) . ' AND olid!=' . S::sqlEscape($olid));
 		}
 	} elseif (!$_COOKIE) {
-		$pwSQL = pwSqlSingle(array('username' => $windid, 'lastvisit' => $timestamp, 'fid' => $fid, 'tid' => $tid,
+		$pwSQL = S::sqlSingle(array('username' => $windid, 'lastvisit' => $timestamp, 'fid' => $fid, 'tid' => $tid,
 			'groupid' => $groupid, 'action' => $wind_in, 'ifhide' => $ifhide, 'uid' => $winduid,'rand'=>$rand));
-		$db->update("UPDATE pw_online SET $pwSQL WHERE ip=" . pwEscape($onlineip));
+		$db->update("UPDATE pw_online SET $pwSQL WHERE ip=" . S::sqlEscape($onlineip));
 	}
 	if (!$olid && $_COOKIE || $db->affected_rows() == 0) {
-		$db->update('DELETE FROM pw_online WHERE uid!=0 AND uid=' . pwEscape($winduid) . ' OR lastvisit<' . pwEscape($timestamp - $db_onlinetime));
+		$db->update('DELETE FROM pw_online WHERE uid!=0 AND uid=' . S::sqlEscape($winduid) . ' OR lastvisit<' . S::sqlEscape($timestamp - $db_onlinetime));
 		$rt = $db->get_one("SELECT MAX(olid) FROM pw_online", MYSQL_NUM);
 		$olid = $rt[0] + 1;
-		$pwSQL = pwSqlSingle(array('olid' => $olid, 'username' => $windid, 'lastvisit' => $timestamp,
+		$pwSQL = S::sqlSingle(array('olid' => $olid, 'username' => $windid, 'lastvisit' => $timestamp,
 			'ip' => $onlineip, 'fid' => $fid, 'tid' => $tid, 'groupid' => $groupid, 'action' => $wind_in,
 			'ifhide' => $ifhide, 'uid' => $winduid));
 		$db->update("REPLACE INTO pw_online SET $pwSQL");
@@ -642,13 +668,13 @@ function Sql_ol() {
  * @return bool
  */
 function GetGcache() {
-	global $db_fguestnum, $db_tguestnum, $db_guestindex;
-	$page = isset($GLOBALS['page']) ? $GLOBALS['page'] : (int) $_GET['page'];
-	if (SCR == 'thread' && $page < $db_fguestnum && !isset($_GET['type']) && !GetGP('search')) {
+	global $db_fguestnum, $db_tguestnum, $db_guestindex,$defaultMode;
+	$page = isset($GLOBALS['page']) ? (int)$GLOBALS['page'] : (int) $_GET['page'];
+	if (SCR == 'thread' && $page < $db_fguestnum && !isset($_GET['type']) && !S::getGP('search')) {
 		return true;
 	} elseif (SCR == 'read' && $page < $db_tguestnum && !isset($_GET['uid'])) {
 		return true;
-	} elseif (SCR == 'index' && $db_guestindex && !isset($_GET['cateid'])) {
+	} elseif (SCR == 'index' && $db_guestindex && !isset($_GET['cateid']) && (($defaultMode=='bbs' && !$_GET['m']) || $_GET['m']=='bbs')) {
 		return true;
 	}
 	return false;
@@ -677,6 +703,15 @@ function pwGetShortcut() {
 			}
 		}
 	}
+	/*侧栏 等处因删除无权查看的隐藏板块*/
+	global $winddb, $forum ,$groupid,$windid;
+	include_once pwCache::getPath(D_P . 'data/bbscache/forum_cache.php');
+	foreach($sForumsShortcut as $k=>$v){
+		if($forum[$k]['f_type'] == 'hidden'
+			&& (!allowcheck($forum['allowvisit'], $groupid, $winddb['groups'], $forum['fid'], $winddb['visit']) && !S::inArray($windid, $manager))) {
+				unset($sForumsShortcut[$k]);
+		}
+	}
 	return $sForumsShortcut;
 }
 
@@ -686,7 +721,7 @@ function pwGetMyShortcut(){
 		global $winddb, $forum;
 		if (trim($winddb['shortcut'], ',')) {
 			if (!isset($forum)) {
-				require (D_P . 'data/bbscache/forum_cache.php');
+				require pwCache::getPath(D_P . 'data/bbscache/forum_cache.php');
 			}
 			$shortcuts = explode(',', $winddb['shortcut']);
 			foreach ($shortcuts as $value) {
@@ -723,7 +758,7 @@ function runJob() {
 	if (!$db_job_isopen || !$winduid) {
 		return;
 	}
-	$taskClass = L::loadclass('job', 'job');
+	$taskClass = L::loadclass('autojob', 'job');
 	$taskClass->run($winduid, $groupid);
 }
 
@@ -734,7 +769,7 @@ function runJob() {
  *
  * @param string $modeName 模式名
  */
-function selectMode(&$modeName) {
+function selectMode(&$modeName,$controll = '') {
 	global $defaultMode, $db_mode, $db_modes, $db_modepages, $pwServer, $db_modedomain;
 	if (defined('M_P'))
 		return;
@@ -743,7 +778,7 @@ function selectMode(&$modeName) {
 		if (!$modeName && $db_modedomain) {
 			$modeName = array_search($pwServer['HTTP_HOST'], $db_modedomain);
 		}
-		if ($db_modes && isset($db_modes[$modeName]) && is_array($db_modes[$modeName]) && $db_modes[$modeName]['ifopen']) {
+		if ($db_modes && isset($db_modes[$modeName]) && is_array($db_modes[$modeName]) && ($db_modes[$modeName]['ifopen'] || ($modeName == 'area' && in_array($controll,array('manage','dialog'))))) {
 			$db_mode = $modeName;
 		}
 		if (!empty($db_mode) && $db_mode != 'bbs' && file_exists(R_P . "mode/$db_mode/")) {
@@ -822,21 +857,21 @@ function PrintEot($template, $EXT = 'htm') {
 	if (!defined('PWERROR')) { //apps template render
 		//zhudong 通过判断模板名称为'm_'开头的调用apps目录下的模板
 		if (defined('A_P') && $appdir && substr($template,0,2) == 'm_' && file_exists(A_P . "$appdir/template/$template.$EXT")) {
-			return Pcv(A_P . "$appdir/template/$template.$EXT");
+			return S::escapePath(A_P . "$appdir/template/$template.$EXT");
 		}
 		if (defined('F_M')/* || ($db_mode && $db_mode != 'bbs')*/) {
 			$temp = modeEot($template, $EXT);
 			if ($temp)
-				return Pcv($temp);
+				return S::escapePath($temp);
 		}
 	}
 	//if (defined('A_P') && !in_array($template,array('header','footer'))/* || ($db_mode && $db_mode != 'bbs')*/) {
 	//	return A_P."$appdir/template/$template.$EXT";
 	//}
 	if (file_exists(R_P . "template/$tplpath/$template.$EXT")) {
-		return Pcv(R_P . "template/$tplpath/$template.$EXT");
+		return S::escapePath(R_P . "template/$tplpath/$template.$EXT");
 	} elseif (file_exists(R_P . "template/wind/$template.$EXT")) {
-		return Pcv(R_P . "template/wind/$template.$EXT");
+		return S::escapePath(R_P . "template/wind/$template.$EXT");
 	} else {
 		exit("Can not find $template.$EXT file");
 	}
@@ -887,7 +922,6 @@ function footer() {
 
 	runJob();
 
-	updateCacheData();
 	require PrintEot('footer');
 	if ($db_advertdb['Site.PopupNotice'] || $db_advertdb['Site.FloatLeft'] || $db_advertdb['Site.FloatRight'] || $db_advertdb['Site.FloatRand']) {
 		require PrintEot('advert');
@@ -898,10 +932,7 @@ function footer() {
 function pwOutPut() {
 	global $db_htmifopen, $db_redundancy, $SCR, $groupid;
 	Update_ol();
-	$output = ob_get_contents();
-	if ($db_htmifopen) {
-		$output = preg_replace("/\<a(\s*[^\>]+\s*)href\=([\"|\']?)((index|cate|thread|read|faq|rss)\.php\?[^\"\'>\s]+\s?)[\"|\']?/ies", "Htm_cv('\\3','<a\\1href=\"')", $output);
-	}
+	$output = parseHtmlUrlRewrite(ob_get_contents(), $db_htmifopen);
 	if ($db_redundancy && $SCR != 'post') {
 		$output = str_replace(array("\r", '<!--<!---->-->', '<!---->-->', '<!--<!---->', "<!---->\n", '<!---->', '<!-- -->', "<!--\n-->", "\t\t", '    ', "\n\t", "\n\n"), array('', '', '', '', '', '', '', '', '', '',"\n", "\n"), $output);
 	} else {
@@ -916,6 +947,7 @@ function pwOutPut() {
 		creatguestcache($output);
 	}
 	if (defined('SHOWLOG')) Error::writeLog();
+	if (defined('PW_PACK_FILES')) pwPack::files();		
 	echo ObContents($output);
 	unset($output);
 	N_flush();
@@ -1005,7 +1037,7 @@ function PostCheck($checkHash = 1, $checkGd = 0, $checkQuestion = 0, $checkRefer
  * @param string $hash 系统hash的key
  */
 function checkVerify($hash = 'verifyhash') {
-	GetGP('verify') != $GLOBALS[$hash] && Showmsg('illegal_request');
+	S::getGP('verify') != $GLOBALS[$hash] && Showmsg('illegal_request');
 }
 
 /**
@@ -1026,6 +1058,29 @@ function GdConfirm($code,$bool = null) {
 }
 
 /**
+ * 随机机器问题1
+ * @param boolean $setCookie
+ */
+function getMachineQuestion_1($setCookie = true){
+	global $timestamp;
+	$alg = mt_rand(0,1);//+-
+	$num1 = mt_rand(1,100);
+	switch($alg){
+		case 0:
+			$num2 = mt_rand(0,100-$num1);
+			$symbol = '+';
+			$answer = $num1 + $num2;
+			break;
+		case 1:
+			$num2 = mt_rand(0,$num1);
+			$symbol = '-';
+			$answer = $num1 - $num2;
+			break;
+	}
+	$setCookie && Cookie('ckquestion',StrCode($timestamp."\t\t".md5($answer.$timestamp)));
+	return sprintf('%s %s %s = ?',$num1,$symbol,$num2);
+}
+/**
  * 校验问题
  *
  * @global string $db_question
@@ -1035,7 +1090,13 @@ function GdConfirm($code,$bool = null) {
  */
 function Qcheck($answer, $qkey) {
 	global $db_question, $db_answer;
-	if ($db_question && (!isset($db_answer[$qkey]) || $answer != $db_answer[$qkey])) {
+	if($qkey < 0){
+		//机选问题
+		//Cookie('ckquestion', '', 0);
+		if(!is_string($answer) || $answer === '' || !SafeCheck(explode("\t", StrCode(GetCookie('ckquestion'), 'DECODE')), $answer, 'ckquestion', 1800 , false ,false)){
+			Showmsg('qcheck_error');
+		}
+	}elseif($db_question && (!isset($db_answer[$qkey]) || $answer != $db_answer[$qkey])){
 		Showmsg('qcheck_error');
 	}
 }
@@ -1048,7 +1109,7 @@ function Qcheck($answer, $qkey) {
 function PwNewDB() {
 	if (!is_object($GLOBALS['db'])) {
 		global $db, $database, $dbhost, $dbuser, $dbpw, $dbname, $PW, $charset, $pconnect;
-		require_once Pcv(R_P . "require/db_$database.php");
+		require_once S::escapePath(R_P . "require/db_$database.php");
 		$db = new DB($dbhost, $dbuser, $dbpw, $dbname, $PW, $charset, $pconnect);
 	}
 }
@@ -1118,9 +1179,10 @@ function pwNavBar() {
 		list($tmpLogin['faceurl']) = showfacedesign($winddb['icon'], 1, 's');
 		$tmpLogin['lastlodate'] = get_date($winddb['lastvisit'], 'Y-m-d');
 	} else {
-		global $db_question, $db_logintype, $db_qcheck;
+		global $db_question, $db_logintype, $db_qcheck,$db_ckquestion;
 		if ($db_question) {
-			list(, $tmpLogin['qcheck']) = explode("\t", $db_qcheck);
+			list(,$tmpLogin['showq']) = explode("\t", $db_qcheck);
+			$tmpLogin['qcheck'] = $db_ckquestion & 2;
 			if ($tmpLogin['qcheck'])
 				$tmpLogin['qkey'] = array_rand($db_question);
 		}
@@ -1133,19 +1195,20 @@ function pwNavBar() {
 			$tmpLogin['logintype'][0] = 0;
 		}
 	}
+	$postion = $db_mode;
 
+	if (defined('APP_GROUP')) $postion = 'group';  //群组定位特殊处理
 	$currentPostion = array();
-	$currentPostion['mode'] = $db_mode;
+	$currentPostion['mode'] = $postion;
 	if (in_array(SCR, array('index', 'cate', 'mode', 'read', 'thread')) || $SCR == 'm_home') {
-		$currentPostion['mode'] = empty($db_mode) ? 'bbs' : $db_mode;
+		$currentPostion['mode'] = empty($postion) ? 'bbs' : $postion;
 	}
 	if ($currentPostion['mode'] == 'area' && $alias) $currentPostion['alias'] = $alias;
-
 	$navConfigService = L::loadClass('navconfig', 'site'); /* @var $navConfigService PW_NavConfig */
-	$tmpNav[PW_NAV_TYPE_MAIN] = $navConfigService->findValidNavListByTypeAndPostion(PW_NAV_TYPE_MAIN, $db_mode, $currentPostion);
-	$tmpNav[PW_NAV_TYPE_HEAD_LEFT] = $navConfigService->findValidNavListByTypeAndPostion(PW_NAV_TYPE_HEAD_LEFT, $db_mode);
-	$tmpNav[PW_NAV_TYPE_HEAD_RIGHT] = $navConfigService->findValidNavListByTypeAndPostion(PW_NAV_TYPE_HEAD_RIGHT, $db_mode);
-	$tmpNav[PW_NAV_TYPE_FOOT] = $navConfigService->findValidNavListByTypeAndPostion(PW_NAV_TYPE_FOOT, $db_mode);
+	$tmpNav[PW_NAV_TYPE_MAIN] = $navConfigService->findValidNavListByTypeAndPostion(PW_NAV_TYPE_MAIN, $postion, $currentPostion);
+	$tmpNav[PW_NAV_TYPE_HEAD_LEFT] = $navConfigService->findValidNavListByTypeAndPostion(PW_NAV_TYPE_HEAD_LEFT, $postion);
+	$tmpNav[PW_NAV_TYPE_HEAD_RIGHT] = $navConfigService->findValidNavListByTypeAndPostion(PW_NAV_TYPE_HEAD_RIGHT, $postion);
+	$tmpNav[PW_NAV_TYPE_FOOT] = $navConfigService->findValidNavListByTypeAndPostion(PW_NAV_TYPE_FOOT, $postion);
 
 	return array($tmpNav, $tmpLogin);
 }
@@ -1158,7 +1221,7 @@ function pwNavBar() {
 function buildNavLinkHtml($navData) {
 	$title = strip_tags($navData['title']);
 	$navData['style']['b'] && $title = "<b>$title</b>";
-	$navData['style']['i'] && $title = "<i>$title</i>";
+	$navData['style']['i'] && $title = "<span style=\"font-style:oblique\">$title</span>";
 	$navData['style']['u'] && $title = "<u>$title</u>";
 	$navData['style']['color'] && $title = "<font color=\"".$navData['style']['color']."\">$title</font>";
 
@@ -1200,12 +1263,12 @@ class bbsTemplate {
 		if (!defined('PWERROR')) {
 			global $appdir;
 			if (defined('A_P') && $appdir && substr($template,0,2) == 'm_' && file_exists(A_P . "$appdir/template/$template.$EXT")) {
-				return Pcv(A_P . "$appdir/template/$template.$EXT");
+				return S::escapePath(A_P . "$appdir/template/$template.$EXT");
 			}
 			if (defined('F_M')/* || ($db_mode && $db_mode != 'bbs')*/) {
 				$temp = modeEot($template, $EXT);
 				if ($temp)
-					return Pcv($temp);
+					return S::escapePath($temp);
 			}
 		}
 		$tplpath = L::style('tplpath');

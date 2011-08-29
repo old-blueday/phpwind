@@ -1,20 +1,16 @@
 <!--<?php 
 $type_tiele = $types[$type];
 print <<<EOT
---><!doctype html>
-<html>
+--><!doctype html><html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=$db_charset" />
-<title>$type_tiele - $keyword -搜索中心 - Powered by phpwind</title>
+<title>$webPageTitle Powered by phpwind</title>
 <meta name="generator" content="phpwind $wind_version" />
 <meta name="description" content="$metaDescription" />
 <meta name="keywords" content="$metaKeywords" />
-<meta http-equiv="x-ua-compatible" content="ie=7" />
 <link rel='archives' title='$db_bbsname' href='$db_bbsurl/simple/' />
-<style type="text/css" media="screen">
-@import url(images/pw_core.css);
-@import url(images/search/style.css);
-</style>
+<link rel="stylesheet" type="text/css" href="images/pw_core.css?101128" media="all" />
+<link rel="stylesheet" type="text/css" href="images/search/style.css" media="all" />
 <SCRIPT type="text/javascript" LANGUAGE="JavaScript" src="js/core/core.js"></SCRIPT>
 <script type="text/javascript" language="JavaScript" src="js/pw_ajax.js"></script>
 <script language="JavaScript">
@@ -30,6 +26,7 @@ var temp_basename = '$temp_basename';
 </script>
 </head>
 <body>
+<div class="home_warp">
 <!--
 EOT;
 ?>-->

@@ -36,8 +36,10 @@ class PcUpload extends uploadBehavior {
 		return true;
 	}
 
-	function getThumbSize() {
-		return "200\t150";
+	function getThumbInfo($filename, $dir) {
+		return array(
+			array('s_' . $filename, $dir, "200\t150")
+		);
 	}
 
 	function getFilePath($currUpload) {
@@ -54,14 +56,14 @@ class PcUpload extends uploadBehavior {
 		if (!in_array($currUpload['attname'],array('topic','postcate'))) {
 			$savedir = '';
 		}
-		return array($filename, $savedir, 's_' . $filename, $savedir);
+		return array($filename, $savedir);
 	}
 
 	function update($uploaddb) {
 
 		foreach ($uploaddb as $key => $value) {
 			if ($value['id']) {
-				$attach = $this->db->get_one("SELECT fieldname FROM pw_pcfield WHERE fieldid=". pwEscape($value['id']));
+				$attach = $this->db->get_one("SELECT fieldname FROM pw_pcfield WHERE fieldid=". S::sqlEscape($value['id']));
 			}
 			if ($value['attname'] == 'postcate' && $attach['fieldname'] == 'pcattach') {
 				$fieldname = 'pcattach';
@@ -77,7 +79,7 @@ class PcUpload extends uploadBehavior {
 			}
 		}
 		if ($this->attachs) {
-			$this->db->update("UPDATE $tablename SET " . pwSqlSingle($this->attachs)." WHERE tid=". pwEscape($this->tid));
+			$this->db->update("UPDATE $tablename SET " . S::sqlSingle($this->attachs)." WHERE tid=". S::sqlEscape($this->tid));
 		}
 	}
 

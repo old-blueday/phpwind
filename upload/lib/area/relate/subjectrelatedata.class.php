@@ -8,7 +8,7 @@ class PW_SubjectRelateData extends RelateData {
 		L::loadClass('tplgetdata', 'area', false);
 		$tid	= (int) $key;
 		if (!$tid) return array();
-		$thread	= $db->get_one("SELECT tid,fid,author,authorid,subject,type,postdate,hits,replies FROM pw_threads WHERE tid=".pwEscape($tid));
+		$thread	= $db->get_one("SELECT tid,fid,author,authorid,subject,type,postdate,hits,replies FROM pw_threads WHERE tid=".S::sqlEscape($tid));
 		if (!$thread) return array();
 		$thread['url'] 	= $this->_getSubjectUrl($thread['tid']);
 		$thread['title'] 	= $thread['subject'];
@@ -23,6 +23,8 @@ class PW_SubjectRelateData extends RelateData {
 	function getHtmlForView($default = 0) {
 		$default = (int) $default ? (int) $default : '';
 		$_input = '<input type="text" class="input" name="pushkey" id="pushkey" value="'.$default.'" >';
+		$_input .= '<input type="button" class="btn" id="pushkeybutton" value="获取数据" >';
+		$_input .= '(可输入帖子tid获取数据)';
 		return array(
 			'title'=>'帖子tid',
 			'html'=>$_input,
@@ -38,7 +40,7 @@ class PW_SubjectRelateData extends RelateData {
 	function _getImagesByTid($tid) {
 		global $db;
 		$temp	= array();
-		$query	= $db->query("SELECT attachurl FROM pw_attachs WHERE tid=".pwEscape($tid,false)." AND type='img' LIMIT 5");
+		$query	= $db->query("SELECT attachurl FROM pw_attachs WHERE tid=".S::sqlEscape($tid,false)." AND type='img' LIMIT 5");
 		while($rt = $db->fetch_array($query)){
 			$a_url	= geturl($rt['attachurl'],'show');
 			$temp[] = is_array($a_url) ? $a_url[0] : $a_url;

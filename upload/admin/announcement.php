@@ -14,7 +14,7 @@ if ($action == 'order') {
 		}
 	}
 	foreach ($updatedb as $key => $value) {
-		$value && $db->update("UPDATE pw_announce SET vieworder=".pwEscape($key)."WHERE aid IN (".pwImplode($value).')');
+		$value && $db->update("UPDATE pw_announce SET vieworder=".S::sqlEscape($key)."WHERE aid IN (".S::sqlImplode($value).')');
 	}
 	updatecache_i();
 	adminmsg('operate_success');
@@ -42,21 +42,20 @@ if ($action == 'order') {
 		!$fid && adminmsg('annouce_fid');
 		!Checkright($fids,$fid) && adminmsg('annouce_right');
 		$basename .= "&fid=$fid";
-
-		$atc_title = trim(ieconvert($_POST['atc_title']));
+		$atc_title = trim($_POST['atc_title']);
 		!$atc_title && adminmsg('annouce_title');
 
 		$atc_content = trim(ieconvert($_POST['atc_content']));
-		$url = trim(Char_cv(str_replace(array('"',"'",'\\'),'',$_POST['url'])));
+		$url = trim(S::escapeChar(str_replace(array('"',"'",'\\'),'',$_POST['url'])));
 		!$atc_content && !$url && adminmsg('annouce_content');
 
 		$startdate = $_POST['startdate'] ? PwStrtoTime($_POST['startdate']) : $timestamp;
 		$enddate = $_POST['enddate'] ? PwStrtoTime($_POST['enddate']) : '';
 		$enddate && $enddate<=$startdate && adminmsg('annouce_time');
 //		!Datecheck($fid,$startdate,$enddate) && adminmsg('annouce_date');
-		InitGP(array('ifopen','vieworder'),'P',2);
+		S::gp(array('ifopen','vieworder'),'P',2);
 		$db->update("INSERT INTO pw_announce"
-			. " SET " . pwSqlSingle(array(
+			. " SET " . S::sqlSingle(array(
 				'fid'		=> $fid,			'ifopen'	=> $ifopen,
 				'vieworder'	=> $vieworder,	'author'	=> $admin_name,
 				'startdate'	=> $startdate,		'enddate'	=> $enddate,
@@ -68,9 +67,9 @@ if ($action == 'order') {
 	}
 } elseif ($action == 'edit') {
 
-	InitGP(array('aid'),'GP',2);
+	S::gp(array('aid'),'GP',2);
 	$sql_select = $_POST['step']!=2 ? ',ifopen,vieworder,startdate,enddate,url,subject,content' : '';
-	$rt = $db->get_one("SELECT aid,fid $sql_select FROM pw_announce WHERE aid=".pwEscape($aid));
+	$rt = $db->get_one("SELECT aid,fid $sql_select FROM pw_announce WHERE aid=".S::sqlEscape($aid));
 	!$rt['aid'] && adminmsg('operate_fail');
 
 	list($fids,$forumcache,$cmscache) = GetForumdb();
@@ -80,7 +79,7 @@ if ($action == 'order') {
 
 		extract($rt,EXTR_SKIP);
 		ifcheck($ifopen,'ifopen');
-		$subject = Char_cv($subject); $atc_content = Char_cv($content);
+		$subject = S::escapeChar($subject); $atc_content = S::escapeChar($content);
 
 		Showoption($fid);
 		$ckdisplay = Displayfid();
@@ -101,39 +100,39 @@ if ($action == 'order') {
 		!$atc_title && adminmsg('annouce_title');
 
 		$atc_content = trim(ieconvert($_POST['atc_content']));
-		$url = trim(Char_cv(str_replace(array('"',"'",'\\'),'',$_POST['url'])));
+		$url = trim(S::escapeChar(str_replace(array('"',"'",'\\'),'',$_POST['url'])));
 		!$atc_content && !$url && adminmsg('annouce_content');
 
 		$startdate = $_POST['startdate'] ? PwStrtoTime($_POST['startdate']) : $timestamp;
 		$enddate = $_POST['enddate'] ? PwStrtoTime($_POST['enddate']) : '';
 		$enddate && $enddate<=$startdate && adminmsg('annouce_time');
 //		!Datecheck($fid,$startdate,$enddate,$aid) && adminmsg('annouce_date');
-		InitGP(array('ifopen','vieworder'),'P',2);
+		S::gp(array('ifopen','vieworder'),'P',2);
 		$db->update("UPDATE pw_announce"
-			. " SET " . pwSqlSingle(array(
+			. " SET " . S::sqlSingle(array(
 					'fid'		=> $fid,			'ifopen'	=> $ifopen,
 					'vieworder'	=> $vieworder,	'startdate'	=> $startdate,
 					'enddate'	=> $enddate,		'url'		=> $url,
 					'subject'	=> $atc_title,		'content'	=> $atc_content
 					))
-			. " WHERE aid=".pwEscape($aid));
+			. " WHERE aid=".S::sqlEscape($aid));
 		updatecache_i();
 		adminmsg('operate_success',$successurl);
 	}
 } elseif ($action == 'del') {
 
 	$aid = (int)$_GET['aid'];
-	$rt = $db->get_one("SELECT aid,fid FROM pw_announce WHERE aid=".pwEscape($aid));
+	$rt = $db->get_one("SELECT aid,fid FROM pw_announce WHERE aid=".S::sqlEscape($aid));
 	!$rt['aid'] && adminmsg('operate_fail');
 	list($fids) = GetForumdb();
 	!Checkright($fids,$rt['fid']) && adminmsg('annouce_right');
-	$db->update("DELETE FROM pw_announce WHERE aid=".pwEscape($aid));
+	$db->update("DELETE FROM pw_announce WHERE aid=".S::sqlEscape($aid));
 	updatecache_i();
 	adminmsg('operate_success');
 
 } else {
 
-	include_once(D_P.'data/bbscache/forum_cache.php');
+	include_once pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
 	$titledb = $namedb = array();
 	list($fids,$forumcache,$cmscache) = GetForumdb();
 	$pages = '';
@@ -142,10 +141,10 @@ if ($action == 'order') {
 	$namedb = $forum;
 	$namedb[-1]['name'] = getLangInfo('all','whole_notice');
 	$namedb[-2]['name'] = getLangInfo('all','cms_notice');
-	InitGP(array('fid','page','ifopen'),'GP',2);
+	S::gp(array('fid','page','ifopen'),'GP',2);
 	$page<1 && $page = 1;
 	if ($fid && Checkright($fids,$fid)) {
-		$sqlwhere .= " AND fid=".pwEscape($fid);
+		$sqlwhere .= " AND fid=".S::sqlEscape($fid);
 		switch ($fid) {
 			case -1:
 				$titledb[-1] = " (<a href=\"$basename\"><b>".getLangInfo('all','all_notice')."</b></a> &raquo; ".getLangInfo('all','whole_notice').")";
@@ -173,11 +172,11 @@ if ($action == 'order') {
 		${'ifopen_'.$ifopen} = 'SELECTED';
 		switch ($ifopen) {
 			case 3:
-				$sqlwhere .= "1 AND startdate>".pwEscape($timestamp); break;//未发布
+				$sqlwhere .= "1 AND startdate>".S::sqlEscape($timestamp); break;//未发布
 			case 2:
-				$sqlwhere .= "1 AND enddate>0 AND enddate<".pwEscape($timestamp); break;//已过期
+				$sqlwhere .= "1 AND enddate>0 AND enddate<".S::sqlEscape($timestamp); break;//已过期
 			case 1:
-				$sqlwhere .= "1 AND startdate<=".pwEscape($timestamp)."AND (enddate=0 OR enddate>=".pwEscape($timestamp).")"; break;//已发布
+				$sqlwhere .= "1 AND startdate<=".S::sqlEscape($timestamp)."AND (enddate=0 OR enddate>=".S::sqlEscape($timestamp).")"; break;//已发布
 			default:
 				$sqlwhere .= '0';//已关闭
 		}
@@ -185,7 +184,7 @@ if ($action == 'order') {
 
 	Showoption($fid);
 	$annoucedb = array();
-	$query = $db->query("SELECT aid,fid,ifopen,vieworder,author,subject,startdate,enddate FROM pw_announce $sqlwhere ORDER BY fid,vieworder,startdate DESC".pwLimit(($page-1)*$db_perpage,$db_perpage));
+	$query = $db->query("SELECT aid,fid,ifopen,vieworder,author,subject,startdate,enddate FROM pw_announce $sqlwhere ORDER BY fid,vieworder,startdate DESC".S::sqlLimit(($page-1)*$db_perpage,$db_perpage));
 	while ($rt = $db->fetch_array($query)) {
 		$rt['subject'] = htmlspecialchars(substrs(strip_tags($rt['subject']),30));
 		$rt['starttime'] = $rt['startdate'] ? get_date($rt['startdate'],'Y-m-d H:i') : '--';
@@ -206,7 +205,7 @@ function GetForumdb() {
 		list($fids,$forumcache) = GetAllowForum($admin_name);
 		$cmscache = '';
 	} else {
-		include D_P.'data/bbscache/forumcache.php';
+		include pwCache::getPath(D_P.'data/bbscache/forumcache.php');
 		list($fids,$hideforum) = GetHiddenForum();
 		if ($admin_gid == 3) {
 			$fids = '';
@@ -230,7 +229,7 @@ function Checkright($fids,$fid) {
 	return true;
 }
 function Displayfid() {
-	include(D_P.'data/bbscache/forum_cache.php');
+	include pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
 	$ckdisplay = ',-1,';
 	foreach ($forum as $value) {
 		if ($value['type'] == 'category') {
@@ -250,8 +249,8 @@ function Showoption($fid) {
 function Datecheck($fid,$startdate,$enddate=null,$aid=null){
 	global $db;
 	!empty($enddate) && $startdate = $enddate;
-	$sql_where = empty($aid) ? '' : "AND aid!=".pwEscape($aid);
-	$rt = $db->get_one("SELECT startdate,enddate FROM pw_announce WHERE fid=".pwEscape($fid)."$sql_where ORDER BY vieworder,startdate DESC LIMIT 1");
+	$sql_where = empty($aid) ? '' : "AND aid!=".S::sqlEscape($aid);
+	$rt = $db->get_one("SELECT startdate,enddate FROM pw_announce WHERE fid=".S::sqlEscape($fid)."$sql_where ORDER BY vieworder,startdate DESC LIMIT 1");
 	if ($rt['startdate']) {
 		$rt['enddate'] && $rt['startdate'] = $rt['enddate'];
 		if ($startdate <= $rt['startdate']) {

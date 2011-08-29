@@ -35,7 +35,7 @@ if ($comment[uid]==$winduid || $winduid==$u || $groupid==3) { print <<<EOT
 EOT;
 } print <<<EOT
 -->
-									<a href="u.php?uid=$comment[uid]" class="b">$comment[username]</a> <span class="gray">$comment[postdate] </span>
+									<a href="{$db_userurl}$comment[uid]" class="b">$comment[username]</a> <span class="gray">$comment[postdate] </span>
 									<p class="f12"> $comment[title] <a class="ml10 f12" onclick="createCommnetInput('$comment_type',$comment_typeid,$comment[id])" id="reply_$comment[id]">回复</a></p>
 										
 											<div id="commentbox_{$comment_typeid}_{$comment[id]}">
@@ -66,7 +66,7 @@ if ($subcomment['uid'] == $winduid || $groupid == 3) {print <<<EOT
 EOT;
 }print <<<EOT
 -->
-												<a href="u.php?uid=$subcomment[uid]" class="mr10">$subcomment[username]:</a><span class="mr10 gray">$subcomment[title]</span><br />
+												<a href="{$db_userurl}$subcomment[uid]" class="mr10">$subcomment[username]:</a><span class="mr10 gray">$subcomment[title]</span><br />
 											<span class="gray mr10 f10">$subcomment[postdate]</span>	
 											</dd>
 											</dl>

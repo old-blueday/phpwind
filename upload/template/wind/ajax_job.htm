@@ -32,7 +32,7 @@ foreach ($buyers as $value) {
 print <<<EOT
 -->
                 <tr class="tr3 vt">
-                    <td><a href="u.php?uid={$value[uid]}" target="_blank" class="s4">{$value[username]}</a></td>
+                    <td><a href="{$db_userurl}{$value[uid]}" target="_blank" class="s4">{$value[username]}</a></td>
                     <td>{$value[cost]}{$value[ctype]}</td>
                     <td>{$value[createdtime]}</td>
                 </tr>

@@ -1,6 +1,21 @@
 <!--<?php print <<<EOT
 -->
 <div style="width:450px;">
+<script type="text/javascript">
+function asubmit(fp){
+	var reasion = '$SYSTEM[enterreason]';
+	if(reasion == 1 && fp['atc_content'].value == ""){
+		ajax.showError('请输入操作原因！');return false;
+	}
+    if(typeof(checkform) == 'function'){
+        if(true == checkform()){
+        	ajax.submit(fp,ajax.guide);
+        }
+    }else{
+    	ajax.submit(fp,ajax.guide);
+    }
+}
+</script>
 <form action="mawhole.php?action=$action&ajax=1" method="post" onsubmit="return false;" name="ajaxfm">
 <input type="hidden" name="verify" value="$verifyhash" />
 <input type="hidden" name="fid" value="$fid" />
@@ -114,7 +129,24 @@ function selectAllForums(){
 }
 </script>
 <script language="JavaScript" src="js/date.js"></script>
+<script type="text/javascript">
+checkform = function(){
+    var el = document.ajaxfm.topped;
+    var flag = false;
+    for(var i=0; i<el.length; i++){
+    	if(el[i].checked){
+    		flag = true;break;
+    	}
+    }
+    if(flag == false){
+        ajax.showError('请选择管理选项');
+        return false;
+    };      
+    return true;
+}
+</script>
 <div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="adel cp" onclick="closep();">关闭</span>置顶操作</div>
+<div class="wrongTip" style="display:none;">隐藏</div>
 <table width="100%" class="vt z">
 <tr class="tr3">
 	<td width="80">管理选项:</td>
@@ -172,7 +204,24 @@ print <<<EOT
 EOT;
 }elseif($action=='digest'){print <<<EOT
 -->
+<script type="text/javascript">
+checkform = function(){
+    var el = document.ajaxfm.digest;
+    var flag = false;
+    for(var i=0; i<el.length; i++){
+    	if(el[i].checked){
+    		flag = true;break;
+    	}
+    }
+    if(flag == false){
+        ajax.showError('请选择管理选项');
+        return false;
+    };      
+    return true;
+}
+</script>
 <div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="adel cp" onclick="closep();">关闭</span>精华操作</div>
+<div class="wrongTip" style="display:none;">隐藏</div>
 <table width="100%" class="vt z">
 <tr class="tr3"><td width="80">管理选项:</td>
 	<td>
@@ -202,7 +251,24 @@ print <<<EOT
 EOT;
 }elseif($action=='lock'){print <<<EOT
 -->
+<script type="text/javascript">
+checkform = function(){
+    var el = document.ajaxfm.locked;
+    var flag = false;
+    for(var i=0; i<el.length; i++){
+        if(el[i].checked){
+            flag = true;break;
+        }
+    }
+    if(flag == false){
+        ajax.showError('请选择管理选项');
+        return false;
+    };      
+    return true;
+}
+</script>
 <div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="adel cp" onclick="closep();">关闭</span>锁定操作</div>
+<div class="wrongTip" style="display:none;">隐藏</div>
 <table width="100%" class="vt z">
 <tr class="tr3">
 	<td width="80">管理选项:</td>
@@ -234,6 +300,7 @@ EOT;
 }elseif($action=='pushtopic'){print <<<EOT
 -->
 <div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="adel cp" onclick="closep();">关闭</span>提前操作</div>
+<div class="wrongTip" style="display:none;">隐藏</div>
 <table width="100%" class="vt z">
 <tr class="tr3"><td width="80">提前时间:</td><td>
 	<label class="mr20"><input type="text" name="pushtime" value="0" size="3" class="input" /> 小时</label>
@@ -273,6 +340,7 @@ EOT;
 }elseif($action=='downtopic'){print <<<EOT
 -->
 <div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="adel cp" onclick="closep();">关闭</span>压帖操作</div>
+<div class="wrongTip" style="display:none;">隐藏</div>
 <table width="100%" class="vt z">
 <tr class="tr3"><td width="80">压后时间:</td><td><label class="mr20"><input type="text" name="timelimit" value="24" size="3" class="input" /> 时</label></td></tr>
 <tr class="tr3"><td>允许上浮:</td><td>
@@ -301,6 +369,7 @@ EOT;
 }elseif($action=='edit'){print <<<EOT
 -->
 <div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="adel cp" onclick="closep();">关闭</span>加亮操作</div>
+<div class="wrongTip" style="display:none;">隐藏</div>
 <table width="100%" class="vt z">
 <tr class="tr3"><td width="80">管理选项:</td>
 	<td>
@@ -368,6 +437,7 @@ EOT;
 }elseif($action=='del'){print <<<EOT
 -->
 <div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="adel cp" onclick="closep();">关闭</span>删除操作</div>
+<div class="wrongTip" style="display:none;">隐藏</div>
 <table width="100%" class="vt z">
 <tr class="tr3"><td width="80">扣除积分:</td>
 	<td>
@@ -379,6 +449,15 @@ EOT;
 EOT;
 }elseif($action=='move' || $action=='copy'){print <<<EOT
 -->
+<script type="text/javascript">
+checkform = function(){
+    if(document.ajaxfm.to_threadcate.value == ''){
+    	ajax.showError('请选择主题分类！');
+    	return false;
+    };    	
+    return true;
+}
+</script>
 <div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="adel cp" onclick="closep();">关闭</span>
 <!--
 EOT;
@@ -393,7 +472,12 @@ EOT;
 }print <<<EOT
 -->
 </div>
+<div class="wrongTip" style="display:none;">隐藏</div>
+<div id="move_isforce" style="display:none; margin:5px; padding:5px; padding-left:20px; width:90%; height:15px; background-color:#FFFFCC; border:#CCCCCC solid 1px; color:#FF0000;">
+	<b id="move_isforce_value"></b>
+</div>
 <table width="100%" class="vt z">
+
 <tr class="tr3">
 	<td width="80">目的版块:</td>
 	<td><select name="to_id" id="to_id" onchange="getThreadCates(this.value)">$forumcache
@@ -427,6 +511,43 @@ EOT;
 		</div>
 		<div id="subtypeselect"></div>
 <script>
+//检测是否需要强制主题分类
+function checkThreadCatesType() {
+	var type = document.getElementById('to_id').value;
+	var threadcate = document.getElementById('to_threadcate').value;
+	var typedb = '$t_typedb';
+	var forum_temp = JSONParse('$forum_temp');
+	if(typedb == "") {
+		if(type in forum_temp){
+			if(forum_temp[type] == 0) {
+				ajax.showError("请选择主题分类");
+				return false;
+			}	
+		}
+		return true;
+	}else{
+		var t_typedb = JSONParse(typedb);
+		if(type in t_typedb){
+			if(t_typedb[type][0] == 2) {
+				if(threadcate == 0) {
+					ajax.showError("请选择主题分类");
+					return false;
+				}else{
+					return true;
+				}
+			}else{
+				return true;	
+			}	
+		}else{
+			if(forum_temp[type]==0){
+				ajax.showError("请选择主题分类");
+				return false;
+			}else{
+				return true;
+			}
+		}
+	}
+}
 function getThreadCates(fid){
 	var selobj = getObj('to_threadcate');
 	selobj.options.length=0;
@@ -435,7 +556,9 @@ function getThreadCates(fid){
 	for (var temp in t_typedb) {
 		if (temp == fid) {
 			for (var temp2 in t_typedb[temp]) {
-				selobj.options.add(new Option(t_typedb[temp][temp2],temp2));
+				if(temp2 != 0) {
+					selobj.options.add(new Option(t_typedb[temp][temp2],temp2));
+				}
 			}
 		}
 	}
@@ -478,17 +601,28 @@ EOT;
 }elseif($action=='unite'){print <<<EOT
 -->
 <div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="adel cp" onclick="closep();">关闭</span>合并操作</div>
+<div class="wrongTip" style="display:none;">隐藏</div>
 <table width="100%" class="vt z">
 <tr class="tr3">
 	<td width="80">合并帖子:</td>
 	<td><input class="input" type="text" name="unitetid" size="10" /> (输入来源帖子的tid,多个用“,”分开)</td>
 </tr>
 </table>
+<script type="text/javascript">
+checkform = function(){
+    if(document.ajaxfm.unitetid.value == ''){
+    	ajax.showError('请输入合并帖子ID！');
+    	return false;
+    };    	
+    return true;
+}
+</script>
 <!--
 EOT;
 }elseif($action == 'push'){print<<<EOT
 -->
 <div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="adel cp" onclick="closep();">关闭</span>推送操作</div>
+<div class="wrongTip" style="display:none;">隐藏</div>
 <table width="100%" class="vt z">
 <tr class="tr3">
 	<td width="80">推送位置:</td>
@@ -568,6 +702,7 @@ EOT;
 } elseif ($action=='type') {print <<<EOT
 -->
 <div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="adel cp" onclick="closep();">关闭</span>转移主题分类</div>
+<div class="wrongTip" style="display:none;">隐藏</div>
 <table width="100%" class="vt z">
 <tr class="tr3">
 	<td width="80">选择主题分类:</td>
@@ -671,9 +806,26 @@ EOT;
 } print <<<EOT
 -->
 </table>
+<!--
+EOT;
+if ($action == 'move') { 
+print <<<EOT
+-->
 <div class="popBottom">
-<span class="btn2"><span><button type="button" name="ajaxsubmit" onclick="postManager.ajaxsubmit(this.form,'$db_enterreason','$type');">提 交</button></span></span>
+<span class="btn2"><span><button type="button" name="ajaxsubmit"   onclick="if(checkThreadCatesType()){asubmit(this.form)}">提 交</button></span></span>
 </div>
+<!--
+EOT;
+} else { 
+print <<<EOT
+-->
+<div class="popBottom">
+<span class="btn2"><span><button type="button" name="ajaxsubmit"  onclick="asubmit(this.form)">提 交</button></span></span>
+</div>
+<!--
+EOT;
+} print <<<EOT
+-->
 </form>
 </div>
 <!--

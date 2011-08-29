@@ -168,7 +168,7 @@ foreach($catedb as $key => $value){print <<<EOT
       <td class="td2"><a href="read.php?tid=$value[tid]" target="_blank">$value[subject]</a></td>
       <td class="td2">{$postcatedb[$pcid][name]}</td>
       <td class="td2"><a href="thread.php?fid=$value[fid]" target="blank">{$forum[$value[fid]][name]}</a></td>
-      <td class="td2"><a href="u.php?uid=$value[authorid]" target="_blank">$value[author]</a></td>
+      <td class="td2"><a href="{$db_userurl}$value[authorid]" target="_blank">$value[author]</a></td>
       <td class="td2">$value[postdate]</td>
       <td class="td2"><a href="$basename&action=delthreads&selid=$value[tid]&pcid=$pcid" onclick="if(!confirm('是否确认删除该帖子？')){return false;}">[删除]</a></td>
     </tr>
@@ -180,6 +180,7 @@ EOT;
  </div>
   <div class="cc mb10">$pages</div>
   <div class="mb10 tac">
+	<span class="bt2"><span><button type="button" onclick="CheckAll(document.FORM)">全 选</button></span></span>
 	<input type="submit" onclick="if(!confirm('是否确认删除帖子？')){return false;}" value="删 除" class="bt3" />
 	<input type="submit" name="sendmsg" onclick='CheckAll(this.form)' value="群发消息" class="bt3" />
 

@@ -87,10 +87,10 @@ Class PwCredit {
 		if (isset($this->cType[$cType])) {
 			if (isset($this->getUser[$uid][$cType])) return $this->getUser[$uid][$cType];
 			if (is_numeric($cType)) {
-				$getv = $db->get_value('SELECT value FROM pw_membercredit WHERE uid=' . pwEscape($uid) . ' AND cid=' . pwEscape($cType));
+				$getv = $db->get_value('SELECT value FROM pw_membercredit WHERE uid=' . S::sqlEscape($uid) . ' AND cid=' . S::sqlEscape($cType));
 				empty($getv) && $getv = 0;
 			} else {
-				$getv = $db->get_value("SELECT $cType FROM pw_memberdata WHERE uid=" . pwEscape($uid));
+				$getv = $db->get_value("SELECT $cType FROM pw_memberdata WHERE uid=" . S::sqlEscape($uid));
 				$cType == 'rvrc' && $getv = intval($getv/10);
 			}
 			$this->getUser[$uid][$cType] = $getv;
@@ -98,10 +98,10 @@ Class PwCredit {
 		if (in_array($cType,array('ALL','COMMON','CUSTOM'))) {
 			$getv = array();
 			if ($cType != 'CUSTOM') {
-				$getv = $db->get_one("SELECT money,FLOOR(rvrc/10) AS rvrc,credit,currency FROM pw_memberdata WHERE uid=" . pwEscape($uid));
+				$getv = $db->get_one("SELECT money,FLOOR(rvrc/10) AS rvrc,credit,currency FROM pw_memberdata WHERE uid=" . S::sqlEscape($uid));
 			}
 			if ($GLOBALS['_CREDITDB'] && $cType != 'COMMON') {
-				$query = $db->query("SELECT cid,value FROM pw_membercredit WHERE uid=" . pwEscape($uid));
+				$query = $db->query("SELECT cid,value FROM pw_membercredit WHERE uid=" . S::sqlEscape($uid));
 				while ($rt = $db->fetch_array($query)) {
 					$getv[$rt['cid']] = $rt['value'];
 				}
@@ -212,10 +212,17 @@ Class PwCredit {
 					}
 					if (is_numeric($cid)) {
 						$v = intval($v);
+						/**
 						$db->pw_update(
-							"SELECT uid FROM pw_membercredit WHERE uid=" . pwEscape($uid) . ' AND cid=' . pwEscape($cid),
-							"UPDATE pw_membercredit SET " . ($act == 'add' ? 'value=value+' : 'value=') . pwEscape($v) .  ' WHERE uid=' . pwEscape($uid) . ' AND cid=' . pwEscape($cid),
-							"INSERT INTO pw_membercredit SET " . pwSqlSingle(array('uid' => $uid, 'cid' => $cid, 'value' => $v))
+							"SELECT uid FROM pw_membercredit WHERE uid=" . S::sqlEscape($uid) . ' AND cid=' . S::sqlEscape($cid),
+							"UPDATE pw_membercredit SET " . ($act == 'add' ? 'value=value+' : 'value=') . S::sqlEscape($v) .  ' WHERE uid=' . S::sqlEscape($uid) . ' AND cid=' . S::sqlEscape($cid),
+							"INSERT INTO pw_membercredit SET " . S::sqlSingle(array('uid' => $uid, 'cid' => $cid, 'value' => $v))
+						);
+						**/
+						$db->pw_update(
+							"SELECT uid FROM pw_membercredit WHERE uid=" . S::sqlEscape($uid) . ' AND cid=' . S::sqlEscape($cid),
+							pwQuery::buildClause("UPDATE :pw_table SET " . ($act == 'add' ? 'value=value+' : 'value=') . S::sqlEscape($v) .  ' WHERE uid=:uid AND cid=:cid', array('pw_membercredit', $uid, $cid)),
+							pwQuery::insertClause('pw_membercredit', array('uid' => $uid, 'cid' => $cid, 'value' => $v))
 						);
 					} else {
 						$cid == 'rvrc' && $v *= 10;
@@ -234,11 +241,13 @@ Class PwCredit {
 			$cacheUids[] = 'UID_'.$uid;
 			$cacheCredits[] = 'UID_CREDIT_'.$uid;
 		}
-		if ($cacheUids) {
-			$_cache = getDatastore();
-			$_cache->delete($cacheUids);
-			$_cache->delete($cacheCredits);/*积分*/
-		}
+		
+//		if ($cacheUids) {
+//			$_cache = getDatastore();
+//			$_cache->delete($cacheUids);
+//			$_cache->delete($cacheCredits);/*积分*/
+//		}
+		
 		$this->writeLog();
 		!isset($setArr) && $this->setUser = array();
 	}
@@ -280,11 +289,11 @@ Class PwCredit {
 		$uid = $log['uid'];
 		foreach ($setv as $key => $affect) {
 			if (isset($this->cType[$key]) && $affect<>0 && $this->_checkLogSet($logtype, $key)) {
-				$log['username'] = Char_cv($log['username']);
+				$log['username'] = S::escapeChar($log['username']);
 				$log['cname']	 = $this->cType[$key];
 				$log['affect']	 = $affect;
 				$log['affect'] > 0 && $log['affect'] = '+'.$log['affect'];
-				$log['descrip'] = Char_cv(strip_tags(getLangInfo('creditlog',$logtype,$log)));
+				$log['descrip'] = S::escapeChar(strip_tags(getLangInfo('creditlog',$logtype,$log)));
 				$credit_pop .= $key.":".$log['affect'].'|';
 				$this->cLog[] = array($log['uid'], $log['username'], $key, $affect, $timestamp, $logtype, $log['ip'], $log['descrip']);
 			}
@@ -299,7 +308,7 @@ Class PwCredit {
 
 	function writeLog() {
 		if (!empty($this->cLog)) {
-			$GLOBALS['db']->update("INSERT INTO pw_creditlog (uid,username,ctype,affect,adddate,logtype,ip,descrip) VALUES ".pwSqlMulti($this->cLog,false));
+			$GLOBALS['db']->update("INSERT INTO pw_creditlog (uid,username,ctype,affect,adddate,logtype,ip,descrip) VALUES ".S::sqlMulti($this->cLog,false));
 		}
 		$this->cLog = array();
 	}
@@ -314,6 +323,11 @@ Class PwCredit {
 				}
 			}
 		}
+	}
+
+	function getCreditTypeByName($cName) {
+		if (isset($this->cType[$cName])) return $cName;
+		return array_search($cName, $this->cType);
 	}
 }
 

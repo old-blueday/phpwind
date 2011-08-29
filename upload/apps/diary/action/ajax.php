@@ -5,15 +5,15 @@ require_once (R_P . 'require/functions.php');
 
 !$winduid && Showmsg('not_login');
 
-InitGP(array('action'));
+S::gp(array('action'));
 
 if ($action == 'delatt') {
 	
 	PostCheck();
-	InitGP(array('did', 'aid'));
+	S::gp(array('did', 'aid'));
 	empty($aid) && Showmsg('job_attach_error');
 	
-	$attach = $db->get_one("SELECT * FROM pw_attachs WHERE aid=" . pwEscape($aid));
+	$attach = $db->get_one("SELECT * FROM pw_attachs WHERE aid=" . S::sqlEscape($aid));
 	!$attach && Showmsg('job_attach_error');
 	if (empty($attach['attachurl']) || strpos($attach['attachurl'], '..') !== false) {
 		Showmsg('job_attach_error');
@@ -22,7 +22,7 @@ if ($action == 'delatt') {
 	$aid = $attach['aid'];
 
 	//获取管理权限
-	$isGM = CkInArray($windid, $manager);
+	$isGM = S::inArray($windid, $manager);
 	!$isGM && $groupid = 3 && $isGM = 1;
 	if ($isGM) {
 		$admincheck = 1;
@@ -43,10 +43,11 @@ if ($action == 'delatt') {
 		if (is_array($attachs)) {
 			unset($attachs[$aid]);
 			$attachs = $attachs ? serialize($attachs) : '';
-			$db->update("UPDATE pw_diary SET aid=".pwEscape($attachs)."WHERE did=" . pwEscape($did));
+			//$db->update("UPDATE pw_diary SET aid=".S::sqlEscape($attachs)."WHERE did=" . S::sqlEscape($did));
+		    pwQuery::update('pw_diary','did =:did' , array($did), array('aid'=> $attachs));
 		}
 		
-		$db->update("DELETE FROM pw_attachs WHERE aid=" . pwEscape($aid));
+		$db->update("DELETE FROM pw_attachs WHERE aid=" . S::sqlEscape($aid));
 		echo 'success';
 		ajax_footer();
 	} else {

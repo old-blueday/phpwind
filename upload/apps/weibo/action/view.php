@@ -1,6 +1,6 @@
 <?php
 !defined('A_P') && exit('Forbidden');
-InitGP(array('do'));
+S::gp(array('do'));
 $USCR = 'space_weibo';
 $whilelist = array(
 	'my','ajax'

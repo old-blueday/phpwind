@@ -1,12 +1,12 @@
 <?php
 !defined('P_W') && exit('Forbidden');
 
-InitGP(array('jobact'));
+S::gp(array('jobact'));
 define('AJAX',1);
 
 if ("showbg" == $jobact) {
 	$bg_perpage = 6;
-	InitGP(array('page', 'cid', 'bgid'), null, 2);
+	S::gp(array('page', 'cid', 'bgid'), null, 2);
 
 	$sum = $stopic_service->countPictures($cid);
 	$total = ceil($sum/$bg_perpage);
@@ -18,7 +18,7 @@ if ("showbg" == $jobact) {
 
 	$is_lastpage = $page == $total || !$sum;
 } elseif ("showcopy" == $jobact) {
-	InitGP(array('cid'));
+	S::gp(array('cid'));
 	$cid = intval($cid);
 	$useful_stopics = $stopic_service->findUsefulSTopicInCategory(5, $cid);
 }

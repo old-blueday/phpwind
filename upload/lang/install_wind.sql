@@ -1,3 +1,21 @@
+
+DROP TABLE IF EXISTS pw_actattachs;
+CREATE TABLE pw_actattachs (
+  aid mediumint(8) unsigned NOT NULL auto_increment,
+  uid int(10) unsigned NOT NULL default '0',
+  actid int(10) unsigned NOT NULL default '0',
+  name varchar(255) NOT NULL default '',
+  type varchar(30) NOT NULL default '',
+  size int(10) unsigned NOT NULL default '0',
+  attachurl varchar(255) NOT NULL default '',
+  hits mediumint(8) unsigned NOT NULL default '0',
+  uploadtime int(10) NOT NULL default '0',
+  descrip varchar(100) NOT NULL default '',
+  ifthumb tinyint(3) NOT NULL default '0',
+  PRIMARY KEY  (aid),
+  KEY idx_actid (actid)
+) ENGINE=MyISAM;
+
 DROP TABLE IF EXISTS pw_actions;
 CREATE TABLE pw_actions (
   id smallint(6) unsigned NOT NULL auto_increment,
@@ -6,7 +24,6 @@ CREATE TABLE pw_actions (
   descrip varchar(100) NOT NULL default '',
   PRIMARY KEY  (id)
 ) TYPE=MyISAM;
-
 INSERT INTO pw_actions(images,name,descrip) VALUES ('1.gif', '{#action_1}', '{#act_1}');
 INSERT INTO pw_actions(images,name,descrip) VALUES ('2.gif', '{#action_2}', '{#act_2}');
 INSERT INTO pw_actions(images,name,descrip) VALUES ('3.gif', '{#action_3}', '{#act_3}');
@@ -16,115 +33,723 @@ INSERT INTO pw_actions(images,name,descrip) VALUES ('5.gif', '{#action_5}', '{#a
 DROP TABLE IF EXISTS pw_active;
 CREATE TABLE pw_active (
   id mediumint(8) unsigned NOT NULL auto_increment,
-  cid mediumint(8) unsigned NOT NULL,
-  uid mediumint(8) unsigned NOT NULL,
-  type tinyint(3) unsigned NOT NULL,
-  title varchar(120) NOT NULL,
-  createtime INT( 10 ) UNSIGNED NOT NULL,
-  begintime int(10) NOT NULL,
-  endtime int(10) NOT NULL,
-  deadline int(10) NOT NULL,
-  address varchar(255) NOT NULL,
-  objecter tinyint(1) NOT NULL,
-  limitnum tinyint(1) NOT NULL,
+  cid int(10) unsigned NOT NULL default '0',
+  uid int(10) unsigned NOT NULL default '0',
+  type tinyint(3) unsigned NOT NULL default '0',
+  title varchar(120) NOT NULL default '',
+  createtime int(10) unsigned NOT NULL default '0',
+  begintime int(10) unsigned NOT NULL default '0',
+  endtime int(10) unsigned NOT NULL default '0',
+  deadline int(10) unsigned NOT NULL default '0',
+  address varchar(255) NOT NULL default '',
+  objecter tinyint(3) NOT NULL default '0',
+  limitnum tinyint(3) NOT NULL default '0',
   price decimal(8,2) NOT NULL,
-  introduction varchar(255) NOT NULL,
-  poster varchar(60) NOT NULL,
+  introduction varchar(255) NOT NULL default '',
+  poster varchar(60) NOT NULL default '',
   content text NOT NULL,
-  members int(10) NOT NULL,
-  hits INT( 10 ) UNSIGNED NOT NULL,
+  members int(10) unsigned NOT NULL default '0',
+  hits int(10) unsigned NOT NULL default '0',
   PRIMARY KEY  (id),
-  KEY cid (cid)
+  KEY idx_cid (cid),
+  KEY idx_uid (uid)
 ) ENGINE=MyISAM;
-
-DROP TABLE IF EXISTS pw_area_level;
-CREATE TABLE pw_area_level (
-    uid int(10) unsigned not null default 0,
-    username varchar(15) NOT NULL DEFAULT '',
-    hasedit tinyint(1)  not null default 0,
-    hasattr tinyint(1) not null default 0,
-    super tinyint(1) not null default 0,
-    level text,
-    key uid (uid)
-)ENGINE=MyISAM;
-
-DROP TABLE IF EXISTS pw_actmembers;
-CREATE TABLE pw_actmembers (
-  id mediumint(8) unsigned NOT NULL auto_increment,
-  uid mediumint(8) unsigned NOT NULL,
-  actid mediumint(8) unsigned NOT NULL,
-  realname VARCHAR( 30 ) NOT NULL,
-  phone varchar(15) NOT NULL,
-  mobile varchar(15) NOT NULL,
-  address varchar(255) NOT NULL,
-  anonymous TINYINT( 1 ) UNSIGNED NOT NULL,
-  PRIMARY KEY (id),
-  KEY actid (actid)
-) ENGINE=MyISAM;
-
-DROP TABLE IF EXISTS pw_attention;
-CREATE TABLE pw_attention (
-  `uid` mediumint(8) NOT NULL default '0',
-  `friendid` mediumint(8) NOT NULL default '0',
-  `joindate` int(10) NOT NULL default '0',
-  PRIMARY KEY  (`friendid`,`uid`),
-  KEY `uid` (`uid`,`joindate`),
-  KEY `friendid` (`friendid`,`joindate`)
-) ENGINE=MyISAM;
-
-DROP TABLE IF EXISTS pw_actattachs;
-CREATE TABLE pw_actattachs (
-  aid mediumint(8) unsigned NOT NULL auto_increment,
-  uid mediumint(8) unsigned NOT NULL default '0',
-  actid mediumint(8) unsigned NOT NULL default '0',
-  name varchar(255) NOT NULL default '0',
-  type varchar(30) NOT NULL default '',
-  size int(10) unsigned NOT NULL default '0',
-  attachurl varchar(80) NOT NULL default '0',
-  hits mediumint(8) unsigned NOT NULL default '0',
-  uploadtime int(10) NOT NULL default '0',
-  descrip varchar(100) NOT NULL default '',
-  ifthumb tinyint(1) NOT NULL default '0',
-  PRIMARY KEY  (aid)
-) ENGINE=MyISAM;
+ 
 
 DROP TABLE IF EXISTS pw_activity;
 CREATE TABLE pw_activity (
-  tid mediumint(8) unsigned NOT NULL default '0',
-  subject varchar(80) NOT NULL default '',
-  admin mediumint(8) NOT NULL default '0',
+  tid int(10) unsigned NOT NULL default '0',
+  subject varchar(100) NOT NULL default '',
+  admin int(10) NOT NULL default '0',
   starttime int(10) NOT NULL default '0',
   endtime int(10) NOT NULL default '0',
   location varchar(20) NOT NULL default '',
   num smallint(6) NOT NULL default '0',
-  sexneed tinyint(1) NOT NULL default '0',
+  sexneed tinyint(3) NOT NULL default '0',
   costs int(10) NOT NULL default '0',
   deadline int(10) NOT NULL default '0',
   PRIMARY KEY  (tid),
-  KEY admin (admin)
+  KEY idx_admin (admin)
+) TYPE=MyISAM;
+
+DROP TABLE IF EXISTS pw_activitycate;
+CREATE TABLE pw_activitycate (
+  `actid` smallint(6) unsigned NOT NULL auto_increment,
+  `name` varchar(30) NOT NULL default '',
+  `ifable` tinyint(3) NOT NULL default '1',
+  `vieworder` tinyint(3) NOT NULL default '0',
+  `ifdel` tinyint(3) NOT NULL default '0',
+  PRIMARY KEY  (`actid`),
+  KEY idx_vieworder (vieworder)
+) TYPE=MyISAM AUTO_INCREMENT=5;
+REPLACE INTO pw_activitycate VALUES(1, '户外活动', 1, 0, 0);
+REPLACE INTO pw_activitycate VALUES(2, '体育健康', 1, 1, 0);
+REPLACE INTO pw_activitycate VALUES(3, '文娱休闲', 1, 2, 0);
+REPLACE INTO pw_activitycate VALUES(4, '其他活动', 1, 3, 0);
+
+DROP TABLE IF EXISTS pw_activitydefaultvalue;
+CREATE TABLE pw_activitydefaultvalue (
+  `tid` int(10) unsigned NOT NULL,
+  `actmid` smallint(6) unsigned NOT NULL default '0',
+  `fid` smallint(6) unsigned NOT NULL default '0',
+  `ifrecycle` tinyint(3) NOT NULL default '0',
+  `iscertified` tinyint(3) NOT NULL default '1',
+  `iscancel` tinyint(3) NOT NULL default '0',
+  `out_biz_no` varchar(255) default NULL default '',
+  `batch_no` varchar(255) NOT NULL default '',
+  `user_id` varchar(255) NOT NULL default '',
+  `recommend` tinyint(1) NOT NULL default '0',
+  `starttime` int(10) unsigned NOT NULL default '0',
+  `endtime` int(10) unsigned NOT NULL default '0',
+  `location` varchar(255) NOT NULL default '',
+  `contact` varchar(255) NOT NULL default '',
+  `telephone` varchar(255) NOT NULL default '',
+  `picture1` varchar(255) NOT NULL default '',
+  `picture2` varchar(255) NOT NULL default '',
+  `picture3` varchar(255) NOT NULL default '',
+  `picture4` varchar(255) NOT NULL default '',
+  `picture5` varchar(255) NOT NULL default '',
+  `signupstarttime` int(10) unsigned NOT NULL default '0',
+  `signupendtime` int(10) unsigned NOT NULL default '0',
+  `minparticipant` int(10) unsigned NOT NULL default '0',
+  `maxparticipant` int(10) unsigned NOT NULL default '0',
+  `userlimit` tinyint(3) NOT NULL default '0',
+  `specificuserlimit` varchar(255) NOT NULL default '',
+  `genderlimit` tinyint(3) unsigned NOT NULL default '0',
+  `fees` varchar(255) NOT NULL default '',
+  `feesdetail` varchar(255) NOT NULL default '',
+  `paymethod` tinyint(3) unsigned NOT NULL default '0',
+  `pushtime` int(10) NOT NULL default '0',
+  `updatetime` int(10) NOT NULL default '0',
+  PRIMARY KEY  (`tid`),
+  KEY `idx_actmid_fid` (`actmid`,`fid`)
+)  TYPE=MyISAM ;
+
+DROP TABLE IF EXISTS pw_activityfield;
+CREATE TABLE pw_activityfield (
+  `fieldid` smallint(6) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(30) NOT NULL default '',
+  `fieldname` varchar(30) NOT NULL default '',
+  `actmid` smallint(6) unsigned NOT NULL default '0',
+  `vieworder` tinyint(3) NOT NULL default '0',
+  `type` varchar(20) NOT NULL default '',
+  `rules` mediumtext NOT NULL,
+  `ifable` tinyint(3) NOT NULL default '1',
+  `ifsearch` tinyint(3) NOT NULL default '0',
+  `ifasearch` tinyint(3) NOT NULL default '0',
+  `issearchable` tinyint(3) unsigned NOT NULL default '1',
+  `threadshow` tinyint(3) NOT NULL default '0',
+  `allowthreadshow` tinyint(3) unsigned NOT NULL default '1',
+  `ifmust` tinyint(3) NOT NULL default '1',
+  `ifdel` tinyint(3) NOT NULL default '1',
+  `mustenable` tinyint(3) unsigned NOT NULL default '0',
+  `textwidth` tinyint(3) NOT NULL default '0',
+  `descrip` varchar(255) NOT NULL default '',
+  `sectionname` varchar(255) NOT NULL default '',
+  PRIMARY KEY (`fieldid`),
+  KEY `idx_actmid` (`actmid`)
+)  TYPE=MyISAM AUTO_INCREMENT=537 ;
+REPLACE INTO pw_activityfield VALUES(1, '活动时间', 'starttime', 1, 1, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 1, 1, 1, 0, 1, 18, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(2, '-', 'endtime', 1, 1, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 1, 1, 1, 0, 1, 18, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(3, '活动地点', 'location', 1, 2, 'text', '', 1, 1, 0, 1, 1, 1, 0, 0, 0, 40, '(多个活动地点用,隔开)', '活动概况');
+REPLACE INTO pw_activityfield VALUES(4, '主题图片', 'picture1', 1, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '(最多5张，支持gif、jpeg、jpg、bmp、png，小于2M)', '活动概况');
+REPLACE INTO pw_activityfield VALUES(5, '主题图片二', 'picture2', 1, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(6, '主题图片三', 'picture3', 1, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(7, '主题图片四', 'picture4', 1, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(8, '主题图片五', 'picture5', 1, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(9, '联系人', 'contact', 1, 4, 'text', '', 1, 0, 1, 1, 0, 1, 1, 0, 1, 20, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(10, '联系电话', 'telephone', 1, 5, 'text', '', 1, 0, 1, 1, 0, 1, 1, 0, 1, 40, '(多个联系电话用,隔开)', '活动概况');
+REPLACE INTO pw_activityfield VALUES(11, '报名时间', 'signupstarttime', 1, 6, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 1, 0, 1, 0, 1, 1, 0, 1, 18, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(12, '-', 'signupendtime', 1, 6, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 1, 0, 1, 0, 1, 1, 0, 1, 18, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(13, '人数限制{@}最少', 'minparticipant', 1, 7, 'text', '', 1, 0, 1, 0, 0, 1, 1, 0, 0, 3, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(14, '最多', 'maxparticipant', 1, 7, 'text', '', 1, 0, 1, 0, 0, 1, 1, 0, 0, 3, '(留空或0表示没有限制)', '报名说明');
+REPLACE INTO pw_activityfield VALUES(15, '报名限制', 'userlimit', 1, 8, 'radio', 'a:2:{i:0;s:14:"1=所有用户";i:1;s:11:"2=仅好友";}', 1, 1, 0, 1, 0, 1, 0, 0, 0, 0, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(16, '请输入其它限制', 'specificuserlimit', 1, 8, 'text', '', 1, 0, 1, 1, 0, 1, 0, 0, 0, 14, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(17, '性别限制', 'genderlimit', 1, 9, 'radio', 'a:3:{i:0;s:8:"1=全部";i:1;s:11:"2=仅男生";i:2;s:11:"3=仅女生";}', 1, 0, 1, 1, 0, 1, 0, 0, 0, 0, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(18, '活动费用', 'fees', 1, 10, 'text', '', 1, 1, 0, 0, 0, 1, 1, 0, 1, 0, '(如 小孩 每位 10元，有车族 每位10 元等)', '费用说明');
+REPLACE INTO pw_activityfield VALUES(19, '费用明细', 'feesdetail', 1, 11, 'text', '', 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, '', '费用说明');
+REPLACE INTO pw_activityfield VALUES(20, '支付方式', 'paymethod', 1, 12, 'radio', 'a:2:{i:0;s:11:"1=支付宝";i:1;s:14:"2=现金支付";}', 1, 0, 1, 1, 0, 1, 1, 0, 1, 0, '', '费用说明');
+REPLACE INTO pw_activityfield VALUES(21, '活动时间', 'starttime', 2, 1, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 1, 1, 1, 0, 1, 1, 0, 1, 18, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(22, '-', 'endtime', 2, 1, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 1, 1, 1, 0, 1, 1, 0, 1, 18, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(23, '活动地点', 'location', 2, 2, 'text', '', 0, 1, 1, 1, 0, 1, 0, 0, 0, 40, '(多个活动地点用,隔开)', '活动概况');
+REPLACE INTO pw_activityfield VALUES(24, '主题图片', 'picture1', 2, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '(最多5张，支持gif、jpeg、jpg、bmp、png，小于2M)', '活动概况');
+REPLACE INTO pw_activityfield VALUES(25, '主题图片二', 'picture2', 2, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(26, '主题图片三', 'picture3', 2, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(27, '主题图片四', 'picture4', 2, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(28, '主题图片五', 'picture5', 2, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(29, '联系人', 'contact', 2, 4, 'text', '', 1, 1, 1, 1, 0, 1, 1, 0, 1, 20, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(30, '联系电话', 'telephone', 2, 5, 'text', '', 1, 1, 1, 1, 0, 1, 1, 0, 1, 40, '(多个联系电话用,隔开)', '活动概况');
+REPLACE INTO pw_activityfield VALUES(31, '报名时间', 'signupstarttime', 2, 6, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 1, 1, 0, 1, 1, 0, 1, 18, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(32, '-', 'signupendtime', 2, 6, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 1, 1, 0, 1, 1, 0, 1, 18, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(33, '人数限制{@}最少', 'minparticipant', 2, 7, 'text', '', 0, 0, 0, 0, 0, 1, 0, 0, 0, 3, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(34, '最多', 'maxparticipant', 2, 7, 'text', '', 0, 0, 0, 0, 0, 1, 0, 0, 0, 3, '(留空或0表示没有限制)', '报名说明');
+REPLACE INTO pw_activityfield VALUES(35, '报名限制', 'userlimit', 2, 8, 'radio', 'a:2:{i:0;s:14:"1=所有用户";i:1;s:11:"2=仅好友";}', 1, 0, 1, 1, 0, 1, 0, 0, 0, 0, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(36, '请输入其它限制', 'specificuserlimit', 2, 8, 'text', '', 0, 0, 1, 1, 0, 1, 0, 0, 0, 14, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(37, '性别限制', 'genderlimit', 2, 9, 'radio', 'a:3:{i:0;s:8:"1=全部";i:1;s:11:"2=仅男生";i:2;s:11:"3=仅女生";}', 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(38, '活动费用', 'fees', 2, 10, 'text', '', 1, 0, 0, 0, 0, 1, 1, 0, 1, 0, '(如 小孩 每位 10元，有车族 每位10 元等)', '费用说明');
+REPLACE INTO pw_activityfield VALUES(39, '费用明细', 'feesdetail', 2, 11, 'text', '', 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, '', '费用说明');
+REPLACE INTO pw_activityfield VALUES(40, '支付方式', 'paymethod', 2, 12, 'radio', 'a:2:{i:0;s:11:"1=支付宝";i:1;s:14:"2=现金支付";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 0, '', '费用说明');
+REPLACE INTO pw_activityfield VALUES(41, '活动时间', 'starttime', 3, 1, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(42, '-', 'endtime', 3, 1, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(43, '活动地点', 'location', 3, 2, 'text', '', 1, 0, 0, 1, 0, 1, 0, 0, 0, 40, '(多个活动地点用,隔开)', '活动概况');
+REPLACE INTO pw_activityfield VALUES(44, '主题图片', 'picture1', 3, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '(最多5张，支持gif、jpeg、jpg、bmp、png，小于2M)', '活动概况');
+REPLACE INTO pw_activityfield VALUES(45, '主题图片二', 'picture2', 3, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(46, '主题图片三', 'picture3', 3, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(47, '主题图片四', 'picture4', 3, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(48, '主题图片五', 'picture5', 3, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(49, '联系人', 'contact', 3, 4, 'text', '', 1, 0, 0, 1, 0, 1, 1, 0, 1, 20, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(50, '联系电话', 'telephone', 3, 5, 'text', '', 1, 0, 0, 1, 0, 1, 1, 0, 1, 40, '(多个联系电话用,隔开)', '活动概况');
+REPLACE INTO pw_activityfield VALUES(51, '报名时间', 'signupstarttime', 3, 6, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(52, '-', 'signupendtime', 3, 6, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(53, '人数限制{@}最少', 'minparticipant', 3, 7, 'text', '', 1, 0, 0, 0, 0, 1, 0, 0, 0, 3, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(54, '最多', 'maxparticipant', 3, 7, 'text', '', 1, 0, 0, 0, 0, 1, 0, 0, 0, 3, '(留空或0表示没有限制)', '报名说明');
+REPLACE INTO pw_activityfield VALUES(55, '报名限制', 'userlimit', 3, 8, 'radio', 'a:2:{i:0;s:14:"1=所有用户";i:1;s:11:"2=仅好友";}', 1, 0, 0, 1, 0, 1, 0, 0, 0, 3, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(56, '请输入其它限制', 'specificuserlimit', 3, 8, 'text', '', 1, 0, 0, 1, 0, 1, 0, 0, 0, 14, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(57, '性别限制', 'genderlimit', 3, 9, 'radio', 'a:3:{i:0;s:8:"1=全部";i:1;s:11:"2=仅男生";i:2;s:11:"3=仅女生";}', 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(58, '活动费用', 'fees', 3, 10, 'text', '', 1, 0, 0, 0, 0, 1, 1, 0, 1, 0, '(如 小孩 每位 10元，有车族 每位10 元等)', '费用说明');
+REPLACE INTO pw_activityfield VALUES(59, '费用明细', 'feesdetail', 3, 11, 'text', '', 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, '', '费用说明');
+REPLACE INTO pw_activityfield VALUES(60, '支付方式', 'paymethod', 3, 12, 'radio', 'a:2:{i:0;s:11:"1=支付宝";i:1;s:14:"2=现金支付";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 0, '', '费用说明');
+REPLACE INTO pw_activityfield VALUES(61, '活动时间', 'starttime', 4, 1, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(62, '-', 'endtime', 4, 1, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(63, '活动地点', 'location', 4, 2, 'text', '', 1, 0, 0, 1, 0, 1, 0, 0, 0, 40, '(多个活动地点用,隔开)', '活动概况');
+REPLACE INTO pw_activityfield VALUES(64, '主题图片', 'picture1', 4, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '(最多5张，支持gif、jpeg、jpg、bmp、png，小于2M)', '活动概况');
+REPLACE INTO pw_activityfield VALUES(65, '主题图片二', 'picture2', 4, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(66, '主题图片三', 'picture3', 4, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(67, '主题图片四', 'picture4', 4, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(68, '主题图片五', 'picture5', 4, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(69, '联系人', 'contact', 4, 4, 'text', '', 1, 0, 0, 1, 0, 1, 1, 0, 1, 20, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(70, '联系电话', 'telephone', 4, 5, 'text', '', 1, 0, 0, 1, 0, 1, 1, 0, 1, 40, '(多个联系电话用,隔开)', '活动概况');
+REPLACE INTO pw_activityfield VALUES(71, '报名时间', 'signupstarttime', 4, 6, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(72, '-', 'signupendtime', 4, 6, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(73, '人数限制{@}最少', 'minparticipant', 4, 7, 'text', '', 1, 0, 0, 0, 0, 1, 0, 0, 0, 3, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(74, '最多', 'maxparticipant', 4, 7, 'text', '', 1, 0, 0, 0, 0, 1, 0, 0, 0, 3, '(留空或0表示没有限制)', '报名说明');
+REPLACE INTO pw_activityfield VALUES(75, '报名限制', 'userlimit', 4, 8, 'radio', 'a:2:{i:0;s:14:"1=所有用户";i:1;s:11:"2=仅好友";}', 1, 0, 0, 1, 0, 1, 0, 0, 0, 3, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(76, '请输入其它限制', 'specificuserlimit', 4, 8, 'text', '', 1, 0, 0, 1, 0, 1, 0, 0, 0, 14, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(77, '性别限制', 'genderlimit', 4, 9, 'radio', 'a:3:{i:0;s:8:"1=全部";i:1;s:11:"2=仅男生";i:2;s:11:"3=仅女生";}', 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(78, '活动费用', 'fees', 4, 10, 'text', '', 1, 0, 0, 0, 0, 1, 1, 0, 1, 0, '(如 小孩 每位 10元，有车族 每位10 元等)', '费用说明');
+REPLACE INTO pw_activityfield VALUES(79, '费用明细', 'feesdetail', 4, 11, 'text', '', 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, '', '费用说明');
+REPLACE INTO pw_activityfield VALUES(80, '支付方式', 'paymethod', 4, 12, 'radio', 'a:2:{i:0;s:11:"1=支付宝";i:1;s:14:"2=现金支付";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 0, '', '费用说明');
+REPLACE INTO pw_activityfield VALUES(81, '活动时间', 'starttime', 5, 1, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 1, 1, 1, 1, 1, 1, 0, 1, 18, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(82, '-', 'endtime', 5, 1, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 1, 1, 1, 1, 1, 1, 0, 1, 18, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(83, '活动地点', 'location', 5, 2, 'text', '', 1, 1, 1, 1, 1, 1, 0, 0, 0, 40, '(多个活动地点用,隔开)', '活动概况');
+REPLACE INTO pw_activityfield VALUES(84, '主题图片', 'picture1', 5, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '(最多5张，支持gif、jpeg、jpg、bmp、png，小于2M)', '活动概况');
+REPLACE INTO pw_activityfield VALUES(85, '主题图片二', 'picture2', 5, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(86, '主题图片三', 'picture3', 5, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(87, '主题图片四', 'picture4', 5, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(88, '主题图片五', 'picture5', 5, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(89, '联系人', 'contact', 5, 4, 'text', '', 1, 1, 1, 1, 1, 1, 1, 0, 1, 20, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(90, '联系电话', 'telephone', 5, 5, 'text', '', 1, 1, 1, 1, 1, 1, 1, 0, 1, 40, '(多个联系电话用,隔开)', '活动概况');
+REPLACE INTO pw_activityfield VALUES(91, '报名时间', 'signupstarttime', 5, 6, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 1, 1, 1, 1, 1, 1, 0, 1, 18, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(92, '-', 'signupendtime', 5, 6, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 1, 1, 1, 1, 1, 1, 0, 1, 18, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(93, '人数限制{@}最少', 'minparticipant', 5, 7, 'text', '', 1, 0, 0, 0, 1, 1, 0, 0, 0, 3, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(94, '最多', 'maxparticipant', 5, 7, 'text', '', 1, 0, 0, 0, 1, 1, 0, 0, 0, 3, '(留空或0表示没有限制)', '报名说明');
+REPLACE INTO pw_activityfield VALUES(95, '报名限制', 'userlimit', 5, 8, 'radio', 'a:2:{i:0;s:14:"1=所有用户";i:1;s:11:"2=仅好友";}', 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(96, '请输入其它限制', 'specificuserlimit', 5, 8, 'text', '', 1, 1, 1, 1, 1, 1, 0, 0, 0, 14, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(97, '性别限制', 'genderlimit', 5, 9, 'radio', 'a:3:{i:0;s:8:"1=全部";i:1;s:11:"2=仅男生";i:2;s:11:"3=仅女生";}', 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(98, '活动费用', 'fees', 5, 10, 'text', '', 1, 0, 0, 0, 1, 1, 1, 0, 1, 0, '(如 小孩 每位 10元，有车族 每位10 元等)', '费用说明');
+REPLACE INTO pw_activityfield VALUES(99, '费用明细', 'feesdetail', 5, 11, 'text', '', 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, '', '费用说明');
+REPLACE INTO pw_activityfield VALUES(100, '支付方式', 'paymethod', 5, 12, 'radio', 'a:2:{i:0;s:11:"1=支付宝";i:1;s:14:"2=现金支付";}', 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, '', '费用说明');
+REPLACE INTO pw_activityfield VALUES(101, '活动时间', 'starttime', 6, 1, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(102, '-', 'endtime', 6, 1, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(103, '活动地点', 'location', 6, 2, 'text', '', 1, 0, 0, 1, 0, 1, 0, 0, 0, 40, '(多个活动地点用,隔开)', '活动概况');
+REPLACE INTO pw_activityfield VALUES(104, '主题图片', 'picture1', 6, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '(最多5张，支持gif、jpeg、jpg、bmp、png，小于2M)', '活动概况');
+REPLACE INTO pw_activityfield VALUES(105, '主题图片二', 'picture2', 6, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(106, '主题图片三', 'picture3', 6, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(107, '主题图片四', 'picture4', 6, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(108, '主题图片五', 'picture5', 6, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(109, '联系人', 'contact', 6, 4, 'text', '', 1, 0, 0, 1, 0, 1, 1, 0, 1, 20, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(110, '联系电话', 'telephone', 6, 5, 'text', '', 1, 0, 0, 1, 0, 1, 1, 0, 1, 40, '(多个联系电话用,隔开)', '活动概况');
+REPLACE INTO pw_activityfield VALUES(111, '报名时间', 'signupstarttime', 6, 6, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(112, '-', 'signupendtime', 6, 6, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(113, '人数限制{@}最少', 'minparticipant', 6, 7, 'text', '', 1, 0, 0, 0, 0, 1, 0, 0, 0, 3, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(114, '最多', 'maxparticipant', 6, 7, 'text', '', 1, 0, 0, 0, 0, 1, 0, 0, 0, 3, '(留空或0表示没有限制)', '报名说明');
+REPLACE INTO pw_activityfield VALUES(115, '报名限制', 'userlimit', 6, 8, 'radio', 'a:2:{i:0;s:14:"1=所有用户";i:1;s:11:"2=仅好友";}', 1, 0, 0, 1, 0, 1, 0, 0, 0, 3, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(116, '请输入其它限制', 'specificuserlimit', 6, 8, 'text', '', 1, 0, 0, 1, 0, 1, 0, 0, 0, 14, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(117, '性别限制', 'genderlimit', 6, 9, 'radio', 'a:3:{i:0;s:8:"1=全部";i:1;s:11:"2=仅男生";i:2;s:11:"3=仅女生";}', 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(118, '活动费用', 'fees', 6, 10, 'text', '', 1, 0, 0, 0, 0, 1, 1, 0, 1, 0, '(如 小孩 每位 10元，有车族 每位10 元等)', '费用说明');
+REPLACE INTO pw_activityfield VALUES(119, '费用明细', 'feesdetail', 6, 11, 'text', '', 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, '', '费用说明');
+REPLACE INTO pw_activityfield VALUES(120, '支付方式', 'paymethod', 6, 12, 'radio', 'a:2:{i:0;s:11:"1=支付宝";i:1;s:14:"2=现金支付";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 0, '', '费用说明');
+REPLACE INTO pw_activityfield VALUES(121, '活动时间', 'starttime', 7, 1, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(122, '-', 'endtime', 7, 1, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(123, '活动地点', 'location', 7, 2, 'text', '', 1, 0, 0, 1, 0, 1, 0, 0, 0, 40, '(多个活动地点用,隔开)', '活动概况');
+REPLACE INTO pw_activityfield VALUES(124, '主题图片', 'picture1', 7, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '(最多5张，支持gif、jpeg、jpg、bmp、png，小于2M)', '活动概况');
+REPLACE INTO pw_activityfield VALUES(125, '主题图片二', 'picture2', 7, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(126, '主题图片三', 'picture3', 7, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(127, '主题图片四', 'picture4', 7, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(128, '主题图片五', 'picture5', 7, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(129, '联系人', 'contact', 7, 4, 'text', '', 1, 0, 0, 1, 0, 1, 1, 0, 1, 20, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(130, '联系电话', 'telephone', 7, 5, 'text', '', 1, 0, 0, 1, 0, 1, 1, 0, 1, 40, '(多个联系电话用,隔开)', '活动概况');
+REPLACE INTO pw_activityfield VALUES(131, '报名时间', 'signupstarttime', 7, 6, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(132, '-', 'signupendtime', 7, 6, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(133, '人数限制{@}最少', 'minparticipant', 7, 7, 'text', '', 1, 0, 0, 0, 0, 1, 0, 0, 0, 3, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(134, '最多', 'maxparticipant', 7, 7, 'text', '', 1, 0, 0, 0, 0, 1, 0, 0, 0, 3, '(留空或0表示没有限制)', '报名说明');
+REPLACE INTO pw_activityfield VALUES(135, '报名限制', 'userlimit', 7, 8, 'radio', 'a:2:{i:0;s:14:"1=所有用户";i:1;s:11:"2=仅好友";}', 1, 0, 0, 1, 0, 1, 0, 0, 0, 3, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(136, '请输入其它限制', 'specificuserlimit', 7, 8, 'text', '', 1, 0, 0, 1, 0, 1, 0, 0, 0, 14, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(137, '性别限制', 'genderlimit', 7, 9, 'radio', 'a:3:{i:0;s:8:"1=全部";i:1;s:11:"2=仅男生";i:2;s:11:"3=仅女生";}', 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(138, '活动费用', 'fees', 7, 10, 'text', '', 1, 0, 0, 0, 0, 1, 1, 0, 1, 0, '(如 小孩 每位 10元，有车族 每位10 元等)', '费用说明');
+REPLACE INTO pw_activityfield VALUES(139, '费用明细', 'feesdetail', 7, 11, 'text', '', 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, '', '费用说明');
+REPLACE INTO pw_activityfield VALUES(140, '支付方式', 'paymethod', 7, 12, 'radio', 'a:2:{i:0;s:11:"1=支付宝";i:1;s:14:"2=现金支付";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 0, '', '费用说明');
+REPLACE INTO pw_activityfield VALUES(141, '活动时间', 'starttime', 8, 1, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(142, '-', 'endtime', 8, 1, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(143, '活动地点', 'location', 8, 2, 'text', '', 1, 0, 0, 1, 0, 1, 0, 0, 0, 40, '(多个活动地点用,隔开)', '活动概况');
+REPLACE INTO pw_activityfield VALUES(144, '主题图片', 'picture1', 8, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '(最多5张，支持gif、jpeg、jpg、bmp、png，小于2M)', '活动概况');
+REPLACE INTO pw_activityfield VALUES(145, '主题图片二', 'picture2', 8, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(146, '主题图片三', 'picture3', 8, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(147, '主题图片四', 'picture4', 8, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(148, '主题图片五', 'picture5', 8, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(149, '联系人', 'contact', 8, 4, 'text', '', 1, 0, 0, 1, 0, 1, 1, 0, 1, 20, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(150, '联系电话', 'telephone', 8, 5, 'text', '', 1, 0, 0, 1, 0, 1, 1, 0, 1, 40, '(多个联系电话用,隔开)', '活动概况');
+REPLACE INTO pw_activityfield VALUES(151, '报名时间', 'signupstarttime', 8, 6, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(152, '-', 'signupendtime', 8, 6, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(153, '人数限制{@}最少', 'minparticipant', 8, 7, 'text', '', 1, 0, 0, 0, 0, 1, 0, 0, 0, 3, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(154, '最多', 'maxparticipant', 8, 7, 'text', '', 1, 0, 0, 0, 0, 1, 0, 0, 0, 3, '(留空或0表示没有限制)', '报名说明');
+REPLACE INTO pw_activityfield VALUES(155, '报名限制', 'userlimit', 8, 8, 'radio', 'a:2:{i:0;s:14:"1=所有用户";i:1;s:11:"2=仅好友";}', 1, 0, 0, 1, 0, 1, 0, 0, 0, 3, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(156, '请输入其它限制', 'specificuserlimit', 8, 8, 'text', '', 1, 0, 0, 1, 0, 1, 0, 0, 0, 14, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(157, '性别限制', 'genderlimit', 8, 9, 'radio', 'a:3:{i:0;s:8:"1=全部";i:1;s:11:"2=仅男生";i:2;s:11:"3=仅女生";}', 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(158, '活动费用', 'fees', 8, 10, 'text', '', 1, 0, 0, 0, 0, 1, 1, 0, 1, 0, '(如 小孩 每位 10元，有车族 每位10 元等)', '费用说明');
+REPLACE INTO pw_activityfield VALUES(159, '费用明细', 'feesdetail', 8, 11, 'text', '', 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, '', '费用说明');
+REPLACE INTO pw_activityfield VALUES(160, '支付方式', 'paymethod', 8, 12, 'radio', 'a:2:{i:0;s:11:"1=支付宝";i:1;s:14:"2=现金支付";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 0, '', '费用说明');
+REPLACE INTO pw_activityfield VALUES(161, '活动时间', 'starttime', 9, 1, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(162, '-', 'endtime', 9, 1, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(163, '活动地点', 'location', 9, 2, 'text', '', 1, 0, 0, 1, 0, 1, 0, 0, 0, 40, '(多个活动地点用,隔开)', '活动概况');
+REPLACE INTO pw_activityfield VALUES(164, '主题图片', 'picture1', 9, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '(最多5张，支持gif、jpeg、jpg、bmp、png，小于2M)', '活动概况');
+REPLACE INTO pw_activityfield VALUES(165, '主题图片二', 'picture2', 9, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(166, '主题图片三', 'picture3', 9, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(167, '主题图片四', 'picture4', 9, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(168, '主题图片五', 'picture5', 9, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(169, '联系人', 'contact', 9, 4, 'text', '', 1, 0, 0, 1, 0, 1, 1, 0, 1, 20, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(170, '联系电话', 'telephone', 9, 5, 'text', '', 1, 0, 0, 1, 0, 1, 1, 0, 1, 40, '(多个联系电话用,隔开)', '活动概况');
+REPLACE INTO pw_activityfield VALUES(171, '报名时间', 'signupstarttime', 9, 6, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(172, '-', 'signupendtime', 9, 6, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(173, '人数限制{@}最少', 'minparticipant', 9, 7, 'text', '', 1, 0, 0, 0, 0, 1, 0, 0, 0, 3, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(174, '最多', 'maxparticipant', 9, 7, 'text', '', 1, 0, 0, 0, 0, 1, 0, 0, 0, 3, '(留空或0表示没有限制)', '报名说明');
+REPLACE INTO pw_activityfield VALUES(175, '报名限制', 'userlimit', 9, 8, 'radio', 'a:2:{i:0;s:14:"1=所有用户";i:1;s:11:"2=仅好友";}', 1, 0, 0, 1, 0, 1, 0, 0, 0, 3, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(176, '请输入其它限制', 'specificuserlimit', 9, 8, 'text', '', 1, 0, 0, 1, 0, 1, 0, 0, 0, 14, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(177, '性别限制', 'genderlimit', 9, 9, 'radio', 'a:3:{i:0;s:8:"1=全部";i:1;s:11:"2=仅男生";i:2;s:11:"3=仅女生";}', 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(178, '活动费用', 'fees', 9, 10, 'text', '', 1, 0, 0, 0, 0, 1, 1, 0, 1, 0, '(如 小孩 每位 10元，有车族 每位10 元等)', '费用说明');
+REPLACE INTO pw_activityfield VALUES(179, '费用明细', 'feesdetail', 9, 11, 'text', '', 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, '', '费用说明');
+REPLACE INTO pw_activityfield VALUES(180, '支付方式', 'paymethod', 9, 12, 'radio', 'a:2:{i:0;s:11:"1=支付宝";i:1;s:14:"2=现金支付";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 0, '', '费用说明');
+REPLACE INTO pw_activityfield VALUES(181, '活动时间', 'starttime', 10, 1, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(182, '-', 'endtime', 10, 1, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(183, '活动地点', 'location', 10, 2, 'text', '', 1, 0, 0, 1, 0, 1, 0, 0, 0, 40, '(多个活动地点用,隔开)', '活动概况');
+REPLACE INTO pw_activityfield VALUES(184, '主题图片', 'picture1', 10, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '(最多5张，支持gif、jpeg、jpg、bmp、png，小于2M)', '活动概况');
+REPLACE INTO pw_activityfield VALUES(185, '主题图片二', 'picture2', 10, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(186, '主题图片三', 'picture3', 10, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(187, '主题图片四', 'picture4', 10, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(188, '主题图片五', 'picture5', 10, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(189, '联系人', 'contact', 10, 4, 'text', '', 1, 0, 0, 1, 0, 1, 1, 0, 1, 20, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(190, '联系电话', 'telephone', 10, 5, 'text', '', 1, 0, 0, 1, 0, 1, 1, 0, 1, 40, '(多个联系电话用,隔开)', '活动概况');
+REPLACE INTO pw_activityfield VALUES(191, '报名时间', 'signupstarttime', 10, 6, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(192, '-', 'signupendtime', 10, 6, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(193, '人数限制{@}最少', 'minparticipant', 10, 7, 'text', '', 1, 0, 0, 0, 0, 1, 0, 0, 0, 3, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(194, '最多', 'maxparticipant', 10, 7, 'text', '', 1, 0, 0, 0, 0, 1, 0, 0, 0, 3, '(留空或0表示没有限制)', '报名说明');
+REPLACE INTO pw_activityfield VALUES(195, '报名限制', 'userlimit', 10, 8, 'radio', 'a:2:{i:0;s:14:"1=所有用户";i:1;s:11:"2=仅好友";}', 1, 0, 0, 1, 0, 1, 0, 0, 0, 3, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(196, '请输入其它限制', 'specificuserlimit', 10, 8, 'text', '', 1, 0, 0, 1, 0, 1, 0, 0, 0, 14, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(197, '性别限制', 'genderlimit', 10, 9, 'radio', 'a:3:{i:0;s:8:"1=全部";i:1;s:11:"2=仅男生";i:2;s:11:"3=仅女生";}', 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(198, '活动费用', 'fees', 10, 10, 'text', '', 1, 0, 0, 0, 0, 1, 1, 0, 1, 0, '(如 小孩 每位 10元，有车族 每位10 元等)', '费用说明');
+REPLACE INTO pw_activityfield VALUES(199, '费用明细', 'feesdetail', 10, 11, 'text', '', 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, '', '费用说明');
+REPLACE INTO pw_activityfield VALUES(200, '支付方式', 'paymethod', 10, 12, 'radio', 'a:2:{i:0;s:11:"1=支付宝";i:1;s:14:"2=现金支付";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 0, '', '费用说明');
+REPLACE INTO pw_activityfield VALUES(201, '活动时间', 'starttime', 11, 1, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(202, '-', 'endtime', 11, 1, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(203, '活动地点', 'location', 11, 2, 'text', '', 1, 0, 0, 1, 0, 1, 0, 0, 0, 40, '(多个活动地点用,隔开)', '活动概况');
+REPLACE INTO pw_activityfield VALUES(204, '主题图片', 'picture1', 11, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '(最多5张，支持gif、jpeg、jpg、bmp、png，小于2M)', '活动概况');
+REPLACE INTO pw_activityfield VALUES(205, '主题图片二', 'picture2', 11, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(206, '主题图片三', 'picture3', 11, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(207, '主题图片四', 'picture4', 11, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(208, '主题图片五', 'picture5', 11, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(209, '联系人', 'contact', 11, 4, 'text', '', 1, 0, 0, 1, 0, 1, 1, 0, 1, 20, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(210, '联系电话', 'telephone', 11, 5, 'text', '', 1, 0, 0, 1, 0, 1, 1, 0, 1, 40, '(多个联系电话用,隔开)', '活动概况');
+REPLACE INTO pw_activityfield VALUES(211, '报名时间', 'signupstarttime', 11, 6, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(212, '-', 'signupendtime', 11, 6, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(213, '人数限制{@}最少', 'minparticipant', 11, 7, 'text', '', 1, 0, 0, 0, 0, 1, 0, 0, 0, 3, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(214, '最多', 'maxparticipant', 11, 7, 'text', '', 1, 0, 0, 0, 0, 1, 0, 0, 0, 3, '(留空或0表示没有限制)', '报名说明');
+REPLACE INTO pw_activityfield VALUES(215, '报名限制', 'userlimit', 11, 8, 'radio', 'a:2:{i:0;s:14:"1=所有用户";i:1;s:11:"2=仅好友";}', 1, 0, 0, 1, 0, 1, 0, 0, 0, 3, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(216, '请输入其它限制', 'specificuserlimit', 11, 8, 'text', '', 1, 0, 0, 1, 0, 1, 0, 0, 0, 14, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(217, '性别限制', 'genderlimit', 11, 9, 'radio', 'a:3:{i:0;s:8:"1=全部";i:1;s:11:"2=仅男生";i:2;s:11:"3=仅女生";}', 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(218, '活动费用', 'fees', 11, 10, 'text', '', 1, 0, 0, 0, 0, 1, 1, 0, 1, 0, '(如 小孩 每位 10元，有车族 每位10 元等)', '费用说明');
+REPLACE INTO pw_activityfield VALUES(219, '费用明细', 'feesdetail', 11, 11, 'text', '', 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, '', '费用说明');
+REPLACE INTO pw_activityfield VALUES(220, '支付方式', 'paymethod', 11, 12, 'radio', 'a:2:{i:0;s:11:"1=支付宝";i:1;s:14:"2=现金支付";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 0, '', '费用说明');
+REPLACE INTO pw_activityfield VALUES(221, '活动时间', 'starttime', 12, 1, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(222, '-', 'endtime', 12, 1, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(223, '活动地点', 'location', 12, 2, 'text', '', 1, 0, 0, 1, 0, 1, 0, 0, 0, 40, '(多个活动地点用,隔开)', '活动概况');
+REPLACE INTO pw_activityfield VALUES(224, '主题图片', 'picture1', 12, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '(最多5张，支持gif、jpeg、jpg、bmp、png，小于2M)', '活动概况');
+REPLACE INTO pw_activityfield VALUES(225, '主题图片二', 'picture2', 12, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(226, '主题图片三', 'picture3', 12, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(227, '主题图片四', 'picture4', 12, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(228, '主题图片五', 'picture5', 12, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(229, '联系人', 'contact', 12, 4, 'text', '', 1, 0, 0, 1, 0, 1, 1, 0, 1, 20, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(230, '联系电话', 'telephone', 12, 5, 'text', '', 1, 0, 0, 1, 0, 1, 1, 0, 1, 40, '(多个联系电话用,隔开)', '活动概况');
+REPLACE INTO pw_activityfield VALUES(231, '报名时间', 'signupstarttime', 12, 6, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(232, '-', 'signupendtime', 12, 6, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(233, '人数限制{@}最少', 'minparticipant', 12, 7, 'text', '', 1, 0, 0, 0, 0, 1, 0, 0, 0, 3, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(234, '最多', 'maxparticipant', 12, 7, 'text', '', 1, 0, 0, 0, 0, 1, 0, 0, 0, 3, '(留空或0表示没有限制)', '报名说明');
+REPLACE INTO pw_activityfield VALUES(235, '报名限制', 'userlimit', 12, 8, 'radio', 'a:2:{i:0;s:14:"1=所有用户";i:1;s:11:"2=仅好友";}', 1, 0, 0, 1, 0, 1, 0, 0, 0, 3, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(236, '请输入其它限制', 'specificuserlimit', 12, 8, 'text', '', 1, 0, 0, 1, 0, 1, 0, 0, 0, 14, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(237, '性别限制', 'genderlimit', 12, 9, 'radio', 'a:3:{i:0;s:8:"1=全部";i:1;s:11:"2=仅男生";i:2;s:11:"3=仅女生";}', 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(238, '活动费用', 'fees', 12, 10, 'text', '', 1, 0, 0, 0, 0, 1, 1, 0, 1, 0, '(如 小孩 每位 10元，有车族 每位10 元等)', '费用说明');
+REPLACE INTO pw_activityfield VALUES(239, '费用明细', 'feesdetail', 12, 11, 'text', '', 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, '', '费用说明');
+REPLACE INTO pw_activityfield VALUES(240, '支付方式', 'paymethod', 12, 12, 'radio', 'a:2:{i:0;s:11:"1=支付宝";i:1;s:14:"2=现金支付";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 0, '', '费用说明');
+REPLACE INTO pw_activityfield VALUES(241, '活动时间', 'starttime', 13, 1, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(242, '-', 'endtime', 13, 1, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(243, '活动地点', 'location', 13, 2, 'text', '', 1, 0, 0, 1, 0, 1, 0, 0, 0, 40, '(多个活动地点用,隔开)', '活动概况');
+REPLACE INTO pw_activityfield VALUES(244, '主题图片', 'picture1', 13, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '(最多5张，支持gif、jpeg、jpg、bmp、png，小于2M)', '活动概况');
+REPLACE INTO pw_activityfield VALUES(245, '主题图片二', 'picture2', 13, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(246, '主题图片三', 'picture3', 13, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(247, '主题图片四', 'picture4', 13, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(248, '主题图片五', 'picture5', 13, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(249, '联系人', 'contact', 13, 4, 'text', '', 1, 0, 0, 1, 0, 1, 1, 0, 1, 20, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(250, '联系电话', 'telephone', 13, 5, 'text', '', 1, 0, 0, 1, 0, 1, 1, 0, 1, 40, '(多个联系电话用,隔开)', '活动概况');
+REPLACE INTO pw_activityfield VALUES(251, '报名时间', 'signupstarttime', 13, 6, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(252, '-', 'signupendtime', 13, 6, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(253, '人数限制{@}最少', 'minparticipant', 13, 7, 'text', '', 1, 0, 0, 0, 0, 1, 0, 0, 0, 3, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(254, '最多', 'maxparticipant', 13, 7, 'text', 'a:1:{s:9:"alipaymax";s:2:"30";}', 1, 0, 0, 0, 0, 1, 0, 0, 0, 3, '(留空或0表示没有限制)', '报名说明');
+REPLACE INTO pw_activityfield VALUES(255, '报名限制', 'userlimit', 13, 8, 'radio', 'a:2:{i:0;s:14:"1=所有用户";i:1;s:11:"2=仅好友";}', 1, 0, 0, 1, 0, 1, 0, 0, 0, 3, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(256, '请输入其它限制', 'specificuserlimit', 13, 8, 'text', '', 1, 0, 0, 1, 0, 1, 0, 0, 0, 14, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(257, '性别限制', 'genderlimit', 13, 9, 'radio', 'a:3:{i:0;s:8:"1=全部";i:1;s:11:"2=仅男生";i:2;s:11:"3=仅女生";}', 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(258, '活动费用', 'fees', 13, 10, 'text', '', 1, 0, 0, 0, 0, 1, 1, 0, 1, 0, '(如 小孩 每位 10元，有车族 每位10 元等)', '费用说明');
+REPLACE INTO pw_activityfield VALUES(259, '费用明细', 'feesdetail', 13, 11, 'text', '', 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, '', '费用说明');
+REPLACE INTO pw_activityfield VALUES(260, '支付方式', 'paymethod', 13, 12, 'radio', 'a:2:{i:0;s:11:"1=支付宝";i:1;s:14:"2=现金支付";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 0, '', '费用说明');
+REPLACE INTO pw_activityfield VALUES(261, '活动时间', 'starttime', 14, 1, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(262, '-', 'endtime', 14, 1, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(263, '活动地点', 'location', 14, 2, 'text', '', 1, 0, 0, 1, 0, 1, 0, 0, 0, 40, '(多个活动地点用,隔开)', '活动概况');
+REPLACE INTO pw_activityfield VALUES(264, '主题图片', 'picture1', 14, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '(最多5张，支持gif、jpeg、jpg、bmp、png，小于2M)', '活动概况');
+REPLACE INTO pw_activityfield VALUES(265, '主题图片二', 'picture2', 14, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(266, '主题图片三', 'picture3', 14, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(267, '主题图片四', 'picture4', 14, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(268, '主题图片五', 'picture5', 14, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(269, '联系人', 'contact', 14, 4, 'text', '', 1, 0, 0, 1, 0, 1, 1, 0, 1, 20, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(270, '联系电话', 'telephone', 14, 5, 'text', '', 1, 0, 0, 1, 0, 1, 1, 0, 1, 40, '(多个联系电话用,隔开)', '活动概况');
+REPLACE INTO pw_activityfield VALUES(271, '报名时间', 'signupstarttime', 14, 6, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(272, '-', 'signupendtime', 14, 6, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(273, '人数限制{@}最少', 'minparticipant', 14, 7, 'text', '', 1, 0, 0, 0, 0, 1, 0, 0, 0, 3, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(274, '最多', 'maxparticipant', 14, 7, 'text', 'a:1:{s:9:"alipaymax";s:2:"30";}', 1, 0, 0, 0, 0, 1, 0, 0, 0, 3, '(留空或0表示没有限制)', '报名说明');
+REPLACE INTO pw_activityfield VALUES(275, '报名限制', 'userlimit', 14, 8, 'radio', 'a:2:{i:0;s:14:"1=所有用户";i:1;s:11:"2=仅好友";}', 1, 0, 0, 1, 0, 1, 0, 0, 0, 3, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(276, '请输入其它限制', 'specificuserlimit', 14, 8, 'text', '', 1, 0, 0, 1, 0, 1, 0, 0, 0, 14, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(277, '性别限制', 'genderlimit', 14, 9, 'radio', 'a:3:{i:0;s:8:"1=全部";i:1;s:11:"2=仅男生";i:2;s:11:"3=仅女生";}', 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(278, '活动费用', 'fees', 14, 10, 'text', '', 1, 0, 0, 0, 0, 1, 1, 0, 1, 0, '(如 小孩 每位 10元，有车族 每位10 元等)', '费用说明');
+REPLACE INTO pw_activityfield VALUES(279, '费用明细', 'feesdetail', 14, 11, 'text', '', 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, '', '费用说明');
+REPLACE INTO pw_activityfield VALUES(280, '支付方式', 'paymethod', 14, 12, 'radio', 'a:2:{i:0;s:11:"1=支付宝";i:1;s:14:"2=现金支付";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 0, '', '费用说明');
+REPLACE INTO pw_activityfield VALUES(281, '活动时间', 'starttime', 15, 1, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(282, '-', 'endtime', 15, 1, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(283, '活动地点', 'location', 15, 2, 'text', '', 1, 0, 0, 1, 0, 1, 0, 0, 0, 40, '(多个活动地点用,隔开)', '活动概况');
+REPLACE INTO pw_activityfield VALUES(284, '主题图片', 'picture1', 15, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '(最多5张，支持gif、jpeg、jpg、bmp、png，小于2M)', '活动概况');
+REPLACE INTO pw_activityfield VALUES(285, '主题图片二', 'picture2', 15, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(286, '主题图片三', 'picture3', 15, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(287, '主题图片四', 'picture4', 15, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(288, '主题图片五', 'picture5', 15, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(289, '联系人', 'contact', 15, 4, 'text', '', 1, 0, 0, 1, 0, 1, 1, 0, 1, 20, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(290, '联系电话', 'telephone', 15, 5, 'text', '', 1, 0, 0, 1, 0, 1, 1, 0, 1, 40, '(多个联系电话用,隔开)', '活动概况');
+REPLACE INTO pw_activityfield VALUES(291, '报名时间', 'signupstarttime', 15, 6, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(292, '-', 'signupendtime', 15, 6, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(293, '人数限制{@}最少', 'minparticipant', 15, 7, 'text', '', 1, 0, 0, 0, 0, 1, 0, 0, 0, 3, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(294, '最多', 'maxparticipant', 15, 7, 'text', '', 1, 0, 0, 0, 0, 1, 0, 0, 0, 3, '(留空或0表示没有限制)', '报名说明');
+REPLACE INTO pw_activityfield VALUES(295, '报名限制', 'userlimit', 15, 8, 'radio', 'a:2:{i:0;s:14:"1=所有用户";i:1;s:11:"2=仅好友";}', 1, 0, 0, 1, 0, 1, 0, 0, 0, 3, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(296, '请输入其它限制', 'specificuserlimit', 15, 8, 'text', '', 1, 0, 0, 1, 0, 1, 0, 0, 0, 14, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(297, '性别限制', 'genderlimit', 15, 9, 'radio', 'a:3:{i:0;s:8:"1=全部";i:1;s:11:"2=仅男生";i:2;s:11:"3=仅女生";}', 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(298, '活动费用', 'fees', 15, 10, 'text', '', 1, 0, 0, 0, 0, 1, 1, 0, 1, 0, '(如 小孩 每位 10元，有车族 每位10 元等)', '费用说明');
+REPLACE INTO pw_activityfield VALUES(299, '费用明细', 'feesdetail', 15, 11, 'text', '', 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, '', '费用说明');
+REPLACE INTO pw_activityfield VALUES(300, '支付方式', 'paymethod', 15, 12, 'radio', 'a:2:{i:0;s:11:"1=支付宝";i:1;s:14:"2=现金支付";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 0, '', '费用说明');
+REPLACE INTO pw_activityfield VALUES(301, '活动时间', 'starttime', 16, 1, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(302, '-', 'endtime', 16, 1, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(303, '活动地点', 'location', 16, 2, 'text', '', 1, 0, 0, 1, 0, 1, 0, 0, 0, 40, '(多个活动地点用,隔开)', '活动概况');
+REPLACE INTO pw_activityfield VALUES(304, '主题图片', 'picture1', 16, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '(最多5张，支持gif、jpeg、jpg、bmp、png，小于2M)', '活动概况');
+REPLACE INTO pw_activityfield VALUES(305, '主题图片二', 'picture2', 16, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(306, '主题图片三', 'picture3', 16, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(307, '主题图片四', 'picture4', 16, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(308, '主题图片五', 'picture5', 16, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(309, '联系人', 'contact', 16, 4, 'text', '', 1, 0, 0, 1, 0, 1, 1, 0, 1, 20, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(310, '联系电话', 'telephone', 16, 5, 'text', '', 1, 0, 0, 1, 0, 1, 1, 0, 1, 40, '(多个联系电话用,隔开)', '活动概况');
+REPLACE INTO pw_activityfield VALUES(311, '报名时间', 'signupstarttime', 16, 6, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(312, '-', 'signupendtime', 16, 6, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(313, '人数限制{@}最少', 'minparticipant', 16, 7, 'text', '', 1, 0, 0, 0, 0, 1, 0, 0, 0, 3, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(314, '最多', 'maxparticipant', 16, 7, 'text', '', 1, 0, 0, 0, 0, 1, 0, 0, 0, 3, '(留空或0表示没有限制)', '报名说明');
+REPLACE INTO pw_activityfield VALUES(315, '报名限制', 'userlimit', 16, 8, 'radio', 'a:2:{i:0;s:14:"1=所有用户";i:1;s:11:"2=仅好友";}', 1, 0, 0, 1, 0, 1, 0, 0, 0, 3, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(316, '请输入其它限制', 'specificuserlimit', 16, 8, 'text', '', 1, 0, 0, 1, 0, 1, 0, 0, 0, 14, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(317, '性别限制', 'genderlimit', 16, 9, 'radio', 'a:3:{i:0;s:8:"1=全部";i:1;s:11:"2=仅男生";i:2;s:11:"3=仅女生";}', 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(318, '活动费用', 'fees', 16, 10, 'text', '', 1, 0, 0, 0, 0, 1, 1, 0, 1, 0, '(如 小孩 每位 10元，有车族 每位10 元等)', '费用说明');
+REPLACE INTO pw_activityfield VALUES(319, '费用明细', 'feesdetail', 16, 11, 'text', '', 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, '', '费用说明');
+REPLACE INTO pw_activityfield VALUES(320, '支付方式', 'paymethod', 16, 12, 'radio', 'a:2:{i:0;s:11:"1=支付宝";i:1;s:14:"2=现金支付";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 0, '', '费用说明');
+REPLACE INTO pw_activityfield VALUES(321, '活动时间', 'starttime', 17, 1, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(322, '-', 'endtime', 17, 1, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(323, '活动地点', 'location', 17, 2, 'text', '', 1, 0, 0, 1, 0, 1, 0, 0, 0, 40, '(多个活动地点用,隔开)', '活动概况');
+REPLACE INTO pw_activityfield VALUES(324, '主题图片', 'picture1', 17, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '(最多5张，支持gif、jpeg、jpg、bmp、png，小于2M)', '活动概况');
+REPLACE INTO pw_activityfield VALUES(325, '主题图片二', 'picture2', 17, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(326, '主题图片三', 'picture3', 17, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(327, '主题图片四', 'picture4', 17, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(328, '主题图片五', 'picture5', 17, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(329, '联系人', 'contact', 17, 4, 'text', '', 1, 0, 0, 1, 0, 1, 1, 0, 1, 20, '', '活动概况');
+REPLACE INTO pw_activityfield VALUES(330, '联系电话', 'telephone', 17, 5, 'text', '', 1, 0, 0, 1, 0, 1, 1, 0, 1, 40, '(多个联系电话用,隔开)', '活动概况');
+REPLACE INTO pw_activityfield VALUES(331, '报名时间', 'signupstarttime', 17, 6, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(332, '-', 'signupendtime', 17, 6, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(333, '人数限制{@}最少', 'minparticipant', 17, 7, 'text', '', 1, 0, 0, 0, 0, 1, 0, 0, 0, 3, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(334, '最多', 'maxparticipant', 17, 7, 'text', '', 1, 0, 0, 0, 0, 1, 0, 0, 0, 3, '(留空或0表示没有限制)', '报名说明');
+REPLACE INTO pw_activityfield VALUES(335, '报名限制', 'userlimit', 17, 8, 'radio', 'a:2:{i:0;s:14:"1=所有用户";i:1;s:11:"2=仅好友";}', 1, 0, 0, 1, 0, 1, 0, 0, 0, 3, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(336, '请输入其它限制', 'specificuserlimit', 17, 8, 'text', '', 1, 0, 0, 1, 0, 1, 0, 0, 0, 14, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(337, '性别限制', 'genderlimit', 17, 9, 'radio', 'a:3:{i:0;s:8:"1=全部";i:1;s:11:"2=仅男生";i:2;s:11:"3=仅女生";}', 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, '', '报名说明');
+REPLACE INTO pw_activityfield VALUES(338, '活动费用', 'fees', 17, 10, 'text', '', 1, 0, 0, 0, 0, 1, 1, 0, 1, 0, '(如 小孩 每位 10元，有车族 每位10 元等)', '费用说明');
+REPLACE INTO pw_activityfield VALUES(339, '费用明细', 'feesdetail', 17, 11, 'text', '', 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, '', '费用说明');
+REPLACE INTO pw_activityfield VALUES(340, '支付方式', 'paymethod', 17, 12, 'radio', 'a:2:{i:0;s:11:"1=支付宝";i:1;s:14:"2=现金支付";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 0, '', '费用说明');
+
+DROP TABLE IF EXISTS pw_activitymembers;
+CREATE TABLE pw_activitymembers (
+  `actuid` int(10) unsigned NOT NULL auto_increment,
+  `fupid` mediumint(8) NOT NULL default '0',
+  `tid` int(10) unsigned NOT NULL default '0',
+  `uid` int(10) unsigned NOT NULL default '0',
+  `actmid` tinyint(3) unsigned NOT NULL default '0',
+  `username` varchar(15) NOT NULL default '',
+  `signupdetail` varchar(255) NOT NULL default '',
+  `signupnum` smallint(6) unsigned NOT NULL default '0',
+  `nickname` varchar(255) NOT NULL default '',
+  `totalcash` varchar(255) NOT NULL default '',
+  `mobile` varchar(15) NOT NULL default '',
+  `telephone` varchar(15) NOT NULL default '',
+  `address` varchar(255) NOT NULL default '',
+  `message` text NOT NULL,
+  `ifanonymous` tinyint(3) NOT NULL default '0',
+  `ifpay` tinyint(3) NOT NULL default '0',
+  `signuptime` int(10) unsigned default '0',
+  `fromuid` int(10) unsigned NOT NULL default '0',
+  `fromusername` varchar(15) NOT NULL default '',
+  `issubstitute` tinyint(3) NOT NULL default '0',
+  `isadditional` tinyint(3) NOT NULL default '0',
+  `isrefund` tinyint(3) NOT NULL default '0',
+  `refundcost` varchar(255) NOT NULL default '',
+  `refundreason` varchar(255) NOT NULL default '',
+  `additionalreason` varchar(255) NOT NULL default '',
+  `out_trade_no` varchar(255) NOT NULL default '0',
+  `batch_detail_no` varchar(255) NOT NULL default '0',
+  PRIMARY KEY  (`actuid`),
+  KEY `idx_tid_uid` (`tid`,`uid`),
+  KEY `idx_uid` (`uid`),
+  KEY `idx_fupid` (`fupid`)
+)  TYPE=MyISAM ;
+
+DROP TABLE IF EXISTS pw_activitymodel;
+CREATE TABLE pw_activitymodel (
+  `actmid` smallint(6) unsigned NOT NULL auto_increment,
+  `name` varchar(30) NOT NULL default '',
+  `actid` tinyint(3) unsigned NOT NULL default '0',
+  `ifable` tinyint(3) NOT NULL default '1',
+  `vieworder` tinyint(3) NOT NULL default '0',
+  `ifdel` tinyint(3) unsigned NOT NULL default '1',
+  PRIMARY KEY  (`actmid`),
+  KEY `idx_actid` (`actid`)
+)  TYPE=MyISAM AUTO_INCREMENT=19 ;
+REPLACE INTO pw_activitymodel VALUES(1, '爬山', 1, 1, 0, 0);
+REPLACE INTO pw_activitymodel VALUES(2, '烧烤', 1, 1, 1, 0);
+REPLACE INTO pw_activitymodel VALUES(3, '暴走/快闪', 1, 1, 2, 0);
+REPLACE INTO pw_activitymodel VALUES(4, '自驾游', 1, 1, 3, 0);
+REPLACE INTO pw_activitymodel VALUES(5, '农家乐', 1, 1, 4, 0);
+REPLACE INTO pw_activitymodel VALUES(6, '室内运动', 2, 1, 0, 0);
+REPLACE INTO pw_activitymodel VALUES(7, '室外运动', 2, 1, 1, 0);
+REPLACE INTO pw_activitymodel VALUES(8, '真人CS', 2, 1, 2, 0);
+REPLACE INTO pw_activitymodel VALUES(9, '看球赛', 2, 1, 3, 0);
+REPLACE INTO pw_activitymodel VALUES(10, '聚餐/茶馆', 3, 1, 0, 0);
+REPLACE INTO pw_activitymodel VALUES(11, '夜生活/舞会', 3, 1, 1, 0);
+REPLACE INTO pw_activitymodel VALUES(12, '电影/K歌', 3, 1, 2, 0);
+REPLACE INTO pw_activitymodel VALUES(13, '演出/展览', 3, 1, 3, 0);
+REPLACE INTO pw_activitymodel VALUES(14, '桌游/棋牌', 3, 1, 4, 0);
+REPLACE INTO pw_activitymodel VALUES(15, '相亲', 4, 1, 0, 0);
+REPLACE INTO pw_activitymodel VALUES(16, '旅游', 4, 1, 1, 0);
+REPLACE INTO pw_activitymodel VALUES(17, '其它', 4, 1, 2, 0);
+
+DROP TABLE IF EXISTS pw_activitypaylog;
+CREATE TABLE pw_activitypaylog (
+  `actpid` mediumint(8) NOT NULL auto_increment,
+  `tid` int(10) unsigned NOT NULL default '0',
+  `actuid` int(10) unsigned NOT NULL default '0',
+  `uid` int(10) unsigned NOT NULL default '0',
+  `username` varchar(15) NOT NULL default '',
+  `authorid` int(10) unsigned NOT NULL default '0',
+  `author` varchar(15) NOT NULL default '',
+  `fromuid` int(10) unsigned NOT NULL default '0',
+  `fromusername` varchar(15) NOT NULL default '',
+  `cost` varchar(255) NOT NULL default '',
+  `costtype` tinyint(3) NOT NULL default '0',
+  `status` tinyint(3) NOT NULL default '0',
+  `createtime` int(10) unsigned NOT NULL default '0',
+  `subject` varchar(100) NOT NULL default '',
+  `wherefrom` tinyint(3) NOT NULL default '0',
+  PRIMARY KEY  (`actpid`),
+  KEY `idx_uid` (`uid`),
+  KEY `idx_authorid` (`authorid`),
+  KEY `idx_tid` (`tid`),
+  KEY `idx_actuid_costtype` (`actuid`,`costtype`),
+  KEY `idx_fromuid` (`fromuid`)
+) TYPE=MyISAM;
+
+DROP TABLE IF EXISTS pw_activityvalue1;
+CREATE TABLE pw_activityvalue1 (
+  `tid` int(10) unsigned NOT NULL,
+  `fid` smallint(6) unsigned NOT NULL default '0',
+  `ifrecycle` tinyint(3) NOT NULL default '0',
+  PRIMARY KEY  (`tid`)
+) TYPE=MyISAM;
+
+DROP TABLE IF EXISTS pw_activityvalue10;
+CREATE TABLE pw_activityvalue10 (
+  `tid` int(10) unsigned NOT NULL,
+  `fid` smallint(6) unsigned NOT NULL default '0',
+  `ifrecycle` tinyint(3) NOT NULL default '0',
+  PRIMARY KEY  (`tid`)
+) TYPE=MyISAM ;
+
+DROP TABLE IF EXISTS pw_activityvalue11;
+CREATE TABLE pw_activityvalue11 (
+  `tid` int(10) unsigned NOT NULL,
+  `fid` smallint(6) unsigned NOT NULL default '0',
+  `ifrecycle` tinyint(3) NOT NULL default '0',
+  PRIMARY KEY  (`tid`)
+) TYPE=MyISAM;
+
+DROP TABLE IF EXISTS pw_activityvalue12;
+CREATE TABLE pw_activityvalue12 (
+  `tid` int(10) unsigned NOT NULL,
+  `fid` smallint(6) unsigned NOT NULL default '0',
+  `ifrecycle` tinyint(3) NOT NULL default '0',
+  PRIMARY KEY  (`tid`)
+) TYPE=MyISAM;
+
+DROP TABLE IF EXISTS pw_activityvalue13;
+CREATE TABLE pw_activityvalue13 (
+  `tid` int(10) unsigned NOT NULL,
+  `fid` smallint(6) unsigned NOT NULL default '0',
+  `ifrecycle` tinyint(3) NOT NULL default '0',
+  PRIMARY KEY  (`tid`)
+) TYPE=MyISAM;
+
+DROP TABLE IF EXISTS pw_activityvalue14;
+CREATE TABLE pw_activityvalue14 (
+  `tid` int(10) unsigned NOT NULL,
+  `fid` smallint(6) unsigned NOT NULL default '0',
+  `ifrecycle` tinyint(3) NOT NULL default '0',
+  PRIMARY KEY  (`tid`)
+) TYPE=MyISAM;
+
+DROP TABLE IF EXISTS pw_activityvalue15;
+CREATE TABLE pw_activityvalue15 (
+  `tid` int(10) unsigned NOT NULL,
+  `fid` smallint(6) unsigned NOT NULL default '0',
+  `ifrecycle` tinyint(3) NOT NULL default '0',
+  PRIMARY KEY  (`tid`)
+) TYPE=MyISAM;
+
+DROP TABLE IF EXISTS pw_activityvalue16;
+CREATE TABLE pw_activityvalue16 (
+  `tid` int(10) unsigned NOT NULL,
+  `fid` smallint(6) unsigned NOT NULL default '0',
+  `ifrecycle` tinyint(3) NOT NULL default '0',
+  PRIMARY KEY  (`tid`)
+) TYPE=MyISAM;
+
+DROP TABLE IF EXISTS pw_activityvalue17;
+CREATE TABLE pw_activityvalue17 (
+  `tid` int(10) unsigned NOT NULL,
+  `fid` smallint(6) unsigned NOT NULL default '0',
+  `ifrecycle` tinyint(3) NOT NULL default '0',
+  PRIMARY KEY  (`tid`)
+) TYPE=MyISAM;
+
+DROP TABLE IF EXISTS pw_activityvalue2;
+CREATE TABLE pw_activityvalue2 (
+  `tid` int(10) unsigned NOT NULL,
+  `fid` smallint(6) unsigned NOT NULL default '0',
+  `ifrecycle` tinyint(3) NOT NULL default '0',
+  PRIMARY KEY  (`tid`)
+) TYPE=MyISAM;
+
+DROP TABLE IF EXISTS pw_activityvalue3;
+CREATE TABLE pw_activityvalue3 (
+  `tid` int(10) unsigned NOT NULL,
+  `fid` smallint(6) unsigned NOT NULL default '0',
+  `ifrecycle` tinyint(3) NOT NULL default '0',
+  PRIMARY KEY  (`tid`)
+) TYPE=MyISAM;
+
+DROP TABLE IF EXISTS pw_activityvalue4;
+CREATE TABLE pw_activityvalue4 (
+  `tid` int(10) unsigned NOT NULL,
+  `fid` smallint(6) unsigned NOT NULL default '0',
+  `ifrecycle` tinyint(3) NOT NULL default '0',
+  PRIMARY KEY  (`tid`)
+) TYPE=MyISAM;
+
+DROP TABLE IF EXISTS pw_activityvalue5;
+CREATE TABLE pw_activityvalue5 (
+  `tid` int(10) unsigned NOT NULL,
+  `fid` smallint(6) unsigned NOT NULL default '0',
+  `ifrecycle` tinyint(3) NOT NULL default '0',
+  PRIMARY KEY  (`tid`)
+) TYPE=MyISAM;
+
+DROP TABLE IF EXISTS pw_activityvalue6;
+CREATE TABLE pw_activityvalue6 (
+  `tid` int(10) unsigned NOT NULL,
+  `fid` smallint(6) unsigned NOT NULL default '0',
+  `ifrecycle` tinyint(3) NOT NULL default '0',
+  PRIMARY KEY  (`tid`)
+) TYPE=MyISAM;
+
+DROP TABLE IF EXISTS pw_activityvalue7;
+CREATE TABLE pw_activityvalue7 (
+  `tid` int(10) unsigned NOT NULL,
+  `fid` smallint(6) unsigned NOT NULL default '0',
+  `ifrecycle` tinyint(3) NOT NULL default '0',
+  PRIMARY KEY  (`tid`)
+) TYPE=MyISAM;
+
+DROP TABLE IF EXISTS pw_activityvalue8;
+CREATE TABLE pw_activityvalue8 (
+  `tid` int(10) unsigned NOT NULL,
+  `fid` smallint(6) unsigned NOT NULL default '0',
+  `ifrecycle` tinyint(3) NOT NULL default '0',
+  PRIMARY KEY  (`tid`)
+) TYPE=MyISAM;
+
+DROP TABLE IF EXISTS pw_activityvalue9;
+CREATE TABLE pw_activityvalue9 (
+  `tid` int(10) unsigned NOT NULL,
+  `fid` smallint(6) unsigned NOT NULL default '0',
+  `ifrecycle` tinyint(3) NOT NULL default '0',
+  PRIMARY KEY  (`tid`)
 ) TYPE=MyISAM;
 
 DROP TABLE IF EXISTS pw_actmember;
 CREATE TABLE pw_actmember (
   id mediumint(8) unsigned NOT NULL auto_increment,
-  actid mediumint(8) NOT NULL default '0',
-  winduid mediumint(8) NOT NULL default '0',
-  state tinyint(1) NOT NULL default '0',
+  actid int(10) unsigned NOT NULL default '0',
+  winduid int(10) unsigned NOT NULL default '0',
+  state tinyint(3) NOT NULL default '0',
   applydate int(10) NOT NULL default '0',
   contact varchar(20) NOT NULL default '',
   message varchar(80) NOT NULL default '',
   PRIMARY KEY  (id),
-  KEY actid (actid),
-  KEY winduid (winduid)
+  KEY idx_actid (actid),
+  KEY idx_winduid (winduid)
 ) TYPE=MyISAM;
+
+DROP TABLE IF EXISTS pw_actmembers;
+CREATE TABLE pw_actmembers (
+  id mediumint(8) unsigned NOT NULL auto_increment,
+  uid int(10) unsigned NOT NULL default '0',
+  actid int(10) unsigned NOT NULL default '0',
+  realname varchar( 30 ) NOT NULL default '',
+  phone varchar(15) NOT NULL default '',
+  mobile varchar(15) NOT NULL default '',
+  address varchar(255) NOT NULL default '',
+  anonymous tinyint(3) unsigned NOT NULL,
+  PRIMARY KEY (id),
+  KEY idx_actid (actid)
+) ENGINE=MyISAM;
 
 DROP TABLE IF EXISTS pw_administrators;
 CREATE TABLE pw_administrators (
-  uid mediumint(8) unsigned NOT NULL default '0',
+  uid int(10) unsigned NOT NULL default '0',
   username varchar(15) NOT NULL default '',
   groupid tinyint(3) NOT NULL default '0',
   groups varchar(255) NOT NULL default '',
-  slog VARCHAR(255) NOT NULL,
+  slog varchar(255) NOT NULL,
   PRIMARY KEY  (uid)
 ) TYPE=MyISAM;
 
@@ -141,9 +766,9 @@ CREATE TABLE pw_adminlog (
   timestamp int(10) NOT NULL default '0',
   ip varchar(20) NOT NULL default '',
   PRIMARY KEY  (id),
-  KEY type (type,timestamp),
-  KEY username1 (username1),
-  KEY username2 (username2)
+  KEY idx_type_timestamp (type,timestamp),
+  KEY idx_username1 (username1),
+  KEY idx_username2 (username2)
 ) TYPE=MyISAM;
 
 DROP TABLE IF EXISTS pw_adminset;
@@ -152,7 +777,6 @@ CREATE TABLE pw_adminset (
   value text NOT NULL,
   PRIMARY KEY  (gid)
 ) TYPE=MyISAM;
-
 INSERT INTO pw_adminset (gid, value) VALUES(3, 'a:69:{s:8:"creathtm";s:1:"1";s:9:"forumsell";s:1:"1";s:11:"singleright";s:1:"1";s:8:"tpccheck";s:1:"1";s:9:"postcheck";s:1:"1";s:6:"tagset";s:1:"1";s:6:"pwcode";s:1:"1";s:6:"setbwd";s:1:"1";s:7:"setform";s:1:"1";s:9:"topiccate";s:1:"1";s:8:"postcate";s:1:"1";s:8:"urlcheck";s:1:"1";s:10:"attachment";s:1:"1";s:11:"attachstats";s:1:"1";s:11:"attachrenew";s:1:"1";s:10:"app_photos";s:1:"1";s:9:"app_diary";s:1:"1";s:10:"app_groups";s:1:"1";s:9:"app_share";s:1:"1";s:9:"app_write";s:1:"1";s:7:"app_hot";s:1:"1";s:8:"checkreg";s:1:"1";s:10:"checkemail";s:1:"1";s:7:"banuser";s:1:"1";s:7:"viewban";s:1:"1";s:12:"customcredit";s:1:"1";s:5:"level";s:1:"1";s:9:"userstats";s:1:"1";s:7:"upgrade";s:1:"1";s:6:"uptime";s:1:"1";s:6:"sethtm";s:1:"1";s:9:"datastate";s:1:"1";s:7:"sitemap";s:1:"1";s:9:"postcache";s:1:"1";s:5:"ipban";s:1:"1";s:8:"ipstates";s:1:"1";s:8:"ipsearch";s:1:"1";s:11:"customfield";s:1:"1";s:11:"updatecache";s:1:"1";s:9:"creditdiy";s:1:"1";s:12:"creditchange";s:1:"1";s:6:"rebang";s:1:"1";s:7:"pwcache";s:1:"1";s:6:"report";s:1:"1";s:8:"forumlog";s:1:"1";s:9:"creditlog";s:1:"1";s:3:"app";s:1:"1";s:10:"hackcenter";s:1:"1";s:9:"setstyles";s:1:"1";s:12:"announcement";s:1:"1";s:8:"draftset";s:1:"1";s:8:"sendmail";s:1:"1";s:7:"sendmsg";s:1:"1";s:7:"present";s:1:"1";s:6:"setads";s:1:"1";s:5:"share";s:1:"1";s:9:"viewtoday";s:1:"1";s:5:"chmod";s:1:"1";s:9:"safecheck";s:1:"1";s:4:"help";s:1:"1";s:7:"message";s:1:"1";s:8:"guestdir";s:1:"1";s:7:"recycle";s:1:"1";s:8:"plantodo";s:1:"1";s:7:"addplan";s:1:"1";s:7:"userpay";s:1:"1";s:9:"orderlist";s:1:"1";s:15:"area_tplcontent";s:1:"1";s:10:"o_comments";s:1:"1";}');
 INSERT INTO pw_adminset (gid, value) VALUES(4, 'a:19:{s:8:"tpccheck";s:1:"1";s:9:"postcheck";s:1:"1";s:6:"setbwd";s:1:"1";s:10:"attachment";s:1:"1";s:11:"attachstats";s:1:"1";s:11:"attachrenew";s:1:"1";s:7:"banuser";s:1:"1";s:7:"viewban";s:1:"1";s:9:"userstats";s:1:"1";s:9:"editgroup";s:1:"1";s:9:"postcache";s:1:"1";s:5:"ipban";s:1:"1";s:8:"ipsearch";s:1:"1";s:6:"report";s:1:"1";s:8:"forumlog";s:1:"1";s:9:"creditlog";s:1:"1";s:12:"announcement";s:1:"1";s:6:"setads";s:1:"1";s:5:"share";s:1:"1";}');
 INSERT INTO pw_adminset (gid, value) VALUES(5, 'a:6:{s:7:"banuser";s:1:"1";s:7:"viewban";s:1:"1";s:6:"report";s:1:"1";s:8:"forumlog";s:1:"1";s:9:"creditlog";s:1:"1";s:12:"announcement";s:1:"1";}');
@@ -160,13 +784,13 @@ INSERT INTO pw_adminset (gid, value) VALUES(5, 'a:6:{s:7:"banuser";s:1:"1";s:7:"
 DROP TABLE IF EXISTS pw_advert;
 CREATE TABLE pw_advert (
   id int(10) unsigned NOT NULL auto_increment,
-  type tinyint(1) NOT NULL default '0',
+  type tinyint(3) NOT NULL default '0',
   uid int(10) unsigned NOT NULL default '0',
-  ckey varchar(32) NOT NULL,
+  ckey varchar(32) NOT NULL default '',
   stime int(10) unsigned NOT NULL default '0',
   etime int(10) unsigned NOT NULL default '0',
-  ifshow tinyint(1) NOT NULL default '0',
-  orderby tinyint(1) NOT NULL default '0',
+  ifshow tinyint(3) NOT NULL default '0',
+  orderby tinyint(3) NOT NULL default '0',
   descrip varchar(255) NOT NULL,
   config text NOT NULL,
   PRIMARY KEY (id)
@@ -176,8 +800,8 @@ DROP TABLE IF EXISTS pw_announce;
 CREATE TABLE pw_announce (
   aid smallint(6) unsigned NOT NULL auto_increment,
   fid smallint(6) NOT NULL default '-1',
-  ifopen tinyint(1) NOT NULL default '0',
-  ifconvert tinyint(1) NOT NULL default '0',
+  ifopen tinyint(3) NOT NULL default '0',
+  ifconvert tinyint(3) NOT NULL default '0',
   vieworder smallint(6) NOT NULL default '0',
   author varchar(15) NOT NULL default '',
   startdate varchar(15) NOT NULL default '',
@@ -186,43 +810,64 @@ CREATE TABLE pw_announce (
   subject varchar(100) NOT NULL default '',
   content mediumtext NOT NULL,
   PRIMARY KEY  (aid),
-  KEY vieworder (vieworder,startdate),
-  KEY fid (fid)
+  KEY idx_vieworder_startdate (vieworder,startdate),
+  KEY idx_fid (fid)
 ) TYPE=MyISAM;
+
+DROP TABLE IF EXISTS pw_area_level;
+CREATE TABLE pw_area_level (
+    uid int(10) unsigned not null default '0',
+    username varchar(15) NOT NULL DEFAULT '',
+    hasedit tinyint(3)  not null default '0',
+    hasattr tinyint(3) not null default '0',
+    super tinyint(3) not null default '0',
+    level text,
+    key idx_uid (uid)
+)ENGINE=MyISAM;
 
 DROP TABLE IF EXISTS pw_argument;
 CREATE TABLE pw_argument (
-  tid mediumint(8) unsigned NOT NULL,
-  cyid smallint(6) unsigned NOT NULL,
-  topped tinyint(1) unsigned NOT NULL,
-  postdate int(10) unsigned NOT NULL,
-  lastpost int(10) unsigned NOT NULL,
+  tid int(10) unsigned NOT NULL,
+  cyid smallint(6) unsigned NOT NULL default '0',
+  topped tinyint(3) unsigned NOT NULL,
+  postdate int(10) unsigned NOT NULL default '0',
+  lastpost int(10) unsigned NOT NULL default '0',
   digest TINYINT(1) NOT NULL DEFAULT '0',
-  titlefont VARCHAR(15) NOT NULL,
-  toolfield VARCHAR(21) NOT NULL,
+  titlefont VARCHAR(15) NOT NULL default '',
+  toolfield VARCHAR(21) NOT NULL default '',
   PRIMARY KEY (tid),
-  KEY cyid (cyid,topped,lastpost),
-  KEY lastpost (lastpost),
-  KEY postdate (postdate),
-  KEY digest (digest)
+  KEY idx_cyid_topped_lastpost (cyid,topped,lastpost),
+  KEY idx_lastpost (lastpost),
+  KEY idx_postdate (postdate),
+  KEY idx_digest (digest)
 ) TYPE=MyISAM;
 
 DROP TABLE IF EXISTS pw_attachbuy;
 CREATE TABLE pw_attachbuy (
   aid mediumint(8) unsigned NOT NULL,
-  uid mediumint(8) unsigned NOT NULL,
-  ctype varchar(20) NOT NULL,
-  cost smallint(5) unsigned NOT NULL,
+  uid int(10) unsigned NOT NULL default '0',
+  ctype varchar(20) NOT NULL default '',
+  cost smallint(6) unsigned NOT NULL,
   createdtime int(10) NOT NULL DEFAULT '0',
   PRIMARY KEY  (aid,uid)
 ) TYPE=MyISAM;
 
+DROP TABLE IF EXISTS pw_attachdownload;
+CREATE TABLE IF NOT EXISTS `pw_attachdownload` (
+  `aid` int(10) unsigned NOT NULL,
+  `uid` int(10) unsigned NOT NULL,
+  `ctype` varchar(20) NOT NULL DEFAULT '0',
+  `cost` smallint(6) unsigned NOT NULL,
+  `createdtime` int(10) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`aid`,`uid`)
+) TYPE=MyISAM;
+
 DROP TABLE IF EXISTS pw_attachs;
 CREATE TABLE pw_attachs (
-  aid mediumint(8) unsigned NOT NULL auto_increment,
+  aid int(10) unsigned NOT NULL auto_increment,
   fid smallint(6) unsigned NOT NULL default '0',
-  uid mediumint(8) unsigned NOT NULL default '0',
-  tid mediumint(8) unsigned NOT NULL default '0',
+  uid int(10) unsigned NOT NULL default '0',
+  tid int(10) unsigned NOT NULL default '0',
   pid int(10) unsigned NOT NULL default '0',
   did int(10) unsigned NOT NULL default '0',
   name varchar(255) NOT NULL default '',
@@ -235,28 +880,59 @@ CREATE TABLE pw_attachs (
   ctype varchar(20) NOT NULL default '',
   uploadtime int(10) NOT NULL default '0',
   descrip varchar(100) NOT NULL default '',
-  ifthumb tinyint(1) NOT NULL default '0',
+  ifthumb tinyint(3) NOT NULL default '0',
   mid int(10) unsigned NOT NULL default '0',
   PRIMARY KEY (aid),
-  KEY fid (fid),
-  KEY uid (uid),
-  KEY did (did),
-  KEY type (type),
-  KEY post (tid,pid)
+  KEY idx_fid (fid),
+  KEY idx_uid (uid),
+  KEY idx_did (did),
+  KEY idx_type (type),
+  KEY idx_tid_pid (tid,pid)
 ) TYPE=MyISAM;
+
+DROP TABLE IF EXISTS pw_attention;
+CREATE TABLE pw_attention (
+  `uid` int(10) NOT NULL default '0',
+  `friendid` int(10) NOT NULL default '0',
+  `joindate` int(10) NOT NULL default '0',
+  PRIMARY KEY  (`friendid`,`uid`),
+  KEY `idx_uid_joindate` (`uid`,`joindate`),
+  KEY `idx_friendid_joindate` (`friendid`,`joindate`),
+  KEY `idx_joindate` (`joindate`)
+) ENGINE=MyISAM;
+
+DROP TABLE IF EXISTS pw_attention_blacklist;
+CREATE TABLE pw_attention_blacklist (
+  `uid` int(10) unsigned NOT NULL,
+  `touid` int(10) unsigned NOT NULL,
+  PRIMARY KEY  (`uid`,`touid`)
+) TYPE=MyISAM;
+
+DROP TABLE IF EXISTS `pw_ban`;
+CREATE TABLE IF NOT EXISTS `pw_ban` (
+  `id` mediumint(8) unsigned not null auto_increment,
+  `uid` int(10) unsigned not null default '0',
+  `username` varchar(15) not null default '',
+  `type` tinyint(3) unsigned not null default '0',
+  `admin` varchar(15) not null default '',
+  `reason` varchar(100) not null default '',
+  `time` int(10) unsigned not null default '0',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idx_type_uid` (`type`,`uid`)
+) ENGINE=MyISAM;
 
 DROP TABLE IF EXISTS pw_banuser;
 CREATE TABLE pw_banuser (
   id mediumint(8) unsigned NOT NULL auto_increment,
-  uid mediumint(8) unsigned NOT NULL default '0',
+  uid int(10) unsigned NOT NULL default '0',
   fid smallint(6) unsigned NOT NULL default '0',
-  type tinyint(1) NOT NULL default '0',
+  type tinyint(3) NOT NULL default '0',
   startdate int(10) NOT NULL default '0',
-  days int(4) NOT NULL default '0',
+  days smallint(6) NOT NULL default '0',
   admin varchar(15) NOT NULL default '',
   reason varchar(80) NOT NULL default '',
   PRIMARY KEY  (id),
-  UNIQUE KEY uid (uid,fid)
+  UNIQUE KEY idx_uid_fid (uid,fid)
 ) TYPE=MyISAM;
 
 DROP TABLE IF EXISTS pw_bbsinfo;
@@ -270,41 +946,23 @@ CREATE TABLE pw_bbsinfo (
   yposts mediumint(8) unsigned NOT NULL default '0',
   hposts mediumint(8) unsigned NOT NULL default '0',
   hit_tdtime int(10) unsigned NOT NULL default '0',
-  hit_control tinyint(2) unsigned NOT NULL default '0',
+  hit_control tinyint(3) unsigned NOT NULL default '0',
   plantime int(10) NOT NULL default '0',
   o_post int(10) unsigned NOT NULL default '0',
   o_tpost int(10) unsigned NOT NULL default '0',
+  last_statistictime INT NOT NULL DEFAULT '0',
   KEY id (id)
 ) TYPE=MyISAM;
 
 DROP TABLE IF EXISTS pw_buyadvert;
 CREATE TABLE pw_buyadvert (
   id int(10) unsigned NOT NULL default '0',
-  uid mediumint(8) unsigned NOT NULL default '0',
-  ifcheck TINYINT(1) NOT NULL DEFAULT '0',
-  lasttime INT(10) NOT NULL DEFAULT '0',
+  uid int(10) unsigned NOT NULL default '0',
+  ifcheck tinyint(3) NOT NULL default '0',
+  lasttime int(10) NOT NULL default '0',
   config text NOT NULL,
   PRIMARY KEY (id,uid)
 ) TYPE=MyISAM;
-
-
-DROP TABLE IF EXISTS pw_channel;
-CREATE TABLE pw_channel (
-  id int(4) NOT NULL AUTO_INCREMENT,
-  name varchar(20) NOT NULL,
-  alias varchar(20) NOT NULL,
-  queue SMALLINT(6) NOT NULL,
-  relate_theme varchar(20) NOT NULL DEFAULT 'default',
-  domain_band varchar(50) NOT NULL,
-  metatitle varchar(255) NOT NULL DEFAULT '',
-  metadescrip varchar(255) NOT NULL DEFAULT '',
-  metakeywords varchar(255) NOT NULL DEFAULT '',
-  statictime int(10) NOT NULL,
-  PRIMARY KEY (id),
-  UNIQUE KEY alias (alias),
-  KEY relate_theme (relate_theme),
-  KEY queue (queue)
-) ENGINE=MyISAM;
 
 DROP TABLE IF EXISTS pw_cache;
 CREATE TABLE pw_cache (
@@ -317,41 +975,72 @@ CREATE TABLE pw_cache (
 DROP TABLE IF EXISTS pw_cachedata;
 CREATE TABLE pw_cachedata (
   id int(10) unsigned NOT NULL auto_increment,
-  invokepieceid smallint(6) unsigned NOT NULL,
+  invokepieceid smallint(6) unsigned NOT NULL default '0',
   fid smallint(6) unsigned NOT NULL default '0',
   loopid smallint(6) unsigned NOT NULL default '0',
   data text NOT NULL,
-  cachetime int(10) NOT NULL,
+  cachetime int(10) NOT NULL default '0',
   PRIMARY KEY (id),
-  UNIQUE KEY invokepieceid (invokepieceid,fid,loopid)
+  UNIQUE KEY idx_invokepieceid_fid_loopid (invokepieceid,fid,loopid)
 ) TYPE=MyISAM;
+
+DROP TABLE IF EXISTS pw_cache_members;
+CREATE TABLE pw_cache_members(
+    ckey char(32) not null default '',
+    cvalue text not null,
+    expire int(10) unsigned not null default '0',
+    primary key (ckey)
+) TYPE=MyISAM;
+
+DROP TABLE IF EXISTS pw_channel;
+CREATE TABLE pw_channel (
+  id smallint(6) NOT NULL AUTO_INCREMENT,
+  name varchar(20) NOT NULL default '',
+  alias varchar(20) NOT NULL default '',
+  queue smallint(6) NOT NULL default '0',
+  relate_theme varchar(20) NOT NULL default 'default',
+  domain_band varchar(50) NOT NULL default '',
+  metatitle varchar(255) NOT NULL default '',
+  metadescrip varchar(255) NOT NULL default '',
+  metakeywords varchar(255) NOT NULL default '',
+  statictime int(10) unsigned NOT NULL default '0',
+  PRIMARY KEY (id),
+  UNIQUE KEY idx_alias (alias),
+  KEY idx_relatetheme (relate_theme),
+  KEY idx_queue (queue)
+) ENGINE=MyISAM;
+REPLACE INTO pw_channel VALUES(1, '首页', 'home','', 'home', '', '', '', '', 0);
+REPLACE INTO pw_channel VALUES(2, '亲子', 'baby','', 'baby', '', '', '', '', 0);
+REPLACE INTO pw_channel VALUES(3, '美食', 'delicious','', 'delicious', '', '', '', '', 0);
+REPLACE INTO pw_channel VALUES(4, '汽车', 'auto','', 'auto', '', '', '', '', 0);
+REPLACE INTO pw_channel VALUES(5, '家装', 'decoration','', 'decoration', '', '', '', '', 0);
 
 DROP TABLE IF EXISTS pw_clientorder;
 CREATE TABLE pw_clientorder (
   id int(11) NOT NULL auto_increment,
   order_no varchar(30) NOT NULL default '',
   type tinyint(3) UNSIGNED NOT NULL,
-  uid mediumint(8) NOT NULL default '0',
+  uid int(10) unsigned NOT NULL default '0',
   paycredit varchar(15) NOT NULL default '',
-  price DECIMAL(8,2) NOT NULL DEFAULT '0',
+  price decimal(8,2) NOT NULL DEFAULT '0',
   payemail varchar(60) NOT NULL default '',
   number smallint(6) NOT NULL default '0',
   date int(10) NOT NULL default '0',
-  state tinyint(1) NOT NULL default '0',
-  extra_1 mediumint(8) NOT NULL,
-  PRIMARY KEY  (id),
-  KEY uid (uid),
-  KEY order_no (order_no)
+  state tinyint(3) NOT NULL default '0',
+  extra_1 int(10) NOT NULL default '0',
+  PRIMARY KEY (id),
+  KEY idx_uid (uid),
+  KEY idx_orderno (order_no)
 ) TYPE=MyISAM;
 
 DROP TABLE IF EXISTS pw_cmembers;
 CREATE TABLE pw_cmembers (
   id mediumint(9) NOT NULL auto_increment,
-  uid mediumint(9) unsigned NOT NULL default '0',
+  uid int(10) unsigned NOT NULL default '0',
   username varchar(20) NOT NULL default '',
   realname varchar(20) NOT NULL default '',
-  ifadmin tinyint(1) NOT NULL default '0',
-  gender tinyint(1) NOT NULL default '0',
+  ifadmin tinyint(3) NOT NULL default '0',
+  gender tinyint(3) NOT NULL default '0',
   tel varchar(15) NOT NULL default '',
   email varchar(50) NOT NULL default '',
   colonyid smallint(6) NOT NULL default '0',
@@ -361,8 +1050,82 @@ CREATE TABLE pw_cmembers (
   lastvisit int(10) unsigned NOT NULL default '0',
   lastpost int(10) unsigned NOT NULL default '0',
   PRIMARY KEY (id),
-  UNIQUE KEY colonyid (colonyid,uid),
-  KEY uid (uid)
+  UNIQUE KEY idx_colonyid_uid (colonyid,uid),
+  KEY idx_uid (uid)
+) TYPE=MyISAM;
+
+DROP TABLE IF EXISTS pw_cms_article;
+CREATE TABLE pw_cms_article (
+  `article_id` mediumint(8) NOT NULL AUTO_INCREMENT,
+  `subject` varchar(100) NOT NULL default '',
+  `descrip` varchar(255) NOT NULL default '',
+  `author` varchar(15) NOT NULL default '',
+  `username` varchar(15) NOT NULL default '',
+  `userid` int(10) unsigned NOT NULL default '0',
+  `jumpurl` varchar(255) NOT NULL default '',
+  `frominfo` varchar(100) NOT NULL default '',
+  `fromurl` varchar(255) NOT NULL default '',
+  `column_id` smallint(6) NOT NULL default '0',
+  `ifcheck` tinyint(3) NOT NULL default '1',
+  `postdate` int(10) NOT NULL default '0',
+  `modifydate` int(10) NOT NULL default '0',
+  `ifattach` tinyint(3) NOT NULL default '0',
+  `sourcetype` varchar(30) NOT NULL default '',
+  `sourceid` int(10) NOT NULL default '0',
+  PRIMARY KEY (`article_id`),
+  KEY `idx_columnid` (`column_id`)
+) TYPE=MyISAM;
+
+DROP TABLE IF EXISTS pw_cms_articlecontent;
+CREATE TABLE pw_cms_articlecontent (
+  `article_id` mediumint(8) NOT NULL,
+  `content` text NOT NULL,
+  `relatearticle` text NOT NULL,
+  PRIMARY KEY (`article_id`)
+) TYPE=MyISAM;
+
+DROP TABLE IF EXISTS pw_cms_articleextend;
+CREATE TABLE pw_cms_articleextend (
+  `article_id` mediumint(8) NOT NULL,
+  `hits` int(10) NOT NULL DEFAULT 0,
+  PRIMARY KEY (`article_id`)
+) TYPE=MyISAM;
+
+DROP TABLE IF EXISTS pw_cms_attach;
+CREATE TABLE pw_cms_attach (
+  `attach_id` mediumint(8) NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) NOT NULL default '',
+  `descrip` varchar(255) NOT NULL default '',
+  `article_id` mediumint(8) NOT NULL default '0',
+  `type` varchar(10) NOT NULL default '',
+  `size` int(10) NOT NULL default '0',
+  `uploadtime` int(10) NOT NULL default '0',
+  `attachurl` varchar(255) NOT NULL default '',
+  `ifthumb` tinyint(3) NOT NULL default '0',
+  PRIMARY KEY (`attach_id`),
+  KEY `idx_articleid` (`article_id`)
+) TYPE=MyISAM;
+
+DROP TABLE IF EXISTS pw_cms_column;
+CREATE TABLE pw_cms_column (
+  `column_id` smallint(6) NOT NULL AUTO_INCREMENT,
+  `parent_id` smallint(6) NOT NULL default '0',
+  `name` varchar(50) NOT NULL default '',
+  `order` smallint(6) NOT NULL default '0',
+  `allowoffer` tinyint(1) NOT NULL default '0',
+  `seotitle` varchar(255) NOT NULL default '',
+  `seodesc` varchar(255) NOT NULL default '',
+  `seokeywords` varchar(255) NOT NULL default '',
+  PRIMARY KEY (`column_id`)
+) TYPE=MyISAM;
+
+DROP TABLE IF EXISTS pw_cms_purview;
+CREATE TABLE pw_cms_purview (
+  `purview_id` smallint(6) NOT NULL AUTO_INCREMENT,
+  `username` varchar(15) NOT NULL default '',
+  `super` tinyint(3) NOT NULL default '0',
+  `columns` text NOT NULL,
+  PRIMARY KEY (`purview_id`)
 ) TYPE=MyISAM;
 
 DROP TABLE IF EXISTS pw_cnalbum;
@@ -370,64 +1133,146 @@ CREATE TABLE pw_cnalbum (
   aid int(11) unsigned not null AUTO_INCREMENT,
   aname varchar(50) NOT NULL default '',
   aintro varchar(200) NOT NULL default '',
-  atype smallint(4) NOT NULL default '0',
-  private tinyint(1) UNSIGNED NOT NULL,
-  albumpwd VARCHAR(40) NOT NULL,
-  ownerid mediumint(8) UNSIGNED NOT NULL,
-  owner varchar(50) NOT NULL default '',
+  atype smallint(6) NOT NULL default '0',
+  private tinyint(3) unsigned NOT NULL,
+  albumpwd varchar(40) NOT NULL default '',
+  ownerid int(10) unsigned NOT NULL default '0',
+  owner varchar(15) NOT NULL default '',
   photonum smallint(6) NOT NULL default '0',
   lastphoto varchar(100) NOT NULL default '',
-  lasttime int(10) UNSIGNED NOT NULL,
-  lastpid varchar(100) NOT NULL,
+  lasttime int(10) unsigned NOT NULL default '0',
+  lastpid varchar(100) NOT NULL default '',
   crtime int(10) NOT NULL default '0',
-  memopen TINYINT(1) NOT NULL DEFAULT '1',
-  isdefault TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
+  memopen tinyint(3) NOT NULL default '1',
+  isdefault tinyint(3) unsigned NOT NULL default '0',
   PRIMARY KEY  (aid),
-  KEY atype (atype,ownerid)
+  KEY idx_atype_ownerid (atype,ownerid)
 ) TYPE=MyISAM;
 
 DROP TABLE IF EXISTS pw_cnclass;
 CREATE TABLE pw_cnclass (
   fid smallint(6) unsigned NOT NULL,
-  cname varchar(20) NOT NULL,
-  ifopen tinyint(1) unsigned NOT NULL,
-  cnsum int(10) unsigned NOT NULL,
+  cname varchar(20) NOT NULL default '',
+  ifopen tinyint(3) unsigned NOT NULL default '0',
+  cnsum int(10) unsigned NOT NULL default '0',
   PRIMARY KEY  (fid)
 ) TYPE=MyISAM;
 
+DROP TABLE IF EXISTS pw_cnlevel;
+CREATE TABLE pw_cnlevel (
+  id mediumint(8) NOT NULL AUTO_INCREMENT,
+  ltype enum('common','special') NOT NULL default 'common',
+  ltitle varchar(60) NOT NULL default '',
+  lpoint int(10) unsigned NOT NULL default '0',
+  albumnum mediumint(8) unsigned NOT NULL default '0',
+  maxphotonum mediumint(8) unsigned NOT NULL default '0',
+  maxmember mediumint(8) unsigned NOT NULL default '0',
+  bbsmode tinyint(3) unsigned NOT NULL default '0',
+  allowmerge tinyint(3) unsigned NOT NULL default '0',
+  allowattorn tinyint(3) unsigned NOT NULL default '0',
+  allowdisband tinyint(3) unsigned NOT NULL default '0',
+  pictopic tinyint(3) unsigned NOT NULL default '0',
+  allowstyle tinyint(3) unsigned NOT NULL default '0',
+  topicadmin TEXT NOT NULL,
+  modeset text NOT NULL,
+  layout text NOT NULL,
+  PRIMARY KEY (id)
+) ENGINE=MyISAM;
+REPLACE INTO pw_cnlevel VALUES('1','common','初级群组','0','10','60','100','0','1','1','0','0','1','a:7:{s:3:"del";s:1:"1";s:9:"highlight";s:1:"0";s:4:"lock";s:1:"0";s:9:"pushtopic";s:1:"0";s:9:"downtopic";s:1:"0";s:8:"toptopic";s:1:"1";s:6:"digest";s:1:"1";}','a:5:{s:6:"thread";a:2:{s:9:"vieworder";s:1:"0";s:5:"title";s:6:"话题";}s:6:"active";a:2:{s:9:"vieworder";s:1:"0";s:5:"title";s:6:"活动";}s:5:"write";a:3:{s:6:"ifopen";s:1:"1";s:9:"vieworder";s:1:"1";s:5:"title";s:9:"讨论区";}s:6:"galbum";a:3:{s:6:"ifopen";s:1:"1";s:9:"vieworder";s:1:"2";s:5:"title";s:6:"相册";}s:6:"member";a:3:{s:6:"ifopen";s:1:"1";s:9:"vieworder";s:1:"3";s:5:"title";s:6:"成员";}}','a:4:{s:6:"thread";a:2:{s:9:"vieworder";s:1:"0";s:3:"num";s:1:"5";}s:6:"active";a:2:{s:9:"vieworder";s:1:"0";s:3:"num";s:1:"4";}s:5:"write";a:3:{s:6:"ifopen";s:1:"1";s:9:"vieworder";s:1:"1";s:3:"num";s:1:"5";}s:6:"galbum";a:3:{s:6:"ifopen";s:1:"1";s:9:"vieworder";s:1:"2";s:3:"num";s:2:"10";}}');
+REPLACE INTO pw_cnlevel VALUES('2','common','中级群组','500','20','60','200','0','1','1','0','0','1','a:7:{s:3:"del";s:1:"1";s:9:"highlight";s:1:"0";s:4:"lock";s:1:"0";s:9:"pushtopic";s:1:"0";s:9:"downtopic";s:1:"0";s:8:"toptopic";s:1:"1";s:6:"digest";s:1:"1";}','a:5:{s:6:"active";a:2:{s:9:"vieworder";s:1:"0";s:5:"title";s:6:"活动";}s:5:"write";a:3:{s:6:"ifopen";s:1:"1";s:9:"vieworder";s:1:"1";s:5:"title";s:9:"讨论区";}s:6:"thread";a:3:{s:6:"ifopen";s:1:"1";s:9:"vieworder";s:1:"2";s:5:"title";s:6:"话题";}s:6:"galbum";a:3:{s:6:"ifopen";s:1:"1";s:9:"vieworder";s:1:"3";s:5:"title";s:6:"相册";}s:6:"member";a:3:{s:6:"ifopen";s:1:"1";s:9:"vieworder";s:1:"4";s:5:"title";s:6:"成员";}}','a:4:{s:6:"active";a:2:{s:9:"vieworder";s:1:"0";s:3:"num";s:1:"4";}s:5:"write";a:3:{s:6:"ifopen";s:1:"1";s:9:"vieworder";s:1:"1";s:3:"num";s:1:"5";}s:6:"thread";a:3:{s:6:"ifopen";s:1:"1";s:9:"vieworder";s:1:"2";s:3:"num";s:1:"5";}s:6:"galbum";a:3:{s:6:"ifopen";s:1:"1";s:9:"vieworder";s:1:"3";s:3:"num";s:2:"10";}}');
+REPLACE INTO pw_cnlevel VALUES('3','common','高级群组','1000','50','100','500','0','0','0','0','0','1','a:7:{s:3:"del";s:1:"1";s:9:"highlight";s:1:"1";s:4:"lock";s:1:"0";s:9:"pushtopic";s:1:"0";s:9:"downtopic";s:1:"0";s:8:"toptopic";s:1:"1";s:6:"digest";s:1:"1";}','a:5:{s:5:"write";a:3:{s:6:"ifopen";s:1:"1";s:9:"vieworder";s:1:"1";s:5:"title";s:9:"讨论区";}s:6:"thread";a:3:{s:6:"ifopen";s:1:"1";s:9:"vieworder";s:1:"2";s:5:"title";s:6:"话题";}s:6:"active";a:3:{s:6:"ifopen";s:1:"1";s:9:"vieworder";s:1:"3";s:5:"title";s:6:"活动";}s:6:"galbum";a:3:{s:6:"ifopen";s:1:"1";s:9:"vieworder";s:1:"4";s:5:"title";s:6:"相册";}s:6:"member";a:3:{s:6:"ifopen";s:1:"1";s:9:"vieworder";s:1:"5";s:5:"title";s:6:"成员";}}','a:4:{s:5:"write";a:3:{s:6:"ifopen";s:1:"1";s:9:"vieworder";s:1:"1";s:3:"num";s:1:"5";}s:6:"thread";a:3:{s:6:"ifopen";s:1:"1";s:9:"vieworder";s:1:"2";s:3:"num";s:1:"5";}s:6:"active";a:3:{s:6:"ifopen";s:1:"1";s:9:"vieworder";s:1:"3";s:3:"num";s:1:"4";}s:6:"galbum";a:3:{s:6:"ifopen";s:1:"1";s:9:"vieworder";s:1:"4";s:3:"num";s:2:"10";}}');
+REPLACE INTO pw_cnlevel VALUES('4','special','官方群组','0','0','0','0','0','1','1','1','0','1','a:7:{s:3:"del";s:1:"1";s:9:"highlight";s:1:"1";s:4:"lock";s:1:"1";s:9:"pushtopic";s:1:"1";s:9:"downtopic";s:1:"1";s:8:"toptopic";s:1:"1";s:6:"digest";s:1:"1";}','a:5:{s:5:"write";a:3:{s:6:"ifopen";s:1:"1";s:9:"vieworder";s:1:"1";s:5:"title";s:9:"讨论区";}s:6:"thread";a:3:{s:6:"ifopen";s:1:"1";s:9:"vieworder";s:1:"2";s:5:"title";s:6:"话题";}s:6:"active";a:3:{s:6:"ifopen";s:1:"1";s:9:"vieworder";s:1:"3";s:5:"title";s:6:"活动";}s:6:"galbum";a:3:{s:6:"ifopen";s:1:"1";s:9:"vieworder";s:1:"4";s:5:"title";s:6:"相册";}s:6:"member";a:3:{s:6:"ifopen";s:1:"1";s:9:"vieworder";s:1:"5";s:5:"title";s:6:"成员";}}','a:4:{s:5:"write";a:3:{s:6:"ifopen";s:1:"1";s:9:"vieworder";s:1:"1";s:3:"num";s:1:"5";}s:6:"thread";a:3:{s:6:"ifopen";s:1:"1";s:9:"vieworder";s:1:"2";s:3:"num";s:1:"5";}s:6:"active";a:3:{s:6:"ifopen";s:1:"1";s:9:"vieworder";s:1:"3";s:3:"num";s:1:"4";}s:6:"galbum";a:3:{s:6:"ifopen";s:1:"1";s:9:"vieworder";s:1:"4";s:3:"num";s:2:"10";}}');
+REPLACE INTO pw_cnlevel VALUES('5','special','商业群组','0','100','100','500','0','0','0','0','0','1','a:7:{s:3:"del";s:1:"1";s:9:"highlight";s:1:"1";s:4:"lock";s:1:"1";s:9:"pushtopic";s:1:"1";s:9:"downtopic";s:1:"1";s:8:"toptopic";s:1:"1";s:6:"digest";s:1:"1";}','a:5:{s:5:"write";a:3:{s:6:"ifopen";s:1:"1";s:9:"vieworder";s:1:"1";s:5:"title";s:9:"讨论区";}s:6:"thread";a:3:{s:6:"ifopen";s:1:"1";s:9:"vieworder";s:1:"2";s:5:"title";s:6:"话题";}s:6:"active";a:3:{s:6:"ifopen";s:1:"1";s:9:"vieworder";s:1:"3";s:5:"title";s:6:"活动";}s:6:"galbum";a:3:{s:6:"ifopen";s:1:"1";s:9:"vieworder";s:1:"4";s:5:"title";s:6:"相册";}s:6:"member";a:3:{s:6:"ifopen";s:1:"1";s:9:"vieworder";s:1:"5";s:5:"title";s:9:"VIP会员";}}','a:4:{s:5:"write";a:3:{s:6:"ifopen";s:1:"1";s:9:"vieworder";s:1:"1";s:3:"num";s:1:"5";}s:6:"thread";a:3:{s:6:"ifopen";s:1:"1";s:9:"vieworder";s:1:"2";s:3:"num";s:1:"5";}s:6:"active";a:3:{s:6:"ifopen";s:1:"1";s:9:"vieworder";s:1:"3";s:3:"num";s:1:"4";}s:6:"galbum";a:3:{s:6:"ifopen";s:1:"1";s:9:"vieworder";s:1:"4";s:3:"num";s:2:"10";}}');
+
 DROP TABLE IF EXISTS pw_cnphoto;
 CREATE TABLE pw_cnphoto (
-  pid smallint(8) NOT NULL auto_increment,
-  aid int(11) unsigned not null,
+  pid int(10) NOT NULL auto_increment,
+  aid int(10) unsigned not null default '0',
   pintro varchar(200) NOT NULL default '',
   path varchar(200) NOT NULL default '',
   uploader varchar(50) NOT NULL default '',
   uptime int(10) NOT NULL default '0',
   hits smallint(6) NOT NULL default '0',
-  ifthumb tinyint(1) UNSIGNED NOT NULL default '0',
-  c_num MEDIUMINT(8) UNSIGNED NOT NULL,
+  ifthumb tinyint(1) unsigned NOT NULL default '0',
+  c_num mediumint(8) unsigned NOT NULL default '0',
   PRIMARY KEY  (pid),
   KEY idx_aid_uptime (aid,uptime)
 ) TYPE=MyISAM;
+
+DROP TABLE IF EXISTS pw_cnskin;
+CREATE TABLE pw_cnskin (
+  dir varchar(20) NOT NULL,
+  name varchar(30) NOT NULL default '',
+  PRIMARY KEY  (dir)
+) ENGINE=MyISAM;
+REPLACE INTO pw_cnskin VALUES('skin_sun','阳光');
+REPLACE INTO pw_cnskin VALUES('skin_purple','紫色');
+REPLACE INTO pw_cnskin VALUES('skin_pink','粉色');
+REPLACE INTO pw_cnskin VALUES('skin_night','星空');
+REPLACE INTO pw_cnskin VALUES('skin_green','绿野');
+REPLACE INTO pw_cnskin VALUES('skin_default','默认');
+REPLACE INTO pw_cnskin VALUES('skin_city','城市');
+REPLACE INTO pw_cnskin VALUES('skin_sport','运动');
+REPLACE INTO pw_cnskin VALUES('skin_leisure','休闲');
+REPLACE INTO pw_cnskin VALUES('skin_car','汽车');
+REPLACE INTO pw_cnskin VALUES('skin_area','地区');
+
+DROP TABLE IF EXISTS pw_cnstyles;
+CREATE TABLE pw_cnstyles (
+  id smallint(6) NOT NULL auto_increment,
+  cname varchar(20) NOT NULL default '',
+  ifopen tinyint(3) NOT NULL default '1',
+  csum int(10) NOT NULL default '0',
+  upid smallint(10) NOT NULL default '0',
+  PRIMARY KEY (id),
+  KEY idx_cname (cname)
+) ENGINE=MyISAM;
+REPLACE INTO pw_cnstyles VALUES('1','默认分类','1','0','0');
+
+DROP TABLE IF EXISTS pw_collection;
+CREATE TABLE pw_collection (
+  id mediumint(8) NOT NULL auto_increment,
+  type varchar(20) NOT NULL default '',
+  typeid int(10) unsigned NOT NULL default '0',
+  uid int(10) unsigned NOT NULL default '0',
+  username varchar(15) NOT NULL default '',
+  postdate int(10) unsigned NOT NULL default '0',
+  content text NOT NULL,
+  ifhidden tinyint(3) unsigned NOT NULL default '0',
+  c_num mediumint(8) unsigned NOT NULL default '0',
+  ctid int(10) not null default '-1',
+  PRIMARY KEY  (id),
+  KEY idx_uid_postdate (uid,postdate),
+  KEY idx_ctid ( `ctid` )
+) TYPE=MyISAM;
+
+DROP TABLE IF EXISTS pw_collectiontype;
+CREATE TABLE `pw_collectiontype` (
+  `ctid` int(10) unsigned not null auto_increment,
+  `uid` int(10) unsigned not null default '0',
+  `name` varchar(20) not null default '',
+  PRIMARY KEY (`ctid`),
+  KEY `idx_uid` (`uid`)
+) ENGINE=MyISAM;
 
 DROP TABLE IF EXISTS pw_colonys;
 CREATE TABLE pw_colonys (
   id smallint(6) unsigned NOT NULL auto_increment,
   classid smallint(6) NOT NULL default '0',
-  cname varchar(20) NOT NULL default '',
+  cname varchar(50) NOT NULL default '',
   admin varchar(20) NOT NULL default '',
   members int(10) NOT NULL default '0',
-  ifcheck tinyint(1) NOT NULL default '0',
-  ifopen tinyint(1) NOT NULL default '1',
+  ifcheck tinyint(3) NOT NULL default '0',
+  ifopen tinyint(3) NOT NULL default '1',
   cnimg varchar(100) NOT NULL default '',
-  banner varchar(100) NOT NULL,
+  banner varchar(100) NOT NULL default '',
   createtime int(10) NOT NULL default '0',
   annouce text NOT NULL default '',
   albumnum smallint(6) NOT NULL default '0',
   photonum int(10) unsigned NOT NULL default '0',
   writenum int(10) unsigned NOT NULL default '0',
   activitynum int(10) NOT NULL default '0',
-  iftopicshowinforum tinyint(1) UNSIGNED DEFAULT '1' NOT NULL,
+  iftopicshowinforum tinyint(3) unsigned NOT NULL default '1',
   annoucesee smallint(6) NOT NULL default '0',
   descrip varchar(255) NOT NULL default '',
   commonlevel mediumint(8) unsigned NOT NULL default '0',
@@ -435,78 +1280,41 @@ CREATE TABLE pw_colonys (
   tnum int(10) NOT NULL default '0',
   pnum int(10) unsigned NOT NULL default '0',
   todaypost int(10) NOT NULL default '0',
-  styleid SMALLINT(6) UNSIGNED NOT NULL DEFAULT '0',
-  visit INT(10) NOT NULL DEFAULT '0',
-  ifshow TINYINT(1) NOT NULL,
-  ifshowpic TINYINT(1) NOT NULL,
-  colonystyle VARCHAR(40) NOT NULL,
-  ifwriteopen TINYINT(1) NOT NULL DEFAULT '1',
-  ifmemberopen TINYINT(1) NOT NULL DEFAULT '1',
-  ifannouceopen TINYINT(1) NOT NULL DEFAULT '1',
-  vieworder TINYINT(3) NOT NULL DEFAULT '0',
-  titlefont varchar(255) NOT NULL DEFAULT '',
-  viewtype TINYINT( 1 ) NOT NULL,
-  visitor TEXT NOT NULL,
+  styleid smallint(6) UNSIGNED NOT NULL default '0',
+  visit int(10) NOT NULL default '0',
+  ifshow tinyint(3) NOT NULL default '0',
+  ifshowpic tinyint(3) NOT NULL default '0',
+  colonystyle varchar(40) NOT NULL default '',
+  ifwriteopen tinyint(3) NOT NULL default '1',
+  ifmemberopen tinyint(3) NOT NULL default '1',
+  ifannouceopen tinyint(3) NOT NULL default '1',
+  vieworder tinyint(3) NOT NULL default '0',
+  titlefont varchar(255) NOT NULL default '',
+  viewtype tinyint(3) NOT NULL default '0',
+  visitor text NOT NULL,
   PRIMARY KEY  (id),
-  UNIQUE KEY cname (cname),
-  KEY admin (admin),
-  KEY classid (classid)
+  UNIQUE KEY idx_cname (cname),
+  KEY idx_admin (admin),
+  KEY idx_classid (classid),
+  KEY idx_classid_vieworder (classid,vieworder)
 ) TYPE=MyISAM;
-
-DROP TABLE IF EXISTS pw_cnskin;
-CREATE TABLE pw_cnskin (
-  dir varchar(20) NOT NULL,
-  name varchar(30) NOT NULL,
-  PRIMARY KEY  (dir)
-) ENGINE=MyISAM;
 
 DROP TABLE IF EXISTS pw_comment;
 CREATE TABLE pw_comment (
   id mediumint(8) unsigned NOT NULL auto_increment,
-  uid mediumint(8) unsigned NOT NULL,
-  username varchar(15) NOT NULL,
-  title varchar(255) NOT NULL,
-  type varchar(10) NOT NULL,
-  typeid mediumint(8) NOT NULL,
-  upid mediumint(8) NOT NULL,
-  postdate int(10) NOT NULL,
-  ifwordsfb TINYINT( 3 ) UNSIGNED NOT NULL,
+  uid int(10) unsigned NOT NULL default '0',
+  username varchar(15) NOT NULL default '',
+  title varchar(255) NOT NULL default '',
+  type varchar(10) NOT NULL default '',
+  typeid mediumint(8) NOT NULL default '0',
+  upid mediumint(8) NOT NULL default '0',
+  postdate int(10) NOT NULL default '0',
+  ifwordsfb tinyint(3) unsigned NOT NULL default '0',
   PRIMARY KEY  (id),
-  KEY type (type,typeid),
-  KEY upid (upid)
+  KEY idx_type_typeid (type,typeid),
+  KEY idx_upid (upid),
+  KEY idx_postdate (postdate)
 ) TYPE=MyISAM;
-
-DROP TABLE IF EXISTS pw_cnlevel;
-CREATE TABLE pw_cnlevel (
-  id mediumint(8) NOT NULL AUTO_INCREMENT,
-  ltype enum('common','special') NOT NULL,
-  ltitle varchar(60) NOT NULL,
-  lpoint int(10) unsigned NOT NULL,
-  albumnum mediumint(8) unsigned NOT NULL,
-  maxphotonum mediumint(8) unsigned NOT NULL,
-  maxmember mediumint(8) unsigned NOT NULL,
-  bbsmode tinyint(1) unsigned NOT NULL,
-  allowmerge tinyint(1) unsigned NOT NULL,
-  allowattorn tinyint(1) unsigned NOT NULL,
-  allowdisband tinyint(1) unsigned NOT NULL,
-  pictopic tinyint(1) unsigned NOT NULL,
-  allowstyle tinyint(1) unsigned NOT NULL,
-  topicadmin TEXT NOT NULL,
-  modeset text NOT NULL,
-  layout text NOT NULL,
-  PRIMARY KEY (id)
-) ENGINE=MyISAM;
-
-DROP TABLE IF EXISTS pw_cnstyles;
-CREATE TABLE pw_cnstyles (
-  id int(5) NOT NULL auto_increment,
-  cname varchar(20) NOT NULL,
-  ifopen tinyint(1) NOT NULL default '1',
-  csum int(10) NOT NULL default '0',
-  upid int(2) NOT NULL,
-  PRIMARY KEY (id),
-  KEY cname (cname)
-) ENGINE=MyISAM;
 
 DROP TABLE IF EXISTS pw_config;
 CREATE TABLE pw_config (
@@ -516,7 +1324,6 @@ CREATE TABLE pw_config (
   decrip text NOT NULL,
   PRIMARY KEY  (db_name)
 ) TYPE=MyISAM;
-
 INSERT INTO pw_config (db_name, db_value) VALUES ('rg_regdetail', '1');
 INSERT INTO pw_config (db_name, db_value) VALUES ('rg_emailcheck', '0');
 INSERT INTO pw_config (db_name, db_value) VALUES ('rg_allowsameip', '0');
@@ -550,7 +1357,7 @@ INSERT INTO pw_config (db_name, db_value) VALUES ('db_hour', '20');
 INSERT INTO pw_config (db_name, db_value) VALUES ('db_http', 'N');
 INSERT INTO pw_config (db_name, db_value) VALUES ('db_attachurl', 'N');
 INSERT INTO pw_config (db_name, db_value) VALUES ('db_lp', '0');
-INSERT INTO pw_config (db_name, db_value) VALUES ('db_obstart', '9');
+INSERT INTO pw_config (db_name, db_value) VALUES ('db_obstart', '0');
 INSERT INTO pw_config (db_name, db_value) VALUES ('db_charset', '{#db_charset}');
 INSERT INTO pw_config (db_name, db_value) VALUES ('db_forcecharset', '0');
 INSERT INTO pw_config (db_name, db_value) VALUES ('db_defaultstyle', 'wind');
@@ -650,13 +1457,14 @@ INSERT INTO pw_config (db_name, db_value) VALUES ('db_opensch', '0	0	0');
 INSERT INTO pw_config (db_name, db_value) VALUES ('db_gdcheck', '0');
 INSERT INTO pw_config (db_name, db_value) VALUES ('db_postgd', '0');
 INSERT INTO pw_config (db_name, db_value) VALUES ('db_gdstyle', '0');
-INSERT INTO pw_config (db_name, db_value) VALUES ('db_gdtype', '0');
+INSERT INTO pw_config (db_name, db_value) VALUES ('db_gdtype', '1');
+INSERT INTO pw_config (db_name, db_value) VALUES ('db_gdcontent', 'a:3:{i:1;s:1:"1";i:2;s:1:"0";i:3;s:1:"0";}');
 INSERT INTO pw_config (db_name, db_value) VALUES ('db_gdsize', '90	30	4');
-INSERT INTO pw_config (db_name, db_value) VALUES ('db_upload', '1	150	150	20480');
+INSERT INTO pw_config (db_name, db_value) VALUES ('db_upload', '1	120	120	2048');
 INSERT INTO pw_config (db_name, db_value) VALUES ('db_uploadfiletype', 'a:6:{s:3:"gif";s:4:"2000";s:3:"png";s:4:"2000";s:3:"zip";s:4:"2000";s:3:"rar";s:4:"2000";s:3:"jpg";s:4:"2000";s:3:"txt";s:4:"2000";}');
 INSERT INTO pw_config (db_name, db_value) VALUES ('db_creditset', 'a:6:{s:6:"Digest";a:5:{s:5:"money";s:1:"0";s:4:"rvrc";s:2:"10";s:6:"credit";s:1:"0";s:8:"currency";s:1:"0";i:1;s:1:"0";}s:4:"Post";a:5:{s:5:"money";s:1:"1";s:4:"rvrc";s:1:"1";s:6:"credit";s:1:"0";s:8:"currency";s:1:"0";i:1;s:1:"0";}s:5:"Reply";a:5:{s:5:"money";s:1:"1";s:4:"rvrc";s:1:"0";s:6:"credit";s:1:"0";s:8:"currency";s:1:"0";i:1;s:1:"0";}s:8:"Undigest";a:5:{s:5:"money";s:1:"0";s:4:"rvrc";s:2:"10";s:6:"credit";s:1:"0";s:8:"currency";s:1:"0";i:1;s:1:"0";}s:6:"Delete";a:5:{s:5:"money";s:1:"1";s:4:"rvrc";s:1:"1";s:6:"credit";s:1:"0";s:8:"currency";s:1:"0";i:1;s:1:"0";}s:8:"Deleterp";a:5:{s:5:"money";s:1:"1";s:4:"rvrc";s:1:"0";s:6:"credit";s:1:"0";s:8:"currency";s:1:"0";i:1;s:1:"0";}}');
 INSERT INTO pw_config (db_name, db_value) VALUES ('db_showgroup', ',3,4,5,16,');
-INSERT INTO pw_config (db_name, vtype,db_value) VALUES ('db_showcustom', 'array','a:4:{i:0;s:5:"money";i:1;s:4:"rvrc";i:2;s:6:"credit";i:3;s:8:"currency";}');
+INSERT INTO pw_config (db_name, vtype,db_value) VALUES ('db_showcustom', 'array','a:2:{i:0;s:5:"money";i:1;s:4:"rvrc";}');
 INSERT INTO pw_config (db_name, db_value) VALUES ('db_menu', '3');
 INSERT INTO pw_config (db_name, db_value) VALUES ('db_fthumbsize', '100	100');
 INSERT INTO pw_config (db_name, db_value) VALUES ('db_athumbsize', '575	0');
@@ -739,7 +1547,6 @@ INSERT INTO pw_config (db_name, db_value) VALUES ('ftp_user', '');
 INSERT INTO pw_config (db_name, db_value) VALUES ('db_schwait', '2');
 INSERT INTO pw_config (db_name, db_value) VALUES ('db_registerfile', 'register.php');
 INSERT INTO pw_config (db_name, db_value) VALUES ('db_adminfile', 'admin.php');
-INSERT INTO pw_config (db_name, db_value) VALUES ('db_newinfoifopen', '1');
 INSERT INTO pw_config (db_name, db_value) VALUES ('db_sortnum', '20');
 INSERT INTO pw_config (db_name, vtype, db_value) VALUES ('db_styledb', 'array', 'a:1:{s:4:"wind";a:2:{i:0;s:4:"wind";i:1;s:1:"1";}}');
 INSERT INTO pw_config (db_name, db_value) VALUES ('db_moneyname', '{#db_moneyname}');
@@ -785,14 +1592,38 @@ INSERT INTO pw_config (db_name, db_value) VALUES('db_iftag', '1');
 INSERT INTO pw_config (db_name, db_value) VALUES('db_readtag', '0');
 INSERT INTO pw_config (db_name, db_value) VALUES('db_tagindex', '20');
 INSERT INTO pw_config (db_name, db_value) VALUES('db_enhideset', 'a:1:{s:4:"type";a:1:{i:0;s:5:"money";}}');
-INSERT INTO pw_config (db_name, vtype, db_value, decrip) VALUES('db_rategroup', 'string', 'a:12:{i:8;s:1:"5";i:9;s:2:"10";i:10;s:2:"10";i:11;s:2:"10";i:12;s:2:"30";i:13;s:2:"30";i:14;s:2:"30";i:15;s:2:"50";i:4;s:4:"1000";i:5;s:3:"100";i:16;s:2:"50";i:2;s:1:"0";}', '');
-INSERT INTO pw_config (db_name, vtype, db_value, decrip) VALUES('db_ratepower', 'string', 'a:3:{i:1;s:1:"0";i:2;s:1:"0";i:3;s:1:"0";}', '');
+INSERT INTO pw_config (db_name, vtype, db_value, decrip) VALUES('db_rategroup', 'array', 'a:13:{i:8;s:2:"10";i:9;s:2:"10";i:10;s:2:"10";i:11;s:2:"10";i:12;s:2:"10";i:13;s:2:"10";i:14;s:2:"10";i:15;s:2:"10";i:4;s:2:"10";i:5;s:2:"10";i:17;s:2:"10";i:16;s:2:"10";i:2;s:2:"10";}', '');
+INSERT INTO pw_config (db_name, vtype, db_value, decrip) VALUES('db_ratepower', 'array', 'a:3:{i:1;s:1:"0";i:2;s:1:"0";i:3;s:1:"0";}', '');
 INSERT INTO pw_config (db_name, vtype, db_value, decrip) values('db_job_isopen','string','1','');
 INSERT INTO pw_config (db_name, vtype, db_value, decrip) values('db_job_ispop','string','1','');
-INSERT INTO pw_config (db_name, vtype, db_value, decrip) values('db_newinfoifopen','string','1','');
-INSERT INTO pw_config (db_name, vtype, db_value, decrip) values('db_bbsradioifopen','string','1','');
+INSERT INTO pw_config (db_name, vtype, db_value, decrip) values('db_newinfoifopen','string','0','');
+INSERT INTO pw_config (db_name, vtype, db_value, decrip) values('db_bbsradioifopen','string','0','');
 INSERT INTO pw_config (db_name, db_value) values('db_hotwords', 'phpwind,PW');
+INSERT INTO pw_config (db_name, vtype, db_value, decrip) VALUES ('db_portalstatictime', 'string', '1', '');
+INSERT INTO pw_config (db_name, db_value) VALUES ('db_classfile_compress', '0');
+INSERT INTO pw_config (db_name, db_value) VALUES ('db_cachefile_compress', '0');
+INSERT INTO pw_config (db_name, db_value) VALUES ('db_filecache_to_memcache', '0');
+INSERT INTO pw_config (db_name, vtype, db_value, decrip) VALUES ('db_unique_strategy', 'string', 'db', '');
+INSERT INTO pw_config (db_name, vtype, db_value, decrip) VALUES ('db_postedittime', 'string', '10', '');
+INSERT INTO pw_config (db_name, vtype, db_value, decrip) VALUES ('db_portalstatictime', 'string', '15', '');
+INSERT INTO pw_config (db_name, vtype, db_value, decrip) VALUES ('db_search_type', 'array', 'a:5:{s:6:"thread";s:6:"帖子";s:5:"diary";s:6:"日志";s:4:"user";s:6:"用户";s:5:"forum";s:6:"版块";s:5:"group";s:6:"群组";}', '');
+INSERT INTO pw_config (db_name, db_value) VALUES ('db_admingradereason', '{#db_admingradereason}');
 
+DROP TABLE IF EXISTS pw_creditlog;
+CREATE TABLE pw_creditlog (
+  id int(10) unsigned NOT NULL auto_increment,
+  uid int(10) unsigned NOT NULL default '0',
+  username varchar(15) NOT NULL default '',
+  ctype varchar(8) NOT NULL default '',
+  affect int(10) NOT NULL default '0',
+  adddate int(10) NOT NULL default '0',
+  logtype varchar(20) NOT NULL default '',
+  ip varchar(15) NOT NULL default '',
+  descrip varchar(255) NOT NULL default '',
+  PRIMARY KEY  (id),
+  KEY idx_uid (uid),
+  KEY idx_adddate (adddate)
+) TYPE=MyISAM;
 
 DROP TABLE IF EXISTS pw_credits;
 CREATE TABLE pw_credits (
@@ -802,26 +1633,9 @@ CREATE TABLE pw_credits (
   description varchar(255) NOT NULL default '',
   type ENUM( 'main', 'group' ) NOT NULL,
   PRIMARY KEY  (cid),
-  KEY type (type)
+  KEY idx_type (type)
 ) TYPE=MyISAM;
-
 INSERT INTO pw_credits VALUES ('1', '{#credit_name}','{#credit_unit}', '{#credit_descrip}', 'main');
-
-DROP TABLE IF EXISTS pw_creditlog;
-CREATE TABLE pw_creditlog (
-  id int(10) unsigned NOT NULL auto_increment,
-  uid mediumint(8) unsigned NOT NULL,
-  username varchar(15) NOT NULL,
-  ctype varchar(8) NOT NULL,
-  affect int(10) NOT NULL,
-  adddate int(10) NOT NULL,
-  logtype varchar(20) NOT NULL,
-  ip varchar(15) NOT NULL,
-  descrip varchar(255) NOT NULL,
-  PRIMARY KEY  (id),
-  KEY uid (uid),
-  KEY adddate (adddate)
-) TYPE=MyISAM;
 
 DROP TABLE IF EXISTS pw_customfield;
 CREATE TABLE pw_customfield (
@@ -851,12 +1665,12 @@ CREATE TABLE pw_cwritedata (
   isshare tinyint(1) unsigned NOT NULL default '0',
   c_num mediumint(8) unsigned NOT NULL default '0',
   moodfirst tinyint(1) NOT NULL default '0',
-  source varchar(10) NOT NULL,
-  content varchar(255) NOT NULL,
-  mood varchar(10) NOT NULL,
+  source varchar(10) NOT NULL default '',
+  content varchar(255) NOT NULL default '',
+  mood varchar(10) NOT NULL default '',
   PRIMARY KEY (id),
-  KEY uid (uid),
-  KEY mood (mood,moodfirst)
+  KEY idx_uid (uid),
+  KEY idx_mood_moodfirst (mood,moodfirst)
 ) ENGINE=MyISAM;
 
 DROP TABLE IF EXISTS pw_datanalyse;
@@ -881,14 +1695,24 @@ CREATE TABLE pw_datastate (
   PRIMARY KEY  (year,month,day)
 ) TYPE=MyISAM;
 
+DROP TABLE IF EXISTS pw_datastore;
+CREATE TABLE pw_datastore (
+  skey varchar(32) NOT NULL,
+  expire int(10) unsigned NOT NULL default '0',
+  vhash char(32) NOT NULL,
+  value text NOT NULL,
+  PRIMARY KEY (skey),
+  KEY idx_expire (expire)
+) TYPE=MyISAM;
+
 DROP TABLE IF EXISTS pw_debatedata;
 CREATE TABLE pw_debatedata (
   pid int(10) unsigned NOT NULL,
   tid int(10) unsigned NOT NULL,
   authorid int(10) unsigned NOT NULL,
   standpoint tinyint(1) unsigned NOT NULL default '0',
-  postdate int(10) unsigned NOT NULL,
-  vote int(10) unsigned NOT NULL,
+  postdate int(10) unsigned NOT NULL default '0',
+  vote int(10) unsigned NOT NULL default '0',
   voteids text NOT NULL,
   PRIMARY KEY  (pid,tid,authorid)
 ) TYPE=MyISAM;
@@ -896,101 +1720,121 @@ CREATE TABLE pw_debatedata (
 DROP TABLE IF EXISTS pw_debates;
 CREATE TABLE pw_debates (
   tid int(10) unsigned NOT NULL,
-  authorid int(10) unsigned NOT NULL,
-  postdate int(10) unsigned NOT NULL,
-  obtitle varchar(255) NOT NULL,
-  retitle varchar(255) NOT NULL,
-  endtime int(10) unsigned NOT NULL,
+  authorid int(10) unsigned NOT NULL default '0',
+  postdate int(10) unsigned NOT NULL default '0',
+  obtitle varchar(255) NOT NULL default '',
+  retitle varchar(255) NOT NULL default '',
+  endtime int(10) unsigned NOT NULL default '0',
   obvote int(10) unsigned NOT NULL default '0',
   revote int(10) unsigned NOT NULL default '0',
   obposts int(10) unsigned NOT NULL default '0',
   reposts int(10) unsigned NOT NULL default '0',
-  umpire varchar(16) NOT NULL,
-  umpirepoint varchar(255) NOT NULL,
-  debater varchar(16) NOT NULL,
+  umpire varchar(16) NOT NULL default '',
+  umpirepoint varchar(255) NOT NULL default '',
+  debater varchar(16) NOT NULL default '',
   judge tinyint(1) unsigned NOT NULL default '0',
   PRIMARY KEY  (tid)
 ) TYPE=MyISAM;
 
-DROP TABLE IF EXISTS pw_datastore;
-CREATE TABLE pw_datastore (
-  skey varchar(32) NOT NULL,
-  expire int(10) unsigned NOT NULL,
-  vhash char(32) NOT NULL,
-  value text NOT NULL,
-  PRIMARY KEY (skey),
-  KEY expire (expire)
-) TYPE=MyISAM;
+DROP TABLE IF EXISTS pw_delta_diarys;
+CREATE TABLE pw_delta_diarys(
+ id int(10) unsigned not null auto_increment,
+ state tinyint(3) unsigned not null default 0,
+ primary key (id)
+)ENGINE=MyISAM;
 
-DROP TABLE IF EXISTS pw_diarytype;
-CREATE TABLE pw_diarytype (
-  dtid mediumint(8) unsigned NOT NULL auto_increment,
-  uid mediumint(8) unsigned NOT NULL,
-  name varchar(20) NOT NULL,
-  num mediumint(8) NOT NULL default '0',
-  PRIMARY KEY  (dtid),
-  KEY uid (uid)
-) TYPE=MyISAM;
+
+DROP TABLE IF EXISTS pw_delta_members;
+CREATE TABLE pw_delta_members(
+ id int(10) unsigned not null auto_increment,
+ state tinyint(3) unsigned not null default 0,
+ primary key (id)
+)ENGINE=MyISAM;
+
+DROP TABLE IF EXISTS pw_delta_posts;
+CREATE TABLE pw_delta_posts(
+ id int(10) unsigned not null auto_increment,
+ state tinyint(3) unsigned not null default 0,
+ primary key (id)
+)ENGINE=MyISAM;
+
+DROP TABLE IF EXISTS pw_delta_threads;
+CREATE TABLE pw_delta_threads(
+ id int(10) unsigned not null auto_increment,
+ state tinyint(3) unsigned not null default 0,
+ primary key (id)
+)ENGINE=MyISAM;
 
 DROP TABLE IF EXISTS pw_diary;
 CREATE TABLE pw_diary (
   did int(10) NOT NULL auto_increment,
-  uid int(10) NOT NULL,
-  dtid mediumint(8) NOT NULL,
+  uid int(10) unsigned NOT NULL default '0',
+  dtid mediumint(8) unsigned NOT NULL default '0',
   aid text NOT NULL,
-  username varchar(15) NOT NULL,
+  username varchar(15) NOT NULL default '',
   privacy tinyint(1) NOT NULL default '0',
-  subject varchar(150) NOT NULL,
+  subject varchar(150) NOT NULL default '',
   content text NOT NULL,
   ifcopy tinyint(1) NOT NULL default '0',
-  copyurl varchar(100) NOT NULL,
+  copyurl varchar(100) NOT NULL default '',
   ifconvert tinyint(1) NOT NULL default '0',
   ifwordsfb tinyint(1) NOT NULL default '0',
   ifupload tinyint(1) NOT NULL default '0',
   r_num int(10) NOT NULL default '0',
   c_num int(10) NOT NULL default '0',
-  postdate int(10) NOT NULL default '0',
+  postdate int(10) unsigned NOT NULL default '0',
   PRIMARY KEY  (did),
-  KEY uid (uid)
+  KEY idx_uid (uid),
+  KEY idx_postdate (postdate)
+) TYPE=MyISAM;
+
+DROP TABLE IF EXISTS pw_diarytype;
+CREATE TABLE pw_diarytype (
+  dtid mediumint(8) unsigned NOT NULL auto_increment,
+  uid int(10) unsigned NOT NULL default '0',
+  name varchar(20) NOT NULL default '',
+  num mediumint(8) NOT NULL default '0',
+  PRIMARY KEY  (dtid),
+  KEY idx_uid (uid)
 ) TYPE=MyISAM;
 
 DROP TABLE IF EXISTS pw_draft;
 CREATE TABLE pw_draft (
   did mediumint(8) unsigned NOT NULL auto_increment,
-  uid mediumint(8) NOT NULL default '0',
+  uid int(10) unsigned NOT NULL default '0',
   content text NOT NULL,
   PRIMARY KEY  (did),
-  KEY uid (uid)
+  KEY idx_uid (uid)
 ) TYPE=MyISAM;
 
 DROP TABLE IF EXISTS pw_elements;
 CREATE TABLE pw_elements (
   eid int(10) unsigned NOT NULL auto_increment,
-  type varchar(30) NOT NULL,
-  mark varchar(30) NOT NULL,
-  id mediumint(8) unsigned NOT NULL,
-  value int(10) NOT NULL,
-  addition varchar(255) NOT NULL,
+  type varchar(30) NOT NULL default '',
+  mark varchar(30) NOT NULL default '',
+  id int(10) unsigned NOT NULL default '0',
+  value int(10) NOT NULL default '0',
+  addition varchar(255) NOT NULL default '',
   special tinyint(1) NOT NULL default '0',
-  time INT( 10 ) UNSIGNED NOT NULL,
+  time int(10) unsigned NOT NULL default '0',
   PRIMARY KEY  (eid),
-  KEY valueidx (type,value),
-  UNIQUE KEY type (type,mark,id)
+  KEY idx_type_value (type,value),
+  UNIQUE KEY idx_type_mark_id (type,mark,id)
 ) TYPE=MyISAM;
 
 DROP TABLE IF EXISTS pw_extragroups;
 CREATE TABLE pw_extragroups (
-  uid mediumint(9) NOT NULL default '0',
+  uid int(10) unsigned NOT NULL default '0',
   gid smallint(6) NOT NULL default '0',
   togid smallint(6) NOT NULL default '0',
-  startdate int(10) NOT NULL default '0',
+  startdate int(10) unsigned NOT NULL default '0',
   days smallint(6) NOT NULL default '0',
-  KEY uid (uid)
+  KEY idx_uid (uid)
 ) TYPE=MyISAM;
 
 DROP TABLE IF EXISTS pw_favors;
 CREATE TABLE pw_favors (
-  uid mediumint(8) unsigned NOT NULL default '1',
+  uid int(10) unsigned NOT NULL default '0',
   tids text NOT NULL,
   type varchar(255) NOT NULL default '',
   PRIMARY KEY  (uid)
@@ -999,13 +1843,13 @@ CREATE TABLE pw_favors (
 DROP TABLE IF EXISTS pw_feed;
 CREATE TABLE pw_feed (
   id int(10) unsigned NOT NULL auto_increment,
-  uid mediumint(8) unsigned NOT NULL,
-  type VARCHAR( 20 )  NOT NULL,
+  uid int(10) unsigned NOT NULL default '0',
+  type varchar(20) NOT NULL default '',
   descrip TEXT,
-  timestamp int(10) unsigned NOT NULL,
-  typeid mediumint(8) unsigned NOT NULL,
+  timestamp int(10) unsigned NOT NULL default '0',
+  typeid mediumint(8) unsigned NOT NULL default '0',
   PRIMARY KEY  (id),
-  KEY uid (uid)
+  KEY idx_uid (uid)
 ) TYPE=MyISAM;
 
 DROP TABLE IF EXISTS pw_filter;
@@ -1014,19 +1858,19 @@ CREATE TABLE pw_filter (
   tid int(10) unsigned NOT NULL default '0',
   pid int(10) unsigned NOT NULL default '0',
   filter mediumtext,
-  state tinyint(1) unsigned NOT NULL default '0',
-  assessor varchar(15) NOT NULL,
+  state tinyint(3) unsigned NOT NULL default '0',
+  assessor varchar(15) NOT NULL default '',
   created_at int(10) unsigned NOT NULL default '0',
   updated_at int(10) unsigned NOT NULL default '0',
   PRIMARY KEY  (id),
-  KEY tid (tid)
+  KEY idx_tid (tid)
 ) TYPE=MyISAM;
 
 DROP TABLE IF EXISTS pw_filter_class;
 CREATE TABLE pw_filter_class (
   id tinyint(3) unsigned NOT NULL auto_increment,
-  title varchar(16) NOT NULL,
-  state tinyint(1) unsigned NOT NULL default '0',
+  title varchar(16) NOT NULL default '',
+  state tinyint(3) unsigned NOT NULL default '0',
   PRIMARY KEY  (id)
 ) TYPE=MyISAM;
 
@@ -1035,26 +1879,26 @@ CREATE TABLE pw_filter_dictionary (
   id int(10) unsigned NOT NULL auto_increment,
   tid int(10) unsigned NOT NULL default '0',
   pid int(10) unsigned NOT NULL default '0',
-  title varchar(100) NOT NULL,
-  bin varchar(255) NOT NULL,
-  source varchar(255) NOT NULL,
+  title varchar(100) NOT NULL default '',
+  bin varchar(255) NOT NULL default '',
+  source varchar(255) NOT NULL default '',
   PRIMARY KEY  (id)
 ) TYPE=MyISAM;
 
 DROP TABLE IF EXISTS pw_focus;
 CREATE TABLE pw_focus (
   id int(10) unsigned NOT NULL auto_increment,
-  pushto varchar(30) NOT NULL,
-  pushtime int(10) NOT NULL,
-  fid smallint(6) NOT NULL,
-  tid mediumint(8) NOT NULL,
-  subject varchar(100) NOT NULL,
+  pushto varchar(30) NOT NULL default '',
+  pushtime int(10) NOT NULL default '0',
+  fid smallint(6) NOT NULL default '0',
+  tid int(10) NOT NULL default '0',
+  subject varchar(100) NOT NULL default '',
   content text NOT NULL,
-  postdate int(10) NOT NULL,
-  url varchar(100) NOT NULL,
-  imgurl varchar(100) NOT NULL,
+  postdate int(10) NOT NULL default '0',
+  url varchar(100) NOT NULL  default '',
+  imgurl varchar(100) NOT NULL  default '',
   PRIMARY KEY  (id),
-  KEY pushto (pushto)
+  KEY idx_pushto (pushto)
 ) TYPE=MyISAM;
 
 DROP TABLE IF EXISTS pw_forumdata;
@@ -1066,15 +1910,14 @@ CREATE TABLE pw_forumdata (
   subtopic mediumint(8) unsigned NOT NULL default '0',
   top1 smallint(6) unsigned NOT NULL default '0',
   top2 smallint(6) unsigned NOT NULL default '0',
-  topthreads TEXT DEFAULT '' NOT NULL,
+  topthreads text NOT NULL default '',
   aid smallint(6) unsigned NOT NULL default '0',
   aidcache int(10) unsigned NOT NULL default '0',
   aids varchar(135) NOT NULL default '',
   lastpost varchar(135) NOT NULL default '',
   PRIMARY KEY  (fid),
-  KEY aid (aid)
+  KEY idx_aid (aid)
 ) TYPE=MyISAM;
-
 INSERT INTO pw_forumdata (fid, tpost, topic, article, subtopic, top1, top2, aid, aidcache, aids, lastpost) VALUES(1, 0, 0, 0, 0, 0, 0, 0, 0, '', '');
 INSERT INTO pw_forumdata (fid, tpost, topic, article, subtopic, top1, top2, aid, aidcache, aids, lastpost) VALUES(2, 0, 0, 0, 0, 0, 0, 0, 0, '', '');
 
@@ -1091,24 +1934,24 @@ CREATE TABLE pw_forumlog (
   timestamp int(10) NOT NULL default '0',
   ip varchar(20) NOT NULL default '',
   PRIMARY KEY  (id),
-  KEY type (type),
-  KEY username1 (username1),
-  KEY username2 (username2)
+  KEY idx_type (type),
+  KEY idx_username1 (username1),
+  KEY idx_username2 (username2)
 ) TYPE=MyISAM;
 
 DROP TABLE IF EXISTS pw_forummsg;
 CREATE TABLE pw_forummsg (
   id smallint(6) NOT NULL auto_increment,
   fid smallint(6) NOT NULL default '0',
-  uid mediumint(8) NOT NULL default '0',
-  username varchar(15) NOT NULL,
-  toname varchar(200) NOT NULL,
+  uid int(10) unsigned NOT NULL default '0',
+  username varchar(15) NOT NULL default '',
+  toname varchar(200) NOT NULL default '',
   msgtype tinyint(1) NOT NULL default '0',
   posttime int(10) NOT NULL default '0',
   savetime int(10) NOT NULL default '0',
   message mediumtext NOT NULL,
   PRIMARY KEY  (id),
-  KEY fid (fid)
+  KEY idx_fid (fid)
 ) TYPE=MyISAM;
 
 DROP TABLE IF EXISTS pw_forums;
@@ -1120,16 +1963,16 @@ CREATE TABLE pw_forums (
   type enum('category','forum','sub','sub2') NOT NULL default 'forum',
   logo varchar(100) NOT NULL default '',
   name varchar(255) NOT NULL default '',
-  descrip varchar(255) NOT NULL default '',
+  descrip text NOT NULL,
   title varchar(255) NOT NULL default '',
   dirname varchar(15) NOT NULL default '',
-  metadescrip varchar(255) NOT NULL DEFAULT '',
+  metadescrip varchar(255) NOT NULL default '',
   keywords varchar(255) NOT NULL default '',
-  vieworder SMALLINT(6) NOT NULL default '0',
+  vieworder smallint(6) NOT NULL default '0',
   forumadmin varchar(255) NOT NULL default '',
   fupadmin varchar(255) NOT NULL default '',
   style varchar(12) NOT NULL default '',
-  across TINYINT(1) NOT NULL DEFAULT '0',
+  across tinyint(1) NOT NULL DEFAULT '0',
   allowhtm tinyint(1) NOT NULL default '0',
   allowhide tinyint(1) NOT NULL default '1',
   allowsell tinyint(1) NOT NULL default '1',
@@ -1144,37 +1987,37 @@ CREATE TABLE pw_forums (
   allowrp varchar(255) NOT NULL default '',
   allowdownload varchar(255) NOT NULL default '',
   allowupload varchar(255) NOT NULL default '',
-  modelid VARCHAR( 255 ) NOT NULL default '',
+  modelid varchar( 255 ) NOT NULL default '',
   forumsell varchar(15) NOT NULL default '',
   pcid varchar(50) NOT NULL default '',
-  actmids varchar(255) NOT NULL DEFAULT '',
+  actmids varchar(255) NOT NULL default '',
   f_type enum('forum','former','hidden','vote') NOT NULL default 'forum',
   f_check tinyint(1) unsigned NOT NULL default '0',
-  t_type TINYINT(1) NOT NULL DEFAULT '0',
+  t_type tinyint(1) NOT NULL default '0',
   cms tinyint(1) NOT NULL default '0',
   ifhide tinyint(1) NOT NULL default '1',
   showsub tinyint(1) NOT NULL default '0',
-  ifcms TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
+  ifcms tinyint(1) unsigned NOT NULL default '0',
   PRIMARY KEY  (fid),
-  KEY fup (fup),
-  KEY type (ifsub,vieworder,fup)
+  KEY idx_fup (fup),
+  KEY idx_ifsub_vieworder_fup (ifsub,vieworder,fup)
 ) TYPE=MyISAM;
-
 INSERT INTO pw_forums (fid, fup, ifsub, childid, type, logo, name, descrip, dirname, keywords, vieworder, forumadmin, fupadmin, style, across, allowhtm, allowhide, allowsell, allowtype, copyctrl, allowencode, password, viewsub, allowvisit, allowread, allowpost, allowrp, allowdownload, allowupload, modelid, forumsell, pcid, f_type, f_check, t_type, cms, ifhide, showsub, ifcms) VALUES(1, 0, 0, 1, 'category', '', '默认分类', '', '', '', 0, '', '', '0', 0, 0, 1, 1, 3, 0, 1, '', 0, '', '', '', '', '', '', '', '', '', 'forum', 0, 0, 0, 1, 0, 0);
 INSERT INTO pw_forums (fid, fup, ifsub, childid, type, logo, name, descrip, dirname, keywords, vieworder, forumadmin, fupadmin, style, across, allowhtm, allowhide, allowsell, allowtype, copyctrl, allowencode, password, viewsub, allowvisit, allowread, allowpost, allowrp, allowdownload, allowupload, modelid, forumsell, pcid, f_type, f_check, t_type, cms, ifhide, showsub, ifcms) VALUES(2, 1, 0, 0, 'forum', '', '默认版块', '', '', '', 0, '', '', '0', 0, 0, 1, 1, 3, 0, 1, '', 0, '', '', '', '', '', '', '', '', '', 'forum', 0, 0, 0, 1, 0, 0);
+INSERT INTO pw_forumsextra (fid, creditset, forumset, commend, appinfo) VALUES(2,'','a:9:{s:8:"orderway";s:8:"lastpost";s:3:"asc";s:4:"DESC";s:11:"replayorder";s:1:"1";s:9:"addnotice";s:1:"1";s:9:"imgthread";s:1:"1";s:10:"relatedcon";s:1:"1";s:12:"allowtpctype";s:9:"money			0";s:9:"uploadset";s:1:"1";s:9:"thumbsize";s:7:"300	300";}','','');
 
 DROP TABLE IF EXISTS pw_forumsell;
 CREATE TABLE pw_forumsell (
   id mediumint(8) NOT NULL auto_increment,
   fid smallint(6) unsigned NOT NULL default '0',
-  uid mediumint(8) unsigned NOT NULL default '1',
+  uid int(10) unsigned NOT NULL default '1',
   buydate int(10) unsigned NOT NULL default '0',
   overdate int(10) unsigned NOT NULL default '0',
   credit varchar(8) NOT NULL default '',
-  cost DECIMAL(8,2) NOT NULL,
+  cost decimal(8,2) NOT NULL,
   PRIMARY KEY  (id),
-  KEY fid (fid),
-  KEY uid (uid)
+  KEY idx_fid (fid),
+  KEY idx_uid (uid)
 ) TYPE=MyISAM;
 
 DROP TABLE IF EXISTS pw_forumsextra;
@@ -1189,27 +2032,28 @@ CREATE TABLE pw_forumsextra (
 
 DROP TABLE IF EXISTS pw_friends;
 CREATE TABLE pw_friends (
-  uid mediumint(8) NOT NULL default '0',
-  friendid mediumint(8) NOT NULL default '0',
-  status tinyint(1) not null default '0',
-  attention tinyint(1) NOT NULL DEFAULT '0',
+  uid int(10) unsigned NOT NULL default '0',
+  friendid int(10) unsigned NOT NULL default '0',
+  status tinyint(3) not null default '0',
+  attention tinyint(3) NOT NULL DEFAULT '0',
   joindate int(10) NOT NULL default '0',
   descrip varchar(255) NOT NULL default '',
   ftid mediumint(8) unsigned NOT NULL DEFAULT '0',
-  iffeed tinyint(1) unsigned NOT NULL DEFAULT '1',
+  iffeed tinyint(3) unsigned NOT NULL DEFAULT '1',
   PRIMARY KEY  (uid,friendid),
-  KEY joindate (joindate),
-  KEY ftid (ftid),
+  KEY idx_joindate (joindate),
+  KEY idx_ftid (ftid),
   KEY idx_uid_joindate(uid,joindate)
 ) TYPE=MyISAM;
+  
 
 DROP TABLE IF EXISTS pw_friendtype;
 CREATE TABLE pw_friendtype (
-  ftid mediumint(8) unsigned NOT NULL auto_increment,
-  uid mediumint(8) unsigned NOT NULL,
-  name varchar(20) NOT NULL,
+  ftid int(10) unsigned NOT NULL auto_increment,
+  uid int(10) unsigned NOT NULL default '0',
+  name varchar(20) NOT NULL default '',
   PRIMARY KEY  (ftid),
-  KEY uid (uid)
+  KEY idx_uid (uid)
 ) TYPE=MyISAM;
 
 DROP TABLE IF EXISTS pw_group_replay;
@@ -1219,7 +2063,7 @@ CREATE TABLE pw_group_replay (
   cyid int(10) NOT NULL default '0',
   is_read smallint(2) NOT NULL default '0',
   add_time int(10) unsigned NOT NULL default '0',
-  num INT(10) NOT NULL,
+  num int(10) NOT NULL,
   KEY uid (uid)
 ) ENGINE = MYISAM;
 
@@ -1231,7 +2075,6 @@ CREATE TABLE pw_hack(
   decrip text NOT NULL,
   PRIMARY KEY  (hk_name)
 ) TYPE=MyISAM;
-
 INSERT INTO pw_hack(hk_name,hk_value) VALUES ('bk_A','a:1:{s:10:"rvrc_money";a:6:{i:0;s:4:"{#rvrc}";i:1;s:4:"{#money}";i:2;s:1:"2";i:3;s:1:"3";i:4;s:1:"1";i:5;i:1;}}');
 INSERT INTO pw_hack (hk_name, vtype, hk_value, decrip) VALUES('bk_ddate', 'string', '10', '');
 INSERT INTO pw_hack (hk_name, vtype, hk_value, decrip) VALUES('bk_drate', 'string', '10', '');
@@ -1265,7 +2108,6 @@ INSERT INTO pw_hack (hk_name, vtype, hk_value, decrip) VALUES('inv_days', 'strin
 INSERT INTO pw_hack (hk_name, vtype, hk_value, decrip) VALUES('inv_limitdays', 'string', '0', '');
 INSERT INTO pw_hack (hk_name, vtype, hk_value, decrip) VALUES('inv_costs', 'string', '50', '');
 INSERT INTO pw_hack (hk_name, vtype, hk_value, decrip) VALUES('inv_credit', 'string', 'currency', '');
-INSERT INTO pw_hack (hk_name, vtype, hk_value, decrip) VALUES('inv_groups', 'string', ',3,4,5,', '');
 INSERT INTO pw_hack (hk_name, vtype, hk_value, decrip) VALUES('inv_groups', 'string', ',3,4,5,', '');
 INSERT INTO pw_hack (hk_name, vtype, hk_value, decrip) VALUES('md_groups', 'string', ',3,', '');
 INSERT INTO pw_hack (hk_name, vtype, hk_value, decrip) VALUES('md_ifmsg', 'string', '1', '');
@@ -1309,89 +2151,148 @@ INSERT INTO pw_hack (hk_name, vtype, hk_value, decrip) VALUES('o_hot_groups', 's
 INSERT INTO pw_hack (hk_name, vtype, hk_value, decrip) VALUES ('ft_member', 'string', '', '');
 INSERT INTO pw_hack (hk_name, vtype, hk_value, decrip) VALUES ('ft_update_num', 'string', '0', '');
 INSERT INTO pw_hack (hk_name, vtype, hk_value, decrip) VALUES ('ft_msg', 'string', '0', '');
-INSERT INTO pw_hack (hk_name, vtype, hk_value, decrip) VALUES('o_uskin','array','a:5:{s:7:"default";s:6:"翱翔";s:3:"ink";s:6:"山水";s:4:"love";s:6:"友情";s:8:"navgreen";s:6:"礼物";s:8:"navyblue";s:6:"深蓝";}','');
+INSERT INTO pw_hack (hk_name, vtype, hk_value, decrip) VALUES('o_uskin','array','a:6:{s:5:"black";s:6:"黑色";s:7:"default";s:6:"翱翔";s:3:"ink";s:6:"山水";s:4:"love";s:6:"友情";s:8:"navgreen";s:6:"礼物";s:8:"navyblue";s:6:"深蓝";}','');
 INSERT INTO pw_hack (hk_name, vtype, hk_value, decrip) VALUES('o_weibophoto','string','1','');
 INSERT INTO pw_hack (hk_name, vtype, hk_value, decrip) VALUES('o_weibourl','string','1','');
+INSERT INTO pw_hack VALUES('o_groups_upgrade','array','a:7:{s:4:"tnum";s:1:"1";s:4:"pnum";s:3:"0.2";s:7:"members";s:1:"1";s:8:"albumnum";s:3:"0.5";s:8:"photonum";s:1:"1";s:8:"writenum";s:1:"1";s:11:"activitynum";s:1:"2";}','');
+INSERT INTO pw_hack VALUES('o_groups_level','array','a:5:{i:1;s:12:"初级群组";i:2;s:12:"中级群组";i:3;s:12:"高级群组";i:4;s:12:"官方群组";i:5;s:12:"商业群组";}','');
+INSERT INTO pw_hack VALUES('o_groups_levelneed','array','a:3:{i:1;s:1:"0";i:2;s:3:"500";i:3;s:4:"1000";}','');
+INSERT INTO pw_hack VALUES ('area_statictime','string','15','');
+INSERT INTO pw_hack VALUES ('o_weibotip','string','有什么新鲜事想告诉大家？','');
+INSERT INTO pw_hack VALUES ('o_ifcommend','string','0','');
+INSERT INTO pw_hack VALUES ('o_senderid','string','1','');
+INSERT INTO pw_hack VALUES ('o_punchopen','string','1','');
+INSERT INTO pw_hack VALUES ('o_punch_reward','string','a:4:{s:4:"type";s:5:"money";s:3:"num";s:1:"5";s:8:"category";s:6:"credit";s:11:"information";s:17:"可获得 铜币 ";}','');
+INSERT INTO pw_hack (hk_name, vtype, hk_value, decrip) VALUES ('o_weibopost','string','1','');
+
 
 DROP TABLE IF EXISTS pw_help;
 CREATE TABLE pw_help (
   hid smallint(6) unsigned NOT NULL auto_increment,
   hup smallint(6) unsigned NOT NULL default '0',
-  lv tinyint(2) NOT NULL default '0',
+  lv tinyint(3) NOT NULL default '0',
   fathers varchar(100) NOT NULL default '',
-  ifchild tinyint(1) NOT NULL default '0',
+  ifchild tinyint(3) NOT NULL default '0',
   title varchar(80) NOT NULL default '',
   url varchar(80) NOT NULL default '',
   content mediumtext NOT NULL,
   vieworder tinyint(3) NOT NULL default '0',
-  ispw tinyint(1) default '0',
+  ispw tinyint(3) default '0',
   PRIMARY KEY  (hid),
-  KEY hup (hup)
+  KEY idx_hup (hup)
 ) TYPE=MyISAM;
 
-INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES(1, 0, 0, '', 1, '账户', '', '', 0, 1);
-INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES(2, 1, 1, '1', 0, '注册登录', '', '<b>如何注册成会员？</b>\nphpwind 默认的注册方式非常简单，只需短短几秒钟的时间，即可成为站点会员。点击页面最左上角的"注册"，按照提示填写信息，提交即可，非常简单方便~\n正式会员将比游客享受更多的操作权限（站点设置不同，权限情况也将不同）。\n\n<b>如何登录？</b>\n已经成为正式会员了？那么点击页面最上角的"登录"进入登录页面，选择登录方式，填写登录信息即可完成登录。\n保存cookie可以让网页记录用户信息，方便下次登录。公用电脑，建议不保留。', 0, 1);
-INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES(3, 1, 1, '1', 0, '忘记密码', '', '<b>忘记登录密码怎么办？</b>\n没有关系，在登录页面点击"忘记密码"，填写注册邮箱就可以找回密码了哦~找回以后，请及时更改密码。\n如果你的邮箱无效或失效，请联系站点管理员。', 0, 1);
-INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES(4, 1, 1, '1', 0, '账户设置', '', '<b>如何修改我的用户信息？</b>\n登录后，点击页面最左上角的"设置"进入用户中心，可以查看和修改你的基本信息、扩展信息等。\n\n<b>如果制定我的个性头像？</b>\n登录后，进入用户中心，点击 头像 可以设置你的个性头像。根据权限分配的不同，你或许可以使用站点自带头像，或许可以使用头像链接，或许可以使用头像上传。\n\n<b>商品信息作什么用？</b>\n用户中心-商品信息，为你发布商品帖所使用的必要信息。支付宝账号--填写支付宝账号信息，如123@163.com。完成后在商品贴中可直接链入支付宝页面；商品分类--填写待出售的商品分类。完成后，为带出售商品的可用分类选项。', 0, 1);
-INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES(5, 1, 1, '1', 0, '隐私与安全', '', '<b>如何保证密码安全？</b>\n1.密码要保密，并经常更改。用户中心-账号设置-密码安全，可以进行密码修改\n2.填写正确常用的邮箱为注册邮箱信息。以便密码被盗或丢失时找回\n3.密码填写要尽量复杂，不使用生日、用户名等为密码信息\n4.定期为电脑杀毒，以防止盗号木马的困扰\n\n<b>交友安全</b>\n站点的信息交互性，让我们结识了很多志同道合的朋友。但是，有时候难免遇到交友不慎的尴尬。你可以进入用户中心->隐私，修改 加好友隐私。\n\n<b>个人信息安全</b>\n进入用户中心->隐私，设置 个人空间、空间留言的访问权限。\n\n<b>如何让站点操作不显示在动态中？</b>\n进入圈子->个人空间->应用管理，设置动态显示隐私', 0, 1);
-INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES(6, 1, 1, '1', 0, '积分使用', '', '<b>什么是积分？</b>\n积分，是站点内用于交易流通的媒介，可以是虚拟货币，也可以是威望、贡献值等。\n\n<b>如何获取积分？</b>\n站点提供多种方式发放积分，以鼓励会员在站点的活跃性。\n1.注册成为会员可以得到一定的积分值。\n2.发表主题或对某个主题进行回复，可以得到一定的积分。\n3.对某个主题进行评价，也可以得到一定的积分。\n4.参加站点组织的活动，赢取奖励\n5.成为站点某个版块管理员，为站点做点小贡献，可以获得不菲的薪资哦~\n\n<b>如何使用积分？</b>\n积分作为站点内用于交易的媒介，可以用于购买道具、特殊组权限、帖子签名等；\n同时威望、贡献值等信息，也能提升你在站点的荣誉度与可信度。', 0, 1);
-INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES(7, 0, 0, '', 1, '主题与回复', '', '', 0, 1);
-INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES(8, 7, 1, '7', 0, '发表主题', '', '<b>如何发表主题？</b>\n在帖子列表页面和帖子阅读页面，可以看到“发表新帖”图标，点击即可进入主题帖发布页面，如果没有发帖权限，会有提示“本论坛只有特定用户组才能发表主题,请到其他版块发贴,以提高等级!”出现。\n特别地，当鼠标停在“发表新帖”图标上时，如果你在该板块有发表交易贴、悬赏帖或投票帖的权限时，就会出现一个下拉菜单，菜单项里显示：交易、悬赏、投票，点击需要的帖子类型即可进入相应的主题发表页面发布新的主题。\n你也可以在帖子列表页面底部的快速发帖框发表普通主题帖。\n\n<b>如何发表匿名帖？</b>\n在帖子列表页面和帖子阅读页面，点击“发表新帖”图标进入发帖页面，在发帖时勾选内容编辑器下面的匿名帖复选框，或者在快速发帖处勾选（如果复选框呈灰色，说明该板块不允许发布匿名贴或者您的权限不够）。', 0, 1);
-INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES(9, 0, 0, '', 1, '站点应用', '', '', 0, 1);
-INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES(10, 9, 1, '9', 0, '记录', '', '<b>什么是记录？</b>\n记录即及时记录，似tweeter的类新鲜事，你可以随时发表感慨、晒晒心情。\n记录更可同步个人签名，显示于帖子阅读页个人头像上部，让更多的人了解和感触到你那刻的感想与心情。\n\n<b>什么是 @我的 ？</b>\n一般的记录显示在动态中，根据权限的不同，可以让好友或是站内所有人都查看阅读到。\n@我的，是记录的一种衍生。它可以单独对某个用户发起言论。只需要@+对方用户名+空格+想要对TA说的话，即可。', 0, 1);
-INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES(12, 9, 1, '9', 0, '应用组件', '', '<b>什么是应用组件？</b>\n应用组件是圈子中接入的第三方娱乐应用，提供了宠物、在线小游戏等多种游戏。具体规则信息等请查看对应的游戏应用。', 1, 1);
-INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES(13, 26, 1, '26', 0, 'windcode', '', '<table><tr class="tr3 tr"><td><font color="#5a6633" face="verdana">[quote]</font>被引用的内容，主要作用是在发帖时引用并回复具体楼层的帖子<font color="#5a6633" face="verdana">[/quote]</font></td><td><table cellpadding="5" cellspacing="1" width="94%" bgcolor="#000000" align="center"><tr><td class="f_one">被引用的帖子和您的回复内容</td></tr></table></td></tr><tr class="tr3 tr"><td><font color="#5a6633" face="verdana">[code]</font><font color="#5a6633"></font><font face="courier" color="#333333"><br />echo "phpwind 欢迎您!"\n</font><font color="#5a6633" face="verdana">[/code]</font></td><th><div class="tpc_content" id="read_553959"><h6 class="quote">Copy code</h6><blockquote id="code1">echo "PHPWind 欢迎您!"</blockquote></div></th></tr><tr class="tr3 tr"><td><font face="verdana" color="5a6633">[url]</font><font face="verdana">http://www.phpwind.net</font><font color="5a6633">[/url] </font></td><td><a href="http://www.phpwind.net" target="_blank"><font color="#000066">http://www.phpwind.net</font></a></td></tr><tr class="tr3 tr"><td><font face="verdana" color="5a6633">[url=http://www.phpwind.net]</font><font face="verdana">PHPWind</font><font color="5a6633">[/url]</font></td><td><a href="http://www.phpwind.net"><font color="000066">PHPWind</font></a></font></td></tr><tr class="tr3 tr"><td><font face="verdana" color="5a6633">[email]</font><font face="verdana">fengyu@163.com</font><font color="5a6633">[/email]</font></td><td><a href="mailto:fengyu@163.com"><font color="000066">fengyu@163.com</font></a></td></tr><tr class="tr3 tr"><td><font face="verdana" color="5a6633">[email=fengyu@163.com]</font><font face="verdana">email me</font><font color="5a6633">[/email]</font></td><td><a href="mailto:fengyu@163.com"><font color="000066">email me</font></a></td></tr><tr class="tr3 tr"> <td><font face="verdana" color="5a6633">[b]</font><font face="verdana">粗体字</font><font color="5a6633" face="verdana">[/b]</font> </td><td><font face="verdana"><b>粗体字</b></font> </td></tr><tr class="tr3 tr"><td><font face="verdana" color="5a6633">[i]</font><font face="verdana">斜体字<font color="5a6633">[/i]</font> </font></td><td><font face="verdana"><i>斜体字</i></font> </td></tr><tr class="tr3 tr"><td><font face="verdana" color="5a6633">[u]</font><font face="verdana">下划线</font><font color="5a6633">[/u]</font></td><td><font face="verdana"><u>下划线</u></font> </td></tr><tr class="tr3 tr"> <td><font face=verdana color=5a6633>[align=center(可以是向左left，向右right)]</font>位于中间<font color="5a6633">[/align]</font></td><td><font face="verdana"><div align="center">中间对齐</div></font></td></tr><tr class="tr3 tr"> <td><font face="verdana" color="5a6633">[size=4]</font><font face="verdana">改变字体大小<font color="5a6633">[/size] </font> </font></td><td><font face="verdana">改变字体大小 </font></td></tr><tr class="tr3 tr"> <td><font face="verdana" color="5a6633">[font=</font><font color="5a6633">楷体_gb2312<font face="verdana">]</font></font><font face="verdana">改变字体<font color="5a6633">[/font] </font> </font></td><td><font face="verdana"><font face=楷体_gb2312>改变字体</font> </font></td></tr><tr class="tr3 tr"> <td><font face="verdana" color="5a6633">[color=red]</font><font face="verdana">改变颜色<font color="5a6633">[/color] </font> </font></td><td><font face="verdana" color="red">改变颜色</font><font face="verdana"> </font></td></tr><tr class="tr3 tr"> <td><font face="verdana" color="5a6633">[img]</font><font face="verdana">http://www.phpwind.net/logo.gif<font color="5a6633">[/img]</font> </font></td><td><img src="logo.gif" /></font> </td></tr><tr class="tr3 tr"> <td><font face=宋体 color="#333333"><font color="#5a6633">[fly]</font>飞行文字特效<font color="#5a6633">[/fly]</font> </font></td><td><font face=宋体&nbsp; &nbsp; color="#333333"><marquee scrollamount="3" behavior="alternate" width="90%">飞行文字特效</marquee></font></td></tr><tr class="tr3 tr"> <td><font face=宋体 color="#333333"><font color="#5a6633">[move]</font>滚动文字特效<font color="#5a6633">[/move]</font> </font></td><td><font face=宋体 color="#333333"> <marquee scrollamount="3" width="90%">滚动文字特效</marquee></font></td></tr><tr class="tr3 tr"><td><font face=宋体 color="#333333"><font color="#5a6633">[flash=400,300]</font>http://www.phpwind.net/wind.swf<font color="#5a6633">[/flash]</font> </font></td><td><font face=宋体 color="#333333">将显示flash文件</font> </td></tr><tr class="tr3 tr"><td><font face=宋体 color="#333333"><font color="#5a6633">[iframe]</font>http://www.phpwind.net<font color="#5a6633">[/iframe]</font> </font></td><td><font face=宋体 color="#333333">将在帖子中粘贴网页(后台默认关闭)</font> </td></tr><tr class="tr3 tr"><td><font color=#5a6633>[glow=255(宽度),red(颜色),1(边界)]</font>要产生光晕效果的文字<font color="#5a6633">[/glow]</font></td><td align="center"><font face=宋体 color="#333333"><table width="255" style="filter:glow(color=red, direction=1)"><tr><td align="center">要产生彩色发光效果的文字</td></tr></table></font></td></tr></table>', 1, 1);
-INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES(16, 7, 1, '7', 0, '发表回复', '', '<b>如何发表回复？</b>\n1.回复主题：帖子阅读页面点击“回复”按钮进入回复页面，或使用页面下方的快速发帖框即可；\n2.回复某楼层：点击该楼层中的“回复”，转到到快速回复框进行回复', 0, 1);
-INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES(17, 7, 1, '7', 0, '附件使用', '', '<b>如何发表附件？</b>\n在帖子编辑页面底部附带了附件上传。\n1.普通上传，表示一次上传一个文件，点击[选择文件]选择本地的文件，插入到编辑内容后，才能上传。\n2.批量上传，一次最多可上次15个文件，点击[选择文件]选择本地的文件进行上传，上传完毕后插入到编辑内容。\n\n<b>如何设置附件购买？</b>\n附件普通上传时，设置查看附件需要消耗的积分类型、积分值即可。', 0, 1);
-INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES(24, 26, 1, '26', 0, '道具使用', '', '<b>如何拥有道具？</b>\n1.购买。在社区->道具中心，为站点的道具交易市场。你可以在这里购买需要的道具。\n2.转让。同样在社区->道具中心，你可以让你的好友低价转让他所拥有的道具。\n\n<b>如何使用道具？</b>\n进入帖子阅读页面，在每个用户的头像下，都有个“道具”图标，点击即可选择使用你想要的道具。\n同时，在主楼（即楼主发表的主题）头部右边，有个“使用道具”，点击后，可以对楼主进行特殊对待。', 0, 1);
-INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES(25, 1, 1, '1', 0, '会员组等级', '', '<b>会员组等级及提升方案</b>\n会员组等级为会员在站点内的权限划分，等级越高、获得的权限也越大。站点默认以发帖数为用户提升方案。\n具体如下：\n<table><tr><td><font color=bule>头衔</font></td><td>新手上路</td><td>侠客</td><td>骑士</td><td>圣骑士</td><td>精灵王</td><td>风云使者</td><td>光明使者</td><td>天使</td></tr><tr><td><font color=bule>发帖数</font></td><td>0</td><td>100</td><td>300</td><td>600</td><td>1000</td><td>5000</td><td>10000</td><td>50000</td></tr></table>', 0, 1);
-INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES(26, 0, 0, '', 1, '常用操作', '', '', 1, 1);
-INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES(27, 26, 1, '26', 0, '短消息', '', '<b>谁可以给我发消息？</b>\n站点内的所有人都可以给你发送短信息，无论你是在线、隐私还是离线状态。\n\n<b>如何给人发消息？</b>\n1.点击用户的头像，在用户信息栏你可以看到一个短信图标，点击可直接对TA发消息；\n2.进入用户中心->短消息中心->发新短消息，根据提示填写信息即可；\n3.收到短消息后的回复，也是哦~\n4.给他人的帖子评分时，也可以进行短消息提示哦~\n\n<b>什么是消息跟踪？</b>\n消息跟踪是记录你发送出去的消息状态。如果状态为已读，表示你发的消息已经被收信人阅读了；如果状态为未读，则表示你的收信人还没有时间或兴趣来打开这条消息，那么你还有机会来更改消息的内容哦，直接点击记录后面的[编辑]即可重新编辑。', 0, 1);
-INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES(28, 9, 1, '9', 0, '日志', '', '<b>如何写私密日志？</b>\n你只需要在编辑完成日志时，将权限设为“仅自己可见”即可。\n\n<b>如何推荐日志给好友？</b>\n在日志列表中，可以看到[分享]按钮，点击后，在推荐栏中填写相关信息即可。', 0, 1);
-INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES(29, 9, 1, '9', 0, '群组', '', '<b>如何创建群组？</b>\n基础app中点击“群组”进入添加新群组，根据提示信息提交即可。\n\n<b>如何设置群管理员？</b>\n如果你是群创始人，那么你就有权利去设定该群的管理员。进入群的成员列表，选择相关的成员设置为管理员即可。\n\n<b>群组可以设置私有吗？</b>\n群组可以设置成私有。\n1.将群组加入权限设置成不允许任何人加入。\n2.将群组内容设置为不公开。\n3.将群组相册设置为不公开。\n\n<b>如何找到他人的群？</b>\n基础app->群组->所有群组，可以查看到允许查看的所有群。', 0, 1);
-INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES(30, 9, 1, '9', 0, '评价', '', '<b>什么是评价?</b>\n评价即是对站点内容（包括帖子、日志、相册等）给予感受的一个概括和评价。因此，不要路过吧，好歹给个点击，发表你一下意见，或许哪天它的上榜还离不开你的轻轻一点哦。', 0, 1);
-INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES(31, 26, 1, '26', 0, '帖子举报', '', '<b>什么是举报？</b>\n协助站长进行帖子监控、举报不良帖子推荐优秀帖子。在帖子楼层操作栏点击“举报”填写理由并提交就能实现了对当前楼层帖子举报的操作。', 0, 1);
-INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES(32, 9, 1, '9', 0, '分享', '', '<b>如何使用分享？</b>\n基础app->分享，填写分享信息，提交即可。\n内容阅读页，点击"推荐"或"分享"，也可以直接分享该页内容给大家哦~。\n\n<b>如何分享视频？</b>\n填写视频所在网页的网址。(不需要填写视频的真实地址)\n\n<b>如何分享音乐？</b>\n填写音乐文件的网址。(后缀需要是mp3或者wma)\n\n<b>如何分享Flash？</b>\n填写 Flash 文件的网址。(后缀需要是swf)', 0, 1);
+INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('8','7','2','47,7','1','发表主题','','<b>如何发表主题？</b>\n在帖子列表页面和帖子阅读页面，可以看到“发表新帖”图标，点击即可进入主题帖发布页面，如果没有发帖权限，会有提示“本论坛只有特定用户组才能发表主题,请到其他版块发贴,以提高等级!”出现。\n特别地，当鼠标停在“发表新帖”图标上时，如果你在该板块有发表交易贴、悬赏帖或投票帖的权限时，就会出现一个下拉菜单，菜单项里显示：交易、悬赏、投票，点击需要的帖子类型即可进入相应的主题发表页面发布新的主题。\n你也可以在帖子列表页面底部的快速发帖框发表普通主题帖。\n\n<b>如何发表匿名帖？</b>\n在帖子列表页面和帖子阅读页面，点击“发表新帖”图标进入发帖页面，在发帖时勾选内容编辑器下面的匿名帖复选框，或者在快速发帖处勾选（如果复选框呈灰色，说明该板块不允许发布匿名贴或者您的权限不够）。','2','1');
+INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('77','58','2','51,58','0','如何创建群组？','','对于已登录的会员，在个人中心中点击“群组”进入添加新群组，根据提示信息提交即可。','0','0');
+INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('78','58','2','51,58','0','设置群管理员','','如果你是群创始人，那么你就有权利去设定该群的管理员。进入群的成员列表，选择相关的成员设置为管理员即可。','0','0');
+INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('79','58','2','51,58','0','群组设置私有','','群组可以设置成私有。\n1.将群组加入权限设置成不允许任何人加入。\n2.将群组内容设置为不公开。\n3.将群组相册设置为不公开。','0','0');
+INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('84','0','0','','1','新手导航','','','0','0');
+INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('85','0','0','','1','站点应用','','','0','0');
+INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('86','84','1','84','1','账号相关','','','0','0');
+INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('87','84','1','84','1','帖子相关','','','0','0');
+INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('88','84','1','84','1','个人中心相关','','个人中心是站点会员在网站社区中的“家”，在这里，会员可以发表日志，上传照片，关注好友以及使用各种在线应用。','0','0');
+INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('89','84','1','84','1','常用功能','','','0','0');
+INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('90','85','1','85','1','日志相关','','注册成为网站会员后，可以在自己的个人中心中记录日志，日志中可以上传附件，例如照片等信息，日志可以分类保存，并且可以设置浏览权限。','0','0');
+INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('91','85','1','85','0','相册相关','','注册成为网站会员后，可以在自己的个人中心中设置相册，上传照片，可以自定义相册名称，并且可以设置浏览权限。','0','0');
+INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('92','85','1','85','1','群组相关','','群组是具有相同话题和兴趣的会员交流的场所，会员可以查找感兴趣的群组并申请加入，待相关群主审核通过后就可进入群组。会员在获得站点授权后可以创建自己的群组。','0','0');
+INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('93','85','1','85','0','新鲜事相关','','会员可以随时发布新鲜事，关注你的会员会在第一时间获取到你的新鲜事信息，你也可以通过关注别人来获取别人的最新消息。','0','0');
+INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('94','86','2','84,86','0','如何注册成为会员？','','如果您还没有注册，是以游客状态浏览论坛的，在头部导航栏可以看到“您尚未　登录&nbsp; 注册”的字样，点击“注册”，填写相应的信息，就可以完成注册了。因站点设置的不同，游客的浏览及使用论坛的权限会受到很多限制，如果您喜欢本站，建议您马上注册。','0','0');
+INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('95','86','2','84,86','0','如何登录？','','如果您已经是注册会员，可以在网站首页头部的登录模块进行登录，也可以在页面头部导航栏点击“登录”，进入登录页面进行登录，在限制游客访问的页面，也会有登录提示页面出现。','0','0');
+INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('96','86','2','84,86','0','忘记密码改怎么办？','','如果您忘记密码，请在登录页面点击“找回密码” 并输入用户名，系统将自动发送密码到您注册时填写的电子邮箱中。','0','0');
+INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('97','86','2','84,86','0','如何编辑个人资料？','','点击页面右上角“设置-帐号”，进入设置账号的页面，就可以对自己的资料信息进行编辑和修改了。','0','0');
+INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('98','87','2','84,87','0','发表主题','','在帖子列表页面和帖子阅读页面，可以看到“新帖”图标，点击即可进入主题帖发布页面，如果没有发帖权限，会有提示“本论坛只有特定用户组才能发表主题,请到其他版块发帖,以提高等级!”出现。','0','0');
+INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('99','87','2','84,87','0','发表出售帖','','在帖子列表页面和帖子阅读页面，点击“新帖”图标进入主题帖发布页面，发帖时在帖子编辑器下方找到“出售此帖”，在前面的复选框理勾选（如果复选框呈灰色，说明该版块不允许发布交易帖或者您的权限不够），填写好会员读帖需要支付的金钱数量（注意不能超过支付最大值）。','0','0');
+INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('100','87','2','84,87','0','发表特殊主题','','在帖子列表页面和帖子阅读页面，当鼠标停在新帖图标上时，如果你在该版块有发表特殊主题（如投票帖、辩论帖等）的权限时，就会出现一个下拉菜单，菜单项里显示：投票、辩论，点击需要的帖子类型即可进入相应的主题发表页面发布新的主题。','0','0');
+INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('101','87','2','84,87','0','发表匿名帖','','在帖子列表页面和帖子阅读页面，点击“新帖”图标进入发帖页面，在编辑框上方的设置区内勾选“匿名”就可以发表匿名帖子。（如果复选框呈灰色，说明该版块不允许发布匿名帖或者您的权限不够）。','0','0');
+INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('102','87','2','84,87','0','发表回复','','在帖子阅读页面点击“回复”按钮进入回复页面回复主题帖，也可以在页面下方的快速发帖处进行回复。','0','0');
+INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('103','87','2','84,87','0','引用功能','','在需要引用的帖子楼层上点击引用，即可引用当前楼层内容，也可以用Wind Code代码进行引用，把需要引用的内容放入[quote] 您要引用的文字[/quote]中间即可。','0','0');
+INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('104','87','2','84,87','0','附件上传','','在发帖页面下的附件上传处点击浏览按钮，上传有效后缀类型的附件，同时可以在描述框对附件进行描述，并设置下载附件所需要的威望值。','0','0');
+INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('105','88','2','84,88','0','如何进入个人中心？','','站点会员在登录的状态下可以进入个人中心，点击页面右上角的“我的快捷通道-个人中心”就可以进入到个人中心了。','0','0');
+INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('106','88','2','84,88','0','如何添加好友？','','首先进入个人中心的朋友模块，然后可以选择添加好友的方式是查找好友或者邀请好友，查找好友的话，首先搜索到要添加为好友的用户，点击“加为好友”，然后待对方同意后，就可以成为好友了；邀请好友的话，首先向好友发送邀请链接，待好友注册后，操作“加为好友”，待对方确认后就可以添加为好友了。','0','0');
+INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('107','89','2','84,89','0','找回密码','','如果您忘记密码，请在登录页面点击“找回密码” 并输入用户名，系统将自动发送密码到您的有效电子邮箱中。','0','0');
+INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('108','89','2','84,89','0','收藏功能','','等于已登录的用户，在帖子阅读页的主题帖中，点击“收藏”按钮，可以将帖子收藏到自己的收藏夹中，会员可以在个人中心的收藏模块中查看历史收藏的帖子。','0','0');
+INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('109','89','2','84,89','0','短消息功能','','可以通过会员头像信息栏或者帖子楼层短消息按钮实现会员之间互发短消息。','0','0');
+INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('110','89','2','84,89','0','帖子举报功能','','协助站长进行帖子监控、举报不良帖子推荐优秀帖子的功能。在帖子楼层操作栏点击“举报”填写理由并提交就能实现了对当前楼层帖子举报的操作。','0','0');
+INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('111','90','2','85,90','0','如何发表日志？','','会员登录站点后，进入个人中心，点击右上角的“写日志”按钮就会进入撰写日志的页面，撰写完毕后，点击“提交”按钮，日志发表成功。','0','0');
+INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('112','90','2','85,90','0','如何设置浏览权限？','','在写新日志时，修改日志的隐私设置，目前日志的浏览权限分为全站可见、仅好友可见、尽自己可见三种类别。','0','0');
+INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('16','7','2','47,7','0','发表回复','','<b>如何发表回复？</b>\n1.回复主题：帖子阅读页面点击“回复”按钮进入回复页面，或使用页面下方的快速发帖框即可；\n2.回复某楼层：点击该楼层中的“回复”，转到到快速回复框进行回复','3','1');
+INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('17','7','2','47,7','0','附件使用','','<b>如何发表附件？</b>\n在帖子编辑页面底部附带了附件上传。\n1.普通上传，表示一次上传一个文件，点击[选择文件]选择本地的文件，插入到编辑内容后，才能上传。\n2.批量上传，一次最多可上次15个文件，点击[选择文件]选择本地的文件进行上传，上传完毕后插入到编辑内容。\n\n<b>如何设置附件购买？</b>\n附件普通上传时，设置查看附件需要消耗的积分类型、积分值即可。','4','1');
+INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('70','54','4','50,53,64,54','0','发表特殊主题','','在帖子列表页面和帖子阅读页面，当鼠标停在新帖图标上时，如果你在该版块有发表特殊主题（如投票帖、辩论帖等）的权限时，就会出现一个下拉菜单，菜单项里显示：投票、辩论，点击需要的帖子类型即可进入相应的主题发表页面发布新的主题。','0','0');
+INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('71','54','4','50,53,64,54','0','发表匿名帖','','在帖子列表页面和帖子阅读页面，点击“新帖”图标进入发帖页面，在编辑框上方的设置区内勾选“匿名”就可以发表匿名帖子。（如果复选框呈灰色，说明该版块不允许发布匿名帖或者您的权限不够）。','0','0');
+INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('72','54','4','50,53,64,54','0','发表回复','','在帖子阅读页面点击“回复”按钮进入回复页面回复主题帖，也可以在页面下方的快速发帖处进行回复。','0','0');
+INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('73','54','4','50,53,64,54','0','引用功能','','在需要引用的帖子楼层上点击引用，即可引用当前楼层内容，也可以用Wind Code代码进行引用，把需要引用的内容放入[quote] 您要引用的文字[/quote]中间即可。','0','0');
+INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('74','54','4','50,53,64,54','0','附件上传','','在发帖页面下的附件上传处点击浏览按钮，上传有效后缀类型的附件，同时可以在描述框对附件进行描述，并设置下载附件所需要的威望值。','0','0');
+INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('75','55','2','50,55','0','如何进入个人中心？','','站点会员在登录的状态下可以进入个人中心，点击页面右上角的“我的快捷通道-个人中心”就可以进入到个人中心了。','0','0');
+INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('76','55','2','50,55','0','如何添加好友？','','首先进入个人中心的朋友模块，然后可以选择添加好友的方式是查找好友或者邀请好友，查找好友的话，首先搜索到要添加为好友的用户，点击“加为好友”，然后待对方同意后，就可以成为好友了；邀请好友的话，首先向好友发送邀请链接，待好友注册后，操作“加为好友”，待对方确认后就可以添加为好友了。','0','0');
+INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('67','53','2','50,53','0','编辑个人资料','','点击页面右上角“设置-帐号”，进入设置账号的页面，就可以对自己的资料信息进行编辑和修改了。','0','0');
+INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('68','54','4','50,53,64,54','0','发表主题','','在帖子列表页面和帖子阅读页面，可以看到“新帖”图标，点击即可进入主题帖发布页面，如果没有发帖权限，会有提示“本论坛只有特定用户组才能发表主题,请到其他版块发帖,以提高等级!”出现。','0','0');
+INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('69','54','4','50,53,64,54','0','发表出售帖','','在帖子列表页面和帖子阅读页面，点击“新帖”图标进入主题帖发布页面，发帖时在帖子编辑器下方找到“出售此帖”，在前面的复选框理勾选（如果复选框呈灰色，说明该版块不允许发布交易帖或者您的权限不够），填写好会员读帖需要支付的金钱数量（注意不能超过支付最大值）。','0','0');
+INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('65','53','2','50,53','0','如何登录？','','如果您已经是注册会员，可以在网站首页头部的登录模块进行登录，也可以在页面头部导航栏点击“登录”，进入登录页面进行登录，在限制游客访问的页面，也会有登录提示页面出现。','0','0');
+INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('66','53','2','50,53','0','忘记密码怎么办','','如果您忘记密码，请在登录页面点击“找回密码” 并输入用户名，系统将自动发送密码到您注册时填写的电子邮箱中。','0','0');
+INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('54','64','3','50,53,64','1','帖子相关','','撒地方撒地方','0','0');
+INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('113','92','2','85,92','0','如何创建群组？','','对于已登录的会员，在个人中心中点击“群组”进入添加新群组，根据提示信息提交即可。','0','0');
+INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('64','53','2','50,53','1','注册成为会员？','','如果您还没有注册，是以游客状态浏览论坛的，在头部导航栏可以看到“您尚未　登录&nbsp; 注册”的字样，点击“注册”，填写相应的信息，就可以完成注册了。因站点设置的不同，游客的浏览及使用论坛的权限会受到很多限制，如果您喜欢这个论坛，建议您马上注册。','0','0');
+INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('40','39','2','38,39','0','设置模块属性','','','1','0');
+INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('41','39','2','38,39','0','设置模块书香','http://www.baidu.com','啊打三分啊打三分啊打三分啊打三分啊打三分啊打三分啊打三分啊打三分啊打三分啊打三分啊打三分啊打三分啊打三分','2','0');
+INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('42','13','2','26,13','0','啊打算分手','','','1','0');
+INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('43','8','3','47,7,8','0','发表主题三级标','','发表主题三级标题发表主题三级标题发表主题三级标题发表主题三级标题发表主题三级标题发表主题三级标题发表主题三级标题发表主题三级标题发表主题三级标题发表主题三级标题','0','0');
+INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('114','92','2','85,92','0','如何设置群管理员？','','如果你是群创始人，那么你就有权利去设定该群的管理员。进入群的成员列表，选择相关的成员设置为管理员即可。','0','0');
+INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('115','92','2','85,92','0','群组是否可以设置为私有？','','群组可以设置成私有。\n1.将群组加入权限设置成不允许任何人加入。\n2.将群组内容设置为不公开。\n3.将群组相册设置为不公开。','0','0');
 
 DROP TABLE IF EXISTS pw_invitecode;
 CREATE TABLE pw_invitecode (
   id mediumint(8) unsigned NOT NULL auto_increment,
   invcode varchar(40) NOT NULL default '',
-  uid mediumint(8) NOT NULL default '0',
+  uid int(10) unsigned NOT NULL default '0',
   receiver varchar(20) NOT NULL default '',
-  createtime int(10) NOT NULL default '0',
-  usetime int(10) NOT NULL default '0',
+  createtime int(10) unsigned NOT NULL default '0',
+  usetime int(10) unsigned NOT NULL default '0',
   ifused tinyint(1) NOT NULL default '0',
   PRIMARY KEY  (id),
-  KEY uid (uid),
-  KEY invcode (invcode)
+  KEY idx_uid (uid),
+  KEY idx_invcode (invcode)
+) TYPE=MyISAM;
+
+DROP TABLE IF EXISTS pw_inviterecord;
+CREATE TABLE pw_inviterecord (
+  id int(10) unsigned NOT NULL auto_increment,
+  uid int(10) unsigned NOT NULL default '0',
+  username varchar(15) NOT NULL default '',
+  unit varchar(15) NOT NULL default '',
+  reward int(10) NOT NULL default '0',
+  ip varchar(16) NOT NULL default '',
+  typeid tinyint(3) NOT NULL default '0',
+  create_time int(10) unsigned NOT NULL default '0',
+  PRIMARY KEY  (id),
+  KEY idx_uid_ip (uid,ip),
+  KEY idx_typeid (typeid)
 ) TYPE=MyISAM;
 
 DROP TABLE IF EXISTS pw_invoke;
 CREATE TABLE pw_invoke (
   id smallint(6) unsigned NOT NULL auto_increment,
-  name varchar(50) NOT NULL,
-  tplid smallint(6) NOT NULL,
+  name varchar(50) NOT NULL default '',
+  tplid smallint(6) NOT NULL default '0',
   tagcode TEXT NOT NULL,
   parsecode text NOT NULL,
-  title VARCHAR(80) NOT NULL DEFAULT '',
+  title varchar(80) NOT NULL default '',
   PRIMARY KEY  (id),
-  UNIQUE KEY name (name)
+  UNIQUE KEY idx_name (name)
 ) TYPE=MyISAM;
 
 DROP TABLE IF EXISTS pw_invokepiece;
 CREATE TABLE pw_invokepiece (
   id smallint(6) unsigned NOT NULL auto_increment,
-  invokename varchar(50) NOT NULL,
-  title varchar(50) NOT NULL,
-  action varchar(30) NOT NULL,
-  config varchar(255) NOT NULL,
-  num smallint(6) NOT NULL,
+  invokename varchar(50) NOT NULL default '',
+  title varchar(50) NOT NULL default '',
+  action varchar(30) NOT NULL default '',
+  config text NOT NULL default '',
+  num smallint(6) NOT NULL default '0',
   param text NOT NULL,
-  cachetime int(10) unsigned NOT NULL,
-  ifpushonly TINYINT( 1 ) UNSIGNED NOT NULL,
+  cachetime int(10) unsigned NOT NULL default '0',
+  ifpushonly tinyint(3) unsigned NOT NULL default '0',
   PRIMARY KEY  (id),
-  UNIQUE KEY invokename ( invokename , title )
+  UNIQUE KEY idx_invokename ( invokename , title )
 ) TYPE=MyISAM;
 
 DROP TABLE IF EXISTS pw_ipstates;
@@ -1401,52 +2302,103 @@ CREATE TABLE pw_ipstates (
   nums int(10) NOT NULL default '0',
   PRIMARY KEY  (day)
 ) TYPE=MyISAM;
+
 DROP TABLE IF EXISTS pw_job;
 CREATE TABLE pw_job (
   id int(10) unsigned NOT NULL AUTO_INCREMENT,
-  title varchar(255) DEFAULT '',
+  title varchar(255) default '',
   description text,
-  icon varchar(255) DEFAULT '',
-  starttime int(10) unsigned NOT NULL DEFAULT '0',
-  endtime int(10) unsigned NOT NULL DEFAULT '0',
-  period smallint(6) unsigned NOT NULL DEFAULT '0',
+  icon varchar(255) default '',
+  starttime int(10) unsigned NOT NULL default '0',
+  endtime int(10) unsigned NOT NULL default '0',
+  period smallint(6) unsigned NOT NULL default '0',
   reward text,
-  sequence smallint(3) NOT NULL DEFAULT '0',
-  usergroup varchar(255) NOT NULL DEFAULT '',
-  prepose int(10) unsigned NOT NULL DEFAULT '0',
-  number int(10) NOT NULL DEFAULT '0',
-  member tinyint(1) NOT NULL DEFAULT '0',
-  auto tinyint(1) NOT NULL DEFAULT '0',
-  finish tinyint(1) NOT NULL DEFAULT '0',
-  display tinyint(1) NOT NULL DEFAULT '0',
-  type tinyint(1) NOT NULL DEFAULT '0',
-  job varchar(255) NOT NULL DEFAULT '',
+  sequence smallint(3) NOT NULL default '0',
+  usergroup varchar(255) NOT NULL default '',
+  prepose int(10) unsigned NOT NULL default '0',
+  number int(10) NOT NULL default '0',
+  member tinyint(3) NOT NULL default '0',
+  auto tinyint(3) NOT NULL default '0',
+  finish tinyint(3) NOT NULL default '0',
+  display tinyint(3) NOT NULL default '0',
+  type tinyint(3) NOT NULL default '0',
+  job varchar(255) NOT NULL default '',
   factor text,
-  isopen tinyint(1) unsigned NOT NULL DEFAULT '0',
+  isopen tinyint(3) unsigned NOT NULL default '0',
   PRIMARY KEY (id)
 ) ENGINE=MyISAM;
-INSERT INTO pw_job VALUES('1','更新个人头像','上传自己的头像，给大家留个好印象吧','','1259896560','0','0','a:4:{s:4:"type";s:5:"money";s:3:"num";s:2:"10";s:8:"category";s:6:"credit";s:11:"information";s:17:"可获得 铜钱 ";}','2','8','0','0','0','1','0','1','0','doUpdateAvatar','a:1:{s:5:"limit";s:0:"";}','1');
-INSERT INTO pw_job VALUES('2','完善个人资料','要让大家了解你，就要先更新自己的个人资料哦','','1259896260','0','0','a:4:{s:4:"type";s:5:"money";s:3:"num";s:2:"10";s:8:"category";s:6:"credit";s:11:"information";s:17:"可获得 铜钱 ";}','1','8','0','0','0','1','1','1','0','doUpdatedata','a:1:{s:5:"limit";s:0:"";}','1');
-INSERT INTO pw_job VALUES('3','给指定用户发送消息','要和大家熟悉起来，一定要学会发消息哦，还可以顺便问问题','','1259694720','0','0','a:4:{s:4:"type";s:5:"money";s:3:"num";s:2:"10";s:8:"category";s:6:"credit";s:11:"information";s:17:"可获得 铜钱 ";}','3','8','0','0','0','1','1','1','0','doSendMessage','a:2:{s:4:"user";s:5:"admin";s:5:"limit";s:0:"";}','1');
-INSERT INTO pw_job VALUES('4','寻找并添加5个好友','去找找有没有志同道合的朋友？加他们为好友吧','','1259694780','0','0','a:4:{s:4:"type";s:5:"money";s:3:"num";s:2:"10";s:8:"category";s:6:"credit";s:11:"information";s:17:"可获得 铜钱 ";}','4','8','0','0','0','1','1','1','0','doAddFriend','a:4:{s:4:"user";s:0:"";s:4:"type";s:1:"2";s:3:"num";s:1:"5";s:5:"limit";s:0:"";}','1');
-INSERT INTO pw_job VALUES('5','论坛每日红包','发红包咯！每天报到都有红包','','1259694840','0','24','a:4:{s:4:"type";s:5:"money";s:3:"num";s:2:"10";s:8:"category";s:6:"credit";s:11:"information";s:17:"可获得 铜钱 ";}','7','','0','0','0','0','1','0','0','doSendGift','','1');
+INSERT INTO pw_job VALUES('1','更新个人头像','上传自己的头像，给大家留个好印象吧','','1259896560','0','0','a:4:{s:4:"type";s:5:"money";s:3:"num";s:2:"10";s:8:"category";s:6:"credit";s:11:"information";s:17:"可获得 铜币 ";}','2','8','0','0','0','1','0','1','0','doUpdateAvatar','a:1:{s:5:"limit";s:0:"";}','1');
+INSERT INTO pw_job VALUES('2','完善个人资料','要让大家了解你，就要先更新自己的个人资料哦','','1259896260','0','0','a:4:{s:4:"type";s:5:"money";s:3:"num";s:2:"10";s:8:"category";s:6:"credit";s:11:"information";s:17:"可获得 铜币 ";}','1','8','0','0','0','1','1','1','0','doUpdatedata','a:1:{s:5:"limit";s:0:"";}','1');
+INSERT INTO pw_job VALUES('3','给admin发送消息','要和大家熟悉起来，一定要学会发消息哦，还可以顺便问问题','','1259694720','0','0','a:4:{s:4:"type";s:5:"money";s:3:"num";s:2:"10";s:8:"category";s:6:"credit";s:11:"information";s:17:"可获得 铜币 ";}','3','8','0','0','0','1','1','1','0','doSendMessage','a:2:{s:4:"user";s:5:"admin";s:5:"limit";s:0:"";}','1');
+INSERT INTO pw_job VALUES('4','寻找并添加5个好友','去找找有没有志同道合的朋友？加他们为好友吧','','1259694780','0','0','a:4:{s:4:"type";s:5:"money";s:3:"num";s:2:"10";s:8:"category";s:6:"credit";s:11:"information";s:17:"可获得 铜币 ";}','4','8','0','0','0','1','1','1','0','doAddFriend','a:4:{s:4:"user";s:0:"";s:4:"type";s:1:"2";s:3:"num";s:1:"5";s:5:"limit";s:0:"";}','1');
+INSERT INTO pw_job VALUES('5','论坛每日红包','发红包咯！每天报到都有红包','','1259694840','0','24','a:4:{s:4:"type";s:5:"money";s:3:"num";s:2:"10";s:8:"category";s:6:"credit";s:11:"information";s:17:"可获得 铜币 ";}','7','','0','0','0','0','1','0','0','doSendGift','','1');
 
 DROP TABLE IF EXISTS pw_jober;
 CREATE TABLE pw_jober (
   id int(10) unsigned NOT NULL AUTO_INCREMENT,
-  jobid int(10) unsigned NOT NULL DEFAULT '0',
-  userid int(10) unsigned NOT NULL DEFAULT '0',
-  current tinyint(1) NOT NULL DEFAULT '0',
-  step smallint(6) NOT NULL DEFAULT '0',
-  last int(10) unsigned NOT NULL DEFAULT '0',
-  next int(10) unsigned NOT NULL DEFAULT '0',
-  status tinyint(1) NOT NULL DEFAULT '0',
-  creattime int(10) unsigned NOT NULL DEFAULT '0',
-  total smallint(6) unsigned NOT NULL DEFAULT '0',
+  jobid int(10) unsigned NOT NULL default '0',
+  userid int(10) unsigned NOT NULL default '0',
+  current tinyint(1) NOT NULL default '0',
+  step smallint(6) NOT NULL default '0',
+  last int(10) unsigned NOT NULL default '0',
+  next int(10) unsigned NOT NULL default '0',
+  status tinyint(1) NOT NULL default '0',
+  creattime int(10) unsigned NOT NULL default '0',
+  total smallint(6) unsigned NOT NULL default '0',
   PRIMARY KEY (id),
-  KEY jobidx (jobid,userid),
-  KEY useridx (userid,status)
+  KEY idx_jobid_userid (jobid,userid),
+  KEY idx_userid_status (userid,status)
 ) ENGINE=MyISAM;
+
+DROP TABLE IF EXISTS pw_log_colonys;
+CREATE TABLE pw_log_colonys(
+    id int(10) unsigned not null auto_increment,
+    sid int(10) unsigned not null default '0',
+    operate tinyint(3) not null default '1',
+    modified_time int(10) unsigned not null default '0',
+    primary key(id),
+    unique key idx_sid_operate(sid,operate)
+)ENGINE=MyISAM;
+
+DROP TABLE IF EXISTS pw_log_diary;
+CREATE TABLE pw_log_diary(
+    id int(10) unsigned not null auto_increment,
+    sid int(10) unsigned not null default '0',
+    operate tinyint(3) not null default '1',
+    modified_time int(10) unsigned not null default '0',
+    primary key(id),
+    unique key idx_sid_operate(sid,operate)
+)ENGINE=MyISAM;
+
+DROP TABLE IF EXISTS pw_log_members;
+CREATE TABLE pw_log_members(
+    id int(10) unsigned not null auto_increment,
+    sid int(10) unsigned not null default '0',
+    operate tinyint(3) not null default '1',
+    modified_time int(10) unsigned not null default '0',
+    primary key(id),
+    unique key idx_sid_operate(sid,operate)
+)ENGINE=MyISAM;
+
+DROP TABLE IF EXISTS pw_log_posts;
+CREATE TABLE pw_log_posts(
+    id int(10) unsigned not null auto_increment,
+    sid int(10) unsigned not null default '0',
+    operate tinyint(3) not null default '1',
+    modified_time int(10) unsigned not null default '0',
+    primary key(id),
+    unique key idx_sid_operate(sid,operate)
+)ENGINE=MyISAM;
+
+DROP TABLE IF EXISTS pw_log_threads;
+CREATE TABLE pw_log_threads(
+    id int(10) unsigned not null auto_increment,
+    sid int(10) unsigned not null default '0',
+    operate tinyint(3) not null default '1',
+    modified_time int(10) unsigned not null default '0',
+    primary key(id),
+    unique key idx_sid_operate(sid,operate)
+)ENGINE=MyISAM;
 
 DROP TABLE IF EXISTS pw_medalinfo;
 CREATE TABLE pw_medalinfo (
@@ -1456,7 +2408,6 @@ CREATE TABLE pw_medalinfo (
   picurl varchar(255) NOT NULL default '',
   PRIMARY KEY  (id)
 ) TYPE=MyISAM;
-
 INSERT INTO pw_medalinfo(id,name,intro,picurl) VALUES (1, '{#medalname_1}', '{#medaldesc_1}!','1.gif');
 INSERT INTO pw_medalinfo(id,name,intro,picurl) VALUES (2, '{#medalname_2}', '{#medaldesc_2}', '2.gif');
 INSERT INTO pw_medalinfo(id,name,intro,picurl) VALUES (3, '{#medalname_3}', '{#medaldesc_3}', '3.gif');
@@ -1474,10 +2425,10 @@ CREATE TABLE pw_medalslogs (
   awardee varchar(40) NOT NULL default '',
   awarder varchar(40) NOT NULL default '',
   awardtime int(10) NOT NULL default '0',
-  timelimit tinyint(2) NOT NULL default '0',
-  state tinyint(1) NOT NULL default '0',
-  level SMALLINT(6) NOT NULL DEFAULT '0',
-  action tinyint(1) NOT NULL default '0',
+  timelimit tinyint(3) NOT NULL default '0',
+  state tinyint(3) NOT NULL default '0',
+  level smallint(6) NOT NULL DEFAULT '0',
+  action tinyint(3) NOT NULL default '0',
   why varchar(255) NOT NULL default '',
   PRIMARY KEY  (id),
   KEY awardee (awardee)
@@ -1486,25 +2437,25 @@ CREATE TABLE pw_medalslogs (
 DROP TABLE IF EXISTS pw_medaluser;
 CREATE TABLE pw_medaluser (
   id mediumint(8) unsigned NOT NULL auto_increment,
-  uid mediumint(8) unsigned NOT NULL,
+  uid int(10) unsigned NOT NULL default '0',
   mid SMALLINT(6) NOT NULL DEFAULT '0',
   PRIMARY KEY  (id),
-  KEY uid (uid)
+  KEY idx_uid (uid)
 ) TYPE=MyISAM;
 
 DROP TABLE IF EXISTS pw_membercredit;
 CREATE TABLE pw_membercredit (
-  uid mediumint(8) unsigned NOT NULL default '0',
+  uid int(10) unsigned NOT NULL default '0',
   cid tinyint(3) NOT NULL default '0',
   value mediumint(8) NOT NULL default '0',
-  KEY uid (uid),
-  KEY cid (cid),
-  KEY cv (cid,value)
+  KEY idx_uid (uid),
+  KEY idx_cid (cid),
+  KEY idx_cid_value (cid,value)
 ) TYPE=MyISAM;
 
 DROP TABLE IF EXISTS pw_memberdata;
 CREATE TABLE pw_memberdata (
-  uid mediumint(8) unsigned NOT NULL default '1',
+  uid int(10) unsigned NOT NULL default '1',
   postnum int(10) unsigned NOT NULL default '0',
   digests smallint(6) NOT NULL default '0',
   rvrc int(10) NOT NULL default '0',
@@ -1524,7 +2475,7 @@ CREATE TABLE pw_memberdata (
   fans mediumint(8) unsigned NOT NULL,
   newfans mediumint(8) unsigned NOT NULL,
   newreferto mediumint(8) unsigned NOT NULL,
-  newcomment mediumint(8) unsigned DEFAULT '0' NOT NULL,
+  newcomment mediumint(8) unsigned NOT NULL DEFAULT '0',
   onlineip varchar(30) NOT NULL default '',
   starttime int(10) unsigned NOT NULL default '0',
   postcheck varchar(16) NOT NULL default '',
@@ -1534,13 +2485,14 @@ CREATE TABLE pw_memberdata (
   jobnum smallint(3) unsigned NOT NULL default 0,
   lastmsg int(10) unsigned NOT NULL default 0,
   lastgrab int(10) unsigned NOT NULL default 0,
+  punch int(10) unsigned not null default '0',
   PRIMARY KEY uid (uid),
-  KEY postnum (postnum)
+  KEY idx_postnum (postnum)
 ) TYPE=MyISAM;
 
 DROP TABLE IF EXISTS pw_memberinfo;
 CREATE TABLE pw_memberinfo (
-  uid mediumint(8) unsigned NOT NULL default '1',
+  uid int(10) unsigned NOT NULL default '1',
   adsips mediumtext NOT NULL,
   credit text NOT NULL default '',
   deposit int(10) NOT NULL default '0',
@@ -1561,7 +2513,7 @@ CREATE TABLE pw_memberinfo (
 
 DROP TABLE IF EXISTS pw_members;
 CREATE TABLE pw_members (
-  uid mediumint(8) unsigned NOT NULL auto_increment,
+  uid int(10) unsigned NOT NULL auto_increment,
   username varchar(15) NOT NULL default '',
   password varchar(40) NOT NULL default '',
   safecv varchar(10) NOT NULL default '',
@@ -1592,44 +2544,43 @@ CREATE TABLE pw_members (
   p_num tinyint(3) unsigned NOT NULL default '0',
   attach varchar(50) NOT NULL default '',
   hack varchar(255) NOT NULL default '0',
-  newpm SMALLINT(6) unsigned NOT NULL default '0',
+  newpm smallint(6) unsigned NOT NULL default '0',
   banpm text NOT NULL,
   msggroups varchar(255) NOT NULL default '',
   medals varchar(255) NOT NULL default '',
   userstatus int(10) unsigned NOT NULL default '0',
   shortcut varchar(255) NOT NULL default '',
   PRIMARY KEY  (uid),
-  UNIQUE KEY username (username),
-  KEY groupid (groupid),
-  KEY email (email)
+  UNIQUE KEY idx_username (username),
+  KEY idx_groupid (groupid),
+  KEY idx_email (email)
 ) TYPE=MyISAM;
 
 DROP TABLE IF EXISTS pw_memo;
 CREATE TABLE pw_memo (
   mid int(10) unsigned NOT NULL auto_increment,
-  username varchar(15) NOT NULL,
+  username varchar(15) NOT NULL default '',
   postdate int(10) NOT NULL default '0',
   content text NOT NULL,
-  isuser tinyint(1) NOT NULL default '0',
+  isuser tinyint(3) NOT NULL default '0',
   PRIMARY KEY  (mid),
-  KEY isuser (isuser,username)
+  KEY idx_isuser_username (isuser,username)
 ) TYPE=MyISAM;
 
 DROP TABLE IF EXISTS pw_modehot;
 CREATE TABLE pw_modehot (
 	id int(10) unsigned NOT NULL AUTO_INCREMENT,
-	parent_id int(10) unsigned DEFAULT NULL,
-	sort tinyint(2) NOT NULL DEFAULT '1',
-	tag varchar(20) DEFAULT NULL,
-	type_name varchar(100) NOT NULL,
+	parent_id int(10) unsigned DEFAULT NULL default '0',
+	sort tinyint(3) NOT NULL DEFAULT '1',
+	tag varchar(20) DEFAULT NULL default '',
+	type_name varchar(100) NOT NULL default '',
 	filter_type text NOT NULL,
 	filter_time text NOT NULL,
-	display tinyint(1) NOT NULL DEFAULT 0,
-	active tinyint(1) NOT NULL DEFAULT 0,
-	remark varchar(100) DEFAULT NULL,
+	display tinyint(3) NOT NULL DEFAULT '0',
+	active tinyint(3) NOT NULL DEFAULT '0',
+	remark varchar(100) DEFAULT NULL default '',
 	PRIMARY KEY (id)
 ) TYPE=MyISAM;
-
 INSERT INTO pw_modehot VALUES(1, 0, 1, 'memberHot', '用户排行', 'N;', 'N;', '1', '1', NULL);
 INSERT INTO pw_modehot VALUES(2, 1, 1, 'memberOnLine', '在线排行', 'N;', 'a:3:{s:7:"current";s:7:"history";s:7:"filters";a:4:{i:0;s:5:"today";i:1;s:4:"week";i:2;s:5:"month";i:3;s:7:"history";}s:11:"filterItems";a:4:{i:0;s:2:"18";i:1;s:2:"18";i:2;s:2:"18";i:3;s:2:"18";}}', '1', '1', NULL);
 INSERT INTO pw_modehot VALUES(3, 1, 2, 'memberCredit', '积分排行', 'a:3:{s:7:"current";s:5:"money";s:7:"filters";a:5:{i:0;s:5:"money";i:1;s:4:"rvrc";i:2;s:6:"credit";i:3;s:8:"currency";i:4;s:1:"4";}s:11:"filterItems";a:5:{i:0;s:2:"18";i:1;s:2:"18";i:2;s:2:"18";i:3;s:2:"18";i:4;s:2:"18";}}', 'N;', '1', '1', NULL);
@@ -1652,51 +2603,17 @@ INSERT INTO pw_modehot VALUES(24, 23, 1, 'forumPost', '今日发帖排行', 'N;'
 INSERT INTO pw_modehot VALUES(25, 23, 2, 'forumTopic', '主题排行', 'N;', 'N;', '0', '1', NULL);
 INSERT INTO pw_modehot VALUES(26, 23, 3, 'forumArticle', '文章排行', 'N;', 'N;', '0', '1', NULL);
 
-DROP TABLE IF EXISTS pw_mpageconfig;
-CREATE TABLE pw_mpageconfig (
-  id smallint(6) unsigned NOT NULL auto_increment,
-  mode varchar(20) NOT NULL,
-  scr varchar(20) NOT NULL,
-  fid smallint(6) unsigned NOT NULL,
-  invokes text NOT NULL,
-  config text NOT NULL,
-  PRIMARY KEY  (id),
-  UNIQUE KEY mode (mode,scr,fid)
-) TYPE=MyISAM;
-
-DROP TABLE IF EXISTS pw_ms_tasks;
-CREATE TABLE pw_ms_tasks (
-  id int(10) unsigned NOT NULL AUTO_INCREMENT,
-  oid int(10) unsigned NOT NULL DEFAULT '0',
-  mid int(10) unsigned NOT NULL DEFAULT '0',
-  created_time int(10) NOT NULL DEFAULT '0',
-  PRIMARY KEY (id),
-  KEY normalidx (created_time)
-) ENGINE=MyISAM;
-
-DROP TABLE IF EXISTS pw_ms_searchs;
-CREATE TABLE pw_ms_searchs (
-  rid int(10) unsigned NOT NULL AUTO_INCREMENT,
-  uid int(10) unsigned NOT NULL DEFAULT '0',
-  mid int(10) unsigned NOT NULL DEFAULT '0',
-  typeid smallint(3) unsigned NOT NULL DEFAULT '0',
-  create_uid int(10) unsigned NOT NULL DEFAULT '0',
-  created_time int(10) NOT NULL DEFAULT '0',
-  PRIMARY KEY (rid),
-  KEY normalidx (uid,create_uid,created_time)
-) ENGINE=MyISAM;
-
 DROP TABLE IF EXISTS pw_ms_attachs;
 CREATE TABLE pw_ms_attachs (
   id int(10) unsigned NOT NULL AUTO_INCREMENT,
-  uid int(10) unsigned NOT NULL DEFAULT '0',
-  aid int(10) unsigned NOT NULL DEFAULT '0',
-  mid int(10) unsigned NOT NULL DEFAULT '0',
-  rid int(10) unsigned NOT NULL DEFAULT '0',
-  status tinyint(1) NOT NULL DEFAULT '0',
-  created_time int(10) NOT NULL DEFAULT '0',
+  uid int(10) unsigned NOT NULL default '0',
+  aid int(10) unsigned NOT NULL default '0',
+  mid int(10) unsigned NOT NULL default '0',
+  rid int(10) unsigned NOT NULL default '0',
+  status tinyint(3) NOT NULL default '0',
+  created_time int(10) NOT NULL default '0',
   PRIMARY KEY (id),
-  KEY mididx (mid)
+  KEY idx_mid (mid)
 ) ENGINE=MyISAM;
 
 DROP TABLE IF EXISTS pw_ms_configs;
@@ -1717,91 +2634,112 @@ CREATE TABLE pw_ms_configs (
   num1 int(10) unsigned NOT NULL default 0,
   num2 int(10) unsigned NOT NULL default 0,
   PRIMARY KEY (uid)
-) ENGINE=MyISAM DEFAULT CHARSET=gbk;
+) ENGINE=MyISAM;
 
 DROP TABLE IF EXISTS pw_ms_messages;
 CREATE TABLE pw_ms_messages (
   mid int(10) unsigned NOT NULL AUTO_INCREMENT,
-  create_uid int(10) unsigned NOT NULL DEFAULT '0',
-  create_username varchar(15) NOT NULL DEFAULT '',
-  title varchar(100) NOT NULL DEFAULT '',
+  create_uid int(10) unsigned NOT NULL default '0',
+  create_username varchar(15) NOT NULL default '',
+  title varchar(100) NOT NULL default '',
   content text,
   extra text,
-  expand varchar(255) NOT NULL DEFAULT '',
-  attach tinyint(1) NOT NULL DEFAULT '0',
-  created_time int(10) NOT NULL DEFAULT '0',
-  modified_time int(10) NOT NULL DEFAULT '0',
+  expand varchar(255) NOT NULL default '',
+  attach tinyint(1) NOT NULL default '0',
+  created_time int(10) NOT NULL default '0',
+  modified_time int(10) NOT NULL default '0',
   PRIMARY KEY (mid)
-) ENGINE=MyISAM DEFAULT CHARSET=gbk;
+) ENGINE=MyISAM;
 
 DROP TABLE IF EXISTS pw_ms_relations;
 CREATE TABLE pw_ms_relations (
   rid int(10) unsigned NOT NULL AUTO_INCREMENT,
-  uid int(10) unsigned NOT NULL DEFAULT '0',
-  mid int(10) unsigned NOT NULL DEFAULT '0',
-  categoryid smallint(3) unsigned NOT NULL DEFAULT '0',
-  typeid smallint(3) unsigned NOT NULL DEFAULT '0',
-  status tinyint(1) NOT NULL DEFAULT '0',
-  isown tinyint(1) NOT NULL DEFAULT '0',
-  created_time int(10) NOT NULL DEFAULT '0',
-  actived_time int(10) NOT NULL DEFAULT '0',
-  modified_time int(10) NOT NULL DEFAULT '0',
+  uid int(10) unsigned NOT NULL default '0',
+  mid int(10) unsigned NOT NULL default '0',
+  categoryid smallint(3) unsigned NOT NULL default '0',
+  typeid smallint(3) unsigned NOT NULL default '0',
+  status tinyint(1) NOT NULL default '0',
+  isown tinyint(1) NOT NULL default '0',
+  created_time int(10) NOT NULL default '0',
+  actived_time int(10) NOT NULL default '0',
+  modified_time int(10) NOT NULL default '0',
   PRIMARY KEY (rid),
-  KEY normalidx (uid,categoryid,typeid,modified_time),
-  KEY categoryidx (uid,categoryid,modified_time),
-  KEY statusidx (uid,status,modified_time),
-  KEY isownidx (uid,isown,modified_time),
-  KEY mididx (mid)
+  KEY idx_uid_categoryid_typeid_modifiedtime (uid,categoryid,typeid,modified_time),
+  KEY idx_uid_categoryid_modifiedtime (uid,categoryid,modified_time),
+  KEY idx_uid_status_modifiedtime (uid,status,modified_time),
+  KEY idx_uid_isown_modifiedtime (uid,isown,modified_time),
+  KEY idx_mid (mid)
 ) ENGINE=MyISAM;
-
 
 DROP TABLE IF EXISTS pw_ms_replies;
 CREATE TABLE pw_ms_replies (
   id int(10) unsigned NOT NULL AUTO_INCREMENT,
-  parentid int(10) unsigned NOT NULL DEFAULT '0',
-  create_uid int(10) unsigned NOT NULL DEFAULT '0',
-  create_username varchar(15) NOT NULL DEFAULT '',
-  title varchar(100) NOT NULL DEFAULT '',
+  parentid int(10) unsigned NOT NULL default '0',
+  create_uid int(10) unsigned NOT NULL default '0',
+  create_username varchar(15) NOT NULL default '',
+  title varchar(100) NOT NULL default '',
   content text,
-  status tinyint(1) NOT NULL DEFAULT '0',
-  created_time int(10) NOT NULL DEFAULT '0',
-  modified_time int(10) NOT NULL DEFAULT '0',
+  status tinyint(1) NOT NULL default '0',
+  created_time int(10) NOT NULL default '0',
+  modified_time int(10) NOT NULL default '0',
   PRIMARY KEY (id),
-  KEY normal (parentid,created_time)
+  KEY idx_parentid_createdtime (parentid,created_time)
+) ENGINE=MyISAM;
+
+DROP TABLE IF EXISTS pw_ms_searchs;
+CREATE TABLE pw_ms_searchs (
+  rid int(10) unsigned NOT NULL AUTO_INCREMENT,
+  uid int(10) unsigned NOT NULL default '0',
+  mid int(10) unsigned NOT NULL default '0',
+  typeid smallint(3) unsigned NOT NULL default '0',
+  create_uid int(10) unsigned NOT NULL default '0',
+  created_time int(10) NOT NULL default '0',
+  PRIMARY KEY (rid),
+  KEY idx_uid_createuid_createdtime (uid,create_uid,created_time)
+) ENGINE=MyISAM;
+
+DROP TABLE IF EXISTS pw_ms_tasks;
+CREATE TABLE pw_ms_tasks (
+  id int(10) unsigned NOT NULL AUTO_INCREMENT,
+  oid int(10) unsigned NOT NULL default '0',
+  mid int(10) unsigned NOT NULL default '0',
+  created_time int(10) NOT NULL default '0',
+  PRIMARY KEY (id),
+  KEY idx_createdtime (created_time)
 ) ENGINE=MyISAM;
 
 DROP TABLE IF EXISTS pw_nav;
 CREATE TABLE pw_nav (
-  nid smallint(4) NOT NULL auto_increment,
-  nkey varchar(32) NOT NULL,
-  type varchar(32) NOT NULL,
+  nid smallint(6) NOT NULL auto_increment,
+  nkey varchar(32) NOT NULL default '',
+  type varchar(32) NOT NULL default '',
   title char(50) NOT NULL default '',
   style char(50) NOT NULL default '',
   link char(100) NOT NULL default '',
   alt char(50) NOT NULL default '',
-  pos char(32) NOT NULL,
-  target tinyint(1) NOT NULL default '0',
-  view smallint(4) NOT NULL default '0',
-  upid smallint(4) NOT NULL,
-  isshow tinyint(1) NOT NULL default '0',
-  floattype VARCHAR( 10 ) NOT NULL DEFAULT '',
-  listtype VARCHAR( 10 ) NOT NULL DEFAULT '',
-  selflisttype VARCHAR( 10 ) NOT NULL DEFAULT '',
+  pos varchar(255) NOT NULL,
+  target tinyint(3) NOT NULL default '0',
+  view smallint(6) NOT NULL default '0',
+  upid smallint(6) NOT NULL default '0',
+  isshow tinyint(3) NOT NULL default '0',
+  floattype varchar(10) NOT NULL default '',
+  listtype varchar(10) NOT NULL default '',
+  selflisttype varchar(10) NOT NULL default '',
   PRIMARY KEY  (nid)
 ) TYPE=MyISAM;
 
 DROP TABLE IF EXISTS pw_oboard;
 CREATE TABLE pw_oboard (
   id mediumint(8) unsigned NOT NULL auto_increment,
-  uid mediumint(8) unsigned NOT NULL,
-  username varchar(15) NOT NULL,
-  touid mediumint(8) unsigned NOT NULL,
-  title varchar(255) NOT NULL,
-  postdate int(10) NOT NULL,
+  uid int(10) unsigned NOT NULL default '0',
+  username varchar(15) NOT NULL default '',
+  touid int(10) unsigned NOT NULL default '0',
+  title varchar(255) NOT NULL default '',
+  postdate int(10) NOT NULL default '0',
   c_num mediumint(8) unsigned NOT NULL default '0',
-  ifwordsfb TINYINT( 3 ) UNSIGNED NOT NULL,
+  ifwordsfb tinyint(3) unsigned NOT NULL,
   PRIMARY KEY  (id),
-  KEY touid (touid)
+  KEY idx_touid (touid)
 ) TYPE=MyISAM;
 
 DROP TABLE IF EXISTS pw_online;
@@ -1816,79 +2754,64 @@ CREATE TABLE pw_online (
   action varchar(16) NOT NULL default '',
   ifhide tinyint(1) NOT NULL default '0',
   uid int(10) NOT NULL default '0',
-  rand smallint(6) not null default 0,
+  rand smallint(6) not null default '0',
   PRIMARY KEY  (olid),
-  KEY uid (uid),
-  KEY ip (ip)
+  KEY idx_uid (uid),
+  KEY idx_ip (ip)
 ) TYPE=HEAP;
 
 DROP TABLE IF EXISTS pw_ouserdata;
 CREATE TABLE pw_ouserdata (
   uid int(10) unsigned NOT NULL,
-  index_privacy tinyint(1) unsigned NOT NULL default '0',
-  profile_privacy tinyint(1) unsigned NOT NULL default '0',
-  info_privacy tinyint(1) unsigned NOT NULL default '0',
-  credit_privacy tinyint(1) unsigned NOT NULL default '0',
-  owrite_privacy tinyint(1) unsigned NOT NULL default '0',
-  msgboard_privacy tinyint(1) unsigned NOT NULL default '0',
-  photos_privacy tinyint(1)  UNSIGNED NOT NULL DEFAULT '0',
-  diary_privacy tinyint(1)  UNSIGNED NOT NULL DEFAULT '0',
-  article_isfeed tinyint(1)  UNSIGNED NOT NULL DEFAULT '1',
-  diary_isfeed tinyint(1)  UNSIGNED NOT NULL DEFAULT '1',
-  photos_isfeed tinyint(1)  UNSIGNED NOT NULL DEFAULT '1',
-  group_isfeed tinyint(1) UNSIGNED DEFAULT '1',
+  index_privacy tinyint(3) unsigned NOT NULL default '0',
+  profile_privacy tinyint(3) unsigned NOT NULL default '0',
+  info_privacy tinyint(3) unsigned NOT NULL default '0',
+  credit_privacy tinyint(3) unsigned NOT NULL default '0',
+  owrite_privacy tinyint(3) unsigned NOT NULL default '0',
+  msgboard_privacy tinyint(3) unsigned NOT NULL default '0',
+  photos_privacy tinyint(3) unsigned NOT NULL default '0',
+  diary_privacy tinyint(3) unsigned NOT NULL default '0',
+  article_isfeed tinyint(3) unsigned NOT NULL default '1',
+  diary_isfeed tinyint(3) unsigned NOT NULL default '1',
+  photos_isfeed tinyint(3) unsigned NOT NULL default '1',
+  group_isfeed tinyint(3) unsigned default '1',
   visits int(10) unsigned NOT NULL default '0',
-  tovisits INT( 10 ) UNSIGNED NOT NULL DEFAULT '0',
-  tovisit varchar(255) NOT NULL,
-  whovisit varchar(255) NOT NULL,
-  diarynum INT( 10 ) unsigned NOT NULL DEFAULT '0',
-  photonum INT( 10 ) unsigned NOT NULL DEFAULT '0',
-  owritenum INT( 10 ) unsigned NOT NULL DEFAULT '0',
-  groupnum INT( 10 ) unsigned NOT NULL DEFAULT '0',
-  sharenum INT( 10 ) unsigned NOT NULL DEFAULT '0',
-  diary_lastpost INT( 10 ) unsigned NOT NULL DEFAULT '0',
-  photo_lastpost INT( 10 ) unsigned NOT NULL DEFAULT '0',
-  owrite_lastpost INT( 10 ) unsigned NOT NULL DEFAULT '0',
-  group_lastpost INT( 10 ) unsigned NOT NULL DEFAULT '0',
-  share_lastpost INT( 10 ) unsigned NOT NULL DEFAULT '0', 
-  self_isfollow TINYINT( 1 ) UNSIGNED DEFAULT '1' NOT NULL ,
-  friend_isfollow TINYINT( 1 ) UNSIGNED DEFAULT '1' NOT NULL ,
-  cnlesp_isfollow TINYINT( 1 ) UNSIGNED DEFAULT '1' NOT NULL ,
-  article_isfollow TINYINT( 1 ) UNSIGNED DEFAULT '1' NOT NULL ,
-  diary_isfollow TINYINT( 1 ) UNSIGNED DEFAULT '1' NOT NULL ,
-  photos_isfollow TINYINT( 1 ) UNSIGNED DEFAULT '1' NOT NULL ,
-  group_isfollow TINYINT( 1 ) UNSIGNED DEFAULT '1' NOT NULL ,
+  tovisits int(10) unsigned NOT NULL default '0',
+  tovisit varchar(255) NOT NULL default '',
+  whovisit varchar(255) NOT NULL default '',
+  diarynum int(10) unsigned NOT NULL default '0',
+  photonum int(10) unsigned NOT NULL default '0',
+  owritenum int(10) unsigned NOT NULL default '0',
+  groupnum int(10) unsigned NOT NULL default '0',
+  sharenum int(10) unsigned NOT NULL default '0',
+  diary_lastpost int(10) unsigned NOT NULL default '0',
+  photo_lastpost int(10) unsigned NOT NULL default '0',
+  owrite_lastpost int(10) unsigned NOT NULL default '0',
+  group_lastpost int(10) unsigned NOT NULL default '0',
+  share_lastpost int(10) unsigned NOT NULL default '0', 
+  self_isfollow tinyint(3) unsigned  NOT NULL default '1',
+  friend_isfollow tinyint(3) unsigned NOT NULL default '1',
+  cnlesp_isfollow tinyint(3) unsigned NOT NULL default '1',
+  article_isfollow tinyint(3) unsigned NOT NULL default '1',
+  diary_isfollow tinyint(3) unsigned NOT NULL default '1',
+  photos_isfollow tinyint(3) unsigned NOT NULL default '1',
+  group_isfollow tinyint(3) unsigned NOT NULL default '1',
+  sinaweibo_isfollow TINYINT(1) UNSIGNED NOT NULL DEFAULT '1',
   PRIMARY KEY  (uid)
 ) TYPE=MyISAM;
-INSERT INTO pw_ouserdata (uid, index_privacy, profile_privacy, info_privacy, credit_privacy, owrite_privacy, msgboard_privacy, photos_privacy, diary_privacy, article_isfeed, diary_isfeed, photos_isfeed, group_isfeed, visits, tovisits, tovisit, whovisit, diarynum, photonum, owritenum, groupnum, sharenum, diary_lastpost, photo_lastpost, owrite_lastpost, group_lastpost, share_lastpost) VALUES
-(1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, '', '', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-
-DROP TABLE IF EXISTS pw_owritedata;
-CREATE TABLE pw_owritedata (
-  id int(10) unsigned NOT NULL auto_increment,
-  uid int(10) unsigned NOT NULL,
-  touid int(10) unsigned NOT NULL,
-  postdate int(10) unsigned NOT NULL,
-  isshare tinyint(1) unsigned NOT NULL default '0',
-  source varchar(10) NOT NULL,
-  content varchar(255) NOT NULL,
-  c_num mediumint(8) UNSIGNED NOT NULL,
-  PRIMARY KEY  (id),
-  KEY uid (uid)
-) TYPE=MyISAM;
+INSERT INTO pw_ouserdata (uid, index_privacy, profile_privacy, info_privacy, credit_privacy, owrite_privacy, msgboard_privacy, photos_privacy, diary_privacy, article_isfeed, diary_isfeed, photos_isfeed, group_isfeed, visits, tovisits, tovisit, whovisit, diarynum, photonum, owritenum, groupnum, sharenum, diary_lastpost, photo_lastpost, owrite_lastpost, group_lastpost, share_lastpost) VALUES (1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, '', '', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
 DROP TABLE IF EXISTS pw_overprint;
 CREATE TABLE pw_overprint (
   id int(10) unsigned NOT NULL AUTO_INCREMENT,
-  title varchar(30) DEFAULT '',
-  icon varchar(255) DEFAULT '',
-  related tinyint(1) NOT NULL DEFAULT '0',
-  total smallint(6) unsigned NOT NULL DEFAULT '0',
-  createtime int(10) NOT NULL DEFAULT '0',
-  isopen tinyint(1) not null default 0,
+  title varchar(30) default '',
+  icon varchar(255) default '',
+  related tinyint(3) NOT NULL default '0',
+  total smallint(6) unsigned NOT NULL default '0',
+  createtime int(10) NOT NULL default '0',
+  isopen tinyint(3) not null default '0',
   PRIMARY KEY (id)
 ) ENGINE=MyISAM;
-
 INSERT INTO pw_overprint (id, title, icon, related, total, createtime, isopen) values('1','绿色置顶','d2.png','0','1','0','1');
 INSERT INTO pw_overprint (id, title, icon, related, total, createtime, isopen) values('2','蓝色置顶','d1.png','0','1','0','1');
 INSERT INTO pw_overprint (id, title, icon, related, total, createtime, isopen) values('3','红色置顶','d3.png','0','1','0','1');
@@ -1900,123 +2823,125 @@ INSERT INTO pw_overprint (id, title, icon, related, total, createtime, isopen) v
 INSERT INTO pw_overprint (id, title, icon, related, total, createtime, isopen) values('9','精华','jh.png','-1','1','0','1');
 INSERT INTO pw_overprint (id, title, icon, related, total, createtime, isopen) values('10','锁帖','sd.png','0','1','0','0');
 
+DROP TABLE IF EXISTS pw_owritedata;
+CREATE TABLE pw_owritedata (
+  id int(10) unsigned NOT NULL auto_increment,
+  uid int(10) unsigned NOT NULL default '0',
+  touid int(10) unsigned NOT NULL default '0',
+  postdate int(10) unsigned NOT NULL default '0',
+  isshare tinyint(3) unsigned NOT NULL default '0',
+  source varchar(10) NOT NULL default '',
+  content varchar(255) NOT NULL default '',
+  c_num mediumint(8) UNSIGNED NOT NULL default '0',
+  PRIMARY KEY  (id),
+  KEY idx_uid (uid)
+) TYPE=MyISAM;
+
+DROP TABLE IF EXISTS pw_pagecache;
+CREATE TABLE pw_pagecache (
+  `sign` char(32) NOT NULL,
+  `type` varchar(30) NOT NULL default '',
+  `data` text NOT NULL,
+  `cachetime` int(10) unsigned NOT NULL default '0',
+  PRIMARY KEY (`sign`),
+  KEY idx_type (`type`)
+) TYPE=MyISAM;
+
 DROP TABLE IF EXISTS pw_pageinvoke;
 CREATE TABLE pw_pageinvoke (
   id int(10) unsigned NOT NULL AUTO_INCREMENT,
-  scr varchar(20) NOT NULL,
-  sign varchar(20) NOT NULL,
-  invokename varchar(50) NOT NULL,
-  pieces varchar(255) NOT NULL,
-  state tinyint(1) unsigned NOT NULL DEFAULT '0',
-  ifverify tinyint(1) unsigned NOT NULL DEFAULT '0',
+  scr varchar(20) NOT NULL default '',
+  sign varchar(20) NOT NULL default '',
+  invokename varchar(50) NOT NULL default '',
+  pieces varchar(255) NOT NULL default '',
+  state tinyint(3) unsigned NOT NULL DEFAULT '0',
+  ifverify tinyint(3) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (id),
-  UNIQUE KEY scr (scr,sign,invokename),
-  KEY invokename (invokename)
-) ENGINE=MyISAM;
-
-DROP TABLE IF EXISTS pw_pushpic;
-CREATE TABLE pw_pushpic (
-  id int(10) unsigned NOT NULL auto_increment,
-  path varchar(255) NOT NULL,
-  invokepieceid smallint(6) unsigned NOT NULL,
-  creator varchar(20) NOT NULL,
-  createtime int(10) unsigned NOT NULL,
-  PRIMARY KEY  (id)
-) ENGINE=MyISAM;
-
-DROP TABLE IF EXISTS pw_poststopped;
-CREATE TABLE pw_poststopped (
-  fid smallint(6) unsigned NOT NULL,
-  tid mediumint(8) unsigned NOT NULL,
-  pid int(10) unsigned NOT NULL,
-  floor int(10) unsigned NOT NULL ,
-  uptime int(10) unsigned NOT NULL DEFAULT '0',
-  overtime int(10) NOT NULL DEFAULT '0',
-  PRIMARY KEY (fid,tid,pid)
+  UNIQUE KEY idx_scr_sign_invokename (scr,sign,invokename),
+  KEY idx_invokename (invokename)
 ) ENGINE=MyISAM;
 
 DROP TABLE IF EXISTS pw_pcfield;
 CREATE TABLE pw_pcfield (
   fieldid smallint(6) unsigned NOT NULL auto_increment,
-  name varchar(30) NOT NULL,
-  fieldname varchar(30) NOT NULL,
-  pcid smallint(6) unsigned NOT NULL,
-  vieworder tinyint(3) NOT NULL,
-  type varchar(20) NOT NULL,
+  name varchar(30) NOT NULL default '',
+  fieldname varchar(30) NOT NULL default '',
+  pcid smallint(6) unsigned NOT NULL default '0',
+  vieworder tinyint(3) NOT NULL default '0',
+  type varchar(20) NOT NULL default '',
   rules mediumtext NOT NULL,
-  ifable tinyint(1) NOT NULL default '1',
-  ifsearch tinyint(1) NOT NULL default '0',
-  ifasearch tinyint(1) NOT NULL default '0',
-  threadshow tinyint(1) NOT NULL default '0',
-  ifmust tinyint(1) NOT NULL default '1',
-  ifdel tinyint(1) NOT NULL default '0',
+  ifable tinyint(3) NOT NULL default '1',
+  ifsearch tinyint(3) NOT NULL default '0',
+  ifasearch tinyint(3) NOT NULL default '0',
+  threadshow tinyint(3) NOT NULL default '0',
+  ifmust tinyint(3) NOT NULL default '1',
+  ifdel tinyint(3) NOT NULL default '0',
   textsize tinyint(3) NOT NULL default '0',
-  descrip varchar(255) NOT NULL,
+  descrip varchar(255) NOT NULL default '',
   PRIMARY KEY  (fieldid),
-  KEY pcid (pcid)
+  KEY idx_pcid (pcid)
 ) TYPE=MyISAM ;
 
 DROP TABLE IF EXISTS pw_pcmember;
 CREATE TABLE pw_pcmember (
   pcmid mediumint(8) unsigned NOT NULL auto_increment,
-  tid mediumint(8) unsigned NOT NULL,
-  uid mediumint(8) unsigned NOT NULL,
-  pcid tinyint(3) unsigned NOT NULL,
-  username varchar(15) NOT NULL,
-  name VARCHAR( 255 ) NOT NULL,
-  zip VARCHAR( 255 ) NOT NULL,
+  tid int(10) unsigned NOT NULL default '0',
+  uid int(10) unsigned NOT NULL default '0',
+  pcid tinyint(3) unsigned NOT NULL default '0',
+  username varchar(15) NOT NULL default '',
+  name varchar( 255 ) NOT NULL default '',
+  zip varchar( 255 ) NOT NULL default '',
   message TEXT NOT NULL,
-  nums tinyint(3) unsigned NOT NULL,
-  totalcash varchar(20) NOT NULL,
-  phone varchar(15) NOT NULL,
-  mobile varchar(15) NOT NULL,
-  address varchar(255) NOT NULL,
-  extra tinyint(1) NOT NULL default '0',
-  jointime INT( 10 ) NOT NULL default 0,
-  ifpay tinyint(1) NOT NULL default '0',
+  nums tinyint(3) unsigned NOT NULL default '0',
+  totalcash varchar(20) NOT NULL default '',
+  phone varchar(15) NOT NULL default '',
+  mobile varchar(15) NOT NULL default '',
+  address varchar(255) NOT NULL default '',
+  extra tinyint(3) NOT NULL default '0',
+  jointime int(10) NOT NULL default 0,
+  ifpay tinyint(3) NOT NULL default '0',
   PRIMARY KEY  (pcmid),
-  KEY tid (tid,uid),
-  KEY uid (uid)
+  KEY idx_tid_uid (tid,uid),
+  KEY idx_uid (uid)
 ) TYPE=MyISAM;
 
 DROP TABLE IF EXISTS pw_pcvalue1;
 CREATE TABLE pw_pcvalue1 (
-  tid mediumint(8) unsigned NOT NULL default '0',
-  fid SMALLINT( 6 ) UNSIGNED NOT NULL DEFAULT  '0',
-  ifrecycle TINYINT( 1 ) NOT NULL default 0,
+  tid int(10) unsigned NOT NULL default '0',
+  fid smallint(6) unsigned NOT NULL default  '0',
+  ifrecycle tinyint(3) NOT NULL default 0,
   pctype tinyint(3) unsigned NOT NULL default '0',
   begintime int(10) unsigned NOT NULL default '0',
   endtime int(10) unsigned NOT NULL default '0',
   limitnum int(10) unsigned NOT NULL default '0',
   objecter tinyint(3) unsigned NOT NULL default '0',
-  price varchar(255) NOT NULL,
-  deposit varchar(255) NOT NULL,
+  price varchar(255) NOT NULL default '',
+  deposit varchar(255) NOT NULL default '',
   payway tinyint(3) unsigned NOT NULL default '0',
-  contacter varchar(255) NOT NULL,
-  tel varchar(255) NOT NULL,
-  phone varchar(255) NOT NULL,
-  mobile varchar(255) NOT NULL,
-  pcattach varchar(255) NOT NULL,
-  mprice VARCHAR( 255 ) NOT NULL,
-  wangwang VARCHAR( 255 ) NOT NULL,
-  qq VARCHAR( 255 ) NOT NULL,
+  contacter varchar(255) NOT NULL default '',
+  tel varchar(255) NOT NULL default '',
+  phone varchar(255) NOT NULL default '',
+  mobile varchar(255) NOT NULL default '',
+  pcattach varchar(255) NOT NULL default '',
+  mprice varchar(255) NOT NULL default '',
+  wangwang varchar(255) NOT NULL default '',
+  qq varchar(255) NOT NULL default '',
   PRIMARY KEY (tid),
-  KEY fid (fid)
+  KEY idx_fid (fid)
 ) TYPE=MyISAM;
 
 DROP TABLE IF EXISTS pw_permission;
 CREATE TABLE pw_permission (
-  uid mediumint(8) unsigned NOT NULL,
+  uid int(10) unsigned NOT NULL,
   fid smallint(6) unsigned NOT NULL,
   gid smallint(6) unsigned NOT NULL,
-  rkey varchar(20) NOT NULL,
+  rkey varchar(20) NOT NULL default '',
   type enum('basic','special','system','systemforum') NOT NULL,
   rvalue text NOT NULL,
   PRIMARY KEY  (uid,fid,gid,rkey),
-  KEY rkey (rkey)
+  KEY idx_rkey (rkey)
 ) TYPE=MyISAM;
 INSERT INTO pw_permission VALUES('0','0','1','allowvisit','basic','1');
-INSERT INTO pw_permission VALUES('0','0','1','maxmsg','basic','30');
 INSERT INTO pw_permission VALUES('0','0','1','maxmsg','basic','30');
 INSERT INTO pw_permission VALUES('0','0','1','allowhide','basic','0');
 INSERT INTO pw_permission VALUES('0','0','1','allowread','basic','1');
@@ -3166,7 +4091,13 @@ INSERT INTO pw_permission VALUES('0','0','15','allowcreate','basic','20');
 INSERT INTO pw_permission VALUES('0','0','3','tcanedit','systemforum','3,4,5');
 INSERT INTO pw_permission VALUES('0','0','4','tcanedit','systemforum','3,4,5');
 INSERT INTO pw_permission VALUES('0','0','5','tcanedit','systemforum','5');
-
+INSERT INTO pw_permission VALUES('0','0','3','bansignature','systemforum','1');
+INSERT INTO pw_permission VALUES('0','0','3','delalbum','systemforum','1');
+INSERT INTO pw_permission VALUES('0','0','3','deldiary','systemforum','1');
+INSERT INTO pw_permission VALUES('0','0','3','delweibo','systemforum','1');
+INSERT INTO pw_permission VALUES('0','0','3','delactive','systemforum','1');
+INSERT INTO pw_permission VALUES('0','0','3','recommendactive','systemforum','1');
+INSERT INTO pw_permission VALUES('0','0','3','banuserip','systemforum','1');
 
 DROP TABLE IF EXISTS pw_pidtmp;
 CREATE TABLE pw_pidtmp (
@@ -3174,49 +4105,23 @@ CREATE TABLE pw_pidtmp (
   PRIMARY KEY (pid)
 ) TYPE=MyISAM;
 
-DROP TABLE IF EXISTS pw_space;
-CREATE TABLE pw_space (
-  uid mediumint(8) unsigned NOT NULL,
-  name varchar(80) NOT NULL,
-  domain varchar(20) NOT NULL,
-  spacetype tinyint(1) NOT NULL,
-  banner varchar(50) NOT NULL,
-  skin varchar(15) NOT NULL,
-  visits INT(10) UNSIGNED NOT NULL,
-  tovisits INT(10) UNSIGNED NOT NULL,
-  visitors VARCHAR(255) NOT NULL,
-  tovisitors VARCHAR(255) NOT NULL,
-  layout TEXT NOT NULL,
-  modelset text NOT NULL,
-  descript VARCHAR(255) NOT NULL,
-  PRIMARY KEY (uid)
-) ENGINE=MyISAM;
-
-DROP TABLE IF EXISTS pw_privacy;
-CREATE TABLE pw_privacy (
-  uid mediumint(8) NOT NULL,
-  ptype varchar(15) NOT NULL,
-  pkey varchar(15) NOT NULL,
-  value tinyint(3) NOT NULL,
-  PRIMARY KEY (uid,ptype,pkey)
-) ENGINE=MyISAM;
-
 DROP TABLE IF EXISTS pw_pinglog;
 CREATE TABLE pw_pinglog (
   id mediumint(8) NOT NULL auto_increment,
   fid smallint(6) NOT NULL default '0',
-  tid mediumint(8) NOT NULL default '0',
+  tid int(10) NOT NULL default '0',
   pid int(10) NOT NULL default '0',
-  name varchar(15) NOT NULL,
-  point varchar(10) NOT NULL,
-  pinger varchar(15) NOT NULL,
+  uid int(10) unsigned NOT NULL default '0',
+  name varchar(15) NOT NULL default '',
+  point varchar(10) NOT NULL default '',
+  pinger varchar(15) NOT NULL default '',
   record mediumtext NOT NULL,
   pingdate int(10) NOT NULL default '0',
-  ifhide TINYINT( 1 ) UNSIGNED NOT NULL DEFAULT '0',
+  ifhide tinyint(3) UNSIGNED NOT NULL DEFAULT '0',
   PRIMARY KEY (id),
-  KEY tid (tid),
-  KEY pid (pid),
-  KEY fid (fid,tid,pid)
+  KEY idx_tid_pid (tid,pid),
+  KEY idx_pid (pid),
+  KEY idx_fid_tid_pid (fid,tid,pid)
 ) TYPE=MyISAM;
 
 DROP TABLE IF EXISTS pw_plan;
@@ -3229,13 +4134,12 @@ CREATE TABLE pw_plan (
   hour varchar(80) NOT NULL default '',
   usetime int(10) NOT NULL default '0',
   nexttime int(10) NOT NULL default '0',
-  ifsave tinyint(1) NOT NULL default '0',
-  ifopen tinyint(1) NOT NULL default '0',
+  ifsave tinyint(3) NOT NULL default '0',
+  ifopen tinyint(3) NOT NULL default '0',
   filename varchar(80) NOT NULL default '',
   config text NOT NULL,
   PRIMARY KEY  (id)
 ) TYPE=MyISAM;
-
 INSERT INTO pw_plan VALUES (1, '{#plan_2}', '*', '*', '20', '30', 0, 0, 0, 0, 'freeban', '');
 INSERT INTO pw_plan VALUES (2, '{#plan_3}', '*', '*', '0', '*', 0, 0, 1, 0, 'birthday', '');
 INSERT INTO pw_plan VALUES (3, '{#plan_4}', '*', '1', '12', '30', 0, 0, 1, 0, 'rewardmsg', '');
@@ -3244,143 +4148,170 @@ INSERT INTO pw_plan VALUES (5, '{#plan_6}', '16', '*', '18', '30', 0, 0, 0, 0, '
 INSERT INTO pw_plan VALUES (6, '{#plan_7}', '*', '*', '22', '*', 0, 0, 0, 0, 'extragroup', '');
 INSERT INTO pw_plan VALUES (7,'广告到期提醒','*','*','9','*','0','0','0','1','alteradvert','');
 
-
 DROP TABLE IF EXISTS pw_polls;
 CREATE TABLE pw_polls (
   pollid int(10) unsigned NOT NULL auto_increment,
-  tid mediumint(8) unsigned NOT NULL default '0',
+  tid int(10) unsigned NOT NULL default '0',
   voteopts mediumtext NOT NULL,
-  modifiable tinyint(1) NOT NULL default '0',
-  previewable tinyint(1) NOT NULL default '0',
-  multiple tinyint(1) unsigned NOT NULL,
-  mostvotes smallint(6) unsigned NOT NULL,
-  voters mediumint(8) unsigned NOT NULL,
-  timelimit int(3) NOT NULL default '0',
-  leastvotes int(3) UNSIGNED NOT NULL,
-  regdatelimit int(10) UNSIGNED NOT NULL,
-  creditlimit varchar(255) NOT NULL,
-  postnumlimit int(10) UNSIGNED NOT NULL,
+  modifiable tinyint(3) NOT NULL default '0',
+  previewable tinyint(3) NOT NULL default '0',
+  multiple tinyint(3) unsigned NOT NULL default '0',
+  mostvotes smallint(6) unsigned NOT NULL default '0',
+  voters mediumint(8) unsigned NOT NULL default '0',
+  timelimit int(10) NOT NULL default '0',
+  leastvotes int(10) unsigned NOT NULL default '0',
+  regdatelimit int(10) unsigned NOT NULL default '0',
+  creditlimit varchar(255) NOT NULL default '',
+  postnumlimit int(10) unsigned NOT NULL default '0',
   PRIMARY KEY  (pollid),
-  KEY tid (tid)
+  KEY idx_tid (tid)
 ) TYPE=MyISAM;
 
 DROP TABLE IF EXISTS pw_postcate;
 CREATE TABLE pw_postcate (
   pcid tinyint(3) unsigned NOT NULL auto_increment,
-  sign ENUM(  'basic',  'buy' ) NOT NULL DEFAULT  'basic',
-  name varchar(30) NOT NULL,
-  ifable tinyint(1) NOT NULL default '1',
-  vieworder tinyint(3) NOT NULL,
-  viewright varchar(255) NOT NULL,
-  adminright varchar(255) NOT NULL,
+  sign ENUM(  'basic',  'buy' ) NOT NULL default  'basic',
+  name varchar(30) NOT NULL default '',
+  ifable tinyint(3) NOT NULL default '1',
+  vieworder tinyint(3) NOT NULL default '0',
+  viewright varchar(255) NOT NULL default '',
+  adminright varchar(255) NOT NULL default '',
   PRIMARY KEY  (pcid)
 ) TYPE=MyISAM ;
-
+  
 INSERT INTO pw_postcate (pcid, sign, name, ifable, vieworder, viewright, adminright) VALUES(1, 'buy' , '团购', 1, 0, '', '');
-
 
 DROP TABLE IF EXISTS pw_posts;
 CREATE TABLE pw_posts (
   pid int(10) unsigned NOT NULL auto_increment,
   fid smallint(6) unsigned NOT NULL default '0',
   tid mediumint(8) unsigned NOT NULL default '0',
-  aid SMALLINT( 6 ) UNSIGNED NOT NULL DEFAULT  '0',
+  aid smallint(6) unsigned NOT NULL default  '0',
   author varchar(15) NOT NULL default '',
   authorid mediumint(8) unsigned NOT NULL default '0',
   icon tinyint(2) NOT NULL default '0',
   postdate int(10) unsigned NOT NULL default '0',
   subject varchar(100) NOT NULL default '',
   userip varchar(15) NOT NULL default '',
-  ifsign tinyint(1) NOT NULL default '0',
+  ifsign tinyint(3) NOT NULL default '0',
   buy text NOT NULL,
   alterinfo varchar(50) NOT NULL default '',
   remindinfo varchar(150) NOT NULL default '',
   leaveword varchar(255) NOT NULL default '',
   ipfrom varchar(255) NOT NULL default '',
-  ifconvert tinyint(1) NOT NULL default '1',
-  ifwordsfb tinyint(1) NOT NULL default '1',
-  ifcheck tinyint(1) NOT NULL default '0',
+  ifconvert tinyint(3) NOT NULL default '1',
+  ifwordsfb tinyint(3) NOT NULL default '1',
+  ifcheck tinyint(3) NOT NULL default '0',
   content mediumtext NOT NULL,
   ifmark varchar(255) NOT NULL default '',
-  ifreward tinyint(1) NOT NULL default '0',
-  ifshield tinyint(1) unsigned NOT NULL default '0',
-  anonymous tinyint(1) NOT NULL default '0',
-  ifhide tinyint(1) NOT NULL default '0',
+  ifreward tinyint(3) NOT NULL default '0',
+  ifshield tinyint(3) unsigned NOT NULL default '0',
+  anonymous tinyint(3) NOT NULL default '0',
+  ifhide tinyint(3) NOT NULL default '0',
   PRIMARY KEY  (pid),
-  KEY fid (fid),
-  KEY postdate (postdate),
-  KEY tid (tid,postdate),
-  KEY authorid (authorid),
-  KEY ifcheck (ifcheck)
+  KEY idx_fid (fid),
+  KEY idx_postdate (postdate),
+  KEY idx_tid (tid,postdate),
+  KEY idx_authorid (authorid),
+  KEY idx_ifcheck (ifcheck)
 ) TYPE=MyISAM;
 
 DROP TABLE IF EXISTS pw_postsfloor;
 CREATE TABLE pw_postsfloor (
   tid int(10) NOT NULL,
   floor int(10) NOT NULL AUTO_INCREMENT,
-  pid int(10) NOT NULL DEFAULT '0',
+  pid int(10) NOT NULL default '0',
   PRIMARY KEY (tid,floor)
 ) TYPE=MyISAM;
+
+DROP TABLE IF EXISTS pw_poststopped;
+CREATE TABLE pw_poststopped (
+  fid smallint(6) unsigned NOT NULL,
+  tid int(10) unsigned NOT NULL,
+  pid int(10) unsigned NOT NULL,
+  floor int(10) unsigned NOT NULL ,
+  uptime int(10) unsigned NOT NULL default '0',
+  overtime int(10) NOT NULL default '0',
+  PRIMARY KEY (fid,tid,pid)
+) ENGINE=MyISAM;
+
+DROP TABLE IF EXISTS pw_privacy;
+CREATE TABLE pw_privacy (
+  uid mediumint(8) NOT NULL,
+  ptype varchar(15) NOT NULL,
+  pkey varchar(15) NOT NULL,
+  value tinyint(3) NOT NULL,
+  PRIMARY KEY (uid,ptype,pkey)
+) ENGINE=MyISAM;
 
 DROP TABLE IF EXISTS pw_proclock;
 CREATE TABLE pw_proclock (
   uid mediumint(8) unsigned NOT NULL,
   action varchar(50) NOT NULL,
-  time int(10) NOT NULL,
+  time int(10) NOT NULL default '0',
   PRIMARY KEY  (uid,action)
 ) TYPE=MyISAM;
 
 DROP TABLE IF EXISTS pw_pushdata;
 CREATE TABLE pw_pushdata (
   id int(10) unsigned NOT NULL auto_increment,
-  invokepieceid smallint(6) unsigned NOT NULL,
+  invokepieceid smallint(6) unsigned NOT NULL default '0',
   fid smallint(6) unsigned NOT NULL default '0',
-  editor VARCHAR(15) NOT NULL,
-  starttime int(10) unsigned NOT NULL,
-  endtime int(10) unsigned NOT NULL,
-  vieworder tinyint(1) unsigned NOT NULL,
-  titlecss VARCHAR(255) NOT NULL,
-  pushtime INT(10) unsigned NOT NULL,
-  ifverify TINYINT(1) unsigned NOT NULL DEFAULT '0',
+  editor varchar(15) NOT NULL default '',
+  starttime int(10) unsigned NOT NULL default '0',
+  endtime int(10) unsigned NOT NULL default '0',
+  vieworder tinyint(1) unsigned NOT NULL default '0',
+  titlecss varchar(255) NOT NULL default '',
+  pushtime int(10) unsigned NOT NULL default '0',
+  ifverify tinyint(3) unsigned NOT NULL default '0',
   data text NOT NULL,
-  ifbusiness TINYINT( 1 ) UNSIGNED NOT NULL,
+  ifbusiness tinyint(3) unsigned NOT NULL default '0',
   PRIMARY KEY (id),
-  KEY invokepieceid (ifverify , invokepieceid , vieworder , starttime)
+  KEY idx_ifverify_invokepieceid_vieworder_starttime (ifverify , invokepieceid , vieworder , starttime)
 ) ENGINE = MyISAM;
+
+DROP TABLE IF EXISTS pw_pushpic;
+CREATE TABLE pw_pushpic (
+  id int(10) unsigned NOT NULL auto_increment,
+  path varchar(255) NOT NULL default '',
+  invokepieceid smallint(6) unsigned NOT NULL default '0',
+  creator varchar(20) NOT NULL default '',
+  createtime int(10) unsigned NOT NULL default '0',
+  PRIMARY KEY  (id)
+) ENGINE=MyISAM;
+ 
 
 DROP TABLE IF EXISTS pw_rate;
 CREATE  TABLE pw_rate (
-  objectid INT(10) NOT NULL DEFAULT 0,
-  optionid SMALLINT(6) NOT NULL DEFAULT 0,
-  typeid SMALLINT(6) NOT NULL DEFAULT 0,
-  uid MEDIUMINT(8) NOT NULL DEFAULT 0,
-  created_at INT(10) NOT NULL DEFAULT 0,
-  ip varchar( 15 ) NOT NULL,
-  KEY idx_tid_oid_uid (typeid,objectid,uid),
-  KEY idx_tid_time (typeid,created_at,optionid,objectid),
-  KEY idx_uid_time (uid,created_at)
+  objectid int(10) NOT NULL default '0',
+  optionid smallint(6) NOT NULL default '0',
+  typeid smallint(6) NOT NULL default '0',
+  uid int(10) unsigned NOT NULL default '0',
+  created_at int(10) unsigned NOT NULL default '0',
+  ip varchar(15) NOT NULL default '',
+  KEY idx_typeid_objectid_uid (typeid,objectid,uid),
+  KEY idx_typeid_createdat_optionid_objectid (typeid,created_at,optionid,objectid),
+  KEY idx_uid_createdat (uid,created_at)
 ) ENGINE = MyISAM;
 
 DROP TABLE IF EXISTS pw_rateconfig;
 CREATE  TABLE pw_rateconfig (
-  id INT NOT NULL AUTO_INCREMENT,
-  title VARCHAR(12) NOT NULL,
-  icon VARCHAR(75) NOT NULL,
-  isopen TINYINT(1) NOT NULL DEFAULT 1,
-  isdefault TINYINT(1) NOT NULL DEFAULT 0,
-  typeid TINYINT(1) NOT NULL DEFAULT 0,
-  creditset TINYINT(1) NOT NULL DEFAULT 0,
-  voternum TINYINT(1) NOT NULL DEFAULT 0,
-  authornum TINYINT(1) NOT NULL DEFAULT 0,
-  creator VARCHAR(20) NULL,
-  created_at INT(10) NULL,
-  updater VARCHAR(20) NULL,
-  update_at INT(10) NULL,
+  id int(10) unsigned NOT NULL AUTO_INCREMENT,
+  title varchar(12) NOT NULL default '',
+  icon varchar(75) NOT NULL default '',
+  isopen tinyint(1) NOT NULL DEFAULT '1',
+  isdefault tinyint(1) NOT NULL DEFAULT '0',
+  typeid tinyint(1) NOT NULL DEFAULT '0',
+  creditset tinyint(1) NOT NULL DEFAULT '0',
+  voternum tinyint(1) NOT NULL DEFAULT '0',
+  authornum tinyint(1) NOT NULL DEFAULT '0',
+  creator varchar(20) NULL default '',
+  created_at int(10) NULL default '0',
+  updater varchar(20) NULL default '',
+  update_at int(10) NULL default '0',
   PRIMARY KEY (id),
-  KEY idx_type_id (typeid)
+  KEY idx_typeid (typeid)
 ) ENGINE = MyISAM;
-
-
 INSERT INTO pw_rateconfig (id, title, icon, isopen, isdefault, typeid, creditset, voternum, authornum, creator, created_at, updater, update_at) VALUES(1, '精彩', '01.gif', 1, 1, 1, -1, 1, 1, 'system', 1251030975, 'admin', 1252394328);
 INSERT INTO pw_rateconfig (id, title, icon, isopen, isdefault, typeid, creditset, voternum, authornum, creator, created_at, updater, update_at) VALUES(2, '感动', '02.gif', 1, 1, 1, -1, 1, 1, 'system', 1251030975, 'admin', 1252394328);
 INSERT INTO pw_rateconfig (id, title, icon, isopen, isdefault, typeid, creditset, voternum, authornum, creator, created_at, updater, update_at) VALUES(3, '搞笑', '03.gif', 1, 1, 1, -1, 1, 1, 'system', 1251030975, 'admin', 1252394328);
@@ -3406,53 +4337,53 @@ INSERT INTO pw_rateconfig (id, title, icon, isopen, isdefault, typeid, creditset
 
 DROP TABLE IF EXISTS pw_rateresult;
 CREATE  TABLE pw_rateresult (
-  id INT(10) NOT NULL AUTO_INCREMENT ,
-  objectid INT(10) NOT NULL DEFAULT 0,
-  optionid SMALLINT(6) NOT NULL DEFAULT 0,
-  typeid TINYINT(1) NOT NULL DEFAULT 0,
-  num INT(10) NOT NULL DEFAULT 0,
+  id int(10) unsigned NOT NULL AUTO_INCREMENT,
+  objectid int(10) unsigned NOT NULL default '0',
+  optionid smallint(6) unsigned NOT NULL default '0',
+  typeid TINYINT(3) NOT NULL default '0',
+  num int(10) unsigned NOT NULL default '0',
   PRIMARY KEY (id),
-  KEY idx_oid (optionid,objectid),
-  KEY idx_tid (typeid,objectid)
+  KEY idx_optionid_objectid (optionid,objectid),
+  KEY idx_typeid_objectid (typeid,objectid)
 ) ENGINE = MyISAM;
 
 DROP TABLE IF EXISTS pw_recycle;
 CREATE TABLE pw_recycle (
   pid int(10) unsigned NOT NULL default '0',
-  tid mediumint(8) unsigned NOT NULL default '0',
+  tid int(10) unsigned NOT NULL default '0',
   fid smallint(6) unsigned NOT NULL default '0',
   deltime int(10) unsigned NOT NULL default '0',
   admin varchar(15) NOT NULL default '',
   PRIMARY KEY  (pid,tid),
-  KEY tid (tid),
-  KEY fid (fid,pid)
+  KEY idx_tid (tid),
+  KEY idx_fid_pid (fid,pid)
 ) TYPE=MyISAM;
 
 DROP TABLE IF EXISTS pw_report;
 CREATE TABLE pw_report (
   id int(10) unsigned NOT NULL auto_increment,
-  tid mediumint(8) unsigned NOT NULL default '0',
+  tid int(10) unsigned NOT NULL default '0',
   pid int(10) unsigned NOT NULL default '0',
-  uid mediumint(9) NOT NULL default '0',
-  type VARCHAR( 50 ) NOT NULL DEFAULT '0',
-  state TINYINT( 1 ) UNSIGNED NOT NULL DEFAULT '0',
+  uid int(10) unsigned NOT NULL default '0',
+  type varchar(50) NOT NULL DEFAULT '',
+  state tinyint(3) UNSIGNED NOT NULL DEFAULT '0',
   reason varchar(255) NOT NULL default '',
   PRIMARY KEY  (id),
-  KEY type (type)
+  KEY idx_type (type)
 ) TYPE=MyISAM;
 
 DROP TABLE IF EXISTS pw_reward;
 CREATE TABLE pw_reward (
-  tid mediumint(8) NOT NULL,
-  cbtype varchar(20) NOT NULL,
-  catype varchar(20) NOT NULL,
-  cbval int(10) NOT NULL,
-  caval int(10) NOT NULL,
-  timelimit int(10) NOT NULL,
-  author varchar(30) NOT NULL,
-  pid mediumint(8) NOT NULL,
+  tid int(10) unsigned NOT NULL,
+  cbtype varchar(20) NOT NULL default '',
+  catype varchar(20) NOT NULL default '',
+  cbval int(10) NOT NULL default '0',
+  caval int(10) NOT NULL default '0',
+  timelimit int(10) NOT NULL default '0',
+  author varchar(30) NOT NULL default '',
+  pid int(10) NOT NULL default '0',
   PRIMARY KEY  (tid),
-  KEY timelimit (timelimit)
+  KEY idx_timelimit (timelimit)
 ) TYPE=MyISAM;
 
 DROP TABLE IF EXISTS pw_schcache;
@@ -3464,34 +4395,49 @@ CREATE TABLE pw_schcache (
   total mediumint(8) unsigned NOT NULL default '0',
   schedid text NOT NULL,
   PRIMARY KEY  (sid),
-  KEY schline (schline)
+  KEY idx_schline (schline)
 ) TYPE=MyISAM;
+
+DROP TABLE IF EXISTS pw_searchadvert;
+CREATE TABLE pw_searchadvert(
+   `id` mediumint(8) unsigned not null auto_increment,
+   `keyword` varchar(32) not null default '',
+   `code` text not null,
+   `starttime` int(10) unsigned not null default '0',
+   `endtime` int(10) unsigned not null default '0',
+   `ifshow` tinyint(3) not null default '0',
+   `orderby` tinyint(3) not null default '0',
+   `config` text not null,
+    primary key(id),
+    KEY `idx_keyword` (`keyword`)
+)ENGINE=MyISAM;
+
+DROP TABLE IF EXISTS pw_searchforum;
+CREATE TABLE IF NOT EXISTS pw_searchforum (
+  `id` smallint(6) unsigned not null auto_increment,
+  `fid` smallint(6) unsigned not null default '0',
+  `vieworder` smallint(6) not null default '0',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM;
+
+DROP TABLE IF EXISTS pw_searchstatistic;
+CREATE TABLE IF NOT EXISTS `pw_searchstatistic` (
+  `id` int(10) unsigned not null auto_increment,
+  `keyword` varchar(32) not null default '',
+  `num` mediumint(8) not null default '0',
+  `created_time` int(10) not null default '0',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM;
 
 DROP TABLE IF EXISTS pw_setform;
 CREATE TABLE pw_setform (
   id int(10) NOT NULL auto_increment,
   name varchar(30) NOT NULL default '',
-  ifopen tinyint(1) NOT NULL default '0',
+  ifopen tinyint(3) NOT NULL default '0',
   value text NOT NULL,
   PRIMARY KEY  (id)
 ) TYPE=MyISAM;
-
 INSERT INTO pw_setform VALUES('1','{#setform_1}','1','{#setfrom_1_inro}');
-
-DROP TABLE IF EXISTS pw_collection;
-CREATE TABLE pw_collection (
-  id mediumint(8) NOT NULL auto_increment,
-  type varchar(20) NOT NULL,
-  typeid int(10) unsigned NOT NULL default '0',
-  uid mediumint(8) NOT NULL,
-  username varchar(15) NOT NULL,
-  postdate int(10) NOT NULL,
-  content text NOT NULL,
-  ifhidden tinyint(1) unsigned NOT NULL default '0',
-  c_num mediumint( 8 ) unsigned NOT NULL default '0',
-  PRIMARY KEY  (id),
-  KEY uid (uid,postdate)
-) TYPE=MyISAM;
 
 DROP TABLE IF EXISTS pw_sharelinks;
 CREATE TABLE pw_sharelinks (
@@ -3501,16 +4447,34 @@ CREATE TABLE pw_sharelinks (
   url varchar(100) NOT NULL default '',
   descrip varchar(200) NOT NULL default '0',
   logo varchar(100) NOT NULL default '',
-  ifcheck tinyint(1) NOT NULL default '0',
+  ifcheck tinyint(3) NOT NULL default '0',
   username varchar(20) NOT NULL default '',
   PRIMARY KEY  (sid)
 ) TYPE=MyISAM;
-
 INSERT INTO pw_sharelinks (threadorder ,name ,url ,descrip ,logo ,ifcheck) VALUES ('0', 'phpwind Board', 'http://www.phpwind.net', '{#sharelinks}', 'logo.gif', '1');
+
+DROP TABLE IF EXISTS pw_sharelinksrelation;
+CREATE TABLE `pw_sharelinksrelation` (
+  `sid` mediumint(8) unsigned not null default '0',
+  `stid` mediumint(8) unsigned not null default '0',
+  KEY `idx_sid` (`sid`),
+  UNIQUE KEY `idx_stid_sid` (`stid`,`sid`)
+) ENGINE=MyISAM;
+
+DROP TABLE IF EXISTS `pw_sharelinkstype`;
+CREATE TABLE IF NOT EXISTS `pw_sharelinkstype` (
+  `stid` smallint(6) unsigned not null auto_increment,
+  `name` varchar(30) not null default '',
+  `vieworder` smallint(6) unsigned not null default '0',
+  `ifable` tinyint(3) unsigned not null default '0',
+  PRIMARY KEY (`stid`)
+) ENGINE=MyISAM;
+
+INSERT INTO `pw_sharelinkstype` (`stid`, `name`, `vieworder`, `ifable`) VALUES (1, '门户', 1, 1),(2, '论坛', 2, 1);
 
 DROP TABLE IF EXISTS pw_singleright;
 CREATE TABLE pw_singleright (
-  uid mediumint(8) unsigned NOT NULL default '0',
+  uid int(10) unsigned NOT NULL default '0',
   visit varchar(80) NOT NULL default '',
   post varchar(80) NOT NULL default '',
   reply varchar(80) NOT NULL default '',
@@ -3527,7 +4491,6 @@ CREATE TABLE pw_smiles (
   type smallint(6) NOT NULL default '0',
   PRIMARY KEY  (id)
 ) TYPE=MyISAM;
-
 INSERT INTO pw_smiles (path,name,vieworder,type) VALUES ('default','{#smile}','1','0');
 INSERT INTO pw_smiles (path,vieworder,type) VALUES ('1.gif','0','1');
 INSERT INTO pw_smiles (path,vieworder,type) VALUES ('2.gif','0','1');
@@ -3544,10 +4507,28 @@ INSERT INTO pw_smiles (path,vieworder,type) VALUES ('12.gif','0','1');
 INSERT INTO pw_smiles (path,vieworder,type) VALUES ('13.gif','0','1');
 INSERT INTO pw_smiles (path,vieworder,type) VALUES ('14.gif','0','1');
 
+DROP TABLE IF EXISTS pw_space;
+CREATE TABLE pw_space (
+  uid int(10) unsigned NOT NULL,
+  name varchar(80) NOT NULL default '',
+  domain varchar(20) NOT NULL default '',
+  spacetype tinyint(1) NOT NULL default '0',
+  banner varchar(50) NOT NULL default '',
+  skin varchar(15) NOT NULL default '',
+  visits int(10) unsigned NOT NULL default '0',
+  tovisits int(10) unsigned NOT NULL default '0',
+  visitors varchar(255) NOT NULL default '',
+  tovisitors varchar(255) NOT NULL default '',
+  layout text NOT NULL,
+  modelset text NOT NULL,
+  descript VARCHAR(255) NOT NULL default '',
+  PRIMARY KEY (uid)
+) ENGINE=MyISAM;
+
 DROP TABLE IF EXISTS pw_sqlcv;
 CREATE TABLE pw_sqlcv (
   id int(10) NOT NULL auto_increment,
-  var varchar(20) NOT NULL,
+  var varchar(20) NOT NULL default '',
   PRIMARY KEY  (id)
 ) TYPE=MyISAM;
 
@@ -3570,21 +4551,33 @@ CREATE TABLE pw_stopic (
   block_config text NOT NULL,
   layout_config text NOT NULL,
   nav_config text NOT NULL,
-  file_name VARCHAR( 30 ) NOT NULL DEFAULT '',
+  file_name varchar(30) NOT NULL default '',
   PRIMARY KEY  (stopic_id)
+) TYPE=MyISAM;
+
+DROP TABLE IF EXISTS pw_stopicblock;
+CREATE TABLE pw_stopicblock (
+  block_id smallint(6) unsigned NOT NULL auto_increment,
+  name varchar(50) NOT NULL default '',
+  tagcode text NOT NULL,
+  begin text NOT NULL,
+  loops text NOT NULL,
+  end text NOT NULL,
+  config varchar(255) NOT NULL default '',
+  replacetag varchar(255) NOT NULL default '',
+  PRIMARY KEY  (block_id)
 ) TYPE=MyISAM;
 
 DROP TABLE IF EXISTS pw_stopiccategory;
 CREATE TABLE pw_stopiccategory (
-  id SMALLINT(6) NOT NULL AUTO_INCREMENT,
-  title VARCHAR(45) NOT NULL,
-  status TINYINT(1) NOT NULL DEFAULT 0,
-  num SMALLINT(6) NOT NULL DEFAULT 0,
-  creator VARCHAR(20) NULL,
-  createtime INT(10) NOT NULL DEFAULT 0,
+  id smallint(6) NOT NULL AUTO_INCREMENT,
+  title varchar(45) NOT NULL default '',
+  status tinyint(3) NOT NULL default 0,
+  num smallint(6) NOT NULL default 0,
+  creator varchar(20) NULL default '',
+  createtime int(10) NOT NULL default 0,
   PRIMARY KEY (id)
 ) TYPE=MyISAM;
-
 INSERT INTO pw_stopiccategory (id, title, status, num, creator, createtime) VALUES(1, '房产', 1, 0, 'phpwind', 1250759842);
 INSERT INTO pw_stopiccategory (id, title, status, num, creator, createtime) VALUES(2, '汽车', 1, 0, 'phpwind', 1250759842);
 INSERT INTO pw_stopiccategory (id, title, status, num, creator, createtime) VALUES(3, '婚庆', 1, 0, 'phpwind', 1250759842);
@@ -3593,79 +4586,66 @@ INSERT INTO pw_stopiccategory (id, title, status, num, creator, createtime) VALU
 
 DROP TABLE IF EXISTS pw_stopicpictures;
 CREATE  TABLE pw_stopicpictures (
-  id INT(10) NOT NULL AUTO_INCREMENT,
-  categoryid SMALLINT(6) NOT NULL DEFAULT 0,
-  title VARCHAR(45) NOT NULL,
-  path VARCHAR(255) NOT NULL,
-  num SMALLINT(6) NOT NULL DEFAULT 0,
-  creator VARCHAR(20) NULL,
-  createtime INT(10) NOT NULL DEFAULT 0,
+  id int(10) NOT NULL AUTO_INCREMENT,
+  categoryid smallint(6) NOT NULL default 0,
+  title varchar(45) NOT NULL default '',
+  path varchar(255) NOT NULL default '',
+  num smallint(6) NOT NULL default '0',
+  creator varchar(20) NULL default '',
+  createtime int(10) NOT NULL default '0',
   PRIMARY KEY (id)
-) TYPE=MyISAM;
-
-DROP TABLE IF EXISTS pw_stopicblock;
-CREATE TABLE pw_stopicblock (
-  block_id smallint(6) unsigned NOT NULL auto_increment,
-  name varchar(50) NOT NULL,
-  tagcode text NOT NULL,
-  begin text NOT NULL,
-  loops text NOT NULL,
-  end text NOT NULL,
-  config varchar(255) NOT NULL,
-  replacetag varchar(255) NOT NULL,
-  PRIMARY KEY  (block_id)
 ) TYPE=MyISAM;
 
 DROP TABLE IF EXISTS pw_stopicunit;
 CREATE TABLE pw_stopicunit (
   unit_id int(10) unsigned NOT NULL auto_increment,
-  stopic_id int(10) unsigned NOT NULL,
-  html_id varchar(50) NOT NULL,
-  block_id smallint(6) unsigned NOT NULL,
-  title varchar(255) NOT NULL,
+  stopic_id int(10) unsigned NOT NULL default '0',
+  html_id varchar(50) NOT NULL default '',
+  block_id smallint(6) unsigned NOT NULL default '0',
+  title varchar(255) NOT NULL default '',
   data text NOT NULL,
   PRIMARY KEY  (unit_id),
-  UNIQUE KEY stopic_id (stopic_id,html_id)
+  UNIQUE KEY idx_stopicid_htmlid (stopic_id,html_id)
 ) TYPE=MyISAM;
 
 DROP TABLE IF EXISTS pw_styles;
 CREATE TABLE pw_styles (
   sid smallint(6) unsigned NOT NULL auto_increment,
-  uid MEDIUMINT( 8 ) NOT NULL,
+  uid int(10) unsigned NOT NULL default '0',
   name varchar(50) NOT NULL default '',
   customname varchar(50) NOT NULL default '',
-  createtime INT(10) NOT NULL,
-  lastmodify INT(10) NOT NULL,
+  createtime INT(10) NOT NULL default '0',
+  lastmodify INT(10) NOT NULL default '0',
   ifopen tinyint(1) NOT NULL default '0',
   stylepath varchar(50) NOT NULL default '',
   tplpath varchar(50) NOT NULL default '',
   yeyestyle varchar(3) NOT NULL default '',
-  bgcolor varchar(100) NOT NULL,
-  linkcolor varchar(7) NOT NULL,
+  bgcolor varchar(100) NOT NULL default '',
+  linkcolor varchar(7) NOT NULL default '',
   tablecolor varchar(7) NOT NULL default '',
-  tdcolor varchar(7) NOT NULL,
-  tablewidth varchar(7) NOT NULL,
-  mtablewidth varchar(7) NOT NULL,
-  headcolor varchar(100) NOT NULL,
-  headborder varchar(7) NOT NULL,
-  headfontone varchar(7) NOT NULL,
-  headfonttwo varchar(7) NOT NULL,
-  cbgcolor varchar(100) NOT NULL,
-  cbgborder varchar(7) NOT NULL,
-  cbgfont varchar(7) NOT NULL,
+  tdcolor varchar(7) NOT NULL default '',
+  tablewidth varchar(7) NOT NULL default '',
+  mtablewidth varchar(7) NOT NULL default '',
+  headcolor varchar(100) NOT NULL default '',
+  headborder varchar(7) NOT NULL default '',
+  headfontone varchar(7) NOT NULL default '',
+  headfonttwo varchar(7) NOT NULL default '',
+  cbgcolor varchar(100) NOT NULL default '',
+  cbgborder varchar(7) NOT NULL default '',
+  cbgfont varchar(7) NOT NULL default '',
   forumcolorone varchar(7) NOT NULL default '',
   forumcolortwo varchar(7) NOT NULL default '',
   extcss TEXT NOT NULL,
   PRIMARY KEY  (sid),
-  KEY uid (uid)
+  KEY idx_uid (uid)
 ) TYPE=MyISAM;
 
 DROP TABLE IF EXISTS pw_tagdata;
 CREATE TABLE pw_tagdata (
   tagid mediumint(8) NOT NULL default '0',
-  tid mediumint(8) NOT NULL default '0',
-  KEY tagid (tagid),
-  KEY tid (tid)
+  tid int(10) unsigned NOT NULL default '0',
+  KEY idx_tagid (tagid),
+  KEY idx_tid (tid)
 ) TYPE=MyISAM;
 
 DROP TABLE IF EXISTS pw_tags;
@@ -3675,8 +4655,8 @@ CREATE TABLE pw_tags (
   num mediumint(8) NOT NULL default '0',
   ifhot tinyint(1) NOT NULL default '0',
   PRIMARY KEY  (tagid),
-  KEY num (ifhot,num),
-  KEY tagname (tagname)
+  KEY idx_ifhot_num (ifhot,num),
+  KEY idx_tagname (tagname)
 ) TYPE=MyISAM;
 
 DROP TABLE IF EXISTS pw_task;
@@ -3684,136 +4664,91 @@ create table pw_task(
   id int(10) unsigned not null auto_increment,
   name char(20) default '',
   task  varchar(255) default '',
-  count int(10) unsigned not null default 0,
-  last int(10) unsigned not null default 0,
-  next  int(10) unsigned not null default 0,
-  ctime int(10) unsigned not null default 0,
+  count int(10) unsigned not null default '0',
+  last int(10) unsigned not null default '0',
+  next  int(10) unsigned not null default '0',
+  ctime int(10) unsigned not null default '0',
   primary key (id),
-  key nextidx (next)
+  key idx_next (next)
 )ENGINE=MyISAM;
 INSERT  INTO pw_task SET  id='1', name='广告到期提醒', task='alteradver', count='1', last='1258970602', next='1258970612', ctime='1258970602';
 
 DROP TABLE IF EXISTS pw_threads;
 CREATE TABLE pw_threads (
-  tid mediumint(8) unsigned NOT NULL auto_increment,
+  tid int(10) unsigned NOT NULL auto_increment,
   fid smallint(6) unsigned NOT NULL default '0',
-  icon tinyint(2) NOT NULL default '0',
+  icon tinyint(3) NOT NULL default '0',
   titlefont varchar(15) NOT NULL default '',
   author varchar(15) NOT NULL default '',
-  authorid mediumint(8) unsigned NOT NULL default '0',
+  authorid int(10) unsigned NOT NULL default '0',
   subject varchar(100) NOT NULL default '',
   toolinfo varchar(16) NOT NULL default '',
   toolfield varchar(21) NOT NULL default '',
-  ifcheck tinyint(1) NOT NULL default '0',
-  type SMALLINT(6) NOT NULL default '0',
+  ifcheck tinyint(3) NOT NULL default '0',
+  type smallint(6) NOT NULL default '0',
   postdate int(10) unsigned NOT NULL default '0',
   lastpost int(10) unsigned NOT NULL default '0',
   lastposter varchar(15) NOT NULL default '',
   hits int(10) unsigned NOT NULL default '0',
   replies int(10) unsigned NOT NULL default '0',
   favors INT( 10 ) NOT NULL DEFAULT '0',
-  modelid SMALLINT( 6 ) UNSIGNED NOT NULL,
-  shares MEDIUMINT UNSIGNED NOT NULL DEFAULT '0',
+  modelid smallint(6) unsigned NOT NULL default '0',
+  shares mediumint(8) unsigned NOT NULL default '0',
   topped smallint(6) NOT NULL default '0',
-  topreplays smallint(6) DEFAULT '0' NOT NULL,
-  locked tinyint(1) NOT NULL default '0',
-  digest tinyint(1) NOT NULL default '0',
-  special tinyint(1) NOT NULL default '0',
-  state tinyint(1) NOT NULL default '0',
-  ifupload tinyint(1) NOT NULL default '0',
-  ifmail tinyint(1) NOT NULL default '0',
+  topreplays smallint(6) NOT NULL default '0',
+  locked tinyint(3) NOT NULL default '0',
+  digest tinyint(3) NOT NULL default '0',
+  special tinyint(3) NOT NULL default '0',
+  state tinyint(3) NOT NULL default '0',
+  ifupload tinyint(3) NOT NULL default '0',
+  ifmail tinyint(3) NOT NULL default '0',
   ifmark smallint(6) NOT NULL default '0',
-  ifshield tinyint(1) NOT NULL default '0',
-  anonymous tinyint(1) NOT NULL default '0',
+  ifshield tinyint(3) NOT NULL default '0',
+  anonymous tinyint(3) NOT NULL default '0',
   dig int(10) NOT NULL default '0',
   fight int(10) NOT NULL default '0',
   ptable tinyint(3) NOT NULL default '0',
-  ifmagic tinyint(1) NOT NULL default '0',
-  ifhide tinyint(1) NOT NULL default '0',
+  ifmagic tinyint(3) NOT NULL default '0',
+  ifhide tinyint(3) NOT NULL default '0',
   inspect varchar(30) NOT NULL default '',
-  tpcstatus INT( 10 ) UNSIGNED NOT NULL,
+  tpcstatus int(10) unsigned NOT NULL default '0',
   PRIMARY KEY  (tid),
-  KEY authorid (authorid),
-  KEY postdate (postdate),
-  KEY digest (digest),
-  KEY type (fid,type,ifcheck),
-  KEY special (special),
-  KEY lastpost (fid,ifcheck,topped,lastpost)
+  KEY idx_authorid (authorid),
+  KEY idx_postdate (postdate),
+  KEY idx_digest (digest),
+  KEY idx_fid_type_ifcheck (fid,type,ifcheck),
+  KEY idx_special (special),
+  KEY idx_fid_ifcheck_topped_lastpost (fid,ifcheck,topped,lastpost)
+) TYPE=MyISAM;
+
+DROP TABLE IF EXISTS pw_threads_img;
+CREATE TABLE `pw_threads_img` (
+  `tid` int(10) unsigned NOT NULL,
+  `fid` mediumint(8) unsigned NOT NULL,
+  PRIMARY KEY  (`tid`),
+  KEY `fid` (`fid`,`tid`)
 ) TYPE=MyISAM;
 
 DROP TABLE IF EXISTS pw_tmsgs;
 CREATE TABLE pw_tmsgs (
-  tid mediumint(8) unsigned NOT NULL default '0',
-  aid SMALLINT( 6 ) UNSIGNED NOT NULL DEFAULT  '0',
+  tid int(10) unsigned NOT NULL default '0',
+  aid SMALLINT(6) UNSIGNED NOT NULL DEFAULT  '0',
   userip varchar(15) NOT NULL default '',
-  ifsign tinyint(1) NOT NULL default '0',
+  ifsign tinyint(3) NOT NULL default '0',
   buy text NOT NULL,
   ipfrom varchar(255) NOT NULL default '',
   alterinfo varchar(50) NOT NULL default '',
   remindinfo varchar(150) NOT NULL default '',
   tags varchar(100) NOT NULL default '',
-  ifconvert tinyint(1) NOT NULL default '1',
-  ifwordsfb tinyint(1) NOT NULL default '1',
+  ifconvert tinyint(3) NOT NULL default '1',
+  ifwordsfb tinyint(3) NOT NULL default '1',
   content mediumtext NOT NULL,
   form varchar(30) NOT NULL default '',
   ifmark varchar(255) NOT NULL default '',
   c_from varchar(30) NOT NULL default '',
-  magic varchar(50) NOT NULL,
+  magic varchar(50) NOT NULL default '',
   overprint smallint(6) not null default 0,
   PRIMARY KEY  (tid)
-) TYPE=MyISAM;
-
-DROP TABLE IF EXISTS pw_topiccate;
-CREATE TABLE pw_topiccate (
-  cateid tinyint(3) unsigned NOT NULL auto_increment,
-  name varchar(30) NOT NULL,
-  ifable tinyint(1) NOT NULL default '1',
-  vieworder tinyint(3) NOT NULL,
-  ifdel tinyint(1) NOT NULL default '0',
-  PRIMARY KEY  (cateid)
-) TYPE=MyISAM;
-
-DROP TABLE IF EXISTS pw_topicmodel;
-CREATE TABLE pw_topicmodel (
-  modelid smallint(6) unsigned NOT NULL auto_increment,
-  name varchar(30) NOT NULL,
-  cateid tinyint(3) unsigned NOT NULL,
-  ifable tinyint(1) NOT NULL default '1',
-  vieworder tinyint(3) NOT NULL,
-  PRIMARY KEY  (modelid),
-  INDEX (cateid)
-) TYPE=MyISAM;
-
-DROP TABLE IF EXISTS pw_topicfield;
-CREATE TABLE pw_topicfield (
-  fieldid smallint(6) unsigned NOT NULL auto_increment,
-  name varchar(30) NOT NULL,
-  fieldname varchar(30) NOT NULL,
-  modelid smallint(6) unsigned NOT NULL,
-  vieworder tinyint(3) NOT NULL,
-  type varchar(20) NOT NULL,
-  rules mediumtext NOT NULL,
-  ifable tinyint(1) NOT NULL default '1',
-  ifsearch tinyint(1) NOT NULL default '0',
-  ifasearch tinyint(1) NOT NULL default '0',
-  threadshow tinyint(1) NOT NULL default '0',
-  ifmust tinyint(1) NOT NULL default '1',
-  textsize TINYINT( 3 ) NOT NULL DEFAULT  '0',
-  descrip varchar(255) NOT NULL,
-  PRIMARY KEY  (fieldid),
-  INDEX (modelid)
-) TYPE=MyISAM;
-
-DROP TABLE IF EXISTS pw_tpl;
-CREATE TABLE pw_tpl (
-  tplid smallint(6) unsigned NOT NULL auto_increment,
-  type varchar(50) NOT NULL,
-  name varchar(50) NOT NULL,
-  descrip varchar(255) NOT NULL,
-  tagcode text NOT NULL,
-  image varchar(255) NOT NULL,
-  PRIMARY KEY  (tplid),
-  KEY type (type)
 ) TYPE=MyISAM;
 
 DROP TABLE IF EXISTS pw_toollog;
@@ -3823,16 +4758,16 @@ CREATE TABLE pw_toollog (
   nums smallint(6) NOT NULL default '0',
   money smallint(6) NOT NULL default '0',
   descrip varchar(255) NOT NULL default '',
-  uid mediumint(8) unsigned NOT NULL default '0',
+  uid int(10) unsigned NOT NULL default '0',
   username varchar(15) NOT NULL default '',
   ip varchar(15) NOT NULL default '',
   time int(10) NOT NULL default '0',
   filename varchar(20) NOT NULL default '',
-  touid mediumint(8) unsigned NOT NULL default '0',
+  touid int(10) unsigned NOT NULL default '0',
   PRIMARY KEY  (id),
-  KEY uid (uid),
-  KEY touid (touid),
-  KEY type (type)
+  KEY idx_uid (uid),
+  KEY idx_touid (touid),
+  KEY idx_type (type)
 ) TYPE=MyISAM;
 
 DROP TABLE IF EXISTS pw_tools;
@@ -3843,16 +4778,15 @@ CREATE TABLE pw_tools (
   descrip varchar(255) NOT NULL default '',
   vieworder tinyint(3) NOT NULL default '0',
   logo varchar(100) NOT NULL default '',
-  state tinyint(1) NOT NULL default '0',
+  state tinyint(3) NOT NULL default '0',
   price varchar(255) NOT NULL default '',
   creditype varchar(10) NOT NULL default '',
-  rmb DECIMAL(8,2) NOT NULL,
-  type tinyint(1) NOT NULL default '0',
+  rmb decimal(8,2) NOT NULL,
+  type tinyint(3) NOT NULL default '0',
   stock smallint(6) NOT NULL default '0',
   conditions text NOT NULL ,
   PRIMARY KEY  (id)
 ) TYPE=MyISAM;
-
 INSERT INTO pw_tools VALUES('1','{#tool_1}','reputation','{#tool_1_inro}','1','1.gif','1','100','money','10.00','2','100','a:1:{s:6:"credit";a:6:{s:7:"postnum";s:1:"0";s:7:"digests";s:1:"0";s:4:"rvrc";s:1:"0";s:5:"money";s:1:"0";s:6:"credit";s:1:"0";i:1;s:1:"0";}}');
 INSERT INTO pw_tools VALUES('2','{#tool_2}','credit','{#tool_2_inro}','2','2.gif','1','100','money','10.00','2','100','a:1:{s:6:"credit";a:6:{s:7:"postnum";s:1:"0";s:7:"digests";s:1:"0";s:4:"rvrc";s:1:"0";s:5:"money";s:1:"0";s:6:"credit";s:1:"0";i:1;s:1:"0";}}');
 INSERT INTO pw_tools VALUES('3','{#tool_3}','colortitle','{#tool_3_inro}','3','3.gif','1','200','money','20.00','1','100','a:1:{s:6:"credit";a:6:{s:7:"postnum";s:1:"0";s:7:"digests";s:1:"0";s:4:"rvrc";s:1:"0";s:5:"money";s:1:"0";s:6:"credit";s:1:"0";i:1;s:1:"0";}}');
@@ -3876,136 +4810,178 @@ INSERT INTO pw_tools VALUES('20','{#tool_20}','mirror','{#tool_20_inro}','20','2
 INSERT INTO pw_tools VALUES('21','{#tool_21}','defend','{#tool_21_inro}','21','21.gif','1','100','money','10.00','2','100','a:1:{s:6:"credit";a:6:{s:7:"postnum";s:1:"0";s:7:"digests";s:1:"0";s:4:"rvrc";s:1:"0";s:5:"money";s:1:"0";s:6:"credit";s:1:"0";i:1;s:1:"0";}}');
 INSERT INTO pw_tools VALUES('22','{#tool_22}','backup','{#tool_22_inro}','22','22.gif','0','10','currency','0.00','1','100','a:1:{s:6:"credit";a:7:{s:7:"postnum";s:1:"0";s:7:"digests";s:1:"0";s:4:"rvrc";s:1:"0";s:5:"money";s:1:"0";s:6:"credit";s:1:"0";i:1;s:1:"0";i:2;s:1:"0";}}');
 
+DROP TABLE IF EXISTS pw_topiccate;
+CREATE TABLE pw_topiccate (
+  cateid tinyint(3) unsigned NOT NULL auto_increment,
+  name varchar(30) NOT NULL default '',
+  ifable tinyint(3) NOT NULL default '1',
+  vieworder tinyint(3) NOT NULL default '0',
+  ifdel tinyint(3) NOT NULL default '0',
+  PRIMARY KEY  (cateid)
+) TYPE=MyISAM;
+
+DROP TABLE IF EXISTS pw_topicfield;
+CREATE TABLE pw_topicfield (
+  fieldid smallint(6) unsigned NOT NULL auto_increment,
+  name varchar(30) NOT NULL default '',
+  fieldname varchar(30) NOT NULL default '',
+  modelid smallint(6) unsigned NOT NULL default '0',
+  vieworder tinyint(3) NOT NULL default '0',
+  type varchar(20) NOT NULL default '0',
+  rules mediumtext NOT NULL,
+  ifable tinyint(3) NOT NULL default '1',
+  ifsearch tinyint(3) NOT NULL default '0',
+  ifasearch tinyint(3) NOT NULL default '0',
+  threadshow tinyint(3) NOT NULL default '0',
+  ifmust tinyint(3) NOT NULL default '1',
+  textsize tinyint(3) NOT NULL DEFAULT  '0',
+  descrip varchar(255) NOT NULL,
+  PRIMARY KEY  (fieldid),
+  KEY idx_modelid (modelid)
+) TYPE=MyISAM;
+
+DROP TABLE IF EXISTS pw_topicmodel;
+CREATE TABLE pw_topicmodel (
+  modelid smallint(6) unsigned NOT NULL auto_increment,
+  name varchar(30) NOT NULL default '',
+  cateid tinyint(3) unsigned NOT NULL default '0',
+  ifable tinyint(3) NOT NULL default '1',
+  vieworder tinyint(3) NOT NULL default '0',
+  PRIMARY KEY  (modelid),
+  KEY idx_cateid (cateid)
+) TYPE=MyISAM;
+
 DROP TABLE IF EXISTS pw_topictype;
 CREATE TABLE pw_topictype (
-id SMALLINT( 4 ) UNSIGNED NOT NULL AUTO_INCREMENT,
-fid SMALLINT( 6 ) UNSIGNED NOT NULL,
-name VARCHAR( 255 ) NOT NULL ,
-logo VARCHAR( 255 ) NOT NULL,
-vieworder TINYINT( 3 ) NOT NULL DEFAULT 0,
-upid SMALLINT( 4 ) UNSIGNED NOT NULL DEFAULT 0,
-PRIMARY KEY  (id)
+ id smallint(6) unsigned NOT NULL AUTO_INCREMENT,
+ fid smallint(6) unsigned NOT NULL default '0',
+ name varchar(255) NOT NULL default '',
+ logo varchar(255) NOT NULL default '',
+ vieworder tinyint(3) NOT NULL default '0',
+ upid smallint(6) unsigned NOT NULL default '0',
+ PRIMARY KEY  (id)
+) TYPE=MyISAM;
+
+DROP TABLE IF EXISTS pw_tpl;
+CREATE TABLE pw_tpl (
+  tplid smallint(6) unsigned NOT NULL auto_increment,
+  type varchar(50) NOT NULL default '',
+  name varchar(50) NOT NULL default '',
+  descrip varchar(255) NOT NULL default '',
+  tagcode text NOT NULL,
+  image varchar(255) NOT NULL default '',
+  PRIMARY KEY  (tplid),
+  KEY idx_type (type)
 ) TYPE=MyISAM;
 
 DROP TABLE IF EXISTS pw_trade;
 CREATE TABLE pw_trade (
-  tid mediumint(8) unsigned NOT NULL,
-  uid mediumint(8) unsigned NOT NULL,
-  name varchar(80) NOT NULL,
-  icon varchar(80) NOT NULL,
-  degree tinyint(1) unsigned NOT NULL,
-  type smallint(6) unsigned NOT NULL,
-  num smallint(6) unsigned NOT NULL,
-  salenum smallint(6) unsigned NOT NULL,
-  price decimal(8,2) NOT NULL,
-  costprice decimal(8,2) NOT NULL,
-  locus varchar(30) NOT NULL,
-  paymethod tinyint(3) unsigned NOT NULL,
-  transport tinyint(1) unsigned NOT NULL,
-  mailfee decimal(4,2) NOT NULL,
-  expressfee decimal(4,2) NOT NULL,
-  emsfee decimal(4,2) NOT NULL,
-  deadline int(10) unsigned NOT NULL,
+  tid int(10) unsigned NOT NULL,
+  uid int(10) unsigned NOT NULL default '0',
+  name varchar(80) NOT NULL default '',
+  icon varchar(80) NOT NULL default '',
+  degree tinyint(3) unsigned NOT NULL default '0',
+  type smallint(6) unsigned NOT NULL default '0',
+  num smallint(6) unsigned NOT NULL default '0',
+  salenum smallint(6) unsigned NOT NULL default '0',
+  price decimal(8,2) NOT NULL default '0',
+  costprice decimal(8,2) NOT NULL default '0',
+  locus varchar(30) NOT NULL default '',
+  paymethod tinyint(3) unsigned NOT NULL default '0',
+  transport tinyint(3) unsigned NOT NULL default '0',
+  mailfee decimal(6,2) NOT NULL default '0',
+  expressfee decimal(6,2) NOT NULL default '0',
+  emsfee decimal(6,2) NOT NULL default '0',
+  deadline int(10) unsigned NOT NULL default '0',
   PRIMARY KEY  (tid),
-  KEY uid (uid)
+  KEY idx_uid (uid)
 ) TYPE=MyISAM;
 
 DROP TABLE IF EXISTS pw_tradeorder;
 CREATE TABLE pw_tradeorder (
   oid mediumint(8) unsigned NOT NULL auto_increment,
-  order_no varchar(30) NOT NULL,
-  tid mediumint(8) unsigned NOT NULL,
-  subject varchar(80) NOT NULL,
-  buyer mediumint(8) unsigned NOT NULL,
-  seller mediumint(8) unsigned NOT NULL,
-  price decimal(6,2) NOT NULL,
-  quantity smallint(6) unsigned NOT NULL,
-  transportfee decimal(4,2) NOT NULL,
-  transport tinyint(1) unsigned NOT NULL,
-  buydate int(10) unsigned NOT NULL,
-  tradedate int(10) unsigned NOT NULL,
-  ifpay tinyint(1) NOT NULL,
-  address varchar(80) NOT NULL,
-  consignee varchar(15) NOT NULL,
-  tel varchar(15) NOT NULL,
-  zip varchar(15) NOT NULL,
-  descrip varchar(255) NOT NULL,
-  payment tinyint(1) unsigned NOT NULL,
-  tradeinfo varchar(255) NOT NULL,
+  order_no varchar(30) NOT NULL default '0',
+  tid int(10) unsigned NOT NULL default '0',
+  subject varchar(80) NOT NULL default '',
+  buyer int(10) unsigned NOT NULL default '0',
+  seller int(10) unsigned NOT NULL default '0',
+  price decimal(6,2) NOT NULL default '0',
+  quantity smallint(6) unsigned NOT NULL default '0',
+  transportfee decimal(4,2) NOT NULL default '0',
+  transport tinyint(3) unsigned NOT NULL default '0',
+  buydate int(10) unsigned NOT NULL default '0',
+  tradedate int(10) unsigned NOT NULL default '0',
+  ifpay tinyint(3) NOT NULL default '0',
+  address varchar(80) NOT NULL default '',
+  consignee varchar(15) NOT NULL default '',
+  tel varchar(15) NOT NULL default '',
+  zip varchar(15) NOT NULL default '',
+  descrip varchar(255) NOT NULL default '',
+  payment tinyint(3) unsigned NOT NULL default '0',
+  tradeinfo varchar(255) NOT NULL default '',
   PRIMARY KEY  (oid),
-  UNIQUE KEY order_no (order_no),
-  KEY tid (tid),
-  KEY buyer (buyer),
-  KEY seller (seller)
-) TYPE=MyISAM;
-
-DROP TABLE IF EXISTS pw_voter;
-CREATE TABLE pw_voter (
-  tid mediumint(8) unsigned NOT NULL,
-  uid mediumint(8) unsigned NOT NULL,
-  username varchar(15) NOT NULL,
-  vote tinyint(3) unsigned NOT NULL,
-  time int(10) unsigned NOT NULL,
-  KEY tid (tid),
-  KEY uid (uid)
+  UNIQUE KEY idx_orderno (order_no),
+  KEY idx_tid (tid),
+  KEY idx_buyer (buyer),
+  KEY idx_seller (seller)
 ) TYPE=MyISAM;
 
 DROP TABLE IF EXISTS pw_ucapp;
 CREATE TABLE pw_ucapp (
   id smallint(5) unsigned NOT NULL auto_increment,
-  name varchar(30) NOT NULL,
-  siteurl varchar(50) NOT NULL,
-  secretkey varchar(40) NOT NULL,
-  interface varchar(30) NOT NULL,
-  uc tinyint(1) unsigned NOT NULL,
+  name varchar(30) NOT NULL default '',
+  siteurl varchar(50) NOT NULL default '',
+  secretkey varchar(40) NOT NULL default '',
+  interface varchar(30) NOT NULL default '',
+  uc tinyint(3) unsigned NOT NULL default '0',
   PRIMARY KEY  (id)
 ) TYPE=MyISAM;
 
 DROP TABLE IF EXISTS pw_ucnotify;
 CREATE TABLE pw_ucnotify (
   nid mediumint(8) NOT NULL auto_increment,
-  action varchar(20) NOT NULL,
+  action varchar(20) NOT NULL default '',
   param text NOT NULL,
-  timestamp int(10) unsigned NOT NULL,
-  complete tinyint(3) unsigned NOT NULL,
-  priority tinyint(3) NOT NULL,
+  timestamp int(10) unsigned NOT NULL default '0',
+  complete tinyint(3) unsigned NOT NULL default '0',
+  priority tinyint(3) NOT NULL default '0',
   PRIMARY KEY  (nid)
 ) TYPE=MyISAM;
 
 DROP TABLE IF EXISTS pw_ucsyncredit;
 CREATE TABLE pw_ucsyncredit (
-  uid mediumint(8) unsigned NOT NULL,
+  uid int(10) unsigned NOT NULL,
   PRIMARY KEY  (uid)
 ) TYPE=MyISAM;
 
-DROP TABLE IF EXISTS pw_usercache;
-CREATE TABLE pw_usercache (
-  uid int(10) unsigned NOT NULL,
-  type varchar(255) NOT NULL,
-  typeid int(10) unsigned NOT NULL,
-  expire int(10) unsigned NOT NULL,
-  num SMALLINT( 6 ) UNSIGNED NOT NULL,
-  value text NOT NULL,
-  PRIMARY KEY (uid,type)
-) ENGINE=MyISAM;
-
 DROP TABLE IF EXISTS pw_userapp;
 CREATE TABLE pw_userapp (
-  uid mediumint(8) unsigned NOT NULL,
-  appid mediumint(8) unsigned NOT NULL,
-  appname varchar(20) NOT NULL,
-  appinfo TEXT NOT NULL,
-  appevent TEXT NOT NULL,
-  PRIMARY KEY  (uid,appid)
+  uid int(10) unsigned NOT NULL,
+  appid mediumint(8) unsigned NOT NULL default '0',
+  appname varchar(20) NOT NULL default '',
+  appinfo text NOT NULL,
+  appevent text NOT NULL,
+  PRIMARY KEY (uid,appid)
 ) TYPE=MyISAM;
 
 DROP TABLE IF EXISTS pw_userbinding;
 CREATE TABLE pw_userbinding (
   id int(10) unsigned NOT NULL auto_increment,
-  uid mediumint(8) unsigned NOT NULL,
-  password varchar(40) NOT NULL,
+  uid int(10) unsigned NOT NULL default '0',
+  password varchar(40) NOT NULL default '',
   PRIMARY KEY  (id,uid),
-  UNIQUE KEY uid (uid)
+  UNIQUE KEY idx_uid (uid)
+) ENGINE=MyISAM;
+
+DROP TABLE IF EXISTS pw_usercache;
+CREATE TABLE pw_usercache (
+  uid int(10) unsigned NOT NULL,
+  type varchar(255) NOT NULL default '',
+  typeid int(10) unsigned NOT NULL default '0',
+  expire int(10) unsigned NOT NULL default '0',
+  num smallint(6) unsigned NOT NULL default '0',
+  value text NOT NULL,
+  PRIMARY KEY (uid,type)
 ) ENGINE=MyISAM;
 
 DROP TABLE IF EXISTS pw_usergroups;
@@ -4015,12 +4991,11 @@ CREATE TABLE pw_usergroups (
   grouptitle varchar(60) NOT NULL default '',
   groupimg varchar(15) NOT NULL default '',
   grouppost int(10) NOT NULL default '0',
-  ifdefault tinyint(1) unsigned NOT NULL default '1',
+  ifdefault tinyint(3) unsigned NOT NULL default '1',
   PRIMARY KEY  (gid),
-  KEY gptype (gptype),
-  KEY grouppost (grouppost)
+  KEY idx_gptype (gptype),
+  KEY idx_grouppost (grouppost)
 ) TYPE=MyISAM;
-
 INSERT INTO pw_usergroups SET gid = 1,  gptype = 'default',grouptitle = 'default',    groupimg = '8', grouppost = 0, ifdefault=1;
 INSERT INTO pw_usergroups SET gid = 2,  gptype = 'default',grouptitle = '{#level_1}', groupimg = '8', grouppost = 0, ifdefault=0;
 INSERT INTO pw_usergroups SET gid = 3,  gptype = 'system', grouptitle = '{#level_3}', groupimg = '3', grouppost = 0, ifdefault=0;
@@ -4041,744 +5016,76 @@ INSERT INTO pw_usergroups SET gid = 17, gptype = 'system',grouptitle = '门户�
 
 DROP TABLE IF EXISTS pw_usertool;
 CREATE TABLE pw_usertool (
-  uid mediumint(8) unsigned NOT NULL default '0',
+  uid int(10) unsigned NOT NULL default '0',
   toolid smallint(6) NOT NULL default '0',
   nums smallint(6) NOT NULL default '0',
   sellnums smallint(6) NOT NULL default '0',
   sellprice varchar(255) NOT NULL default '',
- sellstatus TINYINT( 1 ) UNSIGNED NOT NULL DEFAULT '1',
-  KEY uid (uid)
+  sellstatus tinyint(3) unsigned NOT NULL default '1',
+  KEY idx_uid (uid)
 ) TYPE=MyISAM;
 
-DROP TABLE IF EXISTS pw_windcode;
-CREATE TABLE pw_windcode (
-  id smallint(6) unsigned NOT NULL auto_increment,
-  name varchar(15) NOT NULL default '',
-  icon varchar(30) NOT NULL default '',
-  pattern varchar(30) NOT NULL default '',
-  replacement text NOT NULL ,
-  param tinyint(1) NOT NULL default '0',
-  ifopen tinyint(1) NOT NULL default '0',
-  title varchar(30) NOT NULL default '',
-  descrip varchar(100) NOT NULL default '',
-  PRIMARY KEY  (id)
-) TYPE=MyISAM;
-
-DROP TABLE IF EXISTS pw_wordfb;
-CREATE TABLE pw_wordfb (
-  id smallint(6) unsigned NOT NULL auto_increment,
-  word varchar(100) NOT NULL default '',
-  wordreplace varchar(100) NOT NULL default '',
-  type tinyint(1) NOT NULL default '0',
-  wordtime INT( 10 ) UNSIGNED NOT NULL DEFAULT '0',
-  custom TINYINT( 1 ) NOT NULL DEFAULT '0',
-  classid TINYINT( 3 ) UNSIGNED NOT NULL DEFAULT '0',
-  PRIMARY KEY  (id)
-) TYPE=MyISAM;
-
-DROP TABLE IF EXISTS pw_write_smiles;
-CREATE TABLE pw_write_smiles (
-  smileid smallint(6) unsigned NOT NULL auto_increment,
-  typeid smallint(6) unsigned NOT NULL default '0',
-  vieworder tinyint(2) unsigned  NOT NULL default '0',
-  path varchar(20) NOT NULL default '',
-  name varchar(20) NOT NULL default '',
-  tag varchar(30) NOT NULL default '',
-  desciption varchar(100) NOT NULL default '',
-  PRIMARY KEY  (smileid)
-) TYPE=MyISAM;
-
-DROP TABLE IF EXISTS pw_inviterecord;
-CREATE TABLE pw_inviterecord (
-  id int(10) unsigned NOT NULL auto_increment,
-  uid int(11) NOT NULL default '0',
+DROP TABLE IF EXISTS pw_voter;
+CREATE TABLE pw_voter (
+  tid int(10) unsigned NOT NULL default '0',
+  uid int(10) unsigned NOT NULL default '0',
   username varchar(15) NOT NULL default '',
-  unit varchar(15) NOT NULL default '',
-  reward int(10) NOT NULL default '0',
-  ip varchar(16) NOT NULL default '',
-  typeid tinyint(1) NOT NULL default '0',
-  create_time int(11) NOT NULL default '0',
-  PRIMARY KEY  (id),
-  KEY uididx (uid,ip),
-  KEY typeidx (typeid)
+  vote tinyint(3) unsigned NOT NULL default '0',
+  time int(10) unsigned NOT NULL default '0',
+  KEY idx_tid (tid),
+  KEY idx_uid (uid)
 ) TYPE=MyISAM;
 
-REPLACE INTO pw_channel VALUES(1, '首页', 'home','', 'home', '', '', '', '', 0);
-REPLACE INTO pw_channel VALUES(2, '群组', 'groups','',  'groups', '', '', '', '', 0);
+DROP TABLE IF EXISTS pw_weibo_cmrelations;
+CREATE TABLE pw_weibo_cmrelations (
+  `cid` int(10) unsigned NOT NULL ,
+  `uid` int(10) unsigned NOT NULL ,
+  PRIMARY KEY ( `cid` , `uid` )
+) TYPE=MYISAM;
 
+DROP TABLE IF EXISTS pw_weibo_cnrelations;
+CREATE TABLE pw_weibo_cnrelations (
+  `cyid` int(10) unsigned NOT NULL default '0',
+  `mid` int(10) unsigned NOT NULL default '0',
+  PRIMARY KEY  (`cyid`,`mid`)
+) TYPE=MyISAM;
 
-REPLACE INTO pw_cnstyles VALUES('1','默认分类','1','0','0');
+DROP TABLE IF EXISTS pw_weibo_comment;
+CREATE TABLE pw_weibo_comment (
+  `cid` INT(10) unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+  `uid` INT(10) unsigned NOT NULL default '0',
+  `mid` INT(10) unsigned NOT NULL default '0' ,
+  `content` varchar(250) NOT NULL default '' ,
+  `extra` text NOT NULL,
+  `postdate` int(10) unsigned NOT NULL default '0' ,
+  KEY idx_mid_postdate( `mid` , `postdate` ),
+  KEY idx_postdate( `postdate` )
+) TYPE=MYISAM;
 
+DROP TABLE IF EXISTS pw_weibo_content;
+CREATE TABLE pw_weibo_content (
+  `mid` int(10) unsigned NOT NULL auto_increment,
+  `uid` int(10) unsigned NOT NULL default '0',
+  `content` text NOT NULL,
+  `extra` text NOT NULL,
+  `contenttype` tinyint(3) unsigned  NOT NULL default '0',
+  `type` tinyint(3) unsigned NOT NULL default '0',
+  `objectid` int(10) unsigned NOT NULL default '0',
+  `replies` mediumint(8) unsigned NOT NULL default '0',
+  `transmit` mediumint(8) unsigned NOT NULL default '0',
+  `postdate` int(10) unsigned NOT NULL default '0',
+  PRIMARY KEY  (`mid`),
+  KEY `idx_uid_postdate` (`uid`,`postdate`),
+  KEY `idx_type_objectid` (`type`,`objectid`),
+  KEY `idx_postdate`( `postdate` )
+) TYPE=MyISAM;
 
-REPLACE INTO pw_hack VALUES('o_groups_upgrade','array','a:7:{s:4:"tnum";s:1:"1";s:4:"pnum";s:3:"0.2";s:7:"members";s:1:"1";s:8:"albumnum";s:3:"0.5";s:8:"photonum";s:1:"1";s:8:"writenum";s:1:"1";s:11:"activitynum";s:1:"2";}','');
-REPLACE INTO pw_hack VALUES('o_groups_level','array','a:5:{i:1;s:12:"初级群组";i:2;s:12:"中级群组";i:3;s:12:"高级群组";i:4;s:12:"官方群组";i:5;s:12:"商业群组";}','');
-REPLACE INTO pw_hack VALUES('o_groups_levelneed','array','a:3:{i:1;s:1:"0";i:2;s:3:"500";i:3;s:4:"1000";}','');
-
-REPLACE INTO pw_cnlevel VALUES('1','common','初级群组','0','10','60','100','0','1','1','0','0','1','a:7:{s:3:"del";s:1:"1";s:9:"highlight";s:1:"0";s:4:"lock";s:1:"0";s:9:"pushtopic";s:1:"0";s:9:"downtopic";s:1:"0";s:8:"toptopic";s:1:"1";s:6:"digest";s:1:"1";}','a:5:{s:6:"thread";a:2:{s:9:"vieworder";s:1:"0";s:5:"title";s:6:"话题";}s:6:"active";a:2:{s:9:"vieworder";s:1:"0";s:5:"title";s:6:"活动";}s:5:"write";a:3:{s:6:"ifopen";s:1:"1";s:9:"vieworder";s:1:"1";s:5:"title";s:9:"讨论区";}s:6:"galbum";a:3:{s:6:"ifopen";s:1:"1";s:9:"vieworder";s:1:"2";s:5:"title";s:6:"相册";}s:6:"member";a:3:{s:6:"ifopen";s:1:"1";s:9:"vieworder";s:1:"3";s:5:"title";s:6:"成员";}}','a:4:{s:6:"thread";a:2:{s:9:"vieworder";s:1:"0";s:3:"num";s:1:"5";}s:6:"active";a:2:{s:9:"vieworder";s:1:"0";s:3:"num";s:1:"4";}s:5:"write";a:3:{s:6:"ifopen";s:1:"1";s:9:"vieworder";s:1:"1";s:3:"num";s:1:"5";}s:6:"galbum";a:3:{s:6:"ifopen";s:1:"1";s:9:"vieworder";s:1:"2";s:3:"num";s:2:"10";}}');
-REPLACE INTO pw_cnlevel VALUES('2','common','中级群组','500','20','60','200','0','1','1','0','0','1','a:7:{s:3:"del";s:1:"1";s:9:"highlight";s:1:"0";s:4:"lock";s:1:"0";s:9:"pushtopic";s:1:"0";s:9:"downtopic";s:1:"0";s:8:"toptopic";s:1:"1";s:6:"digest";s:1:"1";}','a:5:{s:6:"active";a:2:{s:9:"vieworder";s:1:"0";s:5:"title";s:6:"活动";}s:5:"write";a:3:{s:6:"ifopen";s:1:"1";s:9:"vieworder";s:1:"1";s:5:"title";s:9:"讨论区";}s:6:"thread";a:3:{s:6:"ifopen";s:1:"1";s:9:"vieworder";s:1:"2";s:5:"title";s:6:"话题";}s:6:"galbum";a:3:{s:6:"ifopen";s:1:"1";s:9:"vieworder";s:1:"3";s:5:"title";s:6:"相册";}s:6:"member";a:3:{s:6:"ifopen";s:1:"1";s:9:"vieworder";s:1:"4";s:5:"title";s:6:"成员";}}','a:4:{s:6:"active";a:2:{s:9:"vieworder";s:1:"0";s:3:"num";s:1:"4";}s:5:"write";a:3:{s:6:"ifopen";s:1:"1";s:9:"vieworder";s:1:"1";s:3:"num";s:1:"5";}s:6:"thread";a:3:{s:6:"ifopen";s:1:"1";s:9:"vieworder";s:1:"2";s:3:"num";s:1:"5";}s:6:"galbum";a:3:{s:6:"ifopen";s:1:"1";s:9:"vieworder";s:1:"3";s:3:"num";s:2:"10";}}');
-REPLACE INTO pw_cnlevel VALUES('3','common','高级群组','1000','50','100','500','0','0','0','0','0','1','a:7:{s:3:"del";s:1:"1";s:9:"highlight";s:1:"1";s:4:"lock";s:1:"0";s:9:"pushtopic";s:1:"0";s:9:"downtopic";s:1:"0";s:8:"toptopic";s:1:"1";s:6:"digest";s:1:"1";}','a:5:{s:5:"write";a:3:{s:6:"ifopen";s:1:"1";s:9:"vieworder";s:1:"1";s:5:"title";s:9:"讨论区";}s:6:"thread";a:3:{s:6:"ifopen";s:1:"1";s:9:"vieworder";s:1:"2";s:5:"title";s:6:"话题";}s:6:"active";a:3:{s:6:"ifopen";s:1:"1";s:9:"vieworder";s:1:"3";s:5:"title";s:6:"活动";}s:6:"galbum";a:3:{s:6:"ifopen";s:1:"1";s:9:"vieworder";s:1:"4";s:5:"title";s:6:"相册";}s:6:"member";a:3:{s:6:"ifopen";s:1:"1";s:9:"vieworder";s:1:"5";s:5:"title";s:6:"成员";}}','a:4:{s:5:"write";a:3:{s:6:"ifopen";s:1:"1";s:9:"vieworder";s:1:"1";s:3:"num";s:1:"5";}s:6:"thread";a:3:{s:6:"ifopen";s:1:"1";s:9:"vieworder";s:1:"2";s:3:"num";s:1:"5";}s:6:"active";a:3:{s:6:"ifopen";s:1:"1";s:9:"vieworder";s:1:"3";s:3:"num";s:1:"4";}s:6:"galbum";a:3:{s:6:"ifopen";s:1:"1";s:9:"vieworder";s:1:"4";s:3:"num";s:2:"10";}}');
-REPLACE INTO pw_cnlevel VALUES('4','special','官方群组','0','0','0','0','0','1','1','1','0','1','a:7:{s:3:"del";s:1:"1";s:9:"highlight";s:1:"1";s:4:"lock";s:1:"1";s:9:"pushtopic";s:1:"1";s:9:"downtopic";s:1:"1";s:8:"toptopic";s:1:"1";s:6:"digest";s:1:"1";}','a:5:{s:5:"write";a:3:{s:6:"ifopen";s:1:"1";s:9:"vieworder";s:1:"1";s:5:"title";s:9:"讨论区";}s:6:"thread";a:3:{s:6:"ifopen";s:1:"1";s:9:"vieworder";s:1:"2";s:5:"title";s:6:"话题";}s:6:"active";a:3:{s:6:"ifopen";s:1:"1";s:9:"vieworder";s:1:"3";s:5:"title";s:6:"活动";}s:6:"galbum";a:3:{s:6:"ifopen";s:1:"1";s:9:"vieworder";s:1:"4";s:5:"title";s:6:"相册";}s:6:"member";a:3:{s:6:"ifopen";s:1:"1";s:9:"vieworder";s:1:"5";s:5:"title";s:6:"成员";}}','a:4:{s:5:"write";a:3:{s:6:"ifopen";s:1:"1";s:9:"vieworder";s:1:"1";s:3:"num";s:1:"5";}s:6:"thread";a:3:{s:6:"ifopen";s:1:"1";s:9:"vieworder";s:1:"2";s:3:"num";s:1:"5";}s:6:"active";a:3:{s:6:"ifopen";s:1:"1";s:9:"vieworder";s:1:"3";s:3:"num";s:1:"4";}s:6:"galbum";a:3:{s:6:"ifopen";s:1:"1";s:9:"vieworder";s:1:"4";s:3:"num";s:2:"10";}}');
-REPLACE INTO pw_cnlevel VALUES('5','special','商业群组','0','100','100','500','0','0','0','0','0','1','a:7:{s:3:"del";s:1:"1";s:9:"highlight";s:1:"1";s:4:"lock";s:1:"1";s:9:"pushtopic";s:1:"1";s:9:"downtopic";s:1:"1";s:8:"toptopic";s:1:"1";s:6:"digest";s:1:"1";}','a:5:{s:5:"write";a:3:{s:6:"ifopen";s:1:"1";s:9:"vieworder";s:1:"1";s:5:"title";s:9:"讨论区";}s:6:"thread";a:3:{s:6:"ifopen";s:1:"1";s:9:"vieworder";s:1:"2";s:5:"title";s:6:"话题";}s:6:"active";a:3:{s:6:"ifopen";s:1:"1";s:9:"vieworder";s:1:"3";s:5:"title";s:6:"活动";}s:6:"galbum";a:3:{s:6:"ifopen";s:1:"1";s:9:"vieworder";s:1:"4";s:5:"title";s:6:"相册";}s:6:"member";a:3:{s:6:"ifopen";s:1:"1";s:9:"vieworder";s:1:"5";s:5:"title";s:9:"VIP会员";}}','a:4:{s:5:"write";a:3:{s:6:"ifopen";s:1:"1";s:9:"vieworder";s:1:"1";s:3:"num";s:1:"5";}s:6:"thread";a:3:{s:6:"ifopen";s:1:"1";s:9:"vieworder";s:1:"2";s:3:"num";s:1:"5";}s:6:"active";a:3:{s:6:"ifopen";s:1:"1";s:9:"vieworder";s:1:"3";s:3:"num";s:1:"4";}s:6:"galbum";a:3:{s:6:"ifopen";s:1:"1";s:9:"vieworder";s:1:"4";s:3:"num";s:2:"10";}}');
-
-
-REPLACE INTO pw_cnskin VALUES('skin_sun','阳光');
-REPLACE INTO pw_cnskin VALUES('skin_purple','紫色');
-REPLACE INTO pw_cnskin VALUES('skin_pink','粉色');
-REPLACE INTO pw_cnskin VALUES('skin_night','星空');
-REPLACE INTO pw_cnskin VALUES('skin_green','绿野');
-REPLACE INTO pw_cnskin VALUES('skin_default','默认');
-REPLACE INTO pw_cnskin VALUES('skin_city','城市');
-REPLACE INTO pw_cnskin VALUES('skin_sport','运动');
-REPLACE INTO pw_cnskin VALUES('skin_leisure','休闲');
-REPLACE INTO pw_cnskin VALUES('skin_car','汽车');
-REPLACE INTO pw_cnskin VALUES('skin_area','地区');
-
-DROP TABLE IF EXISTS pw_activitycate;
-CREATE TABLE pw_activitycate (
-  `actid` smallint(6) unsigned NOT NULL auto_increment,
-  `name` varchar(30) NOT NULL default '',
-  `ifable` tinyint(1) NOT NULL default '1',
-  `vieworder` tinyint(3) NOT NULL default '0',
-  `ifdel` tinyint(1) NOT NULL default '0',
-  PRIMARY KEY  (`actid`)
-) TYPE=MyISAM AUTO_INCREMENT=5;
-
-
-REPLACE INTO pw_activitycate VALUES(1, '户外活动', 1, 0, 0);
-REPLACE INTO pw_activitycate VALUES(2, '体育健康', 1, 1, 0);
-REPLACE INTO pw_activitycate VALUES(3, '文娱休闲', 1, 2, 0);
-REPLACE INTO pw_activitycate VALUES(4, '其他活动', 1, 3, 0);
-
-DROP TABLE IF EXISTS pw_activitymodel;
-CREATE TABLE pw_activitymodel (
-  `actmid` smallint(6) unsigned NOT NULL auto_increment,
-  `name` varchar(30) NOT NULL default '',
-  `actid` tinyint(3) unsigned NOT NULL,
-  `ifable` tinyint(1) NOT NULL default '1',
-  `vieworder` tinyint(3) NOT NULL default '0',
-  `ifdel` tinyint(1) unsigned NOT NULL default '1',
-  PRIMARY KEY  (`actmid`),
-  KEY `actid` (`actid`)
-)  TYPE=MyISAM AUTO_INCREMENT=19 ;
-
-REPLACE INTO pw_activitymodel VALUES(1, '爬山', 1, 1, 0, 0);
-REPLACE INTO pw_activitymodel VALUES(2, '烧烤', 1, 1, 1, 0);
-REPLACE INTO pw_activitymodel VALUES(3, '暴走/快闪', 1, 1, 2, 0);
-REPLACE INTO pw_activitymodel VALUES(4, '自驾游', 1, 1, 3, 0);
-REPLACE INTO pw_activitymodel VALUES(5, '农家乐', 1, 1, 4, 0);
-REPLACE INTO pw_activitymodel VALUES(6, '室内运动', 2, 1, 0, 0);
-REPLACE INTO pw_activitymodel VALUES(7, '室外运动', 2, 1, 1, 0);
-REPLACE INTO pw_activitymodel VALUES(8, '真人CS', 2, 1, 2, 0);
-REPLACE INTO pw_activitymodel VALUES(9, '看球赛', 2, 1, 3, 0);
-REPLACE INTO pw_activitymodel VALUES(10, '聚餐/茶馆', 3, 1, 0, 0);
-REPLACE INTO pw_activitymodel VALUES(11, '夜生活/舞会', 3, 1, 1, 0);
-REPLACE INTO pw_activitymodel VALUES(12, '电影/K歌', 3, 1, 2, 0);
-REPLACE INTO pw_activitymodel VALUES(13, '演出/展览', 3, 1, 3, 0);
-REPLACE INTO pw_activitymodel VALUES(14, '桌游/棋牌', 3, 1, 4, 0);
-REPLACE INTO pw_activitymodel VALUES(15, '相亲', 4, 1, 0, 0);
-REPLACE INTO pw_activitymodel VALUES(16, '旅游', 4, 1, 1, 0);
-REPLACE INTO pw_activitymodel VALUES(17, '其它', 4, 1, 2, 0);
-
-DROP TABLE IF EXISTS pw_activitydefaultvalue;
-CREATE TABLE pw_activitydefaultvalue (
-  `tid` mediumint(8) unsigned NOT NULL,
-  `actmid` smallint(6) unsigned NOT NULL default '0',
-  `fid` smallint(6) unsigned NOT NULL default '0',
-  `ifrecycle` tinyint(1) NOT NULL default '0',
-  `iscertified` tinyint(1) NOT NULL default '1',
-  `iscancel` tinyint(1) NOT NULL default '0',
-  `out_biz_no` varchar(255) default NULL,
-  `batch_no` varchar(255) NOT NULL,
-  `user_id` varchar(255) NOT NULL,
-  `recommend` tinyint(1) NOT NULL default '0',
-  `starttime` int(10) unsigned NOT NULL default '0',
-  `endtime` int(10) unsigned NOT NULL default '0',
-  `location` varchar(255) NOT NULL default '',
-  `contact` varchar(255) NOT NULL default '',
-  `telephone` varchar(255) NOT NULL default '',
-  `picture1` varchar(255) NOT NULL default '',
-  `picture2` varchar(255) NOT NULL default '',
-  `picture3` varchar(255) NOT NULL default '',
-  `picture4` varchar(255) NOT NULL default '',
-  `picture5` varchar(255) NOT NULL default '',
-  `signupstarttime` int(10) unsigned NOT NULL default '0',
-  `signupendtime` int(10) unsigned NOT NULL default '0',
-  `minparticipant` int(10) unsigned NOT NULL default '0',
-  `maxparticipant` int(10) unsigned NOT NULL default '0',
-  `userlimit` tinyint(3) NOT NULL default '0',
-  `specificuserlimit` varchar(255) NOT NULL default '',
-  `genderlimit` tinyint(3) unsigned NOT NULL default '0',
-  `fees` varchar(255) NOT NULL default '',
-  `feesdetail` varchar(255) NOT NULL default '',
-  `paymethod` tinyint(3) unsigned NOT NULL default '0',
-  `pushtime` int(10) NOT NULL default '0',
-  `updatetime` int(10) NOT NULL default '0',
-  PRIMARY KEY  (`tid`),
-  KEY `actmid` (`actmid`,`fid`)
-)  TYPE=MyISAM ;
-
-DROP TABLE IF EXISTS pw_activitymembers;
-CREATE TABLE pw_activitymembers (
-  `actuid` mediumint(8) unsigned NOT NULL auto_increment,
-  `fupid` mediumint(8) NOT NULL default '0',
-  `tid` mediumint(8) unsigned NOT NULL default '0',
-  `uid` mediumint(8) unsigned NOT NULL default '0',
-  `actmid` tinyint(3) unsigned NOT NULL default '0',
-  `username` varchar(15) NOT NULL,
-  `signupdetail` varchar(255) NOT NULL,
-  `signupnum` smallint(5) unsigned NOT NULL default '0',
-  `nickname` varchar(255) NOT NULL,
-  `totalcash` varchar(255) NOT NULL,
-  `mobile` varchar(15) NOT NULL,
-  `telephone` varchar(15) NOT NULL,
-  `address` varchar(255) NOT NULL,
-  `message` text NOT NULL,
-  `ifanonymous` tinyint(1) NOT NULL default '0',
-  `ifpay` tinyint(1) NOT NULL default '0',
-  `signuptime` int(10) default '0',
-  `fromuid` mediumint(8) NOT NULL default '0',
-  `fromusername` varchar(15) NOT NULL,
-  `issubstitute` tinyint(1) NOT NULL default '0',
-  `isadditional` tinyint(1) NOT NULL default '0',
-  `isrefund` tinyint(1) NOT NULL default '0',
-  `refundcost` varchar(255) NOT NULL,
-  `refundreason` varchar(255) NOT NULL,
-  `additionalreason` varchar(255) NOT NULL,
-  `out_trade_no` varchar(255) NOT NULL default '0',
-  `batch_detail_no` varchar(255) NOT NULL,
-  PRIMARY KEY  (`actuid`),
-  KEY `tid` (`tid`,`uid`),
-  KEY `uid` (`uid`),
-  KEY `fupid` (`fupid`)
-)  TYPE=MyISAM ;
-
-DROP TABLE IF EXISTS pw_activityfield;
-CREATE TABLE pw_activityfield (
-  `fieldid` smallint(6) unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(30) NOT NULL,
-  `fieldname` varchar(30) NOT NULL,
-  `actmid` smallint(6) unsigned NOT NULL,
-  `vieworder` tinyint(3) NOT NULL,
-  `type` varchar(20) NOT NULL,
-  `rules` mediumtext NOT NULL,
-  `ifable` tinyint(1) NOT NULL DEFAULT '1',
-  `ifsearch` tinyint(1) NOT NULL DEFAULT '0',
-  `ifasearch` tinyint(1) NOT NULL DEFAULT '0',
-  `issearchable` tinyint(1) unsigned NOT NULL DEFAULT '1',
-  `threadshow` tinyint(1) NOT NULL DEFAULT '0',
-  `allowthreadshow` tinyint(1) unsigned NOT NULL DEFAULT '1',
-  `ifmust` tinyint(1) NOT NULL DEFAULT '1',
-  `ifdel` tinyint(1) NOT NULL DEFAULT '1',
-  `mustenable` tinyint(1) unsigned NOT NULL DEFAULT '0',
-  `textwidth` tinyint(3) NOT NULL DEFAULT '0',
-  `descrip` varchar(255) NOT NULL DEFAULT '',
-  `sectionname` varchar(255) NOT NULL DEFAULT '',
-  PRIMARY KEY (`fieldid`),
-  KEY `actmid` (`actmid`)
-)  TYPE=MyISAM AUTO_INCREMENT=537 ;
-
-
-REPLACE INTO pw_activityfield VALUES(1, '活动时间', 'starttime', 1, 1, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 1, 1, 1, 0, 1, 18, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(2, '-', 'endtime', 1, 1, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 1, 1, 1, 0, 1, 18, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(3, '活动地点', 'location', 1, 2, 'text', '', 1, 1, 0, 1, 1, 1, 0, 0, 0, 40, '(多个活动地点用,隔开)', '活动概况');
-REPLACE INTO pw_activityfield VALUES(4, '主题图片', 'picture1', 1, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '(最多5张，支持gif、jpeg、jpg、bmp、png，小于2M)', '活动概况');
-REPLACE INTO pw_activityfield VALUES(5, '主题图片二', 'picture2', 1, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(6, '主题图片三', 'picture3', 1, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(7, '主题图片四', 'picture4', 1, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(8, '主题图片五', 'picture5', 1, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(9, '联系人', 'contact', 1, 4, 'text', '', 1, 0, 1, 1, 0, 1, 1, 0, 1, 20, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(10, '联系电话', 'telephone', 1, 5, 'text', '', 1, 0, 1, 1, 0, 1, 1, 0, 1, 40, '(多个联系电话用,隔开)', '活动概况');
-REPLACE INTO pw_activityfield VALUES(11, '报名时间', 'signupstarttime', 1, 6, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 1, 0, 1, 0, 1, 1, 0, 1, 18, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(12, '-', 'signupendtime', 1, 6, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 1, 0, 1, 0, 1, 1, 0, 1, 18, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(13, '人数限制{@}最少', 'minparticipant', 1, 7, 'text', '', 1, 0, 1, 0, 0, 1, 1, 0, 0, 3, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(14, '最多', 'maxparticipant', 1, 7, 'text', '', 1, 0, 1, 0, 0, 1, 1, 0, 0, 3, '(留空或0表示没有限制)', '报名说明');
-REPLACE INTO pw_activityfield VALUES(15, '报名限制', 'userlimit', 1, 8, 'radio', 'a:2:{i:0;s:14:"1=所有用户";i:1;s:11:"2=仅好友";}', 1, 1, 0, 1, 0, 1, 0, 0, 0, 0, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(16, '请输入其它限制', 'specificuserlimit', 1, 8, 'text', '', 1, 0, 1, 1, 0, 1, 0, 0, 0, 14, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(17, '性别限制', 'genderlimit', 1, 9, 'radio', 'a:3:{i:0;s:8:"1=全部";i:1;s:11:"2=仅男生";i:2;s:11:"3=仅女生";}', 1, 0, 1, 1, 0, 1, 0, 0, 0, 0, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(18, '活动费用', 'fees', 1, 10, 'text', '', 1, 1, 0, 0, 0, 1, 1, 0, 1, 0, '(如 小孩 每位 10元，有车族 每位10 元等)', '费用说明');
-REPLACE INTO pw_activityfield VALUES(19, '费用明细', 'feesdetail', 1, 11, 'text', '', 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, '', '费用说明');
-REPLACE INTO pw_activityfield VALUES(20, '支付方式', 'paymethod', 1, 12, 'radio', 'a:2:{i:0;s:11:"1=支付宝";i:1;s:14:"2=现金支付";}', 1, 0, 1, 1, 0, 1, 1, 0, 1, 0, '', '费用说明');
-REPLACE INTO pw_activityfield VALUES(21, '活动时间', 'starttime', 2, 1, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 1, 1, 1, 0, 1, 1, 0, 1, 18, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(22, '-', 'endtime', 2, 1, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 1, 1, 1, 0, 1, 1, 0, 1, 18, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(23, '活动地点', 'location', 2, 2, 'text', '', 0, 1, 1, 1, 0, 1, 0, 0, 0, 40, '(多个活动地点用,隔开)', '活动概况');
-REPLACE INTO pw_activityfield VALUES(24, '主题图片', 'picture1', 2, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '(最多5张，支持gif、jpeg、jpg、bmp、png，小于2M)', '活动概况');
-REPLACE INTO pw_activityfield VALUES(25, '主题图片二', 'picture2', 2, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(26, '主题图片三', 'picture3', 2, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(27, '主题图片四', 'picture4', 2, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(28, '主题图片五', 'picture5', 2, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(29, '联系人', 'contact', 2, 4, 'text', '', 1, 1, 1, 1, 0, 1, 1, 0, 1, 20, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(30, '联系电话', 'telephone', 2, 5, 'text', '', 1, 1, 1, 1, 0, 1, 1, 0, 1, 40, '(多个联系电话用,隔开)', '活动概况');
-REPLACE INTO pw_activityfield VALUES(31, '报名时间', 'signupstarttime', 2, 6, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 1, 1, 0, 1, 1, 0, 1, 18, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(32, '-', 'signupendtime', 2, 6, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 1, 1, 0, 1, 1, 0, 1, 18, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(33, '人数限制{@}最少', 'minparticipant', 2, 7, 'text', '', 0, 0, 0, 0, 0, 1, 0, 0, 0, 3, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(34, '最多', 'maxparticipant', 2, 7, 'text', '', 0, 0, 0, 0, 0, 1, 0, 0, 0, 3, '(留空或0表示没有限制)', '报名说明');
-REPLACE INTO pw_activityfield VALUES(35, '报名限制', 'userlimit', 2, 8, 'radio', 'a:2:{i:0;s:14:"1=所有用户";i:1;s:11:"2=仅好友";}', 1, 0, 1, 1, 0, 1, 0, 0, 0, 0, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(36, '请输入其它限制', 'specificuserlimit', 2, 8, 'text', '', 0, 0, 1, 1, 0, 1, 0, 0, 0, 14, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(37, '性别限制', 'genderlimit', 2, 9, 'radio', 'a:3:{i:0;s:8:"1=全部";i:1;s:11:"2=仅男生";i:2;s:11:"3=仅女生";}', 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(38, '活动费用', 'fees', 2, 10, 'text', '', 1, 0, 0, 0, 0, 1, 1, 0, 1, 0, '(如 小孩 每位 10元，有车族 每位10 元等)', '费用说明');
-REPLACE INTO pw_activityfield VALUES(39, '费用明细', 'feesdetail', 2, 11, 'text', '', 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, '', '费用说明');
-REPLACE INTO pw_activityfield VALUES(40, '支付方式', 'paymethod', 2, 12, 'radio', 'a:2:{i:0;s:11:"1=支付宝";i:1;s:14:"2=现金支付";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 0, '', '费用说明');
-REPLACE INTO pw_activityfield VALUES(41, '活动时间', 'starttime', 3, 1, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(42, '-', 'endtime', 3, 1, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(43, '活动地点', 'location', 3, 2, 'text', '', 1, 0, 0, 1, 0, 1, 0, 0, 0, 40, '(多个活动地点用,隔开)', '活动概况');
-REPLACE INTO pw_activityfield VALUES(44, '主题图片', 'picture1', 3, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '(最多5张，支持gif、jpeg、jpg、bmp、png，小于2M)', '活动概况');
-REPLACE INTO pw_activityfield VALUES(45, '主题图片二', 'picture2', 3, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(46, '主题图片三', 'picture3', 3, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(47, '主题图片四', 'picture4', 3, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(48, '主题图片五', 'picture5', 3, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(49, '联系人', 'contact', 3, 4, 'text', '', 1, 0, 0, 1, 0, 1, 1, 0, 1, 20, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(50, '联系电话', 'telephone', 3, 5, 'text', '', 1, 0, 0, 1, 0, 1, 1, 0, 1, 40, '(多个联系电话用,隔开)', '活动概况');
-REPLACE INTO pw_activityfield VALUES(51, '报名时间', 'signupstarttime', 3, 6, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(52, '-', 'signupendtime', 3, 6, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(53, '人数限制{@}最少', 'minparticipant', 3, 7, 'text', '', 1, 0, 0, 0, 0, 1, 0, 0, 0, 3, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(54, '最多', 'maxparticipant', 3, 7, 'text', '', 1, 0, 0, 0, 0, 1, 0, 0, 0, 3, '(留空或0表示没有限制)', '报名说明');
-REPLACE INTO pw_activityfield VALUES(55, '报名限制', 'userlimit', 3, 8, 'radio', 'a:2:{i:0;s:14:"1=所有用户";i:1;s:11:"2=仅好友";}', 1, 0, 0, 1, 0, 1, 0, 0, 0, 3, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(56, '请输入其它限制', 'specificuserlimit', 3, 8, 'text', '', 1, 0, 0, 1, 0, 1, 0, 0, 0, 14, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(57, '性别限制', 'genderlimit', 3, 9, 'radio', 'a:3:{i:0;s:8:"1=全部";i:1;s:11:"2=仅男生";i:2;s:11:"3=仅女生";}', 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(58, '活动费用', 'fees', 3, 10, 'text', '', 1, 0, 0, 0, 0, 1, 1, 0, 1, 0, '(如 小孩 每位 10元，有车族 每位10 元等)', '费用说明');
-REPLACE INTO pw_activityfield VALUES(59, '费用明细', 'feesdetail', 3, 11, 'text', '', 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, '', '费用说明');
-REPLACE INTO pw_activityfield VALUES(60, '支付方式', 'paymethod', 3, 12, 'radio', 'a:2:{i:0;s:11:"1=支付宝";i:1;s:14:"2=现金支付";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 0, '', '费用说明');
-REPLACE INTO pw_activityfield VALUES(61, '活动时间', 'starttime', 4, 1, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(62, '-', 'endtime', 4, 1, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(63, '活动地点', 'location', 4, 2, 'text', '', 1, 0, 0, 1, 0, 1, 0, 0, 0, 40, '(多个活动地点用,隔开)', '活动概况');
-REPLACE INTO pw_activityfield VALUES(64, '主题图片', 'picture1', 4, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '(最多5张，支持gif、jpeg、jpg、bmp、png，小于2M)', '活动概况');
-REPLACE INTO pw_activityfield VALUES(65, '主题图片二', 'picture2', 4, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(66, '主题图片三', 'picture3', 4, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(67, '主题图片四', 'picture4', 4, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(68, '主题图片五', 'picture5', 4, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(69, '联系人', 'contact', 4, 4, 'text', '', 1, 0, 0, 1, 0, 1, 1, 0, 1, 20, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(70, '联系电话', 'telephone', 4, 5, 'text', '', 1, 0, 0, 1, 0, 1, 1, 0, 1, 40, '(多个联系电话用,隔开)', '活动概况');
-REPLACE INTO pw_activityfield VALUES(71, '报名时间', 'signupstarttime', 4, 6, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(72, '-', 'signupendtime', 4, 6, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(73, '人数限制{@}最少', 'minparticipant', 4, 7, 'text', '', 1, 0, 0, 0, 0, 1, 0, 0, 0, 3, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(74, '最多', 'maxparticipant', 4, 7, 'text', '', 1, 0, 0, 0, 0, 1, 0, 0, 0, 3, '(留空或0表示没有限制)', '报名说明');
-REPLACE INTO pw_activityfield VALUES(75, '报名限制', 'userlimit', 4, 8, 'radio', 'a:2:{i:0;s:14:"1=所有用户";i:1;s:11:"2=仅好友";}', 1, 0, 0, 1, 0, 1, 0, 0, 0, 3, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(76, '请输入其它限制', 'specificuserlimit', 4, 8, 'text', '', 1, 0, 0, 1, 0, 1, 0, 0, 0, 14, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(77, '性别限制', 'genderlimit', 4, 9, 'radio', 'a:3:{i:0;s:8:"1=全部";i:1;s:11:"2=仅男生";i:2;s:11:"3=仅女生";}', 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(78, '活动费用', 'fees', 4, 10, 'text', '', 1, 0, 0, 0, 0, 1, 1, 0, 1, 0, '(如 小孩 每位 10元，有车族 每位10 元等)', '费用说明');
-REPLACE INTO pw_activityfield VALUES(79, '费用明细', 'feesdetail', 4, 11, 'text', '', 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, '', '费用说明');
-REPLACE INTO pw_activityfield VALUES(80, '支付方式', 'paymethod', 4, 12, 'radio', 'a:2:{i:0;s:11:"1=支付宝";i:1;s:14:"2=现金支付";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 0, '', '费用说明');
-REPLACE INTO pw_activityfield VALUES(81, '活动时间', 'starttime', 5, 1, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 1, 1, 1, 1, 1, 1, 0, 1, 18, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(82, '-', 'endtime', 5, 1, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 1, 1, 1, 1, 1, 1, 0, 1, 18, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(83, '活动地点', 'location', 5, 2, 'text', '', 1, 1, 1, 1, 1, 1, 0, 0, 0, 40, '(多个活动地点用,隔开)', '活动概况');
-REPLACE INTO pw_activityfield VALUES(84, '主题图片', 'picture1', 5, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '(最多5张，支持gif、jpeg、jpg、bmp、png，小于2M)', '活动概况');
-REPLACE INTO pw_activityfield VALUES(85, '主题图片二', 'picture2', 5, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(86, '主题图片三', 'picture3', 5, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(87, '主题图片四', 'picture4', 5, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(88, '主题图片五', 'picture5', 5, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(89, '联系人', 'contact', 5, 4, 'text', '', 1, 1, 1, 1, 1, 1, 1, 0, 1, 20, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(90, '联系电话', 'telephone', 5, 5, 'text', '', 1, 1, 1, 1, 1, 1, 1, 0, 1, 40, '(多个联系电话用,隔开)', '活动概况');
-REPLACE INTO pw_activityfield VALUES(91, '报名时间', 'signupstarttime', 5, 6, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 1, 1, 1, 1, 1, 1, 0, 1, 18, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(92, '-', 'signupendtime', 5, 6, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 1, 1, 1, 1, 1, 1, 0, 1, 18, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(93, '人数限制{@}最少', 'minparticipant', 5, 7, 'text', '', 1, 0, 0, 0, 1, 1, 0, 0, 0, 3, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(94, '最多', 'maxparticipant', 5, 7, 'text', '', 1, 0, 0, 0, 1, 1, 0, 0, 0, 3, '(留空或0表示没有限制)', '报名说明');
-REPLACE INTO pw_activityfield VALUES(95, '报名限制', 'userlimit', 5, 8, 'radio', 'a:2:{i:0;s:14:"1=所有用户";i:1;s:11:"2=仅好友";}', 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(96, '请输入其它限制', 'specificuserlimit', 5, 8, 'text', '', 1, 1, 1, 1, 1, 1, 0, 0, 0, 14, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(97, '性别限制', 'genderlimit', 5, 9, 'radio', 'a:3:{i:0;s:8:"1=全部";i:1;s:11:"2=仅男生";i:2;s:11:"3=仅女生";}', 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(98, '活动费用', 'fees', 5, 10, 'text', '', 1, 0, 0, 0, 1, 1, 1, 0, 1, 0, '(如 小孩 每位 10元，有车族 每位10 元等)', '费用说明');
-REPLACE INTO pw_activityfield VALUES(99, '费用明细', 'feesdetail', 5, 11, 'text', '', 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, '', '费用说明');
-REPLACE INTO pw_activityfield VALUES(100, '支付方式', 'paymethod', 5, 12, 'radio', 'a:2:{i:0;s:11:"1=支付宝";i:1;s:14:"2=现金支付";}', 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, '', '费用说明');
-REPLACE INTO pw_activityfield VALUES(101, '活动时间', 'starttime', 6, 1, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(102, '-', 'endtime', 6, 1, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(103, '活动地点', 'location', 6, 2, 'text', '', 1, 0, 0, 1, 0, 1, 0, 0, 0, 40, '(多个活动地点用,隔开)', '活动概况');
-REPLACE INTO pw_activityfield VALUES(104, '主题图片', 'picture1', 6, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '(最多5张，支持gif、jpeg、jpg、bmp、png，小于2M)', '活动概况');
-REPLACE INTO pw_activityfield VALUES(105, '主题图片二', 'picture2', 6, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(106, '主题图片三', 'picture3', 6, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(107, '主题图片四', 'picture4', 6, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(108, '主题图片五', 'picture5', 6, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(109, '联系人', 'contact', 6, 4, 'text', '', 1, 0, 0, 1, 0, 1, 1, 0, 1, 20, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(110, '联系电话', 'telephone', 6, 5, 'text', '', 1, 0, 0, 1, 0, 1, 1, 0, 1, 40, '(多个联系电话用,隔开)', '活动概况');
-REPLACE INTO pw_activityfield VALUES(111, '报名时间', 'signupstarttime', 6, 6, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(112, '-', 'signupendtime', 6, 6, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(113, '人数限制{@}最少', 'minparticipant', 6, 7, 'text', '', 1, 0, 0, 0, 0, 1, 0, 0, 0, 3, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(114, '最多', 'maxparticipant', 6, 7, 'text', '', 1, 0, 0, 0, 0, 1, 0, 0, 0, 3, '(留空或0表示没有限制)', '报名说明');
-REPLACE INTO pw_activityfield VALUES(115, '报名限制', 'userlimit', 6, 8, 'radio', 'a:2:{i:0;s:14:"1=所有用户";i:1;s:11:"2=仅好友";}', 1, 0, 0, 1, 0, 1, 0, 0, 0, 3, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(116, '请输入其它限制', 'specificuserlimit', 6, 8, 'text', '', 1, 0, 0, 1, 0, 1, 0, 0, 0, 14, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(117, '性别限制', 'genderlimit', 6, 9, 'radio', 'a:3:{i:0;s:8:"1=全部";i:1;s:11:"2=仅男生";i:2;s:11:"3=仅女生";}', 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(118, '活动费用', 'fees', 6, 10, 'text', '', 1, 0, 0, 0, 0, 1, 1, 0, 1, 0, '(如 小孩 每位 10元，有车族 每位10 元等)', '费用说明');
-REPLACE INTO pw_activityfield VALUES(119, '费用明细', 'feesdetail', 6, 11, 'text', '', 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, '', '费用说明');
-REPLACE INTO pw_activityfield VALUES(120, '支付方式', 'paymethod', 6, 12, 'radio', 'a:2:{i:0;s:11:"1=支付宝";i:1;s:14:"2=现金支付";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 0, '', '费用说明');
-REPLACE INTO pw_activityfield VALUES(121, '活动时间', 'starttime', 7, 1, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(122, '-', 'endtime', 7, 1, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(123, '活动地点', 'location', 7, 2, 'text', '', 1, 0, 0, 1, 0, 1, 0, 0, 0, 40, '(多个活动地点用,隔开)', '活动概况');
-REPLACE INTO pw_activityfield VALUES(124, '主题图片', 'picture1', 7, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '(最多5张，支持gif、jpeg、jpg、bmp、png，小于2M)', '活动概况');
-REPLACE INTO pw_activityfield VALUES(125, '主题图片二', 'picture2', 7, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(126, '主题图片三', 'picture3', 7, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(127, '主题图片四', 'picture4', 7, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(128, '主题图片五', 'picture5', 7, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(129, '联系人', 'contact', 7, 4, 'text', '', 1, 0, 0, 1, 0, 1, 1, 0, 1, 20, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(130, '联系电话', 'telephone', 7, 5, 'text', '', 1, 0, 0, 1, 0, 1, 1, 0, 1, 40, '(多个联系电话用,隔开)', '活动概况');
-REPLACE INTO pw_activityfield VALUES(131, '报名时间', 'signupstarttime', 7, 6, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(132, '-', 'signupendtime', 7, 6, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(133, '人数限制{@}最少', 'minparticipant', 7, 7, 'text', '', 1, 0, 0, 0, 0, 1, 0, 0, 0, 3, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(134, '最多', 'maxparticipant', 7, 7, 'text', '', 1, 0, 0, 0, 0, 1, 0, 0, 0, 3, '(留空或0表示没有限制)', '报名说明');
-REPLACE INTO pw_activityfield VALUES(135, '报名限制', 'userlimit', 7, 8, 'radio', 'a:2:{i:0;s:14:"1=所有用户";i:1;s:11:"2=仅好友";}', 1, 0, 0, 1, 0, 1, 0, 0, 0, 3, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(136, '请输入其它限制', 'specificuserlimit', 7, 8, 'text', '', 1, 0, 0, 1, 0, 1, 0, 0, 0, 14, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(137, '性别限制', 'genderlimit', 7, 9, 'radio', 'a:3:{i:0;s:8:"1=全部";i:1;s:11:"2=仅男生";i:2;s:11:"3=仅女生";}', 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(138, '活动费用', 'fees', 7, 10, 'text', '', 1, 0, 0, 0, 0, 1, 1, 0, 1, 0, '(如 小孩 每位 10元，有车族 每位10 元等)', '费用说明');
-REPLACE INTO pw_activityfield VALUES(139, '费用明细', 'feesdetail', 7, 11, 'text', '', 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, '', '费用说明');
-REPLACE INTO pw_activityfield VALUES(140, '支付方式', 'paymethod', 7, 12, 'radio', 'a:2:{i:0;s:11:"1=支付宝";i:1;s:14:"2=现金支付";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 0, '', '费用说明');
-REPLACE INTO pw_activityfield VALUES(141, '活动时间', 'starttime', 8, 1, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(142, '-', 'endtime', 8, 1, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(143, '活动地点', 'location', 8, 2, 'text', '', 1, 0, 0, 1, 0, 1, 0, 0, 0, 40, '(多个活动地点用,隔开)', '活动概况');
-REPLACE INTO pw_activityfield VALUES(144, '主题图片', 'picture1', 8, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '(最多5张，支持gif、jpeg、jpg、bmp、png，小于2M)', '活动概况');
-REPLACE INTO pw_activityfield VALUES(145, '主题图片二', 'picture2', 8, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(146, '主题图片三', 'picture3', 8, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(147, '主题图片四', 'picture4', 8, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(148, '主题图片五', 'picture5', 8, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(149, '联系人', 'contact', 8, 4, 'text', '', 1, 0, 0, 1, 0, 1, 1, 0, 1, 20, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(150, '联系电话', 'telephone', 8, 5, 'text', '', 1, 0, 0, 1, 0, 1, 1, 0, 1, 40, '(多个联系电话用,隔开)', '活动概况');
-REPLACE INTO pw_activityfield VALUES(151, '报名时间', 'signupstarttime', 8, 6, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(152, '-', 'signupendtime', 8, 6, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(153, '人数限制{@}最少', 'minparticipant', 8, 7, 'text', '', 1, 0, 0, 0, 0, 1, 0, 0, 0, 3, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(154, '最多', 'maxparticipant', 8, 7, 'text', '', 1, 0, 0, 0, 0, 1, 0, 0, 0, 3, '(留空或0表示没有限制)', '报名说明');
-REPLACE INTO pw_activityfield VALUES(155, '报名限制', 'userlimit', 8, 8, 'radio', 'a:2:{i:0;s:14:"1=所有用户";i:1;s:11:"2=仅好友";}', 1, 0, 0, 1, 0, 1, 0, 0, 0, 3, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(156, '请输入其它限制', 'specificuserlimit', 8, 8, 'text', '', 1, 0, 0, 1, 0, 1, 0, 0, 0, 14, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(157, '性别限制', 'genderlimit', 8, 9, 'radio', 'a:3:{i:0;s:8:"1=全部";i:1;s:11:"2=仅男生";i:2;s:11:"3=仅女生";}', 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(158, '活动费用', 'fees', 8, 10, 'text', '', 1, 0, 0, 0, 0, 1, 1, 0, 1, 0, '(如 小孩 每位 10元，有车族 每位10 元等)', '费用说明');
-REPLACE INTO pw_activityfield VALUES(159, '费用明细', 'feesdetail', 8, 11, 'text', '', 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, '', '费用说明');
-REPLACE INTO pw_activityfield VALUES(160, '支付方式', 'paymethod', 8, 12, 'radio', 'a:2:{i:0;s:11:"1=支付宝";i:1;s:14:"2=现金支付";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 0, '', '费用说明');
-REPLACE INTO pw_activityfield VALUES(161, '活动时间', 'starttime', 9, 1, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(162, '-', 'endtime', 9, 1, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(163, '活动地点', 'location', 9, 2, 'text', '', 1, 0, 0, 1, 0, 1, 0, 0, 0, 40, '(多个活动地点用,隔开)', '活动概况');
-REPLACE INTO pw_activityfield VALUES(164, '主题图片', 'picture1', 9, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '(最多5张，支持gif、jpeg、jpg、bmp、png，小于2M)', '活动概况');
-REPLACE INTO pw_activityfield VALUES(165, '主题图片二', 'picture2', 9, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(166, '主题图片三', 'picture3', 9, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(167, '主题图片四', 'picture4', 9, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(168, '主题图片五', 'picture5', 9, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(169, '联系人', 'contact', 9, 4, 'text', '', 1, 0, 0, 1, 0, 1, 1, 0, 1, 20, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(170, '联系电话', 'telephone', 9, 5, 'text', '', 1, 0, 0, 1, 0, 1, 1, 0, 1, 40, '(多个联系电话用,隔开)', '活动概况');
-REPLACE INTO pw_activityfield VALUES(171, '报名时间', 'signupstarttime', 9, 6, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(172, '-', 'signupendtime', 9, 6, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(173, '人数限制{@}最少', 'minparticipant', 9, 7, 'text', '', 1, 0, 0, 0, 0, 1, 0, 0, 0, 3, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(174, '最多', 'maxparticipant', 9, 7, 'text', '', 1, 0, 0, 0, 0, 1, 0, 0, 0, 3, '(留空或0表示没有限制)', '报名说明');
-REPLACE INTO pw_activityfield VALUES(175, '报名限制', 'userlimit', 9, 8, 'radio', 'a:2:{i:0;s:14:"1=所有用户";i:1;s:11:"2=仅好友";}', 1, 0, 0, 1, 0, 1, 0, 0, 0, 3, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(176, '请输入其它限制', 'specificuserlimit', 9, 8, 'text', '', 1, 0, 0, 1, 0, 1, 0, 0, 0, 14, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(177, '性别限制', 'genderlimit', 9, 9, 'radio', 'a:3:{i:0;s:8:"1=全部";i:1;s:11:"2=仅男生";i:2;s:11:"3=仅女生";}', 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(178, '活动费用', 'fees', 9, 10, 'text', '', 1, 0, 0, 0, 0, 1, 1, 0, 1, 0, '(如 小孩 每位 10元，有车族 每位10 元等)', '费用说明');
-REPLACE INTO pw_activityfield VALUES(179, '费用明细', 'feesdetail', 9, 11, 'text', '', 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, '', '费用说明');
-REPLACE INTO pw_activityfield VALUES(180, '支付方式', 'paymethod', 9, 12, 'radio', 'a:2:{i:0;s:11:"1=支付宝";i:1;s:14:"2=现金支付";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 0, '', '费用说明');
-REPLACE INTO pw_activityfield VALUES(181, '活动时间', 'starttime', 10, 1, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(182, '-', 'endtime', 10, 1, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(183, '活动地点', 'location', 10, 2, 'text', '', 1, 0, 0, 1, 0, 1, 0, 0, 0, 40, '(多个活动地点用,隔开)', '活动概况');
-REPLACE INTO pw_activityfield VALUES(184, '主题图片', 'picture1', 10, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '(最多5张，支持gif、jpeg、jpg、bmp、png，小于2M)', '活动概况');
-REPLACE INTO pw_activityfield VALUES(185, '主题图片二', 'picture2', 10, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(186, '主题图片三', 'picture3', 10, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(187, '主题图片四', 'picture4', 10, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(188, '主题图片五', 'picture5', 10, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(189, '联系人', 'contact', 10, 4, 'text', '', 1, 0, 0, 1, 0, 1, 1, 0, 1, 20, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(190, '联系电话', 'telephone', 10, 5, 'text', '', 1, 0, 0, 1, 0, 1, 1, 0, 1, 40, '(多个联系电话用,隔开)', '活动概况');
-REPLACE INTO pw_activityfield VALUES(191, '报名时间', 'signupstarttime', 10, 6, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(192, '-', 'signupendtime', 10, 6, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(193, '人数限制{@}最少', 'minparticipant', 10, 7, 'text', '', 1, 0, 0, 0, 0, 1, 0, 0, 0, 3, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(194, '最多', 'maxparticipant', 10, 7, 'text', '', 1, 0, 0, 0, 0, 1, 0, 0, 0, 3, '(留空或0表示没有限制)', '报名说明');
-REPLACE INTO pw_activityfield VALUES(195, '报名限制', 'userlimit', 10, 8, 'radio', 'a:2:{i:0;s:14:"1=所有用户";i:1;s:11:"2=仅好友";}', 1, 0, 0, 1, 0, 1, 0, 0, 0, 3, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(196, '请输入其它限制', 'specificuserlimit', 10, 8, 'text', '', 1, 0, 0, 1, 0, 1, 0, 0, 0, 14, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(197, '性别限制', 'genderlimit', 10, 9, 'radio', 'a:3:{i:0;s:8:"1=全部";i:1;s:11:"2=仅男生";i:2;s:11:"3=仅女生";}', 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(198, '活动费用', 'fees', 10, 10, 'text', '', 1, 0, 0, 0, 0, 1, 1, 0, 1, 0, '(如 小孩 每位 10元，有车族 每位10 元等)', '费用说明');
-REPLACE INTO pw_activityfield VALUES(199, '费用明细', 'feesdetail', 10, 11, 'text', '', 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, '', '费用说明');
-REPLACE INTO pw_activityfield VALUES(200, '支付方式', 'paymethod', 10, 12, 'radio', 'a:2:{i:0;s:11:"1=支付宝";i:1;s:14:"2=现金支付";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 0, '', '费用说明');
-REPLACE INTO pw_activityfield VALUES(201, '活动时间', 'starttime', 11, 1, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(202, '-', 'endtime', 11, 1, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(203, '活动地点', 'location', 11, 2, 'text', '', 1, 0, 0, 1, 0, 1, 0, 0, 0, 40, '(多个活动地点用,隔开)', '活动概况');
-REPLACE INTO pw_activityfield VALUES(204, '主题图片', 'picture1', 11, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '(最多5张，支持gif、jpeg、jpg、bmp、png，小于2M)', '活动概况');
-REPLACE INTO pw_activityfield VALUES(205, '主题图片二', 'picture2', 11, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(206, '主题图片三', 'picture3', 11, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(207, '主题图片四', 'picture4', 11, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(208, '主题图片五', 'picture5', 11, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(209, '联系人', 'contact', 11, 4, 'text', '', 1, 0, 0, 1, 0, 1, 1, 0, 1, 20, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(210, '联系电话', 'telephone', 11, 5, 'text', '', 1, 0, 0, 1, 0, 1, 1, 0, 1, 40, '(多个联系电话用,隔开)', '活动概况');
-REPLACE INTO pw_activityfield VALUES(211, '报名时间', 'signupstarttime', 11, 6, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(212, '-', 'signupendtime', 11, 6, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(213, '人数限制{@}最少', 'minparticipant', 11, 7, 'text', '', 1, 0, 0, 0, 0, 1, 0, 0, 0, 3, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(214, '最多', 'maxparticipant', 11, 7, 'text', '', 1, 0, 0, 0, 0, 1, 0, 0, 0, 3, '(留空或0表示没有限制)', '报名说明');
-REPLACE INTO pw_activityfield VALUES(215, '报名限制', 'userlimit', 11, 8, 'radio', 'a:2:{i:0;s:14:"1=所有用户";i:1;s:11:"2=仅好友";}', 1, 0, 0, 1, 0, 1, 0, 0, 0, 3, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(216, '请输入其它限制', 'specificuserlimit', 11, 8, 'text', '', 1, 0, 0, 1, 0, 1, 0, 0, 0, 14, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(217, '性别限制', 'genderlimit', 11, 9, 'radio', 'a:3:{i:0;s:8:"1=全部";i:1;s:11:"2=仅男生";i:2;s:11:"3=仅女生";}', 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(218, '活动费用', 'fees', 11, 10, 'text', '', 1, 0, 0, 0, 0, 1, 1, 0, 1, 0, '(如 小孩 每位 10元，有车族 每位10 元等)', '费用说明');
-REPLACE INTO pw_activityfield VALUES(219, '费用明细', 'feesdetail', 11, 11, 'text', '', 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, '', '费用说明');
-REPLACE INTO pw_activityfield VALUES(220, '支付方式', 'paymethod', 11, 12, 'radio', 'a:2:{i:0;s:11:"1=支付宝";i:1;s:14:"2=现金支付";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 0, '', '费用说明');
-REPLACE INTO pw_activityfield VALUES(221, '活动时间', 'starttime', 12, 1, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(222, '-', 'endtime', 12, 1, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(223, '活动地点', 'location', 12, 2, 'text', '', 1, 0, 0, 1, 0, 1, 0, 0, 0, 40, '(多个活动地点用,隔开)', '活动概况');
-REPLACE INTO pw_activityfield VALUES(224, '主题图片', 'picture1', 12, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '(最多5张，支持gif、jpeg、jpg、bmp、png，小于2M)', '活动概况');
-REPLACE INTO pw_activityfield VALUES(225, '主题图片二', 'picture2', 12, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(226, '主题图片三', 'picture3', 12, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(227, '主题图片四', 'picture4', 12, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(228, '主题图片五', 'picture5', 12, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(229, '联系人', 'contact', 12, 4, 'text', '', 1, 0, 0, 1, 0, 1, 1, 0, 1, 20, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(230, '联系电话', 'telephone', 12, 5, 'text', '', 1, 0, 0, 1, 0, 1, 1, 0, 1, 40, '(多个联系电话用,隔开)', '活动概况');
-REPLACE INTO pw_activityfield VALUES(231, '报名时间', 'signupstarttime', 12, 6, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(232, '-', 'signupendtime', 12, 6, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(233, '人数限制{@}最少', 'minparticipant', 12, 7, 'text', '', 1, 0, 0, 0, 0, 1, 0, 0, 0, 3, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(234, '最多', 'maxparticipant', 12, 7, 'text', '', 1, 0, 0, 0, 0, 1, 0, 0, 0, 3, '(留空或0表示没有限制)', '报名说明');
-REPLACE INTO pw_activityfield VALUES(235, '报名限制', 'userlimit', 12, 8, 'radio', 'a:2:{i:0;s:14:"1=所有用户";i:1;s:11:"2=仅好友";}', 1, 0, 0, 1, 0, 1, 0, 0, 0, 3, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(236, '请输入其它限制', 'specificuserlimit', 12, 8, 'text', '', 1, 0, 0, 1, 0, 1, 0, 0, 0, 14, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(237, '性别限制', 'genderlimit', 12, 9, 'radio', 'a:3:{i:0;s:8:"1=全部";i:1;s:11:"2=仅男生";i:2;s:11:"3=仅女生";}', 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(238, '活动费用', 'fees', 12, 10, 'text', '', 1, 0, 0, 0, 0, 1, 1, 0, 1, 0, '(如 小孩 每位 10元，有车族 每位10 元等)', '费用说明');
-REPLACE INTO pw_activityfield VALUES(239, '费用明细', 'feesdetail', 12, 11, 'text', '', 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, '', '费用说明');
-REPLACE INTO pw_activityfield VALUES(240, '支付方式', 'paymethod', 12, 12, 'radio', 'a:2:{i:0;s:11:"1=支付宝";i:1;s:14:"2=现金支付";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 0, '', '费用说明');
-REPLACE INTO pw_activityfield VALUES(241, '活动时间', 'starttime', 13, 1, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(242, '-', 'endtime', 13, 1, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(243, '活动地点', 'location', 13, 2, 'text', '', 1, 0, 0, 1, 0, 1, 0, 0, 0, 40, '(多个活动地点用,隔开)', '活动概况');
-REPLACE INTO pw_activityfield VALUES(244, '主题图片', 'picture1', 13, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '(最多5张，支持gif、jpeg、jpg、bmp、png，小于2M)', '活动概况');
-REPLACE INTO pw_activityfield VALUES(245, '主题图片二', 'picture2', 13, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(246, '主题图片三', 'picture3', 13, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(247, '主题图片四', 'picture4', 13, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(248, '主题图片五', 'picture5', 13, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(249, '联系人', 'contact', 13, 4, 'text', '', 1, 0, 0, 1, 0, 1, 1, 0, 1, 20, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(250, '联系电话', 'telephone', 13, 5, 'text', '', 1, 0, 0, 1, 0, 1, 1, 0, 1, 40, '(多个联系电话用,隔开)', '活动概况');
-REPLACE INTO pw_activityfield VALUES(251, '报名时间', 'signupstarttime', 13, 6, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(252, '-', 'signupendtime', 13, 6, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(253, '人数限制{@}最少', 'minparticipant', 13, 7, 'text', '', 1, 0, 0, 0, 0, 1, 0, 0, 0, 3, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(254, '最多', 'maxparticipant', 13, 7, 'text', 'a:1:{s:9:"alipaymax";s:2:"30";}', 1, 0, 0, 0, 0, 1, 0, 0, 0, 3, '(留空或0表示没有限制)', '报名说明');
-REPLACE INTO pw_activityfield VALUES(255, '报名限制', 'userlimit', 13, 8, 'radio', 'a:2:{i:0;s:14:"1=所有用户";i:1;s:11:"2=仅好友";}', 1, 0, 0, 1, 0, 1, 0, 0, 0, 3, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(256, '请输入其它限制', 'specificuserlimit', 13, 8, 'text', '', 1, 0, 0, 1, 0, 1, 0, 0, 0, 14, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(257, '性别限制', 'genderlimit', 13, 9, 'radio', 'a:3:{i:0;s:8:"1=全部";i:1;s:11:"2=仅男生";i:2;s:11:"3=仅女生";}', 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(258, '活动费用', 'fees', 13, 10, 'text', '', 1, 0, 0, 0, 0, 1, 1, 0, 1, 0, '(如 小孩 每位 10元，有车族 每位10 元等)', '费用说明');
-REPLACE INTO pw_activityfield VALUES(259, '费用明细', 'feesdetail', 13, 11, 'text', '', 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, '', '费用说明');
-REPLACE INTO pw_activityfield VALUES(260, '支付方式', 'paymethod', 13, 12, 'radio', 'a:2:{i:0;s:11:"1=支付宝";i:1;s:14:"2=现金支付";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 0, '', '费用说明');
-REPLACE INTO pw_activityfield VALUES(261, '活动时间', 'starttime', 14, 1, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(262, '-', 'endtime', 14, 1, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(263, '活动地点', 'location', 14, 2, 'text', '', 1, 0, 0, 1, 0, 1, 0, 0, 0, 40, '(多个活动地点用,隔开)', '活动概况');
-REPLACE INTO pw_activityfield VALUES(264, '主题图片', 'picture1', 14, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '(最多5张，支持gif、jpeg、jpg、bmp、png，小于2M)', '活动概况');
-REPLACE INTO pw_activityfield VALUES(265, '主题图片二', 'picture2', 14, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(266, '主题图片三', 'picture3', 14, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(267, '主题图片四', 'picture4', 14, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(268, '主题图片五', 'picture5', 14, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(269, '联系人', 'contact', 14, 4, 'text', '', 1, 0, 0, 1, 0, 1, 1, 0, 1, 20, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(270, '联系电话', 'telephone', 14, 5, 'text', '', 1, 0, 0, 1, 0, 1, 1, 0, 1, 40, '(多个联系电话用,隔开)', '活动概况');
-REPLACE INTO pw_activityfield VALUES(271, '报名时间', 'signupstarttime', 14, 6, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(272, '-', 'signupendtime', 14, 6, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(273, '人数限制{@}最少', 'minparticipant', 14, 7, 'text', '', 1, 0, 0, 0, 0, 1, 0, 0, 0, 3, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(274, '最多', 'maxparticipant', 14, 7, 'text', 'a:1:{s:9:"alipaymax";s:2:"30";}', 1, 0, 0, 0, 0, 1, 0, 0, 0, 3, '(留空或0表示没有限制)', '报名说明');
-REPLACE INTO pw_activityfield VALUES(275, '报名限制', 'userlimit', 14, 8, 'radio', 'a:2:{i:0;s:14:"1=所有用户";i:1;s:11:"2=仅好友";}', 1, 0, 0, 1, 0, 1, 0, 0, 0, 3, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(276, '请输入其它限制', 'specificuserlimit', 14, 8, 'text', '', 1, 0, 0, 1, 0, 1, 0, 0, 0, 14, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(277, '性别限制', 'genderlimit', 14, 9, 'radio', 'a:3:{i:0;s:8:"1=全部";i:1;s:11:"2=仅男生";i:2;s:11:"3=仅女生";}', 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(278, '活动费用', 'fees', 14, 10, 'text', '', 1, 0, 0, 0, 0, 1, 1, 0, 1, 0, '(如 小孩 每位 10元，有车族 每位10 元等)', '费用说明');
-REPLACE INTO pw_activityfield VALUES(279, '费用明细', 'feesdetail', 14, 11, 'text', '', 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, '', '费用说明');
-REPLACE INTO pw_activityfield VALUES(280, '支付方式', 'paymethod', 14, 12, 'radio', 'a:2:{i:0;s:11:"1=支付宝";i:1;s:14:"2=现金支付";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 0, '', '费用说明');
-REPLACE INTO pw_activityfield VALUES(281, '活动时间', 'starttime', 15, 1, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(282, '-', 'endtime', 15, 1, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(283, '活动地点', 'location', 15, 2, 'text', '', 1, 0, 0, 1, 0, 1, 0, 0, 0, 40, '(多个活动地点用,隔开)', '活动概况');
-REPLACE INTO pw_activityfield VALUES(284, '主题图片', 'picture1', 15, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '(最多5张，支持gif、jpeg、jpg、bmp、png，小于2M)', '活动概况');
-REPLACE INTO pw_activityfield VALUES(285, '主题图片二', 'picture2', 15, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(286, '主题图片三', 'picture3', 15, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(287, '主题图片四', 'picture4', 15, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(288, '主题图片五', 'picture5', 15, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(289, '联系人', 'contact', 15, 4, 'text', '', 1, 0, 0, 1, 0, 1, 1, 0, 1, 20, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(290, '联系电话', 'telephone', 15, 5, 'text', '', 1, 0, 0, 1, 0, 1, 1, 0, 1, 40, '(多个联系电话用,隔开)', '活动概况');
-REPLACE INTO pw_activityfield VALUES(291, '报名时间', 'signupstarttime', 15, 6, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(292, '-', 'signupendtime', 15, 6, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(293, '人数限制{@}最少', 'minparticipant', 15, 7, 'text', '', 1, 0, 0, 0, 0, 1, 0, 0, 0, 3, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(294, '最多', 'maxparticipant', 15, 7, 'text', '', 1, 0, 0, 0, 0, 1, 0, 0, 0, 3, '(留空或0表示没有限制)', '报名说明');
-REPLACE INTO pw_activityfield VALUES(295, '报名限制', 'userlimit', 15, 8, 'radio', 'a:2:{i:0;s:14:"1=所有用户";i:1;s:11:"2=仅好友";}', 1, 0, 0, 1, 0, 1, 0, 0, 0, 3, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(296, '请输入其它限制', 'specificuserlimit', 15, 8, 'text', '', 1, 0, 0, 1, 0, 1, 0, 0, 0, 14, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(297, '性别限制', 'genderlimit', 15, 9, 'radio', 'a:3:{i:0;s:8:"1=全部";i:1;s:11:"2=仅男生";i:2;s:11:"3=仅女生";}', 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(298, '活动费用', 'fees', 15, 10, 'text', '', 1, 0, 0, 0, 0, 1, 1, 0, 1, 0, '(如 小孩 每位 10元，有车族 每位10 元等)', '费用说明');
-REPLACE INTO pw_activityfield VALUES(299, '费用明细', 'feesdetail', 15, 11, 'text', '', 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, '', '费用说明');
-REPLACE INTO pw_activityfield VALUES(300, '支付方式', 'paymethod', 15, 12, 'radio', 'a:2:{i:0;s:11:"1=支付宝";i:1;s:14:"2=现金支付";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 0, '', '费用说明');
-REPLACE INTO pw_activityfield VALUES(301, '活动时间', 'starttime', 16, 1, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(302, '-', 'endtime', 16, 1, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(303, '活动地点', 'location', 16, 2, 'text', '', 1, 0, 0, 1, 0, 1, 0, 0, 0, 40, '(多个活动地点用,隔开)', '活动概况');
-REPLACE INTO pw_activityfield VALUES(304, '主题图片', 'picture1', 16, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '(最多5张，支持gif、jpeg、jpg、bmp、png，小于2M)', '活动概况');
-REPLACE INTO pw_activityfield VALUES(305, '主题图片二', 'picture2', 16, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(306, '主题图片三', 'picture3', 16, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(307, '主题图片四', 'picture4', 16, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(308, '主题图片五', 'picture5', 16, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(309, '联系人', 'contact', 16, 4, 'text', '', 1, 0, 0, 1, 0, 1, 1, 0, 1, 20, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(310, '联系电话', 'telephone', 16, 5, 'text', '', 1, 0, 0, 1, 0, 1, 1, 0, 1, 40, '(多个联系电话用,隔开)', '活动概况');
-REPLACE INTO pw_activityfield VALUES(311, '报名时间', 'signupstarttime', 16, 6, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(312, '-', 'signupendtime', 16, 6, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(313, '人数限制{@}最少', 'minparticipant', 16, 7, 'text', '', 1, 0, 0, 0, 0, 1, 0, 0, 0, 3, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(314, '最多', 'maxparticipant', 16, 7, 'text', '', 1, 0, 0, 0, 0, 1, 0, 0, 0, 3, '(留空或0表示没有限制)', '报名说明');
-REPLACE INTO pw_activityfield VALUES(315, '报名限制', 'userlimit', 16, 8, 'radio', 'a:2:{i:0;s:14:"1=所有用户";i:1;s:11:"2=仅好友";}', 1, 0, 0, 1, 0, 1, 0, 0, 0, 3, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(316, '请输入其它限制', 'specificuserlimit', 16, 8, 'text', '', 1, 0, 0, 1, 0, 1, 0, 0, 0, 14, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(317, '性别限制', 'genderlimit', 16, 9, 'radio', 'a:3:{i:0;s:8:"1=全部";i:1;s:11:"2=仅男生";i:2;s:11:"3=仅女生";}', 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(318, '活动费用', 'fees', 16, 10, 'text', '', 1, 0, 0, 0, 0, 1, 1, 0, 1, 0, '(如 小孩 每位 10元，有车族 每位10 元等)', '费用说明');
-REPLACE INTO pw_activityfield VALUES(319, '费用明细', 'feesdetail', 16, 11, 'text', '', 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, '', '费用说明');
-REPLACE INTO pw_activityfield VALUES(320, '支付方式', 'paymethod', 16, 12, 'radio', 'a:2:{i:0;s:11:"1=支付宝";i:1;s:14:"2=现金支付";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 0, '', '费用说明');
-REPLACE INTO pw_activityfield VALUES(321, '活动时间', 'starttime', 17, 1, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(322, '-', 'endtime', 17, 1, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(323, '活动地点', 'location', 17, 2, 'text', '', 1, 0, 0, 1, 0, 1, 0, 0, 0, 40, '(多个活动地点用,隔开)', '活动概况');
-REPLACE INTO pw_activityfield VALUES(324, '主题图片', 'picture1', 17, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '(最多5张，支持gif、jpeg、jpg、bmp、png，小于2M)', '活动概况');
-REPLACE INTO pw_activityfield VALUES(325, '主题图片二', 'picture2', 17, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(326, '主题图片三', 'picture3', 17, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(327, '主题图片四', 'picture4', 17, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(328, '主题图片五', 'picture5', 17, 3, 'upload', '', 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(329, '联系人', 'contact', 17, 4, 'text', '', 1, 0, 0, 1, 0, 1, 1, 0, 1, 20, '', '活动概况');
-REPLACE INTO pw_activityfield VALUES(330, '联系电话', 'telephone', 17, 5, 'text', '', 1, 0, 0, 1, 0, 1, 1, 0, 1, 40, '(多个联系电话用,隔开)', '活动概况');
-REPLACE INTO pw_activityfield VALUES(331, '报名时间', 'signupstarttime', 17, 6, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(332, '-', 'signupendtime', 17, 6, 'calendar', 'a:1:{s:9:"precision";s:6:"minute";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 18, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(333, '人数限制{@}最少', 'minparticipant', 17, 7, 'text', '', 1, 0, 0, 0, 0, 1, 0, 0, 0, 3, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(334, '最多', 'maxparticipant', 17, 7, 'text', '', 1, 0, 0, 0, 0, 1, 0, 0, 0, 3, '(留空或0表示没有限制)', '报名说明');
-REPLACE INTO pw_activityfield VALUES(335, '报名限制', 'userlimit', 17, 8, 'radio', 'a:2:{i:0;s:14:"1=所有用户";i:1;s:11:"2=仅好友";}', 1, 0, 0, 1, 0, 1, 0, 0, 0, 3, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(336, '请输入其它限制', 'specificuserlimit', 17, 8, 'text', '', 1, 0, 0, 1, 0, 1, 0, 0, 0, 14, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(337, '性别限制', 'genderlimit', 17, 9, 'radio', 'a:3:{i:0;s:8:"1=全部";i:1;s:11:"2=仅男生";i:2;s:11:"3=仅女生";}', 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, '', '报名说明');
-REPLACE INTO pw_activityfield VALUES(338, '活动费用', 'fees', 17, 10, 'text', '', 1, 0, 0, 0, 0, 1, 1, 0, 1, 0, '(如 小孩 每位 10元，有车族 每位10 元等)', '费用说明');
-REPLACE INTO pw_activityfield VALUES(339, '费用明细', 'feesdetail', 17, 11, 'text', '', 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, '', '费用说明');
-REPLACE INTO pw_activityfield VALUES(340, '支付方式', 'paymethod', 17, 12, 'radio', 'a:2:{i:0;s:11:"1=支付宝";i:1;s:14:"2=现金支付";}', 1, 0, 0, 1, 0, 1, 1, 0, 1, 0, '', '费用说明');
-
-DROP TABLE IF EXISTS pw_activitypaylog;
-CREATE TABLE pw_activitypaylog (
-  `actpid` mediumint(8) NOT NULL auto_increment,
-  `tid` mediumint(8) NOT NULL default '0',
-  `actuid` mediumint(8) NOT NULL default '0',
-  `uid` mediumint(8) NOT NULL default '0',
-  `username` varchar(15) NOT NULL,
-  `authorid` mediumint(8) NOT NULL default '0',
-  `author` varchar(15) NOT NULL,
-  `fromuid` mediumint(8) NOT NULL default '0',
-  `fromusername` varchar(15) NOT NULL,
-  `cost` varchar(255) NOT NULL,
-  `costtype` tinyint(1) NOT NULL default '0',
-  `status` tinyint(1) NOT NULL default '0',
-  `createtime` int(10) NOT NULL,
-  `subject` varchar(100) NOT NULL,
-  `wherefrom` tinyint(1) NOT NULL default '0',
-  PRIMARY KEY  (`actpid`),
-  KEY `uid` (`uid`),
-  KEY `authorid` (`authorid`),
-  KEY `tid` (`tid`),
-  KEY `actuid` (`actuid`,`costtype`),
-  KEY `fromuid` (`fromuid`)
-) TYPE=MyISAM  ;
-
-DROP TABLE IF EXISTS pw_activityvalue1;
-CREATE TABLE pw_activityvalue1 (
-  `tid` mediumint(8) unsigned NOT NULL,
-  `fid` smallint(6) unsigned NOT NULL,
-  `ifrecycle` tinyint(1) NOT NULL default '0',
-  PRIMARY KEY  (`tid`)
-) TYPE=MyISAM ;
-
-DROP TABLE IF EXISTS pw_activityvalue2;
-CREATE TABLE pw_activityvalue2 (
-  `tid` mediumint(8) unsigned NOT NULL,
-  `fid` smallint(6) unsigned NOT NULL,
-  `ifrecycle` tinyint(1) NOT NULL default '0',
-  PRIMARY KEY  (`tid`)
-) TYPE=MyISAM ;
-
-DROP TABLE IF EXISTS pw_activityvalue3;
-CREATE TABLE pw_activityvalue3 (
-  `tid` mediumint(8) unsigned NOT NULL,
-  `fid` smallint(6) unsigned NOT NULL,
-  `ifrecycle` tinyint(1) NOT NULL default '0',
-  PRIMARY KEY  (`tid`)
-) TYPE=MyISAM ;
-
-DROP TABLE IF EXISTS pw_activityvalue4;
-CREATE TABLE pw_activityvalue4 (
-  `tid` mediumint(8) unsigned NOT NULL,
-  `fid` smallint(6) unsigned NOT NULL,
-  `ifrecycle` tinyint(1) NOT NULL default '0',
-  PRIMARY KEY  (`tid`)
-) TYPE=MyISAM ;
-
-DROP TABLE IF EXISTS pw_activityvalue5;
-CREATE TABLE pw_activityvalue5 (
-  `tid` mediumint(8) unsigned NOT NULL,
-  `fid` smallint(6) unsigned NOT NULL,
-  `ifrecycle` tinyint(1) NOT NULL default '0',
-  PRIMARY KEY  (`tid`)
-) TYPE=MyISAM ;
-
-DROP TABLE IF EXISTS pw_activityvalue6;
-CREATE TABLE pw_activityvalue6 (
-  `tid` mediumint(8) unsigned NOT NULL,
-  `fid` smallint(6) unsigned NOT NULL,
-  `ifrecycle` tinyint(1) NOT NULL default '0',
-  PRIMARY KEY  (`tid`)
-) TYPE=MyISAM ;
-
-DROP TABLE IF EXISTS pw_activityvalue7;
-CREATE TABLE pw_activityvalue7 (
-  `tid` mediumint(8) unsigned NOT NULL,
-  `fid` smallint(6) unsigned NOT NULL,
-  `ifrecycle` tinyint(1) NOT NULL default '0',
-  PRIMARY KEY  (`tid`)
-) TYPE=MyISAM ;
-
-DROP TABLE IF EXISTS pw_activityvalue8;
-CREATE TABLE pw_activityvalue8 (
-  `tid` mediumint(8) unsigned NOT NULL,
-  `fid` smallint(6) unsigned NOT NULL,
-  `ifrecycle` tinyint(1) NOT NULL default '0',
-  PRIMARY KEY  (`tid`)
-) TYPE=MyISAM ;
-
-DROP TABLE IF EXISTS pw_activityvalue9;
-CREATE TABLE pw_activityvalue9 (
-  `tid` mediumint(8) unsigned NOT NULL,
-  `fid` smallint(6) unsigned NOT NULL,
-  `ifrecycle` tinyint(1) NOT NULL default '0',
-  PRIMARY KEY  (`tid`)
-) TYPE=MyISAM ;
-
-DROP TABLE IF EXISTS pw_activityvalue10;
-CREATE TABLE pw_activityvalue10 (
-  `tid` mediumint(8) unsigned NOT NULL,
-  `fid` smallint(6) unsigned NOT NULL,
-  `ifrecycle` tinyint(1) NOT NULL default '0',
-  PRIMARY KEY  (`tid`)
-) TYPE=MyISAM ;
-
-DROP TABLE IF EXISTS pw_activityvalue11;
-CREATE TABLE pw_activityvalue11 (
-  `tid` mediumint(8) unsigned NOT NULL,
-  `fid` smallint(6) unsigned NOT NULL,
-  `ifrecycle` tinyint(1) NOT NULL default '0',
-  PRIMARY KEY  (`tid`)
-) TYPE=MyISAM ;
-
-DROP TABLE IF EXISTS pw_activityvalue12;
-CREATE TABLE pw_activityvalue12 (
-  `tid` mediumint(8) unsigned NOT NULL,
-  `fid` smallint(6) unsigned NOT NULL,
-  `ifrecycle` tinyint(1) NOT NULL default '0',
-  PRIMARY KEY  (`tid`)
-) TYPE=MyISAM ;
-
-DROP TABLE IF EXISTS pw_activityvalue13;
-CREATE TABLE pw_activityvalue13 (
-  `tid` mediumint(8) unsigned NOT NULL,
-  `fid` smallint(6) unsigned NOT NULL,
-  `ifrecycle` tinyint(1) NOT NULL default '0',
-  PRIMARY KEY  (`tid`)
-) TYPE=MyISAM ;
-
-DROP TABLE IF EXISTS pw_activityvalue14;
-CREATE TABLE pw_activityvalue14 (
-  `tid` mediumint(8) unsigned NOT NULL,
-  `fid` smallint(6) unsigned NOT NULL,
-  `ifrecycle` tinyint(1) NOT NULL default '0',
-  PRIMARY KEY  (`tid`)
-) TYPE=MyISAM ;
-
-DROP TABLE IF EXISTS pw_activityvalue15;
-CREATE TABLE pw_activityvalue15 (
-  `tid` mediumint(8) unsigned NOT NULL,
-  `fid` smallint(6) unsigned NOT NULL,
-  `ifrecycle` tinyint(1) NOT NULL default '0',
-  PRIMARY KEY  (`tid`)
-) TYPE=MyISAM ;
-
-DROP TABLE IF EXISTS pw_activityvalue16;
-CREATE TABLE pw_activityvalue16 (
-  `tid` mediumint(8) unsigned NOT NULL,
-  `fid` smallint(6) unsigned NOT NULL,
-  `ifrecycle` tinyint(1) NOT NULL default '0',
-  PRIMARY KEY  (`tid`)
-) TYPE=MyISAM ;
-
-DROP TABLE IF EXISTS pw_activityvalue17;
-CREATE TABLE pw_activityvalue17 (
-  `tid` mediumint(8) unsigned NOT NULL,
-  `fid` smallint(6) unsigned NOT NULL,
-  `ifrecycle` tinyint(1) NOT NULL default '0',
-  PRIMARY KEY  (`tid`)
-) TYPE=MyISAM ;
+DROP TABLE IF EXISTS pw_weibo_referto;
+CREATE TABLE pw_weibo_referto (
+  `uid` int(10) unsigned NOT NULL,
+  `mid` int(10) unsigned NOT NULL default '0',
+  PRIMARY KEY  (`uid`,`mid`)
+) TYPE=MyISAM;
 
 DROP TABLE IF EXISTS pw_weibo_relations;
 CREATE TABLE pw_weibo_relations (
@@ -4791,158 +5098,68 @@ CREATE TABLE pw_weibo_relations (
   KEY `idx_uid_postdate` (`uid`,`postdate`)
 ) TYPE=MyISAM;
 
-DROP TABLE IF EXISTS pw_weibo_referto;
-CREATE TABLE pw_weibo_referto (
-  `uid` int(10) unsigned NOT NULL,
-  `mid` int(10) unsigned NOT NULL default '0',
-  PRIMARY KEY  (`uid`,`mid`)
+DROP TABLE IF EXISTS pw_windcode;
+CREATE TABLE pw_windcode (
+  id smallint(6) unsigned NOT NULL auto_increment,
+  name varchar(15) NOT NULL default '',
+  icon varchar(30) NOT NULL default '',
+  pattern varchar(30) NOT NULL default '',
+  replacement text NOT NULL,
+  param tinyint(3) NOT NULL default '0',
+  ifopen tinyint(3) NOT NULL default '0',
+  title varchar(30) NOT NULL default '',
+  descrip varchar(100) NOT NULL default '',
+  PRIMARY KEY  (id)
 ) TYPE=MyISAM;
 
-DROP TABLE IF EXISTS pw_weibo_content;
-CREATE TABLE pw_weibo_content (
-  `mid` int(10) unsigned NOT NULL auto_increment,
+DROP TABLE IF EXISTS pw_wordfb;
+CREATE TABLE pw_wordfb (
+  id smallint(6) unsigned NOT NULL auto_increment,
+  word varchar(100) NOT NULL default '',
+  wordreplace varchar(100) NOT NULL default '',
+  type tinyint(3) NOT NULL default '0',
+  wordtime int(10) unsigned NOT NULL default '0',
+  custom tinyint(3) NOT NULL default '0',
+  classid tinyint(3) unsigned NOT NULL default '0',
+  PRIMARY KEY  (id)
+) TYPE=MyISAM;
+
+DROP TABLE IF EXISTS pw_write_smiles;
+CREATE TABLE pw_write_smiles (
+  smileid smallint(6) unsigned NOT NULL auto_increment,
+  typeid smallint(6) unsigned NOT NULL default '0',
+  vieworder tinyint(3) unsigned  NOT NULL default '0',
+  path varchar(20) NOT NULL default '',
+  name varchar(20) NOT NULL default '',
+  tag varchar(30) NOT NULL default '',
+  desciption varchar(100) NOT NULL default '',
+  PRIMARY KEY  (smileid)
+) TYPE=MyISAM;
+
+DROP TABLE IF EXISTS pw_cache_members;
+CREATE TABLE pw_cache_members(
+    ckey char(32) not null default '',
+    cvalue text not null,
+    expire int(10) unsigned not null default '0',
+    primary key (ckey)
+) TYPE=MyISAM;
+
+DROP TABLE IF EXISTS pw_statistics_daily;
+CREATE TABLE IF NOT EXISTS `pw_statistics_daily` (
+  `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `name` char(32) NOT NULL DEFAULT '',
+  `typeid` int(6) UNSIGNED NOT NULL DEFAULT '0',
+  `date` date NOT NULL DEFAULT '0000-00-00',
+  `value` int(11) UNSIGNED NOT NULL DEFAULT '0',
+  `updatetime` int(11) UNSIGNED NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idx_name_date_typeid` (`name`,`date`,`typeid`)
+) TYPE=MyISAM;
+
+DROP TABLE IF EXISTS pw_weibo_bind;
+CREATE TABLE IF NOT EXISTS `pw_weibo_bind` (
   `uid` int(10) unsigned NOT NULL default '0',
-  `content` text NOT NULL,
-  `extra` text NOT NULL,
-  `contenttype` tinyint(1) UNSIGNED default '0' NOT NULL,
-  `type` tinyint(1) unsigned NOT NULL default '0',
-  `objectid` mediumint(8) unsigned NOT NULL default '0',
-  `replies` mediumint(8) unsigned NOT NULL default '0',
-  `transmit` mediumint(8) unsigned NOT NULL default '0',
-  `postdate` int(10) unsigned NOT NULL default '0',
-  PRIMARY KEY  (`mid`),
-  KEY `idx_uid_postdate` (`uid`,`postdate`),
-  KEY `idx_type_objectid` (`type`,`objectid`),
-  KEY `idx_postdate`( `postdate` )
+  `weibotype` varchar(20) NOT NULL,
+  `info` text NOT NULL,
+  UNIQUE KEY `uid_weibotype` (`uid`,`weibotype`)
 ) TYPE=MyISAM;
-
-DROP TABLE IF EXISTS pw_weibo_cnrelations;
-CREATE TABLE pw_weibo_cnrelations (
-  `cyid` int(10) unsigned NOT NULL default '0',
-  `mid` int(10) unsigned NOT NULL default '0',
-  PRIMARY KEY  (`cyid`,`mid`)
-) TYPE=MyISAM;
-
-DROP TABLE IF EXISTS pw_weibo_cmrelations;
-CREATE TABLE pw_weibo_cmrelations (
-  `cid` INT(10) UNSIGNED NOT NULL ,
-  `uid` INT(10) UNSIGNED NOT NULL ,
-  PRIMARY KEY ( `cid` , `uid` ),
-  KEY `dx_uid_cid`(uid,cid)
-) TYPE=MYISAM;
-
-DROP TABLE IF EXISTS pw_weibo_comment;
-CREATE TABLE pw_weibo_comment (
-  `cid` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
-  `uid` INT(10) UNSIGNED NOT NULL ,
-  `mid` INT(10) UNSIGNED NOT NULL ,
-  `content` VARCHAR(250) NOT NULL ,
-  `extra` TEXT NOT NULL,
-  `postdate` INT(10) UNSIGNED NOT NULL ,
-  KEY idx_mid_postdate( `mid` , `postdate` )
-) TYPE=MYISAM;
-
-
-DROP TABLE IF EXISTS pw_pagecache;
-CREATE TABLE pw_pagecache (
-  `sign` char(32) NOT NULL,
-  `type` varchar(30) NOT NULL,
-  `data` text NOT NULL,
-  `cachetime` int(10) unsigned NOT NULL,
-  PRIMARY KEY (`sign`),
-  KEY `type` (`type`)
-) TYPE=MyISAM;
-
-
-DROP TABLE IF EXISTS pw_cms_article;
-CREATE TABLE pw_cms_article (
-  `article_id` mediumint(8) NOT NULL AUTO_INCREMENT,
-  `subject` varchar(100) NOT NULL DEFAULT '',
-  `descrip` varchar(255) NOT NULL DEFAULT '',
-  `author` varchar(15) NOT NULL DEFAULT '',
-  `username` varchar(15) NOT NULL DEFAULT '',
-  `userid` int(10) NOT NULL,
-  `jumpurl` varchar(255) NOT NULL DEFAULT '',
-  `frominfo` varchar(100) NOT NULL DEFAULT '',
-  `fromurl` varchar(255) NOT NULL DEFAULT '',
-  `column_id` smallint(6) NOT NULL,
-  `ifcheck` tinyint(1) NOT NULL DEFAULT 1,
-  `postdate` int(10) NOT NULL DEFAULT 0,
-  `modifydate` int(10) NOT NULL DEFAULT 0,
-  `ifattach` tinyint(1) NOT NULL DEFAULT 0,
-  `sourcetype` varchar(30) NOT NULL DEFAULT '',
-  `sourceid` int(10) NOT NULL DEFAULT 0,
-  PRIMARY KEY (`article_id`),
-  KEY `idx_columnid` (`column_id`)
-) TYPE=MyISAM;
-
-DROP TABLE IF EXISTS pw_cms_articlecontent;
-CREATE TABLE pw_cms_articlecontent (
-  `article_id` mediumint(8) NOT NULL,
-  `content` text NOT NULL,
-  `relatearticle` text NOT NULL,
-  PRIMARY KEY (`article_id`)
-) TYPE=MyISAM;
-
-DROP TABLE IF EXISTS pw_cms_articleextend;
-CREATE TABLE pw_cms_articleextend (
-  `article_id` mediumint(8) NOT NULL,
-  `hits` int(10) NOT NULL DEFAULT 0,
-  PRIMARY KEY (`article_id`)
-) TYPE=MyISAM;
-
-
-DROP TABLE IF EXISTS pw_cms_attach;
-CREATE TABLE pw_cms_attach (
-  `attach_id` mediumint(8) NOT NULL AUTO_INCREMENT,
-  `name` varchar(100) NOT NULL DEFAULT '',
-  `descrip` varchar(255) NOT NULL DEFAULT '',
-  `article_id` mediumint(8) NOT NULL,
-  `type` varchar(10) NOT NULL DEFAULT '',
-  `size` int(10) NOT NULL DEFAULT 0,
-  `uploadtime` int(10) NOT NULL DEFAULT 0,
-  `attachurl` varchar(255) NOT NULL DEFAULT '',
-  `ifthumb` tinyint(1) NOT NULL DEFAULT 0,
-  PRIMARY KEY (`attach_id`),
-  KEY `idx_articleid` (`article_id`)
-) TYPE=MyISAM;
-
-DROP TABLE IF EXISTS pw_cms_column;
-CREATE TABLE pw_cms_column (
-  `column_id` smallint(6) NOT NULL AUTO_INCREMENT,
-  `parent_id` smallint(6) NOT NULL,
-  `name` varchar(50) NOT NULL DEFAULT '',
-  `order` smallint(6) NOT NULL DEFAULT 0,
-  `allowoffer` tinyint(1) NOT NULL DEFAULT 0,
-  `seotitle` varchar(255) NOT NULL DEFAULT '',
-  `seodesc` varchar(255) NOT NULL DEFAULT '',
-  `seokeywords` varchar(255) NOT NULL DEFAULT '',
-  PRIMARY KEY (`column_id`)
-) TYPE=MyISAM;
-
-DROP TABLE IF EXISTS pw_cms_purview;
-CREATE TABLE pw_cms_purview (
-  `purview_id` smallint(6) NOT NULL AUTO_INCREMENT,
-  `username` varchar(15) NOT NULL DEFAULT '',
-  `super` tinyint(1) NOT NULL DEFAULT 0,
-  `columns` text NOT NULL,
-  PRIMARY KEY (`purview_id`)
-) TYPE=MyISAM;
-
-DROP TABLE IF EXISTS pw_attention_blacklist;
-CREATE TABLE pw_attention_blacklist (
-  `uid` int(10) unsigned NOT NULL,
-  `touid` int(10) unsigned NOT NULL,
-  PRIMARY KEY  (`uid`,`touid`)
-) TYPE=MyISAM;
-
-
-
-
-
-
-
-
-
-
-

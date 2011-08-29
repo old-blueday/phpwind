@@ -1,0 +1,258 @@
+<!--<?php
+require_once uTemplate::PrintEot('header');
+require_once uTemplate::PrintEot('profile_left');
+print <<<EOT
+-->
+<div class="contUser">
+        	<div class="p15">
+            	<h4 class="site"><span>帐号</span></h4>
+<!--
+EOT;
+require_once uTemplate::PrintEot('info_nav');
+print <<<EOT
+-->
+				<table width="100%" height="450">
+				<tr><td class="vt"><div class="p15">
+					<form id="creator" name="creator" action="profile.php?action=modify" method="post" onsubmit="return setFaceLen()">
+					<input type="hidden" name="verify" value="$verifyhash" />
+					<input type="hidden" value="2" name="step" />
+					<input type="hidden" id="info_type" name="info_type" value="base" />
+<div id="info_base">
+    <table width="100%" class="setTable">
+        <tr>
+            <th class="th">
+                性别
+            </th>
+            <td class="td">
+                <label for="progender0" class="mr20">
+                    <input type="radio" id="progender0" name="progender" value="0" $sexselect[0] /> 
+                    保密
+                </label>
+                <label for="progender1" class="mr20">
+                    <input type="radio" id="progender1" name="progender" value="1" $sexselect[1] /> 
+                    男
+                </label>
+                <label for="progender2" class="mr20">
+                    <input type="radio" id="progender2" name="progender" value="2" $sexselect[2] /> 
+                    女
+                </label>
+            </td>
+        </tr>
+        <tr>
+            <th class="th">
+                生日
+            </th>
+            <td class="td">
+                <select name="proyear">
+<!--
+EOT;
+if($rg_timestart < $rg_timeend){
+for($i=$rg_timestart;$i<=$rg_timeend;$i++){print <<<EOT
+-->
+<option value="$i" $yearslect[$i]>$i </option>
+<!--
+EOT;
+}}else{
+for($i=$rg_timestart;$i>=$rg_timeend;$i--){print <<<EOT
+-->
+<option value="$i" $yearslect[$i]>$i </option>
+<!--
+EOT;
+}}print <<<EOT
+-->
+                </select>
+                <span class="p_lr_10">年</span>
+                <select name="promonth">
+<!--
+EOT;
+for($i=1;$i<=12;$i++){print <<<EOT
+-->
+<option value="$i" $monthslect[$i]>$i </option>
+<!--
+EOT;
+}print <<<EOT
+-->
+                </select>
+                <span class="p_lr_10">月</span>
+                <select name="proday">
+<!--
+EOT;
+for($i=1;$i<=31;$i++){print <<<EOT
+-->
+<option value="$i" $dayslect[$i]>$i </option>
+<!--
+EOT;
+}print <<<EOT
+-->
+                </select>
+                <span class="p_lr_10">日</span>
+            </td>
+        </tr>
+<!--
+EOT;
+foreach($custominfo as $key => $value){print <<<EOT
+-->
+        <tr>
+            <th class="th">
+                $value[0]
+            </th>
+            <td class="td">
+                <input class="input input_wa" type="text" name="customdata[$key]" value="{$customdata[$key]}" />
+            </td>
+        </tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+        <tr>
+            <th class="th">
+                来自
+            </th>
+            <td class="td">
+                <input class="input input_wa" type="text" maxlength="14" name="profrom" value="$userdb[location]" />
+            </td>
+        </tr>
+        <tr>
+            <th class="th">
+                个人主页
+            </th>
+            <td class="td">
+                <input class="input input_wb mr10" type="text" maxlength="75" name="prohomepage" value="$userdb[site]" />
+                <span>
+                    建议加 http://开头
+                </span>
+            </td>
+        </tr>
+<!--
+EOT;
+if($_G[allowhonor]){print <<<EOT
+-->
+        <tr>
+            <th class="th">
+                个性签名
+            </th>
+            <td class="td">
+                <input class="input input_wb mr10" type="text" name="prohonor" value="$userdb[honor]" />（将在我的首页和帖子页面用户信息处显示）
+            </td>
+        </tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+        <tr>
+            <th class="th">
+                自我简介
+            </th>
+            <td class="td">
+                <textarea name="prointroduce" id="prointroduce" class="textareaA mb5">$userdb[introduce]</textarea>
+                <p id="prointroduce_warn">
+                    限500字节
+                </p>
+            </td>
+        </tr>
+        <tr>
+            <th class="th">
+                帖子签名
+            </th>
+            <td class="td">
+                <textarea name="prosign" id="prosign" class="textareaA mb5">$userdb[signature]</textarea>
+                <p>
+                    （将在每个帖子下方显示，<span id="prosign_warn">限{$_G[signnum]}字节</span>）
+                </p>
+            </td>
+        </tr>
+<!--
+EOT;
+if($db_signmoney && false!==strpos($db_signgroup,",$groupid,")){print <<<EOT
+-->
+        <tr>
+            <th class="th">
+                签名展示功能
+            </th>
+            <td class="td">
+                <p class="mb5">
+                    <label for="showsign1" class="mr20">
+                        <input type="radio" id="showsign1" name="showsign" value="1" $prosign_Y/> 
+                        开启
+                    </label>
+                    <label for="showsign0">
+                        <input type="radio" id="showsign0" name="showsign" value="0" $prosign_N/> 
+                        关闭
+                    </label>
+                </p>
+                <p>
+                    （签名显示一天需要相应{$credit->cType[$db_signcurtype]}<b>$db_signmoney</b>{$credit->cUnit[$db_signcurtype]}）
+                </p>
+            </td>
+        </tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+        <tr>
+            <th class="th">
+                时区选择
+<!--选择您所在的时区<br />将时间显示为您当地时间-->
+            </th>
+            <td class="td">
+                <select name="timedf" class="select_wa">
+                    <option value="0">使用默认</option>
+<!--
+EOT;
+include(R_P.'template/admin/timezone.htm');print <<<EOT
+-->
+                </select>
+            </td>
+        </tr>
+		<tr>
+		<th class="th">支付宝帐号</th>
+		<td class="td">
+<input type="text" name="alipay" class="input input_wa" value="{$tradeinfo[alipay]}">
+		</td>
+	</tr>
+        <tr>
+            <th class="th">
+                是否接受邮件
+            </th>
+            <td class="td">
+                <label for="proreceivemail1" class="mr20">
+                    <input type="radio" id="proreceivemail1" name="proreceivemail" value="1" $email_Y /> 
+                    接收邮件
+                </label>
+                <label for="proreceivemail0">
+                    <input type="radio" id="proreceivemail0" name="proreceivemail" value="0" $email_N /> 
+                    不接收邮件
+                </label>
+            </td>
+        </tr>
+    </table>
+    <div class="tac" style=" padding:1em">
+        <span class="btn"><span>
+                <button type="submit">
+                    保存资料
+                </button>
+            </span></span>
+    </div>
+    <script language="JavaScript">
+        var charset = '$db_charset';
+        var signnum = '$_G[signnum]' * 1;
+        initCheckTextNum('prointroduce', 'prointroduce_warn', 500);
+        if (signnum) {
+            initCheckTextNum('prosign', 'prosign_warn', signnum);
+        }
+        else {
+            getObj('prosign_warn').innerHTML = '不限字数';
+        }
+    </script>
+</div>
+<div id="userbinding-node" style="display:none">
+</form>
+</div></td></tr></table>
+            </div>
+        </div>
+<div class="u-m-bg"></div>
+<script type="text/javascript" src = "lang/wind/u/default/info.js"></script>
+<!--
+EOT;
+require_once uTemplate::printEot('footer');
+?>-->

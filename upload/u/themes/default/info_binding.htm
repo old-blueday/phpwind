@@ -1,0 +1,145 @@
+<!--<?php
+require_once uTemplate::PrintEot('header');
+require_once uTemplate::PrintEot('profile_left');
+print <<<EOT
+-->
+<div class="contUser">
+        	<div class="p15">
+            	<h4 class="site"><span>帐号</span></h4>
+<!--
+EOT;
+require_once uTemplate::PrintEot('info_nav');
+print <<<EOT
+-->
+				<table width="100%" height="450">
+				<tr><td class="vt"><div class="p15" id="userbinding-node">
+<!--
+EOT;
+if (($_G['userbinding'] || $ubinding) && $ubindingneedupdatepwd) {
+print <<<EOT
+-->
+						<form action="profile.php?action=modify&" method="post">
+                        <input type="hidden" name="verify" value="$verifyhash" />
+                        <input type="hidden" value="5" name="step" />
+                        <input type="hidden" id="info_type" name="info_type" value="binding" />
+            <p class="wrongTip mb10">您的帐号密码与帐号绑定中的密码不一致，请输入帐号密码来更新帐号绑定中的密码</p>
+							<table width="100%" class="setTable">
+								<tr>
+									<th class="th">帐号密码</th>
+									<td class="td"><input type="password" name="bindpassword" class="input input_wa" /></td>
+								</tr>
+								<tr>
+									<th>&nbsp;</th>
+									<td class="td"><span class="btn"><span><button type="submit">更新</button></span></span></td>
+								</tr>
+							</table>
+						</form>
+<!--
+EOT;
+}
+
+if ($_G['userbinding'] && !$ubindingneedupdatepwd) {print <<<EOT
+-->
+						<form action="profile.php?action=modify&" method="post">
+                        <input type="hidden" name="verify" value="$verifyhash" />
+                        <input type="hidden" id="info_type" name="info_type" value="binding" />
+						<input type="hidden" value="3" name="step" />
+            <h5 class="h5"><strong>添加其他帐号</strong></h5>
+							<table width="100%">
+								<tr class="tr3">
+									<td>用户名</td>
+									<td><input type="text" name="username" class="input input_wa" /></td>
+								</tr>
+								<tr class="tr3">
+									<td>密码</td>
+									<td><input type="password" name="password" class="input input_wa" /></td>
+								</tr>
+<!--
+EOT;
+if ($db_ifsafecv) {
+print <<<EOT
+-->
+								<tr class="tr3">
+									<td>安全问题</td>
+									<td><select name="question" class="select_wa" onchange="showcustomquest(this.value,'customquest2')"><option value="0">无安全问题</option><option value="1">我爸爸的出生地</option><option value="2">我妈妈的出生地</option><option value="3">我的小学校名</option><option value="4">我的中学校名</option><option value="5">我最喜欢的运动</option><option value="6">我最喜欢的歌曲</option><option value="7">我最喜欢的电影</option><option value="8" >我最喜欢的颜色</option><option value="-1">自定义问题</option></select> <input id="customquest2" style="display:none" type="text" name="customquest" class="input input_wa" tabindex="5" /></td>
+								</tr>
+								<tr class="tr3">
+									<td>您的答案</td>
+									<td class="td"><input type="text" name="answer" class="input input_wa" /></td>
+								</tr>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+								<tr>
+									<td></td>
+									<td style="padding:10px 2px;"><span class="btn"><span><button type="submit">添 加</button></span></span></td>
+								</tr>
+							</table>
+						</form>
+<!--
+EOT;
+}
+if ($ubinding && !$ubindingneedupdatepwd) {
+	$ltitle = L::config('ltitle', 'level');
+print <<<EOT
+-->
+						<form action="profile.php?action=modify&" method="post">
+						<input type="hidden" name="verify" value="$verifyhash" />
+						<input type="hidden" value="4" name="step" />
+						<input type="hidden" value="binding" name="info_type" />
+						<h5 class="h5 mb10"><strong>已绑定帐户</strong></h5>
+						<table width="100%" class="tA">
+							<tr class="tr">
+								<td>用户名</td>
+								<td>用户组</td>
+								<td>注册时间</td>
+								<td>发帖数</td>
+								<td>选择</td>
+							</tr>
+<!--
+EOT;
+	foreach ($ubinding as $key => $value) {print <<<EOT
+-->
+							<tr>
+									<td><a href="{$db_userurl}$value[uid]" target="_blank">$value[username]</a></td>
+									<td>{$ltitle[$value[groupid]]}</td>
+									<td>$value[regdate]</td>
+									<td><a href="apps.php?q=article&uid=$value[uid]" target="_blank">$value[postnum]</a></td>
+									<td><input type="checkbox" name="selid[]" value="$value[uid]" /></td>
+							</tr>
+<!--
+EOT;
+	}
+print <<<EOT
+-->
+						</table>
+						<div class="tac" style="padding:1em">
+							<span class="bt"><span><button type="button" onclick="CheckAll(this.form)">全 选</button></span></span>
+							<span class="btn"><span><button type="submit">解除绑定</button></span></span>
+						</div>
+						</form>
+
+<!--
+EOT;
+}
+print <<<EOT
+-->
+</div></td></tr></table>
+		</div>
+</div>
+<script type="text/javascript" src = "js/info.js"></script>
+<script language="JavaScript">
+var display = '$display';
+~function() {
+	var info_type = FetchCookie('pro_tab');
+	DelCookie('pro_tab');
+	if (!info_type) info_type = '$info_type';
+	selectTab(info_type);
+}();
+</script>
+<!--
+EOT;
+require_once uTemplate::printEot('footer');
+?>-->

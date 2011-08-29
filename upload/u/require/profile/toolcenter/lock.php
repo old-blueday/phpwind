@@ -15,11 +15,12 @@ if($tooldb['type']!=1){
 if($tpcdb['authorid'] != $winduid){
 	Showmsg('tool_authorlimit');
 }
-$db->update("UPDATE pw_threads SET locked='1',toolinfo=".pwEscape($tooldb['name'],false)."WHERE tid=".pwEscape($tid));
-$threads = L::loadClass('Threads', 'forum');
-$threads->delThreads($tid);
+//$db->update("UPDATE pw_threads SET locked='1',toolinfo=".S::sqlEscape($tooldb['name'],false)."WHERE tid=".S::sqlEscape($tid));
+pwQuery::update('pw_threads', 'tid=:tid', array($tid), array('locked'=>1, 'toolinfo'=>$tooldb['name']));
+//* $threads = L::loadClass('Threads', 'forum');
+//* $threads->delThreads($tid);
 
-$db->update("UPDATE pw_usertool SET nums=nums-1 WHERE uid=".pwEscape($winduid)."AND toolid=".pwEscape($toolid));
+$db->update("UPDATE pw_usertool SET nums=nums-1 WHERE uid=".S::sqlEscape($winduid)."AND toolid=".S::sqlEscape($toolid));
 $logdata=array(
 	'type'		=>	'use',
 	'descrip'	=>	'tool_11_descrip',

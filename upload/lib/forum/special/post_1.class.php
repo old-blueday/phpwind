@@ -39,7 +39,7 @@ class postSpecial {
 
 	function resetInfo($tid, $atcdb) {
 		global $timestamp;
-		$reset = $this->db->get_one("SELECT * FROM pw_polls WHERE tid=" . pwEscape($tid));
+		$reset = $this->db->get_one("SELECT * FROM pw_polls WHERE tid=" . S::sqlEscape($tid));
 		$reset['votearray'] = unserialize($reset['voteopts']);
 		$reset['multi'] = $reset['ifmodify'] = $reset['ifpreview'] = '';
 		$reset['multiple'] && $reset['multi'] = 'checked';
@@ -77,15 +77,15 @@ class postSpecial {
 
 	function setUp($vtcount) {
 		global $timestamp;
-		$regdatelimit = GetGP('regdatelimit', 'P');
-		$multiplevote = intval(GetGP('multiplevote', 'P'));
-		$mostvotes = intval(GetGP('mostvotes', 'P'));
-		$timelimit = intval(GetGP('timelimit', 'P'));
-		$modifiable = intval(GetGP('modifiable', 'P'));
-		$previewable = intval(GetGP('previewable', 'P'));
-		$leastvotes = intval(GetGP('leastvotes', 'P'));
-		$postnumlimit = intval(GetGP('postnumlimit', 'P'));
-		$creditlimit = GetGP('creditlimit', 'P');
+		$regdatelimit = S::getGP('regdatelimit', 'P');
+		$multiplevote = intval(S::getGP('multiplevote', 'P'));
+		$mostvotes = intval(S::getGP('mostvotes', 'P'));
+		$timelimit = intval(S::getGP('timelimit', 'P'));
+		$modifiable = intval(S::getGP('modifiable', 'P'));
+		$previewable = intval(S::getGP('previewable', 'P'));
+		$leastvotes = intval(S::getGP('leastvotes', 'P'));
+		$postnumlimit = intval(S::getGP('postnumlimit', 'P'));
+		$creditlimit = S::getGP('creditlimit', 'P');
 
 		if (empty($multiplevote)) {
 			$mostvotes = 1;
@@ -118,38 +118,39 @@ class postSpecial {
 	}
 
 	function initData() {
-		$vt_select = explode("\n", Char_cv(GetGP('vt_select', 'P')));
+		$vt_select = explode("\n", S::escapeChar(S::getGP('vt_select', 'P')));
 		$vtcount = $this->setOpts($vt_select);
 		$this->setUp($vtcount);
 	}
 
 	function insertData($tid) {
 		$this->data['tid'] = $tid;
-		$this->db->update("INSERT INTO pw_polls SET " . pwSqlSingle($this->data));
+		$this->db->update("INSERT INTO pw_polls SET " . S::sqlSingle($this->data));
 	}
 
 	function modifyData($tid) {
-		$voteopts = $this->db->get_value("SELECT voteopts FROM pw_polls WHERE tid=" . pwEscape($tid));
+		$voteopts = $this->db->get_value("SELECT voteopts FROM pw_polls WHERE tid=" . S::sqlEscape($tid));
 		$voteopts = unserialize($voteopts);
-		$vt_selarray = Char_cv(GetGP('vt_selarray', 'P'));
+		$vt_selarray = S::escapeChar(S::getGP('vt_selarray', 'P'));
 
 		if ($this->post->_G['modifyvote'] && is_array($voteopts) && is_array($vt_selarray)) {
 			$vtcount = $this->setOpts($vt_selarray, $voteopts);
 			$this->setUp($vtcount);
 		}
-		if (GetGP('vote_close')) {
-			$this->db->update("UPDATE pw_threads SET state='1' WHERE tid=" . pwEscape($tid));
-
+		if (S::getGP('vote_close')) {
+			//$this->db->update("UPDATE pw_threads SET state='1' WHERE tid=" . S::sqlEscape($tid));
+			pwQuery::update('pw_threads', 'tid=:tid', array($tid), array('state'=>1));
+			
 			//临时修改，待改进
-			$threads = L::loadClass('Threads', 'forum');
-			$threads->delThreads($tid);
+			//* $threads = L::loadClass('Threads', 'forum');
+			//* $threads->delThreads($tid);
 		}
 	}
 
 	function updateData($tid) {
 		if ($this->data['voteopts']) {
 			$this->data['tid'] = $tid;
-			$this->db->update("UPDATE pw_polls SET " . pwSqlSingle($this->data) . ' WHERE tid=' . pwEscape($tid));
+			$this->db->update("UPDATE pw_polls SET " . S::sqlSingle($this->data) . ' WHERE tid=' . S::sqlEscape($tid));
 		}
 	}
 }

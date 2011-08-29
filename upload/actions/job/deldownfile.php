@@ -2,7 +2,7 @@
 !defined('P_W') && exit('Forbidden');
 
 PostCheck();
-InitGP(array(
+S::gp(array(
 	'aid',
 	'page'
 ));
@@ -23,7 +23,7 @@ require_once (R_P . 'require/forum.php');
 require_once (R_P . 'require/updateforum.php');
 wind_forumcheck($foruminfo);
 
-$isGM = CkInArray($windid, $manager); //获取管理权限
+$isGM = S::inArray($windid, $manager); //获取管理权限
 $isBM = admincheck($foruminfo['forumadmin'], $foruminfo['fupadmin'], $windid);
 if ($isGM || pwRights($isBM, 'delattach')) {
 	$admincheck = 1;
@@ -38,13 +38,16 @@ if ($groupid != 'guest' && ($admincheck || $attach['uid'] == $winduid)) {
 	$ifaid = $ifupload === false ? 0 : 1;
 	if ($pid) {
 		$pw_posts = GetPtable('N', $tid);
-		$db->update("UPDATE $pw_posts SET aid=" . pwEscape($ifaid, false) . "WHERE tid=" . pwEscape($tid, false) . "AND pid=" . pwEscape($pid, false));
+		//$db->update("UPDATE $pw_posts SET aid=" . S::sqlEscape($ifaid, false) . "WHERE tid=" . S::sqlEscape($tid, false) . "AND pid=" . S::sqlEscape($pid, false));
+		pwQuery::update($pw_posts, 'tid=:tid AND pid=:pid', array($tid, $pid), array('aid' => $ifaid));
 	} else {
 		$pw_tmsgs = GetTtable($tid);
-		$db->update("UPDATE $pw_tmsgs SET aid=" . pwEscape($ifaid, false) . " WHERE tid=" . pwEscape($tid, false));
+		//* $db->update("UPDATE $pw_tmsgs SET aid=" . S::sqlEscape($ifaid, false) . " WHERE tid=" . S::sqlEscape($tid, false));
+		pwQuery::update($pw_tmsgs, 'tid=:tid', array($tid), array('aid'=>$ifaid));
 	}
 	$ifupload = (int) $ifupload;
-	$db->update('UPDATE pw_threads SET ifupload=' . pwEscape($ifupload) . ' WHERE tid=' . pwEscape($tid));
+	//$db->update('UPDATE pw_threads SET ifupload=' . S::sqlEscape($ifupload) . ' WHERE tid=' . S::sqlEscape($tid));
+	pwQuery::update('pw_threads', 'tid=:tid', array($tid), array('ifupload'=>$ifupload));
 	if ($foruminfo['allowhtm'] && $page == 1) {
 		$StaticPage = L::loadClass('StaticPage');
 		$StaticPage->update($tid);

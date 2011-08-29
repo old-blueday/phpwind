@@ -2,11 +2,17 @@
 include_once PrintEot('left');
 print<<<EOT
 -->
-<h2 class="h1 mb10"><a href="$admin_file?adminjob=app&admintype=appslist">返回基础应用列表</a></h2>
+<!-- <h2 class="h1 mb10"><a href="$admin_file?adminjob=app&admintype=appslist">返回基础应用列表</a></h2> -->
 <!--
 EOT;
 if(!$action){print <<<EOT
 -->
+<div class="nav3 mb10">
+	<ul class="cc">
+		<li class="current"><a href="$basename">日志设置</a></li>
+		<li><a href="$admin_file?adminjob=apps&admintype=diary_manage" onclick="openNewUrl('diary_manage','日志管理',this.href);return false;">内容管理</a></li>
+	</ul>
+</div>
 <form action="$basename&" method="post">
   <input type="hidden" name="step" value="3">
   <h2 class="h1">日志基本设置</h2>
@@ -22,7 +28,7 @@ if(!$action){print <<<EOT
                     </ul>
                 </div>
             </td>
-            <td class="td2">&nbsp;</td>
+            <td class="td2"><div class="help_a">开启后，日志功能才可以使用</div></td>
         </tr>
         <tr class="tr1 vt">
           <td class="td1">认证码</td>
@@ -34,7 +40,7 @@ if(!$action){print <<<EOT
                     </ul>
                 </div>
 		  </td>
-          <td class="td2">&nbsp;</td>
+          <td class="td2"><div class="help_a">开启后，发表日志时需要填写认证码</div></td>
         </tr>
         <tr class="tr1 vt">
          <td class="td1">验证问题</td>
@@ -46,69 +52,69 @@ if(!$action){print <<<EOT
                     </ul>
                 </div>
           </td>
-          <td class="td2">&nbsp;</td>
+          <td class="td2"><div class="help_a">开启后，发表日志时需要填写验证问题</div></td>
         </tr>
         <tr class="tr1 vt">
          <td class="td1">允许发表日志的用户组</td>
           <td class="td2">
             	$creategroup
           </td>
-          <td class="td2">&nbsp;</td>
+          <td class="td2"><div class="help_a">指定可以使用日志功能的用户组</div></td>
         </tr>
         <tr class="tr1 vt">
          <td class="td1">最多允许发表日志</td>
           <td class="td2"><input type="text" name="config[diarylimit]" class="input input_wa" value="$o_diarylimit"></td>
-          <td class="td2">&nbsp;</td>
+          <td class="td2"><div class="help_a">指定每个用户最多可发表的日志数</div></td>
         </tr>
         <tr class="tr1 vt">
          <td class="td1">日志灌水预防</td>
           <td class="td2"><input type="text" name="config[diarypertime]" class="input input_wa" value="$o_diarypertime"></td>
-          <td class="td2">&nbsp;</td>
+          <td class="td2"><div class="help_a">单位为秒，设定可以连续发表日志的最短时间间隔。设为0则不做限制</div></td>
         </tr>
         <tr class="tr1 vt">
          <td class="td1">列表页日志内容显示字节</td>
           <td class="td2"><input type="text" name="config[shownum]" class="input input_wa" value="$o_shownum"></td>
-          <td class="td2">&nbsp;</td>
+          <td class="td2"><div class="help_a">指定日志列表中每条日志内容摘要能显示出的最多字节数。0表示全篇显示</div></td>
         </tr>
         <tr class="tr1 vt">
-         <td class="td1">上传附件</td>
+         <td class="td1"></td>
           <td class="td2">
           	<div class="admin_table_b">
                 <table cellpadding="0" cellspacing="0">
                   <tr>
                     <td>后缀名(小写)</td>
-                    <td>最大尺寸(KB)</td>
-                    <td>&nbsp;</td>
+                    <td>最大尺寸(KB)</td>   					
                   </tr>
-                  <tr>
-                    <td><input name="" type="text"  value="jpg"class="input input_wc" /></td>
+
+				  <tr>
+                    <td><input name="" type="text"  value="jpg"class="input input_wc" disabled /></td>
                     <td><input name="uploadsize[jpg]" value="$uploadsize[jpg]" class="input input_wc" /></td>
                     <td>&nbsp;</td>
                   </tr>
                   <tr>
-                    <td><input name="" type="text"  value="jpeg"class="input input_wc" /></td>
+                    <td><input name="" type="text"  value="jpeg"class="input input_wc" disabled /></td>
                     <td><input name="uploadsize[jpeg]" value="$uploadsize[jpeg]" class="input input_wc" /></td>
                     <td>&nbsp;</td>
                   </tr>
                   <tr>
-                    <td><input name="" type="text"  value="png"class="input input_wc" /></td>
+                    <td><input name="" type="text"  value="png"class="input input_wc" disabled /></td>
                     <td><input name="uploadsize[png]" value="$uploadsize[png]" class="input input_wc" /></td>
                     <td>&nbsp;</td>
                   </tr>
                   <tr>
-                    <td><input name="" type="text"  value="gif"class="input input_wc" /></td>
+                    <td><input name="" type="text"  value="gif"class="input input_wc" disabled /></td>
                     <td><input name="uploadsize[gif]" value="$uploadsize[gif]" class="input input_wc" /></td>
                     <td>&nbsp;</td>
                   </tr>
                   <tr>
-                    <td><input name="" type="text"  value="bmp"class="input input_wc" /></td>
+                    <td><input name="" type="text"  value="bmp"class="input input_wc" disabled /></td>
                     <td><input name="uploadsize[bmp]" value="$uploadsize[bmp]" class="input input_wc"></td>
                     <td>&nbsp;</td>
                   </tr>
                 </table>
             </div>
           </td>
-          <td class="td2">&nbsp;</td>
+          <td class="td2"><div class="help_a">指定每种附件类型可上传的尺寸上限</div></td>
         </tr>
         <tr class="tr1 vt">
        	  <td class="td1">附件保存方式</td>
@@ -120,7 +126,7 @@ if(!$action){print <<<EOT
               <option value="3" $attachdir_ck[3]>按天存入不同目录</option>
             </select>
           </td>
-          <td class="td2">&nbsp;</td>
+          <td class="td2"><div class="help_a">指定附件上传到服务器后，在服务器上的保存方式</div></td>
         </tr>
       </table>
   </div>
@@ -209,7 +215,7 @@ print<<<EOT
     <tr class="tr1 vt">
       <td class="td1">发表日期</td>
       <td class="td2">
-      <div class="input_img fl"><i onclick="this.nextSibling.onclick()" class="input_time" title="选择时间">选择时间</i> <input type="text" name="postdate_s" value="$postdate_s" id="postdate_s" onclick="javascript:ShowCalendar(this.id)"></div><span class="p_lr_10 fl">至</span><div class="input_img fl"><i class="input_time" title="选择时间">选择时间</i><input type="text" name="postdate_e" id="postdate_e" value="$postdate_e" onclick="javascript:ShowCalendar(this.id)"></div>
+      <div class="input_img fl"><i onclick="this.nextSibling.onclick()" class="input_time" title="选择时间">选择时间</i><input type="text" name="postdate_s" value="$postdate_s" id="postdate_s" onclick="javascript:ShowCalendar(this.id)"></div><span class="p_lr_10 fl">至</span><div class="input_img fl"><i class="input_time" title="选择时间" onclick="ShowCalendar('postdate_e');">选择时间</i><input type="text" name="postdate_e" id="postdate_e" value="$postdate_e" onclick="javascript:ShowCalendar(this.id)"></div>
         </td>
         <td class="td2">&nbsp;</td>
     </tr>
@@ -258,7 +264,9 @@ print<<<EOT
 <script type="text/javascript">
 getObj('advanceSearchButton').onclick = function() {
 	displayElement('advanceSearchBody','advanceSearchButton');
-	getObj('searchDisplay').value = getObj('advanceSearchBody').style.display;
+	if(getObj('searchDisplay')){
+		getObj('searchDisplay').value = getObj('advanceSearchBody').style.display;
+	}
 };
 </script>
 
@@ -278,13 +286,13 @@ getObj('advanceSearchButton').onclick = function() {
   <input type="hidden" name="sc" value="$sc">
   <input type="hidden" name="perpage" value="$perpage">
   <input type="hidden" name="page" value="$page">
-  <h2 class="h1"><span class="mr10">文章列表</span></h2>
+  <h2 class="h1"><span class="mr10">日志列表</span></h2>
   <div class="admin_table mb10">
   <table width="100%" cellspacing="0" cellpadding="0">
     <tr class="tr2 vt td_bgB">
       <td width="30"><span onclick="CheckAll(document.FORM)" class="cp">全选</span></td>
-      <td>标 题</td>
-      <td>作 者</td>
+      <td>标题</td>
+      <td>作者</td>
       <td>隐私权限</td>
       <td>发表日期</td>
       <td>浏览数</td>
@@ -308,7 +316,7 @@ print <<<EOT
     <tr class="tr1 vt">
       <td class="td2"><input type="checkbox" name="selid[]" value="$value[did]"></td>
       <td class="td2"><a href="apps.php?q=diary&a=detail&did=$value[did]&uid=$value[uid]" target="_blank">$value[subject]</a></td>
-      <td class="td2"><a href="u.php?uid=$value[uid]" target="_blank">$value[username]</td>
+      <td class="td2"><a href="{$db_userurl}$value[uid]" target="_blank">$value[username]</td>
       <td class="td2">{$privacy[$value[privacy]]}</td>
       <td class="td2">$value[postdate]</td>
       <td class="td2">$value[r_num]</td>
@@ -337,6 +345,7 @@ EOT;
   </div>
   <div class="mt10 cc">$pages</div>
   <div class="mb10 tac">
+	<span class="bt"><span><button type="button" onclick="CheckAll(document.FORM)">全 选</button></span></span>
       <span class="btn"><span><button type="submit" onclick="return Checkdel();">删 除</button></span></span>
    </div>
 </form>

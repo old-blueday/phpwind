@@ -17,7 +17,7 @@
 		</select>
 		</div>
 </form>
-		<img src="$imgpath/$stylepath/thread/home-old.gif" align="absmiddle" />&nbsp;<a href="$db_bfn" title="$db_bbsname">$db_bbsname</a><em>&gt;</em>
+<img src="$imgpath/$stylepath/thread/home.gif" class="breadHome" /><em class="breadEm"></em><a href="$db_bfn" title="$db_bbsname">$db_bbsname</a><em>&gt;</em>
 <!--
 EOT;
 if(!$owner){
@@ -123,7 +123,7 @@ EOT;
 	  </span>
 	</div>
 	<div style="text-align:left;margin-top:5px">
-	作者 : <a href="u.php?uid=$value[uid]" target="_blank">$value[username]</a><br />
+	作者 : <a href="{$db_userurl}$value[uid]" target="_blank">$value[username]</a><br />
 	版块 : <a href="thread.php?fid=$value[fid]" target="_blank">$value[fname]</a><br />
 	说明 : <a href="read.php?tid=$value[tid]" target="_blank">$value[descrip]</a><br />
 	</div>

@@ -8,7 +8,7 @@ require_once(R_P.'require/header.php');
 $per = 24;//更新时间，小时单位
 $cachenum = 20;//查询数
 $cachetime = '';
-InitGP(array('action'),'G');
+S::gp(array('action'),'G');
 
 if (empty($action)) {
 	if ($db_online) {
@@ -18,7 +18,7 @@ if (empty($action)) {
 			if($rt['ifuser']) $userinbbs=$rt['count']; else	$guestinbbs=$rt['count'];
 		}
 	} else {
-		@include_once(D_P.'data/bbscache/olcache.php');
+		@include_once pwCache::getPath(D_P.'data/bbscache/olcache.php');
 	}
 	$usertotal = $guestinbbs+$userinbbs;
 	$bbsinfo = $db->get_one("SELECT id,newmember,totalmember,higholnum,higholtime,tdtcontrol,yposts,hposts FROM pw_bbsinfo WHERE id=1");
@@ -29,11 +29,13 @@ if (empty($action)) {
 	$tposts = $rs['tposts'];
 	if ($bbsinfo['tdtcontrol'] < $tdtime) {
 		if ($db_hostweb == 1) {
-			$db->update("UPDATE pw_bbsinfo SET yposts=".pwEscape($tposts).',tdtcontrol='.pwEscape($tdtime).' WHERE id=1');
+			//* $db->update("UPDATE pw_bbsinfo SET yposts=".S::sqlEscape($tposts).',tdtcontrol='.S::sqlEscape($tdtime).' WHERE id=1');
+			pwQuery::update('pw_bbsinfo', 'id=:id', array(1), array('yposts'=>$tposts, 'tdtcontrol'=>$tdtime));
 			$db->update("UPDATE pw_forumdata SET tpost=0 WHERE tpost<>'0'");
 		}
 		if (file_exists(D_P.'data/bbscache/ip_cache.php')) {
-			P_unlink(D_P.'data/bbscache/ip_cache.php');
+			//* P_unlink(D_P.'data/bbscache/ip_cache.php');
+			pwCache::deleteData(D_P.'data/bbscache/ip_cache.php');
 		}
 	}
 	require PrintEot('sort');footer();
@@ -41,7 +43,7 @@ if (empty($action)) {
 } elseif ($action == 'ipstate') {
 
 	!$db_ipstates && Showmsg('ipstates_not_open');
-	InitGP(array('type','year','month'));
+	S::gp(array('type','year','month'));
 	!$type && $type='month';
 	if ($type == 'month') {
 		$c_month = get_date($timestamp,'Y-n');
@@ -50,7 +52,7 @@ if (empty($action)) {
 		$n_year = $c_year+1;
 		$summip = 0;
 		$m_ipdb = array();
-		$query = $db->query("SELECT month,sum(nums) as nums FROM pw_ipstates WHERE month LIKE ".pwEscape("$c_year%").' GROUP BY month');
+		$query = $db->query("SELECT month,sum(nums) as nums FROM pw_ipstates WHERE month LIKE ".S::sqlEscape("$c_year%").' GROUP BY month');
 		while ($rt = $db->fetch_array($query)) {
 			$summip += $rt['nums'];
 			$key = substr($rt['month'],strrpos($rt['month'],'-')+1);
@@ -79,7 +81,7 @@ if (empty($action)) {
 		}
 		$sumip  = 0;
 		$d_ipdb = array();
-		$query  = $db->query("SELECT day,nums FROM pw_ipstates WHERE month=".pwEscape($c_month).' ORDER BY day');
+		$query  = $db->query("SELECT day,nums FROM pw_ipstates WHERE month=".S::sqlEscape($c_month).' ORDER BY day');
 		while ($rt = $db->fetch_array($query)) {
 			$sumip += $rt['nums'];
 			$key = substr($rt['day'],strrpos($rt['day'],'-')+1);
@@ -94,15 +96,15 @@ if (empty($action)) {
 
 } elseif ($action == 'online') {
 
-	require_once(D_P.'data/bbscache/forum_cache.php');
-	require_once(D_P.'data/bbscache/level.php');
-	InitGP(array('page'));
+	require_once pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
+	require_once pwCache::getPath(D_P.'data/bbscache/level.php');
+	S::gp(array('page'));
 	(!is_numeric($page) || $page<1) && $page=1;
 
 	$ltitle['-1'] = 'Member';
 	$threaddb = array();
 	if ($db_online) {
-		$limit = pwLimit(($page-1)*$db_perpage,$db_perpage);
+		$limit = S::sqlLimit(($page-1)*$db_perpage,$db_perpage);
 		$rt    = $db->get_one("SELECT COUNT(*) AS sum FROM pw_online");
 		$pages = numofpage($rt['sum'],$page,ceil($rt['sum']/$db_perpage),"sort.php?action=online&");
 		$count = $rt['sum'];
@@ -172,7 +174,7 @@ if (empty($action)) {
 			if (count($thread) < 10) {
 				$thread['username'] = 'Guest';
 				$thread['uid']		= 0;
-				$thread['ip']		= CkInArray($windid,$manager) ? $thread[0] : "-";
+				$thread['ip']		= S::inArray($windid,$manager) ? $thread[0] : "-";
 				$thread['group']	= 'Guest';
 				$thread['action']	= $thread[4];
 				$thread['lasttime'] = $thread[5];
@@ -182,7 +184,7 @@ if (empty($action)) {
 			} else {
 				$thread['username']	= $thread[0];
 				$thread['uid']		= $thread[8];
-				$thread['ip']		= CkInArray($windid,$manager) ? $thread[2] : "-";
+				$thread['ip']		= S::inArray($windid,$manager) ? $thread[2] : "-";
 				$thread['group']	= $ltitle[$thread[5]];
 				$thread['action']	= $thread[6];
 				$thread['lasttime']	= $thread[7];
@@ -211,7 +213,7 @@ if (empty($action)) {
 		if (!$per || !file_exists(D_P."data/bbscache/member_sort.php") || ($timestamp-$cachetime>$per*3600)) {
 			$step = $_GET['step'] ? intval($_GET['step']) : 0;
 			if ($array[$step]) {
-				@include(D_P."data/bbscache/member_tmp.php");
+				@include pwCache::getPath(D_P."data/bbscache/member_tmp.php");
 				$element = L::loadClass('element');
 				$element->setDefaultNum($cachenum);
 				$member = $element->userSort($array[$step],0,false);
@@ -220,16 +222,17 @@ if (empty($action)) {
 					$_SORTDB[$array[$step]][] = array($v['addition']['uid'],$v['title'],$v['value']);
 				}
 				$step++;
-				writeover(D_P.'data/bbscache/member_tmp.php',"<?php\r\n\$_SORTDB=".pw_var_export($_SORTDB).";\r\n?>");
+				pwCache::setData(D_P.'data/bbscache/member_tmp.php',"<?php\r\n\$_SORTDB=".pw_var_export($_SORTDB).";\r\n?>");
 				refreshto("sort.php?action=member&step=$step",'update_cache');
 			} else {
-				@include(D_P."data/bbscache/member_tmp.php");
-				writeover(D_P.'data/bbscache/member_sort.php',"<?php\r\n\$_SORTDB=".pw_var_export($_SORTDB).";\r\n?>");
-				P_unlink(D_P."data/bbscache/member_tmp.php");
+				@include pwCache::getPath(D_P."data/bbscache/member_tmp.php");
+				pwCache::setData(D_P.'data/bbscache/member_sort.php',"<?php\r\n\$_SORTDB=".pw_var_export($_SORTDB).";\r\n?>");
+				//* P_unlink(D_P."data/bbscache/member_tmp.php");
+				pwCache::deleteData(D_P."data/bbscache/member_tmp.php");
 				refreshto("sort.php?action=member",'update_cache');
 			}
 		}
-		@include(D_P."data/bbscache/member_sort.php");
+		@include pwCache::getPath(D_P."data/bbscache/member_sort.php");
 		$cachetime=get_date($cachetime+$per*3600);		
 	}
 	$show_url="u.php?uid";
@@ -256,9 +259,9 @@ if (empty($action)) {
 			$_sort[$key] = array($value['addition']['fid'],$value['title'],$value['value']);
 		}
 		$_SORTDB['tpost'] = $_sort;
-		writeover(D_P.'data/bbscache/forum_sort.php',"<?php\r\n\$_FORUMDB=".pw_var_export($_SORTDB).";\r\n?>");
+		pwCache::setData(D_P.'data/bbscache/forum_sort.php',"<?php\r\n\$_FORUMDB=".pw_var_export($_SORTDB).";\r\n?>");
 	} else {
-		include(D_P."data/bbscache/forum_sort.php");
+		include pwCache::getPath(D_P."data/bbscache/forum_sort.php");
 		$_SORTDB = $_FORUMDB;
 		unset($_FORUMDB);
 	}
@@ -288,11 +291,11 @@ if (empty($action)) {
 				$article[$key] = array($value['addition']['tid'],substrs($value['title'],30),$value['value']);
 			}
 			$_SORTDB['hits'] = $article;
-			writeover(D_P.'data/bbscache/article_sort.php',"<?php\r\n\$_SORTDB=".pw_var_export($_SORTDB).";\r\n?>");			
+			pwCache::setData(D_P.'data/bbscache/article_sort.php',"<?php\r\n\$_SORTDB=".pw_var_export($_SORTDB).";\r\n?>");			
 		} else {
 			$step = $_GET['step'] ? intval($_GET['step']) : 0;
 			if ($array[$step]) {
-				@include(D_P."data/bbscache/article_tmp.php");
+				@include pwCache::getPath(D_P."data/bbscache/article_tmp.php");
 				unset($_SORTDB[$array[$step]]);
 				switch ($array[$step]) {
 					case 'digest':
@@ -316,17 +319,18 @@ if (empty($action)) {
 				}
 				$_SORTDB[$array[$step]] = $article;
 				$step++;
-				writeover(D_P.'data/bbscache/article_tmp.php',"<?php\r\n\$_SORTDB=".pw_var_export($_SORTDB).";\r\n?>");
+				pwCache::setData(D_P.'data/bbscache/article_tmp.php',"<?php\r\n\$_SORTDB=".pw_var_export($_SORTDB).";\r\n?>");
 				refreshto("sort.php?action=article&step=$step",'update_cache');
 			} else {
-				@include(D_P."data/bbscache/article_tmp.php");
-				writeover(D_P.'data/bbscache/article_sort.php',"<?php\r\n\$_SORTDB=".pw_var_export($_SORTDB).";\r\n?>");
-				P_unlink(D_P."data/bbscache/article_tmp.php");
+				@include pwCache::getPath(D_P."data/bbscache/article_tmp.php");
+				pwCache::setData(D_P.'data/bbscache/article_sort.php',"<?php\r\n\$_SORTDB=".pw_var_export($_SORTDB).";\r\n?>");
+				//* P_unlink(D_P."data/bbscache/article_tmp.php");
+				pwCache::deleteData(D_P."data/bbscache/article_tmp.php");
 				refreshto("sort.php?action=article",'update_cache');
 			}
 		}
 	} else {
-		include(D_P."data/bbscache/article_sort.php");
+		include pwCache::getPath(D_P."data/bbscache/article_sort.php");
 	}
 	$cachetime=get_date($cachetime+$per*3600);
 	$show_url = "read.php?tid";
@@ -341,7 +345,7 @@ if (empty($action)) {
 	*/
 	$cachetime = pwFilemtime(D_P."data/bbscache/team_sort.php");
 	if ((!$per || $timestamp - $cachetime > $per * 3600) && procLock('sort_team')) {
-		include_once(D_P.'data/bbscache/level.php');
+		include_once pwCache::getPath(D_P.'data/bbscache/level.php');
 		$uids  = $gids = array();
 		$query = $db->query("SELECT gid FROM pw_usergroups WHERE gptype='system' AND gid NOT IN(5,6,7)");
 		while ($rt = $db->fetch_array($query)) {
@@ -359,7 +363,7 @@ if (empty($action)) {
 			}
 		}
 		if($gids){
-			$gids = pwImplode($gids);
+			$gids = S::sqlImplode($gids);
 			$query = $db->query("SELECT m.uid,m.username,m.groupid,m.groups,m.memberid,md.lastvisit,md.lastpost,md.postnum,md.rvrc,md.money,md.onlinetime,md.monoltime,md.monthpost FROM pw_members m LEFT JOIN pw_memberdata md USING(uid) WHERE m.groupid IN($gids)");
 			while ($rt = $db->fetch_array($query)) {
 				$men[$rt['uid']] = $rt;
@@ -367,7 +371,7 @@ if (empty($action)) {
 		}
 		if (!empty($admin_a)) {
 			$admin_a = array_unique($admin_a);
-			$fname = pwImplode($admin_a);
+			$fname = S::sqlImplode($admin_a);
 			$query = $db->query("SELECT m.uid,m.username,m.groupid,m.groups,m.memberid,md.lastvisit,md.lastpost,md.postnum,md.rvrc,md.money,md.onlinetime,md.monoltime,md.monthpost FROM pw_members m LEFT JOIN pw_memberdata md USING(uid) WHERE m.username IN($fname)");
 			while ($rt = $db->fetch_array($query)) {
 				$men[$rt['uid']] = $rt;
@@ -393,8 +397,8 @@ if (empty($action)) {
 		}
 
 		if ($uids) {
-			$uids = pwImplode($uids);
-			$query = $db->query("SELECT COUNT(*) AS post,SUM(hits) AS count,authorid FROM pw_threads WHERE postdate>".pwEscape($montime)." AND authorid IN($uids) GROUP BY authorid");
+			$uids = S::sqlImplode($uids);
+			$query = $db->query("SELECT COUNT(*) AS post,SUM(hits) AS count,authorid FROM pw_threads WHERE postdate>".S::sqlEscape($montime)." AND authorid IN($uids) GROUP BY authorid");
 			while ($rt = $db->fetch_array($query)) {
 				$fadmindb[$rt['authorid']]['hits'] = $rt['count'];
 				$fadmindb[$rt['authorid']]['post'] = $rt['post'];
@@ -407,21 +411,21 @@ if (empty($action)) {
 				}
 			}
 		}
-		writeover(D_P.'data/bbscache/team_sort.php', "<?php\r\n\$teamdb=" . pw_var_export($teamdb) . ";\r\n\$forumdb=" . pw_var_export($forumdb) . ";\n?>");
+		pwCache::setData(D_P.'data/bbscache/team_sort.php', "<?php\r\n\$teamdb=" . pw_var_export($teamdb) . ";\r\n\$forumdb=" . pw_var_export($forumdb) . ";\n?>");
 		procUnLock('sort_team');
 	} else {
-		include(D_P.'data/bbscache/team_sort.php');
+		include pwCache::getPath(D_P.'data/bbscache/team_sort.php');
 	}
 	//fclose($fp);
 	$cachetime = get_date($cachetime + $per * 3600);
-	include_once(D_P.'data/bbscache/forum_cache.php');
+	include_once pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
 
 	require PrintEot('sort');footer();
 
 } elseif ($action == 'admin') {
 
 	$thismonth = get_date($timestamp,'n');
-	InitGP(array('month','type'));
+	S::gp(array('month','type'));
 
 	$baseurl = 'sort.php?action=admin';
 	if (!$month || !file_exists(D_P.'data/bbscache/admin_sort_'.$month.".php")) {
@@ -430,7 +434,7 @@ if (empty($action)) {
 		$baseurl .= "&month=$month";
 	}
 	$cachetime = pwFilemtime(D_P."data/bbscache/admin_sort_".$month.".php");
-	include_once(D_P.'data/bbscache/level.php');
+	include_once pwCache::getPath(D_P.'data/bbscache/level.php');
 
 	if ((!$per || $timestamp-$cachetime>$per*3600) && $month == $thismonth) {
 		$gids  = array('0');
@@ -438,22 +442,22 @@ if (empty($action)) {
 		while ($rt = $db->fetch_array($query)) {
 			$gids[] = $rt['gid'];
 		}
-		$gids = pwImplode($gids);
+		$gids = S::sqlImplode($gids);
 		$admindb = array();
 		$query = $db->query("SELECT uid,username,groupid,groups FROM pw_members WHERE groupid IN($gids) ORDER BY groupid");
 		while ($rt = $db->fetch_array($query)) {
 			$admindb[$rt['username']] = array('uid'=>$rt['uid'],'gid'=>$rt['groupid'],'total'=>0);
 		}
-		$query = $db->query("SELECT COUNT(*) AS count,username2 AS manager,type FROM pw_adminlog WHERE timestamp>".pwEscape($montime)." GROUP BY username2,type");
+		$query = $db->query("SELECT COUNT(*) AS count,username2 AS manager,type FROM pw_adminlog WHERE timestamp>".S::sqlEscape($montime)." GROUP BY username2,type");
 		while ($rt = $db->fetch_array($query)) {
 			if (isset($admindb[$rt['manager']])) {
 				$admindb[$rt['manager']][$rt['type']] = $rt['count'];
 				$admindb[$rt['manager']]['total'] += $rt['count'];
 			}
 		}
-		writeover(D_P."data/bbscache/admin_sort_".$month.".php","<?php\n\$admindb=".pw_var_export($admindb).";\n?>");
+		pwCache::setData(D_P."data/bbscache/admin_sort_".$month.".php","<?php\n\$admindb=".pw_var_export($admindb).";\n?>");
 	} else {
-		include Pcv(D_P."data/bbscache/admin_sort_".$month.".php");
+		include S::escapePath(D_P."data/bbscache/admin_sort_".$month.".php");
 	}
 	$cachetime = get_date($cachetime+$per*3600);
 	$sort_a = $month_a = array();
@@ -481,10 +485,11 @@ if (empty($action)) {
 } elseif ($action == 'delsort') {
 
 	PostCheck();
-	InitGP(array('month'));
+	S::gp(array('month'));
 	(!$month || !is_numeric($month) || $groupid!='3') && Showmsg('undefined_action');
 	if (file_exists(D_P.'data/bbscache/admin_sort_'.$month.'.php')) {
-		P_unlink(D_P.'data/bbscache/admin_sort_'.$month.'.php');
+		//* P_unlink(D_P.'data/bbscache/admin_sort_'.$month.'.php');
+		pwCache::deleteData(D_P.'data/bbscache/admin_sort_'.$month.'.php');
 	}
 	refreshto("sort.php?action=admin",'operate_success');
 } elseif ($action == 'favor') {
@@ -495,9 +500,9 @@ if (empty($action)) {
 		$_sort = array();
 		$_SORTDB = $element->hotFavorsort();
 
-		writeover(D_P.'data/bbscache/favor_sort.php',"<?php\r\n\$_FAVORS=".pw_var_export($_SORTDB).";\r\n?>");
+		pwCache::setData(D_P.'data/bbscache/favor_sort.php',"<?php\r\n\$_FAVORS=".pw_var_export($_SORTDB).";\r\n?>");
 	} else {
-		include(D_P."data/bbscache/favor_sort.php");
+		include pwCache::getPath(D_P."data/bbscache/favor_sort.php");
 		$_SORTDB = $_FAVORS;
 		unset($_FAVORS);
 	}

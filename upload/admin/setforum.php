@@ -1,87 +1,85 @@
 <?php
 !function_exists('adminmsg') && exit('Forbidden');
-$basename = "$admin_file?adminjob=setforum&c_type=$c_type";
+S::gp(array('adminitem'));
+empty($adminitem) && $adminitem = 'setforum';
+$basename = "$admin_file?adminjob=setforum&adminitem=$adminitem";
+if ($adminitem == 'setforum'){
+	$basename .= "&c_type=$c_type";
+	include_once pwCache::getPath(D_P.'data/bbscache/forumcache.php');
+	require_once(R_P.'require/updateforum.php');
+	list($hidefid,$hideforum) = GetHiddenForum();
+	$forumcache .= $hideforum;
+	if (empty($action)) {
+		$catedb = $forumdb = $subdb1 = $subdb2 = array();
+		$space  = '<i class="lower lower_a"></i>';
 
-include_once(D_P.'data/bbscache/forumcache.php');
-require_once(R_P.'require/updateforum.php');
-
-
-list($hidefid,$hideforum) = GetHiddenForum();
-$forumcache .= $hideforum;
-if (empty($action)) {
-
-	$catedb = $forumdb = $subdb1 = $subdb2 = array();
-	$space  = '<i class="lower lower_a"></i>';
-
-	$query = $db->query("SELECT fid,fup,type,name,vieworder,forumadmin,f_type,cms FROM pw_forums WHERE cms!='1' ORDER BY vieworder");
-	while ($forums = $db->fetch_array($query)) {
-		$forums['name'] = Quot_cv(strip_tags($forums['name']));
-		$forums['forumadmin'] = trim($forums['forumadmin'],',');
-		if ($forums['type'] == 'category') {
-			$catedb[$forums['fid']] = $forums;
-		} elseif ($forums['type'] == 'forum') {
-			$forumdb[$forums['fid']] = $forums;
-		} elseif ($forums['type'] == 'sub') {
-			$subdb1[$forums['fid']] = $forums;
-		} else {
-			$subdb2[$forums['fid']] = $forums;
+		$query = $db->query("SELECT fid,fup,type,name,vieworder,forumadmin,f_type,cms FROM pw_forums WHERE cms!='1' ORDER BY vieworder");
+		while ($forums = $db->fetch_array($query)) {
+			$forums['name'] = Quot_cv(strip_tags($forums['name']));
+			$forums['forumadmin'] = trim($forums['forumadmin'],',');
+			if ($forums['type'] == 'category') {
+				$catedb[$forums['fid']] = $forums;
+			} elseif ($forums['type'] == 'forum') {
+				$forumdb[$forums['fid']] = $forums;
+			} elseif ($forums['type'] == 'sub') {
+				$subdb1[$forums['fid']] = $forums;
+			} else {
+				$subdb2[$forums['fid']] = $forums;
+			}
 		}
-	}
-
-
 	//$fup_forumcache = $forumcache;
-	$fup_forumcache = getForumSelectHtml();
-	foreach ($subdb2 as $value) {
-		$fup_forumcache = str_replace("<option value=\"{$value['fid']}\">&nbsp;&nbsp; &nbsp; &nbsp;|-  {$value['name']}</option>\r\n",'',$fup_forumcache);
-	}
-	$threaddb = array();
-	foreach ($catedb as $cate) {
-		$threaddb[$cate['fid']] = array();
-		foreach ($forumdb as $key2 => $forumss) {
-			if ($forumss['fup'] == $cate['fid']) {
-				$threaddb[$cate['fid']][] = $forumss;
-				unset($forumdb[$key2]);
-				foreach ($subdb1 as $key3 => $sub1) {
-					if ($sub1['fup'] == $forumss['fid']) {
-						$threaddb[$cate['fid']][] = $sub1;
-						unset($subdb1[$key3]);
-						foreach ($subdb2 as $key4 => $sub2) {
-							if ($sub2['fup'] == $sub1['fid']) {
-								$threaddb[$cate['fid']][] = $sub2;
-								unset($subdb2[$key4]);
+		$fup_forumcache = getForumSelectHtml();
+		foreach ($subdb2 as $value) {
+			$fup_forumcache = str_replace("<option value=\"{$value['fid']}\">&nbsp;&nbsp; &nbsp; &nbsp;|-  {$value['name']}</option>\r\n",'',$fup_forumcache);
+		}
+		$threaddb = array();
+		foreach ($catedb as $cate) {
+			$threaddb[$cate['fid']] = array();
+			foreach ($forumdb as $key2 => $forumss) {
+				if ($forumss['fup'] == $cate['fid']) {
+					$threaddb[$cate['fid']][] = $forumss;
+					unset($forumdb[$key2]);
+					foreach ($subdb1 as $key3 => $sub1) {
+						if ($sub1['fup'] == $forumss['fid']) {
+							$threaddb[$cate['fid']][] = $sub1;
+							unset($subdb1[$key3]);
+							foreach ($subdb2 as $key4 => $sub2) {
+								if ($sub2['fup'] == $sub1['fid']) {
+									$threaddb[$cate['fid']][] = $sub2;
+									unset($subdb2[$key4]);
+								}
 							}
 						}
 					}
 				}
 			}
 		}
-	}
-	$forum_L = array();
-	if ($forumdb) {
-		foreach ($forumdb as $value) {
-			$forum_L[] = $value;
+		$forum_L = array();
+		if ($forumdb) {
+			foreach ($forumdb as $value) {
+				$forum_L[] = $value;
+			}
 		}
-	}
-	if ($subdb1) {
-		foreach ($subdb1 as $value) {
-			$forum_L[] = $value;
+		if ($subdb1) {
+			foreach ($subdb1 as $value) {
+				$forum_L[] = $value;
+			}
 		}
-	}
-	if ($subdb2) {
-		foreach ($subdb2 as $value) {
-			$forum_L[] = $value;
+		if ($subdb2) {
+			foreach ($subdb2 as $value) {
+				$forum_L[] = $value;
+			}
 		}
-	}
-	$ajaxurl = EncodeUrl($basename);
-	include PrintEot('setforum');exit;
+		$ajaxurl = EncodeUrl($basename);
+		include PrintEot('setforum');exit;
 
 } elseif ($action == 'searchforum') {
-	InitGP(array('keyword'));
+	S::gp(array('keyword'));
 	$keyword = trim($keyword);
 	
 	$result = array();
 	if ($keyword) {
-		$query = $db->query("SELECT fid,name FROM pw_forums WHERE cms!='1' AND name LIKE ".pwEscape($keyword . '%')." ORDER BY vieworder");
+		$query = $db->query("SELECT fid,name FROM pw_forums WHERE cms!='1' AND name LIKE ".S::sqlEscape($keyword . '%')." ORDER BY vieworder");
 		while ($rt = $db->fetch_array($query)) {
 			$result[] = array(
 				'forumName' => $rt['name'],
@@ -95,11 +93,12 @@ if (empty($action)) {
 	ajax_footer();
 	
 } elseif ($action == 'addforum') {
-	InitGP(array('fup','forumnum','ifsave'));
-	InitGP(array('name'),'P',0);
+	S::gp(array('fup','forumnum','ifsave'));
+	S::gp(array('name'),'P',0);
 	if (empty($_POST['step'])) {
 		if (!empty($name)) {
-			$db->update("INSERT INTO pw_forums SET " . pwSqlSingle(array(
+			/*
+			$db->update("INSERT INTO pw_forums SET " . S::sqlSingle(array(
 				'fup'	=> 0,
 				'type'	=> 'category',
 				'name'	=> $name,
@@ -108,9 +107,20 @@ if (empty($action)) {
 				'ifhide'=> 1,
 				'allowtype'=> 3
 			)));
+			*/
+			pwQuery::insert('pw_forums', array(
+				'fup'	=> 0,
+				'type'	=> 'category',
+				'name'	=> $name,
+				'f_type'=> 'forum',
+				'cms'	=> 0,
+				'ifhide'=> 1,
+				'allowtype'=> 3
+			));
 			$fid = $db->insert_id();
-			$db->update("INSERT INTO pw_forumdata SET fid=".pwEscape($fid));
-			P_unlink(D_P.'data/bbscache/c_cache.php');
+			$db->update("INSERT INTO pw_forumdata SET fid=".S::sqlEscape($fid));
+			//* P_unlink(D_P.'data/bbscache/c_cache.php');
+			pwCache::deleteData(D_P.'data/bbscache/c_cache.php');
 			updatecache_f();
 			ObHeader("$basename&action=addforum&fup=$fid");
 		} elseif (!empty($fup)) {
@@ -124,19 +134,20 @@ if (empty($action)) {
 		}
 		include PrintEot('setforum');exit;
 	} else {
-		InitGP(array('vieworder','forumadmin','style','keywords','descrip','logo','ifsave','addtype'));
-		InitGP(array('descrip'),'P',0);
+		S::gp(array('vieworder','forumadmin','style','keywords','descrip','logo','ifsave','addtype'));
+		S::gp(array('descrip'),'P',0);
+		$fidArr = array(); //存放新增的版块id数组
 		$forumtype = $forum[$fup]['type'] == 'category' ? 'forum' : ($forum[$fup]['type'] == 'forum' ? 'sub' : 'sub2');
 		if ($forum[$fup]['type'] != 'category') {
-			$fupset = $db->get_one("SELECT f.allowhide,f.allowsell,f.allowtype,f.copyctrl,f.viewsub,f.allowvisit,f.allowpost,f.allowrp,f.allowdownload,f.allowupload,f.f_type,f.f_check,f.cms,f.ifhide,fe.creditset,fe.forumset FROM pw_forums f LEFT JOIN pw_forumsextra fe USING(fid) WHERE f.fid=".pwEscape($fup));
-			Add_S($fupset);
+			$fupset = $db->get_one("SELECT f.allowhide,f.allowsell,f.allowtype,f.copyctrl,f.viewsub,f.allowvisit,f.allowpost,f.allowrp,f.allowdownload,f.allowupload,f.f_type,f.f_check,f.cms,f.ifhide,fe.creditset,fe.forumset FROM pw_forums f LEFT JOIN pw_forumsextra fe USING(fid) WHERE f.fid=".S::sqlEscape($fup));
+			S::slashes($fupset);
 			@extract($fupset,EXTR_OVERWRITE);
 		}
 		foreach($name as $key => $value) {
 			if(empty($value)) continue;
 			$value     = str_replace('<iframe','&lt;iframe',$value);
 			$descrip[$key]  = str_replace('<iframe','&lt;iframe',$descrip[$key]);
-			$keywords[$key] = Char_cv($keywords[$key]);
+			$keywords[$key] = S::escapeChar($keywords[$key]);
 //			strlen($descrip[$key])>250 && adminmsg('descrip_long');
 			$newadmin= array();
 			$str_admin = '';
@@ -160,7 +171,8 @@ if (empty($action)) {
 				$str_admin = '';
 			}
 			if($forum[$fup]['type'] != 'category' && $ifsave[$key] == 1) {
-				$db->update("INSERT INTO pw_forums SET " . pwSqlSingle(array(
+				/*
+				$db->update("INSERT INTO pw_forums SET " . S::sqlSingle(array(
 					'fup'			=> $fup,
 					'type'			=> $forumtype,
 					'logo'			=> $logo[$key],
@@ -185,9 +197,36 @@ if (empty($action)) {
 					'cms'			=> $cms,
 					'ifhide'		=> $ifhide
 				)));
+				*/
+				pwQuery::insert('pw_forums', array(
+					'fup'			=> $fup,
+					'type'			=> $forumtype,
+					'logo'			=> $logo[$key],
+					'name'			=> $value,
+					'descrip'		=> $descrip[$key],
+					'keywords'		=> $keywords[$key],
+					'vieworder'		=> $vieworder[$key],
+					'forumadmin'    => $str_admin,
+					'style'			=> $style[$key],
+					'allowhide'		=> $allowhide,
+					'allowsell'		=> $allowsell,
+					'allowtype'		=> $allowtype,
+					'copyctrl'		=> $copyctrl,
+					'viewsub'		=> $viewsub,
+					'allowvisit'	=> $allowvisit,
+					'allowpost'		=> $allowpost,
+					'allowrp'		=> $allowrp,
+					'allowdownload'	=> $allowdownload,
+					'allowupload'	=> $allowupload,
+					'f_type'		=> $f_type,
+					'f_check'		=> $f_check,
+					'cms'			=> $cms,
+					'ifhide'		=> $ifhide
+				));
 				$fid = $db->insert_id();
+				
 				if ($creditset || $forumset) {
-					$db->update("INSERT INTO pw_forumsextra SET " . pwSqlSingle(array(
+					$db->update("INSERT INTO pw_forumsextra SET " . S::sqlSingle(array(
 						'fid'		=> $fid,
 						'creditset'	=> $creditset,
 						'forumset'	=> $forumset
@@ -195,7 +234,8 @@ if (empty($action)) {
 				}
 			} else {
 				$f_type = $forum[$fup]['f_type'] == 'hidden' ? 'hidden' : 'forum';
-				$db->update("INSERT INTO pw_forums SET " . pwSqlSingle(array(
+				/*
+				$db->update("INSERT INTO pw_forums SET " . S::sqlSingle(array(
 					'fup'			=> $fup,
 					'type'			=> $forumtype,
 					'logo'			=> $logo[$key],
@@ -210,18 +250,49 @@ if (empty($action)) {
 					'ifhide'		=> 1,
 					'allowtype'		=> 3
 				)));
+				*/
+				pwQuery::insert('pw_forums', array(
+					'fup'			=> $fup,
+					'type'			=> $forumtype,
+					'logo'			=> $logo[$key],
+					'name'			=> $value,
+					'descrip'		=> $descrip[$key],
+					'keywords'		=> $keywords[$key],
+					'vieworder'		=> $vieworder[$key],
+					'forumadmin'    => $str_admin,
+					'style'			=> $style[$key],
+					'f_type'		=> $f_type,
+					'cms'			=> 0,
+					'ifhide'		=> 1,
+					'allowtype'		=> 3
+				));
 				$fid = $db->insert_id();
-				//添加默认
-				$forumset = 'a:40:{s:4:"link";s:0:"";s:4:"lock";i:0;s:7:"cutnums";i:0;s:9:"threadnum";i:0;s:7:"readnum";i:0;s:7:"newtime";i:0;s:8:"orderway";s:8:"lastpost";s:3:"asc";s:4:"DESC";s:11:"replayorder";s:1:"1";s:10:"viewcolony";i:1;s:12:"ifcolonycate";i:1;s:11:"allowencode";i:0;s:9:"anonymous";i:0;s:4:"rate";i:0;s:3:"dig";i:0;s:7:"inspect";i:0;s:9:"watermark";i:0;s:9:"overprint";i:0;s:7:"viewpic";i:0;s:7:"ifthumb";i:0;s:9:"ifrelated";i:0;s:11:"relatednums";i:0;s:10:"relatedcon";s:7:"ownpost";s:13:"relatedcustom";a:0:{}s:7:"commend";i:0;s:11:"autocommend";i:0;s:11:"commendlist";s:0:"";s:10:"commendnum";i:0;s:13:"commendlength";i:0;s:11:"commendtime";i:0;s:10:"addtpctype";i:0;s:8:"rvrcneed";i:0;s:9:"moneyneed";i:0;s:10:"creditneed";i:0;s:11:"postnumneed";i:0;s:9:"sellprice";a:0:{}s:9:"uploadset";s:9:"money			0";s:8:"rewarddb";s:3:"			";s:9:"allowtime";s:0:"";s:9:"thumbsize";s:5:"575	0";}';
-				$db->update("INSERT INTO pw_forumsextra SET " . pwSqlSingle(array(
+
+				$forumset = serialize(array(
+					'orderway'		=> 'lastpost',
+					'asc'			=> 'DESC',
+					'replayorder'	=> '1',
+					'addnotice'		=> '1',
+					'imgthread'		=> '1',
+					'relatedcon'	=> '1',
+					'allowtpctype'	=> '1',
+					'uploadset'		=> '1',
+					'allowtpctype'	=> 'money			0',
+					'thumbsize'		=> '300	300'
+				));
+				$db->update("INSERT INTO pw_forumsextra SET " . S::sqlSingle(array(
 					'fid'		=> $fid,
 					'creditset'	=> '',
 					'forumset'	=> $forumset
 				)));
 			}
-			$db->update("INSERT INTO pw_forumdata SET fid=".pwEscape($fid));
+			$fidArr[]  = $fid; //获取新增的版块ID
+			$db->update("INSERT INTO pw_forumdata SET fid=".S::sqlEscape($fid));
 		}
-		P_unlink(D_P.'data/bbscache/c_cache.php');
+		//版块置顶操作
+		updateForumPostTop($fidArr);
+		//* P_unlink(D_P.'data/bbscache/c_cache.php');
+		pwCache::deleteData(D_P.'data/bbscache/c_cache.php');
 		updatecache_f();
 		$forumtype != 'category' && updatetop();
 		if($addtype == 1){
@@ -232,8 +303,8 @@ if (empty($action)) {
 	}
 } elseif ($_POST['action'] == 'editforum') {
 
-	InitGP(array('forumadmin'), 'P', 0);
-	InitGP(array('order'), 'P', 2);
+	S::gp(array('forumadmin'), 'P', 0);
+	S::gp(array('order'), 'P', 2);
 	$errorname = array();
 	$forumdb = $db->query("SELECT fid,forumadmin,vieworder FROM pw_forums WHERE cms!='1'");
 	while ($foruminfo = $db->fetch_array($forumdb)) {
@@ -247,7 +318,7 @@ if (empty($action)) {
 					$admin_d[] = $member['username'];
 				}
 				foreach ($admin_a as $value) {
-					if (CkInArray($value,$admin_d)) {
+					if (S::inArray($value,$admin_d)) {
 						$admin_n[] = $value;
 					}
 				}
@@ -264,7 +335,8 @@ if (empty($action)) {
 			$pwSQL['vieworder'] = $order[$foruminfo['fid']];
 		}
 		if ($pwSQL) {
-			$db->update("UPDATE pw_forums SET".pwSqlSingle($pwSQL)."WHERE fid=".pwEscape($foruminfo['fid'],false));
+			//$db->update("UPDATE pw_forums SET".S::sqlSingle($pwSQL)."WHERE fid=".S::sqlEscape($foruminfo['fid'],false));
+			pwQuery::update('pw_forums', 'fid=:fid', array($foruminfo['fid']), $pwSQL);
 		}
 	}
 	updatecache_f();
@@ -274,9 +346,9 @@ if (empty($action)) {
 
 } elseif ($action == 'delete') {
 
-	InitGP(array('fid'));
+	S::gp(array('fid'));
 
-	$count = $db->get_value("SELECT COUNT(*) AS count FROM pw_forums WHERE fup=".pwEscape($fid)." AND type<>'category'");
+	$count = $db->get_value("SELECT COUNT(*) AS count FROM pw_forums WHERE fup=".S::sqlEscape($fid)." AND type<>'category'");
 	if ($count) {
 		adminmsg('forum_havesub');
 	}
@@ -286,14 +358,14 @@ if (empty($action)) {
 
 	} else {
 		delforum($fid);
-		P_unlink(D_P.'data/bbscache/c_cache.php');
+		//* P_unlink(D_P.'data/bbscache/c_cache.php');
+		pwCache::deleteData(D_P.'data/bbscache/c_cache.php');
 		updatecache_f();
 		adminmsg('operate_success');
 	}
 } elseif ($action == 'edit') {
-
-	InitGP(array('fid'),'GP',2);
-	InitGP(array('c_type'),'GP');
+	S::gp(array('fid'),'GP',2);
+	S::gp(array('c_type'),'GP');
 	if (!$fid) {
 		$basename = "$admin_file?adminjob=setforum&action=edit&c_type=".$c_type;
 		include PrintEot('setforum');exit;
@@ -310,17 +382,21 @@ if (empty($action)) {
 			$fup_forumcache = str_replace("<option value=\"{$value['fid']}\">&nbsp;&nbsp; &nbsp; &nbsp;|-  {$value['name']}</option>\r\n",'',$fup_forumcache);
 		}
 		!in_array($c_type, array('basic','property','recommended','threadtype','usergroup','usercredit')) && $c_type = 'basic';
-		@extract($db->get_one("SELECT f.*,fe.forumset FROM pw_forums f LEFT JOIN pw_forumsextra fe USING(fid) WHERE f.fid=" . pwEscape($fid)));
+
+		@extract($db->get_one("SELECT f.*,fe.forumset FROM pw_forums f LEFT JOIN pw_forumsextra fe USING(fid) WHERE f.fid=" . S::sqlEscape($fid)));
 		$forumset = unserialize($forumset);
 		$forumset['newtime']  /= 60;
 		//$forumset['rvrcneed'] /= 10;
 
 		$forumset['addtpctype'] ? $addtpctype_Y = 'checked' : $addtpctype_N = 'checked';
+		$forumset['allowtpctype'] ? $allowtpctype_Y = 'checked' : $allowtpctype_N = 'checked';
 		$forumset['ifrelated'] ? $ifrelated_Y = 'checked' : $ifrelated_N = 'checked';
 		${'r_'.$forumset['relatedcon']} = 'selected';
 
 		$name = str_replace("<","&lt;",$name);
 		$name = str_replace(">","&gt;",$name);
+		$name = str_replace('"',"&quot;",$name);
+		$name = str_replace("'","&#39;",$name);
 
 		require_once(R_P."require/forum.php");
 		$setfid_style = getstyles($style);
@@ -338,8 +414,11 @@ if (empty($action)) {
 			ifcheck($forumset['rate'],'rate');
 			ifcheck($forumset['overprint'],'overprint');
 			ifcheck($forumset['viewpic'],'viewpic');
+			ifcheck($forumset['imgthread'],'imgthread');
+			ifcheck($forumset['postedittime'],'postedittime');
 			ifcheck($forumset['viewcolony'],'viewcolony');
 			ifcheck($forumset['ifcolonycate'],'ifcolonycate');
+			ifcheck($forumset['addnotice'],'addnotice');
 			list($rw_time,$rw_b_val,$rw_a_val,$rw_credit) = explode("\t",$forumset['rewarddb']);
 			$rw_credit = explode(',',$rw_credit);
 
@@ -421,7 +500,7 @@ if (empty($action)) {
 				$viewdownload = str_replace("_{$value}_",'checked',$viewdownload);
 
 			//主题分类
-			$query = $db->query("SELECT id,name,logo,vieworder,upid FROM pw_topictype WHERE fid=".pwEscape($fid)." ORDER BY vieworder ");
+			$query = $db->query("SELECT id,name,logo,vieworder,upid FROM pw_topictype WHERE fid=".S::sqlEscape($fid)." ORDER BY vieworder ");
 			$t_typedbnum = 1;
 			while ($rt = $db->fetch_array($query)) {
 				$rt['name'] = str_replace(array('<','>','"',"'"),array("&lt;","&gt;","&quot;","&#39;"),$rt['name']);
@@ -436,7 +515,7 @@ if (empty($action)) {
 
 			//分类主题类型
 			$topicdb = $modeldb = array();
-			@include_once(D_P. 'data/bbscache/topic_config.php');
+			@include_once pwCache::getPath(D_P. 'data/bbscache/topic_config.php');
 			foreach ($topiccatedb as $key => $value) {
 				if ($value['ifable'] == 1) {
 					$topicdb[$key]['cateid'] = $value['cateid'];
@@ -456,7 +535,7 @@ if (empty($action)) {
 
 			//活动主题分类
 			$activitycatedb = $activitymodeldb = array();
-			@include_once(D_P. 'data/bbscache/activity_config.php');
+			@include_once pwCache::getPath(D_P. 'data/bbscache/activity_config.php');
 			foreach ($activity_catedb as $key => $value) {
 				if ($value['ifable'] == 1) {
 					$activitycatedb[$key]['actid'] = $value['actid'];
@@ -488,10 +567,10 @@ if (empty($action)) {
 				
 		
 			//团购
-			@include_once(D_P.'data/bbscache/postcate_config.php');
+			@include_once pwCache::getPath(D_P.'data/bbscache/postcate_config.php');
 
 			require_once(R_P.'require/credit.php');
-			$creditset = $db->get_value("SELECT creditset FROM pw_forumsextra WHERE fid=".pwEscape($fid));
+			$creditset = $db->get_value("SELECT creditset FROM pw_forumsextra WHERE fid=".S::sqlEscape($fid));
 			$creditset = $creditset ? unserialize($creditset) : array();
 
 		}
@@ -499,43 +578,54 @@ if (empty($action)) {
 		include PrintEot('setforum');exit;
 
 	} elseif ($_POST['step'] == 2) {
-		$forum = $db->get_one("SELECT type,fup,forumadmin,logo FROM pw_forums WHERE fid=".pwEscape($fid));
-		InitGP(array('name','descrip','metadescrip'),'P',0);
-		InitGP(array('vieworder','dirname','style','across','keywords'),'P');
+		$forum = $db->get_one("SELECT type,fup,forumadmin,logo FROM pw_forums WHERE fid=".S::sqlEscape($fid));
+		S::gp(array('name','descrip','metadescrip'),'P',0);
+		S::gp(array('vieworder','dirname','style','across','keywords','c_type'),'P');
 		Cookie('thisPWTabs', $c_type , 'F', false);
 		$name     = str_replace('<iframe','&lt;iframe',$name);
 		$descrip  = str_replace('<iframe','&lt;iframe',$descrip);
 		$metadescrip = str_replace('<iframe','&lt;iframe',$metadescrip);
-		$keywords = Char_cv($keywords);
-		strlen($descrip)>250 && adminmsg('descrip_long');
+		$keywords = S::escapeChar($keywords);
+		//去掉版块简介字数限制@modify panjl@2010-11-2
+		//strlen($descrip)>250 && adminmsg('descrip_long');
 		strlen($metadescrip)>250 && adminmsg('descrip_long');
 
 		if ($forum['type'] == 'category') {
-			$db->update("UPDATE pw_forums SET " . pwSqlSingle(array(
+			/*
+			$db->update("UPDATE pw_forums SET " . S::sqlSingle(array(
 				'name'		=> $name,
 				'vieworder'	=> $vieworder,
 				'dirname'	=> $dirname,
 				'style'		=> $style,
 				'across'	=> $across,
 				'cms'		=> $cms
-			)) . " WHERE fid=".pwEscape($fid));
+			)) . " WHERE fid=".S::sqlEscape($fid));
+			*/
+			pwQuery::update('pw_forums', 'fid=:fid', array($fid), array(
+				'name'		=> $name,
+				'vieworder'	=> $vieworder,
+				'dirname'	=> $dirname,
+				'style'		=> $style,
+				'across'	=> $across,
+				'cms'		=> $cms
+			));
 		} else {
 
-			InitGP(array('creditdb','forumsetdb','uploadset','rewarddb','cfup','ffup','showsub','ifhide', 'viewsub_1','viewsub_2','allowhide','allowsell','copyctrl','f_check','password','allowvisit','allowread', 'allowpost','allowrp','allowupload','allowdownload','otherfid','otherforum','allowtime','allowtype', 'recycle','forumsell','sdate','cprice','rprice','logotype','logo_upload','logo_url','ifdellogo','t_view_db','new_t_view_db','t_logo_db','new_t_logo_db','new_t_sub_logo_db','new_t_sub_view_db','t_type','modelid','pcid','actmid'),'P');
-			InitGP(array('t_db','new_t_db','new_t_sub_db','f_type'),'P',0);
-			InitGP(array('ifcms'));
-
+			S::gp(array('creditdb','forumsetdb','uploadset','rewarddb','cfup','ffup','showsub','ifhide', 'viewsub_1','viewsub_2','allowhide','allowsell','copyctrl','f_check','password','allowvisit','allowread', 'allowpost','allowrp','allowupload','allowdownload','otherfid','otherforum','allowtime','allowtype', 'recycle','forumsell','sdate','cprice','rprice','logotype','logo_upload','logo_url','ifdellogo','t_view_db','new_t_view_db','t_logo_db','new_t_logo_db','new_t_sub_logo_db','new_t_sub_view_db','t_type','modelid','pcid','actmid'),'P');
+			S::gp(array('t_db','new_t_db','new_t_sub_db','f_type'),'P',0);
+			S::gp(array('ifcms'));
+			
 
 
 			//主题分类
 
 			//更新原有的分类
 			foreach ($t_db as $key => $value) {
-				$db->update("UPDATE pw_topictype SET " . pwSqlSingle(array(
+				$db->update("UPDATE pw_topictype SET " . S::sqlSingle(array(
 					'name'			=> $value,
 					'vieworder'		=> $t_view_db[$key],
 					'logo'			=> $t_logo_db[$key]
-				)) . " WHERE id=".pwEscape($key));
+				)) . " WHERE id=".S::sqlEscape($key));
 			}
 
 			//增加新分类
@@ -544,7 +634,7 @@ if (empty($action)) {
 				$typedb[] = array ('fid' => $fid,'name' => $value,'logo'=>$new_t_logo_db[$key],'vieworder'=>$new_t_view_db[$key]);
 			}
 			if ($typedb) {
-				$db->update("REPLACE INTO pw_topictype (fid,name,logo,vieworder) VALUES " . pwSqlMulti($typedb));
+				$db->update("REPLACE INTO pw_topictype (fid,name,logo,vieworder) VALUES " . S::sqlMulti($typedb));
 			}
 			//增加二级新分类
 			foreach ($new_t_sub_db as $key => $value) {
@@ -554,10 +644,9 @@ if (empty($action)) {
 				}
 			}
 			if ($subtypedb) {
-				$db->update("REPLACE INTO pw_topictype (fid,name,logo,vieworder,upid) VALUES " . pwSqlMulti($subtypedb));
+				$db->update("REPLACE INTO pw_topictype (fid,name,logo,vieworder,upid) VALUES " . S::sqlMulti($subtypedb));
 			}
 			$forumsetdb['newtime'] *= 60;
-
 			foreach ($forumsetdb as $key => $value) {
 				if ($key == 'link') {
 					$forumsetdb['link'] = str_replace(array('"',"'",'\\'),array('','',''),$value);
@@ -567,6 +656,7 @@ if (empty($action)) {
 					$forumsetdb[$key] = (int)$value;
 				}
 			}
+			$forumsetdb['contentminlen'] = $forumsetdb['contentminlen'] < 0 ? 0 : $forumsetdb['contentminlen'];
 
 			$sellprice = array();
 			foreach ($sdate as $key => $value) {
@@ -607,9 +697,9 @@ if (empty($action)) {
 			unset($forumsetdb['thumbheight']);
 			$forumsextradb = serialize($forumsetdb);
 			$db->pw_update(
-				"SELECT fid FROM pw_forumsextra WHERE fid=".pwEscape($fid),
-				"UPDATE pw_forumsextra SET forumset=".pwEscape($forumsextradb,false)."WHERE fid=".pwEscape($fid),
-				"INSERT INTO pw_forumsextra SET forumset=".pwEscape($forumsextradb,false).',fid='.pwEscape($fid)
+				"SELECT fid FROM pw_forumsextra WHERE fid=".S::sqlEscape($fid),
+				"UPDATE pw_forumsextra SET forumset=".S::sqlEscape($forumsextradb,false)."WHERE fid=".S::sqlEscape($fid),
+				"INSERT INTO pw_forumsextra SET forumset=".S::sqlEscape($forumsextradb,false).',fid='.S::sqlEscape($fid)
 			);
 			foreach ($creditdb as $key => $value) {
 				foreach ($value as $k => $v) {
@@ -623,9 +713,9 @@ if (empty($action)) {
 			$creditset = $creditdb ? serialize($creditdb) : '';
 
 			$db->pw_update(
-				"SELECT fid FROM pw_forumsextra WHERE fid=".pwEscape($fid),
-				"UPDATE pw_forumsextra SET creditset=".pwEscape($creditset,false).'WHERE fid='.pwEscape($fid),
-				"INSERT INTO pw_forumsextra SET creditset=".pwEscape($creditset,false).',fid='.pwEscape($fid)
+				"SELECT fid FROM pw_forumsextra WHERE fid=".S::sqlEscape($fid),
+				"UPDATE pw_forumsextra SET creditset=".S::sqlEscape($creditset,false).'WHERE fid='.S::sqlEscape($fid),
+				"INSERT INTO pw_forumsextra SET creditset=".S::sqlEscape($creditset,false).',fid='.S::sqlEscape($fid)
 			);
 			$fup = $cms == '1' ? $cfup : $ffup;
 			$fup == $fid && adminmsg('setforum_fupsame');
@@ -644,7 +734,7 @@ if (empty($action)) {
 			$allowdownload	&& $allowdownload	= ','.implode(",",$allowdownload).',';
 			$allowtype = array_sum($allowtype);
 
-			$rt = $db->get_one("SELECT type,cms FROM pw_forums WHERE fid=".pwEscape($fup));
+			$rt = $db->get_one("SELECT type,cms FROM pw_forums WHERE fid=".S::sqlEscape($fup));
 			if ($rt['type'] == 'category') {
 				$type = 'forum';
 			} elseif ($rt['type'] == 'forum') {
@@ -656,10 +746,10 @@ if (empty($action)) {
 				$type = 'sub2';
 			}
 
-			if ($f_type == 'hidden' && $allowvisit == '') {
+			/*if ($f_type == 'hidden' && $allowvisit == '') {
 				$basename = "$admin_file?adminjob=setforum&action=edit&fid=$fid&c_type=$c_type";
 				adminmsg('forum_hidden');
-			}
+			}*/
 			//$db_uploadfiletype = !empty($db_uploadfiletype) ? (is_array($db_uploadfiletype) ? $db_uploadfiletype : unserialize($db_uploadfiletype)) : array();
 			$db_uploadfiletype = array(
 				'gif'  => 2048,				'jpg'  => 2048,
@@ -669,7 +759,8 @@ if (empty($action)) {
 			if ($logotype == 'upload') {
 				if ($ifdellogo == 1) {
 					pwDelatt($forum['logo'],$db_ifftp);
-					$db->update("UPDATE pw_forums SET logo='' WHERE fid=".pwEscape($fid));
+					//$db->update("UPDATE pw_forums SET logo='' WHERE fid=".S::sqlEscape($fid));
+					pwQuery::update('pw_forums', 'fid=:fid', array($fid), array('logo' => ''));
 					$forum['logo'] = '';
 				}
 				require_once(R_P.'require/postfunc.php');
@@ -683,7 +774,6 @@ if (empty($action)) {
 			foreach ($modelid as $value) {
 				$modelids .= $modelids ? ','.$value : $value;
 			}
-
 			//团购
 			$pcids = '';
 			foreach ($pcid as $value) {
@@ -705,8 +795,8 @@ if (empty($action)) {
 			} else {
 				$viewsub = 3;
 			}
-
-			$db->update("UPDATE pw_forums SET " . pwSqlSingle(array(
+            /*
+			$db->update("UPDATE pw_forums SET " . S::sqlSingle(array(
 				'fup'		=> $fup,			'type'		=> $type,
 				'name'		=> $name,			'vieworder'	=> $vieworder,
 				'logo'		=> $logo,			'keywords'	=> $keywords,
@@ -725,18 +815,38 @@ if (empty($action)) {
 				'modelid'	=> $modelids,		'pcid'		=> $pcids,
 				'actmids'	=> $actmids
 
-			)) . " WHERE fid=".pwEscape($fid));
+			)) . " WHERE fid=".S::sqlEscape($fid));
+			*/
+			pwQuery::update('pw_forums', 'fid=:fid', array($fid), array(
+				'fup'		=> $fup,			'type'		=> $type,
+				'name'		=> $name,			'vieworder'	=> $vieworder,
+				'logo'		=> $logo,			'keywords'	=> $keywords,
+				'descrip'	=> $descrip,		'style'		=> $style,
+				'metadescrip' => $metadescrip,	'ifcms'		=> $ifcms,
+				'across'	=> $across,			'allowhide'	=> $allowhide,
+				'allowsell'	=> $allowsell,		'allowtype'	=> $allowtype,
+				'copyctrl'	=> $copyctrl,		'password'	=> $password,
+				'viewsub'	=> $viewsub,		'allowvisit'=> $allowvisit,
+				'allowread'	=> $allowread,		'allowpost'	=> $allowpost,
+				'allowrp'	=> $allowrp,		'allowdownload'=> $allowdownload,
+				'allowupload' => $allowupload,	'f_type'	=> $f_type,
+				'f_check'	=> $f_check,		't_type'	=> $t_type,
+				'forumsell'	=> $forumsell,		'cms'		=> $cms,
+				'ifhide'	=> $ifhide,			'showsub'	=> $showsub,
+				'modelid'	=> $modelids,		'pcid'		=> $pcids,
+				'actmids'	=> $actmids
+			));
 			updateforum($fup);
 			updateforum($forum['fup']);
 		}
-		P_unlink(D_P.'data/bbscache/c_cache.php');
-
+		//* P_unlink(D_P.'data/bbscache/c_cache.php');
+		pwCache::deleteData(D_P.'data/bbscache/c_cache.php');
+		
 		$othersql = $otherfids = array();
 		$update_f = '';
 		if (is_array($otherfid)) {
-			$otherfids = pwImplode($otherfid);
+			$otherfids = S::sqlImplode($otherfid);
 		}
-		
 		if (is_array($otherforum)) {
 			foreach ($otherforum as $key => $value) {
 				if ($key === 'forumsetdb' || $key === 'creditset' || $key=== 't_typemain') {
@@ -744,22 +854,43 @@ if (empty($action)) {
 					continue;
 				}
 				$othersql[$key] = $$key;
+				if($key === 'allowtype'){
+					if(is_array($modelid)){
+					$othersql['modelid']=$modelids;	
+					}
+					if(is_array($pcid)){
+					$othersql['pcid']=$pcids;	
+					}
+					if(is_array($actmid)){
+					$othersql['actmids']=$actmids;	
+					}
+				}
 			}
+			
 		}
-		
+	/*	var_dump($allowtype);
+		var_dump($otherforum);
+		var_dump($otherfids);
+		var_dump($othersql);exit;*/
+		if ($otherforum['ffup']) {
+			$fup = $cms == '1' ? $cfup : $ffup;
+			doOtherFidsSetFup($fup,$otherfid);
+			unset($otherforum['ffup'],$othersql['ffup']);
+		}
 		if ($othersql && $otherfids) {
-			$db->update("UPDATE pw_forums SET".pwSqlSingle($othersql)."WHERE fid IN($otherfids)");
+			//$db->update("UPDATE pw_forums SET".S::sqlSingle($othersql)."WHERE fid IN($otherfids)");
+			pwQuery::update('pw_forums', 'fid IN(:fid)', array($otherfid), $othersql);
 			if ($otherforum['t_typemain']) {
 				doOtherFidsTopicType($fid,$otherfid);
-			}
+			}		
 		}
 		if ($otherfids && $update_f) {
-			include(D_P.'data/bbscache/forum_cache.php');
+			include pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
 			foreach ($otherfid as $key => $selfid) {
 				if (!$selfid || !is_numeric($selfid) || $selfid == $fid || $forum[$selfid]['type'] == 'category') {
 					continue;
 				}
-				$rt = $db->get_one("SELECT fid,forumset,creditset FROM pw_forumsextra WHERE fid=".pwEscape($selfid));
+				$rt = $db->get_one("SELECT fid,forumset,creditset FROM pw_forumsextra WHERE fid=".S::sqlEscape($selfid));
 				if ($rt['fid']) {
 					$newforumset = unserialize($rt['forumset']);
 					foreach ($forumsetdb as $key => $value) {
@@ -794,7 +925,7 @@ if (empty($action)) {
 
 					$newcreditset = serialize($newcreditset);
 					$forumset = serialize($newforumset);
-					$db->update("UPDATE pw_forumsextra SET forumset=".pwEscape($forumset,false).",creditset=".pwEscape($newcreditset,false)."WHERE fid=".pwEscape($selfid));
+					$db->update("UPDATE pw_forumsextra SET forumset=".S::sqlEscape($forumset,false).",creditset=".S::sqlEscape($newcreditset,false)."WHERE fid=".S::sqlEscape($selfid));
 				} else {
 					$newforumset = array();
 					foreach ($forumsetdb as $key => $value) {
@@ -817,7 +948,7 @@ if (empty($action)) {
 					}
 					$newcreditset = serialize($newcreditset);
 					$forumset = serialize($newforumset);
-					$db->update("INSERT INTO pw_forumsextra SET forumset=".pwEscape($forumset,false).',creditset='.pwEscape($newcreditset,false).',fid='.pwEscape($selfid));
+					$db->update("INSERT INTO pw_forumsextra SET forumset=".S::sqlEscape($forumset,false).',creditset='.S::sqlEscape($newcreditset,false).',fid='.S::sqlEscape($selfid));
 				}
 			}
 		}
@@ -827,27 +958,28 @@ if (empty($action)) {
 	}
 } elseif ($action == 'changename') {
 
-	$fid = (int)GetGP('fid');
-	InitGP(array('fname'),'P',0);
+	$fid = (int)S::getGP('fid');
+	S::gp(array('fname'),'P',0);
 	$fname     = str_replace('<iframe','&lt;iframe',$fname);
 	$fname	 = str_replace(array('<iframe','"',"'"),array("&lt;iframe","",""),$fname);
-	$db->update("UPDATE pw_forums SET name=" . pwEscape($fname)." WHERE fid=".pwEscape($fid));
+	//$db->update("UPDATE pw_forums SET name=" . S::sqlEscape($fname)." WHERE fid=".S::sqlEscape($fid));
+	pwQuery::update('pw_forums', 'fid=:fid', array($fid), array('name' => $fname));
 	updatecache_f();
 	$msg = getLangInfo('cpmsg','operate_success');
 	echo $msg;
 	ajax_footer();
 } elseif ($action == 'delttype') {
-	InitGP(array('type','id'));
+	S::gp(array('type','id'));
 	$id_array = array();
 	if ($type == 'top') {
-		$query = $db->query("SELECT id FROM pw_topictype WHERE upid=".pwEscape($id));
+		$query = $db->query("SELECT id FROM pw_topictype WHERE upid=".S::sqlEscape($id));
 		while ($rt = $db->fetch_array($query)) {
 			$id_array[] = $rt['id'];
 		}
 	}
 	$id_array = array_merge($id_array,array($id));
 	if (!empty($id_array)) {
-		$db->update("DELETE FROM pw_topictype WHERE id IN (".pwImplode($id_array).")");
+		$db->update("DELETE FROM pw_topictype WHERE id IN (".S::sqlImplode($id_array).")");
 		updatecache_f();
 		$ids = implode("\t",$id_array);
 		echo "success\t".$ids;
@@ -856,16 +988,276 @@ if (empty($action)) {
 	}
 	ajax_footer();
 
+}} elseif ($adminitem =='uniteforum'){
+$basename .= "&type=$type";
+require_once(R_P.'require/updateforum.php');
+if(empty($_POST['action'])){
+	@include_once pwCache::getPath(D_P.'data/bbscache/forumcache.php');
+	list($hidefid,$hideforum) = GetHiddenForum();
+
+	include PrintEot('uniteforum');exit;
+} else{
+	S::gp(array('fid','tofid'),'P',2);
+	if(empty($fid)){
+		adminmsg('unite_type');
+	}
+	if($fid==$tofid){
+		adminmsg('unite_same');
+	}
+	$sub=$db->get_one("SELECT fid,name FROM pw_forums WHERE fup=".S::sqlEscape($fid)."LIMIT 1");
+	if($sub){
+		adminmsg('forum_havesub');
+	}
+	$forum=$db->get_one("SELECT type FROM pw_forums WHERE fid=".S::sqlEscape($tofid)."LIMIT 1");
+	if($forum['type']=='category'){
+		adminmsg('unite_type');
+	}
+	$forum=$db->get_one("SELECT fup,type FROM pw_forums WHERE fid=".S::sqlEscape($fid)."LIMIT 1");
+	if($forum['type']=='category'){
+		adminmsg('unite_type');
+	}
+	//$db->update("UPDATE pw_threads SET fid=".S::sqlEscape($tofid)."WHERE fid=".S::sqlEscape($fid));
+	pwQuery::update('pw_threads', 'fid = :fid', array($fid), array('fid'=>$tofid));
+	$ptable_a=array('pw_posts');
+
+	if ($db_plist && count($db_plist)>1) {
+		foreach ($db_plist as $key => $value) {
+			if($key == 0) continue;
+			$ptable_a[] = 'pw_posts'.$key;
+		}
+	}
+	foreach($ptable_a as $val){
+		//$db->update("UPDATE $val SET fid=".S::sqlEscape($tofid)."WHERE fid=".S::sqlEscape($fid));
+		pwQuery::update($val, 'fid=:fid', array($fid), array('fid' => $tofid));
+	}
+	$db->update("UPDATE pw_attachs SET fid=".S::sqlEscape($tofid)."WHERE fid=".S::sqlEscape($fid));
+	//$db->update("DELETE FROM pw_forums WHERE fid=".S::sqlEscape($fid));
+	pwQuery::delete('pw_forums', 'fid=:fid' , array($fid));
+	$db->update("DELETE FROM pw_forumdata WHERE fid=".S::sqlEscape($fid));
+	$db->update("DELETE FROM pw_forumsextra WHERE fid=".S::sqlEscape($fid));
+	//* P_unlink(D_P."data/forums/fid_{$fid}.php");
+	pwCache::deleteData(D_P."data/forums/fid_{$fid}.php");
+
+	updatecache_f();
+	updateforum($tofid);
+	if($forum['type']=='sub'){
+		updateforum($forum['fup']);
+	}
+	adminmsg('operate_success');
+}} elseif ($adminitem == 'forumsell') {
+	$basename .= "&adminitem=forumsell";
+if (empty($action)) {
+
+	require_once(R_P.'require/credit.php');
+	include_once pwCache::getPath(D_P.'data/bbscache/forumcache.php');
+	S::gp(array('username'));
+	S::gp(array('page','uid','fid'),'GP',2);
+
+	$sql = "WHERE 1";
+	if ($username) {
+		$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
+		$userdb = $userService->getByUserName($username);
+		if (!$userdb) {
+			$errorname = $username;
+			adminmsg('user_not_exists');
+		}
+		$uid = $userdb['uid'];
+	}
+	if ($uid) {
+		$sql .= " AND fs.uid=".S::sqlEscape($uid);
+	}
+	if ($fid) {
+		$sql .= " AND fs.fid=".S::sqlEscape($fid);
+	}
+	$page < 1 && $page = 1;
+	$limit = S::sqlLimit(($page-1)*$db_perpage,$db_perpage);
+	$rt = $db->get_one("SELECT COUNT(*) AS sum FROM pw_forumsell fs $sql");
+	$pages = numofpage($rt['sum'],$page,ceil($rt['sum']/$db_perpage),"$basename&uid=$uid&fid=$fid&");
+	$buydb = array();
+	$query = $db->query("SELECT fs.*,m.username,m.uid FROM pw_forumsell fs LEFT JOIN pw_members m USING(uid) $sql ORDER BY fs.overdate DESC $limit");
+	while ($rt = $db->fetch_array($query)) {
+		$rt['buydate']	= get_date($rt['buydate']);
+		$rt['overtime']	= get_date($rt['overdate']);
+		$buydb[] = $rt;
+	}
+
+	include PrintEot('forumsell');exit;
+
+} elseif ($_POST['action'] == 'del') {
+
+	S::gp(array('selid'));
+	if (!$selid = checkselid($selid)) {
+		adminmsg('operate_error');
+	}
+	$db->update("DELETE FROM pw_forumsell WHERE id IN($selid)");
+	adminmsg('operate_success');
+}} elseif ($adminitem == 'creathtm') {
+	require_once(R_P.'require/nav.php'); //导航
+	$basename .= "&type=$type";
+$sqladd = "WHERE type<>'category' AND allowvisit='' AND f_type!='hidden' AND cms='0'";
+if (!$action) {
+	@include_once pwCache::getPath(D_P.'data/bbscache/forumcache.php');
+	$num = 0;
+	$forumcheck = "<ul class=\"list_A list_120\">";
+
+	$select = '';
+	$query	= $db->query("SELECT fid,name,allowhtm FROM pw_forums $sqladd");
+	while ($rt = $db->fetch_array($query)) {
+		$num++;
+		$htm_tr = $num % 5 == 0 ? '' : '';
+		$checked = $rt['allowhtm'] ? 'checked' : $checked='';
+		$forumcheck .= "<li><input type='checkbox' name='selid[]' value='$rt[fid]' $checked>$rt[name]</li>$htm_tr";
+		$rt['allowhtm'] && $select .= "<option value=\"$rt[fid]\">$rt[name]</option>";
+	}
+	$forumcheck.="</ul>";
+	include PrintEot('creathtm');exit;
+
+} elseif ($_POST['action'] == 'submit') {
+	S::gp(array('selid'),'P');
+	$selid = checkselid($selid);
+	if ($selid === false) {
+		$basename = "javascript:history.go(-1);";
+		adminmsg('operate_error');
+	} elseif ($selid == '') {
+		$db->update("UPDATE pw_forums SET allowhtm='0' $sqladd");
+	} elseif ($selid) {
+		$db->update("UPDATE pw_forums SET allowhtm='1' $sqladd AND fid IN($selid)");
+		$db->update("UPDATE pw_forums SET allowhtm='0' $sqladd AND fid NOT IN($selid)");
+	}
+	updatecache_f();
+	adminmsg('operate_success');
+
+} elseif ($action == 'creat') {
+	@set_time_limit(0);
+	$pwServer['REQUEST_METHOD'] != 'POST' && PostCheck($verify);
+	S::gp(array('creatfid','percount','step','tfid','forumnum'));
+
+	$fids = $tid = $fieldadd = $tableadd = $tids = '';
+	!is_array($creatfid) && $creatfid = explode(',',$creatfid);
+	if (in_array('all', $creatfid)) {
+		$query = $db->query("SELECT fid FROM pw_forums $sqladd AND allowhtm='1'");
+		while ($rt = $db->fetch_array($query)) {
+			$fids .= ($fids ? ',' : '') . $rt['fid'];
+		}
+		$creatfid = explode(',',$fids);
+	} else {
+		$fids = implode(',',$creatfid);
+	}
+	!$fids && adminmsg('template_noforum');
+
+	!$tfid && $tfid = 0;
+	$thisfid = (int)$creatfid[$tfid];
+
+	$imgpath	= $db_http	!= 'N' ? $db_http : $db_picpath;
+	$attachpath	= $db_attachurl	!= 'N' ? $db_attachurl : $db_attachname;
+	$staticPage = L::loadClass('StaticPage');
+
+	if (!$staticPage->initForum($thisfid)) {
+		Showmsg('data_error');
+	}
+	(!is_numeric($forumnum) || $forumnum < 0) && $forumnum = 0;
+	!$step && $step = 1;
+	!$percount && $percount = 100;
+	$start = ($step-1) * $percount;
+	$next  = $start + $percount;
+	$step++;
+	$j_url = "$basename&action=$action&percount=$percount&creatfid=$fids&forumnum=$forumnum";
+	$goon  = 0;
+
+	$query = $db->query("SELECT tid FROM pw_threads WHERE fid='$thisfid' AND ifcheck=1 AND special='0' ORDER BY topped DESC,lastpost DESC" . S::sqlLimit($start, $percount));
+	while ($topic = $db->fetch_array($query)) {
+		$goon = 1;
+		$staticPage->update($topic['tid']);
+	}
+	if ($forumnum && $next >= $forumnum) {
+		$goon = 0;
+	}
+	if ($goon) {
+		$j_url .= "&step=$step&tfid=$tfid";
+		adminmsg('updatecache_step',EncodeUrl($j_url));
+	} else {
+		$tfid++;
+		if (isset($creatfid[$tfid])) {
+			$j_url .= "&step=1&tfid=$tfid";
+			adminmsg('updatecache_step1',EncodeUrl($j_url));
+		}
+		adminmsg('operate_success');
+	}
+} elseif ($_POST['action'] == 'delete') {
+
+	@include_once pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
+	S::gp(array('creatfid'),'P');
+	if (in_array('all',$creatfid)) {
+		$handle = opendir(R_P.$db_readdir.'/');
+		while ($file = readdir($handle)) {
+			if (($file != ".") && ($file != "..") && ($file != "")) {
+				if (is_dir(R_P.$db_readdir.'/'.$file)){
+					//cms
+					if (!$forum[$file]['cms']) {
+						deldir(R_P.$db_readdir.'/'.$file);
+					}
+					//cms
+				}
+			}
+		}
+	} elseif ($creatfid) {
+		foreach ($creatfid as $key => $value) {
+			if (is_numeric($value)) {
+				deldir(R_P.$db_readdir.'/'.$value);
+			}
+		}
+	} else {
+		adminmsg('forumid_error');
+	}
+	adminmsg('operate_success');
+}
+/*
+ * 函数名和 common.php 里面冲突了
+function pwAdvert($ckey,$fid=0,$lou=-1,$scr=0) {
+	global $timestamp,$db_advertdb,$_time;
+	if (empty($db_advertdb[$ckey])) return false;
+	$hours = $_time['hours'] + 1;
+	$fid || $fid = $GLOBALS['fid'];
+	$scr || $scr = 'read';
+	$lou = (int)$lou;
+	$tmpAdvert = $db_advertdb[$ckey];
+	if ($db_advertdb['config'][$ckey] == 'rand') {
+		shuffle($tmpAdvert);
+	}
+	$arrAdvert = array();$advert = '';
+	foreach ($tmpAdvert as $key=>$value) {
+            if ($value['stime'] > $timestamp ||
+                $value['etime'] < $timestamp ||
+                ($value['dtime'] && strpos(",{$value['dtime']},",",{$hours},")===false) ||
+		($value['mode'] && strpos($value['mode'],'bbs')===false) ||
+		($value['page'] && strpos($value['page'],$scr)===false) ||
+		($value['fid'] && strpos(",{$value['fid']},",",$fid,")===false) ||
+		($value['lou'] && strpos(",{$value['lou']},",",$lou,")===false)
+            ) {
+		continue;
+            }
+            if ((!$value['ddate'] && !$value['dweek']) ||
+                ($value['ddate'] && strpos(",{$value['ddate']},",",{$_time['day']},")!==false) ||
+                ($value['dweek'] && strpos(",{$value['dweek']},",",{$_time['week']},")!==false)) {
+                $arrAdvert[] = $value['code'];
+                $advert .= is_array($value['code']) ? $value['code']['code'] : $value['code'];
+                if ($db_advertdb['config'][$ckey] != 'all') break;
+            }
+	}
+	return array($advert,$arrAdvert);
+}
+*/
 }
 
 function delforum($fid) {
 	global $db,$db_guestdir,$db_guestthread,$db_guestread;
 
-	$foruminfo = $db->get_one("SELECT fid,fup,forumadmin FROM pw_forums WHERE fid=".pwEscape($fid));
-	$db->update("DELETE FROM pw_forums WHERE fid=".pwEscape($fid));
-	$db->update("DELETE FROM pw_forumdata WHERE fid=".pwEscape($fid));
-	$db->update("DELETE FROM pw_forumsextra WHERE fid=".pwEscape($fid));
-	$db->update("DELETE FROM pw_permission WHERE fid>'0' AND fid=".pwEscape($fid));
+	$foruminfo = $db->get_one("SELECT fid,fup,forumadmin FROM pw_forums WHERE fid=".S::sqlEscape($fid));
+	//$db->update("DELETE FROM pw_forums WHERE fid=".S::sqlEscape($fid));
+	pwQuery::delete('pw_forums', 'fid=:fid', array($fid));
+	$db->update("DELETE FROM pw_forumdata WHERE fid=".S::sqlEscape($fid));
+	$db->update("DELETE FROM pw_forumsextra WHERE fid=".S::sqlEscape($fid));
+	$db->update("DELETE FROM pw_permission WHERE fid>'0' AND fid=".S::sqlEscape($fid));
 	if ($foruminfo['forumadmin']) {
 		$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
 		$forumadmin = explode(",",$foruminfo['forumadmin']);
@@ -883,13 +1275,15 @@ function delforum($fid) {
 		require_once(R_P.'require/guestfunc.php');
 		$db_guestthread && deldir(D_P."$db_guestdir/T_{$fid}");
 	}
-	P_unlink(D_P."data/forums/fid_{$fid}.php");
+	//* P_unlink(D_P."data/forums/fid_{$fid}.php");
+	pwCache::deleteData(D_P."data/forums/fid_{$fid}.php");
+
 
 	require_once(R_P.'require/functions.php');
 	require_once(R_P.'require/updateforum.php');
 	$pw_attachs = L::loadDB('attachs', 'forum');
 	$ttable_a = $ptable_a = array();
-	$query = $db->query("SELECT tid,replies,ptable FROM pw_threads WHERE fid=".pwEscape($fid));
+	$query = $db->query("SELECT tid,replies,ptable FROM pw_threads WHERE fid=".S::sqlEscape($fid));
 	while ($tpc = $db->fetch_array($query)) {
 		$tid = $tpc['tid'];
 		$ttable_a[GetTtable($tid)][] = $tid;
@@ -902,17 +1296,22 @@ function delforum($fid) {
 	pwFtpClose($GLOBALS['ftp']);
 
 	foreach ($ttable_a as $pw_tmsgs => $val) {
-		$val = pwImplode($val,false);
-		$db->update("DELETE FROM $pw_tmsgs WHERE tid IN($val)");
+		//* $val = S::sqlImplode($val,false);
+		//* $db->update("DELETE FROM $pw_tmsgs WHERE tid IN($val)");
+		pwQuery::delete($pw_tmsgs, 'tid IN(:tid)', array($val));
 	}
-	# $db->update("DELETE FROM pw_threads WHERE fid=".pwEscape($fid));
+	# $db->update("DELETE FROM pw_threads WHERE fid=".S::sqlEscape($fid));
 	# ThreadManager
-	$threadManager = L::loadClass("threadmanager", 'forum');
-	$threadManager->deleteByForumId($fid);
+	//* $threadManager = L::loadClass("threadmanager", 'forum');
+	//* $threadManager->deleteByForumId($fid);
+	$threadService = L::loadclass('threads', 'forum');
+	$threadService->deleteByForumId($fid);
+	//* Perf::gatherInfo('changeThreadWithForumIds', array('fid'=>$fid));			
 
 	foreach ($ptable_a as $key => $val) {
 		$pw_posts = GetPtable($key);
-		$db->update("DELETE FROM $pw_posts WHERE fid=".pwEscape($fid));
+		//$db->update("DELETE FROM $pw_posts WHERE fid=".S::sqlEscape($fid));
+		pwQuery::delete($pw_posts, 'fid=:fid', array($fid));
 	}
 	updateforum($foruminfo['fup']);
 }
@@ -968,12 +1367,30 @@ function getForumSelectHtml(){
 	}
         return $forumcache;
 }
-
+function doOtherFidsSetFup($fup, $otherfid = array()){
+	global $db;
+	if (!$fup) return false;
+	$rt = $db->get_one("SELECT type,cms FROM pw_forums WHERE fid=".S::sqlEscape($fup));
+	if ($rt['type'] == 'category') {
+		$type = 'forum';
+	} elseif ($rt['type'] == 'forum') {
+		if (($rt['cms'] && !$cms) || (!$rt['cms'] && $cms)) {
+			adminmsg('setforum_cms');
+		}
+		$type = 'sub';
+	} elseif ($rt['type'] == 'sub') {
+		$type = 'sub2';
+	}
+	foreach ($otherfid as $v){
+		$pwSQL = array('fup'=>$fup,'type'=>$type);
+		$db->update("UPDATE pw_forums SET".S::sqlSingle($pwSQL)."WHERE fid=".S::sqlEscape($v,false));
+	}
+}
 function doOtherFidsTopicType($fid, $otherfid = array()) {
 	global $db;
 	if (!$fid) return false;
 	$otherTypeDb = $subTypedb = array(); 
-	$query = $db->query("SELECT * FROM pw_topictype WHERE fid =".pwEscape($fid));
+	$query = $db->query("SELECT * FROM pw_topictype WHERE fid =".S::sqlEscape($fid));
 	while($rt = $db->fetch_array($query)) {
 		$otherTypeDb[$rt['id']] = $rt;
 		$rt['upid'] && $subTypedb[$rt['upid']][] = $rt;
@@ -991,18 +1408,42 @@ function doOtherFidsTopicType($fid, $otherfid = array()) {
 		$otherTypeArr[$value] = $otherTypeDb;
 	}
 	foreach($otherTypeArr as $key=>$otherType) {
-		$db->update("DELETE FROM pw_topictype WHERE fid=". pwEscape($key));
+		$db->update("DELETE FROM pw_topictype WHERE fid=". S::sqlEscape($key));
 		foreach ($otherType as $value) {
 			$typeSqldb = array('fid'=>$key, 'name'=>$value['name'], 'logo'=>$value['logo'], 'vieworder'=>$value['vieworder']);
-			$db->update("INSERT INTO pw_topictype SET " . pwSqlSingle($typeSqldb));
+			$db->update("INSERT INTO pw_topictype SET " . S::sqlSingle($typeSqldb));
 			$newId = $db->insert_id();
 			if ($value['subType']) {
 				foreach ($value['subType'] as $subValue) {
 					$subTypeSqldb = array('fid'=>$key, 'name'=>$subValue['name'], 'logo'=>$subValue['logo'], 'vieworder'=>$subValue['vieworder'],'upid'=>$newId);
-					$db->update("INSERT INTO pw_topictype SET " . pwSqlSingle($subTypeSqldb));
+					$db->update("INSERT INTO pw_topictype SET " . S::sqlSingle($subTypeSqldb));
 				}
 			}
 		}
 	}
+}
+
+//新增版块置顶操作
+function updateForumPostTop($fidArr) {	
+	global $db;
+	if (!is_array($fidArr)) return false;
+	$postTopData = array();
+	$query = $db->query("SELECT * FROM pw_poststopped WHERE floor = 3 GROUP BY tid ");
+	while ($row = $db->fetch_array($query)) {
+		$postTopData[] = $row;
+	}
+	foreach ($postTopData as $key => $value) {
+		foreach ($fidArr as $fid) {
+			pwQuery::insert('pw_poststopped', array(
+				'fid'			=> $fid,
+				'tid'			=> $value['tid'],
+				'pid'			=> $value['pid'],
+				'floor'			=> $value['floor'],
+				'uptime'		=> $value['uptime'],
+				'overtime'		=> $value['overtime']
+			));
+		}
+	}
+	updatetop();
 }
 ?>

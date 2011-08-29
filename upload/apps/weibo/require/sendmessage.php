@@ -3,7 +3,7 @@
 !$winduid && Showmsg('not_login');
 
 
-InitGP(array('_usernames', 'atc_mctitle', 'atc_mccontent'));
+S::gp(array('_usernames', 'atc_mctitle', 'atc_mccontent'));
 $usernames = $_usernames;/*specia;*/
 
 if(!$_G['allowmessege']){

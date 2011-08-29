@@ -11,9 +11,7 @@ if (empty($_POST['step'])) {
 } else {
 
 	PostCheck();
-	InitGP(array(
-		'content'
-	), 'P');
+	S::gp(array('content'), 'P');
 	$content = trim(str_replace("\n", '', $content));
 	strlen($content) > 90 && $content = substrs($content, 90);
 
@@ -26,8 +24,8 @@ if (empty($_POST['step'])) {
 		$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
 		$userService->update($winduid, array('honor'=>$content));
 		
-		$_cache = getDatastore();
-		$_cache->delete('UID_'.$winduid);
+		//* $_cache = getDatastore();
+		//* $_cache->delete('UID_'.$winduid);
 		
 		if (L::config('o_weibopost', 'o_config')) {
 			$weiboService = L::loadClass('weibo','sns');

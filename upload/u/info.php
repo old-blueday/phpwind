@@ -2,7 +2,7 @@
 !defined('R_P') && exit('Forbidden');
 $USCR = 'space_info';
 
-$isGM = CkInArray($windid,$manager);
+$isGM = S::inArray($windid,$manager);
 !$isGM && $groupid==3 && $isGM=1;
 
 require_once(R_P . 'u/lib/space.class.php');
@@ -13,7 +13,7 @@ if (!$space =& $newSpace->getInfo()) {
 
 $indexRight = $newSpace->viewRight('index');
 $indexValue = $newSpace->getPrivacyByKey('index');
-include_once(D_P . 'data/bbscache/level.php');
+include_once pwCache::getPath(D_P . 'data/bbscache/level.php');
 $newSpace->getDetailInfo();
 $newSpace->initSet();
 $isSpace = true;

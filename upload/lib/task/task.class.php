@@ -104,7 +104,7 @@ class PW_Task {
 	 * 增加一条任务记录
 	 */
 	function add($id, $name, $task, $next) {
-		$this->_db->update("INSERT INTO pw_task" . " SET " . pwSqlSingle(array(
+		$this->_db->update("INSERT INTO pw_task" . " SET " . S::sqlSingle(array(
 			'id' => ($id) ? $id : '',
 			'name' => $name,
 			'task' => $task,
@@ -118,12 +118,12 @@ class PW_Task {
 	 * 更新一条任务记录
 	 */
 	function update($id, $name, $task, $next) {
-		$this->_db->update("UPDATE pw_task SET count=count+1," . pwSqlSingle(array(
+		$this->_db->update("UPDATE pw_task SET count=count+1," . S::sqlSingle(array(
 			'name' => $name,
 			'task' => $task,
 			'last' => $this->_timestamp,
 			'next' => $next,
-		)) . " WHERE id=" . pwEscape($id));
+		)) . " WHERE id=" . S::sqlEscape($id));
 	}
 	/**
 	 * 获取需要执行的任务列表
@@ -182,7 +182,7 @@ class PW_Task {
 	function setFileCache() {
 		$configs = $this->taskConfig();
 		$tasks = "\$tasks=" . pw_var_export($configs) . ";";
-		writeover($this->getCacheFileName(), "<?php\r\n" . $tasks . "\r\n?>");
+		pwCache::setData($this->getCacheFileName(), "<?php\r\n" . $tasks . "\r\n?>");
 		return $configs;
 	}
 	/**
@@ -192,7 +192,7 @@ class PW_Task {
 		if (!$this->_cache) {
 			return $this->taskConfig(); /*not open cache*/
 		}
-		@include Pcv($this->getCacheFileName());
+		@include S::escapePath($this->getCacheFileName());
 		if ($tasks) {
 			return $tasks;
 		}
@@ -216,7 +216,7 @@ class PW_Task {
 		if (isset($classes[$class])) {
 			return $classes[$class];
 		}
-		include Pcv($filename);
+		include S::escapePath($filename);
 		$classes[$class] = new $class();
 		return $classes[$class];
 	}

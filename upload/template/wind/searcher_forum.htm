@@ -1,59 +1,85 @@
 <!--<?php print <<<EOT
 -->
-		<div class="content fl">
-        	<div class="s_dlA">
+
+<!--main begin-->
+<table width="100%" cellpadding="0" cellspacing="0"><tr><td valign="top" height="300">
+<div class="forum_main">
 <!-- 
 EOT;
 foreach($forums as $forum){
 print <<<EOT
--->             
-	            <dl>
-	               <dd class="img"><a href="thread.php?fid={$forum[fid]}" target="_blank"><img src="$forum[logo]" width="44" height="44"></a></dd><dt><a href="thread.php?fid={$forum[fid]}" target="_blank">$forum[name]</a></dt>
-	               <dd>$forum[descrip]</dd>
-	            </dl>
-<!-- 
-EOT;
-}
-print <<<EOT
--->  
-                <div class="pages">
-                    $pager
-                </div>
-                <div class="c">&nbsp;</div>
-            </div>
-            <div class="h">
-         
-            </div>
-        </div>
-        <div class="sidebar fr">
+-->
+	<dl class="cc">
+		<dt><a href="thread.php?fid={$forum[fid]}" target="_blank"><img src="$forum[logo]"></a></dt>
+		<dd>
+			<div class="name cc"><a href="thread.php?fid={$forum[fid]}" class="f14 b" target="_blank">$forum[name]</a>
+			<span id="favorforum{$forum[fid]}">
 <!--
 EOT;
-if($hotwords){
-print <<<EOT
--->         
-        	<div class="p15 s_boxA">
-            	<h2>一周热门搜索</h2>
-                <ul>
-<!-- 
+if ($forum['favor']) {print <<<EOT
+-->
+			<a href="javascript:favorforum($forum[fid]);" class="keepon" title="将本版块移出我的书签">取消收藏</a>
+<!--
 EOT;
-foreach($hotwords as $hotword){
+} else {print <<<EOT
+-->
+			<a href="javascript:favorforum($forum[fid]);" class="keep" title="将本版块添加到我的书签">收藏本版</a>
+<!--
+EOT;
+}
+
+$forum[descrip_sub] = substrs($forum[descrip],120);
+$forum[descrip_title] = strip_tags($forum[descrip]);
 print <<<EOT
--->                
-                	<li><a href="searcher.php?keyword={$hotword}&type=thread">$hotword</a></li>
+-->
+</span>
+			</div>
+			<div title="$forum[descrip_title]">$forum[descrip_sub]</div>
+			<div>
+<!--
+EOT;
+if ($forum['admin']) {print <<<EOT
+-->
+			版主：{$forum['admin']}
+<!--
+EOT;
+}print <<<EOT
+-->
+			</div>
+		</dd>
+	</dl>
 <!-- 
 EOT;
 }
 print <<<EOT
--->                 	
-                </ul>
-            </div>
-<!-- 
+--> 
+	<div class="c"></div>
+</div>
+</td></tr></table>
+<div style="padding:10px 0 10px 20px;" class="cc">
+	$pager
+</div>
+<div style="padding-left:20px;">
+<!--
 EOT;
-}
+require printEOT('searcher_searchinput');
 print <<<EOT
--->              
-        </div>
-        <div class="c">&nbsp;</div>
+-->
+</div>
+<script language="JavaScript">
+function favorforum(fid) {
+	ajax.send('pw_ajax.php?action=shortcut&fid='+fid,'',function(){
+		ajax.guide();
+		var rText = ajax.request.responseText.split('	');
+		if (typeof(rText[1]) != 'undefined' && rText[1] == 'successok') {
+			getObj('favorforum'+fid).innerHTML = "<a title=\"将本版块移出我的书签\" onclick=\"javascript:favorforum("+fid+");\" class=\"keepon\">取消收藏</a>";
+		} else if (typeof(rText[1]) != 'undefined' && rText[1] == 'successno') {
+getObj('favorforum'+fid).innerHTML = "<a title=\"将本版块添加到我的书签\" onclick=\"javascript:favorforum("+fid+");\" style=\"cursor:pointer;\" class=\"keep\">收藏本版</a>";
+		
+		}
+	});
+}
+</script>
 <!--
 EOT;
 ?>

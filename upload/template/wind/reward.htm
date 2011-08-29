@@ -2,7 +2,7 @@
 print <<<EOT
 -->
 <div id="breadCrumb">
-		<img src="$imgpath/$stylepath/thread/home-old.gif" align="absmiddle" />&nbsp;<a href="$db_bfn" title="$db_bbsname">$db_bbsname</a><em>&gt;</em>悬赏帖管理
+<img src="$imgpath/$stylepath/thread/home.gif" class="breadHome" /><em class="breadEm"></em><a href="$db_bfn" title="$db_bbsname">$db_bbsname</a><em>&gt;</em>悬赏帖管理
 </div>
 <!--
 EOT;
@@ -16,10 +16,10 @@ if($action=='reward'){ print <<<EOT
 <tr class="tr2"><td colspan="2">评选“最佳答案”前请先评选“热心助人”！<br />
 “最佳答案”的评定意味着悬赏的结束，如您未能在评选“最佳答案”前评选出“热心助人”，则热心助人将按照发帖顺序给分，每楼给1分，直至热心助人分全部用完。</td></tr>
 <tr class="tr3"><th width="21%">操作者</th>
-<th><a href="u.php?uid=$winduid">$windid</a></th></tr>
+<th><a href="{$db_userurl}$winduid">$windid</a></th></tr>
 <tr class="tr3"><th width="21%">作者</th>
 <th>
-<a href="u.php?uid=$rt[authorid]">$rt[author]</a></th></tr>
+<a href="{$db_userurl}$rt[authorid]">$rt[author]</a></th></tr>
 <tr class="tr3"><th width="21%">操作类型:</th>
 <th>
 <input type="radio" name="type" value="1" $sel_1 />最佳答案
@@ -48,10 +48,10 @@ EOT;
 <table width="100%" align="center" cellspacing="0" cellpadding="0">
 <tr><td colspan="2" class="h">悬赏帖管理</td></tr>
 <tr class="tr3"><th width="21%">操作者</th>
-<th><a href="u.php?uid=$winduid">$windid</a></th></tr>
+<th><a href="{$db_userurl}$winduid">$windid</a></th></tr>
 <tr class="tr3"><th width="21%">作者</th>
 <th>
-<a href="u.php?uid=$rt[authorid]">$rt[author]</a></th></tr>
+<a href="{$db_userurl}$rt[authorid]">$rt[author]</a></th></tr>
 <tr class="tr3"><th width="21%">操作类型:</th>
 <th>
 <input type="radio" name="type" value="2" checked />强行结案 (强制结束悬赏，不返还用户悬赏的积分)<br />

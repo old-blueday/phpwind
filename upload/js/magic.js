@@ -74,6 +74,7 @@ function selectMagic(id){
 	try{getObj(id).className="lhcl_selectBox";}catch(e){}
 	magic_id   = id;
 	magic_name = getObj(id).title;
+	previewMagic(200,210);
 }
 function previewMagic(w,h){
 	if(!magic_id)return false;

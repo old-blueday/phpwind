@@ -53,6 +53,10 @@ $lang['log'] = array (
 							.'给用户[b]{$L[username1]}[/b]转帐 {$L[field1]}{$GLOBALS[moneyname]}，系统收取手续费：{$L[tax]}。',
 'shield_descrip'		=> '帖子：[url=$GLOBALS[db_bbsurl]/read.php?tid=$L[tid]]$L[subject][/url]\n'
 							.'操作：屏蔽主题\n原因：{$L[reason]}',
+'banuserip_descrip'		=> '帖子：[url=$GLOBALS[db_bbsurl]/read.php?tid=$L[tid]]$L[subject][/url]\n'
+							.'操作：禁止IP\n原因：{$L[reason]}',
+'signature_descrip'	=> '帖子：[url=$GLOBALS[db_bbsurl]/read.php?tid=$L[tid]]$L[subject][/url]\n'
+							.'操作：禁止签名\n原因：{$L[reason]}',
 'unite_descrip'			=> '帖子：[url=$GLOBALS[db_bbsurl]/read.php?tid=$L[tid]]$L[subject][/url]\n'
 							.'操作：主题合并\n原因：{$L[reason]}',
 'remind_descrip'		=> '帖子：[url=$GLOBALS[db_bbsurl]/read.php?tid=$L[tid]]$L[subject][/url]\n'

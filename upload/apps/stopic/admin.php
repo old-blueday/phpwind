@@ -26,14 +26,14 @@ $job = in_array($job, $admin_jobs) ? $job : 'stman';
 $stopic_admin_url = $basename;
 
 $stopic_service	= L::loadClass('stopicservice','stopic');
-include Pcv(A_P."/action/admin/$job.php");
+include S::escapePath(A_P."/action/admin/$job.php");
 
 
 function stopic_use_layout($layout) {
-	return Pcv(A_P."/template/layout/$layout.php");
+	return S::escapePath(A_P."/template/layout/$layout.php");
 }
 function stopic_load_view($action, $module='admin') {
-	return Pcv(A_P."/template/$module/$action.htm");
+	return S::escapePath(A_P."/template/$module/$action.htm");
 }
 
 function stopic_check_file_name($file_name) {

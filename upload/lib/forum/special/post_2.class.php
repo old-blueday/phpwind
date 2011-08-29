@@ -44,7 +44,7 @@ class postSpecial {
 	}
 
 	function resetInfo($tid, $atcdb) {
-		$reset = $this->db->get_one("SELECT * FROM pw_activity WHERE tid=" . pwEscape($tid));
+		$reset = $this->db->get_one("SELECT * FROM pw_activity WHERE tid=" . S::sqlEscape($tid));
 		$reset['starttime'] = get_date($reset['starttime'], "Y-m-d H:i");
 		$reset['endtime']   = get_date($reset['endtime'], "Y-m-d H:i");
 		$reset['deadline']  = get_date($reset['deadline'], "Y-m-d H:i");
@@ -54,14 +54,14 @@ class postSpecial {
 	}
 
 	function _setData() {
-		$this->data['subject']	= Char_cv(GetGP('act_subject', 'P'));
-		$this->data['location']	= Char_cv(GetGP('act_location', 'P'));
-		$this->data['sexneed']	= intval(GetGP('act_sex'));
-		$act_starttime	= Char_cv(GetGP('act_starttime'));
-		$act_deadline	= Char_cv(GetGP('act_deadline'));
-		$act_endtime	= Char_cv(GetGP('act_endtime'));
-		$act_num		= intval(GetGP('act_num'));
-		$act_costs		= intval(GetGP('act_costs'));
+		$this->data['subject']	= S::escapeChar(S::getGP('act_subject', 'P'));
+		$this->data['location']	= S::escapeChar(S::getGP('act_location', 'P'));
+		$this->data['sexneed']	= intval(S::getGP('act_sex'));
+		$act_starttime	= S::escapeChar(S::getGP('act_starttime'));
+		$act_deadline	= S::escapeChar(S::getGP('act_deadline'));
+		$act_endtime	= S::escapeChar(S::getGP('act_endtime'));
+		$act_num		= intval(S::getGP('act_num'));
+		$act_costs		= intval(S::getGP('act_costs'));
 
 		!($this->data['subject'] && $act_starttime && $act_deadline) && Showmsg('active_data_empty');
 		$act_starttime= PwStrtoTime($act_starttime);
@@ -89,13 +89,13 @@ class postSpecial {
 
 	function insertData($tid) {
 		$this->data['tid'] = $tid;
-		$this->db->update("INSERT INTO pw_activity SET " . pwSqlSingle($this->data));
+		$this->db->update("INSERT INTO pw_activity SET " . S::sqlSingle($this->data));
 	}
 
 	function modifyData($tid) {
 		global $timestamp;
 		$this->_setData();
-		$act = $this->db->get_one("SELECT * FROM pw_activity WHERE tid=" . pwEscape($tid));
+		$act = $this->db->get_one("SELECT * FROM pw_activity WHERE tid=" . S::sqlEscape($tid));
 
 		if ($timestamp > $act['starttime'] && $act['starttime'] != $this->data['starttime']) {
 			Showmsg('can_not_modify_start');
@@ -112,14 +112,14 @@ class postSpecial {
 		if ($this->data['endtime'] && $this->data['deadline'] > $this->data['endtime'] && $this->data['deadline'] != $act['deadline']) {
 			Showmsg('deadline_endtime_limit');
 		}
-		extract($this->db->get_one('SELECT COUNT(*) AS count FROM pw_actmember WHERE actid=' . pwEscape($tid) . ' AND state=1'));
+		extract($this->db->get_one('SELECT COUNT(*) AS count FROM pw_actmember WHERE actid=' . S::sqlEscape($tid) . ' AND state=1'));
 		if ($this->data['num'] != 0 && $this->data['num'] < $count) {
 			Showmsg('active_num_limit');
 		}
 	}
 
 	function updateData($tid) {
-		$this->db->update("UPDATE pw_activity SET " . pwSqlSingle(array(
+		$this->db->update("UPDATE pw_activity SET " . S::sqlSingle(array(
 			'subject'	=> $this->data['subject'],
 			'starttime'	=> $this->data['starttime'],
 			'endtime'	=> $this->data['endtime'],
@@ -128,7 +128,7 @@ class postSpecial {
 			'sexneed'	=> $this->data['sexneed'],
 			'costs'		=> $this->data['costs'],
 			'deadline'	=> $this->data['deadline']
-		)) . " WHERE tid=" . pwEscape($tid));
+		)) . " WHERE tid=" . S::sqlEscape($tid));
 	}
 }
 ?>

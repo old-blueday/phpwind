@@ -9,7 +9,7 @@ class PW_DataSourceService{
 		global $db_modes;
 		$bbsTypes = $this->_getBBsSourceTypes();
 		foreach ($db_modes as $key => $value) {
-			$sourceTypesFile = Pcv(R_P . 'mode/' . $key . '/config/sourcetype.php');
+			$sourceTypesFile = S::escapePath(R_P . 'mode/' . $key . '/config/sourcetype.php');
 			if (!file_exists($sourceTypesFile)) continue;
 			$sourceTypes = include ($sourceTypesFile);
 			$sourceTypes = $this->_cookModeSourceTypes($sourceTypes,$key);
@@ -162,7 +162,7 @@ class PW_DataSourceService{
 		} elseif (is_numeric($param)) {
 			$result = str_replace('&nbsp;',' ',$result);
 			$temp = substrs($result,$param,'');
-		} elseif (preg_match('/^\d{1,3},\d{1,3}$/',$param) && $addtion =='image') {
+		} elseif (preg_match('/^\d{1,3},\d{1,3}$/',$param)) {
 			list($width,$height) = explode(',',$param);
 			$temp = minImage($result,$width,$height);
 		} elseif (preg_match('/^\w{1,4}(:|-)\w{1,4}((:|-)\w{1,4})?$/',$param)) {
@@ -190,13 +190,13 @@ class PW_DataSourceService{
 	function _getModeSourceFactory($className,$mode) {
 		static $classes = array();
 		if (isset($classes[$className])) return $classes[$className];
-		$coreFile = Pcv(R_P . 'mode/'.$mode.'/require/core.php');
+		$coreFile = S::escapePath(R_P . 'mode/'.$mode.'/require/core.php');
 		if (file_exists($coreFile)) require_once $coreFile;
 		
 		$class = 'PW_' . $className;
 		if (!class_exists($class)) {
 			$fileDir = R_P . 'mode/'.$mode.'/lib/source/'.$className.'.class.php';
-			if (file_exists($fileDir)) require_once Pcv($fileDir);
+			if (file_exists($fileDir)) require_once S::escapePath($fileDir);
 			if (!class_exists($class)) { //再次验证是否存在class
 				$GLOBALS['className'] = $class;
 				Showmsg('该数据类型不存在');

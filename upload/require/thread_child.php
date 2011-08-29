@@ -12,7 +12,7 @@ if ($db_siteappkey && ($db_apps_list['17']['status'] == 1 || is_array($db_thread
 /*The app client*/
 
 $newpic= (int)GetCookie('newpic');
-$query = $db->query("SELECT f.fid,f.logo,f.name, f.descrip,f.forumadmin,f.password,f.allowvisit,f.f_type,f.ifcms,fd.tpost,fd.topic,fd.article,fd.subtopic,fd.lastpost FROM pw_forums f LEFT JOIN pw_forumdata fd USING(fid) WHERE f.fup=".pwEscape($fid)."ORDER BY f.vieworder");
+$query = $db->query("SELECT f.fid,f.logo,f.name, f.descrip,f.forumadmin,f.password,f.allowvisit,f.f_type,f.ifcms,fd.tpost,fd.topic,fd.article,fd.subtopic,fd.lastpost FROM pw_forums f LEFT JOIN pw_forumdata fd USING(fid) WHERE f.fup=".S::sqlEscape($fid)."ORDER BY f.vieworder");
 while($child = $db->fetch_array($query)){
 	if(empty($child['allowvisit']) || strpos($child['allowvisit'],','.$groupid.',')!==false){
 		list($f_a,$child['au'],$f_c,$child['ft'])=explode("\t",$child['lastpost']);

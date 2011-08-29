@@ -58,9 +58,6 @@ if($showlogin){print <<<EOT
 function showcustomquest(qid){
 	getObj("customquest").style.display = qid==-1 ? '' : 'none';
 }
-function opencode() {
-	getObj('ckcode').src = 'ck.php?nowtime=' + new Date().getTime();
-}
 </script>
 		<div>您没有登录或者您没有权限访问此页面，可能有如下几个原因:</div>
 		<div class="mt10">
@@ -71,7 +68,7 @@ function opencode() {
 				<tr class="vt"><td width="60">
 
 EOT;
-$arr_logintypename = array('用户名','UID','Email');
+$arr_logintypename = array('用户名','UID','电子邮箱');
 $value = 0;
 if(count($_LoginInfo['logintype'])==1){
 	$value = current($_LoginInfo['logintype']);print <<<EOT
@@ -122,16 +119,22 @@ if($db_ifsafecv){print <<<EOT
 			</tr>
 
 EOT;
-}if(is_numeric($qkey)){print <<<EOT
+}if($db_ckquestion & 2 && $db_question){
+if($db_imagequestion){
+	$question = '<img id="ckquestion" src="ckquestion.php?q='.$qkey.'&t='.$timestamp.'" align="top">';
+}else{
+	$question = $qkey<0 ? getMachineQuestion_1() :  $db_question[$qkey];
+}
+print <<<EOT
 
 			<tr class="vt"><td>验证问答</td>
-				<td>问题:{$db_question[$qkey]}
+				<td>{$question}
 <!--
 EOT;
-list(, , , ,$showq) = explode("\t", $db_qcheck);
-if($showq){print <<<EOT
+list(,$showq) = explode("\t", $db_qcheck);
+if($showq && $qkey>0){print <<<EOT
 -->
-					<br />正确答案:{$db_answer[$qkey]}
+					正确答案:{$db_answer[$qkey]}
 <!--
 EOT;
 }print <<<EOT
@@ -141,16 +144,23 @@ EOT;
 			</td></tr>
 
 EOT;
-}if($db_gdcheck & 2){print <<<EOT
+}if($db_gdcheck & 2){
+$gdSize = explode("\t",$db_gdsize);
+print <<<EOT
 
 			<tr class="vt"><td>认证码</td>
 				<td>
-					<input class="input" type="text" name="gdcode" size="6" tabindex="17" alt="请输入验证码" />
-					<span style="cursor:pointer; margin-left:3px" onclick="try{opencode()}catch(e){}" >点此显示验证码</span>
-					<div><img src="$imgpath/loading.gif" align="absmiddle" style="cursor:pointer;" id="ckcode" alt="看不清楚，换一张"  onclick="try{opencode()}catch(e){}"/></div>
-<script language="JavaScript">
-opencode();
+					<input class="input" type="text" name="gdcode" size="6" tabindex="17" onFocus="showgd();" alt="请输入验证码" />
+					<span style="cursor:pointer; margin-left:3px" onclick="showgd();" >点此显示验证码</span>
+					<div id="ckcode" style="display:none">
+<script type="text/javascript" src="js/pw_authcode.js"></script>
+<script>
+var flashWidth = "$gdSize[0]";
+var flashHeight = "$gdSize[1]";
+var gdtype = $db_gdtype;
+showGdCode();
 </script>
+					</div>
 			</td></tr>
 
 EOT;

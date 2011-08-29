@@ -1,7 +1,7 @@
 <?php
 !defined('A_P') && exit('Forbidden');
 
-if (GetGP('ajax')) define('AJAX','1');
+if (S::getGP('ajax')) define('AJAX','1');
 
 !$winduid && Showmsg('not_login');
 
@@ -9,7 +9,7 @@ $baseUrl = 'apps.php?';
 $basename = 'apps.php?q='.$q.'&';
 
 
-InitGP(array('link','descrip','ifhidden','type'),'P',1);
+S::gp(array('link','descrip','ifhidden','type'),'P',1);
 $share = array();
 
 $link	= str_replace('&#61;','=',$link);
@@ -18,18 +18,18 @@ $ifhidden = (int)$ifhidden;
 if ($type && in_array($type,array('user','photo','album','group','groupactive','diary','topic','reply'))) {
 	$type_tmp = $type;
 	if (!defined('AJAX')) define('AJAX','1');
-	$id	= (int)GetGP('id');
+	$id	= (int)S::getGP('id');
 	!$id && Showmsg('data_error');
 	if ($type=='user') {
 		if ($id==$winduid) showmsg('data_error');
 		$userdb = getOneInfo($id);
 		empty($userdb) && Showmsg('data_error');
-		$link	= $db_bbsurl.'/u.php?uid='.$id;
+		$link	= $db_bbsurl.'/'.USER_URL.$id;
 		$type	= 'user';
 		$share['user']['username']	= $userdb['username'];
 		$share['user']['image']	= $userdb['face'];
 	} elseif ($type=='photo') {
-		$photo = $db->get_one("SELECT p.pid,p.aid,p.path,p.uploader,p.ifthumb,a.aname,a.private,a.ownerid FROM pw_cnphoto p LEFT JOIN pw_cnalbum a ON p.aid=a.aid WHERE p.pid=" . pwEscape($id) . " AND a.atype='0'");
+		$photo = $db->get_one("SELECT p.pid,p.aid,p.path,p.uploader,p.ifthumb,a.aname,a.private,a.ownerid FROM pw_cnphoto p LEFT JOIN pw_cnalbum a ON p.aid=a.aid WHERE p.pid=" . S::sqlEscape($id) . " AND a.atype='0'");
 		empty($photo) && Showmsg('data_error');
 		$link	= $db_bbsurl.'/{#APPS_BASEURL#}uid='.$photo['ownerid'].'&q=photos&a=view&aid='.$photo['aid'].'&pid='.$id;
 		$type	= 'photo';
@@ -37,7 +37,7 @@ if ($type && in_array($type,array('user','photo','album','group','groupactive','
 		$share['photo']['username']	= $photo['uploader'];
 		$share['photo']['image']	= getphotourl($photo['path'],$photo['ifthumb']);
 	} elseif ($type=='album') {
-		$album 	= $db->get_one("SELECT aname,ownerid,owner,lastphoto FROM pw_cnalbum WHERE atype='0' AND aid=" . pwEscape($id));
+		$album 	= $db->get_one("SELECT aname,ownerid,owner,lastphoto FROM pw_cnalbum WHERE atype='0' AND aid=" . S::sqlEscape($id));
 		empty($album) && Showmsg('data_error');
 		$link	= $db_bbsurl.'/{#APPS_BASEURL#}uid='.$album['ownerid'].'&q=photos&a=album&aid='.$id;
 		$type	= 'album';
@@ -45,7 +45,7 @@ if ($type && in_array($type,array('user','photo','album','group','groupactive','
 		$share['album']['username']	= $album['owner'];
 		$share['album']['image']	= getphotourl($album['lastphoto']);
 	} elseif ($type=='group') {
-		$group 	= $db->get_one("SELECT id,cname,cnimg FROM pw_colonys WHERE id=" . pwEscape($id));
+		$group 	= $db->get_one("SELECT id,cname,cnimg FROM pw_colonys WHERE id=" . S::sqlEscape($id));
 		empty($group) && Showmsg('data_error');
 		if ($group['cnimg']) {
 			list($cnimg) = geturl("cn_img/$group[cnimg]",'lf');
@@ -79,7 +79,7 @@ if ($type && in_array($type,array('user','photo','album','group','groupactive','
 
 	} elseif ($type == 'diary') {
 
-		$diary 	= $db->get_one("SELECT did,subject,uid FROM pw_diary WHERE did=" . pwEscape($id));
+		$diary 	= $db->get_one("SELECT did,subject,uid FROM pw_diary WHERE did=" . S::sqlEscape($id));
 		empty($diary) && Showmsg('data_error');
 
 		$link	= $db_bbsurl.'/{#APPS_BASEURL#}uid='.$diary['uid'].'&q=diary&a=detail&did='.$id;
@@ -88,9 +88,9 @@ if ($type && in_array($type,array('user','photo','album','group','groupactive','
 
 	} elseif ($type == 'topic') {
 		
-		InitGP(array('cyid'));
+		S::gp(array('cyid'));
 		$pw_tmsgs = GetTtable($id);
-		$topicdb = $db->get_one("SELECT t.tid,t.authorid,t.subject,t.author,tm.content FROM pw_threads t LEFT JOIN $pw_tmsgs tm ON t.tid=tm.tid WHERE t.tid=".pwEscape($id));
+		$topicdb = $db->get_one("SELECT t.tid,t.authorid,t.subject,t.author,tm.content FROM pw_threads t LEFT JOIN $pw_tmsgs tm ON t.tid=tm.tid WHERE t.tid=".S::sqlEscape($id));
 		empty($topicdb) && Showmsg('data_error');
 
 		if ($cyid) {
@@ -106,7 +106,7 @@ if ($type && in_array($type,array('user','photo','album','group','groupactive','
 		$topicdb['content'] = substrs($topicdb['content'],100,'N');
 
 		$attimages = array();
-		$query = $db->query("SELECT attachurl,ifthumb FROM pw_attachs WHERE tid=".pwEscape($topicdb['tid'],false)." AND pid=0 AND type='img' LIMIT 4");
+		$query = $db->query("SELECT attachurl,ifthumb FROM pw_attachs WHERE tid=".S::sqlEscape($topicdb['tid'],false)." AND pid=0 AND type='img' LIMIT 4");
 		while ($rt = $db->fetch_array($query)) {
 			$a_url = geturl($rt['attachurl'],'show',$rt['ifthumb']);
 			if ($a_url != 'nopic') {
@@ -119,9 +119,9 @@ if ($type && in_array($type,array('user','photo','album','group','groupactive','
 
 	} elseif ($type == 'reply') {
 
-		InitGP(array('tid', 'cyid'));
+		S::gp(array('tid', 'cyid'));
 		$pw_posts = GetPtable('N',$tid);
-		$replydb = $db->get_one("SELECT p.pid,p.tid,p.subject as psubject,p.author,p.authorid,p.postdate,p.content,t.subject as tsubject FROM $pw_posts p LEFT JOIN pw_threads t ON p.tid=t.tid WHERE p.pid=".pwEscape($id));
+		$replydb = $db->get_one("SELECT p.pid,p.tid,p.subject as psubject,p.author,p.authorid,p.postdate,p.content,t.subject as tsubject FROM $pw_posts p LEFT JOIN pw_threads t ON p.tid=t.tid WHERE p.pid=".S::sqlEscape($id));
 		empty($replydb) && Showmsg('data_error');
 
 		$link = $db_bbsurl.'/job.php?action=topost&tid='.$tid.'&pid='.$id;
@@ -133,7 +133,7 @@ if ($type && in_array($type,array('user','photo','album','group','groupactive','
 		$replydb['content'] = substrs($replydb['content'],100,'N');
 
 		$attimages = array();
-		$query = $db->query("SELECT attachurl FROM pw_attachs WHERE uid=".pwEscape($replydb['authorid'],false)." AND pid=".pwEscape($id,false)." AND type='img' LIMIT 5");
+		$query = $db->query("SELECT attachurl FROM pw_attachs WHERE uid=".S::sqlEscape($replydb['authorid'],false)." AND pid=".S::sqlEscape($id,false)." AND type='img' LIMIT 5");
 		while ($rt = $db->fetch_array($query)) {
 			$a_url = geturl($rt['attachurl'],'show');
 			if ($a_url != 'nopic') {
@@ -151,7 +151,7 @@ if ($type && in_array($type,array('user','photo','album','group','groupactive','
 /*
 * 用户组分享权限
 */
-include (D_P . 'data/bbscache/o_config.php');
+include pwCache::getPath(D_P . 'data/bbscache/o_config.php');
 if ($groupid != 3 && $o_share_groups && strpos ( $o_share_groups, ",$groupid," ) === false) {
 	$shareGM = 1;
 }
@@ -207,9 +207,10 @@ if (!$type) {
 }
 $content = serialize($share);
 $arr = array($type,$winduid,$windid,$timestamp,$content,$ifhidden);
-$db->update("INSERT INTO pw_collection(type,uid,username,postdate,content,ifhidden) VALUES(".pwImplode($arr).")");
+$db->update("INSERT INTO pw_collection(type,uid,username,postdate,content,ifhidden) VALUES(".S::sqlImplode($arr).")");
 if ($type == 'topic') {
-	$db->update("UPDATE pw_threads SET shares=shares+1 WHERE tid=".pwEscape($id));
+	//$db->update("UPDATE pw_threads SET shares=shares+1 WHERE tid=".S::sqlEscape($id));
+	pwQuery::update('pw_threads', 'tid=:tid', array($id), null, array(PW_EXPR=>array('shares=shares+1')));
 }
 if (!$ifhidden) {
 	$f_id = $db->insert_id();
@@ -222,13 +223,13 @@ if (!$ifhidden) {
 	} elseif ($type == 'photo') {
 		$belong	= getLangInfo('app','photo_belong');
 		$image_link	= $link;
-		$share['link']	= $db_bbsurl.'/u.php?uid='.$photo['ownerid'];
+		$share['link']	= $db_bbsurl.'/'.USER_URL.$photo['ownerid'];
 		$title	= $share['photo']['username'];
 		$share_code = '[url='.$image_link.'][img]'.$share['photo']['image'].'[/img][/url]'.$belong;
 	} elseif ($type == 'album') {
 		$belong	= getLangInfo('app','photo_belong');
 		$image_link	= $link;
-		$share['link']	= $db_bbsurl.'/u.php?uid='.$album['ownerid'];
+		$share['link']	= $db_bbsurl.'/'.USER_URL.$album['ownerid'];
 		$title	= $share['album']['username'];
 		$share_code = '[url='.$image_link.'][img]'.$share['album']['image'].'[/img][/url]'.$belong;
 	} elseif ($type == 'group') {

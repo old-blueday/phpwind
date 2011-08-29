@@ -1,8 +1,8 @@
 <?php
 !function_exists('adminmsg') && exit('Forbidden');
-InitGP(array('action','job'));
+S::gp(array('action','job'));
 if (!$action) {
-	InitGP(array('ckey','advertype','adverstatus'));/*hold*/
+	S::gp(array('ckey','advertype','adverstatus'));/*hold*/
 	$cates = $cateDescrip = array();$optCates = '';
 	$query = $db->query("SELECT id,ckey,uid,ifshow,descrip,config FROM pw_advert WHERE type=0 AND ifshow=1 ORDER BY id");
 	while ($rt = $db->fetch_array($query)) {
@@ -23,15 +23,15 @@ if (!$action) {
 	$ckeySelect = $adverClass->getAdverBenchSelect($ckey,'ckey','ckey');
 	
 	if (empty($job)) {
-		InitGP(array('ckey','keyword','page'));
+		S::gp(array('ckey','keyword','page'));
 		$sql = '';$ids = array();
-		$ckey && $sql .= " AND ckey=".pwEscape($ckey);
-		$keyword && $sql .= " AND descrip LIKE ".pwEscape("%$keyword%");
-		(in_array($advertype,array_keys($adverClass->getType()))) && $sql .= " AND config LIKE ".pwEscape("%\"".$advertype."\";%");
-		(in_array($adverstatus,array_keys($adverClass->getStatus())) && $adverstatus != '' ) && $sql .= " AND ifshow=".pwEscape($adverstatus);
+		$ckey && $sql .= " AND ckey=".S::sqlEscape($ckey);
+		$keyword && $sql .= " AND descrip LIKE ".S::sqlEscape("%$keyword%");
+		(in_array($advertype,array_keys($adverClass->getType()))) && $sql .= " AND config LIKE ".S::sqlEscape("%\"".$advertype."\";%");
+		(in_array($adverstatus,array_keys($adverClass->getStatus())) && $adverstatus != '' ) && $sql .= " AND ifshow=".S::sqlEscape($adverstatus);
 		$count = $db->get_value("SELECT COUNT(*) FROM pw_advert WHERE type=1 $sql");
 		$page<1 && $page = 1;
-		$limit = pwLimit(($page-1)*$db_perpage,$db_perpage);
+		$limit = S::sqlLimit(($page-1)*$db_perpage,$db_perpage);
 		$pages = numofpage($count,$page,ceil($count/$db_perpage), "$basename&ckey=$ckey&advertype=$advertype&adverstatus=$adverstatus&keyword=".rawurlencode($keyword).'&');
 		
 		$query = $db->query("SELECT * FROM pw_advert WHERE type=1 $sql ORDER BY id DESC $limit");
@@ -47,17 +47,18 @@ if (!$action) {
 			$adverts[$rt['id']] = $rt;
 		}
 		if ($ids) {
-			$db->update("UPDATE pw_advert SET ifshow=0 WHERE ifshow=1 AND id IN(".pwImplode($ids,false).")");
+			$db->update("UPDATE pw_advert SET ifshow=0 WHERE ifshow=1 AND id IN(".S::sqlImplode($ids,false).")");
 			updatecache_c();
 		}
 	} elseif ($job == 'add') {
 		require_once(R_P.'require/credit.php');
-		include_once(D_P.'data/bbscache/forumcache.php');
+		include_once pwCache::getPath(D_P.'data/bbscache/forumcache.php');
 		$advert = array(
 			'stime'	=> get_date($timestamp,'Y-m-d'),
 			'etime'	=> get_date($timestamp + 31536000,'Y-m-d'),
 		);
 		$config['type'] = 'txt';
+		$config['size'] = 12;
 		$config['winHeight'] = 100;
 		$config['winWidth'] = 200;
 		$config['winClose'] = 5;
@@ -70,9 +71,9 @@ if (!$action) {
 		include_once PrintEot('setadvert');exit;
 	} elseif ($job == 'edit') {
 		require_once(R_P.'require/credit.php');
-		include_once(D_P.'data/bbscache/forumcache.php');
-		InitGP(array('id'));
-		$advert = $db->get_one("SELECT * FROM pw_advert WHERE type=1 AND id=".pwEscape($id));
+		include_once pwCache::getPath(D_P.'data/bbscache/forumcache.php');
+		S::gp(array('id'));
+		$advert = $db->get_one("SELECT * FROM pw_advert WHERE type=1 AND id=".S::sqlEscape($id));
 		!$advert && adminmsg('advert_id_error');
 		$config = unserialize($advert['config']);
 		HtmlConvert($advert);
@@ -80,7 +81,7 @@ if (!$action) {
 
 		$advert['etime'] = get_date($advert['etime'],'Y-m-d');
 		$advert['stime'] = get_date($advert['stime'],'Y-m-d');
-
+		$config['size'] = (int)$config['size'];
 		ifcheck($advert['ifshow'],'ifshow');
 
 		${'type_'.$config['type']} = 'checked';
@@ -151,16 +152,15 @@ if (!$action) {
 		}
 		include_once PrintEot('setadvert');exit;
 	} elseif ($job == 'save') {
-		InitGP(array('id','config','advert','lous','fids','modes','pages','ddate','dweek','dtime'));
+		S::gp(array('id','config','advert','lous','fids','modes','pages','ddate','dweek','dtime'));
 
 		$id = intval($id);
-		$basename .= $id ? "&job=edit&id=$id" : "&job=add";
 
 		!isset($cates[$advert['ckey']]) && $basename = "javascript:history.go(-1);" && adminmsg('advert_ckey_noexist');
 		if ($config['type'] == 'code') {
-			$tmpConfig = GetGP('config');
+			$tmpConfig = S::getGP('config');
 			$config['htmlcode'] = $tmpConfig['htmlcode'];
-			if (!$config['htmlcode'] || strlen($config['htmlcode'])>1024) {
+			if (!$config['htmlcode']/* || strlen($config['htmlcode'])>1024*/) {
 				$basename = "javascript:history.go(-1);";
 				adminmsg('advert_code_error');
 			} elseif(in_array($advert['ckey'],array('Site.FloatLeft','Site.FloatRight','Site.FloatRand')) && preg_match('/<script[^>]*?>.*?<\/script>/si',$config['htmlcode'])) {
@@ -180,6 +180,10 @@ if (!$action) {
 			$basename = "javascript:history.go(-1);";
 			adminmsg('advert_flash_error');
 		}
+		if($config['type'] == 'flash') {
+			$config['width'] = ($config['width'] == "") ? "120" : $config['width'];
+			$config['height'] = ($config['height'] == "") ? "120" : $config['height'];
+		}
 		if (empty($advert['descrip'])) {
 			if ($config['type'] == 'code') {
 				$advert['descrip'] = substrs(strip_tags($config['htmlcode']),250);
@@ -189,7 +193,7 @@ if (!$action) {
 			empty($advert['descrip']) && $basename = "javascript:history.go(-1);" && adminmsg('advert_descrip');
 		}
 		$advert['stime'] = PwStrtoTime($advert['stime']);
-		$advert['etime'] = PwStrtoTime($advert['etime']);
+		$advert['etime'] = PwStrtoTime($advert['etime']) + 86399;
 
 		if ($advert['stime'] > $advert['etime']) {
 			$basename = "javascript:history.go(-1);";
@@ -235,6 +239,29 @@ if (!$action) {
 		if ($config['height']) {
 			$config['height'] = intval($config['height']) . ($config['height'][strlen($config['height'])-1] == '%' ? '%' : '');
 		}
+		
+		//广告图片上传
+		if ($config['type'] == 'img')  {
+			//图片上传 
+			$newConfigUrl = $newConfigLink =  array();
+			L::loadClass('advupload', 'upload', false);
+			foreach ($config['imgupload'] as $key => $value) {
+				if ($value != 0) {
+					$img = new AdvUpload($key);
+					$returnImg = PwUpload::upload($img, 0);
+					if (!is_array($returnImg) || count($returnImg) == 0) continue;
+					$newConfigUrl[] = "attachment/".$returnImg[0]['fileuploadurl'];
+					$newConfigLink[] = $config['link'][$key];
+				} else {
+					$newConfigUrl[] = $config['url'][$key];
+					$newConfigLink[] = $config['link'][$key];
+				}
+			}
+			unset($config['imgupload']);
+			$config['link'] = $newConfigLink;
+			$config['url'] = $newConfigUrl;
+		}
+
 		foreach ($config as $key => $value) {
 			if ($config['type'] == 'img' && in_array($key,array('url','link'))) {
 				$tmp = array();/*support multi pictures*/
@@ -252,11 +279,14 @@ if (!$action) {
 			}else{
 				$value = stripslashes(str_replace(array('&#61;','&amp;'),array('=','&'),$value));/*other*/
 			}
-			$config[$key] = is_array($value) ? stripslashes($value):$value;
+			$config[$key] = is_array($value) ? $value:$value;
+		
 		}
+		$config['size'] = $config['size']."px";
 		$config = addslashes(serialize($config));
+		
 		if ($id) {
-			$db->update("UPDATE pw_advert SET " . pwSqlSingle(array(
+			$db->update("UPDATE pw_advert SET " . S::sqlSingle(array(
 				'ckey'		=> $advert['ckey'],
 				'stime'		=> $advert['stime'],
 				'etime'		=> $advert['etime'],
@@ -264,14 +294,14 @@ if (!$action) {
 				'orderby'	=> $advert['orderby'],
 				'descrip'	=> $advert['descrip'],
 				'config'	=> $config
-			)) . " WHERE type='1' AND id=".pwEscape($id));
+			)) . " WHERE type='1' AND id=".S::sqlEscape($id));
 		} else {
-			$otherkey = (array)GetGP('otherkey');
+			$otherkey = (array)S::getGP('otherkey');
 			$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
 			$winduid = $userService->getUserIdByUserName($admin_name);
 			foreach ($otherkey as $value) {
 				if (!$cates[$value] || $advert['ckey'] == $value) continue;
-				$db->update("INSERT INTO pw_advert SET " . pwSqlSingle(array(
+				$db->update("INSERT INTO pw_advert SET " . S::sqlSingle(array(
 					'uid'       => $winduid,
 					'type'		=> 1,
 					'ckey'		=> $value,
@@ -283,7 +313,7 @@ if (!$action) {
 					'config'	=> $config
 				)));
 			}
-			$db->update("INSERT INTO pw_advert SET " . pwSqlSingle(array(
+			$db->update("INSERT INTO pw_advert SET " . S::sqlSingle(array(
 				'uid'       => $winduid,
 				'type'		=> 1,
 				'ckey'		=> $advert['ckey'],
@@ -297,12 +327,12 @@ if (!$action) {
 			$id = $db->insert_id();
 		}
 		if ($advert['ifshow']) {
-			$db->update("UPDATE pw_advert SET ifshow=1 WHERE type=0 AND ifshow=0 AND ckey=".pwEscape($advert['ckey']));
+			$db->update("UPDATE pw_advert SET ifshow=1 WHERE type=0 AND ifshow=0 AND ckey=".S::sqlEscape($advert['ckey']));
 		}
 		updatecache_c();
-		adminmsg('operate_success');
+		adminmsg('operate_success',"$basename");
 	} elseif (in_array($job,array('del','show','hide'))) {
-		InitGP(array('selid','id'));
+		S::gp(array('selid','id'));
 		if($id && $job == 'del'){
 			$selid = array($id);
 		}
@@ -324,9 +354,9 @@ if (!$action) {
 		updatecache_c();
 		adminmsg('operate_success',"$basename&action=");
 	} elseif ($job == 'check') {
-		InitGP(array('uid'),'GP',2);
+		S::gp(array('uid'),'GP',2);
 		!$uid && adminmsg('unituser_username_empty');
-		$buyer = $db->get_one("SELECT b.*,m.username FROM pw_buyadvert b LEFT JOIN pw_members m USING(uid) WHERE b.id=".pwEscape($id)."AND b.uid=".pwEscape($uid));
+		$buyer = $db->get_one("SELECT b.*,m.username FROM pw_buyadvert b LEFT JOIN pw_members m USING(uid) WHERE b.id=".S::sqlEscape($id)."AND b.uid=".S::sqlEscape($uid));
 		!$buyer && adminmsg('unituser_newname_error');
 		$buyer_config = unserialize($buyer['config']);
 		HtmlConvert($buyer_config);
@@ -344,7 +374,7 @@ if (!$action) {
 			 $price>$usercredit[$config['creditype']] && adminmsg('advert_creditype_lack');
 		}
 
-		$begintime = $db->get_value("SELECT lasttime FROM pw_buyadvert WHERE id=".pwEscape($id)." ORDER BY lasttime DESC");
+		$begintime = $db->get_value("SELECT lasttime FROM pw_buyadvert WHERE id=".S::sqlEscape($id)." ORDER BY lasttime DESC");
 
 		if ($begintime && $begintime > $timestamp) {
 			$buyer_config['starttime'] = get_date($begintime,'Y-m-d H:i');
@@ -364,11 +394,11 @@ if (!$action) {
 
 		$credit->set($uid,$creditype,-$price);
 
-		$db->update("UPDATE pw_buyadvert SET ".pwSqlSingle(array(
+		$db->update("UPDATE pw_buyadvert SET ".S::sqlSingle(array(
 			'ifcheck'	=> 1,
 			'lasttime'	=> $lasttime,
 			'config'	=> $newconfig
-		)) . "WHERE id=".pwEscape($id)."AND uid=".pwEscape($uid));
+		)) . "WHERE id=".S::sqlEscape($id)."AND uid=".S::sqlEscape($uid));
 
 		M::sendNotice(
 			array($buyer['username']),
@@ -391,7 +421,7 @@ if (!$action) {
 
 	require_once(R_P.'require/credit.php');
 	if (empty($job)) {
-		InitGP(array('ifshow','ifhire','keyword','page'));
+		S::gp(array('ifshow','ifhire','keyword','page'));
 
 		$pwSQL = '';
 		if (!empty($ifshow)) {
@@ -400,11 +430,11 @@ if (!$action) {
 		if (!empty($ifhire)) {
 			$pwSQL .=  $ifhire == 2 ? " AND uid=0 " : "AND uid=1 ";
 		}
-		$keyword && $pwSQL .= " AND descrip LIKE ".pwEscape("%$keyword%");
+		$keyword && $pwSQL .= " AND descrip LIKE ".S::sqlEscape("%$keyword%");
 
 		$count = $db->get_value("SELECT COUNT(*) FROM pw_advert WHERE type=0 $pwSQL");
 		$page<1 && $page = 1;
-		$limit = pwLimit(($page-1)*$db_perpage,$db_perpage);
+		$limit = S::sqlLimit(($page-1)*$db_perpage,$db_perpage);
 		$pages = numofpage($count,$page,ceil($count/$db_perpage),"$basename&action=$action&ifshow=$ifshow&ifhire=$ifhire&keyword=".rawurlencode($keyword)."&");
 
 		$query = $db->query("SELECT * FROM pw_advert WHERE type=0 $pwSQL ORDER BY ifshow DESC,id DESC $limit");
@@ -416,7 +446,7 @@ if (!$action) {
 		}
 	} elseif ($job == 'edit') {
 		if (empty($_POST['step'])) {
-			InitGP(array('id'));
+			S::gp(array('id'));
 			$CreditList = '';
 			foreach ($credit->cType as $key => $value) {
 				$CreditList	.= "<option value=\"$key\">$value</option>";
@@ -425,7 +455,7 @@ if (!$action) {
 			$cate = array();
 			$isDefault = '';
 			if ($id) {
-				$cate = $db->get_one("SELECT * FROM pw_advert WHERE type=0 AND id=".pwEscape($id));
+				$cate = $db->get_one("SELECT * FROM pw_advert WHERE type=0 AND id=".S::sqlEscape($id));
 				empty($cate) && adminmsg('advert_id_error',"$basename&action=$action");
 				$cate['id'] < 100 && $isDefault = 'disabled';
 				list($cate['name'],$cate['descrip']) = explode("~\t~",$cate['descrip']);
@@ -441,7 +471,7 @@ if (!$action) {
 			ifcheck($cate['ifshow'],'ifshow');
 			ifcheck($cate['ifhire'],'ifhire');
 		} elseif ($_POST['step'] == 2) {
-			InitGP(array('config','id'));
+			S::gp(array('config','id'));
 			$id = (int)$id;
 			if ((!$id || $id >=100) && !preg_match('/^([a-zA-Z0-9_.]{1,32})$/i',$config['ckey'])) {
 				adminmsg('advert_ckey_error',"$basename&action=$action&job=edit");
@@ -450,15 +480,15 @@ if (!$action) {
 				adminmsg('advert_creditype_error');
 			}
 			if ($id) {
-				$rt = $db->get_one("SELECT id,ckey FROM pw_advert WHERE type=0 AND id=".pwEscape($id));
+				$rt = $db->get_one("SELECT id,ckey FROM pw_advert WHERE type=0 AND id=".S::sqlEscape($id));
 				empty($rt) && adminmsg('advert_id_error',"$basename&action=$action");
 				if ($rt['id'] < 100 && strtolower($rt['ckey']) != strtolower($config['ckey'])) {
-					$rt = $db->get_one("SELECT id,ckey FROM pw_advert WHERE type=0 AND ckey=".pwEscape($config['ckey']));
+					$rt = $db->get_one("SELECT id,ckey FROM pw_advert WHERE type=0 AND ckey=".S::sqlEscape($config['ckey']));
 					!empty($rt) && adminmsg('advert_ckey_exists',"$basename&action=$action");
-					$db->update("UPDATE pw_advert SET ckey=".pwEscape($config['ckey'])."WHERE type=1 AND ckey=".pwEscape($rt['ckey']));
+					$db->update("UPDATE pw_advert SET ckey=".S::sqlEscape($config['ckey'])."WHERE type=1 AND ckey=".S::sqlEscape($rt['ckey']));
 				}
 			} else {
-				$rt = $db->get_one("SELECT id,ckey FROM pw_advert WHERE type=0 AND ckey=".pwEscape($config['ckey']));
+				$rt = $db->get_one("SELECT id,ckey FROM pw_advert WHERE type=0 AND ckey=".S::sqlEscape($config['ckey']));
 				!empty($rt) && adminmsg('advert_ckey_exists',"$basename&action=$action&job=edit");
 			}
 
@@ -495,16 +525,16 @@ if (!$action) {
 				$pwSQL['descrip'] = $cate['descrip'];
 			}
 			if ($id) {
-				$db->update("UPDATE pw_advert SET".pwSqlSingle($pwSQL)."WHERE type=0 AND id=".pwEscape($id));
+				$db->update("UPDATE pw_advert SET".S::sqlSingle($pwSQL)."WHERE type=0 AND id=".S::sqlEscape($id));
 			} else {
-				$db->update("INSERT INTO pw_advert SET".pwSqlSingle($pwSQL));
+				$db->update("INSERT INTO pw_advert SET".S::sqlSingle($pwSQL));
 			}
-			//$db->update("UPDATE pw_advert SET ifshow=1 WHERE type=0 AND ckey=".pwEscape($advert['ckey']));
+			//$db->update("UPDATE pw_advert SET ifshow=1 WHERE type=0 AND ckey=".S::sqlEscape($advert['ckey']));
 			updatecache_c();
 			adminmsg('operate_success',"$basename&action=$action");
 		}
 	} elseif (in_array($job,array('del','show','hide'))) {
-		InitGP(array('selid','id'));
+		S::gp(array('selid','id'));
 		$selid = ($selid) ? $selid : array($id);//only for array
 		if (!$selid = checkselid($selid)) {
 			adminmsg('operate_error',"$basename&action=$action");
@@ -532,9 +562,9 @@ if (!$action) {
 	include_once PrintEot('setadvert');exit;
 } elseif ($action == 'alter') {
 	$adverClass = L::loadclass('adver', 'advertisement');/*during*/
-	initGP(array("step"));
+	S::gp(array("step"));
 	if ($step == 2 ) {
-		InitGP(array('alterstatus','alterbefore','alterway'));
+		S::gp(array('alterstatus','alterbefore','alterway'));
 		$alterstatus = in_array($alterstatus,array(1,0)) ? $alterstatus : 1;/*security*/
 		$alterway = in_array($alterway,array(1,2)) ? $alterway : 1;
 		$alterbefore = intval($alterbefore);
@@ -551,29 +581,5 @@ if (!$action) {
 } else {
 	adminmsg('operate_success');
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 ?>

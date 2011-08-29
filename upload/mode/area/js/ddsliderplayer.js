@@ -26,7 +26,7 @@ function DDSliderPlayer(elementObj, handler, pauseTime, currentClassName) {
 	this.currentClassName = (currentClassName == undefined) ? 'sel' : currentClassName;
 	this.pics = getElementsByClassName('switchItem',elementObj);
 	this.handlers = getElementsByClassName('switchNavItem',handler);
-	this.maxScreen = this.pics.length;
+	this.maxScreen = this.pics.length > this.handlers.length ? this.handlers.length : this.pics.length;
 	for (i=0;i<this.handlers.length;i++) {
 		this.handlers[i].setAttribute("index", i);
 		var id=this.id;

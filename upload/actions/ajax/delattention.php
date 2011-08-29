@@ -1,7 +1,7 @@
 <?php
 !defined('P_W') && exit('Forbidden');
 
-InitGP(array('touid'), 'GP', 2);
+S::gp(array('touid'), 'GP', 2);
 (!$winduid && !$touid) && Showmsg('undefined_action');
 
 PostCheck();

@@ -22,8 +22,8 @@ class Msg {
 		M::sendNotice(
 			$userNames,
 			array(
-				'title' => Char_cv(stripslashes($subject)),
-				'content' => Char_cv(stripslashes($content))
+				'title' => S::escapeChar(stripslashes($subject)),
+				'content' => S::escapeChar(stripslashes($content))
 			),'notice_apps', 'notice_apps'
 		);
 
@@ -36,8 +36,8 @@ class Msg {
 		M::sendNotice(
 			array($toname),
 			array(
-				'title' => Char_cv(stripslashes($subject)),
-				'content' => Char_cv(stripslashes($content))
+				'title' => S::escapeChar(stripslashes($subject)),
+				'content' => S::escapeChar(stripslashes($content))
 			),'notice_apps', 'notice_apps'
 		);
 

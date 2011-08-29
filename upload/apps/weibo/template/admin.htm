@@ -2,19 +2,21 @@
 include_once PrintEot('left');
 print<<<EOT
 -->
-<h2 class="h1 mb10"><a href="$admin_file?adminjob=app&admintype=appslist">返回基础应用列表</a></h2>
+<!-- <h2 class="h1 mb10"><a href="$admin_file?adminjob=app&admintype=appslist">返回基础应用列表</a></h2> -->
 <div class="nav3 mb10">
 	<ul class="cc">
 <!--
 EOT;
-if(!$action){print <<<EOT
--->	
+if (!$action) {print <<<EOT
+-->
+		<li class="current"><a href="$basename">新鲜事设置</a></li>
+		<li><a href="$admin_file?adminjob=apps&admintype=weibo_manage" onclick="openNewUrl('weibo_manage','新鲜事管理',this.href);return false;">内容管理</a></li>
 <!--
 EOT;
 } else {print <<<EOT
 -->	
-		<li $nav[weibo]><a href="$admin_file?adminjob=apps&admintype=app_weibo&action=weibo">新鲜事管理</a></li>
-		<li $nav[comment]><a href="$admin_file?adminjob=apps&admintype=app_weibo&action=comment">评论管理</a></li>	
+		<li $nav[weibo]><a href="$basename&action=weibo">新鲜事管理</a></li>
+		<li $nav[comment]><a href="$basename&action=comment">评论管理</a></li>	
 <!--
 EOT;
 }print <<<EOT
@@ -70,6 +72,11 @@ if(!$action){print <<<EOT
       <td class="td1">允许发表新鲜事的用户组</td>
       <td class="td2">$creategroup</td>
       <td class="td2">全不选则允许所有用户组发表</td>
+	   <td class="td2"></td>
+    </tr>
+	<tr class="tr1 vt">
+      <td class="td1">新鲜事输入框提示语</td>
+      <td class="td2"><input name="weibotip" value="{$o_weibotip}" class="input input_wb" /></td>
     </tr>
   </table>
   </div>
@@ -166,7 +173,7 @@ EOT;
     <tr class="tr1 vt">
       <td class="td1">发表日期</td>
       <td class="td2">
-      	<div class="input_img fl"><i onclick="this.nextSibling.onclick()" class="input_time" title="选择时间">选择时间</i><input type="text" name="postdate_s" value="$postdateStartString" id="postdate_s" onclick="javascript:ShowCalendar(this.id)"></div><span class="p_lr_10 fl">至</span><div class="input_img fl"><i class="input_time" title="选择时间">选择时间</i><input type="text" name="postdate_e" id="postdate_e" value="$postdateEndString" onclick="javascript:ShowCalendar(this.id)"></div>
+      	<div class="input_img fl"><i onclick="this.nextSibling.onclick()" class="input_time" title="选择时间">选择时间</i><input type="text" name="postdate_s" value="$postdateStartString" id="postdate_s" onclick="javascript:ShowCalendar(this.id)"></div><span class="p_lr_10 fl">至</span><div class="input_img fl"><i class="input_time" onclick="javascript:ShowCalendar('postdate_e')" title="选择时间">选择时间</i><input type="text" name="postdate_e" id="postdate_e" value="$postdateEndString" onclick="javascript:ShowCalendar(this.id)"></div>
         </td>
         <td class="td2">&nbsp;</td>
     </tr>
@@ -230,7 +237,7 @@ print <<<EOT
     <tr class="tr1 vt">
       <td class="td2"><input type="checkbox" name="mids[]" value="$weibo[mid]"></td>
       <td class="td2">$weibo[content]</td>
-      <td class="td2"><a href="u.php?uid=$weibo[uid]" target="_blank">$weibo[username]</a></td>
+      <td class="td2"><a href="{$db_userurl}$weibo[uid]" target="_blank">$weibo[username]</a></td>
       <td class="td2" title="$weibo[postdate_s]">{$weibo[lastdate]}</td>
       <td class="td2">$type</td>
       <td class="td2">$weibo[replies]</td>
@@ -244,6 +251,7 @@ EOT;
   </div>
   <div class="cc">$pages</div>
   <div class="mb10 tac">
+	<span class="bt"><span><button type="button" onclick="CheckAll(document.FORM)">全 选</button></span></span>
     <span class="btn"><span><button type="submit" onclick="return checkdel();">删除</button></span></span>
    </div>
 </form>
@@ -279,7 +287,7 @@ print <<<EOT
     <tr class="tr1 vt">
       <td class="td1">发表日期</td>
       <td class="td2">
-      	<div class="input_img fl"><i onclick="this.nextSibling.onclick()" class="input_time" title="选择时间">选择时间</i><input type="text" name="postdate_s" value="$postdateStartString" id="postdate_s" onclick="javascript:ShowCalendar(this.id)"></div><span class="p_lr_10 fl">至</span><div class="input_img fl"><i class="input_time" title="选择时间">选择时间</i><input type="text" name="postdate_e" id="postdate_e" value="$postdateEndString" onclick="javascript:ShowCalendar(this.id)"></div>
+      	<div class="input_img fl"><i onclick="this.nextSibling.onclick()" class="input_time" title="选择时间">选择时间</i><input type="text" name="postdate_s" value="$postdateStartString" id="postdate_s" onclick="javascript:ShowCalendar(this.id)"></div><span class="p_lr_10 fl">至</span><div class="input_img fl"><i class="input_time" onclick="this.nextSibling.onclick()"  title="选择时间">选择时间</i><input type="text" name="postdate_e" id="postdate_e" value="$postdateEndString" onclick="javascript:ShowCalendar(this.id)"></div>
         </td>
         <td class="td2">&nbsp;</td>
     </tr>
@@ -338,7 +346,7 @@ print <<<EOT
     <tr class="tr1 vt">
       <td class="td2"><input type="checkbox" name="cids[]" value="$comment[cid]"></td>
       <td class="td2">$comment[content]</td>
-      <td class="td2"><a href="u.php?uid=$comment[uid]" target="_blank">$comment[username]</a></td>
+      <td class="td2"><a href="{$db_userurl}$comment[uid]" target="_blank">$comment[username]</a></td>
       <td class="td2" title="$comment[postdate_s]">{$comment[lastdate]}</td>
     </tr>
     <!--
@@ -349,6 +357,7 @@ EOT;
   </div>
   <div class="cc">$pages</div>
   <div class="mb10 tac">
+	<span class="bt"><span><button type="button" onclick="CheckAll(document.FORM)">全 选</button></span></span>
     <span class="btn"><span><button type="submit" onclick="return checkdel();">删除</button></span></span>
    </div>
 </form>

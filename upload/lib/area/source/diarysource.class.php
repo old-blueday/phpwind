@@ -44,6 +44,7 @@ class PW_DiarySource extends SystemData {
 	 */
 	function _getData($type, $num) {
 		$element = $this->_getElement();
+		if (!$type) $type = 'new';
 		switch ($type) {
 			case 'new' :
 				return $element->getDataByAction('diary', 'diaryNew', $num);
@@ -83,7 +84,7 @@ class PW_DiarySource extends SystemData {
 		global $db_bbsurl;
 		$data['url'] = $db_bbsurl . '/apps.php?q=diary&a=detail&did=' . $data['did'] . '&uid=' . $data['uid'];
 		$data['title'] = strip_tags($data['subject']);
-		$data['descrip'] = substrs(strip_tags($data['content']),100);
+		$data['descrip'] = substrs(strip_tags(stripWindCode($data['content'])),100);
 		return $data;
 	}
 

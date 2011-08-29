@@ -43,7 +43,18 @@ EOT;
 -->
 			<div class="boxB">
 				<div class="p15">
-					<h5 class="h5 mb10"><strong>基本信息</strong></h5>
+					<h5 class="h5 mb10">
+<!--
+EOT;
+if ($winduid == $space['uid']) {print <<<EOT
+-->
+						<a class="fr" href="profile.php?action=modify">修改资料</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+						<strong>基本信息</strong>
+					</h5>
 					<table class="lh_24 mb15 vt" style="table-layout:fixed;" width="100%">
 						<tr>
 							<td width="100">性别</td>
@@ -91,7 +102,7 @@ EOT;
 						</tr>
 						<tr>
 							<td>帖子签名</td>
-							<td>$space[signature]</td>
+							<td><div style="width:100%;overflow:hidden;">{$space[signature]}</div></td>
 						</tr>
 					</table>
 

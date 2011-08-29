@@ -24,7 +24,7 @@ class PW_OwritedataDB extends BaseDB {
 	function getDataByIds($ids) {
 		if (empty($ids) || !is_array($ids)) return array();
 		$query = $this->_db->query("SELECT w.*, m.* FROM $this->_tableName w LEFT JOIN pw_members m 
-			ON w.uid=m.uid WHERE w.id IN (" . pwImplode($ids) . ") ORDER BY w.id DESC");
+			ON w.uid=m.uid WHERE w.id IN (" . S::sqlImplode($ids) . ") ORDER BY w.id DESC");
 		return $this->_getAllResultFromQuery($query);
 	}
 

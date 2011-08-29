@@ -21,7 +21,7 @@ $lang['email'] = array (
 						如果忘记密码，可以到社区找回密码，也可以写信请管理员重新设定。<br />
 						社区地址：<a href="{$GLOBALS[db_bbsurl]}" style="color:#3366cc;">{$GLOBALS[db_bbsurl]}</a></td></tr></table></td></tr></table></div></body></html>',
 
-'email_additional'		=> 'Reply-To:{$GLOBALS[fromemail]}\r\nX-Mailer: phpwind邮件快递',
+'email_additional'		=> 'Reply-To:{$GLOBALS[fromemail]}\r\nX-Mailer: phpwind电子邮件快递',
 
 'email_welcome_subject'	=> '{$GLOBALS[regname]},您好,感谢您注册{$GLOBALS[db_bbsname]}',
 'email_welcome_content'	=> '<html><head><meta http-equiv="Content-Type" content="text/html; charset=gb18030" /><title>感谢您注册</title></head><body><div align="center"><table cellpadding="0" cellspacing="1" style="border:3px solid #d9e9f1;background:#7fbddd; text-align:left;"><tr><td style="padding:0;"><table cellpadding="30" cellspacing="0" style="border:1px solid #ffffff;background:#f7f7f7;width:500px;"><tr><td style="line-height:2;font-size:12px;"><div style="font-size:14px;margin-bottom:10px;font-weight:700;">Hi, {$GLOBALS[regname]}</div>{$GLOBALS[db_bbsname]}欢迎您的加入！<p style="margin:0;"><span style="padding-right:5em;">您的注册名为： {$GLOBALS[regname]}</span>您的密码为： {$GLOBALS[sRegpwd]}</p><div style="border-top:1px solid #e2e2e2;background:#ffffff;overflow:hidden;height:1px;*height:2px;margin:10px 0;"></div>请尽快删除此邮件，以免帐号信息泄漏<br />如果忘记密码，可以到社区找回密码，也可以写信请管理员重新设定。<br />社区地址：<a href="{$GLOBALS[db_bbsurl]}">{$GLOBALS[db_bbsurl]}</a></td></tr></table></td></tr></table></div></body></html>',
@@ -48,8 +48,8 @@ $lang['email'] = array (
 </table>
 </td></tr></table></div></body></html>',
 
-'emailcheck_subject'	=> 'PHPwind邮件发送检测',
-'emailcheck_content'	=> 'PHPwind邮件发送检测成功!',
+'emailcheck_subject'	=> 'PHPwind电子邮件发送检测',
+'emailcheck_content'	=> 'PHPwind电子邮件发送检测成功!',
 'email_mode_o_title'	=> '您的朋友{$GLOBALS[windid]}邀请您加入{$GLOBALS[db_bbsname]}',
 'email_mode_o_content'	=> '<html><head><meta http-equiv="Content-Type" content="text/html; charset=gb18030" /><title>购买注册码</title></head><body><div align="center"><table cellpadding="0" cellspacing="1" style="border:3px solid #d9e9f1;background:#7fbddd; text-align:left;"><tr><td style="padding:0;"><table cellpadding="30" cellspacing="0" style="border:1px solid #ffffff;background:#f7f7f7;width:500px;"><tr><td style="line-height:2;font-size:12px;">我是{$GLOBALS[windid]}，我在{$GLOBALS[db_bbsname]}上建立了个人主页，请你也加入并成为我的好友。<br />{$GLOBALS[extranote]}\n\n请点击以下链接，接受好友邀请：<br /><a href="{$GLOBALS[invite_url]}">{$GLOBALS[invite_url]}</a><br />{$GLOBALS[db_bbsname]} (<a href="{$GLOBALS[db_bbsurl]}">{$GLOBALS[db_bbsurl]}</a>)</td></tr></table></td></tr></table></div></body></html>',
 'email_groupactive_invite_subject' => '{$GLOBALS[windid]}邀请您加入活动{$GLOBALS[objectName]}',

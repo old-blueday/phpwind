@@ -4,13 +4,13 @@ $basename="$admin_file?adminjob=singleright";
 
 if (empty($action)) {
 	if(empty($job)){
-		InitGP(array('page','username'));
+		S::gp(array('page','username'));
 		$sql = '';
 		(!is_numeric($page) || $page<1) && $page = 1;
-		$limit = pwLimit(($page-1)*$db_perpage,$db_perpage);
+		$limit = S::sqlLimit(($page-1)*$db_perpage,$db_perpage);
 
 		if($username){
-			$sql   = " WHERE m.username=".pwEscape($username);
+			$sql   = " WHERE m.username=".S::sqlEscape($username);
 			$count = 1;
 		} else{
 			@extract($db->get_one("SELECT COUNT(*) AS count FROM pw_singleright"));
@@ -27,10 +27,10 @@ if (empty($action)) {
 		include PrintEot('singleright');exit;
 
 	} elseif($job == 'setright') {
-		InitGP(array('uid','username'));
+		S::gp(array('uid','username'));
 		if(!$_POST['step']){
 			if ($username) {
-				$men = $db->get_one("SELECT m.uid,sr.uid as ifset FROM pw_members m LEFT JOIN pw_singleright sr USING(uid) WHERE m.username=".pwEscape($username));
+				$men = $db->get_one("SELECT m.uid,sr.uid as ifset FROM pw_members m LEFT JOIN pw_singleright sr USING(uid) WHERE m.username=".S::sqlEscape($username));
 				if(!$men){
 					$errorname = $username;
 					adminmsg('user_not_exists');
@@ -38,13 +38,13 @@ if (empty($action)) {
 				$uid = $men['uid'];
 			}
 
-			include_once(D_P.'data/bbscache/forumcache.php');
+			include_once pwCache::getPath(D_P.'data/bbscache/forumcache.php');
 			list($hidefid,$hideforum) = GetHiddenForum();
 			$forumcache .= $hideforum;
 			$forumcache  = "<option></option>".$forumcache;
 			$forum_visit = $forum_post = $forum_reply = $forumcache;
 
-			$rt = $db->get_one("SELECT sr.*,m.username FROM pw_singleright sr LEFT JOIN pw_members m USING(uid) WHERE sr.uid=".pwEscape($uid));
+			$rt = $db->get_one("SELECT sr.*,m.username FROM pw_singleright sr LEFT JOIN pw_members m USING(uid) WHERE sr.uid=".S::sqlEscape($uid));
 
 			if ($rt) {
 				$visit = explode(',',$rt['visit']);
@@ -64,7 +64,7 @@ if (empty($action)) {
 			}
 			include PrintEot('singleright');exit;
 		} else {
-			InitGP(array('visit','post','reply'),'P');
+			S::gp(array('visit','post','reply'),'P');
 			$tmpArray = array();
 			foreach ($visit as $key => $value) {
 				if (is_numeric($value)) {
@@ -86,37 +86,48 @@ if (empty($action)) {
 				}
 			}
 			$reply = implode(',',$tmpArray);
+			/**
 			$db->pw_update(
-				"SELECT * FROM pw_singleright WHERE uid=" . pwEscape($uid),
-				"UPDATE pw_singleright SET" . pwSqlSingle(array(
+				"SELECT * FROM pw_singleright WHERE uid=" . S::sqlEscape($uid),
+				"UPDATE pw_singleright SET" . S::sqlSingle(array(
 						'visit'	=> $visit,
 						'post'	=> $post,
 						'reply'	=> $reply
 					))
-				. " WHERE uid=" . pwEscape($uid),
-				"INSERT INTO pw_singleright SET" . pwSqlSingle(array(
+				. " WHERE uid=" . S::sqlEscape($uid),
+				"INSERT INTO pw_singleright SET" . S::sqlSingle(array(
 					'uid'	=> $uid,
 					'visit'	=> $visit,
 					'post'	=> $post,
 					'reply'	=> $reply
 				))
 			);
+			**/
+			$db->pw_update(
+				"SELECT * FROM pw_singleright WHERE uid=" . S::sqlEscape($uid),
+				pwQuery::updateClause('pw_singleright', 'uid =:uid', array($uid), array('visit'=> $visit,'post'=> $post,'reply'=> $reply)),
+				pwQuery::insertClause('pw_singleright', array('uid'=> $uid,'visit'=> $visit,'post'=> $post,'reply'=> $reply))
+			);			
+
 			adminmsg('operate_success');
 		}
 	} elseif($_POST['job'] == 'del') {
-		InitGP(array('selid'),'P');
+		S::gp(array('selid'),'P');
+		$tmpSelid = $selid;
 		if(!$selid = checkselid($selid)){
 			adminmsg('operate_error');
 		}
-		$db->update("DELETE FROM pw_singleright WHERE uid IN($selid)");
+		//* $db->update("DELETE FROM pw_singleright WHERE uid IN($selid)");
+		pwQuery::delete('pw_singleright', 'uid IN (:uid)', array($tmpSelid));
+		
 		adminmsg('operate_success');
 	}
 } elseif ($action == 'user') {
-	include_once(D_P.'data/bbscache/level.php');
-	include_once(D_P.'data/bbscache/forumcache.php');
+	include_once pwCache::getPath(D_P.'data/bbscache/level.php');
+	include_once pwCache::getPath(D_P.'data/bbscache/forumcache.php');
 
-	InitGP(array('page','uid','fid','gid'),GP,2);
-	$username = Char_cv(GetGP('username'));
+	S::gp(array('page','uid','fid','gid'),GP,2);
+	$username = S::escapeChar(S::getGP('username'));
 	$groupcache = $pageurl = '';$u_d = array();
 
 	list($hidefid,$hideforum) = GetHiddenForum();
@@ -129,20 +140,20 @@ if (empty($action)) {
 	}
 	$sql = "p.gid='0'";
 	if ($uid) {
-		$sql .= ' AND p.uid='.pwEscape($uid);
+		$sql .= ' AND p.uid='.S::sqlEscape($uid);
 		$pageurl .= "uid=$uid&";
 	} elseif ($username) {
-		$sql .= ' AND m.username='.pwEscape($username);
+		$sql .= ' AND m.username='.S::sqlEscape($username);
 		$pageurl .= "username=$username&";
 	} elseif ($gid) {
-		$sql .= ' AND p.uid>0 AND m.groupid='.pwEscape($gid);
+		$sql .= ' AND p.uid>0 AND m.groupid='.S::sqlEscape($gid);
 		$groupcache = str_replace("<option value=\"$gid\">","<option value=\"$gid\" selected>",$groupcache);
 		$pageurl .= "gid=$gid&";
 	} else {
 		$sql .= ' AND p.uid>0';
 	}
 	if ($fid) {
-		$sql .= ' AND p.fid='.pwEscape($fid);
+		$sql .= ' AND p.fid='.S::sqlEscape($fid);
 		$forumcache = str_replace("<option value=\"$fid\">","<option value=\"$fid\" selected>",$forumcache);
 		$pageurl .= "fid=$fid&";
 	} else {
@@ -157,7 +168,7 @@ if (empty($action)) {
 	}
 	(!is_numeric($page) || $page<1) && $page = 1;
 	$pages = numofpage($count,$page,ceil($count/$db_perpage),"$basename&action=$action&$pageurl");
-	$limit = pwLimit(($page-1)*$db_perpage,$db_perpage);
+	$limit = S::sqlLimit(($page-1)*$db_perpage,$db_perpage);
 
 	$query = $db->query("SELECT p.uid,p.fid,m.username,m.groupid FROM pw_permission p LEFT JOIN pw_members m ON p.uid=m.uid WHERE $sql GROUP BY p.uid,p.fid $limit");
 	while ($rd = $db->fetch_array($query)) {
@@ -170,10 +181,10 @@ if (empty($action)) {
 	$jschk = ($uid || $username || $fid || $gid) && $pages ? 'true' : 'false';
 	include PrintEot('singleright');exit;
 } elseif ($action == 'group') {
-	include_once(D_P.'data/bbscache/level.php');
-	include_once(D_P.'data/bbscache/forumcache.php');
+	include_once pwCache::getPath(D_P.'data/bbscache/level.php');
+	include_once pwCache::getPath(D_P.'data/bbscache/forumcache.php');
 
-	InitGP(array('page','fid','gid'),GP,2);
+	S::gp(array('page','fid','gid'),GP,2);
 	$groupcache = $pageurl = $sql = '';$g_d = array();
 
 	list($hidefid,$hideforum) = GetHiddenForum();
@@ -185,14 +196,14 @@ if (empty($action)) {
 	}
 	$sql = "uid='0'";
 	if ($fid) {
-		$sql .= ' AND fid='.pwEscape($fid);
+		$sql .= ' AND fid='.S::sqlEscape($fid);
 		$forumcache = str_replace("<option value=\"$fid\">","<option value=\"$fid\" selected>",$forumcache);
 		$pageurl .= "fid=$fid&";
 	} else {
 		$sql .= " AND fid>'0'";
 	}
 	if ($gid) {
-		$sql .= ' AND gid='.pwEscape($gid);
+		$sql .= ' AND gid='.S::sqlEscape($gid);
 		$groupcache = str_replace("<option value=\"$gid\">","<option value=\"$gid\" selected>",$groupcache);
 		$pageurl .= "gid=$gid&";
 	} else {
@@ -207,7 +218,7 @@ if (empty($action)) {
 	}
 	(!is_numeric($page) || $page<1) && $page = 1;
 	$pages = numofpage($count,$page,ceil($count/$db_perpage),"$basename&action=$action&$pageurl");
-	$limit = pwLimit(($page-1)*$db_perpage,$db_perpage);
+	$limit = S::sqlLimit(($page-1)*$db_perpage,$db_perpage);
 
 	$query = $db->query("SELECT fid,gid FROM pw_permission WHERE $sql GROUP BY fid,gid $limit");
 	while ($rd = $db->fetch_array($query)) {
@@ -218,14 +229,14 @@ if (empty($action)) {
 	include PrintEot('singleright');exit;
 } elseif ($action == 'setright') {//单用户权限设置
 
-	InitGP(array('uid','gid','fid'),'GP',2);
-	$pwuser = Char_cv(GetGP('pwuser'));
+	S::gp(array('uid','gid','fid'),'GP',2);
+	$pwuser = S::escapeChar(S::getGP('pwuser'));
 	$jumpurl = "$basename&action=$job";
 
-	$f = $db->get_one("SELECT name,type FROM pw_forums WHERE fid=".pwEscape($fid));
+	$f = $db->get_one("SELECT name,type FROM pw_forums WHERE fid=".S::sqlEscape($fid));
 	empty($f) && adminmsg('undefined_action',$jumpurl);
 
-	include_once(D_P.'data/bbscache/forumcache.php');
+	include_once pwCache::getPath(D_P.'data/bbscache/forumcache.php');
 	list($hidefid,$hideforum) = GetHiddenForum();
 	$forumcache .= $hideforum;
 
@@ -251,12 +262,12 @@ if (empty($action)) {
 			$username	= $rt['username'];
 			$grouptitle = $ltitle[$gid];
 			$othersel	= $pwuser ? $forumcache : getothersel($uid);
-			$sql = "SELECT rkey,rvalue FROM pw_permission WHERE (uid=" . pwEscape($uid) . ' AND fid=' . pwEscape($fid) . "AND gid='0' OR uid='0' AND fid=" . pwEscape($fid) . " AND gid=" . pwEscape($gid) . " OR uid='0' AND fid='0' AND gid=" . pwEscape($gid) . ") AND type='systemforum' ORDER BY uid,fid";
+			$sql = "SELECT rkey,rvalue FROM pw_permission WHERE (uid=" . S::sqlEscape($uid) . ' AND fid=' . S::sqlEscape($fid) . "AND gid='0' OR uid='0' AND fid=" . S::sqlEscape($fid) . " AND gid=" . S::sqlEscape($gid) . " OR uid='0' AND fid='0' AND gid=" . S::sqlEscape($gid) . ") AND type='systemforum' ORDER BY uid,fid";
 		} else {//group
-			$grouptitle = $db->get_value("SELECT grouptitle FROM pw_usergroups WHERE gid=" . pwEscape($gid));
+			$grouptitle = $db->get_value("SELECT grouptitle FROM pw_usergroups WHERE gid=" . S::sqlEscape($gid));
 			empty($grouptitle) && adminmsg('operate_error',$jumpurl);
 			$othersel = getothersel($gid,'G');
-			$sql = "SELECT rkey,rvalue FROM pw_permission WHERE uid='0' AND (fid=".pwEscape($fid)." AND gid=" . pwEscape($gid) . " OR fid='0' AND gid=" . pwEscape($gid) . ") AND type='systemforum' ORDER BY fid";
+			$sql = "SELECT rkey,rvalue FROM pw_permission WHERE uid='0' AND (fid=".S::sqlEscape($fid)." AND gid=" . S::sqlEscape($gid) . " OR fid='0' AND gid=" . S::sqlEscape($gid) . ") AND type='systemforum' ORDER BY fid";
 		}
 		$query = $db->query($sql);
 
@@ -277,13 +288,13 @@ if (empty($action)) {
 
 	} else {
 
-		InitGP(array('group','othergroup','otherfid'));
+		S::gp(array('group','othergroup','otherfid'));
 		if ($uid) {//user
 			$rt = $userService->get($uid);
 			empty($rt) && adminmsg('data_error',$jumpurl);
 			$gid = 0;
 		} else {//group
-			$rt = $db->get_one("SELECT gid,grouptitle FROM pw_usergroups WHERE gid=" . pwEscape($gid));
+			$rt = $db->get_one("SELECT gid,grouptitle FROM pw_usergroups WHERE gid=" . S::sqlEscape($gid));
 			empty($rt) && adminmsg('operate_error',$jumpurl);
 			$uid = 0;
 		}
@@ -305,14 +316,14 @@ if (empty($action)) {
 			}
 		}
 		if ($pwSQL) {
-			$db->update("REPLACE INTO pw_permission (uid,fid,gid,rkey,type,rvalue) VALUES " . pwSqlMulti($pwSQL));
+			$db->update("REPLACE INTO pw_permission (uid,fid,gid,rkey,type,rvalue) VALUES " . S::sqlMulti($pwSQL));
 		}
 
 		adminmsg('operate_success',"$basename&action=setright&job=$job&fid=$fid&uid=$uid&gid=$gid");
 	}
 } elseif ($action == 'batchright') {//批量用户权限设置
 	$jumpurl = $job=='user' ? "$basename&action=user" : "$basename&action=group";
-	InitGP(array('selid','all','ids'));
+	S::gp(array('selid','all','ids'));
 	list($suid,$sfid,$sgid) = explode('_',$ids);
 	$suid = (int)$suid;
 	$sfid = (int)$sfid;
@@ -329,7 +340,7 @@ if (empty($action)) {
 				$fid = (int)$fid;
 				$gid = (int)$gid;
 				if ($job == 'user' && $fid && $uid) {
-					$pwSQL[] = 'p.uid='.pwEscape($uid).'AND p.fid='.pwEscape($fid).'AND p.gid=0';
+					$pwSQL[] = 'p.uid='.S::sqlEscape($uid).'AND p.fid='.S::sqlEscape($fid).'AND p.gid=0';
 				} elseif ($job == 'group' && $fid && $gid) {
 					$g_d[] = array('fid'=>$fid,'gid'=>$gid);
 				}
@@ -350,13 +361,13 @@ if (empty($action)) {
 			if ($rt) {
 				$username = $rt['username'];
 				if ($sfid) {
-					$sql = "SELECT rkey,rvalue FROM pw_permission WHERE uid=".pwEscape($suid)."AND fid=".pwEscape($sfid)."AND gid='0' AND type='systemforum'";
+					$sql = "SELECT rkey,rvalue FROM pw_permission WHERE uid=".S::sqlEscape($suid)."AND fid=".S::sqlEscape($sfid)."AND gid='0' AND type='systemforum'";
 				} else {
-					$sql = "SELECT rkey,rvalue FROM pw_permission WHERE uid='0' AND fid='0' AND gid=".pwEscape($rt['groupid'],false)."AND type='systemforum'";
+					$sql = "SELECT rkey,rvalue FROM pw_permission WHERE uid='0' AND fid='0' AND gid=".S::sqlEscape($rt['groupid'],false)."AND type='systemforum'";
 				}
 			}
 		} elseif ($sgid) {
-			$sql = "SELECT rkey,rvalue FROM pw_permission WHERE uid='0' AND fid=".pwEscape($sfid)." AND gid=".pwEscape($sgid)."AND type='systemforum'";
+			$sql = "SELECT rkey,rvalue FROM pw_permission WHERE uid='0' AND fid=".S::sqlEscape($sfid)." AND gid=".S::sqlEscape($sgid)."AND type='systemforum'";
 		}
 		if ($sql) {
 			$query = $db->query($sql);
@@ -379,7 +390,7 @@ if (empty($action)) {
 	} elseif ($_POST['step'] == 2) {
 		$pwSQL = $sel = array();
 		if (empty($all)) {
-			InitGP(array('group','othergroup'));
+			S::gp(array('group','othergroup'));
 			empty($selid) && adminmsg('operate_error',$jumpurl);
 			settype($selid,'array');
 			foreach ($selid as $key=>$value) {
@@ -398,14 +409,14 @@ if (empty($action)) {
 			if ($job == 'user') {
 				$where = "p.gid='0'";
 				if ($suid) {
-					$where .= ' AND p.uid='.pwEscape($suid);
+					$where .= ' AND p.uid='.S::sqlEscape($suid);
 				} elseif ($sgid) {
-					$where .= ' AND p.uid>0 AND m.groupid='.pwEscape($sgid);
+					$where .= ' AND p.uid>0 AND m.groupid='.S::sqlEscape($sgid);
 				} else {
 					$where .= ' AND p.uid>0';
 				}
 				if ($fid) {
-					$where .= ' AND p.fid='.pwEscape($sfid);
+					$where .= ' AND p.fid='.S::sqlEscape($sfid);
 				} else {
 					$where .= ' AND p.fid>0';
 				}
@@ -413,12 +424,12 @@ if (empty($action)) {
 			} elseif ($job == 'group') {
 				$where = "uid='0'";
 				if ($fid) {
-					$where .= ' AND fid='.pwEscape($fid);
+					$where .= ' AND fid='.S::sqlEscape($fid);
 				} else {
 					$where .= " AND fid>'0'";
 				}
 				if ($gid) {
-					$where .= ' AND gid='.pwEscape($gid);
+					$where .= ' AND gid='.S::sqlEscape($gid);
 				} else {
 					$where .= " AND gid>'0'";
 				}
@@ -442,14 +453,14 @@ if (empty($action)) {
 			}
 		}
 		if ($pwSQL) {
-			$db->update("REPLACE INTO pw_permission (uid,fid,gid,rkey,type,rvalue) VALUES " . pwSqlMulti($pwSQL));
+			$db->update("REPLACE INTO pw_permission (uid,fid,gid,rkey,type,rvalue) VALUES " . S::sqlMulti($pwSQL));
 		}
 		adminmsg('operate_success',$jumpurl);
 	}
 } elseif ($action == 'delright') {
 
 	$jumpurl = $job=='user' ? "$basename&action=user" : "$basename&action=group";
-	InitGP(array('selid','all'));
+	S::gp(array('selid','all'));
 
 	if (empty($all)) {
 		$pwSQL = array();
@@ -462,11 +473,11 @@ if (empty($action)) {
 			$gid = (int)$gid;
 			if ($job == 'user') {
 				if ($fid && $uid) {
-					$pwSQL[] = 'uid='.pwEscape($uid).'AND fid='.pwEscape($fid).'AND gid=0';
+					$pwSQL[] = 'uid='.S::sqlEscape($uid).'AND fid='.S::sqlEscape($fid).'AND gid=0';
 				}
 			} elseif ($job=='group') {
 				if ($fid && $gid) {
-					$pwSQL[] = 'uid=0 AND fid='.pwEscape($fid).'AND gid='.pwEscape($gid);
+					$pwSQL[] = 'uid=0 AND fid='.S::sqlEscape($fid).'AND gid='.S::sqlEscape($gid);
 				}
 			}
 		}
@@ -479,26 +490,26 @@ if (empty($action)) {
 		$gid = (int)$gid;
 		if ($job == 'user') {
 			if ($uid) {
-				$pwSQL = 'uid='.pwEscape($uid);
+				$pwSQL = 'uid='.S::sqlEscape($uid);
 			} elseif ($gid) {
 				$uids = array();
-				$sql = 'p.uid>0'.($fid ? ' AND p.fid='.pwEscape($fid) : ' AND p.fid>0').' AND p.gid=0 AND m.groupid='.pwEscape($gid);
+				$sql = 'p.uid>0'.($fid ? ' AND p.fid='.S::sqlEscape($fid) : ' AND p.fid>0').' AND p.gid=0 AND m.groupid='.S::sqlEscape($gid);
 				$query = $db->query("SELECT p.uid FROM pw_permission p LEFT JOIN pw_members m ON p.uid=m.uid WHERE $sql GROUP BY p.uid,p.fid");
 				while ($rd = $db->fetch_array($query)) {
 					$uids[] = $rd['uid'];
 				}
 				if ($uids) {
-					$pwSQL = 'uid IN ('.pwImplode($uids).')';
+					$pwSQL = 'uid IN ('.S::sqlImplode($uids).')';
 				} else {
 					adminmsg('operate_error',$jumpurl);
 				}
 			} else {
 				$pwSQL = 'uid>0 ';
 			}
-			$pwSQL .= ($fid ? ' AND fid='.pwEscape($fid) : ' AND fid>0 ') . ' AND gid=0';
+			$pwSQL .= ($fid ? ' AND fid='.S::sqlEscape($fid) : ' AND fid>0 ') . ' AND gid=0';
 		} elseif ($job=='group') {
 			if ($fid && $gid) {
-				$pwSQL[] = 'uid=0 AND fid='.pwEscape($fid).'AND gid='.pwEscape($gid);
+				$pwSQL[] = 'uid=0 AND fid='.S::sqlEscape($fid).'AND gid='.S::sqlEscape($gid);
 			}
 		}
 	}
@@ -511,9 +522,9 @@ if (empty($action)) {
 function getothersel($id,$t = 'U') {
 	global $fid,$db,$forum,$forumcache;
 	if ($t == 'U') {
-		$sql = 'uid=' . pwEscape($id) . " AND fid>'0' AND gid='0'";
+		$sql = 'uid=' . S::sqlEscape($id) . " AND fid>'0' AND gid='0'";
 	} else {
-		$sql = "uid='0' AND fid>'0' AND gid=" . pwEscape($id);
+		$sql = "uid='0' AND fid>'0' AND gid=" . S::sqlEscape($id);
 	}
 	$g_fid = array($fid);
 	$ghtml = $forumcache;

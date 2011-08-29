@@ -10,5 +10,5 @@ if (@rename($db_picpath,$imgdt) && @rename($db_attachname,$attachdt)) {
 	setConfig('db_attachname', $attachdt);
 	updatecache_c();
 }
-writeover(D_P."data/bbscache/set_cache.php","<?php die;?>|$timestamp");
+pwCache::setData(D_P."data/bbscache/set_cache.php","<?php die;?>|$timestamp");
 ?>

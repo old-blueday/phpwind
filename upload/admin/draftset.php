@@ -3,8 +3,8 @@
 $basename="$admin_file?adminjob=draftset";
 
 if(!$action){
-	InitGP(array('username','keyword'));
-	InitGP(array('page','uid'),'GP',2);
+	S::gp(array('username','keyword'));
+	S::gp(array('page','uid'),'GP',2);
 	$sqladd = 'WHERE 1';
 	if($uid){
 		$sqladd .= " AND d.uid='$uid'";
@@ -15,14 +15,15 @@ if(!$action){
 			$errorname = $username;
 			adminmsg('user_not_exists');
 		}
-		$sqladd .= " AND d.uid=".pwEscape($member['uid']);
+		$sqladd .= " AND d.uid=".S::sqlEscape($member['uid']);
+		$uid = $member['uid'];
 	}
 	if($keyword){
-		$sqladd .= " AND content LIKE ".pwEscape("%$keyword%");
+		$sqladd .= " AND content LIKE ".S::sqlEscape("%$keyword%");
 	}
 	$db_perpage = 15;
 	$page < 1 && $page = 1;
-	$limit = pwLimit(($page-1)*$db_perpage,$db_perpage);
+	$limit = S::sqlLimit(($page-1)*$db_perpage,$db_perpage);
 	$rt    = $db->get_one("SELECT COUNT(*) AS n FROM pw_draft d $sqladd");
 	$pages = numofpage($rt['n'],$page,ceil($rt['n']/$db_perpage),"$basename&uid=$uid&keyword=".rawurlencode($keyword)."&");
 
@@ -36,10 +37,10 @@ if(!$action){
 	if(!$_POST['step']){
 		include PrintEot('draftset');exit;
 	} else{
-		if(GetGP('clear')){
+		if(S::getGP('clear')){
 			$db->query("TRUNCATE TABLE pw_draft");
 		} else{
-			InitGP(array('username','keyword','num'));
+			S::gp(array('username','keyword','num'));
 			$num<1 && $num = 200;
 			$sql = '';
 			if($username){
@@ -49,17 +50,17 @@ if(!$action){
 					$errorname = $username;
 					adminmsg('user_not_exists');
 				}
-				$sql .= " AND uid=".pwEscape($member['uid']);
+				$sql .= " AND uid=".S::sqlEscape($member['uid']);
 			}
 			if($keyword){
-				$sql .= " AND content LIKE ".pwEscape("%$keyword%");
+				$sql .= " AND content LIKE ".S::sqlEscape("%$keyword%");
 			}
 			$db->update("DELETE FROM pw_draft WHERE 1 $sql LIMIT $num");
 		}
 		adminmsg('operate_success');
 	}
 } elseif($_POST['action']=='draft'){
-	InitGP(array('selid'));
+	S::gp(array('selid'));
 	if(!$selid = checkselid($selid)){
 		adminmsg('operate_error');
 	}

@@ -11,20 +11,6 @@ a:hover{text-decoration:underline;color:#ba1d06;}
 /*按钮*/
 .bta{display:inline-block;height:22px;line-height:22px;border-color: #e4e4e4 #aeaeae #aeaeae #e4e4e4;background:#f7f7f7;color:#000;}
 .bta:hover{background:#f1f1f1;}
-/*输入框*/
-textarea,input{font:12px Arial;padding:3px 2px 2px;vertical-align:middle;}
-	.input{border:1px solid;border-color: #c0c0c0 #ededed #ededed #c0c0c0;}
-	textarea{border:1px solid;border-color: #c0c0c0 #ededed #ededed #c0c0c0;}
-/*圆角A*/
-.cirA1,.cirA2,.cirA3,.cirA4,.cirA5,.cirA6{background-image:url(cirA.gif);width:5px;height:5px;position:absolute;overflow:hidden}
-	.cirA1{left:-1px;top:-1px;}
-	.cirA2{right:-1px;top:-1px;background-position:-5px 0;}
-	.cirA3{right:-1px;bottom:-1px;background-position:-5px -5px }
-	.cirA4{left:-1px;bottom:-1px;background-position:0 -5px;}
-/*论坛信息*/
-.froum-infor{background:url(froum-infor.png) 0 0 no-repeat;height:35px;color:#76A71E;font-size:16px;line-height:30px; text-align:center;}
-	.froum-infor span{font-size:12px;color:#000;}
-	.froum-infor b{padding:0 5px;}
 /*圆角盒子*/
 .boxB{border:1px solid #d0d0cc;}
 	.boxB h2,.boxB h4{border-bottom:1px solid #d6d6d6;line-height:28px;padding:0 10px;background:#efefef url(boxb-h2.png) 0 top;height:28px;}

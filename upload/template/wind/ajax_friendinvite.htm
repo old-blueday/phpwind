@@ -10,7 +10,7 @@ print <<<EOT
 	<!--<p class="rightTip">请放心，网站不会记录你的邮箱信息</p>-->
 	<table width="100%">
     	<tr>
-        	<td width="50" height="40">邮箱</td>
+        	<td width="50" height="40">电子邮箱</td>
             <td width="165"><input id="username" name="username" type="text" class="input input_wa"></td>
             <td>&nbsp;
             <select class="select_wa" name="type" id="type">
@@ -110,9 +110,9 @@ EOT;
 <div class="p15">
 <div id="message"></div>
 	<input type="hidden" value="{$invcode}" name="invcodes" id="invcodes"/>
-    <h6 class="mb5">邀请邮件正文,限200字节</h6>
+    <h6 class="mb5">邀请电子邮件正文,限200字节</h6>
 		<textarea class="textareaA mb10" name="extranote" id="extranote">{$email_content}</textarea>
-	 <h6 class="mb5">好友Email &nbsp;(同时发送多个邮箱时，每行一个)</h6>
+	 <h6 class="mb5">好友Email &nbsp;(同时发送多个电子邮箱时，每行一个)</h6>
 	 <textarea class="textareaA" id="emailcontent"></textarea>
 </div>
      <div class="p10 tac">
@@ -138,7 +138,7 @@ if($emailCount == 0){print <<<EOT
        <div class="m_height">
           <div class="m_height">
 	               <table width="100%">
-	               		<tr><td colspan="3"><div class="p10">导出的联系人列表为空，请确认您输入了正确的邮箱名和密码</div></td></tr>
+	               		<tr><td colspan="3"><div class="p10">导出的联系人列表为空，请确认您输入了正确的电子邮箱名和密码</div></td></tr>
 	               </table>
 	      </div>
        </div>
@@ -151,7 +151,7 @@ EOT;
    <div id="m_list1" $userListDisplay>
    <h6>你的联系人中有<em>{$_count}</em>位已经在phpwind注册，其中<em>{$friendCount}</em>位已经是你的好友。以下<em>{$notFriendCount}</em>位你可以加为好友</h6>
 	   <div class="m_list">
-		   <div class="m_all"><label for="m_all"><input name="friend_all" id="friend_all" type="checkbox" value="" onclick="checkAll(this,'friend[]')">全选</label></div>
+		   <div class="m_all"><label><input name="friend_all" id="friend_all" type="checkbox" value="" onclick="checkAll(this,'friend[]')">全选</label></div>
 	       <div class="m_height">
 	           <ul class="half cc">
 <!--
@@ -161,9 +161,9 @@ print <<<EOT
 -->
 					<li><label for="$key">
 					<dl>
-						<dt><a href="u.php?uid={$value[uid]}" class="img_50"><i><img src="{$value[face]}"></i></a></dt>
+						<dt><a href="{$db_userurl}{$value[uid]}" class="img_50"><i><img src="{$value[face]}"></i></a></dt>
 						<dd><input name="friend[]" type="checkbox" id="$key" value="$key" class="fr">
-						<p><a href="u.php?uid={$value[uid]}">{$value[username]}</a></p>
+						<p><a href="{$db_userurl}{$value[uid]}">{$value[username]}</a></p>
 						<p>{$value[signature]}</p>
 						</dd>
 					</dl></label>
@@ -182,7 +182,7 @@ EOT;
    </div>
    <div id="m_list2" $emailListDisplay>
 		<div class="m_list">
-	       	<div class="m_all"><label for="m_all"><input name="email_all" id="email_all" type="checkbox" value="" class="mr15" onclick="checkAll(this,'email[]')">全选</label></div>
+	       	<div class="m_all"><label for="email_all"><input name="email_all" id="email_all" type="checkbox" value="" class="mr15" onclick="checkAll(this,'email[]')">全选</label></div>
 	           <div class="m_height">
 	               <table width="100%" class="tA">
 <!--
@@ -230,7 +230,7 @@ function getMailList(){
 	var step = getObj('step').value;
 	var from = document.EMAIL;
 	if("" == type){
-		showTips('请选择邮箱类型');
+		showTips('请选择电子邮箱类型');
 		return false;
 	}
 	if("" == step){
@@ -285,7 +285,7 @@ function emailInvite(ckname,step){
 		if(step == 'addfriend'){
 			showTips('请选择一个要添加的好友');
 		}else if(step == 'sendmail'){
-			showTips('请选择要发送的邮箱');
+			showTips('请选择要发送的电子邮箱');
 		}
 		return false;
 	}
@@ -316,7 +316,7 @@ function emailInvite(ckname,step){
 function simpleInvite(form){
 	var email = getObj('emailcontent').value;
 	if('' == email){
-		showTips('请输入邮箱');
+		showTips('请输入电子邮箱');
 		return false;
 	}
 	var email = email.replace(/\\n/ig,',').replace(/\\r/ig,',');

@@ -1,7 +1,7 @@
 <!--<?php print <<<EOT
 -->
 <div id="breadCrumb">
-		<img src="$imgpath/$stylepath/thread/home-old.gif" align="absmiddle" />&nbsp;<a href="$db_bfn" title="$db_bbsname">$db_bbsname</a><em>&gt;</em>登录
+<img src="$imgpath/$stylepath/thread/home.gif" class="cp breadHome" /><em class="breadEm"></em><a href="$db_bfn" title="$db_bbsname">$db_bbsname</a><em>&gt;</em>登录
 </div>
 <div id="pw_content">
 	<div class="p20">
@@ -27,6 +27,7 @@ EOT;
 -->
 			<dl>
 				<dt>
+					<div style="height:26px;">
 <!--
 EOT;
 if(count($_LoginInfo['logintype'])==1){
@@ -39,7 +40,7 @@ EOT;
 }elseif(count($_LoginInfo['logintype'])>1){
 print <<<EOT
 -->
-					<select name="lgt">
+					<select name="lgt" style="padding:0;">
 <!--
 EOT;
 $i=1;
@@ -64,6 +65,7 @@ EOT;
 EOT;
 }print <<<EOT
 -->
+					</div>
 				</dt>
 				<dd class="ip"><div class=""><input type="text" maxLength="60" name="pwuser" tabindex="2" /></div></dd>
 				<dd class="tp"><div id="regname_info"></div></dd>
@@ -86,7 +88,7 @@ if($db_ifsafecv){print <<<EOT
 					</select>
 				</dd>
       </dl>
-			<dl class="cc" id="customquest" style="display:none">
+			<dl class="cc" id="customquestid" style="display:none">
 				<dt>自定义问题</dt>
 				<dd class="ip">
         	<div><input type="text" name="customquest" tabindex="5" /></div>
@@ -99,17 +101,24 @@ if($db_ifsafecv){print <<<EOT
 			</dl>
 <!--
 EOT;
-}if($loginq && $db_question){
+}if(($db_ckquestion & 2) && $db_question){
 $qkey = array_rand($db_question);
+if(!$question){
+	if($db_imagequestion){
+		$question = '<img id="ckquestion" style="margin:0;" src="ckquestion.php?q='.$qkey.'&t='.$timestamp.'">';
+	}else{
+		$question = $qkey<0 ? getMachineQuestion_1() :  $db_question[$qkey];
+	}
+}
 print <<<EOT
 -->
       <dl class="cc">
 				<dt>验证问答</dt>
 				<dd class="ip"><div><input class="input" type="text" name="qanswer" tabindex="7" /><input type="hidden" name="qkey" value="$qkey" /></div></dd>
-				<dd class="tp"><div class="ignore">{$db_question[$qkey]}
+				<dd class="tp"><div class="ignore">{$question}
 <!--
 EOT;
-if($showq){
+if($showq && $qkey>0){
 print <<<EOT
 -->
 					<p>正确答案:{$db_answer[$qkey]}</p>
@@ -122,6 +131,7 @@ EOT;
 <!--
 EOT;
 }if($db_gdcheck & 2){
+$gdSize = explode("\t",$db_gdsize);
 print <<<EOT
 -->
 			<dl class="cc">
@@ -129,7 +139,13 @@ print <<<EOT
 				<dd class="ip ck">
 					<div><input id="gdcode" name="gdcode" value="" /></div>
 					<span id="menu_gd"></span>
-					<img src="ck.php?nowtime=$timestamp" align="top" onclick="try{opencode('',this,'register_ckcode')}catch(e){}" class="cp mb10" id="register_ckcode" alt="看不清楚，换一张" title="看不清楚，换一张" />
+<script type="text/javascript" src="js/pw_authcode.js"></script>
+<script>
+var flashWidth = "$gdSize[0]";
+var flashHeight = "$gdSize[1]";
+var gdtype = $db_gdtype;
+showGdCode();
+</script>
 				</dd>
 				<dd></dd>
 			</dl>
@@ -157,7 +173,8 @@ EOT;
 <script language="JavaScript">
 document.login.pwuser.focus();
 function showcustomquest(qid){
-	getObj("customquest").style.display = qid==-1 ? '' : 'none';
+		getObj("customquestid").style.display=qid==-1?'':'none';
+	
 }
 </script>
 <!--

@@ -2,7 +2,7 @@
 define('SIMPLEDIR', getindexdir(__FILE__));
 define('SIMPLE', 1);
 require_once (SIMPLEDIR . '/global.php');
-include_once (D_P . 'data/bbscache/forum_cache.php');
+include_once pwCache::getPath(D_P . 'data/bbscache/forum_cache.php');
 
 /*
 * phpwind 是一个免费开源软件，您不需要支付任何费用就可以无限制使用。

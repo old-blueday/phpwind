@@ -531,3 +531,9 @@ var adminNavClass = {
 		return m[key];
 	}
 }
+function closeAdminTab(win){
+	if(win.frameElement){
+		var mid = win.frameElement.id.substr(7);
+		parent.getObj('button_'+mid).getElementsByTagName('a')[1].onclick();
+	}
+}

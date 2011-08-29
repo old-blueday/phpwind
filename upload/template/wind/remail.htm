@@ -2,13 +2,13 @@
 print <<<EOT
 -->
 <div id="breadCrumb">
-		<img src="$imgpath/$stylepath/thread/home-old.gif" align="absmiddle" />&nbsp;<a href="$db_bfn" title="$db_bbsname">$db_bbsname</a><em>&gt;</em>邮件重发
+<img src="$imgpath/$stylepath/thread/home.gif" class="breadHome" /><em class="breadEm"></em><a href="$db_bfn" title="$db_bbsname">$db_bbsname</a><em>&gt;</em>电子邮件重发
 </div>
 <form action="remail.php" method="post">
 <div class="t" style="margin-top:15px">
 <table width="100%" cellspacing="0" cellpadding="0" align="center">
 	<tr>
-		<td colspan="2" class="h">邮件重发</td>
+		<td colspan="2" class="h">电子邮件重发</td>
 	</tr>
 	<tr class="tr3 tr">
 		<th width="21%">用户名</th>
@@ -19,11 +19,11 @@ print <<<EOT
 		<th><input class="input" type="password" name="password" size="40" /></th>
 	</tr>
 	<tr class="tr3 tr">
-		<th>填写原邮箱地址</th>
+		<th>填写原电子邮箱地址</th>
 		<th><input class="input" type="text" name="rg_email" size="40" /></th>
 	</tr>
 	<tr class="tr3 tr">
-		<th>填写新邮箱地址!<br />留空，则发往原邮箱地址</th>
+		<th>填写新电子邮箱地址!<br />留空，则发往原电子邮箱地址</th>
 		<th><input class="input" type="text" name="to_email" size="40" /></th>
 	</tr>
 </table></div>

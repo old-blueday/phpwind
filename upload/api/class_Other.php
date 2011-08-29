@@ -33,7 +33,7 @@ class Other {
 		if (!$title) {
 			return new ApiResponse(false);
 		}
-		$nid = $this->db->get_value("SELECT nid FROM pw_nav WHERE type='main' AND title=" . pwEscape($title));
+		$nid = $this->db->get_value("SELECT nid FROM pw_nav WHERE type='main' AND title=" . S::sqlEscape($title));
 		$view = $this->db->get_value("SELECT view FROM pw_nav WHERE type='main' ORDER BY view DESC");
 		
 		$navConfigService = L::loadClass('navconfig', 'site'); /* @var $navConfigService PW_NavConfig */
@@ -70,9 +70,9 @@ class Other {
 
 		} elseif ($stype == 'upsharelinks') {
 			
-			$sid = $this->db->get_value('SELECT sid FROM pw_sharelinks WHERE sid='.pwEscape($sid));
+			$sid = $this->db->get_value('SELECT sid FROM pw_sharelinks WHERE sid='.S::sqlEscape($sid));
 			if ($sid) {
-				$pwSQL = pwSqlSingle(array(
+				$pwSQL = S::sqlSingle(array(
 					'name'			=> $name,
 					'url'			=> $url,
 					'logo'			=> $logo,
@@ -80,11 +80,11 @@ class Other {
 					'threadorder'	=> $threadorder,
 					'ifcheck'		=> $ifcheck
 				));
-				$this->db->update("UPDATE pw_sharelinks SET $pwSQL WHERE sid=".pwEscape($sid));
+				$this->db->update("UPDATE pw_sharelinks SET $pwSQL WHERE sid=".S::sqlEscape($sid));
 				updatecache_i();
 				
 			} else {
-				$pwSQL = pwSqlSingle(array(
+				$pwSQL = S::sqlSingle(array(
 					'threadorder'	=> $threadorder,
 					'name'			=> $name,
 					'url'			=> $url,
@@ -100,13 +100,13 @@ class Other {
 
 		} elseif ($stype == 'remove') {
 			
-			$this->db->update('DELETE FROM pw_sharelinks WHERE sid='.pwEscape($sid));
+			$this->db->update('DELETE FROM pw_sharelinks WHERE sid='.S::sqlEscape($sid));
 			updatecache_i();
 			return new ApiResponse($sid);
 
 		} elseif ($stype == 'state') {
 
-			$sid = $this->db->get_value('SELECT sid FROM pw_sharelinks WHERE sid='.pwEscape($sid));
+			$sid = $this->db->get_value('SELECT sid FROM pw_sharelinks WHERE sid='.S::sqlEscape($sid));
 
 			return new ApiResponse($sid);
 		}
@@ -142,7 +142,7 @@ class Other {
 		}
 		$survey_cache .= "\r\n?>";
 		$survey_cache = pwConvert($survey_cache,$db_charset,'gbk');
-		writeover(D_P."data/bbscache/survey_cache.php",$survey_cache);
+		pwCache::setData(D_P."data/bbscache/survey_cache.php",$survey_cache);
 		return new ApiResponse(true);
 	}
 
@@ -170,7 +170,7 @@ class Other {
             $classcache .= "'$class[cid]'=>".pw_var_export($class).",\r\n\r\n";
         }
         $classcache .= ");\r\n?>";
-        writeover(D_P."data/bbscache/info_class.php",$classcache);
+        pwCache::setData(D_P."data/bbscache/info_class.php",$classcache);
     }
 
 	/** 添加帮助信息
@@ -185,7 +185,7 @@ class Other {
 	 */
 	function insertHelp($hup = 0,$title,$content,$url = '',$hid = 0,$action = 'add') {
 
-		@include_once(D_P.'data/bbscache/help_cache.php');
+		@include_once pwCache::getPath(D_P.'data/bbscache/help_cache.php');
 		require_once(R_P.'admin/cache.php');
 		$hup = (int)$hup;
 		$hid = (int)$hid;
@@ -223,11 +223,11 @@ class Other {
 						if ($key == $hup) {
 							$lv = $value['lv']+1;
 							$fathers = ($value['fathers'] ? "$value[fathers]," : '').$hup;
-							!$value['ifchild'] && $this->db->update("UPDATE pw_help SET ifchild='1' WHERE hid=".pwEscape($hup));
+							!$value['ifchild'] && $this->db->update("UPDATE pw_help SET ifchild='1' WHERE hid=".S::sqlEscape($hup));
 						}
 					}
 					$this->db->update("INSERT INTO pw_help"
-						. " SET " . pwSqlSingle(array(
+						. " SET " . S::sqlSingle(array(
 							'hup'		=> $hup,
 							'lv'		=> $lv,
 							'fathers'	=> $fathers,
@@ -261,11 +261,11 @@ class Other {
 						if ($key == $hup) {
 							$lv = $value['lv']+1;
 							$fathers = ($value['fathers'] ? "$value[fathers]," : '').$hup;
-							!$value['ifchild'] && $this->db->update("UPDATE pw_help SET ifchild='1' WHERE hid=".pwEscape($hup));
+							!$value['ifchild'] && $this->db->update("UPDATE pw_help SET ifchild='1' WHERE hid=".S::sqlEscape($hup));
 						}
 					}
 					$this->db->update("INSERT INTO pw_help"
-						. " SET " . pwSqlSingle(array(
+						. " SET " . S::sqlSingle(array(
 							'hup'		=> $hup,
 							'lv'		=> $lv,
 							'fathers'	=> $fathers,
@@ -290,14 +290,14 @@ class Other {
 						}
 					}
 					$this->db->update("UPDATE pw_help"
-						. " SET " . pwSqlSingle(array(
+						. " SET " . S::sqlSingle(array(
 								'hup'		=> $hup,
 								'title'		=> $title,
 								'url'		=> $url,
 								'content'	=> $content,
 								'vieworder'	=> 0
 							))
-						. " WHERE hid=".pwEscape($hid)
+						. " WHERE hid=".S::sqlEscape($hid)
 					);
 					$hids = $hid;
 				}
@@ -308,7 +308,7 @@ class Other {
 			updatecache_help();
 			return new ApiResponse($hids);
 		} elseif ($action == 'delete' && $hid > 0) {
-			$this->db->update("DELETE FROM pw_help WHERE hid=".pwEscape($hid).'OR hup='.pwEscape($hid));
+			$this->db->update("DELETE FROM pw_help WHERE hid=".S::sqlEscape($hid).'OR hup='.S::sqlEscape($hid));
 			updatecache_help();
 			return new ApiResponse(true);
 		} else {

@@ -1,10 +1,16 @@
 <!--<?php
 include_once PrintEot('left');
-if($admintype=='checkemail'){print <<<EOT
+if($adminitem=='checkemail'){print <<<EOT
 -->
+<div class="nav3 mb10">
+	<ul class="cc">
+		<li><a href="$jobUrl&adminitem=checkreg">注册审核</a></li>
+		<li class="current"><a href="$basename">邮件审核</a></li>
+	</ul>
+</div>
 <div class="admin_info mb10">
 	<h3 class="h1"><b>提示信息</b></h3>
-	<div class="legend">需要email验证的用户如果无法通过email激活帐号，管理员可使用此功能激活用户帐号</div>
+	<div class="legend">需要电子邮件验证的用户如果无法通过电子邮件激活帐号，管理员可使用此功能激活用户帐号</div>
 </div>
 <div class="mb10 cc">$pages</div>
 <form action=$basename method=post>
@@ -28,7 +34,7 @@ print <<<EOT
 -->
 	<tr class="tr1 vt">
 		<td class="td2">$num</td>
-		<td class="td2"><a href="$admin_file?adminjob=setuser&action=edit&uid=$mem[uid]">$mem[username]</a></td>
+		<td class="td2"><a href="$admin_file?adminjob=usermanage&adminitem=edit&action=edit&uid=$mem[uid]">$mem[username]</a></td>
 		<td class="td2">$mem[regdate]</td>
 		<td class="td2">$mem[email]</td>
 		<td class="td2"><input type='checkbox' name='yzmem[]' value=$mem[uid]></td>
@@ -50,8 +56,14 @@ EOT;
 </form>
 <!--
 EOT;
-}elseif($admintype=='checkreg'){print <<<EOT
+}elseif($adminitem=='checkreg'){print <<<EOT
 -->
+<div class="nav3 mb10">
+	<ul class="cc">
+		<li class="current"><a href="$basename">注册审核</a></li>
+		<li><a href="$jobUrl&adminitem=checkemail">邮件审核</a></li>
+	</ul>
+</div>
 <div class="admin_info mb10">
 	<h3 class="h1"><b>提示信息</b></h3>
 	<div class="legend">此功能可将未验证会员组的用户编入普通会员组</div>
@@ -66,8 +78,8 @@ EOT;
 		<td width="24">ID</td>
 		<td width="120">用户名</td>
 		<td width="150">注册时间</td>
-		<td width="130">Email</td>
-		<td></td>
+		<td width="130">电子邮箱</td>
+		<td>注册原因</td>
 		<td width="50">&nbsp;</td>
 	</tr>
 <!--
@@ -79,7 +91,7 @@ print <<<EOT
 -->
 	<tr class="tr1 vt">
 		<td class="td2">$num</td>
-		<td class="td2"><a href="$admin_file?adminjob=setuser&action=edit&uid=$mem[uid]">$mem[username]</a></td>
+		<td class="td2"><a href="$admin_file?adminjob=usermanage&adminitem=edit&action=edit&uid=$mem[uid]">$mem[username]</a></td>
 		<td class="td2">$mem[regdate]</td>
 		<td class="td2">$mem[email]</td>
 		<td class="td2">

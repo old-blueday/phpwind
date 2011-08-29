@@ -2,6 +2,13 @@
 include_once PrintEot('left');
 print <<<EOT
 -->
+<div class="nav3 mb10">
+	<ul class="cc">
+		<li><a href="$admin_file?adminjob=record&adminitem=adminlog">后台管理日志</a></li>
+		<li class="current"><a href="$admin_file?adminjob=record&adminitem=forumlog">前台管理日志</a></li>
+		<li><a href="$admin_file?adminjob=record&adminitem=adminrecord">后台操作记录</a></li>
+	</ul>
+</div>
 <div class="admin_info mb10">
     <h3 class="h1"><b>提示信息</b></h3>
     <div class="legend"><ol><li>为了保证后台的安全性,系统只允许站点创始人和管理员删除操作日记<br /></li><li>系统保留三天的站点管理日志，只允许删除三天前的日志</li></ol></div>
@@ -10,13 +17,22 @@ print <<<EOT
 <h2 class="h1">搜索</h2>
 <div class="admin_table mb10">
     <table cellpadding="0" cellspacing="0" width="100%">
-        <tr class="tr1 vt">
-            <td class="td2">用户名: <input type="text" class="input input_wa mr5" name='username1'></td>
-            <td class="td2">管理员: <input type="text" class="input input_wa mr5" name='username2'></td>
-            <td class="td2">
-			操作:
-			<select name="type" class="select_wa">
-            <option value="all">全 部</option>
+			<tr>
+				<td class="td1">用户名</td>
+				<td class="td2"><input type="text" class="input input_wa mr5" name="username1"></td>
+			</tr>
+			<tr>
+				<td class="td1">管理员</td>
+				<td class="td2"><input type="text" class="input input_wa mr5" name="username2"></td>
+			</tr>
+			<tr>
+				<td class="td1">所属版块</td>
+				<td class="td2"><select name="fid"  class="select_wa mr20"><option value="-1">所有版块</option>$forumcache</select></td>
+			</tr>
+			<tr>
+				<td class="td1">操作</td>
+				<td class="td2"><select name="type" class="select_wa">
+            <option value="all">全部</option>
             <option value="topped" $type_sel[topped]>{$lang[logtype][topped]}</option>
             <option value="digest" $type_sel[digest]>{$lang[logtype][digest]}</option>
             <option value="highlight" $type_sel[highlight]>{$lang[logtype][highlight]}</option>
@@ -34,10 +50,14 @@ print <<<EOT
             <option value="recycle" $type_sel[recycle]>{$lang[logtype][recycle]}</option>
             <option value="unite" $type_sel[unite]>{$lang[logtype][unite]}</option>
             <option value="banuser" $type_sel[banuser]>{$lang[logtype][banuser]}</option>
-            </select>
-            </td>
-            <td class="td2"><span class="bt2"><span><button type="submit" value='提 交'>提 交</button></span></span></td>
-        </tr>
+            <option value="manageip" $type_sel[manageip]>{$lang[logtype][manageip]}</option>
+            <option value="signature" $type_sel[signature]>{$lang[logtype][signature]}</option>
+            </select></td>
+			</tr>
+			<tr>
+				<td class="td1"></td>
+				<td class="td2"><span class="bt2"><span><button type="submit" value='提 交'>提 交</button></span></span></td>
+			</tr>
     </table>
 </div>
 </form>
@@ -97,6 +117,7 @@ print <<<EOT
 </div>
 <div class="cc mb10">$pages</div>
 <div class="mb10 tac">
+	<span class="bt"><span><button type="button" onclick="CheckAll(document.FORM)">全 选</button></span></span>
     <span class="btn"><span><button type="submit" name="submit" value="删除">删除</button></span></span>
     <span class="bt"><span><button type="button" onclick="delRecord();">删除多余管理日志</button></span></span>
 </div>

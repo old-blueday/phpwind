@@ -34,7 +34,7 @@ EOT;
 <link rel="stylesheet" type="text/css" href="$imgpath/wind-reset.css" />
 <!--
 EOT;
-@include Pcv($css_path);
+@include S::escapePath($css_path);
 if($pwModeCss){print <<<EOT
 -->
 <style>

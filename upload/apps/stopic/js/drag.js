@@ -8,10 +8,10 @@ var drag = Class({},{
 		this.contentClass	= content;
 		this.closeAbleClass	= closeAble;
 		this.packId	= pack;
-		if (is_ie) {
-			document.body.onselectstart = function(){
-				return false;
-			}
+		if (is_ie) {//注释以下代码,在IE中无法选中文本框中的文字 by chenchaoqun
+			//document.body.onselectstart = function(){
+				//return false;
+			//}
 		}
 		this.ie6 = !window.xmlHttp;
 		this.webkit = navigator.userAgent.toLowerCase().indexOf('webkit')>-1;
@@ -114,7 +114,7 @@ var drag = Class({},{
 	_editContent	: function (o) {
 		var itemid = this._getItemParentId(o);
 		var stopic_id = STOPIC_ID ? STOPIC_ID : getObj('stopicId').value;
-		ajax.send(AJAXURL,'job=editblock&block_id='+itemid+'&stopic_id='+stopic_id,ajax.get);
+		ajax.send(AJAXURL,'ajax=1&job=editblock&block_id='+itemid+'&stopic_id='+stopic_id,ajax.get);
 	},
 
 	_removeItem	: function (o) {

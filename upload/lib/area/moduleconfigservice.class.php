@@ -49,7 +49,7 @@ class PW_moduleConfigService {
 		if (!$pwLine) return false;
 		
 		preg_match("/title\s?=\s?(['|\"]?)(.*?)(\\1)/is",$pwLine,$match);
-		if (!$match[2]) return $module;
+		if ( !$match || !$match[2]) return $module;
 		
 		return $match[2];
 	}
@@ -105,7 +105,8 @@ class PW_moduleConfigService {
 		$newModuleString = $this->_createNewPieceCode($configFile,$name,$code);
 
 		$newString	= str_replace($oldModuleString,$newModuleString,$fileString);
-		writeover($configFile,$newString);
+		$temp = pwCache::setData($configFile,$newString,false,'wb+');
+		if (!$temp && !is_writable($configFile)) $this->_writeOverMessage($configFile);
 		clearstatcache();
 	}
 	/**
@@ -141,7 +142,8 @@ class PW_moduleConfigService {
 		
 		$configString = readover($configFile);
 		$newString = str_replace($pwLine,$newPWLine,$configString);
-		writeover($configFile,$newString);
+		$temp = pwCache::setData($configFile,$newString,false,'wb+');
+		if (!$temp && !is_writable($configFile)) $this->_writeOverMessage($configFile);
 		return true;
 	}
 	
@@ -199,8 +201,10 @@ class PW_moduleConfigService {
 			
 			$newFileString = str_replace($reg[0][$key],$pwCode,$newFileString);
 		}
-		writeover($configFile,$data,'a');
-		writeover($templateFile,$newFileString);
+		$temp = pwCache::setData($configFile,$data, false, 'ab+');
+		if (!$temp && !is_writable($configFile)) $this->_writeOverMessage($configFile);
+		$temp = pwCache::setData($templateFile,$newFileString,false,'wb+');
+		if (!$temp && !is_writable($templateFile)) $this->_writeOverMessage($templateFile);
 	}
 	
 	function _getSignFormConfigFile($file) {
@@ -208,7 +212,7 @@ class PW_moduleConfigService {
 		if ($result) {
 			return $result;
 		}
-		if (!strpos($file,'config.htm')) {
+		if (!strpos($file,PW_PORTAL_CONFIG)) {
 			return '';
 		}
 		$temp = explode('/',$file);
@@ -339,6 +343,10 @@ class PW_moduleConfigService {
 	
 	function _getInvokeService() {
 		return L::loadClass('InvokeService', 'area');
+	}
+	
+	function _writeOverMessage($path) {
+		Showmsg('请设置'.str_replace(R_P,'',$path).'文件为可写');
 	}
 }
 ?>

@@ -3,7 +3,7 @@
 
 $basename = "$admin_file?adminjob=postcate";
 
-InitGP(array('pcid'),GP,2);
+S::gp(array('pcid'),GP,2);
 $pcid > 0 && $pcvaluetable = GetPcatetable($pcid);
 
 if (empty($action)){
@@ -26,9 +26,9 @@ if (empty($action)){
 	include PrintEot('postcate');exit;
 
 }  elseif ($action == 'postcate') {
-	InitGP(array('page','step','field','newfield'));
+	S::gp(array('page','step','field','newfield'));
 
-	@include_once(D_P.'data/bbscache/postcate_config.php');
+	@include_once pwCache::getPath(D_P.'data/bbscache/postcate_config.php');
 
 	$sql = '';
 	!$pcid && $pcid = $db->get_value("SELECT pcid FROM pw_postcate ORDER BY vieworder");
@@ -36,7 +36,7 @@ if (empty($action)){
 	if ($pcid) {
 		$searchhtml = $asearchhtml = '';
 		$i = 0;
-		$query = $db->query("SELECT fieldid,name,type,rules,ifsearch,ifasearch,vieworder FROM pw_pcfield WHERE ifable=1 AND (ifsearch=1 OR ifasearch=1) AND pcid=".pwEscape($pcid). "ORDER BY vieworder,fieldid");
+		$query = $db->query("SELECT fieldid,name,type,rules,ifsearch,ifasearch,vieworder FROM pw_pcfield WHERE ifable=1 AND (ifsearch=1 OR ifasearch=1) AND pcid=".S::sqlEscape($pcid). "ORDER BY vieworder,fieldid");
 		while ($rt = $db->fetch_array($query)) {
 			$i++;
 			$rt['fieldvalue'] = $field[$rt['fieldid']];
@@ -66,7 +66,7 @@ if (empty($action)){
 			$newfield = StrCode(serialize($field));
 		}
 		list($count,$tiddb,$alltiddb) = $searchPostcate->getSearchvalue($newfield,'one',true,true);
-		is_array($tiddb) && $sql .= " AND pv.tid IN(".pwImplode($tiddb).")";
+		is_array($tiddb) && $sql .= " AND pv.tid IN(".S::sqlImplode($tiddb).")";
 		is_array($alltiddb) && $alltids = implode(',',$alltiddb);
 	}
 
@@ -79,7 +79,7 @@ if (empty($action)){
 			$alltiddb[] = $rt['tid'];
 		}
 		if ($alltiddb) {
-			$query = $db->query("SELECT tid FROM pw_threads WHERE tid IN(".pwImplode($alltiddb).")");
+			$query = $db->query("SELECT tid FROM pw_threads WHERE tid IN(".S::sqlImplode($alltiddb).")");
 			while ($rt = $db->fetch_array($query)) {
 				$threadb[$rt['tid']] = $rt['tid'];
 			}
@@ -91,7 +91,7 @@ if (empty($action)){
 		}
 
 		if (count($newtiddb) > 0) {
-			$db->update("DELETE FROM $pcvaluetable WHERE tid IN(".pwImplode($newtiddb).") AND ifrecycle=0");
+			$db->update("DELETE FROM $pcvaluetable WHERE tid IN(".S::sqlImplode($newtiddb).") AND ifrecycle=0");
 		}
 
 		is_array($threadb) && $alltids = implode(',',$threadb);
@@ -107,7 +107,7 @@ if (empty($action)){
 		$pages = numofpage($count,$page,$numofpage,"$admin_file?adminjob=postcate&action=postcate&pcid=$pcid&newfield=$newfield&step=$step&");
 		if ($step != 'search') {
 			$start = ($page-1)*$db_perpage;
-			$limit = pwLimit($start,$db_perpage);
+			$limit = S::sqlLimit($start,$db_perpage);
 		}
 		$catedb = array();
 		$query = $db->query("SELECT pv.tid,t.fid,t.subject,t.author,t.authorid,t.postdate FROM $pcvaluetable pv LEFT JOIN pw_threads t ON pv.tid=t.tid WHERE 1 AND ifrecycle=0 $sql ORDER BY t.postdate DESC $limit");
@@ -120,15 +120,15 @@ if (empty($action)){
 	include PrintEot('postcate');exit;
 
 } elseif ($_POST['sendmsg'] || $action == 'sendmsg') {
-	InitGP(array('step','nexto'));
+	S::gp(array('step','nexto'));
 	if (empty($step)) {
-		InitGP(array('selid','alltids'));
+		S::gp(array('selid','alltids'));
 
 		if ($selid) {
-			$selid = pwImplode($selid);
+			$selid = S::sqlImplode($selid);
 		} elseif ($alltids) {
 			$alltids = explode(',',$alltids);
-			$selid = pwImplode($alltids);
+			$selid = S::sqlImplode($alltids);
 		} else {
 			adminmsg('operate_error',"$basename&action=postcate");
 		}
@@ -140,10 +140,10 @@ if (empty($action)){
 		}
 		include PrintEot('postcate');exit;
 	} elseif ($step == '2') {
-		InitGP(array('subject','atc_content','uids'));
+		S::gp(array('subject','atc_content','uids'));
 		$cache_file = D_P."data/bbscache/".substr(md5($admin_pwd),10,10).".txt";
 		if (!$nexto) {
-			writeover($cache_file,$atc_content);
+			pwCache::setData($cache_file,$atc_content);
 		} else {
 			$atc_content = readover($cache_file);
 		}
@@ -152,8 +152,8 @@ if (empty($action)){
 			adminmsg('sendmsg_empty','javascript:history.go(-1);');
 		}
 
-		$subject     = Char_cv($subject);
-		$sendmessage = Char_cv($atc_content);
+		$subject     = S::escapeChar($subject);
+		$sendmessage = S::escapeChar($atc_content);
 		$percount = 1;
 		empty($nexto) && $nexto = 1;
 
@@ -178,14 +178,14 @@ if (empty($action)){
 			$j_url = "$basename&action=$action&step=2&nexto=$nexto&subject=".rawurlencode($subject);
 			adminmsg("sendmsg_step",EncodeUrl($j_url),1);
 		} else {
-			P_unlink($cache_file);
+			pwCache::deleteData($cache_file);
 			adminmsg('operate_success',"$basename&action=postcate");
 		}
 	}
 
 } elseif ($action == 'delthreads') {
 
-	InitGP(array('selid'));
+	S::gp(array('selid'));
 	
 	!$selid && adminmsg('operate_error');
 	is_numeric($selid) && $selid = explode(',',$selid);
@@ -203,15 +203,19 @@ if (empty($action)){
 	$delarticle->delTopic($readdb, $db_recycle);
 
 	if ($db_ifpwcache ^ 1) {
-		$db->update("DELETE FROM pw_elements WHERE type !='usersort' AND id IN(" . pwImplode($delids) . ')');
+		$db->update("DELETE FROM pw_elements WHERE type !='usersort' AND id IN(" . S::sqlImplode($delids) . ')');
 	}
 
 	# $db->update("DELETE FROM pw_threads WHERE tid IN ($selids)");
 	# ThreadManager
-    $threadManager = L::loadClass("threadmanager", 'forum');
-	$threadManager->deleteByThreadIds($fid,$selids);
+    //* $threadManager = L::loadClass("threadmanager", 'forum');
+	//* $threadManager->deleteByThreadIds($fid,$selids);
+	$threadService = L::loadclass('threads', 'forum');
+	$threadService->deleteByThreadIds($delids);	
+	Perf::gatherInfo('changeThreadWithForumIds', array('fid'=>$fid));		
 
-	P_unlink(D_P.'data/bbscache/c_cache.php');
+	//* P_unlink(D_P.'data/bbscache/c_cache.php');
+	pwCache::deleteData(D_P.'data/bbscache/c_cache.php');
 
 	adminmsg('operate_success',"$basename&action=postcate&pcid=$pcid");
 
@@ -221,28 +225,28 @@ if (empty($action)){
 		
 		$ajax_basename_editpostcate = EncodeUrl($basename."&action=editpostcate&");
 
-		extract($db->get_one("SELECT pcid,name,ifable,vieworder FROM pw_postcate WHERE pcid=".pwEscape($pcid)));
+		extract($db->get_one("SELECT pcid,name,ifable,vieworder FROM pw_postcate WHERE pcid=".S::sqlEscape($pcid)));
 		ifcheck($ifable,'ifable');
 
 		include PrintEot('postcate');ajax_footer();
 	} elseif ($_POST['step'] == 2) {
-		InitGP(array('ifable','vieworder'),'P',2);
-		$name = GetGP('name');
+		S::gp(array('ifable','vieworder'),'P',2);
+		$name = S::getGP('name');
 		$name = trim($name);
 		if(!$name || strlen($name) > 14) adminmsg('topic_name');
-		$name = char_cv($name);
+		$name = S::escapeChar($name);
 		$db->update("UPDATE pw_postcate"
-			. " SET " . pwSqlSingle(array(
+			. " SET " . S::sqlSingle(array(
 					'name'		=> $name,			'ifable'	=> $ifable,
 					'vieworder'	=> $vieworder
 					))
-			. " WHERE pcid=".pwEscape($pcid));
+			. " WHERE pcid=".S::sqlEscape($pcid));
 
 		updatecache_postcate();
 		Showmsg('topic_edit_success');
 	}
 } elseif ($action == 'postcatelist') {
-	InitGP(array('selid','vieworder'));
+	S::gp(array('selid','vieworder'));
 
 	!is_array($selid) && $selid = array();
 	$updatedb = array();
@@ -253,32 +257,32 @@ if (empty($action)){
 		}
 	}
 	if ($updatedb) {
-		$db->update("UPDATE pw_postcate SET ifable=1 WHERE pcid IN (".pwImplode($updatedb).')');
-		$db->update("UPDATE pw_postcate SET ifable=0 WHERE pcid NOT IN (".pwImplode($updatedb).')');
+		$db->update("UPDATE pw_postcate SET ifable=1 WHERE pcid IN (".S::sqlImplode($updatedb).')');
+		$db->update("UPDATE pw_postcate SET ifable=0 WHERE pcid NOT IN (".S::sqlImplode($updatedb).')');
 	} else {
 		$db->update("UPDATE pw_postcate SET ifable=0");
 	}
 
 	foreach ($vieworder as $key => $value) {
-		$key && $db->update("UPDATE pw_postcate SET vieworder=".pwEscape($value)."WHERE pcid=".pwEscape($key));
+		$key && $db->update("UPDATE pw_postcate SET vieworder=".S::sqlEscape($value)."WHERE pcid=".S::sqlEscape($key));
 	}
 	updatecache_postcate();
 	adminmsg('operate_success',$basename);
 } elseif ($action == 'editmodel') {
 
-	InitGP(array('step'),GP,2);
+	S::gp(array('step'),GP,2);
 	$ajax_basename_add = EncodeUrl($basename."&action=addfield");
 	if (empty($step)) {
-		@include_once(D_P.'data/bbscache/postcate_config.php');
+		@include_once pwCache::getPath(D_P.'data/bbscache/postcate_config.php');
 		$ajax_basename = EncodeUrl($basename);
 		$ajax_basename_edit = EncodeUrl($basename."&action=editfield");
 		$ajax_basename_delfield = EncodeUrl($basename."&action=delfield");
 		$ajax_basename_editindex = EncodeUrl($basename."&action=editindex");
 
-		$pcid = $db->get_value("SELECT pcid FROM pw_postcate WHERE pcid=".pwEscape($pcid));
+		$pcid = $db->get_value("SELECT pcid FROM pw_postcate WHERE pcid=".S::sqlEscape($pcid));
 		empty($pcid) && adminmsg('postcate_not_exists');
 
-		$query = $db->query("SELECT * FROM pw_pcfield WHERE pcid=".pwEscape($pcid)." ORDER BY vieworder,fieldid ASC");
+		$query = $db->query("SELECT * FROM pw_pcfield WHERE pcid=".S::sqlEscape($pcid)." ORDER BY vieworder,fieldid ASC");
 		while ($rt = $db->fetch_array($query)){
 			$rt['ifable_checked'] = $rt['ifable'] ? 'checked' : '';
 			$rt['ifsearch_checked'] = $rt['ifsearch'] ? 'checked' : '';
@@ -308,14 +312,14 @@ if (empty($action)){
 		include PrintEot('postcate');exit;
 	} elseif ($step == '2') {
 
-		InitGP(array('ifable','vieworder','ifsearch','ifasearch','threadshow','ifmust','textsize'));
+		S::gp(array('ifable','vieworder','ifsearch','ifasearch','threadshow','ifmust','textsize'));
 		foreach ($vieworder as $key => $value) {
 			$field = array();
 			$field = array_keys($value);
 			$fieldname = $field['0'];
 			$viewvalue = $value[$fieldname];
-			$db->update("UPDATE pw_pcfield SET ".pwSqlSingle(array('ifable'=>$ifable[$key]))." WHERE fieldid=".pwEscape($key)."AND ifdel=0");
-			$db->update("UPDATE pw_pcfield SET ".pwSqlSingle(array( 'vieworder'=>$viewvalue,'ifsearch'=>$ifsearch[$key],'ifasearch'=>$ifasearch[$key],'threadshow'=>$threadshow[$key],'ifmust'=>$ifmust[$key],'textsize'=>$textsize[$key]))." WHERE fieldid=".pwEscape($key));
+			$db->update("UPDATE pw_pcfield SET ".S::sqlSingle(array('ifable'=>$ifable[$key]))." WHERE fieldid=".S::sqlEscape($key)."AND ifdel=0");
+			$db->update("UPDATE pw_pcfield SET ".S::sqlSingle(array( 'vieworder'=>$viewvalue,'ifsearch'=>$ifsearch[$key],'ifasearch'=>$ifasearch[$key],'threadshow'=>$threadshow[$key],'ifmust'=>$ifmust[$key],'textsize'=>$textsize[$key]))." WHERE fieldid=".S::sqlEscape($key));
 		}
 		adminmsg("operate_success",$basename."&action=editmodel&pcid=".$pcid);
 	} elseif ($step == '3') {
@@ -339,7 +343,7 @@ if (empty($action)){
 
 	} elseif ($_POST['step'] == 2) {
 
-		InitGP(array('fieldtype','name','rule_min','rule_max','rules','descrip'));
+		S::gp(array('fieldtype','name','rule_min','rule_max','rules','descrip'));
 
 		if (empty($fieldtype)) Showmsg('fieldtype_not_exists');
 		if ($fieldtype == 'select' || $fieldtype == 'radio' || $fieldtype == 'checkbox') {
@@ -361,11 +365,11 @@ if (empty($action)){
 			Showmsg('field_descrip_limit');
 		}
 
-		$db->update("INSERT INTO pw_pcfield SET ".pwSqlSingle(array('name'=>$name,'pcid' => $pcid,'type'=>$fieldtype,'rules'=>$s_rules,'descrip'=>$descrip)));
+		$db->update("INSERT INTO pw_pcfield SET ".S::sqlSingle(array('name'=>$name,'pcid' => $pcid,'type'=>$fieldtype,'rules'=>$s_rules,'descrip'=>$descrip)));
 		$fieldid = $db->insert_id();
 		$fieldname = 'field'.$fieldid;
 
-		$db->update("UPDATE pw_pcfield SET fieldname=".pwEscape($fieldname)." WHERE fieldid=".pwEscape($fieldid));
+		$db->update("UPDATE pw_pcfield SET fieldname=".S::sqlEscape($fieldname)." WHERE fieldid=".S::sqlEscape($fieldid));
 
 		/*$ckfieldname = $db->get_one("SHOW COLUMNS FROM $pcvaluetable LIKE '$fieldname'");
 		if ($ckfieldname) {
@@ -383,9 +387,9 @@ if (empty($action)){
 	define('AJAX',1);
 	if (!$_POST['step']) {
 		$ajax_basename_edit = EncodeUrl($basename."&action=editfield");
-		InitGP(array('fieldid'));
+		S::gp(array('fieldid'));
 		if (empty($fieldid)) Showmsg('field_not_select');
-		$fielddb = $db->get_one("SELECT name,fieldname,rules,type,descrip,ifdel FROM pw_pcfield WHERE fieldid=".pwEscape($fieldid));
+		$fielddb = $db->get_one("SELECT name,fieldname,rules,type,descrip,ifdel FROM pw_pcfield WHERE fieldid=".S::sqlEscape($fieldid));
 
 		$count = $db->get_value("SELECT COUNT(*) FROM $pcvaluetable WHERE ".$fielddb['fieldname']." != ''");//查找是否变量已有值
 		if ($count || $fielddb['ifdel']) $ifhidden = '1';
@@ -404,7 +408,7 @@ if (empty($action)){
 		}
 		include PrintEot('postcate');ajax_footer();
 	} elseif ($_POST['step'] == 2) {
-		InitGP(array('fieldtype','name','rule_min','rule_max','rules','fieldid','descrip'));
+		S::gp(array('fieldtype','name','rule_min','rule_max','rules','fieldid','descrip'));
 		if (empty($fieldid)) Showmsg('field_not_select');
 		if (empty($fieldtype)) Showmsg('fieldtype_not_exists');
 
@@ -424,26 +428,26 @@ if (empty($action)){
 		}
 
 		//判断该字段是否有数据或者是默认字段，如有数据不可更改字段类型
-		$fielddb = $db->get_one("SELECT type,ifdel,fieldname FROM pw_pcfield WHERE fieldid=".pwEscape($fieldid));
+		$fielddb = $db->get_one("SELECT type,ifdel,fieldname FROM pw_pcfield WHERE fieldid=".S::sqlEscape($fieldid));
 
 		if ($fieldtype != $fielddb['type']) {
 			$count = $db->get_value("SELECT COUNT(*) FROM $pcvaluetable WHERE ".$fielddb['fieldname']." != ''");
 			if ($count || $fielddb['ifdel']) Showmsg('can_not_modify_field_type');
 		}
 
-		$db->update("UPDATE pw_pcfield SET ".pwSqlSingle(array('name'=>$name,'type'=>$fieldtype,'rules'=>$s_rules,'descrip'=>$descrip))." WHERE fieldid=".pwEscape($fieldid));
+		$db->update("UPDATE pw_pcfield SET ".S::sqlSingle(array('name'=>$name,'type'=>$fieldtype,'rules'=>$s_rules,'descrip'=>$descrip))." WHERE fieldid=".S::sqlEscape($fieldid));
 
 		Showmsg('pcfield_edit_success');
 	}
 } elseif ($action == 'delfield') {
 	define('AJAX',1);
-	InitGP(array('fieldid'));
-	$ckfield = $db->get_one("SELECT fieldid,pcid,fieldname,ifdel FROM pw_pcfield WHERE fieldid=".pwEscape($fieldid));
+	S::gp(array('fieldid'));
+	$ckfield = $db->get_one("SELECT fieldid,pcid,fieldname,ifdel FROM pw_pcfield WHERE fieldid=".S::sqlEscape($fieldid));
 
 	if ($ckfield['fieldid'] && !$ckfield['ifdel']) {
 
 		$fieldname = $ckfield['fieldname'];
-		$db->update("DELETE FROM pw_pcfield WHERE fieldid=".pwEscape($fieldid));
+		$db->update("DELETE FROM pw_pcfield WHERE fieldid=".S::sqlEscape($fieldid));
 		$ckfield2 = $db->get_one("SHOW COLUMNS FROM $pcvaluetable LIKE '$fieldname'");
 		if ($ckfield2) {
 			$db->query("ALTER TABLE $pcvaluetable DROP $fieldname");
@@ -458,12 +462,12 @@ if (empty($action)){
 
 } elseif ($action == 'editindex') {
 	define('AJAX',1);
-	InitGP(array('type','fieldid'));
+	S::gp(array('type','fieldid'));
 
-	$fielddb = $db->get_one("SELECT * FROM pw_pcfield WHERE fieldid=".pwEscape($fieldid));
+	$fielddb = $db->get_one("SELECT * FROM pw_pcfield WHERE fieldid=".S::sqlEscape($fieldid));
 	$fieldname = $fielddb['fieldname'];
 
-	$field = $db->get_one("SHOW COLUMNS FROM $pcvaluetable LIKE ".pwEscape($fieldname));
+	$field = $db->get_one("SHOW COLUMNS FROM $pcvaluetable LIKE ".S::sqlEscape($fieldname));
 	if (empty($fielddb) || empty($field)) {
 		Showmsg('field_not_exists');
 	}
@@ -492,9 +496,9 @@ if (empty($action)){
 } elseif ($action == 'rightset') {
 
 	if (!$_POST['step']){
-		@include_once(D_P.'data/bbscache/postcate_config.php');
+		@include_once pwCache::getPath(D_P.'data/bbscache/postcate_config.php');
 		!$pcid && $pcid = $db->get_value("SELECT pcid FROM pw_postcate ORDER BY vieworder");
-		$postcate = $db->get_one("SELECT * FROM pw_postcate WHERE pcid=".pwEscape($pcid));
+		$postcate = $db->get_one("SELECT * FROM pw_postcate WHERE pcid=".S::sqlEscape($pcid));
 
 		$query = $db->query("SELECT gid,gptype,grouptitle FROM pw_usergroups");
 		while($rt = $db->fetch_array($query)) {
@@ -503,16 +507,16 @@ if (empty($action)){
 
 		include PrintEot('postcate');exit;
 	} else {
-		InitGP(array('viewright','adminright'));
+		S::gp(array('viewright','adminright'));
 
 		$viewrights = ','.implode(',',$viewright).',';
 		$adminrights = ','.implode(',',$adminright).',';
 		$db->update("UPDATE pw_postcate"
-			. " SET " . pwSqlSingle(array(
+			. " SET " . S::sqlSingle(array(
 					'viewright'		=> $viewrights,			'adminright'	=> $adminrights
 				   
 					))
-			. " WHERE pcid=".pwEscape($pcid));
+			. " WHERE pcid=".S::sqlEscape($pcid));
 
 	
 		updatecache_postcate();

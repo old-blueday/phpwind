@@ -15,7 +15,7 @@ class UserApp {
 
 	function isInstall($uid) {
 		$appid = array();
-		$query = $this->db->query("SELECT appid FROM pw_userapp WHERE uid=" . pwEscape($uid));
+		$query = $this->db->query("SELECT appid FROM pw_userapp WHERE uid=" . S::sqlEscape($uid));
 		while ($rt = $this->db->fetch_array($query)) {
 			$appid[] = $rt['appid'];
 		}
@@ -25,15 +25,15 @@ class UserApp {
 	function add($uid, $appid, $appname, $allowfeed ,$descrip) {
 		global $timestamp;
 
-		$this->db->update("REPLACE INTO pw_userapp SET " . pwSqlSingle(array(
+		$this->db->update("REPLACE INTO pw_userapp SET " . S::sqlSingle(array(
 			'uid'		=> $uid,
 			'appid'		=> $appid,
 			'appname'	=> $appname,
 		)));
 
 		if ($allowfeed) {
-			$descrip = Char_cv($descrip);
-			$this->db->update("INSERT INTO pw_feed SET " . pwSqlSingle(array(
+			$descrip = S::escapeChar($descrip);
+			$this->db->update("INSERT INTO pw_feed SET " . S::sqlSingle(array(
 				'uid'		=> $uid,
 				'type'		=> 'app',
 				'descrip'	=> $descrip,

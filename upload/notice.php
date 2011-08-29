@@ -4,7 +4,7 @@ require_once('global.php');
 require_once(R_P.'require/forum.php');
 require_once(R_P.'require/bbscode.php');
 require_once(R_P.'require/header.php');
-include_once(D_P.'data/bbscache/forum_cache.php');
+include_once pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
 
 $guide=array();
 $sql_select = '';
@@ -29,7 +29,7 @@ if ($fid && $fid!='-1' && $fid!='-2') {
 }
 
 $noticedb = array();
-$query = $db->query("SELECT aid,author,startdate,enddate,subject,content $sql_select FROM pw_announce WHERE fid=".pwEscape($fid)." AND ifopen='1' AND startdate<=".pwEscape($timestamp)." AND (enddate=0 OR enddate>=".pwEscape($timestamp).") ORDER BY vieworder,startdate DESC");
+$query = $db->query("SELECT aid,author,startdate,enddate,subject,content $sql_select FROM pw_announce WHERE fid=".S::sqlEscape($fid)." AND ifopen='1' AND startdate<=".S::sqlEscape($timestamp)." AND (enddate=0 OR enddate>=".S::sqlEscape($timestamp).") ORDER BY vieworder,startdate DESC");
 while ($rt = $db->fetch_array($query)) {
 	$rt['rawauthor'] = rawurlencode($rt['author']);
 	$rt['startdate'] = get_date($rt['startdate']);

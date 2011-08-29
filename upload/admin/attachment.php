@@ -4,13 +4,13 @@
 $db_perpage=50;
 $basename="$admin_file?adminjob=attachment";
 
-include(D_P.'data/bbscache/forum_cache.php');
+include pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
 
 if($admin_gid == 5){
 	list($allowfid,$forumcache) = GetAllowForum($admin_name);
 	$sql = $allowfid ? "fid IN($allowfid)" : '0';
 } else{
-	include D_P.'data/bbscache/forumcache.php';
+	include pwCache::getPath(D_P.'data/bbscache/forumcache.php');
 	list($hidefid,$hideforum) = GetHiddenForum();
 	if($admin_gid == 3){
 		$forumcache .= $hideforum;
@@ -21,7 +21,7 @@ if($admin_gid == 5){
 }
 
 if(empty($action)){
-	InitGP(array('fid','username','uid','filename','hits','ifmore','filesize','ifless','postdate1','postdate2','orderway','asc','pernum','page'));
+	S::gp(array('fid','username','uid','filename','hits','ifmore','filesize','ifless','postdate1','postdate2','orderway','asc','pernum','page'));
 
 	$forumcache = str_replace("<option value=\"$fid\">","<option value=\"$fid\" selected>",$forumcache);
 	$hitsMoreThan = '0' == $ifmore ? 'checked' : '';
@@ -44,44 +44,44 @@ if(empty($action)){
 	'' == $postdate1 && $postdate1 = get_date($timestamp - 90 * 86400,'Y-m-d');
 
 	if(is_numeric($fid)){
-		$sql .= " AND fid=".pwEscape($fid);
+		$sql .= " AND fid=".S::sqlEscape($fid);
 	}
 	$username = trim($username);
 	if($username){
 		$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
 		$uid = $userService->getUserIdByUserName($username);
 	}
-	is_numeric($uid) && $sql .= " AND uid=".pwEscape($uid,false);
+	is_numeric($uid) && $sql .= " AND uid=".S::sqlEscape($uid,false);
 
 	$filename = trim($filename);
 	if($filename!=''){
 		$filename = str_replace('*','%',$filename);
-		$sql .= " AND (name LIKE ".pwEscape("%$filename%").")";
+		$sql .= " AND (name LIKE ".S::sqlEscape("%$filename%").")";
 	}
 	if($hits){
 		if($ifmore){
-			$sql.=" AND (hits<".pwEscape($hits).')';
+			$sql.=" AND (hits<".S::sqlEscape($hits).')';
 		} else{
-			$sql.=" AND (hits>".pwEscape($hits).')';
+			$sql.=" AND (hits>".S::sqlEscape($hits).')';
 		}
 	}
 	if($filesize){
 		if($ifless){
-			$sql.=" AND (size<".pwEscape($filesize).')';
+			$sql.=" AND (size<".S::sqlEscape($filesize).')';
 		} else{
-			$sql.=" AND (size>".pwEscape($filesize).')';
+			$sql.=" AND (size>".S::sqlEscape($filesize).')';
 		}
 	}
 	if($postdate1){
 		$uploadtime = PwStrtoTime($postdate1);
-		is_numeric($uploadtime) && $sql.=" AND uploadtime>".pwEscape($uploadtime);
+		is_numeric($uploadtime) && $sql.=" AND uploadtime>".S::sqlEscape($uploadtime);
 	}
 	if($postdate2){
 		$uploadtime = PwStrtoTime($postdate2);
-		is_numeric($uploadtime) && $sql.=" AND uploadtime<".pwEscape($uploadtime);
+		is_numeric($uploadtime) && $sql.=" AND uploadtime<".S::sqlEscape($uploadtime);
 	}
 
-	if(CkInArray($orderway,array('uploadtime','size','needrvrc','name','hits'))){
+	if(S::inArray($orderway,array('uploadtime','size','needrvrc','name','hits'))){
 		$order = "ORDER BY $orderway";
 		$asc=='DESC' && $order.=' '.$asc;
 	} else{
@@ -89,7 +89,7 @@ if(empty($action)){
 	}
 	$pernum=is_numeric($pernum) ? $pernum : 20;
 	$page < 1 && $page=1;
-	$limit = pwLimit(($page-1)*$pernum,$pernum);
+	$limit = S::sqlLimit(($page-1)*$pernum,$pernum);
 
 	$rt=$db->get_one("SELECT COUNT(*) AS count FROM pw_attachs WHERE $sql");
 	$sum=$rt['count'];
@@ -123,7 +123,7 @@ if(empty($action)){
 		}
 	}
 	//if($_POST['direct']){
-	//	$db->update("DELETE FROM pw_attachs WHERE $sql".pwLimit($pernum));
+	//	$db->update("DELETE FROM pw_attachs WHERE $sql".S::sqlLimit($pernum));
 	//	adminmsg('operate_success');
 	//} else{
 	$filename = str_replace('%','*',$filename);
@@ -136,7 +136,7 @@ if(empty($action)){
 
 } elseif($action=='schdir'){
 
-	InitGP(array('filename','filesize','ifless','postdate1','postdate2','pernum','direct','start'));
+	S::gp(array('filename','filesize','ifless','postdate1','postdate2','pernum','direct','start'));
 
 	if(!$filename && !$filesize && !$postdate1 && !$postdate2){
 		adminmsg('noenough_condition');
@@ -145,7 +145,9 @@ if(empty($action)){
 	if(!$start){
 		$start = 0;
 		if(file_exists($cache_file)){
-			P_unlink($cache_file);
+			//* P_unlink($cache_file);
+			pwCache::deleteData($cache_file);
+
 		}
 	}
 	$num = 0;
@@ -188,8 +190,8 @@ if(empty($action)){
 
 	adminmsg('attach_success',"$basename&action=files&filename=$filename&filesize=$filesize&ifless=$ifless&postdate1=$postdate1&postdate2=$postdate2&pernum=$pernum",0);
 } elseif($action=='files'){
-	InitGP(array('filename','filesize','ifless','postdate1','postdate2','pernum','direct','start'));
-	InitGP(array('page'),'GP',2);
+	S::gp(array('filename','filesize','ifless','postdate1','postdate2','pernum','direct','start'));
+	S::gp(array('page'),'GP',2);
 
 	$sizeMoreThan = '0' == $ifless ? 'checked' : '';
 	$sizeLessThan = !$sizeMoreThan ? 'checked' : '';
@@ -231,8 +233,8 @@ if(empty($action)){
 	}
 	include PrintEot('attachment');exit;
 } elseif($_POST['action']=='delfile'){
-	InitGP(array('filename','filesize','ifless','postdate1','postdate2','pernum','direct','start'));
-	InitGP(array('delfile'),'P');
+	S::gp(array('filename','filesize','ifless','postdate1','postdate2','pernum','direct','start'));
+	S::gp(array('delfile'),'P');
 	if($delfile){
 		foreach($delfile as $key => $value){
 			if(file_exists("$attachdir/$value")){
@@ -244,8 +246,8 @@ if(empty($action)){
 	$basename="$admin_file?adminjob=attachment&action=files&filename=$filename&filesize=$filesize&ifless=$ifless&postdate1=$postdate1&postdate2=$postdate2&pernum=$pernum";
 	adminmsg('attach_delfile');
 } elseif($_POST['action']=='delete'){
-	InitGP(array('fid','username','uid','filename','hits','ifmore','filesize','ifless','postdate1','postdate2','orderway','asc','pernum','page'));
-	InitGP(array('aidarray'),'P');
+	S::gp(array('fid','username','uid','filename','hits','ifmore','filesize','ifless','postdate1','postdate2','orderway','asc','pernum','page'));
+	S::gp(array('aidarray'),'P');
 	$delnum = $count = 0;
 	if($aidarray){
 		$count   = count($aidarray);
@@ -253,7 +255,7 @@ if(empty($action)){
 		foreach($aidarray as $value){
 			is_numeric($value) && $attachs[] = $value;
 		}
-		$attachs = pwImplode($attachs);
+		$attachs = S::sqlImplode($attachs);
 		$query   = $db->query("SELECT attachurl FROM pw_attachs WHERE $sql AND aid IN($attachs)");
 		while($rs=$db->fetch_array($query)){
 			if(P_unlink("$attachdir/$rs[attachurl]")){
@@ -266,7 +268,7 @@ if(empty($action)){
 	}
 	adminmsg('attachstats_del', "$basename&fid=$fid&uid=$uid&filename=".rawurlencode($filename)."&hits=$hits&ifmore=$ifmore&filesize=$filesize&ifless=$ifless&orderway=$orderway&asc=$asc&postdate1=$postdate1&postdate2=$postdate2&pernum=$pernum&page=$page");
 } elseif ($action == 'msgList'){
-	InitGP(array('page'),'GP');
+	S::gp(array('page'),'GP');
 	$messageServer = L::loadClass('message', 'message');
 	$attachCount = $messageServer->countAllAttachs();
 	$pageCount = ceil($attachCount/$db_perpage);
@@ -275,7 +277,7 @@ if(empty($action)){
 	$pages = numofpage($attachCount,$page,$pageCount,$basename.'&action=msgList&');
 	include PrintEot('attachment');exit;
 } elseif ($action == 'msgDel'){
-	InitGP(array('mids'),'GP');
+	S::gp(array('mids'),'GP');
 	!is_array($mids) && adminmsg('请选择要删除的附件');
 	$messageServer = L::loadClass('message', 'message');
 	$messageServer->deleteAttachsByMessageIds($mids);
@@ -312,7 +314,8 @@ function attachcheck($file){
 		P_unlink("$attachdir/thumb/$file");
 	} else{
 		strlen($file)>49 && $file=substr($file,0,49);
-		writeover($cache_file,str_pad($file,49)."\n","ab");
+		//* writeover($cache_file,str_pad($file,49)."\n","ab");
+		pwCache::setData($cache_file,str_pad($file,49)."\n", false, "ab");
 	}
 }
 ?>

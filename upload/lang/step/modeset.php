@@ -22,7 +22,7 @@ foreach ($modelist as $key=>$value) {
 	$db_modepages[$key] = $modepages[$key];
 }
 if (!$db_mode || $db_mode=='bbs') {
-	$db_mode = (count($db_modes) > 1 && !$db_modes[$db_mode]) ? 'area' : 'bbs';
+	$db_mode = (count($db_modes) > 1 && !$db_modes[$db_mode]) ? 'bbs' : 'area';
 }
 $db_modes = addslashes(serialize($db_modes));
 $db_modepages = addslashes(serialize($db_modepages));

@@ -65,14 +65,24 @@ function singleText(objId){
 <div class="contUser" id="content">
     <div class="p15">	
   	<h4 class="site"><span>消息中心设置</span></h4>
+		<form method="post" id="mainForm" name="FORM" action="$normalUrl&verify=$verifyhash" enctype = "multipart/form-data">
     <div class="navC mb10">
     	<ul>
         	<li class="current"><a href="{$baseUrl}?type=shield">消息屏蔽</a></li>
             <li><a href="{$baseUrl}?type=clear">消息清理</a></li>
         </ul>
+<!--
+EOT;
+if($db_msgsound){print <<<EOT
+-->
+		<label class="cp" for="mesTips"><input name="noticevoice" {$noticevoiceStatus} type="checkbox" value="1" id="mesTips" />开启消息提示音</label>
+<!--
+EOT;
+}print <<<EOT
+--> 
     </div>
     <div id="showmessage"></div>
-    <form method="post" id="mainForm" name="FORM" action="$normalUrl&verify=$verifyhash" enctype = "multipart/form-data">
+
     <input type="hidden" name="step" value="2"/>
     <div class="p10">
         <div class="mb20">
@@ -97,7 +107,7 @@ EOT;
 
 <!--<?php
 EOT;
-foreach($html as $key => $value){	
+foreach($shieldHtml as $key => $value){	
 print <<<EOT
 --> 
         <div class="mb20">

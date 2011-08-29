@@ -3,7 +3,7 @@ print <<<EOT
 -->
 <div id='hiddenMessage' style="display:none"></div>
 <div class="contUser" id="content">
-<table width="100%"><tr class="vt"><td height="400">
+<table width="100%"><tr><td height="600" valign="top">
     <div class="p15">
 	<h4 class="site mb5"><span>请求</span>(共{$requestAllCount}条，<a href="$normalUrl&action=unread" class="s2"><b>{$notReadCount}</b>条未处理请求</a>)</h4>
 <form action="$normalUrl&" method="post" name="FORM">
@@ -41,10 +41,10 @@ print <<<EOT
         	<div class="p_lr_25">
 	        <dl class="dl">
                <dt class="dt">
-                   <a class="img_50" href="u.php?uid={$value[create_uid]}"><i><img width="48" height="48" src="{$value[face]}"></i></a>
+                   <a class="img_50" href="{$db_userurl}{$value[create_uid]}"><i><img width="48" height="48" src="{$value[face]}"></i></a>
                </dt>
                <dd class="dd2">
-                   <p class="titleB"><a class="mr10" href="u.php?uid={$value[create_uid]}">{$value[username]}</a>{$value[title]}</p>
+                   <p class="titleB"><a class="mr10" href="{$db_userurl}{$value[create_uid]}">{$value[username]}</a>{$value[title]}</p>
                    <p class="quote">{$value[content]}<img src="u/images/quoteB.png"></p>
 <!--
 EOT;

@@ -104,7 +104,7 @@ function lastinfo($fid,$allowhtm=0,$type='',$sys_type='') {
 		$topicadd = ",tpost=tpost+1,article=article+1 ";
 		$fupadd   = "tpost=tpost+1,article=article+1 ";
 	} else {
-		$rt = $db->get_one("SELECT tid,author,postdate,subject,lastpost,lastposter FROM pw_threads WHERE fid=".pwEscape($fid)." AND topped=0 AND ifcheck=1 AND lastpost>0 ORDER BY lastpost DESC LIMIT 0,1");
+		$rt = $db->get_one("SELECT tid,author,postdate,subject,lastpost,lastposter FROM pw_threads WHERE fid=".S::sqlEscape($fid)." AND topped=0 AND ifcheck=1 AND lastpost>0 ORDER BY lastpost DESC LIMIT 0,1");
 
 		if ($rt['postdate'] == $rt['lastpost']) {
 			$subject = addslashes(substrs($rt['subject'],26));
@@ -120,22 +120,22 @@ function lastinfo($fid,$allowhtm=0,$type='',$sys_type='') {
 	$htmurl   = $db_readdir.'/'.$fid.'/'.date('ym',$rt['postdate']).'/'.$rt['tid'].'.html';
 	$new_url  = file_exists(R_P.$htmurl) && $allowhtm && $sys_type!='1B' ? "$R_url/$htmurl" : "read.php?tid=$rt[tid]&page=e#a";
 	$lastpost = $subject."\t".addslashes($author)."\t".$rt['lastpost']."\t".$new_url;
-	$db->update("UPDATE pw_forumdata SET lastpost=".pwEscape($lastpost).$topicadd." WHERE fid=".pwEscape($fid));
+	$db->update("UPDATE pw_forumdata SET lastpost=".S::sqlEscape($lastpost).$topicadd." WHERE fid=".S::sqlEscape($fid));
 
 	if ($foruminfo['type'] == 'sub' || $foruminfo['type'] == 'sub2') {
 		if ($foruminfo['password'] != '' || $foruminfo['allowvisit'] != '' || $foruminfo['f_type'] == 'hidden') {
 			$lastpost = '';
 		} else {
-			$lastpost = "lastpost=".pwEscape($lastpost);
+			$lastpost = "lastpost=".S::sqlEscape($lastpost);
 		}
 		if ($lastpost && $fupadd) {
 			$lastpost .= ', ';
 		}
 		if ($lastpost || $fupadd) {
-			$db->update("UPDATE pw_forumdata SET $lastpost $fupadd WHERE fid=".pwEscape($foruminfo['fup']));
+			$db->update("UPDATE pw_forumdata SET $lastpost $fupadd WHERE fid=".S::sqlEscape($foruminfo['fup']));
 			if ($foruminfo['type'] == 'sub2') {
-				$rt1 = $db->get_one("SELECT fup FROM pw_forums WHERE fid=".pwEscape($foruminfo['fup']));
-				$db->update("UPDATE pw_forumdata SET $lastpost $fupadd WHERE fid=".pwEscape($rt1['fup']));
+				$rt1 = $db->get_one("SELECT fup FROM pw_forums WHERE fid=".S::sqlEscape($foruminfo['fup']));
+				$db->update("UPDATE pw_forumdata SET $lastpost $fupadd WHERE fid=".S::sqlEscape($rt1['fup']));
 			}
 		}
 	}
@@ -231,7 +231,7 @@ function check_data($type="new") {
 	if (strlen(trim($check_content))>=$db_postmax || strlen(trim($check_content))<$db_postmin) {
 		Showmsg('postfunc_content_limit');
 	}
-	$atc_title = Char_cv($atc_title);
+	$atc_title = S::escapeChar($atc_title);
 	$wordsfb = L::loadClass('FilterUtil', 'filter');
 	$ifwordsfb = $wordsfb->ifwordsfb(stripslashes($atc_content));
 	$ifconvert = 1;
@@ -282,7 +282,7 @@ function check_data($type="new") {
 		$ifconvert = 2;
 	}
 	if ($atc_usesign < 2) {
-		$atc_content = Char_cv($atc_content);
+		$atc_content = S::escapeChar($atc_content);
 	} else {
 		$atc_content = preg_replace(
 			array("/<script.*>.*<\/script>/is","/<(([^\"']|\"[^\"]*\"|'[^']*')*?)>/eis","/javascript/i"),
@@ -356,7 +356,7 @@ function check_tag($tags) {
 		(strlen($value)>15 || strlen($value)<3) && Showmsg('tag_length_limit');
 	}
 	$tags = implode(" ",$tags);
-	return Char_cv($tags);
+	return S::escapeChar($tags);
 }
 function insert_tag($tid,$tags) {
 	global $db;
@@ -364,23 +364,23 @@ function insert_tag($tid,$tags) {
 	$tags = explode(" ",$tags);
 	foreach ($tags as $key => $value) {
 		if (!$value)	continue;
-		$rt = $db->get_one("SELECT tagid FROM pw_tags WHERE tagname=".pwEscape($value));
+		$rt = $db->get_one("SELECT tagid FROM pw_tags WHERE tagname=".S::sqlEscape($value));
 		if (!$rt) {
-			$db->update("INSERT INTO pw_tags SET ".pwSqlSingle(array('tagname'=>$value,'num'=>1)));
+			$db->update("INSERT INTO pw_tags SET ".S::sqlSingle(array('tagname'=>$value,'num'=>1)));
 			$tagid = $db->insert_id();
 		} else {
 			$tagid = $rt['tagid'];
-			$db->update("UPDATE pw_tags SET num=num+1 WHERE tagid=".pwEscape($tagid));
+			$db->update("UPDATE pw_tags SET num=num+1 WHERE tagid=".S::sqlEscape($tagid));
 		}
 		$sql[] = array($tagid,$tid);
 	}
-	$sql && $db->update("INSERT INTO pw_tagdata (tagid,tid) VALUES ".pwSqlMulti($sql));
+	$sql && $db->update("INSERT INTO pw_tagdata (tagid,tid) VALUES ".S::sqlMulti($sql));
 }
 function update_tag($tid,$tags) {
 	global $db;
 	$tags	= " $tags ";
 	$tagids	= array();
-	$query	= $db->query("SELECT * FROM pw_tagdata td LEFT JOIN pw_tags t USING(tagid) WHERE td.tid=".pwEscape($tid));
+	$query	= $db->query("SELECT * FROM pw_tagdata td LEFT JOIN pw_tags t USING(tagid) WHERE td.tid=".S::sqlEscape($tid));
 	while ($rt = $db->fetch_array($query)) {
 		if (strpos($tags," $rt[tagname] ") === false) {
 			$tagids[] = $rt['tagid'];
@@ -389,8 +389,8 @@ function update_tag($tid,$tags) {
 		}
 	}
 	if ($tagids) {
-		$tagids = pwImplode($tagids);
-		$db->update("DELETE FROM pw_tagdata WHERE tid=".pwEscape($tid)."AND tagid IN($tagids)");
+		$tagids = S::sqlImplode($tagids);
+		$db->update("DELETE FROM pw_tagdata WHERE tid=".S::sqlEscape($tid)."AND tagid IN($tagids)");
 		$db->update("UPDATE pw_tags SET num=num-1 WHERE tagid IN($tagids)");
 	}
 	if ($tags = trim($tags)) {
@@ -398,7 +398,7 @@ function update_tag($tid,$tags) {
 	}
 }
 function relate_tag($subject,$content){
-	@include(D_P.'data/bbscache/tagdb.php');
+	@include pwCache::getPath(D_P.'data/bbscache/tagdb.php');
 	$i    = 0;
 	$tags = '';
 	foreach ($tagdb as $tag => $num) {
@@ -433,7 +433,7 @@ function postupload($tmp_name,$filename) {
 		@chmod($filename,0777);
 		return true;
 	} elseif (is_readable($tmp_name)) {
-		writeover($filename,readover($tmp_name));
+		pwCache::setData($filename,readover($tmp_name));
 		if (file_exists($filename)) {
 			@chmod($filename,0777);
 			return true;
@@ -451,7 +451,7 @@ function pwMovefile($dstfile,$srcfile) {
 		P_unlink($srcfile);
 		return true;
 	} elseif (is_readable($srcfile)) {
-		writeover($dstfile,readover($srcfile));
+		pwCache::setData($dstfile,readover($srcfile));
 		if (file_exists($dstfile)) {
 			@chmod($dstfile,0777);
 			P_unlink($srcfile);
@@ -477,7 +477,7 @@ function UploadFile($uid,$uptype = 'all',$thumbs = null){//fix by noizy
 			list($t,$i) = explode('_',$key);
 			$i = (int)$i;
 			$atc_attachment = $value['tmp_name'];
-			$atc_attachment_name = Char_cv($value['name']);
+			$atc_attachment_name = S::escapeChar($value['name']);
 			$atc_attachment_size = $value['size'];
 			$attach_ext = strtolower(substr(strrchr($atc_attachment_name,'.'),1));
 			if (empty($attach_ext) || !isset($db_uploadfiletype[$attach_ext])) {
@@ -656,7 +656,7 @@ function UploadFile($uid,$uptype = 'all',$thumbs = null){//fix by noizy
 }
 function uploadmsg($uptype,$msg) {
 	if ($uptype == 'face' && defined('AJAX') && AJAX) {
-		$msg = Char_cv(getLangInfo('msg',$msg));
+		$msg = S::escapeChar(getLangInfo('msg',$msg));
 		echo "<script language=\"JavaScript1.2\">parent.facepath('','','$msg','','');</script>";exit;
 	} else {
 		Showmsg($msg);

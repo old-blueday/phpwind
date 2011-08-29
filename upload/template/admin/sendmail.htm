@@ -18,23 +18,27 @@ EOT;
 }print <<<EOT
 -->
 <script language="JavaScript" src="js/wind_editor.js"></script>
-<form name='FORM' action="$basename" method="post">
+<script language="JavaScript" src="js/global.js"></script>
+<script  language="JavaScript" src="js/pw_ajax.js"></script>
+<form name='FORM' action="$basename" method="post" onsubmit="return checkpost(document.FORM);">
 <h2 class="h1">邮件群发</h2>
 <div class="admin_table mb10">
 <table width="100%" cellspacing="0" cellpadding="0">
 	<tr class="tr1 vt">
 		<td class="td1">&nbsp;</td>
 		<td class="td2">
-			<ul class="list_A">
+			<ul class="list_A" id="radioby">
 				<li><input type='radio' name='by' value='0' onclick="sendtype(0)" checked>按用户组</li>
-				<li><input type='radio' name='by' value='1' onclick="sendtype(1)">在线用户</li>
-				<li><input type='radio' name='by' value='2' onclick="sendtype(2)">按注册时间</li>
+				<li><input type='radio' name='by' id="online" value='1' onclick="sendtype(1)">在线用户</li>
+				<li><input type='radio' name='by' id="byRegName" value='2' onclick="sendtype(2)">按注册时间</li>
+				<li><input type='radio' name='by' id="byLoginTime" value='3' onclick="sendtype(3)">按最后登录时间</li>       
+                <li><input type='radio' name='by' value='4' onclick="sendtype(4)">按用户名</li>
 			</ul>
 		</td>
 	</tr>
 	<tbody id="group_0">
 		<tr class="tr1 vt">
-			<td class="td1">接收用户</td>
+			<td class="td1">接收用户 <span class="s1">*</span></td>
 			<td class="td2">
 				<ul class="list_A list_120 cc mb10" style="width:480px;">
 <!--
@@ -58,22 +62,35 @@ EOT;
 	</tbody>
 	<tbody id="group_2" style="display:none">
 		<tr class="tr1 vt">
-			<td class="td1">接收用户</td>
+			<td class="td1">按注册时间 </td>
 			<td class="td2"><div class="input_img fl"><i onclick="this.nextSibling.onclick()" class="input_time" title="选择时间"></i><input name="starttime" id="starttime" value="" onclick="ShowCalendar(this.id);" type="text"></div><span class="p_lr_10 fl">至</span><div class="input_img fl"><i class="input_time" title="选择时间"></i><input name="endtime" id="endtime" value="" onclick="ShowCalendar(this.id);" type="text"></div>
 			<div class="help_a" style="display: block;">&nbsp;格式:yyyy-mm-dd，会员注册时间范围</div></td>
 		</tr>
 	</tbody>
+	<tbody id="group_3" style="display:none">
+		<tr class="tr1 vt">
+			<td class="td1">按最后登录时间</td>
+			<td class="td2"><div class="input_img fl"><i onclick="this.nextSibling.onclick()" class="input_time" title="选择时间"></i><input name="loginstarttime" id="loginstarttime" value="" onclick="ShowCalendar(this.id);" type="text"></div><span class="p_lr_10 fl">至</span><div class="input_img fl"><i class="input_time" title="选择时间"></i><input name="loginendtime" id="loginendtime" value="" onclick="ShowCalendar(this.id);" type="text"></div>
+			<div class="help_a" style="display: block;">&nbsp;格式:yyyy-mm-dd，会员最后登录时间范围</div></td>
+		</tr>
+	</tbody>
+		<tbody id="group_4" style="display:none">
+			<tr class="tr1 vt">
+				<td class="td1">用户名 <span class="s1">*</span></td>
+				<td class="td2"><input type="text" name="touser" class="input input_wb fl mr10" /><span class="help_a">多个用户名用，分开</span></td>
+			</tr>
+		</tbody>
 	<tr class="tr1 vt">
 		<td class="td1">每批发送个数</td>
 		<td class="td2"><input class="input input_wa" type="text" name="percount" /></td>
 	</tr>
 	<tr class="tr1 vt">
-		<td class="td1">主题</td>
+		<td class="td1">主题 <span class="s1">*</span></td>
 		<td class="td2"><input type="text" class="input input_wb" name="subject" /></td>
 	</tr>
 	<tr class="tr1 vt" valign="top">
-		<td class="td1">内容</td>
-		<td class="td2"><textarea name="atc_content" class="textarea fl mr10" style="height:150px;"></textarea><div class="fl p10 mr10" style="border:1px solid #ccc;background:#fff;width:200px;height:136px;">\$email:表示用户的邮件地址<br />\$windid:表示用户名<br />\$winduid:表示用户UID</div></td>
+		<td class="td1">内容 <span class="s1">*</span></td>
+		<td class="td2"><textarea name="atc_content" class="textarea fl mr10" style="height:150px;"></textarea><div class="fl p10 mr10" style="border:1px solid #ccc;background:#fff;width:200px;height:136px;">\$email:表示用户的电子邮件地址<br />\$windid:表示用户名<br />\$winduid:表示用户UID</div></td>
 	</tr>
 </table>
 </div>
@@ -87,12 +104,58 @@ EOT;
 <script type="text/javascript" src="js/date.js"></script>
 <SCRIPT LANGUAGE="JavaScript">
 function sendtype(ID){
-	for(var i=0;i<3;i++){
+	for(var i=0;i<5;i++){
 		try{
-		if(i==ID)document.getElementById("group_"+ID).style.display = "";
-		else document.getElementById("group_"+i).style.display = "none";
+		if(i==ID) getObj("group_"+ID).style.display = "";
+		else getObj("group_"+i).style.display = "none";
 		}catch(e){}
 	}
+}
+function checkpost(obj) {
+	var online = document.getElementById("online"); 
+	var userobj = document.getElementsByName("sendto[]"); 
+	var check=0; 
+	for(var i=0;i <userobj.length;i++){ 
+		if(userobj[i].checked){ 
+			check=1; 
+		} 
+	} 
+	if (getObj('byRegName').checked == true && (getObj('starttime').value == '' || getObj('endtime').value == '')) {
+		obj.touser.setAttribute("hasError", 1);
+		showDialog("error","注册时间范围不能为空",2);
+		obj.subject.focus();
+		return false;
+	} 
+	if (getObj('byLoginTime').checked == true && (getObj('loginstarttime').value == '' || getObj('loginendtime').value == '')) {
+		obj.touser.setAttribute("hasError", 1);
+		showDialog("error","最后登录时间范围不能为空",2);
+		obj.subject.focus();
+		return false;
+	} 
+	if (check == 0 && getObj('byRegName').checked == false && getObj('byLoginTime').checked == false && obj.touser.value == "" && online.checked == false) {
+		obj.touser.setAttribute("hasError", 1);
+		showDialog("error","接受用户不能为空",2);
+		obj.subject.focus();
+		return false;
+	} 
+	if (obj.subject.value == "") {
+		obj.subject.setAttribute("hasError", 1);
+		showDialog("error","主题不能为空",2);
+		obj.subject.focus();
+		return false;
+	} 
+	if (obj.atc_content.value == "") {
+		obj.atc_content.setAttribute("hasError", 1);
+		showDialog("error","内容不能为空",2);
+		obj.atc_content.focus();
+		return false;
+	} 
+}
+var rds = getObj('radioby').getElementsByTagName("input");
+for (var i=0;i<=4;i++){
+   if(rds[i].checked){
+      sendtype(i)
+      }
 }
 </SCRIPT>
 <!--
@@ -151,7 +214,22 @@ print <<<EOT
 注册时间在 {$stime}　至　{$etime} 之间的会员
 <!--
 EOT;
-}print <<<EOT
+}elseif($pwSendmail[by]==3){
+$stime=get_date($pwSendmail[info][lostime],'Y-m-d');
+$etime=get_date($pwSendmail[info][loetime],'Y-m-d');
+print <<<EOT
+-->
+最后登录时间在 {$stime}　至　{$etime} 之间的会员
+<!--
+EOT;
+}elseif($pwSendmail[by]==4){
+foreach($pwSendmail[usernames] as $usernames){
+print <<<EOT
+-->
+$usernames
+<!--
+EOT;
+}}print <<<EOT
 -->
 		</td>
 	</tr>

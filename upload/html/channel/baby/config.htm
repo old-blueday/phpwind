@@ -1,0 +1,536 @@
+
+<pw id="A1_头部栏目导航@亲子" />
+<li class="switchNavItem"><a href="" target="_blank" >准妈俱乐部</a></li>
+<li class="switchNavItem"><a href="" target="_blank" >亲子俱乐部</a></li>
+<li class="switchNavItem"><a href="" target="_blank" >无敌宝宝秀</a></li>
+<li class="switchNavItem"><a href="" target="_blank" >试用体验</a></li>
+<li class="switchNavItem"><a href="" target="_blank" >母婴用品</a></li>
+
+
+
+
+<pw id="A2_头部头条@亲子" />
+<list cachetime="1800" action="subject" num="1" title="标题摘要模块X1" />
+<div class="tops">
+	<loop>
+		<h1><a href="{url}" >{title,40}</a></h1>
+		<p>{descrip,110}</p>
+	</loop>
+</div>
+<list cachetime="1800" action="subject" num="2" title="小标题X2" />
+<ul>
+	<loop>
+		<li><a href="{url}"  ><em>【{forumname,4}】</em>{title,20}</a></li>
+	</loop>
+</ul>
+
+
+
+
+<pw id="A3_头部通知和入口@亲子" />
+<list cachetime="1800" action="subject" num="2" title="小标题X2" />
+<ul>
+	<loop>
+		<li><a href="{url}"  >{title,20}</a></li>
+	</loop>
+</ul>
+<list cachetime="1800" action="user" num="4" title="会员名X4" />
+<dl>
+	<dt>获奖通知:</dt>
+	<dd>
+		<loop><a href="{url}" >{title,10}</a></loop>
+	</dd>
+</dl>
+
+
+
+
+<pw id="B1_播放器@亲子" />
+<div id="pwSlidePlayer" class="pwSlide" onmouseover="pwSlidePlayer('pause');" onmouseout="pwSlidePlayer('goon');">
+	<list cachetime="1800" num="4" action="image" func="newpic" rang="" ifpushonly="0" title="播放器" />
+	<loop>
+<!--#
+	$tmpStyle = $key ? 'style="display:none;"' : '';
+#-->
+		<div id="Switch_$key" $tmpStyle>
+			<a href="{url}" target="_blank" ><img class="pwSlideFilter" src="{image,302,252}" /><h3>{title,36}</h3></a>
+		</div>
+	</loop>
+	<span class="pwSlide-bg"></span>
+	<ul id="SwitchNav" class="SwitchNav"></ul>
+</div>
+<div class="c"></div>
+<script type="text/javascript" src="js/picplayer.js"></script>
+<script language="JavaScript">pwSlidePlayer('play',1);</script>
+
+
+
+
+
+<pw id="B2_左侧标题@亲子" />
+<h2 class="sideTitle"><strong>免费</strong>试用火热进行中</h2>
+
+
+
+
+<pw id="B3_左侧图文1@亲子" />
+<ul class="list2">
+	<list cachetime="1800" action="image" num="3" title="活动1" />
+	<loop>
+		<li><a href="{url}"  target="_blank" ><img src="{image,88,88}" width="88" height="88" class="fl" /></a>
+			<h4><a href="{url}"  target="_blank" >{title,22}<em class="hot"><img src="mode/area/themes/baby/images/hot.png" /></em></a></h4>
+			<p>{descript,80}</p>
+			<p><a class="apply" href="{url}">马上申请</a></p>
+		</li>
+	</loop>
+</ul>
+
+
+
+
+<pw id="B4_左侧列表@亲子" />
+<list cachetime="1800" action="subject" num="6" title="标题列表X6" />
+<ul class="list3">
+	<loop>
+		<li><a href="{url}"  target="_blank">【{forumname,4}】{title,35}</a></li>
+	</loop>
+</ul>
+
+
+
+
+<pw id="B5_左侧图文2@亲子" />
+<div class="sideBox">
+	<h3><strong>试用</strong>达人</h3>
+	<list cachetime="1800" num="4" action="image" func="newpic" rang="" ifpushonly="0" title="图文列表X4" />
+	<ul class="list4">
+		<loop>
+			<li><a href="{url}" target="_blank"><img src="{image,57,57}" width="57" height="57" class="fl" /></a>
+				<h4><a href="{url}"  target="_blank">{title,30}</a></h4>
+				<p>{descrip,52}..<a href="{url}"  target="_blank">[详情]</a></p>
+			</li>
+		</loop>
+	</ul>
+</div>
+
+
+
+
+<pw id="B6_左侧广告@亲子" />
+<div class="mt10"><a href="#" target="_blank"><img src="mode/area/themes/baby/images/temp/ad302x65.png" width="302" height="65" /></a></div>
+<div class="mt10"><a href="#" target="_blank"><img src="mode/area/themes/baby/images/temp/ad302x65.png" width="302" height="65" /></a></div>
+
+
+
+
+<pw id="B7_中间摘要@亲子" />
+<list cachetime="1800" num="3" action="subject"  title="头条标题和摘要X3" />
+<ul class="tops">
+	<loop>
+		<li class="t{$key}">
+			<h2><a href="{url}"  target="_blank">{title,44}</a></h2>
+			<p>{descrip,110}…<a href="{url}"  target="_blank">（阅读全文）</a></p>
+		</li>
+	</loop>
+</ul>
+
+
+
+
+<pw id="B8_中间列表@亲子" />
+<list cachetime="1800" action="subject" num="18" title="标题列表X18" />
+<ul class="list1 cc">
+	<loop>
+		<li><a href="{url}"   target="_blank"><em>[{forumname,4}]</em>{title,25}</a></li>
+	</loop>
+</ul>
+
+
+<pw id="B9_右侧tab@亲子" />
+							<span class="switchNavItem"><a href="">妈妈</a></span>
+							<span class="switchNavItem"><a href="">宝宝</a></span>
+						
+							
+<pw id="B10_右侧tab内容1@亲子" />
+	<p class="switchItem" style="display:none">
+			<list cachetime="1800" action="tag" num="11" title="链接标签1" />
+						<loop><a href="{url}">[{title,12}]</a></loop>
+				</p>
+						
+						
+<pw id="B11_右侧tab内容2@亲子" />
+	<p class="switchItem" style="display:none">
+						<list cachetime="1800" action="tag" num="11" title="链接标签2" />
+						<loop><a href="{url}">[{title,12}]</a></loop></p>
+
+<script language="javascript" src="mode/area/js/ddsliderplayer.js"></script>
+
+
+<pw id="B12_右侧广告@亲子" />
+<a href="#"><img src="mode/area/themes/baby/images/temp/ad222x160.png" /></a>
+
+
+
+
+<pw id="B12_中间广告1@亲子" />
+<a href="#"><img class="fl mr10" src="mode/area/themes/baby/images/temp/ad202x65.png" /></a> <a href="#"><img class="fl" src="mode/area/themes/baby/images/temp/ad202x65.png" /></a> <a href="#"><img class="fr" src="mode/area/themes/baby/images/temp/ad222x65.png" /></a>
+
+
+
+
+<pw id="B13_左侧图文1@亲子" />
+<div class="hd">
+	<list cachetime="1800" action="subject" num="1" title="more链接指向" />
+	<loop>
+		<h3>精彩活动</h3>
+		<a class="more" href="{url}">more</a> </loop>
+</div>
+<div class="bd">
+	<div class="bdWrap cc" style="padding:11px 14px 10px;">
+		<div class="fl subject1">
+			<list cachetime="1800" action="image" num="1" title="左边图文X1" />
+			<div class="top1">
+				<loop><a href="{url}" ><img src="{image,105,80}" width="105" height="80"/></a>
+					<h4><a href="{url}"  target="_blank">{title,24}</a></h4>
+					<p>{descrip,76}</p>
+				</loop>
+			</div>
+			<list cachetime="1800" action="subject" num="4" title="左边标题列表X4" />
+			<ul>
+				<loop>
+					<li><a href="{url}"  target="_blank" title="{title,45}">{title}</a></li>
+				</loop>
+			</ul>
+		</div>
+		<div class="fr subject1">
+			<list cachetime="1800" action="image" num="1" title="右边图文X1" />
+			<div class="top1">
+				<loop><a href="{url}" ><img src="{image,105,80}" width="105" height="80"/></a>
+					<h4><a href="{url}"  target="_blank">{title,24}</a></h4>
+					<p>{descrip,76}</p>
+				</loop>
+			</div>
+			<list cachetime="1800" action="subject" num="4" title="右边标题列表X4" />
+			<ul>
+				<loop>
+					<li><a href="{url}"  target="_blank" title="{title,45}">{title}</a></li>
+				</loop>
+			</ul>
+		</div>
+	</div>
+</div>
+
+
+
+
+<pw id="B14_中间广告2@亲子" />
+<a href="#"><img src="mode/area/themes/baby/images/temp/ad648x65.png" /></a>
+
+
+
+
+<pw id="B15_左侧图文2@亲子" />
+<div class="hd">
+	<h3>Color Baby</h3>
+</div>
+<div class="bd">
+	<div class="bdWrap">
+		<div id="babys">
+			<list cachetime="1800" num="1" action="image" func="newpic" rang="" ifpushonly="0" title="小朋友头像X1" />
+			<div id="babyShow">
+				<loop><a href="{url}"  target="_blank" ><img src="{image,295,170}" width="295" height="170" /></a></loop>
+			</div>
+			<list cachetime="1800" num="15" action="image" func="newpic" rang="" ifpushonly="0" title="小朋友头像列表X15" />
+			<ul id="babyList">
+				<loop>
+					<li><a href="{url}"  target="_blank" ><img src="{image,48,48}" width="48" height="48" /></a></li>
+				</loop>
+			</ul>
+		</div>
+	</div>
+</div>
+
+
+
+
+<pw id="B16_左侧图文3@亲子" />
+<list cachetime="1800" num="1" action="subject" func="newsubject" rang="" ifpushonly="0" title="更多链接指向" />
+<div class="hd">
+	<loop>
+		<h3>生日宝宝</h3>
+		<a class="more" href="{url}" target="_blank">more</a> </loop>
+</div>
+<div class="bd">
+<list cachetime="1800" num="1" action="image" func="newpic" rang="" ifpushonly="0" title="宝宝生日详细" />
+	<div class="bdWrap cc">
+	<loop>
+		<div id="pwSlide2" class="pwSlide">
+			<ul class="switch">
+				<li>
+					<a href="{url}"  target="_blank" ><img  src="{image,295,170}" width="295" height="170"  />
+						<h3>{title,30}</h3>
+					</a></li>
+			</ul>
+			<div class="pwSlide-bg" style="background-color:#C06"></div>
+		</div>
+		<div id="babyBirthday">
+				<p><span>ＩＤ：{author}</span><a href="{url}" target="_blank" class="wish">给宝宝送祝福</a><br />
+					宝宝名字：<strong>{title,30}</strong></p>
+				<p>{descrip,140}</p>
+		</div>
+		</loop>
+	</div>
+</div>
+
+
+
+
+<pw id="B17_横幅广告@亲子" />
+<h3>品牌专区</h3>
+<ul class="brandList">
+	<li><a href="#"><img src="mode/area/themes/baby/images/temp/brand/firmus.png" /></a></li>
+	<li><a href="#"><img src="mode/area/themes/baby/images/temp/brand/beingmate.png" /></a></li>
+	<li><a href="#"><img src="mode/area/themes/baby/images/temp/brand/happyprince.png" /></a></li>
+	<li><a href="#"><img src="mode/area/themes/baby/images/temp/brand/nestle.png" /></a></li>
+	<li><a href="#"><img src="mode/area/themes/baby/images/temp/brand/wissun.png" /></a></li>
+	<li><a href="#"><img src="mode/area/themes/baby/images/temp/brand/xianzhi.png" /></a></li>
+</ul>
+
+
+
+
+<pw id="C1_栏目导航@亲子" />
+<h1 class="caption">孕育新生命</h1>
+<div class="hd">
+	<h3>准妈俱乐部申请通道</h3>
+	<ul class="more">
+		<li><em>准备怀孕：</em><a href="#">叶酸</a></li>
+		<li><em>孕早期：</em><a href="#">建卡</a>｜<a href="#">胎教</a></li>
+		<li><em>孕中期：</em><a href="#">B超</a>｜<a href="#">孕检</a></li>
+		<li><em>孕晚期：</em><a href="#">妊娠纹</a>｜<a href="#">胎动</a></li>
+	</ul>
+</div>
+
+
+
+
+<pw id="C2_中间图文@亲子" />
+<div class="pwSlideWrap">
+	<div id="pwSlide3" class="pwSlide">
+	<list cachetime="1800" action="image" num="1" title="左边图片X1" />
+		<ul class="switch">
+		<loop>
+			<li><a href="{url}"  target="_blank" ><img src="{image,235,150}" width="235" height="150" />
+				<h3>{title,20}</h3>
+				</a></li>
+		</loop>
+		</ul>
+		<div class="pwSlide-bg" style="background-color:#030"></div>
+	</div>
+</div>
+<list cachetime="1800" num="2" action="subject"  title="左侧标题摘要X2" />
+<ul class="tops">
+	<loop>
+		<li>
+			<h2><a href="{url}"  target="_blank" >{title,35}</a></h2>
+			<p>{descrip,80}<a href="{url}"  target="_blank" >[详情]</a></p>
+		</li>
+	</loop>
+</ul>
+
+
+
+
+<pw id="C3_中间列表@亲子" />
+<div class="steps">
+	<ol>
+		<li class="item"><em>1</em><a href="#">准备怀孕</a>
+			<list cachetime="1800" action="subject" num="4" title="准备怀孕" />
+			<ul class="list5">
+				<loop>
+					<li><a href="{url}"  target="_blank" >{title,28}</a></li>
+				</loop>
+			</ul>
+		</li>
+		<li class="item"><em>2</em><a href="#">孕前期</a>
+			<list cachetime="1800" action="subject" num="4" title="孕前期" />
+			<ul class="list5">
+				<loop>
+					<li><a href="{url}"  target="_blank" >{title,28}</a></li>
+				</loop>
+			</ul>
+		</li>
+		<li class="item"><em>3</em><a href="#">孕中期</a>
+			<list cachetime="1800" action="subject" num="4" title="孕中期" />
+			<ul class="list5">
+				<loop>
+					<li><a href="{url}"  target="_blank" >{title,28}</a></li>
+				</loop>
+			</ul>
+		</li>
+		<li class="item"><em>4</em><a href="#">孕后期</a>
+			<list cachetime="1800" action="subject" num="4" title="孕后期" />
+			<ul class="list5">
+				<loop>
+					<li><a href="{url}"  target="_blank" >{title,28}</a></li>
+				</loop>
+			</ul>
+		</li>
+	</ol>
+</div>
+
+
+
+
+<pw id="C4_左侧列表@亲子" />
+<list cachetime="1800" action="subject" num="8" title="课堂排行" />
+<ol class="rankingList">
+	<loop>
+		<li><a href="{url}"  target="_blank" >{title,30}</a></li>
+	</loop>
+</ol>
+
+
+
+
+<pw id="D1_栏目导航@亲子" />
+<h1 class="caption">幼儿期 [0月-3岁]</h1>
+<div class="hd">
+	<h3>亲子俱乐部申请通道</h3>
+	<ul class="more">
+		<li><em>新生儿：</em><a href="#">母乳</a>｜<a href="#">起名</a></li>
+		<li><em>婴儿期：</em><a href="#">辅食</a>｜<a href="#">补钙</a></li>
+		<li><em>幼儿期：</em><a href="#">早教</a>｜<a href="#">感冒</a></li>
+		<li><em>孕晚期：</em><a href="#">妊娠纹</a>｜<a href="#">胎动</a></li>
+	</ul>
+</div>
+
+
+
+
+<pw id="D2_中间图文摘要@亲子" />
+<div class="pwSlideWrap">
+	<div id="pwSlide3" class="pwSlide">
+	<list cachetime="1800" action="image" num="1" title="左边图片X1" />
+		<ul class="switch">
+		<loop>
+			<li><a href="{url}"  target="_blank" ><img src="{image,235,150}" width="235" height="150" />
+				<h3>{title,20}</h3>
+				</a></li>
+		</loop>
+		</ul>
+		<div class="pwSlide-bg" style="background-color:#F30"></div>
+	</div>
+</div>
+<list cachetime="1800" num="2" action="subject"  title="左侧标题摘要X2" />
+<ul class="tops">
+	<loop>
+		<li>
+			<h2><a href="{url}"  target="_blank" >{title,35}</a></h2>
+			<p>{descrip,80}<a href="{url}"  target="_blank" >[详情]</a></p>
+		</li>
+	</loop>
+</ul>
+
+
+
+
+<pw id="D3_中间图文列表@亲子" />
+<list cachetime="1800" action="image" num="1" title="左边图片X1" />
+<div class="fl subject2">
+	<loop><a href="{url}"  target="_blank" ><img src="{image,75,70}" width="75" height="70" /></a></loop>
+	<list cachetime="1800" action="subject" num="4" title="左边标题列表X4" />
+	<ul class="list5">
+		<loop>
+			<li><a href="{url}"  target="_blank" >{title,22}</a></li>
+		</loop>
+	</ul>
+</div>
+<list cachetime="1800" action="image" num="1" title="右边边图片X1" />
+<div class="fr subject2">
+	<loop><a href="{url}"  target="_blank" ><img src="{image,75,70}" width="75" height="70" /></a></loop>
+	<list cachetime="1800" action="subject" num="4" title="右边标题列表X4" />
+	<ul class="list5">
+		<loop>
+			<li><a href="{url}"  target="_blank" >{title,22}</a></li>
+		</loop>
+	</ul>
+</div>
+
+
+
+
+<pw id="D4_右侧图文@亲子" />
+<list cachetime="1800" num="4" action="image" func="newpic" rang="" cachetime="1700" ifpushonly="0" title="图文列表X4" />
+<ul class="subject3">
+	<loop>
+		<li><a href="{url}"  target="_blank" ><img src="{image,45,40}" width="45" height="40"  /></a>{descrip,40}</li>
+	</loop>
+</ul>
+
+
+
+
+<pw id="E1_栏目导航@亲子" />
+<h1 class="caption">学龄前 [3岁-6岁]</h1>
+<div class="hd">
+	<h3>亲子俱乐部申请通道</h3>
+	<ul class="more">
+		<li><em>学龄前：</em><a href="#">培养</a>｜<a href="#">艺术</a>｜<a href="#">兴趣班</a>｜<a href="#">幼儿园</a></li>
+	</ul>
+</div>
+
+
+
+
+<pw id="E2_中间图文摘要@亲子" />
+<div class="pwSlideWrap">
+	<div id="pwSlide3" class="pwSlide">
+	<list cachetime="1800" action="image" num="1" title="左边图片X1" />
+		<ul class="switch">
+		<loop>
+			<li><a href="{url}"  target="_blank" ><img src="{image,235,150}" width="235" height="150" />
+				<h3>{title,20}</h3>
+				</a></li>
+		</loop>
+		</ul>
+		<div class="pwSlide-bg" style="background-color:#603"></div>
+	</div>
+</div>
+<list cachetime="1800" num="2" action="subject"  title="左侧标题摘要X2" />
+<ul class="tops">
+	<loop>
+		<li>
+			<h2><a href="{url}"  target="_blank" >{title,35}</a></h2>
+			<p>{descrip,80}<a href="{url}"  target="_blank" >[详情]</a></p>
+		</li>
+	</loop>
+</ul>
+
+
+
+
+<pw id="E3_中间列表@亲子" />
+<list cachetime="1800" action="image" num="3" title="左侧图片X3" />
+<ul class="imgList">
+	<loop>
+		<li><a href="{url}"  target="_blank" ><img src="{image,70,65}" width="70" height="65" />{title,10}</a></li>
+	</loop>
+</ul>
+<list cachetime="1800" action="subject" num="4" title="右侧标题列表X4" />
+<ul class="list5">
+	<loop>
+		<li><a href="{url}"  target="_blank" >{title,42}</a></li>
+	</loop>
+</ul>
+
+
+
+
+<pw id="E4_右侧列表@亲子" />
+<list cachetime="1800" action="subject" num="8" title="标题列表X8" />
+<ol class="rankingList r2">
+	<loop>
+		<li><a href="{url}"  target="_blank" >{title,28}</a></li>
+	</loop>
+</ol>

@@ -14,16 +14,18 @@ function_exists('date_default_timezone_set') && date_default_timezone_set('Etc/G
 
 require_once(R_P.'require/common.php');
 require_once(R_P.'require/functions.php');
-//pwInitGlobals();
+//S::filter();
 //modified@2010/7/7 S&P
 S::filter();
 
 
 
-include_once(D_P.'data/bbscache/config.php');
+include_once pwCache::getPath(D_P.'data/bbscache/config.php');
 
 define('AREA_PATH', R_P . $db_htmdir . '/channel/');
 define('PORTAL_PATH', R_P . $db_htmdir . '/portal/');
+$db_userurl = ($db_htmifopen && $db_userurlopen) ? 'u/' : 'u.php?uid='; //url
+define('USER_URL',$db_userurl);
 
 $timestamp = time();
 $db_cvtime != 0 && $timestamp += $db_cvtime*60;
@@ -33,7 +35,7 @@ $ceversion = defined('CE') ? 1 : 0;
 #phpwind version
 list($wind_version,$wind_repair,$wind_from) = explode(',',WIND_VERSION);
 
-InitGP(array('adminjob','admintype','type','hackset','a_type','action','verify','adskin','job','ajax','admin_keyword'));
+S::gp(array('adminjob','admintype','adminitem','type','hackset','a_type','action','verify','adskin','job','ajax','admin_keyword'));
 
 if (strpos($adminjob,'..') !== false || $admintype && strpos($admintype,'..') !== false) {
 	exit('Forbidden');
@@ -68,9 +70,10 @@ if (D_P != R_P && $db_http != 'N') {
 	$R_url = $db_bbsurl;
 }
 
-include_once(D_P."data/style/wind.php");
-include_once(D_P.'data/sql_config.php');
-include_once(D_P.'data/bbscache/forum_cache.php');
+include_once pwCache::getPath(D_P."data/style/wind.php");
+include_once pwCache::getPath(D_P.'data/sql_config.php');
+include_once pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
+
 require_once(R_P.'admin/cache.php');
 !is_array($manager) && $manager = array();
 !is_array($manager_pwd) && $manager_pwd = array();
@@ -91,7 +94,9 @@ if ($database=='mysqli' && Pwloaddl('mysqli')===false) {
 }
 
 $bbsrecordfile = D_P.'data/bbscache/admin_record.php';
-!file_exists($bbsrecordfile) && writeover($bbsrecordfile,"<?php die;?>\n");
+/** !file_exists($bbsrecordfile) && writeover($bbsrecordfile,"<?php die;?>\n"); **/
+!file_exists($bbsrecordfile) && pwCache::setData($bbsrecordfile,"<?php die;?>\n");
+
 $F_count	= F_L_count($bbsrecordfile,2000);
 $L_T		= 1200-($timestamp-pwFilemtime($bbsrecordfile));
 $L_left		= 15-$F_count;
@@ -127,7 +132,7 @@ if ($_POST['admin_pwd'] && $_POST['admin_name']) {
 }
 
 if (!empty($CK)) {
-	require_once Pcv(R_P."require/db_$database.php");
+	require_once S::escapePath(R_P."require/db_$database.php");
 	$db = new DB($dbhost,$dbuser,$dbpw,$dbname,$PW,$charset,$pconnect);
 	$rightset = checkpass($CK);
 } else {
@@ -137,7 +142,9 @@ if (!empty($CK)) {
 
 if (empty($rightset)) {
 	if ($_POST['admin_name'] || $_POST['admin_pwd']) {
-		writeover($bbsrecordfile,'|'.str_replace('|','&#124;',Char_cv($_POST['admin_name'])).'|'.str_replace('|','&#124;',Char_cv($_POST['admin_pwd']))."|Logging Failed|$onlineip|$timestamp|\n",'ab');
+		/** writeover($bbsrecordfile,'|'.str_replace('|','&#124;',S::escapeChar($_POST['admin_name'])).'|'.str_replace('|','&#124;',S::escapeChar($_POST['admin_pwd']))."|Logging Failed|$onlineip|$timestamp|\n",'ab'); **/
+		pwCache::setData($bbsrecordfile,'|'.str_replace('|','&#124;',S::escapeChar($_POST['admin_name'])).'|'.str_replace('|','&#124;',S::escapeChar($_POST['admin_pwd']))."|Logging Failed|$onlineip|$timestamp|\n", false, 'ab');
+		
 		$db_adminrecord	= 0;
 		$REQUEST_URI	= $pwServer['PHP_SELF'];
 		Cookie('AdminUser','',0);
@@ -147,7 +154,8 @@ if (empty($rightset)) {
 			adminmsg('login_fail');
 		}
 	}
-	if ($_GET['ajax']==1) {
+	S::gp(array("ajax"));
+	if ($ajax == 1) {
 		define('AJAX',1);
 		adminmsg('login_invalid');
 	}
@@ -156,13 +164,13 @@ if (empty($rightset)) {
 } elseif ($_POST['admin_name']) {
 	$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
 	$uid = $userService->getUserIdByUserName($admin_name);
-	$slog = $db->get_value("SELECT slog FROM pw_administrators WHERE uid=".pwEscape($uid,false));
+	$slog = $db->get_value("SELECT slog FROM pw_administrators WHERE uid=" . S::sqlEscape($uid,false));
 	$slog = explode(";",$slog);
 	!$slog && $slog = array();
 	if (count($slog) >= 8) unset($slog[0]);
 	array_push($slog,$timestamp.','.$onlineip);
 	$slog = implode(";",$slog);
-	$db->update("UPDATE pw_administrators SET slog=".pwEscape($slog,false)."WHERE uid=".pwEscape($uid,false));
+	$db->update("UPDATE pw_administrators SET slog=".S::sqlEscape($slog,false)."WHERE uid=" . S::sqlEscape($uid,false));
 	$REQUEST_URI = trim($REQUEST_URI,'?#');
 	ObHeader($REQUEST_URI);
 }
@@ -172,14 +180,14 @@ if ($db_ifsafecv && strpos($db_safegroup,",$admin_gid,")!==false && !$CK[3]) {
 	Cookie('AdminUser','',0);
 	adminmsg('safecv_prompt');
 }
-include_once(D_P.'data/bbscache/level.php');
+include_once pwCache::getPath(D_P.'data/bbscache/level.php');
 !defined('If_manager') && define('If_manager',0);
 if (!If_manager) {
 	Iplimit();
 	$temp_a = array_merge($_POST,$_GET);
 	foreach ($temp_a as $key => $value) {
 		if ($key!='module') {
-			CheckVar($value);
+			S::checkVar($value);
 		}
 	}
 	unset($temp_a);
@@ -188,8 +196,9 @@ if (!If_manager) {
 	$admin_level = getLangInfo('other','admin_level');//'manager';
 }
 $_postdata  = $_POST ? PostLog($_POST) : '';
-$new_record = '|'.str_replace('|','&#124;',Char_cv($admin_name)).'||'.str_replace('|','&#124;',Char_cv($REQUEST_URI))."|$onlineip|$timestamp|$_postdata|\n";
-writeover($bbsrecordfile,$new_record,"ab");
+$new_record = '|'.str_replace('|','&#124;',S::escapeChar($admin_name)).'||'.str_replace('|','&#124;',S::escapeChar($REQUEST_URI))."|$onlineip|$timestamp|$_postdata|\n";
+//* writeover($bbsrecordfile,$new_record,"ab");
+pwCache::setData($bbsrecordfile,$new_record, false, "ab");
 
 if ($pwServer['REQUEST_METHOD'] == 'POST') {
 	$referer_a = @parse_url($pwServer['HTTP_REFERER']);
@@ -203,7 +212,7 @@ if ($pwServer['REQUEST_METHOD'] == 'POST') {
 	PostCheck($verify);
 }
 unset($_postdata,$new_record,$bbsrecordfile,$dbhost,$dbuser,$dbpw,$dbname,$pconnect,$newmanager,$newmngpwd);
-$thisPWTabs = $_GET['tab'] ? Char_cv($_GET['tab']) : Char_cv($_COOKIE['thisPWTabs']);
+$thisPWTabs = $_GET['tab'] ? S::escapeChar($_GET['tab']) : S::escapeChar($_COOKIE['thisPWTabs']);
 
 function HtmlConvert(&$array) {
 	if (is_array($array)) {
@@ -219,9 +228,9 @@ function HtmlConvert(&$array) {
 	}
 }
 function checkpass($CK) {
-	Add_S($CK);
+	S::slashes($CK);
 	global $db,$manager,$db_ifsafecv;
-	if (CkInArray($CK[1],$manager)) {
+	if (S::inArray($CK[1],$manager)) {
 		global $manager_pwd;
 		$v_key = array_search($CK[1],$manager);
 		if (!SafeCheck($CK,PwdCode($manager_pwd[$v_key]))) {
@@ -250,14 +259,14 @@ function checkpass($CK) {
 			$rightset[$key] = 1;
 		}
 	} else {
-		$rt = $db->get_one("SELECT m.uid,m.username,m.groupid,m.groups,m.password,m.safecv,m.groupid,u.gptype,p.rvalue as allowadmincp FROM pw_members m LEFT JOIN pw_usergroups u ON u.gid=m.groupid LEFT JOIN pw_permission p ON p.uid='0' AND p.fid='0' AND p.gid=m.groupid AND p.rkey='allowadmincp' WHERE m.username=".pwEscape($CK[1]));
+		$rt = $db->get_one("SELECT m.uid,m.username,m.groupid,m.groups,m.password,m.safecv,m.groupid,u.gptype,p.rvalue as allowadmincp FROM pw_members m LEFT JOIN pw_usergroups u ON u.gid=m.groupid LEFT JOIN pw_permission p ON p.uid='0' AND p.fid='0' AND p.gid=m.groupid AND p.rkey='allowadmincp' WHERE m.username=".S::sqlEscape($CK[1]));
 		if (!$rt['allowadmincp'] || ($rt['gptype']!='system' && $rt['gptype']!='special') || $db_ifsafecv && $rt['safecv'] != $CK['3']) {
 			return false;
 		}
 		if (!SafeCheck($CK,PwdCode($rt['password'])) || !admincheck($rt['uid'],$CK[1],$rt['groupid'],$rt['groups'],'check')) {
 			return false;
 		}
-		$rightset = $db->get_value('SELECT value FROM pw_adminset WHERE gid='.pwEscape($rt['groupid']));
+		$rightset = $db->get_value('SELECT value FROM pw_adminset WHERE gid='.S::sqlEscape($rt['groupid']));
 		if ($rightset) {
 			if (!is_array($rightset = unserialize($rightset))) {
 				$rightset = array();
@@ -479,7 +488,7 @@ function checkselid($selid) {
 			}
 			$ret[] = $value;
 		}
-		return pwImplode($ret);
+		return S::sqlImplode($ret);
 	} else {
 		return '';
 	}
@@ -495,7 +504,7 @@ function ObHeader($URL) {
 function GetAllowForum($username) {
 	global $db;
 	$allowfid = $forumoption = '';
-	$query = $db->query("SELECT fid,name,forumadmin FROM pw_forums WHERE type!='category' AND (forumadmin LIKE ".pwEscape("%,$username,%")."OR fupadmin LIKE ".pwEscape("%,$username,%").')');
+	$query = $db->query("SELECT fid,name,forumadmin FROM pw_forums WHERE type!='category' AND (forumadmin LIKE ".S::sqlEscape("%,$username,%")."OR fupadmin LIKE ".S::sqlEscape("%,$username,%").')');
 	while ($rt = $db->fetch_array($query)) {
 		$allowfid    .= ','.$rt['fid'];
 		$forumoption .= "<option value=\"$rt[fid]\"> >> $rt[name]</option>";
@@ -621,30 +630,30 @@ function maxmin($id) {
 function admincheck($uid,$username,$groupid,$groups,$action) {
 	global $db;
 	if ($action == 'check') {
-		$rt = $db->get_one("SELECT username,groupid,groups FROM pw_administrators WHERE uid=".pwEscape($uid));
+		$rt = $db->get_one("SELECT username,groupid,groups FROM pw_administrators WHERE uid=".S::sqlEscape($uid));
 		if ($rt && $rt['username'] == $username && ($rt['groupid'] == $groupid || strpos($rt['groups'], ",$groupid,") !== false)) {
 			return true;
 		} else {
 			return false;
 		}
 	} elseif ($action == 'update') {
-		$rt = $db->get_one("SELECT username,groupid,groups FROM pw_administrators WHERE uid=".pwEscape($uid));
+		$rt = $db->get_one("SELECT username,groupid,groups FROM pw_administrators WHERE uid=".S::sqlEscape($uid));
 		if (empty($rt)) {
-			$db->update("INSERT INTO pw_administrators SET " . pwSqlSingle(array(
+			$db->update("INSERT INTO pw_administrators SET " . S::sqlSingle(array(
 				'uid'		=> $uid,
 				'username'	=> $username,
 				'groupid'	=> $groupid,
 				'groups'	=> $groups
 			)));
 		} elseif ($rt['username'] != $username || $rt['groupid'] != $groupid || $rt['groups'] != $groups) {
-			$db->update("UPDATE pw_administrators SET " . pwSqlSingle(array(
+			$db->update("UPDATE pw_administrators SET " . S::sqlSingle(array(
 				'username'	=> $username,
 				'groupid'	=> $groupid,
 				'groups'	=> $groups
-			)) . " WHERE uid=".pwEscape($uid));
+			)) . " WHERE uid=".S::sqlEscape($uid));
 		}
 	} elseif ($action == 'delete') {
-		$db->update("DELETE FROM pw_administrators WHERE uid=".pwEscape($uid));
+		$db->update("DELETE FROM pw_administrators WHERE uid=".S::sqlEscape($uid));
 	} else {
 		return false;
 	}
@@ -684,7 +693,7 @@ function Pwloaddl($mod,$ckfunc='mysqli_get_client_info') {
 	} else {
 		$module ="$mod.so";
 	}
-	@dl(Pcv($module));
+	@dl(S::escapePath($module));
 	if ($ckfunc && !function_exists($ckfunc)) {
 		return false;
 	}
@@ -772,14 +781,14 @@ function updateadmin() {
 	}
 	if ($f_admin) {
 		$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
-		$usernames = pwImplode($f_admin);
+		$usernames = S::sqlImplode($f_admin);
 		$pwSQL = array();
 		$query = $db->query("SELECT m.uid,m.username,m.groupid,m.groups,a.groupid AS gid,a.groups AS gps FROM pw_members m LEFT JOIN pw_administrators a ON m.uid=a.uid WHERE m.username IN($usernames)");
 		while ($rt = $db->fetch_array($query)) {
 			if ($rt['groupid'] == '-1') {
-//				$rt['groups'] = str_replace(',5,',',',$rt['groups']);
-//				$rt['groups'] == ',' && $rt['groups'] = '';
-				$rt['groups'] = $rt['groups'] ? $rt['groups'].'5,' : ",5,";
+				$rt['groups'] = str_replace(',5,',',',$rt['groups']);
+				$rt['groups'] == ',' && $rt['groups'] = '';
+				//$rt['groups'] = $rt['groups'] ? $rt['groups'].'5,' : ",5,";
 				$userService->update($rt['uid'], array('groupid'=>5, 'groups'=>$rt['groups']));
 				$rt['groupid'] = 5;
 			} elseif ($rt['groupid'] != '5' && strpos($rt['groups'],',5,') === false) {
@@ -791,7 +800,7 @@ function updateadmin() {
 			}
 		}
 		if ($pwSQL) {
-			$db->update("REPLACE INTO pw_administrators (uid,username,groupid,groups) VALUES ".pwSqlMulti($pwSQL));
+			$db->update("REPLACE INTO pw_administrators (uid,username,groupid,groups) VALUES ".S::sqlMulti($pwSQL));
 		}
 	}
 }

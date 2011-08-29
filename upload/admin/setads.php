@@ -9,7 +9,7 @@ if ($action != 'submit') {
 
 } elseif ($_POST['action'] == "submit") {
 
-	InitGP(array('ads'),'P');
+	S::gp(array('ads'),'P');
 	setConfig('db_ads', $ads);
 	updatecache_c();
 	adminmsg('operate_success');

@@ -1,7 +1,7 @@
 <?php
 !defined('P_W') && exit('Forbidden');
 
-InitGP(array('uid'), 'GP');
+S::gp(array('uid'), 'GP');
 
 //$uids = explode(',', $uids);
 !$uid && Showmsg('guest_notcard');
@@ -41,7 +41,7 @@ foreach ($appsdb as $value) {
 
 //一页显示个数
 require_once (R_P . 'require/showimg.php');
-include_once (D_P . 'data/bbscache/level.php');
+include_once pwCache::getPath(D_P . 'data/bbscache/level.php');
 $userdb = array();
 $app_with_count = array(
 	'topic',
@@ -51,7 +51,7 @@ $app_with_count = array(
 	'group',
 	'share'
 );
-$info = $db->get_one("SELECT m.uid,m.username,m.groupid,m.memberid,m.icon,m.oicq,m.aliww,m.honor,md.lastpost,md.thisvisit,md.f_num, ud.visits,ud.tovisits, ud.diary_lastpost,ud.photo_lastpost,ud.owrite_lastpost,ud.group_lastpost,ud.share_lastpost FROM pw_members m LEFT JOIN pw_memberdata md ON m.uid=md.uid LEFT JOIN pw_ouserdata ud ON m.uid=ud.uid WHERE m.uid=" . pwEscape($uid));
+$info = $db->get_one("SELECT m.uid,m.username,m.groupid,m.memberid,m.icon,m.oicq,m.aliww,m.honor,md.lastpost,md.thisvisit,md.f_num, s.visits,s.tovisits, ud.diary_lastpost,ud.photo_lastpost,ud.owrite_lastpost,ud.group_lastpost,ud.share_lastpost FROM pw_members m LEFT JOIN pw_memberdata md ON m.uid=md.uid LEFT JOIN pw_ouserdata ud ON m.uid=ud.uid LEFT JOIN pw_space s ON m.uid=s.uid WHERE m.uid=" . S::sqlEscape($uid));
 list($info['icon']) = showfacedesign($info['icon'], 1, 's');
 
 $friendService = L::loadClass('Friend', 'friend'); /* @var $friendService PW_Friend  */

@@ -25,4 +25,20 @@ class PW_Forums {
 		}
 		return $sForumsDao;
 	}
+	
+	/*
+	 * 删除版块管理员
+	 * */
+	function deleteForumAdmin($username,$fid = 0) {
+		$fid = intval($fid);
+		$forumsDao = $this->getForumsDao();
+		$f_admin = $forumsDao->getForumAdmin($fid);
+		
+		foreach($f_admin as $k=>$v){
+			if(false !== $key = array_search($username,$v)){
+				unset($v[$key]);
+				$forumsDao->_update(array('forumadmin',implode(',',$v)), $k);
+			}
+		}
+	}
 }

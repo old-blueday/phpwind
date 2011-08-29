@@ -41,7 +41,8 @@ strong{font-weight:bold}
 .list1 li{background-position:5px -103px; padding:0 2px 0 0; border-bottom:1px dashed #e8e8e8; line-height:24px; width:47%; text-indent:20px; margin-left:1%; margin-right:1%; float:left;overflow:hidden;height:24px;}
 
 /*管理最小高度*/
-.w384 .view-hover,.w384 .view-current{min-height:100px;_height:100px;}
+.w384 .tops,.w384 .list{min-height:120px;_height:120px;}
+
 
 .subject{}
 .subject img{margin:0 8px 0 5px;}
@@ -72,6 +73,7 @@ strong{font-weight:bold}
 
 .pane3 .hd{height:29px; background:#f4f2f3 url(icon.png) no-repeat right bottom; line-height:29px; padding:0 8px;}
 .pane3 .bd{background:#FFF; padding:8px 8px 0;}
+.pane3 .bd .view-hover,.pane3 .bd .view-current{min-height:100px;_height:100px;width:100%;}
 
 .tcorner,.tcorner span,.bcorner,.bcorner span{background:url(corner.png) no-repeat 0 0; height:3px;display:block;font:0pt/0pt Arial;}
 .tcorner{background-position:-3px 0; position:relative; margin-bottom:-3px;}
@@ -88,6 +90,7 @@ strong{font-weight:bold}
 
 /*精彩图片*/
 .picture,.picture h2,.picture .pic_r{background:url(pho_bg.png) no-repeat 0 0;height:159px;}
+.picture .view-hover,.picture .view-current{min-height:130px;_height:130px;width:100%;}
 .picture{background-position:0 -159px; background-repeat:repeat-x; position:relative;}
 .picture h2{background-position:0 0; width:61px; display:block; left:-24px;position:absolute;}
 .picture .pic_r{background-position:right -318px; width:10px; display:block; right:0;position:absolute;}

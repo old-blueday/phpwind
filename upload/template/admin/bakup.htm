@@ -4,8 +4,9 @@ if($job=='bakout'){print <<<EOT
 -->
 <div class="nav3 mb10">
 	<ul class="cc">
-		<li class="current"><a href="$admin_file?adminjob=bakup">数据维护</a></li>
-		<li><a href="$admin_file?adminjob=bakup&job=bakin">数据恢复</a></li>
+		<li class="current"><a href="$basename&job=bakout">数据维护</a></li>
+		<li><a href="$basename&job=bakin">数据恢复</a></li>
+		<li><a href="$basename&job=ptable">数据库分卷</a></li>
 	</ul>
 </div>
 
@@ -19,11 +20,11 @@ EOT;
 -->
 <div class="nav3 mb10">
 	<ul class="cc">
-		<li><a href="$admin_file?adminjob=bakup">数据维护</a></li>
-		<li class="current"><a href="$admin_file?adminjob=bakup&job=bakin">数据恢复</a></li>
+		<li><a href="$basename&job=bakout">数据维护</a></li>
+		<li class="current"><a href="$basename&job=bakin">数据恢复</a></li>
+		<li><a href="$basename&job=ptable">数据库分卷</a></li>
 	</ul>
 </div>
-
 <div class="admin_info mb10">
     <h3 class="h1"><b>提示信息</b></h3>
     <div class="legend">本功能在恢复备份数据的同时,将覆盖原有数据,请确定是否需要恢复,以免造成数据损失<br />数据恢复功能只能恢复由当前版本导出的数据文件,其他软件导出格式可能无法识别<br />如果一个备份文件有多个分卷，您只需任选一个备份文件导入，程序会自动导入其他分卷</div>
@@ -142,6 +143,7 @@ EOT;
 		<input type="radio" name="action" value="optimize" />&nbsp;优化&nbsp;
 	</p>
 	<p>
+	<span class="bt"><span><button type="button" onclick="CheckAll(document.FORM)">全 选</button></span></span>
 	<span class="btn"><span><button type="submit" onclick="return confirm('您确认要进行此操作吗?');">提 交</button></span></span></p>
 </div>
 </form>
@@ -154,7 +156,7 @@ if(!$action){print <<<EOT
 <input type="hidden" name="action" value="del">
 <h2 class="h1"><b>站点备份文件</b></h2>
 <div class="admin_table mb10">
-    <table width="100%" align=center cellspacing="0" cellpadding="0">
+    <table width="100%">
     <tr class="tr2 vt td_bgB">
 		<td width="30"><span onclick="CheckAll(document.FORM)" class="cp">全选</span></td>
         <td>文件名</td>
@@ -184,6 +186,7 @@ EOT;
 </div>
 <!--<input name="action" type="hidden" value="del">-->
 <div class="mb10 tac">
+	<span class="bt"><span><button type="button" onclick="CheckAll(document.FORM)">全 选</button></span></span>
     <span class="bt"><span><button type="submit" name="delete" onclick="return checkset('此功能不可恢复,您确认要删除选中的备份文件！');">删除备份</button></span></span>
 </div>
 </form>

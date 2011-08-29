@@ -323,15 +323,11 @@ function checkAnswer(obj){
 		getInfoBox(obj).innerHTML = "检测中，请稍等...";
 		ajax.send(url,data,function(){
 			var response = parseInt(ajax.request.responseText);
-			switch (response){
-				case 0:
-					return showResult(0,obj);
-					break;
-				case 1:
-					return showResult(1,obj);
-					break;
-				default:
-					return showResult(1,obj);
+			if(response > 0){
+				try{regInfo[5][2] = regInfo[5][2].replace(/t=\d+/,'t='+new Date().getTime()); }catch(e){alert(e);}
+				showResult(response,obj);
+			}else{
+				return showResult(0,obj);
 			}
 		});
 	}

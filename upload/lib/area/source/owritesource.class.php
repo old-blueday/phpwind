@@ -25,6 +25,7 @@ class PW_OwriteSource extends SystemData {
 	 */
 	function _getData($type, $num) {
 		switch ($type) {
+			case '':
 			case 'new' :
 				$write = L::loadDB('owritedata', 'sns');
 				return $write->getNewData($num);

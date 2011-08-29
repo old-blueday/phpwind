@@ -3,24 +3,26 @@
 
 if (!defined('A_P')) define('A_P', R_P . 'apps/');
 
-if (!($foruminfo = L::forum($fid))) {
+$pwforum = new PwForum($fid);
+if (!$pwforum->isForum(true)) {
 	Showmsg('data_error');
 }
+$foruminfo =& $pwforum->foruminfo;
 $groupRight =& $newColony->getRight();
 $pwModeImg = "$imgpath/apps";
-include_once(D_P.'data/bbscache/o_config.php');
+include_once pwCache::getPath(D_P.'data/bbscache/o_config.php');
 
 require_once(R_P . 'require/header.php');
-list($guidename,$forumtitle) = getforumtitle(forumindex($foruminfo['fup'],1));
-$msg_guide = headguide($guidename);
+list($guidename, $forumtitle) = $pwforum->getTitle();
+$msg_guide = $pwforum->headguide($guidename);
 
 $styleid = $colony['styleid'];
 $basename = "thread.php?cyid=$cyid&showtype=active";
-InitGP(array('job'));
+S::gp(array('job'));
 
 if (empty($job)) {
 
-	InitGP(array('page'), '', 2);
+	S::gp(array('page'), '', 2);
 	$page < 1 && $page = 1;
 	$db_perpage = 10;
 	
@@ -36,7 +38,7 @@ if (empty($job)) {
 
 } elseif ($job == 'view') {
 
-	InitGP(array('id','page'), '', 2);
+	S::gp(array('id','page'), '', 2);
 	$page < 1 && $page = 1;
 	
 	require_once(R_P . 'u/require/core.php');
@@ -102,7 +104,7 @@ if (empty($job)) {
 } elseif ($job == 'actmember' || $job == 'membermanage') {
 	
 	
-	InitGP(array('id', 'page'), '', 2);
+	S::gp(array('id', 'page'), '', 2);
 	$page < 1 && $page = 1;
 	$tmpUrlAdd = '&job=' . $job . '&id=' . $id;
 	require_once(A_P . 'groups/lib/active.class.php');
@@ -123,7 +125,7 @@ if (empty($job)) {
 
 	$tmpUrlAdd = '&job=' . $job;
 	if ($job == 'edit') {
-		InitGP(array('id'));
+		S::gp(array('id'));
 		$tmpUrlAdd .= '&id=' . $id;
 		require_once(A_P . 'groups/lib/active.class.php');
 		$newActive = new PW_Active();
@@ -167,8 +169,8 @@ if (empty($job)) {
 
 	} else {
 
-		InitGP(array('title', 'begintime', 'endtime', 'deadline', 'address', 'price','introduction','atc_content','limitnum'), 'P');
-		InitGP(array('type', 'objecter'), 'P', 2);
+		S::gp(array('title', 'begintime', 'endtime', 'deadline', 'address', 'price','introduction','atc_content','limitnum'), 'P');
+		S::gp(array('type', 'objecter'), 'P', 2);
 
 		if(strlen($title) > $db_titlemax) Showmsg('active_title_length');
 		if(strlen($address) > $db_titlemax) Showmsg('active_address_length');
@@ -181,8 +183,8 @@ if (empty($job)) {
 		if ($job == 'edit') {
 			$activePost->initData($active);
 			if ($attachdb = $newActive->getAttById($id)) {
-				InitGP(array('keep'), 'P', 2);
-				InitGP(array('oldatt_desc'), 'P');
+				S::gp(array('keep'), 'P', 2);
+				S::gp(array('oldatt_desc'), 'P');
 				$activePost->initAttachs($attachdb, $keep, $oldatt_desc);
 			}
 		}
@@ -206,7 +208,7 @@ if (empty($job)) {
 			require_once(R_P . 'u/require/core.php');
 			$id = $activePost->insertData();
 			//activitynum加一
-			$db->update("UPDATE pw_colonys SET activitynum=activitynum+'1' WHERE id=" . pwEscape($cyid));
+			$db->update("UPDATE pw_colonys SET activitynum=activitynum+'1' WHERE id=" . S::sqlEscape($cyid));
 			$colony['activitynum']++;
 			updateGroupLevel($colony['id'], $colony);
 			refreshto("{$basename}&job=view&id=$id",'活动发布成功!');
@@ -219,7 +221,7 @@ if (empty($job)) {
 	ObStart();
 	!$winduid && Showmsg('not_login');
 
-	InitGP(array('id'));
+	S::gp(array('id'));
 	require_once(A_P . 'groups/lib/active.class.php');
 	$newActive = new PW_Active();
 	if (!$active = $newActive->getActiveById($id)) {
@@ -235,7 +237,7 @@ if (empty($job)) {
 
 	} else {
 
-		InitGP(array('realname','phone','mobile','address','anonymous'));
+		S::gp(array('realname','phone','mobile','address','anonymous'));
 			
 		$return = $newActive->appendMember($id, $winduid, array(
 			'realname'	=> $realname,
@@ -254,7 +256,7 @@ if (empty($job)) {
 	ob_end_clean();
 	ObStart();
 
-	InitGP(array('id'));
+	S::gp(array('id'));
 	require_once(A_P . 'groups/lib/active.class.php');
 	$newActive = new PW_Active();
 	if (!$active = $newActive->getActiveById($id)) {
@@ -277,7 +279,7 @@ if (empty($job)) {
 		ob_end_clean();
 		ObStart();
 	}
-	InitGP(array('id'));
+	S::gp(array('id'));
 	require_once(A_P . 'groups/lib/active.class.php');
 	$newActive = new PW_Active();
 	if (!$active = $newActive->getActiveById($id)) {

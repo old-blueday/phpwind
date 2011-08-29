@@ -2,7 +2,7 @@
 !defined('R_P') && exit('Forbidden');
 $USCR = 'space_set';
 !$winduid && Showmsg('not_login');
-$isGM = CkInArray($windid,$manager);
+$isGM = S::inArray($windid,$manager);
 !$isGM && $groupid==3 && $isGM=1;
 
 require_once(R_P . 'u/lib/space.class.php');
@@ -27,7 +27,7 @@ $lang_model = array(
 
 if (empty($_POST['step'])) {
 	
-	InitGP(array('tab'));
+	S::gp(array('tab'));
 
 	$modeSel = $tab ? $tab : substr($_COOKIE['spacemodeset'], 4);
 	!in_array($modeSel, array('basic', 'skin', 'model')) && $modeSel = 'basic';
@@ -48,8 +48,8 @@ if (empty($_POST['step'])) {
 
 } else {
 
-	InitGP(array('name', 'spaceskin', 'domain','descript'));
-	InitGP(array('spacetype','ifopen','privacy','shownum'), 'GP', 2);
+	S::gp(array('name', 'spaceskin', 'domain','descript'));
+	S::gp(array('spacetype','ifopen','privacy','shownum'), 'GP', 2);
 	if (strlen($name)>80) {
 		Showmsg('space_name_toolong');
 	}
@@ -81,9 +81,9 @@ if (empty($_POST['step'])) {
 				);
 			}
 		}
-		$pwSQL && $db->update("replace INTO pw_privacy (uid, ptype, pkey, value) values " . pwSqlMulti($pwSQL));
+		$pwSQL && $db->update("replace INTO pw_privacy (uid, ptype, pkey, value) values " . S::sqlMulti($pwSQL));
 	}
-	if ($domain != $space['domain'] && $db->get_value("SELECT COUNT(*) AS sum FROM pw_space WHERE domain=" . pwEscape($domain))) {
+	if ($domain != $space['domain'] && $db->get_value("SELECT COUNT(*) AS sum FROM pw_space WHERE domain=" . S::sqlEscape($domain))) {
 		Showmsg('该域名已被使用!');
 	}
 	*/

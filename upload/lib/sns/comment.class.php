@@ -31,12 +31,12 @@ class PW_Comment {
 	 */
 	function comment($uid,$mid,$content,$extra = array()){
 		if (!$this->_isLegalId($uid)  || !$this->_isLegalId($mid)  || empty($content)) {
-			return false;
+			return 0;
 		}
 		$weiboService = L::loadClass('weibo', 'sns'); /* @var $weiboService PW_Weibo */
 		$weibos = $weiboService->getWeibosByMid($mid);
 		if (empty($weibos)) {
-			return false;
+			return 0;
 		}
 		$content = $this->escapeStr($content);
 		$extra = array_merge((array)$extra, $this->_analyseContent($uid, $content));
@@ -46,7 +46,7 @@ class PW_Comment {
 		}
 		$blacklist = $this->_actionBlackList($uid,$ruid,$extra);
 		if (empty($ruid) || in_array($weibos['uid'],$blacklist)) {
-			return false;
+			return 0;
 		}
 		$comment = array();
 		$comment['uid'] = $uid;
@@ -57,14 +57,25 @@ class PW_Comment {
 		$commentDao = L::loadDB('weibo_comment','sns');
 		$cid = $commentDao->insert($comment);
 		if (empty($cid)) {
-			return false;
+			return 0;
 		}
 		$this->cid = $cid;
 		$data = $this->_getCmRelationsData($cid,$ruid);
 		$this->_addCmRelations($data);
 		$userService = L::loadClass('UserService', 'user');
 		$userService->updatesByIncrement($ruid, array(), array('newcomment' => 1));
-		return true;
+
+		//sinaweibo
+		if ($GLOBALS['db_sinaweibo_status'] && !$extra['isSinaComment']) {
+			$bindService = L::loadClass('WeiboBindService', 'sns/weibotoplatform'); /* @var $bindService PW_WeiboBindService */
+			if ($bindService->isLocalBind($uid, PW_WEIBO_BINDTYPE_SINA)) {
+				unset($comment['extra']);
+				$syncer = L::loadClass('WeiboSyncer', 'sns/weibotoplatform'); /* @var $syncer PW_WeiboSyncer */
+				$syncer->sendComment($cid, $comment);
+			}
+		}
+		
+		return $cid;
 	}
 	
 	/**
@@ -358,7 +369,7 @@ class PW_Comment {
 	 * return string
 	 */
 	function _parseRefer($username, $uArray) {
-		return isset($uArray[$username]) ? '<a href="u.php?uid=' . $uArray[$username] . '">@' . $username . '</a>' : '@' . $username;
+		return isset($uArray[$username]) ? '<a href="'.USER_URL. $uArray[$username] . '">@' . $username . '</a>' : '@' . $username;
 	}
 	
 	/**

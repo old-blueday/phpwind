@@ -5,7 +5,7 @@ if(isset($_GET['ajax']) && $_GET['ajax'] == 1){
 }
 empty($subtype) && $subtype = 'notice';
 $normalUrl = $baseUrl . "?type=$subtype";
-InitGP(array('smstype','page','mid','rid','redirect','ajax'), 'GP');
+S::gp(array('smstype','page','mid','rid','redirect','ajax'), 'GP');
 isset($rid) && empty($rid) && Showmsg("undefined_action");
 isset($mid) && empty($mid) && Showmsg("undefined_action");
 $page = empty($page) ? 1 :(int)$page;
@@ -71,9 +71,22 @@ if($smstype && in_array($action,array('info','next','previous'))){
 if(empty($action) || in_array($action,array('unread','system','postcate','active','apps'))){
 	if($action != 'unread'){ 	
 		$notReadCount = (int) $messageServer->countNoticesNotRead($winduid);
-		list($today, $yesterday, $week, $tTimes, $yTimes, $wTimes, $mTimes) = getSubListInfo($noticeList);
+		list($today, $yesterday, $tTimes, $yTimes, $mTimes) = getSubListInfo($noticeList);
 	}
 	$pages = numofpage($noticeCount, $page,$pageCount, "$normalUrl&action=$action&");
+}elseif($action == 'checkover'){
+	S::gp ( array ('rid', 'dir' ), 'GP' );
+	if($dir == 'previous'){
+		$message = $messageServer->getUpNotice($winduid, $rid, $smstype);
+	}else{
+		$message = $messageServer->getDownNotice($winduid, $rid, $smstype);
+	}
+	if (($message)) {
+		echo( "success\t" );
+	}else{
+		echo("over\t");
+	}
+	ajax_footer();
 }
 $messageServer->resetStatistics(array($winduid),'notice_num');
 !defined('AJAX') && include_once R_P.'actions/message/ms_header.php';

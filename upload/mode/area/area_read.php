@@ -8,7 +8,12 @@ $pwModeCss = 'mode/area/images/area_read_style.css';
 
 $m = $db_mode;
 $db_modepages = $db_modepages[$db_mode];
-if ('' == $read['content']) $read = $threads->getThreads($tid, true);
+//* $threads = L::loadClass('Threads', 'forum');
+//* if ('' == $read['content']) $read = $threads->getThreads($tid, true);
+
+$_cacheService = Perf::gatherCache('pw_threads');
+if ('' == $read['content']) $read = $_cacheService->getThreadAndTmsgByThreadId($tid);
+
 $readnum = $db_readperpage = 5;
 if (!$openIndex) $count--;
 
@@ -23,15 +28,16 @@ $forumset['replayorder'] && $orderby = $forumset['replayorder'] == '1' ? 'asc' :
 $threadorder = bindec(getstatus($read['tpcstatus'],4).getstatus($read['tpcstatus'],3));
 $threadorder && $threadorder != 3 && $orderby = $threadorder == '1' ? 'asc' : 'desc';
 
-list($guidename,$forumtitle) = getforumtitle(forumindex($foruminfo['fup'],1),1);
-$guidename .= " &raquo; <a href=\"read.php?tid=$tid\">$subject</a>";
+//list($guidename,$forumtitle) = getforumtitle(forumindex($foruminfo['fup'],1),1);
+list($guidename, $forumtitle) = $pwforum->getTitle();
+$guidename .= "<em>&gt;</em><a href=\"read.php?tid=$tid\">$subject</a>";
 $forumtitle = '|'.$forumtitle;
 
 $db_metakeyword = substr($read['tags'],0,strpos($read['tags'],"\t"));
 $db_metakeyword = (empty($db_metakeyword) ? $subject : $db_metakeyword).','.$forumtitle;
 $db_metakeyword = trim(str_replace(array('|',' - ',"\t",' ',',,,',',,'),',',$db_metakeyword),',');
 
-if ($groupid == 'guest' && !$read['ifshield'] && !isban($read,$fid)) {
+if ($groupid == 'guest' && !$read['ifshield'] && !$pwforum->forumBan($read)) {
 	if ($read['ifconvert'] == 2) {
 		$metadescrip = stripWindCode($read['content']);
 		$metadescrip = strip_tags($metadescrip);
@@ -62,7 +68,7 @@ bbsSeoSettings('read','',$foruminfo['name'],$foruminfo['topictype'][$read['type'
 /*SEO*/
 
 require_once(M_P.'require/header.php');
-
+$msg_guide = $pwforum->headguide($guidename);
 require_once(R_P.'require/showimg.php');
 Update_ol();
 $readdb = $authorids = array();
@@ -124,12 +130,13 @@ if ($db_replysitemail && $read['authorid']==$winduid && $read['ifmail']==4) {
 		$rt['replyinfo'] = '';
 	}
 	$userService->update($winduid, array(), array(), array('replyinfo' => $rt['replyinfo']));
-	$db->update("UPDATE pw_threads SET ifmail='2' WHERE tid=".pwEscape($tid));
+	//$db->update("UPDATE pw_threads SET ifmail='2' WHERE tid=".S::sqlEscape($tid));
+	pwQuery::update('pw_threads', 'tid=:tid', array($tid), array('ifmail'=>2));
 }
 
 $read['pid'] = 'tpc';
 if (getstatus($read['tpcstatus'], 1)) {
-	$rt = $db->get_one("SELECT a.cyid,c.cname FROM pw_argument a LEFT JOIN pw_colonys c ON a.cyid=c.id WHERE tid=" . pwEscape($tid));
+	$rt = $db->get_one("SELECT a.cyid,c.cname FROM pw_argument a LEFT JOIN pw_colonys c ON a.cyid=c.id WHERE tid=" . S::sqlEscape($tid));
 	$read = $read + $rt;
 }
 $thread_read = $read;
@@ -140,12 +147,13 @@ $thread_read['aid'] && $_pids['tpc'] = 0;
 
 $toread && $urladd .= "&toread=$toread";
 $fpage > 1 && $urladd .= "&fpage=$fpage";
-$pages = numofpage($count,$page,$numofpage,"read.php?tid=$tid{$urladd}&");
+$pages = numofpage($count,$page,$numofpage,"read.php?tid=$tid{$urladd}&#newreply");
 
 if (!$db_hithour) {
-	$db->update('UPDATE pw_threads SET hits=hits+1 WHERE tid='.pwEscape($tid));
+	//$db->update('UPDATE pw_threads SET hits=hits+1 WHERE tid='.S::sqlEscape($tid));
+	pwQuery::update('pw_threads', 'tid=:tid', array($tid), null, array(PW_EXPR=>array('hits=hits+1')));
 } else {
-	writeover(D_P.'data/bbscache/hits.txt',$tid."\t",'ab');
+	pwCache::setData(D_P.'data/bbscache/hits.txt',$tid."\t", false, 'ab');
 }
 
 /***  帖子浏览记录  ***/
@@ -173,12 +181,12 @@ if ($start_limit < 0) {
 	$start_limit = 0;
 	$readnum += $start_limit;
 }
-$limit = pwLimit($start_limit,$readnum);
+$limit = S::sqlLimit($start_limit,$readnum);
 $query = $db->query("SELECT t.*,m.uid,m.username,m.gender,m.oicq,m.aliww,m.groupid,m.memberid,m.icon AS micon,
 			m.hack,m.honor,m.signature,m.regdate,m.medals,m.userstatus,md.postnum,md.digests,md.rvrc,
 			md.money,md.credit,md.currency,md.thisvisit,md.lastvisit,md.onlinetime,md.starttime $fieldadd
 			FROM $pw_posts t LEFT JOIN pw_members m ON m.uid=t.authorid LEFT JOIN pw_memberdata md ON md.uid=t.authorid $tablaadd
-			WHERE t.tid=".pwEscape($tid)." AND t.ifcheck='1' $sqladd ORDER BY $order $limit");
+			WHERE t.tid=".S::sqlEscape($tid)." AND t.ifcheck='1' $sqladd ORDER BY $order $limit");
 while ($read = $db->fetch_array($query)) {
 	$read['src_postdate'] = $read['postdate'];
 	$read['aid'] && $_pids[$read['pid']] = $read['pid'];
@@ -188,14 +196,14 @@ while ($read = $db->fetch_array($query)) {
 //读取帖子及回复的附件信息
 $attachdb = array();
 if ($_pids) {
-	$query = $db->query('SELECT * FROM pw_attachs WHERE tid='.pwEscape($tid)."AND pid IN (".pwImplode($_pids).")");
+	$query = $db->query('SELECT * FROM pw_attachs WHERE tid='.S::sqlEscape($tid)."AND pid IN (".S::sqlImplode($_pids).")");
 	while($rt=$db->fetch_array($query)){
 		if ($rt['pid'] == '0') $rt['pid'] = 'tpc';
 		$attachdb[$rt['pid']][$rt['aid']] = $rt;
 	}
 }
 
-$bandb = isban($readdb,$fid);
+$bandb = $pwforum->forumBan($readdb);
 $wordsfb = L::loadClass('FilterUtil', 'filter');
 
 isset($bandb[$thread_read['authorid']]) && $thread_read['groupid'] = 6;
@@ -211,7 +219,7 @@ foreach ($readdb as $key => $read) {
 	}
 }
 
-$authorids = pwImplode($authorids);
+$authorids = S::sqlImplode($authorids);
 unset($sign,$ltitle,$lpic,$lneed,$_G['right'],$_MEDALDB,$fieldadd,$tablaadd,$read,$order,$readnum,$pageinverse);
 
 if ($db_showcolony && $authorids) {
@@ -232,7 +240,7 @@ if ($db_showcustom && $authorids) {
 		}
 	}
 	if ($cids) {
-		$cids = pwImplode($cids);
+		$cids = S::sqlImplode($cids);
 		$query = $db->query("SELECT uid,cid,value FROM pw_membercredit WHERE uid IN($authorids) AND cid IN($cids)");
 		while ($rt = $db->fetch_array($query)) {
 			$customdb[$rt['uid']][$rt['cid']] = $rt['value'];
@@ -282,12 +290,12 @@ if ($foruminfo['pcid']) {
 	$N_allowpostcateopen = false;
 }
 
-$nxt_thread = $db->get_one("SELECT tid,subject FROM pw_threads WHERE fid=".pwEscape($fid,false)."AND ifcheck='1' AND topped='0' AND postdate<".pwEscape($thread_read['src_postdate2'],false)."ORDER BY postdate DESC LIMIT 1");
-$pre_thread = $db->get_one("SELECT tid,subject FROM pw_threads WHERE fid=".pwEscape($fid,false)."AND ifcheck='1' AND topped='0' AND postdate>".pwEscape($thread_read['src_postdate2'],false)."ORDER BY postdate ASC LIMIT 1");
+$nxt_thread = $db->get_one("SELECT tid,subject FROM pw_threads WHERE fid=".S::sqlEscape($fid,false)."AND ifcheck='1' AND topped='0' AND postdate<".S::sqlEscape($thread_read['src_postdate2'],false)."ORDER BY postdate DESC LIMIT 1");
+$pre_thread = $db->get_one("SELECT tid,subject FROM pw_threads WHERE fid=".S::sqlEscape($fid,false)."AND ifcheck='1' AND topped='0' AND postdate>".S::sqlEscape($thread_read['src_postdate2'],false)."ORDER BY postdate ASC LIMIT 1");
 
 
 $element_class = L::loadClass('element');
-$hot_threads = $element_class->replySortWeek($fid, 10);
+$hot_threads = $element_class->replySortWeek('', 10);
 
 $related_threads = threadrelated('allpost');
 

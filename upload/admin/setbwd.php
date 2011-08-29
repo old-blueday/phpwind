@@ -4,7 +4,7 @@ $basename="$admin_file?adminjob=setbwd";
 
 //引入短消息类
 
-InitGP(array('action','job', 'page'));
+S::gp(array('action','job', 'page'));
 $optCates = '';
 (!is_numeric($page) || $page<1) && $page = 1;
 $db_perpage = 20;
@@ -38,7 +38,7 @@ if ($action == 'setting') {
 		adminmsg('illegal_request');
 	}
 	if (empty($job)) {
-		InitGP(array('type','keyword','class','show', 'sort', 'importshow', 'success','fail'));
+		S::gp(array('type','keyword','class','show', 'sort', 'importshow', 'success','fail'));
 		$type = intval($type);
 		$class = (int) $class;
 
@@ -50,11 +50,11 @@ if ($action == 'setting') {
 
 		$sqladd = ' WHERE 1 ';
 		if($keyword){
-			$sqladd .= " AND word LIKE ".pwEscape("%$keyword%");
+			$sqladd .= " AND word LIKE ".S::sqlEscape("%$keyword%");
 		}
 
 		if($type){
-			$sqladd .= " AND type = " . pwEscape($type);
+			$sqladd .= " AND type = " . S::sqlEscape($type);
 		}
 
 		switch ($sort) {
@@ -74,7 +74,7 @@ if ($action == 'setting') {
 
 		$show_all = $show_center = '';
 		if(intval($class) > 0){
-			$sqladd .= " AND classid = " . pwEscape($class);
+			$sqladd .= " AND classid = " . S::sqlEscape($class);
 		} elseif ($class == -1) {
 			$show_notclass = 'class="current"';
 			$sqladd .= " AND classid = 0";
@@ -86,14 +86,14 @@ if ($action == 'setting') {
 			$sqladd .= " AND classid = 0";
 			$show_notclass = 'class="current"';
 		} elseif (intval($show)) {
-			$sqladd .= " AND classid = " . pwEscape($show);
+			$sqladd .= " AND classid = " . S::sqlEscape($show);
 		}
 
 		$sql = "SELECT COUNT(*) AS sum FROM pw_wordfb ".$sqladd;
 		$count = $db->get_value($sql);
 		$page_count = ceil($count/$db_perpage);
 		if ($page > $page_count) $page = $page_count;
-		$limit = pwLimit(($page-1)*$db_perpage,$db_perpage);
+		$limit = S::sqlLimit(($page-1)*$db_perpage,$db_perpage);
 		$pages = numofpage($count,$page,$page_count, "$basename&action=setting&type=$type&keyword=".rawurlencode($keyword)."&sort=".rawurlencode($sort)."&show=".rawurlencode($show)."&");
 
 		if(!$keyword) $keyword = getLangInfo('cpmsg','filter_keyword');
@@ -132,13 +132,13 @@ if ($action == 'setting') {
 		}
 		include_once PrintEot('filter');exit;
 	} elseif ($job == 'add') {
-		InitGP(array('step'));
+		S::gp(array('step'));
 		if ($step == 2) {
-			InitGP(array('type','repword','class','newclass'));
-			$word = GetGP('word', 'P');
+			S::gp(array('type','repword','class','newclass'));
+			$word = S::getGP('word', 'P');
 			$word = trim(str_replace("\r\n",",",$word));
 			$word = array_unique(explode(',', $word));
-			$strword=pwImplode($word);
+			$strword=S::sqlImplode($word);
 
 			$type = intval($type);
 			if(!$word) ajaxmsg('filtermsg_cannot', "$basename&action=setting");
@@ -200,10 +200,10 @@ if ($action == 'setting') {
 		}
 	} elseif ($job == 'enforce') {
 		define('AJAX', 1);
-	    InitGP(array('step'));
+	    S::gp(array('step'));
 		if ($step == 2) {
-    		$word = GetGP('word', 'P');
-    		$newclass = GetGP('newclass', 'P');
+    		$word = S::getGP('word', 'P');
+    		$newclass = S::getGP('newclass', 'P');
 
     		if ($newclass) {
 	    		//判断长度
@@ -214,7 +214,7 @@ if ($action == 'setting') {
 				}
 
 				//判断是否有重复分类
-				$sql = " SELECT id FROM pw_filter_class WHERE title = " . pwEscape($newclass);
+				$sql = " SELECT id FROM pw_filter_class WHERE title = " . S::sqlEscape($newclass);
 				$num = $db->get_one($sql);
 				if ($num) {
 					echo getLangInfo('cpmsg','filter_class_repeat');
@@ -225,7 +225,7 @@ if ($action == 'setting') {
 
 			$word = trim(str_replace("\r\n",",",$word));
 			$word = explode(',', $word);
-			$strword=pwImplode($word);
+			$strword=S::sqlImplode($word);
 			$type = intval($type);
 			if(!$word) ajaxmsg('filtermsg_cannot', "$basename&action=setting");
 
@@ -238,7 +238,7 @@ if ($action == 'setting') {
 			}
 
 			if ($wordfb) {
-				$prompt=pwImplode($wordfb);
+				$prompt=S::sqlImplode($wordfb);
 
 				//提示信息
 				$L = array(
@@ -251,9 +251,9 @@ if ($action == 'setting') {
 			ajax_footer();
 		}
 	} elseif ($job == 'edit') {
-	    InitGP(array('step'));
+	    S::gp(array('step'));
 		if ($step == 2) {
-			InitGP(array('id', 'type','repword','class','newclass'));
+			S::gp(array('id', 'type','repword','class','newclass'));
 			$type = intval($type);
 
 			//插入新分类
@@ -273,8 +273,8 @@ if ($action == 'setting') {
 			);
 
 			$sql = "UPDATE pw_wordfb"
-				 . " SET " . pwSqlSingle($value)
-				 . "WHERE id = " . pwEscape($id);
+				 . " SET " . S::sqlSingle($value)
+				 . "WHERE id = " . S::sqlEscape($id);
 			$db->update($sql);
 
 			//更新缓存
@@ -287,9 +287,9 @@ if ($action == 'setting') {
 			adminmsg('operate_success', EncodeUrl($basename.'&action=setting&show='.$class));
 		} else {
 		    define('AJAX', 1);
-			InitGP(array('id'));
+			S::gp(array('id'));
 
-			$sql = " SELECT * FROM pw_wordfb WHERE id =".pwEscape($id);
+			$sql = " SELECT * FROM pw_wordfb WHERE id =".S::sqlEscape($id);
 			$word = $db->get_one($sql);
 
 			$selected ='';
@@ -327,9 +327,9 @@ if ($action == 'setting') {
 			ajax_footer();
 		}
 	} elseif ($job == 'batchedit') {
-	    InitGP(array('step'));
+	    S::gp(array('step'));
 		if ($step == 2) {
-			InitGP(array('id', 'type','word','repword','class','newclass'));
+			S::gp(array('id', 'type','word','repword','class','newclass'));
 
 			$type = intval($type);
 
@@ -350,7 +350,7 @@ if ($action == 'setting') {
 			);
 
 			$sql = "UPDATE pw_wordfb"
-				 . " SET " . pwSqlSingle($value)
+				 . " SET " . S::sqlSingle($value)
 				 . "WHERE id IN (".$id.")";
 			$db->update($sql);
 
@@ -364,7 +364,7 @@ if ($action == 'setting') {
 			adminmsg('operate_success', "$basename" . "&action=setting&show=".$class);
 		} else {
 		    define('AJAX', 1);
-			InitGP(array('id'));
+			S::gp(array('id'));
 			if (!$id) adminmsg('operate_error');
 			$id = explode(',', $id);
 
@@ -372,7 +372,7 @@ if ($action == 'setting') {
 				if($value==""){
 					continue;
 				}
-				$str .= $str ? ', '.pwEscape($value).'' : pwEscape($value);
+				$str .= $str ? ', '.S::sqlEscape($value).'' : S::sqlEscape($value);
 				$wid .= $wid ? ', '.$value : $value;
 			}
 
@@ -395,9 +395,9 @@ if ($action == 'setting') {
 			ajax_footer();
 		}
 	}  elseif ($job == 'del') {
-		InitGP(array('step'));
+		S::gp(array('step'));
 		if ($step == 2) {
-			InitGP(array('id'));
+			S::gp(array('id'));
 			if (!$id) adminmsg('operate_error');
 
 			$sql = "SELECT word, custom FROM pw_wordfb WHERE id IN (".$id.")";
@@ -433,7 +433,7 @@ if ($action == 'setting') {
 			adminmsg('operate_success', "$basename&action=setting");
 		} else {
 		    define('AJAX', 1);
-			InitGP(array('id'));
+			S::gp(array('id'));
 			if (!$id) adminmsg('operate_error');
 			$id = explode(',', $id);
 
@@ -442,7 +442,7 @@ if ($action == 'setting') {
 				if($value==""){
 					continue;
 				}
-				$str .= $str ? ', '.pwEscape($value).'' : pwEscape($value);
+				$str .= $str ? ', '.S::sqlEscape($value).'' : S::sqlEscape($value);
 				$wid .= $wid ? ', '.$value : $value;
 				$count++;
 			}
@@ -458,7 +458,7 @@ if ($action == 'setting') {
 			ajax_footer();
 		}
 	} elseif ($job == 'setting') {
-		InitGP(array('setting'));
+		S::gp(array('setting'));
 
 		require_once(R_P.'admin/cache.php');
 	    setConfig('db_wordsfb_setting',$setting);
@@ -468,9 +468,9 @@ if ($action == 'setting') {
 		adminmsg('operate_success', "$basename&action=scan");
 	}
 } elseif ($action == 'class') {
-	InitGP(array('step'));
+	S::gp(array('step'));
 	if (empty($job)) {
-		$limit = pwLimit(($page-1)*$db_perpage,$db_perpage);
+		$limit = S::sqlLimit(($page-1)*$db_perpage,$db_perpage);
 
 		$sqladd = ' WHERE 1 ';
 
@@ -502,7 +502,7 @@ if ($action == 'setting') {
 		include_once PrintEot('filter');exit;
 	} elseif ($job == 'add') {//添加分类
 		if ($step == 2) {
-			InitGP(array('title'));
+			S::gp(array('title'));
 
 			//判断长度
 			if (strlen($title) > 16) adminmsg('filter_class_len', EncodeUrl($basename.'&action=class'));
@@ -519,28 +519,28 @@ if ($action == 'setting') {
 		}
 	} elseif ($job == 'edit') {//修改分类
 		if ($step == 2) {
-			InitGP(array('id','title'));
+			S::gp(array('id','title'));
 
 			//判断长度
 			if (strlen($title) > 16) adminmsg('filter_class_len', EncodeUrl($basename.'&action=class'));
 
 			//判断是否有重复分类
-			$sql = " SELECT id FROM pw_filter_class WHERE title = " . pwEscape($title);
+			$sql = " SELECT id FROM pw_filter_class WHERE title = " . S::sqlEscape($title);
 			$num = $db->get_one($sql);
 			if ($num) adminmsg('filter_class_repeat', EncodeUrl($basename.'&action=class'));
 
 			//更新分类信息
-			$sql = "UPDATE pw_filter_class SET title=".pwEscape($title)." WHERE id=".pwEscape($id);
+			$sql = "UPDATE pw_filter_class SET title=".S::sqlEscape($title)." WHERE id=".S::sqlEscape($id);
 			$db->update($sql);
 
 			//重定向
 			adminmsg('operate_success', EncodeUrl($basename.'&action=class'));
 		} else {
 			define('AJAX', 1);
-			InitGP(array('id'));
+			S::gp(array('id'));
 
 			//获取分类信息
-			$sql = "SELECT id,title FROM pw_filter_class WHERE id=".pwEscape($id);
+			$sql = "SELECT id,title FROM pw_filter_class WHERE id=".S::sqlEscape($id);
 			$class = $db->get_one($sql);
 
 	    	$ajax_basename = EncodeUrl($basename."&action=class&job=edit");
@@ -549,7 +549,7 @@ if ($action == 'setting') {
 		}
 	} elseif ($job == 'del') {//删除分类
 		if ($step == 2) {
-			InitGP(array('class'));
+			S::gp(array('class'));
 			$class = (int) $class;
 
 			delClass($class);
@@ -564,16 +564,16 @@ if ($action == 'setting') {
 			adminmsg('operate_success', $basename.'&action=class');exit;
 		} else {
 			define('AJAX', 1);
-			InitGP(array('class'));
+			S::gp(array('class'));
 			$class = (int) $class;
 
 			if ($class > 0) {
 				//获取分类名
-				$sql = "SELECT title FROM pw_filter_class WHERE id=".pwEscape($class);
+				$sql = "SELECT title FROM pw_filter_class WHERE id=".S::sqlEscape($class);
 				$title = $db->get_value($sql);
 
 				//获取该分类敏感词总数
-				$sql = "SELECT COUNT(*) AS count FROM pw_wordfb WHERE classid=".pwEscape($class);
+				$sql = "SELECT COUNT(*) AS count FROM pw_wordfb WHERE classid=".S::sqlEscape($class);
 				$count = $db->get_value($sql);
 			} elseif ($class == 0) {
 				$title = getLangInfo('cpmsg', 'filter_all_word');
@@ -591,7 +591,7 @@ if ($action == 'setting') {
 		}
 	} elseif ($job == 'import') {//导入词库
 		if ($step == 2) {
-			InitGP(array('class', 'newclass'),'P');
+			S::gp(array('class', 'newclass'),'P');
 			$class = (int) $class;
 			$upload = $_FILES['upload'];
 
@@ -637,10 +637,10 @@ if ($action == 'setting') {
 								continue;
 							}
 
-							$id = $db->get_value("SELECT id FROM pw_wordfb WHERE word=".pwEscape($word));
+							$id = $db->get_value("SELECT id FROM pw_wordfb WHERE word=".S::sqlEscape($word));
 
 							if(empty($id)){
-								$sql  ="INSERT INTO pw_wordfb (word,wordreplace,type,wordtime,classid,custom) VALUES (".pwEscape($word).", '*****', ".pwEscape($type).", ".pwEscape($wordtime).", ".pwEscape($class).", 1)";
+								$sql  ="INSERT INTO pw_wordfb (word,wordreplace,type,wordtime,classid,custom) VALUES (".S::sqlEscape($word).", '*****', ".S::sqlEscape($type).", ".S::sqlEscape($wordtime).", ".S::sqlEscape($class).", 1)";
 								$db->update($sql);
 								$success++;
 							} else {
@@ -666,12 +666,12 @@ EOT;
 				} else{
 					adminmsg('upload_error');
 				}
-				P_unlink($source);
+				pwCache::deleteData($source);
 			}
 
 		} else {
 			define('AJAX', 1);
-			InitGP(array('class'));
+			S::gp(array('class'));
 			$class = (int) $class;
 
 			$classdb = array();
@@ -688,23 +688,23 @@ EOT;
 		}
 	} elseif ($job == 'importshow') {//显示导入结果
 		define('AJAX', 1);
-		InitGP(array('success', 'fail'));
+		S::gp(array('success', 'fail'));
 	    include_once PrintEot('filterAjax');
 	    ajax_footer();
 	} elseif ($job == 'export') {//导出词库
 		if ($step == 2) {
-			InitGP(array('class', 'dict_name'));
+			S::gp(array('class', 'dict_name'));
 			$class = (int) $class;
 
 			if (intval($class) > 0) {
-				$sql = "SELECT word, type FROM pw_wordfb WHERE classid=".pwEscape($class);
+				$sql = "SELECT word, type FROM pw_wordfb WHERE classid=".S::sqlEscape($class);
 				$query = $db->query($sql);
 				while($rt = $db->fetch_array($query)){
 					$words .= $rt['word']."|".$rt['type']."\r\n";
 				}
 			} else {
 				$classid = getCloseClass();
-				$classid = pwImplode($classid);
+				$classid = S::sqlImplode($classid);
 
 				$sql = "SELECT word, type FROM pw_wordfb WHERE classid NOT IN ($classid) ";
 				$query = $db->query($sql);
@@ -727,22 +727,22 @@ EOT;
 			echo $words;exit;
 		} else {
 			define('AJAX', 1);
-			InitGP(array('class'));
+			S::gp(array('class'));
 			$class = (int) $class;
 
 			if ($class > 0) {
 				//获取分类名
-				$sql = "SELECT title FROM pw_filter_class WHERE id=".pwEscape($class);
+				$sql = "SELECT title FROM pw_filter_class WHERE id=".S::sqlEscape($class);
 				$title = $db->get_value($sql);
 
 				//获取该分类敏感词总数
-				$sql = "SELECT COUNT(*) AS count FROM pw_wordfb WHERE classid=".pwEscape($class);
+				$sql = "SELECT COUNT(*) AS count FROM pw_wordfb WHERE classid=".S::sqlEscape($class);
 				$count = $db->get_value($sql);
 			} else {
 				$title = getLangInfo('cpmsg','filter_all_word');
 
 				$classid = getCloseClass();
-				$classid = pwImplode($classid);
+				$classid = S::sqlImplode($classid);
 
 				//获取该分类敏感词总数
 				$sql = "SELECT COUNT(*) AS count FROM pw_wordfb WHERE classid NOT IN ($classid) ";
@@ -757,7 +757,7 @@ EOT;
 		}
 	} elseif ($job == "switch") {//开启/关闭分类
 		if ($step == 2) {
-			InitGP(array('class', 'state'));
+			S::gp(array('class', 'state'));
 
 			if ($class > 0) {
 				//更改分类状态
@@ -768,12 +768,12 @@ EOT;
 			}
 		} else {
 			define('AJAX', 1);
-			InitGP(array('class'));
+			S::gp(array('class'));
 			$class = (int) $class;
 
 			if ($class > 0) {
 				//获取分类名
-				$sql = "SELECT title,state FROM pw_filter_class WHERE id=".pwEscape($class);
+				$sql = "SELECT title,state FROM pw_filter_class WHERE id=".S::sqlEscape($class);
 				$filter_class = $db->get_one($sql);
 				$title  = $filter_class['title'];
 				$state  = $filter_class['state'];
@@ -783,7 +783,7 @@ EOT;
 
 
 				//获取该分类敏感词总数
-				$sql = "SELECT COUNT(*) AS count FROM pw_wordfb WHERE classid=".pwEscape($class);
+				$sql = "SELECT COUNT(*) AS count FROM pw_wordfb WHERE classid=".S::sqlEscape($class);
 				$count = $db->get_value($sql);
 			} else {
 				ajaxmsg('filter_class_state');
@@ -801,7 +801,7 @@ EOT;
 
 	if ($job == 'go') {
 		define('AJAX', 1);
-		InitGP(array('fid', 'restart', 'result'));
+		S::gp(array('fid', 'restart', 'result'));
 
 		# 如果没有敏感词,则不扫描
 		$sql = "SELECT COUNT(*) AS count FROM pw_wordfb";
@@ -833,7 +833,7 @@ EOT;
 		showScan($progress);
 		ajax_footer();
 	} else {
-		InitGP(array('skip'));
+		S::gp(array('skip'));
 		$cachetime = $db_wordsfb_cachetime + 3600;
 		if ($timestamp > $cachetime) {
 			$cache    = setScanCache();
@@ -841,7 +841,7 @@ EOT;
 			$threaddb = unserialize($cache['threaddb']);
 		} else {
 			# 读取缓存
-			require_once(D_P.'data/bbscache/wordsfb_progress.php');
+			require_once pwCache::getPath(D_P.'data/bbscache/wordsfb_progress.php');
 			$catedb   = unserialize($catedb);
 			$threaddb = unserialize($threaddb);
 		}
@@ -874,7 +874,7 @@ EOT;
 		include_once PrintEot('filter');
 	}
 } elseif ($action == 'check') {
-	InitGP(array('sort'));
+	S::gp(array('sort'));
 
 	if(!$sort) $sort = 'pf.id DESC';
 	if (empty($job)) {
@@ -883,7 +883,7 @@ EOT;
 		$count = $db->get_value("SELECT COUNT(*) FROM pw_filter WHERE state=0 AND tid>0 AND pid=0");
 		$page_count = ceil($count/$db_perpage);
 		if ($page > $page_count) $page = $page_count;
-		$limit = pwLimit(($page-1)*$db_perpage,$db_perpage);
+		$limit = S::sqlLimit(($page-1)*$db_perpage,$db_perpage);
 		$pages = numofpage($count,$page,$page_count, "$basename&action=check&");
 
 		$sql = "SELECT pf.id,pf.created_at,pf.filter,pf.tid,pf.pid,pt.subject,pt.author,pt.postdate "
@@ -900,7 +900,7 @@ EOT;
 		$count = $db->get_value("SELECT COUNT(*) FROM pw_filter WHERE state=0 AND tid>0 AND pid>0");
 		$page_count = ceil($count/$db_perpage);
 		if ($page > $page_count) $page = $page_count;
-		$limit = pwLimit(($page-1)*$db_perpage,$db_perpage);
+		$limit = S::sqlLimit(($page-1)*$db_perpage,$db_perpage);
 		$pages = numofpage($count,$page,$page_count, "$basename&action=check&job=post&");
 
 		$sql = "SELECT pf.*,pt.subject,pt.ptable FROM pw_filter AS pf "
@@ -913,13 +913,13 @@ EOT;
 			$check_list[] = $rt;
 		}
 	} elseif ($job == 'pass') {
-		InitGP(array('pid', 'tid', 'type'));
+		S::gp(array('pid', 'tid', 'type'));
 
 		if (!$tid && !$pid) adminmsg('operate_error');
 
 		if (!$type || $type == 'thread') {
 			if (is_array($tid)) {
-				$sTid = pwImplode($tid);
+				$sTid = S::sqlImplode($tid);
 			} else {
 				$sTid = (int)$tid;
 			}
@@ -948,26 +948,26 @@ EOT;
 			}
 
 			foreach ($fids as $key => $value) {
-				$tids = pwImplode($value);
+				$tids = S::sqlImplode($value);
 				$sql = "SELECT COUNT(*) FROM pw_threads WHERE ifcheck=0 AND tid IN (".$tids.")";
 				$num = $db->get_value($sql);
 
-				$sql = "UPDATE pw_forumdata SET article=article+".pwEscape($num,false).",topic=topic+".pwEscape($num,false)."WHERE fid=".pwEscape($key);
+				$sql = "UPDATE pw_forumdata SET article=article+".S::sqlEscape($num,false).",topic=topic+".S::sqlEscape($num,false)."WHERE fid=".S::sqlEscape($key);
 				$db->update($sql);
 			}
 
 			//更改帖子状态
-			$sql = "UPDATE pw_threads SET ifcheck=1 WHERE tid IN (".$sTid.")";
-			$db->update($sql);
+			//$sql = "UPDATE pw_threads SET ifcheck=1 WHERE tid IN (".$sTid.")";
+			pwQuery::update('pw_threads', 'tid IN (:tid)', array($tid), array('ifcheck'=>1));
 			foreach (array_keys($ttable) as $pw_tmsgs) {
-				$sql = "UPDATE $pw_tmsgs SET ifwordsfb='$db_wordsfb' WHERE tid IN (".$sTid.")";
-				$db->update($sql);
+				//* $sql = "UPDATE $pw_tmsgs SET ifwordsfb='$db_wordsfb' WHERE tid IN (".$sTid.")";
+				pwQuery::update($pw_tmsgs, 'tid IN (:tid)', array($tid), array('ifwordsfb'=>$db_wordsfb));
 			}
-
+		
 			$filter_id = implode(',' , $objid);
 			if ($filter_id) {
 				//更改审核状态,更新审核人员信息
-				$sql = "UPDATE pw_filter SET state=1,assessor=". pwEscape($admin_name) .",updated_at=".pwEscape($timestamp) ." WHERE id IN (".$filter_id.")";
+				$sql = "UPDATE pw_filter SET state=1,assessor=". S::sqlEscape($admin_name) .",updated_at=".S::sqlEscape($timestamp) ." WHERE id IN (".$filter_id.")";
 				$db->update($sql);
 			}
 
@@ -984,10 +984,10 @@ EOT;
 				$objid = array_keys($pid);
 			} else {
 				$selid = (int)$pid;
-				$objid[] = GetGP('id');
+				$objid[] = S::getGP('id');
 			}
 
-			$ptable = GetGP('ptable');
+			$ptable = S::getGP('ptable');
 
 			if (is_array($ptable)) {
 				if ($db_plist && count($db_plist)>1) {
@@ -1018,7 +1018,7 @@ EOT;
 						$toUser[] = $post['author'];
 					}
 
-					$sql = "SELECT subject FROM pw_threads WHERE tid =".pwEscape($tid);
+					$sql = "SELECT subject FROM pw_threads WHERE tid =".S::sqlEscape($tid);
 					$subject = $db->get_value($sql);
 
 					M::sendNotice(
@@ -1035,41 +1035,43 @@ EOT;
 				foreach ($fids as $fid => $value) {
 					$forum_count = 0;
 					foreach ($value as $tid => $value) {
-						$pids = pwImplode($value);
+						$pids = S::sqlImplode($value);
 						# 获取主题下要审核通过的回复数量
 						$sql = "SELECT COUNT(*) FROM $pw_posts WHERE ifcheck=0 AND pid IN (".$pids.")";
 						$num = $db->get_value($sql);
 						$forum_count += $num;
 
 						# 获取主题下最后回复信息
-						$sql = "SELECT postdate,author FROM $pw_posts WHERE tid=" . pwEscape($tid) . " ORDER BY postdate DESC LIMIT 1";
+						$sql = "SELECT postdate,author FROM $pw_posts WHERE tid=" . S::sqlEscape($tid) . " ORDER BY postdate DESC LIMIT 1";
 						$last = $db->get_one($sql);
 
 						# 更新主题的回复数,最后回复信息
-						$sql = "UPDATE pw_threads SET replies=replies+".pwEscape($num) . ",lastpost=" . pwEscape($last['postdate'],false) . ",lastposter =" . pwEscape($last['author'],false) . "WHERE tid=" . pwEscape($tid);
+						//$sql = "UPDATE pw_threads SET replies=replies+".S::sqlEscape($num) . ",lastpost=" . S::sqlEscape($last['postdate'],false) . ",lastposter =" . S::sqlEscape($last['author'],false) . "WHERE tid=" . S::sqlEscape($tid);
+						$sql= pwQuery::buildClause('UPDATE :pw_table SET replies = replies + :replies, lastpost = :lastpost, lastposter = :lastposter WHERE tid = :tid', array('pw_threads', $num, $last['postdate'], $last['author'], $tid));
 						$db->update($sql);
 
 						# memcache refresh
-						$threadList = L::loadClass("threadlist", 'forum');
-						$threadList->updateThreadIdsByForumId($fid,$tid);
+						// $threadList = L::loadClass("threadlist", 'forum');
+						// $threadList->updateThreadIdsByForumId($fid,$tid);
+						Perf::gatherInfo('changeThreadWithForumIds', array('fid'=>$fid));						
 					}
 
 					# 更新版块帖子个数
-					$sql = "UPDATE pw_forumdata SET article=article+".pwEscape($forum_count)." WHERE fid=".pwEscape($fid);
+					$sql = "UPDATE pw_forumdata SET article=article+".S::sqlEscape($forum_count)." WHERE fid=".S::sqlEscape($fid);
 					$db->update($sql);
 				}
 				# 更新回复表的更新系数
 				$db->update("UPDATE $pw_posts SET ifcheck='1',ifwordsfb='$db_wordsfb' WHERE pid IN($selid)");
 
 				/*foreach ($tids as $key => $value) {
-					$rt = $db->get_one("SELECT postdate,author FROM $pw_posts WHERE tid=" . pwEscape($key) . " ORDER BY postdate DESC LIMIT 1");
-					$db->update("UPDATE pw_threads SET replies=replies+".pwEscape($value) . ",lastpost=" . pwEscape($rt['postdate'],false) . ",lastposter =" . pwEscape($rt['author'],false) . "WHERE tid=" . pwEscape($key));
+					$rt = $db->get_one("SELECT postdate,author FROM $pw_posts WHERE tid=" . S::sqlEscape($key) . " ORDER BY postdate DESC LIMIT 1");
+					$db->update("UPDATE pw_threads SET replies=replies+".S::sqlEscape($value) . ",lastpost=" . S::sqlEscape($rt['postdate'],false) . ",lastposter =" . S::sqlEscape($rt['author'],false) . "WHERE tid=" . S::sqlEscape($key));
 					# memcache refresh
 					$threadList = L::loadClass("threadlist", 'forum');
 					$threadList->updateThreadIdsByForumId($fid,$tid);
 				}
 				foreach ($fids as $key => $value) {
-					$db->update("UPDATE pw_forumdata SET article=article+".pwEscape($value).",tpost=tpost+".pwEscape($value,false)."WHERE fid=".pwEscape($key));
+					$db->update("UPDATE pw_forumdata SET article=article+".S::sqlEscape($value).",tpost=tpost+".S::sqlEscape($value,false)."WHERE fid=".S::sqlEscape($key));
 				}
 				$db->update("UPDATE $pw_posts SET ifcheck='1',ifwordsfb='$db_wordsfb' WHERE pid IN($selid)");*/
 			}
@@ -1077,7 +1079,7 @@ EOT;
 			$filter_id = implode(',' , $objid);
 			if ($filter_id) {
 				//更改审核状态,更新审核人员信息
-				$sql = "UPDATE pw_filter SET state=1,assessor=". pwEscape($admin_name) .",updated_at=".pwEscape($timestamp) ." WHERE id IN (".$filter_id.")";
+				$sql = "UPDATE pw_filter SET state=1,assessor=". S::sqlEscape($admin_name) .",updated_at=".S::sqlEscape($timestamp) ." WHERE id IN (".$filter_id.")";
 				$db->update($sql);
 			}
 
@@ -1085,7 +1087,7 @@ EOT;
 			adminmsg('operate_success', "$basename" . "&action=check&job=post");
 		}
 	} elseif ($job == 'allpass') {
-		InitGP(array('type', 'step'));
+		S::gp(array('type', 'step'));
 		if ($step == 2) {
 			if (!$type || $type == 'thread') {
 				$ttable = array();
@@ -1113,31 +1115,31 @@ EOT;
 				}
 
 				foreach ($fids as $key => $value) {
-					$tids = pwImplode($value['tid']);
+					$tids = S::sqlImplode($value['tid']);
 					if ($tids) {
 						$sql = "SELECT COUNT(*) FROM pw_threads WHERE ifcheck=0 AND tid IN (".$tids.")";
 						$num = $db->get_value($sql);
 
-						$db->update("UPDATE pw_forumdata SET article=article+".pwEscape($num).",topic=topic+".pwEscape($num,false)."WHERE fid=".pwEscape($key));
+						$db->update("UPDATE pw_forumdata SET article=article+".S::sqlEscape($num).",topic=topic+".S::sqlEscape($num,false)."WHERE fid=".S::sqlEscape($key));
 					}
 				}
 
-
-				$sTid = pwImplode($sTid);
+				$tmpStid = $sTid;
+				$sTid = S::sqlImplode($sTid);
 				//更改帖子状态
 				if ($sTid) {
-					$sql = "UPDATE pw_threads SET ifcheck=1 WHERE tid IN (".$sTid.")";
-					$db->update($sql);
+					//$sql = "UPDATE pw_threads SET ifcheck=1 WHERE tid IN (".$sTid.")";
+					pwQuery::update('pw_threads', 'tid IN (:tid)', array($tmpStid), array('ifcheck'=>1));
 					foreach (array_keys($ttable) as $pw_tmsgs) {
-						$sql = "UPDATE $pw_tmsgs SET ifwordsfb='$db_wordsfb' WHERE tid IN (".$sTid.")";
-						$db->update($sql);
+						//* $sql = "UPDATE $pw_tmsgs SET ifwordsfb='$db_wordsfb' WHERE tid IN (".$sTid.")";
+						pwQuery::update($pw_tmsgs, 'tid IN (:tid)', array($tmpStid), array('ifwordsfb'=>$db_wordsfb));
 					}
 				}
 
-				$filter_id = pwImplode($objid);
+				$filter_id = S::sqlImplode($objid);
 				if ($filter_id) {
 					//更改审核状态,更新审核人员信息
-					$sql = "UPDATE pw_filter SET state=1,assessor=". pwEscape($admin_name) .",updated_at=".pwEscape($timestamp) ." WHERE id IN (".$filter_id.")";
+					$sql = "UPDATE pw_filter SET state=1,assessor=". S::sqlEscape($admin_name) .",updated_at=".S::sqlEscape($timestamp) ." WHERE id IN (".$filter_id.")";
 					$db->update($sql);
 				}
 
@@ -1187,7 +1189,7 @@ EOT;
 							$toUser[] = $post['author'];
 						}
 
-						$sql = "SELECT subject FROM pw_threads WHERE tid =".pwEscape($tid);
+						$sql = "SELECT subject FROM pw_threads WHERE tid =".S::sqlEscape($tid);
 						$subject = $db->get_value($sql);
 
 						$return = M::sendNotice(
@@ -1204,27 +1206,29 @@ EOT;
 					foreach ($fids as $fid => $value) {
 						$forum_count = 0;
 						foreach ($value as $tid => $value) {
-							$pids = pwImplode($value);
+							$pids = S::sqlImplode($value);
 							# 获取主题下要审核通过的回复数量
 							$sql = "SELECT COUNT(*) FROM $pw_posts WHERE ifcheck=0 AND pid IN (".$pids.")";
 							$num = $db->get_value($sql);
 							$forum_count += $num;
 
 							# 获取主题下最后回复信息
-							$sql = "SELECT postdate,author FROM $pw_posts WHERE tid=" . pwEscape($tid) . " ORDER BY postdate DESC LIMIT 1";
+							$sql = "SELECT postdate,author FROM $pw_posts WHERE tid=" . S::sqlEscape($tid) . " ORDER BY postdate DESC LIMIT 1";
 							$last = $db->get_one($sql);
 
 							# 更新主题的回复数,最后回复信息
-							$sql = "UPDATE pw_threads SET replies=replies+".pwEscape($num) . ",lastpost=" . pwEscape($last['postdate'],false) . ",lastposter =" . pwEscape($last['author'],false) . "WHERE tid=" . pwEscape($tid);
+							//$sql = "UPDATE pw_threads SET replies=replies+".S::sqlEscape($num) . ",lastpost=" . S::sqlEscape($last['postdate'],false) . ",lastposter =" . S::sqlEscape($last['author'],false) . "WHERE tid=" . S::sqlEscape($tid);
+							$sql = pwQuery::buildClause('UPDATE :pw_table SET replies = replies + :replies, lastpost = :lastpost, lastposter = :lastposter WHERE tid = :tid', array('pw_threads', $num, $last['postdate'], $last['author'], $tid));
 							$db->update($sql);
 
 							# memcache refresh
-							$threadList = L::loadClass("threadlist", 'forum');
-							$threadList->updateThreadIdsByForumId($fid,$tid);
+							// $threadList = L::loadClass("threadlist", 'forum');
+							// $threadList->updateThreadIdsByForumId($fid,$tid);
+							Perf::gatherInfo('changeThreadWithForumIds', array('fid'=>$fid));						
 						}
 
 						# 更新版块帖子个数
-						$sql = "UPDATE pw_forumdata SET article=article+".pwEscape($forum_count)." WHERE fid=".pwEscape($fid);
+						$sql = "UPDATE pw_forumdata SET article=article+".S::sqlEscape($forum_count)." WHERE fid=".S::sqlEscape($fid);
 						$db->update($sql);
 					}
 					# 更新回复表的更新系数
@@ -1234,7 +1238,7 @@ EOT;
 				$filter_id = implode(',' , $pid);
 				if ($filter_id) {
 					//更改审核状态,更新审核人员信息
-					$sql = "UPDATE pw_filter SET state=1,assessor=". pwEscape($admin_name) .",updated_at=".pwEscape($timestamp) ." WHERE pid IN (".$filter_id.")";
+					$sql = "UPDATE pw_filter SET state=1,assessor=". S::sqlEscape($admin_name) .",updated_at=".S::sqlEscape($timestamp) ." WHERE pid IN (".$filter_id.")";
 					$db->update($sql);
 				}
 
@@ -1264,7 +1268,7 @@ EOT;
 			ajax_footer();
 		}
 	} elseif ($job == 'del') {
-		InitGP(array('pid', 'tid', 'type'));
+		S::gp(array('pid', 'tid', 'type'));
 
 		if (!$tid && !$pid) adminmsg('operate_error', "$basename" . "&action=check");
 
@@ -1272,7 +1276,7 @@ EOT;
 
 		if (!$type || $type == 'thread') {
 			if (is_array($tid)) {
-				$sTid = pwImplode($tid);
+				$sTid = S::sqlImplode($tid);
 			} else {
 				$sTid = (int) $tid;
 			}
@@ -1320,7 +1324,7 @@ EOT;
 			$delarticle->delTopicByTids($threadsid, $db_recycle);
 
 			//更改审核状态,更新审核人员信息
-			$sql = "UPDATE pw_filter SET state=2,assessor=". pwEscape($admin_name) .",updated_at=".pwEscape($timestamp) ." WHERE id IN (".$filter_id.")";
+			$sql = "UPDATE pw_filter SET state=2,assessor=". S::sqlEscape($admin_name) .",updated_at=".S::sqlEscape($timestamp) ." WHERE id IN (".$filter_id.")";
 			$db->update($sql);
 
 			//重定向
@@ -1339,7 +1343,7 @@ EOT;
 				$objid = (int)$pid;
 			}
 
-			$ptable = GetGP('ptable');
+			$ptable = S::getGP('ptable');
 
 			if (is_array($ptable)) {
 				if ($db_plist && count($db_plist)>1) {
@@ -1369,27 +1373,29 @@ EOT;
 				foreach ($fids as $fid => $value) {
 					$forum_count = 0;
 					foreach ($value as $tid => $value) {
-						$pids = pwImplode($value);
+						$pids = S::sqlImplode($value);
 						# 获取主题下要审核通过的回复数量
 						$sql = "SELECT COUNT(*) FROM $pw_posts WHERE ifcheck=1 AND pid IN (".$pids.")";
 						$num = $db->get_value($sql);
 						$forum_count += $num;
 
 						# 获取主题下最后回复信息
-						$sql = "SELECT postdate,author FROM $pw_posts WHERE tid=" . pwEscape($tid) . " AND pid NOT IN (".$pids.") ORDER BY postdate DESC LIMIT 1";
+						$sql = "SELECT postdate,author FROM $pw_posts WHERE tid=" . S::sqlEscape($tid) . " AND pid NOT IN (".$pids.") ORDER BY postdate DESC LIMIT 1";
 						$last = $db->get_one($sql);
 
 						# 更新主题的回复数,最后回复信息
-						$sql = "UPDATE pw_threads SET replies=replies-".pwEscape($num) . ",lastpost=" . pwEscape($last['postdate'],false) . ",lastposter =" . pwEscape($last['author'],false) . "WHERE tid=" . pwEscape($tid);
+						//$sql = "UPDATE pw_threads SET replies=replies-".S::sqlEscape($num) . ",lastpost=" . S::sqlEscape($last['postdate'],false) . ",lastposter =" . S::sqlEscape($last['author'],false) . "WHERE tid=" . S::sqlEscape($tid);
+						$sql = pwQuery::buildClause('UPDATE :pw_table SET replies = replies - :replies, lastpost = :lastpost, lastposter = :lastposter WHERE tid = :tid', array('pw_threads', $num, $last['postdate'], $last['author'], $tid));
 						$db->update($sql);
 
 						# memcache refresh
-						$threadList = L::loadClass("threadlist", 'forum');
-						$threadList->updateThreadIdsByForumId($fid,$tid);
+						// $threadList = L::loadClass("threadlist", 'forum');
+						// $threadList->updateThreadIdsByForumId($fid,$tid);
+						Perf::gatherInfo('changeThreadWithForumIds', array('fid'=>$fid));						
 					}
 
 					# 更新版块文章数
-					$sql = "UPDATE pw_forumdata SET article=article-".pwEscape($forum_count)." WHERE fid=".pwEscape($fid);
+					$sql = "UPDATE pw_forumdata SET article=article-".S::sqlEscape($forum_count)." WHERE fid=".S::sqlEscape($fid);
 					$db->update($sql);
 				}
 
@@ -1399,7 +1405,7 @@ EOT;
 						$toUser[] = $post['author'];
 					}
 
-					$sql = "SELECT subject FROM pw_threads WHERE tid =".pwEscape($tid);
+					$sql = "SELECT subject FROM pw_threads WHERE tid =".S::sqlEscape($tid);
 					$subject = $db->get_value($sql);
 
 					M::sendNotice(
@@ -1420,7 +1426,7 @@ EOT;
 				$filter_id = implode(',' , $objid);
 				if ($filter_id) {
 					//更改审核状态,更新审核人员信息
-					$sql = "UPDATE pw_filter SET state=2,assessor=". pwEscape($admin_name) .",updated_at=".pwEscape($timestamp) ." WHERE id IN (".$filter_id.")";
+					$sql = "UPDATE pw_filter SET state=2,assessor=". S::sqlEscape($admin_name) .",updated_at=".S::sqlEscape($timestamp) ." WHERE id IN (".$filter_id.")";
 					$db->update($sql);
 				}
 			} else {
@@ -1428,7 +1434,7 @@ EOT;
 
 				if ($filter_id) {
 					//更改审核状态,更新审核人员信息
-					$sql = "UPDATE pw_filter SET state=2,assessor=". pwEscape($admin_name) .",updated_at=".pwEscape($timestamp) ." WHERE pid IN (".$filter_id.")";
+					$sql = "UPDATE pw_filter SET state=2,assessor=". S::sqlEscape($admin_name) .",updated_at=".S::sqlEscape($timestamp) ." WHERE pid IN (".$filter_id.")";
 					$db->update($sql);
 				}
 			}
@@ -1440,7 +1446,7 @@ EOT;
 	include_once PrintEot('filter');exit;
 } elseif ($action == 'record') {
 	if ($admin_gid == 3){
-		InitGP(array('sort'));
+		S::gp(array('sort'));
 
 		if(!$sort) $sort = 'pf.updated_at';
 		if (empty($job)) {
@@ -1448,7 +1454,7 @@ EOT;
 			$count = $db->get_value("SELECT COUNT(*) FROM pw_filter WHERE state>0 AND tid>0 AND pid=0");
 			$page_count = ceil($count/$db_perpage);
 			if ($page > $page_count) $page = $page_count;
-			$limit = pwLimit(($page-1)*$db_perpage,$db_perpage);
+			$limit = S::sqlLimit(($page-1)*$db_perpage,$db_perpage);
 			$pages = numofpage($count,$page,$page_count, "$basename&action=record&");
 
 			$sql = "SELECT pf.*,pt.subject, pt.author FROM pw_filter AS pf LEFT JOIN pw_threads AS pt ON pf.tid = pt.tid WHERE pf.state>0 AND pf.tid>0 AND pf.pid=0 ORDER BY $sort DESC $limit";
@@ -1464,7 +1470,7 @@ EOT;
 			$count = $db->get_value("SELECT COUNT(*) FROM pw_filter WHERE state>0 AND pid>0");
 			$page_count = ceil($count/$db_perpage);
 			if ($page > $page_count) $page = $page_count;
-			$limit = pwLimit(($page-1)*$db_perpage,$db_perpage);
+			$limit = S::sqlLimit(($page-1)*$db_perpage,$db_perpage);
 			$pages = numofpage($count,$page,$page_count, "$basename&action=record&job=post&");
 
 			$sql = "SELECT pf.*,pt.subject FROM pw_filter AS pf LEFT JOIN pw_threads AS pt ON pf.tid = pt.tid WHERE pf.state>0 AND pf.pid>0 ORDER BY $sort DESC  $limit";
@@ -1482,20 +1488,20 @@ EOT;
 	}
 } elseif ($action == 'show') {
 	define('AJAX', 1);
-	InitGP(array('pid', 'tid', 'type'));
+	S::gp(array('pid', 'tid', 'type'));
 
 	if ($pid > 0 && $tid > 0){
 		$job = 'post';
 		# 回复
-		$sql = "SELECT ptable FROM pw_threads WHERE tid = ". pwEscape($tid);
+		$sql = "SELECT ptable FROM pw_threads WHERE tid = ". S::sqlEscape($tid);
 		$ptable = $db->get_value($sql);
 		$pw_posts = GetPtable($ptable);
-		$objid = $db->get_value("SELECT id FROM pw_filter WHERE pid=" . pwEscape($pid). " AND tid=" . pwEscape($tid));
+		$objid = $db->get_value("SELECT id FROM pw_filter WHERE pid=" . S::sqlEscape($pid). " AND tid=" . S::sqlEscape($tid));
 		//获取回复帖信息
-		$sql = "SELECT pt.tid, pt.subject, pp.pid, pp.author, pp.postdate, pp.content FROM $pw_posts AS pp LEFT JOIN pw_threads AS pt ON pp.tid = pt.tid WHERE pp.pid=" . pwEscape($pid). " AND pt.tid=" . pwEscape($tid);
+		$sql = "SELECT pt.tid, pt.subject, pp.pid, pp.author, pp.postdate, pp.content FROM $pw_posts AS pp LEFT JOIN pw_threads AS pt ON pp.tid = pt.tid WHERE pp.pid=" . S::sqlEscape($pid). " AND pt.tid=" . S::sqlEscape($tid);
 		$content = $db->get_one($sql);
 		if(!$content && $objid) {
-			$sql = "DELETE FROM pw_filter WHERE pid=" . pwEscape($pid). " AND tid=" . pwEscape($tid);
+			$sql = "DELETE FROM pw_filter WHERE pid=" . S::sqlEscape($pid). " AND tid=" . S::sqlEscape($tid);
 			$db->update($sql);
 
 			ajaxmsg('filtermsg_post_already_delete', "$basename&action=$type&job=post");exit;
@@ -1509,7 +1515,7 @@ EOT;
 		$pw_tmsgs = GetTtable($tid);
 
 		//获取主题帖信息
-		$sql = "SELECT pt.tid, pt.author, pt.subject, pt.postdate, pc.content FROM pw_threads AS pt LEFT JOIN $pw_tmsgs AS pc ON pt.tid = pc.tid WHERE pt.tid=" . pwEscape($tid);
+		$sql = "SELECT pt.tid, pt.author, pt.subject, pt.postdate, pc.content FROM pw_threads AS pt LEFT JOIN $pw_tmsgs AS pc ON pt.tid = pc.tid WHERE pt.tid=" . S::sqlEscape($tid);
 		$content = $db->get_one($sql);
 		$content['subject'] = showHightLight($content['subject']);
 		$content['content'] = showHightLight($content['content']);
@@ -1543,14 +1549,14 @@ EOT;
 			ajax_footer();
 		} else {
 			define('AJAX', 1);
-			InitGP(array('state','class','newclass'));
+			S::gp(array('state','class','newclass'));
 
 			//插入新分类
 			if ($newclass) {
 				$class = newClass($newclass);
 			}
 
-			$class_title = $db->get_value("SELECT title FROM pw_filter_class WHERE id=".pwEscape($class));
+			$class_title = $db->get_value("SELECT title FROM pw_filter_class WHERE id=".S::sqlEscape($class));
 
 			//更改分类状态
 			setClassState($class, $state);
@@ -1575,10 +1581,10 @@ EOT;
 				$i = 0;
 				foreach($content as $key => $value){
 					if($value['word']){
-						$id = $db->get_value("SELECT id FROM pw_wordfb WHERE word=".pwEscape($value['word']));
+						$id = $db->get_value("SELECT id FROM pw_wordfb WHERE word=".S::sqlEscape($value['word']));
 
 						if(empty($id)){
-							$sql  ="INSERT INTO pw_wordfb (word,wordreplace,type,wordtime,classid) VALUES (".pwEscape($value['word']) .", '*****', ".pwEscape($center_level[$value['level']]) .", ".pwEscape($timestamp) .", ".pwEscape($class) ." )";
+							$sql  ="INSERT INTO pw_wordfb (word,wordreplace,type,wordtime,classid) VALUES (".S::sqlEscape($value['word']) .", '*****', ".S::sqlEscape($center_level[$value['level']]) .", ".S::sqlEscape($timestamp) .", ".S::sqlEscape($class) ." )";
 							$db->update($sql);
 
 							$list[] = array('word' => $value['word'], 'level' => $center_level[$value['level']]);
@@ -1692,7 +1698,7 @@ function Clear()
 	$query = $db->query($sql);
 	while ($rt = $db->fetch_array($query)) {
 		if (!$rt['tid']) {
-			$sql = "DELETE FROM pw_filter WHERE id=".pwEscape($rt['id']);
+			$sql = "DELETE FROM pw_filter WHERE id=".S::sqlEscape($rt['id']);
 			$db->update($sql);
 		}
 	}
@@ -1771,12 +1777,12 @@ function setAllDictionary()
 	$source_file = D_P.'data/bbscache/dict_all.txt';
 
 	if(!file_exists($bin_file) && !file_exists($source_file)) {
-		writeover($source_file, '');//文本形式字典
-		writeover($bin_file,'');//二进制字典
+		pwCache::setData($source_file, '');//文本形式字典
+		pwCache::setData($bin_file,'');//二进制字典
 	}
 
 	$classid = getCloseClass();
-	$classid = pwImplode($classid);
+	$classid = S::sqlImplode($classid);
 
 	$querys = $db->query("SELECT word, type FROM pw_wordfb WHERE classid NOT IN ($classid)");
 	$content = "";
@@ -1785,8 +1791,8 @@ function setAllDictionary()
 	  	$content.="".$value['word']."|".$weighing."\r\n";
 	}
 
-	writeover($source_file, $content);//文本形式字典
-	writeover($bin_file,'');//二进制字典
+	pwCache::setData($source_file, $content);//文本形式字典
+	pwCache::setData($bin_file,'');//二进制字典
 
 	//更新二进制字典
 	$trie = new Trie();
@@ -1825,14 +1831,14 @@ function newClass($title)
 	global $db;
 
 	//判断是否有重复分类
-	$sql = " SELECT id FROM pw_filter_class WHERE title = " . pwEscape($title);
+	$sql = " SELECT id FROM pw_filter_class WHERE title = " . S::sqlEscape($title);
 	$num = $db->get_one($sql);
 
 	if ($num) {
 		return 0;
 	} else {
 		//插入分类
-		$sql = "INSERT pw_filter_class SET state=1,title = " . pwEscape($title);
+		$sql = "INSERT pw_filter_class SET state=1,title = " . S::sqlEscape($title);
 		$db->update($sql);
 
 		return $db->insert_id();
@@ -1850,11 +1856,11 @@ function delClass($class)
 
 	if ($class > 0) {
 		//删除分类
-		$sql = "DELETE FROM pw_filter_class WHERE id=".pwEscape($class);
+		$sql = "DELETE FROM pw_filter_class WHERE id=".S::sqlEscape($class);
 		$query = $db->update($sql);
 
 		//删除分类下的敏感词
-		$sql = "DELETE FROM pw_wordfb WHERE classid=".pwEscape($class);
+		$sql = "DELETE FROM pw_wordfb WHERE classid=".S::sqlEscape($class);
 		$query = $db->update($sql);
 	} elseif ($class == 0) {
 		//清空敏感词
@@ -1875,7 +1881,7 @@ function insertWord($word, $type, $class, $repword = '*****')
 {
 	global $db;
 	$wordtime = mktime(0,0,0,date("m"),date("d"),date("Y"));
-	$insertValue = ','.pwEscape($type).','.pwEscape($class).','.pwEscape($repword).','.pwEscape($wordtime).', 1';
+	$insertValue = ','.S::sqlEscape($type).','.S::sqlEscape($class).','.S::sqlEscape($repword).','.S::sqlEscape($wordtime).', 1';
 
 	if (is_array($word)) {
 		$sql = "INSERT INTO pw_wordfb (word, type, classid, wordreplace, wordtime, custom) VALUES";
@@ -1883,7 +1889,7 @@ function insertWord($word, $type, $class, $repword = '*****')
 		$sqlStr = '';
 		foreach ($word as $value) {
 			if ($value) {
-				$sqlStr .= $sqlStr ? ", (".pwEscape($value).$insertValue.")" : "(".pwEscape($value).$insertValue.")";
+				$sqlStr .= $sqlStr ? ", (".S::sqlEscape($value).$insertValue.")" : "(".S::sqlEscape($value).$insertValue.")";
 			}
 		}
 		$sql = $sql.$sqlStr;
@@ -1898,7 +1904,7 @@ function insertWord($word, $type, $class, $repword = '*****')
 		);
 
 		$sql = "INSERT INTO pw_wordfb"
-			 . " SET " . pwSqlSingle($value);
+			 . " SET " . S::sqlSingle($value);
 		$db->update($sql);
 	}
 }
@@ -1911,7 +1917,7 @@ function insertWord($word, $type, $class, $repword = '*****')
  */
 function setClassState($class, $state) {
 	global $db;
-	$sql = "UPDATE pw_filter_class SET state=".pwEscape($state)." WHERE id=".pwEscape($class);;
+	$sql = "UPDATE pw_filter_class SET state=".S::sqlEscape($state)." WHERE id=".S::sqlEscape($class);;
 	$db->update($sql);
 
 	//更新缓存
@@ -1940,7 +1946,7 @@ function setScanCache()
 
 	if(file_exists(D_P.'data/bbscache/wordsfb_progress.php')) {
 		# 读取缓存
-		require_once(D_P.'data/bbscache/wordsfb_progress.php');
+		require_once pwCache::getPath(D_P.'data/bbscache/wordsfb_progress.php');
 		$temp_threaddb = unserialize($threaddb);
 	} else {
 		$temp_threaddb = array();
@@ -2046,7 +2052,7 @@ function setScanCache()
 	$filecontent.="\$threaddb=".pw_var_export($threaddb).";\r\n";
 	$filecontent.="?>";
 	$cahce_file = D_P.'data/bbscache/wordsfb_progress.php';
-	writeover($cahce_file, $filecontent);
+	pwCache::setData($cahce_file, $filecontent);
 
 	setConfig('db_wordsfb_cachetime', $timestamp);
 	updatecache_c();

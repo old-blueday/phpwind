@@ -1,13 +1,13 @@
 <?php
 !defined('P_W') && exit('Forbidden');
 
-InitGP(array('action'));
+S::gp(array('action'));
 $invokeService = L::loadClass('invokeservice', 'area');
 $pageInvokeService = L::loadClass('pageinvokeservice', 'area');
 $portalPageService = L::loadClass('portalpageservice', 'area');
 
 if (!$action) {
-	InitGP(array('keyword','page','alias'));
+	S::gp(array('keyword','page','alias'));
 	
 	$page = (int) $page;
 	$page<=0 && $page =1;
@@ -27,7 +27,7 @@ if (!$action) {
 	$pages = $pageInvokeService->sreachPageInvokesPages($param,$page,$basename."&keyword=$keyword&alias=$alias&");
 	include PrintMode('module');exit;
 } elseif ($action=='edittpl') {
-	InitGP(array('alias','invokename','step','keyword','page'));
+	S::gp(array('alias','invokename','step','keyword','page'));
 	
 	$portalPageService = L::loadClass('portalpageservice', 'area');
 	$beginUrl = $basename.'&alias='.$alias.'&keyword='.$keyword.'&page='.$page;
@@ -42,7 +42,7 @@ if (!$action) {
 		adminmsg('operate_success',$basename.'&alias='.$alias.'&keyword='.$keyword.'&page='.$page);
 	}
 } elseif ($action=='editconfig') {
-	InitGP(array('alias','invokename','step','keyword','page'));
+	S::gp(array('alias','invokename','step','keyword','page'));
 	
 	$beginUrl = $basename.'&alias='.$alias.'&keyword='.$keyword.'&page='.$page;
 
@@ -57,8 +57,8 @@ if (!$action) {
 
 		include PrintMode('module');exit;
 	} else {
-		InitGP(array('p_action','config','num','param','cachetime','ifpushonly','invokename','title'), 'P');
-		InitGP(array('ifverify','pageinvokeid'),'P');
+		S::gp(array('p_action','config','num','param','cachetime','ifpushonly','invokename','title'), 'P');
+		S::gp(array('ifverify','pageinvokeid'),'P');
 		$pageInvokeService->updatePageInvoke($pageinvokeid,array('ifverify'=>(int)$ifverify));
 		$pieces	= array();
 		foreach ($num as $key=>$value) {
@@ -79,7 +79,7 @@ if (!$action) {
 	}
 } elseif ($action == 'source') {
 	define('AJAX',1);
-	InitGP(array('sourcetype','id'), 'P');
+	S::gp(array('sourcetype','id'), 'P');
 	$id = (int) $id;
 
 	$pieceOperate = L::loadClass('pieceoperate', 'area');
@@ -99,7 +99,7 @@ EOT;
 	ajax_footer();
 } elseif ($action =='del') {
 	define('AJAX',1);
-	InitGP(array('id'),'P');
+	S::gp(array('id'),'P');
 	$pageInvokeService->delPageInvoke($id);
 	echo getLangInfo('msg','operate_success')."\treload";
 	ajax_footer();

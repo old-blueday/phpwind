@@ -6,7 +6,7 @@ if(isset($_GET['ajax']) && $_GET['ajax'] == 1){
 empty($subtype) && $subtype = 'request';
 $normalUrl = $baseUrl . "?type=$subtype";
 !empty($winduid) && $userId = $winduid;
-InitGP(array('page'), 'GP', 2);
+S::gp(array('page'), 'GP', 2);
 !$page && $page = 1;
 $requestCount = $requestAllCount = $messageServer->countAllRequest($userId);
 $notReadCount = $messageServer->countRequestsNotRead($userId);

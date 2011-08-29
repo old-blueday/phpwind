@@ -1,13 +1,13 @@
 <?php
 !defined('P_W') && exit('Forbidden');
 
-InitGP(array(
+S::gp(array(
 	'tid',
 	'pcid'
 ));
-$read = $db->get_one("SELECT authorid,subject,fid FROM pw_threads WHERE tid=" . pwEscape($tid));
-$foruminfo = $db->get_one('SELECT forumadmin,fupadmin FROM pw_forums WHERE fid=' . pwEscape($read['fid']));
-$isGM = CkInArray($windid, $manager);
+$read = $db->get_one("SELECT authorid,subject,fid FROM pw_threads WHERE tid=" . S::sqlEscape($tid));
+$foruminfo = $db->get_one('SELECT forumadmin,fupadmin FROM pw_forums WHERE fid=' . S::sqlEscape($read['fid']));
+$isGM = S::inArray($windid, $manager);
 $isBM = admincheck($foruminfo['forumadmin'], $foruminfo['fupadmin'], $windid);
 L::loadClass('postcate', 'forum', false);
 $post = array();
@@ -19,14 +19,14 @@ if (!$isadminright) {
 }
 
 if (empty($_POST['step'])) {
-	$sum = $db->get_value("SELECT SUM(nums) as nums FROM pw_pcmember WHERE tid=" . pwEscape($tid));
+	$sum = $db->get_value("SELECT SUM(nums) as nums FROM pw_pcmember WHERE tid=" . S::sqlEscape($tid));
 	!$sum && Showmsg('pcsendmsg_fail');
 	
 	require_once PrintEot('ajax');
 	ajax_footer();
 } elseif ($_POST['step'] == 2) {
 	PostCheck();
-	InitGP(array(
+	S::gp(array(
 		'subject',
 		'atc_content',
 		'tid',
@@ -51,7 +51,7 @@ if (empty($_POST['step'])) {
 		Showmsg('content_wordsfb');
 	}
 	
-	$query = $db->query("SELECT uid FROM pw_pcmember WHERE tid=" . pwEscape($tid) . " GROUP BY uid");
+	$query = $db->query("SELECT uid FROM pw_pcmember WHERE tid=" . S::sqlEscape($tid) . " GROUP BY uid");
 	while ($rt = $db->fetch_array($query)) {
 		$uiddb[] = $rt['uid'];
 	}

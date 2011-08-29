@@ -63,7 +63,7 @@ class Thread {
 		}
 
 		//检查是否有html发帖权限 没有的话返回提示信息
-		$htmlright = $this->db->get_value("SELECT rvalue FROM pw_permission WHERE uid='0' AND fid='0' AND rkey='htmlcode' AND gid=".pwEscape($groupid));
+		$htmlright = $this->db->get_value("SELECT rvalue FROM pw_permission WHERE uid='0' AND fid='0' AND rkey='htmlcode' AND gid=".S::sqlEscape($groupid));
 
         if ($htmlright == '0') {
 			return new ApiResponse('API_THREAD_NO_HTMLRIGHT');
@@ -80,9 +80,9 @@ class Thread {
 		}
 
 		if (file_exists(D_P."data/groupdb/group_$groupid.php")) {
-			include Pcv(D_P."data/groupdb/group_$groupid.php");
+			include pwCache::getPath(S::escapePath(D_P."data/groupdb/group_$groupid.php"));
 		} else {
-			include(D_P.'data/groupdb/group_1.php');
+			include pwCache::getPath(D_P.'data/groupdb/group_1.php');
 		}
 		L::loadClass('post', 'forum', false);
 		require_once(R_P . 'require/bbscode.php');
@@ -95,8 +95,8 @@ class Thread {
 
 		$postdata = new topicPostData($pwpost);
 
-		include_once(D_P.'data/bbscache/cache_post.php');
-		include_once(D_P.'data/bbscache/forum_typecache.php');
+		include_once pwCache::getPath(D_P.'data/bbscache/cache_post.php');
+		include_once pwCache::getPath(D_P.'data/bbscache/forum_typecache.php');
 		$t_db = $topic_type_cache[$fid];
 		$postdata->setWtype($p_type, $p_sub_type, 1, $t_db);
 		$postdata->setTitle($title);
@@ -124,9 +124,9 @@ class Thread {
 			return new ApiResponse(false);
 		}
 		if (is_numeric($tids)) {
-			$sql = ' tid=' . pwEscape($tids);
+			$sql = ' tid=' . S::sqlEscape($tids);
 		} else {
-			$sql = ' tid IN(' . pwImplode(explode(',',$tids)) . ')';
+			$sql = ' tid IN(' . S::sqlImplode(explode(',',$tids)) . ')';
 		}
 
 		$datadb = array();
@@ -142,7 +142,7 @@ class Thread {
 		}
 
 		foreach ($pw_tmsgsdb as $key => $value) {
-			$query = $this->db->query("SELECT tid,content FROM $key WHERE tid IN(" .pwImplode($value). ")");
+			$query = $this->db->query("SELECT tid,content FROM $key WHERE tid IN(" .S::sqlImplode($value). ")");
 			while ($rt = $this->db->fetch_array($query)) {
 				$datadb[$rt['tid']]['content'] = $rt['content'];
 			}
@@ -152,13 +152,14 @@ class Thread {
 	}
 
 	function downTopped ($tid) {//取消置顶帖
-		$tid = $this->db->get_value('SELECT tid FROM pw_threads WHERE tid='.pwEscape($tid));
+		$tid = $this->db->get_value('SELECT tid FROM pw_threads WHERE tid='.S::sqlEscape($tid));
 
 		if (!$tid) {
 			return new ApiResponse(false);
 		}
 
-		$this->db->update('UPDATE pw_threads SET topped=0 WHERE tid='.pwEscape($tid));
+		//$this->db->update('UPDATE pw_threads SET topped=0 WHERE tid='.S::sqlEscape($tid));
+		pwQuery::update('pw_threads', 'tid=:tid', array($tid), array('topped'=>0));
 		require_once(R_P.'require/updateforum.php');
 		updatetop();
 		return new ApiResponse(true);
@@ -181,9 +182,9 @@ class Thread {
 		$windid  = $winddb['username'];
 		$groupid == '-1' && $groupid = $winddb['memberid'];
 		if (file_exists(D_P."data/groupdb/group_$groupid.php")) {
-			include Pcv(D_P."data/groupdb/group_$groupid.php");
+			include pwCache::getPath(S::escapePath(D_P."data/groupdb/group_$groupid.php"));
 		} else {
-			include(D_P.'data/groupdb/group_1.php');
+			include pwCache::getPath(D_P.'data/groupdb/group_1.php');
 		}
 		L::loadClass('post', 'forum', false);
 		require_once(R_P . 'require/bbscode.php');
@@ -218,7 +219,7 @@ class Thread {
 
 		$postdata = new topicPostData($pwpost);
 
-		include_once(D_P.'data/bbscache/cache_post.php');
+		include_once pwCache::getPath(D_P.'data/bbscache/cache_post.php');
 		$t_db = $topic_type_cache[$fid];
 		$postdata->setWtype($p_type, $p_sub_type, 0, $t_db);
 		$postdata->initData($postmodify);
@@ -264,9 +265,10 @@ class Thread {
 		$delarticle->delTopic($readdb, 0);
 
 		if ($db_ifpwcache ^ 1) {
-			$this->db->update("DELETE FROM pw_elements WHERE type !='usersort' AND id IN(" . pwImplode($delids) . ')');
+			$this->db->update("DELETE FROM pw_elements WHERE type !='usersort' AND id IN(" . S::sqlImplode($delids) . ')');
 		}
-		P_unlink(D_P.'data/bbscache/c_cache.php');
+		//* P_unlink(D_P.'data/bbscache/c_cache.php');
+		pwCache::deleteData(D_P.'data/bbscache/c_cache.php');
 		return new ApiResponse(true);
 	}
 

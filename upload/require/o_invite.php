@@ -11,7 +11,7 @@ if ($hash == appkey($o_u,$app) && $winduid) {
 	if ($ckuser && empty($iffriend)) {
 		$friendcheck = getstatus($ckuser['userstatus'], PW_USERSTATUS_CFGFRIEND, 3);
 		if (!$friendcheck) {
-			$db->query("DELETE FROM pw_attention WHERE uid=" . pwEscape($winduid) . " AND friendid=".pwEscape($o_u));
+			$db->query("DELETE FROM pw_attention WHERE uid=" . S::sqlEscape($winduid) . " AND friendid=".S::sqlEscape($o_u));
 		
 			addSingleFriend(true, $winduid,$o_u, $timestamp, 0);
 			addSingleFriend(true, $o_u, $winduid, $timestamp, 0);
@@ -32,7 +32,7 @@ if ($hash == appkey($o_u,$app) && $winduid) {
 	
 		} elseif ($friendcheck == 1) {
 			
-			$db->query("DELETE FROM pw_attention WHERE uid=" . pwEscape($winduid) . " AND friendid=".pwEscape($touid));
+			$db->query("DELETE FROM pw_attention WHERE uid=" . S::sqlEscape($winduid) . " AND friendid=".S::sqlEscape($touid));
 			addSingleFriend(false, $winduid, $o_u, $timestamp, 1);
 			M::sendRequest(
 				$winduid,
@@ -57,7 +57,7 @@ if ($hash == appkey($o_u,$app) && $winduid) {
 function addSingleFriend($updatemem, $winduid, $frienduid, $timestamp, $status, $friendtype = 0, $checkmsg = '') {
 	global $db;
 	
-	$pwSQL = pwSqlSingle(array(
+	$pwSQL = S::sqlSingle(array(
 		'uid' => $winduid,
 		'friendid' => $frienduid,
 		'joindate' => $timestamp,
@@ -68,7 +68,7 @@ function addSingleFriend($updatemem, $winduid, $frienduid, $timestamp, $status, 
 	
 	$attentionService = L::loadClass('Attention', 'friend'); /* @var $attentionService PW_Attention */
 	if ($isAttention = $attentionService->isFollow($winduid, $frienduid)) {
-		$db->update("UPDATE pw_friends SET status = 0 WHERE uid=".pwEscape($winduid)." AND friendid=".pwEscape($frienduid));
+		$db->update("UPDATE pw_friends SET status = 0 WHERE uid=".S::sqlEscape($winduid)." AND friendid=".S::sqlEscape($frienduid));
 	} else {
 		$db->update("INSERT INTO pw_friends SET $pwSQL");
 	}

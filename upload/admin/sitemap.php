@@ -3,19 +3,20 @@
 $basename = "$admin_file?adminjob=sitemap";
 
 if(!$action){
-	@include_once(D_P.'data/bbscache/sm_config.php');
+	@include_once pwCache::getPath(D_P.'data/bbscache/sm_config.php');
 	include PrintEot('sitemap');exit;
 } elseif($action == 'create'){
-	p_unlink(D_P.'data/bbscache/sitemap.xml');
+	//* p_unlink(D_P.'data/bbscache/sitemap.xml');
+	pwCache::deleteData(D_P.'data/bbscache/sitemap.xml');
 	adminmsg('operate_success');
 } elseif($_POST['action'] == 'baidu'){
-	InitGP(array('config'));
+	S::gp(array('config'));
 	foreach($config as $key=>$value){
 		$hk_name = 'sm_'.$key;
 		$db->pw_update(
-			"SELECT hk_name FROM pw_hack WHERE hk_name=".pwEscape($hk_name),
-			"UPDATE pw_hack SET hk_value=".pwEscape($value)."WHERE hk_name=".pwEscape($hk_name),
-			"INSERT INTO pw_hack SET hk_name=".pwEscape($hk_name).",hk_value=".pwEscape($value)
+			"SELECT hk_name FROM pw_hack WHERE hk_name=".S::sqlEscape($hk_name),
+			"UPDATE pw_hack SET hk_value=".S::sqlEscape($value)."WHERE hk_name=".S::sqlEscape($hk_name),
+			"INSERT INTO pw_hack SET hk_name=".S::sqlEscape($hk_name).",hk_value=".S::sqlEscape($value)
 		);
 	}
 	updatecache_sm();
@@ -31,6 +32,6 @@ function updatecache_sm() {
 		$configdb.="\$$hk_name=".pw_var_export($hk_value).";\r\n";
 	}
 	$configdb.="?>";
-	writeover(D_P.'data/bbscache/sm_config.php',$configdb);
+	pwCache::setData(D_P.'data/bbscache/sm_config.php',$configdb);
 }
 ?>

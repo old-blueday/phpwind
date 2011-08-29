@@ -1,16 +1,16 @@
 <?php
 !defined('P_W') && exit('Forbidden');
 
-InitGP(array('jobact'));
+S::gp(array('jobact'));
 
 if ("delete" == $jobact) {
-	InitGP(array('stopic_ids'));
+	S::gp(array('stopic_ids'));
 	if (!is_array($stopic_ids) || !count($stopic_ids)) Showmsg('没选择要删除的专题，请您重试', $stopic_admin_url."&job=$job");
 
 	if (!$stopic_service->deleteSTopics($stopic_ids)) Showmsg('所有信息均未修改，请您重试', $stopic_admin_url."&job=$job");
 	ObHeader($stopic_admin_url."&job=$job");
 } else {
-	InitGP(array('page', 'search_title', 'search_cid'));
+	S::gp(array('page', 'search_title', 'search_cid'));
 	$page = intval($page);
 	$sum = $stopic_service->countSTopic($search_title, $search_cid);
 

@@ -1,9 +1,12 @@
 <!--<?php print <<<EOT
 -->
 <div id="breadCrumb">
-		<img src="$imgpath/$stylepath/thread/home-old.gif" align="absmiddle" />&nbsp;<a href="$db_bfn?m=bbs" title="$db_bbsname">$db_bbsname</a><em>&gt;</em><a href="$basename">勋章中心</a>
+<img src="$imgpath/$stylepath/thread/home.gif" class="cp breadHome" /><em class="breadEm"></em><a href="$db_bfn?m=bbs" title="$db_bbsname">$db_bbsname</a><em>&gt;</em><a href="$basename">勋章中心</a>
 </div>
-<div style="margin-top:10px">
+<style type="text/css">
+.tr3 td,.tr3 th{padding-left:10px;}
+</style>
+<div>
 <table width="100%" align="center" cellpadding="0" cellspacing="0">
 <tr>
 <td width="22%" valign="top">
@@ -76,21 +79,21 @@ EOT;
 	<tr>
 		<td class="h">您获得的勋章</td>
 	</tr>
-	<tr class="tr1">
-		<th style="text-align:center">
-			$userface<br /><br />
+	<tr>
+		<th class="tac p10">
+			$userface
 <!--
 EOT;
 if($userdb['medals']){
 foreach($userdb['medals'] as $key=>$value){
 if($_MEDALDB[$value][picurl]){print <<<EOT
 -->
-			<img src="$hkimg/{$_MEDALDB[$value][picurl]}" title="{$_MEDALDB[$value][name]}"/>
+			<p><img src="$hkimg/{$_MEDALDB[$value][picurl]}" title="{$_MEDALDB[$value][name]}"/></p>
 <!--
 EOT;
 }}}else{print <<<EOT
 -->
-			<br/>您还没有勋章
+			<p>您还没有勋章</p>
 <!--
 EOT;
 }print <<<EOT
@@ -156,17 +159,17 @@ print <<<EOT
 -->
 	<tr class="tr3 tr tac">
 		<td>$num</td>
-		<td><a href="u.php?uid=$value[uid]" target="_blank">$value[username]</a></td>
+		<td><a href="{$db_userurl}$value[uid]" target="_blank">$value[username]</a></td>
 		<td>$value[medals]</td>
 	</tr>
 <!--
 EOT;
 }print <<<EOT
 -->
+	<tr>
+		<td class="p10" colspan="3">$pages</td>
+	</tr>
 </table></div>
-<div class="t cc">
-	$pages
-</div>
 <!--
 EOT;
 }elseif($action=='award'){print <<<EOT
@@ -174,23 +177,23 @@ EOT;
 <form method="post" action="$basename&action=award&">
 <input type="hidden" name="step" value="2" />
 <div class="t">
+<div class="h">颁发勋章</div>
 <table width="100%" cellspacing="0" cellpadding="0" align="center">
-	<tr><td class="h" colspan="4">颁发勋章</td></tr>
-	<tr class="tr3 tr">
-		<td style="text-align:right" width="30%">用户名: </td>
-		<th><input class="input" type="text" name="pwuser" size="40" value="$pwuser"/>(多个用户可用","号隔开)</th>
+	<tr class="tr3">
+		<td width="100">用户名: </td>
+		<th><input class="input input_wa mr10" type="text" name="pwuser" value="$pwuser"/>(多个用户可用","号隔开)</th>
 	</tr>
-	<tr class="tr3 tr">
-		<td style="text-align:right">选择操作: </td>
+	<tr class="tr3 f_two">
+		<td>选择操作: </td>
 		<th>
-			<input type="radio" name="type" value="1" $type_1 /> 颁发
-			<input type="radio" name="type" value="2" $type_2/> 收回
+			<label class="mr20"><input type="radio" name="type" value="1" $type_1 /> 颁发</label>
+			<label class="mr20"><input type="radio" name="type" value="2" $type_2 /> 收回</label>
 		</th>
 	</tr>
-	<tr class="tr3 tr">
-		<td style="text-align:right">选择勋章: </td>
+	<tr class="tr3">
+		<td>选择勋章: </td>
 		<th>
-			<select name="medal">
+			<select name="medal" class="select_wa">
 				<option>选择勋章</option>
 <!--
 EOT;
@@ -210,10 +213,10 @@ EOT;
 			</select>
 		</th>
 	</tr>
-	<tr class="tr3 tr">
-		<td style="text-align:right">有效期:</td>
+	<tr class="tr3 f_two">
+		<td>有效期:</td>
 		<th>
-			<select name="timelimit">
+			<select name="timelimit" class="select_wa">
 				<option value="0">永久</option>
 				<option value="1">一个月</option>
 				<option value="3">三个月</option>
@@ -222,12 +225,14 @@ EOT;
 			</select>
 		</th>
 	</tr>
-	<tr class="tr3 tr">
-		<td style="text-align:right">操作理由: </td>
-		<th><input class="input" type="text" name="reason" size="50" /></th>
+	<tr class="tr3">
+		<td>操作理由: </td>
+		<th><input class="input input_wb" type="text" name="reason" /></th>
+	</tr>
+	<tr>
+		<td colspan="2" class="p10 tac"><span class="btn"><span><button type="submit">提 交</button></span></span></td>
 	</tr>
 </table></div>
-<div style="text-align:center;margin-bottom:25px"><input class="btn" type="submit" value="提 交" /></div>
 </form>
 <!--
 EOT;
@@ -240,7 +245,7 @@ EOT;
 		<td width="5%">ID</td>
 		<td width="12%">用户名</td>
 		<td width="12%">管理员</td>
-		<td width="10%">勋章名称</td>
+		<td width="12%">勋章名称</td>
 		<td width="7%">操作</td>
 		<td><div style="table-layout:fixed;word-wrap:break-word;">操作原因</div></td>
 		<td width="15%">操作时间</td>
@@ -266,7 +271,7 @@ print <<<EOT
 		<td>$num</td>
 		<td>$value[awardee]</td>
 		<td>$value[awarder]</td>
-		<td>{$_MEDALDB[$value[level]][name]}<br /></td>
+		<td>{$_MEDALDB[$value[level]][name]}</td>
 <!--
 EOT;
 if($value[action]==1){print <<<EOT
@@ -320,7 +325,7 @@ EOT;
 }print <<<EOT
 -->
 </table></div>
-<div class="t cc" style="width:98%;margin-right:0;border:none;">
+<div class="cc">
 	$pages
 </div>
 <!--
@@ -331,12 +336,12 @@ print <<<EOT
 <form method="post" action="$basename&action=apply&">
 <input type="hidden" name="step" value="2" />
 <div class="t">
-<table width="100%" cellspacing="0" cellpadding="0" align="center">
-	<tr><td class="h" colspan="4">申请勋章</td></tr>
-	<tr class="tr3 tr">
-		<td style="text-align:right" width="30%">选择勋章: </td>
+<div class="h">申请勋章</div>
+<table width="100%">
+	<tr class="tr3">
+		<td width="100">选择勋章: </td>
 		<th>
-			<select name="medal">
+			<select name="medal" class="select_wa">
 				<option>选择勋章</option>
 <!--
 EOT;
@@ -352,10 +357,10 @@ EOT;
 			</select>
 		</th>
 	</tr>
-	<tr class="tr3 tr">
-		<td style="text-align:right">有效期:</td>
+	<tr class="tr3 f_two">
+		<td>有效期:</td>
 		<th>
-			<select name="timelimit">
+			<select name="timelimit" class="select_wa">
 				<option value="0">永久</option>
 				<option value="1">一个月</option>
 				<option value="3">三个月</option>
@@ -364,12 +369,15 @@ EOT;
 			</select>
 		</th>
 	</tr>
-	<tr class="tr3 tr">
-		<td style="text-align:right">申请理由: </td>
-		<th><input class="input" type="text" name="reason" size="50" /></th>
+	<tr class="tr3">
+		<td>申请理由: </td>
+		<th><input class="input input_wa" type="text" name="reason" /></th>
 	</tr>
-</table></div>
-<div style="text-align:center;margin-bottom:25px"><input class="btn" type="submit" value="提 交" /></div>
+	<tr>
+		<td colspan="2" class="p10 tac"><span class="btn"><span><button type="submit">提 交</button></span></span></td>
+	</tr>
+</table>
+</div>
 </form>
 <!--
 EOT;
@@ -378,17 +386,17 @@ print <<<EOT
 -->
 <form action="$basename&action=approve&" method="post">
 <div class="t">
-<table width="100%" cellspacing="0" cellpadding="0" align="center">
-	<tr><td class="h" colspan="8">勋章申请列表</td></tr>
+<div class="h">勋章申请列表</div>
+<table width="100%" cellspacing="0" cellpadding="0">
 	<tr class="tr2 tac">
 		<td width="5%">选择</td>
 		<td width="5%">ID</td>
 		<td width="12%">用户名</td>
-		<td width="10%">勋章名称</td>
+		<td width="12%">勋章名称</td>
 		<td><div style="table-layout:fixed;word-wrap:break-word;">操作原因</div></td>
 		<td width="15%">申请时间</td>
 		<td width="7%">有效期</td>
-		<td width="10%">操作</td>
+		<td width="11%">操作</td>
 	</tr>
 <!--
 EOT;
@@ -419,26 +427,27 @@ EOT;
 EOT;
 }print <<<EOT
 -->
-		<td><a href="$basename&action=approve&job=del&id=$value[id]">删除</a>|<a href="$basename&action=approve&job=pass&id=$value[id]">通过</a></td>
+		<td><a href="$basename&action=approve&job=pass&id=$value[id]" class="s4 mr5">[通过]</a><a href="$basename&action=approve&job=del&id=$value[id]" class="s4">[删除]</a></td>
 	</tr>
 <!--
 EOT;
 }print <<<EOT
 -->
+	<tr>
+		<td class="p10" colspan="9">
+			<label class="mr10"><input name="job" value="pass" checked="checked" type="radio">通过</label>
+			<label class="mr10"><input name="job" value="del" type="radio">删除</label>
+			<span class="bt2"><span><button type="button" onclick="CheckAll(this.form)" name="chkall">全选</button></span></span>
+			<span class="btn2"><span><button type="submit">提交</button></span></span>
+		</td>
+	</tr>
 </table>
 </div>
-<center>
-	<input class="btn" name="chkall" value="全选" onclick="CheckAll(this.form)" type="button">
-	<input class="btn" value="提交" type="submit">
-	<input name="job" value="pass" type="radio">通过
-	<input name="job" value="del" checked="checked" type="radio">删除
-</center>
 </form>
-<div class="t cc">
+<div class="cc">
 	$pages
 </div>
 <SCRIPT type="text/javascript" LANGUAGE="JavaScript" src="js/core/friendlist.js"></SCRIPT>
-
 <!--
 EOT;
 }print <<<EOT

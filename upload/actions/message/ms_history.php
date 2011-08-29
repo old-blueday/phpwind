@@ -6,7 +6,7 @@ if(isset($_GET['ajax']) && $_GET['ajax'] == 1){
 empty($subtype) && $subtype = 'history';
 $normalUrl = $baseUrl . "?type=history";
 !empty($winduid) && $userId = $winduid;
-InitGP(array('page'),'GP');
+S::gp(array('page'),'GP');
 
 $countHistory = $messageServer->countHistoryMessage($userId);
 $pageCount = ceil($countHistory / $perpage);

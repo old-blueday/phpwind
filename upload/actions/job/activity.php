@@ -1,11 +1,13 @@
 <?php
 !defined('P_W') && exit('Forbidden');
-initGP(array('job'),'GP');
+S::gp(array('job'),'GP');
+
 if ($job == 'preview') {//帖子预览
+
 	require_once(R_P.'require/bbscode.php');
 	require_once(R_P.'require/header.php');
-	InitGP(array('atc_title','atc_content','pcinfo','atc_title'),'P');
-	InitGP(array('actmid','tid','authorid'),'P',2);
+	S::gp(array('atc_title','atc_content','pcinfo','atc_title'),'P');
+	S::gp(array('actmid','tid','authorid'),'P',2);
 	$data = array();
 
 	L::loadClass('ActivityForBbs', 'activity', false);
@@ -21,13 +23,31 @@ if ($job == 'preview') {//帖子预览
 
 	require_once PrintEot('preview');
 	footer();
+
 } elseif ($job == 'export') {//导出报名列表
-	InitGP(array('tid','actmid'),G,2);
-	$read = $db->get_one("SELECT authorid,subject,fid FROM pw_threads WHERE tid=".pwEscape($tid));//帖子信息
-		
+
+	S::gp(array('tid','actmid'),G,2);
+
+	if (!$windid && ($userdb = getCurrentOnlineUser()) && $userdb['ip'] == $onlineip) {
+		$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
+		$winddb = $userService->get($userdb['uid']);
+		$winduid = $winddb['uid'];
+		$groupid = $winddb['groupid'];
+		$groupid == '-1' && $groupid = $winddb['memberid'];
+		$userrvrc = round($winddb['rvrc'] / 10, 1);
+		$windid = $winddb['username'];
+		if (file_exists(D_P . "data/groupdb/group_$groupid.php")) {
+			require_once pwCache::getPath(S::escapePath(D_P . "data/groupdb/group_$groupid.php"));
+		} else {
+			require_once pwCache::getPath(D_P . "data/groupdb/group_1.php");
+		}
+		define('FX', 1);
+	}
+	$read = $db->get_one("SELECT authorid,subject,fid FROM pw_threads WHERE tid=" . S::sqlEscape($tid));//帖子信息
 	$data = array();
 	L::loadClass('ActivityForBbs', 'activity', false);
 	$postActForBbs = new PW_ActivityForBbs($data);
+
 	$isAdminright = $postActForBbs->getAdminRight($read['authorid']);
 	!$isAdminright && Showmsg('act_export_noright');
 
@@ -40,7 +60,7 @@ if ($job == 'preview') {//帖子预览
 	);
 
 	$payMemberNums = $orderMemberNums = 0;
-	$query = $db->query("SELECT signupnum,ifpay FROM pw_activitymembers WHERE fupid=0 AND tid=".pwEscape($tid));
+	$query = $db->query("SELECT signupnum,ifpay FROM pw_activitymembers WHERE fupid=0 AND tid=" . S::sqlEscape($tid));
 	while ($rt = $db->fetch_array($query)) {
 		if ($rt['ifpay'] != 3) {//费用关闭的不算
 			$orderMemberNums += $rt['signupnum'];//已报名人数
@@ -51,12 +71,12 @@ if ($job == 'preview') {//帖子预览
 	}
 
 	$defaultValueTableName = getActivityValueTableNameByActmid();
-	$defaultValue = $db->get_one("SELECT fees,paymethod FROM $defaultValueTableName WHERE tid=".pwEscape($tid));
+	$defaultValue = $db->get_one("SELECT fees,paymethod FROM $defaultValueTableName WHERE tid=" . S::sqlEscape($tid));
 	$feesdb = unserialize($defaultValue['fees']);
 	$isFree = count($feesdb) > 0 ? false : true;//判断该活动是否免费
 
 	$memberlistdb = $addmemberlistdb = $refundmemberlistdb = array();
-	$query = $db->query("SELECT * FROM pw_activitymembers WHERE fupid=0 AND tid=".pwEscape($tid)." ORDER BY (uid=".pwEscape($winduid).") DESC,ifpay ASC,actuid DESC");//正常报名
+	$query = $db->query("SELECT * FROM pw_activitymembers WHERE fupid=0 AND tid=" . S::sqlEscape($tid) . " ORDER BY (uid=" . S::sqlEscape($winduid) . ") DESC,ifpay ASC,actuid DESC");//正常报名
 	while ($rt = $db->fetch_array($query)) {
 		if ($db_charset == 'utf-8' || $db_charset == 'big5'){
 			foreach($rt as $key => $value) {
@@ -109,11 +129,21 @@ if ($job == 'preview') {//帖子预览
 		$subject = pwConvert($subject,'gbk',$db_charset);
 	}
 	$subject = str_replace(array('&nbsp;','&#160;',' '),array('','',''),$subject);
-
+	/*
 	header("Content-type:application/vnd.ms-excel");
 	header("Content-Disposition:attachment;filename=$subject.xls");
 	header("Pragma: no-cache");
 	header("Expires: 0");
+	*/
+
+	header('Last-Modified: ' . gmdate('D, d M Y H:i:s', $timestamp + 86400) . ' GMT');
+	header('Expires: ' . gmdate('D, d M Y H:i:s', $timestamp + 86400) . ' GMT');
+	header('Cache-control: max-age=86400');
+	header('Content-Encoding: none');
+	header("Content-Disposition: attachment; filename=\"$subject.xls\"");
+	header("Content-type:application/vnd.ms-excel");
+	header("Content-Transfer-Encoding: binary");
+	//$filesize && header("Content-Length: $filesize");
 	
 	echo getLangInfo('other','act_ordermembernums')."{$orderMemberNums}".getLangInfo('other','act_paymembernums')."{$payMemberNums}".getLangInfo('other','act_ren')."\t\n";
 	foreach ($titledb as $key => $value) {
@@ -141,7 +171,7 @@ if ($job == 'preview') {//帖子预览
 			} else {
 				echo "$value[totalcash]".getLangInfo('other','act_yuan')."\t";
 			}
-			echo "{$ifpaydb[$value[ifpay]]}\t";
+			echo "{$ifpaydb[$value[ifpay]]}\t\n";
 		} else {
 			echo getLangInfo('other','act_free')."\t";
 			if ($value['ifpay'] == 3) {
@@ -202,4 +232,18 @@ if ($job == 'preview') {//帖子预览
 	}
 	echo getLangInfo('other','act_exporttime').get_date($timestamp,'Y-n-j H:i:s');
 	exit;
+}
+
+function getCurrentOnlineUser() {
+	global $db_online, $ol_offset, $db;
+	if (empty($db_online)) {
+		$userdb = explode("\t", getuserdb(D_P . "data/bbscache/online.php", $ol_offset));
+		writeover('data/ssss.txt', "\r\n3333".print_r($_COOKIE, true),'ab+');
+		return $userdb ? array('uid' => $userdb[8], 'ip' => $userdb[2]) : array();
+	} else {
+		$olid = (int)GetCookie('olid');
+		$userdb = $db->get_one("SELECT uid,ip FROM pw_online WHERE olid=" . S::sqlEscape($olid) . ' AND uid>0');
+		
+		return $userdb;
+	}
 }

@@ -2,14 +2,14 @@
 <?php
 
 if (empty($block_data['height'])) {
-	$block_data['height'] = 200;
+	$block_data['height'] = 400;
 }
 
 if ('show' == $block_job) {
 print <<<EOT
 -->
 <div class="fl" style="width:100%;">
-	<iframe name="block_{$block_id}_iframe" id="block_{$block_id}_iframe" height="{$block_data[height]}" frameborder="0" allowtransparency="yes" marginheight="0" marginwidth="0" border="0" style="width:100%;float:left;" src="apps.php?q=stopic&job=showtpc&tid={$block_data[tid]}"></iframe>
+	<iframe name="block_{$block_id}_iframe" id="block_{$block_id}_iframe" height="{$block_data[height]}" frameborder="0" allowtransparency="yes" marginheight="0"  marginwidth="0" border="0" style="width:100%;float:left;" src=apps.php?q=stopic&job=showtpc&tid={$block_data[tid]}></iframe>
 </div>
 <!--
 EOT;
@@ -25,7 +25,7 @@ print <<<EOT
 	<tr class="tr1 vt">
         	<td class="td2">主题类别</td>
             <td class="td2">
-	            	目前支持的类别有：投票、辩论、团购/活动
+	            	目前支持的类别有：投票、辩论、团购<!-- /活动 -->
             </td>
 	</tr>
 	<tr class="tr1 vt">

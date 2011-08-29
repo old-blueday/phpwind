@@ -26,13 +26,35 @@ if (!in_array($action,array('pushto','recommend','success'))) {
 list($defaultCurrent, $verifyCurrent, $editconfigCurrent, $edittplCurrent) = array(
 	($action == '' ? 'class="current"' : ''),
 	($action == 'verify' ? 'class="current"' : ''),
-	($action == 'editconfig' ? 'class="current"' : ''),
-	($action == 'edittpl' ? 'class="current"' : ''),
 );
 
 print <<<EOT
 -->
     <div class="pwC_nav_a">
+			<span class="fr">
+<!--
+EOT;
+if($hasattr){
+print <<<EOT
+-->
+            <a href="$baseUrl&action=editconfig" class="mr10">设置模块属性</a>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+<!--
+EOT;
+if($hasedit){
+print <<<EOT
+-->
+            <a href="$baseUrl&action=edittpl" class="mr10">编辑模块代码</a>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+			</span>
         <ul class="cc">
             <li $defaultCurrent><a href="$baseUrl">推送内容管理</a></li>
 <!--
@@ -46,30 +68,6 @@ EOT;
 }
 print <<<EOT
 -->
-
-<!--
-EOT;
-if($hasattr){
-print <<<EOT
--->
-            <li $editconfigCurrent><a href="$baseUrl&action=editconfig">设置模块属性</a></li>
-<!--
-EOT;
-}
-print <<<EOT
--->
-<!--
-EOT;
-if($hasedit){
-print <<<EOT
--->
-            <li $edittplCurrent><a href="$baseUrl&action=edittpl">编辑模块代码</a></li>
-<!--
-EOT;
-}
-print <<<EOT
--->
-
 <!--
 EOT;
 if($action=='add' || $action=='edit'){
@@ -77,6 +75,17 @@ print <<<EOT
 -->
             <li class="current"><a href="javascript:;">内容{$title}</a></li>
 <!--
+EOT;
+}
+print <<<EOT
+-->
+<!-- 
+EOT;
+if($action!='add' && $pageInvokeInfo[pieces]){
+print <<<EOT
+-->         
+            <li class="none"><a href="$baseUrl&action=add" class="s2">添加推送内容</a></li>
+<!-- 
 EOT;
 }
 print <<<EOT
@@ -181,6 +190,33 @@ print <<<EOT
 			element.value = substr(element.value,num);
 		}
 		return true;
+	}
+	function checktitlelength(num,titleid,wordid){
+ 		var titleLength = num;
+		setTimeout(function(){
+		var l = strlen($(titleid).value);
+		if(l<titleLength)
+		{
+			$(wordid).innerHTML='剩余'+(titleLength-l)+'个字节';
+			$(wordid).style.backgroundColor='#fffeed';
+			$(wordid).style.display='inline';
+		}
+		else if(l==titleLength)
+		{
+			$(wordid).innerHTML='已经达到最大字数限制';
+			$(wordid).style.backgroundColor='#ffd9d9';
+			$(wordid).style.display='inline';
+		}
+		else if(l>=titleLength)
+		{
+			$(wordid).innerHTML='已超出最大长度限制！';
+			$(wordid).style.backgroundColor='#ff9999';
+			$(wordid).style.display='inline';
+			$(titleid).value = substr($(titleid).value,titleLength);
+		}
+		else
+			$(wordid).style.display='none';
+		},100);
 	}
 </script>
 <script language="JavaScript" src="js/color_picker.js"></script>

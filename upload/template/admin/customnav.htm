@@ -40,17 +40,19 @@ function displayElement(elementId, isDisplay) {
 </script>
 <!--
 EOT;
-if ('navmain' == $admintype) {
-	if ('add' == $action) {
+if ('navmain' == $adminitem) {
+if ('add' == $action) {
 print <<<EOT
 -->
 <div class="nav3 mb10">
 	<ul class="cc">
-		<li><a href="$basename">社区主导航</a></li>
-		<li class="current"><a href="$basename&action=add">添加导航</a></li>
+		<li class="current"><a href="$basename&adminitem=navmain">社区主导航</a></li>
+		<li><a href="$basename&adminiteme=navside">顶部右侧导航</a></li>
+		<li><a href="$basename&adminitem=navside&type=head_left">顶部左侧导航</a></li>
+		<li><a href="$basename&adminitem=navside&action=footlist&type=$navTypeFoot">底部导航栏</a></li>
+		<li><a href="$basename&adminitem=navmain&action=add">添加导航</a></li>
 	</ul>
 </div>
-
 <form action="$basename" method="post">
 <h2 class="h1">添加导航</h2>
 <div class="admin_table mb10">
@@ -178,8 +180,11 @@ print <<<EOT
 
 <div class="nav3 mb10">
 	<ul class="cc">
-		<li><a href="$basename">社区主导航</a></li>
-		<li class="current"><a href="$basename&action=edit&nid=$nid">编辑导航</a></li>
+		<li><a href="$basename&adminitem=navmain">社区主导航</a></li>
+		<li><a href="$basename&adminitem=navside">顶部右侧导航</a></li>
+		<li><a href="$basename&adminitem=navside&type=head_left">顶部左侧导航</a></li>
+		<li><a href="$basename&adminitem=navside&action=footlist&type=$navTypeFoot">底部导航栏</a></li>
+		<li class="current"><a href="$basename&adminitem=navmain&action=edit&nid=$nid">编辑导航</a></li>
 	</ul>
 </div>
 
@@ -312,13 +317,17 @@ print <<<EOT
 -->
 <div class="nav3 mb10">
 	<ul class="cc">
-		<li class="current"><a href="$basename">社区主导航</a></li>
+		
+		<li class="current"><a href="$basename&adminitem=navmain">社区主导航</a></li>
+		<li><a href="$basename&adminitem=navside">顶部右侧导航</a></li>
+		<li><a href="$basename&adminitem=navside&type=head_left">顶部左侧导航</a></li>
+		<li><a href="$basename&adminitem=navside&action=footlist&type=$navTypeFoot">底部导航栏</a></li>
 	</ul>
 </div>
 
 <form action="$basename" method="post" name="FORM">
 <input name="action" type="hidden" value="editview" />
-<h2 class="h1"><span class="fl mr10">社区导航自定义</span><a hidefocus="true" href="$basename&action=add" class="btn_add fl"><i>添加导航</i></a></h2>
+<h2 class="h1"><span class="fl mr10">社区导航自定义</span><a hidefocus="true" href="$basename&adminitem=navmain&action=add" class="btn_add fl"><i>添加导航</i></a></h2>
 <div class="admin_table mb10">
 <table width="100%" cellspacing="0" cellpadding="0">
 	<tr class="tr2 td_bgB">
@@ -428,16 +437,14 @@ print <<<EOT
 -->
 	<tr class="tr2">
 		<td colspan="6">
-		<a class="fl" href="javascript:;" onclick="CheckAll(document.FORM);">全选</a>
-
 		<a class="fr" href="javascript:;" onclick="toRestore('$basename&action=restore');return false;">恢复默认</a>
-
 		</td>
 	</tr>
 </table>
 </div>
 
 <div class="tac mb10">
+	<span class="bt"><span><button type="button" onclick="CheckAll(document.FORM);">全 选</button></span></span>
 	<span class="btn"><span><button type="submit" name="Submit2">提 交</button></span></span>
 </div>
 </form>
@@ -487,17 +494,18 @@ ctrlListTypeShow();
 EOT;
 	}
 
-} elseif ('navside' == $admintype) {
+} elseif ('navside' == $adminitem) {
 
 	if ('add' == $action) {
 print <<<EOT
 -->
 <div class="nav3 mb10">
 	<ul class="cc">
-		<li><a href="$basename">顶部右侧导航</a></li>
-		<li><a href="$basename&type=$navTypeLeft">顶部左侧导航</a></li>
-		<li><a href="$basename&action=footlist&type=$navTypeFoot">底部导航栏</a></li>
-		<li class="current"><a href="$basename&action=add&type=$navType">添加导航</a></li>
+		<li><a href="$basename&adminitem=navmain">社区主导航</a></li>
+		<li><a href="$basename&adminitem=navside">顶部右侧导航</a></li>
+		<li><a href="$basename&adminitem=navside&type=head_left">顶部左侧导航</a></li>
+		<li><a href="$basename&adminitem=navside&action=footlist&type=$navTypeFoot">底部导航栏</a></li>
+		<li class="current"><a href="$basename&adminitem=navside&action=add&type=$navType">添加导航</a></li>
 	</ul>
 </div>
 
@@ -671,10 +679,11 @@ print <<<EOT
 
 <div class="nav3 mb10">
 	<ul class="cc">
-		<li><a href="$basename">顶部右侧导航</a></li>
-		<li><a href="$basename&type=$navTypeLeft">顶部左侧导航</a></li>
-		<li><a href="$basename&action=footlist&type=$navTypeFoot">底部导航栏</a></li>
-		<li class="current"><a href="$basename&action=edit&nid=$nid">编辑导航</a></li>
+		<li><a href="$basename&adminitem=navmain">社区主导航</a></li>
+		<li><a href="$basename&adminitem=navside">顶部右侧导航</a></li>
+		<li><a href="$basename&adminitem=navside&type=head_left">顶部左侧导航</a></li>
+		<li><a href="$basename&adminitem=navside&action=footlist&type=$navTypeFoot">底部导航栏</a></li>
+		<li class="current"><a href="$basename&adminitem=navside&action=edit&nid=$nid">编辑导航</a></li>
 	</ul>
 </div>
 
@@ -822,16 +831,17 @@ print <<<EOT
 -->
 <div class="nav3 mb10">
 	<ul class="cc">
-		<li><a href="$basename">顶部右侧导航</a></li>
-		<li><a href="$basename&type=$navTypeLeft">顶部左侧导航</a></li>
-		<li class="current"><a href="$basename&action=footlist&type=$navTypeFoot">底部导航栏</a></li>
+		<li><a href="$basename&adminitem=navmain">社区主导航</a></li>
+		<li><a href="$basename&adminitem=navside">顶部右侧导航</a></li>
+		<li><a href="$basename&adminitem=navside&type=head_left">顶部左侧导航</a></li>
+		<li class="current"><a href="$basename&adminitem=navside&action=footlist&type=$navTypeFoot">底部导航栏</a></li>
 	</ul>
 </div>
 
 <form action="$basename" method="post" name="FORM">
 <input name="action" type="hidden" value="editview" />
 <input name="type" type="hidden" value="$type" />
-<h2 class="h1"><span class="fl mr10">{$navTypeName[$navType]}</span><a hidefocus="true" href="$basename&action=add&type=$navType" class="btn_add fl"><i>添加导航</i></a></h2>
+<h2 class="h1"><span class="fl mr10">{$navTypeName[$navType]}</span><a hidefocus="true" href="$basename&adminitem=navside&action=add&type=$navType" class="btn_add fl"><i>添加导航</i></a></h2>
 <div class="admin_table mb10">
 <table width="100%" cellspacing="0" cellpadding="0">
 	<tr class="tr2 td_bgB">
@@ -897,16 +907,14 @@ print <<<EOT
 -->
 	<tr class="tr2">
 		<td colspan="6">
-		<a class="fl" href="javascript:;" onclick="CheckAll(document.FORM);">全选</a>
-
 		<a class="fr" href="javascript:;" onclick="toRestore('$basename&action=restore&type=$navType');return false;">恢复默认</a>
-
 		</td>
 	</tr>
 </table>
 </div>
 
 <div class="tac mb10">
+	<span class="bt"><span><button type="button" onclick="CheckAll(document.FORM);">全 选</button></span></span>
 	<span class="btn"><span><button type="submit" name="Submit2">提 交</button></span></span>
 </div>
 </form>
@@ -919,16 +927,17 @@ print <<<EOT
 -->
 <div class="nav3 mb10">
 	<ul class="cc">
-		<li $rightClass><a href="$basename">顶部右侧导航</a></li>
-		<li $leftClass><a href="$basename&type=$navTypeLeft">顶部左侧导航</a></li>
-		<li><a href="$basename&action=footlist&type=$navTypeFoot">底部导航栏</a></li>
+		<li><a href="$basename&adminitem=navmain">社区主导航</a></li>
+		<li $rightClass><a href="$basename&adminitem=navside">顶部右侧导航</a></li>
+		<li $leftClass><a href="$basename&adminitem=navside&type=$navTypeLeft">顶部左侧导航</a></li>
+		<li><a href="$basename&adminitem=navside&action=footlist&type=$navTypeFoot">底部导航栏</a></li>
 	</ul>
 </div>
 
 <form action="$basename" method="post" name="FORM">
 <input name="type" type="hidden" value="$type" />
 <input name="action" type="hidden" value="editview" />
-<h2 class="h1"><span class="fl mr10">{$navTypeName[$navType]}</span><a hidefocus="true" href="$basename&action=add&type=$navType" class="btn_add fl"><i>添加导航</i></a></h2>
+<h2 class="h1"><span class="fl mr10">{$navTypeName[$navType]}</span><a hidefocus="true" href="$basename&adminitem=navside&action=add&type=$navType" class="btn_add fl"><i>添加导航</i></a></h2>
 <div class="admin_table mb10">
 <table width="100%" cellspacing="0" cellpadding="0">
 	<tr class="tr2 td_bgB">
@@ -1038,16 +1047,14 @@ print <<<EOT
 -->
 	<tr class="tr2">
 		<td colspan="6">
-		<a class="fl" href="javascript:;" onclick="CheckAll(document.FORM);">全选</a>
-
 		<a class="fr" href="javascript:;" onclick="toRestore('$basename&action=restore&type=$navType');return false;">恢复默认</a>
-
 		</td>
 	</tr>
 </table>
 </div>
 
 <div class="tac mb10">
+	<span class="bt"><span><button type="button" onclick="CheckAll(document.FORM);">全 选</button></span></span>
 	<span class="btn"><span><button type="submit" name="Submit2">提 交</button></span></span>
 </div>
 </form>

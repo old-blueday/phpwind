@@ -35,9 +35,13 @@ if ($t_subtypedb) {
 }
 */
 $t_per = $pwforum->foruminfo['t_type'];
-
-$db_forcetype = $t_db && $t_per=='2' && $article==0 && !$pwpost->admincheck ? 1 : 0; // 是否需要强制主题分类
-
+$db_forcetype = 0; // 是否需要强制主题分类
+if ($t_db && $t_per=='2' && !$pwpost->admincheck && !S::inArray($groupid, array(3,4))) {
+	$extraGroups = array();
+	$winddb['groups'] && $extraGroups = array_filter(explode(',', $winddb['groups']));
+	$compareGroups = array_intersect($extraGroups, array(3, 4));
+	empty($compareGroups) && $db_forcetype = 1;
+}
 L::loadClass('postmodify', 'forum', false);
 if ($pid && is_numeric($pid)) {
 	$postmodify = new replyModify($tid, $pid, $pwpost);
@@ -48,7 +52,8 @@ $atcdb = $postmodify->init();
 $postmodify->check();
 
 if ($postmodify->type == 'topic') {
-	$ifmailck = $atcdb['ifmail'] > 1 ? 'checked' : '';
+	$atc_email = ( ($atcdb ['ifmail'] == 1) || ($atcdb ['ifmail'] == 3) ) ? 'checked' : "";
+	$atc_newrp = ( ($atcdb ['ifmail'] == 2) || ($atcdb ['ifmail'] == 3) ) ? 'checked' : "";
 	list($magicid,$magicname) = explode("\t", $atcdb['magic']);
 	$type	 = $atcdb['type'];
 	$special = $atcdb['special'];
@@ -136,6 +141,7 @@ if (empty($_POST['step'])) {
 			$set = $postSpecial->resetInfo($tid, $atcdb);
 		}
 		list($tags) = explode("\t", $atcdb['tags']);
+		$tags = htmlspecialchars($tags);
 	}
 	//empty($subject) && $subject = ' ';
 
@@ -171,6 +177,7 @@ if (empty($_POST['step'])) {
 
 	require_once(R_P.'require/header.php');
 	$msg_guide = $pwforum->headguide($guidename);
+	$postMinLength = empty($pwpost->forum->foruminfo['forumset']['contentminlen']) ? $db_postmin : $pwpost->forum->foruminfo['forumset']['contentminlen'];
 	require_once PrintEot('post');footer();
 
 } elseif ($_POST['step'] == 1) {
@@ -183,15 +190,16 @@ if (empty($_POST['step'])) {
 		}
 	}
 	$pw_posts = GetPtable('N', $tid);
-	$rt = $db->get_one("SELECT COUNT(*) AS count FROM $pw_posts WHERE tid=".pwEscape($tid)." AND ifcheck='1'");
+	$rt = $db->get_one("SELECT COUNT(*) AS count FROM $pw_posts WHERE tid=".S::sqlEscape($tid)." AND ifcheck='1'");
 	$count = $rt['count'] + 1;
 	if ($article == 0 && !$admincheck && $count > 1) {
 		Showmsg('modify_replied');
 	}
-	$rs = $db->get_one("SELECT replies,topped,tpcstatus FROM pw_threads WHERE tid=".pwEscape($tid));
+	$rs = $db->get_one("SELECT replies,topped,tpcstatus FROM pw_threads WHERE tid=".S::sqlEscape($tid));
 	$thread_tpcstatus = $rs['tpcstatus'];
 	if ($rs['replies'] != $rt['count']) {
-		$db->update("UPDATE pw_threads SET replies=".pwEscape($rt['count'])."WHERE tid=".pwEscape($tid));
+		//$db->update("UPDATE pw_threads SET replies=".S::sqlEscape($rt['count'])."WHERE tid=".S::sqlEscape($tid));
+		pwQuery::update('pw_threads', 'tid=:tid' , array($tid), array('replies'=>$rt['count']));
 	}
 	require_once(R_P.'require/credit.php');
 	$creditset = $credit->creditset($creditset,$db_creditset);
@@ -205,25 +213,30 @@ if (empty($_POST['step'])) {
 		$deltype  = 'deltpc';
 		$deltitle = substrs($subject,28);
 		if ($count == 1) {
-			$db->update("DELETE FROM $pw_tmsgs WHERE tid=".pwEscape($tid));
-			# $db->update("DELETE FROM pw_threads WHERE tid=".pwEscape($tid));
+			//* $db->update("DELETE FROM $pw_tmsgs WHERE tid=".S::sqlEscape($tid));
+			pwQuery::delete($pw_tmsgs, 'tid=:tid', array($tid));
+			# $db->update("DELETE FROM pw_threads WHERE tid=".S::sqlEscape($tid));
 			# ThreadManager
-                        $threadManager = L::loadClass("threadmanager", 'forum');
-			$threadManager->deleteByThreadId($fid,$tid);
+            //* $threadManager = L::loadClass("threadmanager", 'forum');
+			//* $threadManager->deleteByThreadId($fid,$tid);
+			$threadService = L::loadclass('threads', 'forum');
+			$threadService->deleteByThreadId($tid);	
+			Perf::gatherInfo('changeThreadWithForumIds', array('fid'=>$fid));		
 
 			P_unlink(R_P."$db_readdir/$fid/".date('ym',$postdate)."/$tid.html");
 		} else {
-			$rt = $db->get_one("SELECT * FROM $pw_posts WHERE tid=".pwEscape($tid)."ORDER BY postdate LIMIT 1");
+			$rt = $db->get_one("SELECT * FROM $pw_posts WHERE tid=".S::sqlEscape($tid)."ORDER BY postdate LIMIT 1");
 			if ($count == 2) {
 				$lastpost	= $rt['postdate'];
 				$lastposter	= $rt['author'];
 			} else {
-				$lt = $db->get_one("SELECT postdate,author FROM $pw_posts WHERE tid=".pwEscape($tid)."ORDER BY postdate DESC LIMIT 1");
+				$lt = $db->get_one("SELECT postdate,author FROM $pw_posts WHERE tid=".S::sqlEscape($tid)."ORDER BY postdate DESC LIMIT 1");
 				$lastpost	= $lt['postdate'];
 				$lastposter	= $lt['author'];
 			}
 			$count -= 2;
-			$db->update("DELETE FROM $pw_posts WHERE pid=".pwEscape($rt['pid']));
+			//$db->update("DELETE FROM $pw_posts WHERE pid=".S::sqlEscape($rt['pid']));
+			pwQuery::delete($pw_posts, 'pid=:pid', array($rt['pid']));
 			$pwSQL = $rt['subject'] ? array('subject'=>$rt['subject']) : array();
 			$pwSQL += array(
 				'icon'		=> $rt['icon'],
@@ -234,16 +247,27 @@ if (empty($_POST['step'])) {
 				'lastposter'=> $lastposter,
 				'replies'	=> $count
 			);
-			$db->update("UPDATE pw_threads SET ".pwSqlSingle($pwSQL,false)." WHERE tid=".pwEscape($tid));
+			//$db->update("UPDATE pw_threads SET ".S::sqlSingle($pwSQL,false)." WHERE tid=".S::sqlEscape($tid));
+			pwQuery::update('pw_threads', 'tid=:tid' , array($tid), $pwSQL);
                         # memcache reflesh
-                        $threadList = L::loadClass("threadlist", 'forum');
-                        $threadList->updateThreadIdsByForumId($fid,$tid);
-			$db->update("UPDATE $pw_tmsgs SET " . pwSqlSingle(array(
+                        //* $threadList = L::loadClass("threadlist", 'forum');
+                        //* $threadList->updateThreadIdsByForumId($fid,$tid);
+			Perf::gatherInfo('changeThreadWithForumIds', array('fid'=>$fid));   
+			/**                     
+			$db->update("UPDATE $pw_tmsgs SET " . S::sqlSingle(array(
 				'aid'		=> $rt['aid'],				'userip'	=> $rt['userip'],
 				'ifsign'	=> $rt['ifsign'],			'ipfrom'	=> $rt['ipfrom'],
 				'alterinfo'	=> $rt['alterinfo'],		'ifconvert'	=> $rt['ifconvert'],
 				'content'	=> $rt['content']
-			),false) . " WHERE tid=".pwEscape($tid));
+			),false) . " WHERE tid=".S::sqlEscape($tid));
+			**/
+			pwQuery::update($pw_tmsgs, 'tid=:tid', array($tid), array(
+				'aid'		=> $rt['aid'],				'userip'	=> $rt['userip'],
+				'ifsign'	=> $rt['ifsign'],			'ipfrom'	=> $rt['ipfrom'],
+				'alterinfo'	=> $rt['alterinfo'],		'ifconvert'	=> $rt['ifconvert'],
+				'content'	=> $rt['content']
+			));			
+			
 		}
 		$msg_delrvrc  = abs($creditset['Delete']['rvrc']);
 		$msg_delmoney = abs($creditset['Delete']['money']);
@@ -257,13 +281,15 @@ if (empty($_POST['step'])) {
 		$credit->sets($authorid,$creditset['Delete'],false);
 
 		if ($thread_tpcstatus && getstatus($thread_tpcstatus, 1)) {
-			$db->update("DELETE FROM pw_argument WHERE tid=".pwEscape($tid));
+			$db->update("DELETE FROM pw_argument WHERE tid=".S::sqlEscape($tid));
 		}
 	} else {
 		$deltype  = 'delrp';
 		$deltitle = $subject ? substrs($subject,28) : substrs($content,28);
-		$db->update("DELETE FROM $pw_posts WHERE pid=".pwEscape($pid));
-		$db->update("UPDATE pw_threads SET replies=replies-1 WHERE tid=".pwEscape($tid));
+		//$db->update("DELETE FROM $pw_posts WHERE pid=".S::sqlEscape($pid));
+		pwQuery::delete($pw_posts, 'pid=:pid', array($pid));
+		//$db->update("UPDATE pw_threads SET replies=replies-1 WHERE tid=".S::sqlEscape($tid));
+		pwQuery::update('pw_threads', 'tid=:tid', array($tid), null, array(PW_EXPR=>array('replies=replies-1')));
 		$msg_delrvrc  = abs($creditset['Deleterp']['rvrc']);
 		$msg_delmoney = abs($creditset['Deleterp']['money']);
 		$credit->addLog('topic_Deleterp',$creditset['Deleterp'],array(
@@ -282,7 +308,8 @@ if (empty($_POST['step'])) {
 		require_once(R_P.'require/guestfunc.php');
 		clearguestcache($tid,$rs['replies']);
 	}
-	P_unlink(D_P.'data/bbscache/c_cache.php');
+	//* P_unlink(D_P.'data/bbscache/c_cache.php');
+	pwCache::deleteData(D_P.'data/bbscache/c_cache.php');
 	require_once R_P . 'require/updateforum.php';
 	updateforum($fid);
 	if ($rs['topped']) {
@@ -318,10 +345,12 @@ if (empty($_POST['step'])) {
 	}
 } elseif ($_POST['step'] == 2) {
 
-	InitGP(array('atc_title','atc_content'), 'P', 0);
-	InitGP(array('replayorder','atc_anonymous','atc_newrp','atc_tags','atc_hideatt','magicid','magicname','atc_enhidetype','atc_credittype','flashatt'),'P');
-	InitGP(array('atc_iconid','atc_hide','atc_requireenhide','atc_rvrc','atc_requiresell','atc_money', 'atc_usesign', 'atc_html', 'p_type', 'p_sub_type', 'atc_convert', 'atc_autourl'), 'P', 2);
+	S::gp(array('atc_title','atc_content'), 'P', 0);
+	S::gp(array('atc_email','replayorder','atc_anonymous','atc_newrp','atc_tags','atc_hideatt','magicid','magicname','atc_enhidetype','atc_credittype','flashatt'),'P');
+	S::gp(array('atc_iconid','atc_hide','atc_requireenhide','atc_rvrc','atc_requiresell','atc_money', 'atc_usesign', 'atc_html', 'p_type', 'p_sub_type', 'atc_convert', 'atc_autourl'), 'P', 2);
 
+	S::gp(array('iscontinue'),'P');//ajax提交时有敏感词时显示是否继续
+	($db_sellset['price'] && (int) $atc_money > $db_sellset['price']) && Showmsg('post_price_limit');
 	require_once(R_P . 'require/bbscode.php');
 	if ($postmodify->type == 'topic') {
 		$postdata = new topicPostData($pwpost);
@@ -329,7 +358,7 @@ if (empty($_POST['step'])) {
 		$postdata->setWtype($p_type, $p_sub_type, $t_per, $t_db, $db_forcetype);
 		$postdata->setTags($atc_tags);
 		$postdata->setMagic($magicid,$magicname);
-		$postdata->setIfmail(0, $atc_newrp);
+		$postdata->setIfmail($atc_email, $atc_newrp);
 		if($replayorder == 1){
 			$postdata->setStatus('3','01');
 		} elseif ($replayorder == 2) {
@@ -343,7 +372,7 @@ if (empty($_POST['step'])) {
 	}
 
 	$postdata->setTitle($atc_title);
-	$postdata->setContent($atc_content);
+	!$postdata->setContent($atc_content) && Showmsg('post_price_limit');
 
 	$postdata->setConvert($atc_convert, $atc_autourl);
 	$postdata->setAnonymous($atc_anonymous);
@@ -361,11 +390,15 @@ if (empty($_POST['step'])) {
 		$postSpecial->modifyData($tid);
 	}
 	if ($postmodify->hasAtt()) {
-		InitGP(array('keep','oldatt_special','oldatt_needrvrc'), 'P', 2);
-		InitGP(array('oldatt_ctype','oldatt_desc'), 'P');
+		S::gp(array('keep','oldatt_special','oldatt_needrvrc'), 'P', 2);
+		S::gp(array('oldatt_ctype','oldatt_desc'), 'P');
 		$postmodify->initAttachs($keep, $oldatt_special, $oldatt_needrvrc, $oldatt_ctype, $oldatt_desc);
 	}
 	L::loadClass('attupload', 'upload', false);
+	/*上传错误检查
+	$return = PwUpload::checkUpload();
+	$return !== true && Showmsg($return);
+	end*/
 	if (PwUpload::getUploadNum() || $flashatt) {
 		$postdata->att = new AttUpload($winduid, $flashatt);
 		$postdata->att->check();
@@ -373,6 +406,7 @@ if (empty($_POST['step'])) {
 		$postdata->att->setReplaceAtt($postmodify->replacedb);
 		PwUpload::upload($postdata->att);
 	}
+	$postdata->iscontinue = $iscontinue;
 	$postmodify->execute($postdata);
 
 	if ($postSpecial) {
@@ -391,28 +425,20 @@ if (empty($_POST['step'])) {
 		$postActForBbs->initData();
 		$postActForBbs->insertData($tid,$fid);
 	}
-
-	if ($postdata->getIfcheck()) {
-		if ($postdata->filter->filter_weight == 3) {
-			$pinfo = 'enter_words';
-			$banword = implode(',',$postdata->filter->filter_word);
-		} elseif($prompts = $pwpost->getprompt()){
-			isset($prompts['allowhide'])   && $pinfo = "post_limit_hide";
-			isset($prompts['allowsell'])   && $pinfo = "post_limit_sell";
-			isset($prompts['allowencode']) && $pinfo = "post_limit_encode";
-		}else{
-			$pinfo = 'enter_thread';
-		}
-	} else {
-		if ($postdata->filter->filter_weight == 2) {
-			$banword = implode(',',$postdata->filter->filter_word);
-			$pinfo = 'post_word_check';
-		} elseif ($postdata->linkCheckStrategy) {
-			$pinfo = 'post_link_check';
-		}  else {
-			$pinfo = 'post_check';
+	defined('AJAX') && $pinfo = "success\t" . "read.php?tid=$tid&page=$page&toread=1#$pid";
+	$flag = false;
+	if(!$iscontinue){
+		if ($postdata->getIfcheck()) {
+			if($prompts = $pwpost->getprompt()){
+				isset($prompts['allowhide'])   && $pinfo = "post_limit_hide";
+				isset($prompts['allowsell'])   && $pinfo = "post_limit_sell";
+				isset($prompts['allowencode']) && $pinfo = "post_limit_encode";
+			}else{
+				defined('AJAX') && $pinfo = "success\t" . "read.php?tid=$tid&page=$page&toread=1#$pid";
+			}
 		}
 	}
+	defined('AJAX') && $flag && $pinfo = "continue\t" . getLangInfo('refreshto', $pinfo);	
 	refreshto("read.php?tid=$tid&page=$page&toread=1#$pid", $pinfo);
 }
 ?>

@@ -11,7 +11,7 @@ function wind_forumcheck($forum) {
 		$skin = $forum['style'];
 	}
 	$pwdcheck = GetCookie('pwdcheck');
-	if ($forum['password'] != '' && ($groupid=='guest' || $pwdcheck[$fid] != $forum['password'] && !CkInArray($windid,$manager))) {
+	if ($forum['password'] != '' && ($groupid=='guest' || $pwdcheck[$fid] != $forum['password'] && !S::inArray($windid,$manager))) {
 		require_once(R_P.'require/forumpw.php');
 	}
 	if ($forum['allowvisit'] && !allowcheck($forum['allowvisit'],$groupid,$winddb['groups'],$fid,$winddb['visit'])){
@@ -48,7 +48,7 @@ function forum_creditcheck() {
 }
 function forum_sell($fid) {
 	global $db,$winduid,$timestamp;
-	$rt = $db->get_one("SELECT MAX(overdate) AS u FROM pw_forumsell WHERE uid=".pwEscape($winduid).' AND fid='.pwEscape($fid));
+	$rt = $db->get_one("SELECT MAX(overdate) AS u FROM pw_forumsell WHERE uid=".S::sqlEscape($winduid).' AND fid='.S::sqlEscape($fid));
 	if ($rt['u'] < $timestamp) {
 		Showmsg('forum_sell');
 	}
@@ -103,7 +103,7 @@ function headguide($guidename,$onmouseover=true) {
 		$db_bfn_temp = $db_bfn;
 	}
 	if ($db_menu && $onmouseover) {
-		$headguide = "<img style=\"cursor:pointer\" id=\"td_cate\" src=\"$imgpath/$stylepath/thread/home.gif\" alt=\"forumlist\" onClick=\"return pwForumList(false,false,null,this);\" align=\"absmiddle\" /> <a href=\"$db_bfn_temp\" title=\"$db_bbsname\">$db_bbsname</a>" ;
+		$headguide = "<img id=\"td_cate\" align=\"absmiddle\" src=\"$imgpath/$stylepath/thread/home.gif\" alt=\"forumlist\" onClick=\"return pwForumList(false,false,null,this);\" class=\"cp breadHome\" /><em class=\"breadEm\"></em><a href=\"$db_bfn_temp\" title=\"$db_bbsname\">$db_bbsname</a>" ;
 	} else{
 		$headguide = "<a href=\"$db_bfn_temp\" title=\"$db_bbsname\">$db_bbsname</a>" ;
 	}
@@ -152,7 +152,7 @@ function forumlist() {
 			if ($value['cms'] || $value['f_type']=='hidden') continue;
 			if ($value['type']=='category') {
 				$listdb[$value['fid']] = array();
-			} elseif ($forum[$value['fup']]['type']=='category' && !CkInArray($value['fid'],$listdb[$value['fup']])) {
+			} elseif ($forum[$value['fup']]['type']=='category' && !S::inArray($value['fid'],$listdb[$value['fup']])) {
 				$listdb[$value['fup']][] = $value['fid'];
 			}
 		}
@@ -179,8 +179,8 @@ function updatecommend($fid,$forumset) {
 	$commend = array();
 	$commendlist = '';
 	if ($forumset['commendlist']) {
-		$commendlist = pwImplode(explode(',',$forumset['commendlist']));
-		$query = $db->query("SELECT tid,authorid,author,subject FROM pw_threads WHERE tid IN($commendlist) AND fid=".pwEscape($fid));
+		$commendlist = S::sqlImplode(explode(',',$forumset['commendlist']));
+		$query = $db->query("SELECT tid,authorid,author,subject FROM pw_threads WHERE tid IN($commendlist) AND fid=".S::sqlEscape($fid));
 		while ($rt = $db->fetch_array($query)) {
 			if ($forumset['commendlength'] && strlen($rt['subject'])>$forumset['commendlength']) {
 				$rt['subject'] = substrs($rt['subject'],$forumset['commendlength']);
@@ -190,7 +190,7 @@ function updatecommend($fid,$forumset) {
 	}
 	$count = count($commend);
 	if ($forumset['autocommend'] && $count < $forumset['commendnum']) {
-		$limit = pwLimit($forumset['commendnum'] - $count);
+		$limit = S::sqlLimit($forumset['commendnum'] - $count);
 		switch ($forumset['autocommend']) {
 			case '1' : $orderby = 'postdate';break;
 			case '2' : $orderby = 'lastpost';break;
@@ -199,7 +199,7 @@ function updatecommend($fid,$forumset) {
 			default  : $orderby = 'digest';break;
 		}
 		$sql   = $forumset['commendlist'] ? " AND tid NOT IN($commendlist)" : '';
-		$query = $db->query("SELECT tid,authorid,author,subject FROM pw_threads WHERE fid=".pwEscape($fid)." AND topped='0' $sql ORDER BY $orderby DESC $limit");
+		$query = $db->query("SELECT tid,authorid,author,subject FROM pw_threads WHERE fid=".S::sqlEscape($fid)." AND topped='0' $sql ORDER BY $orderby DESC $limit");
 		while ($rt = $db->fetch_array($query)) {
 			if ($forumset['commendlength'] && strlen($rt['subject'])>$forumset['commendlength']) {
 				$rt['subject'] = substrs($rt['subject'],$forumset['commendlength']);
@@ -208,14 +208,14 @@ function updatecommend($fid,$forumset) {
 		}
 	}
 	$forumset['ifcommend'] = $timestamp;
-	$forumsetdb = addslashes(serialize($forumset));
-	$commend = $commend ? addslashes(serialize($commend)) : '';
+	$forumsetdb = (serialize($forumset));
+	$commend = $commend ? (serialize($commend)) : '';
 	$db->update("UPDATE pw_forumsextra"
-		. " SET ".pwSqlSingle(array(
+		. " SET ".S::sqlSingle(array(
 				'forumset'	=> $forumsetdb,
 				'commend'	=> $commend
 			))
-		. ' WHERE fid='.pwEscape($fid));
+		. ' WHERE fid='.S::sqlEscape($fid));
 	require_once (R_P.'admin/cache.php');
 	updatecache_forums($fid);
 }
@@ -251,7 +251,7 @@ function isban($udb,$fid = null) {
 	if (isset($udb['groupid']) && isset($udb['userstatus'])) {
 		if ($udb['groupid'] == 6) {
 			$retu[$udb['uid']] = 1;
-		} elseif ($fid && getstatus($udb['userstatus'], PW_USERSTATUS_BANUSER) && ($rt = $db->get_one("SELECT uid FROM pw_banuser WHERE uid=".pwEscape($udb['uid'])." AND fid=".pwEscape($fid)))) {
+		} elseif ($fid && getstatus($udb['userstatus'], PW_USERSTATUS_BANUSER) && ($rt = $db->get_one("SELECT uid FROM pw_banuser WHERE uid=".S::sqlEscape($udb['uid'])." AND fid=".S::sqlEscape($fid)))) {
 			$retu[$udb['uid']] = 2;
 		}
 	} else {
@@ -263,8 +263,8 @@ function isban($udb,$fid = null) {
 			}
 		}
 		if ($fid && $uids) {
-			$uids = pwImplode($uids);
-			$query = $db->query("SELECT uid FROM pw_banuser WHERE uid IN ($uids) AND fid=".pwEscape($fid));
+			$uids = S::sqlImplode($uids);
+			$query = $db->query("SELECT uid FROM pw_banuser WHERE uid IN ($uids) AND fid=".S::sqlEscape($fid));
 			while ($rt = $db->fetch_array($query)) {
 				$retu[$rt['uid']] = 2;
 			}

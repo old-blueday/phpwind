@@ -2,6 +2,15 @@
 include_once PrintEot('left');
 print <<<EOT
 -->
+<div class="nav3 mb10">
+    <ul class="cc">
+		<li><a href="$jobUrl">基本设置</a></li>
+		<li class="current"><a href="$jobUrl&adminitem=setform">预设帖子格式</a></li>
+		<li><a href="$jobUrl&adminitem=pwcode">自定义代码</a></li>
+		<li><a href="$jobUrl&adminitem=commonsmile">普通表情</a></li>
+		<li><a href="$jobUrl&adminitem=specialsmile">特殊表情</a></li>
+    </ul>
+</div>
 <div class="admin_info mb10">
 	<h3 class="h1"><b>提示信息</b></h3>
 	<div class="legend">预设帖子格式说明功能:您可以设定帖子格式，以便于发此类帖子时可以省时省力，比如发出租信息等。(支持html代码)</div>
@@ -45,6 +54,7 @@ EOT;
 </div>
 <input type="hidden" name="action" value="ifopen" />
 <div class="tac mb10">
+	<span class="bt"><span><button type="button" onclick="CheckAll(document.FORM)">全 选</button></span></span>
 	<span class="btn"><span><button type="submit">启 用</button></span></span>
 </div>
 </form>

@@ -1,4 +1,18 @@
 <!--<?php
+print <<<EOT
+-->
+<script language="javascript" type="text/javascript">
+	function cutStrContent(){
+		var content = document.getElementById('atc_content');
+		if(strlen(content.value) > 100 ) content.value = substr(content.value,100);
+		var ad =  document.getElementById('atc_content_warn');
+		if(strlen(content.value) ==100){
+			ad.innerHTML = "剩余0字节";
+		}
+	}
+</script>
+<!-- 
+EOT;
 if ($action=='showping') {
 print <<<EOT
 -->
@@ -8,13 +22,15 @@ print <<<EOT
 <input type="hidden" name="tid" value="$tid" />
 <!--
 EOT;
-	foreach ($atcdb as $key=>$value) {
+$count = 0;
+foreach($postData as $key=>$value){
+$count++;
 print <<<EOT
 -->
 <input type="hidden" name="selid[]" value="$key" />
 <!--
 EOT;
-	}
+}
 print <<<EOT
 -->
 <div style="width:450px;">
@@ -72,19 +88,93 @@ print <<<EOT
 		<td>评分理由：</td>
 		<td>
 			<div class="mb5">
-			<select onchange="this.form.atc_content.value=this.value" style="width:320px;" class="mb5">
+			<select onchange="this.form.atc_content.value=this.value;cutStrContent();" style="width:320px;" class="mb5">
 				<option value="">自定义</option>
 				<option value="">-------</option>
 				$reason_sel
 			</select>
 			</div>
 			<div>
-				<textarea name="atc_content" id="atc_content" onkeydown="ajax.quickpost(event,this.form)" class="textareaA mb5"></textarea>
+				<textarea name="atc_content" onchange="cutStrContent();" onkeyup="cutStrContent();" onkeydown="cutStrContent();" id="atc_content" onkeydown="ajax.quickpost(event,this.form)" class="textareaA mb5"></textarea>
 				<div id="atc_content_warn" class="gray">限100字节</div>
 			</div>
 		</td>
 	</tr>
+<!-- 
+EOT;
+if($showReply){print <<<EOT
+-->
+	<tr class="tr3" id="tdPing">
+		<td class="tar"></td>
+		<td><label for="ifpost"><input type="checkbox" name="ifpost" id="ifpost" value="1" />同时作为回复发表</label></td>
+	</tr>
+<!-- 
+EOT;
+if(($db_gdcheck & 4) && (!$db_postgd || $winddb['postnum'] < $db_postgd)){
+$gdSize = explode("\t",$db_gdsize);
+print <<<EOT
+-->
+	<tr class="tr3" id="tr_gdcheck" style="display:none">
+		<td class="tar">验证码:</td>
+		<td>
+			<input class="input fl mr5" type="text" name="gdcode" size="5" />
+			<div id="ckcode" style="display:none"></div>
+<script type="text/javascript" src="js/pw_authcode.js"></script>
+<script>
+var tip = '看不清楚，换一张';
+var flashWidth = "$gdSize[0]";
+var flashHeight = "$gdSize[1]";
+var gdtype = $db_gdtype;
+showgd();
+</script>
+	</td>
+</tr>
+<!--
+EOT;
+}
+if(($db_ckquestion & 4) && (!$postq || $winddb['postnum'] < $postq) && $db_question){
+$qkey = array_rand($db_question);
+if($db_imagequestion){
+	$question = '<img id="ckquestion" src="ckquestion.php?q='.$qkey.'&t='.$timestamp.'" align="top">';
+}else{
+	$question = $qkey<0 ? getMachineQuestion_1() :  $db_question[$qkey];
+}
+$q_a = $question.($showq && $qkey>0?" 正确答案:".$db_answer[$qkey] : '');
+print <<<EOT
+-->
+	<tr class="tr3" id="tr_ckquestion" style="display:none">
+		<td class="tar">验证问题:</td>
+		<td>$q_a
+			<input class="input" type="text" name="qanswer" size="5"/>
+			<input type="hidden" name="qkey" value="$qkey" />
+		</td>
+	</tr>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+<script>
+	var tr_gdcheck = getObj('tr_gdcheck');
+	var tr_ckquestion = getObj('tr_ckquestion');
+	var ifpost = getObj('ifpost');
+	ifpost.onclick = function(){
+		if(ifpost.checked){
+			if(tr_gdcheck)tr_gdcheck.style.display = '';
+			if(tr_ckquestion)tr_ckquestion.style.display = '';
+		}else{
+			if(tr_gdcheck)tr_gdcheck.style.display = 'none';
+			if(tr_ckquestion)tr_ckquestion.style.display = 'none';
+		}
+	}
+</script>
+<!--
+EOT;
+}//end show reply
+print <<<EOT
+-->
 </table>
+
 <div id="menu_rate" style="display:none;">
 <!--[if IE 6]>
 <iframe frameborder="0" style="position:absolute;width:60px;height:270px;background:#fff;filter:Alpha(opacity=0);" scrolling="no"></iframe>
@@ -142,6 +232,9 @@ function operateshowping() {
 					pingNum.innerHTML  = parseInt(m) + pingNums;
 				}
 				showDialog('success','评分成功!',1);
+				if(true == thisform['ifpost'].checked){
+					setTimeout(function(){location.reload()},300);
+				}
 			} else {
 				for (var i in showping) {
 					var pingLog = $('pingLogTr_'+showping[i]) ? $('pingLogTr_'+showping[i]) : $('createpingLogTr_'+showping[i])
@@ -160,7 +253,7 @@ function operateshowping() {
 }
 
 function showPingCommentHTML(element,showping) {
-		return '<table width="100%"><tr id="createpingLogTr_'+showping['pingLogId']+'" class="vt" onmouseover="showPingDelLink(this, true)" onmouseout="showPingDelLink(this, false)"><th class="p_face"><div id="card_pingUserShow_'+showping['pingLogId']+'_'+showping['pingeruid']+'" class="userCard"><img src="'+showping['face']+'" width="16" height="16" /></div><span id="pingUserShow_'+showping['pingLogId']+'"></span></th><td class="p_name"><a target="_blank" href="u.php?username='+showping['pinger']+'">'+showping['pinger']+'</a></td><td  width="60">'+showping['name']+'</td><td class="s2 b" width="40">'+showping['point']+'</td><td width="90">'+showping['pingtime']+'</td><td>'+showping['record']+'</td><td width="20"><a class="adel" style="display:none;" id="pingDel_'+showping['pingLogId']+'" href="javascript:void(0);" onclick=delPingLog("'+showping['fid']+'","'+showping['tid']+'","'+showping['pid']+'","'+showping['pingLogId']+'")>删除</a></td></tr></table>';
+		return '<table width="100%"><tr id="createpingLogTr_'+showping['pingLogId']+'" class="vt" onmouseover="showPingDelLink(this, true)" onmouseout="showPingDelLink(this, false)"><th class="p_face"><div id="card_pingUserShow_'+showping['pingLogId']+'_'+showping['pingeruid']+'" class="userCard"><img src="'+showping['face']+'" width="16" height="16" /></div><span id="pingUserShow_'+showping['pingLogId']+'"></span></th><td class="p_name"><a target="_blank" href="u.php?uid='+showping['pingeruid']+'">'+showping['pinger']+'</a></td><td  width="60">'+showping['name']+'</td><td class="s2 b" width="40">'+showping['point']+'</td><td width="90">'+showping['pingtime']+'</td><td>'+showping['record']+'</td><td width="20"><a class="adel" style="display:none;" id="pingDel_'+showping['pingLogId']+'" href="javascript:void(0);" onclick=delPingLog("'+showping['fid']+'","'+showping['tid']+'","'+showping['pid']+'","'+showping['pingLogId']+'")>删除</a></td></tr></table>';
 }
 </script>
 
@@ -244,10 +337,12 @@ function operatesel (id) {
 	if (id == '1') {
 		objCheck('ok1').style.display = '';
 		objCheck('ok3').style.display = '';
+		objCheck('tdPing').style.display = '';
 		objCheck('cancel').style.display = 'none';
 	} else {
 		objCheck('ok1').style.display = 'none';
 		objCheck('ok3').style.display = 'none';
+		objCheck('tdPing').style.display = 'none';
 		objCheck('cancel').style.display = '';
 	}
 }
@@ -256,9 +351,132 @@ var charset = '$db_charset';
 
 <!--
 EOT;
-} elseif($action=='postping') {
+}elseif($action=='shield'){print <<<EOT
+-->
+<form action="operate.php?action=$action&ajax=1" method="post">
+<div style="width:450px;">
+<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="adel cp" onclick="closep();">关闭</span>帖子屏蔽</div>
+<input type="hidden" name="verify" value="$verifyhash" />
+<table width="100%" class="vt z mb5">
+	<tr class="tr3">
+		<td class="tar">屏蔽数量</td>
+		<td>$count 篇</td>
+	</tr>
+	<tr class="tr3"><td class="tar">操作类型:</td>
+		<td><input type="radio" name="step" value="3" checked />屏蔽
+			<input type="radio" name="step" value="5" />取消屏蔽 
+		</td>
+	</tr>
+	<tr class="tr3"><td class="tar">消息通知:</td>
+		<td><input type="radio" name="ifmsg" value="1" checked />开启
+			<input type="radio" name="ifmsg" value="0" />关闭
+		</td>
+	</tr>
+	<tr id="ok3" class="tr3">
+		<td>屏蔽理由:</td>
+		<td>
+			<div class="mb5">
+			<select onchange="this.form.atc_content.value=this.value;cutStrContent();" style="width:320px;" class="mb5">
+				<option value="">自定义</option>
+				<option value="">-------</option>
+				$reason_sel
+			</select>
+			</div>
+			<div>
+				<textarea name="atc_content" onchange="cutStrContent();" onkeyup="cutStrContent();" onkeydown="cutStrContent();" id="atc_content" onkeydown="ajax.quickpost(event,this.form)" class="textareaA mb5"></textarea>
+				<div id="atc_content_warn" class="gray">限100字节</div>
+			</div>
+		</td>
+	</tr>
+</table>
+</div>
+<div class="popBottom">
+<span class="btn2"><span>
+<button type="button" name="ajaxsubmit" onclick="ajax.submit(this.form,ajax.get);">提 交</button>
+</span></span></div>
+<!--
+EOT;
+foreach($postdb as $value){
 print <<<EOT
 -->
+<input type="hidden" name="selid[]" value="{$value['pid']}" />
+<!--
+EOT;
+}print <<<EOT
+-->
+<input type="hidden" name="fid" value="$fid" />
+<input type="hidden" name="tid" value="$tid" />
+<input type="hidden" name="page" value="$page" />
+</form>
+<script language="JavaScript">
+setTimeout(function() {
+	initCheckTextNum('atc_content','atc_content_warn', 100);
+}, 100);
+</script>
+<!--
+EOT;
+}elseif($action=='remind'){print <<<EOT
+-->
+<form action="operate.php?action=$action&ajax=1" method="post">
+<div style="width:450px;">
+<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="adel cp" onclick="closep();">关闭</span>帖子提醒</div>
+<input type="hidden" name="verify" value="$verifyhash" />
+<table width="100%" class="vt z mb5">
+	<tr class="tr3">
+		<td class="tar">提醒数量</td>
+		<td>$count 篇</td>
+	</tr>
+	<tr class="tr3"><td class="tar">操作类型:</td>
+		<td><input type="radio" name="step" value="3" checked />提醒
+			<input type="radio" name="step" value="5" />取消提醒
+		</td>
+	</tr>
+	<tr class="tr3"><td class="tar">消息通知:</td>
+		<td><input type="radio" name="ifmsg" value="1" checked />开启
+			<input type="radio" name="ifmsg" value="0" />关闭
+		</td>
+	</tr>
+	<tr id="ok3" class="tr3">
+		<td>提醒理由:</td>
+		<td>
+			<div class="mb5">
+			<select onchange="this.form.atc_content.value=this.value;cutStrContent();" style="width:320px;" class="mb5">
+				<option value="">自定义</option>
+				<option value="">-------</option>
+				$reason_sel
+			</select>
+			</div>
+			<div>
+				<textarea name="atc_content" onchange="cutStrContent();" onkeyup="cutStrContent();" onkeydown="cutStrContent();" id="atc_content" onkeydown="ajax.quickpost(event,this.form)" class="textareaA mb5"></textarea>
+				<div id="atc_content_warn" class="gray">限100字节</div>
+			</div>
+		</td>
+	</tr>
+</table>
+</div>
+<div class="popBottom">
+<span class="btn2"><span>
+<button type="button" name="ajaxsubmit" onclick="ajax.submit(this.form,ajax.get);">提 交</button>
+</span></span></div>
+<!--
+EOT;
+foreach($postdb as $value){
+print <<<EOT
+-->
+<input type="hidden" name="selid[]" value="{$value['pid']}" />
+<!--
+EOT;
+}print <<<EOT
+-->
+<input type="hidden" name="fid" value="$fid" />
+<input type="hidden" name="tid" value="$tid" />
+<input type="hidden" name="page" value="$page" />
+</form>
+<script language="JavaScript">
+setTimeout(function() {
+	initCheckTextNum('atc_content','atc_content_warn', 100);
+}, 100);
+</script>
 <!--
 EOT;
 } elseif($action=='recommend') {
@@ -317,7 +535,7 @@ print <<<EOT
 		</td>
 	</tr>
 	<tbody id="sendemail" style="display:none">
-	<tr class="tr3"><td>对方Email:</td>
+	<tr class="tr3"><td>对方电子邮箱:</td>
 		<td><input type="text" class="input input_wa" name="sendtoemail" value="" /></td>
 	</tr>
 	</tbody>
@@ -626,7 +844,7 @@ EOT;
 	if($type == 'user') {
 print <<<EOT
 -->
-					<textarea class="textareaA" name="atc_content" onkeydown="ajax.quickpost(event,this.form)">我很喜欢用户[url={$db_bbsurl}/u.php?uid={$uid}]{$username}[/url]的个人空间，特别推荐。\n\n他（她）的用户名:\n$title\n\n希望你能喜欢。</textarea>
+					<textarea class="textareaA" name="atc_content" onkeydown="ajax.quickpost(event,this.form)">我很喜欢用户[url={$db_bbsurl}/{$db_userurl}{$uid}]{$username}[/url]的个人空间，特别推荐。\n\n他（她）的用户名:\n$title\n\n希望你能喜欢。</textarea>
 <!--
 EOT;
 	}elseif($type == 'group') {print <<<EOT
@@ -654,7 +872,7 @@ print <<<EOT
 -->
 EOT;
 $uid || $uid = $u;print <<<EOT
-我在用户[url={$db_bbsurl}/u.php?uid={$uid}]{$username}[/url]的个人空间发现这个信息，认为很有价值，特别推荐。\n\n主要信息:\n$title\n\n描述:\n$descrip\n\n希望你能喜欢。
+我在用户[url={$db_bbsurl}/{$db_userurl}{$uid}]{$username}[/url]的个人空间发现这个信息，认为很有价值，特别推荐。\n\n主要信息:\n$title\n\n描述:\n$descrip\n\n希望你能喜欢。
 <!--
 EOT;
 }
@@ -786,7 +1004,7 @@ function post(form) {
 		var totalmsg = $totalMessage;
 		var maxmsg = $max;
 		if(maxmsg > 0 && totalmsg >= maxmsg){
-			MC.showFailTips("消息已满,发送失败.请及时清理");
+			MC.showFailTips("消息已满,发送失败.请及时<a href=\"message.php?type=clear\">清理</a>");
 			return false;
 		}
 		var unames = document.getElementsByName('_usernames[]');

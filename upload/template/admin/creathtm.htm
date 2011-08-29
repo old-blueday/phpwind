@@ -2,6 +2,14 @@
 include_once PrintEot('left');
 print <<<EOT
 -->
+<div class="nav3 mb10">
+	<ul class="cc">
+		<li><a href="$admin_file?adminjob=setforum&adminitem=setforum">版块管理</a></li>
+		<li><a href="$admin_file?adminjob=setforum&adminitem=uniteforum">版块合并</a></li>
+		<li><a href="$admin_file?adminjob=setforum&adminitem=forumsell">版块出售记录</a></li>
+		<li class="current"><a href="$admin_file?adminjob=setforum&adminitem=creathtm">生成静态文件</a></li>
+	</ul>
+</div>
 <div class="admin_info mb10">
     <h3 class="h1"><b>提示信息</b></h3>
     <div class="legend">功能说明:<ol>

@@ -28,6 +28,7 @@ class PW_Photoanalyse extends PW_Datanalyse {
 	function _getExtendActions() {
 		global $db_ratepower;
 		$rateSets = unserialize($db_ratepower);
+		$_tmp = array();
 		if ($rateSets[3]) {
 			$rate = L::loadClass('rate', 'rate');
 			$_tmp = $rate->getRatePictureHotTypes();

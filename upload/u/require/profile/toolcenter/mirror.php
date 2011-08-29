@@ -7,7 +7,7 @@
  * @effect:查看用户IP.
  */
 
-InitGP(array('uid'),'GP',2);
+S::gp(array('uid'),'GP',2);
 if($tooldb['type'] != 2){
 	Showmsg('tooluse_type_error');  // 判断道具类型是否设置错误
 }
@@ -18,7 +18,7 @@ $ipdb = '';
 $userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
 $rt = $userService->get($uid, false, true); //onlineip
 $ipdb = explode('|',$rt['onlineip']);
-$db->update("UPDATE pw_usertool SET nums=nums-1 WHERE uid=".pwEscape($winduid)."AND toolid=".pwEscape($toolid));
+$db->update("UPDATE pw_usertool SET nums=nums-1 WHERE uid=".S::sqlEscape($winduid)."AND toolid=".S::sqlEscape($toolid));
 $logdata = array(
 	'type'		=>	'use',
 	'descrip'	=>	'tool_20_descrip',

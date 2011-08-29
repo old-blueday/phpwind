@@ -12,16 +12,19 @@ if ($tooldb['type']!=2) {
 }
 if (!$_POST['step']) {
 	require_once uTemplate::PrintEot('profile_toolcenter');
-	pwOutPut();
+	if( defined('AJAX'))
+		ajax_footer();
+	else 
+		pwOutPut();
 } else {
-	include_once(D_P."data/bbscache/dbreg.php");
+	include_once pwCache::getPath(D_P."data/bbscache/dbreg.php");
 	if (isset($rg_namelen)) {
 		list($rg_regminname,$rg_regmaxname) = explode("\t",$rg_namelen);
 	} else {
 		$rg_regminname = 3;
 		$rg_regmaxname = 12;
 	}
-	InitGP(array('pwuser'),'P');
+	S::gp(array('pwuser'),'P');
 	!$pwuser && Showmsg('username_empty');
 	if(strlen($pwuser)>$rg_regmaxname || strlen($pwuser)<$rg_regminname){
 		Showmsg('reg_username_limit');
@@ -63,7 +66,7 @@ if (!$_POST['step']) {
 	}
 	/*
 	$userService->update($winduid, array('username' => $pwuser));
-	$db->update("UPDATE pw_threads SET author=".pwEscape($pwuser)."WHERE authorid=".pwEscape($winduid));
+	$db->update("UPDATE pw_threads SET author=".S::sqlEscape($pwuser)."WHERE authorid=".S::sqlEscape($winduid));
 	$ptable_a=array('pw_posts');
 	if($db_plist && count($db_plist)>1){
 		foreach($db_plist as $key => $val){
@@ -72,24 +75,24 @@ if (!$_POST['step']) {
 		}
 	}
 	foreach($ptable_a as $val){
-		$db->update("UPDATE $val SET author=".pwEscape($pwuser)."WHERE authorid=".pwEscape($winduid));
+		$db->update("UPDATE $val SET author=".S::sqlEscape($pwuser)."WHERE authorid=".S::sqlEscape($winduid));
 	}
-	$db->update("UPDATE pw_cmembers SET username=".pwEscape($pwuser)."WHERE uid=".pwEscape($winduid));
-	$db->update("UPDATE pw_colonys SET admin=".pwEscape($pwuser)."WHERE admin=".pwEscape($windid));
-	$db->update("UPDATE pw_announce SET author=".pwEscape($pwuser)."WHERE author=".pwEscape($windid));
-	$db->update("UPDATE pw_medalslogs SET awardee=".pwEscape($pwuser)."WHERE awardee=".pwEscape($windid));
+	$db->update("UPDATE pw_cmembers SET username=".S::sqlEscape($pwuser)."WHERE uid=".S::sqlEscape($winduid));
+	$db->update("UPDATE pw_colonys SET admin=".S::sqlEscape($pwuser)."WHERE admin=".S::sqlEscape($windid));
+	$db->update("UPDATE pw_announce SET author=".S::sqlEscape($pwuser)."WHERE author=".S::sqlEscape($windid));
+	$db->update("UPDATE pw_medalslogs SET awardee=".S::sqlEscape($pwuser)."WHERE awardee=".S::sqlEscape($windid));
 
 	require R_P.'admin/cache.php';
-	$query = $db->query("SELECT fid,forumadmin,fupadmin FROM pw_forums WHERE forumadmin LIKE ".pwEscape("%,$windid,%")."OR fupadmin LIKE".pwEscape( "%,$windid,%"));
+	$query = $db->query("SELECT fid,forumadmin,fupadmin FROM pw_forums WHERE forumadmin LIKE ".S::sqlEscape("%,$windid,%")."OR fupadmin LIKE".S::sqlEscape( "%,$windid,%"));
 	while($rt = $db->fetch_array($query)){
 		$rt['forumadmin']	= str_replace(",$windid,",",$pwuser,",$rt['forumadmin']);
 		$rt['fupadmin']		= str_replace(",$windid,",",$pwuser,",$rt['fupadmin']);
-		$db->update("UPDATE pw_forums SET ".pwSqlSingle(array('forumadmin'=>$rt['forumadmin'],'fupadmin'=>$rt['fupadmin']),false)."WHERE fid=".pwEscape($rt['fid']));
+		$db->update("UPDATE pw_forums SET ".S::sqlSingle(array('forumadmin'=>$rt['forumadmin'],'fupadmin'=>$rt['fupadmin']),false)."WHERE fid=".S::sqlEscape($rt['fid']));
 		updatecache_forums($rt['fid']);
 	}
 	*/
 
-	$db->update("UPDATE pw_usertool SET nums=nums-1 WHERE uid=".pwEscape($winduid)."AND toolid=".pwEscape($toolid));
+	$db->update("UPDATE pw_usertool SET nums=nums-1 WHERE uid=".S::sqlEscape($winduid)."AND toolid=".S::sqlEscape($toolid));
 	$logdata=array(
 		'type'		=>	'use',
 		'nums'		=>	'',
@@ -104,8 +107,10 @@ if (!$_POST['step']) {
 		'tid'		=>	$tid,
 	);
 	writetoollog($logdata);
-	$_cache = getDatastore();
-	$_cache->delete('UID_'.$winduid);
+	//* $_cache = getDatastore();
+	//* $_cache->delete('UID_'.$winduid);
+	
+	perf::gatherInfo('changeMembersWithUserIds', array('uid'=>$winduid));
 	Showmsg('toolmsg_8_success');
 }
 ?>

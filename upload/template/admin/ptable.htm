@@ -3,6 +3,13 @@ include_once PrintEot('left');
 if(empty($action)){
 print <<<EOT
 -->
+<div class="nav3 mb10">
+	<ul class="cc">
+		<li ><a href="$basename&job=bakout">数据维护</a></li>
+		<li><a href="$basename&job=bakin">数据恢复</a></li>
+		<li class="current"><a href="$basename&job=ptable">数据库分卷</a></li>
+	</ul>
+</div>
 <div class="admin_info mb10">
 	<h3 class="h1">功能说明</h3>
     <div class="legend mb10">数据库分卷技术实现将一个数据量非常大的表拆分成多个数据较小的表，从而提高数据库查询效率，让您的站点在超大数据量下仍然能高效运行<br /><font color="blue">注意:</font><br />当回复表比较大(几百M)的时候，可以使用该功能进行分卷来降低原来的回复表的负载，分卷教程可以到phpwind官方论坛<a href="http://faq.phpwind.net/" target="_blank">FAQ</a>里面查阅一下 </div>

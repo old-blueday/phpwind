@@ -78,12 +78,14 @@ class PW_Ucuser {
 		$count = $userService->count();
 		$lastestUser = $userService->getLatestNewUser();
 		
-		$this->db->update("UPDATE pw_bbsinfo SET newmember=" . pwEscape($lastestUser['username']) . ',totalmember=' . pwEscape($count) . " WHERE id='1'");
+		//* $this->db->update("UPDATE pw_bbsinfo SET newmember=" . S::sqlEscape($lastestUser['username']) . ',totalmember=' . S::sqlEscape($count) . " WHERE id='1'");
+		$this->db->update(pwQuery::buildClause("UPDATE :pw_table SET newmember=:newmember,totalmember=:totalmember WHERE id=:id", array('pw_bbsinfo',$lastestUser['username'], $count)));
 	}
 	
 	function alterName($uid, $oldname, $username) {
 		global $db_plist;
-		$this->db->update("UPDATE pw_threads SET author=" . pwEscape($username) . " WHERE authorid=" . pwEscape($uid));
+		//$this->db->update("UPDATE pw_threads SET author=" . S::sqlEscape($username) . " WHERE authorid=" . S::sqlEscape($uid));
+		pwQuery::update('pw_threads', 'authorid=:authorid', array($uid), array('author'=>$username));
 		$ptable_a = array(
 			'pw_posts'
 		);
@@ -94,20 +96,24 @@ class PW_Ucuser {
 			}
 		}
 		foreach ($ptable_a as $val) {
-			$this->db->update("UPDATE $val SET author=" . pwEscape($username) . " WHERE authorid=" . pwEscape($uid));
+			//$this->db->update("UPDATE $val SET author=" . S::sqlEscape($username) . " WHERE authorid=" . S::sqlEscape($uid));
+			pwQuery::update($val, 'authorid=:authorid', array($uid), array('author' => $username));
 		}
-		$this->db->update("UPDATE pw_cmembers SET username=" . pwEscape($username) . " WHERE uid=" . pwEscape($uid));
-		$this->db->update("UPDATE pw_area_level SET username=" . pwEscape($username) . " WHERE uid=" . pwEscape($uid));
-		$this->db->update("UPDATE pw_colonys SET admin=" . pwEscape($username) . " WHERE admin=" . pwEscape($oldname));
-		$this->db->update("UPDATE pw_announce SET author=" . pwEscape($username) . " WHERE author=" . pwEscape($oldname));
-		$this->db->update("UPDATE pw_medalslogs SET awardee=" . pwEscape($username) . " WHERE awardee=" . pwEscape($oldname));
+		//* $this->db->update("UPDATE pw_cmembers SET username=" . S::sqlEscape($username) . " WHERE uid=" . S::sqlEscape($uid));
+		pwQuery::update('pw_cmembers', 'uid=:uid', array($uid), array('username'=>$username));
+		
+		$this->db->update("UPDATE pw_area_level SET username=" . S::sqlEscape($username) . " WHERE uid=" . S::sqlEscape($uid));
+		$this->db->update("UPDATE pw_colonys SET admin=" . S::sqlEscape($username) . " WHERE admin=" . S::sqlEscape($oldname));
+		$this->db->update("UPDATE pw_announce SET author=" . S::sqlEscape($username) . " WHERE author=" . S::sqlEscape($oldname));
+		$this->db->update("UPDATE pw_medalslogs SET awardee=" . S::sqlEscape($username) . " WHERE awardee=" . S::sqlEscape($oldname));
 
 		$upfid = array();
-		$query = $this->db->query("SELECT fid,forumadmin,fupadmin FROM pw_forums WHERE forumadmin LIKE " . pwEscape("%,$oldname,%", false) . " OR fupadmin LIKE " . pwEscape("%,$oldname,%", false));
+		$query = $this->db->query("SELECT fid,forumadmin,fupadmin FROM pw_forums WHERE forumadmin LIKE " . S::sqlEscape("%,$oldname,%", false) . " OR fupadmin LIKE " . S::sqlEscape("%,$oldname,%", false));
 		while ($rt = $this->db->fetch_array($query)) {
 			$rt['forumadmin'] = str_replace(",$oldname,", ",$username,", $rt['forumadmin']);
 			$rt['fupadmin'] = str_replace(",$oldname,", ",$username,", $rt['fupadmin']);
-			$this->db->update("UPDATE pw_forums SET forumadmin=" . pwEscape($rt['forumadmin'], false) . ",fupadmin=" . pwEscape($rt['fupadmin'], false) . " WHERE fid=" . pwEscape($rt['fid'], false));
+			//$this->db->update("UPDATE pw_forums SET forumadmin=" . S::sqlEscape($rt['forumadmin'], false) . ",fupadmin=" . S::sqlEscape($rt['fupadmin'], false) . " WHERE fid=" . S::sqlEscape($rt['fid'], false));
+			pwQuery::update('pw_forums', 'fid=:fid', array($rt['fid']), array('forumadmin' => $rt['forumadmin'], 'fupadmin' => $rt['fupadmin']));
 			$upfid[] = $rt['fid'];
 		}
 		if ($upfid) {

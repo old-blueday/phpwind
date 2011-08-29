@@ -37,7 +37,7 @@ class PushUpload extends uploadBehavior {
 		$filename	= date("YmdHis", time()).'.'. $currUpload['ext'];
 		$savedir	= 'pushpic/';
 		
-		return array($filename, $savedir, 's_' . $filename, $savedir);
+		return array($filename, $savedir);
 	}
 
 	function update($uploaddb) {

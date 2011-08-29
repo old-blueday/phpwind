@@ -1,9 +1,7 @@
 <?php
 !defined('P_W') && exit('Forbidden');
 
-InitGP(array(
-	'type'
-));
+S::gp(array('type'));
 if ($type == 'pwcode') {
 	$code = array();
 	$query = $db->query("SELECT * FROM pw_windcode");
@@ -12,10 +10,8 @@ if ($type == 'pwcode') {
 		$code[] = $rt;
 	}
 } else {
-	@include_once (D_P . 'data/bbscache/setform.php');
-	InitGP(array(
-		'id'
-	), 'GP', 2);
+	@include_once pwCache::getPath(D_P . 'data/bbscache/setform.php');
+	S::gp(array('id'), 'GP', 2);
 	$setform = array();
 	if (isset($setformdb[$id])) {
 		$setform = $setformdb[$id];

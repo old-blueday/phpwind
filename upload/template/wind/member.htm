@@ -5,7 +5,7 @@
 </style>
 
 <div id="breadCrumb">
-		<img src="$imgpath/$stylepath/thread/home-old.gif" align="absmiddle" />&nbsp;<a href="$db_bfn" title="$db_bbsname">$db_bbsname</a><em>&gt;</em>会员列表
+<img src="$imgpath/$stylepath/thread/home.gif" class="cp breadHome" /><em class="breadEm"></em><a href="$db_bfn" title="$db_bbsname">$db_bbsname</a><em>&gt;</em>会员列表
 </div>
 <div id="pw_content">
 <div class="pd15" style="padding-top:15px; padding-bottom:15px;">
@@ -34,7 +34,7 @@
 <tr class="tr2">
 <td>用户名</td>
 <td class="tal y-style">性别</td>
-<td class="tal y-style">Email</td>
+<td class="tal y-style">电子邮箱</td>
 <td class="tal y-style" width="8%">来自</td>
 <td class="tal y-style" width="12%">QQ</td>
 <td class="tal y-style">注册时间</td>
@@ -53,7 +53,7 @@ $class=$i%2==0 ? "f_two" : "f_one";
 print <<<EOT
 -->
 <tr class="tr3 $class">
-<td><a href="u.php?uid=$member[uid]" target="_blank" class="s7">
+<td><a href="{$db_userurl}$member[uid]" target="_blank" class="s7">
 <b>$member[username]</b></a></td>
 <td class="tal y-style">
 <!--

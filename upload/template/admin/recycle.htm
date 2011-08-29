@@ -81,11 +81,14 @@ if ($type == 'topic'){print <<<EOT
 				<input type="text" class="input input_wa mr20" name="admin">
 			</td>
         </tr>
+				<tr class="tr1 vt">
+            <td class="td1">&nbsp;</td>
+			<td class="td2">
+				<span class="btn2"><span><button type="submit">提 交</button></span></span>
+			</td>
+        </tr>
       </table>
   </div>
-<div class="mb10 tac">
-	<span class="btn"><span><button type="submit">提 交</button></span></span>
-</div>
 </form>
 <SCRIPT LANGUAGE="JavaScript">
 var typefrom = '$from';
@@ -191,7 +194,8 @@ EOT;
 -->
   </table>
   </div>
-  <div class="fr"><span class="bt2"><span><button type="button" value="清空草稿箱" onclick="Recycle.Confirm('topic');">清空回收站</button></span></span></div>
+  <div class="fr"><span class="bt2"><span><button type="button" value="清空草稿箱" onclick="Recycle.Confirm('topic');">清空回收站</button></span></span>
+  </div>
   <div class="cc mb10">$pages</div>
   <div class="mb10 tac">
   	<p><input type="radio" name="action" value="revert" checked> 还原帖子&nbsp;
@@ -199,6 +203,7 @@ EOT;
         <input type="radio" name="action" value="clear"> 删除记录</p>
   </div>
 <div class="tac mb10">
+	<span class="bt"><span><button type="button" onclick="CheckAll(document.form1)">全 选</button></span></span>
     <span class="btn"><span><button type="submit" name="hello" onclick="return confirm('您确认要进行此操作吗?');">提 交</button></span></span>
 </div>
 </form>
@@ -253,12 +258,15 @@ EOT;
 				<input type="text" class="input input_wa mr20" name="admin">
 			</td>
         </tr>
+				<tr class="tr1 vt">
+            <td class="td1">&nbsp;</td>
+			<td class="td2">
+				<span class="btn2"><span><button type="submit">提 交</button></span></span>
+			</td>
+        </tr>
       </table>
   </div>
 <input type="hidden" name="ptable" id="ptable" value="">
-<div class="mb10 tac">
-	<span class="btn"><span><button type="submit">提 交</button></span></span>
-</div>
 </form>
 <SCRIPT LANGUAGE="JavaScript">
 var typefrom = '$from';
@@ -288,7 +296,7 @@ window.onload = function(){
 EOT;
 if($db_plist && count($db_plist)>1){print <<<EOT
 -->
-        <select onchange="window.location=('$basename&type=reply&ptable='+this.value);" name="select_ptable" id="select_ptable">
+        <select onchange="window.location=('$basename&type=reply&ptable='+this.value);" name="select_ptable" id="select_ptable" class="f12">
           $p_table
         </select>
 <!--
@@ -321,8 +329,9 @@ EOT;
 }print<<<EOT
 -->
       <td>作者</td>
+      <td>发帖时间</td>
       <td>删除人</td>
-      <td>时间</td>
+      <td>删除时间</td>
     </tr>
 <!--
 EOT;
@@ -366,11 +375,12 @@ EOT;
 -->
       </td>
       <td class="td2"><a href="u.php?uid=$value[authorid]" target="_blank">$value[author]</a></td>
+      <td class="td2">$value[postdate]</td>   
       <td class="td2">$value[admin]</td>
       <td class="td2">$value[deltime]</td>
     </tr>
     <tr id="content_$value[pid]" class="tr1 vt" style="display:none;">
-      <td class="td2" colspan="7">$value[content]</td>
+      <td class="td2" colspan="7"><div style="border:1px solid #ccc;background:#f7f7f7;margin-left:35px;padding:3px 11px;">$value[content]</div></td>
     </tr>
 <!--
 EOT;
@@ -386,6 +396,7 @@ EOT;
         <input type="radio" name="action" value="clear"> 删除记录</p>
   </div>
   <div class="tac mb10">
+	<span class="bt"><span><button type="button" onclick="CheckAll(document.form1)">全 选</button></span></span>
     <span class="btn"><span><button type="submit" name="hello" onclick="return confirm('您确认要进行此操作吗?');">提 交</button></span></span>
  </div>
 </form>

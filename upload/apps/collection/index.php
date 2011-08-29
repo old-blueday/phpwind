@@ -1,14 +1,14 @@
 <?php
 !defined('A_P') && exit('Forbidden');
 
-InitGP(array('uid'), 2);
-include_once(D_P . 'data/bbscache/o_config.php');
-InitGP(array('page', 'ajax'));
+S::gp(array('uid'), 2);
+include_once pwCache::getPath(D_P . 'data/bbscache/o_config.php');
+S::gp(array('page', 'ajax'));
 
 if ($q == "collection") {
 	
 	require_once(R_P.'require/showimg.php');	
-	InitGP(array('a','type','space'),null,1);
+	S::gp(array('a','type','space'),null,1);
 	require_once(R_P . 'u/lib/space.class.php');
 	$newSpace = new PwSpace($uid ? $uid : $winduid);
 	$space =& $newSpace->getInfo();
@@ -17,16 +17,16 @@ if ($q == "collection") {
 	$where = '';
 	
 	if ($ajax == '1') {
-		require_once Pcv($appEntryBasePath . 'action/ajax.php');
+		require_once S::escapePath($appEntryBasePath . 'action/ajax.php');
 	} else {
 		!$winduid && Showmsg('not_login');
 		$page = intval($page);
 		$page < 1 && $page = 1;
 		$db_perpage = 10;
-		require_once Pcv($appEntryBasePath . '/action/my.php');
+		require_once S::escapePath($appEntryBasePath . '/action/my.php');
 	}
 } elseif ($q == "sharelink") {
-	require_once Pcv($appEntryBasePath . '/action/m_sharelink.php');
+	require_once S::escapePath($appEntryBasePath . '/action/m_sharelink.php');
 }
 
 
@@ -53,15 +53,7 @@ function get_key($tid,$tiddb) {
 	}
 	return null;
 }
-function getFidoff($gid) {
-	global $db;
-	$fidoff = array(0);
-	$query = $db->query("SELECT fid FROM pw_forums WHERE type<>'category' AND (password!='' OR forumsell!='' OR allowvisit!='' AND allowvisit NOT LIKE '%,$gid,%')");
-	while ($rt = $db->fetch_array($query)) {
-		$fidoff[] = $rt['fid'];
-	}
-	return $fidoff;
-}
+
 
 function makefavor($tiddb) {
 	$newtids = $ex = '';

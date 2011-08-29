@@ -1,21 +1,21 @@
 <?php
 !function_exists('adminmsg') && exit('Forbidden');
-@include_once (D_P . 'data/bbscache/o_config.php');
+@include_once pwCache::getPath(D_P . 'data/bbscache/o_config.php');
 @include_once (R_P . 'require/credit.php');
 @include_once (A_P . 'lib/utility.class.php');
 @include_once (A_P . 'lang/lang_o_hot.php');
 $utility = new HotModuleUtility();
 if(empty($action)){
-	InitGP(array("hot_baseSet"),'P');
+	S::gp(array("hot_baseSet"),'P');
 	if ($hot_baseSet=="baseSet") {
-		InitGP(array("config","hot_userGroup"),'P');
+		S::gp(array("config","hot_userGroup"),'P');
 		$config["hot_groups"] = ','.implode(',',(array)$hot_userGroup).',';
 		$cacheFlag=false;
 		foreach ($config as $key => $value) {
 			if(${'o_'.$key} != $value){
-				$db->pw_update("SELECT * FROM pw_hack WHERE hk_name=".pwEscape('o_'.$key),
-					   "UPDATE pw_hack SET vtype=".pwEscape('string').", hk_value=".pwEscape($value)." WHERE hk_name=".pwEscape('o_'.$key),
-					   "INSERT INTO pw_hack SET hk_name=".pwEscape('o_'.$key).", vtype=".pwEscape('string').", hk_value=".pwEscape($value));
+				$db->pw_update("SELECT * FROM pw_hack WHERE hk_name=".S::sqlEscape('o_'.$key),
+					   "UPDATE pw_hack SET vtype=".S::sqlEscape('string').", hk_value=".S::sqlEscape($value)." WHERE hk_name=".S::sqlEscape('o_'.$key),
+					   "INSERT INTO pw_hack SET hk_name=".S::sqlEscape('o_'.$key).", vtype=".S::sqlEscape('string').", hk_value=".S::sqlEscape($value));
 				$cacheFlag=true;
 			}
 		}
@@ -36,9 +36,9 @@ if(empty($action)){
 		ifcheck($o_hot_open,"hot_open");
 	}
 }elseif($action=="hotTypeSet"){
-	InitGP(array('updateAll'),'GP');
+	S::gp(array('updateAll'),'GP');
 	if ($updateAll=="updateAll") {
-		InitGP(array('fTime','fType','active','sort','type_name','display'));
+		S::gp(array('fTime','fType','active','sort','type_name','display'));
 		$query = $db->query("SELECT * FROM pw_modehot ORDER BY id");
 		$num= 0;
 		while ($rt = $db->fetch_array($query)) {
@@ -66,9 +66,9 @@ if(empty($action)){
 			$active[$rt["id"]] = $active[$rt["id"]] ? '1' : '0';
 			$active[$rt["id"]] != $rt["active"] && $flag = true;
 			if ($flag) {
-				$sql = "UPDATE pw_modehot SET sort=".pwEscape($sort[$rt["id"]]).", type_name=".pwEscape($type_name[$rt["id"]]).", 
-						filter_type=".pwEscape(serialize($filterTypeData)).", filter_time=".pwEscape(serialize($filterTimeData)).", 
-						display=".pwEscape($display[$rt["id"]]).", active=".pwEscape($active[$rt["id"]])." WHERE id=".pwEscape($rt["id"]);
+				$sql = "UPDATE pw_modehot SET sort=".S::sqlEscape($sort[$rt["id"]]).", type_name=".S::sqlEscape($type_name[$rt["id"]]).", 
+						filter_type=".S::sqlEscape(serialize($filterTypeData)).", filter_time=".S::sqlEscape(serialize($filterTimeData)).", 
+						display=".S::sqlEscape($display[$rt["id"]]).", active=".S::sqlEscape($active[$rt["id"]])." WHERE id=".S::sqlEscape($rt["id"]);
 				$db->update($sql);
 			}
 		}
@@ -78,9 +78,9 @@ if(empty($action)){
 		$default = $lang['o_hot']['default'];
 		$db->update("DELETE FROM pw_modehot");
 		foreach ($default as $key => $value) {
-			$sql = "INSERT INTO pw_modehot SET id=".pwEscape($value['id']).", parent_id=".pwEscape($value["parent_id"]).", sort=".pwEscape($value["sort"]).", type_name=".pwEscape($value["type_name"]).", 
-					filter_type=".pwEscape(serialize($value["filter_type"])).", filter_time=".pwEscape(serialize($value["filter_time"])).", 
-					display=".pwEscape($value["display"]).", active=".pwEscape($value["active"]).", tag=".pwEscape($value["tag"]);
+			$sql = "INSERT INTO pw_modehot SET id=".S::sqlEscape($value['id']).", parent_id=".S::sqlEscape($value["parent_id"]).", sort=".S::sqlEscape($value["sort"]).", type_name=".S::sqlEscape($value["type_name"]).", 
+					filter_type=".S::sqlEscape(serialize($value["filter_type"])).", filter_time=".S::sqlEscape(serialize($value["filter_time"])).", 
+					display=".S::sqlEscape($value["display"]).", active=".S::sqlEscape($value["active"]).", tag=".S::sqlEscape($value["tag"]);
 			$db->update($sql);
 		}
 		$basename = $basename."&action=hotTypeSet";
@@ -120,11 +120,11 @@ if(empty($action)){
 		}
 	}
 }elseif($action=="hotEdit"){
-	InitGP(array("updateHot","tag"),'P');
+	S::gp(array("updateHot","tag"),'P');
 	if($updateHot=="updateHot"){
 		$filterType = $utility->getFilter($tag,'type');
 		$filterTime = $utility->getFilter($tag,'time');      
-		InitGP(array_merge(array("id","currentFilterType","currentFilterTime","active","display","itemsCount",
+		S::gp(array_merge(array("id","currentFilterType","currentFilterTime","active","display","itemsCount",
 				"typeName","fFilterType","fFilterTime"),$utility->createParam($filterType,'filterTypeItem'),
 		$utility->createParam($filterTime,'filterTimeItem')),'P');
 		$active = $active ? $active : '0';
@@ -173,18 +173,18 @@ if(empty($action)){
 		if ($itemsCount) {
 			$filterTypeData = $filterTimeData = $itemsCount;
 		}else{
-			$filterTypeData = pwEscape(serialize($filterTypeData));
-			$filterTimeData = pwEscape(serialize($filterTimeData));
+			$filterTypeData = S::sqlEscape(serialize($filterTypeData));
+			$filterTimeData = S::sqlEscape(serialize($filterTimeData));
 		}
-		$sqlUpdateHot = "UPDATE pw_modehot SET type_name=".pwEscape($typeName).",
+		$sqlUpdateHot = "UPDATE pw_modehot SET type_name=".S::sqlEscape($typeName).",
 						filter_type=".$filterTypeData.", filter_time=".$filterTimeData.", 
-						display=".pwEscape($display).", active=".pwEscape($active)." WHERE id=".pwEscape($id);
+						display=".S::sqlEscape($display).", active=".S::sqlEscape($active)." WHERE id=".S::sqlEscape($id);
 		$db->update($sqlUpdateHot);
 		$basename = $basename."&action=hotEdit&hotId=".$id;
 		adminmsg('operate_success');
 	}else{
-		InitGP(array('hotId'),'G');
-		$sqlQueryHotById= "SELECT * FROM pw_modehot WHERE id=".pwEscape($hotId);
+		S::gp(array('hotId'),'G');
+		$sqlQueryHotById= "SELECT * FROM pw_modehot WHERE id=".S::sqlEscape($hotId);
 		$rt = $db->get_one($sqlQueryHotById);
 		$active = $rt["active"] ? 'checked' : '';
 		$display = $rt["display"] ? 'checked' : '';

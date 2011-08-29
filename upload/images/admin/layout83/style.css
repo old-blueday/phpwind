@@ -1,0 +1,155 @@
+html,body{overflow:hidden;width:100%;height:100%;font-family:Simsun;color:#333;}
+a{color:#006699; text-decoration:none;}
+
+/*零碎*/
+th{font-weight:100;}
+.mr10{margin-right:10px;}
+.mr20{margin-right:20px;}
+.mb10{margin-bottom:10px;}
+.bgA,.tabA_pre,.tabA_next,.tabA_pre_old,.tabA_next_old,.tabA li,.tabA li span,.tabA li .del{background:url(bg.png) 999px 999px;}
+.tableA{width:100%;height:100%;font-size:12px;}
+.tbody{display:table-header-group}
+.link_down span,.breadCrumb span.admenu_down{padding:0 8px 0 0;background:url(down.png) center right no-repeat; cursor:pointer;}
+.breadCrumb span.admenu_down{padding:0 8px 0 5px;margin-right:4px;}
+.beta{padding:0 14px;background:url(../yunbeta.png) no-repeat;}
+
+h1{width:133px;overflow:hidden; position:relative;height:45px;float:left;padding:3px 0 0 0;display:block;}
+h1 img{display:block;}
+h1 .old{ position:absolute;bottom:0;right:0;color:#666;}
+h1 .old:hover{ text-decoration:underline;}
+
+.h2{margin:0 10px;padding:10px 5px 5px;border-bottom:1px solid #b7d3e1; font-weight:700; position:relative;}
+.trD h2{ position:absolute;background:#eaf7ff;width:118px;}
+.hr{border-bottom:1px dashed #b7d3e1;height:0;color:#b7d3e1;margin:5px 0;overflow:hidden; clear:both; font:0/0 Arial;}
+
+/*头部*/
+.trA{height:55px; background-position:0 0;}
+.trA th{width:140px;}
+
+/*菜单切换*/
+.trB{background-color:#f9f9f9;height:30px;}
+.trB th{padding:5px 10px 0; background-position:right -84px;}
+.trB th a{margin:0 7px;color:#333;}
+.trB td{background-position:0 -54px; vertical-align:top;}
+
+/**/
+.trC{height:28px;}
+.trC th.bgA{ background-position:right -92px;}
+.trC th.bgA a{margin:0 7px;color:#333;}
+.trC td{ vertical-align:bottom;}
+
+.breadCrumb{font-family:Simsun;position:absolute;height:30px;background:#fff;padding-top:10px;right:18px;left:5px;margin-top:-30px;}
+.breadCrumb em{ font-style:normal;}
+.breadCrumb span{padding:0 5px;}
+
+/*内容区域*/
+.trD th{background:#eaf7ff url(bgB.png) right 0 repeat-y;}
+.trD td{padding-top:30px;}
+
+/*搜索*/
+.search{border:1px solid #9ac2e5;background:#fff;height:17px;width:118px;overflow:hidden;}
+.search input{border:0 none;float:left;padding:1px 2px;font:12px Arial;vertical-align:middle;height:17px;width:90px;background:#fff;}
+.search button{float:right;border:0 none;background:#fff;height:16px;cursor:pointer;width:22px;}
+.gray{color:#999;}
+
+/*btn*/
+.btn_cf{display:block;line-height:20px;background:#fff;border:1px solid #e4e4e4;margin:0 5px; text-align:center;color:#666;}
+
+/*navA*/
+.navA_wrap{overflow:hidden;min-width:800px;line-height:20px;height:45px;}
+.navA_wrap .fr{width:250px;}
+.navA{float:left;height:45px;padding-left:15px;}
+.navA li{float:left;font-family:Tahoma;margin-right:13px;width:48px;height:45px;}
+.navA li a{color:#488bd1;display:block; float:left;font-weight:700;background:url(navA.png) -999px -999px no-repeat;padding-top:25px;width:48px;text-align:center;outline:none;}
+.navA li a:hover{color:#1b6499;}
+#common a{ background-position:0 0;}
+#initiator a{ background-position:-50px 0;}
+#config a{ background-position:-100px 0;}
+#consumer a{ background-position:-150px 0;}
+#contentforums a{ background-position:-200px 0;}
+#applicationcenter a{ background-position:-250px 0;}
+#markoperation a{ background-position:-300px 0;}
+#datacache a{ background-position:-350px 0;}
+#modemanage{width:58px;}
+#modemanage a{background-position:-400px 0;padding-right:10px;}
+#common a:hover,#common .current{ background-position:0 -50px;}
+#initiator a:hover,#initiator .current{ background-position:-50px -50px;}
+#config a:hover,#config .current{ background-position:-100px -50px;}
+#consumer a:hover,#consumer .current{ background-position:-150px -50px;}
+#contentforums a:hover,#contentforums .current{ background-position:-200px -50px;}
+#applicationcenter a:hover,#applicationcenter .current{ background-position:-250px -50px;}
+#markoperation a:hover,#markoperation .current{ background-position:-300px -50px;}
+#datacache a:hover,#datacache .current{ background-position:-350px -50px;}
+#modemanage a:hover,#modemanage .current{ background-position:-400px -50px;}
+.navA_wrap .fr{margin-top:10px;color:#444; font-family:Arial;}
+.navA_wrap .fr a{color:#444;}
+/*tabA*/
+.tabA{}
+.tabA ul{margin:2px 15px;line-height:23px;height:23px;overflow:hidden;}
+.tabA li{float:left;padding-right:4px; background-position:right -163px;margin-right:1px;}
+.tabA li span{ display:block;line-height:21px;height:23px;padding:0 10px 0 15px;float:left; background-position:0 -140px; white-space:nowrap;}
+.tabA li a{outline:none;float:left; font-style:normal;color:#8fb3d5;}
+.tabA li .del{width:7px;height:7px;overflow:hidden;display:block;text-indent:-2000em; background-position:-20px -130px;margin:7px -4px 0 5px; position:relative;}
+.tabA li .del:hover{ background-position:-27px -130px;}
+.tabA .hover a{color:#333;}
+.tabA .hover{ background-position:right -255px;}
+.tabA .hover span{ background-position:0 -232px;}
+.tabA li.current{ background-position:right -209px;}
+.tabA li.current span{ background-position:0 -186px;}
+.tabA li.current a{color:#fff; font-weight:700;}
+.tabA .fr{margin-top:10px;}
+.tabA_pre,.tabA_next,.tabA_pre_old,.tabA_next_old{width:5px;height:9px;display:block;overflow:hidden;text-indent:-2000em;margin:10px 5px 0;}
+.tabA_pre{background-position:0 -130px;float:left;}
+.tabA_next{background-position:-4px -130px;float:right;}
+.tabA_pre_old{ background-position:-9px -130px; float:left;}
+.tabA_next_old{ background-position:-13px -130px; float:right;}
+
+/*左侧菜单*/
+.menubar{padding-bottom:10px;}
+.menubar dl{padding:5px 10px;}
+.menubar dt{padding:2px 0 1px;}
+.menubar dt a{color:#333;display:block;padding:3px 5px 3px 20px;background:url(menu_off.png) 5px center no-repeat;height:16px;line-height:16px;}
+.menubar dl dt.current a{ background:#d0e6f6 url(menu_on.png) 5px center no-repeat; font-weight:700;}
+.menubar dl dt.expand a{background:url(menu_expand.png) 5px center no-repeat;}
+.menubar dd{line-height:25px;padding:0 0 2px 15px;}
+.menubar ul li{padding-left:10px;background:url(page.png) 0 center no-repeat;}
+.menubar a:hover{background-color:#d0e6f6;}
+
+.menubar dt.disabled{background:0;padding-left:5px; font-weight:700;padding-bottom:5px;}
+
+/*上下*/
+.menuNext,.menuNext a{background:url(menu_next.png) 999px 999px no-repeat;}
+.menuNext{height:21px; background-position:0 0; position:absolute; bottom:0;left:0;width:140px;}
+.menuNext a{float:left;width:70px;height:21px; text-indent:-2000em;overflow:hidden;}
+.menuNext a.pre:hover{ background-position:0 -30px;}
+.menuNext a.next:hover{background-position:right -30px;}
+.menuNext a.pre_old,.menuNext a.pre_old:hover{ background-position:0 -61px;}
+.menuNext a.next_old,.menuNext a.next_old:hover{ background-position:right -61px;}
+
+/*操作菜单*/
+.refresh,.admin_full,.admin_unfull{background:url(options_ico.png) no-repeat;}
+.options{width:179px;height:20px;background:url(options.png) no-repeat;margin-right:10px;overflow:hidden;}
+.options a,.toppage_down{float:left;height:18px;overflow:hidden;line-height:18px;margin-top:1px; font-style:normal;}
+.options a:hover{background-color:#f2f2f2;}
+.refresh{width:29px;text-indent:-2000em;background-position:-61px 2px;}
+.admin_full,.admin_unfull{width:27px;text-indent:-2000em;background-position:8px 3px;}
+.admin_full:hover{background-color:#fff;}
+.admin_unfull{ background-position:-27px 3px;}
+.toppage,.toppage_down{width:60px; text-align:center;color:#989898;}
+.admin_map{width:62px;text-align:center;color:#989898;}
+
+/*下拉*/
+.admenu_bg{margin:-8px 0 0 -9px;}
+.admenu_bg h2{padding:0 8px 0 10px;background:url(down.png) center right no-repeat;float:left;line-height:22px;}
+.admenu_bg ul li input{ vertical-align:middle;margin-top:0;*margin-top:1px;_margin-top:-2px;}
+.admenu,.admenu_bg{ position:absolute;border:1px solid #b8d3e1; font-size:12px;width:106px;padding:1px;background:#fff;}
+.admenu ul,.admenu_bg ul{clear:both;}
+.admenu ul li a,.admenu_bg ul li a{color:#333333;display:block;line-height:25px;height:25px;overflow:hidden;padding:0 10px;}
+.admenu ul li a.current,.admenu ul li a.current:hover,.admenu_bg ul li a:hover{color:#fff;background:#549ed4;}
+.admenu ul li a:hover{background-color:#d0e6f6;color:#333;}
+.admenu ul li span.fl{width:16px;height:16px;margin:5px 3px 0 0;}
+
+
+
+
+

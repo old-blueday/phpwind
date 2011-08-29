@@ -3,7 +3,7 @@
 
 //require_once(R_P.'require/pw_func.php');
 require_once(R_P.'require/credit.php');
-InitGP(array('job','gid'));
+S::gp(array('job','gid'));
 $pro_tab = 'permission';
 
 if (empty($job)) {
@@ -15,7 +15,7 @@ if (empty($job)) {
 		$gids[] = $rt['gid'];
 	}
 	if ($gids) {
-		$query = $db->query("SELECT gid,rkey,rvalue FROM pw_permission WHERE uid='0' AND fid='0' AND gid IN(" . pwImplode($gids) . ") AND rkey IN ('sellinfo','sellprice','rmbprice','selltype', 'selllimit', 'allowbuy')");
+		$query = $db->query("SELECT gid,rkey,rvalue FROM pw_permission WHERE uid='0' AND fid='0' AND gid IN(" . S::sqlImplode($gids) . ") AND rkey IN ('sellinfo','sellprice','rmbprice','selltype', 'selllimit', 'allowbuy')");
 		while ($rt = $db->fetch_array($query)) {
 			$sright[$rt['gid']][$rt['rkey']] = $rt['rvalue'];
 		}
@@ -26,7 +26,7 @@ if (empty($job)) {
 				$specialdb[$key] = $value;
 			}
 		}
-		$query = $db->query("SELECT gid,startdate,days FROM pw_extragroups WHERE uid=".pwEscape($winduid));
+		$query = $db->query("SELECT gid,startdate,days FROM pw_extragroups WHERE uid=".S::sqlEscape($winduid));
 		while ($rt = $db->fetch_array($query)) {
 			if (array_key_exists($rt['gid'],$specialdb)) {
 				$specialdb[$rt['gid']]['days']		= $rt['days'];
@@ -40,16 +40,16 @@ if (empty($job)) {
 
 } elseif ($job == 'buy') {
 
-	$rt = $db->get_one("SELECT uid,startdate,days FROM pw_extragroups WHERE uid=".pwEscape($winduid) . " AND gid=" . pwEscape($gid));
+	$rt = $db->get_one("SELECT uid,startdate,days FROM pw_extragroups WHERE uid=".S::sqlEscape($winduid) . " AND gid=" . S::sqlEscape($gid));
 	if ($rt && $timestamp <= $rt['startdate'] + $rt['days']*86400) {
 		$enddate = get_date($rt['startdate'] + $rt['days']*86400,'Y-m-d');
 		Showmsg('specialgroup_exists');
 	}
-	$rt = $db->get_one("SELECT gid,grouptitle FROM pw_usergroups WHERE gptype='special' AND gid=" . pwEscape($gid));
+	$rt = $db->get_one("SELECT gid,grouptitle FROM pw_usergroups WHERE gptype='special' AND gid=" . S::sqlEscape($gid));
 	if (!$rt) {
 		Showmsg('specialgroup_error');
 	}
-	$query = $db->query("SELECT gid,rkey,rvalue FROM pw_permission WHERE uid='0' AND fid='0' AND gid=" . pwEscape($gid) . " AND rkey IN ('sellinfo','sellprice','rmbprice','selltype','selllimit','allowbuy')");
+	$query = $db->query("SELECT gid,rkey,rvalue FROM pw_permission WHERE uid='0' AND fid='0' AND gid=" . S::sqlEscape($gid) . " AND rkey IN ('sellinfo','sellprice','rmbprice','selltype','selllimit','allowbuy')");
 	while ($permi = $db->fetch_array($query)) {
 		$rt['sright'][$permi['rkey']] = $permi['rvalue'];
 	}
@@ -65,8 +65,8 @@ if (empty($job)) {
 	} else {
 
 		PostCheck();
-		InitGP(array('pwpwd'), 'P');
-		InitGP(array('days','buymethod','options'), null, 2);
+		S::gp(array('pwpwd'), 'P');
+		S::gp(array('days','buymethod','options'), null, 2);
 		if (!is_numeric($days) || $days <= 0) {
 			Showmsg('illegal_nums');
 		}
@@ -83,13 +83,13 @@ if (empty($job)) {
 			if ($rt['sright']['rmbprice'] <= 0) {
 				Showmsg('undefined_action');
 			}
-			include_once(D_P.'data/bbscache/ol_config.php');
+			include_once pwCache::getPath(D_P.'data/bbscache/ol_config.php');
 			if (!$ol_onlinepay) {
 				Showmsg($ol_whycolse);
 			}
 			$grouptitle = $rt['grouptitle'];
 			$order_no = '1'.str_pad($winduid,10, "0",STR_PAD_LEFT).get_date($timestamp,'YmdHis').num_rand(5);
-			$db->update("INSERT INTO pw_clientorder SET " . pwSqlSingle(array(
+			$db->update("INSERT INTO pw_clientorder SET " . S::sqlSingle(array(
 				'order_no'	=> $order_no,
 				'type'		=> 3,
 				'uid'		=> $winduid,
@@ -146,14 +146,14 @@ if (empty($job)) {
 		}
 		
 		$db->pw_update(
-			"SELECT uid FROM pw_extragroups WHERE uid=" . pwEscape($winduid) . " AND gid=" . pwEscape($gid),
-			"UPDATE pw_extragroups SET ". pwSqlSingle(array(
+			"SELECT uid FROM pw_extragroups WHERE uid=" . S::sqlEscape($winduid) . " AND gid=" . S::sqlEscape($gid),
+			"UPDATE pw_extragroups SET ". S::sqlSingle(array(
 				'togid'		=> $winddb['groupid'],
 				'startdate'	=> $timestamp,
 				'days'		=> $days
-			)) . " WHERE uid=".pwEscape($winduid)."AND gid=".pwEscape($gid)
+			)) . " WHERE uid=".S::sqlEscape($winduid)."AND gid=".S::sqlEscape($gid)
 			,
-			"INSERT INTO pw_extragroups SET " . pwSqlSingle(array(
+			"INSERT INTO pw_extragroups SET " . S::sqlSingle(array(
 				'uid'		=> $winduid,
 				'togid'		=> $winddb['groupid'],
 				'gid'		=> $gid,

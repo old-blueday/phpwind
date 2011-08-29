@@ -1,7 +1,7 @@
 <?php
 !defined('P_W') && exit('Forbidden');
 define('AJAX',1);
-InitGP(array('stopic_id','block_config'));
+S::gp(array('stopic_id','block_config'));
 
 $stopic_id = (int) $stopic_id;
 if (!$stopic_id) showmsg('undefined_error');

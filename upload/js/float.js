@@ -33,10 +33,11 @@ function floatPop(popParam){
 			return;
 		}
 	}
-	document.getElementById("popup").style.top=ietruebody().clientHeight+getTop()-marginL-popParam.winHeight+"px";
+	document.getElementById("popup").style.top=((document.compatMode && document.compatMode!="BackCompat")? document.documentElement : document.body).clientHeight+getTop()-marginL-popParam.winHeight+"px";
 }
 function hidePop(type){
 	document.getElementById("popup").style.display="none";
+	document.getElementById("popup").innerHTML="";
 	clearInterval(it1);
 	if(typeof type=='undefined') document.cookie="hidepop=1; path=/";
 }
@@ -88,6 +89,7 @@ function floatAd(){
 }
 function hideAd(){
 	document.getElementById("floatAd").style.display="none";
+	document.getElementById("floatAd").innerHTML="";
 	clearInterval(it2);
 }
 
@@ -125,10 +127,12 @@ function ShowFloat(LeftCode, RightCode){
 }
 function hideFloat(){
 	clearTimeout(it3);
-	if(IsElement("adLeftFloat"))
+	if(IsElement("adLeftFloat")){
 		document.getElementById("adLeftFloat").style.display = "none";
-	if(IsElement("adRightFloat"))
+		document.getElementById("adLeftFloat").innerHTML = "";}
+	if(IsElement("adRightFloat")){
 		document.getElementById("adRightFloat").style.display = "none";
+		document.getElementById("adRightFloat").innerHTML = "";}
 	return false;
 }
 function moveFloat(){

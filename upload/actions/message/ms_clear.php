@@ -5,11 +5,11 @@ if(isset($_GET['ajax']) && $_GET['ajax'] == 1){
 }
 $normalUrl = $baseUrl."?type=clear";
 !empty($winduid) && $userId = $winduid;
-InitGP(array('action'), 'GP');
+S::gp(array('action'), 'GP');
 if(empty($action)){
 	if($_POST['step'] == 2){
 		PostCheck();	
-		InitGP(array('clear'), 'GP');
+		S::gp(array('clear'), 'GP');
 		if(!$clear){
 			refreshto($normalUrl,'您还没选择要清空的数据');
 		}

@@ -4,7 +4,7 @@
 $bbsclose = true;
 $AdminUser = GetCookie('AdminUser');
 $CK = $AdminUser ? explode("\t",StrCode(GetCookie('AdminUser'),'DECODE')) : array();
-if (CkInArray($CK[1],$manager)) {
+if (S::inArray($CK[1],$manager)) {
 	$v_key = array_search($CK[1],$manager);
 	SafeCheck($CK,PwdCode($manager_pwd[$v_key])) && $bbsclose = false;
 }
@@ -37,7 +37,7 @@ if (!$db_bbsifopen) {
 		if ($tmpAllowvisit === false) {
 			if (!$windid) {
 				Showmsg($db_visitmsg);
-			} elseif (!CkInArray($windid,$manager) && strpos($db_visitgroup,','.$groupid.',')===false && strpos(strtolower($db_visituser),','.strtolower($windid).',')===false) {
+			} elseif (!S::inArray($windid,$manager) && strpos($db_visitgroup,','.$groupid.',')===false && strpos(strtolower($db_visituser),','.strtolower($windid).',')===false) {
 				PwNewDB();
 				require_once(R_P.'require/checkpass.php');
 				Loginout(); Showmsg('visiter_login');

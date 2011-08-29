@@ -53,13 +53,13 @@ EOT;
 if (!$showtype) {print <<<EOT
 -->
 <div class="threadInfo mb10">
-    <table>
+    <table width="100%" style="table-layout:fixed;">
         <tr class="vt">
-            <td width="90" class="tar pd15"><img src="$colony[cnimg]" style="width:90px;height:90px;" /></td>
-            <td>
+            <td width="115" class="tac"><img src="$colony[cnimg]" style="width:90px;height:90px;" /></td>
+            <td style="padding-right:10px;">
             	<p class="mb5 f14 b">$colony[cname]</p>
                 <p class="mb5">$colony[descrip]</p>
-                <p class="mb5">分类：<span class="mr20"><a href="apps.php?q=groups&a=all&styleid={$colony['styleid']}" target="_blank" class="s4">{$o_styledb[$colony['styleid']]['cname']}</a></span>创建：<span class="mr20 s4">$colony[createtime_s]</span>成员：<span class="mr20 s4"><a href="thread.php?cyid=$cyid&showtype=member">$colony[members]</a></span>积分：<span class="mr20">$colonyNums</span></p>
+                <p class="mb5">分类：<span class="mr20"><a href="group.php?q=all&styleid={$colony['styleid']}" target="_blank" class="s4">{$o_styledb[$colony['styleid']]['cname']}</a></span>创建：<span class="mr20 s4">$colony[createtime_s]</span>成员：<span class="mr20 s4"><a href="thread.php?cyid=$cyid&showtype=member">$colony[members]</a></span>积分：<span class="mr20">$colonyNums</span></p>
                 <p class="mb5">
 					群主：<span class="mr20"><a href="u.php?username=$colony[admin]" target="_blank" title="{$colony[admin]}" class="s4">$colony[admin]</a></span>
 <!--
@@ -72,7 +72,7 @@ EOT;
 foreach ($magdb as $key => $value) {
 if ($value['username'] != $colony['admin']) {print <<<EOT
 -->
-						<a href="u.php?uid=$key" target="_blank">{$value['username']}</a>
+						<a href="{$db_userurl}$key" target="_blank">{$value['username']}</a>
 <!--
 EOT;
 }}print <<<EOT
@@ -82,7 +82,7 @@ EOT;
 EOT;
 }print <<<EOT
 -->
-				</p>
+							</p>
             </td>
         </tr>
     </table>
@@ -91,12 +91,10 @@ EOT;
 EOT;
 if ($colony['annouce'] && ($colony['ifannouceopen'] || $colony['ifFullMember'])) {print <<<EOT
 -->
-<div class="pd15">
-	<div class="tabA">
+<div style="padding:0 10px 10px;">
+	<div class="h">
 		<a class="fr closeicon" href="javascript:;" onclick="return IndexDeploy('thread',0);"><img alt="展开收起" id="img_thread" src="$imgpath/$stylepath/index/cate_$thread_img.gif" /></a>
-		<ul class="cc">
-			<li id="tab_t1" class="current"><a href="javascript:;">群公告</a></li>
-		</ul>
+		<strong>群公告</strong>
 	</div>
 	<div id="cate_thread" style="$cate_thread">
 		<div id="tab_1">

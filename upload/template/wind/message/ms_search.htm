@@ -3,7 +3,7 @@ print <<<EOT
 -->
 <script type="text/javascript" src="js/pw_search.js"></script>
 <div class="contUser" id="content">
-<table width="100%"><tr class="vt"><td height="400">
+<table width="100%"><tr><td height="600" valign="top">
 	<div class="p15">
 <!--
 EOT;
@@ -78,7 +78,7 @@ EOT;
 EOT;
 foreach($searchList as $key => $value){
 $_name = $value['typeid'] == $messageServer->getConst('groupsms_colony') ? $value['cname'] : $value['create_username'];
-$_url = $value['typeid'] == $messageServer->getConst('groupsms_colony') ? "apps.php?q=group&cyid={$value['colonyid']}" : "u.php?uid={$value['uid']}";
+$_url = $value['typeid'] == $messageServer->getConst('groupsms_colony') ? "apps.php?q=group&cyid={$value['colonyid']}" : "{$db_userurl}{$value['uid']}";
 $_icon = $value['typeid'] == $messageServer->getConst('groupsms_colony') ? $value['cnimg'] : $value['face'];
 $_link = "{$baseUrl}?action=info&type=sms&subtype=search&rid={$value[rid]}&mid={$value[mid]}&smstype={$value[typeid]}";
 list($_img,$_b,$_tip) = getMessageIconByStatus($value);

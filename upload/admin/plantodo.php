@@ -21,7 +21,7 @@ if(!$action){
 	}
 	include PrintEot('plantodo');exit;
 } elseif($_POST['action']=="unsubmit"){
-	InitGP(array('selid'),'P');
+	S::gp(array('selid'),'P');
 	!$selid && adminmsg("operate_error");
 	$selids = '';
 	foreach($selid as $key=>$value){
@@ -32,10 +32,10 @@ if(!$action){
 	$selids && $db->update("DELETE FROM pw_plan WHERE id IN($selids)");
 	adminmsg("operate_success");
 } elseif($action=='planset'){
-	InitGP(array('id'));
+	S::gp(array('id'));
 	!$id && adminmsg('operate_error');
 	if($_POST['step']!=3){
-		$rt		= $db->get_one("SELECT * FROM pw_plan WHERE id=".pwEscape($id));
+		$rt		= $db->get_one("SELECT * FROM pw_plan WHERE id=".S::sqlEscape($id));
 		$month	= str_replace("<option value=\"$rt[month]\">","<option value=\"$rt[month]\" selected=\"SELECTED\">",makeoption(1,31));
 		$day	= str_replace("<option value=\"$rt[day]\">","<option value=\"$rt[day]\" selected=\"SELECTED\">",makeoption(0,23));
 		$hour	= makeoption(0,59);
@@ -65,7 +65,7 @@ if(!$action){
 		ifcheck($rt['ifopen'],'ifopen');
 		include PrintEot('plantodo');exit;
 	} else {
-		InitGP(array('title','month','week','day','hours','ifopen','filename'),'P');
+		S::gp(array('title','month','week','day','hours','ifopen','filename'),'P');
 		if(is_numeric($month)){
 			$month = $month<1 ? 1 : ($month>31 ? 31 : $month);
 			$week  = '*';
@@ -109,7 +109,7 @@ if(!$action){
 		);
 		$nexttime = nexttime($plan);
 		$db->update("UPDATE pw_plan"
-			. " SET " . pwSqlSingle(array(
+			. " SET " . S::sqlSingle(array(
 					'subject'	=> $title,
 					'month'		=> $month,
 					'week'		=> $week,
@@ -119,30 +119,30 @@ if(!$action){
 					'ifopen'	=> $ifopen,
 					'filename'	=> $filename
 				))
-			. " WHERE id=".pwEscape($id));
+			. " WHERE id=".S::sqlEscape($id));
 		updatecache_plan();
 		adminmsg("operate_success");
 	}
 } elseif($action=='detail'){
-	InitGP(array('id'));
-	$rt = $db->get_one("SELECT * FROM pw_plan WHERE id=".pwEscape($id));
+	S::gp(array('id'));
+	$rt = $db->get_one("SELECT * FROM pw_plan WHERE id=".S::sqlEscape($id));
 	!$rt && adminmsg('operate_error');
 	$filename = $rt['filename'];
 	if(file_exists(R_P.'require/plan/'.$filename.'_set.php')){
-		require_once Pcv(R_P.'require/plan/'.$filename.'_set.php');
+		require_once S::escapePath(R_P.'require/plan/'.$filename.'_set.php');
 		include PrintEot('plantodo');exit;
 	} else{
 		adminmsg('operate_error');
 	}
 } elseif ($action == 'add') {
-	InitGP(array('step'));
+	S::gp(array('step'));
 	if(!$step){
 		$month = makeoption(1,31);
 		$day   = makeoption(0,23);
 		$hour  = makeoption(0,59);
 		include PrintEot('plantodo');exit;
 	} elseif($step == '2'){
-		InitGP(array('title','month','week','day','hours','ifopen','filename'),'P');
+		S::gp(array('title','month','week','day','hours','ifopen','filename'),'P');
 		if (!$title) {
 			$basename = "javascript:history.go(-1)";
 			adminmsg('operate_error');
@@ -187,7 +187,7 @@ if(!$action){
 		$nexttime = nexttime($plan);
 		if(strpos($filename,'..')!==false)adminmsg("undefined_action");
 		$db->update("INSERT INTO pw_plan"
-			. " SET " . pwSqlSingle(array(
+			. " SET " . S::sqlSingle(array(
 				'subject'	=> $title,	'month'		=> $month,
 				'week'		=> $week,	'day'		=> $day,
 				'hour'		=> $hour_w,	'nexttime'	=> $nexttime,

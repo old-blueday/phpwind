@@ -1,49 +1,34 @@
 <!--
 <?php
-$changeUrl = $changeUrl."rnd = ".rand(1000,9999)."&";
+$changeUrl = $changeUrl."&rnd = ".rand(1000,9999)."&";
 print <<<EOT
 -->
  <div>
-	<div class="pwC_search">
-		<script type="text/javascript">
-			window.onload = function(){
-				initFormSubInvoke();
+	<script type="text/javascript">
+		window.onload = function(){
+			initFormSubInvoke();
+		}
+		var deleteTips = function(url){
+			if(confirm("你确定删除这条数据吗?")){
+					setTimeout(function(){
+					 window.location.href = url;
+					 },0);
 			}
-			var deleteTips = function(url){
-				if(confirm("你确定删除这条数据吗?")){
-					  setTimeout(function(){
-						 window.location.href = url;
-					   },0);
-				}
-				return false;
-			}
-			function verifyPushdata(url) {
-				setTimeout(function(){
-					window.location.href = url;
-				},0);
-				return false;
-			}
-		</script>
-		<form action="$changeUrl" method="post" id="subinvokeform"><span class="mr5">{$subInvokesSelect}</span></form>
-<!-- 
-EOT;
-if(!$action){
-print <<<EOT
--->         
-            <a href="$baseUrl&action=add" class="mr10">添加推送内容</a>
-<!-- 
-EOT;
-}
-print <<<EOT
---> 
-            <!-- <a href="javascript:;" class="mr10">提前推荐</a> -->
-	</div>
+			return false;
+		}
+		function verifyPushdata(url) {
+			setTimeout(function(){
+				window.location.href = url;
+			},0);
+			return false;
+		}
+	</script>
 	<div class="pwC_content_a">
          <div class="admin_table">
          	<table width="100%" cellpadding="0" cellspacing="0">
              	<tr class="tr2 td_bgA s3">
                  	<td>标题</td>
-                     <td width="68">显示位置</td>
+                     <td width="68"><form action="$changeUrl" method="post" id="subinvokeform"><span>{$subInvokesSelect}</span></form></td>
                      <td width="63">推荐人</td>
                      <td width="25">星级</td>
                      <td width="40">时间</td>
@@ -54,11 +39,11 @@ EOT;
 if($lists){
 foreach($lists as $list){
 $altTitle = strip_tags($list['data']['title']);
-$add_star=$list[ifbusiness] ==1 ?'<img src="images/star.png" height="13">':'';
+$add_star=$list[ifbusiness] ==1 ?'<img src="images/star.png" height="13" align="absmiddle">':'';
 print <<<EOT
 -->
                  <tr class="tr1 vt">
-	                <td class="td2"><p class="lh_22"><a href="{$list[data][url]}" title="$altTitle" target="_blank">{$add_star}{$list[data][title]}</a></p></td>
+	                <td class="td2"><p class="lh_18"><a href="{$list[data][url]}" title="$altTitle" target="_blank">{$add_star}{$list[data][title]}</a></p></td>
 					<td class="td2"><p class="lh_22" title="$list[invokename]">$list[invoketitle]</p></td>
 					<td class="td2"><p class="lh_22" title="admin">$list[editor]</p></td>
 					<td class="td2">$list[grade]</td>
@@ -83,7 +68,7 @@ print <<<EOT
 -->
 	                <td class="td2">
 						<a href="$baseUrl&action=edit&invokepieceid=$list[invokepieceid]&pushdataid=$list[id]" class="mr5">[编辑]</a>
-	                 	<a href="javascript:;" onClick="deleteTips('{$baseUrl}&action=delete&pushdataid={$list[id]}');">[删除]</a>
+	                 	<a href="javascript:;" onClick="deleteTips('{$baseUrl}&action=delete&pushdataid={$list[id]}&ifverify={$list[ifverify]}');">[删除]</a>
 <!-- 
 EOT;
 if($action){

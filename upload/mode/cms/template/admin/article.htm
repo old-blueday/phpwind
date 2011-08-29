@@ -76,12 +76,12 @@ print <<<EOT
 -->
 		<tr class="tr1 vt">
 			<td class="td2"><input type="checkbox" value="{$article[article_id]}" name="aids[]"/></td>
-			<td class="td2"><a href="mode.php?m=cms&q=view&id={$article[article_id]}" target="_blank">{$article[subject]}</a></td>
+			<td class="td2"><a href="index.php?m=cms&q=view&id={$article[article_id]}" target="_blank">{$article[subject]}</a></td>
 			<td class="td2">{$_column}</td>
-			<td class="td2"><a href="u.php?uid={$article[userid]}" target="_blank">{$article[username]}</a></td>
+			<td class="td2"><a href="{$db_userurl}{$article[userid]}" target="_blank">{$article[username]}</a></td>
 			<td class="td2">{$article['postdate']}</td>
 			<td class="td2">
-				<a href="mode.php?m=cms&q=post&action=edit&id={$article[article_id]}&page=1" target="_blank">[编辑]</a>
+				<a href="index.php?m=cms&q=post&action=edit&id={$article[article_id]}&page=1" target="_blank">[编辑]</a>
 <!--
 EOT;
 if($type == 'recycle'){

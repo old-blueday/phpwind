@@ -130,15 +130,15 @@ class PW_ShowPicture {
 	}
 
 	function _getAlbumByPictureId($pictureId) {
-		return $this->_db->get_one("SELECT * FROM pw_cnphoto p LEFT JOIN pw_cnalbum a USING(aid) WHERE pid=" . pwEscape($pictureId));
+		return $this->_db->get_one("SELECT * FROM pw_cnphoto p LEFT JOIN pw_cnalbum a USING(aid) WHERE pid=" . S::sqlEscape($pictureId));
 	}
 
 	function _getAlbumByAlbumId($albumId) {
-		return $this->_db->get_one("SELECT * FROM pw_cnalbum  WHERE aid=" . pwEscape($albumId) . " LIMIT 1");
+		return $this->_db->get_one("SELECT * FROM pw_cnalbum  WHERE aid=" . S::sqlEscape($albumId) . " LIMIT 1");
 	}
 
 	function _getPictureIds($ablumId) {
-		$query = $this->_db->query("SELECT pid FROM pw_cnphoto WHERE aid=" . pwEscape($ablumId) . " ORDER BY pid ASC LIMIT 200");
+		$query = $this->_db->query("SELECT pid FROM pw_cnphoto WHERE aid=" . S::sqlEscape($ablumId) . " ORDER BY pid ASC LIMIT 200");
 		$result = array();
 		while ($rs = $this->_db->fetch_array($query)) {
 			$result[] = $rs['pid'];
@@ -156,11 +156,11 @@ class PW_ShowPicture {
 	}
 
 	function _getPicture($pictureId) {
-		return $this->_db->get_one("SELECT p.pid,p.aid,p.pintro,p.path as basepath,p.uploader,p.uptime,p.hits,p.c_num,p.ifthumb,a.aname,a.private, a.ownerid,a.owner,a.photonum,m.groupid FROM pw_cnphoto p LEFT JOIN pw_cnalbum a ON p.aid=a.aid LEFT JOIN pw_members m ON p.uploader=m.username WHERE p.pid=" . pwEscape($pictureId) . " AND a.atype='0'");
+		return $this->_db->get_one("SELECT p.pid,p.aid,p.pintro,p.path as basepath,p.uploader,p.uptime,p.hits,p.c_num,p.ifthumb,a.aname,a.private, a.ownerid,a.owner,a.photonum,m.groupid FROM pw_cnphoto p LEFT JOIN pw_cnalbum a ON p.aid=a.aid LEFT JOIN pw_members m ON p.uploader=m.username WHERE p.pid=" . S::sqlEscape($pictureId) . " AND a.atype='0'");
 	}
 
 	function _getGroupsPicture($pictureId) {
-		return $this->_db->get_one("SELECT p.pid,p.aid,p.pintro,p.path as basepath,p.ifthumb,p.uploader,p.uptime,p.hits,a.aname,a.atype, a.private,a.ownerid,a.photonum,a.memopen,a.aintro,m.groupid FROM pw_cnphoto p LEFT JOIN pw_cnalbum a ON p.aid=a.aid LEFT JOIN pw_members m ON p.uploader=m.username WHERE p.pid=" . pwEscape($pictureId));
+		return $this->_db->get_one("SELECT p.pid,p.aid,p.pintro,p.path as basepath,p.ifthumb,p.uploader,p.uptime,p.hits,a.aname,a.atype, a.private,a.ownerid,a.photonum,a.memopen,a.aintro,m.groupid FROM pw_cnphoto p LEFT JOIN pw_cnalbum a ON p.aid=a.aid LEFT JOIN pw_members m ON p.uploader=m.username WHERE p.pid=" . S::sqlEscape($pictureId));
 	}
 
 	function _getConnection() {

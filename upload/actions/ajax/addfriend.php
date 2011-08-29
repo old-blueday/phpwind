@@ -2,7 +2,7 @@
 !defined('P_W') && exit('Forbidden');
 
 PostCheck();
-InitGP(array('touid','reload'), 'GP', 2);
+S::gp(array('touid','reload'), 'GP', 2);
 if ($touid == $winduid) {
 	Showmsg('friend_self_add_error');
 }
@@ -18,7 +18,7 @@ if ($attentionService->isInBlackList($touid, $winduid)) {
 	Showmsg('对方已设置隐私，您无法加为好友!');
 }
 
-$rs = $db->get_one("SELECT uid,status FROM pw_friends WHERE uid=" . pwEscape($winduid) . " AND friendid=" . pwEscape($friend['uid']));
+$rs = $db->get_one("SELECT uid,status FROM pw_friends WHERE uid=" . S::sqlEscape($winduid) . " AND friendid=" . S::sqlEscape($friend['uid']));
 if ($rs) {
 	if ($rs['status'] == '1') {
 		Showmsg('friend_status_check');
@@ -37,7 +37,7 @@ if (empty($_POST['step'])) {
 		
 		require_once (R_P . 'require/showimg.php');
 		list($faceurl) = showfacedesign($friend['icon'], '1', 's');
-		$query = $db->query("SELECT ftid,name FROM pw_friendtype WHERE uid=" . pwEscape($winduid) . " ORDER BY ftid");
+		$query = $db->query("SELECT ftid,name FROM pw_friendtype WHERE uid=" . S::sqlEscape($winduid) . " ORDER BY ftid");
 		$types = array();
 		while ($rt = $db->fetch_array($query)) {
 			$types[$rt['ftid']] = $rt['name'];
@@ -46,12 +46,12 @@ if (empty($_POST['step'])) {
 		ajax_footer();
 	}
 } else {
-	InitGP(array(
+	S::gp(array(
 		'friendtype'
 	));
 	
 	if ($friendtype > 0) {
-		$checkftid = $db->get_value("SELECT ftid FROM pw_friendtype WHERE uid=" . pwEscape($winduid) . " AND ftid=" . pwEscape($friendtype));
+		$checkftid = $db->get_value("SELECT ftid FROM pw_friendtype WHERE uid=" . S::sqlEscape($winduid) . " AND ftid=" . S::sqlEscape($friendtype));
 		if (empty($checkftid)) Showmsg('friend_type_not_exists');
 	}
 	if (!$friendcheck) {
@@ -86,15 +86,13 @@ if (empty($_POST['step'])) {
 		}
 	
 	} elseif ($friendcheck == 1) {
-		InitGP(array(
-			'checkmsg'
-		), 'P');
+		S::gp(array('checkmsg'), 'P');
 		if (strlen($checkmsg) > 255) {
 			$_strmaxlen = 255;
 			Showmsg('string_limit');
 		}
 
-		//$db->query("DELETE FROM pw_attention WHERE uid=" . pwEscape($winduid) . " AND touid=".pwEscape($touid));
+		//$db->query("DELETE FROM pw_attention WHERE uid=" . S::sqlEscape($winduid) . " AND touid=" . S::sqlEscape($touid));
 		//addSingleFriend(false, $winduid, $friend['uid'], $timestamp, 1, $friendtype, $checkmsg); 
 		/*xufazhang 2010-07-22 start*/
 		//$friendService = L::loadClass('Friend', 'friend'); // @var $friendService PW_Friend 

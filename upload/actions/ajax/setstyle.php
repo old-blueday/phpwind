@@ -4,7 +4,7 @@
 if ($groupid != 3 && $groupid != 4) {
 	Showmsg('undefined_action');
 }
-$rightset = $db->get_value("SELECT value FROM pw_adminset WHERE gid=" . pwEscape($groupid));
+$rightset = $db->get_value("SELECT value FROM pw_adminset WHERE gid=" . S::sqlEscape($groupid));
 require_once (R_P . 'require/pw_func.php');
 //$rightset = P_unserialize($rightset);
 if (!$rightset || !(is_array($rightset = unserialize($rightset)))) {
@@ -21,7 +21,7 @@ if (empty($_POST['step'])) {
 } else {
 	
 	PostCheck();
-	InitGP(array(
+	S::gp(array(
 		'set',
 		'setskin'
 	));
@@ -38,7 +38,7 @@ if (empty($_POST['step'])) {
 			}
 		}
 	}
-	$pwSQL = pwSqlSingle(array(
+	$pwSQL = S::sqlSingle(array(
 		'bgcolor' => $set['bgcolor'],
 		'linkcolor' => $set['linkcolor'],
 		'tablecolor' => $set['tablecolor'],
@@ -55,9 +55,9 @@ if (empty($_POST['step'])) {
 		'forumcolorone' => $set['forumcolorone'],
 		'forumcolortwo' => $set['forumcolortwo']
 	));
-	$rs = $db->get_one("SELECT sid FROM pw_styles WHERE name=" . pwEscape($setskin) . " AND uid='0'");
+	$rs = $db->get_one("SELECT sid FROM pw_styles WHERE name=" . S::sqlEscape($setskin) . " AND uid='0'");
 	if ($rs) {
-		$db->update("UPDATE pw_styles SET $pwSQL WHERE name=" . pwEscape($setskin) . " AND uid='0'");
+		$db->update("UPDATE pw_styles SET $pwSQL WHERE name=" . S::sqlEscape($setskin) . " AND uid='0'");
 	} else {
 		$db->update("INSERT INTO pw_styles SET $pwSQL");
 	}

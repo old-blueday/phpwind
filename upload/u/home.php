@@ -6,15 +6,43 @@ if (!$winduid) {
 	Showmsg('not_login');
 }
 $USCR = 'user_home';
-
+$perpage = 20;
 require_once(R_P . 'u/lib/space.class.php');
-include_once(D_P.'data/bbscache/level.php');
+require_once(R_P.'require/functions.php');
+include_once pwCache::getPath(D_P.'data/bbscache/level.php');
+include_once pwCache::getPath(D_P.'data/bbscache/o_config.php');
+require_once(R_P.'require/credit.php');
 $newSpace = new PwSpace($winduid);
 $space = $newSpace->getInfo();
 $finishPercentage = getMemberInfoFinishPercentage($winduid);
 
-require_once(R_P.'require/showimg.php');
-list($faceurl) = showfacedesign($winddb['icon'],1,'m');
+$winddb['medals'] && $listmedals = getMedalIconsByUid($winduid);
+//升级提示条
+$usercredit = array(                   	
+	'postnum'	=> $winddb['postnum'],
+	'digests'	=> $winddb['digests'],
+	'rvrc'		=> $winddb['rvrc'],
+	'money'		=> $winddb['money'],
+	'credit'	=> $winddb['credit'],
+	'currency'	=> $winddb['currency'],
+	'onlinetime'=> $winddb['onlinetime']
+);
+foreach ($credit->get($winduid,'CUSTOM') as $key => $value) {  //金钱、积分、威望
+	$usercredit[$key] = $value;
+}
+$upgradeset  = unserialize($db_upgrade);
+$totalcredit = CalculateCredit($usercredit,$upgradeset); 
+
+$last = $percent = 0;
+!$lneed && $lneed = array();
+foreach ($lneed as $key=>$value){
+	if($value > $totalcredit){
+		$last = $value;break;
+	}
+}
+$percent = $last ? ceil(($totalcredit/$last) * 100) : 0;
+require_once R_P . 'require/showimg.php';
+list($faceurl) = showfacedesign($winddb['icon'],1,'m'); //头像
 
 $weiboService = L::loadClass('weibo','sns'); /* @var $weiboService PW_Weibo */
 $weiboList = $weiboService->getUserAttentionWeibos($winduid, array(), 1, 20);
@@ -26,7 +54,7 @@ $pages = numofpage($weiboCount, 1, ceil($weiboCount/20), 'apps.php?q=weibo&do=at
 
 if (!$db_toolbar) {
 	$pwForumList = array();
-	include_once(D_P.'data/bbscache/forumlist_cache.php');
+	include_once pwCache::getPath(D_P.'data/bbscache/forumlist_cache.php');
 	if ($pwForumAllList && $GLOBALS['groupid'] == 3) {
 		$pwForumList = array_merge($pwForumList,$pwForumAllList);
 	}
@@ -34,35 +62,28 @@ if (!$db_toolbar) {
 
 (empty($winddb['honor']) || !$_G['allowhonor']) && $winddb['honor'] = getLangInfo('other','whattosay');
 
-//道具中心
-$toolCenter = L::loadClass('ToolCenter', 'toolcenter');
-$myTools = $randTools = array();
-if ($db_toolifopen) {
-	$myTools = $toolCenter->getToolsByUidAndNum($winduid, 3);
-	if(empty($myTools)){
-		$randTools = $toolCenter->getToolsByRandom(3);
-	}
-}
-
 //任务
 if ($db_job_isopen) {
 	$isApplyJob = false;
 	$jobService = L::loadclass("job", 'job');
+	$myJobList = array();
 	$myJobList = $jobService->appendJobDetailInfo($jobService->getAppliedJobs($winduid));
-	if (count($myJobList)) $myJobList = array_slice($myJobList, 0, 3);
+	if (count($myJobList)) $myJobList = array_slice($myJobList, 0, 2);
 	if (empty($myJobList)) {
 		$isApplyJob = true;
 		$myJobList = $jobService->appendJobDetailInfo($jobService->getCanApplyJobs($winduid, $groupid));
-		if (count($myJobList)) $myJobList = array_slice($myJobList, 0, 3);
+		if (count($myJobList)) $myJobList = array_slice($myJobList, 0, 2);
 	}
 }
+list($isPunch,$showPunch) = isPunchRoutine();//每日打卡
 
-$modelList = array('recommendUsers' => 3,'visitor' => 5);
+$modelList = array('recommendUsers' => 3,'visitor' => 6, 'friendsBirthday' => array('num' => 3,'expire' => 21600 ));
 $o_weibopost == '0' && $modelList['friend'] = 6;
 $spaceData = $newSpace->getSpaceData($modelList);
 $o_weibopost == '0' && $myFriends = $spaceData['friend'];//我的好友
 $latestVisits = $spaceData['visitor'];//最近访客
 $recommendUsers = $spaceData['recommendUsers'];//我推荐关注模块
+$birthdays = $spaceData['friendsBirthday'];//好友生日
 
 /* sinaweibo bind */
 if (!$db_sinaweibo_status) {
@@ -102,4 +123,20 @@ function getMemberInfoFinishPercentage($userId) {
 		if ('' != $data[$field]) $finish++;
 	}
 	return ceil(round($finish * 1.0 / $total, 3) * 100);
+}
+
+function isPunchRoutine(){
+	global $o_punchopen,$o_punch_usergroup,$o_punch_reward,$groupid,$winddb,$tdtime;
+	if(!$o_punchopen){
+		return array(false,false);
+	}
+	$usergroup = ($o_punch_usergroup) ? explode(",",$o_punch_usergroup) : array();
+	if($usergroup && !in_array($groupid,$usergroup)){
+		return array(false,false);
+	}
+	list($todayStart,$todayEnd) = array($tdtime,$tdtime+86400);
+	if($winddb['punch']>$todayStart && $winddb['punch']< $todayEnd){
+		return array(false,true);
+	}
+	return array(true,true);
 }

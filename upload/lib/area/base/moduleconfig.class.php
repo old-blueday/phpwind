@@ -56,10 +56,10 @@ class PW_ModuleConfig{
 	}
 	
 	function _getTemplateFile($sign) {
-		return $this->getPath($sign).'/main.htm';
+		return $this->getPath($sign).'/'.PW_PORTAL_MAIN;
 	}
 	function _getConfigFile($sign) {
-		return $this->getPath($sign).'/config.htm';
+		return $this->getPath($sign).'/'.PW_PORTAL_CONFIG;
 	}
 	
 	function _getModuleConfigService() {

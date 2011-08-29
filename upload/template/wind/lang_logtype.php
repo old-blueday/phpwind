@@ -83,6 +83,7 @@ $lang['logtype'] = array(
 		'other_present'		=> '节日送礼',
 		'other_finishjob'	=> '任务奖励',
 		'other_propaganda' 	=> '宣传奖励',
+		'other_finishpunch' => '打卡奖励',
 	),
 
 	'bk_save'			=> '存款',
@@ -107,6 +108,8 @@ $lang['logtype'] = array(
 	'remind'			=> '提醒',
 	'recycle'			=> '回收站',
 	'banuser'			=> '禁言',
+	'banuserip'			=> '禁止IP',
+	'signature'			=> '禁止签名',
 
 	'credit'			=> '评分',
 	'deluser'			=> '用户',

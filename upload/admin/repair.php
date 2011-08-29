@@ -4,7 +4,7 @@ $basename = $admin_file.'?adminjob=repair';
 if (in_array($_POST['action'],array('repair','optimize'))) {
 	!$_POST['tabledb'] && adminmsg('db_empty_tables');
 	$action = strtoupper($_POST['action']);
-	$table = Char_cv(implode(', ',$_POST['tabledb']));
+	$table = S::escapeChar(implode(', ',$_POST['tabledb']));
 	@set_time_limit(200);
 	if($_POST['action']=='repair'){
 		$query = $db->query("$action TABLE $table EXTENDED");

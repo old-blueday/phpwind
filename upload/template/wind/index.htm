@@ -53,7 +53,7 @@ EOT;
 EOT;
 if($_COOKIE['widthCfg'] == 1){print <<<EOT
 -->
-    	<li><a id="widthCfg" href="javascript:shiftStyle();" class="s2">[切换到窄版]</a></li>
+		<li><a id="widthCfg" href="javascript:shiftStyle();" class="s2">[切换到窄版]</a></li>
 <!--
 EOT;
 } else {print <<<EOT
@@ -63,17 +63,13 @@ EOT;
 EOT;
 }print <<<EOT
 -->
-        <li><a href="searcher.php?sch_time=newatc">最新帖子</a></li>
-        <li><a href="searcher.php?digest=1">精华区</a></li>
-        <li><a href="job.php?action=sign">标记已读</a></li>
+		<li><a href="apps.php?q=article">我的帖子</a></li>
+		<li><a href="searcher.php?sch_time=newatc">查看新帖</a></li>
+		<li><a href="searcher.php?digest=1">精华区</a></li>
 <!--
 EOT;
-if (SCR == 'index' && ($groupid == 3 || $groupid == 4)) {print <<<EOT
---><li><a href="javascript:;" onClick="if (typeof MgMode == 'function') {mgm.showMenu(this);} else {KSHBJ=this;loadjs('js/mgmode.js');}return false;">可视化布局</a></li>
-<!--
-EOT;
-}if (!empty($shortcutforum)){print <<<EOT
---><li id="id_shortcut" onClick="read.open('menu_shortcut',this.id);"><a href="javascript:;" class="iconDroplink">书签</a><span class="iconDrop"><i>▼</i></span></li>
+if (!empty($shortcutforum)){print <<<EOT
+--><li id="id_shortcut" onclick="read.open('menu_shortcut',this.id,0,22);"><a href="javascript:;" class="link_down"><span>书签</span></a></li>
 <!--
 EOT;
 }if ($skincount >1){print <<<EOT
@@ -88,7 +84,7 @@ EOT;
 EOT;
 if($db_todaypost){print <<<EOT
 -->
-    	<li>今日<em><a href="searcher.php?sch_time=newatc" class="s2 b">$tposts</a></em></li>
+    	<li>今日<em><a href="searcher.php?sch_time=today" class="s2 b">$tposts</a></em></li>
         <li>昨日<em class="b s2">$yposts</em></li>
 <!--
 EOT;
@@ -107,7 +103,6 @@ EOT;
 if($db_newinfoifopen) portalEcho('bbsindex');print <<<EOT
 -->
 <div class="c mb10">&nbsp;</div>
-<div class="pd15">
 <!--
 EOT;
 if($threadright){print<<<EOT
@@ -119,11 +114,7 @@ server.start();
 </script>
 <!--
 EOT;
-}print<<<EOT
--->
-<!--
-EOT;
-if($notice_A){print <<<EOT
+}if($notice_A){print <<<EOT
 -->
 <div class="noticebg">
 	<div id="notice">
@@ -171,24 +162,19 @@ EOT;
 <div class="c mb10">&nbsp;</div>
 <!--
 EOT;
-}print <<<EOT
--->
-<!--
-EOT;
-if($db_iftag && $db_tagindex && $tagdb = L::config('tagdb','tagdb')){print <<<EOT
+}if($db_iftag && $db_tagindex && $tagdb = L::config('tagdb','tagdb')){print <<<EOT
 -->
 <div class="t">
+	<div class="h"><h3 class="cateT">热门标签</h3></div>
+	<div class="tTable">
 	<table width="100%" cellspacing="0" cellpadding="0">
 		<tr>
-			<td class="h"><b>热门标签</b></td>
-		</tr>
-		<tr class="tr3">
-			<td>
-				<div style="padding-left:6px;">
+			<td style="padding-top:10px;">
 <!--
 EOT;
 $num=0;
 foreach($tagdb as $key=>$val){
+$key=preg_replace('/"([^"]+)"/','$1',$key);
 $rawkey=rawurlencode($key); $num++;
 if($num>$db_tagindex) break;
 print <<<EOT
@@ -198,28 +184,20 @@ print <<<EOT
 EOT;
 }print <<<EOT
 -->
-				</div>
 			</td>
 		</tr>
 	</table>
+	</div>
 </div>
 <!--
 EOT;
-}
-print <<<EOT
--->
-<div class="contentc"></div>
-<div id="content">
-<div class="contentwrap z">
-<!--
-EOT;
-$_adindex = 0;
+}$_adindex = 0;
 foreach($catedb as $k=>$cate){
 if($forumdb[$cate['fid']]){
 $_adindex++;
 if($cate['across']){print <<<EOT
 -->
-<div class="t" id="t_$cate[fid]">
+<div id="t_$cate[fid]">
     <div class="h"><a class="closeicon fr cp" onclick="return IndexDeploy('$cate[fid]',0)"><img id="img_$cate[fid]" alt="展开收起" src="$imgpath/$stylepath/index/cate_$cate[deploy_img].gif" /></a>
 <!--
 EOT;
@@ -229,42 +207,47 @@ if($cate['admin']){print <<<EOT
 <!--
 EOT;
 }print <<<EOT
---><h3><span class="s3 mr5">&raquo;</span><a href="index.php?m=bbs&cateid=$cate[fid]" class="mr10">$cate[name]</a></h3></div>
-    <div class="z">
+--><h3 class="cateT"><a href="index.php?m=bbs&cateid=$cate[fid]" class="mr10">$cate[name]</a></h3></div>
+    <div class="tTable">
         <table width="100%" style="table-layout:fixed;">
         	<tbody style="display:$cate[tbody_style];" id="cate_$cate[fid]" class="across">
 <!--
 EOT;
 $a=0;
+$count =count($forumdb[$cate[fid]]);
+$j=1;
+$forumslastClass = '';
 foreach($forumdb[$cate['fid']] as $forums){
+if(ceil($count/$cate['across']) == $j) {
+	$forumslastClass = 'tr3none';
+}
+$forumClass = $forums[logo] ? '' : 'class="'.$forums[pic].'"';
 if($a==0){print <<<EOT
 -->
-            <tr class="tr3">
+            <tr class="tr3 $forumslastClass">
 <!--
 EOT;
 }$a++;print <<<EOT
 -->
+						<th $forumClass id="fid_{$forums[fid]}" height="40">
 <!--
 EOT;
 if($forums['logo']){print <<<EOT
 -->
-          		<th id="fid_{$forums[fid]}">
+          		
 					<img src="$forums[logo]" class="fl mr10" alt="forumlogo" />
 <!--
 EOT;
-}else{print <<<EOT
+}
+print <<<EOT
 -->
-				<th class="$forums[pic]" id="fid_{$forums[fid]}">
-<!--
-EOT;
-}print <<<EOT
--->
-                    <h2 class="mr10"><a href="thread.php?fid=$forums[fid]" id="fn_$forums[fid]">$forums[name]</a></h2>
+
+                    <h2 class="forumT mr10"><a href="thread.php?fid=$forums[fid]" id="fn_$forums[fid]">$forums[name]</a></h2>
 <!--
 EOT;
 if($db_todaypost && $forums[tpost]){print <<<EOT
 -->
-					<span class="s2 mr10">(今日$forums[tpost])</span>
+						<span class="s2 mr10">(今日$forums[tpost])</span>
 <!--
 EOT;
 }print <<<EOT
@@ -273,23 +256,17 @@ EOT;
 EOT;
 if($threadright && ($threadright[down][admin] || in_array(0,$threadright[down][other]) || in_array($cate[fid],$threadright[down][other]) || in_array($forums[fid],$threadright[down][other])) ){print <<<EOT
 -->
-					<a class="s7" href="javascript:;" id="jh_forum$forums[fid]" onclick="sendmsg('apps.php?q=appthread&forumid=$forums[fid]&do=downall','',this.id)">充实内容</a>
+					<a class="s4" href="javascript:;" id="jh_forum$forums[fid]" onclick="sendmsg('apps.php?q=appthread&forumid=$forums[fid]&do=downall','',this.id)">充实内容</a>
 <!--
 EOT;
 }print <<<EOT
 -->
-                    <p><span class="mr20">主题:$forums[topics]</span>帖子:$forums[article]</p>
+					<p class="fNum"><span class="mr10">主题:$forums[topics]</span>帖子:$forums[article]</p>
 <!--
 EOT;
 if($forums[au]){print <<<EOT
 -->
-					<p><a href="$forums[ft]" class="s6">$forums[t]</a></p>
-<!--
-EOT;
-}if($forums[forumappinfo][forum_across]){
-print <<<EOT
--->
-					<!--<br /><span>{$forums[forumappinfo][forum_across]}</span-->
+					<p class="fNum"><a href="$forums[ft]">最后发帖:{$forums[newtitle]}</a></p>
 <!--
 EOT;
 }if($forums[pic]=='lock'){print <<<EOT
@@ -303,6 +280,7 @@ EOT;
 <!--
 EOT;
 if($a==$cate['across']){
+$j++;
 $a=0;
 print <<<EOT
 -->
@@ -330,7 +308,7 @@ EOT;
 EOT;
 }else{print <<<EOT
 -->
-<div class="t z" id="t_$cate[fid]">
+<div id="t_$cate[fid]">
     <div class="h"><a class="closeicon fr cp" onclick="return IndexDeploy('$cate[fid]',0)"><img id="img_$cate[fid]" alt="展开收起" src="$imgpath/$stylepath/index/cate_$cate[deploy_img].gif" /></a>
 <!--
 EOT;
@@ -339,42 +317,43 @@ if($cate[admin]){print <<<EOT
 <!--
 EOT;
 }print <<<EOT
---><h3><a href="$db_bfn?m=bbs&cateid=$cate[fid]"><span class="mr5">&raquo;</span>$cate[name]</a></h3></div>
+--><h3 class="cateT"><a href="$db_bfn?m=bbs&cateid=$cate[fid]">$cate[name]</a></h3></div>
+	<div class="tTable">
 			<table width="100%" style="table-layout:fixed;">
-				<tbody>
-					<tr class="tr2">
-								<th class="tac">版块</th>
-								<td width="120" class="tac">主题 / 帖子</td>
-								<td width="220">最后发表</td>
-						</tr>
-				</tbody>
 					<tbody id="cate_$cate[fid]" style="display:$cate[tbody_style];">
 <!--
 EOT;
-foreach($forumdb[$cate[fid]] as $forums){print <<<EOT
+$count =count($forumdb[$cate[fid]]);
+$i=0;
+foreach($forumdb[$cate[fid]] as $forums){
+$i++;
+$length=$count-$i;
+$forumlastClass = $length==0 ? 'tr3none' : '';
+$forumClass = $forums[logo] ? '' : 'class="'.$forums[pic].'"';
+print <<<EOT
 -->
-					<tr class="tr3" id="fid_$forums[fid]">
-							<th class="$forums[pic]">
+					<tr class="tr3 $forumlastClass" id="fid_$forums[fid]">
+							<th $forumClass>
 <!--
 EOT;
 if($forums[logo]){print <<<EOT
 -->
-				<a href="thread.php?fid=$forums[fid]" target="_blank"><img alt="forumlogo" src="$forums[logo]" class="fl mr10"></a>
+								<a href="thread.php?fid=$forums[fid]" target="_blank"><img alt="forumlogo" src="$forums[logo]" class="fl mr10"></a>
 <!--
 EOT;
 }print <<<EOT
 -->
-									<h2><a href="thread.php?fid=$forums[fid]" id="fn_$forums[fid]" class="mr10">$forums[name]</a></h2>
+								<h2 class="forumT"><a href="thread.php?fid=$forums[fid]" id="fn_$forums[fid]" class="mr10">$forums[name]</a></h2>
 <!--
 EOT;
 if($db_todaypost && $forums[tpost]){print <<<EOT
 -->
-				<span class="s2 mr10">(今日<span class="f10">$forums[tpost]</span>)</span>
+								<span class="s2 mr10">(今日<span class="f10">$forums[tpost]</span>)</span>
 <!--
 EOT;
 }if($threadright && ($threadright[down][admin] || in_array(0,$threadright[down][other]) || in_array($cate[fid],$threadright[down][other]) || in_array($forums[fid],$threadright[down][other])) ){print <<<EOT
 -->
-				<a class="s7" href="javascript:;" id="jh_forum$forums[fid]" onclick="sendmsg('apps.php?q=appthread&forumid=$forums[fid]&do=downall','',this.id)">充实内容</a>
+							<a class="s4" href="javascript:;" id="jh_forum$forums[fid]" onclick="sendmsg('apps.php?q=appthread&forumid=$forums[fid]&do=downall','',this.id)">充实内容</a>
 <!--
 EOT;
 }if($forums[descrip]){
@@ -391,12 +370,13 @@ print <<<EOT
 EOT;
 }if($showsub[$forums['fid']]){print <<<EOT
 -->
-				<p>子版:<span>&nbsp;{$showsub[$forums[fid]]}</span></p>
+				<p>子版:&nbsp;{$showsub[$forums[fid]]}</p>
 <!--
 EOT;
-}print <<<EOT
+}if($forums[admin]){print <<<EOT
 -->
-				<p class="adminlist"><span>版主:</span>
+
+				<p>版主:
 <!--
 EOT;
 if($db_adminshow && $forums[admin]){print <<<EOT
@@ -412,18 +392,17 @@ EOT;
 				$forums[admin]
 <!--
 EOT;
-}print <<<EOT
+}}print <<<EOT
 --></p>
 							</th>
-							<td class="num tac"><em>$forums[topics]</em>$forums[article]</td>
+							<td class="num tac" style="width:120px;"><em>$forums[topics]</em>/$forums[article]</td>
 							<td class="re">
 <!--
 EOT;
 if($forums[au]){print <<<EOT
 -->
 									<p><a href="$forums[ft]" class="s4">$forums[t]</a></p>
-									<p><a href="u.php?username={$forums[au]}" class="s6">$forums[au]</a></p>
-									<p class="s6">$forums[newtitle]</p>
+									<p class="fNum">{$forums[newtitle]} <a href="u.php?username={$forums[au]}">$forums[au]</a></p>
 <!--
 EOT;
 }if($forums[pic]=='lock'){print <<<EOT
@@ -440,7 +419,8 @@ EOT;
 }print <<<EOT
 -->
 		</tbody>
-			</table>
+	</table>
+	</div>
 </div>
 <!--
 EOT;
@@ -448,62 +428,54 @@ EOT;
 list($htmlAdvert,$arrayAdvert) = pwAdvert('Mode.Layer.Index',-1,$_adindex);
 if($htmlAdvert){print <<<EOT
 -->
-<div class="tac mb5">$htmlAdvert</div>
+<div class="tac" style="border-top:1px dotted #ddd;">$htmlAdvert</div>
 <!--
 EOT;
 }}}print <<<EOT
 -->
-</div>
-</div>
-<!--
-EOT;
-print <<<EOT
--->
-<div class="c"></div>
 <script language="JavaScript" src="js/Deploy.js"></script>
-<div class="t">
-	<div class="h"><a class="closeicon fr cp cate_$cate_img" onclick="return IndexDeploy('info',0)" id="img_info"><img alt="展开收起"  src="$imgpath/$stylepath/index/cate_$cate_img.gif" /></a><h3>站点相关</h3></div>
-	<table cellspacing="0" cellpadding="0" width="100%" style="table-layout:fixed;">
-		<tbody id="cate_info" style="display:$cate_info;">
 <!--
 EOT;
 if($db_indexlink==1){print <<<EOT
 -->
-			<tr class="tr2">
-				<td style="padding-left:10px;">
+			<div class="h">
 <!--
 EOT;
 if($db_ifselfshare && $groupid!='guest'){print <<<EOT
 -->
-					<a id="selfshare" href="javascript:;" title="自助友情链接" class="cp fr s4" onclick="sendmsg('pw_ajax.php','action=sharelink',this.id)">自助友情链接</a>
+					<a id="selfshare" href="javascript:;" title="自助友情链接" class="cp fr" onclick="sendmsg('pw_ajax.php','action=sharelink',this.id)">自助友情链接</a>
 <!--
 EOT;
 }print <<<EOT
 -->
-					 友情链接 </td>
-			</tr>
+					<strong>友情链接</strong></div>
+<div class="tTable"><table cellspacing="0" cellpadding="0" width="100%" style="table-layout:fixed;">
 <!--
 EOT;
 foreach($sharelink[0] as $share){ print <<<EOT
 -->
-			<tr class="tr3">
+			<tr>
 				<td>$share</td>
 			</tr>
 <!--
 EOT;
 }print <<<EOT
 -->
-			<tr class="tr3">
-				<td><div class="sharelink2">$sharelink[1]</div></td>
+			<tr>
+				<td><div class="sharelink2 cc">$sharelink[1]</div></td>
 			</tr>
 <!--
 EOT;
-}if($db_indexshowbirth && $brithcache!='empty'){print <<<EOT
+}print <<<EOT
 -->
-			<tr class="tr2">
-				<td style="padding-left:10px;">生日会员</td>
-			</tr>
-			<tr class="tr3">
+</table></div>
+<!--
+EOT;
+if($db_indexshowbirth && $brithcache!='empty'){print <<<EOT
+-->
+<div class="h b">生日会员</div>
+<div class="tTable"><table cellspacing="0" cellpadding="0" width="100%" style="table-layout:fixed;">
+			<tr>
 				<td style="word-break: keep-all;">
 <!--
 EOT;
@@ -521,16 +493,15 @@ EOT;
 -->
 				</td>
 			</tr>
+</table></div>
 <!--
 EOT;
 }print <<<EOT
 -->
-		<tr class="tr2">
-			<td style="padding-left:10px;">在线用户<a name="online"></a> -  共 $usertotal 人在线,$userinbbs 位会员,$guestinbbs 位访客,最多 $higholnum 人发生在 $mostinbbstime </td>
-		</tr>
-		<tr class="tr3">
-			<td>
-				<div style="padding:6px;">
+<div class="h">在线用户<a name="online"></a> -  共 $usertotal 人在线,$userinbbs 位会员,$guestinbbs 位访客,最多 $higholnum 人发生在 $mostinbbstime </div>
+<div class="tTable"><table cellspacing="0" cellpadding="0" width="100%" style="table-layout:fixed;">
+		<tr>
+			<td style="padding:8px 0;">
 <!--
 EOT;
 foreach($showgroup as $value){
@@ -560,12 +531,9 @@ EOT;
 EOT;
 }}print <<<EOT
 -->
-				</div>
 			</td>
 		</tr>
-		</tbody>
 	</table>
-</div>
 </div>
 </div>
 <!--

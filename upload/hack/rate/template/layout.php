@@ -5,6 +5,6 @@ include_once PrintEot ( 'left' );
 print <<<EOT
 -->
 EOT;
-require_once Pcv($filepath);
+require_once S::escapePath($filepath);
 include_once PrintEot ( 'adminbottom' );
 ?>

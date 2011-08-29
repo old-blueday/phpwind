@@ -7,7 +7,7 @@
  */
 set_time_limit(0);
 error_reporting(E_ERROR | E_PARSE);
-@set_magic_quotes_runtime(0);
+function_exists('set_magic_quotes_runtime') && set_magic_quotes_runtime(0);
 function_exists('date_default_timezone_set') && date_default_timezone_set('Etc/GMT+0');
 
 define('PW_UPLOAD',1);
@@ -34,7 +34,7 @@ require_once(R_P.'lang/install_lang.php');
  */
 $_WIND			= 'install';
 $from_version	= '';
-$wind_version	= '8.0';
+$wind_version	= '8.3';
 $wind_repair	= '';
 $wind_from		= '';//Customized version
 $_actionStep = array('index','readme','writable','database','createtable','hack',
@@ -94,6 +94,7 @@ if ($action == 'writable') {
 		'data/style/',
 		'data/tmp/',
 		'html/',
+		'html/stopic/',
 		'html/read/',
 		'html/channel/',
 		'html/portal/bbsindex/',
@@ -107,7 +108,19 @@ if ($action == 'writable') {
 		'html/portal/oindex/',
 		'html/portal/oindex/main.htm',
 		'html/portal/oindex/config.htm',
-		'html/portal/oindex/index.html'
+		'html/portal/oindex/index.html',
+		'html/portal/groupgatherleft/main.htm',
+		'html/portal/groupgatherleft/config.htm',
+		'html/portal/groupgatherleft/index.html',
+		'html/portal/groupgatherright/main.htm',
+		'html/portal/groupgatherright/config.htm',
+		'html/portal/groupgatherright/index.html',
+		'html/portal/userlist/main.htm',
+		'html/portal/userlist/config.htm',
+		'html/portal/userlist/index.html',
+		'html/portal/usermix/main.htm',
+		'html/portal/usermix/config.htm',
+		'html/portal/usermix/index.html'
 	);
 	$writelog = '';
 	$fileexist = $writable = array();
@@ -250,7 +263,7 @@ if ($action == 'createtable') {
 	setstatus($userstatus,7);
 	setstatus($userstatus,8);
 
-	$db->update("INSERT INTO pw_members (username,password,email,groupid,memberid,regdate,userstatus,shortcut) VALUES ('$manager[0]','$manager_pwd[0]','$manager_email','3','8','$timestamp','$userstatus',',article,write,diary,share,groups,photos,')");
+	$db->update("INSERT INTO pw_members (username,password,icon,email,groupid,memberid,regdate,userstatus,shortcut) VALUES ('$manager[0]','$manager_pwd[0]','none.gif|1|||','$manager_email','3','8','$timestamp','$userstatus',',article,write,diary,share,groups,photos,')");
 	$uid = $db->insert_id();
 	$db->update("INSERT INTO pw_memberdata (uid,lastvisit,thisvisit) VALUES ('$uid','$timestamp','$timestamp')");
 	$db->update("INSERT INTO pw_bbsinfo (id,newmember,totalmember,tdtcontrol) VALUES ('1','$manager[0]','1','$tdtime')");
@@ -457,7 +470,7 @@ if ($action == 'other') {
 	require_once(R_P.'admin/cache.php');
 	updatecache_c();
 	require(R_P.'lang/step/writesmile.php');
-	
+
 	//设置门户首页为默认首页
 	$update	= array('area_default_alias','string','home','');
 	$db->update("REPLACE INTO pw_hack VALUES (".pwImplode($update).')');
@@ -546,13 +559,13 @@ if ($action == 'static') {
 	$ChannelService->updateAreaChannels();
 
 	require_once(R_P.'require/nav.php');
-	//foreach ($channelsArray as $channelInfoValue) {
-	//	$alias = $channelInfoValue['alias'];
-	//	$staticPath=Pcv(AREA_PATH.$channelInfoValue['alias'].'/index.html');
 
-	//	require M_P.'index.php';
-	//	aliasStatic($staticPath);
-	//}
+	$alias = array('baby','decoration','auto','delicious');
+	foreach ($alias as $value) {
+		$alias = $value;
+		require M_P.'index.php';
+		aliasStatic($alias);
+	}
 
 	list($prev,$next) = getStepto($action);
 	pwHeader("$basename?action=$next");exit;
@@ -600,8 +613,8 @@ if ($action == 'finish') {
 	updatecache_conf('area',true);
 	updatecache_conf('o',true);
 
-	$ipindex = L::loadClass('iptable', 'utility');
-	$ipindex->createIpIndex();
+//	$ipindex = L::loadClass('iptable', 'utility');
+//	$ipindex->createIpIndex();
 
 	$db_htmdir = 'html';
 	$db_bbsurl = $bbsurl;
@@ -794,7 +807,7 @@ function Promptmsg($msg,$toaction=null,$jump=false){
 function footer(){
 	global $footer;
 	require_once(R_P.'lang/footer.htm');
-	$output = trim(str_replace(array('<!--<!---->','<!---->',"\r"),'',ob_get_contents()),"\n");
+	$output = str_replace(array('<!--<!---->-->','<!---->-->', '<!--<!---->', "<!---->\r\n", '<!---->', '<!-- -->', "\t\t\t"), '', ob_get_contents());
 	ob_end_clean();
 	ob_start();
 	echo $output;unset($output);exit;

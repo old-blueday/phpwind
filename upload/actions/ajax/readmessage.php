@@ -1,6 +1,6 @@
 <?php
 !defined('P_W') && exit('Forbidden');
-InitGP(array(
+S::gp(array(
 	'mid',
 	'type'
 ));

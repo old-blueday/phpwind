@@ -39,8 +39,9 @@ if(file_exists($filename)){
 	}
 }
 if($yestime!=$tdtime) {
-	P_unlink($filename);
-	writeover($filename,str_pad("<?php die;?>\tNULL\t$tdtime\t",$dbtdsize)."\n");/*24小时初始化一次*/
+	//* P_unlink($filename);
+	pwCache::deleteData($filename);
+	pwCache::setData($filename,str_pad("<?php die;?>\tNULL\t$tdtime\t",$dbtdsize)."\n");/*24小时初始化一次*/
 }
 function fputin($fp,$offset,$dbtdsize,$prior='M',$next='M',$ifadd='N')
 {

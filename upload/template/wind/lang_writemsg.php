@@ -78,6 +78,8 @@ $lang['writemsg'] = array (
 	'unlock_content'		=> '您发表的帖子被 [b]{$L[manager]}[/b] 执行 [b]解除锁定[/b] 操作'.$lang['_othermsg'],
 	'push_title'			=> '您的帖子被提前',
 	'push_content'			=> '您发表的帖子被 [b]{$L[manager]}[/b] 执行 [b]提前[/b] 操作'.$lang['_othermsg'],
+	'recommend_title'		=> '您的帖子被推荐',
+	'recommend_content'		=> '您发表的帖子被 [b]{$L[manager]}[/b] 执行 [b]推荐[/b] 操作'.$lang['_othermsg'],
 	'pushto_title'			=> '您的帖子被推送',
 	'pushto_content'		=> '您发表的帖子被 [b]{$L[manager]}[/b] 执行 [b]推送[/b] 操作'.$lang['_othermsg'],
 	'unhighlight_title'		=> '您的帖子标题被取消加亮显示',
@@ -130,6 +132,11 @@ $lang['writemsg'] = array (
 	'shield_content_1'		=> '您发表的帖子被 [b]{$L[manager]}[/b] [b]屏蔽[/b]'.$lang['_othermsg'],
 	'shield_title_0'		=> '您的帖子被取消屏蔽',
 	'shield_content_0'		=> '您发表的帖子被 [b]{$L[manager]}[/b] 执行 [b]取消屏蔽[/b] 操作'.$lang['_othermsg'],
+	'bansignature_title_0'	=> '您的论坛签名被解除屏蔽',
+	'bansignature_title_1'	=> '您的论坛签名被禁止',
+	'bansignature_content_1'=> '您的论坛签名被 [b]{$L[manager]}[/b] 于{$L[admindate]}执行 [b]禁止[/b] 操作\n'.
+							   '[b]操作理由:[/b]{$L[reason]}',
+	'bansignature_content_0'=> '您的论坛签名被 [b]{$L[manager]}[/b] 于{$L[admindate]}执行 [b]解除屏蔽[/b] 操作',
 	'remind_title'			=> '您的帖子被提醒管理',
 	'remind_content'		=> '您发表的帖子被 [b]{$L[manager]}[/b] 执行 [b]提醒管理[/b] 操作'.$lang['_othermsg'],
 	'unite_title'			=> '您的帖子被{$L[manager]}合并',
@@ -137,12 +144,12 @@ $lang['writemsg'] = array (
 	'unite_owner_content'	=> '您发表的帖子被 [b]{$L[manager]}[/b] 执行 [b]合并[/b] 操作',
 	'leaveword_title'		=> '您的帖子被留言',
 	'leaveword_content'		=> '[b]{$L[author]}[/b] 在您发表的帖子上留言了。'.$lang['_othermsg'],
-	'birth_title'			=> '$L[toUser],祝您生日快乐',
-	'birth_content'			=> '[img]$GLOBALS[imgpath]/wind/birth.jpg[/img]\r\n'
+	'birth_title'			=> '$L[userName],祝您生日快乐',
+	'birth_content'			=> '[img]$GLOBALS[db_bbsurl]/u/images/birthday.gif[/img]\r\n'
 								. '祈愿您的生日，为您带来一个最瑰丽最金碧辉煌的一生。\r\n'
 								. '只希望你的每一天都快乐、健康、美丽，生命需要奋斗、创造、把握！\r\n'
 								. '生日的烛光中摇曳一季繁花，每一支都是我的祝愿：生日快乐！\r\n\r\n'
-								. '--------------------------------------- {$L[fromUser]} 送上最真挚的祝福！\r\n\r\n',
+								. '--------------------------------------- {$L[fromUsername]} 送上最真挚的祝福！\r\n\r\n',
 	'down_title'			=> '您的帖子被执行压帖操作',
 	'down_content'			=> '您发表的帖子被 [b]{$L[manager]}[/b] [b]压后了 {$L[timelimit]} 小时[/b]'.$lang['_othermsg'],
 	'change_type_title'		=> '您的帖子被修改了主题分类',
@@ -162,23 +169,24 @@ $lang['writemsg'] = array (
 	'advert_apply_content'	=> '用户 {$L[username]} 于 {$L[time]} 申请了 {$L[days]} 天的广告展示，请求您审核。',
 
 	'friend_add_title_1'	=> '好友系统通知：{$L[username]}将您列入他（她）的好友名单',
-	'friend_add_content_1'	=> '[url=$GLOBALS[db_bbsurl]/u.php?uid={$L[uid]}]{$L[username]}[/url] 将您列入他（她）的好友名单。',
+	'friend_add_content_1'	=> '[url=$GLOBALS[db_bbsurl]/{$GLOBALS[db_userurl]}{$L[uid]}]{$L[username]}[/url] 将您列入他（她）的好友名单。',
 	'friend_add_title_2'	=> '好友系统通知：{$L[username]} 请求加您为好友',
-	'friend_add_content_2'	=> '[url={$GLOBALS[db_bbsurl]}/u.php?uid={$L[uid]}]{$L[username]}[/url] 请求加您为好友。是否同意？\n\n$L[msg]\n\n',
+	'friend_add_content_2'	=> '[url={$GLOBALS[db_bbsurl]}/{$GLOBALS[db_userurl]}{$L[uid]}]{$L[username]}[/url] 请求加您为好友。是否同意？\n\n$L[msg]\n\n',
 	'friend_delete_title'	=> '好友系统通知：{$L[username]} 解除与您的好友关系',
-	'friend_delete_content'	=> '[url={$GLOBALS[db_bbsurl]}/u.php?uid={$L[uid]}]{$L[username]}[/url] 解除与您的好友关系。',
+	'friend_delete_content'	=> '[url={$GLOBALS[db_bbsurl]}/{$GLOBALS[db_userurl]}{$L[uid]}]{$L[username]}[/url] 解除与您的好友关系。',
 	'friend_accept_title'	=> '好友系统通知：{$L[username]} 通过了您的好友请求',
-	'friend_accept_content' => '[url={$GLOBALS[db_bbsurl]}/u.php?uid={$L[uid]}]{$L[username]}[/url] 通过了您的好友请求。',
+	'friend_accept_content' => '[url={$GLOBALS[db_bbsurl]}/{$GLOBALS[db_userurl]}{$L[uid]}]{$L[username]}[/url] 通过了您的好友请求。',
 	'friend_acceptadd_title'=> '好友系统通知：{$L[username]} 通过了您的好友请求,并加您为好友',
-	'friend_acceptadd_content'	=> '[url={$GLOBALS[db_bbsurl]}/u.php?uid={$L[uid]}]{$L[username]}[/url] 通过了您的好友请求,并加您为好友。',
+	'friend_acceptadd_content'	=> '[url={$GLOBALS[db_bbsurl]}/{$GLOBALS[db_userurl]}{$L[uid]}]{$L[username]}[/url] 通过了您的好友请求,并加您为好友。',
 
 	'friend_refuse_title'	=> '好友系统通知：{$L[username]} 拒绝了您的好友请求',
-	'friend_refuse_content'	=> '[url={$GLOBALS[db_bbsurl]}/u.php?uid={$L[uid]}]{$L[username]}[/url]'
+	'friend_refuse_content'	=> '[url={$GLOBALS[db_bbsurl]}/{$GLOBALS[db_userurl]}{$L[uid]}]{$L[username]}[/url]'
 								. '拒绝了您的好友请求\r\n\r\n[b]拒绝理由：[/b]{$L[msg]}\r\n\r\n',
 	'friend_agree_title'	=> '好友系统通知：{$L[username]} 通过了您的好友请求',
-	'friend_agree_content'	=> '[url={$GLOBALS[db_bbsurl]}/u.php?uid={$L[uid]}]{$L[username]}[/url]'
+	'friend_agree_content'	=> '[url={$GLOBALS[db_bbsurl]}/{$GLOBALS[db_userurl]}{$L[uid]}]{$L[username]}[/url]'
 								. '通过了您的好友请求\r\n\r\n',
-
+	'user_update_title'		=> '系统通知',
+	'user_update_content'	=> '亲爱的{$L[username]}，我们非常高兴的告诉你，你刚刚升到了{$L[membername]}级别。你离下一级{$L[upmembername]}级别还有{$L[userneed]}分，要继续努力哦',
 	'banuser_title'			=> '系统禁言通知',
 	'banuser_content_1'		=> '你已经被管理员{$L[manager]} 禁言,禁言时间为{$L[limit]} 天\n\n{$L[reason]}',
 	'banuser_content_2'		=> '你已经被管理员{$L[manager]} 禁言\n\n{$L[reason]}',
@@ -241,8 +249,8 @@ $lang['writemsg'] = array (
 	
 	
 	
-	'birth_title'				=> '今天是你的生日',
-	'birth_content'				=> '生日快乐，稍上我的祝福，祝你开心每一天！',
+	/*'birth_title'				=> '{$L[userName]},祝你生日快乐！',
+	'birth_content'				=> '生日快乐，稍上我的祝福，祝你开心每一天！',*/
 
 	'group_attorn_title'		=> '转让群组通知',
 	'group_attorn_content'		=> '[b]{$L[username]}[/b]将群组“[url={$GLOBALS[db_bbsurl]}/apps.php?q=group&cyid={$L[cyid]}]{$L[cname]}[/url]”转让给了您，以下是关于此群组的介绍：{$L[descrip]}',
@@ -264,68 +272,72 @@ $lang['writemsg'] = array (
 	'filtermsg_post_del_title'		=> '【敏感词】您发表的回复因包含敏感内容被管理员删除!',
 	'filtermsg_post_del_content'	=> '您发表于：{$L[subject]}的回复，因包含敏感内容被管理员删除。\n\n',
 	'colony_join_title_check'		=> '群组请求[{$L[cname]}]：{$GLOBALS[windid]}申请加入，请审核',
-	'colony_join_content_check'		=> '<a href="u.php?uid={$GLOBALS[winduid]}" target="_blank">{$GLOBALS[windid]}</a>申请加入群组{$L[cname]}，，请审核。<a href="{$L[colonyurl]}">查看详情</a>！',
+	'colony_join_content_check'		=> '<a href="{$GLOBALS[db_userurl]}{$GLOBALS[winduid]}" target="_blank">{$GLOBALS[windid]}</a>申请加入群组{$L[cname]}，，请审核。<a href="{$L[colonyurl]}">查看详情</a>！',
 	'colony_join_title'				=> '群组通知[{$L[cname]}]:{$GLOBALS[windid]}已成功加入',
-	'colony_join_content'		=> '用户<a href="u.php?uid={$GLOBALS[winduid]}" target="_blank">{$GLOBALS[windid]}</a>加入了群组{$L[cname]}，<a href="{$L[colonyurl]}">快去看看吧</a>！',
+	'colony_join_content'		=> '用户<a href="{$GLOBALS[db_userurl]}{$GLOBALS[winduid]}" target="_blank">{$GLOBALS[windid]}</a>加入了群组{$L[cname]}，<a href="{$L[colonyurl]}">快去看看吧</a>！',
 	'o_del_title'				=> '群组通知[{$L[cname]}]：已将你移出该群!',
-	'o_del_content'			=> '[url=$L[curl]]{$L[cname]}[/url] <a href="u.php?uid={$GLOBALS[winduid]}" target="_blank">{$GLOBALS[windid]}</a>已经将您移出该群了!',
+	'o_del_content'			=> '[url=$L[curl]]{$L[cname]}[/url] <a href="{$GLOBALS[db_userurl]}{$GLOBALS[winduid]}" target="_blank">{$GLOBALS[windid]}</a>已经将您移出该群了!',
 
-
+	//团购
+	'activity_pcjoin_new_title'		=> '{$L[username]}报名参加了您的团购活动',
+	'activity_pcjoin_new_content'	=> '[url=$GLOBALS[db_bbsurl]/{$GLOBALS[db_userurl]}{$L[uid]}]{$L[username]}[/url]报名参加了您发起的团购活动[url=$GLOBALS[db_bbsurl]/read.php?tid={$L[tid]}]“{$L[subject]}”[/url]\r\n\r\n' . '发表日期：{$L[createtime]}'.'\r\n'.'所在版块：[url=$GLOBALS[db_bbsurl]/thread.php?fid={$L[fid]}]{$L[fname]}[/url]',
+	
 	//活动
 
 	//报名
 	'activity_signup_new_title'		=> '{$L[username]}报名参加了您的活动',
-	'activity_signup_new_content'	=> '[url=$GLOBALS[db_bbsurl]/u.php?uid={$L[uid]}]{$L[username]}[/url]报名参加了您发起的活动“{$L[subject]}”\r\n\r\n' . '[url=$GLOBALS[db_bbsurl]/read.php?tid={$L[tid]}]查看活动详情[/url]',
+	'activity_signup_new_content'	=> '[url=$GLOBALS[db_bbsurl]/{$GLOBALS[db_userurl]}{$L[uid]}]{$L[username]}[/url]报名参加了您发起的活动[url=$GLOBALS[db_bbsurl]/read.php?tid={$L[tid]}]“{$L[subject]}”[/url]\r\n\r\n' . '发表日期：{$L[createtime]}'.'\r\n'.'所在版块：[url=$GLOBALS[db_bbsurl]/thread.php?fid={$L[fid]}]{$L[fname]}[/url]',
+	
 
 	//删除
 	'activity_signup_close_title'		=> '您从活动中关闭了{$L[username]}',
-	'activity_signup_close_content'		=> '您从活动“{$L[subject]}“中关闭了报名者[url=$GLOBALS[db_bbsurl]/u.php?uid={$L[uid]}]{$L[username]}[/url]\r\n\r\n' . '[url=$GLOBALS[db_bbsurl]/read.php?tid={$L[tid]}]查看活动详情[/url]',
+	'activity_signup_close_content'		=> '您从活动“{$L[subject]}“中关闭了报名者[url=$GLOBALS[db_bbsurl]/{$GLOBALS[db_userurl]}{$L[uid]}]{$L[username]}[/url]\r\n\r\n' . '[url=$GLOBALS[db_bbsurl]/read.php?tid={$L[tid]}]查看活动详情[/url]',
 	'activity_signuper_close_title'		=> '您的报名已被{$L[username]}关闭',
-	'activity_signuper_close_content'	=> '[url=$GLOBALS[db_bbsurl]/u.php?uid={$L[uid]}]{$L[username]}[/url]已关闭您在“{$L[subject]}“活动中的报名信息\r\n\r\n' . '[url=$GLOBALS[db_bbsurl]/read.php?tid={$L[tid]}]查看活动详情[/url]',
+	'activity_signuper_close_content'	=> '[url=$GLOBALS[db_bbsurl]/{$GLOBALS[db_userurl]}{$L[uid]}]{$L[username]}[/url]已关闭您在“{$L[subject]}“活动中的报名信息\r\n\r\n' . '[url=$GLOBALS[db_bbsurl]/read.php?tid={$L[tid]}]查看活动详情[/url]',
 
 	//关闭
 	'activity_close_pay_title'				=> '您关闭了{$L[username]}的费用',
-	'activity_close_pay_content'			=> '您已关闭了[url=$GLOBALS[db_bbsurl]/u.php?uid={$L[uid]}]{$L[username]}[/url]在活动“{$L[subject]}“中的追加费用{$L[totalcash]}元\r\n\r\n' . '[url=$GLOBALS[db_bbsurl]/read.php?tid={$L[tid]}]查看活动详情[/url]',
+	'activity_close_pay_content'			=> '您已关闭了[url=$GLOBALS[db_bbsurl]/{$GLOBALS[db_userurl]}{$L[uid]}]{$L[username]}[/url]在活动“{$L[subject]}“中的追加费用{$L[totalcash]}元\r\n\r\n' . '[url=$GLOBALS[db_bbsurl]/read.php?tid={$L[tid]}]查看活动详情[/url]',
 	'activity_close_signuper_pay_title'		=> '{$L[username]}关闭了您的费用',
-	'activity_close_signuper_pay_content'	=> '[url=$GLOBALS[db_bbsurl]/u.php?uid={$L[uid]}]{$L[username]}[/url]已关闭了您在活动“{$L[subject]}“中的追加费用{$L[totalcash]}元\r\n\r\n' . '[url=$GLOBALS[db_bbsurl]/read.php?tid={$L[tid]}]查看活动详情[/url]',
+	'activity_close_signuper_pay_content'	=> '[url=$GLOBALS[db_bbsurl]/{$GLOBALS[db_userurl]}{$L[uid]}]{$L[username]}[/url]已关闭了您在活动“{$L[subject]}“中的追加费用{$L[totalcash]}元\r\n\r\n' . '[url=$GLOBALS[db_bbsurl]/read.php?tid={$L[tid]}]查看活动详情[/url]',
 
 	//支付
 	'activity_payed_title'				=> '{$L[username]}支付了活动费用',
-	'activity_payed_content'			=> '[url=$GLOBALS[db_bbsurl]/u.php?uid={$L[uid]}]{$L[username]}[/url]通过支付宝支付了“{$L[subject]}“的活动费用{$L[totalcash]}元\r\n\r\n' . '[url=$GLOBALS[db_bbsurl]/read.php?tid={$L[tid]}]查看活动详情[/url]',
-	'activity_payed2_content'			=> '[url=$GLOBALS[db_bbsurl]/u.php?uid={$L[uid]}]{$L[username]}[/url]通过支付宝支付了“{$L[subject]}“的追加费用{$L[totalcash]}元\r\n\r\n' . '[url=$GLOBALS[db_bbsurl]/read.php?tid={$L[tid]}]查看活动详情[/url]',
+	'activity_payed_content'			=> '[url=$GLOBALS[db_bbsurl]/{$GLOBALS[db_userurl]}{$L[uid]}]{$L[username]}[/url]通过支付宝支付了“{$L[subject]}“的活动费用{$L[totalcash]}元\r\n\r\n' . '[url=$GLOBALS[db_bbsurl]/read.php?tid={$L[tid]}]查看活动详情[/url]',
+	'activity_payed2_content'			=> '[url=$GLOBALS[db_bbsurl]/{$GLOBALS[db_userurl]}{$L[uid]}]{$L[username]}[/url]通过支付宝支付了“{$L[subject]}“的追加费用{$L[totalcash]}元\r\n\r\n' . '[url=$GLOBALS[db_bbsurl]/read.php?tid={$L[tid]}]查看活动详情[/url]',
 	'activity_payed_signuper_title'		=> '您支付了活动费用',
 	'activity_payed_signuper_content'	=> '您已成功支付了“{$L[subject]}“的活动费用{$L[totalcash]}元\r\n\r\n' . '[url=$GLOBALS[db_bbsurl]/read.php?tid={$L[tid]}]查看活动详情[/url]',
 	'activity_payed2_signuper_content'	=> '您已成功支付了“{$L[subject]}“的追加费用{$L[totalcash]}元\r\n\r\n' . '[url=$GLOBALS[db_bbsurl]/read.php?tid={$L[tid]}]查看活动详情[/url]',
 
 	//代付
 	'activity_payed_from_title'			=> '您支付了{$L[username]}的活动费用',
-	'activity_payed_from_content'		=> '您已成功帮[url=$GLOBALS[db_bbsurl]/u.php?uid={$L[uid]}]{$L[username]}[/url]支付了“{$L[subject]}“的活动费用{$L[totalcash]}元\r\n\r\n' . '[url=$GLOBALS[db_bbsurl]/read.php?tid={$L[tid]}]查看活动详情[/url]',
-	'activity_payed2_from_content'		=> '您已成功帮[url=$GLOBALS[db_bbsurl]/u.php?uid={$L[uid]}]{$L[username]}[/url]支付了“{$L[subject]}“的追加费用{$L[totalcash]}元\r\n\r\n' . '[url=$GLOBALS[db_bbsurl]/read.php?tid={$L[tid]}]查看活动详情[/url]',
+	'activity_payed_from_content'		=> '您已成功帮[url=$GLOBALS[db_bbsurl]/{$GLOBALS[db_userurl]}{$L[uid]}]{$L[username]}[/url]支付了“{$L[subject]}“的活动费用{$L[totalcash]}元\r\n\r\n' . '[url=$GLOBALS[db_bbsurl]/read.php?tid={$L[tid]}]查看活动详情[/url]',
+	'activity_payed2_from_content'		=> '您已成功帮[url=$GLOBALS[db_bbsurl]/{$GLOBALS[db_userurl]}{$L[uid]}]{$L[username]}[/url]支付了“{$L[subject]}“的追加费用{$L[totalcash]}元\r\n\r\n' . '[url=$GLOBALS[db_bbsurl]/read.php?tid={$L[tid]}]查看活动详情[/url]',
 
 	//被代付
 	'activity_payed_signuper_from_title'	=> '{$L[username]}支付了您的活动费用',
-	'activity_payed_signuper_from_content'	=> '[url=$GLOBALS[db_bbsurl]/u.php?uid={$L[uid]}]{$L[username]}[/url]帮您支付了“{$L[subject]}“的活动费用{$L[totalcash]}元\r\n\r\n' . '[url=$GLOBALS[db_bbsurl]/read.php?tid={$L[tid]}]查看活动详情[/url]',
-	'activity_payed2_signuper_from_content'	=> '[url=$GLOBALS[db_bbsurl]/u.php?uid={$L[uid]}]{$L[username]}[/url]帮您支付了“{$L[subject]}“的追加费用{$L[totalcash]}元\r\n\r\n' . '[url=$GLOBALS[db_bbsurl]/read.php?tid={$L[tid]}]查看活动详情[/url]',
+	'activity_payed_signuper_from_content'	=> '[url=$GLOBALS[db_bbsurl]/{$GLOBALS[db_userurl]}{$L[uid]}]{$L[username]}[/url]帮您支付了“{$L[subject]}“的活动费用{$L[totalcash]}元\r\n\r\n' . '[url=$GLOBALS[db_bbsurl]/read.php?tid={$L[tid]}]查看活动详情[/url]',
+	'activity_payed2_signuper_from_content'	=> '[url=$GLOBALS[db_bbsurl]/{$GLOBALS[db_userurl]}{$L[uid]}]{$L[username]}[/url]帮您支付了“{$L[subject]}“的追加费用{$L[totalcash]}元\r\n\r\n' . '[url=$GLOBALS[db_bbsurl]/read.php?tid={$L[tid]}]查看活动详情[/url]',
 
 	//确认支付
 	'activity_confirmpay_title'				=> '您修改了{$L[username]}的支付状态',
-	'activity_confirmpay_content'			=> '您已将[url=$GLOBALS[db_bbsurl]/u.php?uid={$L[uid]}]{$L[username]}[/url]在活动“{$L[subject]}“中{$L[totalcash]}元费用的支付状态改为“已支付”\r\n\r\n' . '[url=$GLOBALS[db_bbsurl]/read.php?tid={$L[tid]}]查看活动详情[/url]',
-	'activity_confirmpay2_content'	=> '您已将[url=$GLOBALS[db_bbsurl]/u.php?uid={$L[uid]}]{$L[username]}[/url]在活动“{$L[subject]}“中{$L[totalcash]}元追加费用的支付状态改为“已支付”\r\n\r\n' . '[url=$GLOBALS[db_bbsurl]/read.php?tid={$L[tid]}]查看活动详情[/url]',
+	'activity_confirmpay_content'			=> '您已将[url=$GLOBALS[db_bbsurl]/{$GLOBALS[db_userurl]}{$L[uid]}]{$L[username]}[/url]在活动“{$L[subject]}“中{$L[totalcash]}元费用的支付状态改为“已支付”\r\n\r\n' . '[url=$GLOBALS[db_bbsurl]/read.php?tid={$L[tid]}]查看活动详情[/url]',
+	'activity_confirmpay2_content'	=> '您已将[url=$GLOBALS[db_bbsurl]/{$GLOBALS[db_userurl]}{$L[uid]}]{$L[username]}[/url]在活动“{$L[subject]}“中{$L[totalcash]}元追加费用的支付状态改为“已支付”\r\n\r\n' . '[url=$GLOBALS[db_bbsurl]/read.php?tid={$L[tid]}]查看活动详情[/url]',
 	'activity_confirmpay_signuper_title'	=> '{$L[username]}修改了您的支付状态',
-	'activity_confirmpay_signuper_content'	=> '[url=$GLOBALS[db_bbsurl]/u.php?uid={$L[uid]}]{$L[username]}[/url]已将您在活动“{$L[subject]}“中{$L[totalcash]}元费用的支付状态改为“已支付”\r\n\r\n' . '[url=$GLOBALS[db_bbsurl]/read.php?tid={$L[tid]}]查看活动详情[/url]',
-	'activity_confirmpay2_signuper_content'	=> '[url=$GLOBALS[db_bbsurl]/u.php?uid={$L[uid]}]{$L[username]}[/url]已将您在活动“{$L[subject]}“中{$L[totalcash]}元追加费用的支付状态改为“已支付”\r\n\r\n' . '[url=$GLOBALS[db_bbsurl]/read.php?tid={$L[tid]}]查看活动详情[/url]',
+	'activity_confirmpay_signuper_content'	=> '[url=$GLOBALS[db_bbsurl]/{$GLOBALS[db_userurl]}{$L[uid]}]{$L[username]}[/url]已将您在活动“{$L[subject]}“中{$L[totalcash]}元费用的支付状态改为“已支付”\r\n\r\n' . '[url=$GLOBALS[db_bbsurl]/read.php?tid={$L[tid]}]查看活动详情[/url]',
+	'activity_confirmpay2_signuper_content'	=> '[url=$GLOBALS[db_bbsurl]/{$GLOBALS[db_userurl]}{$L[uid]}]{$L[username]}[/url]已将您在活动“{$L[subject]}“中{$L[totalcash]}元追加费用的支付状态改为“已支付”\r\n\r\n' . '[url=$GLOBALS[db_bbsurl]/read.php?tid={$L[tid]}]查看活动详情[/url]',
 
 	//退款
 	'activity_refund_title'				=> '您退回了{$L[username]}的费用',
-	'activity_refund_content'			=> '您已成功退回[url=$GLOBALS[db_bbsurl]/u.php?uid={$L[uid]}]{$L[username]}[/url]在活动“{$L[subject]}“中的费用{$L[totalcash]}元\r\n\r\n' . '[url=$GLOBALS[db_bbsurl]/read.php?tid={$L[tid]}]查看活动详情[/url]',
-	'activity_refund2_content'			=> '您已成功退回[url=$GLOBALS[db_bbsurl]/u.php?uid={$L[uid]}]{$L[username]}[/url]在活动“{$L[subject]}“中的追加费用{$L[totalcash]}元\r\n\r\n' . '[url=$GLOBALS[db_bbsurl]/read.php?tid={$L[tid]}]查看活动详情[/url]',
+	'activity_refund_content'			=> '您已成功退回[url=$GLOBALS[db_bbsurl]/{$GLOBALS[db_userurl]}{$L[uid]}]{$L[username]}[/url]在活动“{$L[subject]}“中的费用{$L[totalcash]}元\r\n\r\n' . '[url=$GLOBALS[db_bbsurl]/read.php?tid={$L[tid]}]查看活动详情[/url]',
+	'activity_refund2_content'			=> '您已成功退回[url=$GLOBALS[db_bbsurl]/{$GLOBALS[db_userurl]}{$L[uid]}]{$L[username]}[/url]在活动“{$L[subject]}“中的追加费用{$L[totalcash]}元\r\n\r\n' . '[url=$GLOBALS[db_bbsurl]/read.php?tid={$L[tid]}]查看活动详情[/url]',
 	'activity_refund_signuper_title'	=> '{$L[username]}退回了您的费用',
-	'activity_refund_signuper_content'	=> '[url=$GLOBALS[db_bbsurl]/u.php?uid={$L[uid]}]{$L[username]}[/url]已成功退回您在活动“{$L[subject]}“中的费用{$L[totalcash]}元\r\n\r\n' . '[url=$GLOBALS[db_bbsurl]/read.php?tid={$L[tid]}]查看活动详情[/url]',
-	'activity_refund2_signuper_content'	=> '[url=$GLOBALS[db_bbsurl]/u.php?uid={$L[uid]}]{$L[username]}[/url]已成功退回您在活动“{$L[subject]}“中的追加费用{$L[totalcash]}元\r\n\r\n' . '[url=$GLOBALS[db_bbsurl]/read.php?tid={$L[tid]}]查看活动详情[/url]',
+	'activity_refund_signuper_content'	=> '[url=$GLOBALS[db_bbsurl]/{$GLOBALS[db_userurl]}{$L[uid]}]{$L[username]}[/url]已成功退回您在活动“{$L[subject]}“中的费用{$L[totalcash]}元\r\n\r\n' . '[url=$GLOBALS[db_bbsurl]/read.php?tid={$L[tid]}]查看活动详情[/url]',
+	'activity_refund2_signuper_content'	=> '[url=$GLOBALS[db_bbsurl]/{$GLOBALS[db_userurl]}{$L[uid]}]{$L[username]}[/url]已成功退回您在活动“{$L[subject]}“中的追加费用{$L[totalcash]}元\r\n\r\n' . '[url=$GLOBALS[db_bbsurl]/read.php?tid={$L[tid]}]查看活动详情[/url]',
 
 	//追加活动费用
 	'activity_additional_title'			=> '{$L[username]}追加了你的活动费用',
-	'activity_additional_content'		=> '[url=$GLOBALS[db_bbsurl]/u.php?uid={$L[uid]}]{$L[username]}[/url]追加了“{$L[subject]}“的活动费用{$L[totalcash]}元\r\n\r\n' . '[url=$GLOBALS[db_bbsurl]/read.php?tid={$L[tid]}]查看活动详情[/url]',
+	'activity_additional_content'		=> '[url=$GLOBALS[db_bbsurl]/{$GLOBALS[db_userurl]}{$L[uid]}]{$L[username]}[/url]追加了“{$L[subject]}“的活动费用{$L[totalcash]}元\r\n\r\n' . '[url=$GLOBALS[db_bbsurl]/read.php?tid={$L[tid]}]查看活动详情[/url]',
 
 	//取消活动
 	'activity_cancel_title'				=> '“{$L[subject]}“活动已取消',
@@ -339,5 +351,10 @@ $lang['writemsg'] = array (
 					. '论坛管理操作通知短消息，对本次管理操作有任何异议，请与我取得联系。',
 	'activity_delete_signuper_content'	=> '“{$L[subject]}“活动被管理员删除，请联系活动发起者退回报名费用\n\n'
 					. '[url=$GLOBALS[db_bbsurl]/mode.php?m=o&q=activity&see=feeslog]查看我的活动费用流通日志[/url]',
+					
+	'split_title'			=> '您的帖子被拆分',
+	'split_content'		    => '您发表的帖子{$L[spiltInfo]}被 [b]{$L[manager]}[/b] 执行 [b]拆分[/b] 操作\n\n'
+								. '操作原因：{$L[msg]}\n\n'
+								. '论坛管理操作通知短消息，对本次管理操作有任何异议，请与我取得联系。',
 );
 ?>

@@ -36,17 +36,21 @@ class PW_Weibo_CnrelationsDB extends BaseDB {
 	}
 
 	function addCnRelations($fieldDatas) {
-		$this->_db->update("INSERT INTO " . $this->_tableName . " (cyid,mid) VALUES  " . pwSqlMulti($fieldDatas,FALSE));
+		$this->_db->update("INSERT INTO " . $this->_tableName . " (cyid,mid) VALUES  " . S::sqlMulti($fieldDatas,FALSE));
 		return $this->_db->insert_id();
 	}
 
 	function getConloysWeibos($cyids,$page = 1,$perpage = 20){
-		$cyids = is_array($cyids) ? $cyids : array($cyids);
-		if (!$this->_isLegalNumeric($page) || !$this->_isLegalNumeric($perpage) || empty($cyids)){
-			return array();
-		} 
 		$offset = ($page - 1) * $perpage;
-		$sql = 'SELECT * FROM '.$this->_tableName.'  a LEFT JOIN '.$this->_foreignTableName.' b ON a.mid = b.mid WHERE a.cyid IN ( '.pwImplode($cyids).' ) ORDER BY a.mid DESC '.$this->_Limit($offset,$perpage);
+		if ($cyids == 'nocyids') {
+			$sql = 'SELECT * FROM '.$this->_tableName.'  a LEFT JOIN '.$this->_foreignTableName.' b ON a.mid = b.mid ORDER BY a.mid DESC '.$this->_Limit($offset,$perpage);
+		} else {
+			$cyids = is_array($cyids) ? $cyids : array($cyids);
+			if (!$this->_isLegalNumeric($page) || !$this->_isLegalNumeric($perpage) || empty($cyids)){
+				return array();
+			} 
+			$sql = 'SELECT * FROM '.$this->_tableName.'  a LEFT JOIN '.$this->_foreignTableName.' b ON a.mid = b.mid WHERE a.cyid IN ( '.S::sqlImplode($cyids).' ) ORDER BY a.mid DESC '.$this->_Limit($offset,$perpage);
+		}
 		$query = $this->_db->query($sql);
 		return $this->_getAllResultFromQuery($query);
 	}
@@ -56,7 +60,7 @@ class PW_Weibo_CnrelationsDB extends BaseDB {
 		if(empty($cyids)){
 			return 0;
 		}
-		$sql = 'SELECT count(*) FROM '.$this->_tableName.'  a LEFT JOIN '.$this->_foreignTableName.' b ON a.mid = b.mid WHERE  a.cyid IN ( '.pwImplode($cyids).')';
+		$sql = 'SELECT count(*) FROM '.$this->_tableName.'  a LEFT JOIN '.$this->_foreignTableName.' b ON a.mid = b.mid WHERE  a.cyid IN ( '.S::sqlImplode($cyids).')';
 		return (int)$this->_db->get_value($sql);
 	}
 	
@@ -65,7 +69,7 @@ class PW_Weibo_CnrelationsDB extends BaseDB {
 			return false;
 		}
 		$mids = is_array($mids) ? $mids : array($mids);
-		$sql = 'DELETE FROM '.$this->_tableName.' WHERE mid IN (' . pwImplode($mids) . ') ';
+		$sql = 'DELETE FROM '.$this->_tableName.' WHERE mid IN (' . S::sqlImplode($mids) . ') ';
 		$this->_db->query($sql);
 		return true;
 	}

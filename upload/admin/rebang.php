@@ -1,21 +1,17 @@
 <?php
 !function_exists('adminmsg') && exit('Forbidden');
 $basename = "$amind_file?adminjob=rebang";
-empty($action) && $action = 'rebang';
+	empty($action) && $action = 'rebang';
+	$query = $db->query("SELECT db_name,db_value FROM pw_config WHERE db_name LIKE 'nf\_%'");
+	while ($rt = $db->fetch_array($query)) {
+		$rt['db_name'] = preg_replace('/[^\d\w\_]/is','',$rt['db_name']);
+		${$rt['db_name']} = (array)unserialize($rt['db_value']);
 
-$query = $db->query("SELECT db_name,db_value FROM pw_config WHERE db_name LIKE 'nf\_%'");
-while ($rt = $db->fetch_array($query)) {
-	$rt['db_name'] = preg_replace('/[^\d\w\_]/is','',$rt['db_name']);
-	${$rt['db_name']} = (array)unserialize($rt['db_value']);
-
-}
-if ($action == 'rebang') {
-
-	require_once(R_P.'require/credit.php');
-
-	if ($_POST['job'] == 'cate') {
-
-		InitGP(array('cate'),'GP',1);
+	}
+	if ($action == 'rebang') {
+		require_once(R_P.'require/credit.php');
+		if ($_POST['job'] == 'cate') {
+		S::gp(array('cate'),'GP',1);
 		$catedb = array();
 		foreach ($cate as $key=>$val) {
 			$flag = $val['flag'];
@@ -48,7 +44,7 @@ if ($action == 'rebang') {
 
 	} elseif($_POST['job'] == 'config') {
 
-		InitGP(array('newinfoifopen','position','titlelen','shownum','bbsradioifopen'),'P');
+		S::gp(array('newinfoifopen','position','titlelen','shownum','bbsradioifopen'),'P');
 		$newinfoifopen = $newinfoifopen ? '1' : '0';
 		$bbsradioifopen = $bbsradioifopen ? '1' : '0';
 		$nf_config['position'] = (int)$position ? (int)$position : '1';
@@ -71,7 +67,6 @@ if ($action == 'rebang') {
 		$nf_config['position'] ? ${'position_'.$nf_config['position']} = 'checked' : $position_1 = 'checked';
 		!$nf_config['titlelen'] && $nf_config['titlelen'] = '25';
 		!$nf_config['shownum'] && $nf_config['shownum'] = '7';
-
 		include PrintEot('rebang');exit;
 	}
 } elseif ($action == 'update') {
@@ -158,7 +153,7 @@ if ($action == 'rebang') {
 
 } elseif ($action == 'setting') {
 
-	InitGP(array('orderid','type'));
+	S::gp(array('orderid','type'));
 	if (!$nf_order[$orderid] || $nf_order[$orderid]['type'] != $type) {
 		adminmsg('operate_fail',"$basename&action=rebang");
 	}
@@ -166,8 +161,8 @@ if ($action == 'rebang') {
 
 		if ($_POST['step'] == '2') {
 
-			InitGP(array('title'),'P',0);
-			InitGP(array('picmode','urls','links','idlinks'),'P');
+			S::gp(array('title'),'P',0);
+			S::gp(array('picmode','urls','links','idlinks'),'P');
 			$nf_order[$orderid]['mode'] = $picmode ? '1' : '0';
 			if ($nf_order[$orderid]['mode'] && is_array($urls)) {
 				$pic = array();
@@ -204,8 +199,8 @@ if ($action == 'rebang') {
 
 		} else {
 
-			InitGP(array('titles'),'P',0);
-			InitGP(array('links'),'P');
+			S::gp(array('titles'),'P',0);
+			S::gp(array('links'),'P');
 
 			if (is_array($titles)) {
 				$custom = array();
@@ -225,7 +220,7 @@ if ($action == 'rebang') {
 
 		if ($_POST['step'] == '2') {
 
-			InitGP(array('info'),'P');
+			S::gp(array('info'),'P');
 			$bbsinfo = '';
 			foreach ($info as $val) {
 				$val && $bbsinfo .= ','.$val;
@@ -246,13 +241,14 @@ if ($action == 'rebang') {
 	}
 	if ($_POST['step'] == '2') {
 
-		InitGP(array('updatetime'),'P');
+		S::gp(array('updatetime'),'P');
 		$nf_order[$orderid]['updatetime'] = is_numeric($updatetime) ? intval($updatetime) : '0';
 		setConfig('nf_order', $nf_order);
 		updatecache_conf('nf', false, 'newinfo_config.php');
 		adminmsg('operate_success',"$basename&action=rebang");
 	}
-}
+}	
+
 
 function orderCmp($row1,$row2){
    if ($row2['order'] > $row1['order']) {

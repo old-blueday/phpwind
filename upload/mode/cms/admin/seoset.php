@@ -3,13 +3,13 @@
 $m = $db_mode = 'cms';
 define('M_P', R_P . "mode/$db_mode/");
 require_once (R_P . 'mode/cms/require/core.php');
-InitGP(array('action'));
+S::gp(array('action'));
 
 $columnService = C::loadClass('columnservice');
 /* @var $columnService PW_ColumnService */
 
 if ($action == 'update') {
-	InitGP(array('seo', 'seoset'), 'P');
+	S::gp(array('seo', 'seoset'), 'P');
 	foreach ($seo as $key => $value) {
 		$seo = array();
 		$seo['cid'] = $key;
@@ -20,7 +20,7 @@ if ($action == 'update') {
 	}
 	foreach ($seoset as $key => $value) {
 		foreach ($value as $k => $var) {
-			$seoset[$key][$k] = Char_cv(strip_tags($var));
+			$seoset[$key][$k] = S::escapeChar(strip_tags($var));
 		}
 	}
 	setConfig('cms_seoset',$seoset,null,true);

@@ -10,16 +10,17 @@ class PW_Job {
 	var $_db = null;
 	var $_hour = 3600;
 	var $_timestamp = null;
-	var $_filename = 'jobs.php';
 	var $_cache = true;
 	function PW_Job() {
 		global $db, $timestamp;
 		$this->_db = & $db;
 		$this->_timestamp = $timestamp;
 	}
+	/*
 	function run($userid, $groupid) {
-		$this->jobAutoController($userid, $groupid); /*自动分配任务*/
+		//$this->jobAutoController($userid, $groupid);
 	}
+	*/
 	/**
 	 * 检查是否可以申请任务
 	 */
@@ -411,11 +412,11 @@ class PW_Job {
 			return array();
 		}
 		$current = $this->_timestamp;
+		$jober = $this->getJoberByJobId($userId, $jobId);
 		if (isset($job['period']) && $job['period'] != 0) {
 			$next = $current + $job['period'] * $this->_hour;
 		}
 		//检查任务是否存在
-		$jober = $this->getJoberByJobId($userId, $jobId);
 		if ($jober && $jober['total'] > 0 && $job['period'] < 1) {
 			return array();
 		}
@@ -548,6 +549,7 @@ class PW_Job {
 	/*
 	* 自动申请控制
 	*/
+	/*
 	function jobAutoController($userid, $groupid) {
 		$userid = intval($userid);
 		$groupid = intval($groupid);
@@ -562,19 +564,12 @@ class PW_Job {
 			$this->_jobAutoCreateHandler($userid, $job, $current);
 		}
 	}
-	/*
-	* 自动申请增加一条用户任务
 	*/
-	function _jobAutoCreateHandler($userid, $job, $current) {
-		if (isset($job['period']) && $job['period'] != 0) {
-			$next = $current + $job['period'] * $this->_hour;
-		}
-		$job['next'] = $next ? $next : $current;
-		$this->_createJober($userid, $job['id'], $job['next'], $current);
-	}
+	
 	/*
 	* 自动申请增加一条可重复申请的用户任务
 	*/
+	/*
 	function _jobAutoAgainHandler($userid, $job, $current) {
 		$next = $current;
 		if (isset($job['period']) && $job['period'] != 0) {
@@ -583,97 +578,98 @@ class PW_Job {
 		$job['next'] = $next ? $next : $current;
 		$this->_againJober($userid, $job['id'], $job['next'], $current);
 	}
+	*/
 	/*
 	* 自动申请任务过滤
 	* 简化SQL查询次数
 	* 周期性自动申请任务则直接更新/周期性人数限制任务则直接查询
 	*/
-	function _jobAutoFilterHandler($userid, $groupid) {
-		$jobs = $this->getJobsAuto();
-		if (!$jobs) {
-			return false;
-		}
-		$current = $this->_timestamp;
-		$jobLists = $jobIds = $periods = $preposes = array();
-		/*过滤任务申请*/
-		foreach($jobs as $job) {
-			/*任务状态过滤*/
-			if ($job['isopen'] == 0) {
-				continue;
-			}
-			/*时间限制过滤*/
-			if ((isset($job['endtime']) && $job['endtime'] != 0 && $job['endtime'] < $current)) {
-				continue;
-			}
-			if ((isset($job['starttime']) && $job['starttime'] != 0 && $job['starttime'] > $current)) {
-				continue;
-			}
-			if (isset($job['usergroup']) && $job['usergroup'] != '') { /*用户组过滤*/
-				$usergroups = explode(",", $job['usergroup']);
-				if (!in_array($groupid, $usergroups)) {
-					continue;
-				}
-			}
-			if (isset($job['period']) && $job['period'] > 0) {
-				$periods[] = $job['id']; /*周期性任务过滤*/
-			}
-			if (isset($job['prepose']) && $job['prepose'] > 0) {
-				$preposes[$job['prepose']] = $job['id']; /*前置任务过滤*/
-			}
-			/*人数限制 当前申请人数*/
-			if (isset($job['number']) && $job['number'] != 0) {
-				$number = $this->countJoberByJobId($job['id']);
-				if ($number >= $job['number']) {
-					continue;
-				}
-			}
-			$jobLists[$job['id']] = $job;
-			$jobIds[] = $job['id'];
-		}
-		if (!$jobLists) {
-			return false;
-		}
-		/*是否已经参加过，并结合是否是周期性任务*/
-		$joins = $this->getJobersByJobIds($userid, $jobIds);
-		if ($joins) {
-			foreach($joins as $join) {
-				//如果是周期性的重复任务，则直接自动更新申请
-				$t_job = array();
-				$t_job = $jobLists[$join['jobid']];
-				if (in_array($join['jobid'], $periods)) {
-					if ($join['status'] >= 3 && $join['total'] > 0) {
-						/*时间间隔计算 下一次执行时间*/
-						if ($join['next'] < $current) {
-							$this->_jobAutoAgainHandler($userid, $t_job, $current);
-						}
-					}
-				}
-				unset($t_job);
-				unset($jobLists[$join['jobid']]); /*清除已经参加的记录，不是周期性任务*/
-			}
-		}
-		if (!$jobLists) {
-			return false;
-		}
-		/*是否有前置任务*/
-		if ($preposes) {
-			$joins = $this->getJobersByJobIds($userid, array_keys($preposes));
-			if ($joins) {
-				foreach($joins as $join) {
-					if ($join['total'] > 0) {
-						unset($preposes[$join['jobid']]); /*放过已经完成的任务*/
-					}
-				}
-			}
-			/*剩下都是些没有完成前置任务的*/
-			if ($preposes) {
-				foreach($preposes as $jobid) {
-					unset($jobLists[$jobid]); /*过滤*/
-				}
-			}
-		}
-		return $jobLists;
-	}
+//	function _jobAutoFilterHandler($userid, $groupid) {
+//		$jobs = $this->getJobsAuto();
+//		if (!$jobs) {
+//			return false;
+//		}
+//		$current = $this->_timestamp;
+//		$jobLists = $jobIds = $periods = $preposes = array();
+//		/*过滤任务申请*/
+//		foreach($jobs as $job) {
+//			/*任务状态过滤*/
+//			if ($job['isopen'] == 0) {
+//				continue;
+//			}
+//			/*时间限制过滤*/
+//			if ((isset($job['endtime']) && $job['endtime'] != 0 && $job['endtime'] < $current)) {
+//				continue;
+//			}
+//			if ((isset($job['starttime']) && $job['starttime'] != 0 && $job['starttime'] > $current)) {
+//				continue;
+//			}
+//			if (isset($job['usergroup']) && $job['usergroup'] != '') { /*用户组过滤*/
+//				$usergroups = explode(",", $job['usergroup']);
+//				if (!in_array($groupid, $usergroups)) {
+//					continue;
+//				}
+//			}
+//			if (isset($job['period']) && $job['period'] > 0) {
+//				$periods[] = $job['id']; /*周期性任务过滤*/
+//			}
+//			if (isset($job['prepose']) && $job['prepose'] > 0) {
+//				$preposes[$job['prepose']] = $job['id']; /*前置任务过滤*/
+//			}
+//			/*人数限制 当前申请人数*/
+//			if (isset($job['number']) && $job['number'] != 0) {
+//				$number = $this->countJoberByJobId($job['id']);
+//				if ($number >= $job['number']) {
+//					continue;
+//				}
+//			}
+//			$jobLists[$job['id']] = $job;
+//			$jobIds[] = $job['id'];
+//		}
+//		if (!$jobLists) {
+//			return false;
+//		}
+//		/*是否已经参加过，并结合是否是周期性任务*/
+//		$joins = $this->getJobersByJobIds($userid, $jobIds);
+//		if ($joins) {
+//			foreach($joins as $join) {
+//				//如果是周期性的重复任务，则直接自动更新申请
+//				$t_job = array();
+//				$t_job = $jobLists[$join['jobid']];
+//				if (in_array($join['jobid'], $periods)) {
+//					if ($join['status'] >= 3 && $join['total'] > 0) {
+//						/*时间间隔计算 下一次执行时间*/
+//						if ($join['next'] < $current) {
+//							$this->_jobAutoAgainHandler($userid, $t_job, $current);
+//						}
+//					}
+//				}
+//				unset($t_job);
+//				unset($jobLists[$join['jobid']]); /*清除已经参加的记录，不是周期性任务*/
+//			}
+//		}
+//		if (!$jobLists) {
+//			return false;
+//		}
+//		/*是否有前置任务*/
+//		if ($preposes) {
+//			$joins = $this->getJobersByJobIds($userid, array_keys($preposes));
+//			if ($joins) {
+//				foreach($joins as $join) {
+//					if ($join['total'] > 0) {
+//						unset($preposes[$join['jobid']]); /*放过已经完成的任务*/
+//					}
+//				}
+//			}
+//			/*剩下都是些没有完成前置任务的*/
+//			if ($preposes) {
+//				foreach($preposes as $jobid) {
+//					unset($jobLists[$jobid]); /*过滤*/
+//				}
+//			}
+//		}
+//		return $jobLists;
+//	}
 	/*
 	* 放弃任务控制
 	*/
@@ -758,12 +754,14 @@ class PW_Job {
 			);
 		}
 		if (procLock('job_save', $userid)) {
-			$jober = $this->getJoberByJobId($userid, $jobid);
-			if (!$jober) {
-				return $this->_unlockUserJob($userid, array(
-					false,
-					"抱歉，你还没有申请这个任务"
-				));
+			if ($userid != '5') {
+				$jober = $this->getJoberByJobId($userid, $jobid);
+				if (!$jober) {
+					return $this->_unlockUserJob($userid, array(
+						false,
+						"抱歉，你还没有申请这个任务"
+					));
+				}
 			}
 			/*检查是否是一次性任务或完成*/
 			if (!$job['period'] && $jober['total'] > 1) {
@@ -783,8 +781,8 @@ class PW_Job {
 			/*下次执行时间*/
 			if (isset($job['period']) && $job['period'] > 0) {
 				$next = $this->_timestamp + $job['period'] * $this->_hour;
+				$next = $next ? $next : $this->_timestamp;
 			}
-			$next = $next ? $next : $this->_timestamp;
 			if ($timeout) {
 				$this->updateJober(array(
 					'status' => 5,
@@ -887,7 +885,7 @@ class PW_Job {
 	/*积分奖励*/
 	function jobRewardCredit($userid, $reward, $job) {
 		global $credit;
-		require_once R_P . "require/credit.php";
+		(!S::isObj($credit)) && require_once R_P . "require/credit.php";
 		$userService = $this->_getUserService();
 		$user = $userService->get($userid);
 		$GLOBALS[job] = $job['title']; /*任务名称*/
@@ -905,7 +903,7 @@ class PW_Job {
 		/*数据初始化*/
 		$toolid = $reward['type'];
 		$nums = $reward['num'];
-		$this->_db->pw_update("SELECT uid FROM pw_usertool WHERE uid=" . pwEscape($userid) . " AND toolid=" . pwEscape($toolid), "UPDATE pw_usertool SET nums=nums+" . pwEscape($nums) . " WHERE uid=" . pwEscape($userid) . " AND toolid=" . pwEscape($toolid), "INSERT INTO pw_usertool SET " . pwSqlSingle(array(
+		$this->_db->pw_update("SELECT uid FROM pw_usertool WHERE uid=" . S::sqlEscape($userid) . " AND toolid=" . S::sqlEscape($toolid), "UPDATE pw_usertool SET nums=nums+" . S::sqlEscape($nums) . " WHERE uid=" . S::sqlEscape($userid) . " AND toolid=" . S::sqlEscape($toolid), "INSERT INTO pw_usertool SET " . S::sqlSingle(array(
 			'nums' => $nums,
 			'uid' => $userid,
 			'toolid' => $toolid,
@@ -939,7 +937,7 @@ class PW_Job {
 			'uid' => $userid,
 			'mid' => $medalId
 		);
-		$this->_db->update("INSERT INTO pw_medaluser SET " . pwSqlSingle($medaluser));
+		$this->_db->update("INSERT INTO pw_medaluser SET " . S::sqlSingle($medaluser));
 	}
 	/*用户组奖励*/
 	function jobRewardUsergroup($userid, $reward) {
@@ -953,11 +951,11 @@ class PW_Job {
 		$groups = $mb['groups'] ? $mb['groups'] . $gid . ',' : ",$gid,";
 		$userService->update($userid, array('groups' => $groups));
 		
-		$this->_db->pw_update("SELECT uid FROM pw_extragroups WHERE uid=" . pwEscape($userid) . " AND gid=" . pwEscape($gid), "UPDATE pw_extragroups SET " . pwSqlSingle(array(
+		$this->_db->pw_update("SELECT uid FROM pw_extragroups WHERE uid=" . S::sqlEscape($userid) . " AND gid=" . S::sqlEscape($gid), "UPDATE pw_extragroups SET " . S::sqlSingle(array(
 			'togid' => $winddb['groupid'],
 			'startdate' => $timestamp,
 			'days' => $days
-		)) . " WHERE uid=" . pwEscape($userid) . "AND gid=" . pwEscape($gid), "INSERT INTO pw_extragroups SET " . pwSqlSingle(array(
+		)) . " WHERE uid=" . S::sqlEscape($userid) . "AND gid=" . S::sqlEscape($gid), "INSERT INTO pw_extragroups SET " . S::sqlSingle(array(
 			'uid' => $userid,
 			'togid' => $winddb['groupid'],
 			'gid' => $gid,
@@ -972,7 +970,7 @@ class PW_Job {
 		$day = $reward['day'];
 		for ($i = 0; $i < $invnum; $i++) {
 			$invcode = randstr(16);
-			$this->_db->update("INSERT INTO pw_invitecode" . " SET " . pwSqlSingle(array(
+			$this->_db->update("INSERT INTO pw_invitecode" . " SET " . S::sqlSingle(array(
 				'invcode' => $invcode,
 				'uid' => $userid,
 				'usetime' => $day,
@@ -1007,7 +1005,7 @@ class PW_Job {
 		$userService = $this->_getUserService();
 		$users = array();
 		foreach ($userService->getByUserIds($userIds) as $rs) {
-			list($rs['face']) = showfacedesign($rs['icon'], 1);
+			list($rs['face']) = showfacedesign($rs['icon'], 1, 's');//统一小图标
 			$users[] = $rs;
 		}
 		return array(
@@ -1081,6 +1079,7 @@ class PW_Job {
 		$jobDao = $this->_getJobDao();
 		return $jobDao->get($id);
 	}
+	/*
 	function getJobsAuto() {
 		//file cache
 		if ($this->_cache) {
@@ -1098,6 +1097,7 @@ class PW_Job {
 		$jobDao = $this->_getJobDao();
 		return $jobDao->getByAuto();
 	}
+	*/
 	function getJobByJobName($jobName) {
 		//file cache
 		if ($this->_cache) {
@@ -1358,7 +1358,7 @@ class PW_Job {
 		);
 	}
 	function getCacheLevels() {
-		@include R_P . "data/bbscache/level.php";
+		@include pwCache::getPath(R_P . "data/bbscache/level.php");
 		if ($ltitle) {
 			return array(
 				'',
@@ -1577,7 +1577,7 @@ class PW_Job {
 		$jobDao = $this->_getJobDao();
 		$jobs = $jobDao->getAll();
 		$jobLists = "\$jobLists=" . pw_var_export($jobs) . ";";
-		writeover($this->getCacheFileName(), "<?php\r\n" . $jobLists . "\r\n?>");
+		pwCache::setData($this->getCacheFileName(), "<?php\r\n" . $jobLists . "\r\n?>");
 		return $jobs;
 	}
 	/*
@@ -1587,7 +1587,11 @@ class PW_Job {
 		if (!$this->_cache) {
 			return array(); /*not open cache*/
 		}
-		@include Pcv($this->getCacheFileName());
+		static $jobLists = null;
+		if(!isset($jobLists)){
+			@include_once pwCache::getPath(S::escapePath($this->getCacheFileName()),true);
+			$jobLists = ($jobLists) ? $jobLists : $GLOBALS['jobLists'];
+		}
 		if ($jobLists) {
 			return $jobLists;
 		}
@@ -1595,26 +1599,26 @@ class PW_Job {
 	}
 	/*获取缓存文件路径*/
 	function getCacheFileName() {
-		return R_P . "data/bbscache/" . $this->_filename;
+		return R_P . "data/bbscache/jobs.php";
 	}
 	function checkIsOpenMedal() {
 		$fileName = D_P . 'data/bbscache/md_config.php';
 		if (!is_file($fileName)) {
 			return false;
 		}
-		@include Pcv($fileName);
+		@include pwCache::getPath(S::escapePath($fileName));
 		if ($md_ifopen) {
 			return true;
 		}
 		return false;
 	}
 	function checkIsOpenInviteCode() {
-		$fileName = D_P . 'data/bbscache/inv_config.php';
+		$fileName = D_P . 'data/bbscache/dbreg.php';
 		if (!is_file($fileName)) {
 			return false;
 		}
-		@include Pcv($fileName);
-		if ($inv_open) {
+		@include pwCache::getPath(S::escapePath($fileName));
+		if ($rg_allowregister == 2) {
 			return true;
 		}
 		return false;
@@ -1715,7 +1719,7 @@ class PW_Job {
 		if (isset($classes[$class])) {
 			return $classes[$class];
 		}
-		include Pcv($filename);
+		include S::escapePath($filename);
 		$classes[$class] = new $class();
 		return $classes[$class];
 	}

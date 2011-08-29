@@ -1,7 +1,7 @@
 <?php
 !defined('P_W') && exit('Forbidden');
 define('AJAX',1);
-InitGP(array('touid', 'recommend'), 'GP', 2);
+S::gp(array('touid', 'recommend'), 'GP', 2);
 (!$winduid && !$touid) && Showmsg('undefined_action');
 
 PostCheck();

@@ -2,20 +2,21 @@
 
 !function_exists('readover') && exit('Forbidden');
 
-if(!$db_job_isopen){
+if(!$db_job_isopen && $action != 'punch'){
 	Showmsg('抱歉，用户任务系统还没有开启');
 }
 
 $pro_tab = "job";/*导航*/
 $jobService = L::loadclass("job", 'job'); /* @var $jobService PW_Job */
 $current = array('','','','');
-initGP(array("id","step","action"));
+S::gp(array("id","step","action"));
+$q = "jobcenter";
 $action = empty($action) ? 'applied' : $action;
 if($action == "list"){
 	$jobs = $jobService->jobDisplayController($winduid,$groupid,$action);
 	$current[0] = "current";
 	require_once uTemplate::PrintEot('jobcenter');pwOutPut();
-}elseif($action == "apply"){
+} elseif ($action == "apply"){
 	if($step == 2){
 		$id = intval($id);
 		list($bool,$message,$job) = $jobService->checkApply($id,$winduid,$groupid);
@@ -44,7 +45,7 @@ if($action == "list"){
 	$current[1] = "current";
 	require_once uTemplate::PrintEot('jobcenter');pwOutPut();
 }elseif($action == "finish"){	
-	initGP(array("jobid"));
+	S::gp(array("jobid"));
 	if($jobid){
 		$jobid = intval($jobid);
 		if($jobid<1){
@@ -86,7 +87,7 @@ if($action == "list"){
 		$list['total'] = $jober['total'];
 		$list['last'] = get_date($jober['last'],"Y-m-d H:i");
 		require_once(R_P.'require/showimg.php');
-		list($list['face']) = showfacedesign($winddb['icon'],1);
+		list($list['face']) = showfacedesign($winddb['icon'],1,m);
 		list($others,$total) = $jobService->jobDetailHandler($winduid,$job['id']);
 		$show = "detail";
 	}else{
@@ -107,7 +108,7 @@ if($action == "list"){
 }elseif($action == "start"){		
 	//获取任务开始链接
 	list($bool,$message,$link) = $jobService->jobStartController($winduid,$id);
-	if (GetGP('ajax')) {
+	if (S::getGP('ajax')) {
 		ajax_footer();
 	}
 	if(!$bool){
@@ -124,11 +125,39 @@ if($action == "list"){
 		$id = intval($id);
 		list($bool,$message) = $jobService->jobGainController($winduid,$id);
 		if($bool){
-			$jobService->jobAutoController($winduid,$groupid);/*自动申请*/
+			$autojobService = L::loadclass("autojob", 'job'); /* @var $jobService PW_Job */
+			$autojobService->jobAutoController($winduid,$groupid);/*自动申请*/
 			$appliedHTML = $jobService->buildApplieds($winduid,$groupid);
 			ajaxResponse($message,true,$appliedHTML);
 		}else{
 			ajaxResponse($message,false);
+		}
+	}
+} elseif($action == 'punch'){
+	//每日打卡
+	if($step == 2){
+		include_once pwCache::getPath(D_P . 'data/bbscache/o_config.php');
+		if(!$o_punchopen){
+			ajaxResponse('打卡功能已经关闭',false);
+		}
+		$usergroup = ($o_punch_usergroup) ? explode(",",$o_punch_usergroup) : array();
+		if($usergroup && !in_array($groupid,$usergroup)){
+			ajaxResponse('您所在用户组没有打卡的权限',false);
+		}
+		list($todayStart,$todayEnd) = array($tdtime,$tdtime+86400);
+		if($winddb['punch'] > $todayStart && $winddb['punch'] < $todayEnd){
+			ajaxResponse('你已经打卡,请明天再试',false);
+		}
+		if(procLock('punch_save', $winduid)){
+			if(pwQuery::update('pw_memberdata','uid=:uid',array($winduid),array('punch'=>$timestamp))){
+				list($bool,$information) = getPunchReward($o_punch_reward);
+			}
+		}
+		procUnLock('punch_save', $winduid);
+		if($bool){
+			ajaxResponse('打卡成功!' . $information,true);
+		}else{
+			ajaxResponse('打卡失败,请明天继续!',false);
 		}
 	}
 }else{
@@ -137,5 +166,26 @@ if($action == "list"){
 
 function ajaxResponse($message,$flag,$html=''){
 	echo '[{"message":\''.$message.'\',"flag":\''.$flag.'\',"html":\''.$html.'\'}]';ajax_footer();
+}
+/*
+ * 打卡领取奖励
+ */
+function getPunchReward($reward){
+	global $credit,$winduid,$windid;
+	$reward = (S::isArray($reward)) ? $reward : unserialize($reward);
+	if(!$reward){
+		return array(false,'');
+	}
+	(!S::isObj($credit)) && require_once R_P . "require/credit.php";
+	$credit->addLog('other_finishpunch', array(
+		$reward['type'] => $reward['num']
+	), array(
+		'uid' => $winduid,
+		'username' => $windid,
+		'ip' => $GLOBALS['onlineip']
+	));
+	$credit->set($winduid, $reward['type'], $reward['num']);
+	$unit = (isset($credit->cUnit[$reward['type']])) ? $credit->cUnit[$reward['type']] : '';
+	return array(true,'获得 '.$reward['num'].pwCreditNames($reward['type']));
 }
 ?>

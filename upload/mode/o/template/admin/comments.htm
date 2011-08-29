@@ -23,7 +23,7 @@ print <<<EOT
     <tr class="tr1 vt">
       <td class="td1">发表日期</td>
       <td class="td2">
-      <div class="input_img fl"><i onclick="this.nextSibling.onclick()" class="input_time" title="选择时间">选择时间</i><input type="text" name="postdate_s" value="$postdateStartString" id="postdate_s" onclick="javascript:ShowCalendar(this.id)"></div><span class="p_lr_10 fl">至</span><div class="input_img fl"><i class="input_time" title="选择时间">选择时间</i><input type="text" name="postdate_e" id="postdate_e" value="$postdateEndString" onclick="javascript:ShowCalendar(this.id)"></div>
+      <div class="input_img fl"><i onclick="this.nextSibling.onclick()" class="input_time" title="选择时间">选择时间</i><input type="text" name="postdate_s" value="$postdateStartString" id="postdate_s" onclick="javascript:ShowCalendar(this.id)"></div><span class="p_lr_10 fl">至</span><div class="input_img fl"><i class="input_time" onclick="this.nextSibling.onclick()" title="选择时间">选择时间</i><input type="text" name="postdate_e" id="postdate_e" value="$postdateEndString" onclick="javascript:ShowCalendar(this.id)"></div>
       </td>
     </tr>
     <tr class="tr1 vt">
@@ -83,7 +83,7 @@ print <<<EOT
     <tr class="tr1 vt">
       <td class="td2"><input type="checkbox" name="selid[]" value="$comment[id]"></td>
       <td class="td2">$comment[s_title]</td>
-      <td class="td2"><a href="u.php?uid=$comment[uid]" target="_blank">$comment[username]</a></td>
+      <td class="td2"><a href="{$db_userurl}$comment[uid]" target="_blank">$comment[username]</a></td>
       <td class="td2">$comment[postdate]</td>
       <td class="td2">$comment[ch_type]</td>
     </tr>

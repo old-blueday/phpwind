@@ -49,7 +49,7 @@ class postVote {
 	function initData() {
 		global $timestamp;
 		!$_POST['vt_select'] && Showmsg('postfunc_noempty');
-		$vt_select = GetGP('vt_select', 'P');
+		$vt_select = S::getGP('vt_select', 'P');
 		$vt_select = explode("\n", $vt_select);
 		$votearray = array();
 		foreach ($vt_select as $key => $option) {
@@ -64,14 +64,14 @@ class postVote {
 		if ($vtcount > $this->maxselect) {
 			Showmsg('vote_num_limit');
 		}
-		$regdatelimit = GetGP('regdatelimit', 'P');
-		$multiplevote = intval(GetGP('multiplevote', 'P'));
-		$mostvotes = intval(GetGP('mostvotes', 'P'));
-		$timelimit = intval(GetGP('timelimit', 'P'));
-		$modifiable = intval(GetGP('modifiable', 'P'));
-		$previewable = intval(GetGP('previewable', 'P'));
-		$leastvotes = intval(GetGP('leastvotes', 'P'));
-		$postnumlimit = intval(GetGP('postnumlimit', 'P'));
+		$regdatelimit = S::getGP('regdatelimit', 'P');
+		$multiplevote = intval(S::getGP('multiplevote', 'P'));
+		$mostvotes = intval(S::getGP('mostvotes', 'P'));
+		$timelimit = intval(S::getGP('timelimit', 'P'));
+		$modifiable = intval(S::getGP('modifiable', 'P'));
+		$previewable = intval(S::getGP('previewable', 'P'));
+		$leastvotes = intval(S::getGP('leastvotes', 'P'));
+		$postnumlimit = intval(S::getGP('postnumlimit', 'P'));
 		
 		if (empty($multiplevote)) {
 			$mostvotes = 1;
@@ -86,7 +86,7 @@ class postVote {
 		$regdatelimit = strtotime($regdatelimit);
 		$regdatelimit = $regdatelimit > $timestamp ? $timestamp : $regdatelimit;
 		
-		$creditlimit = GetGP('creditlimit', 'P');
+		$creditlimit = S::getGP('creditlimit', 'P');
 		$creditlimit_temp = array();
 		foreach ($creditlimit as $key => $value) {
 			if (!empty($value)) {
@@ -107,7 +107,7 @@ class postVote {
 	
 	function insertData($tid) {
 		$this->data['tid'] = $tid;
-		$this->db->update("INSERT INTO pw_polls SET " . pwSqlSingle($this->data));
+		$this->db->update("INSERT INTO pw_polls SET " . S::sqlSingle($this->data));
 	}
 }
 ?>

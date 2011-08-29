@@ -2,15 +2,16 @@
 !function_exists('adminmsg') && exit('Forbidden');
 $basename = "$admin_file?adminjob=help";
 
-InitGP(array('hid'),'GP',2);
-@include_once(D_P.'data/bbscache/help_cache.php');
+S::gp(array('hid'),'GP',2);
+@include_once pwCache::getPath(D_P.'data/bbscache/help_cache.php');
 if ($action=='add' || $action=='edit') {
-	InitGP(array('hup'),'GP',2);
+	S::gp(array('hup'),'GP',2);
 	if ($_POST['step']!='2') {
 		$helpslt = '';
 		$action=='add' && !$hup && $hup = $hid;
 		foreach ($_HELP as $value) {
 			$add = $slted = '';
+			if ($value['lv'] >= 3) continue;
 			for ($i=0;$i<$value['lv'];$i++) {
 				$add .= '&nbsp;&nbsp;';
 			}
@@ -21,13 +22,13 @@ if ($action=='add' || $action=='edit') {
 		if ($action!='add') {
 			@extract($_HELP[$hid]);
 			if ($ifcontent) {
-				@extract($db->get_one("SELECT content FROM pw_help WHERE hid=".pwEscape($hid)));
+				@extract($db->get_one("SELECT content FROM pw_help WHERE hid=".S::sqlEscape($hid)));
 				$content = htmlspecialchars($content);
 			}
 		}
 	} else {
-		InitGP(array('content'),'P',0);
-		InitGP(array('vieworder','title','url'),'P');
+		S::gp(array('content'),'P',0);
+		S::gp(array('vieworder','title','url'),'P');
 		$title	= trim($title);
 		$url	= trim($url);
 		$content = str_replace(
@@ -35,7 +36,7 @@ if ($action=='add' || $action=='edit') {
 			array('&nbsp; &nbsp; ','','&nbsp; '),
 			trim($content)
 		);
-		empty($title) && adminmsg('help_empty');
+		empty($title) && ($hup == 0 ? adminmsg('top_help_empty', $basename . '&action=add') : adminmsg('help_empty', $basename . '&action=add&hup=' . $hup));
 		$lv = 0;
 		$fathers = '';
 		$vieworder = (int)$vieworder;
@@ -44,12 +45,13 @@ if ($action=='add' || $action=='edit') {
 				strtolower($title)==strtolower($value['title']) && adminmsg('help_title');
 				if ($key==$hup) {
 					$lv = $value['lv']+1;
+					$lv > 3 && adminmsg('help_maxlv');
 					$fathers = ($value['fathers'] ? "$value[fathers]," : '').$hup;
-					!$value['ifchild'] && $db->update("UPDATE pw_help SET ifchild='1' WHERE hid=".pwEscape($hup));
+					!$value['ifchild'] && $db->update("UPDATE pw_help SET ifchild='1' WHERE hid=".S::sqlEscape($hup));
 				}
 			}
 			$db->update("INSERT INTO pw_help"
-				. " SET " . pwSqlSingle(array(
+				. " SET " . S::sqlSingle(array(
 					'hup'		=> $hup,
 					'lv'		=> $lv,
 					'fathers'	=> $fathers,
@@ -65,23 +67,23 @@ if ($action=='add' || $action=='edit') {
 				$key!=$hid && strtolower($title)==strtolower($value['title']) && adminmsg('help_title');
 			}
 			$db->update("UPDATE pw_help"
-				. " SET " . pwSqlSingle(array(
+				. " SET " . S::sqlSingle(array(
 						'hup'		=> $hup,
 						'title'		=> $title,
 						'url'		=> $url,
 						'content'	=> $content,
 						'vieworder'	=> $vieworder
 					))
-				. " WHERE hid=".pwEscape($hid)
+				. " WHERE hid=".S::sqlEscape($hid)
 			);
 		}
 		updatecache_help();
 		adminmsg('operate_success');
 	}
 } elseif ($action=='update') {
-	InitGP(array('selid'),'P',2);
+	S::gp(array('selid'),'P',2);
 	foreach ($selid as $key => $value) {
-		$value!=$_HELP[$key]['vieworder'] && $db->update("UPDATE pw_help SET vieworder=".pwEscape($value).'WHERE hid='.pwEscape((int)$key));
+		$value!=$_HELP[$key]['vieworder'] && $db->update("UPDATE pw_help SET vieworder=".S::sqlEscape($value).'WHERE hid='.S::sqlEscape((int)$key));
 	}
 	updatecache_help();
 	adminmsg('operate_success');
@@ -89,7 +91,7 @@ if ($action=='add' || $action=='edit') {
 	if ($_POST['step']!='2') {
 		$dtitle = $_HELP[$hid]['title'];
 	} else {
-		$db->update("DELETE FROM pw_help WHERE hid=".pwEscape($hid).'OR hup='.pwEscape($hid));
+		$db->update("DELETE FROM pw_help WHERE hid=".S::sqlEscape($hid).'OR hup='.S::sqlEscape($hid));
 		updatecache_help();
 		adminmsg('operate_success');
 	}
@@ -113,7 +115,7 @@ if ($action=='add' || $action=='edit') {
 			for ($i=$lv;$i<$value['lv'];$i++) {
 				$value['add'] = '<i class="lower"></i>';
 			}
-			$listdb[$key] = array('hid' => $value['hid'],'hup' => $value['hup'],'fathers' => $value['fathers'],'ifchild' => $value['ifchild'],'order' => $value['vieworder'],'title' => $value['title'],'add' => $value['add']);
+			$listdb[$key] = array('hid' => $value['hid'],'hup' => $value['hup'],'fathers' => $value['fathers'],'ifchild' => $value['ifchild'],'order' => $value['vieworder'],'title' => $value['title'],'add' => $value['add'],'lv' => $value['lv']);
 		}
 	}
 	unset($_HELP);

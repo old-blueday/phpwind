@@ -7,7 +7,7 @@
  * @return void
  */
 function pw_post(name,value){
-	
+
 	this.panelpre = 'manager_';
 	this.panelallid = 'ajaxall';
 	this.currentallid = 'pw_sel_all';
@@ -42,6 +42,7 @@ function pw_post(name,value){
 		this.counter = this.$(this.counterid, 'id');
 		this.panel = this.$(this.panelpre+obj.value,'id');
 		if (!this.counter) {
+		  if(!checkinfo[2]) return false;
 		  sendmsg(this.url, checkinfo[2], 1);
 		  var _this = this;
 		  setTimeout(function(){
@@ -80,6 +81,7 @@ function pw_post(name,value){
 		sendmsg(atag.href,data,id);
 		return false;
 	}
+	
 	this.manager = function(obj,e){
 		var checkinfo = this.checknum();
 		this.control = this.$(this.controlid, 'id');
@@ -135,7 +137,28 @@ function pw_post(name,value){
 		}
 		return new Array(a,b,selected);
 	}
-
+	
+	this.showError = function(message,time){
+		var control = this.$(this.controlid, 'id'),
+			popout = getElementsByClassName('popout',control)[0],
+			msgBoxs = getElementsByClassName('wrongTip',popout),
+			box = msgBoxs.length ? msgBoxs[0] : null;
+			popBottom = getElementsByClassName('popBottom',control);
+			if(!box) {	
+				
+				box = document.createElement('div');
+				box.className = 'wrongTip';
+				box.innerHTML = message;
+				popBottom[0].parentNode.insertBefore(box,popBottom[0]);
+			}
+			box.style.display = '';
+			box.innerHTML = message;
+			if(time == undefined) time = 3;	
+			clearTimeout(this.showTime);
+			this.showTime = setTimeout(function(){box.style.display = 'none';},time * 1000);
+			return false;
+	}
+	
 	this.checkall = function(obj){
 		this.panelall = this.$(this.panelallid, 'id');
 		this.currentall = this.$(this.currentallid,'id');
@@ -191,10 +214,10 @@ function pw_post(name,value){
 				} else if (rText[1] == 'nextto') {
 					sendmsg(rText[2],rText[3],rText[4]);
 				} else if (rText[1] == 'reload') {
-					setTimeout("window.location.reload();",2000);
+					setTimeout("window.location.reload();",3000);
 				}
 			}
 		}
-		dbreason == '1' ? atc_content.value ? ajax.submit(form,callback) : alert('请输入操作理由！') : ajax.submit(form,callback);
+		dbreason == '1' ? atc_content.value ? ajax.submit(form,callback) : this.showError('请输入操作原因'): ajax.submit(form,callback);
 	}
 }

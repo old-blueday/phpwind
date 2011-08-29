@@ -50,6 +50,7 @@ class PW_StaticPage {
 		$this->vars['db_bbstitle'] = $this->vars['db_bbstitle']['other'];
 		$this->vars['db_bbsname_a'] = addslashes($this->vars['db_bbsname']); //模版内用到
 		$this->vars['wind_version'] = $GLOBALS['wind_version'];
+		$this->vars['db_userurl'] = $GLOBALS['db_userurl'];
 		
 		if (!is_array($this->vars['db_union'])) {
 			$this->vars['db_union'] = explode("\t", stripslashes($this->vars['db_union']));
@@ -114,7 +115,7 @@ class PW_StaticPage {
 	function getReadContent() {
 		$readdb = array();
 		$pw_tmsgs = GetTtable($this->tid);
-		$read = $this->db->get_one("SELECT t.*,tm.*,m.uid,m.username,m.oicq,m.groupid,m.memberid,m.icon AS micon ,m.hack,m.honor,m.signature,m.regdate,m.medals,m.userstatus,md.onlinetime,md.postnum,md.digests,md.rvrc,md.money,md.credit,md.currency,md.starttime,md.thisvisit,md.lastvisit{$this->fieldadd} FROM pw_threads t LEFT JOIN $pw_tmsgs tm ON t.tid=tm.tid LEFT JOIN pw_members m ON m.uid=t.authorid LEFT JOIN pw_memberdata md ON md.uid=t.authorid $this->tablaadd WHERE t.tid=" . pwEscape($this->tid));
+		$read = $this->db->get_one("SELECT t.*,tm.*,m.uid,m.username,m.oicq,m.groupid,m.memberid,m.icon AS micon ,m.hack,m.honor,m.signature,m.regdate,m.medals,m.userstatus,md.onlinetime,md.postnum,md.digests,md.rvrc,md.money,md.credit,md.currency,md.starttime,md.thisvisit,md.lastvisit{$this->fieldadd} FROM pw_threads t LEFT JOIN $pw_tmsgs tm ON t.tid=tm.tid LEFT JOIN pw_members m ON m.uid=t.authorid LEFT JOIN pw_memberdata md ON md.uid=t.authorid $this->tablaadd WHERE t.tid=" . S::sqlEscape($this->tid));
 		
 		if (!$read || $read['special'] || !$read['ifcheck']) {return false;}
 		$this->fid = $read['fid'];
@@ -148,7 +149,7 @@ class PW_StaticPage {
 		if ($read['replies'] > 0) {
 			$readnum = $this->perpage - 1;
 			$pw_posts = GetPtable($read['ptable']);
-			$query = $this->db->query("SELECT t.*,m.uid,m.username,m.oicq,m.groupid,m.memberid,m.icon AS micon,m.hack,m.honor,m.signature,m.regdate,m.medals,m.userstatus,md.onlinetime,md.postnum,md.digests,md.rvrc,md.money,md.credit,md.currency,md.starttime,md.thisvisit,md.lastvisit $this->fieldadd FROM $pw_posts t LEFT JOIN pw_members m ON m.uid=t.authorid LEFT JOIN pw_memberdata md ON md.uid=t.authorid $this->tablaadd WHERE t.tid=" . pwEscape($this->tid) . " AND ifcheck='1' ORDER BY postdate LIMIT 0,$readnum");
+			$query = $this->db->query("SELECT t.*,m.uid,m.username,m.oicq,m.groupid,m.memberid,m.icon AS micon,m.hack,m.honor,m.signature,m.regdate,m.medals,m.userstatus,md.onlinetime,md.postnum,md.digests,md.rvrc,md.money,md.credit,md.currency,md.starttime,md.thisvisit,md.lastvisit $this->fieldadd FROM $pw_posts t LEFT JOIN pw_members m ON m.uid=t.authorid LEFT JOIN pw_memberdata md ON md.uid=t.authorid $this->tablaadd WHERE t.tid=" . S::sqlEscape($this->tid) . " AND ifcheck='1' ORDER BY postdate LIMIT 0,$readnum");
 			while ($read = $this->db->fetch_array($query)) {
 				if ($this->isHideContent($read['content'])) {return false;}
 				$read['aid'] && $_pids[] = $read['pid'];
@@ -183,7 +184,7 @@ class PW_StaticPage {
 	function getAttachs($pids) {
 		if (empty($pids)) {return array();}
 		$attdb = array();
-		$query = $this->db->query('SELECT * FROM pw_attachs WHERE tid=' . pwEscape($this->tid) . " AND pid IN (" . pwImplode($pids) . ")");
+		$query = $this->db->query('SELECT * FROM pw_attachs WHERE tid=' . S::sqlEscape($this->tid) . " AND pid IN (" . S::sqlImplode($pids) . ")");
 		while ($rt = $this->db->fetch_array($query)) {
 			if ($rt['pid'] == '0') $rt['pid'] = 'tpc';
 			$attdb[$rt['pid']][$rt['aid']] = $rt;
@@ -199,8 +200,8 @@ class PW_StaticPage {
 			}
 		}
 		if ($cids) {
-			$cids = pwImplode($cids);
-			$query = $this->db->query("SELECT uid,cid,value FROM pw_membercredit WHERE uid IN(" . pwImplode($authorids) . ") AND cid IN($cids)");
+			$cids = S::sqlImplode($cids);
+			$query = $this->db->query("SELECT uid,cid,value FROM pw_membercredit WHERE uid IN(" . S::sqlImplode($authorids) . ") AND cid IN($cids)");
 			while ($rt = $this->db->fetch_array($query)) {
 				$customdb[$rt['uid']][$rt['cid']] = $rt['value'];
 			}
@@ -213,7 +214,7 @@ class PW_StaticPage {
 		ob_end_clean();
 		ObStart();
 		
-		include Pcv($this->tpl);
+		include S::escapePath($this->tpl);
 		$ceversion = defined('CE') ? 1 : 0;
 		$content = str_replace(array('<!--<!---->', '<!---->'), array('', ''), ob_get_contents());
 		$content .= "<script language=\"JavaScript\" src=\"http://init.phpwind.net/init.php?sitehash={$db_sitehash}&v=$wind_version&c=$ceversion\"></script>";
@@ -222,16 +223,16 @@ class PW_StaticPage {
 		if (!is_dir(R_P . $this->htmdir . '/' . $this->fid)) {
 			@mkdir(R_P . $this->htmdir . '/' . $this->fid);
 			@chmod(R_P . $this->htmdir . '/' . $this->fid, 0777);
-			writeover(R_P . "$this->htmdir/$this->fid/index.html", '');
+			pwCache::setData(R_P . "$this->htmdir/$this->fid/index.html", '');
 			@chmod(R_P . "$this->htmdir/$this->fid/index.html", 0777);
 		}
 		if (!is_dir(R_P . $this->htmdir . '/' . $this->fid . '/' . $this->datedir)) {
 			@mkdir(R_P . $this->htmdir . '/' . $this->fid . '/' . $this->datedir);
 			@chmod(R_P . $this->htmdir . '/' . $this->fid . '/' . $this->datedir, 0777);
-			writeover(R_P . "$this->htmdir/$this->fid/$this->datedir/index.html", '');
+			pwCache::setData(R_P . "$this->htmdir/$this->fid/$this->datedir/index.html", '');
 			@chmod(R_P . "$this->htmdir/$this->fid/$this->datedir/index.html", 0777);
 		}
-		writeover(R_P . "$this->htmdir/$this->fid/$this->datedir/$this->tid.html", $content, "rb+", 0);
+		pwCache::setData(R_P . "$this->htmdir/$this->fid/$this->datedir/$this->tid.html", $content, false, "rb+", 0);
 		@chmod(R_P . "$this->htmdir/$this->fid/$this->datedir/$this->tid.html", 0777);
 	}
 
@@ -352,7 +353,7 @@ class PW_StaticPage {
 						$a_url = geturl($at['attachurl'], 'show');
 						if (is_array($a_url)) {
 							$atype = 'pic';
-							$dfurl = '<br>' . cvpic($a_url[0], 1, $db_windpost['picwidth'], $db_windpost['picheight'], $at['ifthumb']);
+							$dfurl = '<br>' . cvpic($a_url[0], 1, $db_windpost['picwidth'], $db_windpost['picheight'], $at['ifthumb']&1);
 							$rat = array('aid' => $at['aid'], 'img' => $dfurl, 'dfadmin' => 0, 
 								'desc' => $at['desc']);
 						} elseif ($a_url == 'imgurl') {

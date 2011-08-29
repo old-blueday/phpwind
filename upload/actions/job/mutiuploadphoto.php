@@ -1,6 +1,6 @@
 <?php
 !defined('P_W') && exit('Forbidden');
-@include_once (D_P . 'data/bbscache/o_config.php');
+@include_once pwCache::getPath(D_P . 'data/bbscache/o_config.php');
 
 if (empty($_POST['step'])) {
 	$filetype = '';
@@ -20,12 +20,12 @@ if (empty($_POST['step'])) {
 	//验证码
 	//require_once(R_P.'require/postfunc.php');
 	require_once (R_P. 'u/require/core.php');
-	InitGP(array(
+	S::gp(array(
 		'uid',
 		'verify',
 		'desc',
 	), 'P');
-	InitGP(array(
+	S::gp(array(
 		'aid',
 		'filenames',
 		'photoid'
@@ -36,22 +36,23 @@ if (empty($_POST['step'])) {
 
 	//$windid = pwConvert($windid,$db_charset,'utf-8');
 	$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
+	$winduid = $uid;
 	$windid = $userService->getUserNameByUserId($uid);
 	$filenames = pwConvert($filenames, $db_charset, 'utf-8');
 	$filenames = addslashes($filenames);
 	
 	checkVerify('swfhash');
 	
-	$rt = $db->get_one("SELECT aname,photonum,ownerid,private,lastphoto,atype FROM pw_cnalbum WHERE aid=" . pwEscape($aid));
+	$rt = $db->get_one("SELECT aname,photonum,ownerid,private,lastphoto,atype FROM pw_cnalbum WHERE aid=" . S::sqlEscape($aid));
 	
 		
 	if (empty($rt)) {
 		Showmsg('undefined_action');
 	}
 	if ($rt['atype'] == 1) {
-		$colony = $db->get_one("SELECT c.*,cm.id AS ifcyer FROM pw_colonys c LEFT JOIN pw_cmembers cm ON c.id=cm.colonyid AND cm.uid=" . pwEscape($uid) . " WHERE c.id=" . pwEscape($rt['ownerid']));
+		$colony = $db->get_one("SELECT c.*,cm.id AS ifcyer FROM pw_colonys c LEFT JOIN pw_cmembers cm ON c.id=cm.colonyid AND cm.uid=" . S::sqlEscape($uid) . " WHERE c.id=" . S::sqlEscape($rt['ownerid']));
 		$level = $colony['speciallevel'] ? $colony['speciallevel'] : $colony['commonlevel'];
-		$o_maxphotonum = $db->get_value("SELECT maxphotonum FROM pw_cnlevel WHERE id=" . pwEscape($level));
+		$o_maxphotonum = $db->get_value("SELECT maxphotonum FROM pw_cnlevel WHERE id=" . S::sqlEscape($level));
 	} else {
 		$uid != $rt['ownerid'] && Showmsg('colony_phototype');
 	}
@@ -76,7 +77,7 @@ if (empty($_POST['step'])) {
 	
 	if ($rt['atype'] == 1) {
 		$cyid = $rt['ownerid'];
-		$db->update("UPDATE pw_colonys SET photonum=photonum+" . pwEscape($photoNum, false) . ' WHERE id=' . pwEscape($cyid));
+		$db->update("UPDATE pw_colonys SET photonum=photonum+" . S::sqlEscape($photoNum, false) . ' WHERE id=' . S::sqlEscape($cyid));
 
 		$colony['photonum']+= $photoNum;
 		updateGroupLevel($colony['id'], $colony);
@@ -108,7 +109,7 @@ if (empty($_POST['step'])) {
 		updateDatanalyse($pid,'picNew',$timestamp);
 	}
 	
-	$db->update("UPDATE pw_cnalbum SET photonum=photonum+" . pwEscape($photoNum, false) . ",lasttime=" . pwEscape($timestamp, false) . ',lastpid=' . pwEscape(implode(',', $lastpid)) . (!$rt['lastphoto'] ? ',lastphoto=' . pwEscape($img->getLastPhoto()) : '') . " WHERE aid=" . pwEscape($aid));
+	$db->update("UPDATE pw_cnalbum SET photonum=photonum+" . S::sqlEscape($photoNum, false) . ",lasttime=" . S::sqlEscape($timestamp, false) . ',lastpid=' . S::sqlEscape(implode(',', $lastpid)) . (!$rt['lastphoto'] ? ',lastphoto=' . S::sqlEscape($img->getLastPhoto()) : '') . " WHERE aid=" . S::sqlEscape($aid));
 	
 	countPosts("+$photoNum");
 	

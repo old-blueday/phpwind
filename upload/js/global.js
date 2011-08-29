@@ -6,9 +6,10 @@
  *
  */
 /**
- *@param String id 对话框的id，若不传递，则默认为pw_box
+ * @param String
+ *            id 对话框的id，若不传递，则默认为pw_box
  */
-PWMENU_ZINDEX=0;
+PWMENU_ZINDEX=1001;
 
 function PwMenu(id){
 	this.pid	= null;
@@ -77,9 +78,7 @@ PwMenu.prototype = {
 	},
 
 	move : function(e) {
-		if (is_ie) {
-			document.body.onselectstart = function(){return false;}
-		}
+		if(is_ie){document.body.onselectstart = function(){return false;}}
 		var e  = is_ie ? window.event : e;
 		var o  = this.menu||getPWBox(this.mid);
 		var x  = e.clientX;
@@ -87,8 +86,9 @@ PwMenu.prototype = {
 		this.w = e.clientX - parseInt(o.offsetLeft);
 		this.h = e.clientY - parseInt(o.offsetTop);
 		var _=this;
+		_.menu=_.menu||getPWBox(_.mid);
+		document.body.setCapture && _.menu.setCapture();
 		document.onmousemove = function(e) {
-			_.menu=_.menu||getPWBox(_.mid);
 			var e  = is_ie ? window.event : e;
 			var x  = e.clientX;
 			var y  = e.clientY;
@@ -96,11 +96,10 @@ PwMenu.prototype = {
 			_.menu.style.top  = y - _.h + 'px';
 		};
 		document.onmouseup   = function() {
-			if (is_ie) {
-				document.body.onselectstart = function(){return true;}
-			}
-			document.onmousemove = '';
-			document.onmouseup   = '';
+			if(is_ie){document.body.onselectstart = function(){return true;}}
+			document.body.releaseCapture && _.menu.releaseCapture();// IE释放鼠标监控
+			document.onmousemove = null;
+			document.onmouseup = null;
 		};
 	},
 
@@ -118,27 +117,36 @@ PwMenu.prototype = {
 		this.setMenu(idName.innerHTML, 1, 1, oCall);
 		this.menu.className = idName.className;
 		this.menupz(object,pz);
-		var _=this;
+
 		if (type == 3) {
-			document.onmousedown = function (e) {
-				var o = is_ie ? window.event.srcElement : e.target;
-				if (!issrc(o)) {
-					read.close();
-					document.onmousedown = '';
-				}
-			}
+			this.closeByClick();
 		} else if (type != 2) {
-			getObj(object).onmouseout = function() {_.close();getObj(object).onmouseout = '';};
-			this.menu.onmouseout = function() {_.close();}
-			this.menu.onmouseover = function() {clearTimeout(read.t);}
+			this.closeByMove(object);
 		}
+	},
+	
+	closeByClick : function() {
+		document.onmousedown = function (e) {
+			var o = is_ie ? window.event.srcElement : e.target;
+			if (!issrc(o)) {
+				read.close();
+				document.onmousedown = '';
+			}
+		}
+	},
+
+	closeByMove : function(id) {
+		var _=this;
+		getObj(id).onmouseout = function() {_.close();getObj(id).onmouseout = '';};
+		_.menu.onmouseout = function() {_.close();}
+		_.menu.onmouseover = function() {clearTimeout(read.t);}
 	},
 
 	menupz : function(obj,pz) {
 		this.menu=this.menu||getPWBox(this.mid);
 		this.menu.onmouseout = '';
 		this.menu.style.display = '';
-		//this.menu.style.zIndex	= 3000;
+		// this.menu.style.zIndex = 3000;
 		this.menu.style.left	= '-500px';
 		this.menu.style.visibility = 'visible';
 
@@ -166,12 +174,9 @@ PwMenu.prototype = {
 				var offsethwidth = ietruebody().clientWidth;
 			}
 			/*
-			if (IsElement('upPanel') && is_ie) {
-				var gettop = 0;
-			} else {
-				var gettop  = ;
-			}
-			*/
+			 * if (IsElement('upPanel') && is_ie) { var gettop = 0; } else { var
+			 * gettop = ; }
+			 */
 			var show_top = IsElement('upPanel') ? top - getObj('upPanel').scrollTop : top;
 
 			if (pz_h!=1 && (pz_h==2 || show_top < offsetheight/2)) {
@@ -204,8 +209,9 @@ PwMenu.prototype = {
 					oc.pz ? pz = oc.pz : 0;
 				}
 				getObj(a).onmouseover = function(){_.open(b, a, type, pz, oc);};
-				//getObj(a).onmouseover=function(){_.open(b,a);callBack?callBack(b):0};
-				//try{getObj(a).parentNode.onfocus = function(){_.open(b,a);callBack?callBack(b):0};}catch(e){}
+				// getObj(a).onmouseover=function(){_.open(b,a);callBack?callBack(b):0};
+				// try{getObj(a).parentNode.onfocus =
+				// function(){_.open(b,a);callBack?callBack(b):0};}catch(e){}
 			}
 		}
 		for (var i in openmenu) {
@@ -270,7 +276,7 @@ function loadjs(path, code, id, callBack) {
 	var s = document.createElement("script");
 	if (id) s.id = id;
 	if (path) {
-		//bug fix
+		// bug fix
 		if(is_webkit && path.indexOf(' ')>-1)
 		{
 			var reg = /src="(.+?)"/ig;
@@ -311,7 +317,7 @@ function opencode(menu,td,id) {
 
 	document.body.onmousedown=function(e) {
 		var o = is_ie ? window.event.srcElement : e.target;
-        var f = is_ie ? false : true;//firefox  e.type = click by lh
+        var f = is_ie ? false : true;// firefox e.type = click by lh
 
 		if( o!=getObj(id) && o!=td )
 		{
@@ -334,7 +340,7 @@ function getPWBox(type){
 	if (getObj(type||'pw_box')) {
 		return getObj(type||'pw_box');
 	}
-	var pw_box	= elementBind('div',type||'pw_box','','position:absolute');
+	var pw_box	= elementBind('div',type||'pw_box','','position:absolute;left:-10000px');
 
 	document.body.appendChild(pw_box);
 	return pw_box;
@@ -411,13 +417,12 @@ function pwForumList(isLink,isPost,fid,handle,ifblank) {
 				if (getObj('title_forumlist') == null) {
 					showDialog('error','没有找到版块列表信息');
 				}
-				getObj('title_forumlist').innerHTML = '快速浏览';
+				getObj('title_forumlist').innerHTML = '快速跳转';
 			}
 			gIsPost = isPost;
 			if (handle.id.indexOf('pwb_')==-1) {
-				read.open('menu_forumlist',handle,2);
+				read.open('menu_forumlist', handle, 3);
 			}
-
 		} else {
 			read.close();
 		}
@@ -436,7 +441,7 @@ function char_cv(str){
 	return str;
 }
 
-function showDialog(type,message,autohide,callback) {
+/*function showDialog(type,message,autohide,callback) {
 	if (!type) type = 'warning';
 	var tar = '<div class="popBottom" style="text-align:right;">';
 	if (type == 'confirm' && typeof(callback) == 'function') {
@@ -460,7 +465,7 @@ function showDialog(type,message,autohide,callback) {
 	if (autohide) {
 		window.setTimeout("closep()", (autohide * 1000));
 	}
-}
+}*/
 
 function checkFileType() {
 	var fileName = getObj("uploadpic").value;
@@ -478,24 +483,26 @@ function checkFileType() {
 }
 var searchTxt = '搜索其实很简单！ (^_^)';
 function searchFocus(e){
-	if(e.value == searchTxt)
+	if(e.value == searchTxt){
 		e.value='';
+		e.className = '';
+	}
+	//e.parentNode.className += ' inputFocus';
 }
 function searchBlur(e){
-	if(e.value == '')
+	if(e.value == ''){
 		e.value=searchTxt;
+		e.className = 'gray';
+	}
+	//e.parentNode.className = 'ip';
 }
 function getSearchType(e){
 	var n = e.srcElement;
 	if(n && n.tagName!='LI') return;
-	n.parentNode.nextSibling.innerHTML = n.innerHTML;
-	var m = n.parentNode.firstChild;
-	while(m){
-		if(m.style.display=='none'){
-			m.style.display='';
-			break;
-		}else
-			m = m.nextSibling;
+	n.parentNode.parentNode.getElementsByTagName('h6')[0].innerHTML = n.innerHTML;
+	var lis = n.parentNode.getElementsByTagName('li');
+	for(var i = 0,j=lis.length;i < j;i++){
+		lis[i].style.display = '';
 	}
 	n.style.display='none';
 	getObj('search_type').value=n.getAttribute('type');
@@ -506,3 +513,238 @@ function searchInput() {
 		getObj('search_input').value='';
 	return true;
 }
+
+(function() {
+    if (window.showDlg) return;
+    var win = window,doc = win.document,
+        isIE = !+'\v1', // IE浏览器
+	    isCompat = doc.compatMode == 'CSS1Compat',	// 浏览器当前解释模式
+	    IE6 = isIE && /MSIE (\d)\./.test(navigator.userAgent) && parseInt(RegExp.$1) < 7, // IE6以下需要用iframe来遮罩
+	    useFixed = !isIE || (!IE6 && isCompat), // 滚动时，IE7+（标准模式）及其它浏览器使用Fixed定位
+        Typeis = function(o,type) {
+		    return Object.prototype.toString.call(o)==='[object ' + type + ']';
+	    }, // 判断元素类型
+        $ = function(o) {
+            return Typeis(o,'String') ? doc.getElementById(o) : o;
+        },
+        $height = function(obj) {return parseInt(obj.style.height) || obj.offsetHeight}, // 获取元素高度
+        $width = function(obj) {return parseInt(obj.style.width) || obj.offsetWidth}, // 获取元素高度
+        getWinSize = function() {
+            var rootEl = doc.body;
+			return [Math.max(rootEl.scrollWidth, rootEl.clientWidth), Math.max(Math.max(doc.body.scrollHeight,rootEl.scrollHeight), Math.max(rootEl.clientHeight,doc.body.clientHeight || window.clientHeight))]
+		},
+		/* 获取scrollLeft和scrollTop */
+		getScrollPos = function() {
+		    var body = doc.body,docEl = doc.documentElement;
+			return {
+			    left:body.scrollLeft || docEl.scrollLeft, top:body.scrollTop || docEl.scrollTop
+			}
+		},
+		getElementsByClassName = function(className, element) {
+		    var children = (element || document).getElementsByTagName('*');
+		    var elements = new Array();
+		    for (var i = 0; i < children.length; i++) {
+			    var child = children[i];
+			    var classNames = child.className.split(' ');
+			    for (var j = 0; j < classNames.length; j++) {
+				    if (classNames[j] == className) {
+					    elements.push(child);
+					    break;
+				    }
+			    }
+		    }
+		    return elements;
+	    },
+        empty = function(){},
+        defaultCfg = {   // 默认配置
+            id:         'pw_dialog',
+            type:       'warning',
+            message:    '',// 弹出提示的文字
+            showObj:    null,// 要显示的本地元素,在ajax提示是常用
+            width:      350,// 弹出框高度
+            isMask:     1,
+            autoHide:   0,// 是否自动关闭
+		    zIndex:		9999, // 层叠值
+		    onShow:		empty,// 显示时执行
+		    onOk:       empty,
+		    onClose:	empty, // 关闭时执行
+		    left:       '50%',// 绝对位置
+		    top:        '50%',
+		    alpha:      0.2,// 遮罩的透明度
+		    backgroundColor:'#000',// 遮罩的背景色
+		    titleText:  '提示',// 提示标题
+		    okText:      '确定',// 确定按钮文字
+		    cancelText:  '取消',// 取消文字，确认时用
+		    closeText:  '关闭',// 关闭文字
+		    button:     null// 默认不显示按钮
+        },
+		icoPath = 'images/';
+        
+    var Dialog = function(options) {// 构造函数
+        var self = this;
+        this.options = options;
+        if (!(self instanceof Dialog)) {
+            return new Dialog(options);
+        }
+        this._initialize();
+    }
+    Dialog.prototype = {
+        _initialize:function() {
+            for(var i in defaultCfg) {
+                if(!(i in options)){
+                    options[i] = defaultCfg[i];
+                }
+            }
+            this.show();
+        },
+        show:function(options) {
+            var self = this,
+                opt = self.options,
+                box = opt.showObj;
+            	closep();
+                createButton = function(){// 创建按钮
+                    var html = [],btn = opt.button;
+                    if(opt.autoHide){ html.push('<div class="fl gray">本窗口<span class="spanTime">'+ opt.autoHide +'</span>秒后关闭</div>');}
+                    if(btn){
+                        for(var i = 0,j = btn.length;i < j;i++ ) {
+                            html.push('<span class="bt2"><span><button class="pw_dialoag_button" type="button">'+ btn[i][0] +'</button></span></span>');
+                        }
+                    }else {
+                        if(opt.type === 'confirm') {
+                            html.push('<span class="btn2"><span><button type="button" class="pw_dialoag_ok">'+ opt.okText +'</button></span></span>');
+                        }
+                        html.push('<span class="bt2"><span><button type="button" class="pw_dialoag_close">'+ opt.closeText +'</button></span></span>');
+                    }
+                    return html.join('');
+                }
+                // timeout;
+            if(!opt.showObj) {
+                var divStyle = 'z-index:'+ (opt.zIndex + 1) +';position:'+ (useFixed ? 'fixed' : 'absolute')+';';
+                    maskStyle = (!opt.isMask ? 'display:none':'') + 'width:'+ getWinSize()[0] +'px;height:'+ getWinSize()[1] +'px;z-index:'+ opt.zIndex +';position:absolute;top:0;left:0;text-align:center;filter:alpha(opacity='+ opt.alpha*100 + ');opacity:'+ opt.alpha +';background-color:'+opt.backgroundColor;
+                    if(!$(opt.id)) {
+                        box = document.createElement('div');
+                        box.id = opt.id;
+                    }else {
+                        box = $(opt.id);
+                    }
+                    if (!opt.type) opt.type = defaultCfg.type;
+		            box.innerHTML = [
+		            /* 遮罩 */
+		            '<div style="' + maskStyle + '"></div>', IE6 ? ("<iframe id='maskIframe' src='about:blank' style='" + maskStyle + "'></iframe>") : '',
+		            /* 窗体 */
+		            // IE6 ? "<iframe src='javascript:false'
+					// style='width:100%;height:999px;position:absolute;top:0;left:0;z-index:-1;opacity:1;filter:alpha(opacity=100)'></iframe>":
+					// '',
+		            '<div style="'+ divStyle +'" class="popout">\
+		            <table cellspacing="0" cellpadding="0" border="0">\
+		                <tbody>\
+		                <tr><td class="bgcorner1"></td><td class="pobg1"></td><td class="bgcorner2"></td></tr><tr><td class="pobg4"></td>\
+		                    <td>\
+		                        <div id="box_container" class="popoutContent">\
+		                            <div style="width:'+ opt.width +'px;">\
+		                                <div class="popTop">'+ opt.titleText +'</div>\
+		                                <div class="popCont"><img align="absmiddle" class="mr10" src="'+ icoPath + opt.type +'_bg.gif">'+ opt.message +'</div>\
+		                                <div style="text-align: right;" class="popBottom">\
+		                                '+ createButton() + '\
+		                                </div>\
+		                            </div>\
+		                        </div>\
+		                    </td><td class="pobg2"></td></tr><tr><td class="bgcorner4"></td><td class="pobg3"></td><td class="bgcorner3"></td></tr>\
+		                </tbody>\
+		            </table>\
+		            </div>',
+		            /* 阴影 */
+		            isIE ? "<div id='ym-shadow' style='position:absolute;z-index:10000;background:#808080;filter:alpha(opacity=80) progid:DXImageTransform.Microsoft.Blur(pixelradius=5);'></div>": ''].join('');
+		        doc.body.insertBefore(box, doc.body.childNodes[0]);
+		        var popout = getElementsByClassName('popout',box)[0];
+                popout.style.left = Typeis(opt.left,'Number') ? opt.left + 'px' : opt.left
+                popout.style.top = Typeis(opt.top,'Number') ? opt.top + 'px' : opt.top;
+                var h = $height(popout),w = $width(popout);
+                if(!Typeis(opt.left,'Number')) {
+				    popout.style.marginLeft = useFixed ? - w / 2 + "px" : getScrollPos().left - w / 2 + "px";
+				}else {
+				    popout.style.left = ''+opt.left + 'px';
+				}
+				if(!Typeis(opt.top,'Number')) {
+				    popout.style.marginTop = useFixed ? - h / 2 + "px" : getScrollPos().top - h / 2 + "px";
+				}else {
+				    popout.style.top = ''+opt.top + 'px';
+				}
+				var closeTime = function() {
+					if(interval){
+						clearInterval(interval);
+						interval = null;
+					}
+                };
+				if(opt.button) {
+				    var customBtn = getElementsByClassName('pw_dialoag_button',box),buttons = opt.button;
+				    if(customBtn.length){
+                        for(var i = 0,j = customBtn.length;i < j;i++) {
+                            (function(i){
+                                customBtn[i].onclick = function() {
+                                   buttons[i][1] && buttons[i][1](); 
+                                }
+                            })(i)
+                            
+                        }
+                    }
+				}else{
+		            var closeBtn = getElementsByClassName('pw_dialoag_close',box),
+                        okBtn = getElementsByClassName('pw_dialoag_ok',box);
+                   if(closeBtn.length){
+                        closeBtn[0].onclick = function() {
+                            self.close();
+                        }
+                    }
+                    if(okBtn.length) {
+                        okBtn[0].onclick = function() {
+                            self.options.onOk && self.options.onOk();
+							//self.options.onClose && self.options.onClose();
+                            self.close();
+                        }
+                    }
+                }
+                
+            }else{
+                var obj = $(opt.showObj);
+                if(obj.nodeType !== 1) {// 如果传进来的不是元素,直接return
+                    return;
+                }
+                obj.style.display = '';
+                var msgObj = getElementsByClassName('message',obj),
+                    msgClose = getElementsByClassName('close',obj);
+                if( !msgObj.length ) { return false; }
+                msgObj[0].innerHTML = opt.message;
+                if( msgClose.length ) { msgClose[0].onclick = function() {obj.style.display = 'none'; }}
+            }
+            opt.onShow && opt.onShow();
+            if(opt.autoHide) {
+                var spanTime = getElementsByClassName('spanTime',popout)[0];
+		        interval = setInterval(function() {
+		                var time = --opt.autoHide;
+		                if(spanTime){ spanTime.innerHTML = time;}
+		                if(time === 0){
+		                    clearInterval(interval);
+		                    self.close();
+		                }
+		        },1000);
+		    }
+        },
+        close:function() {
+            var opt = this.options;
+            if(!opt.showObj && $(opt.id)) {
+                doc.body.removeChild($(opt.id));
+            }else if($(opt.showObj)) {
+                $(opt.showObj).style.display = 'none';
+            }
+            opt.onClose && opt.onClose();
+        }
+    }
+    win['showDlg'] = function(type,message,autohide,callback){
+		var isMask = type === 'confirm' ? 0 : 1,
+			onClose = type !== 'confirm' ? callback : null,
+			options = arguments.length === 1 ? arguments[0] : { type:type,message:message,autoHide:autohide,onOk:callback,onClose:onClose,isMask:isMask };
+        Dialog(options);
+    }
+	win['showDialog'] = win['showDlg'];
+})();

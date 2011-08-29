@@ -2,6 +2,16 @@
 include_once PrintEot('left');
 print <<<EOT
 -->
+<div class="nav3 mb10">
+	<ul class="cc">
+		<li><a href="$admin_file?adminjob=interfacesettings&adminitem=index">首页</a></li>
+		<li><a href="$admin_file?adminjob=interfacesettings&adminitem=thread">列表页</a></li>
+		<li><a href="$admin_file?adminjob=interfacesettings&adminitem=read">阅读页</a></li>
+		<li><a href="$admin_file?adminjob=interfacesettings&adminitem=popinfo">提示信息</a></li>
+        <li><a href="$admin_file?adminjob=interfacesettings&adminitem=jsinvoke">js调用设置</a></li>
+		<li class="current"><a href="$admin_file?adminjob=interfacesettings&adminitem=overprint">主题印戳</a></li>
+	</ul>
+</div>
 <div class="admin_info mb10">
 	<h3 class="h1">印戳设置</h3>
 	<div class="legend">
@@ -79,6 +89,7 @@ EOT;
 </table>
 </div>
 <div class="tac mb10">
+	<span class="bt"><span><button type="button" onclick="CheckAll(document.FORM)">全 选</button></span></span>
 	<span class="btn"><span><button type="submit">提 交</button></span></span>
 </div>
 </form>

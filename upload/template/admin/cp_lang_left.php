@@ -23,9 +23,10 @@ $nav_manager = array(
 
 $nav_left = array(
 	'config' => array(
-		'name' => '核心设置',
+		'name' => '全局',
 		'items' => array(
 			'basic',
+			'customnav',
 			'regset'	=> array(
 				'name'	=> '注册设置',
 				'items'	=> array(
@@ -36,6 +37,8 @@ $nav_left = array(
 				),
 			),
 			'credit',
+			'member',
+			'editer',
 			/*
 			'creditset'	=> array(
 				'name'	=> '积分设置',
@@ -55,80 +58,51 @@ $nav_left = array(
 					'attachstats',
 				)
 			),
+			'safe',
+			'seoset',
 			'messageset',
 			'searcher',
 			'email',
+			'userpay',
 			'help',
 			'wap',
-			'safe',
-			'seoset',
-			'member',
-			'pcache',
 			'sethtm',
+			//'pcache',
 		),
 	),
 	'consumer' => array(
-		'name'	=> '会员权限',
+		'name'	=> '用户',
 		'items'	=> array(
-			'groups'	=> array(
-				'name'	=> '会员组设置',
-				'items'=> array(
-					'level',
-					'userstats',
-					'upgrade',
-					'editgroup',
-					'uptime',
-				),
-			),
-			'members'	=> array(
-				'name'	=> '会员管理',
-				'items'=>array(
-					'setuser',
-					'delmember',
-					'banuser',
-					'viewban',
-					'unituser',
-				),
-			),
-			'usercheck'		=> array(
-				'name'			=> '会员审核',
-				'items'			=> array(
-					'checkreg',
-					'checkemail',
-				),
-			),
-			'customcredit',
+			'level',
+			'upgrade',
+			'usermanage',
+			'banuser',
+			'bansignature',
+			'usercheck',
+			'userstats',
+			//'customcredit',
+			'uptime',
 		),
 	),
 	'contentforums'	=> array(
-		'name'	=> '内容版块',
+		'name'	=> '内容',
 		'items'	=> array(
-			'forums' => array(
-				'name'	=> '版块管理',
-				'items'=> array(
-					'setforum',
-					'singleright',
-					'uniteforum',
-					'forumsell',
-					'creathtm',
-				),
-			),
-			'contentmanage' => array(
+			/*'contentmanage' => array(
 				'name'	=> '内容管理',
-				'items'=> array(
+				'items'=> array(*/
 					'article',
-					'app_photos',
-					'app_diary',
-					'app_groups',
+					'photos_manage',
+					'diary_manage',
+					'groups_manage',
 					//'app_share',
-					'app_weibo',
+					'weibo_manage',
 					'o_comments',
 					'message',
 					'report',
 					'draftset',
 					'recycle',
-				),
-			),
+				/*),
+			),*/
 			'contentcheck'	=> array(
 				'name'	=> '内容审核',
 				'items'	=> array(
@@ -143,137 +117,116 @@ $nav_left = array(
 				)
 			),
 			'tagset',
-			'pwcode',
-			'setform',
-			'overprint',
-			'postcache',
+			//'pwcode',
+			//'setform',
+			//'overprint',
 		),
 	),
 	'datacache'	=> array(
-		'name'	=>'数据缓存',
+		'name'	=> '数据',
 		'items'	=> array(
-			'aboutcache'	=> array(
-				'name'	=> '缓存相关',
-				'items'	=> array(
-					'updatecache',
-					'pwcache',
-					'guestdir',
-				),
-			),
-			'database'	=> array(
-				'name'	=> '数据库',
-				'items'	=> array(
-					'bakup',
-					'ptable',
-				),
-			),
-			'log'	=> array(
-				'name'	=> '管理日志',
-				'items'	=> array(
-					'adminlog',
-					'forumlog',
-					'creditlog',
-					'adminrecord',
-				),
-			),
-			'check'	=> array(
-				'name'	=> '文件检查',
-				'items'	=> array(
-					'chmod',
-					'safecheck',
-				),
-			),
+			'bakup',
+			'aboutcache',
+			'record',
+			'filecheck',
 			'ipban',
 			'viewtoday',
-			'datastate',
 			'postindex',
+			'datastate',
+			'ystats',
+			'creditlog',
 		),
 	),
 	'applicationcenter'	=> array(
-		'name'	=> '应用中心',
+		'name'	=> '应用',
 		'items'	=> array(
-			'onlineapplication' => array(
-				'name'	=> '在线应用',
+		'onlineapplication' => array(
+				'name'	=> '应用中心',
 				'items' => array(
 					'appset',
 					'onlineapp',
 					'i9p',
 					'blooming',
 					'taolianjie',
-					//'sinaweibo',
+					'sinaweibo',
+					'yunstatistics'
 				),
 			),
-			'appslist',
-			'topiccate',
-			'app_stopic',
+			'hackcenter',
+			//'appslist',
+			'photos_set',
+			'diary_set',
+			'groups_set',
+			//'app_share',
+			'hot',
+			'weibo_set',
 			'postcate',
 			'activity',
-			'hackcenter',
-			'job',
-			'onlinepay' => array(
-				'name'	=> '网上支付设置',
+			'topiccate',
+			/*
+			'basicapp' => array(
+				'name' => '基础应用',
 				'items' => array(
-					'userpay',
-					'orderlist',
+					
 				),
 			),
+			*/
 		),
 	),
 	'markoperation'=> array(
-		'name'	=> '运营工具',
+		'name'	=> '运营',
 		'items'	=> array(
 			'setadvert',
+			'stopic',
+			'job',
 			'announcement',
 			'sendmail',
 			'sendmsg',
-			'navmenu'		=> array(
-				'name'	=> '导航菜单管理',
-				'items'=> array(
-					'navmain',
-					'navside',
-					//'navmode'
-				),
-			),
+			'present',
 			'share',
 			'plantodo',
-			'present',
 //			'setads',
-			'ystats',
-			'sitemap',
+			//'sitemap',
 		),
 	),
-
-			'modemanage'=> array(
-				'name'	=> '模式设置',
+	
+	'modelist' => array(
+		'name'	=> '模式设置',
+		'items'=> array(
+			'modeset',
+			//'modestamp',
+			//'modepush',
+		),
+	),
+	'bbs' => array(
+		'name'	=> '论坛模式',
+		'items'=> array(
+			'bbssetting',
+			'setforum',
+			'interfacesettings',
+			/*
+			'forums' => array(
+				'name'	=> '版块管理',
 				'items'=> array(
-					'modeset',
-					//'modestamp',
-					//'modepush',
+					'setforum',
+					'uniteforum',
+					'forumsell',
+					'creathtm',
 				),
 			),
-			'o'		=> array(
-				'name'	=> '个人中心',
-				'items'=> array(
-					'o_global',
-					'o_skin',
-				)
-			),
-			'bbs'	=> array(
-				'name'	=> '论坛模式',
-				'items'=> array(
-					'detail'	=> array(
-						'name' => '界面设置',
-						'items' => array(
-							'index',
-							'thread',
-							'read',
-							'popinfo',
-							'jsinvoke',
-						)
-					),
-					'rebang',
-					'setstyles',
-				),
+			*/
+			'singleright',
+			'setstyles',
+			'rebang',
+		),
+	),
+	'o' => array(
+		'name'	=> '个人中心',
+		'items'=> array(
+			'o_global',
+			'o_skin',
+			'o_commend',
+		)
 	),
 );
 
@@ -296,29 +249,4 @@ if ($fp = opendir($extentPath)) {
 	}
 }
 
-/*if (isset($db_modes['area'])) {
-	$nav_left['area'] = array(
-		'name'	=> '门户模式',
-		'items'=> array(
-			'areaCore' => array(
-					'name' => '门户核心设置',
-					'items' => array(
-							'area_channel_manage',
-							'area_module',
-							//'area_selecttpl',
-							'area_level_manage',
-							'area_static_manage',
-
-						)
-				),
-			//'areaContent' => array(
-					//'name' => '内容管理',
-					//'items' => array(
-							'area_pushdata',
-							//'area_columns_contents',
-						//)
-				//),
-		),
-	);
-}*/
 ?>

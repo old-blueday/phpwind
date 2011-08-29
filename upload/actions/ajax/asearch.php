@@ -1,7 +1,7 @@
 <?php
 !defined('P_W') && exit('Forbidden');
 
-InitGP(array(
+S::gp(array(
 	'fid',
 	'modelid',
 	'pcid',
@@ -12,7 +12,7 @@ InitGP(array(
 if ($modelid) {
 	L::loadClass('posttopic', 'forum', false);
 	$postTopic = new postTopic($pwpost);
-	$query = $db->query("SELECT fieldid,name as newname,type,rules,vieworder,textsize FROM pw_topicfield WHERE modelid = " . pwEscape($modelid) . " AND ifable='1' AND ifasearch='1' ORDER BY vieworder ASC,fieldid ASC");
+	$query = $db->query("SELECT fieldid,name as newname,type,rules,vieworder,textsize FROM pw_topicfield WHERE modelid = " . S::sqlEscape($modelid) . " AND ifable='1' AND ifasearch='1' ORDER BY vieworder ASC,fieldid ASC");
 	while ($rt = $db->fetch_array($query)) {
 		list($rt['name1'], $rt['name2']) = explode('{#}', $rt['newname']);
 		$rt['searchhtml'] = $postTopic->getASearchHtml($rt['type'], $rt['fieldid'], $rt['textsize'], $rt['rules']);
@@ -22,7 +22,7 @@ if ($modelid) {
 	
 	L::loadClass('postcate', 'forum', false);
 	$postTopic = new postCate($pwpost);
-	$query = $db->query("SELECT fieldid,name as newname,type,rules,vieworder,textsize FROM pw_pcfield WHERE pcid = " . pwEscape($pcid) . " AND ifable='1' AND ifasearch='1' ORDER BY vieworder ASC,fieldid ASC");
+	$query = $db->query("SELECT fieldid,name as newname,type,rules,vieworder,textsize FROM pw_pcfield WHERE pcid = " . S::sqlEscape($pcid) . " AND ifable='1' AND ifasearch='1' ORDER BY vieworder ASC,fieldid ASC");
 	while ($rt = $db->fetch_array($query)) {
 		list($rt['name1'], $rt['name2']) = explode('{#}', $rt['newname']);
 		$rt['searchhtml'] = $postTopic->getASearchHtml($rt['type'], $rt['fieldid'], $rt['textsize'], $rt['rules']);

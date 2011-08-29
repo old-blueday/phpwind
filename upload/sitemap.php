@@ -1,13 +1,13 @@
 <?php
 require_once('global.php');
 @header("Content-type: application/xml");
-$for_google = GetGP('g');
+$for_google = S::getGP('g');
 if ($for_google) {
 	$cachefile = D_P."data/bbscache/sitemap_google.xml";
 } else {
 	$cachefile = D_P."data/bbscache/sitemap.xml";
 }
-@include_once(D_P.'data/bbscache/sm_config.php');
+@include_once pwCache::getPath(D_P.'data/bbscache/sm_config.php');
 !$sm_updatePeri && $sm_updatePeri = 12;
 
 if ($timestamp-pwFilemtime($cachefile)>=$sm_updatePeri*3600) {
@@ -25,8 +25,8 @@ if ($timestamp-pwFilemtime($cachefile)>=$sm_updatePeri*3600) {
 			$fidoff[] = $rt['fid'];
 		}
 	}
-	$sql = $fidoff ? ' fid NOT IN(' . pwImplode($fidoff) . ')' : '1';
-	$query = $db->query("SELECT t.tid,t.fid,t.subject,t.postdate,t.lastpost,t.hits,t.replies,t.digest,tm.content FROM pw_threads t FORCE INDEX (postdate) LEFT JOIN $pw_tmsgs tm ON t.tid=tm.tid WHERE $sql ORDER BY t.postdate DESC LIMIT $sm_num");
+	$sql = $fidoff ? ' fid NOT IN(' . S::sqlImplode($fidoff) . ')' : '1';
+	$query = $db->query("SELECT t.tid,t.fid,t.subject,t.postdate,t.lastpost,t.hits,t.replies,t.digest,tm.content FROM pw_threads t FORCE INDEX (".getForceIndex('idx_postdate').") LEFT JOIN $pw_tmsgs tm ON t.tid=tm.tid WHERE $sql ORDER BY t.postdate DESC LIMIT $sm_num");
 	while ($rt = $db->fetch_array($query)) {
 		if ($db_htmifopen) {
 			$link = "$db_bbsurl/read{$db_dir}tid-{$rt['tid']}$db_ext";
@@ -46,7 +46,7 @@ if ($timestamp-pwFilemtime($cachefile)>=$sm_updatePeri*3600) {
 	} else {
 		$mapinfo = "<?xml version =\"1.0\" encoding=\"{$db_charset}\"?>\r\n<document xmlns:bbs=\"http://www.baidu.com/search/bbs_sitemap.xsd\">\r\n\t<webSite>$db_bbsurl</webSite>\r\n\t<webMaster>$db_ceoemail</webMaster>\r\n\t<updatePeri>$sm_updatePeri</updatePeri>\r\n\t<updatetime>".get_date($timestamp)."</updatetime>\r\n\t<version>phpwind $wind_version Certificate</version>\r\n".$mapinfo."</document>";
 	}
-	writeover($cachefile,$mapinfo);
+	pwCache::setData($cachefile,$mapinfo);
 	echo $mapinfo;
 } else {
 	readfile($cachefile);

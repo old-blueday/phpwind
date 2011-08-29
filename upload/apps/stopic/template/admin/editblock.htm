@@ -2,10 +2,11 @@
 <?php
 print <<<EOT
 -->
-<form action="$ajaxurl" method="post" onsubmit="return false;">
+<div style="width:550px;">
+<form action="$ajaxurl" method="post" enctype="multipart/form-data" onsubmit="return false;">
 <h2 class="h1" style="cursor:move" onmousedown="read.move(event);"><a class="fr del_img" href="javascript:;" onclick="closep();" title="关闭">关闭</a>修改“{$block_name}”模块的内容</h2>
 <div class="admin_table mb10">
-<table cellspacing="0" cellpadding="0" width="500" style="table-layout:auto;">
+<table cellspacing="0" cellpadding="0" width="100%" style="table-layout:auto;">
 
 EOT;
 
@@ -23,7 +24,7 @@ print <<<EOT
     <span class="btn2"><span><button type="button" onfocus="blur();" onclick="ajax.submit(this.form,updateHTML)">提 交</button></span></span>
 </div>
 </form>
-
+</div>
 <script language="javascript">
 function delTr (e) {
 	while (e && e.tagName.toLowerCase() != 'tr') {

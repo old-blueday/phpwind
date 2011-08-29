@@ -1,6 +1,6 @@
 <?php
 !defined('P_W') && exit('Forbidden');
-InitGP(array('action'));
+S::gp(array('action'));
 !in_array($action, array('friend', 'mark', 'del', 'postReply', 'overlook', 'post', 'agree', 'markgroup', 'shield',
 	'unshield','open','close','replay')) && ajaxExport("非法操作请返回");
 if (in_array($action, array('friend', 'agree','overlook'))) {
@@ -9,7 +9,7 @@ if (in_array($action, array('friend', 'agree','overlook'))) {
 }
 if(!$winduid) ajaxExport(array('bool' => $bool, 'message' => '你还没有登录'));
 if ('friend' == $action) {
-	InitGP(array('gname'));
+	S::gp(array('gname'));
 	if ($gname == '-1') {
 		 $friend = $friendObj->getFriends($winduid);
 		 $group	 = $friendObj->getFriendColonys($winduid);
@@ -26,7 +26,7 @@ if ('friend' == $action) {
 		 ajaxExport($json);
 	}
 } elseif ('mark' == $action) {
-	InitGP(array('rids'), 'GP');
+	S::gp(array('rids'), 'GP');
 	empty($rids) && ajaxExport("非法操作请返回");
 	!is_array($rids) && $rids = explode(',', trim($rids, ','));
 	if (!($messageServer->markMessages($winduid, $rids))) {
@@ -34,7 +34,7 @@ if ('friend' == $action) {
 	}
 	ajaxExport("标记已读操作成功!");
 } elseif ('markgroup' == $action) {
-	InitGP(array('rids'), 'GP');
+	S::gp(array('rids'), 'GP');
 	empty($rids) && ajaxExport("非法操作请返回");
 	!is_array($rids) && $rids = explode(',', trim($rids, ','));
 	if (!($messageServer->markGroupMessages($winduid, $rids))) {
@@ -42,7 +42,7 @@ if ('friend' == $action) {
 	}
 	ajaxExport("标记已读操作成功!");
 } elseif ('del' == $action) {
-	InitGP(array('rids'), 'GP');
+	S::gp(array('rids'), 'GP');
 	empty($rids) && ajaxExport("非法操作请返回");
 	!is_array($rids) && $rids = explode(',', trim($rids, ','));
 	if (!($messageServer->deleteMessages($winduid, $rids))) {
@@ -50,7 +50,7 @@ if ('friend' == $action) {
 	}
 	ajaxExport("删除操作成功!");
 } elseif ('postReply' == $action) {
-	InitGP(array('parentMid', 'atc_content','rid','gdcode'), 'GP');
+	S::gp(array('parentMid', 'atc_content','rid','gdcode'), 'GP');
 	if(!$_G['allowmessege']) ajaxExport(array('bool' => false, 'message' => '你所在的用户组不能发送消息'));
 	if(($db_gdcheck & 8) && false === GdConfirm($gdcode,true)){
 		ajaxExport(array('bool' => false, 'message' => '你的验证码不正确或过期'));
@@ -68,7 +68,7 @@ if ('friend' == $action) {
 	ajaxExport(array('bool' => true, 'message' => '消息已发送'));
 } elseif ($action == 'overlook') {
 	/* 忽略请求 */
-	InitGP(array('rids', 'typeid','fuid'), 'GP');
+	S::gp(array('rids', 'typeid','fuid'), 'GP');
 	empty($rids) && ajaxExport("非法操作请返回");
 	!is_array($rids) && $rids = explode(',', trim($rids, ','));
 	$ignoreType = $messageServer->getReverseConst($typeid);
@@ -83,7 +83,7 @@ if ('friend' == $action) {
 	$messageServer->overlookRequests($winduid, $rids);
 	ajaxExport($msg);
 } elseif ($action == 'post') {
-	InitGP(array('_usernames', 'atc_title', 'atc_content','flashatt','gdcode'));
+	S::gp(array('_usernames', 'atc_title', 'atc_content','flashatt','gdcode'));
 	$usernames = $_usernames;/*specia;*/
 	$atc_title = trim($atc_title);
 	$atc_content = trim($atc_content);
@@ -151,7 +151,7 @@ if ('friend' == $action) {
 	ajaxExport(array('bool' => true, 'message' => '消息已发送'));
 } elseif ('agree' == $action) {
 	/* 请求同意  */
-	InitGP(array('rids', 'typeid', 'fid','cyid','check'), 'GP');
+	S::gp(array('rids', 'typeid', 'fid','cyid','check'), 'GP');
 	empty($rids) && ajaxExport("非法操作请返回");
 	!is_array($rids) && $rids = explode(',', trim($rids, ','));
 	$fid && !is_array($fid) && $fid = array($fid);
@@ -191,7 +191,7 @@ if ('friend' == $action) {
 	ajaxExport($msg);
 } elseif ('shield' == $action) {
 	/* 屏蔽多人消息 */
-	InitGP(array('rid', 'mid'), 'GP');
+	S::gp(array('rid', 'mid'), 'GP');
 	(empty($rid) || empty($mid)) && ajaxExport("非法操作请返回");
 	if (!($messageServer->shieldGroupMessage($winduid, $rid, $mid))) {
 		ajaxExport("屏蔽多人消息失败");
@@ -199,7 +199,7 @@ if ('friend' == $action) {
 	ajaxExport("屏蔽操作成功!");
 } elseif ('unshield' == $action) {
 	/* 恢复多人消息 */
-	InitGP(array('rid', 'mid'), 'GP');
+	S::gp(array('rid', 'mid'), 'GP');
 	(empty($rid) || empty($mid)) && ajaxExport("非法操作请返回");
 	if (!($messageServer->recoverGroupMessage($winduid, $rid, $mid))) {
 		ajaxExport("恢复多人消息失败");
@@ -207,7 +207,7 @@ if ('friend' == $action) {
 	ajaxExport("恢复操作成功!");
 } elseif ('close' == $action) {
 	/* 拒收群组消息 */
-	InitGP(array('gid', 'mid'), 'GP');
+	S::gp(array('gid', 'mid'), 'GP');
 	(empty($gid) || empty($mid)) && ajaxExport("非法操作请返回");
 	if (!($messageServer->closeGroupMessage($winduid, $gid, $mid))) {
 		ajaxExport("拒收群组消息失败");
@@ -215,7 +215,7 @@ if ('friend' == $action) {
 	ajaxExport("拒收群组消息成功!");
 } elseif ('open' == $action) {
 	/* 启用群组消息 */
-	InitGP(array('gid', 'mid'), 'GP');
+	S::gp(array('gid', 'mid'), 'GP');
 	(empty($gid) || empty($mid)) && ajaxExport("非法操作请返回");
 	if (!($messageServer->openGroupMessage($winduid, $gid, $mid))) {
 		ajaxExport("启用群组消息失败");

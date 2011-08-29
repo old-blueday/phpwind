@@ -2,10 +2,10 @@
 !defined('M_P') && exit('Forbidden');
 
 set_time_limit(300);
-$aid = (int)GetGP('aid');
+$aid = (int)S::getGP('aid');
 empty($aid) && Showmsg('job_attach_error');
 
-InitGP(array('type'), 'GP');
+S::gp(array('type'), 'GP');
 
 if (!$windid && GetCookie('winduser') && $ol_offset) {
 	$userdb = explode("\t", getuserdb(D_P . "data/bbscache/online.php", $ol_offset));
@@ -18,9 +18,9 @@ if (!$windid && GetCookie('winduser') && $ol_offset) {
 		$userrvrc = round($winddb['rvrc'] / 10, 1);
 		$windid = $winddb['username'];
 		if (file_exists(D_P . "data/groupdb/group_$groupid.php")) {
-			require_once Pcv(D_P . "data/groupdb/group_$groupid.php");
+			require_once pwCache::getPath(S::escapePath(D_P . "data/groupdb/group_$groupid.php"));
 		} else {
-			require_once (D_P . "data/groupdb/group_1.php");
+			require_once pwCache::getPath(D_P . "data/groupdb/group_1.php");
 		}
 	}
 	define('FX', 1);

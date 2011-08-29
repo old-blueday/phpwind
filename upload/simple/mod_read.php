@@ -14,7 +14,7 @@ if ($page > 1) {
 	$S_sql = ',tm.*';
 	$J_sql = "LEFT JOIN $pw_tmsgs tm ON t.tid=tm.tid";
 }
-$read = $db->get_one("SELECT t.*,m.uid,m.groupid,m.userstatus $S_sql FROM pw_threads t LEFT JOIN pw_members m ON t.authorid=m.uid $J_sql WHERE t.tid=".pwEscape($tid));
+$read = $db->get_one("SELECT t.*,m.uid,m.groupid,m.userstatus $S_sql FROM pw_threads t LEFT JOIN pw_members m ON t.authorid=m.uid $J_sql WHERE t.tid=".S::sqlEscape($tid));
 !$read && Showmsg('illegal_tid');
 $fid = $read['fid'];
 
@@ -44,7 +44,7 @@ if ($ifConvert) {
 bbsSeoSettings('read','',$foruminfo['name'],$read['type'],$read['subject'],$read['tags'],$_summary);
 //SEO setting
 
-$isGM = CkInArray($windid,$manager);
+$isGM = S::inArray($windid,$manager);
 $isBM = admincheck($foruminfo['forumadmin'],$foruminfo['fupadmin'],$windid);
 if ($windid && ($isGM || $isBM)) {
 	$admincheck = 1;
@@ -95,7 +95,7 @@ $db_readperpage = 50;/*perpage*/
 
 #高楼索引支持
 if ($openIndex) {
-	$count = $db->get_value("SELECT COUNT(*) AS count FROM pw_postsfloor WHERE tid =". pwEscape($tid))." LIMIT 1";
+	$count = $db->get_value("SELECT COUNT(*) AS count FROM pw_postsfloor WHERE tid =". S::sqlEscape($tid))." LIMIT 1";
 }else{
 	$count = $read['replies'] + 1;
 }
@@ -118,9 +118,10 @@ if ($page == 1) {
 $pages = PageDiv($count,$page,$numofpage,"{$DIR}t$tid");
 
 if (!$db_hithour) {
-	$db->update("UPDATE pw_threads SET hits=hits+1 WHERE tid=".pwEscape($tid));
+	//$db->update("UPDATE pw_threads SET hits=hits+1 WHERE tid=".S::sqlEscape($tid));
+	pwQuery::update('pw_threads', 'tid=:tid', array($tid), null, array(PW_EXPR=>array('hits=hits+1')));
 } else {
-	writeover(D_P."data/bbscache/hits.txt",$tid."\t",'ab');
+	pwCache::setData(D_P."data/bbscache/hits.txt",$tid."\t", false, 'ab');
 }
 
 if ($read['replies'] > 0) {
@@ -129,15 +130,15 @@ if ($read['replies'] > 0) {
 		$start_limit < 0 && $start_limit = 0;
 		$end = $start_limit + $db_readperpage;
 		$sql_floor = " AND f.floor > " . $start_limit ." AND f.floor <= ".$end." ";
-		$query = $db->query("SELECT f.pid FROM pw_postsfloor f WHERE f.tid = ". pwEscape($tid) ." $sql_floor ORDER BY f.floor");
+		$query = $db->query("SELECT f.pid FROM pw_postsfloor f WHERE f.tid = ". S::sqlEscape($tid) ." $sql_floor ORDER BY f.floor");
 		while ($rt = $db->fetch_array($query)) {
 			$postIds[] = $rt['pid'];
 		}
 		if ($postIds) {
-			$postIds && $sql_postId = " AND p.pid IN ( ". pwImplode($postIds,false) ." ) ";
+			$postIds && $sql_postId = " AND p.pid IN ( ". S::sqlImplode($postIds,false) ." ) ";
 			$query = $db->query("SELECT p.*,m.uid,m.groupid,m.userstatus 
 				FROM $pw_posts p LEFT JOIN pw_members m ON p.authorid=m.uid 
-				WHERE p.tid=".pwEscape($tid)." $sql_postId ORDER BY p.postdate");
+				WHERE p.tid=".S::sqlEscape($tid)." $sql_postId ORDER BY p.postdate");
 			while ($read = $db->fetch_array($query)) {
 				if ($read['ifcheck']!='1') {
 					$read['subject'] = '';
@@ -162,7 +163,7 @@ if ($read['replies'] > 0) {
 			$readnum = $db_readperpage;
 			$start_limit--;
 		}
-		$query = $db->query("SELECT p.*,m.uid,m.groupid,m.userstatus FROM $pw_posts p  force index(tid) LEFT JOIN pw_members m ON p.authorid=m.uid WHERE p.tid=".pwEscape($tid)." AND p.ifcheck='1' ORDER BY p.postdate".pwLimit($start_limit,$readnum));
+		$query = $db->query("SELECT p.*,m.uid,m.groupid,m.userstatus FROM $pw_posts p  force index(".getForceIndex('idx_tid').") LEFT JOIN pw_members m ON p.authorid=m.uid WHERE p.tid=".S::sqlEscape($tid)." AND p.ifcheck='1' ORDER BY p.postdate".S::sqlLimit($start_limit,$readnum));
 	
 		while ($read = $db->fetch_array($query)) {
 			$readdb[] = $read;

@@ -22,7 +22,7 @@ class PwFriend {
 			" pw_friends f".
 			" LEFT JOIN pw_members m".
 			" ON f.friendid=m.uid".
-			" WHERE f.status=0 AND f.uid= " .pwEscape($uid) .
+			" WHERE f.status=0 AND f.uid= " .S::sqlEscape($uid) .
 			"ORDER BY f.joindate";
 		$_query = $this->_db->query($_sql);
 		while($rt = $this->_db->fetch_array($_query)) {
@@ -40,7 +40,7 @@ class PwFriend {
 			" pw_attention a".
 			" LEFT JOIN pw_members m".
 			" ON a.touid=m.uid".
-			" WHERE a.uid= " .pwEscape($uid) .
+			" WHERE a.uid= " .S::sqlEscape($uid) .
 			"ORDER BY a.date";
 		$_query = $this->_db->query($_sql);
 		while($rt = $this->_db->fetch_array($_query)) {
