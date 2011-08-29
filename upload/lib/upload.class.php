@@ -23,14 +23,9 @@ class PwUpload {
 		return $arr;
 	}
 
-	function upload(&$bhv,$ifUpdate = 1) {
-
+	function upload(&$bhv) {
 		$uploaddb = array();
 		foreach ($_FILES as $key => $value) {
-			if ($value['error'] == 1) {
-				$maxuploadsize = ini_get('upload_max_filesize');
-				showUploadMsg('上传的附件超过服务器上传的最大限制'.$maxuploadsize.'！');
-			}
 			if (!PwUpload::if_uploaded_file($value['tmp_name']) || !$bhv->allowType($key)) {
 				continue;
 			}
@@ -46,47 +41,73 @@ class PwUpload {
 				showUploadMsg($upload['size'] < 1 ? 'upload_size_0' : 'upload_size_error');
 			}
 			list($filename, $savedir) = $bhv->getFilePath($upload);
-			$upload['fileuploadurl'] = $savedir . $filename;
 
 			$source = PwUpload::savePath($bhv->ifftp, $filename, $savedir);
 
 			if (!PwUpload::postupload($atc_attachment, $source)) {
 				showUploadMsg('upload_error');
 			}
+			clearstatcache();
 			$upload['size'] = ceil(filesize($source) / 1024);
-
-			if (in_array($upload['ext'], array('gif','jpg','jpeg','png','bmp','swf'))) {
-				require_once (R_P . 'require/imgfunc.php');
-				if (!$img_size = GetImgSize($source, $upload['ext'])) {
-					P_unlink($source);
-					showUploadMsg('upload_content_error');
-				}
-				if ($upload['ext'] != 'swf') {
-					if ($bhv->allowThumb() && ($upload['ext'] != 'gif' || $GLOBALS['db_ifathumbgif'])) {
-						$thumbInfo = PwUpload::makeThumb($source, $bhv->getThumbInfo($filename, $savedir), $bhv->ifftp, $upload['ifthumb']);
-					}
-					$bhv->allowWaterMark() && PwUpload::waterMark($source, $upload['ext'], $img_size);
-					$upload['type'] = 'img';
-				}
-			} elseif ($upload['ext'] == 'txt') {
-				if (preg_match('/(onload|submit|post|form)/i', readover($source))) {
-					P_unlink($source);
-					showUploadMsg('upload_content_error');
-				}
-				$upload['type'] = 'txt';
-			}
-			if ($bhv->ifftp) {
-				PwUpload::movetoftp($source, $upload['fileuploadurl']);
-			}
-			if ($upload['ifthumb']) {
-				PwUpload::operateThumb($thumbInfo, $bhv->allowWaterMark(), $bhv->ifftp, $upload['ext']);
-			}
+			$upload['fileuploadurl'] = $savedir . $filename;
+			PwUpload::operateAttach($source, $filename, $savedir, $upload, $bhv);
 			$uploaddb[] = $upload;
 		}
-		if (!$ifUpdate) return $uploaddb;
-		$bhv->update($uploaddb);
+		return $bhv->update($uploaddb);
 	}
 
+	/**
+	 * @static
+	 */
+	function operateAttach($source, $filename, $savedir, &$upload, $bhv) {
+		$thumbInfo = array();
+		if (PwUpload::isImage($upload['ext'])) {
+			list($thumbInfo, $upload['ifthumb'], $upload['type']) = PwUpload::operateImage($source, $filename, $savedir, $upload, $bhv);
+		} elseif ($upload['ext'] == 'txt') {
+			if (preg_match('/(onload|submit|post|form)/i', readover($source))) {
+				P_unlink($source);
+				showUploadMsg('upload_content_error');
+			}
+			$upload['type'] = 'txt';
+		}
+		if ($bhv->ifftp) {
+			if (!PwUpload::movetoftp($source, $savedir . $filename)) return false;
+		} else {
+			if (!PwUpload::movefile($source, PwUpload::savePath(0, $filename, $savedir))) return false;
+		}
+		if ($upload['ifthumb']) {
+			PwUpload::operateThumb($thumbInfo, $bhv->allowWaterMark(), $bhv->ifftp, $upload['ext']);
+		}
+		return true;
+	}
+
+	function isImage($ext) {
+		return in_array($ext, array('gif','jpg','jpeg','png','bmp','swf'));
+	}
+
+	/**
+	 * @static
+	 */
+	function operateImage($source, $filename, $savedir, $upload, $bhv) {
+		require_once (R_P . 'require/imgfunc.php');
+		if (!$img_size = GetImgSize($source, $upload['ext'])) {
+			P_unlink($source);
+			showUploadMsg('upload_content_error');
+		}
+		$thumbInfo = array();
+		$ifthumb = 0;
+		if ($upload['ext'] != 'swf') {
+			if ($bhv->allowThumb() && ($upload['ext'] != 'gif' || $GLOBALS['db_ifathumbgif'])) {
+				$thumbInfo = PwUpload::makeThumb($source, $bhv->getThumbInfo($filename, $savedir), $bhv->ifftp, $ifthumb);
+			}
+			$bhv->allowWaterMark() && PwUpload::waterMark($source, $upload['ext'], $img_size);
+			$upload['type'] = 'img';
+		}
+		return array($thumbInfo, $ifthumb, $upload['type']);
+	}
+	/**
+	 * @static
+	 */
 	function operateThumb($list, $waterMark, $ifftp, $ext) {
 		if (empty($list)) return false;
 		foreach ($list as $k => $v) {
@@ -102,7 +123,7 @@ class PwUpload {
 		$array = array();
 		foreach ($thumbInfo as $key => $value) {
 			list($thumbw, $thumbh, $cenTer) = explode("\t", $value[2]);
-			$thumburl = PwUpload::savePath($ifftp, $value[0], $value[1], 'thumb_' . $key . '_');
+			$thumburl = PwUpload::savePath($ifftp, $value[0], $value[1]);
 			PwUpload::createFolder(dirname($thumburl));
 			if (($thumb = MakeThumb($source, $thumburl, $thumbw, $thumbh, $cenTer)) && $source != $thumburl) {
 				$ifthumb |= (1 << $key);
@@ -165,13 +186,20 @@ class PwUpload {
 			return true;
 		}
 	}
+
+	function &getFtpObj() {
+		if (!is_object($GLOBALS['ftp'])) {
+			require_once (R_P . 'require/functions.php');
+			pwFtpNew($GLOBALS['ftp'], true);
+		}
+		return $GLOBALS['ftp'];
+	}
 	/**
 	 * @static
 	 */
 	function movetoftp($srcfile, $dstfile) {
-		global $ftp;
-		require_once (R_P . 'require/functions.php');
-		if (pwFtpNew($ftp, true) && $ftp->upload($srcfile, $dstfile)) {
+		$ftp =& PwUpload::getFtpObj();
+		if ($ftp->upload($srcfile, $dstfile)) {
 			P_unlink($srcfile);
 			return true;
 		}
@@ -181,16 +209,21 @@ class PwUpload {
 	 * @static
 	 */
 	function movefile($srcfile, $dstfile) {
+		if ($srcfile == $dstfile) {
+			return true;
+		}
 		PwUpload::createFolder(dirname($dstfile));
 		if (rename($srcfile, $dstfile)) {
 			@chmod($dstfile, 0777);
 			return true;
-		} elseif (@copy($srcfile, $dstfile)) {
+		}
+		if (@copy($srcfile, $dstfile)) {
 			@chmod($dstfile, 0777);
 			P_unlink($srcfile);
 			return true;
-		} elseif (is_readable($srcfile)) {
-			pwCache::setData($dstfile, readover($srcfile));
+		}
+		if (is_readable($srcfile)) {
+			pwCache::writeover($dstfile, readover($srcfile));
 			if (file_exists($dstfile)) {
 				@chmod($dstfile, 0777);
 				P_unlink($srcfile);
@@ -214,7 +247,7 @@ class PwUpload {
 			@chmod($filename, 0777);
 			return true;
 		} elseif (is_readable($tmp_name)) {
-			pwCache::setData($filename, readover($tmp_name));
+			pwCache::writeover($filename, readover($tmp_name));
 			if (file_exists($filename)) {
 				@chmod($filename, 0777);
 				return true;
@@ -237,11 +270,10 @@ class PwUpload {
 	/**
 	 * @static
 	 */
-	function savePath($ifftp, $filename, $dir, $thumb = '') {
-		global $attachdir;
+	function savePath($ifftp, $filename, $dir) {
+		global $attachdir, $timestamp;
 		if ($ifftp) {
-			$thumb && $filename = $thumb . $filename;
-			$source = D_P . "data/tmp/{$filename}";
+			$source = D_P . 'data/tmp/' . get_date($timestamp, 'j') . '/' . str_replace('/', '_', $dir) . $filename;
 		} else {
 			$source = $attachdir . '/' . $dir . $filename;
 		}
@@ -258,11 +290,36 @@ class uploadBehavior {
 
 	var $ftype;
 	var $ifftp;
+	
+	var $flashatt = array();
+	var $savetoalbum;
+	var $albumid;
 
 	function uploadBehavior() {
 		global $db_ifftp;
 		$this->ifftp = & $db_ifftp;
 		$this->ftype = array();
+	}
+
+	function setFlashAtt($flashatt = null, $savetoalbum = 0, $albumid = 0) {
+		if ($flashatt && is_array($flashatt)) {
+			$this->flashatt = $flashatt;
+		}
+		$this->savetoalbum = $savetoalbum;
+		$this->albumid = $albumid;
+	}
+
+	function getSaveAttach($uid) {
+		$saveAttach = null;
+		if ($this->flashatt && $this->savetoalbum && $this->albumid) {
+			L::loadClass('saveAttach', '', false);
+			$saveAttach = saveAttach::getInstance($uid, $this->albumid, count($this->flashatt));
+		}
+		return $saveAttach;
+	}
+
+	function execute() {
+		PwUpload::upload($this);
 	}
 
 	function allowThumb() {
@@ -302,6 +359,10 @@ class uploadBehavior {
 }
 
 function showUploadMsg($msg) {
-	Showmsg($msg);
+	if (function_exists('showExtraMsg')) {
+		showExtraMsg($msg);
+	} else {
+		Showmsg($msg);
+	}
 }
 ?>

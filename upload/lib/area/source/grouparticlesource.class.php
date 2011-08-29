@@ -56,6 +56,7 @@ class PW_GroupArticleSource extends SystemData {
 	function _cookData($result) {
 		global $db_bbsurl;
 		$result['url'] 	= $db_bbsurl.'/apps.php?q=group&a=read&cyid='.$result['cyid'].'&tid='.$result['tid'];
+		$result['authorurl'] = 'u.php?uid='.$result['authorid'];
 		$result['title'] 	= $result['subject'];
 		$result['image']	= '';
 		return $result;

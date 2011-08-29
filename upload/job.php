@@ -1,5 +1,8 @@
 <?php
 define('SCR', 'job');
+if (isset($_GET['action']) && in_array($_GET['action'], array('mutiupload', 'mutiuploadphoto', 'uploadicon'))) {
+	define('CK', 1);
+}
 require_once ('global.php');
 require_once (R_P . 'require/functions.php');
 
@@ -35,9 +38,13 @@ $whiteActions = array(
 	'activity',//活动
 	'attachbuy', //出售附件
 	'pweditor',
+	'pwschools',
+	'tofloor',//楼层直达
 );
 if (in_array($action, $whiteActions)) {
 	require S::escapePath(R_P . 'actions/job/' . $action . '.php');
+} else {
+	Showmsg('undefined_action');
 }
 
 function fseeks($fp, $dbtdsize, $seed) {

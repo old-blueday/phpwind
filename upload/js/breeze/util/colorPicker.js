@@ -33,22 +33,23 @@ Breeze.namespace('util.colorPicker', function (B) {
                     mainContain = doc.createElement('div'),
                     main = [], list = [], standard = [];
 	            mainContain.style.width = '201px';
+				mainContain.style.paddingTop = '10px';
 	            _mainColor.forEach(function (n) {
-	                var li = '<li><span style="background-color:#' + n + '"></span></li>';
+	                var li = '<li><span style="background-color:#' + n + '" unselectable="on"></span></li>';
 	                main.push(li);
 	            });
 	            mainUl.innerHTML = main.join('');
 	            _colorList.forEach(function (n) {
 	                var li = [];
 	                n.forEach(function (j) {
-	                    var span = '<span style="background-color:#' + j + '"></span>';
+	                    var span = '<span style="background-color:#' + j + '" unselectable="on"></span>';
 	                    li.push(span);
 	                });
 	                list.push('<li>' + li.join('') + '</li>');
 	            });
 	            listUl.innerHTML = list.join('');
 	            _standardColor.forEach(function (n) {
-	                var li = '<li><span title="#' + n + '" style="background-color:#' + n + '"></span></li>';
+	                var li = '<li><span title="#' + n + '" style="background-color:#' + n + '" unselectable="on"></span></li>';
 	                standard.push(li);
 	            });
 	            standardUl.innerHTML = standard.join('');
@@ -62,7 +63,7 @@ Breeze.namespace('util.colorPicker', function (B) {
 	            contain.id = this.id;
 	            contain.style.zIndex = 99999;
 	            contain.style.display = 'none';
-	            contain.className = 'B_menu B_p10';
+	            contain.className = 'B_menu B_p10B';
 	            contain.appendChild(mainContain);
 	            doc.body.appendChild(contain);
 	        }

@@ -1,0 +1,135 @@
+<!--<?php
+include_once PrintEot('left');print <<<EOT
+-->
+<form action="$basename" method="post">
+  <h2 class="h1">标签搜索</h2>
+  <div class="admin_table mb10">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <tr class="tr1 vt">
+      <td class="td1">标签名</td>
+      <td class="td2"><input name="tagname" class="input input_wa mr20" value="$tagname" ></td>
+      <td class="td2">&nbsp;</td>
+    </tr>
+
+    <tr class="tr1 vt">
+      <td class="td1">热门标签</td>
+      <td class="td2">
+		<select name="ifhot" class="select_wa fl mr20">
+          <option  value="" $sel_>所有</option>
+          <option  value="1" $sel_1>允许</option>
+          <option  value="0" $sel_0>不允许</option>
+		</select>
+       是否允许为热门标签</td>
+      <td class="td2">&nbsp;</td>
+    </tr>
+
+    <tr class="tr1 vt">
+      <td class="td1">使用人数</td>
+      <td class="td2">
+        <input type="text" name="startnum" class="input input_wc" value="$startnum">&nbsp;-&nbsp;<input type="text" name="endnum" class="input input_wc" value="$endnum">
+      </td>
+      <td class="td2">&nbsp;</td>
+    </tr>
+  </table>
+  </div>
+  <div class="mb10 tac">
+    <span class="mr10"><span class="btn"><span><button type="submit">提 交</button></span></span></span>
+   </div>
+</form>
+<form action="$basename&" method="post" name="FORM">
+  <input type="hidden" name="action" value="$action">
+  <input type="hidden" name="step" value="2">
+  <input type="hidden" name="tagname" value="$tagname">
+  <input type="hidden" name="ifhot" value="$ifhot">
+  <input type="hidden" name="startnum" value="$startnum">
+  <input type="hidden" name="endnum" value="$endnum">
+  <input type="hidden" name="page" value="$page">
+  <h2 class="h1"><span class="mr10">标签列表</span></h2>
+  <div class="admin_table mb10">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <tr class="tr2 vt td_bgB">
+      <td width="30"><span onclick="CheckAll(document.FORM)" class="cp">全选</span></td>
+      <td>标签名称</td>
+      <td>使用人数</td>
+      <td>热门标签状态</td>
+    </tr>
+<!--
+EOT;
+if (empty($tags)) {print <<<EOT
+-->
+<tr><td class="p10" colspan="9"><div class="admin_tips">啊哦，没有你要的信息！</div></td></tr>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+<!--
+EOT;
+foreach($tags as $value){
+print <<<EOT
+-->
+    <tr class="tr1 vt">
+      <td class="td2"><input type="checkbox" name="tagid[]" value="$value[tagid]"></td>
+      <td class="td2">$value[tagname]</td>
+      <td class="td2">$value[num]</td>
+<!--
+EOT;
+if ($value[ifhot] == '1') {print <<<EOT
+-->
+      <td class="td2">允许</td>
+<!--
+EOT;
+} else {print <<<EOT
+-->
+	  <td class="td2">不允许</td>
+<!--
+EOT;
+}print <<<EOT
+-->
+      <td class="td2">
+<!--
+EOT;
+print <<<EOT
+-->
+      </td>
+    </tr>
+<!--
+EOT;
+}}print <<<EOT
+-->
+  </table>
+  </div>
+  <div class="mt10 cc">$pages</div>
+  <div class="mb10 tac">
+    <input type="radio" name="action" value="deltags" id="deltags" checked />&nbsp;删除标签&nbsp;
+    <input type="radio" name="action" value="sethot" />&nbsp;允许为热门标签&nbsp;
+    <input type="radio" name="action" value="setnothot" />&nbsp;不允许为热门标签&nbsp;
+  </div>
+  <div class="mb10 tac">
+	<span class="bt"><span><button type="button" onclick="CheckAll(document.FORM)">全 选</button></span></span>
+      <span class="btn"><span><button type="submit" onclick="return Checkdel();">提 交</button></span></span>
+   </div>
+</form>
+<script language="JavaScript" src="js/global.js"></script>
+<script language="JavaScript">
+function Checkdel(){
+	var obj = document.FORM["tagid[]"];
+	var ar = obj.length ? obj:[obj];
+		for(var i=0;i<ar.length;i++) {
+			if(ar[i].checked === true) {
+				if (getObj('deltags').checked) {
+					if (confirm('确定删除吗？')) {
+						return true;
+					}
+					return false;
+				}
+				else return true;
+			}
+		}
+showDialog('error','请选择操作对象!', 2);
+return false;
+}
+</script>
+<!--
+EOT;
+include_once PrintEot('adminbottom');
+?>-->

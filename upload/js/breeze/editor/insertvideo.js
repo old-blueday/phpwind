@@ -6,24 +6,24 @@ B.namespace('editor.insertvideo', function(B){
 		B.util.dialog({
 			id: 'B_editor_video',
 			reuse: true,
-			data: '<div class="B_menu B_p10" style="left:720px;top:895px;">\
+			data: '<div class="B_menu B_p10B">\
 	<div style="width:310px;">\
-		<div class="B_h B_drag_handle"><a href="#" class="B_menu_adel B_close">×</a>插入视频</div>\
-		<form name="B_editor_videoForm" class="B_tableA B_mb10">\
-			<table width="100%">\
+		<div class="B_h B_drag_handle"><a href="javascript:;" class="B_menu_adel B_close">×</a>插入视频</div>\
+		<form name="B_editor_videoForm" class="B_tableA">\
+			<table width="100%" class="B_mb10">\
 				<tbody><tr>\
-					<td width="60">视频地址</td>\
-					<td><input name="url" type="text" class="B_input B_fl" size="35"><a href="#" class="B_helpA"><i></i></a></td>\
+					<td width="60">地址：</td>\
+					<td><input name="url" type="text" class="B_input B_fl" size="35"><a class="B_helpA"  onclick="event&&(event.returnValue=false)"><i>支持rm wmn avi flv swf等视频格式链接地址<br />示例：http://server/filename.wmv<br>支持优酷、土豆等视频网站的视频网址</i></a></td>\
 				</tr><tr>\
-					<td>显示尺寸</td>\
+					<td>尺寸：</td>\
 					<td><span class="B_mr20"><input name="w" type="text" class="B_input" size="2" value="480"> 宽</span><span><input name="h" type="text" class="B_input" value="400" size="2"> 高</span></td>\
 				</tr><tr>\
-					<td>自动播放</td>\
-					<td><input name="autoPlay" type="checkbox"></td>\
+					<td>设置：</td>\
+					<td><label><input name="autoPlay" type="checkbox">自动展开</label></td>\
 				</tr>\
 			</tbody></table>\
 		</form>\
-		<div class="B_tac"><span class="B_btn2"><span><button class="B_sumbit" type="button">提 交</button></span></span><span class="B_bt2"><span><button class="B_close" type="button">取 消</button></span></span></div>\
+		<div class="B_tac B_p10"><span class="B_btn2"><span><button class="B_sumbit" type="button">提 交</button></span></span><span class="B_bt2"><span><button class="B_close" type="button">取 消</button></span></span></div>\
 	</div>\
 </div>',
 			callback: function(popup){

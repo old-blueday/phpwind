@@ -185,7 +185,8 @@ class Other {
 	 */
 	function insertHelp($hup = 0,$title,$content,$url = '',$hid = 0,$action = 'add') {
 
-		@include_once pwCache::getPath(D_P.'data/bbscache/help_cache.php');
+		//* @include_once pwCache::getPath(D_P.'data/bbscache/help_cache.php');
+		extract(pwCache::getData(D_P.'data/bbscache/help_cache.php', false));
 		require_once(R_P.'admin/cache.php');
 		$hup = (int)$hup;
 		$hid = (int)$hid;

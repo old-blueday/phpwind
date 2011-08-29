@@ -12,7 +12,8 @@ if ($admintype == 'article') {
 		list($allowfid,$forumcache) = GetAllowForum($admin_name);
 		$sql = $allowfid ? "fid IN($allowfid)" : '0';
 	} else {
-		include pwCache::getPath(D_P.'data/bbscache/forumcache.php');
+		//* include pwCache::getPath(D_P.'data/bbscache/forumcache.php');
+		pwCache::getData(D_P.'data/bbscache/forumcache.php');
 		list($hidefid,$hideforum) = GetHiddenForum();
 		if ($admin_gid == 3) {
 			$forumcache .= $hideforum;
@@ -47,9 +48,9 @@ if ($admintype == 'article') {
 			$rt = $db->get_one("SELECT MAX(tid) AS mtid FROM pw_threads");
 			$pw_tmsgs = GetTtable($rt['mtid']);
 		} else {
-			$pw_tmsgs = $ttable>0 ? 'pw_tmsgs'.$ttable : 'pw_tmsgs';
+			$pw_tmsgs = $ttable>0 ? 'pw_tmsgs'.intval($ttable) : 'pw_tmsgs';
 		}
-		S::gp(array('fid','ifkeep','pstarttime','pendtime','lstarttime','lendtime','author','keyword','userip','lines','direct'));
+		S::gp(array('fid','ifkeep','pstarttime','pendtime','lstarttime','lendtime','author','authorid','keyword','userip','lines','direct'));
 		S::gp(array('tstart','tend','hits','replies','tcounts','counts','page','sphinx','sphinxRange'),'GP',2);
 		if (empty($_POST['step'])) {
 			if($page=="0"){
@@ -58,7 +59,7 @@ if ($admintype == 'article') {
 			$_POST['lstarttime'] && $lstarttime = PwStrtoTime($lstarttime);
 			$_POST['lendtime']   && $lendtime   = PwStrtoTime($lendtime);
 			}
-			if ($fid=='-1' && !$pstarttime && !$pendtime && !$tcounts && !$counts && !$lstarttime && !$lendtime && !$hits && !$replies && !$author && !$keyword && !$userip && !$tstart && !$tend) {
+			if ($fid=='-1' && !$pstarttime && !$pendtime && !$tcounts && !$counts && !$lstarttime && !$lendtime && !$hits && !$replies && !$author && !$authorid && !$keyword && !$userip && !$tstart && !$tend) {
 				adminmsg('noenough_condition');
 			}
 			if (is_numeric($fid) && $fid > 0) {
@@ -92,11 +93,16 @@ if ($admintype == 'article') {
 			} elseif ($counts) {
 				$sql.=" AND char_length(tm.content)<".S::sqlEscape($counts);
 			}
-			if ($author) {
-				$authorarray = explode(",",$author);
+			if ($author || $authorid) {
+				$authorarray = explode(",",($authorid) ? $authorid : $author);
 				foreach ($authorarray as $value) {
-					$value = str_replace('*','%',$value);
-					$authorwhere .= " OR username LIKE ".S::sqlEscape($value,false);
+					if($authorarray=$authorid){
+						$value = intval($value);
+						$authorwhere .= " OR uid LIKE ".S::sqlEscape($value,false);
+					}else{
+						$value = str_replace('*','%',$value);
+						$authorwhere .= " OR username LIKE ".S::sqlEscape($value,false);					
+					}
 				}
 				$authorwhere = substr_replace($authorwhere,"",0,3);
 				$query = $db->query("SELECT uid FROM pw_members WHERE $authorwhere");
@@ -153,7 +159,8 @@ if ($admintype == 'article') {
 			//$pages=numofpage_t($count,$page,$numofpage,"$admin_file?adminjob=superdel&admintype=article&action=$action&fid=$fid&ifkeep=$ifkeep&pstarttime=$pstarttime&pendtime=$pendtime&lstarttime=$lstarttime&lendtime=$lendtime&tstart=$tstart&tend=$tend&hits=$hits&replies=$replies&author=".rawurlencode($author)."&keyword=".rawurlencode($keyword)."&userip=$userip&lines=$lines&ttable=$ttable&tcounts=$tcounts&counts=$counts&sphinx=$sphinx&sphinxRange=$sphinxRange&");
 			$pages = pagerforjs($count, $page, $numofpage, "onclick=\"manageclass.superdel(this,'del_tpc_form','')\"");
 			$delid = $topicdb = array();
-			include pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
+			//* include pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
+			pwCache::getData(D_P.'data/bbscache/forum_cache.php');
 			while ($topic = $db->fetch_array($query)) {
 				if ($_POST['direct']) {
 					$delid[$topic['tid']] = $topic['fid'];
@@ -184,7 +191,7 @@ if ($admintype == 'article') {
 			//$delarticle->delTopic($readdb, $db_recycle); /*需要使用回收站功能？*/
 			$delarticle->delTopic($readdb, false);
 								
-			adminmsg('operate_success',"$admin_file?adminjob=superdel&admintype=article&action=$action&fid=$_POST[fid]&ifkeep=$ifkeep&pstarttime=$pstarttime&pendtime=$pendtime&lstarttime=$lstarttime&lendtime=$lendtime&tstart=$tstart&tend=$tend&hits=$_POST[hits]&replies=$_POST[replies]&author=".rawurlencode($author)."&keyword=".rawurlencode($keyword)."&userip=$userip&lines=$lines&ttable=$ttable&tcounts=$tcounts&counts=$counts&page=$page");
+			adminmsg('operate_success',"$admin_file?adminjob=superdel&admintype=article&action=$action&fid=$_POST[fid]&ifkeep=$ifkeep&pstarttime=$pstarttime&pendtime=$pendtime&lstarttime=$lstarttime&lendtime=$lendtime&tstart=$tstart&tend=$tend&hits=$_POST[hits]&replies=$_POST[replies]&author=".rawurlencode($author)."&authorid=$authorid&keyword=".rawurlencode($keyword)."&userip=$userip&lines=$lines&ttable=$ttable&tcounts=$tcounts&counts=$counts&page=$page");
 
 		}
 	} elseif ($action == 'delrpl') {

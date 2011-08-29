@@ -1,6 +1,7 @@
 <?php
 require_once('global.php');
-include_once pwCache::getPath(D_P.'data/bbscache/ol_config.php');
+//* include_once pwCache::getPath(D_P.'data/bbscache/ol_config.php');
+pwCache::getData(D_P.'data/bbscache/ol_config.php');
 if(!$ol_onlinepay){
 	Showmsg($ol_whycolse);
 }
@@ -16,36 +17,13 @@ if ($_GET['verifycode'] != $ol_paypalcode) {
 	S::gp(array('invoice','mc_gross'));
 	$rt = $db->get_one("SELECT c.*,m.username FROM pw_clientorder c LEFT JOIN pw_members m USING(uid) WHERE order_no=".S::sqlEscape($invoice));
 	if ($rt['state'] == '0') {
-		if ($rt['number'] != $mc_gross) {
+		if ($rt['price'] != $mc_gross) {
 			Showmsg('gross_error');
 		}
-		$rmbrate = $db_creditpay[$rt['paycredit']]['rmbrate'];
-		!$rmbrate && $rmbrate = 10;
-		$currency = $rt['number'] * $rmbrate;
-
-		require_once(R_P.'require/credit.php');
-		$credit->addLog('main_olpay',array($rt['paycredit'] => $currency),array(
-			'uid'		=> $rt['uid'],
-			'username'	=> $rt['username'],
-			'ip'		=> $onlineip,
-			'number'	=> $rt['number']
-		));
-		$credit->set($rt['uid'],$rt['paycredit'],$currency);
-
-		$descrip = getLangInfo('other','paypal_orders');
-		$db->update("UPDATE pw_clientorder SET state=2,descrip=".S::sqlEscape($descrip,false)."WHERE order_no=".S::sqlEscape($invoice));
-		
-		M::sendNotice(
-			array($rt['username']),
-			array(
-				'title' => getLangInfo('writemsg','olpay_title'),
-				'content' => getLangInfo('writemsg','olpay_content_2',array(
-					'currency'	=> $currency,
-					'cname'		=> $credit->cType[$rt['paycredit']],
-					'number'	=> $rt['number']
-				)),
-			)
-		);
+		if (file_exists(R_P."require/olpay/pay_{$rt[type]}.php")) {
+			require_once S::escapePath(R_P."require/olpay/pay_{$rt[type]}.php");
+		}
+		$db->update("UPDATE pw_clientorder SET state=2 WHERE order_no=" . S::sqlEscape($invoice));
 
 		require_once(R_P.'require/posthost.php');
 		$getdb = '';

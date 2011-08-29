@@ -342,6 +342,8 @@ function simpleInvite(form){
 			showTips('邮件数超过上限20');
 		}else if(status == 'mode_o_extra_toolang'){
 			showTips('邮件正文过长,限200字节');
+		} else {
+			showTips(status);
 		}
 	});
 }

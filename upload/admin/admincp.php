@@ -20,7 +20,8 @@ S::filter();
 
 
 
-include_once pwCache::getPath(D_P.'data/bbscache/config.php');
+//* include_once pwCache::getPath(D_P.'data/bbscache/config.php');
+pwCache::getData(D_P.'data/bbscache/config.php');
 
 define('AREA_PATH', R_P . $db_htmdir . '/channel/');
 define('PORTAL_PATH', R_P . $db_htmdir . '/portal/');
@@ -70,9 +71,12 @@ if (D_P != R_P && $db_http != 'N') {
 	$R_url = $db_bbsurl;
 }
 
-include_once pwCache::getPath(D_P."data/style/wind.php");
-include_once pwCache::getPath(D_P.'data/sql_config.php');
-include_once pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
+//* include_once pwCache::getPath(D_P."data/style/wind.php");
+//* include_once pwCache::getPath(D_P.'data/sql_config.php');
+//* include_once pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
+pwCache::getData(D_P."data/style/wind.php");
+require D_P.'data/sql_config.php';
+pwCache::getData(D_P.'data/bbscache/forum_cache.php');
 
 require_once(R_P.'admin/cache.php');
 !is_array($manager) && $manager = array();
@@ -94,8 +98,8 @@ if ($database=='mysqli' && Pwloaddl('mysqli')===false) {
 }
 
 $bbsrecordfile = D_P.'data/bbscache/admin_record.php';
-/** !file_exists($bbsrecordfile) && writeover($bbsrecordfile,"<?php die;?>\n"); **/
-!file_exists($bbsrecordfile) && pwCache::setData($bbsrecordfile,"<?php die;?>\n");
+!file_exists($bbsrecordfile) && writeover($bbsrecordfile,"<?php die;?>\n");
+/** !file_exists($bbsrecordfile) && pwCache::setData($bbsrecordfile,"<?php die;?>\n"); **/
 
 $F_count	= F_L_count($bbsrecordfile,2000);
 $L_T		= 1200-($timestamp-pwFilemtime($bbsrecordfile));
@@ -142,8 +146,8 @@ if (!empty($CK)) {
 
 if (empty($rightset)) {
 	if ($_POST['admin_name'] || $_POST['admin_pwd']) {
-		/** writeover($bbsrecordfile,'|'.str_replace('|','&#124;',S::escapeChar($_POST['admin_name'])).'|'.str_replace('|','&#124;',S::escapeChar($_POST['admin_pwd']))."|Logging Failed|$onlineip|$timestamp|\n",'ab'); **/
-		pwCache::setData($bbsrecordfile,'|'.str_replace('|','&#124;',S::escapeChar($_POST['admin_name'])).'|'.str_replace('|','&#124;',S::escapeChar($_POST['admin_pwd']))."|Logging Failed|$onlineip|$timestamp|\n", false, 'ab');
+		writeover($bbsrecordfile,'|'.str_replace('|','&#124;',S::escapeChar($_POST['admin_name'])).'|'.str_replace('|','&#124;',S::escapeChar($_POST['admin_pwd']))."|Logging Failed|$onlineip|$timestamp|\n",'ab');
+		/** pwCache::setData($bbsrecordfile,'|'.str_replace('|','&#124;',S::escapeChar($_POST['admin_name'])).'|'.str_replace('|','&#124;',S::escapeChar($_POST['admin_pwd']))."|Logging Failed|$onlineip|$timestamp|\n", false, 'ab'); **/
 		
 		$db_adminrecord	= 0;
 		$REQUEST_URI	= $pwServer['PHP_SELF'];
@@ -180,7 +184,8 @@ if ($db_ifsafecv && strpos($db_safegroup,",$admin_gid,")!==false && !$CK[3]) {
 	Cookie('AdminUser','',0);
 	adminmsg('safecv_prompt');
 }
-include_once pwCache::getPath(D_P.'data/bbscache/level.php');
+//* include_once pwCache::getPath(D_P.'data/bbscache/level.php');
+pwCache::getData(D_P.'data/bbscache/level.php');
 !defined('If_manager') && define('If_manager',0);
 if (!If_manager) {
 	Iplimit();
@@ -197,8 +202,8 @@ if (!If_manager) {
 }
 $_postdata  = $_POST ? PostLog($_POST) : '';
 $new_record = '|'.str_replace('|','&#124;',S::escapeChar($admin_name)).'||'.str_replace('|','&#124;',S::escapeChar($REQUEST_URI))."|$onlineip|$timestamp|$_postdata|\n";
-//* writeover($bbsrecordfile,$new_record,"ab");
-pwCache::setData($bbsrecordfile,$new_record, false, "ab");
+writeover($bbsrecordfile,$new_record,"ab");
+//* pwCache::setData($bbsrecordfile,$new_record, false, "ab");
 
 if ($pwServer['REQUEST_METHOD'] == 'POST') {
 	$referer_a = @parse_url($pwServer['HTTP_REFERER']);
@@ -421,7 +426,7 @@ function PrintEot($template,$EXT='htm') {
 	$tplpath = L::style('tplpath');
 	!$template && $template = 'N';
 	//cms
-	if ($template=='bbscode' || in_array($template,array('c_header','c_footer'))) {
+	if ($template=='bbscode' || in_array($template,array('wysiwyg_editor_common','c_header','c_footer'))) {
 		if (file_exists(R_P."template/$tplpath/$template.$EXT")) {
 			return R_P."template/$tplpath/$template.$EXT";
 		} elseif (file_exists(R_P."template/wind/$template.$EXT")) {
@@ -803,5 +808,17 @@ function updateadmin() {
 			$db->update("REPLACE INTO pw_administrators (uid,username,groupid,groups) VALUES ".S::sqlMulti($pwSQL));
 		}
 	}
+}
+function setstatus(&$status, $b, $setv = '1') {
+	--$b;
+	for ($i = strlen($setv) - 1; $i >= 0; $i--) {
+		if ($setv[$i]) {
+			$status |= 1 << $b;
+		} else {
+			$status &= ~(1 << $b);
+		}
+		++$b;
+	}
+	//return $status;
 }
 ?>

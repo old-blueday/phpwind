@@ -724,8 +724,10 @@ if ($action == 'toptopic') {
 	}
 
 } elseif ($action == 'type') {
-	include_once pwCache::getPath(D_P.'data/bbscache/cache_post.php');
-	include_once pwCache::getPath(D_P.'data/bbscache/forum_typecache.php');
+	//* include_once pwCache::getPath(D_P.'data/bbscache/cache_post.php');
+	//* include_once pwCache::getPath(D_P.'data/bbscache/forum_typecache.php');
+	pwCache::getData(D_P.'data/bbscache/cache_post.php');
+	pwCache::getData(D_P.'data/bbscache/forum_typecache.php');
 	$fid = $colony['classid'];
 	$t_db = (array)$topic_type_cache[$fid];
 	if (empty($_POST['step'])) {

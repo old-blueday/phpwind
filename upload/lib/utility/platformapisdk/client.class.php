@@ -3,6 +3,76 @@
  * Warning: should be coded in php4
  */
 !function_exists('readover') && exit('Forbidden');
+
+
+define('PW_PLATFORM_CLIENT_DEFAULT_ADMIN_USER_ID', '-1');
+define('PW_PLATFORM_CLIENT_DEFAULT_GUEST_USER_ID', '-99');
+
+class PlatformApiClient extends PlatformApiProtocol {
+
+	/**
+	 * 通过GET请求平台标准api接口
+	 * 
+	 * @param string $method 接口名，如：weibo.site.bind
+	 * @param array $params 接口参数
+	 * @return string
+	 */
+	function get($method, $params = array()) {
+		$method = $this->_checkMethod($method);
+		return HttpClient::get($this->_buildRequestUrl($method), $this->_buildSignedQueryString($method, $params));
+	}
+	
+	/**
+	 * 通过POST请求平台标准api接口
+	 * 
+	 * @param string $method 接口名，如：weibo.site.bind
+	 * @param array $params 接口参数
+	 * @return string
+	 */
+	function post($method, $params = array()) {
+		$method = $this->_checkMethod($method);
+		return HttpClient::post($this->_buildRequestUrl($method), $this->_buildSignedQueryString($method, $params));
+	}
+	
+	/**
+	 * 生成平台对站点开放的入口页面的URL
+	 * 
+	 * @param int $siteUserId 站点用户id，如无填0
+	 * @param string $method 接口名，如：weibo.site.bind
+	 * @param array $params 接口参数
+	 * @return string URL
+	 */
+	function buildPageUrl($siteUserId, $method, $params = array()) {
+		$method = $this->_checkMethod($method);
+		$params['site_uid'] = intval($siteUserId);
+		return $this->_buildRequestUrl($method) . "?" . $this->_buildSignedQueryString($method, $params);
+	}
+	
+	/**
+	 * 生成平台对站点公共页面（不需要身份验证）的URL
+	 * 
+	 * @param string $method 接口名，如：openim.bind.intro
+	 * @param array $params 接口参数
+	 * @return string URL
+	 */
+	function buildPublicPageUrl($method, $params = array()) {
+		$method = $this->_checkMethod($method);
+		return $this->_buildRequestUrl($method) . "?" . $this->_buildPublicQueryString($params);
+	}
+}
+
+class PlatformApiClientUtility {
+	function convertCharset($inCharset, $outCharset, $data) {
+		return pwConvert($data, $outCharset, $inCharset);
+	}
+	
+	function decodeJson($jsonString) {
+		L::loadClass('json', 'utility', false);
+		$json = new Services_JSON();
+		return $json->decode($jsonString);
+	}
+}
+
 class PlatformApiProtocol {
 	var $_appKey = '';
 	var $_appSecret = '';
@@ -136,72 +206,6 @@ class PlatformApiProtocol {
 	
 	function _throwError($msg) {
 		die($msg . '');
-	}
-}
-
-
-class PlatformApiClient extends PlatformApiProtocol {
-
-	/**
-	 * 通过GET请求平台标准api接口
-	 * 
-	 * @param string $method 接口名，如：weibo.site.bind
-	 * @param array $params 接口参数
-	 * @return string
-	 */
-	function get($method, $params = array()) {
-		$method = $this->_checkMethod($method);
-		return HttpClient::get($this->_buildRequestUrl($method), $this->_buildSignedQueryString($method, $params));
-	}
-	
-	/**
-	 * 通过POST请求平台标准api接口
-	 * 
-	 * @param string $method 接口名，如：weibo.site.bind
-	 * @param array $params 接口参数
-	 * @return string
-	 */
-	function post($method, $params = array()) {
-		$method = $this->_checkMethod($method);
-		return HttpClient::post($this->_buildRequestUrl($method), $this->_buildSignedQueryString($method, $params));
-	}
-	
-	/**
-	 * 生成平台对站点开放的入口页面的URL
-	 * 
-	 * @param int $siteUserId 站点用户id，如无填0
-	 * @param string $method 接口名，如：weibo.site.bind
-	 * @param array $params 接口参数
-	 * @return string URL
-	 */
-	function buildPageUrl($siteUserId, $method, $params = array()) {
-		$method = $this->_checkMethod($method);
-		$params['site_uid'] = intval($siteUserId);
-		return $this->_buildRequestUrl($method) . "?" . $this->_buildSignedQueryString($method, $params);
-	}
-	
-	/**
-	 * 生成平台对站点公共页面（不需要身份验证）的URL
-	 * 
-	 * @param string $method 接口名，如：openim.bind.intro
-	 * @param array $params 接口参数
-	 * @return string URL
-	 */
-	function buildPublicPageUrl($method, $params = array()) {
-		$method = $this->_checkMethod($method);
-		return $this->_buildRequestUrl($method) . "?" . $this->_buildPublicQueryString($params);
-	}
-}
-
-class PlatformApiClientUtility {
-	function convertCharset($inCharset, $outCharset, $data) {
-		return pwConvert($data, $outCharset, $inCharset);
-	}
-	
-	function decodeJson($jsonString) {
-		L::loadClass('json', 'utility', false);
-		$json = new Services_JSON();
-		return $json->decode($jsonString);
 	}
 }
 

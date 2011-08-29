@@ -3,7 +3,8 @@
 $wind_in = 'toolcenter';
 $USCR = 'set_toolcenter';
 
-require_once pwCache::getPath(D_P.'data/bbscache/level.php');
+//* require_once pwCache::getPath(D_P.'data/bbscache/level.php');
+pwCache::getData(D_P.'data/bbscache/level.php');
 
 if(!$db_hackdb[$wind_in] || !file_exists(R_P."u/require/profile/toolcenter.php")){
 	Showmsg('hack_error');
@@ -343,7 +344,8 @@ if (empty($job)) {
 					procUnLock('tool_buy',$winduid);
 					Showmsg('undefined_action');
 				}
-				include_once pwCache::getPath(D_P.'data/bbscache/ol_config.php');
+				//* include_once pwCache::getPath(D_P.'data/bbscache/ol_config.php');
+				pwCache::getData(D_P.'data/bbscache/ol_config.php');
 				if (!$ol_onlinepay) {
 					procUnLock('tool_buy',$winduid);
 					Showmsg($ol_whycolse);

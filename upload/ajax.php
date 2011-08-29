@@ -12,7 +12,7 @@ $pwpost  = new PwPost($pwforum);
 $pwpost->forumcheck();
 $pwpost->postcheck();
 
-list($uploadcredit,$uploadmoney,$downloadmoney,$downloadimg) = explode("\t", $pwforum->forumset['uploadset']);
+//list($uploadcredit,$uploadmoney,$downloadmoney,$downloadimg) = explode("\t", $pwforum->forumset['uploadset']);
 
 if ($groupid == 6 || getstatus($winddb['userstatus'], PW_USERSTATUS_BANUSER)) {
 	$pwSQL = '';
@@ -148,6 +148,7 @@ if ($action == 'modify') {
 		if ($postmodify->type == 'topic') {
 			$postdata = new topicPostData($pwpost);
 		} else {
+			$pid = 'tpc';
 			$postdata = new replyPostData($pwpost);
 		}
 		$postdata->initData($postmodify);
@@ -159,10 +160,6 @@ if ($action == 'modify') {
 
 		extract(L::style());
 
-		$aids = array();
-		if ($atcdb['attachs']) {
-			$aids = attachment($atc_content);
-		}
 		$leaveword = $atcdb['leaveword'] ? leaveword($atcdb['leaveword']) : '';
 		$content   = convert($postdata->data['content'] . $leaveword, $db_windpost);
 
@@ -177,46 +174,14 @@ if ($action == 'modify') {
 		}
 		$creditnames = pwCreditNames();
 
-		if ($aids) {
-			if ($winduid == $atcdb['authorid'] || $pwpost->isGM || pwRights($pwpost->isBM, 'delattach')) {
-				$dfadmin = 1;
-			} else {
-				$dfadmin = 0;
-			}
-			foreach ($atcdb['attachs'] as $at) {
-				if (!in_array($at['aid'], $aids)) {
-					continue;
-				}
-				$atype = '';
-				$rat = array();
-				if ($at['type'] == 'img' && $at['needrvrc'] == 0 && (!$downloadimg || !$downloadmoney || $_G['allowdownload'] == 2)) {
-					$a_url = geturl($at['attachurl'],'show');
-					if (is_array($a_url)) {
-						$atype = 'pic';
-						$dfurl = '<br>'.cvpic($a_url[0], 1, $db_windpost['picwidth'], $db_windpost['picheight'], $at['ifthumb']);
-						$rat = array('aid' => $at['aid'], 'img' => $dfurl, 'dfadmin' => $dfadmin, 'desc' => $at['descrip']);
-					} elseif ($a_url == 'imgurl') {
-						$atype = 'picurl';
-						$rat = array('aid' => $at['aid'], 'name' => $at['name'], 'dfadmin' => $dfadmin, 'verify' => md5("showimg{$tid}{$read[pid]}{$fid}{$at[aid]}{$db_hash}"));
-					}
-				} else {
-					$atype = 'downattach';
-					if ($at['needrvrc'] > 0) {
-						!$at['ctype'] && $at['ctype'] = $at['special'] == 2 ? 'money' : 'rvrc';
-						$at['special'] == 2 && $db_sellset['price'] > 0 && $at['needrvrc'] = min($at['needrvrc'], $db_sellset['price']);
-					}
-					$rat = array('aid' => $at['aid'], 'name' => $at['name'], 'size' => $at['size'], 'hits' => $at['hits'], 'needrvrc' => $at['needrvrc'], 'special' => $at['special'], 'cname' => $creditnames[$at['ctype']], 'type' => $at['type'], 'dfadmin' => $dfadmin, 'desc' => $at['descrip'], 'ext' => strtolower(substr(strrchr($at['name'],'.'),1)));
-				}
-				if ($atype) {
-					$content = attcontent($content, $atype, $rat);
-				}
-			}
+		if ($atcdb['attachs']) {
+			$attachShow = new attachShow(($pwpost->isGM || pwRights($pwpost->isBM, 'delattach')), $pwforum->forumset['uploadset']);
+			$attachShow->setData($atcdb['attachs']);
+			$attachShow->parseAttachs($pid, $content, $winduid == $atcdb['authorid']);
 		}
 		$alterinfo && $content .= "<div id=\"alert_$pid\" style=\"color:gray;margin-top:30px\">[ $alterinfo ]</div>";
 		$atcdb['icon'] = $atcdb['icon'] ? "<img src=\"$imgpath/post/emotion/$atcdb[icon].gif\" align=\"left\" border=\"0\" />" : '';
-/*		if (!$postdata->getIfcheck()) {
-			Showmsg('post_verify');
-		}*/
+
 		if (!$postdata->getIfcheck()) {
 			if ($postdata->filter->filter_weight == 2) {
 				$banword = implode(',',$postdata->filter->filter_word);

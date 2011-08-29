@@ -21,7 +21,7 @@ if ($adminitem == 'adminlog') {
 				$output=array_slice($bbslogfiledata,0,100);
 				$output=array_reverse($output);
 				$output="<?php die;?>\r\n".implode("",$output);
-				pwCache::setData($bbsrecordfile,$output);
+				pwCache::writeover($bbsrecordfile,$output);
 				adminmsg('log_del');
 			}else{
 				adminmsg('log_min');
@@ -97,8 +97,10 @@ if($action=='search'){
 	if(!$action){
 	require_once GetLang('logtype');
 	require_once(R_P.'require/bbscode.php');
-	include_once pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
-	include pwCache::getPath(D_P.'data/bbscache/forumcache.php');
+	//* include_once pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
+	pwCache::getData(D_P.'data/bbscache/forum_cache.php');
+	//* include pwCache::getPath(D_P.'data/bbscache/forumcache.php');
+	pwCache::getData(D_P.'data/bbscache/forumcache.php');
 	S::gp(array('page','username1','username2','fid','type'));
 	//增加所属板块@modify panjl@2010-11-2
 	$forumcache = str_replace("<option value=\"$fid\">","<option value=\"$fid\" selected>",$forumcache);
@@ -155,10 +157,10 @@ if($action=='search'){
 	S::gp(array('content','jumpurl'));
 	if ($content) {
 		/** !file_exists($bbscrecordfile) && writeover($bbscrecordfile,"<?php die;?>\n"); **/
-		!file_exists($bbscrecordfile) && pwCache::setData($bbscrecordfile,"<?php die;?>\n");
+		!file_exists($bbscrecordfile) && pwCache::writeover($bbscrecordfile,"<?php die;?>\n");
 		$new_crecord = '|'.str_replace('|','&#124;',S::escapeChar($admin_name)).'|'."|$onlineip|$timestamp|".'|'.str_replace('|','&#124;',$content)."\n";
 		//* writeover($bbscrecordfile,$new_crecord,"ab");
-		pwCache::setData($bbscrecordfile,$new_crecord, false, "ab");
+		pwCache::writeover($bbscrecordfile,$new_crecord, false, "ab");
 	}
 	ObHeader($jumpurl);
 	} elseif ($type == 'del') {
@@ -172,7 +174,7 @@ if($action=='search'){
 			$output=array_reverse($output);
 			$output="<?php die;?>\r\n".implode("",$output);
 			//* writeover($bbscrecordfile,$output);
-			pwCache::setData($bbscrecordfile,$output);
+			pwCache::writeover($bbscrecordfile,$output);
 			adminmsg('adminrecord_del');
 		}else{
 			adminmsg('adminrecord_min');

@@ -51,7 +51,7 @@ print <<<EOT
 		<td>$count 篇</td>
 	</tr>
     <tr class="tr3">
-		<td>标题</td>
+		<td>标　　题:</td>
 		<td>{$subject}</td>
 	</tr>
 	<tr id="ok1" class="tr3">
@@ -85,7 +85,7 @@ print <<<EOT
 		</td>
 	</tr>
 	<tr id="ok3" class="tr3">
-		<td>评分理由：</td>
+		<td>评分理由:</td>
 		<td>
 			<div class="mb5">
 			<select onchange="this.form.atc_content.value=this.value;cutStrContent();" style="width:320px;" class="mb5">
@@ -132,6 +132,7 @@ showgd();
 <!--
 EOT;
 }
+list($postq,$showq) = explode("\t", $db_qcheck);
 if(($db_ckquestion & 4) && (!$postq || $winddb['postnum'] < $postq) && $db_question){
 $qkey = array_rand($db_question);
 if($db_imagequestion){
@@ -549,7 +550,7 @@ EOT;
 print <<<EOT
 -->
 	<tr class="tr3">
-		<td align="center">认证码：</td>
+		<td align="center">验证码：</td>
 		<td><img src="ck.php?nowtime=1" align="absmiddle" onclick="this.src='ck.php?nowtime=' + new Date().getTime();" style="cursor:pointer;" /><br />
 			<input type="text" class="input" name="gdcode" size="8" />
 		</td>
@@ -1036,8 +1037,10 @@ function post(form) {
 </script>
 <script type="text/javascript" language="JavaScript" src="apps/weibo/js/post.js"></script>
 <script language="javascript">
-var pw_weiboPost = new weibo_post({form:'weibo_form',content:'weibo_content'});
-setTimeout(function(){pw_weiboPost.checkWordLength();}, 300);
+setTimeout(function(){
+	var pw_weiboPost = new weibo_post({form:'weibo_form',content:'weibo_content'});
+	pw_weiboPost.checkWordLength();
+}, 300);
 </script>
 <!--
 EOT;

@@ -36,12 +36,19 @@ $tpcsBuyDate = $tpcs['buy'] ? unserialize($tpcs['buy']) : array();
 require_once (R_P . 'require/credit.php');
 
 if ($type == 'record') {
+	S::gp(array('page'));
+	$page = (int) $page;
+	$page < 1 && $page = 1;
+	$db_perpage = 10;
+	$total = count($tpcsBuyDate);
+	$tpcsBuyDate = array_slice($tpcsBuyDate, ($page - 1) * $db_perpage, $db_perpage);
+	$pages = numofpage($total, $page, ceil($total/$db_perpage), "job.php?action=buytopic&type=record&tid=$tid&pid=$pid&", null, 'ajaxurl');
 	$buyers = array();
 	foreach ($tpcsBuyDate as $key => $buy) {
 		$buy['createdtime'] = get_date($buy['createdtime'],'Y-m-d H:i');
 		$buy['cost'] = $buy['creditvalue'];
 		$buy['ctype'] = $credit->cType[$buy['credittype']];
-		$buyers[$key] = $buy;
+		$buyers[$buy['uid']] = $buy;
 	}
 	require_once PrintEot($template);
 	ajax_footer();
@@ -81,7 +88,7 @@ if ($type == 'record') {
 		));
 		$credit->set($winduid, $credittype, -$creditvalue, false);
 		
-		$creditvalue > 10 && $creditvalue = $creditvalue * 0.9;
+//		$creditvalue > 10 && $creditvalue = $creditvalue * 0.9;
 		$income = $creditvalue * $count;
 		if (!$db_sellset['income'] || $income < $db_sellset['income']) {
 			$credit->addLog('topic_sell', array(

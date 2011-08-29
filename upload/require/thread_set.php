@@ -11,7 +11,8 @@ $foruminfo =& $pwforum->foruminfo;
 $groupRight =& $newColony->getRight();
 $pwModeImg = "$imgpath/apps";
 require_once(R_P . 'u/require/core.php');
-include_once pwCache::getPath(D_P . 'data/bbscache/o_config.php');
+//* include_once pwCache::getPath(D_P . 'data/bbscache/o_config.php');
+pwCache::getData(D_P . 'data/bbscache/o_config.php');
 
 require_once(R_P . 'require/header.php');
 list($guidename, $forumtitle) = $pwforum->getTitle();
@@ -149,7 +150,8 @@ if (empty($t)) {
 			}
 		}
 		
-		$db->update("UPDATE pw_colonys SET " . S::sqlSingle($pwSQL) . ' WHERE id=' . S::sqlEscape($cyid));
+		//* $db->update("UPDATE pw_colonys SET " . S::sqlSingle($pwSQL) . ' WHERE id=' . S::sqlEscape($cyid));
+		pwQuery::update('pw_colonys', 'id=:id', array($cyid),$pwSQL);
 
 		refreshto("{$basename}",'colony_setsuccess');
 	}
@@ -173,7 +175,8 @@ if (empty($t)) {
 				Showmsg('content_wordsfb');
 		}
 	}
-	$db->update("UPDATE pw_colonys SET " . S::sqlSingle($pwSQL) . ' WHERE id=' . S::sqlEscape($cyid));
+	//* $db->update("UPDATE pw_colonys SET " . S::sqlSingle($pwSQL) . ' WHERE id=' . S::sqlEscape($cyid));
+	pwQuery::update('pw_colonys', 'id=:id', array($cyid),$pwSQL);
 	refreshto("{$basename}",'colony_setsuccess');
 	
 } elseif ($t == 'style') {
@@ -195,7 +198,8 @@ if (empty($t)) {
 			'colonystyle' => $colonystyle
 		);
 
-		$db->update("UPDATE pw_colonys SET " . S::sqlSingle($pwSQL) . ' WHERE id=' . S::sqlEscape($cyid));
+		//* $db->update("UPDATE pw_colonys SET " . S::sqlSingle($pwSQL) . ' WHERE id=' . S::sqlEscape($cyid));
+		pwQuery::update('pw_colonys', 'id=:id', array($cyid), $pwSQL);
 
 		refreshto("{$basename}&t=$t",'colony_setsuccess');
 	}
@@ -226,8 +230,9 @@ if (empty($t)) {
 			'ifannouceopen'=>$ifannouceopen
 		);
 
-		$db->update("UPDATE pw_colonys SET " . S::sqlSingle($pwSQL) . ' WHERE id=' . S::sqlEscape($cyid));
-
+		//* $db->update("UPDATE pw_colonys SET " . S::sqlSingle($pwSQL) . ' WHERE id=' . S::sqlEscape($cyid));
+		pwQuery::update('pw_colonys', 'id=:id', array($cyid), $pwSQL);
+		
 		refreshto("{$basename}&t=$t",'colony_setsuccess');
 	}
 
@@ -308,7 +313,8 @@ if (empty($t)) {
 			Showmsg('您选择的用户没有接受的权限!');
 		}
 
-		$db->update("UPDATE pw_colonys SET admin=" . S::sqlEscape($userdb['username']) . ' WHERE id=' . S::sqlEscape($cyid));
+		//* $db->update("UPDATE pw_colonys SET admin=" . S::sqlEscape($userdb['username']) . ' WHERE id=' . S::sqlEscape($cyid));
+		pwQuery::update('pw_colonys', 'id=:id', array($cyid), array('admin'=>$userdb['username']));
 		
 		M::sendNotice(
 			array($userdb['username']),
@@ -357,7 +363,8 @@ if (empty($t)) {
 		}
 		updateUserAppNum($cMembers,'group','minus');
 		$db->update("DELETE FROM pw_cmembers WHERE colonyid=" . S::sqlEscape($cyid));
-		$db->update("DELETE FROM pw_colonys WHERE id=" . S::sqlEscape($cyid));
+		//* $db->update("DELETE FROM pw_colonys WHERE id=" . S::sqlEscape($cyid));
+		pwQuery::delete('pw_colonys', 'id=:id', array($cyid));
 		$db->update("UPDATE pw_cnclass SET cnsum=cnsum-1 WHERE fid=" . S::sqlEscape($colony['classid']) . " AND cnsum>0");
 		$db->update("DELETE FROM pw_argument WHERE cyid=" . S::sqlEscape($cyid));
 		

@@ -34,6 +34,18 @@ class PW_Datanalyse {
 		$this->_clearNotExistData($data,$action);
 		return $this->_sortResultData($data);
 	}
+	
+	/**
+	 * 根据action获取热门文章列表
+	 * @param string/array $action
+	 * @param int $num
+	 * @param int $time
+	 */
+	function getHotArticleByAction($action, $num, $time = '') {
+		if (!$this->_filterAction($action)) return array();
+		$this->_formatResultData($this->datanalyseDB->getDataOderByTag($action, $num, $time));
+		return $this->_getHotArticlesByTags();
+	}
 
 	function _clearNotExistData($data, $action) {
 		if (count($data) == count($this->tags)) return;
@@ -180,7 +192,8 @@ class PW_Datanalyse {
 	 */
 	function _readFileByKey($key, $value = '') {
 		$_filename = D_P . "data/bbscache/datanalyse.php";
-		if (file_exists($_filename)) include pwCache::getPath($_filename);
+		//* if (file_exists($_filename)) include pwCache::getPath($_filename);
+		if (file_exists($_filename)) extract(pwCache::getData($_filename, false));
 		$_data = "\$overtimes=array(\r\n";
 		$_result = '';
 		foreach ((array) $overtimes as $k => $var) {

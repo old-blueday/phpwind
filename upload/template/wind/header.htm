@@ -6,11 +6,18 @@ print <<<EOT
 --><!doctype html>
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=$db_charset" />
+<meta charset="$db_charset" />
 <title>$webPageTitle - Powered by phpwind</title>
 <meta name="generator" content="phpwind v{$metaVersion}" />
 <meta name="description" content="$metaDescription" />
 <meta name="keywords" content="$metaKeywords" />
+<!--[if IE 9 ]>
+<meta name="msapplication-task" content="name=网站首页; action-uri=$db_bbsurl; icon-uri=$db_bbsurl/favicon.ico" />
+<meta name="msapplication-task" content="name=个人中心; action-uri=$db_bbsurl/u.php; icon-uri=$db_bbsurl/images/ico/home.ico" />
+<meta name="msapplication-task" content="name=我的帖子; action-uri=$db_bbsurl/apps.php?q=article; icon-uri=$db_bbsurl/images/ico/post.ico" />
+<meta name="msapplication-task" content="name=消息中心; action-uri=$db_bbsurl/message.php; icon-uri=$db_bbsurl/images/ico/mail.ico" />
+<meta name="msapplication-task" content="name=我的设置; action-uri=$db_bbsurl/profile.php; icon-uri=$db_bbsurl/images/ico/edit.ico" />
+<![endif]-->
 <link rel='archives' title='$db_bbsname' href='$db_bbsurl/simple/' />
 <!--
 EOT;
@@ -28,25 +35,26 @@ if(SCR == 'read' && $link_ref_canonical){print <<<EOT
 EOT;
 }print <<<EOT
 -->
-<link rel="stylesheet" type="text/css" href="$imgpath/pw_core.css?101128" media="all" />
+<link rel="stylesheet" href="$imgpath/pw_core.css?101128" />
 <!--
 EOT;
 @include Pcv($css_path);
 if($pwModeCss){print <<<EOT
---><link rel="stylesheet" type="text/css" href="$pwModeCss" />
+--><link rel="stylesheet" href="$pwModeCss" />
 <!--
 EOT;
-}if($_COOKIE['widthCfg'] == 1){print <<<EOT
+}if(($db_shiftstyle == 1 && $_COOKIE['widthCfg'] == 1) || $db_shiftstyle == 2){print <<<EOT
 -->
-<link id="fullscreenStyle" rel="stylesheet" type="text/css" href="$imgpath/fullscreen.css" media="all" />
+<link id="fullscreenStyle" rel="stylesheet" href="$imgpath/fullscreen.css" />
 <!--
 EOT;
 }print <<<EOT
 -->
 <SCRIPT type="text/javascript" language="JavaScript" src="js/core/core.js"></SCRIPT>
 <script type="text/javascript" language="JavaScript" src="js/pw_ajax.js"></script>
-<script language="JavaScript">var imgpath = '$imgpath';var verifyhash = '$verifyhash';var modeimg = '$pwModeImg';var modeBase = '$baseUrl';var winduid = '$winduid';var windid	= '$windid';var groupid	= '$groupid';var basename = '$basename';var temp_basename = '$temp_basename';
+<script language="JavaScript">var imgpath = '$imgpath';var verifyhash = '$verifyhash';var modeimg = '$pwModeImg';var modeBase = '$baseUrl';var winduid = '$winduid';var windid	= '$windid';var groupid	= '$groupid';var basename = '$basename';var temp_basename = '$temp_basename';var db_shiftstyle = '$db_shiftstyle';
 function shiftStyle(){
+	if(db_shiftstyle == 1){
 	if (getObj('widthCfg').innerHTML=='[切换到宽版]') {
 		if(!getObj('fullscreenStyle')) {
 				var l = document.createElement('link');
@@ -66,12 +74,21 @@ function shiftStyle(){
 		getObj('fullscreenStyle').disabled=true;
 		getObj('widthCfg').innerHTML='[切换到宽版]';
 	}
-	SetCookie('widthCfg',widthCfg);	
+	SetCookie('widthCfg',widthCfg);
+	if(goTop){
+		goTop.setStyle();
+	}
+	}
 };
 </script>
 </head>
 <body onKeyDown="try{keyCodes(event);}catch(e){}">
 $msgsound
+<!--
+EOT;
+if ($_Navbar['head_right'] || $_Navbar['head_left']) {
+print <<<EOT
+-->
 <div id="top">
 	<div class="top">
     	<span class="fr">
@@ -168,6 +185,11 @@ print <<<EOT
         </ul>
     </div>
 </div>
+<!--
+EOT;
+}
+print <<<EOT
+-->
 <div class="wrap">
 <!--
 EOT;
@@ -286,17 +308,27 @@ EOT;
 EOT;
 foreach ($_Navbar['main'] as $key => $value) {
 	if ($key == 'html') continue;
-	$currentClass = $value['data']['iscurrent'] ? 'class="current"' : '';
+	$currentClass = '';
+	if ($value['data']['iscurrent']) {
+		$currentClass = ' class="current"';
+		$currentMainNavKey = $key; 
+	}
 	$html = buildNavLinkHtml($value['data']);
+	$crossEvent = $verticalEvent = $currentEvent = '';
 
-	$crossEvent = (!$value['data']['iscurrent'] && 'cross' == $value['data']['floattype'] && $value['subs']) ? " onmouseover=\"ctrlSubMenu('nav_key_up_$key', 'nav_key_sub_$key');\" " : '';
-
-	$verticalEvent = (!$value['data']['iscurrent'] && 'vertical' == $value['data']['floattype'] && $value['subs']) ? " onmouseover=\"tmpHideAllCross('nav_key_sub_$key'); read.open('nav_key_sub_$key', 'nav_key_up_$key', null, 0, window['nav_key_up_$key']); \" " : '';
-
-	$currentEvent = $value['data']['iscurrent'] ? " onmouseover=\"tmpHideAllCross('nav_key_sub_$key'); \" " : '';
+	if (!$value['data']['iscurrent'] && 'cross' == $value['data']['floattype'] && $value['subs']) {
+		$crossEvent = " onmouseover=\"ctrlSubMenu('nav_key_up_$key', 'nav_key_sub_$key');\"";
+	}
+	if (!$value['data']['iscurrent'] && 'vertical' == $value['data']['floattype'] && $value['subs']) {
+		$verticalEvent = " onmouseover=\"tmpHideAllCross('nav_key_sub_$key',false);\"";
+		$db_menuinit .= ",'nav_key_up_$key' : 'nav_key_sub_$key'";
+	}
+	if ($value['data']['iscurrent']) {
+		$currentEvent = " onmouseover=\"tmpHideAllCross('nav_key_sub_$key',false);\"";
+	}
 print <<<EOT
 -->
-					<li $currentClass $crossEvent $verticalEvent $currentEvent>$html</li>
+					<li{$currentClass}{$crossEvent}{$verticalEvent}{$currentEvent}>$html</li>
 <!--
 EOT;
 }
@@ -309,9 +341,10 @@ print <<<EOT
 <!--
 EOT;
 if($ifHaveSubs){
+$navBStyle = empty($_Navbar['main'][$currentMainNavKey]['subs']) ? 'style="display:none"' : '';
 print <<<EOT
 -->		
-				<div id="navB" class="pr">
+				<div id="navB" $navBStyle class="pr">
 <!--
 EOT;
 $showEmptyNav = true;
@@ -351,7 +384,7 @@ EOT;
 			$menuListClass = 'space' == $nav['listtype'] ? 'menuListC' : 'menuListB';
 print <<<EOT
 -->
-        	<div id="nav_key_sub_$key" class="navB" style="position:absolute; width:100%; top:0px; z-index:11; display:none;" >
+        	<div id="nav_key_sub_$key" class="navB" style="position:absolute; width:100%; top:0px; z-index:11; display:none;">
 				<div class="navBbg">
                 <ul class="$menuListClass cc">
 <!--
@@ -405,7 +438,6 @@ print <<<EOT
 -->
 
 		</div>
-
 <!--
 EOT;
 }
@@ -414,14 +446,18 @@ print <<<EOT
      </div>
 <script language="javascript">
 var timeoutSpecifyId = {};
+var navBStyle = '$navBStyle';
 
 function tmpClose(elementId) {
     timeoutSpecifyId[elementId] = setTimeout(function() {
         getObj(elementId).style.display = 'none';
     }, 100);
 }
-function tmpHideAllCross(currentSubMenuId) {
+function tmpHideAllCross(currentSubMenuId,showNavB) {
 	if(!getObj('navB')) return;
+	if (showNavB) {
+		getObj('navB').style.display = '';
+	}
     var elements = getElementsByClassName('navB', getObj('navB'));
     if(elements.length){
         for (i=0; i<elements.length; i++) {
@@ -431,22 +467,34 @@ function tmpHideAllCross(currentSubMenuId) {
 }
 
 function ctrlSubMenu(parentId, subMenuId) {
-    clearTimeout(timeoutSpecifyId[subMenuId]);
+    try {
+		clearTimeout(timeoutSpecifyId[subMenuId]);
 
-    tmpHideAllCross(subMenuId);
-    getObj(subMenuId).style.display = '';
+		tmpHideAllCross(subMenuId,true);
+		getObj(subMenuId).style.display = '';
 
-    getObj(parentId).onmouseout = function() {
-        tmpClose(subMenuId);
-        getObj(parentId).onmouseout = '';
-    };
-    getObj(subMenuId).onmouseout = function() {
-        tmpClose(subMenuId);
-    };
-    getObj(subMenuId).onmouseover = function() {
-        clearTimeout(timeoutSpecifyId[subMenuId]);
-        getObj(subMenuId).style.display = '';
-    };
+		getObj(parentId).onmouseout = function() {
+			tmpClose(subMenuId);
+			 timeoutSpecifyId[parentId] = setTimeout(function() {
+				if (navBStyle) {
+					getObj('navB').style.display = 'none';
+				}
+			}, 100);
+			getObj(parentId).onmouseout = '';
+		};
+		getObj(subMenuId).onmouseout = function() {
+			tmpClose(subMenuId);
+			if (navBStyle) {
+				getObj('navB').style.display = 'none';
+			}
+		};
+		getObj(subMenuId).onmouseover = function() {
+			clearTimeout(timeoutSpecifyId[subMenuId]);
+			clearTimeout(timeoutSpecifyId[parentId]);
+			getObj(subMenuId).style.display = '';
+			getObj('navB').style.display = '';
+		};
+	}catch(e){}
 }
 </script>
     <div id="searchA">
@@ -477,14 +525,18 @@ print <<<EOT
 <!--
 EOT;
 }print <<<EOT
---></ul><h6>帖子</h6></div>
+--></ul><h6 class="w">帖子</h6></div>
 	            <button type="submit" class="fl cp">搜索</button>
             </form>
-            <div class="s_tags"><span class="s2">热搜：</span>
+            <div class="s_tags">
 <!--
 EOT;
 $hotwords = ($db_hotwords) ? explode(",",$db_hotwords) : array();
-if($hotwords){
+if($hotwords){print <<<EOT
+-->
+            <span class="s2">热搜：</span>
+<!--
+EOT;
 foreach($hotwords as $hotword){
 print <<<EOT
 -->
@@ -533,7 +585,7 @@ EOT;
 -->
 <div id="menu_shortcut" class="pw_menu" style="display:none;">
 	<h6><a href="javascript:;" class="link_down"><span>书签</span></a></h6>
-	<ul class="menuList">
+	<ul class="menuList" id="forumBooks">
 <!--
 EOT;
 foreach ($shortcutforum as $key => $value) {print <<<EOT

@@ -2,19 +2,23 @@
 --><!doctype html>
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=$db_charset" />
+<meta charset="$db_charset" />
 <title>$webPageTitle - Powered by phpwind</title>
 <meta name="generator" content="phpwind $wind_version" />
 <meta name="description" content="$metaDescription" />
 <meta name="keywords" content="$metaKeywords" />
-<link rel='archives' title='$db_bbsname' href='$db_bbsurl/simple/' />
+<!--[if IE 9 ]>
+<meta name="msapplication-task" content="name=网站首页; action-uri=$db_bbsurl; icon-uri=$db_bbsurl/favicon.ico" />
+<meta name="msapplication-task" content="name=个人中心; action-uri=$db_bbsurl/u.php; icon-uri=$db_bbsurl/images/ico/home.ico" />
+<meta name="msapplication-task" content="name=我的帖子; action-uri=$db_bbsurl/apps.php?q=article; icon-uri=$db_bbsurl/images/ico/post.ico" />
+<meta name="msapplication-task" content="name=消息中心; action-uri=$db_bbsurl/message.php; icon-uri=$db_bbsurl/images/ico/mail.ico" />
+<meta name="msapplication-task" content="name=我的设置; action-uri=$db_bbsurl/profile.php; icon-uri=$db_bbsurl/images/ico/edit.ico" />
+<![endif]-->
 <base id="headbase" href="$db_bbsurl/" />
-<style type="text/css" media="screen">
-@import url($imgpath/pw_core.css);
-@import url($imgpath/toolbar.css);
-@import url($imgpath/g/g_style.css);
-@import url($imgpath/g/{$colony[colonystyle]}/style.css);
-</style>
+<link rel="stylesheet" href="$imgpath/pw_core.css" />
+<link rel="stylesheet" href="$imgpath/toolbar.css" />
+<link rel="stylesheet" href="$imgpath/g/g_style.css" />
+<link rel="stylesheet" id="change2" href="$imgpath/g/{$colony[colonystyle]}/style.css" />
 <script type="text/javascript" language="JavaScript" src="js/core/core.js"></script>
 <script type="text/javascript" language="JavaScript" src="js/pw_ajax.js"></script>
 <script language="JavaScript">
@@ -27,6 +31,23 @@ var windid	= '$windid';
 var groupid	= '$groupid';
 var basename = '$basename';
 var temp_basename = '$temp_basename';
+
+function resizeImg(ele){
+	var a=ele;
+	if(a.width<30||a.height<30){
+		setTimeout(function(){
+			resizeImg(a);
+		},10)
+		return false;
+	}
+	if(a.width>100){
+		
+			a.width = 100;
+			
+		} else if(a.height>100){
+			a.height=100;
+		}
+}
 </script>
 </head>
 <body onKeyDown="try{keyCodes(event);}catch(e){}">
@@ -387,11 +408,15 @@ function ctrlSubMenu(parentId, subMenuId) {
 	            <div class="s_select" onMouseOut="this.firstChild.style.display='none';" onMouseOver="this.firstChild.style.display='block';"><ul onClick="getSearchType(event)"><li type="thread" style="display:none">帖子</li><li type="diary">日志</li><li type="user">用户</li><li type="forum">版块</li><li type="group">群组</li></ul><h6>帖子</h6></div>
 	            <button type="submit" class="fl cp">搜索</button>
             </form>
-            <div class="s_tags"><span class="s2">热搜：</span>
+            <div class="s_tags">
 <!--
 EOT;
 $hotwords = ($db_hotwords) ? explode(",",$db_hotwords) : array();
-if($hotwords){
+if($hotwords){print <<<EOT
+-->
+            <span class="s2">热搜：</span>
+<!--
+EOT;
 foreach($hotwords as $hotword){
 print <<<EOT
 -->
@@ -415,7 +440,7 @@ print <<<EOT
 		<div id="breadCrumb" class="cc">
 			<ul class="fr">
 				<li><a href="apps.php?q=groups&a=my" class="b"><img src="images/g/mygroup.png" align="absmiddle" /> 我的群组</a></li>
-				<li><a href="group.php?q=all">所有群组</a></li>
+				<li><a href="group.php?q=all"><img src="u/images/icon/groups.png" align="absmiddle" /> 所有群组</a></li>
 			</ul>
 			<img id="td_cate" align="absmiddle" src="images/wind/thread/home.gif" alt="forumlist" class="cp breadHome" />
 			<em class="breadEm"></em>

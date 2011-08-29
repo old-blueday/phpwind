@@ -7,39 +7,29 @@ function boxClose() {
 	parent.portalBox.close();
 }
 </script>
-<div class="pwC_content_a">
-    <div class="admin_table">
 <!-- 
 EOT;
 if ($cms && $tid) {
 print <<<EOT
 -->
-<div class="tip-page">
-<div class="tip-bgA"></div>
-<div class="tip-bgB"></div>
-	<div class="tip-bgC">
-	<div class="tip-top"></div>
-	<table cellpadding="0" cellspacing="0" class="tip-table">
-		<tr><td height="100">
-		<div class="tip-content">
-			<span class="f16 b">$successLang</span><br />
-			您选择了生成CMS页面，是否立即进入编辑？<br />
-			<div class="tac p10">
-				<span class="btn2"><span><button type="button" onclick="parent.location.href='$postModifyUrl'">编辑</button></span></span>
-				<span class="bt2"><span><button type="button" onclick="boxClose();">关闭</button></span></span>
-			</div>
-		</div>
-		</td></tr>
-	</table>
+<div class="tipWrap">
+	<div class="regCorrect">
+		<p class="f14 mb10 b">$successLang</p>
+		<p class="f14 mb10">您选择了生成CMS页面，是否立即进入编辑？</p>
+		<p><span class="btn2"><span><button type="button" onclick="parent.location.href='$postModifyUrl'">编辑</button></span></span><span class="bt2"><span><button type="button" onclick="boxClose();">关闭</button></span></span></p>
 	</div>
-<div class="tip-bgB"></div>
 </div>
 <!-- 
 EOT;
 } else {
 print <<<EOT
 -->
-<div class="adminRight">$successLang</div>
+<div class="tipWrap">
+	<div class="regCorrect">
+		<p class="f14 mb10 b">$successLang</p>
+		<p class="s6">两秒后自动关闭</p>
+	</div>
+</div>
 <script type="text/javascript">
 setTimeout(boxClose,2000);
 </script>
@@ -48,9 +38,6 @@ EOT;
 }
 print <<<EOT
 -->	
-    </div>
-</div>
-
 <!--
 EOT;
 ?>

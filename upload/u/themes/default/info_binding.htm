@@ -130,15 +130,6 @@ print <<<EOT
 		</div>
 </div>
 <script type="text/javascript" src = "js/info.js"></script>
-<script language="JavaScript">
-var display = '$display';
-~function() {
-	var info_type = FetchCookie('pro_tab');
-	DelCookie('pro_tab');
-	if (!info_type) info_type = '$info_type';
-	selectTab(info_type);
-}();
-</script>
 <!--
 EOT;
 require_once uTemplate::printEot('footer');

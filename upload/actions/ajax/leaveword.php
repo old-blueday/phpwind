@@ -47,7 +47,8 @@ if (empty($_POST['step'])) {
 	$atc_content != $content && $_tmp['ifconvert'] = 2;
 	$pw_posts = GetPtable($ptable);
 	if ($ifmsg && !empty($atc_content)) {
-		include_once pwCache::getPath(D_P . 'data/bbscache/forum_cache.php');
+		//* include_once pwCache::getPath(D_P . 'data/bbscache/forum_cache.php');
+		pwCache::getData(D_P . 'data/bbscache/forum_cache.php');
 		$atc = $db->get_one("SELECT author,fid,subject,content,postdate FROM $pw_posts WHERE pid=" . S::sqlEscape($pid) . ' AND tid=' . S::sqlEscape($tid));
 		!$atc['subject'] && $atc['subject'] = substrs($atc['content'], 35);
 
@@ -75,7 +76,8 @@ if (empty($_POST['step'])) {
 	}
 	
 	//* $db->update("UPDATE $pw_posts SET leaveword=" . S::sqlEscape($atc_content) . " $sqladd WHERE pid=" . S::sqlEscape($pid) . ' AND tid=' . S::sqlEscape($tid));
-	$db->update(pwQuery::buildClause("UPDATE :pw_table SET leaveword=" . S::sqlEscape($atc_content) . " $sqladd WHERE pid=:pid AND tid=:tid", array($pw_posts, $pid, $tid)));
+	$db->update(pwQuery::buildClause("UPDATE :pw_table SET leaveword=:leaveword $sqladd WHERE pid=:pid AND tid=:tid", array($pw_posts,$atc_content, $pid, $tid)));
+	
 	echo "success\t" . str_replace(array(
 		"\n",
 		"\t"

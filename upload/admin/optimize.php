@@ -13,7 +13,8 @@ if (!$action) {
 	if (!$_POST['step']) {
 
 		if (file_exists(D_P.'data/bbscache/optimize_size.php')) {
-			include pwCache::getPath(D_P.'data/bbscache/optimize_size.php');
+			//* include pwCache::getPath(D_P.'data/bbscache/optimize_size.php');
+			pwCache::getData(D_P.'data/bbscache/optimize_size.php');
 			!$optimize_conf['size'][$type] && include(R_P.'admin/optimize_conf.php');
 		} else {
 			include(R_P.'admin/optimize_conf.php');
@@ -47,7 +48,7 @@ if (!$action) {
 		ifcheck($db_today,'today');;
 		ifcheck($db_threadonline,'threadonline');
 		ifcheck($db_showcolony,'showcolony');
-		ifcheck($db_iffthumb,'iffthumb');
+	//	ifcheck($db_iffthumb,'iffthumb');
 		ifcheck($db_wapifopen,'wapifopen');
 		ifcheck($db_jsifopen,'jsifopen');
 		ifcheck($db_ifsafecv,'ifsafecv');
@@ -109,7 +110,8 @@ if (!$action) {
 	if (!$_POST['step']) {
 
 		if (file_exists(D_P.'data/bbscache/optimize_func.php')) {
-			include pwCache::getPath(D_P.'data/bbscache/optimize_func.php');
+			//* include pwCache::getPath(D_P.'data/bbscache/optimize_func.php');
+			pwCache::getData(D_P.'data/bbscache/optimize_func.php');
 			!$optimize_conf['func'][$type] && include(R_P.'admin/optimize_conf.php');
 		} else {
 			include(R_P.'admin/optimize_conf.php');
@@ -131,7 +133,7 @@ if (!$action) {
 		ifcheck($db_setform,'setform');
 		ifcheck($db_autoimg,'autoimg');
 		ifcheck($db_menu,'menu');
-		ifcheck($db_iffthumb,'iffthumb');
+	//	ifcheck($db_iffthumb,'iffthumb');
 		ifcheck($db_ifathumb,'ifathumb');
 		ifcheck($db_ifselfshare,'ifselfshare');
 		$db_watermark == 1 ? $watermark_1 = 'checked' : ($db_watermark == 2 ? $watermark_2 = 'checked' : $watermark_0 = 'checked');
@@ -183,7 +185,8 @@ if (!$action) {
 } elseif ($_POST['action'] == 'size') {
 
 	if (file_exists(D_P.'data/bbscache/optimize_size.php')) {
-		include pwCache::getPath(D_P.'data/bbscache/optimize_size.php');
+		//* include pwCache::getPath(D_P.'data/bbscache/optimize_size.php');
+		pwCache::getData(D_P.'data/bbscache/optimize_size.php');
 		!$optimize_conf['size'][$type] && include(R_P.'admin/optimize_conf.php');
 	} else {
 		include(R_P.'admin/optimize_conf.php');
@@ -205,7 +208,8 @@ if (!$action) {
 } elseif ($_POST['action'] == 'func') {
 
 	if (file_exists(D_P.'data/bbscache/optimize_func.php')) {
-		include pwCache::getPath(D_P.'data/bbscache/optimize_func.php');
+		//* include pwCache::getPath(D_P.'data/bbscache/optimize_func.php');
+		pwCache::getData(D_P.'data/bbscache/optimize_func.php');
 		!$optimize_conf['func'][$type] && include(R_P.'admin/optimize_conf.php');
 	} else {
 		include(R_P.'admin/optimize_conf.php');

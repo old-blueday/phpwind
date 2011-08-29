@@ -165,6 +165,14 @@ class PW_Register {
 		$this->_insertUser();
 	}
 	
+	function changeEmail($uid,$newEmail){
+		$uid = intval($uid);
+		$newEmail = trim($newEmail);
+		if(!$uid || !$newEmail) return false;
+		PW_Register::checkEmail($newEmail);
+		return pwQuery::update('pw_members' , "uid=:uid", array($uid), array('email'=>$newEmail));
+	}
+	
 	function _insertUser() {
 		global $timestamp, $onlineip, $credit;
 		/**
@@ -237,6 +245,7 @@ class PW_Register {
 		
 		//* $this->db->update("UPDATE pw_bbsinfo SET newmember=" . S::sqlEscape($this->data['username']) . ",totalmember=totalmember+1 WHERE id='1'");
 		$this->db->update(pwQuery::buildClause("UPDATE :pw_table SET newmember=:newmember,totalmember=totalmember+1 WHERE id=:id", array('pw_bbsinfo',$this->data['username'],1)));
+		$this->memberinfo or $this->memberinfo['uid'] = $this->uid;
 		if ($this->memberinfo) {
 			/**
 			$this->db->update("REPLACE INTO pw_memberinfo SET uid=" . S::sqlEscape($this->uid) . ',' . S::sqlSingle($this->memberinfo));
@@ -350,15 +359,15 @@ class PW_Register {
 	function checkPwd($regpwd, $regpwdrepeat) {
 		list($regminpwd, $regmaxpwd) = explode("\t", L::reg('rg_pwdlen'));
 		if (strlen($regpwd) < $regminpwd) {
-			Showmsg('reg_password_minlimit');
+			Showmsg('reg_password_minlimit',$GLOBALS['showPwdLogin']);
 		} elseif ($regmaxpwd && strlen($regpwd) > $regmaxpwd) {
-			Showmsg('reg_password_maxlimit');
+			Showmsg('reg_password_maxlimit',$GLOBALS['showPwdLogin']);
 		}
 		if (str_replace($this->illegalChar, '', $regpwd) != $regpwd) {
-			Showmsg('illegal_password');
+			Showmsg('illegal_password',$GLOBALS['showPwdLogin']);
 		}
 		if ($regpwd != $regpwdrepeat) {
-			Showmsg('password_confirm');
+			Showmsg('password_confirm',$GLOBALS['showPwdLogin']);
 		}
 		$this->checkPwdComplex($regpwd);
 	}
@@ -372,22 +381,22 @@ class PW_Register {
 			switch (intval($value)) {
 				case 1:
 					if (!preg_match('/[a-z]/', $regpwd)) {
-						Showmsg('reg_password_lowstring');
+						Showmsg('reg_password_lowstring',$GLOBALS['showPwdLogin']);
 					}
 					break;
 				case 2:
 					if (!preg_match('/[A-Z]/', $regpwd)) {
-						Showmsg('reg_password_upstring');
+						Showmsg('reg_password_upstring',$GLOBALS['showPwdLogin']);
 					}
 					break;
 				case 3:
 					if (!preg_match('/[0-9]/', $regpwd)) {
-						Showmsg('reg_password_num');
+						Showmsg('reg_password_num',$GLOBALS['showPwdLogin']);
 					}
 					break;
 				case 4:
 					if (!preg_match('/[^a-zA-Z0-9]/', $regpwd)) {
-						Showmsg('reg_password_specialstring');
+						Showmsg('reg_password_specialstring',$GLOBALS['showPwdLogin']);
 					}
 					break;
 			}
@@ -410,7 +419,6 @@ class PW_Register {
 		if (empty($regemail) || !ereg("^[-a-zA-Z0-9_\.]+\@([0-9A-Za-z][0-9A-Za-z-]+\.)+[A-Za-z]{2,5}$", $regemail)) {
 			Showmsg('illegal_email');
 		}
-		
 		if (L::reg('rg_emailtype') == 1 && L::reg('rg_email')) {
 			
 			$e_check = 0;
@@ -422,9 +430,7 @@ class PW_Register {
 				}
 			}
 			$e_check == 0 && Showmsg('email_check');
-		
 		} elseif (L::reg('rg_emailtype') == 2 && L::reg('rg_banemail')) {
-			
 			$e_check = 0;
 			$e_limit = explode(',', L::reg('rg_banemail'));
 			foreach ($e_limit as $key => $val) {
@@ -435,7 +441,6 @@ class PW_Register {
 			}
 			$e_check == 1 && Showmsg('email_bancheck');
 		}
-		
 		$email_check = $this->db->get_one('SELECT COUNT(*) AS count FROM pw_members WHERE email=' . S::sqlEscape($regemail));
 		if ($email_check['count']) {
 			Showmsg('reg_email_have_same');

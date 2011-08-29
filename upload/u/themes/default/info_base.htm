@@ -17,101 +17,8 @@ print <<<EOT
 					<input type="hidden" name="verify" value="$verifyhash" />
 					<input type="hidden" value="2" name="step" />
 					<input type="hidden" id="info_type" name="info_type" value="base" />
-<div id="info_base">
     <table width="100%" class="setTable">
-        <tr>
-            <th class="th">
-                性别
-            </th>
-            <td class="td">
-                <label for="progender0" class="mr20">
-                    <input type="radio" id="progender0" name="progender" value="0" $sexselect[0] /> 
-                    保密
-                </label>
-                <label for="progender1" class="mr20">
-                    <input type="radio" id="progender1" name="progender" value="1" $sexselect[1] /> 
-                    男
-                </label>
-                <label for="progender2" class="mr20">
-                    <input type="radio" id="progender2" name="progender" value="2" $sexselect[2] /> 
-                    女
-                </label>
-            </td>
-        </tr>
-        <tr>
-            <th class="th">
-                生日
-            </th>
-            <td class="td">
-                <select name="proyear">
-<!--
-EOT;
-if($rg_timestart < $rg_timeend){
-for($i=$rg_timestart;$i<=$rg_timeend;$i++){print <<<EOT
--->
-<option value="$i" $yearslect[$i]>$i </option>
-<!--
-EOT;
-}}else{
-for($i=$rg_timestart;$i>=$rg_timeend;$i--){print <<<EOT
--->
-<option value="$i" $yearslect[$i]>$i </option>
-<!--
-EOT;
-}}print <<<EOT
--->
-                </select>
-                <span class="p_lr_10">年</span>
-                <select name="promonth">
-<!--
-EOT;
-for($i=1;$i<=12;$i++){print <<<EOT
--->
-<option value="$i" $monthslect[$i]>$i </option>
-<!--
-EOT;
-}print <<<EOT
--->
-                </select>
-                <span class="p_lr_10">月</span>
-                <select name="proday">
-<!--
-EOT;
-for($i=1;$i<=31;$i++){print <<<EOT
--->
-<option value="$i" $dayslect[$i]>$i </option>
-<!--
-EOT;
-}print <<<EOT
--->
-                </select>
-                <span class="p_lr_10">日</span>
-            </td>
-        </tr>
-<!--
-EOT;
-foreach($custominfo as $key => $value){print <<<EOT
--->
-        <tr>
-            <th class="th">
-                $value[0]
-            </th>
-            <td class="td">
-                <input class="input input_wa" type="text" name="customdata[$key]" value="{$customdata[$key]}" />
-            </td>
-        </tr>
-<!--
-EOT;
-}print <<<EOT
--->
-        <tr>
-            <th class="th">
-                来自
-            </th>
-            <td class="td">
-                <input class="input input_wa" type="text" maxlength="14" name="profrom" value="$userdb[location]" />
-            </td>
-        </tr>
+		$customFieldsString
         <tr>
             <th class="th">
                 个人主页
@@ -204,12 +111,6 @@ include(R_P.'template/admin/timezone.htm');print <<<EOT
                 </select>
             </td>
         </tr>
-		<tr>
-		<th class="th">支付宝帐号</th>
-		<td class="td">
-<input type="text" name="alipay" class="input input_wa" value="{$tradeinfo[alipay]}">
-		</td>
-	</tr>
         <tr>
             <th class="th">
                 是否接受邮件
@@ -225,13 +126,21 @@ include(R_P.'template/admin/timezone.htm');print <<<EOT
                 </label>
             </td>
         </tr>
-    </table>
-    <div class="tac" style=" padding:1em">
-        <span class="btn"><span>
+				<tr>
+            <th class="th">
+                &nbsp;
+            </th>
+            <td class="td" style="padding:10px 13px;">
+        			<span class="btn"><span>
                 <button type="submit">
                     保存资料
                 </button>
-            </span></span>
+            	</span></span>
+            </td>
+        </tr>
+    </table>
+    <div class="tac" style=" padding:1em">
+
     </div>
     <script language="JavaScript">
         var charset = '$db_charset';
@@ -244,14 +153,14 @@ include(R_P.'template/admin/timezone.htm');print <<<EOT
             getObj('prosign_warn').innerHTML = '不限字数';
         }
     </script>
+<div id="info_base">
 </div>
-<div id="userbinding-node" style="display:none">
-</form>
-</div></td></tr></table>
+<div id="userbinding-node" style="display:none"></div>
+</form></div>
+</td></tr></table>
             </div>
-        </div>
-<div class="u-m-bg"></div>
-<script type="text/javascript" src = "lang/wind/u/default/info.js"></script>
+</div>
+<script type="text/javascript" src = "js/info.js"></script>
 <!--
 EOT;
 require_once uTemplate::printEot('footer');

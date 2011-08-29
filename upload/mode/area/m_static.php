@@ -18,13 +18,16 @@ if ($type == 'channel') {
 	//获得关联模板
 	
 	require M_P.'index.php';
-
+	if ($db_advertdb['Site.PopupNotice'] || $db_advertdb['Site.FloatLeft'] || $db_advertdb['Site.FloatRight'] || $db_advertdb['Site.FloatRand']) {
+		require PrintEot('advert');
+	}
 	aliasStatic($channelInfo['alias']);
 	echo getLangInfo('msg','operate_success');
 	ajax_footer();exit;
 } elseif ( $type == 'autostatic') {
 	S::gp(array('alias'));
-	include_once pwCache::getPath(D_P.'data/bbscache/area_config.php');
+	//* include_once pwCache::getPath(D_P.'data/bbscache/area_config.php');
+	pwCache::getData(D_P.'data/bbscache/area_config.php');
 	if (!$alias || !$area_channels[$alias]) exit; //频道不存在
 	if (!$area_statictime) exit;	//未设置更新时间
 	$channelInfo = $area_channels[$alias];

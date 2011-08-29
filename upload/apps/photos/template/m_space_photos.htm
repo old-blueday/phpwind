@@ -182,30 +182,32 @@ EOT;
 if ($cnpho) {
 foreach ($cnpho as $key => $value) {print <<<EOT
 -->
-			<li><div class="aimg"><a href="{$basename}a=view&pid=$value[pid]"><img src="$value[path]" /></a></div><p>
+			<li><div class="aimg"><a href="{$basename}a=view&pid=$value[pid]"><img onload="resizeImg(this)" src="$value[path]" /></a></div><p>
 <!--
 EOT;
 if ($isown || $photoService->isDelRight()) {print <<<EOT
 -->
-<a href="javascript:;" class="adel" onclick="pwConfirm('是否确认删除',this,function(){ajaxdel('$value[pid]')});" title="删除">删除</a>
+<a href="javascript:;" class="adel" onclick="pwConfirm('是否确认删除此照片？',this,function(){ajaxdel('$value[pid]')});" title="删除">删除</a>
 <!--
 EOT;
 }print <<<EOT
 -->共{$value[c_num]}条评论</p>
 				<p>$value[uptime]</p>
 			</li>
-
-
-<!--
-EOT;
-}}else{print <<<EOT
--->
-			<li><div class="tac p10 f14">暂无照片！</div></li>
 <!--
 EOT;
 }print <<<EOT
 -->
 		</ul>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+			<div class="tac p10 f14">暂无照片！</div>
+<!--
+EOT;
+}print <<<EOT
+-->
 		</div>
 		<div class="cc p20">$pages</div>
 		
@@ -230,12 +232,12 @@ EOT;
 EOT;
 if ($isown) {print <<<EOT
 -->
-				<a href="{$basename}a=upload&job=flash&aid=$aid">上传</a>&nbsp;┊&nbsp;
+				<a href="apps.php?q=photos&a=upload&job=flash&aid=$aid">上传</a>&nbsp;┊&nbsp;
 <!--
 EOT;
 }if ($isown || $photoService->isDelRight()) {print <<<EOT
 -->
-				<a onclick="pwConfirm('是否确认删除',this,function(){ajaxdel('$photo[pid]')});" href="javascript:;">删除</a>
+				<a onclick="pwConfirm('是否确认删除此照片？',this,function(){ajaxdel('$photo[pid]')});" href="javascript:;">删除</a>
 <!--
 EOT;
 }print <<<EOT

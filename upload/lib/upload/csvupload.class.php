@@ -35,8 +35,7 @@ class CsvUpload extends uploadBehavior {
 	}
 
 	function update($uploaddb) {
-
-
+		return true;
 	}
 	
 	function getServerPath($filename, $dir) {
@@ -48,8 +47,5 @@ class CsvUpload extends uploadBehavior {
 		}
 		return $source;
 	}
-
-
-
 }
 ?>

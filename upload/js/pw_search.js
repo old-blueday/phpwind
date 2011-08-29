@@ -230,8 +230,14 @@ pw_search.prototype = {
 		return (pw_muti[code]?pw_muti[code]:(pw_chinese.charAt(code-19968)));
 	},
 	del:function(eArgs){
-		var e = eArgs ? eArgs : window.event;
-		var item = e.srcElement.parentNode.parentNode.parentNode;
+		var e;
+		if (is_ie) {
+			e = event.srcElement;
+	    } else {
+	    	e = eArgs.target;
+	    }
+		//var e = eArgs ? eArgs : window.event;
+		var item = e.parentNode.parentNode.parentNode;
 		item.parentNode.removeChild(item);
 	},
 	add:function(str){
@@ -246,7 +252,11 @@ pw_search.prototype = {
 		if(str=='')
 			return;
 		if(this.dst.parentNode.getElementsByTagName('span').length>=this.dst.getAttribute('max')){
-			MC.showFailTips('最多只能同时发送'+this.dst.getAttribute('max')+'人').fadeTips();
+			if (this.dst.getAttribute('issearch') != 1) {
+				MC.showFailTips('最多只能同时发送'+this.dst.getAttribute('max')+'人').fadeTips();
+				return;
+			}
+			MC.showFailTips('最多只能同时搜索'+this.dst.getAttribute('max')+'人的消息').fadeTips();
 			return;
 		}
 		if(!tmpArray.length || (tmpArray.length && pw_search.inArray(str,tmpArray) < 0)){
@@ -335,17 +345,26 @@ pw_search.prototype = {
 		}
 	},
 	setFriends:function(e){//选择好友
-		var e=e||event,input;
-		var target=e.srcElement;
+		var target;
+		if (is_ie) {
+			target = event.srcElement;
+	    } else {
+	    	target = e.target;
+	    }
+		//var e=e||event,input;
+		//var target=e.srcElement;
 		if(target.tagName!='INPUT'){
 			input=target.getElementsByTagName('input')[0];
-			if(!input.checked && this.dst.parentNode.getElementsByTagName('span').length>=this.dst.getAttribute('max'))
+			if(!input.checked && this.dst.parentNode.getElementsByTagName('span').length>=this.dst.getAttribute('max')) {
+				this.closeSel();
 				return;
+			}
 			input.checked=!input.checked;
 		}else{
 			input=target;
 			if(input.checked && this.dst.parentNode.getElementsByTagName('span').length>=this.dst.getAttribute('max')){
 				input.checked=!input.checked;
+				this.closeSel();
 				return;
 			}
 		}
@@ -360,6 +379,9 @@ pw_search.prototype = {
 			}
 		}else{
 			this.add(input.value);
+			if (this.dst.parentNode.getElementsByTagName('span').length>=this.dst.getAttribute('max')) {
+				this.closeSel();
+			}
 			this.dst.focus();
 		}
 	},
@@ -370,7 +392,7 @@ pw_search.prototype = {
 		str='';
 		_obj = this;
 		//判断是否选中
-		if(ds.length==0){
+		if(ds.toString().replace(/^\s*$/,'') == ''){
 			str = '<li style="width:auto;height:auto;float:none;margin-top:60px;" class="tac f15">暂无好友，<a target="_blank" href="u.php?a=friend&type=find"><span style="color:#228B22">寻找我的好友</span></a></li>';
 		}else{
 			for (var i=ds.length-1; i>=0; i--){
@@ -392,6 +414,7 @@ pw_search.prototype = {
 		_obj = this;
 		//判断是否选中
 		for (var i=0;i<ds.length; i++){
+			if (typeof(inputs[i]) == 'undefined') continue;
 			if(pw_search.inArray(inputs[i].value,mdata)>-1){
 				inputs[i].checked="checked";
 				inputs[i].parentNode.className = 'selected';

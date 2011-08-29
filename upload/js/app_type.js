@@ -1,13 +1,13 @@
 // JavaScript Document 个人中心 日志、收藏、朋友自定义分类的JS
 var ismouseupval = 0;
-function addType(id,u){
+function addType(id,u,type){
 	if (getObj('dt_add')) {
 		changeCreatInputDisplay('dt_add');
 		return true;
 	}
-	creatDiaryTypeInput(id,u);
+	creatDiaryTypeInput(id,u,type);
 }
-function creatDiaryTypeInput(id,u){
+function creatDiaryTypeInput(id,u,type){
 	var parent	= getObj(id);
 	var li	= addChild(parent,'li','dt_add');//生成<li id='dt_add'></li>
 
@@ -23,7 +23,7 @@ function creatDiaryTypeInput(id,u){
 	ok.onclick	= function () {
 		var name = char_cv(text.value);
 		if (name.length<1) {
-			showDialog('error','类型名称不能为空');
+			showDialog('error','分类名称不能为空');
 			return false;
 		}
 		ajax.send(typeConfig.createUrl,'u='+u+'&name='+ajax.convert(name),function(){
@@ -31,7 +31,7 @@ function creatDiaryTypeInput(id,u){
 			if (rText[0] == 'success') {
 				var dtid = rText[1] - 0;
 				if (isNaN(dtid)==false) {
-					creatDiaryType('dt_-1',dtid,name,u);
+					creatDiaryType('dt_-1',dtid,name,u,type);
 					delElement('dt_add');
 				} else {
 					showDialog('error','非法错误');
@@ -60,14 +60,18 @@ function changeCreatInputDisplay(id){
 		dt_add.style.display = 'none';
 	}
 }
-function creatDiaryType(latter,dtid,name,u){
+function creatDiaryType(latter,dtid,name,u,type){
 	latter = objCheck(latter);
 	var parent = latter.parentNode;//ul
 	var li = elementBind('li','dt_'+dtid);//生成<li id='dt_1' onmouseover="changSpanDisplay(this);" onmouseout="changSpanDisplay(this);"></li>
 	li.style.overflow = "hidden";
 	li.onmouseout = function(){isMouseUp(dtid,1);};
 	li.onmouseover = function(){isMouseUp(dtid,0)};
-	li.innerHTML = '<a style="visibility:hidden" title="删除" class="adel cp mr5" id ="del_'+dtid+'"   onclick="pwConfirm(\'是否确认删除\',this,function(){delType(\''+dtid+'\',\''+u+'\')})">删除</a><a style="visibility:hidden" title="编辑" id ="edit_'+dtid+'" class="aedit mr5 cp"  onclick="showEidt(\''+dtid+'\',\''+u+'\');">编辑</a><a href="apps.php?q=diary&dtid='+dtid+'">'+name+'</a> <cite id="dnum_'+dtid+'">[0]</cite>';
+	addUrl = 'apps.php?q=diary&dtid='+dtid;
+	if (type == 'collection') {
+		addUrl = 'apps.php?q=collection&a=list&ftype='+dtid;
+	}
+	li.innerHTML = '<a style="visibility:hidden" title="删除" class="adel cp mr5" id ="del_'+dtid+'"   onclick="pwConfirm(\'是否确认删除\',this,function(){delType(\''+dtid+'\',\''+u+'\')})">删除</a><a style="visibility:hidden" title="编辑" id ="edit_'+dtid+'" class="aedit mr5 cp"  onclick="showEidt(\''+dtid+'\',\''+u+'\');">编辑</a><a href="'+addUrl+'">'+name+'</a> <cite id="dnum_'+dtid+'">[0]</cite>';
 	parent.insertBefore(li,latter);//在ul中，id="dt_null"的li前动态插入新li一行
 }
 
@@ -126,7 +130,7 @@ function showEidt(dtid,u){
 	ok.onclick	= function () {
 		var name = char_cv(text.value);
 		if (name.length<1) {
-			showDialog('error','类型名称不能为空');
+			showDialog('error','分类名称不能为空');
 			return false;
 		}
 		ajax.send(typeConfig.upUrl,'u='+u+'&name='+name+'&dtid='+dtid,function(){

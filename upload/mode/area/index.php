@@ -1,7 +1,8 @@
 <?php
 !defined('M_P') && exit('Forbidden');
 
-include_once pwCache::getPath(D_P.'data/bbscache/area_config.php');
+//* include_once pwCache::getPath(D_P.'data/bbscache/area_config.php');
+pwCache::getData(D_P.'data/bbscache/area_config.php');
 
 if(!$area_channels) Showmsg('还未创建频道');
 define('F_M',true);
@@ -53,7 +54,8 @@ $ifEditAdmin = $areaLevelService->getAreaLevel($winduid,$channelInfo['id']);
 $logic_file_path = AREA_PATH.$alias."/";
 
 extract(L::style('',$skinco));
-include_once pwCache::getPath(D_P.'data/bbscache/area_config.php');
+//* include_once pwCache::getPath(D_P.'data/bbscache/area_config.php');
+pwCache::getData(D_P.'data/bbscache/area_config.php');
 
 include_once (M_P.'require/core.php');
 

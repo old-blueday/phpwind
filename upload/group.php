@@ -5,7 +5,8 @@ if (isset($_POST['ajax'])) {
 }
 require_once('global.php');
 !$db_groups_open && Showmsg('groups_close');
-include_once pwCache::getPath(D_P.'data/bbscache/o_config.php');
+//* include_once pwCache::getPath(D_P.'data/bbscache/o_config.php');
+pwCache::getData(D_P.'data/bbscache/o_config.php');
 S::gp(array('q', 'step'));
 $step && $step = (int) $step;
 
@@ -32,6 +33,7 @@ if (empty($q)) {
 	$o_groups_creditset['Creategroup'] = @array_diff($o_groups_creditset['Creategroup'],array(0));
 	$costs = '';
 	if (!empty($o_groups_creditset['Creategroup']) && is_array($o_groups_creditset['Creategroup'])) {
+		$createGroupCredit = 1;
 		foreach ($o_groups_creditset['Creategroup'] as $key => $value) {
 			if ($value > 0) {
 				$moneyname = $credit->cType[$key];
@@ -45,7 +47,8 @@ if (empty($q)) {
 		}
 	}
 	$costs = trim($costs,",");
-	include_once pwCache::getPath(S::escapePath(D_P."data/groupdb/group_$groupid.php"));
+	//* include_once pwCache::getPath(S::escapePath(D_P."data/groupdb/group_$groupid.php"));
+	pwCache::getData(S::escapePath(D_P."data/groupdb/group_$groupid.php"));
 	if ($_G['allowcreate'] && $_G['allowcreate'] <= $db->get_value("SELECT COUNT(*) AS sum FROM pw_colonys WHERE admin=" . S::sqlEscape($windid))) 	{
 		Showmsg('colony_numlimit');
 	}
@@ -53,7 +56,8 @@ if (empty($q)) {
 		$u = $winduid;
 		$username = $windid;
 		$o_cate = array();
-		include_once pwCache::getPath(D_P . 'data/bbscache/forum_cache.php');
+		//* include_once pwCache::getPath(D_P . 'data/bbscache/forum_cache.php');
+		pwCache::getData(D_P . 'data/bbscache/forum_cache.php');
 		if(is_array($o_classdb)){
 			foreach ($o_classdb as $key => $value) {
 					$o_cate[$forum[$key]['fup']][$key] = $value;
@@ -121,6 +125,7 @@ if (empty($q)) {
 		empty($commonLevel) && Showmsg("系统未创建群组等级,无法创建群组！");
 		S::gp(array('title1','title2','title3','title4'));
 		$titlefont = S::escapeChar("$title1~$title2~$title3~$title4~$title5~$title6~");
+		/**
 		$db->update("INSERT INTO pw_colonys SET " . S::sqlSingle(array(
 				'cname'		=> $cname,
 				//'classid'	=> $cid,
@@ -134,14 +139,29 @@ if (empty($q)) {
 				'titlefont' => $titlefont
 		)));
 		$cyid = $db->insert_id();
-		$db->update("UPDATE pw_cnstyles SET csum=csum+1 WHERE id IN (" . S::sqlImplode($styles) . ')');
+		**/
 		require_once(A_P . 'groups/lib/imgupload.class.php');
 		$img = new CnimgUpload($cyid);
 		PwUpload::upload($img);
 		pwFtpClose($ftp);
+		$cyid = pwQuery::insert('pw_colonys', array(
+				'cname'		=> $cname,
+				//'classid'	=> $cid,
+				'styleid'	=> $styleid,
+				'commonlevel' => $commonLevel,
+				'admin'		=> $windid,
+				'members'	=> 1,
+				'ifcheck'	=> 2,
+				'createtime'=> $timestamp,
+				'descrip'	=> $descrip,
+				'titlefont' => $titlefont
+		));
+		
+		$db->update("UPDATE pw_cnstyles SET csum=csum+1 WHERE id IN (" . S::sqlImplode($styles) . ')');
 		if ($cnimg = $img->getImgUrl()) {
 			$cnimg = substr(strrchr($cnimg,'/'),1);
-			$db->update("UPDATE pw_colonys SET cnimg=".S::sqlEscape($cnimg)." WHERE id=".S::sqlEscape($cyid));
+			//* $db->update("UPDATE pw_colonys SET cnimg=".S::sqlEscape($cnimg)." WHERE id=".S::sqlEscape($cyid));
+			$db->update(pwQuery::buildClause("UPDATE :pw_table SET cnimg=:cnimg WHERE id=:id", array('pw_colonys',$cnimg,$cyid)));
 		}
 		/**
 		$db->update("INSERT INTO pw_cmembers SET " . S::sqlSingle(array(

@@ -19,7 +19,7 @@ if(!$action){print <<<EOT
 <div class="admin_info mb10">
 	<h3 class="h1"><b>提示信息</b></h3>
 	<div class="legend">
-		<ul><li>添加特殊表情:请先上传表情至<b>$imgpath/post/smile/write/</b>目录中，然后在“特殊表情(该目录下尚未被添加的表情)”中选中并填写表情名称后即可添加</li>
+		<ul><li>添加表情组:请上传表情组文件夹至images/post/smile/目录中</li>
 <li>表情名称:使用该表情时将出现相应的语言描述，必填</li></ul>
 	</div>
 </div>
@@ -98,16 +98,18 @@ function delSmiles(){
 EOT;
 }elseif($action=='smilemanage'){print <<<EOT
 -->
-<form action="$basename" method="post">
+<form action="$basename" method="post"  name="smiledel" id="deleteForm">
 <input type="hidden" name="id" value="$id" />
 <input type="hidden" name="action" value="$action" />
 <input type="hidden" name="step" value="3" />
+<input type="hidden" name="typeid" value="$id" />
 <h2 class="h1">
 <span class="mr10">表情管理<span class="linka">(已经成功添加的表情)</span></span><a href="$basename" class="linka">返回上一级<span class="f9">▲</span></a>
 </h2>
 <div class="admin_table mb10">
 <table cellspacing="0" cellpadding="0" border="0" width="100%">
 	<tr class="tr2 td_bgB">
+    	<td width="30"><span onclick="CheckAll(document.smiledel)" class="cp">全选</span></td>
 		<td width="50">顺序</td>
 		<td width="50">标签</td>
 		<td width="60">图片路径</td>
@@ -127,6 +129,7 @@ EOT;
 foreach($smiles as $value){print <<<EOT
 -->
 	<tr class="tr1">
+    	<td class="td2">&nbsp;<input type="checkbox" name="checkSelect[]" value="$value[id]"></td>
 		<td class="td2"><input name="vieworder[$value[id]]" class="input input_wd" value="$value[vieworder]"></td>	
 		<td class="td2">[s:$value[id]]</td>
 		<td class="td2">$path/$value[path]</td>
@@ -142,7 +145,9 @@ EOT;
 </table>
 </div>
 <div class="tac mb10">
-	<span class="btn"><span><button type="submit">提 交</button></span></span>
+	<span class="bt"><span><button type="button" onclick="CheckAll(document.smiledel)">全 选</button></span></span>
+	<span class="btn"><span><button type="submit">编&nbsp;辑</button></span></span>
+    <span class="btn"><span><button  type="button" name="deletesubmit" id="delete_submit" onclick="submitForm(document.smiledel,'delsmile');">删&nbsp;除</button></span></span>
 </div>
 </form>
 <script language="javascript">
@@ -150,6 +155,11 @@ function delSmile(){
 	var msg=confirm("删除表情请注意:\\n\\n删除该表情将会导致前台的该表情图片无法再显示，您确认要删除吗？");
 	return msg;
 }
+
+function submitForm(aForm, action) {
+	aForm.action.value = action;
+	aForm.submit();
+} 
 </script>
 <form action="$basename" method="post" name="FORMADD">
 <h2 class="h1"><span class="mr20">表情管理</span><span class="linka">(该目录下尚未被添加的表情)</span></h2>
@@ -210,7 +220,7 @@ print <<<EOT
 <li>表情名称:使用该表情时将出现相应的语言描述，必填</li></ul>
 	</div>
 </div>
-<form action="$basename&tab=$tab" method="post">
+<form action="$basename&tab=$tab" method="post" name="FORMDEL" id="deleteForm">
 <input type="hidden" name="action" value="edits" />
 <input type="hidden" name="step" value="3" />
 <h2 class="h1">
@@ -219,6 +229,7 @@ print <<<EOT
 <div class="admin_table mb10">
 <table cellspacing="0" cellpadding="0" border="0" width="100%">
 	<tr class="tr2 td_bgB">
+  		<td width="30"><span onclick="CheckAll(document.FORMDEL)" class="cp">全选</span></td>
 		<td width="50">顺序</td>
 		<td width="165">表情名称<span class="s1">*</span></td>
 		<td width="60">图片路径</td>
@@ -236,6 +247,7 @@ EOT;
 		foreach ($smiles as $smile) {print <<<EOT
 -->
 	<tr class="tr1">
+   		<td class="td2">&nbsp;<input type="checkbox" name="checkSelect[]" value="$smile[smileid]"></td>
 		<td class="td2"><input name="edits[$smile[smileid]][order]" class="input input_wd" value="$smile[vieworder]"></td>
 		<td class="td2"><input type="text" class="input input_wa" name="edits[$smile[smileid]][name]" value="$smile[name]" /></td>
 		<td class="td2">$smile[path]</td>
@@ -250,7 +262,9 @@ EOT;
 </table>
 </div>
 <div class="tac mb10">
-	<span class="btn"><span><button type="submit">提 交</button></span></span>
+	<span class="bt"><span><button type="button" onclick="CheckAll(document.FORMDEL)">全 选</button></span></span>
+	<span class="btn"><span><button type="submit">编&nbsp;辑</button></span></span>
+     <span class="btn"><span><button  type="button" name="deletesubmit" id="delete_submit" onclick="submitForm(document.FORMDEL,'delsmile');">删&nbsp;除</button></span></span>
 </div>
 </form>
 
@@ -259,6 +273,11 @@ function delSmile(){
 	var msg=confirm("删除表情请注意:\\n\\n删除该表情将会导致前台的该表情图片无法再显示，您确认要删除吗？");
 	return msg;
 }
+
+function submitForm(aForm, action) {
+	aForm.action.value = action;
+	aForm.submit();
+} 
 </script>
 
 <form action="$basename&tab=$tab" method="post" name="FORMADD">
@@ -266,7 +285,7 @@ function delSmile(){
 <div class="admin_table mb10">
 <table cellspacing="0" cellpadding="0" width="100%">
 	<tr class="tr2 td_bgB">
-		<td width="80"><span onclick="CheckAll(document.FORMADD)" class="cp">全选</span></td>
+		<td width="30"><span onclick="CheckAll(document.FORMADD)" class="cp">全选</span></td>
 		<td width="50">顺序</td>
 		<td width="100">表情名称<span class="s1">*</span></td>
 		<td width="100">图片路径</td>

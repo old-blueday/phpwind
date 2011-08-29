@@ -146,7 +146,7 @@ EOT;
 									<div class="p15">
 										<table width="100%" class="setTable">
 											<tr>
-												<th class="th">请选择充值积分:</th>
+												<th class="th">充值积分名</th>
 												<td class="td">
 													<select name="paycredit" id="paycredit" onchange="payinfo(this.value);" class="select_wa">
 <!--
@@ -164,12 +164,14 @@ EOT;
 													&nbsp;&nbsp;<span class="s2"><span id="payinfo"></span></span>
 												</td>
 											</tr>
-										<tr>
-											<th class="th">请输入充值金额:</th>
-											<td class="td">
-												<input class="input input_wa" type="text" name="number" value="10" size="8" />&nbsp;元
-											</td>
-										</tr>
+											<tr>
+												<th class="th">充值积分数</th>
+												<td class="td">
+													<input class="input input_wa" type="text" name="creditnumber" onkeyup="calculateMoney(this)" />
+													&nbsp;&nbsp;<span class="s2"><span id="moneyinfo"></span></span>
+													<input class="input input_wa" type="hidden" name="number" id="moneynumber" />
+												</td>
+											</tr>
 										<tr>
 											<th class="th">支付方式: </th>
 											<td class="td">
@@ -196,13 +198,26 @@ EOT;
 											</td>
 										</tr>
 										</table>
-										<div class="tac" style="padding:1em;"><span class="btn"><span><button type="submit">提交订单</button></span></span></div>
+										<div class="tac" style="padding:1em;"><span class="btn"><span><button type="submit" id="buysubmit">提交订单</button></span></span></div>
 									</div>
 								</form>
 							<script language="JavaScript">
 								var creditinfo = $creditinfo;
 								function payinfo(c) {
 									getObj('payinfo').innerHTML = '当前汇率:' + creditinfo[c][0] + ' ' + creditinfo[c][2] + ' = ￥1（最低 ' + creditinfo[c][1] + ' 元人民币 ）';
+								}
+								
+								function calculateMoney(obj) {
+									var radio = creditinfo[getObj('paycredit').value][0];
+									var moneyNumber = Math.round(obj.value)/radio;
+									if (isNaN(moneyNumber)) {
+										getObj('moneyinfo').innerHTML = '请输入数字';
+										getObj('buysubmit').disabled = true;
+										return false;
+									}
+									getObj('moneynumber').value = moneyNumber;
+									getObj('moneyinfo').innerHTML = '(所需人民币' + moneyNumber + '元)';
+									getObj('buysubmit').disabled = false;
 								}
 								payinfo(getObj('paycredit').value);
 							</script>
@@ -274,33 +289,36 @@ EOT;
 										<tr>
 											<td>
 												积分 <select class="input_wc" name="ctype">
-											<option></option>
+												<option></option>
 <!--
 EOT;
-foreach ($credit->cType as $key => $value) {print <<<EOT
+foreach ($credit->cType as $key => $value) {
+$ctypeSelect = ($key == $ctype) ? 'selected' : '';
+print <<<EOT
 -->
-											<option value="$key">$value</option>
+											<option value="$key" $ctypeSelect>$value</option>
 <!--
 EOT;
 }print <<<EOT
 -->
 											</select>
 											</td>
-											<td>日期 <input class="input" type="text" name="stime" size="10" id="stime" onclick="ShowCalendar(this.id)" />&nbsp;-&nbsp;<input class="input" type="text" name="etime" size="10" id="etime" onclick="ShowCalendar(this.id)" />
+											<td>日期 <input class="input" type="text" name="stime" size="10" id="stime" onclick="ShowCalendar(this.id)"  value="$stimeView" />&nbsp;-&nbsp;<input class="input" type="text" name="etime" size="10" id="etime" onclick="ShowCalendar(this.id)" value="$etimeView" />
 											</td>
 											<td>操作 <select class="select_wa" name="logtype">
 											<option></option>
 <!--
 EOT;
 foreach($lang['logtype']['creditlog'] as $key => $value){
+$logtypeSelect = ($key == $logtype) ? 'selected' : '';
 if(strpos($key,'_') === false){print <<<EOT
 -->
-											<option value="$key">&#62;&#62; $value</option>
+											<option value="$key" $logtypeSelect>&#62;&#62; $value</option>
 <!--
 EOT;
 }else{print <<<EOT
 -->
-											<option value="$key"> &nbsp;|- $value</option>
+											<option value="$key" $logtypeSelect> &nbsp;|- $value</option>
 <!--
 EOT;
 }}print <<<EOT
@@ -363,7 +381,13 @@ print <<<EOT
 											<li>{$value}：$creditdb[$key]</li>
 <!--
 EOT;
-}print <<<EOT
+}
+if($db_virerate){
+	$virerate = $db_virerate . '%';
+} else {
+	$virerate = '无';
+}
+print <<<EOT
 -->
 									</ul>
 							</div>
@@ -371,7 +395,7 @@ EOT;
 										<table width="100%" class="setTable">
 											<tr>
 												<th class="th">转帐手续费</th>
-												<td class="td">$db_virerate%</td>
+												<td class="td">$virerate</td>
 											</tr>
 											<tr>
 												<th class="th">转入用户名</th>

@@ -9,6 +9,7 @@ class PW_ForumOption{
 		$result[] = '全站调用';
 		foreach ($forums as $fid=>$forum) {
 			if ($forum['type']=='category') continue;
+			
 			$result[$fid] = $this->_initForumName($forum);
 		}
 		return $result;

@@ -237,7 +237,8 @@ if ($action=='config') {
 } elseif ($action == 'flash') {
 
 	header('Cache-Control: no-cache, must-revalidate');
-	@include_once pwCache::getPath(D_P.'data/bbscache/ystat.php');
+	//* @include_once pwCache::getPath(D_P.'data/bbscache/ystat.php');
+	pwCache::getData(D_P.'data/bbscache/ystat.php');
 	echo $flashvars;exit;
 } else {
 	ObHeader($basename.'&action=config');

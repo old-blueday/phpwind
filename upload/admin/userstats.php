@@ -2,7 +2,8 @@
 !function_exists('adminmsg') && exit('Forbidden');
 //require_once D_P.'data/bbscache/forum_cache.php';
 S::gp(array('adminitem'));
-require_once pwCache::getPath(D_P.'data/bbscache/level.php');
+//* require_once pwCache::getPath(D_P.'data/bbscache/level.php');
+pwCache::getData(D_P.'data/bbscache/level.php');
 $ltitle['-1'] = getLangInfo('all','reg_member');
 $basename = "$admin_file?adminjob=userstats&adminitem=$adminitem";
 empty($adminitem) && $adminitem = 'userstats';

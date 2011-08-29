@@ -22,37 +22,7 @@ print <<<EOT
 			<td class="td2">
 				大小:&nbsp;<input name="upload[imgsize]"value="$db_imgsize" class="input input_wc" />  KB</li>
 			</td>
-			<td class="td2"><div class="help_a">超过设定值大小的图片将不能上传为头像</div></td>
-		</tr>
-		<tr class="tr1 vt">
-			<td class="td1">头像显示限制</td>
-			<td class="td2">
-				<ul class="list_C">
-					<li>宽:　&nbsp;<input name="upload[imgwidth]" value="$db_imgwidth" class="input input_wc" maxlength="3">&nbsp;像素</li>
-					<li>高:　&nbsp;<input name="upload[imglen]" value="$db_imglen" class="input input_wc" maxlength="3">&nbsp;像素</li>
-				</ul>
-			</td>
-			<td class="td2"><div class="help_a">超过设定值大小的图片将不能上传为头像</div></td>
-		</tr>
-		<tr class="tr1 vt">
-			<td class="td1">头像缩略功能</td>
-			<td class="td2">
-				<ul class="list_A list_80">
-					<li><input type="radio" value="1" name="config[iffthumb]" $iffthumb_Y>开启</li>
-					<li><input type="radio" value="0" name="config[iffthumb]" $iffthumb_N>关闭</li>
-				</ul>
-			</td>
-			<td class="td2"><div class="help_a">开启后，上传的头像将按照一定比例被进行缩略</div></td>
-		</tr>
-		<tr class="tr1 vt">
-			<td class="td1">头像缩略限制</td>
-			<td class="td2">
-				<ul class="list_C">
-					<li>宽:　&nbsp;<input name="fthumbsize[fthumbwidth]" value="$db_fthumbwidth" class="input input_wc" />&nbsp;像素</li>
-					<li>高:　&nbsp;<input name="fthumbsize[fthumbheight]" value="$db_fthumbheight" class="input input_wc" />&nbsp;像素</li>
-				</ul>
-			</td>
-			<td class="td2"><div class="help_a">超过设定值的图片才会被压缩，0或空表示不限制。</div></td>
+			<td class="td2"><div class="help_a"><font color="red">系统限制上传附件最大尺寸为{$maxuploadsize},</font>超过设定值大小的图片将不能上传为头像</div></td>
 		</tr>
 	</table>
 </div>

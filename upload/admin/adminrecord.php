@@ -7,11 +7,11 @@ $db_adminrecord == 0 && adminmsg('adminrecord_open');
 if ($admintype == 'add') {
 	S::gp(array('content','jumpurl'));
 	if ($content) {
-		/** !file_exists($bbscrecordfile) && writeover($bbscrecordfile,"<?php die;?>\n"); **/
-		!file_exists($bbscrecordfile) && pwCache::setData($bbscrecordfile,"<?php die;?>\n");
+		!file_exists($bbscrecordfile) && writeover($bbscrecordfile,"<?php die;?>\n");
+		/** !file_exists($bbscrecordfile) && pwCache::setData($bbscrecordfile,"<?php die;?>\n"); **/
 		$new_crecord = '|'.str_replace('|','&#124;',S::escapeChar($admin_name)).'|'."|$onlineip|$timestamp|".'|'.str_replace('|','&#124;',$content)."\n";
-		//* writeover($bbscrecordfile,$new_crecord,"ab");
-		pwCache::setData($bbscrecordfile,$new_crecord, false, "ab");
+		writeover($bbscrecordfile,$new_crecord,"ab");
+		//* pwCache::setData($bbscrecordfile,$new_crecord, false, "ab");
 	}
 	ObHeader($jumpurl);
 } elseif ($admintype == 'del') {
@@ -24,8 +24,8 @@ if ($admintype == 'add') {
 			$output=array_slice($recorddb,0,100);
 			$output=array_reverse($output);
 			$output="<?php die;?>\r\n".implode("",$output);
-			//* writeover($bbscrecordfile,$output);
-			pwCache::setData($bbscrecordfile,$output);
+			writeover($bbscrecordfile,$output);
+			//* pwCache::setData($bbscrecordfile,$output);
 			adminmsg('adminrecord_del');
 		}else{
 			adminmsg('adminrecord_min');

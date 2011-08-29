@@ -8,7 +8,8 @@
  */
 require_once('global.php');
 
-include_once pwCache::getPath(D_P.'data/bbscache/ol_config.php');
+//* include_once pwCache::getPath(D_P.'data/bbscache/ol_config.php');
+pwCache::getData(D_P.'data/bbscache/ol_config.php');
 !$ol_onlinepay && Showmsg($ol_whycolse);
 if (!$ol_99bill || !$ol_99billcode) {
 	Showmsg('olpay_seterror');

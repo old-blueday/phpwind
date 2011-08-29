@@ -1,0 +1,104 @@
+<!--<?php
+include_once PrintEot('left');
+if($step>1 && ($starttime || $endtime)){
+$starttime = get_date($starttime,'Y-m-d');
+$endtime = get_date($endtime-86400,'Y-m-d');
+}
+print <<<EOT
+-->
+<style type="text/css">
+.percent{border:1px solid #73aa55;padding:1px;background:#fff;height:16px;overflow:hidden;}
+.per_value{float:left;height:100%;background:#bee4aa;overflow:hidden;}
+</style>
+<div class="admin_info mb10">
+  <h3 class="h1"><b>提示信息</b></h3>
+  <div class="legend"><ol><li> 通过此功能可将历史图片生成为图酷，不建议进行大数据量操作</li><li>未开启图酷功能的版块无法处理历史数据，请先开启图酷功能&nbsp;&nbsp;<a href="$admin_file?adminjob=setforum&action=edit&c_type=basic">版块设置</a></li></ol> </div>
+</div>
+<script src="js/date.js"></script>
+<!--
+EOT;
+	if(!$tucoolForumsHtml){print <<<EOT
+-->
+<div class="admin_tips">请先开启图酷版块！</div>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+<form action="$basename&" method="post">
+ <input type="hidden" name="action" value="process">
+  <h2 class="h1">数据生成</h2>
+		<div class="admin_table mb10">
+		<table cellspacing="0" cellpadding="0" width="100%" class="mb10">
+				<tr class="tr1 vt">
+					<td class="td1">版块选择：<!--利用此功能可将一个或多个设置同时应用到其它版块中，不再需要逐个版块设置，使操作更加简便<br />操作说明:<ol><li><font color=blue>选中</font>需要进行横向操作的<font color=blue>权限设置后面的复选框</font></li><li>在左边的复选框中<font color=blue>选择</font>需要进行横向操作的<font color=blue>版块</font></li><li>然后提交即可完成版块权限横向操作</li></ol>注:<ol><li>选择版块时可使用 ‘Ctrl’ 键进行多选，也可使用 ‘Shift’ 键或拖动鼠标连续选择多个版块</li><li>不使用此功能，请不要选中<font color=blue>权限设置后面的复选框</font>和左边的复选框中<font color=blue>版块</font></li></ol>--></td>
+					<td class="td2">
+						<select id="tucoolForums" class="select_wa" name="fids[]" size="12" multiple>$tucoolForumsHtml</select>
+						<span class="bt2"><span><button type="button" onclick="selectAllForums(getObj('tucoolForums'))">全选</button></span></span>
+					</td>
+				</tr>
+				<tr class="tr1 vt">
+					<td class="td1">发表时间：</td>
+					<td class="td2 ">
+						<div class="input_img fl"><i onclick="this.nextSibling.onclick()" class="input_time" title="选择时间">选择时间</i><input type="text" name="starttime" id="starttime" value="$starttime" onclick="ShowCalendar(this.id)" /></div>
+						<span class="p_lr_10 fl">至</span>
+						<div class="input_img fl"><i onclick="this.nextSibling.onclick()" class="input_time" title="选择时间">选择时间</i><input type="text" name="endtime" id="endtime" value="$endtime" onclick="ShowCalendar(this.id)" /></div>
+					</td>
+				</tr>
+<!--
+EOT;
+$process = '';
+if($action == 'process' && $step){
+$width = 352;
+$process = min($width,intval($width * ($haveBuild/$totalNums))).'px';
+$percent = min(ceil($haveBuild/$totalNums*100),100) . '%'; 
+print <<<EOT
+-->
+				<tr class="tr1">
+					<td class="td1">处理进度：</td>
+					<td class="td2">
+						<div style="width:356px;" class="fl mr10"><div class="percent"><div class="per_value" id="progress"></div></div></div>
+						<span id="percent">$percent</span>
+					</td>
+				</tr>
+                <tr class="tr1">
+                <td class="td1"></td>
+                  <td class="td2">
+                    <span>共需处理 $totalNums 条数据，已处理 $haveBuild 条！<span>
+                    </td>
+                </tr>
+<script language="JavaScript"> 
+
+function process(width) {
+	var haveBuild = {$haveBuild};
+	var totalNums = {$totalNums};
+	if (haveBuild < totalNums) var refresh = setTimeout("document.location='{$jumpUrl}';", 1000);
+	getObj('progress').style.width = width;
+	
+}
+process('$process');
+
+</script>  
+<!--
+EOT;
+}print <<<EOT
+-->
+		</table>
+		</div>
+		<div class="p10 tac"><span class="btn"><span><button type="submit"  value="提 交">生成</button></span></span></div>
+</form>
+<script>
+var select = true;
+function selectAllForums(obj){
+	var options = obj.options;
+	for(i=0;i<options.length;i++){
+		obj.options[i].selected = select;
+	}
+	select = !select;
+}
+if (tuobj = getObj('tucoolForums')) selectAllForums(tuobj);
+</script>
+<!--
+EOT;
+}
+include_once PrintEot('adminbottom');
+?>-->

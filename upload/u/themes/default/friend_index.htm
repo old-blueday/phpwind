@@ -4,7 +4,7 @@ require_once(uTemplate::printEot('user_appleft'));
 print<<<EOT
 -->
 <div class="contUser">
-<table width="100%"><tr><td valign="top" height="400">
+<table width="100%"><tr><td valign="top" height="500">
 	<div class="p15">
 		<h4 class="site"><img src="u/images/module/friend.png" align="absmiddle" class="mr10" /><span>朋友</span></h4>
 		<div class="navC mb10">
@@ -38,7 +38,7 @@ EOT;
 if ($type == 'birthday') {print <<<EOT
 -->
 		<div class="bdB pb10 p_lr_10 cc">
-			我现在的生日设置为：{$birthday} <a href="profile.php?action=modify">点击设置我的生日</a>
+			我现在的生日设置为：{$birthday} <a href="profile.php?action=modify&info_type=$birthdayLink">点击设置我的生日</a>
 		</div>
 		<div class="conFeed" style="padding-left:7px;">
 <!--
@@ -122,41 +122,23 @@ EOT;
 }print<<<EOT
 -->
 		<div class="contentB p_lr_10">
-			<ul class="half cc">
+		<div class="friList" id="friList">
 <!--
 EOT;
 if (!empty($friends)) {
+$userService = L::loadClass('UserService', 'user');
 foreach ($friends as $key => $value) {
-$value['honor'] = substrs($value['honor'],40);
+$groupId = ($value['groupid'] == '-1') ? $value['memberid'] : $value['groupid'];
+$groupRight = $userService->getRightByGroupId($groupId);
+$value['honor'] = $groupRight['allowhonor'] ? substrs($value['honor'],40) : '';
 print <<<EOT
 -->
-				<li id="friend_{$value[uid]}">
-					<dl class="friDl cc p10 mr10 mb10">
-						<dt class="fl mr10">
-<!--
-EOT;
-	if ($value['attentionEach']) {print <<<EOT
--->
-                        	<div class="fr"><div class="mnfollow" title="互相关注"></div></div>
-<!--
-EOT;
-	}print <<<EOT
--->
-                        	<a href="{$db_userurl}$value[uid]" class="img_50"><img src="$value[face]" width="44" height="44" /></a></dt>
-						<dd>
-							<div><!--
-EOT;
-if (!$value['attention']) {print <<<EOT
--->
-<a href="javascript:;" onclick="Attention.add(this,'{$value['uid']}',0);" class="follow s7 fr" name="att_friend">加关注</a>
-<!--
-EOT;
-} else {print <<<EOT
---><a href="javascript:;" class="fr following gray">关注中</a>
-<!--
-EOT;
-}print <<<EOT
---><a href="{$db_userurl}$value[uid]" class="b">$value[username]</a><!--
+			<dl class="cc nadlA" id="friend_{$value[uid]}">
+				<dt><a href="{$db_userurl}$value[uid]" class="img_50"><img src="$value[face]" width="44" height="44" /></a></dt>
+				<dd>
+					<div class="nadlCon">
+						<div class="nadlCon_l fl">
+							<p class="mb5"><a href="{$db_userurl}$value[uid]" class="b">$value[username]</a><!--
 EOT;
 if(checkOnline($value['thisvisit'])){
 print <<<EOT
@@ -165,8 +147,20 @@ print <<<EOT
 <!--
 EOT;
 }print <<<EOT
---></div><!--$value[honor] 最近登录: {$value[lastvisit]}-->
-							<div>被关注：<span id="att_friend_{$value[uid]}">{$value['fans']}</span></div>
+-->
+<!--
+EOT;
+if($u == $winduid){print <<<EOT
+-->
+							<a href="javascript:;" onclick="sendmsg('pw_ajax.php?action=msg&touid=$value[uid]');"><img src="$imgpath/pwicon/add_mes.png" title="发送消息" align="absmiddle" /></a>
+<!--
+EOT;
+}print <<<EOT
+-->
+</p>
+							<p class="mb5">$value[honor]</p>
+							<p>被关注：<span id="att_friend_{$value[uid]}" class="mr20">{$value['fans']}</span>最近登录: {$value[lastvisit]}</p>
+						</div>
 <!--
 EOT;
 if($u == $winduid) {
@@ -177,64 +171,94 @@ $ftypename = '未分组';
 }
 print <<<EOT
 -->
-							<div>
-								<a href="javascript:;" class="adown fr s7" id="td_More{$value[uid]}" onclick="read.open('menu_More{$value[uid]}','td_More{$value[uid]}');">更多操作</a><a href="javascript:;" class="adown" id="td_ftid{$value[uid]}" onclick="read.open('menu_ftid{$value[uid]}','td_ftid{$value[uid]}');" title="点击重新分组"><span id="ftypename_{$value[uid]}" class="s7">{$ftypename}</span></a>
-								<div id="menu_ftid{$value[uid]}" style="display:none;">
+						<div class="nadlCon_r fl pr">
+							<a href="javascript:;" class="link_down" id="td_ftid{$value[uid]}" onclick="read.open('menu_ftid{$value[uid]}','td_ftid{$value[uid]}');" title="点击重新分组"><span id="ftypename_{$value[uid]}">{$ftypename}</span></a>
+<div id="menu_ftid{$value[uid]}" style="display:none; ">
 <!--
 EOT;
 if ($friendType) {print <<<EOT
 -->
-								<div class="pw_menu">
-									<ul class="menuList">
+			<div class="pw_menu friGroup">
+				<ul class="menuList">
 <!--
 EOT;
 foreach ($friendType as $type) {print <<<EOT
 -->
-										<li><a  href="javascript:;" onclick="setFriendType('',{$value[uid]}, $type[ftid]);" class="s6">{$type['name']}</a></li>
+					<li><a  href="javascript:;" onclick="setFriendType('',{$value[uid]}, $type[ftid]);" class="s6">{$type['name']}</a></li>
 <!--
 EOT;
 }print <<<EOT
 -->
-									</ul>
-								</div>
+				</ul>
+			</div>
 <!--
 EOT;
 }print <<<EOT
 -->
-								</div>
-							</div>
-							<div class="pw_menu" style="display:none;" id="menu_More{$value[uid]}">
-								<ul class="menuList" style="width:70px;">
-									<li><a href="javascript:;" onclick="pwConfirm('是否确认解除？',this,function(){delFriend('$value[uid]')});">解除好友</a></li>
+			</div>
+						</div>
+						<div class="nadlCon_c fr">				
 <!--
 EOT;
-if($u==$winduid){
-print <<<EOT
+if (!$value['attention']) {print <<<EOT
 -->
-									<li><a href="javascript:;" onclick="sendmsg('pw_ajax.php?action=msg&touid=$value[uid]');" title="发送消息">发送消息</a></li>
+									<p class="mb5"><a href="javascript:;" onclick="Attention.add(this,'{$value['uid']}',1)" class="follow">关注</a></p>
 <!--
 EOT;
-}print <<<EOT
+	}if ($value['attentionEach']) {print <<<EOT
 -->
+                  <p class="mb5"><img src="u/images/mnfollow.png" title="互相关注" /></p>
+<!--
+EOT;
+	}print <<<EOT
+-->
+							<ul>
 <!--
 EOT;
 if ($value['attention']) {print <<<EOT
---><li>
-<a href="javascript:;" onclick="pwConfirm('是否取消关注？',this,function(){Attention.del('{$value[uid]}')});" title="取消关注">取消关注</a></li>
+-->
+									<li><a href="javascript:;" onclick="pwConfirm('是否取消关注？',this,function(){Attention.del('{$value[uid]}')})" class="s7">取消关注</a></li>
 <!--
 EOT;
-}print <<<EOT
+}if (!in_array($value['uid'], $friendsAllUids)) {print <<<EOT
+-->
+									<li><a href="javascript:;"  onclick="sendmsg('pw_ajax.php?action=addfriend&touid={$value[uid]}&reload=1');" class="s7">加为好友</a></li>
+<!--
+EOT;
+ } else {print <<<EOT
+-->
+									<li><a href="javascript:;" onclick="pwConfirm('是否确认解除？',this,function(){delFriend('$value[uid]')});" title="解除好友" class="s7">解除好友</a></li>
+<!--
+EOT;
+} print <<<EOT
 -->
 								</ul>
-							</div>
-						</dd>
-					</dl>
-				</li>
+						</div>
+					</div>
+				</dd>
+			</dl>
 <!--
 EOT;
 }}print <<<EOT
 -->
-			</ul>
+		</div>
+<script type="text/javascript">
+var li = document.getElementById("friList");
+var tt = li.getElementsByTagName("dl");
+for(i=0; i<tt.length; i++){
+	tt[i].onmouseover= function(){
+		for(j=0; j<tt.length; j++){
+			tt[j].className = "cc nadlA";
+			this.className  = "current cc nadlA";
+		}
+	}
+	tt[i].onmouseout= function(){
+      for(j=0; j<tt.length; j++){
+          this.className  = "cc nadlA";
+      }
+   }
+}
+</script>
 <!--
 EOT;
 } else {print <<<EOT
@@ -250,48 +274,24 @@ EOT;
 EOT;
 } elseif ($type == 'attention' || $type == 'attentioned')  {print <<<EOT
 -->
-
-	<script language="javascript">setCurrent('at_$atype','at_attention','s5 b');</script>
 	<div class="p_lr_10 contentB">
-		<ul class="half cc">
+		<div class="friList" id="friList">
 <!--
 EOT;
 if (!empty($attentions)) {
+$userService = L::loadClass('UserService', 'user');
 foreach ($attentions as $key => $value) {
-$value['honor'] = substrs($value['honor'],40);
+$groupId = ($value['groupid'] == '-1') ? $value['memberid'] : $value['groupid'];
+$groupRight = $userService->getRightByGroupId($groupId);
+$value['honor'] = $groupRight['allowhonor'] ? substrs($value['honor'],40) : '';
 print <<<EOT
 -->
-			<li id="friend_{$value[uid]}">
-				<dl class="friDl cc p10 mr10 mb10">
-					<dt class="fl mr10">
-<!--
-EOT;
-	if ($value['attentionEach']) {print <<<EOT
--->
-						<div class="fr"><div class="mnfollow" title="互相关注"></div></div>
-<!--
-EOT;
-	}print <<<EOT
--->
-                        <a href="{$db_userurl}$value[uid]" class="img_50"><img src="$value[face]" width="44" height="44" /></a>
-					</dt>
-					<dd>
-						<div>
-<!--
-EOT;
-if ($value['attention']) {print <<<EOT
--->
-							<a  href="javascript:;" onclick="pwConfirm('是否取消关注？',this,function(){Attention.del('{$value[uid]}')})" class="s7 fr">取消关注</a>
-<!--
-EOT;
-} else {print <<<EOT
--->
-							<a  href="javascript:;" onclick="Attention.add(this,'{$value['uid']}',1)" class="s7 fr follow">加关注</a>
-<!--
-EOT;
-	}print <<<EOT
--->
-							<a href="{$db_userurl}$value[uid]" class="b">$value[username]</a><!--
+			<dl class="cc nadlA" id="friend_{$value[uid]}">
+				<dt><a href="{$db_userurl}$value[uid]" class="img_50"><img src="$value[face]" width="44" height="44" /></a></dt>
+				<dd>
+					<div class="nadlCon">
+						<div class="nadlCon_l fl">
+							<p class="mb5"><a href="{$db_userurl}$value[uid]" class="b">$value[username]</a><!--
 EOT;
 if(checkOnline($value['thisvisit'])){
 print <<<EOT
@@ -301,55 +301,81 @@ print <<<EOT
 EOT;
 }print <<<EOT
 -->
-						</div>
-						<div class="lh_18">$value[honor]</div>
-						<div>
-                        	<a href="javascript:;" class="adown fr s7" id="td_More{$value[uid]}" onclick="read.open('menu_More{$value[uid]}','td_More{$value[uid]}');">更多操作</a>
-							<div class="pw_menu" style="display:none;" id="menu_More{$value[uid]}">
-								<ul class="menuList" style="width:70px;">
-									<li>
-<!--
-EOT;
-if (!in_array($value['uid'], $friendsAllUids)) {print <<<EOT
--->
-									<a href="javascript:;"  onclick="sendmsg('pw_ajax.php?action=addfriend&touid={$value[uid]}&reload=1');">加为好友</a></li>
-<!--
-EOT;
- } else {print <<<EOT
--->
-									<a href="javascript:;" onclick="pwConfirm('是否确认解除？',this,function(){delFriend('$value[uid]')});" title="解除好友" >解除好友</a></li>
-<!--
-EOT;
-} print <<<EOT
--->
-
-
 <!--
 EOT;
 if($u == $winduid){print <<<EOT
 -->
-									<li><a href="javascript:;" onclick="sendmsg('pw_ajax.php?action=msg&touid=$value[uid]');" title="发送消息">发送消息</a></li>
+							<a href="javascript:;" onclick="sendmsg('pw_ajax.php?action=msg&touid=$value[uid]');"><img src="$imgpath/pwicon/add_mes.png" title="发送消息" align="absmiddle" /></a>
 <!--
 EOT;
-}if ($value['attention']) {print <<<EOT
+}print <<<EOT
 -->
-									<li><a href="javascript:;" onclick="pwConfirm('是否取消关注？',this,function(){Attention.del('{$value[uid]}')});" title="取消关注">取消关注</a></li>
+</p>
+							<p class="mb5">$value[honor]</p>
+							<p>最近登录: {$value[lastvisit]}</p>
+						</div>
+						<div class="nadlCon_c fr">
+<!--
+EOT;
+if (!$value['attention']) {print <<<EOT
+-->
+									<p class="mb5"><a href="javascript:;" onclick="Attention.add(this,'{$value['uid']}',1)" class="follow">关注</a></p>
+<!--
+EOT;
+	}if ($value['attentionEach']) {print <<<EOT
+-->
+                  <p class="mb5"><img src="u/images/mnfollow.png" title="互相关注" /></p>
+<!--
+EOT;
+	}print <<<EOT
+-->
+							<ul>
+<!--
+EOT;
+if ($value['attention']) {print <<<EOT
+-->
+									<li><a href="javascript:;" onclick="pwConfirm('是否取消关注？',this,function(){Attention.del('{$value[uid]}')})" class="s7">取消关注</a></li>
+<!--
+EOT;
+}if (!in_array($value['uid'], $friendsAllUids)) {print <<<EOT
+-->
+									<li><a href="javascript:;"  onclick="sendmsg('pw_ajax.php?action=addfriend&touid={$value[uid]}&reload=1');" class="s7">加为好友</a></li>
+<!--
+EOT;
+ } else {print <<<EOT
+-->
+									<li><a href="javascript:;" onclick="pwConfirm('是否确认解除？',this,function(){delFriend('$value[uid]')});" title="解除好友" class="s7">解除好友</a></li>
 <!--
 EOT;
 }print <<<EOT
 -->
 								</ul>
-							</div>
-                            最近登录: {$value[lastvisit]}
-                        </div>
-					</dd>
-				</dl>
-			</li>
+						</div>
+					</div>
+				</dd>
+			</dl>
 <!--
 EOT;
 }print <<<EOT
 --> 
-		</ul>
+		</div>
+<script type="text/javascript">
+var li = document.getElementById("friList");
+var tt = li.getElementsByTagName("dl");
+for(i=0; i<tt.length; i++){
+	tt[i].onmouseover= function(){
+		for(j=0; j<tt.length; j++){
+			tt[j].className = "cc nadlA";
+			this.className  = "current cc nadlA";
+		}
+	}
+	tt[i].onmouseout= function(){
+      for(j=0; j<tt.length; j++){
+          this.className  = "cc nadlA";
+      }
+   }
+}
+</script>
 <!--
 EOT;
 } else {print <<<EOT
@@ -382,38 +408,58 @@ if ($step != 2 ){
 }
 print <<<EOT
 -->
-<form action="{$thisbase}type=find" method="post" onsubmit="return checkSubmit();">
-<input type="hidden" name="verify" value="$verifyhash" />
+<form action="u.php" method="get" onsubmit="return checkSubmit();">
+<input type="hidden" name="a" value="friend">
+<input type="hidden" name="type" value="find">
 <input type="hidden" name="step" value="2">
 	<div class="friSearch p15 cc mb10">
 		<div class="fl friSip mr5">
 			<input class="f14 fl" type="text" size="50" name="f_keyword" value="$f_keyword" maxlength="35" id="f_keyword" />
 			<div class="friSelect fl">
-			<select name="according" id="according">
-				<option value="user" $userchecked>用户名</option>
-				<option value="uid" $uidchecked>UID</option>
-				<option value="email" $emailchecked>电子邮箱</option>
-			</select>
+				<span class="dropdown">
+				<select name="according" id="according">
+					<option value="user" $userchecked>用户名</option>
+					<option value="uid" $uidchecked>UID</option>
+					<option value="email" $emailchecked>电子邮箱</option>
+					<option value="tags" $tagschecked>标签</option>			
+				</select>
+				</span>
 			</div>
 		</div>
-		<span class="mr20"><span class="btn"><span><button type="submit">查找</button></span></span></span>想找更多朋友，马上<a href="u.php?a=friend&type=invite">开始邀请</a>
+		<span class="mr20"><span class="btn"><span><button type="submit">查找</button></span></span></span>
+<!--
+EOT;
+$rg_config  = L::reg();
+if (!($rg_config['rg_allowregister'] == 0 || ($rg_config['rg_registertype'] == 1 && date('j',$timestamp) != $rg_config['rg_regmon']) || ($rg_config['rg_registertype'] == 2 && date('w',$timestamp) != $rg_config['rg_regweek']))) {
+print <<<EOT
+--> 
+		想找更多朋友，马上<a href="u.php?a=friend&type=invite">开始邀请</a>
+<!--
+EOT;
+}print <<<EOT
+-->
 	</div>
 </form>
-<script language="javascript">
+<script type="text/javascript" src="js/select.js"></script>
+<script type="text/javascript">
+var ld=window.onload;
+window.onReady(function(){
+	new sSelect(getObj('according'));
+});
 function checkSubmit() {
 	var keyWord = getObj("f_keyword").value;
 	if (keyWord == '' || keyWord == null) {
 		showDialog('error','关键字不能为空,请重新输入',1);
 		return false;
 	}
-	window.location = '{$thisbase}type=find&step=2&f_keyword=' + keyWord + '&according=' + getObj('according').value;
-	return false;
+	//window.location = '{$thisbase}type=find&step=2&f_keyword=' + keyWord + '&according=' + getObj('according').value;
+	return true;
 }
 function changDisplay(source,target) {
-var objsource = getObj(source);
-objsource.style.display = 'none';
-var objtarget = getObj(target);
-objtarget.style.display = '';
+	var objsource = getObj(source);
+	objsource.style.display = 'none';
+	var objtarget = getObj(target);
+	objtarget.style.display = '';
 }
 </script>
 <div>
@@ -425,24 +471,27 @@ if (empty($step)) {print <<<EOT
 EOT;
 if ($recommendUsers) {print <<<EOT
 -->
-<h5 class="h5 mb10"><strong>可能感兴趣的人</strong></h5>
-<ul class="threeLines cc">
+	<h5 class="h5 mb10"><strong>可能感兴趣的人</strong></h5>
+	<ul class="threeLines cc">
 <!--
 EOT;
+$userService = L::loadClass('UserService', 'user');
 foreach ($recommendUsers as $member){
+$groupId = ($member['groupid'] == '-1') ? $member['memberid'] : $member['groupid'];
+$groupRight = $userService->getRightByGroupId($groupId);
 //$db_menuinit .= ",'td_recommendUsers{$member[uid]}' : 'menu_recommendUsers{$member[uid]}'";
 print <<<EOT
 -->
-	<li>
-		<dl class="friDl cc p10 mr10 mb10">
-			<dt class="fl mr10"><a class="img_50" href="{$db_userurl}$member[uid]" target="_blank"><img height="44" width="44" src="$member[face]"/></a></dt>
-			<dd>
-				<div>
+		<li>
+			<dl class="friDl cc p10 mr10 mb10">
+				<dt class="fl mr10"><a class="img_50" href="{$db_userurl}$member[uid]" target="_blank"><img height="44" width="44" src="$member[face]"/></a></dt>
+				<dd>
+					<div class="lh_18">
 <!--
 EOT;
 if (!$member['attention']) {print <<<EOT
 -->
-<a href="javascript:;" onclick="Attention.add(this,'{$member['uid']}',1);" class="s7 follow fr" name="att_recommend">加关注</a>
+<a href="javascript:;" onclick="Attention.add(this,'{$member['uid']}',1);" class="follow fr" name="att_recommend">关注</a>
 <!--
 EOT;
 } else {print <<<EOT
@@ -450,57 +499,53 @@ EOT;
 <!--
 EOT;
 }print <<<EOT
--->
-				<a class="b" href="{$db_userurl}$member[uid]" target="_blank">$member[username]</a>
-<!--
+--><a class="b" href="{$db_userurl}$member[uid]" target="_blank">$member[username]</a><!--
 EOT;
 if (checkOnline($member['thisvisit'])) {
 print <<<EOT
--->
-<img src="$imgpath/online.png" alt="在线" style="vertical-align:middle" /> 
-<!--
+--><img src="$imgpath/online.png" alt="在线" style="vertical-align:middle" /><!--
 EOT;
 }print <<<EOT
 --></div>
-				<div>被关注：<span id="att_recommend_{$member[uid]}">{$member['fans']}</span></div>
-				<a href="javascript:;" class="adown s7 fr" id="td_recommendUsers{$member[uid]}" onclick="read.open('menu_recommendUsers{$member[uid]}','td_recommendUsers{$member[uid]}');">更多操作</a>
-				<div class="pw_menu" style="display:none;" id="menu_recommendUsers{$member[uid]}">
-					<ul class="menuList" style="width:70px;">
-						<li><a href="javascript:;"  onclick="sendmsg('pw_ajax.php?action=addfriend&touid={$member[uid]}&reload=1');">加为好友</a></li>
-						<li><a href="javascript:;" onclick="sendmsg('pw_ajax.php?action=msg&touid={$member[uid]}');">发送消息</a></li>
+					<div>被关注：<span id="att_recommend_{$member[uid]}">{$member['fans']}</span></div>
+					<a href="javascript:;" class="adown s7 fr" id="td_recommendUsers{$member[uid]}" onclick="read.open('menu_recommendUsers{$member[uid]}','td_recommendUsers{$member[uid]}');">更多操作</a>
+					<div class="pw_menu" style="display:none;" id="menu_recommendUsers{$member[uid]}">
+						<ul class="menuList" style="width:70px;">
+							<li><a href="javascript:;"  onclick="sendmsg('pw_ajax.php?action=addfriend&touid={$member[uid]}&reload=1');">加为好友</a></li>
+							<li><a href="javascript:;" onclick="sendmsg('pw_ajax.php?action=msg&touid={$member[uid]}');">发送消息</a></li>
 <!--
 EOT;
 if ($member['attention']) {print <<<EOT
 -->
-			<li><a href="javascript:;" onclick="pwConfirm('是否取消关注？',this,function(){Attention.del('{$member[uid]}')});" title="取消关注">取消关注</a></li>
+							<li><a href="javascript:;" onclick="pwConfirm('是否取消关注？',this,function(){Attention.del('{$member[uid]}')});" title="取消关注">取消关注</a></li>
 <!--
 EOT;
 }print <<<EOT
 -->
-					</ul>
-				</div>
+						</ul>
+					</div>
 <!--
 EOT;
-if ($member['honor']) {print <<<EOT
+if ($member['honor'] && $groupRight['allowhonor']) {print <<<EOT
 -->
-				<div class="lh_18">{$member['honor']}</div>
+					<div class="lh_18">{$member['honor']}</div>
 <!--
 EOT;
 } else {print <<<EOT
 -->
-				<div>该用户暂无签名</div>
+					<div>该用户暂无签名</div>
 <!--
 EOT;
 }print <<<EOT
 -->
-			</dd>
-		</dl>
-	</li>
+				</dd>
+			</dl>
+		</li>
 <!--
 EOT;
 }print <<<EOT
 -->
-</ul>
+	</ul>
 <!--
 EOT;
 }print <<<EOT
@@ -510,24 +555,27 @@ EOT;
 EOT;
 if ($mostFriends) {print <<<EOT
 -->
-<h5 class="h5 mb10"><strong>好友的好友</strong></h5>
-<ul class="threeLines cc">
+	<h5 class="h5 mb10"><strong>好友的好友</strong></h5>
+	<ul class="threeLines cc">
 <!--
 EOT;
+$userService = L::loadClass('UserService', 'user');
 foreach ($mostFriends as $member){
+$groupId = ($member['groupid'] == '-1') ? $member['memberid'] : $member['groupid'];
+$groupRight = $userService->getRightByGroupId($groupId);
 //$db_menuinit .= ",'td_mostFriends{$member[uid]}' : 'menu_mostFriends{$member[uid]}'";
 print <<<EOT
 -->
-	<li>
-		<dl class="friDl cc p10 mr10 mb10">
-			<dt class="fl mr10"><a class="img_50" href="{$db_userurl}$member[uid]" target="_blank"><img height="44" width="44" src="$member[face]"/></a></dt>
-			<dd>
-				<div>
+		<li>
+			<dl class="friDl cc p10 mr10 mb10">
+				<dt class="fl mr10"><a class="img_50" href="{$db_userurl}$member[uid]" target="_blank"><img height="44" width="44" src="$member[face]"/></a></dt>
+				<dd>
+					<div class="lh_18">
 <!--
 EOT;
 if (!$member['attention']) {print <<<EOT
 -->
-<a href="javascript:;" onclick="Attention.add(this,'{$member['uid']}',1)" class="follow s7 fr" name="att_friends">加关注</a>
+<a href="javascript:;" onclick="Attention.add(this,'{$member['uid']}',1)" class="follow fr" name="att_friends">关注</a>
 <!--
 EOT;
 } else {print <<<EOT
@@ -535,58 +583,53 @@ EOT;
 <!--
 EOT;
 }print <<<EOT
--->
-				<a class="b" href="{$db_userurl}$member[uid]" target="_blank">$member[username]</a>
-<!--
+--><a class="b" href="{$db_userurl}$member[uid]" target="_blank">$member[username]</a><!--
 EOT;
 if (checkOnline($member['thisvisit'])) {
 print <<<EOT
--->
-<img src="$imgpath/online.png" alt="在线" style="vertical-align:middle" /> 
-<!--
+--><img src="$imgpath/online.png" alt="在线" style="vertical-align:middle" /><!--
 EOT;
 }print <<<EOT
 --></div>
-				<div>被关注：<span id="att_friends_{$member[uid]}">{$member['fans']}</span></div>
-				<a href="javascript:;" class="adown s7 fr" id="td_mostFriends{$member[uid]}" onclick="read.open('menu_mostFriends{$member[uid]}','td_mostFriends{$member[uid]}');">更多操作</a>
-				<div class="pw_menu" style="display:none;" id="menu_mostFriends{$member[uid]}">
-					<ul class="menuList" style="width:70px;">
-                        <li><a href="javascript:;" onclick="sendmsg('pw_ajax.php?action=addfriend&touid={$member[uid]}&reload=1');">加为好友</a></li>
-						<li><a href="javascript:;" onclick="sendmsg('pw_ajax.php?action=msg&touid={$member[uid]}');">发送消息</a></li>
+					<div>被关注：<span id="att_friends_{$member[uid]}">{$member['fans']}</span></div>
+					<a href="javascript:;" class="adown s7 fr" id="td_mostFriends{$member[uid]}" onclick="read.open('menu_mostFriends{$member[uid]}','td_mostFriends{$member[uid]}');">更多操作</a>
+					<div class="pw_menu" style="display:none;" id="menu_mostFriends{$member[uid]}">
+						<ul class="menuList" style="width:70px;">
+							<li><a href="javascript:;" onclick="sendmsg('pw_ajax.php?action=addfriend&touid={$member[uid]}&reload=1');">加为好友</a></li>
+							<li><a href="javascript:;" onclick="sendmsg('pw_ajax.php?action=msg&touid={$member[uid]}');">发送消息</a></li>
 <!--
 EOT;
 if ($member['attention']) {print <<<EOT
 -->
-						<li><a href="javascript:;" onclick="pwConfirm('是否取消关注？',this,function(){Attention.del('{$member[uid]}')});" title="取消关注">取消关注</a>
-                        </li>
+							<li><a href="javascript:;" onclick="pwConfirm('是否取消关注？',this,function(){Attention.del('{$member[uid]}')});" title="取消关注">取消关注</a></li>
 <!--
 EOT;
 }print <<<EOT
 -->
-					</ul>
-				</div>
+						</ul>
+					</div>
 <!--
 EOT;
-if ($member['honor']) {print <<<EOT
+if ($member['honor'] && $groupRight['allowhonor']) {print <<<EOT
 -->
-				<div class="lh_18">{$member['honor']}</div>
+					<div class="lh_18">{$member['honor']}</div>
 <!--
 EOT;
 } else {print <<<EOT
 -->
-				<div>该用户暂无签名</div>
+					<div>该用户暂无签名</div>
 <!--
 EOT;
 }print <<<EOT
 -->
-			</dd>
-		</dl>
-	</li>
+				</dd>
+			</dl>
+		</li>
 <!--
 EOT;
 }print <<<EOT
 -->
-</ul>
+	</ul>
 <!--
 EOT;
 }print <<<EOT
@@ -596,24 +639,27 @@ EOT;
 EOT;
 if ($onlineMembers) {print <<<EOT
 -->
-<h5 class="h5 mb10"><strong>当前在线的人</strong></h5>
-<ul class="threeLines cc">
+	<h5 class="h5 mb10"><strong>当前在线的人</strong></h5>
+	<ul class="threeLines cc">
 <!--
 EOT;
+$userService = L::loadClass('UserService', 'user');
 foreach ($onlineMembers as $member) {
 //$db_menuinit .= ",'td_onlineMembers{$member[uid]}' : 'menu_onlineMembers{$member[uid]}'";
+$groupId = ($member['groupid'] == '-1') ? $member['memberid'] : $member['groupid'];
+$groupRight = $userService->getRightByGroupId($groupId);
 print <<<EOT
 -->
-	<li>
-		<dl class="friDl cc p10 mr10 mb10">
-			<dt class="fl mr10"><a class="img_50" href="{$db_userurl}$member[uid]" target="_blank"><img height="44" width="44" src="$member[face]"/></a></dt>
-			<dd>
-				<div>
+		<li>
+			<dl class="friDl cc p10 mr10 mb10">
+				<dt class="fl mr10"><a class="img_50" href="{$db_userurl}$member[uid]" target="_blank"><img height="44" width="44" src="$member[face]"/></a></dt>
+				<dd>
+					<div class="lh_18">
 <!--
 EOT;
 if (!$member['attention']) {print <<<EOT
 -->
-<a href="javascript:;" onclick="Attention.add(this,'{$member['uid']}',1)" class="follow s7 fr" name="att_online">加关注</a>
+<a href="javascript:;" onclick="Attention.add(this,'{$member['uid']}',1)" class="follow fr" name="att_online">关注</a>
 <!--
 EOT;
 } else {print <<<EOT
@@ -621,110 +667,114 @@ EOT;
 <!--
 EOT;
 }print <<<EOT
--->
-				<a class="b" href="{$db_userurl}$member[uid]" target="_blank">$member[username]</a>
-<!--
+--><a class="b" href="{$db_userurl}$member[uid]" target="_blank">$member[username]</a><!--
 EOT;
 if (checkOnline($member['thisvisit'])) {
 print <<<EOT
--->
-<img src="$imgpath/online.png" alt="在线" style="vertical-align:middle" /> 
-<!--
+--><img src="$imgpath/online.png" alt="在线" style="vertical-align:middle" /> <!--
 EOT;
 }print <<<EOT
 --></div>
-				<div>被关注：<span id="att_online_{$member[uid]}">{$member['fans']}</span></div>
-				<a href="javascript:;" class="adown s7 fr" id="td_onlineMembers{$member[uid]}" onclick="read.open('menu_onlineMembers{$member[uid]}','td_onlineMembers{$member[uid]}');">更多操作</a>
-				<div class="pw_menu" style="display:none;" id="menu_onlineMembers{$member[uid]}">
-					<ul class="menuList" style="width:70px;">
-                        <li><a href="javascript:;" onclick="sendmsg('pw_ajax.php?action=addfriend&touid={$member[uid]}&reload=1');">加为好友</a></li>
-						<li><a href="javascript:;" onclick="sendmsg('pw_ajax.php?action=msg&touid={$member[uid]}');">发送消息</a></li>
+					<div>被关注：<span id="att_online_{$member[uid]}">{$member['fans']}</span></div>
+					<a href="javascript:;" class="adown s7 fr" id="td_onlineMembers{$member[uid]}" onclick="read.open('menu_onlineMembers{$member[uid]}','td_onlineMembers{$member[uid]}');">更多操作</a>
+					<div class="pw_menu" style="display:none;" id="menu_onlineMembers{$member[uid]}">
+						<ul class="menuList" style="width:70px;">
+							<li><a href="javascript:;" onclick="sendmsg('pw_ajax.php?action=addfriend&touid={$member[uid]}&reload=1');">加为好友</a></li>
+							<li><a href="javascript:;" onclick="sendmsg('pw_ajax.php?action=msg&touid={$member[uid]}');">发送消息</a></li>
 <!--
 EOT;
 if ($member['attention']) {print <<<EOT
 -->                        
-            <li><a href="javascript:;" onclick="pwConfirm('是否取消关注？',this,function(){Attention.del('{$member[uid]}')});" title="取消关注">取消关注</a></li>
+							<li><a href="javascript:;" onclick="pwConfirm('是否取消关注？',this,function(){Attention.del('{$member[uid]}')});" title="取消关注">取消关注</a></li>
 <!--
 EOT;
 }print <<<EOT
 -->
-					</ul>
-				</div>
+						</ul>
+					</div>
 <!--
 EOT;
-if ($member['honor']) {print <<<EOT
+if ($member['honor'] && $groupRight['allowhonor']) {print <<<EOT
 -->
-				<div class="lh_18">{$member['honor']}</div>
+					<div class="lh_18">{$member['honor']}</div>
 <!--
 EOT;
 } else {print <<<EOT
 -->
-				<div>该用户暂无签名</div>
+					<div>该用户暂无签名</div>
 <!--
 EOT;
 }print <<<EOT
 -->
-			</dd>
-		</dl>
-	</li>
+				</dd>
+			</dl>
+		</li>
 <!--
 EOT;
 }print <<<EOT
 -->
-</ul>
+	</ul>
 <!--
 EOT;
 }} else {
 if($members){print<<<EOT
 -->
-<h5 class="h5 mb10"><strong>搜索  {$keyword}  找到{$count}个人</strong></h5>
-<ul class="threeLines cc">
+	<h5 class="h5 mb10"><strong>搜索  {$keyword}  找到{$count}个人</strong></h5>
+	<ul class="threeLines cc">
 <!--
 EOT;
-foreach ($members as $key => $member){print <<<EOT
+$userService = L::loadClass('UserService', 'user');
+foreach ($members as $key => $member){
+$groupId = ($member['groupid'] == '-1') ? $member['memberid'] : $member['groupid'];
+$groupRight = $userService->getRightByGroupId($groupId);
+print <<<EOT
 -->
-	<li>
-		<dl class="friDl cc p10 mr10 mb10">
-			<dt class="fl mr10"><a class="img_50" href="{$db_userurl}$member[uid]" target="_blank"><img height="44" width="44" src="$member[face]"/></a></dt>
-			<dd>
-				<div><a class="b" href="{$db_userurl}$member[uid]" target="_blank">$member[username]</a>
-<!--
+		<li>
+			<dl class="friDl cc p10 mr10 mb10">
+				<dt class="fl mr10"><a class="img_50" href="{$db_userurl}$member[uid]" target="_blank"><img height="44" width="44" src="$member[face]"/></a></dt>
+				<dd>
+					<div class="lh_18"><a class="b" href="{$db_userurl}$member[uid]" target="_blank">$member[username]</a><!--
 EOT;
 if (checkOnline($member['thisvisit'])) {
 print <<<EOT
--->
-<img src="$imgpath/online.png" alt="在线" style="vertical-align:middle" />
-<!--
-EOT;
-}print <<<EOT
---></div>
-<!--
-EOT;
-if ($member['honor']) {print <<<EOT
--->
-				<div class="lh_18">{$member['honor']}</div>
-<!--
-EOT;
-} else {print <<<EOT
--->
-				<div>该用户暂无签名</div>
-<!--
+--><img src="$imgpath/online.png" alt="在线" style="vertical-align:middle" /><!--
 EOT;
 }print <<<EOT
 -->
-				<div class="lh_25 cc">
+					</div>
+<!--
+EOT;
+if ($according == 'tags') {
+print <<<EOT
+-->
+					<div class="lh_18">{$memberTags[$member[uid]]}</div>
+<!--
+EOT;
+} else {
+	if ($member['honor'] && $groupRight['allowhonor']) {print <<<EOT
+-->
+					<div class="lh_18">{$member['honor']}</div>
+<!--
+EOT;
+	} else {print <<<EOT
+-->
+					<div>该用户暂无签名</div>
+<!--
+EOT;
+	}
+}print <<<EOT
+-->
+					<div class="lh_25 cc">
 <!--
 EOT;
 if (!$member['attention']) {print <<<EOT
 -->
-
-<div class="fl mr10" id="att_{$value['uid']}"><a href="javascript:;" onclick="Attention.add(this,'{$member['uid']}',1)" class="follow s7" >加关注</a>
-</div>
+						<div class="fl mr10" id="att_{$value['uid']} "><a href="javascript:;" onclick="Attention.add(this,'{$member['uid']}',1)" class="follow" >关注</a></div>
 <!--
 EOT;
 } else {print <<<EOT
 -->
-<a href="javascript:;" onclick="pwConfirm('是否取消关注？',this,function(){Attention.del('{$member[uid]}')});" title="取消关注" class="s7 mr10 fl">取消关注</a>
+						<a href="javascript:;" onclick="pwConfirm('是否取消关注？',this,function(){Attention.del('{$member[uid]}')});" title="取消关注" class="s7 mr10 fl">取消关注</a>
 <!--
 EOT;
 }print <<<EOT
@@ -733,35 +783,35 @@ EOT;
 EOT;
 if (!in_array($member['uid'], $friendsAllUids)) {print <<<EOT
 -->
-<a href="javascript:;"  onclick="sendmsg('pw_ajax.php?action=addfriend&touid={$member[uid]}&reload=1');" title="加为好友" class="s7 follow fl">加为好友</a>
+						<a href="javascript:;"  onclick="sendmsg('pw_ajax.php?action=addfriend&touid={$member[uid]}&reload=1');" title="加为好友" class="follow fl">加为好友</a>
 <!--
 EOT;
 } else {print <<<EOT
 -->
-<a href="javascript:;" onclick="pwConfirm('是否确认解除？',this,function(){delFriend('$member[uid]')});" title="解除好友" class="s7 follow fl">解除好友</a>
+						<a href="javascript:;" onclick="pwConfirm('是否确认解除？',this,function(){delFriend('$member[uid]')});" title="解除好友" class="s7 fl">解除好友</a>
 <!--
 EOT;
 }print <<<EOT
 -->
-				</div>
-			</dd>
-		</dl>
-	</li>
+					</div>
+				</dd>
+			</dl>
+		</li>
 <!--
 EOT;
 }print <<<EOT
 -->
-</ul>
+	</ul>
+	<div class="cc mb10">$pages</div>
 <!--
 EOT;
 }else {print <<<EOT
 -->
-						<div class="f14 tac p15">很抱歉，没有搜到你要的人</div>
+	<div class="f14 tac p15">很抱歉，没有搜到你要的人</div>
 <!--
 EOT;
 }}print <<<EOT
 -->
-					<div class="cc mb10">$pages</div>
 </div>
 <!--
 EOT;

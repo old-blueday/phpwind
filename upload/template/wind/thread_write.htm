@@ -94,7 +94,7 @@ getObj('showSmile').onclick = function(e) {
 	var rect = getObj('showSmile').getBoundingClientRect();
 	getObj('smileContainer').style.left = rect.left+ietruebody().scrollLeft+'px';
 	getObj('smileContainer').style.top = rect.top + ietruebody().scrollTop + 20 +'px';
-}
+};
 applySmile(function(codeText) {
 	insertContentToTextArea(getObj('writetext'), codeText);
 	checkTextNum('writetext','writetext_warn',255,true);

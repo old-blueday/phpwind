@@ -1,5 +1,6 @@
 <!--<?php
 include_once PrintEot('left');
+if ($adminitem == 'content') {
 if (empty($action)) {print <<<EOT
 -->
 <div class="nav3 mb10 ta">
@@ -145,6 +146,117 @@ function report_jump(type,action){
 	return true;
 }
 </script>
+<!--
+EOT;
+}elseif ($adminitem == 'remind') {
+print <<<EOT
+-->
+<script type="text/javascript" language="JavaScript" src="js/global.js"></script>
+<script type="text/javascript" language="JavaScript" src="js/pw_ajax.js"></script>
+<div class="admin_info mb10">
+	<h2 class="h1">功能说明</h2>
+	<div class="legend">
+    	<ol>
+        	<li>在下方列表中的用户会接收到举报提醒信息，但处理举报的权限要到相应的"用户->用户组权限"中设置。</li>
+            <li>除此列表中的用户外，各版块版主会收到各自负责版块内的帖子举报信息。</li>
+        </ol>
+    </div>
+</div>
+<form name="FORM" id="remindmemberform" action="$basename&" method="post">
+<input type="hidden" name="action" value="del" />
+<h2 class="h1"><span class="fl mr10">接收提醒用户列表</span>
+<span id="addusername" style="display:none;">
+	<input type="text" class="input" name="username" id="username" /><span class="btn2 f12"><span><button type="button" onclick="ajaxAdd();">提 交</button></span></span><span class="bt2 f12"><span><button type="button" onclick="showInput();">取 消</button></span></span>
+</span>
+<span class="btn_add fl" id="add">
+	<i onclick="showInput();">添加</i>
+</span>
+<span id="addtip"></span>
+</h2>
+<div class="admin_table mb10" id="tablelist">
+  <table width="100%" cellspacing="0" cellpadding="0">
+  <tbody>
+    <tr class="tr2">
+	  	<td width="35"><span onclick="CheckAll(document.FORM)" class="cp">全选</span></td>
+      <td width="150">用户名</td>
+      <td>用户组</td>
+    </tr>
+<!--
+EOT;
+if (empty($remindMember)) {
+$isEmpty = true;
+print <<<EOT
+-->
+	<tr id="emptymember"><td class="p10" colspan="5"><div class="admin_tips">啊哦，没有你要的信息！</div></td></tr>
+<!--
+EOT;
+}else{
+foreach($members as $member){
+if (empty($member)) continue;
+print <<<EOT
+-->
+	<tr class="tr1 t">
+	  <td class="td2"><input type="checkbox" name="selid[]" value="$member[uid]"></td>
+      <td class="td2"><a href="{$db_userurl}$member[uid]" target="_blank">$member[username]</a></td>
+      <td class="td2">$member[groupname]</td>
+    </tr>
+<!--
+EOT;
+}}
+print <<<EOT
+-->
+	</tbody>
+   </table>
+</div>
+<div class="cc">$pages</div>
+<div class="tac mb10">
+	<span class="bt"><span><button type="button" onclick="CheckAll(document.FORM)">全 选</button></span></span>
+	<span class="btn"><span><button type="submit" name="hello">删除</button></span></span>
+</div>
+<input type="hidden" name="isempty" id="isempty" value="$isEmpty" />
+</form>
+<script language="JavaScript">
+var basename = '$basename';
+var db_userurl = '$db_userurl';
+function showInput() {
+	var addusername = getObj('addusername').style.display;
+	var add = getObj('add').style.display;
+	getObj('addusername').style.display = addusername == 'none' ? '' : 'none';
+	getObj('add').style.display = add == 'none' ? '' : 'none';
+	getObj('addtip').innerHTML = getObj('username').value = '';
+}
+
+function ajaxAdd() {
+	var username = getObj('username').value;
+	ajax.send(basename + '&ajax=1&action=add&username=' + username,'',function(){
+		var rText = ajax.request.responseText;
+		if (rText == 'empty') {
+			getObj('addtip').innerHTML = '<span class="f12 s1 fn" style="margin-left:10px;">添加失败，没有找到指定用户，请重新输入</span>';
+		} else if (rText == 'exists') {
+			getObj('addtip').innerHTML = '<span class="f12 s1 fn" style="margin-left:10px;">该用户已在接收举报提醒用户列表中，无需重复添加</span>';
+		} else {
+			var isempty = getObj('isempty').value;
+			if (isempty == true) getObj('emptymember').style.display='none';
+			var tableListInner = getObj('tablelist').innerHTML;
+			showInput();
+			getObj('addtip').innerHTML = '<span class="f12 fn s3" style="margin-left:10px;">添加成功</span>';
+			rsText = rText.split('\t');
+			addHtml = '<tr class="tr1 t"><td class="td2"><input type="checkbox" name="selid[]" value="' + rsText[0] + '"></td>';
+			addHtml += '<td class="td2"><a href="' + db_userurl + rsText[0] + '" target="_blank">' + rsText[1] + '</a></td>';
+			addHtml += '<td class="td2">' + rsText[2] + '</td></tr>';
+			tableListInner = tableListInner.replace(/<\/tbody>\s*<\/table>/ig, '');
+			getObj('tablelist').innerHTML = tableListInner + addHtml + '</tbody></table>';
+			getObj('isempty').value = false;
+		}
+	});
+}
+</script>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+
 <!--
 EOT;
 include_once PrintEot('adminbottom');

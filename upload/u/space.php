@@ -34,6 +34,7 @@ $indexRight = $newSpace->viewRight('index');
 $indexValue = $newSpace->getPrivacyByKey('index');
 if ($indexRight) {
 	$data = $newSpace->layout();
+	//var_dump($data);
 } else {
 	$data = array(0 => $newSpace->getSpaceData(array('info' => 1)));
 }
@@ -72,7 +73,7 @@ if ($winduid && !$space['isMe']) {
 	$tovisitors = $db->get_value("SELECT tovisitors FROM pw_space WHERE uid=" . S::sqlEscape($winduid));
 	$tovisitors = unserialize($tovisitors);
 	is_array($tovisitors) || $tovisitors = array();
-
+	
 	if (!isset($tovisitors[$uid]) || $timestamp - $tovisitors[$uid] > 900) {
 		$tovisitors[$uid] = $timestamp;
 		arsort($tovisitors);
@@ -91,7 +92,14 @@ if ($winduid && !$space['isMe']) {
 }
 
 $isSpace = true;
-require_once(uTemplate::printEot(($space['spacetype'] || !$indexRight) ? 'space_blog_index' : 'space_index'));
+
+$spaceTemplate = "";
+$spacestyle = (($space['spacestyle'] === '2') || ($space['spacestyle'] === '3')) ? $space['spacestyle'] : 2;
+
+$spaceTemplate = 'space_' . $spacestyle . '_index';
+//var_dump($spaceTemplate);
+//require_once(uTemplate::printEot(($space['spacetype'] || !$indexRight) ? 'space_blog_index' : 'space_index'));
+require_once(uTemplate::printEot($spaceTemplate));
 
 pwOutPut();
 

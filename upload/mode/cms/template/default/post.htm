@@ -122,170 +122,12 @@ EOT;
 		</table>
 		<div style="padding:0 20px;">
 		<!--编辑器开始-->
-			<div class="pr cc">
-				<div class="wind_editor_con cc">
-                       <div id="w_editor_but" class="w_editor_but">
-                       <ul class="cc fl">
-                           <li>
-                               <div id="wy_fontname" style="width: 77px;" class="wy_select">字体</div>
-                               <div id="wy_fontsize" style="width: 15px;" class="wy_select">2</div>
-                               <div class="c">&nbsp;</div>
-                               <a title="粗体" id="wy_bold" href="javascript:">粗体</a>
-                               <a title="斜体" id="wy_italic" href="javascript:">斜体</a>
-                               <a title="下划线" id="wy_underline" href="javascript:">下划线</a>
-                               <a title="删除线" id="wy_strikethrough" href="javascript:">删除线</a>
-                               <a title="字体颜色" id="wy_forecolor" href="javascript:">字体颜色</a>
-                               <a title="背景颜色" id="wy_hilitecolor" href="javascript:">背景颜色</a>
-                           </li>
-                           <li>
-                               <div class="cc fl">
-                                   <a title="对齐" id="wy_justify" href="javascript:">对齐</a>
-                                   <a title="列表" id="wy_insertlist" href="javascript:">列表</a>
-                                   <a title="缩进" id="wy_indent" href="javascript:">缩进</a>
-                                   <a title="水平线" id="wy_inserthorizontalrule" href="javascript:">水平线</a>
-                                   <a title="引用" id="wy_quote" href="javascript:">引用</a>
-                                   <div class="c">&nbsp;</div>
-                                   <a title="去除字体格式" id="wy_removeformat" href="javascript:">去除字体格式</a>
-                                   <a title="插入链接" id="wy_createlink" href="javascript:">插入链接</a>
-                                   <a title="清除链接" id="wy_unlink" href="javascript:">清除链接</a>
-                                   <a title="表格" id="wy_inserttable" href="javascript:">表格</a>
-                                   <a title="代码" id="wy_code" href="javascript:">代码</a>
-                               </div>
-                           </li>
-                           <li class="li_icon_big">
-                               <div>
-                                   <a title="图片" id="wy_insertimage" href="javascript:">图片</a>
-                                   <a title="多媒体" id="wy_media" href="javascript:">多媒体</a>
-                                   <a onclick="return showEmotion();" unselectable="on" href="javascript:" title="表情" id="td_face">表情</a>
-
-                               </div>
-                               <div class="c"></div>
-                           </li>
-                           <li class="li_bg_none">
-                           		<a title="分页符" id="wy_cutpage" unselectable="on" href="javascript:" onclick="return pageCut();" >分页符</a>
-                               <a style="display: none;" title="自定义代码" id="wy_pwcode" href="javascript:">自定义代码</a>
-                               <a style="display: none;" title="帖子格式" id="wy_setform" href="javascript:">帖子格式</a>
-                               <div class="c">&nbsp;</div>
-                           </li>
-                       </ul>
-                       <div class="fr windcode">
-						<input id="wy_windcode" type="checkbox" />Wind代码 {$db_appsdb[11][status]}
-					   </div>
-                   	</div>
-                   	<textarea id="textarea" name="atc_content" style="height:280px;">{$content}</textarea>
-                       <div class="wy_menu_B" id="menu_editor" style="display:none;"></div>
-                       <div style="display:none"><span id="autosave"></span></div>
-                   	<div class="c"></div>
-                   	<div class="pr" style="height:12px;" onmousedown="editor.flex(event);">
-                       <div style="cursor:s-resize;position:absolute;bottom:-10px;height:12px;width:100%;padding-bottom:10px;" class="cc">
-                           <div class="post-flex">拉动</div>
-                       </div>
-                   </div>
-				</div>
-			</div>
-			<div class="w_editor_up">
-				<div style="height: 23px;">
-					<div class="fr" style="line-height: 18px; padding: 5px 0pt 0pt 10px;"></div>
-					<ul class="w_tab_a cc">
-						<li id="formUploadBtn" class="current"><a hidefocus="true" href="javascript:uploader.singleTab();">普通上传</a></li>
-						<li id="batUploadBtn" style="display:none"><a hidefocus="true" href="javascript:uploader.mutiTab();">批量上传</a></li>
 <!--
 EOT;
-if ($mutiupload > 0 && 0) {print <<<EOT
+require cmsTemplate::printEot('wysiwyg_editor_cms');
+print <<<EOT
 -->
-					    <li id="flashAtt_use" class="none_css"><a hidefocus="true" href="javascript:uploader.init();" style="padding-right:0;">已有附件($mutiupload)</a></li>
-					    <li id="flashAtt_clear" class="none_css"><a hidefocus="true" href="javascript:uploader.clear();">清空已有附件&nbsp;</a></li>
-<!--
-EOT;
-}print <<<EOT
--->
-				    	<li class="none_css"><a style="padding-right: 14px;" class="wy_tips" href="javascript:;">&nbsp;可上传类型<i style="width: 250px;">{$filetypeinfo}</i></a></li>
-				   	</ul>
-				</div>
-				<div class="w_editor_up_con" style="border-bottom:1px solid #ccc;">
-<script type="text/javascript">
-(function(){
-    getObj('wy_windcode').onclick = function(){
-       var cls = this.checked ? "buttonDisabled" : "";
-       getObj('wy_inserttable').className =  getObj('wy_removeformat').className = cls;    	
-    }
-    getObj('wy_windcode').click();
-})();
-</script>
-
-<script>
-var allowmutinum = parseInt('$db_attachnum');
-var allow_ext = '$uploadfiletype';
-var allow_size = '$uploadfilesize';
-var attachnum = parseInt('$db_attachnum');
-</script>
-<script type="text/javascript" language="JavaScript" src="js/upload.js"></script>
-<table cellPadding="0" cellSpacing="0" style="display:none" width="100%">
-<tbody id="att_mode"><tr>
-    <td><input class="input" type="file" name="attachment_" size="20" /></td><td><input class="input" type="text" name="atc_desc" size="20" /></td>
-    <td><select name="att_special" onchange="newAtt.sel(this);" style="display:none;"><option value="0"></option><option value="1">加密</option><option value="2">出售</option></select></td>
-    <td><select name="att_ctype" style="display:none;">{$alltype}</select></td>
-    <td><input class="input" type="hidden" name="atc_needrvrc" value="0" size="1" /></td>
-    <td></td></tr>
-</tbody>
-</table>
-<!--
-EOT;
-if($attach){print <<<EOT
--->
-
-						<div class="cc">该帖包含附件<span class="gray">(不想保留的附件去掉√)</span> :
-							<table class="tr_p10" style="table-layout:fixed">
-								<tr class="gray">
-									<td width="20"></td>
-									<td width="186">附件</td>
-									<td width="180">描述</td>
-									<td width="100"></td>
-								</tr>
-								<tbody id="ajaxtable"></tbody>
-							</table>
-						</div>
-<script language="JavaScript">
-var stylepath = '$stylepath';
-
-var attachs = {{$attach}};
-oldAtt.init();
-</script>
-<!--
-EOT;
-}print <<<EOT
--->
-
-					<div class="cc">
-<!--已包含的附件的列表-->
-						<table class="tr_p10" style="table-layout:fixed">
-							<thead>
-								<tr valign="top" class="gray" id="formUpload">
-									<td width="200">上传附件 (图片、文件等)</td>
-									<td width="180">描述</td>
-									<td width="100">&nbsp;</td>
-								</tr>
-							</thead>
-							<tbody id="attach"></tbody>
-							<!--模板-->
-						</table>
-<!--待批量上传的文件-->
-
- 						<div class="menu menu_img" id="viewimg"></div>
-					</div>
-<script language="JavaScript">
-newAtt.create();
-</script>
-					<div id="batUpload">
-						<div style="width: 100%;">
-							<div id="flashUploadPanel"></div>
-						</div>
-					</div>
-					<div class="c"></div>
-				</div>
-			</div>
-			<div id="menu_face" class="menu" style="display:none;"></div>
-<!--编辑器结束-->
+		<!--编辑器结束-->
 		</div>
 		<div style="padding:0 20px;overflow:hidden;">
 			<ul class="postInfo mb10" style="height:76px;">
@@ -366,83 +208,7 @@ EOT;
 
 <script type="text/javascript" src="js/lang/zh_cn.js"></script>
 <script type="text/javascript" src="js/post.js"></script>
-<script type="text/javascript" src="data/bbscache/face.js"></script>
-<script type="text/javascript" src="js/wind_c_editor.js"></script>
-<script type="text/javascript" src="js/uploader.js"></script>
 <script type="text/javascript">
-var editor = null,charset = 'gbk';
-function WysiwygConfig() {
-this.baseURL = document.baseURI || document.URL;
-if (this.baseURL && this.baseURL.match(/(.*)\/([^\/]?)/)) {
-	this.baseURL = RegExp.$1 + "/";
-}
-this.imgURL = imgpath + "/post/c_editor/";
-
-this.btnList = {
-	removeformat:[ true, editorcode, false ],
-	bold: [ true, editorcode, true ],
-	italic: [ true, editorcode, true ],
-	underline: [ true, editorcode, true ],
-	strikethrough: [ true, editorcode, true ],
-	justify : [true, showJustify, false],
-	insertlist : [true, showList, false],
-	indent: [ true, showDent, false ],
-	forecolor: [ true, showcolor, false ],
-	hilitecolor: [ true, showcolor, false ],
-	inserthorizontalrule: [ true, editorcode, false ],
-	createlink: [ true, showcreatelink, false ],
-	unlink: [ true, editorcode, false ],
-	insertimage: [ true, insertImage, false ],
-	music: [ true, insertMusic, false ],
-	inserttable: [ true, showTable, false ],
-	windcode: [ true, editorcode, false ],
-	undo: [ true, editorcode, false ],
-	redo: [ true, editorcode, false ],
-	media: [ true, rming, false ],
-	quote: [ true, code, false ],
-	code: [ true, code, false ],
-	pwcode: [true, extend , false ],
-	setform: [true, extend , false ]
-};
-this.fontname = {
-	"default": "字体",
-	"宋体":	'宋体',
-	"新宋体":	'新宋体',
-	"楷体_GB2312":	'楷体_GB2312',
-	"黑体":	'黑体',
-	"Arial":	   'arial,helvetica,sans-serif',
-	"Courier New":	   'courier new,courier,monospace',
-	"Georgia":	   'georgia,times new roman,times,serif',
-	"Tahoma":	   'tahoma,arial,helvetica,sans-serif',
-	"Times New Roman": 'times new roman,times,serif',
-	"Verdana":	   'verdana,arial,helvetica,sans-serif',
-	"impact":	   'impact'
-};
-this.fontsize = {
-	"default": "2",
-	"1":  "1",
-	"2": "2",
-	"3": "3",
-	"4": "4",
-	"5": "5",
-	"6": "6",
-	"7": "7"
-};
-this.formatblock = {
-	"default": "格式",
-	"普通": "p",
-	"标题一": "h1",
-	"标题二": "h2",
-	"标题三": "h3",
-	"标题四": "h4",
-	"标题五": "h5",
-	"标题六": "h6"
-};
-this.selList = ['fontname','fontsize'];
-};
-editor = new WYSIWYD();
-editor.config = new WysiwygConfig();
-editor.init('textmode', 0);
 var maxLength=200;
 function wordlength(target)
 {
@@ -467,14 +233,6 @@ function wordlength(target)
 		target.maxLength = maxLength;
 	}
 }
-var mutiupload = '0';
-var allowmutinum = parseInt('$db_attachnum');
-var allow_ext = '{$filetype}';
-/*
-uploader.maxLength = {$db_attachnum};
-uploader.insertable= true;
-window.onReady(function(){uploader.init();});
-*/
 document.FORM.Submit.disabled = false;
 var cnt = 0;
 function checkpost(obj) {
@@ -490,8 +248,14 @@ function checkpost(obj) {
 		return false;
 	}
 	if (strlen(obj.atc_content.value) < 0 || atc_contentTemp == "") {
-		showDialog("error","文章<span class='warnFontStyle'>内容</span>不能为空",2);
-		editor.focusEditor();
+		showDialog({
+			type: "error",
+			message: "文章<span class='warnFontStyle'>内容</span>不能为空",
+			autoHide:2,
+			onClose : function(){
+				editor.focusEditor();
+			}
+		});
 		return false;
 	} else if (strlen(obj.atc_content.value) > 50000) {
 		showDialog("error","文章<span class='warnFontStyle'>内容</span>不能大于 50000 个字节",2);

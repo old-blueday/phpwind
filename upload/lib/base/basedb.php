@@ -145,8 +145,7 @@ class BaseDB {
 	function _insert($fieldData) {
 		if (!$this->_check() || !$fieldData) return false;
 		//* $this->_db->update("INSERT INTO " . $this->_tableName . " SET " . $this->_getUpdateSqlString($fieldData));
-		pwQuery::insert($this->_tableName, $fieldData);
-		return $this->_db->insert_id();
+		return pwQuery::insert($this->_tableName, $fieldData);
 	}
 	/**
 	 * 基础更新数据查询语句
@@ -157,8 +156,7 @@ class BaseDB {
 	function _update($fieldData, $id) {
 		if (!$this->_check() || !$fieldData || $id < 1) return false;
 		//* $this->_db->update("UPDATE " . $this->_tableName . " SET " . $this->_getUpdateSqlString($fieldData) . " WHERE " . $this->_primaryKey . "=" . $this->_addSlashes($id) . " LIMIT 1");
-		pwQuery::update($this->_tableName, "{$this->_primaryKey}=:{$this->_primaryKey}", array($id), $fieldData);
-		return $this->_db->affected_rows();
+		return pwQuery::update($this->_tableName, "{$this->_primaryKey}=:{$this->_primaryKey}", array($id), $fieldData);
 	}
 	/**
 	 * 基础删除一条数据查询语句
@@ -168,8 +166,7 @@ class BaseDB {
 	function _delete($id) {
 		if (!$this->_check() || $id < 1) return false;
 		//* $this->_db->update("DELETE FROM " . $this->_tableName . " WHERE " . $this->_primaryKey . "=" . $this->_addSlashes($id) . " LIMIT 1");
-		pwQuery::delete($this->_tableName, "{$this->_primaryKey}=:{$this->_primaryKey}", array($id));
-		return $this->_db->affected_rows();
+		return pwQuery::delete($this->_tableName, "{$this->_primaryKey}=:{$this->_primaryKey}", array($id));
 	}
 	/**
 	 * 基础获取一条数据查询语句

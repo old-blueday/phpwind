@@ -21,9 +21,9 @@ Class DB_ERROR {
 	function dblog($msg){
 		$msg = str_replace(array("\n","\r","<"),array('','','&lt;'),$msg);
 		if (file_exists(D_P.'data/bbscache/dblog.php')){
-			pwCache::setData(D_P.'data/bbscache/dblog.php',"$msg\n", false, 'ab');
+			pwCache::writeover(D_P.'data/bbscache/dblog.php',"$msg\n", 'ab');
 		} else{
-			pwCache::setData(D_P.'data/bbscache/dblog.php',"<?php die;?>\n$msg\n");
+			pwCache::writeover(D_P.'data/bbscache/dblog.php',"<?php die;?>\n$msg\n");
 		}
 	}
 }

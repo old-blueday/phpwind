@@ -118,15 +118,15 @@ EOT;
 		<div class="cmsBoxB">
 <!--
 EOT;
-$_columnName = $column && $columns['parent'][name] ? $columns['parent'][name] : '栏目';
+$_columnName = $column && $columnInfo['name'] ? $columnInfo['name'] : '栏目';
+$column && $_columnName != '栏目' && $returnBack = '<a href="' . getColumnUrl($columnInfo['parent_id']) . '" class="fr">返回上级</a>';
 print <<<EOT
 -->
-			<h2>{$_columnName}</h2>
+			<h2>{$returnBack}{$_columnName}</h2>
 			<ul class="cmsForumlist cc cmslistB">
 <!--
 EOT;
-foreach($columns['sub'] as $var){
-$_current = $var['column_id'] == $column ? 'class="current"' : '' ;
+foreach($columns as $var){
 $url = getColumnUrl($var[column_id]);
 print <<<EOT
 -->
@@ -144,7 +144,7 @@ EOT;
 				<ul>
 <!--
 EOT;
-foreach($pageCache->getData('hotArticle') as $article){
+foreach((array)$hotArticle as $article){
 print <<<EOT
 -->
 					<li><a href="{$article[url]}" target="_blank">{$article[subject]}</a></li>

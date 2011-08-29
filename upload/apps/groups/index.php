@@ -1,7 +1,8 @@
 <?php
 !defined('A_P') && exit('Forbidden');
 $USCR = 'user_groups';
-include_once pwCache::getPath(D_P . 'data/bbscache/o_config.php');
+//* include_once pwCache::getPath(D_P . 'data/bbscache/o_config.php');
+pwCache::getData(D_P . 'data/bbscache/o_config.php');
 
 $baseUrl = 'apps.php?q=' . $q;
 $basename =  $baseUrl . '&';

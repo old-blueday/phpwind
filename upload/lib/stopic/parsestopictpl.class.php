@@ -97,7 +97,8 @@ class PW_ParseStopicTpl {
 	function getLayoutString($layout) {
 		if (!isset($this->layoutStrings[$layout])) {
 			if ($layout && file_exists(S::escapePath(A_P.'data/layout/'.$layout.'/layout.htm'))) {
-				$this->layoutStrings[$layout] = readover(S::escapePath(A_P.'data/layout/'.$layout.'/layout.htm'));
+				//* $this->layoutStrings[$layout] = readover(S::escapePath(A_P.'data/layout/'.$layout.'/layout.htm'));
+				$this->layoutStrings[$layout] = pwCache::readover(S::escapePath(A_P.'data/layout/'.$layout.'/layout.htm'));
 			} else {
 				$this->layoutStrings[$layout] = '';
 			}

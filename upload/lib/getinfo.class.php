@@ -99,10 +99,10 @@ class GetInfo {
 
 		if ($type == 'newsubject') {
 			if ($this->reality == false) {
-				$sql = "SELECT t.tid AS id,t.postdate AS value FROM pw_threads t $forceindex WHERE t.ifcheck=1 AND t.topped=0 AND t.anonymous != 1 $sqladd ORDER BY t.postdate DESC " . S::sqlLimit($num);
+				$sql = "SELECT t.tid AS id,t.postdate AS value FROM pw_threads t $forceindex WHERE t.ifcheck=1 AND t.anonymous != 1 AND t.ifshield != 1 AND t.locked != 2 $sqladd ORDER BY t.postdate DESC " . S::sqlLimit($num);
 			} else {
 				if ($special == 2) {
-					$sql = "SELECT a.*,t.fid FROM pw_threads t LEFT JOIN pw_activity a ON t.tid=a.tid WHERE t.ifcheck='1' AND t.anonymous != 1 $sqladd ORDER BY t.tid DESC " . S::sqlLimit($num);
+					$sql = "SELECT a.*,t.fid FROM pw_threads t LEFT JOIN pw_activity a ON t.tid=a.tid WHERE t.ifcheck='1' AND t.anonymous != 1 AND t.ifshield != 1 AND t.locked != 2 $sqladd ORDER BY t.tid DESC " . S::sqlLimit($num);
 				} elseif ($special == 3) {
 					global $db_moneyname, $db_rvrcname, $db_creditname, $db_currencyname, $_CREDITDB;
 					$cType = array(
@@ -114,11 +114,11 @@ class GetInfo {
 					foreach ($_CREDITDB as $k => $v) {
 						$cType[$k] = $v[0];
 					}
-					$sql = "SELECT r.tid,r.cbtype,r.catype,r.cbval,r.caval,r.timelimit,t.fid,t.author,t.authorid,t.subject,t.type,t.postdate,t.hits,t.replies FROM pw_threads t LEFT JOIN pw_reward r ON t.tid=r.tid WHERE t.ifcheck='1' AND t.anonymous != 1 $sqladd ORDER BY t.tid DESC " . S::sqlLimit($num);
+					$sql = "SELECT r.tid,r.cbtype,r.catype,r.cbval,r.caval,r.timelimit,t.fid,t.author,t.authorid,t.subject,t.type,t.postdate,t.hits,t.replies FROM pw_threads t LEFT JOIN pw_reward r ON t.tid=r.tid WHERE t.ifcheck='1' AND t.anonymous != 1 AND t.ifshield != 1 AND t.locked != 2 $sqladd ORDER BY t.tid DESC " . S::sqlLimit($num);
 				} elseif ($special == 4) {
-					$sql = "SELECT tr.tid,tr.name,tr.icon,tr.price,t.fid FROM pw_threads t LEFT JOIN pw_trade tr ON t.tid=tr.tid WHERE t.ifcheck='1' AND t.anonymous != 1 $sqladd ORDER BY t.tid DESC " . S::sqlLimit($num);
+					$sql = "SELECT tr.tid,tr.name,tr.icon,tr.price,t.fid FROM pw_threads t LEFT JOIN pw_trade tr ON t.tid=tr.tid WHERE t.ifcheck='1' AND t.anonymous != 1 AND t.ifshield != 1 AND t.locked != 2 $sqladd ORDER BY t.tid DESC " . S::sqlLimit($num);
 				} else {
-					$sql = "SELECT t.tid,t.fid,t.author,t.authorid,t.subject,t.type,t.postdate,t.hits,t.replies FROM pw_threads t $forceindex WHERE ifcheck=1 AND topped=0 AND t.anonymous != 1 $sqladd ORDER BY postdate DESC " . S::sqlLimit($num);
+					$sql = "SELECT t.tid,t.fid,t.author,t.authorid,t.subject,t.type,t.postdate,t.hits,t.replies FROM pw_threads t $forceindex WHERE ifcheck=1 AND t.anonymous != 1 AND t.ifshield != 1 AND t.locked != 2 $sqladd ORDER BY postdate DESC " . S::sqlLimit($num);
 				}
 			}
 		} elseif ($type == 'newreply') {
@@ -131,19 +131,19 @@ class GetInfo {
 			}
 			if ($tids) {
 				if ($this->reality == false) {
-					$sql = "SELECT tid AS id,postdate AS value FROM pw_threads WHERE tid IN(" . S::sqlImplode($tids) . ") AND anonymous != 1 ORDER BY lastpost DESC";
+					$sql = "SELECT tid AS id,postdate AS value FROM pw_threads WHERE tid IN(" . S::sqlImplode($tids) . ") AND anonymous != 1 AND ifshield != 1 AND locked != 2 ORDER BY lastpost DESC";
 				} else {
-					$sql = "SELECT tid,fid,author,authorid,subject,type,postdate,hits,replies FROM pw_threads WHERE tid IN(" . S::sqlImplode($tids) . ") AND anonymous != 1 ORDER BY lastpost DESC";
+					$sql = "SELECT tid,fid,author,authorid,subject,type,postdate,hits,replies FROM pw_threads WHERE tid IN(" . S::sqlImplode($tids) . ") AND anonymous != 1 AND ifshield != 1 AND locked != 2 ORDER BY lastpost DESC";
 				}
 			} else {
 				return false;
 			}
 		} elseif ($type == 'replysort') {
 			if ($this->reality == false) {
-				$sql = "SELECT t.tid AS id,t.replies AS value,t.postdate AS addition FROM pw_threads t WHERE t.ifcheck='1' AND t.replies>0 $sqladd ORDER BY t.replies DESC " . S::sqlLimit($num);
+				$sql = "SELECT t.tid AS id,t.replies AS value,t.postdate AS addition FROM pw_threads t WHERE t.ifcheck='1' AND t.replies>0 AND t.ifshield != 1 AND t.locked != 2 $sqladd ORDER BY t.replies DESC " . S::sqlLimit($num);
 			} else {
 				if ($special == 2) {
-					$sql = "SELECT a.*,t.fid FROM pw_threads t LEFT JOIN pw_activity a ON t.tid=a.tid WHERE t.ifcheck='1' AND t.replies>0 $sqladd ORDER BY t.replies DESC " . S::sqlLimit($num);
+					$sql = "SELECT a.*,t.fid FROM pw_threads t LEFT JOIN pw_activity a ON t.tid=a.tid WHERE t.ifcheck='1' AND t.replies>0 AND t.ifshield != 1 AND t.locked != 2 $sqladd ORDER BY t.replies DESC " . S::sqlLimit($num);
 				} elseif ($special == 3) {
 					global $db_moneyname, $db_rvrcname, $db_creditname, $db_currencyname, $_CREDITDB;
 					$cType = array(
@@ -155,18 +155,18 @@ class GetInfo {
 					foreach ($_CREDITDB as $k => $v) {
 						$cType[$k] = $v[0];
 					}
-					$sql = "SELECT r.tid,r.cbtype,r.catype,r.cbval,r.caval,r.timelimit,t.fid,t.author,t.authorid,t.subject,t.type,t.postdate,t.hits,t.replies FROM pw_threads t LEFT JOIN pw_reward r ON t.tid=r.tid WHERE t.ifcheck='1' AND t.replies>0 $sqladd ORDER BY t.replies DESC " . S::sqlLimit($num);
+					$sql = "SELECT r.tid,r.cbtype,r.catype,r.cbval,r.caval,r.timelimit,t.fid,t.author,t.authorid,t.subject,t.type,t.postdate,t.hits,t.replies FROM pw_threads t LEFT JOIN pw_reward r ON t.tid=r.tid WHERE t.ifcheck='1' AND t.replies>0 AND t.ifshield != 1 AND t.locked != 2 $sqladd ORDER BY t.replies DESC " . S::sqlLimit($num);
 				} elseif ($special == 4) {
-					$sql = "SELECT tr.tid,tr.name,tr.icon,tr.price,t.fid,t.postdate FROM pw_threads t LEFT JOIN pw_trade tr ON t.tid=tr.tid WHERE t.ifcheck='1' AND t.replies>0 $sqladd ORDER BY t.replies DESC " . S::sqlLimit($num);
+					$sql = "SELECT tr.tid,tr.name,tr.icon,tr.price,t.fid,t.postdate FROM pw_threads t LEFT JOIN pw_trade tr ON t.tid=tr.tid WHERE t.ifcheck='1' AND t.replies>0 AND t.ifshield != 1 AND t.locked != 2 $sqladd ORDER BY t.replies DESC " . S::sqlLimit($num);
 				} else {
-					$sql = "SELECT t.tid,t.fid,t.author,t.authorid,t.subject,t.type,t.postdate,t.hits,t.replies FROM pw_threads t WHERE t.ifcheck='1' AND t.replies>0 $sqladd ORDER BY t.replies DESC " . S::sqlLimit($num);
+					$sql = "SELECT t.tid,t.fid,t.author,t.authorid,t.subject,t.type,t.postdate,t.hits,t.replies FROM pw_threads t WHERE t.ifcheck='1' AND t.replies>0 AND t.ifshield != 1 AND t.locked != 2 $sqladd ORDER BY t.replies DESC " . S::sqlLimit($num);
 				}
 			}
 		} elseif ($type == 'hitsort') {
 			if ($this->reality == false) {
-				$sql = "SELECT tid AS id,hits AS value,postdate AS addition FROM pw_threads WHERE ifcheck='1' AND hits>0 $sqladd ORDER BY hits DESC " . S::sqlLimit($num);
+				$sql = "SELECT tid AS id,hits AS value,postdate AS addition FROM pw_threads WHERE ifcheck='1' AND hits>0 AND ifshield != 1 AND locked != 2 $sqladd ORDER BY hits DESC " . S::sqlLimit($num);
 			} else {
-				$sql = "SELECT tid,fid,author,authorid,subject,type,postdate,hits,replies FROM pw_threads WHERE ifcheck='1' AND hits>0 $sqladd ORDER BY hits DESC " . S::sqlLimit($num);
+				$sql = "SELECT tid,fid,author,authorid,subject,type,postdate,hits,replies FROM pw_threads WHERE ifcheck='1' AND hits>0 AND ifshield != 1 AND locked != 2 $sqladd ORDER BY hits DESC " . S::sqlLimit($num);
 			}
 		}
 		$posts = array();
@@ -178,6 +178,7 @@ class GetInfo {
 			} else {
 				$tem = array();
 				$tem['url'] = 'read.php?tid=' . $post['tid'];
+				$tem['authorurl'] = 'u.php?uid=' . $post['authorid'];
 				if ($type == 'replysort' || $type == 'newsubject') {
 					if ($special == 2) {
 						$tem['title'] = $post['subject'];
@@ -397,7 +398,9 @@ class GetInfo {
 			'monoltime',
 			'onlinetime',
 			'digests',
-			'f_num'
+			'f_num',
+			'newUser',
+			'postMostUser'
 		);
 	}
 	/**
@@ -458,6 +461,23 @@ class GetInfo {
 			} else {
 				$sql = "SELECT md.uid,md.value,m.username,m.icon,m.gender,m.groupid,m.memberid FROM pw_membercredit md LEFT JOIN pw_members m USING(uid) WHERE md.cid=" . S::sqlEscape($type) . "$sqladd ORDER BY md.value DESC " . S::sqlLimit($num);
 			}
+		} elseif ($type == 'newUser') {
+			if ($this->reality == false) {
+				$sql = "SELECT md.uid as id,md.uid as value,m.username as addition FROM pw_members m LEFT JOIN pw_memberdata md USING(uid) ORDER BY m.uid DESC " . S::sqlLimit($num);
+			} else {
+				$sql = "SELECT md.uid,md.uid as value,m.username,m.icon,m.gender,m.groupid,m.memberid FROM pw_members m LEFT JOIN pw_memberdata md USING(uid) ORDER BY m.uid DESC " . S::sqlLimit($num);
+			}
+		} elseif ($type == 'postMostUser') {
+			global $timestamp;
+			$sqlAdd = '';
+			$week = $timestamp - 3600*24*7;
+			$sqlAdd .= " t.postdate BETWEEN $week AND $timestamp";
+			$sqlAdd .= " AND (tpcstatus & 16) = 16 ";
+			if ($this->reality == false) {
+				$sql = "SELECT md.uid as id,COUNT(*) as value,m.username as addition FROM pw_threads t LEFT JOIN pw_members m ON t.authorid = m.uid LEFT JOIN pw_memberdata md USING(uid) WHERE $sqlAdd GROUP BY t.authorid ORDER BY value DESC " . S::sqlLimit($num);
+			} else {
+				$sql = "SELECT md.uid,COUNT(*) as value,m.username,m.icon,m.gender,m.groupid,m.memberid FROM pw_threads t LEFT JOIN pw_members m ON t.authorid = m.uid LEFT JOIN pw_memberdata md USING(uid) WHERE $sqlAdd GROUP BY t.authorid ORDER BY value DESC " . S::sqlLimit($num);
+			}
 		} else {
 			return false;
 		}
@@ -477,6 +497,7 @@ class GetInfo {
 			} else {
 				$tem = array();
 				$tem['url'] = USER_URL . $rt['uid'];
+				$tem['uid'] = $rt['uid'];
 				$tem['title'] = $rt['username'];
 				$tem['value'] = $rt['value'];
 				if (!$rt['icon']) {
@@ -596,7 +617,8 @@ class GetInfo {
 		$num = intval($num) ? intval($num) : $this->cachenum;
 		$sqladd = '';
 		$fid && $sqladd .= " AND fid IN ($fid) ";
-		isset($forum) || include pwCache::getPath(D_P . 'data/bbscache/forum_cache.php');
+		//* isset($forum) || include pwCache::getPath(D_P . 'data/bbscache/forum_cache.php');
+		isset($forum) || extract(pwCache::getData(D_P . 'data/bbscache/forum_cache.php', false));
 		$favors = array();
 		$query = $this->db->query("SELECT tid,fid,author,authorid,subject,postdate,hits,replies,favors FROM pw_threads WHERE favors>0 AND postdate >=" . S::sqlEscape($timestamp - 360 * 24 * 3600) . " $sqladd ORDER BY favors DESC " . S::sqlLimit($num));
 		while ($rt = $this->db->fetch_array($query)) {

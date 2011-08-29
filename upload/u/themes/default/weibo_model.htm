@@ -3,10 +3,21 @@ class weiboModelTemplate {
 	
 	var $_maxPhoto = 4;
 	var $_isGM;
+	var $_isTopic;
+	var $_topicName;
+	var $_weiboDiv; // 广场里有热门评论和热门新鲜事两个div，为了区别两个comment
+	var $_showPhotoOnload; //是否载入就显示图片
 	
 	function weiboModelTemplate() {
-		global $windid,$manager,$groupid,$SYSTEM;
+		global $windid,$manager,$groupid,$SYSTEM,$do;
 		$this->_isGM = ($SYSTEM['delweibo'] || CkInArray($windid, $manager));
+		$this->_isTopic = $do == 'topics'? 1: 0;
+		$this->_topicName = $GLOBALS['topic'];
+		$this->_weiboDiv = '';
+	}
+	
+	function setWeiboDiv($d){
+		$this->_weiboDiv = $d;
 	}
 
 	function _isManager($uid) {
@@ -29,12 +40,12 @@ print <<<EOT
 	<div class="userInfoweek">
 		<div id="myFace" class="fl mr10"><p id="toModifyFace" class="tac" style="display:none;"><a href="profile.php?action=modify&info_type=face" class="s5">修改头像</a></p><img src="$faceurl" width="80" height="80" class="img"></div>
 		<div class="fl" style="width:482px;">
-			<form id="weibo_form" name="weibo_form" action="apps.php?q=weibo&do=post&ajax=1" method="post" onsubmit="return false">
+			<form id="weibo_form" name="weibo_form" action="apps.php?q=weibo&do=post&ajax=1" method="post" onsubmit="return false" style="display:block;">
 					<input type="hidden" name="verify" value="{$GLOBALS['verifyhash']}" />
-			<div class="homeSk"  onclick="getObj('popTips').style.display='none'">
+			<div class="homeSk" onclick="getObj('popTips').style.display='none'">
 				<div class="fl"><div id="submitSuccess" class="success" style="display:none;">发布成功</div></div>
 				<div class="fl f14"><div id="popTips" style="position:absolute;padding:10px 13px;"></div></div>
-				<textarea id="weibo_content" name="atc_content" class="homeText">{$GLOBALS['o_weibotip']}</textarea>
+				<textarea id="weibo_content" name="atc_content" class="homeText" autocomplete="off">{$GLOBALS['o_weibotip']}</textarea>
 				<div class="c"></div>
 				<div id="uploadPicDiv" class="homeSk_input" style="display:none;"></div>
 			</div>
@@ -53,6 +64,7 @@ EOT;
 $display = ($GLOBALS['o_weibophoto'] != '0' && $GLOBALS['db_phopen']) ? '' : 'none'; 
 print <<<EOT
 -->
+				<span id="weibo_topic" class="sk_topic cp">话题</span>
 				<span id="uploadPic" style="display:$display">
 					<span id="uploadPicload" class="file fr" >
 					<span class="sk_img cp">图片</span>
@@ -60,10 +72,10 @@ print <<<EOT
 						<input id="writePic" name="writePic" type="file" hidefocus="true" />
 					</form>
 					</span>
-					<span id="uploadPicLoadding" class="fl" style="display:none;width:120px;position:relative;line-height:20px;">正在上传中.......</span>
+					<span id="uploadPicLoadding" class="fl" style="display:none;width:60px;position:relative;line-height:20px;">上传中...</span>
 				</span>
-				<img src="javascript://" id="imgPreview" style="position:absolute;display:none;left:-10000px;" />
-				<div class="limit fr mr15 s6" id="weibo_contentlimit">你还可以输入<em>255</em>个字节</div>
+				<img src="javascript://" id="imgPreview" style="position:absolute;display:none;left:-10000px;z-index:1;" />
+				<div class="limit fr mr15 s6" id="weibo_contentlimit"><em>0/255</em></div>
 			</div>
 		</div>
 	</div>
@@ -81,7 +93,7 @@ var content = getObj('weibo_content'),
 	dvalue = getObj('weibo_content').value;
 	color = '#888';
 	content.style.color = color;
-	content.onkeydown = function() {
+	content.onkeydown = function(event) {
 		ctrlEnter(event,getObj('weibo_form'),function(){pw_weiboPost.post();});
 	}
 	content.onfocus = function() {
@@ -91,16 +103,42 @@ var content = getObj('weibo_content'),
 	}
 	content.onblur = function(){
 		if(this.value === '') {
-			this.value = dvalue;
+	//		this.value = dvalue;
 			this.style.color = color;
 		}
 	}
+/*话题功能*/	
+var weibo_topic = getObj('weibo_topic');
+var defaultTopic = '#请在这里输入自定义话题#';
+weibo_topic.onclick = function(){
+	if (content.value == dvalue) content.value = '';content.style.color = '';
+	setSelection();
+}
+function setSelection() {
+	var pos = content.value.indexOf(defaultTopic);
+	var len = defaultTopic.length;
+	if(pos == -1) insertContentToTextArea(content,defaultTopic);
+	if(pos < 0) pos = content.value.indexOf(defaultTopic);
+	var range;
+	if (is_ie) {
+		range = content.createTextRange();
+		range.moveStart('character',-content.value.length);
+		range.moveEnd('character',-content.value.length);
+		range.collapse(true);
+		range.moveStart('character',pos+1);
+		range.moveEnd('character',len-2);
+		range.select();
+	} else {
+		content.setSelectionRange(pos+1,pos+len-1);
+	}
+}
 </script>
 <!--
 EOT;
 	}
 
 	function weibo($value) {//普通新鲜事
+   
 print <<<EOT
 -->
 <dl class="dl cc">
@@ -109,10 +147,11 @@ print <<<EOT
 	</dt>
 	<dd class="dd">
 		<div class="title">
-			<span class="uname"><a href="{$GLOBALS[db_userurl]}{$value['authorid']}">{$value['username']}</a>：</span>{$value['content']}
+			<span class="uname"><a href="{$GLOBALS[db_userurl]}{$value['authorid']}">{$value['username']}</a>:&nbsp;</span>{$value['content']}
 		</div>
 <!--
 EOT;
+ if($value['mid']){
 if ($value['extra']['photos']) $this->_showPhotos($value['extra']['photos']);
 if ($value['extra']['_hasVideo']) $this->_showVideo($value['extra']['_hasVideo']);
 print <<<EOT
@@ -123,16 +162,21 @@ EOT;
 $this->_operateButton($value);
 print <<<EOT
 -->
-			<cite title="{$value['postdate_s']}">{$value['lastdate']} [<a href="apps.php?uid={$value['authorid']}&q=weibo">新鲜事</a>]</cite>
+			<cite title="{$value['postdate_s']}"><a href="apps.php?q=weibo&do=detail&mid={$value['mid']}&uid={$value['authorid']}">{$value['lastdate']}</a> [<a href="apps.php?uid={$value['authorid']}&q=weibo">新鲜事</a>]</cite>
 		</div>
-		<div id="comment_{$value['mid']}"></div>
+		<div id="comment_{$value['mid']}{$this->_weiboDiv}"></div>
+<!--
+EOT;
+}print <<<EOT
+-->
 	</dd>
 </dl>
 <!--
 EOT;
 	}
 
-	function transmit($value) {//新鲜事转发
+	function transmit($value) {
+     if($value['mid']){//新鲜事转发
 print <<<EOT
 -->
 <dl class="dl cc">
@@ -141,7 +185,7 @@ print <<<EOT
 	</dt>
 	<dd class="dd">
 		<div class="title">
-			<span class="uname"><a href="{$GLOBALS[db_userurl]}{$value['authorid']}">{$value['username']}</a> </span>转发：{$value['content']}
+			<span class="uname"><a href="{$GLOBALS[db_userurl]}{$value['authorid']}">{$value['username']}</a> </span>转发:&nbsp;{$value['content']}
 		</div>
 <!--
 EOT;
@@ -161,14 +205,14 @@ EOT;
 $this->_operateButton($value);
 print <<<EOT
 -->
-			<cite title="{$value['postdate_s']}">{$value['lastdate']} [<a href="apps.php?uid={$value['authorid']}&q=weibo">新鲜事</a>]</cite>
+			<cite title="{$value['postdate_s']}"><a href="apps.php?q=weibo&do=detail&mid={$value['mid']}&uid={$value['authorid']}">{$value['lastdate']}</a>[<a href="apps.php?uid={$value['authorid']}&q=weibo">新鲜事</a>]</cite>
 		</div>
-		<div id="comment_{$value['mid']}"></div>
+		<div id="comment_{$value['mid']}{$this->_weiboDiv}"></div>
 	</dd>
 </dl>
 <!--
 EOT;
-	}
+	}}
 
 	function _transmit($value) {
 		if (empty($value)) {print <<<EOT
@@ -194,7 +238,7 @@ EOT;
 print <<<EOT
 -->
 <div class="title">
-	<a href="{$GLOBALS[db_userurl]}{$value['authorid']}">{$value['username']}</a>：<a href="$url">{$value['extra']['title']}</a>
+	<a href="{$GLOBALS[db_userurl]}{$value['authorid']}">{$value['username']}</a>:&nbsp;<a href="$url">{$value['extra']['title']}</a>
 </div>
 <div class="mb10">{$value['content']}</div>
 <!--
@@ -204,7 +248,7 @@ EOT;
 print <<<EOT
 -->
 <div class="mb10">
-	<a href="{$GLOBALS[db_userurl]}{$value['uid']}">{$value['username']}</a>：{$value['content']}
+	<a href="{$GLOBALS[db_userurl]}{$value['uid']}">{$value['username']}</a>:&nbsp;{$value['content']}
 </div>
 <!--
 EOT;
@@ -214,10 +258,10 @@ EOT;
 print <<<EOT
 -->
 <div class="unForward">
-	<a href="apps.php?q=weibo&do=transmit&ajax=1&mid={$value['mid']}" onclick="return ajaxurl(this)" class="s7">原文转发({$value['transmit']})</a>&nbsp;|&nbsp;
+	<a href="apps.php?q=weibo&do=transmit&ajax=1&mid={$value['mid']}" onclick="return ajaxurl(this)" class="s7">原文转发({$value['transmit']})</a>&nbsp;
 	<a href="javascript:void(0);" class="s7"  onclick="getcomments('comment',{$value[mid]},'',{$identify});return false;">原文评论<span id="commentnum_{$id}">({$value['replies']})</span></a>
 </div>
-<div id="comment_{$id}"></div>
+<div id="comment_{$id}{$this->_weiboDiv}"></div>
 <!--
 EOT;
 		$identify++;
@@ -233,7 +277,7 @@ print <<<EOT
 	</dt>
 	<dd class="dd">
 		<div class="title">
-			<span class="uname"><a href="{$GLOBALS[db_userurl]}{$value['authorid']}">{$value['username']}</a>：</span><!--
+			<span class="uname"><a href="{$GLOBALS[db_userurl]}{$value['authorid']}">{$value['username']}</a>:&nbsp;</span><!--
 EOT;
 if ($value['content']) {print <<<EOT
 -->{$value['content']}<!--
@@ -255,9 +299,9 @@ EOT;
 $this->_operateButton($value);
 print <<<EOT
 -->
-			<cite title="{$value['postdate_s']}">{$value['lastdate']}  [<a href="apps.php?q=photos&uid={$value['authorid']}&a=album&aid={$value['extra']['aid']}">来自相册</a>]</cite>
+			<cite title="{$value['postdate_s']}"><a href="apps.php?q=weibo&do=detail&mid={$value['mid']}&uid={$value['authorid']}">{$value['lastdate']}</a>  [<a href="apps.php?q=photos&uid={$value['authorid']}&a=album&aid={$value['extra']['aid']}">来自相册</a>]</cite>
 		</div>
-		<div id="comment_{$value['mid']}"></div>
+		<div id="comment_{$value['mid']}{$this->_weiboDiv}"></div>
 	</dd>
 </dl>
 <!--
@@ -273,7 +317,7 @@ print <<<EOT
 	</dt>
 	<dd class="dd">
 		<div class="title">
-			<span class="uname"><a href="{$GLOBALS[db_userurl]}{$value['authorid']}">{$value['username']}</a>：</span>分享照片
+			<span class="uname"><a href="{$GLOBALS[db_userurl]}{$value['authorid']}">{$value['username']}</a>:&nbsp;</span>分享照片
 		</div>
 <!--
 EOT;
@@ -286,9 +330,9 @@ EOT;
 $this->_operateButton($value);
 print <<<EOT
 -->
-			<cite title="{$value['postdate_s']}">{$value['lastdate']}  [来自群组 - <a href="apps.php?q=galbum&cyid={$value['extra']['cyid']}&a=album&aid={$value['extra']['aid']}">{$value['extra']['cname']}</a>]</cite>
+			<cite title="{$value['postdate_s']}"><a href="apps.php?q=weibo&do=detail&mid={$value['mid']}&uid={$value['authorid']}">{$value['lastdate']}</a>  [来自群组 - <a href="apps.php?q=galbum&cyid={$value['extra']['cyid']}&a=album&aid={$value['extra']['aid']}">{$value['extra']['cname']}</a>]</cite>
 		</div>
-		<div id="comment_{$value['mid']}"></div>
+		<div id="comment_{$value['mid']}{$this->_weiboDiv}"></div>
 	</dd>
 </dl>
 <!--
@@ -304,7 +348,7 @@ print <<<EOT
 	</dt>
 	<dd class="dd">
 		<div class="title">
-			<span class="uname"><a href="{$GLOBALS[db_userurl]}{$value['authorid']}">{$value['username']}</a>：</span><a href="apps.php?q=group&a=active&job=view&cyid={$value['extra']['cyid']}&id={$value['objectid']}" target="_blank">{$value['extra']['title']}</a>
+			<span class="uname"><a href="{$GLOBALS[db_userurl]}{$value['authorid']}">{$value['username']}</a>:&nbsp;</span><a href="apps.php?q=group&a=active&job=view&cyid={$value['extra']['cyid']}&id={$value['objectid']}" target="_blank">{$value['extra']['title']}</a>
 		</div>
 		<div class="mb10">
 			{$value['content']}
@@ -315,9 +359,9 @@ EOT;
 $this->_operateButton($value);
 print <<<EOT
 -->
-			<cite title="{$value['postdate_s']}">{$value['lastdate']} [来自群组 - <a href="apps.php?q=group&a=active&cyid={$value['extra']['cyid']}">{$value['extra']['cname']}</a>]</cite>
+			<cite title="{$value['postdate_s']}"><a href="apps.php?q=weibo&do=detail&mid={$value['mid']}&uid={$value['authorid']}">{$value['lastdate']}</a> [来自群组 - <a href="apps.php?q=group&a=active&cyid={$value['extra']['cyid']}">{$value['extra']['cname']}</a>]</cite>
 		</div>
-		<div id="comment_{$value['mid']}"></div>
+		<div id="comment_{$value['mid']}{$this->_weiboDiv}"></div>
 	</dd>
 </dl>
 <!--
@@ -333,7 +377,7 @@ print <<<EOT
 	</dt>
 	<dd class="dd">
 		<div class="title">
-			<span class="uname"><a href="{$GLOBALS[db_userurl]}{$value['authorid']}">{$value['username']}</a>：</span><a href="apps.php?q=group&a=read&cyid={$value['extra']['cyid']}&tid={$value['objectid']}" target="_blank">{$value['extra']['title']}</a>
+			<span class="uname"><a href="{$GLOBALS[db_userurl]}{$value['authorid']}">{$value['username']}</a>:&nbsp;</span><a href="apps.php?q=group&a=read&cyid={$value['extra']['cyid']}&tid={$value['objectid']}" target="_blank">{$value['extra']['title']}</a>
 		</div>
 		<div class="mb10">
 			{$value['content']}
@@ -344,9 +388,9 @@ EOT;
 $this->_operateButton($value);
 print <<<EOT
 -->
-			<cite title="{$value['postdate_s']}">{$value['lastdate']} [来自群组 - <a href="apps.php?q=group&a=thread&cyid={$value['extra']['cyid']}">{$value['extra']['cname']}</a>]</cite>
+			<cite title="{$value['postdate_s']}"><a href="apps.php?q=weibo&do=detail&mid={$value['mid']}&uid={$value['authorid']}">{$value['lastdate']}</a> [来自群组 - <a href="apps.php?q=group&a=thread&cyid={$value['extra']['cyid']}">{$value['extra']['cname']}</a>]</cite>
 		</div>
-		<div id="comment_{$value['mid']}"></div>
+		<div id="comment_{$value['mid']}{$this->_weiboDiv}"></div>
 	</dd>
 </dl>
 <!--
@@ -362,7 +406,7 @@ print <<<EOT
 	</dt>
 	<dd class="dd">
 		<div class="title">
-			<span class="uname"><a href="{$GLOBALS[db_userurl]}{$value['authorid']}">{$value['username']}</a>：</span>{$value['content']}
+			<span class="uname"><a href="{$GLOBALS[db_userurl]}{$value['authorid']}">{$value['username']}</a>:&nbsp;</span>{$value['content']}
 		</div>
 		<div class="gray">
 <!--
@@ -370,9 +414,9 @@ EOT;
 $this->_operateButton($value);
 print <<<EOT
 -->
-			<cite title="{$value['postdate_s']}">{$value['lastdate']} [来自群组 - <a href="apps.php?q=group&a=write&cyid={$value['extra']['cyid']}">{$value['extra']['cname']}</a>]</cite>
+			<cite title="{$value['postdate_s']}"><a href="apps.php?q=weibo&do=detail&mid={$value['mid']}&uid={$value['authorid']}">{$value['lastdate']}</a> [来自群组 - <a href="apps.php?q=group&a=write&cyid={$value['extra']['cyid']}">{$value['extra']['cname']}</a>]</cite>
 		</div>
-		<div id="comment_{$value['mid']}"></div>
+		<div id="comment_{$value['mid']}{$this->_weiboDiv}"></div>
 	</dd>
 </dl>
 <!--
@@ -388,7 +432,7 @@ print <<<EOT
 	</dt>
 	<dd class="dd">
 		<div class="title">
-			<span class="uname"><a href="{$GLOBALS[db_userurl]}{$value['authorid']}">{$value['username']}</a>：</span><a href="apps.php?q=diary&a=detail&did={$value['objectid']}&uid={$value['authorid']}" target="_blank">{$value['extra']['title']}</a>
+			<span class="uname"><a href="{$GLOBALS[db_userurl]}{$value['authorid']}">{$value['username']}</a>:&nbsp;</span><a href="apps.php?q=diary&a=detail&did={$value['objectid']}&uid={$value['authorid']}" target="_blank">{$value['extra']['title']}</a>
 		</div>
 		<div class="mb10">
 			{$value['content']}
@@ -399,9 +443,9 @@ EOT;
 $this->_operateButton($value);
 print <<<EOT
 -->
-			<cite title="{$value['postdate_s']}">{$value['lastdate']} [<a href="apps.php?uid={$value['authorid']}&q=diary">来自日志</a>]</cite>
+			<cite title="{$value['postdate_s']}"><a href="apps.php?q=weibo&do=detail&mid={$value['mid']}&uid={$value['authorid']}">{$value['lastdate']}</a> [<a href="apps.php?uid={$value['authorid']}&q=diary">来自日志</a>]</cite>
 		</div>
-		<div id="comment_{$value['mid']}"></div>
+		<div id="comment_{$value['mid']}{$this->_weiboDiv}"></div>
 	</dd>
 </dl>
 <!--
@@ -417,7 +461,7 @@ print <<<EOT
 	</dt>
 	<dd class="dd">
 		<div class="title">
-			<span class="uname"><a href="{$GLOBALS[db_userurl]}{$value['authorid']}">{$value['username']}</a>：</span><a href="read.php?tid={$value['objectid']}" target="_blank">{$value['extra']['title']}</a>
+			<span class="uname"><a href="{$GLOBALS[db_userurl]}{$value['authorid']}">{$value['username']}</a>:&nbsp;</span><a href="read.php?tid={$value['objectid']}" target="_blank">{$value['extra']['title']}</a>
 		</div>
 		<div class="mb10">
 			{$value['content']}
@@ -434,9 +478,9 @@ $this->_operateButton($value);
 $fname = strip_tags($value['extra']['fname']);
 print <<<EOT
 -->
-			<cite title="{$value['postdate_s']}">{$value['lastdate']} [来自帖子 - <a href="thread.php?fid={$value['extra']['fid']}" class="gray">{$fname}</a>]</cite>
+			<cite title="{$value['postdate_s']}"><a href="apps.php?q=weibo&do=detail&mid={$value['mid']}&uid={$value['authorid']}">{$value['lastdate']}</a> [来自帖子 - <a href="thread.php?fid={$value['extra']['fid']}" class="gray">{$fname}</a>]</cite>
 		</div>
-		<div id="comment_{$value['mid']}"></div>
+		<div id="comment_{$value['mid']}{$this->_weiboDiv}"></div>
 	</dd>
 </dl>
 <!--
@@ -452,7 +496,7 @@ print <<<EOT
 	</dt>
 	<dd class="dd">
 		<div class="title">
-			<span class="uname"><a href="{$GLOBALS[db_userurl]}{$value['authorid']}">{$value['username']}</a>：</span><a href="mode.php?m=cms&q=view&id={$value['objectid']}" target="_blank">{$value['extra']['title']}</a>
+			<span class="uname"><a href="{$GLOBALS[db_userurl]}{$value['authorid']}">{$value['username']}</a>:&nbsp;</span><a href="mode.php?m=cms&q=view&id={$value['objectid']}" target="_blank">{$value['extra']['title']}</a>
 		</div>
 		<div class="mb10">
 			{$value['content']}
@@ -468,9 +512,9 @@ EOT;
 $this->_operateButton($value);
 print <<<EOT
 -->
-			<cite title="{$value['postdate_s']}">{$value['lastdate']} [来自文章 - <a href="mode.php?m=cms&q=list&column={$value['extra']['cid']}" class="gray">{$value['extra']['cname']}</a>]</cite>
+			<cite title="{$value['postdate_s']}"><a href="apps.php?q=weibo&do=detail&mid={$value['mid']}&uid={$value['authorid']}">{$value['lastdate']}</a> [来自文章 - <a href="mode.php?m=cms&q=list&column={$value['extra']['cid']}" class="gray">{$value['extra']['cname']}</a>]</cite>
 		</div>
-		<div id="comment_{$value['mid']}"></div>
+		<div id="comment_{$value['mid']}{$this->_weiboDiv}"></div>
 	</dd>
 </dl>
 <!--
@@ -486,7 +530,7 @@ print <<<EOT
 	</dt>
 	<dd class="dd">
 		<div class="title">
-			<span class="uname"><a href="{$GLOBALS[db_userurl]}{$value['authorid']}">{$value['username']}</a>：</span>{$value['content']}
+			<span class="uname"><a href="{$GLOBALS[db_userurl]}{$value['authorid']}">{$value['username']}</a>:&nbsp;</span>{$value['content']}
 		</div>
 <!--
 EOT;
@@ -508,9 +552,9 @@ $sinaUserUrl = 'http://t.sina.com.cn/';
 $sinaUserUrl .= isset($value['sinaWeiboUserInfo']['id']) ? $value['sinaWeiboUserInfo']['id'] : '';
 print <<<EOT
 -->
-			<cite title="{$value['postdate_s']}">{$value['lastdate']} [来自 - <a target="_blank" href="$sinaUserUrl">新浪微博</a>]</cite>
+			<cite title="{$value['postdate_s']}"><a href="apps.php?q=weibo&do=detail&mid={$value['mid']}&uid={$value['authorid']}">{$value['lastdate']}</a> [来自 - <a target="_blank" href="$sinaUserUrl">新浪微博</a>]</cite>
 		</div>
-		<div id="comment_{$value['mid']}"></div>
+		<div id="comment_{$value['mid']}{$this->_weiboDiv}"></div>
 	</dd>
 </dl>
 <!--
@@ -525,20 +569,21 @@ EOT;
 		}
 		$page = $page ? $page : 1;
 		$isGM = $this->_isManager($value['authorid']);
-		$id = $value['mid'];
+		$id = $value['mid'];	
 print <<<EOT
 -->
 	<div class="fr">
 <!--
 EOT;
+if($value['mid']){
 if($isGM){print <<<EOT
 -->
-		<a href="javascript:void(0);" class="s7" onclick="deleteweibo('{$value['mid']}','$do','$page','weiboFeed');return false;">删除</a>&nbsp;|&nbsp;<!--
+		<a href="javascript:void(0);" class="s7" onclick="deleteweibo('{$value['mid']}','$do','$page','weiboFeed','$this->_isTopic','$this->_topicName');return false;">删除</a>&nbsp;|&nbsp;<!--
 EOT;
 }
 if ($GLOBALS['o_weibopost'] != '0') {
 print <<<EOT
---><a href="javascript:;" onclick="transmitWeibo({$value['mid']});return false;" class="s7">转发<!--
+--><a href="javascript:;" onclick="transmitWeibo({$value['mid']},'$do','$this->_isTopic','$this->_topicName');return false;" class="s7">转发<!--
 EOT;
 if ($value['transmit'] > 0) {print <<<EOT
 -->({$value['transmit']})<!--
@@ -556,7 +601,7 @@ EOT;
 --></span></a>&nbsp;|&nbsp;<a href="apps.php?q=collection&a=favor&type=weibo&ajax=1&id={$value['mid']}" onclick="return ajaxurl(this)" class="s7">收藏</a></div>
 <!--
 EOT;
-	}
+	}}
 
 	function _showPhotos($value, $isLocalPhoto = true) {
 		static $kNum = 0;
@@ -576,6 +621,7 @@ print <<<EOT
 -->
 <script type="text/javascript">
 weibo.push("$kNum", $photos);
+
 </script>
 <div class="ddPhoto mb10 cc">
 <!--
@@ -589,14 +635,16 @@ EOT;
 $ul_width = count($photolist)*116;
 print <<<EOT
 -->
-	<div class="fl" id="photolist_{$kNum}" style="width:{$rect_width}px;overflow:hidden;">
+	<div class="fl" id="photolist_{$kNum}" count="$count" style="width:{$rect_width}px;overflow:hidden;">
 		<ul class="fl" style="width:{$ul_width}px">
 <!--
 EOT;
 $i=0;
-foreach ($photolist as $photo) {print <<<EOT
+foreach ($photolist as $photo) {
+$ifDefaultShow = ($i == 0 && $this->_showPhotoOnload) ? "onload=\"weibo.showPhoto('$photo[pid]','$photo[s_path]','$kNum','$i');resizeImg(this);\"" : 'onload="resizeImg(this);"';
+print <<<EOT
 -->
-			<li><img src="{$photo['path']}" onclick="weibo.showPhoto('{$photo[pid]}','{$photo[s_path]}','$kNum','$i')" onerror="this.src='$GLOBALS[imgpath]/imgdel.jpg'" /></li>
+			<li class="cp" onclick="weibo.showPhoto('{$photo[pid]}','{$photo[s_path]}','$kNum','$i')" style="cursor: url('u/images/zoomin.cur'),auto"><img src="{$photo['path']}"  $ifDefaultShow onerror="this.src='$GLOBALS[imgpath]/imgdel.jpg'" /></li>
 <!--
 EOT;
 $i++;
@@ -613,6 +661,13 @@ if ($count > $this->_maxPhoto) {print <<<EOT
 EOT;
 }print <<<EOT
 -->
+</div>
+<div id="photocontainer_{$kNum}" style="display:none;">
+<!--
+EOT;
+$this->_photoMask($kNum);
+print <<<EOT
+-->	
 </div>
 <!--
 EOT;
@@ -650,6 +705,25 @@ print <<<EOT
 </div>
 <!--
 EOT;
+	}
+    
+    function _photoMask($num) {
+print <<<EOT
+-->
+<div id="photo_mask_{$num}" class="feedImgB" style="display:none;">
+		<p class="mb5"><a href="javascript:;" onclick="weibo.hidePhoto($num)" class="feediImgFold">收起</a>&nbsp;|&nbsp;<a href="javascript:;" class="artWork" target="_blank" onclick="this.href=weibo.bigPhotoUrl($num)">查看大图</a></p>
+	<div class="tac pr cc" style="overflow:hidden;" id="photo_small_{$num}">
+			<div id="prephoto_{$num}" onclick="weibo.prevPhoto($num)" class="aPre" title="上一张" style="zoom:1;left:0;_padding-bottom:5000px;_margin-bottom:-5000px;"></div>
+			<div id="nextphoto_{$num}" onclick="weibo.nextPhoto($num)" class="aNext" title="下一张" style="zoom:1;bottom:0;top:0;_padding-bottom:5000px;_margin-bottom:-5000px;"></div>
+			<img src="javascript://" id="photo_path_{$num}" style="display:block;margin:0 auto;" />
+	</div>
+</div>
+<!--
+EOT;
+	}
+	
+	function showPhotoOnload($show = false) {
+		$this->_showPhotoOnload = (bool) $show;
 	}
     
     function live($list) {
@@ -771,7 +845,7 @@ EOT;
 	</div>
 <!--
 EOT;
-	}    
+	}
 }
 $weiboModelTemplate = new weiboModelTemplate();
 ?>

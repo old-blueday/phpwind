@@ -23,6 +23,15 @@ class Forum {
         return new ApiResponse($forumsdb);
     }
 
+	function getforums() {
+		$forums = array();
+		$query = $this->db->query("SELECT f.fid,f.name,f.fup,f.type FROM pw_forums f WHERE f.ifsub='0' AND f.ifcms!=2 AND f.cms!='1' ORDER BY f.vieworder");
+		while ($rt = $this->db->fetch_array($query)) {
+			$forums[] = $rt;
+		}
+		return new ApiResponse($forums);
+	}
+
 	function insertApp($fids,$appid,$appinfo = '') {//更新版块APP信息
 
 		if (!$fids) {
@@ -110,7 +119,8 @@ class Forum {
 		if (!$name) {
 			return new ApiResponse(false);
 		}
-		@include_once pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
+		//* @include_once pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
+		extract(pwCache::getData(D_P.'data/bbscache/forum_cache.php', false));
 		$forumtype = $forum[$fup]['type'] == 'category' ? 'forum' : ($forum[$fup]['type'] == 'forum' ? 'sub' : 'sub2');
 		
 		/*

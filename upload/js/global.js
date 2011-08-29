@@ -496,8 +496,12 @@ function searchBlur(e){
 	}
 	//e.parentNode.className = 'ip';
 }
-function getSearchType(e){
-	var n = e.srcElement;
+function getSearchType(event){
+	if (is_ie){
+		var n = window.event.srcElement;
+    } else {
+    	var n = event.target;
+    }
 	if(n && n.tagName!='LI') return;
 	n.parentNode.parentNode.getElementsByTagName('h6')[0].innerHTML = n.innerHTML;
 	var lis = n.parentNode.getElementsByTagName('li');
@@ -748,3 +752,98 @@ function searchInput() {
     }
 	win['showDialog'] = win['showDlg'];
 })();
+//回到顶部
+var addLoadEvent =function( func){
+       var oldonload =window .onload ;
+       if(typeof oldonload !="function"){
+             window.onload=func;
+       }else{
+             window.onload=function (){
+                   if ( oldonload) {
+                         oldonload();
+                   }
+                   func();
+             }
+       }
+}
+var Tween={
+	Quad:{
+			easeOut: function(t,b,c,d){
+						return -c *(t/=d)*(t-2) + b;
+					},
+			easeInOut: function(t,b,c,d){
+						if ((t/=d/2) < 1) return c/2*t*t + b;
+						return -c/2 * ((--t)*(t-2) - 1) + b;
+					}		
+		}
+}
+var scrollBar=function(){
+	var that=this;
+	if(!document.getElementById("scrollBar")){
+		var ele=document.createElement("div");
+		ele.id="scrollBar";
+		ele.innerHTML='<a hideFocus="true" href="javascript:void(0)">回到顶部</a>';
+		document.body.appendChild(ele);
+	}else{
+		var ele=document.getElementById("scrollBar");
+	}
+	var barTxt="回到顶部";
+	var distance=100;//限定范围
+	var dd=document.documentElement;
+	var db=document.body;
+	var scrollTop;//顶部距离
+	this.setStyle=function(){
+		scrollTop=db.scrollTop||dd.scrollTop;//顶部距离
+		var sw=dd.scrollWidth;
+		var pos='right:50%;margin-right:-510px;';
+		var fullscreen=document.getElementById('fullscreenStyle');//判断屏幕状态
+		if((fullscreen&&!fullscreen.disabled)||sw<1020){//宽屏或者窗口宽度小于可见值时 1020=960+20*2+10*2
+				pos='right:5px;';
+		}
+		var ctxt=scrollTop>=distance?'':'display:none';
+		ele.style.cssText='position:fixed;'+pos+'bottom:75px;'+ctxt;
+	}
+	this.update=function(){//控制滑块显示 并修正IE6定位
+			scrollTop=db.scrollTop||dd.scrollTop;
+			ele.style.display=(scrollTop>=distance)?"block":"none";
+		if(!window.XMLHttpRequest){//如果IE6
+			var h=ele.offsetHeight;
+			var ch=document.documentElement.clientHeight;
+			ele.style.position="absolute";
+			ele.style.top=ch+scrollTop-h-75+"px";
+		}	
+	}
+	that.b=0;//初始值
+	that.c=0;//变化量
+	var d=10,t=0;//持续时间和增量
+	this.run=function(){
+		if(dd.scrollTop){
+			dd.scrollTop=Math.ceil(Tween.Quad.easeOut(t,that.b,that.c,d));
+		}else{
+			db.scrollTop = Math.ceil(Tween.Quad.easeOut(t,that.b,that.c,d));
+		}
+		if(t<d){ t++; setTimeout(that.run, 10); }else{t=0;}
+	}
+	ele.onclick=function(){
+		that.b=scrollTop;
+		that.c=-scrollTop;
+		that.run();
+		return false;
+	}
+	this.init=function(){
+		this.setStyle();
+		window.onscroll=function(){
+			that.update();
+		}
+		window.onresize=function(){
+			that.setStyle();
+			that.update();
+		}
+	}
+}
+
+var goTop;
+addLoadEvent(function(){
+	goTop=new scrollBar();
+	goTop.init();
+})

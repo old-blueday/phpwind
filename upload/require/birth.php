@@ -19,10 +19,10 @@ if ((!file_exists($cachefile) || pwFilemtime($cachefile) <= $tdtime) && procLock
 		$rt['age'] = $nyear - substr($rt['bday'],0,strpos($rt['bday'],'-'));
 		$brithcache .= ' <span><a href="u.php?username='.rawurlencode($rt['username'])."\" title=\"$rt[username]$rt[gender]".getLangInfo('other','indexbirth',array('age'=>$rt['age']))."\">$rt[username]</a></span>";
 	}
-	pwCache::setData($cachefile,"<?php\r\n\$birthnum=".pw_var_export($birthnum).";\r\n\$brithcache=".pw_var_export($brithcache).";\r\n?>");
+	pwCache::writeover($cachefile,"<?php\r\n\$birthnum=".pw_var_export($birthnum).";\r\n\$brithcache=".pw_var_export($brithcache).";\r\n?>");
 	procUnLock('birth');
 } else {
-	include_once pwCache::getPath($cachefile,true);
+	include_once ($cachefile);
 }
 $db_bdayautohide && !$brithcache && $brithcache = 'empty';
 ?>

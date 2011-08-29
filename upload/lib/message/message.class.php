@@ -13,9 +13,9 @@ class PW_Message {
 	 * @param string $typeId 站内信类型，默认为短消息，可选评论/留言/评价
 	 * @return int 发送成功的messageId
 	 */
-	function sendMessage($userId, $usernames, $messageInfo, $typeId = null) {
+	function sendMessage($userId, $usernames, $messageInfo, $typeId = null ,$isSuper = false) {
 		$service = $this->_serviceFactory("message");
-		return $service->sendMessage($userId, $usernames, $messageInfo, $typeId);
+		return $service->sendMessage($userId, $usernames, $messageInfo, $typeId ,$isSuper);
 	}
 	/**
 	 * 公共消息中心全局回复函数
@@ -335,6 +335,37 @@ class PW_Message {
 		$service = $this->_serviceFactory("message");
 		return $service->getRelation($userId, $relationId);
 	}
+	
+	function getInBox($userId, $page, $perpage){
+		$service = $this->_serviceFactory("message");
+		return $service->getInBox($userId, $page, $perpage);
+	}
+	
+	function countInBox($userId){
+		$service = $this->_serviceFactory("message");
+		return $service->countInBox($userId);
+	}
+	
+	function getOutBox($userId, $page, $perpage){
+		$service = $this->_serviceFactory("message");
+		return $service->getOutBox($userId, $page, $perpage);
+	}
+	
+	function countOutBox($userId){
+		$service = $this->_serviceFactory("message");
+		return $service->countOutBox($userId);
+	}
+	
+	function getMessageByTypeIdWithBoxName($userId, $typeId, $page, $perpage, $boxName = 'outbox'){
+		$service = $this->_serviceFactory("message");
+		return $service->getMessageByTypeIdWithBoxName($userId, $typeId, $page, $perpage, $boxName);
+	}
+	
+	function countMessageByTypeIdWithBoxName($userId, $typeId, $boxName = 'outbox'){
+		$service = $this->_serviceFactory("message");
+		return $service->countMessageByTypeIdWithBoxName($userId, $typeId, $boxName);
+	}
+	
 	/**************************************************************/
 	/**
 	 * 发送一个通知

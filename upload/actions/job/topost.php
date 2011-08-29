@@ -5,7 +5,7 @@ S::gp(array('pid'));
 S::gp(array('cyid', 'floor','uid'), 'GP', 2);
 
 !$pid && $floor == 0 && $pid = 'tpc';
-$linkurl = $cyid ? "apps.php?q=group&cyid=$cyid&a=read&tid=$tid" : "read.php?tid=$tid";
+$linkurl = $cyid ? "apps.php?q=group&cyid=$cyid&a=read&tid=$tid" : "read.php?tid=$tid&displayMode=1";
 
 if ($pid == 'tpc') {
 	ObHeader("$linkurl#tpc");

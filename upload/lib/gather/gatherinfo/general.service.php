@@ -15,7 +15,32 @@ class GatherInfo_General_Service {
 		if (!Perf::checkMemcache() || !isset($information['tid'])) return true;
 		$threadIds = is_array ( $information ['tid'] ) ? $information ['tid'] : array ($information ['tid'] );
 		$_cacheService = Perf::gathercache ( 'pw_threads' );
+		$_cacheService->clearCacheForTmsgByThreadIds ( $threadIds );
 		return $_cacheService->clearCacheForThreadByThreadIds ( $threadIds );
+	}
+	
+	/**
+	 * 有些查询语句无法改造成结构化查询，所以通过gatherinfo收集
+	 *
+	 * @param array $information
+	 * @return boolean
+	 */
+	function changeThreads($information) {
+		return Perf::gatherQuery('update', array('pw_threads'), $information);
+	}
+	
+	/**
+	 * 有些查询语句无法改造成结构化查询，所以通过gatherinfo收集
+	 *
+	 * @param array $information
+	 * @return boolean
+	 */
+	function changePosts($information) {
+		return Perf::gatherQuery('update', array($information['_tablename']), $information);
+	}
+	
+	function deletePosts($information){
+		return Perf::gatherQuery('delete', array($information['_tablename']), $information);
 	}
 
 	/**
@@ -174,4 +199,54 @@ class GatherInfo_General_Service {
 		return $_cacheService->clearCacheForCmemberAndColonyByUserIds( $userIds );
 	}
 	**/
+	
+	/**
+	 * 有些查询语句无法改造成结构化查询，所以通过gatherinfo收集
+	 *
+	 * @param array $information
+	 * @return boolean
+	 */
+	function changeForumData($information){
+		return Perf::gatherQuery('update', array('pw_forumdata'), $information);
+	}
+	
+	/**
+	 * 当发帖和发回复时，从memcache读取缓存数据然后更新它，而不是直接删除缓存
+	 *
+	 * @param array $information
+	 * @return boolean
+	 */
+	function changeForumDataWithForumId($information = null){
+		if (!Perf::checkMemcache()) return true;
+		if (!S::isArray($information) || !($information = current($information)) || !isset($information['fid'])) return false;
+		$fid = intval($information['fid']);
+		$_cacheService = Perf::getCacheService();
+		$_cacheInfo = $_cacheService->get(array('all_forums_info', 'forumdata_announce_' . $fid));
+		$_unique = $GLOBALS['db_memcache']['hash'];
+		// 更新index页面里版块缓存
+		if (isset($_cacheInfo[$_unique . 'all_forums_info'])){
+			$allForums = $_cacheInfo[$_unique . 'all_forums_info'];
+			foreach ($information as $key => $value){
+				if (in_array($key, array('article', 'topic','tpost','subtopic'))){
+					$allForums[$fid][$key] = $allForums[$fid][$key] + $value;
+				}else {
+					$allForums[$fid][$key] = $value;
+				}
+			}
+			$_cacheService->set('all_forums_info', $allForums, 300);
+		}
+		// 更新thread页面里版块和通告缓存
+		if (isset($_cacheInfo[$_unique . 'forumdata_announce_' . $fid])){
+			$forums = $_cacheInfo[$_unique . 'forumdata_announce_' . $fid];
+			foreach ($information as $key => $value){
+				if (in_array($key, array('article', 'topic','tpost','subtopic'))){
+					$forums[$key] = $forums[$key] + $value;
+				}else {
+					$forums[$key] = $value;
+				}
+			}
+			$_cacheService->set('forumdata_announce_' . $fid, $forums, 300);			
+		}
+		return true;
+	}
 }

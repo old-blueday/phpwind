@@ -7,7 +7,7 @@ S::gp(array('action', 'step'));
 if ($adminitem == 'banuser') {
 	!$action && $action = 'banuser';
 	if (!$step) {
-		S::gp(array('username'),'G');
+		S::gp(array('username', 'userid'),'G');
 		$select[$db_banby] = 'selected';
 		$db_banlimit = (int)$db_banlimit;
 		$db_autoban ? $autoban_Y = 'checked' : $autoban_N = 'checked';
@@ -15,16 +15,18 @@ if ($adminitem == 'banuser') {
 		include PrintEot('banuser');exit;
 	}
 	if ($action == 'banuser') {
-		S::gp(array('username', 'ban_reason'),'P');
+		S::gp(array('username', 'userid', 'ban_reason'),'P');
 		S::gp(array('limit','type'),'P',2);
 		$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
-		$userdb = $userService->getByUserName($username);
+		!$userid && $username && $userdb = $userService->getByUserName($username);
+		$userid && $userdb = $userService->get($userid);
 		if (!$userdb) {
 			$errorname = $username;
 			adminmsg('user_not_exists', $basename . '&adminitem=banuser&action=banuser');
 		}
 		//Vars for banservice
-		require pwCache::getPath(D_P . "data/groupdb/group_{$admin_gid}.php");
+		//* require pwCache::getPath(D_P . "data/groupdb/group_{$admin_gid}.php");
+		pwCache::getData(S::escapePath(D_P . "data/groupdb/group_{$admin_gid}.php"));
 		$windid = $admin_name;
 		//end Vars
 		$banUserService = L::loadClass('BanUser', 'user'); /* @var $banUserService PW_BanUser */
@@ -42,15 +44,17 @@ if ($adminitem == 'banuser') {
 			showmsg($return, $basename . '&adminitem=banuser&action=banuser');
 		}
 	} elseif ($action == 'freeuser') {
-		S::gp(array('username'),'P');
+		S::gp(array('username', 'userid'),'P');
 		$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
-		$userdb = $userService->getByUserName($username);
+		$username && $userdb = $userService->getByUserName($username);
+		$userid && $userdb = $userService->get($userid);
 		if (!$userdb) {
 			$errorname = $username;
 			adminmsg('user_not_exists', $basename . '&adminitem=banuser&action=freeuser');
 		}
 		//Vars for banservice
-		require pwCache::getPath(D_P . "data/groupdb/group_{$admin_gid}.php");
+		//* require pwCache::getPath(D_P . "data/groupdb/group_{$admin_gid}.php");
+		pwCache::getData(S::escapePath(D_P . "data/groupdb/group_{$admin_gid}.php"));
 		$windid = $admin_name;
 		//end Vars
 		$banUserService = L::loadClass('BanUser', 'user'); /* @var $banUserService PW_BanUser */
@@ -76,7 +80,7 @@ if ($adminitem == 'banuser') {
 	}
 } elseif ($adminitem == 'viewban') {
 	if (empty($action)) {
-		S::gp(array('page','banuser','bantype','adminban','starttime','endtime'));
+		S::gp(array('page','banuser','banuseruid','bantype','adminban','starttime','endtime'));
 		(!is_numeric($page) || $page < 1) && $page = 1;
 		$limit = S::sqlLimit(($page-1)*$db_perpage,$db_perpage);
 		$sql = "WHERE 1";
@@ -84,6 +88,10 @@ if ($adminitem == 'banuser') {
 		$count = 0;
 		if ($banuser) {
 			$sql .= " AND m.username=".S::sqlEscape($banuser);
+			$count = 1;
+		}
+		if ($banuseruid) {
+			$sql .= " AND m.uid=".S::sqlEscape($banuseruid);
 			$count = 1;
 		}
 		if ($bantype) {

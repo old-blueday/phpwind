@@ -1,6 +1,6 @@
 var collection = {	
 	appUrl : 'apps.php?q=collection',
-	
+	postdata : verifyhash ? 'verify='+verifyhash :  '',
 	$ : function(id){
 		return document.getElementById(id);
 	},
@@ -19,7 +19,7 @@ var collection = {
 	
 	del : function(id) {
 		var _this = this;
-		ajax.send('apps.php?q=collection&a=del&ajax=1&id='+id,'',function(){
+		ajax.send('apps.php?q=collection',this.postdata + '&a=del&ajax=1&id='+id,function(){
 			var rText = ajax.request.responseText.split('\t');
 			if (rText[0] == 'success') {
 				var element = _this.$('collection_'+id);

@@ -82,6 +82,35 @@ class PwForum {
 			$GLOBALS['skinco'] = $this->foruminfo['style'];
 		}
 	}
+
+	function authStatus($userstatus) {
+		if (!$GLOBALS['db_authstate']) return true;
+		if ($this->forumset['auth_cellphone'] && !getstatus($userstatus, PW_USERSTATUS_AUTHMOBILE)) {
+			return 'forum_auth_cellphone';
+		}
+		if ($this->forumset['auth_alipay'] && !getstatus($userstatus, PW_USERSTATUS_AUTHALIPAY)) {
+			return 'forum_auth_alipay';
+		}
+		if ($GLOBALS['db_authcertificate'] && $this->forumset['auth_certificate'] && !getstatus($userstatus, PW_USERSTATUS_AUTHCERTIFICATE)) {
+			return 'forum_auth_certificate';
+		}
+		return true;
+	}
+
+	function authCredit($userstatus) {
+		if (!$GLOBALS['db_authstate']) return 1;
+		$array = array(1);
+		if ($this->forumset['auth_cellphone_credit'] > 1 && getstatus($userstatus, PW_USERSTATUS_AUTHMOBILE)) {
+			$array[] = intval($this->forumset['auth_cellphone_credit']);
+		}
+		if ($this->forumset['auth_alipay_credit'] > 1 && getstatus($userstatus, PW_USERSTATUS_AUTHALIPAY)) {
+			$array[] = intval($this->forumset['auth_alipay_credit']);
+		}
+		if ($GLOBALS['db_authcertificate'] && $this->forumset['auth_certificate_credit'] > 1 && getstatus($userstatus, PW_USERSTATUS_AUTHCERTIFICATE)) {
+			$array[] = intval($this->forumset['auth_certificate_credit']);
+		}
+		return max($array);
+	}
 	
 	function creditcheck($user, $groupid) {
 		if ($this->foruminfo['allowvisit']) {
@@ -167,21 +196,27 @@ class PwForum {
 	
 	function getUpForum() {
 		global $forum, $fpage;
-		isset($forum) || include pwCache::getPath(D_P . 'data/bbscache/forum_cache.php');
+		//* isset($forum) || include pwCache::getPath(D_P . 'data/bbscache/forum_cache.php');
+		isset($forum) || extract(pwCache::getData(D_P . 'data/bbscache/forum_cache.php', false));
 		$upforum = array();
 		$upforum[] = array(
-			strip_tags($this->foruminfo['name']),
+			$this->stripHtml($this->foruminfo['name']),
 			"thread.php?fid={$this->fid}" . ($fpage > 1 ? "&page=$fpage" : '')
 		);
 		$fup = $this->foruminfo['fup'];
 		while ($fup > 0 && isset($forum[$fup]) && $forum[$fup]['type'] != 'category') {
 			$upforum[] = array(
-				strip_tags($forum[$fup]['name']),
+				$this->stripHtml($forum[$fup]['name']),
 				"thread.php?fid=$fup"
 			);
 			$fup = $forum[$fup]['fup'];
 		}
 		return array_reverse($upforum);
+	}
+
+	function stripHtml($name) {
+		($str = strip_tags($name)) || $str = $name;
+		return $str;
 	}
 	
 	function getTitle() {
@@ -209,7 +244,7 @@ class PwForum {
 			$db_bfn_temp = $db_bfn;
 		}
 		if ($db_menu && $onmouseover) {
-			$headguide = "<img id=\"td_cate\" src=\"$imgpath/" . L::style('stylepath') . "/thread/home.gif\" alt=\"forumlist\" onClick=\"return pwForumList(false,false,null,this);\" class=\"cp breadHome\" /><em class=\"breadEm\"></em><a href=\"$db_bfn_temp\" title=\"$db_bbsname\">$db_bbsname</a>";
+			$headguide = "<img id=\"td_cate\" src=\"$imgpath/" . L::style('stylepath') . "/thread/home.gif\" title=\"快速跳转至其他版块\" onClick=\"return pwForumList(false,false,null,this);\" class=\"cp breadHome\" /><em class=\"breadEm\"></em><a href=\"$db_bfn_temp\" title=\"$db_bbsname\">$db_bbsname</a>";
 		} else {
 			$headguide = "<a href=\"$db_bfn\" title=\"$db_bbsname\">$db_bbsname</a>";
 		}
@@ -260,14 +295,18 @@ class PwForum {
 	function lastinfo($type, $action = '+', $lastpost = array()) {
 		global $db_readdir, $R_url;
 		$lp = $topicadd = $fupadd = '';
-		
+		$_arrTopicAdd = $_arrFupAdd = $_arrLp = array();
+		$_num = intval($action.'1');
 		if ($action == '+' || $action == '-') {
 			if ($type == 'topic') {
 				$topicadd = "tpost=tpost{$action}'1',article=article{$action}'1',topic=topic{$action}'1' ";
 				$fupadd = "tpost=tpost{$action}'1',article=article{$action}'1',subtopic=subtopic{$action}'1' ";
+				$_arrTopicAdd = array('tpost'=>$_num, 'article'=>$_num, 'topic'=>$_num);
+				$_arrFupAdd = array('tpost'=>$_num, 'article'=>$_num, 'subtopic'=>$_num);
 			} else {
 				$topicadd = "tpost=tpost{$action}'1',article=article{$action}'1' ";
 				$fupadd = "tpost=tpost{$action}'1',article=article{$action}'1' ";
+				$_arrTopicAdd = $_arrFupAdd = array('tpost'=>$_num, 'article'=>$_num);
 			}
 		}
 		if ($lastpost) {
@@ -279,19 +318,24 @@ class PwForum {
 				}
 			}
 			$lp = "lastpost=" . S::sqlEscape($lastpost['subject'] . "\t" . $lastpost['author'] . "\t" . $lastpost['lastpost'] . "\t" . $newurl);
+			$_arrLp = array('lastpost'=> $lastpost['subject'] . "\t" . $lastpost['author'] . "\t" . $lastpost['lastpost'] . "\t" . $newurl );
 		}
 		if ($topicadd || $lp) {
 			$sql = trim($topicadd . ',' . $lp, ',');
 			$this->db->update("UPDATE pw_forumdata SET $sql WHERE fid=" . S::sqlEscape($this->fid));
+			Perf::gatherInfo('changeForumDataWithForumId', array(array_merge($_arrTopicAdd,$_arrLp, array('fid'=>$this->fid))));
+			//*$this->db->update(pwQuery::updateClause("UPDATE :pw_table SET $sql WHERE fid=:fid", array('pw_forumdata',$this->fid)));
 		}
 		if ($this->foruminfo['type'] == 'sub' || $this->foruminfo['type'] == 'sub2') {
 			!$this->isOpen() && $lp = '';
 			if ($lp || $fupadd) {
 				$sql = trim($fupadd . ',' . $lp, ',');
 				$this->db->update("UPDATE pw_forumdata SET $sql WHERE fid=" . S::sqlEscape($this->foruminfo['fup']));
+				Perf::gatherInfo('changeForumDataWithForumId', array(array_merge($_arrFupAdd,$_arrLp, array('fid'=>$this->foruminfo['fup']))));
 				if ($this->foruminfo['type'] == 'sub2') {
 					$rt1 = $this->db->get_one("SELECT fup FROM pw_forums WHERE fid=" . S::sqlEscape($this->foruminfo['fup']));
 					$this->db->update("UPDATE pw_forumdata SET $sql WHERE fid=" . S::sqlEscape($rt1['fup']));
+					Perf::gatherInfo('changeForumDataWithForumId', array(array_merge($_arrFupAdd,$_arrLp, array('fid'=>$rt1['fup']))));
 				}
 			}
 		}

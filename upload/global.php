@@ -22,8 +22,10 @@ defined('SCR') || define('SCR','other');
 $P_S_T	 = pwMicrotime();
 require_once(R_P.'require/common.php');
 S::filter();
-require_once pwCache::getPath(D_P.'data/bbscache/baseconfig.php',false,false);
-require_once pwCache::getPath(D_P.'data/bbscache/config.php',true);
+require_once (D_P.'data/bbscache/baseconfig.php');
+require_once D_P.'data/sql_config.php';
+//* require_once pwCache::getPath(D_P.'data/bbscache/config.php',true);
+pwCache::getData(D_P.'data/bbscache/config.php');
 
 
 define('AREA_PATH', R_P . $db_htmdir . '/channel/');
@@ -97,9 +99,10 @@ if ($cookie_lastvisit = GetCookie('lastvisit')) {
 }
 
 S::gp(array('fid','tid'),'GP',2);
-$db = $ftp = $credit = null;
+#$db = $ftp = $credit = null;
+$ftp = $credit = null;//distributed
 
-require_once pwCache::getPath(D_P.'data/sql_config.php');
+//* require_once pwCache::getPath(D_P.'data/sql_config.php');
 !is_array($manager) && $manager = array();
 $newmanager = array();
 foreach ($manager as $key => $value) {
@@ -150,7 +153,7 @@ if ($db_pptifopen && $db_ppttype == 'client') {
 $ol_offset = (int)GetCookie('ol_offset');
 $skinco	   = GetCookie('skinco');
 
-if ($db_refreshtime && str_replace("=",'',$REQUEST_URI) == $lastpath && $onbbstime < $db_refreshtime) {
+if ($db_refreshtime && SCR != 'register' && str_replace("=",'',$REQUEST_URI) == $lastpath && $onbbstime < $db_refreshtime) {
 	!GetCookie('winduser') && $groupid = 'guest';
 	$skin = $skinco ? $skinco : $db_defaultstyle;
 	Showmsg('refresh_limit');
@@ -165,7 +168,7 @@ $_time		= array('hours'=>get_date($timestamp,'G'),'day'=>get_date($timestamp,'j'
 $tdtime		= PwStrtoTime(get_date($timestamp,'Y-m-d'));
 $montime	= PwStrtoTime(get_date($timestamp,'Y-m').'-1');
 
-if (!defined('CK') && ($_COOKIE || $timestamp%3 == 0)) {
+if (!defined('CK')) {
 	switch (SCR) {
 		case 'thread': $lastpos = "F$fid";break;
 		case 'read': $lastpos = "T$tid";break;
@@ -174,13 +177,14 @@ if (!defined('CK') && ($_COOKIE || $timestamp%3 == 0)) {
 		case 'mode': $lastpos = $db_mode;break;
 		default: $lastpos = 'other';
 	}
-	if ($timestamp-$lastvisit>$db_onlinetime || $lastpos != GetCookie('lastpos')) {
+
+	if ($timestamp-$lastvisit>$db_onlinetime || $lastpos != GetCookie('lastpos') || GetCookie('oltoken') == 'init') {
 		$runfc = 'Y';
 		Cookie('lastpos',$lastpos);
 	}
 }
 if (is_numeric($winduid) && strlen($windpwd)>=16) {
-	$winddb	  = User_info();
+	$winddb = User_info();
 	list($winduid,$groupid,$userrvrc,$windid,$_datefm,$_timedf,$credit_pop) = array($winddb['uid'],$winddb['groupid'],floor($winddb['rvrc']/10),$winddb['username'],$winddb['datefm'],$winddb['timedf'],$winddb['creditpop']);
 
 	if ($credit_pop && $db_ifcredit) {//Credit Changes Tips
@@ -222,12 +226,16 @@ if ($db_ifsafecv && !$safecv && !defined('PRO') && strpos($db_safegroup,",$group
 	Showmsg('safecv_prompt');
 }
 
-include_once pwCache::getPath(D_P.'data/bbscache/inv_config.php',true);
-if ($inv_linkopen && !$windid && (is_numeric($_GET['u']) || ($_GET['a'] && strlen($_GET['a'])<16)) && strpos($pwServer['HTTP_REFERER'],$pwServer['HTTP_HOST']) === false) {
+//* include_once pwCache::getPath(D_P.'data/bbscache/inv_config.php',true);
+pwCache::getData(D_P.'data/bbscache/inv_config.php'); 
+if ($inv_linkopen && !$windid && (is_numeric($_GET['u']) || ($_GET['a'] && strlen(rawurldecode($_GET['a']))<16)) && strpos($pwServer['HTTP_REFERER'],$pwServer['HTTP_HOST']) === false) {
 	S::gp(array('u','a'));
-	Cookie('userads',"$u\t$a\t".md5($pwServer['HTTP_REFERER']));
-} elseif ($inv_linkopen && $inv_linktype == '0' && GetCookie('userads')) {
-	require_once(R_P.'require/userads.php');
+	if ($inv_linktype == 0) {
+		$a = rawurldecode($a);
+		require_once(R_P.'require/userads.php');
+	} else {
+		Cookie('userads',"$u\t$a\t".md5($pwServer['HTTP_REFERER']));
+	}
 }
 unset($u,$a,$cookie_userads);
 
@@ -259,11 +267,14 @@ if ($groupid == 'guest' && $db_guestdir && GetGcache()) {
 PwNewDB();
 unset($db_whybbsclose,$db_whycmsclose,$db_ipban,$db_diy,$dbhost,$dbuser,$dbpw,$dbname,$pconnect,$manager_pwd,$newmanager);
 if ($groupid == 'guest') {
-	require_once pwCache::getPath(D_P.'data/groupdb/group_2.php');
+	//* require_once pwCache::getPath(D_P.'data/groupdb/group_2.php');
+	pwCache::getData(D_P.'data/groupdb/group_2.php');
 } elseif (file_exists(D_P."data/groupdb/group_$groupid.php")) {
-	require_once pwCache::getPath(S::escapePath(D_P."data/groupdb/group_$groupid.php"));
+	//* require_once pwCache::getPath(S::escapePath(D_P."data/groupdb/group_$groupid.php"));
+	pwCache::getData(S::escapePath(D_P."data/groupdb/group_$groupid.php"));
 } else {
-	require_once pwCache::getPath(D_P.'data/groupdb/group_1.php');
+	//* require_once pwCache::getPath(D_P.'data/groupdb/group_1.php');
+	pwCache::getData(D_P.'data/groupdb/group_1.php');
 }
 visitRightByGroup();
 if ($_G['pwdlimitime'] && !defined('PRO') && !S::inArray($windid,$manager) && $timestamp-86400*$_G['pwdlimitime']>$winddb['pwdctime'] ) {
@@ -297,9 +308,20 @@ function refreshto($URL, $content, $statime = 1, $forcejump = false) {
 		$index_url = & $B_url;
 		ObStart(); //noizy
 		extract(L::style());
-
+		//css file for showmsg
+		require (L::style('', $skinco, true));
+		if ("wind" != $tplpath && file_exists(D_P.'data/style/'.$tplpath.'_css.htm')) {
+			$css_path = D_P.'data/style/'.$tplpath.'_css.htm';
+		} else{
+			$css_path = D_P.'data/style/wind_css.htm';
+		}
+		//end css file
 		$content = getLangInfo('refreshto', $content);
-		require PrintEot('refreshto');
+		if (defined('AREA_PAGE') && function_exists('areaLoadFrontView')) {
+			require_once areaLoadFrontView('area_manage_refreshto');
+		} else {
+			require PrintEot('refreshto');
+		}
 		$output = str_replace(array('<!--<!---->', '<!---->', "\r\n\r\n"), '', ob_get_contents());
 		echo ObContents($output);
 		exit();
@@ -361,9 +383,21 @@ function Showmsg($msg_info, $dejump = 0) {
 		$showlogin = true;
 	}
 	extract(L::style());
+	//css file for showmsg
+	require (L::style('', $skinco, true));
+	if ("wind" != $tplpath && file_exists(D_P.'data/style/'.$tplpath.'_css.htm')) {
+		$css_path = D_P.'data/style/'.$tplpath.'_css.htm';
+	} else{
+		$css_path = D_P.'data/style/wind_css.htm';
+	}
+	//end css file
 	list($_Navbar, $_LoginInfo) = pwNavBar();
 	ob_end_clean();
 	ObStart();
+	/*
+	if (defined('AREA_PAGE') && function_exists('areaLoadFrontView')) {
+		require_once areaLoadFrontView('area_manage_showmsg');exit;
+	}*/
 	require_once PrintEot('showmsg');
 	exit();
 }
@@ -448,7 +482,7 @@ function getUserByUid($uid) {
 		global $db;
 		$sqladd = $sqltab = '';
 		if (in_array(SCR, array('index', 'read', 'thread', 'post'))) {
-			$sqladd = (SCR == 'post') ? ',md.postcheck,sr.visit,sr.post,sr.reply' : ',sr.visit';
+			$sqladd = (SCR == 'post') ? ',md.postcheck,sr.visit,sr.post,sr.reply' : (SCR == 'read' ? ',sr.visit,sr.reply' : ',sr.visit');
 			$sqltab = "LEFT JOIN pw_singleright sr ON m.uid=sr.uid";
 		}
 		$detail = $db->get_one("SELECT m.uid,m.username,m.password,m.safecv,m.email,m.bday,m.oicq,m.groupid,m.memberid,m.groups,m.icon,m.regdate,m.honor,m.timedf, m.style,m.datefm,m.t_num,m.p_num,m.yz,m.newpm,m.userstatus,m.shortcut,m.medals,md.lastmsg,md.postnum,md.rvrc,md.money,md.credit,md.currency,md.lastvisit,md.thisvisit,md.onlinetime,md.lastpost,md.todaypost,md.monthpost,md.onlineip,md.uploadtime,md.uploadnum,md.starttime,md.pwdctime,md.monoltime,md.digests,md.f_num,md.creditpop,md.jobnum,md.lastgrab,md.follows,md.fans,md.newfans,md.newreferto,md.newcomment,md.punch $sqladd FROM pw_members m LEFT JOIN pw_memberdata md ON m.uid=md.uid $sqltab WHERE m.uid=" . S::sqlEscape($uid) . " AND m.groupid<>'0' AND md.uid IS NOT NULL");
@@ -621,6 +655,7 @@ function Txt_ol() {
  * 在线用户数据库存储实现
  */
 function Sql_ol() {
+	/**
 	global $db, $fid, $tid, $timestamp, $windid, $winduid, $onlineip, $groupid, $wind_in, $db_onlinetime, $db_ipstates, $db_today, $lastvisit, $tdtime;
 	$olid = (int) GetCookie('olid');
 	$ifhide = $GLOBALS['_G']['allowhide'] && GetCookie('hideid') ? 1 : 0;
@@ -657,6 +692,32 @@ function Sql_ol() {
 	}
 	if ($db_today && $timestamp - $lastvisit > $db_onlinetime) {
 		require_once (R_P . 'require/today.php');
+	}
+	**/
+	
+	global $winduid, $timestamp, $db_onlinetime, $db_ipstates, $db_today, $lastvisit, $tdtime, $onlineip;
+	$onlineService = L::loadClass('OnlineService', 'user');
+	
+	// 统计每日来访IP
+	$ipscookie = GetCookie('ipstate');
+	$guestInfo = $onlineService->getGuestInfo();
+	if ($db_ipstates && (
+	$ipscookie && $ipscookie < $GLOBALS['tdtime'] ||
+	!$ipscookie && GetCookie('oltoken')=='init' && $onlineService->countOnlineGuestByIp($guestInfo['ip']) == 0 ||
+	$guestInfo['ipchange'])) {
+		require_once (R_P . 'require/ipstates.php');
+	}
+	
+	// 统计每日来访会员
+	if ($winduid && $db_today && $timestamp - $lastvisit > $db_onlinetime) {
+		require_once (R_P . 'require/today.php');
+	}
+		
+	// 更新在线信息
+	if (!$_COOKIE || (GetCookie('oltoken') === null && !$winduid)){
+		$onlineService->setGuestToken();
+	}else {
+		$winduid ? $onlineService->updateOnlineUser() : $onlineService->updateOnlineGuest();
 	}
 }
 
@@ -697,15 +758,15 @@ function pwGetShortcut() {
 		if (empty($sForumsShortcut)) {
 			if (!$db_shortcutforum && $winduid) {
 				require_once (R_P . 'require/updateforum.php');
-				$sForumsShortcut = updateshortcut();
-			} else {
-				$sForumsShortcut = $db_shortcutforum;
-			}
+				updateshortcut();
+				//$sForumsShortcut = updateshortcut();
+			} 
 		}
 	}
 	/*侧栏 等处因删除无权查看的隐藏板块*/
 	global $winddb, $forum ,$groupid,$windid;
-	include_once pwCache::getPath(D_P . 'data/bbscache/forum_cache.php');
+	//* include_once pwCache::getPath(D_P . 'data/bbscache/forum_cache.php');
+	extract(pwCache::getData(D_P . 'data/bbscache/forum_cache.php', false));
 	foreach($sForumsShortcut as $k=>$v){
 		if($forum[$k]['f_type'] == 'hidden'
 			&& (!allowcheck($forum['allowvisit'], $groupid, $winddb['groups'], $forum['fid'], $winddb['visit']) && !S::inArray($windid, $manager))) {
@@ -721,7 +782,8 @@ function pwGetMyShortcut(){
 		global $winddb, $forum;
 		if (trim($winddb['shortcut'], ',')) {
 			if (!isset($forum)) {
-				require pwCache::getPath(D_P . 'data/bbscache/forum_cache.php');
+				//* require pwCache::getPath(D_P . 'data/bbscache/forum_cache.php');
+				extract(pwCache::getData(D_P . 'data/bbscache/forum_cache.php', false));
 			}
 			$shortcuts = explode(',', $winddb['shortcut']);
 			foreach ($shortcuts as $value) {
@@ -947,7 +1009,7 @@ function pwOutPut() {
 		creatguestcache($output);
 	}
 	if (defined('SHOWLOG')) Error::writeLog();
-	if (defined('PW_PACK_FILES')) pwPack::files();		
+	if (defined('PW_PACK_FILES')) pwPack::files();
 	echo ObContents($output);
 	unset($output);
 	N_flush();
@@ -1235,12 +1297,15 @@ function buildNavLinkHtml($navData) {
 function visitRightByGroup() {
 	global $_G, $groupid, $manager, $windid, $pwServer;
 
+	if (defined('CK') && CK == 1) return;
 	if (S::inArray(SCR,array('sendpwd', 'login', 'register', 'job'))) {
-		if (SCR !== 'job' || $pwServer['HTTP_USER_AGENT'] == 'Shockwave Flash' && S::inArray($_GET['action'], array('mutiupload', 'mutiuploadphoto', 'uploadicon'))) return;
+		$action = S::getGP('action');
+		if (SCR !== 'job' || $pwServer['HTTP_USER_AGENT'] == 'Shockwave Flash' && S::inArray($action, array('mutiupload', 'mutiuploadphoto', 'uploadicon'))) return;
 	}
 
 	if (empty($_G['allowvisit'])) {
 		if (empty($groupid) || $groupid == 'guest') {
+			if (defined('AJAX') && $_GET['action'] == 'pwschools') return;
 			ObHeader('login.php');
 		} elseif (!S::inArray($windid, $manager)) {
 			@extract($GLOBALS, EXTR_SKIP);

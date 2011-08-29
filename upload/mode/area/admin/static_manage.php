@@ -5,7 +5,8 @@ S::gp(array('action','step'));
 
 if (!$action) {
 	if (!$step) {
-		include_once pwCache::getPath(D_P.'data/bbscache/area_config.php');
+		//* include_once pwCache::getPath(D_P.'data/bbscache/area_config.php');
+		pwCache::getData(D_P.'data/bbscache/area_config.php');
 		include PrintMode('static_manage');exit;
 	} else {
 		S::gp(array('statictime','portalstatictime'),'P',2);

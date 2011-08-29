@@ -45,26 +45,25 @@ function wordlength(target,maxLength){
 						<tr>
 							<th class="th">空间名称</th>
 							<td class="td">
-								<input name="name" id="name" type="text" class="input input_wb" value="$space[name]" onkeyup="wordlength(this,80)" />
-								<span class="s6" id="span_name">($space[namelength]/80)</span>
+								<input name="name" id="name" type="text" class="input input_wb mr5" value="$space[name]" onkeyup="wordlength(this,80)" /><span id="span_name" class="f10 gray">($space[namelength]/80)</span>
 							</td>
 						</tr>
 						<tr>
 							<th class="th">空间简介</th>
 							<td class="td">
-								<textarea name="descript"  class="textareaA fl mr10"  onkeyup="wordlength(this,255)">$space[descript]</textarea>
-								<span id="span_descript" class="fl">($space[desclength]/255)</span>
+								<textarea name="descript"  class="textareaA fl mr5"  onkeyup="wordlength(this,255)">$space[descript]</textarea><span id="span_descript" class="f10 gray">($space[desclength]/255)</span>
 							</td>
 						</tr>
 						<tr>
 							<th class="th">背景图片</th>
 							<td class="td">
-								<input name="banner" id="banner" type="file" class="input input_wa mb5" onchange="uploadbanner();">
+								<input name="banner" id="banner" type="file" class="input mb5" style="width:338px;padding:3px 0;margin:0;" onchange="uploadbanner();">
 								<script type="text/javascript">
 									function uploadbanner(){
 										var atm=getObj('banner');
 										var path = getObj('banner').value;
 										var maxUploadSize;
+										var filesize;
 										if('$maxuploadsize'.indexOf('M')>-1){											
 										 	maxUploadSize=parseInt('$maxuploadsize'.split('M')[0])*1024*1024;
 										}else if('$maxuploadsize'.indexOf('K') >-1) {
@@ -127,9 +126,46 @@ EOT;
 								空间类型
 							</th>
 							<td class="td">
-								<ul class="lh_24">
-									<li><label><input name="spacetype" type="radio" value="0"{$ifcheck_0} /> 交友型空间</label></li>
-									<li><label><input name="spacetype" type="radio" value="1"{$ifcheck_1} /> 博客型空间</label></li>
+								<ul class="menuSkin" id="spacestyleType" style="padding:0;margin:0;">
+									<li style="margin-top:0;" {$spacestyle_2}>
+										<a href="javascript:;" style="border:0;" hidefocus="true" onClick="selectStyle('spacestyleType')">
+											<i style="background:url(u/images/space/1v2.png) no-repeat">&nbsp;</i>
+											<span style="line-height:18px;"><label for="ifcheckstyle_2"><input id="ifcheckstyle_2" name="spacestyle" type="radio" class="mr5" value="2" {$ifcheckstyle_2} />两栏式</label></span></a>
+									</li>
+									<li style="margin-top:0;" {$spacestyle_3}>
+										<a href="javascript:;" style="border:0;" hidefocus="true" onClick="selectStyle('spacestyleType')">
+											<i style="background:url(u/images/space/1v1v1.png) no-repeat">&nbsp;</i>
+											<span style="line-height:18px;"><label for="ifcheckstyle_3"><input id="ifcheckstyle_3" name="spacestyle" type="radio" class="mr5" value="3" {$ifcheckstyle_3} />三栏式</label></span></a>
+									</li>
+								</ul>
+							</td>
+						</tr>
+            <tr>
+							<th class="th">
+								空间主题
+							</th>
+							<td class="td">
+								<ul class="menuSkin cc" id="spacesthemes" style="padding:0;margin:0;width:auto;">
+									<li style="margin-top:0;" {$spacethemes_3}>
+										<a href="javascript:;" style="border:0;" hidefocus="true" onClick="selectStyle('spacesthemes')">
+											<i style="background:url(u/images/space/bbs_mode.png) no-repeat">&nbsp;</i>
+											<span style="line-height:18px;"><label for="ifcheckstyle_2"><input id="ifcheckstyle_3" name="spacetype" type="radio" class="mr5" value="3" {$ifcheck_3} />论坛模式</label></span></a>
+									</li>
+									<li style="margin-top:0;" {$spacethemes_1}>
+										<a href="javascript:;" style="border:0;" hidefocus="true" onClick="selectStyle('spacesthemes')">
+											<i style="background:url(u/images/space/blog_mode.png) no-repeat">&nbsp;</i>
+											<span style="line-height:18px;"><label for="ifcheckstyle_2"><input id="ifcheckstyle_1" name="spacetype" type="radio" class="mr5" value="1" {$ifcheck_1} />博客模式</label></span></a>
+									</li>
+									<li style="margin-top:0;" {$spacethemes_2}>
+										<a href="javascript:;" style="border:0;" hidefocus="true" onClick="selectStyle('spacesthemes')">
+											<i style="background:url(u/images/space/img_mode.png) no-repeat">&nbsp;</i>
+											<span style="line-height:18px;"><label for="ifcheckstyle_2"><input id="ifcheckstyle_2" name="spacetype" type="radio" class="mr5" value="2" {$ifcheck_2} />图片模式</label></span></a>
+									</li>
+									<li style="margin-top:0;" {$spacethemes_0}>
+										<a href="javascript:;" style="border:0;" hidefocus="true" onClick="selectStyle('spacesthemes')">
+											<i style="background:url(u/images/space/all_mode.png) no-repeat">&nbsp;</i>
+											<span style="line-height:18px;"><label for="ifcheckstyle_2"><input id="ifcheckstyle_0" name="spacetype" type="radio" class="mr5" value="0" {$ifcheck_0} />综合模式</label></span></a>
+									</li>
 								</ul>
 							</td>
 						</tr>
@@ -148,7 +184,7 @@ $ifcheck = ($key == $space['skin']) ? ' checked' : '';
 print <<<EOT
 -->
 							<li {$style}>
-								<a href="javascript:;">
+								<a href="javascript:;" hidefocus="true"  onClick="selectStyle('themesLi')">
 									<i style="background:url(u/themes/$key/images/preview.jpg) no-repeat">&nbsp;</i>
 									<span><label for="skin{$key}"><input type="radio" name="spaceskin" value="$key" id="skin{$key}" class="mr5" {$ifcheck} />{$value}</label></span>
 								</a>
@@ -163,14 +199,6 @@ EOT;
 				<div id="set_model" style="display:$style_model">
 					<div class="moduleList mb15">
 						<ul class="cc">
-							<!-- <li>
-								<div class="cc">
-									<span class="fl icon"><img src="u/images/module/info.png" /></span>
-									<h4 class="fl f14 b"><a href="javascript:;">我的资料</a></h4>
-									<span class="fr"><label><input class="checkbox" type="checkbox" checked disabled />显示</label></span>
-								</div>
-								<p class="lh_22">&nbsp;<label class="fl">隐私</label><select name=""><option value="">登录后任何人可见</option></select></p>
-							</li> -->
 <!--
 EOT;
 foreach ($spaceModel as $key) {
@@ -201,12 +229,14 @@ EOT;
 </div>
 <script type="text/javascript">window.onReady(function(){new pwTab('tabList', 'tab_', 'set_', 'spacemodeset');});</script>
 <script type="text/javascript">
-var lis = getObj('themesLi').getElementsByTagName('li');
-for(var i = 0,j = lis.length;i < j;i++){
-	lis[i].onclick = function(){
-		for(var i = 0;i<j;i++){lis[i].className = '';}
-		this.getElementsByTagName('input')[0].checked = 'checked';
-		this.className = 'current';
+function selectStyle(obj) {
+	var lis = getObj(obj).getElementsByTagName('li');
+	for(var i = 0,j = lis.length;i < j;i++){
+		lis[i].onclick = function(){
+			for(var i = 0;i<j;i++){lis[i].className = '';}
+			this.getElementsByTagName('input')[0].checked = 'checked';
+			this.className = 'current';
+		}
 	}
 }
 </script>

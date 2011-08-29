@@ -1,8 +1,8 @@
 <?php
 !function_exists('adminmsg') && exit('Forbidden');
 
-@include_once pwCache::getPath(D_P.'data/bbscache/o_config.php');
-
+//* @include_once pwCache::getPath(D_P.'data/bbscache/o_config.php');
+pwCache::getData(D_P.'data/bbscache/o_config.php');
 if (empty($action)) {
 
 	if (empty($_POST['step'])) {
@@ -13,6 +13,7 @@ if (empty($action)) {
 		ifcheck($db_phopen,'phopen');
 		ifcheck($o_photos_gdcheck,'photos_gdcheck');
 		ifcheck($o_photos_qcheck,'photos_qcheck');
+		$maxuploadsize = @ini_get('upload_max_filesize');
 
 		$creategroup = ''; $num = 0;
 		foreach ($ltitle as $key => $value) {

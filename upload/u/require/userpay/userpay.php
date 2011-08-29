@@ -35,7 +35,8 @@ if (empty($action)) {
 	!$db_creditpay && $db_creditpay = array();
 	$paycredit = key($db_creditpay);
 	$pay_link = "<span class=\"btn\"><span><button onClick=\"location.href='userpay.php?action=buy';\">马上充值</button></span></span>";
-	include_once pwCache::getPath(D_P.'data/bbscache/ol_config.php');
+	//* include_once pwCache::getPath(D_P.'data/bbscache/ol_config.php');
+	pwCache::getData(D_P.'data/bbscache/ol_config.php');
 	if (!$ol_onlinepay || empty($db_creditpay)) {
 		$pay_link = "<div class=\"blockquote3\">支付功能尚未开启</div>";
 	}
@@ -48,7 +49,8 @@ if (empty($action)) {
 } elseif ($action == 'buy') {
 
 	S::gp(array('paycredit'));
-	include_once pwCache::getPath(D_P.'data/bbscache/ol_config.php');
+	//* include_once pwCache::getPath(D_P.'data/bbscache/ol_config.php');
+	pwCache::getData(D_P.'data/bbscache/ol_config.php');
 	if (!$ol_onlinepay) {
 		Showmsg($ol_whycolse);
 	}
@@ -69,7 +71,8 @@ if (empty($action)) {
 
 } elseif ($action == 'pay') {
 
-	include_once pwCache::getPath(D_P.'data/bbscache/ol_config.php');
+	//* include_once pwCache::getPath(D_P.'data/bbscache/ol_config.php');
+	pwCache::getData(D_P.'data/bbscache/ol_config.php');
 	if (!$ol_onlinepay) {
 		Showmsg($ol_whycolse);
 	}
@@ -107,7 +110,7 @@ if (empty($action)) {
 			'cmd'			=> '_xclick',
 			'invoice'		=> $order_no,
 			'business'		=> $ol_paypal,
-			'item_name'		=> getLangInfo('other','userpay_content'),
+			'item_name'		=> getLangInfo('olpay', "olpay_0_title", array('order_no' => $order_no)),
 			'item_number'	=> 'phpw*',
 			'amount'		=> $number,
 			'no_shipping'	=> 0,
@@ -236,11 +239,13 @@ if (empty($action)) {
 		$urladd .= "ctype=$ctype&";
 	}
 	if ($stime) {
+		$stimeView = $stime;
 		!is_numeric($stime) && $stime = PwStrtoTime($stime);
 		$sqladd .= " AND adddate>".S::sqlEscape($stime);
 		$urladd .= "stime=$stime&";
 	}
 	if ($etime) {
+		$etimeView = $etime;
 		!is_numeric($etime) && $etime = PwStrtoTime($etime);
 		if ($etime == $stime) $etime = $etime + 86400;
 		$sqladd .= " AND adddate<".S::sqlEscape($etime);
@@ -279,7 +284,7 @@ if (empty($action)) {
 	empty($vm_credit) && Showmsg('virement_closed');
 
 	if (empty($_POST['step'])) {
-
+			$db_virelimit = (int) $db_virelimit;
 		//require_once(R_P.'require/header.php');
 			require_once uTemplate::PrintEot('userpay');
 			pwOutPut();

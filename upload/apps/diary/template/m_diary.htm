@@ -628,28 +628,30 @@ print <<<EOT
 			<input type="text" class="input input_wb mr10" name="atc_title" id="atc_title" value="$diary[subject]"/><span id="atc_title_warn" class="gray">限 $db_titlemax 字节</span>
 			<div id="menu_face" class="menu" style="display:none;"></div>
 			</div>
+			<div class="cc">
 <!--
 EOT;
-require_once PrintEot('wysiwyg_editor');
+require_once PrintEot('wysiwyg_editor_diary');
 print <<<EOT
 -->
+			</div>
             <table cellpadding="0" cellspacing="0" width="100%" style=" table-layout:fixed;">
                 <tr class="tr3">
                     <td width="62">日志分类</td>
-                    <td><div class="dropdown mr10">
-                        <select name="dtid" id="dtid_add"><option value="0" $dtid_0>默认分类</option>$dtsel</select></div><span class="btn_add"><span><button onclick="javascript:add_dtid('$uid','dtid_add');" type="button">添加分类</button></span></span>
+                    <td><span class="dropdown mr10">
+                        <select name="dtid" id="dtid_add"><option value="0" $dtid_0>默认分类</option>$dtsel</select></span><span class="btn_add"><span><button onclick="javascript:add_dtid('$uid','dtid_add');" type="button">添加分类</button></span></span>
                     </td>
                 </tr>
                 <tr class="tr3">
                     <td>隐私设置</td>
                     <td>
-										<div class="dropdown mr10">
+										<span class="dropdown mr10">
                         <select name="privacy" id="dtid_pvc" onchange="optionsel(this.value,'{$sendWeiboPrivacy}')">
                             <option value="0" $privacy_0>全站可见</option>
                             <option value="1" $privacy_1>仅好友可见</option>
                             <option value="2" $privacy_2>仅自己可见</option>
                         </select>
-										</div>
+										</span>
 						<label for="if_copy" class="mr10">
 							<input id="if_copy" type="checkbox" name="ifcopy" value="1" $checked $disabled>&nbsp;允许转载
 						</label>
@@ -673,101 +675,12 @@ EOT;
                 </tr>
 <!--
 EOT;
-if ($db_allowupload && $_G['allowupload'] || $attach) {print <<<EOT
--->
-                <tr><td colspan="2">
-                    <table cellPadding="0" cellSpacing="0" style="display:none" width="100%">
-                    <tbody id="att_mode"><tr>
-                        <td><input class="input" type="file" name="attachment_" size="20" /></td><td><input class="input" type="text" name="atc_desc" size="20" /></td>
-                        <td><select style="display:none;"><option value="0"></option><option value="1">加密</option><option value="2">出售</option></select></td>
-                        <td><select name="att_ctype" style="display:none;">{$alltype}</select></td>
-                        <td><input class="input" type="hidden" name="atc_needrvrc" value="0" size="1" /></td>
-                        <td></td></tr>
-                    </tbody>
-                    </table>
-                </td>
-            </tr>
-<script language="JavaScript">
-var allow_ext = '$uploadfiletype';
-var allow_size = '$uploadfilesize';
-var attachnum = parseInt('$db_attachnum');
-var charset = '$db_charset';
-var titlemax = '$db_titlemax';
-var postmax = '$db_postmax';
-initCheckTextNum('atc_title','atc_title_warn',titlemax);
-initCheckTextNum('textarea','textarea_warn',postmax);
-</script>
-<script type="text/javascript" language="JavaScript" src="js/upload.js"></script>
-<!--
-EOT;
-}if($attach){print <<<EOT
--->
-<tr class="tr3">
-    <td colspan="2" style="padding:0;border:0;">
-        <div class="editor-mwidth">
-            <table class="tr_p10" width="100%" style="table-layout:fixed">
-                <tr>
-                    <td width="3%"></td>
-                    <td width="240">该帖包含附件<span class="gray">(不想保留的附件去掉√)</span> :</td>
-                    <td width="40">描述</td>
-                    <td width="10%"></td>
-                    <td width="10%"></td>
-                    <td width="140"></td>
-                    <td width="130"></td>
-                </tr>
-                <tbody id="ajaxtable"></tbody>
-            </table>
-<script language="JavaScript">
-var attachs = {{$attach}};
-oldAtt.init();
-</script>
-        </div>
-    </td>
-</tr>
-<!--
-EOT;
-}
-$shortcut=$_GET['s']?'':'tr3';
-
-if($db_allowupload && $_G['allowupload']){print <<<EOT
--->
-<tr class="$shortcut">
-    <td style="padding-top:0;" colspan="2">
-<!--
-EOT;
-$shortcut=$_GET['s']?' style="display:none"':'';
-print <<<EOT
--->
-        <table class="tr_p10" width="100%" style="table-layout:fixed">
-            <tr>
-                <td style="padding-right:3em" width="35%">上传图片附件</td>
-                <td>描述</td>
-                <td width="10%"></td>
-                <td width="10%"></td>
-                <td width="8%"></td>
-                <td width="100"></td>
-            </tr>
-            <tbody id="attach"></tbody>
-        </table>
-        <div id="viewimg" class="menu" style="display:none;"></div>
-        <div id="attsize" $shortcut style="margin-top:10px">有效文件类型:$uploadfilesize</div>
-    </td>
-</tr>
-<script language="JavaScript">
-newAtt.create();
-</script>
-<!--
-EOT;
-}print <<<EOT
--->
-<!--
-EOT;
 if ($o_diary_gdcheck) {
 $gdSize = explode("\t",$db_gdsize);
 print <<<EOT
 -->
                 <tr class="tr3 vt">
-                    <td>认证码:</td>
+                    <td>验证码:</td>
                     <td>
                         <input class="input" onfocus="showgd();" type="text" name="gdcode" id="gdcode" size="5" tabindex="3"  />
                         <span id="ckcode" style="display:none;">
@@ -825,7 +738,7 @@ EOT;
 EOT;
 if($a == 'edit'){print <<<EOT
 -->
-<script language="JavaScript">setTimeout("editor.gotoEnd();",50);</script>
+
 <!--
 EOT;
 }else{print <<<EOT
@@ -836,45 +749,35 @@ EOT;
 }print <<<EOT
 -->
 <script language="JavaScript">var stylepath = 'wind';</script>
-<!--
-EOT;
-if(R_P!=D_P){
-$facedb = readover(D_P.'data/bbscache/face.js');
-print <<<EOT
--->
-<script language="javascript">
-{$facedb}
-</script>
-<!--
-EOT;
-}else{print <<<EOT
--->
-<script language="JavaScript" src="data/bbscache/face.js"></script>
-<!--
-EOT;
-}print <<<EOT
--->
 <script language="JavaScript">
-editor.init('$editor', IsChecked('atc_html') ? 1 : 0);
+var charset = '$db_charset';
+var titlemax = '$db_titlemax';
+var postmax = '$db_postmax';
+initCheckTextNum('atc_title','atc_title_warn',titlemax);
+initCheckTextNum('textarea','textarea_warn',postmax);
 var cnt  = 0;
 document.FORM.Submit.disabled = false;
 function checkpost(obj) {
-	if (obj.atc_title.value == "") {
-		showDialog("error","日志<span class='warnFontStyle'>标题</span>不能为空",2);
-		obj.atc_title.focus();
-		return false;
-	} else if (strlen(obj.atc_title.value) > $db_titlemax) {
+	if (strlen(obj.atc_title.value) > $db_titlemax) {
 		showDialog("error","日志<span class='warnFontStyle'>标题</span>不能大于 <span class='warnFontStyle'>$db_titlemax</span> 个字节",2);
 		obj.atc_title.focus();
 		return false;
 	}
 	if (strlen(obj.atc_content.value) < $db_postmin) {
-		showDialog("error","日志<span class='warnFontStyle'>内容</span>不能少于 <span class='warnFontStyle'>$db_postmin</span> 个字节",2);
-		editor.focusEditor();
+		obj.atc_content.setAttribute("hasError", 1);
+		showDialog({
+			type: "error",
+			message: "日志<span class='warnFontStyle'>内容</span>不能少于 <span class='warnFontStyle'>$db_postmin</span> 个字节",
+			autoHide:2
+		});
 		return false;
 	} else if (strlen(obj.atc_content.value) > $db_postmax) {
-		showDialog("error","日志<span class='warnFontStyle'>内容</span>不能大于 <span class='warnFontStyle'>$db_postmax</span> 个字节",2);
-		editor.focusEditor();
+		obj.atc_content.setAttribute("hasError", 1);
+		showDialog({
+			type: "error",
+			message: "日志<span class='warnFontStyle'>内容</span>不能大于 <span class='warnFontStyle'>$db_postmax</span> 个字节",
+			autoHide:2
+		});
 		return false;
 	}
 	var pattern = /\[url=(\d+)\]/gmi;

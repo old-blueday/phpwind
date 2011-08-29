@@ -74,7 +74,7 @@ var uploader = {
 			};
 			var attr = {id:'mutiupload',name:'mutiupload'};
 			loadjs('js/swfobject.js','','',function(){
-				swfobject.embedSWF(imgpath + '/uploader.swf', "flashUploadPanel", "250", "46", "10.0.0", "js/expressInstall.swf",flashVar,params,attr,function(e){
+				swfobject.embedSWF(imgpath + '/uploader.swf', "B_uploader_container", "250", "46", "10.0.0", "js/expressInstall.swf",flashVar,params,attr,function(e){
 						uploader.flash = e.ref;
 				});
 			});
@@ -230,16 +230,12 @@ var uploader = {
 	/**
 	 * 计算大小
 	 */
-	getSize:function(n)
+	getSize:function(m)
 	{
-		var pStr = 'BKMGTPEZY';
-		var i = 0;
-		while(n>1024)
-		{
-			n=n/1024;
-			i++;
-		}
-		var t = 3-Math.ceil(Math.log(n)/Math.LN10);
+		var pStr = 'BKMGTPEZY',
+			i = Math.floor(Math.log(m/Math.LN2 / 10) );
+		var n = m/Math.pow(1024, i),
+			t = 3-Math.ceil(Math.log(n)/Math.LN10);
 		return Math.round(n*Math.pow(10,t))/Math.pow(10,t)+pStr.charAt(i);  
 	},
 	/**

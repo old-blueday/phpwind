@@ -27,7 +27,7 @@ if($sub=="diaryRate"){print <<<EOT
 EOT;
 }elseif($sub=="diaryFav"){print <<<EOT
 -->
-	    &nbsp;<a id="diaryShare" href="javascript:;" onclick="sendmsg('operate.php?action=share&ajax=1&type=diary&id=$value[id]','',this.id);" class="s7">收藏</a>
+	    &nbsp;<a id="diaryShare" href="apps.php?q=collection&a=favor&type=diary&ajax=1&id=$value[id]" onclick="return ajaxurl(this)" class="s7">收藏</a>
 <!--
 EOT;
 }elseif($sub=="diaryShare"){print <<<EOT

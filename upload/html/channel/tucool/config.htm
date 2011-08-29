@@ -1,0 +1,129 @@
+
+<pw id="A1_头部图片轮播@图酷" />
+<ul class="tu_flash_switch" id="SlayerA_1">
+	<list cachetime="1800" action="image" num="4" title="图片播放器大图" />
+	<loop>
+		<li class="switchItem" style="display:none"><a href="{url}"  target="_blank"><img src="{image,520,300}" width="520" height="300" /><h3>{title,30}</h3></a></li>
+	</loop>
+</ul>
+<div class="tu_flash_bg"></div>
+	<ol class="tu_flash_nav" id="SlayerA_2">
+	<!--#foreach($pwresult as $value){#-->
+		<li class="switchNavItem"><a href="$value[url]"  target="_blank"><img src="$value[image]" width="47" height="47" /></a></li>
+	<!--#}#-->
+	</ol>
+
+<pw id="B1_今日推荐标题@图酷" />
+<a href="#" class="more">更多</a><strong>今日推荐</strong>
+
+<pw id="B2_今日推荐图文@图酷" />
+<list cachetime="1800" action="image" num="3" title="今日推荐图文" />
+<div class="tu_dl_img cc">
+<!--# $count = 0;#-->
+	<loop>
+<!--#
+$tempClass = (($count % 3) == 0) ? 'class="one"' : '';
+$count++;
+#-->
+	<dl $tempClass>
+		<dt><a href="{url}"><img src="{image,180,135}" width="180" height="135" /></a></dt>
+		<dd>
+			<p class="s6 cc mb10"><span class="imgView">查看：</span><span class="mr10 fl">{hits}</span><span class="imgFav">收藏：</span><span class="fl">{collectnum}</span></p>
+			<p class="mb5"><a href="{url}">{title,24}</a></p>
+			<p><a href="{authorurl}" class="s6 mr20">{author}</a><span class="s6">{totalnum} 张</span></p>
+		</dd>
+	</dl>
+	</loop>
+</div>
+
+<pw id="B3_图片分类模块1@图酷" />
+<a href="#" class="more">更多</a><strong>人物</strong>
+
+<pw id="B4_图片分类模块列表1@图酷" />
+	<ul class="tu_mode_ul cc">
+		<list cachetime="1800" action="image" num="4" title="图片分类模块列表1" />
+		<loop>
+		<li><a href="{url}"><img src="{image,138,103}" width="138" height="103" /></a><p><a href="{url}">{title,20}</a></p></li>
+		</loop>
+	</ul>
+
+<pw id="B5_图片分类模块2@图酷" />
+<a href="#" class="more">更多</a><strong>风景</strong>
+
+<pw id="B6_图片分类模块列表2@图酷" />
+	<ul class="tu_mode_ul cc">
+		<list cachetime="1800" action="image" num="4" title="图片分类模块列表2" />
+		<loop>
+		<li><a href="{url}"><img src="{image,138,103}" width="138" height="103" /></a><p><a href="{url}">{title,20}</a></p></li>
+		</loop>
+	</ul>
+
+<pw id="B7_图片分类模块3@图酷" />
+<a href="#" class="more">更多</a><strong>旅游</strong>
+
+<pw id="B8_图片分类模块列表3@图酷" />
+	<ul class="tu_mode_ul cc">
+		<list cachetime="1800" action="image" num="4" title="图片分类模块列表3" />
+		<loop>
+		<li><a href="{url}"><img src="{image,138,103}" width="138" height="103" /></a><p><a href="{url}">{title,20}</a></p></li>
+		</loop>
+	</ul>
+
+<pw id="B9_图片分类模块4@图酷" />
+<a href="#" class="more">更多</a><strong>婚纱</strong>
+
+<pw id="B10_图片分类模块列表4@图酷" />
+	<ul class="tu_mode_ul cc">
+		<list cachetime="1800" action="image" num="4" title="图片分类模块列表4" />
+		<loop>
+		<li><a href="{url}"><img src="{image,138,103}" width="138" height="103" /></a><p><a href="{url}">{title,20}</a></p></li>
+		</loop>
+	</ul>
+
+<pw id="A3_头部公告标题@图酷" />
+公告
+<pw id="A4_头部公告列表@图酷" />
+<ul class="tu_ul">
+   <li><a href="#">phpwind8.5 图酷公告</a></li>
+   <li><a href="#">phpwind8.5 图酷公告</a></li>
+   <li><a href="#">phpwind8.5 图酷公告</a></li>
+   <li><a href="#">phpwind8.5 图酷公告</a></li>
+   <li><a href="#">phpwind8.5 图酷公告</a></li>
+   <li><a href="#">phpwind8.5 图酷公告</a></li>
+</ul>
+
+<pw id="B11_右侧广告位@图酷" />
+<a href="#" target="_blank"><img src="http://tiyan.phpwind.net/c/attachment/Mon_1103/60_6420_9bf60eeecb6dfa5.png" class="fl" /></a>
+
+<pw id="B13_右侧活跃图客标题@图酷" />
+活跃图客
+
+<pw id="B14_右侧活跃图客列表@图酷" />
+	<ul class="tu_ul_img cc">
+	<list cachetime="1800" action="image" num="8" title="活跃图客列表" />
+		<loop>
+		<li><a href="{url}" title="{title}" alt="{title}"><img src="{image,48,48}" width="48" height="48" /></a></li>
+		</loop>
+	</ul>
+
+<pw id="B15_右侧精彩活动标题@图酷" />
+精华图酷
+<pw id="B16_右侧精彩活动列表@图酷" />
+<list cachetime="1800" action="subject" num="3" title="精彩活动列表" />
+	<loop>
+	<dl>
+		<dt><a href="{url}">{title,24}</a></dt>
+		<dd>{descrip,76}</dd>
+	</dl>
+	</loop>
+
+<pw id="B17_右侧热门图酷标题@图酷" />
+热门图酷
+<pw id="B18_右侧热门图酷列表@图酷" />
+	<ol class="tu_ol">
+	<list cachetime="1800" action="subject" num="10" title="热门图酷列表" />
+		<loop>
+		<li><a href="{url}">{title,24}</a></li>
+		</loop>
+	</ol>
+

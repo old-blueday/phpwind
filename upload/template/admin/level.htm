@@ -15,7 +15,7 @@ print <<<EOT
 	<h3 class="h1"><b>提示信息</b></h3>
     <div class="legend">
         <a onClick="javascript:scroller('level_1', 800);" class="b cp">会员组</a>:级别按照会员发的帖子数自动进行级别判断并更新。<br />
-<a onClick="javascript:scroller('level_2', 800);" class="b cp">系统组</a>:属于站点管理层，系统组成员由站点管理员设定，管理员可以在 <a href="$admin_file?adminjob=usermanage&adminitem=edit">会员管理</a> 内编辑用户组成员。<br />
+<a onClick="javascript:scroller('level_2', 800);" class="b cp">系统组</a>:属于站点管理层，系统组成员由站点管理员设定，管理员可以在 <a href="$admin_file?adminjob=usermanage&adminitem=edit">用户管理</a> 内编辑用户组成员。<br />
 <a onClick="javascript:scroller('level_3', 800);" class="b cp">特殊组</a>:可以设置管理权限的组别，区别于系统组，特殊组可以进行出售<br />
 <a onClick="javascript:scroller('level_4', 800);" class="b cp">默认组</a>:默认组别不可删除，当其他组别未设置权限时，则使用该默认权限<br />
 注:批量添加的用户组权限设置为默认，需要单独进行权限编辑。
@@ -67,7 +67,7 @@ EOT;
                 <td class="td2"><input type="text" class="input input_wa" name="memtitle[add][]" /></td>
 				<td class="td2">
                 	<input type="hidden" class="input input_wd mr10" name="mempic[add][]" value="" onchange="getImg(this)" />
-                	<img id="img_member_{$member[gid]}" src="$imgpath/$stylepath/level/6.gif" title="选择等级图片" onclick="showImg(this)" style="cursor:pointer" align="absmiddle" />
+                	<img id="img_member_{$member[gid]}" src="$imgpath/$stylepath/level/0.gif" title="选择等级图片" onclick="showImg(this)" style="cursor:pointer" align="absmiddle" />
                 </td>
                 <td class="td2"><input name="mempost[add][]" type="text" class="input input_wc" /></td>
 				<td class="td2"><span class="mr20" >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
@@ -78,7 +78,7 @@ EOT;
                 <td class="td2"><input type="text" class="input input_wa" name="memtitle[add][]" /></td>
 				<td class="td2">
                 	<input type="hidden" class="input input_wd mr10" name="mempic[add][]" value="" onchange="getImg(this)" />
-                	<img id="img_member_new" src="$imgpath/$stylepath/level/6.gif" title="选择等级图片" onclick="showImg(this)" style="cursor:pointer" align="absmiddle" />
+                	<img id="img_member_new" src="$imgpath/$stylepath/level/0.gif" title="选择等级图片" onclick="showImg(this)" style="cursor:pointer" align="absmiddle" />
                 </td>
                 <td class="td2"><input name="mempost[add][]" type="text" class="input input_wc" /></td>
 				<td class="td2"><span class="mr20" >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
@@ -145,7 +145,7 @@ EOT;
                 <td class="td2"><input type="text" class="input input_wa" name="systitle[add][]" value="" /></td>
                 <td class="td2">
                     <input type="hidden" class="input input_wd mr10" name="syspic[add][]" value="" onchange="getImg(this)" />
-                    <img id="img_system_$sys[gid]" src="$imgpath/$stylepath/level/6.gif" title="选择等级图片" onclick="showImg(this)" style="cursor:pointer" align="absmiddle" />
+                    <img id="img_system_$sys[gid]" src="$imgpath/$stylepath/level/21.gif" title="选择等级图片" onclick="showImg(this)" style="cursor:pointer" align="absmiddle" />
                 </td>
                 <td class="td2">&nbsp;</td>
                 <td class="td2">
@@ -158,7 +158,7 @@ EOT;
                 <td class="td2"><input type="text" class="input input_wa" name="systitle[add][]" value="" /></td>
                 <td class="td2">
                     <input type="hidden" class="input input_wd mr10" name="syspic[add][]" value="" onchange="getImg(this)" />
-                    <img id="img_system_new" src="$imgpath/$stylepath/level/6.gif" title="选择等级图片" onclick="showImg(this)" style="cursor:pointer" align="absmiddle" />
+                    <img id="img_system_new" src="$imgpath/$stylepath/level/21.gif" title="选择等级图片" onclick="showImg(this)" style="cursor:pointer" align="absmiddle" />
                 </td>
                 <td class="td2">&nbsp;</td>
                 <td class="td2">
@@ -219,7 +219,7 @@ EOT;
                 <td class="td2"><input type="text" class="input input_wa" name="viptitle[add][]" value="" /></td>
                 <td class="td2">
                     <input type="hidden" class="input input_wd mr10" name="vippic[add][]" value="" onchange="getImg(this)" />
-                    <img id="img_special_{$vip[gid]}" src="$imgpath/$stylepath/level/6.gif" title="选择等级图片" onclick="showImg(this)" style="cursor:pointer" align="absmiddle" />
+                    <img id="img_special_{$vip[gid]}" src="$imgpath/$stylepath/level/16.gif" title="选择等级图片" onclick="showImg(this)" style="cursor:pointer" align="absmiddle" />
                 </td>
                 <td class="td2">&nbsp;</td>
                 <td class="td2">
@@ -232,7 +232,7 @@ EOT;
                 <td class="td2"><input type="text" class="input input_wa" name="viptitle[add][]" value="" /></td>
                 <td class="td2">
                     <input type="hidden" class="input input_wd mr10" name="vippic[add][]" value="" onchange="getImg(this)" />
-                    <img id="img_special_new" src="$imgpath/$stylepath/level/6.gif" title="选择等级图片" onclick="showImg(this)" style="cursor:pointer" align="absmiddle" />
+                    <img id="img_special_new" src="$imgpath/$stylepath/level/16.gif" title="选择等级图片" onclick="showImg(this)" style="cursor:pointer" align="absmiddle" />
                 </td>
                 <td class="td2">&nbsp;</td>
                 <td class="td2">
@@ -378,7 +378,7 @@ function scroller(el, duration) {
 EOT;
 foreach ($levelImg as $key=>$value) {print <<<EOT
 -->
-<li><img src="$imgpath/$stylepath/level/$value" align="absmiddle" title="点击选择" onclick="selImg('$key')" /> 编号:$key</li>
+<li><span>编号:$key</span><img src="$imgpath/$stylepath/level/$value" align="absmiddle" title="点击选择" onclick="selImg('$key')" /></li>
 <!--
 EOT;
 }print <<<EOT

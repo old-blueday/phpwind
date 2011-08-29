@@ -3,13 +3,7 @@ print <<<EOT
 -->
 <script src="js/float.js" language="javascript"></script>
 <script language="javascript" defer>
-var oldWindowOnloadFunc = window.onload;
-
-window.onload = function () {
-	if (oldWindowOnloadFunc != undefined) {
-		oldWindowOnloadFunc();
-	}
-
+window.onReady(function () {
 	var LeftCode = RightCode = '';
 /*
 EOT;
@@ -61,8 +55,8 @@ print <<<EOT
 EOT;
 }print <<<EOT
 */
-imgloops.imginit();/*多图片轮播*/
-}
+	imgloops.imginit();/*多图片轮播*/
+});
 </script>
 <!--
 EOT;

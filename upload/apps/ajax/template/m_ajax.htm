@@ -577,7 +577,7 @@ print <<<EOT
 		<tr>
 			<td>&nbsp;</td>
 			<td>
-				<div>认证码:</div>
+				<div>验证码:</div>
 				<div id="ckcode" style="display:none;margin-bottom:5px;"></div>
 <script type="text/javascript" language="JavaScript" src="js/pw_authcode.js"></script>
 <script>
@@ -917,4 +917,33 @@ print <<<EOT
 </dl>
 <!--
 EOT;
-}?>-->
+} elseif ($a == 'addtag'){
+print <<<EOT
+-->
+<li id="tag_{$tags[tagid]}"><a href="javascript:;"><span onClick="javascript:window.location='u.php?a=friend&type=find&type=find&according=tags&step=2&f_keyword={$tags[tagname]}';return false;">$tags[tagname]</span><del onclick="pwConfirm('是否删除该标签？',this,function(){delTag('{$tags[tagid]}')});" title="{$tags[tagname]}">×</del></a>
+</li>
+<!--
+EOT;
+} elseif ($a == 'changetag'){
+print <<<EOT
+-->
+						<ul class="tagSole cc" id="changetags">
+<!--
+EOT;
+	foreach ($hotTags as $value) { print <<<EOT
+-->
+							<li><a onClick="addTag('$value[tagname]');">$value[tagname]</a></li>
+<!--
+EOT;
+	}print <<<EOT
+-->
+						</ul>
+<!--
+EOT;
+} elseif ($a == 'addAttention'){
+print <<<EOT
+-->
+		<li id="attentionedTopic"><a href="apps.php?q=weibo&do=topics&topic={$topic[topicid]}">$topic[topicname]</a></li>
+<!--
+EOT;
+} ?>-->

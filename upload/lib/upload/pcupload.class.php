@@ -24,7 +24,6 @@ class PcUpload extends uploadBehavior {
 			'jpeg' => $maxfilesize,				'bmp'  => $maxfilesize,
 			'png'  => $maxfilesize
 		);
-
 	}
 
 	function allowType($key) {
@@ -81,6 +80,7 @@ class PcUpload extends uploadBehavior {
 		if ($this->attachs) {
 			$this->db->update("UPDATE $tablename SET " . S::sqlSingle($this->attachs)." WHERE tid=". S::sqlEscape($this->tid));
 		}
+		return true;
 	}
 
 	function getAttachs() {

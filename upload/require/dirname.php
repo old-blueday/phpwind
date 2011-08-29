@@ -17,6 +17,7 @@ if ($dirname) {
 	if ($fids) {
 		$fids = S::sqlImplode($fids);
 		$sqlwhere .= "AND (f.fid IN ($fids) OR f.fup IN ($fids))";
+		$updateDaily = 0;
 	}
 }
 empty($fids) && $sqlwhere .= " AND (f.type!='category' OR f.type='category' AND f.dirname='')";

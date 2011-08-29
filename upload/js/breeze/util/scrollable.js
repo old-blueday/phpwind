@@ -97,15 +97,15 @@ Breeze.namespace('util.scrollable',function(B){
 		 },
 		 //显示和隐藏
 		 switchView: function(fromPanels, toPanels, index){
-			B.require('util.animate', function(B){
+			/*B.require('util.animate', function(B){*/
 				fromPanels.forEach(function(n){
-					B.slideUp(n);
+					B.hide(n);
 					//B.animaten.style.display = 'none';
 				});
 				toPanels.forEach(function(n){
-					B.slideDown(n);
+					B.show(n);
 				});
-			});
+			/*});*/
 			//B.css(fromPanels, DISPLAY, NONE);
             //B.css(toPanels, DISPLAY, BLOCK);
             // fire onSwitch events

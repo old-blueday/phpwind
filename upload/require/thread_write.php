@@ -11,7 +11,8 @@ $foruminfo =& $pwforum->foruminfo;
 $groupRight =& $newColony->getRight();
 $pwModeImg = "$imgpath/apps";
 require_once(R_P . 'u/require/core.php');
-include_once pwCache::getPath(D_P . 'data/bbscache/o_config.php');
+//* include_once pwCache::getPath(D_P . 'data/bbscache/o_config.php');
+pwCache::getData(D_P . 'data/bbscache/o_config.php');
 
 require_once(R_P . 'require/header.php');
 list($guidename, $forumtitle) = $pwforum->getTitle();

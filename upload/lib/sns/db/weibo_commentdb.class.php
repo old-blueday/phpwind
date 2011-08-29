@@ -71,7 +71,7 @@ class PW_Weibo_CommentDB extends BaseDB {
 			return array();
 		} 
 		$offset = ($page - 1) * $perpage;
-		$sql = 'SELECT * FROM '.$this->_foreignTableName.' a LEFT JOIN '.$this->_tableName.' b ON a.cid = b.cid WHERE  a.uid = '.$this->_addSlashes($uid).' ORDER BY a.cid DESC '.$this->_Limit($offset,$perpage);
+		$sql = 'SELECT * FROM '.$this->_foreignTableName.' a LEFT JOIN '.$this->_tableName.' b ON a.cid = b.cid WHERE  a.uid = '.$this->_addSlashes($uid).' AND b.uid <> '.$this->_addSlashes($uid).' ORDER BY a.cid DESC '.$this->_Limit($offset,$perpage);
 		$query = $this->_db->query($sql);
 		return  $this->_getAllResultFromQuery($query);
 	}
@@ -80,7 +80,7 @@ class PW_Weibo_CommentDB extends BaseDB {
 		if (!$this->_isLegalNumeric($uid)){
 			return array();
 		} 
-		$sql = 'SELECT count(*) FROM '.$this->_foreignTableName.' a LEFT JOIN '.$this->_tableName.' b ON a.cid = b.cid WHERE  a.uid = '.$this->_addSlashes($uid);
+		$sql = 'SELECT count(*) FROM '.$this->_foreignTableName.' a LEFT JOIN '.$this->_tableName.' b ON a.cid = b.cid WHERE  a.uid = '.$this->_addSlashes($uid).' AND b.uid <> '.$this->_addSlashes($uid);
 		return  $this->_db->get_value($sql);
 	}
 
@@ -110,6 +110,17 @@ class PW_Weibo_CommentDB extends BaseDB {
 		} 
 		$sql = 'SELECT count(*) FROM '.$this->_tableName.' a LEFT JOIN '.$this->_foreignTableName.' b ON a.cid = b.cid WHERE a.uid = '.$this->_addSlashes($uid).' AND a.mid = '.$this->_addSlashes($mid).' AND b.uid = '.$this->_addSlashes($cuid);
 		return  $this->_db->get_value($sql);
+	}
+	
+	/**
+	 * 取得n天内评论次数最多的新鲜事Id
+	 * @param int $num 获取记录条数
+	 * @return array
+	 */
+	function getHotComment($num,$time){
+		if(!$time || !$num) return array();
+		$query = $this->_db->query("SELECT mid,count(mid) as counts FROM " . $this->_tableName . ' WHERE postdate > ' . S::sqlEscape($time) . ' GROUP BY mid ORDER BY counts DESC,postdate DESC'. $this->_limit($num));
+		return array_keys($this->_getAllResultFromQuery($query,'mid'));
 	}
 	
 	function deleteCommentByCids($cids){

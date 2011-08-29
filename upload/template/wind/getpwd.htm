@@ -1,22 +1,26 @@
 <!--<?php print <<<EOT
 -->
 <div id="breadCrumb">
-<img src="$imgpath/$stylepath/thread/home.gif" class="cp breadHome" /><em class="breadEm"></em><a href="$db_bfn" title="$db_bbsname">$db_bbsname</a><em>&gt;</em>&raquo; 取回密码
+<img src="$imgpath/$stylepath/thread/home.gif" class="cp breadHome" /><em class="breadEm"></em><a href="$db_bfn" title="$db_bbsname">$db_bbsname</a><em></em>&raquo; 取回密码
 </div>
 
-<form action="$basename" method="post" name="formct">
+<form action="$basename" method="post" name="formct" onsubmit="return checkAll();">
 <div class="t" style="margin-top:15px">
 	<table width="100%" cellspacing="0" cellpadding="0">
-		<tr>
+		<tr class="h" >
 			<th class="h" colspan="2">验证完成.可以通过此程序设置新密码</th>
+			<th></th>
+			<th></th>
 		</tr>
 		<tr class="tr3 f_one">
 			<th width="25%">新密码</th>
-			<th><input type="password" name="new_pwd" class="input" size="40" /></th>
+			<th width="30%"><input type="password" name="new_pwd" id="pwd" class="input" size="40" onblur="showTips(this,'pwd')" /></th>
+			<th id="pwd_info"></th>
 		</tr>
 		<tr class="tr3 f_two">
 			<th>重复新密码</th>
-			<th><input type="password" name="pwdreapt" class="input" size="40" /></th>
+			<th width="30%"><input type="password" name="pwdreapt" id="pwdrepeat" class="input" size="40" onblur="showTips(this,'pwdrepeat')" /></th>
+			<th id="pwdrepeat_info"></th>
 		</tr>
 		<tr>
 			<td>&nbsp;</td><td><div class="p10 tac"><input type="hidden" value="2" name="jop" /><input class="btn" type="submit" value="提 交" /></div>
@@ -25,6 +29,125 @@
 	</table>
 </div>
 </form>
+<script language="javascript">
+var regminpwd 	= parseInt('$rg_regminpwd');
+var regmaxpwd 	= parseInt('$rg_regmaxpwd');
+var pwdcomplex	= '$rg_config[rg_pwdcomplex]';
+var pwdInfo 	= new Array(
+		" ",
+		"密码设置错误。密码中必须包含小写字母",
+		"密码设置错误。密码中必须包含大写字母",
+		"密码设置错误。密码中必须包含数字",
+		"密码设置错误。密码中必须包含符号",
+		"密码设置错误。密码长度过小",
+		"密码设置错误。密码过长",
+		"密码设置错误。密码不允许和用户名相同",
+		"密码设置错误。密码不允以下字符:\\ & ' \" ! / * , < > % # ?。",
+		"不允许注册帐号与密码相同",
+        getPwdRule());
+var pwdrepeatInfo = new Array(
+		" ",
+		"两次输入的密码不一致。请再输入一次您上面输入的密码",
+		"请再输入一遍您上面填写的密码");
+
+function showTips(obj,type) {
+	var key;
+	key = type == 'pwd' ? checkPwd(obj) : checkPwdRepeat(obj);
+	getObj(obj.id + '_info').innerHTML = eval(obj.id + 'Info')[key];
+	return key;		
+}
+
+function checkAll() {
+	ispwd = showTips(getObj('pwd'), 'pwd');
+	ispwdrepeat = showTips(getObj('pwdrepeat'), 'pwdrepeat');
+	if (ispwd == 0 && ispwdrepeat == 0) return true;
+	return false; 
+}
+
+function checkPwd(obj) {
+	var pwd = obj.value;
+	if(pwd.length<regminpwd){
+		return 5;
+	}else if(regmaxpwd>0 && pwd.length>regmaxpwd) {
+		return 6;
+	}
+	if(/[\\\/\&\'\"\*\,<>#\?% ]/.test(pwd)){
+		return 8;
+	}
+	var rule = pwdcomplex.split(',');
+	var pwdReg;
+	for(var i=0;i<rule.length;i++){
+		switch(Number(rule[i])){
+			case 1:
+				pwdReg = /[a-z]/;
+				if(!pwdReg.test(pwd)) return 1;
+				break;
+			case 2:
+				pwdReg = /[A-Z]/;
+				if(!pwdReg.test(pwd)) return 2;
+				break;
+			case 3:
+				pwdReg = /[0-9]/;
+				if(!pwdReg.test(pwd)) return 3;
+				break;
+			case 4:
+				pwdReg = /[^a-zA-Z0-9]/;
+				if(!pwdReg.test(pwd)) return 4;
+				break;
+			default:
+				continue;
+				break;
+		}
+	}
+	var pwdRepeat = getObj('pwdrepeat');
+	if(pwdRepeat.value && checkPwdRepeat(pwdRepeat)){
+	    getObj('pwdrepeat_info').innerHTML = pwdrepeatInfo[1];
+	}
+	return 0;
+}
+
+function checkPwdRepeat(obj){
+	if (obj.value==getObj('pwd').value && obj.value.length > 0) {
+		return 0;
+	} else {
+		return 1;
+	}
+}
+
+function getPwdRule(){
+	var intiString 	= "";
+	if(regminpwd){
+		intiString 	+= "最小长度:"+regminpwd+" ";
+	}
+	if(regmaxpwd){
+		intiString 	+= "最大长度:"+regmaxpwd+" ";
+	}
+	if(!pwdcomplex){
+		return intiString;
+	}
+	var addString 	= "密码里必须包含以下字符类型:";
+	var rule = pwdcomplex.split(',');
+	for(var i=0;i<rule.length;i++){
+		switch(Number(rule[i])){
+			case 1:
+				addString += "小写字母 ";
+				break;
+			case 2:
+				addString += "大写字母 ";
+				break;
+			case 3:
+				addString += "数字 ";
+				break;
+			case 4:
+				addString += "符号 ";
+				break;
+			default:
+				break;
+		}
+	}
+	return intiString + addString;
+}
+</script>
 <!--
 EOT;
 ?>-->

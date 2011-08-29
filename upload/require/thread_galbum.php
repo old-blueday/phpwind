@@ -10,7 +10,8 @@ if (!$pwforum->isForum(true)) {
 $foruminfo =& $pwforum->foruminfo;
 $groupRight =& $newColony->getRight();
 $pwModeImg = "$imgpath/apps";
-include_once pwCache::getPath(D_P.'data/bbscache/o_config.php');
+//* include_once pwCache::getPath(D_P.'data/bbscache/o_config.php');
+pwCache::getData(D_P.'data/bbscache/o_config.php');
 
 require_once(R_P . 'u/require/core.php');
 require_once(R_P . 'require/header.php');
@@ -158,7 +159,8 @@ if (empty($a)) {
 				'lasttime'	=> $timestamp,		'crtime'	=> $timestamp,
 				'memopen'   => 1
 			)));
-			$db->update("UPDATE pw_colonys SET albumnum=albumnum+1 WHERE id=" . S::sqlEscape($cyid));
+			//* $db->update("UPDATE pw_colonys SET albumnum=albumnum+1 WHERE id=" . S::sqlEscape($cyid));
+			$db->update(pwQuery::buildClause("UPDATE :pw_table SET albumnum=albumnum+1 WHERE id=:id", array('pw_colonys', $cyid)));
 		}
 		$query = $db->query("SELECT aid,aname,memopen FROM pw_cnalbum WHERE atype='1' AND ownerid=" . S::sqlEscape($cyid) . ' ORDER BY aid DESC');
 		while ($rt = $db->fetch_array($query)) {
@@ -225,7 +227,8 @@ if (empty($a)) {
 		require_once(R_P.'apps/groups/lib/group.class.php');
 		$colony = getGroupByCyid($cyid);
 
-		$db->update("UPDATE pw_colonys SET photonum=photonum+" . S::sqlEscape($photoNum) . " WHERE id=" . S::sqlEscape($cyid));
+		//* $db->update("UPDATE pw_colonys SET photonum=photonum+" . S::sqlEscape($photoNum) . " WHERE id=" . S::sqlEscape($cyid));
+		$db->update(pwQuery::buildClause("UPDATE :pw_table SET photonum=photonum+:photonum WHERE id=:id", array('pw_colonys',$photoNum,$cyid)));
 
 		$colony['photonum']+=$photoNum;
 		updateGroupLevel($colony['id'], $colony);
@@ -545,7 +548,8 @@ if (empty($a)) {
 				'lasttime'	=> $timestamp,		'crtime'	=> $timestamp,
 				'memopen'   => $memopen
 		)));
-		$db->update("UPDATE pw_colonys SET albumnum=albumnum+1 WHERE id=" . S::sqlEscape($cyid));
+		//* $db->update("UPDATE pw_colonys SET albumnum=albumnum+1 WHERE id=" . S::sqlEscape($cyid));
+		$db->update(pwQuery::buildClause("UPDATE :pw_table SET albumnum=albumnum+1 WHERE id=:id", array('pw_colonys', $cyid)));
 		$aid = $db->insert_id();
 
 		$colony['albumnum']++;

@@ -4,6 +4,8 @@
 	var charset = '$db_charset';
 	var imgpath   = '$imgpath';
 	var stylepath = '$stylepath';
+	var db_urlcheck = "$db_urlcheck";
+	var db_bbsurl = '$db_bbsurl';
 	function addsmile(NewCode){
 	    document.FORM.atc_content.value += ' [s:'+NewCode+'] ';
 	}
@@ -14,24 +16,8 @@
 		window.onerror = function () {return true;}
 	}
 </script>
-<!--
-EOT;
-if(R_P==D_P){print <<<EOT
--->
-					<script language="JavaScript" src="data/bbscache/face.js"></script>
-<!--
-EOT;
-}else{
-$facedb=readover(D_P."data/bbscache/face.js");
-print <<<EOT
--->
-					<script language="JavaScript">
-					$facedb
-					</script>
-<!--
-EOT;
-}print <<<EOT
--->
+<script language="javascript" src="js/pw_lwd.js"></script>
+<script src="$db_htmdir/js/face.js"></script>
 <div id="menu_show" style="display:none;"></div>
 <div id="menu_face" class="menu" style="display:none;"></div>
 <script language="JavaScript" src="js/post.js"></script>

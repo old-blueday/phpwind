@@ -12,6 +12,7 @@ class topicPost {
 	var $post;
 	var $forum;
 	var $postdata;
+	var $tid;
 	
 	var $data;
 	var $att;
@@ -43,6 +44,16 @@ class topicPost {
 			require_once (R_P . 'require/credit.php');
 			$creditset = $credit->creditset($this->forum->creditset, $db_creditset);
 			$creditset = $creditset[$this->type];
+		}
+		return $creditset;
+	}
+
+	function userCreidtSet() {
+		$creditset = $this->creditSet();
+		if (($times = $this->forum->authCredit($this->post->user['userstatus'])) > 1) {
+			foreach ($creditset as $key => $value) {
+				$value > 0 && $creditset[$key] *= $times;
+			}
 		}
 		return $creditset;
 	}
@@ -116,8 +127,8 @@ class topicPost {
 			'tpcstatus' => $this->data['tpcstatus'],
 			'modelid' => $this->data['modelid']
 		);
-		pwQuery::insert('pw_threads', $pwSQL);
-		$this->tid = $this->db->insert_id();
+		$this->tid = pwQuery::insert('pw_threads', $pwSQL);
+		//* $this->tid = $this->db->insert_id();
 		# memcache refresh
 		// $threadList = L::loadClass("threadlist", 'forum');
 		// $threadList->updateThreadIdsByForumId($this->data['fid'], $this->tid);
@@ -131,11 +142,16 @@ class topicPost {
 		}
 		if (is_object($this->att) && ($aids = $this->att->getAids())) {
 			$this->att->pw_attachs->updateById($aids, array('tid' => $this->tid));
-			if ($this->att->getUploadImgNum()) {
-				$this->db->update("INSERT INTO pw_threads_img SET " . S::sqlSingle(array(
-					'tid' => $this->tid,
-					'fid' => $this->data['fid']
-				)));
+			$topicImgNum = $this->att->getUploadImgNum();
+			if ($this->forum->forumset['iftucool'] && $this->forum->forumset['tucoolpic'] && $topicImgNum >= $this->forum->forumset['tucoolpic']) {
+				$tucoolService = L::loadClass('tucool','forum');
+				$tucoolService->add(
+					array(
+						'fid' => $this->data['fid'],
+						'tid' => $this->tid,
+						'tpcnum' => $topicImgNum
+					)
+				);
 			}
 		}
 		$ipTable = L::loadClass('IPTable', 'utility');
@@ -160,7 +176,7 @@ class topicPost {
 			$userService->updateByIncrement($this->data['authorid'], array(), array('digests' => 1));
 			$this->post->user['digests']++;
 		}
-		$this->post->updateUserInfo($this->type, $this->creditSet(), $this->data['content']);
+		$this->post->updateUserInfo($this->type, $this->userCreidtSet(), $this->data['content']);
 		$this->afterpost();
 
 		if ($this->extraBehavior) {

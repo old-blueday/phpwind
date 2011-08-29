@@ -505,7 +505,7 @@ class PW_Ping {
 	 */
 	function addPost($tid,$content){
 		global $timestamp;
-		$tpcarray = $this->db->get_one("SELECT tid,fid,locked,ifcheck,postdate,ptable FROM pw_threads WHERE tid=" .S::sqlEscape($tid));
+		$tpcarray = $this->db->get_one("SELECT tid,fid,locked,subject,ifcheck,postdate,lastpost,ptable,author FROM pw_threads WHERE tid=" .S::sqlEscape($tid));
 		L::loadClass('forum', 'forum', false);
 		L::loadClass('post', 'forum', false);
 		if($tpcarray['tid'] != $tid)return false;
@@ -533,6 +533,9 @@ class PW_Ping {
 			
 			require_once(R_P . 'require/bbscode.php');
 			$postdata = new replyPostData($pwpost);
+			//set title
+			//$title = '回 楼主(' . $tpcarray['author'].')的帖子';
+			//strlen($title) <= intval($postdata->titlemax) && $postdata->setTitle($title);
 			$replypost->setTpc($tpcarray);
 			$postdata->setContent($content);
 			$postdata->conentCheck();
@@ -546,7 +549,8 @@ class PW_Ping {
 	 * @param $tid
 	 */
 	function checkReply($tid) {
-		global $timestamp;
+		global $timestamp,$groupid,$winddb,$winduid,$_time;
+		$this->hours =& $_time['hours'];
 		$tpcarray = $this->db->get_one("SELECT tid,fid,locked,ifcheck,postdate,ptable FROM pw_threads WHERE tid=" . S::sqlEscape($tid));
 		if (empty($tpcarray)) {
 			return false;
@@ -563,7 +567,19 @@ class PW_Ping {
 			return 'reply_ifcheck';
 		} elseif (!$pwpost->isGM && $tpcarray['locked']%3<>0 && !pwRights($pwpost->isBM,'replylock')) {
 			return 'reply_lockatc';
+		} elseif (!$pwpost->isGM && !$pwpost->forum->allowtime($this->hours) && !pwRights($pwpost->isBM, 'allowtime')) {
+			return 'forum_allowtime';
 		} else {
+			if ($groupid == 6 || getstatus($winddb['userstatus'], PW_USERSTATUS_BANUSER)) {
+				$bandb = array();
+				$query = $this->db->query("SELECT * FROM pw_banuser WHERE uid=".S::sqlEscape($winduid));
+				while ($rt = $this->db->fetch_array($query)) {
+					if ($rt['fid'] == 0 || $rt['fid'] == $tpcarray['fid']) {
+						$bandb[$rt['fid']] = $rt;
+					} 
+				}
+				if ($bandb) return 'ban_info3';
+			} 
 			L::loadClass('replypost', 'forum', false);
 			$replypost = new replyPost($pwpost);
 			$replypost->setTpc($tpcarray);

@@ -50,13 +50,13 @@ if ('friend' == $action) {
 	}
 	ajaxExport("删除操作成功!");
 } elseif ('postReply' == $action) {
-	S::gp(array('parentMid', 'atc_content','rid','gdcode'), 'GP');
+	S::gp(array('parentMid', 'atc_content','rid','gdcode','flashatt'), 'GP');
 	if(!$_G['allowmessege']) ajaxExport(array('bool' => false, 'message' => '你所在的用户组不能发送消息'));
 	if(($db_gdcheck & 8) && false === GdConfirm($gdcode,true)){
 		ajaxExport(array('bool' => false, 'message' => '你的验证码不正确或过期'));
 	}
 	empty($parentMid) && ajaxExport(array('bool' => false, 'message' => '非法操作请返回'));
-	empty($atc_content) && ajaxExport(array('bool' => false, 'message' => '回复内容不能为空'));
+	empty($atc_content) && $atc_content !== '0' && ajaxExport(array('bool' => false, 'message' => '回复内容不能为空'));
 	$atc_content = trim(strip_tags($atc_content));
 	$filterUtil = L::loadClass('filterutil', 'filter');
 	$atc_content = $filterUtil->convert($atc_content);
@@ -64,6 +64,14 @@ if ('friend' == $action) {
 		'content' => $atc_content);
 	if (!($message = $messageServer->sendReply($winduid, $rid, $parentMid, $messageInfo))) {
 		ajaxExport(array('bool' => false, 'message' => '回复失败'));
+	} else {
+		L::loadClass('messageupload', 'upload', false);
+		if ($db_allowupload && $_G['allowupload'] && (PwUpload::getUploadNum() || $flashatt)) {
+			S::gp(array('savetoalbum', 'albumid'), 'P', 2);
+			$messageAtt = new messageAtt($parentMid,$rid);
+			$messageAtt->setFlashAtt($flashatt, $savetoalbum, $albumid);
+			PwUpload::upload($messageAtt);
+		}
 	}
 	ajaxExport(array('bool' => true, 'message' => '消息已发送'));
 } elseif ($action == 'overlook') {
@@ -141,10 +149,10 @@ if ('friend' == $action) {
 		initJob($winduid,'doSendMessage',array('user'=>$usernames));
 		define('AJAX',1);
 		L::loadClass('messageupload', 'upload', false);
-
 		if ($db_allowupload && $_G['allowupload'] && (PwUpload::getUploadNum() || $flashatt)) {
+			S::gp(array('savetoalbum', 'albumid'), 'P', 2);
 			$messageAtt = new messageAtt($messageId);
-			$messageAtt->transfer($flashatt);
+			$messageAtt->setFlashAtt($flashatt, $savetoalbum, $albumid);
 			PwUpload::upload($messageAtt);
 		}
 	}
@@ -208,7 +216,8 @@ if ('friend' == $action) {
 } elseif ('close' == $action) {
 	/* 拒收群组消息 */
 	S::gp(array('gid', 'mid'), 'GP');
-	(empty($gid) || empty($mid)) && ajaxExport("非法操作请返回");
+	empty($gid) && ajaxExport("群组已删除");
+	empty($mid) && ajaxExport("非法操作请返回");
 	if (!($messageServer->closeGroupMessage($winduid, $gid, $mid))) {
 		ajaxExport("拒收群组消息失败");
 	}

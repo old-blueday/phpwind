@@ -196,6 +196,16 @@ if ($adminitem == 'basic') {
 					'name'		=> $name,
 					'vieworder'	=> $vieworder
 			)));
+			$id = $db->insert_id();
+			$smilepath = "$imgdir/post/smile/$path";
+			$fp = opendir($smilepath);
+			$picext = array("gif","bmp","jpeg","jpg","png");
+			while ($smilefile = readdir($fp)) {
+				if (in_array(strtolower(end(explode(".",$smilefile))),$picext)) {
+					$db->update("INSERT INTO pw_smiles SET ".S::sqlSingle(array('path'=>$smilefile,'type'=>$id)));
+				}
+			}
+			closedir($fp);
 			updatecache_p();
 			adminmsg('operate_success');
 		
@@ -203,7 +213,6 @@ if ($adminitem == 'basic') {
 		
 			S::gp(array('shownum','name','type'),'P');
 			S::gp(array('vieworder'),'P',2);
-	
 			foreach ($vieworder as $key => $value) {
 				$smilesname = $name[$key];
 				$db->update("UPDATE pw_smiles"
@@ -243,7 +252,6 @@ if ($adminitem == 'basic') {
 					$smiles[] = $smiledb;
 				}
 				$smilepath = "$imgdir/post/smile/$path";
-		
 				$fp = opendir($smilepath);
 				$i = 0;
 				while ($smilefile = readdir($fp)) {
@@ -288,8 +296,16 @@ if ($adminitem == 'basic') {
 		
 		} elseif ($action == 'delsmile') {
 		
-			S::gp(array('smileid','typeid'));
-			$db->update("DELETE FROM pw_smiles WHERE id=".S::sqlEscape($smileid));
+			S::gp(array('smileid','typeid','checkSelect'));
+			if($checkSelect){
+				foreach($checkSelect as $key => $v){
+					$v = intval($v);
+					if(!$v) continue;
+					$db->update("DELETE FROM pw_smiles WHERE id=".S::sqlEscape($v));
+				}
+			}else{
+				$smileid && $db->update("DELETE FROM pw_smiles WHERE id=".S::sqlEscape($smileid));
+			}
 			updatecache_p();
 			adminmsg('operate_success',"$basename&action=smilemanage&id=$typeid");
 		}
@@ -332,16 +348,24 @@ if ($adminitem == 'basic') {
 				adminmsg('表情信息没有更改');
 			}
 		} elseif ($action == 'delsmile') {
-			S::gp(array('smileid'), 2);
-			if ($smileService->delete($smileid)) {
+			S::gp(array('smileid','checkSelect'), 2);
+			if($checkSelect){
+				foreach($checkSelect as $key => $v){
+					$v = intval($v);
+					if(!$v || $v < 0) continue;
+					$smileService->delete($v);
+				}
 				adminmsg('operate_success');
-			} else {
-				adminmsg('删除表情失败');
+			}else{
+				if ($smileService->delete($smileid)) {
+					adminmsg('operate_success');
+				} else {
+					adminmsg('删除表情失败');
+				}
 			}
 		} else {
 			$smiles = $smileService->findByType();
 			$newSmiles = $smileService->findNewInType(0, array_keys($smiles));
-	
 			include PrintEot('postcache');
 		}
 }

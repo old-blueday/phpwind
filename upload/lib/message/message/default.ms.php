@@ -89,11 +89,11 @@ class MS_Default extends MS_Base {
 	}
 	function setDefaultShield($app_array = array()){
 		$default = array(
-				    'sms_message'       	 => 1,//留言
-				    'sms_comment_write' 	 => 1,//评论记录
-				    'sms_comment_diary' 	 => 1,//评论日志
-				    'sms_comment_photo' 	 => 1,//照片相册
-					'sms_comment_share' 	 => 1,//分享相册
+				    //'sms_message'       	 => 1,//留言
+				    //'sms_comment_write' 	 => 1,//评论记录
+				    //'sms_comment_diary' 	 => 1,//评论日志
+				    //'sms_comment_photo' 	 => 1,//照片相册
+					//'sms_comment_share' 	 => 1,//分享相册
 				    'sms_share_diary' 		 => 1,//日志分享
 				    'sms_share_photo' 		 => 1,//照片分享
 				    'sms_share_post' 		 => 1,//帖子分享
@@ -107,6 +107,12 @@ class MS_Default extends MS_Base {
 				    'notice_active'          => 1,//活动通知
 					'notice_apps'            => 1,//应用通知
 				    $this->_s_notice_system  => 1,//系统通知
+				    //$this->_notice_comment   => 1,//评论通知
+				    'notice_comment_write' 	 => 1,//评论记录
+				    'notice_comment_diary' 	 => 1,//评论日志
+				    'notice_comment_photo' 	 => 1,//照片相册
+					'notice_comment_share' 	 => 1,//分享相册
+				    $this->_notice_guestbook => 1,//留言通知
 				    'request_friend' 		 => 1,//好友请求
 				    'request_group' 		 => 1,//群组请求
 				    'request_apps' 			 => 1,//应用请求

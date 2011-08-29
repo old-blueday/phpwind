@@ -7,12 +7,14 @@ S::gp(array(
 	'toread',
 	'fpage',
 	'anchor',
-	'option'
+	'option',
+	'displayMode'
 ));
 $jumpurl = $db_bbsurl . '/read.php?tid=' . $tid;
 ($page > 1) && $jumpurl .= '&page=' . $page;
 ($fpage) && $jumpurl .= '&fpage=' . $fpage;
 ($toread) && $jumpurl .= '&toread=' . $toread;
+$displayMode && $jumpurl .= '&displayMode=' . $displayMode;
 $jumpurl .= "#" . $anchor;
 $descript = getDescript($option);
 require_once PrintEot('poplogin');

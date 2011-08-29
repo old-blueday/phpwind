@@ -94,7 +94,7 @@ class GroupStyle {
 		
 		if(empty($upids)) return array();
 
-		$query = $this->db->query("SELECT * FROM pw_cnstyles WHERE upid IN (".S::sqlImplode($upids).")");
+		$query = $this->db->query("SELECT * FROM pw_cnstyles WHERE upid IN (".S::sqlImplode($upids).") ORDER BY vieworder ASC");
 		while ($rt = $this->db->fetch_array($query)) {
 			//if($rt['ifopen'] == 0) continue; 
 			$styledb[$rt['upid']][$rt['id']] = $rt;
@@ -111,7 +111,7 @@ class GroupStyle {
 	*/
 
 	function addNewSubStyle($newSubStyle) {
-		$this->db->update("INSERT INTO pw_cnstyles(cname,ifopen,upid) VALUES ". S::sqlMulti($newSubStyle));
+		$this->db->update("INSERT INTO pw_cnstyles(cname,ifopen,upid,vieworder) VALUES ". S::sqlMulti($newSubStyle));
 	}
 }
 ?>

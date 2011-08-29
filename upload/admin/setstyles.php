@@ -22,7 +22,9 @@ if (!$action) {
 			pwQuery::update('pw_forums', 'style=:style', array($key), array('style' => ''));
 		}
 		$ifopen[$key] == '0' && $key == $defaultstyle && $defaultstyle = 'wind';
-		include_once S::escapePath(D_P."data/style/$key.php");
+		//* include_once S::escapePath(D_P."data/style/$key.php");
+		extract(pwCache::getData(S::escapePath(D_P."data/style/$key.php"), false));
+		//include S::escapePath(D_P."data/style/$key.php");
 		$ckstyle = $db->get_value("SELECT sid FROM pw_styles WHERE name=".S::sqlEscape($key,false)." AND uid='0'");
 		if ($ckstyle){
 			$db->update("UPDATE pw_styles SET ".S::sqlSingle(array('customname'=>$customname[$key],'ifopen'=>$ifopen[$key]))."WHERE name=".S::sqlEscape($key,false)." AND uid='0'");
@@ -67,10 +69,11 @@ if (!$action) {
 
 	if (!$_POST['step']) {
 
-		include_once S::escapePath(D_P."data/style/$sid.php");
+		//* include_once S::escapePath(D_P."data/style/$sid.php");
+		extract(pwCache::getData(S::escapePath(D_P."data/style/$sid.php"), false));
 		ifcheck($yeyestyle,'yes');
 		$css_777   = pwWritable(D_P."data/style/{$tplpath}_css.htm") ? 1 : 0;
-		$style_css = readover(D_P."data/style/{$tplpath}_css.htm");
+		$style_css = pwCache::readover(D_P."data/style/{$tplpath}_css.htm");
 		$style_css = explode('<!--css-->',$style_css);
 		$style_css = str_replace('$',"\$",$style_css[1]);
 

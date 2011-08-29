@@ -7,7 +7,7 @@ class PwSpace {
 
 	var $uid;
 	var $info  = array();
-	var $models = array('friend', 'visitor', 'visit', 'messageboard', 'article', 'weibo');
+	var $models = array('friend', 'visitor', 'visit', 'tags', 'messageboard', 'article', 'weibo', 'reply');
 
 	var $default = false;
 
@@ -32,8 +32,11 @@ class PwSpace {
 			} else {
 				$this->default = true;
 			}
+			$spaceGroupid = $this->info['groupid'] == -1 ? $this->info['memberid'] : $this->info['groupid'];
+			include pwCache::getPath(D_P . "data/groupdb/group_$spaceGroupid.php");
+			$this->info['generalRight'] = $_G;
 			!$this->info['name'] && $this->info['name'] = $this->info['username'] . '的个人主页';
-			!$this->info['skin'] && $this->info['skin'] = 'default';
+			!$this->info['skin'] && $this->info['skin'] = 'default85';
 			$GLOBALS['uskin'] =& $this->info['skin'];
 		}
 		if ($db_dopen) $this->models[] = 'diary';
@@ -48,11 +51,16 @@ class PwSpace {
 			$this->info['modelset'] = array(
 				'friend'		=> array('ifopen' => 1, 'num' => 5),
 				'visitor'		=> array('ifopen' => 1, 'num' => 5),
-				//'visit'			=> array('ifopen' => 1, 'num' => 1),
+				'visit'			=> array('ifopen' => 0, 'num' => 5),
+				'tags'			=> array('ifopen' => 1, 'num' => 10, 'expire' => 7200),
 				'messageboard'	=> array('ifopen' => 1, 'num' => 5),
-				'diary'			=> array('ifopen' => 1, 'num' => 10),
-				'photos'		=> array('ifopen' => 1, 'num' => 8),
-				'weibo'			=> array('ifopen' => 1, 'num' => 10),
+				'diary'			=> array('ifopen' => 0, 'num' => 10),
+				'photos'		=> array('ifopen' => 0, 'num' => 8),
+				'weibo'			=> array('ifopen' => 0, 'num' => 10),
+				'article'		=> array('ifopen' => 1, 'num' => 5),
+				'reply'			=> array('ifopen' => 1, 'num' => 5),
+				//'favorites'		=> array('ifopen' => 1, 'num' => 5),
+				'colony'		=> array('ifopen' => 0, 'num' => 5)
 				//'share'			=> array('ifopen' => 1, 'num' => 5)
 			);
 		}
@@ -60,8 +68,8 @@ class PwSpace {
 			$this->info['layout'] = unserialize($this->info['layout']);
 		} else {
 			$this->info['layout'] = array(
-				0 => array('messageboard'),
-				1 => array('weibo','diary','photos'),
+				0 => array('tags'),
+				1 => array('article','reply','messageboard'),
 				2 => array('friend','visitor')
 			);
 		}
@@ -128,7 +136,8 @@ class PwSpace {
 		);
 		$tmp = array('info');
 		foreach ($this->info['layout'] as $key => $value) {
-			if ($key > 1 && $this->info['spacetype'] == 1) {
+			//if ($key > 1 && $this->info['spacetype'] == 1) {
+			if ($key > 1 && $this->info['spacestyle'] == 2) {
 				break;
 			}
 			foreach ($value as $k => $v) {
@@ -168,7 +177,8 @@ class PwSpace {
 				'visit'			=> 0,
 				'article'		=> 0,
 				'colony'		=> 0,
-				'share'			=> 0
+				'share'			=> 0,
+				'tags'			=> 0
 			);
 			$array = array_merge($array, $this->getPrivacy());
 		}

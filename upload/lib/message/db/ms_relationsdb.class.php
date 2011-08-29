@@ -23,6 +23,10 @@ class PW_Ms_RelationsDB extends BaseDB {
 		$this->_db->update("INSERT INTO " . $this->_tableName . " (uid,mid,categoryid,typeid,status,isown,created_time,modified_time) VALUES  " . S::sqlMulti($fieldDatas, FALSE));
 		return $this->_db->insert_id();
 	}
+	function addReplyRelations($fieldDatas) {
+		$this->_db->update("INSERT INTO " . $this->_tableName . " (uid,mid,categoryid,typeid,status,isown,relation,created_time,modified_time) VALUES  " . S::sqlMulti($fieldDatas, FALSE));
+		return $this->_db->insert_id();
+	}
 	function getRelations($userId, $categoryId, $typeId, $offset, $limit) {
 		$query = $this->_db->query("SELECT * FROM " . $this->_tableName . " WHERE uid = " . $this->_addSlashes($userId) . " AND categoryid=" . $this->_addSlashes($categoryId) . " AND typeid=" . $this->_addSlashes($typeId) . " ORDER BY modified_time DESC LIMIT " . $offset . "," . $limit);
 		return $this->_getAllResultFromQuery($query);

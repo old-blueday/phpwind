@@ -47,6 +47,8 @@ class JOB_Config {
 			'doUpdateAvatar'  =>'上传头像',
 			'doSendMessage'   =>'发送消息',
 			'doAddFriend'     =>'加好友',
+			'doAuthAlipay'     =>'支付宝认证',
+			'doAuthMobile'     =>'手机认证',
 		);
 		return $k ? $data[$k] : $data;
 	}
@@ -133,7 +135,13 @@ class JOB_Config {
 				break;	
 			case 'doSendGift':
 				return $this->finish_doSendGift($factor);
-				break;														
+				break;
+			case 'doAuthAlipay':
+				return $this->finish_doAuthAlipay($factor);
+				break;
+			case 'doAuthMobile':
+				return $this->finish_doAuthMobile($factor);
+				break;
 			default :
 				return '';
 				break;
@@ -147,6 +155,12 @@ class JOB_Config {
 	
 	function finish_doUpdateAvatar($factor){
 		return '成功上传个人头像后即可完成任务'.$this->getLimitTime($factor);
+	}
+	function finish_doAuthMobile($factor){
+		return '成功绑定手机号码即可完成任务'.$this->getLimitTime($factor);
+	}
+	function finish_doAuthAlipay($factor){
+		return '成功绑定支付宝帐号即可完成任务'.$this->getLimitTime($factor);
 	}
 	
 	function finish_doSendMessage($factor){

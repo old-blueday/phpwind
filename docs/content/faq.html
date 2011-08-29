@@ -3,4 +3,132 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>phpwind寮
+<title>phpwind开发文档</title>
+<link rel="stylesheet" type="text/css" href="../images/pages.css" />
+</head>
+<body>
+        	<h1 class="h1A">常见问题</h1>
+            <div class="content cc">
+           <p>本文常见问题并非是一个phpwind完整的问题库，而是期望以常见问题解答的形式，对部分已有用户提到的最常见的功能或问题作以介绍，能给您使用过程中碰到的问题解决带来启示，抛砖引玉。目前phpwind已有较为完善的FAQ系统，如果此处没有您需要的答案，可到<a href="http://faq.phpwind.net/" target="_black">FAQ帮助中心</a>搜索答案，同时phpwind也在官方论坛上提供技术支持，您也可以在<a href="http://www.phpwind.net/thread-htm-fid-2.html" target="_black">讨论区</a>寻求帮助。</p>
+<br />
+<p><B>-- 忘记安全问题,进不了后台</B>
+	<ul style="text-indent:2em">
+		<li>找到data/bbscache/config.php</LI>
+		<li>把$db_ifsafecv='1';</LI>
+		<li>改成$db_ifsafecv='0'; 然后用创始人进入后台修改安全问题即可</LI>
+	</ul>
+</li>
+<p><B>-- 站点无法登录，后台无法显示等问题</B>
+	<ul style="text-indent:2em">
+		<li>查看是不是因为设置了安全问题而无法进入?</LI>
+		<li>检查下是不是风格原因引起的（查看wind风格下是否正常）
+		<p>风格的安装需要对应版本，否则也会出错。</p></LI>
+		<li>进后台查看【全局】-&gt;【站点设置】-&gt;【全局参数】 
+		  <p>COOKIE有效目录 设为 \ </p>
+		<p>COOKIE有效域名 清空</p> 
+		<p>二级目录/域名功能 不使用</p></LI>
+		<li>文件修改错误：
+		<p>到http://www.phpwind.com/index.php?m=download下载对应编码的安装包， 
+		<p>解压程序包,把upload里面的所有文件覆盖到空间上,即保证程序完整性.</li>
+	</ul>
+</p> 
+<p><B>-- 帖子插入多媒体（视频,flash,wmv,flv,swf,）无法播放</B>
+	<ul style="text-indent:2em">
+		<li>【后台】->【用户】-&gt;【会员权限】->【会员组设置】->【会员组权限】->【多媒体允许自动播放】->开启
+		<li>【后台】->【全局】->【会员相关】->【信息发布】->【Wind Flash】->开启
+		<li>【后台】->【全局】->【会员相关】->【信息发布】->【多媒体标签】->开启
+	</ul>
+</p>
+
+<p><B>-- 统计代码放哪？</B>
+	<ul  style="text-indent:2em">
+		<li>【后台】->【数据】->【量子统计】，开启就可以 </li>
+	  <li>若是其他代码，可将代码插入到 template/wind/footer.htm 
+		<p>打开template/风格名/footer.htm</P>
+		<p>找到</p></li>
+	  <li>
+	    <p>&lt;a href=&quot;javascript:scroll(0,0)&quot;&gt;返回顶部&lt;/a&gt;		</p>
+	    <p><a href="javascript:scroll(0,0)"></a>
+        统计代码就加在这个后面,当然其他位置也可以</p>
+      </li>
+		<li>此外，PW增第三方统计，  在第三方网站上注册并获得统计代码，并将统计代码粘贴在论坛后台第三方统计代码框内即可。  </li>
+		<p>后台路径：【后台】->【全局】->【站点设置】->【站点信息】</p>
+	</ul>
+</p>
+
+<p><B>-- 传附件失败，造成的原因可能有:附件目录不可写(777)</B>
+	<ul style="text-indent:2em">
+		<li>请先检查attachment目录是否可写,如果是linux服务器的话可以直接在ftp里面对着attachment目录右键属性(CHMOD),然后设置成777</li> 
+		<li>如果还有问题的话,就是服务器问题了
+		<p>解决办法一、把 php.ini 屏蔽下 ;open_basedir =</p>
+		<p>解决办法二、把php.ini 屏蔽 ;upload_tmp_dir =??或将 upload_tmp_dir =?? 的实际目录放到php的安装目录下</p>
+		<p>例如d:\php为安装目录 那么??upload_tmp_dir =d:\php\temp 权限给予users权限??即可</p></li>
+		<li>修改后重启web服务 即可	
+</p>
+</li>
+	</ul>
+	<p><B>-- 勋章未回收时删除了勋章，导致勋章位置显示xx</B>
+  <ul style="text-indent:2em">
+		<li>清除所有会员勋章：UPDATE pw_members SET medals=0?</li>
+		<li>清除单个会员勋章 (例 uid=1）：UPDATE pw_members SET medals=0 where `uid` = '1';
+		  <p>参考教程：</p>
+		<p><a href="http://www.phpwind.net/read-htm-tid-643151.html" target="_black">http://www.phpwind.net/read-htm-tid-643151.html</a></p>
+		<p><a href="http://www.phpwind.net/read-htm-tid-591169.html" target="_black">http://www.phpwind.net/read-htm-tid-591169.html</a></p></li>
+	</ul>
+</p>
+
+<p><B>-- 论坛出现字体很大，文字颜色不对的错误</B>
+	<ul style="text-indent:2em">
+		通常情况都是公告或者版块名称里填写的 html 代码 没有填写 </font> 之类的闭合符号引起了。
+		<p>检查公告或者版块名称里的html代码，正确填写完闭合符号。</p>
+	</ul>
+</p>
+
+<p><B>-- 我的程序文件images 为何会自动变成数字文件？</B>
+	<ul  style="text-indent:2em">
+		<li>【后台】->【全局】->【安全优化】->【动态目录】，选择关闭 自动不定期更改图片链
+		<li>填写上面的图片保存目录。
+  </p>
+</li>
+	</ul>
+	<p><B>-- 出现 Cannot use database 的问题</B>
+<ul style="text-indent:2em">
+		打开论坛出现如下错误信息。
+		<p>Cannot use database</p>
+		<p>The URL Is:</p>
+		<p>http://yourname/index.php?</p>
+		<p>MySQL Server Error:</p>
+		<p>Access denied for user 'root'@'phpwind' (using password: YES) ( 1045 )</p>
+		<p>You Can Get Help In:</p>
+		<p>http://www.phpwind.net</p>
+		<p>解决方案：</p>
+		<li>检查mysql数据库是否运行正常。</li>
+		<li>检查phpwind论坛所使用的数据库是否存在。</li>
+		<li>查看data/sql_config.php 文件的数据库用户名，数据库密码，数据库名是否配置正确。</li>
+	</ul>
+</p>
+
+<p><B>-- 我想修改模板，该怎么做？</B>
+	<ul  style="text-indent:2em">
+		您可以在系统设置中修改（要求相关模板文件和目录可写，属性 777)或在本地修改好模板文件后通过 FTP 上传到相应目录。 
+	</ul>
+</p>
+
+<p><B>-- 更换风格后，刚打开的时候是更换后的风格，但是用户登录进去后看到的界面还是原来的？</B>
+	<ul style="text-indent:2em">
+		<li>清除cookie 重新登录 </li>
+		<li>重新通过头部的风格选项选择风格</li>
+	</ul>
+</p>
+
+<p><B>--安装风格插件后，论坛出现乱码等</B> 
+	<ul style="text-indent:2em">
+		<p>安装风格和插件时必须注意编码和版本的选择必须要与您安装的论坛版本、编码一致。 </p>
+		<p><br/>
+	  </p>
+    </ul>
+	<p style="text-indent:2em">更多问题,请访问<a href=http://faq.phpwind.net/ target="_black">phpwind FAQ</a>进行搜索。
+	  如果搜索没有解决，请移步 <a href=http://www.phpwind.net/thread-htm-fid-2.html target="_black">官网讨论区</a>发帖求助。</p>
+            </div>
+      </body>
+</html>

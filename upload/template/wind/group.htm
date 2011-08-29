@@ -30,7 +30,7 @@ print <<<EOT
 		<li class="mr5"><a href="apps.php?q=groups" class="b"><img src="images/g/mygroup.png" align="absmiddle" /> 我的群组</a></li>
 		<li class="mr5"><a href="group.php?q=all"><img src="u/images/icon/groups.png" align="absmiddle" /> 所有群组</a></li>
 	</ul>
-	<img align="absmiddle" src="images/wind/thread/home.gif" alt="forumlist" class="breadHome" />
+	<img align="absmiddle" src="images/wind/thread/home.gif" class="breadHome" />
 	<em class="breadEm"></em>
 	<a href="group.php">群组首页</a>
 </div>
@@ -83,6 +83,22 @@ EOT;
 					<div class="conFeed" id="weiboFeed">
 <script>
 var transmitAction = 'reloaddelay';
+function resizeImg(ele){
+	var a=ele;
+	if(a.width<30||a.height<30){
+		setTimeout(function(){
+			resizeImg(a);
+		},10)
+		return false;
+	}
+	if(a.width>100){
+		
+			a.width = 100;
+			
+		} else if(a.height>100){
+			a.height=100;
+		}
+}
 </script>
 <!--
 EOT;
@@ -295,7 +311,7 @@ $gdSize = explode("\t",$db_gdsize);
 print <<<EOT
 -->
 	<tr>
-		<th class="th">认证码<span class="s1">*</span></th>
+		<th class="th">验证码<span class="s1">*</span></th>
 		<td class="td">
 			<div id="ckcode" style="display:none;margin-bottom:1px;">
 <script type="text/javascript" src="js/pw_authcode.js"></script>
@@ -334,7 +350,7 @@ EOT;
 -->
 	<tr>
 		<th class="th"></th>
-		<td class="td"><span class="btn"><span><button type="submit" name="Submit">创建新群组</button></span></span></td>
+		<td class="td" id="submit"><span class="btn"><span><button type="submit" name="Submit">创建新群组</button></span></span></td>
 	</tr>
 </table>
 </form><div id="divload"></div>
@@ -379,6 +395,8 @@ var cnt  = 0;
 document.FORM.Submit.disabled = false;
 function checkpost(obj) {
 	var cname = obj.cname.value;
+	var createGroupCredit = '$createGroupCredit';
+	var position =getObj('submit');
 	if (obj.cname.value == "") {
 		obj.cname.focus();
 		showDialog("error","请输入群组<span class='warnFontStyle'>名称</span>",2);
@@ -395,7 +413,14 @@ function checkpost(obj) {
 		showDialog("error","请选择群组<span class='warnFontStyle'>分类</span>",2);
 		return false;
 	} 
-	SubmitAjax(obj);
+	if (createGroupCredit) {
+		var costs = "创建群组会扣除积分:$costs,继续吗?";
+		pwConfirmExtend(costs, position, function() {
+			SubmitAjax(obj);
+		});
+	} else {
+		SubmitAjax(obj);
+	}
 	return false;
 }
 //ajax提交数据 zhuli
@@ -558,12 +583,14 @@ print <<<EOT
 <!--
 EOT;
 foreach ($o_style_relation as $key => $value) {
+if (!isset($o_styledb[$key])) continue;
 print <<<EOT
 -->	
 <option value="$key">+<strong>{$o_styledb[$key]['cname']}</strong></option>
 <!--
 EOT;
-foreach ($value as $k => $v) {print <<<EOT
+foreach ($value as $k => $v) {
+print <<<EOT
 -->
 			<option value="$v">&nbsp;&nbsp;&nbsp;{$o_styledb[$v]['cname']}</option>
 <!--
@@ -599,6 +626,7 @@ EOT;
 <!--
 EOT;
 foreach ($o_style_relation as $key => $value) {
+if (!isset($o_styledb[$key])) continue;
 print <<<EOT
 -->	
 			<li id="cid_$key"><cite>+</cite>&nbsp;<a href="group.php?q=all&styleid=$key">{$o_styledb[$key]['cname']}</a></li>

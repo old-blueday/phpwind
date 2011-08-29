@@ -36,7 +36,8 @@ class postTopic {
 
 	function getTopicCache(){
 
-		@include pwCache::getPath(D_P.'data/bbscache/topic_config.php');
+		//* @include pwCache::getPath(D_P.'data/bbscache/topic_config.php');
+		extract(pwCache::getData(D_P.'data/bbscache/topic_config.php', false));
 		$this->topiccatedb =& $topiccatedb;
 		$this->topicmodeldb =& $topicmodeldb;
 
@@ -220,7 +221,7 @@ class postTopic {
 		$modeldb = explode(",",$this->forum->foruminfo['modelid']);
 
 		$selectmodelhtml = '';
-		$selectmodelhtml .= "<select name=\"modelid\" onchange=\"window.location.href='post.php?fid='+'$fid'+'&modelid='+this.value\"  tabindex=\"2\">";
+		$selectmodelhtml .= "<select name=\"modelid\" onchange=\"window.onbeforeunload = function(){};window.location.href='post.php?fid='+'$fid'+'&modelid='+this.value\"  tabindex=\"2\">";
 
 		foreach ($modeldb as $value) {
 			$selected = '';
@@ -263,7 +264,7 @@ class postTopic {
 				$fieldone[$rt['fieldname']] = nl2br($fieldone[$rt['fieldname']]);
 			}
 			$rt['fieldvalue'] = $fieldone[$rt['fieldname']];
-			if ($rt['fieldvalue'] && $rt['type'] != 'img' && $rt['type'] != 'upload'){
+			if (S::isNatualValue($rt['fieldvalue']) && $rt['type'] != 'img' && $rt['type'] != 'upload'){
 				$classname =  $i%2 == 0 ? 'two' : '';
 				$rt['rules'] && $rt['rules'] = unserialize($rt['rules']);
 				list($rt['name1'],$rt['name2']) = explode('{#}',$rt['name']);
@@ -340,7 +341,7 @@ class postTopic {
 
 		$query = $this->db->query("SELECT fieldid,name,type,rules,ifmust,ifable FROM pw_topicfield WHERE modelid=".S::sqlEscape($this->modelid));
 		while ($rt = $this->db->fetch_array($query)) {
-			if ($rt['type'] != 'upload' && $rt['ifable'] && $rt['ifmust'] && !$topic[$rt['fieldid']]) {
+			if ($rt['type'] != 'upload' && $rt['ifable'] && $rt['ifmust'] && !S::isNatualValue($topic[$rt['fieldid']])) {
 				$db_topicname = $rt['name'];
 				Showmsg('topic_field_must');
 			}
@@ -399,7 +400,7 @@ class postTopic {
 
 	}
 	function initSearchHtml($modelid) {/*获取前台分类信息搜索列表*/
-		global $fid;
+		global $fid, $searchname;
 		$query = $this->db->query("SELECT fieldid,name,type,rules,ifsearch,ifasearch,textsize,vieworder FROM pw_topicfield WHERE modelid = ".S::sqlEscape($modelid)." AND ifable='1' AND (ifsearch='1' OR ifasearch='1') ORDER BY vieworder ASC,fieldid ASC");
 		$count=$this->db->num_rows($query);
 		if($count == 0) {
@@ -432,21 +433,23 @@ class postTopic {
 				foreach (unserialize($rt['rules']) as $key => $value) {
 					$op_key = substr($value,0,strpos($value,'='));
 					$op_value = substr($value,strpos($value,'=')+1);
-					$searchhtml .= "<option value=\"".$op_key."\">".$op_value."</option>";
+					$selected = $searchname[$fieldid] == $op_key ? 'selected' : '';
+					$searchhtml .= "<option value=\"".$op_key."\" $selected>".$op_value."</option>";
 				}
 				$searchhtml .= '</select>';
 			} elseif ($type == 'checkbox') {
 				foreach(unserialize($rt['rules']) as $ck => $cv){
 					$op_key = substr($cv,0,strpos($cv,'='));
 					$op_value = substr($cv,strpos($cv,'=')+1);
-					$searchhtml .= "<input type=\"checkbox\" name=\"searchname[$fieldid][]\" value=\"$op_key\"/> $op_value ";
+					$checked = S::isArray($searchname[$fieldid]) && in_array($op_key, $searchname[$fieldid]) ? 'checked' : '';
+					$searchhtml .= "<input type=\"checkbox\" name=\"searchname[$fieldid][]\" value=\"$op_key\" $checked/> $op_value ";
 				}
 			} elseif ($type == 'calendar') {
-				$searchhtml .= "<input id=\"calendar_start_$rt[fieldid]\" type=\"text\" class=\"input\" name=\"searchname[$fieldid][start]\" onclick=\"ShowCalendar(this.id,0)\" size=\"$textsize\"/> - <input id=\"calendar_end_$rt[fieldid]\" type=\"text\" class=\"input\" name=\"searchname[$fieldid][end]\" onclick=\"ShowCalendar(this.id,0)\" size=\"$textsize\"/>";
+				$searchhtml .= "<input id=\"calendar_start_$rt[fieldid]\" type=\"text\" class=\"input\" name=\"searchname[$fieldid][start]\" value=\"{$searchname[$fieldid]['start']}\" onclick=\"ShowCalendar(this.id,0)\" size=\"$textsize\"/> - <input id=\"calendar_end_$rt[fieldid]\" type=\"text\" class=\"input\" name=\"searchname[$fieldid][end]\" value=\"{$searchname[$fieldid]['end']}\" onclick=\"ShowCalendar(this.id,0)\" size=\"$textsize\"/>";
 			} elseif ($type == 'range') {
-				$searchhtml .= "<input type=\"text\" size=\"5\" class=\"input\" name=\"searchname[$fieldid][min]\"/> - <input type=\"text\" class=\"input\" name=\"searchname[$fieldid][max]\" size=\"$textsize\"/>";
+				$searchhtml .= "<input type=\"text\" size=\"5\" class=\"input\" name=\"searchname[$fieldid][min]\" value=\"{$searchname[$fieldid]['min']}\"/> - <input type=\"text\" class=\"input\" name=\"searchname[$fieldid][max]\" value=\"{$searchname[$fieldid]['max']}\"  size=\"$textsize\"/>";
 			} else {
-				$searchhtml .= "<input type=\"text\" size=\"$textsize\" name=\"searchname[".$fieldid."]\" value=\"\" class=\"input\">";
+				$searchhtml .= "<input type=\"text\" size=\"$textsize\" name=\"searchname[".$fieldid."]\" value=\"$searchname[$fieldid]\" class=\"input\">";
 			}
 			$searchhtml .= $name2."</td></tr>";
 		}

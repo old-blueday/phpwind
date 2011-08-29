@@ -31,12 +31,12 @@ EOT;
 EOT;
 }if($warnid & 8){print <<<EOT
 -->
-			<li>强烈建议您将 admin.php 文件重新命名，您可以通过“核心设置-安全与优化-安全控制”将 admin.php 重新命名，如:abc.php，然后使用 abc.php 登录后台管理 </li>
+			<li>强烈建议您将 admin.php 文件重新命名，您可以通过“全局-安全优化-安全控制”将 admin.php 重新命名，如:abc.php，然后使用 abc.php 登录后台管理 </li>
 <!--
 EOT;
 }if($warnid & 16){print <<<EOT
 -->
-			<li>强烈建议您开启 安全问题功能（“核心设置-安全与优化-安全控制”），并在 强制使用安全问题用户组设置 中选择管理员、总版主、版主等具有较高管理权限的用户组 </li>
+			<li>强烈建议您开启 安全问题功能（“全局-安全优化-安全控制”），并在 强制使用安全问题用户组设置 中选择管理员、总版主、版主等具有较高管理权限的用户组 </li>
 <!--
 EOT;
 }if($warnid & 32){print <<<EOT
@@ -220,12 +220,12 @@ EOT;
 EOT;
 }if($warnid & 8){print <<<EOT
 -->
-	<li>强烈建议您将 admin.php 文件重新命名，您可以通过“核心设置-安全与优化-安全控制”将 admin.php 重新命名，如:abc.php，然后使用 abc.php 登录后台管理 </li>
+	<li>强烈建议您将 admin.php 文件重新命名，您可以通过“全局-安全优化-安全控制”将 admin.php 重新命名，如:abc.php，然后使用 abc.php 登录后台管理 </li>
 <!--
 EOT;
 }if($warnid & 16){print <<<EOT
 -->
-	<li>强烈建议您开启 安全问题功能（“核心设置-安全与优化-安全控制”），并在 强制使用安全问题用户组设置 中选择管理员、总版主、版主等具有较高管理权限的用户组 </li>
+	<li>强烈建议您开启 安全问题功能（“全局-安全优化-安全控制”），并在 强制使用安全问题用户组设置 中选择管理员、总版主、版主等具有较高管理权限的用户组 </li>
 <!--
 EOT;
 }if($warnid & 32){print <<<EOT
@@ -286,6 +286,10 @@ if($admin_gid == '3'){print <<<EOT
             <tr class="tr1 vt">
                 <td class="td1">回复</td>
                 <td class="td2">待审核回复数 {$sysinfo['pcheck']} <a href="javascript:;" onclick="openNewUrl('tpccheck','帖子审核','$admin_file?adminjob=tpccheck&action=postcheck');">审核</a></td>
+            </tr>
+            <tr class="tr1 vt">
+                <td class="td1">敏感词</td>
+                <td class="td2">待审核敏感词数 {$sysinfo['bwd']} <a href="javascript:;" onclick="openNewUrl('setbwd','敏感词审核','$admin_file?adminjob=setbwd&action=check');">审核</a></td>
             </tr>
             <tr class="tr1 vt">
                 <td class="td1">会员</td>

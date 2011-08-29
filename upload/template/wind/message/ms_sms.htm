@@ -16,9 +16,9 @@ print <<<EOT
 -->
 <script type="text/javascript" src="js/global.js"></script>
 <script type="text/javascript">
-	showDialog('warning', '您的收件箱已满，您将不能正常收发消息，请及时<a href="message.php?type=clear">清理</a>');
+	showDialog('warning', '您的消息已满，您将不能正常收发消息，请及时<a href="message.php?type=clear">清理</a>');
 </script>
-		<div class="wrongTip mb15">您的收件箱已满，您将不能正常收发消息，请及时<a href="message.php?type=clear">清理</a>！</div>
+		<div class="wrongTip mb15">您的消息已满，您将不能正常收发消息，请及时<a href="message.php?type=clear">清理</a>！</div>
 <!--
 EOT;
 }print <<<EOT
@@ -37,19 +37,16 @@ $deltype = $redirect ? '' : $upaction;
 print <<<EOT
 -->
  		<div class="cc mb10">
-			<span class="fr">
-				<a href="javascript:;" onclick="getpage('previous')">上一条</a>&nbsp;&nbsp;|&nbsp;&nbsp;
-				<a href="javascript:;" onclick="getpage('next')">下一条</a>
-			</span>
-				<a href="$normalUrl&type=sms&action={$itype}&smstype={$smstype}&itype={$itype}">&lt;&lt;返回</a>
-    </div>
+			<a href="$normalUrl&type=sms&action={$itype}&boxname={$boxname}&smstype={$smstype}&itype={$itype}" class="mr20">&lt;&lt;返回</a>
+			<a href="javascript:;" onclick="getpage('previous')">上一条</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="javascript:;" onclick="getpage('next')">下一条</a>
+		</div>
     <div id="showmessageTip"></div>
 <script type="text/javascript">
 function getpage(act){
-	ajax.send("$normalUrl&action=checkover&rid={$message[rid]}&itype={$itype}&smstype={$smstype}&redirect=$redirect&dir="+act,'',function(){
+	ajax.send("$normalUrl&action=checkover&boxname={$boxname}&rid={$message[rid]}&itype={$itype}&smstype={$smstype}&redirect=$redirect&dir="+act,'',function(){
 		 var rText = ajax.request.responseText.split('\t');
 		 if (rText[0] == 'success'){
-			 location.href = "$normalUrl&action="+ act +"&rid={$message[rid]}&itype={$itype}&smstype={$smstype}&redirect=$redirect";
+			 location.href = "$normalUrl&action="+ act +"&boxname={$boxname}&rid={$message[rid]}&itype={$itype}&smstype={$smstype}&redirect=$redirect";
 		 }else{
 			 showDialog('warning',(act == "next") ? "已经是最后一条！" : "已经是第一条！",3);return false;
 		 }
@@ -57,7 +54,10 @@ function getpage(act){
 	});
 	return false;
 }
+var db_bbsurl = '$db_bbsurl';
+var db_urlcheck = '$db_urlcheck';
 </script>
+<script type="text/javascript" src="js/pw_lwd.js"></script>
 <!--
 EOT;
 if($smstype == $messageServer->getConst('sms_rate')){
@@ -77,54 +77,25 @@ function getSmsList(rType){
 	location.href='$normalUrl&action='+rType+'&smstype=$smstype&itype='+rType;
 }
 </script>
+<div class="navC mb10">
+    	<ul>
+        	<li {$currentBoxs[inbox]}><a href="$normalUrl&action=inbox">收件箱</a></li>
+            <li {$currentBoxs[outbox]}><a href="$normalUrl&action=outbox">发件箱</a></li>
+        </ul>
+ 
+    </div>
 <form action="$normalUrl" method="post" name="FORM">
 <input type="hidden" name="ajax" value="1"/>
 				<div class="cc mb10">
 				<span class="mr5"><label><input id="checkall" name="checkall" type="checkbox" value="" onclick="MC.CheckAll(this.form,this)">&nbsp;全选</label></span>
 				<span class="bt2"><span><button onclick="MC.mSubmit(this.form,'mark','sms','$action','$page','showmessageTip')" type="button">标记已读</button></span></span>
 				<span class="bt2"><span><button onclick="MC.mSubmit(document.FORM,'del','sms','$action','$page','showmessageTip')"  type="button">删除</button></span></span>
-				<span style="margin:0 3px 0 6px;">筛选：<select onchange="selectSmsType(this.value)">
-					<option value="0">全部站内信</option>
+				<span style="margin:0 3px 0 6px;">筛选：<span class="dropdown"><select id="alltype" onchange="selectSmsType(this.value)">
+					<option value="{$boxname}">全部</option>
 					<option $smsTypeSelect_sms_message  value="message">短消息</option>
 					<option $smsTypeSelect_sms_rate value="rate">评分</option>
-					<option $smsTypeSelect_sms_comment value="comment">评论</option>
-					<option $smsTypeSelect_sms_guestbook value="guestbook">留言</option>
 					<option $smsTypeSelect_sms_reply value="reply">帖子回复</option>
-				</select></span>
-<!--
-EOT;
-if(!empty($smstype)){
-$_self = "我发起的消息";
-$_other = "我收到的消息";
-if($smstype == $messageServer->getConst('sms_rate')){
-$_self = "我发起的帖子评分";
-$_other = "我收到的帖子评分";
-}elseif($smstype == $messageServer->getConst('sms_share')){
-$_self = "我对别人的分享";
-$_other = "别人对我的分享";
-}elseif($smstype == $messageServer->getConst('sms_comment')){
-$_self = "我对别人的评论";
-$_other = "别人对我的评论";
-}elseif($smstype == $messageServer->getConst('sms_guestbook')){
-$_self = "我对别人的留言";
-$_other = "别人对我的留言";
-}
-$selected_all = $selected_self = $selected_other = '';
-$selected_all = $action == '' || $action == 'all' ? 'selected' : '';
-$selected_self = $action == 'self' ? 'selected' : '';
-$selected_other = $action == 'other' ? 'selected' : '';
-print <<<EOT
---> 
-        <select onchange="getSmsList(this.value)">
-            <option value="all" $selected_all>全部</option>
-            <option value="self" $selected_self>{$_self}</option>
-            <option value="other" $selected_other>{$_other}</option>
-        </select>
-<!--
-EOT;
-}
-print <<<EOT
--->
+				</select></span></span>
 		 </div>
        <div id="showmessageTip"></div>
        <table width="100%" class="mb10">
@@ -174,7 +145,7 @@ EOT;
 -->
 				 </p><em><span title="$value[modified_time]">{$value[modified_time_format]}</span></em></td>
 				 <td class="value">
-				 	<h4 $_b><a href="$normalUrl&action=info&page=$page&rid={$value[rid]}&itype={$itype}&smstype={$smstype}&mid={$value[mid]}&redirect=$redirect">{$value[title]}</a></h4>
+				 	<h4 $_b><a href="$normalUrl&action=info&boxname={$boxname}&page=$page&rid={$value[rid]}&itype={$itype}&smstype={$smstype}&mid={$value[mid]}&redirect=$redirect">{$value[title]}</a></h4>
 				 	<p class="lh_18">{$value[content]}</p>
 					<em class="s2">{$_tip}</em>
 				</td>
@@ -209,7 +180,12 @@ EOT;
 	</div>
 </td></tr></table>
 </div>
-<script>
+<script type="text/javascript" src="js/select.js"></script>
+<script type="text/javascript">
+var ld=window.onload;
+window.onReady(function(){
+	new sSelect(getObj('alltype'));
+});
 (function(){
 	try{
 	var sms_line=getObj('smsListTable').getElementsByTagName('tr');
@@ -230,9 +206,9 @@ EOT;
 
 function selectSmsType(type) {
 	if(type) {
-		window.location.href = '{$normalUrl}&action='+type;
+		window.location.href = '{$normalUrl}&action='+type+'&boxname={$boxname}';
 	} else {
-		window.location.href = '{$normalUrl}';
+		window.location.href = '{$normalUrl}&boxname={$boxname}';
 	}
 }
 </script>

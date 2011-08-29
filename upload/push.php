@@ -12,7 +12,8 @@ $monthname	= 'fmonth';
 $sqladd		= '';
 $fidoff		= array();
 $ifview		= false;
-include_once pwCache::getPath(D_P.'data/bbscache/forumcache.php');
+//* include_once pwCache::getPath(D_P.'data/bbscache/forumcache.php');
+pwCache::getData(D_P.'data/bbscache/forumcache.php');
 
 $query = $db->query("SELECT fid,password,allowvisit FROM pw_forums WHERE password!='' OR allowvisit!='' OR f_type='hidden'");
 while ($rt = $db->fetch_array($query)) {
@@ -23,7 +24,8 @@ while ($rt = $db->fetch_array($query)) {
 }
 
 if ($fid && (!in_array($fid,$fidoff) || $ifview)) {
-	include_once pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
+	//* include_once pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
+	pwCache::getData(D_P.'data/bbscache/forum_cache.php');
 	$sqladd		 = " AND fid=".S::sqlEscape($fid);
 	$weekname	.= '_'.$fid;
 	$monthname	.= '_'.$fid;

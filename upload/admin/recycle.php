@@ -11,7 +11,8 @@ if ($admin_gid == 5) {
 	list($allowfid,$forumcache) = GetAllowForum($admin_name);
 	$sql = $allowfid ? " AND r.fid IN($allowfid)" : '';
 } else {
-	include pwCache::getPath(D_P.'data/bbscache/forumcache.php');
+	//* include pwCache::getPath(D_P.'data/bbscache/forumcache.php');
+	pwCache::getData(D_P.'data/bbscache/forumcache.php');
 	list($hidefid,$hideforum) = GetHiddenForum();
 	if ($admin_gid == 3) {
 		$forumcache .= $hideforum;
@@ -459,7 +460,8 @@ function ReverColonyTopic($tids) {
 	global $db;
 	$query = $db->query("SELECT COUNT(*) AS tnum, SUM(b.replies+1) AS pnum, a.cyid FROM pw_argument a LEFT JOIN pw_threads b ON a.tid=b.tid WHERE a.tid IN(" . S::sqlImplode($tids) . ") GROUP BY a.cyid");
 	while ($rt = $db->fetch_array($query)) {
-		$db->update("UPDATE pw_colonys SET tnum=tnum+" . S::sqlEscape($rt['tnum']) . ',pnum=pnum+' . S::sqlEscape($rt['pnum']) . ' WHERE id=' . S::sqlEscape($rt['cyid']));
+		//* $db->update("UPDATE pw_colonys SET tnum=tnum+" . S::sqlEscape($rt['tnum']) . ',pnum=pnum+' . S::sqlEscape($rt['pnum']) . ' WHERE id=' . S::sqlEscape($rt['cyid']));
+		$db->update(pwQuery::buildClause("UPDATE :pw_table SET tnum=tnum+:tnum,pnum=pnum+:pnum WHERE id=:id", array('pw_colonys', $rt['tnum'], $rt['pnum'], $rt['cyid'])));
 	}
 }
 

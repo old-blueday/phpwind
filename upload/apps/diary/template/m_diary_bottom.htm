@@ -61,7 +61,7 @@ if ($a == 'write' || $a == 'edit') {print <<<EOT
 	return true;
 	};
 </script>
-<script language="JavaScript" src="data/bbscache/face.js"></script>
+<script src="$db_htmdir/js/face.js"></script>
 <script language="JavaScript" src="js/global.js"></script>
 <script language="JavaScript" src="js/app_global.js"></script>
 					<div id="menu_show" style="display:none;"></div>
@@ -121,11 +121,11 @@ EOT;
 		<div style="display:block;padding:10px 0;" class="cc">
         		<div class="cc">
 				<div class="mr10 fl lh_24">隐私设置</div>
-				<div class="dropdown mr20"><select name="privacy" id="dtid_pvc" onChange="optionsel(this.value,'{$sendWeiboPrivacy}')">
+				<span class="dropdown mr20"><select name="privacy" id="dtid_pvc" onChange="optionsel(this.value,'{$sendWeiboPrivacy}')">
 					<option value="0" $privacy_0>全站可见</option>
 					<option value="1" $privacy_1>仅好友可见</option>
 					<option value="2" $privacy_2>仅自己可见</option>
-				</select></div>
+				</select></span>
 				<span style="display:none;">
 				<input type="checkbox" name="atc_convert" id="atc_convert" value="1" checked/>Wind Code自动转换
 				</span>
@@ -148,10 +148,10 @@ EOT;
                 </div>
              </div>
                <div style="display:block;padding:10px 0;" class="cc">
-				<div class="mr10 fl lh_24">日志分类</div><div class="dropdown"><select name="dtid" id="dtid_add">
+				<div class="mr10 fl lh_24">日志分类</div><span class="dropdown"><select name="dtid" id="dtid_add">
 					<option value="0" $dtid_0>默认分类</option>
 					$dtsel
-				</select></div>
+				</select></span>
 				</div>
 				<span class="btn" style="margin:0;"><span><button name="Submit" type="submit">提 交</button></span></span>
 			</div>
@@ -161,7 +161,7 @@ EOT;
 EOT;
 if($a == 'edit'){print <<<EOT
 -->
-<script language="JavaScript">setTimeout("editor.gotoEnd();",50);</script>
+
 <!--
 EOT;
 }else{print <<<EOT
@@ -172,24 +172,7 @@ EOT;
 }print <<<EOT
 -->
 <script language="JavaScript">var stylepath = 'wind';</script>
-<!--
-EOT;
-if(R_P!=D_P){
-$facedb = readover(D_P.'data/bbscache/face.js');
-print <<<EOT
--->
-<script language="javascript">
-{$facedb}
-</script>
-<!--
-EOT;
-}else{print <<<EOT
--->
-<script language="JavaScript" src="data/bbscache/face.js"></script>
-<!--
-EOT;
-}print <<<EOT
--->
+<script src="$db_htmdir/js/face.js"></script>
 <script language="JavaScript">
 var cnt  = 0;
 document.FORM.Submit.disabled = false;

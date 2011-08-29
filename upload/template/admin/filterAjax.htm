@@ -66,7 +66,7 @@ function postSubmit()
 	if (word != '') {
 		ajax.send('$post_basename','word=' + word + '&newclass='+newclass+'&step=2',function() {
 			var prompt = ajax.request.responseText;
-			if(prompt == ''){
+			if(prompt == '' || /^\s*$/g.test(prompt)){
 				document.form1.action="$ajax_basename";
 				document.form1.method = "POST";
 				document.form1.submit();
@@ -328,8 +328,8 @@ EOT;
     	<td class="td2">分类状态</td>
     	<td class="td2">
         	<ul class="list_A list_80">
-        		<li><input name="state" id="enabled" type="radio" value="1" />启用</li>
-        		<li><input name="state" id="disable" type="radio" value="0" checked/>停用</li>
+        		<li><input name="state" id="enabled" type="radio" value="1" checked />启用</li>
+        		<li><input name="state" id="disable" type="radio" value="0" />停用</li>
             </ul>
         </td>
     </tr>

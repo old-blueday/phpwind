@@ -3,7 +3,8 @@
 $basename = 'apps.php?q='.$q.'&uid='.$uid.'&';
 
 empty($space) && Showmsg('您访问的空间不存在!');
-include_once pwCache::getPath(D_P . 'data/bbscache/o_config.php');
+//* include_once pwCache::getPath(D_P . 'data/bbscache/o_config.php');
+pwCache::getData(D_P . 'data/bbscache/o_config.php');
 $whiteList = array(
 	'own',
 	'albumcheck',
@@ -112,6 +113,7 @@ if ($a == 'own' && $indexRight) {
 	$cnpho = array();
 	$result = $photoService->getPhotoListByAid($aid);
 	if(!is_array($result)){
+		$result == 'mode_o_photos_private_3' && refreshto($basename, 'mode_o_photos_private_3');
 		Showmsg($result);
 	}
 	if($indexRight && !$photoRight ){
@@ -140,6 +142,7 @@ if ($a == 'own' && $indexRight) {
 	S::gp(array('pid'));
 	$result = $photoService->viewPhoto($pid);
 	if(!is_array($result)){
+		$result == 'mode_o_photos_private_3' && refreshto($basename, 'mode_o_photos_private_3');
 		Showmsg($result);
 	}
     list($photo,$nearphoto,$prePid,$nextPid) = $result;

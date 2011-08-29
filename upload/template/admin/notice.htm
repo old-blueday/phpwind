@@ -2,6 +2,7 @@
 include_once PrintEot('left');
 if(in_array($action,array('add','edit'))){print <<<EOT
 -->
+<script type="text/javascript" LANGUAGE="JavaScript" src="js/core/core.js"></script>
 <form name="FORM" method="post" action="$basename&" onsubmit="return checkpost(document.FORM);">
 	<input type="hidden" name="action" value="$action">
 	<input type="hidden" name="aid" value="$aid">
@@ -65,28 +66,22 @@ EOT;
 	</tbody>
 	<tr class="tr1 vt"r>
 		<td class="td1">公告内容</td>
-		<td class="td2" colspan="2"><div style="width:650px;background:#ffffff">
+		<td class="td2" colspan="2"><div style="width:680px;background:#fff;" class="cc">
 <!--
 EOT;
-require_once PrintEot('wysiwyg_editor');
+require_once PrintEot('wysiwyg_editor_common');
 print <<<EOT
 -->
 		</div></td>
 	</tr>
 </table>
 </div>
-
-<script type="text/javascript" LANGUAGE="JavaScript" src="js/core/core.js"></script>
 <script type="text/javascript" language="JavaScript" src="js/pw_ajax.js"></script>
 <script language="JavaScript" src="js/post.js"></script>
 <script language="JavaScript" src="js/global.js"></script>
 
-<script language="JavaScript" src="data/bbscache/face.js"></script>
 <div id="menu_face" class="menu" style="display:none;"></div>
 <div id="menu_generalface" class="menu" style="display:none;"></div>
-
-<script type="text/javascript">editor.init('wysiwyg', 0);</script>
-
 <div class="tac mb10">
 	<span class="btn"><span><button type="submit">提 交</button></span></span>
 </div>
@@ -168,19 +163,29 @@ EOT;
 $showf = true;
 foreach($annoucedb as $fid => $noticedb){print <<<EOT
 -->
-	<tr class="tr2 vt td_bgB">
+
 <!--
 EOT;
 if ($showf) {
 $showf = false;print <<<EOT
 -->
-		<td width="30">顺 序</td>
-		<td>
+	<tr class="tr2 vt td_bgB">
+		<td>顺 序</td>
+		<td>&nbsp;</td>
+		<td width="40">状 态</td>
+		<td width="80">发布者</td>
+		<td width="100">开始时间</td>
+		<td width="100">结束时间</td>
+		<td width="120">操 作</td>
+	</tr>
+	<tr class="tr2 vt">
+		<td width="30">&nbsp;</td>
+		<td colspan="6">
 <!--
 EOT;
 if(!empty($namedb[$fid])){print <<<EOT
 -->
-		<span class="fl b s5"><a href="$basename&fid=$fid">{$namedb[$fid][name]}</a></span>
+		<span class="fl b s5 f14"><a href="$basename&fid=$fid">{$namedb[$fid][name]}</a></span>
 <!--
 EOT;
 }else{print <<<EOT
@@ -191,22 +196,19 @@ EOT;
 }print <<<EOT
 -->
 		</td>
-		<td width="40">状 态</td>
-		<td width="80">发布者</td>
-		<td width="100">开始时间</td>
-		<td width="100">结束时间</td>
-		<td width="120">操 作</td>
+	</tr>
 <!--
 EOT;
 } else {print <<<EOT
 -->
+	<tr class="tr2 vt">
 		<td width="30">&nbsp;</td>
 		<td colspan="6">
 <!--
 EOT;
 if(!empty($namedb[$fid])){print <<<EOT
 -->
-		<span class="fl b s5"><a href="$basename&fid=$fid">{$namedb[$fid][name]}</a></span>
+		<span class="fl b s5 f14"><a href="$basename&fid=$fid">{$namedb[$fid][name]}</a></span>
 <!--
 EOT;
 }else{print <<<EOT

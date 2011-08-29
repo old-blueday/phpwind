@@ -5,7 +5,7 @@ if (!pwWritable(D_P.'data/sql_config.php')) {
 	adminmsg('manager_error');
 }
 
-include pwCache::getPath(D_P.'data/sql_config.php');
+include D_P.'data/sql_config.php';
 !is_array($manager) && $manager = array();
 !is_array($manager_pwd) && $manager_pwd = array();
 $newmanager = $newmngpwd = array();
@@ -60,6 +60,7 @@ if (!$action) {
 		'manager' => $manager,
 		'manager_pwd' => $manager_pwd,
 		'db_hostweb' => $db_hostweb,
+		'db_distribute' => $db_distribute,
 		'attach_url' => $attach_url
 	);
 	require_once(R_P.'require/updateset.php');
@@ -117,6 +118,7 @@ if (!$action) {
 			'manager' => $manager,
 			'manager_pwd' => $manager_pwd,
 			'db_hostweb' => $db_hostweb,
+			'db_distribute' => $db_distribute,
 			'attach_url' => $attach_url
 		);
 		require_once(R_P.'require/updateset.php');
@@ -157,6 +159,7 @@ if (!$action) {
 			'manager' => $newmanager,
 			'manager_pwd' => $newmngpwd,
 			'db_hostweb' => $db_hostweb,
+			'db_distribute' => $db_distribute,
 			'attach_url' => $attach_url
 		);
 		require_once(R_P.'require/updateset.php');

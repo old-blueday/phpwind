@@ -39,7 +39,8 @@ if ($m && $pwServer ['HTTP_HOST'] == $db_modedomain[$m]) {
 	$basename = "mode.php?m=$m&";
 }
 if ($m == 'cms') {//兼容老版本入口
-	@include_once pwCache::getPath(S::escapePath(D_P . 'data/bbscache/cms_config.php'));
+	//* @include_once pwCache::getPath(S::escapePath(D_P . 'data/bbscache/cms_config.php'));
+	pwCache::getData(S::escapePath(D_P . 'data/bbscache/cms_config.php'));
 	if (file_exists(M_P . 'require/core.php')) {
 		require_once (M_P . 'require/core.php');
 	}
@@ -48,7 +49,8 @@ if ($m == 'cms') {//兼容老版本入口
 	exit;
 }
 if (file_exists ( M_P . "m_{$q}.php" )) {
-	@include_once pwCache::getPath(S::escapePath(D_P . 'data/bbscache/' . $db_mode . '_config.php'));
+	//* @include_once pwCache::getPath(S::escapePath(D_P . 'data/bbscache/' . $db_mode . '_config.php'));
+	pwCache::getData(S::escapePath(D_P . 'data/bbscache/' . $db_mode . '_config.php'));
 	${$db_mode.'_sitename'} = ${$db_mode.'_sitename'} ? ${$db_mode.'_sitename'} : $db_bbsname;
 	 $db_mode == 'cms' && $db_bbsname = ${$db_mode.'_sitename'}; 
 

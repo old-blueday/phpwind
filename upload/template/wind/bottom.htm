@@ -1,6 +1,6 @@
 <!--<?php
 if (!defined('AJAX')) {print <<<EOT
---><div style="height:25px;">&nbsp;</div><link rel="stylesheet" type="text/css" href="images/toolbar.css?2010412" media="all" />
+--><div style="height:25px;">&nbsp;</div><link rel="stylesheet" href="images/toolbar.css?2010412" />
 <div class="startbar-wrapper fixed">
 <!--[if IE 6]>
 <iframe frameborder="0" style="position:absolute;width:98%;height:25px;filter:Alpha(opacity=0);" scrolling="no"></iframe>
@@ -124,7 +124,7 @@ EOT;
 				<span class="fl" style="display:none">
 					<span class="app-m app-m-new app-current" style="margin-left:-1px;" onclick="pw_bottom.hiddenTab('pwb_message')">消息</span>
 				</span>
-				<span class="app-m app-m-new fl" id="pwb_message" title="查看最新末读消息">消息</span>
+				<span class="app-m app-m-new fl" id="pwb_message" title="查看最新未读消息">消息</span>
 <!--
 EOT;
 	} else {print <<<EOT
@@ -132,7 +132,7 @@ EOT;
 				<span class="fl" style="display:none">
 					<span class="app-m app-current" style="margin-left:-1px;" onclick="pw_bottom.hiddenTab('pwb_message')">消息</span>
 				</span>
-				<span class="app-m fl" id="pwb_message" title="查看最新末读消息">消息</span>
+				<span class="app-m fl" id="pwb_message" title="查看最新未读消息">消息</span>
 <!--
 EOT;
 	}print <<<EOT

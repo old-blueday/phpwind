@@ -61,7 +61,7 @@ if ($skincount > 1) {
 
 $s_url = $pwServer['PHP_SELF'].'?';
 foreach ($_GET as $key => $value) {
-	$key != 'skinco' && $value && $s_url .= "$key=".rawurlencode($value).'&';
+	$key != 'skinco' && $value && !S::isArray($value) && $s_url .= "$key=".rawurlencode($value).'&';
 }
 ($_GET) && $s_url =  S::escapeChar($s_url);
 

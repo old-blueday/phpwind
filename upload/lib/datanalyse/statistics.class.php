@@ -59,7 +59,28 @@ class PW_Statistics {
 		$this->_reduce('agedistribution', 1, $srcNum, $this->unday);
 		$this->_add('agedistribution', 1, $dstNum, $this->unday);
 	}
-
+	
+	/**
+	 * 房产安装时间
+	 */
+	function houseInstallTime() {
+		$this->_add('houseinstalltime', 0, 0, $this->unday);
+	}
+	
+	/**
+	 * 店铺安装时间
+	 */
+	function dianpuInstallTime() {
+		$this->_add('dianpuinstalltime', 0, 0, $this->unday);
+	}
+	
+	/**
+	 * 实名认证安装时间
+	 */
+	function authInstallTime() {
+		$this->_add('authinstalltime', 0, 0, $this->unday);
+	}
+	
 	function addtag($tagids) {
 		if (empty($tagids) || !is_array($tagids)) {
 			return false;
@@ -97,7 +118,8 @@ class PW_Statistics {
 	
 		$lastday = pwEscape(get_date($tdtime - 86400,'Y-m-d'));
 		$this->_db->update("DELETE FROM `pw_statistics_daily` WHERE (name='userinbbs' OR name='guestinbbs') AND `date`<$lastday");
-		$this->_db->update("UPDATE `pw_bbsinfo` SET `last_statistictime`=$this->t WHERE id=1");
+		//$this->_db->update("UPDATE `pw_bbsinfo` SET `last_statistictime`=$this->t WHERE id=1");
+		pwQuery::update('pw_bbsinfo', 'id=:id', array(1), array('last_statistictime' => $this->t));
 		
 		/*归总前日登录数*/
 		if(procLock('statisticLogin')){

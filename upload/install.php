@@ -34,7 +34,7 @@ require_once(R_P.'lang/install_lang.php');
  */
 $_WIND			= 'install';
 $from_version	= '';
-$wind_version	= '8.3';
+$wind_version	= '8.5';
 $wind_repair	= '';
 $wind_from		= '';//Customized version
 $_actionStep = array('index','readme','writable','database','createtable','hack',
@@ -64,7 +64,7 @@ if ($action == 'index') {
  * 版权阅读
  */
 if ($action == 'readme') {
-	$wind_licence = str_replace(array('  ',"\n"),array('&nbsp; ','<br />'),readover('licence.txt'));
+	$wind_licence = str_replace(array('  ',"\n"),array('&nbsp; ','<br />'),readover(R_P.'licence.txt'));
 	//writeover(D_P."data/install.log",$lang["success_1"]."\n",'ab+');
 	pwViewHtml($action);exit;
 }
@@ -94,6 +94,7 @@ if ($action == 'writable') {
 		'data/style/',
 		'data/tmp/',
 		'html/',
+		'html/js/',
 		'html/stopic/',
 		'html/read/',
 		'html/channel/',
@@ -408,6 +409,10 @@ if ($action == 'custom') {
 	require(R_P.'lang/step/topic.php');
 	require(R_P.'lang/step/pcfield.php');
 	require(R_P.'lang/step/nav.php');
+	require(R_P.'lang/step/pw_areas.php');
+	require(R_P.'lang/step/pw_school.php');
+    $areaService = L::LoadClass('areasservice','utility');
+    $areaService->setAreaCache();
 
 	list($prev,$next) = getStepto($action);
 	pwHeader("$basename?action=$next");exit;
@@ -423,7 +428,7 @@ if ($action == 'other') {
 		$db = pwNewDB();
 	}
 
-	$writeinto = str_pad('<?php die;?>',96)."\n";
+	$writeinto = str_pad('<?php die;?>',96)."\r\n";
 	writeover(D_P.'data/bbscache/online.php',$writeinto);
 	writeover(D_P.'data/bbscache/guest.php',$writeinto);
 	writeover(D_P.'data/bbscache/olcache.php',"<?php\r\n\$userinbbs=1;\r\n\$guestinbbs=0;\r\n?>");
@@ -449,7 +454,7 @@ if ($action == 'other') {
 	$db->update("REPLACE INTO pw_config SET db_name='db_ifpwcache',db_value= '567'");
 
 	//风格
-	$styles = array('wind' => '蓝色天空','wind8gray'=>'水墨江南','wind8black'=>'黑色旋风','wind8green'=>'绿意盎然','wind8purple'=>'紫色梦幻');
+	$styles = array('wind' => '蓝色天空','wind8gray'=>'水墨江南','wind8black'=>'黑色旋风','wind8green'=>'绿之印象','wind8purple'=>'紫色梦幻','wind85' => '春意盎然');
 	$i = 1;$temp_styledb=array();
 	foreach ($styles as $key => $value) {
 		if (!file_exists(D_P.'data/style/'.$key.'.php')) continue;
@@ -462,7 +467,7 @@ if ($action == 'other') {
 
 	$temp_styledb = addslashes(serialize($temp_styledb));
 	$db->update("REPLACE INTO pw_config(db_name,vtype,db_value) VALUES ('db_styledb','array','$temp_styledb')");
-	$db->update("REPLACE INTO pw_config(db_name,vtype,db_value) VALUES ('db_defaultstyle','array','wind')");
+	$db->update("REPLACE INTO pw_config(db_name,vtype,db_value) VALUES ('db_defaultstyle','string','wind85')");
 
 	$o_classdb = addslashes(serialize(array(1 => '默认分类')));
 	$db->update("REPLACE INTO pw_hack (hk_name, vtype, hk_value, decrip) VALUES('o_classdb', 'array','$o_classdb' , '')");
@@ -472,7 +477,7 @@ if ($action == 'other') {
 	require(R_P.'lang/step/writesmile.php');
 
 	//设置门户首页为默认首页
-	$update	= array('area_default_alias','string','home','');
+	$update	= array('area_default_alias','string','home85','');
 	$db->update("REPLACE INTO pw_hack VALUES (".pwImplode($update).')');
 
 	@unlink(D_P.'data/type_cache.php');
@@ -560,7 +565,7 @@ if ($action == 'static') {
 
 	require_once(R_P.'require/nav.php');
 
-	$alias = array('baby','decoration','auto','delicious');
+	$alias = array('baby','decoration','auto','delicious','home85','tucool');
 	foreach ($alias as $value) {
 		$alias = $value;
 		require M_P.'index.php';
@@ -578,6 +583,7 @@ if ($action == 'finish') {
 	} else {
 		$db = pwNewDB();
 	}
+	$db_htmdir = 'html';
 	if ($_GET['app'] == '1') {
 		M::sendNotice(
 			array($manager['0']),

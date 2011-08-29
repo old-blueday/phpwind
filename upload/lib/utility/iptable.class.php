@@ -59,6 +59,7 @@ class PW_IPTable {
 			$offset = $ipIndex[0];
 			$offsize = $ipIndex[1] - $ipIndex[0];
 		}
+		if ($offsize < 1) return $unknowIp;
 		if ($handle = @fopen($txt, 'rb')) {
 			flock($handle, LOCK_SH);
 			fseek($handle, $offset, SEEK_SET);

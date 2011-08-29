@@ -10,7 +10,7 @@ if (typeof HTMLElement != "undefined") {
 		});
 		Event.prototype.__defineGetter__("srcElement", function() {
 			var node=this.target;
-			while(node.nodeType != 1) node = node.parentNode;
+			while(node && node.nodeType != 1) node = node.parentNode;
 			return node
 		})
 	}

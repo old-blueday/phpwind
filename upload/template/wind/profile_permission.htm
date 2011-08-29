@@ -200,9 +200,9 @@ $add = '+';
 								<td>搜索权限</td>
 								<td>会员列表</td>
 								<td>会员资料</td>
-								<td>展区功能</td>
-								<td>报告功能</td>
+								<td>举报功能</td>
 								<td>头像上传</td>
+                                <td>自定义头像</td>
 							</tr>
 							<tr class="user-tr">
 								<td>{$_P[$per[hide]]}</td>
@@ -210,29 +210,27 @@ $add = '+';
 								<td>{$_P[$per[search]]}</td>
 								<td>{$_P[$per[member]]}</td>
 								<td>{$_P[$per[profile]]}</td>
-								<td>{$_P[$per[show]]}</td>
 								<td>{$_P[$per[report]]}</td>
 								<td>{$_P[$per[upload]]}</td>
+                                <td>{$_P[$per[portait]]}</td>
 							</tr>
 							<tr class="user-tr">
-								<td>自定义头像</td>
-								<td>荣誉头衔</td>
 								<td>统计排行</td>
 								<td>发消息</td>
 								<td>消息上限</td>
 								<td>收藏夹容量</td>
 								<td>草稿箱容量</td>
 								<td>签名大小上限</td>
+                                <td colspan="2"></td>
 							</tr>
 							<tr class="user-tr">
-								<td>{$_P[$per[portait]]}</td>
-								<td>{$_P[$per[honor]]}</td>
 								<td>{$_P[$per[sort]]}</td>
 								<td>{$_P[$per[messege]]}</td>
 								<td>{$per[maxmsg]}</td>
 								<td>{$per[maxfavor]}</td>
 								<td>{$per[maxgraft]}</td>
 								<td>{$per[signnum]}</td>
+                                <td colspan="2"></td>
 							</tr>
 							<tr class="user-tr"><td colspan="8" class="b">版块权限</td></tr>
 							<tr class="user-tr">
@@ -282,9 +280,7 @@ $add = '+';
 							<tr class="user-tr">
 								<td>下载附件</td>
 								<td>{$_P[$per[down]]}</td>
-								<td colspan="2">附件大小上限</td>
-								<td>$per[uploadmaxsize]</td>
-								<td colspan="3" class="tal"></td>
+								<td colspan="6" class="tal"></td>
 							</tr>
 							<tr class="user-tr">
 								<td colspan="2" style="vertical-align:top;width:150px;">附件允许后缀</td>

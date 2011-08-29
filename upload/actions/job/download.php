@@ -15,9 +15,11 @@ if (!$windid && ($userdb = getCurrentOnlineUser()) && $userdb['ip'] == $onlineip
 	$userrvrc = round($winddb['rvrc'] / 10, 1);
 	$windid = $winddb['username'];
 	if (file_exists(D_P . "data/groupdb/group_$groupid.php")) {
-		require_once pwCache::getPath(S::escapePath(D_P . "data/groupdb/group_$groupid.php"));
+		//* require_once pwCache::getPath(S::escapePath(D_P . "data/groupdb/group_$groupid.php"));
+		pwCache::getData(S::escapePath(D_P . "data/groupdb/group_$groupid.php"));
 	} else {
-		require_once pwCache::getPath(D_P . "data/groupdb/group_1.php");
+		//* require_once pwCache::getPath(D_P . "data/groupdb/group_1.php");
+		pwCache::getData(D_P . "data/groupdb/group_1.php");
 	}
 	define('FX', 1);
 }
@@ -129,8 +131,12 @@ function getCurrentOnlineUser() {
 		$userdb = explode("\t", getuserdb(D_P . "data/bbscache/online.php", $ol_offset));
 		return $userdb ? array('uid' => $userdb[8], 'ip' => $userdb[2]) : array();
 	} else {
-		$olid = (int)GetCookie('olid');
-		$userdb = $db->get_one("SELECT uid,ip FROM pw_online WHERE olid=" . S::sqlEscape($olid) . ' AND uid>0');
+		//* $olid = (int)GetCookie('olid');
+		//* $userdb = $db->get_one("SELECT uid,ip FROM pw_online WHERE olid=" . S::sqlEscape($olid) . ' AND uid>0');
+		
+		$onlineService = L::loadClass('OnlineService', 'user');
+		$userdb = $onlineService->getOnlineUserByUserId($GLOBALS['winduid']);	
+				
 		return $userdb;
 	}
 }

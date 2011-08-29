@@ -101,10 +101,12 @@ class PW_Collection {
 		$weiboService = L::loadClass('weibo', 'sns'); /* @var $weiboService PW_Weibo */
 		foreach ($tmpDate as $key => $temp) {
 			$temp['content'] = unserialize($temp['content']);
+			$temp['type'] == 'postfavor' && $temp['content']['link'] = urlRewrite($temp['content']['link']);
 			if (strpos($temp['content']['link'],'{#APPS_BASEURL#}') !== false) {			
 				$temp['content']['link'] = str_replace('{#APPS_BASEURL#}','apps.php?',$temp['content']['link']);
 			}
-			$temp['title']	= ($temp['type'] == 'postfavor') ? getLangInfo('app','collection_postfavor_name',array('type'		=> getLangInfo('app',$temp['type']),'postdate'	=> get_date($temp['content']['lastpost']),)) : getLangInfo('app','collection_type_name',array('type'		=> getLangInfo('app',$temp['type']),'postdate'	=> get_date($temp['postdate']),));
+			//$temp['title']	= ($temp['type'] == 'postfavor') ? getLangInfo('app','collection_postfavor_name',array('type'		=> getLangInfo('app',$temp['type']),'postdate'	=> get_date($temp['content']['lastpost']),)) : getLangInfo('app','collection_type_name',array('type'		=> getLangInfo('app',$temp['type']),'postdate'	=> get_date($temp['postdate']),));
+			$temp['title'] = getLangInfo('app','collection_type_name',array('type'		=> getLangInfo('app',$temp['type']),'postdate'	=> get_date($temp['postdate']),));
 			$result[] = $temp;
 		}
 		return $result;
@@ -122,10 +124,12 @@ class PW_Collection {
 		$weiboService = L::loadClass('weibo', 'sns'); /* @var $weiboService PW_Weibo */
 		foreach ($tmpDate as $key => $temp) {
 			$temp['content'] = unserialize($temp['content']);
+			$temp['type'] == 'postfavor' && $temp['content']['link'] = urlRewrite($temp['content']['link']);
 			if (strpos($temp['content']['link'],'{#APPS_BASEURL#}') !== false) {			
 				$temp['content']['link'] = str_replace('{#APPS_BASEURL#}','apps.php?',$temp['content']['link']);
 			}
-			$temp['title']	= ($temp['type'] == 'postfavor') ? getLangInfo('app','collection_postfavor_name',array('type'		=> getLangInfo('app',$temp['type']),'postdate'	=> get_date($temp['content']['lastpost']),)) : getLangInfo('app','collection_type_name',array('type'		=> getLangInfo('app',$temp['type']),'postdate'	=> get_date($temp['postdate']),));
+			//$temp['title']	= ($temp['type'] == 'postfavor') ? getLangInfo('app','collection_postfavor_name',array('type'		=> getLangInfo('app',$temp['type']),'postdate'	=> get_date($temp['content']['lastpost']),)) : getLangInfo('app','collection_type_name',array('type'		=> getLangInfo('app',$temp['type']),'postdate'	=> get_date($temp['postdate']),));
+			$temp['title'] = getLangInfo('app','collection_type_name',array('type'		=> getLangInfo('app',$temp['type']),'postdate'	=> get_date($temp['postdate']),));
 			$result[] = $temp;
 		}
 		return $result;

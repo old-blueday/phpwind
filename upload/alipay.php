@@ -1,7 +1,8 @@
 <?php
 require_once('global.php');
 require_once(R_P.'require/posthost.php');
-include_once pwCache::getPath(D_P.'data/bbscache/ol_config.php');
+//* include_once pwCache::getPath(D_P.'data/bbscache/ol_config.php');
+pwCache::getData(D_P.'data/bbscache/ol_config.php');
 
 S::gp(array('action','out_trade_no','trade_status','buyer_email','notify_id'));
 

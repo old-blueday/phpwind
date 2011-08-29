@@ -3,7 +3,8 @@
 $basename = "$admin_file?adminjob=help";
 
 S::gp(array('hid'),'GP',2);
-@include_once pwCache::getPath(D_P.'data/bbscache/help_cache.php');
+//* @include_once pwCache::getPath(D_P.'data/bbscache/help_cache.php');
+pwCache::getData(D_P.'data/bbscache/help_cache.php');
 if ($action=='add' || $action=='edit') {
 	S::gp(array('hup'),'GP',2);
 	if ($_POST['step']!='2') {

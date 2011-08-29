@@ -2,7 +2,6 @@
 <?php 
 print <<<EOT
 -->
-<div>
 <form action="$baseUrl&action={$action}" method="post" enctype="multipart/form-data" >
 	<input type="hidden" name="step" value="2" />
 	<input type="hidden" name="pushkey" value="$selid" />
@@ -71,7 +70,6 @@ print <<<EOT
 		<span class="btn2"><span><button type="submit">提交</button></span></span>
 	</div>
 </form>
-</div>
 <!--
 EOT;
 ?>

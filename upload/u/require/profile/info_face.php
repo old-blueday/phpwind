@@ -2,6 +2,7 @@
 !function_exists('readover') && exit('Forbidden');
 define('AVATARS_PER_PAGE',12);
 if (!$step){
+	S::gp(array('facetype'),'G');
 	//获取图像信息
 	list($iconurl,$icontype,$iconwidth,$iconheight,$iconfile,,,$iconsize) = showfacedesign($userdb['icon'], true,'m');
 	//系统头像
@@ -25,10 +26,11 @@ if (!$step){
 		list($db_upload,$db_imglen,$db_imgwidth,$db_imgsize) = explode("\t",$db_upload);
 		$pwServer['HTTP_USER_AGENT'] = 'Shockwave Flash';
 		$swfhash = GetVerify($winduid);
-		$upload_param = rawurlencode($db_bbsurl.'/job.php?action=uploadicon&verify='.$swfhash.'&uid='.$winduid.'&');
+		//$upload_param = rawurlencode($db_bbsurl.'/job.php?action=uploadicon&verify='.$swfhash.'&uid='.$winduid.'&');
 		$save_param = rawurlencode($db_bbsurl.'/job.php?action=uploadicon&step=2&');
 		$default_pic = rawurlencode("$db_picpath/facebg.jpg");
-		$icon_encode_url = 'up='.$upload_param.'&saveFace='.$save_param.'&url='.$default_pic.'&PHPSESSID='.$sid.'&'.'imgsize='.$db_imgsize.'&';
+		//$icon_encode_url = 'up='.$upload_param.'&saveFace='.$save_param.'&url='.$default_pic.'&PHPSESSID='.$sid.'&'.'imgsize='.$db_imgsize.'&';
+		$icon_encode_url = 'saveFace='.$save_param.'&url='.$default_pic.'&imgsize='.$db_imgsize.'&';
 	} else {
 		$icon_encode_url = '';
 	}
@@ -54,7 +56,7 @@ if (!$step){
 	} elseif ($_G['allowportait'] && $facetype == 2) {
 		$httpurl = S::getGP('httpurl','P');
 		if (strncmp($httpurl[0],'http://',7) != 0 || strrpos($httpurl[0],'|') !== false) {
-			Showmsg('illegal_customimg');
+			refreshto("profile.php?action=modify&info_type=$info_type&facetype=$facetype",getLangInfo('msg','illegal_customimg'),2,true);
 		}
 		$proicon = S::escapeChar($httpurl[0]);
 		$httpurl[1] = (int)$httpurl[1];

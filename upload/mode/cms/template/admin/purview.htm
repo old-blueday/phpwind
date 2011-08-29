@@ -70,6 +70,7 @@ var checkboxClass = {
 		for(var i=0,length=boxs.length;i<length;i++){
 			if(boxs[i].type == 'checkbox' ){
 				var next = boxs[i].nextSibling;
+				if (next.nodeType != 1) continue;
 				next.onclick = function(){
 					this.previousSibling.click();
 				}

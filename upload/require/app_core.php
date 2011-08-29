@@ -251,10 +251,10 @@ function countPosts($exp='+1') {
 	$num = intval(trim($exp,'+-'));
 	if (strpos($exp,'+') !== false) {
 		//* $db->update("UPDATE pw_bbsinfo SET o_post=o_post+".S::sqlEscape($num,false).",o_tpost=o_tpost+".S::sqlEscape($num,false));
-		$db->update(pwQuery::buildClause("UPDATE :pw_table SET o_post=o_post+".S::sqlEscape($num,false).",o_tpost=o_tpost+".S::sqlEscape($num,false), array('pw_bbsinfo')));
+		$db->update(pwQuery::buildClause("UPDATE :pw_table SET o_post=o_post+:o_post, o_tpost=o_tpost+:o_tpost", array('pw_bbsinfo',$num,$num)));
 	} else {
 		//* $db->update("UPDATE pw_bbsinfo SET o_post=o_post-".S::sqlEscape($num,false).",o_tpost=o_tpost-".S::sqlEscape($num,false));
-		$db->update(pwQuery::buildClause("UPDATE :pw_table SET o_post=o_post-".S::sqlEscape($num,false).",o_tpost=o_tpost-".S::sqlEscape($num,false), array('pw_bbsinfo')));
+		$db->update(pwQuery::buildClause("UPDATE :pw_table SET o_post=o_post-:o_post, o_tpost=o_tpost-:o_tpost", array('pw_bbsinfo',$num,$num)));
 	}
 }
 
@@ -651,7 +651,8 @@ function updateGroupLevel($cyid, $gdb = array()) {
 		}
 	}
 	if ($lid <> $gdb['commonlevel']) {
-		$GLOBALS['db']->update("UPDATE pw_colonys SET commonlevel=" . S::sqlEscape($lid) . ' WHERE id=' . S::sqlEscape($cyid));
+		//* $GLOBALS['db']->update("UPDATE pw_colonys SET commonlevel=" . S::sqlEscape($lid) . ' WHERE id=' . S::sqlEscape($cyid));
+		pwQuery::update('pw_colonys', 'id=:id', array($cyid), array('commonlevel'=>$lid));
 	}
 }
 ?>

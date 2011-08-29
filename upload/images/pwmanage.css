@@ -30,7 +30,7 @@
 .pwC_search{padding:10px;border-bottom:1px solid #dde9f5;}
 .pwC_search select{ vertical-align:middle;}
 .pwC_search a{color:#336699; text-decoration:underline;}
-.pwC_content_a{height:390px;overflow:hidden;overflow-y:auto;background:#fff;margin-bottom:10px;_width:680px;}
+.pwC_content_a{height:390px;overflow-x:hidden;overflow-y:auto;_overflow-y:scroll;background:#fff;margin-bottom:10px;_width:700px;}
 /*color_class*/
 .pwnew span{float:left;margin-right:5px;}
 .pwnew a{padding:0 5px;margin:0;display:block;height:19px;float:left;line-height:19px;border:1px solid #cae2f2;color:#333333;cursor:pointer; font-family:Verdana, Geneva, sans-serif;background:#fff;font-weight:100;}
@@ -76,16 +76,15 @@ textarea{border: 1px solid; border-color: #c0c0c0 #ededed #ededed #c0c0c0;}
 .mt10{margin-top:10px;}
 .lh_18{line-height:18px;height:18px;overflow:hidden;}
 .lh3{line-height:3;}
-.tip-page{width:600px;margin:20px auto 30px;}
-.tip-table{margin:0 1px;background:#ffffff;width:598px;}
-.tip-top{background:url(tip-top.png) center no-repeat;height:50px;}
-.tip-bgA,.tip-bgB,.tip-bgC,.tip-bgC {background:#3366cc;}
-.tip-bgA,.tip-bgB{height:1px;overflow:hidden;}
-.tip-bgA{margin:0 2px;}
-.tip-bgB{margin:0 1px;}
-.tip-bgC{padding-top:1px;}
-.tip-content{padding:0 0 0 67px;}
-.tip-content tr td{padding:5px 10px 5px 0;line-height:25px;}
+
 
 .pw_tips{padding:5px 10px;border-bottom:1px solid #dde9f5;color:#ff5500;}
 .adminRight{border:1px solid #6bcb6b;background:#fafffa url(admin/adminright.png) 30px 16px no-repeat;padding:20px 40px 20px 80px;margin:60px 100px;color:#333; font-size:16px; font-weight:700;}
+
+/*tips*/
+.tipWrap{background:#eaf2fa;padding:120px 0;height:300px;}
+.s6{color:#666;}
+.f14{ font-size:14px;}
+.mb10{margin-bottom:10px;}
+.regCorrect,.regIgnore{padding:40px 0 60px 160px;background:#fff url(register/regright2.png) 60px 40px no-repeat;border:1px solid #bfccd8;width:320px;margin:0 auto;-moz-border-radius:5px;-webkit-border-radius:5px;}
+.regIgnore{ background:#fff url(register/ignore.png) 60px 0 no-repeat;padding-top:5px;}

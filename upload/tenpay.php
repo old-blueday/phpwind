@@ -3,7 +3,8 @@ require_once('global.php');
 
 S::gp(array('cmdno','pay_result','date','bargainor_id','transaction_id','sp_billno','total_fee', 'fee_type','attach','sign'));
 
-include_once pwCache::getPath(D_P.'data/bbscache/ol_config.php');
+//* include_once pwCache::getPath(D_P.'data/bbscache/ol_config.php');
+pwCache::getData(D_P.'data/bbscache/ol_config.php');
 
 if (!$ol_onlinepay) {
 	Showmsg($ol_whycolse);

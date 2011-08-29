@@ -46,7 +46,7 @@ EOT;
 	       <div class="mb10">
 	       		<div class="input_img cc fl mr5" onclick="getObj('usernames').focus();">
                     <em class="input_down" onclick="pwSearch.selectInit(event,'popout','message.php?type=ajax','action=friend',0)">选择好友</em>
-                    <div id="get_friend"><input type="text" max="1" id="usernames" name="usernames" onblur="pwSearch.blur()" onfocus="pwSearch.init('message.php?type=ajax','action=friend&actionType=list&uid=$winduid','resultd','searchResult')" onkeydown="pwSearch.move(event)" onkeyup="pwSearch.searchResult(event,200);" autocomplete=off disableautocomplete></div>
+                    <div id="get_friend"><input type="text" max="1" issearch="1" id="usernames" name="usernames" onblur="pwSearch.blur()" onfocus="pwSearch.init('message.php?type=ajax','action=friend&actionType=list&uid=$winduid','resultd','searchResult')" onkeydown="pwSearch.move(event)" onkeyup="pwSearch.searchResult(event,200);" autocomplete=off disableautocomplete></div>
                 </div>
 	       <form action="$normalUrl" method="post" onsubmit="return MC.submitSearch(document.SEARCH)" name="SEARCH">
                 <div class="search_select">
@@ -54,8 +54,6 @@ EOT;
 	        		<option value="all">全部</option>
 	        		<option value="sms_message">短消息</option>
 	        		<option value="sms_rate">评分</option>
-	        		<option value="sms_comment">评论</option>
-	        		<option value="sms_guestbook">留言</option>
 	        		<option value="sms_reply">帖子回复</option>
 	        	</select>
                 </div>

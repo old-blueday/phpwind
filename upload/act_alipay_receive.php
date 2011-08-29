@@ -33,9 +33,9 @@ if ($action == 'user_authentication') {//用户验证
 
 		$userService->update($winduid, array(), array(), array('tradeinfo' => $tradeinfo));
 
-		paymsg("profile.php?action=modify&info_type=trade",'act_authentication_success');
+		paymsg("profile.php?action=modify&info_type=base",'act_authentication_success');
 	} else {
-		paymsg("profile.php?action=modify&info_type=trade",'act_authentication_fail');
+		paymsg("profile.php?action=modify&info_type=base",'act_authentication_fail');
 	}
 } elseif ($action == 'confirm_aa_detail_payment') {//订单支付
 	S::gp(array('is_success','out_trade_no','batch_detail_no','trade_status'));

@@ -28,7 +28,8 @@ if (empty($action)){
 }  elseif ($action == 'postcate') {
 	S::gp(array('page','step','field','newfield'));
 
-	@include_once pwCache::getPath(D_P.'data/bbscache/postcate_config.php');
+	//* @include_once pwCache::getPath(D_P.'data/bbscache/postcate_config.php');
+	pwCache::getData(D_P.'data/bbscache/postcate_config.php');
 
 	$sql = '';
 	!$pcid && $pcid = $db->get_value("SELECT pcid FROM pw_postcate ORDER BY vieworder");
@@ -145,7 +146,8 @@ if (empty($action)){
 		if (!$nexto) {
 			pwCache::setData($cache_file,$atc_content);
 		} else {
-			$atc_content = readover($cache_file);
+			//* $atc_content = readover($cache_file);
+			$atc_content = pwCache::getData($cache_file, false, true);
 		}
 
 		if (empty($subject) || empty($atc_content)) {
@@ -273,7 +275,8 @@ if (empty($action)){
 	S::gp(array('step'),GP,2);
 	$ajax_basename_add = EncodeUrl($basename."&action=addfield");
 	if (empty($step)) {
-		@include_once pwCache::getPath(D_P.'data/bbscache/postcate_config.php');
+		//* @include_once pwCache::getPath(D_P.'data/bbscache/postcate_config.php');
+		pwCache::getData(D_P.'data/bbscache/postcate_config.php');
 		$ajax_basename = EncodeUrl($basename);
 		$ajax_basename_edit = EncodeUrl($basename."&action=editfield");
 		$ajax_basename_delfield = EncodeUrl($basename."&action=delfield");
@@ -496,7 +499,8 @@ if (empty($action)){
 } elseif ($action == 'rightset') {
 
 	if (!$_POST['step']){
-		@include_once pwCache::getPath(D_P.'data/bbscache/postcate_config.php');
+		//* @include_once pwCache::getPath(D_P.'data/bbscache/postcate_config.php');
+		pwCache::getData(D_P.'data/bbscache/postcate_config.php');
 		!$pcid && $pcid = $db->get_value("SELECT pcid FROM pw_postcate ORDER BY vieworder");
 		$postcate = $db->get_one("SELECT * FROM pw_postcate WHERE pcid=".S::sqlEscape($pcid));
 

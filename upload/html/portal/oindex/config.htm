@@ -1,98 +1,61 @@
+<pw id="社区达人@广场" />
+<list num="10" action="weibosort" cachetime="1800" ifpushonly="0" title="社区达人推荐" />
+<div class="daren_wrap">
+<ul id="darenPhotos">
+<loop>
+	<li><a href="{url}" class="daren_img"><img src="{image,48,48}" width="48" height="48" /></a><span class="fl"><a href="{url}">{title,12}</a>&nbsp;&nbsp;{tags,50}</span></li>	
+</loop>	
+</ul></div>
 
-<pw id="幻灯片@广场" />
-	<ul class="switch" id="PP1_A">
-	<list num="4" action="photo" cachetime="1800" ifpushonly="0" title="图片" />
-	<loop>
-		<li class="switchItem" style="display:">
-			<a href="{url}"><img src="{image,301,327}" width="301" height="327" /><h3>{title,50}</h3></a>
-		</li>
-	</loop>
-	</ul>
-	<div class="pwSlide-bg"></div>
-	<ul class="SwitchNav" id="PP1_B">
-<!--#for($i = 1; $i<=$key+1; $i++){#-->					
-		<li class="switchNavItem"><a href="#" onclick="return false;">{$i}</a></li>
-<!--#}#-->
-	</ul>
-	<script language="javascript" src="mode/area/js/ddsliderplayer.js"></script>
-	<script>ddSliderPlayers('PP1_A','PP1_B',4,'current');</script>
-	
-<pw id="推荐日志摘要@广场" />
-	<ul class="tops">
-	<list num="3" action="diary" cachetime="1800" ifpushonly="0" title="帖子列表" />
-	<loop>
-<!--#$classKey = $key+1;#-->
-		<li>
-			<h2 class="t{$classKey}"><a href="{url}" target="_blank">{title,40}</a></h2>
-			<p>{descrip,90}</p>
-		</li>
-	</loop>
-	</ul>
-				
-<pw id="推荐日志列表@广场" />
-	<ul class="list">
-	<list num="4" action="diary" cachetime="1800" ifpushonly="0" title="帖子列表" />
-	<loop>
-		<li><span class="fr gray">{author}</span><a href="{url}" target="_blank">{title,40}</a></li>
-	</loop>
-	</ul>
-				
+
 <pw id="热门帖子标题@广场" />
-			热门<em>帖子</em>
-
-
+	<em>热门帖子</em>
 
 <pw id="热门帖子@广场" />
-			<list num="10" action="subject" cachetime="1800" ifpushonly="0" title="帖子列表" />
-			<ul class="list1">
-			<loop>
-				<li><span class="fr gray">{author}</span><a href="{url}" target="_blank">{title,26}</a></li>
-			</loop>
-			</ul>
+<list num="10" action="subject" cachetime="1800" ifpushonly="0" title="帖子列表" />
+<ul class="list1">
+<loop>
+	<li><span class="fr cp"><a href="{authorurl}" target="_blank" class="gray">{author}</a></span><a href="{url}" target="_blank">{title,26}</a></li>
+</loop>
+</ul>
 			
-			
-			
-<pw id="最新帖子@广场" />
-			<list num="10" action="subject" cachetime="1800" ifpushonly="0" title="帖子列表" />
-			<ul class="list1">
-			<loop>
-				<li><span class="fr gray">{author}</span><a href="{url}" target="_blank">{title,26}</a></li>
-			</loop>
-			</ul>
 					
 <pw id="精彩照片@广场" />
 	
-	<list num="5" action="photo" cachetime="1800" ifpushonly="0" title="精彩照片" />
-	<loop>
-		<li><a href="{url}" target="_blank"><img src="{image,119,129}" width="119" height="129" /></a></li>
-	</loop>
-				
-<pw id="最新新鲜事标题@广场" />
-<h2><a href="" class="more">more</a>最新<em>新鲜事</em></h2>
-
-
-<pw id="社区达人标题@广场" />
-<h2>社区<em>达人</em></h2>
-
-<pw id="社区达人@广场" />
-<ul class="listimg cc">
-<list num="10" action="user" cachetime="1800" ifpushonly="0" title="帖子列表" />
+<list num="5" action="photo" cachetime="1" ifpushonly="0" title="精彩照片" />
 <loop>
-	<li><a href="{url}" target="_blank"><img src="{image,64,64}" width="64" height="64" /><p class="lh_18 cp">{title}</p></a></li>
+	<li><a href="{url}" target="_blank"><img src="{image,120,100}" width="119" height="129" /></a></li>
 </loop>
-</ul>
-					
-<pw id="热门群组标题@广场" />
-			<h2>热门<em>群组</em></h2>
+	
+<pw id="热门新鲜事标题@广场" />
+	<h2><em>热门新鲜事</em></h2>
 
-<pw id="热门群组@广场" />
-<list num="10" action="group" cachetime="1800" ifpushonly="0" title="帖子列表" />
+
+<pw id="今日热门话题标题@广场" />
+			<h2>今日热门<em>话题</em></h2>
+
+<pw id="今日热门话题@广场" />
+<list num="10" action="group" cachetime="1800" ifpushonly="0" title="今日热门话题" />
+<!--# $count = 0;#-->
 <loop>
-<div class="subject2 cc">
-	<a href="{url}" target="_blank"><img src="{image,71,71}" width="71" height="71" class="fl" /></a>
-	<h4><a href="{url}" target="_blank">{title,12}</a></h4>
-	<p>{descrip,40}</p>
-</div>
-</loop>				
+<!--#
+$tempClass = $count<3 ? 'class="top"' : '';
+$count++;
+#-->
+	<li $tempClass><em>$count</em><span> <a href="{url}" target="_blank">{title,12}</a></span></li>
+</loop>	
 
-				
+
+<pw id="今日人气用户标题@广场" />
+			<h2>今日人气<em>用户</em></h2>
+
+<pw id="今日人气用户@广场" />
+<list num="10" action="user" cachetime="1800" ifpushonly="0" title="今日人气用户" />
+<!--# $count = 0;#-->
+<loop>
+<!--#
+$tempClass = $count<3 ? 'class="top"' : '';
+$count++;
+#-->
+	<li $tempClass ><em>$count</em><span> <a href="{url}" target="_blank">{title,12}</a></span></li>
+</loop>

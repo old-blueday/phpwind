@@ -16,8 +16,8 @@ if (!$_POST['step']) {
 		if($db_history && !$config['db_history']){
 			adminmsg('你不能清空已经设置的历史时间');
 		}
-		if($config['db_history'] && ($setHistory = strtotime($config['db_history']))){
-			if( $db_history && $setHistory < strtotime($db_history)){
+		if($config['db_history'] && ($setHistory = PwStrtoTime($config['db_history']))){
+			if( $db_history && $setHistory < PwStrtoTime($db_history)){
 				adminmsg('你设置的历史时间不能小于当前历史时间');
 			}
 			@set_time_limit(0);

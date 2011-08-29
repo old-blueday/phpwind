@@ -1,7 +1,8 @@
 <?php
 !function_exists('adminmsg') && exit('Forbidden');
 
-include pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
+//* include pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
+pwCache::getData(D_P.'data/bbscache/forum_cache.php');
 
 $basename = "$admin_file?adminjob=attachstats";
 

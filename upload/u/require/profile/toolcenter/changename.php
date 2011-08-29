@@ -17,7 +17,8 @@ if (!$_POST['step']) {
 	else 
 		pwOutPut();
 } else {
-	include_once pwCache::getPath(D_P."data/bbscache/dbreg.php");
+	//* include_once pwCache::getPath(D_P."data/bbscache/dbreg.php");
+	extract(pwCache::getData(D_P."data/bbscache/dbreg.php", false));
 	if (isset($rg_namelen)) {
 		list($rg_regminname,$rg_regmaxname) = explode("\t",$rg_namelen);
 	} else {

@@ -118,6 +118,20 @@ class PW_Job {
 				""
 			);
 		}
+		//实名认证任务
+		if (S::inArray($job['job'],array('doAuthAlipay','doAuthMobile'))) {
+			global $db_authstate;
+			$userService = $this->_getUserService();
+			$userdb = $userService->get($userId, true, false, false);
+			if (!$db_authstate)  return array(false,'站点未开启实名认证','');
+			
+			if ($job['job'] == 'doAuthAlipay' && getstatus($userdb['userstatus'], PW_USERSTATUS_AUTHALIPAY)){
+				return array(false,'您已经绑定支付宝','');
+			}
+			if ($job['job'] == 'doAuthMobile' && getstatus($userdb['userstatus'], PW_USERSTATUS_AUTHMOBILE)){
+				return array(false,'您已经绑定手机号','');
+			}
+		}
 		//任务是否为周期性任务 用用户是否已经申请，下次开始的时间
 		$again = 0;
 		if (isset($job['period']) && $job['period'] != 0) {
@@ -154,7 +168,7 @@ class PW_Job {
 		$list = array();
 		foreach ($jobs as $key => $job) {
 			if ($job['isopen'] == 0)  continue;
-
+			if ((isset($job['isuserguide']) && $job['isuserguide'])) continue; //新用户引导增加
 			$job['icon'] = (isset($job['icon']) && $job['icon'] != "") ? "attachment/job/" . $job['icon'] : "images/job/" . strtolower($job['job']) . ".gif";
 			
 			$reward = '';
@@ -508,6 +522,7 @@ class PW_Job {
 			if ($isApplied && $job['period'] == 0) {
 				continue;
 			}
+			if ((isset($job['isuserguide']) && $job['isuserguide'])) continue; //新用户引导增加
 			if ((isset($job['endtime']) && $job['endtime'] != 0 && $job['endtime'] < $current)) {
 				continue;
 			}
@@ -542,6 +557,19 @@ class PW_Job {
 				if ($jober['status'] != 3) {
 					return false;
 				}
+			}
+		}
+		//实名认证
+		if (S::inArray($job['job'],array('doAuthAlipay','doAuthMobile'))) {
+			global $db_authstate;
+			if (!$db_authstate) return false;
+			$userService = $this->_getUserService();
+			$userdb = $userService->get($userId, true, false, false);
+			if ($job['job'] == 'doAuthAlipay' && getstatus($userdb['userstatus'], PW_USERSTATUS_AUTHALIPAY)){
+				return false;
+			}
+			if ($job['job'] == 'doAuthMobile' && getstatus($userdb['userstatus'], PW_USERSTATUS_AUTHMOBILE)){
+				return false;
 			}
 		}
 		return true;
@@ -754,14 +782,12 @@ class PW_Job {
 			);
 		}
 		if (procLock('job_save', $userid)) {
-			if ($userid != '5') {
-				$jober = $this->getJoberByJobId($userid, $jobid);
-				if (!$jober) {
-					return $this->_unlockUserJob($userid, array(
-						false,
-						"抱歉，你还没有申请这个任务"
-					));
-				}
+			$jober = $this->getJoberByJobId($userid, $jobid);
+			if (!$jober) {
+				return $this->_unlockUserJob($userid, array(
+					false,
+					"抱歉，你还没有申请这个任务"
+				));
 			}
 			/*检查是否是一次性任务或完成*/
 			if (!$job['period'] && $jober['total'] > 1) {
@@ -815,6 +841,7 @@ class PW_Job {
 					"抱歉，你已经领取过奖励，不能重复领取"
 				));
 			}
+
 			$data = array();
 			$data['status'] = 3; /*任务完成*/
 			$data['total'] = $jober['total'] + 1;
@@ -881,6 +908,8 @@ class PW_Job {
 				return "无";
 				break;
 		}
+		require_once R_P.'u/require/core.php';
+		updateMemberid($userid, false);
 	}
 	/*积分奖励*/
 	function jobRewardCredit($userid, $reward, $job) {
@@ -1216,6 +1245,7 @@ class PW_Job {
 		}
 		$result = array();
 		foreach($jobs as $job) {
+			if ((isset($job['isuserguide']) && $job['isuserguide'])) continue; //新用户引导增加
 			$result[] = array_merge($tmp[$job['id']], $job);
 		}
 		return $result;
@@ -1358,7 +1388,8 @@ class PW_Job {
 		);
 	}
 	function getCacheLevels() {
-		@include pwCache::getPath(R_P . "data/bbscache/level.php");
+		//* @include pwCache::getPath(R_P . "data/bbscache/level.php");
+		extract(pwCache::getData(R_P . "data/bbscache/level.php", false));
 		if ($ltitle) {
 			return array(
 				'',
@@ -1589,7 +1620,8 @@ class PW_Job {
 		}
 		static $jobLists = null;
 		if(!isset($jobLists)){
-			@include_once pwCache::getPath(S::escapePath($this->getCacheFileName()),true);
+			//* @include_once pwCache::getPath(S::escapePath($this->getCacheFileName()),true);
+			extract(pwCache::getData(S::escapePath($this->getCacheFileName()), false));
 			$jobLists = ($jobLists) ? $jobLists : $GLOBALS['jobLists'];
 		}
 		if ($jobLists) {
@@ -1606,7 +1638,8 @@ class PW_Job {
 		if (!is_file($fileName)) {
 			return false;
 		}
-		@include pwCache::getPath(S::escapePath($fileName));
+		//* @include pwCache::getPath(S::escapePath($fileName));
+		extract(pwCache::getData(S::escapePath($fileName), false));
 		if ($md_ifopen) {
 			return true;
 		}
@@ -1617,7 +1650,8 @@ class PW_Job {
 		if (!is_file($fileName)) {
 			return false;
 		}
-		@include pwCache::getPath(S::escapePath($fileName));
+		//* @include pwCache::getPath(S::escapePath($fileName));
+		extract(pwCache::getData(S::escapePath($fileName), false));
 		if ($rg_allowregister == 2) {
 			return true;
 		}
@@ -1689,7 +1723,7 @@ class PW_Job {
 		$html .= '		  </tr>';
 		$html .= '        <tr class="vt">';
 		$html .= '            <td>完成奖励:</td>';
-		$html .= '            <td class="s3">' . $list[reward] . '</td>';
+		$html .= '            <td class="s2">' . $list[reward] . '</td>';
 		$html .= '        </tr>';
 		$html .= '            <tr class="vt">';
 		$html .= '            <td>任务描述:</td>';

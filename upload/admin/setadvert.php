@@ -52,7 +52,8 @@ if (!$action) {
 		}
 	} elseif ($job == 'add') {
 		require_once(R_P.'require/credit.php');
-		include_once pwCache::getPath(D_P.'data/bbscache/forumcache.php');
+		//* include_once pwCache::getPath(D_P.'data/bbscache/forumcache.php');
+		pwCache::getData(D_P.'data/bbscache/forumcache.php');
 		$advert = array(
 			'stime'	=> get_date($timestamp,'Y-m-d'),
 			'etime'	=> get_date($timestamp + 31536000,'Y-m-d'),
@@ -71,7 +72,8 @@ if (!$action) {
 		include_once PrintEot('setadvert');exit;
 	} elseif ($job == 'edit') {
 		require_once(R_P.'require/credit.php');
-		include_once pwCache::getPath(D_P.'data/bbscache/forumcache.php');
+		//* include_once pwCache::getPath(D_P.'data/bbscache/forumcache.php');
+		pwCache::getData(D_P.'data/bbscache/forumcache.php');
 		S::gp(array('id'));
 		$advert = $db->get_one("SELECT * FROM pw_advert WHERE type=1 AND id=".S::sqlEscape($id));
 		!$advert && adminmsg('advert_id_error');
@@ -173,6 +175,8 @@ if (!$action) {
 				adminmsg('advert_txt_error');
 			}
 			$config['title'] = str_replace(array('&lt;','&gt;'),array('<','>'),$config['title']);
+			$config['size'] = (int) $config['size'];
+			!$config['size'] && $config['size'] = 12;
 		} elseif ($config['type'] == 'img' && (!$config['url'] || !$config['link'])) {
 			$basename = "javascript:history.go(-1);";
 			adminmsg('advert_img_error');
@@ -248,9 +252,9 @@ if (!$action) {
 			foreach ($config['imgupload'] as $key => $value) {
 				if ($value != 0) {
 					$img = new AdvUpload($key);
-					$returnImg = PwUpload::upload($img, 0);
+					$returnImg = PwUpload::upload($img);
 					if (!is_array($returnImg) || count($returnImg) == 0) continue;
-					$newConfigUrl[] = "attachment/".$returnImg[0]['fileuploadurl'];
+					$newConfigUrl[] = "$db_attachname/".$returnImg[0]['fileuploadurl'];
 					$newConfigLink[] = $config['link'][$key];
 				} else {
 					$newConfigUrl[] = $config['url'][$key];

@@ -39,10 +39,10 @@ class StopicUpload extends uploadBehavior{
 	 * 表单file名称
 	 * 
 	 * @param string $key
-	 * @return string
+	 * @return bool
 	 */
 	function allowType($key) {
-		return $key = "image_upload_".$this->inputId;
+		return $key == "image_upload_".$this->inputId;
 	}
 	
 	/**
@@ -72,7 +72,7 @@ class StopicUpload extends uploadBehavior{
 	 * @return bool
 	 */
 	function update($uploaddb) {
-		return true;
+		return $uploaddb;
 	}
 	
 	/**

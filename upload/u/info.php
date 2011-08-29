@@ -13,10 +13,13 @@ if (!$space =& $newSpace->getInfo()) {
 
 $indexRight = $newSpace->viewRight('index');
 $indexValue = $newSpace->getPrivacyByKey('index');
-include_once pwCache::getPath(D_P . 'data/bbscache/level.php');
+//* include_once pwCache::getPath(D_P . 'data/bbscache/level.php');
+pwCache::getData(D_P . 'data/bbscache/level.php');
 $newSpace->getDetailInfo();
 $newSpace->initSet();
 $isSpace = true;
+$customerService = L::loadClass('CustomerFieldService','user');
+$customerValues = $customerService->getCustomerValues($uid);
 require_once(uTemplate::printEot('user_info'));
 pwOutPut();
 

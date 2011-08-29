@@ -15,7 +15,8 @@ if ($adminitem == 'blacklist') {print <<<EOT
 <div class="admin_info mb10">
 	<h3 class="h1"><b>提示信息</b></h3>
 	<div class="legend">如果不希望数据显示到自动调用模块，请将id加入到黑名单中<br />
-	加入黑名单的数据，将不会进入缓存库。可以控制黑名单数据不在门户模块自动调用、统计排行、js调用等地方显示
+	加入黑名单的数据，将不会进入调用的缓存库。可以控制黑名单数据不在门户模块自动调用、统计排行、js调用等地方显示<br />
+    加入黑名单的会员和帖子，在删除后，不会立即更新。如要立即更新，请更新<a href="$jobUrl&adminitem=pwcache">PW缓存库</a>
 	</div>
 </div>
 <form action="$basename" method="post">

@@ -19,41 +19,58 @@ print <<<EOT
 					<input type="hidden" id="info_type" name="info_type" value="link" />
 <div id="info_link">
 						<table width="100%" class="setTable">
+$customFieldsString
 							<tr>
-								<th class="th">QQ</th>
-								<td class="td"><input class="input" type="text" size="25" maxlength="12" name="prooicq" value="$userdb[oicq]" /></td>
+								<th class="th">手机号</th>
+								<td class="td">
+<!--
+EOT;
+if (!$db_authstate) {print <<<EOT
+-->
+									<input class="input input_wa" type="text" maxlength="16" name="proauthmobile" value="$userdb[authmobile]" />
+<!--
+EOT;
+} elseif ($isAuthMobile) {print <<<EOT
+-->
+									<span id="td_span_mobile" class="mr20">$authmobile</span><img src="u/images/attest/mobile.gif" align="absmiddle" class="mr5"/>已绑定手机 <a id="a_edit_mobile" href="profile.php?action=auth&check_step=mobile">[修改]</a>
+<!--
+EOT;
+} else {print <<<EOT
+-->
+									<input class="input input_wa" type="text" maxlength="16" name="proauthmobile" id="td_input_mobile" value="$userdb[authmobile]" />
+									<a href="javascript:void(0);" onclick="checkMobile();return false;" class="mr10">[绑定]</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+								</td>
 							</tr>
 							<tr>
-								<th class="th">阿里旺旺</th>
-								<td class="td"><input class="input" type="text" size="25" maxlength="30" name="proaliww" value="$userdb[aliww]" /></td>
-							</tr>
-							<tr>
-								<th class="th">Yahoo</th>
-								<td class="td"><input class="input" type="text" size="25" name="proyahoo" value="$userdb[yahoo]" /></td>
-							</tr>
-							<tr>
-								<th class="th">Msn</th>
-								<td class="td"><input class="input" type="text" size="25" name="promsn" value="$userdb[msn]" /></td>
+									<th class="th">
+											&nbsp;
+									</th>
+									<td class="td" style="padding:10px 13px;">
+										<span class="btn"><span><button type="submit">保存资料</button></span></span>
+									</td>
 							</tr>
 						</table>
-						<div class="tac" style=" padding:1em">
-							<span class="btn"><span><button type="submit">保存资料</button></span></span>
-						</div>
-					</div>
+					</div></form>
 <div id="userbinding-node" style="display:none">
-</form>
-</div></td></tr></table>
-            </div>
-        </div>
+</div></div></td></tr></table>
+		</div>
+</div>
 <script type="text/javascript" src = "js/info.js"></script>
 <script language="JavaScript">
 var display = '$display';
-~function() {
-	var info_type = FetchCookie('pro_tab');
-	DelCookie('pro_tab');
-	if (!info_type) info_type = '$info_type';
-	selectTab(info_type);
-}();
+function checkMobile() {
+	var url = 'profile.php?action=auth&check_step=mobile';
+	var mobile = $('td_input_mobile').value;
+
+	if (mobile != '' && typeof (mobile) != 'undefined') {
+		url += '&check_mobile='+mobile;
+	}
+	window.location.href = url;
+}
 </script>
 <!--
 EOT;

@@ -21,8 +21,11 @@ $lang_model = array(
 	'diary' => array('日志', '篇', 'diary'),
 	'photos' => array('相册照片', '张', 'photos'),
 	'weibo' => array('新鲜事', '条', 'write'),
-	'article' => array('帖子' , '篇', 'article'),
-	'colony' => array('群组', '个', 'colony')
+	'article' => array('发表的帖子' , '篇', 'article'),
+	'colony' => array('群组', '个', 'colony'),
+	'tags' => array('个人标签', '个', 'tags'),
+	'reply' => array('回复的帖子', '篇', 'article'),
+//	'favorites' => array('收藏的帖子', '篇', 'article')
 );
 
 if (empty($_POST['step'])) {
@@ -31,16 +34,20 @@ if (empty($_POST['step'])) {
 
 	$modeSel = $tab ? $tab : substr($_COOKIE['spacemodeset'], 4);
 	!in_array($modeSel, array('basic', 'skin', 'model')) && $modeSel = 'basic';
+	S::int($space['spacetype']) < 0 && $space['spacetype'] = 3;
+	!$space['spacestyle'] && $space['spacestyle'] = 2;
 	!$space['spacetype'] && $space['spacetype'] = 0;
-
-	$sel_basic = $sel_skin = $sel_model = $ifcheck_0 = $ifcheck_1 = '';
+	$sel_basic = $sel_skin = $sel_model = $ifcheck_0 = $ifcheck_1 = $ifcheck_2 = $ifcheck_3 = $ifcheckstyle_2 = $ifcheckstyle_3 = '';
 	$style_basic = $style_skin = $style_model = 'none';
 	${'sel_' . $modeSel} = ' class="current"';
 	${'style_' . $modeSel} = '';
 	${'ifcheck_' . $space['spacetype']} = ' checked';
+	${'spacethemes_' . $space['spacetype']} = 'class="current"';
+	${'ifcheckstyle_' . $space['spacestyle']} = ' checked';
+	${'spacestyle_' . $space['spacestyle']} = 'class="current"';
 	$maxuploadsize = ini_get('upload_max_filesize');
 	//$privacy = $newSpace->getPrivacy();
-	!$o_uskin && $o_uskin = array('default' => 'default');
+	!$o_uskin && $o_uskin = array('default85' => 'default85');
 	$space['namelength'] = strlen($space['name']);
 	$space['desclength'] = strlen($space['descript']);
 	require_once(uTemplate::printEot('space_set'));
@@ -49,24 +56,106 @@ if (empty($_POST['step'])) {
 } else {
 
 	S::gp(array('name', 'spaceskin', 'domain','descript'));
-	S::gp(array('spacetype','ifopen','privacy','shownum'), 'GP', 2);
+	S::gp(array('spacestyle','spacetype','ifopen','privacy','shownum'), 'GP', 2);
 	if (strlen($name)>80) {
 		Showmsg('space_name_toolong');
 	}
 	if (strlen($descript)>255) {
 		Showmsg('space_descript_toolong');
 	}
-	
+
 	$modelset = array();
-	foreach ($spaceModel as $key => $value) {
-		(!$shownum[$value] || $shownum[$value] < 1) && $shownum[$value] = 1;
-		if ($shownum[$value] > 50) {
-			Showmsg($lang_model[$value][0] . '模块展示条目请不要超过50!');
+	$layout = "";
+	if(intval($space['spacetype']) == $spacetype){
+		foreach ($spaceModel as $key => $value) {
+			(!$shownum[$value] || $shownum[$value] < 1) && $shownum[$value] = 1;
+			if ($shownum[$value] > 50) {
+				Showmsg($lang_model[$value][0] . '模块展示条目请不要超过50!');
+			}
+			$modelset[$value] = array(
+				'ifopen'	=> intval($ifopen[$value]),
+				'num'		=> $shownum[$value]
+			);
 		}
-		$modelset[$value] = array(
-			'ifopen'	=> intval($ifopen[$value]),
-			'num'		=> $shownum[$value]
-		);
+	}else{
+		switch($spacetype){
+			case '0' : #'all'
+				$modelset['messageboard'] = array('ifopen' => 1, 'num' => 5);
+				$modelset['tags'] = array('ifopen' => 1, 'num' => 10, 'expire' => 7200);
+				$modelset['weibo'] = array('ifopen' => 1, 'num' => 5);
+				$modelset['diary'] = array('ifopen' => 1, 'num' => 10);
+				$modelset['photos'] = array('ifopen' => 1, 'num' => 8);
+				$modelset['friend'] = array('ifopen' => 1, 'num' => 5);
+				$modelset['visitor'] = array('ifopen' => 1, 'num' => 5);
+				$modelset['article'] = array('ifopen' => 1, 'num' => 5);
+				$modelset['reply'] = array('ifopen' => 1, 'num' => 5);
+			//	$modelset['favorites'] = array('ifopen' => 0, 'num' => 5);
+				$modelset['visit']	= array('ifopen' => 0, 'num' => 5);
+				$modelset['colony']	= array('ifopen' => 0, 'num' => 5);
+				$layout = array(
+						0 => array('messageboard','tags'),
+						1 => array('weibo','diary','photos'),
+						2 => array('friend','visitor')
+				);
+				break;
+			case '1' : #'blog'
+				$modelset['messageboard'] = array('ifopen' => 1, 'num' => 5);
+				$modelset['tags'] = array('ifopen' => 1, 'num' => 10, 'expire' => 7200);
+				$modelset['weibo'] = array('ifopen' => 1, 'num' => 5);
+				$modelset['diary'] = array('ifopen' => 1, 'num' => 10);
+				$modelset['friend'] = array('ifopen' => 1, 'num' => 5);
+				$modelset['visitor'] = array('ifopen' => 1, 'num' => 5);
+				$modelset['article'] = array('ifopen' => 0, 'num' => 5);
+				$modelset['reply'] = array('ifopen' => 0, 'num' => 5);
+			//	$modelset['favorites'] = array('ifopen' => 0, 'num' => 5);
+				$modelset['photos'] = array('ifopen' => 1, 'num' => 8);
+				$modelset['visit']	= array('ifopen' => 0, 'num' => 5);
+				$modelset['colony']	= array('ifopen' => 0, 'num' => 5);
+				$layout = array(
+						0 => array('messageboard','tags'),
+						1 => array('weibo','diary'),
+						2 => array('friend','visitor')
+				);
+				break;
+			case '2' : #'photo'
+				$modelset['tags'] = array('ifopen' => 1, 'num' => 10, 'expire' => 7200);
+				$modelset['photos'] = array('ifopen' => 1, 'num' => 32);
+				$modelset['messageboard'] = array('ifopen' => 1, 'num' => 5);
+				$modelset['friend'] = array('ifopen' => 1, 'num' => 5);
+				$modelset['visitor'] = array('ifopen' => 1, 'num' => 5);
+				$modelset['article'] = array('ifopen' => 0, 'num' => 5);
+				$modelset['reply'] = array('ifopen' => 0, 'num' => 5);
+			//	$modelset['favorites'] = array('ifopen' => 0, 'num' => 5);
+				$modelset['weibo'] = array('ifopen' => 0, 'num' => 5);
+				$modelset['diary'] = array('ifopen' => 0, 'num' => 10);
+				$modelset['visit']	= array('ifopen' => 0, 'num' => 5);
+				$modelset['colony']	= array('ifopen' => 0, 'num' => 5);
+				$layout = array(
+						0 => array('tags'),
+						1 => array('photos','messageboard'),
+						2 => array('friend','visitor')
+				);
+				break;
+			default : #'bbs';
+				$modelset['tags'] = array('ifopen' => 1, 'num' => 10, 'expire' => 7200);
+				$modelset['article'] = array('ifopen' => 1, 'num' => 5);
+				$modelset['reply'] = array('ifopen' => 1, 'num' => 5);
+			//	$modelset['favorites'] = array('ifopen' => 1, 'num' => 5);
+				$modelset['messageboard'] = array('ifopen' => 1, 'num' => 5);
+				$modelset['friend'] = array('ifopen' => 1, 'num' => 5);
+				$modelset['visitor'] = array('ifopen' => 1, 'num' => 5);
+				$modelset['photos'] = array('ifopen' => 0, 'num' => 8);
+				$modelset['weibo'] = array('ifopen' => 0, 'num' => 5);
+				$modelset['diary'] = array('ifopen' => 0, 'num' => 10);
+				$modelset['visit']	= array('ifopen' => 0, 'num' => 5);
+				$modelset['colony']	= array('ifopen' => 0, 'num' => 5);
+				$layout = array(
+						0 => array('tags'),
+						1 => array('article','reply','messageboard'),
+						2 => array('friend','visitor')
+				);
+				break;
+		}
 	}
 	/*
 	if ($privacy && is_array($privacy)) {
@@ -92,10 +181,12 @@ if (empty($_POST['step'])) {
 		'name'		=> $name,
 		'descript'  => $descript,
 		'domain'	=> $domain,
+		'spacestyle'=> $spacestyle,
 		'spacetype'	=> $spacetype,
 		'skin'		=> $spaceskin,
 		'modelset'	=> serialize($modelset)
 	);
+	$layout && $pwSQL['layout'] = serialize($layout);
 	set_time_limit(0);
 	require_once(R_P . 'u/lib/spacebannerupload.class.php');
 	$upload = new spaceBannerUpload($winduid);
@@ -103,7 +194,6 @@ if (empty($_POST['step'])) {
 	if ($img = $upload->getImgUrl()) {
 		$pwSQL['banner'] = $img;
 	}
-
 	$newSpace->updateInfo($pwSQL);
 
 	refreshto('u.php?a=set', 'operate_success');

@@ -42,8 +42,8 @@ EOT;
 }else{print <<<EOT
 -->
 			<div class="boxB">
-				<div class="p15">
-					<h5 class="h5 mb10">
+				<div class="p15 per_infor">
+					<h5 class="h5">
 <!--
 EOT;
 if ($winduid == $space['uid']) {print <<<EOT
@@ -55,81 +55,14 @@ EOT;
 -->
 						<strong>基本信息</strong>
 					</h5>
+					<div class="p10">
 					<table class="lh_24 mb15 vt" style="table-layout:fixed;" width="100%">
 						<tr>
-							<td width="100">性别</td>
-							<td>
-<!--
-EOT;
-if ($space['gender'] == 1) {print <<<EOT
--->
-						男
-<!--
-EOT;
-} elseif ($space['gender'] == 2) {print <<<EOT
--->
-						女
-<!--
-EOT;
-} else {print <<<EOT
--->
-						保密
-<!--
-EOT;
-}print <<<EOT
--->
-							</td>
+							<th>UID</th>
+							<td>$space[uid]</td>
 						</tr>
 						<tr>
-							<td>生日</td>
-							<td>$space[bday]</td>
-						</tr>
-						<tr>
-							<td>来自</td>
-							<td>$space[location]</td>
-						</tr>
-						<tr>
-							<td>个人主页</td>
-							<td>$space[site]</td>
-						</tr>
-						<tr>
-							<td>个性签名</td>
-							<td>$space[honor]</td>
-						</tr>
-						<tr>
-							<td>自我介绍</td>
-							<td>$space[introduce]</td>
-						</tr>
-						<tr>
-							<td>帖子签名</td>
-							<td><div style="width:100%;overflow:hidden;">{$space[signature]}</div></td>
-						</tr>
-					</table>
-
-					<h5 class="h5 mb10"><strong>社区信息</strong></h5>
-					<table class="lh_24 mb15 vt" style="table-layout:fixed;" width="100%">
-						<tr>
-							<td width="100">精华帖子</td>
-							<td>$space[digests]</td>
-						</tr>
-						<tr>
-							<td width="100">平均日发帖</td>
-							<td>$space[averagepost] (今日：$space[todaypost])</td>
-						</tr>
-						<tr>
-							<td width="100">在线时间</td>
-							<td>$space[onlinetime_s] 小时</td>
-						</tr>
-						<tr>
-							<td width="100">注册时间</td>
-							<td>$space[regdate]</td>
-						</tr>
-						<tr>
-							<td width="100">最后登录</td>
-							<td>$space[lastvisit_s]</td>
-						</tr>
-						<tr>
-							<td width="100">会员头衔</td>
+							<th>会员头衔</th>
 							<td>{$ltitle[$space['memberid']]}</td>
 						</tr>
 <!--
@@ -137,7 +70,7 @@ EOT;
 if ($space['groupid'] != -1) {print <<<EOT
 -->
 						<tr>
-							<td width="100">系统头衔</td>
+							<th>系统头衔</th>
 							<td>{$ltitle[$space['groupid']]}</td>
 						</tr>
 <!--
@@ -145,59 +78,159 @@ EOT;
 }print <<<EOT
 -->
 						<tr>
-							<td width="100">UID</td>
-							<td>$space[uid]</td>
+							<th>在线时间</th>
+							<td>$space[onlinetime_s] 小时</td>
 						</tr>
-					</table>
-
-					<h5 class="h5 mb10"><strong>联系方式</strong></h5>
-					<table class="lh_24 mb15 vt" style="table-layout:fixed;" width="100%">
-						<tr>
-							<td width="100">QQ</td>
-							<td>$space[oicq]</td>
-						</tr>
-						<tr>
-							<td>阿里旺旺</td>
-							<td>$space[aliww]</td>
-						</tr>
-						<tr>
-							<td>yahoo</td>
-							<td>$space[yahoo]</td>
-						</tr>
-						<tr>
-							<td>msn</td>
-							<td>$space[msn]</td>
-						</tr>
-					</table>
 <!--
 EOT;
-if ($customfield) {print <<<EOT
+if(S::isArray($customerValues['basic'])){
+	foreach($customerValues['basic'] as $k=>$v){
+		if ($k == '生日' && $v == '0000-00-00') $v = '';
+		print <<<EOT
 -->
-					<h5 class="h5 mb10"><strong>扩展资料</strong></h5>
-					<table class="lh_24 mb15 vt" style="table-layout:fixed;" width="100%">
+						<tr>
+							<th>$k</th>
+							<td>$v</td>
+						</tr>
 <!--
 EOT;
-foreach($customfield as $value){
-$field = 'field_' . $value['id'];
-if ($value['type'] == '3') {
-	$options = getOptions($value['options']);
-	$fieldvalue = $options[$space[$field]];
-} else {
-	$fieldvalue = $space[$field];
+	}
+}print <<<EOT
+-->
+						<tr>
+							<th>个人主页</th>
+							<td>$space[site]</td>
+						</tr>
+<!--
+EOT;
+if ($space['generalRight']['allowhonor']) {
+print <<<EOT
+-->
+						<tr>
+							<th>个性签名</th>
+							<td>$space[honor]</td>
+						</tr>
+<!--
+EOT;
 }
 print <<<EOT
 -->
 						<tr>
-							<td width="100">$value[title]</td>
-							<td>$fieldvalue</td>
+							<th>自我介绍</th>
+							<td>$space[introduce]</td>
+						</tr>
+						<tr>
+							<th>注册时间</th>
+							<td>$space[regdate]</td>
+						</tr>
+						<tr>
+							<th>最后登录</th>
+							<td>$space[lastvisit_s]</td>
+						</tr>
+					</table>
+					</div>
+					<h5 class="h5"><strong>社区信息</strong></h5>
+					<div class="p10">
+					<table class="lh_24 mb15 vt" style="table-layout:fixed;" width="100%">
+						<tr>
+							<th>精华帖子</th>
+							<td>$space[digests]</td>
+						</tr>
+						<tr>
+							<th>帖子</th>
+							<td>$space[postnum]</td>
+						</tr>
+						<tr>
+							<th>平均日发帖</th>
+							<td>$space[averagepost] (今日：$space[todaypost])</td>
+						</tr>
+						<tr>
+							<th>帖子签名</th>
+							<td><div style="width:100%;overflow:hidden;">{$space[signature]}</div></td>
+						</tr>
+					</table>
+					</div>
+					<h5 class="h5"><strong>联系方式</strong></h5>
+					<div class="p10">
+					<table class="lh_24 mb15 vt" style="table-layout:fixed;" width="100%">
+<!--
+EOT;
+if(S::isArray($customerValues['contact'])){
+	foreach($customerValues['contact'] as $k=>$v){
+		print <<<EOT
+-->
+						<tr>
+							<th>$k</th>
+							<td>$v</td>
 						</tr>
 <!--
 EOT;
-}}print <<<EOT
+	}
+}
+if ($winduid == $space['uid'] || getstatus($space['userstatus'], PW_USERSTATUS_PUBLICMAIL)) {
+print <<<EOT
 -->
-					</table>
+						<tr>
+							<th>电子邮箱</th>
+							<td>$space[email]</td>
+						</tr>
 <!--
 EOT;
+}
+print <<<EOT
+-->
+					</table>
+					</div>
+<!--
+EOT;
+if ($customerValues['education']) {print <<<EOT
+-->
+					<h5 class="h5"><strong>工作教育</strong></h5>
+					<div class="p10">
+					<table class="lh_24 mb15 vt" style="table-layout:fixed;" width="100%">
+<!--
+EOT;
+	foreach($customerValues['education'] as $k=>$v){
+		print <<<EOT
+-->
+						<tr>
+							<th>$k</th>
+							<td>$v</td>
+						</tr>
+<!--
+EOT;
+	}
+print <<<EOT
+-->
+					</table>
+					</div>
+<!--
+EOT;
+}
+if ($customerValues['other']) {print <<<EOT
+-->
+					<h5 class="h5"><strong>其它资料</strong></h5>
+					<div class="p10">
+					<table class="lh_24 mb15 vt" style="table-layout:fixed;" width="100%">
+<!--
+EOT;
+	foreach($customerValues['other'] as $k=>$v){
+		print <<<EOT
+-->
+						<tr>
+							<th>$k</th>
+							<td>$v</td>
+						</tr>
+<!--
+EOT;
+	}
+print <<<EOT
+-->
+					</table>
+					</div>
+<!--
+EOT;
+}
 }print <<<EOT
 -->
 				</div>

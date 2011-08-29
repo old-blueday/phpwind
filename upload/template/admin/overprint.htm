@@ -102,13 +102,13 @@ if($icons){
 print <<<EOT
 -->
 		<input type="hidden" name="current" vaule="" id="current"/>
-		<ul class="list_A list_80 cc">
+		<ul class="cc">
 <!--
 EOT;
 foreach($icons as $k=>$icon){
 print <<<EOT
 -->
-			<li style="height:80px; padding:3px 15px; text-align:center;"><a href="javascript:;" id="popusericon_$k"><img src="$iconPath/$icon" id="popiconpath_$k" path="$icon" /></a></li>
+			<li style="height:80px;float:left;width:80px; padding:3px 15px; text-align:center;"><a href="javascript:;" id="popusericon_$k"><img src="$iconPath/$icon" id="popiconpath_$k" path="$icon" /></a></li>
 <!--
 EOT;
 }

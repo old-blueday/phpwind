@@ -145,7 +145,7 @@ class Datanalyse {
 	 */
 	function setDeleteTimePoint() {
 		$c = "timepoint=" . $this->nowtimestamp;
-		pwCache::setData(D_P . "data/bbscache/datanlyse.txt",$c);
+		pwCache::writeover(D_P . "data/bbscache/datanlyse.txt",$c);
 	}
 
 	/**

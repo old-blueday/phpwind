@@ -76,7 +76,16 @@ if(!$action){
 } elseif($action=='addtag'){
 	if($_POST['step']){
 		S::gp(array('tags'),'GP',1);
-		$tagdb = explode(',',$tags);
+		
+		function checkTags($tags) {
+			$tmpTags = explode(',',$tags);
+			foreach ($tmpTags as $value) {
+				$tagLength = strlen(trim($value));
+				($tagLength > 15 || $tagLength < 3) && adminmsg('标签的长度请控制在 3-15 个字节之间', $basename);
+			}
+			return $tmpTags;
+		}
+		$tagdb = checkTags($tags);
 		foreach($tagdb as $tag){
 			if($tag = trim($tag)){
 				$rt = $db->get_one("SELECT tagid FROM pw_tags WHERE tagname=".S::sqlEscape($tag));
@@ -137,6 +146,8 @@ function updatetags() {
 	while ($rs = $db->fetch_array($query)) {
 		$tagdb[$rs['tagname']] = $rs['num'];
 	}
+	/** pwCache::writeover(D_P."data/bbscache/tagdb.php","<?php\r\n\$tagdb=".pw_var_export($tagdb).";\r\n?>"); **/
 	pwCache::setData(D_P."data/bbscache/tagdb.php","<?php\r\n\$tagdb=".pw_var_export($tagdb).";\r\n?>");
+	touch(D_P."data/bbscache/tagdb.php");
 }
 ?>

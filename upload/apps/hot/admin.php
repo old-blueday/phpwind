@@ -1,6 +1,7 @@
 <?php
 !function_exists('adminmsg') && exit('Forbidden');
-@include_once pwCache::getPath(D_P . 'data/bbscache/o_config.php');
+//* @include_once pwCache::getPath(D_P . 'data/bbscache/o_config.php');
+pwCache::getData(D_P . 'data/bbscache/o_config.php');
 @include_once (R_P . 'require/credit.php');
 @include_once (A_P . 'lib/utility.class.php');
 @include_once (A_P . 'lang/lang_o_hot.php');

@@ -55,7 +55,7 @@ EOT;
 EOT;
 foreach ($magdb as $value) {print <<<EOT
 -->
-			<li><a href="{$db_userurl}$value[uid]" target="_blank" class="i" title="$value[username]"><img src="{$udb[$value[uid]][faceurl]}" height="44" width="44" /></a><p class="n"><a href="{$db_userurl}$value[uid]" target="_blank">$value[username]</a></p>
+			<li><a href="{$db_userurl}$value[uid]" target="_blank" class="i" title="$value[username]"><img src="{$udb[$value[uid]][faceurl]}" height="44" width="44" /></a><p class="n"><a href="{$db_userurl}$value[uid]" target="_blank" title="$value[username]">$value[username]</a></p>
 <!--
 EOT;
 if ($value['username'] == $colony['admin']) {print <<<EOT

@@ -200,7 +200,7 @@ foreach($v['data'] as $k1 => $v1){
 $v1[image] = getphotourl($v1[image],$v1['ifthumb']);
 print <<<EOT
 -->
-		<li><a href="$v1[url]" target="_blank" class="aimg"><span><img src="$v1[image]" /></span></a>
+		<li><a href="$v1[url]" target="_blank" class="aimg"><span><img src="$v1[image]" onload="resizeImg(this);"/></span></a>
 		<p><span class="mr10">$v[unit]数：$v1[value]</span>
 <!--
 EOT;

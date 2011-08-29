@@ -48,7 +48,7 @@ if(!$action){print <<<EOT
 		</td><td class="td2"><div class="help_a">开启后，才可以创建新群组</div></td>
     </tr>
     <tr class="tr1 vt">
-      <td class="td1">创建群组认证码</td>
+      <td class="td1">创建群组验证码</td>
       <td class="td2">
       <div class="list_A list_80">
              <ul class="cc">
@@ -56,10 +56,10 @@ if(!$action){print <<<EOT
                 <li><input type="radio" name="config[groups_gdcheck]" value="0" $groups_gdcheck_N />关闭</li>
              </ul>
          </div>
-        </td><td class="td2"><div class="help_a">开启后，创建群组时需要填写认证码</div></td>
+        </td><td class="td2"><div class="help_a">开启后，创建群组时需要填写验证码</div></td>
     </tr>
     <tr class="tr1 vt">
-      <td class="td1">发表新帖认证码</td>
+      <td class="td1">发表新帖验证码</td>
       <td class="td2">
       <div class="list_A list_80">
              <ul class="cc">
@@ -67,7 +67,7 @@ if(!$action){print <<<EOT
                 <li><input type="radio" name="config[groups_p_gdcheck]" value="0" $groups_p_gdcheck_N />关闭</li>
              </ul>
          </div>
-        </td><td class="td2"><div class="help_a">开启后，发表新帖时需要填写认证码</div></td>
+        </td><td class="td2"><div class="help_a">开启后，发表新帖时需要填写验证码</div></td>
     </tr>
     <tr class="tr1 vt">
       <td class="td1">创建群组验证问题</td>
@@ -107,7 +107,7 @@ if(!$action){print <<<EOT
       <td class="td1">群组标志图片最大尺寸</td>
       <td class="td2"><input name="config[imgsize]" class="input input_wa" value="$o_imgsize">
         </td>
-		<td class="td2"><div class="help_a">单位KB，0 或 留空 则按<a href="?adminjob=settings&admintype=att" onClick="parent.PW.Dialog({id:'basic',url:'?adminjob=settings&admintype=att',name:'附件设置'});return false;">附件设置</a>配置</div></td>
+		<td class="td2"><div class="help_a">单位KB，0或留空 则按<a href="?adminjob=settings&admintype=att" onClick="parent.PW.Dialog({id:'basic',url:'?adminjob=settings&admintype=att',name:'附件设置'});return false;">附件设置</a>配置。<font color="red">&nbsp;注意：系统限制上传附件最大尺寸为{$maxuploadsize}</font></div></td>
     </tr>
     <!-- <tr class="tr1 vt"><td>群组标志图片宽高范围[像素]</td>
 <td><input name="config[imgwidth]" size="8" class="input" value="$o_imgwidth"> 宽
@@ -422,7 +422,7 @@ print <<<EOT
 	  <td class="td2"><input type="checkbox" name="ifshow[$value[id]]" value="1" {$ifcheck}/> <input type="hidden" name="selid[]" value="$value[id]" /></td>
 	  <td class="td2"><input type="checkbox" name="ifshowpic[$value[id]]" value="1" $checked3></td>
       <td class="td2"><a href="$basename&action=editcolony&cyid=$value[id]" class="mr20">[编辑]</a>
-      <a href="$basename&action=delcolony&cyid=$value[id]" onclick="return checkdel();" title="删除">[删除]</a>
+      <a href="$basename&action=delcolony&cyid=$value[id]" title="删除">[删除]</a>
       <input name="ids[$value[id]]" type="hidden" value="$value[id]"></td>
     </tr>
 <!--
@@ -439,12 +439,7 @@ EOT;
 <script language="JavaScript" src="js/pw_ajax.js"></script>
 <script language="JavaScript" src="js/global.js"></script>
 <script language="JavaScript">
-function checkdel() {
-	if (confirm('您确定要删除这个群组吗？')) {
-		return true;
-	}
-	return false;
-}
+
 function setSecondstyle(id) {
 	var jsStyle = JSONParse('$jsStyle');
 	var jsStyleRelation = JSONParse('$jsStyleRelation');
@@ -498,7 +493,7 @@ EOT;
 	<li><a href="$admin_file?adminjob=apps&admintype=groups_manage" onclick="openNewUrl('groups_manage','群组管理',this.href);return false;">内容管理</a></li>
 </ul>
 </div>
-<link rel="stylesheet" type="text/css" href="images/g/g_style.css" />
+<link rel="stylesheet" type="text/css" href="images/post/minieitor/minieitor.css" />
 <script type="text/javascript" LANGUAGE="JavaScript" src="js/core/core.js"></script>
 <script type="text/javascript" LANGUAGE="JavaScript" src="js/global.js"></script>
 <script type="text/javascript" LANGUAGE="JavaScript" src="js/mini_editor.js"></script>
@@ -589,7 +584,7 @@ EOT;
 </script>
     <tr class="tr1 vt">
       <td class="td1" >加入权限</td>
-      <td class="td2" ><select name="ifcheck">
+      <td class="td2" ><select name="ifcheck" class="select_wa">
           <option value="2" $ifcheck_2>允许任何人加入该群组</option>
           <option value="1" $ifcheck_1>需要管理员审核才能加入该群组</option>
           <option value="0" $ifcheck_0>不允许任何人加入该群组</option>
@@ -600,31 +595,38 @@ EOT;
     <tr class="tr1 vt">
       <td class="td1" >群组简介</td>
       <td class="td2" >
-		<div class="mb5 g_operation " style="overflow:hidden;">
-			<h5>
-				<span class="g_link cp" title="插入url链接" onClick="editor.createLinkBox(this.id);" id="createlinkid" unselectable="on">插入url链接</span>
-				<span class="g_B cp" title="加粗" onClick="editor.bold();" id="createb2" unselectable="on">加粗</span>
-				<span class="g_color cp" title="加颜色" onClick="editor.createcolor(this.id);" id="createcolorid" unselectable="on">加颜色</span>
-			</h5>
-			<p><textarea maxlength="200" id="mini_descrip" name="descrip" class="p5">{$colony[descrip]}</textarea>
-			<input type="hidden" id="board_uid" value="$u"></p>
-			<script type="text/javascript">var editor = new MiniEditor('mini_descrip');</script>
-		</div>
+    <div class="minieitor_pw cc">
+        <ul class="miniUl">
+            <li><a href="javascript:" title="插入url链接" class="milink_pw" onClick="editor.createLinkBox(this.id);" id="createlinkid" unselectable="on">插入url链接</a></li>
+            <li><a href="javascript:" title="加粗" class="mistrong_pw" onClick="editor.bold();" id="createb2" unselectable="on">加粗</a></li>
+						<li><a href="javascript:" title="加颜色" class="micolor_pw" onClick="editor.createcolor(this.id);" id="createcolorid" unselectable="on">加颜色</a></li>
+        </ul>
+        <div class="minitextarea">
+            <textarea maxlength="200"  id="mini_descrip" name="descrip">{$colony[descrip]}</textarea><input type="hidden" id="board_uid" value="$u">
+        <div class="c"></div>
+        </div>
+				<script type="text/javascript">var editor = new MiniEditor('mini_descrip');</script>
+        <div class="c"></div>
+    </div>
         <p id="descrip_warn">限 255 字节</p> </td>
 				<td class="td2"></td>
     </tr>
 		<tr class="tr1 vt">
 		<td class="td1" >群组公告</td>
 		<td class="td2" >
-			<div class="mb5 g_operation">
-				<h5>
-					<span class="g_link cp" title="插入url链接" onClick="editor2.createLinkBox(this.id);" id="createlinkid2" unselectable="on">插入url链接</span>
-					<span class="g_B cp" title="加粗" onClick="editor2.bold();" unselectable="on">加粗</span>
-					<span class="g_color cp" title="加颜色" onClick="editor2.createcolor(this.id);" unselectable="on" id="createcolorid2">加颜色</span>
-				</h5>
-				<p><textarea maxlength="200" id="editor_annouce" name="annouce">{$colony[annouce]}</textarea><input type="hidden" id="board_uid" value="$u"></p>
+		<div class="minieitor_pw cc">
+        <ul class="miniUl">
+            <li><a href="javascript:" title="插入url链接" class="milink_pw" onClick="editor2.createLinkBox(this.id);" id="createlinkid2" unselectable="on">插入url链接</a></li>
+            <li><a href="javascript:" title="加粗" class="mistrong_pw" onClick="editor2.bold();" unselectable="on">加粗</a></li>
+						<li><a href="javascript:" title="加颜色" class="micolor_pw" onClick="editor2.createcolor(this.id);" unselectable="on" id="createcolorid2">加颜色</a></li>
+        </ul>
+        <div class="minitextarea">
+            <textarea maxlength="200" id="editor_annouce" name="annouce">{$colony[annouce]}</textarea><input type="hidden" id="board_uid" value="$u">
+        <div class="c"></div>
+        </div>
 				<script type="text/javascript">var editor2 = new MiniEditor('editor_annouce');</script>
-			</div>
+        <div class="c"></div>
+    </div>
 			<p id="annouce_warn">限 50000 字节</p>
 		</td>
 		<td class="td2"></td>
@@ -1666,18 +1668,10 @@ EOT;
   <div class="cc">$pages</div>
   <div class="mb10 tac">
 	<span class="bt"><span><button type="button" onclick="CheckAll(document.FORM1)">全 选</button></span></span>
-    <span class="btn"><span><button type="submit" onclick="return Checkdel();">删除</button></span></span>
+    <span class="btn"><span><button type="submit" >删除</button></span></span>
    </div>
 </form>
-<script language="JavaScript">
-function Checkdel(){
-	if (!confirm("您确定要删除选中项吗?")) {
-		return false;
-	}else{
-		return true;
-	}
-}
-</script>
+
 <!--
 EOT;
 } elseif ($action == 'album') {print <<<EOT
@@ -1894,18 +1888,10 @@ EOT;
   <div class="cc">$pages</div>
   <div class="mb10 tac">
 	<span class="bt"><span><button type="button" onclick="CheckAll(document.FORM)">全 选</button></span></span>
-    <span class="btn"><span><button type="submit" onclick="return checkdel();">删除</button></span></span>
+    <span class="btn"><span><button type="submit" >删除</button></span></span>
    </div>
 </form>
-<script language="JavaScript">
-function checkdel(){
-	if(confirm("确定要删除所选相册吗？" )){
-		return true;
-	}else{
-		return false;
-	}
-}
-</script>
+
 
 <!--
 EOT;
@@ -2040,19 +2026,9 @@ EOT;
   <div class="cc">$pages</div>
   <div class="mb10 tac">
     <span class="bt"><span><button type="button" name="chkall" onclick="CheckAll(this.form)">全 选</button></span></span>
-    <span class="btn"><span><button type="submit" onclick="return checkdel();">删 除</button></span></span>
+    <span class="btn"><span><button type="submit" >删 除</button></span></span>
    </div>
 </form>
-
-<script language="JavaScript">
-function checkdel(){
-	if(confirm("确定要删除所选照片吗？" )){
-		return true;
-	}else{
-		return false;
-	}
-}
-</script>
 
 <!--
 EOT;
@@ -2131,7 +2107,8 @@ print <<<EOT
 -->
 	<tr class="tr1 vt">
 		<td class="td2"><input type="checkbox" name="selid[]" value="$style[id]" {$ifcheck2} /></td>
-		<td class="td2"><i class="lower"></i><input type="text" name="cname[$style[id]]" value="{$style['cname']}" class="input_wa input mr10" /></td>
+		<td class="td2"><i class="lower"></i><input type="text" size="1" name="vieworder[$style[id]]" value="$style[vieworder]" class="input mr10" />
+		<input type="text" name="cname[$style[id]]" size="30" value="{$style['cname']}" class="input" /></td>
 		<td class="td2">{$style['csum']}</td>
 		<td class="td2"><input type="checkbox" name="delid[]" value="$style[id]" /></td>
     </tr>
@@ -2294,18 +2271,9 @@ EOT;
 <div class="cc">$pages</div>
 <div class="mb10 tac">
 	<span class="bt"><span><button type="button" onclick="CheckAll(document.FORM)">全 选</button></span></span>
-	<span class="btn"><span><button type="submit" onclick="return Checkdel();">删除</button></span></span>
+	<span class="btn"><span><button type="submit" >删除</button></span></span>
 </div>
 </form>
-<script language="JavaScript">
-function Checkdel() {
-	if (!confirm("您确定要删除选中项吗?")) {
-		return false;
-	} else{
-		return true;
-	}
-}
-</script>
 
 <!--
 EOT;
@@ -2456,18 +2424,9 @@ EOT;
 <div class="cc">$pages</div>
 <div class="mb10 tac">
 	<span class="bt"><span><button type="button" onclick="CheckAll(document.FORM)">全 选</button></span></span>
-	<span class="btn"><span><button type="submit" onclick="return Checkdel();">删除</button></span></span>
+	<span class="btn"><span><button type="submit" >删除</button></span></span>
 </div>
 </form>
-<script language="JavaScript">
-function Checkdel() {
-	if (!confirm("您确定要删除选中项吗?")) {
-		return false;
-	} else{
-		return true;
-	}
-}
-</script>
 
 <!--
 EOT;

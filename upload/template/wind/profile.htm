@@ -8,7 +8,6 @@
 <meta name="generator" content="phpwind $wind_version" />
 <meta name="description" content="$metaDescription" />
 <meta name="keywords" content="$metaKeywords" />
-<meta http-equiv="x-ua-compatible" content="ie=7" />
 <link rel='archives' title='$db_bbsname' href='$db_bbsurl/simple' />
 <base id="headbase" href="$db_bbsurl/" />
 <link rel="stylesheet" type="text/css" href="$imgpath/set/set-style.css" />
@@ -393,10 +392,10 @@ EOT;
 												<td>头像链接 <input name="httpurl[0]" value="$httpurl" class="input" type="text" size="40" /> 必须以 http://开头</td>
 											</tr>
 											<tr>
-												<td>头像宽度 <input name="httpurl[1]" value="$width2" class="input" size="4" maxlength="3" /> 必须是 1 -- $db_imgwidth 之间的一个整数。</td>
+												<td> <input name="httpurl[1]" value="$width2" class="input" size="4" maxlength="3" /> 必须是 1 -- $db_imgwidth 之间的一个整数。</td>
 											</tr>
 											<tr>
-												<td>头像高度 <input name="httpurl[2]" value="$height2" class="input" size="4" maxlength="3" /> 必须是 1 -- $db_imgheight 之间的一个整数。</td>
+												<td> <input name="httpurl[2]" value="$height2" class="input" size="4" maxlength="3" /> 必须是 1 -- $db_imgheight 之间的一个整数。</td>
 											</tr>
 										</table>
 										</div>
@@ -1087,9 +1086,9 @@ EOT;
 										<td>搜索权限</td>
 										<td>会员列表</td>
 										<td>会员资料</td>
-										<td>展区功能</td>
-										<td>报告功能</td>
+										<td>举报功能</td>
 										<td>头像上传</td>
+                                        <td>自定义头像</td>
 									</tr>
 									<tr>
 										<td>{$_P[$per[hide]]}</td>
@@ -1097,12 +1096,12 @@ EOT;
 										<td>{$_P[$per[search]]}</td>
 										<td>{$_P[$per[member]]}</td>
 										<td>{$_P[$per[profile]]}</td>
-										<td>{$_P[$per[show]]}</td>
 										<td>{$_P[$per[report]]}</td>
 										<td>{$_P[$per[upload]]}</td>
+                                        <td>{$_P[$per[portait]]}</td>
+                                        
 									</tr>
 									<tr>
-										<td>自定义头像</td>
 										<td>荣誉头衔</td>
 										<td>统计排行</td>
 										<td>发消息</td>
@@ -1110,9 +1109,9 @@ EOT;
 										<td>收藏夹容量</td>
 										<td>草稿箱容量</td>
 										<td>签名大小上限</td>
+                                        <td colspan="1"></td>
 									</tr>
 									<tr>
-										<td>{$_P[$per[portait]]}</td>
 										<td>{$_P[$per[honor]]}</td>
 										<td>{$_P[$per[sort]]}</td>
 										<td>{$_P[$per[messege]]}</td>
@@ -1120,6 +1119,7 @@ EOT;
 										<td>{$per[maxfavor]}</td>
 										<td>{$per[maxgraft]}</td>
 										<td>{$per[signnum]}</td>
+                                        <td colspan="1"></td>
 									</tr>
 									<tr><td colspan="8" class="b">版块权限</td></tr>
 									<tr>
@@ -1170,8 +1170,7 @@ EOT;
 										<td>{$_P[$per[attach]]}</td>
 										<td>{$_P[$per[down]]}</td>
 										<td>$per[allownum]</td>
-										<td>$per[uploadmaxsize]</td>
-										<td colspan="4" class="tal">$per[uptype]</td>
+										<td colspan="5" class="tal">$per[uptype]</td>
 									</tr>
 								</table>
 <!--

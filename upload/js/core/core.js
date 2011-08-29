@@ -2,9 +2,11 @@ var agt = navigator.userAgent.toLowerCase();
 var is_ie = ((agt.indexOf("msie") != -1) && (agt.indexOf("opera") == -1));
 var is_gecko= (navigator.product == "Gecko");
 var is_webkit=agt.indexOf('webkit')>-1;
-document.write("<script src='js/desktop/Compatibility.js'></sc"+"ript>");
+var is_safari = (agt.indexOf('chrome')==-1)&&is_webkit;
+if(!window.opera){
+	is_ie||is_safari||document.write("<script src='js/desktop/Compatibility.js'></sc"+"ript>");
+}
 document.write("<script src='js/lang/zh_cn.js'></sc"+"ript>");
-
 var gIsPost = true;
 window.getObj?0:getObj=function(s){return document.getElementById(s)};
 $=getObj;
@@ -130,7 +132,7 @@ function getObj(id) {
 	return document.getElementById(id);
 }
 function getElementsByClassName (className, parentElement){
-	if (typeof(parentElement)=='object') {
+	if (parentElement && typeof(parentElement)=='object') {
 		var elems = parentElement.getElementsByTagName("*");
 	} else {
 		var elems = (document.getElementById(parentElement)||document.body).getElementsByTagName("*");
@@ -184,6 +186,13 @@ function CopyCode(obj) {
 			for(var i=0,l=lis.length; i<l; i++){
 				ar.push(lis[i].textContent);
 			}
+			window.clip = new ZeroClipboard.Client();
+			clip.setHandCursor( true );
+			
+			clip.addEventListener('complete', function (client, text) {
+				alert("复制成功!" );
+				closep();
+			});
 			clip.setText(ar.join("\r\n"));
 			var clipEle = getObj('clipWin');
 			if (!clipEle){
@@ -205,13 +214,6 @@ function CopyCode(obj) {
 			script.src = 'js/ZeroClipboard.js';
 			script.onload = function(){
 				ZeroClipboard.setMoviePath( 'js/ZeroClipboard.swf' );
-				window.clip = new ZeroClipboard.Client();
-				clip.setHandCursor( true );
-				
-				clip.addEventListener('complete', function (client, text) {
-					alert("复制成功!" );
-					closep();
-				});
 				openClipWin();
 			};
 			document.body.appendChild(script);
@@ -222,7 +224,17 @@ function CopyCode(obj) {
 	return false;
 }
 function Addtoie(value,title) {
-	is_ie ? window.external.AddFavorite(value,title) : window.sidebar.addPanel(title,value,"");
+	try
+	  {
+		is_ie ? window.external.AddFavorite(value,title) : window.sidebar.addPanel(title,value,"");
+	  }
+	catch(err)
+	  {
+	    txt = "1、抱歉，您的IE注册表值被修改，导致不支持收藏，您可按照以下方法修改。\n\n"
+	    txt += "2、打开注册表编辑器，右键点击HKEY_CLASSES_ROOT查找'C:/\WINDOWS/\system32/\shdocvw.dll'。 \n\n"
+	    txt += "3、点击(默认)，把'C:/\WINDOWS/\system32/\shdocvw.dll'修改为'C:/\WINDOWS/\system32/\ieframe.dll'，重启IE浏览器。\n\n"
+		is_ie ? alert(txt) : alert("抱歉，您的浏览器不支持，请使用Ctrl+D进行添加\n\n")
+	  }
 }
 ~function() {
 	var ifcheck = true;
@@ -325,8 +337,8 @@ function imgResize(o, size) {
 	}catch(e){}
 }
 function ajaxurl(o, ep) {
-	read.obj = o;
-	ajax.send(o.href + ((typeof ep == 'undefined' || !ep) ? '' : ep), '', ajax.get);
+	if (typeof o == 'object') {var url = o.href;read.obj = o;} else {var url = o;}
+	ajax.send(url + ((typeof ep == 'undefined' || !ep) ? '' : ep), '', ajax.get);
 	return false;
 }
 
@@ -703,5 +715,13 @@ var Attention = {
     }
 })();
 
-
-
+function getBaseUrl() {
+	var baseURL = document.baseURI || getHeadBase() || document.URL;
+	if (baseURL && baseURL.match(/(.*)\/([^\/]?)/)) {
+		baseURL = RegExp.$1 + "/";
+	}
+	return baseURL;
+}
+function getHeadBase() {
+	return getObj('headbase') ? getObj('headbase').href : null;
+}

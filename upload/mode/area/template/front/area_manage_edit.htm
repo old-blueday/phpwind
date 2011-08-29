@@ -86,6 +86,7 @@ if($k=='descrip'){print <<<EOT
 EOT;
 } elseif ($k=='title') {
 $value = strip_tags($value);
+$val == 'default' && $val = 50;
 print <<<EOT
 -->
 						<input type="text" onkeyup="checktitlelength($val,'pushto_title','wordtip');" onkeydown="checktitlelength($val,'pushto_title','wordtip');"   class="input" size="40" name="param[$k]"   value="{$value}" id="pushto_title">&nbsp;&nbsp;<span id="wordtip"></span>
@@ -94,7 +95,7 @@ print <<<EOT
 							<span title="斜体字"><a onclick="styleOnclick(this,'css[i]')" class="{$stylename[i]}">倾斜</a></span>
 							<span title="下划线"><a onclick="styleOnclick(this,'css[u]')" class="{$stylename[u]}">下划线</a></span>
 							<span id="color_show" style="background:{$stylename[color]};" title="点击取消颜色" onclick="colorCancel()"></span>
-							<span title="颜色选择"><a class="two tal" onclick="showColorPicker(this,'css[color]',function(){pickReback(color_picker)})"><img src="$imgpath/pickcolor.gif"  /></a></span>
+							<span title="颜色选择"><a class="two tal" onclick="showColorPicker(this,'css[color]',function(){pickAjaxReback(color_picker)})"><img src="$imgpath/pickcolor.gif"  /></a></span>
 							<span>时间:<input name="css[endtime]" id="css[endtime]" size="15" class="input" type="input" value="{$stylename[endtime]}" onclick="ShowCalendar(this.id,1);getCurrentDatePos();" /></span>
 							<input id="css[color]" name="css[color]" type="hidden" value="$stylename[color]" />
 							<input id="css[b]" name="css[b]" type="hidden" value="{$push['titlecss']['b']}" />
@@ -152,7 +153,7 @@ print <<<EOT
 							<dl>
 								<dt>
 									<input id="uploadpic" type="file" name="uploadpic" onchange="checkFileType()" />
-									 <p>允许类型: jpg，jpeg，gif，png(文件大小不得大于2M)<span id="fileTypeError" style="display:none;"><font color="red">请选择正确的文件类型</font></span></p>
+									 <p>允许类型: jpg，jpeg，gif，png，bmp(文件大小不得大于2M)<span id="fileTypeError" style="display:none;"><font color="red">请选择正确的文件类型</font></span></p>
 								</dt>
 							</dl>
 						</div>
@@ -250,12 +251,12 @@ EOT;
 EOT;
 if ($push[ifverify]) {print<<<EOT
 -->
-        <input name="" type="submit" value="审核并提交" class="btn" />
+		<span class="btn2"><span><button type="submit">审核并提交</button></span></span>
 <!--
 EOT;
 } else {print<<<EOT
 -->
-		<input name="" type="submit" value="提交" class="btn" />
+		<span class="btn2"><span><button type="submit">提交</button></span></span>
 <!--
 EOT;
 }print<<<EOT

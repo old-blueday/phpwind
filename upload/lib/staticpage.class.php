@@ -20,6 +20,7 @@ class PW_StaticPage {
 	var $tpl;
 	
 	var $forum = null;
+	var $attachShow = null;
 	
 	var $datedir;
 	var $fid;
@@ -51,7 +52,8 @@ class PW_StaticPage {
 		$this->vars['db_bbsname_a'] = addslashes($this->vars['db_bbsname']); //模版内用到
 		$this->vars['wind_version'] = $GLOBALS['wind_version'];
 		$this->vars['db_userurl'] = $GLOBALS['db_userurl'];
-		
+		$this->vars['creditnames'] = pwCreditNames();
+
 		if (!is_array($this->vars['db_union'])) {
 			$this->vars['db_union'] = explode("\t", stripslashes($this->vars['db_union']));
 			$this->vars['db_union'][0] && $this->vars['db_hackdb'] = array_merge((array) $this->vars['db_hackdb'], (array) unserialize($this->vars['db_union'][0]));
@@ -77,6 +79,7 @@ class PW_StaticPage {
 		$style = L::style(null, L::config('db_defaultstyle'));
 		foreach ($style as $key => $value) {
 			$this->vars[$key] = $value;
+			$GLOBALS[$key] = $style;
 		}
 		$this->vars['css_path'] = D_P . 'data/style/wind_css.htm';
 		
@@ -115,7 +118,7 @@ class PW_StaticPage {
 	function getReadContent() {
 		$readdb = array();
 		$pw_tmsgs = GetTtable($this->tid);
-		$read = $this->db->get_one("SELECT t.*,tm.*,m.uid,m.username,m.oicq,m.groupid,m.memberid,m.icon AS micon ,m.hack,m.honor,m.signature,m.regdate,m.medals,m.userstatus,md.onlinetime,md.postnum,md.digests,md.rvrc,md.money,md.credit,md.currency,md.starttime,md.thisvisit,md.lastvisit{$this->fieldadd} FROM pw_threads t LEFT JOIN $pw_tmsgs tm ON t.tid=tm.tid LEFT JOIN pw_members m ON m.uid=t.authorid LEFT JOIN pw_memberdata md ON md.uid=t.authorid $this->tablaadd WHERE t.tid=" . S::sqlEscape($this->tid));
+		$read = $this->db->get_one("SELECT t.*,tm.*,m.uid,m.username,m.oicq,m.groupid,m.memberid,m.icon AS micon ,m.hack,m.honor,m.signature,m.regdate,m.medals,m.userstatus,md.onlinetime,md.postnum,md.digests,md.rvrc,md.money,md.credit,md.currency,md.starttime,md.thisvisit,md.lastvisit,mb.* FROM pw_threads t LEFT JOIN $pw_tmsgs tm ON t.tid=tm.tid LEFT JOIN pw_members m ON m.uid=t.authorid LEFT JOIN pw_memberdata md ON md.uid=t.authorid $this->tablaadd WHERE t.tid=" . S::sqlEscape($this->tid));
 		
 		if (!$read || $read['special'] || !$read['ifcheck']) {return false;}
 		$this->fid = $read['fid'];
@@ -134,9 +137,12 @@ class PW_StaticPage {
 		$this->vars['db_metakeyword'] = $read['subject'] . str_replace(array('|', ' - '), ',', $this->forumtitle) . 'phpwind';
 		$this->vars['subject'] = $read['subject'];
 		$this->vars['titletop1'] = substrs('Re:' . str_replace('&nbsp;', ' ', $read['subject']), L::config('db_titlemax') - 2);
+		$this->vars['hits'] = $read['hits'];
+		$this->vars['replies'] = $read['replies'];
 		$this->vars['tid'] = $this->tid;
 		$this->vars['fid'] = $this->fid;
 		$this->vars['pwforum'] = $this->forum;
+		$this->vars['postUrl'] = 'post.php?fid=' . $this->fid;
 		$_pids = array();
 		$read['aid'] && $_pids[] = 0;
 		
@@ -149,7 +155,7 @@ class PW_StaticPage {
 		if ($read['replies'] > 0) {
 			$readnum = $this->perpage - 1;
 			$pw_posts = GetPtable($read['ptable']);
-			$query = $this->db->query("SELECT t.*,m.uid,m.username,m.oicq,m.groupid,m.memberid,m.icon AS micon,m.hack,m.honor,m.signature,m.regdate,m.medals,m.userstatus,md.onlinetime,md.postnum,md.digests,md.rvrc,md.money,md.credit,md.currency,md.starttime,md.thisvisit,md.lastvisit $this->fieldadd FROM $pw_posts t LEFT JOIN pw_members m ON m.uid=t.authorid LEFT JOIN pw_memberdata md ON md.uid=t.authorid $this->tablaadd WHERE t.tid=" . S::sqlEscape($this->tid) . " AND ifcheck='1' ORDER BY postdate LIMIT 0,$readnum");
+			$query = $this->db->query("SELECT t.*,m.uid,m.username,m.oicq,m.groupid,m.memberid,m.icon AS micon,m.hack,m.honor,m.signature,m.regdate,m.medals,m.userstatus,md.onlinetime,md.postnum,md.digests,md.rvrc,md.money,md.credit,md.currency,md.starttime,md.thisvisit,md.lastvisit, mb.* FROM $pw_posts t LEFT JOIN pw_members m ON m.uid=t.authorid LEFT JOIN pw_memberdata md ON md.uid=t.authorid $this->tablaadd WHERE t.tid=" . S::sqlEscape($this->tid) . " AND ifcheck='1' ORDER BY postdate LIMIT 0,$readnum");
 			while ($read = $this->db->fetch_array($query)) {
 				if ($this->isHideContent($read['content'])) {return false;}
 				$read['aid'] && $_pids[] = $read['pid'];
@@ -157,7 +163,10 @@ class PW_StaticPage {
 			}
 			$this->db->free_result($query);
 		}
-		$attachdb = $this->getAttachs($_pids);
+		if ($_pids) {
+			$this->attachShow = new attachShow(false);
+			$this->attachShow->init($this->tid, $_pids);
+		}
 		$this->vars['db_menuinit'] = "'td_post' : 'menu_post','td_post1' : 'menu_post','td_hack' : 'menu_hack'";
 		
 		$bandb = $this->forum->forumBan($readdb);
@@ -165,7 +174,6 @@ class PW_StaticPage {
 		$start_limit = 0;
 		foreach ($readdb as $key => $read) {
 			isset($bandb[$read['authorid']]) && $read['groupid'] = 6;
-			$read['aid'] && $read['aid'] = $attachdb[$read['pid']];
 			$authorids[] = $read['authorid'];
 			$readdb[$key] = $this->htmread($read, $start_limit++);
 			$this->vars['db_menuinit'] .= ",'td_read_" . $read['pid'] . "':'menu_read_" . $read['pid'] . "'";
@@ -179,17 +187,6 @@ class PW_StaticPage {
 
 	function setSeosetting($read) {
 		list($this->vars['webPageTitle'], $this->vars['metaDescription'], $this->vars['metaKeywords']) = bbsSeoSettings('read', '', $this->vars['forumname'], '', &$read['subject']);
-	}
-
-	function getAttachs($pids) {
-		if (empty($pids)) {return array();}
-		$attdb = array();
-		$query = $this->db->query('SELECT * FROM pw_attachs WHERE tid=' . S::sqlEscape($this->tid) . " AND pid IN (" . S::sqlImplode($pids) . ")");
-		while ($rt = $this->db->fetch_array($query)) {
-			if ($rt['pid'] == '0') $rt['pid'] = 'tpc';
-			$attdb[$rt['pid']][$rt['aid']] = $rt;
-		}
-		return $attdb;
 	}
 
 	function getCustomdb($authorids) {
@@ -223,16 +220,16 @@ class PW_StaticPage {
 		if (!is_dir(R_P . $this->htmdir . '/' . $this->fid)) {
 			@mkdir(R_P . $this->htmdir . '/' . $this->fid);
 			@chmod(R_P . $this->htmdir . '/' . $this->fid, 0777);
-			pwCache::setData(R_P . "$this->htmdir/$this->fid/index.html", '');
+			pwCache::writeover(R_P . "$this->htmdir/$this->fid/index.html", '');
 			@chmod(R_P . "$this->htmdir/$this->fid/index.html", 0777);
 		}
 		if (!is_dir(R_P . $this->htmdir . '/' . $this->fid . '/' . $this->datedir)) {
 			@mkdir(R_P . $this->htmdir . '/' . $this->fid . '/' . $this->datedir);
 			@chmod(R_P . $this->htmdir . '/' . $this->fid . '/' . $this->datedir, 0777);
-			pwCache::setData(R_P . "$this->htmdir/$this->fid/$this->datedir/index.html", '');
+			pwCache::writeover(R_P . "$this->htmdir/$this->fid/$this->datedir/index.html", '');
 			@chmod(R_P . "$this->htmdir/$this->fid/$this->datedir/index.html", 0777);
 		}
-		pwCache::setData(R_P . "$this->htmdir/$this->fid/$this->datedir/$this->tid.html", $content, false, "rb+", 0);
+		pwCache::writeover(R_P . "$this->htmdir/$this->fid/$this->datedir/$this->tid.html", $content,  "rb+", 0);
 		@chmod(R_P . "$this->htmdir/$this->fid/$this->datedir/$this->tid.html", 0777);
 	}
 
@@ -257,7 +254,10 @@ class PW_StaticPage {
 			$read['author'] = $read['username'];
 			$read['ontime'] = (int) ($read['onlinetime'] / 3600);
 			$tpc_author = $read['author'];
-			$read['face'] = showfacedesign($read['micon']);
+			list($read['face'],,$httpWidth,$httpHeight,,,,$read['facesize']) = showfacedesign($read['micon'], true, 'm');
+			if ($httpWidth > $GLOBALS['db_imgwidth'] || $httpHeight > $GLOBALS['db_imgheight']) {
+				$read['facesize'] = ' width="' . $GLOBALS['db_imgwidth'] . '" height="' . $GLOBALS['db_imgheight'] . '"';
+			}
 			if ($db_ipfrom == 1) $read['ipfrom'] = ' From:' . $read['ipfrom'];
 			
 			if (L::config('md_ifopen', 'cache_read') && $read['medals']) {
@@ -291,7 +291,7 @@ class PW_StaticPage {
 				$read['signature'] = '';
 			}
 		} else {
-			$read['face'] = "<br>";
+			$read['face'] = "$imgpath/face/none.gif";
 			$read['lpic'] = '8';
 			$read['level'] = $read['digests'] = $read['postnum'] = $read['money'] = $read['regdate'] = $read['lastlogin'] = $read['aurvrc'] = $read['credit'] = '*';
 			if ($anonymous) {
@@ -326,13 +326,7 @@ class PW_StaticPage {
 			$read['content'] = shield($read['ifshield'] ? ($read['ifshield'] == 1 ? 'shield_article' : 'shield_del_article') : 'ban_article');
 			$tpc_shield = 1;
 		}
-		$creditnames = pwCreditNames();
 		if (!$tpc_shield) {
-			$attachs = $aids = array();
-			if ($read['aid'] && !$read['ifhide']) {
-				$attachs = $read['aid'];
-				$aids = attachment($read['content']);
-			}
 			$wordsfb = L::loadClass('FilterUtil', 'filter');
 			if (!$wordsfb->equal($read['ifwordsfb'])) {
 				$read['content'] = $wordsfb->convert($read['content']);
@@ -345,40 +339,8 @@ class PW_StaticPage {
 			} else {
 				strpos($read['content'], '[s:') !== false && $read['content'] = showface($read['content']);
 			}
-			if ($attachs && is_array($attachs) && !$read['ifhide']) {
-				foreach ($attachs as $at) {
-					$atype = '';
-					$rat = array();
-					if ($at['type'] == 'img' && $at['needrvrc'] == 0) {
-						$a_url = geturl($at['attachurl'], 'show');
-						if (is_array($a_url)) {
-							$atype = 'pic';
-							$dfurl = '<br>' . cvpic($a_url[0], 1, $db_windpost['picwidth'], $db_windpost['picheight'], $at['ifthumb']&1);
-							$rat = array('aid' => $at['aid'], 'img' => $dfurl, 'dfadmin' => 0, 
-								'desc' => $at['desc']);
-						} elseif ($a_url == 'imgurl') {
-							$atype = 'picurl';
-							$rat = array('aid' => $at['aid'], 'name' => $at['name'], 'dfadmin' => 0, 
-								'verify' => md5("showimg{$read[tid]}{$read[pid]}{$read[fid]}{$at[aid]}{$GLOBALS[db_hash]}"));
-						}
-					} else {
-						$atype = 'downattach';
-						if ($at['needrvrc'] > 0) {
-							!$at['ctype'] && $at['ctype'] = $at['special'] == 2 ? 'money' : 'rvrc';
-							$at['special'] == 2 && $GLOBALS['db_sellset']['price'] > 0 && $at['needrvrc'] = min($at['needrvrc'], $GLOBALS['db_sellset']['price']);
-						}
-						$rat = array('aid' => $at['aid'], 'name' => $at['name'], 'size' => $at['size'], 
-							'hits' => $at['hits'], 'needrvrc' => $at['needrvrc'], 'special' => $at['special'], 
-							'cname' => $creditnames[$at['ctype']], 'type' => $at['type'], 'dfadmin' => 0, 
-							'desc' => $at['desc'], 'ext' => strtolower(substr(strrchr($at['name'], '.'), 1)));
-					}
-					if (!$atype) continue;
-					if (in_array($at['aid'], $aids)) {
-						$read['content'] = attcontent($read['content'], $atype, $rat);
-					} else {
-						$read[$atype][$at['aid']] = $rat;
-					}
-				}
+			if ($read['aid'] && $this->attachShow->isShow($read['ifhide'], $tid)) {
+				$read += $this->attachShow->parseAttachs($read['pid'], $read['content'], false);
 			}
 		}
 		if ($read['remindinfo']) {

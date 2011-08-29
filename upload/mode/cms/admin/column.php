@@ -40,7 +40,7 @@ if (empty($action)) {
 } elseif ($action == 'delete') {
 	S::gp(array('cid'));
 	if (empty($cid)) Showmsg('非法操作请返回', $basename);
-	if ($articles = $columnService->getArticlesByColumeId($cid)) Showmsg('该栏目下已存在文章数据，不可删除，请移除文章后再删除');
+	if ($articles = $columnService->getArticlesByColumeId($cid)) Showmsg('该栏目下已存在文章数据，请删除栏目下文章，并清理回收站后再删除栏目');
 	if ($columns = $columnService->getSubColumnsById($cid)) Showmsg('该栏目存在子栏目，不可删除，请移除子栏目后再删除');
 	if (!$columnService->deleteColumn($cid)) Showmsg('删除栏目失败');
 	Showmsg('删除栏目操作成功!', $basename);

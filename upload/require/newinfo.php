@@ -1,7 +1,8 @@
 <?php
 !function_exists('readover') && exit('Forbidden');
 
-include_once pwCache::getPath(D_P.'data/bbscache/newinfo_config.php');
+//* include_once pwCache::getPath(D_P.'data/bbscache/newinfo_config.php');
+pwCache::getData(D_P.'data/bbscache/newinfo_config.php');
 foreach ($nf_order as $key => $val) {
 	$updatetime = $nf_order[$key]['updatetime'] ? $nf_order[$key]['updatetime'] : 30;
 	if ($val['order'] && $val['cachetime']+$updatetime<$timestamp && $val['type'] != 'custom' && ($val['type'] != 'newpic' || !$val['mode'])) {

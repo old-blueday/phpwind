@@ -35,7 +35,7 @@ print <<<EOT
 		<td><label class="mr20"><input type="radio" name="range" value="0" checked />{$forum[$fid][name]}</label>
 <!--
 EOT;
-if($isGM || $SYSTEM['banuser']){print <<<EOT
+if($isGM || $SYSTEM['banuser']==2){print <<<EOT
 -->
 				<label class="mr20"><input type="radio" name="range" value="1" />全局禁言</label>
 <!--
@@ -503,6 +503,15 @@ EOT;
 		<td width="23%">评分时间</td>
 		<td>评分理由</td>
 	</tr>
+<script language="javascript" type="text/javascript">
+function cutStrContent(obj){
+	if(strlen(getObj(obj).value) > 100 ) {
+		getObj(obj).value = substr(getObj(obj).value,100);
+		alert ('评分理由请不要超过100字节');
+	}
+}
+
+</script>
 <!--
 EOT;
 foreach($pingdb as $val){print<<<EOT
@@ -512,7 +521,7 @@ foreach($pingdb as $val){print<<<EOT
 		<td>$val[pinger]</td>
 		<td>$val[name] $val[point]</td>
 		<td>$val[pingdate]</td>
-		<td title="双击修改评分记录" ondblclick="editrecord('$val[id]')"><span id="ping_$val[id]">$val[record]</span><span id="edit_$val[id]" style="display:none"><input type="text" class="input input_wa" id="editbox_$val[id]" value="$val[record]"> <img title="保存" alt="保存" onclick="savePingLog('$val[id]');" src="$imgpath/post/c_editor/save.gif" style="cursor:pointer;" align="absmiddle"></span></td>
+		<td title="双击修改评分记录" ondblclick="editrecord('$val[id]')"><span id="ping_$val[id]">$val[record]</span><span id="edit_$val[id]" style="display:none"><input type="text" class="input input_wa" id="editbox_$val[id]" value="$val[record]" onchange="cutStrContent(this.id);" onkeyup="cutStrContent(this.id);" onkeydown="cutStrContent(this.id);"> <img title="保存" alt="保存" onclick="savePingLog('$val[id]');" src="$imgpath/post/c_editor/save.gif" style="cursor:pointer;" align="absmiddle"></span></td>
 	</tr>
 <!--
 EOT;

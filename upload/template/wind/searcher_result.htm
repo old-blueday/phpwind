@@ -1,15 +1,14 @@
 <!--<?php print <<<EOT
 -->
 <!-- 搜索结果页 -->
-<div class="main2 cc" id="mainbox">
-	<table width="100%" height="400"><tr><td valign="top">
-	<div class="list_h">
-			<div class="fr">获得约 <strong>{$total}</strong> 条结果
-
-			（用时<strong>{$totaltime}</strong>秒）</div>
+<div class="main_min">
+<div id="mainbox">
+	<div class="hd">
+		<span class="fr">获得约 {$total} 条结果，用时{$totaltime}秒</span>
 <!--
 EOT;
-if(in_array($type,array("thread","special")) && $threads){
+$ifShowSearcher = ($threads || $fid) ? 1 : 0;
+if(in_array($type,array("thread","special")) && $ifShowSearcher){
 	$siderInner = $_COOKIE['searchtoggle']!=='0' ? '隐藏侧边栏' : '显示侧边栏';
 print <<<EOT
 -->
@@ -25,7 +24,6 @@ EOT;
 }
 print <<<EOT
 -->
-
 	</div>
 <!--
 EOT;
@@ -46,7 +44,7 @@ if(in_array($type,array("thread","special")) && $threads){
 }
 print <<<EOT
 -->
-	</td></tr></table>
+</div>
 </div>
 <!--
 EOT;

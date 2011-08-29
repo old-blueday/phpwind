@@ -1,14 +1,16 @@
 <?php
 !function_exists('adminmsg') && exit('Forbidden');
 $basename="$admin_file?adminjob=tpccheck";
-include_once pwCache::getPath(D_P.'data/bbscache/forumcache.php');
+//* include_once pwCache::getPath(D_P.'data/bbscache/forumcache.php');
+pwCache::getData(D_P.'data/bbscache/forumcache.php');
 include_once(R_P.'require/forum.php');
 
 if ($admin_gid == 5) {
 	list($allowfid,$forumcache) = GetAllowForum($admin_name);
 	$sql = $allowfid ? "fid IN($allowfid)" : '0';
 } else {
-	include pwCache::getPath(D_P.'data/bbscache/forumcache.php');
+	//* include pwCache::getPath(D_P.'data/bbscache/forumcache.php');
+	pwCache::getData(D_P.'data/bbscache/forumcache.php');
 	list($hidefid,$hideforum) = GetHiddenForum();
 	if ($admin_gid == 3) {
 		$forumcache .= $hideforum;
@@ -101,13 +103,17 @@ if (!$action) {
 			foreach ($fids as $key => $value) {
 				$rt = $db->get_one("SELECT tid,author,postdate,subject FROM pw_threads WHERE fid=" . S::sqlEscape($key) . " ORDER BY lastpost DESC LIMIT 1");
 				$lastpost = $rt['subject']."\t".$rt['author']."\t".$rt['postdate']."\t"."read.php?tid=$rt[tid]&page=e#a";
+				/**
 				$db->update("UPDATE pw_forumdata"
 					. " SET topic=topic+" . S::sqlEscape($value)
 						. ',article=article+' . S::sqlEscape($value)
 						. ',tpost=tpost+' . S::sqlEscape($value)
 						. ',lastpost=' . S::sqlEscape($lastpost)
 					. ' WHERE fid=' . S::sqlEscape($key));
+				**/
+				$db->update(pwQuery::buildClause("UPDATE :pw_table SET topic=topic+:topic,article=article+:article,tpost=tpost+:tpost,lastpost=:lastpost WHERE fid=:fid", array('pw_forumdata', $value, $value, $value, $lastpost, $key)));		
 			}
+	
 			if ($pass) {
 				//$db->update("UPDATE pw_threads SET ifcheck='1' WHERE $sql AND tid IN(".S::sqlImplode($pass).")");
 				pwQuery::update('pw_threads', "$sql AND tid IN (:tid)", array($pass), array('ifcheck'=>1));
@@ -127,7 +133,8 @@ if (!$action) {
 			if ($cydb) {
 				$query = $db->query("SELECT COUNT(*) AS tnum,cyid FROM pw_argument WHERE tid IN(" . S::sqlImplode($cydb) . ") GROUP BY cyid");
 				while ($rt = $db->fetch_array($query)) {
-					$db->update("UPDATE pw_colonys SET tnum=tnum+" . S::sqlEscape($rt['tnum']) . ' WHERE id=' . S::sqlEscape($rt['cyid']));
+					//* $db->update("UPDATE pw_colonys SET tnum=tnum+" . S::sqlEscape($rt['tnum']) . ' WHERE id=' . S::sqlEscape($rt['cyid']));
+					$db->update(pwQuery::buildClause("UPDATE :pw_table SET tnum=tnum+:tnum WHERE id=:id", array('pw_colonys', $rt['tnum'], $rt['cyid'])));
 				}
 			}
 			/*
@@ -137,7 +144,8 @@ if (!$action) {
 			} */
 			Perf::gatherInfo('changeThreadWithForumIds', array('fid'=>array_keys($fids)));		
 			
-		} else if(is_array($dels)){
+		}
+		if(is_array($dels)){
 
 			$delarticle = L::loadClass('DelArticle', 'forum');
 			if (!$sqlby = $delarticle->sqlFormatByIds($dels)) {
@@ -240,10 +248,15 @@ if (!$action) {
 				Perf::gatherInfo('changeThreadWithForumIds', array('fid'=>$fid));				
 			}
 			foreach ($fids as $key => $value) {
+				/**
 				$db->update("UPDATE pw_forumdata SET article=article+".S::sqlEscape($value).",tpost=tpost+".S::sqlEscape($value,false)."WHERE fid=".S::sqlEscape($key));
+				**/
+				$db->update(pwQuery::buildClause("UPDATE :pw_table SET article=article+:article,tpost=tpost+:tpost WHERE fid=:fid", array('pw_forumdata', $value, $value, $key)));
 			}
-			//$db->update("UPDATE $pw_posts SET ifcheck='1',ifwordsfb='$db_wordsfb' WHERE $sql AND pid IN(".S::sqlImplode($pass).")");
-			$db->update(pwQuery::buildClause("UPDATE :pw_table SET ifcheck='1',ifwordsfb=:ifwordsfb WHERE $sql AND pid IN(:pid)", array($pw_posts, $db_wordsfb, $pass)));
+
+			$db->update("UPDATE $pw_posts SET ifcheck='1',ifwordsfb='$db_wordsfb' WHERE $sql AND pid IN(".S::sqlImplode($pass).")");
+			Perf::gatherInfo('changePosts', array('_tablename'=>$pw_posts, 'pid'=>$pass));
+			
 			/**
 			$threadIds = explode(",",$pass);
 			if($threadIds){
@@ -289,8 +302,8 @@ if (!$action) {
 			foreach ($deluids as $uid => $value) {
 				$userService->updateByIncrement($uid, array(), array('postnum'=>-$value));
 			}
-			//$db->update("DELETE FROM $pw_posts WHERE $sql AND pid IN(".S::sqlImplode($dels).")");
-			$db->update(pwQuery::buildClause("DELETE FROM :pw_table WHERE $sql AND pid IN(:pid)", array($pw_posts, $dels)));
+			$db->update("DELETE FROM $pw_posts WHERE $sql AND pid IN(".S::sqlImplode($dels).")");
+			Perf::gatherInfo('deletePosts', array('_tablename'=>$pw_posts, 'pid'=>$dels));
 		}
 		adminmsg('operate_success');
 		/**End modify by liaohu 2010-06-21*/

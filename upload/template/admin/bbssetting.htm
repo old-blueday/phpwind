@@ -48,16 +48,6 @@ include_once PrintEot('left');print <<<EOT
 			<td class="td2"><div class="help_a">开启后，可以在帖子列表页、阅读页快速跳转到别的版块</div></td>
 		</tr>
 		<tr class="tr1 vt">
-			<td class="td1">阅读页个人信息显示</td>
-			<td class="td2">
-				<ul class="list_A list_80">
-					<li><input type="radio" value="1" name="config[readinfo]" $readinfo_Y>开启</li>
-					<li><input type="radio" value="0" name="config[readinfo]" $readinfo_N>关闭</li>
-				</ul>
-			</td>
-			<td class="td2"><div class="help_a">开启后，帖子阅读页左栏个人信息将直接显示。关闭则出现查看站点用户信息，点击即可显示</div></td>
-		</tr>
-		<tr class="tr1 vt">
 			<td class="td1">回收站功能</td>
 			<td class="td2">
 				<ul class="list_A list_80">
@@ -66,6 +56,17 @@ include_once PrintEot('left');print <<<EOT
 				</ul>
 			</td>
 			<td class="td2"><div class="help_a">开启后，删除的主题和回复将暂存于回收站</div></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">宽窄屏切换</td>
+			<td class="td2">
+				<ul class="list_A list_80">
+					<li><input name="config[shiftstyle]" type="radio" value="1" $shiftstyle_1>开启</li>
+					<li><input name="config[shiftstyle]" type="radio" value="2" $shiftstyle_2>宽屏</li>
+					<li><input name="config[shiftstyle]" type="radio" value="3" $shiftstyle_3>窄屏</li>
+				</ul>
+			</td>
+			<td class="td2"><div class="help_a">勾选开启，用户可以在前台控制宽窄屏显示；勾选宽屏，则前台的显示模式为宽屏，用户不可切换；勾选窄屏，则前台的实现模式为窄屏，用户不可切换。</div></td>
 		</tr>
 	</table>
 </div>

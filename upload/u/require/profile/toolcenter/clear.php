@@ -22,7 +22,9 @@ $user_a = explode('|',addslashes($rt['icon']));
 if (empty($user_a[4])) {
 	Showmsg('tooluse_nousepig');
 } else {
-	$userface = "$user_a[0]|$user_a[1]|$user_a[2]|$user_a[3]";
+	$user_a[4] = '';
+	//$userface = "$user_a[0]|$user_a[1]|$user_a[2]|$user_a[3]";
+	$userface = implode('|',$user_a);
 }
 
 $userService->update($uid, array('icon' => $userface));

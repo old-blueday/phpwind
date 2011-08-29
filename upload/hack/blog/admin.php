@@ -1,6 +1,7 @@
 <?php
 !function_exists('adminmsg') && exit('Forbidden');
-include_once pwCache::getPath(D_P."data/bbscache/bg_config.php");
+//* include_once pwCache::getPath(D_P."data/bbscache/bg_config.php");
+pwCache::getData(D_P."data/bbscache/bg_config.php");
 
 if (!$action){
 	ifcheck($bg_ifopen,'ifopen');

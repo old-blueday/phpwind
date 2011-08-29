@@ -4,7 +4,8 @@ if (isset($_POST['ajax'])) {
 	define('AJAX', '1');
 }
 require_once('global.php');
-include_once pwCache::getPath(D_P.'data/bbscache/help_cache.php');
+//* include_once pwCache::getPath(D_P.'data/bbscache/help_cache.php');
+pwCache::getData(D_P.'data/bbscache/help_cache.php');
 
 $pages = $db_unioninfo = '';
 $catedb = $helpNav = $hasChildArray = $firstLevel = $secondLevel = array();

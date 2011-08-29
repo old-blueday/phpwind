@@ -221,7 +221,7 @@ Class PwCredit {
 						**/
 						$db->pw_update(
 							"SELECT uid FROM pw_membercredit WHERE uid=" . S::sqlEscape($uid) . ' AND cid=' . S::sqlEscape($cid),
-							pwQuery::buildClause("UPDATE :pw_table SET " . ($act == 'add' ? 'value=value+' : 'value=') . S::sqlEscape($v) .  ' WHERE uid=:uid AND cid=:cid', array('pw_membercredit', $uid, $cid)),
+							pwQuery::buildClause("UPDATE :pw_table SET " . ($act == 'add' ? 'value=value+' : 'value=') . ':value' .  ' WHERE uid=:uid AND cid=:cid', array('pw_membercredit', $v, $uid, $cid)),
 							pwQuery::insertClause('pw_membercredit', array('uid' => $uid, 'cid' => $cid, 'value' => $v))
 						);
 					} else {

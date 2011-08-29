@@ -3,7 +3,8 @@ define('SCR', 'app');
 require_once ('global.php');
 require_once (R_P . 'require/functions.php');
 require_once (R_P . 'u/require/core.php');
-require_once pwCache::getPath(D_P . 'data/bbscache/o_config.php');
+//* require_once pwCache::getPath(D_P . 'data/bbscache/o_config.php');
+pwCache::getData(D_P . 'data/bbscache/o_config.php');
 if (isset($_GET['ajax'])) {
 	define('AJAX', '1');
 }
@@ -34,7 +35,8 @@ if (in_array($q, array('ajax', 'article', 'diary', 'galbum', 'group', 'groups', 
 	S::gp(array('tid'),'G',2);
 	!$db_siteappkey && Showmsg('app_not_register');
 
-	@include_once pwCache::getPath(D_P.'data/bbscache/info_class.php');
+	//* @include_once pwCache::getPath(D_P.'data/bbscache/info_class.php');
+	pwCache::getData(D_P.'data/bbscache/info_class.php');
 	!is_array($info_class) && $info_class = array();
 
 	$openclass = array();
@@ -49,7 +51,8 @@ if (in_array($q, array('ajax', 'article', 'diary', 'galbum', 'group', 'groups', 
 } elseif ($q == 'updata') {
 
 	require_once (R_P . 'require/posthost.php');
-	include_once pwCache::getPath(D_P . 'data/bbscache/level.php');
+	//* include_once pwCache::getPath(D_P . 'data/bbscache/level.php');
+	pwCache::getData(D_P . 'data/bbscache/level.php');
 	S::gp(array('tid', 'cid'), 'P', 2);
 
 	$pw_tmsgs = GetTtable($tid);
@@ -92,7 +95,8 @@ if (in_array($q, array('ajax', 'article', 'diary', 'galbum', 'group', 'groups', 
 
 } elseif ($q == 'survey') {
 
-	@include_once pwCache::getPath(D_P . "data/bbscache/survey_cache.php");
+	//* @include_once pwCache::getPath(D_P . "data/bbscache/survey_cache.php");
+	pwCache::getData(D_P . "data/bbscache/survey_cache.php");
 	require_once (R_P . 'require/header.php');
 	S::gp(array('itemid'), 'G', 2);
 	if (!$itemid) {
@@ -148,14 +152,14 @@ if (in_array($q, array('ajax', 'article', 'diary', 'galbum', 'group', 'groups', 
 
 	$music_list_html = '<div class="musicshow">';
 	if (is_array($musicdb)) {
-		$music_list_html .= '<ul>';
+		$music_list_html .= '<ul class="music_list">';
 		foreach ($musicdb as $value) {
 			$value['song_name_s'] = substrs($value['song_name'], 30);
-			$music_list_html .= "<li><span>[<a onclick=\"insert_xiami_music('$value[song_id]')\" href=\"javascript:;\">" . getLangInfo('other', 'music_insert') . "</a>]</span><p><a title=\"$value[song_name]\" href=\"javascript:;\" onclick=\"insert_xiami_music('$value[song_id]')\">$value[song_name_s] -- $value[artist_name]</a></p><input type=\"hidden\" id=\"$value[song_id]\" value=\"$value[song_info]\"/></li>";
+			$music_list_html .= "<li><a onclick=\"insert_xiami_music('$value[song_id]');return false;\" href=\"javascript:;\" class=\"fr\">[" . getLangInfo('other', 'music_insert') . "]</a><a title=\"$value[song_name]\" href=\"javascript:;\" onclick=\"insert_xiami_music('$value[song_id]');return false;\">$value[song_name_s] -- $value[artist_name]</a><input type=\"hidden\" id=\"$value[song_id]\" value=\"$value[song_info]\"/></li>";
 		}
 		$music_list_html .= "</ul>$pages";
 	} else {
-		$music_list_html .= "<p align=\"center\" style=\"height:70px; line-height:50px\"><span class=\"musicresult\" style=\"background:url($imgpath/post/c_editor/music_none.gif) no-repeat 0 0; display:inline-block; padding-left:55px\">" . getLangInfo('other', 'music_none1') . "<span class=\"musicred\"><a href=\"javascript:;\">$keyword</a></span>" . getLangInfo('other', 'music_none2') . "</span></p>";
+		$music_list_html .= "<p align=\"center\" style=\"height:70px; line-height:50px\"><span class=\"musicresult\" style=\"background:url($imgpath/post/c_editor/music_none.gif) no-repeat 0 0; display:inline-block; padding-left:60px\">" . getLangInfo('other', 'music_none1') . "<span class=\"musicred\"><a href=\"javascript:;\" onclick=\"return false\">$keyword</a></span>" . getLangInfo('other', 'music_none2') . "</span></p>";
 
 	}
 	$music_list_html .= "</div>";
@@ -239,21 +243,21 @@ function numofpage_music($count, $page, $numofpage, $url, $max = null, $ajaxurl 
 	} else {
 		list($url, $mao) = explode('#', $url);
 		$mao && $mao = '#' . $mao;
-		$pages = "<div class=\"pages\"><a style=\"cursor:pointer;\" class=\"b\"" . ($ajaxurl ? " onclick=\"return getMusic('1')\"" : '') . ">&laquo;</a>";
+		$pages = "<ul class=\"B_face_pages B_cc\">";
 		for ($i = $page - 3; $i <= $page - 1; $i++) {
 			if ($i < 1) continue;
-			$pages .= "<a style=\"cursor:pointer;\"" . ($ajaxurl ? " onclick=\"return getMusic('$i')\"" : '') . ">$i</a>";
+			$pages .= "<li><a style=\"cursor:pointer;\"" . ($ajaxurl ? " onclick=\"return getMusic('$i')\"" : '') . ">$i</a></li>";
 		}
-		$pages .= "<b>$page</b>";
+		$pages .= "<li><a href=\"javascript:;\" class=\"current\">$page</a></li>";
 		if ($page < $numofpage) {
 			$flag = 0;
 			for ($i = $page + 1; $i <= $numofpage; $i++) {
-				$pages .= "<a style=\"cursor:pointer;\"" . ($ajaxurl ? " onclick=\"return getMusic('$i')\"" : '') . ">$i</a>";
+				$pages .= "<li><a href=\"javascript:;\"" . ($ajaxurl ? " onclick=\"return getMusic('$i')\"" : '') . ">$i</a><li>";
 				$flag++;
 				if ($flag == 4) break;
 			}
 		}
-		$pages .= "<a style=\"cursor:pointer;\" class=\"b\"" . ($ajaxurl ? " onclick=\"return getMusic('$numofpage')\"" : '') . ">&raquo;</a><span class=\"pagesone\">Pages: $page/$total&nbsp; &nbsp; &nbsp;Go <input type=\"text\" size=\"3\" onkeydown=\"javascript: if(event.keyCode==13){" . ($ajaxurl ? "getMusic(this.value);" : " location='{$url}page='+this.value+'{$mao}';") . "return false;}\"></span></div>";
+		$pages .= "</ul>";
 		return $pages;
 	}
 }
@@ -268,25 +272,22 @@ function app_specialRoute($route) {
 	}
 	return $route;
 }
+
 function getNextOrPreDiaryName($did,$fuid,$type){
 	global $db,$winduid;
-	$uid=$fuid ? $fuid : $winduid;
-	$sqladd="WHERE uid=".S::sqlEscape($uid);
-	if($type=='next'){
-		if ($uid != $winduid) {
-		$sqladd .= " AND privacy!=2 AND did>".S::sqlEscape($did);
-		} else {
-		$sqladd .= " AND did>".S::sqlEscape($did);
+	$uid = $fuid ? $fuid : $winduid;
+	$sqladd = "WHERE uid=".S::sqlEscape($uid);
+	if ($type == 'next') {
+		$sqladd = $uid != $winduid ? $sqladd . " AND privacy != 2 AND did > " . S::sqlEscape($did) : $sqladd. " AND did > " . S::sqlEscape($did);
+		$minDid = $db->get_value('SELECT MIN(did) FROM pw_diary ' . $sqladd);
+		if(!$minDid) return '';
+		$diaryName = $db->get_value("SELECT subject as diaryName FROM pw_diary  WHERE did = $minDid");
+	} elseif ($type == 'pre') {
+		$sqladd = $uid != $winduid ? $sqladd . " AND privacy != 2 AND did < " . S::sqlEscape($did) : $sqladd . " AND did < " . S::sqlEscape($did);
+		$maxDid = $db->get_value('SELECT MAX(did) FROM pw_diary ' . $sqladd);
+		if(!$maxDid) return '';
+		$diaryName = $db->get_value("SELECT subject as diaryName FROM pw_diary WHERE did = $maxDid");
 	}
-	$diaryName=$db->get_value("SELECT subject as diaryName FROM pw_diary  where did=(select MIN(did) from pw_diary $sqladd)");
-	}else if($type=='pre'){
-		if ($uid != $winduid) {
-		$sqladd .= " AND privacy!=2 AND did<".S::sqlEscape($did);
-	} else {
-		$sqladd .= " AND did<".S::sqlEscape($did);
-	}
-	$diaryName=$db->get_value("SELECT subject as diaryName FROM pw_diary a where did=(select MAX(did) from pw_diary $sqladd)");
-	}
-	return ($diaryName) ? $diaryName :'';
+	return ($diaryName) ? $diaryName : '';
 }
 ?>

@@ -4,7 +4,6 @@
 #Author:           2010-4-12 10:30
 #Recent:           2010-4-12
 -------------------------------------*/
-html{background-image:url(about:blank);background-attachment:fixed;_overflow-x:hidden;}
 .startbar-wrapper{width:100%;position:fixed;bottom:0;z-index:1000;height:25px;_position: absolute;_top: expression(documentElement . scrollTop +   documentElement . clientHeight-this . offsetHeight);}
 .startbar{margin-left:22px;margin-right:15px;}
 .startbar-ui{position:relative;height:24px;border:1px solid #8ebcc7;border-bottom:0;background:#e2f2f8 url(startbar.png) repeat-x;}

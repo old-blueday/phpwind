@@ -32,7 +32,9 @@ $db->update("UPDATE pw_usertool SET nums=nums-1 WHERE uid=".S::sqlEscape($windui
 if(empty($rt['icon'])){
 	$userface="||0||1";
 } else{
-	$userface="$user_a[0]|$user_a[1]|$user_a[2]|$user_a[3]|1";
+	//$userface="$user_a[0]|$user_a[1]|$user_a[2]|$user_a[3]|1";
+	$user_a[4] = 1;
+	$userface = implode('|',$user_a);
 }
 
 $userService->update($uid, array('icon' => $userface), array(), array('tooltime' => $timestamp));

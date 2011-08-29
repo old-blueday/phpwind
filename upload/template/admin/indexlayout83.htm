@@ -113,7 +113,8 @@ EOT;
     </div>
 </div>
 <script src="js/desktop/Cookie.js"></script>
-<script id="B_script_base" src="js/breeze/core/base.js"></script>
+<script>var BREEZE_BASE_PATH = 'js/breeze/';</script>
+<script src="js/breeze/core/base.js"></script>
 <script type="text/javascript">
 USUALL = $diyjsstr; /*常用的功能模块*/
 <!--
@@ -153,6 +154,7 @@ function fullscreen(e){
 	if(scr && !scr.disabled){
 		scr.disabled = true;
 		B.$('#fullScreen').className = 'admin_full';
+		B.$('#fullScreen').title = '全屏';
 		return;
 	}
 	if(!scr){
@@ -161,6 +163,7 @@ function fullscreen(e){
 	scr.disabled = false;
 	
 	B.$('#fullScreen').className = 'admin_unfull';
+	B.$('#fullScreen').title = '返回';
 	return false;
 }
 function init(){
@@ -577,7 +580,6 @@ function delSpan2(li){
 	}
 	B.remove(li);
 	B.query('#'+B.data(B.$('a', li), 'name')).remove();
-	e.halt();
 }
 function next(e){
 	var a, node =B.next( B.$('#B_history .current') );
@@ -783,7 +785,9 @@ PW.Dialog = function(cfg){
 }
 adminNavClass.initTips = initTips;
 
-init();
+window.onload = function(){
+	init();
+}
 adminSearchClass.init();
 </script>
 <!--

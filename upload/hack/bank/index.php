@@ -1,7 +1,8 @@
 <?php
 !function_exists('readover') && exit('Forbidden');
 $wind_in='bank';
-require_once pwCache::getPath(D_P.'data/bbscache/bk_config.php');
+//* require_once pwCache::getPath(D_P.'data/bbscache/bk_config.php');
+pwCache::getData(D_P.'data/bbscache/bk_config.php');
 
 $groupid == 'guest' && Showmsg('not_login');
 $bk_open == '0'     && Showmsg('bk_close');
@@ -59,7 +60,7 @@ if (empty($action)) {
 		$query = $db->query("SELECT i.uid,m.username,i.deposit,i.startdate FROM pw_memberinfo i LEFT JOIN pw_members m ON m.uid=i.uid ORDER BY i.deposit DESC ".S::sqlLimit($bk_num));
 		while ($deposit = $db->fetch_array($query)) {
 			if ($deposit['deposit']) {
-				$deposit['startdate'] = get_date($deposit['startdate']);
+				$deposit['startdate'] = $deposit['startdate'] ? get_date($deposit['startdate']) : '';
 				$_DESPOSTDB[] = array($deposit['uid'],$deposit['username'],$deposit['deposit'], $deposit['startdate']);
 			}
 		}
@@ -67,15 +68,15 @@ if (empty($action)) {
 		$query = $db->query("SELECT i.uid,username,ddeposit,dstartdate FROM pw_memberinfo i LEFT JOIN pw_members m ON m.uid=i.uid ORDER BY ddeposit DESC ".S::sqlLimit($bk_num));
 		while ($deposit = $db->fetch_array($query)) {
 			if ($deposit['ddeposit']) {
-				$deposit['dstartdate'] = get_date($deposit['dstartdate']);
+				$deposit['dstartdate'] = $deposit['dstartdate'] ? get_date($deposit['dstartdate']) : '';
 				$_DDESPOSTDB[] = array($deposit['uid'],$deposit['username'],$deposit['ddeposit'], $deposit['dstartdate']);
 			}
 		}
 		$wirtedb = savearray('_DESPOSTDB',$_DESPOSTDB);
 		$wirtedb.= "\n".savearray('_DDESPOSTDB',$_DDESPOSTDB);
-		pwCache::setData(D_P.'data/bbscache/bank_sort.php',"<?php\r\n".$wirtedb.'?>');
+		pwCache::writeover(D_P.'data/bbscache/bank_sort.php',"<?php\r\n".$wirtedb.'?>');
 	}
-	include pwCache::getPath(D_P."data/bbscache/bank_sort.php");
+	include (D_P."data/bbscache/bank_sort.php");
 	require_once PrintHack('index');footer();
 }
 
@@ -306,6 +307,7 @@ if ($_POST['action'] == 'save') {
 	while ($rt = $db->fetch_array($query)) {
 		$rt['date']   = get_date($rt['timestamp']);
 		$rt['descrip']= str_replace(array('[b]','[/b]'),array('<b>','</b>'),$rt['descrip']);
+		$to && $rt['ip'] = $_G['viewipfrom'] ? $rt['ip'] : '保密';
 		$logdb[] = $rt;
 	}
 	require_once PrintHack('index');footer();

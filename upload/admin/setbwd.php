@@ -841,7 +841,8 @@ EOT;
 			$threaddb = unserialize($cache['threaddb']);
 		} else {
 			# 读取缓存
-			require_once pwCache::getPath(D_P.'data/bbscache/wordsfb_progress.php');
+			//* require_once pwCache::getPath(D_P.'data/bbscache/wordsfb_progress.php');
+			pwCache::getData(D_P.'data/bbscache/wordsfb_progress.php');
 			$catedb   = unserialize($catedb);
 			$threaddb = unserialize($threaddb);
 		}
@@ -951,9 +952,11 @@ EOT;
 				$tids = S::sqlImplode($value);
 				$sql = "SELECT COUNT(*) FROM pw_threads WHERE ifcheck=0 AND tid IN (".$tids.")";
 				$num = $db->get_value($sql);
-
+				/**
 				$sql = "UPDATE pw_forumdata SET article=article+".S::sqlEscape($num,false).",topic=topic+".S::sqlEscape($num,false)."WHERE fid=".S::sqlEscape($key);
 				$db->update($sql);
+				**/
+				$db->update(pwQuery::buildClause("UPDATE :pw_table SET article=article+:article,topic=topic+:topic WHERE fid=:fid", array('pw_forumdata', $num, $num, $key)));
 			}
 
 			//更改帖子状态
@@ -1057,8 +1060,11 @@ EOT;
 					}
 
 					# 更新版块帖子个数
+					/**
 					$sql = "UPDATE pw_forumdata SET article=article+".S::sqlEscape($forum_count)." WHERE fid=".S::sqlEscape($fid);
 					$db->update($sql);
+					**/
+					$db->update(pwQuery::buildClause("UPDATE :pw_table SET article=article+:article WHERE fid=:fid", array('pw_forumdata', $forum_count, $fid)));
 				}
 				# 更新回复表的更新系数
 				$db->update("UPDATE $pw_posts SET ifcheck='1',ifwordsfb='$db_wordsfb' WHERE pid IN($selid)");
@@ -1119,8 +1125,10 @@ EOT;
 					if ($tids) {
 						$sql = "SELECT COUNT(*) FROM pw_threads WHERE ifcheck=0 AND tid IN (".$tids.")";
 						$num = $db->get_value($sql);
-
+						/**
 						$db->update("UPDATE pw_forumdata SET article=article+".S::sqlEscape($num).",topic=topic+".S::sqlEscape($num,false)."WHERE fid=".S::sqlEscape($key));
+						**/
+						$db->update(pwQuery::buildClause("UPDATE :pw_table SET article=article+:article,topic=topic+:topic WHERE fid=:fid", array('pw_forumdata', $num, $num, $key)));
 					}
 				}
 
@@ -1228,8 +1236,11 @@ EOT;
 						}
 
 						# 更新版块帖子个数
+						/**
 						$sql = "UPDATE pw_forumdata SET article=article+".S::sqlEscape($forum_count)." WHERE fid=".S::sqlEscape($fid);
 						$db->update($sql);
+						**/
+						$db->update(pwQuery::buildClause("UPDATE :pw_table SET article=article+:article WHERE fid=:fid", array('pw_forumdata', $forum_count, $fid)));
 					}
 					# 更新回复表的更新系数
 					$db->update("UPDATE $pw_posts SET ifcheck='1',ifwordsfb='$db_wordsfb' WHERE pid IN($selid)");
@@ -1395,8 +1406,11 @@ EOT;
 					}
 
 					# 更新版块文章数
+					/**
 					$sql = "UPDATE pw_forumdata SET article=article-".S::sqlEscape($forum_count)." WHERE fid=".S::sqlEscape($fid);
 					$db->update($sql);
+					**/
+					$db->update(pwQuery::buildClause("UPDATE :pw_table SET article=article-:article WHERE fid=:fid", array('pw_forumdata', $forum_count, $fid)));					
 				}
 
 				foreach ($db_threads as $tid => $thread) {
@@ -1788,6 +1802,7 @@ function setAllDictionary()
 	$content = "";
 	while ($value = $db->fetch_array($querys)) {
 		$weighing = $score[$value['type']];
+		$value['word'] = strtolower($value['word']);
 	  	$content.="".$value['word']."|".$weighing."\r\n";
 	}
 
@@ -1946,7 +1961,8 @@ function setScanCache()
 
 	if(file_exists(D_P.'data/bbscache/wordsfb_progress.php')) {
 		# 读取缓存
-		require_once pwCache::getPath(D_P.'data/bbscache/wordsfb_progress.php');
+		//* require_once pwCache::getPath(D_P.'data/bbscache/wordsfb_progress.php');
+		pwCache::getData(D_P.'data/bbscache/wordsfb_progress.php');
 		$temp_threaddb = unserialize($threaddb);
 	} else {
 		$temp_threaddb = array();

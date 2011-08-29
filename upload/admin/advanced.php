@@ -47,7 +47,7 @@ if ($adminitem == 'mmemcache') {
 	$ranks = $sphinxSearch->_getSphinxRanks();
 	$groups = $sphinxSearch->_getSphinxGroups();
 	if ($_POST ['step'] == 2) {
-		S::gp ( array ('host', 'port', 'isopen','rank','group','tindex','tcindex','pindex','dindex','dcindex','cmsindex','wordsegment_mode','sync_data') );
+		S::gp ( array ('host', 'port', 'isopen','rank','group','tindex','tcindex','pindex','dindex','dcindex','cmsindex','weiboindex','wordsegment_mode','sync_data') );
 		empty($host) && adminmsg ( "抱歉，服务器主机不能为空" );
 		empty($port) && adminmsg ( "抱歉，服务器端口不能为空" );
 		$isopen = (isset ( $isopen )) ? $isopen : 0;
@@ -72,6 +72,7 @@ if ($adminitem == 'mmemcache') {
 							 'dindex'=>trim($dindex),
 							 'dcindex'=>trim($dcindex),
 							 'cmsindex'=>trim($cmsindex),
+							 'weiboindex'=>trim($weiboindex),
 							 'wordsegment_mode'=> S::int($wordsegment_mode),
 							 'sync'=>$sync_data,
 						);
@@ -105,6 +106,44 @@ if ($adminitem == 'mmemcache') {
 		}
 		include PrintEot ( 'advanced' );
 	}
+} elseif ($adminitem == 'distribute') {
+	if ($_POST ['step'] == 2) {
+		if (!pwWritable(D_P.'data/sql_config.php')) {
+			adminmsg('manager_error');
+		}
+		include D_P.'data/sql_config.php';
+
+		S::gp ( array ('db_distribute'));
+		if($db_distribute){
+			$_service = L::loadClass ( 'cachedistribute', 'utility' );
+			if (!$_service->dumpData ()) adminmsg("抱歉，将缓存文件导入数据库时出错");
+		}
+		
+		$newconfig = array(
+			'dbhost' => $dbhost,
+			'dbuser' => $dbuser,
+			'dbpw' => $dbpw,
+			'dbname' => $dbname,
+			'database' => $database,
+			'PW' => $PW,
+			'pconnect' => $pconnect,
+			'charset' => $charset,
+			'manager' => $manager,
+			'manager_pwd' => $manager_pwd,
+			'db_hostweb' => $db_hostweb,
+			'db_distribute' => intval($db_distribute),
+			'attach_url' => $attach_url
+		);
+		require_once(R_P.'require/updateset.php');
+		write_config($newconfig);
+		
+		//* setConfig ( 'db_distribute', intval($db_distribute) );
+		//* updatecache_c ();		
+		adminmsg('operate_success');
+	}
+	$baseUrl = EncodeUrl ($basename);
+	ifcheck($db_distribute, 'db_distribute');
+	include PrintEot ( 'advanced' );
 }
 
 function assignSelect($arrays,$select){

@@ -41,4 +41,34 @@ class PW_Forums {
 			}
 		}
 	}
+
+	function getTucoolForums(){
+		$tucoolForums = array();
+		$fids = $this->getAllForumIds();
+		$forumsDao = $this->getForumsDao();
+		$forumSets = $forumsDao->getForumSetsByFids($fids);
+		if ($forumSets) {
+			foreach ($forumSets as $k=>$v) {
+				$forumset = array();
+				$v = @unserialize($v['forumset']);
+				if(!$v['iftucool']) continue;
+				$forumset['tucoolpic'] = intval($v['tucoolpic']);
+				S::isArray($forumset) && $tucoolForums[$k] = $forumset;
+			}
+		}
+		if ($tucoolForums) {
+			$forums = $forumsDao->getFormusByFids(array_keys($tucoolForums),'fid,name');
+			foreach ($forums as $k=>$v) {
+				$tucoolForums[$k] = array_merge($tucoolForums[$k],$v);
+			}
+		}
+		return $tucoolForums;
+	}
+	function getAllForumIds() {
+		$forums = getForumCache();
+		foreach ($forums as $v) {
+			$fids[] = $v['fid'];
+		}
+		return $fids;
+	}
 }

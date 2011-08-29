@@ -84,6 +84,7 @@ class usercontrol {
 
 	function synlogout() {
 		$synlogout = '';
+		if (!$this->base->appid) return '';
 		$mapp = $this->base->load('app');
 		$list = $mapp->applist();
 		foreach ($list as $appid => $app) {

@@ -1,7 +1,8 @@
 <?php
 !function_exists('adminmsg') && exit('Forbidden');
 
-@include_once pwCache::getPath(D_P.'data/bbscache/o_config.php');
+//* @include_once pwCache::getPath(D_P.'data/bbscache/o_config.php');
+pwCache::getData(D_P.'data/bbscache/o_config.php');
 
 require_once(A_P . 'lib/colonys.class.php');
 $newColony = new PW_Colony();
@@ -308,7 +309,8 @@ if (empty($action)) {
 		is_array($ifshow) || $ifshow = array();
 		is_array($vieworder) || $vieworder = array();
 		foreach ($ids as $key =>$id) {
-			$db->update("UPDATE pw_colonys SET ifshow=".S::sqlEscape($ifshow[$id]).",vieworder=".S::sqlEscape($vieworder[$id]).",ifshowpic=".S::sqlEscape($ifshowpic[$id])." WHERE id=".S::sqlEscape($id));
+			//* $db->update("UPDATE pw_colonys SET ifshow=".S::sqlEscape($ifshow[$id]).",vieworder=".S::sqlEscape($vieworder[$id]).",ifshowpic=".S::sqlEscape($ifshowpic[$id])." WHERE id=".S::sqlEscape($id));
+			pwQuery::update('pw_colonys', 'id=:id', array($id), array('ifshow'=>$ifshow[$id], 'vieworder'=>$vieworder[$id], 'ifshowpic'=>$ifshowpic[$id]));
 		}
 
 
@@ -471,7 +473,8 @@ if (empty($action)) {
 			$colonyServer->changeTopicShowInForum($cyid, $iftopicshowinforum, $colony['classid']);
 		}
 		$pwSQL['styleid'] = $styleid;
-		$db->update("UPDATE pw_colonys SET " . S::sqlSingle($pwSQL) . ' WHERE id=' . S::sqlEscape($cyid));
+		//* $db->update("UPDATE pw_colonys SET " . S::sqlSingle($pwSQL) . ' WHERE id=' . S::sqlEscape($cyid));
+		pwQuery::update('pw_colonys', 'id=:id', array($cyid), $pwSQL);
 		require_once(R_P .'u/require/core.php');
 		updateGroupLevel($cyid, $colony);		
 		adminmsg('operate_success',"$basename&action=editcolony");
@@ -514,7 +517,8 @@ if (empty($action)) {
 		$db->update("UPDATE pw_cmembers a LEFT JOIN pw_ouserdata o ON a.uid=o.uid SET o.groupnum=o.groupnum-1 WHERE a.colonyid=" . S::sqlEscape($cyid) . ' AND o.groupnum>0');
 		$db->update("DELETE FROM pw_argument WHERE cyid=" . S::sqlEscape($cyid));
 		$db->update("DELETE FROM pw_cmembers WHERE colonyid=" . S::sqlEscape($cyid));
-		$db->update("DELETE FROM pw_colonys  WHERE id=" . S::sqlEscape($cyid));
+		//* $db->update("DELETE FROM pw_colonys  WHERE id=" . S::sqlEscape($cyid));
+		pwQuery::delete('pw_colonys', 'id=:id', array($cyid));
 		$db->update("UPDATE pw_cnclass SET cnsum=cnsum-1 WHERE fid=" . S::sqlEscape($rt['classid']) . ' AND cnsum>0');
 	}
 	adminmsg('operate_success',"$basename&action=colony");
@@ -582,7 +586,8 @@ if (empty($action)) {
 			$db->update("UPDATE pw_cmembers a LEFT JOIN pw_ouserdata o ON a.uid=o.uid SET o.groupnum=o.groupnum-1 WHERE a.colonyid=" . S::sqlEscape($rt[0],false) . ' AND o.groupnum>0');
 			$db->update("DELETE FROM pw_argument WHERE cyid=" . S::sqlEscape($rt[0],false));
 			$db->update("DELETE FROM pw_cmembers WHERE colonyid=" . S::sqlEscape($rt[0],false));
-			$db->update("DELETE FROM pw_colonys  WHERE id=" . S::sqlEscape($rt[0],false));
+			//* $db->update("DELETE FROM pw_colonys  WHERE id=" . S::sqlEscape($rt[0],false));
+			pwQuery::delete('pw_colonys', 'id=:id', array($rt[0]));
 		}
 		pwFtpClose($ftp);
 		adminmsg('operate_success',"$basename&action=cache");
@@ -598,7 +603,7 @@ if (empty($action)) {
 		if ($ttype == '1') {
 
 			!$delid && adminmsg('operate_error');
-			$pw_tmsgs = 'pw_tmsgs' . $ttable;
+			$pw_tmsgs = 'pw_tmsgs' . ($ttable > 0 ? intval($ttable) : '');
 			$fidarray = $delaids = $specialdb = array();
 			$tmpDelids = $delid;
 			$delids = S::sqlImplode($delid);
@@ -707,7 +712,8 @@ if (empty($action)) {
 				$colony['pnum'] -= $value['pnum'];
 				updateGroupLevel($key, $colony);
 
-				$db->update("UPDATE pw_colonys SET tnum=tnum-" . S::sqlEscape($value['tnum']) . ", pnum=pnum-" . S::sqlEscape($value['pnum']) . ", todaypost=todaypost-" . S::sqlEscape($value['todaypost']) . " WHERE id=". S::sqlEscape($key));
+				//* $db->update("UPDATE pw_colonys SET tnum=tnum-" . S::sqlEscape($value['tnum']) . ", pnum=pnum-" . S::sqlEscape($value['pnum']) . ", todaypost=todaypost-" . S::sqlEscape($value['todaypost']) . " WHERE id=". S::sqlEscape($key));
+				$db->update(pwQuery::buildClause("UPDATE :pw_table SET tnum=tnum-:tnum,pnum=pnum-:pnum,todaypost=todaypost-:todaypost WHERE id=:id", array('pw_colonys',$value['tnum'], $value['pnum'], $value['todaypost'], $key)));
 			}
 
 			foreach ($ptable_a as $key => $val) {
@@ -831,7 +837,7 @@ if (empty($action)) {
 		$tpre = 't';
 		if ($ttype == '1') {
 			$sqltab = 'pw_threads t';
-			$pw_tmsgs = 'pw_tmsgs' . $ttable;
+			$pw_tmsgs = 'pw_tmsgs' . ($ttable > 0 ? intval($ttable) : '');
 			$tpre = 'tm';
 			$addpage .= "ttable=$ttable&";
 		} else {
@@ -929,7 +935,8 @@ if (empty($action)) {
 			$colony['albumnum'] -= $rt['sum'];
 			updateGroupLevel($rt['ownerid'], $colony);
 
-			$db->update("UPDATE pw_colonys SET albumnum=albumnum-" . S::sqlEscape($rt[sum]) . ",photonum=photonum-". S::sqlEscape($rt['photonum']) ." WHERE id=" . S::sqlEscape($rt['ownerid']));
+			//* $db->update("UPDATE pw_colonys SET albumnum=albumnum-" . S::sqlEscape($rt[sum]) . ",photonum=photonum-". S::sqlEscape($rt['photonum']) ." WHERE id=" . S::sqlEscape($rt['ownerid']));
+			$db->update(pwQuery::buildClause("UPDATE :pw_table SET albumnum=albumnum-:albumnum,photonum=photonum-:photonum WHERE id=:id", array('pw_colonys',$rt['sum'], $rt['photonum'], $rt['ownerid'])));
 		}
 
 		foreach ($selid as $key => $aid) {
@@ -1104,7 +1111,8 @@ if (empty($action)) {
 			$colony['photonum']--;
 			updateGroupLevel($photo['ownerid'], $colony);
 
-			$db->update("UPDATE pw_colonys SET photonum=photonum-1 WHERE id=" . S::sqlEscape($photo['ownerid']));
+			//* $db->update("UPDATE pw_colonys SET photonum=photonum-1 WHERE id=" . S::sqlEscape($photo['ownerid']));
+			$db->update(pwQuery::buildClause("UPDATE :pw_table SET photonum=photonum-1 WHERE id=:id", array('pw_colonys',$photo['ownerid'])));
 
 			pwDelatt($photo['path'], $db_ifftp);
 			$lastpos = strrpos($photo['path'],'/') + 1;
@@ -1378,7 +1386,8 @@ if (empty($action)) {
 			$colony['writenum']--;
 			updateGroupLevel($colony['id'], $colony);
 
-			$db->update("UPDATE pw_colonys SET writenum=writenum-1 WHERE id=". S::sqlEscape($writedb['cyid']));
+			//* $db->update("UPDATE pw_colonys SET writenum=writenum-1 WHERE id=". S::sqlEscape($writedb['cyid']));
+			$db->update(pwQuery::buildClause("UPDATE :pw_table SET writenum=writenum-1 WHERE id=:id", array('pw_colonys',$writedb['cyid'])));
 
 			$affected_rows = delAppAction('write',$id)+1;
 			countPosts("-$affected_rows");

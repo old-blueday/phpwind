@@ -2,9 +2,17 @@
 define('PRO','1');
 define('SCR','login');
 require_once('global.php');
+require (L::style('', $skinco, true));
+if ("wind" != $tplpath && file_exists(D_P.'data/style/'.$tplpath.'_css.htm')) {
+	$css_path = D_P.'data/style/'.$tplpath.'_css.htm';
+} else{
+	$css_path = D_P.'data/style/wind_css.htm';
+}
+
 if ($db_pptifopen && $db_ppttype == 'client') {
 	Showmsg('passport_login');
 }
+
 S::gp(array('action','forward'));
 !$db_pptifopen && $forward = '';
 $pre_url = $pwServer['HTTP_REFERER'] ? $pwServer['HTTP_REFERER'] : $db_bbsurl.'/'.$db_bfn;
@@ -39,12 +47,12 @@ if ($action == 'login') {
 		} else {
 			$arr_logintype[0] = 0;
 		}
-		if (GetCookie('o_invite') && $db_modes['o']['ifopen']==1) {
+		if ((GetCookie('o_invite') && $db_modes['o']['ifopen']==1) || $isfromreg) {
 			S::gp(array('jumpurl'));
 		} else {
 			$jumpurl = $pre_url;
 		}
-		require_once(R_P.'require/header.php');
+		list(,$_LoginInfo) = pwNavBar();
 		require_once PrintEot('login');footer();
 
 	} else {
@@ -65,9 +73,17 @@ if ($action == 'login') {
 		//list($winduid, $groupid, $windpwd, $showmsginfo) = checkpass($pwuser, $md5_pwpwd, $safecv, $lgt);
 		$logininfo = checkpass($pwuser, $md5_pwpwd, $safecv, $lgt);
 		if (!is_array($logininfo)) {
+			if ($logininfo == 'login_jihuo') {
+				$regEmail = getRegEmail($pwuser);
+				ObHeader("$db_registerfile?step=finish&email=$regEmail");
+			}
 			Showmsg($logininfo);
 		}
 		list($winduid, $groupid, $windpwd, $showmsginfo) = $logininfo;
+		
+		//* 当游客“登陆”时，删除该游客在pw_online_guest表中的记录
+		$onlineService = L::loadClass('OnlineService', 'user');
+		$onlineService->deleteOnlineGuest();		
 		
 		/*update cache*/
 		//* $_cache = getDatastore();
@@ -75,9 +91,11 @@ if ($action == 'login') {
 		perf::gatherInfo('changeMembersWithUserIds', array('uid'=>$winduid));
 		
 		if (file_exists(D_P."data/groupdb/group_$groupid.php")) {
-			require_once pwCache::getPath(S::escapePath(D_P."data/groupdb/group_$groupid.php"));
+			//* require_once pwCache::getPath(S::escapePath(D_P."data/groupdb/group_$groupid.php"));
+			pwCache::getData(S::escapePath(D_P."data/groupdb/group_$groupid.php"));
 		} else {
-			require_once pwCache::getPath(D_P."data/groupdb/group_1.php");
+			//* require_once pwCache::getPath(D_P."data/groupdb/group_1.php");
+			pwCache::getData(D_P."data/groupdb/group_1.php");
 		}
 		(int)$keepyear && $cktime = '31536000';
 		$cktime != 0 && $cktime += $timestamp;
@@ -90,7 +108,7 @@ if ($action == 'login') {
 			autoban($winduid);
 		}
 		($_G['allowhide'] && $hideid) ? Cookie('hideid',"1",$cktime) : Loginipwrite($winduid);
-		(empty($jumpurl) || false !== strpos($jumpurl, $regurl)) && $jumpurl = $db_bfn;
+		(empty($jumpurl) || false !== strpos($jumpurl, $regurl) || false !== strpos($jumpurl,'sendpwd.php')) && $jumpurl = $db_bfn;
 
 		if (GetCookie('o_invite') && $db_modes['o']['ifopen'] == 1) {
 			list($o_u,$hash,$app) = explode("\t",GetCookie('o_invite'));
@@ -106,7 +124,9 @@ if ($action == 'login') {
 			require_once(R_P.'require/passport_server.php');
 		}
 		//passport
-	
+		$isRegActivate = GetCookie('regactivate');
+		Cookie('regactivate','',0);
+		$jumpurl = $isRegActivate ? "$db_registerfile?step=finish&verify=$verifyhash": $jumpurl;
 		refreshto($jumpurl,'have_login');
 	}
 } elseif ($action == 'quit') {
@@ -122,6 +142,11 @@ if ($action == 'login') {
 			Cookie('force',$winduid);
 		}
 	}
+	
+	//* 当用户“退出”时，删除该用户在pw_online_user表中的记录
+	$onlineService = L::loadClass('OnlineService', 'user');
+	$onlineService->deleteOnlineUser($winduid);
+	
 	Loginout();
 	require_once(R_P . 'uc_client/uc_client.php');
 	$showmsginfo = uc_user_synlogout();

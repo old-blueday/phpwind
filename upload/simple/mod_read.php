@@ -117,11 +117,13 @@ if ($page == 1) {
 }
 $pages = PageDiv($count,$page,$numofpage,"{$DIR}t$tid");
 
-if (!$db_hithour) {
-	//$db->update("UPDATE pw_threads SET hits=hits+1 WHERE tid=".S::sqlEscape($tid));
-	pwQuery::update('pw_threads', 'tid=:tid', array($tid), null, array(PW_EXPR=>array('hits=hits+1')));
-} else {
-	pwCache::setData(D_P."data/bbscache/hits.txt",$tid."\t", false, 'ab');
+//更新帖子点击
+if ($db_hits_store == 0){
+	pwQuery::update('pw_threads', 'tid=:tid', array($tid), null, array(PW_EXPR=>array('hits=hits+1')));	
+}elseif ($db_hits_store == 1){
+	$db->update('UPDATE pw_hits_threads SET hits=hits+1 WHERE tid='.S::sqlEscape($tid)); 
+}elseif ($db_hits_store == 2){
+	pwCache::writeover(D_P.'data/bbscache/hits.txt',$tid."\t", 'ab');
 }
 
 if ($read['replies'] > 0) {

@@ -12,6 +12,15 @@ print <<<EOT
 		<div class="navB">
 			<ul class="one">
 				<li id="a_modify"><img src="u/images/set/modify.png">&nbsp;<a href="profile.php?action=modify">帐号</a></li>
+<!--
+EOT;
+if ($db_authstate) {print <<<EOT
+-->
+				<li id="a_auth"><img src="u/images/set/auth.png">&nbsp;<a href="profile.php?action=auth">认证</a></li>
+<!--
+EOT;
+}print <<<EOT
+-->
 				<li id="a_privacy"><img src="u/images/set/privacy.png">&nbsp;<a href="profile.php?action=privacy">隐私</a></li>
 				<li id="a_userpay"><img src="u/images/set/userpay.png">&nbsp;<a href="userpay.php">积分</a></li>
 				<li id="a_permission"><img src="u/images/set/permission.png">&nbsp;<a href="profile.php?action=permission">权限</a></li>
@@ -19,7 +28,7 @@ print <<<EOT
 EOT;
 if ($_G['atclog']) {print <<<EOT
 -->
-				 <li id="a_log"><img src="u/images/set/modify.png">&nbsp;<a href="profile.php?action=log">操作记录</a></li>
+				 <li id="a_log"><img src="u/images/set/record.png">&nbsp;<a href="profile.php?action=log">操作记录</a></li>
 <!--
 EOT;
 }print <<<EOT

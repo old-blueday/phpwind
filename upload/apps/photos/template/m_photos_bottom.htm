@@ -4,7 +4,6 @@ print <<<EOT
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=$db_charset" />
-<meta http-equiv="x-ua-compatible" content="ie=7" />
 <title>上传照片</title>
 <base id="headbase" href="$db_bbsurl/" />
 <link rel="stylesheet" type="text/css" href="images/pw_core.css" media="all" />
@@ -70,14 +69,14 @@ EOT;
 	</div>
 	<div class="photoup">
 		<dl class="cc" style="height:130px;">
-			<dt><span><img id="preview_1" style="filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod=image);border:1px solid #ccc;" width="90" height="90" src="$imgpath/90.png"></span></dt>
+			<dt><span><img id="preview_1" style="filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod=image);" width="90" height="90" src="$imgpath/90.png"></span></dt>
 			<dd><p><input type="file" class="input" name="photo_1" id="p_1" accept="image/*" onChange="preview_img(1);"/></p>
 			<p style="margin-top:8px;"><textarea id="pintro_1" name="pintro[1]" class="textareaA mb5"></textarea></p>
 			<span class="s6" id="pintro_1_warn">限255字节</span>
 			</dd>
 		</dl>
 		<dl class="cc" style="height:130px;">
-			<dt><span><img id="preview_2" style="filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod=image);border:1px solid #ccc;" width="90" height="90" src="$imgpath/90.png"></span></dt>
+			<dt><span><img id="preview_2" style="filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod=image);" width="90" height="90" src="$imgpath/90.png"></span></dt>
 			<dd><p><input type="file" class="input" name="photo_2" id="p_2" accept="image/*" onChange="preview_img(2);"/></p>
 			<p style="margin-top:8px;"><textarea id="pintro_2" name="pintro[2]" class="textareaA mb5"></textarea></p>
 			<span class="s6" id="pintro_2_warn">限255字节</span>

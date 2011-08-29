@@ -10,7 +10,8 @@ if (!$pwforum->isForum(true)) {
 $foruminfo =& $pwforum->foruminfo;
 $groupRight =& $newColony->getRight();
 $pwModeImg = "$imgpath/apps";
-include_once pwCache::getPath(D_P.'data/bbscache/o_config.php');
+//* include_once pwCache::getPath(D_P.'data/bbscache/o_config.php');
+pwCache::getData(D_P.'data/bbscache/o_config.php');
 
 require_once(R_P . 'require/header.php');
 list($guidename, $forumtitle) = $pwforum->getTitle();
@@ -59,36 +60,9 @@ if (empty($job)) {
 	require_once(R_P . 'require/bbscode.php');
 	$active['content'] = convert($active['content'], $db_windpost);
 	if ($attachs = $newActive->getAttById($id)) {
-		$aids = attachment($active['content']);
-		if ($winduid == $active['uid'] || $isGM || $pwSystem['delattach']) {
-			$dfadmin = 1;
-		} else {
-			$dfadmin = 0;
-		}
-		foreach ($attachs as $at) {
-			$atype = '';
-			$rat = array();
-			if ($at['type'] == 'img') {
-				$a_url = geturl($at['attachurl'],'show');
-				if (is_array($a_url)) {
-					$atype = 'pic';
-					$dfurl = '<br>'.cvpic($a_url[0], 1, $db_windpost['picwidth'], $db_windpost['picheight'], $at['ifthumb']);
-					$rat = array('aid' => $at['aid'], 'img' => $dfurl, 'dfadmin' => $dfadmin, 'desc' => $at['descrip']);
-				} elseif ($a_url == 'imgurl') {
-					$atype = 'picurl';
-					$rat = array('aid' => $at['aid'], 'name' => $at['name'], 'dfadmin' => $dfadmin, 'verify' => md5("showimg{$tid}{$read[pid]}{$fid}{$at[aid]}{$GLOBALS[db_hash]}"));
-				}
-			} else {
-				$atype = 'downattach';
-				$rat = array('aid' => $at['aid'], 'name' => $at['name'], 'size' => $at['size'], 'hits' => $at['hits'], 'needrvrc' => $at['needrvrc'], 'special' => $at['special'], 'cname' => $GLOBALS['creditnames'][$at['ctype']], 'type' => $at['type'], 'dfadmin' => $dfadmin, 'desc' => $at['descrip'], 'ext' => strtolower(substr(strrchr($at['name'],'.'),1)));
-			}
-			if (!$atype) continue;
-			if (in_array($at['aid'], $aids)) {
-				$active['content'] = attcontent($active['content'], $atype, $rat);
-			} else {
-				$active[$atype][$at['aid']] = $rat;
-			}
-		}
+		$attachShow = new attachShow(($isGM || $pwSystem['delattach']), '', 0, 'active');
+		$attachShow->setData($attachs);
+		$active += $attachShow->parseAttachs('tpc', $active['content'], $winduid == $active['uid']);
 	}
 	$newActive->updateHits($id);
 	list($newactivedb) = $newActive->searchList(array('cid'=>$cyid), 3, 0, 'id', 'DESC');
@@ -102,7 +76,6 @@ if (empty($job)) {
 	require_once PrintEot('thread_active');footer();
 
 } elseif ($job == 'actmember' || $job == 'membermanage') {
-	
 	
 	S::gp(array('id', 'page'), '', 2);
 	$page < 1 && $page = 1;
@@ -148,11 +121,10 @@ if (empty($job)) {
 		$editor = getstatus($winddb['userstatus'], PW_USERSTATUS_EDITOR) ? 'wysiwyg' : 'textmode';
 		$_G['uploadtype'] && $db_uploadfiletype = $_G['uploadtype'];
 		$db_uploadfiletype = !empty($db_uploadfiletype) ? (is_array($db_uploadfiletype) ? $db_uploadfiletype : unserialize($db_uploadfiletype)) : array();
-		$uploadfiletype = $uploadfilesize = ' ';
-		foreach ($db_uploadfiletype as $key => $value) {
-			$uploadfiletype .= $key.' ';
-			$uploadfilesize .= $key.':'.$value.'KB; ';
-		}
+		$attachAllow = pwJsonEncode($db_uploadfiletype);
+		$imageAllow = pwJsonEncode(getAllowKeysFromArray($db_uploadfiletype, array('jpg','jpeg','gif','png','bmp')));
+		$attachUrl = 'pweditor.php?action=attach';
+
 		$attach = '';
 		if ($job == 'edit' && $attachdb = $newActive->getAttById($id)) {
 			foreach ($attachdb as $key => $value) {
@@ -208,7 +180,8 @@ if (empty($job)) {
 			require_once(R_P . 'u/require/core.php');
 			$id = $activePost->insertData();
 			//activitynum加一
-			$db->update("UPDATE pw_colonys SET activitynum=activitynum+'1' WHERE id=" . S::sqlEscape($cyid));
+			//* $db->update("UPDATE pw_colonys SET activitynum=activitynum+'1' WHERE id=" . S::sqlEscape($cyid));
+			$db->update(pwQuery::buildClause("UPDATE :pw_table SET activitynum=activitynum+'1' WHERE id=:id", array('pw_colonys', $cyid)));
 			$colony['activitynum']++;
 			updateGroupLevel($colony['id'], $colony);
 			refreshto("{$basename}&job=view&id=$id",'活动发布成功!');

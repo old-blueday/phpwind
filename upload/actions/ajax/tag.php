@@ -11,8 +11,10 @@ if (!file_exists(D_P . "data/bbscache/tagdb.php") || $timestamp - $cachetime > 3
 	}
 	/** writeover(D_P . "data/bbscache/tagdb.php", "<?php\r\n\$tagdb=" . pw_var_export($tagdb) . ";\r\n?>"); **/
 	pwCache::setData(D_P . "data/bbscache/tagdb.php", "<?php\r\n\$tagdb=" . pw_var_export($tagdb) . ";\r\n?>");
+	touch(D_P . "data/bbscache/tagdb.php");
 } else {
-	include_once pwCache::getPath(D_P . "data/bbscache/tagdb.php");
+	//* include_once (D_P . "data/bbscache/tagdb.php");
+	extract(pwCache::getData(D_P . "data/bbscache/tagdb.php", false));
 }
 foreach ($tagdb as $key => $num) {
 	echo $key . ',' . $num . "\t";

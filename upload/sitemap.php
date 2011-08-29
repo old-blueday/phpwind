@@ -7,7 +7,8 @@ if ($for_google) {
 } else {
 	$cachefile = D_P."data/bbscache/sitemap.xml";
 }
-@include_once pwCache::getPath(D_P.'data/bbscache/sm_config.php');
+//* @include_once pwCache::getPath(D_P.'data/bbscache/sm_config.php');
+pwCache::getData(D_P.'data/bbscache/sm_config.php');
 !$sm_updatePeri && $sm_updatePeri = 12;
 
 if ($timestamp-pwFilemtime($cachefile)>=$sm_updatePeri*3600) {
@@ -46,7 +47,7 @@ if ($timestamp-pwFilemtime($cachefile)>=$sm_updatePeri*3600) {
 	} else {
 		$mapinfo = "<?xml version =\"1.0\" encoding=\"{$db_charset}\"?>\r\n<document xmlns:bbs=\"http://www.baidu.com/search/bbs_sitemap.xsd\">\r\n\t<webSite>$db_bbsurl</webSite>\r\n\t<webMaster>$db_ceoemail</webMaster>\r\n\t<updatePeri>$sm_updatePeri</updatePeri>\r\n\t<updatetime>".get_date($timestamp)."</updatetime>\r\n\t<version>phpwind $wind_version Certificate</version>\r\n".$mapinfo."</document>";
 	}
-	pwCache::setData($cachefile,$mapinfo);
+	pwCache::writeover($cachefile,$mapinfo);
 	echo $mapinfo;
 } else {
 	readfile($cachefile);

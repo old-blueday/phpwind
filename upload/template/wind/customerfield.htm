@@ -1,0 +1,603 @@
+<?php
+
+class customerFieldTemplate {
+	var $pwCustomerField; /* @var $pwCustomerField PW_CustomerField */
+	var $fieldInfo;
+	var $fieldHtml;
+	var $requriedHtml;
+	var $defaultValue = '';
+	var $defaultValueHtml = '';
+	var $htmlTemplate = array();
+	var $loadedScripts = array();
+	
+	function customerFieldTemplate($pwCustomerField = null) {
+		@$this->pwCustomerField = ($pwCustomerField && is_a($pwCustomerField , 'PW_CustomerField')) ? $pwCustomerField : L::loadClass('CustomerField','user');
+		$this->initHtmlTemplate();
+	}
+	
+	function buildHtml($fieldInfo,$defaultValue=''){
+		if (!S::isArray($fieldInfo)) return false;
+		$this->fieldHtml = '';
+		$this->defaultValueHtml = '';
+		$this->fieldInfo = $this->pwCustomerField->formatFieldInfo($fieldInfo);
+		$this->defaultValue = '';
+		$defaultValue && $this->defaultValue = $defaultValue;
+		$this->formatRequriedHtml();
+		$this->formatDescripHtml();
+		if (!isset($this->pwCustomerField->flipTypeMap[$this->fieldInfo['type']])) return false;
+		$methodName = 'build'. ucfirst($this->pwCustomerField->flipTypeMap[$this->fieldInfo['type']]);
+		$htmlTemplate = 'template'. ucfirst($this->pwCustomerField->flipTypeMap[$this->fieldInfo['type']]);
+		method_exists($this,$methodName) && eval("\$this->$methodName();");
+		
+		if(!isset($this->htmlTemplate[$htmlTemplate])) return false;
+		$this->fieldHtml = str_replace(
+			array(
+				'<!--[FIELD_TITLE]-->',
+				'<!--[FIELD_MAXLEN]-->',
+				'<!--[FIELD_NAME]-->',
+				'<!--[FIELD_DESCRIP]-->',
+				'<!--[REQUIRED_HTML]-->',
+				'<!--[DESCRIP_HTML]-->',
+				'<!--[FIELD_HTML_SELECT]-->',
+				'<!--[FIELD_HTML_RADIO]-->',
+				'<!--[FIELD_HTML_CHECKBOX]-->',
+				'<!--[FIELD_HTML_YEAR]-->',
+				'<!--[FIELD_HTML_AREASCRIPTS]-->',
+				'<!--[FIELD_HTML_AREAPROVINCE]-->',
+				'<!--[FIELD_HTML_AREACITY]-->',
+				'<!--[FIELD_HTML_AREAAREA]-->',
+				'<!--[FIELD_HTML_EDUSCRIPTS]-->',
+				'<!--[FIELD_HTML_EDUNAME]-->',
+				'<!--[FIELD_HTML_EDULEVEL]-->',
+				'<!--[FIELD_HTML_EDUYEAR]-->',
+				'<!--[FIELD_HTML_CAREERSCRIPTS]-->',
+				'<!--[FIELD_HTML_CAREERNAME]-->',
+				'<!--[FIELD_HTML_CAREERDATE]-->',
+				'<!--[DEFAULT_VALUE_HTML]-->',
+			),
+			array(
+				$this->fieldInfo['title'],
+				$this->fieldInfo['maxlen'],
+				$this->fieldInfo['fieldname'],
+				$this->fieldInfo['descrip'],
+				$this->requriedHtml,
+				$this->descripHtml,
+				$this->fieldInfo['html_select'],				
+				$this->fieldInfo['html_radio'],				
+				$this->fieldInfo['html_checkbox'],				
+				$this->fieldInfo['html_year'],				
+				$this->fieldInfo['html_areascripts'],				
+				$this->fieldInfo['html_areaprovince'],				
+				$this->fieldInfo['html_areacity'],				
+				$this->fieldInfo['html_areaarea'],				
+				$this->fieldInfo['html_eduscripts'],				
+				$this->fieldInfo['html_eduname'],				
+				$this->fieldInfo['html_edulevel'],				
+				$this->fieldInfo['html_eduyear'],	
+				$this->fieldInfo['html_careerscripts'],				
+				$this->fieldInfo['html_careername'],								
+				$this->fieldInfo['html_careerdate'],	
+				$this->defaultValueHtml,
+			),
+			$this->htmlTemplate[$htmlTemplate]
+		);
+
+		if(preg_match_all('/<\!--\[IF\sFIELD_([A-Z_]+)\]-->.*<\!--\[ENDIF\sFIELD_[A-Z_]+\]-->/',$this->fieldHtml,$m)) {
+			$deleteFragment = array();
+			foreach($m[1] as $k=>$v){
+				$key = strtolower($v);
+				if(!isset($fieldInfo[$key]) || !$fieldInfo[$key]) {
+					$deleteFragment[] = $m[0][$k];
+				}
+			}
+			$deleteFragment && $this->fieldHtml = str_replace($deleteFragment,'',$this->fieldHtml);
+			//$this->fieldHtml = preg_replace('/<\!?--\[(IF|ENDIF)\sFIELD_[A-Z_]+\]-->/i','',$this->fieldHtml);
+		}
+		
+		return true;
+	}
+	
+	function formatRequriedHtml(){
+		$this->requriedHtml = $this->fieldInfo['required'] ? '<span class="s1">*</span>' : '';
+	}
+	function formatDescripHtml(){
+		$this->descripHtml = $this->fieldInfo['descrip'] ? '':' style="display:none"';
+	}
+	
+	function buildInput(){
+		$this->defaultValue && $this->defaultValueHtml = $this->defaultValue;
+	}
+	function buildTextarea(){
+		$this->defaultValue && $this->defaultValueHtml = $this->defaultValue;
+	}
+	function buildSelect(){
+$this->fieldInfo['html_select'] = <<<EOT
+					<select name="{$this->fieldInfo['fieldname']}">
+EOT;
+		$selectedHtml = '';
+		foreach ($this->fieldInfo['options'] as $k=>$v){
+			$selectedHtml = '';
+			if ($this->defaultValue && $k == $this->defaultValue) $selectedHtml = '  selected=1';
+$this->fieldInfo['html_select'] .= <<<EOT
+<option value="$k"$selectedHtml>$v</option>
+EOT;
+		}
+$this->fieldInfo['html_select'] .= <<<EOT
+					</select>
+EOT;
+	}
+	
+	function buildRadio(){
+		$this->fieldInfo['html_radio'] = '';
+		$checked = false;
+		foreach ($this->fieldInfo['options'] as $k=>$v){
+			$checkedHtml = '';
+			if ($this->defaultValue && $k == $this->defaultValue && $checked == false) {
+				$checkedHtml = 'checked';
+				$checked = true;
+			}
+$this->fieldInfo['html_radio'] .= <<<EOT
+				<label class="mr15"><input type="radio" name="{$this->fieldInfo['fieldname']}" value="$k" $checkedHtml>$v</label>
+EOT;
+	
+		}
+	}
+	
+	function buildCheckbox(){
+		$this->fieldInfo['html_checkbox'] = '';
+		$defaultValue = array();
+		$this->defaultValue && $defaultValue = explode("\t",$this->defaultValue);
+		foreach ($this->fieldInfo['options'] as $k=>$v){
+			$checkedHtml = S::inArray($k,$defaultValue) ? ' checked' : '';
+$this->fieldInfo['html_checkbox'] .= <<<EOT
+	<label class="mr15"><input type="checkbox" name="{$this->fieldInfo['fieldname']}[]" value="$k"$checkedHtml>$v</label>
+EOT;
+		}
+	}
+	
+	function buildYear(){
+		$this->fieldInfo['html_year'] = '';
+		$defaultValue = array('year'=>0,'month'=>0,'day'=>0);
+		if ($this->defaultValue) {
+			$tmpDate = getdate(strtotime($this->defaultValue));
+			$defaultValue['year'] = $tmpDate['year'];
+			$defaultValue['month'] = $tmpDate['mon'];
+			$defaultValue['day'] = $tmpDate['mday'];
+		}
+$this->fieldInfo['html_year'] .= <<<EOT
+<select name="{$this->fieldInfo['fieldname']}_year">
+EOT;
+		for ($i = $this->fieldInfo['options']['enddate']; $i>= $this->fieldInfo['options']['startdate']; $i--) {		
+			//year
+			$selectedHtml = $i == $defaultValue['year'] ? ' selected=1' : '';
+$this->fieldInfo['html_year'] .= <<<EOT
+<option value="$i" $selectedHtml>$i</option>
+EOT;
+		}
+$this->fieldInfo['html_year'] .= <<<EOT
+</select>
+
+<select name="{$this->fieldInfo['fieldname']}_month">
+<!--
+EOT;
+		for ($i = 1; $i<= 12; $i++) {
+			$selectedHtml = $i == $defaultValue['month'] ? ' selected=1' : '';
+$this->fieldInfo['html_year'] .= <<<EOT
+-->
+<option value="$i" $selectedHtml>$i </option>
+<!--
+EOT;
+}
+$this->fieldInfo['html_year'] .= <<<EOT
+-->
+</select>
+
+<select name="{$this->fieldInfo['fieldname']}_day">
+<!--
+EOT;
+		for ($i = 1; $i<= 31; $i++) {
+			$selectedHtml = $i == $defaultValue['day'] ? ' selected=1' : '';
+$this->fieldInfo['html_year'] .= <<<EOT
+-->
+<option value="$i" $selectedHtml>$i </option>
+<!--
+EOT;
+}
+$this->fieldInfo['html_year'] .= <<<EOT
+-->
+</select>
+EOT;
+	}
+	
+	function buildArea(){
+		static $areaService;
+		!$areaService && $areaService = L::LoadClass('AreasService','utility');
+		$id = md5(microtime());
+		if(!S::isArray($this->defaultValue)){
+			$basicValue = array(array('parentid'=>0,'selectid'=>'province_'.$id,'defaultid'=>'','hasfirst'=>1));
+		} else {
+			//var_dump($this->defaultValue);exit;
+			$basicValue = array(
+				array('parentid'=>0,'selectid'=>'province_'.$id,'defaultid'=>intval($this->defaultValue['province']),'hasfirst'=>1),
+				array('parentid'=>$this->defaultValue['province'],'selectid'=>'city_'.$id,'defaultid'=>intval($this->defaultValue['city']),'hasfirst'=>1),
+				array('parentid'=>$this->defaultValue['city'],'selectid'=>'area_'.$id,'defaultid'=>intval($this->defaultValue['area']),'hasfirst'=>1)
+			);
+		}
+		$this->fieldInfo['html_areascripts'] = $areaService->buildAllAreasLists($basicValue);
+		if(!$this->loadedScripts['area']){
+			$this->fieldInfo['html_areascripts'] .= <<<EOT
+	<script src="js/pw_areas.js"></script>
+EOT;
+			$this->loadedScripts['area'] = true;
+		}
+	$this->fieldInfo['html_areaprovince'] = <<<EOT
+			<select id="province_$id" onchange="changeSubArea(this.value, 'city_$id',1);" style="width:70px;"></select>
+EOT;
+	$this->fieldInfo['html_areacity'] = <<<EOT
+			<select id="city_$id" onchange="changeSubArea(this.value, 'area_$id',1);" style="width:70px;"></select>
+EOT;
+	$this->fieldInfo['html_areaarea'] = <<<EOT
+			<select id="area_$id" name="{$this->fieldInfo[fieldname]}" style="width:70px;"></select>
+EOT;
+	}
+	
+	function buildEducation(){
+		$id = 'ids_' . md5(microtime());
+$this->fieldInfo['html_eduscripts'] = <<<EOT
+		<script>
+			var eduHtml = '';
+			function getSchoolWindow(id,inputObj){
+				var type=1;
+				inputObj = getObj('schoolname_' + id);
+				level = getObj('level_' + id).value;
+				var schoolNameObj = getObj('schoolname_'+id);
+				if(level > 3){
+					type = 3;//大学
+				}else if(level > 1){
+					type = 2;//中学
+				}
+				url = 'pw_ajax.php?action=pwschools&type=' + type + '&sid=' + id;
+				sendmsg(url,'',getObj('schoolname_' + id));return false;
+			}
+			
+			function addEducation(s,t){
+				var l = getObj(t).lastChild;
+				var n = getObj(s).cloneNode(true);
+				n.style.display = '';
+				n.id = '';
+				n.innerHTML = n.innerHTML.replace(/((w+_)?ids_)[a-z0-9]+/ig, '$1'+Math.random().toString().substring(2));
+				getObj(t).insertBefore(n,l);
+			}
+		</script>
+EOT;
+$this->fieldInfo['html_edulevel'] = <<<EOT
+				<select name="new_{$this->fieldInfo['fieldname']}_level[]" id="level_$id">
+<!--
+EOT;
+		foreach ($this->pwCustomerField->educationMap as $k=>$v) {
+$this->fieldInfo['html_edulevel'] .= <<<EOT
+-->
+				<option value="$k">$v</option>
+<!--
+EOT;
+}
+$this->fieldInfo['html_edulevel'] .= <<<EOT
+-->
+				</select>
+EOT;
+$this->fieldInfo['html_eduname'] = <<<EOT
+			<input type="hidden" name="new_{$this->fieldInfo['fieldname']}_schoolid[]" id="schoolid_$id" value=""><input type="text" class="input" onfocus="" onclick="getSchoolWindow('$id');" id="schoolname_$id" />
+EOT;
+$this->fieldInfo['html_eduyear'] = <<<EOT
+				<select name="new_{$this->fieldInfo['fieldname']}_year[]">
+EOT;
+$date = getdate($GLOBALS['timestamp']);
+$startYear = $date['year'] - 10;
+$endYear = $startYear - 60;
+			for($i = $startYear; $i>= $endYear ; $i--){
+$this->fieldInfo['html_eduyear'] .= <<<EOT
+				<option value="$i">$i</option>
+EOT;
+			}
+$this->fieldInfo['html_eduyear'] .= <<<EOT
+				</select>
+EOT;
+		/*有默认值格式化默认值*/
+		if (S::isArray($this->defaultValue) && preg_match('/<\!--DEFAULT_VALUE_TEMPLATE-->(.*)<\!--END_DEFAULT_VALUE_TEMPLATE-->/is',$this->htmlTemplate['templateEducation'],$m) ) {
+			if(!$m[1]) return ;
+			foreach ($this->defaultValue as $k=>$v) {
+				if (!S::isArray($v)) continue;
+				$tmpEducation = array();
+				//教育程度
+$tmpEducation['html_edulevel'] = <<<EOT
+				<select name="{$this->fieldInfo['fieldname']}_level[$v[educationid]]" id="level_$k">
+<!--
+EOT;
+				foreach ($this->pwCustomerField->educationMap as $key=>$value) {
+					$selectedHtml = $key == $v['educationlevel'] ? '  selected=1' : '';
+$tmpEducation['html_edulevel'] .= <<<EOT
+-->
+				<option value="$key"$selectedHtml>$value</option>
+<!--
+EOT;
+				}
+$tmpEducation['html_edulevel'] .= <<<EOT
+-->
+				</select>
+EOT;
+$tmpEducation['html_eduname'] = <<<EOT
+			<input type="hidden" name="{$this->fieldInfo['fieldname']}_schoolid[$v[educationid]]" id="schoolid_$k" value="$v[schoolid]"><input type="text" class="input" onfocus="" onclick="getSchoolWindow('$k');" id="schoolname_$k" value="$v[schoolname]" />
+EOT;
+				//入学年份
+				$tempDate = getdate($v['starttime']);
+				$year = $tempDate['year'];
+$tmpEducation['html_eduyear'] = <<<EOT
+				<select name="{$this->fieldInfo['fieldname']}_year[$v[educationid]]">
+EOT;
+$date = getdate($GLOBALS['timestamp']);
+$startYear = $date['year'] - 10;
+$endYear = $startYear - 60;
+			for($i = $startYear; $i>= $endYear ; $i--){
+				$selectedHtml = $i == $year ? '  selected=1' : '';
+$tmpEducation['html_eduyear'] .= <<<EOT
+				<option value="$i"$selectedHtml>$i</option>
+EOT;
+			}
+$tmpEducation['html_eduyear'] .= <<<EOT
+				</select>
+EOT;
+				//todo
+				$this->defaultValueHtml .= str_replace(
+					array('<!--[FIELD_HTML_EDULEVEL]-->','<!--[FIELD_HTML_EDUNAME]-->','<!--[FIELD_HTML_EDUYEAR]-->'),
+					array($tmpEducation['html_edulevel'],$tmpEducation['html_eduname'],$tmpEducation['html_eduyear']),
+					//$this->htmlTemplate['templateEducation']
+					$m[1]
+				);
+			}
+		}
+	}
+
+	function buildCareer(){
+		$id = 'ids_' . md5(microtime());
+$this->fieldInfo['html_careerscripts'] = <<<EOT
+		<script>
+			
+			function addCareer(s,t){
+				var l = getObj(t).lastChild;
+				var n = getObj(s).cloneNode(true);
+				n.style.display = '';
+				n.id = '';
+				n.innerHTML = n.innerHTML.replace(/((w+_)?ids_)[a-z0-9]+/ig, '$1'+Math.random().toString().substring(2));
+				getObj(t).insertBefore(n,l);
+			}
+		</script>
+EOT;
+$this->fieldInfo['html_careername'] = <<<EOT
+			<input type="text" class="input" onfocus="" id="companyname_$id" name="new_career_companyname[]" />
+EOT;
+$this->fieldInfo['html_careerdate'] = <<<EOT
+				<select name="new_career_year[]">
+EOT;
+$date = getdate($GLOBALS['timestamp']);
+$startYear = $date['year'];
+$endYear = $startYear - 60;
+			for($i = $startYear; $i>= $endYear ; $i--){
+$this->fieldInfo['html_careerdate'] .= <<<EOT
+				<option value="$i">$i</option>
+EOT;
+			}
+$this->fieldInfo['html_careerdate'] .= <<<EOT
+				</select>
+<select name="new_career_month[]">
+<!--
+EOT;
+		for ($i = 1; $i<= 12; $i++) {
+$this->fieldInfo['html_careerdate'] .= <<<EOT
+-->
+<option value="$i">$i </option>
+<!--
+EOT;
+}
+$this->fieldInfo['html_careerdate'] .= <<<EOT
+-->
+</select>
+
+<select name="new_career_day[]">
+<!--
+EOT;
+		for ($i = 1; $i<= 31; $i++) {
+$this->fieldInfo['html_careerdate'] .= <<<EOT
+-->
+<option value="$i">$i </option>
+<!--
+EOT;
+}
+$this->fieldInfo['html_careerdate'] .= <<<EOT
+-->
+</select>
+EOT;
+
+		/*有默认值格式化默认值*/
+		if (S::isArray($this->defaultValue) && preg_match('/<\!--DEFAULT_VALUE_TEMPLATE-->(.*)<\!--END_DEFAULT_VALUE_TEMPLATE-->/is',$this->htmlTemplate['templateCareer'],$m)) {
+			if(!$m[1]) return ;
+			foreach ($this->defaultValue as $k=>$v) {
+				if (!S::isArray($v)) continue;
+				$tmpCareer = array();
+				//公司名
+$tmpCareer['html_careername'] = <<<EOT
+			<input type="text" class="input" onfocus="" id="companyname_{$v[careerid]}" name="career_companyname[{$v[careerid]}]" value="$v[companyname]" />
+EOT;
+				//入职日期
+				$careerdate = getdate($v['starttime']);
+$tmpCareer['html_careerdate'] = <<<EOT
+				<select name="career_year[{$v[careerid]}]">
+EOT;
+$date = getdate($GLOBALS['timestamp']);
+$startYear = $date['year'];
+$endYear = $startYear - 60;
+			for($i = $startYear; $i>= $endYear ; $i--){
+				$selectedHtml = $careerdate['year'] == $i ?' selected=1':'';
+$tmpCareer['html_careerdate'] .= <<<EOT
+				<option value="$i"$selectedHtml>$i</option>
+EOT;
+			}
+$tmpCareer['html_careerdate'] .= <<<EOT
+				</select>
+<select name="career_month[{$v[careerid]}]">
+<!--
+EOT;
+		for ($i = 1; $i<= 12; $i++) {
+			$selectedHtml = $careerdate['mon'] == $i ?'  selected=1':'';
+$tmpCareer['html_careerdate'] .= <<<EOT
+-->
+<option value="$i"$selectedHtml>$i </option>
+<!--
+EOT;
+}
+$tmpCareer['html_careerdate'] .= <<<EOT
+-->
+</select>
+
+<select name="career_day[{$v[careerid]}]">
+<!--
+EOT;
+		for ($i = 1; $i<= 31; $i++) {
+			$selectedHtml = $careerdate['mday'] == $i ?'  selected=1':'';
+$tmpCareer['html_careerdate'] .= <<<EOT
+-->
+<option value="$i"$selectedHtml>$i </option>
+<!--
+EOT;
+}
+$tmpCareer['html_careerdate'] .= <<<EOT
+-->
+</select>
+EOT;
+				//default value html
+				$this->defaultValueHtml .= str_replace(
+					array('<!--[FIELD_HTML_CAREERNAME]-->','<!--[FIELD_HTML_CAREERDATE]-->'),
+					array($tmpCareer['html_careername'],$tmpCareer['html_careerdate']),
+					$m[1]
+					//$this->htmlTemplate['templateCareer']
+				);
+			}
+		}
+	}
+	function initHtmlTemplate(){
+		$this->htmlTemplate['templateInput'] = <<<EOT
+		<dl class="cc">
+			<dt><!--[FIELD_TITLE]--><!--[REQUIRED_HTML]--></dt>
+			<dd class="ip"><div><input type="text" maxlength="<!--[FIELD_MAXLEN]-->" name="<!--[FIELD_NAME]-->" class="input" id="<!--[FIELD_NAME]-->" value="<!--[DEFAULT_VALUE_HTML]-->"></div></dd>
+			<dd class="tp"><div id="<!--[FIELD_NAME]-->_info" class="ignore"<!--[DESCRIP_HTML]-->><!--[FIELD_DESCRIP]--></div></dd>
+		</dl>
+EOT;
+		$this->htmlTemplate['templateTextarea'] = 	<<<EOT
+		<dl class="cc" style="padding-bottom:10px;">
+			<dt><!--[FIELD_TITLE]--><!--[REQUIRED_HTML]--></dt>
+			<dd class="ip"><div><textarea name="<!--[FIELD_NAME]-->" class="input" id="<!--[FIELD_NAME]-->"><!--[DEFAULT_VALUE_HTML]--></textarea></div></dd>
+			<dd class="tp"><div id="<!--[FIELD_NAME]-->_info" class="ignore"<!--[DESCRIP_HTML]-->><!--[FIELD_DESCRIP]--></div></dd>
+		</dl>
+EOT;
+		
+		$this->htmlTemplate['templateSelect'] =  <<<EOT
+			<dl class="cc">
+				<dt><!--[FIELD_TITLE]--><!--[REQUIRED_HTML]--></dt>
+				<dd class="ip">
+					<!--[FIELD_HTML_SELECT]-->
+				</dd>
+				<dd class="tp"><div id="<!--[FIELD_NAME]-->_info" class="ignore"<!--[DESCRIP_HTML]-->><!--[FIELD_DESCRIP]--></div></dd>
+			</dl>
+EOT;
+		$this->htmlTemplate['templateRadio'] = <<<EOT
+			<dl class="cc">
+				<dt><!--[FIELD_TITLE]--><!--[REQUIRED_HTML]--></dt>
+				<dd class="ip">
+					<!--[FIELD_HTML_RADIO]-->
+				</dd>
+				<dd class="tp"><div id="<!--[FIELD_NAME]-->_info" class="ignore"<!--[DESCRIP_HTML]-->><!--[FIELD_DESCRIP]--></div></dd>
+			</dl>
+EOT;
+
+		$this->htmlTemplate['templateCheckbox'] = <<<EOT
+			<dl class="cc">
+				<dt><!--[FIELD_TITLE]--><!--[REQUIRED_HTML]--></dt>
+				<dd class="ip">
+					<!--[FIELD_HTML_CHECKBOX]-->
+				</dd>
+				<dd class="tp"><div id="<!--[FIELD_NAME]-->_info" class="ignore"<!--[DESCRIP_HTML]-->><!--[FIELD_DESCRIP]--></div></dd>
+			</dl>
+EOT;
+
+		$this->htmlTemplate['templateYear'] = <<<EOT
+			<dl class="cc">
+				<dt><!--[FIELD_TITLE]--><!--[REQUIRED_HTML]--></dt>
+				<dd class="ip">
+					<!--[FIELD_HTML_YEAR]-->
+				</dd>
+				<dd class="tp"><div id="<!--[FIELD_NAME]-->_info" class="ignore"<!--[DESCRIP_HTML]-->><!--[FIELD_DESCRIP]--></div></dd>
+			</dl>
+EOT;
+		
+		$this->htmlTemplate['templateArea'] = <<<EOT
+			<!--[FIELD_HTML_AREASCRIPTS]-->
+			<dl class="cc">
+				<dt><!--[FIELD_TITLE]--><!--[REQUIRED_HTML]--></dt>
+				<dd class="if">
+					<!--[FIELD_HTML_AREAPROVINCE]-->
+					<!--[FIELD_HTML_AREACITY]-->
+					<!--[FIELD_HTML_AREAAREA]-->
+				</dd>
+			</dl>
+EOT;
+
+		$this->htmlTemplate['templateEducation'] = <<<EOT
+			<div class="regAdd_mode" id="eduBox">
+				<!--[FIELD_HTML_EDUSCRIPTS]-->
+				<a href="javascript://" class="fr mr20 s4" onclick="addEducation('eduItem','eduBox');">增加一个新经历</a>
+				<!--[DEFAULT_VALUE_HTML]-->
+				<div id="eduItem" class="regAdd_mode_div">
+					<!--DEFAULT_VALUE_TEMPLATE-->
+					<dl class="cc">
+						<dt>教育程度：</dt>
+						<dd class="if">
+							<!--[FIELD_HTML_EDULEVEL]-->
+						</dd>
+					</dl>
+					<dl class="cc">
+						<dt>学校名称：</dt>
+						<dd class="ip"><div><!--[FIELD_HTML_EDUNAME]--></div></dd>
+					</dl>
+					<dl class="cc">
+						<dt>入学年份：</dt>
+						<dd class="if">
+							<!--[FIELD_HTML_EDUYEAR]-->
+						</dd>
+					</dl>
+					<!--END_DEFAULT_VALUE_TEMPLATE-->
+				</div>
+			</div>
+EOT;
+		$this->htmlTemplate['templateCareer'] = <<<EOT
+			<div class="regAdd_mode" id="careerBox">
+				<!--[FIELD_HTML_CAREERSCRIPTS]-->
+				<a href="javascript://" class="fr mr20 s4" onclick="addCareer('careerItem','careerBox');">增加一个新经历</a>
+				<!--[DEFAULT_VALUE_HTML]-->
+				<div id="careerItem" class="regAdd_mode_div">
+				<!--DEFAULT_VALUE_TEMPLATE-->
+				<dl class="cc">
+					<dt>公司名称：</dt>
+					<dd class="ip"><div><!--[FIELD_HTML_CAREERNAME]--></div></dd>
+				</dl>
+				<dl class="cc">
+					<dt>入职时间：</dt>
+					<dd class="if">
+						<!--[FIELD_HTML_CAREERDATE]-->
+					</dd>
+				</dl>
+				<!--END_DEFAULT_VALUE_TEMPLATE-->
+				</div>
+			</div>
+EOT;
+	}
+}
+?>

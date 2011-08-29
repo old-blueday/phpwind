@@ -226,14 +226,16 @@ function editcol(id){
 		ds[i].className = id==ds[i].id ? 'checkon' : 'tr1 vt';
 	}
 	var o	= getObj(id);
-	var td1 = o.firstChild;
-	var td2 = o.lastChild;
+	var td1 = o.cells[0];
+	var td2 = o.cells[1];
 	document.setform.title.value = td1.innerHTML;
-	if(td2.firstChild.tagName.toLowerCase() == 'input'){
+	var select = td2.getElementsByTagName("SELECT");
+	if(select.length == 0){
 		ShowType('0');
+		document.setform.content.value = '';
 	} else{
 		ShowType('1');
-		var sel  = td2.firstChild.options;
+		var sel  = select[0].options;
 		var html = '';
 		for(var i=0;i<sel.length;i++){
 			html += (html ? "\\n" : '')+sel[i].text;
@@ -267,13 +269,14 @@ function checkform(){
 			input		= document.createElement('input');
 			input.type	= 'hidden';
 			input.name	= 'value['+i+']';
-			input.value	= ds[i].firstChild.innerHTML;
+			input.value	= ds[i].cells[0].innerHTML;
 			document.setform.appendChild(input);
-			if(ds[i].lastChild.firstChild.tagName.toLowerCase() == 'select'){
+			var select = ds[i].cells[1].getElementsByTagName("SELECT");
+			if(select.length > 0){
 				input	= document.createElement('input');
 				input.type	= 'hidden';
 				input.name	= 'descipt['+i+']';
-				var sel  = ds[i].lastChild.firstChild.options;
+				var sel  = select[0].options;
 				var html = '';
 				for(var j=0;j<sel.length;j++){
 					html += (html ? "," : '')+sel[j].text;

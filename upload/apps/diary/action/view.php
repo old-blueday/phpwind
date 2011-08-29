@@ -7,7 +7,8 @@ $basename = 'apps.php?q='.$q.'&uid='.$uid.'&';
 empty($space) && Showmsg('您访问的空间不存在!');
 
 $a = isset($a) ? $a : 'list';
-include_once pwCache::getPath(D_P . 'data/bbscache/o_config.php');
+//* include_once pwCache::getPath(D_P . 'data/bbscache/o_config.php');
+pwCache::getData(D_P . 'data/bbscache/o_config.php');
 	//$ouserdataService = L::loadClass('Ouserdata', 'sns'); /* @var $ouserdataService PW_Ouserdata */
 	//$ouserDb = $ouserPrivacy = array();
 	//$ouserDb = $ouserdataService->get($uid);
@@ -52,7 +53,7 @@ if ($a == 'list' && $indexRight) {
 	$winduid != $uid && $diaryTemp['privacy'] == 1 && !$is_friend && Showmsg('diary_friend_right');
 
 	$diary = $diaryService->getDiaryDbView($diaryTemp);
-	$url = 'apps.php?q=diary&u='.$uid.'&did='.$did.'&';
+	$url = 'apps.php?q=diary&a=detail&uid='.$uid.'&did='.$did.'&';
 	list($commentdb,$subcommentdb,$pages) = getCommentDbByTypeid('diary',$did,$page,$url);
 	$comment_type = 'diary';
 	$comment_typeid = $did;
@@ -72,8 +73,8 @@ if ($a == 'list' && $indexRight) {
 	} else {
 		!$diary['privacy'] && $weiboPriv = true;
 	}
-	$diaryNextName=getNextOrPreDiaryName($did, $fuid,'next');
-	$diaryPreName=getNextOrPreDiaryName($did, $fuid,'pre');
+	$diaryNextName=getNextOrPreDiaryName($did, $uid,'next');
+	$diaryPreName=getNextOrPreDiaryName($did, $uid,'pre');
 	
 } elseif ($a == 'copydiary') {
 

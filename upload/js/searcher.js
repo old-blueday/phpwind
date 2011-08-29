@@ -39,13 +39,30 @@ var searcher = {
 		if(!advanced || !close || !close2){return ;}
 		var _this = this;
 		advanced.onclick=function(){
+			if (getObj('advancedThread').style.display != 'none' || getObj('advancedDiary').style.display != 'none'){
+				_this._resetAdvanced("none");
+				if (getObj('Calendar')) {
+					HiddenCalendar();
+				}
+				advanced.innerHTML = '高级搜索';
+				return;
+			}
 			_this._hiddenAdvanced();
+			advanced.innerHTML = '普通搜索';
 		}
 		close.onclick = function(){
 			_this._resetAdvanced("none");
+			if (getObj('Calendar')) {
+				HiddenCalendar();
+			}
+			advanced.innerHTML = '高级搜索';
 		}
 		close2.onclick = function(){
 			_this._resetAdvanced("none");
+			if (getObj('Calendar')) {
+				HiddenCalendar();
+			}
+			advanced.innerHTML = '高级搜索';
 		}
 	},
 	/* 绑定日历点击事件 */

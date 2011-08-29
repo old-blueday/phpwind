@@ -6,6 +6,7 @@ $url = ($pwServer['HTTP_REFERER'] && strpos($pwServer['HTTP_REFERER'],$db_adminf
 if ($_GET['m'] == 'bbs') {
 	$url = $db_bbsurl.'/index.php?m=bbs';
 }
+bbsSeoSettings('index');
 if ($db_columns) {
 	if ($_GET['action'] == 'columns') {
 		extract(L::style());

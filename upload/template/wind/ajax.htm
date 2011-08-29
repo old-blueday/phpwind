@@ -82,7 +82,7 @@ EOT;
 EOT;
 }elseif($action=='draft'){print <<<EOT
 -->
-<div style="width:420px;">
+<div style="width:450px;">
 	<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="adel cp" onclick="closep();">关闭</span>草稿箱</div>
 	<table width="100%">
 <!--
@@ -343,7 +343,7 @@ if($db_gdcheck & 8){
 $gdSize = explode("\t",$db_gdsize);
 print <<<EOT
 -->
-	<tr><td>认证码</td><td>
+	<tr><td>验证码</td><td>
 <script type="text/javascript" src="js/pw_authcode.js"></script>
 <script>
 var flashWidth = "$gdSize[0]";
@@ -458,12 +458,12 @@ EOT;
 }elseif($action=='extend'){
 if($type=='pwcode'){print <<<EOT
 -->
-<div style="padding:1px;">
+<div class="p10">
 <!--
 EOT;
 foreach($code as $key=>$value){print <<<EOT
 -->
-<span class="button" id="wy_$value[name]" title="$value[title]" onmouseover="this.className='button buttonHover'" onmouseout="this.className='button'" onmousedown="this.className='button buttonActive'" onclick="this.className='button';upcode(this.id,'$value[param]');"><img style="width:20px;height:20px" src="$imgpath/post/c_editor/$value[icon]" /><span style="display:none">$value[descrip]</span></span>
+<span class="cp" id="wy_$value[name]" title="$value[title]" onclick="this.className='button';upcode(this.id,'$value[param]');"><img style="width:20px;height:20px;background:url($imgpath/post/c_editor/$value[icon]) 0 0 no-repeat;" src="$imgpath/blank.gif" /><span style="display:none">$value[descrip]</span></span>
 <!--
 EOT;
 }print <<<EOT
@@ -474,12 +474,12 @@ EOT;
 }else{
 if(!$setform){print <<<EOT
 -->
-<ul style="width:80px" class="tac f12">
+<ul class="menuList tac">
 <!--
 EOT;
 foreach($setformdb as $key=>$value){print <<<EOT
 -->
-<li><a href="javascript:onclick=showform('$value[id]')">$value[name]</a></li>
+<li><a href="javascript:;" onclick="showform('$value[id]');return false;">$value[name]</a></li>
 <!--
 EOT;
 }print <<<EOT
@@ -491,17 +491,18 @@ EOT;
 -->
 <div>
 <div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="cp adel" onclick="closep();read.obj=null;">关闭</span>$setform[name]</div>
+<div style="width:260px">
 <table width="100%" id="formstyle">
 <!--
 EOT;
 foreach($setform[value] as $k=>$v){print <<<EOT
 -->
-<tr><td align="center">$v[0]</td><td><!--
+<tr><td width="60">$v[0]</td><td><!--
 EOT;
 if($v[1]){
 $s=explode(',',$v[1]);
 print <<<EOT
---><select><!--
+--><select class="select_wa"><!--
 EOT;
 foreach($s as $k1=>$v1){print <<<EOT
 --><option value="$v1">$v1</option><!--
@@ -510,7 +511,7 @@ EOT;
 --></select><!--
 EOT;
 }else{print <<<EOT
---><input type="text" class="input"/><!--
+--><input type="text" class="input input_wa"/><!--
 EOT;
 }print <<<EOT
 --></td></tr>
@@ -630,7 +631,7 @@ EOT;
 }elseif($action=='modify'){print <<<EOT
 -->
 <div style="width:450px;">
-<form action="ajax.php?action=$action" method="post" onsubmit="return false;">
+<form action="ajax.php?action=$action&ajax=1" method="post" onsubmit="return false;">
 <input type="hidden" name="verify" value="$verifyhash" />
 <div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="cp adel" onclick="closep();">关闭</span>编辑帖子</div>
 <div style="display: none;" class="wrongTip"></div>
@@ -643,7 +644,7 @@ if(($db_gdcheck & 4) && (!$db_postgd || $winddb['postnum'] < $db_postgd)){
 $gdSize = explode("\t",$db_gdsize);
 print <<<EOT
 -->
-	<tbody><tr><td>认证码：</td>
+	<tbody><tr><td>验证码：</td>
 		<td>
 <script type="text/javascript" src="js/pw_authcode.js"></script>
 <script>
@@ -701,7 +702,7 @@ if(($db_gdcheck & 4) && (!$db_postgd || $winddb['postnum'] < $db_postgd)){
 $gdSize = explode("\t",$db_gdsize);
 print <<<EOT
 -->
-	<tbody><tr><td>认证码：</td>
+	<tbody><tr><td>验证码：</td>
 		<td>
 <script type="text/javascript" src="js/pw_authcode.js"></script>
 <script>
@@ -744,7 +745,7 @@ EOT;
 <input type="hidden" value="1" name="atc_usesign" />
 <input type="hidden" value="1" name="atc_convert" />
 <input type="hidden" value="cn0zz" name="_hexie" id="_hexiequote" />
-<div class="popBottom"><span class="btn2"><span><button type="submit" name="ajaxsubmit">提 交</button></span></span><span class="bt2"><span><button type="button" onclick="window.location.href='post.php?action=quote&fid=$fid&tid=$tid&pid=$pid&article=$article&page=$page'">进入高级模式</button></span></span></div>
+<div class="popBottom"><span class="btn2"><span><button type="submit" name="ajaxsubmit">提 交</button></span></span><span class="bt2"><span><button type="button" onclick="window.location.href='post.php?action=quote&fid=$fid&tid=$tid&pid=$pid&article=$article&page=$page#breadCrumb'">进入高级模式</button></span></span></div>
 </form>
 </div>
 <script language="JavaScript">
@@ -778,7 +779,7 @@ $i=$key+1;
 print <<<EOT
 -->
 <tr class="tr3 tac">
-	<td class="tal"><a href="read.php?tid=$val[tid]" target="_blank">$val[subject]</a></td>
+	<td class="tal"><a href="read.php?tid=$val[tid]">$val[subject]</a></td>
 </tr>
 <!--
 EOT;
@@ -1230,12 +1231,12 @@ EOT;
 <!--
 EOT;
 } elseif ($action == 'report') {
-$sendtitle = $type == 'topic' ? '发信息通知版主' : '发信息通知管理员';
+$sendtitle = $type == 'topic' ? '发信息通知版主' : '发信息通知站方';
 print <<<EOT
 -->
 <form action="pw_ajax.php?action=$action" method="post" onsubmit="return false;">
 <input type="hidden" name="verify" value="$verifyhash" />
-<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="adel" onclick="closep();">删除</span>{$ch_type}举报</div>
+<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="adel cp" onclick="closep();">删除</span>{$ch_type}举报</div>
 <table width="380" cellspacing="0" cellpadding="0">
 <tr><td>
 感谢您能一起协助我们管理站点，我们会尽快处理您的举报内容！
@@ -2222,15 +2223,15 @@ EOT;
 print <<<EOT
 -->
 <!-- splitTr --><!-- pingId:{$pingdata['id']} -->
-<span id="pingUserShow_{$pingdata['id']}"></span><img src="{$pingdata['icon']}" width="16" height="16" id="card_pingUserShow_{$pingdata[id]}" onmouseover="setTimeout(function(){showcard('{$pingdata['id']}','{$pingdata['uid']}','pingUserShow_')}, 700)" align="absmiddle" />
+<span id="pingUserShow_{$pingdata['id']}"></span><img src="{$pingdata['icon']}" width="16" height="16" id="card_pingUserShow_{$pingdata[id]}" align="absmiddle" />
 <!-- split -->
 <a target="_blank" href="u.php?username={$pingdata['pinger']}">{$pingdata['pinger']}</a>
 <!-- split -->
 {$pingdata['name']}
 <!-- split -->
-<b>{$pingdata['point']}</b>
+<b class="s2">{$pingdata['point']}</b>
 <!-- split -->
-<span class="gray">{$pingdata['pingtime']}</span>
+{$pingdata['pingtime']}
 <!-- split -->
 {$pingdata['record']}
 <!-- split -->
@@ -2472,8 +2473,8 @@ print <<<EOT
 <!--
 EOT;
 }else{
-$beforenum = substr($value[mobile],0,3);
-$lastnum = substr($value[mobile],-4);
+$beforenum = substr($value[mobile],0,5);
+$lastnum = substr($value[mobile],-3);
 if($value[mobile]){
 print<<<EOT
 -->
@@ -3431,7 +3432,7 @@ function checkAdditionalReasonLength(){
 		$('ajaxsubmit').disabled = false;
 		var l = strlen($('reason').value);
 		if(l < 128 && l > 0) {
-			$('wordtip').innerHTML='剩余'+(128-l)+'个字';
+			$('wordtip').innerHTML='剩余'+(128-l)+'个字节';
 			$('wordtip').style.backgroundColor='#fffeed';
 			$('wordtip').style.display='inline';
 		} else if (l == 128) {
@@ -3784,7 +3785,7 @@ function checkAdditionalReasonLength(){
 		$('ajaxsubmit').disabled = false;
 		var l = strlen($('reason').value);
 		if(l < 250 && l > 0) {
-			$('wordtip').innerHTML='剩余'+(250-l)+'个字';
+			$('wordtip').innerHTML='剩余'+(250-l)+'个字节';
 			$('wordtip').style.backgroundColor='#fffeed';
 			$('wordtip').style.display='inline';
 		} else if (l == 250) {
@@ -3978,8 +3979,8 @@ EOT;
 EOT;
 	if ($type == 'record') { print <<<EOT
 -->
-<div style="width:320px;">
-	<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><a class="adel" onclick="closep();" href="javascript:;">关闭</a>提示
+<div style="width:420px;">
+	<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><a class="adel" onclick="closep();" href="javascript:;">关闭</a>附件购买记录
     </div>
     <div class="p10">
 		<table width="100%">
@@ -3995,8 +3996,8 @@ EOT;
 } else {print <<<EOT
 -->
 			<tr class="tr2">
-				<td width="90">用户名</td>
-				<td width="60">金额</td>
+				<td width="120">用户名</td>
+				<td width="90">金额</td>
 				<td>时间</td>
 			</tr>
 <!--
@@ -4017,6 +4018,7 @@ EOT;
 }print <<<EOT
 -->
 		</table>
+		<div class="cc">$pages</div>
 	</div>
 	<div class="popBottom">
 		<span class="bt2"><span><button type="button" name="ajaxsubmit" onclick="closep();">关闭</button></span></span>
@@ -4146,6 +4148,80 @@ EOT;
 EOT;
 }print <<<EOT
 -->
+<!--
+EOT;
+} elseif ($action == 'pwschools'){print <<<EOT
+-->
+<!--
+EOT;
+$xuexiaokudaxiao = $type > 2 ? 'position:relative;width:355px;_height:313px;' : 'position:relative;width:585px;_height:313px;';
+print <<<EOT
+-->
+<div class="pr" style="$xuexiaokudaxiao">
+<!--[if IE 6]>
+<iframe frameborder='0' style='position:absolute;top:0;width:100%;height:340px;filter:Alpha(opacity=0);_filter:Alpha(opacity=0);opacity:.0;'></iframe>
+<![endif]-->
+<div style="_position:absolute;_width:100%;">
+	<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><a href="javascript://" class="adel" onclick="closep();">关闭</a>学校资料库</div>
+	<div class="p10 cc" style="*height:230px;*overflow:hidden;">
+	<script type="text/javascript">
+		function getSchools(areaid,type){
+			obj = getObj('schools');
+			ajax.send("pw_ajax.php?action=pwschools&job=getschools&areaid="+areaid+"&type="+type,"",function(){
+				var rText = ajax.request.responseText,s = 0;
+				if (rText == '[]') {
+					for (var z = obj.length -1; z >= 0; --z) {
+						obj.remove(z);
+					}
+				} else {
+					schoolData = JSONParse(rText);
+					for (i in schoolData) {
+						obj.options[s] = new Option(schoolData[i].schoolname, schoolData[i].schoolid);s++;
+					}
+				}
+			});
+		}
+		function selectSchool(){
+			var obj = getObj('schools');
+			var sid = "{$sid}";
+			try{
+				var schoolNameObj = getObj('schoolname_' + sid);
+				var schoolIdObj = getObj('schoolid_' + sid);
+				schoolIdObj.value = obj.options[obj.selectedIndex].value;
+				schoolNameObj.value = obj.options[obj.selectedIndex].text;
+				closep();
+				if (typeof(checkField) == 'function') checkField(schoolNameObj);
+			} catch(e){
+			}
+		}
+	</script>
+		
+		<span>
+<!--
+EOT;
+if($type > 2){print <<<EOT
+-->
+		<select size="15" style="width:100px;margin:0 10px 0 0;padding:0;;" id="province" onchange="getSchools(this.value, '$type');"></select>
+<!-- 
+EOT;
+}else{print <<<EOT
+-->
+		<select size="15" style="width:100px;margin:0 10px 0 0;padding:0;" id="province" onchange="changeSubArea(this.value, 'city');"></select>
+		<select id="city" size="15" style="width:100px;margin:0 10px 0 0;padding:0;" onchange="changeSubArea(this.value, 'area');"></select>
+		<select id="area" size="15" style="width:100px;margin:0 10px 0 0;padding:0;" onchange="getSchools(this.value,'$type');"></select>
+<!--
+EOT;
+}print <<<EOT
+-->
+		</span>
+		<select size="15" style="width:140px;margin:0;" id="schools" onchange="selectSchool()"></select>
+	</div>
+	<div class="popBottom"><span class="bt2"><span><button type="button" onclick="closep();">关闭</button></span></span></div>
+</div>
+</div>
+<script>
+addAreas(0, 'province', '-1', 0);
+</script>
 <!--
 EOT;
 }

@@ -73,6 +73,18 @@ if ($a == 'own') {
 	if(!is_array($result)){
 		Showmsg($result);
 	}
+	// 删除积分提示
+	require_once(R_P.'require/credit.php');
+	$o_photos_creditset = unserialize($o_photos_creditset);
+	$creditset = getCreditset($o_photos_creditset['Deletephoto'],false);
+	$creditset = array_diff($creditset,array(0));
+	foreach ($creditset as $key => $value) {
+		$moneyName = $credit->cType[$key];
+		$unit = $credit->cUnit[$key];
+		$credit_pop .= $value.$unit.$moneyName.",";
+	}
+	$deletePhotoCredit = $creditset ? '删除照片会扣除积分：'.$credit_pop.'，继续吗？' : '是否确认删除?';
+	
 	list($album,$cnpho) = $result;
 	$isown = $album['ownerid'] == $winduid ? '1' : '0';
 	if (!$isown) {
@@ -93,6 +105,18 @@ if ($a == 'own') {
 	if(!is_array($result)){
 		Showmsg($result);
 	}
+	// 删除积分提示
+	require_once(R_P.'require/credit.php');
+	$o_photos_creditset = unserialize($o_photos_creditset);
+	$creditset = getCreditset($o_photos_creditset['Deletephoto'],false);
+	$creditset = array_diff($creditset,array(0));
+	foreach ($creditset as $key => $value) {
+		$moneyName = $credit->cType[$key];
+		$unit = $credit->cUnit[$key];
+		$credit_pop .= $value.$unit.$moneyName.",";	
+	}
+	$deletePhotoCredit = $creditset ? '删除照片会扣除积分：'.$credit_pop.'继续吗？' : '是否确认删除?';
+	
     list($photo,$nearphoto,$prePid,$nextPid) = $result;
 	$isown = $photo['ownerid'] == $winduid ? '1' : '0';
 	if (!$isown) {//转跳处理
@@ -213,6 +237,7 @@ if ($a == 'own') {
 						'owner'		=> $windid,
 						'lasttime'	=> $timestamp,	
 						'crtime'	=> $timestamp,
+						'isdefault'	=> 1,
 					);	
 			$photoService->createAlbum($data);
 		}
@@ -307,6 +332,16 @@ if ($a == 'own') {
 		createfail($checkpwd,'photos_group_right');
 		Showmsg('photos_group_right');
 	}
+	require_once(R_P.'require/credit.php');
+	$o_photos_creditset = unserialize($o_photos_creditset);
+	$o_photos_creditset['Createalbum'] = @array_diff($o_photos_creditset['Createalbum'],array(0));
+	foreach ($o_photos_creditset['Createalbum'] as $key => $value) {
+		$moneyName = $credit->cType[$key];
+		$unit = $credit->cUnit[$key];
+		$credit_pop .= $value.$unit.$moneyName.",";
+	}
+	$createAlbumCredit = $o_photos_creditset['Createalbum'] ? '创建相册会扣除积分：'.$credit_pop.'继续吗？' : '是否确认创建?';
+	$createAlbum = $o_photos_creditset['Createalbum'] ? $o_photos_creditset['Createalbum'] : '';
 	if (empty($step)) {
 		$rt = array();
 		$select_0 = 'selected';
@@ -360,9 +395,7 @@ if ($a == 'own') {
 			createfail($checkpwd,$o_albumnum2,'limit_num');
 			Showmsg('colony_album_num2');
 		}
-		require_once(R_P.'require/credit.php');
-		$o_photos_creditset = unserialize($o_photos_creditset);
-		$o_photos_creditset['Createalbum'] = @array_diff($o_photos_creditset['Createalbum'],array(0));
+
 		if (!empty($o_photos_creditset['Createalbum'])) {
 			foreach ($o_photos_creditset['Createalbum'] as $key => $value) {
 				if ($value > 0) {

@@ -84,7 +84,7 @@ if(!$action){print <<<EOT
     <tr class="tr1 vt">
       <td class="td1">图片最大尺寸[KB]</td>
       <td class="td2"><input name="config[maxfilesize]" value="$o_maxfilesize" class="input input_wa" maxlength="8" /></td>
-      <td class="td2"><div class="help_a">上传的每张照片允许的最大尺寸，单位为KB</div></td>
+      <td class="td2"><div class="help_a">上传的每张照片允许的最大尺寸，单位为KB。<font color="red">&nbsp;注意：系统限制上传附件最大尺寸为{$maxuploadsize}</font></div></td>
     </tr>
   </table>
   </div>
@@ -477,7 +477,7 @@ print <<<EOT
 <style>
 .admin_appimg li{float:left;width:150px;height:200px;line-height:18px; text-align:center;}
 .admin_appimg li a.aimg{width:100px;height:100px;padding:5px;border:1px solid #ccc;background:#fff;margin-bottom:3px;display:block;line-height:100px;}
-.admin_appimg li img{margin-top:expression((100 - this.height )/2);}
+.admin_appimg li img{margin-top:expression((100 - this.height )/2);max-width:100px;max-height:100px;_height:100px;_width:100px;}
 </style>
 <form action="$basename&action=photos&" method="post">
   <input type="hidden" name="job" value="delete">

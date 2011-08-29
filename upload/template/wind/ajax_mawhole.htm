@@ -299,6 +299,14 @@ print <<<EOT
 EOT;
 }elseif($action=='pushtopic'){print <<<EOT
 -->
+<script type="text/javascript">
+checkform = function(){
+	if(document.ajaxfm.pushtime.value == '0' || document.ajaxfm.pushtime.value == ''){
+		 ajax.showError('请选择管理选项'); return false;
+	}
+    return true;
+}
+</script>
 <div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="adel cp" onclick="closep();">关闭</span>提前操作</div>
 <div class="wrongTip" style="display:none;">隐藏</div>
 <table width="100%" class="vt z">
@@ -368,6 +376,14 @@ print <<<EOT
 EOT;
 }elseif($action=='edit'){print <<<EOT
 -->
+<script type="text/javascript">
+checkform = function(){
+	if(document.ajaxfm.title1.value == '#FFA500' && document.ajaxfm.title2.value == '' && document.ajaxfm.title3.value == '' && document.ajaxfm.title4.value == ''){
+		 ajax.showError('请选择管理选项'); return false;
+	}
+    return true;
+}
+</script>
 <div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="adel cp" onclick="closep();">关闭</span>加亮操作</div>
 <div class="wrongTip" style="display:none;">隐藏</div>
 <table width="100%" class="vt z">
@@ -378,7 +394,7 @@ EOT;
 			<span title="斜体字"><a onclick="styleOnclick(this,'title3')" class="$stylename[2]">斜体</a></span>
 			<span title="下划线"><a onclick="styleOnclick(this,'title4')" class="$stylename[3]">下划线</a></span>
 			<span id="color_show" title="点击取消颜色" onclick="colorCancel()"></span>
-			<span title="颜色选择"><a class="two tal" onclick="showColorPicker(this,document.ajaxfm.title1,function(){pickReback(color_picker)})"><img src="$imgpath/pickcolor.gif"  /></a></span>
+			<span title="颜色选择"><a class="two tal" onclick="showColorPicker(this,document.ajaxfm.title1,function(){pickAjaxReback(color_picker)})"><img src="$imgpath/pickcolor.gif"  /></a></span>
 			<input id="title1" name="title1" type="hidden" value="$titlecolor" />
 			<input id="title2" name="title2" type="hidden" value="{$titledetail[1]}" />
 			<input id="title3" name="title3" type="hidden" value="{$titledetail[2]}" />
@@ -404,6 +420,7 @@ print <<<EOT
 -->
 <tr class="tr3"><td>有效时间:</td><td><input type="text" name="timelimit" size="4" class="input" /> 天</td></tr>
 </table>
+
 <script id="ajax_color" language="JavaScript" src="js/color_picker.js"></script>
 <script type="text/javascript" id="ajax_edit">
 function pickReback(color){
@@ -699,6 +716,81 @@ EOT;
 <input type="hidden" name="pushto" value="$pushto" />
 <!--
 EOT;
+} elseif ($action=='banuser') {print <<<EOT
+-->
+<div style="width:450px;">
+<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="adel cp" onclick="closep();">关闭</span>会员禁言</div>
+<table width="100%" class="mb5 z vt">
+	<tr class="tr3"><td width="70">禁言对象：</td>
+		<td>
+<!--
+EOT;
+$usernames = implode(',', $userInfo);
+$relation = '';
+foreach ($relations as $key => $value) {
+	$relation .= $relation ? ",$key:$value" : "$key:$value";
+}
+print <<<EOT
+-->
+		$usernames
+		</td>
+	</tr>
+	<tr class="tr3">
+		<td>禁言范围:</td>
+		<td><label class="mr20"><input type="radio" name="range" value="0" checked />{$forum[$fid][name]}</label>
+<!--
+EOT;
+if($isGM || $SYSTEM['banuser']){print <<<EOT
+-->
+				<label class="mr20"><input type="radio" name="range" value="1" />全局禁言</label>
+<!--
+EOT;
+if ($SYSTEM[banuserip]){print <<<EOT
+-->
+				<label><input type="checkbox" name="banip" value="1" /> 禁止该 IP</label>
+<!--
+EOT;
+}}print <<<EOT
+-->
+		</td>
+	</tr>
+	<tr class="tr3">
+		<td>禁言类型：</td>
+		<td><label class="mr20"><input type="radio" name="type" value="1" checked />定期禁言</label>
+<!--
+EOT;
+if($isGM || $SYSTEM['bantype']){print <<<EOT
+-->
+			<label><input type="radio" name="type" value="2" />永久禁言</label>
+<!--
+EOT;
+}print <<<EOT
+-->
+		</td>
+	</tr>
+	<tr class="tr3">
+		<td>禁言时间：</td>
+		<td><input class="input" type="text" name="limit" value="1" size="5" /> 天(最大天数<span class="s1">$pwBanMax</span>天)</td>
+	</tr>
+	<tr class="tr3">
+		<td>消息通知</td>
+		<td>
+			<label class="mr20"><input type="radio" name="ifmsg" value="1" checked />开启</label>
+			<label><input type="radio" name="ifmsg" value="0" />关闭</label>
+		</td>
+	</tr>
+	<tr class="tr3">
+		<td>禁言理由：</td>
+		<td><textarea name="atc_content" onkeydown="ajax.quickpost(event,this.form)" class="textareaA"></textarea></td>
+	</tr>
+</table>
+<input type="hidden" name="relation" value="$relation" />
+<input type="hidden" name="fid" value="$fid" />
+<input type="hidden" name="step" value="3" />
+<div class="popBottom"><span class="btn2"><span><button type="button"  name="ajaxsubmit" onclick="asubmit(this.form);">提 交</button></span></span></div>
+</div>
+<!--
+EOT;
 } elseif ($action=='type') {print <<<EOT
 -->
 <div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="adel cp" onclick="closep();">关闭</span>转移主题分类</div>
@@ -760,7 +852,9 @@ EOT;
 <input type="hidden" name="seltid" value="$seltid" />
 <!--
 EOT;
-}print <<<EOT
+}
+if ($action != 'banuser') {
+print <<<EOT
 -->
 <table width="100%" class="mb5 vt z">
 <tr class="tr3"><td width="80">消息通知:</td>
@@ -824,7 +918,7 @@ print <<<EOT
 </div>
 <!--
 EOT;
-} print <<<EOT
+}} print <<<EOT
 -->
 </form>
 </div>

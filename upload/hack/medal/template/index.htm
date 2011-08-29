@@ -178,6 +178,15 @@ EOT;
 <input type="hidden" name="step" value="2" />
 <div class="t">
 <div class="h">颁发勋章</div>
+<script>
+function switchMedalAdmin(type){
+	if(type == 2){
+		getObj('td_valid').style.display = 'none';
+	} else {
+		getObj('td_valid').style.display = '';
+	}
+}
+</script>
 <table width="100%" cellspacing="0" cellpadding="0" align="center">
 	<tr class="tr3">
 		<td width="100">用户名: </td>
@@ -186,8 +195,8 @@ EOT;
 	<tr class="tr3 f_two">
 		<td>选择操作: </td>
 		<th>
-			<label class="mr20"><input type="radio" name="type" value="1" $type_1 /> 颁发</label>
-			<label class="mr20"><input type="radio" name="type" value="2" $type_2 /> 收回</label>
+			<label class="mr20"><input type="radio" name="type" value="1" $type_1 onclick="switchMedalAdmin(this.value)" autocomplete="off" /> 颁发</label>
+			<label class="mr20"><input type="radio" name="type" value="2" $type_2 onclick="switchMedalAdmin(this.value)" autocomplete="off" /> 收回</label>
 		</th>
 	</tr>
 	<tr class="tr3">
@@ -213,7 +222,7 @@ EOT;
 			</select>
 		</th>
 	</tr>
-	<tr class="tr3 f_two">
+	<tr class="tr3 f_two" id="td_valid">
 		<td>有效期:</td>
 		<th>
 			<select name="timelimit" class="select_wa">

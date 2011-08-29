@@ -1,7 +1,8 @@
 <?php
 !function_exists('readover') && exit('Forbidden');
 require_once(R_P.'require/functions.php');
-include_once pwCache::getPath(D_P . 'data/bbscache/level.php');
+//* include_once pwCache::getPath(D_P . 'data/bbscache/level.php');
+pwCache::getData(D_P . 'data/bbscache/level.php');
 list($m_faceurl) = showfacedesign($winddb['icon'], 1, 'm');
 
 $uinfo = $db->get_one("SELECT m.bday,m.location,m.site,m.introduce,o.index_privacy FROM pw_members m LEFT JOIN pw_ouserdata o ON m.uid=o.uid WHERE m.uid=" . S::sqlEscape($winduid));

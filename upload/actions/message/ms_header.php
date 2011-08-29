@@ -25,7 +25,8 @@ $newSpace = new PwSpace($winduid);
 if (!$space =& $newSpace->getInfo()) {
 	Showmsg('您访问的空间不存在!');
 }
-include_once pwCache::getPath(D_P . 'data/bbscache/o_config.php');
+//* include_once pwCache::getPath(D_P . 'data/bbscache/o_config.php');
+pwCache::getData(D_P . 'data/bbscache/o_config.php');
 require_once(uTemplate::printEot('header'));
 require messageEot('leftmenu');
 ?>

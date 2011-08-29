@@ -33,7 +33,8 @@ if ($step != 2){
 	ifcheck($db_windpost['checkurl'], 'windpost_checkurl');
 	//face
 	list($db_upload, $db_imglen, $db_imgwidth, $db_imgsize) = explode("\t", $db_upload);
-	list($db_fthumbwidth, $db_fthumbheight) = explode("\t", $db_fthumbsize);
+//	list($db_fthumbwidth, $db_fthumbheight) = explode("\t", $db_fthumbsize);
+	$maxuploadsize = @ini_get('upload_max_filesize');
 	$signgroup = '';
 	$num = 0;
 	foreach ($ltitle as $key => $value) {
@@ -49,19 +50,19 @@ if ($step != 2){
 		${'logintype_' . $i} = ($db_logintype & pow(2, $i)) ? 'CHECKED' : '';
 	}
 
-	$db_imglen = (int) $db_imglen;
+	$db_imglen = $db_imglen > 120 ? 120 : (int) $db_imglen;
 	$db_imgsize = (int) $db_imgsize;
-	$db_imgwidth = (int) $db_imgwidth;
+	$db_imgwidth = $db_imgwidth > 120 ? 120 : (int) $db_imgwidth;
 	$db_signmoney = (int) $db_signmoney;
 	$db_signheight = (int) $db_signheight;
-	$db_fthumbwidth = (int) $db_fthumbwidth;
-	$db_fthumbheight = (int) $db_fthumbheight;
+	//$db_fthumbwidth = (int) $db_fthumbwidth;
+	//$db_fthumbheight = (int) $db_fthumbheight;
 	$db_windpic['size'] = (int) $db_windpic['size'];
 	$db_windpic['picwidth'] = (int) $db_windpic['picwidth'];
 	$db_windpic['picheight'] = (int) $db_windpic['picheight'];
 
 	ifcheck($db_upload, 'upload');
-	ifcheck($db_iffthumb, 'iffthumb');
+//	ifcheck($db_iffthumb, 'iffthumb');
 	ifcheck($db_signwindcode, 'signwindcode');
 	ifcheck($db_windpic['pic'], 'windpic_pic');
 	ifcheck($db_windpic['flash'], 'windpic_flash');
@@ -69,21 +70,24 @@ if ($step != 2){
 	include PrintEot('member');exit;
 } else {
 	S::gp(array('sellset', 'enhideset','config'), 'P');
-	S::gp(array('windpost', 'upload', 'signgroup', 'logintype', 'fthumbsize', 'windpic'), 'P', 2);
+	S::gp(array('windpost', 'upload', 'signgroup', 'logintype', 'windpic'), 'P', 2);
 	$config['windpost'] = is_array($db_windpost) ? $db_windpost : array();
 	//post
 	$config['sellset'] = is_array($sellset) ? $sellset : array();
 	$config['windpic'] = is_array($windpic) ? $windpic : array();
 	is_array($windpost) && $config['windpost'] = array_merge($config['windpost'],$windpost);
 	$config['enhideset'] = is_array($enhideset) ? $enhideset : array();
-	(int) $config['postmax'] < 1 && $config['postmax'] = 50000;
+	$config['titlemax'] = (int) $config['titlemax'];
+	$config['postmax'] = (int) $config['postmax'];
+	$config['postmax'] < 1 && $config['postmax'] = 50000;
+	$config['postmin'] = (int) $config['postmin'];
 	//face
-	$upload['imglen'] < 1 && $upload['imglen'] = 160;
+	$upload['imglen'] = $upload['imglen'] > 120 ? 120 : $upload['imglen'];
 	$upload['imgsize'] < 1 && $upload['imgsize'] = 20;
-	$upload['imgwidth'] < 1 && $upload['imgwidth'] = 160;
+	$upload['imgwidth'] = $upload['imgwidth'] > 120 ? 120 : $upload['imgwidth'];
 	$config['logintype'] = intval(array_sum($logintype));
 	$config['signgroup'] = $signgroup ? ',' . implode(',', $signgroup) . ',' : '';
-	$config['fthumbsize'] = $fthumbsize['fthumbwidth'] . "\t" . $fthumbsize['fthumbheight'];
+	//$config['fthumbsize'] = $fthumbsize['fthumbwidth'] . "\t" . $fthumbsize['fthumbheight'];
 	$config['upload'] = $upload['upload'] . "\t" . $upload['imglen'] . "\t" . $upload['imgwidth'] . "\t" . $upload['imgsize'];
 	saveConfig();
 	adminmsg('operate_success');

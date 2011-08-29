@@ -161,7 +161,8 @@ if ('navmain' == $adminitem) {
 		$adds += (bool)$navConfigService->add(PW_NAV_TYPE_MAIN, array('nkey' => 'group', 'pos' => '-1', 'title' => '群组', 'style' => '', 'link' => 'group.php', 'alt' => '', 'target' => 0, 'view' => 3, 'upid' => 0, 'isshow' => 1));
 		
 		$view = 4;
-		include pwCache::getPath(D_P.'data/bbscache/area_config.php');
+		//* include pwCache::getPath(D_P.'data/bbscache/area_config.php');
+		pwCache::getData(D_P.'data/bbscache/area_config.php');
 		if (!$area_default_alias) {
 			$currentAlias = is_array($area_channels) ? current($area_channels) : array();
 			$area_default_alias = $currentAlias['alias'];

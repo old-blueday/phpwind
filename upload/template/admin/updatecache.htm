@@ -207,16 +207,26 @@ print <<<EOT
     <form action="$basename&" method=post>
       <input type="hidden" name=action value='clearMemcache'>
       <tr class="tr1 vt">
-        <td class="td1" rowspan="1">清除指定版块的<br />Memcache缓存</td>
+        <td class="td1" rowspan="1">清除指定版块的帖子列表页缓存</td>
         <td class="td2"><select name="fid">
             $forumSelect
           </select><span class="bt2"><span>
           <button type="submit" value="清除">清除</button>
           </span></span>
         </td>
-        <td class="td2"><div class="help_a">实现指定版块Memcache清除</div></td>
+        <td class="td2"><div class="help_a">实现指定版块里面的帖子列表页Memcache清除</div></td>
       </tr>
     </form>
+    <form action="$basename&" method=post>
+      <input type="hidden" name=action value='clearForumMemcache'>
+      <tr class="tr1 vt">
+        <td class="td1">清除版块基本信息</td>
+        <td class="td2"><span class="bt2"><span>
+          <button type="submit" value="清除">清除</button>
+          </span></span></td>
+        <td class="td2"><div class="help_a">此操作将清除Memcache中所有版块的基本信息</div></td>
+      </tr>
+    </form>    
     <form action="$basename&" method=post>
       <input type="hidden" name=action value='flushMemcache'>
       <tr class="tr1 vt">

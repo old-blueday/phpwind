@@ -26,10 +26,18 @@ print <<<EOT
 		<th>您的电子邮箱:</th>
 		<th><input type="text" class="input" name="fromemail" size="25" value="$winddb[email]" /></th>
 	</tr>
+<!--
+EOT;
+if($hasReceiver){print <<<EOT
+-->
 	<tr class="tr3">
 		<th>对方姓名:</th>
 		<th><input type="text" class="input" name="sendtoname" size="25" value="$to_user" readonly /></th>
 	</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
 	<tr class="tr3">
 		<th>对方电子邮箱:</th>
 		<th>
@@ -58,7 +66,7 @@ EOT;
 if($db_gdcheck & 16){print <<<EOT
 -->
 	<tr class="tr3">
-		<th>认证码</th>
+		<th>验证码</th>
 		<th>
 			<input class="input" type="text" name="gdcode" size="6" onfocus="try{opencode('menu_gd',this)}catch(e){}" /><span style="cursor:pointer; margin-left:3px" onclick="this.previousSibling.focus();">点此显示验证码</span>
 			<div class="menu" id="menu_gd" style="visibility:hidden;"><img src="ck.php?" align="absmiddle" style="cursor:pointer;" id="ckcode" alt="看不清楚，换一张" /></div></th>

@@ -14,10 +14,13 @@ if (empty($_POST['step'])) {
 		$subject = getLangInfo('writemsg', 'birth_title');
 		$atc_content = getLangInfo('writemsg', 'birth_content');
 	}
+	list($bool,$message) = $messageServer->checkReceiver(array($reinfo['username']));
+	if(!$bool){
+		 Showmsg ( $message );
+	}
 	require_once PrintEot('ajax');
 	ajax_footer();
 } else {
-	
 	PostCheck(1, $db_gdcheck & 8);
 	S::gp(array(
 		'msg_title',
@@ -33,6 +36,9 @@ if (empty($_POST['step'])) {
 		Showmsg('msg_empty');
 	} elseif (strlen($msg_title) > 75 || strlen($atc_content) > 1500) {
 		Showmsg('msg_subject_limit');
+	}
+	if(isset($_G['messagecontentsize']) && $_G['messagecontentsize'] > 0 && strlen($atc_content) > $_G['messagecontentsize']){
+		Showmsg('内容超过限定长度'.$_G['messagecontentsize'].'字节');
 	}
 	if($pwuser == $windid){
 		Showmsg('send_message_to_self');

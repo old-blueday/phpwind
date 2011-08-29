@@ -193,6 +193,7 @@ EOT;
 EOT;
 }elseif($_POST['sendmsg']){print<<<EOT
 -->
+<script type="text/javascript" LANGUAGE="JavaScript" src="js/core/core.js"></script>
 <div class="nav3 mb10">
     <ul class="cc">
       <li><a href="$basename">团购</a></li>
@@ -217,7 +218,7 @@ EOT;
       <td class="td2">
 <!--
 EOT;
-require_once PrintEot('wysiwyg_editor');
+require_once PrintEot('wysiwyg_editor_common');
 print <<<EOT
 -->
       </td>
@@ -225,16 +226,12 @@ print <<<EOT
   </table>
   </div>
 
-<script type="text/javascript" LANGUAGE="JavaScript" src="js/core/core.js"></script>
 <script type="text/javascript" language="JavaScript" src="js/pw_ajax.js"></script>
 <script language="JavaScript" src="js/post.js"></script>
 <script language="JavaScript" src="js/global.js"></script>
 
-<script language="JavaScript" src="data/bbscache/face.js"></script>
 <div id="menu_face" class="menu" style="display:none;"></div>
 <div id="menu_generalface" class="menu" style="display:none;"></div>
-
-<script type="text/javascript">editor.init('wysiwyg', 0);</script>
 
   <div class="mb10 tac">
         <span class="btn"><span><button type="submit">提 交</button></span></span>

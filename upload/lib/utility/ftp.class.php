@@ -47,11 +47,47 @@ class FTP {
 		return $matchs[1] . ((substr($matchs[1], -1) == '/') ? '' : '/');
 	}
 
-	function upload($localfile, $remotefile, $mode = 'I') {
-		if (str_replace(array('..', '.php.'), '', $localfile) != $localfile || preg_match('/\.php$/i', $localfile)) {
+	function checkFile($filename) {
+		return (str_replace(array('..', '.php.'), '', $filename) != $filename || preg_match('/\.php$/i', $filename));
+	}
+
+	function get($localfile, $remotefile, $mode = 'I') {
+		if ($this->checkFile($localfile)) {
 			$this->showerror("Error：illegal file type！（{$localfile}）");
 		}
-		if (str_replace(array('..', '.php.'), '', $remotefile) != $remotefile || preg_match('/\.php$/i', $remotefile)) {
+		if ($this->checkFile($remotefile)) {
+			$this->showerror("Error：illegal file type！（{$remotefile}）");
+		}
+		$mode != 'I' && $mode = 'A';
+		if (!$this->sendcmd('TYPE', $mode)) {
+			$this->showerror('Error：TYPE command failed');
+		}
+		$this->open_data_connection();
+		if (!$this->sendcmd('RETR', $remotefile)) {
+			$this->close_data_connection();
+			return false;
+		}
+		if (!($fp = @fopen($localfile, 'wb'))) {
+			$this->showerror("Error：Cannot read file \"$localfile\"");
+		}
+		while (!@feof($this->data_connection)) {
+			@fwrite($fp, @fread($this->data_connection, 4096));
+		}
+		@fclose($fp);
+		$this->close_data_connection();
+
+		if (!$this->checkcmd()) {
+			return false;
+			//$this->showerror('Error：GET command failed');
+		}
+		return true;
+	}
+
+	function upload($localfile, $remotefile, $mode = 'I') {
+		if ($this->checkFile($localfile)) {
+			$this->showerror("Error：illegal file type！（{$localfile}）");
+		}
+		if ($this->checkFile($remotefile)) {
 			$this->showerror("Error：illegal file type！（{$remotefile}）");
 		}
 		if ($savedir = dirname($remotefile)) {
@@ -94,6 +130,9 @@ class FTP {
 		return $this->sendcmd('DELE', $this->rootpath . S::escapeDir($file));
 	}
 	function rename($oldname, $newname) {
+		if ($savedir = dirname($newname)) {
+			$this->mkdir($savedir);
+		}
 		$oldname = $this->rootpath . S::escapeDir($oldname);
 		$this->sendcmd('RNFR', $oldname);
 		return $this->sendcmd('RNTO', $newname);

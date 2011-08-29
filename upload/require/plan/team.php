@@ -2,9 +2,12 @@
 !function_exists('readover') && exit('Forbidden');
 
 require_once(R_P.'require/credit.php');
-@include_once pwCache::getPath(D_P.'data/bbscache/tm_config.php');
+//* @include_once pwCache::getPath(D_P.'data/bbscache/tm_config.php');
+//pwCache::getData(D_P.'data/bbscache/tm_config.php');
+pwCache::getData(D_P.'data/bbscache/config.php');
 
 $gids = 0;
+$_tmconf = unserialize($db_team);
 if (!empty($_tmconf['group'])) {
 	$gids = implode(',',$_tmconf['group']);
 }
@@ -46,20 +49,22 @@ $msgdata = S::escapeChar($_tmconf['msgdata']);
 $arousemsg = S::escapeChar($_tmconf['arousemsg']);
 
 foreach ($admindb as $username => $value) {
+	
 	$uid = $value['uid'];
 	$addcredit = '';
 	foreach ($value['wages'] as $k => $v) {
 		if (empty($v) || !is_numeric($v)) continue;
 		$addcredit .= ($addcredit ? ',' : '')."[color=#0000ff]{$v}[/color]".$credit->cType[$k];
 	}
-	$credit->addLog('hack_teampay',$value['wages'],array(
-		'uid'		=> $uid,
-		'username'	=> $username,
-		'ip'		=> $onlineip,
-		'datef'		=> $datef
-	));
-	$credit->sets($uid,$value['wages'],false);
-
+	if ($value['assess'] >= $_tmconf['eligibility']) {
+		$credit->addLog('hack_teampay',$value['wages'],array(
+			'uid'		=> $uid,
+			'username'	=> $username,
+			'ip'		=> $onlineip,
+			'datef'		=> $datef
+		));
+		$credit->sets($uid,$value['wages'],false);
+	}
 	if ($addcredit) {
 		if ($_tmconf['arouse'] && $value['arouse'] || $_tmconf['ifmsg']) {
 			M::sendNotice(array($username),array('title' => $_tmconf['msgtitle'],'content' => str_replace(array('$username','$db_bbsname','$credit','$time'),array($username,$db_bbsname,$addcredit, get_date($timestamp)),($_tmconf['arouse'] && $value['arouse']) ? $arousemsg : $msgdata)));

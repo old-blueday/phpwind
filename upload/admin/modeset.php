@@ -41,7 +41,7 @@ if (!$action) {
 				if (function_exists('file_get_contents')) {
 					$filedata = @file_get_contents(R_P."mode/$modedir/info.xml");
 				} else {
-					$filedata = readover(R_P."mode/$modedir/info.xml");
+					$filedata = pwCache::readover(R_P."mode/$modedir/info.xml");
 				}
 				if (preg_match('/\<modename\>(.+?)\<\/modename\>\s+\<descrip\>(.+?)\<\/descrip\>/is',$filedata,$infodb)) {
 					$infodb[1] && $modename = S::escapeChar(str_replace(array("\n"),'',$infodb[1]));
@@ -64,7 +64,7 @@ if (!$action) {
 		if (function_exists('file_get_contents')) {
 			$filedata = @file_get_contents(R_P."mode/$mode/info.xml");
 		} else {
-			$filedata = readover(R_P."mode/$mode/info.xml");
+			$filedata = pwCache::readover(R_P."mode/$mode/info.xml");
 		}
 		$sqlarray = file_exists(R_P."mode/$mode/sql.txt") ? FileArray($mode,'mode') : array();
 		!empty($sqlarray) && SQLCreate($sqlarray, true);
@@ -80,6 +80,13 @@ if (!$action) {
 			'title'		=> $m_name
 		);
 		setConfig('db_modes', $db_modes);
+	
+		//云统计获取房产、商家导航的安装时间
+		if (S::inArray($mode, array('house', 'dianpu'))) {
+			$stasticsService = L::loadClass('Statistics', 'datanalyse');
+			$mode == 'house' && $stasticsService->houseInstallTime();
+			$mode == 'dianpu' && $stasticsService->dianpuInstallTime();
+		}
 	
 		if ($params['pages']['item']) {
 			$items = $params['pages']['item'];
@@ -237,6 +244,11 @@ if (!$action) {
 		}
 	}
 
+	//云统计获取房产、商家导航的安装时间
+	$stasticsService = L::loadClass('Statistics', 'datanalyse');
+	isset($db_modes['house']) && $db_modes['house']['ifopen'] == 0 && in_array('house', $ifopen) && $stasticsService->houseInstallTime();
+	isset($db_modes['dianpu']) && $db_modes['dianpu']['ifopen'] == 0 && in_array('dianpu', $ifopen) && $stasticsService->dianpuInstallTime();
+	
 	foreach ($db_modes as $key=>$value) {
 		if (in_array($key,$ifopen)) {
 			$db_modes[$key]['ifopen'] = 1;

@@ -54,10 +54,10 @@ class PW_ChannelService {
 	function _initFileModuleIds($file,$name) {
 		@chmod($file,0777);
 		
-		$fileString = readover($file);
+		$fileString = pwCache::readover($file);
 		$moduleConfigService = L::loadClass('moduleconfigservice', 'area');
 		$newString	= $moduleConfigService->cookModuleIds($fileString,$name);
-		pwCache::setData($file,$newString);
+		pwCache::writeover($file,$newString);
 	}
 	
 	function _copyThemesFiles($theme,$alias) {

@@ -7,7 +7,8 @@ $photoEditor = ($db_phopen && $winduid);
 if (!$photoEditor && $job) {
 	Showmsg('undefined_action');
 }
-include_once pwCache::getPath(D_P . 'data/bbscache/o_config.php');
+//* include_once pwCache::getPath(D_P . 'data/bbscache/o_config.php');
+pwCache::getData(D_P . 'data/bbscache/o_config.php');
 
 require_once(R_P . 'u/require/core.php');
 L::loadClass('photo', 'colony', false);

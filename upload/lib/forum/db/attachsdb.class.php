@@ -58,6 +58,82 @@ class PW_AttachsDB extends BaseDB {
 		return $this->_getAllResultFromQuery($query);
 	}
 
+	function getLatestAttachByTidType($tid,$type='img') {
+		return $this->_db->get_value("SELECT attachurl FROM " . $this->_tableName . ' WHERE tid=' . S::sqlEscape($tid) . ' AND pid=0 AND type=' . S::sqlEscape($type) . ' ORDER BY aid DESC Limit 1');
+	}
+	
+	function countThreadImagesByTidUid($tid,$uid) {
+		return $this->_db->get_value("SELECT COUNT(*) FROM " . $this->_tableName . ' WHERE tid=' . S::sqlEscape($tid) . ' AND uid=' . S::sqlEscape($uid) . " AND type='img'");
+	}
+	
+	function countTopicImagesByTid($tid) {
+		return $this->_db->get_value("SELECT COUNT(*) FROM " . $this->_tableName . ' WHERE tid=' . S::sqlEscape($tid) . " AND pid=0 AND type='img'");
+	}
+	
+	function getUidByTidPidType($tid,$pid,$type='img') {
+		return $this->_db->get_value("SELECT uid FROM " . $this->_tableName . ' WHERE tid=' . S::sqlEscape($tid) . ' AND pid=' . S::sqlEscape($pid) . ' AND type=' . S::sqlEscape($type) . ' Limit 1');
+	}	
+	
+	/**
+	 * 获取版块图酷帖
+	 * @param array $sql
+	 * return array
+	 */
+	function getImgs($fieldData,$topicNum=1,$startTime,$endTime,$offset,$size=10){
+		if(!$fieldData || !$startTime || !$endTime || !$topicNum) return array();
+		if($topicNum < 1) $topicNum = 1;
+		if($startTime){
+			$sql .= "t.postdate>" . S::sqlEscape($startTime);
+		}
+		if($endTime){
+			$sql .="AND t.postdate<" . S::sqlEscape($endTime);
+		}
+		if ($fieldData) {
+			$sql .= "AND t1.fid =" . S::sqlEscape($fieldData);
+		}
+		$query = $this->_db->query("SELECT t.tid FROM pw_threads t FORCE INDEX (idx_postdate) LEFT JOIN $this->_tableName t1 USING(tid) WHERE $sql AND t1.pid=0 AND t1.type='img' GROUP BY (t1.tid) HAVING COUNT(t1.aid) >= " . S::sqlEscape($topicNum). S::sqlLimit($offset,$size));
+		return $this->_getAllResultFromQuery($query,'tid');
+	}
+	
+	/**
+	 * 根据主题图片附件数获取不满足条件的tid
+	 * Enter description here ...
+	 */
+	function getUnsatisfiedTidsByTopicImageNum($fid,$tpcImageNum){
+		$tids = array();
+		$fid = intval($fid);
+		$tpcImageNum = intval($tpcImageNum);
+		$query = $this->_db->query("SELECT tid FROM $this->_tableName WHERE fid=$fid AND pid=0 GROUP BY tid HAVING COUNT(aid)<$tpcImageNum");
+		while($rt = $this->_db->fetch_array($query)) {
+			$tids[] = $rt['tid'];
+		}
+		return $tids;
+	}
+	/**
+	 * 
+	 * 计算图酷帖总条数
+	 * @param array $fids
+	 * @param int $startTime
+	 * @param int $endTime 
+	 * @param int $topicNum后台设置的图酷显示图片数
+	 * return int $num
+	 */
+	function countTuCoolThreadNum($fid,$startTime,$endTime,$topicNum){
+		if(!$startTime || !$endTime || !$topicNum) return array();
+		if($topicNum < 1) $topicNum = 1;
+		if($startTime){
+			$sql .= "t.postdate>" . S::sqlEscape($startTime);
+		}
+		if($endTime){
+			$sql .="AND t.postdate<" . S::sqlEscape($endTime);
+		}
+		if ($fid) {
+			$sql .= "AND t1.fid = " . S::sqlEscape($fid);
+		}
+		$query = $this->_db->query("SELECT t.tid FROM pw_threads t FORCE INDEX (idx_postdate) LEFT JOIN $this->_tableName t1 USING(tid) WHERE $sql AND t1.pid=0 AND t1.type='img' GROUP BY (t1.tid) HAVING COUNT(t1.aid) >= " . S::sqlEscape($topicNum));
+		return count($this->_getAllResultFromQuery($query,'tid'));
+	}
+	
 	function gets($params) {
 		$params = $this->_checkData($params);
 		$data = $where = array();
@@ -144,7 +220,7 @@ class PW_AttachsDB extends BaseDB {
 	}
 
 	function getStruct() {
-		return array('aid','fid','uid','tid','pid','did','name','type','size','attachurl','hits','needrvrc','special','ctype','uploadtime','descrip','ifthumb');
+		return array('aid','fid','uid','tid','pid','did','name','type','size', 'attachurl','hits','needrvrc', 'special','ctype', 'uploadtime','descrip','ifthumb','mid');
 	}
 
 	function _checkData($data) {
@@ -182,6 +258,39 @@ class PW_AttachsDB extends BaseDB {
 		$userIds = $userIds ? $this->_getImplodeString($userIds) : $this->_addSlashes($userIds);
 		$query = $this->_db->query( "SELECT * FROM " . $this->_tableName. " WHERE uid IN( ".$userIds." )");
 		return $this->_getAllResultFromQuery($query);
+	}
+	
+	/**
+	 * 图酷帖附件
+	 * @param $tid 帖子tid
+	 * @param $uid 
+	 * @return array
+	 */
+	function getByTidAndUid($tid,$uid) {
+		$tid = intval($tid);
+		$uid = intval($uid);
+		if ($tid < 1 || $uid < 1) return array();
+		$query = $this->_db->query( "SELECT * FROM " . $this->_tableName. " WHERE tid = " . $this->_addSlashes($tid) . " AND uid = " . $this->_addSlashes($uid));
+		return $this->_getAllResultFromQuery($query);
+	}
+	
+	/**
+	 * 注意只提供搜索服务
+	 * @param $sql
+	 * @return unknown_type
+	 */
+	function countSearch($sql){
+		$result = $this->_db->get_one ( $sql );
+		return ($result) ? $result['total'] : 0;
+	}
+	/**
+	 * 注意只提供搜索服务
+	 * @param $sql
+	 * @return unknown_type
+	 */
+	function getSearch($sql){
+		$query = $this->_db->query ($sql);
+		return $this->_getAllResultFromQuery ( $query );
 	}
 }
 

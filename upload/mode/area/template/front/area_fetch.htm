@@ -130,7 +130,7 @@ print <<<EOT
 					<span title="斜体字"><a onclick="styleOnclick(this,'css[i]')" class="$stylename[i]">倾斜</a></span>
 					<span title="下划线"><a onclick="styleOnclick(this,'css[u]')" class="$stylename[u]">下划线</a></span>
 					<span id="color_show" title="点击取消颜色" style="background:{$stylename[color]};" onclick="colorCancel()"></span>
-					<span title="颜色选择"><a class="two tal" onclick="showColorPicker(this,'css[color]',function(){pickReback(color_picker)})"><img src="$imgpath/pickcolor.gif"  /></a></span>
+					<span title="颜色选择"><a class="two tal" onclick="showColorPicker(this,'css[color]',function(){pickAjaxReback(color_picker)})"><img src="$imgpath/pickcolor.gif"  /></a></span>
 					<span>时间:<input name="css[endtime]" id="css[endtime]" size="15" class="input" type="input" value="{$stylename[endtime]}" onclick="ShowCalendar(this.id,1);getCurrentDatePos();" /></span>
 					<input id="css[color]" name="css[color]" type="hidden" value="$stylename[color]" />
 					<input id="css[b]" name="css[b]" type="hidden" value="{$push['titlecss']['b']}" />

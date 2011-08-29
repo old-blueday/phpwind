@@ -56,7 +56,8 @@ class PW_Colony {
 	}
 
 	function delColonyById($id) {
-		$this->_db->update("DELETE FROM pw_colonys WHERE id=" . S::sqlEscape($id));
+		//* $this->_db->update("DELETE FROM pw_colonys WHERE id=" . S::sqlEscape($id));
+		pwQuery::delete('pw_colonys', 'id=:id', array($id));
 	}
 
 	function getSingleMember($id, $uid) {
@@ -148,7 +149,8 @@ class PW_Colony {
 			$_sql_update .= ",$key=$key+" . S::sqlEscape($value);
 		}
 		$_sql_update = ltrim($_sql_update, ',');
-		$this->_db->update("UPDATE pw_colonys SET " . $_sql_update . ' WHERE id=' . S::sqlEscape($toid));
+		//* $this->_db->update("UPDATE pw_colonys SET " . $_sql_update . ' WHERE id=' . S::sqlEscape($toid));
+		$this->_db->update(pwQuery::buildClause("UPDATE :pw_table SET {$_sql_update} WHERE id=:id", array('pw_colonys',$toid)));
 
 		return true;
 	}
@@ -270,7 +272,8 @@ class PW_Colony {
 	 */
 
 	function getRankByColonyCredit($num) {
-		isset($o_groups_upgrade) || include_once pwCache::getPath(D_P . 'data/bbscache/o_config.php');
+		//* isset($o_groups_upgrade) || include_once pwCache::getPath(D_P . 'data/bbscache/o_config.php');
+		isset($o_groups_upgrade) || extract(pwCache::getData(D_P . 'data/bbscache/o_config.php', false));
 		$tnum = $o_groups_upgrade['tnum'] ? $o_groups_upgrade['tnum'] : 0;
 		$pnum = $o_groups_upgrade['pnum'] ? $o_groups_upgrade['pnum'] : 0;
 		$members = $o_groups_upgrade['members'] ? $o_groups_upgrade['members'] : 0;

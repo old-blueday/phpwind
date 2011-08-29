@@ -68,10 +68,25 @@ function delatt(pid, aid, type) {
 	ajax.send('pw_ajax.php','action=deldownfile&aid=' + aid + (typeof type == 'undefined' ? '' : ('&type=' + type)), function() {
 		if (ajax.request.responseText == 'success') {
 			var o = getObj('att_'+aid);
-			o.parentNode.removeChild(o);
+			var b = getObj('att_small_'+aid);
+			if (o) o.parentNode.removeChild(o);
+			if (b) b.parentNode.removeChild(b);
 		} else {
 			ajax.guide();
 		}
+	});
+}
+function setcover(aid,position) {
+	pwConfirm('确认将此图设置为该图酷帖封面？', position, function() {
+		ajax.send('pw_ajax.php','action=setcover&aid=' + aid, function() {
+			if (ajax.request.responseText == 'success') {
+				//var o = getObj('att_'+aid);
+				//o.parentNode.removeChild(o);
+				showDialog('success','封面设置成功',1);
+			} else {
+				ajax.guide();
+			}
+		});
 	});
 }
 function playatt(aid) {
@@ -107,7 +122,7 @@ function postreply(txt) {
 	if (typeof document.FORM != "undefined") {
 		document.FORM.atc_title.value = txt;
 		if (txt.match(/\((.+?)\)/ig)) {
-			document.FORM.replytouser.value = RegExp.$1;
+			if (document.FORM.replytouser) document.FORM.replytouser.value = RegExp.$1;
 		}
 		document.FORM.atc_content.focus();
 	} else {
@@ -243,25 +258,31 @@ function checkUrl(obj) {
 			urladd = '...';
 		}
 		getObj("pw_box").innerHTML='';
-		setTimeout(
-			function(){
-				read.open('checkurl',obj.id,1,11);
-				getObj('suburl').innerHTML = suburl + urladd;
-				getObj('trueurl').href = url;
-				//for buttons
-				var buttons = document.getElementsByTagName('button');
-				for(var i=0;i<buttons.length;i++){
-					if(buttons[i].id == 'trueurl'){
-						buttons[i].onclick=function(){
-							window.open(url);
-							closep();
-							return false;
+		if(getObj('suburl')){
+			setTimeout(
+				function(){
+					read.open('checkurl',obj.id,1,11);
+					getObj('suburl').innerHTML = suburl + urladd;
+					getObj('trueurl').href = url;
+					//for buttons
+					var buttons = document.getElementsByTagName('button');
+					for(var i=0;i<buttons.length;i++){
+						if(buttons[i].id == 'trueurl'){
+							buttons[i].onclick=function(){
+								window.open(url);
+								closep();
+								return false;
+							}
 						}
 					}
-				}
-				//for buttons
-			},300
-		);
+					//for buttons
+				},300
+			);
+		}else{
+			//setTimeout(function(){window.open(url);},300);
+			window.open(url);
+			return false;
+		}
 		return false;
 	} else {
 		return true;
@@ -271,7 +292,7 @@ function checkUrl(obj) {
 function getFloorUrl(obj) {
 	var uid = getObj("hideUid").value;
 	var tid = getObj("tid").value;
-	var url = "job.php?action=topost&floor=" + obj.value + "&tid=" + tid;
+	var url = "job.php?action=tofloor&floor=" + obj.value + "&tid=" + tid;
 	if (uid > 0) {
 		url += "&uid=" + uid;
 	}
@@ -308,7 +329,7 @@ function showSignature(idName, isShow) {
 var loadFloor = {
 	showHidden : function(tid) {
 		var pids = '';
-		var objs = document.forms['delatc'].getElementsByTagName('blockquote');
+		var objs = document.forms['delatc'].getElementsByTagName('div');
 		for (var i = 0; i < objs.length; i++) {
 			if (objs[i].id && objs[i].id.substr(0, 7) == 'hidden_') {
 				pids += (pids ? ',' : '') + objs[i].id.substr(objs[i].id.lastIndexOf('_') + 1);
@@ -351,6 +372,7 @@ function showAttImg(lou, type) {
 var readImg = {
 	queue : {},
 	lou : 0,
+	preview: null,
 	init : function(lou) {
 		if (!this.queue[lou]) {
 			var list = getObj('imgList_' + lou + '_small').getElementsByTagName('img');
@@ -360,31 +382,24 @@ var readImg = {
 			}
 			this.queue[lou] = {'value' : imgs, 'counter' : 0};
 		}
+		
+		var popwin = document.getElementById('photo_pop'),
+			popbg = document.getElementById('photo_pop_mask');
+		
+		if(is_ie){
+			document.body.appendChild(popwin);
+			document.body.appendChild(popbg);
+		}
+		popbg.onmousedown = function(){
+			readImg.hidePhoto();
+		}
 	},
 	show : function(lou, counter) {
 		this.init(lou);
 		var obj = this.queue[lou];
 		obj.counter = counter;
 		var photo = obj.value;
-		var prephoto = getObj('prephoto');
-		var nextphoto = getObj('nextphoto');
-		if (obj.counter == 0) {
-			if (photo.length > 1) {
-				nextphoto.style.display = '';
-			}
-			prephoto.style.display = 'none';
-		}
-		if (obj.counter == photo.length-1) {
-			if (obj.counter > 0) {
-				prephoto.style.display = '';
-			}
-			nextphoto.style.display = 'none';
-		}
-		if (obj.counter > 0 && obj.counter < photo.length-1) {
-			prephoto.style.display = '';
-			nextphoto.style.display = '';
-		}
-		this.createTmp(photo,counter);
+		this.createTmp(photo, counter);
 		this.lou = lou;
 	},
 	viewAll : function() {
@@ -395,82 +410,69 @@ var readImg = {
 	nextPhoto : function() {
 		var obj = this.queue[this.lou];
 		var photo = obj.value;
-		if (obj.counter > photo.length -2) return;
-		obj.counter++;
-		getObj('prephoto').style.display = '';
+		obj.counter = (parseInt(obj.counter)+1) % photo.length;
 		this.createTmp(photo,obj.counter);
-
-		if (obj.counter == photo.length-1) {
-			getObj('nextphoto').style.display = 'none';
-		}
 	},
 	createTmp : function(photo, counter){
-		var imgpretmp = getObj('imgpre')
-		if(imgpretmp){
-			document.body.removeChild(imgpretmp);
-			imgpretmp.onload='';
-			delete imgpretmp;
-		}
-		imgpre = new Image();
-		imgpre.id = 'imgpre';
-		imgpre.src = photo[counter];
-		imgpre.style.position = 'absolute';
-		imgpre.style.top = '-100000px';
-		document.body.insertBefore(imgpre,document.body.childNodes[0]);
-		setTimeout(reposPhoto,0);
-		imgpre.onload = reposPhoto;
-		getObj('photo_pop_page').innerHTML = (parseInt(counter)+1) + ' / ' + photo.length;
+		this.preview = new Image();
+		this.preview.onload = loadPreimg;
+		this.preview.src = photo[counter];
+		//修改左右箭头
+		var piccount = document.getElementById('photo_pop_page');
+		piccount.innerHTML = (photo.length==1)?'':'第'+(parseInt(counter)+1)+'张/共'+photo.length+'张';
+		var prevImg = document.getElementById('prephoto'),
+			nextImg = document.getElementById('nextphoto');
+		prevImg.style.display = nextImg.style.display =(photo.length==1)? 'none': '';
+		/*prevImg.onclick = function(){
+			showImg(currentTid, data.imgid, 'prev');
+		};
+		nextImg.onclick = function(){
+			showImg(currentTid, data.imgid, 'next');
+		}*/
 	},
 
 	prevPhoto : function() {
 		var obj = this.queue[this.lou];
 		var photo = obj.value;
-		if (obj.counter < 1) return;
-		obj.counter--;
-		getObj('nextphoto').style.display = '';
+		obj.counter = (parseInt(obj.counter)-1+photo.length) % photo.length;
 		this.createTmp(photo,obj.counter);
-		if (obj.counter <= 0) {
-			obj.counter = 0;
-			getObj('prephoto').style.display = 'none';
-		}
 	},
 
 	hidePhoto : function(){
 		getObj('photo_pop').style.display='none';
 		getObj('photo_pop_mask').style.display='none';
-		getObj('imgpre').src='#';
+		if(readImg.preview){
+			readImg.preview.onload = '';
+		}
 	}
 }
-function reposPhoto() {
-	var photo = getObj('imgpre');
-	if(photo.src == 'javascript://;'){
-		setTimeout(reposPhoto,200);
-		return;
+function loadPreimg(){
+	var preview = readImg.preview;
+	preview.onload = '';
+	var rect = document.compatMode === "CSS1Compat" ? document.documentElement : document.body;
+	maxHeight = rect.clientHeight-100;
+	maxWidth = rect.clientWidth-100;
+	var ratio = preview.width/preview.height;
+	//获取高宽
+	if(preview.width>maxWidth){
+		preview.width = maxWidth;
+		preview.height = maxWidth/ratio;
 	}
-	if(!photo.width){
-		setTimeout(reposPhoto,200);
-		return;
+	if(preview.height>maxHeight){
+		preview.height = maxHeight;
+		preview.width = maxHeight* ratio;
 	}
-	var path = getObj('photo_path');
-	path.src =  photo.src;
-	path.style.height = 'auto';
-	path.style.width  = 'auto';
-	if (photo.width > 900) {
-		path.style.height = photo.height/photo.width*900+'px';
-		path.style.width = '900px';
-	}
-	var offsetheight = (is_ie ? ietruebody().offsetHeight : ietruebody().clientHeight) - 120;
-	if (photo.height > offsetheight) {
-		path.style.width = photo.width/photo.height*offsetheight+'px';
-		path.style.height = offsetheight + 'px';
-	}
-	var popo= getObj('photo_pop');
-	popo.style.top = '-10000px';
-	popo.style.display='';
-	getObj('photo_pop_mask').style.width=document.body.scrollWidth+'px';
-	getObj('photo_pop_mask').style.height=document.body.scrollHeight+'px';
-	popo.style.left = (document.body.clientWidth-popo.clientWidth)/2+'px';
-	popo.style.top = ( (window.innerHeight||document.documentElement.offsetHeight) -popo.clientHeight)/2+ietruebody().scrollTop+'px';
-	getObj('photo_pop_mask').style.display='';
-	getObj('prephoto').style.height=getObj('nextphoto').style.height= (parseInt(path.style.height)||photo.height)+'px';
+	var popwin = document.getElementById('photo_pop'),
+		popbg =  document.getElementById('photo_pop_mask'),
+		imgp = document.getElementById('photo_path'),
+		imgc = document.getElementById('imgLoading');
+	imgc.style.width = preview.width+'px';
+	imgc.style.height = preview.height+'px';
+	imgp.src = preview.src;
+	popbg.style.height = Math.max(rect.clientHeight-20, (document.documentElement.scrollHeight || document.body.scrollHeight))+'px';
+	popbg.style.display = popwin.style.display = 'block';
+	var w = popwin.clientWidth || parseInt(popwin.currentStyle.width),
+		h = popwin.clientHeight || parseInt(popwin.currentStyle.height);
+	popwin.style.left =( (document.documentElement.clientWidth || document.body.clientWidth)-w)/2 +'px';
+	popwin.style.top = ietruebody().scrollTop + ( (document.documentElement.clientHeight || document.body.clientHeight)-h)/2 +'px';
 }

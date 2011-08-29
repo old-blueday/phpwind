@@ -47,7 +47,32 @@ EOT;
      <a href="{$value['content']['link']}" target="_blank">{$value['content']['postfavor']['subject']}</a>
     </div>
     </td>
-    </tr>		
+    </tr>	
+<!--
+EOT;
+	}
+	function tucool($value) { //图酷
+print <<<EOT
+-->
+    <tr class="tr3 vt" id="collection_{$value['id']}">
+    <td width="20" style="vertical-align:top;"><input type="checkbox" name="idarray[]" value="{$value['id']}" id="idarray[]"/></td>
+    <td colspan="4">
+    <a class="adel cp" onclick="pwConfirm('你确认要删除这条收藏吗？',this,function(){collection.del('{$value['id']}')})">删除</a>
+    <div class="mb10 gray" id="title_{$value['id']}">{$value['title']}</div>
+    <div class="mb5">
+<!--
+EOT;
+if ($value['content']['username']) {print <<<EOT
+-->
+    <p class="mb5"><a href="{$GLOBALS[db_userurl]}{$value['content']['uid']}">{$value['content']['username']}</a>：</p>
+<!--
+EOT;
+}print <<<EOT
+-->    
+    <a href="{$value['content']['link']}" title="查看原图" alt="查看原图" target="_blank"><img src="{$value['content'][tucool]['image']}" width="200" height="150" class="img" /></a></div>
+<p class="mb5">所属帖子:<a href="read.php?tid={$value['content'][tucool]['tid']}" class="mr20">{$value['content'][tucool]['subject']}</a>图片名：{$value['content'][tucool]['name']}{$value['content'][tucool]['pintro']}</p>
+    </td>
+    </tr>	
 <!--
 EOT;
 	}
@@ -253,6 +278,22 @@ print <<<EOT
 -->
 <script type="text/javascript">
 weibo.push("$kNum", $photos);
+function resizeImg(ele){
+	var a=ele;
+	if(a.width<30||a.height<30){
+		setTimeout(function(){
+			resizeImg(a);
+		},10)
+		return false;
+	}
+	if(a.width>100){
+		
+			a.width = 100;
+			
+		} else if(a.height>100){
+			a.height=100;
+		}
+}
 </script>
 <div class="ddPhoto mb10 cc">
 <!--
@@ -267,7 +308,7 @@ $rect_width = $this->_maxPhoto*116;
 $ul_width = count($photolist)*116;
 print <<<EOT
 -->
-	<div class="fl" id="photolist_{$kNum}" style="width:{$rect_width}px;overflow:hidden;">
+	<div class="fl" id="photolist_{$kNum}" count="$count" style="width:{$rect_width}px;overflow:hidden;">
 		<ul class="fl" style="width:{$ul_width}px">
 <!--
 EOT;
@@ -277,7 +318,7 @@ $photo['path'] = $photo['path'] == 'n' ? 'images/imgdel.jpg' : $photo['path'];
 
 print <<<EOT
 --> 
-           <li><img src="{$photo['path']}" onclick="weibo.showPhoto('{$photo[pid]}','{$photo[s_path]}','$kNum','$i')" onerror="this.src='$GLOBALS[imgpath]/imgdel.jpg'" /></li>
+           <li><img src="{$photo['path']}" onclick="weibo.showPhoto('{$photo[pid]}','{$photo[s_path]}','$kNum','$i')" onerror="this.src='$GLOBALS[imgpath]/imgdel.jpg'" onload="resizeImg(this)" /></li>
             
 <!--
 EOT;
@@ -295,6 +336,13 @@ if ($count > $this->_maxPhoto) {print <<<EOT
 EOT;
 }print <<<EOT
 -->
+</div>
+<div id="photocontainer_{$kNum}" style="display:none;">
+<!--
+EOT;
+$this->_photoMask($kNum);
+print <<<EOT
+-->	
 </div>
 <!--
 EOT;
@@ -320,7 +368,7 @@ print <<<EOT
 EOT;
 if ($value['content']['username']) {print <<<EOT
 -->
-    <span><a href="{$GLOBALS[db_userurl]}{$value['content']['uid']}">{$value['content']['username']}</a>：</span>
+    <p class="mb5"><a href="{$GLOBALS[db_userurl]}{$value['content']['uid']}">{$value['content']['username']}</a>：</p>
 <!--
 EOT;
 }print <<<EOT
@@ -542,6 +590,21 @@ print <<<EOT
 					<img src="javascript://" id="photo_path"/></td>
 			</tr>
 		</table>
+	</div>
+</div>
+<!--
+EOT;
+	}
+    
+    function _photoMask($num) {
+print <<<EOT
+-->
+<div id="photo_mask_{$num}" class="feedImgB" style="display:none;">
+		<p class="mb5"><a href="javascript:;" onclick="weibo.hidePhoto($num)" class="feediImgFold">收起</a>&nbsp;|&nbsp;<a href="javascript:;" class="artWork" target="_blank" onclick="this.href=weibo.bigPhotoUrl($num)">查看大图</a></p>
+	<div class="tac pr cc" style="overflow:hidden;">
+			<div id="prephoto_{$num}" onclick="weibo.prevPhoto($num)" class="aPre" title="上一张" style="zoom:1;left:0;_padding-bottom:5000px;_margin-bottom:-5000px;"></div>
+			<div id="nextphoto_{$num}" onclick="weibo.nextPhoto($num)" class="aNext" title="下一张" style="zoom:1;bottom:0;top:0;_padding-bottom:5000px;_margin-bottom:-5000px;"></div>
+			<img src="javascript://" id="photo_path_{$num}" style="display:block;margin:0 auto;" />
 	</div>
 </div>
 <!--

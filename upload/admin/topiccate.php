@@ -7,7 +7,8 @@ S::gp(array('cateid','modelid'),GP,2);
 
 if (empty($action)){
 
-	@include_once pwCache::getPath(D_P.'data/bbscache/topic_config.php');
+	//* @include_once pwCache::getPath(D_P.'data/bbscache/topic_config.php');
+	pwCache::getData(D_P.'data/bbscache/topic_config.php');
 	$topiccatedb = array();
 	$query = $db->query("SELECT cateid,name,ifable,vieworder,ifdel FROM pw_topiccate ORDER BY vieworder,cateid");
 	while ($rt = $db->fetch_array($query)) {
@@ -67,7 +68,8 @@ if (empty($action)){
 	S::gp(array('page','step','field','newfield'));
 
 	$topicdb = $topiccatedb = $topicmodeldb = array();
-	@include_once pwCache::getPath(D_P.'data/bbscache/topic_config.php');
+	//* @include_once pwCache::getPath(D_P.'data/bbscache/topic_config.php');
+	pwCache::getData(D_P.'data/bbscache/topic_config.php');
 	foreach ($topicmodeldb as $value) {
 		$newmodeldb[$value['cateid']][] = $value;
 	}
@@ -183,7 +185,8 @@ if (empty($action)){
 		if (!$nexto) {
 			pwCache::setData($cache_file,$atc_content);
 		} else {
-			$atc_content = readover($cache_file);
+			//* $atc_content = readover($cache_file);
+			$atc_content = pwCache::getData($cache_file, false, true);
 		}
 
 		if (empty($subject) || empty($atc_content)) {

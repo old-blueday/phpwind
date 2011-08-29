@@ -14,7 +14,7 @@ $db_modepages = $db_modepages[$db_mode];
 $_cacheService = Perf::gatherCache('pw_threads');
 if ('' == $read['content']) $read = $_cacheService->getThreadAndTmsgByThreadId($tid);
 
-$readnum = $db_readperpage = 5;
+$readnum = $db_readperpage = $forumset['readnum'] ? $forumset['readnum'] : ($db_readperpage ? $db_readperpage : 5);
 if (!$openIndex) $count--;
 
 $numofpage = ceil($count/$db_readperpage);
@@ -149,11 +149,13 @@ $toread && $urladd .= "&toread=$toread";
 $fpage > 1 && $urladd .= "&fpage=$fpage";
 $pages = numofpage($count,$page,$numofpage,"read.php?tid=$tid{$urladd}&#newreply");
 
-if (!$db_hithour) {
-	//$db->update('UPDATE pw_threads SET hits=hits+1 WHERE tid='.S::sqlEscape($tid));
-	pwQuery::update('pw_threads', 'tid=:tid', array($tid), null, array(PW_EXPR=>array('hits=hits+1')));
-} else {
-	pwCache::setData(D_P.'data/bbscache/hits.txt',$tid."\t", false, 'ab');
+//更新帖子点击
+if ($db_hits_store == 0){
+	pwQuery::update('pw_threads', 'tid=:tid', array($tid), null, array(PW_EXPR=>array('hits=hits+1')));	
+}elseif ($db_hits_store == 1){
+	$db->update('UPDATE pw_hits_threads SET hits=hits+1 WHERE tid='.S::sqlEscape($tid)); 
+}elseif ($db_hits_store == 2){
+	pwCache::writeover(D_P.'data/bbscache/hits.txt',$tid."\t", 'ab');
 }
 
 /***  帖子浏览记录  ***/
@@ -201,14 +203,25 @@ if ($_pids) {
 		if ($rt['pid'] == '0') $rt['pid'] = 'tpc';
 		$attachdb[$rt['pid']][$rt['aid']] = $rt;
 	}
+	$attachShow = new attachShow(($isGM || $pwSystem['delattach']), $forumset['uploadset'], $forumset['viewpic']);
+	$attachShow->init($tid, $_pids);
 }
 
-$bandb = $pwforum->forumBan($readdb);
+if(!$readdb){
+	$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
+	$userInfo = $userService->get($thread_read['authorid']); //replyinfo
+	$thread_read['groupid'] = $userInfo['groupid'];
+	$thread_read['userstatus'] = $userInfo['userstatus'];
+}
+
+$bandb = $readdb ? $pwforum->forumBan($readdb) : $pwforum->forumBan($thread_read);
 $wordsfb = L::loadClass('FilterUtil', 'filter');
 
 isset($bandb[$thread_read['authorid']]) && $thread_read['groupid'] = 6;
+$author = $thread_read['author'];
 $authorids[] = $thread_read['authorid'];
 $thread_read = viewread($thread_read, 0);
+$thread_read['author'] = $author;
 
 foreach ($readdb as $key => $read) {
 	isset($bandb[$read['authorid']]) && $read['groupid'] = 6;
@@ -232,6 +245,7 @@ if ($db_showcolony && $authorids) {
 	}
 	$db->free_result($query);
 }
+$db_showcustom = ',' . implode(',', $db_showcustom) . ',';
 if ($db_showcustom && $authorids) {
 	$customdb = $cids = array();
 	foreach ($_CREDITDB as $key => $value) {
@@ -264,7 +278,8 @@ if ($groupid != 'guest' && !$tpc_locked && ($admincheck || !$foruminfo['allowrp'
         $anonymity = true;
     }
 }
-$db_menuinit .= ",'td_post' : 'menu_post','td_post1' : 'menu_post','td_admin' : 'menu_admin'";
+//$db_menuinit .= ",'td_post' : 'menu_post','td_post1' : 'menu_post','td_admin' : 'menu_admin'";
+$db_menuinit .= ",'td_admin' : 'menu_admin'";
 
 //allowtype onoff
 

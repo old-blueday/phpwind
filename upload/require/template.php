@@ -2,8 +2,10 @@
 !function_exists('readover') && exit('Forbidden');
 require_once(R_P.'require/bbscode.php');
 require_once(R_P.'require/showimg.php');
-include_once pwCache::getPath(D_P."data/bbscache/forumcache.php");
-include_once pwCache::getPath(D_P.'data/bbscache/customfield.php');
+//* include_once pwCache::getPath(D_P."data/bbscache/forumcache.php");
+//* include_once pwCache::getPath(D_P.'data/bbscache/customfield.php');
+extract(pwCache::getData(D_P."data/bbscache/forumcache.php", false));
+extract(pwCache::getData(D_P.'data/bbscache/customfield.php', false));
 
 if ($tid) {
 	if (!is_array($db_union)) {
@@ -11,9 +13,11 @@ if ($tid) {
 		$db_union[0] && $db_hackdb = array_merge((array)$db_hackdb,(array)unserialize($db_union[0]));
 	}
 	$readtpl = 'readtpl';
-	include_once S::escapePath(D_P."data/style/$tskin.php");
+	//* include_once S::escapePath(D_P."data/style/$tskin.php");
+	extract(pwCache::getData(S::escapePath(D_P."data/style/$tskin.php"), false));
 	if (!file_exists(R_P."template/$tplpath/$readtpl.htm")) {
-		include_once S::escapePath(D_P."data/style/$db_defaultstyle.php");
+		//* include_once S::escapePath(D_P."data/style/$db_defaultstyle.php");
+		extract(pwCache::getData(S::escapePath(D_P."data/style/$db_defaultstyle.php"), false));
 		if (!file_exists(R_P."template/$tplpath/$readtpl.htm")) {
 			$tplpath = 'wind';
 		}
@@ -23,9 +27,11 @@ if ($tid) {
 	} else {
 		$css_path = D_P.'data/style/wind_css.htm';
 	}
-	include_once pwCache::getPath(D_P.'data/bbscache/md_config.php');
+	//* include_once pwCache::getPath(D_P.'data/bbscache/md_config.php');
+	pwCache::getData(D_P.'data/bbscache/md_config.php');
 	if ($md_ifopen) {
-		include_once pwCache::getPath(D_P.'data/bbscache/medaldb.php');
+		//* include_once pwCache::getPath(D_P.'data/bbscache/medaldb.php');
+		pwCache::getData(D_P.'data/bbscache/medaldb.php');
 	}
 	$fieldadd = $tablaadd = '';
 	foreach ($customfield as $key => $val) {
@@ -186,16 +192,16 @@ if ($tid) {
 			if (!is_dir(R_P.$db_readdir.'/'.$fid)) {
 				@mkdir(R_P.$db_readdir.'/'.$fid);
 				@chmod(R_P.$db_readdir.'/'.$fid,0777);
-				pwCache::setData(R_P."$db_readdir/$fid/index.html",'');
+				pwCache::writeover(R_P."$db_readdir/$fid/index.html",'');
 				@chmod(R_P."$db_readdir/$fid/index.html",0777);
 			}
 			if (!is_dir(R_P.$db_readdir.'/'.$fid.'/'.$date)) {
 				@mkdir(R_P.$db_readdir.'/'.$fid.'/'.$date);
 				@chmod(R_P.$db_readdir.'/'.$fid.'/'.$date,0777);
-				pwCache::setData(R_P."$db_readdir/$fid/$date/index.html",'');
+				pwCache::writeover(R_P."$db_readdir/$fid/$date/index.html",'');
 				@chmod(R_P."$db_readdir/$fid/$date/index.html",0777);
 			}
-			pwCache::setData(R_P."$db_readdir/$fid/$date/$tid.html",$content, false, "rb+",0);
+			pwCache::writeover(R_P."$db_readdir/$fid/$date/$tid.html",$content, "rb+",0);
 			@chmod(R_P."$db_readdir/$fid/$date/$tid.html",0777);
 		} elseif (file_exists(R_P."$db_readdir/$fid/$date/$tid.html")) {
 			P_unlink(R_P."$db_readdir/$fid/$date/$tid.html");
@@ -204,7 +210,8 @@ if ($tid) {
 }
 function htmread($read,$start_limit) {
 	global $tpc_author,$count,$timestamp,$db_onlinetime,$db_bbsurl,$attachdir,$attachpath,$_G,$tablecolor,$readcolorone,$readcolortwo,$lpic,$ltitle,$imgpath,$db_ipfrom,$db_showonline,$stylepath,$db_windpost,$db_windpic,$fid,$tid,$attachments,$aids,$db_signwindcode,$md_ifopen,$_MEDALDB,$db_shield;
-	include_once pwCache::getPath(D_P.'data/bbscache/level.php');
+	//* include_once pwCache::getPath(D_P.'data/bbscache/level.php');
+	extract(pwCache::getData(D_P.'data/bbscache/level.php', false));
 	$read['lou'] = $start_limit;
 	$start_limit == $count-1 && $read['jupend'] = '<a name=lastatc></a>';
 

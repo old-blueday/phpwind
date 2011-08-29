@@ -34,8 +34,15 @@ class PW_AnnounceSource extends SystemData {
 	 */
 	function _cookData($data) {
 		global $db_bbsurl, $db_windpost;
-		$data['url'] = $data['url'] ? $data['url'] : $db_bbsurl . '/notice.php#' . $data['aid'];
+		$data['url'] = $data['url'] ? $data['url'] : $db_bbsurl . '/notice.php?fid='.$data['fid'].'#' . $data['aid'];
 		$data['title'] = convert($data['subject'], $db_windpost);
+		if($data['author']){
+			$userService = L::loadClass('userService', 'user');
+			$userId = $userService->getUserIdByUserName($data['author']);
+			$data['authorurl'] = 'u.php?uid='.$userId;
+		}else{
+			$data['authorurl'] = '';
+		}
 		$data['content'] = convert($data['content'], $db_windpost);
 		$data['descrip'] = substrs(strip_tags($data['content']),100);
 		return $data;

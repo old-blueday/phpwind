@@ -15,11 +15,12 @@ print <<<EOT
 EOT;
 foreach($result['data'] as $key => $value){
 $value['image'] = getphotourl($value['image'],$value['ifthumb']);
+$authorName = substrs($value['author'],8);
 print <<<EOT
 -->
 			<li><a href="$value[url]" target="_blank" class="aimg"><span><img src="$value[image]" /></span></a>
-			<p>上传人：<a href="u.php?username=$value[author]" target="_blank">$value[author]</a></p><p>$result[unit]数：
-			<span class="mr10">$value[value]</span>
+			<p class="lh_18" style="padding-bottom:0;">上传人：<a href="u.php?username=$value[author]" target="_blank" title="$value[author]">$authorName</a></p>
+			<p>$result[unit]数：$value[value]</p><p>
 <!--
 EOT;
 if($sub=="picRate"){print <<<EOT
@@ -29,7 +30,7 @@ if($sub=="picRate"){print <<<EOT
 EOT;
 }elseif($sub=="picFav"){print <<<EOT
 -->
-			<a  onclick="sendmsg('operate.php?action=share&ajax=1&type=photo&id=$value[id]','',this.id);" href="javascript:;">收藏</a>
+			<a href="apps.php?q=collection&a=favor&type=photo&ajax=1&id=$value[id]&ptype=photo" onclick="return ajaxurl(this)" class="mr10 allCollect">收藏</a>
 <!--
 EOT;
 }elseif($sub=="picShare"){print <<<EOT

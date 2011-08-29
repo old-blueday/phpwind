@@ -1,7 +1,8 @@
 <?php
 !function_exists('adminmsg') && exit('Forbidden');
 
-include pwCache::getPath(D_P.'data/bbscache/bk_config.php');
+//* include pwCache::getPath(D_P.'data/bbscache/bk_config.php');
+pwCache::getData(D_P.'data/bbscache/bk_config.php');
 
 if(!$action){
 	if($bk_open)$bk_open_1="checked";else $bk_open_0="checked";

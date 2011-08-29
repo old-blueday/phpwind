@@ -297,7 +297,8 @@ class PW_Active {
 			if ($value['poster']) {
 				pwDelatt($value['poster'], $GLOBALS['db_ifftp']);
 			}
-			$this->_db->update("UPDATE pw_colonys SET activitynum=activitynum-1 WHERE id=". S::sqlEscape($value['cid']));
+			//* $this->_db->update("UPDATE pw_colonys SET activitynum=activitynum-1 WHERE id=". S::sqlEscape($value['cid']));
+			$this->_db->update(pwQuery::buildClause("UPDATE :pw_table SET activitynum=activitynum-1 WHERE id=:id", array('pw_colonys',$value['cid'])));
 		}
 		$this->_db->update("DELETE FROM pw_actmembers WHERE actid" . $this->sqlIn($id));
 		$this->_db->update("DELETE FROM pw_active WHERE id" . $this->sqlIn($id));

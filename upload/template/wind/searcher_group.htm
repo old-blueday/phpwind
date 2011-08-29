@@ -1,8 +1,6 @@
 <!--<?php print <<<EOT
 -->
-<div>
-	<table width="100%" cellpadding="0" cellspacing="0" height="300"><tr><td valign="top">
-	<div class="forum_main">
+	<div class="forum_main main_min cc">
 <!--
 EOT;
 foreach($groups as $group){
@@ -23,18 +21,17 @@ EOT;
 print <<<EOT
 -->
 	</div>
-	<div style="padding:10px 0 10px 20px;" class="cc">
+	<div class="c">&nbsp;</div>
+	<div style="padding:10px 0 20px 20px;" class="cc">
 	$pager
 	</div>
-	<div style="padding-left:20px;">
+	<div class="p10" style="width:555px;margin-left:auto;margin-right:auto;">
 <!--
 EOT;
 require printEOT('searcher_searchinput');
 print <<<EOT
 -->
-		</div>
-	</td></tr></table>
-</div>       
+	</div>
 <!--
 EOT;
 ?>-->

@@ -120,10 +120,12 @@ var adminjobclass = {
 		}		
 	},
 	/*初始化*/
-	init : function(reward,list,job){
+	init : function(reward,list,job,isuserguide){
+		if (isuserguide != '1') {
+			this.bindJobList();
+			this.bindJob();
+		}
 		this.bindReward();
-		this.bindJobList();
-		this.bindJob();
 		this.initReward(reward);/*初始化选择*/
 		this.initJobList(list);/*初始化*/
 		this.initJobTable(job);/*初始化任务配置*/
@@ -158,8 +160,8 @@ var adminjobclass = {
 }
 
 /*公用调用自动化加载事件*/
-function adminJobReady(reward,list,job){
-	adminjobclass.init(reward,list,job);
+function adminJobReady(reward,list,job,isuserguide){
+	adminjobclass.init(reward,list,job,isuserguide);
 }
 
 function deleteJob(url,id){

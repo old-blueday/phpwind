@@ -13,7 +13,8 @@ if (!in_array($a,array('showgroupwritecommlist'))) {
 }
 
 require_once(R_P.'require/functions.php');
-include_once pwCache::getPath(D_P . 'data/bbscache/o_config.php');
+//* include_once pwCache::getPath(D_P . 'data/bbscache/o_config.php');
+pwCache::getData(D_P . 'data/bbscache/o_config.php');
 
 $isGM = S::inArray($windid,$manager);
 !$isGM && $groupid==3 && $isGM=1;
@@ -195,6 +196,7 @@ if ($a == 'delshare') {
 	require_once(R_P.'require/postfunc.php');
 	banUser();
 	S::gp(array('type','id','title','upid','position','other'),'P');
+	
 	$title 	= nl2br(str_replace('&#61;','=',$title));
 	$id = (int)$id;
 	$upid = (int)$upid ? (int)$upid : 0;
@@ -255,6 +257,7 @@ if ($a == 'delshare') {
 
 		//echo "success\t".$insertid."\t".$face."\t".$title;
 		if($tousername != $windid){
+			/* change to notice modified for phpwind8.5 
 			M::sendMessage(
 				$winduid,
 				array($tousername),
@@ -279,6 +282,31 @@ if ($a == 'delshare') {
 				),
 				'sms_comment_'.$type,
 				'sms_comment'
+			);
+			*/
+			M::sendNotice(
+				array($tousername),
+				array(
+					'create_uid'	=> $winduid,
+					'create_username'	=> $windid,
+					'title' => getLangInfo('writemsg','o_'.$type.'_success_title',array(
+						'formname'	=> $windid,
+						'sender'    => $windid,
+						'receiver'  => $tousername,
+					)),
+					'content' => getLangInfo('writemsg','o_'.$type.'_success_cotent',array(
+						'formuid' 	=> $winduid,
+						'formname'	=> $windid,
+						'touid'		=> $uid,
+						'title'		=> strip_tags($title),
+						'type'		=> $type,
+						'id'		=> $id,
+						'sender'    => $windid,
+						'receiver'  => $tousername,
+					)),
+				),
+				'notice_comment_'.$type,
+				'notice_comment'
 			);
 		}
 		if(empty($other)){
@@ -420,6 +448,7 @@ if ($a == 'delshare') {
 	$userCache->delete($uid, 'messageboard');
 
 	if ($thisid) {
+		/* change to notice modified for phpwind8.5
 		M::sendMessage(
 			$winduid,
 			array($tousername),
@@ -442,6 +471,29 @@ if ($a == 'delshare') {
 			),
 			'sms_message',
 			'sms_guestbook'
+		);
+		*/
+		M::sendNotice(
+			array($tousername),
+			array(
+				'create_uid'	=> $winduid,
+				'create_username'	=> $windid,
+				'title' => getLangInfo('writemsg','o_board_success_title',array(
+					'formname'	=> $windid,
+					'sender'    => $windid,
+					'receiver'  => $tousername,
+				)),
+				'content' => getLangInfo('writemsg','o_board_success_cotent',array(
+					'formuid' 	=> $winduid,
+					'formname'	=> $windid,
+					'touid'		=> $uid,
+					'content'	=> $data['title'],
+					'sender'    => $windid,
+					'receiver'  => $tousername,
+				)),
+			),
+			'notice_guestbook',
+			'notice_guestbook'
 		);
 		countPosts('+1');
 		require_once(R_P.'require/showimg.php');
@@ -811,7 +863,81 @@ if ($a == 'delshare') {
 	}
 	$o_maxphotonum && $rt['photonum'] >= $o_maxphotonum && Showmsg('mutiupload_photofull');
 	echo "success";ajax_footer();
-}
+} elseif ($a == 'addtag') {
+	$memberTagsService = L::loadClass('MemberTagsService','user');
+	($memberTagsService->countTagsByUid($winduid) >= 10) && Showmsg('u_tagsnum_limit');
+	S::gp(array('tagname'));
+	$tagname = str_replace('%26', '&', $tagname);
+	(strlen($tagname) < 1 || strlen($tagname) > 16) && Showmsg('u_tags_limit');
+	require_once(R_P . 'require/bbscode.php');
+	$wordsfb = L::loadClass('FilterUtil', 'filter');
+	if (($banword = $wordsfb->comprise($tagname)) !== false) Showmsg('u_tagname_wordsfb');
+	$tags = $memberTagsService->getTagsByTagName($tagname);
+	$memberTagData = array(
+		'userid' => $winduid,
+		'crtime' => $timestamp
+	);
+	if ($tags) {
+		if ($memberTagsService->getTagsByTagidAndUid($tags['tagid'],$winduid)) Showmsg('u_tags_had');
+		$memberTagData['tagid'] = $tags['tagid'];
+		$memberTagsService->addMemberTags($memberTagData);
+		$tagData['num'] = $tags['num']+1;
+		$memberTagsService->updateTags($tagData,$tags['tagid']);
+	} else {
+		$tagData['tagname'] = $tagname;
+		$tagData['num'] = 1;
+		$memberTagData['tagid'] = $memberTagsService->addTags($tagData);
+		$memberTagsService->addMemberTags($memberTagData);
+		$tags['tagname'] = $tagname;
+		$tags['tagid'] = $memberTagData['tagid'];
+	}
+	$userCache = L::loadClass('UserCache', 'user');//ismodify
+	$userCache->delete($winduid, 'tags');
+	
+	require_once printEOT('m_ajax');ajax_footer();
+}  elseif ($a == 'deltag') {
+	S::gp(array('tagid'));
+
+	if (!$tagid) Showmsg('undefined_action');
+	$memberTagsService = L::loadClass('MemberTagsService','user');
+	$tags = $memberTagsService->getTagsByTagidAndUid($tagid,$winduid);
+	if (!$tags || (!$isGM && $tags['userid'] != $winduid) || $tags['tagid'] != $tagid) {
+		Showmsg('undefined_action');
+	}
+	if ($memberTagsService->deleteMemberTags($tags['tagid'],$winduid)) {
+		$memberTagsService->updateNumByTagId($tags['tagid'],'-1');
+		$userCache = L::loadClass('UserCache', 'user');//ismodify
+		$userCache->delete($tags['userid'], 'tags');
+	}
+	echo "success";
+	ajax_footer();
+}  elseif ($a == 'changetag') {
+	$memberTagsService = L::loadClass('MemberTagsService','user');
+	$hotTags = $memberTagsService->getTagsByNum();
+	require_once printEOT('m_ajax');ajax_footer();
+}  elseif ($a == 'addAttention') {
+	S::gp(array('topicName'));
+	$topicService = L::loadClass('topic','sns');
+	if ($topicName == '') Showmsg('undefined_action');
+	$topic = $topicService->getTopicByName($topicName);
+	if (!$topic) $addTopic = $topicService->addTopic($topicName);
+	$topicid = $topic ? $topic['topicid'] : $addTopic[$topicName];
+	if ($topicService->getOneAttentionedTopic($topicid,$winduid)) Showmsg('topic_attention_repeat');
+	$topicService->addAttentionTopic($topicid,$winduid);
+	echo "success\t";ajax_footer();
+}  elseif ($a == 'delAttention') {
+	S::gp(array('topicName'));
+	if (!$topicName) Showmsg('undefined_action');
+	$topicService = L::loadClass('topic','sns');
+	$topic = $topicService->getTopicByName($topicName);
+	if (!$topic) Showmsg('undefined_action');
+	if (!$topicService->getOneAttentionedTopic($topic['topicid'],$winduid)) Showmsg('topic_notAttentioned');
+	if (!$isGM && $topic['userid'] != $winduid && $topic['topicname'] != $topicName) {
+		Showmsg('undefined_action');
+	}
+	$topicService->deleteAttentionedTopic($topic['topicid'],$winduid);
+	echo "success\t";ajax_footer();
+} 
 
 function getUserNameByTypeAndId($type,$id) {
 	global $db;

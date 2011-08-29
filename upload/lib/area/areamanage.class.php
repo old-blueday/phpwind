@@ -43,8 +43,12 @@ class PW_AreaManage {
 			$channels[$key] = $info['name'];
 			$invokes[$key]  = $info['invokes'];
 		}
-		$channelId = !$channelId ? $defaultId : $channelId;
-
+		if ($channelId === -1) {
+			$channelKeys = array_keys($channels);
+			$channelId = $channelKeys[0];
+		} else {
+			$channelId = !$channelId ? $defaultId : $channelId;
+		}
 		$currentInvokes = (isset($invokes[$channelId])) ? $invokes[$channelId] : array();
 		$invoke = $invoke ? $invoke : $this->_getFirstInvoke($currentInvokes);
 		$subInvokes = $this->getSecondGrade($userId,$channelId,$invoke);

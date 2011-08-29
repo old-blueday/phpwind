@@ -666,7 +666,7 @@ function user_authentication(paymethod) {
 						$valuedisplay = 'style="display:none;"';
 					}
 					$picpath = PW_PostActivity::getActivityImgUrl($picvalue,true);
-					$imgs .= "<input id=\"fetch_{$i}\" type=\"hidden\" name=\"act[picture{$i}]\" value=\"$picvalue\"/><div $valuedisplay class=\"t_img\" id=\"img_picture_{$i}\"><img id=\"act_pic_" . $data['fieldid'] . "\" src=\"$picpath\"/><a href=\"javascript:;\" onclick=\"delpicture('{$i}','$actmid','$tid','" . $data['fieldid'] . "');\">".getLangInfo('other','pc_delimg')."</a></div>";
+					$imgs .= "<input id=\"fetch_{$i}\" type=\"hidden\" name=\"act[picture{$i}]\" value=\"$picvalue\"/><div $valuedisplay class=\"t_img\" id=\"img_picture_{$i}\"><img id=\"act_pic_" . $data['fieldid'] . "\" src=\"$picpath\"/><a href=\"javascript:;\" onclick=\"delpicture('{$i}','$actmid','$tid','" . $data['fieldid'] . "');return false;\">".getLangInfo('other','pc_delimg')."</a></div>";
 				}
 
 				$acthtml .= "$imgs <input type=\"button\" class=\"btn\" value=\"" . getLangInfo('other','act_upload_img') . "\" onclick=\"uploadpicture('$actmid')\"><p>" . $data['descrip'] . "</p>";
@@ -763,7 +763,7 @@ ajax.send('pw_ajax.php?action=activity&job=delimg','actmid='+actmid+'&fieldid='+
 
 		//$selectmodelhtml = '<div class="w_title_ip pr" style="margin-left: 5px;">';
 		$selectmodelhtml = '<div style="margin-left: 5px;">';
-		$selectmodelhtml .= "<select name=\"actmid\" onchange=\"window.location.href='post.php?fid='+'$fid'+'&actmid='+this.value\">";
+		$selectmodelhtml .= "<select name=\"actmid\" onchange=\"window.onbeforeunload = function(){};window.location.href='post.php?fid='+'$fid'+'&actmid='+this.value\">";
 		
 		$newactcatedb = array();
 		$activityModelDb = $this->getActivityModelDb();
@@ -1563,7 +1563,7 @@ function actRecommend(tid, actmid, obj) {
 	}
 
 	function initSearchHtml($actmid = 0) {/*获取前台活动搜索列表*/
-		global $fid;
+		global $fid, $searchname;
 
 		$fieldService = L::loadClass('ActivityField', 'activity');
 		$searchhtml = "<form action=\"thread.php?fid=$fid".($actmid ? "&actmid=$actmid" : "&allactmid=1")."\" method=\"post\">";
@@ -1607,22 +1607,24 @@ function actRecommend(tid, actmid, obj) {
 					foreach ($rules as $key => $value) {
 						$op_key = substr($value,0,strpos($value,'='));
 						$op_value = substr($value,strpos($value,'=')+1);
-						$searchhtml .= "<option value=\"".$op_key."\">".$op_value."</option>";
+						$selected = $searchname[$fieldname] == $op_key ? 'selected' : '';
+						$searchhtml .= "<option value=\"".$op_key."\" $selected>".$op_value."</option>";
 					}
 					$searchhtml .= '</select>';
 				} elseif ($type == 'checkbox') {
 					foreach($rules as $ck => $cv){
 						$op_key = substr($cv,0,strpos($cv,'='));
 						$op_value = substr($cv,strpos($cv,'=')+1);
-						$searchhtml .= "<input type=\"checkbox\" name=\"searchname[$fieldname][]\" value=\"$op_key\"/> $op_value ";
+						$checked = in_array($op_key, $searchname[$fieldname]) ? 'checked' : '';
+						$searchhtml .= "<input type=\"checkbox\" name=\"searchname[$fieldname][]\" value=\"$op_key\" $checked/> $op_value ";
 					}
 				} elseif ($type == 'calendar') {
 					$showCalendarJsOption = 'minute' == $rules['precision'] ? 1 : 0;
-					$searchhtml .= "<input id=\"calendar_start_$fieldname\" type=\"text\" class=\"input\" name=\"searchname[$fieldname]\" onclick=\"ShowCalendar(this.id,$showCalendarJsOption)\" size=\"$textwidth\"/>";
+					$searchhtml .= "<input id=\"calendar_start_$fieldname\" type=\"text\" class=\"input\" name=\"searchname[$fieldname]\" value=\"$searchname[$fieldname]\" onclick=\"ShowCalendar(this.id,$showCalendarJsOption)\" size=\"$textwidth\"/>";
 				} elseif ($type == 'range') {
-					$searchhtml .= "<input type=\"text\" size=\"5\" class=\"input\" name=\"searchname[$fieldname][min]\"/> - <input type=\"text\" class=\"input\" name=\"searchname[$fieldname][max]\" size=\"$textwidth\"/>";
+					$searchhtml .= "<input type=\"text\" size=\"5\" class=\"input\" name=\"searchname[$fieldname][min]\" value=\"{$searchname[$fieldname]['min']}\"/> - <input type=\"text\" class=\"input\" name=\"searchname[$fieldname][max]\" value=\"{$searchname[$fieldname]['max']}\" size=\"$textwidth\"/>";
 				} else {
-					$searchhtml .= "<input type=\"text\" size=\"$textwidth\" name=\"searchname[$fieldname]\" value=\"\" class=\"input\">";
+					$searchhtml .= "<input type=\"text\" size=\"$textwidth\" name=\"searchname[$fieldname]\" value=\"$searchname[$fieldname]\" class=\"input\">";
 				}
 
 				$searchhtml .= $rt['name'][2];

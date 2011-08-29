@@ -1,244 +1,115 @@
 <!--<?php
 include_once PrintEot('left');
-if($admintype=='appset'){
+if($msg){print <<<EOT
+-->
+<div class="admin_tips">$msg</div><br />
+<!--
+EOT;
+}if($admintype=='appset'){
+print <<<EOT
+-->
+<script type="text/javascript" src="{$db_server_url}/statics/common/js/global.js"></script>
+<script language="JavaScript">
+var server = new PwJs.Server("pwapp");
+server.start();
+</script>
+<!--
+EOT;
+if(!$isRegister){
 print <<<EOT
 -->
 <div class="nav3 mb10">
-    <ul class="cc">
-      <li class="current"><a href="$basename&admintype=appset" hidefocus="true">基本设置</a></li>
-      <li><a href="http://faq.phpwind.net/app.php" target="_blank" hidefocus="true">在线指南</a></li>
-    </ul>
+	<ul class="cc" id="basictype">
+		<li class="current"><a hidefocus="true" href="$basename&admintype=appset">应用首页</a></li>
+	</ul>
 </div>
-<div class="mb10">
-	<h2 class="h1">APP平台帐号</h2>
-	<div class="legend mb10">
-	<p>在您建立论坛时，系统会为该论坛自动创建一个app帐户。假如您之前手动注册过app帐户，在密钥一致的情况下，论坛将与您的帐户自动关联。</p> 
-<!--
-EOT;
-if($db_siteappkey && !$db_appidstate){print <<<EOT
--->
-    您好，您在APP平台的帐号为：<b>{$db_appid}</b>&nbsp;&nbsp; <a href="http://app.phpwind.net/pwbbsapi.php?m=login&pw_query=$pw_query" target="_blank">登录app平台</a>
-    <span class="gray">如果app使用有问题，请尝试重新与app centre获得连接。 <a href="$basename&admintype=registerapp">重新连接</a></span>
-<!--
-EOT;
-}elseif($db_siteappkey && $db_appidstate){print <<<EOT
--->
-    您好，该论坛在app平台的帐户名为：<b>{$db_appid}</b>，登录app平台可修改一次帐户名，在完成修改前，您仅可通过此处登录到app平台 &nbsp;&nbsp;<a href="http://app.phpwind.net/pwbbsapi.php?m=login&pw_query=$pw_query" target="_blank">登录app平台</a> 
-    <span class="gray">如果app使用有问题，请尝试重新与app centre获得连接。 <a href="$basename&admintype=registerapp">重新连接</a></span>
-<!--
-EOT;
-}else{print <<<EOT
--->
-	您好，未检测到app帐户名，该论坛尚未同app平台关联，无法使用任何来自app平台的应用 &nbsp;&nbsp;<a href="$basename&admintype=registerapp">重新检测</a>&nbsp;&nbsp; <a href="http://faq.phpwind.net/answer-595" target="_blank">如何解决？</a>
-<!--
-EOT;
-}print <<<EOT
--->
-	</div>
-	<h2 class="h1">APP用户端</h2>
-	<div class="legend mb10">
-<!--
-EOT;
-if($app_version){print <<<EOT
--->
-	最新app用户端版本为<b>{$app_version}</b>，我已经安装的版本是 <b>{$personal}</b>&nbsp;&nbsp; <a href="http://www.phpwind.com/index.php?m=download#app" target="_blank">下载最新版本</a>&nbsp;&nbsp; <a href="http://faq.phpwind.net/answer-485" target="_blank">使用教程</a>
-<!--
-EOT;
-}else{print <<<EOT
--->
-	<p>APP用户端无法使用！有以下几种可能：</p>
-	<p>1、服务器不支持fsockopen函数</p>
-	<p>2、服务器DNS解析问题，无法ping通其他网站</p>
-	<p>3、其他一些未知情况</p>
-<!--
-EOT;
-}print <<<EOT
--->
-	</div>
-	<div class="admin_info">
-    <h2 class="h1" >密钥说明</h2>
-    <div class="legend">
-    通用密钥是系统安装自动为每个站点生成的，包括一对密钥和一个唯一识别码，将作为您站点的唯一固定标识。这一组密钥在您注册APP平台或修改APP平台帐户时需要用到，而且只有通过创始人身份登录后台才能够看到，请您妥善管理，不要随意泄露。仅当您的数据库发生变化时，密钥可能会重新生成，导致您在APP的操作失效。
-    </div>
-	</div>
+
+<h3 class="h1">在线应用中心状态</h3>
+<div class="p10 mb15">
+	<p class="mb10">您好，您的在线应用中心还未注册，请先</p>
+      <p><span class="btn2"><span><button name="siteinfo" type="button" onclick="location.href='$basename&admintype=register';">注册</button></span></span><span class="bt2"><span><button name="login" type="button" onclick="location.href='$basename&admintype=link';">老帐号登录</button></span></span></p>
 </div>
-<h2 class="h1"><span class="mr20">通用密钥</span></h2>
-<div class="admin_table mb10">
-<table width="100%" cellspacing="0" cellpadding="0">
-  <tr class="tr1 vt">
-    <td class="td1">密钥一</td>
-    <td class="td2">
-    	$db_siteid
-      	<input type="hidden" value="$db_siteid" />
-		<span class="bt2"><span><button type="button" onclick="CopyCode('$db_siteid');">复制</button></span></span>
-  	</td>
-  </tr>
-  <tr class="tr1 vt">
-    <td class="td1">密钥二</td>
-    <td class="td2">
-    	$db_siteownerid
-     	<input type="hidden" value="$db_siteownerid">
-        <span class="bt2"><span><button type="button" onclick="CopyCode('$db_siteownerid');">复制</button></span></span>
-     </td>
-  </tr>
-  <tr class="tr1 vt">
-    <td class="td1">唯一识别码</td>
-    <td class="td2">
-    	$db_sitehash
-    	<input type="hidden" value="$db_sitehash">
-        <span class="bt2"><span><button type="button" onclick="CopyCode('$db_sitehash');">复制</button></span></span>
-    </td>
-  </tr>
-</table>
-</div>
-<SCRIPT type="text/javascript" LANGUAGE="JavaScript" src="js/core/core.js"></SCRIPT>
-<h2 class="h1">环境及文件检测（如果有未通过项，则部分功能可能会受影响）</h2>
-<div class="admin_table mb10">
-<table width="100%" cellspacing="0" cellpadding="0">
-  <tr class="tr2">
-    <td colspan="3">函数检测：fsockopen</td>
+
+<iframe id="pwapp" name="pwapp" frameborder="0" width="100%" height="600" scrolling="no" src="{$onlineAppListUrl}"></iframe>
+
 <!--
 EOT;
-if(!$app_version){print <<<EOT
--->
-    <td>不支持</td>
-<!--
-EOT;
-}else{print <<<EOT
--->
-    <td>支持</td>
-<!--
-EOT;
-}print <<<EOT
--->
-  </tr>
-  <tr class="tr2 td_bgA">
-    <td colspan="4">用户端文件检测：未知文件:$cklog[1] &nbsp;&nbsp; 文件被修改:$cklog[3] &nbsp;&nbsp; 文件丢失:$cklog[2]</td>
-  </tr>
-  <tr class="tr2">
-    <td>文件名</td>
-    <td width="20%">文件大小</td>
-    <td width="30%">最后修改时间</td>
-    <td width="20%">文件状态</td>
-  </tr>
-<!--
-EOT;
-foreach($dirlist as $dir=>$value){print <<<EOT
--->
-  <tr class="tr2 td_bgB">
-    <td colspan="4">{$dir}/</td>
-  </tr>
-<!--
-EOT;
-foreach($value as $k=>$v){print <<<EOT
--->
-  <tr class="tr1 vt">
-    <td class="td2">$v[0]</td>
-    <td class="td2" width="20%">$v[1]</td>
-    <td class="td2" width="30%">$v[2]</td>
-    <td class="td2" width="20%">
-<!--
-EOT;
-if($v[3]=='1'){print <<<EOT
--->
-      <span class="s2">未知文件</span>
-<!--
-EOT;
-}elseif($v[3]=='2'){print <<<EOT
--->
-      <span class="s2">文件丢失</span>
-<!--
-EOT;
-}elseif($v[3]=='4'){print <<<EOT
--->
-      <span class="s3">文件正常</span>
-<!--
-EOT;
-}else{print <<<EOT
--->
-      <span class="s1">文件被修改</span>
-<!--
-EOT;
-}print <<<EOT
--->
-    </td>
-  </tr>
-<!--
-EOT;
-}}print <<<EOT
--->
-</table>
-</div>
-<!--
-EOT;
-}elseif($admintype=='appslist'){
+}else{
 print <<<EOT
 -->
-<h2 class="h1">基础应用</h2>
-<div class="admin_table mb10">
-<table width="100%" cellspacing="0" cellpadding="0">
-  <tr class="tr2">
-    <td>应用名称</td>
-    <td>URL</td>
-    <td width="44">操作</td>
-    <td>&nbsp;</td>
-  </tr>
-  <tr class="tr1 vt">
-    <td class="td2">帖子</td>
-    <td class="td2"><input class="input input_wb" type="text" name="url_article" value="{$db_bbsurl}/apps.php?q=article" id="url_article" >
-      <a href="javascript:;" onclick="copyUrl('article')">复制</a></td>
-    <td class="td2"></td>
-    <td class="td2"><a href="$admin_file?adminjob=superdel&admintype=article">[管理]</a></td>
-  </tr>
-  <tr class="tr1 vt">
-    <td class="td2">相册</td>
-    <td class="td2"><input class="input input_wb" type="text" name="url_photos" value="{$db_bbsurl}/apps.php?q=photos" id="url_photos" >
-      <a href="javascript:;" onclick="copyUrl('photos')">复制</a></td>
-    <td class="td2"><a href="$admin_file?adminjob=apps&admintype=photos_set">[设置]</a></td>
-    <td class="td2"><a href="$admin_file?adminjob=apps&admintype=photos_manage">[管理]</a></td>
-  </tr>
-  <tr class="tr1 vt">
-    <td class="td2">日志</td>
-    <td class="td2"><input class="input input_wb" type="text" name="url_diary" value="{$db_bbsurl}/apps.php?q=diary" id="url_diary" >
-      <a href="javascript:;" onclick="copyUrl('diary')">复制</a></td>
-    <td class="td2"><a href="$admin_file?adminjob=apps&admintype=diary_set">[设置]</a></td>
-    <td class="td2"><a href="$admin_file?adminjob=apps&admintype=diary_manage">[管理]</a></td>
-  </tr>
-  <tr class="tr1 vt">
-    <td class="td2">群组</td>
-    <td class="td2"><input class="input input_wb" type="text" name="url_groups" value="{$db_bbsurl}/apps.php?q=groups" id="url_groups" >
-      <a href="javascript:;" onclick="copyUrl('groups')">复制</a></td>
-    <td class="td2"><a href="$admin_file?adminjob=apps&admintype=groups_set">[设置]</a></td>
-    <td class="td2"><a href="$admin_file?adminjob=apps&admintype=groups_manage">[管理]</a></td>
-  </tr>
-  <tr class="tr1 vt">
-    <td class="td2">热榜</td>
-    <td class="td2"><input class="input input_wb" type="text" name="url_hot" value="{$db_bbsurl}/apps.php?q=hot" id="url_hot" >
-      <a href="javascript:;" onclick="copyUrl('hot')">复制</a></td>
-    <td class="td2"><a href="$admin_file?adminjob=apps&admintype=hot">[设置]</a></td>
-    <td class="td2"></td>
-  </tr>
-
-  <tr class="tr1 vt">
-    <td class="td2">新鲜事</td>
-    <td class="td2"><input class="input input_wb" type="text" name="url_weibo" value="{$db_bbsurl}/apps.php?q=weibo" id="url_weibo" >
-      <a href="javascript:;" onclick="copyUrl('weibo')">复制</a></td>
-    <td class="td2"><a href="$admin_file?adminjob=apps&admintype=weibo_set">[设置]</a></td>
-    <td class="td2"><a href="$admin_file?adminjob=apps&admintype=weibo_manage">[管理]</a></td>
-  </tr>
-</table>
+<iframe id="pwapp" name="pwapp" frameborder="0" width="100%" height="700" scrolling="no" src="{$loginUrl}"></iframe>
+<!--
+EOT;
+}}elseif($admintype=='register'){
+print <<<EOT
+-->
+<div class="nav3 mb10">
+	<ul class="cc" id="basictype">
+		<li><a href="$basename&admintype=appset" hidefocus="true">应用首页</a></li>
+		<li class="current"><a href="$basename&admintype=register" hidefocus="true">在线注册</a></li>
+	</ul>
 </div>
-<script language="JavaScript">
-function copyUrl(id) {
-	var url = getObj('url_'+id).value;
-	if (is_ie) {
-		window.clipboardData.setData("Text",url);
-		alert('URL已复制到剪帖板');
-	} else {
-		prompt('按下 Ctrl+C 复制到剪贴板',url)
-	}
-}
-</script>
+
+<h3 class="h1">在线应用中心注册</h3>
+
+<form action="$basename&admintype=$admintype" method="post">
+<input type="hidden" name="step" value="2">
+<div class="admin_table mb10">
+	<table width="100%" cellpadding="0" cellspacing="0">
+		<tr class="tr1">
+			<td class="td1">用户名 <span class="s1">*</span></td>
+			<td class="td2"><input type="text" class="input input_wa" name="username" /> <span class="gray">用于登录，注册后不可修改</span></td>
+		</tr>
+		<tr class="tr1">
+			<td class="td1">邮箱地址 <span class="s1">*</span></td>
+			<td class="td2"><input type="text" class="input input_wa" name="email" /> <span class="gray">请正确填写常用邮箱，注册后不可修改</span></td>
+		</tr>
+		<tr class="tr1">
+			<td class="td1">密码 <span class="s1">*</span></td>
+			<td class="td2"><input type="password" class="input input_wa" name="password" /></td>
+		</tr>
+		<tr class="tr1">
+			<td class="td1">确认密码 <span class="s1">*</span></td>
+			<td class="td2"><input type="password" class="input input_wa" name="repassword" /></td>
+		</tr>
+	</table>
+</div>
+<div class="mb10 tac">
+	<span class="btn"><span><button type="submit">提 交</button></span></span>
+</div>
+</form>
+<!--
+EOT;
+}elseif($admintype=='link'){
+print <<<EOT
+-->
+<div class="nav3 mb10">
+	<ul class="cc" id="basictype">
+		<li><a href="$basename&admintype=appset" hidefocus="true">应用首页</a></li>
+		<li class="current"><a href="$basename&admintype=link" hidefocus="true">重新登录</a></li>
+	</ul>
+</div>
+
+<h3 class="h1">关联帐号</h3>
+
+<form action="$basename&admintype=$admintype" method="post">
+<input type="hidden" name="step" value="2">
+<div class="admin_table mb10">
+	<table width="100%" cellpadding="0" cellspacing="0">
+		<tr class="tr1">
+			<td class="td1">用户名 <span class="s1">*</span></td>
+			<td class="td2"><input type="text" class="input input_wa" name="username" /></td>
+		</tr>
+		<tr class="tr1">
+			<td class="td1">密码 <span class="s1">*</span></td>
+			<td class="td2"><input type="password" class="input input_wa" name="password" /></td>
+		</tr>
+	</table>
+</div>
+<div class="mb10 tac">
+	<span class="btn"><span><button type="submit">提 交</button></span></span>
+</div>
+</form>
 <!--
 EOT;
 }elseif($admintype=='onlineapp'){
@@ -247,9 +118,9 @@ if (empty($db_appifopen)) {print <<<EOT
 <form action="{$basename}" method="post">
 <input type="hidden" name="admintype" value="open" />
 <div class="admin_info mb10">
-	<h2 class="h1">社区应用</h2>
+	<h2 class="h1">会员应用</h2>
     <div class="legend">
-社区应用包括多个游戏、便民、交互模块，可以帮助您提高站点的娱乐交互性，从而提高站点用户粘性。这些模块由第三方app提供商和phpwind共同开发，按照phpwind论坛标准与用户习惯接入，从而确保每一个pw论坛的无缝体验。部分模块的部分功能可能需要论坛用户充值方可使用；作为应用的载体，当用户在您的站点产生消费时，您也将获得一定分成。 <a href="  http://faq.phpwind.net/topic-58" target=blank>了解更多</a>
+会员应用包括多个游戏、便民、交互模块，可以帮助您提高站点的娱乐交互性，从而提高站点用户粘性。这些模块由第三方app提供商和phpwind共同开发，按照phpwind论坛标准与用户习惯接入，从而确保每一个pw论坛的无缝体验。部分模块的部分功能可能需要论坛用户充值方可使用；作为应用的载体，当用户在您的站点产生消费时，您也将获得一定分成。 <a href="  http://faq.phpwind.net/topic-58" target=blank>了解更多</a>
     </div>
 </div>
 <div class="p10">
@@ -261,7 +132,7 @@ EOT;
 } else {print <<<EOT
 -->
 <div class="admin_info mb10">
-	<h2 class="h1">社区应用</h2>
+	<h2 class="h1">会员应用</h2>
     <div class="legend">
     	<ol>
         	<li>当站点应用使用异常时，你可以使用数据更新操作将站点信息更新到app应用平台。</li>
@@ -328,7 +199,7 @@ if (empty($db_appifopen)) {print <<<EOT
 <div class="admin_info mb10">
 	<h2 class="h1">功能说明</h2>
     <div class="legend">
-    	开启“随拍随发”应用必须先开启“社区应用”，“社区应用”可选择单独在论坛模式或个人中心下展示。是否现在为您开启“社区应用” 和“随拍随发”？ 社区应用包括多个游戏、便民、交互模块，可以帮助您提高站点的娱乐交互性，从而提高站点用户粘性。这些模块由第三方app提供商和phpwind共同开发，按照phpwind论坛标准与用户习惯接入，从而确保每一个pw论坛的无缝体验。部分模块的部分功能可能需要论坛用户充值方可使用；作为应用的载体，当用户在您的站点产生消费时，您也将获得一定分成。 <a href="  http://faq.phpwind.net/topic-58" target=blank>了解更多</a> 
+    	开启“随拍随发”应用必须先开启“会员应用”，“会员应用”可选择单独在论坛模式或个人中心下展示。是否现在为您开启“会员应用” 和“随拍随发”？ 会员应用包括多个游戏、便民、交互模块，可以帮助您提高站点的娱乐交互性，从而提高站点用户粘性。这些模块由第三方app提供商和phpwind共同开发，按照phpwind论坛标准与用户习惯接入，从而确保每一个pw论坛的无缝体验。部分模块的部分功能可能需要论坛用户充值方可使用；作为应用的载体，当用户在您的站点产生消费时，您也将获得一定分成。 <a href="  http://faq.phpwind.net/topic-58" target=blank>了解更多</a> 
     </div>
 </div>
 <h2 class="h1">随拍随发</h2>
@@ -360,16 +231,20 @@ server.start();
 <iframe id="pwapp" name="pwapp" frameborder="0" width="100%" height="600" scrolling="no" src="{$appurl}"></iframe>
 <!--
 EOT;
-}elseif($admintype=='showinfo'){
+}elseif($admintype=='yunstatistics'){
 print <<<EOT
 -->
-<div class="admin_info mb10">
-	<h2 class="h1">信息提示</h2>
-    <div class="legend">
-    	你好，该论坛尚未同APP平台关联，无法使用任何来自APP平台的应用。<br />
-        请到“应用中心 > 在线应用 > <a href="$admin_file?adminjob=app&admintype=appset">APP帐号与设置</a>”查看设置。
-    </div>
-</div>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<style>
+body,html{overflow:hidden;}
+body,html,iframe{padding:0;margin:0;width:100%;height:100%;}
+</style>
+</head>
+<body>
+<iframe id="pwapp" scrolling="auto" name="pwapp" frameborder="0" src="$yunStatisticsUrl"></iframe>
+</body></html>
 <!--
 EOT;
 }include_once PrintEot('adminbottom');

@@ -9,7 +9,8 @@ $space =& $newSpace->getInfo();
 
 $basename = 'apps.php?q=' . $q . '&';
 
-include_once pwCache::getPath(D_P . 'data/bbscache/o_config.php');
+//* include_once pwCache::getPath(D_P . 'data/bbscache/o_config.php');
+pwCache::getData(D_P . 'data/bbscache/o_config.php');
 include_once (R_P . 'require/showimg.php');
 include_once (R_P . 'require/credit.php');
 L::loadClass('datanalyse', 'datanalyse', false);

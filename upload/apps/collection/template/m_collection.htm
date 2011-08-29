@@ -13,6 +13,7 @@ print <<<EOT
 			<ul>
 				<li id="type_all"><a href="{$basename}a=$a">全部</a></li>
 				<li id="type_postfavor"><a href="{$basename}a=$a&type=postfavor">帖子</a></li>
+				<li id="type_tucool"><a href="{$basename}a=$a&type=tucool">图酷</a></li>
 				<li id="type_weibo"><a href="{$basename}a=$a&type=weibo">新鲜事</a></li>
 				<li id="type_cms"><a href="{$basename}a=$a&type=cms">文章</a></li>
 <!--
@@ -79,7 +80,7 @@ EOT;
 if ($winduid || $groupid == 3) {print <<<EOT
 -->
 	
-	<div class="pd5"  ><span class="cp addImg" onclick="addType('dt_ul','$winduid');">添加分类</span></div>
+	<div class="pd5"  ><span class="cp addImg" onclick="addType('dt_ul','$winduid','collection');">添加分类</span></div>
 
 <!--
 EOT;
@@ -143,7 +144,7 @@ print <<<EOT
 EOT;
 foreach($collectionDb as $value){
 	$method = $value['type'];
-    if (!in_array($method, array('weibo', 'postfavor', 'diary', 'photo', 'group', 'active', 'web', 'multimedia','cms')))
+    if (!in_array($method, array('weibo', 'postfavor', 'tucool', 'diary', 'photo', 'group', 'active', 'web', 'multimedia','cms')))
 	    continue;
 	$collectionModelTemplate->$method($value);
 }
@@ -166,15 +167,16 @@ showDialog('error','请选择操作对象!', 2);
 return false;
 }
 function removes(){ 
-	removesIsNotSelect();
-	ajax.send('apps.php?q=collection&a=remove',document.docollection,function(){
-		var rText = ajax.request.responseText.split('\t');
-		if (rText[0] == 'success') {
-			window.location.reload();
-		} else {
-			showDialog('error','请选择操作对象!', 2);
-		}
-	});
+	if(removesIsNotSelect()){
+		ajax.send('apps.php?q=collection&a=remove',document.docollection,function(){
+			var rText = ajax.request.responseText.split('\t');
+			if (rText[0] == 'success') {
+				window.location.reload();
+			} else {
+				showDialog('error','请选择操作对象!', 2);
+			}
+		});
+	}
 }
 //移动的时候 没有选择移动对象，弹出提示
 function removesIsNotSelect() {

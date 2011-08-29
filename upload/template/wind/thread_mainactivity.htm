@@ -9,12 +9,16 @@ print <<<EOT
 EOT;
 if($managecheck){print <<<EOT
 -->
-		<td class="adminbox"></td>
+			<td class="icon" width="50" style="padding:0;">&nbsp;</td>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+			<td class="icon" width="40" style="padding:0;">&nbsp;</td>
 <!--
 EOT;
 }print <<<EOT
 -->
-		<td class="icon">&nbsp;</td>
 		<td class="subject">文章</td>
 <!--
 EOT;
@@ -37,6 +41,7 @@ $thread['lstptime'] = get_date($thread['lastpost']);
 print <<<EOT
 -->
 	<tr class="tr3">
+		<td class="icon tac" width="40">
 <!--
 EOT;
 if($managecheck){
@@ -47,13 +52,25 @@ if ($thread['fid'] == $fid) {
 }
 print <<<EOT
 -->
-	<td class="adminbox">$thread[adminbox]</td>
+$thread[adminbox]
+<!--
+EOT;
+}if($thread[topped]){print <<<EOT
+-->
+	<a href="read.php?tid={$thread[tid]}" target="_blank">
+		<img src="$imgpath/$stylepath/file/headtopic_$thread[topped].gif" align="absmiddle" alt="置顶帖标志" title="置顶帖标志"/>
+	</a>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+	<a title="$tooltip" href="$thread[tpcurl]" target="_blank">$thread[status]</a>	
 <!--
 EOT;
 }print <<<EOT
 -->
-    <td class="icon"><a title="打开新窗口" href="$thread[tpcurl]" target="_blank">$thread[status]</a></td>
-	<td class="subject" id="td_$thread[tid]" width="400">
+	</td>
+	<td class="subject f14" id="td_$thread[tid]">
 <!--
 EOT;
 if($thread[digest]){print <<<EOT
@@ -64,11 +81,6 @@ EOT;
 }if($thread[toolinfo]){print <<<EOT
 -->
     		<span class="f14 s3">[$thread[toolinfo]]</span>
-<!--
-EOT;
-}if($thread[topped]){print <<<EOT
--->
-			<img src="$imgpath/$stylepath/file/headtopic_$thread[topped].gif" style="margin-right:5px;" align="absmiddle" title="置顶帖标志"/>
 <!--
 EOT;
 }print <<<EOT

@@ -3,8 +3,10 @@ define('SCR','show');
 require_once('global.php');
 require_once(R_P.'require/header.php');
 require_once(R_P.'require/forum.php');
-include_once pwCache::getPath(D_P.'data/bbscache/forumcache.php');
-include_once pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
+//* include_once pwCache::getPath(D_P.'data/bbscache/forumcache.php');
+//* include_once pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
+pwCache::getData(D_P.'data/bbscache/forumcache.php');
+pwCache::getData(D_P.'data/bbscache/forum_cache.php');
 
 !$_G['show'] && Showmsg('groupright_show');
 $db_showperpage = 16;
