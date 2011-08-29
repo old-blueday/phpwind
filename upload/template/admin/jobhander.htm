@@ -53,12 +53,12 @@ var checkForm = function(form){
         <td colspan="3">基本设置</td>
       </tr>
       <tr class="tr1 vt">
-        <td class="td1">任务名称</td>
+        <td class="td1">任务名称 <span class="s1">*</span></td>
         <td class="td2"><input name="title" value="$title" type="text" class="input input_wb " /></td>
         <td class="td2"><div class="help_a"></div></td>
       </tr>
       <tr class="tr1 vt">
-        <td class="td1">任务描述</td>
+        <td class="td1">任务描述 <span class="s1">*</span></td>
         <td class="td2"><textarea name="description" class="textarea">$description</textarea></td>
         <td class="td2"><div class="help_a">支持html代码</div></td>
       </tr>
@@ -95,7 +95,7 @@ EOT;
       <tr class="tr1 vt">
         <td class="td1">任务周期[小时]</td>
         <td class="td2"><input name="period" type="text" value="$period" class="input input_wa" /></td>
-        <td class="td2"><div class="help_a">如设置为24，则表示该任务结束24小时以后可以再次被申请。留空表示任务不可再申请</div></td>
+        <td class="td2"><div class="help_a">如设置为24，则表示该任务结束24小时以后可以再次被申请，留空表示任务不可再申请。此设置对每日打卡类任务无效。</div></td>
       </tr>
       <tr class="tr1 vt">
         <td class="td1">任务奖励</td>
@@ -111,6 +111,7 @@ EOT;
            </td>
           <td class="td2"><div class="help_a">其中，道具、勋章和邀请码需要开启相应功能</div></td>
       </tr>
+
     </table>
 <script type="text/javascript">
 	window.onload = function(){
@@ -218,7 +219,7 @@ EOT;
       </tr>
       <tr class="tr1 vt">
         <td class="td1">申请人数限制</td>
-        <td class="td2"><input name="number" value="$number" type="text" class="input input_wa mr20" />
+        <td class="td2"><input name="number" value="$number" type="text" class="input input_wa mr20"/>
            </td>
 		  <td class="td2"><div class="help_a">当申请的人数达到设置值后，任务将不可再申请。0或留空表示不限制</div></td>
       </tr>
@@ -240,8 +241,10 @@ EOT;
            </ul>
          </td><td  class="td2"><div class="help_a"></div></td>
       </tr>
+
    </table>
 </div>
+
 <div class="admin_table">
     <table cellpadding="0" cellspacing="0" width="100%">
       <tr class="tr2 td_bgB b">
@@ -273,6 +276,7 @@ EOT;
       </tr>
     </table>
  </div>
+
 <div id="jobTables">
   <!-- 任务具体内容开始 -->
   <!-- 完善资料 -->
@@ -327,12 +331,12 @@ EOT;
       <td class="td1">完成成果</td>
       <td class="td2">
 	  
-       <input name="factor[doAddFriend][type]" type="radio"  value="1" $doAddFriend[type1] /> 指定会员 
-	   <input name="factor[doAddFriend][user]" type="text" class="input input_wa mr20" value="$doAddFriend[user]" /><br />
-       <input name="factor[doAddFriend][type]" type="radio"  value="2" $doAddFriend[type2] /> 好友个数 
-	   <input name="factor[doAddFriend][num]" type="text" class="input input_wa mr20" value="$doAddFriend[num]" />
+       <input name="factor[doAddFriend][type]" type="radio"  value="1" $doAddFriend[type1] Onclick="getObj('friendnum').disabled='disabled';getObj('frienduser').disabled='';getObj('friendnum').value='';" /> 指定会员 
+	   <input name="factor[doAddFriend][user]" type="text" id="frienduser" class="input input_wa mr20" value="$doAddFriend[user]" /><br />
+       <input name="factor[doAddFriend][type]" type="radio"  value="2" $doAddFriend[type2] Onclick="getObj('frienduser').disabled='disabled';getObj('friendnum').disabled='';getObj('frienduser').value='';"/> 好友个数 
+	   <input name="factor[doAddFriend][num]" type="text" id="friendnum" class="input input_wa mr20" value="$doAddFriend[num]" />
 	      </td>
-      <td class="td2"><div class="help_a">将输入框中指定会员加为好友即可完成任务<br />至少加多少个好友才能完成任务</div></td>
+      <td class="td2"><div class="help_a">将输入框中指定的某个会员加为好友即可完成任务<br />至少加多少个好友才能完成任务</div></td>
     </tr>
    
     <tr class="tr1 vt">

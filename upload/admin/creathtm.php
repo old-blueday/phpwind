@@ -5,7 +5,7 @@ $basename = "$admin_file?adminjob=creathtm&type=$type";
 $sqladd = "WHERE type<>'category' AND allowvisit='' AND f_type!='hidden' AND cms='0'";
 if (!$action) {
 
-	@include_once(D_P.'data/bbscache/forumcache.php');
+	@include_once pwCache::getPath(D_P.'data/bbscache/forumcache.php');
 	$num = 0;
 	$forumcheck = "<ul class=\"list_A list_120\">";
 
@@ -23,7 +23,7 @@ if (!$action) {
 
 } elseif ($_POST['action'] == 'submit') {
 
-	InitGP(array('selid'),'P');
+	S::gp(array('selid'),'P');
 	$selid = checkselid($selid);
 	if ($selid === false) {
 		$basename = "javascript:history.go(-1);";
@@ -41,7 +41,7 @@ if (!$action) {
 
 	@set_time_limit(0);
 	$pwServer['REQUEST_METHOD'] != 'POST' && PostCheck($verify);
-	InitGP(array('creatfid','percount','step','tfid','forumnum'));
+	S::gp(array('creatfid','percount','step','tfid','forumnum'));
 
 	$fids = $tid = $fieldadd = $tableadd = $tids = '';
 	!is_array($creatfid) && $creatfid = explode(',',$creatfid);
@@ -75,7 +75,7 @@ if (!$action) {
 	$j_url = "$basename&action=$action&percount=$percount&creatfid=$fids&forumnum=$forumnum";
 	$goon  = 0;
 
-	$query = $db->query("SELECT tid FROM pw_threads WHERE fid='$thisfid' AND ifcheck=1 AND special='0' ORDER BY topped DESC,lastpost DESC" . pwLimit($start, $percount));
+	$query = $db->query("SELECT tid FROM pw_threads WHERE fid='$thisfid' AND ifcheck=1 AND special='0' ORDER BY topped DESC,lastpost DESC" . S::sqlLimit($start, $percount));
 	while ($topic = $db->fetch_array($query)) {
 		$goon = 1;
 		$staticPage->update($topic['tid']);
@@ -96,8 +96,8 @@ if (!$action) {
 	}
 } elseif ($_POST['action'] == 'delete') {
 
-	@include_once(D_P.'data/bbscache/forum_cache.php');
-	InitGP(array('creatfid'),'P');
+	@include_once pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
+	S::gp(array('creatfid'),'P');
 	if (in_array('all',$creatfid)) {
 		$handle = opendir(R_P.$db_readdir.'/');
 		while ($file = readdir($handle)) {

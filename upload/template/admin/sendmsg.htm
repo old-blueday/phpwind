@@ -2,21 +2,22 @@
 include_once PrintEot('left');
 if(empty($action)){print <<<EOT
 -->
-<form name='FORM' action="$basename" method="post" onreset="mreset()">
+<form name='FORM' action="$basename" method="post" onreset="mreset()" onsubmit="return checkpost(document.FORM);">
 <h2 class="h1">消息群发</h2>
 <div class="admin_table mb10">
 <table width="100%" cellspacing="0" cellpadding="0">
 	<tr class="tr1 vt">
 		<td class="td1">&nbsp;</td>
 		<td class="td2">
-			<ul class="list_A list_80 cc">
+			<ul class="list_A">
 				<li><input type="radio" name="by" value="1" onclick="sendtype(0)" checked="checked" />用户组</li>
-				<li><input type="radio" name="by" value="2" onclick="sendtype(1)" />在线用户</li>
+				<li><input type="radio" name="by" id="online" value="2" onclick="sendtype(1)" />在线用户</li>
+                <li><input type="radio" name="by" value="3" onclick="sendtype(2)" />按用户名</li>
 			</ul>
 		</td>
 	</tr>
 	<tr class="tr1 vt" id="group">
-		<td class="td1">接收用户</td>
+		<td class="td1">接收用户 <span class="s1">*</span></td>
 		<td class="td2">
 			<ul class="list_A list_120 cc mb10" style="width:480px;">
 <!--
@@ -27,7 +28,7 @@ if($key=='1' || $key=='2' || isset($lneed[$key]))continue;
 $num++;
 print <<<EOT
 -->
-				<li><input type='checkbox' name='sendto[]' value='$key'>$value</li>
+				<li><input type='checkbox'  name='sendto[]' value='$key'>$value</li>
 <!--
 EOT;
 }print <<<EOT
@@ -37,11 +38,15 @@ EOT;
 			<span class="bt2"><span><button onclick="CheckAll(this.form)" value="全 选" name="chkall" onfocus="blur();" type="button">全 选</button></span></span>
 		</td>
 	</tr>
+    <tr class="tr1 vt" id="users" style="display:none" >
+				<td class="td1">用户名 <span class="s1">*</span></td>
+				<td class="td2"><input type="text" name="touser" class="input input_wb fl mr10" /><span class="help_a">多个用户名用，分开</span></td>
+	</tr>
 	<tr class="tr1 vt">
-		<td class="td1">主题</td>
+		<td class="td1">主题 <span class="s1">*</span></td>
 		<td class="td2"><input type="text" class="input input_wb" name="subject" /></td></tr>
 	<tr class="tr1 vt">
-		<td class="td1">内容</td>
+		<td class="td1">内容 <span class="s1">*</span></td>
 		<td class="td2">
 <!--
 EOT;
@@ -66,18 +71,52 @@ print <<<EOT
 
 <input type="hidden" name="action" value="send" />
 <div class="tac mb10">
-	<span class="btn"><span><button type="submit">提 交</button></span></span>
+	<span class="btn"><span><button type="submit" >提 交</button></span></span>
 	<span class="bt"><span><button type="reset">重 置</button></span></span>
 </div>
 </form>
 <SCRIPT LANGUAGE="JavaScript">
 function sendtype(ID){
 	var group = document.getElementById("group");
+	var users = document.getElementById("users");
 	if (ID==0){
 		group.style.display = "";
+		users.style.display = "none";
 	}else if (ID==1){
+		users.style.display = "none";
 		group.style.display = "none";
+	}else if (ID==2){
+		group.style.display = "none";
+		users.style.display = "";
 	}
+}
+function checkpost(obj) {
+	var online = document.getElementById("online"); 
+	var userobj = document.getElementsByName("sendto[]"); 
+	var check=0; 
+	for(var i=0;i <userobj.length;i++){ 
+		  if(userobj[i].checked){ 
+			  check=1; 
+		  } 
+	} 
+	if (check == 0 && obj.touser.value == "" && online.checked == false) {
+			obj.touser.setAttribute("hasError", 1);
+			showDialog("error","接受用户不能为空",2);
+			obj.subject.focus();
+			return false;
+	} 
+	if (obj.subject.value == "") {
+			obj.subject.setAttribute("hasError", 1);
+			showDialog("error","主题不能为空",2);
+			obj.subject.focus();
+			return false;
+	} 
+	if (obj.atc_content.value == "") {
+			obj.atc_content.setAttribute("hasError", 1);
+			showDialog("error","内容不能为空",2);
+			obj.subject.focus();
+			return false;
+	} 
 }
 function mreset(){
 	editor._textArea.value='';

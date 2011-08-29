@@ -1,10 +1,10 @@
 <?php
 !defined('R_P') && exit('Forbidden');
 $USCR = 'space_board';
-$isGM = CkInArray($windid,$manager);
+$isGM = S::inArray($windid,$manager);
 !$isGM && $groupid==3 && $isGM=1;
 
-InitGP(array('uid', 'page'),'',2);
+S::gp(array('uid', 'page'),'',2);
 
 require_once(R_P . 'u/lib/space.class.php');
 $newSpace = new PwSpace($uid ? $uid : $winduid);
@@ -34,13 +34,13 @@ if ($uid != $winduid) {
 }
 
 $db_perpage = 10;
-$count	= $db->get_value("SELECT COUNT(*) AS count FROM pw_oboard WHERE touid=".pwEscape($uid));
+$count	= $db->get_value("SELECT COUNT(*) AS count FROM pw_oboard WHERE touid=".S::sqlEscape($uid));
 list($pages,$limit) = pwLimitPages($count,$page,$basename);
 
 $boards = array();
 require_once(R_P.'require/bbscode.php');
 $wordsfb = L::loadClass('FilterUtil', 'filter');
-$query = $db->query("SELECT o.*,m.icon as face FROM pw_oboard o LEFT JOIN pw_members m ON o.uid=m.uid WHERE o.touid=".pwEscape($uid)." ORDER BY o.id DESC $limit");
+$query = $db->query("SELECT o.*,m.icon as face FROM pw_oboard o LEFT JOIN pw_members m ON o.uid=m.uid WHERE o.touid=".S::sqlEscape($uid)." ORDER BY o.id DESC $limit");
 while ($rt = $db->fetch_array($query)) {
 	$rt['postdate']	= get_date($rt['postdate']);
 	list($rt['face'])	=  showfacedesign($rt['face'],1,'m');

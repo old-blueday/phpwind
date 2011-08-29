@@ -1,10 +1,7 @@
 <?php
 !function_exists('readover') && exit('Forbidden');
 !defined('USED_HEAD') && define('USED_HEAD', 1);
-/*performance*/
-//extract(L::style('',$skinco));
-require_once(L::style('',$skinco,true));
-
+require (L::style('', $skinco, true));
 /*app list*/
 if ($db_siteappkey) {
 	$app_array = array();
@@ -14,7 +11,13 @@ if ($db_siteappkey) {
 /*app list*/
 
 list($_Navbar,$_LoginInfo) = pwNavBar();
-list(, , , ,$showq) = explode("\t", $db_qcheck);
+foreach($_Navbar['main'] as $key => $value) {
+	if($value['subs']){
+		$ifHaveSubs=true;
+		break;
+	}
+}
+list(,$showq) = explode("\t", $db_qcheck);
 if ($winduid) $db_menuinit .= ",'td_u' : 'menu_u'";
 if ($db_menu) $db_menuinit .= ",'td_sort' : 'menu_sort'";
 if (!is_array($db_union)) {
@@ -37,43 +40,37 @@ if (!in_array(SCR,array('register','login'))) {
 $msgsound = $head_pop = '';
 if ($groupid == 'guest' && $db_regpopup == '1') {
 	$head_pop = 'head_pop';
-} elseif ($winddb['newpm']>0 && $db_msgsound && $secondurl!='message.php' && $_G['maxmsg']>0) {
+} elseif ($winddb['newpm']>0 && $db_msgsound && $secondurl!='message.php' && $_G['maxmsg']>=0 && getstatus($winddb['userstatus'], PW_USERSTATUS_NOTICEVPICE)) {
 	$msgsound = "<div style='overflow:hidden;width:0;float:left'><embed src='$imgpath/msg/msg.wav' width='0' height='0' AutoStart='true' type='application/x-mplayer2'></embed></div>";
 }
 
 $db_skindb = array();
-empty($db_styledb) && $db_styledb['wind'] = array('0' => 'wind','1' => '1');
+$db_skinimagedb=array();
+empty($db_styledb) && $db_styledb['wind'] = array('0' => 'wind','1' => '1','2' =>'wind');
 if(is_array($db_styledb)){
 	foreach ($db_styledb as $key => $value) {
 		$cname = $value[0] ? $value[0] : $key;
-		$value[1] === '1' && $db_skindb[$key] = $cname;
+		$tname = $value[2] ? $value[2] : $key;
+		$value[1] === '1' && $db_skindb[$key] = array($cname,$tname);
 	}
 }
 $skincount = count($db_skindb);
-if ($skincount > 1){
+if ($skincount > 1) {
 	$db_menuinit .= ",'td_skin' : 'menu_skin'";
 }
 
 $s_url = $pwServer['PHP_SELF'].'?';
 foreach ($_GET as $key => $value) {
-	$key!='skinco' && $value && $s_url .= "$key=".rawurlencode($value).'&';
+	$key != 'skinco' && $value && $s_url .= "$key=".rawurlencode($value).'&';
 }
-/*performance*/
-//$s_url = Char_cv($s_url);
-($_GET) && $s_url =  Char_cv($s_url);
+($_GET) && $s_url =  S::escapeChar($s_url);
 
-/*performance*/
-//if (file_exists(D_P."data/style/{$tplpath}_css.htm")) {
-//	$css_path = D_P."data/style/{$tplpath}_css.htm";
-//} else {
-//	$css_path = D_P.'data/style/wind_css.htm';
-//}
-if( "wind" != $tplpath  && file_exists(D_P.'data/style/'.$tplpath.'_css.htm')){
+if ("wind" != $tplpath && file_exists(D_P.'data/style/'.$tplpath.'_css.htm')) {
 	$css_path = D_P.'data/style/'.$tplpath.'_css.htm';
-}else{
+} else{
 	$css_path = D_P.'data/style/wind_css.htm';
 }
-/*新任务数*/
+
 $jobnum = ($db_job_isopen && $winddb['jobnum']>0) ? "(".$winddb['jobnum'].")" : "";
 
 require PrintEot('header');

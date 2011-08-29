@@ -5,7 +5,7 @@
 .tr3:hover{background:#e6f2fc url(tr3_bg.gif) left bottom repeat-x;color:#49779e;}
 .tr3 .input:hover{border:1px solid #2897c7;}
 .tr3 td table tr td,.tr3 th table tr td{padding:.4em;padding-left:0;}
-.tr3 th{text-align:left;font-weight:normal; color:#008800;}
+.tr3 th{text-align:left;font-weight:normal;}
 
 .tgtable{border:none!important;}
 .tgtable td{padding:15px 5px; line-height:24px;}

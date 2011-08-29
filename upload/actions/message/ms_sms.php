@@ -6,26 +6,31 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == 1) {
 empty($subtype) && $subtype = 'sms';
 $normalUrl = $baseUrl . "?type=$subtype";
 !empty($winduid) && $userId = $winduid;
-InitGP(array(
+S::gp(array(
 	'smstype', 
 	'page', 
-	'redirect'), 'GP');
+	'redirect',
+	'itype'), 'GP');
 $smsCount = $smsAllCount = (int) $messageServer->countAllMessage($userId);
 $notReadCount = (int) $messageServer->countMessagesNotRead($userId);
 $emptyListTip = "";
 $action = ($redirect && !in_array($action, array(
 	'previous', 
 	'info', 
-	'next'))) ? '' : $action;
+	'next', 'checkover' ))) ? '' : $action;
 $nav = $action && $action != 'unread' ? array(
 	$action => 'class = current') : ' class = current';
+//收件箱和发件箱tab框样式
+!$itype && $itype = 'all';
+$itypes = array('all'=>3,'other'=>2,'self'=>1);
+$isown = $itypes[$itype];
 if (empty($action) || $action == 'all') {
 	$redirect = 1;
 	$pageCount = ceil($smsCount / $perpage);
 	$page = validatePage($page, $pageCount);
 	$smsList = $messageServer->getAllMessages($userId, $page, $perpage);
 	$pages = numofpage($smsCount, $page, $pageCount, "$normalUrl&");
-	list($today, $yesterday, $week, $tTimes, $yTimes, $wTimes, $mTimes) = getSubListInfo($smsList);
+	list($today, $yesterday, $tTimes, $yTimes, $mTimes) = getSubListInfo($smsList);
 	!$smsCount && $emptyListTip = "暂无任何站内信，赶快去<a href=\"u.php?a=friend&type=find\">找好友</a>吧";
 } elseif ($action == 'message') {
 	$smstype = $messageServer->getConst('sms_message');
@@ -34,7 +39,7 @@ if (empty($action) || $action == 'all') {
 	$page = validatePage($page, $pageCount);
 	$smsList = $messageServer->getMessages($userId, $smstype, $page, $perpage);
 	$pages = numofpage($smsCount, $page, $pageCount, "$normalUrl&action=message&");
-	list($today, $yesterday, $week, $tTimes, $yTimes, $wTimes, $mTimes) = getSubListInfo($smsList);
+	list($today, $yesterday, $tTimes, $yTimes, $mTimes) = getSubListInfo($smsList);
 	!$smsCount && $emptyListTip = "暂无任何短消息，赶快去<a href=\"u.php?a=friend&type=find\">找好友</a>吧";
 } elseif ($action == 'rate') {
 	$smstype = $messageServer->getConst('sms_rate');
@@ -43,7 +48,7 @@ if (empty($action) || $action == 'all') {
 	$page = validatePage($page, $pageCount);
 	$smsList = $messageServer->getMessages($userId, $smstype, $page, $perpage);
 	$pages = numofpage($smsCount, $page, $pageCount, "$normalUrl&action=rate&");
-	list($today, $yesterday, $week, $tTimes, $yTimes, $wTimes, $mTimes) = getSubListInfo($smsList);
+	list($today, $yesterday, $tTimes, $yTimes, $mTimes) = getSubListInfo($smsList);
 	!$smsCount && $emptyListTip = "暂无任何评分，赶快去<a href=\"u.php?a=friend&type=find\">找好友</a>吧";
 } elseif ($action == 'comment') {
 	$smstype = $messageServer->getConst('sms_comment');
@@ -52,7 +57,7 @@ if (empty($action) || $action == 'all') {
 	$page = validatePage($page, $pageCount);
 	$smsList = $messageServer->getMessages($userId, $smstype, $page, $perpage);
 	$pages = numofpage($smsCount, $page, $pageCount, "$normalUrl&action=comment&");
-	list($today, $yesterday, $week, $tTimes, $yTimes, $wTimes, $mTimes) = getSubListInfo($smsList);
+	list($today, $yesterday, $tTimes, $yTimes, $mTimes) = getSubListInfo($smsList);
 	!$smsCount && $emptyListTip = "暂无任何评论，赶快去<a href=\"u.php?a=friend&type=find\">找好友</a>吧";
 } elseif ($action == 'guestbook') {
 	$smstype = $messageServer->getConst('sms_guestbook');
@@ -61,7 +66,7 @@ if (empty($action) || $action == 'all') {
 	$page = validatePage($page, $pageCount);
 	$smsList = $messageServer->getMessages($userId, $smstype, $page, $perpage);
 	$pages = numofpage($smsCount, $page, $pageCount, "$normalUrl&action=guestbook&");
-	list($today, $yesterday, $week, $tTimes, $yTimes, $wTimes, $mTimes) = getSubListInfo($smsList);
+	list($today, $yesterday, $tTimes, $yTimes, $mTimes) = getSubListInfo($smsList);
 	!$smsCount && $emptyListTip = "暂无任何留言，赶快去<a href=\"u.php?a=friend&type=find\">找好友</a>吧";
 } elseif ($action == 'reply') {
 	$smstype = $messageServer->getConst('sms_reply');
@@ -70,22 +75,22 @@ if (empty($action) || $action == 'all') {
 	$page = validatePage($page, $pageCount);
 	$smsList = $messageServer->getMessages($userId, $smstype, $page, $perpage);
 	$pages = numofpage($smsCount, $page, $pageCount, "$normalUrl&action=reply&");
-	list($today, $yesterday, $week, $tTimes, $yTimes, $wTimes, $mTimes) = getSubListInfo($smsList);
+	list($today, $yesterday, $tTimes, $yTimes, $mTimes) = getSubListInfo($smsList);
 	!$smsCount && $emptyListTip = "暂无任何帖子回复，赶快去<a href=\"u.php?a=friend&type=find\">找好友</a>吧";	
 } elseif ($action == 'self') {
 	$smsCount = $messageServer->countMessagesBySelf($userId, $smstype);
 	$pageCount = ceil($smsCount / $perpage);
 	$page = validatePage($page, $pageCount);
 	$smsList = $messageServer->getMessagesBySelf($userId, $smstype, $page, $perpage);
-	$pages = numofpage($smsCount, $page, $pageCount, "$normalUrl&action=self&smsType=$smstype&");
-	list($today, $yesterday, $week, $tTimes, $yTimes, $wTimes, $mTimes) = getSubListInfo($smsList);
+	$pages = numofpage($smsCount, $page, $pageCount, "$normalUrl&action=self&smstype=$smstype&");
+	list($today, $yesterday, $tTimes, $yTimes, $mTimes) = getSubListInfo($smsList);
 } elseif ($action == 'other') {
 	$smsCount = $messageServer->countMessagesByOther($userId, $smstype);
 	$pageCount = ceil($smsCount / $perpage);
 	$page = validatePage($page, $pageCount);
 	$smsList = $messageServer->getMessagesByOther($userId, $smstype, $page, $perpage);
-	$pages = numofpage($smsCount, $page, $pageCount, "$normalUrl&action=other&smsType=$smstype&");
-	list($today, $yesterday, $week, $tTimes, $yTimes, $wTimes, $mTimes) = getSubListInfo($smsList);
+	$pages = numofpage($smsCount, $page, $pageCount, "$normalUrl&action=other&smstype=$smstype&");
+	list($today, $yesterday, $tTimes, $yTimes, $mTimes) = getSubListInfo($smsList);
 } elseif ($action == 'unread') {
 	$pageCount = ceil($notReadCount / $perpage);
 	$page = validatePage($page, $pageCount);
@@ -93,9 +98,9 @@ if (empty($action) || $action == 'all') {
 	$pages = numofpage($notReadCount, $page, $pageCount, "$normalUrl&action=unread&");
 	!$notReadCount && $emptyListTip = "暂无任何未读消息";
 } elseif ($action == 'info') {
-	InitGP(array(
+	S::gp(array(
 		'mid', 
-		'rid', 
+		'rid',
 		'page'), 'GP');
 	empty($mid) && Showmsg("undefined_action");
 	if (!$relation = $messageServer->getRelation($userId, $rid)) {
@@ -109,27 +114,43 @@ if (empty($action) || $action == 'all') {
 	$smsList = $messageServer->getReplies($userId, $mid, $rid);
 	$attachs = $messageServer->showAttachs($userId, $mid);
 } elseif ($action == 'previous') {
-	InitGP(array(
-		'rid'), 'GP');
-	empty($rid) && Showmsg("undefined_action");
-	if (!($message = $messageServer->getUpMessage($userId, $rid, $smstype))) {
-		Showmsg("已经是第一条");
+	S::gp ( array ('rid' ), 'GP' );
+	empty ( $rid ) && Showmsg ( "undefined_action" );
+	!$smstype && $smstype = null;
+	$message = $messageServer->getUpInfoByType ( $userId, $rid, $isown, $smstype );
+	if (! ($message)) {
+		Showmsg ( "已经是第一条" );
 	} else {
-		$userListHtml = getAllUsersHtml($message);
-		$smsList = $messageServer->getReplies($userId, $message['mid'], $message['rid']);
-		$attachs = $messageServer->showAttachs($userId, $message['mid']);
+		$userListHtml = getAllUsersHtml ( $message );
+		$smsList = $messageServer->getReplies ( $userId, $message ['mid'], $message ['rid'] );
+		$attachs = $messageServer->showAttachs ( $userId, $message ['mid'] );
 	}
 } elseif ($action == 'next') {
-	InitGP(array(
-		'rid'), 'GP');
-	empty($rid) && Showmsg("undefined_action");
-	if (!($message = $messageServer->getDownMessage($userId, $rid, $smstype))) {
-		Showmsg("已经是最后一条");
-	} else {
-		$userListHtml = getAllUsersHtml($message);
-		$smsList = $messageServer->getReplies($userId, $message['mid'], $message['rid']);
-		$attachs = $messageServer->showAttachs($userId, $message['mid']);
+	S::gp ( array ('rid' ), 'GP' );
+	!$smstype && $smstype = null;
+	empty ( $rid ) && Showmsg ( "undefined_action" );
+	$message = $messageServer->getDownInfoByType ( $userId, $rid, $isown, $smstype );
+	if (! ($message)) {
+		Showmsg ( "已经是最后一条" );
+	}else{
+		$userListHtml = getAllUsersHtml ( $message );
+		$smsList = $messageServer->getReplies ( $userId, $message ['mid'], $message ['rid'] );
+		$attachs = $messageServer->showAttachs ( $userId, $message ['mid'] );
+	}	
+}elseif($action == 'checkover'){
+	S::gp ( array ('rid', 'dir' ), 'GP' );
+	!$smstype && $smstype = null;
+	if($dir == 'previous'){
+		$message = $messageServer->getUpInfoByType ( $userId, $rid , $isown, $smstype);
+	}else{
+		$message = $messageServer->getDownInfoByType ( $userId, $rid , $isown, $smstype);
 	}
+	if (($message)) {
+		echo( "success\t" );
+	}else{
+		echo("over\t");
+	}
+	ajax_footer();
 }
 
 if ($subtype == 'sms') {
@@ -148,7 +169,6 @@ if ($smstype && in_array($action, array(
 
 }
 $smsList = ($smsList) ? $smsList : array();
-
 !defined('AJAX') && include_once R_P.'actions/message/ms_header.php';
 require messageEot($subtype);
 if (defined('AJAX')) {

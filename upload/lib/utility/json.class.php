@@ -55,7 +55,7 @@
  * @license     http://www.opensource.org/licenses/bsd-license.php
  * @link        http://pear.php.net/pepr/pepr-proposal-show.php?id=198
  */
-
+!function_exists('readover') && exit('Forbidden');
 /**
  * Marker constant for Services_JSON::decode(), used to flag stack state
  */

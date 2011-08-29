@@ -3,7 +3,10 @@ function AjaxObj() {
 	this.responseText = null;
 	var s = document.createElement('div');
 	s.style.display = 'none';
-	s.innerHTML = '<iframe id="ajaxiframe" name="ajaxiframe" width="0" height="0" src=""></iframe>';
+	var n = 'iframe' + new Date().getTime();
+	//页面中有iframe的时候,会造成多个相同name的iframe,这时候提交时target有冲突,造成错误 @by chenchaoqun
+	//s.innerHTML = '<iframe id="ajaxiframe" name="ajaxiframe" width="0" height="0" src=""></iframe>';
+	s.innerHTML = '<iframe src="about:blank" id="' + n + '" name="' + n + '"></iframe>';
 	document.body.appendChild(s);
 	//document.body.insertBefore(s,document.body.childNodes[0]);
 	this.iframe = s.firstChild;
@@ -12,7 +15,8 @@ function AjaxObj() {
 		if (typeof data == 'string' && data != '') {
 			var f = document.createElement('form');
 			f.name	 = 'ajaxform';
-			f.target = 'ajaxiframe';
+			//f.target = 'ajaxiframe';
+			f.target = n;
 			f.method = 'post';
 			f.action = url;
 			var ds = data.split("&");
@@ -26,8 +30,8 @@ function AjaxObj() {
 					f.appendChild(el);
 				}
 			}
-			document.body.appendChild(f);
-			//document.body.insertBefore(f,document.body.childNodes[0]);
+			//document.body.appendChild(f);//ie6要用insertBefore
+			document.body.insertBefore(f,document.body.childNodes[0]);
 			f.submit();
 			document.body.removeChild(f);
 		} else if (typeof data == 'object') {
@@ -40,10 +44,11 @@ function AjaxObj() {
 			} else {
 				data.setAttribute('action', url);
 			}
-			data.target = 'ajaxiframe';
+			data.target = n;
 			data.submit();
 		} else {
-			self.ajaxiframe.location.href=url;
+			self.frames[n].location.replace(url);//让iframe没有浏览历史
+			//this.iframe.src=url;
 		}
 	}
 }
@@ -90,12 +95,15 @@ XMLhttp.prototype = {
 	load : function() {
 		if (is_ie) {
 			ajax.request.responseText = (typeof ajax.request.iframe.contentWindow.document.XMLDocument != 'undefined') ? ajax.request.iframe.contentWindow.document.XMLDocument.text : null;
-			ajax.request.iframe.detachEvent('onload',ajax.load);
 		} else {
 			ajax.request.responseText = ajax.request.iframe.contentWindow.document.documentElement.textContent;
+		}
+		if (ajax.request.iframe.detachEvent) {
+			ajax.request.iframe.detachEvent('onload',ajax.load);
+		} else {
 			ajax.request.iframe.removeEventListener('load',ajax.load,true);
 		}
-		try{if (self.ajaxiframe.location.href == 'about:blank'){return '';}}catch(e){}
+		//try{if (ajax.request.iframe.location.href == 'about:blank'){return '';}}catch(e){}
 		if (typeof(ajax.recall) == 'function') {
 			ajax.recall();
 			ajax.doscript();
@@ -139,10 +147,10 @@ XMLhttp.prototype = {
 	doscript : function() {
 		for (var i = 0; i < this.sArray.length; i++) {
 			var id = path = code = '';
-			if (this.sArray[i]['attribute'].match(/\s*id\="([\w\_]+?)"/ig)) {
+			if (this.sArray[i]['attribute'].match(/\s*id\="([\w\_]+?)"/i)) {
 				id = RegExp.$1;
 			}
-			if (this.sArray[i]['attribute'].match(/\s*src\="(.+?)"/ig)) {
+			if (this.sArray[i]['attribute'].match(/\s*src\="(.+?)"/i)) {
 				path = RegExp.$1;
 			} else {
 				code = this.sArray[i]['code'];
@@ -150,6 +158,27 @@ XMLhttp.prototype = {
 			loadjs(path, code, id);
 		}
 		this.sArray = new Array();
+	},
+	
+	showError : function(message,time){
+		var control = document.getElementById('pw_box'),
+			popout = getElementsByClassName('popout',control)[0],
+			msgBoxs = getElementsByClassName('wrongTip',popout),
+			box = msgBoxs.length ? msgBoxs[0] : null;
+			popBottom = getElementsByClassName('popBottom',control);
+			if(!box) {	
+				
+				box = document.createElement('div');
+				box.className = 'wrongTip';
+				box.innerHTML = message;
+				popBottom[0].parentNode.insertBefore(box,popBottom[0]);
+			}
+			box.style.display = '';
+			box.innerHTML = message;
+			if(time == undefined) time = 3;	
+			clearTimeout(this.showTime);
+			this.showTime = setTimeout(function(){box.style.display = 'none';},time * 1000);
+			return false;
 	},
 
 	guide : function() {
@@ -162,7 +191,6 @@ XMLhttp.prototype = {
 		if(operateOverPrint(rText)){
 			return false;
 		}
-
 		if (rText[1] != 'nextto') {
 			showDialog('',rText[0],2);
 		}
@@ -372,7 +400,7 @@ function showViewLog(url,data,id){
 				if(evt){
 		    		evt.stopPropagation();
 		    	}else{
-		    		event.cancelBubble = true;cloneNode
+		    		event.cancelBubble = true;
 		    	}
 			}
 		}

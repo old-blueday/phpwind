@@ -19,31 +19,31 @@ class PW_Ms_ConfigsDB extends BaseDB {
 		return $this->_count();
 	}
 	function gets($userIds){
-		$query = $this->_db->query ( "SELECT * FROM " . $this->_tableName. " WHERE uid in( ".pwImplode($userIds).")"  );
+		$query = $this->_db->query ( "SELECT * FROM " . $this->_tableName. " WHERE uid in( ".S::sqlImplode($userIds).")"  );
 		return $this->_getAllResultFromQuery ( $query );
 	}
 	function inserts($fieldDatas){
-		$this->_db->update("INSERT INTO ".$this->_tableName." (uid,blacklist,blackcolony,categories,statistics,shieldinfo,sms_num,notice_num,request_num,groupsms_num) VALUES  ".pwSqlMulti($fieldDatas,FALSE));
+		$this->_db->update("INSERT INTO ".$this->_tableName." (uid,blacklist,blackcolony,categories,statistics,shieldinfo,sms_num,notice_num,request_num,groupsms_num) VALUES  ".S::sqlMulti($fieldDatas,FALSE));
 		return $this->_db->insert_id ();
 	}
 	function updateByUserIds($fieldData,$userIds){
-		$this->_db->update ( "UPDATE " . $this->_tableName . " SET " . $this->_getUpdateSqlString ( $fieldData ) . " WHERE uid in(  " . pwImplode($userIds).")" );
+		$this->_db->update ( "UPDATE " . $this->_tableName . " SET " . $this->_getUpdateSqlString ( $fieldData ) . " WHERE uid in(  " . S::sqlImplode($userIds).")" );
 		return $this->_db->affected_rows ();
 	}
 	function updateSmsNumberByUserIds($userIds,$number){
-		$this->_db->update ( "UPDATE " . $this->_tableName . " SET sms_num = sms_num+" . $this->_addSlashes( $number ) . " WHERE uid in(  " . pwImplode($userIds) .")" );
+		$this->_db->update ( "UPDATE " . $this->_tableName . " SET sms_num = sms_num+" . $this->_addSlashes( $number ) . " WHERE uid in(  " . S::sqlImplode($userIds) .")" );
 		return $this->_db->affected_rows ();
 	}
 	function updateRequestNumberByUserIds($userIds,$number){
-		$this->_db->update ( "UPDATE " . $this->_tableName . " SET request_num = request_num+" . $this->_addSlashes( $number ) . " WHERE uid in(  " .  pwImplode($userIds) .")" );
+		$this->_db->update ( "UPDATE " . $this->_tableName . " SET request_num = request_num+" . $this->_addSlashes( $number ) . " WHERE uid in(  " .  S::sqlImplode($userIds) .")" );
 		return $this->_db->affected_rows ();
 	}
 	function updateNoticeNumberByUserIds($userIds,$number){
-		$this->_db->update ( "UPDATE " . $this->_tableName . " SET notice_num = notice_num+" . $this->_addSlashes( $number ) . " WHERE uid in(  " .  pwImplode($userIds) .")" );
+		$this->_db->update ( "UPDATE " . $this->_tableName . " SET notice_num = notice_num+" . $this->_addSlashes( $number ) . " WHERE uid in(  " .  S::sqlImplode($userIds) .")" );
 		return $this->_db->affected_rows ();
 	}
 	function updateGroupSmsNumberByUserIds($userIds,$number){
-		$this->_db->update ( "UPDATE " . $this->_tableName . " SET groupsms_num = groupsms_num+" . $this->_addSlashes( $number ) . " WHERE uid in(  " . pwImplode($userIds) .")" );
+		$this->_db->update ( "UPDATE " . $this->_tableName . " SET groupsms_num = groupsms_num+" . $this->_addSlashes( $number ) . " WHERE uid in(  " . S::sqlImplode($userIds) .")" );
 		return $this->_db->affected_rows ();
 	}
 	function updateSmsNumsByUserIds($eUserIds,$nUserIds,$number){

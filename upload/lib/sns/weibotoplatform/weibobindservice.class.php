@@ -48,6 +48,14 @@ class PW_WeiboBindService {
 		return (bool) $bindDao->add($userId, $weiboType, $bindInfo);
 	}
 	
+	function updateBindInfo($userId, $weiboType, $bindInfo) {
+		$userId = intval($userId);
+		if ($userId <= 0 || !$this->_checkWeiboType($weiboType)) return false;
+		
+		$bindDao = $this->_getBindDao();
+		return (bool) $bindDao->update($userId, $weiboType, $bindInfo);
+	}
+	
 	function localUnBind($userId, $weiboType) {
 		$userId = intval($userId);
 		if ($userId <= 0 || !$this->_checkWeiboType($weiboType)) return false;

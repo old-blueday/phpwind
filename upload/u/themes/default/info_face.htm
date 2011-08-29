@@ -1,0 +1,179 @@
+<!--<?php
+require_once uTemplate::PrintEot('header');
+require_once uTemplate::PrintEot('profile_left');
+print <<<EOT
+-->
+<div class="contUser">
+        	<div class="p15">
+            	<h4 class="site"><span>帐号</span></h4>
+<!--
+EOT;
+require_once uTemplate::PrintEot('info_nav');
+print <<<EOT
+-->
+				<table width="100%" height="450">
+				<tr><td class="vt"><div class="p15">
+					<form id="creator" name="creator" action="profile.php?action=modify&" method="post" onsubmit="return setFaceLen()">
+					<input type="hidden" name="verify" value="$verifyhash" />
+					<input type="hidden" value="2" name="step" />
+					<input type="hidden" id="info_type" name="info_type" value="face" />
+<div id="info_face">
+						<table width="100%" class="setTable vt">
+							<tr>
+								<td width="180">
+									<img src="$iconurl?$timestamp" name="useravatars" class="img" $iconsize/>
+								</td>
+								<td>
+									<div id="openchang">
+                    <label class="mr20" for="facetype1"><input type="radio" id="facetype1" checked="checked" name="facetype" value="1" onclick="CkFaceType(this.value)">系统头像</label>
+<!--
+EOT;
+if($_G[allowportait]){print <<<EOT
+-->
+										<label class="mr20" for="facetype2"><input type="radio" id="facetype2" name="facetype" value="2" onclick="CkFaceType(this.value)">头像链接</label>
+<!--
+EOT;
+}if($db_ifupload && $_G[upload]){print <<<EOT
+-->
+										<label class="mr20" for="facetype3"><input type="radio" id="facetype3" name="facetype" value="3" onclick="CkFaceType(this.value)">头像上传</label>
+<!--
+EOT;
+}print <<<EOT
+-->
+										<div class="c mb10"></div>
+										<div id="face1" style="display:none;">
+											<div id="iconbox">
+												<div class="mb10">
+<!--
+EOT;
+if ($pre_page < $page) {print <<<EOT
+-->
+                                                	<a onclick="showSystemIcon(0);" href="javascript:;" class="mr20">上一页</a>
+<!--
+EOT;
+}
+if ($next_page > $page) {print <<<EOT
+-->
+													<a onclick="showSystemIcon(2);" href="javascript:;">下一页</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+												</div>
+												<div class="profileFace">
+                                                	<ul class="cc">
+<!--
+EOT;
+foreach ($imgname_array as $key => $value) {print <<<EOT
+-->
+														<li onclick="showimage('$imgpath','$value')"><img src='$imgpath/face/$value' width="50" height="50" class="img"></li>
+<!--
+EOT;
+}print <<<EOT
+-->
+													</ul>
+												</div>
+											</div>
+											<input type="hidden" name="proicon" value="$iconfile" />
+										</div>
+										<div id="face2" style="display:none;">
+										<table cellpadding="0" cellspacing="0" class="setTable">
+											<tr>
+												<td class="td"><span class="mr20">头像链接</span><input name="httpurl[0]" id="httpurl_url" value="$httpurl" class="input input_wb mr10" type="text" /> 必须以 http://开头</td>
+											</tr>
+											<tr>
+												<td class="td"><span class="mr20">头像宽度</span><input name="httpurl[1]" value="$iconwidth" class="input input_wc mr10" maxlength="3" onblur="if(1 <= this.value && this.value <= $db_imgwidth){document.images.useravatars.width = this.value;}" /> 必须是 1 -- $db_imgwidth 之间的一个整数。</td>
+											</tr>
+											<tr>
+												<td class="td"><span class="mr20">头像高度</span><input name="httpurl[2]" value="$iconheight" class="input input_wc mr10" maxlength="3" onblur="if(1 <= this.value &&  this.value <= $db_imgheight){document.images.useravatars.height = this.value;}" /> 必须是 1 -- $db_imgheight 之间的一个整数。</td>
+											</tr>
+										</table>
+                                        <div class="p15">当高度和宽度留空，或只设置一个值时，则根据图片原尺寸进行缩放</div>
+										<input type="hidden" id="httpurl_w" name="httpurl[3]" />
+										<input type="hidden" id="httpurl_h" name="httpurl[4]" />
+										</div>
+										<div id="face3" style="display:none;">
+<!--
+EOT;
+if($db_bbsifopen != 1){print <<<EOT
+-->
+<div class="blockquote3">
+抱歉，站点正处于内部开放状态，只有在完全开放状态下，才能使用头像上传功能。<br />
+<span class="gray">（站点状态的后台设置路径：核心设置 &#187; 常规设置）</span>
+</div>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+											<object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" codebase=" http://fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=10,0,0,0" width="500" height="405" id="FlashVars" align="middle">
+												<param name="movie" value="js/face.swf" />
+												<param name="FlashVars" value="$icon_encode_url" />
+												<embed  width="500" height="405" src="js/face.swf" flashvars="$icon_encode_url" pluginspage="http://www.macromedia.com/shockwave/download/index.cgi?P1_Prod_Version=ShockwaveFlash"  type="application/x-shockwave-flash" />
+											</object>
+<!--
+EOT;
+}print <<<EOT
+--></div>
+									</div>
+								</td>
+							</tr>
+						</table>
+						<div class="tac" style=" padding:1em" id="face_button">
+							<span class="btn"><span><button type="submit">保存资料</button></span></span>
+						</div>
+					</div>
+</form>
+</div>
+<div id="userbinding-node" style="display:none">
+</div></td></tr></table>
+            </div>
+        </div>
+<script type="text/javascript" src = "js/info.js"></script>
+<script language="JavaScript">
+var display = '$display';
+~function() {
+	var info_type = FetchCookie('pro_tab');
+	DelCookie('pro_tab');
+	if (!info_type) info_type = '$info_type';
+	selectTab(info_type);
+}();
+</script>
+        <script type="text/javascript">
+            function CkFaceType(value){
+                var facetype = document.getElementsByName('facetype');
+                for (i = 0; i < facetype.length; i++) {
+                    if (facetype[i].value == value) {
+                        facetype[i].checked = true;
+                        if (value == '3') {
+                            getObj('face_button').style.display = 'none';
+                        }
+                        getObj('face' + value).style.display = '';
+                    }
+                    else {
+                        getObj('face_button').style.display = '';
+                        getObj('face' + facetype[i].value).style.display = 'none';
+                    }
+                }
+            }
+            
+            CkFaceType('$icontype');
+            function showimage(imgpath, value){
+                var path = imgpath + '/face/';
+                facepath(path, value, false);
+            }
+            
+            function facepath(iconurl, iconfile, showmsg, iconwidth, iconheight){
+                document.images.useravatars.src = iconurl + iconfile + '?' + new Date().getTime();
+                if (iconwidth > 0) 
+                    document.images.useravatars.width = iconwidth;
+                if (iconheight > 0) 
+                    document.images.useravatars.height = iconheight;
+                document.creator.proicon.value = iconfile;
+                return false;
+            }
+        </script>
+		
+<!--
+EOT;
+require_once uTemplate::printEot('footer');
+?>-->

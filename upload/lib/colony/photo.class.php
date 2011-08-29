@@ -38,6 +38,14 @@ class PW_Photo {
 		$this->_ifriend = $ifriend;
 	}
 	/**
+	 * 设置读取个数
+	 * @param unknown_type $num
+	 */
+	function setPerpage($num) {
+		$num = (int) $num ? (int) $num : 20;
+		$this->_perpage = $num;
+	}
+	/**
 	 *是否是超级管理员
 	 *@return boolean
 	 */
@@ -137,13 +145,8 @@ class PW_Photo {
 	 *@return int 返回相册总数
 	 */
 	function getAlbumNumByUid(){
-		$priacy = array();
-		$friendService = $this->_getServiceFactory('Friend', 'friend');
 		$albumDao = $this->_getDaoFactory('CnAlbum');
-		if(!$this->isSelf() && !$this->isPermission()){
-			$priacy = array_merge($priacy,array(0,3));
-			$priacy = $friendService->isFriend($this->_winduid,$this->_uid) ?  array_merge($priacy,array(1)) : $priacy;
-		}
+		$priacy = $this->_getAlbumBrowseListPriacy();
 		$result = $albumDao->getAlbumNumByUid($this->_uid,0,$priacy);
 		return $result['sum'];
 	}
@@ -152,13 +155,8 @@ class PW_Photo {
 	 *@return Array 返回相册列表
 	 */
 	function getAlbumBrowseList(){
-		$priacy = array();
-		$friendService = $this->_getServiceFactory('Friend', 'friend');
 		$albumDao = $this->_getDaoFactory('CnAlbum');
-		if(!$this->isSelf() && !$this->isPermission()){	
-			$priacy = array_merge($priacy,array(0,3));
-			$priacy = $friendService->isFriend($this->_winduid,$this->_uid) ?  array_merge($priacy,array(1)) : $priacy;
-		}
+		$priacy = $this->_getAlbumBrowseListPriacy();
 		$userInfo = $this->getUserInfoByUid();
 		$result = $albumDao->getAlbumNumByUid($this->_uid,0,$priacy);
 		$total = $result['sum'];
@@ -179,6 +177,21 @@ class PW_Photo {
 		}
 		return array($total,$albumdb);	
 		
+	}
+	
+	/**
+	 * 列表获取的限制条件 $priacy
+	 *@return Array 返回相册列表限制条件
+	 */
+	function _getAlbumBrowseListPriacy() {
+		$priacy = array();
+		$friendService = $this->_getServiceFactory('Friend', 'friend');
+		if(!$this->isSelf() && !$this->isPermission()){	
+			$priacy = array_merge($priacy,array(0,3));
+			$isFriend = $friendService->isFriend($this->_winduid,$this->_uid);
+			if ($isFriend !== "null") $priacy = array_merge($priacy,array(1));
+		}
+		return $priacy;
 	}
 	/**
 	 *取得朋友相册列表
@@ -380,7 +393,7 @@ class PW_Photo {
 		foreach($_FILES as $k=>$v){
 			(isset($v['name']) && $v['name'] != "") && $uploadNum++;
 		}
-		include_once (D_P.'data/bbscache/o_config.php');
+		include_once pwCache::getPath(D_P.'data/bbscache/o_config.php');
 		if($o_maxphotonum && ($albumInfo['photonum']+$uploadNum) > $o_maxphotonum ){
 			return 'colony_photofull';
 		}
@@ -545,7 +558,7 @@ class PW_Photo {
 	 *@param $aid int 相册ID
 	 *@return Array 返回相片列表
 	 */
-	function getPhotoListByAid($aid,$paging=true){
+	function getPhotoListByAid($aid,$paging=true,$ifthumb = true){
 		$album = $this->albumViewRight($aid);
 		if(!is_array($album)){
 			return $album;
@@ -565,7 +578,7 @@ class PW_Photo {
 			!$paging && $this->_perpage = $album['photonum'];
 			$photoList = $photoDao->getPagePhotosInfoByAid($aid,$this->_page,$this->_perpage,1);
 			foreach ($photoList as $key => $value) {
-				$value['path']	= getphotourl($value['path'], $value['ifthumb']);
+				$value['path']	= getphotourl($value['path'], $value['ifthumb'] && $ifthumb);
 				if ($this->_dbshield && $userInfo['groupid'] == 6 && !$this->isPermission()) {
 					$value['path'] = $this->_pwModeImg.'/banuser.gif';
 				}

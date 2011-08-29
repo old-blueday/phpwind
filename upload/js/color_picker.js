@@ -12,8 +12,9 @@ var handle_start_x;
 var event_start_x;
 var currentSliderIndex;
 
-function pickReback(color){
-	getObj('color_show').style.backgroundColor = color;
+function pickReback(showid,color){
+	if (!showid) showid = 'color_show';
+	getObj(showid).style.backgroundColor = color;
 }
 function styleOnclick(e,obj){
 	var objclass = e.className;

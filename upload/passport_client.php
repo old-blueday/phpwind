@@ -2,8 +2,8 @@
 require_once('global.php');
 require_once(R_P.'require/checkpass.php');
 
-InitGP(array('action','forward','verify'));
-InitGP(array('userdb'),'GP',0);
+S::gp(array('action','forward','verify'));
+S::gp(array('userdb'),'GP',0);
 if(!$db_pptifopen || $db_ppttype!='client'){
 	Showmsg('passport_close');
 }
@@ -16,7 +16,7 @@ $db_hash=$db_pptkey;
 parse_str(StrCode($userdb,'DECODE'),$userdb);
 
 if($action=='login'){
-	$userdb = Char_cv($userdb);
+	$userdb = S::escapeChar($userdb);
 	if(!$userdb['time'] || !$userdb['username'] || !$userdb['password']){
 		Showmsg('passport_data');
 	}
@@ -55,7 +55,10 @@ if($action=='login'){
 			'gender'	=> 0,
 			'regdate'	=> $timestamp
 		);
-		$db->update("REPLACE INTO pw_members SET".pwSqlSingle($sql1));
+		/**
+		$db->update("REPLACE INTO pw_members SET".S::sqlSingle($sql1));
+		**/
+		pwQuery::replace('pw_members', $sql1);
 		$winduid = $db->insert_id();
 		$sql2 += array(
 			'uid'		=> $winduid,
@@ -64,8 +67,12 @@ if($action=='login'){
 			'thisvisit'	=> $timestamp,
 			'onlineip'	=> $onlineip
 		);
-		$db->update("REPLACE INTO pw_memberdata SET".pwSqlSingle($sql2));
-		$db->update("UPDATE pw_bbsinfo SET newmember=".pwEscape($userdb['username']).",totalmember=totalmember+1 WHERE id='1'");
+		/**
+		$db->update("REPLACE INTO pw_memberdata SET".S::sqlSingle($sql2));
+		**/
+		pwQuery::replace('pw_memberdata', $sql2);
+		//* $db->update("UPDATE pw_bbsinfo SET newmember=".S::sqlEscape($userdb['username']).",totalmember=totalmember+1 WHERE id='1'");
+		$db->update(pwQuery::buildClause("UPDATE :pw_table SET newmember=:newmember,totalmember=totalmember+1 WHERE id=:id", array('pw_bbsinfo', $userdb['username'], 1)));
 	}
 	$db_hash=$_db_hash;
 	$windpwd = PwdCode($userdb['password']);

@@ -51,7 +51,7 @@ _MP.init=function()
 	this.vir.getElementsByTagName('button')[0].innerHTML = this.getSelectedText();
 	var opts='';
 	this.sel.parentNode.insertBefore(this.vir,this.sel);
-	this.vir.getElementsByTagName('button')[0].style.width = this.vir.style.width=this.sel.clientWidth+20+'px';
+	this.vir.getElementsByTagName('button')[0].style.width = this.vir.style.width = this.sel.clientWidth+20+'px';
 	this.sel.style.display='none';
 	this.getSelectedText();
 	this.vir.getElementsByTagName('button')[0].onclick=this.showOptions.bind(this);

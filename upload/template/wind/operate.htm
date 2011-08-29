@@ -1,7 +1,7 @@
 <!--<?php print <<<EOT
 -->
 <div id="breadCrumb">
-		<img src="$imgpath/$stylepath/thread/home-old.gif" align="absmiddle" />&nbsp;<a href="$db_bfn" title="$db_bbsname">$db_bbsname</a><em>&gt;</em>站点操作
+<img src="$imgpath/$stylepath/thread/home.gif" class="breadHome" /><em class="breadEm"></em><a href="$db_bfn" title="$db_bbsname">$db_bbsname</a><em>&gt;</em>站点操作
 </div>
 <div id="pw_content">
 <!--
@@ -12,7 +12,10 @@ if($action=='showping'){print <<<EOT
 <input type="hidden" name="verify" value="$verifyhash" />
 <!--
 EOT;
-foreach($atcdb as $key=>$value){print <<<EOT
+$count = 0;
+foreach($postData as $key=>$value){
+$count++;
+print <<<EOT
 -->
 <input type="hidden" name="selid[]" value="$key" />
 <!--
@@ -37,7 +40,7 @@ EOT;
 	</tr>
 	<tr class="tr3">
 		<td class="tar">操作者:</td>
-		<td><a href="u.php?uid=$winduid">$windid</a></td>
+		<td><a href="{$db_userurl}$winduid">$windid</a></td>
 	</tr>
 	<tr class="tr3">
 		<td class="tar">评分数量:</td>
@@ -45,7 +48,7 @@ EOT;
 	</tr>
 	<tr class="tr3">
 		<td class="tar">标题:</td>
-		<td><a href="read.php?tid=$tid">$atc[subject]</a></td>
+		<td>$subject</td>
 	</tr>
 	<tr id="ok1" class="tr3 vt">
 		<td class="tar">积分名称:</td>
@@ -60,8 +63,8 @@ EOT;
 				</tr>
 				<tbody id="c_model"><tr class="tr5">
 					<td><select name="cid[]" onchange="optionsel(this)">$creditselect</select></td>
-					<td><input class="input fl" type="text" name="addpoint[]" value="1" size="3" />
-					<a href="javascript:;" class="select_arrow fl" style="margin:2px 0 0 2px;" onclick="readByRateOpen(this);">下拉</a>
+					<td><input class="input fl" type="text" id="addpoint" name="addpoint[]" value="1" size="3" />
+					<a href="javascript:;" id="ratelists" class="select_arrow fl" style="margin:2px 0 0 2px;" onclick="readByRateOpen(this);">下拉</a>
           </td>
 					<td align="center"></td>
 					<td align="center"></td>
@@ -81,7 +84,7 @@ EOT;
 	<tr id="ok3" class="tr3">
 		<td class="tar">评分理由:</td>
 		<td style="vertical-align:top">
-			<textarea name="atc_content" id="atc_content" rows="8" style="width:300px;"></textarea>
+			<textarea name="atc_content" id="atc_content"  onchange="cutStrContent();"  onkeyup="cutStrContent();" onkeydown="cutStrContent();" rows="8" style="width:300px;"></textarea>
 			<select name="" size="8" multiple onchange="this.form.atc_content.value=this.value">
 			<option value="">自定义</option>
 			<option value="">-------</option>
@@ -90,11 +93,93 @@ EOT;
 			<div id="atc_content_warn" class="gray">限100字节</div>
 		</td>
 	</tr>
+<!-- 
+EOT;
+if($showReply){print <<<EOT
+-->
+	<tr class="tr3" id="tdPing">
+		<td class="tar"></td>
+		<td><label for="ifpost"><input type="checkbox" name="ifpost" id="ifpost" value="1" />同时作为回复发表</label></td>
+	</tr>
+<!-- 
+EOT;
+if(($db_gdcheck & 4) && (!$db_postgd || $winddb['postnum'] < $db_postgd)){
+$gdSize = explode("\t",$db_gdsize);
+print <<<EOT
+-->
+	<tr class="tr3" id="tr_gdcheck" style="display:none">
+		<td class="tar">验证码:</td>
+		<td>
+			<input class="input fl mr5" type="text" name="gdcode" size="5" />
+<script type="text/javascript" src="js/pw_authcode.js"></script>
+<script>
+var tip = '看不清楚，换一张';
+var flashWidth = "$gdSize[0]";
+var flashHeight = "$gdSize[1]";
+var gdtype = $db_gdtype;
+showGdCode();
+</script>
+	</td>
+</tr>
+<!--
+EOT;
+}
+if(($db_ckquestion & 4) && (!$postq || $winddb['postnum'] < $postq) && $db_question){
+$qkey = array_rand($db_question);
+if($db_imagequestion){
+	$question = '<img id="ckquestion" src="ckquestion.php?q='.$qkey.'&t='.$timestamp.'" align="top">';
+}else{
+	$question = $qkey<0 ? getMachineQuestion_1() :  $db_question[$qkey];
+}
+$q_a = $question.($showq && $qkey>0?" 正确答案:".$db_answer[$qkey] : '');
+print <<<EOT
+-->
+	<tr class="tr3" id="tr_ckquestion" style="display:none">
+		<td class="tar">验证问题:</td>
+		<td>$q_a
+			<input class="input" type="text" name="qanswer" size="5"/>
+			<input type="hidden" name="qkey" value="$qkey" />
+		</td>
+	</tr>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+<script>
+	var tr_gdcheck = getObj('tr_gdcheck');
+	var tr_ckquestion = getObj('tr_ckquestion');
+	var ifpost = getObj('ifpost');
+	ifpost.onclick = function(){
+		if(ifpost.checked){
+			if(tr_gdcheck)tr_gdcheck.style.display = '';
+			if(tr_ckquestion)tr_ckquestion.style.display = '';
+		}else{
+			if(tr_gdcheck)tr_gdcheck.style.display = 'none';
+			if(tr_ckquestion)tr_ckquestion.style.display = 'none';
+		}
+	}
+</script>
+<!--
+EOT;
+}//end show reply
+print <<<EOT
+-->
 	<tr>
 		<td></td>
 		<td style="padding:.5em 0;"><input class="btn" type="submit" value="提 交" />  <a class="btn3" type="button" onclick="javascript:history.go(-1)" />返 回</a></td>
 	</tr>
 </table>
+<script language="javascript" type="text/javascript">
+	function cutStrContent(){
+		var content = document.getElementById('atc_content');
+		if(strlen(content.value) > 100 ) content.value = substr(content.value,100);
+		var ad =  document.getElementById('atc_content_warn');
+		if(strlen(content.value) ==100){
+			ad.innerHTML = "剩余0字节";
+		}
+	}
+</script>
 </div>
 
 <div id="menu_rate" style="display:none;">
@@ -102,14 +187,14 @@ EOT;
 <iframe frameborder="0" style="position:absolute;width:60px;height:270px;background:#fff;filter:Alpha(opacity=0);" scrolling="no"></iframe>
 <![endif]-->
     <div class="pw_menu" style="_position:absolute;_z-index:1;">
-        <ul class="menuList" style="width:54px;" onmousedown="getRate(event)">
+        <ul class="menuList" style="width:54px;">
 <!--
 EOT;
-if ($ratelist) {
-foreach ($ratelist as $rate) {
+if ($noneJsonList) {
+foreach ($noneJsonList['money'] as $rate) {
 print <<<EOT
 -->
-            <li><a href="javascript:;" onmousedown="rateInput('{$rate}');" class="s6">{$rate}</a></li>
+            <li><a href="javascript:;" onmousedown="getRate(this);" class="s6">{$rate}</a></li>
 <!--
 EOT;
 }
@@ -128,15 +213,16 @@ EOT;
 <input type="hidden" name="page" value="$page" />
 <input type="hidden" name="tid" value="$tid" /></form>
 <script language="javascript">
-var ratelist = JSONParse('$ratelist');
 function operatesel (id) {
 	if (id == '1') {
 		objCheck('ok1').style.display = '';
 		objCheck('ok3').style.display = '';
+		objCheck('tdPing').style.display = '';
 		objCheck('cancel').style.display = 'none';
 	} else {
 		objCheck('ok1').style.display = 'none';
 		objCheck('ok3').style.display = 'none';
+		objCheck('tdPing').style.display = 'none';
 		objCheck('cancel').style.display = '';
 	}
 }
@@ -172,48 +258,117 @@ setTimeout(function() {
 }, 100);
 
 
-function getRate(e)
-{
-	e = e||window.event;
-	//e.cancelBubble = true;
-	if(e.srcElement.tagName=='A'){
-		lineNode.getElementsByTagName('input')[0].value=parseInt(e.srcElement.innerHTML);
-	}
+function getRate(obj){
+	getObj('addpoint').value=parseInt(obj.innerHTML);
+	read.close();
 }
 
-
-var lineNode;
-function readByRateOpen(e)
-{
-	var menu_rate = $('menu_rate');
-	lineNode = e.parentNode.parentNode;
-	var ul = getObj('menu_rate').getElementsByTagName('ul')[0];
-	var tr = e.parentNode.parentNode;
-	var d = tr.getElementsByTagName('select')[0].value;
-	var ar = ratelist[d];
-	var l = ar.length;
-	var html='';
-	for(var i=0;i<l;i++){
-		html += '<li><a href="javascript:;">'+ar[i]+'</a></li>';
-	}
-	ul.innerHTML=html;
-	menu_rate.style.display='block';
-	menu_rate.style.position='absolute';
-	menu_rate.style.top = 20+e.getBoundingClientRect().top - $('pw_box').getBoundingClientRect().top + 'px';
-	menu_rate.style.left = e.getBoundingClientRect().left - $('pw_box').getBoundingClientRect().left + 'px';
-	document.body.onmousedown = function(){
-		document.body.onmousedown = null;
-		menu_rate.style.display = 'none';
-	};
-}
-function rateInput(val)
-{
-	var tr = lineNode;
-	tr.getElementsByTagName('input')[0].value = val;
-	$('menu_rate').style.display = 'none';
-	document.body.onmousedown = null;
+function readByRateOpen(e){
+	read.open('menu_rate',e.id,3);
 }
 </script>
+<!--
+EOT;
+}elseif($action=='shield'){print <<<EOT
+-->
+<form action="operate.php?action=$action" method="post">
+<input type="hidden" name="verify" value="$verifyhash" />
+<div class="t">
+<table width="100%" cellspacing="0" cellpadding="0" align="center">
+	<tr><th class="h" colspan="2">帖子屏蔽</th>
+	</tr>
+	<tr class="tr3">
+		<td class="tar">屏蔽数量</td>
+		<td>$count 篇</td>
+	</tr>
+	<tr class="tr3"><td class="tar">操作类型:</td>
+		<td><input type="radio" name="step" value="3" checked />屏蔽
+			<input type="radio" name="step" value="5" />取消屏蔽 
+		</td>
+	</tr>
+	<tr class="tr3"><td class="tar">消息通知:</td>
+		<td><input type="radio" name="ifmsg" value="1" checked />开启
+			<input type="radio" name="ifmsg" value="0" />关闭
+		</td>
+	</tr>
+	<tr class="tr3 vt">
+		<td class="tar">操作原因:</td>
+		<td><textarea name="atc_content" style="width:300px;height:124px"></textarea>
+		<select name="" size="8" multiple onchange="this.form.atc_content.value=this.value">
+				<option value="">自定义</option>
+				<option value="">-------</option>
+				$reason_sel
+			</select>
+
+		</td>
+	</tr>
+	<tr><td></td><td style="padding:5px 6px;"><input class="btn" type="submit" value="提 交" /> <a class="btn3" style="cursor:pointer;" type="button" onclick="javascript:history.go(-1)" />返 回</a></td></tr>
+</table></div>
+<!--
+EOT;
+foreach($postdb as $value){
+print <<<EOT
+-->
+<input type="hidden" name="selid[]" value="{$value['pid']}" />
+<!--
+EOT;
+}print <<<EOT
+-->
+<input type="hidden" name="fid" value="$fid" />
+<input type="hidden" name="tid" value="$tid" />
+<input type="hidden" name="page" value="$page" />
+</form>
+<!--
+EOT;
+}elseif($action=='remind'){print <<<EOT
+-->
+<form action="operate.php?action=$action" method="post">
+<input type="hidden" name="verify" value="$verifyhash" />
+<div class="t">
+<table width="100%" cellspacing="0" cellpadding="0" align="center">
+	<tr><th class="h" colspan="2">帖子提醒</th>
+	</tr>
+	<tr class="tr3">
+		<td class="tar">提醒数量</td>
+		<td>$count 篇</td>
+	</tr>
+	<tr class="tr3"><td class="tar">操作类型:</td>
+		<td><input type="radio" name="step" value="3" checked />提醒
+			<input type="radio" name="step" value="5" />取消提醒
+		</td>
+	</tr>
+	<tr class="tr3"><td class="tar">消息通知:</td>
+		<td><input type="radio" name="ifmsg" value="1" checked />开启
+			<input type="radio" name="ifmsg" value="0" />关闭
+		</td>
+	</tr>
+	<tr class="tr3 vt">
+		<td class="tar">提醒理由:</td>
+		<td><textarea name="atc_content" style="width:300px;height:124px"></textarea>
+		<select name="" size="8" multiple onchange="this.form.atc_content.value=this.value">
+				<option value="">自定义</option>
+				<option value="">-------</option>
+				$reason_sel
+			</select>
+
+		</td>
+	</tr>
+	<tr><td></td><td style="padding:5px 6px;"><input class="btn" type="submit" value="提 交" /> <a class="btn3" style="cursor:pointer;" type="button" onclick="javascript:history.go(-1)" />返 回</a></td></tr>
+</table></div>
+<!--
+EOT;
+foreach($postdb as $value){
+print <<<EOT
+-->
+<input type="hidden" name="selid[]" value="{$value['pid']}" />
+<!--
+EOT;
+}print <<<EOT
+-->
+<input type="hidden" name="fid" value="$fid" />
+<input type="hidden" name="tid" value="$tid" />
+<input type="hidden" name="page" value="$page" />
+</form>
 <!--
 EOT;
 }elseif($action=='recommend'){print <<<EOT
@@ -266,7 +421,7 @@ EOT;
 		</td>
 	</tr>
 	<tbody id="sendemail" style="display:none">
-	<tr class="tr3"><td class="tar">对方Email:</td>
+	<tr class="tr3"><td class="tar">对方电子邮箱:</td>
 		<td><input type="text" class="input" name="sendtoemail" size="25" value="" /></td>
 	</tr>
 	</tbody>

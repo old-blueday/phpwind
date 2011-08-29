@@ -2,7 +2,7 @@
 !defined('P_W') && exit('Forbidden');
 
 PostCheck();
-InitGP(array(
+S::gp(array(
 	'aid',
 	'type',
 	'page'
@@ -62,12 +62,12 @@ class activeDelfile extends delfileInterface {
 		$this->_db =& $db;
 		$this->uid = $winduid;
 		$this->groupid = $groupid;
-		$this->isGM = CkInArray($windid, $manager);
+		$this->isGM = S::inArray($windid, $manager);
 	}
 
 	function init($aid) {
 		$this->aid = $aid;
-		$this->attach = $this->_db->get_one("SELECT * FROM pw_actattachs WHERE aid=" . pwEscape($aid));
+		$this->attach = $this->_db->get_one("SELECT * FROM pw_actattachs WHERE aid=" . S::sqlEscape($aid));
 	}
 	
 	function execute() {
@@ -96,7 +96,7 @@ class activeDelfile extends delfileInterface {
 
 	function _del() {
 		$this->delfile($this->attach['attachurl']);
-		$this->_db->update("DELETE FROM pw_actattachs WHERE aid=" . pwEscape($this->aid));
+		$this->_db->update("DELETE FROM pw_actattachs WHERE aid=" . S::sqlEscape($this->aid));
 	}
 }
 
@@ -115,6 +115,7 @@ class threadDelfile extends delfileInterface {
 
 	var $admincheck;
 	var $foruminfo;
+	var $attachsDB;
 
 	function threadDelfile() {
 		global $db,$winddb,$groupid,$windid,$winduid,$_G,$manager;
@@ -125,14 +126,15 @@ class threadDelfile extends delfileInterface {
 		$this->username =& $windid;
 		$this->user =& $winddb;
 		$this->groupid =& $groupid;
-		$this->isGM = CkInArray($this->username, $manager);
-
+		$this->isGM = S::inArray($this->username, $manager);
+		
+		$this->attachsDB = L::loadDB('attachs', 'forum');
 		$this->foruminfo = array();
 	}
 	
 	function init($aid) {
 		$this->aid = $aid;
-		$this->attach = $this->_db->get_one("SELECT * FROM pw_attachs WHERE aid=" . pwEscape($aid));
+		$this->attach = $this->attachsDB->get($aid);
 	}
 
 	function execute() {
@@ -164,7 +166,7 @@ class threadDelfile extends delfileInterface {
 
 	function _checkAllow() {
 		$this->tid = $this->attach['tid'];
-		$thread = $this->_db->get_one("SELECT fid,tpcstatus,ifcheck FROM pw_threads WHERE tid=" . pwEscape($this->tid, false));
+		$thread = $this->_db->get_one("SELECT fid,tpcstatus,ifcheck FROM pw_threads WHERE tid=" . S::sqlEscape($this->tid, false));
 
 		if (getstatus($thread['tpcstatus'], 1) && !$thread['fid'] && $thread['ifcheck'] == '2') {
 			return $this->_checkColony($thread['fid']);
@@ -193,8 +195,8 @@ class threadDelfile extends delfileInterface {
 	}
 
 	function _del() {
-		$this->delfile($this->attach['attachurl']);	
-		$this->_db->update("DELETE FROM pw_attachs WHERE aid=" . pwEscape($this->aid));
+		$this->delfile($this->attach['attachurl']);
+		$this->attachsDB->delete($this->aid);
 
 		require_once(R_P . 'require/updateforum.php');
 		$ifupload = getattachtype($this->tid);
@@ -202,29 +204,38 @@ class threadDelfile extends delfileInterface {
 		$updateArr = array('aid' =>$ifaid);
 		if ($this->attach['pid']) {
 			$pw_posts = GetPtable('N', $this->tid);
-			$content = $this->_db->get_value("SELECT content FROM $pw_posts WHERE tid=" . pwEscape($this->tid, false) . "AND pid=" . pwEscape($this->attach['pid'], false));
+			$content = $this->_db->get_value("SELECT content FROM $pw_posts WHERE tid=" . S::sqlEscape($this->tid, false) . "AND pid=" . S::sqlEscape($this->attach['pid'], false));
 			if (($content = $this->parseAttContent($content)) !== false) {
 				$updateArr['content'] = $content;
 				$updateThreadCache = TRUE;
 			}
-			$this->_db->update("UPDATE $pw_posts SET " . pwSqlSingle($updateArr) . " WHERE tid=" . pwEscape($this->tid, false) . "AND pid=" . pwEscape($this->attach['pid'], false));
+			//$this->_db->update("UPDATE $pw_posts SET " . S::sqlSingle($updateArr) . " WHERE tid=" . S::sqlEscape($this->tid, false) . "AND pid=" . S::sqlEscape($this->attach['pid'], false));
+			pwQuery::update($pw_posts, 'tid=:tid AND pid=:pid', array($this->tid, $this->attach['pid']), $updateArr);
 		} else {
 			$pw_tmsgs = GetTtable($this->tid);
-			$content = $this->_db->get_value("SELECT content FROM $pw_tmsgs WHERE tid=" . pwEscape($this->tid, false));
+			$content = $this->_db->get_value("SELECT content FROM $pw_tmsgs WHERE tid=" . S::sqlEscape($this->tid, false));
 			if (($content = $this->parseAttContent($content)) !== false) {
 				$updateArr['content'] = $content;
 				$updateThreadCache = TRUE;
 			}
-			$this->_db->update("UPDATE $pw_tmsgs SET " . pwSqlSingle($updateArr) . " WHERE tid=" . pwEscape($this->tid, false));
+			//* $this->_db->update("UPDATE $pw_tmsgs SET " . S::sqlSingle($updateArr) . " WHERE tid=" . S::sqlEscape($this->tid, false));
+			pwQuery::update($pw_tmsgs, 'tid=:tid', array($this->tid), $updateArr);
+			
+			if ($this->attach['type'] == 'img' && !$this->attachsDB->getImgsByTid($this->tid)) {
+				$this->_db->update("DELETE FROM pw_threads_img WHERE tid=" . S::sqlEscape($this->tid));
+			}
 		}
 		
 		if ($updateThreadCache) {
-			$threadService = L::loadClass("threads", 'forum'); /* @var $threadService PW_Threads */ 
-			$threadService->clearTmsgsByThreadId($this->tid);
+			//* $threadService = L::loadClass("threads", 'forum'); /* @var $threadService PW_Threads */ 
+			//* $threadService->clearTmsgsByThreadId($this->tid);
+			Perf::gatherInfo('changeThreadWithThreadIds', array('tid'=>$this->tid));
 		}
 		
 		$ifupload = (int) $ifupload;
-		$this->_db->update('UPDATE pw_threads SET ifupload=' . pwEscape($ifupload) . ' WHERE tid=' . pwEscape($this->tid));
+		//$this->_db->update('UPDATE pw_threads SET ifupload=' . S::sqlEscape($ifupload) . ' WHERE tid=' . S::sqlEscape($this->tid));
+		pwQuery::update('pw_threads', "tid=:tid", array($this->tid), array("ifupload"=>$ifupload));
+		
 		if ($this->foruminfo['allowhtm'] && $GLOBALS['page'] == 1) {
 			$StaticPage = L::loadClass('StaticPage');
 			$StaticPage->update($this->tid);

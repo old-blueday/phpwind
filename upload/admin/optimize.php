@@ -13,7 +13,7 @@ if (!$action) {
 	if (!$_POST['step']) {
 
 		if (file_exists(D_P.'data/bbscache/optimize_size.php')) {
-			include(D_P.'data/bbscache/optimize_size.php');
+			include pwCache::getPath(D_P.'data/bbscache/optimize_size.php');
 			!$optimize_conf['size'][$type] && include(R_P.'admin/optimize_conf.php');
 		} else {
 			include(R_P.'admin/optimize_conf.php');
@@ -78,7 +78,7 @@ if (!$action) {
 
 	} else {
 
-		InitGP(array('config','safegroup','schcontrol'),'P');
+		S::gp(array('config','safegroup','schcontrol'),'P');
 
 		$config['opensch'] = $schcontrol['opensch']."\t".$schcontrol['schstart']."\t".$schcontrol['schend'];
 		if ($safegroup) {
@@ -109,7 +109,7 @@ if (!$action) {
 	if (!$_POST['step']) {
 
 		if (file_exists(D_P.'data/bbscache/optimize_func.php')) {
-			include(D_P.'data/bbscache/optimize_func.php');
+			include pwCache::getPath(D_P.'data/bbscache/optimize_func.php');
 			!$optimize_conf['func'][$type] && include(R_P.'admin/optimize_conf.php');
 		} else {
 			include(R_P.'admin/optimize_conf.php');
@@ -157,7 +157,7 @@ if (!$action) {
 
 	} elseif ($_POST['step'] == '2') {
 
-		InitGP(array('config','upload'),'P');
+		S::gp(array('config','upload'),'P');
 		$upload['imgsize']=!is_numeric($upload['imgsize']) ? 20480 : $upload['imgsize']*1024;
 		!is_numeric($config['imglen'])   && $config['imglen']=200;
 		!is_numeric($config['imgwidth']) && $config['imgwidth']=180;
@@ -183,7 +183,7 @@ if (!$action) {
 } elseif ($_POST['action'] == 'size') {
 
 	if (file_exists(D_P.'data/bbscache/optimize_size.php')) {
-		include(D_P.'data/bbscache/optimize_size.php');
+		include pwCache::getPath(D_P.'data/bbscache/optimize_size.php');
 		!$optimize_conf['size'][$type] && include(R_P.'admin/optimize_conf.php');
 	} else {
 		include(R_P.'admin/optimize_conf.php');
@@ -205,7 +205,7 @@ if (!$action) {
 } elseif ($_POST['action'] == 'func') {
 
 	if (file_exists(D_P.'data/bbscache/optimize_func.php')) {
-		include(D_P.'data/bbscache/optimize_func.php');
+		include pwCache::getPath(D_P.'data/bbscache/optimize_func.php');
 		!$optimize_conf['func'][$type] && include(R_P.'admin/optimize_conf.php');
 	} else {
 		include(R_P.'admin/optimize_conf.php');

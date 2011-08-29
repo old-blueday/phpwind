@@ -1,0 +1,483 @@
+<!--<?php
+include_once PrintEot('left');
+if($adminitem !='rebang') {print <<<EOT
+-->
+<form action="$basename" method="post">
+<input type="hidden" name="step" value="2">
+<!--
+EOT;
+if($adminitem=='index' || $settingdb['index']){print <<<EOT
+-->
+<div class="nav3 mb10">
+	<ul class="cc">
+		<li class="current"><a href="$admin_file?adminjob=interfacesettings&adminitem=index">首页</a></li>
+		<li><a href="$admin_file?adminjob=interfacesettings&adminitem=thread">列表页</a></li>
+		<li><a href="$admin_file?adminjob=interfacesettings&adminitem=read">阅读页</a></li>
+		<li><a href="$admin_file?adminjob=interfacesettings&adminitem=popinfo">提示信息</a></li>
+        <li><a href="$admin_file?adminjob=interfacesettings&adminitem=jsinvoke">js调用设置</a></li>
+		<li><a href="$admin_file?adminjob=interfacesettings&adminitem=overprint">主题印戳</a></li>
+	</ul>
+</div>
+<h3 class="h1">首页细节设置</h3>
+<div class="admin_table mb10">
+	<table width="100%" cellspacing="0" cellpadding="0">
+	<!-- 	<tr class="tr1 vt">
+			<td class="td1"><span class="xia2">站点默认首页:</span><br />当地址栏里没有指定访问哪个页面时，默认指向的页面</td>
+			<td class="td2">
+				<input type="radio" value="0" name="config[setindex]" $setindex_N /> 站点首页
+				<input type="radio" value="1" name="config[setindex]" $setindex_Y /> home首页
+			</td>
+				</tr> -->
+		<tr class="tr1 vt">
+			<td class="td1">站点首页调用文件</td>
+			<td class="td2"><input name="config[bfn]" value="$db_bfn" class="input input_wa" /></td>
+			<td class="td2"><div class="help_a">站点首页文件名。默认为index.php。请确保此处与系统文件名保持一致</div></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">发帖数显示</td>
+			<td class="td2">
+				<ul class="list_A list_80">
+					<li><input type="radio" value="1" name="config[todaypost]" $todaypost_Y>开启</li>
+					<li><input type="radio" value="0" name="config[todaypost]" $todaypost_N>关闭</li>
+				</ul>
+			</td>
+			<td class="td2"><div class="help_a">在首页显示今日昨日发帖数 与 版块今日发帖数 </div></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">自定义版块logo</td>
+			<td class="td2">
+				<ul class="list_C">
+					<li><input type="radio" value="0" name="config[indexfmlogo]" $indexfmlogo_0>不使用</li>
+					<li><input type="radio" value="1" name="config[indexfmlogo]" $indexfmlogo_1>默认</li>
+					<li><input type="radio" value="2" name="config[indexfmlogo]" $indexfmlogo_2>自定义</li>
+				</ul>
+			</td>
+			<td class="td2"><div class="help_a">不使用:不显示版块Logo<br />使用默认:将图标命名为*.gif(*表示对应的版块ID),上传至images\***\ forumlogo(*代表风格目录名称)即可 <br />使用自定义:在版块设置里上传图片或填写图片地址即可 </div></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">下拉框方式显示版主</td>
+			<td class="td2">
+				<ul class="list_A list_80">
+					<li><input type="radio" value="1" name="config[adminshow]" $adminshow_Y>开启</li>
+					<li><input type="radio" value="0" name="config[adminshow]" $adminshow_N>关闭</li>
+				</ul>
+			</td>
+			<td class="td2"><div class="help_a">下拉框方式显示版主。默认关闭 </div></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">显示今天生日会员</td>
+			<td class="td2">
+				<ul class="list_A list_80">
+					<li><input type="radio" value="1" name="config[indexshowbirth]" $indexshowbirth_Y>开启</li>
+					<li><input type="radio" value="0" name="config[indexshowbirth]" $indexshowbirth_N>关闭</li>
+				</ul>
+			</td>
+			<td class="td2"><div class="help_a">开启后，将在站点首页显示今天过生日的会员 </div></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">无会员生日自动隐藏</td>
+			<td class="td2">
+				<ul class="list_A list_80">
+					<li><input type="radio" value="1" name="config[bdayautohide]" $bdayautohide_Y>开启</li>
+					<li><input type="radio" value="0" name="config[bdayautohide]" $bdayautohide_N>关闭</li>
+				</ul>
+			</td>
+			<td class="td2"><div class="help_a">开启后，没有人过生日的时候站点首页将自动隐藏今日生日模块 </div></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">显示友情链接</td>
+			<td class="td2">
+				<ul class="list_A list_80">
+					<li><input type="radio" value="1" name="config[indexlink]" $indexlink_Y>开启</li>
+					<li><input type="radio" value="0" name="config[indexlink]" $indexlink_N>关闭</li>
+				</ul>
+			</td>
+			<td class="td2"><div class="help_a">开启后在首页显示友情链接 </div></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">滚动显示友情链接</td>
+			<td class="td2">
+				<ul class="list_A list_80">
+					<li><input type="radio" value="1" name="config[indexmqshare]" $indexmqshare_Y>开启</li>
+					<li><input type="radio" value="0" name="config[indexmqshare]" $indexmqshare_N>关闭</li>
+				</ul>
+			</td>
+			<td class="td2"><div class="help_a">默认关闭 </div></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">自助友情链接</td>
+			<td class="td2">
+				<ul class="list_A list_80">
+					<li><input type="radio" value="1" name="config[ifselfshare]" $ifselfshare_Y>开启</li>
+					<li><input type="radio" value="0" name="config[ifselfshare]" $ifselfshare_N>关闭</li>
+				</ul>
+			</td>
+			<td class="td2"><div class="help_a">会员可在前台自助申请友情链接(每个会员只能申请一次)，管理员审核通过后在前台显示 </div></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">在线显示用户组</td>
+			<td class="td2">$usergroup</td>
+			<td class="td2"><div class="help_a">请选择在线显示的用户组，复选框内填写用户组显示顺序。<br /><br /><font color="#0000FF">注：1、全不选这只显示“普通会员”。<br />2、在线图标存放在“images/所选风格的图片目录/group/用户组ID.gif”，如“images/wind/group/3.gif”。<br />在线图标以用户组ID命名，请检查图片是否存在，<b>不存在则无法正常显示</b></font>。 </div></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">首页显示在线用户</td>
+			<td class="td2">
+				<ul class="list_A list_80">
+					<li><input type="radio" value="1" name="config[indexonline]" $indexonline_Y>开启</li>
+					<li><input type="radio" value="0" name="config[indexonline]" $indexonline_N>关闭</li>
+				</ul>
+			</td>
+			<td class="td2"><div class="help_a">影响速度 </div></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">首页显示在线游客</td>
+			<td class="td2">
+				<ul class="list_A list_80">
+					<li><input type="radio" value="1" name="config[showguest]" $showguest_Y>开启</li>
+					<li><input type="radio" value="0" name="config[showguest]" $showguest_N>关闭</li>
+				</ul>
+			</td>
+			<td class="td2"><div class="help_a">影响速度 </div></td>
+		 </tr>
+	</table>
+</div>
+<!--
+EOT;
+}if($adminitem=='thread' || $settingdb['thread']){print <<<EOT
+-->
+<div class="nav3 mb10">
+	<ul class="cc">
+		<li><a href="$admin_file?adminjob=interfacesettings&adminitem=index">首页</a></li>
+		<li class="current"><a href="$admin_file?adminjob=interfacesettings&adminitem=thread">列表页</a></li>
+		<li><a href="$admin_file?adminjob=interfacesettings&adminitem=read">阅读页</a></li>
+		<li><a href="$admin_file?adminjob=interfacesettings&adminitem=popinfo">提示信息</a></li>
+        <li><a href="$admin_file?adminjob=interfacesettings&adminitem=jsinvoke">js调用设置</a></li>
+		<li><a href="$admin_file?adminjob=interfacesettings&adminitem=overprint">主题印戳</a></li>
+	</ul>
+</div>
+<h3 class="h1">主题列表细节设置</h3>
+<div class="admin_table mb10">
+	<table width="100%" cellspacing="0" cellpadding="0">
+		<tr class="tr1 vt">
+			<td class="td1">新帖控制[秒]</td>
+			<td class="td2"><input name="config[newtime]" value="$db_newtime" class="input input_wa" /></td>
+			<td class="td2"><div class="help_a">超过设定时间主题将不再显示为新帖 </div></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">每页显示主题数目</td>
+			<td class="td2"><input name="config[perpage]" value="$db_perpage" class="input input_wa" /></td>
+			<td class="td2"><div class="help_a">每页显示主题数目，默认20个 </div></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">最大显示页数</td>
+			<td class="td2"><input name="config[maxpage]" value="$db_maxpage" class="input input_wa" /></td>
+			<td class="td2"><div class="help_a">主题列表中用户可以查看的最大页数，建议设置为 1000 －2500 之间，0 为不限制 </div></td>
+		</tr>
+		<tr class="tr1 vt" style="display:none">
+			<td class="td1">主题分类默认显示个数</td>
+			<td class="td2"><input name="config[maxtypenum]" value="$db_maxtypenum" class="input input_wa" /></td>
+			<td class="td2"><div class="help_a">默认5个 </div></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">点击率延迟更新[小时]</td>
+			<td class="td2">
+				<select name="config[hithour]" class="select_wa">
+					<option value="0" $hithour_sel[0]>0</option>
+					<option value="1" $hithour_sel[1]>1</option>
+					<option value="4" $hithour_sel[4]>4</option>
+					<option value="6" $hithour_sel[6]>6</option>
+					<option value="8" $hithour_sel[8]>8</option>
+					<option value="12" $hithour_sel[12]>12</option>
+					<option value="20" $hithour_sel[20]>24</option>
+				</select>
+			</td>
+			<td class="td2"><div class="help_a">设置为0则不使用此功能,使用生成html功能将自动使用此功能 </div></td>
+		</tr>
+		<!--<tr class="tr1 vt">
+			<td class="td1"><span class="xia2">总置顶,分类置顶功能:</span><br />置顶3: 为总置顶。置顶2: 为分类置顶。置顶1:为本版块置顶</td>
+			<td class="td2">
+				<input type="radio" value="1" name="config[topped]" $topped_Y>开启
+				<input type="radio" value="0" name="config[topped]" $topped_N>关闭
+			</td>
+				</tr>
+		-->
+		<tr class="tr1 vt">
+			<td class="td1">版块内显示在线用户</td>
+			<td class="td2">
+			<input type="hidden" value="1" name="config[topped]" />
+				<ul class="list_A list_80">
+					<li><input type="radio" value="1" name="config[threadonline]" $threadonline_Y>开启</li>
+					<li><input type="radio" value="0" name="config[threadonline]" $threadonline_N>关闭</li>
+				</ul>
+			</td>
+			<td class="td2"><div class="help_a">可查看到在该版块的所有在线人员 </div></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">显示表情符</td>
+			<td class="td2">
+				<ul class="list_A list_80">
+					<li><input type="radio" value="1" name="config[threademotion]" $threademotion_Y>开启</li>
+					<li><input type="radio" value="0" name="config[threademotion]" $threademotion_N>关闭</li>
+				</ul>
+			</td>
+			<td class="td2"><div class="help_a">在帖子列表页显示表情符 </div></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">显示快速发表主题</td>
+			<td class="td2">
+				<ul class="list_A list_80">
+					<li><input type="radio" value="1" name="config[threadshowpost]" $threadshowpost_Y>开启</li>
+					<li><input type="radio" value="0" name="config[threadshowpost]" $threadshowpost_N>关闭</li>
+				</ul>
+			</td>
+			<td class="td2"><div class="help_a">开启后可快速发表主题 </div></td>
+		 </tr>
+		 <tr class="tr1 vt">
+			<td class="td1">侧栏版块列表</td>
+			<td class="td2">
+				<ul class="list_A list_80">
+					<li><input type="radio" value="1" name="config[threadsidebarifopen]" $threadsidebarifopen_Y>开启</li>
+					<li><input type="radio" value="0" name="config[threadsidebarifopen]" $threadsidebarifopen_N>关闭</li>
+				</ul>
+			</td>
+			<td class="td2"><div class="help_a">开启后列表页显示版块列表 </div></td>
+		 </tr>
+		 <tr class="tr1 vt">
+			<td class="td1">侧栏版块列表宽度</td>
+			<td class="td2"><input name="config[threadsidebarwidth]" value="$db_threadsidebarwidth" class="input input_wa" /> px</td>
+			<td class="td2"><div class="help_a">设置版块列表宽度，可根据版块名称长短适当调整，默认为 130px </div></td>
+		 </tr>
+	</table>
+</div>
+<!--
+EOT;
+}if($adminitem=='read' || $settingdb['read']){print <<<EOT
+-->
+<div class="nav3 mb10">
+	<ul class="cc">
+		<li><a href="$admin_file?adminjob=interfacesettings&adminitem=index">首页</a></li>
+		<li><a href="$admin_file?adminjob=interfacesettings&adminitem=thread">列表页</a></li>
+		<li class="current"><a href="$admin_file?adminjob=interfacesettings&adminitem=read">阅读页</a></li>
+		<li><a href="$admin_file?adminjob=interfacesettings&adminitem=popinfo">提示信息</a></li>
+        <li><a href="$admin_file?adminjob=interfacesettings&adminitem=jsinvoke">js调用设置</a></li>
+		<li><a href="$admin_file?adminjob=interfacesettings&adminitem=overprint">主题印戳</a></li>
+	</ul>
+</div>
+<h3 class="h1">帖子阅读页面细节设置</h3>
+<div class="admin_table mb10">
+	<table width="100%" cellspacing="0" cellpadding="0">
+		<tr class="tr1 vt">
+			<td class="td1">每页帖子楼层数</td>
+			<td class="td2"><input name="config[readperpage]" value="$db_readperpage" class="input input_wa" /></td>
+			<td class="td2"><div class="help_a">默认10个 </div></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">匿名的名称</td>
+			<td class="td2"><input name="config[anonymousname]" value="$db_anonymousname" class="input input_wa" /></td>
+			<td class="td2"><div class="help_a">发表匿名帖时,匿名用户显示的昵称 </div></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">显示在线用户状态</td>
+			<td class="td2">
+				<ul class="list_A list_80">
+					<li><input type="radio" value="1" name="config[showonline]" $showonline_Y>开启</li>
+					<li><input type="radio" value="0" name="config[showonline]" $showonline_N>关闭</li>
+				</ul>
+			</td>
+			<td class="td2"><div class="help_a">开启后，可查看到在当前阅读页的所有会员 </div></td>
+		</tr>
+		<!-- <tr class="tr1 vt">
+			<td class="td1">显示会员加入的群组</td>
+			<td class="td2">
+				<ul class="list_A list_80">
+					<li><input type="radio" value="1" name="config[showcolony]" $showcolony_Y>开启</li>
+					<li><input type="radio" value="0" name="config[showcolony]" $showcolony_N>关闭</li>
+				</ul>
+			</td>
+			<td class="td2"><div class="help_a">在帖子阅读页个人信息栏显示会员加入的群组:</span> </div></td>
+		</tr> -->
+		<tr class="tr1 vt">
+			<td class="td1">选择要显示的积分</td>
+			<td class="td2">
+				<ul class="list_A list_120">
+<!--
+EOT;
+foreach ($credit->cType as $key => $value) {
+$ctcked = in_array($key,$db_showcustom) ? ' checked' : '';
+print <<<EOT
+-->
+					<li><input type="checkbox" name="showcustom[]" value="$key"{$ctcked} />{$value}</li>
+<!--
+EOT;
+}print <<<EOT
+-->
+				</ul>
+			</td>
+			<td class="td2"><div class="help_a">在帖子阅读页个人信息栏显示会员积分情况 </div></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">评分时间限制[小时]</td>
+			<td class="td2"><input name="config[pingtime]" value="$db_pingtime" class="input input_wa" /></td>
+			<td class="td2"><div class="help_a">帖子发表后超过此时间限制其他用户将不能对此帖评分，系统组不受限制，0 为不限制 </div></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">显示会员IP来源</td>
+			<td class="td2">
+				<ul class="list_A list_80">
+					<li><input type="radio" value="1" name="config[ipfrom]" $ipfrom_Y>开启</li>
+					<li><input type="radio" value="0" name="config[ipfrom]" $ipfrom_N>关闭</li>
+				</ul>
+			</td>
+			<td class="td2"><div class="help_a">用户权限中可单独设置每个用户组权限，此处关闭则所有用户组都不能查看IP来源 </div></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">屏蔽禁言会员所有帖子</td>
+			<td class="td2">
+				<ul class="list_A list_80">
+					<li><input type="radio" value="1" name="config[shield]" $shield_Y>开启</li>
+					<li><input type="radio" value="0" name="config[shield]" $shield_N>关闭</li>
+				</ul>
+			</td>
+			<td class="td2"><div class="help_a">开启后，会员将无法查看到禁言用户发布的所有帖子 </div></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">记录并显示会员在线时间</td>
+			<td class="td2">
+				<ul class="list_A list_80">
+					<li><input type="radio" value="1" name="config[ifonlinetime]" $ifonlinetime_Y>开启</li>
+					<li><input type="radio" value="0" name="config[ifonlinetime]" $ifonlinetime_N>关闭</li>
+				</ul>
+			</td>
+			<td class="td2"><div class="help_a">在帖子阅读页个人信息名片中显示会员在线时间 </div></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">阅读页主题相关功能</td>
+			<td class="td2">
+				<ul class="list_A list_80">
+					<li><input type="radio" value="1" name="config[threadrelated]" $threadrelated_Y>开启</li>
+					<li><input type="radio" value="0" name="config[threadrelated]" $threadrelated_N>关闭</li>
+				</ul>
+			</td>
+			<td class="td2"><div class="help_a">具体设置请到版块-版块管理-设置，对每个版块进行设置；将在每个帖子主题内容下方出现相关信息</div></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">帖子楼层单位</td>
+			<td class="td2">
+				<input name="config[floorunit]" value="$db_floorunit" class="input input_wa" />
+			</td>
+			<td class="td2"><div class="help_a">设置帖子显示楼层的单位，如“楼”将显示为 1 楼 </div></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">帖子楼层名称</td>
+			<td class="td2">
+				<textarea name="floorname" class="textarea" />$floorname</textarea>
+			</td>
+			<td class="td2"><div class="help_a">格式 “楼层名称”或“N:楼层名称”，N代表楼层数（主题帖为0楼），如果没有指定楼层N，则第一行代表主题帖子。其中，连续楼层之间可以用‘,’逗号隔开或换行，N后面的楼层为N+1，以此类推，直到再次出现N。例:<br />0:楼主，沙发，板凳<br />3:地板，地下室<br />100:中奖楼层 </div></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">分享到各大网站</td>
+			<td class="td2">
+				<ul class="list_A list_80">
+					<li><input type="radio" value="1" name="config[sharesite]" $sharesite_Y>开启</li>
+					<li><input type="radio" value="0" name="config[sharesite]" $sharesite_N>关闭</li>
+				</ul>
+			</td>
+			<td class="td2"><div class="help_a">开启后，在帖子内容下面显示分享到各大网站的控件 </div></td>
+		</tr>
+	</table>
+</div>
+<!--
+EOT;
+}if($adminitem=='popinfo' || $settingdb['popinfo']){
+print <<<EOT
+-->
+<div class="nav3 mb10">
+	<ul class="cc">
+		<li><a href="$admin_file?adminjob=interfacesettings&adminitem=index">首页</a></li>
+		<li><a href="$admin_file?adminjob=interfacesettings&adminitem=thread">列表页</a></li>
+		<li><a href="$admin_file?adminjob=interfacesettings&adminitem=read">阅读页</a></li>
+		<li class="current"><a href="$admin_file?adminjob=interfacesettings&adminitem=popinfo">提示信息</a></li>
+        <li><a href="$admin_file?adminjob=interfacesettings&adminitem=jsinvoke">js调用设置</a></li>
+		<li><a href="$admin_file?adminjob=interfacesettings&adminitem=overprint">主题印戳</a></li>
+	</ul>
+</div>
+<h3 class="h1">重要页面弹出信息设置</h3>
+<div class="admin_table mb10">
+	<table width="100%" cellspacing="0" cellpadding="0">
+		<tr class="tr1 vt">
+			<td class="td1">注册页面</td>
+			<td class="td2"><textarea wrap="off" name="sitemsg[reg]" class="textarea">$db_sitemsg[reg]</textarea></td>
+			<td class="td2"><div class="help_a">注册页面的弹出信息，每行填写一条信息，多条信息将随机显示 </div></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">登录页面</td>
+			<td class="td2"><textarea wrap="off" name="sitemsg[login]" class="textarea">$db_sitemsg[login]</textarea></td>
+			<td class="td2"><div class="help_a">登录页面的弹出信息，每行填写一条信息，多条信息将随机显示 </div></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">发帖页面</td>
+			<td class="td2"><textarea wrap="off" name="sitemsg[post]" class="textarea">$db_sitemsg[post]</textarea></td>
+			<td class="td2"><div class="help_a">发帖页面的弹出信息，每行填写一条信息，多条信息将随机显示 </div></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">回复页面</td>
+			<td class="td2"><textarea wrap="off" name="sitemsg[reply]" class="textarea">$db_sitemsg[reply]</textarea></td>
+			<td class="td2"><div class="help_a">回复页面的弹出信息，每行填写一条信息，多条信息将随机显示 </div></td>
+		</tr>
+	</table>
+</div>
+<!--
+EOT;
+}if($adminitem=='jsinvoke' || $settingdb['jsinvoke']){
+print <<<EOT
+-->
+<div class="nav3 mb10">
+	<ul class="cc">
+		<li><a href="$admin_file?adminjob=interfacesettings&adminitem=index">首页</a></li>
+		<li><a href="$admin_file?adminjob=interfacesettings&adminitem=thread">列表页</a></li>
+		<li><a href="$admin_file?adminjob=interfacesettings&adminitem=read">阅读页</a></li>
+		<li><a href="$admin_file?adminjob=interfacesettings&adminitem=popinfo">提示信息</a></li>
+        <li class="current"><a href="$admin_file?adminjob=interfacesettings&adminitem=jsinvoke">js调用设置</a></li>
+		<li><a href="$admin_file?adminjob=interfacesettings&adminitem=overprint">主题印戳</a></li>
+	</ul>
+</div>
+<h3 class="h1">JS调用设置</h3>
+<div class="admin_table mb10">
+	<table width="100%" cellspacing="0" cellpadding="0">
+		<tr class="tr1 vt">
+			<td class="td1">JS调用</td>
+			<td class="td2">
+				<ul class="list_A list_80">
+					<li><input type="radio" value="1" name="config[jsifopen]" $jsifopen_Y>开启</li>
+					<li><input type="radio" value="0" name="config[jsifopen]" $jsifopen_N>关闭</li>
+				</ul>
+			</td>
+			<td class="td2"><div class="help_a">此功能允许在您的网站首页或其他地方调用站点的内容。<br />调用方式分为: 版块调用、公告调用、基本信息调用、会员排行调用、文章调用 </div></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">缓存更新时间[秒]</td>
+			<td class="td2"><input name="config[jsper]" value="$db_jsper" class="input input_wa" /></td>
+			<td class="td2"><div class="help_a">由于部分调用查询比较消耗服务器资源，系统采用了缓存技术实现数据定期更新。<br />建议设置为:900 </div></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">可调用的网站域名</td>
+			<td class="td2"><input name="config[bindurl]" value="$db_bindurl" class="input input_wa" /></td>
+			<td class="td2"><div class="help_a">您可以设置允许调用站点内容的网站域名列表，只有在列表中的域名才能调用站点信息。<br />多个域名用 "," 分隔域名，不要包含 http:// 或其他非域名内容，留空不限制 </div></td>
+		</tr>
+	</table>
+</div>
+<!--
+EOT;
+}if ($pwatermark != 1 && $pathumb != 1) {print <<<EOT
+-->
+<div class="tac mb10"><span id="submit" class="btn"><span><button type="submit" onfocus="blur();">提 交</button></span></span></div>
+<!--
+EOT;
+}print<<<EOT
+-->
+</form>
+
+<!--
+EOT;
+}include_once PrintEot('adminbottom');
+?>-->

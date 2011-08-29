@@ -60,7 +60,7 @@ class MS_Request extends MS_Base {
 		if( 1 > $userId || 1 > $typeId || 1 > $relationId ){
 			return false;
 		}
-		return $this->_upMessage($userId,$this->_request,$typeId,$relationId);
+		return $this->_upMessage($userId,$this->_request,$relationId,$typeId);
 	}
 	function getDownRequest($userId,$relationId,$typeId){
 		$userId = intval($userId);
@@ -69,7 +69,7 @@ class MS_Request extends MS_Base {
 		if( 1 > $userId || 1 > $typeId || 1 > $relationId ){
 			return false;
 		}
-		return $this->_downMessage($userId,$this->_request,$typeId,$relationId);
+		return $this->_downMessage($userId,$this->_request,$relationId,$typeId);
 	}
 	function countAllRequest($userId){
 		$userId   = intval($userId);

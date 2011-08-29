@@ -12,6 +12,8 @@ weibo_post.prototype = {
 		this.wordLimit = 255;
 		this.postUrl = 'apps.php?q=weibo&do=post&ajax=1';
 		this.nextdo		= j.nextdo;
+		this.weibotip		= j.weibotip,
+		this.dvalue 	= this.$(this.content).value;//后台设置的默认文字
 		var _			 = this;
 
 		if(_.IsElement(j.content)) {
@@ -54,7 +56,10 @@ weibo_post.prototype = {
 		
 		var saveRng;
 		if (_.IsElement('uploadPic')) {
+			
 			_.$('uploadPic').onmousedown = function() {
+				var content = _.$(_.content);
+				if(content.value === _.dvalue){content.value='';}
 				if(document.selection){
 					saveRng = document.selection.createRange();
 					if(saveRng.parentElement().tagName != 'TEXTAREA')
@@ -160,6 +165,9 @@ weibo_post.prototype = {
 			smiles[0].onclick = function() {displayElement('smileContainer', false);};
 			for (i=1; i<smiles.length; i++) {
 				smiles[i].onclick = function() {
+				if(_.$(_.content).value==_.dvalue){
+					_.$(_.content).value = '';
+				}
 				var codeText = '[s:' + this.title + ']';
 					addSmileCallback(codeText);
 					hideSmile();
@@ -177,6 +185,7 @@ weibo_post.prototype = {
 		var rect = thisobj.getBoundingClientRect();
 		this.$('urlContainer').style.left = rect.left+ietruebody().scrollLeft + 'px';
 		this.$('urlContainer').style.top = rect.top + ietruebody().scrollTop + 22 +'px';
+		if(content.value === _.dvalue){content.value='';}
 		if (document.selection) {
 			this.$('urlInput').select();
 			var sel = document.selection.createRange();
@@ -197,17 +206,9 @@ weibo_post.prototype = {
 			showDialog('error','链接地址出错，链接地址必须以:http://开头');
 			return false;
 		}
-		this.$(this.content).value += codeText;
+		insertContentToTextArea(content, codeText);
 		this.displayElement('urlContainer', false);
-		if(is_ie){
-			content.select();
-			var sel = document.selection.createRange();
-			sel.moveStart('character',sel.text.length);
-			sel.select();
-			delete sel;
-		}else{
-			content.focus();
-		}
+		if(content.value === this.dvalue){content.value='';}
 		this.checkWordLength();
 	},
 
@@ -215,8 +216,9 @@ weibo_post.prototype = {
 		var saveRng;
 		var thisform = this.$('uploadPicForm');
 		var content = this.$(this.content);
+		if(content.value === this.dvalue){content.value='';}
 		var _ = this;
-		content.style.height='51px';			
+		content.style.height='18px';			
 		this.displayElement('uploadPicDiv', true);
 		this.displayElement('uploadPicload',false);
 		this.displayElement('uploadPicLoadding',true);
@@ -225,7 +227,7 @@ weibo_post.prototype = {
 			var gotText = ajax.request.responseText;
 			var textSplit = gotText.split('\t');
 			_.displayElement('uploadPicLoadding',false);
-			_.displayElement('uploadPicload',true);	
+			_.displayElement('uploadPicload',true);
 			if ('success' == textSplit[0]) {
 				var div = document.createElement('div');
 				div.className = "fl";
@@ -280,20 +282,19 @@ weibo_post.prototype = {
 	
 	post : function() {
 		var _this = this;
-		var thisForm = _this.$(_this.form);
-		var contentValue = 	_this.$(_this.content).value;
-		var weibo_submit = _this.$('weibo_submit');
+		var thisForm = _this.$(_this.form),
+			content = _this.$(_this.content),
+			weibo_submit = _this.$('weibo_submit');
 		
 		var nextdo = _this.nextdo;
-
-		contentValue = contentValue.replace(/(^\\s*)|(\\s*$)/g, "");
-		
+		var weibotip = _this.weibotip;
+		content.value = content.value.replace(/(^\\s*)|(\\s*$)/g, "");
 		var picNum = _this.getPicNum();
-		if (picNum && contentValue == '') {
-			contentValue = _this.$(_this.content).value = '分享图片';
+		if (picNum && (content.value === '' || content.value === _this.dvalue)) {
+			content.value = '分享图片';
 		}
 		
-		if (contentValue == '' || strlen(contentValue) >_this.wordLimit) return _this.shockWarning();
+		if (content.value == '' || strlen(content.value) >_this.wordLimit || content.value ===_this.dvalue ) return _this.shockWarning();
 		weibo_submit.disabled = false;
 		ajax.send(_this.postUrl, thisForm, function() {
 			var gotText = ajax.request.responseText;
@@ -309,9 +310,9 @@ weibo_post.prototype = {
 				_this.$('uploadPicDiv').innerHTML = '';
 				_this.$(_this.content).style.height='';
 				_this.$(_this.content).value = '';
-				setTimeout(function(){_this.displayElement('submitSuccess', false);}, 2000);
+				_this.$(_this.content).style.color='rgb(136, 136, 136)';
+				setTimeout(function(){_this.displayElement('submitSuccess', false);_this.$(_this.content).value = weibotip;}, 2000);
 				if (nextdo == 'filterweibo') filterCheckAll();
-			
 				getWeiboList(nextdo, 1, 'weiboFeed');
 				_this.checkWordLength();
 				getObj('writePic').value = '';

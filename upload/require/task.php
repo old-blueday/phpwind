@@ -3,12 +3,12 @@
 @set_time_limit(600);
 @ignore_user_abort(TRUE);
 
-$query = $db->query("SELECT * FROM pw_plan WHERE ifopen='1' AND nexttime<".pwEscape($timestamp));
+$query = $db->query("SELECT * FROM pw_plan WHERE ifopen='1' AND nexttime<".S::sqlEscape($timestamp));
 while ($plan = $db->fetch_array($query)) {
 	if (file_exists(R_P.'require/plan/'.$plan['filename'].'.php')) {
 		$nexttime = nexttime($plan);
-		require_once Pcv(R_P.'require/plan/'.$plan['filename'].'.php');
-		$db->update("UPDATE pw_plan SET".pwSqlSingle(array('usetime' => $timestamp, 'nexttime' => $nexttime),false)."WHERE id=".pwEscape($plan['id'],false));
+		require_once S::escapePath(R_P.'require/plan/'.$plan['filename'].'.php');
+		$db->update("UPDATE pw_plan SET".S::sqlSingle(array('usetime' => $timestamp, 'nexttime' => $nexttime),false)."WHERE id=".S::sqlEscape($plan['id'],false));
 	}
 }
 $db->free_result($query);

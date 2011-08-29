@@ -57,7 +57,7 @@ class PW_Weibo_CommentDB extends BaseDB {
 			return array();
 		}
 		$mid = is_array($mid) ? $mid : array($mid);
-		$sql = 'SELECT cid FROM ' . $this->_tableName . ' WHERE mid IN (' . pwImplode($mid) . ')';
+		$sql = 'SELECT cid FROM ' . $this->_tableName . ' WHERE mid IN (' . S::sqlImplode($mid) . ')';
 		$array = array();
 		$query = $this->_db->query($sql);
 		while ($rt = $this->_db->fetch_array($query)) {
@@ -117,7 +117,7 @@ class PW_Weibo_CommentDB extends BaseDB {
 			return false;
 		}
 		$cids = is_array($cids) ? $cids : array($cids);
-		$sql = 'DELETE FROM '.$this->_tableName.' WHERE cid  IN (' . pwImplode($cids) . ') ';
+		$sql = 'DELETE FROM '.$this->_tableName.' WHERE cid  IN (' . S::sqlImplode($cids) . ') ';
 		$query = $this->_db->query($sql);
 		return true;
 	}
@@ -146,7 +146,7 @@ class PW_Weibo_CommentDB extends BaseDB {
 			return false;
 		}
 		$mids = is_array($mids) ? $mids : array($mids);
-		$this->_db->update('DELETE ' . ($this->_db->server_info() > '4.1' ? 'a,b' : $this->_tableName . ',' . $this->_foreignTableName) .  " FROM $this->_tableName a LEFT JOIN $this->_foreignTableName b ON a.cid = b.cid WHERE a.mid IN (" . pwImplode($mids) . ')');
+		$this->_db->update('DELETE ' . ($this->_db->server_info() > '4.1' ? 'a,b' : $this->_tableName . ',' . $this->_foreignTableName) .  " FROM $this->_tableName a LEFT JOIN $this->_foreignTableName b ON a.cid = b.cid WHERE a.mid IN (" . S::sqlImplode($mids) . ')');
 		return true;
 	}
 	
@@ -156,17 +156,17 @@ class PW_Weibo_CommentDB extends BaseDB {
 		} 
 		$sqlAdd = '';
 		if($uids && is_array($uids)){
-			$sqlAdd .= ' AND uid IN (' . pwImplode($uids) . ') ';
+			$sqlAdd .= ' AND uid IN (' . S::sqlImplode($uids) . ') ';
 		}
 		if($contents){
-			$sqlAdd .= ' AND content like '.pwEscape('%'.$contents.'%');
+			$sqlAdd .= ' AND content like '.S::sqlEscape('%'.$contents.'%');
 		}
 		if($startDate && is_numeric($startDate)){
-			$sqlAdd .= ' AND postdate >= ' . pwEscape($startDate);
+			$sqlAdd .= ' AND postdate >= ' . S::sqlEscape($startDate);
 		}
 		
 		if($endDate && is_numeric($endDate)){
-			$sqlAdd .= ' AND postdate <= ' . pwEscape($endDate);
+			$sqlAdd .= ' AND postdate <= ' . S::sqlEscape($endDate);
 		}
 		$orderby = in_array($orderby,array('desc','asc')) ? $orderby : 'desc';
 		$sql = 'SELECT count(*) FROM '.$this->_tableName.' WHERE 1=1 '.$sqlAdd;

@@ -9,6 +9,23 @@
 <meta name="keywords" content="$seo_keyword" />
 <base id="headbase" href="$db_bbsurl/" />
 <link rel="stylesheet" type="text/css" href="$db_bbsurl/apps/stopic/image/style.css" />
+<!--
+EOT;
+if ($layout_config['othercss'] == "") { print <<<EOT
+-->
+<style>
+.wrap{width:960px;margin:0 auto 0;overflow:hidden;}/*专题内容框架*/
+#main{padding:10px;}/*专题内边距*/
+.zt_nav li{float:left;line-height:35px; font-size:14px;margin:0 10px; white-space:nowrap;}/*导航样式*/
+.itemDraggable{margin-top:10px;overflow:hidden;}/*模型外边框*/
+.itemDraggable .itemHeader{background:#f7f7f7 url(apps/stopic/data/style/baby_org/h-orange.png) right 0 repeat-x;padding:6px 10px 5px; font-weight:700;color:#fff;border:1px solid #e9be62;}/*标题栏*/
+.itemDraggable .itemContent{padding:4px 10px;border:1px solid #eaebe6;}/*模型内边距*/
+.itemDraggable .itemContent li{line-height:24px;}/*列表行高*/
+</style>
+<!--
+EOT;
+}else{ print <<<EOT
+-->
 <style>
 html{background:{$layout_config[bgcolor]} url($bg_url) center 0 {$layout_config[bgrepeat]};} /*全局背景*/
 a{color:{$layout_config[fontcolor]}; text-decoration:none;} /*链接字体颜色*/
@@ -17,6 +34,11 @@ a{color:{$layout_config[fontcolor]}; text-decoration:none;} /*链接字体颜色
 .banner h1{ position:absolute;}
 {$layout_config[othercss]}
 </style>
+<!--
+EOT;
+}  print <<<EOT
+?>-->
+
 </head>
 <body>
 <div class="wrap">

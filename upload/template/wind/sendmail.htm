@@ -3,7 +3,7 @@ if($action=='mailto'){
 print <<<EOT
 -->
 <div id="breadCrumb">
-		<img src="$imgpath/$stylepath/thread/home-old.gif" align="absmiddle" />&nbsp;<a href="$db_bfn" title="$db_bbsname">$db_bbsname</a><em>&gt;</em>发送邮件
+<img src="$imgpath/$stylepath/thread/home.gif" class="breadHome" /><em class="breadEm"></em><a href="$db_bfn" title="$db_bbsname">$db_bbsname</a><em>&gt;</em>发送电子邮件
 </div>
 
 <form method="post" action="sendemail.php?">
@@ -14,7 +14,7 @@ print <<<EOT
 <div class="t" style="margin-top:8px">
 <table width="100%" cellspacing="0" cellpadding="0" align="center">
 	<tr>
-		<td colspan="2" class="h"><b>发送邮件</b></td>
+		<td colspan="2" class="h"><b>发送电子邮件</b></td>
 	</tr>
 	<tr class="tr3">
 		<th width="21%">您的名字:</th>
@@ -23,7 +23,7 @@ print <<<EOT
 		</th>
 	</tr>
 	<tr class="tr3">
-		<th>您的Email:</th>
+		<th>您的电子邮箱:</th>
 		<th><input type="text" class="input" name="fromemail" size="25" value="$winddb[email]" /></th>
 	</tr>
 	<tr class="tr3">
@@ -31,13 +31,13 @@ print <<<EOT
 		<th><input type="text" class="input" name="sendtoname" size="25" value="$to_user" readonly /></th>
 	</tr>
 	<tr class="tr3">
-		<th>对方Email:</th>
+		<th>对方电子邮箱:</th>
 		<th>
 <!--
 EOT;
 if($hiddenmail){print <<<EOT
 -->
-邮箱已设置保密不影响邮件发送
+电子邮箱已设置保密不影响电子邮件发送
 <!--
 EOT;
 }else{print <<<EOT

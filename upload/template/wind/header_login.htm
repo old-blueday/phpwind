@@ -4,7 +4,7 @@ if (empty($winduid)) {print <<<EOT
 <!--
 EOT;
 if($groupid=='guest'){
-$arr_logintypename = array('用户名','UID','Email');
+$arr_logintypename = array('用户名','UID','电子邮箱');
 $loginJumpUrl = "http://{$pwServer['HTTP_HOST']}{$REQUEST_URI}";
 if (basename($REQUEST_URI,".php") == 'login') {
 	$loginJumpUrl = "{$db_bbsurl}/index.php";
@@ -51,20 +51,28 @@ EOT;
 if($db_ifsafecv || ($db_gdcheck & 2) || $_LoginInfo['qcheck']){print <<<EOT
 -->
 	<div class="fl">
-		<div id="nav_logintab" class="tal" style="width:330px;position:absolute;display:none;z-index:2;margin:21px 0 0 -199px;">
-			<div class="pw_menu popoutContent">
-				<table width="100%" class="mb5">
+	<div id="nav_logintab" class="popout" style="position:absolute;z-index:2;margin:21px 0 0 -154px;display:none;"><table border="0" cellspacing="0" cellpadding="0"><tbody><tr><td class="bgcorner1"></td><td class="pobg1"></td><td class="bgcorner2"></td></tr><tr><td class="pobg4"></td><td><div class="popoutContent">
+		<div style="width:260px;padding:10px 5px;">
+				<table width="100%" style="table-layout:fixed;">
 <!--
 EOT;
 if($db_gdcheck & 2){
-	$gdsize or $gdsize = explode("\t", $db_gdsize);
-	print <<<EOT
+$gdSize = explode("\t",$db_gdsize);
+print <<<EOT
 -->
 					<tr>
-						<td width="60">认证码</td>
+						<td width="70">认证码</td>
 						<td>
-							<input class="input mr5" type="text" name="gdcode" size="5" tabindex="12" onfocus="try{opencode('menu_gd',this)}catch(e){}" /><span class="cp" onclick="this.previousSibling.focus();">点此显示验证码</span>
-							<div class="menu" id="menu_gd" style="visibility:hidden;"><img src="ck.php?" align="absmiddle" style="cursor:pointer;" id="ckcode" alt="看不清楚，换一张" width="{$gdsize[0]}px" height="{$gdsize[1]}px" /></div>
+							<input class="input mr10" type="text" id="inputgdcode" name="gdcode" size="7" tabindex="12" onfocus="showgd('header_ckcode');" /><span class="cp" onclick="this.previousSibling.focus();">点此显示验证码</span>
+							<div id="header_ckcode" style="display:none;">
+<script type="text/javascript" language="JavaScript" src="js/pw_authcode.js"></script>
+<script>
+var flashWidth = "$gdSize[0]";
+var flashHeight = "$gdSize[1]";
+var gdtype = $db_gdtype;
+showGdCode();
+</script>
+							</div>
 						</td>
 					</tr>
 <!--
@@ -72,8 +80,8 @@ EOT;
 }if($db_ifsafecv){print <<<EOT
 -->
 					<tr>
-						<td width="60">安全问题</td>
-						<td><select name="question" onchange="showcustomquest_h(this.value)" tabindex="13">
+						<td width="70">安全问题</td>
+						<td><p class="mb5"><select name="question" onchange="showcustomquest_h(this.value)" tabindex="13" style="width:156px;">
 							<option value="0">无安全问题</option>
 							<option value="1">我爸爸的出生地</option>
 							<option value="2">我妈妈的出生地</option>
@@ -83,31 +91,29 @@ EOT;
 							<option value="6">我最喜欢的歌曲</option>
 							<option value="7">我最喜欢的电影</option>
 							<option value="8">我最喜欢的颜色</option>
-							<option value="-1">自定义问题</option></select>
-							<input id="othercustomquest" style="display:none" name="customquest" class="input" size="17" tabindex="14" />
+							<option value="-1">自定义问题</option></select></p>
+							<input id="othercustomquest" style="display:none" name="customquest" class="input input_wa" size="17" tabindex="14" />
 							</td>
 						</tr>
 						<tr>
 							<td>您的答案</td>
-							<td><input name="answer" class="input" size="30" tabindex="15" /></td>
+							<td><input name="answer" class="input input_wa" tabindex="15" /></td>
 						</tr>
 <!--
 EOT;
-}if($_LoginInfo['qcheck']){print <<<EOT
+}if($_LoginInfo['qcheck'] && $db_question){
+if($db_imagequestion){
+	$question = "<img src='ckquestion.php?q=".$_LoginInfo['qkey']."&t=".$timestamp."'>";
+}else{
+	$question = $_LoginInfo['qkey']<0 ? getMachineQuestion_1() :  $db_question[$_LoginInfo['qkey']];
+}
+$q_a = $question.($_LoginInfo['showq'] && $_LoginInfo['qkey']>0?" <br />答案:".$db_answer[$_LoginInfo['qkey']] : '');
+print <<<EOT
 -->
 						<tr>
-							<td width="60">验证问答</td>
-							<td>问题:{$db_question[$_LoginInfo['qkey']]}<br />
-<!--
-EOT;
-if($showq){print <<<EOT
--->
-							正确答案:{$db_answer[$_LoginInfo['qkey']]}
-<!--
-EOT;
-}print <<<EOT
--->
-								<p><input class="input" name="qanswer" size="30" tabindex="16" /></p>
+							<td width="70">验证问答</td>
+							<td>{$q_a}<br />
+								<p><input class="input input_wa" name="qanswer" tabindex="16" /></p>
 								<input type="hidden" name="qkey" value="{$_LoginInfo['qkey']}" /></td>
 						</tr>
 <!--
@@ -115,15 +121,14 @@ EOT;
 }print <<<EOT
 -->
 				</table>
-				<div class="c"></div>
-			</div>
 		</div>
+	</div></td><td class="pobg2"></td></tr><tr><td class="bgcorner4"></td><td class="pobg3"></td><td class="bgcorner3"></td></tr></tbody></table></div>
 	</div>
 <!--
 EOT;
 }print <<<EOT
 -->
-		<input class="input mr5 fl" style="width:128px;padding:2px 0 2px 3px;" type="password" name="pwpwd" onfocus="if(IsElement('nav_logintab')) getObj('nav_logintab').style.display='';this.value='';var o_nav_logintab = IsElement('nav_logintab') ? getObj('nav_logintab') : ''; PW_popEvent(o_nav_logintab);" tabindex="11" />
+		<input class="input mr5 fl" style="width:128px;padding:2px 0 2px 3px;" type="password" name="pwpwd" onfocus="if(IsElement('nav_logintab')) getObj('nav_logintab').style.display='';this.value='';if(getObj('header_ckcode') && getObj('header_ckcode').style.display=='none') getObj('inputgdcode').value='';var o_nav_logintab = IsElement('nav_logintab') ? getObj('nav_logintab') : ''; PW_popEvent(o_nav_logintab);" id="showpwd" tabindex="11" />
 		<span class="fl" style="width:63px;"><span class="bt2"><span><button type="submit" style="width:60px;">登录</button></span></span></span><span class="btn2"><span><button type="button" onClick="location.href='$regurl#breadCrumb';" style="width:60px;">注册</button></span></span>
 <!--
 EOT;
@@ -204,7 +209,7 @@ print <<<EOT
 <dl class="login fr">
 	<dt class="fr"><a href="u.php" hidefocus="true" class="img_50"><i><img src="$_LoginInfo[faceurl]" alt="$windid" /></i></a></dt>
 	<dd class="fr">
-		<p class="l_info"><span id="td_userinfomore" style="padding:0 5px;"><a href="u.php" class="b iconDroplink">$windid</a><span class="iconDrop"><i>▼</i></span></span><span class="mr5"></span><a href="$loginouturl" class="mr5">退出</a><span class="gray">|</span><script language="JavaScript">
+		<p class="l_info mb5"><span id="td_userinfomore" style="padding:0 5px;"><a href="u.php" class="b link_down"><span>$windid</span></a></span><span class="mr5"></span><a href="$loginouturl" class="mr5">退出</a><span class="gray">|</span><script language="JavaScript">
 var td_userinfomore = {
 	pz : 21,
 	open : function() {
@@ -217,10 +222,10 @@ var td_userinfomore = {
 		$('td_userinfomore').className = '';
 	}
 }
-</script><span id="td_message" class="pd5"><!--
+</script><span id="td_message" class="pd5 link_down"><!--
 EOT;
 $tmpMsgNum = 0;
-($winddb['newpm']>0 && $_G['maxmsg']>0) && $tmpMsgNum += $winddb['newpm'];
+($winddb['newpm']>0 && $_G['maxmsg']>=0) && $tmpMsgNum += $winddb['newpm'];
 $winddb['newreferto']>0 && $tmpMsgNum += $winddb['newreferto'];
 $winddb['newcomment']>0 && $tmpMsgNum += $winddb['newcomment'];
 $winddb['newfans']>0 && $tmpMsgNum += $winddb['newfans'];
@@ -231,39 +236,20 @@ EOT;
 if ($winddb['newreferto']>0 || $winddb['newfans']>0 || $winddb['newcomment']) {
 $db_menuinit .= ",'td_message' : 'menu_message'";
 print <<<EOT
---><span class="iconDroplink"></span><span class="iconDrop"><i>▼</i></span><script language="JavaScript">var td_message = {pz : 21}</script>
-<!--
+--><script language="JavaScript">var td_message = {pz : 21}</script><!--
 EOT;
 }print <<<EOT
---></span>
-<!--
-EOT;
-if ($db_job_isopen) {
-	$tmpJobNum = ($winddb['jobnum']>0) ? "(".$winddb['jobnum'].")" : "";
-print <<<EOT
---><a href="javascript:;" id="newjob" onClick="return showJobPOP();" class="mr5" num="$tmpJobNum">任务<span class="s2">$tmpJobNum</span></a>
-<!--
-EOT;
-	}
-	if($db_toolifopen){
-print <<<EOT
--->
-				<a href="profile.php?action=toolcenter" class="mr5">道具</a><!--
-EOT;
-}print <<<EOT
---><span class="gray">|</span><span id="td_profile" class="pd5"><a href="profile.php?action=modify" target="_blank" class="iconDroplink">设置</a><span class="iconDrop"><i>▼</i></span></span>
-<!--
+--></span><span id="td_profile" class="pd5"><a href="profile.php?action=modify" target="_blank" class="link_down"><span>设置</span></a></span><!--
 EOT;
 if(CkInArray($windid,$manager) || $SYSTEM['allowadmincp']){print <<<EOT
--->
-							<a href="$db_adminfile" target="_blank">系统设置</a>
+--><span class="gray mr5">|</span><a href="$db_adminfile" target="_blank">系统设置</a>
 <!--
 EOT;
 }
-$winddb[honor] = $winddb[honor] ? $winddb[honor] : "还没有签名，写一个吧～";
 print <<<EOT
 --></p>
-                            <label for="tophonor"><p id="write_honor" class="l_write" onClick="beginInput()"><span>$winddb[honor]</span><input type="text" id="tophonor" value="$winddb[honor]" /></p></label>
+			<p>{$db_moneyname}：<a href="userpay.php" class="s2 mr20">$winddb[money] $db_moneyunit</a>{$db_rvrcname}：<a href="userpay.php" class="s2 mr20">$userrvrc $db_rvrcunit</a>级别：<a href="profile.php?action=permission
+" class="s2">{$gp_grouptitle}</a></p>
                         </dd>
                     </dl>
 <!--
@@ -275,14 +261,14 @@ EOT;
 EOT;
 if (getstatus($winddb['userstatus'],12)) {print <<<EOT
 -->
-<input type="hidden" id="url" value="$db_bbsurl"></input>
+<base id="headbase" href="$db_bbsurl/" />
 <script language="JavaScript" src="js/userbinding.js"></script>
 <!--
 EOT;
 }if ($winduid){print<<<EOT
 -->
 <div id="menu_userinfomore" class="cc pw_menu" style="display:none;">
-	<h6 style="left:-1px;right:auto;"><a href="u.php" class="b iconDroplink">$windid</a><span class="iconDrop"><i>▼</i></span></h6>
+	<h6 style="left:-1px;right:auto;"><a href="u.php" class="b link_down"><span>$windid</span></a></h6>
 	<div>
 		<ul class="menu-half cc" style="width:26em;">
 		<li>等级: $gp_grouptitle</li>
@@ -328,7 +314,7 @@ EOT;
 	</div>
 </div>
 <div id="menu_profile" class="pw_menu" style="display:none;">
-	<h6><a href="profile.php?action=modify" class="iconDroplink">设置</a><span class="iconDrop"><i>▼</i></span></h6>
+	<h6><a href="profile.php?action=modify" class="link_down"><span>设置</span></a></h6>
     <ul style="width:50px;" class="menuList">
         <li><a href="profile.php?action=modify" target="_blank">帐号</a></li>
         <li><a href="profile.php?action=privacy" target="_blank">隐私</a></li>
@@ -341,7 +327,7 @@ EOT;
 if ($winddb['newreferto']>0 || $winddb['newfans']>0 || $winddb['newcomment']) {print <<<EOT
 -->
 <div id="menu_message" class="pw_menu" style="display:none;">
-	<h6 style="left:-1px;right:auto;"><a href="message.php" class="iconDroplink" >消息{$tmpMsgCue}</a><span class="iconDrop"><i>▼</i></span></h6>
+	<h6 style="left:-1px;right:auto;"><a href="message.php" class="link_down" >消息{$tmpMsgCue}</a></h6>
 	<ul class="menuList tal">
 <!--
 EOT;

@@ -6,7 +6,9 @@ class PW_BanUserDB extends BaseDB {
 	var $_primaryKey = 'id';
 	
 	function add($fieldData) {
-		return $this->_insert($fieldData);
+		$pwSQL = S::sqlSingle($fieldData);
+		return $this->_db->update("REPLACE INTO pw_banuser SET $pwSQL");
+		//return $this->_insert($fieldData);
 	}
 	
 	function findAllByUserId($userId) {
@@ -15,6 +17,15 @@ class PW_BanUserDB extends BaseDB {
 		
 		$query = $this->_db->query("SELECT * FROM " . $this->_tableName . " WHERE uid=" . $this->_addSlashes($userId));
 		return $this->_getAllResultFromQuery($query);
+	}
+
+	function checkByUidFid($uid,$fid){
+		$uid = intval($uid);
+		$fid = intval($fid);
+		if ($uid <= 0) return array();
+		return intval($this->_db->get_value(
+			"SELECT COUNT(*) FROM " . $this->_tableName . " WHERE uid=" . $this->_addSlashes($uid) . " AND fid=".$this->_addSlashes($fid)
+		));
 	}
 	
 	function deleteByUserId($userId) {

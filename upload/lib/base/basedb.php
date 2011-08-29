@@ -34,13 +34,13 @@ class BaseDB {
 	/**
 	 * 构造更新的sql
 	 * 
-	 * @see pwSqlSingle
+	 * @see S::sqlSingle
 	 * @access protected
 	 * @param array $arr 更新数据数组
 	 * @return string
 	 */
 	function _getUpdateSqlString($arr) {
-		return pwSqlSingle($arr);
+		return S::sqlSingle($arr);
 	}
 	
 	/**
@@ -86,25 +86,25 @@ class BaseDB {
 	/**
 	 * 反斜杠过滤
 	 * 
-	 * @see pwEscape
+	 * @see S::sqlEscape
 	 * @access protected
 	 * @param mixed $var 数据
 	 * @return mixed 过滤后的数据
 	 */
 	function _addSlashes($var) {
-		return pwEscape($var);
+		return S::sqlEscape($var);
 	}
 	
 	/**
 	 * implode组装数组为sql
 	 * 
-	 * @see pwImplode
+	 * @see S::sqlImplode
 	 * @access protected
 	 * @param $arr 数据数组
 	 * @param bool $strip 是否经过stripslashes处理
 	 */
 	function _getImplodeString($arr, $strip = true) {
-		return pwImplode($arr, $strip);
+		return S::sqlImplode($arr, $strip);
 	}
 	
 	/**
@@ -144,7 +144,8 @@ class BaseDB {
 	 */
 	function _insert($fieldData) {
 		if (!$this->_check() || !$fieldData) return false;
-		$this->_db->update("INSERT INTO " . $this->_tableName . " SET " . $this->_getUpdateSqlString($fieldData));
+		//* $this->_db->update("INSERT INTO " . $this->_tableName . " SET " . $this->_getUpdateSqlString($fieldData));
+		pwQuery::insert($this->_tableName, $fieldData);
 		return $this->_db->insert_id();
 	}
 	/**
@@ -155,7 +156,8 @@ class BaseDB {
 	 */
 	function _update($fieldData, $id) {
 		if (!$this->_check() || !$fieldData || $id < 1) return false;
-		$this->_db->update("UPDATE " . $this->_tableName . " SET " . $this->_getUpdateSqlString($fieldData) . " WHERE " . $this->_primaryKey . "=" . $this->_addSlashes($id) . " LIMIT 1");
+		//* $this->_db->update("UPDATE " . $this->_tableName . " SET " . $this->_getUpdateSqlString($fieldData) . " WHERE " . $this->_primaryKey . "=" . $this->_addSlashes($id) . " LIMIT 1");
+		pwQuery::update($this->_tableName, "{$this->_primaryKey}=:{$this->_primaryKey}", array($id), $fieldData);
 		return $this->_db->affected_rows();
 	}
 	/**
@@ -165,7 +167,8 @@ class BaseDB {
 	 */
 	function _delete($id) {
 		if (!$this->_check() || $id < 1) return false;
-		$this->_db->update("DELETE FROM " . $this->_tableName . " WHERE " . $this->_primaryKey . "=" . $this->_addSlashes($id) . " LIMIT 1");
+		//* $this->_db->update("DELETE FROM " . $this->_tableName . " WHERE " . $this->_primaryKey . "=" . $this->_addSlashes($id) . " LIMIT 1");
+		pwQuery::delete($this->_tableName, "{$this->_primaryKey}=:{$this->_primaryKey}", array($id));
 		return $this->_db->affected_rows();
 	}
 	/**
@@ -203,7 +206,7 @@ class BaseDB {
 	 * @return string SQL语句
 	 */
 	function _Limit($start, $num = false){
-		return pwLimit($start, $num);
+		return S::sqlLimit($start, $num);
 	}
 }
 

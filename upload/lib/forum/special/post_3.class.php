@@ -60,15 +60,15 @@ class postSpecial {
 
 	function resetInfo($tid, $atcdb) {
 		$reset = array();
-		@extract($this->db->get_one("SELECT cbtype,catype FROM pw_reward WHERE tid=" . pwEscape($tid)));
+		@extract($this->db->get_one("SELECT cbtype,catype FROM pw_reward WHERE tid=" . S::sqlEscape($tid)));
 		$reset['b_select'] = "<option value=\"$cbtype\">" . pwCreditNames($cbtype) . '</option>';
 		$reset['a_select'] = "<option value=\"$catype\">" . pwCreditNames($catype) . '</option>';
 		return $reset;
 	}
 	
 	function setData() {
-		$bonus = Char_cv(GetGP('bonus', 'P'), true);
-		$ctype = Char_cv(GetGP('ctype', 'P'));
+		$bonus = S::escapeChar(S::getGP('bonus', 'P'), true);
+		$ctype = S::escapeChar(S::getGP('ctype', 'P'));
 
 		if (empty($bonus)) {
 			$bonus = array();
@@ -134,7 +134,7 @@ class postSpecial {
 			global $timestamp;
 			$this->data['tid'] = $tid;
 			$this->data['timelimit'] = $timestamp + $this->valid * 86400;
-			$this->db->update("INSERT INTO pw_reward SET " . pwSqlSingle($this->data));
+			$this->db->update("INSERT INTO pw_reward SET " . S::sqlSingle($this->data));
 		}
 	}
 
@@ -142,7 +142,7 @@ class postSpecial {
 		if (empty($_POST['addreward'])) {
 			return;
 		}
-		$rewdb = $this->db->get_one("SELECT * FROM pw_reward WHERE tid=".pwEscape($tid));
+		$rewdb = $this->db->get_one("SELECT * FROM pw_reward WHERE tid=".S::sqlEscape($tid));
 		if ($rewdb['pid'] && $rewdb['author']) {
 			Showmsg('reward_add_end');
 		}
@@ -160,7 +160,7 @@ class postSpecial {
 		if ($this->data['cbval'] > 0 || $this->data['caval'] > 0) {
 			global $timestamp;
 			$timelimit = ($this->data['timelimit'] > $timestamp ? $this->data['timelimit'] : $timestamp) + $this->valid * 86400;
-			$this->db->update("UPDATE pw_reward SET cbval=cbval+" . pwEscape($this->data['cbval']) . ",caval=caval+" . pwEscape($this->data['caval']) . ",timelimit=" . pwEscape($timelimit) . ' WHERE tid=' . pwEscape($tid));
+			$this->db->update("UPDATE pw_reward SET cbval=cbval+" . S::sqlEscape($this->data['cbval']) . ",caval=caval+" . S::sqlEscape($this->data['caval']) . ",timelimit=" . S::sqlEscape($timelimit) . ' WHERE tid=' . S::sqlEscape($tid));
 		}
 	}
 }

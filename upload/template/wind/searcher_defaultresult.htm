@@ -1,0 +1,548 @@
+<!--<?php print <<<EOT
+-->
+
+<div class="main2 cc" id="mainbox">
+<!--
+EOT;
+if($total){
+print <<<EOT
+-->   
+	<div class="list_h">
+			<div class="fr">获得约 <strong>{$total}</strong> 条结果
+			（用时<strong>{$totaltime}</strong>秒）</div>
+			<a href="searcher.php?type=thread">搜索</a> &gt;	 $typeTitle
+	</div>
+<!--
+EOT;
+if (($type == "thread" || $type == 'special') && $threads ) {
+print <<<EOT
+-->
+	<div class="list_main cc sideClose" id="sidebar">
+			<div class="list_content">
+			<table width="100%" cellpadding="0" cellspacing="0" height="300"><tr><td valign="top">
+			<div class="dlA">
+<!--
+EOT;
+if ($adverts) {print <<<EOT
+-->
+	
+<!--
+EOT;
+	foreach ($adverts as $advert) {
+	print <<<EOT
+-->
+				<div class="promotion">
+					$advert
+				</div>
+<!--
+EOT;
+	}print <<<EOT
+-->
+<!--
+EOT;
+}print <<<EOT
+-->
+	
+	
+<!-- 
+EOT;
+if($admincheck || $superedit || $superdelete ){
+print <<<EOT
+-->		
+				<form action="mawhole.php?" method="post" id="search" name="SEARCH">
+				 <input type="hidden" value="$verifyhash" name="verify">
+				<input type="hidden" name="action" value="" id="action" />
+				<input type="hidden" name="fid" value="$fid" />
+<!-- 
+EOT;
+}
+print <<<EOT
+-->   	
+	
+<!-- 
+EOT;
+foreach($threads as $thread){
+print <<<EOT
+-->       	
+	            	<dl id="search_{$thread[tid]}">
+	                	<dt>
+<!-- 
+EOT;
+if($admincheck || $superedit ){
+print <<<EOT
+-->                   	
+	                	<input type="checkbox" value="$thread[tid]" name="tidarray[]"> 
+<!-- 
+EOT;
+}
+$threadUrl = ($threadrange == 3) ? "job.php?action=topost&tid=".$thread[tid]."&pid=".$thread[pid] : "read.php?tid=".$thread[tid];
+print <<<EOT
+-->                	
+	                	<a href="{$threadUrl}" target="_blank" class="tlink">$thread[subject]</a>
+						</dt>
+						<dd>
+						<div class="num">$thread[replies]条回复 - $thread[hits]次浏览</div>
+						<div class="text">$thread[content]</div>
+						<div class="author"><cite>$thread[postdate]</cite> - 
+<!--
+EOT;
+if(!$isGM && $thread['anonymous'] == 1){print <<<EOT
+-->
+匿名
+<!--
+EOT;
+}else{print <<<EOT
+-->
+						作者: <a href="{$db_userurl}$thread[authorid]">$thread[author]</a>
+<!-- 
+EOT;
+}
+print <<<EOT
+-->
+						 - <a href="thread.php?fid={$thread[fid]}">{$thread[name]}</a>
+<!-- 
+EOT;
+if($admincheck || $superedit ){
+print <<<EOT
+-->                     
+						- <a href="post.php?action=modify&fid={$thread[fid]}&tid={$thread[tid]}&pid=tpc&article=0" target="_blank" class="s2">编辑</a>
+<!-- 
+EOT;
+}
+print <<<EOT
+-->                  
+						</div>
+	                    </dd>
+	                </dl>
+<!-- 
+EOT;
+}
+print <<<EOT
+--> 
+	                <div class="cc mb20">
+	                   $pager
+	                </div>
+<!-- 
+EOT;
+if($admincheck || $superdelete || $superedit ){
+print <<<EOT
+-->
+	            	<div class="manage cc">
+	                <input name="" type="checkbox" value="" onclick="CheckAll(this.form)" >全选 
+<!-- 
+EOT;
+if($admincheck && $fid ){
+print <<<EOT
+-->                                
+	                <a href="javascript:;" onclick="searchSubmit('headtopic');">置顶</a><a href="javascript:;" onclick="searchSubmit('digest');">精华</a><a href="javascript:;" onclick="searchSubmit('lock');">锁定</a><a href="javascript:;" onclick="searchSubmit('pushtopic');">提前</a><a href="javascript:;" onclick="searchSubmit('downtopic');">压帖</a><a href="javascript:;" onclick="searchSubmit('edit');">加亮</a><a href="javascript:;" onclick="searchSubmit('type');">分类主题</a><a href="javascript:;" onclick="searchSubmit('move');">移动</a><a href="javascript:;" onclick="searchSubmit('copy');">复制</a><a href="javascript:;" onclick="searchSubmit('del');">删除</a>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+<!--
+EOT;
+if( $superdelete && !$fid ){
+print <<<EOT
+-->               
+	                <a href="javascript:;" onclick="searchSubmit('delall');">删除</a>
+<!-- 
+EOT;
+}
+print <<<EOT
+-->                 
+	                </div>
+	            </form>
+<!-- 
+EOT;
+}
+print <<<EOT
+-->  
+	
+	
+			</div>
+<!--
+EOT;
+require printEOT('searcher_searchinput');
+print <<<EOT
+-->
+			</td></tr></table>
+		</div>
+<div class="list_sideBar">
+<!--
+EOT;
+list($htmlAdvert,$arrayAdvert) = pwAdvert('Site.Search.Thread.Right','');
+if($htmlAdvert){print <<<EOT
+-->
+<div style="height:200px;width:200px;">
+<div class="tac mb5">$htmlAdvert</div>
+</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+						
+<!--
+EOT;
+if($hotwords){
+print <<<EOT
+-->     
+						<div class="list_box">
+							<h2><a>热门搜索</a></h2>
+							<ul>
+<!-- 
+EOT;
+foreach($hotwords as $hotword){
+print <<<EOT
+-->
+								<li><a href="searcher.php?keyword={$hotword}&type=thread">$hotword</a></li>
+<!-- 
+EOT;
+}
+print <<<EOT
+--> 
+								
+							</ul>
+						</div>
+<!-- 
+EOT;
+}
+print <<<EOT
+-->
+	
+					</div>
+	</div>
+<script type="text/javascript">
+	var searchSubmit = function(type){
+		if(!type) return false;
+		getObj("action").value = type;
+		var form = getObj("search");
+		var ischeck = false;
+		var del = [];
+		var threadIds = '';
+		var count = 0;
+		for (var i = 0; i < form.elements.length; i++) {
+			var e = form.elements[i];
+			if (e.type == 'checkbox' && e.checked == true ) {
+				var v = e.value;
+				ischeck = true;
+				threadIds += v+"|";
+				del.push(v);
+				count += 1;
+			}
+		}
+		if(!ischeck){
+			showDialog('error',"请选择操作的帖子");
+			return false;
+		}
+		if(type == "delall"){
+			showDialog("confirm","确定要删除帖子吗?",0,function(){
+				var data = "&fid=all&step=2&verify={$verifyhash}&tidarray="+threadIds;
+				ajax.send("mawhole.php?action=delall&ajax=1",data,function(){
+					for(i=0;i<del.length;i++){
+						var t = document.getElementById("search_"+del[i]);
+						if(t){
+							t.innerHTML="";
+						}
+					}
+					if(count >= 10){
+						location.href = 'searcher.php?keyword={$keyword}&type=thread';
+					}else{
+						showDialog('success',ajax.request.responseText,1);
+					}
+				});
+			});
+			return false;
+		}
+		setTimeout(function(){
+			form.submit();
+		},0);
+	}
+	</script>
+<!--
+EOT;
+} elseif ($type == "user" && $users) {
+print <<<EOT
+-->
+	<div class="user_main cc">
+<!-- 
+EOT;
+foreach($users as $user){
+print <<<EOT
+-->  
+	<dl class="cc">
+		<dt><a href="{$db_userurl}$user[uid]" target="_blank"><img src="{$user[face]}"></a></dt>
+		<dd class="one">
+			<div class="name"><a href="{$db_userurl}$user[uid]" target="_blank">$user[username]</a></div>
+			<ul>
+				<li>性别：$user[gender]</li>
+				<li>星座：$user[constellation]</li>
+				<li>来自：$user[location]</li>
+				<li>签名：$user[introduce]</li>
+			</ul>
+		</dd>
+		<dd class="two">
+			<ul>
+				<li><a href="u.php?a=info&uid={$user[uid]}" target="_blank">查看个人资料</a></li>
+				<li><a href="javascript:;" onclick="return Attention.add(this,'{$user['uid']}',0)" class="s7 follow">加关注</a></li>
+				<li><a href="message.php?type=post&username={$user[username]}" target="_blank">发消息</a></li>
+				<li><a href="{$db_userurl}{$user[uid]}" target="_blank">去TA家</a></li>
+			</ul>
+		</dd>
+	</dl>
+<!-- 
+EOT;
+}
+print <<<EOT
+-->
+</div>
+<div style="padding:10px 0 0 0;" class="cc">
+ $pager
+</div>
+<!--
+EOT;
+require printEOT('searcher_searchinput');
+print <<<EOT
+-->
+
+<!--
+EOT;
+} elseif ($type == "diary" && $diarys) {
+print <<<EOT
+-->
+	<div class="list_main list_main_no">
+	<div class="list_content">
+		<table width="100%" cellpadding="0" cellspacing="0" height="300"><tr><td valign="top">
+		<div class="dlA">
+<!-- 
+EOT;
+foreach($diarys as $diary){
+$diary[dtid] = $diary[dtid] == 0 ? '-1' : $diary[dtid];
+print <<<EOT
+-->    
+
+			<dl>
+				<dt><a href="apps.php?q=diary&uid={$diary[uid]}&a=detail&did={$diary[did]}" class="tlink" target="_blank">$diary[subject]</a></dt>
+				<dd>
+					<div class="num"></div>
+					<div class="text">$diary[content]</div>
+					<div class="riji_author">作者：<a href="{$db_userurl}{$diary[uid]}" target="_blank" class="mr20">$diary[username]</a>查看：$diary[r_num]<span>|</span>回复：$diary[c_num]<span>|</span>发布时间：<cite>$diary[postdate]</cite></div>
+				</dd>
+			</dl>
+
+<!-- 
+EOT;
+}
+print <<<EOT
+-->  			
+			
+			
+			<div class="mb20">
+			<div class="pages">
+                   $pager
+                </div>
+				<div class="c"></div>
+			</div>
+		</div>
+<!--
+EOT;
+require printEOT('searcher_searchinput');
+print <<<EOT
+-->
+		</td></tr></table>
+	</div>
+<div class="list_sideBar">
+<!--
+EOT;
+list($htmlAdvert,$arrayAdvert) = pwAdvert('Site.Search.Diary.Right','');
+if($htmlAdvert){print <<<EOT
+-->
+<div style="height:200px;width:200px;">
+<div class="tac mb5">$htmlAdvert</div>
+</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+<!--
+EOT;
+if($hotwords){
+print <<<EOT
+-->     
+						<div class="list_box">
+							<h2><a>热门搜索</a></h2>
+							<ul>
+<!-- 
+EOT;
+foreach($hotwords as $hotword){
+print <<<EOT
+-->
+								<li><a href="searcher.php?keyword={$hotword}&type=diary">$hotword</a></li>
+<!-- 
+EOT;
+}
+print <<<EOT
+--> 
+								
+							</ul>
+						</div>
+<!-- 
+EOT;
+}
+print <<<EOT
+-->
+	</div>
+	<div class="c"></div>
+</div>
+<!--
+EOT;
+} elseif ($type == "group" && $groups) {
+print <<<EOT
+-->
+	<table width="100%" cellpadding="0" cellspacing="0"><tr><td valign="top" height="300">
+	<div class="forum_main">
+<!--
+EOT;
+foreach($groups as $group){
+print <<<EOT
+-->
+		<dl class="cc" style="height:85px;">
+			<dt><a href="apps.php?q=group&cyid={$group[id]}" target="_blank"><img class="img" width="60" height="60" src="$group[cnimg]"></a></dt>
+			<dd>
+				<div class="name"><a href="apps.php?q=group&cyid={$group[id]}" target="_blank" class="f16 b">$group[cname]</a></div>
+				<div class="seahr"></div>
+				<div class="text">$group[descrip]</div>
+				<div class="info">分类：$group[sname]，成员：$group[members]，积分：$group[credit]，更新：$group[createtime]</div>
+			</dd>
+		</dl>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+	</div>
+	<div style="padding:10px 0 20px 20px;">
+	$pager
+	</div>
+	<div style="padding-left:20px;">
+<!--
+EOT;
+require printEOT('searcher_searchinput');
+print <<<EOT
+-->
+	</div>
+	</td></tr></table>
+<!--
+EOT;
+} elseif ($type == 'forum' && $forums) {
+print <<<EOT
+-->
+<table width="100%" cellpadding="0" cellspacing="0"><tr><td valign="top" height="300">
+<div class="forum_main">
+<!-- 
+EOT;
+foreach($forums as $forum){
+print <<<EOT
+-->
+	<dl class="cc">
+		<dt><a href="thread.php?fid={$forum[fid]}" target="_blank"><img src="$forum[logo]"></a></dt>
+		<dd>
+			<div class="name cc"><a href="thread.php?fid={$forum[fid]}" class="f14 b" target="_blank">$forum[name]</a>
+			<span id="favorforum{$forum[fid]}">
+<!--
+EOT;
+if ($forum['favor']) {print <<<EOT
+-->
+			<a href="javascript:favorforum($forum[fid]);" class="keepon" title="将本版块移出我的书签">取消收藏</a>
+<!--
+EOT;
+} else {print <<<EOT
+-->
+			<a href="javascript:favorforum($forum[fid]);" class="keep" title="将本版块添加到我的书签">收藏本版</a>
+<!--
+EOT;
+}
+
+$forum[descrip_sub] = substrs($forum[descrip],120);
+$forum[descrip_title] = strip_tags($forum[descrip]);
+print <<<EOT
+-->
+</span>
+			</div>
+			<div title="$forum[descrip_title]">$forum[descrip_sub]</div>
+			<div>
+<!--
+EOT;
+if ($forum['admin']) {print <<<EOT
+-->
+			版主：{$forum['admin']}
+<!--
+EOT;
+}print <<<EOT
+-->
+			</div>
+		</dd>
+	</dl>
+<!-- 
+EOT;
+}
+print <<<EOT
+--> 
+
+
+	<div class="c"></div>
+</div>
+</td></tr></table>
+	<div style="padding:10px 0 20px 20px;">
+	$pager
+	</div>
+	<div style="padding-left:20px;">
+<!--
+EOT;
+require printEOT('searcher_searchinput');
+print <<<EOT
+-->
+	</div>
+</div>
+<script language="JavaScript">
+function favorforum(fid) {
+	ajax.send('pw_ajax.php?action=shortcut&fid='+fid,'',function(){
+		ajax.guide();
+		var rText = ajax.request.responseText.split('	');
+		if (typeof(rText[1]) != 'undefined' && rText[1] == 'successok') {
+			getObj('favorforum'+fid).innerHTML = "<a title=\"将本版块移出我的书签\" onclick=\"javascript:favorforum("+fid+");\" class=\"keepon\">取消收藏</a>";
+		} else if (typeof(rText[1]) != 'undefined' && rText[1] == 'successno') {
+getObj('favorforum'+fid).innerHTML = "<a title=\"将本版块添加到我的书签\" onclick=\"javascript:favorforum("+fid+");\" style=\"cursor:pointer;\" class=\"keep\">收藏本版</a>";
+		
+		}
+	});
+}
+</script>
+<div class="c">&nbsp;</div>
+
+<!--
+EOT;
+} elseif ($type && $lists) {
+	require printEOT('searcher_'.$type);
+}
+} else {
+print <<<EOT
+-->
+		<div class="list_h"><a href="searcher.php?type=thread">搜索</a> &gt;	 $typeTitle</div>
+		<div class="content fl">
+        	<div class="p20 f14">
+        	<p class="f16 mb20">抱歉，没有找到相关的{$typeTitle}。 </p>
+            <p class="mb10">相关建议：</p> 
+            <p class="mb5">&nbsp;&nbsp;&nbsp;看看输入的文字是否有误</p>
+            <p class="mb5">&nbsp;&nbsp;&nbsp;去掉可能不必要的字词，如“的”、“什么”等</p>
+			</div>
+    </div>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+</div>
+<!--
+EOT;
+?>-->

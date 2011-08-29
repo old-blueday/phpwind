@@ -134,17 +134,18 @@ var portal = {
 	},
 	
 	initFormPushkey : function(){
+		var pushkeybutton = this.$("pushkeybutton");
 		var pushkey = this.$("pushkey");
 		if(pushkey){
 			var _this = this;
-			pushkey.onblur = function(){
-				if("" == this.value){
+			pushkeybutton.onclick = function(){
+				if("" == pushkey.value){
 					return ;
 				}
 				var channelId = _this.$(_this.channel).value;
 				var invoke = _this.$(_this.invoke).value;
 				var subinvoke = _this.$(_this.subinvoke).value;
-				var data = "&channelid="+channelId+"&invoke="+invoke+"&ifpush=4&subinvoke="+subinvoke+"&selid="+this.value;
+				var data = "&channelid="+channelId+"&invoke="+invoke+"&ifpush=4&subinvoke="+subinvoke+"&selid="+pushkey.value;
 				_this.getGrade(data,"fetch");
 			};
 		}

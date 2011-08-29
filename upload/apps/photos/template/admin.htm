@@ -2,15 +2,16 @@
 include_once PrintEot('left');
 print<<<EOT
 -->
-<h2 class="h1 mb10"><a href="$admin_file?adminjob=app&admintype=appslist">返回基础应用列表</a></h2>
+<!-- <h2 class="h1 mb10"><a href="$admin_file?adminjob=app&admintype=appslist">返回基础应用列表</a></h2> -->
 <!--
 EOT;
 if(!$action){print <<<EOT
 -->
 <div class="nav3 mb10">
-  <ul class="cc">
-    <li class="current"><a href="$basename">相册设置</a></li>
-  </ul>
+	<ul class="cc">
+		<li class="current"><a href="$basename">相册设置</a></li>
+		<li><a href="$admin_file?adminjob=apps&admintype=photos_manage" onclick="openNewUrl('photos_manage','相册管理',this.href);return false;">内容管理</a></li>
+	</ul>
 </div>
 <form action="$basename&" method="post">
   <input type="hidden" name="step" value="3">
@@ -27,7 +28,7 @@ if(!$action){print <<<EOT
           </ul>
         </div>
 		</td>
-       <td class="td2"><!--<span class="xia2">相册功能:</span>--></td>
+       <td class="td2"><div class="help_a">开启后，相册功能才可以使用</div></td>
     </tr>
     <tr class="tr1 vt">
       <td class="td1">验证码</td>
@@ -39,7 +40,7 @@ if(!$action){print <<<EOT
                     </ul>
                 </div>
 		</td>
-        <td class="td2"><!--<span class="xia2">验证码:</span>--></td>
+        <td class="td2"><div class="help_a">开启后，创建相册时需要填写验证码</div></td>
     </tr>
     <tr class="tr1 vt">
       <td class="td1">验证问题</td>
@@ -51,23 +52,23 @@ if(!$action){print <<<EOT
                     </ul>
                 </div>
 		</td>
-       <td class="td2"><!--<span class="xia2">验证问题:</span>--></td>
+       <td class="td2"><div class="help_a">开启后，创建相册时需要填写验证问题</div></td>
     </tr>
     <tr class="tr1 vt">
       <td class="td1">允许创建相册的用户组</td>
       <td class="td2">$creategroup</td>
-      <td class="td2"><!--<span class="xia2">允许创建相册的用户组:</span><br />全不选为任何用户组可创建相册--></td>
+      <td class="td2"><div class="help_a">指定可以使用的相册功能的用户组</div></td>
     </tr>
     <tr class="tr1 vt">
       <td class="td1">会员可以创建的相册数</td>
       <td class="td2"><input name="config[albumnum2]" value="$o_albumnum2" class="input input_wa" maxlength="8" /></td>
-      <td class="td2"><!--<span class="xia2">每个会员可以创建的相册数:</span>--></td>
+      <td class="td2"><div class="help_a">指定每个会员可以创建的相册数量上限</div></td>
     </tr>
     <tr class="tr1 vt">
       <td class="td1">相册最多可容纳的照片数</td>
-      <td class="td2"><input name="config[maxphotonum]" value="$o_maxphotonum" class="input input_wa mr20" maxlength="8" />(不适合太大，建议值:20-30)
+      <td class="td2"><input name="config[maxphotonum]" value="$o_maxphotonum" class="input input_wa mr20" maxlength="8" />
       </td>
-       <td class="td2"><!--<span class="xia2">每个相册最多可容纳的照片数:</span>--></td>
+       <td class="td2"><div class="help_a">指定每个相册可以容纳的照片数上限(不适合太大，建议值:20-30)</div></td>
     </tr>
     <tr class="tr1 vt">
       <td class="td1">相册分目录建立标准</td>
@@ -78,12 +79,12 @@ if(!$action){print <<<EOT
               <li><input type="radio" name="config[mkdir]" value="3" $mkdir3 />按群组ID存入不同目录</li>
           </ul>
         </td>
-        <td class="td2"><!--<span class="xia2">相册分目录建立标准:</span>--></td>
+        <td class="td2"><div class="help_a"><!--相册分目录建立标准--></div></td>
     </tr>
     <tr class="tr1 vt">
-      <td class="td1">图片最大尺寸[k]</td>
+      <td class="td1">图片最大尺寸[KB]</td>
       <td class="td2"><input name="config[maxfilesize]" value="$o_maxfilesize" class="input input_wa" maxlength="8" /></td>
-      <td class="td2"><!--<span class="xia2">上传单张图片的最大尺寸:（单位k）</span>--></td>
+      <td class="td2"><div class="help_a">上传的每张照片允许的最大尺寸，单位为KB</div></td>
     </tr>
   </table>
   </div>
@@ -183,14 +184,37 @@ if ($job == 'edit'){print <<<EOT
     <tr class="tr1 vt">
     <td class="td1">可见度</td>
     <td class="td2">
-    <select name="private" class="select_wa">
+    <select name="private" class="select_wa" onchange="optionsel(this.value)">
     <option value="0" $private_0>全站可见</option>
     <option value="1" $private_1>仅好友可见</option>
     <option value="2" $private_2>仅自己可见</option>
     <option value="3" $private_3>需要密码访问</option>
-    </select>
+    </select>&nbsp;&nbsp;&nbsp;&nbsp;
+<!--
+EOT;
+if($album['private'] == 3){print <<<EOT
+-->	
+<a href="javascript:;" onclick="optionsel(3)">重设密码</a>
+<!--
+EOT;
+}print <<<EOT
+-->	
     </td>
     </tr>
+	<tbody id="photopwd"  style="display:none;">
+	<tr tr1 vt>
+		<th class="td1">输入密码</th>
+		<td class="td2">
+			<input type="password" name="pwd"  class="input_wa input mr10" id="pwdinfo" /><span id="pwdinfo_warn" class="gray">最小长度:3 最大长度:15</span>
+		</td>
+	</tr>
+	<tr>
+		<td class="td1">确认密码</td>
+		<td class="td2">
+			<input type="password" name="repwd" class="input input_wa" />
+		</td>
+	</tr>
+	</tbody>
   </table>
   </div>
   <div class="mb10 tac">
@@ -198,6 +222,19 @@ if ($job == 'edit'){print <<<EOT
     <span class="bt"><span><button type="button" onclick="javascript:history.go(-1);">返 回</button></span></span>
    </div>
 </form>
+<script language="javascript" type="text/javascript">
+	function optionsel(id) {
+		pwdobj = getObj('photopwd');
+		if (isNaN(id)) {
+			showDialog('error','非法操作');
+		}
+		if (id == '3') {
+			pwdobj.style.display = '';
+		} else {
+			pwdobj.style.display = 'none';
+		}
+	}
+</script>
 <!--
 EOT;
 }else{print <<<EOT
@@ -224,14 +261,14 @@ EOT;
     <tr class="tr1 vt">
       <td class="td1">发表日期</td>
       <td class="td2">
-       <div class="input_img fl"><i onclick="this.nextSibling.onclick()" class="input_time" title="选择时间">选择时间</i><input type="text" name="crtime_s" value="$crttimeStartString" id="crtime_s" onclick="javascript:ShowCalendar(this.id)"></div><span class="p_lr_10 fl">至</span><div class="input_img fl"><i class="input_time" title="选择时间">选择时间</i><input type="text" name="crtime_e" id="crtime_e" value="$crttimeEndString" onclick="javascript:ShowCalendar(this.id)"></div>
+       <div class="input_img fl"><i onclick="this.nextSibling.onclick()" class="input_time" title="选择时间">选择时间</i><input type="text" name="crtime_s" value="$crttimeStartString" id="crtime_s" onclick="javascript:ShowCalendar(this.id)"></div><span class="p_lr_10 fl">至</span><div class="input_img fl"><i class="input_time" onclick="this.nextSibling.onclick()" title="选择时间">选择时间</i><input type="text" name="crtime_e" id="crtime_e" value="$crttimeEndString" onclick="javascript:ShowCalendar(this.id)"></div>
         </td>
         <td class="td2"><!--发表日期--></td>
     </tr>
     <tr class="tr1 vt">
       <td class="td1">最后更新日期</td>
       <td class="td2">
-      <div class="input_img fl"><i onclick="this.nextSibling.onclick()" class="input_time" title="选择时间">选择时间</i> <input type="text" name="lasttime_s" id="lasttime_s" value="$lasttimeStartString" onclick="javascript:ShowCalendar(this.id)"></div><span class="p_lr_10 fl">至</span><div class="input_img fl"><i class="input_time" title="选择时间">选择时间</i><input type="text" name="lasttime_e" id="lasttime_e" value="$lasttimeEndString" onclick="javascript:ShowCalendar(this.id)"></div>
+      <div class="input_img fl"><i onclick="javascript:ShowCalendar('lasttime_s')" class="input_time" title="选择时间">选择时间</i> <input type="text" name="lasttime_s" id="lasttime_s" value="$lasttimeStartString" onclick="javascript:ShowCalendar(this.id)"></div><span class="p_lr_10 fl">至</span><div class="input_img fl"><i class="input_time" onclick="this.nextSibling.onclick()" title="选择时间">选择时间</i><input type="text" name="lasttime_e" id="lasttime_e" value="$lasttimeEndString" onclick="javascript:ShowCalendar(this.id)"></div>
         </td>
         <td class="td2"><!--最后更新日期--></td>
     </tr>
@@ -267,7 +304,9 @@ EOT;
 <script type="text/javascript">
 getObj('advanceSearchButton').onclick = function() {
 	displayElement('advanceSearchBody','advanceSearchButton');
-	getObj('searchDisplay').value = getObj('advanceSearchBody').style.display;
+	if(getObj('searchDisplay')){
+		getObj('searchDisplay').value = getObj('advanceSearchBody').style.display;
+	}
 };
 </script>
 
@@ -288,7 +327,7 @@ getObj('advanceSearchButton').onclick = function() {
   <div class="admin_table mb10">
   <table width="100%" cellspacing="0" cellpadding="0">
     <tr class="tr2 vt td_bgB">
-      <td width="24"><span onclick="CheckAll(document.FORM)" class="cp">全选</span></td>
+      <td width="30"><span onclick="CheckAll(document.FORM)" class="cp">全选</span></td>
       <td>标题</td>
       <td>作者</td>
       <td>发表时间</td>
@@ -312,7 +351,7 @@ print <<<EOT
     <tr class="tr1 vt">
       <td class="td2"><input type="checkbox" name="selid[]" value="$album[aid]"></td>
       <td class="td2"><a href="apps.php?q=photos&uid=$album[ownerid]&a=album&aid=$album[aid]" target="_blank" title="$album[aname]">$album[s_aname]</a></td>
-      <td class="td2"><a href="u.php?uid=$album[ownerid]" target="_blank">$album[owner]</a></td>
+      <td class="td2"><a href="{$db_userurl}$album[ownerid]" target="_blank">$album[owner]</a></td>
       <td class="td2">$album[crtime]</td>
       <td class="td2">$album[lasttime]</td>
       <td class="td2">
@@ -352,6 +391,7 @@ EOT;
   </div>
   <div class="cc">$pages</div>
   <div class="mb10 tac">
+	<span class="bt"><span><button type="button" onclick="CheckAll(document.FORM)">全 选</button></span></span>
     <span class="btn"><span><button type="submit" name="button" onclick="return Checkdel();">删除</button></span></span>
    </div>
 </form>
@@ -408,7 +448,7 @@ print <<<EOT
     <tr class="tr1 vt">
       <td class="td1">上传日期</td>
       <td class="td2">
-       <div class="input_img fl"><i onclick="this.nextSibling.onclick()" class="input_time" title="选择时间">选择时间</i><input type="text" name="uptime_s" value="$uptimeStartString" id="uptime_s" onclick="javascript:ShowCalendar(this.id)"></div><span class="p_lr_10 fl">至</span><div class="input_img fl"><i class="input_time" title="选择时间">选择时间</i><input type="text" name="uptime_e" id="uptime_e" value="$uptimeEndString" onclick="javascript:ShowCalendar(this.id)"></div>
+       <div class="input_img fl"><i onclick="this.nextSibling.onclick()" class="input_time" title="选择时间">选择时间</i><input type="text" name="uptime_s" value="$uptimeStartString" id="uptime_s" onclick="javascript:ShowCalendar(this.id)"></div><span class="p_lr_10 fl">至</span><div class="input_img fl"><i class="input_time" onclick="this.nextSibling.onclick()" title="选择时间">选择时间</i><input type="text" name="uptime_e" id="uptime_e" value="$uptimeEndString" onclick="javascript:ShowCalendar(this.id)"></div>
         </td>
         <td class="td2"><!--上传日期--></td>
     </tr>
@@ -435,8 +475,9 @@ print <<<EOT
 </form>
 
 <style>
-.admin_appimg li{float:left;width:150px;height:200px;line-height:18px;}
-.admin_appimg li img{width:100px;height:100px;padding:5px;border:1px solid #ccc;background:#fff;margin-bottom:3px;}
+.admin_appimg li{float:left;width:150px;height:200px;line-height:18px; text-align:center;}
+.admin_appimg li a.aimg{width:100px;height:100px;padding:5px;border:1px solid #ccc;background:#fff;margin-bottom:3px;display:block;line-height:100px;}
+.admin_appimg li img{margin-top:expression((100 - this.height )/2);}
 </style>
 <form action="$basename&action=photos&" method="post">
   <input type="hidden" name="job" value="delete">
@@ -466,9 +507,9 @@ EOT;
 EOT;
 foreach ($cnpho as $key => $photo) {print <<<EOT
 -->
-      <li> <a href="apps.php?q=photos&a=view&pid=$photo[pid]" target="_blank"><img src="$photo[path]" width="100" height="100" title="$photo[aname]"/> </a>
+      <li><a href="apps.php?q=photos&a=view&pid=$photo[pid]" target="_blank" class="aimg"><img src="$photo[path]" title="$photo[aname]"/> </a>
         <p>所属相册:<a href="$basename&action=photos&job=list&aid=$photo[aid]" title="$photo[aname]">$photo[s_aname]</a></p>
-        <p> <a href="$admin_file?adminjob=mode&admintype=o_comments&job=list&type=photo&typeid=$photo[pid]" onclick="parent.PW.Dialog({id:'o_comments',url:'$admin_file?adminjob=mode&admintype=o_comments&job=list&type=photo&typeid=$photo[pid]',name:'评论管理'});return false;">照片评论（$photo[c_num]）</a></p>
+        <p> <a href="$admin_file?adminjob=mode&admintype=o_comments&job=list&type=photo&typeid=$photo[pid]" onclick="openNewUrl('o_comments','评论管理',this.href);return false;">照片评论（$photo[c_num]）</a></p>
         <p>选中
           <input type="checkbox" name="selid[]" value="$photo[pid]">
         </p>

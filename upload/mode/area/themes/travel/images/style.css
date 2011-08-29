@@ -42,8 +42,8 @@ strong{font-weight:bold}
 .pwSlide .SwitchNav li.current{padding:0; height:12px; width:13px;}
 .pwSlide .SwitchNav li.current a{background-position:-13px 0}
 
-.sideT{background:url(bg_bar.png) no-repeat 0 0;height:7px;overflow:hidden;}
-.sideT{background-position:left top; margin-bottom:-7px;}
+.sideT{background:url(bg_bar.png) 0 0 no-repeat;height:7px;overflow:hidden;}
+.sideT{background-position:left top; margin-bottom:-7px; position:relative;}
 .sideB{background:url(sidB.png);height:7px;overflow:hidden; margin-top:-7px;}
 
 .pane1{background:url(bg_bar.png) repeat-y -268px 0;}
@@ -129,7 +129,7 @@ strong{font-weight:bold}
 
 .imglist2{}
 .imglist2 li{width:90px; margin-right:14px; display:inline;text-align:center; float:left; line-height:21px; height:116px; overflow:hidden;}
-.imglist2 li img{margin-top:5px;}
+.imglist2 li img{margin-top:5px;display:block;}
 .imglist2 li a{color:#0d6dab}
 
 .imglist3 li{width:117px; height:121px; overflow:hidden; float:left; margin:10px 3px 2px; display:inline; text-align:center; line-height:21px;}

@@ -4,12 +4,12 @@ require_once('global.php');
 require_once(R_P.'require/header.php');
 
 $groupid == 'guest' && Showmsg('not_login');
-InitGP(array('action'));
+S::gp(array('action'));
 !$action && $action = 'mailto';
 
 if ($action == 'mailto') {
 
-	InitGP(array('uid','username'));
+	S::gp(array('uid','username'));
 	
 	$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
 	if ($username || is_numeric($uid)) {
@@ -50,7 +50,7 @@ if ($action == 'mailto') {
 			Showmsg('sendeamil_refused');
 		}
 		$sendtoemail = $userdb['email'];
-		InitGP(array('subject','atc_content','fromname','fromemail','sendtoname'));
+		S::gp(array('subject','atc_content','fromname','fromemail','sendtoname'));
 
 		if (empty($subject)) {
 			Showmsg('sendeamil_subject_limit');

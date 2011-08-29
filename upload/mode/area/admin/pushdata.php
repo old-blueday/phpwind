@@ -1,11 +1,11 @@
 <?php
 !defined('P_W') && exit('Forbidden');
 
-InitGP(array('action'));
+S::gp(array('action'));
 $invokeService = L::loadClass('invokeservice', 'area');
 $pageInvokeService = L::loadClass('pageinvokeservice', 'area');
 $pushdataService = L::loadClass('pushdataservice', 'area');
-InitGP(array('keyword','page','alias','invoke','invokepiece'));
+S::gp(array('keyword','page','alias','invoke','invokepiece'));
 
 if (!$action || $action =='viewverify') {
 	$noformat = 1;
@@ -35,7 +35,7 @@ if (!$action || $action =='viewverify') {
 	$pages = $pushdataService->searchPushdatasCount($searchArray,$page,$url);
 	include PrintMode('pushdata');exit;
 } elseif ($action=='edit') {
-	InitGP(array('pushdataid','step'));
+	S::gp(array('pushdataid','step'));
 	$editUrl = "{$basename}&page={$page}&alias={$alias}&invoke=$invoke&invokepiece={$invokepiece}";
 	$manageService = L::loadclass("AreaManage", 'area');
 	$dataSourceService = L::loadClass('datasourceservice', 'area');
@@ -70,7 +70,7 @@ if (!$action || $action =='viewverify') {
 		
 		include PrintMode('pushdata');exit;
 	} else {
-		InitGP(array('param','offset','starttime','css','ifbusiness','invokepieceid'),'GP');
+		S::gp(array('param','offset','starttime','css','ifbusiness','invokepieceid'),'GP');
 		$pushdataService = L::loadClass('pushdataservice', 'area');
 		$pushdataService->editPushdata($pushdataid,array('invokepieceid'=>$invokepieceid,'editor'=>$admin_name,'starttime'=>$starttime,'vieworder'=>$offset,'data'=>$param,'titlecss'=>$css,'ifbusiness'=>$ifbusiness,'ifverify'=>0));
 
@@ -80,7 +80,7 @@ if (!$action || $action =='viewverify') {
 } elseif($action == "fetch" ) {
 	$dataSourceService = L::loadClass('datasourceservice', 'area');
 	define('AJAX',1);
-	InitGP(array('pushdataid','invokepieceid'));
+	S::gp(array('pushdataid','invokepieceid'));
 	if (!$invokepieceid) {
 		ajax_footer();
 	}
@@ -94,24 +94,24 @@ if (!$action || $action =='viewverify') {
 	$stylename	= $pushdataService->getTitleCss($push);
 	require_once PrintMode('ajax_pushdata');ajax_footer();
 } elseif ($action=='dels') {
-	InitGP(array('selid'), '', 2);
+	S::gp(array('selid'), '', 2);
 	if (!$selid) Showmsg('请选择要删除的推送内容');
 	$pushdataService->deletePushdatas($selid);
 	adminmsg('operate_success');
 } elseif ($action=='del') {
-	InitGP(array('id'), '', 2);
+	S::gp(array('id'), '', 2);
 	define('AJAX',1);
 	$pushdataService->deletePushdata($id);
 	echo getLangInfo('msg','operate_success')."\treload";
 	ajax_footer();
 } elseif ($action=='verify') {
-	InitGP(array('id'), '', 2);
+	S::gp(array('id'), '', 2);
 	define('AJAX',1);
 	$pushdataService->verifyPushdata($id);
 	echo getLangInfo('msg','operate_success')."\treload";
 	ajax_footer();
 } elseif ($action == 'channelchange') {
-	InitGP(array('alias','ifverify'));
+	S::gp(array('alias','ifverify'));
 	define('AJAX',1);
 	$portalPageService = L::loadClass('portalpageservice', 'area');
 	

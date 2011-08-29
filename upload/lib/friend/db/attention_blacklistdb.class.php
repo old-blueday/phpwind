@@ -33,7 +33,7 @@ class PW_Attention_BlacklistDB extends BaseDB {
 		foreach ($blackList as $val) {
 			$array[] = array($uid, $val);
 		}
-		$this->_db->update("INSERT INTO " . $this->_tableName . ' (uid, touid) VALUES ' . pwSqlMulti($array));
+		$this->_db->update("INSERT INTO " . $this->_tableName . ' (uid, touid) VALUES ' . S::sqlMulti($array));
 	}
 
 	function del($uid, $blackList) {

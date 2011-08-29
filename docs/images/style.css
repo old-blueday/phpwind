@@ -42,32 +42,37 @@ form{display:inline;}
 .f24{font-size:24px;}
 .fn,.fn a{font-weight:normal}
 
-body{background:#f0efed; font-family:Verdana;height:100%;width:100%;overflow:hidden;}
+body{background:#fff; font-family:Verdana;height:100%;width:100%;overflow:hidden; }
 a{color:#336699;text-decoration:none;}
 a:hover{color:#ff5500;}
-#menubar{width:300px; position:absolute;left:0;top:0;height:100%;background:#29547f url(menubar_bg.png) right 0 repeat-y;}
-.menubar{padding:90px 15px 0 0;text-align:right;}
-#content{padding-left:300px; overflow-y:scroll;height:100%;}
-.content{padding:80px 40px 50px;line-height:2;color:#555;}
+.header{height:80px;width:100%; position:absolute;z-index:1; background:#93D5EF url(header.png) repeat-x left bottom;  }
+#menubar{width:149px; position:absolute;left:0;top:80px; bottom:0;background:#eaf2f5; border-right:1px solid #d3e2e8}
+.menubar{padding:20px 0 0 0; position:absolute; width:150px;}
+#content{position:absolute;z-index:0;left:150px;right:0;overflow:hidden;top:80px; bottom:0;}
+.content{padding:0 40px 50px;line-height:2;color:#555;}
 .content a{ white-space:nowrap;}
-.logo{padding-right:10px;}
-.logo a{background:url(logo.png) no-repeat;width:156px;height:55px;float:right;overflow:hidden;display:block;text-indent:-2000em;line-height:50000px;}
-h2{ font-size:16px;color:#336699; font-weight:700;padding-left:20px;}
-h3{ font-size:14px;color:#000000; font-weight:700;}
-.div_hr{border-bottom:1px solid #fff;height:1px;overflow:hidden;background:#d0ceca;margin:10px 0;}
-.box{padding:5px 20px; font-size:12px;}
-.box2{padding:30px 0 20px 0; font-size:12px;text-align:center;}
-.nav{padding:30px 5px 0 0;}
-.nav ul{float:right;}
-.nav li{line-height:24px;height:24px;width:100px; overflow:hidden;}
-.nav ul li{list-style-type:none;}
-.nav li a{color:#fff;display:block;padding:0 15px;margin:2px;}
-.nav li a:hover{background:#174471;}
-.nav .current{border:1px solid #34608c;background:#174471;padding:1px;}
-.nav .current a{border:1px solid #7aa7d3;background:#5386b9;height:22x;line-height:22px;padding:0 13px;margin:0;}
-.bottom{padding:30px 40px; font-size:11px;color:#999; font-family:Arial;}
-.footer{color:#bfd4ea; position:absolute;bottom:25px;right:25px; text-align:right;}
+.content td{padding:0 5px;_padding:5px;font-size:12px }
+.space_bottom,.space_top{height:10px; background:#fff;left:150px;right:20px;position:absolute;z-index:1;}
+.space_bottom{bottom:0}
+.space_top{top:80px}
 
-ul { color: #666666; margin-left:10px;padding-bottom: 14px; }
-li { margin-left:5px; line-height: 1.8em; }
-ul li{list-style-type:disc;}
+.logo{padding-left:10px;}
+.logo a{background:url(logo.png) no-repeat center 5px;width:350px;height:80px;float:left;overflow:hidden;display:block;text-indent:-2000em;line-height:50000px;}
+h2{ font-size:16px;color:#336699; font-weight:700;padding-left:20px;}
+.div_hr{border-bottom:1px solid #fff;height:1px;overflow:hidden;background:#d0ceca;margin:10px 0;}
+.box{padding:5px 20px;}
+.box p{text-indent:2em;}
+.nav{float:left; width:100%}
+.nav ul{float:left; width:140px; padding-left:10px}
+.nav li{line-height:30px;height:30px;overflow:hidden;}
+.nav li a{color:#333;display:block;padding:0 15px;margin:2px 1px; }
+.nav li a:hover{background:#dde9ed;}
+.nav li div{display:none;}
+.nav .current{height:auto;}
+.nav .current a,.nav .current a:hover{background:#fff;height:28x;line-height:28px;padding:0 13px;margin: 0; color:#F30;border:1px solid #d3e2e8; border-right-color:#fff;width:141px}
+.nav .current div{display:block;}
+.nav .current div a{background:none;border:0;color:#336699;padding:0 13px 0 26px;}
+.nav .current div a:hover{border:0;background:#dde9ed;padding:0 13px 0 26px;color:#333;}
+
+.bottom{padding:30px 40px; font-size:11px;color:#999; font-family:Arial;}
+.companyinfo{color:#bfd4ea; position:absolute;top:30px;right:15px; text-align:right; z-index:3}

@@ -52,7 +52,7 @@ EOT;
 print <<<EOT
 -->				
 					<dl class="dl cc">
-						<dt class="dt"><a href="u.php?uid={$value['uid']}"><img class="img" src="{$value['icon']}" alt="{$value['username']}" width="44" height="44" /></a></dt>
+						<dt class="dt"><a href="{$db_userurl}{$value['uid']}"><img class="img" src="{$value['icon']}" alt="{$value['username']}" width="44" height="44" /></a></dt>
 						<dd class="dd">
 <!--
 EOT;
@@ -63,7 +63,7 @@ EOT;
 EOT;
 			}print <<<EOT
 -->
-							<div class="title"><a href="u.php?uid={$value['uid']}">{$value['username']}</a>{$value['content']}</div>
+							<div class="title"><a href="{$db_userurl}{$value['uid']}">{$value['username']}</a>{$value['content']}</div>
 							<div class="gray cc">
 <!--
 EOT;
@@ -133,7 +133,7 @@ EOT;
 	}
 } elseif ($do == 'transmit') {print <<<EOT
 -->
-<form action="apps.php?q=weibo&do=transmit&ajax=1&mid=$mid" onSubmit="return false;" method="post">
+<form name="transmitform" id="transmitform" action="apps.php?q=weibo&do=transmit&ajax=1&mid=$mid" onSubmit="return false;" method="post">
 <input type="hidden" name="step" value="3" />
 <div style="width:365px">
 	<div class="popTop" onmousedown="read.move(event);" style="cursor:move"><span class="adel cp" onclick="closep();">关闭</span>转发到我的新鲜事</div>
@@ -154,10 +154,15 @@ print <<<EOT
 			{$showInfo['content']}
 <!--
 EOT;
-}print <<<EOT
+}
+$defaultString = '顺便说点什么吧..';
+if(!$dString){
+	$dString = $defaultString;
+}
+print <<<EOT
 -->
 		</div>
-		<textarea id="atc_content" name="atc_content" class="textareaA mb5" onkeyup="wordlength(this, 255, 'counter_{$id}')">$dString</textarea>
+		<textarea id="atc_content" name="atc_content" class="textareaA mb5" onkeyup="wordlength(this, 255, 'counter_{$id}')" onkeydown = "ctrlEnter(event,getObj('transmitform'),transmitWeiboSubmitForm)">$dString</textarea>
 		<div class="cc">
 			<span onclick="showcommentsmile(this, 'atc_content', 'counter_{$id}')" class="sk_show cp" id="showSmile">表情</span>
 <!--
@@ -171,6 +176,25 @@ EOT;
 -->
 			<div id="counter_{$id}">你还可以输入<em>255</em>个字符</div>
 		</div>
+<!-- 
+EOT;
+if($defaultString == $dString){
+	print <<<EOT
+-->
+	<script>
+		var atc_content = getObj('atc_content');
+		var defaultString = '$defaultString';
+		atc_content.style.color = 'gray';
+		atc_content.onclick = function(){
+			if(atc_content.innerHTML == defaultString)
+			atc_content.innerHTML = '';
+		}
+	</script>
+<!--
+EOT;
+}
+print <<<EOT
+-->
   </div>
 	<div class="popBottom"><span class="btn2"><span>
     <button type="button" name="ajaxsubmit" onclick="transmitWeiboSubmitForm(this.form,'1','{$weibo['uid']}');">提 交</button>
@@ -197,7 +221,7 @@ print <<<EOT
 		<input type="hidden" name="subdo" value="$do" />
 		<input type="hidden" name="ifreplay" value="0" />
 		<dl class="cc dlA" style="border:none;">
-			<dt class="dtA"><a href="u.php?uid=$winduid"><img class="img" src="$face" alt="$windid" width="35" height="35" /></a></dt>
+			<dt class="dtA"><a href="{$db_userurl}$winduid"><img class="img" src="$face" alt="$windid" width="35" height="35" /></a></dt>
 			<dd class="ddA">
 				<p class="mb10"><textarea name="writeContent" id="writeContent_{$id}" onkeyup="wordlength(this, 255, 'counter_{$id}')" onkeydown = "ctrlEnter(event,getObj('FORM_{$id}'),postcomment)">$replayusername</textarea></p>
 				<p class="cc mb10">
@@ -208,13 +232,13 @@ EOT;
 if($iftransmitweibo && $o_weibopost != '0'){
 print <<<EOT
 -->						
-					<label class="fr mr20"><input name="ifsendweibo"  type="checkbox" value="1">&nbsp;同时转发到新鲜事</label>
+					<label class="fr mr5"><input name="ifsendweibo"  type="checkbox" value="1">&nbsp;同时转发到新鲜事</label>
 <!--
 EOT;
 }
 print <<<EOT
 -->						
-					<span class="fr mr20 gray" id="counter_{$id}">你还可以输入<em>255</em>个字节</span>
+					<span class="fr mr5 gray" id="counter_{$id}">你还可以输入<em>255</em>个字节</span>
 				</p>
 			</dd>
 		</dl>
@@ -225,7 +249,7 @@ foreach($commentList as $value){
 print <<<EOT
 -->		
 		<dl class="cc dlA">
-			<dt class="dtA"><a href="u.php?uid={$value['uid']}"><img class="img" src="{$value['icon']}" alt="{$value['username']}" width="35" height="35" /></a></dt>
+			<dt class="dtA"><a href="{$db_userurl}{$value['uid']}"><img class="img" src="{$value['icon']}" alt="{$value['username']}" width="35" height="35" /></a></dt>
 			<dd class="ddA">
 <!--
 EOT;
@@ -244,7 +268,7 @@ EOT;
 }
 print <<<EOT
 -->					
-				<p class="titleA"><a href="u.php?uid={$value['uid']}">{$value['username']}</a>：<span class="mr20">{$value['content']}</span><span class="w gray" title="{$value['postdate_s']}">{$value['lastdate']}</span></p>
+				<p class="titleA"><a href="{$db_userurl}{$value['uid']}">{$value['username']}</a>：<span class="mr20">{$value['content']}</span><span class="w gray" title="{$value['postdate_s']}">{$value['lastdate']}</span></p>
 			</dd>
 		</dl>
 <!--

@@ -1,5 +1,6 @@
 <?php
-!defined('M_P') && exit('Forbidden');
+!defined('P_W') && exit('Forbidden');
+!defined('CMS_BASEURL') && define("CMS_BASEURL", "index.php?m=cms&");;
 
 /**
  * @param string $_page 当前页面信息(list,view)
@@ -46,28 +47,19 @@ function getPostPurview($username, $_G) {
  * @param unknown_type $cid
  * @return string|string|string|boolean
  */
-function checkEditPurview($name, $cid) {
+function checkEditPurview($name, $cid='') {
 	if (isGM($name)) return true;
 	if (!$name) return false;
 	$cms_editadmin = L::config('cms_editadmin', 'cms_config');
-	if (!$cms_editadmin) return false;
+	if (!S::isArray($cms_editadmin)) return false;
 	if (empty($cid)) {
 		$_keys = array_keys($cms_editadmin);
 		foreach ($_keys as $key) {
-			if (in_array($name, $cms_editadmin[$key])) return true;
+			if (S::inArray($name, $cms_editadmin[$key])) return true;
 		}
 		return false;
 	}
-	return in_array($name, $cms_editadmin[$cid]);
-}
-
-function updateArticleHitsDatanalyse($aid, $cid, $num) {
-	$articleService = C::loadClass('articleservice');
-	/* @var $articleService PW_ArticleService */
-	$articleService->updateArticleHits($aid);
-	if (((int) $num % 13) == 0) {
-		updateDatanalyse($aid, 'article_' . $cid, (int) $num, true);
-	}
+	return S::inArray($name, $cms_editadmin[$cid]);
 }
 
 /**
@@ -76,20 +68,20 @@ function updateArticleHitsDatanalyse($aid, $cid, $num) {
  * @param $id
  * @param $columns
  */
-function getPosition($cid, $id = 0, $columns = array()) {
+function getPosition($cid, $id = 0, $columns = array(), $cms_sitename = '') {
 	if (!$columns) {
 		$columnService = C::loadClass('columnservice');
 		$columns = $columnService->findAllColumns();
 	}
-	$postion = '<a href="index.php?m=cms" class="b">首页</a> ';
-	if (!$cid) {return $postion . '&raquo; 文章列表';}
+	$postion = $cms_sitename ? "<a href='index.php?m=cms'>$cms_sitename</a>":'<a href="index.php?m=cms">首页</a>';
+	if (!$cid) {return $postion . '&gt; 文章列表';}
 	$columnLists = getColumnList($columns, $cid);
-	
+
 	foreach ($columnLists as $value) {
-		$postion .= '&raquo; <a href="' . getColumnUrl($value['column_id']) . '">' . $value['name'] . '</a> ';
+		$postion .= '&gt; <a href="' . getColumnUrl($value['column_id']) . '">' . $value['name'] . '</a> ';
 	}
 	if (!$id) {return $postion;}
-	return $postion . '&raquo; 正文内容';
+	return $postion . '> 正文内容';
 }
 
 /**
@@ -97,7 +89,8 @@ function getPosition($cid, $id = 0, $columns = array()) {
  * @param unknown_type $cid
  */
 function getColumnUrl($cid) {
-	return 'mode.php?m=cms&q=list&column=' . $cid;
+	$cid = (int) $cid;
+	return CMS_BASEURL.'q=list&column=' . $cid;
 }
 
 /**
@@ -105,7 +98,8 @@ function getColumnUrl($cid) {
  * @param $id
  */
 function getArticleUrl($id) {
-	return 'mode.php?m=cms&q=view&id=' . $id;
+	$id = (int) $id;
+	return CMS_BASEURL.'q=view&id=' . $id;
 }
 
 function getColumnList($columns, $cid) {
@@ -145,7 +139,7 @@ function updateArticleHits() {
 			}
 			unset($hitarray, $hits, $hits_a);
 		}
-		P_unlink($hitfile);
+		pwCache::deleteData($hitfile);
 	}
 }
 

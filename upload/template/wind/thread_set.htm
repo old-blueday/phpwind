@@ -447,7 +447,7 @@ foreach ($groupManager as $key => $value) {print <<<EOT
 			<tr>
 				<td width="45px"><input name="newmanager" type="radio" value="{$value['uid']}" /></td>
 				<td class="p10" width="70"><a href="javascript:;" class="img_50"><img src="$value[faceurl]" width="48" height="48" /></a></td>
-				<td width="215px"><a href="u.php?uid=$value[uid]" target="_blank">$value[username]</a><p class="s2">管理员</p></td>
+				<td width="215px"><a href="{$db_userurl}$value[uid]" target="_blank">$value[username]</a><p class="s2">管理员</p></td>
 				<!--td  width="210px" class="s6">最后发言：2010-12-12</td-->
 				<td><p><a href="pw_ajax.php?action=msg&touid=$value[uid]" onclick="return ajaxurl(this);">发送短信</a></p><p><a href="pw_ajax.php?action=addfriend&touid=$value[uid]" onclick="return ajaxurl(this);">加为好友</a></p>
               </td>

@@ -1,0 +1,79 @@
+<!--<?php
+include_once PrintEot('left');print <<<EOT
+-->
+<form action="$basename" method="post">
+<input type="hidden" name="step" value="2" />
+<h2 class="h1">论坛设置</h2>
+<div class="admin_table mb10">
+	<table width="100%" cellspacing="0" cellpadding="0">
+		<tr class="tr1 vt">
+			<td class="td1">站点默认风格</td>
+			<td class="td2"><select name="config[defaultstyle]" class="select_wa">$sltstyles</select></td>
+			<td class="td2"><div class="help_a">选择论坛模式默认风格。用户在没有指定风格的时候，均使用默认风格</div></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">左右分栏设置</td>
+			<td class="td2">
+				<select name="config[columns]" class="select_wa">
+					<option value="2" $columns_2>开启，默认使用分栏模式</option>
+					<option value="1" $columns_1>开启，默认使用平板模式</option>
+					<option value="0" $columns_0>关闭左右分栏</option>
+				</select>
+			</td>
+			<td class="td2"><div class="help_a">左右分栏的开关，开启后可选择分栏的默认模式</div></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">文字广告列数</td>
+			<td class="td2"><input name="config[txtadnum]" value="$db_txtadnum" class="input input_wa" /></td>
+			<td class="td2"><div class="help_a">设置文字广告位的显示列数。0表示不限制，只有1列</div></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">副版主功能</td>
+			<td class="td2">
+				<ul class="list_A list_80">
+					<li><input type="radio" value="1" name="config[adminset]" $adminset_Y>开启</li>
+					<li><input type="radio" value="0" name="config[adminset]" $adminset_N>关闭</li>
+				</ul>
+			</td>
+			<td class="td2"><div class="help_a">开启后，可在前台的[版块管理]添加副版主。第一版主有权任命和罢免其他版主</div></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">版块快速跳转</td>
+			<td class="td2">
+				<ul class="list_A list_80">
+					<li><input type="radio" value="1" name="config[menu]" $menu_Y>开启</li>
+					<li><input type="radio" value="0" name="config[menu]" $menu_N>关闭</li>
+				</ul>
+			</td>
+			<td class="td2"><div class="help_a">开启后，可以在帖子列表页、阅读页快速跳转到别的版块</div></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">阅读页个人信息显示</td>
+			<td class="td2">
+				<ul class="list_A list_80">
+					<li><input type="radio" value="1" name="config[readinfo]" $readinfo_Y>开启</li>
+					<li><input type="radio" value="0" name="config[readinfo]" $readinfo_N>关闭</li>
+				</ul>
+			</td>
+			<td class="td2"><div class="help_a">开启后，帖子阅读页左栏个人信息将直接显示。关闭则出现查看站点用户信息，点击即可显示</div></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">回收站功能</td>
+			<td class="td2">
+				<ul class="list_A list_80">
+					<li><input name="config[recycle]" type="radio" value="1" $recycle_Y>开启</li>
+					<li><input name="config[recycle]" type="radio" value="0" $recycle_N>关闭</li>
+				</ul>
+			</td>
+			<td class="td2"><div class="help_a">开启后，删除的主题和回复将暂存于回收站</div></td>
+		</tr>
+	</table>
+</div>
+<div class="mb10 tac">
+	<span class="btn"><span><button type="submit"  value="提 交">提 交</button></span></span>
+</div>
+</form>
+<!--
+EOT;
+include_once PrintEot('adminbottom');
+?>-->

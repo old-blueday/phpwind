@@ -3,27 +3,27 @@
 
 function updateforum($fid,$lastinfo='') {//TODO 慢查询
 	global $db,$db_fcachenum;
-	$fm = $db->get_one("SELECT fup,type,password,allowvisit,f_type FROM pw_forums WHERE fid=".pwEscape($fid));
+	$fm = $db->get_one("SELECT fup,type,password,allowvisit,f_type FROM pw_forums WHERE fid=".S::sqlEscape($fid));
 	if ($fm['type'] != 'category') {
 		$subtopics = $subrepliess = 0;
-		$query = $db->query("SELECT fid FROM pw_forums WHERE fup=".pwEscape($fid));
+		$query = $db->query("SELECT fid FROM pw_forums WHERE fup=".S::sqlEscape($fid));
 		while ($subinfo = $db->fetch_array($query)) {
-			@extract($db->get_one("SELECT COUNT(*) AS subtopic,SUM( replies ) AS subreplies FROM pw_threads WHERE fid=".pwEscape($subinfo['fid'])." AND ifcheck='1'"));
+			@extract($db->get_one("SELECT COUNT(*) AS subtopic,SUM( replies ) AS subreplies FROM pw_threads WHERE fid=".S::sqlEscape($subinfo['fid'])." AND ifcheck='1'"));
 			$subtopics   += $subtopic;
 			$subrepliess += $subreplies;
-			$query2 = $db->query("SELECT fid FROM pw_forums WHERE fup=".pwEscape($subinfo['fid']));
+			$query2 = $db->query("SELECT fid FROM pw_forums WHERE fup=".S::sqlEscape($subinfo['fid']));
 			while ($subinfo2 = $db->fetch_array($query2)) {
-				@extract($db->get_one("SELECT COUNT(*) AS subtopic,SUM( replies ) AS subreplies FROM pw_threads WHERE fid=".pwEscape($subinfo2['fid'])." AND ifcheck='1'"));
+				@extract($db->get_one("SELECT COUNT(*) AS subtopic,SUM( replies ) AS subreplies FROM pw_threads WHERE fid=".S::sqlEscape($subinfo2['fid'])." AND ifcheck='1'"));
 				$subtopics   += $subtopic;
 				$subrepliess += $subreplies;
 			}
 		}
-		$rs       = $db->get_one("SELECT COUNT(*) AS topic,SUM( replies ) AS replies FROM pw_threads WHERE fid=".pwEscape($fid)."AND ifcheck='1' AND topped<=3");
+		$rs       = $db->get_one("SELECT COUNT(*) AS topic,SUM( replies ) AS replies FROM pw_threads WHERE fid=".S::sqlEscape($fid)."AND ifcheck='1' AND topped<=3");
 		$topic    = $rs['topic'];
 		$replies  = $rs['replies'];
 		$article  = $topic + $replies + $subtopics + $subrepliess;
 		if (!$lastinfo) {
-			$lt = $db->get_one("SELECT tid,author,postdate,lastpost,lastposter,subject FROM pw_threads WHERE fid=".pwEscape($fid)." AND topped=0 AND ifcheck=1 AND lastpost>0 ORDER BY lastpost DESC LIMIT 1");
+			$lt = $db->get_one("SELECT tid,author,postdate,lastpost,lastposter,subject FROM pw_threads WHERE fid=".S::sqlEscape($fid)." AND topped=0 AND ifcheck=1 AND lastpost>0 ORDER BY lastpost DESC LIMIT 1");
 			if ($lt['postdate'] == $lt['lastpost']) {
 				$subject = addslashes(substrs($lt['subject'],26));
 			} else {
@@ -33,13 +33,13 @@ function updateforum($fid,$lastinfo='') {//TODO 慢查询
 			$lastinfo = $lt['tid'] ? $subject."\t".$author."\t".$lt['lastpost']."\t"."read.php?tid=$lt[tid]&page=e#a" : '' ;
 		}
 		$db->update("UPDATE pw_forumdata"
-			. " SET ".pwSqlSingle(array(
+			. " SET ".S::sqlSingle(array(
 					'topic'		=> $topic,
 					'article'	=> $article,
 					'subtopic'	=> $subtopics,
 					'lastpost'	=> $lastinfo
 				))
-			. " WHERE fid=".pwEscape($fid));
+			. " WHERE fid=".S::sqlEscape($fid));
 		if ($fm['password'] != '' || $fm['allowvisit'] != '' || $fm['f_type'] == 'hidden') {
 			$lastinfo = '';
 		}
@@ -52,7 +52,7 @@ function updateforum($fid,$lastinfo='') {//TODO 慢查询
 
 function updateForumCount($fid, $topic, $replies, $tpost = 0) {
 	global $db,$db_fcachenum;
-	$fm = $db->get_one("SELECT fup,type,password,allowvisit,f_type FROM pw_forums WHERE fid=" . pwEscape($fid));
+	$fm = $db->get_one("SELECT fup,type,password,allowvisit,f_type FROM pw_forums WHERE fid=" . S::sqlEscape($fid));
 	if ($fm['type'] == 'category') {
 		return false;
 	}
@@ -62,28 +62,28 @@ function updateForumCount($fid, $topic, $replies, $tpost = 0) {
 	$tpost = intval($tpost);
 
 	$lastpost = '';
-	$lt = $db->get_one("SELECT tid,author,postdate,lastpost,lastposter,subject FROM pw_threads WHERE fid=" . pwEscape($fid) . " AND topped='0' AND ifcheck='1' AND lastpost>0 ORDER BY lastpost DESC LIMIT 1");
+	$lt = $db->get_one("SELECT tid,author,postdate,lastpost,lastposter,subject FROM pw_threads WHERE fid=" . S::sqlEscape($fid) . " AND topped='0' AND ifcheck='1' AND lastpost>0 ORDER BY lastpost DESC LIMIT 1");
 	if ($lt) {
 		if ($lt['postdate'] == $lt['lastpost']) {
 			$subject = substrs($lt['subject'], 26);
 		} else {
 			$subject = 'Re:'.substrs($lt['subject'],26);
 		}
-		$lastpost = ",lastpost=" . pwEscape($subject."\t".$lt['lastposter']."\t".$lt['lastpost']."\t"."read.php?tid=$lt[tid]&page=e#a");
+		$lastpost = ",lastpost=" . S::sqlEscape($subject."\t".$lt['lastposter']."\t".$lt['lastpost']."\t"."read.php?tid=$lt[tid]&page=e#a");
 	}
-	$db->update("UPDATE pw_forumdata SET article=article+'$article',topic=topic+'$topic',tpost=tpost+'$tpost'{$lastpost} WHERE fid=" . pwEscape($fid));
+	$db->update("UPDATE pw_forumdata SET article=article+'$article',topic=topic+'$topic',tpost=tpost+'$tpost'{$lastpost} WHERE fid=" . S::sqlEscape($fid));
 
 	if (($fm['type'] == 'sub' || $fm['type'] == 'sub2') && $fids = getUpFids($fid)) {
 		if ($fm['password'] != '' || $fm['allowvisit'] != '' || $fm['f_type'] == 'hidden') {
 			$lastpost = '';
 		}
-		$db->update("UPDATE pw_forumdata SET article=article+'$article',subtopic=subtopic+'$topic',tpost=tpost+'$tpost'{$lastpost} WHERE fid IN(" . pwImplode($fids) . ')');
+		$db->update("UPDATE pw_forumdata SET article=article+'$article',subtopic=subtopic+'$topic',tpost=tpost+'$tpost'{$lastpost} WHERE fid IN(" . S::sqlImplode($fids) . ')');
 	}
 }
 
 function getUpFids($fid) {
 	global $forum;
-	isset($forum) || include_once(D_P . 'data/bbscache/forum_cache.php');
+	isset($forum) || include_once pwCache::getPath(D_P . 'data/bbscache/forum_cache.php');
 	$upfids = array();
 	$fid = $forum[$fid]['fup'];
 	while (in_array($forum[$fid]['type'], array('sub2','sub','forum'))) {
@@ -113,7 +113,8 @@ function updateshortcut() {
 function delfcache($fid,$num) {
 	if ($num < 1) return;
 	for ($i=1;$i<=$num;$i++) {
-		P_unlink(D_P."data/bbscache/fcache_{$fid}_{$i}.php");
+		//* P_unlink(D_P."data/bbscache/fcache_{$fid}_{$i}.php");
+		pwCache::deleteData(D_P."data/bbscache/fcache_{$fid}_{$i}.php");
 	}
 }
 
@@ -138,12 +139,12 @@ function updatetop() {
 	foreach ($fids as $key => $value) {
 		if (is_array($value)) {
 			$_fids[] = $key;
-			$db->update("UPDATE pw_forumdata SET  " . pwSqlSingle($value) . " WHERE fid =  ".pwEscape($key));
+			$db->update("UPDATE pw_forumdata SET  " . S::sqlSingle($value) . " WHERE fid =  ".S::sqlEscape($key));
 		}
 	}
 	if (!empty($_fids)) {
 		require_once(R_P.'admin/cache.php');
-		$_fids = pwEscape($_fids);
+		$_fids = S::sqlEscape($_fids);
 		updatecache_forums($_fids);
 	}
 }
@@ -169,7 +170,7 @@ function setForumsTopped($tid,$fid,$topped,$t=0){
 							   'uptime'=>$fid,
 							   'overtime'=>$t);
 		}
-		!empty($_topped) && $db->update("REPLACE INTO pw_poststopped (fid,tid,pid,floor,uptime,overtime) values ".pwSqlMulti($_topped));
+		!empty($_topped) && $db->update("REPLACE INTO pw_poststopped (fid,tid,pid,floor,uptime,overtime) values ".S::sqlMulti($_topped));
 	}
 	return $topAll;
 }
@@ -265,7 +266,7 @@ function getForumListForHeadTopic($fid){
 
 function getattachtype($tid) {
 	global $db;
-	$type = $db->get_value("SELECT type FROM pw_attachs WHERE tid=".pwEscape($tid,false)."ORDER BY aid LIMIT 1");
+	$type = $db->get_value("SELECT type FROM pw_attachs WHERE tid=".S::sqlEscape($tid,false)."ORDER BY aid LIMIT 1");
 	if ($type) {
 		switch($type) {
 			case 'img': $r=1;break;
@@ -287,7 +288,7 @@ function delete_tag($tids) {
 			$tagdb[$tagid]++;
 		}
 		foreach ($tagdb as $tagid=>$num) {
-			$db->update("UPDATE pw_tags SET num=num-".pwEscape($num)." WHERE tagid=".pwEscape($tagid));
+			$db->update("UPDATE pw_tags SET num=num-".S::sqlEscape($num)." WHERE tagid=".S::sqlEscape($tagid));
 		}
 		$db->update("DELETE FROM pw_tagdata WHERE tid IN($tids)");
 	}

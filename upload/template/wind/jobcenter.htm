@@ -288,7 +288,7 @@ EOT;
 foreach($others as $other){
 print <<<EOT
 -->
-                                    	<li><a href="u.php?uid=$other[uid]"><img src="$other[face]" /></a><p><a href="u.php?uid=$other[uid]" title="$other[username]">$other[username]</a></p></li>
+                                    	<li><a href="{$db_userurl}$other[uid]"><img src="$other[face]" /></a><p><a href="{$db_userurl}$other[uid]" title="$other[username]">$other[username]</a></p></li>
 <!--
 EOT;
 }

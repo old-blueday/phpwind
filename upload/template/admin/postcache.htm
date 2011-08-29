@@ -1,57 +1,34 @@
 <!--<?php
 include_once PrintEot('left');
-
-$commonClass = $tab != 'write' ? 'class="current"' : '';
-$writeClass = $tab == 'write' ? 'class="current"' : '';
+if($adminitem == 'commonsmile'){
 print <<<EOT
 -->
-
-<div class="admin_info mb10">
-	<h3 class="h1"><a name="2">使用帮助</a></h3>
-	<div class="legend">
-		<ul>
-<!--
-EOT;
-if ($tab != 'write') {
-print <<<EOT
--->
-<li>添加表情组:请先在你的图片目录下<b>$imgpath/post/smile/</b>建立相应的目录</li>
-<li>添加表情:一个表情组下所有的表情图片都要上传至该表情组的文件夹下才可以进行添加</li>
-<li>表情名称:当鼠标悬停时将出现该表情的介绍</li>
-<li>表情描述:如果设置表情描述，使用该表情时将出现相应的语言描述</li>
-<!--
-EOT;
-} else {
-print <<<EOT
--->
-<li>添加特殊表情:请先上传表情至<b>$imgpath/post/smile/write/</b>目录中，然后在“特殊表情(该目录下尚未被添加的表情)”中选中并填写表情名称后即可添加</li>
-<li>表情名称:使用该表情时将出现相应的语言描述，必填</li>
-<!--
-EOT;
-}
-print <<<EOT
--->
-</ul>
-	</div>
-</div>
-
 <div class="nav3 mb10">
-	<ul class="cc">
-		<li $commonClass><a href="$basename">普通表情</a></li>
-		<li $writeClass><a href="$basename&tab=write">特殊表情</a></li>
-	</ul>
+    <ul class="cc">
+		<li><a href="$jobUrl">基本设置</a></li>
+		<li><a href="$jobUrl&adminitem=setform">预设帖子格式</a></li>
+		<li><a href="$jobUrl&adminitem=pwcode">自定义代码</a></li>
+		<li class="current"><a href="$jobUrl&adminitem=commonsmile">普通表情</a></li>
+		<li><a href="$jobUrl&adminitem=specialsmile">特殊表情</a></li>
+    </ul>
 </div>
-
 <!--
 EOT;
-if ($tab != 'write') {
 if(!$action){print <<<EOT
 -->
-<form method="post" action="$basename">
+<div class="admin_info mb10">
+	<h3 class="h1"><b>提示信息</b></h3>
+	<div class="legend">
+		<ul><li>添加特殊表情:请先上传表情至<b>$imgpath/post/smile/write/</b>目录中，然后在“特殊表情(该目录下尚未被添加的表情)”中选中并填写表情名称后即可添加</li>
+<li>表情名称:使用该表情时将出现相应的语言描述，必填</li></ul>
+	</div>
+</div>
+<form method="post" action="$basename" name="FORM">
 <h2 class="h1">表情管理</h2>
 <div class="admin_table mb10">
 <table cellspacing="0" cellpadding="0" border="0" width="100%">
 	<tr class="tr2 td_bgB">
+		<td width="30"><span onclick="CheckAll(document.FORM)" class="cp">启用</span></td>
 		<td width="30">顺序</td>
 		<td width="100">表情组名称</td>
 		<td width="180">图片路径</td>
@@ -65,9 +42,12 @@ if (empty($facedb)) {print <<<EOT
 <!--
 EOT;
 }else{
-foreach($facedb as $key=>$face){print <<<EOT
+foreach($facedb as $key=>$face){
+$checked = $face[type] == 0 ? 'checked="checked"' : '';
+print <<<EOT
 -->
 	<tr class="tr3">
+		<td class="td2"><input name="type[]" value="$face[id]" type="checkbox" $checked /></td>
 		<td class="td2"><input value="$face[vieworder]" class="input input_wd" name="vieworder[$face[id]]" type="text" /></td>
 		<td class="td2"><input name="name[$face[id]]" class="input input_wa" value="$face[name]" type="text" /></td>
 		<td class="td2">$face[path]</td>
@@ -82,22 +62,24 @@ EOT;
 <input name="action" type="hidden" value="editsmiles">
 <input name="shownum" type="hidden" value="16">
 <div class="tac mb10">
+	<span class="bt"><span><button type="button" onclick="CheckAll(document.FORM)">全 选</button></span></span>
 	<span class="btn"><span><button name="update" type="submit">提 交</button></span></span>
 </div>
 </form>
 <h2 class="h1">添加表情组</h2>
 <form method="post" action="$basename">
 <div class="admin_table mb10">
+
 <table cellspacing="0" cellpadding="0" border="0" width="100%">
 	<tr class="tr2 td_bgB">
-		<td width="180" >图片路径</td>
+		<td width="30">顺序</td>
 		<td width="100">表情组名称</td>
-		<td>显示顺序</td>
+		<td>图片路径</td>
 	</tr>
 	<tr class="tr1">
+		<td class="td2"><input class="input input_wd" value="$maxOrder" type="text" name="vieworder" /></td>
+		<td class="td2"><input class="input input_wa" type="text" name="name" /></td>
 		<td class="td2"><input class="input input_wa" type="text" name="path" /></td>
-		<td class="td2"><input class="input input_wc" type="text" name="name" /></td>
-		<td class="td2"><input class="input input_wd" type="text" name="vieworder" /></td>
 	</tr>
 </table>
 </div>
@@ -126,7 +108,7 @@ EOT;
 <div class="admin_table mb10">
 <table cellspacing="0" cellpadding="0" border="0" width="100%">
 	<tr class="tr2 td_bgB">
-		<td width="50">显示顺序</td>
+		<td width="50">顺序</td>
 		<td width="50">标签</td>
 		<td width="60">图片路径</td>
 		<td width="60">图片预览</td>
@@ -200,6 +182,7 @@ EOT;
 </table>
 </div>
 <div class="tac mb10">
+	<span class="bt"><span><button type="button" onclick="CheckAll(document.FORMADD)">全 选</button></span></span>
 	<span class="btn"><span><button type="submit">添 加</button></span></span>
 </div>
 <input type="hidden" name="id" value="$id">
@@ -208,10 +191,25 @@ EOT;
 <!--
 EOT;
 }
-
-} else {
+}elseif($adminitem == 'specialsmile'){
 print <<<EOT
 -->
+<div class="nav3 mb10">
+    <ul class="cc">
+		<li><a href="$jobUrl">基本设置</a></li>
+		<li><a href="$jobUrl&adminitem=setform">预设帖子格式</a></li>
+		<li><a href="$jobUrl&adminitem=pwcode">自定义代码</a></li>
+		<li><a href="$jobUrl&adminitem=commonsmile">普通表情</a></li>
+		<li  class="current"><a href="$jobUrl&adminitem=specialsmile">特殊表情</a></li>
+    </ul>
+</div>
+<div class="admin_info mb10">
+	<h3 class="h1"><b>提示信息</b></h3>
+	<div class="legend">
+		<ul><li>添加特殊表情:请先上传表情至<b>$imgpath/post/smile/write/</b>目录中，然后在“特殊表情(该目录下尚未被添加的表情)”中选中并填写表情名称后即可添加</li>
+<li>表情名称:使用该表情时将出现相应的语言描述，必填</li></ul>
+	</div>
+</div>
 <form action="$basename&tab=$tab" method="post">
 <input type="hidden" name="action" value="edits" />
 <input type="hidden" name="step" value="3" />
@@ -221,7 +219,7 @@ print <<<EOT
 <div class="admin_table mb10">
 <table cellspacing="0" cellpadding="0" border="0" width="100%">
 	<tr class="tr2 td_bgB">
-		<td width="50">显示顺序</td>
+		<td width="50">顺序</td>
 		<td width="165">表情名称<span class="s1">*</span></td>
 		<td width="60">图片路径</td>
 		<td width="60">图片预览</td>
@@ -269,7 +267,7 @@ function delSmile(){
 <table cellspacing="0" cellpadding="0" width="100%">
 	<tr class="tr2 td_bgB">
 		<td width="80"><span onclick="CheckAll(document.FORMADD)" class="cp">全选</span></td>
-		<td width="50">显示顺序</td>
+		<td width="50">顺序</td>
 		<td width="100">表情名称<span class="s1">*</span></td>
 		<td width="100">图片路径</td>
 		<td>图片预览</td>
@@ -299,6 +297,7 @@ EOT;
 </table>
 </div>
 <div class="tac mb10">
+	<span class="bt"><span><button type="button" onclick="CheckAll(document.FORMADD)">全 选</button></span></span>
 	<span class="btn"><span><button type="submit">添 加</button></span></span>
 </div>
 <input type="hidden" name="action" value="addsmile">

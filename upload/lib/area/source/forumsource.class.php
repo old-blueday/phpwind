@@ -22,9 +22,9 @@ class PW_ForumSource extends SystemData {
 				'name' 	=> '版块排行',
 				'type'	=> 'select',
 				'value'	=> array(
-					'topic'		=>	'帖子总数',
-					'article'		=>	'主题数',
-					'tpost'=>	'今日发帖数',
+					'topic'		=> '帖子排行',
+					'article'	=> '主题排行',
+					'tpost'		=> '今日排行',
 				),
 			),
 		);

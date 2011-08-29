@@ -9,13 +9,21 @@ if($listCount <= 10){
 $value['content1'] = strip_tags($value['content']);
 print <<<EOT
 -->
-<tr class="tr3" id="sms_0_{$value[id]}" $sms_0 onclick="MC.showDetailMsg('{$value[id]}',1)">
+<script type="text/javascript">
+	trclick = function(e,id,flag){
+		if(e.srcElement.tagName == 'DIV'){
+			return false;
+		};
+		MC.showDetailMsg(id,flag);
+	}
+</script>
+<tr class="tr3" id="sms_0_{$value[id]}" $sms_0 oncopy="return true;" oncut="return true;" onclick="trclick(event,{$value[id]},1)">
 	<td class="face">&nbsp;</td>
 	<td><a href="{$_linkUrl}">{$value[create_username]}</a></td>
-	<td><p class="lh_18 imgnone">{$value[content1]}</p></td>
+	<td><div class="lh_18 imgnone">{$value[content1]}</div></td>
 </tr>
 <tr class="tr3 vt" id="sms_1_{$value[id]}" $sms_1
-	onclick="MC.showDetailMsg('{$value[id]}',2)">
+	onclick="trclick(event,{$value[id]},2)">
 	<td class="face" style="vertical-align:top;"><a class="img_50" href="{$_linkUrl}"><i><img width="48" height="48" src="{$value[face]}"></i></a></td>
 	<td class="name" style="vertical-align:top;width:120px;"><p><a href="{$_linkUrl}">{$value[create_username]}</a>
 <!--

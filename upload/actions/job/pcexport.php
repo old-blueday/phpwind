@@ -1,13 +1,13 @@
 <?php
 !defined('P_W') && exit('Forbidden');
 
-InitGP(array(
+S::gp(array(
 	'tid',
 	'pcid'
 ), G, 2);
-$read = $db->get_one("SELECT authorid,subject,fid FROM pw_threads WHERE tid=" . pwEscape($tid));
-$foruminfo = $db->get_one('SELECT forumadmin,fupadmin FROM pw_forums WHERE fid=' . pwEscape($read['fid']));
-$isGM = CkInArray($windid, $manager);
+$read = $db->get_one("SELECT authorid,subject,fid FROM pw_threads WHERE tid=" . S::sqlEscape($tid));
+$foruminfo = $db->get_one('SELECT forumadmin,fupadmin FROM pw_forums WHERE fid=' . S::sqlEscape($read['fid']));
+$isGM = S::inArray($windid, $manager);
 $isBM = admincheck($foruminfo['forumadmin'], $foruminfo['fupadmin'], $windid);
 L::loadClass('postcate', 'forum', false);
 $post = array();
@@ -19,7 +19,7 @@ if (!$isadminright) {
 }
 
 $memberdb = array();
-$query = $db->query("SELECT username,mobile,phone,address,nums,ifpay,totalcash,name,zip,message FROM pw_pcmember WHERE tid=" . pwEscape($tid));
+$query = $db->query("SELECT username,mobile,phone,address,nums,ifpay,totalcash,name,zip,message FROM pw_pcmember WHERE tid=" . S::sqlEscape($tid));
 while ($rt = $db->fetch_array($query)) {
 	if ($rt['ifpay'] == 1) {
 		$rt['ifpay'] = getLangInfo('other', 'pc_payed');

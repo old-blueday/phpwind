@@ -2,8 +2,9 @@
 print <<<EOT
 -->
 <div class="g_navB mb10">
+
 <span class="fr">
-<!--
+ <!--
 EOT;
 $tmp = '';
 if ($ifadmin && $job != 'post') {print<<<EOT
@@ -45,8 +46,8 @@ EOT;
 EOT;
 if (empty($job)) {print <<<EOT
 -->
-    <div class="g_contentA fl">
-    	<div class="p10">
+<div class="g_contentA fl">
+	<div class="p10">
     	<table class="vt mb10" width="100%" style="table-layout:fixed;">
 <!--
 EOT;
@@ -111,18 +112,17 @@ EOT;
             </tr>
 <!--
 EOT;
-}
-} else {print <<<EOT
+}} else {print <<<EOT
 -->
 			<tr><td class="p10"><div class="f14 tac">
 <!--
 EOT;
-if($ifadmin){print <<<EOT
+if($ifadmin && $colony['activitynum'] == 0){print <<<EOT
 -->
 			暂无活动，我来第一个<a href="apps.php?q=group&a=active&cyid=$cyid&job=post" class="line s2">发起活动</a>吧！
 <!--
 EOT;
-} else {print <<<EOT
+}elseif($colony['activitynum'] == 0){print <<<EOT
 -->
 			暂无活动
 <!--
@@ -248,9 +248,9 @@ EOT;
 print <<<EOT
 -->
 													<a href="javascript:;" onclick="sendmsg('operate.php?action=toweibo&ajax=1&type=groupactive&id=$active[id]','',this.id);" class="allForward mr20">新鲜事</a></span>
-                        	<strong>发起人：</strong><a href="u.php?uid=$active[uid]" target="_blank" class="img_25 mr10"><i><img src="$active[icon]" align="absmiddle" /></i></a><a href="u.php?uid=$active[uid]" target="_blank">$active[username]</a>
+                        	<strong>发起人：</strong><a href="{$db_userurl}$active[uid]" target="_blank" class="img_25 mr10"><i><img src="$active[icon]" align="absmiddle" /></i></a><a href="{$db_userurl}$active[uid]" target="_blank">$active[username]</a>
                         </p>
-                        <p class="g_hF cc"><strong>活动时间：</strong>$active[begintime_s] - $active[endtime_s]</p>
+                        <p class="g_hF cc"><strong>活动时间：</strong>$active[begintime_s] 至 $active[endtime_s]</p>
                         <p class="g_hF cc"><strong>报名截止：</strong>$active[deadline_s]</p>
                         <p class="g_hF cc"><strong>地点：</strong>$active[address]</p>
                         <p class="g_hF cc"><strong>费用估计：</strong>
@@ -335,7 +335,10 @@ EOT;
             <h3 class="g_hA b">
             	活动详情
             </h3>
-			<div class="p15 mb10 f14" style="line-height:2">
+<style type="text/css">
+.a_content img{max-width:500px;}
+</style>
+			<div class="p15 mb10 f14 a_content" style="line-height:2;overflow:hidden;">
 					$active[content]
 <!--
 EOT;
@@ -486,7 +489,7 @@ if ($value['anonymous'] == 1 && !$ifadmin && $winduid !=$value['uid']) {print <<
 EOT;
 } else {print <<<EOT
 -->
-                    <li><a href="u.php?uid=$value[uid]" target="_blank" class="i"><img src="$value[icon]" width="44" height="44" /></a><p class="n"><a href="u.php?uid=$value[uid]" title="$value[username]" target="_blank">$value[username]</a></p></li>
+                    <li><a href="{$db_userurl}$value[uid]" target="_blank" class="i"><img src="$value[icon]" width="44" height="44" /></a><p class="n"><a href="{$db_userurl}$value[uid]" title="$value[username]" target="_blank">$value[username]</a></p></li>
 <!--
 EOT;
 }}print <<<EOT
@@ -644,7 +647,7 @@ if ($value['anonymous'] == 1 && $groupid != 3 && $active['uid'] != $winduid && $
 EOT;
 } else {print <<<EOT
 -->
-					<td><a href="u.php?uid=$value[uid]"  target="_blank"><img src="$value[icon]" class="img_60" /><br />$value[username]</a></td>
+					<td><a href="{$db_userurl}$value[uid]"  target="_blank"><img src="$value[icon]" class="img_60" /><br />$value[username]</a></td>
 <!--
 EOT;
 }}print <<<EOT
@@ -712,6 +715,17 @@ EOT;
 .wy_tips:hover i{display:block; position:absolute;border:1px solid #f8ad48;background:#fffeed;padding:2px 5px;color:#333;font-style:normal;line-height:130%;word-break:keep-all;word-wrap:no-wrap;}
 .w_editor_up .w_tab_a .current a{background:#fff;border-bottom:none;color:#333;padding-bottom:1px;}
 .w_editor_up_con{background-color:#ffffff;padding:10px;border-top:1px solid #ddd;}
+.bta {
+background:none repeat scroll 0 0 #FFFFFF;
+border:1px solid #D5E6ED;
+color:#333333;
+cursor:pointer;
+line-height:22px;
+width:5px;
+margin:0 3px;
+padding:0 8px;
+white-space:nowrap;
+}
 </style>
 <!--
 EOT;
@@ -750,8 +764,8 @@ EOT;
 				<tr>
 					<td width="120px">活动名称&nbsp;<span class="s1">*</span></td>
 					<td>
-						<input type="text" class="input input_wb" name="title" id="title" value="{$active[title]}" />
-						<span id="title_warn" class="s6">限 $db_titlemax 字节</span>
+						<input type="text" class="input input_wb" name="atc_title" id="atc_title" value="{$active[title]}" />
+						<span id="atc_title_warn" class="s6">限 $db_titlemax 字节</span>
 					</td>
 				</tr>
 				<tr>
@@ -863,10 +877,9 @@ $('batUploadBtn').onclick = function() {
 	$('formUploadBtn').className="";
 	this.className="current";
 };
-initCheckTextNum('title','title_warn','$db_titlemax');
+initCheckTextNum('atc_title','atc_title_warn','$db_titlemax');
 initCheckTextNum('address','address_warn','$db_titlemax');
 initCheckTextNum('introduction','introduction_warn',130);
-
 </script>
 
 								<div class="w_editor_up_con">
@@ -875,9 +888,9 @@ EOT;
 if($attach){print <<<EOT
 -->
 									<div class="cc">该帖包含附件<span class="gray">(不想保留的附件去掉√)</span> :
-										<table class="tr_p10">
+										<table class="tr_p10" style="table-layout:fixed">
 											<tr class="gray">
-												<td width="11"></td>
+												<td width="20"></td>
 												<td width="220">附件</td>
 												<td width="180">描述</td>
 												<td width="65" style="display:none;">售/密</td>
@@ -903,7 +916,7 @@ EOT;
 											</tr>
 											<tbody id="qlist"></tbody>
 										</table>
-										<table class="tr_p10">
+										<table class="tr_p10" style="table-layout:fixed">
 											<tr valign="top" id="formUpload" class="gray">
 												<td width="250">上传附件 (图片、文件等)</td>
 												<td width="180">描述</td>
@@ -950,11 +963,11 @@ EOT;
 document.FORM.Submit.disabled = false;
 function checkpost(obj) {
 	if (obj.title.value == "") {
-		obj.title.focus();
+		obj.atc_title.focus();
 		showDialog("error","活动名称不能为空",2);
 		return false;
 	}　else if (obj.type.value == "") {
-		obj.title.focus();
+		obj.atc_title.focus();
 		showDialog("error","请选择活动类型",2);
 		return false;
 	}　else if (obj.limitnum.value && obj.limitnum.value != parseInt(obj.limitnum.value)) {
@@ -970,7 +983,7 @@ function checkpost(obj) {
 		showDialog("error","请填写活动开始时间和结束时间!",2);
 		return false;
 	}　else if (compTime(obj.begintime.value,obj.endtime.value) == 1 || compTime(obj.begintime.value,obj.endtime.value) == 0) {
-		obj.title.focus();
+		obj.atc_title.focus();
 		showDialog("error","活动开始时间不能大于结束时间!",2);
 		return false;
 	}　else if (obj.deadline.value == "") {

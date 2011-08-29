@@ -1,7 +1,7 @@
 <?php
 !defined('P_W') && exit('Forbidden');
 
-InitGP(array(
+S::gp(array(
 	'verify',
 	'pid',
 	'aid'
@@ -10,7 +10,7 @@ if ($verify != md5("showimg{$tid}{$pid}{$fid}{$aid}{$db_hash}")) {
 	Showmsg('undefined_action');
 }
 if (function_exists('file_get_contents')) {
-	$rs = $db->get_one('SELECT attachurl FROM pw_attachs WHERE aid=' . pwEscape($aid) . ' AND tid=' . pwEscape($tid) . ' AND fid=' . pwEscape($fid));
+	$rs = $db->get_one('SELECT attachurl FROM pw_attachs WHERE aid=' . S::sqlEscape($aid) . ' AND tid=' . S::sqlEscape($tid) . ' AND fid=' . S::sqlEscape($fid));
 	if ($rs) {
 		$fgeturl = geturl($rs['attachurl']);
 		if ($fgeturl[0]) {

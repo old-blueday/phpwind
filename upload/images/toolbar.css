@@ -24,8 +24,8 @@ html{background-image:url(about:blank);background-attachment:fixed;_overflow-x:h
 .app-butt,.app-f,.app-m{cursor:pointer;height:24px;display:block;line-height:24px; padding-left:30px; padding-right:10px }
 .app-butt{border-right:1px solid #8ebcc7;background:url(pwicon/app-menu.png) no-repeat 8px 5px;}
 .app-f{border-left:1px solid #8ebcc7;background:url(online.png) no-repeat 10px 5px;}
-.app-m{border-left:1px solid #8ebcc7;background:url(wind/meg-read.gif) no-repeat 10px 7px;}
-.app-m-new{background:url(wind/meg.gif) no-repeat 10px 4px;color:#ff5500;}
+.app-m{border-left:1px solid #8ebcc7;background:url(pwicon/meg-read.gif) no-repeat 10px 7px;}
+.app-m-new{background:url(pwicon/meg.gif) no-repeat 10px 4px;color:#ff5500;}
 .app-current{z-index:1002;position:absolute;background-color:#f4fafb;border:1px solid #8ebcc7; margin-top:-1px;border-top:0;}
 .mes-height{line-height:25px;height:120px;overflow:hidden;}
 .startbar-menuleft{left:-1px;width:250px;}

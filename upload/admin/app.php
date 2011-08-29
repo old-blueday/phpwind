@@ -2,7 +2,7 @@
 !defined('P_W') && exit('Forbidden');
 
 require_once(R_P.'require/posthost.php');
-@include_once(D_P.'data/bbscache/o_config.php');
+@include_once pwCache::getPath(D_P.'data/bbscache/o_config.php');
 
 !$admintype && $admintype = 'appset';
 
@@ -126,7 +126,7 @@ if ($admintype == 'appset') {
 
 } elseif ($admintype == 'open') {
 
-	InitGP(array('open_app','updatelist'));
+	S::gp(array('open_app','updatelist'));
 
 	$sqlarray = file_exists(R_P."api/sql.txt") ? FileArray('api') : array();
 	!empty($sqlarray) && SQLCreate($sqlarray);
@@ -179,7 +179,7 @@ if ($admintype == 'appset') {
 
 		$appurl = $appclient->getAppIframe('17');
 	} elseif ($_POST['step'] == 2) {
-		InitGP(array('open_app'));
+		S::gp(array('open_app'));
 
 		$sqlarray = file_exists(R_P."api/sql.txt") ? FileArray('api') : array();
 		!empty($sqlarray) && SQLCreate($sqlarray);
@@ -276,7 +276,7 @@ function SQLCreate($sqlarray) {
 
 function FileArray($hackdir){
 	if (function_exists('file_get_contents')) {
-		$filedata = @file_get_contents(Pcv(R_P."$hackdir/sql.txt"));
+		$filedata = @file_get_contents(S::escapePath(R_P."$hackdir/sql.txt"));
 	} else {
 		$filedata = readover(R_P."$hackdir/sql.txt");
 	}
@@ -329,6 +329,7 @@ function UpdateClassCache($classdb=array(),$flag=false) {
 		$classcache .= "'$class[cid]'=>".pw_var_export($class).",\r\n\r\n";
 	}
 	$classcache .= ");\r\n?>";
-	writeover(D_P."data/bbscache/info_class.php",$classcache);
+	//* writeover(D_P."data/bbscache/info_class.php",$classcache);
+	pwCache::setData(D_P."data/bbscache/info_class.php",$classcache);
 }
 ?>

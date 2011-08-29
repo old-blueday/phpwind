@@ -3,12 +3,12 @@ define('SCR','show');
 require_once('global.php');
 require_once(R_P.'require/header.php');
 require_once(R_P.'require/forum.php');
-include_once(D_P.'data/bbscache/forumcache.php');
-include_once(D_P.'data/bbscache/forum_cache.php');
+include_once pwCache::getPath(D_P.'data/bbscache/forumcache.php');
+include_once pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
 
 !$_G['show'] && Showmsg('groupright_show');
 $db_showperpage = 16;
-InitGP(array('pwuser','uid','action','type','page','aid'));
+S::gp(array('pwuser','uid','action','type','page','aid'));
 $fidoff= array();
 
 $query = $db->query("SELECT fid,allowvisit,password,f_type,forumsell FROM pw_forums WHERE type<>'category'");
@@ -33,7 +33,7 @@ if ($pwuser || is_numeric($uid)) {
 	} else {
 		$uid     = $userInfo['uid'];
 		$owner   = $userInfo['username'];
-		$sqladd .= " AND a.uid=".pwEscape($uid);
+		$sqladd .= " AND a.uid=".S::sqlEscape($uid);
 	}
 }
 
@@ -41,7 +41,7 @@ if (is_numeric($fid) && $fid > 0) {
 	if (in_array($fid,$fidoff)) {
 		Showmsg('forum_not_allow');
 	}
-	$sqladd .= " AND a.fid=".pwEscape($fid);
+	$sqladd .= " AND a.fid=".S::sqlEscape($fid);
 	$forumcache = str_replace("<option value=\"$fid\">","<option value=\"$fid\" selected>",$forumcache);
 }
 $type_1 = $type_2 = '';
@@ -56,7 +56,7 @@ if (empty($action)) {
 
 	$url = "show.php?uid=$uid&fid=$fid&type=$type&";
 	(!is_numeric($page) || $page<1) && $page = 1;
-	$limit = pwLimit(($page-1)*$db_showperpage,$db_showperpage);
+	$limit = S::sqlLimit(($page-1)*$db_showperpage,$db_showperpage);
 	$rt    = $db->get_one("SELECT COUNT(*) AS sum FROM pw_attachs a WHERE $sqladd");
 	$pages = numofpage($rt['sum'],$page,ceil($rt['sum']/$db_showperpage),$url);
 
@@ -70,7 +70,7 @@ if (empty($action)) {
 		$ttable_a[GetTtable($rt['tid'])][] = $rt['tid'];
 	}
 	foreach ($ttable_a as $pw_tmsgs => $value){
-		$value = pwImplode($value);
+		$value = S::sqlImplode($value);
 		if ($value) {
 			$query = $db->query("SELECT t.tid,t.fid,t.authorid,t.author as username,t.subject,t.ifcheck,t.ifshield,t.ptable,tm.content,tm.buy FROM pw_threads t LEFT JOIN $pw_tmsgs tm USING(tid) WHERE t.tid IN($value)");
 			while ($rt = $db->fetch_array($query)) {
@@ -80,7 +80,7 @@ if (empty($action)) {
 		}
 	}
 	if ($pids) {
-		$pids = pwImplode($pids);
+		$pids = S::sqlImplode($pids);
 		foreach ($ptable_a as $ptable => $value) {
 			$pw_posts = GetPtable($ptable);
 			$query = $db->query("SELECT pid,tid,fid,authorid,author as username,subject,ifcheck,ifshield,content,buy FROM $pw_posts WHERE pid IN($pids)");
@@ -146,7 +146,7 @@ if (empty($action)) {
 		$rtinfo = $db->get_one("SELECT t.fid,t.subject,t.ifcheck,t.ifshield,tm.content,m.username
 			FROM pw_threads t LEFT JOIN $pw_tmsgs tm ON tm.tid=t.tid
 			LEFT JOIN pw_members m ON m.uid=t.authorid
-			WHERE t.tid=".pwEscape($rt['tid'],false));
+			WHERE t.tid=".S::sqlEscape($rt['tid'],false));
 		if (in_array($rtinfo['fid'],$fidoff) || $rtinfo['ifshield']=='2' || $groupid!='3' && $groupid!='4' && ($rtinfo['needrvrc']>$userrvrc || !$rtinfo['ifcheck'] || $rtinfo['ifshield'] || (strpos($rtinfo['content'],"[post]") !== false && strpos($rtinfo['content'],"[/post]") !== false) || (strpos($rtinfo['content'],"[hide") !== false && strpos($rtinfo['content'],"[/hide]") !== false) || (strpos($rtinfo['content'],"[sell") !== false && strpos($rtinfo['content'],"[/sell]") !== false))) {
 			Showmsg('pic_not_exists');
 		}

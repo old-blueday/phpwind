@@ -24,7 +24,8 @@ var changeStyle = Class({},{
 		
 		e.className="current";
 		var self = this;
-		ajax.send(AJAXURL,'job=changestyle&style='+styledir,function(){
+		var stopic_id = getObj('stopicId').value;
+		ajax.send(AJAXURL,'job=changestyle&style='+styledir + '&stopicid=' + stopic_id + '&blockid=block_banner_101',function(){
 			var rText = ajax.request.responseText.split('\t');
 			if (rText[0] != 'success') {
 				alert(ajax.request.responseText);

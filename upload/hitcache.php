@@ -16,7 +16,8 @@ if ($c_htm || $db_hithour) {
 			fclose($handle);
 		}
 	} else {
-		@unlink(D_P.'data/bbscache/hits.txt');
+		//* @unlink(D_P.'data/bbscache/hits.txt');
+		@pwCache::deleteData(D_P.'data/bbscache/hits.txt');
 	}
 }
 ?>

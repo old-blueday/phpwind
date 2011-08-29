@@ -28,7 +28,7 @@ EOT;
 </div>
 <!--
 EOT;
-}elseif($indexRight && !$newSpace->viewRight('diary')){print <<<EOT
+}elseif($indexRight && !$newSpace->viewRight('photos')){print <<<EOT
 -->
 <div class="boxA">
 	<table width="100%">
@@ -43,6 +43,15 @@ EOT;
 -->
 	<div class="boxA cc">
 		<h2>
+<!--
+EOT;
+if ($uid ==$winduid) {print <<<EOT
+-->	
+		<span class="fr" style="padding-top:2px;"><span class="btn_add"><span><button type="button" onClick="location.href='apps.php?q=photos&a=create';">创建相册</button></span></span></span>
+<!--
+EOT;
+}print <<<EOT
+-->
 			<span class="mr10">相册</span>
 		</h2>
 			<div style="min-height:480px;_height:480px;">
@@ -96,7 +105,7 @@ if ($value['ownerid'] == $winduid || $groupid == 3) {print <<<EOT
 <!--
 EOT;
 }else{print <<<EOT
---><a href="u.php?uid=$uid">$value[owner]</a><!--
+--><a href="{$db_userurl}$uid">$value[owner]</a><!--
 EOT;
 }if ($value['ownerid'] == $winduid || $SYSTEM['delalbum']) {print <<<EOT
 -->|&nbsp;&nbsp;<a href="{$basename}a=delalbum&aid=$value[aid]" onclick="return ajaxurl(this)">删除相册</a>
@@ -117,8 +126,7 @@ EOT;
 EOT;
 }print <<<EOT
 -->
-	<div class="c"></div>
-	<div class="cc mt10">$pages</div>
+	<div class="cc p20">$pages</div>
 </div>
 <!--
 EOT;
@@ -141,6 +149,7 @@ EOT;
 EOT;
 	}print <<<EOT
 -->
+			<a href="apps.php?q=photos&a=upload&job=flash&aid=$aid">上传</a>&nbsp;┊&nbsp;
             <a href="{$basename}a=delalbum&aid=$aid" onclick="return ajaxurl(this)" title="删除相册">删除</a>
 		</div>
 		<a class="b" href="{$basename}q=$q">$album[owner]的相册</a> &raquo; <span class="s5 b">$album[aname] ($album[photonum])</span>
@@ -198,27 +207,13 @@ EOT;
 -->
 		</ul>
 		</div>
-		<div class="p10 mb10 cc">$pages</div>
+		<div class="cc p20">$pages</div>
 		
 <!--
 EOT;
 } elseif ($a == 'view') {
 print <<<EOT
 -->
-<style type="text/css">
-/*兼容：当站点有侧栏是，相册的内容页展现方式变更*/
-.sidePhoto{width:740px;;float:none;height:120px;}
-.galbum_photo .prePhoto{float:left;}
-.galbum_photo .nextPhoto{float:right;}
-.galbum_photo .g_listA{height:120px;float:left;}
-.galbum_photo .g_listA li{display:inline;overflow:hidden;width:120px;}
-.galbum_photo .prePhoto,.galbum_photo .nextPhoto{width:20px;margin-top:33px;}
-.galbum_photo .prePhoto a,.galbum_photo .nextPhoto a{width:14px;height:38px;}
-.galbum_photo .prePhoto a{background-position:0 0;}
-.galbum_photo .prePhoto a:hover{ background-position:-40px 0;}
-.galbum_photo .nextPhoto a{background-position:-20px 0;}
-.galbum_photo .nextPhoto a:hover{background-position:-60px 0;}
-</style>
 		<div class="p10">
 			<div class="fr">
 				<a href="apps.php?q=collection&a=favor&type=photo&ajax=1&id=$photo[pid]&ptype=photo" onclick="return ajaxurl(this)" class="mr10 allCollect">收藏</a>
@@ -231,10 +226,16 @@ EOT;
 EOT;
 	}print <<<EOT
 -->
-                <!--
+<!--
 EOT;
-if($isown || $photoService->isDelRight()){print <<<EOT
---><a onclick="pwConfirm('是否确认删除',this,function(){ajaxdel('$photo[pid]')});" href="javascript:;">删除</a>
+if ($isown) {print <<<EOT
+-->
+				<a href="{$basename}a=upload&job=flash&aid=$aid">上传</a>&nbsp;┊&nbsp;
+<!--
+EOT;
+}if ($isown || $photoService->isDelRight()) {print <<<EOT
+-->
+				<a onclick="pwConfirm('是否确认删除',this,function(){ajaxdel('$photo[pid]')});" href="javascript:;">删除</a>
 <!--
 EOT;
 }print <<<EOT
@@ -258,34 +259,6 @@ EOT;
 -->
 <!--
 EOT;
-foreach($nearphoto as $value){
-$ifsel = ($pid == $value[pid]) ? 'class="current"' : '';
-print <<<EOT
--->
-					<ul class="g_listA cc" id="imglist_{$value[pid]}">
-<!--
-EOT;
-if($value[pid]=='begin'||$value[pid]=='end'){
-print <<<EOT
--->
-					<li><div class="aimg"><a href="javascript:;"><img src="$value[path]" /></a></div></li>
-<!--
-EOT;
-} else {print <<<EOT
--->
-					<li $ifsel><div class="aimg"><a href="{$basename}a=view&pid=$value[pid]#imgtop"><img src="$value[path]" onload="if(this.width>100){this.width = 100;} else if(this.height>100){this.height=100;}" /></a></div></li>
-<!--
-EOT;
-}print <<<EOT
--->
-				</ul>
-<!--
-EOT;
-}print <<<EOT
--->
-
-<!--
-EOT;
 if($photo[photonum]>5){print<<<EOT
 -->
 							<div class="nextPhoto"><a onclick="return ajaxpage('{$basename}a=pre&pid=$photo[pid]{$friendurl}','next');">下一张</a></div>
@@ -293,6 +266,35 @@ if($photo[photonum]>5){print<<<EOT
 EOT;
 }print <<<EOT
 -->
+					<ul class="g_listA cc">
+<!--
+EOT;
+foreach($nearphoto as $value){
+$ifsel = ($pid == $value[pid]) ? 'class="current"' : '';
+print <<<EOT
+-->
+					<li id="imglist_{$value[pid]}" $ifsel>
+<!--
+EOT;
+if($value[pid]=='begin'||$value[pid]=='end'){
+print <<<EOT
+-->
+					<div class="aimg"><a href="javascript:;"><img src="$value[path]" /></a></div>
+<!--
+EOT;
+} else {print <<<EOT
+-->
+					<div class="aimg"><a href="{$basename}a=view&pid=$value[pid]#imgtop"><img src="$value[path]" onload="if(this.width>100){this.width = 100;} else if(this.height>100){this.height=100;}" /></a></div>
+<!--
+EOT;
+}print <<<EOT
+-->
+					</li>
+<!--
+EOT;
+}print <<<EOT
+-->
+				</ul>
 		
 					</div>
 				</div>
@@ -339,7 +341,7 @@ EOT;
 					</table>
 					</div>
 					<div class="onePhototip">
-						<div class="fr s7"><a href="javascript:;" onclick="ImgClick();" class="s7">原图</a>&nbsp;┊&nbsp;<a href="javascript:;" onclick="sendmsg('pw_ajax.php?action=report&type=photo&tid=$pid&pid=$uid','',this.id);" id="report_photo" class="s7">举报</a>
+						<div class="fr s7" style="z-index:1200"><a href="javascript:;" onclick="ImgClick();" class="s7">原图</a>&nbsp;┊&nbsp;<a href="javascript:;" onclick="sendmsg('pw_ajax.php?action=report&type=photo&tid=$pid&pid=$uid','',this.id);" id="report_photo" class="s7">举报</a>
 						</div>
 						<div><span class="mr20">$photo[pintro]</span><span class="mr20">上传于{$photo[uptime]}</span><span class="mr20">浏览($photo[hits])</span><span class="mr20">评论($photo[c_num])</span></div>
 					</div>

@@ -18,7 +18,7 @@ $lang['message'] = array (
 'colony_check_ignore'		=> '你已经忽略了对方加入群组的请求'	,
 'colony_check_agree'		=> '你已经同意了对方加入群组的请求'	,
 
-'friend_add_success'		=> '从现在开始，你们俩就是好友了！<a href="u.php?uid={$GLOBALS[fid]}">马上去看TA</a>',
+'friend_add_success'		=> '从现在开始，你们俩就是好友了！<a href="{$GLOBALS[db_userurl]}{$GLOBALS[fid]}">马上去看TA</a>',
 'friend_add_fail'			=> '添加好友失败',
 'friend_add_ignore'			=> '你已经忽略了对方的请求',
 'friend_request_agree'		=> '你已经同意了TA的好友请求'	,

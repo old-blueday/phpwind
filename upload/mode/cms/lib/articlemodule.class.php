@@ -49,10 +49,13 @@ class PW_ArticleModule extends PW_Module {
 	 */
 	function setSubject($subject) {
 		if (empty($subject)) {
-			$this->addError('文章标题不能为空');
+			$this->addError('文章<span class=\'warnFontStyle\'>标题</span>不能为空');
 		}
 		if (strlen($subject) > 80) {
-			$this->addError('文章标题长度不能大于80字节');
+			$this->addError('文章<span class=\'warnFontStyle\'>标题</span>长度不能大于<span class=\'warnFontStyle\'>80</span>字节');
+		}
+		if( ($bword = $this->_filterUitil->comprise($subject)) &&  $GLOBALS['iscontinue'] != 1 ){ 
+			$this->addError("文章<span class='warnFontStyle'>标题</span>中含有敏感词：<span class='warnFontStyle'>" . $bword . "</span>，禁止发表，请返回修改");
 		}
 		$subject = $this->_filterUitil->convert($subject);
 		$this->subject = $subject;
@@ -65,12 +68,16 @@ class PW_ArticleModule extends PW_Module {
 	 */
 	function setContent($content, $page = 0) {
 		if (empty($content)) {
-			$this->addError('文章内容不能为空');
+			$this->addError('文章<span class=\'warnFontStyle\'>内容</span>不能为空');
 		}
 		if (strlen($content) > 50000) {
-			$this->addError('文章内容过大');
+			$this->addError('文章<span class=\'warnFontStyle\'>内容</span>过大');
+		}
+		if( ($bword = $this->_filterUitil->comprise($content)) &&  $GLOBALS['iscontinue'] != 1) {
+			$this->addError("文章内容中含有敏感词：<span class='warnFontStyle'>" . $bword . "</span>，禁止发表，请返回修改");
 		}
 		$content = $this->_filterUitil->convert($content);
+		$content = htmlspecialchars($content);
 		//$content = html_check($content);
 		foreach (array('wmv', 'rm', 'flash') as $key => $value) {
 			if (strpos(",{$GLOBALS['_G']['media']},", ",$value,") === false) {
@@ -98,12 +105,15 @@ class PW_ArticleModule extends PW_Module {
 	 * @param string $descrip
 	 */
 	function setDescrip($descrip) {
-		$descrip = $this->_filterUitil->convert($descrip);
+		if( ($bword = $this->_filterUitil->comprise( $descrip ))  &&  $GLOBALS['iscontinue'] != 1) {
+			$this->addError("文章<span class='warnFontStyle'>摘要</span>中包含禁用敏感词：<span class='warnFontStyle'>" . $bword. "</span>，禁止发表，请返回修改");
+		 } 
+		$descrip = $this->_filterUitil->convert( $descrip );
 		if (empty($descrip)) {
 			$descrip = substrs($this->_filterWindCode(), 200);
 		}
 		if (strlen($descrip) > 255) {
-			$this->addError('描述内容不能大于255字节');
+			$this->addError('<span class=\'warnFontStyle\'>描述</span>内容不能大于<span class=\'warnFontStyle\'>255</span>字节');
 		}
 		$this->descrip = $descrip;
 	}
@@ -119,7 +129,7 @@ class PW_ArticleModule extends PW_Module {
 	function setColumnId($columnId) {
 		$columnId = (int) $columnId;
 		if (!$columnId) {
-			$this->addError('请选择所属栏目');
+			$this->addError('没有选择<span class=\'warnFontStyle\'>栏目<span>');
 		}
 		$this->columnId = $columnId;
 	}
@@ -156,7 +166,7 @@ class PW_ArticleModule extends PW_Module {
 			$uploaddb = PwUpload::upload($articleUpload, false);
 			foreach ($uploaddb as $key => $value) {
 				$value['name'] = $value['name'];
-				$value['descrip'] = Char_cv(GetGP('atc_desc_' . $value['id'], 'P'));
+				$value['descrip'] = S::escapeChar(S::getGP('atc_desc_' . $value['id'], 'P'));
 				$uploaddb[$key] = $value;
 			}
 		}
@@ -211,7 +221,7 @@ class PW_ArticleModule extends PW_Module {
 	function setSourceType($sourceType) {
 		$sourceTypeConfig = $this->getSourceTypeConfig();
 		if ($sourceType && !isset($sourceTypeConfig[$sourceType])) {
-			$this->addError('文章获取来源有误');
+			$this->addError('<span class=\'warnFontStyle\'>文章获取来源</span>有误');
 		}
 		$this->sourceType = $sourceType;
 	}
@@ -275,7 +285,7 @@ class PW_ArticleModule extends PW_Module {
 
 	function _cookOldAttachs($attachs, $oldatt_desc, $keep) {
 		foreach ($attachs as $key => $value) {
-			if (!in_array($value['attach_id'], $keep)) {
+			if (!S::inArray($value['attach_id'], $keep)) {
 				$value['attname'] = 'delete';
 			} else {
 				$value['descrip'] = $oldatt_desc[$value['attach_id']];

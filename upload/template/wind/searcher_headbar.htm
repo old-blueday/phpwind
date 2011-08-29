@@ -1,315 +1,137 @@
 <!--<?php
-if($GLOBALS['groupid'] != 'guest' && $GLOBALS['groupid'] != '' && $GLOBALS['db_toolbar']){print <<<EOT
--->
-<!--
-EOT;
-}print <<<EOT
+print <<<EOT
 -->
 $msgsound
-<div class="new_topbar_wrap">
-	<div class="new_topbar">
-    	<div class="cc">
-            <ul class="new_topbar_right" style=" float:left;">
-<!--
-EOT;
-foreach($navs as $nav){
-$nav = buildNavLinkHtml($nav['data']);
-print <<<EOT
--->
-            	<li>$nav</li>
-<!--
-EOT;
-}
-print <<<EOT
--->
-            </ul>
-						<span class="fr" style="padding-top:7px;">
-<!--
-EOT;
-foreach($_Navbar['head_right'] as $key => $value){
-	$html = buildNavLinkHtml($value['data']);
-print <<<EOT
--->
-            <span>$html</span>
-<!--
-EOT;
-	if (is_array($value['subs'])) {
-		$db_menuinit .= ",'nav_key_up_$key' : 'nav_key_sub_$key'"; //register
-print <<<EOT
--->
-			<div style="display: none;" class="pw_menu" id="nav_key_sub_{$key}">
-			<ul class="menuList">
-<!--
-EOT;
-		foreach ($value['subs'] as $value) {
-			$html = buildNavLinkHtml($value);
-print <<<EOT
--->
-				<li>$html</li>
-<!--
-EOT;
-		}
-print <<<EOT
--->
-			</ul>
-			</div>
-<!--
-EOT;
-	}
-
-}
-
-print <<<EOT
--->
-        	</span>
-						<span class="new_topbar_left fr">
+	<div id="top">
+		<div class="top">				
 <!--
 EOT;
 if($groupid=='guest'){
-if ($db_ajax & 16) {
-$arr_logintypename = array('用户名','UID','Email');print <<<EOT
--->
-				<a onclick="showLoginDiv();" title="展开登录框" style="cursor:pointer" hidefocus="true">登录</a><a href="$regurl" hidefocus="true">注册</a>
-                <div id="user-login" class="menu-post" style="display:none;">
-                            <form action="login.php" name="login_FORM" method="post">
-                                <input type="hidden" name="jumpurl" value="http://{$pwServer['HTTP_HOST']}{$REQUEST_URI}" />
-                                <input type="hidden" name="step" value="2" />
-                                <input type="hidden" name="cktime" value="31536000" />
-                                <div class="menu-b" style="width:400px;padding-bottom:10px;">
-                                    <div class="pwC_h"><span class="fr" onclick="read.close();" style="cursor:pointer;" title="关闭"><img src="$imgpath/close.gif" /></span>登录</div>
-									<table width="100%" cellpadding="0" cellspacing="0">
-                                    <tr class="user-table">
-                                        <td width="30%">
-                                        <select name="lgt">
-<!--
-EOT;
-if(count($_LoginInfo['logintype'])==1){
-$value = current($_LoginInfo['logintype']);print <<<EOT
--->
-                                        <option value="$value" selected>$arr_logintypename[$value]</option>
-                                        </select>
-<!--
-EOT;
-}elseif(count($_LoginInfo['logintype'])>1){
-$i=1;
-foreach($_LoginInfo['logintype'] as $value){
-$str_checked = $i==1? 'selected':'';
-$i++;print <<<EOT
--->
-                                        <option value="$value" $str_checked>$arr_logintypename[$value]</option>
-<!--
-EOT;
-}print <<<EOT
--->
-                                        </select>
-<!--
-EOT;
-}else{print <<<EOT
--->
-                                            <input type="radio" name="lgt" value="$value" checked />
-                                            <span id="login_$value">用户名</span>
-<!--
-EOT;
-}print <<<EOT
--->
-                                        </td>
-                                        <td class="tal"><input class="input gray" type="text" onfocus="checkinput(this);" onblur="if(getObj('logintab')) getObj('logintab').style.display='';checkinput(this,'输入用户名');" style="width:150px" name="pwuser" id="pwuser" value="输入用户名" tabindex="1" /></td>
-                                    </tr>
-                                    <tr class="user-table">
-                                        <td>密  码</td>
-                                        <td class="tal"><input class="input" type="password" name="pwpwd" style="width:150px;" tabindex="2" /></td>
-                                    </tr>
-<!--
-EOT;
-if($db_gdcheck & 2){print <<<EOT
--->
-                                    <tr class="user-table">
-                                        <td>认证码</td>
-                                        <td class="tal">
-                                            <input class="input" onfocus="showCK();" type="text" name="gdcode" size="5" tabindex="3"  />
-                                            <img id="ckcode" style="cursor:pointer;display:none" onclick="this.src='ck.php?nowtime='+new Date().getTime();" alt="看不清楚，换一张" />
-                                        </td>
-                                    </tr>
-<!--
-EOT;
-}if($db_ifsafecv){print <<<EOT
--->
-                                    <tr class="user-table">
-                                        <td>安全问题</td>
-                                        <td class="tal">
-                                            <select name="question" onchange="showcustomquest_l(this.value)" tabindex="4"><option value="0">无安全问题</option><option value="1">我爸爸的出生地</option><option value="2">我妈妈的出生地</option><option value="3">我的小学校名</option><option value="4">我的中学校名</option><option value="5">我最喜欢的运动</option><option value="6">我最喜欢的歌曲</option><option value="7">我最喜欢的电影</option><option value="8" >我最喜欢的颜色</option><option value="-1">自定义问题</option></select>
-                                            <input id="customquest_l" type="text" style="display:none" class="input" size="10" tabindex="5" />
-                                        </td>
-                                    </tr>
-                                    <tr class="user-table">
-                                        <td>您的答案</td>
-                                        <td class="tal"><input name="answer" type="text" class="input" size="25" tabindex="6" /></td>
-                                    </tr>
-<!--
-EOT;
-}if($_LoginInfo['qcheck']){print <<<EOT
--->
-                                    <tr class="user-table">
-                                        <td>验证问题</td>
-                                        <td class="tal">问题:{$db_question[$_LoginInfo['qkey']]}<br />正确答案:{$db_answer[$_LoginInfo['qkey']]}<br />
-                                            <input class="input" name="qanswer" size="25" tabindex="7" />
-                                            <input type="hidden" name="qkey" value="{$_LoginInfo['qkey']}" />
-                                        </td>
-                                    </tr>
-<!--
-EOT;
-}print <<<EOT
--->
-                                    <tr class="user-table">
-                                        <td></td>
-                                        <td class="tal"><input class="btn fl" type="submit" value=" 登 录 " tabindex="8" />
-                                            <a href="sendpwd.php" class="fl">找回密码</a></td>
-                                    </tr>
-                                </table>
-                    			</div>
-                            </form>
-                    </div>
-<!--
-EOT;
-} else {print <<<EOT
--->
-				<a href="login.php" title="登录" hidefocus="true">登录</a><a href="$regurl" hidefocus="true">注册</a>
-<!--
-EOT;
-}} else {
-$db_menuinit .= ",'td_userinfomore' : 'menu_userinfomore','td_profile' : 'menu_profile'";print <<<EOT
--->
-                <span><a href="u.php" class="new_topbar_name menu_down" hidefocus="true"><img src="$_LoginInfo[faceurl]" width="15" height="15" class="top_face" />$windid<span><img src="$_LoginInfo[faceurl]" width="15" height="15" id="iconimg" class="top_face" />$windid</span></a></span>
-				<a href="$loginouturl" hidefocus="true">退出</a>
-				<i>&nbsp;</i>
-<!--
-EOT;
-if($winddb['newpm']>0 && $_G['maxmsg']>0){print <<<EOT
--->
-				<a id="td_msg" href="message.php" target="_blank" class="new_topbar_mes" hidefocus="true">消息<span class="green">({$winddb[newpm]})</span></a>
-<!--
-EOT;
-} else {print <<<EOT
--->
-				<a id="td_msg" href="message.php" title="消息" target="_blank" hidefocus="true">消息</a>
-<!--
-EOT;
-}if($db_job_isopen){
-$jobnum = ($winddb['jobnum']>0) ? "(".$winddb['jobnum'].")" : "";
 print <<<EOT
 -->
-                <a href="jobcenter.php" id="newjob" hidefocus="true" num="$jobnum">任务<span class="green">$jobnum</span></a>
-<!--
-EOT;
-}
-print <<<EOT
--->
-                <i>&nbsp;</i>
-                <span id="span_profile"><a id="td_profile" class="menu_down" href="profile.php" hidefocus="true" target="_blank">设置<span>设置</span></a></span>
-<script language="JavaScript">
-var td_userinfomore = {
-	open : function() {
-		$('span_userinfomore').className = 'current';
-		if (typeof userBinding == 'object') {
-			userBinding.append();
-		}
-	},
-	close : function () {
-		$('span_userinfomore').className = '';
-	}
-}
-var td_profile = {
-	pz : 22,
-	open : function() {
-		$('span_profile').className = 'current';
-	},
-	close : function () {
-		$('span_profile').className = '';
-	}
-}
-</script>
-<!--
-EOT;
-if (getstatus($winddb['userstatus'],12)) {print <<<EOT
--->
-                <script language="JavaScript" src="js/userbinding.js"></script>
-<!--
-EOT;
-}if(CkInArray($windid,$manager) || $SYSTEM['allowadmincp']){print <<<EOT
--->
-                <i>&nbsp;</i>
-				<a href="$db_adminfile" target="_blank" class="backend" hidefocus="true">系统设置</a>
-<!--
-EOT;
-}}print <<<EOT
--->
-            </span>
-        </div>
-    </div>
-</div>
-<!--
-EOT;
-if ($winduid){print<<<EOT
--->
-<div id="menu_userinfomore" style="display:none;">
-	<div class="pw_menu" style="margin-top:-2px;margin-top:0\0;">
-		<div style="width:26.5em;">
-		<ul class="menu-half cc">
-		<li>等级: $gp_grouptitle</li>
-<!--
-EOT;
-if ($_G['allowhide']) {print <<<EOT
--->
-		<li>状态:
-<span style="cursor:pointer;" onclick="ajax.send('pw_ajax.php?action=changestate','',changeState)" id="online_state">
-<!--
-EOT;
-if (GetCookie('hideid') == 1) {print <<<EOT
---><img src="$imgpath/stealth.png" align="absmiddle" />隐身
+			<div class="fr"><a href="login.php" title="登录" hidefocus="true">登陆</a>|<a href="$regurl"  title="注册" hidefocus="true">注册</a></div>
 <!--
 EOT;
 } else {print <<<EOT
---><img src="$imgpath/online.png" align="absmiddle" />在线
+-->
+			<div class="fr">
+			<a href="u.php"  hidefocus="true">$windid</a>
+			<a href="$loginouturl" hidefocus="true">退出</a>&nbsp;|
 <!--
 EOT;
-}print <<<EOT
---></span>
-<script language="JavaScript">
-function changeState() {
-	var msg = ajax.request.responseText;
-	if (msg == 1){
-		getObj('online_state').innerHTML = '<img src="$imgpath/stealth.png" align="absmiddle" />隐身';
-	}else{
-		getObj('online_state').innerHTML = '<img src="$imgpath/online.png" align="absmiddle" />在线';
+if($winddb['newpm']>0 && $_G['maxmsg']>0){
+$tmpMsgNum = 0;
+$tmpMsgNum += $winddb['newpm'];
+$winddb['newreferto']>0 && $tmpMsgNum += $winddb['newreferto'];
+$winddb['newcomment']>0 && $tmpMsgNum += $winddb['newcomment'];
+$winddb['newfans']>0 && $tmpMsgNum += $winddb['newfans'];
+print <<<EOT
+-->
+				<a href="message.php" class="link_down">消息<span class="s2">($tmpMsgNum)</span></a>
+<!--
+EOT;
+	}else{print <<<EOT
+-->
+				<a href="message.php">消息</a>
+<!--
+EOT;
 	}
-}
-</script>
-			</li>
+	$db_menuinit .= ",'td_profile' : 'menu_profile'";
+print <<<EOT
+-->
+				<a id="td_profile" href="profile.php" class="mr10 link_down"><span>设置</span></a>
+<!--
+EOT;
+	if (CkInArray($windid, $manager) || $SYSTEM['allowadmincp']) {print <<<EOT
+-->
+				| <a href="$db_adminfile" target="_blank">系统设置</a>
 <!--
 EOT;
 }print <<<EOT
 -->
 
-			<li>帖子: $winddb[postnum]</li>
-			<li>今日: $winddb[todaypost]</li>
-			<li>$db_rvrcname: $userrvrc $db_rvrcunit</li>
-			<li>$db_moneyname: $winddb[money] $db_moneyunit</li>
-			<li>$db_creditname: $winddb[credit] $db_creditunit</li>
-			<li>最后登录: <span class="f10">{$_LoginInfo['lastlodate']}</span></li>
-			<li>登录IP: <span class="f10">$onlineip</span></li>
-		</ul>
-			<div class="userbindingMenu"></div>
-		</div>
-	</div>
-</div>
-<div id="menu_profile" class="pw_menu" style="display:none">
-    <ul class="menuList">
-        <li><a href="profile.php?action=modify" target="_blank">帐号</a></li>
-        <li><a href="profile.php?action=privacy" target="_blank">隐私</a></li>
-        <li><a href="userpay.php" target="_blank">积分</a></li>
-        <li><a href="profile.php?action=permission" target="_blank">权限</a></li>
-    </ul>
-</div>
+			</div>
+			<div id="menu_profile" style="display:none;">
+				<div style="margin-right:-6px;">
+				<div class="pw_menu" style=" position:relative;width:47px;_margin-top:-7px;">
+					<h6 style="left:-1px;padding-left:8px;"><a href="profile.php" class="link_down"><span>设置</span></a></h6>
+					<ul class="menuList" style="width:45px;">
+						<li><a href="profile.php?action=modify">帐号</a></li>
+						<li><a href="profile.php?action=privacy">隐私</a></li>
+						<li><a href="userpay.php">积分</a></li>
+						<li><a href="profile.php?action=permission">权限</a></li>
+					</ul>
+				</div>
+				</div>
+			</div>
+
 <!--
 EOT;
-}?>-->
+}print <<<EOT
+-->
+
+<!--
+EOT;
+if ($_Navbar['main']['few']) {
+	foreach($_Navbar['main']['few'] as $key => $value) {
+		if (!$value[data][nid]) continue;
+		$nav = buildNavLinkHtml($value['data']);
+	print <<<EOT
+-->
+				$nav
+<!--
+EOT;
+	}
+} 
+print <<<EOT
+-->
+
+
+<!--
+EOT;
+if (count($_Navbar['main']['more'])) {
+	$db_menuinit .= ",'td_omainNav' : 'menu_omainNav'";
+print <<<EOT
+-->
+	<a id="td_omainNav" class="link_down"><span id="td_omainNav" class="link_down">更多</span></a>
+	<div id="menu_omainNav" style="display:none;">
+		<div style="margin-left:-7px;">
+		<div class="pw_menu" style=" position:relative;width:102px;_margin-top:-7px;">
+			<h6 style="left:-1px;padding-left:6px;" class="link_down"><span>更多</span></h6>
+			<ul class="menuList">
+<!--
+EOT;
+	foreach($_Navbar['main']['more'] as $key => $value) {
+		if (!$value[data][nid]) continue;
+		$nav = buildNavLinkHtml($value['data']);
+print<<<EOT
+-->
+				$nav
+<!--
+EOT;
+	}
+print <<<EOT
+-->
+			</ul>
+		</div>
+		</div>
+	</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+		</div>
+	</div>
+<!--
+EOT;
+list($htmlAdvert,$arrayAdvert) = pwAdvert('Site.Header','');
+if($htmlAdvert){print <<<EOT
+-->
+<div class="tac mb5">$htmlAdvert</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+<!--
+EOT;
+?>-->

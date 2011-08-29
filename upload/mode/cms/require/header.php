@@ -1,7 +1,7 @@
 <?php
 !defined('M_P') && exit('Forbidden');
 !defined('USED_HEAD') && define('USED_HEAD', 1);
-require_once(L::style('',$skinco,true));
+require (L::style('', $skinco, true));
 $db_menuinit .= "'td_userinfomore' : 'menu_userinfomore'";
 //头部统一为论坛头部添加
 $db_menuinit .= ",'td_u' : 'menu_u'";

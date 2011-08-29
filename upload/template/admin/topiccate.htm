@@ -201,7 +201,7 @@ print <<<EOT
 		<td class="td2"><a href="read.php?tid=$value[tid]" target="_blank" class="unline">$value[subject]</a></td>
 		<td class="td2">{$topicmodeldb[$modelid][name]}</td>
 		<td class="td2"><a href="thread.php?fid=$value[fid]" target="blank">{$forum[$value[fid]][name]}</a></td>
-		<td class="td2"><a href="u.php?uid=$value[authorid]" target="_blank" class="unline">$value[author]</a></td>
+		<td class="td2"><a href="{$db_userurl}$value[authorid]" target="_blank" class="unline">$value[author]</a></td>
 		<td class="td2">$value[postdate]</td>
 		<td class="td2"><a href="$basename&action=delthreads&selid=$value[tid]&modelid=$modelid" onclick="if(!confirm('是否确认删除该帖子？')){return false;}" class="unline">删除</a></td>
 	</tr>
@@ -796,7 +796,7 @@ EOT;
 <table cellpadding="0" cellpadding="0" width="300">
 	<tr class="tr1 vt">
 		<td class="td2">模板名称:</td>
-		<td class="td2"><input type="text" class="input input_wa" name="modename" value=""></td>
+		<td class="td2" style="width:170px"><input type="text" class="input input_wa" name="modename" value=""></td>
 	</tr>
 </table>
 </div>

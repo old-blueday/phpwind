@@ -9,6 +9,8 @@
 .admin_table .tr3 td{padding:8px 0 6px 15px;}
 .admin_table .td1,.admin_table .td2,.admin_table .td3{padding:8px 5px 8px 15px;border-bottom:1px solid #dde9f5;line-height:22px;}
 .admin_table .td1,.admin_table .td3{width:140px;color:#333;background:#f4f8fc;}
+.admin_table .td1{padding:5px 5px 5px 15px;}
+.admin_table .td1 h2{padding:0; font-weight:700;line-height:14px;}
 .admin_table table a{color:#336699;}
 .td_bgA td{background:#f1faff;}
 .pwC_h{line-height:25px;height:25px;border-top:1px solid #cbdaea;background:#eaf2fa;margin:0;padding:0 15px; font-size:14px; font-weight:700;border-bottom:1px solid #deeaf7;color:#333;}
@@ -23,6 +25,7 @@
 .pwC_nav_a li a{float:left;display:block;border:1px solid #cbdaea;padding:0 5px;line-height:22px;background:#f7fbff;}
 .pwC_nav_a li a:hover{ text-decoration:none;color:#336699;}
 .pwC_nav_a li.current a{border-bottom:0px;background:#fff;height:23px;}
+.pwC_nav_a li.none a{border:0;background:none;}
 
 .pwC_search{padding:10px;border-bottom:1px solid #dde9f5;}
 .pwC_search select{ vertical-align:middle;}
@@ -71,6 +74,7 @@ textarea{border: 1px solid; border-color: #c0c0c0 #ededed #ededed #c0c0c0;}
 .gray{color:#999999;}
 
 .mt10{margin-top:10px;}
+.lh_18{line-height:18px;height:18px;overflow:hidden;}
 .lh3{line-height:3;}
 .tip-page{width:600px;margin:20px auto 30px;}
 .tip-table{margin:0 1px;background:#ffffff;width:598px;}

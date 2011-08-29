@@ -1,12 +1,12 @@
 <!--<?php
 include_once PrintEot('left');
-if ($admintype == 'msphinx') {
+if ($adminitem == 'msphinx') {
 print <<<EOT
 -->
 <div class="nav3 mb10">
     <ul class="cc">
-        <li class="current"><a href="$admin_file?adminjob=advanced&admintype=msphinx">Sphinx全文索引配置</a></li>
-        <li><a href="$admin_file?adminjob=advanced&admintype=mmemcache">Memcache 缓存配置</a></li>
+        <li class="current"><a href="$admin_file?adminjob=advanced&adminitem=msphinx">Sphinx全文索引配置</a></li>
+        <li><a href="$admin_file?adminjob=advanced&adminitem=mmemcache">Memcache 缓存配置</a></li>
     </ul>
 </div>
 <div class="admin_info mb10">
@@ -65,6 +65,27 @@ print <<<EOT
     更详细的介绍与说明请参考全文索引官方文档</p>
 				</td>
 			</tr>
+
+            <tr class="tr1 vt">
+                <td class="td1">分词模式选择</td>
+                <td class="td2">
+		        	<ul class="list_A list_80" id="ws_mode">
+						<li><input type="radio" value="1" name="wordsegment_mode" {$wordsegment_mode[1]}>一元分词</li>
+						<li><input type="radio" value="2" name="wordsegment_mode" {$wordsegment_mode[2]}>二元分词</li>
+		            </ul>
+	            </td>
+            </tr>						
+            <tr class="tr1 vt">
+                <td class="td1">实时操作记录(开启后将影响速度，请谨慎选择)</td>
+                <td class="td2">
+					<ul class="list_A list_120" id="syn_data_id">
+						<li><input type="checkbox" value="sync_threads" name="sync_data[]" {$sync_data['sync_threads']} /> 帖子</li>
+						<li><input type="checkbox" value="sync_posts" name="sync_data[]" {$sync_data['sync_posts']} /> 回复</li>
+						<li><input type="checkbox" value="sync_diarys" name="sync_data[]" {$sync_data['sync_diarys']} /> 日志</li>
+						<li><input type="checkbox" value="sync_members" name="sync_data[]" {$sync_data['sync_members']} /> 用户</li>
+					</ul>
+	            </td>
+            </tr>	            
             <tr class="tr1 vt">
                 <td class="td1">设置全文索引评分模式</td>
                 <td class="td2">
@@ -88,17 +109,29 @@ print <<<EOT
                 </td>
             </tr>
             <tr class="tr1 vt">
-                <td class="td1">[主题索引]名称</td>
+                <td class="td1">[帖子索引]名称</td>
                 <td class="td2"><input type="text" name="tindex" value="$configure[tindex]"  id="tindex" class="input input_wa" /></td>
             </tr>
             <tr class="tr1 vt">
-                <td class="td1">[主题+内容索引]名称 </td>
+                <td class="td1">[帖子+内容索引]名称 </td>
                 <td class="td2"><input type="text" name="tcindex" value="$configure[tcindex]"  id="tcindex" class="input input_wa" /></td>
             </tr>
             <tr class="tr1 vt">
                 <td class="td1">[回复索引]名称 </td>
                 <td class="td2"><input type="text" name="pindex" value="$configure[pindex]"  id="pindex" class="input input_wa" /></td>
             </tr>
+            <tr class="tr1 vt">
+                <td class="td1">[日志主题索引]名称 </td>
+                <td class="td2"><input type="text" name="dindex" value="$configure[dindex]"  id="dindex" class="input input_wa" /></td>
+            </tr>
+            <tr class="tr1 vt">
+                <td class="td1">[日志主题+内容索引]名称 </td>
+                <td class="td2"><input type="text" name="dcindex" value="$configure[dcindex]"  id="dcindex" class="input input_wa" /></td>
+            </tr>
+            <tr class="tr1 vt">
+                <td class="td1">[文章索引]名称 </td>
+                <td class="td2"><input type="text" name="cmsindex" value="$configure[cmsindex]"  id="cmsindex" class="input input_wa" /></td>
+            </tr>                                    
         </table>
     </div>
 </div>
@@ -110,12 +143,12 @@ print <<<EOT
 </form>
 <!--
 EOT;
-}elseif($admintype == 'mmemcache'){print <<<EOT
+}elseif($adminitem == 'mmemcache'){print <<<EOT
 -->
 <div class="nav3 mb10">
     <ul class="cc">
-        <li><a href="$admin_file?adminjob=advanced&admintype=msphinx">Sphinx全文索引配置</a></li>
-        <li class="current"><a href="$admin_file?adminjob=advanced&admintype=mmemcache">Memcache 缓存配置</a></li>
+        <li><a href="$admin_file?adminjob=advanced&adminitem=msphinx">Sphinx全文索引配置</a></li>
+        <li class="current"><a href="$admin_file?adminjob=advanced&adminitem=mmemcache">Memcache 缓存配置</a></li>
     </ul>
 </div>
 <div class="admin_info mb10">
@@ -159,6 +192,10 @@ EOT;
 		<td class="td1">服务器端口号</td>
 		<td class="td2"><input type="text" name="port" value="{$configure[port]}" id="port" class="input input_wa" /></td>
 	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">唯一键前缀</td>
+		<td class="td2"><input type="text" name="hash" value="{$configure[hash]}" id="hash" class="input input_wa" /></td>
+	</tr>	
 </table>
 </div>
 <div class="tac p10">
@@ -207,6 +244,18 @@ var sphinx = {
 		this.$("tindex").value = "threadsindex";
 		this.$("tcindex").value = "tmsgsindex";
 		this.$("pindex").value = "postsindex";
+		this.$("dindex").value = "diarysindex";
+		this.$("dcindex").value = "diarycontentsindex";
+		this.$("cmsindex").value = "cmsindex";
+		var ws_mode = this.$("ws_mode").getElementsByTagName("input");
+		for(var i=0;i<ws_mode.length;i++){
+			ws_mode[i].checked = false;
+		}
+		ws_mode[0].checked = true;
+		var syn_data_id = this.$("syn_data_id").getElementsByTagName("input");
+		for(var i=0;i<syn_data_id.length;i++){
+			syn_data_id[i].checked = false;
+		}		
 		var ranks = this.$("rank").getElementsByTagName("option");
 		for(var i=0;i<ranks.length;i++){
 			if(ranks[i].value == "SPH_RANK_PROXIMITY_BM25" ){
@@ -229,4 +278,5 @@ var sphinx = {
 </script>
 <!--
 EOT;
+include_once PrintEot('adminbottom');
 ?>-->

@@ -90,12 +90,14 @@ getObj('showSmile').onclick = function(e) {
 		getObj('smileContainer').style.display='none';
 		document.body.onclick=null;
 	};
+	getObj('writetext').focus();
 	var rect = getObj('showSmile').getBoundingClientRect();
 	getObj('smileContainer').style.left = rect.left+ietruebody().scrollLeft+'px';
 	getObj('smileContainer').style.top = rect.top + ietruebody().scrollTop + 20 +'px';
 }
 applySmile(function(codeText) {
 	insertContentToTextArea(getObj('writetext'), codeText);
+	checkTextNum('writetext','writetext_warn',255,true);
 });
 </script>
 <script language="JavaScript" src="mode/o/js/smile.js"></script>
@@ -117,7 +119,7 @@ if($value[icon]){print <<<EOT
 -->
  
 
-		<dt class="dt"><a href="u.php?uid=$value[uid]" target="_blank" class="userCard img_50"  id="card_write_{$i}_{$value[uid]}"><img src="$value[icon]" width="44" height="44" /></a><span id="write_{$i}" style="height:1px" class="fr"></span></dt>
+		<dt class="dt"><a href="{$db_userurl}$value[uid]" target="_blank" class="userCard img_50"  id="card_write_{$i}_{$value[uid]}"><img src="$value[icon]" width="44" height="44" /></a><span id="write_{$i}" style="height:1px" class="fr"></span></dt>
 		<dd class="dd">
 <!--
 EOT;
@@ -129,7 +131,7 @@ if ($ifadmin || $value['uid'] == $winduid) {print <<<EOT
 EOT;
 }print <<<EOT
 -->
-		<p class="f14 mb15"><a href="u.php?uid=$value[uid]" target="_blank" class="mr5">$value[username]</a>$value[content]</p>
+		<p class="f14 mb15"><a href="{$db_userurl}$value[uid]" target="_blank" class="mr5">$value[username]</a>$value[content]</p>
 		<p class="gray mb10"><span class="mr5">{$value[postdate]}</span><!--通过{$db_blogsource[$value[source]]}--><span id="com_write_$value[id]"><a href="javascript:;" id='a_write_{$value[id]}' onclick="PW_Comment.showCommList('groupwrite','$value[id]',this)">回复({$value[c_num]})</a></span> 
         </p>
 		<div id="combox_groupwrite_{$value[id]}">

@@ -1,11 +1,13 @@
 <!--<?php
 require_once(uTemplate::printEot('header'));
-//require_once(uTemplate::printEot('user_appleft'));
+require_once(uTemplate::printEot('user_appleft'));
 print <<<EOT
 -->
 <link rel="stylesheet" type="text/css" href="apps/activity/images/style.css" media="all" />
 <div class="contUser">
+<table width="100%"><tr><td valign="top" height="500">
 	<div class="p15">
+		<h4 class="site"><img src="u/images/module/activity.png" align="absmiddle" class="mr10" /><span>活动</span></h4>
 		<div class="navC">
             <ul>
                 <li id="a_own"><a href="{$basename}">我的活动</a></li>
@@ -36,8 +38,7 @@ EOT;
 		</div>
 		<div class="bgA p10 cc">
 		<span class="fr">
-			<form action="mode.php" method="GET">
-			<input type="hidden" name="m" value="o" />
+			<form action="apps.php?q=activity" method="GET">
 			<input type="hidden" name="q" value="activity" />
 			<input type="hidden" name="a" value="$a" />
 			<input type="hidden" name="see" value="$see" />
@@ -265,7 +266,7 @@ EOT;
 print <<<EOT
 -->
 						</h4>
-						<p class="mb5">活动时间：$value[starttime] - $value[endtime]</p>
+						<p class="mb5">活动时间：$value[starttime] 至 $value[endtime]</p>
 						<p class="mb5">活动地点：$value[location]</p>
 						<p class="acSummary">
 <!--
@@ -311,7 +312,7 @@ EOT;
 			if ($value[authorid]) {
 print <<<EOT
 -->
-							<a target="_blank" href="u.php?uid=$value[authorid]">$value[author]</a>
+							<a target="_blank" href="{$db_userurl}$value[authorid]">$value[author]</a>
 <!--
 EOT;
 			} else {
@@ -347,6 +348,7 @@ EOT;
 print <<<EOT
 -->
 	</div>
+</td></tr></table>
 </div>
 <script type="text/javascript">setCurrent('see_$see','see_fromforum','b s5');</script>
 <!--

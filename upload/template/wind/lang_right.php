@@ -14,6 +14,7 @@ $lang['right'] = array (
 	'message' => array(
 		'allowmessege'	=> array(
 			'title'	=> '发送消息',
+			'desc'  => '开启后，此用户组的用户可以发送消息',
 			'html'	=> '<ul class="list_A list_80 cc"><li><input type="radio" value="1" name="group[allowmessege]" $allowmessege_Y />开启</li><li><input type="radio" value="0" name="group[allowmessege]" $allowmessege_N />关闭</li></ul>'
 		),
 		'maxmsg'	=> array(
@@ -35,36 +36,43 @@ $lang['right'] = array (
 		),
 		'multiopen' => array(
 			'title'	  => '发送多人消息',
+			'desc'	  => '开启后，此用户组的用户可以发送多人消息',
 			'html'    => '<ul class="list_A list_80 cc"><li><input type="radio" value="1" name="group[multiopen]" $multiopen_Y />开启</li><li><input type="radio" value="0" name="group[multiopen]" $multiopen_N />关闭</li></ul>'
 		)
 	),
 	'basic' => array(
 		'allowvisit' => array(
 			'title'	=> '站点访问',
-			'desc'	=> '选择关闭，用户将不能访问站点的任何页面',
+			'desc'	=> '关闭后，用户将不能访问站点的任何页面',
 			'html'	=> '<ul class="list_A list_80 cc"><li><input type="radio" value="1" name="group[allowvisit]" $allowvisit_Y />开启</li><li><input type="radio" value="0" name="group[allowvisit]" $allowvisit_N />关闭</li></ul>'
 		),
 		'allowhide' => array(
 			'title'	=> '隐身登录',
+			'desc'	=> '开启后，用户可以隐身登陆站点',
 			'html'	=> '<ul class="list_A list_80 cc"><li><input type="radio" value="1" name="group[allowhide]" $allowhide_Y />开启</li><li><input type="radio" value="0" name="group[allowhide]" $allowhide_N />关闭</li></ul>'
 		),
 		'userbinding' => array(
-			'title'	=> '绑定其他帐号',
+			'title'	=> '多账号绑定',
+			'desc'	=> '俗称马甲绑定',
+			'desc'	=> '开启后，用户可以进行多账号绑定',
 			'html'	=> '<ul class="list_A list_80 cc"><li><input type="radio" value="1" name="group[userbinding]" $userbinding_Y />开启</li><li><input type="radio" value="0" name="group[userbinding]" $userbinding_N />关闭</li></ul>'
 		),
 		'allowread'	=> array(
 			'title'	=> '浏览帖子',
+			'desc'	=> '开启后，用户可以浏览帖子',
 			'html'	=> '<ul class="list_A list_80 cc"><li><input type="radio" value="1" name="group[allowread]" $allowread_Y />开启</li><li><input type="radio" value="0" name="group[allowread]" $allowread_N />关闭</li></ul>'
 		),
 		'allowsearch'	=> array(
 			'title'	=> '搜索控制',
+			'desc'	=> '修改用户的搜索权限',
 			'html'	=> '<ul class="list_A"><li><input type="radio" value="0" name="group[allowsearch]" $allowsearch_0 />不允许</li>
 			<li><input type="radio" value="1" name="group[allowsearch]" $allowsearch_1 />允许搜索主题标题</li>
-			<li><input type="radio" value="2" name="group[allowsearch]" $allowsearch_2 />允许搜索主题内容</li>
+			<li><input type="radio" value="2" name="group[allowsearch]" $allowsearch_2 />允许搜索主题标题、内容</li>
 			<li><input type="radio" value="3" name="group[allowsearch]" $allowsearch_3 />允许搜索全部内容(包含回复内容)</li></ul>'
 		),
 		'allowmember'	=> array(
 			'title'	=> '查看会员列表',
+			'desc'	=> '开启后，用户可以查看会员列表',
 			'html'	=> '<ul class="list_A list_80 cc"><li><input type="radio" value="1" name="group[allowmember]" $allowmember_Y />开启</li><li><input type="radio" value="0" name="group[allowmember]" $allowmember_N />关闭</li></ul>'
 		),
 		/*
@@ -75,28 +83,34 @@ $lang['right'] = array (
 		*/
 		'atclog' => array(
 			'title'	=> '查看帖子操作记录',
-			'desc'	=> '允许用户查看自己的帖子被操作情况',
+			'desc'	=> '允许用户查看自己帖子的被操作情况',
 			'html'	=> '<ul class="list_A list_80 cc"><li><input type="radio" value="1" name="group[atclog]" $atclog_Y />开启</li><li><input type="radio" value="0" name="group[atclog]" $atclog_N />关闭</li></ul>'
 		),
+		//去掉展区功能@modify panjl@2010-11-2
+		/*
 		'show' => array(
 			'title'	=> '使用展区',
 			'html'	=> '<ul class="list_A list_80 cc"><li><input type="radio" value="1" name="group[show]" $show_Y />开启</li><li><input type="radio" value="0" name="group[show]" $show_N />关闭</li></ul>'
 		),
+		*/
 		'allowreport' => array(
 			'title'	=> '使用举报',
+			'desc'	=> '开启后，此用户组的用户可以使用举报功能',
 			'html'	=> '<ul class="list_A list_80 cc"><li><input type="radio" value="1" name="group[allowreport]" $allowreport_Y />开启</li><li><input type="radio" value="0" name="group[allowreport]" $allowreport_N />关闭</li></ul>'
 		),
 		'upload' => array(
 			'title'	=> '头像上传',
-			'desc'	=> '此设置需先在核心设置中开启头像上传功能才有效',
+			'desc'	=> "此设置需先在 <a href=\"$admin_file?adminjob=member\" onclick=\"parent.PW.Dialog({id:'member',url:'$admin_file?adminjob=member',name:'会员相关'});return false;\">全局->会员相关->头像设置</a> 中开启头像上传功能才有效",
 			'html'	=> '<ul class="list_A list_80 cc"><li><input type="radio" value="1" name="group[upload]" $upload_Y />开启</li><li><input type="radio" value="0" name="group[upload]" $upload_N />关闭</li></ul>'
 		),
 		'allowportait'	=> array(
 			'title'	=> '头像链接',
+			'desc'	=> '开启后，此用户组的用户可以用外部网站图片链接地址作为自己的头像',
 			'html'	=> '<ul class="list_A list_80 cc"><li><input type="radio" value="1" name="group[allowportait]" $allowportait_Y />开启</li><li><input type="radio" value="0" name="group[allowportait]" $allowportait_N />关闭</li></ul>'
 		),
 		'allowhonor'	=> array(
 			'title'	=> '个性签名',
+			'desc'	=> '开启后，此用户组的用户可以使用个性签名功能',
 			'html'	=> '<ul class="list_A list_80 cc"><li><input type="radio" value="1" name="group[allowhonor]" $allowhonor_Y />开启</li><li><input type="radio" value="0" name="group[allowhonor]" $allowhonor_N />关闭</li></ul>'
 		),
 		/*'allowmessege'	=> array(
@@ -105,15 +119,16 @@ $lang['right'] = array (
 		),*/
 		'allowsort'	=> array(
 			'title'	=> '查看统计排行',
+			'desc'	=> '开启后，此用户组的用户可以查看统计排行',
 			'html'	=> '<ul class="list_A list_80 cc"><li><input type="radio" value="1" name="group[allowsort]" $allowsort_Y />开启</li><li><input type="radio" value="0" name="group[allowsort]" $allowsort_N />关闭</li></ul>'
 		),
-		'alloworder'	=> array(
+		/*'alloworder'	=> array(
 			'title'	=> '主题排序',
 			'html'	=> '<ul class="list_A list_80 cc"><li><input type="radio" value="1" name="group[alloworder]" $alloworder_Y />开启</li><li><input type="radio" value="0" name="group[alloworder]" $alloworder_N />关闭</li></ul>'
-		),
+		),*/
 		'viewipfrom'	=> array(
 			'title'	=> '查看ip来源',
-			'desc'	=> '如果论坛模式下界面设置中<a href="admin.php?adminjob=settings&admintype=read">帖子阅读页设置</a>关闭此功能，则此项设置无效',
+			'desc'	=> "如果论坛模式下界面设置中<a href=\"$admin_file?adminjob=settings&admintype=read\">帖子阅读页设置</a>关闭此功能，则此项设置无效",
 			'html'	=> '<ul class="list_A list_80 cc"><li><input type="radio" value="1" name="group[viewipfrom]" $viewipfrom_Y />开启</li><li><input type="radio" value="0" name="group[viewipfrom]" $viewipfrom_N />关闭</li></ul>'
 		),
 		'searchtime'	=> array(
@@ -177,10 +192,12 @@ $lang['right'] = array (
 		),
 		'maxfavor'	=> array(
 			'title'	=> '收藏夹容量',
+			'desc'  => '设置收藏夹可以收藏的信息条数',
 			'html'	=> '<input class="input input_wa" value="$maxfavor" name="group[maxfavor]" />'
 		),
 		'maxgraft'	=> array(
 			'title'	=> '草稿箱容量',
+			'desc'  => '设置草稿箱可以容纳的信息条数',
 			'html'	=> '<input class="input input_wa" value="$maxgraft" name="group[maxgraft]" />'
 		),
 		'pwdlimitime'	=> array(
@@ -197,26 +214,32 @@ $lang['right'] = array (
 	'read'	=> array(
 		'allowpost'	=> array(
 			'title'	=> '发表主题',
+			'desc'	=> '开启后，此用户组的用户可以发表主题',
 			'html'	=> '<ul class="list_A list_80 cc"><li><input type="radio" value="1" name="group[allowpost]" $allowpost_Y />开启</li><li><input type="radio" value="0" name="group[allowpost]" $allowpost_N />关闭</li></ul>'
 		),
 		'allowrp'	=> array(
 			'title'	=> '回复主题',
+			'desc'	=> '开启后，此用户组的用户可以回复主题',
 			'html'	=> '<ul class="list_A list_80 cc"><li><input type="radio" value="1" name="group[allowrp]" $allowrp_Y />开启</li><li><input type="radio" value="0" name="group[allowrp]" $allowrp_N />关闭</li></ul>'
 		),
 		'allownewvote'	=> array(
 			'title'	=> '发起投票',
+			'desc'	=> '开启后，此用户组的用户可以发起投票',
 			'html'	=> '<ul class="list_A list_80 cc"><li><input type="radio" value="1" name="group[allownewvote]" $allownewvote_Y />开启</li><li><input type="radio" value="0" name="group[allownewvote]" $allownewvote_N />关闭</li></ul>'
 		),
 		'modifyvote'	=> array(
 			'title'	=> '修改发起的投票选项',
+			'desc'	=> '开启后，此用户组的用户有权限修改发起的投票选项',
 			'html'	=> '<ul class="list_A list_80 cc"><li><input type="radio" value="1" name="group[modifyvote]" $modifyvote_Y />开启</li><li><input type="radio" value="0" name="group[modifyvote]" $modifyvote_N />关闭</li></ul>'
 		),
 		'allowvote'	=> array(
 			'title' => '参与投票',
+			'desc'	=> '开启后，此用户组的用户可以参与投票',
 			'html'	=> '<ul class="list_A list_80 cc"><li><input type="radio" value="1" name="group[allowvote]" $allowvote_Y />开启</li><li><input type="radio" value="0" name="group[allowvote]" $allowvote_N />关闭</li></ul>'
 		),
 		'viewvote'	=> array(
 			'title'	=> '查看投票用户',
+			'desc'	=> '开启后，此用户组的用户可以查看投票用户',
 			'html'	=> '<ul class="list_A list_80 cc"><li><input type="radio" value="1" name="group[viewvote]" $viewvote_Y />开启</li><li><input type="radio" value="0" name="group[viewvote]" $viewvote_N />关闭</li></ul>'
 		),
 		/*'allowactive'	=> array(
@@ -225,27 +248,33 @@ $lang['right'] = array (
 		),*/
 		'allowreward'	=> array(
 			'title'	=> '悬赏帖',
+			'desc'	=> '开启后，此用户组的用户可以发表悬赏帖',
 			'html'	=> '<ul class="list_A list_80 cc"><li><input type="radio" value="1" name="group[allowreward]" $allowreward_Y />开启</li><li><input type="radio" value="0" name="group[allowreward]" $allowreward_N />关闭</li></ul>'
 		),
 		'allowgoods'	=> array(
 			'title'	=> '商品帖',
+			'desc'	=> '开启后，此用户组的用户可以发表商品帖',
 			'html'	=> '<ul class="list_A list_80 cc"><li><input type="radio" value="1" name="group[allowgoods]" $allowgoods_Y />开启</li><li><input type="radio" value="0" name="group[allowgoods]" $allowgoods_N />关闭</li></ul>'
 		),
 		'allowdebate'	=> array(
 			'title'	=> '辩论帖',
+			'desc'	=> '开启后，此用户组的用户可以发表辩论帖',
 			'html'	=> '<ul class="list_A list_80 cc"><li><input type="radio" value="1" name="group[allowdebate]" $allowdebate_Y />开启</li><li><input type="radio" value="0" name="group[allowdebate]" $allowdebate_N />关闭</li></ul>'
 		),
 		'allowmodelid'	=> array(
 			'title'	=> '分类信息帖',
+			'desc'	=> '开启后，此用户组的用户可以发表分类信息帖',
 			'html'	=> '<ul class="list_A list_80 cc"><li><input type="radio" value="1" name="group[allowmodelid]" $allowmodelid_Y />开启</li><li><input type="radio" value="0" name="group[allowmodelid]" $allowmodelid_N />关闭</li></ul>'
 		),
 		'allowpcid'	=> array(
 			'title'	=> '团购帖',
-			'html'	=> '<ul class="list_A list_80 cc"><li><input type="radio" name="group[allowpcid][]" value="1" $allowpcid_sel_Y/>开启</li><li><input type="radio" name="group[allowpcid][]" value="0" $allowpcid_sel_N />关闭</li>'
+			'desc'	=> '开启后，此用户组的用户可以发表团购帖',
+			'html'	=> '<ul class="list_A list_80 cc"><li><input type="radio" name="group[allowpcid]" value="1" $allowpcid_Y/>开启</li><li><input type="radio" name="group[allowpcid]" value="0" $allowpcid_N />关闭</li>'
 			//<li><input type="checkbox" name="group[allowpcid][]" value="2" $allowpcid_sel[2] />活动</li></ul>'
 		),
 		'allowactivity'	=> array(
 			'title'	=> '活动帖',
+			'desc'	=> '开启后，此用户组的用户可以发表活动帖',
 			'html'	=> '<ul class="list_A list_80 cc"><li><input type="radio" value="1" name="group[allowactivity]" $allowactivity_Y />开启</li><li><input type="radio" value="0" name="group[allowactivity]" $allowactivity_N />关闭</li></ul>'
 		),
 		'htmlcode'	=> array(
@@ -282,14 +311,17 @@ $lang['right'] = array (
 		),
 		'dig'	=> array(
 			'title'	=> '推荐帖子',
+			'desc'	=> '开启后，此用户组的用户可以推荐帖子',
 			'html'	=> '<ul class="list_A list_80 cc"><li><input type="radio" value="1" name="group[dig]" $dig_Y />开启</li><li><input type="radio" value="0" name="group[dig]" $dig_N />关闭</li></ul>'
 		),
 		'leaveword'	=>	array(
 			'title'	=> '楼主留言',
+			'desc'	=> '开启后，此用户组的用户可以给楼主留言',
 			'html'	=> '<ul class="list_A list_80 cc"><li><input type="radio" value="1" name="group[leaveword]" $leaveword_Y />开启</li><li><input type="radio" value="0" name="group[leaveword]" $leaveword_N />关闭</li></ul>'
 		),
 		'allowdelatc'	=> array(
 			'title'	=> '删除自己的帖子',
+			'desc'	=> '开启后，此用户组的用户可以删除自己的帖子',
 			'html'	=> '<ul class="list_A list_80 cc"><li><input type="radio" value="1" name="group[allowdelatc]" $allowdelatc_Y />开启</li><li><input type="radio" value="0" name="group[allowdelatc]" $allowdelatc_N />关闭</li></ul>'
 		),
 		'atccheck'	=> array(
@@ -335,12 +367,18 @@ $lang['right'] = array (
 			'title'	=> '编辑时间约束[分钟]',
 			'desc'	=> '超过设定时间后拒绝用户编辑。0或留空表示不限制',
 			'html'	=> '<input class="input input_wa" value="$edittime" name="group[edittime]" />'
+		),
+		//增加链接帖发帖限制@modify panjl@2010-11-2
+		'posturlnum'	=> array(
+			'title'	=> '链接帖发帖限制',
+			'desc'	=> '当会员的发表的帖子数量达到设定值以后就可以发表带链接的帖子。此设置为防止注册机注册后发带有链接地址的广告。0或留空表示不限制',
+			'html'	=> '<input class="input input_wa" value="$posturlnum" name="group[posturlnum]" />'
 		)
 	),
 	'group' =>array(
 		'allowcreate'=>array(
 			'title'=>'允许创建群组个数',
-			'desc' =>'0 或 留空 表示没限制，需要在群组基础设置中开启“<a href="admin.php?adminjob=apps&admintype=app_groups">允许创建新群组</a>”才有效',
+			'desc' =>"0 或 留空 表示没限制，需要在群组基础设置中开启<a href=\"$admin_file?adminjob=apps&admintype=app_groups\">允许创建新群组</a>才有效",
 			'html'=>'<input size="35" class="input" value="$allowcreate" name="group[allowcreate]" />'
 		),
 		'allowjoin'=>array(
@@ -415,15 +453,15 @@ $lang['right'] = array (
 		)
 	),
 	'system'	=> array(
-		'allowadmincp'	=> array(
-			'title'	=> '可进后台',
-			'desc'	=> "具体后台权限设置需要到<a href=\"$admin_file?adminjob=rightset\">创始人-后台权限管理</a>里进行配置",
-			'html'	=> '<ul class="list_A list_80 cc"><li><input type="radio" value="1" name="group[allowadmincp]" $allowadmincp_Y />开启</li><li><input type="radio" value="0" name="group[allowadmincp]" $allowadmincp_N />关闭</li></ul>'
-		),
 		'superright' => array(
 			'title'	=> '超级管理权限',
 			'desc'	=> "<font color=\"red\">是</font>：表明以下针对版块的权限设置对所有版块生效（例如：管理员）<br /><font color=\"red\">否</font>：表明以下针对版块的权限设置对所有版块无效，此时如果要配置单个版块的管理权限，需要到<a href=\"$admin_file?adminjob=singleright\">版块用户权限</a>里进行配置<br />（注：当编辑版主权限时，开启则版主在所有版块都拥有权限，关闭则版主只在本版块拥有权限）",
 			'html'	=> '<ul class="list_A list_80 cc"><li><input type="radio" value="1" name="group[superright]" $superright_Y />开启</li><li><input type="radio" value="0" name="group[superright]" $superright_N />关闭</li></ul>'
+		),
+		'enterreason' => array(
+			'title' => '强制输入操作原因',
+			'desc' => '开启后，前台管理的所有操作都必须输入操作原因。可避免由于管理操作上的不透明而引起站点会员纠纷',
+			'html'	=> '<ul class="list_A list_80 cc"><li><input type="radio" value="1" name="group[enterreason]" $enterreason_Y />开启</li><li><input type="radio" value="0" name="group[enterreason]" $enterreason_N />关闭</li></ul>'
 		),
 		'colonyright' => array(
 			'title'	=> '群组管理权限',
@@ -469,7 +507,7 @@ $lang['right'] = array (
 		),
 		'viewip'	=> array(
 			'title'	=> '查看IP',
-			'desc'	=> '浏览帖子时显示',
+			'desc'	=> '浏览帖子时显示,管理员将不受该功能限制',
 			'html'	=> '<ul class="list_A list_80 cc"><li><input type="radio" value="1" name="group[viewip]" $viewip_Y />开启</li><li><input type="radio" value="0" name="group[viewip]" $viewip_N />关闭</li></ul>'
 		),
 		'topped'	=> array(
@@ -482,6 +520,7 @@ $lang['right'] = array (
 		),
 		'replayorder' => array(
 			'title'	  => '帖子回复显示顺序',
+			'desc'    => '开启后，在编辑帖子时，用户能够设置帖子回复的显示顺序',
 			'html'	  => '<ul class="list_A list_80 cc"><li><input type="radio" value="1" name="group[replayorder]" $replayorder_Y />开启</li><li><input type="radio" value="0" name="group[replayorder]" $replayorder_N />关闭</li></ul>',
 		),
 		'digestadmin'	=> array(
@@ -567,6 +606,10 @@ $lang['right'] = array (
 			'title'	=> '合并主题',
 			'html'	=> '<ul class="list_A list_80 cc"><li><input type="radio" value="1" name="group[unite]" $unite_Y />开启</li><li><input type="radio" value="0" name="group[unite]" $unite_N />关闭</li></ul>'
 		),
+		'split'	=> array(
+			'title'	=> '拆分帖子',
+			'html'	=> '<ul class="list_A list_80 cc"><li><input type="radio" value="1" name="group[split]" $split_Y />开启</li><li><input type="radio" value="0" name="group[split]" $split_N />关闭</li></ul>'
+		),
 		'remind'	=> array(
 			'title'	=> '帖子管理提醒',
 			'html'	=> '<ul class="list_A list_80 cc"><li><input type="radio" value="1" name="group[remind]" $remind_Y />开启</li><li><input type="radio" value="0" name="group[remind]" $remind_N />关闭</li></ul>'
@@ -590,9 +633,7 @@ $lang['right'] = array (
 			<font color="red">无禁言权限:</font>该用户组无权限对会员进行禁言操作<br />
 			<font color="red">所有版块:</font>(有禁言权限)并且被禁言会员在所有版块中都没权限发言<br />
 			<font color="red">单一版块</font>(有禁言权限)并且被禁言会员在帖子所在版块没权限发言,而在其他版块中可以发言',
-			'html'	=> '<ul class="list_A"><li><input type="radio" value="0" name="group[banuser]" $banuser_0 />无禁言权限</li><li>
-			<input type="radio" value="1" name="group[banuser]" $banuser_1 />单一版块</li><li>
-			<input type="radio" value="2" name="group[banuser]" $banuser_2 />所有版块</li></ul>'
+			'html'	=> '<ul class="list_A"><li><input type="radio" value="0" name="group[banuser]" $banuser_0 />无禁言权限</li><li><input type="radio" value="1" name="group[banuser]" $banuser_1 />单一版块</li><li><input type="radio" value="2" name="group[banuser]" $banuser_2 />所有版块</li></ul>'
 		),
 		'bantype'	=> array(
 			'title'	=> '永久禁言用户',
@@ -602,6 +643,21 @@ $lang['right'] = array (
 			'title'	=> '禁言时间限制',
 			'desc'	=> '<font color=blue> 说明：</font>禁言会员的最大天数',
 			'html'	=> '<input type=text class="input input_wa" value="$banmax" name="group[banmax]" />'
+		),
+		'banuserip' => array(
+			'title' => '禁止ip',
+			'desc'  => '开启后，拥有禁止ip权限',
+			'html'	=> '<ul class="list_A list_80 cc"><li><input type="radio" value="1" name="group[banuserip]" $banuserip_Y />开启</li><li><input type="radio" value="0" name="group[banuserip]" $banuserip_N />关闭</li></ul>'
+		),
+		'banadmin'	=> array(
+			'title'	=> '可禁言管理组',
+			'desc'	=> '<font color=blue> 说明：</font>开启后，可以禁言所有用户组，包括系统组和特殊用户组',
+			'html'	=> '<ul class="list_A list_80 cc"><li><input type="radio" value="1" name="group[banadmin]" $banadmin_Y />开启</li><li><input type="radio" value="0" name="group[banadmin]" $banadmin_N />关闭</li></ul>'
+		),
+		'bansignature' => array(
+			'title' => '禁止帖子签名',
+			'desc'  => '开启后，拥有禁止帖子签名权限',
+			'html'	=> '<ul class="list_A list_80 cc"><li><input type="radio" value="1" name="group[bansignature]" $bansignature_Y />开启</li><li><input type="radio" value="0" name="group[bansignature]" $bansignature_N />关闭</li></ul>'
 		),
 		'areapush'	=> array(
 			'title'	=> '门户推送',
@@ -617,9 +673,9 @@ $lang['right'] = array (
 			'title'	=> '可编辑管理组帖子',
 			'desc'	=> '<font color=blue> 说明：</font>可编辑管理组的帖子',
 			'html'	=> '<ul class="list_A list_80 cc">
-			<li><input type="checkbox" name="group[tcanedit][]" value="3" $tcanedit_sel[3]/>管理员</li>
-			<li><input type="checkbox" name="group[tcanedit][]" value="4" $tcanedit_sel[4]/>总版主</li>
-			<li><input type="checkbox" name="group[tcanedit][]" value="5" $tcanedit_sel[5]/>论坛版主</li></ul>'
+			<li><label><input type="checkbox" name="group[tcanedit][]" value="3" $tcanedit_sel[3]/>管理员</label></li>
+			<li><label><input type="checkbox" name="group[tcanedit][]" value="4" $tcanedit_sel[4]/>总版主</label></li>
+			<li><label><input type="checkbox" name="group[tcanedit][]" value="5" $tcanedit_sel[5]/>论坛版主</label></li></ul>'
 		),
 		'deldiary'	=> array(
 			'title'	=> '日志删除权限',

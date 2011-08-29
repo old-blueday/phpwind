@@ -4,8 +4,8 @@
  * 门户前台管理入口
  * @author liuhui @2010-3-10
  */
-initGP(array("invokename","channelid","action","selid"));
-$invokename = pwConvert($invokename,$db_charset,'utf8');
+S::gp(array("invokename","channelid","action","selid"));
+$invokename = pwConvert(urldecode($invokename),$db_charset,'utf8');
 $levelService = L::loadclass("AreaLevel", 'area');
 if(empty($action)){
 	/*门户管理操作*/
@@ -23,7 +23,7 @@ if(empty($action)){
 	$level = $levelService->getAreaLevel($winduid,$channelid,$invokename);
 	if($level){
 		//获取频道名称
-		list($title,$baseUrl) = array("模块内容管理-".$invokeInfo['title'],"mode.php?m=area&q=manage&invokename=".$invokename."&channelid=".$channelid);
+		list($title,$baseUrl) = array("模块内容管理-".$invokeInfo['title'],"mode.php?m=area&q=manage&invokename=".urlencode($invokename)."&channelid=".$channelid);
 		require_once areaLoadFrontView('area_dialog');
 	}else{
 		echo $levelService->language("area_no_level");

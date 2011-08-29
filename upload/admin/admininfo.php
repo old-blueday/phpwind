@@ -10,11 +10,11 @@ if (defined('CE')) {
 $warnid = $mid = $u = 0;
 
 if ($job == 'memo') {
-	list($mmid,$mcontent) = $db->get_one("SELECT mid,content FROM pw_memo WHERE isuser='0' AND username=".pwEscape($admin_name),MYSQL_NUM);
+	list($mmid,$mcontent) = $db->get_one("SELECT mid,content FROM pw_memo WHERE isuser='0' AND username=".S::sqlEscape($admin_name),MYSQL_NUM);
 	$mmid = (int)$mmid;
-	$content = Char_cv($_POST['content']);
+	$content = S::escapeChar($_POST['content']);
 	if (!$mmid) {
-		$pwSQL = pwSqlSingle(array(
+		$pwSQL = S::sqlSingle(array(
 			'username'	=> $admin_name,
 			'postdate'	=> $timestamp,
 			'content'	=> $content,
@@ -22,20 +22,20 @@ if ($job == 'memo') {
 		));
 		$db->update('INSERT INTO pw_memo SET '.$pwSQL);
 	} elseif ($mmid==(int)$_POST['mid'] && $mcontent!=$content) {
-		$pwSQL = pwSqlSingle(array(
+		$pwSQL = S::sqlSingle(array(
 			'postdate'	=> $timestamp,
 			'content'	=> $content
 		));
-		$db->update("UPDATE pw_memo SET $pwSQL WHERE mid=".pwEscape($mmid));
+		$db->update("UPDATE pw_memo SET $pwSQL WHERE mid=".S::sqlEscape($mmid));
 	}
 	$job = '';
 }
 if (!$job) {
 	$content = '';
-	@extract($db->get_one('SELECT mid,content FROM pw_memo WHERE isuser=0 AND username='.pwEscape($admin_name)));
+	@extract($db->get_one('SELECT mid,content FROM pw_memo WHERE isuser=0 AND username='.S::sqlEscape($admin_name)));
 	$content && $content = str_replace('<br />',"\n",$content);
 }
-if (!$job || $job == 'notice') {
+if (!$job || $job == 'notice' || $job == 'desktop') {
 
 	$cachetext = explode("\r\n",substr(readover(D_P.'data/bbscache/admin_cache.php'),12));
 	list($cachetime,$pw_size,$o_size,$dbversion,$max_upload,$max_ex_time,$sys_mail,$totalmember,$threads,$posts,$hits, $yposts) = explode('|',$cachetext[0]);
@@ -67,16 +67,17 @@ if (!$job || $job == 'notice') {
 		@extract($db->get_one('SELECT SUM(topic) AS threads,SUM(article) AS posts FROM pw_forumdata'));
 		$hits = $db->get_value('SELECT SUM(hits) FROM pw_threads');
 		$cachetime = $timestamp+60*60*12;
-		writeover(D_P.'data/bbscache/admin_cache.php',"<?php die;?>$cachetime|$pw_size|$o_size|$dbversion|$max_upload|$max_ex_time|$sys_mail|$totalmember|$threads|$posts|$hits|$yposts\r\n{$cachetext[1]}");
+		/** writeover(D_P.'data/bbscache/admin_cache.php',"<?php die;?>$cachetime|$pw_size|$o_size|$dbversion|$max_upload|$max_ex_time|$sys_mail|$totalmember|$threads|$posts|$hits|$yposts\r\n{$cachetext[1]}"); **/
+		pwCache::setData(D_P.'data/bbscache/admin_cache.php',"<?php die;?>$cachetime|$pw_size|$o_size|$dbversion|$max_upload|$max_ex_time|$sys_mail|$totalmember|$threads|$posts|$hits|$yposts\r\n{$cachetext[1]}");
 	}
 	$altertime	= gmdate('Y-m-d H:i',$timestamp+$db_timedf*3600);
 	$systemtime	= $db_cvtime==0 ? $altertime : gmdate('Y-m-d H:i',time()+$db_timedf*3600);
 	$sysversion = PHP_VERSION;
-	$sysos      = str_replace('PHP/'.$sysversion,'',GetServer('SERVER_SOFTWARE'));
+	$sysos      = str_replace('PHP/'.$sysversion,'',S::getServer('SERVER_SOFTWARE'));
 	$ifcookie   = isset($_COOKIE) ? 'SUCCESS' : 'FAIL';
 }
 if (!$job || $job == 'desktop') {
-	if (/*$admin_gid=='3' ||*/ CkInArray($admin_name,$manager)) {
+	if (/*$admin_gid=='3' ||*/ S::inArray($admin_name,$manager)) {
 		$u = 1;
 		if (pwWritable(D_P.'data/sql_config.php')) {
 			$warnid += 1;
@@ -106,7 +107,7 @@ if (!$job || $job == 'desktop') {
 		}
 	}
 
-	include_once(D_P.'data/bbscache/forumcache.php');
+	include_once pwCache::getPath(D_P.'data/bbscache/forumcache.php');
 	$sysinfo = array();
 	if ($admin_gid == '3') {
 		$cachetext = explode("\r\n",substr(readover(D_P.'data/bbscache/admin_cache.php'),12));
@@ -140,7 +141,8 @@ if (!$job || $job == 'desktop') {
 			$sysinfo['pw_size']	 = number_format($sysinfo['pw_size']/(1024*1024),2);
 			$cachetext[1] = serialize($sysinfo);
 			$cachetime = $timestamp+60*60;
-			writeover(D_P.'data/bbscache/admin_cache.php',"<?php die;?>{$cachetext[0]}\r\n$cachetime|{$cachetext[1]}");
+			/** writeover(D_P.'data/bbscache/admin_cache.php',"<?php die;?>{$cachetext[0]}\r\n$cachetime|{$cachetext[1]}"); **/
+			pwCache::setData(D_P.'data/bbscache/admin_cache.php',"<?php die;?>{$cachetext[0]}\r\n$cachetime|{$cachetext[1]}");
 		} else {
 			$sysinfo = unserialize($sysinfo);
 		}
@@ -149,7 +151,7 @@ if (!$job || $job == 'desktop') {
 			$fids[] = $key;
 		}
 		if ($fids) {
-			$sql = "fid IN(" . pwImplode($fids) . ")";
+			$sql = "fid IN(" . S::sqlImplode($fids) . ")";
 			$sysinfo['tcheck'] = $db->get_value("SELECT COUNT(*) FROM pw_threads WHERE $sql AND ifcheck='0'");
 		} else {
 			$sysinfo['tcheck'] = 0;
@@ -203,7 +205,7 @@ if (!$job || $job == 'desktop') {
 	$userdb = $userService->getByUserName($admin_name);
 	if ($userdb) {
 		$uid = $userdb['uid'];
-		$slog = $db->get_value("SELECT slog FROM pw_administrators WHERE uid=".pwEscape($uid,false));
+		$slog = $db->get_value("SELECT slog FROM pw_administrators WHERE uid=".S::sqlEscape($uid,false));
 		$slog = explode(";",$slog);
 		$slog = array_reverse($slog);
 		foreach ($slog as $key=>$value) {
@@ -224,7 +226,7 @@ if (!$job || $job == 'desktop') {
 				$detail[6]=htmlspecialchars($detail[6]);
 				$adlogfor.="
 <tr class=\"tr1\">
-<td class=\"td2\"><a href='$admin_file?adminjob=setuser&action=search&schname=$detail[1]&schname_s=1'>$detail[1]</a></td>
+<td class=\"td2\"><a href='$admin_file?adminjob=usermanage&adminitem=edit&action=search&schname=$detail[1]&schname_s=1' onclick=\"openNewUrl('usermanage','用户管理',this.href);return false;\">$detail[1]</a></td>
 <td class=\"td2\">$detail[3]</td>
 <td class=\"td2\">$winddate</td>
 <td class=\"td2\">$detail[6]</td>
@@ -245,7 +247,7 @@ if ($job == 'shortcut') {
 			if (is_array($value)) {
 				foreach ($value['items'] as $k=>$v) {
 					if (adminRightCheck($v)) {
-						$nav_left[$cate]['items'][$v] = $purview[$v][0];
+						$nav_left[$cate]['items'][$v] = strip_tags($purview[$v][0]);
 					}
 					unset($nav_left[$cate]['items'][$k]);
 				}
@@ -261,6 +263,6 @@ if ($job == 'shortcut') {
 	$poweredby = true;
 }
 $poweredby || $job == 'desktop' && $poweredby = true;
-require_once PrintEot('admin');afooter();
+require_once PrintEot('admin');//afooter();
 
 ?>

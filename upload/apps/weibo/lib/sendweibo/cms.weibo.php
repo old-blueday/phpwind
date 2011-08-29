@@ -11,7 +11,7 @@ class weibo_Cms extends baseWeibo {
 	var $_cid;
 	var $_url;
 	function weibo_Cms() {
-		$this->_url = $GLOBALS['db_bbsurl']."/mode.php?m=cms&q=view";
+		$this->_url = $GLOBALS['db_bbsurl']."/index.php?m=cms&q=view";
 	}
 	function init($id) {
 		$this->_cid = $id;
@@ -20,7 +20,7 @@ class weibo_Cms extends baseWeibo {
 		$article 	= $articleDB->get($this->_cid);
 		empty($article) && Showmsg('data_error');
 		$this->_url = $this->_url . "&id=".$this->_cid;
-		$title = $content = sprintf("[url=%s] %s [/url]", $this->_url, $article['subject']);
+		$title = $content = '我发现了一篇文章'.sprintf("[url=%s] %s [/url]", $this->_url, $article['subject']).'，特别推荐。';
 		$descrip = $article['descrip'];
 		$mailSubject =  getLangInfo('app','cms_recommend');
 		$mailContent = getLangInfo('app','ajax_sendweibo_cmsinfo',array('title'	=> $title,'descrip'=>$descrip));

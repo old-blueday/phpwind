@@ -3,7 +3,7 @@
  * @author suqian
  * @date 2010-7-5
  */
-var space_uid = space_uid;
+var space_uid = space_uid,timer;
 
 weiboPhotos.queue = new Array();//相册队列
 weiboPhotos.qLength = 0;//队列个数
@@ -68,22 +68,45 @@ function weiboPhotos() {
 		}
 	};
 	this.createTmp = function(src){
-		var imgpretmp = getObj('imgpre')
+		var imgpretmp = getObj('imgpre'),self = this;
 		if(imgpretmp){
 			document.body.removeChild(imgpretmp);
 			imgpretmp.onload='';
 			delete imgpretmp;
 		}
-		imgpre = new Image();
-		imgpre.id = 'imgpre';
-		imgpre.src = src;
-		imgpre.style.position = 'absolute';
-		imgpre.style.top = '-100000px';
-		document.body.appendChild(imgpre);
-		setTimeout(reposPhoto,0);
-		imgpre.onload = reposPhoto;
+		this.imgpre = new Image();
+		this.imgpre.src = src;
+		if (this.imgpre.complete){
+			this.reposPhoto();
+			return;
+		}
+		this.imgpre.onload = function(){
+			self.reposPhoto();
+		}
 	};
-	
+	this.reposPhoto = function(){
+		var photo = this.imgpre;
+		var path = getObj('photo_path');
+		path.src =  photo.src;
+		var popo= getObj('photo_pop');
+		var mask = getObj('photo_pop_mask');
+		mask.style.width=document.body.scrollWidth+'px';
+		mask.style.height=document.body.scrollHeight+'px';
+		mask.style.display='';
+		
+		var reportH = document.documentElement.clientHeight || document.body.clientHeight || window.innerHeight,
+			reportW = document.documentElement.clientWidth || document.body.clientWidth || window.innerWidth,
+			i = 0, finalW = Math.min(reportW-25,photo.width),finalH = Math.min(reportH-25,photo.height);
+
+		path.style.display ='block';
+		popo.style.display='block';
+		path.style.height = finalH +'px';
+		path.style.width = 'auto';
+		getObj('prephoto').style.height=getObj('nextphoto').style.height= finalH+'px';
+		popo.style.left = (document.body.clientWidth - popo.clientWidth) / 2+'px';
+		popo.style.top = ( (window.innerHeight||document.documentElement.offsetHeight) - popo.clientHeight)/2+ietruebody().scrollTop+'px';
+
+	};
 	this.prevPhoto = function(){
 		var obj = weiboPhotos.queue[this.key];
 		var photo = obj.value;
@@ -107,10 +130,11 @@ function weiboPhotos() {
 		}
 	};
 	this.hidePhoto = function(){
+		clearInterval(timer);
+		timer = null;
 		getObj('photo_pop').style.display='none';
 		getObj('photo_pop_mask').style.display='none';
 		if (getObj('comment_to_weibo')) getObj('comment_to_weibo').style.display='none';
-		getObj('imgpre').src='#';
 	}
 }
 var weibo = new weiboPhotos();
@@ -192,25 +216,43 @@ function reposPhoto()
 	}
 	var path = getObj('photo_path');
 	path.src =  photo.src;
-	path.style.height = 'auto';
-	path.style.width  = 'auto';
-	if(photo.width>900){
-		path.style.height = photo.height/photo.width*900+'px';
-		path.style.width='900px';
-	}
-	if(photo.height>550){
-		path.style.width = photo.width/photo.height*550+'px';
-		path.style.height = '550px';
-	}
 	var popo= getObj('photo_pop');
-	popo.style.top = '-10000px';
-	popo.style.display='';
-	getObj('photo_pop_mask').style.width=document.body.scrollWidth+'px';
-	getObj('photo_pop_mask').style.height=document.body.scrollHeight+'px';
-	popo.style.left = (document.body.clientWidth-popo.clientWidth)/2+'px';
-	popo.style.top = ( (window.innerHeight||document.documentElement.offsetHeight) -popo.clientHeight)/2+ietruebody().scrollTop+'px';
-	getObj('photo_pop_mask').style.display='';
-	getObj('prephoto').style.height=getObj('nextphoto').style.height= (parseInt(path.style.height)||photo.height)+'px';
+	var mask = getObj('photo_pop_mask');
+	mask.style.width=document.body.scrollWidth+'px';
+	mask.style.height=document.body.scrollHeight+'px';
+	mask.style.display='';
+	
+	//getObj('prephoto').style.height = getObj('nextphoto').style.height = '0px';
+	var reportH = document.documentElement.clientHeight || document.body.clientHeight || window.innerHeight,
+		reportW = document.documentElement.clientWidth || document.body.clientWidth || window.innerWidth,
+		i = 0, finalW = Math.min(reportW,photo.width)-25,finalH = Math.min(reportH,photo.height)-25;
+	//clearInterval(timer);
+	path.style.display ='block';
+	popo.style.display='block';
+	path.style.height = finalH +'px';
+	path.style.width = 'auto';
+	getObj('prephoto').style.height=getObj('nextphoto').style.height= finalH+'px';
+	popo.style.left = (document.body.clientWidth - popo.clientWidth) / 2+'px';
+	popo.style.top = ( (window.innerHeight||document.documentElement.offsetHeight) - popo.clientHeight)/2+ietruebody().scrollTop+'px';
+	/*timer = setInterval(function(){//放大动画效果
+		var yHeight = parseInt(path.style.height,10);
+		var dist = Math.ceil((finalH - yHeight) / 2);
+		yHeight = yHeight + dist;
+		if (yHeight >= finalH) {
+			yHeight = finalH;
+			clearInterval(timer);
+			timer = null;
+			getObj('prephoto').style.height=getObj('nextphoto').style.height= yHeight+'px';
+			//getObj('prephoto').style.width=getObj('nextphoto').style.width= path.clientWidth+'px';
+			//path.style.height = 'auto';
+			path.style.width = 'auto';
+		}
+		path.style.height = yHeight +'px';
+		getObj('prephoto').style.height=getObj('nextphoto').style.height= yHeight+'px';
+		popo.style.left = (document.body.clientWidth - popo.clientWidth) / 2+'px';
+		popo.style.top = ( (window.innerHeight||document.documentElement.offsetHeight) - popo.clientHeight)/2+ietruebody().scrollTop+'px';
+		//v += a;
+	}, 12);*/
 }
 
 function displayControl(from){
@@ -252,7 +294,12 @@ function refreshcomment(action,mid,uid,identify,page){
 	var data = buildData(mid,uid,identify,page);
 	ajax.send(url,data,function(){
 		var responseText = ajax.request.responseText;
-		commentObj.innerHTML = responseText;
+		if(responseText.length < 100) {
+			showDialog("warning", responseText,2);
+			return false;
+		} else {
+			commentObj.innerHTML = responseText;
+		}
 	});
 }
 
@@ -280,8 +327,12 @@ function buildData(mid,uid,identify,page){
 
 function postcomment(form){
 	var content = form.writeContent.value;
-	if(strlen(content) <= 0 || strlen(content) > 255 ){
-		return shockwarning(form.writeContent);
+	var contentLen = strlen(content);
+	if(contentLen <= 0 || contentLen > 255 ){
+		shockwarning(form.writeContent);
+		showText = (contentLen <= 0 ? '评论内容不能为空' : '评论内容不能多于255字节');
+		showDialog("error", showText);
+		return false;
 	}
 	var baseUrl = "apps.php?q=weibo&do=postcomment&ajax=1";
 	var rnd = Math.random()*(8)+1;
@@ -401,6 +452,10 @@ function replycomment(username,form){
 
 function showcommentsmile(obj, textArea, tip) {
 	if (typeof textArea != 'object') textArea = getObj(textArea);
+	if (defaultString && textArea.innerHTML == defaultString)
+	{
+		textArea.innerHTML = '';
+	}
 	miniSmile.show(obj);
 	miniSmile.apply(function(code, textArea) {
 		insertContentToTextArea(textArea, code);
@@ -427,12 +482,27 @@ var weiboList = {
 	receive : function(href) {getWeiboList('receive', this.getPage(href), 'weiboFeed');scroll(0,0);return false;}
 }
 
-function getWeiboList(action, page, menuId, uid) {
+function getWeiboList(action, page, menuId, uid, type) {
 	var obj = getObj(menuId);
 	if (obj == null) {
 		return false;
 	}
 	if (action == 'filterweibo') {
+
+		if (type == 'all')
+		{
+			getObj('imgs').checked = true;
+			getObj('strings').checked = true;
+		} else if (type == 'strings')
+		{
+			getObj('imgs').checked = '';
+			getObj('strings').checked = true;
+		} else if (type == 'imgs')
+		{
+			getObj('imgs').checked = true;
+			getObj('strings').checked = '';
+		} else {
+		}
 		getObj('page').value = page;
 		ajax.submit(getObj('filterWeiboForm'), function() {
 			obj.innerHTML = ajax.runscript(ajax.request.responseText);
@@ -444,6 +514,8 @@ function getWeiboList(action, page, menuId, uid) {
 		});
 	} else if (action == 'reload') {
 		setTimeout(function() {location.reload();}, 50);
+	} else if (action == 'reloaddelay') {
+		setTimeout(function() {location.reload();}, 2000);
 	}
 }
 
@@ -476,9 +548,14 @@ function transmitWeibo(id,action) {
 }
 
 function transmitWeiboSubmitForm(form, page,uid) {
+	//var transmitAction ='';
 	if (typeof form == 'undefined' || !form) {
 		return false;
-	}	
+	}
+	if (defaultString && getObj('atc_content').innerHTML == defaultString)
+	{
+		getObj('atc_content').innerHTML = '';
+	}
 	if (transmitAction == "user_home") {
 		transmitAction = "filterweibo";
 	}

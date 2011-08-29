@@ -15,7 +15,7 @@ class PW_ColumnDB extends BaseDB {
 	 */
 	function deleteColumnById($id) {
 		if (empty($id)) return false;
-		$_sql = "DELETE FROM " . $this->_tableName . " WHERE column_id = " . pwEscape($id);
+		$_sql = "DELETE FROM " . $this->_tableName . " WHERE column_id = " . S::sqlEscape($id);
 		return $this->_db->update($_sql);
 	}
 
@@ -26,9 +26,9 @@ class PW_ColumnDB extends BaseDB {
 	 */
 	function deleteColumnByIds($ids) {
 		if (!is_array($ids)) return false;
-		$_sql = "DELETE FROM " . $this->_tableName . " WHERE column_id IN (" . pwImplode($ids) . ")";
+		$_sql = "DELETE FROM " . $this->_tableName . " WHERE column_id IN (" . S::sqlImplode($ids) . ")";
 		$this->_db->update($_sql);
-		$_sql = "DELETE FROM " . $this->_tableName . " WHERE parent_id IN (" . pwImplode($ids) . ")";
+		$_sql = "DELETE FROM " . $this->_tableName . " WHERE parent_id IN (" . S::sqlImplode($ids) . ")";
 		$this->_db->update($_sql);
 		return true;
 	}
@@ -39,7 +39,7 @@ class PW_ColumnDB extends BaseDB {
 	 * @return string
 	 */
 	function insertColumn($datas) {
-		$_sql = "INSERT INTO " . $this->_tableName . " (`parent_id`,`name`,`order`,`allowoffer`,`seotitle`,`seodesc`,`seokeywords`) VALUES " . pwSqlMulti($datas, false);
+		$_sql = "INSERT INTO " . $this->_tableName . " (`parent_id`,`name`,`order`,`allowoffer`,`seotitle`,`seodesc`,`seokeywords`) VALUES " . S::sqlMulti($datas, false);
 		return $this->_db->update($_sql);
 	}
 
@@ -49,7 +49,7 @@ class PW_ColumnDB extends BaseDB {
 	 * @param unknown_type $data
 	 */
 	function updateColumn($cid, $data) {
-		$_sql = "UPDATE " . $this->_tableName . " SET " . pwSqlSingle($data) . " WHERE column_id = " . pwEscape($cid);
+		$_sql = "UPDATE " . $this->_tableName . " SET " . S::sqlSingle($data) . " WHERE column_id = " . S::sqlEscape($cid);
 		return $this->_db->update($_sql);
 	}
 
@@ -59,12 +59,12 @@ class PW_ColumnDB extends BaseDB {
 	 * @param unknown_type $order
 	 */
 	function updateColumnOrder($cid, $order) {
-		$_sql = "UPDATE " . $this->_tableName . " SET `order` = " . pwEscape($order) . " WHERE column_id = " . pwEscape($cid);
+		$_sql = "UPDATE " . $this->_tableName . " SET `order` = " . S::sqlEscape($order) . " WHERE column_id = " . S::sqlEscape($cid);
 		return $this->_db->update($_sql);
 	}
 
 	function updateColumnSEO($cid, $title, $desc, $keyword) {
-		$_sql = "UPDATE " . $this->_tableName . " SET seotitle = " . pwEscape($title) . ", seodesc = " . pwEscape($desc) . ", seokeywords = " . pwEscape($keyword) . " WHERE column_id = " . pwEscape($cid);
+		$_sql = "UPDATE " . $this->_tableName . " SET seotitle = " . S::sqlEscape($title) . ", seodesc = " . S::sqlEscape($desc) . ", seokeywords = " . S::sqlEscape($keyword) . " WHERE column_id = " . S::sqlEscape($cid);
 		return $this->_db->update($_sql);
 	}
 
@@ -83,7 +83,7 @@ class PW_ColumnDB extends BaseDB {
 	}
 
 	function getColumnByName($name) {
-		$_sql = "SELECT c.* FROM " . $this->_tableName . " c WHERE c.name = " . pwEscape($name);
+		$_sql = "SELECT c.* FROM " . $this->_tableName . " c WHERE c.name = " . S::sqlEscape($name);
 		return $this->_db->get_value($_sql);
 	}
 
@@ -94,7 +94,7 @@ class PW_ColumnDB extends BaseDB {
 	 */
 	function getColumn($id) {
 		if (!is_array($id)) $id = array($id);
-		$_sql = "SELECT * FROM " . $this->_tableName . " WHERE column_id IN ( " . pwImplode($id) . " )";
+		$_sql = "SELECT * FROM " . $this->_tableName . " WHERE column_id IN ( " . S::sqlImplode($id) . " )";
 		return $this->_getAllResultFromQuery($this->_db->query($_sql));
 	}
 

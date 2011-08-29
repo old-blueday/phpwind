@@ -1,16 +1,16 @@
 <?php
 !defined('P_W') && exit('Forbidden');
 
-InitGP(array(
+S::gp(array(
 	'fid',
 	'tid',
 	'pid'
 ), null, 2);
-$db->update("UPDATE pw_pinglog SET ifhide=1 WHERE fid=" . pwEscape($fid) . " AND tid=" . pwEscape($tid) . " AND pid=" . pwEscape($pid) . " AND pinger=" . pwEscape($windid));
+$db->update("UPDATE pw_pinglog SET ifhide=1 WHERE fid=" . S::sqlEscape($fid) . " AND tid=" . S::sqlEscape($tid) . " AND pid=" . S::sqlEscape($pid) . " AND pinger=" . S::sqlEscape($windid));
 if ($db->affected_rows()) {
 	echo "清空评分动态成功!";
-	require_once R_P . 'require/pingfunc.php';
-	update_markinfo($fid, $tid, $pid);
+	$pingService = L::loadClass("ping", 'forum');
+	$pingService->update_markinfo($fid, $tid, $pid);
 } else {
 	echo "没有需要清空的评分动态";
 }

@@ -24,7 +24,7 @@ class PwSpace {
 			$this->info = $userdb;
 		}
 		if ($this->info) {
-			if ($space = $this->_db->get_one("SELECT * FROM pw_space WHERE uid=" . pwEscape($this->uid))) {
+			if ($space = $this->_db->get_one("SELECT * FROM pw_space WHERE uid=" . S::sqlEscape($this->uid))) {
 				$this->info = array_merge($this->info, $space);
 				if ($this->info['banner']) {
 					list($this->info['banner_s']) = geturl($this->info['banner'], 'lf');
@@ -147,7 +147,7 @@ class PwSpace {
 	}
 	
 	function getPrivacy() {
-		$rt = $this->_db->get_one("SELECT index_privacy AS `index`,msgboard_privacy AS `messageboard`,photos_privacy AS `photos`,diary_privacy AS `diary`,owrite_privacy AS `weibo` FROM pw_ouserdata WHERE uid=" . pwEscape($this->uid));
+		$rt = $this->_db->get_one("SELECT index_privacy AS `index`,msgboard_privacy AS `messageboard`,photos_privacy AS `photos`,diary_privacy AS `diary`,owrite_privacy AS `weibo` FROM pw_ouserdata WHERE uid=" . S::sqlEscape($this->uid));
 		if ($rt) {
 			return $rt;
 		}
@@ -208,9 +208,9 @@ class PwSpace {
 	function updateInfo($data) {
 		if ($this->default) {
 			$data['uid'] = $this->uid;
-			$this->_db->update("INSERT INTO pw_space SET " . pwSqlSingle($data));
+			$this->_db->update("INSERT INTO pw_space SET " . S::sqlSingle($data));
 		} else {
-			$this->_db->update("UPDATE pw_space SET " . pwSqlSingle($data) . ' WHERE uid=' . pwEscape($this->uid));
+			$this->_db->update("UPDATE pw_space SET " . S::sqlSingle($data) . ' WHERE uid=' . S::sqlEscape($this->uid));
 		}
 	}
 }

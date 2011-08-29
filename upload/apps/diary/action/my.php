@@ -1,9 +1,9 @@
 <?php
 !defined('A_P') && exit('Forbidden');
 //TODO 删除不用的请求处理分支，分离出ajax请求
-if(!$winduid){
-	InitGP(array('a','q','did'));
-	$did = (int)GetGP('did');
+if(!$winduid){ 
+	S::gp(array('a','q','did'));
+	$did = (int)S::getGP('did');
 	('detail' !== $a) && ('diary' !== $q) && !is_numeric($did) && Showmsg("not_login");
 	$diaryService = L::loadClass('Diary', 'diary');
 	$diaryTemp = $diaryService->get($did);
@@ -11,9 +11,10 @@ if(!$winduid){
 	ObHeader($url);
 }
 $USCR = 'user_diary';
-//TODO 暂时调用
+//TODO 暂时调用		
 
-InitGP(array('s'));
+S::gp(array('s','diraryAjax'));
+if ($diraryAjax == 1) define('AJAX', '1');
 
 $a = isset($a) ? $a : 'list';
 
@@ -22,7 +23,7 @@ $temp_basename = 'apps.php?q='.$q.'&a='.$a.'&';
 
 if ($a == 'list') {//我的日志列表
 
-	$dtid = (int)GetGP('dtid');//TODO 查看日志分类ID
+	$dtid = (int)S::getGP('dtid');//TODO 查看日志分类ID
 	$diaryTypeId = $dtid == '-1' ? 0 : (is_numeric($dtid) && $dtid > 0 ? $dtid : null);
 	$diaryPrivacy = $dtid == '-2' ? array(2) : array();
 	$diaryService = L::loadClass('Diary', 'diary'); /* @var $diaryService PW_Diary */
@@ -33,8 +34,9 @@ if ($a == 'list') {//我的日志列表
 	$pages = numofpage($count,$page,ceil($count/$db_perpage),"{$basename}a=$a&dtid=$dtid&");
 
 } elseif ($a == 'detail') {//查看我的日志
-
-	$did = (int)GetGP('did');
+	$stylepath = L::style('stylepath');
+	$did = (int)S::getGP('did');
+	$fuid = (int)S::getGP('fuid');
 	!$did && Showmsg("日志不存在");
 	$diaryService = L::loadClass('Diary', 'diary'); /* @var $diaryService PW_Diary */
 	list($diaryNums, $diaryType, $defaultTypeNum, $privacyNum) = $diaryService->getDiaryTypeMode($winduid, 0);//TODO	右侧分类Start
@@ -44,7 +46,7 @@ if ($a == 'list') {//我的日志列表
 		ObHeader($url);
 	}
 	$diary = $diaryService->getDiaryDbView($diaryTemp);
-	list($commentdb,$subcommentdb,$pages) = getCommentDbByTypeid('diary',$did,$page,"{$basename}a={$a}&did={$did}&");
+	list($commentdb,$subcommentdb,$pages) = getCommentDbByTypeid('diary',$did,$page,"{$basename}a={$a}&did={$did}&#createcommentbox");
 	$comment_type = 'diary';
 	$comment_typeid = $did;
 	$myOuserData = array();
@@ -54,6 +56,9 @@ if ($a == 'list') {//我的日志列表
 	if (!$myOuserData['index_privacy'] && !$myOuserData['diary_privacy'] && !$diary['privacy']){
 		$weiboPriv = true;
 	}
+
+	$diaryNextName=getNextOrPreDiaryName($did, $fuid,'next');
+	$diaryPreName=getNextOrPreDiaryName($did, $fuid,'pre');
 } elseif ($a == 'friendslists') {//好友日志列表
 
 	$friendsService = L::loadClass('Friend', 'friend'); /* @var $friendsService PW_Friend */
@@ -68,7 +73,7 @@ if ($a == 'list') {//我的日志列表
 
 } elseif ($a == 'friendlist') {//单个好友列表
 
-	InitGP(array('fuid', 'dtid'));
+	S::gp(array('fuid', 'dtid'));
 	!$fuid && Showmsg('好友不存在');
 
 	$ouserPrivacy = array();
@@ -98,7 +103,7 @@ if ($a == 'list') {//我的日志列表
 
 } elseif ($a == 'frienddetail') {//查看好友日志
 
-	InitGP(array('did', 'fuid'));
+	S::gp(array('did', 'fuid'));
 	!$did && Showmsg("日志不存在");
 	!$fuid && Showmsg("好友不存在");
 
@@ -139,7 +144,8 @@ if ($a == 'list') {//我的日志列表
 	if (!$myOuserData['index_privacy'] && !$myOuserData['diary_privacy'] && !$diary['privacy']){
 		$weiboPriv = true;
 	}
-
+	$friendDiaryNextName=getNextOrPreDiaryName($did, $fuid,'next');
+	$friendDiaryPreName=getNextOrPreDiaryName($did, $fuid,'pre');
 } elseif ($a == 'write') {
 
 	//权限设置
@@ -165,8 +171,8 @@ if ($a == 'list') {//我的日志列表
 	* 灌水机制
 	*/
 	$endtime = $tdtime + 24*3600;
-	$postdate = $db->get_value("SELECT postdate FROM pw_diary WHERE uid=".pwEscape($winduid)." ORDER BY postdate DESC LIMIT 1");
-	$todaycount = $db->get_value("SELECT COUNT(*) as count FROM pw_diary WHERE uid=".pwEscape($winduid)." AND postdate>=".pwEscape($tdtime)." AND postdate<".pwEscape($endtime));
+	$postdate = $db->get_value("SELECT postdate FROM pw_diary WHERE uid=".S::sqlEscape($winduid)." ORDER BY postdate DESC LIMIT 1");
+	$todaycount = $db->get_value("SELECT COUNT(*) as count FROM pw_diary WHERE uid=".S::sqlEscape($winduid)." AND postdate>=".S::sqlEscape($tdtime)." AND postdate<".S::sqlEscape($endtime));
 
 	$tdtime  >= $postdate && $todaycount = 0;
 
@@ -187,24 +193,24 @@ if ($a == 'list') {//我的日志列表
 		$uploadfilesize .= $key.':'.$value.'KB; ';
 	}
 
-	
+
 	$myAppsData = array();
 	$ouserDataService = L::loadClass('Ouserdata', 'sns'); /* @var $ouserDataService PW_Ouserdata */
 	$myAppsData = $ouserDataService->get($winduid);
-	
+
 	$appsDiaryPrivacy = false;
 	$myAppsData['index_privacy'] < 1 && $myAppsData['diary_privacy'] < 1 && $appsDiaryPrivacy = true;
 
-	
+
 	$sendWeiboPrivacy = $appsDiaryPrivacy;
 	$weibocheck = $appsDiaryPrivacy === true ? 'checked=checked' : '';
 	$weibodisplay = $appsDiaryPrivacy === true ? '' : 'style="display:none"';
-	
+
 	if (!$_POST['step']) {
 
 		$editor = getstatus($winddb['userstatus'], PW_USERSTATUS_EDITOR) ? 'wysiwyg' : 'textmode';
 		$dtsel = '';
-		$query = $db->query("SELECT * FROM pw_diarytype WHERE uid=".pwEscape($winduid)." ORDER BY dtid");
+		$query = $db->query("SELECT * FROM pw_diarytype WHERE uid=".S::sqlEscape($winduid)." ORDER BY dtid");
 		while ($rt = $db->fetch_array($query)) {
 			$dtsel .= "<option value=\"$rt[dtid]\">$rt[name]</option>";
 		}
@@ -213,18 +219,18 @@ if ($a == 'list') {//我的日志列表
 
 	} elseif ($_POST['step'] == 2) {
 
-		initGP(array("privacy"));
+		S::gp(array("privacy"));
 		require_once(R_P.'require/postfunc.php');
 		PostCheck(1,$o_diary_gdcheck,$o_diary_qcheck);
-		InitGP(array('dtid','privacy','ifcopy','ifsendweibo'),'P');
+		S::gp(array('dtid','privacy','ifcopy','ifsendweibo'),'P');
 		require_once(R_P.'require/bbscode.php');
 
 		$wordsfb = L::loadClass('FilterUtil', 'filter');
 		if (($banword = $wordsfb->comprise($_POST['atc_title'])) !== false) {
-			Showmsg('title_wordsfb');
+			Showmsg('diary_title_wordsfb');
 		}
 		if (($banword = $wordsfb->comprise($_POST['atc_content'], false)) !== false) {
-			Showmsg('content_wordsfb');
+			Showmsg('diary_content_wordsfb');
 		}
 
 		list($atc_title,$atc_content,$ifconvert,$ifwordsfb) = check_data('new');
@@ -233,12 +239,25 @@ if ($a == 'list') {//我的日志列表
 		$dtid = (int)$dtid;
 		$privacy = (int)$privacy;
 		$ifcopy = (int)$ifcopy;
+		$ifupload = 0;
 //		!$privacy && $ifcopy = 1;
 
-//		require_once(M_P.'require/upload.php');
-		require_once(R_P.'require/app_upload.php');
+		//require_once(M_P.'require/upload.php');
+		//require_once(R_P.'require/app_upload.php');
+		$aids = $attachs = array();
+		L::loadClass('diaryupload', 'upload', false);
+		if (PwUpload::getUploadNum()) {
+			$diaryUpload = new DiaryUpload($winduid);
+			$diaryUpload->check();
+			PwUpload::upload($diaryUpload);
+			$aids = $diaryUpload->getAids();
+			$attachs = $diaryUpload->getAttachs();
+			$attachIds = $diaryUpload->getAttachIds();
+			$ifupload = $diaryUpload->ifupload;
+		}
 
-		$pwSQL = pwSqlSingle(array(
+       /**
+		$pwSQL = S::sqlSingle(array(
 			'uid'		=> $winduid,
 			'dtid'		=> $dtid,
 			'aid'		=> (!empty($attachs) ? addslashes(serialize($attachs)) : ''),
@@ -252,15 +271,32 @@ if ($a == 'list') {//我的日志列表
 			'ifwordsfb'	=> $ifwordsfb,
 			'postdate'	=> $timestamp,
 		));
-		$db->update("INSERT INTO pw_diary SET $pwSQL");
+		$db->update("INSERT INTO pw_diary SET $pwSQL");**/
+		$pwSQL = array(
+			'uid'		=> $winduid,
+			'dtid'		=> $dtid,
+			'aid'		=> (!empty($attachs) ? addslashes(serialize($attachs)) : ''),
+			'username'	=> $windid,
+			'privacy'	=> $privacy,
+			'subject'	=> $atc_title,
+			'content'	=> $atc_content,
+			'ifcopy'	=> $ifcopy,
+			'ifconvert'	=> $ifconvert,
+			'ifupload'	=> $ifupload,
+			'ifwordsfb'	=> $ifwordsfb,
+			'postdate'	=> $timestamp,
+		);
+		pwQuery::insert('pw_diary', $pwSQL);
 		$did = $db->insert_id();
-		$db->update("UPDATE pw_diarytype SET num=num+1 WHERE uid=".pwEscape($winduid)." AND dtid=".pwEscape($dtid));//更新分类日志数
+		$db->update("UPDATE pw_diarytype SET num=num+1 WHERE uid=".S::sqlEscape($winduid)." AND dtid=".S::sqlEscape($dtid));//更新分类日志数
 
 		if ($aids) {
-			$db->update("UPDATE pw_attachs SET did=".pwEscape($did)." WHERE aid IN($aids)");
+			$diaryService = L::loadClass('Diary', 'diary');
+			$diaryService->updateDiaryContentByAttach($did, $attachIds);
+			$db->update("UPDATE pw_attachs SET did=" . S::sqlEscape($did) . " WHERE aid IN(" . S::sqlImplode($aids) . ")");
 		}
 
-		if (!$privacy) {
+		if (!$privacy && !$myAppsData['index_privacy']) {
 			$userCache = L::loadClass('Usercache', 'user');
 			$userCache->delete($winduid, 'carddiary');
 			updateDatanalyse($did,'diaryNew',$timestamp);
@@ -289,7 +325,9 @@ if ($a == 'list') {//我的日志列表
 			addLog($creditlog['Post'],$windid,$winduid,'diary_Post');
 		}
 		updateUserAppNum($winduid,'diary');
-		refreshto("{$basename}a=detail&did=$did",'operate_success',2);
+		$url = "{$basename}a=detail&did=$did";
+		$msg = defined('AJAX') ?  "success\t".$url : 'operate_success';	
+		refreshto($url,$msg);
 	}
 } elseif ($a == 'edit') {
 
@@ -305,10 +343,10 @@ if ($a == 'list') {//我的日志列表
 
 	if (!$_POST['step']) {
 
-		$did = (int)GetGP('did');
+		$did = (int)S::getGP('did');
 		$editor = getstatus($winddb['userstatus'], PW_USERSTATUS_EDITOR) ? 'wysiwyg' : 'textmode';
 		$dtsel = '';
-		$diary = $db->get_one("SELECT did,dtid,aid,privacy,subject,content,ifcopy,ifconvert FROM pw_diary WHERE uid=".pwEscape($winduid)." AND did=".pwEscape($did));
+		$diary = $db->get_one("SELECT did,dtid,aid,privacy,subject,content,ifcopy,ifconvert FROM pw_diary WHERE uid=".S::sqlEscape($winduid)." AND did=".S::sqlEscape($did));
 
 		!$diary && Showmsg('illegal_request');
 		$attach = '';
@@ -326,14 +364,14 @@ if ($a == 'list') {//我的日志列表
 		$atc_content = $diary['content'];
 		${'privacy_'.$diary['privacy']} = 'selected';
 		$diary['ifcopy'] && $checked = 'checked';
-		
-		
+
+
 		$diary['ifconvert'] == 2 && $convertChecked = 'checked';
 
 
 		($diary['privacy'] == '2') && $disabled = 'disabled';
 
-		$query = $db->query("SELECT * FROM pw_diarytype WHERE uid=".pwEscape($winduid)." ORDER BY dtid");
+		$query = $db->query("SELECT * FROM pw_diarytype WHERE uid=".S::sqlEscape($winduid)." ORDER BY dtid");
 		while ($rs = $db->fetch_array($query)) {
 			$selected = '';
 			$rs['dtid'] == $diary['dtid'] && $selected .= 'selected';
@@ -342,10 +380,11 @@ if ($a == 'list') {//我的日志列表
 		if (strpos($atc_content,$db_bbsurl) !== false) {
 			$atc_content = str_replace('p_w_picpath',$db_picpath,$atc_content);
 			$atc_content = str_replace('p_w_upload',$db_attachname,$atc_content);
-		}		
+		}
+		
 	} elseif ($_POST['step'] == 2) {
 
-		InitGP(array('did','dtid','dtided','privacy','privacyed','ifcopy'),'P');
+		S::gp(array('did','dtid','dtided','privacy','privacyed','ifcopy'),'P');
 
 		require_once(R_P.'require/bbscode.php');
 		require_once(R_P.'require/postfunc.php');
@@ -353,10 +392,10 @@ if ($a == 'list') {//我的日志列表
 
 		$wordsfb = L::loadClass('FilterUtil', 'filter');
 		if (($banword = $wordsfb->comprise($_POST['atc_title'])) !== false) {
-			Showmsg('title_wordsfb');
+			Showmsg('diary_title_wordsfb');
 		}
 		if (($banword = $wordsfb->comprise($_POST['atc_content'], false)) !== false) {
-			Showmsg('content_wordsfb');
+			Showmsg('diary_content_wordsfb');
 		}
 
 		list($atc_title,$atc_content,$ifconvert,$ifwordsfb) = check_data('modify');
@@ -366,17 +405,18 @@ if ($a == 'list') {//我的日志列表
 		$dtided = (int)$dtided;
 		$privacy = (int)$privacy;
 		$ifcopy = (int)$ifcopy;
+		$ifupload = 0;
 
 		/**
 		* 附件修改
 		*/
 		$oldattach = $replacedb = $unsetattach = array();
 
-		$aid = $db->get_value("SELECT aid FROM pw_diary WHERE uid=".pwEscape($winduid)." AND did=".pwEscape($did));
+		$aid = $db->get_value("SELECT aid FROM pw_diary WHERE uid=".S::sqlEscape($winduid)." AND did=".S::sqlEscape($did));
 
 		if ($aid) {
-			InitGP(array('keep','oldatt_special','oldatt_needrvrc'), 'P', 2);
-			InitGP(array('oldatt_ctype','oldatt_desc'), 'P');
+			S::gp(array('keep','oldatt_special','oldatt_needrvrc'), 'P', 2);
+			S::gp(array('oldatt_ctype','oldatt_desc'), 'P');
 			$oldattach = unserialize(stripslashes($aid));
 			foreach ($oldattach as $key => $value) {
 				if (!@in_array($key,$keep)) {
@@ -397,18 +437,35 @@ if ($a == 'list') {//我的日志列表
 						$db_attachnum++;
 						$replacedb[$key] = $oldattach[$key];
 					} elseif ($value['ctype'] <> $v['ctype'] || $value['desc'] <> $v['desc']) {
-						$runsql[] = 'UPDATE pw_attachs SET ' . pwSqlSingle(array(
+						$runsql[] = 'UPDATE pw_attachs SET ' . S::sqlSingle(array(
 							'needrvrc'	=> $v['needrvrc'],
 							'descrip'	=> $v['desc'],
 							'special'	=> $v['special'],
 							'ctype'		=> $v['ctype']
-						)) . ' WHERE aid=' . pwEscape($key);
+						)) . ' WHERE aid=' . S::sqlEscape($key);
 					}
 				}
 			}
 		}
 		//require_once(M_P.'require/upload.php');
-		require_once(R_P.'require/app_upload.php');
+		//require_once(R_P.'require/app_upload.php');
+		$aids = $attachs = array();
+		L::loadClass('diaryupload', 'upload', false);
+		if (PwUpload::getUploadNum()) {
+			$diaryUpload = new DiaryUpload($winduid);
+			$diaryUpload->check();
+			$diaryUpload->setReplaceAtt($replacedb);
+			PwUpload::upload($diaryUpload);
+			$aids = $diaryUpload->getAids();
+			$attachs = $diaryUpload->getAttachs();
+			$attachIds = $diaryUpload->getAttachIds();
+			$ifupload = $diaryUpload->ifupload;
+			if ($oldattach && $diaryUpload->replacedb) {
+				foreach ($diaryUpload->replacedb as $key => $value) {
+					$oldattach[$key] = $value;
+				}
+			}
+		}
 
 		if ($attachs) {
 			foreach ($attachs as $key => $value) {
@@ -426,8 +483,8 @@ if ($a == 'list') {//我的日志列表
 		/**
 		* 附件修改
 		*/
-
-		$pwSQL = pwSqlSingle(array(
+       /**       
+		$pwSQL = S::sqlSingle(array(
 			'dtid'		=> $dtid,
 			'aid'		=> $oldattach,
 			'privacy'	=> $privacy,
@@ -438,17 +495,30 @@ if ($a == 'list') {//我的日志列表
 			'ifupload'	=> $ifupload,
 			'ifwordsfb'	=> $ifwordsfb,
 		));
-
-
-		$db->update("UPDATE pw_diary SET $pwSQL WHERE uid=".pwEscape($winduid)." AND did=".pwEscape($did));
+		$db->update("UPDATE pw_diary SET $pwSQL WHERE uid=".S::sqlEscape($winduid)." AND did=".S::sqlEscape($did));
+		**/
+		$pwSQL = array(
+			'dtid'		=> $dtid,
+			'aid'		=> $oldattach,
+			'privacy'	=> $privacy,
+			'subject'	=> $atc_title,
+			'content'	=> $atc_content,
+			'ifcopy'	=> $ifcopy,
+			'ifconvert'	=> $ifconvert,
+			'ifupload'	=> $ifupload,
+			'ifwordsfb'	=> $ifwordsfb,
+		);
+		pwQuery::update('pw_diary', 'uid =:uid AND did =:did', array($winduid, $did), $pwSQL);
 
 		if ($aids) {
-			$db->update("UPDATE pw_attachs SET did=".pwEscape($did)." WHERE aid IN($aids)");
+			$diaryService = L::loadClass('Diary', 'diary');
+			$diaryService->updateDiaryContentByAttach($did, $attachIds);
+			$db->update("UPDATE pw_attachs SET did=" . S::sqlEscape($did) . " WHERE aid IN(" . S::sqlImplode($aids) . ")");
 		}
 
 		if ($dtided != $dtid) {
-			$db->update("UPDATE pw_diarytype SET num=num-1 WHERE uid=".pwEscape($winduid)." AND dtid=".pwEscape($dtided));
-			$db->update("UPDATE pw_diarytype SET num=num+1 WHERE uid=".pwEscape($winduid)." AND dtid=".pwEscape($dtid));
+			$db->update("UPDATE pw_diarytype SET num=num-1 WHERE uid=".S::sqlEscape($winduid)." AND dtid=".S::sqlEscape($dtided));
+			$db->update("UPDATE pw_diarytype SET num=num+1 WHERE uid=".S::sqlEscape($winduid)." AND dtid=".S::sqlEscape($dtid));
 		}
 
 		if ($privacyed == 2 && $privacy !=2) {
@@ -458,19 +528,20 @@ if ($a == 'list') {//我的日志列表
 				countPosts("-$affected_rows");
 			}
 		}
-
-		refreshto("{$basename}a=detail&did=$did",'operate_success');
+		$url = "{$basename}a=detail&did=$did";
+		$msg = defined('AJAX') ?  "success\t".$url : 'operate_success';	
+		refreshto($url, $msg);
 	}
 } elseif ($a == 'copydiary') {
 	define('AJAX', 1);
 	define('F_M',true);
 	banUser();
-	InitGP(array('did'));
+	S::gp(array('did'));
 
 	empty($did) && Showmsg('data_error');
 
 	$dtsel = '';
-	$query = $db->query("SELECT * FROM pw_diarytype WHERE uid=".pwEscape($winduid)." ORDER BY dtid");
+	$query = $db->query("SELECT * FROM pw_diarytype WHERE uid=".S::sqlEscape($winduid)." ORDER BY dtid");
 	while ($rt = $db->fetch_array($query)) {
 		$dtsel .= "<option value=\"$rt[dtid]\">$rt[name]</option>";
 	}
@@ -479,16 +550,16 @@ if ($a == 'list') {//我的日志列表
 } elseif ($a == 'next') {
 
 	define('AJAX',1);
-	$did = (int)GetGP('did');
-	$fuid = (int)GetGP('fuid');
+	$did = (int)S::getGP('did');
+	$fuid = (int)S::getGP('fuid');
 
 	$uid = $fuid ? $fuid : $winduid;
-	$sqladd = "WHERE uid=".pwEscape($uid);
+	$sqladd = "WHERE uid=".S::sqlEscape($uid);
 	if ($uid != $winduid) {
-		$sqladd .= " AND privacy!=2 AND did>".pwEscape($did);
+		$sqladd .= " AND privacy!=2 AND did>".S::sqlEscape($did);
 		$basename = $basename."a=frienddetail&fuid=$uid&";
 	} else {
-		$sqladd .= " AND did>".pwEscape($did);
+		$sqladd .= " AND did>".S::sqlEscape($did);
 		$basename = $basename."a=detail&";
 	}
 	$did = $db->get_value("SELECT MIN(did) FROM pw_diary $sqladd");
@@ -498,15 +569,15 @@ if ($a == 'list') {//我的日志列表
 } elseif ($a == 'pre') {
 
 	define('AJAX',1);
-	$did = (int)GetGP('did');
-	$fuid = (int)GetGP('fuid');
+	$did = (int)S::getGP('did');
+	$fuid = (int)S::getGP('fuid');
 	$uid = $fuid ? $fuid : $winduid;
-	$sqladd = "WHERE uid=".pwEscape($uid);
+	$sqladd = "WHERE uid=".S::sqlEscape($uid);
 	if ($uid != $winduid) {
-		$sqladd .= " AND privacy!=2 AND did<".pwEscape($did);
+		$sqladd .= " AND privacy!=2 AND did<".S::sqlEscape($did);
 		$basename = $basename."a=frienddetail&fuid=$uid&";
 	} else {
-		$sqladd .= " AND did<".pwEscape($did);
+		$sqladd .= " AND did<".S::sqlEscape($did);
 		$basename = $basename."a=detail&";
 	}
 
@@ -515,8 +586,6 @@ if ($a == 'list') {//我的日志列表
 	ajax_footer();
 
 }
-
-
 if($s) require_once PrintEot('m_diary_bottom');
 else require_once PrintEot('m_diary');
 

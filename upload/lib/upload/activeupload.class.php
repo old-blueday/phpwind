@@ -89,13 +89,13 @@ class activeAtt extends uploadBehavior {
 			$rt['ext'] = strtolower(substr(strrchr($rt['name'],'.'),1));
 			$srcfile = "$attachdir/mutiupload/$rt[attachurl]";
 			$rt['fileuploadurl'] = $filename = $thumbname = preg_replace('/^0_/', "{$this->cid}_", $rt['attachurl']);
-			$thumbdir = 'thumb/';
+			//$thumbdir = 'thumb/';
 			if ($savedir = $this->getSaveDir($rt['ext'])) {
 				$rt['fileuploadurl'] = $savedir . $filename;
-				$thumbdir .= $savedir;
+				//$thumbdir .= $savedir;
 			}
 			$source   = PwUpload::savePath(0, $filename, $savedir);
-			$thumburl = PwUpload::savePath($this->ifftp, $thumbname, $thumbdir, 'thumb_');
+			//$thumburl = PwUpload::savePath($this->ifftp, $thumbname, $thumbdir, 'thumb_');
 
 			if (in_array($rt['ext'], array('gif','jpg','jpeg','png','bmp'))) {
 				require_once(R_P.'require/imgfunc.php');
@@ -103,22 +103,23 @@ class activeAtt extends uploadBehavior {
 					Showmsg('upload_content_error');
 				}
 				if ($this->allowThumb()) {
-					$thumbsize = PwUpload::makeThumb($srcfile, $thumburl, $this->getThumbSize(), $rt['ifthumb']);
+					$thumbInfo = PwUpload::makeThumb($srcfile, $this->getThumbInfo($filename, $savedir), $this->ifftp, $rt['ifthumb']);
 				}
 				if ($this->allowWaterMark()) {
 					PwUpload::waterMark($srcfile, $rt['ext'], $img_size);
-					$rt['ifthumb'] && PwUpload::waterMark($thumburl, $rt['ext']);
+					//$rt['ifthumb'] && PwUpload::waterMark($thumburl, $rt['ext']);
 				}
 			}
 			if ($this->ifftp) {
-				if (!PwUpload::movetoftp($srcfile, $rt['fileuploadurl']))
-					continue;
-				$rt['ifthumb'] && PwUpload::movetoftp($thumburl, "thumb/$rt[fileuploadurl]");
+				if (!PwUpload::movetoftp($srcfile, $rt['fileuploadurl'])) continue;
+				//$rt['ifthumb'] && PwUpload::movetoftp($thumburl, "thumb/$rt[fileuploadurl]");
 			} else {
-				if (!PwUpload::movefile($srcfile, $source))
-					continue;
+				if (!PwUpload::movefile($srcfile, $source)) continue;
 			}
-			$this->db->update("INSERT INTO pw_actattachs SET " . pwSqlSingle(array(
+			if ($rt['ifthumb']) {
+				PwUpload::operateThumb($thumbInfo, $this->allowWaterMark(), $this->ifftp, $rt['ext']);
+			}
+			$this->db->update("INSERT INTO pw_actattachs SET " . S::sqlSingle(array(
 				'uid'		=> $this->uid,
 				'hits'		=> 0,							'name'		=> $rt['name'],
 				'type'		=> $rt['type'],					'size'		=> $rt['size'],
@@ -158,10 +159,7 @@ class activeAtt extends uploadBehavior {
 			$filename = $this->cid . "_{$this->uid}_$prename." . preg_replace('/(php|asp|jsp|cgi|fcgi|exe|pl|phtml|dll|asa|com|scr|inf)/i', "scp_\\1", $currUpload['ext']);
 			$savedir = $this->getSaveDir($currUpload['ext']);
 		}
-		$thumbdir = 'thumb/';
-		$savedir && $thumbdir .= $savedir;
-
-		return array($filename, $savedir, $filename, $thumbdir);
+		return array($filename, $savedir);
 	}
 
 	function getSaveDir($ext) {
@@ -189,9 +187,11 @@ class activeAtt extends uploadBehavior {
 		return true;
 		//return $this->forum->forumset['watermark'];
 	}
-
-	function getThumbSize() {
-		return $this->thumbsize;
+	
+	function getThumbInfo($filename, $dir) {
+		return array(
+			array($filename, 'thumb/' . $dir, $this->thumbsize)
+		);
 	}
 
 	function update($uploaddb) {
@@ -201,15 +201,15 @@ class activeAtt extends uploadBehavior {
 			if ($value['attname'] == 'replace' && isset($this->replacedb[$value['id']])) {
 				$aid = $value['id'];
 				$value['descrip'] = $this->replacedb[$aid]['desc'];
-				$this->db->update('UPDATE pw_actattachs SET ' . pwSqlSingle(array(
+				$this->db->update('UPDATE pw_actattachs SET ' . S::sqlSingle(array(
 					'name'		=> $value['name'],			'type'		=> $value['type'],
 					'size'		=> $value['size'],			'attachurl'	=> $value['fileuploadurl'],
 					'uploadtime'=> $timestamp,
 					'descrip'	=> $value['descrip'],		'ifthumb'	=> $value['ifthumb']
-				)) . ' WHERE aid=' . pwEscape($aid));
+				)) . ' WHERE aid=' . S::sqlEscape($aid));
 			} else {
-				$value['descrip'] = Char_cv(GetGP('atc_desc'.$value['id'], 'P'));
-				$this->db->update("INSERT INTO pw_actattachs SET " . pwSqlSingle(array(
+				$value['descrip'] = S::escapeChar(S::getGP('atc_desc'.$value['id'], 'P'));
+				$this->db->update("INSERT INTO pw_actattachs SET " . S::sqlSingle(array(
 					'uid'		=> $this->uid,
 					'hits'		=> 0,							'name'		=> $value['name'],
 					'type'		=> $value['type'],				'size'		=> $value['size'],
@@ -226,9 +226,9 @@ class activeAtt extends uploadBehavior {
 	function updateById($aids, $data) {
 		if (empty($aids) || empty($data)) return false;
 		if (is_array($aids)) {
-			$this->db->update("UPDATE pw_actattachs SET " . pwSqlSingle($data) . ' WHERE aid IN(' . pwImplode($aids) . ')');
+			$this->db->update("UPDATE pw_actattachs SET " . S::sqlSingle($data) . ' WHERE aid IN(' . S::sqlImplode($aids) . ')');
 		} else {
-			$this->db->update("UPDATE pw_actattachs SET " . pwSqlSingle($data) . ' WHERE aid=' . intval($aids));
+			$this->db->update("UPDATE pw_actattachs SET " . S::sqlSingle($data) . ' WHERE aid=' . intval($aids));
 		}
 		return true;
 	}

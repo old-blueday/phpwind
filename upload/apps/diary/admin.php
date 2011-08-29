@@ -1,7 +1,7 @@
 <?php
 !function_exists('adminmsg') && exit('Forbidden');
 
-include_once(D_P.'data/bbscache/o_config.php');
+include_once pwCache::getPath(D_P.'data/bbscache/o_config.php');
 require_once(R_P .'require/app_core.php');
 if (empty($action)) {
 
@@ -39,8 +39,8 @@ if (empty($action)) {
 
 	} else {
 
-		InitGP(array('config','dopen','groups','creditset','creditlog'),'GP',2);
-		InitGP(array('uploadsize'),'P',2);
+		S::gp(array('config','dopen','groups','creditset','creditlog'),'GP',2);
+		S::gp(array('uploadsize'),'P',2);
 		
 		require_once(R_P.'admin/cache.php');
 		setConfig('db_dopen', $dopen);
@@ -68,18 +68,18 @@ if (empty($action)) {
 		foreach ($config as $key => $value) {
 			if (${'o_'.$key} != $value) {
 				$db->pw_update(
-					'SELECT hk_name FROM pw_hack WHERE hk_name=' . pwEscape("o_$key"),
-					'UPDATE pw_hack SET ' . pwSqlSingle(array('hk_value' => $value, 'vtype' => 'string')) . ' WHERE hk_name=' . pwEscape("o_$key"),
-					'INSERT INTO pw_hack SET ' . pwSqlSingle(array('hk_name' => "o_$key", 'vtype' => 'string', 'hk_value' => $value))
+					'SELECT hk_name FROM pw_hack WHERE hk_name=' . S::sqlEscape("o_$key"),
+					'UPDATE pw_hack SET ' . S::sqlSingle(array('hk_value' => $value, 'vtype' => 'string')) . ' WHERE hk_name=' . S::sqlEscape("o_$key"),
+					'INSERT INTO pw_hack SET ' . S::sqlSingle(array('hk_name' => "o_$key", 'vtype' => 'string', 'hk_value' => $value))
 				);
 				$updatecache = true;
 			}
 		}
 		if ($uploadsize) {
 			$db->pw_update(
-				'SELECT hk_name FROM pw_hack WHERE hk_name=' . pwEscape("o_uploadsize"),
-				'UPDATE pw_hack SET ' . pwSqlSingle(array('hk_value' => $uploadsize, 'vtype' => 'string')) . ' WHERE hk_name=' . pwEscape("o_uploadsize"),
-				'INSERT INTO pw_hack SET ' . pwSqlSingle(array('hk_name' => "o_uploadsize", 'vtype' => 'string', 'hk_value' => $uploadsize))
+				'SELECT hk_name FROM pw_hack WHERE hk_name=' . S::sqlEscape("o_uploadsize"),
+				'UPDATE pw_hack SET ' . S::sqlSingle(array('hk_value' => $uploadsize, 'vtype' => 'string')) . ' WHERE hk_name=' . S::sqlEscape("o_uploadsize"),
+				'INSERT INTO pw_hack SET ' . S::sqlSingle(array('hk_name' => "o_uploadsize", 'vtype' => 'string', 'hk_value' => $uploadsize))
 			);
 			$updatecache = true;
 		}
@@ -87,34 +87,45 @@ if (empty($action)) {
 		adminmsg('operate_success');
 	}
 } elseif ($action == 'cp') {
-	InitGP(array('step'));
-	InitGP(array('groups','groupid','author','keyword','postdate_s','postdate_e','hits','replies','tcounts','counts','orderby','sc','perpage','direct','page', 'searchDisplay'));
+	S::gp(array('step'));
+	S::gp(array('groups','groupid','author','keyword','postdate_s','postdate_e','hits','replies','tcounts','counts','orderby','sc','perpage','direct','page', 'searchDisplay'));
 	if ($step == 'delete') {
 		require_once(R_P. "require/app_core.php");
 		$selids = '';
-		InitGP(array('selid'),'P',1);
+		S::gp(array('selid'),'P',1);
 		if (is_array($selid)) {
 			foreach ($selid as $value) {
 				if (is_numeric($value)) {
 					$selids[] = $value;
 				}
 			}
-			$selids = pwImplode($selids);
+			$selids = S::sqlImplode($selids);
 		}
 		!$selids && adminmsg('operate_error',"$basename&action=cp");
 		$selids = strpos($selids,',')!==false ? "IN ($selids)" : "= $selids";
-		
+		$uids = $dids = array();
 		$query = $db->query("SELECT uid,dtid,did FROM pw_diary WHERE did $selids");
-		while ($rt = $db->fetch_array($query)){
-			$db->update("DELETE FROM pw_diary WHERE did=".pwEscape($rt['did']));
-			$db->update("UPDATE pw_diarytype SET num=num-1 WHERE dtid=".pwEscape($rt['dtid']));
+		while ($rt = $db->fetch_array($query)){			
+			//$db->update("DELETE FROM pw_diary WHERE did=".S::sqlEscape($rt['did']));
+			pwQuery::delete('pw_diary', 'did=:did', array($rt['did']));
+			$db->update("UPDATE pw_diarytype SET num=num-1 WHERE dtid=".S::sqlEscape($rt['dtid']));
 			if ($affected_rows = delAppAction('diary',$rt['did'])) {
 				countPosts("-$affected_rows");
 			}
 			$uids[] = $rt['uid'];
+			$dids[] = $rt['did'];
 		}
-		$uids = array_unique($uids);
+		$uids = array_unique($uids);		
 		updateUserAppNum($uids,'diary','recount');
+		
+		//删除日志时，删除微博
+		$weiboService = L::loadClass('weibo','sns'); /* @var $weiboService PW_Weibo */
+		$weiboArr = $weiboService->getWeibosByObjectIdsAndType($dids,'diary');
+		foreach ($weiboArr as $weibo) {
+			$mids[] = $weibo['mid'];
+		}
+		$mids && $weiboService->deleteWeibos($mids);
+		
 		adminmsg('operate_success',"$basename&action=cp&step=list&groupid=$groupid&author=$author&keyword=$keyword&postdate1=$postdate1&postdate2=$postdate2&hits=$hits&replies=$replies&tcounts=$tcounts&counts=$counts&orderby=$orderby&sc=$sc&perpage=$perpage&&page=$page&");
 
 	} else {
@@ -134,14 +145,14 @@ if (empty($action)) {
 		}
 		if ($groups) {
 			$groupid = implode(",",$groups);
-			$sql .= " AND m.groupid IN(".pwImplode($groups).")";
+			$sql .= " AND m.groupid IN(".S::sqlImplode($groups).")";
 		}
 
 		if ($author) {
 			$authorarray = explode(",",$author);
 			foreach ($authorarray as $value) {
 				$value = str_replace('*','%',$value);
-				$authorwhere .= " OR username LIKE ".pwEscape($value,false);
+				$authorwhere .= " OR username LIKE ".S::sqlEscape($value,false);
 			}
 			$authorwhere = substr_replace($authorwhere,"",0,3);
 			$authorids = array('-99');
@@ -149,7 +160,7 @@ if (empty($action)) {
 			while ($rt = $db->fetch_array($query)) {
 				$authorids[] = $rt['uid'];
 			}
-			$sql .= " AND d.uid IN(".pwImplode($authorids).")";
+			$sql .= " AND d.uid IN(".S::sqlImplode($authorids).")";
 		}
 
 		if ($keyword) {
@@ -158,7 +169,7 @@ if (empty($action)) {
 			foreach ($keywordarray as $value) {
 				$value = str_replace('*','%',$value);
 				$keywhere .= 'OR';
-				$keywhere .= " d.content LIKE ".pwEscape("%$value%")."OR d.subject LIKE ".pwEscape("%$value%");
+				$keywhere .= " d.content LIKE ".S::sqlEscape("%$value%")."OR d.subject LIKE ".S::sqlEscape("%$value%");
 			}
 			$keywhere = substr_replace($keywhere,"",0,3);
 			$sql .= " AND ($keywhere) ";
@@ -166,26 +177,26 @@ if (empty($action)) {
 
 		if ($postdate_s) {
 			$date1 = PwStrtoTime($postdate_s);
-			$sql.=" AND d.postdate>".pwEscape($date1);
+			$sql.=" AND d.postdate>".S::sqlEscape($date1);
 		}
 		if ($postdate_e) {
 			$date2  = PwStrtoTime($postdate_e);
-			$sql.=" AND d.postdate<".pwEscape($date2);
+			$sql.=" AND d.postdate<".S::sqlEscape($date2);
 		}
 
-		$hits    && $sql.=" AND d.r_num<".pwEscape($hits);
-		$replies && $sql.=" AND d.c_num<".pwEscape($replies);
+		$hits    && $sql.=" AND d.r_num<".S::sqlEscape($hits);
+		$replies && $sql.=" AND d.c_num<".S::sqlEscape($replies);
 		if ($tcounts) {
-			$sql .= " AND char_length(d.content)>".pwEscape($tcounts);
+			$sql .= " AND char_length(d.content)>".S::sqlEscape($tcounts);
 		} elseif ($counts) {
-			$sql .= " AND char_length(d.content)<".pwEscape($counts);
+			$sql .= " AND char_length(d.content)<".S::sqlEscape($counts);
 		}
 		
 		$sc != 'asc' && $sc = 'desc';
 		$order = /*$orderby ? " ORDER BY d.$orderby" : */" ORDER BY d.postdate $sc";
 		
 		(int)$page < 1 && $page = 1;
-		$limit = pwLimit(($page-1)*$perpage,$perpage);
+		$limit = S::sqlLimit(($page-1)*$perpage,$perpage);
 
 		$query = $db->query("SELECT d.* FROM pw_diary d LEFT JOIN pw_members m ON d.uid=m.uid $sql $order $by $limit");
 		while($rt = $db->fetch_array($query)){

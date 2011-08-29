@@ -3,10 +3,10 @@
 $baseUrl = $admin_file . "?adminjob=mode&admintype=cms_purview&";
 $purviewService = C::loadClass('PurviewService');
 /* @var $purviewService PW_PurviewService */
-InitGP(array('action', 'page'));
+S::gp(array('action', 'page'));
 if (!$action) {
 	$perPage = 20;
-	InitGP(array('username'));
+	S::gp(array('username'));
 	$cmsPurviews = $purviewService->findAll($username, $page, $perPage);
 	if (!$username) {
 		$count = $purviewService->countPurview();
@@ -15,7 +15,7 @@ if (!$action) {
 	$ajaxUrl = EncodeUrl($baseUrl);
 
 } elseif ($action == 'add') {
-	InitGP(array('username', 'pid'));
+	S::gp(array('username', 'pid'));
 	if (!empty($pid)) {
 		$userpurview = $purviewService->findPurviewById($pid);
 	}
@@ -23,7 +23,7 @@ if (!$action) {
 	$columns = $purviewService->getAllColumns();
 
 } elseif ($action == 'addsubmit') {
-	InitGP(array('pid', 'username', 'columnids', 'super'));
+	S::gp(array('pid', 'username', 'columnids', 'super'));
 	if (empty($username)) Showmsg('用户名不能为空', $basename . '&action=add&pid=' . $pid);
 	if (!empty($columnids) && !is_array($columnids)) Showmsg('非法操作', $basename . '&action=add&pid=' . $pid);
 	if ($super) {
@@ -38,7 +38,7 @@ if (!$action) {
 	Showmsg('操作成功!', $basename . '&$action=add');
 
 } elseif ($action == 'del') {
-	InitGP(array('pid'));
+	S::gp(array('pid'));
 	if (empty($pid)) Showmsg('非法操作');
 	if (!$purviewService->deletePruviewById($pid)) Showmsg('删除操作失败');
 	$purviewService->updatePurviewCache();

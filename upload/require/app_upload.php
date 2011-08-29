@@ -27,12 +27,12 @@ if ($filenum > 0 && $filenum <= $db_attachnum) {
 		$value['name'] = addslashes($value['name']);
 
 		if (!$value['ifreplace']) {
-			InitGP(array('atc_desc'.$value['id']),'P',1);
+			S::gp(array('atc_desc'.$value['id']),'P',1);
 			$value['descrip']	= ${'atc_desc'.$value['id']};
 			$value['needrvrc'] = $value['special'] = 0;
 			$value['ctype'] = '';
 
-			$db->update("INSERT INTO pw_attachs SET ".pwSqlSingle(array(
+			$db->update("INSERT INTO pw_attachs SET ".S::sqlSingle(array(
 				'fid'		=> $fid,				'uid'		=> $winduid,
 				'hits'		=> 0,					'name'		=> $value['name'],
 				'type'		=> $value['type'],		'size'		=> $value['size'],
@@ -62,13 +62,13 @@ if ($filenum > 0 && $filenum <= $db_attachnum) {
 			$value['ctype']		= 0;
 			$value['descrip']	= $replacedb[$value['id']]['desc'];
 			$aid = $replacedb[$value['id']]['aid'];
-			$db->update("UPDATE pw_attachs SET ".pwSqlSingle(array(
+			$db->update("UPDATE pw_attachs SET ".S::sqlSingle(array(
 				'name'		=> $value['name'],			'type'		=> $value['type'],
 				'size'		=> $value['size'],			'attachurl'	=> $value['attachurl'],
 				'needrvrc'	=> $value['needrvrc'],		'special'	=> $value['special'],
 				'ctype'		=> $value['ctype'],			'uploadtime'=> $timestamp,
 				'descrip'	=> $value['descrip'],		'ifthumb'	=> $value['ifthumb']
-			)) . " WHERE aid=".pwEscape($aid));
+			)) . " WHERE aid=".S::sqlEscape($aid));
 			$oldattach[$aid]['name'] = $value['name'];
 			$oldattach[$aid]['type'] = $value['type'];
 			$oldattach[$aid]['size'] = $value['size'];
@@ -81,7 +81,7 @@ unset($_FILES);
 foreach ($attachs as $key => $value) {
 	$aids[] = $key;
 }
-$aids && $aids = pwImplode($aids);
+$aids && $aids = S::sqlImplode($aids);
 require_once(R_P.'require/functions.php');
 pwFtpClose($ftp);
 
@@ -94,7 +94,7 @@ function UploadDiary($uid,$uptype = 'all',$thumbs = null){
 			list($t,$i) = explode('_',$key);
 			$i = (int)$i;
 			$atc_attachment = $value['tmp_name'];
-			$atc_attachment_name = Char_cv($value['name']);
+			$atc_attachment_name = S::escapeChar($value['name']);
 			$atc_attachment_size = $value['size'];
 			$attach_ext = strtolower(substr(strrchr($atc_attachment_name,'.'),1));
 

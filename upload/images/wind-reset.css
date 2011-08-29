@@ -195,7 +195,7 @@ a.gray{color:#999;}
 .card-title{margin:2px 0 4px;}
 .card-online,.card-fri,.card-fri-out,.card-mail,.card-offline,.card-blog,.card-magic,.card-qq,.card-ww{width:16px;height:16px;overflow:hidden;text-indent:-9999px;}
 .card-online{float:left;background-position:0 0;margin-left:5px;}
-.card-offline{float:left;background-position:-20px 0;margin-left:5px;}
+.card-offline{float:left;background-position:-16px 0;margin-left:5px;}
 .card-fri{float:right;background-position:0 -20px;}
 .card-fri-out{float:right;background-position:0 -100px;}
 .card-mail{float:right;background-position:0 -40px;margin-left:7px;}

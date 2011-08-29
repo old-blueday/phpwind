@@ -1,8 +1,7 @@
 <?php
 !defined('P_W') && exit('Forbidden');
 
-InitGP(array(
-	'u'), 'P', 2);
+S::gp(array('u'), 'P', 2);
 if (!$u)
 	Showmsg('undefined_action');
 if ($u != $winduid)

@@ -17,6 +17,8 @@ print <<<EOT
 <input type="hidden" name="step" value="3" />
 <input type="hidden" name="tid" value="$tid" />
 <input type="hidden" name="verify" value="$verifyhash" />
+<input type="hidden" name="ajax" value="1" />
+<input type="hidden" name="iscontinue" value="1" />
 <div class="g_bgB">
 <table width="100%" style="table-layout:fixed">
     <tr class="vt">
@@ -27,7 +29,7 @@ EOT;
 if($winduid){print<<<EOT
 -->
                 <p class="gName mb5 cc">
-					<a href="u.php?uid=$winduid" target="_blank" class="mr5 fl" target="_blank">$windid</a>
+					<a href="{$db_userurl}$winduid" target="_blank" class="mr5 fl" target="_blank">$windid</a>
 <!--
 EOT;
 if($db_showonline){
@@ -51,7 +53,7 @@ list($fp_face) = showfacedesign($winddb['icon'],1);
 print <<<EOT
 -->
                 <p class="mb10">
-					<a href="u.php?uid=$winduid"  class="gFace" target="_blank">
+					<a href="{$db_userurl}$winduid"  class="gFace" target="_blank">
 					<img src="$fp_face" width="80" height="80" /></a>
 				</p>
             </div>
@@ -82,19 +84,34 @@ print <<<EOT
                 <div class="mb10">
 <!--
 EOT;
-if($o_groups_p_gdcheck){print <<<EOT
+if($o_groups_p_gdcheck){
+$gdSize = explode("\t",$db_gdsize);
+print <<<EOT
 -->
                     <dl class="cc">
                         <dt class="dtA">认证码: </dt>
-                        <dd><input class="input" type="text" name="gdcode" size="5" tabindex="6" onfocus="try{opencode('menu_gd',this)}catch(e){}" id="fs_gdcode"/><br />
-                        <div class="menu" id="menu_gd" style="visibility:hidden;"><img src="ck.php?" align="absmiddle" style="cursor:pointer;" id="ckcode" alt="看不清楚，换一张" />
-                        </div>
+                        <dd><input class="input" type="text" name="gdcode" size="5" tabindex="6" onfocus="showgd();" id="fs_gdcode"/><br />
+					<div id="ckcode" style="display:none">
+<script type="text/javascript" src="js/pw_authcode.js"></script>
+<script>
+var flashWidth = "$gdSize[0]";
+var flashHeight = "$gdSize[1]";
+var gdtype = $db_gdtype;
+showGdCode();
+</script>
+					</div>
                         </dd>
                     </dl>
 <!--
 EOT;
-}if($o_groups_p_qcheck){
+}if($db_question && $o_groups_p_qcheck){
 $qkey = array_rand($db_question);
+if($db_imagequestion){
+	$question = sprintf('<img src="ckquestion.php?q=%s">',$qkey);
+}else{
+	$question = $qkey<0 ? getMachineQuestion_1() :  $db_question[$qkey];
+}
+$q_a = $question.($showq && $qkey>0?" 正确答案:".$db_answer[$qkey] : '');
 print <<<EOT
 -->
 <style type="text/css">
@@ -103,7 +120,7 @@ print <<<EOT
 </style>
                     <dl class="cc">
                         <dt class="dtA">验证问题:</dt>
-                        <dd><input class="input" type="text" name="qanswer" /> <input type="hidden" name="qkey" value="$qkey" />{$db_question[$qkey]} 正确答案:{$db_answer[$qkey]}</dd>
+                        <dd><input class="input" type="text" name="qanswer" /> <input type="hidden" name="qkey" value="$qkey" />{$q_a}</dd>
                     </dl>
 <!--
 EOT;
@@ -111,6 +128,7 @@ EOT;
 -->
                 </div>
                 <p><span class="mr10"><span class="btn"><span><button name="Submit" type="submit">写好了，发布</button></span></span></span><span class="s3">Ctrl + Enter 快速发布</span>
+				<div id="divload"></div>
             </div>
         </td>
         <td class="floot_right" width="250">
@@ -227,35 +245,62 @@ PwFace.init('face_tab', 'face_main', 3, 16);
  }*/
 function checkpost(obj){
 	if(obj.atc_title.value==""){
-		showDialog("error","标题不能为空",2);
+		showDialog("error","话题回复<span class='warnFontStyle'>标题</span>不能为空",2);
 		obj.atc_title.focus();
 		return false;
 	} else if(strlen(obj.atc_title.value)>$db_titlemax){
-		showDialog("error","标题超过最大长度 $db_titlemax 个字节",2);
+		showDialog("error","话题回复<span class='warnFontStyle'>标题</span>不能超过 <span class='warnFontStyle'>$db_titlemax</span> 个字节",2);
 		obj.atc_title.focus();
 		return false;
 	}
 	if(strlen(obj.atc_content.value)<$db_postmin){
-		showDialog("error","文章内容少于 $db_postmin 个字节",2);
+		showDialog("error","话题回复<span class='warnFontStyle'>内容</span>不能少于 <span class='warnFontStyle'>$db_postmin </span>个字节",2);
 		obj.atc_content.focus();
 		return false;
 	} else if(strlen(obj.atc_content.value)>$db_postmax){
-		showDialog("error","文章内容大于 $db_postmax 个字节",2);
+		showDialog("error","话题回复<span class='warnFontStyle'>内容</span>不能大于 <span class='warnFontStyle'>$db_postmax </span>个字节",2);
 		obj.atc_content.focus();
 		return false;
 	}
-	document.FORM.Submit.disabled = true;
-	cnt++;
-	if(cnt!=1){
-		showDialog("warning","Submission Processing. Please Wait");
-		return false;
-	}
-	if (is_ie && newAtt.aid < 2) {
-		document.FORM.encoding = "application/x-www-form-urlencoded";
-	}
-	return true;
+	SubmitAjax(obj)
+	return false;
 }
-
+//ajax提交数据 
+function SubmitAjax(obj) {
+	document.FORM.Submit.disabled = true;
+	getObj('divload').innerHTML = showLoading();
+	cnt++;
+	ajax.send("{$basename}a=reply&cyid=$cyid", obj, function(){
+		if (undefined == ajax.request.responseText) {
+			showDialog({
+				type: 'error',
+				message: '请求超时!'
+			});
+			document.FORM.Submit.disabled = false;
+			getObj('divload').innerHTML = "";
+			return false;
+		}
+		var rText = ajax.request.responseText.split('\t');
+		if (rText[0] == 'success') {
+			window.onbeforeunload = function(){};
+			window.location =  rText[1];
+	    }else if(rText[0] == 'continue'){ //敏感词
+			 showDialog({type:'confirm',message:rText[1],okText:'继续',onOk:function(){
+				obj.iscontinue.value = 1;
+				SubmitAjax(obj);
+			 }});
+		} else {
+			showDialog('error', rText[0]);
+		}
+		cnt = 0;
+		document.FORM.Submit.disabled = false;
+		getObj('divload').innerHTML = "";
+		return false;
+	});
+}
+function showLoading(){
+	return "<div id=\"loading\" style=\"padding:20px;width:80%;text-align:center\"><img src=\""+imgpath+"/loading.gif\" align=\"absbottom\" alt=\"loading\" /> 正在加载数据...</div>";
+}
 function checklength(theform,postmaxchars){
 	if(postmaxchars != 0){
 		message = '<br />系统限制最大字节数:'+postmaxchars+' 字节';

@@ -63,7 +63,7 @@ EOT;
       <ul>
         <li><a href="index.php" target="_blank"><img src="$imgpath/admin/main/home.gif" alt="站点首页" />站点首页</a></li>
         <li><a onclick="openNewUrl('checkreg','审核注册','$admin_file?adminjob=usercheck&admintype=checkreg')" style="cursor:pointer"><img src="$imgpath/admin/main/user.png" alt="审核注册" />审核注册</a></li>
-        <li><a onclick="openNewUrl('checkemail','审核邮件','$admin_file?adminjob=usercheck&admintype=checkemail')" style="cursor:pointer"><img src="$imgpath/admin/main/mail.png" alt="审核邮件" />审核邮件</a></li>
+        <li><a onclick="openNewUrl('checkemail','审核电子邮件','$admin_file?adminjob=usercheck&admintype=checkemail')" style="cursor:pointer"><img src="$imgpath/admin/main/mail.png" alt="审核电子邮件" />审核电子邮件</a></li>
         <li><a onclick="openNewUrl('tpccheck','帖子审核','$admin_file?adminjob=tpccheck')" style="cursor:pointer"><img src="$imgpath/admin/main/tpc.png" alt="审核主题" />审核主题</a></li>
         <li><a onclick="openNewUrl('tpccheck','帖子审核','$admin_file?adminjob=tpccheck&action=postcheck')" style="cursor:pointer"><img src="$imgpath/admin/main/post.png" alt="审核回复" />审核回复</a></li>
         <li><a onclick="openNewUrl('share','审核链接','$admin_file?adminjob=share&state=0')" style="cursor:pointer"><img src="$imgpath/admin/main/share.png" alt="审核链接" />审核链接</a></li>
@@ -184,13 +184,6 @@ function WhereToJump(id,name,v,url){
 	}
 	return false;
 }
-function openNewUrl(id,name,url){
-	parent.PW.Dialog({
-					'id': id,
-					'name': name,
-					'url': url
-				}).loadIframe(url);
-}
 </script>
 <!--
 EOT;
@@ -296,7 +289,7 @@ if($admin_gid == '3'){print <<<EOT
             </tr>
             <tr class="tr1 vt">
                 <td class="td1">会员</td>
-                <td class="td2">未验证会员数 {$sysinfo['M7']} <a href="javascript:;" onclick="openNewUrl('checkreg','会员审核','$admin_file?adminjob=usercheck&admintype=checkreg');">审核</a></td>
+                <td class="td2">未验证会员数 {$sysinfo['M7']} <a href="javascript:;" onclick="openNewUrl('usercheck','用户审核','$admin_file?adminjob=usercheck');">审核</a></td>
             </tr>
             <tr class="tr1 vt">
                 <td class="td1">链接</td>
@@ -309,7 +302,7 @@ if($admin_gid == '3'){print <<<EOT
             <tr class="tr1 vt">
                 <td class="td1">论坛缓存</td>
                 <td class="td2">
-                	<span class="bt2"><span><button type="button" onclick="openNewUrl('updatecache','论坛缓存更新','$admin_file?adminjob=updatecache');">更 新</button></span></span>
+                	<span class="bt2"><span><button type="button" onclick="openNewUrl('aboutcache','论坛缓存更新','$admin_file?adminjob=aboutcache&adminitem=updatecache&action=cache');">更 新</button></span></span>
                 </td>
             </tr>
             <tr class="tr1 vt">
@@ -340,7 +333,7 @@ if($admin_gid == '3'){print <<<EOT
                 <td class="td1">编辑用户</td>
                 <td class="td2">                    
                      <input id="schname" class="input input_wa" name="schname" value="请输入用户名" onclick="this.value=''" type="text" />
-                    <span class="bt2"><span><button type="button" onclick="WhereToJump('setuser','编辑用户','schname','adminjob=setuser&action=search&schname_s=1&schname=');">编 辑</button></span></span>
+                    <span class="bt2"><span><button type="button" onclick="WhereToJump('usermanage','编辑用户','schname','adminjob=usermanage&adminitem=edit&action=search&schname_s=1&schname=');">编 辑</button></span></span>
                     
                 </td>
             </tr>
@@ -423,7 +416,7 @@ EOT;
             <tr class="tr1 vt">
                 <td class="td1">会员管理</td>
                 <td class="td2">
-                    <span class="bt2"><span><button type="button" onclick="openNewUrl('setuser','会员管理','$admin_file?adminjob=setuser')">管 理</button></span></span>
+                    <span class="bt2"><span><button type="button" onclick="openNewUrl('usermanage','会员管理','$admin_file?adminjob=usermanage');">管 理</button></span></span>
                 </td>
             </tr>
 		</table>
@@ -461,15 +454,6 @@ function WhereToJump(id,name,v,url){
 	}
 	return false;
 }
-
-function openNewUrl(id,name,url){
-	parent.PW.Dialog({
-		'id': id,
-		'name': name,
-		'url': url,
-		'max':false
-	}).loadIframe(url);
-}
 </script>
 <div id="system" style="display:none;"></div>
 <!--
@@ -494,6 +478,7 @@ EOT;
 <div class="legend">
     <ul>
         <li>社区软件版本：phpwind {$wind_version} ($db_charset) </li>
+		<li>版本编号：{$wind_repair}</li>
         <li>PHP程式版本:$sysversion</li>
         <li>MYSQL 版本:$dbversion</li>
         <li>服务器端信息:$sysos</li>
@@ -547,4 +532,6 @@ EOT;
 </div>
 <!--
 EOT;
-}?>-->
+}
+include_once PrintEot('adminbottom');
+?>-->

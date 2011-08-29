@@ -1,16 +1,16 @@
 <?php
 !defined('P_W') && exit('Forbidden');
 
-InitGP(array(
+S::gp(array(
 	'pcmid',
 	'pcid',
 	'tid',
 	'jointype',
 	'payway'
 ));
-$read = $db->get_one("SELECT authorid,subject,fid FROM pw_threads WHERE tid=" . pwEscape($tid));
-$foruminfo = $db->get_one('SELECT forumadmin,fupadmin FROM pw_forums WHERE fid=' . pwEscape($read['fid']));
-$isGM = CkInArray($windid, $manager);
+$read = $db->get_one("SELECT authorid,subject,fid FROM pw_threads WHERE tid=" . S::sqlEscape($tid));
+$foruminfo = $db->get_one('SELECT forumadmin,fupadmin FROM pw_forums WHERE fid=' . S::sqlEscape($read['fid']));
+$isGM = S::inArray($windid, $manager);
 $isBM = admincheck($foruminfo['forumadmin'], $foruminfo['fupadmin'], $windid);
 L::loadClass('postcate', 'forum', false);
 $post = array();
@@ -21,7 +21,7 @@ if ($isadminright != 1) {
 	ajax_footer();
 }
 
-$db->UPDATE("DELETE FROM pw_pcmember WHERE pcmid=" . pwEscape($pcmid));
+$db->UPDATE("DELETE FROM pw_pcmember WHERE pcmid=" . S::sqlEscape($pcmid));
 
 echo "success\t$jointype\t$tid\t$payway";
 ajax_footer();

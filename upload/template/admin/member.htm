@@ -1,0 +1,230 @@
+<!--<?php
+include_once PrintEot('left');
+print <<<EOT
+-->
+<form action="$basename" method="post">
+<input type="hidden" name="step" value="2">
+<h3 class="h1">头像设置</h3>
+<div class="admin_table mb10">
+	<table width="100%" cellspacing="0" cellpadding="0">
+		<tr class="tr1 vt">
+			<td class="td1">头像上传功能</td>
+			<td class="td2">
+				<ul class="list_A list_80">
+					<li><input type="radio" value="1" name="upload[upload]" $upload_Y>开启</li>
+					<li><input type="radio" value="0" name="upload[upload]" $upload_N>关闭</li>
+				</ul>
+			</td>
+			<td class="td2"><div class="help_a">此处为全局控制，此功能关闭则所有用户都不能使用头像上传功能</div></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">头像上传大小限制</td>
+			<td class="td2">
+				大小:&nbsp;<input name="upload[imgsize]"value="$db_imgsize" class="input input_wc" />  KB</li>
+			</td>
+			<td class="td2"><div class="help_a">超过设定值大小的图片将不能上传为头像</div></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">头像显示限制</td>
+			<td class="td2">
+				<ul class="list_C">
+					<li>宽:　&nbsp;<input name="upload[imgwidth]" value="$db_imgwidth" class="input input_wc" maxlength="3">&nbsp;像素</li>
+					<li>高:　&nbsp;<input name="upload[imglen]" value="$db_imglen" class="input input_wc" maxlength="3">&nbsp;像素</li>
+				</ul>
+			</td>
+			<td class="td2"><div class="help_a">超过设定值大小的图片将不能上传为头像</div></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">头像缩略功能</td>
+			<td class="td2">
+				<ul class="list_A list_80">
+					<li><input type="radio" value="1" name="config[iffthumb]" $iffthumb_Y>开启</li>
+					<li><input type="radio" value="0" name="config[iffthumb]" $iffthumb_N>关闭</li>
+				</ul>
+			</td>
+			<td class="td2"><div class="help_a">开启后，上传的头像将按照一定比例被进行缩略</div></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">头像缩略限制</td>
+			<td class="td2">
+				<ul class="list_C">
+					<li>宽:　&nbsp;<input name="fthumbsize[fthumbwidth]" value="$db_fthumbwidth" class="input input_wc" />&nbsp;像素</li>
+					<li>高:　&nbsp;<input name="fthumbsize[fthumbheight]" value="$db_fthumbheight" class="input input_wc" />&nbsp;像素</li>
+				</ul>
+			</td>
+			<td class="td2"><div class="help_a">超过设定值的图片才会被压缩，0或空表示不限制。</div></td>
+		</tr>
+	</table>
+</div>
+
+<h3 class="h1">签名设置</h3>
+<div class="admin_table mb10">
+	<table width="100%" cellspacing="0" cellpadding="0">
+		<tr class="tr1 vt">
+			<td class="td1">签名最大高度控制[像素]</td>
+			<td class="td2"><input name="config[signheight]" value="$db_signheight" class="input input_wa" /></td><td class="td2"><div class="help_a">帖子签名的最大高度控制</div></td>
+				</tr>
+		<tr class="tr1 vt">
+			<td class="td1">签名中Wind代码功能</td>
+			<td class="td2">
+				<ul class="list_A list_80">
+					<li><input type="radio" value="1" name="config[signwindcode]" $signwindcode_Y>开启</li>
+					<li><input type="radio" value="0" name="config[signwindcode]" $signwindcode_N>关闭</li>
+				</ul>
+			</td>
+			<td class="td2"><div class="help_a">开启后，可在帖子签名中使用Wind代码</div></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">签名中Wind img功能</td>
+			<td class="td2">
+				<ul class="list_A list_80">
+					<li><input type="radio" value="1" name="windpic[pic]" $windpic_pic_Y>开启</li>
+					<li><input type="radio" value="0" name="windpic[pic]" $windpic_pic_N>关闭</li>
+				</ul>
+			</td>
+			<td class="td2"><div class="help_a">开启后，可在帖子签名中使用[img]标签</div></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">签名中[img]标签大小控制</td>
+			<td class="td2">
+				<ul class="list_C">
+					<li>宽:　&nbsp;<input name="windpic[picwidth]" value="$db_windpic[picwidth]" size="5" class="input" />&nbsp;像素</li>
+					<li>高:　&nbsp;<input name="windpic[picheight]" value="$db_windpic[picheight]" size="5" class="input" />&nbsp;像素</li>
+				</ul>
+			</td>
+			<td class="td2"><div class="help_a">超过设定值，帖子签名中的外链图片会按照此设定值进行缩略。<br />0或留空表示不限制</div></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">签名中[size]标签最大值</td>
+			<td class="td2"><input name="windpic[size]" value="$db_windpic[size]" class="input input_wa" /></td><td class="td2"><div class="help_a">签名中[size]标签最大值设置。0或留空表示不限制</div></td>
+				</tr>
+		<tr class="tr1 vt">
+			<td class="td1">签名中Wind Flash功能</td>
+			<td class="td2">
+				<ul class="list_A list_80">
+					<li><input type="radio" value="1" name="windpic[flash]" $windpic_flash_Y>开启</li>
+					<li><input type="radio" value="0" name="windpic[flash]" $windpic_flash_N>关闭</li>
+				</ul>
+			</td>
+			<td class="td2"><div class="help_a">开启后，可在帖子签名中添加flash。建议关闭</div></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">签名每日消耗积分数</td>
+			<td class="td2">
+				<input name="config[signmoney]" value="$db_signmoney" class="input input_wa mr10" />
+				<select name="config[signcurtype]" class="select_wa">$signcurtype</select>
+			</td><td class="td2"><div class="help_a">签名显示一天需要相应积分数。0或留空表示不限制</div></td>
+				</tr>
+		<tr class="tr1 vt">
+			<td class="td1">需要购买签名的用户组</td>
+			<td class="td2">$signgroup</td>
+			<td class="td2"><div class="help_a">该功能配合phpwind-网上银行系统可为站长带来可观的经济来源 </div></td>
+		</tr>
+	</table>
+</div>
+
+<h3 class="h1">内容发布设置</h3>
+<div class="admin_table mb10">
+	<table width="100%" cellspacing="0" cellpadding="0">
+		<tr class="tr1 vt">
+			<td class="td1">标题最大长度[字节]</td>
+			<td class="td2"><input name="config[titlemax]" value="$db_titlemax" class="input input_wa" /></td>
+			<td class="td2"><div class="help_a">帖子标题最大长度控制</div></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">内容最大长度[字节]</td>
+			<td class="td2"><input name="config[postmax]" value="$db_postmax" class="input input_wa" /></td>
+			<td class="td2"><div class="help_a">帖子内容最大长度控制</div></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">内容最小长度[字节]</td>
+			<td class="td2"><input name="config[postmin]" value="$db_postmin" class="input input_wa" /></td>
+			<td class="td2"><div class="help_a">帖子内容最小长度控制</div></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">回复时显示提示旧帖数</td>
+			<td class="td2"><input name="config[showreplynum]" value="$db_showreplynum" class="input input_wa" /></td>
+			<td class="td2"><div class="help_a">回复编辑页底部显示的回复数量控制</div></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">投票选项个数控制</td>
+			<td class="td2"><input name="config[selcount]" value="$db_selcount" class="input input_wa" /></td>
+			<td class="td2"><div class="help_a">投票选项个数控制</div></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">链接帖发帖限制</td>
+			<td class="td2">
+				<input type="text" value="$db_posturlnum" name="config[posturlnum]" class="input input_wa" >
+			</td>
+			<td class="td2"><div class="help_a">当会员的发表的帖子数量达到设定值以后就可以发表带链接的帖子。<br />此设置为防止注册机注册后发带有链接地址的广告。0或留空表示不限制</div></td>
+		 </tr>
+		 <tr class="tr1 vt">
+			<td class="td1">帖子编辑记录时间[分钟]</td>
+			<td class="td2">
+				<input type="text" value="$db_postedittime" name="config[postedittime]" class="input input_wa" >
+			</td>
+			<td class="td2"><div class="help_a">超过这个时间后，系统会记录用户编辑帖子操作记录。0或留空则不记录。管理员不受限制</div></td>
+		 </tr>
+	</table>
+</div>
+
+<h3 class="h1">出售加密设置</h3>
+<div class="admin_table mb10">
+	<table width="100%" cellspacing="0" cellpadding="0">
+		<tr class="tr1 vt">
+			<td class="td1">出售帖允许的积分类型</td>
+			<td class="td2"><ul class="list_A list_120">$sellset</ul></td>
+			<td class="td2"><div class="help_a">出售帖全局开关。勾选允许使用的积分类型</div></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">出售帖允许的积分大小</td>
+			<td class="td2">
+				<ul class="list_C">
+					<li><input name="sellset[price]" value="$db_sellset[price]" class="input input_wa" />&nbsp;最高单价限制</li>
+					<li><input name="sellset[income]" value="$db_sellset[income]" class="input input_wa" />&nbsp;最高收入限制</li>
+				</ul>
+			</td>
+			<td class="td2"><div class="help_a">帖子可出售的最高价格，0或留空表示不限制</div></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">加密帖允许的积分类型</td>
+			<td class="td2"><ul class="list_A list_120">$enhideset</ul></td>
+			<td class="td2"><div class="help_a">加密帖允许的积分类型</div></td>
+		</tr>
+	</table>
+</div>
+
+<h3 class="h1">其它设置</h3>
+<div class="admin_table mb10">
+	<table width="100%" cellspacing="0" cellpadding="0">
+		<tr class="tr1 vt">
+			<td class="td1">用户登录方式</td>
+			<td class="td2">
+				<ul class="list_A list_80">
+					<li><input type="checkbox" value="1" name="logintype[]" $logintype_0 />用户名</li>
+					<li><input type="checkbox" value="2" name="logintype[]" $logintype_1 />UID</li>
+					<li><input type="checkbox" value="4" name="logintype[]" $logintype_2 />电子邮箱</li>
+				</ul>
+			</td>
+			<td class="td2"><div class="help_a">不设置则只支持用户名登录 </div></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">用户组头衔更改</td>
+			<td class="td2">
+				<ul class="list_A list_80">
+					<li><input type="radio" value="1" name="config[selectgroup]" $selectgroup_Y>开启</li>
+					<li><input type="radio" value="0" name="config[selectgroup]" $selectgroup_N>关闭</li>
+				</ul>
+			</td>
+			<td class="td2"><div class="help_a">仅对拥有多个用户组头衔的会员有效</div></td>
+		</tr>
+	</table>
+</div>
+<div class="mb10 tac">
+	<span class="btn"><span><button type="submit"  value="提 交">提 交</button></span></span>
+</div>
+</form>
+<!--
+EOT;
+include_once PrintEot('adminbottom');
+?>-->

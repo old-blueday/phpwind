@@ -22,45 +22,49 @@ class weiboModelTemplate {
 		$this->weibo($value);
 	}
 
-	function post($nextDo = '') {
+	function post($nextDo = '',$faceurl = '') {
 print <<<EOT
 -->
 <div class="userInfo">
 	<div class="userInfoweek">
-		<div class="limit tar mb5" id="weibo_contentlimit">你还可以输入<em>255</em>个字节</div>
-		<form id="weibo_form" name="weibo_form" action="apps.php?q=weibo&do=post&ajax=1" method="post" onsubmit="return false">
-        <input type="hidden" name="verify" value="{$GLOBALS['verifyhash']}" />
-		<div class="homeSk">
-			<div class="fl"><div id="submitSuccess" class="success" style="margin:20px 0 0 90px;display:none;">发布成功</div></div>
-			<textarea id="weibo_content" name="atc_content" class="homeText" onkeydown = "ctrlEnter(event,getObj('weibo_form'),function(){pw_weiboPost.post();})"></textarea>
-			<div class="c"></div>
-			<div id="uploadPicDiv" class="homeSk_input fl" style="display:none;"></div>
-		</div>
-		</form>
-		<div class="p5">
-			<span id="writebutton" class="fr"><button class="button cp" id="weibo_submit">发表</button></span>
-			<span id="weibo_smile" class="sk_show cp">表情</span>
+		<div id="myFace" class="fl mr10"><p id="toModifyFace" class="tac" style="display:none;"><a href="profile.php?action=modify&info_type=face" class="s5">修改头像</a></p><img src="$faceurl" width="80" height="80" class="img"></div>
+		<div class="fl" style="width:482px;">
+			<form id="weibo_form" name="weibo_form" action="apps.php?q=weibo&do=post&ajax=1" method="post" onsubmit="return false">
+					<input type="hidden" name="verify" value="{$GLOBALS['verifyhash']}" />
+			<div class="homeSk"  onclick="getObj('popTips').style.display='none'">
+				<div class="fl"><div id="submitSuccess" class="success" style="display:none;">发布成功</div></div>
+				<div class="fl f14"><div id="popTips" style="position:absolute;padding:10px 13px;"></div></div>
+				<textarea id="weibo_content" name="atc_content" class="homeText">{$GLOBALS['o_weibotip']}</textarea>
+				<div class="c"></div>
+				<div id="uploadPicDiv" class="homeSk_input" style="display:none;"></div>
+			</div>
+			</form>
+			<div class="p5 cc" style="padding-right:0px;">
+				<span id="writebutton" class="fr"><button class="button cp" id="weibo_submit"> </button></span>
+				<span id="weibo_smile" class="sk_show cp">表情</span>
 <!--
 EOT;
 $display = $GLOBALS['o_weibourl'] != '0' ? '' : 'none'; 
 print <<<EOT
 -->
-			<span id="weibo_url" class="sk_share cp" style="display:$display">链接</span>
+				<span id="weibo_url" class="sk_link cp" style="display:$display">链接</span>
 <!--
 EOT;
 $display = ($GLOBALS['o_weibophoto'] != '0' && $GLOBALS['db_phopen']) ? '' : 'none'; 
 print <<<EOT
 -->
-			<span id="uploadPic" style="display:$display">
-				<span id="uploadPicload" class="file fr" >
-				<span class="sk_img cp">图片</span>
-				<form id="uploadPicForm" name="uploadPicForm" method="post" action="pw_ajax.php?action=uploadwritepic" enctype="multipart/form-data">
-					<input id="writePic" name="writePic" type="file" hidefocus="true" />
-				</form>
+				<span id="uploadPic" style="display:$display">
+					<span id="uploadPicload" class="file fr" >
+					<span class="sk_img cp">图片</span>
+					<form id="uploadPicForm" name="uploadPicForm" method="post" action="pw_ajax.php?action=uploadwritepic" enctype="multipart/form-data">
+						<input id="writePic" name="writePic" type="file" hidefocus="true" />
+					</form>
+					</span>
+					<span id="uploadPicLoadding" class="fl" style="display:none;width:120px;position:relative;line-height:20px;">正在上传中.......</span>
 				</span>
-				<span id="uploadPicLoadding" class="fl" style="display:none;width:200px;position:relative;line-height:20px;">正在上传中.......</span>
-			</span>
-			<img src="javascript://" id="imgPreview" style="display:none;position:absolute;z-index:1;" />
+				<img src="javascript://" id="imgPreview" style="position:absolute;display:none;left:-10000px;" />
+				<div class="limit fr mr15 s6" id="weibo_contentlimit">你还可以输入<em>255</em>个字节</div>
+			</div>
 		</div>
 	</div>
 <!--
@@ -69,11 +73,29 @@ include printEot('writesmile');
 include printEot('writeurl');
 print <<<EOT
 -->
-<script type="text/javascript" language="JavaScript" src="apps/weibo/js/post.js"></script>
-<script language="javascript">
-var pw_weiboPost = new weibo_post({form:'weibo_form',content:'weibo_content',smile:'weibo_smile',url:'weibo_url',photo:'weibo_photo',nextdo:'{$nextDo}'});
-</script>
 </div>
+<script type="text/javascript" src="apps/weibo/js/post.js"></script>
+<script>
+var pw_weiboPost = new weibo_post({form:'weibo_form',content:'weibo_content',smile:'weibo_smile',url:'weibo_url',photo:'weibo_photo',nextdo:'{$nextDo}',weibotip:'{$GLOBALS[o_weibotip]}'});
+var content = getObj('weibo_content'),
+	dvalue = getObj('weibo_content').value;
+	color = '#888';
+	content.style.color = color;
+	content.onkeydown = function() {
+		ctrlEnter(event,getObj('weibo_form'),function(){pw_weiboPost.post();});
+	}
+	content.onfocus = function() {
+		if(this.value === dvalue) {
+			this.value = '';this.style.color='';
+		}
+	}
+	content.onblur = function(){
+		if(this.value === '') {
+			this.value = dvalue;
+			this.style.color = color;
+		}
+	}
+</script>
 <!--
 EOT;
 	}
@@ -87,7 +109,7 @@ print <<<EOT
 	</dt>
 	<dd class="dd">
 		<div class="title">
-			<span class="uname"><a href="u.php?uid={$value['authorid']}">{$value['username']}</a>：</span>{$value['content']}
+			<span class="uname"><a href="{$GLOBALS[db_userurl]}{$value['authorid']}">{$value['username']}</a>：</span>{$value['content']}
 		</div>
 <!--
 EOT;
@@ -119,7 +141,7 @@ print <<<EOT
 	</dt>
 	<dd class="dd">
 		<div class="title">
-			<span class="uname"><a href="u.php?uid={$value['authorid']}">{$value['username']}</a> </span>转发：{$value['content']}
+			<span class="uname"><a href="{$GLOBALS[db_userurl]}{$value['authorid']}">{$value['username']}</a> </span>转发：{$value['content']}
 		</div>
 <!--
 EOT;
@@ -172,7 +194,7 @@ EOT;
 print <<<EOT
 -->
 <div class="title">
-	<a href="u.php?uid={$value['authorid']}">{$value['username']}</a>：<a href="$url">{$value['extra']['title']}</a>
+	<a href="{$GLOBALS[db_userurl]}{$value['authorid']}">{$value['username']}</a>：<a href="$url">{$value['extra']['title']}</a>
 </div>
 <div class="mb10">{$value['content']}</div>
 <!--
@@ -182,7 +204,7 @@ EOT;
 print <<<EOT
 -->
 <div class="mb10">
-	<a href="u.php?uid={$value['uid']}">{$value['username']}</a>：{$value['content']}
+	<a href="{$GLOBALS[db_userurl]}{$value['uid']}">{$value['username']}</a>：{$value['content']}
 </div>
 <!--
 EOT;
@@ -211,7 +233,7 @@ print <<<EOT
 	</dt>
 	<dd class="dd">
 		<div class="title">
-			<span class="uname"><a href="u.php?uid={$value['authorid']}">{$value['username']}</a>：</span><!--
+			<span class="uname"><a href="{$GLOBALS[db_userurl]}{$value['authorid']}">{$value['username']}</a>：</span><!--
 EOT;
 if ($value['content']) {print <<<EOT
 -->{$value['content']}<!--
@@ -251,7 +273,7 @@ print <<<EOT
 	</dt>
 	<dd class="dd">
 		<div class="title">
-			<span class="uname"><a href="u.php?uid={$value['authorid']}">{$value['username']}</a>：</span>分享照片
+			<span class="uname"><a href="{$GLOBALS[db_userurl]}{$value['authorid']}">{$value['username']}</a>：</span>分享照片
 		</div>
 <!--
 EOT;
@@ -282,7 +304,7 @@ print <<<EOT
 	</dt>
 	<dd class="dd">
 		<div class="title">
-			<span class="uname"><a href="u.php?uid={$value['authorid']}">{$value['username']}</a>：</span><a href="apps.php?q=group&a=active&job=view&cyid={$value['extra']['cyid']}&id={$value['objectid']}" target="_blank">{$value['extra']['title']}</a>
+			<span class="uname"><a href="{$GLOBALS[db_userurl]}{$value['authorid']}">{$value['username']}</a>：</span><a href="apps.php?q=group&a=active&job=view&cyid={$value['extra']['cyid']}&id={$value['objectid']}" target="_blank">{$value['extra']['title']}</a>
 		</div>
 		<div class="mb10">
 			{$value['content']}
@@ -311,7 +333,7 @@ print <<<EOT
 	</dt>
 	<dd class="dd">
 		<div class="title">
-			<span class="uname"><a href="u.php?uid={$value['authorid']}">{$value['username']}</a>：</span><a href="apps.php?q=group&a=read&cyid={$value['extra']['cyid']}&tid={$value['objectid']}" target="_blank">{$value['extra']['title']}</a>
+			<span class="uname"><a href="{$GLOBALS[db_userurl]}{$value['authorid']}">{$value['username']}</a>：</span><a href="apps.php?q=group&a=read&cyid={$value['extra']['cyid']}&tid={$value['objectid']}" target="_blank">{$value['extra']['title']}</a>
 		</div>
 		<div class="mb10">
 			{$value['content']}
@@ -340,7 +362,7 @@ print <<<EOT
 	</dt>
 	<dd class="dd">
 		<div class="title">
-			<span class="uname"><a href="u.php?uid={$value['authorid']}">{$value['username']}</a>：</span>{$value['content']}
+			<span class="uname"><a href="{$GLOBALS[db_userurl]}{$value['authorid']}">{$value['username']}</a>：</span>{$value['content']}
 		</div>
 		<div class="gray">
 <!--
@@ -366,7 +388,7 @@ print <<<EOT
 	</dt>
 	<dd class="dd">
 		<div class="title">
-			<span class="uname"><a href="u.php?uid={$value['authorid']}">{$value['username']}</a>：</span><a href="apps.php?q=diary&a=detail&did={$value['objectid']}&uid={$value['authorid']}" target="_blank">{$value['extra']['title']}</a>
+			<span class="uname"><a href="{$GLOBALS[db_userurl]}{$value['authorid']}">{$value['username']}</a>：</span><a href="apps.php?q=diary&a=detail&did={$value['objectid']}&uid={$value['authorid']}" target="_blank">{$value['extra']['title']}</a>
 		</div>
 		<div class="mb10">
 			{$value['content']}
@@ -395,7 +417,7 @@ print <<<EOT
 	</dt>
 	<dd class="dd">
 		<div class="title">
-			<span class="uname"><a href="u.php?uid={$value['authorid']}">{$value['username']}</a>：</span><a href="read.php?tid={$value['objectid']}" target="_blank">{$value['extra']['title']}</a>
+			<span class="uname"><a href="{$GLOBALS[db_userurl]}{$value['authorid']}">{$value['username']}</a>：</span><a href="read.php?tid={$value['objectid']}" target="_blank">{$value['extra']['title']}</a>
 		</div>
 		<div class="mb10">
 			{$value['content']}
@@ -409,9 +431,10 @@ print <<<EOT
 <!--
 EOT;
 $this->_operateButton($value);
+$fname = strip_tags($value['extra']['fname']);
 print <<<EOT
 -->
-			<cite title="{$value['postdate_s']}">{$value['lastdate']} [来自帖子 - <a href="thread.php?fid={$value['extra']['fid']}" class="gray">{$value['extra']['fname']}</a>]</cite>
+			<cite title="{$value['postdate_s']}">{$value['lastdate']} [来自帖子 - <a href="thread.php?fid={$value['extra']['fid']}" class="gray">{$fname}</a>]</cite>
 		</div>
 		<div id="comment_{$value['mid']}"></div>
 	</dd>
@@ -429,7 +452,7 @@ print <<<EOT
 	</dt>
 	<dd class="dd">
 		<div class="title">
-			<span class="uname"><a href="u.php?uid={$value['authorid']}">{$value['username']}</a>：</span><a href="mode.php?m=cms&q=view&id={$value['objectid']}" target="_blank">{$value['extra']['title']}</a>
+			<span class="uname"><a href="{$GLOBALS[db_userurl]}{$value['authorid']}">{$value['username']}</a>：</span><a href="mode.php?m=cms&q=view&id={$value['objectid']}" target="_blank">{$value['extra']['title']}</a>
 		</div>
 		<div class="mb10">
 			{$value['content']}
@@ -463,7 +486,7 @@ print <<<EOT
 	</dt>
 	<dd class="dd">
 		<div class="title">
-			<span class="uname"><a href="u.php?uid={$value['authorid']}">{$value['username']}</a>：</span>{$value['content']}
+			<span class="uname"><a href="{$GLOBALS[db_userurl]}{$value['authorid']}">{$value['username']}</a>：</span>{$value['content']}
 		</div>
 <!--
 EOT;
@@ -608,19 +631,19 @@ EOT;
 print <<<EOT
 -->
 <div id="photo_pop_mask" onclick="weibo.hidePhoto()" class="popImgbg" style="display:none;position:absolute;background:#000;filter:alpha(opacity=50);-moz-opacity:0.5;opacity:0.5;left:0;right:0;top:0;bottom:0;z-index:1;"></div>
-<div id="photo_pop" class="popImg" style="display:none;position:absolute;z-index:2;">
-	<div class="p10 tac pr bgA">
+<div id="photo_pop" class="popImg" style="display:none;position:absolute;z-index:2;border:3px solid #fff">
+	<div class="tac pr">
 		<span class="popImgdel cp" onclick="weibo.hidePhoto()">关闭</span>
-		<table width="400" cellpadding="0" cellspacing="0">
+		<table cellpadding="0" cellspacing="0">
 			<tr>
 				<td>
 					<div class="fl" id="prephoto">
-						<span onclick="weibo.prevPhoto()" class="aPre" title="上一张" style="filter:alpha(opacity=0);"></span>
+						<span onclick="weibo.prevPhoto()" class="aPre" title="上一张" style="zoom:1"></span>
 					</div>
 					<div class="fl" id="nextphoto">
-						<span onclick="weibo.nextPhoto()" class="aNext" title="下一张" style="filter:alpha(opacity=0);"></span>
+						<span onclick="weibo.nextPhoto()" class="aNext" title="下一张" style="zoom:1"></span>
 					</div>
-					<img src="javascript://" id="photo_path"/></td>
+					<img src="javascript://" id="photo_path" style="display: block;line-height:1;" /></td>
 			</tr>
 		</table>
 	</div>
@@ -634,7 +657,7 @@ print <<<EOT
 -->
 	<a href="javascript:;" class="fl preLive">上一页</a>
 	<a href="javascript:;" class="fr nextLive">下一页</a>
-	<div class="ulLive">
+	<div class="ulLive" style="height:56px;overflow:hidden;width:535px;">
 	<ul class="cc">
 <!--
 EOT;
@@ -642,9 +665,9 @@ if (!$list || !is_array($list)) return false;
 foreach ($list as $value) {
 print <<<EOT
 -->
-		<li>
+		<li style="height:52px;overflow:hidden;">
 			<a href="apps.php?q=weibo&uid={$value['authorid']}" class="img_50 mr10"><img src="{$value['icon']}" alt="{$value['username']}" /></a>
-			<p><span class="f14"><a href="u.php?uid={$value['authorid']}">{$value['username']}:</a> </span><!--
+			<p style="width:105px;overflow:hidden;"><span><a href="{$GLOBALS[db_userurl]}{$value['authorid']}">{$value['username']}:</a></span><!--
 EOT;
 if ($value['type'] == 10) {
 $url = "read.php?tid={$value['objectid']}";
@@ -664,7 +687,7 @@ if($url) {print <<<EOT
 EOT;
 }print <<<EOT
 -->     
-            {$value['content']}</p>
+       {$value['content']}</p>
 		</li>
 <!--
 EOT;
@@ -673,21 +696,22 @@ EOT;
 	</ul>
     
 <script type="text/javascript">
+
 (function(){
-	function moveElement(elem, final_x, final_y, interval)
-	{
-		if (!elem.style.left) elem.style.left = "0px";
+	var interval;
+	function moveElement(elem, final_x, final_y, interval){
+		/*if (!elem.style.left) elem.style.left = "0px";
 		if (!elem.style.top) elem.style.top = "0px";
 		var xpos = parseInt(elem.style.left);
 		var ypos = parseInt(elem.style.top);
 		if (xpos == final_x && ypos == final_y){ if (elem.movement) clearTimeout(elem.movement);return true;}
-		if (xpos < final_x) {var dist = Math.ceil((final_x - xpos) / 2);xpos = xpos + dist;}
-		if (xpos > final_x) {var dist = Math.ceil((xpos - final_x) / 2);xpos = xpos - dist;}
-		if (ypos < final_y) {var dist = Math.ceil((final_y - ypos) / 10);ypos = ypos + dist;}
-		if (ypos > final_y) {var dist = Math.ceil((ypos - final_y) / 10);ypos = ypos - dist;}
-		elem.style.left = xpos + "px";elem.style.top = ypos + "px";
-		elem.movement = setTimeout(function(){moveElement(elem, final_x, final_y, interval)}, interval);
+		if (xpos < final_x) {var dist = Math.ceil((final_x - xpos) / 1.2);xpos = xpos + dist;}
+		if (xpos > final_x) {var dist = Math.ceil((xpos - final_x) / 1.2);xpos = xpos - dist;}
+		elem.style.left = xpos + "px";elem.style.top = ypos + "px";*/
+		elem.style.left = final_x+'px';
+		//elem.movement = setTimeout(function(){moveElement(elem, final_x, final_y, interval)}, interval);
 	}
+
 	var moveElem = getElementsByClassName("cc","J_feedLive")[0];
 	var prevElem = getElementsByClassName("preLive","J_feedLive")[0];
 	var nextElem = getElementsByClassName("nextLive","J_feedLive")[0];
@@ -702,6 +726,7 @@ EOT;
 	var currentNum = 0;moveElem.style.left = 0;
 	moveElem.style.width = width*lis.length+"px";
 	prevElem.onclick = function(){
+		clearInterval(interval);
 		if(currentNum==0){
 			var oFragment = document.createDocumentFragment();
 			while(lis.length!=3){
@@ -713,10 +738,14 @@ EOT;
 			moveElem.style.left = -width*(lis.length-3)+"px";
 			currentNum = 6;
 			}
-			moveElement(moveElem,parseInt(moveElem.style.left)+width*3,0,0);
+			moveElement(moveElem,parseInt(moveElem.style.left)+width*3,0,10);
 			currentNum-=3;
+			interval = setInterval(function(){
+				nextElem.onclick();
+			},6000);
 	};
 	nextElem.onclick = function(){
+		clearInterval(interval);
 		if(currentNum==lis.length-3){
 			var oFragment = document.createDocumentFragment();
 			while(lis.length!=3){
@@ -728,11 +757,15 @@ EOT;
 			moveElem.style.left = 0;
 			currentNum = 0;
 			}
-		moveElement(moveElem,parseInt(moveElem.style.left)-width*3,0,0);
+		moveElement(moveElem,parseInt(moveElem.style.left)-width*3,0,10);
 		currentNum+=3;
+		interval = setInterval(function(){
+			nextElem.onclick();
+		},6000);
 	};
-	window.nextElem = nextElem;
-	setInterval("nextElem.onclick()",5000);
+	interval = setInterval(function(){
+		nextElem.onclick();
+	},6000);
 })();
 </script>
 	</div>

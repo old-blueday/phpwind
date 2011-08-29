@@ -10,7 +10,7 @@ if ($foruminfo['type'] == 'category') {
 	header("Location: index.php");exit;
 }
 wind_forumcheck($foruminfo);
-$foruminfo['topic'] = $db->get_value("SELECT topic FROM pw_forumdata WHERE fid=".pwEscape($fid));
+$foruminfo['topic'] = $db->get_value("SELECT topic FROM pw_forumdata WHERE fid=".S::sqlEscape($fid));
 $forumset  = $foruminfo['forumset'];
 $forumname = strip_tags($foruminfo['name']);
 
@@ -43,7 +43,7 @@ if ($numofpage && $page > $numofpage) {
 $pages = PageDiv($count,$page,$numofpage,"{$DIR}f$fid",$db_maxpage);
 
 $threaddb = array();
-$query = $db->query("SELECT * FROM pw_threads WHERE fid=".pwEscape($fid)." AND topped<=3 AND ifcheck='1' ORDER BY topped DESC, lastpost DESC".pwLimit($start_limit,$db_perpage));
+$query = $db->query("SELECT * FROM pw_threads WHERE fid=".S::sqlEscape($fid)." AND topped<=3 AND ifcheck='1' ORDER BY topped DESC, lastpost DESC".S::sqlLimit($start_limit,$db_perpage));
 while ($thread = $db->fetch_array($query)) {
 	$threaddb[] = $thread;
 }

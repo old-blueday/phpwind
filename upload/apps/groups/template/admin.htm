@@ -2,22 +2,23 @@
 include_once PrintEot('left');
 print<<<EOT
 -->
-<h2 class="h1 mb10"><a href="$admin_file?adminjob=app&admintype=appslist">返回基础应用列表</a></h2>
+<!-- <h2 class="h1 mb10"><a href="$admin_file?adminjob=app&admintype=appslist">返回基础应用列表</a></h2> -->
 <!--
 EOT;
 if(!$action){print <<<EOT
 -->
 <div class="nav3 mb10">
-  <ul class="cc">
-  <li class="current"><a href="$basename">基本设置</a></li>
-	<li><a href="$basename&action=style">群组分类</a></li>
-	<li><a href="$basename&action=class">关联版块</a></li>
-	<li><a href="$basename&action=colony">群组管理</a></li>
-	<li><a href="$basename&action=mergecolony">合并群组</a></li>
-	<li><a href="$basename&action=level">群组等级</a></li>
-	<li><a href="$basename&action=colonystyle">群组风格</a></li>
-	<li><a href="$basename&action=cache">更新缓存</a></li>
-  </ul>
+	<ul class="cc">
+		<li class="current"><a href="$basename">基本设置</a></li>
+		<li><a href="$basename&action=style">群组分类</a></li>
+		<li><a href="$basename&action=class">关联版块</a></li>
+		<li><a href="$basename&action=colony">群组管理</a></li>
+		<li><a href="$basename&action=mergecolony">合并群组</a></li>
+		<li><a href="$basename&action=level">群组等级</a></li>
+		<li><a href="$basename&action=colonystyle">群组风格</a></li>
+		<li><a href="$basename&action=cache">更新缓存</a></li>
+		<li><a href="$admin_file?adminjob=apps&admintype=groups_manage" onclick="openNewUrl('groups_manage','群组管理',this.href);return false;">内容管理</a></li>
+	</ul>
 </div>
 <form action="$basename&" method="post">
   <input type="hidden" name="step" value="3">
@@ -44,7 +45,7 @@ if(!$action){print <<<EOT
                 <li><input type="radio" name="config[newcolony]" value="0" $newcolony_N>关闭</li>
              </ul>
          </div>
-		</td><td class="td2"><div class="help_a"></div></td>
+		</td><td class="td2"><div class="help_a">开启后，才可以创建新群组</div></td>
     </tr>
     <tr class="tr1 vt">
       <td class="td1">创建群组认证码</td>
@@ -55,7 +56,7 @@ if(!$action){print <<<EOT
                 <li><input type="radio" name="config[groups_gdcheck]" value="0" $groups_gdcheck_N />关闭</li>
              </ul>
          </div>
-        </td><td class="td2"><div class="help_a"></div></td>
+        </td><td class="td2"><div class="help_a">开启后，创建群组时需要填写认证码</div></td>
     </tr>
     <tr class="tr1 vt">
       <td class="td1">发表新帖认证码</td>
@@ -66,7 +67,7 @@ if(!$action){print <<<EOT
                 <li><input type="radio" name="config[groups_p_gdcheck]" value="0" $groups_p_gdcheck_N />关闭</li>
              </ul>
          </div>
-        </td><td class="td2"><div class="help_a"></div></td>
+        </td><td class="td2"><div class="help_a">开启后，发表新帖时需要填写认证码</div></td>
     </tr>
     <tr class="tr1 vt">
       <td class="td1">创建群组验证问题</td>
@@ -77,7 +78,7 @@ if(!$action){print <<<EOT
                 <li><input type="radio" name="config[groups_qcheck]" value="0" $groups_qcheck_N />关闭</li>
              </ul>
          </div>
-        </td><td class="td2"><div class="help_a"></div></td>
+        </td><td class="td2"><div class="help_a">开启后，创建群组时需要填写验证问题</div></td>
     </tr>
     <tr class="tr1 vt">
       <td class="td1">发表新帖验证问题</td>
@@ -88,7 +89,7 @@ if(!$action){print <<<EOT
                 <li><input type="radio" name="config[groups_p_qcheck]" value="0" $groups_p_qcheck_N />关闭</li>
              </ul>
          </div>
-        </td><td class="td2"><div class="help_a"></div></td>
+        </td><td class="td2"><div class="help_a">开启后，发表新帖时需要填写验证问题</div></td>
     </tr>
     <!-- <tr class="tr1 vt">
       <td class="td1">创建群组的个数限制</td>
@@ -106,7 +107,7 @@ if(!$action){print <<<EOT
       <td class="td1">群组标志图片最大尺寸</td>
       <td class="td2"><input name="config[imgsize]" class="input input_wa" value="$o_imgsize">
         </td>
-		<td class="td2"><div class="help_a">单位KB，0 或 留空 则按<a href="admin.php?adminjob=settings&admintype=att">附件设置</a>配置</div></td>
+		<td class="td2"><div class="help_a">单位KB，0 或 留空 则按<a href="?adminjob=settings&admintype=att" onClick="parent.PW.Dialog({id:'basic',url:'?adminjob=settings&admintype=att',name:'附件设置'});return false;">附件设置</a>配置</div></td>
     </tr>
     <!-- <tr class="tr1 vt"><td>群组标志图片宽高范围[像素]</td>
 <td><input name="config[imgwidth]" size="8" class="input" value="$o_imgwidth"> 宽
@@ -211,6 +212,7 @@ EOT;
 		<li><a href="$basename&action=level">群组等级</a></li>
 		<li><a href="$basename&action=colonystyle">群组风格</a></li>
 		<li><a href="$basename&action=cache">更新缓存</a></li>
+		<li><a href="$admin_file?adminjob=apps&admintype=groups_manage" onclick="openNewUrl('groups_manage','群组管理',this.href);return false;">内容管理</a></li>
     </ul>
 </div>
 <form action="$basename&" method="post">
@@ -333,6 +335,7 @@ EOT;
 		<li><a href="$basename&action=level">群组等级</a></li>
 		<li><a href="$basename&action=colonystyle">群组风格</a></li>
 		<li><a href="$basename&action=cache">更新缓存</a></li>
+		<li><a href="$admin_file?adminjob=apps&admintype=groups_manage" onclick="openNewUrl('groups_manage','群组管理',this.href);return false;">内容管理</a></li>
     </ul>
 </div>
 <h2 class="h1">搜索内容</h2>
@@ -492,6 +495,7 @@ EOT;
 	<li><a href="$basename&action=level">群组等级</a></li>
 	<li><a href="$basename&action=colonystyle">群组风格</a></li>
 	<li><a href="$basename&action=cache">更新缓存</a></li>
+	<li><a href="$admin_file?adminjob=apps&admintype=groups_manage" onclick="openNewUrl('groups_manage','群组管理',this.href);return false;">内容管理</a></li>
 </ul>
 </div>
 <link rel="stylesheet" type="text/css" href="images/g/g_style.css" />
@@ -509,7 +513,7 @@ EOT;
     <tr class="tr1 vt">
       <td class="td1">群组名称 <span class="s1">*</span></td>
       <td class="td2" ><input type="text" class="input input_wa" name="cname" id="cname" value="$colony[cname]" />
-        &nbsp;<span id="cname_warn">限 20 字节</span></td>
+        &nbsp;<span id="cname_warn">限 50 字节</span></td>
 			<td class="td2"></td>
     </tr>
     <tr class="tr1 vt">
@@ -805,6 +809,7 @@ EOT;
 	<li><a href="$basename&action=level">群组等级</a></li>
 	<li><a href="$basename&action=colonystyle">群组风格</a></li>
 	<li><a href="$basename&action=cache">更新缓存</a></li>
+	<li><a href="$admin_file?adminjob=apps&admintype=groups_manage" onclick="openNewUrl('groups_manage','群组管理',this.href);return false;">内容管理</a></li>
 </ul>
 </div>
 <div class="c"></div>
@@ -845,6 +850,7 @@ EOT;
       <li><a href="$basename&action=level">群组等级</a></li>
       <li><a href="$basename&action=log">日志管理</a></li>
       <li><a href="$basename&action=cache">更新缓存</a></li>
+	  <li><a href="$admin_file?adminjob=apps&admintype=groups_manage" onclick="openNewUrl('groups_manage','群组管理',this.href);return false;">内容管理</a></li>
     </ul>
 </div>
 <form action="$basename&" method="post">
@@ -898,6 +904,7 @@ EOT;
   </div>
   <div class="cc">$pages</div>
   <div class="mb10 tac">
+	<span class="bt"><span><button type="button" onclick="CheckAll(document.FORM)">全 选</button></span></span>
     <span class="btn"><span><button type="submit">删除</button></span></span>
    </div>
 </form>
@@ -923,6 +930,7 @@ EOT;
         <li class="current"><a href="$basename&action=level">群组等级</a></li>
         <li><a href="$basename&action=colonystyle">群组风格</a></li>
         <li><a href="$basename&action=cache">更新缓存</a></li>
+		<li><a href="$admin_file?adminjob=apps&admintype=groups_manage" onclick="openNewUrl('groups_manage','群组管理',this.href);return false;">内容管理</a></li>
     </ul>
 </div>
 <!--
@@ -1071,18 +1079,22 @@ EOT;
 			<tr class="tr1 vt">
 				<td class="td1">等级头衔</td>
 				<td class="td2"><select name="id" onchange="location.href='$basename&action=level&job=edit&id=' + this.value" class="select_wa">$options</select></td>
+				<td class="td2"><div class="help_a"></div></td>
 			</tr>
 			<tr class="tr1 vt">
 				<td class="td1">最多拥有的相册数</td>
-				<td class="td2"><input type="text" name="config[albumnum]" class="input input_wa" value="{$rt['albumnum']}" /> （0 或 留空 表示没限制）</td>
+				<td class="td2"><input type="text" name="config[albumnum]" class="input input_wa" value="{$rt['albumnum']}" /> </td>
+				<td class="td2"><div class="help_a">0 或 留空 表示没限制</div></td>
 			</tr>
 			<tr class="tr1 vt">
 				<td class="td1">单相册最多可容纳图片数</td>
-				<td class="td2"><input type="text" name="config[maxphotonum]" class="input input_wa" value="{$rt['maxphotonum']}" /> （0 或 留空 表示没限制）</td>
+				<td class="td2"><input type="text" name="config[maxphotonum]" class="input input_wa" value="{$rt['maxphotonum']}" /> </td>
+				<td class="td2"><div class="help_a">0 或 留空 表示没限制</div></td>
 			</tr>
 			<tr class="tr1 vt">
 				<td class="td1">群组容纳成员最大值</td>
-				<td class="td2"><input type="text" name="config[maxmember]" class="input input_wa" value="{$rt['maxmember']}" /> （0 或 留空 表示没限制）</td>
+				<td class="td2"><input type="text" name="config[maxmember]" class="input input_wa" value="{$rt['maxmember']}" /></td>
+				<td class="td2"><div class="help_a">0 或 留空 表示没限制</div></td>
 			</tr>
 			<tr class="tr1 vt">
 				<td class="td1">群主合并群组</td>
@@ -1092,6 +1104,7 @@ EOT;
                         <li><input type="radio" name="config[allowmerge]" value="0" $allowmerge_N />关闭</li>
                     </ul>
                 </td>
+				<td class="td2"><div class="help_a">开启后，群主可以合并群组</div></td>
 			</tr>
 			<tr class="tr1 vt">
 				<td class="td1">群主转让群组</td>
@@ -1101,6 +1114,7 @@ EOT;
                         <li><input type="radio" name="config[allowattorn]" value="0" $allowattorn_N />关闭</li>
                     </ul>
                 </td>
+				<td class="td2"><div class="help_a">开启后，群主可以转让群组</div></td>
 			</tr>
 			<tr class="tr1 vt">
 				<td class="td1">群主解散群组</td>
@@ -1110,6 +1124,7 @@ EOT;
                         <li><input type="radio" name="config[allowdisband]" value="0" $allowdisband_N />关闭</li>
                     </ul>
                 </td>
+				<td class="td2"><div class="help_a">开启后，群主可以结算群组</div></td>
 			</tr>
 			<tr class="tr1 vt">
 				<td class="td1">群组风格主题</td>
@@ -1119,6 +1134,7 @@ EOT;
                         <li><input type="radio" name="config[allowstyle]" value="0" $allowstyle_N />关闭</li>
                     </ul>
                 </td>
+				<td class="td2"><div class="help_a"></div></td>
 			</tr>
 		</table>
 	</div>
@@ -1134,6 +1150,7 @@ EOT;
                         <li><input type="radio" name="config[topicadmin][del]" value="0" $ta_del_N />关闭</li>
                     </ul>
                  </td>
+				 <td class="td2"><div class="help_a">开启后，群主可以删除话题</div></td>
 			</tr>
 			<tr class="tr1 vt">
 				<td class="td1">加亮</td>
@@ -1143,6 +1160,7 @@ EOT;
                         <li><input type="radio" name="config[topicadmin][highlight]" value="0" $ta_highlight_N />关闭</li>
                     </ul>
                 </td>
+				<td class="td2"><div class="help_a">开启后，群主可以加亮话题</div></td>
 			</tr>
 			<tr class="tr1 vt">
 				<td class="td1">锁帖</td>
@@ -1152,6 +1170,7 @@ EOT;
                         <li><input type="radio" name="config[topicadmin][lock]" value="0" $ta_lock_N />关闭</li>
                     </ul>
                 </td>
+				<td class="td2"><div class="help_a">开启后，群主可以锁定话题</div></td>
 			</tr>
 			<tr class="tr1 vt">
 				<td class="td1">提前</td>
@@ -1161,6 +1180,7 @@ EOT;
                         <li><input type="radio" name="config[topicadmin][pushtopic]" value="0" $ta_pushtopic_N />关闭</li>
                     </ul>
                 </td>
+				<td class="td2"><div class="help_a">开启后，群主可以将话题提前</div></td>
 			</tr>
 			<tr class="tr1 vt">
 				<td class="td1">压帖</td>
@@ -1170,6 +1190,7 @@ EOT;
                         <li><input type="radio" name="config[topicadmin][downtopic]" value="0" $ta_downtopic_N />关闭</li>
                     </ul>
                 </td>
+				<td class="td2"><div class="help_a">开启后，群主可以将话题压帖</div></td>
 			</tr>
 			<tr class="tr1 vt">
 				<td class="td1">置顶</td>
@@ -1179,6 +1200,7 @@ EOT;
                         <li><input type="radio" name="config[topicadmin][toptopic]" value="0" $ta_toptopic_N />关闭</li>
                     </ul>
                 </td>
+				<td class="td2"><div class="help_a">开启后，群主可以置顶话题</div></td>
 			</tr>
 			<tr class="tr1 vt">
 				<td class="td1">精华</td>
@@ -1188,6 +1210,7 @@ EOT;
                         <li><input type="radio" name="config[topicadmin][digest]" value="0" $ta_digest_N />关闭</li>
                     </ul>
                 </td>
+				<td class="td2"><div class="help_a">开启后，群主可以将话题设置为精华</div></td>
 			</tr>
 		</table>
 	</div>
@@ -1402,6 +1425,7 @@ EOT;
 		<li><a href="$basename&action=level" >群组等级</a></li>
 		<li class="current"><a href="$basename&action=colonystyle">群组风格</a></li>
 		<li><a href="$basename&action=cache">更新缓存</a></li>
+		<li><a href="$admin_file?adminjob=apps&admintype=groups_manage" onclick="openNewUrl('groups_manage','群组管理',this.href);return false;">内容管理</a></li>
 	</ul>
 </div>
 
@@ -1458,6 +1482,7 @@ EOT;
 	<li><a href="$basename&action=level">群组等级</a></li>
 	<li><a href="$basename&action=colonystyle">群组风格</a></li>
 	<li class="current"><a href="$basename&action=cache">更新缓存</a></li>
+	<li><a href="$admin_file?adminjob=apps&admintype=groups_manage" onclick="openNewUrl('groups_manage','群组管理',this.href);return false;">内容管理</a></li>
 </ul>
 </div>
   <h2 class="h1">缓存更新</h2>
@@ -1564,7 +1589,7 @@ EOT;
     <tr class="tr1 vt">
       <td class="td1">发表日期</td>
       <td class="td2">
-      <div class="input_img fl"><i onclick="this.nextSibling.onclick()" class="input_time" title="选择时间">选择时间</i><input type="text" name="postdate_s" value="$postdateStartString" id="postdate_s" onclick="javascript:ShowCalendar(this.id)"></div><span class="p_lr_10 fl">至</span><div class="input_img fl"><i class="input_time" title="选择时间">选择时间</i> <input type="text" name="postdate_e" id="postdate_e" value="$postdateEndString" onclick="javascript:ShowCalendar(this.id)"></div>
+      <div class="input_img fl"><i onclick="this.nextSibling.onclick()" class="input_time" title="选择时间">选择时间</i><input type="text" name="postdate_s" value="$postdateStartString" id="postdate_s" onclick="javascript:ShowCalendar(this.id)"></div><span class="p_lr_10 fl">至</span><div class="input_img fl"><i class="input_time" onclick="javascript:ShowCalendar('postdate_e')"  title="选择时间">选择时间</i> <input type="text" name="postdate_e" id="postdate_e" value="$postdateEndString" onclick="javascript:ShowCalendar(this.id)"></div>
        </td>
         <td class="td2"><!--发表日期: (格式 yyyy-mm-dd)--></td>
     </tr>
@@ -1596,8 +1621,7 @@ function seltable(v) {
 }
 seltable(document.FORM.ttype.value);
 </script>
-
-<form action="$basename&action=argument" method="post" name="FORM">
+<form action="$basename&action=argument" method="post" name="FORM1">
   <input type="hidden" name="step" value="delete" />
   <input type="hidden" name="ttype" value="$ttype" />
   <input type="hidden" name="ttable" value="$ttable" />
@@ -1606,7 +1630,7 @@ seltable(document.FORM.ttype.value);
   <div class="admin_table mb10">
   <table width="100%" cellspacing="0" cellpadding="0">
     <tr class="tr2 vt td_bgB">
-      <td width="30"><span onclick="CheckAll(document.FORM)" class="cp">全选</span></td>
+      <td width="30"><span onclick="CheckAll(document.FORM1)" class="cp">全选</span></td>
       <td>标 题</td>
       <td>作 者</td>
       <td>所属群组</td>
@@ -1628,7 +1652,7 @@ print <<<EOT
     <tr class="tr1 vt">
       <td class="td2"><input type="checkbox" name="delid[]" value="$value[delid]"></td>
       <td class="td2"><a href="apps.php?q=group&cyid=$value[cyid]&a=read&tid=$value[tid]" target="_blank">$value[subject]</a></td>
-      <td class="td2"><a href="u.php?uid=$value[authorid]" target="_blank">$value[author]</a></td>
+      <td class="td2"><a href="{$db_userurl}$value[authorid]" target="_blank">$value[author]</a></td>
       <td class="td2"><a href="apps.php?q=group&cyid=$value[cyid]" target="_blank">$value[cname]</a></td>
       <td class="td2">$value[postdate]</td>
       <td class="td2">$j_lang</td>
@@ -1641,6 +1665,7 @@ EOT;
   </div>
   <div class="cc">$pages</div>
   <div class="mb10 tac">
+	<span class="bt"><span><button type="button" onclick="CheckAll(document.FORM1)">全 选</button></span></span>
     <span class="btn"><span><button type="submit" onclick="return Checkdel();">删除</button></span></span>
    </div>
 </form>
@@ -1653,7 +1678,6 @@ function Checkdel(){
 	}
 }
 </script>
-
 <!--
 EOT;
 } elseif ($action == 'album') {print <<<EOT
@@ -1744,14 +1768,14 @@ EOT;
     <tr class="tr1 vt">
       <td class="td1">创建时间</td>
       <td class="td2">
-      <div class="input_img fl"><i onclick="this.nextSibling.onclick()" class="input_time" title="选择时间">选择时间</i><input type="text" name="crtime_s" value="$crtimeStartString" id="crtime_s" onclick="javascript:ShowCalendar(this.id)"></div><span class="p_lr_10 fl">至</span><div class="input_img fl"><i class="input_time" title="选择时间">选择时间</i><input type="text" name="crtime_e" id="crtime_e" value="$crtimeEndString" onclick="javascript:ShowCalendar(this.id)"></div>
+      <div class="input_img fl"><i onclick="this.nextSibling.onclick()" class="input_time" title="选择时间">选择时间</i><input type="text" name="crtime_s" value="$crtimeStartString" id="crtime_s" onclick="javascript:ShowCalendar(this.id)"></div><span class="p_lr_10 fl">至</span><div class="input_img fl"><i class="input_time" onclick="javascript:ShowCalendar('crtime_e')" title="选择时间">选择时间</i><input type="text" name="crtime_e" id="crtime_e" value="$crtimeEndString" onclick="javascript:ShowCalendar(this.id)"></div>
         </td>
         <td class="td2">&nbsp;</td>
     </tr>
     <tr class="tr1 vt">
       <td class="td1">最后更新日期</td>
       <td class="td2">
-      <div class="input_img fl"><i onclick="this.nextSibling.onclick()" class="input_time" title="选择时间">选择时间</i><input type="text" name="lasttime_s" id="lasttime_s" value="$lasttimeStartString" onclick="javascript:ShowCalendar(this.id)"></div><span class="p_lr_10 fl">至</span><div class="input_img fl"><i class="input_time" title="选择时间">选择时间</i><input type="text" name="lasttime_e" id="lasttime_e" value="$lasttimeEndString" onclick="javascript:ShowCalendar(this.id)"></div>
+      <div class="input_img fl"><i onclick="this.nextSibling.onclick()" class="input_time" title="选择时间">选择时间</i><input type="text" name="lasttime_s" id="lasttime_s" value="$lasttimeStartString" onclick="javascript:ShowCalendar(this.id)"></div><span class="p_lr_10 fl">至</span><div class="input_img fl"><i class="input_time" onclick="javascript:ShowCalendar('lasttime_e')"  title="选择时间">选择时间</i><input type="text" name="lasttime_e" id="lasttime_e" value="$lasttimeEndString" onclick="javascript:ShowCalendar(this.id)"></div>
         </td>
         <td class="td2">&nbsp;</td>
     </tr>
@@ -1787,7 +1811,9 @@ EOT;
 <script type="text/javascript">
 getObj('advanceSearchButton').onclick = function() {
 	displayElement('advanceSearchBody','advanceSearchButton');
-	getObj('searchDisplay').value = getObj('advanceSearchBody').style.display;
+	if(getObj('searchDisplay')){
+		getObj('searchDisplay').value = getObj('advanceSearchBody').style.display;
+	}
 };
 </script>
 
@@ -1867,6 +1893,7 @@ EOT;
   </div>
   <div class="cc">$pages</div>
   <div class="mb10 tac">
+	<span class="bt"><span><button type="button" onclick="CheckAll(document.FORM)">全 选</button></span></span>
     <span class="btn"><span><button type="submit" onclick="return checkdel();">删除</button></span></span>
    </div>
 </form>
@@ -1927,7 +1954,7 @@ EOT;
     <tr class="tr1 vt">
       <td class="td1">上传日期</td>
       <td class="td2">
-      	<div class="input_img fl"><i onclick="this.nextSibling.onclick()" class="input_time" title="选择时间">选择时间</i><input type="text" name="uptime_s" value="$uptimeStartString" id="uptime_s" onclick="javascript:ShowCalendar(this.id)"></div><span class="p_lr_10 fl">至</span><div class="input_img fl"><i class="input_time" title="选择时间">选择时间</i> <input type="text" name="uptime_e" id="uptime_e" value="$uptimeEndString" onclick="javascript:ShowCalendar(this.id)"></div>
+      	<div class="input_img fl"><i onclick="this.nextSibling.onclick()" class="input_time" title="选择时间">选择时间</i><input type="text" name="uptime_s" value="$uptimeStartString" id="uptime_s" onclick="javascript:ShowCalendar(this.id)"></div><span class="p_lr_10 fl">至</span><div class="input_img fl"><i class="input_time" onclick="javascript:ShowCalendar('uptime_e')"  title="选择时间">选择时间</i> <input type="text" name="uptime_e" id="uptime_e" value="$uptimeEndString" onclick="javascript:ShowCalendar(this.id)"></div>
        </td>
         <td class="td2"><!--上传日期--></td>
     </tr>
@@ -2050,6 +2077,7 @@ function addSubType(id) {
 		<li><a href="$basename&action=level">群组等级</a></li>
 		<li><a href="$basename&action=colonystyle">群组风格</a></li>
 		<li><a href="$basename&action=cache">更新缓存</a></li>
+		<li><a href="$admin_file?adminjob=apps&admintype=groups_manage" onclick="openNewUrl('groups_manage','群组管理',this.href);return false;">内容管理</a></li>
 	</ul>
 </div>
 <div class="c"></div>
@@ -2175,7 +2203,7 @@ EOT;
     <tr class="tr1 vt">
       <td class="td1">发表日期</td>
       <td class="td2">
-      	<div class="input_img fl"><i onclick="this.nextSibling.onclick()" class="input_time" title="选择时间">选择时间</i><input type="text" name="postdate_s" value="$postdateStartString" id="postdate_s" onclick="javascript:ShowCalendar(this.id)"></div><span class="p_lr_10 fl">至</span><div class="input_img fl"><i class="input_time" title="选择时间">选择时间</i><input type="text" name="postdate_e" id="postdate_e" value="$postdateEndString" onclick="javascript:ShowCalendar(this.id)"></div>
+      	<div class="input_img fl"><i onclick="this.nextSibling.onclick()" class="input_time" title="选择时间">选择时间</i><input type="text" name="postdate_s" value="$postdateStartString" id="postdate_s" onclick="javascript:ShowCalendar(this.id)"></div><span class="p_lr_10 fl">至</span><div class="input_img fl"><i class="input_time" onclick="javascript:ShowCalendar('postdate_e')"  title="选择时间">选择时间</i><input type="text" name="postdate_e" id="postdate_e" value="$postdateEndString" onclick="javascript:ShowCalendar(this.id)"></div>
         </td>
         <td class="td2">&nbsp;</td>
     </tr>
@@ -2237,7 +2265,7 @@ print <<<EOT
       <td class="td2"><input type="checkbox" name="selid[]" value="$write[id]"></td>
       <td class="td2">$write[s_content]</td>
       <td class="td2"><a href="apps.php?q=group&cyid=$write[cyid]" target="_blank">$write[cname]</a></td>
-      <td class="td2"><a href="u.php?uid=$write[uid]" target="_blank">$write[username]</a></td>
+      <td class="td2"><a href="{$db_userurl}$write[uid]" target="_blank">$write[username]</a></td>
       <td class="td2">$write[postdate]</td>
       <td class="td2">群组</td>
       <td class="td2">
@@ -2265,6 +2293,7 @@ EOT;
   </div>
 <div class="cc">$pages</div>
 <div class="mb10 tac">
+	<span class="bt"><span><button type="button" onclick="CheckAll(document.FORM)">全 选</button></span></span>
 	<span class="btn"><span><button type="submit" onclick="return Checkdel();">删除</button></span></span>
 </div>
 </form>
@@ -2325,7 +2354,7 @@ EOT;
 	<tr class="tr1 vt">
 		<td class="td1">发布日期</td>
 		<td class="td2">
-		<div class="input_img fl"><i onclick="this.nextSibling.onclick()" class="input_time" title="选择时间">选择时间</i><input type="text" name="createtime_s" value="$createtime_s" id="createtime_s" onclick="javascript:ShowCalendar(this.id)"></div><span class="p_lr_10 fl">至</span><div class="input_img fl"><i class="input_time" title="选择时间">选择时间</i> <input type="text" name="createtime_e" id="createtime_e" value="$createtime_e" onclick="javascript:ShowCalendar(this.id)"></div>
+		<div class="input_img fl"><i onclick="this.nextSibling.onclick()" class="input_time" title="选择时间">选择时间</i><input type="text" name="createtime_s" value="$createtime_s" id="createtime_s" onclick="javascript:ShowCalendar(this.id)"></div><span class="p_lr_10 fl">至</span><div class="input_img fl"><i class="input_time" onclick="javascript:ShowCalendar('createtime_e')"  title="选择时间">选择时间</i> <input type="text" name="createtime_e" id="createtime_e" value="$createtime_e" onclick="javascript:ShowCalendar(this.id)"></div>
 		</td>
 	</tr>
 	<tr class="tr1 vt">
@@ -2426,6 +2455,7 @@ EOT;
 </div>
 <div class="cc">$pages</div>
 <div class="mb10 tac">
+	<span class="bt"><span><button type="button" onclick="CheckAll(document.FORM)">全 选</button></span></span>
 	<span class="btn"><span><button type="submit" onclick="return Checkdel();">删除</button></span></span>
 </div>
 </form>

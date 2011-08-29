@@ -1,0 +1,71 @@
+<!--<?php
+require_once uTemplate::PrintEot('header');
+require_once uTemplate::PrintEot('profile_left');
+print <<<EOT
+-->
+<div class="contUser">
+        	<div class="p15">
+            	<h4 class="site"><span>帐号</span></h4>
+<!--
+EOT;
+require_once uTemplate::PrintEot('info_nav');
+print <<<EOT
+-->
+				<table width="100%" height="450">
+				<tr><td class="vt"><div class="p15">
+					<form id="creator" name="creator" action="profile.php?action=modify" method="post" onsubmit="return setFaceLen()">
+					<input type="hidden" name="verify" value="$verifyhash" />
+					<input type="hidden" value="2" name="step" />
+					<input type="hidden" id="info_type" name="info_type" value="other" />
+<!--
+EOT;
+if($customfield){print <<<EOT
+-->
+					<div id="info_other">
+						<table width="100%" class="setTable">
+<!--
+EOT;
+foreach($customfield as $value){
+$value[required] && $value[descrip].='（必填内容）';
+$editable=(!$userdb[$value[field]]||$value[editable])?'':'disabled';
+if($value[type]=='1'){
+$field_type="<input class=\"input input_wa\" type=\"text\" name=\"$value[field]\" value=\"{$userdb[$value[field]]}\" $editable />";
+}elseif($value[type]=='2'){
+$field_type="<textarea name=\"$value[field]\" rows=\"5\" class=\"textarea_a\" $editable>{$userdb[$value[field]]}</textarea>";
+}elseif($value[type]=='3'){
+$field_type='';
+foreach($value[options] as $v){
+list($k,$v)=explode('=',$v);
+$selected=$userdb[$value[field]]==$k?'selected':'';
+$field_type.="<option value=\"$k\" $selected>$v</option>";
+}$field_type="<select name=\"$value[field]\" class=\"select_wa\" $editable>$field_type</select>";
+}print <<<EOT
+-->
+							<tr>
+								<th class="th">$value[title]</th>
+								<td class="td"><span class="mr10">$field_type</span>$value[descrip]</td>
+							</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+						</table>
+						<div class="tac p10">
+							<span class="btn"><span><button type="submit">保存资料</button></span></span>
+						</div>
+					</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+<div id="userbinding-node" style="display:none">
+</form>
+</div></td></tr></table>
+            </div>
+        </div>
+<div class="u-m-bg"></div>
+<script type="text/javascript" src = "js/info.js"></script>
+<!--
+EOT;
+require_once uTemplate::printEot('footer');
+?>-->

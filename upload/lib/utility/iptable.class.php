@@ -3,7 +3,7 @@
 
 /**
  * ip地址查询
- * 
+ *
  * @package IP
  */
 class PW_IPTable {
@@ -18,7 +18,7 @@ class PW_IPTable {
 	function PW_IPTable() {
 		$this->bsize = 1024;
 		$this->dirName = R_P . 'ipdata';
-		$this->indexFile = D_P . 'data/bbscache/ipIndex.bin';
+		$this->indexFile = R_P . 'ipdata/ipindex.dat';
 	}
 
 	/**

@@ -4,7 +4,6 @@ class PW_tplGetData{
 	var $cache = array();
 	var $invokepieces = array();
 	var $updates;
-	var $index=0;
 	function PW_tplGetData(){
 		
 	}
@@ -18,9 +17,32 @@ class PW_tplGetData{
 			$temp = md5($value['invokename'].$value['title']);
 			$this->invokepieces[$temp] = $value;
 		}
+		$this->_initCache($invokepieces);
+	}
+	
+	function _initCache($invokepieces) {
 		$pw_cachedata	= L::loadDB('cachedata', 'area');
 		$config = array_keys($invokepieces);
 		$this->cache	= $pw_cachedata->getDatasByInvokepieceids($config);
+		$this->_cookCacheForCacheTime();
+	}
+	
+	function _cookCacheForCacheTime() {
+		global $timestamp;
+		$temp = $this->cache;
+		$cacheTimes = array();
+		foreach ($temp as $key=>$value) {
+			$cacheTimes[$key] = $value['cachetime'];
+		}
+		array_multisort($cacheTimes, SORT_ASC,$temp);
+		$count = 0;
+		foreach ($temp as $value) {
+			if ($value['cachetime'] == 0) continue;
+			if ($value['cachetime']>$timestamp || $count>4) break;
+			$id = $value['invokepieceid'];
+			$this->cache[$id]['ifupdate'] = 1;
+			$count++;
+		}
 	}
 
 	function getData($invokename,$title){
@@ -29,7 +51,6 @@ class PW_tplGetData{
 
 		if ($temp === false) {
 			$temp = $this->_getDataFromBBS($invokename,$title);
-			$this->index++;
 		}
 		return $temp;
 	}
@@ -46,7 +67,7 @@ class PW_tplGetData{
 		$encode = md5($invokename.$title);
 		if (isset($this->invokepieces[$encode])) {
 			return $this->invokepieces[$encode];
-		} 
+		}
 		$pw_invkoepiece = L::loadDB('invokepiece', 'area');
 		return $pw_invkoepiece->getDataByInvokeNameAndTitle($invokename,$title);
 	}
@@ -54,7 +75,7 @@ class PW_tplGetData{
 	function _getDataFromCache($invokename,$title){
 		global $timestamp;
 		$key = $this->_getPieceIdByInvokeNameAndTitle($invokename,$title);
-		if (isset($this->cache[$key]) && ($this->cache[$key]['cachetime'] == 0 || $this->cache[$key]['cachetime']>$timestamp || $this->index >4)) {
+		if (isset($this->cache[$key]) && ($this->cache[$key]['cachetime'] == 0 || !isset($this->cache[$key]['ifupdate']))) {
 			return $this->cache[$key]['data'];
 		}
 		return false;
@@ -82,11 +103,7 @@ class PW_tplGetData{
 		global $timestamp;
 		$invokename = $config['invokename'];
 		$title	= $config['title'];
-		$temp_fid	= 0;
-		if ($config['rang']=='fid') {
-			global $fid;
-			$temp_fid	= $fid;
-		}
+		
 		$config['cachetime'] = (int) $config['cachetime'];
 		$invokepieceid = $config['id'];
 		$cachetime = $config['cachetime'] ? $timestamp+$config['cachetime'] : 0;

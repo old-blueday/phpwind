@@ -143,6 +143,7 @@ WYSIWYD.prototype.initButtom = function() {
 				obj.cmd(obj.name);
 				//_stopEvent(is_ie ? window.event : ev);
 			}
+			return (el.tagName.toLowerCase() == 'a') ? false : true;
 		});
 	}
 	function setSelect(txt) {
@@ -200,17 +201,19 @@ WYSIWYD.prototype.initIframe = function() {
 	if (!is_ie) {
 		iframe.style.borderWidth = "0px";
 	}
-	var height = this._textArea.offsetHeight;
-	var width  = this._textArea.offsetWidth;
+	var height = this._textArea.offsetHeight || this._textArea.style.height;
+	var width  = this._textArea.offsetWidth || this._textArea.style.width;
 	height = parseInt(height);
 	width = parseInt(width);
 	if (!is_ie) {
 		height -= 3;
 		width -= 3;
 	}
-	iframe.style.width   = width + "px";
-	iframe.style.height  = height + "px";
-
+	width = width ? width +"px":"100%";
+	height = height ? height +"px":"100%";
+	iframe.style.width  = width;
+	iframe.style.height = height;
+	
 	this._textArea.style.width = iframe.style.width;
 	this._textArea.style.height= iframe.style.height;
 
@@ -381,7 +384,7 @@ WYSIWYD.prototype.updateToolbar = function(noStatus) {
 				break;
 			//case "htmlmode": btn.state("active", !iftext);break;
 			//case "windcode": btn.state("active", iftext);break;
-			case 'windcode': $('wy_windcode').checked = iftext ? true : false;
+			case 'windcode': $('wy_windcode').checked = iftext ? true : false;break;
 			default:
 				try{
 					btn.state("active",(!iftext && btn.mover && doc.queryCommandState(cmd)));
@@ -732,16 +735,11 @@ function insertImage(cmdID) {
 	var menu_editor = getObj("menu_editor");
 	menu_editor.className = "";
 	var iframeW = 452;
-	var iframeH = 370;	
-	if (winduid == '') {
-		iframeW = 700;
-		iframeH = 500;
-	}
-
-	menu_editor.innerHTML = '<div id="J_photoInsert"><div class="popout"><table border="0" cellspacing="0" cellpadding="0"><tbody><tr><td class="bgcorner1"></td><td class="pobg1"></td><td class="bgcorner2"></td></tr><tr><td class="pobg4"></td><td style="padding:0;"><div class="popoutContent"><iframe id="imgIframe" scrolling="no" style="zoom:1" frameborder="0" src="apps.php?q=photos&a=pweditor" width="'+iframeW+'" height="'+iframeH+'"></iframe></div></td><td class="pobg2"></td></tr><tr><td class="bgcorner4"></td><td class="pobg3"></td><td class="bgcorner3"></td></tr></tbody></table></div></div>';
+	var iframeH = 350;
+	menu_editor.innerHTML = '<div id="J_photoInsert"><div class="popout"><table border="0" cellspacing="0" cellpadding="0"><tbody><tr><td class="bgcorner1"></td><td class="pobg1"></td><td class="bgcorner2"></td></tr><tr><td class="pobg4"></td><td style="padding:0;"><div class="popoutContent"><iframe id="imgIframe" scrolling="no" style="zoom:1" frameborder="0" src="job.php?action=pweditor" width="'+iframeW+'" height="'+iframeH+'"></iframe></div></td><td class="pobg2"></td></tr><tr><td class="bgcorner4"></td><td class="pobg3"></td><td class="bgcorner3"></td></tr></tbody></table></div></div>';
 /*'<div style="width:340px;"><h4><div class="fr" style="cursor:pointer;" onclick="closep();" title="'+I18N['close']+'"><img src='+imgpath+'/close.gif></div>'+I18N['insertImage']+'</h4><table width="100%"><tbody><tr><td width="25%">'+I18N['mediaurl']+'</td><td><input class="input" type="text" id="mediaurl" size="32" /></td></tr><tr><td> </td><td><input class="btn" type="button" onclick="return insertImageToPage();" value="'+I18N['submit']+'" /></td></tr></tbody></table></div>';*/
 	read.open('menu_editor','wy_insertimage','2');
-	getObj("imgIframe").src = "apps.php?q=photos&a=pweditor";
+	getObj("imgIframe").src = "job.php?action=pweditor&t=" + new Date().getTime();
 	//getObj("mediaurl").focus();
 	//setInterval("imgIframeAutoHeight()", 200);
 };
@@ -878,6 +876,7 @@ function SetC(color,cmdID) {
 };
 function showJustify(cmdID) {
 	var menu_editor = getObj('menu_editor');
+	menu_editor.className = 'wy_menu_B';
 	menu_editor.innerHTML = "<ul style=\"width:80px;margin:0 0 2px 10px;line-height:22px;\"><li><a unselectable=\"on\" href=\"javascript:\" onclick=\"return setJustify('left');\">左对齐</a></li><li><a unselectable=\"on\" href=\"javascript:\" onclick=\"return setJustify('center');\">居中</a></li><li><a unselectable=\"on\" href=\"javascript:\" onclick=\"return setJustify('right');\">右对齐</a></li><li><a unselectable=\"on\" href=\"javascript:\" onclick=\"return setJustify('full');\">左右平等</a></li></ul>";
 	read.open('menu_editor','wy_' + cmdID);
 };
@@ -888,11 +887,13 @@ function setJustify(cmdID) {
 };
 function showList(cmdID) {
 	var menu_editor = getObj('menu_editor');
+	menu_editor.className = 'wy_menu_B';
 	menu_editor.innerHTML = "<ul style=\"width:80px;margin:0 0 2px 10px;line-height:22px;\"><li><a unselectable=\"on\" href=\"javascript:\" onclick=\"return sendMenuCmd('insertorderedlist');\">有序列表</a></li><li><a unselectable=\"on\" href=\"javascript:\" onclick=\"return sendMenuCmd('insertunorderedlist');\">无序列表</a></li></ul>";
 	read.open('menu_editor','wy_' + cmdID);
 };
 function showDent(cmdID) {
 	var menu_editor = getObj('menu_editor');
+	menu_editor.className = 'wy_menu_B';
 	menu_editor.innerHTML = "<ul style=\"width:80px;margin:0 0 2px 10px;line-height:22px;\"><li><a unselectable=\"on\" href=\"javascript:\" onclick=\"return sendMenuCmd('indent');\">缩进</a></li><li><a unselectable=\"on\" href=\"javascript:\" onclick=\"return sendMenuCmd('outdent');\">取消缩进</a></li></ul>";
 	read.open('menu_editor','wy_' + cmdID);
 };
@@ -903,6 +904,7 @@ function sendMenuCmd(cmdID) {
 };
 function ShowSelect(cmdID) {
 	var menu_editor = getObj("menu_editor");
+	menu_editor.className = 'wy_menu_B';
 	var wh = {'fontname' : '110','fontsize' : '60','formatblock' : '80'};
 	var html = '<ul style="width:'+wh[cmdID]+'px;margin:0 0 2px 10px;line-height:22px;">';
 	var options = editor.config[cmdID];
@@ -919,7 +921,7 @@ function rming(cmdID) {
 	editor.saveRange();
 	var menu_editor = getObj("menu_editor");
 	menu_editor.className = "wy_menu_B";
-	menu_editor.innerHTML = '<div style="width:320px;"><h4><div class="fr" style="cursor:pointer;" onclick="closep();" title="'+I18N['close']+'"><img src='+imgpath+'/close.gif></div>'+I18N['insertmedia']+'</h4><table width="100%"><tbody><tr><td width="25%">'+I18N['mediaurl']+'</td><td><input class="input" type="text" id="mediaurl" size="32" /></td></tr><tr><td>'+I18N['mediatype']+'</td><td><input type="radio" name="mediatype" id="mediatype1" value="1"> rm <input type="radio" name="mediatype" id="mediatype2" value="2" checked> wmv <input type="radio" name="mediatype" id="mediatype3" value="3"> mp3 <input type="radio" name="mediatype" id="mediatype4" value="4"> flash</td></tr><tr><td>'+I18N['medialength']+'</td><td><input class="input" type="text" id="medialength" value="314" size="6" />&nbsp;'+I18N['mediawidth']+'&nbsp;&nbsp;<input class="input" type="text" id="mediawidth" value="256" size="6" />&nbsp;'+I18N['mediaheight']+'</td></tr><tr><td>'+I18N['mediaplay']+'</td><td><input type="checkbox" id="midiaauto" />'+I18N['mediaauto']+'</td></tr><tr><td> </td><td><input class="btn" type="button" onclick="return insertmedia();" value="'+I18N['submit']+'" /></td></tr></tbody></table></div>';
+	menu_editor.innerHTML = '<div style="width:320px;"><h4><div class="fr" style="cursor:pointer;" onclick="closep();" title="'+I18N['close']+'"><img src='+imgpath+'/close.gif></div>'+I18N['insertmedia']+'</h4><table width="100%"><tbody><tr><td width="25%">'+I18N['mediaurl']+'</td><td><input class="input" type="text" id="mediaurl" size="32" /></td></tr><tr><td>'+I18N['mediatype']+'</td><td><input type="radio" name="mediatype" id="mediatype1" value="1"> rm <input type="radio" name="mediatype" id="mediatype2" value="2"> wmv <input type="radio" name="mediatype" id="mediatype3" value="3"> mp3 <input type="radio" name="mediatype" id="mediatype4" value="4" checked> flash</td></tr><tr><td>'+I18N['medialength']+'</td><td><input class="input" type="text" id="medialength" value="314" size="6" />&nbsp;'+I18N['mediawidth']+'&nbsp;&nbsp;<input class="input" type="text" id="mediawidth" value="256" size="6" />&nbsp;'+I18N['mediaheight']+'</td></tr><tr><td>'+I18N['mediaplay']+'</td><td><input type="checkbox" id="midiaauto" />'+I18N['mediaauto']+'</td></tr><tr><td> </td><td><input class="btn" type="button" onclick="return insertmedia();" value="'+I18N['submit']+'" /></td></tr></tbody></table></div>';
 	read.open('menu_editor','wy_media','2');
 	getObj("mediaurl").focus();
 };
@@ -974,12 +976,13 @@ function sell(cmdID) {
 	editor.saveRange();
 	//editor.focusEditor();
 	var menu_editor = getObj("menu_editor");
+	menu_editor.className = "wy_menu_B";
 	editor.sellNum = editor.sellNum||5;
 	var n = editor.getHTML().match(/\[sell=[\d]+(,[\w]+)?]/ig);
 	n = (n==null)?0:n.length;
-	menu_editor.innerHTML = '<div style="width:290px;"><h4><a href="javascript:;" onclick="closep();" class="adel">关闭</a>帖子出售</h4><div style="padding:5px 30px;"><p class="f14 mb10">共有 <span class="s2">'+(n+1)+'</span> 处出售内容</p><p class="f14"><span class="fl" style="line-height:22px;">帖子售价：</span><div class="fl mr5 f12"><input name="" type="text" class="input fl" style="width:50px;" value="'+editor.sellNum+'" /><a href="javascript:;" class="select_arrow fl" style="margin:2px 0 0 2px;" onclick="sell_dropdown()" >下拉</a><div class="fl"><div id="sell_dropdown" class="pw_menu" style="position:absolute;margin:20px 0 0 -17px;display:none;"><ul class="menuList tal" style="width:40px;" onmousedown="getSellValue(event)"><li><a href="javascript:;">1</a></li><li><a href="javascript:;">3</a></li><li><a href="javascript:;">5</a></li><li><a href="javascript:;">7</a></li><li><a href="javascript:;">9</a></li></ul></div></div></div><span id="sell_credit_span"></span><div class="c"></div></p></div><div class="p10 tac"><span class="btn2"><span><button onclick="insertSell()" type="button">确定</button></span></span><span class="bt2"><span><button type="button" onclick="closep()">取消</button></span></span></div></div>';
+	menu_editor.innerHTML = '<div style="width:290px;"><h4><a href="javascript:;" onclick="closep();" class="adel">关闭</a>帖子出售</h4><div style="padding:5px 30px;"><p class="f14 mb10">共有 <span class="s2">'+(n+1)+'</span> 处出售内容 售价不能大于:<font color="blue">' + sellprice + '</font></p><p class="f14"><span class="fl" style="line-height:22px;">帖子售价：</span><div class="fl mr5 f12"><input name="" type="text" class="input fl" style="width:50px;" value="'+editor.sellNum+'" /><a href="javascript:;" class="select_arrow fl" style="margin:2px 0 0 2px;" onclick="sell_dropdown()" >下拉</a><div class="fl"><div id="sell_dropdown" class="pw_menu" style="position:absolute;margin:20px 0 0 -17px;display:none;"><ul class="menuList tal" style="width:40px;" onmousedown="getSellValue(event)"><li><a href="javascript:;">1</a></li><li><a href="javascript:;">3</a></li><li><a href="javascript:;">5</a></li><li><a href="javascript:;">7</a></li><li><a href="javascript:;">9</a></li></ul></div></div></div><span id="sell_credit_span"></span><div class="c"></div></p></div><div class="p10 tac"><span class="btn2"><span><button onclick="insertSell()" type="button">确定</button></span></span><span class="bt2"><span><button type="button" onclick="closep()">取消</button></span></span></div></div>';
 	read.open('menu_editor','wy_sell','2');
-	if (n == 0 && IsElement('attmode_2')) {
+	if (IsElement('attmode_2')) {
 		var s = getObj('attmode_2').cloneNode(true);
 		s.id = 'sell_credit';s.name = '';
 		s.style.width = '70px';

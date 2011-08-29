@@ -29,9 +29,9 @@ class Forum {
 			return new ApiResponse(false);
 		}
 		if (is_numeric($fids)) {
-			$sql = ' fid=' . pwEscape($fids);
+			$sql = ' fid=' . S::sqlEscape($fids);
 		} else {
-			$sql = ' fid IN(' . pwImplode(explode(",",$fids)) . ')';
+			$sql = ' fid IN(' . S::sqlImplode(explode(",",$fids)) . ')';
 		}
 		
 		$query = $this->db->query("SELECT fid,appinfo FROM pw_forumsextra WHERE appinfo!=''");
@@ -41,7 +41,7 @@ class Forum {
 			unset($appdb[$appid]);
 			$appdb = serialize($appdb);
 			
-			$this->db->update("UPDATE pw_forumsextra SET appinfo=" . pwEscape($appdb) . " WHERE fid=" . pwEscape($rt['fid']));
+			$this->db->update("UPDATE pw_forumsextra SET appinfo=" . S::sqlEscape($appdb) . " WHERE fid=" . S::sqlEscape($rt['fid']));
 		}
 
 		$oldfids = array();
@@ -52,7 +52,7 @@ class Forum {
 			$appdb[$appid] = $appinfo;
 			$appdb = serialize($appdb);
 			$oldfids[$rt['fid']] = $rt['fid'];
-			$this->db->update("UPDATE pw_forumsextra SET appinfo=" . pwEscape($appdb) . " WHERE fid=" . pwEscape($rt['fid']));
+			$this->db->update("UPDATE pw_forumsextra SET appinfo=" . S::sqlEscape($appdb) . " WHERE fid=" . S::sqlEscape($rt['fid']));
 		}
 
 		$forumset = array(
@@ -71,7 +71,7 @@ class Forum {
 				$appdb = array();
 				$appdb[$appid] = $appinfo;
 				$appdb = serialize($appdb);
-				$this->db->update("INSERT INTO pw_forumsextra SET " . pwSqlSingle(array(
+				$this->db->update("INSERT INTO pw_forumsextra SET " . S::sqlSingle(array(
 					'fid'			=> $value,
 					'forumset'		=> $forumset,
 					'appinfo'		=> $appdb
@@ -86,15 +86,15 @@ class Forum {
 	}
 
 	function alertType($fid,$name,$logo = '') {//添加版块主题分类
-		$fid = $this->db->get_value("SELECT fid FROM pw_forums WHERE fid=" . pwEscape($fid));
+		$fid = $this->db->get_value("SELECT fid FROM pw_forums WHERE fid=" . S::sqlEscape($fid));
 		if (!$fid || !$name) {
 			return new ApiResponse(false);
 		}
-		$topicid = $this->db->get_value("SELECT id FROM pw_topictype WHERE fid=" . pwEscape($fid). " AND name=" . pwEscape($name));
+		$topicid = $this->db->get_value("SELECT id FROM pw_topictype WHERE fid=" . S::sqlEscape($fid). " AND name=" . S::sqlEscape($name));
 		if ($topicid) {
-			$this->db->update("UPDATE pw_topictype SET logo=" . pwEscape($logo) . " WHERE id=" . pwEscape($topicid));
+			$this->db->update("UPDATE pw_topictype SET logo=" . S::sqlEscape($logo) . " WHERE id=" . S::sqlEscape($topicid));
 		} else {
-			$this->db->update("INSERT INTO pw_topictype SET " . pwSqlSingle(array(
+			$this->db->update("INSERT INTO pw_topictype SET " . S::sqlSingle(array(
 				'fid'		=> $fid,
 				'name'		=> $name,
 				'logo'		=> $logo
@@ -110,10 +110,11 @@ class Forum {
 		if (!$name) {
 			return new ApiResponse(false);
 		}
-		@include_once(D_P.'data/bbscache/forum_cache.php');
+		@include_once pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
 		$forumtype = $forum[$fup]['type'] == 'category' ? 'forum' : ($forum[$fup]['type'] == 'forum' ? 'sub' : 'sub2');
-
-		$this->db->update("INSERT INTO pw_forums SET " . pwSqlSingle(array(
+		
+		/*
+		$this->db->update("INSERT INTO pw_forums SET " . S::sqlSingle(array(
 			'fup'			=> $fup,
 			'type'			=> $forumtype,
 			'name'			=> $name,
@@ -122,9 +123,19 @@ class Forum {
 			'ifhide'		=> 1,
 			'allowtype'		=> 3
 		)));
+		*/
+		pwQuery::insert('pw_forums', array(
+			'fup'			=> $fup,
+			'type'			=> $forumtype,
+			'name'			=> $name,
+			'descrip'		=> $descrip,
+			'cms'			=> 0,
+			'ifhide'		=> 1,
+			'allowtype'		=> 3
+		));
 
 		$fid = $this->db->insert_id();
-		$this->db->update("INSERT INTO pw_forumdata SET fid=".pwEscape($fid));
+		$this->db->update("INSERT INTO pw_forumdata SET fid=".S::sqlEscape($fid));
 
 		$forumset = array(
 			'lock'		=> 0,		'cutnums'		=> 0,			'threadnum'		=> 0,			'readnum'		=> 0,
@@ -138,12 +149,14 @@ class Forum {
 		);
 		$forumset['link'] = $linkurl;
 		$forumset = serialize($forumset);
-		$this->db->update("INSERT INTO pw_forumsextra SET " . pwSqlSingle(array(
+		$this->db->update("INSERT INTO pw_forumsextra SET " . S::sqlSingle(array(
 			'fid'			=> $fid,
 			'forumset'		=> $forumset
 		)));
 
-		P_unlink(D_P.'data/bbscache/c_cache.php');
+		//* P_unlink(D_P.'data/bbscache/c_cache.php');
+		pwCache::deleteData(D_P.'data/bbscache/c_cache.php');
+		
 		require_once(R_P.'admin/cache.php');
 		updatecache_f();
 		require_once(R_P.'require/updateforum.php');

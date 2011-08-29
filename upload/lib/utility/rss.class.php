@@ -52,7 +52,7 @@ class Rss {
 		$all .= $this->rssImage;
 		$all .= $this->rssItem;
 		$all .= "</channel></rss>";
-		writeover($rss_path, $all);
+		pwCache::setData($rss_path, $all);
 	}
 }
 ?>

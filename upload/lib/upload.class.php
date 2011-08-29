@@ -13,7 +13,7 @@ class PwUpload {
 		$arr = array(
 			'id' => intval($i),
 			'attname' => $t,
-			'name' => Char_cv($value['name']),
+			'name' => S::escapeChar($value['name']),
 			'size' => intval($value['size']),
 			'type' => 'zip',
 			'ifthumb' => 0,
@@ -45,11 +45,10 @@ class PwUpload {
 				$GLOBALS['oversize'] = $bhv->ftype[$upload['ext']];
 				showUploadMsg($upload['size'] < 1 ? 'upload_size_0' : 'upload_size_error');
 			}
-			list($filename, $savedir, $thumbname, $thumbdir) = $bhv->getFilePath($upload);
+			list($filename, $savedir) = $bhv->getFilePath($upload);
 			$upload['fileuploadurl'] = $savedir . $filename;
 
 			$source = PwUpload::savePath($bhv->ifftp, $filename, $savedir);
-			$thumburl = PwUpload::savePath($bhv->ifftp, $thumbname, $thumbdir, 'thumb_');
 
 			if (!PwUpload::postupload($atc_attachment, $source)) {
 				showUploadMsg('upload_error');
@@ -64,12 +63,9 @@ class PwUpload {
 				}
 				if ($upload['ext'] != 'swf') {
 					if ($bhv->allowThumb() && ($upload['ext'] != 'gif' || $GLOBALS['db_ifathumbgif'])) {
-						$thumbsize = PwUpload::makeThumb($source, $thumburl, $bhv->getThumbSize(), $upload['ifthumb']);
+						$thumbInfo = PwUpload::makeThumb($source, $bhv->getThumbInfo($filename, $savedir), $bhv->ifftp, $upload['ifthumb']);
 					}
-					if ($bhv->allowWaterMark()) {
-						PwUpload::waterMark($source, $upload['ext'], $img_size);
-						$upload['ifthumb'] && PwUpload::waterMark($thumburl, $upload['ext']);
-					}
+					$bhv->allowWaterMark() && PwUpload::waterMark($source, $upload['ext'], $img_size);
 					$upload['type'] = 'img';
 				}
 			} elseif ($upload['ext'] == 'txt') {
@@ -81,23 +77,39 @@ class PwUpload {
 			}
 			if ($bhv->ifftp) {
 				PwUpload::movetoftp($source, $upload['fileuploadurl']);
-				$upload['ifthumb'] && PwUpload::movetoftp($thumburl, $thumbdir . $thumbname);
+			}
+			if ($upload['ifthumb']) {
+				PwUpload::operateThumb($thumbInfo, $bhv->allowWaterMark(), $bhv->ifftp, $upload['ext']);
 			}
 			$uploaddb[] = $upload;
 		}
 		if (!$ifUpdate) return $uploaddb;
 		$bhv->update($uploaddb);
 	}
+
+	function operateThumb($list, $waterMark, $ifftp, $ext) {
+		if (empty($list)) return false;
+		foreach ($list as $k => $v) {
+			$waterMark && PwUpload::waterMark($v[0], $ext);
+			$ifftp && PwUpload::movetoftp($v[0], $v[1]);
+		}
+		return true;
+	}
 	/**
 	 * @static
 	 */
-	function makeThumb($source, $thumburl, $thumbsize, &$ifthumb) {
-		list($thumbw, $thumbh, $cenTer) = explode("\t", $thumbsize);
-		PwUpload::createFolder(dirname($thumburl));
-		if ($thumb = MakeThumb($source, $thumburl, $thumbw, $thumbh, $cenTer)) {
-			$source != $thumburl && $ifthumb = 1;
+	function makeThumb($source, $thumbInfo, $ifftp, &$ifthumb) {
+		$array = array();
+		foreach ($thumbInfo as $key => $value) {
+			list($thumbw, $thumbh, $cenTer) = explode("\t", $value[2]);
+			$thumburl = PwUpload::savePath($ifftp, $value[0], $value[1], 'thumb_' . $key . '_');
+			PwUpload::createFolder(dirname($thumburl));
+			if (($thumb = MakeThumb($source, $thumburl, $thumbw, $thumbh, $cenTer)) && $source != $thumburl) {
+				$ifthumb |= (1 << $key);
+				$array[] = array($thumburl, $value[1] . $value[0]);
+			}
 		}
-		return $thumb;
+		return $array;
 	}
 	/**
 	 * @static
@@ -123,6 +135,23 @@ class PwUpload {
 			}
 		}
 		return count($_FILES);
+	}
+	
+	/*检查上传是否有错误*/
+	function checkUpload(){
+		foreach ($_FILES as $k => $v) {
+			switch ($v['error']){
+				case UPLOAD_ERR_INI_SIZE:
+					$maxuploadsize = @ini_get('upload_max_filesize');
+					return '上传的附件超过服务器上传的最大限制' . $maxuploadsize;
+					break;
+				case UPLOAD_ERR_NO_TMP_DIR:
+					return '附件上传失败,服务器TMP目录设置错误';
+					break;
+				default:
+			}
+		}
+		return true;
 	}
 	/**
 	 * @static
@@ -161,7 +190,7 @@ class PwUpload {
 			P_unlink($srcfile);
 			return true;
 		} elseif (is_readable($srcfile)) {
-			writeover($dstfile, readover($srcfile));
+			pwCache::setData($dstfile, readover($srcfile));
 			if (file_exists($dstfile)) {
 				@chmod($dstfile, 0777);
 				P_unlink($srcfile);
@@ -185,7 +214,7 @@ class PwUpload {
 			@chmod($filename, 0777);
 			return true;
 		} elseif (is_readable($tmp_name)) {
-			writeover($filename, readover($tmp_name));
+			pwCache::setData($filename, readover($tmp_name));
 			if (file_exists($filename)) {
 				@chmod($filename, 0777);
 				return true;
@@ -243,9 +272,17 @@ class uploadBehavior {
 	function allowWaterMark() {
 		return false;
 	}
-
-	function getThumbSize() {
-		return '';
+	
+	/**
+	 * @abstract 配置生成缩略图策略
+	 * @retrun array(
+	 *		array($filename_1, $dir_1, $thumbsize_1),
+	 *		array($filename_2, $dir_2, $thumbsize_2),
+	 *		...
+	 *	)
+	 */
+	function getThumbInfo() {
+		return array();
 	}
 	/**
 	 * @abstract

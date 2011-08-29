@@ -132,7 +132,7 @@ class UcDB {
 			define('QUERY', true);
 			@mysql_close($this->conn);
 			sleep(2);
-			include(D_P . 'data/sql_config.php');
+			include pwCache::getPath(D_P . 'data/sql_config.php');
 			$this->connect($dbhost, $dbuser, $dbpw, $dbname);
 			$result_set = $this->query($sql);
 		}

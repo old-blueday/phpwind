@@ -9,13 +9,14 @@
 .wy_menu_B .tr3{padding:4px 0 4px 10px;text-align:right;}
 .wy_menu_B td{padding:4px 0 4px 10px;text-align:right;}
 .wy_menu_B a.fr{color:#3366cc;}
+#qanswer_info img{margin:0 0 0 5px;height:21px;}
 </style>
 <!--
 EOT;
 if(GetGP('vip')=='activating'){print <<<EOT
 -->
 <div id="breadCrumb">
-		<img src="$imgpath/$stylepath/thread/home-old.gif" align="absmiddle" />&nbsp;<a href="$db_bfn" title="$db_bbsname">$db_bbsname</a><em>&gt;</em>注册
+<img src="$imgpath/$stylepath/thread/home.gif" class="breadHome" /><em class="breadEm"></em><a href="$db_bfn" title="$db_bbsname">$db_bbsname</a><em>&gt;</em>注册
 </div>
 <div id="pw_content">
 	<div class="p20">
@@ -41,12 +42,12 @@ EOT;
 }elseif(!$step && $step!=2){print <<<EOT
 -->
 <div id="breadCrumb">
-		<img src="$imgpath/$stylepath/thread/home-old.gif" align="absmiddle" />&nbsp;<a href="$db_bfn" title="$db_bbsname">$db_bbsname</a><em>&gt;</em>注册
+<img src="$imgpath/$stylepath/thread/home.gif" class="breadHome" /><em class="breadEm"></em><a href="$db_bfn" title="$db_bbsname">$db_bbsname</a><em>&gt;</em>注册
 </div>
 <div id="pw_content">
 	<div class="p20">
 		<div class="regTitle cc">
-			<span class="fr">已经拥有帐号？<a href="login.php#breadCrumb" class="s4">请在此登陆</a></span>
+			<span class="fr">已经拥有帐号？<a href="login.php#breadCrumb" class="s4">请在此登录</a></span>
 			<h5>注册<!--请填写以下必填信息完成注册--></h5>
 		</div>
 		<table width="100%"><tr><td class="vt" height="300" style="padding-bottom:30px;">
@@ -100,19 +101,19 @@ EOT;
 			<dl class="cc">
 				<dt><label for="regemail">电子邮箱<span class="s1">*</span></label></dt>
 				<dd class="ip"><div class=""><input type="text"  maxlength="75" name="regemail" value="" id="regemail"/></div>
-				<!--p class="cc"><label><input type="checkbox" name="regemailtoall" value="1" style="width:auto;padding:0;margin:0;" /> 公开邮箱</label></p-->
+				<!--p class="cc"><label><input type="checkbox" name="regemailtoall" value="1" style="width:auto;padding:0;margin:0;" /> 公开电子邮箱</label></p-->
 				</dd>
 				<dd class="tp"><div id="email_info">
 <!--
 EOT;
 if($rg_config['rg_emailtype'] == '1' && $rg_config['rg_email']){print <<<EOT
 -->
-					为避免无法收取站点邮件，请使用以下邮箱进行注册:<br />({$rg_config[rg_email]})
+					<div style="padding:0;position:relative;margin:-5px 0 0 -22px;width:390px;">为避免无法收取站点邮件，请使用以下电子邮箱进行注册:<br /><span class="s2">({$rg_config[rg_email]})</span></div>
 <!--
 EOT;
 } elseif($rg_config['rg_emailtype'] == '2' && $rg_config['rg_banemail']){print <<<EOT
 -->
-					为避免无法收取站点邮件，以下邮箱无法进行注册:<br />({$rg_config[rg_banemail]})
+					<div style="padding:0;position:relative;margin:-5px 0 0 -22px;width:390px;">为避免无法收取站点邮件，以下电子邮箱无法进行注册:<br /><span class="s2">({$rg_config[rg_banemail]})</span></div>
 <!--
 EOT;
 }print<<<EOT
@@ -127,11 +128,11 @@ if($rg_config['rg_allowregister']==2){print <<<EOT
 				<dt><label for="invcode">邀请注册码<span class="s1">*</span></label></dt>
 				<dd class="ip"><div><input type="text" value="$invcode" name="invcode" id="invcode" /></div></dd>
 				<dd class="tp"><div id="invcode_info"></div>
-				<span style="display:none;">
+				<span>
 <!--
 EOT;
 if($inv_config['inv_onlinesell']){print <<<EOT
---><span id="buy_invitecode"><p><a href="javascript:;" class="s4" onclick="insertOnlineSell();">购买邀请码</a></p></span>
+--><span id="buy_invitecode"><p class="p5"><a href="javascript:;" class="s4" onclick="insertOnlineSell();">购买邀请码</a></p></span>
 <!--
 EOT;
 }print <<<EOT
@@ -140,34 +141,34 @@ EOT;
 			</dl>
 <!--
 EOT;
-}if($regq && $db_question){
+}
+if(($db_ckquestion & 1) && $db_question){
 $qkey = array_rand($db_question);
 $db_question[$qkey] = addcslashes($db_question[$qkey],'"');
+if(!$question){
+	if($db_imagequestion){
+		$question = "<img id='ckquestion' src='ckquestion.php?q=".$qkey.'&t='.$timestamp."' height='21' style='margin:0 0 0 5px;'>";
+		
+	}else{
+		$question = $qkey<0 ? getMachineQuestion_1() :  $db_question[$qkey];
+	}
+}
 print <<<EOT
 -->
 			<dl>
 				<dt><label for="regpwdrepeat">防恶意注册<span class="s1">*</span></label></dt>
 				<dd class="ip"><div><input type="text" name="qanswer" id="qanswer" /><input type="hidden" id="regqkey" name="qkey" value="$qkey" /></div></dd>
-				<dd class="tp"><div id="qanswer_info"></div></dd>
-<!--
-EOT;
-if($showq){print <<<EOT
--->
-				<dd class="regTips"><span id="qanswer_info">正确答案:$db_answer[$qkey]</span></dd>
-<!--
-EOT;
-}print <<<EOT
--->								
+				<dd class="tp"><div id="qanswer_info"></div></dd>							
 
 			</dl>
 <!--
 EOT;
 }if($rg_config['rg_ifcheck']){print <<<EOT
 -->
-			<dl>
-				<dt>注册原因<span color="s1">*</span></dt>
+			<dl class="cc">
+				<dt>注册原因<span class="s1">*</span></dt>
 				<dd class="ip">
-					<textarea name="regreason" rows="4" cols="50" class="textareaA"></textarea>
+					<textarea name="regreason" style="width:222px;margin-bottom:10px;" class="textareaA"></textarea>
 				</dd>
 				<dd class="tp"></dd>
 			</dl>
@@ -277,7 +278,9 @@ if(substr($val[3],0,1)=='1'){print <<<EOT
 				</dl>
 <!--
 EOT;
-}}}if($db_gdcheck & 1){print <<<EOT
+}}}if($db_gdcheck & 1){
+$gdSize = explode("\t",$db_gdsize);
+print <<<EOT
 -->
 
 				<dl class="cc mb10">
@@ -285,7 +288,13 @@ EOT;
 						<dd class="ip ck">
 							<div><input id="gdcode" name="gdcode" value="" /></div>
 							<span id="menu_gd"></span>
-							<img src="ck.php?nowtime=$timestamp" align="top" onclick="try{opencode('',this,'register_ckcode')}catch(e){}" class="cp" id="register_ckcode" alt="看不清楚，换一张" title="看不清楚，换一张" />
+<script type="text/javascript" src="js/pw_authcode.js"></script>
+<script>
+var flashWidth = "$gdSize[0]";
+var flashHeight = "$gdSize[1]";
+var gdtype = $db_gdtype;
+showGdCode();
+</script>
 						</dd>
 						<dd class="tp"><div id="gdcode_info"></div></dd>
 				</dl>
@@ -366,10 +375,10 @@ var regpwdrepeat= new Element("regpwdrepeat",regInfo[2],"pwdrepeat_info");
 regInfo[3] 		= new Array(
 						" ",
 						"您的填写有误。",
-						"该邮箱已被注册，请更换别邮箱。",
-						"请填写真实并且最常用的邮箱。"+(regemail?"我们需要通过邮箱对您进行认证。":""),
-						"邮箱不是系统指定的邮箱地址，不能注册",
-						"请输入正确的邮箱地址");
+						"该电子邮箱已被注册，请更换别邮箱。",
+						"请填写真实并且最常用的电子邮箱。"+(regemail?"我们需要通过电子邮箱对您进行认证。":""),
+						"电子邮箱不是系统指定的邮箱地址，不能注册",
+						"请输入正确的电子邮箱地址");
 var regemail 	= new Element("regemail",regInfo[3],"email_info");
 
 if(parseInt("$db_gdcheck")&1){
@@ -381,10 +390,18 @@ if(parseInt("$db_gdcheck")&1){
 	var gdcode 	= new Element("regemail",regInfo[4],"gdcode_info");
 }
 if(getObj('regqkey')){
-	regInfo[5] 	= new Array(
+	if(parseInt("$showq")>0 && parseInt("$qkey")>0){
+		regInfo[5] 	= new Array(
 						" ",
 						"验证答案错误。",
-						"问题:$db_question[$qkey]<br />请输入答案:$db_answer[$qkey]"	);
+						"问题:$question 请输入答案:$db_answer[$qkey]");
+	}
+	else{
+		regInfo[5] 	= new Array(
+						" ",
+						"验证答案错误。",
+						"问题:$question");
+	}
 	var qanswer = new Element("qanswer",regInfo[5],"qanswer_info");
 }
 if(parseInt("$rg_config[rg_allowregister]")==2){
@@ -419,6 +436,9 @@ function permit() {
 }
 if (regdetail) {
 	setTimeout('permit();',1000);
+} else {
+	setTimeout("getObj('regname').focus();", 500);
+	getObj('registerclause').checked="checked";
 }
 function getPwdRule(){
 	var intiString 	= "";
@@ -507,7 +527,7 @@ if($email && $rg_config['rg_emailcheck']){
 print<<<EOT
 -->
 <div id="breadCrumb">
-		<img src="$imgpath/$stylepath/thread/home-old.gif" align="absmiddle" />&nbsp;<a href="$db_bfn" title="$db_bbsname">$db_bbsname</a><em>&gt;</em>注册
+<img src="$imgpath/$stylepath/thread/home.gif" class="breadHome" /><em class="breadEm"></em><a href="$db_bfn" title="$db_bbsname">$db_bbsname</a><em>&gt;</em>注册
 </div>
 <div id="pw_content">
 	<div class="p20">
@@ -516,10 +536,10 @@ print<<<EOT
 		</div>
 		<table width="100%"><tr><td class="vt" height="200" style="padding-left:200px;">
 		<div class="f16 b mb10">注册成功，请立即开通账户</div>
-		<div class="mb10">亲爱的会员，您已经通过邮箱{$email}注册成为{$db_bbsname}大家庭中的一员了。</div>
-		<div class="mb10">我们已经把激活邮件发送到了{$email}邮箱，快去激活吧！</div>
-		<div class="mb20"><span class="mr20"><span class="btn"><span><button type="button" onclick="window.location.href='$emailurl'">去我的邮箱激活</button></span></span></span><a href="$db_registerfile?step=finish&email=$email&verify=$_GET[verify]&r=1" class="s4" target="_blank">再次发送激活邮件</a></div>
-		<div class="ignoreTip fl"><p class="mb5">小贴士:如果你没有收到激活邮件，可能邮件被误放入垃圾邮件中了；</p>你还可以选择<a href="$db_registerfile?step=finish&email=$email&verify=$_GET[verify]&r=1" class="s4" target="_blank">再次发送激活邮件</a>来接收激活邮件。</div>
+		<div class="mb10">亲爱的会员，您已经通过电子邮箱{$email}注册成为{$db_bbsname}大家庭中的一员了。</div>
+		<div class="mb10">我们已经把激活电子邮箱发送到了{$email}电子邮箱，快去激活吧！</div>
+		<div class="mb20"><span class="mr20"><span class="btn"><span><button type="button" onclick="window.location.href='$emailurl'">去我的电子邮箱激活</button></span></span></span><a href="$db_registerfile?step=finish&email=$email&verify=$_GET[verify]&r=1" class="s4" target="_blank">再次发送激活电子邮箱</a></div>
+		<div class="ignoreTip fl"><p class="mb5">小贴士:如果你没有收到激活电子邮件，可能邮件被误放入垃圾电子邮件中了；</p>你还可以选择<a href="$db_registerfile?step=finish&email=$email&verify=$_GET[verify]&r=1" class="s4" target="_blank">再次发送激活电子邮箱</a>来接收激活电子邮件。</div>
 		</td></tr></table>
 	</div>
 </div>
@@ -529,7 +549,7 @@ EOT;
 if(!$option){print<<<EOT
 -->
 <div id="breadCrumb">
-		<img src="$imgpath/$stylepath/thread/home-old.gif" align="absmiddle" />&nbsp;<a href="$db_bfn" title="$db_bbsname">$db_bbsname</a><em>&gt;</em>注册
+<img src="$imgpath/$stylepath/thread/home.gif" class="breadHome" /><em class="breadEm"></em><a href="$db_bfn" title="$db_bbsname">$db_bbsname</a><em>&gt;</em>注册
 </div>
 <div id="pw_content">
 	<div class="p20">
@@ -542,7 +562,7 @@ if(!$option){print<<<EOT
 		<input type="hidden" name="option" value="1" />
 		<table width="100%"><tr><td class="vt" height="200" style="padding-left:200px;">
 		<div class="f16 b mb10">恭喜您！亲爱的会员，您已经注册成功。</div>
-		<div class="mb20"><span class="mr20"><span class="btn"><span><button type="submit">现在去完善资料</button></span></span></span><a href="./$db_bfn" class="s4" target="_blank">先去逛逛</a></div>
+		<div class="mb20"><span class="mr20"><span class="btn"><span><button type="submit">现在去完善资料</button></span></span></span><a href="./$db_bfn" class="s4">先去逛逛</a></div>
 		</td></tr></table>
 		</form>
 	</div>
@@ -552,7 +572,7 @@ EOT;
 }elseif($option==1){print<<<EOT
 -->
 <div id="breadCrumb">
-		<img src="$imgpath/$stylepath/thread/home-old.gif" align="absmiddle" />&nbsp;<a href="$db_bfn" title="$db_bbsname">$db_bbsname</a><em>&gt;</em>完善资料
+<img src="$imgpath/$stylepath/thread/home.gif" class="breadHome" /><em class="breadEm"></em><a href="$db_bfn" title="$db_bbsname">$db_bbsname</a><em>&gt;</em>完善资料
 </div>
 <div id="pw_content">
 	<div class="p20">
@@ -660,7 +680,7 @@ EOT;
 					<dt>&nbsp;</dt>
 					<dd>
 						<span class="btn"><span><button type="submit">下一步</button></span></span>
-						<span class="bt"><span><button type="submit" name="option">跳过</button></span></span>
+						<span class="bt"><span><button type="button" onclick="location.href='./$db_bfn';">跳过</button></span></span>
 					</dd>
 					<dd class="regTips"></dd>
 				</dl>
@@ -689,7 +709,7 @@ EOT;
 .profileFace li{float:left;cursor:pointer;width:62px;overflow:hidden;margin:0 10px 10px 0;}
 </style>
 <div id="breadCrumb">
-		<img src="$imgpath/$stylepath/thread/home-old.gif" align="absmiddle" />&nbsp;<a href="$db_bfn" title="$db_bbsname">$db_bbsname</a><em>&gt;</em>完善资料
+<img src="$imgpath/$stylepath/thread/home.gif" class="breadHome" /><em class="breadEm"></em><a href="$db_bfn" title="$db_bbsname">$db_bbsname</a><em>&gt;</em>完善资料
 </div>
 <div id="pw_content">
 	<div class="p20">
@@ -910,8 +930,10 @@ EOT;
 		</td>
 	</tr>
 </table>
-<div class="popBottom"><span class="btn2"><span><button type="button" onclick="unpermit();">同 意</button></span></span></div>
+<div class="popBottom"><span class="btn2"><span><button type="button" id="regbutton" onclick="unpermit();">同 意</button></span></span></div>
 <script language="JavaScript">
+getObj('regbutton').focus();
+
 function unpermit() {
 	getObj("registerclause").disabled = '';
 	getObj("registerclause").checked = 'checked';
@@ -935,7 +957,7 @@ EOT;
 EOT;
 if(!empty($_POST['step'])){print <<<EOT
 -->
-			<div class="p10" style="padding-top:0;"><div class="rightTip">提示：您输入的邮箱中 ($email) 已经有一个生成订单，您确定现在支付？<input type="hidden" name="submit" value="1" /></div></div>
+			<div class="p10" style="padding-top:0;"><div class="rightTip">提示：您输入的电子邮箱中 ($email) 已经有一个生成订单，您确定现在支付？<input type="hidden" name="submit" value="1" /></div></div>
 <!--
 EOT;
 }print <<<EOT
@@ -946,8 +968,8 @@ EOT;
 					<td><input class="input input_wa" type="text" name="invnum" value="$num" /></td>
 				</tr>
 				<tr>
-					<td style="padding-left:20px;">接收邀请码的邮箱</td>
-					<td><input class="input input_wa mb5" type="text" name="email" value="$email" /><p>我们会将邀请码发送到这个邮箱</p></td>
+					<td style="padding-left:20px;">接收邀请码的电子邮箱</td>
+					<td><input class="input input_wa mb5" type="text" name="email" value="$email" /><p>我们会将邀请码发送到这个电子邮箱</p></td>
 				</tr>
 			</table>
 			<div class="popBottom"><span class="btn2"><span><button type="submit">确认购买</button></span></span></div>

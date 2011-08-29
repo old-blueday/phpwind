@@ -10,9 +10,13 @@ li{list-style-type:none;}
 .app-del,.app-edit{width:16px;height:16px;overflow:hidden;text-indent:-2000em;}
 
 /*AA 阅读Start*/
-.aa_infos{color:#454545; line-height:24px;}
-.aa_infos li{min-height:24px; _height:24px; padding:3px 0; padding-left:70px; position:relative;}
-.aa_infos li em{position:absolute; top:3px; left:0; width:65px; overflow:hidden; text-align:right;font-style:normal; color:#888;}
+.aa_infos{padding:0 0 10px;border-top:1px solid #e4e4e4; font-size:12px;}
+.aa_infos li{line-height:28px;font-weight:500;color:#444444; list-style:none;border-bottom:1px solid #e4e4e4;padding-left:110px;}
+.aa_infos em{ font-style:normal;width:100px;float:left; text-align:right; font-weight:700;margin-left:-110px;background:#f7f7f7;}
+.aa_infos .t3{font-style:normal;padding-top:10px;}
+
+
+
 
 .aa_table_cost{border:1px solid #9fb7e7; margin-top:5px;}
 .aa_table_cost th,.aa_table_cost td{padding:3px 8px; line-height:24px;}

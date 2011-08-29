@@ -6,23 +6,25 @@ print <<<EOT
 EOT;
 if(empty($action)) {print <<<EOT
 -->
-<div class="nav3 mb10">
-	<ul class="cc">
-        <li class="current"><a href="javascript:;">静态配置</a></li>
-    </ul>
-</div>
 <div class="admin_info mb10">
     <h3 class="h1"><b>提示信息</b></h3>
-    <div class="legend"> 注意：开启门户模式静态化后，门户模式首页的底部导航条将被隐藏 </div>
+    <div class="legend">
+    	设置频道静态页面和其他功能页面的静态更新时间，时间越短则更新越频繁，但可能会影响效率<br />
+    	当前台模块缓存更新时间大于后台静态页更新时间，静态更新不生效
+     </div>
 </div>
 <form action="$basename" method="post" >
 <input type="hidden" name="step" value="2">
-<h2 class="h1"><span class="mr5 fl">配置门户模式静态化</span></h2>
+<h2 class="h1"><span class="mr5 fl">页面静态配置</span></h2>
 <div class="admin_table mb10">
 	<table width="100%">
     	<tr class="tr2">
-        	<td>静态页面更新时间[分]</td>
-        	<td><input type="text" class="input input_wa mr10" name="statictime" value="$area_statictime">0或留空则为不自动更新</td>
+        	<td>频道静态更新时间[分]</td>
+        	<td><input type="text" class="input input_wa mr10" name="statictime" value="$area_statictime">设置频道静态页面的更新时间，0或留空表示不更新</td>
+        </tr>
+        <tr class="tr2">
+        	<td>其他页面更新时间[分]</td>
+        	<td><input type="text" class="input input_wa mr10" name="portalstatictime" value="$db_portalstatictime">设置其他功能页面模块的静态更新时间，比如帖子阅读页广播台、论坛首页四格、广场等，0或留空表示不更新</td>
         </tr>
 	</table>
 </div>

@@ -1,0 +1,1012 @@
+<!--<?php
+include_once PrintEot('left');
+if ($adminitem == 'edit') {
+print <<<EOT
+-->
+<div class="nav3 mb10">
+	<ul class="cc">
+		<li class="current"><a href="$basename">编辑用户</a></li>
+		<li><a href="$jobUrl&adminitem=delete">删除用户</a></li>
+		<li><a href="$jobUrl&adminitem=add">添加用户</a></li>
+		<li><a href="$jobUrl&adminitem=usertitle">用户组头衔</a></li>
+		<li><a href="$jobUrl&adminitem=unituser">合并用户</a></li>
+		<li><a href="$jobUrl&adminitem=customcredit">自定义积分</a></li>
+	</ul>
+</div>
+<!--
+EOT;
+	if(empty($action)){print <<<EOT
+-->
+<div class="admin_info mb10">
+	<h3 class="h1"><b>提示信息</b></h3>
+	<div class="legend">主要功能:用户组管理，未验证会员审核，禁言组设置，会员编辑，(<font color=blue>版主设置</font>请到版块管理处)<ol><li>用户组管理:<br /><font color=blue><b>搜索会员并可设置会员为管理员.总版主.和其他特殊组.</b></font><br />在"用户组"处选择要进行操作的用户组，按搜索进入该用户组的管理，要去除该用户组的某个会员只需将他的系统头衔设为普通会员或其他用户组头衔</li><li>未验证会员审核:<br />当开启新注册会员需要管理员验证功能时可以对需要验证的新会员进行管理，在"用户组"处选择"验证会员"选项，按搜索进入验证会员的管理，要通过某个会员验证只需将此会员的系统头衔设为普通会员或其他用户组头衔</li><li>单个会员管理:<br />在"用户名包含"处填写会员ID（可以使用通配符进行模糊查找），按搜索进入对会员资料编辑<br />注:只有超管才能编辑管理员的资料</li></ol></div>
+</div>
+<form action="$basename&" method=post>
+<h2 class="h1"><b>编辑用户</b></h2>
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+	<tr class="tr1 vt">
+		<td class="td1">用户组</td>
+		<td class="td2">
+			<select class="select_wa" name=groupid>
+				<option value=''>不限制</option>
+				$groupselect
+			</select>
+		</td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">用户名包含</td>
+		<td class="td2"><input type="text" class="input input_wa mr20" maxlength=14 name="schname" />可使用通配符 "*"<!-- <input type="checkbox" value="1" name="vaguename" /> 模糊搜索 --></td>
+		</tr>
+	<tr class="tr1 vt">	
+		<td class="td1">用户UID</td>
+		<td class="td2"><input type="text" class="input input_wa mr20" maxlength=14 name="schuid" />可使用通配符 "*"<!-- <input type="checkbox" value="1" name="vaguename" /> 模糊搜索 --></td>
+		</tr>
+	<tr class="tr1 vt">
+		<td class="td1">电子邮箱</td>
+		<td class="td2"><input type="text" class="input input_wa mr20" name="schemail" />可使用通配符 "*"<!-- <input type="checkbox" value="1" name="vagueemail" /> 模糊搜索 --></td>
+
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">最后登录IP</td>
+		<td class="td2"><input type="text" class="input input_wa mr20" name="userip" />可使用通配符 "*"</td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">注册时间大于</td>
+		<td class="td2">
+			<select class="select_wa" name=regdate>
+				<option value="all">不限制</option>
+				<option value="86400">一天</option>
+				<option value="172800">二天</option>
+				<option value="604800">一星期</option>
+				<option value="2592000">一个月</option>
+				<option value="7776000">三个月</option>
+				<option value="15552000">六个月</option>
+				<option value="31536000">一年</option>
+			</select>
+		</td>
+	</tr>
+	<tr class="tr1 vt">
+	<td class="td1">多久未登录</td>
+	<td class="td2">
+		<select class="select_wa" name=schlastvisit>
+			<option value="all">不限制</option>
+			<option value="86400">一天</option>
+			<option value="172800">二天</option>
+			<option value="604800">一星期</option>
+			<option value="2592000">一个月</option>
+			<option value="7776000">三个月</option>
+			<option value="15552000">六个月</option>
+			<option value="31536000">一年</option>
+		</select>
+	</td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">排序</td>
+		<td class="td2">
+			<select class="select_wa fl mr20" name=orderway>
+				<option value="username">用户名</option>
+				<option value="regdate">注册时间</option>
+				<option value="lastpost">最后发表</option>
+				<option value="lastvisit">最后登录</option>
+				<option value="postnum">发帖</option>
+			</select>
+			<ul class="list_A list_80 fl">
+				<li><input type="radio" size="5" name="asc" value='' checked="checked" />正序</li>
+				<li><input type="radio" size="5" name="asc" value='DESC' />倒序</li>
+			</ul>
+	</td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">每页显示行数</td>
+		<td class="td2"><input type="text" class="input input_wa" name="lines" value=100 /></td>
+
+	</tr>
+</table>
+</div>
+<div class="tac mb10">
+	<span class="btn"><span><button type="submit">提 交</button></span></span>
+</div>
+<input type="hidden" name=action value="search">
+</form>
+<!--
+EOT;
+	}elseif($action == 'search'){print <<<EOT
+-->
+<div class="admin_info mb10">
+	<h3 class="h1"><b>编辑用户</b></h3>
+	<div class="legend"><ol><li>此功能可以批量修改会员头衔 </li><li>此功能设置为禁言组的用户将被<font color=blue>永久禁言</font></li></ol></div>
+</div>
+<div class="mb10 cc">$pages</div>
+<form action="$basename&" method="post">
+<input type="hidden" name="action" value="editgroup">
+<h2 class="h1"><b>用户列表</b></h2>
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+	<tr class="tr2 td_bgB">
+		<td width="30">ID</td>
+		<td width="70">用户名</td>
+		<td width="110">电子邮箱</td>
+		<td width="150"><p class="lh_18" title="所属用户组">所属用户组</p></td>
+		<td width="110">注册时间</td>
+		<td width="110">最后登录</td>
+		<td width="30">发帖</td>
+		<td width="100">IP</td>
+		<td width="">操作</td>
+	</tr>
+<!--
+EOT;
+foreach($schdb as $key=>$sch){
+if(!$sch[username])continue;
+$key+=($page-1)*$lines+1;
+$uid=$sch[uid];
+print <<<EOT
+-->
+	<tr class="tr1 vt">
+		<td class="td2">$key</td>
+		<td class="td2"><a href="{$db_userurl}$sch[uid]" target=_blank>$sch[username]</a></td>
+		<td class="td2"><p class="lh_18" title="$sch[email]">$sch[email]</p></td>
+		<td class="td2"><select name='gid[$uid]' class="select">$sch[groupselect]</select></td>
+		<td class="td2">$sch[regdate]</td>
+		<td class="td2">$sch[lastvisit]</td>
+		<td class="td2">$sch[postnum]</td>
+		<td class="td2">$sch[onlineip]</td>
+		<td class="td2"><a title="编辑" href="$basename&action=edit&uid=$sch[uid]">[编辑]</a></td>
+	</tr>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+</table>
+</div>
+<div class="tac mb10">
+	<span class="btn"><span><button type="submit">提 交</button></span></span>
+</div>
+</form>
+<!--
+EOT;
+	}elseif($action=='edit'){print <<<EOT
+-->
+<form action="$basename&" method="post" onsubmit="return setFaceLen()">
+<h2 class="h1"><b>编辑用户</b></h2>
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+	<tr class="tr1 vt">
+		<td class="td1">系统头衔</td>
+		<td class="td2"><select class="select_wa" name=groupid>$groupselect</select></td>
+		 <td class="td2"><div class="help_a">所属用户组</div></td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">附加用户组头衔</td>
+		<td class="td2">$usergroup</td>
+		<td class="td2"><div class="help_a">勾选会员的附加用户组头衔。不选则表示该会员无附加头衔</div></td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">用户名</td>
+		<td class="td2"><input type="text" class="input input_wa" name="username" value="$username" /></td>
+		<td class="td2"><div class="help_a">当前会员的用户名。<font color=blue>如无特殊需要请不要修改</font></div></td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">新密码</td>
+		<td class="td2"><input type="text" class="input input_wa" name="password" value='' /></td>
+	<td class="td2"><div class="help_a">输入想要替换的密码。<font color=blue>如不更改请留空</font></div></td></tr>
+	<tr class="tr1 vt">
+		<td class="td1">确认密码</td>
+		<td class="td2"><input type="text" class="input input_wa" name="check_pwd" /></td>
+		<td class="td2"><div class="help_a">再次输入密码。<font color=blue>如不更改请留空</font></div></td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">安全问题</td>
+		<td class="td2">
+			<select name="question" class="select_wa" onchange="showcustomquest(this.value)">
+				<option value="-2">不修改安全问题和答案</option><option value="0">无安全问题</option>
+<option value="1">我爸爸的出生地</option>
+<option value="2">我妈妈的出生地</option>
+<option value="3">我的小学校名</option>
+<option value="4">我的中学校名</option>
+<option value="5">我最喜欢的运动</option>
+<option value="6">我最喜欢的歌曲</option>
+<option value="7">我最喜欢的电影</option>
+<option value="8">我最喜欢的颜色</option>
+<option value="-1">自定义问题</option>
+			</select>
+			<input id="customquest" style="display:none" type="text" class="input input_wa" name="customquest" />
+		</td><td class="td2"><div class="help_a">可修改会员的安全问题。不修改时，请将答案留空</div></td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">您的答案</td>
+		<td class="td2"><input type="text" name="answer" class="input input_wa" /></td>
+		<td class="td2"><div class="help_a">安全问题不修改时，请留空</div></td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">电子邮箱</td>
+		<td class="td2">
+			<input type="text" class="input input_wa mr10" name="email"value='$email'>
+			<input type=checkbox name=publicmail value=1 $ifpublicmail />公开电子邮箱
+		</td><td class="td2"><div class="help_a">填写您常用的电子邮件地址</div></td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">接收邮件</td>
+		<td class="td2">
+			<ul class="list_A list_80 cc">
+				<li><input type=radio name='receivemail' value='1' $email_open />开启</li>
+				<li><input type=radio name='receivemail' value='0' $email_close />关闭</li>
+			</ul>
+		</td><td class="td2"><div class="help_a">开启后，前台会员信息栏处将直接显示邮件发送入口</div></td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">注册日期</td>
+		<td class="td2"><input type="text" class="input input_wa" name=regdate value='$regdate' /></td>
+		<td class="td2"><div class="help_a">格式:(YYYY-MM-DD HH:II，如:1983-12-20 00:00)</div></td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">最后登录</td>
+		<td class="td2">$lastvisit</td>
+		<td class="td2">&nbsp;</td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">邮件激活</td>
+		<td class="td2"><input type="text" class="input input_wa" name=yz value='$yz' /></td>
+		<td class="td2"><div class="help_a">1表示此会员已被激活。如果站点没有开启邮件激活，那么此处默认为1</div></td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">IP</td>
+		<td class="td2"><input type="text" class="input input_wa" name=userip value='$onlineip' /></td>
+		<td class="td2"><div class="help_a">此会员最后登录的IP</div></td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">头像</td>
+		<td class="td2">
+        	<ul class="list_A mb5">
+            	<li><input type="radio" name="facetype" value="1" onclick="CkFaceType(this.value)">系统头像</li>
+                <li><input type="radio" name="facetype" value="2" onclick="CkFaceType(this.value)">头像链接</li>
+                <li><input type="radio" name="facetype" value="3" onclick="CkFaceType(this.value)" $disabled>头像上传</li>
+            </ul>
+            <div id="face1" style="display:none;">
+            	<select name="proicon" class="select_wa">{$faces}</select>
+            </div>
+            <div id="face2" style="display:none;">
+            	<table>
+                	<tr>
+                		<td><!--头像链接--></td>
+                        <td>宽:</td>
+                        <td>高:</td>
+                    </tr>
+                    <tr>
+                		<td><input type="text" class="input input_wa mr10" id="httpurl_url" name="httpurl[0]" value='$httpurl'></td>
+                        <td><input type=text size="5" name="httpurl[1]" class="input mr10" value='$iconwidth'></td>
+                        <td><input type=text size="5" name="httpurl[2]" class="input" value='$iconheight'></td>
+                    </tr>
+                </table>
+                <input type="hidden" id="httpurl_w" name="httpurl[3]" />
+                <input type="hidden" id="httpurl_h" name="httpurl[4]" />
+            </div>
+            <div id="face3" style="display:none;">
+                <img src="{$iconurl}">
+                <input type="checkbox" name="delupload" value="$iconfile" />删
+            </div>
+		</td><td class="td2"><div class="help_a">系统头衔:填写系统头像文件名<br />头像链接:必须以 http开头并设置该头像宽.高<br />头像上传:请到前台操作<br />不使用请留空</div></td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">发帖数</td>
+		<td class="td2"><input type="text" class="input input_wa" name="postnum" value="$postnum" /></td>
+	<td class="td2"><div class="help_a">会员历史发帖数量</div></td></tr>
+	<tr class="tr1 vt">
+		<td class="td1">{$db_rvrcname}</td>
+		<td class="td2"><input type="text" class="input input_wa" name="rvrc" value="$rvrc" /></td>
+	<td class="td2"><div class="help_a">会员拥有的{$db_rvrcname}数量</div></td></tr>
+	<tr class="tr1 vt">
+		<td class="td1">{$db_moneyname}</td>
+		<td class="td2"><input type="text" class="input input_wa" name="money" value="$money" /></td>
+	<td class="td2"><div class="help_a">会员拥有的{$db_moneyname}数量</div></td></tr>
+	<tr class="tr1 vt">
+		<td class="td1">活期存款</td>
+		<td class="td2"><input type="text" class="input input_wa" name="deposit" value="$deposit" /></td>
+	<td class="td2"><div class="help_a">会员拥有的活期存款数量</div></td></tr>
+	<tr class="tr1 vt">
+		<td class="td1">定期存款</td>
+		<td class="td2"><input type="text" class="input input_wa" name="ddeposit" value="$ddeposit" /></td>
+	<td class="td2"><div class="help_a">会员拥有的定期存款数量</div></td></tr>
+	<tr class="tr1 vt">
+		<td class="td1">$db_currencyname</td>
+		<td class="td2"><input type="text" class="input input_wa" name="currency" value="$currency" /></td><td class="td2"><div class="help_a">会员拥有的{$db_currencyname}数量</div></td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">{$db_creditname}</td>
+		<td class="td2"><input type="text" class="input input_wa" name="credit" value="$mdcredit" /></td>
+	<td class="td2"><div class="help_a">会员拥有的{$db_creditname}数量</div></td></tr>
+<!--
+EOT;
+foreach($_CREDITDB as $key => $value){print <<<EOT
+-->
+	<tr class="tr1 vt">
+		<td class="td1">$value[0]</td>
+		<td class="td2"><input type="text" class="input input_wa" name="creditdb[$key]" value="$custom_credits[$key]" /></td>
+		<td class="td2"><div class="help_a">会员拥有的{$value[0]}数量</div></td>
+	</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+	<tr class="tr1 vt">
+		<td class="td1">在线时间[小时]</td>
+		<td class="td2"><input type="text" class="input input_wa" name="onlinetime" value="$onlinetime" /></td><td class="td2"><div class="help_a">会员的历史在线时间</div></td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">个人主页</td>
+		<td class="td2"><input type="text" class="input input_wa" name="site" value="$site" /></td>
+	<td class="td2"><div class="help_a"></div></td></tr>
+	<tr class="tr1 vt">
+		<td class="td1">来自</td>
+		<td class="td2"><input type="text" class="input input_wa" name="location" value="$location" /></td><td class="td2"><div class="help_a"></div></td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">QQ</td>
+		<td class="td2"><input type="text" class="input input_wa" name="oicq" value="$oicq" /></td>
+	<td class="td2"><div class="help_a"></div></td></tr>
+	<tr class="tr1 vt">
+		<td class="td1">ICQ</td>
+		<td class="td2"><input type="text" class="input input_wa" name="icq" value="$icq" /></td>
+	<td class="td2"><div class="help_a"></div></td></tr>
+	<tr class="tr1 vt">
+		<td class="td1">MSN</td>
+		<td class="td2"><input type="text" class="input input_wa" name="msn" value="$msn" /></td>
+	<td class="td2"><div class="help_a"></div></td></tr>
+	<tr class="tr1 vt">
+		<td class="td1">Yahoo</td>
+		<td class="td2"><input type="text" class="input input_wa" name="yahoo" value="$yahoo" /></td>
+	<td class="td2"><div class="help_a"></div></td></tr>
+	<tr class="tr1 vt">
+		<td class="td1">个性签名</td>
+		<td class="td2"><input type="text" class="input input_wa" maxlength="75" name="honor" value="$honor" /></td>
+	<td class="td2"><div class="help_a"></div></td></tr>
+	<tr class="tr1 vt">
+		<td class="td1">性别</td>
+		<td class="td2">
+			<select name="gender" class="select_wa">
+				<option value="0" $sexselect[0]>保密</option>
+				<option value="1" $sexselect[1]>男</option>
+				<option value="2" $sexselect[2]>女</option>
+			</select>
+		</td><td class="td2"><div class="help_a"></div></td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">生日</td>
+		<td class="td2">
+			<select name="year">
+				<option value="0000"></option>
+<!--
+EOT;
+for($i=1960;$i<2005;$i++){
+print <<<EOT
+-->
+				<option value="$i" $yearslect[$i]>$i</option>
+<!--
+EOT;
+}print <<<EOT
+-->
+			</select>&nbsp;年
+			<select name="month">
+				<option value="00"></option>
+<!--
+EOT;
+for($i=1;$i<13;$i++){print <<<EOT
+-->
+				<option value="$i" $monthslect[$i]>$i</option>
+<!--
+EOT;
+}print <<<EOT
+-->
+			</select>&nbsp;月
+			<select name="day">
+				<option value="00"></option>
+<!--
+EOT;
+for($i=1;$i<32;$i++){print <<<EOT
+-->
+				<option value="$i" $dayslect[$i]>$i</option>
+<!--
+EOT;
+}print <<<EOT
+-->
+			</select>&nbsp;日
+		</td><td class="td2"><div class="help_a"></div>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">帖子签名</td>
+		<td class="td2"><textarea class="textarea" name="signature">$signature</textarea></td>
+	<td class="td2"><div class="help_a"> </div></td></tr>
+		<tr class="tr1 vt"><td class="td1">自我简介</td>
+		<td class="td2"><textarea name="introduce" class="textarea">$introduce</textarea></td>
+	<td class="td2"><div class="help_a"> </div></td></tr>
+		<tr class="tr1 vt"><td class="td1">消息拒绝列表</td>
+		<td class="td2"><textarea name="banpm" class="textarea">$banpm</textarea></td>
+	<td class="td2"><div class="help_a"> </div></td></tr>
+</table>
+</div>
+<!--
+EOT;
+if($customfield){print <<<EOT
+-->
+<h2 class="h1"></h2>
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+<!--
+EOT;
+foreach($customfield as $key=>$val){
+$field="field_".(int)$val[id];
+if($val[type]=='1'){
+$field_type="<input type=\"text\" size=\"30\" name=\"$field\" value=\"{$$field}\">";
+}elseif($val[type]=='2'){
+$field_type="<textarea name=\"$field\" rows=\"5\" cols=\"50\">{$$field}</textarea>";
+}elseif($val[type]=='3'){
+$field_type="<select name=\"$field\">";
+$options=explode("\n",$val[options]);
+foreach($options as $k=>$v){
+list($k,$v)=explode('=',$v);
+$type_sel=$$field==$k?'selected':'';
+$field_type.="<option value=\"$k\" $type_sel>$v</option>";
+}$field_type.="</select>";
+}print <<<EOT
+-->
+	<tr class="tr1 vt">
+		<td class="td1">$val[title]<br>$val[descrip]</td>
+		<td class="td2">{$field_type}</td>
+	</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+</table>
+</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+<div class="tac mb10">
+	<span class="btn"><span><button type="submit">提 交</button></span></span>
+</div>
+<input type="hidden" name="action" value="edit" />
+<input type="hidden" name="uid" value="$temUid" />
+<input type="hidden" name="step" value="2" />
+</form>
+<script language="JavaScript">
+function showcustomquest(qid){
+  getObj("customquest").style.display = qid==-1 ? '' : 'none';
+}
+function CkFaceType(value){
+	var facetype = document.getElementsByName('facetype');
+	for (i=0;i<facetype.length;i++) {
+		if (facetype[i].value == value) {
+			facetype[i].checked = true;
+			document.getElementById('face' + value).style.display = '';
+		} else {
+			document.getElementById('face' + facetype[i].value).style.display = 'none';
+		}
+	}
+}
+function setFaceLen() {
+	var v = 0;
+	var facetype = document.getElementsByName('facetype');
+	for (i = 0; i < facetype.length; i++) {
+		if (facetype[i].checked === true) {
+			v = facetype[i].value;break
+		}
+	}
+	if (v == 2) {
+		var img = new Image();
+		img.src = getObj('httpurl_url').value;
+		getObj('httpurl_w').value = img.width;
+		getObj('httpurl_h').value = img.height;
+	}
+	return true;
+}
+CkFaceType('$icontype');
+</script>
+<!--
+EOT;
+	}
+}elseif($adminitem == 'add'){
+	print <<<EOT
+-->
+<div class="nav3 mb10">
+	<ul class="cc">
+		<li><a href="$jobUrl&adminitem=edit">编辑用户</a></li>
+		<li><a href="$jobUrl&adminitem=delete">删除用户</a></li>
+		<li class="current"><a href="$basename">添加用户</a></li>
+		<li><a href="$jobUrl&adminitem=usertitle">用户组头衔</a></li>
+		<li><a href="$jobUrl&adminitem=unituser">合并用户</a></li>
+		<li><a href="$jobUrl&adminitem=customcredit">自定义积分</a></li>
+	</ul>
+</div>
+<div class="admin_info mb10">
+	<h3 class="h1"><b>提示信息</b></h3>
+	<div class="legend">使用此功能可以在开启<font color=blue>禁止注册新用户</font>功能时,由管理员添加特定用户   <br />超管(<font color=blue>站点创始人</font>)可以使用此功能<font color=blue>添加站点管理员</font>(普通管理员无此权限)</div>
+</div>
+<form action="$basename&" method=post>
+<h2 class="h1"><b>添加用户</b></h2>
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+	<tr class="tr1 vt">
+		<td class="td1">用户名</td>
+		<td class="td2"><input type="text" class="input input_wa" maxlength="14" name="username"></td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">密&#160;&#160;码</td>
+		<td class="td2"><input type="password" class="input input_wa" name="password"></td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">电子邮箱</td>
+		<td class="td2"><input type="text" class="input input_wa" name="email"></td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">用户组</td>
+		<td class="td2"><select class="select_wa" name="groupid">$groupselect_add</select></td>
+	</tr>
+</table>
+</div>
+<div class="tac mb10">
+	<span class="btn"><span><button type="submit">提 交</button></span></span>
+</div>
+<input type="hidden" name="action" value="addnew" />
+</form>
+
+<!--
+EOT;
+}elseif($adminitem == 'usertitle'){print <<<EOT
+-->
+<div class="nav3 mb10">
+	<ul class="cc">
+		<li><a href="$jobUrl&adminitem=edit">编辑用户</a></li>
+		<li><a href="$jobUrl&adminitem=delete">删除用户</a></li>
+		<li><a href="$jobUrl&adminitem=add">添加用户</a></li>
+		<li class="current"><a href="$basename">用户组头衔</a></li>
+		<li><a href="$jobUrl&adminitem=unituser">合并用户</a></li>
+		<li><a href="$jobUrl&adminitem=customcredit">自定义积分</a></li>
+	</ul>
+</div>
+<!--
+EOT;
+	if(empty($action)){print <<<EOT
+-->
+<div class="admin_info mb10">
+	<h3 class="h1"><b>提示信息</b></h3>
+	<div class="legend">用户组头衔管理<br />此功能可查看用户的附加用户组头衔</div>
+</div>
+<form action="$basename&" method=post>
+<input type="hidden" name="action" value="groups">
+<h2 class="h1"><b>用户组头衔管理</b></h2>
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+	<tr class="tr1 vt">
+		<td class="td1">附加用户组头衔</td>
+		<td class="td2">
+			<select class="select_wa" name="groupid">
+				<option value=''>不限制</option>
+				$g_sel
+			</select>
+		</td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">用户名包含</td>
+		<td class="td2"><input type="text" class="input input_wa" maxlength=14 name="schname"></td>
+	</tr>
+</table>
+</div>
+<div class="tac mb10">
+	<span class="btn"><span><button type="submit">提 交</button></span></span>
+</div>
+</form>
+<!--
+EOT;
+	}elseif($action == 'groups'){
+print <<<EOT
+-->
+<h2 class="h1"><b>用户列表</b></h2>
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+	<tr class="tr2 td_bgB">
+		<td width="24">ID</td>
+		<td width="80">用户名</td>
+		<td width="220">所属用户组</td>
+		<td>勾选会员的附加用户组头衔。不选则表示该会员无附加头衔</td>
+		<td width="50">操作</td>
+	</tr>
+<!--
+EOT;
+$id=0;
+foreach($schdb as $key => $value){
+$id++;
+print <<<EOT
+-->
+	<tr class="tr1 vt">
+		<td class="td2">$id</td>
+		<td class="td2"><a href="{$db_userurl}$value[uid]" target=_blank>$value[username]</a></td>
+		<td class="td2">$value[system]</td>
+		<td class="td2">$value[gtitle]</td>
+		<td class="td2"><a href="$jobUrl&adminitem=edit&action=edit&uid=$value[uid]">编辑</a></td>
+	</tr>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+</table>
+</div>
+<!--
+EOT;
+	}
+}elseif($adminitem == 'unituser'){
+print <<<EOT
+-->
+<div class="nav3 mb10">
+	<ul class="cc">
+		<li><a href="$jobUrl&adminitem=edit">编辑用户</a></li>
+		<li><a href="$jobUrl&adminitem=delete">删除用户</a></li>
+		<li><a href="$jobUrl&adminitem=add">添加用户</a></li>
+		<li><a href="$jobUrl&adminitem=usertitle">用户组头衔</a></li>
+		<li class="current"><a href="$basename">合并用户</a></li>
+		<li><a href="$jobUrl&adminitem=customcredit">自定义积分</a></li>
+	</ul>
+</div>
+<h2 class="h1">合并用户</h2>
+<form action="$basename&" method="post">
+<input type="hidden" name="action" value="unit">
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+    <tr class="tr2 td_bgB">
+		<td colspan="2">将原用户的积分、帖子数据合并到目标用户中，同时删除原用户的记录</td>
+		<td class="td2"><div class="help_a"> </div></td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">原用户数字ID</td>
+		<td class="td2"><input class="input input_wb" type="text" name="uids" /></td>
+			<td class="td2"><div class="help_a">原用户数字ID(多个ID用英文半角逗号“,”分隔)</div></td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">目标用户数字ID</td>
+		<td class="td2"><input class="input input_wa" type="text" name="newuid" /></td>
+			<td class="td2"><div class="help_a"> </div></td>
+	</tr>
+</table>
+</div>
+<div class="tac mb10">
+	<span class="btn"><span><button type="submit">提 交</button></span></span>
+</div>
+</form>
+<!--
+EOT;
+}elseif($adminitem == 'delete'){
+print <<<EOT
+-->
+<div class="nav3 mb10">
+	<ul class="cc">
+		<li><a href="$jobUrl&adminitem=edit">编辑用户</a></li>
+		<li class="current"><a href="$basename">删除用户</a></li>
+		<li><a href="$jobUrl&adminitem=add">添加用户</a></li>
+		<li><a href="$jobUrl&adminitem=usertitle">用户组头衔</a></li>
+		<li><a href="$jobUrl&adminitem=unituser">合并用户</a></li>
+		<li><a href="$jobUrl&adminitem=customcredit">自定义积分</a></li>
+	</ul>
+</div>
+<!--
+EOT;
+if(empty($action)){print <<<EOT
+-->
+<div class="admin_info mb10">
+	<h3 class="h1"><b>提示信息</b></h3>
+	<div class="legend">删除符合条件的用户,用于清理站点冗余数据,此操作不可恢复,请谨慎使用！<br />删除项目中的“其他”，包括评分、收藏、朋友等其他行为记录。</div>
+</div>
+<form action="$basename&" method="post">
+  <h3 class="h1"><b>删除用户</b></h3>
+  <div class="admin_table mb10">
+  <table width=100% cellspacing="0" cellpadding="0">
+    <tr class="tr1 vt">
+      <td class="td1">用户组</td>
+      <td class="td2"><select name="groupid" class="select_wa">
+      	<option value=''>不限制</option>
+          $groupselect
+        </select></td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">用户名包含</td>
+      <td class="td2"><input type="text" class="input input_wa mr20" maxlength=16 name="schname">  可使用通配符 "*"</td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">电子邮箱</td>
+      <td class="td2"><input type="text" class="input input_wa mr20" maxlength=64 name="schemail">
+        可使用通配符 "*"</td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">发帖数小于[帖]</td>
+      <td class="td2"><input type="text" class="input input_wa mr20" maxlength=10 name="postnum">
+      </td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">在线时间小于[时]</td>
+      <td class="td2"><input type="text" class="input input_wa mr20" maxlength=10 name="onlinetime">
+      </td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">根据用户IP查找</td>
+      <td class="td2"><input type="text" class="input input_wa mr20" maxlength=15 name="userip">
+        可使用通配符 "*"</td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">注册时间大于</td>
+      <td class="td2"><select name="regdate" class="select_wa">
+          <option value="all">不限制</option>
+          <option value="86400">一天</option>
+          <option value="172800">二天</option>
+          <option value="604800">一星期</option>
+          <option value="2592000">一个月</option>
+          <option value="7776000">三个月</option>
+          <option value="15552000">六个月</option>
+          <option value="31536000">一年</option>
+        </select></td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">多久未登录</td>
+      <td class="td2"><select name="schlastvisit" class="select_wa">
+          <option value="all">不限制</option>
+          <option value="86400">一天</option>
+          <option value="172800">二天</option>
+          <option value="604800">一星期</option>
+          <option value="2592000">一个月</option>
+          <option value="7776000">三个月</option>
+          <option value="15552000">六个月</option>
+          <option value="31536000">一年</option>
+        </select></td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">排序方式</td>
+      <td class="td2"><select name="orderway" class="select_wa mr20 fl">
+          <option value='lastvisit' checked>最后登录</option>
+          <option value='regdate'> 注册时间</option>
+          <option value='postnum'> 发帖</option>
+        </select>
+       			<ul class="list_80 fl list_A">
+                	<li><input type="radio" size="5" name="asc" value="ASC" checked="checked">正序</li>
+                    <li><input type="radio" size="5" name="asc" value="DESC">倒序</li>
+                </ul>
+        </td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">每页显示行数</td>
+      <td class="td2"><input type="text" class="input input_wa mr20" name="lines" value="30"><input type="checkbox" name="direct" value="1" onclick="deldirect(this.form,'info3','每页显示行数');">
+        直接删除(直接删除符合条件的项目)</td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">删除项目</td>
+      <td class="td2">
+      	<ul class="list_A list_120">
+            <li><input type="checkbox" name="item[]" value="1">用户信息</li>
+            <li><input type="checkbox" name="item[]" value="2">用户主题</li>
+            <li><input type="checkbox" name="item[]" value="4">用户回复</li>
+            <li><input type="checkbox" name="item[]" value="8">用户消息</li>
+            <li><input type="checkbox" name="item[]" value="16">用户相册</li>
+           	<li><input type="checkbox" name="item[]" value="32">用户日志</li>
+            <li><input type="checkbox" name="item[]" value="64">用户新鲜事</li>
+						<li><input type="checkbox" name="item[]" value="128">用户评论</li>
+            <li><input type="checkbox" name="item[]" value="256">其他</li>
+        </ul>
+		</td>
+    </tr>
+  </table>
+  </div>
+  	<div class="mb10 tac">
+    <span class="btn"><span><button type="submit">提 交</button></span></span>
+    </div>
+  <input type="hidden" class="btn" name="action" value="del">
+</form>
+<!--
+EOT;
+} if($action=='del' && empty($step)){print <<<EOT
+-->
+<form action="$basename&" method="post" name="FORM" id="superdel_member">
+  <input type="hidden" name="action" value="$action">
+  <input type="hidden" name="step" value="2">
+  <input type="hidden" name="groupid" value="$groupid">
+  <input type="hidden" name="schname" value="$schname">
+  <input type="hidden" name="schemail" value="$schemail">
+  <input type="hidden" name="postnum" value="$postnum">
+  <input type="hidden" name="onlinetime" value="$onlinetime">
+  <input type="hidden" name="regdate" value="$regdate">
+  <input type="hidden" name="schlastvisit" value="$schlastvisit">
+  <input type="hidden" name="orderway" value="$orderway">
+  <input type="hidden" name="asc" value="$asc">
+  <input type="hidden" name="lines" value="$lines">
+  <input type="hidden" name="page" value="$page">
+  <input type="hidden" name="sphinx" value="$sphinx">
+  <input type="hidden" name="sphinxRange" value="$sphinxRange">
+  <h2 class="h1"><b>用户列表</b></h2>
+  <div class="admin_table mb10">
+	<table cellpadding="0" cellspacing="0" width="100%">
+    <tr class="tr2 vt td_bgB">
+	  <td width="50"><span class="cp" onclick="CheckAll(document.FORM)">全选</span></td>
+      <td width="85">用户名</td>
+      <td width="85">电子邮箱</td>
+      <td>系统头衔</td>
+      <td width="85">IP</td>
+      <td>注册时间</td>
+      <td>最后登录</td>
+      <td>发帖</td>
+    </tr>
+<!--
+EOT;
+if (!empty($schdb)) {
+foreach($schdb as $key=>$sch){
+if(!$sch[username])continue;
+print <<<EOT
+-->
+    <tr class="tr1 vt">
+      <td class="td2"><input type="checkbox" name="delid[]" value="$sch[uid]" checked>
+      <td class="td2"><a href="{$db_userurl}$sch[uid]" target="_blank">$sch[username]</a></td>
+      <td class="td2">$sch[email]</td>
+      <td class="td2">$sch[group]</td>
+      <td class="td2">$sch[onlineip]</td>
+      <td class="td2">$sch[regdate]</td>
+      <td class="td2">$sch[lastvisit]</td>
+      <td class="td2">$sch[postnum]</td>
+      </td>
+    </tr>
+<!--
+EOT;
+}}else{print <<<EOT
+-->
+<tr><td class="p10" colspan="8"><div class="admin_tips">啊哦，没有你要的信息！</div></td></tr>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+    <tr class="tr1 vt">
+       <td class="td2" colspan="9">
+			 	<p class="mb20 fl mr5" style="line-height:25px;">删除项目</p>
+					<ul class="list_A list_120" style="width:600px;">
+						<li><label><input type="checkbox" name="item[]" value="1" $check_0>用户信息</label></li>
+						<li><label><input type="checkbox" name="item[]" value="2" $check_1>用户主题</label></li>
+						<li><label><input type="checkbox" name="item[]" value="4" $check_2>用户回复</label></li>
+						<li><label><input type="checkbox" name="item[]" value="8" $check_3>用户消息</label></li>
+						<li><label><input type="checkbox" name="item[]" value="16">用户相册</label></li>
+						<li><label><input type="checkbox" name="item[]" value="32">用户日志</label></li>
+						<li><label><input type="checkbox" name="item[]" value="64">用户新鲜事</label></li>
+						<li><label><input type="checkbox" name="item[]" value="128">用户评论</label></li>
+						<li><label><input type="checkbox" name="item[]" value="256">其他</label></li>
+					</ul>
+					<div style="padding-top:5px;"><span class="bt2"><span><button type="button" onclick="CheckAll2(document.FORM, 1, 'item')">全选</button></span></span></div>
+        </td>
+    </tr>
+  </table>
+  </div>
+  <div class="cc mb10">$pages</div>
+  <div class="mt5 mb10 tac">
+		<span class="bt"><span><button type="button" onclick="CheckAll2(document.FORM, 0, 'delid')">全 选</button></span></span>
+        <span class="btn"><span><button type="submit">提 交</button></span></span>
+  </div>
+</form>
+<script type="text/javascript">
+var ifcheck = [true, true];
+function CheckAll2(form, n, match) {
+	for (var i = 0; i < form.elements.length; i++) {
+		var e = form.elements[i];
+		if (e.type == 'checkbox' && (typeof match == 'undefined' || e.name.match(match))) {
+			e.checked = ifcheck[n];
+		}
+	}
+	ifcheck[n] = ifcheck[n] == true ? false : true;
+}
+</script>
+<!--
+EOT;
+}
+}elseif($adminitem == 'customcredit'){
+print <<<EOT
+-->
+<div class="nav3 mb10">
+	<ul class="cc">
+		<li><a href="$jobUrl&adminitem=edit">编辑用户</a></li>
+		<li><a href="$jobUrl&adminitem=delete">删除用户</a></li>
+		<li><a href="$jobUrl&adminitem=add">添加用户</a></li>
+		<li><a href="$jobUrl&adminitem=usertitle">用户组头衔</a></li>
+		<li><a href="$jobUrl&adminitem=unituser">合并用户</a></li>
+		<li class="current"><a href="$basename">自定义积分</a></li>
+	</ul>
+</div>
+<div class="admin_info mb10">
+	<h3 class="h1"><b>提示信息</b></h3>
+	<div class="legend"><br />可以查看和管理用户自定义积分</div>
+</div>
+<!--
+EOT;
+if (!$action){print <<<EOT
+-->
+<form action="$basename&" method="post">
+<input type="hidden" name="action" value="edit" />
+<h2 class="h1"><b>自定义积分管理</b></h2>
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+<tr class="tr1 vt">
+	<td class="td1">用户名</td>
+	<td class="td2"><input class="input input_wa" type="text" name="username" /></td>
+	</tr>
+</table>
+</div>
+<div class="mb10 tac">
+	<span class="btn"><span><button type="submit">提 交</button></span></span>
+</div>
+</form>
+<div class="cc mb10">$pages</div>
+<h2 class="h1"><b>自定义积分管理</b></h2>
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+	<tr class="tr2 td_bgB">
+		<td width="24">ID</td>
+		<td width="80">用户名</td>
+		<td width="120">自定义积分名称</td>
+		<td width="100">自定义积分值</td>
+		<td>操作</td>
+	</tr>
+<!--
+EOT;
+$id=($page-1)*$db_perpage;
+foreach($creditdb as $key => $value){
+if($value[username] && $value[name]){
+$id++;
+print <<<EOT
+-->
+	<tr class="tr1 vt">
+		<td class="td2">$id</td>
+		<td class="td2">$value[username]</td>
+		<td class="td2">$value[name]</td>
+		<td class="td2">$value[value]</td>
+		<td class="td2"><a title="编辑" href="$basename&action=edit&uid=$value[uid]">编辑</a></td>
+	</tr>
+<!--
+EOT;
+}}print <<<EOT
+-->
+</table>
+</div>
+<div class="mb10 cc">$pages</div>
+<!--
+EOT;
+}elseif($action=='edit'){print <<<EOT
+-->
+<form action="$basename&" method="post">
+<input type="hidden" name="action" value="edit">
+<input type="hidden" name="step" value="2">
+<input type="hidden" name="uid" value="$rt[uid]">
+<h2 class="h1"><b>自定义积分管理</b></h2>
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+	<tr class="tr1 vt">
+		<td class="td1">用户名</td>
+		<td class="td2">$rt[username]</td>
+	</tr>
+<!--
+EOT;
+foreach($_CREDITDB as $key => $value){print <<<EOT
+-->
+	<tr class="tr1 vt">
+		<td class="td1">$value[0]</td>
+		<td class="td2"><input class="input" type="text" name="creditdb[$key]" value="{$u_credit[$key]}"></td>
+	</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+</table>
+</div>
+<div class="tac mb10">
+	<span class="btn"><span><button type="submit">提 交</button></span></span>
+</div>
+</form>
+<!--
+EOT;
+}
+}
+
+include_once PrintEot('adminbottom');
+?>-->

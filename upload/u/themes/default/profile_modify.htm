@@ -121,7 +121,7 @@ EOT;
 							</tr>
 							<tr>
 								<th class="th">个人主页</th>
-								<td class="td"><input class="input input_wb" type="text" maxlength="75" name="prohomepage" value="$userdb[site]" /><p>建议加 http://开头</p></td>
+								<td class="td"><input class="input input_wb mr5" type="text" maxlength="75" name="prohomepage" value="$userdb[site]" /><span>建议加 http://开头</span></td>
 							</tr>
 <!--
 EOT;
@@ -415,7 +415,7 @@ if($ifppt){print <<<EOT
 -->
 							<tr>
 								<th class="th">原密码</th>
-								<td class="td"><input class="input input_wa mr10" type="password" maxlength="75" name="oldpwd" value="" />修改密码或邮箱时需要密码验证</td>
+								<td class="td"><input class="input input_wa mr10" type="password" maxlength="75" name="oldpwd" value="" />修改密码或电子邮箱时需要密码验证</td>
 							</tr>
 							<tr>
 								<th class="th">新密码</th>
@@ -426,9 +426,9 @@ if($ifppt){print <<<EOT
 								<td class="td"><input class="input input_wa" type="password" maxlength="75" name="check_pwd" value="" /></td>
 							</tr>
 							<tr>
-								<th class="th">E-MAIL</th>
+								<th class="th">电子邮箱</th>
 								<td class="td"><input class="input input_wa" type="text" maxlength="75" name="proemail" value="$userdb[email]" />
-								<label for="propublicemail"><input type="checkbox" id="propublicemail" name="propublicemail" value="1" $ifpublic />公开邮箱</label></td>
+								<label for="propublicemail"><input type="checkbox" id="propublicemail" name="propublicemail" value="1" $ifpublic />公开电子邮箱</label></td>
 							</tr>
 <!--
 EOT;
@@ -598,7 +598,7 @@ EOT;
 	foreach ($ubinding as $key => $value) {print <<<EOT
 -->
 								<tr>
-									<td><a href="u.php?uid=$value[uid]" target="_blank">$value[username]</a></td>
+									<td><a href="{$db_userurl}$value[uid]" target="_blank">$value[username]</a></td>
 									<td>{$ltitle[$value[groupid]]}</td>
 									<td>$value[regdate]</td>
 									<td><a href="apps.php?q=article&u=$value[uid]" target="_blank">$value[postnum]</a></td>
@@ -656,7 +656,7 @@ function facepath(iconurl,iconfile,showmsg,iconwidth,iconheight) {
 }
 function showSystemIcon(page) {
 	getObj('iconbox').innerHTML = '<div class="tac" style="width:272px;padding:30px 0 0;"><div><img src="'+imgpath+'/loading.gif" align="absmiddle" /> 正在加载数据...</div></div>';
-	ajax.send('pw_ajax.php','action=showface&page='+page,getIcon);
+	ajax.send('pw_ajax.php?action=showface&page='+page,'',getIcon);
 }
 
 function getIcon() {

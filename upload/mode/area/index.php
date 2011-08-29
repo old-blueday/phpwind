@@ -1,11 +1,11 @@
 <?php
 !defined('M_P') && exit('Forbidden');
 
-include_once(D_P.'data/bbscache/area_config.php');
+include_once pwCache::getPath(D_P.'data/bbscache/area_config.php');
 
 if(!$area_channels) Showmsg('还未创建频道');
 define('F_M',true);
-if (!$alias) InitGP(array('alias'),'GP');
+if (!$alias) S::gp(array('alias'),'GP');
 
 if (!$area_default_alias) {
 	$currentAlias = current($area_channels);
@@ -35,7 +35,7 @@ seoSettings($_seo,array($area_sitename,$channelInfo['name'],'','','','',$channel
 
 $channelImagePath = $db_htmdir . '/channel/'.$alias.'/images';
 if (defined('HTML_CHANNEL')) {
-	$htmlFile = Pcv(AREA_PATH.$alias.'/index.html');
+	$htmlFile = S::escapePath(AREA_PATH.$alias.'/index.html');
 	if (!file_exists($htmlFile)) Showmsg('channel_html_have_not_create');
 	readfile($htmlFile);
 	exit;
@@ -53,7 +53,7 @@ $ifEditAdmin = $areaLevelService->getAreaLevel($winduid,$channelInfo['id']);
 $logic_file_path = AREA_PATH.$alias."/";
 
 extract(L::style('',$skinco));
-include_once (D_P.'data/bbscache/area_config.php');
+include_once pwCache::getPath(D_P.'data/bbscache/area_config.php');
 
 include_once (M_P.'require/core.php');
 

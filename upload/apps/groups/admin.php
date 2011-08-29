@@ -1,7 +1,7 @@
 <?php
 !function_exists('adminmsg') && exit('Forbidden');
 
-@include_once(D_P.'data/bbscache/o_config.php');
+@include_once pwCache::getPath(D_P.'data/bbscache/o_config.php');
 
 require_once(A_P . 'lib/colonys.class.php');
 $newColony = new PW_Colony();
@@ -42,8 +42,8 @@ if (empty($action)) {
 		require_once PrintApp('admin');
 	} else {
 
-		InitGP(array('config','creditset','creditlog'),'GP',0);
-		InitGP(array('groups','groups_open'),'GP',2);
+		S::gp(array('config','creditset','creditlog'),'GP',0);
+		S::gp(array('groups','groups_open'),'GP',2);
 
 		require_once(R_P.'admin/cache.php');
 		setConfig('db_groups_open', $groups_open);
@@ -52,7 +52,7 @@ if (empty($action)) {
 		foreach ($config as $key => $value) {
 			switch ($key) {
 				case 'moneytype':
-					$config[$key] = Char_cv($value);break;
+					$config[$key] = S::escapeChar($value);break;
 				case 'rate':
 					$config[$key] = (double)$value;break;
 				default:
@@ -89,7 +89,7 @@ if (empty($action)) {
 			$isint = false;
 			if ($_POST['step'] == 'basic') {
 				if ($key == 'name' || $key == 'moneytype') {
-					$config[$key] = Char_cv($value);
+					$config[$key] = S::escapeChar($value);
 				} elseif ($key == 'rate') {
 					$config[$key] = (double)$value;
 				} else {
@@ -109,9 +109,9 @@ if (empty($action)) {
 	foreach ($config as $key => $value) {
 		if (${'cn_'.$key} != $value) {
 			$db->pw_update(
-				"SELECT hk_name FROM pw_hack WHERE hk_name=" . pwEscape("cn_$key"),
-				"UPDATE pw_hack SET hk_value=" . pwEscape($value) . "WHERE hk_name=" . pwEscape("cn_$key"),
-				"INSERT INTO pw_hack SET hk_name=" . pwEscape("cn_$key") . ",hk_value=" . pwEscape($value)
+				"SELECT hk_name FROM pw_hack WHERE hk_name=" . S::sqlEscape("cn_$key"),
+				"UPDATE pw_hack SET hk_value=" . S::sqlEscape($value) . "WHERE hk_name=" . S::sqlEscape("cn_$key"),
+				"INSERT INTO pw_hack SET hk_name=" . S::sqlEscape("cn_$key") . ",hk_value=" . S::sqlEscape($value)
 			);
 			$updatecache = true;
 		}
@@ -149,11 +149,11 @@ if (empty($action)) {
 
 	} else {
 
-		InitGP(array('selid','cname'));
+		S::gp(array('selid','cname'));
 		empty($selid) && $selid = array();
 		empty($isclass) && $isclass = array();
 		if ($delclass = array_diff($isclass, $selid)) {
-			$db->update("UPDATE pw_cnclass SET ifopen=0,cname='' WHERE fid IN (" . pwImplode($delclass) . ')');
+			$db->update("UPDATE pw_cnclass SET ifopen=0,cname='' WHERE fid IN (" . S::sqlImplode($delclass) . ')');
 		}
 		if ($addclass = array_diff($selid, $isclass)) {
 			$pwSQL = array();
@@ -161,13 +161,13 @@ if (empty($action)) {
 				!$cname[$value] && $cname[$value] = strip_tags($forum[$value]['name']);
 				$pwSQL[] = array($value,$cname[$value],1);
 			}
-			$db->update("REPLACE INTO pw_cnclass (fid,cname,ifopen) VALUES " . pwSqlMulti($pwSQL));
+			$db->update("REPLACE INTO pw_cnclass (fid,cname,ifopen) VALUES " . S::sqlMulti($pwSQL));
 		}
 		if ($upclass = array_intersect($selid,$isclass)) {
 			foreach ($upclass as $key => $value) {
 				!$cname[$value] && $cname[$value] = strip_tags($forum[$value]['name']);
 				if ($cname[$value] != $classdb[$value]['cname']) {
-					$db->update("UPDATE pw_cnclass SET cname=" . pwEscape($cname[$value]) . ' WHERE fid=' . pwEscape($value));
+					$db->update("UPDATE pw_cnclass SET cname=" . S::sqlEscape($cname[$value]) . ' WHERE fid=' . S::sqlEscape($value));
 				}
 			}
 		}
@@ -177,8 +177,8 @@ if (empty($action)) {
 	}
 } elseif ($action == 'credit') {
 
-	InitGP(array('fid'));
-	$f = $db->get_one("SELECT creditset FROM pw_cnclass WHERE fid=" . pwEscape($fid));
+	S::gp(array('fid'));
+	$f = $db->get_one("SELECT creditset FROM pw_cnclass WHERE fid=" . S::sqlEscape($fid));
 	!$f && adminmsg('operate_fail');
 
 	require_once(R_P . 'require/credit.php');
@@ -190,7 +190,7 @@ if (empty($action)) {
 
 	} else {
 
-		InitGP(array('creditset'), 'P');
+		S::gp(array('creditset'), 'P');
 
 		foreach ($creditset as $key => $value) {
 			foreach ($value as $k => $v) {
@@ -202,7 +202,7 @@ if (empty($action)) {
 			}
 		}
 		$creditset = $creditset ? serialize($creditset) : '';
-		$db->update("UPDATE pw_cnclass SET creditset=" . pwEscape($creditset) . ' WHERE fid=' . pwEscape($fid));
+		$db->update("UPDATE pw_cnclass SET creditset=" . S::sqlEscape($creditset) . ' WHERE fid=' . S::sqlEscape($fid));
 
 		adminmsg('operate_success', "$basename&action=credit&fid=$fid");
 	}
@@ -211,7 +211,7 @@ if (empty($action)) {
 
 	if (empty($_POST['step'])) {
 
-		InitGP(array('cid', 'level', 'cname', 'admin', 'firstgradestyle', 'secondgradestyle','styleid'));
+		S::gp(array('cid', 'level', 'cname', 'admin', 'firstgradestyle', 'secondgradestyle','styleid'));
 
 		!is_array($o_classdb) && $o_classdb = array();
 		$sqladd = $pageadd = '';
@@ -236,18 +236,18 @@ if (empty($action)) {
 				$subStyle = $o_style_relation[$styleid] ? $o_style_relation[$styleid] : array($styleid);				
 				$sqladd .= ' AND styleid IN('.S::sqlImplode($subStyle).')';
 			} else {
-				$sqladd .= ' AND styleid='.pwEscape($styleid);
+				$sqladd .= ' AND styleid='.S::sqlEscape($styleid);
 			}
 		}
 		if ($cid) {
 			$pageadd .= "&cid=$cid";
-			$sqladd .= ' AND classid='.pwEscape($cid > 0 ? $cid : 0);
+			$sqladd .= ' AND classid='.S::sqlEscape($cid > 0 ? $cid : 0);
 		}
 		if ($level) {
 			if (isset($o_groups_levelneed[$level])) {
-				$sqladd .= ' AND commonlevel=' . pwEscape($level) . ' AND speciallevel=0';
+				$sqladd .= ' AND commonlevel=' . S::sqlEscape($level) . ' AND speciallevel=0';
 			} elseif (isset($o_groups_level[$level])) {
-				$sqladd .= ' AND speciallevel=' . pwEscape($level);
+				$sqladd .= ' AND speciallevel=' . S::sqlEscape($level);
 			} elseif ($level == '-1') {
 				$sqladd .= " AND speciallevel='0'";
 			}
@@ -256,12 +256,12 @@ if (empty($action)) {
 		if ($cname) {
 			$pageadd .= '&cname=$cname';
 			$sql_cname = str_replace('*','%',$cname);
-			$sqladd .= ' AND cname LIKE '.pwEscape($sql_cname);
+			$sqladd .= ' AND cname LIKE '.S::sqlEscape($sql_cname);
 		}
 		if ($admin) {
 			$pageadd .= '&admin=$admin';
 			$sql_admin = str_replace('*','%',$admin);
-			$sqladd .= ' AND admin LIKE '.pwEscape($sql_admin);
+			$sqladd .= ' AND admin LIKE '.S::sqlEscape($sql_admin);
 		}
 
 		$options = "<option value=\"0\">不限制</option><option value=\"-1\"" . ($cid == -1 ? ' selected' : '') . ">不关联</option>";
@@ -277,11 +277,11 @@ if (empty($action)) {
 		$pages = '';
 		$db_perpage = 20;
 		$colonys = array();
-		InitGP(array('page'),'GP',2);
+		S::gp(array('page'),'GP',2);
 		$page < 1 && $page = 1;
 		$id = ($page-1) * $db_perpage;
 				
-		$query = $db->query("SELECT id,cname,admin,classid,commonlevel,speciallevel,ifshow,ifshowpic,vieworder,styleid FROM pw_colonys WHERE 1 " . $sqladd ." order by id desc ". pwLimit($id,$db_perpage));
+		$query = $db->query("SELECT id,cname,admin,classid,commonlevel,speciallevel,ifshow,ifshowpic,vieworder,styleid FROM pw_colonys WHERE 1 " . $sqladd ." order by id desc ". S::sqlLimit($id,$db_perpage));
 		while ($rt = $db->fetch_array($query)) {
 			$rt['speciallevel'] == 0 && $rt['speciallevel'] = $rt['commonlevel'];
 			$rt['cname'] = trim($rt['cname']);
@@ -301,14 +301,14 @@ if (empty($action)) {
 
 	} else {
 
-		InitGP(array('ifshow','selid','ids','ifshowpic','vieworder'));
+		S::gp(array('ifshow','selid','ids','ifshowpic','vieworder'));
 
 		$basename .= '&action=colony';
 
 		is_array($ifshow) || $ifshow = array();
 		is_array($vieworder) || $vieworder = array();
 		foreach ($ids as $key =>$id) {
-			$db->update("UPDATE pw_colonys SET ifshow=".pwEscape($ifshow[$id]).",vieworder=".pwEscape($vieworder[$id]).",ifshowpic=".pwEscape($ifshowpic[$id])." WHERE id=".pwEscape($id));
+			$db->update("UPDATE pw_colonys SET ifshow=".S::sqlEscape($ifshow[$id]).",vieworder=".S::sqlEscape($vieworder[$id]).",ifshowpic=".S::sqlEscape($ifshowpic[$id])." WHERE id=".S::sqlEscape($id));
 		}
 
 
@@ -319,8 +319,8 @@ if (empty($action)) {
 
 	require_once(R_P. 'require/credit.php');
 	require_once(R_P . 'apps/groups/lib/colony.class.php');
-	InitGP(array('cyid'));
-	$colony = $db->get_one("SELECT * FROM pw_colonys WHERE id=" . pwEscape($cyid));
+	S::gp(array('cyid'));
+	$colony = $db->get_one("SELECT * FROM pw_colonys WHERE id=" . S::sqlEscape($cyid));
 	!$colony && adminmsg('undefined_action');
 	if (empty($_POST['step'])) {
 		is_array($creditset = unserialize($colony['creditset'])) || $creditset = array();
@@ -354,7 +354,7 @@ if (empty($action)) {
 		$jsStyle = pwJsonEncode($o_styledb);
 		$jsStyleRelation = pwJsonEncode($o_style_relation);
 	
-		$cnclass['fid'] = $db->get_value("SELECT fid FROM pw_cnclass WHERE fid=" . pwEscape($colony['classid']). " AND ifopen=1");
+		$cnclass['fid'] = $db->get_value("SELECT fid FROM pw_cnclass WHERE fid=" . S::sqlEscape($colony['classid']). " AND ifopen=1");
 		if (!$cnclass['fid']) {
 			$cidDisplay = "display:none";
 			$viewtype_2 = 'checked';
@@ -366,8 +366,8 @@ if (empty($action)) {
 
 	} else {
 		$basename .= "&action=$action&cyid=$cyid";
-		InitGP(array('cname','annouce','descrip','admin','firstgradestyle','secondgradestyle','viewtype','speciallevel','q_1','q_2'),'P');
-		InitGP(array('iftopicshowinforum'), '', 2);
+		S::gp(array('cname','annouce','descrip','admin','firstgradestyle','secondgradestyle','viewtype','speciallevel','q_1','q_2'),'P');
+		S::gp(array('iftopicshowinforum'), '', 2);
 		!$cname && Showmsg('colony_emptyname');
 		strlen($cname) > 20 && Showmsg('colony_cnamelimit');
 		strlen($descrip) > 255 && Showmsg('colony_descriplimit');
@@ -396,10 +396,10 @@ if (empty($action)) {
 		$annouce[key($annouce)] = str_replace(array("\r","\n"),'',current($annouce));
 		$annouce = implode("\r\n",$annouce);
 
-		if ($colony['cname'] != stripcslashes($cname) && $db->get_value("SELECT id FROM pw_colonys WHERE cname=" . pwEscape($cname))) {
+		if ($colony['cname'] != stripcslashes($cname) && $db->get_value("SELECT id FROM pw_colonys WHERE cname=" . S::sqlEscape($cname))) {
 			Showmsg('colony_samename');
 		}
-		InitGP(array('cid','ifcheck'), 'P', 2);
+		S::gp(array('cid','ifcheck'), 'P', 2);
 		$pwSQL = array(
 			'cname'			=> $cname,
 			'ifcheck'		=> $ifcheck,
@@ -433,21 +433,31 @@ if (empty($action)) {
 		}
 
 		if ($admin != $colony['admin']) {
-			$rt = $db->get_one("SELECT m.uid,c.id AS ifcyer FROM pw_members m LEFT JOIN pw_cmembers c ON m.uid=c.uid AND c.colonyid=" . pwEscape($cyid) . " WHERE m.username=" . pwEscape($admin));
+			$rt = $db->get_one("SELECT m.uid,c.id AS ifcyer FROM pw_members m LEFT JOIN pw_cmembers c ON m.uid=c.uid AND c.colonyid=" . S::sqlEscape($cyid) . " WHERE m.username=" . S::sqlEscape($admin));
 			if (empty($rt)) {
 				$errorname = $admin;
 				adminmsg('user_not_exists');
 			}
 			if ($rt['ifcyer']) {
-				$db->update("UPDATE pw_cmembers SET ifadmin=1 WHERE colonyid=" . pwEscape($cyid) . ' AND uid=' . pwEscape($rt['uid']));
+				//* $db->update("UPDATE pw_cmembers SET ifadmin=1 WHERE colonyid=" . S::sqlEscape($cyid) . ' AND uid=' . S::sqlEscape($rt['uid']));
+				pwQuery::update('pw_cmembers', 'colonyid=:colonyid AND uid=:uid', array($cyid, $rt['uid']), array('ifadmin'=>1));
 			} else {
-				$db->update("INSERT INTO pw_cmembers SET " . pwSqlSingle(array(
+				/**
+				$db->update("INSERT INTO pw_cmembers SET " . S::sqlSingle(array(
 					'uid' => $rt['uid'],
 					'username' => $admin,
 					'ifadmin' => 1,
 					'colonyid' => $cyid,
 					'addtime' => $timestamp
 				)));
+				**/
+				pwQuery::insert('pw_cmembers', array(
+					'uid' => $rt['uid'],
+					'username' => $admin,
+					'ifadmin' => 1,
+					'colonyid' => $cyid,
+					'addtime' => $timestamp
+				));
 			}
 			$pwSQL['admin'] = $admin;
 		}
@@ -461,7 +471,7 @@ if (empty($action)) {
 			$colonyServer->changeTopicShowInForum($cyid, $iftopicshowinforum, $colony['classid']);
 		}
 		$pwSQL['styleid'] = $styleid;
-		$db->update("UPDATE pw_colonys SET " . pwSqlSingle($pwSQL) . ' WHERE id=' . pwEscape($cyid));
+		$db->update("UPDATE pw_colonys SET " . S::sqlSingle($pwSQL) . ' WHERE id=' . S::sqlEscape($cyid));
 		require_once(R_P .'u/require/core.php');
 		updateGroupLevel($cyid, $colony);		
 		adminmsg('operate_success',"$basename&action=editcolony");
@@ -475,7 +485,7 @@ if (empty($action)) {
 	} else {
 
 		$basename = $basename.'&action=mergecolony';
-		InitGP(array('fromcname','tocname'), '');
+		S::gp(array('fromcname','tocname'), '');
 		require_once(A_P . 'lib/colony.class.php');
 		require_once(A_P . 'lib/colonys.class.php');
 		$colonyServer = new PW_Colony();
@@ -495,17 +505,17 @@ if (empty($action)) {
 
 } elseif ($action == 'delcolony') {
 
-	InitGP(array('cyid'),'',2);
-	$rt = $db->get_one("SELECT classid,cnimg FROM pw_colonys WHERE id=" . pwEscape($cyid));
+	S::gp(array('cyid'),'',2);
+	$rt = $db->get_one("SELECT classid,cnimg FROM pw_colonys WHERE id=" . S::sqlEscape($cyid));
 	if (!empty($rt)) {
 		Delcnimg($rt['cnimg']);
 		pwFtpClose($ftp);
 		//updateUserAppNum($rt['uid'],'group','recount');
-		$db->update("UPDATE pw_cmembers a LEFT JOIN pw_ouserdata o ON a.uid=o.uid SET o.groupnum=o.groupnum-1 WHERE a.colonyid=" . pwEscape($cyid) . ' AND o.groupnum>0');
-		$db->update("DELETE FROM pw_argument WHERE cyid=" . pwEscape($cyid));
-		$db->update("DELETE FROM pw_cmembers WHERE colonyid=" . pwEscape($cyid));
-		$db->update("DELETE FROM pw_colonys  WHERE id=" . pwEscape($cyid));
-		$db->update("UPDATE pw_cnclass SET cnsum=cnsum-1 WHERE fid=" . pwEscape($rt['classid']) . ' AND cnsum>0');
+		$db->update("UPDATE pw_cmembers a LEFT JOIN pw_ouserdata o ON a.uid=o.uid SET o.groupnum=o.groupnum-1 WHERE a.colonyid=" . S::sqlEscape($cyid) . ' AND o.groupnum>0');
+		$db->update("DELETE FROM pw_argument WHERE cyid=" . S::sqlEscape($cyid));
+		$db->update("DELETE FROM pw_cmembers WHERE colonyid=" . S::sqlEscape($cyid));
+		$db->update("DELETE FROM pw_colonys  WHERE id=" . S::sqlEscape($cyid));
+		$db->update("UPDATE pw_cnclass SET cnsum=cnsum-1 WHERE fid=" . S::sqlEscape($rt['classid']) . ' AND cnsum>0');
 	}
 	adminmsg('operate_success',"$basename&action=colony");
 
@@ -514,17 +524,17 @@ if (empty($action)) {
 	if ($_POST['step'] != 'del') {
 
 		require_once GetLang('logtype');
-		InitGP(array('keyword','page'));
+		S::gp(array('keyword','page'));
 		$db_perpage = 20;
 		$logdb = array();
 		$pages = $sqladd = $addpages = '';
 		if ($keyword) {
-			$sqladd = " AND descrip LIKE ".pwEscape("%$keyword%");
+			$sqladd = " AND descrip LIKE ".S::sqlEscape("%$keyword%");
 			$addpages = "&keyword=".rawurlencode($keyword);
 		}
 		(int)$page<1 && $page = 1;
 		$id = ($page-1)*$db_perpage;
-		$query = $db->query("SELECT id,type,field2,field3,username1,timestamp,descrip FROM pw_forumlog WHERE type LIKE 'cy\_%' $sqladd".pwLimit($id,$db_perpage));
+		$query = $db->query("SELECT id,type,field2,field3,username1,timestamp,descrip FROM pw_forumlog WHERE type LIKE 'cy\_%' $sqladd".S::sqlLimit($id,$db_perpage));
 		while ($rt = $db->fetch_array($query)) {
 			$rt['timestamp'] = get_date($rt['timestamp']);
 			$rt['descrip'] = str_replace(array('[b]','[/b]'),array('<b>','</b>'),$rt['descrip']);
@@ -540,7 +550,7 @@ if (empty($action)) {
 
 	} else {
 
-		InitGP(array('selid'),'P',1);
+		S::gp(array('selid'),'P',1);
 		if (!($selid = checkselid($selid))) {
 			$basename = 'javascript:history.go(-1);';
 			adminmsg('operate_error');
@@ -559,7 +569,7 @@ if (empty($action)) {
 		$db->update("UPDATE pw_cnclass SET cnsum='0'");
 		$query = $db->query("SELECT classid,COUNT(*) AS sum FROM pw_colonys WHERE classid>0 GROUP BY classid");
 		while ($rt = $db->fetch_array($query)) {
-			$db->update("UPDATE pw_cnclass SET cnsum=" . pwEscape($rt['sum']) . ' WHERE fid=' . pwEscape($rt['classid']));
+			$db->update("UPDATE pw_cnclass SET cnsum=" . S::sqlEscape($rt['sum']) . ' WHERE fid=' . S::sqlEscape($rt['classid']));
 		}
 		$j_url = "$basename&action=cache";
 		adminmsg('operate_success',$j_url);
@@ -569,28 +579,29 @@ if (empty($action)) {
 		$query = $db->query("SELECT id,cnimg FROM pw_colonys WHERE classid<1");
 		while ($rt = $db->fetch_array($query,MYSQL_NUM)) {
 			Delcnimg($rt[1]);
-			$db->update("UPDATE pw_cmembers a LEFT JOIN pw_ouserdata o ON a.uid=o.uid SET o.groupnum=o.groupnum-1 WHERE a.colonyid=" . pwEscape($rt[0],false) . ' AND o.groupnum>0');
-			$db->update("DELETE FROM pw_argument WHERE cyid=" . pwEscape($rt[0],false));
-			$db->update("DELETE FROM pw_cmembers WHERE colonyid=" . pwEscape($rt[0],false));
-			$db->update("DELETE FROM pw_colonys  WHERE id=" . pwEscape($rt[0],false));
+			$db->update("UPDATE pw_cmembers a LEFT JOIN pw_ouserdata o ON a.uid=o.uid SET o.groupnum=o.groupnum-1 WHERE a.colonyid=" . S::sqlEscape($rt[0],false) . ' AND o.groupnum>0');
+			$db->update("DELETE FROM pw_argument WHERE cyid=" . S::sqlEscape($rt[0],false));
+			$db->update("DELETE FROM pw_cmembers WHERE colonyid=" . S::sqlEscape($rt[0],false));
+			$db->update("DELETE FROM pw_colonys  WHERE id=" . S::sqlEscape($rt[0],false));
 		}
 		pwFtpClose($ftp);
 		adminmsg('operate_success',"$basename&action=cache");
 	}
 } elseif ($action == 'argument') {
 
-	InitGP(array('step'));
+	S::gp(array('step'));
 
 	if ($step == 'delete') {
 
-		InitGP(array('ttype', 'delid', 'ttable', 'ptable'));
+		S::gp(array('ttype', 'delid', 'ttable', 'ptable'));
 		require_once(R_P.'require/updateforum.php');
 		if ($ttype == '1') {
 
 			!$delid && adminmsg('operate_error');
 			$pw_tmsgs = 'pw_tmsgs' . $ttable;
 			$fidarray = $delaids = $specialdb = array();
-			$delids = pwImplode($delid);
+			$tmpDelids = $delid;
+			$delids = S::sqlImplode($delid);
 			$tnum = array();
 			$pnum = array();
 			/**
@@ -622,7 +633,7 @@ if (empty($action)) {
 				}
 				$pw_posts = GetPtable($ptable);
 				if ($ifupload) {
-					$query2 = $db->query("SELECT aid FROM $pw_posts WHERE tid=".pwEscape($tid));
+					$query2 = $db->query("SELECT aid FROM $pw_posts WHERE tid=".S::sqlEscape($tid));
 					while (@extract($db->fetch_array($query2))) {
 						if ($aid) {
 							$attachs = unserialize(stripslashes($aid));
@@ -641,7 +652,7 @@ if (empty($action)) {
 				$db_guestread && clearguestcache($tid,$replies);
 
 				//统计用户的回复数
-				$query3 = $db->query("SELECT authorid FROM $pw_posts WHERE tid=".pwEscape($tid));
+				$query3 = $db->query("SELECT authorid FROM $pw_posts WHERE tid=".S::sqlEscape($tid));
 				while ($rt3 = $db->fetch_array($query3)) {
 					$delnum[$rt3['authorid']]++;
 					$pnum[$tid]++;
@@ -650,7 +661,7 @@ if (empty($action)) {
 
 				//统计群组的主题数、回复数、今天发帖数
 				$clonys = array();
-				$cyid = $db->get_value( " SELECT cyid FROM pw_argument WHERE tid=". pwEscape($tid));
+				$cyid = $db->get_value( " SELECT cyid FROM pw_argument WHERE tid=". S::sqlEscape($tid));
 				$colonys[$cyid]['tnum'] = $tnum[$tid];
 				$colonys[$cyid]['pnum'] = $pnum[$tid] + $tnum[$tid];
 				$colonys[$cyid]['todaypost'] = $colonys[$cyid]['pnum'];
@@ -658,31 +669,34 @@ if (empty($action)) {
 			}
 
 			if (isset($specialdb[1])) {
-				$pollids = pwImplode($specialdb[1]);
+				$pollids = S::sqlImplode($specialdb[1]);
 				$db->update("DELETE FROM pw_polls WHERE tid IN($pollids)");
 			}
 			if (isset($specialdb[2])) {
-				$actids = pwImplode($specialdb[2]);
+				$actids = S::sqlImplode($specialdb[2]);
 				$db->update("DELETE FROM pw_activity WHERE tid IN($actids)");
 				$db->update("DELETE FROM pw_actmember WHERE actid IN($actids)");
 			}
 			if (isset($specialdb[3])) {
-				$rewids = pwImplode($specialdb[3]);
+				$rewids = S::sqlImplode($specialdb[3]);
 				$db->update("DELETE FROM pw_reward WHERE tid IN($rewids)");
 			}
 			if (isset($specialdb[4])) {
-				$tradeids = pwImplode($specialdb[4]);
+				$tradeids = S::sqlImplode($specialdb[4]);
 				$db->update("DELETE FROM pw_trade WHERE tid IN($tradeids)");
 			}
 			if ($delaids) {
-				$delaids = pwImplode($delaids);
+				$delaids = S::sqlImplode($delaids);
 				$db->update("DELETE FROM pw_attachs WHERE aid IN($delaids)");
 			}
 
 			# $db->update("DELETE FROM pw_threads WHERE tid IN ($delids)");
 			# ThreadManager
-                        $threadManager = L::loadClass("threadmanager", 'forum');
-			$threadManager->deleteByThreadIds($fid,$delids);
+            //* $threadManager = L::loadClass("threadmanager", 'forum');
+			//* $threadManager->deleteByThreadIds($fid,$delids);
+			$threadService = L::loadclass('threads', 'forum');
+			$threadService->deleteByThreadIds($tmpDelids);	
+			Perf::gatherInfo('changeThreadWithForumIds', array('fid'=>$fid));			
 
 			$db->update("DELETE FROM pw_argument WHERE tid IN($delids)");
 
@@ -693,12 +707,13 @@ if (empty($action)) {
 				$colony['pnum'] -= $value['pnum'];
 				updateGroupLevel($key, $colony);
 
-				$db->update("UPDATE pw_colonys SET tnum=tnum-" . pwEscape($value['tnum']) . ", pnum=pnum-" . pwEscape($value['pnum']) . ", todaypost=todaypost-" . pwEscape($value['todaypost']) . " WHERE id=". pwEscape($key));
+				$db->update("UPDATE pw_colonys SET tnum=tnum-" . S::sqlEscape($value['tnum']) . ", pnum=pnum-" . S::sqlEscape($value['pnum']) . ", todaypost=todaypost-" . S::sqlEscape($value['todaypost']) . " WHERE id=". S::sqlEscape($key));
 			}
 
 			foreach ($ptable_a as $key => $val) {
 				$pw_posts = GetPtable($key);
-				$db->update("DELETE FROM $pw_posts WHERE tid IN ($delids)");
+				//$db->update("DELETE FROM $pw_posts WHERE tid IN ($delids)");
+				pwQuery::delete($pw_posts, 'tid IN(:tid)', array($delid));//此处需要传入数组，所以用$delid传入
 			}
 			$db->update("DELETE FROM $pw_tmsgs WHERE tid IN ($delids)");
 			delete_tag($delids);
@@ -714,14 +729,15 @@ if (empty($action)) {
 			foreach ($delnum as $key => $value){
 				$userService->updateByIncrement($key, array(), array('postnum'=>-$value));
 			}
-			P_unlink(D_P.'data/bbscache/c_cache.php');
+			//* P_unlink(D_P.'data/bbscache/c_cache.php');
+			pwCache::deleteData(D_P.'data/bbscache/c_cache.php');
 
 		} else {
 
 			!$delid && adminmsg('operate_error');
 			$pw_posts = GetPtable($ptable);
 			$fidarray = $tidarray = $delnum = $delaids = array();
-			$delids = pwImplode($delid);
+			$delids = S::sqlImplode($delid);
 
 			$query = $db->query("SELECT aid,tid,fid,authorid FROM $pw_posts WHERE pid IN ($delids)");
 			while (@extract($db->fetch_array($query))) {
@@ -742,7 +758,7 @@ if (empty($action)) {
 			*/
 			if ($tidarray) {
 				$dtids = array_unique($tidarray);
-				$query = $db->query("SELECT tid,fid,postdate,ifupload FROM pw_threads WHERE tid IN(" . pwImplode($dtids) . ")");
+				$query = $db->query("SELECT tid,fid,postdate,ifupload FROM pw_threads WHERE tid IN(" . S::sqlImplode($dtids) . ")");
 				while (@extract($db->fetch_array($query))) {
 					$htmurl = $db_readdir.'/'.$fid.'/'.date('ym',$postdate).'/'.$tid.'.html';
 					if (file_exists(R_P . $htmurl)) {
@@ -751,14 +767,15 @@ if (empty($action)) {
 				}
 			}
 			if ($delaids) {
-				$delaids = pwImplode($delaids);
+				$delaids = S::sqlImplode($delaids);
 				$db->update("DELETE FROM pw_attachs WHERE aid IN($delaids)");
 			}
-			$db->update("DELETE FROM $pw_posts WHERE pid IN ($delids)");
-
+			//$db->update("DELETE FROM $pw_posts WHERE pid IN ($delids)");
+			pwQuery::delete($pw_posts, 'pid IN(:pid)', array($delid));
 			$tidarray = array_count_values($tidarray);
 			foreach ($tidarray as $key => $value) {
-				$db->update("UPDATE pw_threads SET replies=replies-".pwEscape($value)." WHERE tid=" . pwEscape($key));
+				//$db->update("UPDATE pw_threads SET replies=replies-".S::sqlEscape($value)." WHERE tid=" . S::sqlEscape($key));
+				$db->update(pwQuery::buildClause("UPDATE :pw_table SET replies=replies-:replies WHERE tid=:tid", array('pw_threads', $value, $key)));
 			}
 			/**
 			* 数据更新
@@ -771,13 +788,14 @@ if (empty($action)) {
 			foreach ($delnum as $key => $value){
 				$userService->updateByIncrement($key, array(), array('postnum'=>-$value));
 			}
-			P_unlink(D_P.'data/bbscache/c_cache.php');
+			//* P_unlink(D_P.'data/bbscache/c_cache.php');
+			pwCache::deleteData(D_P.'data/bbscache/c_cache.php');
 		}
 		adminmsg('operate_success',"$basename&action=argument&");
 
 	} else {
 
-		InitGP(array('ttable', 'ptable', 'page','cid','author','ckauthor','keyword','ktype','ttype','ckkeyword','postdate_s','postdate_e','orderby','sc','perpage','cname'));
+		S::gp(array('ttable', 'ptable', 'page','cid','author','ckauthor','keyword','ktype','ttype','ckkeyword','postdate_s','postdate_e','orderby','sc','perpage','cname'));
 
 		$postdateStartString = $postdate_s && is_numeric($postdate_s) ? get_date($postdate_s, 'Y-m-d') : $postdate_s;
 		$postdateEndString = $postdate_e && is_numeric($postdate_e) ? get_date($postdate_e, 'Y-m-d') : $postdate_e;
@@ -821,20 +839,20 @@ if (empty($action)) {
 			$addpage .= "ttype=2&ptable=$ptable&";
 		}
 		if ((int)$cid > 0) {
-			$sql .= " AND t.fid=" . pwEscape($cid);
+			$sql .= " AND t.fid=" . S::sqlEscape($cid);
 			$addpage .= "cid=$cid&";
 		}
 		if ($cname){
 			$addpage .= "cname=$cname&";
-			$sql .= " AND c.cname LIKE " . pwEscape(str_replace('*', '%', $cname));
+			$sql .= " AND c.cname LIKE " . S::sqlEscape(str_replace('*', '%', $cname));
 		}
 		if ($author) {
 			$addpage .= "author=$author&";
 			if ($ckauthor) {
 				$addpage .= "ckauthor=$ckauthor&";
-				$u_sql = "username=" . pwEscape($author);
+				$u_sql = "username=" . S::sqlEscape($author);
 			} else {
-				$u_sql = "username LIKE " . pwEscape('%'.$author.'%');
+				$u_sql = "username LIKE " . S::sqlEscape('%'.$author.'%');
 			}
 			$authorids = array();
 			$query = $db->query("SELECT uid FROM pw_members WHERE $u_sql LIMIT 30");
@@ -845,15 +863,15 @@ if (empty($action)) {
 				$authorids = array(0);
 				//adminmsg('author_nofind', $basename . '&action=argument');
 			}
-			$sql .= " AND t.authorid IN(" . pwImplode($authorids) . ")";
+			$sql .= " AND t.authorid IN(" . S::sqlImplode($authorids) . ")";
 		}
 		if ($keyword) {
 			$addpage .= "keyword=$keyword&ktype=$ktype&ckkeyword=$ckkeyword&";
 
 			if ($ckkeyword) {
-				$k_sql = " = " . pwEscape($keyword);
+				$k_sql = " = " . S::sqlEscape($keyword);
 			} else {
-				$k_sql = " LIKE " . pwEscape('%'.$keyword.'%');
+				$k_sql = " LIKE " . S::sqlEscape('%'.$keyword.'%');
 			}
 			if ($ktype == 'subject') {
 				$sql .= " AND t.subject" . $k_sql;
@@ -864,19 +882,19 @@ if (empty($action)) {
 		}
 		if ($postdate_s) {
 			!is_numeric($postdate_s) && $postdate_s = PwStrtoTime($postdate_s);
-			$sql .= " AND t.postdate>".pwEscape($postdate_s);
+			$sql .= " AND t.postdate>".S::sqlEscape($postdate_s);
 			$addpage .= "postdate_s=$postdate_s&";
 		}
 		if ($postdate_e) {
 			!is_numeric($postdate_e) && $postdate_e = PwStrtoTime($postdate_e);
-			$sql .= " AND t.postdate<".pwEscape($postdate_e);
+			$sql .= " AND t.postdate<".S::sqlEscape($postdate_e);
 			$addpage .= "postdate_e=$postdate_e&";
 		}
 		$sql_orderby = ($orderby == 'postdate') ? 'ORDER BY t.postdate' : 'ORDER BY t.authorid';
 		$sc != 'ASC' && $sc = 'DESC';
 		!$perpage && $perpage = $db_perpage;
 		(int)$page<1 && $page = 1;
-		$limit = pwLimit(($page-1)*$perpage,$perpage);
+		$limit = S::sqlLimit(($page-1)*$perpage,$perpage);
 
 		$query = $db->query("SELECT t.*,a.*,c.cname FROM $sqltab LEFT JOIN pw_argument a ON t.tid=a.tid LEFT JOIN pw_colonys c ON a.cyid=c.id WHERE 1 $sql AND a.tid IS NOT NULL $sql_orderby $sc $limit");
 		$argumentdb = array();
@@ -901,21 +919,21 @@ if (empty($action)) {
 	if ($job == 'delete') {
 
 		require_once(R_P .'u/require/core.php');
-		InitGP(array('selid','aname','owner','cid','crtime_s','crtime_e','lasttime_s','lasttime_e','private','lines','orderway','ordertype','cname'));
+		S::gp(array('selid','aname','owner','cid','crtime_s','crtime_e','lasttime_s','lasttime_e','private','lines','orderway','ordertype','cname'));
 		empty($selid) && adminmsg("no_album_selid");
 
-		$query = $db->query("SELECT ownerid,COUNT(*) AS sum,SUM(photonum) AS photonum FROM pw_cnalbum WHERE aid IN(" . pwImplode($selid) . ") AND atype='1' GROUP BY ownerid");
+		$query = $db->query("SELECT ownerid,COUNT(*) AS sum,SUM(photonum) AS photonum FROM pw_cnalbum WHERE aid IN(" . S::sqlImplode($selid) . ") AND atype='1' GROUP BY ownerid");
 		while ($rt = $db->fetch_array($query)) {
 
 			$colony = $newColony->getColonyById($rt['ownerid']);
 			$colony['albumnum'] -= $rt['sum'];
 			updateGroupLevel($rt['ownerid'], $colony);
 
-			$db->update("UPDATE pw_colonys SET albumnum=albumnum-" . pwEscape($rt[sum]) . ",photonum=photonum-". pwEscape($rt['photonum']) ." WHERE id=" . pwEscape($rt['ownerid']));
+			$db->update("UPDATE pw_colonys SET albumnum=albumnum-" . S::sqlEscape($rt[sum]) . ",photonum=photonum-". S::sqlEscape($rt['photonum']) ." WHERE id=" . S::sqlEscape($rt['ownerid']));
 		}
 
 		foreach ($selid as $key => $aid) {
-			$query = $db->query("SELECT cn.pid,cn.path,cn.ifthumb,ca.ownerid FROM pw_cnphoto cn LEFT JOIN pw_cnalbum ca ON cn.aid=ca.aid WHERE cn.aid=" . pwEscape($aid));
+			$query = $db->query("SELECT cn.pid,cn.path,cn.ifthumb,ca.ownerid FROM pw_cnphoto cn LEFT JOIN pw_cnalbum ca ON cn.aid=ca.aid WHERE cn.aid=" . S::sqlEscape($aid));
 			if (($num = $db->num_rows($query)) > 0) {
 				$affected_rows = 0;
 				while ($rt = $db->fetch_array($query)) {
@@ -932,16 +950,16 @@ if (empty($action)) {
 			}
 		}
 		//获取相片总数
-//		$query = $db->query("SELECT ownerid AS cyid,COUNT(*) AS count,SUM(photonum) AS photonum FROM pw_cnalbum WHERE aid IN(" . pwImplode($selid) . ') GROUP BY ownerid');
+//		$query = $db->query("SELECT ownerid AS cyid,COUNT(*) AS count,SUM(photonum) AS photonum FROM pw_cnalbum WHERE aid IN(" . S::sqlImplode($selid) . ') GROUP BY ownerid');
 //		while ($rt = $db->fetch_array($query)) {
 //			$albumnum = (int)$rt['count'];
 //			$photonum = (int)$rt['photonum'];
 //			$cyid = (int)$rt['cyid'];
-//			$db->update("UPDATE pw_colonys SET albumnum=albumnum-$albumnum,photonum=photonum-$photonum" . " WHERE id=" . pwEscape($cyid));
+//			$db->update("UPDATE pw_colonys SET albumnum=albumnum-$albumnum,photonum=photonum-$photonum" . " WHERE id=" . S::sqlEscape($cyid));
 //		}
 
-		$db->update("DELETE FROM pw_cnphoto WHERE aid IN(" . pwImplode($selid) . ')');
-		$db->update("DELETE FROM pw_cnalbum WHERE aid IN(" . pwImplode($selid) . ')');
+		$db->update("DELETE FROM pw_cnphoto WHERE aid IN(" . S::sqlImplode($selid) . ')');
+		$db->update("DELETE FROM pw_cnalbum WHERE aid IN(" . S::sqlImplode($selid) . ')');
 
 		$uids = array_unique($uids);
 		updateUserAppNum($uids,'photo','recount');
@@ -949,25 +967,25 @@ if (empty($action)) {
 
 	} elseif ($job == 'edit') {
 
-		InitGP(array('aid'));
-		$album = $db->get_one("SELECT aid,aname,aintro,private FROM pw_cnalbum WHERE aid=".pwEscape($aid));
+		S::gp(array('aid'));
+		$album = $db->get_one("SELECT aid,aname,aintro,private FROM pw_cnalbum WHERE aid=".S::sqlEscape($aid));
 		empty($album) && Showmsg('album_not_exist',"$basename&action=albums");
 
 		if (empty($_POST['step'])) {
 
-			InitGP(array('cname','aname','owner','cid','crtime_s','crtime_e','lasttime_s','lasttime_e','private','lines','orderway','ordertype','page'));
+			S::gp(array('cname','aname','owner','cid','crtime_s','crtime_e','lasttime_s','lasttime_e','private','lines','orderway','ordertype','page'));
 			${'private_'.$album['private']} = 'selected';
 			require_once PrintApp('admin');
 
 		} else {
 
-			InitGP(array('aname','aintro','private'));
-			InitGP(array('url_cname','url_aname','url_owner','url_cid','url_crtime_s','url_crtime_e','url_lasttime_s','url_lasttime_e','url_private','url_lines','url_orderway','url_ordertype','url_page'));
-			$db->update("UPDATE pw_cnalbum SET ".pwSqlSingle(array('aname' => $aname,'aintro' => $aintro, 'private' => $private))." WHERE aid=".pwEscape($aid));
+			S::gp(array('aname','aintro','private'));
+			S::gp(array('url_cname','url_aname','url_owner','url_cid','url_crtime_s','url_crtime_e','url_lasttime_s','url_lasttime_e','url_private','url_lines','url_orderway','url_ordertype','url_page'));
+			$db->update("UPDATE pw_cnalbum SET ".S::sqlSingle(array('aname' => $aname,'aintro' => $aintro, 'private' => $private))." WHERE aid=".S::sqlEscape($aid));
 			adminmsg('operate_success',"$basename&action=album&job=list&&cname=".rawurlencode($url_cname)."&aname=".rawurlencode($url_aname)."&owner=".rawurlencode($url_owner)."&cid=$url_cid&crtime_s=$url_crtime_s&crtime_e=$url_crtime_e&lasttime_s=$url_lasttime_s&lasttime_e=$url_lasttime_e&private=$url_private&lines=$url_lines&orderway=$url_orderway&ordertype=$url_ordertype&page=$url_page&");
 		}
 	} else {
-		InitGP(array('aname','owner','cid','crtime_s','crtime_e','lasttime_s','lasttime_e','private','lines','orderway','ordertype','page','cname', 'searchDisplay'));
+		S::gp(array('aname','owner','cid','crtime_s','crtime_e','lasttime_s','lasttime_e','private','lines','orderway','ordertype','page','cname', 'searchDisplay'));
 
 		$crtimeStartString = $crtime_s && is_numeric($crtime_s) ? get_date($crtime_s, 'Y-m-d') : $crtime_s;
 		$crtimeEndString = $crtime_e && is_numeric($crtime_e) ? get_date($crtime_e, 'Y-m-d') : $crtime_e;
@@ -993,41 +1011,41 @@ if (empty($action)) {
 		$sqltab = $urladd = '';
 		if ($cname) {
 			$cname = str_replace('*','%',$cname);
-			$sql .= ' AND cl.cname LIKE '.pwEscape($cname);
+			$sql .= ' AND cl.cname LIKE '.S::sqlEscape($cname);
 			$urladd .= '&cname='.rawurlencode($cname);
 		}
 		if ($aname) {
 			$aname = str_replace('*','%',$aname);
-			$sql .= ' AND c.aname LIKE '.pwEscape($aname);
+			$sql .= ' AND c.aname LIKE '.S::sqlEscape($aname);
 			$urladd .= '&aname='.rawurlencode($aname);
 		}
 		if ($owner) {
 			$owner = str_replace('*','%',$owner);
-			$sql .= ' AND c.owner LIKE '.pwEscape($owner);
+			$sql .= ' AND c.owner LIKE '.S::sqlEscape($owner);
 			$urladd .= '&owner='.rawurlencode($owner);
 		}
 		if ($cid) {
-			$sql .= ' AND cl.classid LIKE '.pwEscape($cid);
+			$sql .= ' AND cl.classid LIKE '.S::sqlEscape($cid);
 			$urladd .= '&cid='.rawurlencode($cid);
 		}
 		if ($crtime_s) {
-			$sql .= ' AND c.crtime>='.pwEscape($crtime_s);
+			$sql .= ' AND c.crtime>='.S::sqlEscape($crtime_s);
 			$urladd .= "&crtime_s=$crtime_s";
 		}
 		if ($crtime_e) {
-			$sql .= ' AND c.crtime<='.pwEscape($crtime_e);
+			$sql .= ' AND c.crtime<='.S::sqlEscape($crtime_e);
 			$urladd .= "&crtime_e=$crtime_e";
 		}
 		if ($lasttime_s) {
-			$sql .= ' AND c.lasttime>='.pwEscape($lasttime_s);
+			$sql .= ' AND c.lasttime>='.S::sqlEscape($lasttime_s);
 			$urladd .= "&lasttime_s=$lasttime_s";
 		}
 		if ($lasttime_e) {
-			$sql .= ' AND c.lasttime<='.pwEscape($lasttime_e);
+			$sql .= ' AND c.lasttime<='.S::sqlEscape($lasttime_e);
 			$urladd .= "&lasttime_e=$lasttime_e";
 		}
 		if ($private > -1) {
-			$sql .= ' AND c.private='.pwEscape($private);
+			$sql .= ' AND c.private='.S::sqlEscape($private);
 			$urladd .= "&private=$private";
 		}
 		$sql_orderway = $orderway == 'crtime' ? 'c.crtime' : 'c.lasttime';
@@ -1043,7 +1061,7 @@ if (empty($action)) {
 		}
 		$pages = numofpage($count,$page,$numofpage,"$basename&action=$action&job=list$urladd&");
 		$start = ($page-1)*$lines;
-		$limit = pwLimit($start,$lines);
+		$limit = S::sqlLimit($start,$lines);
 		$query = $db->query("SELECT c.aid,c.aname,c.private,c.ownerid,c.owner,c.photonum,c.lasttime,c.lastpid,c.crtime,cl.cname,cl.admin FROM pw_cnalbum c LEFT JOIN pw_colonys cl ON c.ownerid=cl.id WHERE $sql ORDER BY $sql_orderway $ordertype ".$limit);
 		while ($rt = $db->fetch_array($query)) {
 			$rt['s_aname'] = substrs($rt['aname'],30);
@@ -1062,31 +1080,31 @@ if (empty($action)) {
 
 	if ($job == 'delete') {
 
-		InitGP(array('aid','cid','cname','aname','uploader','pintro','uptime_s','uptime_e','orderway','ordertype','lines','page','selid'));
+		S::gp(array('aid','cid','cname','aname','uploader','pintro','uptime_s','uptime_e','orderway','ordertype','lines','page','selid'));
 		require_once(R_P . 'u/require/core.php');
 		foreach ($selid as $key => $pid) {
-			$photo = $db->get_one("SELECT cp.path,ca.aid,ca.lastphoto,ca.lastpid,ca.ownerid FROM pw_cnphoto cp LEFT JOIN pw_cnalbum ca ON cp.aid=ca.aid WHERE cp.pid=" . pwEscape($pid) . " AND ca.atype='1'");
+			$photo = $db->get_one("SELECT cp.path,ca.aid,ca.lastphoto,ca.lastpid,ca.ownerid FROM pw_cnphoto cp LEFT JOIN pw_cnalbum ca ON cp.aid=ca.aid WHERE cp.pid=" . S::sqlEscape($pid) . " AND ca.atype='1'");
 			if (empty($photo)) {
 				adminmsg('data_error',"$basename&action=photos");
 			}
 			$uids[] = $photo['ownerid'];
-			$db->update("DELETE FROM pw_cnphoto WHERE pid=" . pwEscape($pid));
+			$db->update("DELETE FROM pw_cnphoto WHERE pid=" . S::sqlEscape($pid));
 
 			$pwSQL = array();
 			if ($photo['path'] == $photo['lastphoto']) {
-				$pwSQL['lastphoto'] = $db->get_value("SELECT path FROM pw_cnphoto WHERE aid=" . pwEscape($photo['aid']) . " ORDER BY pid DESC LIMIT 1");
+				$pwSQL['lastphoto'] = $db->get_value("SELECT path FROM pw_cnphoto WHERE aid=" . S::sqlEscape($photo['aid']) . " ORDER BY pid DESC LIMIT 1");
 			}
 			if (strpos(",$photo[lastpid],",",$pid,") !== false) {
 				$pwSQL['lastpid'] = implode(',',getLastPid($photo['aid']));
 			}
-			$upsql = $pwSQL ? ',' . pwSqlSingle($pwSQL) : '';
-			$db->update("UPDATE pw_cnalbum SET photonum=photonum-1{$upsql} WHERE aid=" . pwEscape($photo['aid']));
+			$upsql = $pwSQL ? ',' . S::sqlSingle($pwSQL) : '';
+			$db->update("UPDATE pw_cnalbum SET photonum=photonum-1{$upsql} WHERE aid=" . S::sqlEscape($photo['aid']));
 
 			$colony = $newColony->getColonyById($photo['ownerid']);
 			$colony['photonum']--;
 			updateGroupLevel($photo['ownerid'], $colony);
 
-			$db->update("UPDATE pw_colonys SET photonum=photonum-1 WHERE id=" . pwEscape($photo['ownerid']));
+			$db->update("UPDATE pw_colonys SET photonum=photonum-1 WHERE id=" . S::sqlEscape($photo['ownerid']));
 
 			pwDelatt($photo['path'], $db_ifftp);
 			$lastpos = strrpos($photo['path'],'/') + 1;
@@ -1102,7 +1120,7 @@ if (empty($action)) {
 	} else {
 
 		require_once(R_P . 'u/require/core.php');
-		InitGP(array('cid','cname','aid','aname','uploader','pintro','uptime_s','uptime_e','orderway','ordertype','lines','page'));
+		S::gp(array('cid','cname','aid','aname','uploader','pintro','uptime_s','uptime_e','orderway','ordertype','lines','page'));
 
 		empty($o_classdb) && $o_classdb = array();
 		$colonySelection = formSelect('cid', $cid, array(''=>'不限制') + $o_classdb, 'class="select_wa"');
@@ -1119,42 +1137,42 @@ if (empty($action)) {
 		$sql = "ca.atype='1'";
 
 		if	($cid) {
-			$sql .= ' AND c.classid='.pwEscape($cid);
+			$sql .= ' AND c.classid='.S::sqlEscape($cid);
 			$urladd .= '&cid='.$cid;
 		}
 
 		if ($cname) {
 			$urladd .= '&cname='.rawurlencode($cname);
 			$cname = str_replace('*','%',$cname);
-			$sql .= ' AND c.cname LIKE '.pwEscape($cname);
+			$sql .= ' AND c.cname LIKE '.S::sqlEscape($cname);
 		}
 
 		if ($aid) {
-			$sql .= ' AND ca.aid ='.pwEscape($aid);
+			$sql .= ' AND ca.aid ='.S::sqlEscape($aid);
 			$urladd .= '&aid='.$aid;
 		}
 		if ($aname) {
 			$urladd .= '&aname='.rawurlencode($aname);
 			$aname = str_replace('*','%',$aname);
-			$sql .= ' AND ca.aname LIKE '.pwEscape($aname);
+			$sql .= ' AND ca.aname LIKE '.S::sqlEscape($aname);
 		}
 		if ($uploader) {
 			$uploader = str_replace('*','%',$uploader);
-			$sql .= ' AND cp.uploader LIKE '.pwEscape($uploader);
+			$sql .= ' AND cp.uploader LIKE '.S::sqlEscape($uploader);
 			$urladd .= '&uploader='.rawurlencode($uploader);
 		}
 		if ($pintro) {
 			$pintro = str_replace('*','%',$pintro);
-			$sql .= ' AND cp.pintro LIKE '.pwEscape($pintro);
+			$sql .= ' AND cp.pintro LIKE '.S::sqlEscape($pintro);
 			$urladd .= '&pintro='.rawurlencode($pintro);
 		}
 		if ($uptime_s) {
-			$sql .= ' AND cp.uptime>='.pwEscape($uptime_s);
+			$sql .= ' AND cp.uptime>='.S::sqlEscape($uptime_s);
 			$urladd .= "&uptime_s=$uptime_s";
 		}
 		if ($uptime_e) {
 			$uptime_e_sql = $uptime_e + 24*3600;
-			$sql .= ' AND cp.uptime<='.pwEscape($uptime_e_sql);
+			$sql .= ' AND cp.uptime<='.S::sqlEscape($uptime_e_sql);
 			$urladd .= "&uptime_e=$uptime_e";
 		}
 		switch ($orderway) {
@@ -1181,7 +1199,7 @@ if (empty($action)) {
 		}
 		$pages = numofpage($count,$page,$numofpage,"$basename&action=$action&job=list&lines=$lines$urladd&");
 		$start = ($page-1)*$lines;
-		$limit = pwLimit($start,$lines);
+		$limit = S::sqlLimit($start,$lines);
 		$query = $db->query("SELECT cp.pid,cp.aid,cp.path,cp.uploader,cp.uptime,cp.ifthumb,cp.hits,cp.c_num,ca.aname,ca.ownerid,c.cname FROM pw_cnphoto cp LEFT JOIN pw_cnalbum ca ON cp.aid=ca.aid LEFT JOIN pw_colonys c ON ca.ownerid=c.id WHERE ".$sql." ".$sqladd." ".$limit);
 		$cnpho = array();
 		while ($rt = $db->fetch_array($query)) {
@@ -1205,13 +1223,13 @@ if (empty($action)) {
 } elseif ($action == 'active') {
 
 
-	InitGP(array('job'));
+	S::gp(array('job'));
 
 	if ($job == 'del') {
 
 		if (empty($_POST['step'])) {
 
-			InitGP(array('id'));
+			S::gp(array('id'));
 			define('AJAX', 1);
 			$posthash = EncodeUrl("$basename&action=active&job=del&selid=$id&ajax=1");
 			require_once (A_P . 'template/admin_ajax.htm');
@@ -1219,7 +1237,7 @@ if (empty($action)) {
 
 		} else {
 
-			InitGP(array('selid','urladd'));
+			S::gp(array('selid','urladd'));
 
 			if (isset($_GET['ajax'])) {
 				define('AJAX', 1);
@@ -1240,8 +1258,8 @@ if (empty($action)) {
 		}
 
 	} else {
-		InitGP(array('page','type','limit','activestate'), 'GP', 2);
-		InitGP(array('title','cname','cadmin','createtime_s','createtime_e','orderway','ordertype','activestate'));
+		S::gp(array('page','type','limit','activestate'), 'GP', 2);
+		S::gp(array('title','cname','cadmin','createtime_s','createtime_e','orderway','ordertype','activestate'));
 		$activeState = formSelect('activestate',$activestate,array('-1'=>'不限制','1'=>'可以报名','2'=>'人员已满','3'=>'报名已截止','4'=>'活动进行中','5'=>'活动已结束'),'class="select_wa"');
 		$activeTypes = array(1 => '出游', 2 => '聚餐 ', 3 => '舞会', 4 => '户外', 5 => '烧烤', 6 => '其他');
 		$activeTypeSelection = formSelect('type', $type, $activeTypes, 'class="select_wa"', '不限制');
@@ -1267,7 +1285,7 @@ if (empty($action)) {
 		}
 		if ($cname) {
 			$str_cname = str_replace('*','%', $cname);
-			$where = ($str_cname == $cname ? '=' : ' LIKE ') . pwEscape($str_cname);
+			$where = ($str_cname == $cname ? '=' : ' LIKE ') . S::sqlEscape($str_cname);
 			$array = array();
 			$query = $db->query("SELECT id FROM pw_colonys WHERE cname " . $where . ' LIMIT 100');
 			while ($rt = $db->fetch_array($query)) {
@@ -1282,7 +1300,7 @@ if (empty($action)) {
 		}
 		if ($cadmin) {
 			$str_cadmin = str_replace('*','%', $cadmin);
-			$where = ($str_cadmin == $cadmin ? '=' : ' LIKE ') . pwEscape($str_cadmin);
+			$where = ($str_cadmin == $cadmin ? '=' : ' LIKE ') . S::sqlEscape($str_cadmin);
 			$array = array();
 			$query = $db->query("SELECT uid FROM pw_members WHERE username" . $where . ' LIMIT 100');
 			while ($rt = $db->fetch_array($query)) {
@@ -1330,7 +1348,7 @@ if (empty($action)) {
 		}
 		$colonys = array();
 		if ($cids) {
-			$query = $db->query("SELECT id,cname FROM pw_colonys WHERE id IN (" . pwImplode($cids) . ')');
+			$query = $db->query("SELECT id,cname FROM pw_colonys WHERE id IN (" . S::sqlImplode($cids) . ')');
 			while ($rt = $db->fetch_array($query)) {
 				$colonys[$rt['id']] = $rt['cname'];
 			}
@@ -1345,22 +1363,22 @@ if (empty($action)) {
 
 	if ($job == 'del') {
 
-		InitGP(array('selid','content','username','postdate_s','postdate_e','ordertype','page','lines'));
+		S::gp(array('selid','content','username','postdate_s','postdate_e','ordertype','page','lines'));
 		empty($selid) && adminmsg("no_write_selid","$basename&action=write");
 		require_once(R_P. "u/require/core.php");
 		foreach ($selid as $key => $id) {
-			$writedb = $db->get_one("SELECT uid,cyid FROM pw_cwritedata WHERE id=".pwEscape($id));
+			$writedb = $db->get_one("SELECT uid,cyid FROM pw_cwritedata WHERE id=".S::sqlEscape($id));
 			if (empty($writedb)) {
 				adminmsg('data_error',"$basename&action=write");
 			}
 			$uids[] = $writedb['uid'];
-			$db->update("DELETE FROM pw_cwritedata WHERE id=".pwEscape($id));
+			$db->update("DELETE FROM pw_cwritedata WHERE id=".S::sqlEscape($id));
 
 			$colony = $newColony->getColonyById($writedb['cyid']);
 			$colony['writenum']--;
 			updateGroupLevel($colony['id'], $colony);
 
-			$db->update("UPDATE pw_colonys SET writenum=writenum-1 WHERE id=". pwEscape($writedb['cyid']));
+			$db->update("UPDATE pw_colonys SET writenum=writenum-1 WHERE id=". S::sqlEscape($writedb['cyid']));
 
 			$affected_rows = delAppAction('write',$id)+1;
 			countPosts("-$affected_rows");
@@ -1369,7 +1387,7 @@ if (empty($action)) {
 		updateUserAppNum($uids,'owrite','recount');
 		adminmsg('operate_success',"$basename&action=write&job=list&content=".rawurlencode($content)."&username=".rawurlencode($username)."&postdate_s=$postdate_s&postdate_e=$postdate_e&ordertype=$ordertype&lines=$lines&page=$page&");
 	} else {
-		InitGP(array('content','username','cid','cname','postdate_s','postdate_e','ordertype','page','lines'));
+		S::gp(array('content','username','cid','cname','postdate_s','postdate_e','ordertype','page','lines'));
 
 		empty($o_classdb) && $o_classdb = array();
 		$colonySelection = formSelect('cid', $cid, array('-1'=>'不限制') + $o_classdb, 'class="select_wa"');
@@ -1384,33 +1402,33 @@ if (empty($action)) {
 		if ($content) {
 			$content = str_replace('*','%',$content);
 			$sql .= $sql ? ' AND' : '';
-			$sql .= ' w.content LIKE '.pwEscape($content);
+			$sql .= ' w.content LIKE '.S::sqlEscape($content);
 			$urladd .= '&content='.rawurlencode($content);
 		}
 		if ($username) {
 			$username = str_replace('*','%',$username);
 			$sql .= $sql ? ' AND' : '';
-			$sql .= ' m.username LIKE '.pwEscape($username);
+			$sql .= ' m.username LIKE '.S::sqlEscape($username);
 			$urladd .= '&username='.rawurlencode($username);
 		}
 		if ((int)$cid > 0) {
 			$sql .= $sql ? ' AND' : '';
-			$sql .= "  n.classid=" . pwEscape($cid);
+			$sql .= "  n.classid=" . S::sqlEscape($cid);
 			$urladd .= "cid=$cid&";
 		}
 		if ($cname){
 			$sql .= $sql ? ' AND' : '';
-			$sql .= "  n.cname LIKE " . pwEscape(str_replace('*', '%', $cname));
+			$sql .= "  n.cname LIKE " . S::sqlEscape(str_replace('*', '%', $cname));
 			$urladd .= "cname=$cname&";
 		}
 		if ($postdate_s) {
 			$sql .= $sql ? ' AND' : '';
-			$sql .= ' w.postdate>='.pwEscape($postdate_s);
+			$sql .= ' w.postdate>='.S::sqlEscape($postdate_s);
 			$urladd .= "&postdate_s=$postdate_s";
 		}
 		if ($postdate_e) {
 			$sql .= $sql ? ' AND' : '';
-			$sql .= ' w.postdate<='.pwEscape($postdate_e);
+			$sql .= ' w.postdate<='.S::sqlEscape($postdate_e);
 			$urladd .= "&postdate_e=$postdate_e";
 		}
 		$ordertype = $ordertype == 'asc' ? 'asc' : 'desc';
@@ -1426,7 +1444,7 @@ if (empty($action)) {
 		}
 		$pages=numofpage($count,$page,$numofpage,"$basename&action=write&job=list$urladd&");
 		$start = ($page-1)*$lines;
-		$limit = pwLimit($start,$lines);
+		$limit = S::sqlLimit($start,$lines);
 
 		$query = $db->query("SELECT w.id,w.uid,m.username,w.postdate,w.source,w.content,w.c_num,w.cyid,n.cname FROM pw_cwritedata w LEFT JOIN pw_members m ON w.uid=m.uid LEFT JOIN pw_colonys n on w.cyid=n.id $sql "."ORDER BY postdate $ordertype ".$limit);
 		while ($rt = $db->fetch_array($query)) {
@@ -1444,7 +1462,7 @@ if (empty($action)) {
 
 } elseif ($action == 'style') {
 
-	InitGP(array('job'));
+	S::gp(array('job'));
 	require_once(R_P.'apps/groups/lib/groupstyle.class.php');
 	$groupStyle = new GroupStyle();
 	$allStyles = $allStylesOfOpen = array();
@@ -1461,7 +1479,7 @@ if (empty($action)) {
 
 		} else {
 
-			InitGP(array('selid','cname','delid','new_t_sub_db'));
+			S::gp(array('selid','cname','delid','new_t_sub_db'));
 
 			$newSubStyle = array();
 
@@ -1477,13 +1495,13 @@ if (empty($action)) {
 			empty($selid) && $selid = array();
 			$db->update("UPDATE pw_cnstyles SET ifopen=0");
 			if($selid) {
-				$db->update("UPDATE pw_cnstyles SET ifopen=1 WHERE id IN (" . pwImplode($selid) . ')');
+				$db->update("UPDATE pw_cnstyles SET ifopen=1 WHERE id IN (" . S::sqlImplode($selid) . ')');
 			}
 			//更新分类名称
 						
 			foreach ($allStyles as $key => $value) {
 				if ($value['cname'] != $cname[$key]) {
-					$db->update("UPDATE pw_cnstyles SET cname=" . pwEscape($cname[$key]) . ' WHERE id=' . pwEscape($key));
+					$db->update("UPDATE pw_cnstyles SET cname=" . S::sqlEscape($cname[$key]) . ' WHERE id=' . S::sqlEscape($key));
 				}
 			}
 
@@ -1504,17 +1522,17 @@ if (empty($action)) {
 				
 				foreach ($delids as $key=>$ids) {
 					foreach ($ids as $id) {
-						$cname  = $db->get_value("SELECT cname FROM pw_colonys WHERE styleid =" . pwEscape($id));
+						$cname  = $db->get_value("SELECT cname FROM pw_colonys WHERE styleid =" . S::sqlEscape($id));
 						$cname && adminmsg("群组:{$cname} 下有该分类:{$allStyles[$id][cname]}存在，不可删除", "$basename&action=style");
-						$db->query("DELETE FROM pw_cnstyles WHERE id = " . pwEscape($id));
+						$db->query("DELETE FROM pw_cnstyles WHERE id = " . S::sqlEscape($id));
 					}
-					$ucname  = $db->get_value("SELECT cname FROM pw_colonys WHERE styleid =" . pwEscape($key));
+					$ucname  = $db->get_value("SELECT cname FROM pw_colonys WHERE styleid =" . S::sqlEscape($key));
 					
 					$ucname && adminmsg("群组:{$ucname} 下有该分类:{$allStyles[$key][cname]}存在，不可删除", "$basename&action=style");
-					$db->query("DELETE FROM pw_cnstyles WHERE id = " . pwEscape($key));
+					$db->query("DELETE FROM pw_cnstyles WHERE id = " . S::sqlEscape($key));
 				}
-//				$db->query("UPDATE pw_colonys SET styleid = 0 WHERE styleid IN(" . pwImplode($delids) . ')');
-//				$db->query("DELETE FROM pw_cnstyles WHERE id IN (" . pwImplode($delids) . ')');
+//				$db->query("UPDATE pw_colonys SET styleid = 0 WHERE styleid IN(" . S::sqlImplode($delids) . ')');
+//				$db->query("DELETE FROM pw_cnstyles WHERE id IN (" . S::sqlImplode($delids) . ')');
 			}
 
 			//添加新的二级分类
@@ -1535,8 +1553,8 @@ if (empty($action)) {
 
 	} else { //添加新分类
 
-		InitGP(array('cname'));
-		$count = $db->get_one("SELECT COUNT(*) AS count FROM pw_cnstyles WHERE cname=" . pwEscape($cname) . " AND upid=0");
+		S::gp(array('cname'));
+		$count = $db->get_one("SELECT COUNT(*) AS count FROM pw_cnstyles WHERE cname=" . S::sqlEscape($cname) . " AND upid=0");
 		if ($count['count'] == 0) {
 			$db->query("INSERT INTO pw_cnstyles(cname,ifopen,csum) VALUES ('$cname','1','0')");
 			updatecache_cnc_s();
@@ -1567,7 +1585,7 @@ if (empty($action)) {
 
 	} else {
 
-		InitGP(array('name','style_name'));
+		S::gp(array('name','style_name'));
 
 		$db->update("DELETE FROM pw_cnskin");
 
@@ -1575,12 +1593,12 @@ if (empty($action)) {
 		foreach ($name as $key => $value) {
 			$pwSQL[] = array($value, $style_name[$key]);
 		}
-		$db->update("REPLACE INTO pw_cnskin (dir, name) VALUES " . pwSqlMulti($pwSQL));
+		$db->update("REPLACE INTO pw_cnskin (dir, name) VALUES " . S::sqlMulti($pwSQL));
 
 		adminmsg('operate_success',"$basename&action=colonystyle");
 	}
 } elseif ($action == 'thread') {
-	InitGP(array('cyid'));
+	S::gp(array('cyid'));
 	if ($_POST['step'] == 'updatecache') {
 		$j_url = "$basename&action=cache";
 		$cyid = (int)$cyid;
@@ -1610,8 +1628,8 @@ function updatecache_cnc() {
 	$classdb = serialize($classdb);
 	$db->pw_update(
 		"SELECT hk_name FROM pw_hack WHERE hk_name='o_classdb'",
-		'UPDATE pw_hack SET ' . pwSqlSingle(array('hk_value' => $classdb, 'vtype' => 'array')) . " WHERE hk_name='o_classdb'",
-		'INSERT INTO pw_hack SET ' . pwSqlSingle(array('hk_name' => 'o_classdb', 'vtype' => 'array', 'hk_value' => $classdb))
+		'UPDATE pw_hack SET ' . S::sqlSingle(array('hk_value' => $classdb, 'vtype' => 'array')) . " WHERE hk_name='o_classdb'",
+		'INSERT INTO pw_hack SET ' . S::sqlSingle(array('hk_name' => 'o_classdb', 'vtype' => 'array', 'hk_value' => $classdb))
 	);
 	updatecache_conf('o',true);
 }
@@ -1619,7 +1637,7 @@ function updatecache_cnc() {
 function updatecache_cnc_s() {
 	global $db;
 	$styledb = $style_relation = array();
-	$query = $db->query('SELECT id,cname,upid FROM pw_cnstyles WHERE ifopen=1');
+	$query = $db->query('SELECT id,cname,upid FROM pw_cnstyles WHERE ifopen=1 ORDER BY upid ASC');
 	while ($rt = $db->fetch_array($query)) {
 		$styledb[$rt['id']] = array(
 			'cname'	=> $rt['cname'],
@@ -1635,13 +1653,13 @@ function updatecache_cnc_s() {
 	$style_relation = serialize($style_relation);
 	$db->pw_update(
 		"SELECT hk_name FROM pw_hack WHERE hk_name='o_styledb'",
-		'UPDATE pw_hack SET ' . pwSqlSingle(array('hk_value' => $styledb, 'vtype' => 'array')) . " WHERE hk_name='o_styledb'",
-		'INSERT INTO pw_hack SET ' . pwSqlSingle(array('hk_name' => 'o_styledb', 'vtype' => 'array', 'hk_value' => $styledb))
+		'UPDATE pw_hack SET ' . S::sqlSingle(array('hk_value' => $styledb, 'vtype' => 'array')) . " WHERE hk_name='o_styledb'",
+		'INSERT INTO pw_hack SET ' . S::sqlSingle(array('hk_name' => 'o_styledb', 'vtype' => 'array', 'hk_value' => $styledb))
 	);
 	$db->pw_update(
 		"SELECT hk_name FROM pw_hack WHERE hk_name='o_style_relation'",
-		'UPDATE pw_hack SET ' . pwSqlSingle(array('hk_value' => $style_relation, 'vtype' => 'array')) . " WHERE hk_name='o_style_relation'",
-		'INSERT INTO pw_hack SET ' . pwSqlSingle(array('hk_name' => 'o_style_relation', 'vtype' => 'array', 'hk_value' => $style_relation))
+		'UPDATE pw_hack SET ' . S::sqlSingle(array('hk_value' => $style_relation, 'vtype' => 'array')) . " WHERE hk_name='o_style_relation'",
+		'INSERT INTO pw_hack SET ' . S::sqlSingle(array('hk_name' => 'o_style_relation', 'vtype' => 'array', 'hk_value' => $style_relation))
 	);
 	updatecache_conf('o',true);
 }

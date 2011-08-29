@@ -4,13 +4,10 @@ print <<<EOT
 <style type="text/css">
 .vote-ol{margin-left:2.5em;list-style-type:decimal;line-height:2}
 </style>
+<div class="t">
 <form action="job.php?action=vote" method="post" name="vote">
 <input type="hidden" name="verify" value="$verifyhash" />
-<div class="c"></div>
-<div class="t5 f_one">
-<table width="100%" cellspacing="0" cellpadding="0">
-
-<tr class="tr3"><th colspan="2">
+<div class="h" style="border-top:0 none;">
 <!-- 
 EOT;
 if('no' === $viewvoter){
@@ -28,18 +25,18 @@ EOT;
 }
 print <<<EOT
 -->
-
-总共有<b>{$voters}</b>人参与本次投票 发起于:$tpc_date
+<strong>总共有<b>{$voters}</b>人参与本次投票 发起于:$tpc_date</strong>
 <!--
 EOT;
 if ($tpc_endtime) {print <<<EOT
 -->
- 至 $tpc_endtime 结束
+<strong> 至 $tpc_endtime 结束</strong>
 <!--
 EOT;
 }print <<<EOT
 -->
-</td></tr>
+</div>
+<table width="100%" cellspacing="0" cellpadding="0">
 <tr class="tr3 f_two"><td colspan="2">
 <b>投票限制条件:</b> <br />
 <ol class="vote-ol">
@@ -108,7 +105,7 @@ $vote[name]
 EOT;
 if ($vote['voter']) {print <<<EOT
 -->
-<tr class="tr3"><th colspan="2" class="gray">&nbsp;&nbsp;$vote[voter]&nbsp;&nbsp;</td></tr>
+<tr class="tr3"><td colspan="2" class="gray">&nbsp;&nbsp;$vote[voter]&nbsp;&nbsp;</td></tr>
 <!--
 EOT;
 }}print <<<EOT
@@ -146,7 +143,7 @@ EOT;
 } print <<<EOT
 -->
 <input type="hidden" value="$tid" name="tid" />
-&nbsp;&nbsp;<input class="btn" type="submit" value="提 交" />
+<span class="btn2"><span><button type="submit">提 交</button></span></span>
 <!--
 EOT;
 }print <<<EOT
@@ -158,8 +155,9 @@ EOT;
 -->
 </td>
 </tr>
-</table></div>
+</table>
 </form>
+</div>
 <script language="JavaScript">
 var tempnum = 0;
 var voteid = '';

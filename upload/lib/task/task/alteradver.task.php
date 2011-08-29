@@ -26,7 +26,7 @@ class Task_AlterAdver {
 		$before = $alterbefore*3600*24;
 		$current = time();
 		$result = array();
-		$query = $this->_db->query("SELECT * FROM pw_advert WHERE type=1 AND ifshow=1 AND etime>".pwEscape($current)." AND etime<=".pwEscape($before+$current));
+		$query = $this->_db->query("SELECT * FROM pw_advert WHERE type=1 AND ifshow=1 AND etime>".S::sqlEscape($current)." AND etime<=".S::sqlEscape($before+$current));
 		while($rs = $this->_db->fetch_array($query)){
 			$result[$rs['uid']][] = $rs;
 		}
@@ -63,7 +63,7 @@ class Task_AlterAdver {
 	}
 	
 	function _getAdvers($ckey){
-		$query = $this->_db->query("SELECT * FROM pw_advert WHERE ckey=".pwEscape($ckey));
+		$query = $this->_db->query("SELECT * FROM pw_advert WHERE ckey=".S::sqlEscape($ckey));
 		$current = time();
 		$title = $descrip = '';/* adver title*/
 		$up = $down = 0;
@@ -93,7 +93,7 @@ class Task_AlterAdver {
 	 */
 	function sendShortMessage($touid,$subject,$content){
 		global $db;
-		$subject = Char_cv($subject);
+		$subject = S::escapeChar($subject);
 		$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
 		$toUserName = $userService->getUserNameByUserId($touid);
 		M::sendNotice(

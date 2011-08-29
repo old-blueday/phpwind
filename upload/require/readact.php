@@ -1,7 +1,7 @@
 <?php
 !function_exists('readover') && exit('Forbidden');
 
-$activity = $db->get_one("SELECT * FROM pw_activity WHERE tid=".pwEscape($tid));
+$activity = $db->get_one("SELECT * FROM pw_activity WHERE tid=".S::sqlEscape($tid));
 
 if ($activity) {
 	$special = 'read_activity';
@@ -13,7 +13,7 @@ if ($activity) {
 		${'active_'.$key}=$val;
 	}
 	unset($activity);
-	$query = $db->query("SELECT a.state,a.winduid,m.username FROM pw_actmember a LEFT JOIN pw_members m ON a.winduid=m.uid WHERE a.actid=".pwEscape($tid));
+	$query = $db->query("SELECT a.state,a.winduid,m.username FROM pw_actmember a LEFT JOIN pw_members m ON a.winduid=m.uid WHERE a.actid=".S::sqlEscape($tid));
 	$act_total = $act_y = 0;
 	$actuserdb = array();
 	while ($rt = $db->fetch_array($query)) {
@@ -21,6 +21,6 @@ if ($activity) {
 		$rt['state'] == 1 && $act_y ++;
 		$rt['state'] == 1 && $actuserdb[] = array('winduid'=>$rt['winduid'],'username'=>$rt['username']);
 	}
-	$actmen = $db->get_one("SELECT state FROM pw_actmember WHERE winduid=".pwEscape($winduid)."AND actid=".pwEscape($tid));
+	$actmen = $db->get_one("SELECT state FROM pw_actmember WHERE winduid=".S::sqlEscape($winduid)."AND actid=".S::sqlEscape($tid));
 }
 ?>

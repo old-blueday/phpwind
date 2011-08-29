@@ -8,7 +8,7 @@ if(!$db_toolbar && $pwForumList){print <<<EOT
 	<div class="sbar-box-a" style="width:700px;">
 		<div class="sbar-title" style="cursor:pointer" onclick="try{pw_bottom.hiddenTab();read.close();}catch(e){read.close();}">
 				<span class="adel">隐藏</span>
-				<span id="title_forumlist" class="b">快速浏览</span>
+				<span id="title_forumlist" class="b">快速跳转</span>
 		</div>
 		<div class="sbar-box-b">
 			<div class="forum-list-popout">
@@ -53,7 +53,7 @@ EOT;
 -->
 </div>
 <div id="pw_content">
-<div class="p15">
+<div>
 <!--
 EOT;
 foreach($noticedb as $value){print <<<EOT
@@ -65,7 +65,7 @@ foreach($noticedb as $value){print <<<EOT
 <tr>
 <th class="tal fn" style="padding:15px;">$value[content]</th></tr>
 <tr><td>
-<div class="fr">
+<div class="fr mr10">
 作者：<a href="u.php?username=$value[rawauthor]">$value[author]</a>
 &nbsp;&nbsp;时间：$value[startdate]
 </div>

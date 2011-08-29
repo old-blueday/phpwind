@@ -31,7 +31,8 @@ class PW_UserCache {
 			'colony',
 			//'share',
 			'messageboard',
-			'recommendUsers'
+			'recommendUsers',
+			'friendsBirthday'
 		);
 	}
 	

@@ -1,15 +1,13 @@
 <?php
 !defined('P_W') && exit('Forbidden');
 
-InitGP(array(
-	'uid'
-));
+S::gp(array('uid'));
 $db_logintype = 2;
 require_once (R_P . 'require/checkpass.php');
 
-$id = $db->get_value("SELECT id FROM pw_userbinding WHERE uid=" . pwEscape($winduid));
+$id = $db->get_value("SELECT id FROM pw_userbinding WHERE uid=" . S::sqlEscape($winduid));
 
-$user = $db->get_one("SELECT s.password,m.uid,m.safecv FROM pw_userbinding s LEFT JOIN pw_members m ON s.uid=m.uid WHERE s.id=" . pwEscape($id) . ' AND s.uid=' . pwEscape($uid));
+$user = $db->get_one("SELECT s.password,m.uid,m.safecv FROM pw_userbinding s LEFT JOIN pw_members m ON s.uid=m.uid WHERE s.id=" . S::sqlEscape($id) . ' AND s.uid=' . S::sqlEscape($uid));
 
 $logininfo = checkpass($user['uid'], $user['password'], $user['safecv'], 1);
 if (!is_array($logininfo)) {

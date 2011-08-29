@@ -1,7 +1,10 @@
 <!--<?php
-include_once PrintEot('left');print <<<EOT
+include_once PrintEot('left');
+${$action} = "class='current'";
+if( $action == 'setucenter' ){
+print<<<EOT
 -->
-<form action="$basename&" method="post">
+<form action="$basename&action=setucenter" method="post">
   <input type="hidden" name="step" value="2">
   <h2 class="h1">个人中心设置</h2>
   <div class="admin_table mb10">
@@ -10,34 +13,69 @@ include_once PrintEot('left');print <<<EOT
       <td class="td1">广场模块</td>
       <td class="td2">
        <ul class="cc list_80 fl list_A">
-           <li><input type="radio" name="config[browseopen]" value="1" $browseopen_Y>开启</li>
+           <li><input type="radio" checked=""  name="config[browseopen]" value="1" $browseopen_Y>开启</li>
            <li><input type="radio" name="config[browseopen]" value="0" $browseopen_N>关闭</li>
          </ul>
-      </td><td class="td2"><div class="help_a">开启后，会员可通过广场页面查看到更多的内容</div></td>
+      </td><td class="td2"><div class="help_a"><span> <a href="javascript:;" onclick="parent.PW.Dialog({id:'area_module',url:'$admin_file?adminjob=mode&admintype=area_module&alias=oindex',name:'模块管理'});">模块管理</a></span>
+	  <span><a href="javascript:;" onclick="parent.PW.Dialog({id:'area_pushdata',url:'$admin_file?adminjob=mode&admintype=area_pushdata&alias=oindex',name:'内容推送管理'});">内容管理</a>
+</div></td>
     </tr>
-    <!-- <tr class="tr1 vt">
-      <td class="td1">未登录状态圈子首页</td>
+	<tr class="tr1 vt">
+      <td class="td1">个人中心url伪静态</td>
       <td class="td2">
-          <ul class="cc list_160 list_A">
-              <li><input type="checkbox" value="2" name="indexset[]" $indexset_1 />最新照片</li>
-              <li><input type="checkbox" value="4" name="indexset[]" $indexset_2 />站点热门</li>
-              <li><input type="checkbox" value="8" name="indexset[]" $indexset_3 />最新动态</li>
-              <li> <input type="checkbox" value="16" name="indexset[]" $indexset_4 />活跃会员</li>
-              <li><input type="checkbox" value="32" name="indexset[]" $indexset_5 />记录</li>
-              <li><input type="checkbox" value="64" name="indexset[]" $indexset_6 />分享</li>
-              <li><input type="checkbox" value="128" name="indexset[]" $indexset_7 />相册</li>
-              <li><input type="checkbox" value="256" name="indexset[]" $indexset_8 />群组</li>
-              <li><input type="checkbox" value="512" name="indexset[]" $indexset_9 />日志</li>
-          </ul>
-     </td><td class="td2"><div class="help_a">勾选以开启未登录状态个人中心首页展示的内容模块</div></td>
-    </tr> -->
+       <ul class="cc list_80 fl list_A">
+           <li><input type="radio"  name="configa[userurlopen]" value="1" $userurlopen_Y >开启</li>
+           <li><input type="radio"  name="configa[userurlopen]" value="0" $userurlopen_N>关闭</li>
+         </ul>
+      </td><td class="td2"><div class="help_a">开启该功能首先要确保你的服务器是否支持URL伪静态功能</div></td>
+    </tr>
   </table>
   </div>
+  <!-- Punch job start ========================================================= -->
+   <h2 class="h1">每日打卡设置</h2>
+  <script type="text/javascript" language="JavaScript" src="js/desktop/adminjob.js"></script>
+  <div class="admin_table">
+   <table cellpadding="0" cellspacing="0" width="100%">
+    <tr class="tr1 vt">
+            <td class="td1">每日打卡</td>
+            <td class="td2">
+           	 	<div class="list_A list_80">
+                    <ul class="cc">
+                        <li><input type="radio" value="1" name="config[punchopen]" $punchopen_Y />开启</li>
+                        <li><input type="radio" value="0" name="config[punchopen]" $punchopen_N />关闭</li>
+                    </ul>
+                </div>
+            </td>
+            <td class="td2"><div class="help_a">开启后,用户可以在个人中心首页打卡获取积分奖励,每日一次</div></td>
+        </tr>
+      <tr class="tr1 vt">
+        <td class="td1">奖励名称</td>
+        <td class="td2">$creditSelect</td>
+        <td class="td2"><div class="help_a"></div></td>
+      </tr>
+      <tr class="tr1 vt">
+        <td class="td1">奖励数量</td>
+        <td class="td2"><input name="reward[credit][num]" value="$reward[num]" type="text" class="input input_wa" /></td>
+        <td class="td2"><div class="help_a"></div></td>
+      </tr>
+      <tr class="tr1 vt">
+        <td class="td1">每日打卡申请条件</td>
+        <td class="td2"> $levelCheckBox </td>
+		<td class="td2"><div class="help_a">勾选的用户组有打卡权限,没有权限的用户,在个人中心不显示打卡按钮.全不选则不限制</div></td>
+      </tr>
+   </table>
+</div>
+  <!-- Punch job end =========================================================== -->
   <div class="mb10 tac">
     <span class="btn"><span><button type="submit" value="提 交">提 交</button></span></span>
   </div>
+  <h3 class="h1">使用方法:</h3>
+	<div class="legend">以apache服务器为例介绍使用方法.<ol>
+	<li>在<b>个人中心URL伪静态</b>，一定要确保您的服务器已经<font color="red"><b>开启了url重写</b></font>,然后需要确保全局-静态目录部署开启"<br/>&nbsp;&nbsp;默认的URL形式为 "http://www.phpwind.net/<font color="red"><b>u.php?uid=2</b></font><br/>&nbsp;&nbsp;新的URL形式为&nbsp; &nbsp; "http://www.phpwind.net/<font color="red"><b>u/2</b></font>"<br/>&nbsp;&nbsp;这种纯静态形式的URL更易被搜索引擎收录</li>
+	<li>Apache Web Server 的配置<br/>&nbsp;&nbsp;首先确定加载了 Mod_rewrite 模块，方法: 检查 conf/httpd.conf 中是否存在以下两段代码 (具体路径可能会有所不同，但形式基本是一样的):<br/><br/>(一)LoadModule rewrite_module     libexec/mod_rewrite.so<br/> (二)AddModule mod_rewrite.c<br/><br/> 如果存在，那么在配置文件（通常就是conf/httpd.conf）中加入如下代码。此时须注意，如果网站使用通过虚拟主机来定义，请务必加到虚拟主机配置中去，否则可能无法使用。改好后然后将 Apache 重启. <br/><br/>&lt;IfModule mod_rewrite.c&gt;<br/> RewriteEngine On<br/><font color="red">RewriteRule ^u/([0-9]+)$ u.php?uid=$1</font><br/>&lt;/IfModule&gt;</li></ol></div>
 </form>
 <!--
 EOT;
+}
 include_once PrintEot('adminbottom');
 ?>-->

@@ -2,7 +2,7 @@
 !defined('P_W') && exit('Forbidden');
 define('AJAX','1');
 PostCheck();
-InitGP(array(
+S::gp(array(
 	'pid',
 	'page',
 	'type'
@@ -10,15 +10,19 @@ InitGP(array(
 
 $template = 'ajax_job';
 
+if (empty($windid)) {
+	Showmsg('not_login');
+}
+
 $tpcs = array();
 if ($pid == 'tpc') {
 	$table = GetTtable($tid);
-	$tpcs = $db->get_one("SELECT t.author,t.authorid,t.subject,tm.userip,tm.content,tm.buy FROM pw_threads t LEFT JOIN $table tm ON tm.tid=t.tid WHERE t.tid=" . pwEscape($tid));
+	$tpcs = $db->get_one("SELECT t.author,t.authorid,t.subject,tm.userip,tm.content,tm.buy FROM pw_threads t LEFT JOIN $table tm ON tm.tid=t.tid WHERE t.tid=" . S::sqlEscape($tid));
 	$where = '';
 } elseif (is_numeric($pid)) {
 	$table = GetPtable('N', $tid);
-	$tpcs = $db->get_one("SELECT author,authorid,subject,userip,content,buy FROM $table WHERE pid=" . pwEscape($pid) . ' AND tid=' . pwEscape($tid));
-	$where = ' AND pid=' . pwEscape($pid);
+	$tpcs = $db->get_one("SELECT author,authorid,subject,userip,content,buy FROM $table WHERE pid=" . S::sqlEscape($pid) . ' AND tid=' . S::sqlEscape($tid));
+	$where = ' AND pid=' . S::sqlEscape($pid);
 }
 
 !$tpcs && Showmsg('illegal_tid');
@@ -27,10 +31,6 @@ if ($pid == 'tpc') {
 $tpcs['content'] = substr($tpcs['content'], strpos($tpcs['content'], '[sell=') + 6);
 $cost = substr($tpcs['content'], 0, strpos($tpcs['content'], ']'));
 list($creditvalue, $credittype) = explode(',', $cost);
-
-if (empty($windid)) {
-	Showmsg('undefined_action');
-}
 
 $tpcsBuyDate = $tpcs['buy'] ? unserialize($tpcs['buy']) : array();
 require_once (R_P . 'require/credit.php');
@@ -46,7 +46,7 @@ if ($type == 'record') {
 	require_once PrintEot($template);
 	ajax_footer();
 } elseif ($type == 'buy') {
-	InitGP(array('step'));
+	S::gp(array('step'));
 	if ($winduid == $tpcs['authorid']) {
 		Showmsg('自己的帖子不需要购买');
 	}
@@ -115,11 +115,12 @@ if ($type == 'record') {
 		
 		$tpcs['buy'] = $tpcsBuyDate ? serialize($tpcsBuy+$tpcsBuyDate) : serialize($tpcsBuy);
 		
-		$db->update("UPDATE $table SET buy=" . pwEscape($tpcs['buy'], false) . " WHERE tid=" . pwEscape($tid) . $where);
+		$db->update("UPDATE $table SET buy=" . S::sqlEscape($tpcs['buy'], false) . " WHERE tid=" . S::sqlEscape($tid) . $where);
 		
-		$threadObj = L::loadClass("threads", 'forum');
-		$threadObj->clearThreadByThreadId($tid);
-		$threadObj->clearTmsgsByThreadId($tid);
+		//* $threadObj = L::loadClass("threads", 'forum');
+		//* $threadObj->clearThreadByThreadId($tid);
+		//* $threadObj->clearTmsgsByThreadId($tid);
+		Perf::gatherInfo('changeThreadWithThreadIds', array('tid'=>$tid));
 		Showmsg('ajaxma_success');
 	} else {
 		$basename = "job.php?action=buytopic&type=buy&tid=$tid&pid=$pid&page=$page";

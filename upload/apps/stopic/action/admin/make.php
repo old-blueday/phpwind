@@ -1,7 +1,7 @@
 <?php
 !defined('P_W') && exit('Forbidden');
 
-InitGP(array("stopic_id"), null, 2);
+S::gp(array("stopic_id"), null, 2);
 
 $tpl_content = '';
 if ($stopic_id) {

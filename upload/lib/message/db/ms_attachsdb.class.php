@@ -19,18 +19,18 @@ class PW_Ms_AttachsDB extends BaseDB {
 		return $this->_count();
 	}
 	function addAttachs($fieldDatas){
-		return $this->_db->update("INSERT INTO ".$this->_tableName." (uid,aid,mid,rid,status,created_time) VALUES  ".pwSqlMulti($fieldDatas,FALSE));
+		return $this->_db->update("INSERT INTO ".$this->_tableName." (uid,aid,mid,rid,status,created_time) VALUES  ".S::sqlMulti($fieldDatas,FALSE));
 	}
 	function getAttachsByMessageId($userId,$messageId){
 		$query = $this->_db->query ( "SELECT *  FROM " . $this->_tableName. " WHERE mid = ".$this->_addSlashes($messageId));
 		return $this->_getAllResultFromQuery ( $query );
 	}
 	function getAttachsByMessageIds($messageIds){
-		$query = $this->_db->query ( "SELECT *  FROM " . $this->_tableName. " WHERE mid in( ".pwImplode($messageIds).")");
+		$query = $this->_db->query ( "SELECT *  FROM " . $this->_tableName. " WHERE mid in( ".S::sqlImplode($messageIds).")");
 		return $this->_getAllResultFromQuery ( $query );
 	}
 	function deleteAttachsByMessageIds($messageIds){
-		return $this->_db->update ( "DELETE FROM " . $this->_tableName. " WHERE mid in( ".pwImplode($messageIds).")");
+		return $this->_db->update ( "DELETE FROM " . $this->_tableName. " WHERE mid in( ".S::sqlImplode($messageIds).")");
 	}
 	function getAllAttachs($start,$limit){
 		$query = $this->_db->query ( "SELECT *  FROM " . $this->_tableName. " ORDER BY created_time DESC LIMIT ".$start.",".$limit);

@@ -4,7 +4,7 @@
 if (empty($_GET['step'])) {
 
 	list($db_upload,$db_imglen,$db_imgwidth,$db_imgsize) = explode("\t",$db_upload);
-	InitGP(array('uid','verify'));
+	S::gp(array('uid','verify'));
 	$swfhash = GetVerify($uid);
 	checkVerify('swfhash');
 	$db_uploadfiletype = array();
@@ -40,7 +40,7 @@ if (empty($_GET['step'])) {
 
 		$middleFile = PwUpload::savePath($db_ifftp, $filename, "$middleDir");
 		PwUpload::createFolder(dirname($middleFile));
-		writeover($middleFile, $data);
+		pwCache::setData($middleFile, $data);
 
 		require_once(R_P.'require/imgfunc.php');
 		if (!$img_size = GetImgSize($middleFile,'jpg')) {

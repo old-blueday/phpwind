@@ -7,7 +7,7 @@
  * @effect:清除猪头卡的效果．
  */
 
-InitGP(array('uid'),'GP',2);
+S::gp(array('uid'),'GP',2);
 if ($tooldb['type'] != 2){
 	Showmsg('tooluse_type_error');  // 判断道具类型是否设置错误
 }
@@ -27,7 +27,7 @@ if (empty($user_a[4])) {
 
 $userService->update($uid, array('icon' => $userface));
 
-$db->update("UPDATE pw_usertool SET nums=nums-1 WHERE uid=".pwEscape($winduid)."AND toolid=".pwEscape($toolid));
+$db->update("UPDATE pw_usertool SET nums=nums-1 WHERE uid=".S::sqlEscape($winduid)."AND toolid=".S::sqlEscape($toolid));
 $logdata=array(
 	'type'		=>	'use',
 	'descrip'	=>	'tool_19_descrip',
@@ -40,7 +40,7 @@ $logdata=array(
 );
 writetoollog($logdata);
 
-$_cache = getDatastore();
-$_cache->delete('UID_'.$uid);
+//* $_cache = getDatastore();
+//* $_cache->delete('UID_'.$uid);
 Showmsg('toolmsg_success');
 ?>

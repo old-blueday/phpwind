@@ -15,11 +15,11 @@ if(!$action){
 		$r_0_0 = $r_1_0 = $r_2_0 = 'checked';
 		include PrintEot('pwcode');exit;
 	} else{
-		InitGP(array('name','icon','pattern','param','title','descrip'));
-		InitGP(array('replace'),'P',0);
+		S::gp(array('name','icon','pattern','param','title','descrip'));
+		S::gp(array('replace'),'P',0);
 		$pattern = implode("\t",$pattern);
 		$db->update("INSERT INTO pw_windcode"
-			. " SET " . pwSqlSingle(array(
+			. " SET " . S::sqlSingle(array(
 				'name'		=> $name,
 				'icon'		=> $icon,
 				'pattern'	=> $pattern,
@@ -34,8 +34,8 @@ if(!$action){
 	}
 } elseif($action=='edit'){
 	if(!$_POST['step']){
-		InitGP(array('id'),'GP',2);
-		$rt = $db->get_one("SELECT * FROM pw_windcode WHERE id=".pwEscape($id));
+		S::gp(array('id'),'GP',2);
+		$rt = $db->get_one("SELECT * FROM pw_windcode WHERE id=".S::sqlEscape($id));
 		${'s_'.$rt['param']} = 'selected';
 		$p = explode("\t",$rt['pattern']);
 		for($i=0;$i<3;$i++){
@@ -44,11 +44,11 @@ if(!$action){
 		}
 		include PrintEot('pwcode');exit;
 	} else{
-		InitGP(array('id','name','icon','pattern','param','title','descrip'));
-		InitGP(array('replace'),'P',0);
+		S::gp(array('id','name','icon','pattern','param','title','descrip'));
+		S::gp(array('replace'),'P',0);
 		$pattern = implode("\t",$pattern);
 		$db->update("UPDATE pw_windcode"
-			. " SET " . pwSqlSingle(array(
+			. " SET " . S::sqlSingle(array(
 					'name'		=> $name,
 					'icon'		=> $icon,
 					'pattern'	=> $pattern,
@@ -57,13 +57,13 @@ if(!$action){
 					'title'		=> $title,
 					'descrip'	=>$descrip
 				))
-			. " WHERE id=".pwEscape($id));
+			. " WHERE id=".S::sqlEscape($id));
 		//updatecache_wcode();
 		updatecache_c();
 		adminmsg("operate_success");
 	}
 } elseif($_POST['action']=='submit'){
-	InitGP(array('selid','icon'));
+	S::gp(array('selid','icon'));
 	$delids = checkselid($selid);
 	if($delids){
 		$db->update("DELETE FROM pw_windcode WHERE id IN($delids)");

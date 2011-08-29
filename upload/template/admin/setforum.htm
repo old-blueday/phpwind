@@ -2,6 +2,14 @@
 include_once PrintEot('left');
 if (empty($action)) {print <<<EOT
 -->
+<div class="nav3 mb10">
+	<ul class="cc">
+		<li class="current"><a href="$admin_file?adminjob=setforum&adminitem=setforum">版块管理</a></li>
+		<li><a href="$admin_file?adminjob=setforum&adminitem=uniteforum">版块合并</a></li>
+		<li><a href="$admin_file?adminjob=setforum&adminitem=forumsell">版块出售记录</a></li>
+		<li><a href="$admin_file?adminjob=setforum&adminitem=creathtm">生成静态文件</a></li>
+	</ul>
+</div>
 <h2 class="h1">快捷操作</h2>
 <div class="admin_table mb10">
     <table cellspacing="0" cellpadding="0" width="100%">
@@ -398,6 +406,14 @@ searchSelector.init('forumname', 'searchForumSelection', '$ajaxurl');
 EOT;
 }elseif($action == 'addforum') {print<<<EOT
 -->
+<div class="nav3 mb10">
+	<ul class="cc">
+		<li class="current"><a href="$admin_file?adminjob=setforum&adminitem=setforum&c_type=$c_type">版块管理</a></li>
+		<li><a href="$admin_file?adminjob=setforum&adminitem=uniteforum&type=$type">版块合并</a></li>
+		<li><a href="$admin_file?adminjob=setforum&adminitem=forumsell">版块出售记录</a></li>
+		<li><a href="$admin_file?adminjob=setforum&adminitem=creathtm&type=$type">生成静态文件</a></li>
+	</ul>
+</div>
 <div class="admin_info mb10">
     <h3 class="h1"><b>提示信息</b></h3>
     <div class="legend"><ol><li>版块关键字:有利于搜索引擎(50字节以内)
@@ -413,7 +429,7 @@ EOT;
             <td>顺序</td>
             <td>版块名称</td>
             <td>版主</td>
-            <td>默认同核心设置</td>
+            <td>默认同全局设置</td>
             <td>关键字</td>
             <td>简介</td>
             <td>图标</td>
@@ -497,6 +513,14 @@ EOT;
 EOT;
 if(!$fid){print <<<EOT
 -->
+<div class="nav3 mb10">
+	<ul class="cc">
+		<li class="current"><a href="$admin_file?adminjob=setforum&adminitem=setforum&c_type=$c_type">版块管理</a></li>
+		<li><a href="$admin_file?adminjob=setforum&adminitem=uniteforum&type=$type">版块合并</a></li>
+		<li><a href="$admin_file?adminjob=setforum&adminitem=forumsell">版块出售记录</a></li>
+		<li><a href="$admin_file?adminjob=setforum&adminitem=creathtm&type=$type">生成静态文件</a></li>
+	</ul>
+</div>
 <h2 class="h1"><span class="mr10">请选择需要设置的版块</span><a href="$basename" class="linka">返回上一级<span class="f9">▲</span></a></h2>
 <div class="admin_table mb10">
     <table cellspacing="0" cellpadding="0" width="100%">
@@ -593,7 +617,7 @@ print <<<EOT
                     $setfid_style
                 </select>
             </td>
-            <td class="td2"><div class="help_a">默认同核心设置</div></td>
+            <td class="td2"><div class="help_a">默认同全局设置</div></td>
             <td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[style]" value="1" /></div></td>
         </tr>
         <tr class="tr1 vt">
@@ -609,7 +633,7 @@ if($type=='category'){print <<<EOT
         <tr class="tr1 vt">
             <td class="td1">二级目录/域名设置</td>
             <td class="td2"><input type="text" class="input input_wa" name="dirname" value="$dirname" /></td>
-            <td class="td2"><div class="help_a">版块二级域名/二级目录设置<br />(启用二级目录功能需要到<a href="admin.php?adminjob=settings&admintype=basic&action=global&admin_keyword=二级目录">核心设置</a>处开启)</div></td>
+            <td class="td2"><div class="help_a">版块二级域名/二级目录设置<br />(启用二级目录功能需要到<a href="?adminjob=settings&admintype=basic&action=global&admin_keyword=二级目录/域名访问" onClick="parent.PW.Dialog({id:'basic',url:'?adminjob=settings&admintype=basic&action=global&admin_keyword=二级目录/域名访问',name:'站点设置'});return false;">站点设置</a>处开启)</div></td>
             <td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[dirname]" value="1" /></div></td>
         </tr>
 </table>
@@ -622,24 +646,24 @@ EOT;
 		<td class="td1">选择上级版块</td>
 		<td class="td2"><select name="ffup" class="select_wa"><option value="">选择上级版块</option>$fup_forumcache</select><!--站点版块--></td>
         <td class="td2"><!--选择上级版块--></td>
-        <td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[fup]" value="1" /></div></td>
+        <td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[ffup]" value="1" /></div></td>
 	</tr>
 	<tr class="tr1 vt">
 		<td class="td1">版块关键字</td>
 		<td class="td2"><textarea name="keywords" class="textarea">{$keywords}</textarea></td>
-        <td class="td2"><div class="help_a">设置版块关键字，有利于搜索引擎(250字节以内)<br />也可在 核心设置->SEO优化中进行设置</div></td>
+        <td class="td2"><div class="help_a">设置版块关键字，有利于搜索引擎(250字节以内)<br />也可在 <a href="?adminjob=settings&admintype=basic"  onClick="parent.PW.Dialog({id:'seoset',url:'?adminjob=seoset',name:'SEO设置'});return false;">全局->SEO优化</a> 中进行设置</div></td>
         <td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[keywords]" value="1" /></div></td>
 	</tr>
 	<tr class="tr1 vt">
 		<td class="td1">版块Meta描述</td>
 		<td class="td2"><textarea class="textarea" name="metadescrip">{$metadescrip}</textarea></td>
-        <td class="td2"><div class="help_a">有利于搜索引擎(250字节以内)<br />也可在 核心设置->SEO优化中进行设置</div></td>
-        <td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[descrip]" value="1" /></div></td>
+        <td class="td2"><div class="help_a">有利于搜索引擎(250字节以内)<br />也可在 <a href="?adminjob=settings&admintype=basic"  onClick="parent.PW.Dialog({id:'seoset',url:'?adminjob=seoset',name:'SEO设置'});return false;">全局->SEO优化</a> 中进行设置</div></td>
+        <td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[metadescrip]" value="1" /></div></td>
 	</tr>
 	<tr class="tr1 vt">
 		<td class="td1">版块简介</td>
 		<td class="td2"><textarea class="textarea" name="descrip">{$descrip}</textarea></td>
-        <td class="td2"><div class="help_a">支持html代码</div></td>
+        <td class="td2"><div class="help_a">支持html代码，html样式受论坛页面样式影响<br/>如需要特殊样式，请在html标签中添加样式</div></td>
         <td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[descrip]" value="1" /></div></td>
 	</tr>
 	<tr class="tr1 vt">
@@ -675,7 +699,7 @@ EOT;
 				</dd>
 			</dl>
 		</td>
-        <td class="td2"><div class="help_a">此处设置只有在“论坛模式”->“界面设置”->“首页细节设置”处选择为自定义才有效</div></td>
+        <td class="td2"><div class="help_a">此处设置只有在 <a href="?adminjob=interfacesettings&adminitem=index&admin_keyword=logo"  onClick="parent.PW.Dialog({id:'interfacesettings',url:'?adminjob=interfacesettings&adminitem=index&admin_keyword=logo',name:'界面设置'});return false;">论坛模式->界面设置</a> 处选择为自定义才有效</div></td>
         <td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[logo]" value="1" /></div></td>
 	</tr>
 <!--
@@ -717,12 +741,12 @@ print<<<EOT
 		<td class="td1">版块类别</td>
 		<td class="td2">
             <ul class="list_A">
-                <li><input type="radio" name="f_type" value="forum" $ftype_forum />开放版块</li>
-                <li><input type="radio" name="f_type" value="former" $ftype_former />正规版块</li>
-                <li><input type="radio" name="f_type" value="hidden" $ftype_hidden />隐藏版块</li>
+                <li><input type="radio" onclick="changeDescript('forum')" name="f_type" value="forum" $ftype_forum />开放版块</li>
+                <li><input type="radio" onclick="changeDescript('former')" name="f_type" value="former" $ftype_former />正规版块</li>
+                <li><input type="radio" onclick="changeDescript('hidden')" name="f_type" value="hidden" $ftype_hidden />隐藏版块</li>
             </ul>
 		</td>
-		<td class="td2"><div class="help_a">版块隐藏时需要到版块用户组权限处进行详细设置</div></td>
+		<td class="td2"><div class="help_a" id="typedescript"></div></td>
 		<td class="td2" width="40"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[f_type]" value="1" /></div></td>
 
 	</tr>
@@ -806,6 +830,17 @@ function changeLogoType(type) {
 		getObj('logo_upload').style.display = 'none';
 	}
 }
+function changeDescript(type) {
+	descObj = getObj('typedescript');
+	if (type == 'forum') {
+		descObj.innerHTML = "对所有用户开放，也可以在版块的<a href=\"{$admin_file}?adminjob=setforum&action=edit&fid={$fid}&c_type=usergroup\">【用户组权限】</a>中设置权限";
+	} else if (type == 'former') {
+		descObj.innerHTML = '限制游客访问，也可以在版块的<a href=\"{$admin_file}?adminjob=setforum&action=edit&fid={$fid}&c_type=usergroup\">【用户组权限】</a>中设置权限';
+	} else {
+		descObj.innerHTML = '没有权限的用户将不可见，还需要在版块的<a href=\"{$admin_file}?adminjob=setforum&action=edit&fid={$fid}&c_type=usergroup\">【用户组权限】</a>中设置权限';
+	}
+}
+changeDescript('$f_type');
 adds();
 changeLogoType('$logotype');
 </script>
@@ -835,20 +870,26 @@ changeLogoType('$logotype');
 <tr class="tr1 vt">
 	<td class="td1">主题列表显示主题个数</td>
 	<td class="td2"><input type="text" class="input input_wa mr5" name="forumsetdb[threadnum]" value="$forumset[threadnum]" /></td>
-	<td class="td2"><div class="help_a">留空使用“论坛模式->界面设置->帖子列表页设置”中设定的值</div></td>
+	<td class="td2"><div class="help_a">留空使用  <a href="?adminjob=interfacesettings&adminitem=thread&admin_keyword=主题数目"  onClick="parent.PW.Dialog({id:'interfacesettings',url:'?adminjob=interfacesettings&adminitem=thread&admin_keyword=主题数目',name:'界面设置'});return false;">论坛模式->界面设置</a> 中设定的值</div></td>
 	<td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[forumsetdb][threadnum]" value="1" /></div></td>
 </tr>
 <tr class="tr1 vt">
 	<td class="td1">浏览帖子显示文章个数</td>
 	<td class="td2"><input type="text" class="input input_wa mr5" name="forumsetdb[readnum]" value="$forumset[readnum]" /></td>
-	<td class="td2"><div class="help_a">留空使用“论坛模式->界面设置->帖子阅读页设置”中设定的值</div></td>
+	<td class="td2"><div class="help_a">留空使用  <a href="?adminjob=interfacesettings&adminitem=read&admin_keyword=每页帖子楼层数"  onClick="parent.PW.Dialog({id:'interfacesettings',url:'?adminjob=interfacesettings&adminitem=read&admin_keyword=每页帖子楼层数',name:'界面设置'});return false;">论坛模式->界面设置</a> 中设定的值</div></td>
 	<td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[forumsetdb][readnum]" value="1" /></div></td>
 </tr>
 <tr class="tr1 vt">
-	<td class="td1">新帖图片标识时间[分钟]</td>
+	<td class="td1">新帖标识时间[分钟]</td>
 	<td class="td2"><input type="text" class="input input_wa mr5" name="forumsetdb[newtime]" value="$forumset[newtime]" /></td>
-	<td class="td2"><div class="help_a">留空使用“论坛模式->界面设置->帖子列表页设置”中设定的值</div></td>
+	<td class="td2"><div class="help_a">留空使用  <a href="?adminjob=interfacesettings&adminitem=thread&admin_keyword=新帖控制"  onClick="parent.PW.Dialog({id:'interfacesettings',url:'?adminjob=interfacesettings&adminitem=thread&admin_keyword=新帖控制',name:'界面设置'});return false;">论坛模式->界面设置</a> 中设定的值</div></td>
 	<td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[forumsetdb][newtime]" value="1" /></div></td>
+</tr>
+<tr class="tr1 vt">
+	<td class="td1">内容最小长度[字节]</td>
+	<td class="td2"><input type="text" class="input input_wa mr5" name="forumsetdb[contentminlen]" value="$forumset[contentminlen]" /></td>
+	<td class="td2"><div class="help_a"></div></td>
+	<td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[forumsetdb][contentminlen]" value="1" /></div></td>
 </tr>
 <tr class="tr1 vt">
 	<td class="td1">默认主题排序关键字</td>
@@ -895,6 +936,17 @@ changeLogoType('$logotype');
     <td class="td2"><div class="help_a"></div></td>
     <td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[forumsetdb][recycle]" value="1"></div></td>
 </tr>
+<tr class="tr1 vt">
+     <td class="td1">允许版主发布公告</td>
+     <td class="td2">
+         <ul class="cc list_80 fl list_A">
+             <li><input type="radio" value="1" name="forumsetdb[addnotice]" $addnotice_Y />开启</li>
+             <li><input type="radio" value="0" name="forumsetdb[addnotice]" $addnotice_N />关闭</li>
+         </ul>
+     </td>
+     <td class="td2"><div class="help_a">开启后，允许版主发布版块公告</div></td>
+     <td class="td2" width="40"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[forumsetdb][addnotice]" value="1" /></div></td>
+ </tr>
 <!--
 EOT;
 	if($type=='forum' && trim($cmscache)){print <<<EOT
@@ -1045,18 +1097,38 @@ function display(id){
 		getObj('span_thumb').style.display = 'none';
 	}
 }
-
+function check_viewsub(obj){
+  		var viewsub,viewsub_1,viewsub_2;
+  		if(!obj && !(getObj('viewsub').checked)){
+  			return false;
+  		}
+  		if(!obj)obj = getObj('viewsub');
+  		viewsub_1 = getObj('viewsub_1').checked?getObj('viewsub_1').value : 0;
+  		viewsub_2 = getObj('viewsub_2').checked?getObj('viewsub_2').value : 0;
+		if (viewsub_1 && viewsub_2) {
+			viewsub = 0;
+		} else if (viewsub_1) {
+			viewsub = viewsub_1;
+		} else if (viewsub_2) {
+			viewsub = viewsub_2;
+		} else {
+			viewsub = 3;
+		}
+		obj.value = viewsub;
+		pwJsCheck(obj);
+  	}
 </script>
 	<tr class="tr1 vt">
    		<td class="td1">版块页面显示设置</td>
         <td class="td2">
 			 <ul class="list_A list_120 cc">
-				<li><input type="checkbox" name="viewsub_1" value="1" $viewsub_1 />显示子版</li>
-				<li><input type="checkbox" name="viewsub_2" value="2" $viewsub_2 />帖子列表</li>
+				<li><input type="checkbox" name="viewsub_1" id="viewsub_1" value="1" $viewsub_1 onclick="check_viewsub();" />显示子版</li>
+				<li><input type="checkbox" name="viewsub_2" id="viewsub_2" value="2" $viewsub_2 onclick="check_viewsub();" />帖子列表</li>
 			</ul>
         </td>
         <td class="td2"><div class="help_a"></div></td>
-        <td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[viewsub]" value="1"></div></td>
+        <td class="td2">
+        <div class="none_pw"><input type="checkbox" id="viewsub" onclick="check_viewsub(this);" name="otherforum[viewsub]" value="1"></div></td>
     </tr>
 	<tr class="tr1 vt">
     	<td class="td1">显示关联群组</td>
@@ -1216,28 +1288,45 @@ function display(id){
         <td class="td2"><div class="help_a">开启后，用户只有登录后，才能看帖子中的图片和附件</div></td>
         <td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[forumsetdb][viewpic]" value="1" /></div></td>
     </tr>
-    <tr class="tr1 vt">
-    	<td class="td1">缩略图控制</td>
-        <td class="td2">
-       		<select name="forumsetdb[ifthumb]" class="select_wa" onchange="display(this.value);">
-               	<option value="0" $thumbSelect[0]>统一设置</option>
-               	<option value="1" $thumbSelect[1] >独立设置 </option> 
-               	<option value="2" $thumbSelect[2]>不缩略</option>
-             </select>
-             <span style="$style" id="span_thumb">
-            	宽 <input type="text" class="input input_wc" name="forumsetdb[thumbwidth]" value="$forumset[width]" /> 
-            	高 <input type="text" class="input input_wc" name="forumsetdb[thumbheight]" value="$forumset[height]" />
-             </span>
-        </td>
-        <td class="td2">
-        <div class="help_a">
-        	<span id="ifthumb_0" $thumbstyle[0]>选择统一设置，则使用附件设置-图片缩略中的统一设置</span>
-       		<span id="ifthumb_1" $thumbstyle[1]>选择独立设置，则独立设置本版块图片缩略大小</span>
-       		<span id="ifthumb_2" $thumbstyle[2]>选择不缩略，则本版块图片不缩略。</span>
-        </div>
-        </td>
+	<tr class="tr1 vt">
+		<td class="td1">缩略图控制</td>
+		<td class="td2">
+			<select name="forumsetdb[ifthumb]" class="select_wa" onchange="display(this.value);">
+				<option value="0" $thumbSelect[0]>统一设置</option>
+				<option value="1" $thumbSelect[1] >独立设置 </option> 
+				<option value="2" $thumbSelect[2]>不缩略</option>
+			</select>
+			<span style="$style" id="span_thumb">
+				宽 <input type="text" class="input input_wc" name="forumsetdb[thumbwidth]" value="$forumset[width]" /> 
+				高 <input type="text" class="input input_wc" name="forumsetdb[thumbheight]" value="$forumset[height]" />
+			</span>
+		</td>
+		<td class="td2">
+		<div class="help_a">
+			<span id="ifthumb_0" $thumbstyle[0]>选择统一设置，则使用附件设置-图片缩略中的统一设置</span>
+			<span id="ifthumb_1" $thumbstyle[1]>选择独立设置，则独立设置本版块图片缩略大小</span>
+			<span id="ifthumb_2" $thumbstyle[2]>选择不缩略，则本版块图片不缩略。</span>
+		</div>
+		</td>
         <td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[forumsetdb][ifthumb]" value="1" /></div></td>
     </tr>
+	<tr class="tr1 vt">
+		<td class="td1">图片帖功能</td>
+		<td class="td2">
+			<ul class="cc list_80 fl list_A">
+                <li><input type="radio" value="1" name="forumsetdb[imgthread]" $imgthread_Y />开启</li>
+                <li><input type="radio" value="0" name="forumsetdb[imgthread]" $imgthread_N />关闭</li>
+            </ul>
+		</td>
+		<td class="td2"><div class="help_a">开启后，版块列表帖子类型增加图片帖功能</div></td>
+        <td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[forumsetdb][imgthread]" value="1" /></div></td>
+    </tr>
+	<tr class="tr1 vt">
+		<td class="td1">编辑时间约束[分钟]</td>
+		<td class="td2"><input type="text" class="input input_wa mr5" name="forumsetdb[postedittime]" value="$forumset[postedittime]" /></td>
+		<td class="td2"><div class="help_a">超过设定时间后拒绝用户编辑该版块帖子。0或留空表示不限制。管理人员不受限制</div></td>
+		<td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[forumsetdb][postedittime]" value="1" /></div></td>
+	</tr>
    </table>
 <h2 class="h1">主题相关</h2>
 <table cellspacing="0" cellpadding="0" width="100%" class="mb10">
@@ -1411,8 +1500,8 @@ EOT;
     <tr class="tr1 vt">
         <td class="td1">推荐列帖子列表</td>
         <td class="td2"><input type="text" class="input input_wa" name="forumsetdb[commendlist]" value="$forumset[commendlist]" /></td>
-        <td class="td2"><div class="help_a"></div></td>
-        <td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[forumsetdb][commendlist]" value="1" /></div></td>
+        <td class="td2"><div class="help_a">多个列表ID之间使用‘,’隔开，例如：1234,45,暂时不支持其它版块帖子调用</div></td>
+        <td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[forumsetdb][commendlist]" value="1" /> </div></td>
     </tr>
     <tr class="tr1 vt">
         <td class="td1">推荐列表最大显示条数</td>
@@ -1509,7 +1598,7 @@ EOT;
     </tr>
         
         
-        <tr class="tr1 vt">
+    <tr class="tr1 vt">
         <td class="td1">帖子列表分类显示</td>
         <td class="td2">
             <ul class="cc list_80 fl list_A">
@@ -1519,6 +1608,17 @@ EOT;
         </td>
         <td class="td2"><div class="help_a">开启后，帖子列表页将显示主题分类名称。如果分类设置了图标URL，则显示分类图标</div></td>
         <td class="td2" width="40"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[forumsetdb][addtpctype]" value="1" /></div></td>
+    </tr>
+    <tr class="tr1 vt">
+        <td class="td1">允许版主管理</td>
+        <td class="td2">
+            <ul class="cc list_80 fl list_A">
+                <li><input type="radio" value="1" name="forumsetdb[allowtpctype]" $allowtpctype_Y />开启</li>
+                <li><input type="radio" value="0" name="forumsetdb[allowtpctype]" $allowtpctype_N />关闭</li>
+            </ul>
+        </td>
+        <td class="td2"><div class="help_a">开启后，允许版主管理该板块的主题分类</div></td>
+        <td class="td2" width="40"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[forumsetdb][allowtpctype]" value="1" /></div></td>
     </tr>
 </table>
 <script language="JavaScript" src="js/pw_ajax.js"></script>
@@ -1804,6 +1904,7 @@ function showtab(t,a){
 			if (obj[i].id==a) {
 				getObj(obj[i].id).className = 'current';
 				getObj('c_'+a).style.display = '';
+				getObj('c_type').value = a;
 				setCookie('thisPWTabs',a);
 				hasCurrent = true;
 			} else {
@@ -1832,10 +1933,10 @@ function FetchCookie(name) {
 }
 ~function() {
 	
-	var c_type = FetchCookie('thisPWTabs');
-	DelCookie('thisPWTabs');
-	if (c_type)c_type = '$c_type';
-	showtab('tab3_eidt',c_type);
+	//var c_type = FetchCookie('thisPWTabs');
+	//DelCookie('thisPWTabs');
+	//if (c_type)c_type = '$c_type';
+	showtab('tab3_eidt','$c_type');
 }();
 <!--
 EOT;
@@ -1856,8 +1957,17 @@ function displayCrossConfigDiv() {
 	var frm = document.getElementById('addform');
 	frm.className = (frm.className=='addform') ? '' : 'addform';
 }
+
+<!--
+EOT;
+if($type!='category'){print <<<EOT
+-->
 getObj('linkCtrlCrossConfig').onclick = displayCrossConfigDiv;
 getObj('headCtrlCrossConfig').onclick = displayCrossConfigDiv;
+<!--
+EOT;
+}print <<<EOT
+-->
 </script>
 <!--
 EOT;

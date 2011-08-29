@@ -116,11 +116,13 @@ function PW_popEvent (obj)
 	}
    document.body.onmousedown=function()
 	{
-	   if(!event.srcElement.getAttribute("s"))
+		var e = window.event || event,
+			elem = e.srcElement || e.target;
+	   if(!elem.getAttribute("s") && elem.id != 'showpwd' && elem.id != 'header_reg_ckcode_img' && elem.id != 'changeGdCode' && elem.id != 'changeGdCode_a' && elem.tagName!=='OBJECT')
 		{
 		   obj.style.display="none";
+		   try{getObj('header_ckcode').style.display="none";}catch(e){}
 		}
-
 	};
 
 }
@@ -162,17 +164,60 @@ function IsElement(id) {
 function CopyCode(obj) {
 	if (typeof obj != 'object') {
 		if (is_ie) {
-			window.clipboardData.setData("Text",obj);
-			alert('复制成功!');
+			if(window.clipboardData.setData("Text",obj)){
+				alert('复制成功！');
+			}
 		} else {
 			prompt('按Ctrl+C复制内容', obj);
 		}
 	} else if (is_ie) {
-		var js = document.body.createTextRange();
-		js.moveToElementText(obj);
-		js.select();
-		js.execCommand("Copy");
-		alert('复制成功!');
+		var lis = obj.getElementsByTagName('li'), ar = [];
+		for(var i=0,l=lis.length; i<l; i++){
+			ar.push(lis[i].innerText);
+		}
+		if(window.clipboardData.setData('Text', ar.join("\r\n") ) ){
+			alert('复制成功！');
+		}
+	} else {
+		function openClipWin(){
+			var lis = obj.getElementsByTagName('li'), ar = [];
+			for(var i=0,l=lis.length; i<l; i++){
+				ar.push(lis[i].textContent);
+			}
+			clip.setText(ar.join("\r\n"));
+			var clipEle = getObj('clipWin');
+			if (!clipEle){
+				var clipEle = document.createElement('div');
+				clipEle.innerHTML = '<div class="popout"><table border="0" cellspacing="0" cellpadding="0"><tbody><tr><td class="bgcorner1"></td><td class="pobg1"></td><td class="bgcorner2"></td></tr><tr><td class="pobg4"></td><td><div class="popoutContent">\
+<div class="p10"><a href="javascript:closep();" class="adel">关闭</a>提示</div><div class="popBottom"><span class="btn2"><span><button type="button">点击这里复制代码</button></span></span></div></div></td><td class="pobg2"></td></tr><tr><td class="bgcorner4"></td><td class="pobg3"></td><td class="bgcorner3"></td></tr></tbody></table></div>';
+				//clipEle.innerHTML = '<p id="d_clip_button">提示</p>';
+				clipEle.style.display = 'none';
+				document.body.appendChild(clipEle);
+			}
+			read.open(clipEle, null, 2);
+			var btn = getObj('pw_box').getElementsByTagName('button')[0];
+			clip.glue(btn);
+			//clip.glue( 'd_clip_button', 'd_clip_container' );
+		}//彈窗
+		
+		if (!window.clip){
+			var script = document.createElement('script');
+			script.src = 'js/ZeroClipboard.js';
+			script.onload = function(){
+				ZeroClipboard.setMoviePath( 'js/ZeroClipboard.swf' );
+				window.clip = new ZeroClipboard.Client();
+				clip.setHandCursor( true );
+				
+				clip.addEventListener('complete', function (client, text) {
+					alert("复制成功!" );
+					closep();
+				});
+				openClipWin();
+			};
+			document.body.appendChild(script);
+		}else{
+			openClipWin();
+		}
 	}
 	return false;
 }
@@ -279,9 +324,9 @@ function imgResize(o, size) {
 		pre.coords = o.width/2 + ' 0 ' + ',' + o.width + ',' + o.height;
 	}catch(e){}
 }
-function ajaxurl(o) {
+function ajaxurl(o, ep) {
 	read.obj = o;
-	ajax.send(o.href,'',ajax.get);
+	ajax.send(o.href + ((typeof ep == 'undefined' || !ep) ? '' : ep), '', ajax.get);
 	return false;
 }
 
@@ -313,6 +358,7 @@ function showConInfo(uid,cyid){
 	ajax.send('apps.php?q=group&a=uintro&cyid='+cyid+'&uid='+uid,'',ajax.get);
 }
 
+/*
 userCard = {
 	t1	 : null,
 	t2	 : null,
@@ -352,9 +398,10 @@ userCard = {
 		userCard.menu.menu.style.zIndex = 9;
 		userCard.menu.obj = $(sx[1] + '_' + sx[2]) || $(id);
 		userCard.menu.setMenu(userCard.data[sx[3]], '', 1);
-		userCard.menu.menupz(userCard.menu.obj);
+		userCard.menu.menupz(userCard.menu.obj,21);
 	}
 }
+*/
 
 Class = function(aBaseClass, aClassDefine) {
 	function class_() {
@@ -565,4 +612,96 @@ var Attention = {
 		});
 		return false;
 	}
-}
+};
+
+(function(){
+    var win = window,doc = win.document,
+        defaultCfg = {
+            container :win,
+            srcAttr : 'data-src',
+            delay : 100,            //resize时和socrll时延迟处理,以免频繁触发,100毫秒基本无视觉问题
+            placeholder :'images/blank.gif'         //图片占位符
+        },
+        addEvent = function( obj, type, fn ) {  
+            if (obj.addEventListener)  
+                obj.addEventListener( type, fn, false );  
+            else if (obj.attachEvent) {  
+                obj["e"+type+fn] = fn;  
+                obj.attachEvent( "on"+type, function() { obj["e"+type+fn](); } );  
+            }  
+        };
+        
+    function ImgLazyLoad(options) {
+        var self = this;
+        this.options = options || {};
+        if (!(self instanceof ImgLazyLoad)) {
+            return new ImgLazyLoad(options);
+        }
+        this._initialize();
+    }
+    
+    ImgLazyLoad.prototype = {
+        _initialize:function() {
+            var self = this,
+                lazyImgs = doc.getElementsByTagName('img');
+            for(var i in defaultCfg) {
+                if(!(i in self.options)) {//合并参数
+                    self.options[i] = defaultCfg[i];
+                }
+            }
+            for(var i = 0,j = lazyImgs.length;i < j;i++) {
+                var img = lazyImgs[i];
+                if(!img.getAttribute(self.options.srcAttr)) {
+                    img.setAttribute(self.options.srcAttr,img.src);
+                }
+                if(self.options.placeholder) {
+                    img.src = self.options.placeholder;
+                }else {
+                    img.removeAttribute('src');
+                }
+                //img.style.display = 'none';
+            }
+            var $ = function(elem) { return typeof elem === 'string' ? document.getElementById(elem) : elem; },
+                container = self.options.container.nodeType === 1 ? $(self.options.container) :win,
+                
+                threshold = function() {//计算图片加载入口
+		            if(container===win) {
+		                var scrollTop =  win.pageYOffset || container.scrollTop || doc.documentElement.scrollTop || doc.body.scrollTop,
+		                    eHeight = doc.documentElement.clientHeight || doc.body.clientHeight || window.innerHeight;
+		                return scrollTop + eHeight;
+		            }
+		            return container.getBoundingClientRect().top + container.clientHeight;
+		        },
+		        
+		        eHeight = function() { return container.innerHeight || container.clientHeight; },//元素的高度
+		        
+		        loadImgs = function() {
+		            for(var i = 0,j = lazyImgs.length;i < j;i++) {
+		                var img = lazyImgs[i],src = img.getAttribute('src');
+		                if(!src || src.indexOf(self.options.placeholder) > -1) {
+	                        if(img.getBoundingClientRect().top <= threshold()) {
+	                            var src = img.getAttribute(self.options.srcAttr);
+								if(src){
+	                            	img.src = src.indexOf('javascript') > -1 ? '' : src;
+								}//IE8不允许img.src="javascript://",拒绝访问的错误
+	                            img.style.display = '';
+	                        }
+		                }
+		            }
+		        };
+		    loadImgs();
+		    addEvent(container,'scroll',function() {
+		        setTimeout(function() {
+		            loadImgs();
+		        },self.options.delay);
+		    });
+        }
+    }
+    
+    win['ImgLazyLoad'] = function(option) {
+        ImgLazyLoad(option);
+    }
+})();
+
+
+

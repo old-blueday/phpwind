@@ -83,7 +83,7 @@ var searcher = {
 		if(!elements){return ;}
 		var _this = this;
 		for(i=0;i<elements.length;i++){
-			var t = elements[i].getAttribute("type");
+			var t = elements[i].id;
 			if(t == type){
 				_this._typeClick(elements[i]);
 			}
@@ -91,9 +91,9 @@ var searcher = {
 	},
 	/* 搜索类型点击事件 */
 	_typeClick : function(obj){
-		this._resetClass();
-		obj.className = "current";
-		var type = obj.getAttribute("type");
+//		this._resetClass();
+//		obj.className = "current";
+		var type = obj.id;
 		var help = this.$("searchAdvanced");//help
 		var advanced = this._advanced.toString();
 		if(advanced.indexOf(type) >= 0 ){
@@ -101,7 +101,7 @@ var searcher = {
 		}else{
 			help.style.display = "none";
 		}
-		this.$("hiddenType").value = type;
+		this.$("hiddenType").value = type || 'thread';
 		this._hiddenCalendar();
 		var _this = this;
 		setTimeout(function(){
@@ -121,7 +121,7 @@ var searcher = {
 		var elements = this._getSearchType();
 		if(!elements){return ;}
 		for(i=0;i<elements.length;i++){
-			elements[i].className = "";
+			//elements[i].className = "";
 		}
 	},
 	/* 隐藏高级表单函数 */
@@ -178,3 +178,16 @@ var searcherInit = function(type){
 var searchertable = function(id){
 	searcher._showTable(id);
 }
+//搜索框添加焦点样式@by chenchaoqun
+/*var keyword1 = document.getElementById('searchform').keyword;
+keyword1.onfocus = function() {
+	this.className = this.className + ' inputFocus';
+}
+keyword1.onblur = function(){
+	this.className = this.className.replace(' inputFocus','');
+}
+if(document.getElementById('searchformbottom')){
+	keyword2 = document.getElementById('searchformbottom').keyword
+	keyword2.onfocus = function(){keyword1.onfocus.call(this);}
+	keyword2.onblur = function(){keyword1.onblur.call(this);}
+}*/

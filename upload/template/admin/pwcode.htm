@@ -1,5 +1,18 @@
 <!--<?php
 include_once PrintEot('left');
+print <<<EOT
+-->
+<div class="nav3 mb10">
+    <ul class="cc">
+		<li><a href="$jobUrl">基本设置</a></li>
+		<li><a href="$jobUrl&adminitem=setform">预设帖子格式</a></li>
+		<li class="current"><a href="$jobUrl&adminitem=pwcode">自定义代码</a></li>
+		<li><a href="$jobUrl&adminitem=commonsmile">普通表情</a></li>
+		<li><a href="$jobUrl&adminitem=specialsmile">特殊表情</a></li>
+    </ul>
+</div>
+<!--
+EOT;
 if(!$action){print <<<EOT
 -->
 <div class="admin_info mb10">
@@ -68,6 +81,7 @@ EOT;
 </table>
 </div>
 <div class="tac mb10">
+	<span class="bt"><span><button type="button" onclick="CheckAll(document.FORM)">全 选</button></span></span>
 	<span class="btn"><span><button type="submit">删除</button></span></span>
 </div>
 </form>

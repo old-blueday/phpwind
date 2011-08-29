@@ -2,7 +2,7 @@
 define('SCR','act_alipay_push');
 require_once('global.php');
 
-InitGP(array('action'));
+S::gp(array('action'));
 require_once(R_P.'lib/activity/alipay.php');
 
 $service = $action;
@@ -16,9 +16,9 @@ if ($action == 'user_authentication') {//身份验证
 	ObHeader($AlipayInterface->alipayurl($param));
 } elseif ($action == 'confirm_aa_detail_payment') {//订单支付
 
-	InitGP(array('actuid','tid','fromuid','actmid'),GP,2);
+	S::gp(array('actuid','tid','fromuid','actmid'),GP,2);
 	
-	$memberdb = $db->get_one("SELECT am.uid,am.username,am.ifpay,am.isrefund,am.out_trade_no,am.totalcash,am.ifanonymous,t.authorid FROM pw_activitymembers am LEFT JOIN pw_threads t USING(tid) WHERE am.actuid=".pwEscape($actuid));
+	$memberdb = $db->get_one("SELECT am.uid,am.username,am.ifpay,am.isrefund,am.out_trade_no,am.totalcash,am.ifanonymous,t.authorid FROM pw_activitymembers am LEFT JOIN pw_threads t USING(tid) WHERE am.actuid=".S::sqlEscape($actuid));
 
 	L::loadClass('ActivityForBbs', 'activity', false);
 	$postActForBbs = new PW_ActivityForBbs($data);
@@ -39,7 +39,7 @@ if ($action == 'user_authentication') {//身份验证
 	$out_trade_no = $memberdb['out_trade_no'] ? $memberdb['out_trade_no'] : $db_sitehash.'_'.$tid.'_'.$actuid.'_'.generatestr(6);
 
 	$defaultValueTableName = getActivityValueTableNameByActmid();
-	$defaultValue = $db->get_one("SELECT out_biz_no,paymethod,iscancel,endtime FROM $defaultValueTableName WHERE tid=".pwEscape($tid));
+	$defaultValue = $db->get_one("SELECT out_biz_no,paymethod,iscancel,endtime FROM $defaultValueTableName WHERE tid=".S::sqlEscape($tid));
 	$defaultValue['paymethod'] != 1 && Showmsg('act_toalipay_paymethod');//只有支付方式为支付宝才可以支付
 	$defaultValue['endtime'] + 30*86400 < $timestamp && Showmsg('act_endtime_toolong');//结束时间后一个月,>0 则可以操作,< 0无法操作
 	$defaultValue['iscancel'] == 1 && Showmsg('act_iscancelled_y');//活动被取消无法支付
@@ -55,7 +55,7 @@ if ($action == 'user_authentication') {//身份验证
 	);
 	
 	if ($fromuid != '-1') {//是否代付
-		$fromusername = $db->get_value("SELECT username FROM pw_members WHERE uid=".pwEscape($fromuid));
+		$fromusername = $db->get_value("SELECT username FROM pw_members WHERE uid=".S::sqlEscape($fromuid));
 		$issubstitute = 1;
 	} else {
 		$fromuid = $issubstitute = 0;
@@ -68,13 +68,13 @@ if ($action == 'user_authentication') {//身份验证
 		'fromusername'	=> $fromusername,//代付用户名
 	);
 
-	$db->update("UPDATE pw_activitymembers SET " . pwSqlSingle($sqlarray)." WHERE actuid=".pwEscape($actuid));
+	$db->update("UPDATE pw_activitymembers SET " . S::sqlSingle($sqlarray)." WHERE actuid=".S::sqlEscape($actuid));
 	ObHeader($AlipayInterface->alipayurl($param));
 } elseif ($action == 'refund_aa_payment') {//退款
-	InitGP(array('tid','actuid','actmid'),GP,2);
+	S::gp(array('tid','actuid','actmid'),GP,2);
 
-	$memberdb = $db->get_one("SELECT am.ifpay,am.isrefund,am.username,am.totalcash,am.out_trade_no,am.refundcost,t.authorid FROM pw_activitymembers am LEFT JOIN pw_threads t USING(tid) WHERE am.actuid=".pwEscape($actuid));
-	$tempcost = $db->get_value("SELECT SUM(totalcash) as sum FROM pw_activitymembers WHERE isrefund=1 AND fupid=".pwEscape($actuid));//已退费用
+	$memberdb = $db->get_one("SELECT am.ifpay,am.isrefund,am.username,am.totalcash,am.out_trade_no,am.refundcost,t.authorid FROM pw_activitymembers am LEFT JOIN pw_threads t USING(tid) WHERE am.actuid=".S::sqlEscape($actuid));
+	$tempcost = $db->get_value("SELECT SUM(totalcash) as sum FROM pw_activitymembers WHERE isrefund=1 AND fupid=".S::sqlEscape($actuid));//已退费用
 
 	if ($memberdb['isrefund'] || $memberdb['authorid'] != $winduid) {//退款交易无法操作、不是发起人无法操作
 		Showmsg('act_refund_noright');
@@ -87,7 +87,7 @@ if ($action == 'user_authentication') {//身份验证
 	$refundcost = number_format($memberdb['refundcost'], 2, '.', '');//退款金额
 
 	$defaultValueTableName = getActivityValueTableNameByActmid();
-	$defaultValue = $db->get_one("SELECT user_id,paymethod,endtime FROM $defaultValueTableName WHERE tid=".pwEscape($tid));
+	$defaultValue = $db->get_one("SELECT user_id,paymethod,endtime FROM $defaultValueTableName WHERE tid=".S::sqlEscape($tid));
 	$defaultValue['endtime'] + 30*86400 < $timestamp && Showmsg('act_endtime_toolong');//结束时间后一个月,>0 则可以操作,< 0无法操作
 	$defaultValue['paymethod'] != 1 && Showmsg('act_toalipay_paymethod');//支付宝支付才能退款
 

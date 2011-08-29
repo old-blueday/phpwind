@@ -1,13 +1,10 @@
 <?php
 !defined('P_W') && exit('Forbidden');
 
-InitGP(array(
-	'page'
-));
+S::gp(array('page'));
 (!is_numeric($page) || $page < 1) && $page = 1;
-$pre_page = $page - 1;
-$next_page = $page + 1;
-$db_perpage = 10;
+$page > 1 && $pre_page = $page - 1;
+$db_perpage = 12;
 $img = @opendir("$imgdir/face");
 $num = $pagenum = 0;
 while ($imgname = @readdir($img)) {
@@ -19,7 +16,7 @@ while ($imgname = @readdir($img)) {
 		}
 	}
 }
-if ($pagenum < $db_perpage) $next_page = $page;
+$num > $db_perpage*$page && $next_page = $page + 1;
 @closedir($img);
 require_once PrintEot('ajax');
 ajax_footer();

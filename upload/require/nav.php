@@ -15,9 +15,11 @@ function pwNavBar() {
 		list($tmpLogin['faceurl']) = showfacedesign($winddb['icon'], 1, 's');
 		$tmpLogin['lastlodate'] = get_date($winddb['lastvisit'], 'Y-m-d');
 	} else {
-		global $db_question, $db_logintype, $db_qcheck;
+		global $db_question, $db_logintype, $db_qcheck ,$db_ckquestion;
 		if ($db_question) {
-			list(, $tmpLogin['qcheck']) = explode("\t", $db_qcheck);
+			//list(, $tmpLogin['qcheck'],,,$tmpLogin['showq']) = explode("\t", $db_qcheck);
+			$tmpLogin['qcheck'] = $db_ckquestion & 2;
+			list(,$tmpLogin['showq']) = explode("\t", $db_qcheck);
 			if ($tmpLogin['qcheck'])
 				$tmpLogin['qkey'] = array_rand($db_question);
 		}

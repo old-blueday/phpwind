@@ -1,0 +1,478 @@
+<!--<?php print <<<EOT
+-->
+<!--
+EOT;
+if($groupid=='guest'){
+$arr_logintypename = array('用户名','UID','电子邮箱');
+print <<<EOT
+-->
+<form action="$db_bbsurl/login.php" name="login_FORM" method="post">
+<input type="hidden" name="jumpurl" value="{$pwServer['HTTP_REFERER']}" />
+<input type="hidden" name="step" value="2" />
+<input type="hidden" name="cktime" value="31536000" />
+<!--
+EOT;
+if (count($_LoginInfo['logintype'])>=1) {
+$value = $_LoginInfo['logintype'][0];
+empty($value) && $value = 0;
+print <<<EOT
+-->
+<input type="hidden" name="lgt" id="nav_lgt" value="$value">
+<!--
+EOT;
+} else {
+print <<<EOT
+-->
+<input type="hidden" name="lgt" id="nav_lgt" value="0">
+<!--
+EOT;
+}
+print <<<EOT
+-->
+<dl class="login fr mr5">
+	<dd class="tal mb10">
+		<div class="fl input mr5" style="width:128px;padding:2px 0 2px 3px;"><input onfocus="navCheckinput(this);" onblur="navCheckinput(this);" class="fl gray" style="width:111px;border:0;padding:0;line-height:17px;height:17px;" name="pwuser" id="nav_pwuser" value="输入用户名" tabindex="1" type="text" />
+<!--
+EOT;
+if (count($_LoginInfo['logintype']) > 1) {
+print <<<EOT
+-->
+		<a href="javascript:;" title="切换登录方式" class="select_arrow fl" onclick="showLoginType();">下拉</a>
+        <div class="fl">
+		<div class="pw_menu" id="login_type_list" style="position:absolute;display:none;margin:18px 0 0 -80px;">
+			<ul class="menuList tal" style="width:76px;">
+<!--
+EOT;
+foreach($_LoginInfo['logintype'] as $v){
+print <<<EOT
+-->
+				<li><a href="javascript:;" onclick="selectLoginType('$v','$arr_logintypename[$v]')">$arr_logintypename[$v]</a></li>
+
+<!--
+EOT;
+}
+print <<<EOT
+-->
+			</ul>
+		</div>
+        </div>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+		</div>
+		<label style="width:65px;" class="fl s6"><input name="cktime" type="checkbox" value="31536000" style="margin-bottom:1px;padding:1px 3px 0;" tabindex="3"/>记住</label>
+		<a href="sendpwd.php" class="s6">找回密码</a>
+	</dd>
+	<dd class="tal">
+<!--
+EOT;
+if($db_ifsafecv || ($db_gdcheck & 2) || $_LoginInfo['qcheck']){
+print <<<EOT
+-->
+	<div class="fl">
+		<div id="nav_logintab" class="tal" style="width:330px;position:absolute;display:none;z-index:2;margin:21px 0 0 -199px;">
+			<div class="pw_menu popoutContent">
+				<table cellspacing="0" cellpadding="1" align="center" style="width:95%; margin:auto">
+<!--
+EOT;
+if($db_gdcheck & 2){
+$gdSize = explode("\t",$db_gdsize);
+print <<<EOT
+-->
+					<tr>
+						<td>认证码</td>
+						<td>
+							<input class="input" type="text" name="gdcode" size="5" tabindex="12" onfocus="try{opencode('menu_gd',this)}catch(e){}" /><span style="cursor:pointer; margin-left:3px" onclick="this.previousSibling.focus();">点此显示验证码</span>
+							<div class="menu" id="menu_gd" style="visibility:hidden;">
+<script type="text/javascript" src="js/pw_authcode.js"></script>
+<script>
+var flashWidth = "$gdSize[0]";
+var flashHeight = "$gdSize[1]";
+var gdtype = $db_gdtype;
+showGdCode();
+</script>
+							</div>
+						</td>
+					</tr>
+
+<!--
+EOT;
+}
+print <<<EOT
+-->
+
+<!--
+EOT;
+if($db_ifsafecv){
+print <<<EOT
+-->
+					<tr>
+						<td width="20%">安全问题</td>
+						<td><select name="question" onchange="showcustomquest(this.value)" tabindex="13">
+							<option value="0">无安全问题</option>
+							<option value="1">我爸爸的出生地</option>
+							<option value="2">我妈妈的出生地</option>
+							<option value="3">我的小学校名</option>
+							<option value="4">我的中学校名</option>
+							<option value="5">我最喜欢的运动</option>
+							<option value="6">我最喜欢的歌曲</option>
+							<option value="7">我最喜欢的电影</option>
+							<option value="8">我最喜欢的颜色</option>
+							<option value="-1">自定义问题</option></select>
+							<input id="othercustomquest" style="display:none" name="customquest" class="input" size="17" tabindex="14" />
+							</td>
+						</tr>
+					<tr>
+						<td>您的答案</td>
+						<td><input name="answer" class="input" size="30" tabindex="15" /></td>
+					</tr>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+
+<!--
+EOT;
+if($_LoginInfo['qcheck'] && $db_question){
+if($db_imagequestion){
+	$question = '<img id="ckquestion" src="ckquestion.php?q='.$_LoginInfo['qkey'].'&t='.$timestamp.'" align="top">';
+}else{
+	$question = $_LoginInfo['qkey']<0 ? getMachineQuestion_1() :  $db_question[$_LoginInfo['qkey']];
+}
+$q_a = $question.($_LoginInfo['showq'] && $_LoginInfo['qkey']>0?" 正确答案:".$db_answer[$_LoginInfo['qkey']] : '');
+print <<<EOT
+-->
+					<tr>
+						<td>验证问答</td>
+						<td>问题:{$q_a}<br />
+<!--
+EOT;
+if($_LoginInfo['showq'] && $_LoginInfo['qkey']>0){print <<<EOT
+-->
+						正确答案:{$db_answer[$_LoginInfo['qkey']]}<br />
+<!--
+EOT;
+}print <<<EOT
+-->
+							<input class="input" name="qanswer" size="30" tabindex="16" />
+							<input type="hidden" name="qkey" value="{$_LoginInfo['qkey']}" /></td>
+					</tr>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+				</table>
+			</div>
+		</div>
+	</div>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+	    <input type="password" onfocus="if(IsElement('nav_logintab')) getObj('nav_logintab').style.display='';this.value='';var o_nav_logintab = IsElement('nav_logintab') ? getObj('nav_logintab') : ''; PW_popEvent(o_nav_logintab);" id="showpwd" name="pwpwd" class="input mr5 fl" style="width:128px;padding:2px 0 2px 3px;" tabindex="2" />
+	    <span class="fl" style="width:63px;"><span class="bt2"><span><button type="submit" style="width:60px;">登录</button></span></span></span>
+			<span class="btn2"><span><button type="button" onClick="location.href='$regurl#breadCrumb';" style="width:60px;">注册</button></span></span>
+	</dd>
+</dl>
+</form>
+<script language="JavaScript">
+var default_login_type = '$value';
+var default_input_value = '输入' + '$arr_logintypename[$value]';
+
+
+function check_user(obj){
+	if(obj.value=="用户名"){
+		obj.value='';
+	}else if(obj.value==""){
+		obj.value='用户名';
+	}
+}
+function check_password(obj,type){
+	if(type=='onfocus'){
+		obj.style.display='none';
+		getObj('relpwd').style.display='';
+		getObj('relpwd').focus();
+	}else{
+		if(obj.value==''){
+			obj.style.display='none';
+			getObj('showpwd').style.display='';
+		}
+	}
+}
+function navCheckinput(obj){
+	if (obj.className.indexOf('gray')!=-1) {
+		obj.value = '';
+		obj.className = obj.className.replace('gray', 'black');
+	} else if (obj.value=='') {
+		obj.value = obj.defaultValue = default_input_value;
+		if (obj.className.indexOf('black') == -1) {
+			obj.className += ' gray';
+		} else {
+			obj.className = obj.className.replace('black', 'gray');
+		}
+	}
+}
+
+function showLoginType(){
+	if(getObj('login_type_list').style.display=='none'){
+		getObj('login_type_list').style.display = '';
+	} else {
+		getObj('login_type_list').style.display = 'none';
+	}
+	if (IsElement('nav_logintab')){
+		getObj('nav_logintab').style.display = 'none';
+	}
+}
+
+function showcustomquest(qid){
+	getObj('othercustomquest').style.display = qid==-1 ? '' : 'none';
+}
+function navCheckinput(obj){
+	if (obj.className.indexOf('gray')!=-1) {
+		obj.value = '';
+		obj.className = obj.className.replace('gray', 'black');
+	} else if (obj.value=='') {
+		obj.value = obj.defaultValue = default_input_value;
+		if (obj.className.indexOf('black') == -1) {
+			obj.className += ' gray';
+		} else {
+			obj.className = obj.className.replace('black', 'gray');
+		}
+	}
+}
+function changeDefaultInputValue(text){
+	getObj('nav_pwuser').value = text;
+	getObj('nav_lgt').value = default_login_type;
+}
+
+function selectLoginType(type,text){
+
+	var nav_pwuser = getObj('nav_pwuser');
+	nav_pwuser.value = '输入'+text;
+	if (nav_pwuser.className.indexOf('black') != -1) {
+		nav_pwuser.className = nav_pwuser.className.replace('black', 'gray');
+	}
+	getObj('nav_lgt').value = type;
+	getObj('login_type_list').style.display = 'none';
+}
+
+//changeDefaultInputValue(default_input_value);
+</script>
+<!--
+EOT;
+} else {
+$db_menuinit .= ",'td_userinfomore' : 'menu_userinfomore','td_profile' : 'menu_profile'";
+print <<<EOT
+-->
+<dl class="login fr">
+  	 <dt class="fr"><a href="u.php" hidefocus="true" class="img_50"><i><img src="$_LoginInfo[faceurl]" alt="$windid" /></i></a></dt>
+       	<dd class="fr">
+         	<p class="l_info"><span id="td_userinfomore" style="padding:0 5px;"><a href="u.php" class="b iconDroplink">$windid</a><span class="iconDrop"><i>▼</i></span></span><span class="mr5"> </span><a href="$loginouturl" class="mr5">退出</a><span class="gray">|</span>
+<base id="headbase" href="$db_bbsurl/" />
+<script language="JavaScript">
+var td_userinfomore = {
+	pz : 21,
+	open : function() {
+		$('td_userinfomore').className = 'current';
+		if (typeof userBinding == 'object') {
+			userBinding.append();
+		}
+	},
+	close : function () {
+		$('td_userinfomore').className = '';
+	}
+}
+</script>
+<span id="td_message" class="pd5"><!--
+EOT;
+$tmpMsgNum = 0;
+($winddb['newpm']>0 && $_G['maxmsg']>0) && $tmpMsgNum += $winddb['newpm'];
+$winddb['newreferto']>0 && $tmpMsgNum += $winddb['newreferto'];
+$winddb['newcomment']>0 && $tmpMsgNum += $winddb['newcomment'];
+$winddb['newfans']>0 && $tmpMsgNum += $winddb['newfans'];
+$tmpMsgCue = ($tmpMsgNum>0) ? "<span style=\"color:#ff5500;\">($tmpMsgNum)</span>" : '';
+print <<<EOT
+--><a href="message.php">消息{$tmpMsgCue}</a><!--
+EOT;
+if ($winddb['newreferto']>0 || $winddb['newfans']>0 || $winddb['newcomment']) {
+$db_menuinit .= ",'td_message' : 'menu_message'";
+print <<<EOT
+--><span class="iconDroplink"></span><span class="iconDrop"><i>▼</i></span><script language="JavaScript">var td_message = {pz : 21}</script>
+<!--
+EOT;
+}print <<<EOT
+--></span>
+<!--
+EOT;
+if($db_job_isopen){
+	$jobnum = ($winddb['jobnum']>0) ? "(".$winddb['jobnum'].")" : "";
+print <<<EOT
+-->
+			<script type="text/javascript" language="JavaScript" src="js/pw_jobcenter.js"></script>
+			<a href="javascript:;" id="newjob" onClick="return showJobPOP();" class="mr5" num="$jobnum">任务<span style="color:#ff5500;">$jobnum</span></a>
+<!--
+EOT;
+}
+if($db_toolifopen){print <<<EOT
+-->
+			<a href="profile.php?action=toolcenter" class="mr5">道具</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+			<span class="gray">|</span><span id="td_profile" class="pd5"><a id="td_profile" class="iconDroplink" href="profile.php?action=modify" target="_blank">设置</a><span class="iconDrop"><i>▼</i></span></span>
+<!--
+EOT;
+if(CkInArray($windid,$manager) || $SYSTEM['allowadmincp']){
+print <<<EOT
+-->
+			<a href="$db_adminfile" class="mr5" target="_blank">系统设置</a>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+
+<!--
+EOT;
+if ($ifChannelEdit) {
+	if ($ifactive) {
+print <<<EOT
+-->
+			<a href="$channelInfo[url]" class="mr5">查看静态页</a>
+			<a href="javascript:updateCache('$alias')" class="mr5">刷新静态</a>
+<!--
+EOT;
+	} else {
+print <<<EOT
+-->
+			<a href="index.php?m=area&alias={$alias}" class="mr5">频道管理</a>
+<!--
+EOT;
+	}
+}
+
+$winddb[honor] = $winddb[honor] ? $winddb[honor] : "还没有签名，写一个吧～";
+print <<<EOT
+-->
+			</p><label for="tophonor"><p id="write_honor" class="l_write" onClick="beginInput()"><span>$winddb[honor]</span><input type="text" id="tophonor" value="$winddb[honor]" /></p></label>
+		</dd>
+	</dl>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+
+<!--
+EOT;
+if (getstatus($winddb['userstatus'],12)) {print <<<EOT
+-->
+<script language="JavaScript" src="js/userbinding.js"></script>
+<!--
+EOT;
+}if ($winduid){print<<<EOT
+-->
+<div id="menu_userinfomore" class="cc pw_menu" style="display:none;">
+	<h6 style="left:-1px;right:auto;"><a href="u.php" class="b iconDroplink">$windid</a><span class="iconDrop"><i>▼</i></span></h6>
+	<div>
+		<ul class="menu-half cc" style="width:26em;">
+		<li>等级: $gp_grouptitle
+<!--
+EOT;
+if ($_G['allowhide']) {print <<<EOT
+-->
+		<li>状态:
+<span style="cursor:pointer;" onclick="ajax.send('pw_ajax.php?action=changestate','',changeState)" id="online_state">
+<!--
+EOT;
+if (GetCookie('hideid') == 1) {print <<<EOT
+--><img src="$imgpath/stealth.png" align="absmiddle" />隐身
+<!--
+EOT;
+} else {print <<<EOT
+--><img src="$imgpath/online.png" align="absmiddle" />在线
+<!--
+EOT;
+}print <<<EOT
+--></span>
+<script language="JavaScript">
+function changeState() {
+	var msg = ajax.request.responseText;
+	if (msg == 1){
+		getObj('online_state').innerHTML = '<img src="$imgpath/stealth.png" align="absmiddle" />隐身';
+	}else{
+		getObj('online_state').innerHTML = '<img src="$imgpath/online.png" align="absmiddle" />在线';
+	}
+}
+</script>
+			</li>
+<!--
+EOT;
+}print <<<EOT
+-->
+
+			<li>帖子: $winddb[postnum]</li>
+			<li>今日: $winddb[todaypost]</li>
+			<li>$db_rvrcname: $userrvrc $db_rvrcunit</li>
+			<li>$db_moneyname: $winddb[money] $db_moneyunit</li>
+			<li>$db_creditname: $winddb[credit] $db_creditunit</li>
+			<li>最后登录: <span class="f10">{$_LoginInfo['lastlodate']}</span></li>
+			<li style="width:90%">登录IP: <span class="f10">$onlineip</span></li>
+		</ul>
+		<div class="userbindingMenu"></div>
+	</div>
+</div>
+<div id="menu_profile" class="pw_menu" style="display:none">
+	<h6><a href="profile.php?action=modify" class="iconDroplink">设置</a><span class="iconDrop"><i>▼</i></span></h6>
+    <ul style="width:50px;" class="menuList">
+        <li><a href="profile.php?action=modify" target="_blank">帐号</a></li>
+        <li><a href="profile.php?action=privacy" target="_blank">隐私</a></li>
+        <li><a href="userpay.php" target="_blank">积分</a></li>
+        <li><a href="profile.php?action=permission" target="_blank">权限</a></li>
+    </ul>
+</div>
+<!--
+EOT;
+if ($winddb['newreferto']>0 || $winddb['newfans']>0 || $winddb['newcomment']) {print <<<EOT
+-->
+<div id="menu_message" class="pw_menu" style="display:none;">
+	<h6 style="left:-1px;right:auto;"><a href="message.php" class="iconDroplink" >消息{$tmpMsgCue}</a><span class="iconDrop"><i>▼</i></span></h6>
+	<ul class="menuList tal">
+<!--
+EOT;
+if ($winddb['newpm']>0 && $_G['maxmsg']) {print <<<EOT
+-->
+		<li><a href="message.php">新消息：<span style="color:#ff5500;">$winddb[newpm]</span></a></li>
+<!--
+EOT;
+}if ($winddb['newfans']>0) {print <<<EOT
+-->
+		<li><a href="u.php?a=friend&type=attentioned">新关注：<span style="color:#ff5500;">$winddb[newfans]</span></a></li>
+<!--
+EOT;
+}if ($winddb['newreferto']>0 || $winddb['newcomment']>0) {
+$tmpNum = $winddb['newreferto'] + $winddb['newcomment'];
+$tmpAction = ($winddb['newcomment'] > $winddb['newreferto']) ? 'receive' : 'refer';
+print <<<EOT
+-->
+		<li><a href="apps.php?q=weibo&do=$tmpAction">提到我：<span style="color:#ff5500;">$tmpNum</span></a></li>
+<!--
+EOT;
+}print <<<EOT
+-->
+	</ul>
+</div>
+<!--
+EOT;
+}}print <<<EOT
+-->
+<script language="javascript">var verifyhash = '$verifyhash';</script>
+<!--
+EOT;
+?>-->

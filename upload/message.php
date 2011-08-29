@@ -4,9 +4,14 @@ define('SCR', 'message');
 define('MS', 'ms_');
 define('MESSAGE', 'message');
 define('DS', DIRECTORY_SEPARATOR);
-InitGP(array('subtype','type', 'action'));
+S::gp(array('subtype','type', 'action'));
 (!$winduid && $type != 'ajax') && Showmsg ( 'not_login' );
 $USCR = 'msg_message';
+
+//导航
+$homenavigation = array();
+$navConfigService = L::loadClass('navconfig', 'site');
+$homenavigation = $navConfigService->userHomeNavigation(PW_NAV_TYPE_MAIN, 'o');
 
 if (!$type) {
 	if ($winddb['newpm'] > 0 && $_G['maxmsg']) {
@@ -48,7 +53,6 @@ if (!empty($subtype) && !in_array($subtype, array_keys($allowTypes)))
 
 if (!in_array($type, array_keys($allowTypes)))
 	Showmsg('undefined_action');
-
 $operateFile = R_P . $allowTypes[$type];
 
 if (file_exists($operateFile)) {
@@ -97,22 +101,19 @@ function resetUserMsgCount($num){
  */
 function getSubListInfo($allList) {
 	global $timestamp;
-	$tTimes = $yTimes = $wTimes = $mTimes = 0;
+	$tTimes = $yTimes = $mTimes = 0;
 	$today = PwStrtoTime(get_date($timestamp, 'Y-m-d'));
 	$yesterday = $today - 24 * 60 * 60;
-	$week = today - 7 * 24 * 60 * 60;
 	foreach ((array) $allList as $key => $value) {
 		if ($value['modified_time'] >= $today) {
 			$tTimes++;
 		} elseif ($value['modified_time'] >= $yesterday && $value['modified_time'] < $today) {
 			$yTimes++;
-		} elseif ($value['modified_time'] >= $week && $value['modified_time'] < $yesterday) {
-			$wTimes++;
-		} elseif ($value['modified_time'] < $week) {
+		} elseif ($value['modified_time'] < $yesterday) {
 			$mTimes++;
 		}
 	}
-	return array($today, $yesterday, $week, $tTimes, $yTimes, $wTimes, $mTimes);
+	return array($today, $yesterday, $tTimes, $yTimes, $mTimes);
 }
 
 /**
@@ -121,7 +122,7 @@ function getSubListInfo($allList) {
  * @return string
  */
 function getSubListHtml($value) {
-	global $today, $tTimes, $yesterday, $yTimes, $week, $wTimes, $mTimes, $groups;
+	global $today, $tTimes, $yesterday, $yTimes, $mTimes, $groups;
 	$result = '';
 	if ($value['modified_time'] >= $today && $tTimes) {
 		$result = "<tr class=\"tr2\"><td colspan=\"6\">今天<em>({$tTimes}条)</em></td></tr>";
@@ -129,10 +130,7 @@ function getSubListHtml($value) {
 	} elseif ($value['modified_time'] >= $yesterday && $value['modified_time'] < $today && $yTimes) {
 		$result = "<tr class=\"tr2\"><td colspan=\"6\">昨天<em>({$yTimes}条)</em></td></tr>";
 		$yTimes = 0;
-	} elseif ($value['modified_time'] >= $week && $value['modified_time'] < $yesterday && $wTimes) {
-		$result = "<tr class=\"tr2\"><td colspan=\"6\">本周<em>({$wTimes}条)</em></td></tr>";
-		$wTimes = 0;
-	} elseif ($value['modified_time'] < $week && $mTimes) {
+	} elseif ($value['modified_time'] < $yesterday && $mTimes) {
 		$result = "<tr class=\"tr2\"><td colspan=\"6\">更早<em>({$mTimes}条)</em></td></tr>";
 		$mTimes = 0;
 	}

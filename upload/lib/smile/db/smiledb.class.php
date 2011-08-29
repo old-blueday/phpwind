@@ -19,10 +19,10 @@ class PW_SmileDB extends BaseDB {
 	function findByTypeId($typeId) {
 		$data = array();
 		if (file_exists($this->_getCacheKey())) {
-			include $this->_getCacheKey();
+			include S::escapePath($this->_getCacheKey());
 		} else {
 			$data = $this->findByTypeIdWithoutCache($typeId);
-			writeover($this->_getCacheKey(), '<?php $data = ' . var_export($data, true) . ';');
+			pwCache::setData($this->_getCacheKey(), '<?php $data = ' . var_export($data, true) . ';');
 		}
 		return $data;
 	}
@@ -71,7 +71,7 @@ class PW_SmileDB extends BaseDB {
 	}
 	
 	function _cleanCache() {
-		P_unlink($this->_getCacheKey());
+		pwCache::deleteData($this->_getCacheKey());
 	}
 
 }

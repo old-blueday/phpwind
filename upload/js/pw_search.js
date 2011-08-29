@@ -322,7 +322,7 @@ pw_search.prototype = {
 		this.selDiv.style.display='';
 		this.selDiv.style.left=this.dst.parentNode.getBoundingClientRect().right-this.selDiv.clientWidth+ietruebody().scrollLeft+offset+'px';
 		this.selDiv.style.top=this.dst.parentNode.getBoundingClientRect().top+ietruebody().scrollTop+20+'px';
-		this.selDiv.style.zIndex = '10';
+		this.selDiv.style.zIndex = '1110';
 		btn.className="input_up";
 		document.onclick=function(){
 			pwSearch.closeSel();
@@ -371,7 +371,7 @@ pw_search.prototype = {
 		_obj = this;
 		//判断是否选中
 		if(ds.length==0){
-			str = '<li style="width:auto;height:auto;float:none;margin-top:60px;" class="tac f15">暂无好友，<a target="_blank" href="u.php?a=friend&type=find">寻找我的好友</a></li>';
+			str = '<li style="width:auto;height:auto;float:none;margin-top:60px;" class="tac f15">暂无好友，<a target="_blank" href="u.php?a=friend&type=find"><span style="color:#228B22">寻找我的好友</span></a></li>';
 		}else{
 			for (var i=ds.length-1; i>=0; i--){
 				str+='<li onclick="_obj.setFriends(event)"><input type="checkbox" value="'+ds[i]+'" />'+ds[i]+'</li>';

@@ -3,7 +3,8 @@
  * 错误与日志基类
  */
 class PW_Errors {
-	var $_errors = array(); //错误集合	
+	var $_errors = array(); //错误集合
+	
 
 	var $_logs = array(); //日志集合
 	
@@ -29,7 +30,7 @@ class PW_Errors {
 		$logFile = D_P.'data/error.log';
 		if (!$this->_logs) return false;
 		$temp = pw_var_export($this->_logs);
-		writeover($logFile,$temp,'rb+');
+		pwCache::setData($logFile,$temp, false, 'rb+');
 	}
 	/**
 	 * 检查是否有错误信息，有的话及时报错

@@ -21,7 +21,7 @@ class PW_PostsDB extends BaseDB {
 	
 	function getsByPostIds($postIds,$table){
 		if(!$table) return false;
-		$postIds = (is_array($postIds)) ? pwImplode($postIds) : $postIds;
+		$postIds = (is_array($postIds)) ? S::sqlImplode($postIds) : $postIds;
 		$query = $this->_db->query ( "SELECT * FROM ".$table." p  WHERE p.pid in(".$postIds.") ORDER BY p.postdate DESC" );
 		return $this->_getAllResultFromQuery ( $query );
 	}

@@ -1,14 +1,14 @@
-var url=getObj('url').value;
 var userBinding = {
+	baseUrl : getObj('headbase').href,
 	menu : null,
 	getMenu : function(callback) {
 		if (userBinding.menu != null) {
 			return true;
 		}		
-		ajax.send(url+'/pw_ajax.php?action=showuserbinding', '', function() {
+		ajax.send(this.baseUrl + 'pw_ajax.php?action=showuserbinding', '', function() {
 			userBinding.menu = document.createElement('div');
 			if (ajax.request.responseText != null && ajax.request.responseText.indexOf('<') != -1) {
-				userBinding.menu.className = 'menu_topup2';
+				userBinding.menu.className = 'pw_menu';
 				userBinding.menu.innerHTML = ajax.runscript(ajax.request.responseText);
 				callback();
 			}
@@ -39,7 +39,7 @@ var userBinding = {
 	},
 
 	change : function(uid) {
-		ajax.send(url+'/pw_ajax.php?action=switchuser&uid=' + uid, '', function() {
+		ajax.send(this.baseUrl + 'pw_ajax.php?action=switchuser&uid=' + uid, '', function() {
 			var rText = ajax.request.responseText.split('\t');
 			if (typeof dataStorage == 'object') {
 				dataStorage.save();

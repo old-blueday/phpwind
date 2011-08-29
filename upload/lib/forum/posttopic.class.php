@@ -36,7 +36,7 @@ class postTopic {
 
 	function getTopicCache(){
 
-		@include(D_P.'data/bbscache/topic_config.php');
+		@include pwCache::getPath(D_P.'data/bbscache/topic_config.php');
 		$this->topiccatedb =& $topiccatedb;
 		$this->topicmodeldb =& $topicmodeldb;
 
@@ -46,38 +46,39 @@ class postTopic {
 		global $tid,$imgpath;
 		$topicfielddb = array();
 		$topichtml = "
-<style>.tr3 .w{margin-right:10px;}
+<style>
+.pp td{padding:5px 10px;}
 .msg {
-	background: #fff url($imgpath/pccheck.gif) no-repeat -25px -75px;
+	background: #fff url($imgpath/pccheck.gif) no-repeat 0 -37px;
 	border: 1px solid #fff;
 	display: inline;
 	margin-left: 5px;
-	font-size:13px;
-	padding: 2px 2px 2px 18px;
-	vertical-align : -1px;
-	*vertical-align : 5px;
-	_vertical-align : 3px;
+	padding: 2px 2px 2px 20px;
+	vertical-align : -2px;
+	*vertical-align : 0;
 }
-
-.pass {
-	background-position: 1px -57px;
-	background-color: #E6FFE6;
-	border-color: #00BE00;
-}
-
 .error {
-	background-position: 1px -38px;
-	background-color: #FFF2E9;
-	border-color: #FF6600;
+	background-position: 2px -37px;
+	background-color: #fef1f0;
+	border-color: #ffb3b6;
+	color:#f14a10;
+	zoom:1;
+	height:17px;
+	overflow:hidden;
+}
+.pass {
+	background-position: 2px -57px;
+	width:22px;
+	height:21px;
 }
 </style><script language=\"JavaScript\" src=\"js/pw_pccheck.js\"></script>";
-		$topichtml .= "<script language=\"JavaScript\" src=\"js/date.js\"></script><script language=\"JavaScript\" src=\"js/desktop/Compatibility.js\"></script><table width=\"100%\"><tr class=\"tr3\"><td colspan=2>".getLangInfo('other','pc_must')."</td></tr>";
+		$topichtml .= "<script language=\"JavaScript\" src=\"js/date.js\"></script><script language=\"JavaScript\" src=\"js/desktop/Compatibility.js\"></script><table width=\"100%\"><tr class=\"pp f_two\"><td colspan=2>".getLangInfo('other','pc_must')."</td></tr>";
 
 		if ($tid) {
 			$tablename = GetTopcitable($modelid);
-			$fieldone = $this->db->get_one("SELECT * FROM $tablename WHERE tid=".pwEscape($tid));
+			$fieldone = $this->db->get_one("SELECT * FROM $tablename WHERE tid=".S::sqlEscape($tid));
 		}
-		$query = $this->db->query("SELECT fieldid,name,fieldname,type,rules,descrip,ifmust,vieworder,textsize FROM pw_topicfield WHERE modelid=".pwEscape($modelid)." AND ifable=1 ORDER BY vieworder,fieldid ASC");
+		$query = $this->db->query("SELECT fieldid,name,fieldname,type,rules,descrip,ifmust,vieworder,textsize FROM pw_topicfield WHERE modelid=".S::sqlEscape($modelid)." AND ifable=1 ORDER BY vieworder,fieldid ASC");
 		while ($rt = $this->db->fetch_array($query)) {
 			if ($tid) $rt['fieldvalue'] = $fieldone[$rt['fieldname']];
 			list($rt['name1'],$rt['name2']) = explode('{#}',$rt['name']);
@@ -89,18 +90,18 @@ class postTopic {
 				foreach ($value as $k => $v) {
 					$v['tabindex'] = $tabindex;
 					$ifmust = '';
-					$v['ifmust'] && $ifmust = "<font color=\"#FF0000\">*</font>";
-					$topichtml .= "<tr class=\"tr3\"><td width=\"100\">$v[name1]：{$ifmust}</td><td>";
+					$v['ifmust'] && $ifmust = "<span class=\"s1\">*</span>";
+					$topichtml .= "<tr class=\"pp f_two\"><td width=\"100\">$v[name1]：{$ifmust}</td><td>";
 					$topichtml .= postTopic::getTopicType($v)." ".$v['name2'];
 					$topichtml .= " <span class='gray'>$v[descrip]</span></td></tr>";
 				}
 			} else {
-				$topichtml .= "<tr class=\"tr3\">";
+				$topichtml .= "<tr class=\"pp\">";
 				$i = 0;
 				foreach ($value as $k => $v) {
 					$v['tabindex'] = $tabindex;
 					$ifmust = '';
-					$v['ifmust'] && $ifmust = "<font color=\"#FF0000\">*</font>";
+					$v['ifmust'] && $ifmust = "<span class=\"s1\">*</span>";
 					if ($i == 0) {
 						$topichtml .= "<td style=\"width:100px;\">$v[name1]：{$ifmust}</td><td>";
 					}
@@ -127,23 +128,12 @@ class postTopic {
 		$textsize = $data['textsize'] ? $data['textsize'] : 20;
 		$data['rules'] && $data['rules'] = unserialize($data['rules']);
 		if ($data['type'] == 'number') {
-			if ($data['rules']['minnum'] && $data['rules']['maxnum']) {
-				$pccheck = "check=\"{$data[rules][minnum]}-{$data[rules][maxnum]}\"";
-				if ($data['ifmust']) {
-					$error = 'error="rang_error"';
-				} else {
-					$error = 'error="rang_error2"';
-				}
-			} else {
-				$pccheck = 'check="/^\d+$/"';
-				if ($data['ifmust']) {
-					$error = 'error="number_error"';
-				} else {
-					$error = 'error="number_error2"';
-				}
-			}
+			$data['rules']['minnum'] === '' && $data['rules']['minnum'] = 'n';
+			$data['rules']['maxnum'] === '' && $data['rules']['maxnum'] = 'n';
+			$pccheck = "check=\"{$data[rules][minnum]}-{$data[rules][maxnum]}\"";
+			$error = $data['ifmust'] ? 'error="rang_error"' : 'error="rang_error2"';
 			$topichtml = "<input type=\"text\" $pccheck $error class=\"input\" name=\"topic[$data[fieldid]]\" value=\"$data[fieldvalue]\" size=\"$textsize\" tabindex = \"{$data[tabindex]}\">";
-			if ($data['rules']['minnum'] && $data['rules']['maxnum']) {
+			if ($data['rules']['minnum'] !== '' && $data['rules']['maxnum'] !== '') {
 				$topichtml .= " <span class='gray'>(".getLanginfo('other','pc_defaultname')."{$data[rules][minnum]} ~ {$data[rules][maxnum]})</span>";
 			}
 		} elseif ($data['type'] == 'email') {
@@ -163,14 +153,16 @@ class postTopic {
 			}
 			$topichtml = "<input type=\"text\" $pccheck $error class=\"input\" name=\"topic[$data[fieldid]]\" value=\"$data[fieldvalue]\" size=\"$textsize\"  tabindex = \"{$data[tabindex]}\" />";
 		} elseif (in_array($data['type'],array('text','img','url'))) {
-			$topichtml = "<input type=\"text\" $pccheck $error class=\"input\" name=\"topic[$data[fieldid]]\" value=\"$data[fieldvalue]\" size=\"$textsize\"  tabindex = \"{$data[tabindex]}\" />";
+			$addfieldvalue = '';
+			$data['type']=='url' && !$data[fieldvalue] && $addfieldvalue='http://';
+			$topichtml = "<input type=\"text\" $pccheck $error class=\"input\" name=\"topic[$data[fieldid]]\" value=\"$addfieldvalue$data[fieldvalue]\" size=\"$textsize\"  tabindex = \"{$data[tabindex]}\" />";
 		} elseif ($data['type'] == 'radio') {
 			$i = 0;
 			foreach($data['rules'] as $rk => $rv){
 				$i++;
 				$chehcked = '';
 				$rv_value = substr($rv,0,strpos($rv,'='));
-				$rv_name = substr($rv,strpos($rv,'=')+1);
+		   		$rv_name = substr($rv,strpos($rv,'=')+1);
 				if ($data['fieldvalue']) {
 					$rv_value == $data['fieldvalue'] && $chehcked = 'checked';
 				} elseif ($i == 1) {
@@ -203,8 +195,8 @@ class postTopic {
 				$selected = '';
 				$sv_value = substr($sv,0,strpos($sv,'='));
 				$sv_name = substr($sv,strpos($sv,'=')+1);
-				$sv_value == $data['fieldvalue'] && $selected = 'selected';
-				$topichtml .= "<option value=\"$sv_value\">$sv_name</option>";
+				if($sv_value == $data['fieldvalue']) $selected = 'selected';
+				$topichtml .= "<option value=\"$sv_value\" $selected>$sv_name</option>";
 			}
 			$topichtml .= "</select>";
 		} elseif ($data['type'] == 'calendar') {
@@ -214,7 +206,7 @@ class postTopic {
 		} elseif ($data['type'] == 'upload') {
 			$imgs = '';
 			$data['fieldvalue'] && $data['fieldvalue'] = postTopic::getpcurl($data['fieldvalue'],1);
-			$data['fieldvalue'] && $imgs = "<span id=\"img_$data[fieldid]\"><img src=\"{$data[fieldvalue]}\" width=\"240px\"/><a href=\"javascript:;\" onclick=\"pcdelimg('$modelid','$data[fieldid]','topic');\">".getLangInfo('other','pc_delimg')."</a></span>";
+			$data['fieldvalue'] && $imgs = "<span id=\"img_$data[fieldid]\"><img src=\"{$data[fieldvalue]}\" width=\"240px\"/><a href=\"javascript:;\" onclick=\"pcdelimg('$modelid','$data[fieldid]','topic');return false;\">".getLangInfo('other','pc_delimg')."</a></span>";
 			$topichtml .= "<input type=\"file\" class=\"bt\" name=\"topic_$data[fieldid]\" size=\"$textsize\"  tabindex = \"{$data[tabindex]}\" >$imgs";
 		} else {
 			$topichtml = "";
@@ -245,7 +237,7 @@ class postTopic {
 		$newtopicvalue = $topicvalue = $flashtopicvalue = '';
 
 		$newtopicvalue .= "<div class=\"cates\">";
-		$flashtopicvalue .= "<div class=\"cate_meg_player\" ><style type=\"text/css\">.flash{height:150px;}</style><div id=\"pwSlidePlayer\" class=\"readFlash\">";
+		$flashtopicvalue .= "<div class=\"cate_meg_player\" ><div id=\"pwSlidePlayer\" class=\"readFlash\">";
 		$topicvalue .= "<ul class=\"cate-list\">";
 		if(!isset($this->topicmodeldb[$modelid])) return;
 
@@ -253,10 +245,10 @@ class postTopic {
 			$fieldone = $pcdb;
 		} else {
 			$tablename = GetTopcitable($modelid);
-			$fieldone = $this->db->get_one("SELECT * FROM $tablename WHERE tid=".pwEscape($tid));
+			$fieldone = $this->db->get_one("SELECT * FROM $tablename WHERE tid=".S::sqlEscape($tid));
 		}
 
-		$query = $this->db->query("SELECT fieldid,fieldname,name,rules,type,vieworder FROM pw_topicfield WHERE modelid=".pwEscape($modelid)." ORDER BY vieworder,fieldid");
+		$query = $this->db->query("SELECT fieldid,fieldname,name,rules,type,vieworder FROM pw_topicfield WHERE modelid=".S::sqlEscape($modelid)." ORDER BY vieworder,fieldid");
 
 		$vieworder_mark = $i = $tmpCount = 0;
 		$flash = false;
@@ -264,7 +256,7 @@ class postTopic {
 			if (($rt['type'] == 'img' || $rt['type'] == 'upload') && $fieldone[$rt['fieldname']]) {
 				$tmpCount++;
 				$rt['type'] == 'upload' && $fieldone[$rt['fieldname']] = postTopic::getpcurl($fieldone[$rt['fieldname']],1);
-				$flashtopicvalue .= "<div class=\"readFlash\" id=\"Switch_$rt[fieldname]\" style=\"display:none;\"><img src=\"{$fieldone[$rt[fieldname]]}\" width=\"240px\"/></div>";
+				$flashtopicvalue .= "<div class=\"readFlash\" id=\"Switch_$rt[fieldname]\" style=\"display:none;\"><img src=\"{$fieldone[$rt[fieldname]]}\" /></div>";
 				$flash = true;
 			}
 			if($rt['type'] == 'textarea') {
@@ -310,9 +302,9 @@ class postTopic {
 		$sql = '';
 		$fielddb = array();
 		if ($type == 'more') {
-			is_array($modelid) && $sql .= " WHERE modelid IN(".pwImplode($modelid).")";
+			is_array($modelid) && $sql .= " WHERE modelid IN(".S::sqlImplode($modelid).")";
 		} elseif ($type == 'one') {
-			$modelid && $sql .= " WHERE modelid=".pwEscape($modelid);
+			$modelid && $sql .= " WHERE modelid=".S::sqlEscape($modelid);
 		} else {
 			$sql .= '';
 		}
@@ -344,9 +336,9 @@ class postTopic {
 
 	function initData() {/*初始化上传信息*/
 		global $timestamp,$db_topicname;
-		$topic = GetGP('topic','P');
+		$topic = S::getGP('topic','P');
 
-		$query = $this->db->query("SELECT fieldid,name,type,rules,ifmust,ifable FROM pw_topicfield WHERE modelid=".pwEscape($this->modelid));
+		$query = $this->db->query("SELECT fieldid,name,type,rules,ifmust,ifable FROM pw_topicfield WHERE modelid=".S::sqlEscape($this->modelid));
 		while ($rt = $this->db->fetch_array($query)) {
 			if ($rt['type'] != 'upload' && $rt['ifable'] && $rt['ifmust'] && !$topic[$rt['fieldid']]) {
 				$db_topicname = $rt['name'];
@@ -356,7 +348,7 @@ class postTopic {
 				if ($rt['type'] == 'number') {
 					!is_numeric($topic[$rt['fieldid']]) && Showmsg('number_error');
 					$limitnum = unserialize($rt['rules']);
-					if ($limitnum['minnum'] && $limitnum['maxnum'] && ($topic[$rt['fieldid']] < $limitnum['minnum'] || $topic[$rt['fieldid']] > $limitnum['maxnum'])) {
+					if (($limitnum['minnum'] !== '' && $topic[$rt['fieldid']] < $limitnum['minnum']) || ($limitnum['maxnum'] !== '' && $topic[$rt['fieldid']] > $limitnum['maxnum'])) {
 						$db_topicname = $rt['name'];
 						Showmsg('topic_number_limit');
 					}
@@ -393,9 +385,9 @@ class postTopic {
 		$tablename = GetTopcitable($this->modelid);
 
 		$this->db->pw_update(
-			"SELECT tid FROM $tablename WHERE tid=".pwEscape($tid),
-			"UPDATE $tablename SET ".pwSqlSingle($this->data) . "WHERE tid=".pwEscape($tid),
-			"INSERT INTO $tablename SET " . pwSqlSingle($this->data)
+			"SELECT tid FROM $tablename WHERE tid=".S::sqlEscape($tid),
+			"UPDATE $tablename SET ".S::sqlSingle($this->data) . "WHERE tid=".S::sqlEscape($tid),
+			"INSERT INTO $tablename SET " . S::sqlSingle($this->data)
 		);
 
 		/*附件上传*/
@@ -408,46 +400,25 @@ class postTopic {
 	}
 	function initSearchHtml($modelid) {/*获取前台分类信息搜索列表*/
 		global $fid;
-
+		$query = $this->db->query("SELECT fieldid,name,type,rules,ifsearch,ifasearch,textsize,vieworder FROM pw_topicfield WHERE modelid = ".S::sqlEscape($modelid)." AND ifable='1' AND (ifsearch='1' OR ifasearch='1') ORDER BY vieworder ASC,fieldid ASC");
+		$count=$this->db->num_rows($query);
+		if($count == 0) {
+			return null;
+		}
 		$searchhtml = "<form action=\"thread.php?fid=$fid&modelid=$modelid\" method=\"post\">";
 		$searchhtml .= "<input type=\"hidden\" name=\"topicsearch\" value=\"1\"><script language=\"JavaScript\" src=\"js/date.js\"></script><table>";
-
-		$query = $this->db->query("SELECT fieldid,name,type,rules,ifsearch,ifasearch,textsize,vieworder FROM pw_topicfield WHERE modelid = ".pwEscape($modelid)." AND ifable='1' AND (ifsearch='1' OR ifasearch='1') ORDER BY vieworder ASC,fieldid ASC");
 		$vieworder_mark = $ifsearch = $ifasearch = 0;
 		while ($rt = $this->db->fetch_array($query)) {
 			if($rt['ifasearch'] == 1) {
-				$ifasearch = '1';
+				$ifsearch = '1';
 				if ($rt['ifsearch'] == 0) continue;
 			}
-			$ifsearch = '1';
 			$type = $rt['type'];
 			$fieldid = $rt['fieldid'];
 			list($name1,$name2) = explode('{#}',$rt['name']);
 
-
-			if ($rt['vieworder'] == 0) {
-				if ($type == 'checkbox' || $type == 'radio') {
-					$searchhtml .= "<tr><th>";
-				} else {
-					$searchhtml .= "<tr><th>";
-				}
-				$searchhtml .= $name1 ? $name1."：" : '';
-			} elseif ($rt['vieworder'] != 0) {
-				if ($vieworder_mark != $rt['vieworder']) {
-					if ($vieworder_mark != 0) $searchhtml .= "</td></tr>";
-
-					if ($type == 'checkbox' || $type == 'radio') {
-						$searchhtml .= "<tr><th>";
-					} else {
-						$searchhtml .= "<tr><th>";
-					}
-
-					$searchhtml .= $name1 ? $name1."：" : '';
-					$searchhtml .= "</th><td>";
-				} elseif ($vieworder_mark == $rt['vieworder']) {
-					$searchhtml .= $name1 ? $name1 : '';
-				}
-			}
+			$searchhtml .= "<tr><th>";
+			$searchhtml .= $name1 ? $name1."</th><td>" : '';
 
 			$op_key = $op_value = '';
 			if (!$rt['textsize'] || $rt['textsize'] >10){
@@ -477,15 +448,9 @@ class postTopic {
 			} else {
 				$searchhtml .= "<input type=\"text\" size=\"$textsize\" name=\"searchname[".$fieldid."]\" value=\"\" class=\"input\">";
 			}
-
-			if ($rt['vieworder'] == 0) {
-				$searchhtml .= $name2."</td></tr>";
-			} elseif ($rt['vieworder'] != 0) {
-				$searchhtml .= $name2;
-				$vieworder_mark = $rt['vieworder'];
-			}
+			$searchhtml .= $name2."</td></tr>";
 		}
-		$searchhtml .= "</td></tr><tr><th></th><td><span class=\"btn2\" style=\"margin-right:10px;\"><span><button type=\"submit\" name=\"submit\">".getLangInfo('other','pc_search')."</button></span></span>";
+		$searchhtml .= "<tr><th></th><td><span class=\"btn2\" style=\"margin-right:10px;\"><span><button type=\"submit\" name=\"submit\">".getLangInfo('other','pc_search')."</button></span></span>";
 		$ifsearch == 0 && $searchhtml .= "</td></tr></table></form>";
 		$ifsearch == '1' && $searchhtml .= "<a id=\"aserach\" href=\"javascript:;\" onclick=\"sendmsg('pw_ajax.php?action=asearch&fid=$fid&modelid=$modelid','',this.id);\">".getLangInfo('other','pc_asearch')."</a></td></tr></table></form>";
 
@@ -503,20 +468,20 @@ class postTopic {
 		$field = unserialize(StrCode($field,'DECODE'));
 
 		$sqladd = '';
-		$fid && $sqladd .= " fid=".pwEscape($fid);
+		$fid && $sqladd .= " fid=".S::sqlEscape($fid);
 		$fielddb = postTopic::getFieldData($modelid,$type);
 
 		foreach ($field as $key => $value) {
 			if ($value) {
 				if (in_array($fielddb[$key]['type'],array('number','radio','select'))) {
-					$sqladd .= $sqladd ? " AND ".$fielddb[$key]['fieldname']."=".pwEscape($value) : $fielddb[$key]['fieldname']."=".pwEscape($value);
+					$sqladd .= $sqladd ? " AND ".$fielddb[$key]['fieldname']."=".S::sqlEscape($value) : $fielddb[$key]['fieldname']."=".S::sqlEscape($value);
 				} elseif ($fielddb[$key]['type'] == 'checkbox') {
 					$checkboxs = '';
 					foreach ($value as $cv) {
 						$checkboxs .= $checkboxs ? ','.$cv : $cv;
 					}
 					$value = '%,'.$checkboxs.',%';
-					$sqladd .= $sqladd ? " AND ".$fielddb[$key]['fieldname'] ." LIKE(".pwEscape($value).")" : $fielddb[$key]['fieldname'] ." LIKE(".pwEscape($value).")";
+					$sqladd .= $sqladd ? " AND ".$fielddb[$key]['fieldname'] ." LIKE(".S::sqlEscape($value).")" : $fielddb[$key]['fieldname'] ." LIKE(".S::sqlEscape($value).")";
 				} elseif ($fielddb[$key]['type'] == 'calendar' && ($value['start'] || $value['end'])) {
 
 					$value['start'] && $value['start'] = PwStrtoTime($value['start']);
@@ -526,13 +491,13 @@ class postTopic {
 						Showmsg('calendar_error');
 					}
 
-					$sqladd .= $sqladd ? " AND ".$fielddb[$key]['fieldname'].">=".pwEscape($value['start'])." AND ".$fielddb[$key]['fieldname']."<=".pwEscape($value['end']) : $fielddb[$key]['fieldname'].">=".pwEscape($value['start'])." AND ".$fielddb[$key]['fieldname']."<=".pwEscape($value['end']);
+					$sqladd .= $sqladd ? " AND ".$fielddb[$key]['fieldname'].">=".S::sqlEscape($value['start'])." AND ".$fielddb[$key]['fieldname']."<=".S::sqlEscape($value['end']) : $fielddb[$key]['fieldname'].">=".S::sqlEscape($value['start'])." AND ".$fielddb[$key]['fieldname']."<=".S::sqlEscape($value['end']);
 
 				} elseif (in_array($fielddb[$key]['type'],array('text','url','email','textarea'))) {
 					$value = '%'.$value.'%';
-					$sqladd .= $sqladd ? " AND ".$fielddb[$key]['fieldname'] ." LIKE(".pwEscape($value).")" : $fielddb[$key]['fieldname'] ." LIKE(".pwEscape($value).")";
+					$sqladd .= $sqladd ? " AND ".$fielddb[$key]['fieldname'] ." LIKE(".S::sqlEscape($value).")" : $fielddb[$key]['fieldname'] ." LIKE(".S::sqlEscape($value).")";
 				} elseif ($fielddb[$key]['type'] == 'range' && $value['min'] && $value['max']) {
-					$sqladd .= $sqladd ? " AND ".$fielddb[$key]['fieldname'].">=".pwEscape($value['min'])." AND ".$fielddb[$key]['fieldname']."<=".pwEscape($value['max']) : $fielddb[$key]['fieldname'].">=".pwEscape($value['min'])." AND ".$fielddb[$key]['fieldname']."<=".pwEscape($value['max']);
+					$sqladd .= $sqladd ? " AND ".$fielddb[$key]['fieldname'].">=".S::sqlEscape($value['min'])." AND ".$fielddb[$key]['fieldname']."<=".S::sqlEscape($value['max']) : $fielddb[$key]['fieldname'].">=".S::sqlEscape($value['min'])." AND ".$fielddb[$key]['fieldname']."<=".S::sqlEscape($value['max']);
 				} else {
 					$sqladd .= '';
 				}
@@ -541,7 +506,7 @@ class postTopic {
 		if ($sqladd) {
 			!$page && $page = 1;
 			$start = ($page-1)*$db_perpage;
-			$limit = pwLimit($start,$db_perpage);
+			$limit = S::sqlLimit($start,$db_perpage);
 			$tablename = GetTopcitable($modelid);
 
 			$sqladd .= $sqladd ? " AND ifrecycle=0" : " ifrecycle=0";

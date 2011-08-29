@@ -12,18 +12,20 @@ $pwModeCss = 'mode/area/images/area_read_style.css';
 $searchadd = $thread_children = $thread_online = $fastpost = $updatetop = $urladd = '';
 wind_forumcheck($foruminfo);
 $forumname = strip_tags($foruminfo['name']);
-list($guidename,$forumtitle) = getforumtitle(forumindex($foruminfo['fup'],1));
+list($guidename, $forumtitle) = $pwforum->getTitle();
+
+//list($guidename,$forumtitle) = getforumtitle(forumindex($foruminfo['fup'],1));
 $db_metakeyword = trim(str_replace(array('|',' - ',' ',',, ',', , '),', ',$forumtitle),', ');
 $foruminfo['keywords'] && $db_metakeyword = $foruminfo['keywords'].','.$db_metakeyword;
 if ($foruminfo['descrip']) {
-	$db_metadescrip = Char_cv(strip_tags($foruminfo['descrip']));
+	$db_metadescrip = S::escapeChar(strip_tags($foruminfo['descrip']));
 	$db_metadescrip = $db_bbsname.','.str_replace(array("\n",'&nbsp;','&amp;','&lt;','&gt;'),'',$db_metadescrip);
 }
 $toptids = $foruminfo['topthreads'];
 $pwSystem = array();
 $isGM = $isBM = $admincheck = $ajaxcheck = $managecheck = $pwAnonyHide = $pwPostHide = $pwSellHide = $pwEncodeHide = 0;
 if ($groupid != 'guest') {
-	$isGM = CkInArray($windid,$manager);
+	$isGM = S::inArray($windid,$manager);
 	$isBM = admincheck($foruminfo['forumadmin'],$foruminfo['fupadmin'],$windid);
 	$admincheck = ($isGM || $isBM) ? 1 : 0;
 	if (!$isGM) {
@@ -54,8 +56,8 @@ bbsSeoSettings('thread',$_seo,$foruminfo['name']);
 /*SEO*/
 
 require_once(M_P.'require/header.php');
-
-InitGP(array('page','type','subtype','search','orderway','asc','special','modelid','pcid','topicsearch'));
+$msg_guide = $pwforum->headguide($guidename);
+S::gp(array('page','type','subtype','search','orderway','asc','special','modelid','pcid','topicsearch'));
 $db_maxpage && $page > $db_maxpage && $page = $db_maxpage;
 (int)$page<1 && $page = 1;
 
@@ -139,7 +141,7 @@ if ($foruminfo['childid']) {
 }
 
 if ($managecheck) {
-	InitGP(array('concle'));
+	S::gp(array('concle'));
 	$concle || $concle = GetCookie('concle');
 	if ($concle==1 && ($isGM || $pwSystem['topped'] || $pwSystem['digestadmin'] || $pwSystem['lockadmin'] || $pwSystem['pushadmin'] || $pwSystem['coloradmin'] || $pwSystem['downadmin'])) {
 		$concle = 2;$managemode = 1;
@@ -212,17 +214,17 @@ if ($t_db && is_numeric($type) && isset($t_db[$type])) {
 		}
 		if ($typeids) {
 			$typeids = array_merge($typeids,array($type));
-			$searchadd = ' AND type IN('.pwImplode($typeids).") AND ifcheck='1'";
+			$searchadd = ' AND type IN('.S::sqlImplode($typeids).") AND ifcheck='1'";
 		} else {
-			$searchadd = ' AND type='.pwEscape($type)." AND ifcheck='1'";
+			$searchadd = ' AND type='.S::sqlEscape($type)." AND ifcheck='1'";
 		}
 	} else {
-		$searchadd = ' AND type='.pwEscape($type)." AND ifcheck='1'";
+		$searchadd = ' AND type='.S::sqlEscape($type)." AND ifcheck='1'";
 	}
 	$urladd .= "&type=$type";
 	$pwSelectType = $type;
 } elseif ((int)$special>0) {
-	$searchadd = ' AND special='.pwEscape($special)." AND ifcheck='1'";
+	$searchadd = ' AND special='.S::sqlEscape($special)." AND ifcheck='1'";
 	$urladd .= "&special=$special";
 	$pwSelectSpecial = $special;
 } elseif ($search == 'digest') {
@@ -233,23 +235,23 @@ if ($t_db && is_numeric($type) && isset($t_db[$type])) {
 	if ($isGM || $pwSystem['viewcheck']) {
 		$searchadd = " AND ifcheck='0'";
 	} else {
-		$searchadd = ' AND authorid='.pwEscape($winduid)." AND ifcheck='0'";
+		$searchadd = ' AND authorid='.S::sqlEscape($winduid)." AND ifcheck='0'";
 	}
 	$urladd .= "&search=$search";
 	$pwSelectType = 'check';
 } elseif (is_numeric($search)) {
-	$searchadd = " AND lastpost>=".pwEscape($timestamp - $search*84600)." AND ifcheck='1'";
+	$searchadd = " AND lastpost>=".S::sqlEscape($timestamp - $search*84600)." AND ifcheck='1'";
 	$urladd .= "&search=$search";
 } elseif (is_numeric($modelid)) {//选择某个信息分类中的某个模板的条件下
-	$searchadd = " AND modelid=".pwEscape($modelid);
+	$searchadd = " AND modelid=".S::sqlEscape($modelid);
 	$urladd .= "&modelid=$modelid";
 } elseif (is_numeric($pcid)) {
 	$special = $pcid + 20;
-	$searchadd = " AND special=".pwEscape($special);
+	$searchadd = " AND special=".S::sqlEscape($special);
 	$urladd .= "&pcid=".$pcid;
 }
 if ($searchadd) {
-	$rs = $db->get_one('SELECT COUNT(*) AS count FROM pw_threads WHERE fid='.pwEscape($fid).$searchadd);
+	$rs = $db->get_one('SELECT COUNT(*) AS count FROM pw_threads WHERE fid='.S::sqlEscape($fid).$searchadd);
 	$count = $rs['count'];
 } else {
 	$searchadd = " AND ifcheck='1'";
@@ -267,11 +269,11 @@ if ($winddb['p_num']) {
 }
 
 if (!$pcid && !$modelid) {
-	$sql	= 'fid='.pwEscape($fid).' AND topped<1';
+	$sql	= 'fid='.S::sqlEscape($fid).' AND topped<1';
 	$topadd	= 'topped';
 	$count += $foruminfo['top1']+$foruminfo['top2'];
 } else {
-	$sql	= 'fid='.pwEscape($fid);
+	$sql	= 'fid='.S::sqlEscape($fid);
 	$topadd	= 'topped';
 }
 
@@ -302,8 +304,8 @@ if ($fcache < 2) {
 		$rows = $foruminfo['top1'] + $foruminfo['top2'];
 		if ($start_limit < $rows) {
 			$L = (int)min($rows-$start_limit,$db_perpage);
-			$limit  = pwLimit($start_limit,$L);
-			$limit2 = $L == $db_perpage ? '' : pwLimit(0,$db_perpage-$L);
+			$limit  = S::sqlLimit($start_limit,$L);
+			$limit2 = $L == $db_perpage ? '' : S::sqlLimit(0,$db_perpage-$L);
 			if ($toptids) {
 				$query = $db->query("SELECT * FROM pw_threads WHERE tid IN($toptids) AND topped>0 ORDER BY topped DESC,$orderway DESC $limit");
 				while ($rt = $db->fetch_array($query)) {
@@ -314,16 +316,16 @@ if ($fcache < 2) {
 			unset($toptids,$L,$limit,$toppeddb);
 		} else {
 			list($st,$lt,$asc,$R) = getstart($start_limit-$rows,$asc,$count);
-			$limit2 = pwLimit($st,$lt);
+			$limit2 = S::sqlLimit($st,$lt);
 		}
 		unset($rows);
 	} else {
 		list($st,$lt,$asc,$R) = getstart($start_limit,$asc,$count);
-		$limit2 = pwLimit($st,$lt);
+		$limit2 = S::sqlLimit($st,$lt);
 	}
 	if ($limit2) {
 		if ($topicsearch == 1) {
-			InitGP(array('searchname','new_searchname'));
+			S::gp(array('searchname','new_searchname'));
 			$searchname && $new_searchname = StrCode(serialize($searchname));
 
 			if ($modelid > 0) {
@@ -333,7 +335,7 @@ if ($fcache < 2) {
 			}
 
 			if ($tiddb){
-				$query = $db->query("SELECT * FROM pw_threads WHERE tid IN (".pwImplode($tiddb).")");
+				$query = $db->query("SELECT * FROM pw_threads WHERE tid IN (".S::sqlImplode($tiddb).")");
 				$urladd = "&topicsearch=1&new_searchname=$new_searchname";
 				while ($thread = $db->fetch_array($query)) {
 					$tpcdb[] = $thread;
@@ -354,7 +356,7 @@ if ($fcache < 2) {
 
 	//Start Here pwcache
 	if (($db_ifpwcache&112) && pwFilemtime(D_P.'data/bbscache/hitsort_judge.php')<$timestamp-600) {
-		include_once(D_P.'data/bbscache/hitsort_judge.php');
+		include_once pwCache::getPath(D_P.'data/bbscache/hitsort_judge.php');
 		$updatelist = $updatetype = array();
 		foreach ($tpcdb as $thread) {
 			if ($db_ifpwcache & 16) {
@@ -412,11 +414,12 @@ if ($fcache < 2) {
 			}
 			if ($sqladd) {
 				$thread['toolfield'] = $t.($e ? ','.$e : '');
-				$db->update("UPDATE pw_threads SET toolfield=".pwEscape($thread['toolfield'])." $sqladd WHERE tid=".pwEscape($thread['tid']));
+				//$db->update("UPDATE pw_threads SET toolfield=".S::sqlEscape($thread['toolfield'])." $sqladd WHERE tid=".S::sqlEscape($thread['tid']));
+				$db->update(pwQuery::buildClause("UPDATE :pw_table SET toolfield=:toolfield $sqladd WHERE tid=:tid", array('pw_threads', $thread['toolfield'], $thread['tid'])));
 			}
 		}
 		$thread['src_subject'] = $thread['subject'];
-		$thread['subject'] = substrs($thread['subject'], 50);
+		$thread['subject'] = substrs($thread['subject'], 54);
 		if ($thread['titlefont']) {
 			$titledetail = explode("~",$thread['titlefont']);
 			if ($titledetail[0]) $thread['subject'] = "<font color=$titledetail[0]>$thread[subject]</font>";
@@ -507,14 +510,14 @@ if ($fcache < 2) {
 		$threaddb[$thread['tid']] = $thread;
 	}
 	if ($rewids) {
-		$rewids = pwImplode($rewids);
+		$rewids = S::sqlImplode($rewids);
 		$query = $db->query("SELECT tid,cbval,caval FROM pw_reward WHERE tid IN($rewids)");
 		while ($rt = $db->fetch_array($query)) {
 			$threaddb[$rt['tid']]['rewcredit'] = $rt['cbval'] + $rt['caval'];
 		}
 	}
 	if ($cyids) {
-		$query = $db->query("SELECT a.tid,a.cyid,c.cname FROM pw_argument a LEFT JOIN pw_colonys c ON a.cyid=c.id WHERE tid IN (" . pwImplode($cyids) . ')');
+		$query = $db->query("SELECT a.tid,a.cyid,c.cname FROM pw_argument a LEFT JOIN pw_colonys c ON a.cyid=c.id WHERE tid IN (" . S::sqlImplode($cyids) . ')');
 		while ($rt = $db->fetch_array($query)) {
 			$threaddb[$rt['tid']]['colony'] = $rt;
 		}
@@ -522,7 +525,7 @@ if ($fcache < 2) {
 
 	if ($topicids) {
 		$topicvaluetable = GetTopcitable($modelid);
-		$query = $db->query("SELECT * FROM $topicvaluetable WHERE tid IN (" .pwImplode($topicids). ")");
+		$query = $db->query("SELECT * FROM $topicvaluetable WHERE tid IN (" .S::sqlImplode($topicids). ")");
 		while ($rt = $db->fetch_array($query)) {
 			$threaddb[$rt['tid']]['topic'] = $rt;
 		}
@@ -530,7 +533,7 @@ if ($fcache < 2) {
 
 	if ($postcatepcids) {//团购
 		$pcvaluetable = GetPcatetable($pcid);
-		$query = $db->query("SELECT * FROM $pcvaluetable WHERE tid IN (" .pwImplode($postcatepcids). ")");
+		$query = $db->query("SELECT * FROM $pcvaluetable WHERE tid IN (" .S::sqlImplode($postcatepcids). ")");
 		while ($rt = $db->fetch_array($query)) {
 			$threaddb[$rt['tid']]['topic'] = $rt;
 		}
@@ -542,7 +545,7 @@ if ($fcache < 2) {
 	}
 	unset($tpcdb,$query,$topadd,$searchadd,$sql,$limit2,$R,$p_status,$updatetop,$rewids,$arrStatus);
 } else {
-	include_once Pcv(D_P."data/bbscache/fcache_{$fid}_{$page}.php");
+	include_once pwCache::getPath(S::escapePath(D_P."data/bbscache/fcache_{$fid}_{$page}.php"));
 	if ($page == 1 && !$ifsort) {
 		foreach ($threaddb as $key => $value) {
 			$value['topped'] && $ifsort = 1;
@@ -596,140 +599,8 @@ if ($foruminfo['allowtype'] && (($foruminfo['allowtype'] & 1) || ($foruminfo['al
 }
 $element_class = L::loadClass('element');
 $hot_threads = $element_class->replySortWeek($fid, 10);
-$related_threads = threadrelated('allpost');
-function threadrelated ($relatedcon) {
+$related_threads = $element_class->newSubject();
 
-	global $db,$db_iftag,$db_threadrelated,$forumset,$fid,$read,$tid,$db_modes,$db_dopen,$db_phopen,$db_share_open,$db_groups_open,$groupid,$timestamp;
-
-	$relatedb = array();
-
-	if (in_array($relatedcon,array('allpost','alldigest','allhits','allreply','forumpost','forumdigest','forumhits','forumreply'))) {
-		//require_once(R_P.'require/element.class.php');
-		//$element = new Element($forumset['relatednums']);
-		$element = L::loadClass('element');
-		$element->setDefaultNum($forumset['relatednums']);
-		switch ($relatedcon) {
-			case 'allpost' :
-				$relatedb = $element->newSubject();break;
-			case 'alldigest' :
-				$relatedb = $element->digestSubject();break;
-			case 'allhits' :
-				$relatedb = $element->hitSort();break;
-			case 'allreply' :
-				$relatedb = $element->replySort();break;
-			case 'forumpost' :
-				$relatedb = $element->newSubject($fid);break;
-			case 'forumdigest' :
-				$relatedb = $element->digestSubject($fid);break;
-			case 'forumhits' :
-				$relatedb = $element->hitSort($fid);break;
-			case 'forumreply' :
-				$relatedb = $element->replySort($fid);break;
-		}
-	} elseif ($relatedcon == 'oinfo') {//继续改进
-		if ($db_modes['o']['ifopen']) {
-			require_once(R_P."require/app_core.php");
-			$addwhere = '';
-			if (!$db_dopen) {
-				$addwhere .= " AND type!='diary'";
-			}
-			if (!$db_phopen) {
-				$addwhere .= " AND type!='photo'";
-			}
-			if (!$db_share_open) {
-				$addwhere .= " AND type!='share'";
-			}
-			if (!$db_groups_open) {
-				$addwhere .= " AND type!='colony'";
-			}
-			$query = $db->query("SELECT type,descrip FROM pw_feed WHERE uid=".pwEscape($read['authorid']).$addwhere." ORDER BY timestamp DESC  ".pwLimit(0,$forumset['relatednums']));
-			while ($rt = $db->fetch_array($query)) {
-				$rt['title'] = parseFeedRead($rt['descrip']);
-				$rt['url'] = "u.php?uid=$read[authorid]";
-				unset($rt['type']);
-				$relatedb[] = $rt;
-			}
-		}
-
-	} elseif (in_array($relatedcon,array('pictags','hottags'))) {
-		$tagid = $tagdbs = array();
-		$endtime = $timestamp - 30*24*3600;
-		$sql = 'WHERE t.ifcheck=1 AND t.tid !='.pwEscape($tid). ' AND t.postdate >='.pwEscape($endtime);
-		$fidout = array('0');
-		$query = $db->query("SELECT fid,allowvisit,password FROM pw_forums WHERE type<>'category'");
-		while ($rt = $db->fetch_array($query)) {
-			$allowvisit = (!$rt['allowvisit'] || $rt['allowvisit'] != str_replace(",$groupid,",'',$rt['allowvisit'])) ? true : false;
-			if ($rt['password'] || !$allowvisit) {
-				$fidout[] = $rt['fid'];
-			}
-		}
-		$fidout = pwImplode($fidout);
-		$fidout && $sql .= " AND fid NOT IN ($fidout)";
-
-		if ($db_iftag) {
-			if ($read['tags'] && $relatedcon == 'pictags') {
-				list($tagdb,$tpc_tag) = explode("\t",$read['tags']);
-				$tagdbs = explode(' ',$tagdb);
-			} elseif ($relatedcon == 'hottags') {
-				@include_once(D_P.'data/bbscache/tagdb.php');
-				$j = 0;
-				foreach ($tagdb as $key => $val) {
-					$j++;
-					if ($j > 5) break;
-					$tagdbs[] = $key;
-				}
-				unset($tagdb);
-			}
-
-			if ($tagdbs) {
-				$query = $db->query("SELECT tagid FROM pw_tags WHERE tagname IN(" . pwImplode($tagdbs) . ')');
-				while ($rt = $db->fetch_array($query)) {
-					$tagid[] = $rt['tagid'];
-				}
-			}
-			if ($tagid) {
-				$query = $db->query("SELECT t.tid,t.subject FROM pw_tagdata tg LEFT JOIN pw_threads t USING(tid) $sql AND tg.tagid IN(" . pwImplode($tagid) . ") GROUP BY tid ORDER BY postdate DESC ".pwLimit(0,$forumset['relatednums']));
-				while ($rt = $db->fetch_array($query)) {
-					$rt['title'] = $rt['subject'];
-					$rt['url'] = "read.php?tid=".$rt['tid'];
-					unset($rt['subject']);
-					unset($rt['tid']);
-					$relatedb[] = $rt;
-				}
-			}
-		}
-	} elseif (in_array($relatedcon,array('ownpost','owndigest','ownhits','ownreply'))) {
-		$endtime = $timestamp - 15*24*3600;
-		$sql = "WHERE ifcheck=1 AND tid !=".pwEscape($tid). "AND postdate >=".pwEscape($endtime)." AND authorid=".pwEscape($read['authorid'])." AND fid>0 ";
-		$orderby = '';
-
-		switch ($relatedcon) {
-			case 'ownpost' :
-				$orderby .= " ORDER BY postdate DESC";
-				break;
-			case 'owndigest' :
-				$sql .= " AND digest>0";
-				$orderby .= " ORDER BY postdate DESC";
-				break;
-			case 'ownhits' :
-				$orderby .= " ORDER BY hits DESC";
-				break;
-			case 'ownreply' :
-				$orderby .= " ORDER BY replies DESC";
-				break;
-		}
-		$query = $db->query("SELECT tid,subject FROM pw_threads FORCE INDEX(postdate) $sql $orderby".pwLimit(0,$forumset['relatednums']));
-		while ($rt = $db->fetch_array($query)) {
-			$rt['title'] = $rt['subject'];
-			$rt['url'] = "read.php?tid=".$rt['tid'];
-			unset($rt['subject']);
-			unset($rt['tid']);
-			$relatedb[] = $rt;
-		}
-	}
-
-	return $relatedb;
-}
 require_once PrintEot('area_thread');
 
 footer();

@@ -30,7 +30,7 @@ class PW_AttachsDB extends BaseDB {
 		if (!is_null($type)) {
 			$sql .= ' AND type' . $this->_sqlIn($type);
 		}
-		$nums && $sql .= pwLimit($nums);
+		$nums && $sql .= S::sqlLimit($nums);
 		$data = array();
 		$query = $this->_db->query($sql);
 		while($rt = $this->_db->fetch_array($query)) {
@@ -51,6 +51,11 @@ class PW_AttachsDB extends BaseDB {
 		$data = $this->_db->get_one("SELECT * FROM ".$this->_tableName." WHERE aid=".intval($aid));
 		if (!$data) return null;
 		return $data;
+	}
+
+	function getImgsByTid($tid) {
+		$query = $this->_db->query("SELECT * FROM " . $this->_tableName . ' WHERE tid=' . S::sqlEscape($tid) . " AND pid=0 AND type='img'");
+		return $this->_getAllResultFromQuery($query);
 	}
 
 	function gets($params) {
@@ -76,7 +81,7 @@ class PW_AttachsDB extends BaseDB {
 		$start = $step*$num;
 		$end = $start + $num;
 		$result = array();
-		$query = $this->_db->query("SELECT tid, pid FROM pw_attachs WHERE aid >".pwEscape($start)." AND aid <".pwEscape($end)." GROUP BY tid, pid");
+		$query = $this->_db->query("SELECT tid, pid FROM pw_attachs WHERE aid >".S::sqlEscape($start)." AND aid <".S::sqlEscape($end)." GROUP BY tid, pid");
 		while ($rt = $this->_db->fetch_array($query)) {
 			$result[] = $rt;
 		}
@@ -87,9 +92,9 @@ class PW_AttachsDB extends BaseDB {
 		if (empty($aids) || empty($data)) return false;
 		$data = $this->_checkData($data);
 		if (is_array($aids)) {
-			$this->_db->update("UPDATE pw_attachs SET " . pwSqlSingle($data) . ' WHERE aid IN(' . $this->_getImplodeString($aids) . ')');
+			$this->_db->update("UPDATE pw_attachs SET " . S::sqlSingle($data) . ' WHERE aid IN(' . $this->_getImplodeString($aids) . ')');
 		} else {
-			$this->_db->update("UPDATE pw_attachs SET " . pwSqlSingle($data) . ' WHERE aid=' . intval($aids));
+			$this->_db->update("UPDATE pw_attachs SET " . S::sqlSingle($data) . ' WHERE aid=' . intval($aids));
 		}
 		return true;
 	}
@@ -111,9 +116,9 @@ class PW_AttachsDB extends BaseDB {
 		if (empty($data)) return false;
 		$data = $this->_checkData($data);
 		if (is_array($tids)) {
-			$this->_db->update("UPDATE pw_attachs SET " . pwSqlSingle($data) . ' WHERE tid IN(' . $this->_getImplodeString($tids) . ')' . (!is_null($pid) ? " AND pid=".intval($pid) : ""));
+			$this->_db->update("UPDATE pw_attachs SET " . S::sqlSingle($data) . ' WHERE tid IN(' . $this->_getImplodeString($tids) . ')' . (!is_null($pid) ? " AND pid=".intval($pid) : ""));
 		} else {
-			$this->_db->update("UPDATE pw_attachs SET " . pwSqlSingle($data) . ' WHERE tid=' . intval($tids) . (!is_null($pid) ? " AND pid=".intval($pid) : ""));
+			$this->_db->update("UPDATE pw_attachs SET " . S::sqlSingle($data) . ' WHERE tid=' . intval($tids) . (!is_null($pid) ? " AND pid=".intval($pid) : ""));
 		}
 		return true;
 	}
@@ -130,7 +135,7 @@ class PW_AttachsDB extends BaseDB {
 	}
 
 	function getTableStructs($type) {
-		$query = $this->_db->query("show table status like ".pwEscape($this->_tableName));
+		$query = $this->_db->query("show table status like ".S::sqlEscape($this->_tableName));
 		$data = $this->_db->fetch_array($query);
 		if (isset($data[$type])) {
 			return $data[$type];
@@ -149,21 +154,21 @@ class PW_AttachsDB extends BaseDB {
 	}
 
 	function getsByAids($aids){
-		$aids = is_array($aids) ? pwImplode($aids) : $aids;
+		$aids = is_array($aids) ? S::sqlImplode($aids) : $aids;
 		$query = $this->_db->query ( "SELECT * FROM " . $this->_tableName. " WHERE aid in (".$aids.") " );
 		return $this->_getAllResultFromQuery ( $query );
 	}
 
 	function deleteByAids($aids){
-		return $this->_db->update ( "DELETE FROM " . $this->_tableName. " WHERE aid in( ".pwImplode($aids).")");
+		return $this->_db->update ( "DELETE FROM " . $this->_tableName. " WHERE aid in( ".S::sqlImplode($aids).")");
 	}
 
 	function countMultiUpload($userId){
-		return $this->_db->get_value("SELECT COUNT(*) AS sum FROM pw_attachs WHERE fid=0 AND tid=0 AND pid='0' AND mid='0' AND did ='0' AND uid=" . pwEscape($userId));
+		return $this->_db->get_value("SELECT COUNT(*) AS sum FROM pw_attachs WHERE fid=0 AND tid=0 AND pid='0' AND mid='0' AND did ='0' AND uid=" . S::sqlEscape($userId));
 	}
 
 	function _sqlIn($ids) {
-		return (is_array($ids) && $ids) ? ' IN (' . pwImplode($ids) . ')' : '=' . pwEscape($ids);
+		return (is_array($ids) && $ids) ? ' IN (' . S::sqlImplode($ids) . ')' : '=' . S::sqlEscape($ids);
 	}
 
 	function getDiaryAttachsBydid($id) {

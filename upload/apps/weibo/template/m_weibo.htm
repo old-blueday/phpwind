@@ -1,25 +1,16 @@
 <!--<?php
 require_once(uTemplate::printEot('header'));
-//require_once(uTemplate::printEot('user_appleft'));
+require_once(uTemplate::printEot('user_appleft'));
 print <<<EOT
 -->
 <script language="javascript">
 var transmitAction = '{$do}';
 </script>
-<style type="text/css">
-.headTrgB{border-bottom:9px $uskin_homeTop solid;}
-/*兼容:版本之前首页与应用的区别*/
-</style>
 <div class="homeBg cc">
 	<div class="homeCont fl">
-<!--
-EOT;
-require_once uTemplate::printEot('weibo_model');
-$weiboModelTemplate->photoPop();
-$o_weibopost != '0' && $weiboModelTemplate->post($do);
-print <<<EOT
--->
-		<div class="p15">
+	<table width="100%"><tr><td valign="top" height="500">
+		<div class="p15" style="padding-bottom:0;">
+			<h4 class="site"><img src="u/images/module/write.png" align="absmiddle" class="mr10" /><span>新鲜事</span></h4>
 			<div class="navC">
 				<ul>
 					<li {$nav[lookround]}><a href="{$basename}do=lookround">随便看看</a></li>
@@ -28,6 +19,18 @@ print <<<EOT
 					<li {$nav[refer]}><a href="{$basename}do=receive">提到我的</a></li>
 				</ul>
 			</div>
+		</div>
+		<div class="weiboBg">
+<!--
+EOT;
+require_once uTemplate::printEot('weibo_model');
+$weiboModelTemplate->photoPop();
+$db_o_weibopost != '0' && $weiboModelTemplate->post($do,$faceurl);
+print <<<EOT
+-->
+		</div>
+		<div class="bdA" style="margin:10px 15px 0;"></div>
+		<div class="p15" style="padding-top:5px;">
 <!--
 EOT;
 if (in_array($do,array('refer','receive'))) {
@@ -120,7 +123,7 @@ EOT;
 print <<<EOT
 -->				
 					<dl class="dl cc">
-						<dt class="dt"><a href="u.php?uid={$value['uid']}"><img class="img" src="{$value['icon']}" alt="{$value['username']}" width="44" height="44" /></a></dt>
+						<dt class="dt"><a href="{$db_userurl}{$value['uid']}"><img class="img" src="{$value['icon']}" alt="{$value['username']}" width="44" height="44" /></a></dt>
 						<dd class="dd">
 <!--
 EOT;
@@ -131,7 +134,7 @@ EOT;
 EOT;
 			}print <<<EOT
 -->
-							<div class="title"><a href="u.php?uid={$value['uid']}">{$value['username']}</a>{$value['content']}</div>
+							<div class="title"><a href="{$db_userurl}{$value['uid']}">{$value['username']}</a>{$value['content']}</div>
 							<div class="gray cc">
 <!--
 EOT;
@@ -205,6 +208,7 @@ EOT;
 			</td></tr>
 			</table>
 		</div>
+	</td></tr></table>
 	</div>
 	<div class="homeSide fr">
 		<div class="p10">
@@ -219,9 +223,9 @@ EOT;
 foreach ($recommendUsers as $key => $value) {print <<<EOT
 -->
 				<dl class="dl cc">
-					<dt class="dt"><a href="u.php?uid=$value[uid]" class="img_50"><i><img src="$value[face]" width="48" height="48" /></i></a></dt>
+					<dt class="dt"><a href="{$db_userurl}$value[uid]" class="img_50"><i><img src="$value[face]" width="48" height="48" /></i></a></dt>
 					<dd class="dd3">
-						<p class="mb5"><a href="u.php?uid=$value[uid]">{$value['username']}</a></p>
+						<p class="mb5"><a href="{$db_userurl}$value[uid]">{$value['username']}</a></p>
 						<p class="lh_18"><a href="javascript:;" onclick="return Attention.add(this,'{$value['uid']}',1)" class="s7 follow">加关注</a></p>
 					</dd>
 				</dl>
@@ -241,9 +245,9 @@ EOT;
 foreach ($weiboAuthorSort as $key => $value) {print <<<EOT
 -->
 				<dl class="dl cc">
-					<dt class="dt"><a href="u.php?uid=$value[uid]" class="img_50"><i><img src="$value[icon]" width="48" height="48" /></i></a></dt>
+					<dt class="dt"><a href="{$db_userurl}$value[uid]" class="img_50"><i><img src="$value[icon]" width="48" height="48" /></i></a></dt>
 					<dd class="dd3">
-						<p class="mb5"><a href="u.php?uid=$value[uid]">$value[username]</a></p>
+						<p class="mb5"><a href="{$db_userurl}$value[uid]">$value[username]</a></p>
 						<span class="gray">被转次数：</span><strong>$value[counts]</strong>
 					</dd>
 				</dl>

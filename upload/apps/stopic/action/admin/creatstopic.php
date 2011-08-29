@@ -1,8 +1,8 @@
 <?php
 !defined('P_W') && exit('Forbidden');
 define('AJAX',1);
-InitGP(array('stopic_id','category_id','is_cover'), null, 2);
-InitGP(array('block_config','stopic_title', 'file_name'));
+S::gp(array('stopic_id','category_id','is_cover'), null, 2);
+S::gp(array('block_config','stopic_title', 'file_name'));
 
 $file_name = trim($file_name);
 if ('' == $file_name) $file_name = $stopic_id;

@@ -3,7 +3,7 @@ print <<<EOT
 -->
 <div id='hiddenMessage' style="display:none"></div>
 <div class="contUser" id="content">
-<table width="100%"><tr class="vt"><td height="400">
+<table width="100%"><tr><td height="600" valign="top">
 	<div class="p15">
 <!--
 EOT;
@@ -26,7 +26,7 @@ if($smstype == $messageServer->getConst('sms_rate')){
 		$smstype == $messageServer->getConst('notice_apps')){
 	require messageEot('notice_info');
 }elseif($smstype == $messageServer->getConst('groupsms_colony')){
-	$linkUrl = "u.php?uid=";
+	$linkUrl = "{$db_userurl}";
 	require messageEot('groupsms_ginfo');
 }elseif($smstype == $messageServer->getConst('groupsms_normal') || 
 		$smstype == $messageServer->getConst('groupsms_shield')){
@@ -59,7 +59,7 @@ EOT;
 foreach($historyList as $key => $value){
 $value['content'] = strip_tags($value['content']);
 $_name = $value['typeid'] == $messageServer->getConst('groupsms_colony') ? $value['cname'] : $value['create_username'];
-$_url = $value['typeid'] == $messageServer->getConst('groupsms_colony') ? "apps.php?q=group&cyid={$value['colonyid']}" : "u.php?uid={$value['uid']}";
+$_url = $value['typeid'] == $messageServer->getConst('groupsms_colony') ? "apps.php?q=group&cyid={$value['colonyid']}" : "{$db_userurl}{$value['uid']}";
 $_icon = $value['typeid'] == $messageServer->getConst('groupsms_colony') ? $value['cnimg'] : $value['face'];
 $_link = "{$baseUrl}?action=info&subtype=history&rid={$value[rid]}&mid={$value[mid]}&smstype={$value[typeid]}";
 if($value['typeid'] == $messageServer->getConst('sms_message') || 

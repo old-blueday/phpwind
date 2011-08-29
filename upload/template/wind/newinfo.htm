@@ -153,7 +153,7 @@ if(is_numeric($v[id])){
 	}elseif(in_array($val[type],array('topic','article','tpost'))){
 		$v[id] = "thread.php?fid=$v[id]";
 	}else{
-		$v[id] = "u.php?uid=$v[id]";
+		$v[id] = "{$db_userurl}$v[id]";
 	}
 }
 if (in_array($nf_order[$key]['type'],array('new','newpost','newreply','digest'))) {

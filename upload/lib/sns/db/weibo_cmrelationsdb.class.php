@@ -36,7 +36,7 @@ class PW_Weibo_CmrelationsDB extends BaseDB {
 	}
 
 	function addCmRelations($fieldDatas){
-		$this->_db->update("INSERT INTO " . $this->_tableName . " (uid,cid) VALUES  " . pwSqlMulti($fieldDatas,FALSE));
+		$this->_db->update("INSERT INTO " . $this->_tableName . " (uid,cid) VALUES  " . S::sqlMulti($fieldDatas,FALSE));
 		return $this->_db->insert_id();
 	}
 	function removeCmRelation($uid,$cid){
@@ -62,7 +62,7 @@ class PW_Weibo_CmrelationsDB extends BaseDB {
 			return false;
 		}
 		$cids = is_array($cids) ? $cids : array($cids);
-		$sql = 'DELETE FROM '.$this->_tableName.' WHERE cid  IN (' . pwImplode($cids) . ') ';
+		$sql = 'DELETE FROM '.$this->_tableName.' WHERE cid  IN (' . S::sqlImplode($cids) . ') ';
 		$this->_db->query($sql);
 		return true;
 	}

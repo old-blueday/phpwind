@@ -23,7 +23,7 @@ if(!$action){
 
 } else {
 
-	InitGP(array('config','ppt_credit','ppturls'),'P');
+	S::gp(array('config','ppt_credit','ppturls'),'P');
 	$config['db_pptcredit'] = implode(',',$ppt_credit);
 	foreach ($config as $key => $value) {
 		setConfig($key, $value);

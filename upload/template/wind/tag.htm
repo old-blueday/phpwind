@@ -2,7 +2,7 @@
 print <<<EOT
 -->
 <div id="breadCrumb">
-		<img src="$imgpath/$stylepath/thread/home-old.gif" align="absmiddle" />&nbsp;<a href="$db_bfn" title="$db_bbsname">$db_bbsname</a>
+<img src="$imgpath/$stylepath/thread/home.gif" class="breadHome" /><em class="breadEm"></em><a href="$db_bfn" title="$db_bbsname">$db_bbsname</a>
 <!--
 EOT;
 if($action!='tag'){ print <<<EOT
@@ -18,20 +18,14 @@ EOT;
 print <<<EOT
 -->
 </div>
-<div id="pw_content">
 <!--
 EOT;
 if($action=='taglist'){print <<<EOT
 -->
-<div class="hB mb10">
-	<ul class="tabB">
-    	<li class="current"><a href="javascript:;">热门标签</a></li>
-    </ul>
-</div>
-<div class="pd15">
 <div class="t">
-<table width="100%" cellspacing="0" cellpadding="0" align="center">
-	<tr class="tr3 f_one"><td>
+<div class="h b" style="border-top:0;">热门标签</div>
+<table width="100%">
+	<tr class="tr3 f_one"><td style="padding:5px 10px 10px;">
 <!--
 EOT;
 $num=0;
@@ -54,21 +48,15 @@ EOT;
 <form action="link.php?action=tag" method="post">
 <div class="tac" style="margin:20px"><input type="text" class="input" size="40" name="tagname" /> <span class="btn2"><span><button type="submit"> 搜 索 </button></span></span></div></form>
 </div>
-</div>
 <!--
 EOT;
 }elseif($action=='tag'){print <<<EOT
 -->
-<div class="hB mb10">
-	<ul class="tabB">
-    	<li class="current"><a href="javascript:;">标签:$tagname</a></li>
-    </ul>
-</div>
-<div class="pd15">
 <div class="cc mb10">$pages</div>
-<div class="t"><table width="100%" cellspacing="0" cellpadding="0" align="center">
-<tr><td class="h" colspan="7"></td></tr>
-<tr class="tr2"><td width="6%">状态</td>
+<div class="t">
+<div class="h b" style="border-top:0;">标签:$tagname</div>
+<table width="100%">
+<tr class="tr2"><td width="6%" style="padding-left:10px;">状态</td>
 <td width="*">标题</td>
 <td width="15%">版块</td>
 <td width="13%">作者</td>
@@ -80,7 +68,7 @@ EOT;
 EOT;
 foreach($tiddb as $value){print <<<EOT
 -->
-<tr class="tr3 f_one"><td>$value[status]</td>
+<tr class="tr3 f_one"><td style="padding-left:10px;">$value[status]</td>
 <td width="*">
 <!--
 EOT;
@@ -107,7 +95,7 @@ print <<<EOT
 </td>
 <td>
 <a href="thread.php?fid=$value[fid]">$value[forumname]</a></td>
-<td class="smalltxt"><a href="u.php?uid=$value[authorid]">$value[author]</a><br />$value[postdate]</td>
+<td class="smalltxt"><a href="{$db_userurl}$value[authorid]">$value[author]</a><br />$value[postdate]</td>
 <td>$value[replies]</td>
 <td>$value[hits]</td>
 <td>
@@ -121,13 +109,11 @@ EOT;
 -->
 </table></div>
 <div class="cc mb10">$pages</div>
-</div>
-
 <!--
 EOT;
 }print <<<EOT
 -->
-</div>
+
 <!--
 EOT;
 ?>-->

@@ -19,7 +19,7 @@ if (pwFilemtime(D_P.'data/bbscache/file_lock.txt')<$cachetime) {
 		setConfig('db_union', $wget);
 		updatecache_c();
 	}
-	writeover(D_P.'data/bbscache/file_lock.txt','');
+	pwCache::setData(D_P.'data/bbscache/file_lock.txt','');
 
 } elseif (pwFilemtime(D_P.'data/bbscache/file_lock1.txt')<$timestamp-3600) {//stat.
 
@@ -52,12 +52,12 @@ if (pwFilemtime(D_P.'data/bbscache/file_lock.txt')<$cachetime) {
 	$s_url = rawurlencode($pwServer['HTTP_HOST']);
 	$rawbbsname = rawurlencode($db_bbsname);
 	PostHost('http://nt.phpwind.net/pwstat.php',"bbsname=$rawbbsname&url=$s_url&type=admin&data=$statadmin",'POST');
-	writeover(D_P.'data/bbscache/file_lock1.txt','');
+	pwCache::setData(D_P.'data/bbscache/file_lock1.txt','');
 } elseif (pwFilemtime(D_P.'data/bbscache/info.txt')<$cachetime) {
 	require_once(R_P.'require/posthost.php');
 	$wget = PostHost('http://nt.phpwind.net/src/pw7/info1.php',"charset=$db_charset&ce=$ceversion");
 	$wget = str_replace(array('<pwret>','</pwret>'),'',$wget);
-	writeover(D_P.'data/bbscache/info.txt',$wget);
+	pwCache::setData(D_P.'data/bbscache/info.txt',$wget);
 } elseif (pwFilemtime(D_P."data/bbscache/myshow_default.php")<$cachetime) {
 	require_once(R_P.'require/posthost.php');
 	$url = "http://dm.phpwind.net/misc/custom/recommend_2.xml?$timestamp";
@@ -88,7 +88,7 @@ if (pwFilemtime(D_P.'data/bbscache/file_lock.txt')<$cachetime) {
 			$T .= $T ? ",$v : '$name[$k]'" : "$v : '$name[$k]'";
 			if(!$maxnum--)break;
 		}
-		writeover(D_P."data/bbscache/myshow_default.php","<?php\r\n\t\$mDef = \"$T\";\r\n?>");
+		pwCache::setData(D_P."data/bbscache/myshow_default.php","<?php\r\n\t\$mDef = \"$T\";\r\n?>");
 	}
 }
 /*app register*/

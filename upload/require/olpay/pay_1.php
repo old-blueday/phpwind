@@ -1,16 +1,16 @@
 <?php
 !function_exists('readover') && exit('Forbidden');
 
-$tool = $db->get_one("SELECT id,name FROM pw_tools WHERE id=" . pwEscape($rt['paycredit']));
+$tool = $db->get_one("SELECT id,name FROM pw_tools WHERE id=" . S::sqlEscape($rt['paycredit']));
 
 if ($tool) {
 
-	$db->update("UPDATE pw_tools SET stock=stock-" . pwEscape($rt['number']) . " WHERE id=" . pwEscape($tool['id']));
+	$db->update("UPDATE pw_tools SET stock=stock-" . S::sqlEscape($rt['number']) . " WHERE id=" . S::sqlEscape($tool['id']));
 
 	$db->pw_update(
-		"SELECT uid FROM pw_usertool WHERE uid=" . pwEscape($rt['uid']) . " AND toolid=" . pwEscape($tool['id']),
-		"UPDATE pw_usertool SET nums=nums+" . pwEscape($rt['number']) . " WHERE uid=" . pwEscape($rt['uid']) . " AND toolid=" . pwEscape($tool['id']),
-		"INSERT INTO pw_usertool SET " . pwSqlSingle(array('nums' => $rt['number'], 'uid' => $rt['uid'], 'toolid' => $tool['id']))
+		"SELECT uid FROM pw_usertool WHERE uid=" . S::sqlEscape($rt['uid']) . " AND toolid=" . S::sqlEscape($tool['id']),
+		"UPDATE pw_usertool SET nums=nums+" . S::sqlEscape($rt['number']) . " WHERE uid=" . S::sqlEscape($rt['uid']) . " AND toolid=" . S::sqlEscape($tool['id']),
+		"INSERT INTO pw_usertool SET " . S::sqlSingle(array('nums' => $rt['number'], 'uid' => $rt['uid'], 'toolid' => $tool['id']))
 	);
 
 	require_once(R_P.'require/tool.php');

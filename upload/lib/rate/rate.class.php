@@ -182,7 +182,7 @@ class PW_Rate {
 		if (!$this->_cache || !$config = $this->_get_RateConfigCache($typeId, $optionId)) {
 			$config = $this->getRateConfig($typeId, $optionId);
 		}
-		require_once Pcv(R_P . "require/credit.php");
+		require_once S::escapePath(R_P . "require/credit.php");
 		if ($config['creditset'] < 0) {
 			$creditMap = array_flip($this->_getCreditMap());
 			$cType = $creditMap[$config['creditset']];
@@ -318,7 +318,7 @@ class PW_Rate {
 		$result['title'] = $thread['subject'];
 		$result['href'] = "/read.php?tid=" . $tid;
 		$result['author'] = $thread['author'];
-		$result['authorUrl'] = "/u.php?uid=" . $thread['authorid']; //authorid
+		$result['authorUrl'] = "/".USER_URL. $thread['authorid']; //authorid
 		return $result;
 	}
 	function _getDiaryByById($did) {
@@ -331,7 +331,7 @@ class PW_Rate {
 		$result['title'] = $diary['subject'];
 		$result['href'] = "/apps.php?q=diary&u=" . $diary['uid'] . "&did=" . $did;
 		$result['author'] = $diary['username'];
-		$result['authorUrl'] = "/u.php?uid=" . $diary['uid']; //1
+		$result['authorUrl'] = "/".USER_URL. $diary['uid']; //1
 		return $result;
 	}
 	function _getPhotoById($pid) {
@@ -346,7 +346,7 @@ class PW_Rate {
 		//$result ['href'] = "/apps.php?q=photos&a=view&pid=" . $pid;
 		$result['href'] = "/apps.php?q=photos&space=1&u=" . $album['ownerid'] . "&a=view&pid=" . $pid;
 		$result['author'] = $photo['uploader'];
-		$result['authorUrl'] = "/u.php?uid=" . $album['ownerid'];
+		$result['authorUrl'] = "/".USER_URL. $album['ownerid'];
 		return $result;
 	}
 	function _checkObjectByTypeId($typeId, $objectId) {
@@ -425,7 +425,7 @@ class PW_Rate {
 		return $groups;
 	}
 	function _getBaseDB() {
-		require_once Pcv(dirname(__FILE__) . "/base/basedb.php");
+		require_once S::escapePath(dirname(__FILE__) . "/base/basedb.php");
 		return new BaseDB();
 	}
 	/*************************数据处理区域 end********************************/
@@ -554,7 +554,7 @@ class PW_Rate {
 		}
 		//写入缓存文件
 		$result = serialize($tmp);
-		writeover($this->_getReteConfigFilePath(), $result, 'w');
+		pwCache::setData($this->_getReteConfigFilePath(), $result, false, 'w');
 		return $result;
 	}
 	// 如果指定类型则返回对应的数据
@@ -631,7 +631,7 @@ class PW_Rate {
 		return $tmp;
 	}
 	function _getDatanalyseService() {
-		require_once R_P . 'lib/datanalyse/datanalyse.class.php';
+		L::loadClass('datanalyse','datanalyse',false);
 		return new Datanalyse();
 	}
 	/***********************************************************/

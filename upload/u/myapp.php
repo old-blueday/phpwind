@@ -3,7 +3,7 @@
 !$winduid && Showmsg('not_login');
 $USCR = 'user_appset';
 
-InitGP(array('action'));
+S::gp(array('action'));
 require_once(R_P.'require/showimg.php');
 require_once(R_P . 'u/lib/space.class.php');
 $newSpace = new PwSpace($winduid);
@@ -35,10 +35,10 @@ if (empty($action)) {
 
 	//基础应用列表
 	$isshowdb = explode(',',$winddb['appshortcut']);
-	$rt = $db->get_one("SELECT photos_privacy,diary_privacy FROM pw_ouserdata WHERE uid=".pwEscape($winduid));
+	$rt = $db->get_one("SELECT photos_privacy,diary_privacy FROM pw_ouserdata WHERE uid=".S::sqlEscape($winduid));
 	if (!$rt) {
-		$db->query("INSERT INTO pw_ouserdata SET uid=".pwEscape($winduid));
-		$rt = $db->get_one("SELECT photos_privacy,diary_privacy FROM pw_ouserdata WHERE uid=".pwEscape($winduid));
+		$db->query("INSERT INTO pw_ouserdata SET uid=".S::sqlEscape($winduid));
+		$rt = $db->get_one("SELECT photos_privacy,diary_privacy FROM pw_ouserdata WHERE uid=".S::sqlEscape($winduid));
 	}
 	@extract($rt);
 	$all_basic_app = array('article','weibo','diary','groups','photos');
@@ -59,8 +59,8 @@ if (empty($action)) {
 	pwOutPut();
 } elseif ($action == 'del') {
 	define('AJAX',1);
-	InitGP(array('id'));
-	$db->update("DELETE FROM pw_userapp WHERE uid=" . pwEscape($winduid) . ' AND appid=' . pwEscape($id));
+	S::gp(array('id'));
+	$db->update("DELETE FROM pw_userapp WHERE uid=" . S::sqlEscape($winduid) . ' AND appid=' . S::sqlEscape($id));
 
 	if ($db->affected_rows()) {
 
@@ -74,7 +74,7 @@ if (empty($action)) {
 	echo 'ok';
 	ajax_footer();
 } elseif ($action == 'edit') {
-	InitGP(array('show','privacy'));
+	S::gp(array('show','privacy'));
 	//显示在快捷菜单栏处理
 	$showshortcut = array();
 	list($fidshortcut) = explode("\t",$winddb['shortcut']);
@@ -99,9 +99,9 @@ if (empty($action)) {
 		}
 	}
 	$db->pw_update(
-		"SELECT uid FROM pw_ouserdata WHERE uid=".pwEscape($winduid),
-		"UPDATE pw_ouserdata SET ".pwSqlSingle($SQL)." WHERE uid=".pwEscape($winduid),
-		"INSERT INTO pw_ouserdata SET ".pwSqlSingle($SQL)
+		"SELECT uid FROM pw_ouserdata WHERE uid=".S::sqlEscape($winduid),
+		"UPDATE pw_ouserdata SET ".S::sqlSingle($SQL)." WHERE uid=".S::sqlEscape($winduid),
+		"INSERT INTO pw_ouserdata SET ".S::sqlSingle($SQL)
 	);
 	refreshto("{$basename}action=my",'myapp_success');
 }

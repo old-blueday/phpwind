@@ -5,7 +5,7 @@ if (!pwWritable(D_P.'data/sql_config.php')) {
 	adminmsg('manager_error');
 }
 
-include D_P.'data/sql_config.php';
+include pwCache::getPath(D_P.'data/sql_config.php');
 !is_array($manager) && $manager = array();
 !is_array($manager_pwd) && $manager_pwd = array();
 $newmanager = $newmngpwd = array();
@@ -19,7 +19,7 @@ $manager = $newmanager;
 $manager_pwd = $newmngpwd;
 unset($newmanager,$newmngpwd);
 
-InitGP(array('oldname','username','password'));
+S::gp(array('oldname','username','password'));
 
 if (!$action) {
 
@@ -31,7 +31,7 @@ if (!$action) {
 	if (!$username || !$password) {
 		adminmsg('manager_empty');
 	}
-	if (GetGP('check_pwd') != $password) {
+	if (S::getGP('check_pwd') != $password) {
 		adminmsg('password_confirm');
 	}
 	if (str_replace(array('\\','&',' ',"'",'"','/','*',',','<','>',"\r","\t","\n",'#'),'',$username) != $username) {
@@ -42,7 +42,7 @@ if (!$action) {
 	}
 	$password = md5($password);
 	
-	if (CkInArray($username,$manager)) {
+	if (S::inArray($username,$manager)) {
 		adminmsg('manager_had');
 	}
 	
@@ -71,7 +71,7 @@ if (!$action) {
 
 } elseif ($action == 'edit') {
 
-	if (!CkInArray($oldname,$manager)) {
+	if (!S::inArray($oldname,$manager)) {
 		adminmsg('undefined_action');
 	}
 	if ($_POST['step'] != 2) {
@@ -90,7 +90,7 @@ if (!$action) {
 		if (!$password) {
 			$password = $manager_pwd[$key];
 		} else {
-			if (GetGP('check_pwd')!=$password) {
+			if (S::getGP('check_pwd')!=$password) {
 				adminmsg('password_confirm');
 			}
 			if (str_replace(array('\\','&',' ',"'",'"','/','*',',','<','>',"\r","\t","\n",'#'),'',$password)!=$password) {
@@ -99,7 +99,7 @@ if (!$action) {
 			$password = $manager_pwd[$key] = md5($password);
 		}
 		if ($username != $oldname) {
-			if (CkInArray($username,$manager)) {
+			if (S::inArray($username,$manager)) {
 				adminmsg('manager_had');
 			}
 			$manager[$key] = $username;
@@ -170,7 +170,7 @@ if (!$action) {
 	}
 } elseif ($action == 'ifopen') {
 
-	InitGP(array('config'));
+	S::gp(array('config'));
 	foreach ($config as $key => $value) {
 		setConfig("db_$key", $value);
 	}
@@ -188,8 +188,8 @@ function lowerManager($username){
 		$userService->update($rt['uid'], array('groupid'=>-1));
 	}
 
-	if($rt = $db->get_one('SELECT uid,groups FROM pw_administrators WHERE username='.pwEscape($username))){
-		$db->update("UPDATE pw_administrators SET groupid='-1' WHERE uid=".pwEscape($rt['uid']));
+	if($rt = $db->get_one('SELECT uid,groups FROM pw_administrators WHERE username='.S::sqlEscape($username))){
+		$db->update("UPDATE pw_administrators SET groupid='-1' WHERE uid=".S::sqlEscape($rt['uid']));
 	}
 }
 

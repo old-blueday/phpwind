@@ -46,6 +46,8 @@ class Search_Sphinx extends Search_Base {
 		$this->_sphinx          = &$db_sphinx;
 		$this->_sphinxFilterIds = ($db_filterids) ? explode(",",$db_filterids) : false;
 		$this->_sphinxMaxMatch  = min($this->_maxResult,$this->_sphinxMaxMatch);
+		$this->_sphinxCharset   = (isset($this->_sphinx['wordsegment_mode'])) ? $this->_sphinx['wordsegment_mode'] : $this->_sphinxCharset;
+		
 	}
 	function checkUserLevel(){
 		return $this->_checkUserLevel();
@@ -244,7 +246,7 @@ class Search_Sphinx extends Search_Base {
 	function _sphinxAssemble(){
 		$sphinxAPI = $this->_sphinxAPI;
 		if(!$sphinxAPI) return false;
-		$sphinxAPI->SetServer ( $this->_sphinxHost, $this->_sphinxPort );
+		$sphinxAPI->SetServer ( $this->_sphinxHost, (int)$this->_sphinxPort );
 		$sphinxAPI->SetConnectTimeout ( 1 );
 		$sphinxAPI->SetMatchMode ( $this->_sphinxMode );
 		if($this->_sphinxFilter){
@@ -263,6 +265,32 @@ class Search_Sphinx extends Search_Base {
 		$sphinxAPI->SetRankingMode ( $this->_sphinxRanking );
 		$sphinxAPI->SetArrayResult ( true );
 		return $sphinxAPI->Query ( $this->charsetReverse($this->_sphinxKeywords), $this->_sphinxIndex );
+	}
+	/*
+	 * 自定义通用全文索引扩展服务
+	 * @version phpwind 8.3
+	 */
+	function sphinxSearcher($conditions,$primaryId = 'id'){
+		$this->_sphinxAPI         = $this->_getSphinxAPI();
+		$this->_sphinxHost        = isset($conditions['host']) ? $conditions['host'] : $this->_sphinx['host'];
+		$this->_sphinxPort        = isset($conditions['port']) ? $conditions['port'] : $this->_sphinx['port'];
+		$this->_sphinxFilter      = $conditions['filter'];
+		$this->_sphinxFilterRange = $conditions['filterRange'];
+		$this->_sphinxOffset      = $conditions['offset'];
+		$this->_sphinxLimit       = $conditions['perpage'];
+		$this->_sphinxKeywords    = $conditions['keywords'];
+		$this->_sphinxIndex       = $conditions['index'];
+		$this->_sphinxSortBy      = $conditions['sortby'];
+		$this->_sphinxGroupBy     = $conditions['groupby'] ? $conditions['groupby'] : '';
+		$this->_sphinxGroup       = $conditions['group'] ? $conditions['group'] : $this->_getSphinxGroup();
+		$this->_sphinxSort        = $conditions['sort'] ? $conditions['sort'] : $this->_getSphinxSort($this->_sphinxOrder);
+		$this->_sphinxRanking     = $conditions['ranking'] ? $conditions['ranking'] : $this->_getSphinxRanking();
+		$this->_sphinxMode        = $conditions['mode'] ? $conditions['mode'] : $this->_getSphinxMode($this->_sphinxMethod);
+		$result = $this->_sphinxAssemble();
+		if ( $result === false ){
+			return false;
+		}
+		return $this->_buildSphinxResult($result,$primaryId);
 	}
 	
 	function charsetReverse($keyword){
@@ -359,11 +387,15 @@ class Search_Sphinx extends Search_Base {
 		return array ( 'isopen'  => 0, 
 					   'host'    => 'localhost', 
 					   'port'    => 3312,
+					   'wordsegment_mode' => 1,
 					   'rank'    => "SPH_RANK_PROXIMITY_BM25", 
 					   'group'   => "SPH_GROUPBY_ATTR",
 					   'tindex'  => "threadsindex",
 					   'tcindex' => "tmsgsindex",
-					   'pindex'  => "postsindex"
+					   'pindex'  => "postsindex",
+					   'dindex'  => 'diarysindex',
+					   'dcindex' => 'diarycontentsindex',
+					   'cmsindex'=> 'cmsindex',					   
 		);
 	}
 	

@@ -10,11 +10,11 @@ if (empty($action)) {
 
 } elseif ($action == "send") {
 	$pwServer['REQUEST_METHOD']!='POST' && PostCheck($verify);
-	InitGP(array('step','by','sendto','touser','subject','atc_content','present','percount','count'));
-	
+	S::gp(array('step','by','sendto','touser','subject','atc_content','present','percount','count'));
+
 	$cache_file = D_P."data/bbscache/".substr($admin_pwd,10,10).".txt";
 	if (!$step) {
-		writeover($cache_file,$atc_content);
+		pwCache::setData($cache_file,$atc_content);
 	} else {
 		$atc_content = readover($cache_file);
 	}
@@ -25,7 +25,7 @@ if (empty($action)) {
 	!$percount && $percount = 100;
 	empty($step) && $step = 1;
 	$start = ($step-1)*$percount;
-	$limit = pwLimit($start,$percount);
+	$limit = S::sqlLimit($start,$percount);
 
 	$creditlist = '';
 	$sendmessage .= '<br /><br /><b>'.getLangInfo('other','affect').'</b>';
@@ -60,18 +60,18 @@ if (empty($action)) {
 	} elseif ($by == 1) {
 		$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
 		$uids = array();
-		if($onlineuser = $userService->findOnlineUsers(($timestamp-$db_onlinetime*60))){
+		if($onlineuser = $userService->findOnlineUsers(($timestamp-$db_onlinetime))){
 			foreach($onlineuser as $user){
 				$uids[] = $user['uid'];
 			}
 		}
-		$uids = pwImplode($uids);
+		$uids = S::sqlImplode($uids);
 		$uids && $sqlwhere = "uid IN($uids)";
 		$count = count($onlineuser);
 	} elseif ($by == 2) {
 		!$touser && adminmsg('operate_error');
 		$userService = L::loadClass('UserService', 'user');
-		$to_a_temp = explode(',', $touser);		
+		$to_a_temp = explode(',', $touser);
 		$to_a = array();
 		$to_a_err = array();
 		foreach( $to_a_temp as $value ){
@@ -82,22 +82,23 @@ if (empty($action)) {
 				array_push($to_a_err, $value);
 			}
 		}
-		$to_a && $sqlwhere = "username IN(" . pwImplode($to_a) . ")";
+		$to_a && $sqlwhere = "username IN(" . S::sqlImplode($to_a) . ")";
 		$count = count($to_a);
-		if(0 !== count($to_a_err)){
-			$existUsers = pwImplode($to_a_err);
+		/* //修改用户名输入有错误时发送失败@modify panjl@2010-11-3
+		 if(0 !== count($to_a_err)){
+			$existUsers = S::sqlImplode($to_a_err);
 			adminmsg('sendmsg_success_part');
-		}
+			}
+			*/
 	} else {
 		adminmsg('operate_error');
 	}
-
 	$pruids = $usernames = $u_a = array();
 	if($sqlwhere){
 		$query = $db->query("SELECT uid,username,email,newpm FROM pw_members WHERE $sqlwhere");
 		while ($rt = $db->fetch_array($query)) {
 			$u_a[] = $rt['uid'];
-	
+
 			if ($by > 0) {
 				$usernames[] = $rt['username'];
 			} else {
@@ -127,7 +128,12 @@ if (empty($action)) {
 		$j_url = "$basename&action=$action&step=$step&count=$count&sendto=$sendto&touser=" . rawurlencode($touser) . "&subject=". rawurlencode($subject)."&by=$by&percount=$percount$creditlist";
 		adminmsg("sendmsg_step",EncodeUrl($j_url),1);
 	} else {
-		P_unlink($cache_file);
+		//修改用户名输入有错误时发送失败@modify panjl@2010-11-3
+		if(0 !== count($to_a_err)){
+			$existUsers = S::sqlImplode($to_a_err);
+			adminmsg('sendmsg_success_part');
+		}
+		pwCache::deleteData($cache_file);
 		adminmsg('sendmsg_success');
 	}
 }

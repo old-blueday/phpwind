@@ -19,7 +19,7 @@ class PW_DiarytypeDB extends BaseDB {
 		return $this->_count();
 	}
 	function getsByTdids($tdids){
-		$tdids = (is_array($tdids)) ? pwImplode($tdids) : $tdids;
+		$tdids = (is_array($tdids)) ? S::sqlImplode($tdids) : $tdids;
 		$query = $this->_db->query ( "SELECT * FROM ".$this->_tableName." WHERE dtid in(".$tdids.")" );
 		return $this->_getAllResultFromQuery ( $query );
 	}

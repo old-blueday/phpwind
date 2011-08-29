@@ -7,6 +7,6 @@ class PW_ChannelModuleConfig extends PW_ModuleConfig{
 	}
 	
 	function getPath($alias) {
-		return Pcv(AREA_PATH.$alias);
+		return S::escapePath(AREA_PATH.$alias);
 	}
 }

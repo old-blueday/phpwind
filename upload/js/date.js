@@ -69,17 +69,15 @@ function ShowDays() {
                 daily = 1;
 			}
             if(daily > 0 && daily <= DaysNum){
-				cell.style.cssText = 'cursor:pointer;border-right:1px solid #BBBBBB; border-bottom:1px solid #BBBBBB; color:#215DC6; font-family:Verdana; font-size:12px';
+				cell.style.cssText = '';
 				if(day==daily){
-					prebackground = cell.style.background;
-					precolor = cell.style.color;
-					cell.style.background='#006699';
-					cell.style.color='#FFFFFF';
+					prebackground = cell.className;
+					cell.className='current';
 					seltd = cell;
 				} else if(intDay==6){
-					cell.style.color='green';
+					cell.className='sat';
 				} else if(intDay==0){
-					cell.style.color='red';
+					cell.className='sun';
 				}
 				cell.innerHTML = daily;
                 daily++;
@@ -97,12 +95,9 @@ function GetDate(idname,e,type){
     if(getElement.tagName == "TD"){
         if(getElement.innerHTML != ""){
 			if(type == 1){
-				seltd.style.background = prebackground;
-				seltd.style.color = precolor;
-				prebackground = getElement.style.background;
-				precolor = getElement.style.color;
-				getElement.style.background='#006699';
-				getElement.style.color='#FFFFFF';
+				seltd.className = prebackground;
+				prebackground = getElement.className;
+				getElement.className='current';
 				seltd = getElement;
 			}else{
 				sDate = getObj('Year').value + "-" + getObj('Month').value + "-" + getElement.innerHTML;
@@ -162,11 +157,11 @@ function ShowCalendar(idname,type){
     Cal.style.visibility="visible";
 
     table ="<iframe frameborder='0' style='position:absolute;top:0;width:250px;height:200px;filter:Alpha(opacity=0);_filter:Alpha(opacity=0);opacity:.0;'></iframe>";
-    table+="<table border='0' cellspacing='0' style='position:absolute;width:250px;background:#fff;line-height:1.5;border:1px solid #a9d5e9;'>";
-    table+="<tr>";
-    table+="<td class=\"h\">";
-    table+="<span class=\"fr cp\" title='关闭' onClick='javascript:HiddenCalendar()'><img src=\""+ imgpath +"/close.gif\" alt=\"close\" /></span>";
-    table+="<select name='Year' id='Year' onChange='ShowDays()' style='font-family:Verdana; font-size:12px'>";
+    table+="<div class=\"pw_menu\" style=\"position:absolute;margin-left:-2px;\">";
+    table+="<div class=\"timeSelect\">";
+    table+="<div class=\"popTop\" style=\"border-bottom:0\">";
+    table+="<a class=\"adel cp\" title='关闭' onClick='javascript:HiddenCalendar()'>关闭</a>";
+    table+="<select name='Year' id='Year' onChange='ShowDays()' style='font-family:Verdana; font-size:12px' class=\"mr10\">";
     for(i = thisyear - 35;i < (thisyear + 5);i++){
         table+="<option value=" + i + " " + (today.year == i ? "Selected" : "") + ">" + i + "</option>";
 	}
@@ -178,14 +173,12 @@ function ShowCalendar(idname,type){
 	}
 
 	table+="</select>";
-    table+="</td>";
-    table+="</tr>";
-    table+="<tr><td align='center' style=\"padding:5px;vertical-align:top;\">";
-    table+="<table id='Day' border='0' width='100%'>";
-    table+="<tr>";
+    table+="</div>";
+    table+="<table id='Day' class=\"tac\" width='100%'>";
+    table+="<tr style=\"background:#f7fbff;\">";
 
     for(i = 0;i < weeks.length;i++){
-        table+="<td align='center' style='font-size:12px;'>" + weeks[i] + "</td>";
+        table+="<th><span>" + weeks[i] + "</span></th>";
 	}
 	table+="</tr>";
 
@@ -193,21 +186,21 @@ function ShowCalendar(idname,type){
         table+="<tr>";
         if (type == 1) {
         	for (intDays = 0;intDays < weeks.length;intDays++){
-	        	table+="<td onClick='GetDate(\"" + idname + "\",event,\"1\")' ondblclick='GetDate2(\"" + idname + "\")' align='center'></td>";
+	        	table+="<td onClick='GetDate(\"" + idname + "\",event,\"1\")' ondblclick='GetDate2(\"" + idname + "\")'><span></span></td>";
 			}
 	    } else {
         	for (intDays = 0;intDays < weeks.length;intDays++){
-	        	table+="<td onClick='GetDate(\"" + idname + "\",event)' align='center'></td>";
+	        	table+="<td onClick='GetDate(\"" + idname + "\",event)'></td>";
 			}
         }
 
         table+="</tr>";
     }
-    table+="</table></td></tr>";
+    table+="</table>";
 	if(type == 1){
-		table+="<tr><td align=\"center\" style=\"padding:5px;\"><input class=\"input\" type=\"text\" name=\"Hour\" id=\"Hour\" size=\"1\" value=\""+today.hour+"\"> 点 <input class=\"input\" type=\"text\" name=\"minute\" id=\"Minute\" size=\"1\" value=\""+today.minute+"\"> 分 <input class=\"btn\" type=\"button\" name=\"submit\" value=\"确定\" onClick='GetDate2(\"" + idname + "\")'></td></tr>";
+		table+="<div class=\"popBottom cc\"><span class=\"mr5\"><input class=\"input\" type=\"text\" name=\"Hour\" id=\"Hour\" size=\"1\" value=\""+today.hour+"\">点<input class=\"input\" type=\"text\" name=\"minute\" id=\"Minute\" size=\"1\" value=\""+today.minute+"\">分</span><span class=\"btn2\"><span><button type=\"button\" name=\"submit\" onClick='GetDate2(\"" + idname + "\")'>确认</button></span></span></div>";
 	}
-	table+="</table>";
+	table+="</div>";
     Cal.innerHTML=table;
     ShowDays();
 }

@@ -47,7 +47,7 @@ class PW_ToolCenter {
 
 	function getToolsByUidAndNum($uid,$num){
 		$tools = array();
-		$query = $this->_db->query("SELECT u.*,t.name,t.price,t.creditype,t.stock,t.descrip,t.type,t.logo FROM pw_usertool u LEFT JOIN pw_tools t ON t.id=u.toolid WHERE u.uid=".pwEscape($uid)." AND u.nums>0 LIMIT ".intval($num));
+		$query = $this->_db->query("SELECT u.*,t.name,t.price,t.creditype,t.stock,t.descrip,t.type,t.logo FROM pw_usertool u LEFT JOIN pw_tools t ON t.id=u.toolid WHERE u.uid=".S::sqlEscape($uid)." AND u.nums>0 LIMIT ".intval($num));
 		while ($rt = $this->_db->fetch_array($query)) {
 			if(empty($rt['logo'])) {
 				$rt['logo'] = $GLOBALS['imgpath'] . '/nopic.gif';

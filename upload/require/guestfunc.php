@@ -39,7 +39,7 @@ function creatguestcache($output) {
 				@mkdir(D_P."$db_guestdir/T_{$fid}");
 				@chmod(D_P."$db_guestdir/T_{$fid}", 0777);
 			}
-			writeover(D_P."$db_guestdir/T_{$fid}/{$fid}_{$page}.html",$output);
+			pwCache::setData(D_P."$db_guestdir/T_{$fid}/{$fid}_{$page}.html",$output);
 			break;
 		case 'read' :
 			$tmp = 'R_'.intval($tid/500);
@@ -47,18 +47,18 @@ function creatguestcache($output) {
 				@mkdir(D_P."$db_guestdir/$tmp");
 				@chmod(D_P."$db_guestdir/$tmp", 0777);
 			}
-			writeover(D_P."$db_guestdir/$tmp/{$tid}_{$page}.html",$output);
+			pwCache::setData(D_P."$db_guestdir/$tmp/{$tid}_{$page}.html",$output);
 			break;
 		case 'index' :
 			$indexpath = getguestIndexpath();
-			writeover($indexpath,$output);
+			pwCache::setData($indexpath,$output);
 			break;
 	}
 }
 
 function getguestIndexpath(){
 	global $db_guestdir;
-	$mode = GetGP('m');
+	$mode = S::getGP('m');
 	$mode = ($mode && in_array($mode,array('bbs','area','o'))) ? $mode : '';
 	return D_P."$db_guestdir/index".$mode.".html";
 }

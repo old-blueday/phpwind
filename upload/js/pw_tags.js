@@ -46,7 +46,7 @@ PwTags.prototype = {
 		var html = '';
 		for(var i=0;i<tag.tagdb.length;i++){
 			var s = tag.tagdb[i];
-			html += '<a href="javascript:;" class="gray" onclick="tag.addtag(this);" style="cursor:pointer;margin:5px;">'+s[0]+'</a>';
+			html += '<a href="javascript:;" class="gray" onclick="tag.addtag(this);return false;" style="cursor:pointer;margin:5px;">'+s[0]+'</a>';
 			//if(i>98) break;
 		}
 		tag.menu.lastChild.innerHTML = html;
@@ -104,7 +104,7 @@ PwTags.prototype = {
 		str = str.replace(/\s+/g,' ');
 		if(str.split(' ').length > 4){
 			if (typeof showDialog == 'function') {
-				showDialog('warning','最多可以添加5个标签');
+				showDialog('warning','最多可以添加  <font color="red">5</font> 个标签');
 			} else {
 				alert('最多可以添加5个标签');
 			}
@@ -122,9 +122,11 @@ PwTags.prototype = {
 		var gettags = '';
 		var subject = document.FORM.atc_title.value;
 		var content = editor.getHTML();
+		var tagName = '';
 		for(var i=0;i<tag.tagdb.length;i++){
 			var s = tag.tagdb[i];
-			if(subject.indexOf(s[0]) != -1 || content.indexOf(s[0]) != -1){
+			tagName = (s[0].indexOf(' ') != -1 && s[0].indexOf('"') != -1) ? s[0].replace(/"/g,''):s[0];
+			if(subject.indexOf(tagName) != -1 || content.indexOf(tagName) != -1){
 				gettags += gettags ? ' '+s[0] : s[0];
 				if(++num>4) break;
 			}

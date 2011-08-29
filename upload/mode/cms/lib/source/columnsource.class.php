@@ -63,7 +63,7 @@ class PW_ColumnSource extends SystemData {
 	 */
 	function _cookData($data) {
 		global $db_bbsurl;
-		$data['url'] = $db_bbsurl . '/mode.php?m=cms&q=list&column=' . $data['column_id'];
+		$data['url'] = $db_bbsurl . '/'.getColumnUrl($data['column_id']);
 		$data['title'] = strip_tags($data['name']);
 		$data['descrip'] = strip_tags($data['name']);
 		return $data;

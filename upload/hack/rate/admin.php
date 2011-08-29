@@ -2,7 +2,7 @@
 !defined('P_W') && exit('Forbidden');
 define ( "H_R", R_P . "hack/rate/" );
 define ( "L_R", R_P . "lib/rate/" );
-InitGP ( array ('ajax' ) );
+S::gp ( array ('ajax' ) );
 $action = strtolower ( ($job) ? $job : "admin" );
 $filepath = H_R . "action/" . $action . "Action.php";
 
@@ -11,7 +11,7 @@ $filepath = H_R . "action/" . $action . "Action.php";
 if ($job != "ajax") {
 	require H_R . '/template/layout.php';
 } else {
-	require_once Pcv($filepath);
+	require_once S::escapePath($filepath);
 }
 
 ?>

@@ -67,7 +67,7 @@ class MS_Notice extends MS_Base {
 		if( 1 > $userId || 1 > $typeId || 1 > $relationId ){
 			return false;
 		}
-		return $this->_upMessage($userId,$this->_notice,$typeId,$relationId);
+		return $this->_upMessage($userId,$this->_notice,$relationId,$typeId);
 	}
 	function getDownNotice($userId,$relationId,$typeId){
 		$userId = intval($userId);
@@ -76,7 +76,7 @@ class MS_Notice extends MS_Base {
 		if( 1 > $userId || 1 > $typeId || 1 > $relationId ){
 			return false;
 		}
-		return $this->_downMessage($userId,$this->_notice,$typeId,$relationId);
+		return $this->_downMessage($userId,$this->_notice,$relationId, $typeId);
 	}
 	function countAllNotice($userId){
 		$userId   = intval($userId);
@@ -274,6 +274,7 @@ class MS_Notice extends MS_Base {
 			return false;
 		}
 		$this->_updateStatisticsByUserNames($onlineUserIds,false,$this->_notice,1);
+		$this->_updateUserMessageNumbers($onlineUserIds);
 		return true;
 	}
 	

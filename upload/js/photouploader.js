@@ -92,11 +92,13 @@ var uploader = {
 	},
 	//批量上传完毕
 	finish:function(b){
-		if(!b)//没有可以上传的图片
+		if(!b){//没有可以上传的图片
+			closep();
 			showDialog('warning','上传失败，请重新选择照片!',2);
-		else
+		}else{
 			read.setMenu(uploader.jumpphoto(uploader.albumId));
 			read.menupz();//showDialog('success','上传成功！',2);
+		}
 	},
 	//批量上传限制最大数目
 	countFile:function()

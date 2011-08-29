@@ -17,6 +17,7 @@ class PW_GroupImageSource extends SystemData {
 	function _getData($sortType,$num) {
 		$dataAnalyseService = $this->_getDataAnalyseService();
 		switch ($sortType) {
+			case '':
 			case 'new' :
 				return $dataAnalyseService->getDataByAction('groupphoto', 'groupPicNew', $num);
 			case 'comment' :

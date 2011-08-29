@@ -20,7 +20,7 @@ unset($usercreditdb,$key,$value);
 
 if (!empty($updateMemberData[$winduid])) {
 	$credit->runsql($updateMemberData,false);
-	$db->update("UPDATE pw_usertool SET nums=nums-1 WHERE uid=".pwEscape($winduid)."AND toolid=".pwEscape($toolid));
+	$db->update("UPDATE pw_usertool SET nums=nums-1 WHERE uid=".S::sqlEscape($winduid)."AND toolid=".S::sqlEscape($toolid));
 	$logdata=array(
 		'type'		=>	'use',
 		'nums'		=>	'',
@@ -34,8 +34,9 @@ if (!empty($updateMemberData[$winduid])) {
 	);
 	writetoollog($logdata);
 
-	$_cache = getDatastore();
-	$_cache->delete('UID_'.$winduid);
+	//* $_cache = getDatastore();
+	//* $_cache->delete('UID_'.$winduid);
+	perf::gatherInfo('changeMembersWithUserIds', array('uid'=>$winduid));
 	Showmsg('toolmsg_2_success');
 } else{
 	Showmsg('toolmsg_2_failed');

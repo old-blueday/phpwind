@@ -4,13 +4,17 @@ $basename="$admin_file?adminjob=tagset";
 
 if(!$action){
 	$db_perpage = 51;
-	InitGP(array('keyword'));
-	InitGP(array('page','ls','le','ns','ne','ifhot'),'GP',2);
+	S::gp(array('keyword'));
+	S::gp(array('page','ls','le','ns','ne','ifhot'),'GP');
+	is_numeric($ls) && $ls = (int) $ls;
+	is_numeric($le) && $le = (int) $le;
+	is_numeric($ns) && $ns = (int) $ns;
+	is_numeric($ne) && $ne = (int) $ne;
 	$page < 1 && $page = 1;
 	${'sel_'.$ifhot} = 'selected';
-	$sql = "WHERE ifhot=".pwEscape($ifhot);
+	$sql = "WHERE ifhot=".S::sqlEscape($ifhot);
 	if($keyword){
-		$sql .= " AND tagname LIKE ".pwEscape("%$keyword%");
+		$sql .= " AND tagname LIKE ".S::sqlEscape("%$keyword%");
 	}
 	if($ls>0){
 		$sql .= " AND char_length(tagname)>=".$ls;
@@ -24,7 +28,7 @@ if(!$action){
 	if($ne>0){
 		$sql .= " AND num<=".$ne;
 	}
-	$limit = pwLimit(($page-1)*$db_perpage,$db_perpage);
+	$limit = S::sqlLimit(($page-1)*$db_perpage,$db_perpage);
 	$rt    = $db->get_one("SELECT COUNT(*) AS sum FROM pw_tags $sql");
 	$pages = numofpage($rt['sum'],$page,ceil($rt['sum']/$db_perpage), "$basename&keyword=$keyword&ls=$ls&le=$le&ns=$ns&ne=$ne&ifhot=$ifhot&");
 
@@ -36,27 +40,27 @@ if(!$action){
 		$tagdb[] = $rt;
 	}
 	
-	$ls = $ls ? $ls : '';
-	$le = $le ? $le : '';
-	$ns = $ns ? $ns : '';
-	$ne = $ne ? $ne : '';
+	$ls = $ls ? $ls : (is_int($ls) ? 0 : '');
+	$le = $le ? $le : (is_int($le) ? 0 : '');
+	$ns = $ns ? $ns : (is_int($ns) ? 0 : '');
+	$ne = $ne ? $ne : (is_int($ne) ? 0 : '');
 	include PrintEot('tagset');exit;
 } elseif($action=='tag'){
-	InitGP(array('page','tagid','tagname'));
+	S::gp(array('page','tagid','tagname'));
 	(int)$page < 1 && $page = 1;
-	$sql   = is_numeric($tagid) ? "tagid=".pwEscape($tagid) : "tagname=".pwEscape($tagname);
+	$sql   = is_numeric($tagid) ? "tagid=".S::sqlEscape($tagid) : "tagname=".S::sqlEscape($tagname);
 	$limit = "LIMIT ".($page-1)*$db_perpage.",$db_perpage";
 	$rs    = $db->get_one("SELECT tagid,tagname,num FROM pw_tags WHERE $sql");
 	$pages = numofpage($rs['num'],$page,ceil($rs['num']/$db_perpage),"$basename&tagid=$tagid&");
 
 	$readb = $ttable_a = array();
-	$query = $db->query("SELECT td.tagid,td.tid,t.subject FROM pw_tagdata td LEFT JOIN pw_threads t ON td.tid=t.tid WHERE tagid=".pwEscape($rs['tagid'],false).$limit);
+	$query = $db->query("SELECT td.tagid,td.tid,t.subject FROM pw_tagdata td LEFT JOIN pw_threads t ON td.tid=t.tid WHERE tagid=".S::sqlEscape($rs['tagid'],false).$limit);
 	while($rt = $db->fetch_array($query)){
 		$readb[$rt['tid']] = $rt;
 		$ttable_a[GetTtable($rt['tid'])][] = $rt['tid'];
 	}
 	foreach($ttable_a as $pw_tmsgs=>$tids){
-		$tids  = pwImplode($tids);
+		$tids  = S::sqlImplode($tids);
 		$query = $db->query("SELECT tid,tags FROM $pw_tmsgs WHERE tid IN($tids)");
 		while($rt = $db->fetch_array($query)){
 			list($tags,$relatetag) = explode("\t",$rt['tags']);
@@ -71,13 +75,13 @@ if(!$action){
 	include PrintEot('tagset');exit;
 } elseif($action=='addtag'){
 	if($_POST['step']){
-		InitGP(array('tags'),'GP',1);
+		S::gp(array('tags'),'GP',1);
 		$tagdb = explode(',',$tags);
 		foreach($tagdb as $tag){
 			if($tag = trim($tag)){
-				$rt = $db->get_one("SELECT tagid FROM pw_tags WHERE tagname=".pwEscape($tag));
+				$rt = $db->get_one("SELECT tagid FROM pw_tags WHERE tagname=".S::sqlEscape($tag));
 				if(!$rt){
-					$db->update("INSERT INTO pw_tags SET tagname=".pwEscape($tag).",num=0");
+					$db->update("INSERT INTO pw_tags SET tagname=".S::sqlEscape($tag).",num=0");
 				}
 			}
 		}
@@ -90,7 +94,7 @@ if(!$action){
 	include PrintEot('tagset');exit;
 } elseif ($_POST['action'] == 'set') {
 
-	InitGP(array('config'));
+	S::gp(array('config'));
 
 	foreach ($config as $key => $value) {
 		setConfig("db_$key", $value);
@@ -103,7 +107,7 @@ if(!$action){
 
 } elseif ($_POST['action'] == 'deltag') {
 
-	InitGP(array('selid'));
+	S::gp(array('selid'));
 	if (!$selid = checkselid($selid)) {
 		adminmsg('operate_error');
 	}
@@ -114,7 +118,7 @@ if(!$action){
 
 } elseif ($_POST['action'] == 'sethot') {
 
-	InitGP(array('selid','ifhot'));
+	S::gp(array('selid','ifhot'));
 	if(!$selid = checkselid($selid)){
 		adminmsg('operate_error');
 	}
@@ -129,10 +133,10 @@ function updatetags() {
 	global $db,$db_tagindex;
 	$tagnum = max($db_tagindex,200);
 	$tagdb = array();
-	$query = $db->query("SELECT * FROM pw_tags WHERE ifhot='0' ORDER BY num DESC".pwLimit($tagnum));
+	$query = $db->query("SELECT * FROM pw_tags WHERE ifhot='0' ORDER BY num DESC".S::sqlLimit($tagnum));
 	while ($rs = $db->fetch_array($query)) {
 		$tagdb[$rs['tagname']] = $rs['num'];
 	}
-	writeover(D_P."data/bbscache/tagdb.php","<?php\r\n\$tagdb=".pw_var_export($tagdb).";\r\n?>");
+	pwCache::setData(D_P."data/bbscache/tagdb.php","<?php\r\n\$tagdb=".pw_var_export($tagdb).";\r\n?>");
 }
 ?>

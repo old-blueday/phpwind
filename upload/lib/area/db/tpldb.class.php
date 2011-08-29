@@ -4,11 +4,11 @@ class PW_TplDB extends BaseDB {
 	var $_tableName = "pw_tpl";
 
 	function getData($tplid){
-		return $this->_db->get_one("SELECT * FROM ".$this->_tableName." WHERE tplid=".pwEscape($tplid));
+		return $this->_db->get_one("SELECT * FROM ".$this->_tableName." WHERE tplid=".S::sqlEscape($tplid));
 	}
 	function getTplIdsByType($type){
 		$temp = array();
-		$query = $this->_db->query("SELECT tplid FROM ".$this->_tableName." WHERE type=".pwEscape($type));
+		$query = $this->_db->query("SELECT tplid FROM ".$this->_tableName." WHERE type=".S::sqlEscape($type));
 		while ($rt = $this->_db->fetch_array($query)) {
 			$temp[] = $rt['tplid'];
 		}
@@ -16,7 +16,7 @@ class PW_TplDB extends BaseDB {
 	}
 	function getDatas($type,$limit){
 		if ($type) {
-			$sqladd = ' WHERE type='.pwEscape($type);
+			$sqladd = ' WHERE type='.S::sqlEscape($type);
 			if (!$sqladd) return array();
 		} else {
 			$sqladd = '';
@@ -41,20 +41,20 @@ class PW_TplDB extends BaseDB {
 	}
 	function countByType($type){
 		if (!$type) return $this->count();
-		return $this->_db->get_value("SELECT COUNT(*) AS count FROM ".$this->_tableName." WHERE type=".pwEscape($type));
+		return $this->_db->get_value("SELECT COUNT(*) AS count FROM ".$this->_tableName." WHERE type=".S::sqlEscape($type));
 	}
 	function insertData($array){
 		$array = $this->_checkData($array);
 		if (!$array['name'] || !$array['tagcode']) {
 			Showmsg('tpl_insert_data_error');
 		}
-		$this->_db->update("INSERT INTO ".$this->_tableName." SET ".pwSqlSingle($array,false));
+		$this->_db->update("INSERT INTO ".$this->_tableName." SET ".S::sqlSingle($array,false));
 		return $this->_db->insert_id();
 	}
 	function updataById($tplid,$array) {
 		$array	= $this->_checkData($array);
 		if (!$array) return null;
-		$this->_db->update("UPDATE ".$this->_tableName." SET ".pwSqlSingle($array,false)." WHERE tplid=".pwEscape($tplid));
+		$this->_db->update("UPDATE ".$this->_tableName." SET ".S::sqlSingle($array,false)." WHERE tplid=".S::sqlEscape($tplid));
 	}
 
 

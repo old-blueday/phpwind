@@ -23,7 +23,7 @@ class PW_DelArticle {
 		if (!is_array($ids) && !is_numeric($ids)) {
 			$ids = explode(',', $ids);
 		}
-		return is_array($ids) ? "IN(" . pwImplode($ids) . ')' : "=" . pwEscape($ids);
+		return is_array($ids) ? "IN(" . S::sqlImplode($ids) . ')' : "=" . S::sqlEscape($ids);
 	}
 	
 	function getForumInfo($fid, $key = null) {
@@ -152,7 +152,7 @@ class PW_DelArticle {
 			return true;
 		}
 		require_once(R_P.'require/updateforum.php');
-		$deltids = pwImplode($tids);
+		$deltids = S::sqlImplode($tids);
 		
 		/*写操作日志 */
 		require_once (R_P . 'require/writelog.php');
@@ -164,21 +164,29 @@ class PW_DelArticle {
 			$this->_reCountColony($cydb);
 		}
 		if ($recycle) {
-			$this->db->update("UPDATE pw_threads SET fid='0',ifcheck='1',topped='0' WHERE tid IN($deltids)");
+			//$this->db->update("UPDATE pw_threads SET fid='0',ifcheck='1',topped='0' WHERE tid IN($deltids)");
+			pwQuery::update('pw_threads', 'tid IN (:tid)' , array($tids), array('fid'=>'0','ifcheck'=>'1','topped'=>'0'));//这里的$tid是还未过滤的$deltids
 			foreach ($ptable_a as $key => $val) {
 				$pw_posts = GetPtable($key);
-				$this->db->update("UPDATE $pw_posts SET fid='0' WHERE tid IN($deltids)");
+				//$this->db->update("UPDATE $pw_posts SET fid='0' WHERE tid IN($deltids)");
+				pwQuery::update($pw_posts, 'tid IN(:tid)', array($tids), array('fid' => '0'));
 			}
 			if ($recycledb) {
-				$this->db->update("REPLACE INTO pw_recycle (pid,tid,fid,deltime,admin) VALUES " . pwSqlMulti($recycledb));
+				$this->db->update("REPLACE INTO pw_recycle (pid,tid,fid,deltime,admin) VALUES " . S::sqlMulti($recycledb));
 			}
 			// ThreadManager reflesh memcache
+			/*
 			$threadlist = L::loadClass("threadlist", 'forum');
 			foreach ($fids as $fid => $value) {
 				$threadlist->refreshThreadIdsByForumId($fid);
 			}
+			
 			$threads = L::loadClass('Threads', 'forum');
 			$threads->delThreads($tids);
+			*/	
+			Perf::gatherInfo('changeThreadWithForumIds', array('fid'=>array_keys($fids)));
+			Perf::gatherInfo('changeThreadWithThreadIds', array('tid'=>$tids));		
+			
 			if ($modeldb) {
 				$this->_RecycleModelTopic($modeldb);
 			}
@@ -189,16 +197,22 @@ class PW_DelArticle {
 				$this->_RecyclePcTopic($pcdb);
 			}
 		} else {
-			$threadManager = L::loadClass("threadmanager", 'forum'); /* @var $threadManager PW_ThreadManager */
+			//* $threadManager = L::loadClass("threadmanager", 'forum'); /* @var $threadManager PW_ThreadManager */
+			$threadService = L::loadclass('threads', 'forum');
 			foreach ($fids as $fid => $value) {
-				$threadManager->deleteByThreadIds($fid, $value['tids']);
+				//* $threadManager->deleteByThreadIds($fid, $value['tids']);
+				$threadService->deleteByThreadIds($value['tids']);
+				Perf::gatherInfo('changeThreadWithForumIds', array('fid'=>$fid));
 			}
 			foreach ($ttable_a as $pw_tmsgs => $val) {
-				$this->db->update("DELETE FROM $pw_tmsgs WHERE tid IN($deltids)");
+				//* $this->db->update("DELETE FROM $pw_tmsgs WHERE tid IN($deltids)");
+				pwQuery::delete($pw_tmsgs, 'tid IN(:tid)', array($tids));
 			}
+			
 			foreach ($ptable_a as $key => $val) {
 				$pw_posts = GetPtable($key);
-				$this->db->update("DELETE FROM $pw_posts WHERE tid IN($deltids)");
+				//$this->db->update("DELETE FROM $pw_posts WHERE tid IN($deltids)");
+				pwQuery::delete($pw_posts, 'tid IN(:tid)', array($tids));
 			}
 			if ($specialdb) {
 				$this->_delSpecialTopic($specialdb);
@@ -213,7 +227,7 @@ class PW_DelArticle {
 				$this->_delPcTopic($pcdb);
 			}
 			if ($cydb) {
-				$this->db->update("DELETE FROM pw_argument WHERE tid IN(" . pwImplode($cydb) . ')');
+				$this->db->update("DELETE FROM pw_argument WHERE tid IN(" . S::sqlImplode($cydb) . ')');
 			}
 			delete_tag($deltids);		
 		}
@@ -230,9 +244,10 @@ class PW_DelArticle {
 		
 		/* delete cache*/
 		if ($db_ifpwcache ^ 1) {
-			$db->update("DELETE FROM pw_elements WHERE type !='usersort' AND id IN(" . pwImplode($tids) . ')');
+			$db->update("DELETE FROM pw_elements WHERE type !='usersort' AND id IN(" . S::sqlImplode($tids) . ')');
 		}
-		P_unlink(D_P . 'data/bbscache/c_cache.php');
+		//* P_unlink(D_P . 'data/bbscache/c_cache.php');
+		pwCache::deleteData(D_P . 'data/bbscache/c_cache.php');
 				
 		/* 扣除积分 */
 		$delCredit && $credit->runsql();		
@@ -242,7 +257,7 @@ class PW_DelArticle {
 		
 		if ($delutids) {
 			$userCache = L::loadClass('Usercache', 'user');
-			$userCache->delete(array_keys($delutids), array('article', 'cardtopic'));
+			$userCache->delete(array_keys($delutids), array('article', 'cardtopic', 'weibo'));
 		}
 		$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
 		foreach ($deluids as $key => $value) {
@@ -264,27 +279,27 @@ class PW_DelArticle {
 
 	function _delSpecialTopic($specialdb) {
 		if (isset($specialdb[1])) {
-			$pollids = pwImplode($specialdb[1]);
+			$pollids = S::sqlImplode($specialdb[1]);
 			$this->db->update("DELETE FROM pw_polls WHERE tid IN($pollids)");
 		}
 		if (isset($specialdb[2])) {
-			$actids = pwImplode($specialdb[2]);
+			$actids = S::sqlImplode($specialdb[2]);
 			$this->db->update("DELETE FROM pw_activity WHERE tid IN($actids)");
 			$this->db->update("DELETE FROM pw_actmember WHERE actid IN($actids)");
 		}
 		if (isset($specialdb[3])) {
-			$rewids = pwImplode($specialdb[3]);
+			$rewids = S::sqlImplode($specialdb[3]);
 			$this->db->update("DELETE FROM pw_reward WHERE tid IN($rewids)");
 		}
 		if (isset($specialdb[4])) {
-			$tradeids = pwImplode($specialdb[4]);
+			$tradeids = S::sqlImplode($specialdb[4]);
 			$this->db->update("DELETE FROM pw_trade WHERE tid IN($tradeids)");
 		}
 	}
 
 	function _delModelTopic($modeldb){
 		foreach ($modeldb as $key => $value) {
-			$modelids = pwImplode($value);
+			$modelids = S::sqlImplode($value);
 			$pw_topicvalue = GetTopcitable($key);
 			$this->db->update("DELETE FROM $pw_topicvalue WHERE tid IN($modelids)");
 		}
@@ -292,7 +307,7 @@ class PW_DelArticle {
 
 	function _delPcTopic($pcdb){
 		foreach ($pcdb as $key => $value) {
-			$pcids =  pwImplode($value);
+			$pcids =  S::sqlImplode($value);
 			$key = $key > 20 ? $key - 20 : 0;
 			$key = (int)$key;
 			$pcvaluetable = GetPcatetable($key);
@@ -307,7 +322,7 @@ class PW_DelArticle {
 	function _delActivityTopic ($activityDb) {
 		$defaultValueTableName = getActivityValueTableNameByActmid();
 		$newActivityDb = array();
-		$query = $this->db->query("SELECT actmid,tid FROM $defaultValueTableName WHERE tid IN(".pwImplode($activityDb).")");
+		$query = $this->db->query("SELECT actmid,tid FROM $defaultValueTableName WHERE tid IN(".S::sqlImplode($activityDb).")");
 		while ($rt = $this->db->fetch_array($query)) {
 			$newActivityDb[$rt['actmid']][] = $rt['tid'];
 		}
@@ -319,7 +334,7 @@ class PW_DelArticle {
 		$data = array();
 		/*帖子被删除费用日志更新*/
 		foreach ($newActivityDb as $key => $value) {
-			$tids = pwImplode($value);
+			$tids = S::sqlImplode($value);
 			$userDefinedValueTableName = getActivityValueTableNameByActmid($key, 1, 1);
 			$this->db->update("DELETE FROM $defaultValueTableName WHERE tid IN($tids)");
 			$this->db->update("DELETE FROM $userDefinedValueTableName WHERE tid IN($tids)");
@@ -335,7 +350,7 @@ class PW_DelArticle {
 
 	function _RecycleModelTopic($modeldb){
 		foreach ($modeldb as $key => $value) {
-			$modelids = pwImplode($value);
+			$modelids = S::sqlImplode($value);
 			$pw_topicvalue = GetTopcitable($key);
 			$this->db->update("UPDATE $pw_topicvalue SET ifrecycle='1' WHERE tid IN($modelids)");
 		}
@@ -343,7 +358,7 @@ class PW_DelArticle {
 
 	function _RecyclePcTopic($pcdb){
 		foreach ($pcdb as $key => $value) {
-			$pcids =  pwImplode($value);
+			$pcids =  S::sqlImplode($value);
 			$key = $key > 20 ? $key - 20 : 0;
 			$pcvaluetable = GetPcatetable($key);
 			$this->db->update("UPDATE $pcvaluetable SET ifrecycle='1' WHERE tid IN($pcids)");
@@ -358,7 +373,7 @@ class PW_DelArticle {
 		
 		$defaultValueTableName = getActivityValueTableNameByActmid();
 		$newActivityDb = array();
-		$query = $this->db->query("SELECT actmid,tid FROM $defaultValueTableName WHERE tid IN(".pwImplode($activityDb).")");
+		$query = $this->db->query("SELECT actmid,tid FROM $defaultValueTableName WHERE tid IN(".S::sqlImplode($activityDb).")");
 		while ($rt = $this->db->fetch_array($query)) {
 			$newActivityDb[$rt['actmid']][] = $rt['tid'];
 		}
@@ -370,7 +385,7 @@ class PW_DelArticle {
 		$data = array();
 		/*帖子被删除费用日志更新*/
 		foreach ($newActivityDb as $key => $value) {
-			$tids = pwImplode($value);
+			$tids = S::sqlImplode($value);
 			$userDefinedValueTableName = getActivityValueTableNameByActmid($key, 1, 1);
 			$this->db->update("UPDATE $defaultValueTableName SET ifrecycle='1' WHERE tid IN($tids)");
 			$this->db->update("UPDATE $userDefinedValueTableName SET ifrecycle='1' WHERE tid IN($tids)");
@@ -435,12 +450,13 @@ class PW_DelArticle {
 			}
 		}
 		if (!empty($pids)) {
-			$result = $this->db->update("DELETE FROM pw_poststopped WHERE pid IN (". pwImplode($pids) .")");
+			$result = $this->db->update("DELETE FROM pw_poststopped WHERE pid IN (". S::sqlImplode($pids) .")");
 			$tids = array_unique($tids);
 			if ($result) {
 				foreach ($tids as $key => $value) {
-					$count = $this->db->get_value("SELECT COUNT(*) FROM pw_poststopped WHERE tid = ".pwEscape($value)." AND fid = '0' AND pid != '0'");
-					$this->db->update("UPDATE pw_threads SET topreplays = ".pwEscape($count,false)."WHERE tid = ".pwEscape($value));
+					$count = $this->db->get_value("SELECT COUNT(*) FROM pw_poststopped WHERE tid = ".S::sqlEscape($value)." AND fid = '0' AND pid != '0'");
+					//$this->db->update("UPDATE pw_threads SET topreplays = ".S::sqlEscape($count,false)."WHERE tid = ".S::sqlEscape($value));
+					pwQuery::update('pw_threads', 'tid = :tid' , array($value), array('topreplays'=>$count));
 				}
 			}
 		}
@@ -453,13 +469,13 @@ class PW_DelArticle {
 			$tids = array_unique($tids);
 		}
 		if (!empty($tids)) {
-			$query = $this->db->query("SELECT * FROM pw_poststopped WHERE tid IN (". pwImplode($tids) .") 
+			$query = $this->db->query("SELECT * FROM pw_poststopped WHERE tid IN (". S::sqlImplode($tids) .") 
 						AND fid = '0' AND pid != '0' ");
 			while ($tr = $this->db->fetch_array($query)) {
 				$ptable = GetPtable('N',$tr['tid']);
 				$this->db->update("UPDATE pw_poststopped SET floor = (
-					SELECT COUNT(*) FROM $ptable p WHERE p.tid = ".pwEscape($tr['tid'])."
-					AND p.pid <= ". pwEscape($tr['pid']) ." AND p.pid != '0' AND p.ifcheck = '1' ) WHERE pid = " . pwEscape($tr['pid']));
+					SELECT COUNT(*) FROM $ptable p WHERE p.tid = ".S::sqlEscape($tr['tid'])."
+					AND p.pid <= ". S::sqlEscape($tr['pid']) ." AND p.pid != '0' AND p.ifcheck = '1' ) WHERE pid = " . S::sqlEscape($tr['pid']));
 			}
 		}
 	}
@@ -540,19 +556,21 @@ class PW_DelArticle {
 			return true;
 		}
 		require_once(R_P.'require/updateforum.php');
-		$delpids = pwImplode($pids);
+		$delpids = S::sqlImplode($pids);
 		if ($recycle) {
 			foreach ($ptable_a as $key => $val) {
 				$pw_posts = GetPtable($key);
-				$this->db->update("UPDATE $pw_posts SET tid='0',fid='0' WHERE pid IN($delpids)");
+				//$this->db->update("UPDATE $pw_posts SET tid='0',fid='0' WHERE pid IN($delpids)");
+				pwQuery::update($pw_posts,'pid IN(:pid)', array($pids), array('tid' => '0', 'fid' => '0'));
 			}
 			if ($recycledb) {
-				$this->db->update("REPLACE INTO pw_recycle (pid,tid,fid,deltime,admin) VALUES " . pwSqlMulti($recycledb));
+				$this->db->update("REPLACE INTO pw_recycle (pid,tid,fid,deltime,admin) VALUES " . S::sqlMulti($recycledb));
 			}
 		} else {
 			foreach ($ptable_a as $key => $val) {
 				$pw_posts = GetPtable($key);
-				$this->db->update("DELETE FROM $pw_posts WHERE pid IN($delpids)");
+				//$this->db->update("DELETE FROM $pw_posts WHERE pid IN($delpids)");
+				pwQuery::delete($pw_posts, 'pid IN(:pid)', array($pids));
 			}
 		}
 		if ($delpids) {
@@ -560,10 +578,11 @@ class PW_DelArticle {
 		}
 		/*前台删主题，默认将其设为屏蔽*/
 		if ($deltpc) {
-			$this->db->update("UPDATE pw_threads SET ifshield='2' WHERE tid IN (" . pwImplode($deltpc) . ')');
+			//$this->db->update("UPDATE pw_threads SET ifshield='2' WHERE tid IN (" . S::sqlImplode($deltpc) . ')');
+			pwQuery::update('pw_threads', 'tid IN (:tid)' , array($deltpc), array('ifshield'=>2));
 			$pw_attachs = L::loadDB('attachs', 'forum');
 			$attachdb += $pw_attachs->getByTid($deltpc, 0);
-			!$recycle && delete_tag(pwImplode($deltpc));
+			!$recycle && delete_tag(S::sqlImplode($deltpc));
 		}
 		if ($_tids) {
 			$pw_attachs = L::loadDB('attachs', 'forum');
@@ -584,15 +603,17 @@ class PW_DelArticle {
 			}
 		}
 		if ($delfids) {
-			$threadlist = L::loadClass("threadlist", 'forum');
+			//* $threadlist = L::loadClass("threadlist", 'forum');
 			foreach ($delfids as $fid => $value) {
-				$threadlist->refreshThreadIdsByForumId($fid);
+				//* $threadlist->refreshThreadIdsByForumId($fid);
+				Perf::gatherInfo('changeThreadWithForumIds', array('fid'=>$fid));
 				updateForumCount($fid, -$value['topic'], -$value['replies']);
 			}
 		}
 		if ($deltids && !$recount) {
 			foreach ($deltids as $tid => $value) {
-				$this->db->update("UPDATE pw_threads SET replies=replies-" . pwEscape($value) . " WHERE tid=" . pwEscape($tid));
+				//$this->db->update("UPDATE pw_threads SET replies=replies-" . S::sqlEscape($value) . " WHERE tid=" . S::sqlEscape($tid));
+				$this->db->update(pwQuery::buildClause("UPDATE :pw_table SET replies=replies-:replies WHERE tid=:tid", array('pw_threads', $value, $tid)));
 			}
 		}
 		
@@ -615,7 +636,7 @@ class PW_DelArticle {
 		global $db_readdir,$db_guestread;
 		$db_guestread && require_once(R_P.'require/guestfunc.php');
 		$deltopic = array();
-		$query = $this->db->query("SELECT tid,fid,postdate,lastpost,author,replies,anonymous,ptable,locked FROM pw_threads WHERE tid IN(" . pwImplode($tids) . ")");
+		$query = $this->db->query("SELECT tid,fid,postdate,lastpost,author,replies,anonymous,ptable,locked FROM pw_threads WHERE tid IN(" . S::sqlImplode($tids) . ")");
 		while ($read = $this->db->fetch_array($query)) {
 			$htmurl = $db_readdir.'/'.$read['fid'].'/'.date('ym',$read['postdate']).'/'.$read['tid'].'.html';
 			if (file_exists(R_P . $htmurl)) {
@@ -630,8 +651,9 @@ class PW_DelArticle {
 				}
 			}
 		}
-		$threads = L::loadClass('Threads', 'forum');
-		$threads->delThreads($tids);
+		//* $threads = L::loadClass('Threads', 'forum');
+		//* $threads->delThreads($tids);	
+		Perf::gatherInfo('changeThreadWithThreadIds', array('tid'=>$tids));	
 
 		return $deltopic;
 	}
@@ -646,33 +668,40 @@ class PW_DelArticle {
 			$read['anonymous'] && $read['author'] = $db_anonymousname;
 			if ($ifdel) {
 				if ($recycle) {
-					$this->db->update("UPDATE pw_threads SET fid='0',ifshield='0' WHERE tid='$tid'");
+					//$this->db->update("UPDATE pw_threads SET fid='0',ifshield='0' WHERE tid='$tid'");
+					pwQuery::update('pw_threads', 'tid = :tid' , array($tid), array('fid'=>0,'ifshield'=>0));
 				} else {
-					$threadManager = L::loadClass("threadmanager", 'forum');
-					$threadManager->deleteByThreadId($read['fid'], $tid);
+					//* $threadManager = L::loadClass("threadmanager", 'forum');
+					//* $threadManager->deleteByThreadId($read['fid'], $tid);
+					$threadService = L::loadclass('threads', 'forum');
+					$threadService->deleteByThreadId($tid);	
+					Perf::gatherInfo('changeThreadWithForumIds', array('fid'=>$read['fid']));				
 					$pw_tmsgs = GetTtable($tid);
-					$this->db->update("DELETE FROM $pw_tmsgs WHERE tid='$tid'");
+					//* $this->db->update("DELETE FROM $pw_tmsgs WHERE tid='$tid'");
+					pwQuery::delete($pw_tmsgs, 'tid=:tid', array($tid));
 				}
 				$ret = 1;
 			} else {
 				$pwSQL = array('replies' => 0, 'lastposter' => $read['author']);
 				!($read['lastpost'] > $timestamp || $read['locked'] > 2) && $pwSQL['lastpost'] = $read['postdate'];
-				$this->db->update("UPDATE pw_threads SET " . pwSqlSingle($pwSQL) . " WHERE tid=" . pwEscape($tid));
+				//$this->db->update("UPDATE pw_threads SET " . S::sqlSingle($pwSQL) . " WHERE tid=" . S::sqlEscape($tid));
+				pwQuery::update('pw_threads', 'tid = :tid' , array($tid), $pwSQL);
 			}
 		} else {
 			$pt = $this->db->get_one("SELECT postdate,author,anonymous FROM $pw_posts WHERE tid='$tid' ORDER BY postdate DESC LIMIT 1");
 			$pt['anonymous'] && $pt['author'] = $db_anonymousname;
 			$pwSQL = array('replies' => $replies, 'lastposter' => $pt['author']);
 			!($read['lastpost'] > $timestamp || $read['locked'] > 2) && $pwSQL['lastpost'] = $pt['postdate'];
-			$this->db->update("UPDATE pw_threads SET " . pwSqlSingle($pwSQL) . " WHERE tid=" . pwEscape($tid));
+			//$this->db->update("UPDATE pw_threads SET " . S::sqlSingle($pwSQL) . " WHERE tid=" . S::sqlEscape($tid));
+			pwQuery::update('pw_threads', 'tid = :tid' , array($tid), $pwSQL);
 		}
 		return $ret;
 	}
 
 	function _reCountColony($tids) {
-		$query = $this->db->query("SELECT COUNT(*) AS tnum, SUM(b.replies+1) AS pnum, a.cyid FROM pw_argument a LEFT JOIN pw_threads b ON a.tid=b.tid WHERE a.tid IN(" . pwImplode($tids) . ") AND b.fid>0 AND b.ifcheck='1' GROUP BY a.cyid");
+		$query = $this->db->query("SELECT COUNT(*) AS tnum, SUM(b.replies+1) AS pnum, a.cyid FROM pw_argument a LEFT JOIN pw_threads b ON a.tid=b.tid WHERE a.tid IN(" . S::sqlImplode($tids) . ") AND b.fid>0 AND b.ifcheck='1' GROUP BY a.cyid");
 		while ($rt = $this->db->fetch_array($query)) {
-			$this->db->update("UPDATE pw_colonys SET tnum=tnum-" . pwEscape($rt['tnum']) . ',pnum=pnum-' . pwEscape($rt['pnum']) . ' WHERE id=' . pwEscape($rt['cyid']));
+			$this->db->update("UPDATE pw_colonys SET tnum=tnum-" . S::sqlEscape($rt['tnum']) . ',pnum=pnum-' . S::sqlEscape($rt['pnum']) . ' WHERE id=' . S::sqlEscape($rt['cyid']));
 		}
 	}
 }

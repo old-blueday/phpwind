@@ -27,12 +27,12 @@ if ($db_bindurl && $pwServer['HTTP_REFERER'] && strpos(",$db_bindurl,",",$REFERE
 	$showmsg = getLangInfo('other','bindurl');
 	exit("document.write(\"$showmsg\");");
 }
-InitGP(array('action'));
+S::gp(array('action'));
 
 switch ($action) {
 	case 'forum':
-		include_once(D_P.'data/bbscache/forum_cache.php');
-		InitGP(array('pre','fidin'));
+		include_once pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
+		S::gp(array('pre','fidin'));
 		$pre       = is_numeric($pre) ? $prefix[$pre] : $prefix[0];
 		$fids      = explode('_',$fidin);
 		$foruminfo = '';
@@ -45,7 +45,7 @@ switch ($action) {
 		echo "document.write(\"$foruminfo\");";
 		break;
 	case 'notice':
-		InitGP(array('pre','num','length'));
+		S::gp(array('pre','num','length'));
 		$cachefile = D_P."data/bbscache/new_{$action}_".md5($action.(int)$pre.(int)$num.(int)$length);
 		if ($timestamp - $per >= pwFilemtime($cachefile) && procLock('new_js_notice')) {
 			$pre      = is_numeric($pre) ? $prefix[$pre] : $prefix[0];
@@ -60,7 +60,7 @@ switch ($action) {
 			}
 			$noticedb = str_replace('"','\"',$noticedb);
 			$noticedb = "document.write(\"$noticedb\");";
-			writeover($cachefile,$noticedb);
+			pwCache::setData($cachefile,$noticedb);
 			procUnLock('new_js_notice');
 			echo $noticedb;
 		} else {
@@ -68,15 +68,19 @@ switch ($action) {
 		}
 		break;
 	case 'info':
-		InitGP(array('pre','member','article','yesterday','online'));
+		S::gp(array('pre','member','article','yesterday','online'));
 		$cachefile = D_P."data/bbscache/new_{$action}_".md5($action.(int)$pre.(int)$member.(int)$article.(int)$yesterday.(int)$online);
 		if ($timestamp - $per >= pwFilemtime($cachefile) && procLock('new_js_info')) {
 			$pre = is_numeric($pre) ? $prefix[$pre] : $prefix[0];
-			$bbsinfo = $db->get_one("SELECT * FROM pw_bbsinfo WHERE id=1");
-			if ($bbsinfo['tdtcontrol'] < $tdtime) {
+			//* $bbsinfo = $db->get_one("SELECT * FROM pw_bbsinfo WHERE id=1");
+			$bbsInfoService = L::loadClass('BbsInfoService', 'forum'); 
+			$bbsinfo = $bbsInfoService->getBbsInfoById(1);
+			
+ 			if ($bbsinfo['tdtcontrol'] < $tdtime) {
 				if ($db_hostweb == 1) {
 					$rt=$db->get_one("SELECT SUM(fd.tpost) as tposts FROM pw_forums f LEFT JOIN pw_forumdata fd USING(fid) WHERE f.ifsub='0' AND f.cms!='1'");
-					$db->update("UPDATE pw_bbsinfo SET yposts=".pwEscape($rt['tposts']).",tdtcontrol=".pwEscape($tdtime)." WHERE id=1");
+					//* $db->update("UPDATE pw_bbsinfo SET yposts=".S::sqlEscape($rt['tposts']).",tdtcontrol=".S::sqlEscape($tdtime)." WHERE id=1");
+					pwQuery::update('pw_bbsinfo', 'id=:id', array(1), array('yposts'=>$rt['tposts'], 'tdtcontrol'=>$tdtime));
 					$db->update("UPDATE pw_forumdata SET tpost=0 WHERE tpost<>'0'");
 				}
 			}
@@ -97,7 +101,9 @@ switch ($action) {
 					$rs = $db->get_one("SELECT SUM(fd.tpost) as tposts FROM pw_forums f LEFT JOIN pw_forumdata fd USING(fid) WHERE f.ifsub='0' AND f.cms!='1'");
 				}
 				if (!$member) {
-					$bbsinfo = $db->get_one("SELECT * FROM pw_bbsinfo WHERE id=1");
+					//* $bbsinfo = $db->get_one("SELECT * FROM pw_bbsinfo WHERE id=1");
+					$bbsInfoService = L::loadClass('BbsInfoService', 'forum'); 
+					$bbsinfo = $bbsInfoService->getBbsInfoById(1);
 				}
 				$tposts = $rs['tposts'];
 				$info .= "$pre ".getLangInfo('other','js_today').":$tposts<br>"
@@ -106,7 +112,9 @@ switch ($action) {
 			}
 			if ($online) {
 				if (!$member && !$yesterday) {
-					$bbsinfo = $db->get_one("SELECT * FROM pw_bbsinfo WHERE id=1");
+					//* $bbsinfo = $db->get_one("SELECT * FROM pw_bbsinfo WHERE id=1");
+					$bbsInfoService = L::loadClass('BbsInfoService', 'forum'); 
+					$bbsinfo = $bbsInfoService->getBbsInfoById(1);					
 				}
 				@include_once(D_P.'data/bbscache/olcache.php');
 				$usertotal  = $guestinbbs+$userinbbs;
@@ -119,7 +127,7 @@ switch ($action) {
 			}
 			$info = str_replace('"','\"',$info);
 			$info = "document.write(\"$info\");";
-			writeover($cachefile,$info);
+			pwCache::setData($cachefile,$info);
 			procUnLock('new_js_info');
 			echo $info ;
 		} else {
@@ -127,7 +135,7 @@ switch ($action) {
 		}
 		break;
 	case 'member':
-		InitGP(array('num','pre','order'));
+		S::gp(array('num','pre','order'));
 		$cachefile = D_P."data/bbscache/new_{$action}_".md5($action.(int)$num.(int)$pre.(int)$order);
 		if ($timestamp - $per >= pwFilemtime($cachefile) && procLock('new_js_member')) {
 			$num	  = is_numeric($num) ? $num : 10;
@@ -162,7 +170,7 @@ switch ($action) {
 				$userdb = str_replace('"','\"',$userdb);
 				$newlist .= "document.write(\"$userdb<br>\");\n";
 			}
-			writeover($cachefile,$newlist);
+			pwCache::setData($cachefile,$newlist);
 			procUnLock('new_js_member');
 			echo $newlist;
 		} else {
@@ -170,13 +178,13 @@ switch ($action) {
 		}
 		break;
 	case 'article':
-		InitGP(array('num','length','fidin','fidout','postdate','author','fname','hits','replies', 'pre','digest','order'));
+		S::gp(array('num','length','fidin','fidout','postdate','author','fname','hits','replies', 'pre','digest','order'));
 		$cachefile = D_P."data/bbscache/new_{$action}_".md5($action.(int)$num.(int)$length.$fidin.$fidout.(int)$postdate.(int)$author.(int)$fname.(int)$hits.(int)$replies.(int)$pre.(int)$digest.(int)$order);
 		if ($timestamp - $per >= pwFilemtime($cachefile) && procLock('new_js_article')) {
 			$num	  = is_numeric($num) ? $num : 10;
 			$length	  = is_numeric($length) ? $length : 35;
 			$pre	  = is_numeric($pre) ? $prefix[$pre] : $prefix[0];
-			$fname && include_once(D_P.'data/bbscache/forum_cache.php');
+			$fname && include_once pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
 			$orderway = array(
 				'1'   => 'lastpost',
 				'2'   => 'postdate',
@@ -208,7 +216,7 @@ switch ($action) {
 					$article .= " <font color='$color'>(".get_date($threads['postdate'],"Y-m-d H:i").')</font>';
 				}
 				if ($author) {
-					$article .= " <a href='$db_bbsurl/u.php?uid=$threads[authorid]' target='_blank'><font color='$color'>($threads[author])</font></a>";
+					$article .= " <a href='$db_bbsurl/".USER_URL."$threads[authorid]' target='_blank'><font color='$color'>($threads[author])</font></a>";
 				}
 				if ($replies) {
 					$article .= " <font color='$color'>(".getLangInfo('other','js_replies')."：$threads[replies])</font></a>";
@@ -222,7 +230,7 @@ switch ($action) {
 				$article = str_replace('"','\"',$article);
 				$newlist .= "document.write(\"$article<br>\");\n";
 			}
-			writeover($cachefile,$newlist);
+			pwCache::setData($cachefile,$newlist);
 			procUnLock('new_js_article');
 			echo $newlist;
 		} else {

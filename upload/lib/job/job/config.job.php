@@ -131,8 +131,6 @@ class JOB_Config {
 			case 'doReply':
 				return $this->finish_doReply($factor);
 				break;	
-				
-				
 			case 'doSendGift':
 				return $this->finish_doSendGift($factor);
 				break;														
@@ -171,8 +169,7 @@ class JOB_Config {
 	
 	function finish_doReply($factor){
 		if($factor['type'] == 1){
-			$threads = L::loadClass('Threads', 'forum');
-			$thread = $threads->getThreads($factor['tid'],!($page>1));
+			$thread = $GLOBALS['db']->get_one("SELECT tid,subject FROM pw_threads WHERE tid=".S::sqlEscape($factor['tid']));
 			if(!$thread){
 				return '抱歉，指定的回复帖子不存在，请联系管理员';/*错误过滤*/
 			}
@@ -186,35 +183,8 @@ class JOB_Config {
 	function finish_doSendGift($factor){
 		return "申请任务后即可完成任务，得到奖励";
 	}
-	
 	function getLimitTime($factor){
 		return (isset($factor['limit']) && $factor['limit']>0 ) ? ",限制".$factor['limit']."小时内完成 " : "";
 	}
 	
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

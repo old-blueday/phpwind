@@ -111,7 +111,7 @@ print <<<EOT
       	
       	<br/>
       	
-      	作者：<a href="u.php?uid=$check[authorid]" target="_blank">$check[author]</a>&nbsp;
+      	作者：<a href="{$db_userurl}$check[authorid]" target="_blank">$check[author]</a>&nbsp;
       	
       	发表时间：$check[postdate]
       	
@@ -120,7 +120,7 @@ print <<<EOT
 
       	
       	</td>
-      <!--<td class="td2"><a href="u.php?uid=$check[authorid]" target="_blank">$check[author]</a></td>
+      <!--<td class="td2"><a href="{$db_userurl}$check[authorid]" target="_blank">$check[author]</a></td>
       <td class="td2"><a href="thread.php?fid=$check[fid]" target="_blank">$check[name]</a></td>
       <td class="td2">$check[postdate]</td>-->
     </tr>

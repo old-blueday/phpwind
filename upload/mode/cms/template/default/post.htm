@@ -1,6 +1,7 @@
 <!--<?php print <<<EOT
 -->
 <link rel="stylesheet" type="text/css" href="$pwModeImg/style.css" media="all" />
+<script language="JavaScript" src="js/date.js"></script>
 <style type="text/css" media="screen">
 	@import url(images/post/c_editor/editor.css);
 	@import url(images/post/c_editor/upload.css);
@@ -11,28 +12,35 @@
 <input type="hidden" name="action" value="$action" />
 <input type="hidden" name="id" value="$id" />
 <input type="hidden" name="page" value="$page" />
-<div class="cmsbreadCrumb mb10">
-	<a href="index.php?m=cms" class="b">首页</a> &raquo; 发布文章
-</div>
-<div class="cmsBoxC">
+<input type="hidden" name="ajax" value="1" />
+<input type="hidden" name="iscontinue" value="0" />
 <!--
 EOT;
+if (!$hasSource) {
+print <<<EOT
+-->
+<input type="hidden" name="cms_sourcetype" value="$articleModule->sourceType" />
+<input type="hidden" name="cms_sourceid" value="$articleModule->sourceId" />
+<!--
+EOT;
+}
 $postTitle = $action == 'edit' ? '编辑文章' : '发表文章';
 $_sourceTitle = $action == 'edit' ? '内容关联' : '内容获取';
 $_sourceTip = $action == 'edit' ? '(关联ID后，可以引导用户进入原帖子或日志)' : '(输入帖子ID或者日志ID后，可以自动获取内容)';
 print <<<EOT
 -->
-	<h2 class="mb10">$postTitle</h2>
-	<div>
-		<table class="cmsTable mb10" width="100%">
+<div id="breadCrumb">
+	<img align="absmiddle" src="images/wind/thread/home.gif" alt="forumlist" class="breadHome" /><em class="breadEm"></em>$pagePosition&gt; {$postTitle}
+</div>
+<div class="cmsBoxC">
+	<div class="cmsBoxC_bg">
+	<h2>
 <!--
 EOT;
 if ($hasSource) {print <<<EOT
 -->
-			<tr>
-				<th width="80" class="th">{$_sourceTitle}</th>
-				<td class="td">
-					<select id="sourcetype" name="cms_sourcetype" class="mr5 select_wa">
+			<span class="fr f12 fn">{$_sourceTitle}
+					<select id="sourcetype" name="cms_sourcetype" class="mr5">
 <!--
 EOT;
 foreach ($articleModule->getSourceTypeConfig() as $key=>$value) {
@@ -49,7 +57,7 @@ EOT;
 EOT;
 if (!$action) {print <<<EOT
 -->
-					<input name="cms_sourceid" class="input input_wa" type="text" onfocus="resetFormOnSubmit(true)" onkeydown="getSourceDataByEnter(event,this.value)" onBlur="getSourceData(this.value)" value="{$articleModule->sourceId}">
+<input name="cms_sourceid" class="input" size="5" type="text" onfocus="resetFormOnSubmit(true)"   onkeydown="getSourceDataByEnter(event,this.value)" onBlur="getSourceData(this.value)" value="{$articleModule->sourceId}">
 <!--
 EOT;
 }else{print <<<EOT
@@ -59,22 +67,18 @@ EOT;
 EOT;
 }print <<<EOT
 -->
-					<span>{$_sourceTip}</span>
-				</td>
-			</tr>
+					<span class="btn2"><span><button type="button">提取</button></span></span></span>
 <!--
 EOT;
 }print <<<EOT
 -->
+	$postTitle</h2>
+		<table class="cmsTable mb10" width="100%">
 			<tr>
-				<th class="th">标题</th>
-				<td class="td"><input name="cms_subject" value="{$articleModule->subject}" class="input input_wb" type="text"></td>
-			</tr>
-			<tr>
-				<th class="th">栏目</th>
-				<td class="td">
-					<select name="cid" class="mr5 select_wa">
-						<option value="0">栏目名称</option>
+				<td class="td" colspan="2">
+					<input name="cms_subject" value="{$articleModule->subject}" class="input input_wb mr10" type="text">
+					<select name="cid">
+						<option value="0">请选择栏目</option>
 <!--
 EOT;
 foreach ($columns as $key=>$value) {
@@ -106,8 +110,8 @@ if ($page && $pages && $page!='add' && $page!='all') {print <<<EOT
 EOT;
 }print <<<EOT
 -->
-					<a href="mode.php?m=cms&q=post&action=edit&id=$id&page=all" class="fr pagedel mr5">编辑全部</a>
-					<a href="mode.php?m=cms&q=post&action=edit&id=$id&page=add" class="fr pagedel mr5">添加分页</a>
+					<a href="{$cmsBaseUrl}q=post&action=edit&id=$id&page=all" class="fr pagedel mr5">编辑全部</a>
+					<a href="{$cmsBaseUrl}q=post&action=edit&id=$id&page=add" class="fr pagedel mr5">添加分页</a>
 					$pages
 				</td>
 			</tr>
@@ -116,10 +120,10 @@ EOT;
 }print <<<EOT
 -->
 		</table>
-		<div class="mb10" style="padding:0 20px;">
+		<div style="padding:0 20px;">
 		<!--编辑器开始-->
-			<div class="pr cc mb10">
-				<div class="wind_editor_con cc mb10">
+			<div class="pr cc">
+				<div class="wind_editor_con cc">
                        <div id="w_editor_but" class="w_editor_but">
                        <ul class="cc fl">
                            <li>
@@ -198,24 +202,42 @@ EOT;
 				    	<li class="none_css"><a style="padding-right: 14px;" class="wy_tips" href="javascript:;">&nbsp;可上传类型<i style="width: 250px;">{$filetypeinfo}</i></a></li>
 				   	</ul>
 				</div>
-				<div class="w_editor_up_con">
-<!--
-EOT;
-if($attach){print <<<EOT
--->
+				<div class="w_editor_up_con" style="border-bottom:1px solid #ccc;">
+<script type="text/javascript">
+(function(){
+    getObj('wy_windcode').onclick = function(){
+       var cls = this.checked ? "buttonDisabled" : "";
+       getObj('wy_inserttable').className =  getObj('wy_removeformat').className = cls;    	
+    }
+    getObj('wy_windcode').click();
+})();
+</script>
+
+<script>
+var allowmutinum = parseInt('$db_attachnum');
+var allow_ext = '$uploadfiletype';
+var allow_size = '$uploadfilesize';
+var attachnum = parseInt('$db_attachnum');
+</script>
+<script type="text/javascript" language="JavaScript" src="js/upload.js"></script>
 <table cellPadding="0" cellSpacing="0" style="display:none" width="100%">
 <tbody id="att_mode"><tr>
     <td><input class="input" type="file" name="attachment_" size="20" /></td><td><input class="input" type="text" name="atc_desc" size="20" /></td>
-    <td><select style="display:none;"><option value="0"></option><option value="1">加密</option><option value="2">出售</option></select></td>
+    <td><select name="att_special" onchange="newAtt.sel(this);" style="display:none;"><option value="0"></option><option value="1">加密</option><option value="2">出售</option></select></td>
     <td><select name="att_ctype" style="display:none;">{$alltype}</select></td>
     <td><input class="input" type="hidden" name="atc_needrvrc" value="0" size="1" /></td>
     <td></td></tr>
 </tbody>
 </table>
+<!--
+EOT;
+if($attach){print <<<EOT
+-->
+
 						<div class="cc">该帖包含附件<span class="gray">(不想保留的附件去掉√)</span> :
-							<table class="tr_p10">
+							<table class="tr_p10" style="table-layout:fixed">
 								<tr class="gray">
-									<td width="11"></td>
+									<td width="20"></td>
 									<td width="186">附件</td>
 									<td width="180">描述</td>
 									<td width="100"></td>
@@ -223,7 +245,6 @@ if($attach){print <<<EOT
 								<tbody id="ajaxtable"></tbody>
 							</table>
 						</div>
-<script type="text/javascript" language="JavaScript" src="js/upload.js"></script>
 <script language="JavaScript">
 var stylepath = '$stylepath';
 
@@ -234,9 +255,10 @@ oldAtt.init();
 EOT;
 }print <<<EOT
 -->
+
 					<div class="cc">
 <!--已包含的附件的列表-->
-						<table id="attach" class="tr_p10">
+						<table class="tr_p10" style="table-layout:fixed">
 							<thead>
 								<tr valign="top" class="gray" id="formUpload">
 									<td width="200">上传附件 (图片、文件等)</td>
@@ -244,31 +266,16 @@ EOT;
 									<td width="100">&nbsp;</td>
 								</tr>
 							</thead>
-							<tbody></tbody>
+							<tbody id="attach"></tbody>
 							<!--模板-->
-							<tfoot id="singleUploadMod">
-								<tr>
-									<td class="uploadfilename" width="200"><input type="file" name="attachment" onchange="uploader.insert(this)" /></td>
-									<td width="180"><input type="text" name="atc_desc" /></td>
-									<td width="100">&nbsp;</td>
-								</tr>
-							</tfoot>
 						</table>
 <!--待批量上传的文件-->
-						<table style="margin-bottom: 10px;" class="uploadFileInfo" id="uploadFileInfo">
-							<thead>
-								<tr>
-									<td width="60%">文件名</td>
-									<td width="15%">大小</td>
-									<td width="20%">上传进度</td>
-									<td width="5%">删</td>
-								</tr>
-							</thead>
-							<tbody id="qlist">
-							</tbody>
-						</table>
+
  						<div class="menu menu_img" id="viewimg"></div>
 					</div>
+<script language="JavaScript">
+newAtt.create();
+</script>
 					<div id="batUpload">
 						<div style="width: 100%;">
 							<div id="flashUploadPanel"></div>
@@ -280,72 +287,78 @@ EOT;
 			<div id="menu_face" class="menu" style="display:none;"></div>
 <!--编辑器结束-->
 		</div>
-		<table class="cmsTable mb10" width="100%">
-			<tr class="vt">
-				<th width="80" class="th">摘要</th>
-				<td class="td"><textarea name="cms_descrip" cols="" rows="" class="textareaA">{$articleModule->descrip}</textarea></td>
-			</tr>
-			<tr>
-				<th class="th">跳转链接</th>
-				<td class="td"><input name="cms_jumpurl" value="{$articleModule->jumpUrl}" type="text" class="input input_wb">
-				<span>(维护后，点击文章标题将跳转到这个链接)</span></td>
-			</tr>
-			<tr>
-				<th class="th">原作者</th>
-				<td class="td"><input name="cms_author" value="{$articleModule->author}" type="text" class="input input_wa"></td>
-			</tr>
-			<tr>
-				<th class="th">信息来源</th>
-				<td class="td"><input name="cms_frominfo" value="{$articleModule->fromInfo}" type="text" class="input input_wa"></td>
-			</tr>
-			<tr>
-				<th class="th">来源地址</th>
-				<td class="td"><input name="cms_fromurl" value="{$articleModule->fromUrl}" type="text" class="input input_wb"></td>
-			</tr>
-			<tr class="vt">
-				<th class="th">相关文章</th>
-				<td class="td">
-					<div>
-						<table>
-							<tbody id="mode" style="display:none"><tr>
-								<td><input name="cms_relate[subject][]" type="text" class="input input_wa"></td>
-								<td><input name="cms_relate[url][]" type="text" class="input input_wa"></td>
-								<td><a href="#" onclick="removecols(this);return false;" class="s2">删除</a></td>
-							</tr>
-							</tbody>
-
-							<tr>
-								<td width="170">标题</td>
-								<td width="170">链接</td>
-								<td><a href="javascript:;" onclick="addcols('mode','relate');return false;" class="s3 mr5">添加</a></td>
-							</tr>
-							<tbody id="relate">
+		<div style="padding:0 20px;overflow:hidden;">
+			<ul class="postInfo mb10" style="height:76px;">
+				<li><em>原作者</em><input name="cms_author" value="{$articleModule->author}" type="text" class="input input_wb"></li>	
+				<li><em>来源网址</em><input name="cms_fromurl" value="{$articleModule->fromUrl}" type="text" class="input input_wb"></li>
+				<li><em>信息来源</em><input name="cms_frominfo" value="{$articleModule->fromInfo}" type="text" class="input input_wb"></li>
 <!--
 EOT;
-foreach ($articleModule->relate as $value) {print <<<EOT
+if(checkEditPurview($windid)){
+print <<<EOT
 -->
-							<tr>
-								<td><input name="cms_relate[subject][]" value="$value[subject]" type="text" class="input input_wa"></td>
-								<td><input name="cms_relate[url][]" value="$value[url]" type="text" class="input input_wa"></td>
-								<td><a href="javascript:;" onclick="removecols(this);return false;">删除</a></td>
-							</tr>
+				<li class="cc"><a class="wy_tips" style="float:right;margin:2px 15px 0 0;" href="javascript:;"><img src="u/images/help_a.png" /><i style="margin-left:-230px;">添加后，点击文章标题将跳转到这个链接。</i></a><em title="">跳转链接</em><input name="cms_jumpurl" value="{$articleModule->jumpUrl}" type="text" class="input input_wb"></li>
 <!--
 EOT;
 }print <<<EOT
 -->
-							<tr>
-								<td><input name="cms_relate[subject][]" type="text" class="input input_wa"></td>
-								<td><input name="cms_relate[url][]" type="text" class="input input_wa"></td>
-								<td><a href="javascript:;" onclick="removecols(this);return false;">删除</a></td>
-							</tr>
-							</tbody>
-						</table>
-					</div>
-				</td>
-			</tr>
-		</table>
+<!--
+EOT;
+if(checkEditPurview($windid)){
+print <<<EOT
+-->
+				<li><em>发布时间</em><input class="input input_wb" value="$postdate" type="text" name="cms_timelimit" size="16" id="cms_timelimit" onclick="ShowCalendar(this.id,1);" /></li>
+<!--
+EOT;
+}print <<<EOT
+-->
+			</ul>
+			<div class="c"></div>
+			<div class="postInfo mb10">
+				<div class="f14 mb5 b">摘要</div>
+				<textarea name="cms_descrip" class="textareaA" style="width:99%;">{$articleModule->descrip}</textarea>
+			</div>
+			<div class="c"></div>
+			<div class="postInfo mb10">
+				<div class="f14 mb5 b">相关文章</div>
+				<table width="100%">
+					<tbody id="mode" style="display:none"><tr>
+						<td><input name="cms_relate[subject][]" type="text" class="input input_wb"></td>
+						<td><input name="cms_relate[url][]" type="text" class="input input_wb"></td>
+						<td><a href="#" onclick="removecols(this);return false;" class="s4">[删除]</a></td>
+					</tr>
+					</tbody>
+					<tr>
+						<td width="350">标题</td>
+						<td width="350">链接</td>
+						<td><a href="javascript:;" onclick="addcols('mode','relate');return false;" class="s2 mr5">[添加]</a></td>
+					</tr>
+					<tbody id="relate">
+<!--
+EOT;
+foreach ($articleModule->relate as $value) {print <<<EOT
+-->
+					<tr>
+						<td><input name="cms_relate[subject][]" value="$value[subject]" type="text" class="input input_wb"></td>
+						<td><input name="cms_relate[url][]" value="$value[url]" type="text" class="input input_wb"></td>
+						<td><a href="javascript:;" onclick="removecols(this);return false;" class="s4">[删除]</a></td>
+					</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+					<tr>
+						<td><input name="cms_relate[subject][]" type="text" class="input input_wb"></td>
+						<td><input name="cms_relate[url][]" type="text" class="input input_wb"></td>
+						<td><a href="javascript:;" onclick="removecols(this);return false;" class="s4">[删除]</a></td>
+					</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
 		<div class="tac mb20"><span class="mr20"><span class="btn"><span><button name="Submit" type="submit">发布</button></span></span></span><label><input name="addnewpage" type="checkbox" value="1">&nbsp;保存后继续编辑新分页内容</label></div>
-		<div class="c">&nbsp;</div>
+		<div class="c" >&nbsp;</div>
+		<div id="divload"></div>
 	</div>
 </div>
 </form>
@@ -457,27 +470,31 @@ function wordlength(target)
 var mutiupload = '0';
 var allowmutinum = parseInt('$db_attachnum');
 var allow_ext = '{$filetype}';
-
+/*
 uploader.maxLength = {$db_attachnum};
 uploader.insertable= true;
 window.onReady(function(){uploader.init();});
+*/
 document.FORM.Submit.disabled = false;
+var cnt = 0;
 function checkpost(obj) {
-	if (obj.cms_subject.value == "") {
-		showDialog("error","标题不能为空",2);
+	var subjectTemp = obj.cms_subject.value.replace( /^\s*/, '');
+	var atc_contentTemp = obj.atc_content.value.replace( /^\s*/, '');
+	if (obj.cms_subject.value == "" || subjectTemp == "") {
+		showDialog("error","文章<span class='warnFontStyle'>标题</span>不能为空",2);
 		obj.cms_subject.focus();
 		return false;
 	} else if (strlen(obj.cms_subject.value) > 80) {
-		showDialog("error","标题超过最大长度80 个字节",2);
+		showDialog("error","文章<span class='warnFontStyle'>标题</span>不能大于长度 <span class='warnFontStyle'>80 </span>个字节",2);
 		obj.cms_subject.focus();
 		return false;
 	}
-	if (strlen(obj.atc_content.value) < 0) {
-		showDialog("error","文章内容不能为空",2);
+	if (strlen(obj.atc_content.value) < 0 || atc_contentTemp == "") {
+		showDialog("error","文章<span class='warnFontStyle'>内容</span>不能为空",2);
 		editor.focusEditor();
 		return false;
 	} else if (strlen(obj.atc_content.value) > 50000) {
-		showDialog("error","文章内容大于 50000 个字节",2);
+		showDialog("error","文章<span class='warnFontStyle'>内容</span>不能大于 50000 个字节",2);
 		editor.focusEditor();
 		return false;
 	}
@@ -491,7 +508,40 @@ function checkpost(obj) {
 		}
 	}
 	obj.atc_content.value = str;
-	return true;
+	SubmitAjax(obj);
+	return false;
+}
+//ajax提交数据 
+function SubmitAjax(obj) {
+	document.FORM.Submit.disabled = true;
+	getObj('divload').innerHTML = showLoading();
+	cnt++;
+	ajax.send("{$cmsBaseUrl}q=post", obj, function(){
+		
+		if(undefined == ajax.request.responseText || ajax.request.responseText.length > 500){
+			showDialog({
+				type: 'error',
+				message: '<span class=\'s1\'>附件</span> 太大或网络原因，请求超时，请稍后再试!'
+			});
+			document.FORM.Submit.disabled = false;
+			getObj('divload').innerHTML = "";
+			return false;
+		}
+		var rText = ajax.request.responseText.split('\t');
+		if (rText[0] == 'success') {
+			window.onbeforeunload = function(){};
+			window.location =  rText[1];
+		} else {
+			showDialog('error', rText[0]);
+		}
+		cnt = 0;
+		document.FORM.Submit.disabled = false;
+		getObj('divload').innerHTML = "";
+		return false;
+	});
+}
+function showLoading(){
+	return "<div id=\"loading\" style=\"padding:20px;width:80%;text-align:center\"><img src=\""+imgpath+"/loading.gif\" align=\"absbottom\" alt=\"loading\" /> 正在加载数据...</div>";
 }
 function addcols(mode,ft){
 	var s = getObj(mode).firstChild.cloneNode(true);
@@ -508,9 +558,11 @@ function deletePage() {
 }
 
 function getSourceData(id) {
-	id = id - 0;
-	resetFormOnSubmit(false);
-	if (!id) return false;
+	id = parseInt(id) - 0;
+	if (!id || id == "NaN") {
+		resetFormOnSubmit(false);
+		return false;
+	}
 	var sourceType = getObj('sourcetype').value;
 	window.location.href = "{$basename}q=post&sourcetype="+sourceType+"&sourceid="+id+"&cid={$cid}";
 }
@@ -521,7 +573,7 @@ function resetFormOnSubmit(status){
 	if(status==true) {
 		aform.onsubmit = function(){return false};
 	}else{
-		aform.onsubmit = '';
+		aform.onsubmit = function() {return checkpost(document.FORM);};
 	}
 }
 

@@ -14,7 +14,7 @@ print <<<EOT
 EOT;
 $index = 0;
 foreach($smsInfo as $key => $value){
-$_linkUrl = "u.php?uid=" . $value['uid']; 
+$_linkUrl = "{$db_userurl}" . $value['uid']; 
 $index++;
 if($index == 1){
 print <<<EOT

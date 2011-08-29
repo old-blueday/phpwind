@@ -52,12 +52,12 @@ class PW_PostActivity extends PW_Activity {
 	 */
 	function initData() {
 		global $db_actname,$tid,$limitnums;
-		$act = GetGP('act','P');
+		$act = S::getGP('act','P');
 
 		$requiredTimes = array();
 		$participantFields = array();
 		$actdb = $data = array();
-		$query = $this->db->query("SELECT fieldname,name,type,rules,ifmust,ifable,ifdel FROM pw_activityfield WHERE actmid=".pwEscape($this->actmid)." ORDER BY ifdel ASC, vieworder ASC");
+		$query = $this->db->query("SELECT fieldname,name,type,rules,ifmust,ifable,ifdel FROM pw_activityfield WHERE actmid=".S::sqlEscape($this->actmid)." ORDER BY ifdel ASC, vieworder ASC");
 		while ($rt = $this->db->fetch_array($query)) {
 			$data[] = $rt;
 		}
@@ -69,12 +69,12 @@ class PW_PostActivity extends PW_Activity {
 			$defaultValueTableName = getActivityValueTableNameByActmid();
 			if ($this->getPeopleAlreadySignup() || $this->getPeopleAlreadyPaid()) { //如已有用户支付费用或报名
 				if ('paymethod' == $rt['fieldname'] && $this->getPeopleAlreadyPaid()) { //禁止修改支付方式
-					$act[$rt['fieldname']] = $this->db->get_value("SELECT paymethod FROM $defaultValueTableName WHERE tid=".pwEscape($tid));
+					$act[$rt['fieldname']] = $this->db->get_value("SELECT paymethod FROM $defaultValueTableName WHERE tid=".S::sqlEscape($tid));
 					$act[$rt['fieldname']] || $act[$rt['fieldname']] = 2;
 				} elseif ('fees' == $rt['fieldname']) { //禁止修改费用
 					continue;
 				} elseif ('signupstarttime' == $rt['fieldname']) { //禁止修改报名开始时间
-					$SignupStartTimestamp = $this->db->get_value("SELECT signupstarttime FROM $defaultValueTableName WHERE tid=".pwEscape($tid));
+					$SignupStartTimestamp = $this->db->get_value("SELECT signupstarttime FROM $defaultValueTableName WHERE tid=".S::sqlEscape($tid));
 					$act[$rt['fieldname']] = $this->getTimeFromTimestamp($SignupStartTimestamp, $rules['precision']);
 				}
 			}
@@ -167,6 +167,7 @@ class PW_PostActivity extends PW_Activity {
 		$this->data['default']['fid']		= $fid;
 		$this->data['default']['actmid']	= $this->actmid;
 		$this->data['user'] = array();
+		!S::isArray($this->data['act']['1']) &&  $this->data['act']['1'] = array();
 		foreach ($this->data['act']['1'] as $key => $value) {
 			if ($value) {
 				$this->data['user'][$key] = $value;
@@ -179,36 +180,36 @@ class PW_PostActivity extends PW_Activity {
 		$userDefinedValueTableName = getActivityValueTableNameByActmid($this->actmid, 1, 1);
 
 		$this->db->pw_update(
-			"SELECT tid FROM $defaultValueTableName WHERE tid=".pwEscape($tid),
-			"UPDATE $defaultValueTableName SET ".pwSqlSingle($this->data['default']) . "WHERE tid=".pwEscape($tid),
-			"INSERT INTO $defaultValueTableName SET " . pwSqlSingle($this->data['default'])
+			"SELECT tid FROM $defaultValueTableName WHERE tid=".S::sqlEscape($tid),
+			"UPDATE $defaultValueTableName SET ".S::sqlSingle($this->data['default']) . "WHERE tid=".S::sqlEscape($tid),
+			"INSERT INTO $defaultValueTableName SET " . S::sqlSingle($this->data['default'])
 		);
 
 		$this->db->pw_update(
-			"SELECT tid FROM $userDefinedValueTableName WHERE tid=".pwEscape($tid),
-			"UPDATE $userDefinedValueTableName SET ".pwSqlSingle($this->data['user']) . "WHERE tid=".pwEscape($tid),
-			"INSERT INTO $userDefinedValueTableName SET " . pwSqlSingle($this->data['user'])
+			"SELECT tid FROM $userDefinedValueTableName WHERE tid=".S::sqlEscape($tid),
+			"UPDATE $userDefinedValueTableName SET ".S::sqlSingle($this->data['user']) . "WHERE tid=".S::sqlEscape($tid),
+			"INSERT INTO $userDefinedValueTableName SET " . S::sqlSingle($this->data['user'])
 		);
 		
 		
-		$subject = $this->db->get_value('SELECT subject FROM pw_threads WHERE tid=' . pwEscape($tid));
+		$subject = $this->db->get_value('SELECT subject FROM pw_threads WHERE tid=' . S::sqlEscape($tid));
 		if ($subject){
-			$this->db->update('UPDATE pw_activitypaylog SET subject=' . pwEscape($subject) . ' WHERE tid=' . pwEscape($tid));	
+			$this->db->update('UPDATE pw_activitypaylog SET subject=' . S::sqlEscape($subject) . ' WHERE tid=' . S::sqlEscape($tid));	
 		}
 
 
 		/*选择支付宝+没有绑定支付宝+没有通过支付宝实名认证 or 创建AA活动号*/
 		if ($this->data['default']['paymethod'] == 1) {
-			$tradeinfo		= $this->db->get_one("SELECT tradeinfo FROM pw_memberinfo WHERE uid=".pwEscape($this->winduid));
+			$tradeinfo		= $this->db->get_one("SELECT tradeinfo FROM pw_memberinfo WHERE uid=".S::sqlEscape($this->winduid));
 			$tradeinfo		= unserialize($tradeinfo['tradeinfo']);
 			$alipay			= $tradeinfo['alipay'];
 			$isBinded		= $tradeinfo['isbinded'];
 			$isCertified	= $tradeinfo['iscertified'];
 
 			if (!$alipay || $isBinded != 'T' || $isCertified != 'T') {//选择支付宝+没有绑定支付宝+没有通过支付宝实名认证
-				$this->db->update("UPDATE $defaultValueTableName SET iscertified=0 WHERE tid=".pwEscape($tid));
+				$this->db->update("UPDATE $defaultValueTableName SET iscertified=0 WHERE tid=".S::sqlEscape($tid));
 			} elseif ($alipay && $isBinded == 'T' && $isCertified == 'T') {//绑定支付宝+通过支付宝实名认证
-				$this->db->update("UPDATE $defaultValueTableName SET iscertified=1 WHERE tid=".pwEscape($tid));
+				$this->db->update("UPDATE $defaultValueTableName SET iscertified=1 WHERE tid=".S::sqlEscape($tid));
 				require_once(R_P . 'lib/activity/alipay_push.php');
 				$alipayPush = new AlipayPush();
 				if ($action == 'new') {
@@ -248,15 +249,15 @@ class PW_PostActivity extends PW_Activity {
 			$tid = (int)$tid;
 			$status = (int)$status;
 			if (!$wherefrom) {
-				$this->db->query("SELECT tid FROM pw_activitypaylog WHERE tid=".PwEscape($tid) . " AND actuid=" . PwEscape($actuid));
+				$this->db->query("SELECT tid FROM pw_activitypaylog WHERE tid=".S::sqlEscape($tid) . " AND actuid=" . S::sqlEscape($actuid));
 				$affected_rows = $this->db->affected_rows();
 				if ($affected_rows || $actuid == 0) {
-					$this->db->update("UPDATE pw_activitypaylog SET status=".PwEscape($status) ." WHERE tid=".PwEscape($tid));
+					$this->db->update("UPDATE pw_activitypaylog SET status=".S::sqlEscape($status) ." WHERE tid=".S::sqlEscape($tid));
 				} else {
-					$read = $this->db->get_one("SELECT subject,author,authorid FROM pw_threads WHERE tid=".PwEscape($tid));
+					$read = $this->db->get_one("SELECT subject,author,authorid FROM pw_threads WHERE tid=".S::sqlEscape($tid));
 					$userdb = $this->db->get_one("SELECT uid,username,totalcash,issubstitute,isadditional,isrefund,fromusername,fromuid,ifpay 
 												FROM pw_activitymembers 
-												WHERE actuid=".PwEscape($actuid));
+												WHERE actuid=".S::sqlEscape($actuid));
 	
 					if ($userdb['issubstitute'] == 1) {//是否代付
 						//$uid = $userdb['fromuid'];
@@ -303,9 +304,9 @@ class PW_PostActivity extends PW_Activity {
 					);
 					
 					$this->db->pw_update(
-						"SELECT tid FROM pw_activitypaylog WHERE actuid=".pwEscape($actuid)." AND costtype=".pwEscape($costtype),
-						"UPDATE pw_activitypaylog SET ".pwSqlSingle($sqlArray) . "WHERE actuid=".pwEscape($actuid)." AND costtype=".pwEscape($costtype),
-						"INSERT INTO pw_activitypaylog SET " . pwSqlSingle($sqlArray)
+						"SELECT tid FROM pw_activitypaylog WHERE actuid=".S::sqlEscape($actuid)." AND costtype=".S::sqlEscape($costtype),
+						"UPDATE pw_activitypaylog SET ".S::sqlSingle($sqlArray) . "WHERE actuid=".S::sqlEscape($actuid)." AND costtype=".S::sqlEscape($costtype),
+						"INSERT INTO pw_activitypaylog SET " . S::sqlSingle($sqlArray)
 					);
 				}
 			}
@@ -380,9 +381,9 @@ class PW_PostActivity extends PW_Activity {
 		$sql = '';
 		$fielddb = array();
 		if (is_array($actmid)) {
-			$sql .= " WHERE actmid IN(".pwImplode($actmid).")";
+			$sql .= " WHERE actmid IN(".S::sqlImplode($actmid).")";
 		} elseif ($actmid > 0 && is_numeric($actmid)) {
-			$sql .= " WHERE actmid=".pwEscape($actmid);
+			$sql .= " WHERE actmid=".S::sqlEscape($actmid);
 		} else {
 			$sql .= '';
 		}
@@ -405,7 +406,7 @@ class PW_PostActivity extends PW_Activity {
 		$sqladd = '';
 		$defaultValueTableName = getActivityValueTableNameByActmid();
 
-		$fid && $sqladd .= " $defaultValueTableName.fid=".pwEscape($fid);
+		$fid && $sqladd .= " $defaultValueTableName.fid=".S::sqlEscape($fid);
 		$fielddb = PW_PostActivity::getFieldData($actmid,$type);
 
 		if ($actmid) {
@@ -424,39 +425,39 @@ class PW_PostActivity extends PW_Activity {
 					continue;
 				}
 				if (in_array($fielddb[$key]['type'],array('number','radio','select'))) {
-					$sqladd .= $sqladd ? " AND ".$tableName.$fielddb[$key]['fieldname']."=".pwEscape($value) : $tableName.$fielddb[$key]['fieldname']."=".pwEscape($value);
+					$sqladd .= $sqladd ? " AND ".$tableName.$fielddb[$key]['fieldname']."=".S::sqlEscape($value) : $tableName.$fielddb[$key]['fieldname']."=".S::sqlEscape($value);
 				} elseif ($fielddb[$key]['type'] == 'checkbox') {
 					$checkboxs = '';
 					foreach ($value as $cv) {
 						$checkboxs .= $checkboxs ? ','.$cv : $cv;
 					}
 					$value = '%,'.$checkboxs.',%';
-					$sqladd .= $sqladd ? " AND ".$tableName.$fielddb[$key]['fieldname'] ." LIKE(".pwEscape($value).")" : $tableName.$fielddb[$key]['fieldname'] ." LIKE(".pwEscape($value).")";
+					$sqladd .= $sqladd ? " AND ".$tableName.$fielddb[$key]['fieldname'] ." LIKE(".S::sqlEscape($value).")" : $tableName.$fielddb[$key]['fieldname'] ." LIKE(".S::sqlEscape($value).")";
 				} elseif ($fielddb[$key]['type'] == 'calendar') {
 					$value && $value = PwStrtoTime($value);
 					if (strpos($fielddb[$key]['fieldname'],'start') !== false){
-						$sqladd .= $sqladd ? " AND ".$tableName.$fielddb[$key]['fieldname'].">=".pwEscape($value): 
-					                     $tableName.$fielddb[$key]['fieldname'].">=".pwEscape($value);
+						$sqladd .= $sqladd ? " AND ".$tableName.$fielddb[$key]['fieldname'].">=".S::sqlEscape($value): 
+					                     $tableName.$fielddb[$key]['fieldname'].">=".S::sqlEscape($value);
 					}elseif (strpos($fielddb[$key]['fieldname'],'end') !== false){
 						$starttimeFlag = substr($fielddb[$key]['fieldname'],0,-7) . 'starttime';
 						if ($value <= PwStrtoTime($field[$starttimeFlag]) && $field[$starttimeFlag]){
 							Showmsg('calendar_error');
 						}
 						
-						$sqladd .= $sqladd ? " AND ".$tableName.$starttimeFlag . "<=".pwEscape($value): 
-					                     $tableName.$starttimeFlag . "<=".pwEscape($value);
+						$sqladd .= $sqladd ? " AND ".$tableName.$starttimeFlag . "<=".S::sqlEscape($value): 
+					                     $tableName.$starttimeFlag . "<=".S::sqlEscape($value);
 					}else{
-						$sqladd .= $sqladd ? " AND ".$tableName.$fielddb[$key]['fieldname'].">=".pwEscape($value['start']).
-										 " AND ".$tableName.$fielddb[$key]['fieldname']."<=".pwEscape($value['end']) : 
-					                     $tableName.$fielddb[$key]['fieldname'].">=".pwEscape($value['start']).
-										 " AND ".$tableName.$fielddb[$key]['fieldname']."<=".pwEscape($value['end']);
+						$sqladd .= $sqladd ? " AND ".$tableName.$fielddb[$key]['fieldname'].">=".S::sqlEscape($value['start']).
+										 " AND ".$tableName.$fielddb[$key]['fieldname']."<=".S::sqlEscape($value['end']) : 
+					                     $tableName.$fielddb[$key]['fieldname'].">=".S::sqlEscape($value['start']).
+										 " AND ".$tableName.$fielddb[$key]['fieldname']."<=".S::sqlEscape($value['end']);
 					}
 					
 				} elseif (in_array($fielddb[$key]['type'],array('text','url','email','textarea'))) {
 					$value = '%'.$value.'%';
-					$sqladd .= $sqladd ? " AND ".$tableName.$fielddb[$key]['fieldname'] ." LIKE(".pwEscape($value).")" : $tableName.$fielddb[$key]['fieldname'] ." LIKE(".pwEscape($value).")";
+					$sqladd .= $sqladd ? " AND ".$tableName.$fielddb[$key]['fieldname'] ." LIKE(".S::sqlEscape($value).")" : $tableName.$fielddb[$key]['fieldname'] ." LIKE(".S::sqlEscape($value).")";
 				} elseif ($fielddb[$key]['type'] == 'range' && $value['min'] && $value['max']) {
-					$sqladd .= $sqladd ? " AND ".$tableName.$fielddb[$key]['fieldname'].">=".pwEscape($value['min'])." AND ".$tableName.$fielddb[$key]['fieldname']."<=".pwEscape($value['max']) : $tableName.$fielddb[$key]['fieldname'].">=".pwEscape($value['min'])." AND ".$tableName.$fielddb[$key]['fieldname']."<=".pwEscape($value['max']);
+					$sqladd .= $sqladd ? " AND ".$tableName.$fielddb[$key]['fieldname'].">=".S::sqlEscape($value['min'])." AND ".$tableName.$fielddb[$key]['fieldname']."<=".S::sqlEscape($value['max']) : $tableName.$fielddb[$key]['fieldname'].">=".S::sqlEscape($value['min'])." AND ".$tableName.$fielddb[$key]['fieldname']."<=".S::sqlEscape($value['max']);
 				} else {
 					$sqladd .= '';
 				}
@@ -465,10 +466,10 @@ class PW_PostActivity extends PW_Activity {
 		if ($sqladd) {
 			!$page && $page = 1;
 			$start = ($page-1)*$db_perpage;
-			$limit = pwLimit($start,$db_perpage);
+			$limit = S::sqlLimit($start,$db_perpage);
 
 
-			$actmidSql = $actmid ? "AND actmid=" . pwEscape($actmid) : '';
+			$actmidSql = $actmid ? "AND actmid=" . S::sqlEscape($actmid) : '';
 
 			$sqladd .= $sqladd ? " AND $defaultValueTableName.ifrecycle=0 " . $actmidSql : " $defaultValueTableName.ifrecycle=0 " . $actmidSql;
 			$count = $this->db->get_value("SELECT COUNT(*) as count FROM $defaultValueTableName ".($userDefinedTableName ? "LEFT JOIN $userDefinedTableName USING (tid)" : "")." WHERE $sqladd");
@@ -516,7 +517,7 @@ class PW_PostActivity extends PW_Activity {
 	 * @access private
 	 */
 	function getOrderMemberUid($tid) {// to do act
-		$orderUid = $this->db->get_value("SELECT uid FROM pw_activitymembers WHERE tid=".pwEscape($tid)." AND uid=".pwEscape($this->winduid));
+		$orderUid = $this->db->get_value("SELECT uid FROM pw_activitymembers WHERE tid=".S::sqlEscape($tid)." AND uid=".S::sqlEscape($this->winduid));
 		return $orderUid;
 	}
 	/**
@@ -526,7 +527,7 @@ class PW_PostActivity extends PW_Activity {
 	 * @access private
 	 */
 	function peopleAlreadySignup($tid) {
-		$peopleAlreadySignup = $this->db->get_value("SELECT SUM(signupnum) as sum FROM pw_activitymembers WHERE tid=".pwEscape($tid)." AND fupid=0 AND ifpay IN('0','1','2','4')");
+		$peopleAlreadySignup = $this->db->get_value("SELECT SUM(signupnum) as sum FROM pw_activitymembers WHERE tid=".S::sqlEscape($tid)." AND fupid=0 AND ifpay IN('0','1','2','4')");
 		return $peopleAlreadySignup;
 	}
 
@@ -537,7 +538,7 @@ class PW_PostActivity extends PW_Activity {
 	 * @access private
 	 */
 	function peopleAlreadyPaid($tid) {
-		$peopleAlreadyPaid = $this->db->get_value("SELECT SUM(signupnum) as sum FROM pw_activitymembers WHERE tid=".pwEscape($tid)." AND ifpay IN('1','2','4')");
+		$peopleAlreadyPaid = $this->db->get_value("SELECT SUM(signupnum) as sum FROM pw_activitymembers WHERE tid=".S::sqlEscape($tid)." AND ifpay IN('1','2','4')");
 		return $peopleAlreadyPaid;
 	}	
 	
@@ -549,7 +550,7 @@ class PW_PostActivity extends PW_Activity {
 	 */
 	function getActmid($tid) {
 		$defaultValueTableName = getActivityValueTableNameByActmid();
-		$actmid = $this->db->get_value("SELECT actmid FROM $defaultValueTableName WHERE tid=".pwEscape($tid));
+		$actmid = $this->db->get_value("SELECT actmid FROM $defaultValueTableName WHERE tid=".S::sqlEscape($tid));
 		return (int)$actmid;
 	}
 
@@ -563,7 +564,7 @@ class PW_PostActivity extends PW_Activity {
 	function getActTidDb($actmid,$fid) {
 		$defaultValueTableName = getActivityValueTableNameByActmid();
 		$actTidDb = array();
-		$query = $this->db->query("SELECT tid FROM $defaultValueTableName WHERE actmid=".pwEscape($actmid)." AND fid=".pwEscape($fid) ." AND ifrecycle=0");
+		$query = $this->db->query("SELECT tid FROM $defaultValueTableName WHERE actmid=".S::sqlEscape($actmid)." AND fid=".S::sqlEscape($fid) ." AND ifrecycle=0");
 		while ($rt = $this->db->fetch_array($query)) {
 			$actTidDb[] = $rt['tid'];
 		}
@@ -578,7 +579,7 @@ class PW_PostActivity extends PW_Activity {
 	 */
 	function getAlipayPayedNum ($tid, $uid) {
 		$payednum = 0;
-		$query = $this->db->query("SELECT actuid,batch_detail_no FROM pw_activitymembers WHERE isrefund=0 AND tid=".pwEscape($tid)." AND uid=".pwEscape($uid));
+		$query = $this->db->query("SELECT actuid,batch_detail_no FROM pw_activitymembers WHERE isrefund=0 AND tid=".S::sqlEscape($tid)." AND uid=".S::sqlEscape($uid));
 		while ($rt = $this->db->fetch_array($query)) {
 			if ($rt['batch_detail_no']) {
 				$payednum++;
@@ -595,7 +596,7 @@ class PW_PostActivity extends PW_Activity {
 	 */
 	function activityDelSendmsg ($tiddb) {
 		require_once R_P.'require/msg.php';
-		$query = $this->db->query("SELECT subject,author FROM pw_threads WHERE tid IN(".pwImplode($tiddb).")");
+		$query = $this->db->query("SELECT subject,author FROM pw_threads WHERE tid IN(".S::sqlImplode($tiddb).")");
 		while ($rt = $this->db->fetch_array($query)) {
 			$msgdb[] = array(
 				'toUser'	=> $rt['author'],
@@ -606,7 +607,7 @@ class PW_PostActivity extends PW_Activity {
 				)
 			);
 		}
-		$query = $this->db->query("SELECT DISTINCT uid,username,subject FROM pw_activitymembers am LEFT JOIN pw_threads t ON am.tid=t.tid WHERE am.tid IN(".pwImplode($tiddb).")");
+		$query = $this->db->query("SELECT DISTINCT uid,username,subject FROM pw_activitymembers am LEFT JOIN pw_threads t ON am.tid=t.tid WHERE am.tid IN(".S::sqlImplode($tiddb).")");
 		while ($rt = $this->db->fetch_array($query)) {
 			$signupermsgdb[] = array(
 				'toUser'	=> $rt['username'],
@@ -650,10 +651,10 @@ class PW_PostActivity extends PW_Activity {
 	function pushActivityToAppCenter ($tid, $actmid) {
 		global $db_siteid,$db_siteownerid,$db_sitehash,$db_bbsurl,$db_bbsname,$db_charset;
 		$defaultValueTableName = getActivityValueTableNameByActmid();
-		$this->db->update("UPDATE $defaultValueTableName SET pushtime=".pwEscape($this->timestamp)." WHERE tid=".pwEscape($tid));
+		$this->db->update("UPDATE $defaultValueTableName SET pushtime=".S::sqlEscape($this->timestamp)." WHERE tid=".S::sqlEscape($tid));
 
 		$i = $payMemberNums = $orderMemberNums = $payMemberCosts = $orderMemberCosts = $payRefundCouts = 0;
-		$query = $this->db->query("SELECT am.tid,am.fupid,am.isrefund,am.ifpay,am.totalcash,am.signupnum,t.subject,t.authorid,t.author,t.postdate FROM pw_activitymembers am LEFT JOIN pw_threads t ON am.tid=t.tid WHERE am.tid=".pwEscape($tid));
+		$query = $this->db->query("SELECT am.tid,am.fupid,am.isrefund,am.ifpay,am.totalcash,am.signupnum,t.subject,t.authorid,t.author,t.postdate FROM pw_activitymembers am LEFT JOIN pw_threads t ON am.tid=t.tid WHERE am.tid=".S::sqlEscape($tid));
 		while ($rt = $this->db->fetch_array($query)) {
 			if ($rt['ifpay'] != 3 && $rt['fupid'] == 0) {//费用关闭的不算
 				$orderMemberNums += $rt['signupnum'];//已报名人数

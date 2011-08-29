@@ -23,7 +23,7 @@ if ($_G['postlimit'] && $winddb['todaypost'] >= $_G['postlimit']) {
 if ($_G['postpertime'] && $timestamp-$winddb['lastpost']<=$_G['postpertime']) {
 	wap_msg('post_limit');
 }
-InitGP(array('action'));
+S::gp(array('action'));
 !$action && $action = 'new';
 
 if ($action == 'new') {
@@ -55,14 +55,15 @@ if ($action == 'new') {
 		if (!is_numeric($fid)) {
 			wap_msg("post_nofid!");
 		}
-		InitGP(array('subject','content'),'P',0);
+		S::gp(array('subject','content'),'P',0);
 		wap_check($fid,'new');
 		$subject = wap_cv($subject);
 		$content = wap_cv($content);
 
-		$ipfrom  = Char_cv(cvipfrom($onlineip));
+		$ipfrom  = S::escapeChar(cvipfrom($onlineip));
+		/*
 		$db->update("INSERT INTO pw_threads"
-			. " SET ".pwSqlSingle(array(
+			. " SET ".S::sqlSingle(array(
 				'fid'		=> $fid,
 				'ifcheck'	=> 1,
 				'subject'	=> $subject,
@@ -71,14 +72,27 @@ if ($action == 'new') {
 				'postdate'	=> $timestamp,
 				'lastpost'	=> $timestamp,
 				'lastposter'=> $windid
-		)));
+		)));*/
+		pwQuery::insert('pw_threads', array(
+				'fid'		=> $fid,
+				'ifcheck'	=> 1,
+				'subject'	=> $subject,
+				'author'	=> $windid,
+				'authorid'	=> $winduid,
+				'postdate'	=> $timestamp,
+				'lastpost'	=> $timestamp,
+				'lastposter'=> $windid
+		));
+		
 		$tid = $db->insert_id();
 		# memcache refresh
-		$threadlist = L::loadClass("threadlist", 'forum');
-		$threadlist->updateThreadIdsByForumId($fid,$tid);
+		// $threadlist = L::loadClass("threadlist", 'forum');
+		// $threadlist->updateThreadIdsByForumId($fid,$tid);
+		//* Perf::gatherInfo('changeThreadWithForumIds', array('fid'=>$fid));
+		
 		$pw_tmsgs = GetTtable($tid);
 		$db->update("INSERT INTO $pw_tmsgs"
-			. " SET ".pwSqlSingle(array(
+			. " SET ".S::sqlSingle(array(
 				'tid'		=> $tid,
 				'content'	=> $content,
 				'userip'	=> $onlineip,
@@ -86,10 +100,10 @@ if ($action == 'new') {
 		)));
 
 		$lastpost = $subject."\t".addslashes($windid)."\t".$timestamp."\t"."read.php?tid=$tid&page=e#a";
-		$db->update("UPDATE pw_forumdata SET lastpost=".pwEscape($lastpost).",tpost=tpost+1,article=article+1,topic=topic+1 WHERE fid=".pwEscape($fid));
+		$db->update("UPDATE pw_forumdata SET lastpost=".S::sqlEscape($lastpost).",tpost=tpost+1,article=article+1,topic=topic+1 WHERE fid=".S::sqlEscape($fid));
 
 		require_once(R_P.'require/credit.php');
-		$fm = $db->get_one("SELECT creditset FROM pw_forumsextra WHERE fid=".pwEscape($fid));
+		$fm = $db->get_one("SELECT creditset FROM pw_forumsextra WHERE fid=".S::sqlEscape($fid));
 		$creditset = $credit->creditset($fm['creditset'],$db_creditset);
 		$credit->addLog('topic_Post',$creditset['Post'],array(
 			'uid'		=> $winduid,
@@ -116,7 +130,7 @@ if ($action == 'new') {
 	if (!$tid) {
 		wap_msg('undefined_action');
 	}
-	$tp = $db->get_one("SELECT fid,subject,locked,ifcheck,ptable,tpcstatus FROM pw_threads WHERE tid=".pwEscape($tid));
+	$tp = $db->get_one("SELECT fid,subject,locked,ifcheck,ptable,tpcstatus FROM pw_threads WHERE tid=".S::sqlEscape($tid));
 	!$tp && wap_msg('illegal_tid');
 	$fid = $tp['fid'];
 	$openIndex = getstatus($tp['tpcstatus'], 2); #高楼索引支持
@@ -133,22 +147,24 @@ if ($action == 'new') {
 		if ($tp['locked']>0) {
 			wap_msg("reply_lockatc");
 		}
-		InitGP(array('subject','content'),'P',0);
+		S::gp(array('subject','content'),'P',0);
 		wap_check($fid,'reply');
 
 		$subject = wap_cv($subject);
 		$content = wap_cv($content);
-		$ipfrom  = Char_cv(cvipfrom($onlineip));
+		$ipfrom  = S::escapeChar(cvipfrom($onlineip));
 
 		$pw_posts = GetPtable($tp['ptable']);
 		if ($db_plist && count($db_plist)>1) {
-			$db->update("INSERT INTO pw_pidtmp(pid) values('')");
-			$pid = $db->insert_id();
+			//* $db->update("INSERT INTO pw_pidtmp(pid) values('')");
+			//* $pid = $db->insert_id();
+			$uniqueService = L::loadClass ('unique', 'utility');
+			$pid = $uniqueService->getUnique('post');
 		} else {
 			$pid = '';
 		}
-		$db->update("INSERT INTO $pw_posts"
-			. " SET ".pwSqlSingle(array(
+		/*$db->update("INSERT INTO $pw_posts"
+			. " SET ".S::sqlSingle(array(
 				'pid'		=> $pid,
 				'tid'		=> $tid,
 				'fid'		=> $fid,
@@ -160,31 +176,47 @@ if ($action == 'new') {
 				'userip'	=> $onlineip,
 				'ipfrom'	=> $ipfrom,
 				'content'	=> $content
-		)));
+		)));*/
+		pwQuery::insert($pw_posts, array(
+				'pid'		=> $pid,
+				'tid'		=> $tid,
+				'fid'		=> $fid,
+				'ifcheck'	=> 1,
+				'subject'	=> $subject,
+				'author'	=> $windid,
+				'authorid'	=> $winduid,
+				'postdate'	=> $timestamp,
+				'userip'	=> $onlineip,
+				'ipfrom'	=> $ipfrom,
+				'content'	=> $content
+		));
 		!$pid && $pid = $db->insert_id();
+		/*
 		$db->update("UPDATE pw_threads"
-			. " SET ".pwSqlSingle(array(
+			. " SET ".S::sqlSingle(array(
 					'lastpost'	=> $timestamp,
 					'lastposter'=> $windid,
 				))
 			. ",replies=replies+1,hits=hits+1"
-			. " WHERE tid=".pwEscape($tid)
-		);
+			. " WHERE tid=".S::sqlEscape($tid)
+		);*/
+		$db->update(pwQuery::buildClause('UPDATE :pw_table SET lastpost=:lastpost, lastposter=:lastposter,replies=replies+1,hits=hits+1 WHERE tid=:tid', array('pw_threads', $timestamp, $windid, $tid)));
 		
 		#增加高楼索引
 		if ($openIndex && $pid) {
-			$db->update("INSERT INTO pw_postsfloor SET pid=". pwEscape($pid) .", tid=". pwEscape($tid));
+			$db->update("INSERT INTO pw_postsfloor SET pid=". S::sqlEscape($pid) .", tid=". S::sqlEscape($tid));
 		}
 		
 		# memcache refresh
-		$threadList = L::loadClass("threadlist", 'forum');
-		$threadList->updateThreadIdsByForumId($fid,$tid);
+		// $threadList = L::loadClass("threadlist", 'forum');
+		// $threadList->updateThreadIdsByForumId($fid,$tid);
+		Perf::gatherInfo('changeThreadWithForumIds', array('fid'=>$fid));			
 
 		$lastpost = $subject."\t".addslashes($windid)."\t".$timestamp."\t"."read.php?tid=$tid&page=e#a";
-		$db->update("UPDATE pw_forumdata SET lastpost=".pwEscape($lastpost).",tpost=tpost+1,article=article+1,topic=topic+1 WHERE fid=".pwEscape($fid));
+		$db->update("UPDATE pw_forumdata SET lastpost=".S::sqlEscape($lastpost).",tpost=tpost+1,article=article+1,topic=topic+1 WHERE fid=".S::sqlEscape($fid));
 
 		require_once(R_P.'require/credit.php');
-		$fm = $db->get_one("SELECT creditset FROM pw_forumsextra WHERE fid=".pwEscape($fid));
+		$fm = $db->get_one("SELECT creditset FROM pw_forumsextra WHERE fid=".S::sqlEscape($fid));
 		$creditset = $credit->creditset($fm['creditset'],$db_creditset);
 		$credit->addLog('topic_Reply',$creditset['Reply'],array(
 			'uid'		=> $winduid,

@@ -1,12 +1,15 @@
 <?php
 !function_exists('readover') && exit('Forbidden');
 
-InitGP(array('action','viewvoter'));
+S::gp(array('action','viewvoter'));
+if(empty($viewvoter) && ($admincheck || $groupid == 3 || $_G['viewvote'])){
+	$viewvoter = 'yes';
+}
 if ($viewvoter == 'yes' && !$admincheck && $groupid != 3 && !$_G['viewvote']) {
 	Showmsg('readvote_noright');
 }
-$expression = $winduid ? 'v.uid='.pwEscape($winduid) : 'v.username='.pwEscape($onlineip);
-$readvote = $db->get_one("SELECT p.*,v.tid AS havevote FROM pw_polls p LEFT JOIN pw_voter v ON p.tid=v.tid AND {$expression} WHERE p.tid=" . pwEscape($tid) . " GROUP BY p.tid");
+$expression = $winduid ? 'v.uid='.S::sqlEscape($winduid) : 'v.username='.S::sqlEscape($onlineip);
+$readvote = $db->get_one("SELECT p.*,v.tid AS havevote FROM pw_polls p LEFT JOIN pw_voter v ON p.tid=v.tid AND {$expression} WHERE p.tid=" . S::sqlEscape($tid) . " GROUP BY p.tid");
 
 if ($action == 'modify' && !$readvote['modifiable']) {
 	Showmsg('vote_not_modify');
@@ -34,7 +37,7 @@ function vote($readvote) {
 		$votesum += $option[1];
 	}
 	if ($viewvoter == 'yes') {
-		$query = $db->query("SELECT username,vote FROM pw_voter WHERE tid=" . pwEscape($tid) . " LIMIT 500");
+		$query = $db->query("SELECT username,vote FROM pw_voter WHERE tid=" . S::sqlEscape($tid) . " LIMIT 500");
 		while ($rt = $db->fetch_array($query)) {
 			$voter[$rt['vote']] .= "<span class=bold>$rt[username]</span>" . ' ';
 		}

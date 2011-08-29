@@ -29,7 +29,8 @@ $lang = array(
 
 	'error_777'			=> '<b>{#filename}</b> 文件或文件夹777属性检测不通过',
 	'error_777s'		=> '<b>{#filenames}</b> 等文件或文件夹777属性检测不通过',
-	'error_adminemail'	=> '创始人Email不能为空',
+	'error_admin'		=> '将admin.php改成{#db_adminfile}后才能继续升级',
+	'error_adminemail'	=> '创始人电子邮箱不能为空',
 	'error_adminname'	=> '创始人用户名不能为空',
 	'error_adminpwd'	=> '创始人密码不能为空',
 	'error_ckpwd'		=> '两次输入密码不同',
@@ -95,6 +96,13 @@ $lang = array(
 			<span class="black" style="width:250px; float:left">html/portal/bbsradio/config.htm</span><span class="black" style="padding-right:2em">html/portal/bbsradio/index.html</span><br/>
 			<span class="black" style="width:250px; float:left">html/portal/oindex</span><span class="black" style="padding-right:2em">html/portal/oindex/main.htm</span><br/>
 			<span class="black" style="width:250px; float:left">html/portal/oindex/config.htm</span><span class="black" style="padding-right:2em">html/portal/oindex/index.html</span><br/>
+			<span class="black" style="width:250px; float:left">html/portal/groupgatherleft/main.htm</span><span class="black" style="padding-right:2em">html/portal/groupgatherleft/config.htm</span><br/>
+			<span class="black" style="width:250px; float:left">html/portal/groupgatherleft/index.html</span><span class="black" style="padding-right:2em">html/portal/groupgatherright/main.htm</span><br/>
+			<span class="black" style="width:250px; float:left">html/portal/groupgatherright/config.htm</span><span class="black" style="padding-right:2em">html/portal/groupgatherright/index.html</span><br/>
+			<span class="black" style="width:250px; float:left">html/portal/userlist/main.htm</span><span class="black" style="padding-right:2em">html/portal/userlist/config.htm</span><br/>
+			<span class="black" style="width:250px; float:left">html/portal/userlist/index.html</span><span class="black" style="padding-right:2em">html/portal/usermix/main.htm</span><br/>
+			<span class="black" style="width:250px; float:left">html/portal/usermix/config.htm</span><span class="black" style="padding-right:2em">html/portal/usermix/index.html</span><br/>
+			<span class="black" style="width:250px; float:left">html/stopic</span><span class="black" style="padding-right:2em"></span><br/>
 		</div>
 		<p>第三步：</p><p>运行 <small>http://yourwebsite/upload/{#basename}</small> 安装程序，填入安装相关信息与资料，完成安装！</p>
 		<p>● Windows 服务器下安装方法</p><p>第一步：</p><p>使用ftp工具，将该软件包里的upload目录下的所有文件上传到您的空间，假设上传后目录为 upload。</p>
@@ -111,7 +119,7 @@ $lang = array(
 		<p>第二步：如果upload目录下存在 images、attachment、data 目录,请将改成你论坛相应的目录名。注: 可以到论坛后台的 “核心-安全与优化-动态目录” 里查看</p>
 		<p>第三步：使用ftp工具，将该软件包里的upload目录下的所有文件上传到您的空间，假设上传后目录为 upload。</p>
 		<p>第四步：运行 <small>http://yourwebsite/upload/{#basename}</small> 补丁更新程序，按提示进行操作, 直到更新完成！</p>',
-	'log_resources'		=> '<p>感谢您选择使用phpwind 社区系统，如果您对我们的产品及服务有任何疑问或建议，随时欢迎您将信息发表到官方论坛（http://www.phpwind.net）或发送至我们的邮箱<font color="#f79646"><b>client@phpwind.net</b></font>。</p><br /><p>如果您需要构建与论坛相关联的内容发布管理系统，我们诚意向您推荐我们的合作伙伴——PHP168。<br />　　<a href="http://bbs.php168.com/read-bbs-tid-205437.html" target="_blank" style="color:#00727c">合作主页</a>&nbsp; &nbsp; &nbsp; &nbsp; <a href="http://www.phpwind.net/thread-htm-fid-91.html" target="_blank" style="color:#00727c">讨论区</a></p><p>如果您需要构建与论坛相关联的网店管理系统，我们诚意推荐我们的合作伙伴——ShopEX。<br />　　<a href="http://www.phpwind.com/shopex" target="_blank" style="color:#00727c">合作主页</a>&nbsp; &nbsp; &nbsp; &nbsp; <a href="http://www.phpwind.net/thread-htm-fid-93.html" target="_blank" style="color:#00727c">讨论区</a></p><p>如果您需要构建与论坛相关联的博客系统，我们诚意向您推荐我们的博客产品——LxBlog。<br />　　<a href="http://www.phpwind.com/introduce.php?action=introduce&job=bloginfo" target="_blank" style="color:#00727c">官方主页</a>&nbsp; &nbsp; &nbsp; &nbsp; <a href="http://www.phpwind.net/thread-htm-fid-21.html" target="_blank" style="color:#00727c">讨论区</a>&nbsp; &nbsp; &nbsp; &nbsp; <a href="http://www.phpwind.net/read-htm-tid-620820.html" target="_blank" style="color:#00727c">论坛与博客整合图文教程</a></p><p>如果您需要个性化您的论坛，欢迎您访问phpwind官方论坛获取更多资源。phpwind将联合数十家第三方团队与业务伙伴，与站长一起播种未来！</p><p><a href="http://www.phpwind.net/hack.php?H_name=hackcenter&action=style" target="_blank" style="color:#00727c">获取更多免费论坛风格</a>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <a href="http://www.phpwind.net/hack.php?H_name=hackcenter&action=hack" target="_blank" style="color:#00727c">获取更多免费论坛插件</a></p>',
+	'log_resources'		=> '<p>感谢您选择使用phpwind 社区系统，如果您对我们的产品及服务有任何疑问或建议，随时欢迎您将信息发表到官方论坛（http://www.phpwind.net）或发送至我们的电子邮箱<font color="#f79646"><b>client@phpwind.net</b></font>。</p><br /><p>如果您需要构建与论坛相关联的内容发布管理系统，我们诚意向您推荐我们的合作伙伴——PHP168。<br />　　<a href="http://bbs.php168.com/read-bbs-tid-205437.html" target="_blank" style="color:#00727c">合作主页</a>&nbsp; &nbsp; &nbsp; &nbsp; <a href="http://www.phpwind.net/thread-htm-fid-91.html" target="_blank" style="color:#00727c">讨论区</a></p><p>如果您需要构建与论坛相关联的网店管理系统，我们诚意推荐我们的合作伙伴——ShopEX。<br />　　<a href="http://www.phpwind.com/shopex" target="_blank" style="color:#00727c">合作主页</a>&nbsp; &nbsp; &nbsp; &nbsp; <a href="http://www.phpwind.net/thread-htm-fid-93.html" target="_blank" style="color:#00727c">讨论区</a></p><p>如果您需要构建与论坛相关联的博客系统，我们诚意向您推荐我们的博客产品——LxBlog。<br />　　<a href="http://www.phpwind.com/introduce.php?action=introduce&job=bloginfo" target="_blank" style="color:#00727c">官方主页</a>&nbsp; &nbsp; &nbsp; &nbsp; <a href="http://www.phpwind.net/thread-htm-fid-21.html" target="_blank" style="color:#00727c">讨论区</a>&nbsp; &nbsp; &nbsp; &nbsp; <a href="http://www.phpwind.net/read-htm-tid-620820.html" target="_blank" style="color:#00727c">论坛与博客整合图文教程</a></p><p>如果您需要个性化您的论坛，欢迎您访问phpwind官方论坛获取更多资源。phpwind将联合数十家第三方团队与业务伙伴，与站长一起播种未来！</p><p><a href="http://www.phpwind.net/hack.php?H_name=hackcenter&action=style" target="_blank" style="color:#00727c">获取更多免费论坛风格</a>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <a href="http://www.phpwind.net/hack.php?H_name=hackcenter&action=hack" target="_blank" style="color:#00727c">获取更多免费论坛插件</a></p>',
 	'log_union'			=> '<p>安装完成后，您的无图版帖子顶楼内容上方将出现阿里妈妈统一投放的广告，所有收益都归站长所有，并由阿里妈妈统一结算。收益详情请见 <a href="http://union.phpwind.com/news.php?action=read&nid=46" target="_blank" style="color:#00727c">http://union.phpwind.com/news.php?action=read&nid=46</a>。</p><p>现在，在版本安装完成之前，您还可开启完整版以下3个阿里妈妈广告位：</p><p><input type="checkbox" name="banners" value="1" CHECKED> 全站顶部 468*60 <input type="checkbox" name="atcbottoms" value="1"> 帖子内容下方 468*60 <input type="checkbox" name="footers" value="1"> 全站底部 760*90 </p><p>如果您尚未注册阿里妈妈帐号，请不要担心。无论是无图版还是完整版的广告，从第一个PV和点击开始，数据将会保存在为您预留的帐户中，直到您注册登录营销平台（<a href="http://union.phpwind.com" target="_blank" style="color:#00727c">http://union.phpwind.com</a>）并绑定阿里妈妈帐号后（可在营销平台一次性完成阿里妈妈帐号的注册与绑定），您可以随时登录阿里妈妈平台（<a href="http://www.alimama.com" target="_blank" style="color:#00727c">http://www.alimama.com</a>）查看您无图版广告数据并提领收益。<a href="http://www.phpwind.net/read-htm-tid-633350.html" target="_blank" style="color:#00727c">查看图文说明</a></p><p>如果您已拥有阿里妈妈帐号，只需登录营销平台进行激活操作即可。</p><p>7月15日-8月15日,“<a href="http://www.phpwind.net/read.php?tid=633351" target="_blank" style="color:#00727c">有流量就有现金，分级奖励</a>”活动正式开始，敬请关注。</p>',
 	'log_unionmsgt'		=> '欢迎您使用并测试phpwind V7.5 sp3 社区系统！',
 	'log_unionmsgc'		=> '尊敬的站长：\n\n　　欢迎您使用并测试phpwind V7.5 sp3社区系统。官方v6.3 RC演示于3月15日开放至今，版本经过多次调试与完善，已趋于稳定。在RC版公开测试期间，如发现BUG，或对这个版本有任何建议、意见，欢迎您进入此帖进行回复[url]http://www.phpwind.net/read.php?tid=603810[/url]。\n\n　　另外，从4月30日起，通过phpwind社区营销平台指导，站长将可以获得阿里妈妈提供的在线广告服务，由营销后台登记注册至阿里妈妈（[url]www.alimama.com[/url]）平台的站长，将会获得如下[b]独家优势[/b]：\n　　1.高优先级别享有阿里妈妈广告交易平台的众多功能，包括优先三包、优先享有更多广告推广模式等；\n　　2.phpwind社区营销平台累计收入超过100元的站长，将会直接享有网站最低收入保障服务，让您在稳定的收入下，获得更多价值；\n　　3.在未来，phpwind站长将会获得阿里妈妈广告交易平台的phpwind论坛插件，实现更多快捷、并具有独立优势的在线广告服务。\n　　同时，phpwind社区营销平台Google Adsense、下划线、主题帖营销第一期，将暂时停止投放。\n\n　　[b]详情请访问：[url]http://www.phpwind.net/read-htm-tid-602463.html[/url]。[/b]\n\nphpwind官方\n2008-4-29',
@@ -199,15 +207,14 @@ $lang = array(
 	'step_pre'			=> '上一步',
 	'step_next'			=> '下一步',
 	'left_info'			=> '<dt style="margin:0;">更新记录</dt>
-        <dd style="padding-top:5px;"><a href="http://www.phpwind.net/read-htm-tid-1047487.html" target="_blank">phpwind 8 功能优化列表</a></dd>
-        <dd><a href="http://www.phpwind.net/read-htm-tid-827868.html" target="_blank">如您所愿：灵活构建内容组织形式和业务体系</a></dd>
-        <dd><a href="http://www.phpwind.net/read-htm-tid-826139.html" target="_blank">挖掘用户兴趣点：让浏览者点击阅读更多</a></dd>
+        <dd style="padding-top:5px;"><a href="http://www.phpwind.net/read-htm-tid-1163917.html" target="_blank">phpwind8.3 新增功能优化列表</a></dd>
+        <dd><a href="http://www.phpwind.net/read-htm-tid-1165422.html" target="_blank">phpwind8.3 bug修复列表</a></dd>
         <dt>帮助文档</dt>
-        <dd style="padding-top:5px;"><a href="http://www.phpwind.net/read-htm-tid-1050227.html" target="_blank">安装教程</a></dd>
-		<dd><a href="http://www.phpwind.net/read-htm-tid-1051081.html" target="_blank">升级教程</a></dd>
-		<dd><a href="http://www.phpwind.net/read-htm-tid-1052364.html" target="_blank">插件安装教程</a></dd>
-        <dd><a href="http://www.phpwind.net/read-htm-tid-1052366.html" target="_blank">风格安装教程</a></dd>
-        <dd><a href="http://www.phpwind.net/read-htm-tid-1052354.html" target="_blank">数据库结构手册</a></dd>
+        <dd style="padding-top:5px;"><a href="http://www.phpwind.net/read-htm-tid-1163914.html" target="_blank">安装教程</a></dd>
+		<dd><a href="http://www.phpwind.net/read-htm-tid-1163915.html" target="_blank">升级教程</a></dd>
+		<dd><a href="http://www.phpwind.net/read-htm-tid-1164576.html" target="_blank">插件安装教程</a></dd>
+        <dd><a href="http://www.phpwind.net/read-htm-tid-1164575.html" target="_blank">风格安装教程</a></dd>
+        <dd><a href="http://www.phpwind.net/read-htm-tid-1164574.html" target="_blank">数据库结构手册</a></dd>
         <dd><a href="http://www.phpwind.net/thread-htm-fid-54.html" target="_blank">在线反馈</a></dd>
 		<dd><a href="http://faq.phpwind.net" target="_blank">帮助中心</a></dd>
 		<dd><a href="http://www.phpwind.net/read-htm-tid-753172.html" target="_blank">什么是模式化</a></dd>',
@@ -257,7 +264,7 @@ $lang = array(
 通过您在APP平台上的临时帐户，您已开启APP平台“帖子交换”中的“自动下载”，您的临时帐户信息如下。<br />
 用户名：{#username}<br />
 密码：{#pwd}<br />
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;对于临时用户名，您有且仅有一次修改机会，请按照此教程进行操作（<a href=http://www.phpwind.net/read.php?tid=753581 target=_blank>http://www.phpwind.net/read.php?tid=753581</a>）进行操作。为了保证帐户的信息安全，登录APP平台时还需要您填写自己的常用邮箱，此邮箱将作为激活、修改此帐户信息的最重要凭证。<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;对于临时用户名，您有且仅有一次修改机会，请按照此教程进行操作（<a href=http://www.phpwind.net/read.php?tid=753581 target=_blank>http://www.phpwind.net/read.php?tid=753581</a>）进行操作。为了保证帐户的信息安全，登录APP平台时还需要您填写自己的常用电子邮箱，此邮箱将作为激活、修改此帐户信息的最重要凭证。<br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;您已开启的“帖子交换>自动下载”可随时登录APP平台修改设置，也可以尝试手动下载方式，通过精确条件筛选与您站点相符的内容再进行下载。除了下载，您还可以推送您站点中原创帖子到帖子交换中心，当您的帖子被其他站点下载后，帖子中都会保留原创地址。通过这种方式，您可以提高站点外链权重，并进行推广。<br />
 帖子交换详细教程请访问：<a href=http://www.phpwind.net/read-htm-tid-746186.html target=_blank>http://www.phpwind.net/read-htm-tid-746186.html</a><br />
 相信APP平台上其他应用也能帮到您，详情请访问<a href=http://www.phpwind.net/read-htm-tid-717216.html target=_blank>http://www.phpwind.net/read-htm-tid-717216.html</a>，如有任何问题请咨询app@phpwind.com。",
@@ -291,6 +298,7 @@ $lang = array(
 	'credit_unit'		=> '点',
 
 	'db_adminreason'	=> '广告帖\n恶意灌水\n非法内容\n与版规不符\n重复发帖\n\n优秀文章\n原创内容',
+	'db_admingradereason'=> '优秀文章，支持！\n神马都是浮云',
 	'db_charset'		=> 'utf-8',
 	'db_currencyname'	=> '银元',
 	'db_currencyunit'	=> '个',
@@ -308,7 +316,7 @@ $lang = array(
 	'db_floorname_3'	=> '板凳',
 	'db_floorname_4'	=> '地板',
 	'db_sitemsg_1'		=> '带红色*的都是必填项目，若填写不全将无法注册',
-	'db_sitemsg_2'		=> '请添加能正常收发邮件的邮箱',
+	'db_sitemsg_2'		=> '请添加能正常收发邮件的电子邮箱',
 	'db_sitemsg_3'		=> '如果您在网吧或者非个人电脑，建议设置Cookie有效期为 即时，以保证账户安全',
 	'db_sitemsg_4'		=> '如果您在写长篇帖子又不马上发表，建议存为草稿',
 	'db_sitemsg_5'		=> '如果您提交过一次失败了，可以用”恢复数据”来恢复帖子内容',
@@ -353,7 +361,7 @@ $lang = array(
 	'help_26'			=> 'Rss聚合',
 	'help_27'			=>'Wind Code',
 	'helpd_2'			=> '注册方法：如果您还没有注册，是以游客状态浏览论坛的，在头部导航栏可以看到“您尚未登录&#160;注册”的字样，点击“注册”，填写相应的信息，就可以完成注册了。\n因站长设置的不同，游客的浏览及使用论坛的权限会受到很多限制，如果您喜欢这个论坛，建议您马上注册。\n登录方法：如果您已经注册了该论坛，可以在网站首页头部的登录模块进行登录，也可以在页面头部导航栏点击“登录”，进入登录页面进行登录，在限制游客访问的页面，也会有登录提示页面出现。',
-	'helpd_3'			=> '如果您忘记密码，请在登录页面点击“找回密码”并输入用户名，系统将自动发送密码到您的有效邮箱中。',
+	'helpd_3'			=> '如果您忘记密码，请在登录页面点击“找回密码”并输入用户名，系统将自动发送密码到您的有效电子邮箱中。',
 	'helpd_4'			=> '点击进入“控制面板”下的“编辑个人资料”，就可以对自己的资料信息进行修改了。',
 	'helpd_5'			=> '点击进入“控制面板”下的“编辑个人资料”，找到“论坛可控制性数据”一栏，在该栏目下有“选择风格”的选项，在下拉列表里选择喜欢的风格，点击“提交”按钮，就可以了。',
 	'helpd_6'			=> '点击进入“控制面板”下的“编辑个人资料”，找到“论坛可控制性数据”一栏，在该栏目下有“选择默认使用的编辑器”选项，选择习惯使用的编辑器，点击“提交”。',

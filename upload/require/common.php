@@ -1,6 +1,6 @@
 <?php
 defined('P_W') || exit('Forbidden');
-define('WIND_VERSION', '8.0,20100920');
+define('WIND_VERSION', '8.3,20101201');
 define('PW_USERSTATUS_BANUSER', 1); //是否禁言位 (版块禁言)
 define('PW_USERSTATUS_CFGFRIEND', 3); //设置朋友位
 //define('PW_USERSTATUS_NEWPM', 5); //是否有新短消息
@@ -13,6 +13,24 @@ define('PW_USERSTATUS_EDITOR', 11); //所见即所得
 define('PW_USERSTATUS_USERBINDING', 12); //用户是否有绑定帐号
 define('PW_USERSTATUS_SHOWWIDTHCFG', 13); //切换宽、窄版模式
 define('PW_USERSTATUS_SHOWSIDEBAR', 14); //侧栏版块列表收缩切换
+define('PW_USERSTATUS_BANSIGNATURE', 15);//是否禁止签名
+define('PW_USERSTATUS_NOTICEVPICE', 20);//设置提示音
+define ('PW_COLUMN', 'column' ); //查询字段
+define ('PW_EXPR', 'expr' ); //查询表达式
+define ('PW_ORDERBY', 'orderby' ); //排序
+define ('PW_GROUPBY', 'groupby' ); //分组
+define ('PW_LIMIT', 'limit' ); //分页
+define ('PW_ASC', 'asc' ); //升序
+define ('PW_DESC', 'desc' ); //降序
+define ('PW_CACHE_MEMCACHE', 'memcache' ); //内存缓存
+define ('PW_CACHE_FILECACHE', 'filecache' ); //文件缓存
+define ('PW_CACHE_DBCACHE', 'dbcache' ); //数据库缓存
+define ('PW_OVERFLOW_NUM',2000000000);	//数据溢出大小临界数
+
+//* portal Start*//
+define ('PW_PORTAL_MAIN', 'main.htm' ); //可视化结构文件
+define ('PW_PORTAL_CONFIG', 'config.htm' ); //可视化配置文件
+//* portal end*//
 
 
 
@@ -153,7 +171,7 @@ function Cookie($cookieName, $cookieValue, $expireTime = 'F', $needPrefix = true
  */
 function ObContents($output) {
 	ob_end_clean();
-	$getHAE = GetServer('HTTP_ACCEPT_ENCODING');
+	$getHAE = S::getServer('HTTP_ACCEPT_ENCODING');
 	if (!headers_sent() && $GLOBALS['db_obstart'] && $getHAE && N_output_zip() != 'ob_gzhandler') {
 		$encoding = '';
 		if (strpos($getHAE, 'x-gzip') !== false) {
@@ -240,7 +258,7 @@ function N_output_zip() {
  * @global string $db_charset
  */
 function ajax_footer() {
-	global $db_charset;
+	global $db_charset,$db_htmifopen;
 	if (defined('SHOWLOG')) Error::writeLog();
 	$output = str_replace(array('<!--<!--<!---->','<!--<!---->','<!---->-->','<!---->'),'', ob_get_contents());
 	if (P_W == 'admincp') {
@@ -249,6 +267,8 @@ function ajax_footer() {
 			"FormCheck('\\1','\\2','\\3')",
 			rtrim($output,'<!--')
 		);
+	} else {
+		$output = parseHtmlUrlRewrite($output, $db_htmifopen);
 	}
 	header("Content-Type: text/xml;charset=$db_charset");
 	echo ObContents("<?xml version=\"1.0\" encoding=\"$db_charset\"?><ajax><![CDATA[" . $output . "]]></ajax>");
@@ -342,7 +362,7 @@ function pwDefendCc($ccLoad) {
 	if ($ccBanedIp && $ipOffset = strpos("$ccBanedIp\n", "\t$onlineip\n")) {
 		$ccLtt = substr($ccBanedIp, $ipOffset - 10, 10);
 		$ccCrc32 == $ccLtt && exit('Forbidden, Please turn off CC');
-		writeover(D_P . 'data/ccbanip.txt', str_replace("\n$ccLtt\t$onlineip", '', $ccBanedIp));
+		pwCache::setData(D_P . 'data/ccbanip.txt', str_replace("\n$ccLtt\t$onlineip", '', $ccBanedIp));
 	}
 	if (($db_xforwardip || $ccLoad == 2) && ($timestamp - $ccTimestamp > 3 || $timestamp < $ccTimestamp)) {
 		$isCc = false;
@@ -364,11 +384,11 @@ function pwDefendCc($ccLoad) {
 			$banIps = '';
 			$ccBanedIp && $banIps .= implode("\n", array_slice(explode("\n", $ccBanedIp), -999));
 			$banIps .= "\n" . $ccCrc32 . "\t" . $onlineip;
-			writeover(D_P . 'data/ccbanip.txt', $banIps);
+			pwCache::setData(D_P . 'data/ccbanip.txt', $banIps);
 			exit();
 		}
 		@filesize(D_P . 'data/ccip.txt') > 27 * 1000 && P_unlink(D_P . 'data/ccip.txt');
-		writeover(D_P . 'data/ccip.txt', "$ccCrc32\t$onlineip\n", 'ab');
+		pwCache::setData(D_P . 'data/ccip.txt', "$ccCrc32\t$onlineip\n", false, 'ab');
 	}
 }
 
@@ -406,7 +426,7 @@ function CookiePre() {
  * @return bool
  */
 function P_unlink($fileName) {
-	return @unlink(Pcv($fileName));
+	return @unlink(S::escapePath($fileName));
 }
 
 /**
@@ -416,7 +436,7 @@ function P_unlink($fileName) {
  * @param string $method 读取模式
  */
 function readover($fileName, $method = 'rb') {
-	$fileName = Pcv($fileName);
+	$fileName = S::escapePath($fileName);
 	$data = '';
 	if ($handle = @fopen($fileName, $method)) {
 		flock($handle, LOCK_SH);
@@ -435,16 +455,18 @@ function readover($fileName, $method = 'rb') {
  * @param bool $ifLock 是否锁文件
  * @param bool $ifCheckPath 是否检查文件名中的“..”
  * @param bool $ifChmod 是否将文件属性改为可读写
+ * @return bool 是否写入成功   :注意rb+创建新文件均返回的false,请用wb+
  */
 function writeover($fileName, $data, $method = 'rb+', $ifLock = true, $ifCheckPath = true, $ifChmod = true) {
-	$fileName = Pcv($fileName, $ifCheckPath);
+	$fileName = S::escapePath($fileName, $ifCheckPath);
 	touch($fileName);
 	$handle = fopen($fileName, $method);
 	$ifLock && flock($handle, LOCK_EX);
-	fwrite($handle, $data);
+	$writeCheck = fwrite($handle, $data);
 	$method == 'rb+' && ftruncate($handle, strlen($data));
 	fclose($handle);
 	$ifChmod && @chmod($fileName, 0777);
+	return $writeCheck;
 }
 
 /**
@@ -780,7 +802,7 @@ function GetTtable($tid) {
 function GetPtable($postTableId, $tid = null) {
 	if ($GLOBALS['db_plist'] && is_array($plistdb = $GLOBALS['db_plist'])) {
 		if ($postTableId == 'N' && !empty($tid)) {
-			$postTableId = $GLOBALS['db']->get_value('SELECT ptable FROM pw_threads WHERE tid=' . pwEscape($tid, false));
+			$postTableId = $GLOBALS['db']->get_value('SELECT ptable FROM pw_threads WHERE tid=' . S::sqlEscape($tid, false));
 		}
 		if ((int) $postTableId > 0 && array_key_exists($postTableId, $plistdb)) {return 'pw_posts' . $postTableId;}
 	}
@@ -868,11 +890,11 @@ function pwRights($isBM = false, $rightKey = '', $fid = false) {
 		$sForumRights[$fid] = $forumRight = array();
 		$isUser = false;
 
-		$pwSQL = 'uid=' . pwEscape($uid, false) . 'AND fid=' . pwEscape($fid, false) . "AND gid='0'";
+		$pwSQL = 'uid=' . S::sqlEscape($uid, false) . 'AND fid=' . S::sqlEscape($fid, false) . "AND gid='0'";
 		if ($isBM && $gid != 5) { //获取版主权限
-			$pwSQL .= " OR uid='0' AND fid=" . pwEscape($fid, false) . "AND gid IN ('5'," . pwEscape($gid, false) . ") OR uid='0' AND fid='0' AND gid='5'";
+			$pwSQL .= " OR uid='0' AND fid=" . S::sqlEscape($fid, false) . "AND gid IN ('5'," . S::sqlEscape($gid, false) . ") OR uid='0' AND fid='0' AND gid='5'";
 		} else {
-			$pwSQL .= " OR uid='0' AND fid=" . pwEscape($fid, false) . "AND gid=" . pwEscape($gid, false);
+			$pwSQL .= " OR uid='0' AND fid=" . S::sqlEscape($fid, false) . "AND gid=" . S::sqlEscape($gid, false);
 		}
 		$query = $GLOBALS['db']->query("SELECT uid,fid,gid,rkey,rvalue FROM pw_permission WHERE ($pwSQL) AND type='systemforum' ORDER BY uid DESC,fid");
 		while ($rt = $GLOBALS['db']->fetch_array($query)) {
@@ -919,8 +941,24 @@ function getstatus($status, $b, $getv = 1) {
  */
 function isGM($name) {
 	global $manager;
-	return CkInArray($name, $manager);
+	return S::inArray($name, $manager);
 }
+
+/**
+ * 判断用户所在用户组对版块的管理权限
+ *
+ * @param string $name 用户名
+ * @param string $isBM  是否为版主
+ * @param string $type 例如：$pwSystem权限，deltpcs编辑权限
+ * @return bool
+ */
+function userSystemRight($name, $isBM, $type) {
+	$isGM = isGM($name);
+	$pwSystem = pwRights($isBM); 
+	if ($isGM || $pwSystem[$type])  return true;
+	return false;
+}
+
 
 //积分业务
 
@@ -1010,17 +1048,24 @@ function PwdCode($pwd) {
  * @param string $pwdCode 用户私有信息
  * @param string $cookieName cookie名
  * @param int $expire 过期秒数
+ * @param bool $clearCookie 验证错误是否清除cookie
+ * @param bool $refreshCookie 是否刷新cookie
  * @return bool
  */
-function SafeCheck($cookieData, $pwdCode, $cookieName = 'AdminUser', $expire = 1800) {
+function SafeCheck($cookieData, $pwdCode, $cookieName = 'AdminUser', $expire = 1800,$clearCookie = true ,$refreshCookie = true) {
 	global $timestamp;
-	if ($timestamp - $cookieData[0] > $expire || $cookieData[2] != md5($pwdCode . $cookieData[0])) {
+	if($timestamp - $cookieData[0] > $expire) {
 		Cookie($cookieName, '', 0);
 		return false;
+	} elseif ($cookieData[2] != md5($pwdCode . $cookieData[0])) {
+		$clearCookie && Cookie($cookieName, '', 0);
+		return false;
 	}
-	$cookieData[0] = $timestamp;
-	$cookieData[2] = md5($pwdCode . $cookieData[0]);
-	Cookie($cookieName, StrCode(implode("\t", $cookieData)));
+	if ($refreshCookie) {
+		$cookieData[0] = $timestamp;
+		$cookieData[2] = md5($pwdCode . $cookieData[0]);
+		Cookie($cookieName, StrCode(implode("\t", $cookieData)));
+	}
 	return true;
 }
 
@@ -1173,9 +1218,9 @@ function getLangInfo($T, $I, $L = false, $M = false) {
 	static $lang;
 	if (!isset($lang[$T])) {
 		if ($M == false) {
-			require Pcv(GetLang($T));
+			require S::escapePath(GetLang($T));
 		} else {
-			require Pcv(getModeLang($T));
+			require S::escapePath(getModeLang($T));
 		}
 	}
 	if (isset($lang[$T][$I])) {
@@ -1194,7 +1239,7 @@ function getLangInfo($T, $I, $L = false, $M = false) {
 function GetCreditLang($T, $logtype) {
 	static $lang;
 	if (!isset($lang[$T])) {
-		require Pcv(GetLang($T));
+		require S::escapePath(GetLang($T));
 	}
 	$pop = '';
 	if (isset($lang[$T][$logtype])) {
@@ -1254,7 +1299,7 @@ function areaEot($template, $EXT = 'htm') {
 	$srcTplTime = pwFilemtime($srcTpl);
 	if ($template == 'main') {
 		$ifNeedParsePW = 1;
-		$configFile = AREA_PATH . $alias . '/config.htm';
+		$configFile = AREA_PATH . $alias . '/'.PW_PORTAL_CONFIG;
 		$srcTplTime = max(pwFilemtime($configFile), $srcTplTime);
 	}
 	if (pwFilemtime($tarTpl) > $srcTplTime) {return $tarTpl;}
@@ -1263,7 +1308,7 @@ function areaEot($template, $EXT = 'htm') {
 }
 
 function getAreaChannelTpl($template, $channel, $EXT = 'htm') {
-	$srcTpl = Pcv(AREA_PATH . "$channel/$template.$EXT");
+	$srcTpl = S::escapePath(AREA_PATH . "$channel/$template.$EXT");
 	if (!file_exists($srcTpl)) {
 		
 		$srcTpl = M_P . 'template/' . $template . '.' . $EXT;
@@ -1283,10 +1328,10 @@ function getAreaChannelTpl($template, $channel, $EXT = 'htm') {
  */
 function portalEot($sign) {
 	$GLOBALS['__pwPortalEot'] = 1;
-	$srcTpl = Pcv(PORTAL_PATH . $sign . '/main.htm');
-	$tarTpl = Pcv(D_P . "data/tplcache/portal_" . $sign . '.htm');
+	$srcTpl = S::escapePath(PORTAL_PATH . $sign . '/'.PW_PORTAL_MAIN);
+	$tarTpl = S::escapePath(D_P . "data/tplcache/portal_" . $sign . '.htm');
 
-	$configFile = Pcv(PORTAL_PATH . $sign . '/config.htm');
+	$configFile = S::escapePath(PORTAL_PATH . $sign . '/'.PW_PORTAL_CONFIG);
 	$srcTplTime = max(pwFilemtime($configFile), pwFilemtime($srcTpl));
 
 	if (pwFilemtime($tarTpl) <= $srcTplTime) {
@@ -1297,7 +1342,7 @@ function portalEot($sign) {
 		$parseTemplate = L::loadClass('parsetemplate', 'area');
 		$file_str = $parseTemplate->execute('other', $sign, $file_str);
 
-		writeover($tarTpl, $file_str);
+		pwCache::setData($tarTpl, $file_str);
 	}
 	return $tarTpl;
 }
@@ -1308,21 +1353,18 @@ function portalEot($sign) {
 function portalEcho($sign,$_viewer = '') {
 	$GLOBALS['__pwPortalEot'] = 1;
 	global $timestamp;
-	$staticPath = Pcv(PORTAL_PATH . $sign .'/index.html');
-	$mainFile = Pcv(PORTAL_PATH . $sign . '/main.htm');
-	$configFile = Pcv(PORTAL_PATH . $sign . '/config.htm');
+	$staticPath = S::escapePath(PORTAL_PATH . $sign .'/index.html');
+	$mainFile = S::escapePath(PORTAL_PATH . $sign . '/'.PW_PORTAL_MAIN);
+	$configFile = S::escapePath(PORTAL_PATH . $sign . '/'.PW_PORTAL_CONFIG);
 
 	$staticFileMTime = pwFilemtime($staticPath);
 	$tplFileMTime = max(pwFilemtime($mainFile),pwFilemtime($configFile));
-	
-	if (is_file(D_P.'data/bbscache/portal_config.php')) {
-		include D_P.'data/bbscache/portal_config.php';
-	}
 
-	$lockName = 'portal_'.$sign;
-	if (($tplFileMTime>$staticFileMTime || $staticFileMTime<$timestamp-600 || !filesize($staticPath) || $portal_staticstate[$sign]) && procLock($lockName)) {
+	if (is_file(D_P.'data/bbscache/portal_config.php')) {
+		include pwCache::getPath(D_P.'data/bbscache/portal_config.php');
+	}
+	if (($tplFileMTime>$staticFileMTime || ($GLOBALS['db_portalstatictime'] && $staticFileMTime<$timestamp-$GLOBALS['db_portalstatictime']*60) || !filesize($staticPath) || $portal_staticstate[$sign])) {
 		portalStatic($sign,$_viewer);
-		procUnLock($lockName);
 	}
 	$output .= readover($staticPath);
 
@@ -1333,14 +1375,13 @@ function portalEcho($sign,$_viewer = '') {
  * @param $sign
  */
 function portalStatic($sign,$_viewer = '') {
-	$staticPath = Pcv(PORTAL_PATH.$sign);
+	$lockName = 'portal_'.$sign;
+	if (!procLock($lockName)) return false;
+	$staticPath = S::escapePath(PORTAL_PATH.$sign);
 	if (!is_dir($staticPath)) return false;
-	$staticPath = Pcv(PORTAL_PATH.$sign.'/index.html');
+	$staticPath = S::escapePath(PORTAL_PATH.$sign.'/index.html');
 	$otherOutput = ob_get_contents();
 	ob_clean();
-	
-	$portalPageService = L::loadClass('portalpageservice', 'area');
-	$portalPageService->setPortalStaticState($sign,0);
 
 	$pageInvokeService = L::loadClass('pageinvokeservice', 'area');
 	$pageConfig = $pageInvokeService->getEffectPageInvokePieces('other', $sign);
@@ -1350,8 +1391,16 @@ function portalStatic($sign,$_viewer = '') {
 
 	$temp = ob_get_contents();
 	$temp = str_replace(array('<!--<!---->',"<!---->\r\n",'<!---->','<!-- -->',"\t\t\t"),'',$temp);
-	writeover($staticPath, $temp);
+	$success = pwCache::setData($staticPath, $temp,false,'wb+');
+	procUnLock($lockName);
+	if (!$success && !pwCache::setData($staticPath, $temp)&& !is_writable($staticPath)) {	//写入二次尝试
+		ob_end_clean();
+		ObStart();
+		Showmsg('请设置'.str_replace(R_P,'',$staticPath).'文件为可写，如果文件不存在，则新建一个空文件');
+	}
 	ob_clean();
+	$portalPageService = L::loadClass('portalpageservice', 'area');
+	$portalPageService->setPortalStaticState($sign,0);
 	updateCacheData();
 	if ($otherOutput) echo $otherOutput;
 }
@@ -1359,7 +1408,7 @@ function portalStatic($sign,$_viewer = '') {
 function modeTemplate($srcTpl, $tarTpl) {
 	$file_str = readover($srcTpl);
 	$file_str = tplParsePrint($file_str);
-	writeover($tarTpl, $file_str);
+	pwCache::setData($tarTpl, $file_str);
 	return $tarTpl;
 }
 
@@ -1382,7 +1431,7 @@ function areaTemplate($alias, $srcTpl, $tarTpl) {
 	$parseTemplate = L::loadClass('parsetemplate', 'area');
 	$file_str = $parseTemplate->execute('channel', $alias, $file_str);
 
-	writeover($tarTpl, $file_str);
+	pwCache::setData($tarTpl, $file_str);
 	return $tarTpl;
 }
 
@@ -1480,10 +1529,10 @@ function minImage($sourceImg, $width, $height) {
 		}
 		$file_ext = end(explode('.', $sourceImg));
 		$imgname = substr(md5($sourceImg . $width . $height), 10, 10) . '.' . $file_ext;
-		
+
 		$srcfile = ((strpos($sourceImg, $db_attachname) === 0 || strpos($sourceImg, 'images') === 0) ? R_P : $attachdir) . $sourceImg;
 		$targtImg = $attachdir . "/mini/" . $imgname;
-		
+
 		if (file_exists($targtImg) && filemtime($targtImg)>filemtime($srcfile)) {return $db_bbsurl . '/' . $db_attachname . "/mini/" . $imgname;}
 		require_once (R_P . 'require/imgfunc.php');
 		$thumbsize = modeImageThumb($srcfile, $targtImg, $width, $height);
@@ -1776,8 +1825,8 @@ function bbsSeoSettings($_page = 'index', $_definedSeo = array(), $_fname = '', 
  */
 function parseSeoTargets($content, $_replace, $_targets) {
 	$content = str_replace($_targets, $_replace, $content);
-	$content = trim(preg_replace(array('((\s*\-\s*)+)', '((\s*\,\s*)+)', '((\s*\|\s*)+)', '((\s*\t\s*)+)'), array(
-		'-', ',', '|', '', ''), $content), ' -,|');
+	$content = trim(preg_replace(array('((\s*\,\s*)+)', '((\s*\|\s*)+)', '((\s*\t\s*)+)'), array(
+	',', '|', '', ''), $content), ' -,|');
 	return $content;
 }
 
@@ -1786,7 +1835,7 @@ function parseSeoTargets($content, $_replace, $_targets) {
  */
 function checkPortalRight() {
 	global $db_portal_admins,$manager,$winduid,$windid;
-	return CkInArray($windid,$manager) || in_array($winduid, $db_portal_admins);
+	return S::inArray($windid,$manager) || ($winduid && in_array($winduid, $db_portal_admins));
 }
 
 function descriplog($message) {
@@ -1797,7 +1846,9 @@ function descriplog($message) {
 	return $message;
 }
 
-//字符串
+function parseHtmlUrlRewrite($html, $flag) {
+	return $flag ? preg_replace("/\<a(\s*[^\>]+\s*)href\=([\"|\']?)((index|cate|thread|read|faq|rss)\.php\?[^\"\'>\s]+\s?)[\"|\']?/ies", "Htm_cv('\\3','<a\\1href=\"')", $html) : $html;
+}
 
 /**
  * url处理
@@ -1820,6 +1871,14 @@ function urlRewrite($url) {
 	return $turl . $add;
 }
 
+/*
+ * 获取强制索引名称
+ */
+function getForceIndex($index) {
+	$indexdb = array('idx_postdate' => 'idx_postdate', 'idx_digest' => 'idx_digest', 'idx_uid_categoryid_modifiedtime' => 'idx_uid_categoryid_modifiedtime', 'idx_tid' => 'idx_tid' , 'idx_fid_ifcheck_topped_lastpost'=>'idx_fid_ifcheck_topped_lastpost');
+	return $indexdb[$index];
+}
+
 //LOADER
 
 class PW_BaseLoader {
@@ -1833,26 +1892,33 @@ class PW_BaseLoader {
 
 		$classes[$classToken] = true; //默认值
 		$fileDir = R_P . $dir . strtolower($className) . '.class.php';
-		if (!$isGetInstance) return (@require_once Pcv($fileDir)); //未实例化的直接返回
-
+		
+		if (!$isGetInstance) return (@require_once S::escapePath($fileDir)); //未实例化的直接返回
 
 		$class = $classPrefix . $className;
 		if (!class_exists($class)) {
-			if (file_exists($fileDir)) require_once Pcv($fileDir);
+			
+			# pack class start
+			if($GLOBALS['db_classfile_compress']){
+				$_directory = explode('/',$dir);
+				if( isset($_directory[1]) && in_array( $_directory[1], array('framework','gather','forum','job','rate','site','user','utility') ) ){
+					$fileDir = pwPack::classPath($fileDir,$class);
+				}
+			}
+			# pack class end
+			
+			if (file_exists($fileDir)) require_once S::escapePath($fileDir);
 			if (!class_exists($class)) { //再次验证是否存在class
 				$GLOBALS['className'] = $class;
 				Showmsg('load_class_error');
 			}
 		}
-
 		$classes[$classToken] = &new $class(); //实例化
-
-
 		return $classes[$classToken];
 	}
 
 	function _loadBaseDB() {
-		if (!class_exists('BaseDB')) require (R_P . 'lib/base/basedb.php');
+		if (!class_exists('BaseDB')) require_once (R_P . 'lib/base/basedb.php');
 	}
 
 	function _formatDir($dir) {
@@ -1896,7 +1962,7 @@ class L extends PW_BaseLoader {
 		$key = $dir . '_' . $file;
 		if (!isset($conf[$key])) {
 			if (file_exists(D_P . "data/$dir/{$file}.php")) {
-				include Pcv(D_P . "data/$dir/{$file}.php");
+				include S::escapePath(D_P . "data/$dir/{$file}.php");
 				$arr = get_defined_vars();
 				unset($arr['dir'], $arr['file'], $arr['var'], $arr['key'], $arr['conf'], $arr['isStatic']);
 				if ($isStatic !== true) {return $var ? $arr[$var] : $arr;}
@@ -1915,16 +1981,14 @@ class L extends PW_BaseLoader {
 	function style($var = null, $skinco = null, $ispath = false) {
 		global $skin, $db_styledb, $db_defaultstyle;
 		$skinco && isset($db_styledb[$skinco]) && $skin = $skinco;
-
 		if ($skin && strpos($skin, '..') === false && file_exists(D_P . "data/style/$skin.php") && is_array($db_styledb[$skin]) && $db_styledb[$skin][1] == '1') {
-//fix warning by noizy
+
 		} elseif ($db_defaultstyle && strpos($db_defaultstyle, '..') === false && file_exists(D_P . "data/style/$db_defaultstyle.php")) {
-//fix warning by noizy
 			$skin = $db_defaultstyle;
 		} else {
 			$skin = 'wind';
 		}
-		return !$ispath ? L::config($var, $skin, 'style') : Pcv(D_P . 'data/style/' . $skin . '.php');
+		return !$ispath ? L::config($var, $skin, 'style') : S::escapePath(D_P . 'data/style/' . $skin . '.php');
 	}
 
 	function forum($fid) {
@@ -2013,7 +2077,7 @@ class template {
 
 	function printEot($template, $EXT = 'htm') {
 		
-		if (($filepath = $this->bev->getpath($template, $EXT)) !== false) {return Pcv($filepath);}
+		if (($filepath = $this->bev->getpath($template, $EXT)) !== false) {return S::escapePath($filepath);}
 		exit('Can not find ' . $this->bev->getDefaultDir() . $template . '.' . $EXT . ' file');
 	}
 }
@@ -2057,4 +2121,244 @@ class Error {
 		$pwError->writeLog();
 	}
 }
+/*
+ * 结构化查询类库
+ */
+class pwQuery{
+	/*
+	 * 执行新增操作
+	 */
+	function insert($tableName, $col_names){
+		$GLOBALS['db']->update(pwQuery::insertClause($tableName, $col_names));
+		$insert_id =  $GLOBALS['db']->insert_id();
+		$insert_id && Perf::gatherQuery ( 'insert', array($tableName), array_merge($col_names,array('insert_id'=>$insert_id)));
+		return $insert_id;
+	}
+	/*
+	 * 执行替换操作
+	 */
+	function replace($tableName, $col_names){
+		return $GLOBALS['db']->update(pwQuery::replaceClause($tableName, $col_names));
+	}
+	/*
+	 * 执行更新操作
+	 */
+	function update($tableName, $where_statement = null, $where_conditions = null, $col_names, $expand = null) {
+		return $GLOBALS['db']->update(pwQuery::updateClause($tableName, $where_statement, $where_conditions, $col_names, $expand));
+	}
+	/*
+	 * 执行删除操作
+	 */
+	function delete($tableName, $where_statement = null, $where_conditions = null, $expand = null) {
+		return $GLOBALS['db']->update(pwQuery::deleteClause($tableName, $where_statement, $where_conditions, $expand ));
+	}
+	/*
+	 * 构造新增insert语句,仅返回数据新增语句,不执行数据库操作
+	 */
+	function insertClause($tableName, $col_names){
+		$service = L::loadClass('querybuilder','utility');
+		return $service->insertClause($tableName, $col_names);
+	}
+	/*
+	 * 构造替换replace语句,仅返回数据替换语句,不执行数据库操作
+	 */
+	function replaceClause($tableName, $col_names){
+		$service = L::loadClass('querybuilder','utility');
+		return $service->replaceClause($tableName, $col_names);
+	}
+	/*
+	 * 构造更新update语句,仅返回数据更新语句,不执行数据库操作
+	 */
+	function updateClause($tableName, $where_statement = null, $where_conditions = null, $col_names, $expand = null) {
+		$service = L::loadClass('querybuilder','utility');
+		return $service->updateClause($tableName, $where_statement, $where_conditions, $col_names, $expand);
+	}
+	/*
+	 * 构造删除delete语句,仅返回数据删除语句,不执行数据库操作
+	 */
+	function deleteClause($tableName, $where_statement = null, $where_conditions = null, $expand = null) {
+		$service = L::loadClass('querybuilder','utility');
+		return $service->deleteClause($tableName, $where_statement, $where_conditions, $expand );
+	}
+	/*
+	 * 构造查询语句,仅返回数据查询语句,不执行数据库操作
+	 */
+	function selectClause($tableName, $where_statement = null, $where_conditions = null, $expand = null) {
+		$service = L::loadClass('querybuilder','utility');
+		return $service->selectClause($tableName, $where_statement, $where_conditions, $expand);
+	}
+	/*
+	 * 构造通用查询语句,仅返回数据查询语句,不执行数据库操作
+	 */
+	function buildClause($format, $parameters) {
+		$service = L::loadClass('querybuilder','utility');
+		return $service->buildClause($format, $parameters);
+	}
+}
+/*
+ * 全局聚合服务中心
+ */
+class Perf {
+	/*
+	 * 全局缓存聚合
+	 */
+	function gatherCache($cacheName){
+		$gatherCache = L::loadClass ( 'gather', 'gather' );
+		return $gatherCache->spreadCache ($cacheName);
+	}
+	/*
+	 * 全局查询聚合
+	 */
+	function gatherQuery($operate, $tableNames, $fields, $expand = array()){
+		$gatherQuery = L::loadClass('gather','gather');
+		return $gatherQuery->spreadQuery($operate, $tableNames, $fields, $expand);
+	}
+	/*
+	 * 全局信息聚合
+	 */
+	function gatherInfo($gatherName, $information, $defaultName = 'general'){
+		$gatherInfo = L::loadClass ( 'gather', 'gather' );
+		$gatherInfo->spreadInfo($gatherName, $information, $defaultName);
+	}
+	/*
+	 * 检查是否开启或安装Memcache
+	 */
+	function checkMemcache(){
+		static $isMemcache = null;
+		if (! isset ( $isMemcache )) {
+			$isMemcache = class_exists ( "Memcache" ) && strtolower ( $GLOBALS ['db_datastore'] ) == 'memcache';
+		}
+		return $isMemcache;
+	}
+	
+	function getCacheService(){
+		return L::loadClass('cacheservice','utility');
+	}
+}
+/**
+ * 全局通用读取缓存路径与写缓存数据服务
+ */
+class pwCache {
+	/**
+	 * 获取缓存路径函数
+	 * @param string 	$filePath	文件名称
+	 * @param boolean 	$isPack 	是否可选压缩文件
+	 */
+	function getPath($filePath, $isPack = false, $withCache = true) {
+		if (! $withCache || !$isPack ) {
+			return $filePath;
+		}
+		if( $GLOBALS['db_filecache_to_memcache'] && Perf::checkMemcache() && in_array ( SCR, array ('index', 'read', 'thread' ))){
+			$_cacheService = perf::gatherCache('pw_filecache');
+			return $_cacheService->getFileCache($filePath);
+		}
+		if ( $GLOBALS['db_cachefile_compress'] && in_array ( SCR, array ('index', 'read', 'thread' ) )) {
+			return pwPack::cachePath ( $filePath );
+		}
+		return $filePath;
+	}
+	/**
+	 * 写缓存通用函数
+	 * @param string 		$filePath	文件名称
+	 * @param string|array 	$data		数据	
+	 * @param boolean 		$isBuild	是否需要装组装
+	 * @param string 		$method		读写模式
+	 * @param boolean		$ifLock		是否锁文件
+	 */
+	function setData($filePath, $data, $isBuild = false, $method = 'rb+', $ifLock = true) {
+		if ($isBuild && is_array ( $data )) {
+			$_tmp = '';
+			foreach ( $data as $key => $value ) {
+				if (! preg_match ( '/^\w+$/', $key ))
+					continue;
+				$_tmp .= "\$" . $key . " = " . pw_var_export ( $value ) . ";\r\n";
+			}
+			$data = "<?php\r\n" . $_tmp . "\r\n?>";
+		}
+		if ( $GLOBALS['db_filecache_to_memcache'] && Perf::checkMemcache ()) {
+			$_cacheService = perf::gatherCache ( 'pw_filecache' );
+			$_cacheService->clearFileCache ( $filePath );
+		}
+		if ( $GLOBALS['db_cachefile_compress'] ) {
+			$_packService = pwPack::getPackService ();
+			$_packService->flushCacheFile($filePath);
+		}
+		return writeover ( $filePath, $data, $method, $ifLock );
+	}
+	/**
+	 * 删除文件缓存函数
+	 * @param string 		$filePath	文件名称
+	 */
+	function deleteData($filePath) {
+		if ( $GLOBALS['db_filecache_to_memcache'] && Perf::checkMemcache ()) {
+			$_cacheService = perf::gatherCache ( 'pw_filecache' );
+			$_cacheService->clearFileCache ( $filePath );
+		}
+		if ( $GLOBALS['db_cachefile_compress'] ) {
+			$_packService = pwPack::getPackService ();
+			$_packService->flushCacheFiles();
+		}
+		return P_unlink ( $filePath );
+	}
+}
+/*
+ * 版本文件打包服务
+ */
+class pwPack {
+	/*
+	 * 通用缓存文件获取
+	 */
+	function cachePath($filePath) {
+		if( !$GLOBALS['db_cachefile_compress'] || !in_array ( SCR, array ('index', 'read', 'thread' ) ) ){
+			return $filePath;
+		}
+		$_packService = pwPack::getPackService ();
+      	return $_packService->loadCachePath ( $filePath );
+	}
+	/*
+	 * 通用类库文件获取
+	 */
+	function classPath($filePath, $className) {
+		if( !$GLOBALS['db_classfile_compress'] || !in_array ( SCR, array ('index', 'read', 'thread' ) ) ){
+			return $filePath;
+		}
+		static $_packClassFile = null;
+		if (! isset ( $_packClassFile )) {
+			$_packClassFile = D_P . 'data/package/pack.class.' . SCR . '.php';
+			if (is_file ( $_packClassFile )) {
+				(! class_exists ( 'BaseDB' )) && require_once (R_P . 'lib/base/basedb.php');
+				require_once S::escapePath ( $_packClassFile );
+			}
+		}
+		if ($_packClassFile && class_exists ( $className )) {
+			return R_P . 'require/returns.php';
+		}
+		return $filePath;
+	}
+	/*
+	 * 通用类库文件压缩
+	 */
+	function files() {
+		if( !in_array ( SCR, array ('index', 'read', 'thread' ) ) ){
+			return false;
+		}
+		$_packService = pwPack::getPackService ();
+		if( $GLOBALS['db_cachefile_compress'] ){
+			$_packService->packCacheFiles ();
+		}
+		return true;
+	}
+	/*
+	 * 获取打包服务
+	 */
+	function getPackService() {
+		static $packService = null;
+		if (! isset ( $packService )) {
+			require_once R_P.'require/packservice.php';
+			$packService = new PW_packService ();
+		}
+		return $packService;
+	}
+}
+
 ?>

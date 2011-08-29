@@ -4,10 +4,11 @@
 !$winduid && Showmsg('not_login');
 !$db_groups_open && Showmsg('groups_close');
 
-$isGM = CkInArray($windid,$manager);
+$isGM = S::inArray($windid,$manager);
 !$isGM && $groupid==3 && $isGM=1;
 
-InitGP(array('a', 'uid'));
+S::gp(array('a', 'uid', 'ajax', 'page'));
+if ($ajax == 1) define('AJAX', '1');
 
 require_once(R_P . 'u/lib/space.class.php');
 $newSpace = new PwSpace($uid ? $uid : $winduid);
@@ -18,7 +19,7 @@ if (!$space =& $newSpace->getInfo()) {
 if ($uid) {
 	$isSpace = true;
 	$USCR = 'space_groups';
-	require_once Pcv($appEntryBasePath . 'action/view.php');
+	require_once S::escapePath($appEntryBasePath . 'action/view.php');
 }
 
 if ($db_question && $o_groups_qcheck) {
@@ -33,7 +34,7 @@ if (empty($a)) {
 
 	$colonyids = $group_own = $group_other = $apply  = array();
 	$counter = 0;
-	$query = $db->query("SELECT cm.ifadmin,cm.addtime,c.id,c.cname,c.cnimg,c.admin,c.createtime,cm2.uid FROM pw_cmembers cm LEFT JOIN pw_colonys c ON cm.colonyid=c.id LEFT JOIN pw_members cm2 ON c.admin=cm2.username WHERE cm.uid=" . pwEscape($winduid) . " ORDER BY cm.addtime DESC");
+	$query = $db->query("SELECT cm.ifadmin,cm.addtime,c.id,c.cname,c.cnimg,c.admin,c.createtime,cm2.uid FROM pw_cmembers cm LEFT JOIN pw_colonys c ON cm.colonyid=c.id LEFT JOIN pw_members cm2 ON c.admin=cm2.username WHERE cm.uid=" . S::sqlEscape($winduid) . " ORDER BY cm.addtime DESC");
 	while ($rt = $db->fetch_array($query)) {
 		if ($rt['cnimg']) {
 			list($rt['cnimg']) = geturl("cn_img/$rt[cnimg]",'lf');
@@ -63,6 +64,7 @@ if (empty($a)) {
 		$count = $weiboService->getConloysWeibosCount($colonyids);
 		$pageCount = ceil($count / $perpage);
 		$page = validatePage($page,$pageCount);
+		$navPages = numofpage($count,$page,$pageCount,'apps.php?q=groups&');
 		$weiboList = $weiboService->getConloysWeibos($colonyids,$page,$perpage);
 	}
 
@@ -70,13 +72,13 @@ if (empty($a)) {
 
 } elseif ($a == 'my') {
 
-	InitGP(array('page'), '', 2);
+	S::gp(array('page'), '', 2);
 	$page < 1 && $page = 1;
-	$total = $db->get_one("SELECT COUNT(*) AS sum,SUM(cm.username=c.admin) AS creates FROM pw_cmembers cm LEFT JOIN pw_colonys c ON cm.colonyid=c.id WHERE cm.ifadmin<>'-1' AND cm.uid=" . pwEscape($winduid));
+	$total = $db->get_one("SELECT COUNT(*) AS sum,SUM(cm.username=c.admin) AS creates FROM pw_cmembers cm LEFT JOIN pw_colonys c ON cm.colonyid=c.id WHERE cm.ifadmin<>'-1' AND cm.uid=" . S::sqlEscape($winduid));
 	list($pages, $limit) = pwLimitPages($total['sum'], $page, "{$basename}a=my&");
 
 	$group = array();
-	$query = $db->query("SELECT c.id,c.cname,c.cnimg,c.admin,c.members FROM pw_cmembers cm LEFT JOIN pw_colonys c ON cm.colonyid=c.id WHERE cm.ifadmin<>'-1' AND cm.uid=" . pwEscape($winduid) . ' ORDER BY (cm.username=c.admin) DESC ' . $limit);
+	$query = $db->query("SELECT c.id,c.cname,c.cnimg,c.admin,c.members FROM pw_cmembers cm LEFT JOIN pw_colonys c ON cm.colonyid=c.id WHERE cm.ifadmin<>'-1' AND cm.uid=" . S::sqlEscape($winduid) . ' ORDER BY (cm.username=c.admin) DESC ' . $limit);
 	while ($rt = $db->fetch_array($query)) {
 		if ($rt['cnimg']) {
 			list($rt['cnimg']) = geturl("cn_img/$rt[cnimg]",'lf');
@@ -90,29 +92,38 @@ if (empty($a)) {
 
 } elseif ($a == 'all') {
 
-	InitGP(array('page', 'styleid', 'friends', 'members'), null, 2);
-	InitGP(array('keyword'));
+	S::gp(array('page', 'styleid', 'friends', 'members'), null, 2);
+	S::gp(array('keyword'));
 
 	require_once(R_P . 'apps/groups/lib/colony.class.php');
 	$atc_name = getLangInfo('app','group');
 	$cMembers = $group = array();
 	$sqlsel   = $sqltab = '';
-
+	
+		
 	if ($styleid) {
-		$sqlsel .= ' AND c.styleid=' . pwEscape($styleid);
+		$tmpStyle = array();
+		if ($o_styledb[$styleid]['upid'] == '0') {
+			foreach ($o_styledb as $k => $v) {
+				if ($v['upid'] == $styleid) {
+					$tmpStyle[] = $k;
+				}
+			}
+		}
+		$sqlsel .= ' AND c.styleid' . ($tmpStyle ? ' IN(' . S::sqlImplode($tmpStyle) . ')' : '=' . S::sqlEscape($styleid));
 	}
 	if ($members) {
-		$sqlsel .= ' AND c.members>=' . pwEscape($members);
+		$sqlsel .= ' AND c.members>=' . S::sqlEscape($members);
 	}
 	if ($keyword) {
-		$sqlsel .= ' AND c.cname LIKE ' . pwEscape("%" . $keyword . "%");
+		$sqlsel .= ' AND c.cname LIKE ' . S::sqlEscape("%" . $keyword . "%");
 	}
 	if ($friends) {
 		$friends = getFriends($winduid);
 		unset($friends[$winduid]);
 		$uids = $friends ? array_keys($friends) : array(0);
 		$sqltab .= ' LEFT JOIN pw_cmembers cm ON c.id=cm.colonyid';
-		$sqlsel .= ' AND cm.uid IN(' . pwImplode($uids) . ')';
+		$sqlsel .= ' AND cm.uid IN(' . S::sqlImplode($uids) . ')';
 	}
 	$total = $db->get_value("SELECT COUNT(DISTINCT c.id) AS sum FROM pw_colonys c {$sqltab} WHERE 1 {$sqlsel}");
 
@@ -132,9 +143,9 @@ if (empty($a)) {
 			$group[$rt['id']] = $rt;
 		}
 	}
-	$colonyids = pwImplode(array_keys($group));
+	$colonyids = S::sqlImplode(array_keys($group));
 	if ($colonyids) {
-		$query = $db->query("SELECT id,ifadmin,colonyid FROM pw_cmembers WHERE colonyid IN ($colonyids) AND uid=" . pwEscape($winduid,false));
+		$query = $db->query("SELECT id,ifadmin,colonyid FROM pw_cmembers WHERE colonyid IN ($colonyids) AND uid=" . S::sqlEscape($winduid,false));
 		while ($rt = $db->fetch_array($query)) {
 			$cMembers[$rt['colonyid']] = $rt['ifadmin'];
 		}
@@ -158,7 +169,7 @@ if (empty($a)) {
 
 } elseif ($a == 'friend') {
 
-	InitGP(array('page','cid'), null, 2);
+	S::gp(array('page','cid'), null, 2);
 
 	$friends = getFriends($winduid);
 	unset($friends[$winduid]);
@@ -169,10 +180,10 @@ if (empty($a)) {
 
 	if (count($friends)) {
 
-		$total = $db->get_value("SELECT COUNT(DISTINCT c.id) AS count FROM pw_cmembers cm LEFT JOIN pw_colonys c ON cm.colonyid=c.id WHERE cm.uid IN(" . pwImplode($friends) . ") AND cm.ifadmin <> '-1'");
+		$total = $db->get_value("SELECT COUNT(DISTINCT c.id) AS count FROM pw_cmembers cm LEFT JOIN pw_colonys c ON cm.colonyid=c.id WHERE cm.uid IN(" . S::sqlImplode($friends) . ") AND cm.ifadmin <> '-1'");
 		list($pages,$limit) = pwLimitPages($total,$page,"{$basename}a=friend&");
 		$friends[] = $winduid;
-		$query = $db->query("SELECT c.id,c.cname,c.cnimg,c.admin,SUM(cm.uid='$winduid') AS ifadd FROM pw_cmembers cm LEFT JOIN pw_colonys c ON cm.colonyid=c.id WHERE cm.uid IN(" . pwImplode($friends) . ") AND cm.ifadmin<>'-1' GROUP BY cm.colonyid HAVING(SUM(cm.uid!='$winduid') > 0) ORDER BY cm.colonyid DESC $limit");
+		$query = $db->query("SELECT c.id,c.cname,c.cnimg,c.admin,SUM(cm.uid='$winduid') AS ifadd FROM pw_cmembers cm LEFT JOIN pw_colonys c ON cm.colonyid=c.id WHERE cm.uid IN(" . S::sqlImplode($friends) . ") AND cm.ifadmin<>'-1' GROUP BY cm.colonyid HAVING(SUM(cm.uid!='$winduid') > 0) ORDER BY cm.colonyid DESC $limit");
 		while ($rt = $db->fetch_array($query)) {
 			if ($rt['cnimg']) {
 				list($rt['cnimg']) = geturl("cn_img/$rt[cnimg]",'lf');
@@ -183,7 +194,7 @@ if (empty($a)) {
 			$group[$rt['id']] = $rt;
 		}
 		if ($group) {
-			$query = $db->query("SELECT uid,username,colonyid FROM pw_cmembers WHERE uid IN (" . pwImplode($friends) . ') AND colonyid IN(' . pwImplode(array_keys($group)) . ") AND ifadmin<>'-1'");
+			$query = $db->query("SELECT uid,username,colonyid FROM pw_cmembers WHERE uid IN (" . S::sqlImplode($friends) . ') AND colonyid IN(' . S::sqlImplode(array_keys($group)) . ") AND ifadmin<>'-1'");
 			while ($rt = $db->fetch_array($query)) {
 				$num = $group[$rt['colonyid']]['ifadd'] ? 2 : 3;
 				if ($rt['uid'] != $winduid && count($group[$rt['colonyid']]['friends']) < $num) {
@@ -225,8 +236,8 @@ if (empty($a)) {
 		}
 	}
 	$costs = trim($costs,",");
-	include_once Pcv(D_P."data/groupdb/group_$groupid.php");
-	if ($_G['allowcreate'] && $_G['allowcreate'] <= $db->get_value("SELECT COUNT(*) AS sum FROM pw_colonys WHERE admin=" . pwEscape($windid))) 	{
+	include_once pwCache::getPath(S::escapePath(D_P."data/groupdb/group_$groupid.php"));
+	if ($_G['allowcreate'] && $_G['allowcreate'] <= $db->get_value("SELECT COUNT(*) AS sum FROM pw_colonys WHERE admin=" . S::sqlEscape($windid))) 	{
 		Showmsg('colony_numlimit');
 	}
 
@@ -235,7 +246,7 @@ if (empty($a)) {
 		$u = $winduid;
 		$username = $windid;
 		$o_cate = array();
-		include_once(D_P . 'data/bbscache/forum_cache.php');
+		include_once pwCache::getPath(D_P . 'data/bbscache/forum_cache.php');
 		if(is_array($o_classdb)){
 			foreach ($o_classdb as $key => $value) {
 					$o_cate[$forum[$key]['fup']][$key] = $value;
@@ -257,12 +268,12 @@ if (empty($a)) {
 	} else {
 
 		require_once(R_P.'require/postfunc.php');
-		PostCheck(1,$o_groups_gdcheck,$o_groups_qcheck);
+		PostCheck(1,$o_groups_gdcheck,$o_groups_qcheck && $db_question);
 
-		InitGP(array('cname','descrip'),'P');
-		InitGP(array('cid','firstgradestyle','secondgradestyle'), 'P', 2);
+		S::gp(array('cname','descrip'),'P');
+		S::gp(array('cid','firstgradestyle','secondgradestyle'), 'P', 2);
 
-		(!$cname || strlen($cname) > 50) && Showmsg('colony_emptyname');
+		(!$cname || strlen($cname) > 20) && Showmsg('colony_emptyname');
 		$descrip = str_replace('&#61;' , '=', $descrip);
 		strlen($descrip) > 255 && Showmsg('colony_descrip');
 		//!$cid && Showmsg('colony_class');
@@ -295,7 +306,7 @@ if (empty($a)) {
 			$cid = 0;
 		}
 		*/
-		$rt = $db->get_one("SELECT id FROM pw_colonys WHERE cname=".pwEscape($cname));
+		$rt = $db->get_one("SELECT id FROM pw_colonys WHERE cname=".S::sqlEscape($cname));
 		$rt['id'] > 0 && Showmsg('colony_samename');
 		//积分变动
 		if (!empty($o_groups_creditset['Creategroup'])) {
@@ -311,9 +322,9 @@ if (empty($a)) {
 		$commonLevel = key($o_groups_levelneed);
 		empty($commonLevel) && Showmsg("系统未创建群组等级,无法创建群组！");
 
-		InitGP(array('title1','title2','title3','title4'));
-		$titlefont = Char_cv("$title1~$title2~$title3~$title4~$title5~$title6~");
-		$db->update("INSERT INTO pw_colonys SET " . pwSqlSingle(array(
+		S::gp(array('title1','title2','title3','title4'));
+		$titlefont = S::escapeChar("$title1~$title2~$title3~$title4~$title5~$title6~");
+		$db->update("INSERT INTO pw_colonys SET " . S::sqlSingle(array(
 				'cname'		=> $cname,
 				//'classid'	=> $cid,
 				'styleid'	=> $styleid,
@@ -326,7 +337,7 @@ if (empty($a)) {
 				'titlefont' => $titlefont
 		)));
 		$cyid = $db->insert_id();
-		$db->update("UPDATE pw_cnstyles SET csum=csum+1 WHERE id IN (" . pwImplode($styles) . ')');
+		$db->update("UPDATE pw_cnstyles SET csum=csum+1 WHERE id IN (" . S::sqlImplode($styles) . ')');
 
 		require_once(A_P . 'groups/lib/imgupload.class.php');
 		$img = new CnimgUpload($cyid);
@@ -334,24 +345,34 @@ if (empty($a)) {
 		pwFtpClose($ftp);
 		if ($cnimg = $img->getImgUrl()) {
 			$cnimg = substr(strrchr($cnimg,'/'),1);
-			$db->update("UPDATE pw_colonys SET cnimg=".pwEscape($cnimg)." WHERE id=".pwEscape($cyid));
+			$db->update("UPDATE pw_colonys SET cnimg=".S::sqlEscape($cnimg)." WHERE id=".S::sqlEscape($cyid));
 		}
-
-		$db->update("INSERT INTO pw_cmembers SET " . pwSqlSingle(array(
+		/**
+		$db->update("INSERT INTO pw_cmembers SET " . S::sqlSingle(array(
 				'uid'		=> $winduid,
 				'username'	=> $windid,
 				'ifadmin'	=> 1,
 				'colonyid'	=> $cyid,
 				'addtime'	=> $timestamp
 		)));
+		**/
+		pwQuery::insert('pw_cmembers', array(
+				'uid'		=> $winduid,
+				'username'	=> $windid,
+				'ifadmin'	=> 1,
+				'colonyid'	=> $cyid,
+				'addtime'	=> $timestamp
+		));
 		
 		updateUserAppNum($winduid,'group');
-		refreshto("apps.php?q=group&cyid=$cyid&a=set",'colony_regsuccess');
+		$url = "apps.php?q=group&cyid=$cyid&a=set";
+		$msg = defined('AJAX') ?  "success\t".$url : 'colony_regsuccess';
+		refreshto("apps.php?q=group&cyid=$cyid&a=set",$msg);
 	}
 } elseif ($a == 'checkcname') {
 	define('AJAX',1);
-	InitGP(array('cname'));
-	$ckcname = $db->get_value("SELECT cname FROM pw_colonys WHERE cname=".pwEscape($cname));
+	S::gp(array('cname'));
+	$ckcname = $db->get_value("SELECT cname FROM pw_colonys WHERE cname=".S::sqlEscape($cname));
 	if(empty($ckcname)) {
 		echo "ok";
 	}

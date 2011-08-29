@@ -18,7 +18,8 @@ class JOB_DoSendMessage{
 	 * 任务链接
 	 */
 	function getUrl($job){
-		return "message.php?type=post";
+		$factor = unserialize($job['factor']);
+		return "message.php?type=post&username=$factor[user]";
 	}
 	
 	function finish($job,$jober,$factor){

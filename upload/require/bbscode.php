@@ -85,6 +85,7 @@ function convert($message,$allow,$type="post"){
 	$message = preg_replace($searcharray,$replacearray,$message);
 
 	if ($type == 'post') {
+		$tpc_tag && $message = relatetag($message, $tpc_tag);
 		if ($foruminfo['allowhide'] && strpos($message,"[post]")!==false && strpos($message,"[/post]")!==false) {
 			$message=preg_replace("/\[post\](.+?)\[\/post\]/eis","post('\\1')",$message);
 		}
@@ -109,7 +110,7 @@ function convert($message,$allow,$type="post"){
 	if ($allow['flash']) {
 		$message = preg_replace("/\[flash=(\d+?)\,(\d+?)(\,(0|1))?\]([^\[\<\r\n\"']+?)\[\/flash\]/eis", "wplayer('\\5','\\1','\\2','\\4','flash')",$message,$db_cvtimes);
 	} else {
-		$message = preg_replace("/\[flash=(\d+?)\,(\d+?)(\,(0|1))?\]([^\[\<\r\n\"']+?)\[\/flash\]/is","<img src='$imgpath/$stylepath/file/music.gif' align='absbottom'> <a target='_blank' href='\\5 '>flash: \\5</a>",$message,$db_cvtimes);
+		$message = preg_replace("/\[flash=(\d+?)\,(\d+?)(\,(0|1))?\]([^\[\<\r\n\"']+?)\[\/flash\]/is","<img src='$imgpath/wind/file/music.gif' align='absbottom'> <a target='_blank' href='\\5 '>flash: \\5</a>",$message,$db_cvtimes);
 	}
 	if ($type == 'post') {
 		$t = 0;
@@ -137,7 +138,7 @@ function convert($message,$allow,$type="post"){
 					"/\[wmv(?:=[0-9]{1,3}\,[0-9]{1,3}\,[01]{1})?\]([^\<\r\n\"']+?)\[\/wmv\]/is",
 					"/\[rm(?:=[0-9]{1,3}\,[0-9]{1,3}\,[01]{1})\]([^\<\r\n\"']+?)\[\/rm\]/is"
 				),
-				"<img src=\"$imgpath/$stylepath/file/music.gif\" align=\"absbottom\"> <a target=\"_blank\" href=\"\\1 \">\\1</a>",$message,$db_cvtimes
+				"<img src=\"$imgpath/wind/file/music.gif\" align=\"absbottom\"> <a target=\"_blank\" href=\"\\1 \">\\1</a>",$message,$db_cvtimes
 			);
 		}
 		if ($allow['iframe']) {
@@ -145,7 +146,6 @@ function convert($message,$allow,$type="post"){
 		} else {
 			$message = preg_replace("/\[iframe\]([^\[\<\r\n\"']+?)\[\/iframe\]/is","Iframe Close: <a target=_blank href='\\1 '>\\1</a>",$message,$db_cvtimes);
 		}
-		$tpc_tag && $message = relatetag($message,$tpc_tag);
 		strpos($message,'[s:') !== false && $message = showface($message);
 	}
 	if (is_array($phpcode_htm)) {
@@ -182,35 +182,33 @@ function attcontent($message, $atype, $att) {
 		case 'pic':
 			$html = '<b>'.$att['desc'].'</b>'.$att['img'];break;
 		case 'downattach':
-			$html = '<b>'.$att['desc'].'</b>' . "<img src=\"$GLOBALS[imgpath]/$GLOBALS[stylepath]/file/$att[type].gif\" align=\"absmiddle\" /><a href=\"job.php?action=download&aid=$att[aid]\" target=\"_blank\"> $att[name]</a> ($att[size] K) &#19979;&#36733;&#27425;&#25968;:$att[hits] ";
+			$html = '<b>'.$att['desc'].'</b>' . "<img src=\"$GLOBALS[imgpath]/$GLOBALS[stylepath]/file/$att[type].gif\" align=\"absmiddle\" /><a href=\"job.php?action=download&aid=$att[aid]\" onclick=\"return ajaxurl(this,'&check=1');\"> $att[name]</a> ($att[size] K) &#19979;&#36733;&#27425;&#25968;:$att[hits] ";
 			if ($att['needrvrc'] > 0) {
-				if ($att['type'] == 'img' && ($att['isBuy'] || $att['dfadmin'] || $att['isThrough'])) {
-					$showImg = $att['img'];
-//					list($srcW,$srcH) = getimagesize($showImg);
+				$showImg = '';
+				if ($att['type'] == 'img' && viewHiddenAtt($att)) {
+					$showImg = $att['img']."<br>";
 				}
-				if ($att['special'] == 2) {			
-					$html = $showImg ? $showImg."<br>" : "&nbsp;&nbsp;<span class=\"b s2\">&#38468;&#20214;&#20986;&#21806;：</span><img src=\"$GLOBALS[imgpath]/$GLOBALS[stylepath]/file/$att[type].gif\" align=\"absmiddle\" />"; 
-					$html .= "<a id=\"td_att{$att['aid']}\" href=\"javascript:;\" onmouseover=\"read.open('menu_att{$att['aid']}','td_att{$att['aid']}');\" style=\"margin-left:10px;margin-right:10px;\">$att[name]</a>";
+				if ($att['special'] == 2) {
+					$html = "<span class=\"b s2\">&#38468;&#20214;&#20986;&#21806;：</span><img src=\"$GLOBALS[imgpath]/$GLOBALS[stylepath]/file/$att[type].gif\" align=\"absmiddle\" /><a id=\"td_att{$att['aid']}\" href=\"job.php?action=download&aid=$att[aid]\" onclick=\"return ajaxurl(this,'&check=1');\" onmouseover=\"read.open('menu_att{$att['aid']}','td_att{$att['aid']}');\" style=\"margin-left:5px;margin-right:10px;\">$att[name]</a>" . $showImg;
 					$html .= "<div id=\"menu_att{$att['aid']}\" class=\"pw_menu\" style=\"display:none;\"><div class=\"p10\"><ul>".
-							"<li>&#19979;&#36733;&#27425;&#25968;:$att[hits]</li>".
-							"<li>&#31867;&#22411;&#65306;&#20986;&#21806;</li>".
+							"<li>&#19979;&#36733;:$att[hits]</li>".
+							"<li>&#31867;&#22411;:&#20986;&#21806;</li>".
 							"<li>&#21806;&#20215;:{$att[needrvrc]}{$att[cname]}</li>".
 							"<li>&#22823;&#23567;:$att[size] K</li>";
 					$html .= $att['desc'] ? "<li>&#25551;&#36848;:{$att['desc']}</li>" : '';
 					$html .=	"<li><a class=\"mr10 s4\" title=\"&#26597;&#30475;&#35760;&#24405;\" onclick=\"sendmsg('job.php?action=attachbuy&amp;type=record&amp;aid={$att['aid']}');\" href=\"javascript:;\">[&#35760;&#24405;]</a>".
-							"<a class=\"mr10 s4\" title=\"&#19979;&#36733;：{$att[name]}\" onclick=\"sendmsg('job.php?action=attachbuy&amp;type=download&amp;aid={$att['aid']}');\" href=\"javascript:;\" id=\"fg_{$att['aid']}\">[&#19979;&#36733;]</a>";
+							"<span class=\"mr10 s4 cp\" onclick=\"return ajaxurl(getObj('td_att{$att['aid']}'),'&check=1');\" id=\"fg_{$att['aid']}\">[&#19979;&#36733;]</span>";
 					$html .= $att['dfadmin'] ? "<a onclick=\"delatt('tpc','{$att['aid']}');\" class=\"cp s4\">[&#21024;&#38500;]</a>" : "";
 					$html .= "</li></ul></div></div>";
 				} else {
-					$html = $showImg ? $showImg."<br>" : "<img src=\"$GLOBALS[imgpath]/$GLOBALS[stylepath]/file/$att[type].gif\" align=\"absmiddle\" />";
-					$html .= "<a id=\"td_att{$att['aid']}\" href=\"javascript:;\" onmouseover=\"read.open('menu_att{$att['aid']}','td_att{$att['aid']}');\" style=\"margin-left:10px;margin-right:10px;\">$att[name]</a>";
+					$html = "<img src=\"$GLOBALS[imgpath]/$GLOBALS[stylepath]/file/$att[type].gif\" align=\"absmiddle\" /><a id=\"td_att{$att['aid']}\" href=\"job.php?action=download&aid=$att[aid]\" onclick=\"return ajaxurl(this,'&check=1');\" onmouseover=\"read.open('menu_att{$att['aid']}','td_att{$att['aid']}');\" style=\"margin-left:5px;margin-right:10px;\">$att[name]</a>" . $showImg;
 					$html .= "<div id=\"menu_att{$att['aid']}\" class=\"pw_menu\" style=\"display:none;\"><div class=\"p10\"><ul>".
-					"<li>&#19979;&#36733;&#27425;&#25968;:$att[hits]</li>".
-					"<li>&#31867;&#22411;&#65306;&#21152;&#23494;</li>".
+					"<li>&#19979;&#36733;:$att[hits]</li>".
+					"<li>&#31867;&#22411;:&#21152;&#23494;</li>".
 					"<li>&#38656;&#35201;:{$att[needrvrc]}{$att[cname]}</li>".
 					"<li>&#22823;&#23567;:$att[size] K</li>";
 					$html .= $att['desc'] ? "<li>&#25551;&#36848;:{$att['desc']}</li>" : '';
-					$html .= "<a href=\"job.php?action=download&aid=$att[aid]\"  class=\"mr10 s4\" title=\"&#19979;&#36733;：{$att[name]}\">[&#19979;&#36733;]</a>";
+					$html .= "<span onclick=\"return ajaxurl(getObj('td_att{$att['aid']}'),'&check=1');\" class=\"mr10 s4 cp\">[&#19979;&#36733;]</span>";
 					$html .= $att['dfadmin'] ? "<a onclick=\"delatt('tpc','{$att['aid']}');\" class=\"cp s4\">[&#21024;&#38500;]</a>" : "";
 					$html .= "</li></ul></div></div>";
 				}
@@ -259,7 +257,8 @@ function cvurl($http,$url='',$name='',$ifdownload='',$checkurl) {
 	$code_num++;
 	if ($checkurl == 1) {
 		static $urlnum = 0;
-		$addjs = 'onclick="return checkUrl(this)" id="url_' . ++$urlnum . '"';
+		$stamp = $GLOBALS['type'] == 'ajax_addfloor' ? "_{$GLOBALS['timestamp']}" : '';
+		$addjs = 'onclick="return checkUrl(this)" id="url_' . ++$urlnum . $stamp .'"';
 	}
 	$name = str_replace('\\"','"',$name);
 	if (!$url) {
@@ -286,7 +285,6 @@ function nopic($url) {
 
 function cvpic($url,$type='',$picwidth='',$picheight='',$ifthumb='') {
 	global $db_bbsurl,$db_picpath,$attachpath,$db_ftpweb,$code_num,$code_htm;
-	$code_num++;
 	$lower_url = strtolower($url);
 	strncmp($lower_url,'http',4)!=0 && $url = "$db_bbsurl/$url";
 	if (strpos($lower_url,'login')!==false && (strpos($lower_url,'action=quit')!==false || strpos($lower_url,'action-quit')!==false)) {
@@ -297,43 +295,43 @@ function cvpic($url,$type='',$picwidth='',$picheight='',$ifthumb='') {
 	$wopen = 0;
 	$alt = '';
 	if ($ifthumb) {
-		if ($db_ftpweb && !strpos($url,$attachpath)!==false) {
+		if ($db_ftpweb && !strpos($url,$attachpath) !== false) {
 			$picurlpath = $db_ftpweb;
 		} else{
 			$picurlpath = $attachpath;
 		}
-		if (strpos($url,$picurlpath)!==false) {
+		if (strpos($url,$picurlpath) !== false) {
 			$wopen = 1;
-			$alt = 'title="Click Here To EnLarge"';
-			$turl = str_replace($picurlpath,"$picurlpath/thumb",$url);
+			$alt = 'title="点击查看原图"';
+			$turl = str_replace($picurlpath, "$picurlpath/thumb", $url);
 		}
 	}
 	if ($picwidth || $picheight) {
-		$wopen = !$wopen ? "if(this.width>=$picwidth)" : '';
+		$wopen = !$wopen ? "if(this.parentNode.tagName!='A'&&this.width>=$picwidth)" : '';
 		$onload = 'onload="';
 		$picwidth  && $onload .= "if(this.offsetWidth>'$picwidth')this.width='$picwidth';";
 		$picheight && $onload .= "if(this.offsetHeight>'$picheight')this.height='$picheight';";
 		$onload .= '"';
 		$code = "<img src=\"$turl\" border=\"0\" onclick=\"$wopen window.open('$url');\" $onload $alt>";
-	} else{
-		$wopen = !$wopen ? "if(this.width>screen.width-461)" : '';
+	} else {
+		$wopen = !$wopen ? "if(this.parentNode.tagName!='A'&&this.width>screen.width-461)" : '';
 		$code = "<img src=\"$turl\" border=\"0\" onclick=\"$wopen window.open('$url');\" $alt>";
 	}
-	$code_htm[-1][$code_num]=$code;
 	if ($type) {
 		return $code;
 	} else {
+		$code_htm[-1][++$code_num] = $code;
 		return "<\twind_code_$code_num\t>";
 	}
 }
 
 function phpcode($code){
 	global $phpcode_htm,$codeid;
-	$code = str_replace(array("[attachment=",'\\"'),array("&#91;attachment=",'"'),$code);
+	$code = str_replace(array("[attachment=",'\\"'),array("&#91;attachment=",'"'),trim($code));
 	$codeid ++;
 	$code = preg_replace('/^(<br \/>)?(.+?)(<br \/>)$/','\\2',$code);
 	$code = str_replace("<br />", "</li><li>", $code);
-	$phpcode_htm[$codeid] = "<table cellspacing=\"0\" cellpadding=\"0\" width=\"80%\"><tr><td><div class=\"c\"></div><span class=\"f10 s8\"><a href=\"javascript:\"  onclick=\"CopyCode(document.getElementById('code$codeid'));\">".getLangInfo('bbscode','copycode')."</a></span><div class=\"blockquote2\" id=\"code$codeid\"><ol><li>".preg_replace("/^(\<br \/\>)?(.*)/is","\\2",$code)."</li></ol></div></td></tr></table>";
+	$phpcode_htm[$codeid] = "<div class=\"f12\"><a href=\"javascript:\"  onclick=\"CopyCode(document.getElementById('code$codeid'));\">".getLangInfo('bbscode','copycode')."</a></div><div class=\"blockquote2\" id=\"code$codeid\"><ol><li>".preg_replace("/^(\<br \/\>)?(.*)/is","\\2",$code)."</li></ol></div>";
 	return "<\twind_phpcode_$codeid\t>";
 }
 
@@ -355,7 +353,7 @@ function ifpost($tid) {
 			$ifview = 4;
 		} else {
 			$pw_posts = GetPtable($GLOBALS['ptable']);
-			$rs = $db->get_one("SELECT count(*) AS count FROM $pw_posts WHERE tid=".pwEscape($tid)." AND authorid=".pwEscape($winduid));
+			$rs = $db->get_one("SELECT count(*) AS count FROM $pw_posts WHERE tid=".S::sqlEscape($tid)." AND authorid=".S::sqlEscape($winduid));
 			$ifview = $rs['count'] > 0 ? 1 : 0;
 		}
 	}
@@ -367,7 +365,7 @@ function post($code) {
 
 	if (ifpost($tid) > 0) {
 		$r_ifpost = ifpost($tid);
-		$code_htm[3][$code_num] = "<h6 class=\"quote\" style=\"padding:0;margin:0;\"><span class=\"s3 f12 fn\">".getLangInfo('bbscode','bbcode_hide'.$r_ifpost)."</span></h6><blockquote class=\"blockquote\" style=\"margin:10px 0;\">".str_replace('\\"','"',$code)."</blockquote>";
+		$code_htm[3][$code_num] = "<h6 class=\"quote\" style=\"padding:0;margin:0;\"><span class=\"s2 f12 fn\">".getLangInfo('bbscode','bbcode_hide'.$r_ifpost)."</span></h6><blockquote class=\"blockquote\" style=\"margin:10px 0;\">".str_replace('\\"','"',$code)."</blockquote>";
 	} else {
 		$code_htm[3][$code_num] = "<blockquote id=\"hidden_{$code_num}_{$tpc_pid}\" class=\"blockquote f12 hidden\" style=\"margin:10px 0;\">" . getLangInfo('bbscode','bbcode_hide') . "</blockquote>";
 	}
@@ -382,7 +380,7 @@ function hidden($cost,$code) {
 
 		static $sCredit = null;
 		list($creditvalue,$credittype) = explode(',',$cost);
-		if (!$credittype || !CkInArray($credittype,$db_enhideset['type'])) {
+		if (!$credittype || !S::inArray($credittype,$db_enhideset['type'])) {
 			$credittype = 'rvrc';
 		}
 		if (in_array($credittype,array('money','rvrc','credit','currency'))) {
@@ -391,7 +389,7 @@ function hidden($cost,$code) {
 		} elseif (isset($_CREDITDB[$credittype])) {
 			$creditname = $_CREDITDB[$credittype][0];
 			if (!isset($sCredit)) {
-				$query = $db->query("SELECT uid,cid,value FROM pw_membercredit WHERE uid=".pwEscape($winduid));
+				$query = $db->query("SELECT uid,cid,value FROM pw_membercredit WHERE uid=".S::sqlEscape($winduid));
 				while ($rt = $db->fetch_array($query)) {
 					$sCredit[$rt['cid']] = $rt['value'];
 				}
@@ -408,7 +406,7 @@ function hidden($cost,$code) {
 					. getLangInfo('bbscode','bbcode_encode1',array('name'=>$creditname,'value'=>$creditvalue))
 					. "</blockquote>";
 		} else {
-			$code = "<h6 class=\"quote\" style=\"padding:0;margin:0;\"><span class=\"s3 f12 fn\">"
+			$code = "<h6 class=\"quote\" style=\"padding:0;margin:0;\"><span class=\"s2 f12 fn\">"
 					. getLangInfo('bbscode','bbcode_encode2',array('name'=>$creditname,'value'=>$creditvalue))
 					. "</span></h6><blockquote class=\"blockquote\" style=\"margin:10px 0;\">"
 					. str_replace('\\"','"',$code)
@@ -447,7 +445,7 @@ function sell($cost,$code) {
 	$printcode = '';
 	$buyBaseUrl = "job.php?action=buytopic&tid=$tid&pid=$tpc_pid&verify=$GLOBALS[verifyhash]&page={$GLOBALS['page']}";
 	if (++$sell_num == 1) {
-		$printcode = "<div><span class=\"s3 f12\">" 
+		$printcode = "<div><span class=\"s2 f12\">" 
 						. getLangInfo('bbscode','bbcode_sell_info',array('value' => $creditvalue, 'name' => $creditname, 'count' => $count))
 						. "</span> "
 						. getLangInfo('bbscode','bbcode_sell_record_buy',array('record' => $buyBaseUrl."&type=record", 'buy' => $buyBaseUrl."&type=buy"))
@@ -485,13 +483,13 @@ function wplayer($wmvurl,$width='',$height='',$auto='',$type='wmv'){
 }
 function showface($message) {
 	global $face,$db_cvtimes;
-	include_once(D_P.'data/bbscache/postcache.php');
+	include_once pwCache::getPath(D_P.'data/bbscache/postcache.php');
 	$message = preg_replace("/\[s:(.+?)\]/eis","postcache('\\1')",$message,$db_cvtimes);
 	return $message;
 }
 function postcache($key) {
 	global $face,$imgpath,$tpc_author;
-	!$face[$key] && $face[$key] = current($face);
+	is_array($face) && !$face[$key] && $face[$key] = current($face);
 	if ($face[$key][2]) {
 		return "<br /><img src=$imgpath/post/smile/{$face[$key][0]} /><br />[<span class=\"s1 b\">$tpc_author</span>] {$face[$key][2]}<br />";
 	} else {
@@ -504,10 +502,10 @@ function wordsConvert($str, $wdstruct = array()) {
 }
 function leaveword($code,$pid) {
 	global $admincheck,$imgpath,$tid;
-	return "<div id=\"lwd_$pid\" class=\"blockquote f12\" style=\"margin-top:10px;\"><span class=\"mr5\">".($admincheck ? "<span onclick=\"read.obj=getObj('lwd_$pid');ajax.send('pw_ajax.php?action=leaveword','step=3&tid=$tid&pid=$pid',worded);\" class=\"adel fr\">x</span>" : '')."<span class=\"s2 f12\">".getLangInfo('bbscode','post_reply')."</span></span>".str_replace("\n","<br />",$code)."</div>";
+	return "<div id=\"lwd_$pid\" class=\"louMes\">".($admincheck ? "<span onclick=\"read.obj=getObj('lwd_$pid');ajax.send('pw_ajax.php?action=leaveword','step=3&tid=$tid&pid=$pid',worded);\" class=\"adel fr\">x</span>" : '')."<h4 class=\"b\">".getLangInfo('bbscode','post_reply')."</h4><p>".str_replace("\n","<br />",$code)."</p></div>";
 }
-function relatetag($message,$tags) {
-	$tags = explode(' ',$tags);
+function relatetag($message, $tags) {
+	if (!is_array($tags)) return $message;
 	foreach ($tags as $key => $tag) {
 		$message = preg_replace("/(?<=[\s\"\]>()]|[\x7f-\xff]|^)(".preg_quote($tag, '/').")([.,:;-?!()\s\"<\[]|[\x7f-\xff]|$)/siUe","tagfont('\\1','\\2')",$message,1);
 	}
@@ -517,5 +515,42 @@ function tagfont($tag,$code) {
 	static $rlt_id = 0;
 	$rlt_id++;
 	return "<span onclick=\"sendmsg('pw_ajax.php','action=relatetag&tagname=$tag',this.id)\" style=\"cursor:pointer;border-bottom: 1px solid #FA891B;\" id=\"rlt_$rlt_id\">$tag</span>$code";
+}
+
+function getReadTag($tags) {
+	list($tagdb, $relatetag) = explode("\t", $tags);
+	$html = '';
+	$list = array();
+	$tagdb = $tagdb ? parseReadTag($tagdb) : array();
+	foreach ($tagdb as $key => $tag) {
+		$tag && $html .= "<a href=\"link.php?action=tag&tagname=".rawurlencode($tag)."\"><span class=\"s2\">$tag</span></a> ";
+	}
+	$GLOBALS['db_readtag'] && $list = array_merge($tagdb, $relatetag ? parseReadTag($relatetag) : array());
+	return array($html, $list);
+}
+
+/**
+ * 将保存的TAGS字符串重新解开
+ * @param string $tags
+ */
+function parseReadTag($tags){
+	$pattern = '/"([^"]+)"/';
+	$readTags = array();
+	if (preg_match_all($pattern, $tags ,$m)) {
+		$tmpArray = preg_split($pattern, $tags);
+		$tags1 = array();
+		foreach ($tmpArray as $v){
+			$v = trim($v);
+			if(!$v) continue;
+			$tags1 = array_merge($tags1,explode(' ',$v));
+		}
+		$readTags = array_merge($tags1,$m[1]);
+	} else {
+		$readTags = explode(' ',$tags);
+	}
+	foreach ($readTags as $k=>$v) {
+		if(!$v) unset($readTags[$k]);
+	}
+	return $readTags;
 }
 ?>

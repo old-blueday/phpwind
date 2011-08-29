@@ -8,7 +8,7 @@ $Rss_listnum=20;
 $Rss_updatetime=10;
 
 if ($tid) {
-	$rs = $db->get_one("SELECT t.subject,t.fid,t.ptable,f.name,f.allowvisit,f.f_type FROM pw_threads t LEFT JOIN pw_forums f USING(fid) WHERE tid=".pwEscape($tid));
+	$rs = $db->get_one("SELECT t.subject,t.fid,t.ptable,f.name,f.allowvisit,f.f_type FROM pw_threads t LEFT JOIN pw_forums f USING(fid) WHERE tid=".S::sqlEscape($tid));
 	if (!$rs || $rs['allowvisit'] != '' || $rs['f_type'] == 'hidden') {
 		echo "<META HTTP-EQUIV='Refresh' CONTENT='0; URL=rss.php'>";exit;
 	}
@@ -38,7 +38,7 @@ if ($tid) {
 	$Rss->image($image);
 
 	$pw_posts = GetPtable($rs['ptable']);
-	$query = $db->query("SELECT pid,tid,subject,author,postdate,anonymous,content FROM $pw_posts WHERE tid=".pwEscape($tid)." ORDER BY postdate DESC LIMIT $Rss_listnum");
+	$query = $db->query("SELECT pid,tid,subject,author,postdate,anonymous,content FROM $pw_posts WHERE tid=".S::sqlEscape($tid)." ORDER BY postdate DESC LIMIT $Rss_listnum");
 	while ($rt = $db->fetch_array($query)) {
 		$rt['content'] = substrs(stripWindCode($rt['content']),300);
 		$rt['anonymous'] && $rt['author'] = $db_anonymousname;
@@ -64,7 +64,7 @@ if ($tid) {
 	$cache_path = D_P.'data/bbscache/rss_'.$fid.'_cache.xml';
 	if ($timestamp-pwFilemtime($cache_path) > $Rss_updatetime*60) {
 		L::loadClass('rss', 'utility', false);
-		require_once(D_P.'data/bbscache/forum_cache.php');
+		require_once pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
 		if ($db_tlist) {
 			@extract($db->get_one("SELECT MAX(tid) AS tid FROM pw_threads"));
 			$pw_tmsgs = GetTtable($tid);
@@ -72,7 +72,7 @@ if ($tid) {
 			$pw_tmsgs = 'pw_tmsgs';
 		}
 		if ($fid) {
-			$rt = $db->get_one("SELECT allowvisit,f_type FROM pw_forums WHERE fid=".pwEscape($fid));
+			$rt = $db->get_one("SELECT allowvisit,f_type FROM pw_forums WHERE fid=".S::sqlEscape($fid));
 			if (!$rt || $rt['allowvisit'] != '' || $rt['f_type'] == 'hidden') {
 				echo"<META HTTP-EQUIV='Refresh' CONTENT='0; URL=rss.php'>";exit;
 			}
@@ -80,7 +80,7 @@ if ($tid) {
 		$sql = $forceindex = '';
 		if ($fid) {
 			$description = "Latest $Rss_newnum article of ".$forum[$fid]['name'];
-			$sql = "WHERE t.fid=".pwEscape($fid)."AND ifcheck=1 AND topped='0' AND lastpost>".pwEscape($timestamp-604800)." ORDER BY lastpost DESC LIMIT $Rss_listnum";
+			$sql = "WHERE t.fid=".S::sqlEscape($fid)."AND ifcheck=1 AND topped='0' AND lastpost>".S::sqlEscape($timestamp-604800)." ORDER BY lastpost DESC LIMIT $Rss_listnum";
 		} else {
 			$fids  = $extra = '';
 			$query = $db->query("SELECT fid FROM pw_forums WHERE allowvisit='' AND f_type!='hidden'");
@@ -90,8 +90,8 @@ if ($tid) {
 			}
 			$description = "Latest $Rss_newnum article of all forums";
 			if ($fids) {
-				$sql = "WHERE fid IN($fids) AND ifcheck=1 AND topped='0' AND postdate>".pwEscape($timestamp-604800)." ORDER BY postdate DESC LIMIT $Rss_newnum";
-				$forceindex = 'FORCE INDEX (postdate)';
+				$sql = "WHERE fid IN($fids) AND ifcheck=1 AND topped='0' AND postdate>".S::sqlEscape($timestamp-604800)." ORDER BY postdate DESC LIMIT $Rss_newnum";
+				$forceindex = 'FORCE INDEX ('.getForceIndex('idx_postdate').')';
 			}
 		}
 		$channel = array(

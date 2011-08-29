@@ -5,6 +5,7 @@ class PW_MembersDB extends BaseDB {
 	var $_tableName = "pw_members";
 	var $_memberDataTableName = "pw_memberdata";
 	var $_memberInfoTableName = "pw_memberinfo";
+	var $_singleRightTableName = 'pw_singleright';
 	var $_primaryKey = 'uid';
 	
 	function get($id) {
@@ -50,7 +51,10 @@ class PW_MembersDB extends BaseDB {
 	
 	function updates($fieldData, $ids) {
 		if (!$this->_check() || !$fieldData || empty($ids)) return false;
+		/**
 		$this->_db->update("UPDATE " . $this->_tableName . " SET " . $this->_getUpdateSqlString($fieldData) . " WHERE " . $this->_primaryKey . " IN (" . $this->_getImplodeString($ids) . ")");
+		**/
+		pwQuery::update('pw_members', "uid IN(:uid)" , array($ids), $fieldData);
 		return $this->_db->affected_rows();
 	}
 	
@@ -66,11 +70,12 @@ class PW_MembersDB extends BaseDB {
 		}
 		if (empty($incrementStatement)) return 0;
 		
-		$this->_db->update("UPDATE " . $this->_tableName . " SET " . implode(", ", $incrementStatement) . " WHERE uid=" . $this->_addSlashes($userId));
+		//* $this->_db->update("UPDATE " . $this->_tableName . " SET " . implode(", ", $incrementStatement) . " WHERE uid=" . $this->_addSlashes($userId));
+		$this->_db->update(pwQuery::buildClause("UPDATE :pw_table SET " . implode(", ", $incrementStatement) . " WHERE uid=:uid", array($this->_tableName, $userId)));
 		return $this->_db->affected_rows();
 	}
 	
-	function delete($id) {
+	function delete($id) {	
 		return $this->_delete($id);
 	}
 	
@@ -107,17 +112,18 @@ class PW_MembersDB extends BaseDB {
 		}
 		
 		$userstatus = 'userstatus=userstatus' . implode('', $userstatus);
-		$this->_db->update("UPDATE " . $this->_tableName . " SET $userstatus WHERE uid=" . $this->_addSlashes($userId));
+		//* $this->_db->update("UPDATE " . $this->_tableName . " SET $userstatus WHERE uid=" . $this->_addSlashes($userId));
+		$this->_db->update(pwQuery::buildClause("UPDATE :pw_table SET $userstatus WHERE uid=:uid", array($this->_tableName, $userId)));		
 		return $this->_db->affected_rows();
 	}
 	
 	function getUsersByUserNames($userNames) {
-		$query = $this->_db->query("SELECT * FROM " . $this->_tableName . " WHERE username IN(" . pwImplode($userNames) . ")");
+		$query = $this->_db->query("SELECT * FROM " . $this->_tableName . " WHERE username IN(" . S::sqlImplode($userNames) . ")");
 		return $this->_getAllResultFromQuery($query);
 	}
 	
 	function getUsersByUserIds($userIds) {
-		$query = $this->_db->query("SELECT * FROM " . $this->_tableName . " WHERE uid IN(" . pwImplode($userIds) . ")");
+		$query = $this->_db->query("SELECT * FROM " . $this->_tableName . " WHERE uid IN(" . S::sqlImplode($userIds) . ")");
 		return $this->_getAllResultFromQuery($query, 'uid');
 	}
 	
@@ -133,7 +139,7 @@ class PW_MembersDB extends BaseDB {
 	 * @return Array:
 	 */
 	function getUserByUserEmails($emails) {
-		$query = $this->_db->query("SELECT * FROM " . $this->_tableName . " WHERE email IN (" . pwImplode($emails) . ")");
+		$query = $this->_db->query("SELECT * FROM " . $this->_tableName . " WHERE email IN (" . S::sqlImplode($emails) . ")");
 		return $this->_getAllResultFromQuery($query);
 	}
 	
@@ -144,7 +150,7 @@ class PW_MembersDB extends BaseDB {
 	 * @return array
 	 */
 	function getUsersByGroupIds($groupIds) {
-		$query = $this->_db->query("SELECT * FROM " . $this->_tableName . " WHERE groupid IN(" . pwImplode($groupIds) . ")");
+		$query = $this->_db->query("SELECT * FROM " . $this->_tableName . " WHERE groupid IN(" . S::sqlImplode($groupIds) . ")");
 		return $this->_getAllResultFromQuery($query);
 	}
 	
@@ -160,7 +166,7 @@ class PW_MembersDB extends BaseDB {
 	}
 	
 	function getUserInfosByUserIds($userIds) {
-		$userIds = (is_array($userIds)) ? pwImplode($userIds) : $userIds;
+		$userIds = (is_array($userIds)) ? S::sqlImplode($userIds) : $userIds;
 		$query = $this->_db->query("SELECT * FROM " . $this->_tableName . " m LEFT JOIN " . $this->_memberDataTableName . " md ON m.uid=md.uid WHERE m.uid IN(" . $userIds . ")");
 		return $this->_getAllResultFromQuery($query, 'uid');
 	}
@@ -178,7 +184,7 @@ class PW_MembersDB extends BaseDB {
 	 * @version phpwind 8.0
 	 */
 	function countSearch($keywords) {
-		$result = $this->_db->get_one("SELECT COUNT(*) as total FROM " . $this->_tableName . " WHERE username like " . pwEscape("%$keywords%") . " LIMIT 1");
+		$result = $this->_db->get_one("SELECT COUNT(*) as total FROM " . $this->_tableName . " WHERE username like " . S::sqlEscape("%$keywords%") . " LIMIT 1");
 		return ($result) ? $result['total'] : 0;
 	}
 	
@@ -187,9 +193,43 @@ class PW_MembersDB extends BaseDB {
 	 * @version phpwind 8.0
 	 */
 	function getSearch($keywords, $offset, $limit) {
-		$query = $this->_db->query("SELECT * FROM " . $this->_tableName . " WHERE username like " . pwEscape("%$keywords%") . " LIMIT " . $offset . "," . $limit);
+		$query = $this->_db->query("SELECT * FROM " . $this->_tableName . " WHERE username like " . S::sqlEscape("%$keywords%") . " LIMIT " . $offset . "," . $limit);
 		return $this->_getAllResultFromQuery($query);
 	}
-
+	
+	function getMemberAndData($userIds){
+		$query = $this->_db->query("SELECT m.uid,m.username,m.gender,m.oicq,m.aliww,m.groupid,m.memberid,m.icon AS micon ,m.hack,m.honor,m.signature,m.regdate,m.medals,m.userstatus,md.postnum,md.digests,md.rvrc,md.money,md.credit,md.currency,md.thisvisit,md.lastvisit,md.onlinetime,md.starttime FROM pw_members m LEFT JOIN pw_memberdata md ON m.uid=md.uid WHERE m.uid IN (".S::sqlImplode($userIds).") ");
+		return $this->_getAllResultFromQuery($query);
+	}
+	
+	function getLatestUsersCount() {
+		$total = $this->_db->get_value("SELECT COUNT(*) as total FROM " . $this->_tableName . " LIMIT 1");
+		return ($total<500) ? $total :500;
+	}
+	
+	function getLatestUsers($offset, $limit) {
+		$query = $this->_db->query ("SELECT * FROM ".$this->_tableName." ORDER BY uid DESC " .$this->_Limit($offset, $limit));
+		return $this->_getAllResultFromQuery ( $query );
+	}
+	
+	function getMembersAndMemberDataAndMemberInfoByUserIds($userIds, $fieldinfo = ''){
+		$query = $this->_db->query (
+		"SELECT m.*, m.icon AS micon,
+		md.uid as `md.uid`, md.lastmsg,md.postnum,md.rvrc,md.money,md.credit,md.currency,md.lastvisit,md.thisvisit,md.onlinetime,md.lastpost,md.todaypost,
+		md.monthpost,md.onlineip,md.uploadtime,md.uploadnum,md.starttime,md.pwdctime,md.monoltime,md.digests,md.f_num,md.creditpop,
+		md.jobnum,md.lastgrab,md.follows,md.fans,md.newfans,md.newreferto,md.newcomment,md.postcheck,md.punch,
+		mi.customdata $fieldinfo FROM pw_members m LEFT JOIN pw_memberdata md ON m.uid=md.uid LEFT JOIN pw_memberinfo mi ON mi.uid=m.uid 
+		WHERE m.uid IN (".S::sqlImplode($userIds,false).")"	);	
+		return $this->_getAllResultFromQuery ( $query, 'uid' );
+	}
+	
+	
+	/**
+	function getMemberAndDataAndInfo($userIds){
+		$query = $this->_db->query("SELECT m.uid,m.username,m.gender,m.oicq,m.aliww,m.groupid,m.memberid,m.icon AS micon ,m.hack,m.honor,m.signature,m.regdate,m.medals,m.userstatus,md.postnum,md.digests,md.rvrc,md.money,md.credit,md.currency,md.thisvisit,md.lastvisit,md.onlinetime,md.starttime,mi.customdata FROM pw_members m LEFT JOIN pw_memberdata md ON m.uid=md.uid LEFT JOIN pw_memberinfo mi ON mi.uid=m.uid WHERE m.uid IN (".S::sqlImplode($userIds).") ");
+		return $this->_getAllResultFromQuery($query);		
+	}
+	**/
+	
 }
 ?>

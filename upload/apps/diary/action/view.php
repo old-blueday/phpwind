@@ -7,7 +7,7 @@ $basename = 'apps.php?q='.$q.'&uid='.$uid.'&';
 empty($space) && Showmsg('您访问的空间不存在!');
 
 $a = isset($a) ? $a : 'list';
-include_once(D_P . 'data/bbscache/o_config.php');
+include_once pwCache::getPath(D_P . 'data/bbscache/o_config.php');
 	//$ouserdataService = L::loadClass('Ouserdata', 'sns'); /* @var $ouserdataService PW_Ouserdata */
 	//$ouserDb = $ouserPrivacy = array();
 	//$ouserDb = $ouserdataService->get($uid);
@@ -16,7 +16,7 @@ include_once(D_P . 'data/bbscache/o_config.php');
 	//!$ouserPrivacy['diary'] &&  Showmsg('该朋友的日志设置了查看权限');
 
 if ($a == 'list' && $indexRight) {
-	$dtid = (int)GetGP('dtid');//TODO 查看日志分类ID
+	$dtid = (int)S::getGP('dtid');//TODO 查看日志分类ID
 	$diaryTypeId = $dtid == '-1' ? 0 : ( (is_numeric($dtid) && $dtid > 0) ? $dtid : null );
 	
 	$friendsService = L::loadClass('Friend', 'friend'); /* @var $friendsService PW_Friend */ //TODO 是否好友
@@ -34,7 +34,7 @@ if ($a == 'list' && $indexRight) {
 
 } elseif ($a == 'detail' && $indexRight) {
 
-	$did = (int)GetGP('did');
+	$did = (int)S::getGP('did');
 	!$did && Showmsg("日志不存在");
 	if($indexRight && !$newSpace->viewRight('diary')){
 		Showmsg('该空间日志设置隐私，您没有权限查看!');
@@ -52,7 +52,7 @@ if ($a == 'list' && $indexRight) {
 	$winduid != $uid && $diaryTemp['privacy'] == 1 && !$is_friend && Showmsg('diary_friend_right');
 
 	$diary = $diaryService->getDiaryDbView($diaryTemp);
-	$url = 'apps.php?q=diary&u='.$u.'&did='.$did.'&';
+	$url = 'apps.php?q=diary&u='.$uid.'&did='.$did.'&';
 	list($commentdb,$subcommentdb,$pages) = getCommentDbByTypeid('diary',$did,$page,$url);
 	$comment_type = 'diary';
 	$comment_typeid = $did;
@@ -72,18 +72,20 @@ if ($a == 'list' && $indexRight) {
 	} else {
 		!$diary['privacy'] && $weiboPriv = true;
 	}
+	$diaryNextName=getNextOrPreDiaryName($did, $fuid,'next');
+	$diaryPreName=getNextOrPreDiaryName($did, $fuid,'pre');
 	
 } elseif ($a == 'copydiary') {
 
 	define('AJAX', 1);
 	define('F_M',true);
 	banUser();
-	InitGP(array('did'));
+	S::gp(array('did'));
 
 	empty($did) && Showmsg('data_error');
 
 	$dtsel = '';
-	$query = $db->query("SELECT * FROM pw_diarytype WHERE uid=".pwEscape($winduid)." ORDER BY dtid");
+	$query = $db->query("SELECT * FROM pw_diarytype WHERE uid=".S::sqlEscape($winduid)." ORDER BY dtid");
 	while ($rt = $db->fetch_array($query)) {
 		$dtsel .= "<option value=\"$rt[dtid]\">$rt[name]</option>";
 	}
@@ -92,7 +94,7 @@ if ($a == 'list' && $indexRight) {
 } elseif ($a == 'next') {
 
 	define('AJAX',1);
-	$did = (int)GetGP('did');
+	$did = (int)S::getGP('did');
 	
 	//TODO 是否好友
 	$friendsService = L::loadClass('Friend', 'friend'); /* @var $friendsService PW_Friend */
@@ -107,8 +109,8 @@ if ($a == 'list' && $indexRight) {
 	elseif ($uid != $winduid) $diaryPrivacy = array(0,1); //日志权限，
 	
 	
-	$sqladd = "WHERE uid=".pwEscape($uid)." AND did>".pwEscape($did);
-	$diaryPrivacy && is_array($diaryPrivacy) && $sqladd .= " AND privacy IN(".pwImplode($diaryPrivacy).")";
+	$sqladd = "WHERE uid=".S::sqlEscape($uid)." AND did>".S::sqlEscape($did);
+	$diaryPrivacy && is_array($diaryPrivacy) && $sqladd .= " AND privacy IN(".S::sqlImplode($diaryPrivacy).")";
 	
 
 	$did = $db->get_value("SELECT MIN(did) FROM pw_diary $sqladd");
@@ -119,7 +121,7 @@ if ($a == 'list' && $indexRight) {
 } elseif ($a == 'pre') {
 
 	define('AJAX',1);
-	$did = (int)GetGP('did');
+	$did = (int)S::getGP('did');
 	
 
 	//TODO 是否好友
@@ -134,8 +136,8 @@ if ($a == 'list' && $indexRight) {
 	if ($uid != $winduid && !$is_friend) $diaryPrivacy = array(0);
 	elseif ($uid != $winduid) $diaryPrivacy = array(0,1); //日志权限，
 	
-	$sqladd = "WHERE uid=".pwEscape($uid)." AND did<".pwEscape($did);
-	$diaryPrivacy && is_array($diaryPrivacy) && $sqladd .= " AND privacy IN(".pwImplode($diaryPrivacy).")";
+	$sqladd = "WHERE uid=".S::sqlEscape($uid)." AND did<".S::sqlEscape($did);
+	$diaryPrivacy && is_array($diaryPrivacy) && $sqladd .= " AND privacy IN(".S::sqlImplode($diaryPrivacy).")";
 	
 
 	$did = $db->get_value("SELECT MAX(did) FROM pw_diary $sqladd");

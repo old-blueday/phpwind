@@ -1,7 +1,7 @@
 <?php
 !defined('P_W') && exit('Forbidden');
 
-InitGP(array(
+S::gp(array(
 	'subjectid',
 	'page',
 	'type'
@@ -26,7 +26,8 @@ if (!file_exists($cachefile) || $timestamp - pwFilemtime($cachefile) > 43200) {
 	require_once (R_P . 'require/posthost.php');
 	$data = PostHost($url);
 	if ($data && strpos($data, '<?xml') !== false) {
-		writeover($cachefile, $data);
+		//* writeover($cachefile, $data);
+		pwCache::setData($cachefile, $data);
 	}
 }
 header("Content-Type: text/xml; charset=UTF-8");

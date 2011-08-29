@@ -14,14 +14,13 @@
  */
 class PW_NavConfigDB extends BaseDB {
 	var $_tableName = "pw_nav";
-	var $_cachePrefix = "navcache_";
 	
 	function add($fieldsData) {
 		if (!is_array($fieldsData) || !count($fieldsData)) return 0;
 		$this->_db->update("INSERT INTO " . $this->_tableName . " SET " . $this->_getUpdateSqlString($fieldsData));
 		$insertId = $this->_db->insert_id();
 		
-		if ($insertId) $this->_cleanCache($fieldsData['type']);
+		if ($insertId) $this->_cleanCache();
 		return $insertId;
 	}
 	
@@ -78,19 +77,54 @@ class PW_NavConfigDB extends BaseDB {
 		$this->_db->update("DELETE FROM " . $this->_tableName . " WHERE type=" . $this->_addSlashes($navType) . " ");
 		$deletes = $this->_db->affected_rows();
 		
-		if ($deletes) $this->_cleanCache($navType);
+		if ($deletes) $this->_cleanCache();
 		return $deletes;
 	}
 	
+	/**
+	 * 从缓存文件中读取导航信息，如果该文件不存在则从数据库读取并创建缓存文件
+	 *
+	 * @param string $navType
+	 * @return array
+	 */
 	function findByType($navType) {
-		$data = array();
-		if (file_exists($this->_getCacheKey($navType))) {
-			include $this->_getCacheKey($navType);
-		} else {
-			$data = $this->findByTypeWithoutCache($navType);
-			writeover($this->_getCacheKey($navType), '<?php $data = ' . var_export($data, true) . ';');
+		$_navCacheFilePath = $this->_getCacheFilePath();
+		static $navConfigData = array();
+		if (!$navConfigData && file_exists($_navCacheFilePath)) {
+			include_once pwCache::getPath($_navCacheFilePath,true);
+			$navConfigData = ($navConfigData) ? $navConfigData : $GLOBALS['navConfigData'];
 		}
-		return $data;
+		if (!isset($navConfigData[$navType])){
+			//* $navConfigData[$navType] = $this->findByTypeWithoutCache($navType);
+			//* pwCache::setData($_navCacheFilePath, array('navConfigData'=>$navConfigData), true);
+			$navConfigData = $this->findNavConfigs();
+		}
+		return $navConfigData[$navType];
+	}
+	
+	function findNavConfigs(){
+		static $navConfigData = array();
+		$_navCacheFilePath = $this->_getCacheFilePath();
+		if (!$navConfigData && file_exists($_navCacheFilePath)) {
+			include_once pwCache::getPath($_navCacheFilePath,true);
+			$navConfigData = ($navConfigData) ? $navConfigData : $GLOBALS['navConfigData'];
+		}
+		if(!$navConfigData){
+			$navConfigData = $this->findAllByTypeWithoutCache();
+			pwCache::setData($_navCacheFilePath, array('navConfigData'=>$navConfigData), true);
+		}
+		return $navConfigData;
+	}
+	
+	function findAllByTypeWithoutCache() {
+		$query = $this->_db->query("SELECT * FROM " . $this->_tableName . " ORDER BY upid,view");
+		$result =  $this->_getAllResultFromQuery($query);
+		if(!$result) return array();
+		$_tmp = array();
+		foreach($result as $value){
+			$_tmp[$value['type']][] = $value; 
+		}
+		return $_tmp;
 	}
 	
 	function findByTypeWithoutCache($navType) {
@@ -103,20 +137,12 @@ class PW_NavConfigDB extends BaseDB {
 		return $this->_getAllResultFromQuery($query);
 	}
 	
-	
-	
-	function _getCacheKey($navType) {
-		return D_P . "data/bbscache/" . $this->_cachePrefix . $navType . ".php";
+	function _getCacheFilePath() {
+		return D_P . "data/bbscache/navcache.php";
 	}
 	
-	function _cleanCache($navType = '') {
-		if ('' == $navType) {
-			foreach ($this->_getNavTypes() as $navType) {
-				P_unlink($this->_getCacheKey($navType));
-			}
-		} elseif($this->_checkNavType($navType)) {
-			P_unlink($this->_getCacheKey($navType));
-		}
+	function _cleanCache() {
+		pwCache::deleteData($this->_getCacheFilePath());
 	}
 	
 	function _checkNavType($navType) {

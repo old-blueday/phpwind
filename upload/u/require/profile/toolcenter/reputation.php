@@ -18,7 +18,7 @@ $rt = $userService->get($winduid, false, true);
 
 if ($rt['rvrc'] < 0) {
 	$userService->update($winduid, array(), array('rvrc' => 0));
-	$db->update("UPDATE pw_usertool SET nums=nums-1 WHERE uid=".pwEscape($winduid)."AND toolid=".pwEscape($toolid));
+	$db->update("UPDATE pw_usertool SET nums=nums-1 WHERE uid=".S::sqlEscape($winduid)."AND toolid=".S::sqlEscape($toolid));
 	$logdata = array(
 		'type'		=>	'use',
 		'nums'		=>	'',

@@ -1,0 +1,3 @@
+.tbody,.trD th{*display:block;}
+.trD th{display:table-cell;width:140px;}
+.tbody{display:table-header-group}

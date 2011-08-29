@@ -264,7 +264,7 @@ EOT;
 			<td>$uinfo[tel]</td>
 		</tr>
 		<tr>
-			<td>邮箱</td>
+			<td>电子邮箱</td>
 			<td>$uinfo[email]</td>
 		</tr>
 		<tr>
@@ -363,7 +363,7 @@ EOT;
 EOT;
 if($type == 'user') {print <<<EOT
 -->
-					<textarea rows="6" style="width:300px" name="atc_content" onkeydown="ajax.quickpost(event,this.form)">我很喜欢用户[url={$db_bbsurl}/u.php?uid={$uid}]{$username}[/url]的个人空间，特别推荐。\n\n他（她）的用户名:\n$title\n\n希望你能喜欢。</textarea>
+					<textarea rows="6" style="width:300px" name="atc_content" onkeydown="ajax.quickpost(event,this.form)">我很喜欢用户[url={$db_bbsurl}/{$db_userurl}{$uid}]{$username}[/url]的个人空间，特别推荐。\n\n他（她）的用户名:\n$title\n\n希望你能喜欢。</textarea>
 <!--
 EOT;
 }else{print <<<EOT
@@ -371,7 +371,7 @@ EOT;
 					<textarea rows="6" style="width:300px" name="atc_content" onkeydown="ajax.quickpost(event,this.form)">
 EOT;
 $uid || $uid = $u;print <<<EOT
-我在用户[url={$db_bbsurl}/u.php?uid={$uid}]{$username}[/url]的个人空间发现这个信息，认为很有价值，特别推荐。\n\n主要信息:\n$title\n\n描述:\n$descrip\n\n希望你能喜欢。</textarea>
+我在用户[url={$db_bbsurl}/{$db_userurl}{$uid}]{$username}[/url]的个人空间发现这个信息，认为很有价值，特别推荐。\n\n主要信息:\n$title\n\n描述:\n$descrip\n\n希望你能喜欢。</textarea>
 <!--
 EOT;
 }print <<<EOT
@@ -580,32 +580,40 @@ print <<<EOT
 		</tbody>
 		<!--
 EOT;
-if ($o_photos_gdcheck) {print <<<EOT
+if ($o_photos_gdcheck) {
+$gdSize = explode("\t",$db_gdsize);
+print <<<EOT
 -->
 		<tr>
 			<td>&nbsp;</td>
 			<td>
 				<div>认证码:</div>
-				<img id="ckcode" style="cursor:pointer;display:none;margin-bottom:5px;" onclick="this.src='ck.php?nowtime='+new Date().getTime();" alt="看不清楚，换一张" /><br />
-				<input class="input" onfocus="showCK();" type="text" name="gdcode" id="gdcode" style="width:50px;" tabindex="3"  />
+				<div id="ckcode" style="display:none;margin-bottom:5px;"></div>
+<script type="text/javascript" src="js/pw_authcode.js"></script>
+<script>
+var flashWidth = "$gdSize[0]";
+var flashHeight = "$gdSize[1]";
+var gdtype = $db_gdtype;
+</script>
+				<br />
+				<input class="input" onfocus="showgd();" type="text" name="gdcode" id="gdcode" style="width:50px;" tabindex="3"  />
 			</td>
 		</tr>
-<script language="JavaScript">
-function showCK(){
-	getObj('ckcode').style.display="";
-	if (getObj('ckcode').src.indexOf('ck.php') == -1) {
-		getObj('ckcode').src = 'ck.php?nowtime=' + new Date().getTime();
-	}
-}
-</script>
 <!--
 EOT;
-}if($o_photos_qcheck){print <<<EOT
+}if($db_question && $o_photos_qcheck){
+if($db_imagequestion){
+	$question = '<img id="ckquestion" src="ckquestion.php?q='.$qkey.'&t='.$timestamp.'" align="top">';
+}else{
+	$question = $qkey<0 ? getMachineQuestion_1() :  $db_question[$qkey];
+}
+$q_a = $question.($showq && $qkey>0?" 正确答案:".$db_answer[$qkey] : '');
+print <<<EOT
 -->
 		<tr>
 			<td>&nbsp;</td>
 			<td>
-			<div>验证问题: {$db_question[$qkey]} （正确答案:{$db_answer[$qkey]}）</div>
+			<div>验证问题: {$q_a}</div>
 			<input class="input" name="qanswer" id="qanswer" size="25" tabindex="7" />
 			<input type="hidden" name="qkey" id="qkey" value="$qkey" />
 			</td>

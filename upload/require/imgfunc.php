@@ -48,7 +48,11 @@ function ImgWaterMark($source, $w_pos = 0, $w_img = '', $w_text = '', $w_font = 
 	imagealphablending($sourcedb['source'], true);
 	if ($db_watermark == 1) {
 		if ($waterdb['type'] == 'png') {
-			imagecopy($sourcedb['source'], $waterdb['source'], $wX, $wY, 0, 0, $waterdb['width'], $waterdb['height']);
+			$tmp = imagecreatetruecolor($sourcedb['width'], $sourcedb['height']);
+			imagecopy($tmp, $sourcedb['source'], 0, 0, 0, 0, $sourcedb['width'], $sourcedb['height']);
+			imagecopy($tmp, $waterdb['source'], $wX, $wY, 0, 0, $waterdb['width'], $waterdb['height']);
+			$sourcedb['source'] = $tmp;
+			//imagecopy($sourcedb['source'], $waterdb['source'], $wX, $wY, 0, 0, $waterdb['width'], $waterdb['height']);
 		} else {
 			imagecopymerge($sourcedb['source'], $waterdb['source'], $wX, $wY, 0, 0, $waterdb['width'], $waterdb['height'], $w_pct);
 		}
@@ -90,6 +94,12 @@ function MakeThumb($srcFile, &$dstFile, $dstW, $dstH, $cenTer = null, $sameFile 
 	}
 	$dstX = $dstY = 0;
 	$thumb = $imagecreate($minitemp['dstW'], $minitemp['dstH']);
+	
+	if(function_exists('ImageColorAllocate') && function_exists('ImageColorTransparent')){
+		//背景透明处理
+		$black = ImageColorAllocate($thumb,0,0,0);
+		$bgTransparent = ImageColorTransparent($thumb,$black);
+	}
 	$imagecopyre($thumb, $minitemp['source'], $dstX, $dstY, $srcX, $srcY, $minitemp['dstW'], $minitemp['dstH'], $imgwidth, $imgheight);
 	MakeImage($minitemp['type'], $thumb, $dstFile);
 	imagedestroy($thumb);

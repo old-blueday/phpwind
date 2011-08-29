@@ -133,12 +133,383 @@ EOT;
 	<input type="hidden" name="keyword" value="$keyword">
 	<input type="hidden" name="page" value="$page">
 	<input type="hidden" name="step" value="2">
-	<div class="tac">
+	<div class="tac mb20">
 		<span class="btn"><span><button type="submit" onfocus="blur();">提交</button></span></span>
 	</div>
 </form>
+<style type="text/css">
+.typeTable{overflow-x:scroll;}
+.typeTable td{padding:5px;border:1px solid #accee5;white-space:nowrap;width:80px;}
+.bgA{background:#e2f2fc;color:#333;}
+.bgB{background:#fff3dd;color:#514530;}
+</style>
 
-<h3 class="h1">标签说明</h3>
+<div style="" class="typeTable">
+<table style="table-layout:fixed;">
+	<tr class="bgA">
+		<td></td>
+		<td></td>
+		<td>标题</td>
+		<td>链接地址</td>
+		<td>图片地址</td>
+		<td>描述</td>
+		<td>发帖时间</td>
+		<td>版块名称</td>
+		<td>版块地址</td>
+		<td>作者</td>
+		<td>作者ID</td>
+		<td>用户ID</td>
+		<td>积分</td>
+		<td>帖子数</td>
+		<td>主题数</td>
+		<td>成员数</td>
+		<td>主题分类名称</td>
+		<td>主题分类链接</td>
+		<td>头像</td>
+	</tr>
+	<tr>
+		<td class="bgA">属性名称</td>
+		<td class="bgA">属性\变量值</td>
+		<td class="bgB">title</td>
+		<td class="bgB">url</td>
+		<td class="bgB">images</td>
+		<td class="bgB">descrip</td>
+		<td class="bgB">postdate</td>
+		<td class="bgB">forumname</td>
+		<td class="bgB">forumurl</td>
+		<td class="bgB">author</td>
+		<td class="bgB">authorid</td>
+		<td class="bgB">userid</td>
+		<td class="bgB">credit</td>
+		<td class="bgB">pnum</td>
+		<td class="bgB">tnum</td>
+		<td class="bgB">members</td>
+		<td class="bgB">topictypename</td>
+		<td class="bgB">topictypeurl</td>
+		<td class="bgB">icon</td>
+	</tr>
+	<tr>
+		<td class="bgA">帖子排行</td>
+		<td class="bgA">subject</td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td></td>
+	</tr>
+	<tr>
+		<td class="bgA">图片排行</td>
+		<td class="bgA">image</td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td></td>
+	</tr>
+	<tr>
+		<td class="bgA">标签排行</td>
+		<td class="bgA">tag</td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+	</tr>
+	<tr>
+		<td class="bgA">用户排行</td>
+		<td class="bgA">user</td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+	</tr>
+	<tr>
+		<td class="bgA">日志排行</td>
+		<td class="bgA">diary</td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td></td>
+		<td></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+	</tr>
+	<tr>
+		<td class="bgA">版块排行</td>
+		<td class="bgA">forum</td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+	</tr>
+	<tr>
+		<td class="bgA">群组排行</td>
+		<td class="bgA">group</td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td></td>
+		<td></td>
+		<td></td>
+	</tr>
+	<tr>
+		<td class="bgA">群组主题</td>
+		<td class="bgA">grouparticle</td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td></td>
+		<td></td>
+		<td><span class="s3">&radic;</span></td>
+		<td></td>
+		<td></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td></td>
+		<td></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td></td>
+		<td></td>
+		<td></td>
+	</tr>
+	<tr>
+		<td class="bgA">群组图片</td>
+		<td class="bgA">groupphoto</td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+	</tr>
+	<tr>
+		<td class="bgA">空间图片</td>
+		<td class="bgA">photo</td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+	</tr>
+	<tr>
+		<td class="bgA">友情链接</td>
+		<td class="bgA">sharelinks</td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+	</tr>
+	<tr>
+		<td class="bgA">公告</td>
+		<td class="bgA">announce</td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+	</tr>
+	<tr>
+		<td class="bgA">文章排行</td>
+		<td class="bgA">article</td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td></td>
+		<td></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td></td>
+		<td><span class="s3">&radic;</span></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+	</tr>
+	<tr>
+		<td class="bgA">栏目排行</td>
+		<td class="bgA">column</td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+	</tr>
+	<tr>
+		<td class="bgA">新鲜事</td>
+		<td class="bgA">weibo</td>
+		<td><span class="s3">&radic;</span></td>
+		<td></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+	</tr>
+</table>
+</div>
+
+
+
+
+
 <div class="legend">
 <textarea style="width:690px;height:1100px;padding:5px;overflow:auto;border:0;color:#676767;line-height:1.5;">
 a) <list >标签，一个<list>代表是一个调用模块： 
@@ -165,34 +536,20 @@ b) <loop><li><a href=”{url}” target=”_blank”>{title,32}</a></li></loop>�
             h) {authorid} ：帖子作者的id 
             i) {tagrelate} ：代表相关主题
 
-        2) 针对于action=”user”模块（用户） 
-            a) {url} :用户的链接地址 
-            b) {title}：用户名 
-            c) {image}：用户头像 
-            d) {value} ：用户某属性的值，如果用户按金钱数排行的，则就调用用户的金钱数 
-
-        3) 针对于 action=”forum” 模块（版块） 
-            a) {url} : 版块链接 
-            b) {title} :版块名称 
-            c) {image}：版块logo 
-            d) {value} :版块的某属性的值，如：主题数，帖子数..等 
-
-        4) 针对于 action=”area” 模块 （按区域划分的房产模块） 
+        2) 针对于 action=”area” 模块 （按区域划分的房产模块） 
             a) {url} :链接 
             b) {title} ：房产名称 
             c) {aveprice} ：价格
             d) {area} ：区域
             e) {opendate} ：开盘时间
             
-        5) 针对于 action=”price” 模块 （按价格划分的房产模块） 
+        3) 针对于 action=”price” 模块 （按价格划分的房产模块） 
             a) {url} :链接 
             b) {title} ：房产名称 
             c) {aveprice} ：价格
             d) {area} ：区域
             e) {opendate} ：开盘时间
 
-        6) 针对于 action=”image” 模块（图片） 
-            a) 和 action=”subject”相同 
 
     虽然在模板里面可以定义，调用个数，标题的长度或者图片的截取大小，但是后台还是支持不改动模板而设置这几种属性： 
 

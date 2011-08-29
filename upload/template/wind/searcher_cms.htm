@@ -1,0 +1,99 @@
+<!--<?php print <<<EOT
+-->
+<!--main begin-->
+<div class="list_main list_main_no">
+	<div class="list_content">
+		<table width="100%" cellpadding="0" cellspacing="0" height="300"><tr><td valign="top">
+		<div class="dlA">
+<!--
+EOT;
+if ($adverts) {print <<<EOT
+-->
+	
+<!--
+EOT;
+	foreach ($adverts as $advert) {
+	print <<<EOT
+-->
+				<div class="promotion">
+					$advert
+				</div>
+<!--
+EOT;
+	}print <<<EOT
+-->
+<!--
+EOT;
+}print <<<EOT
+-->
+
+<!-- 
+EOT;
+foreach($lists as $value){
+print <<<EOT
+-->    
+
+			<dl>
+				<dt><a href="index.php?m=cms&q=view&id=$value[article_id]" class="tlink" target="_blank">$value[subject]</a></dt>
+				<dd>
+					<div class="num">$value[hits]次浏览</div>
+					<div class="text">$value[descrip]</div>
+					<div class="riji_author"><cite>$value[postdate]</cite> - 作者: <a href="u.php?username={$value[username]}" target="_blank">$value[username]</a> - <a href="index.php?m=cms&q=list&column={$value[column_id]}" target="_blank" class="mr20">$value[column_name]</a></div>
+				</dd>
+			</dl>
+
+<!-- 
+EOT;
+}
+print <<<EOT
+-->  			
+			
+			
+			<div class="mb20">
+			<div class="pages">
+                   $pager
+                </div>
+				<div class="c"></div>
+			</div>
+		</div>
+<!--
+EOT;
+require printEOT('searcher_searchinput');
+print <<<EOT
+-->
+		</td></tr></table>
+	</div>
+<div class="list_sideBar">
+<!--
+EOT;
+if($hotwords){
+print <<<EOT
+-->     
+						<div class="list_box">
+							<h2><a>热门搜索</a></h2>
+							<ul>
+<!-- 
+EOT;
+foreach($hotwords as $hotword){
+print <<<EOT
+-->
+								<li><a href="searcher.php?keyword={$hotword}&type=cms">$hotword</a></li>
+<!-- 
+EOT;
+}
+print <<<EOT
+--> 
+								
+							</ul>
+						</div>
+<!-- 
+EOT;
+}
+print <<<EOT
+-->
+	</div>
+	<div class="c"></div>
+</div>
+<!--
+EOT;
+?>

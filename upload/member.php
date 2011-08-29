@@ -6,7 +6,7 @@ require_once('global.php');
 * 用户组权限判断
 */
 $_G['allowmember']==0 && Showmsg('member_right');
-InitGP(array('page','orderway','asc'));
+S::gp(array('page','orderway','asc'));
 require_once(R_P.'require/header.php');
 
 $db_maxmember && $page>$db_maxmember && $page=$db_maxmember;
@@ -36,7 +36,7 @@ if ($orderby == 'uid' || $orderby == 'username') {
 	$sql_table = "pw_memberdata md LEFT JOIN pw_members m USING(uid)";
 }
 $asc = $asc == 'ASC'? 'ASC' :'DESC';
-$pwLimit = pwLimit($start,$db_perpage);
+$pwLimit = S::sqlLimit($start,$db_perpage);
 $memberdb = array();
 $query = $db->query("SELECT m.uid,m.username,m.email,m.gender,m.regdate,m.oicq,m.site,m.location,md.postnum,md.digests,md.rvrc,md.money,md.thisvisit FROM $sql_table ORDER BY $orderby $asc $pwLimit");
 while ($member = $db->fetch_array($query)) {

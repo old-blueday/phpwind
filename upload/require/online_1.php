@@ -1,7 +1,7 @@
 <?php
 !function_exists('readover') && exit('Forbidden');
 
-isset($forum) || include(D_P.'data/bbscache/forum_cache.php');
+isset($forum) || include pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
 
 $onlinedb = $gusetdb = array();
 
@@ -57,7 +57,7 @@ $flag = -1;
 foreach ($onlinedb as $key => $val) {
 	$flag++;
 	if ($flag % 7 == 0) $index_whosonline .= '</tr><tr>';
-	$index_whosonline .= "<td style=\"padding:0 0 5px;border:0;width:14%\"><img src=\"$imgpath/$stylepath/group/$val[img].gif\" align=\"absmiddle\"> <a href=\"u.php?uid=$val[uid]\" title=\"$val[onlineinfo]\">$val[username]</a></td>";
+	$index_whosonline .= "<td style=\"padding:0 0 5px;border:0;width:14%\"><img src=\"$imgpath/$stylepath/group/$val[img].gif\" align=\"absmiddle\"> <a href=\"". USER_URL ."$val[uid]\" title=\"$val[onlineinfo]\">$val[username]</a></td>";
 }
 $index_whosonline .= '</tr></table></div>';
 

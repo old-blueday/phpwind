@@ -8,16 +8,16 @@ if ($db_forumdir == '1') {
 } elseif ($db_forumdir == '2') {
 	$dirname = substr($pwServer['HTTP_HOST'], 0, strpos($pwServer['HTTP_HOST'],'.'));
 }
-$sqlwhere = " AND (f.type!='category' OR f.type='category' AND f.dirname='')";
+$fids = array();
 if ($dirname) {
-	$fids = array();
-	$query = $db->query("SELECT fid FROM pw_forums WHERE type='category' AND dirname=" . pwEscape($dirname,false));
+	$query = $db->query("SELECT fid FROM pw_forums WHERE type='category' AND dirname=" . S::sqlEscape($dirname,false));
 	while ($forums = $db->fetch_array($query,MYSQL_NUM)) {
 		$fids[] = $forums[0];
 	}
 	if ($fids) {
-		$fids = pwImplode($fids);
-		$sqlwhere = "AND (f.fid IN ($fids) OR f.fup IN ($fids))";
+		$fids = S::sqlImplode($fids);
+		$sqlwhere .= "AND (f.fid IN ($fids) OR f.fup IN ($fids))";
 	}
 }
+empty($fids) && $sqlwhere .= " AND (f.type!='category' OR f.type='category' AND f.dirname='')";
 ?>

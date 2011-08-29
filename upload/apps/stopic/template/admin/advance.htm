@@ -31,9 +31,9 @@ body{background:#fff;padding:0;margin:0;}
     	<td class="td1">背景图片选择</td>
 		<td class="td2">
 			<ul class="list_B list_160 cc" style="width:550px;">
-				<li><input name="is_new_bg" id="notNewBg" type="radio" value="0" onclick="showBgDisplay();" checked />选择全局背景图片</li>
+				<li><input name="is_new_bg" id="notNewBg"  type="radio" value="0" onclick="showBgDisplay();" checked />选择全局背景图片</li>
 				<li><input name="is_new_bg" id="uploadBg"type="radio" value="1" onclick="showBgDisplay();" />上传自定义图片</li>
-				<li><input name="bg_id" id="opNoBg" type="radio" value="0"/>无背景图片</li>
+				<li><input {$is_new_bg} name="is_new_bg"   id="opNoBg" type="radio" value="2"/>无背景图片</li>
 			</ul>
 			<div id="trShowBg">
 				<div style="width:695px;">
@@ -168,7 +168,7 @@ $layout_data[othercss]</textarea>
 </div>
 <div class="tac mb10">
 			<input type="hidden" name="jobact" value="save" />
-			<input type="hidden" id="stopicId" name="stopic_id" value="" />
+			<input type="hidden" id="stopicId" name="stopic_id" value="{$stopic_id}" />
 			<input type="hidden" id="stopicTitle" name="stopic_title" value="" />
 			<input type="hidden" id="categoryId" name="category_id" value="" />
             <span class="btn2"><span><button type="submit" onfocus="blur();">保 存</button></span></span>
@@ -219,11 +219,11 @@ function showBgDisplay() {
 	if (getObj('notNewBg').checked) {
 		getObj('trShowBg').style.display = '';
 		getObj('trShowUpload').style.display = 'none';
-		getObj('opNoBg').checked = false;
+		//getObj('opNoBg').checked = false;
 	} else{
 		getObj('trShowBg').style.display = 'none';
 		getObj('trShowUpload').style.display = '';
-		getObj('opNoBg').checked = false;
+		//getObj('opNoBg').checked = false;
 	}
 }
 function checkFileType() {
@@ -256,12 +256,54 @@ function getParentInfo() {
 }
 
 function checkAdvanceSubmit() {
+	changeMakeStyleImg();
 	getParentInfo();
 	if (checkFileType()) {
 		window.parent.document.getElementById('opShowIframeSaveOk').value = 1;
+		changeMakeStyleImg();
 		getObj("opAdvanceForm").submit();
 	}
 	return false;
+}
+
+//保存设置后，改变工作区域的样式图片
+function changeMakeStyleImg() {
+	var opNoBg = getObj("opNoBg");
+	var containe = parent.document.getElementById("container");
+	if(opNoBg.checked == false){ //改变背景图或者背景颜色
+		var bg = document.getElementsByName("bg_id");
+		var i;
+		var bg_id;
+		for	(i=0;i<bg.length;i++) {
+			if(bg[i].checked){
+				bg_id = bg[i].value;
+			}
+		}
+		if(bg_id < 0) {
+			containe.style.backgroundImage="url({$db_bbsurl}/apps/stopic/data/uploadbg/"+parseInt(-bg_id)+".jpg)";
+		} else {
+<!--
+EOT;
+	foreach($bg_list as $list) {
+print <<<EOT
+-->
+			if(bg_id == "{$list['id']}") {
+				containe.style.backgroundImage="url({$db_bbsurl}/attachment/stopic/{$list['path']})";
+			}
+<!--
+EOT;
+	}
+print <<<EOT
+-->
+		}
+	} else {
+		var newStyleBg = getObj("layoutnavbgcolor");
+		containe.style.background = newStyleBg.value;	
+	}
+	var newStyleImg = getObj("layoutbannerurl");
+	var stopic_banner_img = parent.document.getElementById("stopic_banner_img");
+	if (stopic_banner_img !== null) stopic_banner_img.src = newStyleImg.value;
+	
 }
 
 
@@ -272,7 +314,7 @@ getObj("opNoBg").onclick = function() {
 		var i;
 		for(i=0;i<obj.length;i++){
 			if(obj[i].checked){
-				obj[i].checked = false;
+				//obj[i].checked = false;
 			}
 		}
 	}
@@ -284,6 +326,7 @@ getObj("opNoBg").onclick = function() {
 function selectBg(bgId) {
 	getObj('bgId_'+bgId).checked = true;
 	changeBgPicClass(bgId);
+	changeMakeStyleImg();
 }
 
 function changeBgPicClass(bgId) {
@@ -313,7 +356,8 @@ window.onload = function() {
 	showBgDisplay();
 	showStopicBg(1);
 	showSaveOkMessage();
-
+	changeMakeStyleImg();
+	getObj('trShowUpload').style.display = 'none';
 	New(changeStyle,['style_ul','opStyleSave']);
 };
 

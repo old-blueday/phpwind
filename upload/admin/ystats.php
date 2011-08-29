@@ -15,7 +15,7 @@ if ($action=='config') {
 	} else {
 		L::loadClass('xml', 'utility', false);
 		$xml = new XML(); $xml->setEncode('UTF-8');
-		InitGP(array('config'),'P',2);
+		S::gp(array('config'),'P',2);
 		if (!$db_ystats_unit_id && !$db_ystats_key) { //雅虎统计激活
 			$ystats = array();
 			$response = PostHost($ystatsUrl.'/reg.html?type=1');
@@ -66,8 +66,8 @@ if ($action=='config') {
 		adminmsg('ystat_active_account', $basename.'&action=config');
 	}
 	$basename .= '&action=report';
-	InitGP(array('view'));
-	InitGP(array('year','month'),'GP',2);
+	S::gp(array('view'));
+	S::gp(array('year','month'),'GP',2);
 	$pwDate['now']		= $timestamp+28800;//北京时间
 	list($pwDate['hours'],$pwDate['mday'],$pwDate['wday'],$pwDate['year'],$pwDate['month']) = explode('-',gmdate('G-j-w-Y-m',$pwDate['now'])); //当天小时数,当月天数,本周天数,当前年份,当前月份
 	$pwDate['wday']    == 0 && $pwDate['wday'] = 7;//星期:1-7
@@ -190,7 +190,7 @@ if ($action=='config') {
 	} else {
 		$flashvars = '';
 	}
-	writeover(D_P.'data/bbscache/ystat.php',"<?php\n\$flashvars = \"$flashvars\";\n?>");
+	pwCache::setData(D_P.'data/bbscache/ystat.php',"<?php\n\$flashvars = \"$flashvars\";\n?>");
 	krsort($ystats['date_list']);
 	include PrintEot('ystats');exit;
 } elseif ($action=='bind') {
@@ -199,7 +199,7 @@ if ($action=='config') {
 	if ($_POST['step']!=2) {
 		include PrintEot('ystats');exit;
 	} else {
-		InitGP(array('ymail'),'P');
+		S::gp(array('ymail'),'P');
 		if (!$ymail || !preg_match('/^[a-zA-Z][a-zA-Z0-9_]{3,31}\@(yahoo\.com\.cn|yahoo\.cn)$/',$ymail)) {
 			adminmsg('ystat_ymail_format');
 		}
@@ -237,7 +237,7 @@ if ($action=='config') {
 } elseif ($action == 'flash') {
 
 	header('Cache-Control: no-cache, must-revalidate');
-	@include_once(D_P.'data/bbscache/ystat.php');
+	@include_once pwCache::getPath(D_P.'data/bbscache/ystat.php');
 	echo $flashvars;exit;
 } else {
 	ObHeader($basename.'&action=config');

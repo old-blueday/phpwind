@@ -1,16 +1,17 @@
 <?php
 define('SCR','thread');
 require_once('global.php');
-require_once(R_P.'require/forum.php');
-include_once(D_P.'data/bbscache/cache_thread.php');
+L::loadClass('forum', 'forum', false);
+include_once pwCache::getPath(D_P . 'data/bbscache/cache_thread.php',true);
 
-InitGP(array('cyid'), '', 2);
-/*群组相关*/
+S::gp(array('cyid'), '', 2);
+S::gp(array('search','topicsearch'));
+
 if ($cyid) {
 	!$db_groups_open && Showmsg('groups_close');
-	InitGP(array('showtype'));
+	S::gp(array('showtype'));
 	require_once(R_P . 'apps/groups/lib/colony.class.php');
-	include_once(D_P . 'data/bbscache/o_config.php');
+	include_once pwCache::getPath(D_P . 'data/bbscache/o_config.php',true);
 	$newColony = new PwColony($cyid);
 	if (!$colony =& $newColony->getInfo()) {
 		Showmsg('data_error');
@@ -22,13 +23,13 @@ if ($cyid) {
 	$tmpUrlAdd .= '&a=thread';
 	if ($showtype && in_array($showtype, array('galbum', 'member', 'active', 'write', 'set'))) {
 		$tmpUrlAdd = '';
-		require_once Pcv(R_P."require/thread_{$showtype}.php");
+		require_once S::escapePath(R_P."require/thread_{$showtype}.php");
 	}
 	require_once(R_P . 'require/bbscode.php');
 	require_once(R_P . 'require/functions.php');
 	$colony['descrip'] = convert($colony['descrip'], array());
 	$annouce = convert(nl2br($colony['annouce']), $db_windpost);
-	
+
 	$colonyNums = PwColony::calculateCredit($colony);
 	$magdb = $newColony->getManager();
 }
@@ -44,77 +45,71 @@ if ($db_siteappkey && $db_apps_list['17']['status'] == 1) {
 }
 /*The app client*/
 
-if (!($foruminfo = L::forum($fid))) {
+$pwforum = new PwForum($fid);
+if (!$pwforum->isForum(true)) {
 	Showmsg('data_error');
 }
+$foruminfo =& $pwforum->foruminfo;
+$forumset =& $pwforum->forumset;
 
-$rt = $db->get_one("SELECT fd.tpost,fd.topic,fd.article,fd.subtopic,fd.top1,fd.top2,fd.topthreads,fd.lastpost,fd.aid,fd.aids,fd.aidcache,fd.tpost,fd.topic,fd.article ,a.ifconvert,a.author,a.startdate,a.enddate,a.subject,a.content FROM pw_forumdata fd LEFT JOIN pw_announce a ON fd.aid=a.aid WHERE fd.fid=".pwEscape($fid));
+$rt = $db->get_one("SELECT fd.tpost,fd.topic,fd.article,fd.subtopic,fd.top1,fd.top2,fd.topthreads,fd.lastpost,fd.aid,fd.aids,fd.aidcache,fd.tpost,fd.topic,fd.article ,a.ifconvert,a.author,a.startdate,a.enddate,a.subject,a.content FROM pw_forumdata fd LEFT JOIN pw_announce a ON fd.aid=a.aid WHERE fd.fid=".S::sqlEscape($fid));
 
 $rt && $foruminfo += $rt;#版块信息合并
-$forumset = $foruminfo['forumset'];
+
 !$forumset['commend'] && $foruminfo['commend'] = null;
-$foruminfo['type']=='category' && ObHeader('cate.php?cateid='.$fid);
+$foruminfo['type'] == 'category' && ObHeader('cate.php?cateid=' . $fid);
 if ($forumset['link']) {
 	$flink = str_replace("&amp;","&",$forumset['link']);
 	ObHeader($flink);
 }
 
-$type = (int)GetGP('type');
-$toptids = trim($foruminfo['topthreads'],',');
+$threadBehavior = getThreadFactory($cyid, $search, $topicsearch);
+if (($return = $threadBehavior->init()) !== true) {
+	Showmsg($return);
+}
+$threadBehavior->setFid($fid);
 
-if ($db_indexfmlogo == 2) {
-	if(!empty($foruminfo['logo']) && strpos($foruminfo['logo'],'http://') === false && file_exists($attachdir.'/'.$foruminfo['logo'])){
-		$foruminfo['logo'] = "$attachpath/$foruminfo[logo]";
+$type = (int)S::getGP('type');
+
+$foruminfo['logo'] = $threadBehavior->getLogo($foruminfo['logo']);
+
+//门户形式浏览
+if ($foruminfo['ifcms'] && $db_modes['area']['ifopen'] && !$cyid) {
+	S::gp(array('viewbbs'));
+	if (!$viewbbs) {
+		require_once R_P. 'require/forum.php';
+		require_once R_P. 'mode/area/area_thread.php';exit;
 	}
-} elseif ($db_indexfmlogo == 1 && file_exists("$imgdir/$stylepath/forumlogo/$foruminfo[fid].gif")) {
-	$foruminfo['logo'] = "$imgpath/$stylepath/forumlogo/$foruminfo[fid].gif";
-} else {
-	$foruminfo['logo'] = '';
+	$viewbbs = $viewbbs ? "&viewbbs=$viewbbs" : "";
 }
 
-if (!$cyid) {
-	//门户形式浏览
-	if ($foruminfo['ifcms'] && $db_modes['area']['ifopen']) {
-		InitGP(array('viewbbs'));
-		if (!$viewbbs) {
-			require_once R_P. 'mode/area/area_thread.php';exit;
-		}
-		$viewbbs = $viewbbs ? "&viewbbs=$viewbbs" : "";
-	}
-	if ($foruminfo['cnifopen']) {
-		require_once(R_P . 'apps/groups/lib/colonys.class.php');
-		$colonyServer = new PW_Colony();
-	}
+if (!S::inArray($windid,$manager)) {
+	$pwforum->forumcheck($winddb, $groupid);
 }
-if (!CkInArray($windid,$manager)) {
-	wind_forumcheck ( $foruminfo );
-}
+$pwforum->setForumStyle();
+
 //版块浏览及管理权限
 $pwSystem = array();
 $isGM = $isBM = $admincheck = $ajaxcheck = $managecheck = $pwAnonyHide = $pwPostHide = $pwSellHide = $pwEncodeHide = 0;
 if ($groupid != 'guest') {
-	L::loadClass('forum', 'forum', false);
-	$isGM = CkInArray($windid,$manager);
+	$isGM = S::inArray($windid,$manager);
 	if ($colony) {//群组论坛浏览方式
 		$ifcolonyadmin = $newColony->getColonyAdmin();
 		$ifbbsadmin = $newColony->getBbsAdmin($isGM);
-		$fid = $newColony->info['classid'];
-		$pwforum = new PwForum($fid);
 		$isBM = $pwforum->isBM($windid);
 		$pwSystem = pwRights($isBM);
-		if($newColony->getManageCheck($ifbbsadmin,$ifcolonyadmin)) {
+		if ($newColony->getManageCheck($ifbbsadmin,$ifcolonyadmin)) {
 			$managecheck = 1;
 		}
 		$pwSystem['forumcolonyright'] && $managecheck = 1;
 		($ifcolonyadmin || $ifbbsadmin || $pwSystem['forumcolonyright']) && $ajaxcheck = 1;
 	} else {
-		$pwforum = new PwForum($fid);
 		list($isBM,$admincheck,$ajaxcheck,$managecheck,$pwAnonyHide,$pwPostHide,$pwSellHide,$pwEncodeHide,$pwSystem) = $pwforum->getSystemRight();
 	}
 }
 if (!$admincheck) {
-	!$foruminfo['allowvisit'] && forum_creditcheck();#积分限制浏览
-	$foruminfo['forumsell'] && forum_sell($fid);#出售版块
+	$pwforum->creditcheck($winddb, $groupid);#积分限制浏览
+	$pwforum->sellcheck($winduid);#出售版块
 }
 
 $forumset['newtime'] && $db_newtime = $forumset['newtime'];
@@ -122,7 +117,7 @@ if ($foruminfo['aid'] && ($foruminfo['startdate']>$timestamp || ($foruminfo['end
 	$foruminfo['aid'] = 0;
 }
 
-list($guidename,$forumtitle) = getforumtitle(forumindex($foruminfo['fup'],1));
+list($guidename, $forumtitle) = $pwforum->getTitle();
 
 
 /* SEO */
@@ -135,7 +130,7 @@ bbsSeoSettings('thread',$_seo,$foruminfo['name'],$_seo_type);
 
 require_once(R_P.'require/header.php');
 
-$msg_guide = headguide($guidename);
+$msg_guide = $pwforum->headguide($guidename);
 unset($guidename,$foruminfo['forumset']);
 
 //版主列表
@@ -156,9 +151,9 @@ if ($foruminfo['forumadmin']) {
 }
 //版主推荐
 if ($forumset['commend'] && ($forumset['autocommend'] || $forumset['commendlist']) && $forumset['commendtime'] && $timestamp-$forumset['ifcommend']>$forumset['commendtime']) {
+	require_once R_P. 'require/forum.php';
 	updatecommend($fid,$forumset);
 }
-
 //版块浏览记录
 $threadlog = str_replace(",$fid,",',',GetCookie('threadlog'));
 $threadlog.= ($threadlog ? '' : ',').$fid.',';
@@ -168,11 +163,11 @@ Cookie('threadlog',$threadlog);
 Update_ol();
 
 $orderClass = array();//排序
-InitGP(array('subtype','search','orderway','asc','topicsearch'));
-InitGP(array('page','modelid','pcid','special','actmid','allactmid'),'GP',2);
+S::gp(array('subtype','search','orderway','asc','topicsearch'));
+S::gp(array('page','modelid','pcid','special','actmid','allactmid','allpcid','allmodelid'),'GP',2);
 ($orderway && $asc == "DESC" ) ? $orderClass[$orderway] = "↓" : $orderClass['lastpost'] = "↓";
 
-$searchadd = $thread_children = $thread_online = $fastpost = $updatetop = $urladd = '';
+$searchadd = $thread_children = $thread_online = $fastpost = '';
 
 $db_maxpage && $page > $db_maxpage && $page = $db_maxpage;
 (int)$page<1 && $page = 1;
@@ -219,6 +214,8 @@ if (strpos($_COOKIE['deploy'],"\tchildren\t")===false) {
 	$cate_children = 'display:none;';
 }
 if ($foruminfo['cnifopen'] && $forumset['viewcolony'] && !$cyid) {
+	require_once(R_P . 'apps/groups/lib/colonys.class.php');
+	$colonyServer = new PW_Colony();
 	$cnGroups = $colonyServer->getColonysInForum($fid);
 }
 
@@ -230,7 +227,7 @@ if (($foruminfo['childid'] || $cnGroups) && !$cyid) {
 
 //快捷管理
 if ($managecheck) {
-	InitGP(array('concle'));
+	S::gp(array('concle'));
 	$concle || $concle = GetCookie('concle');
 	if ($concle==1 && ($isGM || $pwSystem['topped'] || $pwSystem['digestadmin'] || $pwSystem['lockadmin'] || $pwSystem['pushadmin'] || $pwSystem['coloradmin'] || $pwSystem['downadmin'])) {
 		$concle = 2;$managemode = 1;
@@ -240,7 +237,7 @@ if ($managecheck) {
 		Cookie("concle","",0);
 	}
 	if ($colony) {
-		$trd_adminhide = "<form action=\"mawholecolony.php?$viewbbs\" method=\"post\" name=\"mawhole\"><input type=\"hidden\" name=\"cyid\" value=\"$cyid\"";
+		$trd_adminhide = "<form action=\"mawholecolony.php?$viewbbs\" method=\"post\" name=\"mawhole\"><input type=\"hidden\" name=\"cyid\" value=\"$cyid\">";
 	} else {
 		$trd_adminhide = "<form action=\"mawhole.php?$viewbbs\" method=\"post\" name=\"mawhole\"><input type=\"hidden\" name=\"fid\" value=\"$fid\">";
 	}
@@ -255,7 +252,6 @@ if ($foruminfo['allowtype'] && (($foruminfo['allowtype'] & 1) || ($foruminfo['al
 } else {
 	$N_allowtypeopen = false;
 }
-
 /*分类、团购、活动 start*/
 /*分类信息*/
 if ($foruminfo['modelid'] || $modelid > 0) {
@@ -290,7 +286,6 @@ if ($foruminfo['actmids'] || $actmid > 0) {
 			break;
 		}
 	}
-
 	if ($foruminfo['actmids']) {
 		$N_allowtypeopen = true;
 	}
@@ -356,88 +351,16 @@ if ($modelid > 0) {/*分类信息*/
 	$theSpecialFlag = true;
 } elseif ($allactmid) { /*活动所有分类*/
 	$initSearchHtml = $postActForBbs->initSearchHtml();
-	$theSpecialFlag = true;
+	//$theSpecialFlag = true;
+}elseif ($allpcid) { /*团购所有分类*/
+	$initSearchHtml = $postCate->initSearchHtml();
+	//$theSpecialFlag = true;
 }
 /*分类、团购、活动 end*/
 
 $t_per = $foruminfo['t_type'];
 $t_db = (array)$foruminfo['topictype'];
 unset($foruminfo['t_type']);/* 0 */
-$pwSelectType = $pwSelectSpecial = 'all';
-
-if ($t_db && is_numeric($type) && isset($t_db[$type])) {
-	if ($t_db[$type]['upid'] == 0) {
-		foreach ($t_db as $key => $value) {
-			$value['upid'] == $type && $typeids[] = $key;
-		}
-		if ($typeids) {
-			$typeids = array_merge($typeids,array($type));
-			$searchadd = ' AND t.type IN('.pwImplode($typeids).") AND t.ifcheck='1'";
-		} else {
-			$searchadd = ' AND t.type='.pwEscape($type)." AND t.ifcheck='1'";
-		}
-	} else {
-		$searchadd = ' AND t.type='.pwEscape($type)." AND t.ifcheck='1'";
-	}
-	$urladd .= "&type=$type";
-	$pwSelectType = $type;
-} elseif ((int)$special>0) {
-	$searchadd = ' AND t.special='.pwEscape($special)." AND t.ifcheck='1'";
-	$urladd .= "&special=$special";
-	$pwSelectSpecial = $special;
-} elseif ($search == 'digest') {
-	if($cyid) {
-		$searchadd = " AND a.digest>'0' AND t.ifcheck='1'";
-		$tmpUrlAdd .= '&digest=1';
-	} else {
-		$searchadd = " AND t.digest>'0' AND t.ifcheck='1'";
-	}
-	$urladd .= "&search=$search";
-	$pwSelectType = 'digest';
-} elseif ($search == 'check') {
-	if ($isGM || $pwSystem['viewcheck']) {
-		$searchadd = " AND t.ifcheck='0'";
-	} else {
-		$searchadd = ' AND t.authorid=' . pwEscape($winduid) . " AND t.ifcheck='0'";
-	}
-	$urladd .= "&search=$search";
-	$pwSelectType = 'check';
-} elseif (is_numeric($search)) {
-	$searchadd = " AND t.lastpost>=" . pwEscape($timestamp - $search*84600) . " AND t.ifcheck='1'";
-	$urladd .= "&search=$search";
-}
-if ($modelid > 0) {//选择某个信息分类中的某个模板的条件下
-	$searchadd .= " AND t.modelid=".pwEscape($modelid) . " AND t.ifcheck='1'";
-	$urladd .= "&modelid=$modelid";
-	$pwSelectType = 'model_'.$modelid;
-} elseif ($pcid > 0) {//团购
-	$searchadd .= " AND t.special=".pwEscape($pcid+20) . " AND t.ifcheck='1'";
-	$urladd .= "&pcid=$pcid";
-	$pwSelectType = 'pcid_'.$pcid;
-} elseif ($actmid > 0) {//活动子分类
-	$actTidDb = $postActForBbs->getActTidDb($actmid,$fid);
-	if ($actTidDb) {
-		$searchadd .= " AND tid IN(".pwImplode($actTidDb).")";
-	} else {
-		$searchadd .= " AND tid=0";//让其搜索为0
-	}
-	$urladd .= "&actmid=$actmid";
-	$pwSelectType = 'activity_list';
-} elseif ($allactmid) { //所有活动
-	$searchadd .= " AND t.special=8 AND t.ifcheck='1'";
-	$urladd .= "&allactmid=1";
-	$pwSelectType = 'activity_list';
-}
-
-if ($cyid) {
-	$count = $searchadd ? $newColony->getArgumentCount($searchadd) : $colony['tnum'];
-} elseif ($searchadd) {
-	$rs = $db->get_one('SELECT COUNT(*) AS count FROM pw_threads t WHERE t.fid='.pwEscape($fid).$searchadd);
-	$count = $rs['count'];
-} else {
-	$searchadd = " AND t.ifcheck='1'";
-	$count = $foruminfo['topic'];
-}
 
 if ($winddb['t_num']) {
 	$db_perpage = $winddb['t_num'];
@@ -450,37 +373,13 @@ if ($winddb['p_num']) {
 	$db_readperpage = $forumset['readnum'];
 }
 
-
-if (!$theSpecialFlag) {
-	$count += $foruminfo['top2']+$foruminfo['top1'];
+$threadBehavior->setWhere();
+$pwSelectType = $threadBehavior->getSelectType();
+$pwSelectSpecial = $threadBehavior->getSelectSpecial();
+$count = $threadBehavior->getThreadCount();
+if (!$theSpecialFlag && !$cyid) {
+	$count += $foruminfo['top2'] + $foruminfo['top1'];
 }
-if (!$theSpecialFlag) {
-	$sql = 'fid='.pwEscape($fid).' AND topped=0';
-} else {//分类信息、团购、活动
-	$sql = 'fid='.pwEscape($fid);
-}
-
-$tpcdb = $ordersel = $ascsel = array();
-if ($_G['alloworder']) {
-	if (!in_array($orderway,array('lastpost','postdate','hits','replies','favors'))) {
-		$orderway = $forumset['orderway'] ? $forumset['orderway'] : 'lastpost';
-	} else {
-		$urladd .= "&orderway=$orderway";
-	}
-	$ordersel[$orderway] = 'selected';
-
-	if (!in_array($asc,array('DESC','ASC'))) {
-		$asc = $forumset['asc'] ? $forumset['asc'] : 'DESC';
-	} else {
-		$urladd .= "&asc=$asc";
-	}
-	$ascsel[$asc]='selected';
-} else {
-	$asc = $forumset['asc'] ? $forumset['asc'] : 'DESC';
-	$orderway = $forumset['orderway'] ? $forumset['orderway'] : 'lastpost';
-}
-$condisel[$search] = 'selected';
-
 $numofpage = ceil($count/$db_perpage);
 $numofpage < 1 && $numofpage = 1;
 if ($page > $numofpage) {
@@ -489,365 +388,14 @@ if ($page > $numofpage) {
 $start_limit = intval(($page-1) * $db_perpage);
 $totalpage	= min($numofpage,$db_maxpage);
 
-$pageUrl	= "thread.php?" . ($cyid ? "cyid=$cyid" : "fid=$fid");
-$pages		= numofpage($count,$page,$numofpage,"{$pageUrl}{$urladd}$viewbbs&",$db_maxpage);
-$attachtype	= array('1'=>'img','2'=>'txt','3'=>'zip');
+$urladd	 = $threadBehavior->getUrladd();
+$pageUrl = "thread.php?" . ($cyid ? "cyid=$cyid" : "fid=$fid");
+$pages	 = numofpage($count, $page, $numofpage, "{$pageUrl}{$urladd}{$viewbbs}&", $db_maxpage);
 
-$fcache = 0;
-if ($db_fcachenum && $page <= $db_fcachenum && empty($urladd) && $topicsearch != 1 && !$cyid) {
-	$fcachetime = pwFilemtime(D_P."data/bbscache/fcache_{$fid}_{$page}.php");
-	$lastpost = explode("\t",$foruminfo['lastpost']);
-	if (!file_exists(D_P."data/bbscache/fcache_{$fid}_{$page}.php") || $lastpost[2]>$fcachetime && $timestamp-$fcachetime>$db_fcachetime) {
-		$fcache = 1;
-	} else {
-		$fcache = 2;
-	}
-}
-$threaddb = array();
+$threaddb = $threadBehavior->getThread($start_limit, !$theSpecialFlag);
 
-if ($fcache < 2) {
-	$R = 0;
-	if (!$theSpecialFlag && !$cyid) {
-		$rows = (int)($foruminfo['top2'] + $foruminfo['top1']);
-		if ($start_limit < $rows) {
-			$L = (int)min($rows-$start_limit,$db_perpage);
-			$limit  = pwLimit($start_limit,$L);
-			$offset = 0;
-			$limit2 = $L == $db_perpage ? '' : $db_perpage-$L;
-			if ($toptids) {
-				$query = $db->query("SELECT * FROM pw_threads WHERE tid IN($toptids) ORDER BY topped DESC,lastpost DESC $limit");
-				while ($rt = $db->fetch_array($query)) {
-					$tpcdb[] = $rt;
-				}
-				$db->free_result($query);
-			}
-			unset($toptids,$L,$limit);
-		} else {
-			list($st,$lt,$asc,$R) = getstart($start_limit-$rows,$asc,$count);
-			$offset = $st; $limit2 = $lt;
-		}
-		unset($rows);
-	} else {
-		list($st,$lt,$asc,$R) = getstart($start_limit,$asc,$count);
-		$offset = $st; $limit2 = $lt;
-	}
-
-	if ($cyid) {
-		$tpcdb = $newColony->getArgument($searchadd, $offset, $limit2, $orderway, $asc);
-		$R && $tpcdb = array_reverse($tpcdb);
-	} elseif ($topicsearch == 1) {
-		InitGP(array('searchname','new_searchname'));
-		$pcsqladd = '';
-		if ($search == 'digest') {
-			$pcsqladd .= " AND digest>'0' AND ifcheck='1'";
-		} elseif ($search == 'check') {
-			if ($isGM || $pwSystem['viewcheck']) {
-				$pcsqladd .= " AND ifcheck='0'";
-			} else {
-				$pcsqladd .= ' AND authorid='.pwEscape($winduid)." AND ifcheck='0'";
-			}
-		} elseif (is_numeric($search)) {
-			$pcsqladd .= " AND lastpost>=".pwEscape($timestamp - $search*84600)." AND ifcheck='1'";
-		}
-
-		$searchname && $new_searchname = StrCode(serialize($searchname));
-		if ($modelid > 0) {
-			list($count,$tiddb,$alltiddb) = $postTopic->getSearchvalue($new_searchname,'one',true);
-		} elseif($pcid > 0) {
-			list($count,$tiddb,$alltiddb) = $postCate->getSearchvalue($new_searchname,'one',true);
-		} elseif($actmid > 0 || $allactmid) {
-			list($count,$tiddb,$alltiddb) = $postActForBbs->getSearchvalue($new_searchname,'one',true,true);
-		}
-
-		if ($search && $count && $alltiddb) {
-			$count = $db->get_value("SELECT COUNT(*) as count FROM pw_threads WHERE tid IN (".pwImplode($alltiddb).") $pcsqladd");
-		}
-
-		$numofpage = ceil($count/$db_perpage);
-		$numofpage < 1 && $numofpage = 1;
-		if ($page > $numofpage) {
-			$page  = $numofpage;
-		}
-		$totalpage	= min($numofpage,$db_maxpage);
-		$count == -1 && $count = 0;
-		$pages		= numofpage($count,$page,$numofpage,"thread.php?fid=$fid&pcid=$pcid&topicsearch=$topicsearch&new_searchname=$new_searchname&search=$search&orderway=$orderway&asc=$asc&",$db_maxpage);
-		$tpcdb = array();
-		if ($tiddb){
-			$query = $db->query("SELECT * FROM pw_threads WHERE tid IN (".pwImplode($tiddb).") $pcsqladd ORDER BY $orderway $asc");
-			while ($thread = $db->fetch_array($query)) {
-				$tpcdb[] = $thread;
-			}
-			$db->free_result($query);
-		}
-
-	} elseif ($limit2) {
-		if ($orderway == 'lastpost' && empty($urladd) && strtolower($db_datastore) == 'memcache' && !$R && $offset < 980) {
-			$threadlist = L::loadClass("threadlist", 'forum');
-			$tmpTpcdb = $threadlist->getThreads($fid,$offset,$limit2);
-			$tpcdb = array_merge((array)$tpcdb,(array)$tmpTpcdb);
-		} else {
-			$query = $db->query("SELECT * FROM pw_threads t WHERE $sql $searchadd ORDER BY t.$orderway $asc ".pwLimit($offset,$limit2));
-			while ($thread = $db->fetch_array($query)) {
-				$tpcdb[] = $thread;
-			}
-			$db->free_result($query);
-			$R && $tpcdb = array_reverse($tpcdb);
-		}
-	}
-
-	//Start Here pwcache
-	if (($db_ifpwcache&112) && pwFilemtime(D_P.'data/bbscache/hitsort_judge.php')<$timestamp-600) {
-		include_once(D_P.'data/bbscache/hitsort_judge.php');
-		$updatelist = $updatetype = array();
-		foreach ($tpcdb as $thread) {
-			if ($db_ifpwcache & 16) {
-				if ($thread['hits']>$hitsort_judge['hitsort'][$fid] && $thread['fid']==$fid) {
-					$updatelist[] = array('hitsort',$fid,$thread['tid'],$thread['hits'],'',0);
-					$updatetype['hitsort'] = 1;
-				}
-			}
-			if ($db_ifpwcache & 32 && $thread['postdate']>$timestamp-24*3600) {
-				if ($thread['hits']>$hitsort_judge['hitsortday'][$fid] && $thread['fid']==$fid) {
-					$updatelist[] = array('hitsortday',$fid,$thread['tid'],$thread['hits'],$thread['postdate'],0);
-					$updatetype['hitsortday'] = 1;
-				}
-			}
-
-			if ($db_ifpwcache & 64 && $thread['postdate']>$timestamp-7*24*3600) {
-				if ($thread['hits']>$hitsort_judge['hitsortweek'][$fid] && $thread['fid']==$fid) {
-					$updatelist[] = array('hitsortweek',$fid,$thread['tid'],$thread['hits'],$thread['postdate'],0);
-					$updatetype['hitsortweek'] = 1;
-				}
-			}
-		}
-		if ($updatelist) {
-			L::loadClass('elementupdate', '', false);
-			$elementupdate = new ElementUpdate($fid);
-			$elementupdate->setJudge('hitsort',$hitsort_judge);
-			$elementupdate->setUpdateList($updatelist);
-			$elementupdate->setUpdateType($updatetype);
-			$elementupdate->updateSQL();
-			unset($elementupdate);
-		}
-		unset($updatelist,$updatetype,$hitsort_judge);
-	}
-	//End Here
-	$pwAnonyHide = $isGM || $pwSystem['anonyhide'];
-	$rewids = $cyids = array();
-	$arrStatus = array(1=>'vote',2=>'active',3=>'reward',4=>'trade',5=>'debate');
-	foreach ($tpcdb as $key => $thread) {
-		$foruminfo['allowhtm'] == 1 && $htmurl = $db_readdir.'/'.$fid.'/'.date('ym',$thread['postdate']).'/'.$thread['tid'].'.html';
-		$thread['tpcurl'] = "read.php?tid={$thread[tid]}$viewbbs".($page>1 ? "&fpage=$page" : '');
-		if ($managemode == 1) {
-			$thread['tpcurl'] .= '&toread=1';
-		} elseif (!$foruminfo['cms'] && $foruminfo['allowhtm']==1 && file_exists(R_P.$htmurl)) {
-			$thread['tpcurl'] = "$htmurl";
-		}
-		if ($thread['toolfield']) {
-			list($t,$e) = explode(',',$thread['toolfield']);
-			$sqladd = '';
-			if ($t && $t<$timestamp) {
-				$sqladd .= ",toolinfo='',topped='0'";$t='';
-				$thread['topped']>0 && $updatetop=1;
-			}
-			if ($e && $e<$timestamp) {
-				$sqladd .= ",titlefont=''";$thread['titlefont']='';$e='';
-			}
-			if ($sqladd) {
-				$thread['toolfield'] = $t.($e ? ','.$e : '');
-				$db->update("UPDATE pw_threads SET toolfield=".pwEscape($thread['toolfield'])." $sqladd WHERE tid=".pwEscape($thread['tid']));
-				/* clear thread cache*/
-				$threads = L::loadClass('Threads', 'forum');
-				$threads->delThreads($thread['tid']);
-			}
-		}
-		$forumset['cutnums'] && $thread['subject'] = substrs($thread['subject'],$forumset['cutnums']);
-		if ($thread['titlefont']) {
-			$titledetail = explode("~",$thread['titlefont']);
-			if ($titledetail[0]) $thread['subject'] = "<font color=$titledetail[0]>$thread[subject]</font>";
-			if ($titledetail[1]) $thread['subject'] = "<b>$thread[subject]</b>";
-			if ($titledetail[2]) $thread['subject'] = "<i>$thread[subject]</i>";
-			if ($titledetail[3]) $thread['subject'] = "<u>$thread[subject]</u>";
-		}
-		if ($thread['ifmark']) {
-			$thread['ifmark'] = $thread['ifmark']>0 ? " <span class='gray tpage'>( +$thread[ifmark] )</span> " : " <span class='gray tpage w'>( $thread[ifmark] )</span> ";
-		} else {
-			unset($thread['ifmark']);
-		}
-		if (isset($arrStatus[$thread['special']])) {
-			$p_status = $thread['locked']%3 == 0 ? $arrStatus[$thread['special']] : $arrStatus[$thread['special']].'lock';
-		} elseif ($thread['locked']%3<>0) {
-			$p_status = $thread['locked']%3 == 1 ? 'topiclock' : 'topicclose';
-		} else {
-			$p_status = $thread['ifmagic'] ? 'magic' : ($thread['replies']>=10 ? 'topichot' : 'topicnew');
-		}
-		if ($thread['special'] == 8 && $p_status == 'topicnew') {//活动帖图标展示
-			$p_status = 'activity';
-		}
-		$thread['inspect'] && $thread['inspect'] = explode("\t",$thread['inspect']);
-		$thread['tooltip'] = $p_status;
-		$thread['status'] = "<img src=\"$imgpath/$stylepath/thread/".$p_status.".gif\" align=\"absmiddle\">";
-		if ($thread['special'] == 8 && $p_status == 'activity') {//活动帖图标展示
-			$thread['status'] = "<img src=\"$imgpath/activity/".$p_status.".gif\" border=0 align=\"absmiddle\">";
-		}
-		$thread['topped'] && $ifsort=1;
-		$thread['ispage'] = '';
-		if ($thread['topreplays']+$thread['replies']+1>$db_readperpage) {
-			$numofpage = ceil(($thread['topreplays']+$thread['replies']+1)/$db_readperpage);
-			$fpage = $page > 1 ? "&fpage=$page" : "";
-			$thread['ispage']=' ';
-			$thread['ispage'].=" <img src=\"$imgpath/$stylepath/file/multipage.gif\" align=\"absmiddle\" alt=\"pages\"> <span class=\"tpage\">";
-			for($j=1; $j<=$numofpage; $j++) {
-				if ($j==6 && $j+1<$numofpage) {
-					$thread['ispage'].=" .. <a href=\"read.php?tid=$thread[tid]$fpage&page=$numofpage\">$numofpage</a>";
-					break;
-				} elseif ($j == 1) {
-					$thread['ispage'].=" <a href=\"read.php?tid=$thread[tid]$fpage\">$j</a>";
-				} else {
-					$thread['ispage'].=" <a href=\"read.php?tid=$thread[tid]$fpage&page=$j\">$j</a>";
-				}
-			}
-			$thread['ispage'].='</span> ';
-		}
-		$postdetail = explode(",",$thread['lastpost']);
-
-		if ($thread['ifupload']) {
-			$atype = $attachtype[$thread['ifupload']];
-			$thread['titleadd']=" <img src=\"$imgpath/$stylepath/file/$atype.gif\" alt=\"$atype\" align=\"absmiddle\">";
-		} else {
-			$thread['titleadd']="";
-		}
-		if ($managecheck) {
-			if ($thread['fid'] == $fid) {
-				$thread['adminbox'] = "<input type=\"checkbox\" autocomplete=\"off\" name=\"tidarray[]\" id=tid_{$thread[tid]} value=\"$thread[tid]\" onclick=\"postManager.show(this,event)\" onmouseover=\"postManager.manager(this,event)\"/>";
-			} else {
-				$thread['adminbox'] = "&nbsp;&nbsp;&nbsp;";
-			}
-		}
-		if ($db_threademotion) {
-			if ($thread['icon']=="R"||!$thread['icon']) {
-				$thread['useriocn']='';
-			} else {
-				$thread['useriocn']="<img src=\"$imgpath/post/emotion/$thread[icon].gif\" alt=\"$thread[icon]\" align=\"absmiddle\"> ";
-			}
-		}
-		if ($thread['anonymous'] && $thread['authorid']!=$winduid && !$pwAnonyHide) {
-			$thread['author']	= $db_anonymousname;
-			$thread['authorid'] = 0;
-		}
-		if ($thread['special'] == 3 && $thread['state'] < 1) {
-			$rewids[] = $thread['tid'];
-		}
-
-		//获取分类信息的帖子id
-		if ($modelid > 0) {
-			$topicids[] = $thread['tid'];
-		}
-
-		//获取团购的帖子id
-		if ($pcid > 0) {
-			$postcatepcids[] = $thread['tid'];
-		}
-
-		//获取活动的帖子id
-		if ($actmid > 0 || $thread['special'] == 8) {
-			$activitytiddb[] = $thread['tid'];
-		}
-
-		if (getstatus($thread['tpcstatus'], 1)) {
-			$cyids[] = $thread['tid'];
-		}
-		$threaddb[$thread['tid']] = $thread;
-	}
-
-	if ($rewids) {
-		$rewids = pwImplode($rewids);
-		$query = $db->query("SELECT tid,cbval,caval FROM pw_reward WHERE tid IN($rewids)");
-		while ($rt = $db->fetch_array($query)) {
-			$threaddb[$rt['tid']]['rewcredit'] = $rt['cbval'] + $rt['caval'];
-		}
-	}
-	if ($cyids && !$cyid) {
-		$query = $db->query("SELECT a.tid,a.cyid,c.cname FROM pw_argument a LEFT JOIN pw_colonys c ON a.cyid=c.id WHERE tid IN (" . pwImplode($cyids) . ')');
-		while ($rt = $db->fetch_array($query)) {
-			$threaddb[$rt['tid']]['colony'] = $rt;
-		}
-	}
-	if ($topicids) {
-		$topicvaluetable = GetTopcitable($modelid);
-		$query = $db->query("SELECT * FROM $topicvaluetable WHERE tid IN (" .pwImplode($topicids). ")");
-		while ($rt = $db->fetch_array($query)) {
-			$threaddb[$rt['tid']]['topic'] = $rt;
-		}
-	}
-	if ($postcatepcids) {//团购
-		$pcvaluetable = GetPcatetable($pcid);
-		$query = $db->query("SELECT * FROM $pcvaluetable WHERE tid IN (" .pwImplode($postcatepcids). ")");
-		while ($rt = $db->fetch_array($query)) {
-			$threaddb[$rt['tid']]['topic'] = $rt;
-		}
-	}
-	if ($activitytiddb) {//活动
-		$defaultValueTableName = getActivityValueTableNameByActmid();
-		if ($actmid) {
-			$userDefinedValueTableName = getActivityValueTableNameByActmid($actmid, 1, 1);
-			$query = $db->query("SELECT actmid,recommend,starttime,endtime,location,contact,telephone,picture1,picture2,picture3,picture4,picture5,signupstarttime,signupendtime,minparticipant,maxparticipant,userlimit,specificuserlimit,genderlimit,fees,feesdetail,paymethod,ut.* FROM $defaultValueTableName dt LEFT JOIN $userDefinedValueTableName ut USING(tid) WHERE dt.tid IN(".pwImplode($activitytiddb). ")");
-
-		} else {
-			$query = $db->query("SELECT * FROM $defaultValueTableName WHERE tid IN(".pwImplode($activitytiddb). ")");
-		}
-		while ($rt = $db->fetch_array($query)) {
-			if ($rt['recommend'] == 1) {
-				$threaddb[$rt['tid']]['recommendadd'] = " <img src=\"$imgpath/activity/actrecommend.gif\" border=0 align=\"absmiddle\" title=\"".getLangInfo('other','act_recommend')."\">";
-			} else {
-				$threaddb[$rt['tid']]['recommendadd'] = "";
-			}
-			if ($threadshowfield) {
-				foreach ($threadshowfield AS $key => $column) {
-					$i = 0;
-					$columnHtml = '';
-					foreach ($column AS $field) {
-						// 如人数限制值为0，视为空
-						if (in_array($field['fieldname'], array('minparticipant','maxparticipant')) && $rt[$field['fieldname']] == 0) {
-							$rt[$field['fieldname']] = '';
-						}
-						if ($rt[$field['fieldname']] !== '') {
-							$names = $postActForBbs->getNamePartsByName($field['name']);
-							if ($i != 0) {
-								$columnHtml .= ' ' . $names[0];
-							}
-							$columnHtml .= $names[1].' ';
-							$fieldValueHtml = $postActForBbs->getThreadFieldValueHtml($field['type'], $rt[$field['fieldname']], $field['rules'], $field['fieldname']);
-							$columnHtml .= $fieldValueHtml;
-							$columnHtml .= $names[2];
-							$columnHtml = trim($columnHtml);
-						}
-						$i++;
-					}
-					$threaddb[$rt['tid']]['topic'][$key] = ($columnHtml ? $columnHtml : '');
-				}
-			}
-		}
-	}
-
-	if ($updatetop) {
-		require_once(R_P.'require/updateforum.php');
-		updatetop();
-	}
-	if ($fcache == 1) {
-		writeover(D_P."data/bbscache/fcache_{$fid}_{$page}.php", "<?php\r\n\$threaddb=".pw_var_export($threaddb).";\r\n?>");
-	}
-	unset($tpcdb,$query,$searchadd,$sql,$limit2,$R,$p_status,$updatetop,$rewids,$arrStatus);
-} else {
-	include_once Pcv(D_P."data/bbscache/fcache_{$fid}_{$page}.php");
-	if ($page == 1 && !$ifsort) {
-		foreach ($threaddb as $key => $value) {
-			$value['topped'] && $ifsort = 1;
-			break;
-		}
-	}
-}
-
+//获取列表是否新窗打开的cookie
+$newwindows = $_COOKIE['newwindows'];
 
 if ($groupid != 'guest') {
 	$_G['allowpost'] && $db_threadshowpost == 1 && $fastpost = 'fastpost';
@@ -923,5 +471,752 @@ function getstart($start,$asc,$count) {
 	} else {
 		return array($start,$limit,$asc,0);
 	}
+}
+
+class baseThread {
+
+	var $threadSearch;
+	var $db;
+	var $fid;
+
+	function baseThread() {
+		$this->db =& $GLOBALS['db'];
+		$this->threadSearch = new threadSearch();
+	}
+
+	function init() {
+		return true;
+	}
+
+	function getThreadCount() {//abstruct
+	}
+
+	function getThread($start, $allowtop) {//abstruct
+	}
+
+	function setWhere() {//abstruct
+	}
+
+	function setFid($fid) {
+		$this->fid = $fid;
+	}
+
+	function getUrladd() {
+		return $this->threadSearch->urladd;
+	}
+
+	function getSelectType() {
+		return $this->threadSearch->selectType;
+	}
+
+	function getSelectSpecial() {
+		return $this->threadSearch->selectSpecial;
+	}
+
+	function getLogo($logo) {
+		global $db_indexfmlogo,$attachdir,$attachpath,$imgdir,$stylepath,$imgpath;
+		if ($db_indexfmlogo == 2 && $logo) {
+			if (strpos($logo,'http://') === false && file_exists($attachdir . '/' . $logo)) {
+				return "$attachpath/$logo";
+			}
+			return $logo;
+		}
+		if ($db_indexfmlogo == 1 && file_exists("$imgdir/$stylepath/forumlogo/{$this->fid}.gif")) {
+			return "$imgpath/$stylepath/forumlogo/$fid.gif";
+		}
+		return '';
+	}
+
+	function getThreadSortWithToppedThread($allowtop, $start) {
+		global $count;
+		$R = 0;
+		$tpcdb = array();
+		$asc = $this->threadSearch->asc;
+		if ($allowtop) {
+			global $foruminfo,$db_perpage;
+			$rows = (int)($foruminfo['top2'] + $foruminfo['top1']);
+			if ($start < $rows) {
+				$L = (int)min($rows - $start, $db_perpage);
+				$limit  = S::sqlLimit($start,$L);
+				$offset = 0;
+				$limit2 = $L == $db_perpage ? '' : $db_perpage - $L;
+				if ($toptids = trim($foruminfo['topthreads'], ',')) {
+					$query = $this->db->query("SELECT * FROM pw_threads WHERE tid IN($toptids) ORDER BY topped DESC,lastpost DESC $limit");
+					while ($rt = $this->db->fetch_array($query)) {
+						$tpcdb[] = $rt;
+					}
+					$this->db->free_result($query);
+				}
+				unset($toptids,$L,$limit);
+			} else {
+				list($offset,$limit2,$asc,$R) = getstart($start - $rows, $asc, $count);
+			}
+		} else {
+			list($offset,$limit2,$asc,$R) = getstart($start, $asc, $count);
+		}
+		$this->threadSearch->asc = $asc;
+		return array($offset, $limit2, $tpcdb, $R);
+	}
+
+	function analyseDataToCache($tpcdb) {
+		global $db_ifpwcache,$timestamp;
+		if (!($db_ifpwcache&112) || pwFilemtime(D_P.'data/bbscache/hitsort_judge.php') > $timestamp - 600) {
+			return;
+		}
+		include_once pwCache::getPath(D_P.'data/bbscache/hitsort_judge.php');
+		$updatelist = $updatetype = array();
+		foreach ($tpcdb as $thread) {
+			if ($db_ifpwcache & 16) {
+				if ($thread['hits'] > $hitsort_judge['hitsort'][$this->fid] && $thread['fid'] == $this->fid) {
+					$updatelist[] = array('hitsort', $this->fid, $thread['tid'], $thread['hits'], '', 0);
+					$updatetype['hitsort'] = 1;
+				}
+			}
+			if ($db_ifpwcache & 32 && $thread['postdate'] > $timestamp - 24*3600) {
+				if ($thread['hits'] > $hitsort_judge['hitsortday'][$this->fid] && $thread['fid'] == $this->fid) {
+					$updatelist[] = array('hitsortday', $this->fid, $thread['tid'], $thread['hits'], $thread['postdate'], 0);
+					$updatetype['hitsortday'] = 1;
+				}
+			}
+			if ($db_ifpwcache & 64 && $thread['postdate'] > $timestamp-7*24*3600) {
+				if ($thread['hits'] > $hitsort_judge['hitsortweek'][$this->fid] && $thread['fid'] == $this->fid) {
+					$updatelist[] = array('hitsortweek', $this->fid, $thread['tid'], $thread['hits'], $thread['postdate'], 0);
+					$updatetype['hitsortweek'] = 1;
+				}
+			}
+		}
+		if ($updatelist) {
+			L::loadClass('elementupdate', '', false);
+			$elementupdate = new ElementUpdate($this->fid);
+			$elementupdate->setJudge('hitsort', $hitsort_judge);
+			$elementupdate->setUpdateList($updatelist);
+			$elementupdate->setUpdateType($updatetype);
+			$elementupdate->updateSQL();
+			unset($elementupdate);
+		}
+	}
+
+	function parseThread($tpcdb) {
+		global $isGM,$pwSystem,$foruminfo,$forumset,$db_readdir,$viewbbs,$page,$managemode,$imgpath,$stylepath,$db_readperpage,$managecheck, $db_threademotion,$winduid,$db_anonymousname,$modelid,$pcid,$actmid,$timestamp;
+
+		$this->analyseDataToCache($tpcdb);
+		$pwAnonyHide = $isGM || $pwSystem['anonyhide'];
+		$updatetop = 0;
+		$threaddb = $rewids = $cyids = array();
+		$arrStatus = array(1 => 'vote', 2 => 'active', 3 => 'reward', 4 => 'trade', 5 => 'debate');
+		$attachtype	= array('1' => 'img', '2' => 'txt', '3' => 'zip');
+		foreach ($tpcdb as $key => $thread) {
+			$foruminfo['allowhtm'] == 1 && $htmurl = $db_readdir.'/'.$this->fid.'/'.date('ym',$thread['postdate']).'/'.$thread['tid'].'.html';
+			$thread['tpcurl'] = "read.php?tid={$thread[tid]}$viewbbs".($page>1 ? "&fpage=$page" : '');
+			if ($managemode == 1) {
+				$thread['tpcurl'] .= '&toread=1';
+			} elseif (!$foruminfo['cms'] && $foruminfo['allowhtm']==1 && file_exists(R_P.$htmurl)) {
+				$thread['tpcurl'] = "$htmurl";
+			}
+			if ($thread['toolfield']) {
+				list($t,$e) = explode(',',$thread['toolfield']);
+				$sqladd = '';
+				if ($t && $t<$timestamp) {
+					$sqladd .= ",toolinfo='',topped='0'";$t='';
+					$thread['topped']>0 && $updatetop=1;
+				}
+				if ($e && $e<$timestamp) {
+					$sqladd .= ",titlefont=''";$thread['titlefont']='';$e='';
+				}
+				if ($sqladd) {
+					$thread['toolfield'] = $t.($e ? ','.$e : '');
+					$this->db->update(pwQuery::buildClause("UPDATE :pw_table SET toolfield=:toolfield $sqladd WHERE tid=:tid", array('pw_threads', $thread['toolfield'], $thread['tid'])));
+					//* $threads = L::loadClass('Threads', 'forum');
+					//* $threads->delThreads($thread['tid']);
+				}
+			}
+			$forumset['cutnums'] && $thread['subject'] = substrs($thread['subject'],$forumset['cutnums']);
+			if ($thread['titlefont']) {
+				$titledetail = explode("~",$thread['titlefont']);
+				if ($titledetail[0]) $thread['subject'] = "<font color=$titledetail[0]>$thread[subject]</font>";
+				if ($titledetail[1]) $thread['subject'] = "<b>$thread[subject]</b>";
+				if ($titledetail[2]) $thread['subject'] = "<i>$thread[subject]</i>";
+				if ($titledetail[3]) $thread['subject'] = "<u>$thread[subject]</u>";
+			}
+			if ($thread['ifshield']) {
+				$thread['subject'] = threadShield('shield_title');
+			}
+			if ($thread['ifmark']) {
+				$thread['ifmark'] = $thread['ifmark']>0 ? " <span class='gray tpage'>( +$thread[ifmark] )</span> " : " <span class='gray tpage w'>( $thread[ifmark] )</span> ";
+			} else {
+				unset($thread['ifmark']);
+			}
+			if (isset($arrStatus[$thread['special']])) {
+				$p_status = $thread['locked']%3 == 0 ? $arrStatus[$thread['special']] : $arrStatus[$thread['special']].'lock';
+			} elseif ($thread['locked']%3<>0) {
+				$p_status = $thread['locked']%3 == 1 ? 'topiclock' : 'topicclose';
+			} else {
+				$p_status = $thread['ifmagic'] ? 'magic' : ($thread['replies']>=10 ? 'topichot' : 'topicnew');
+			}
+			if ($thread['special'] == 8 && $p_status == 'topicnew') {//活动帖图标展示
+				$p_status = 'activity';
+			}
+			$thread['inspect'] && $thread['inspect'] = explode("\t",$thread['inspect']);
+			$thread['tooltip'] = $p_status;
+			$thread['status'] = "<img src=\"$imgpath/$stylepath/thread/".$p_status.".gif\" align=\"absmiddle\">";
+			if ($thread['special'] == 8 && $p_status == 'activity') {//活动帖图标展示
+				$thread['status'] = "<img src=\"$imgpath/activity/".$p_status.".gif\" border=0 align=\"absmiddle\">";
+			}
+			$thread['topped'] && $GLOBALS['ifsort']=1;
+			$thread['ispage'] = '';
+			if ($thread['topreplays']+$thread['replies']+1>$db_readperpage) {
+				$numofpage = ceil(($thread['topreplays']+$thread['replies']+1)/$db_readperpage);
+				$fpage = $page > 1 ? "&fpage=$page" : "";
+				$thread['ispage']=' ';
+				$thread['ispage'].=" <img src=\"$imgpath/$stylepath/file/multipage.gif\" align=\"absmiddle\" alt=\"pages\"> <span class=\"tpage\">";
+				for($j=1; $j<=$numofpage; $j++) {
+					if ($j==6 && $j+1<$numofpage) {
+						$thread['ispage'].=" .. <a href=\"read.php?tid=$thread[tid]$fpage&page=$numofpage\">$numofpage</a>";
+						break;
+					} elseif ($j == 1) {
+						$thread['ispage'].=" <a href=\"read.php?tid=$thread[tid]$fpage\">$j</a>";
+					} else {
+						$thread['ispage'].=" <a href=\"read.php?tid=$thread[tid]$fpage&page=$j\">$j</a>";
+					}
+				}
+				$thread['ispage'].='</span> ';
+			}
+			$postdetail = explode(",",$thread['lastpost']);
+
+			if ($thread['ifupload']) {
+				$atype = $attachtype[$thread['ifupload']];
+				$thread['titleadd']=" <img src=\"$imgpath/$stylepath/file/$atype.gif\" alt=\"$atype\" align=\"absmiddle\">";
+			} else {
+				$thread['titleadd']="";
+			}
+			/*if ($managecheck) {
+				if ($thread['fid'] == $this->fid) {
+					$thread['adminbox'] = "<input type=\"checkbox\" autocomplete=\"off\" name=\"tidarray[]\" id=tid_{$thread[tid]} value=\"$thread[tid]\" onclick=\"postManage.show('postbatch','a_ajax_{$thread[tid]}')\" />";
+				} else {
+					$thread['adminbox'] = "&nbsp;&nbsp;&nbsp;";
+				}
+			}*/
+			if ($db_threademotion) {
+				if ($thread['icon']=="R"||!$thread['icon']) {
+					$thread['useriocn']='';
+				} else {
+					$thread['useriocn']="<img src=\"$imgpath/post/emotion/$thread[icon].gif\" alt=\"$thread[icon]\" align=\"absmiddle\"> ";
+				}
+			}
+			if ($thread['anonymous'] && $thread['authorid']!=$winduid && !$pwAnonyHide) {
+				$thread['author']	= $db_anonymousname;
+				$thread['authorid'] = 0;
+			}
+			if ($thread['special'] == 3 && $thread['state'] < 1) {
+				$rewids[] = $thread['tid'];
+			}
+
+			//获取分类信息的帖子id
+			if ($modelid > 0) {
+				$topicids[] = $thread['tid'];
+			}
+
+			//获取团购的帖子id
+			if ($pcid > 0) {
+				$postcatepcids[] = $thread['tid'];
+			}
+
+			//获取活动的帖子id
+			if ($actmid > 0 || $thread['special'] == 8) {
+				$activitytiddb[] = $thread['tid'];
+			}
+
+			if (getstatus($thread['tpcstatus'], 1)) {
+				$cyids[] = $thread['tid'];
+			}
+			$threaddb[$thread['tid']] = $thread;
+		}
+
+		if ($rewids) {
+			$rewids = S::sqlImplode($rewids);
+			$query = $this->db->query("SELECT tid,cbval,caval FROM pw_reward WHERE tid IN($rewids)");
+			while ($rt = $this->db->fetch_array($query)) {
+				$threaddb[$rt['tid']]['rewcredit'] = $rt['cbval'] + $rt['caval'];
+			}
+		}
+		if ($cyids && !$cyid) {
+			$query = $this->db->query("SELECT a.tid,a.cyid,c.cname FROM pw_argument a LEFT JOIN pw_colonys c ON a.cyid=c.id WHERE tid IN (" . S::sqlImplode($cyids) . ')');
+			while ($rt = $this->db->fetch_array($query)) {
+				$threaddb[$rt['tid']]['colony'] = $rt;
+			}
+		}
+		if ($topicids) {
+			$topicvaluetable = GetTopcitable($modelid);
+			$query = $this->db->query("SELECT * FROM $topicvaluetable WHERE tid IN (" .S::sqlImplode($topicids). ")");
+			while ($rt = $this->db->fetch_array($query)) {
+				$threaddb[$rt['tid']]['topic'] = $rt;
+			}
+		}
+		if ($postcatepcids) {//团购
+			$pcvaluetable = GetPcatetable($pcid);
+			$query = $this->db->query("SELECT * FROM $pcvaluetable WHERE tid IN (" .S::sqlImplode($postcatepcids). ")");
+			while ($rt = $this->db->fetch_array($query)) {
+				$threaddb[$rt['tid']]['topic'] = $rt;
+			}
+		}
+		if ($activitytiddb) {//活动
+			global $threadshowfield,$postActForBbs;
+			$defaultValueTableName = getActivityValueTableNameByActmid();
+			if ($actmid) {
+				$userDefinedValueTableName = getActivityValueTableNameByActmid($actmid, 1, 1);
+				$query = $this->db->query("SELECT actmid,recommend,starttime,endtime,location,contact,telephone,picture1,picture2,picture3,picture4,picture5,signupstarttime,signupendtime,minparticipant,maxparticipant,userlimit,specificuserlimit,genderlimit,fees,feesdetail,paymethod,ut.* FROM $defaultValueTableName dt LEFT JOIN $userDefinedValueTableName ut USING(tid) WHERE dt.tid IN(".S::sqlImplode($activitytiddb). ")");
+			} else {
+				$query = $this->db->query("SELECT * FROM $defaultValueTableName WHERE tid IN(".S::sqlImplode($activitytiddb). ")");
+			}
+			while ($rt = $this->db->fetch_array($query)) {
+				if ($rt['recommend'] == 1) {
+					$threaddb[$rt['tid']]['recommendadd'] = " <img src=\"$imgpath/activity/actrecommend.gif\" border=0 align=\"absmiddle\" title=\"".getLangInfo('other','act_recommend')."\">";
+				} else {
+					$threaddb[$rt['tid']]['recommendadd'] = "";
+				}
+				if ($threadshowfield) {
+					foreach ($threadshowfield AS $key => $column) {
+						$i = 0;
+						$columnHtml = '';
+						foreach ($column AS $field) {
+							// 如人数限制值为0，视为空
+							if (in_array($field['fieldname'], array('minparticipant','maxparticipant')) && $rt[$field['fieldname']] == 0) {
+								$rt[$field['fieldname']] = '';
+							}
+							if ($rt[$field['fieldname']] !== '') {
+								$names = $postActForBbs->getNamePartsByName($field['name']);
+								if ($i != 0) {
+									$columnHtml .= ' ' . $names[0];
+								}
+								$columnHtml .= $names[1].' ';
+								$fieldValueHtml = $postActForBbs->getThreadFieldValueHtml($field['type'], $rt[$field['fieldname']], $field['rules'], $field['fieldname']);
+								$columnHtml .= $fieldValueHtml;
+								$columnHtml .= $names[2];
+								$columnHtml = trim($columnHtml);
+							}
+							$i++;
+						}
+						$threaddb[$rt['tid']]['topic'][$key] = ($columnHtml ? $columnHtml : '');
+					}
+				}
+			}
+		}
+		if ($updatetop) {
+			require_once(R_P.'require/updateforum.php');
+			updatetop();
+		}
+		return $threaddb;
+	}
+}
+
+class colonyThread extends baseThread {
+
+	function getThreadCount() {
+		global $newColony,$colony;
+		$sqladd = $this->threadSearch->sqladd;
+		return $sqladd ? $newColony->getArgumentCount($sqladd) : $colony['tnum'];
+	}
+
+	function getThread($start, $allowtop) {
+		global $newColony;
+		list($offset, $limit2, $tpcdb, $R) = $this->getThreadSortWithToppedThread(false, $start);
+		$tpcdb = $newColony->getArgument($this->threadSearch->sqladd, $offset, $limit2, $this->threadSearch->order, $this->threadSearch->asc);
+		$R && $tpcdb = array_reverse($tpcdb);
+		return $this->parseThread($tpcdb);
+	}
+
+	function setWhere() {
+		global $type,$search;
+		$this->threadSearch->setType($type)
+		|| $this->threadSearch->setDigest($search, 'a');
+
+		$this->threadSearch->setOrder();
+	}
+}
+
+class commonThread extends baseThread {
+
+	function getThreadCount() {
+		if ($this->threadSearch->sqladd) {
+			$sqladd = $GLOBALS['theSpecialFlag'] ? $this->threadSearch->getSqlAdd() : $this->threadSearch->getSqlAdd(true);
+			$count = $this->db->get_value('SELECT COUNT(*) AS count FROM pw_threads t WHERE t.fid =' . S::sqlEscape($this->fid) . $sqladd);
+		} else {
+			$count = $GLOBALS['theSpecialFlag'] ? $GLOBALS['foruminfo']['topic'] : $GLOBALS['foruminfo']['topic'] - $GLOBALS['foruminfo']['top1'];
+		}
+		return $count;
+	}
+
+	function getThread($start, $allowtop) {
+		$method = $this->getThreadMethod();
+		if ($method == 2) {
+			return $this->getFromCache();
+		}
+		$tpcdb = $this->parseThread($this->getFromDB($start, $allowtop));
+		if ($method == 1) {
+			pwCache::setData(D_P."data/bbscache/fcache_{$this->fid}_{$GLOBALS[page]}.php", "<?php\r\n\$threaddb=" . pw_var_export($tpcdb) . ";\r\n?>");
+		}
+		return $tpcdb;
+	}
+
+	function getThreadMethod() {
+		global $page,$db_fcachenum,$fid,$foruminfo,$timestamp,$db_fcachetime;
+		$fcache = 0;
+		if ($db_fcachenum && $page <= $db_fcachenum && empty($this->threadSearch->urladd)) {
+			$fcachetime = pwFilemtime(D_P . "data/bbscache/fcache_{$fid}_{$page}.php");
+			$lastpost = explode("\t", $foruminfo['lastpost']);
+			if (!file_exists(D_P."data/bbscache/fcache_{$fid}_{$page}.php") || $lastpost[2]>$fcachetime && $timestamp-$fcachetime>$db_fcachetime) {
+				$fcache = 1;
+			} else {
+				$fcache = 2;
+			}
+		}
+		return $fcache;
+	}
+
+	function getFromCache() {
+		global $fid,$page,$ifsort;
+		include pwCache::getPath(S::escapePath(D_P."data/bbscache/fcache_{$fid}_{$page}.php"));
+		if ($page == 1 && !$ifsort) {
+			foreach ($threaddb as $key => $value) {
+				$value['topped'] && $ifsort = 1;
+				break;
+			}
+		}
+		return $threaddb;
+	}
+
+	function getFromDB($start, $allowtop) {
+		list($offset, $limit2, $tpcdb, $R) = $this->getThreadSortWithToppedThread($allowtop, $start);
+		if ($limit2) {
+			global $db_datastore;
+			if ($this->threadSearch->order == 'lastpost' && empty($this->threadSearch->urladd) && perf::checkMemcache() && !$R && $offset < 980) {
+				//* $threadlist = L::loadClass('threadlist', 'forum');
+				//* $tmpTpcdb = $threadlist->getThreads($this->fid, $offset, $limit2);
+				$_cacheService = Perf::gatherCache('pw_threads');
+				$tmpTpcdb = $_cacheService->getThreadListByForumId($this->fid, $offset, $limit2);
+				$tpcdb = array_merge((array)$tpcdb,(array)$tmpTpcdb);
+			} else {
+				$sqladd = $this->threadSearch->getSqlAdd($allowtop);
+				$query = $this->db->query("SELECT * FROM pw_threads t WHERE t.fid=" . S::sqlEscape($this->fid) . " $sqladd ORDER BY t.{$this->threadSearch->order} {$this->threadSearch->asc} " . S::sqlLimit($offset, $limit2));
+				while ($thread = $this->db->fetch_array($query)) {
+					$tpcdb[] = $thread;
+				}
+				$this->db->free_result($query);
+				$R && $tpcdb = array_reverse($tpcdb);
+			}
+		}
+		return $tpcdb;
+	}
+
+	function setWhere() {
+		global $type,$special,$search,$modelid,$pcid,$actmid,$allactmid,$allpcid,$allmodelid;
+		$this->threadSearch->setType($type)
+		|| $this->threadSearch->setSpecial($special)
+		|| $this->threadSearch->setDigest($search)
+		|| $this->threadSearch->setCheck($search)
+		|| $this->threadSearch->setTime($search);
+
+		$this->threadSearch->setModel($modelid)
+		|| $this->threadSearch->setPc($pcid)
+		|| $this->threadSearch->setAct($actmid)
+		|| $this->threadSearch->setAllact($allactmid)
+		|| $this->threadSearch->setAllpcid($allpcid)
+		|| $this->threadSearch->setAllmodelid($allmodelid);
+
+		$this->threadSearch->setOrder();
+	}
+}
+
+class imgThread extends baseThread {
+
+	function getThreadCount() {
+		return $this->db->get_value("SELECT COUNT(*) AS count FROM pw_threads_img ti LEFT JOIN pw_threads t ON ti.tid=t.tid WHERE ti.fid=" . S::sqlEscape($this->fid) . ' AND ti.fid=t.fid AND t.ifcheck=1');
+	}
+
+	function getThread($start, $allowtop) {
+		list($offset, $limit2, $tpcdb, $R) = $this->getThreadSortWithToppedThread(true, $start);
+		$order = $this->threadSearch->order;
+		$orderby = ($order == 'lastpost') ? 'ti.tid' : "t.{$order}";
+		$query = $this->db->query("SELECT t.* FROM pw_threads_img ti LEFT JOIN pw_threads t ON ti.tid=t.tid WHERE ti.fid=" . S::sqlEscape($this->fid) . " AND ti.fid=t.fid AND t.ifcheck=1 ORDER BY $orderby {$this->threadSearch->asc} " . S::sqlLimit($offset, $limit2));
+		while ($thread = $this->db->fetch_array($query)) {
+			$tpcdb[] = $thread;
+		}
+		$this->db->free_result($query);
+		$R && $tpcdb = array_reverse($tpcdb);
+		return $this->parseThread($tpcdb);
+	}
+
+	function setWhere() {
+		global $search;
+		$this->threadSearch->setImg($search);
+		$this->threadSearch->setOrder();
+	}
+}
+
+class topicsearchThread extends baseThread {
+
+	var $tiddb = array();
+	var $alltiddb = array();
+
+	function getThreadCount() {
+		global $modelid,$pcid,$actmid,$allactmid;
+		$searchname = S::escapeChar(S::getGP('searchname'));
+		$new_searchname = S::escapeChar(S::getGP('new_searchname'));
+		$searchname && $new_searchname = StrCode(serialize($searchname));
+		$count = 0;
+		if ($modelid > 0) {
+			list($count, $tiddb, $alltiddb) = $GLOBALS['postTopic']->getSearchvalue($new_searchname, 'one', true);
+		} elseif($pcid > 0) {
+			list($count, $tiddb, $alltiddb) = $GLOBALS['postCate']->getSearchvalue($new_searchname, 'one', true);
+		} elseif($actmid > 0 || $allactmid) {
+			list($count, $tiddb, $alltiddb) = $GLOBALS['postActForBbs']->getSearchvalue($new_searchname, 'one', true, true);
+		}
+		if ($this->threadSearch->sqladd && $count && $alltiddb) {
+			$sqladd = $this->threadSearch->getSqlAdd();
+			$count = $this->db->get_value("SELECT COUNT(*) as count FROM pw_threads t WHERE t.tid IN (" . S::sqlImplode($alltiddb) . ") $sqladd");
+		}
+		$this->tiddb = $tiddb;
+		$this->alltiddb = $alltiddb;
+		return $count;
+	}
+
+	function getThread($start, $allowtop) {
+		$tpcdb = array();
+		if ($this->tiddb) {
+			$sqladd = $this->threadSearch->getSqlAdd();
+			$query = $this->db->query("SELECT * FROM pw_threads t WHERE t.tid IN (" .S::sqlImplode($this->tiddb) . ") $sqladd ORDER BY {$this->threadSearch->order} {$this->threadSearch->asc}");
+			while ($thread = $this->db->fetch_array($query)) {
+				$tpcdb[] = $thread;
+			}
+			$this->db->free_result($query);
+		}
+		return $this->parseThread($tpcdb);
+	}
+
+	function setWhere() {
+		global $search;
+		$this->threadSearch->setDigest($search)
+		|| $this->threadSearch->setCheck($search)
+		|| $this->threadSearch->setTime($search);
+		$this->threadSearch->setOrder();
+	}
+}
+
+class threadSearch {
+
+	var $sqladd;
+	var $urladd;
+	var $order;
+	var $asc;
+	var $_ifcheck;
+
+	var $selectType;
+	var $selectSpecial;
+
+	function threadSearch() {
+		$this->sqladd = '';
+		$this->urladd = '';
+		$this->order = 'lastpost';
+		$this->asc = 'DESC';
+		$this->_ifcheck = 1;
+
+		$this->selectType = $this->selectSpecial = 'all';
+	}
+
+	function setType($type) {
+		global $t_db;
+		if (!($t_db && is_numeric($type) && isset($t_db[$type]))) {
+			return false;
+		}
+		if ($t_db[$type]['upid'] == 0) {
+			$typeids = array();
+			foreach ($t_db as $key => $value) {
+				$value['upid'] == $type && $typeids[] = $key;
+			}
+			if ($typeids) {
+				$typeids = array_merge($typeids, array($type));
+				$this->sqladd .= ' AND t.type IN(' . S::sqlImplode($typeids) . ")";
+			} else {
+				$this->sqladd .= ' AND t.type=' . S::sqlEscape($type);
+			}
+		} else {
+			$this->sqladd .= ' AND t.type=' . S::sqlEscape($type);
+		}
+		$this->urladd .= "&type=$type";
+		$this->selectType = $type;
+		return true;
+	}
+
+	function setSpecial($special) {
+		$special = (int)$special;
+		if (!($special > 0)) {
+			return false;
+		}
+		$this->sqladd .= ' AND t.special=' . S::sqlEscape($special);
+		$this->urladd .= "&special=$special";
+		$this->selectSpecial = $special;
+		return true;
+	}
+
+	function setDigest($search, $t='t') {
+		if ($search != 'digest') {
+			return false;
+		}
+		$this->sqladd .= " AND {$t}.digest>'0'";
+		$this->urladd .= "&search=$search";
+		$t == 'a' && $GLOBALS['tmpUrlAdd'] .= '&digest=1';
+		$this->selectType = 'digest';
+		$this->selectSpecial = 'digest';
+		return true;
+	}
+
+	function setCheck($search) {
+		if ($search != 'check') {
+			return false;
+		}
+		if ($GLOBALS['isGM'] || $GLOBALS['pwSystem']['viewcheck']) {
+			$this->sqladd .= " AND t.ifcheck='0'";
+		} else {
+			$this->sqladd .= ' AND t.authorid=' . S::sqlEscape($GLOBALS['winduid']) . " AND t.ifcheck='0'";
+		}
+		$this->urladd .= "&search=$search";
+		$this->_ifcheck = 0;
+		$this->selectType = 'check';
+		return true;
+	}
+
+	function setTime($search) {
+		if (!is_numeric($search)) {
+			return false;
+		}
+		$this->sqladd .= " AND t.lastpost>=" . S::sqlEscape($GLOBALS['timestamp'] - $search*84600);
+		$this->urladd .= "&search=$search";
+		return true;
+	}
+
+	function setImg($search) {
+		if ($search != 'img') {
+			return false;
+		}
+		$this->urladd .= "&search=$search";
+		$this->selectSpecial = 'img';
+		return true;
+	}
+
+	function setModel($modelid) {
+		if (!($modelid > 0)) {
+			return false;
+		}
+		$this->sqladd .= " AND t.modelid=" . S::sqlEscape($modelid);
+		$this->urladd .= "&modelid=$modelid";
+		$this->selectType = 'model_' . $modelid;
+		$this->selectSpecial = 'allmodelid';
+		return true;
+	}
+	function setAllmodelid($allmodelid) {
+		if(!($allmodelid > 0)) {
+			return false;
+		}
+		$this->sqladd .= " AND t.modelid>0";
+		$this->urladd .= "&allmodelid=1";
+		$this->selectSpecial = 'allmodelid';
+		return true;
+		
+	}
+	function setPc($pcid) {
+		if (!($pcid > 0)) {
+			return false;
+		}
+		$this->sqladd .= " AND t.special=" . S::sqlEscape($pcid + 20);
+		$this->urladd .= "&pcid=$pcid";
+		$this->selectType = 'pcid_' . $pcid;
+		$this->selectSpecial = 'allpcid';
+		return true;
+	}
+
+	function setAct($actmid) {
+		if (!($actmid > 0)) {
+			return false;
+		}
+		global $postActForBbs,$fid;
+		$actTidDb = $postActForBbs->getActTidDb($actmid, $fid);
+		if ($actTidDb) {
+			$this->sqladd .= " AND t.tid IN(" . S::sqlImplode($actTidDb) . ")";
+		} else {
+			$this->sqladd .= " AND t.tid=0";//让其搜索为0
+		}
+		$this->urladd .= "&actmid=$actmid";
+		$this->selectType = 'actmid_'.$actmid;
+		$this->selectSpecial = 'allactmid';
+		return true;
+	}
+
+	function setAllact($allactmid) {
+		if (!$allactmid) {
+			return false;
+		}
+		$this->sqladd .= " AND t.special=8";
+		$this->urladd .= "&allactmid=1";
+		//$this->selectType = 'activity_list';
+		$this->selectSpecial = 'allactmid';
+		return true;
+	}
+	function  setAllpcid($allpcid) {
+		if(!$allpcid) {
+			return false;
+		}
+		$this->sqladd .= " AND (t.special=21 OR t.special=22) ";
+		$this->urladd .= "&allpcid=1";
+		$this->selectSpecial = 'allpcid';
+		return true;
+	}
+	function setOrder() {
+		global $_G, $orderway,$asc,$forumset;
+		if ($_G['alloworder']) {
+			if (!in_array($orderway, array('lastpost','postdate','hits','replies','favors'))) {
+				$orderway = $forumset['orderway'] ? $forumset['orderway'] : 'lastpost';
+			} else {
+				$this->urladd .= "&orderway=$orderway";
+			}
+			$this->order = $orderway;
+			//$ordersel[$orderway] = 'selected';
+
+			if (!in_array($asc, array('DESC','ASC'))) {
+				$asc = $forumset['asc'] ? $forumset['asc'] : 'DESC';
+			} else {
+				$this->urladd .= "&asc=$asc";
+			}
+			$this->asc = $asc;
+			//$ascsel[$asc]='selected';
+		} else {
+			$this->asc = $forumset['asc'] ? $forumset['asc'] : 'DESC';
+			$this->order = $forumset['orderway'] ? $forumset['orderway'] : 'lastpost';
+		}
+	}
+
+	function getSqlAdd($allowtop = false) {
+		$sqladd = $this->sqladd;
+		$this->_ifcheck && $sqladd .= " AND t.ifcheck='1'";
+		$allowtop && $sqladd .= ' AND t.topped=0';
+		return $sqladd;
+	}
+}
+function threadShield($code){
+	global $groupid;
+	$code = getLangInfo('bbscode',$code);
+	return "<span style=\"color:black; text-decoration:line-through;\">$code</span>";
+}
+function getThreadFactory($cyid, $search, $topicsearch) {
+	if ($cyid) {
+		$object = 'colony';
+	} elseif ($search == 'img') {
+		$object = 'img';
+	} elseif ($topicsearch) {
+		$object = 'topicsearch';
+	} else {
+		$object = 'common';
+	}
+	$object .= 'Thread';
+	return new $object();
 }
 ?>

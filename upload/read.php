@@ -1,26 +1,48 @@
 <?php
 define('SCR','read');
 require_once('global.php');
-require_once(R_P.'require/forum.php');
+L::loadClass('forum', 'forum', false);
+//require_once(R_P.'require/forum.php');
 require_once(R_P.'require/bbscode.php');
-include_once(D_P.'data/bbscache/cache_read.php');
-InitGP(array('fpage','uid','toread'),'GP',2);
-$ordertype = GetGP('ordertype');
+include_once pwCache::getPath(D_P.'data/bbscache/cache_read.php',true);
+S::gp(array('fpage','toread'), 'GP', 2);
+S::gp(array('uid'));
+
+$_showSmallImg = 5;
+$ordertype = S::getGP('ordertype');
 $fieldadd = $tablaadd = $sqladd = $fastpost = $special = $ifmagic = $urladd = $fieldinfo = $tableinfo = '';
 $_uids    = $_pids = $colony = array();
-$page = GetGP('page');
+$page = S::getGP('page');
 $page < 1 && $page != 'e' && $page = 1;
-$threads = L::loadClass('Threads', 'forum');
-$read = $threads->getThreads($tid,!($page>1));
+if (Perf::checkMemcache()) {
+	$_cacheService = Perf::getCacheService();
+	$_thread = $_cacheService->get('thread_tid_' . $tid);
+	if ($page < 2) {
+		$_thread && $_tmsg = $_cacheService->get('thread_tmsg_tid_' . $tid);
+		$read = ($_thread && $_tmsg) ? array_merge($_thread, $_tmsg) : false;
+	} else {
+		$read = $_thread;
+	}
+	if(!$read){
+		$_cacheService = Perf::gatherCache('pw_threads');
+		$read = ($page>1) ? $_cacheService->getThreadByThreadId($tid) : $_cacheService->getThreadAndTmsgByThreadId($tid);	
+	}
+} else {
+	if (($page>1)) {
+		$read = $db->get_one("SELECT * FROM pw_threads WHERE tid=" . S::sqlEscape($tid));
+	} else {
+		$read = $db->get_one("SELECT t.* ,tm.* FROM pw_threads t LEFT JOIN ".S::sqlMetadata(GetTtable($tid))." tm ON t.tid=tm.tid WHERE t.tid=" . S::sqlEscape($tid));
+	}
+}
 !$read && Showmsg('illegal_tid');
 
 if (getstatus($read['tpcstatus'], 1)) {#帖子是否来自群组
 	$_sql_sel = $_sql_tab = '';
 	if ($winduid) {
 		$_sql_sel = ',cm.id AS ifcyer,cm.ifadmin';
-		$_sql_tab = ' LEFT JOIN pw_cmembers cm ON c.id=cm.colonyid AND cm.uid=' . pwEscape($winduid);
+		$_sql_tab = ' LEFT JOIN pw_cmembers cm ON c.id=cm.colonyid AND cm.uid=' . S::sqlEscape($winduid);
 	}
-	$colony = $db->get_one("SELECT a.cyid,c.cname,c.ifopen,c.admin,c.speciallevel,c.commonlevel,c.classid,c.viewtype{$_sql_sel} FROM pw_argument a LEFT JOIN pw_colonys c ON a.cyid=c.id{$_sql_tab} WHERE tid=" . pwEscape($tid));
+	$colony = $db->get_one("SELECT a.cyid,c.cname,c.ifopen,c.admin,c.speciallevel,c.commonlevel,c.classid,c.viewtype{$_sql_sel} FROM pw_argument a LEFT JOIN pw_colonys c ON a.cyid=c.id{$_sql_tab} WHERE tid=" . S::sqlEscape($tid));
 	if ($colony && (!$colony['classid'] || $colony['viewtype'] == '2')) {
 		ObHeader("apps.php?q=group&a=read&cyid={$colony[cyid]}&tid=$tid");
 	}
@@ -45,19 +67,21 @@ if ($db_siteappkey && ($db_apps_list['17']['status'] == 1 || is_array($db_thread
 }
 /*The app client*/
 
-//读取版块信息及权限判断
-if (!($foruminfo = L::forum($fid))) {
+$pwforum = new PwForum($fid);
+if (!$pwforum->isForum()) {
 	Showmsg('data_error');
 }
-if (!CkInArray($windid, $manager)) {
-	wind_forumcheck ( $foruminfo );
+$foruminfo =& $pwforum->foruminfo;
+$forumset =& $pwforum->forumset;
+
+if (!S::inArray($windid, $manager)) {
+	$pwforum->forumcheck($winddb, $groupid);
 }
-$forumset  = $foruminfo['forumset'];
+$pwforum->setForumStyle();
 
 if (!$foruminfo['allowvisit'] && $_G['allowread']==0 && $_COOKIE) {
 	Showmsg('read_group_right');
 }
-
 /**************************************/
 
 if (is_array($customfield)) {
@@ -85,12 +109,12 @@ $fieldinfo && $tableinfo = 'LEFT JOIN pw_memberinfo mi ON mi.uid=m.uid';
 $isGM = $isBM = $admincheck = $managecheck = $pwPostHide = $pwSellHide = $pwEncodeHide = 0;
 $pwSystem = array();
 if ($groupid != 'guest') {
-	$isGM = CkInArray($windid,$manager);
-	$isBM = admincheck($foruminfo['forumadmin'],$foruminfo['fupadmin'],$windid);
+	$isGM = S::inArray($windid,$manager);
+	$isBM = $pwforum->isBM($windid);
 	$admincheck = ($isGM || $isBM) ? 1 : 0;
 	if (!$isGM) {#非创始人权限获取
 		$pwSystem = pwRights($isBM);
-		if ($pwSystem && ($pwSystem['tpccheck'] || $pwSystem['digestadmin'] || $pwSystem['lockadmin'] || $pwSystem['pushadmin'] || $pwSystem['coloradmin'] || $pwSystem['downadmin'] || $pwSystem['delatc'] || $pwSystem['moveatc'] || $pwSystem['copyatc'] || $pwSystem['topped'] || $pwSystem['unite'] || $pwSystem['pingcp'] || $pwSystem['areapush'])) {
+		if ($pwSystem && ($pwSystem['tpccheck'] || $pwSystem['digestadmin'] || $pwSystem['lockadmin'] || $pwSystem['pushadmin'] || $pwSystem['coloradmin'] || $pwSystem['downadmin'] || $pwSystem['delatc'] || $pwSystem['moveatc'] || $pwSystem['copyatc'] || $pwSystem['topped'] || $pwSystem['unite'] || $pwSystem['pingcp'] || $pwSystem['areapush'] || $pwSystem['split'])) {
 			$managecheck = 1;
 		}
 		$pwPostHide = $pwSystem['posthide'];
@@ -106,8 +130,8 @@ if ($foruminfo['allowread'] && !$admincheck && !allowcheck($foruminfo['allowread
 	Showmsg('forum_read_right');
 }
 if (!$admincheck) {
-	!$foruminfo['allowvisit'] && forum_creditcheck();
-	$foruminfo['forumsell'] && forum_sell($fid);
+	$pwforum->creditcheck($winddb, $groupid);#积分限制浏览
+	$pwforum->sellcheck($winduid);#出售版块
 }
 if ($read['ifcheck'] == 0 && !$isGM && $windid != $read['author'] && !$pwSystem['viewcheck']) {
 	Showmsg('read_check');
@@ -129,7 +153,7 @@ if ($colony) {#帖子是否来自群组
 	$colonyManageCheck = ($ifColonyAdmin || $ifColonyRight || $isGM || $ifForumColonyRight) ? 1 : 0;
 	if ($ifColonyAdmin) {//根据等级获取群组管理员所具有的权限
 		$colonyLevel = $colony['speciallevel'] ? $colony['speciallevel'] : $colony['commonlevel'];
-		if ($colonyLevel && $colonyRights = $db->get_one("SELECT * FROM pw_cnlevel WHERE id=" . pwEscape($colonyLevel))) {
+		if ($colonyLevel && $colonyRights = $db->get_one("SELECT * FROM pw_cnlevel WHERE id=" . S::sqlEscape($colonyLevel))) {
 			$colonyTopicAdmin = $colonyRights['topicadmin'] ? unserialize($colonyRights['topicadmin']) : array();
 		}
 	}
@@ -182,15 +206,16 @@ if ($read['ifmagic'] && $db_windmagic) {
 	$ifmagic = 1;
 	list($magicid,$magicname) = explode("\t",$read['magic']);
 }
-if ($uid>0 && $read['replies'] > 0) {#只看作者回复数统计
-	$rt = $db->get_one("SELECT COUNT(*) AS n FROM $pw_posts WHERE tid=".pwEscape($tid)." AND authorid=".pwEscape($uid)." AND anonymous='0' AND ifcheck='1'");
+if (isset($uid) && $read['replies'] > 0) {#只看作者回复数统计
+	$uid = intval($uid);
+	$rt = $db->get_one("SELECT COUNT(*) AS n FROM $pw_posts WHERE tid=" . S::sqlEscape($tid) . " AND authorid=" . S::sqlEscape($uid) . " AND anonymous='0' AND ifcheck='1'");
 	$read['replies'] = $rt['n'];
-	$sqladd = 'AND t.authorid='.pwEscape($uid)." AND t.anonymous='0'";
+	$sqladd = 'AND t.authorid=' . S::sqlEscape($uid) . " AND t.anonymous='0'";
 	$urladd = "&uid=$uid";
 	$openIndex = false;
 }
 if ($openIndex) {#高楼帖子索引
-	$count = 1 + $db->get_value("SELECT max(floor) FROM pw_postsfloor WHERE tid =". pwEscape($tid));
+	$count = 1 + $db->get_value("SELECT max(floor) FROM pw_postsfloor WHERE tid =". S::sqlEscape($tid));
 } else {
 	$count = $read['replies']+1;
 }
@@ -201,7 +226,7 @@ $read_category = getThreadType();
 
 //门户阅读方式
 if ($foruminfo['ifcms'] && $db_modes['area']['ifopen']) {
-	InitGP(array('viewbbs'));
+	S::gp(array('viewbbs'));
 	if (!$viewbbs) {
 		require_once R_P. 'mode/area/area_read.php';exit;
 	}
@@ -215,13 +240,15 @@ if ($winddb['p_num']) {
 $numofpage = ceil(($count+$topped_count)/$db_readperpage);
 if ($page == 'e' || $page > $numofpage) {
 	$numofpage == 1 && $page > 1 && ObHeader("read.php?tid=$tid&toread=$toread");
-	$page = $numofpage;
+	//$numofpage > 1 && $page == 'e' && $orderby == 'desc' && ObHeader("read.php?tid=$tid&page=1&toread=$toread");
+	$page = ($page == 'e' && $orderby == 'desc') ? 1 : $numofpage;
 }
 
 $page == 1 && $read['aid'] && $_pids['tpc'] = 0;#附件 TODO 首页才读
 
 //当前位置导航
-list($guidename,$forumtitle) = getforumtitle(forumindex($foruminfo['fup'],1),1);
+list($guidename, $forumtitle) = $pwforum->getTitle();
+//list($guidename,$forumtitle) = getforumtitle(forumindex($foruminfo['fup'],1),1);
 $forumtitle = '|'.$forumtitle;
 
 
@@ -318,21 +345,8 @@ if ($read['special'] == 1 && ($foruminfo['allowtype'] & 2) && ($page == 1 || $nu
 }
 
 //帖子回复短消息提醒
-if ($db_replysitemail && $read['authorid']==$winduid && $read['ifmail']==4) {
-	/*
-	$userService = L::loadClass('UserService', 'user');
-	$sqluid = pwEscape($winduid);
-	$rt = $db->get_one('SELECT replyinfo FROM pw_memberinfo WHERE uid='.$sqluid);
-	$rt['replyinfo'] = str_replace(",$tid,",',',$rt['replyinfo']);
-	if ($rt['replyinfo'] == ',') {
-		if (getstatus($winddb['userstatus'], PW_USERSTATUS_NEWRP)) {
-			$userService->setUserStatus($winduid, PW_USERSTATUS_NEWRP, false);
-		}
-		$rt['replyinfo'] = '';
-	}
-	$userService->update($winduid, array(), array(), array('replyinfo' => $rt['replyinfo']));
-	*/
-	$db->update("UPDATE pw_threads SET ifmail='2' WHERE tid=" . pwEscape($tid));
+if ($db_replysitemail && $read['authorid'] == $winduid && $read['ifmail'] == 4) {
+	pwQuery::update('pw_threads', 'tid=:tid', array($tid), array('ifmail' => 2));
 }
 
 if ($page == 1) {
@@ -352,9 +366,10 @@ $tpc_locked = $read['locked']%3<>0 ? 1 : 0;
 
 //更新帖子点击
 if (!$db_hithour) {
-	$db->update('UPDATE pw_threads SET hits=hits+1 WHERE tid='.pwEscape($tid));
+	//$db->update('UPDATE pw_threads SET hits=hits+1 WHERE tid='.S::sqlEscape($tid));
+	pwQuery::update('pw_threads', 'tid=:tid', array($tid), null, array(PW_EXPR=>array('hits=hits+1')));
 } else {
-	writeover(D_P.'data/bbscache/hits.txt',$tid."\t",'ab');
+	pwCache::setData(D_P.'data/bbscache/hits.txt',$tid."\t", false, 'ab');
 }
 
 //帖子浏览记录
@@ -382,17 +397,17 @@ if ($topped_count) {
 	$topped_count - $start_limit < $db_readperpage && $topped_page_num = $topped_count - $start_limit;
 	$topped_page_num = $topped_page_num < 0 ? 0 : $topped_page_num;
 	if ($topped_count > $start_limit) {
-		$limit = pwLimit($start_limit,$topped_page_num);
+		$limit = S::sqlLimit($start_limit,$topped_page_num);
 		$query = $db->query("SELECT t.floor, p.* $fieldadd FROM pw_poststopped t
 			LEFT JOIN $pw_posts p ON t.pid = p.pid $tablaadd
-			WHERE t.tid = ".pwEscape($tid)." AND t.fid = '0' AND t.pid != '0' AND p.ifcheck = '1' ORDER BY t.uptime desc $limit");
+			WHERE t.tid = ".S::sqlEscape($tid)." AND t.fid = '0' AND t.pid != '0' AND p.ifcheck = '1' ORDER BY t.uptime desc $limit");
 		while ($rd = $db->fetch_array($query)) {
 			$_uids[$rd['authorid']] = 'UID_'.$rd['authorid'];
 			$rd['aid'] && $_pids[$rd['pid']] = $rd['pid'];
 			$rd['istop'] = "topped";
 			$_page = ceil(($rd['floor'] + 1 + $topped_count)/$db_readperpage);
 			$rd['jumpurl'] = "read.php?tid=$tid&page=$_page#".$rd['pid'];
-			$rd['remindinfo'] = '';
+			//$rd['remindinfo'] = '';
 			$readdb[] = $rd;
 		}
 	}
@@ -410,13 +425,13 @@ if ($read['replies'] > 0 && $topped_page_num < $db_readperpage) {
 		$start_limit = $start_limit-$topped_count <= 0 ? 0 : $start_limit-$topped_count;
 		$end = $start_limit + $readnum - $topped_page_num;
 		$sql_floor = " AND f.floor > " . $start_limit ." AND f.floor <= ".$end." ";
-		$query = $db->query("SELECT f.pid FROM pw_postsfloor f WHERE f.tid = ". pwEscape($tid) ." $sql_floor ORDER BY f.floor $orderby");
+		$query = $db->query("SELECT f.pid FROM pw_postsfloor f WHERE f.tid = ". S::sqlEscape($tid) ." $sql_floor ORDER BY f.floor $orderby");
 		while ($rt = $db->fetch_array($query)) {
 			$postIds[] = $rt['pid'];
 		}
 		if ($postIds) {
-			$postIds && $sql_postId = " AND t.pid IN ( ". pwImplode($postIds,false) ." ) ";
-			$query = $db->query("SELECT t.* $fieldadd FROM $pw_posts t $tablaadd WHERE t.tid=".pwEscape($tid)." $sql_postId $sqladd");
+			$postIds && $sql_postId = " AND t.pid IN ( ". S::sqlImplode($postIds,false) ." ) ";
+			$query = $db->query("SELECT t.* $fieldadd FROM $pw_posts t $tablaadd WHERE t.tid=".S::sqlEscape($tid)." $sql_postId $sqladd");
 			while ($read = $db->fetch_array($query)) {
 				if ($read['ifcheck']!='1') {
 					$read['subject'] = '';
@@ -453,8 +468,8 @@ if ($read['replies'] > 0 && $topped_page_num < $db_readperpage) {
 			$start_limit = 0;
 		}
 		$start_limit = $pageinverse ? ($start_limit+$topped_count) : ($start_limit-$topped_count <= 0 ? 0 : $start_limit-$topped_count);
-		$limit = pwLimit($start_limit,($readnum-$topped_page_num));
-		$query = $db->query("SELECT t.* $fieldadd FROM $pw_posts t $tablaadd WHERE t.tid=".pwEscape($tid)." AND t.ifcheck='1' $sqladd ORDER BY $order $limit");
+		$limit = S::sqlLimit($start_limit,($readnum-$topped_page_num));
+		$query = $db->query("SELECT t.* $fieldadd FROM $pw_posts t $tablaadd WHERE t.tid=".S::sqlEscape($tid)." AND t.ifcheck='1' $sqladd ORDER BY $order $limit");
 		while ($read = $db->fetch_array($query)) {
 			$_uids[$read['authorid']] = 'UID_'.$read['authorid'];
 			$read['aid'] && $_pids[$read['pid']] = $read['pid'];
@@ -468,7 +483,7 @@ if ($read['replies'] > 0 && $topped_page_num < $db_readperpage) {
 //读取帖子及回复的附件信息
 $attachdb = $pwMembers = $colonydb = $customdb = array();
 if ($_pids) {
-	$query = $db->query('SELECT * FROM pw_attachs WHERE tid='.pwEscape($tid)."AND pid IN (".pwImplode($_pids).")");
+	$query = $db->query('SELECT * FROM pw_attachs WHERE tid='.S::sqlEscape($tid)."AND pid IN (".S::sqlImplode($_pids).")");
 	while($rt=$db->fetch_array($query)){
 		if ($rt['pid'] == '0') $rt['pid'] = 'tpc';
 		$attachdb[$rt['pid']][$rt['aid']] = $rt;
@@ -476,7 +491,7 @@ if ($_pids) {
 }
 
 //游客浏览权限控制
-if($forumset['viewpic'] && !$winduid && $attachdb){
+if ($forumset['viewpic'] && !$winduid && $attachdb) {
 	$viewpic = 1;
 }
 
@@ -487,115 +502,120 @@ if($db_showcustom && is_array($db_showcustom)){
 	}
 }
 //读取用户信息
+
 if ($_uids) {
-	$skey = array();
-	foreach ($_uids as $key=>$value) {
-		$skey[$value] = $key;
-		$db_showcolony && $skey['UID_GROUP_'.$key] = $key;
-		$showCustom && $skey['UID_CREDIT_'.$key] = $key;
-	}
-
-	$_cache = getDatastore();
-	$arrValues = $_cache->get(array_keys($skey));
-
-	$tmpUIDs = $tmpGROUPs = $tmpGROUPs = $tmpCacheData = $tmpColonydb = $tmpCustomdb = array();
-	foreach ($skey as $key=>$value) {
-		$prefix = substr($key,0,strrpos($key,'_'));
-
-		switch ($prefix) {
-			case 'UID' :
-				if (!isset($arrValues[$key])) {
-					$tmpUIDs[$key] = $value;
-					$tmpCacheData[$key] = '';
-				} else {
-					$pwMembers[$value] = $arrValues[$key];
-				}
-				break;
-			case 'UID_CREDIT' :
-				if (!isset($arrValues[$key])) {
-					$tmpCREDITs[$key] = $value;
-					$tmpCustomdb[$key] = '';
-				} else {
-					$customdb[$value] = $arrValues[$key];
-				}
-				break;
-			case 'UID_GROUP' :
-				if (!isset($arrValues[$key])) {
-					$tmpGROUPs[$key] = $value;
-					$tmpColonydb[$key] = '';
-				} else {
-					$colonydb[$value] = $arrValues[$key];
-				}
-				break;
+	$_userIds = array_keys($_uids);
+	if (perf::checkMemcache()){
+		$_cacheService = Perf::gatherCache('pw_members');
+		$pwMembers = $tableinfo ? $_cacheService->getAllByUserIds($_userIds, true, true, true) : $_cacheService->getAllByUserIds($_userIds, true, true);
+		$showCustom && $customdb = $_cacheService->getMemberCreditByUserIds($_userIds);
+		$db_showcolony && $colonydb = $_cacheService->getCmemberAndColonyByUserIds($_userIds);	
+		//为了兼容原来版本中的查询字段取别名 'icon as micon'
+		if (S::isArray($pwMembers)){
+			foreach ($pwMembers as $k=>$v){
+				$pwMembers[$k]['micon'] = $pwMembers[$k]['icon'];
+				unset($pwMembers[$k]['icon']);
+			}
 		}
-	}
-	if ($db_showcolony && $tmpGROUPs) {#会员群组信息
-		$query = $db->query("SELECT c.uid,cy.id,cy.cname"
-							. " FROM pw_cmembers c LEFT JOIN pw_colonys cy ON cy.id=c.colonyid"
-							. " WHERE c.uid IN(".pwImplode($tmpGROUPs,false).") AND c.ifadmin!='-1'");
-		while ($rt = $db->fetch_array($query)) {
-			$colonydb[$rt['uid']] = $tmpColonydb['UID_GROUP_'.$rt['uid']] = $rt;
+	} else {
+		$_dbCacheService = Perf::gatherCache('pw_membersdbcache');
+		list($pwMembers, $customdb, $colonydb) = $_dbCacheService->getUserDBCacheByUserIds($_userIds, $showCustom, $db_showcolony, $showfield);
+		/**
+		$skey = array();
+		foreach ($_uids as $key=>$value) {
+			$skey[$value] = $key;
+			$db_showcolony && $skey['UID_GROUP_'.$key] = $key;
+			$showCustom && $skey['UID_CREDIT_'.$key] = $key;
 		}
-		is_object($_cache) && $_cache->update($tmpColonydb,3600);
-		$db->free_result($query);
-	}
-
-	if ($showCustom && $tmpCREDITs) {#自定义积分显示
-		$query = $db->query("SELECT uid,cid,value FROM pw_membercredit WHERE uid IN(".pwImplode($tmpCREDITs,false).")");
-		while ($rt = $db->fetch_array($query)) {
-			$customdb[$rt['uid']][$rt['cid']] = $rt['value'];
-			$tmpCustomdb['UID_CREDIT_'.$rt['uid']][$rt['cid']] = $rt['value'];
+		
+		$_cache = getDatastore();
+		$arrValues = $_cache->get(array_keys($skey));
+	
+		$tmpUIDs = $tmpGROUPs = $tmpGROUPs = $tmpCacheData = $tmpColonydb = $tmpCustomdb = array();
+		foreach ($skey as $key=>$value) {
+			$prefix = substr($key,0,strrpos($key,'_'));
+	
+			switch ($prefix) {
+				case 'UID' :
+					if (!isset($arrValues[$key])) {
+						$tmpUIDs[$key] = $value;
+						$tmpCacheData[$key] = '';
+					} else {
+						$pwMembers[$value] = $arrValues[$key];
+					}
+					break;
+				case 'UID_CREDIT' :
+					if (!isset($arrValues[$key])) {
+						$tmpCREDITs[$key] = $value;
+						$tmpCustomdb[$key] = '';
+					} else {
+						$customdb[$value] = $arrValues[$key];
+					}
+					break;
+				case 'UID_GROUP' :
+					if (!isset($arrValues[$key])) {
+						$tmpGROUPs[$key] = $value;
+						$tmpColonydb[$key] = '';
+					} else {
+						$colonydb[$value] = $arrValues[$key];
+					}
+					break;
+			}
 		}
-		is_object($_cache) && $_cache->update($tmpCustomdb,3600);
-		$db->free_result($query);
-	}
-
-	if ($tmpUIDs) {#会员信息
-		$query = $db->query("SELECT m.uid,m.username,m.gender,m.oicq,m.aliww,m.groupid,m.memberid,m.icon AS micon ,m.hack,m.honor,m.signature,m.regdate,m.medals,m.userstatus,md.postnum,md.digests,md.rvrc,md.money,md.credit,md.currency,md.thisvisit,md.lastvisit,md.onlinetime,md.starttime $fieldinfo FROM pw_members m LEFT JOIN pw_memberdata md ON m.uid=md.uid $tableinfo WHERE m.uid IN (".pwImplode($tmpUIDs,false).") ");
-		while ($rt = $db->fetch_array($query)) {
-			is_array($pwMembers[$rt['uid']]) ? $pwMembers[$rt['uid']] += $rt : $pwMembers[$rt['uid']] = $rt;
-			$tmpCacheData['UID_'.$rt['uid']] = $rt;
+		if ($db_showcolony && $tmpGROUPs) {#会员群组信息
+			$query = $db->query("SELECT c.uid,cy.id,cy.cname"
+								. " FROM pw_cmembers c LEFT JOIN pw_colonys cy ON cy.id=c.colonyid"
+								. " WHERE c.uid IN(".S::sqlImplode($tmpGROUPs,false).") AND c.ifadmin!='-1'");
+			while ($rt = $db->fetch_array($query)) {
+				$colonydb[$rt['uid']] = $tmpColonydb['UID_GROUP_'.$rt['uid']] = $rt;
+			}
+			is_object($_cache) && $_cache->update($tmpColonydb,3600);
+			$db->free_result($query);
 		}
-		is_object($_cache) && $_cache->update($tmpCacheData,3600);
-		$db->free_result($query);
+	
+		if ($showCustom && $tmpCREDITs) {#自定义积分显示
+			$query = $db->query("SELECT uid,cid,value FROM pw_membercredit WHERE uid IN(".S::sqlImplode($tmpCREDITs,false).")");
+			while ($rt = $db->fetch_array($query)) {
+				$customdb[$rt['uid']][$rt['cid']] = $rt['value'];
+				$tmpCustomdb['UID_CREDIT_'.$rt['uid']][$rt['cid']] = $rt['value'];
+			}
+			is_object($_cache) && $_cache->update($tmpCustomdb,3600);
+			$db->free_result($query);
+		}
+	
+		if ($tmpUIDs) {#会员信息
+			$query = $db->query("SELECT m.uid,m.username,m.gender,m.oicq,m.aliww,m.groupid,m.memberid,m.icon AS micon ,m.hack,m.honor,m.signature,m.regdate,m.medals,m.userstatus,md.postnum,md.digests,md.rvrc,md.money,md.credit,md.currency,md.thisvisit,md.lastvisit,md.onlinetime,md.starttime $fieldinfo FROM pw_members m LEFT JOIN pw_memberdata md ON m.uid=md.uid $tableinfo WHERE m.uid IN (".S::sqlImplode($tmpUIDs,false).") ");
+			while ($rt = $db->fetch_array($query)) {
+				is_array($pwMembers[$rt['uid']]) ? $pwMembers[$rt['uid']] += $rt : $pwMembers[$rt['uid']] = $rt;
+				$tmpCacheData['UID_'.$rt['uid']] = $rt;
+			}
+			is_object($_cache) && $_cache->update($tmpCacheData,3600);
+			$db->free_result($query);
+		}
+		unset($skey,$_uids,$_cache,$tmpUIDs,$tmpCREDITs,$tmpGROUPs,$tmpColonydb,$tmpCustomdb,$tmpCacheData);
+		**/
 	}
-	unset($skey,$_uids,$_cache,$tmpUIDs,$tmpCREDITs,$tmpGROUPs,$tmpColonydb,$tmpCustomdb,$tmpCacheData);
 }
 
 //用户禁言及词语过滤
-$bandb = isban($pwMembers,$fid);
+$bandb = $pwforum->forumBan($pwMembers);
 $start_limit = ($page == 1 || $start_limit < 0)? 0 : $start_limit + 1;
+
 //帖子详细内容
 $ping_logs = array();
 $pageinverse && $start_limit += $readnum - 1;
 
-$buyAids = array();
-if ($winduid) {
-	//购买的附件信息
-	$query = $db->query("SELECT aid FROM pw_attachbuy Where uid= ".pwEscape($winduid));
-	while ($rt = $db->fetch_array($query)) {
-		$buyAids[] = $rt['aid'];	
-	}
-	//用户积分信息
-	require_once( R_P ."require/credit.php");
-	$creditdb = array(
-			'money'		=> $winddb['money'],
-			'rvrc'		=> $userrvrc,
-			'credit'	=> $winddb['credit'],
-			'currency'	=> $winddb['currency']
-			);
-			
-	$creditdb += $credit->get($winduid,'CUSTOM');
-}
+$sellAttachs = array();
+
 foreach ($readdb as $key => $read) {
 	$read = array_merge((array)$read,(array)$pwMembers[$read['authorid']]);
 	isset($bandb[$read['authorid']]) && $read['groupid'] = 6;
 	if ($read['istop'] == 'topped') {
 		$readdb[$key] = viewread($read,'');
-	}else{
-		if($pageinverse){
+	} else {
+		if( $pageinverse) {
 			$readdb[$key] = viewread($read,$start_limit--);
-		}else{
+		} else {
 			$readdb[$key] = viewread($read,$start_limit++);
 		}
 	}
@@ -604,11 +624,10 @@ foreach ($readdb as $key => $read) {
 	}
 }
 unset($_cache,$sign,$ltitle,$lpic,$lneed,$_G['right'],$_MEDALDB,$fieldadd,$tablaadd,$read,$order,$readnum,$pwMembers,$attachdb);
-
 //快速回复
-if ($groupid != 'guest' && !$tpc_locked && ($admincheck || !$foruminfo['allowrp'] || allowcheck($foruminfo['allowrp'],$groupid,$winddb['groups'],$fid,$winddb['reply']))) {
+if ($groupid != 'guest' && !($tpc_locked && !$SYSTEM['replylock']) && ($admincheck || !$foruminfo['allowrp'] || allowcheck($foruminfo['allowrp'],$groupid,$winddb['groups'],$fid,$winddb['reply']))) {
 	$psot_sta = 'reply';//control the faster reply
-	$titletop1= substrs('Re:'.str_replace('&nbsp;',' ',$subject),$db_titlemax-2);
+	$titletop1= substrs('Re:'.str_replace('&nbsp;',' ',$subject),$db_titlemax-3);
 	$fastpost = 'fastpost';
 	$db_forcetype = 0;
 
@@ -619,16 +638,15 @@ if ($groupid != 'guest' && !$tpc_locked && ($admincheck || !$foruminfo['allowrp'
 	}
 	!$foruminfo['allowrp'] && $_G['allowrp'] && $fastpost = 'fastpost';
 
-} else if($groupid == 'guest' && !$tpc_locked){//显示快速回复表单
+} elseif ($groupid == 'guest' && !$tpc_locked) {//显示快速回复表单
     $fastpost = 'fastpost';
     $psot_sta = 'reply';
-    $titletop1= substrs('Re:'.str_replace('&nbsp;',' ',$subject),$db_titlemax-2);
+    $titletop1= substrs('Re:'.str_replace('&nbsp;',' ',$subject),$db_titlemax-3);
     $db_forcetype = 0;
-    if((!$_G['allowrp'] && !$foruminfo['allowrp'])  || $foruminfo['allowrp']) {
-        $anonymity = true;
+    if ((!$_G['allowrp'] && !$foruminfo['allowrp']) || $foruminfo['allowrp']) {
+		$anonymity = true;
     }
 }
-
 
 $postUrl = 'post.php?fid=' . $fid;
 if ($readdb[0]['cyid']) {
@@ -671,22 +689,20 @@ if ($foruminfo['actmids']) {
 	$N_allowtypeopen = true;
 }
 
-if (defined('M_P') && file_exists(M_P.'read.php')) {
-	require_once(M_P.'read.php');
-}
-$msg_guide = headguide($guidename);
+$msg_guide = $pwforum->headguide($guidename);
+//$msg_guide = headguide($guidename);
 unset($fourm,$guidename);
 
 //评价功能开启
 $rateSets = unserialize($db_ratepower);
-if(!$forumset['rate'] && $rateSets[1] && isset($db_hackdb['rate'])){
+if (!$forumset['rate'] && $rateSets[1] && isset($db_hackdb['rate'])) {
 	list($noAjax,$objectid,$typeid,$elementid) = array(TRUE,$tid,1,'vote_box');
 	require_once R_P . 'hack/rate/index.php';
 }
 
 if ($ping_logs) {
-	require_once R_P . 'require/pingfunc.php';
-	$ping_logs = get_pinglogs($tid, $ping_logs);
+	$pingService = L::loadClass("ping", 'forum');
+	$ping_logs = $pingService->getPingLogs($tid, $ping_logs);
 } else {
 	$ping_logs = array();
 }
@@ -695,17 +711,18 @@ require_once PrintEot('read');
 footer();
 
 function viewread($read,$start_limit) {
-	global $db,$_G,$isGM,$pwSystem,$groupid,$attach_url,$winduid,$tablecolor,$tpc_author,$tpc_buy,$tpc_pid,$tpc_tag,$count,$orderby,$pageinverse,$timestamp,$db_onlinetime,$attachdir,$attachpath,$readcolorone,$readcolortwo,$lpic,$ltitle,$imgpath,$db_ipfrom,$db_showonline,$stylepath,$db_windpost,$db_windpic,$db_signwindcode,$fid,$tid,$pid,$md_ifopen,$_MEDALDB,$rewardtype,$db_shield,$db_iftag,$db_readtag,$viewpic;
+	global $db,$_G,$isGM,$pwSystem,$groupid,$attach_url,$winduid,$tablecolor,$tpc_author,$tpc_buy,$tpc_pid,$tpc_tag,$count,$orderby,$pageinverse,$timestamp,$db_onlinetime,$attachdir,$attachpath,$readcolorone,$readcolortwo,$lpic,$ltitle,$imgpath,$db_ipfrom,$db_showonline,$stylepath,$db_windpost,$db_windpic,$db_signwindcode,$fid,$tid,$pid,$md_ifopen,$_MEDALDB,$rewardtype,$db_shield,$db_iftag,$viewpic;
 	global $ping_logs, $buyAids,$creditdb;
-	if ($read['istop']=='topped') {
+	if ($read['istop'] == 'topped') {
 		$read['lou'] = $read['floor'];
-	}else{
+	} else {
 		$read['lou'] = ($orderby != 'desc'|| $start_limit == 0) ? $start_limit : $count - $start_limit;
 	}
 	$read['jupend'] = $start_limit==$count-1 ? "<a name=a></a><a name=$read[pid]></a>" : "<a name=$read[pid]></a>";
+	$orderby == 'desc' && ($read['jupend'] = $start_limit == 1 ? "<a name=a></a><a name=$read[pid]></a>" : "<a name=$read[pid]></a>");
 	$tpc_buy = $read['buy'];
 	$tpc_pid = $read['pid'];
-	$tpc_tag = NULL;
+	$tpc_tag = array();
 	$tpc_shield = 0;
 
 	$read['ifsign']<2 && $read['content'] = str_replace("\n","<br />",$read['content']);
@@ -784,7 +801,11 @@ function viewread($read,$start_limit) {
 			}
 		}
 	}
-	$read['face'] = showfacedesign($read['micon']);
+	list($read['face'],,$httpWidth,$httpHeight,,,,$read['facesize']) = showfacedesign($read['micon'], true, 'm');
+	//list(,,$originalWidth,$originalHeight,,) = explode('|', $read['micon']);
+	if ($httpWidth > $GLOBALS['db_imgwidth'] || $httpHeight > $GLOBALS['db_imgheight']) {
+		$read['facesize'] = ' width="' . $GLOBALS['db_imgwidth'] . '" height="' . $GLOBALS['db_imgheight'] . '"';
+	}
 	list($read['posttime'],$read['postdate']) = getLastDate($read['postdate']);
 	$read['mark'] = $read['reward'] = $read['tag'] = NULL;
 	if ($read['ifmark']) {
@@ -796,37 +817,18 @@ function viewread($read,$start_limit) {
 		}
 	}
 	if ($read['icon']) {
-		$read['icon'] = "<img src=\"$imgpath/post/emotion/$read[icon].gif\" align=\"left\" border=\"0\" />";
+		$read['icon'] = "<img src=\"$imgpath/post/emotion/$read[icon].gif\" align=\"absmiddle\" />";
 	} else{
 		$read['icon'] = '';
 	}
 	if ($md_ifopen && $read['medals']) {
-		$medals = $ifMedalNotExist = '';
-		$md_a = explode(',',$read['medals']);
-		foreach ($md_a as $key => $value) {
-			if ($value && $_MEDALDB[$value]) {
-				$medals .= "<img src=\"hack/medal/image/{$_MEDALDB[$value][picurl]}\" title=\"{$_MEDALDB[$value][name]}\" /> ";
-			} else {
-				unset($md_a[$key]);
-				$ifMedalNotExist = 1;
-			}
-		}
-		if ($ifMedalNotExist == 1) {
-			$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
-			$userService->update($read['authorid'], array('medals' => implode(',',$md_a)));
-		}
-		$read['medals'] = $medals.'<br />';
+		$read['medals'] = getMedals($read['authorid'], $read['medals']) . '<br />';
 	} else {
 		$read['medals'] = '';
 	}
 	$read['leaveword'] && $read['content'] .= leaveword($read['leaveword'],$read['pid']);
-
 	if ($db_iftag && $read['tags']) {
-		list($tagdb,$tpc_tag) = explode("\t",$read['tags']);
-		$tagdb = explode(' ',$tagdb);
-		foreach ($tagdb as $key => $tag) {
-			$tag && $read['tag'] .= "<a href=\"link.php?action=tag&tagname=".rawurlencode($tag)."\"><span class=\"s2\">$tag</span></a> ";
-		}
+		list($read['tag'], $tpc_tag) = getReadTag($read['tags']);
 	}
 	if ($read['ifshield'] || $read['groupid'] == 6 && $db_shield) {
 		if ($read['ifshield'] == 2) {
@@ -863,7 +865,7 @@ function viewread($read,$start_limit) {
 		if ($read['ifconvert'] == 2) {
 			$read['content'] = convert($read['content'], $db_windpost);
 		} else {
-			$tpc_tag && $db_readtag && $read['content'] = relatetag($read['content'], $tpc_tag);
+			$tpc_tag && $read['content'] = relatetag($read['content'], $tpc_tag);
 			strpos($read['content'],'[s:') !== false && $read['content'] = showface($read['content']);
 		}
 		if ($attachs && is_array($attachs) && !$read['ifhide'] && empty($viewpic)) {
@@ -872,37 +874,33 @@ function viewread($read,$start_limit) {
 			} else {
 				$dfadmin = 0;
 			}
-
 			foreach ($attachs as $at) {
 				$atype = '';
 				$rat = array();	
 				
 				if ($at['type'] == 'img' && $at['needrvrc'] == 0 && (!$GLOBALS['downloadimg'] || !$GLOBALS['downloadmoney'] || $_G['allowdownload'] == 2)) {
-					$a_url = geturl($at['attachurl'],'show');
+					$a_url = geturl($at['attachurl'], 'show');
 					if (is_array($a_url)) {
 						$atype = 'pic';
-						$dfurl = '<br>'.cvpic($a_url[0], 1, $db_windpost['picwidth'], $db_windpost['picheight'], $at['ifthumb']);
-						$rat = array('aid' => $at['aid'], 'name' => $at['name'], 'img' => $dfurl, 'dfadmin' => $dfadmin, 'desc' => $at['descrip']);
+						$dfurl = cvpic($a_url[0], 1, $db_windpost['picwidth'], $db_windpost['picheight'], $at['ifthumb'] & 1);
+						$rat = array('aid' => $at['aid'], 'name' => $at['name'], 'url' => $a_url[0], 'img' => $dfurl, 'dfadmin' => $dfadmin, 'desc' => $at['descrip'], 'miniUrl' => getMiniUrl($at['attachurl'], $at['ifthumb'], $a_url[1]));
 					} elseif ($a_url == 'imgurl') {
 						$atype = 'picurl';
 						$rat = array('aid' => $at['aid'], 'name' => $at['name'], 'dfadmin' => $dfadmin, 'verify' => md5("showimg{$tid}{$read[pid]}{$fid}{$at[aid]}{$GLOBALS[db_hash]}"));
 					}
 				} else {
 					$atype = 'downattach';
-					$rat = array('aid' => $at['aid'], 'name' => $at['name'], 'size' => $at['size'], 'hits' => $at['hits'],'special' => $at['special'], 'cname' => $GLOBALS['creditnames'][$at['ctype']], 'type' => $at['type'], 'dfadmin' => $dfadmin, 'desc' => $at['descrip'], 'ext' => strtolower(substr(strrchr($at['name'],'.'),1)));
+					$rat = array('aid' => $at['aid'], 'name' => $at['name'], 'size' => $at['size'], 'hits' => $at['hits'],'special' => $at['special'], 'ctype' => $at['ctype'], 'cname' => $GLOBALS['creditnames'][$at['ctype']], 'type' => $at['type'], 'dfadmin' => $dfadmin, 'desc' => $at['descrip'], 'ext' => strtolower(substr(strrchr($at['name'],'.'),1)));
 					if ($at['needrvrc'] > 0) {
 						!$at['ctype'] && $at['ctype'] = $at['special'] == 2 ? 'money' : 'rvrc';
-						if($at['type'] == 'img') {
+						if ($at['type'] == 'img') {
 							$a_url = geturl($at['attachurl'],'show');
-							$dfurl = '<br>'.cvpic($a_url[0], 1, $db_windpost['picwidth'], $db_windpost['picheight'], $at['ifthumb']);
+							$dfurl = '<br>'.cvpic($a_url[0], 1, $db_windpost['picwidth'], $db_windpost['picheight'], $at['ifthumb'] & 1);
 							$rat['img'] = $dfurl;
 						}
-						if ($at['special'] == 2) {//出售
+						if ($at['special'] == 2) {
 							$GLOBALS['db_sellset']['price'] > 0 && $at['needrvrc'] = min($at['needrvrc'], $GLOBALS['db_sellset']['price']);
-							$rat['isBuy'] = false;
-							if (in_array($at['aid'],$buyAids)) $rat['isBuy'] = true;
-						} else {//加密
-							$creditdb[$at['ctype']] >= $at['needrvrc'] && $rat['isThrough'] = true;
+							$GLOBALS['sellAttachs'][] = $at['aid'];
 						}
 						$rat['needrvrc'] = $at['needrvrc'];
 					}
@@ -935,6 +933,68 @@ function viewread($read,$start_limit) {
 	}
 	$GLOBALS['foruminfo']['copyctrl'] && $read['content'] = preg_replace("/<br \/>/eis","copyctrl()",$read['content']);
 	return $read;
+}
+
+function getMedals($uid, $medals) {
+	global $_MEDALDB;
+	$html = '';$flag = 0;
+	$md_a = explode(',', $medals);
+	foreach ($md_a as $key => $value) {
+		if ($value && $_MEDALDB[$value]) {
+			$html .= "<img src=\"hack/medal/image/{$_MEDALDB[$value][picurl]}\" title=\"{$_MEDALDB[$value][name]}\" /> ";
+		} else {
+			unset($md_a[$key]);
+			$flag = 1;
+		}
+	}
+	if ($flag) {
+		$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
+		$userService->update($uid, array('medals' => implode(',', $md_a)));
+	}
+	return $html;
+}
+
+function viewHiddenAtt($attach) {
+	if ($attach['dfadmin']) return true;
+	if ($attach['special'] == 2 && isBuyFromSellAtt($attach['aid'])) {
+		return true;
+	}
+	if ($attach['special'] == 1 && checkCreditFromHiddenAtt($attach['ctype'], $attach['needrvrc'])) {
+		return true;
+	}
+	return false;
+}
+
+function isBuyFromSellAtt($aid) {
+	static $buyAids = null;
+	if (!isset($buyAids)) {
+		global $db,$sellAttachs,$winduid;
+		$buyAids = array();
+		if ($sellAttachs) {
+			$query = $db->query("SELECT aid FROM pw_attachbuy WHERE uid= " . S::sqlEscape($winduid) . ' AND aid IN(' . S::sqlImplode($sellAttachs) . ')');
+			while ($rt = $db->fetch_array($query)) {
+				$buyAids[] = $rt['aid'];	
+			}
+		}
+	}
+	return in_array($aid, $buyAids);
+}
+
+function checkCreditFromHiddenAtt($ctype, $v) {
+	$hav = 0;
+	if (in_array($ctype, array('money', 'rvrc', 'credit', 'currency'))) {
+		$hav = $ctype == 'rvrc' ? $GLOBALS['userrvrc'] : $GLOBALS['winddb'][$ctype]; 
+	}
+	if (is_numeric($ctype)) {
+		static $creditdb = null;
+		if (!isset($creditdb)) {
+			global $credit;
+			require_once( R_P ."require/credit.php");
+			$creditdb = $credit->get($GLOBALS['winduid'],'CUSTOM');
+		}
+		$hav = $creditdb[$ctype];
+	}
+	return $hav > $v;
 }
 
 function threadrelated ($relatedcon) {
@@ -982,10 +1042,10 @@ function threadrelated ($relatedcon) {
 			if (!$db_groups_open) {
 				$addwhere .= " AND type!='colony'";
 			}
-			$query = $db->query("SELECT type,descrip FROM pw_feed WHERE uid=".pwEscape($read['authorid']).$addwhere." ORDER BY timestamp DESC  ".pwLimit(0,$forumset['relatednums']));
+			$query = $db->query("SELECT type,descrip FROM pw_feed WHERE uid=".S::sqlEscape($read['authorid']).$addwhere." ORDER BY timestamp DESC  ".S::sqlLimit(0,$forumset['relatednums']));
 			while ($rt = $db->fetch_array($query)) {
 				$rt['title'] = parseFeedRead($rt['descrip']);
-				$rt['url'] = "u.php?uid=$read[authorid]";
+				$rt['url'] = USER_URL."$read[authorid]";
 				unset($rt['type']);
 				$relatedb[] = $rt;
 			}
@@ -994,7 +1054,7 @@ function threadrelated ($relatedcon) {
 	} elseif (in_array($relatedcon,array('pictags','hottags'))) {
 		$tagid = $tagdbs = array();
 		$endtime = $timestamp - 30*24*3600;
-		$sql = 'WHERE t.ifcheck=1 AND t.tid !='.pwEscape($tid). ' AND t.postdate >='.pwEscape($endtime);
+		$sql = 'WHERE t.ifcheck=1 AND t.tid !='.S::sqlEscape($tid). ' AND t.postdate >='.S::sqlEscape($endtime);
 		$fidout = array('0');
 		$query = $db->query("SELECT fid,allowvisit,password FROM pw_forums WHERE type<>'category'");
 		while ($rt = $db->fetch_array($query)) {
@@ -1003,7 +1063,7 @@ function threadrelated ($relatedcon) {
 				$fidout[] = $rt['fid'];
 			}
 		}
-		$fidout = pwImplode($fidout);
+		$fidout = S::sqlImplode($fidout);
 		$fidout && $sql .= " AND fid NOT IN ($fidout)";
 
 		if ($db_iftag) {
@@ -1011,7 +1071,7 @@ function threadrelated ($relatedcon) {
 				list($tagdb,$tpc_tag) = explode("\t",$read['tags']);
 				$tagdbs = explode(' ',$tagdb);
 			} elseif ($relatedcon == 'hottags') {
-				@include_once(D_P.'data/bbscache/tagdb.php');
+				@include_once pwCache::getPath(D_P.'data/bbscache/tagdb.php');
 				$j = 0;
 				foreach ($tagdb as $key => $val) {
 					$j++;
@@ -1022,13 +1082,13 @@ function threadrelated ($relatedcon) {
 			}
 
 			if ($tagdbs) {
-				$query = $db->query("SELECT tagid FROM pw_tags WHERE tagname IN(" . pwImplode($tagdbs) . ')');
+				$query = $db->query("SELECT tagid FROM pw_tags WHERE tagname IN(" . S::sqlImplode($tagdbs) . ')');
 				while ($rt = $db->fetch_array($query)) {
 					$tagid[] = $rt['tagid'];
 				}
 			}
 			if ($tagid) {
-				$query = $db->query("SELECT t.tid,t.subject FROM pw_tagdata tg LEFT JOIN pw_threads t USING(tid) $sql AND tg.tagid IN(" . pwImplode($tagid) . ") GROUP BY tid ORDER BY postdate DESC ".pwLimit(0,$forumset['relatednums']));
+				$query = $db->query("SELECT t.tid,t.subject FROM pw_tagdata tg LEFT JOIN pw_threads t USING(tid) $sql AND tg.tagid IN(" . S::sqlImplode($tagid) . ") GROUP BY tid ORDER BY postdate DESC ".S::sqlLimit(0,$forumset['relatednums']));
 				while ($rt = $db->fetch_array($query)) {
 					$rt['title'] = $rt['subject'];
 					$rt['url'] = "read.php?tid=".$rt['tid'];
@@ -1040,7 +1100,7 @@ function threadrelated ($relatedcon) {
 		}
 	} elseif (in_array($relatedcon,array('ownpost','owndigest','ownhits','ownreply'))) {
 		$endtime = $timestamp - 15*24*3600;
-		$sql = "WHERE ifcheck=1 AND tid !=".pwEscape($tid). "AND postdate >=".pwEscape($endtime)." AND authorid=".pwEscape($read['authorid'])." AND fid>0 ";
+		$sql = "WHERE ifcheck=1 AND tid !=".S::sqlEscape($tid). "AND postdate >=".S::sqlEscape($endtime)." AND authorid=".S::sqlEscape($read['authorid'])." AND fid>0 ";
 		$orderby = '';
 
 		switch ($relatedcon) {
@@ -1058,7 +1118,7 @@ function threadrelated ($relatedcon) {
 				$orderby .= " ORDER BY replies DESC";
 				break;
 		}
-		$query = $db->query("SELECT tid,subject FROM pw_threads FORCE INDEX(postdate) $sql $orderby".pwLimit(0,$forumset['relatednums']));
+		$query = $db->query("SELECT tid,subject FROM pw_threads FORCE INDEX(".getForceIndex('idx_postdate').") $sql $orderby".S::sqlLimit(0,$forumset['relatednums']));
 		while ($rt = $db->fetch_array($query)) {
 			$rt['title'] = $rt['subject'];
 			$rt['url'] = "read.php?tid=".$rt['tid'];
@@ -1077,5 +1137,22 @@ function getThreadType(){
 	return ($topic_type) ? '<a href="thread.php?fid='.$fid.'&type='.$read['type'].'" class="s5">['.$topic_type['name'].']</a>' : '';
 }
 
+function getMiniUrl($path, $ifthumb, $where) {
+	$dir = '';
+	($ifthumb & 1) && $dir = 'thumb/';
+	($ifthumb & 2) && $dir = 'thumb/mini/';
+	if ($where == 'Local') return $GLOBALS['attachpath'] . '/' . $dir . $path;
+	if ($where == 'Ftp') return $GLOBALS['db_ftpweb'] . '/' . $dir . $path;
+	if (!is_array($GLOBALS['attach_url'])) return $GLOBALS['attach_url'] . '/' . $dir . $path;
+	return $GLOBALS['attach_url'][0] . '/' . $dir . $path;
+}
 
+function getTidAdert($fid, $lou) {
+	$array = array();
+	list($array['TidAmong']) = pwAdvert('Mode.Forum.Layer.TidAmong', $fid, $lou);
+	list($array['TidRight']) = pwAdvert('Mode.Forum.Layer.TidRight', $fid, $lou+1);
+	list($array['TidUp']) = pwAdvert('Mode.Forum.Layer.TidUp', $fid, $lou+1);
+	list($array['TidDown']) = pwAdvert('Mode.Forum.Layer.TidDown', $fid, $lou+1);
+	return $array;
+}
 ?>

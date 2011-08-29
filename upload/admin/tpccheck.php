@@ -1,14 +1,14 @@
 <?php
 !function_exists('adminmsg') && exit('Forbidden');
 $basename="$admin_file?adminjob=tpccheck";
-include_once(D_P.'data/bbscache/forumcache.php');
+include_once pwCache::getPath(D_P.'data/bbscache/forumcache.php');
 include_once(R_P.'require/forum.php');
 
 if ($admin_gid == 5) {
 	list($allowfid,$forumcache) = GetAllowForum($admin_name);
 	$sql = $allowfid ? "fid IN($allowfid)" : '0';
 } else {
-	include(D_P.'data/bbscache/forumcache.php');
+	include pwCache::getPath(D_P.'data/bbscache/forumcache.php');
 	list($hidefid,$hideforum) = GetHiddenForum();
 	if ($admin_gid == 3) {
 		$forumcache .= $hideforum;
@@ -17,33 +17,33 @@ if ($admin_gid == 5) {
 		$sql = $hidefid ? "fid NOT IN($hidefid)" : '1';
 	}
 }
-$action = GetGP('action');
+$action = S::getGP('action');
 
 
 if (!$action) {
 	if (!$_POST['step']) {
 
-		InitGP(array('fid','username','uid','page'));
+		S::gp(array('fid','username','uid','page'));
 		if (is_numeric($fid)) {
-			$sql .= " AND fid=" . pwEscape($fid);
+			$sql .= " AND fid=" . S::sqlEscape($fid);
 		} elseif ($sql == '1') {
 			$fids = array();
 			foreach ($forum as $key => $value) {
 				$fids[] = $key;
 			}
-			$fids && $sql .= " AND fid IN(" . pwImplode($fids) . ")";
+			$fids && $sql .= " AND fid IN(" . S::sqlImplode($fids) . ")";
 		}
 		$sql .= " AND ifcheck='0'";
 		if ($username) {
-			$sql .= " AND author like " . pwEscape("%$username%");
+			$sql .= " AND author like " . S::sqlEscape("%$username%");
 			$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
 			$userdb = $userService->getByUserName($username);
 			$uid=$userdb['uid'];
 		}
-	//	is_numeric($uid) && $sql .= "AND authorid=" . pwEscape($uid);
+	//	is_numeric($uid) && $sql .= "AND authorid=" . S::sqlEscape($uid);
 
 		(!is_numeric($page) || $page < 1) && $page = 1;
-		$limit = pwLimit(($page-1)*$db_perpage,$db_perpage);
+		$limit = S::sqlLimit(($page-1)*$db_perpage,$db_perpage);
 
 		$rt    = $db->get_one("SELECT COUNT(*) AS sum FROM pw_threads WHERE $sql");
 		$pages = numofpage($rt['sum'],$page,ceil($rt['sum']/$db_perpage),"$basename&fid=$fid&uid=$uid&");
@@ -79,7 +79,7 @@ if (!$action) {
 	} elseif ($_POST['step'] == 2) {
 
 	    /**Begin modify by liaohu 2010-06-21*/
-		InitGP(array('pass','dels','here','selid'),'P');
+		S::gp(array('pass','dels','here','selid'),'P');
 
 		if(0 == count($pass) && 0 == count($dels) && 0 == count($here)){
 			adminmsg("operate_error");
@@ -89,7 +89,7 @@ if (!$action) {
 
 		if (is_array($pass)) {
 			$fids  = $cydb = $arrtmsgs = array();
-			$query = $db->query("SELECT tid,fid,tpcstatus FROM pw_threads WHERE $sql AND tid IN(".pwImplode($pass).")");
+			$query = $db->query("SELECT tid,fid,tpcstatus FROM pw_threads WHERE $sql AND tid IN(".S::sqlImplode($pass).")");
 			while ($rt = $db->fetch_array($query)) {
 				$tablename = GetTtable($rt['tid']);
 				$arrtmsgs[$tablename][] = $rt['tid'];
@@ -99,38 +99,44 @@ if (!$action) {
 				}
 			}
 			foreach ($fids as $key => $value) {
-				$rt = $db->get_one("SELECT tid,author,postdate,subject FROM pw_threads WHERE fid=" . pwEscape($key) . " ORDER BY lastpost DESC LIMIT 1");
+				$rt = $db->get_one("SELECT tid,author,postdate,subject FROM pw_threads WHERE fid=" . S::sqlEscape($key) . " ORDER BY lastpost DESC LIMIT 1");
 				$lastpost = $rt['subject']."\t".$rt['author']."\t".$rt['postdate']."\t"."read.php?tid=$rt[tid]&page=e#a";
 				$db->update("UPDATE pw_forumdata"
-					. " SET topic=topic+" . pwEscape($value)
-						. ',article=article+' . pwEscape($value)
-						. ',tpost=tpost+' . pwEscape($value)
-						. ',lastpost=' . pwEscape($lastpost)
-					. ' WHERE fid=' . pwEscape($key));
+					. " SET topic=topic+" . S::sqlEscape($value)
+						. ',article=article+' . S::sqlEscape($value)
+						. ',tpost=tpost+' . S::sqlEscape($value)
+						. ',lastpost=' . S::sqlEscape($lastpost)
+					. ' WHERE fid=' . S::sqlEscape($key));
 			}
 			if ($pass) {
-				$db->update("UPDATE pw_threads SET ifcheck='1' WHERE $sql AND tid IN(".pwImplode($pass).")");
+				//$db->update("UPDATE pw_threads SET ifcheck='1' WHERE $sql AND tid IN(".S::sqlImplode($pass).")");
+				pwQuery::update('pw_threads', "$sql AND tid IN (:tid)", array($pass), array('ifcheck'=>1));
 				foreach ($arrtmsgs as $tmsgs => $tids) {
 					if ($tids) {
-						$db->update("UPDATE $tmsgs SET ifwordsfb='$db_wordsfb' WHERE tid IN(".pwImplode($tids).")");
+						//* $db->update("UPDATE $tmsgs SET ifwordsfb='$db_wordsfb' WHERE tid IN(".S::sqlImplode($tids).")");
+						pwQuery::update($tmsgs, 'tid IN (:tid)', array($tids), array('ifwordsfb'=>$db_wordsfb));
 					}
 				}
+				/**
 				$threadIds = explode("','",trim($pass,"'"));
 				if($threadIds){
 					$threads = L::loadClass('Threads', 'forum');
 					$threads->delThreads($threadIds);
-				}
+				}**/
 			}
 			if ($cydb) {
-				$query = $db->query("SELECT COUNT(*) AS tnum,cyid FROM pw_argument WHERE tid IN(" . pwImplode($cydb) . ") GROUP BY cyid");
+				$query = $db->query("SELECT COUNT(*) AS tnum,cyid FROM pw_argument WHERE tid IN(" . S::sqlImplode($cydb) . ") GROUP BY cyid");
 				while ($rt = $db->fetch_array($query)) {
-					$db->update("UPDATE pw_colonys SET tnum=tnum+" . pwEscape($rt['tnum']) . ' WHERE id=' . pwEscape($rt['cyid']));
+					$db->update("UPDATE pw_colonys SET tnum=tnum+" . S::sqlEscape($rt['tnum']) . ' WHERE id=' . S::sqlEscape($rt['cyid']));
 				}
 			}
+			/*
 			foreach($fids as $fid){
 				$threadList = L::loadClass("threadlist", 'forum');
 				$threadList->refreshThreadIdsByForumId($fid);
-			}
+			} */
+			Perf::gatherInfo('changeThreadWithForumIds', array('fid'=>array_keys($fids)));		
+			
 		} else if(is_array($dels)){
 
 			$delarticle = L::loadClass('DelArticle', 'forum');
@@ -148,14 +154,15 @@ if (!$action) {
 } else {
 	$basename="$admin_file?adminjob=tpccheck&action=postcheck";
 	if (!$_POST['step']) {
-		InitGP(array('fid','username','uid','page','ptable'));
+		S::gp(array('fid','username','uid','page','ptable'));
 		/**Begin modify by liaohu 2010-06-21*/
 		if ($username) {
 			$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
 			$userdb = $userService->getByUserName($username);
 			$uid=$userdb['uid'];
 		}
-		//is_numeric($uid) && $sql .= " AND authorid=" . pwEscape($uid);
+		//is_numeric($uid) && $sql .= " AND authorid=" . S::sqlEscape($uid);
+		$sql = str_replace('fid', 't.fid', $sql);
 		$sql .= " ORDER BY postdate DESC";
 		if ($db_plist && count($db_plist)>1) {
 			!isset($ptable) && $ptable = $db_ptable;
@@ -169,12 +176,12 @@ if (!$action) {
 			$pw_posts = 'pw_posts';
 		}
 		(!is_numeric($page) || $page < 1) && $page = 1;
-		$limit = pwLimit(($page-1)*$db_perpage,$db_perpage);
-		$rt    = $db->get_one("SELECT COUNT(*) AS sum FROM $pw_posts WHERE ifcheck='0' ".(is_numeric($fid) ? " AND fid=".pwEscape($fid) : " ") . (is_numeric($uid)  ?  " AND authorid=" . pwEscape($uid) : " " ) . " ORDER BY postdate DESC");
+		$limit = S::sqlLimit(($page-1)*$db_perpage,$db_perpage);
+		$rt    = $db->get_one("SELECT COUNT(*) AS sum FROM $pw_posts WHERE ifcheck='0' ".(is_numeric($fid) ? " AND fid=".S::sqlEscape($fid) : " ") . ($username  ?  " AND author like " . S::sqlEscape("%$username%") : " " ) . " ORDER BY postdate DESC");
 		$pages = numofpage($rt['sum'],$page,ceil($rt['sum']/$db_perpage),"$basename&fid=$fid&uid=$uid&");
-		//(is_numeric($uid)  ? " AND t.authorid=" . pwEscape($uid) : " ") .
+		//(is_numeric($uid)  ? " AND t.authorid=" . S::sqlEscape($uid) : " ") .
 		$postdb=array();
-		$query = $db->query("SELECT p.pid,p.tid,p.fid,p.subject,p.author,p.authorid,p.ifcheck,p.postdate,p.content,t.subject as tsubject FROM $pw_posts AS p LEFT JOIN pw_threads AS t ON p.tid = t.tid WHERE p.ifcheck='0' ".(is_numeric($fid) ? " AND t.fid=".pwEscape($fid) : " ") .(is_numeric($uid)  ? " AND t.authorid=" . pwEscape($uid) : " ") . " AND $sql $limit");
+		$query = $db->query("SELECT p.pid,p.tid,p.fid,p.subject,p.author,p.authorid,p.ifcheck,p.postdate,p.content,t.subject as tsubject FROM $pw_posts AS p LEFT JOIN pw_threads AS t ON p.tid = t.tid WHERE p.ifcheck='0' ".(is_numeric($fid) ? " AND t.fid=".S::sqlEscape($fid) : " ") .($username  ? " AND p.author like " . S::sqlEscape("%$username%") : " ") . " AND $sql $limit");
 		/**Begin modify by liaohu 2010-06-21*/
 		while ($rt = $db->fetch_array($query)) {
 			if ($rt['subject']) {
@@ -192,7 +199,7 @@ if (!$action) {
 
 	} elseif ($_POST['step'] == 2) {
 		/**Begin modify by liaohu 2010-06-21*/
-		InitGP(array('pass','dels','here','ptable'),'P');
+		S::gp(array('pass','dels','here','ptable'),'P');
 
 		if(0 == count($pass) && 0 == count($dels) && 0 == count($here)){
 			adminmsg("operate_error");
@@ -203,15 +210,16 @@ if (!$action) {
 		//if ($type == 'pass') {
 		if(is_array($pass)){
 			$fids  = $tids = array();
-			$query = $db->query("SELECT fid,tid FROM $pw_posts WHERE $sql AND pid IN(".pwImplode($pass).")");
+			$query = $db->query("SELECT fid,tid FROM $pw_posts WHERE $sql AND pid IN(".S::sqlImplode($pass).")");
 			while ($rt = $db->fetch_array($query)) {
 				$tids[$rt['tid']] ++;
 				$fids[$rt['fid']] ++;
 			}
 			foreach ($tids as $key => $value) {
-				$rt = $db->get_one("SELECT postdate,author FROM $pw_posts WHERE tid=" . pwEscape($key) . " ORDER BY postdate DESC LIMIT 1");
+				$rt = $db->get_one("SELECT postdate,author FROM $pw_posts WHERE tid=" . S::sqlEscape($key) . " ORDER BY postdate DESC LIMIT 1");
 
-				$db->update("UPDATE pw_threads SET replies=replies+".pwEscape($value) . ",lastpost=" . pwEscape($rt['postdate'],false) . ",lastposter =" . pwEscape($rt['author'],false) . "WHERE tid=" . pwEscape($key));
+				//$db->update("UPDATE pw_threads SET replies=replies+".S::sqlEscape($value) . ",lastpost=" . S::sqlEscape($rt['postdate'],false) . ",lastposter =" . S::sqlEscape($rt['author'],false) . "WHERE tid=" . S::sqlEscape($key));
+				$db->update(pwQuery::buildClause('UPDATE :pw_table SET replies = replies + :replies, lastpost = :lastpost, lastposter = :lastposter WHERE tid = :tid', array('pw_threads', $value, $rt['postdate'], $rt['author'], $key)));
 				# memcache refresh
 				M::sendNotice(
 					array($rt['author']),
@@ -222,27 +230,32 @@ if (!$action) {
 						)),
 					)
 				);
+				/*
 				$threadList = L::loadClass("threadlist", 'forum');
 				$threadList->updateThreadIdsByForumId($fid,$key);
 
 				$thread = L::loadClass("Threads", 'forum');
-				$thread->clearThreadByThreadId($key);
+				$thread->clearThreadByThreadId($key); */
+				
+				Perf::gatherInfo('changeThreadWithForumIds', array('fid'=>$fid));				
 			}
 			foreach ($fids as $key => $value) {
-				$db->update("UPDATE pw_forumdata SET article=article+".pwEscape($value).",tpost=tpost+".pwEscape($value,false)."WHERE fid=".pwEscape($key));
+				$db->update("UPDATE pw_forumdata SET article=article+".S::sqlEscape($value).",tpost=tpost+".S::sqlEscape($value,false)."WHERE fid=".S::sqlEscape($key));
 			}
-			$db->update("UPDATE $pw_posts SET ifcheck='1',ifwordsfb='$db_wordsfb' WHERE $sql AND pid IN(".pwImplode($pass).")");
+			//$db->update("UPDATE $pw_posts SET ifcheck='1',ifwordsfb='$db_wordsfb' WHERE $sql AND pid IN(".S::sqlImplode($pass).")");
+			$db->update(pwQuery::buildClause("UPDATE :pw_table SET ifcheck='1',ifwordsfb=:ifwordsfb WHERE $sql AND pid IN(:pid)", array($pw_posts, $db_wordsfb, $pass)));
+			/**
 			$threadIds = explode(",",$pass);
 			if($threadIds){
 				$threads = L::loadClass('Threads', 'forum');
 				$threads->delThreads($threadIds);
-			}
+			}**/
 		} else if(is_array($dels)){
 			require_once(R_P.'require/credit.php');
 			$creditOpKey = "Deleterp";
 			$forumInfos = array();
 			$_tids = $_pids = $deluids = array();
-			$query = $db->query("SELECT fid,tid,pid,aid,author,authorid FROM $pw_posts WHERE $sql AND pid IN(".pwImplode($dels).")");
+			$query = $db->query("SELECT fid,tid,pid,aid,author,authorid FROM $pw_posts WHERE $sql AND pid IN(".S::sqlImplode($dels).")");
 			while ($rt = $db->fetch_array($query)) {
 				//积分操作
 				if (!isset($forumInfos[$rt['fid']])) $forumInfos[$rt['fid']] = L::forum($rt['fid']);
@@ -276,7 +289,8 @@ if (!$action) {
 			foreach ($deluids as $uid => $value) {
 				$userService->updateByIncrement($uid, array(), array('postnum'=>-$value));
 			}
-			$db->update("DELETE FROM $pw_posts WHERE $sql AND pid IN(".pwImplode($dels).")");
+			//$db->update("DELETE FROM $pw_posts WHERE $sql AND pid IN(".S::sqlImplode($dels).")");
+			$db->update(pwQuery::buildClause("DELETE FROM :pw_table WHERE $sql AND pid IN(:pid)", array($pw_posts, $dels)));
 		}
 		adminmsg('operate_success');
 		/**End modify by liaohu 2010-06-21*/

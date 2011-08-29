@@ -1,14 +1,15 @@
 <?php
 !defined('A_P') && exit('Forbidden');
-InitGP(array('do'));
+S::gp(array('do'));
 !$winduid && Showmsg('not_login');
 $USCR = 'user_weibo';
-InitGP(array('s'));
+S::gp(array('s'));
 if($s) {//底部快捷
+	require_once(R_P.'require/showimg.php');
+	list($faceurl) = showfacedesign($winddb['icon'],1,'m');
 	require_once PrintEot('m_weibo_bottom');
 	pwOutPut();
 }
-
 extract(L::config(null, 'o_config'));
 $whilelist = array(
 	'post','my','attention','refer','comment','lookround','filterweibo','ajax',
@@ -20,11 +21,11 @@ if (!in_array($do,$whilelist)) {
 }
 $nav = !in_array($do,array('receive'))  ? array($do => 'class="current"') : array('refer' => 'class="current"');
 $perpage = 20;
-
 if ($do == 'post') {
 
 	PostCheck();
-	InitGP(array('atc_content', 'uploadPic', 'ismessage','type'), 'GP');
+	S::gp(array('atc_content'),'GP', 0);
+	S::gp(array('uploadPic', 'ismessage','type'), 'GP');
 	$type != 'sendweibo' && $type = 'weibo';
 	if ($o_weibourl != 1) {
 		preg_match('/http:\/\//i', $atc_content) && Showmsg('weibo_link_close');
@@ -38,7 +39,7 @@ if ($do == 'post') {
 	$extra = array();
 	if ($uploadPic && is_array($uploadPic)) {
 		$array = array();
-		$query = $db->query("SELECT p.* FROM pw_cnphoto p LEFT JOIN pw_cnalbum a ON p.aid=a.aid WHERE p.pid IN (" . pwImplode($uploadPic) . ")");
+		$query = $db->query("SELECT p.* FROM pw_cnphoto p LEFT JOIN pw_cnalbum a ON p.aid=a.aid WHERE p.pid IN (" . S::sqlImplode($uploadPic) . ")");
 		while ($rt = $db->fetch_array($query)) {
 			$array[$rt['pid']] = $rt;
 		}
@@ -69,7 +70,7 @@ if ($do == 'post') {
 } elseif ($do == 'conloy') {
 	
 	$colonyids = array();
-	$query = $db->query("SELECT cm.ifadmin,c.id FROM pw_cmembers cm LEFT JOIN pw_colonys c ON cm.colonyid=c.id LEFT JOIN pw_members cm2 ON c.admin=cm2.username WHERE cm.uid=" . pwEscape($winduid) . " ORDER BY cm.addtime DESC");
+	$query = $db->query("SELECT cm.ifadmin,c.id FROM pw_cmembers cm LEFT JOIN pw_colonys c ON cm.colonyid=c.id LEFT JOIN pw_members cm2 ON c.admin=cm2.username WHERE cm.uid=" . S::sqlEscape($winduid) . " ORDER BY cm.addtime DESC");
 	while ($rt = $db->fetch_array($query)) {
 		if ($rt['ifadmin'] != '-1') {
 			$colonyids[] = $rt['id'];
@@ -111,7 +112,7 @@ if ($do == 'post') {
 
 } elseif ($do == 'replay') {
 	
-	InitGP(array('mid','uids','identify','commentpage'), 'GP');
+	S::gp(array('mid','uids','identify','commentpage'), 'GP');
 	$perpage = 10;
 	$commentService = L::loadClass("comment","sns");
 	$userService = L::loadClass('UserService', 'user');
@@ -126,7 +127,7 @@ if ($do == 'post') {
 	
 } elseif ($do == 'comment') {
 
-	InitGP(array('mid','identify','commentpage'), 'GP');
+	S::gp(array('mid','identify','commentpage'), 'GP');
 	$perpage = 10;
 	$commentService = L::loadClass("comment","sns");
 	$count = $commentService->getCommentsCountByMid($mid);
@@ -137,7 +138,8 @@ if ($do == 'post') {
 
 } elseif ($do == 'postcomment') {
 
-	InitGP(array('mid','ifsendweibo','writeContent','identify'), 'GP');
+	S::gp(array('mid','ifsendweibo','writeContent','identify'), 'GP');
+	$writeContent = nl2br($writeContent);
 	$commentService = L::loadClass("comment","sns");
 	if (($status = $commentService->commentCheck($writeContent)) !== true) {
 		Showmsg($status);
@@ -160,7 +162,7 @@ if ($do == 'post') {
 
 } elseif ($do == 'deletecomment') {
 
-	InitGP(array('cid','mid'));
+	S::gp(array('cid','mid'));
 	$commentService = L::loadClass("comment","sns");
 	if($commentService->deleteComment($cid)){
 		$weiboService->updateCountNum(array('replies' => -1), $mid,'plus');
@@ -169,16 +171,16 @@ if ($do == 'post') {
 	
 } elseif($do == 'deleteweibo') {
 
-	InitGP(array('mid'));
+	S::gp(array('mid'));
 	$weibo = $weiboService->getWeibosByMid($mid);
-	if ($weibo && ($weibo['uid'] == $winduid || $SYSTEM['delweibo'] || CkInArray($windid, $manager))) {
+	if ($weibo && ($weibo['uid'] == $winduid || $SYSTEM['delweibo'] || S::inArray($windid, $manager))) {
 		$weiboService->deleteWeibos($mid);
 		$type = $weiboService->getType($weibo['type']);
-		if($type == 'weibo'){
+		if ($type == 'weibo') {
 			weibocredit('weibo_Delete');
 		}
 		$userCache = L::loadClass('Usercache', 'user');
-		$userCache->delete($winduid, 'weibo');
+		$userCache->delete($weibo['uid'], 'weibo');
 		echo 'ok';
 	} else {
 		Showmsg("您要删除的微博不存在");
@@ -193,7 +195,7 @@ if ($do == 'post') {
 	$pages = numofpage($count, $page, $pageCount, 'apps.php?q=weibo&do=lookround&', null, 'weiboList.lookround');
 
 } elseif ($do == 'filterweibo') {
-	InitGP(array('filter'));
+	S::gp(array('filter'));
 	$count = $weiboService->getUserAttentionWeibosCount($winduid,$filter);
 	$count > 200 && $count = 200;
 	$pageCount = ceil($count / $perpage);
@@ -203,7 +205,7 @@ if ($do == 'post') {
 
 } elseif ($do == 'transmit') {
 
-	InitGP(array('mid'), 'GP', 2);
+	S::gp(array('mid'), 'GP', 2);
 	if (!$weibo = $weiboService->getWeibosByMid($mid)) {
 		Showmsg('您转发的新鲜事不存在，或已被删除!');
 	}
@@ -238,7 +240,7 @@ if ($do == 'post') {
 		$showInfo['extra'] = $showInfo['extra'] ? unserialize($showInfo['extra']) : array();
 		$id = 'transmit_' . $id;
 	} else {
-		InitGP(array('atc_content','ifcomment'), 'P');
+		S::gp(array('atc_content','ifcomment'), 'P');
 		$tmid = $transmits ? $weibo['objectid'] : $mid;
 					
 		if (($return = $weiboService->sendCheck($atc_content, $groupid,true)) !== true) {
@@ -273,13 +275,13 @@ if (defined('AJAX')) {
 	$cacheData = $userCache->get($winduid, array('recommendUsers' => 3));
 	$recommendUsers = $cacheData['recommendUsers'];
 	
-	$rt = $db->get_one("SELECT * FROM pw_cache WHERE name='weiboAuthorSort_5' AND time>" . pwEscape($timestamp - 86400));
+	$rt = $db->get_one("SELECT * FROM pw_cache WHERE name='weiboAuthorSort_5' AND time>" . S::sqlEscape($timestamp - 86400));
 	if ($rt) {
 		$weiboAuthorSort = unserialize($rt['cache']);
 		is_array($weiboAuthorSort) || $weiboAuthorSort = array();
 	} else {
 		$weiboAuthorSort = $weiboService->getAuthorSort(5);
-		$db->update("REPLACE INTO pw_cache SET " . pwSqlSingle(array(
+		$db->update("REPLACE INTO pw_cache SET " . S::sqlSingle(array(
 			'name'	=> 'weiboAuthorSort_5',
 			'cache'	=> serialize($weiboAuthorSort),
 			'time'	=> $timestamp

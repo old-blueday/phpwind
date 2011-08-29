@@ -41,30 +41,22 @@ $uskin_boxlinkA = '#ffffff';					//小模块文字链接颜色
 $uskin_boxlinkB = '#6fb0d6';					//小模块次要文字链接颜色
 
 //个人中心首页
-$uskin_homeTop = '#ecf5f7';				//新鲜事模块 顶上的三角形背景
-$uskin_homeTbg = 'inforbox.jpg';	//新鲜事模块背景
 $uskin_homeSk = 'textarea.png';		//新鲜事模块输入框背景
 $uskin_homeBtn = 'pub.png';				//新鲜事模块按钮
-$uskin_homeBtntext = '#0e6cac';		//新鲜事模块按钮文字颜色
+$uskin_homeBtntext = '#ffffff';		//新鲜事模块按钮文字颜色
 $uskin_homeTip = '#444444';				//新鲜事模块字数限制文字颜色
 $uskin_homeSide = 'homebg.png';		//侧栏背景图片
-$uskin_mainTop = '#608bab';				//大内容区域上边框颜色
-$uskin_mainBor = '#cee1e8';				//大内容区域边框颜色
 
 //设置，消息左侧栏背景
-$uskin_appBgTop = '#f0f6f9';			//侧栏顶上的三角形背景
 $uskin_appBg = 'menubar.png';			//宽度为160px
 $uskin_appBgcur = 'navBcur.png';	//菜单激活状态时的背景
-
-//内容区域选项卡激活背景
-$uskin_navC = 'navC.png';					//无图片则为统一的背景颜色
 
 print<<<EOT
 --><style type="text/css">
 /*body bg*/
 html{background-color:$uskin_bg;}
 body{color:$uskin_textB;font:12px Tahoma,Arial;}
-.warp{background:url(u/themes/$uskin/images/$uskin_bgimg) center 0 repeat-x;}
+.warp{background:url(u/themes/$uskin/images/$uskin_bgimg) center 0 repeat-x;min-height:600px;}
 
 /*link*/
 a{color:$uskin_linkA; text-decoration:none;}
@@ -76,19 +68,16 @@ a:hover,.line{ text-decoration:underline;}
 
 /*space banner*/
 .spBan h2{color:$uskin_headTitle;}
-.spBan p{color:$uskin_textC;}
-
-/*main Triangle*/
-.headTrgA{border-bottom:10px $uskin_mainTop solid;}
-.headTrgB{border-bottom:9px $uskin_boxA solid;}
+.spBan p{color:$uskin_textA;}
 
 /*main bg*/
-.main{border:1px solid $uskin_mainBor;background-color:$uskin_boxA;border-top:2px solid $uskin_mainTop;}
-		.menubar a{color:$uskin_textB;}
 	.contUser{background:$uskin_boxA;}/*right -> content*/
+	
+/*menu app*/
+.menuApp{margin-top:35px;}
 
 /*foot*/
-.foot{color:$uskin_textC;border-top:1px solid $uskin_bdB;}
+.foot{color:$uskin_textC;}
 .foot a{color:$uskin_textB;}
 
 /*nav*/
@@ -100,20 +89,27 @@ a:hover,.line{ text-decoration:underline;}
 		.navB li em{color:#ff0000; font-style:normal;}
 		.navB .current a{color:$uskin_linkA;color:$uskin_textA;font-weight:700;}
 		.navB .current{background:url(u/themes/$uskin/images/$uskin_appBgcur) 10px 0 no-repeat;}
+		
+/*app nav*/
+.appNav_top{ background:url(u/themes/$uskin/images/appNav_top.png) no-repeat;}
+.appNav{ background:url(u/themes/$uskin/images/appNav.png) no-repeat;color:#33798e;}
+.appNav ul{background:url(u/themes/$uskin/images/appNav_ul.png) left bottom no-repeat;}
+.appNav_bottom{ background:url(u/themes/$uskin/images/appNav_bottom.png) no-repeat;}
+.appNav a{color:#33798e;}
+.appNav li.current{background:url(u/themes/$uskin/images/appNav_cur.png) right center no-repeat; font-weight:700;}
 
 	/*content nav one*/
 .navC{border-bottom:1px solid $uskin_bdB;}
 		.navC li{border-left:1px solid $uskin_bdB;border-right:1px solid $uskin_bdB;}
-			.navC li a{border-top:1px solid $uskin_bdB;background:$uskin_bgA;font-size:14px;}
+			.navC li a{border-top:1px solid $uskin_bdB;background:$uskin_bgA;color:#676568;}
 			.navC li a:hover{background:$uskin_boxA;text-decoration:none;}
 			.navC .current,.navC li:hover{border-left:1px solid $uskin_bdB;border-right:1px solid $uskin_bdB;}
 			.navC li:hover a{border-top:1px solid $uskin_bdB;}
-			.navC .current a,.navC .current a:hover{background:$uskin_boxA url(u/themes/$uskin/images/$uskin_navC) repeat-x;border-bottom:1px solid $uskin_boxA;color:$uskin_textA;border-top:1px solid $uskin_bdB;}
+			.navC .current a,.navC .current a:hover{background:$uskin_boxA;border-bottom:1px solid $uskin_boxA;color:$uskin_textA;border-top:1px solid $uskin_bdB;}
 			.navC .current a{ font-weight:700;}
 		
 /*nav bottom tips*/
 	.tips input{color:#7eb0d3;}
-	.tips a{color:#7eb0d3;}
 	
 /*box*/
 .boxA,.boxB{border:1px solid $uskin_boxbd;background:$uskin_boxA;}
@@ -124,12 +120,13 @@ a:hover,.line{ text-decoration:underline;}
 	.boxC h3{font-weight:700;color:$uskin_textA;}
 
 /*home info*/
-.userInfo{background:url(u/themes/$uskin/images/$uskin_homeTbg) no-repeat;}
-		.userInfoweek .button{background:url(u/themes/$uskin/images/$uskin_homeBtn) no-repeat;color:$uskin_homeBtntext;}
-		.userInfoweek .button:hover{text-shadow: 0 1px 0 #fff;}
+.userInfo{}
+		.userInfoweek .button{background:url(u/themes/$uskin/images/$uskin_homeBtn) no-repeat;color:$uskin_homeBtntext;text-shadow: 1px 1px 0 #2d6dbf;}
+		.userInfoweek .button:hover{ background-position:0 -28px;}
 		.homeSk_input{background:url(u/themes/$uskin/images/homeSk_input.png) no-repeat;}
 	.limit{color:$uskin_homeTip;}
 	.homeSk{background:url(u/themes/$uskin/images/$uskin_homeSk) no-repeat;}
+	.sk_show,.sk_img,.sk_link{color:#666;}
 
 /*border*/
 .bdA{border-bottom:1px solid $uskin_bdA;}
@@ -138,20 +135,21 @@ a:hover,.line{ text-decoration:underline;}
 .bgA{background:$uskin_bgA;}
 .bgB{background:$uskin_boxA;}
 /*title*/
-h1{font-size:16px;font-weight:700;color:$uskin_textA;line-height:1.5;}
+h1{font-size:14px;font-weight:700;color:$uskin_textA;line-height:1.5;padding-top:2px;}
 .h5{border-bottom:1px solid $uskin_bdB;}
 	.h5 li a{color:$uskin_textB;}
-	.h5 .tab a{border:1px solid $uskin_bdB;background:$uskin_boxA;}
+	.h5 .tab a{}
 	.h5 .tab a:hover{ text-decoration:none;background:$uskin_bgA;}
-	.h5 .tab .current a{background:$uskin_bgA;}
+	.h5 .tab .current a{border:1px solid $uskin_bdB;border-bottom:0;background:$uskin_boxA;}
 /*list*/
 .ulA li:hover,.ulA li.current{background:$uskin_bgA;}
-.ulA em{font-size:11px;color:$uskin_textB;}
+.ulA em{font-size:11px;}
 .ulE li a{color:$uskin_textB;}
 .ulE li.current,.ulE li:hover{background:$uskin_bgA;}
 .ulE li.current a{color:$uskin_linkA;}
 /*replay dl*/
 .redlA dl{background:$uskin_bgA;}
+.redlA .replyip{border:1px solid #c9ddec;background:#fff;color:#333;}
 /*share*/
 .shareA{background:$uskin_boxA;border:1px solid $uskin_bdA;}
 .shareA span{border-left:1px solid $uskin_bdA;background:$uskin_bgA;}
@@ -161,11 +159,10 @@ h1{font-size:16px;font-weight:700;color:$uskin_textA;line-height:1.5;}
 .tr2 td{border-top:1px solid $uskin_bdA;border-bottom:1px dotted $uskin_bdA;}
 .tr2 td em{color:$uskin_textD;}
 .tr3 td{border-bottom:1px dotted $uskin_bdA;}
-.tr3 .name{color:$uskin_textC;}
-.tr3 .name a{color:$uskin_textA;}
+.tr3 .name em{color:$uskin_textC;}
+.tr3 .name{color:$uskin_textA;}
 .tr3 .value{color:$uskin_textC;}
 .tr3 .value .b a{color:$uskin_textA;}
-.tr3 .title{color:$uskin_textB;}
 .setTable .th{color:$uskin_textA;}
 .z .tr5:hover td{background:$uskin_bgA;}
 .z2 .tr3:hover td{background:#fffaee;}
@@ -178,11 +175,11 @@ h1{font-size:16px;font-weight:700;color:$uskin_textA;line-height:1.5;}
 .mailFri dl{background:$uskin_bgA;}
 .mailFri .current dl{border:1px solid $uskin_bdC;background:$uskin_bgB;}
 /*search*/
-.search{border:1px solid $uskin_bdA;background:$uskin_boxA;}
+.search{border:1px solid #eaeceb;background:$uskin_boxA;}
 .search .sip{background:$uskin_boxA;}
 .search ul{border:1px solid $uskin_bdA;background:$uskin_boxA;}
 .search ul li:hover,.search ul li.current{background:$uskin_bgA;}
-.search button{background:$uskin_boxA url(u/images/search.png) 2px 2px no-repeat;}
+.search button{background:#fff url(u/images/search.png) 2px 2px no-repeat;}
 .spaceTip{background:$uskin_bgB;border:1px solid $uskin_bdC;}
 .spaceTip a{color:$uskin_linkA;}
 /*user list*/
@@ -190,13 +187,14 @@ h1{font-size:16px;font-weight:700;color:$uskin_textA;line-height:1.5;}
 .dlA .dl2{background:$uskin_bgA;}
 .dlA .dl2 dt img{border:1px solid $uskin_bdA;background:$uskin_boxA;}
 .dlB .dl{border-bottom:1px dotted $uskin_bdD;}
+.dlB .dd p,.dlB .dd2 p{color:#333;}
 .dlE dl{border-bottom:1px solid $uskin_bdA;}
 .dynamic .dd,.dynamic .dd2{border-bottom:1px dotted $uskin_bdA;}
 .feedImg img{border:1px solid $uskin_bdA;}
 .feedImgB{border:1px solid $uskin_bdD;background:$uskin_bgC;color:$uskin_textC;}
 .feedImgB a{color:$uskin_linkB;}
 /*infoBox*/
-.ulInfoA li{border-left:1px solid $uskin_bdD;}
+.ulInfoA li{border-left:1px solid #dce9f1;}
 .ulInfoA li em{font-size:14px; font-weight:700; font-family:Tahoma, Geneva, sans-serif}
 .ulInfoA li a{color:$uskin_textB;}
 .ulInfoA li a em{color:$uskin_linkA;}
@@ -206,11 +204,11 @@ h1{font-size:16px;font-weight:700;color:$uskin_textA;line-height:1.5;}
 .text_open{ font-size:14px;color:$uskin_textA;font-weight:700;}
 .text_open:hover{text-decoration:none;color:$uskin_linkA;}
 .current .text_open{text-decoration:none;color:$uskin_linkA;}
-.tasks_text dt{color:$uskin_textB;}
 .tasks_face_list li img{border:1px solid $uskin_bdA;}
 .tasks_text_tr td{border-top:0;}
 /*app groups list*/
 .dlC .dd .titleB{border-bottom:1px dotted $uskin_bdD;}
+.dlC .dd2 p.titleB{color:#333;}
 /*hot*/
 .w300 h2{ font-size:14px;color:$uskin_textD; font-weight:700;}
 .w300-box{border:1px solid $uskin_bdA;}
@@ -237,16 +235,16 @@ h1{font-size:16px;font-weight:700;color:$uskin_textA;line-height:1.5;}
 a.help_a i{border:1px solid $uskin_bdC;background:$uskin_bgB;color:$uskin_textA;}
 /*conFeed*/
 .homeBg{background:$uskin_boxA url(u/themes/$uskin/images/$uskin_homeSide) right 0 repeat-y;}
-.feedsAll{background:$uskin_boxA url(u/themes/$uskin/images/$uskin_navC) repeat-x;border:1px solid $uskin_bdB;border-bottom:0;color:$uskin_textB;}
+.feedsAll{background:$uskin_boxA url(u/themes/$uskin/images/$uskin_navC) repeat-x;border:1px solid $uskin_bdB;border-bottom:0;}
 /*space_info*/
 #space_info .face img{ border:1px solid $uskin_bdD;}
 #space_info .line{border-bottom:1px dotted $uskin_bdD;}
 .appList li a{color:$uskin_textA;}
 /*conFeed*/
 .conFeed .dl{border-bottom:1px dotted $uskin_bdD;}
-.conFeed .dd .title{color:$uskin_textE;font-size:14px;} /*微薄标题*/
+.conFeed .dd .title{color:$uskin_textA;} /*weibo title*/
 .conFeed .dd cite a{color:$uskin_textC;}
-.forward{border:1px solid $uskin_bdA;background:$uskin_bgC;} /*微薄转发区域*/
+.forward{border:1px solid $uskin_bdA;background:$uskin_bgC;}
 .redlB .img{border:1px solid $uskin_bdA;background:$uskin_boxA;}
 .redlB .dlA{border-top:1px dotted $uskin_bdD;}
 .redlB .ddA textarea{border:1px solid $uskin_bdA;}
@@ -258,6 +256,11 @@ a.help_a i{border:1px solid $uskin_bdC;background:$uskin_bgB;color:$uskin_textA;
 .friSearch{background:$uskin_bgD;}
 .friSip{border:1px solid $uskin_bdA;}
 .friSelect{border-left:1px solid $uskin_bdA;}
+/*windows table*/
+.tA{border-top:1px solid #e8f5fb}
+.tA .tr td{background:#f2f9fd;border-bottom:1px solid #d7eef8;border-right:1px solid #f2f9fd;border-left:1px solid #f2f9fd;color:#698fa0;padding:5px 5px 5px 10px;}
+.tA td,.tA th{padding:5px;border-bottom:1px solid #e8f5fb;border-right:1px solid #fff;border-left:1px solid #fff; vertical-align:middle;line-height:21px;}
+.tA tr:hover td,.tA tr:hover th{background:#f7fbff;border-bottom:1px solid #e8f5fb;border-right:1px solid #e8f5fb;border-left:1px solid #e8f5fb;color:#1d6180;}
 /*span color*/
 .s1{color:#f00;}/*red*/
 .s2{color:$uskin_textD;}/*org*/
@@ -268,7 +271,11 @@ a.help_a i{border:1px solid $uskin_bdC;background:$uskin_bgB;color:$uskin_textA;
 .s7{color:$uskin_linkB;}
 .gray{color:$uskin_textC;}
 /*ie6 png 24*/
-.topwarp,.place,.navA,.popImgdel{_behavior: url("u/images/iepngfix.htc")}
+.topwarp,.place div.one,.place div img,.navA,.popImgdel,.appNav_top,.appNav,.appNav_bottom,.logo img,.appNav .one li a img,h4.site img,.refresh img,.aset img{_behavior: url("u/images/iepngfix.htc");}
+
+/*expandApp*/
+.expandApp{border:1px solid $uskin_bdB;background:$uskin_boxA;}
+.msg span{position: absolute;font-size:14px;text-align:center; left: 600px; top: 294px; width: 350px; height: 17px; font-family: Arial; text-align: left; word-wrap: break-word;}
 </style>
 <!--
 EOT;

@@ -118,16 +118,19 @@ class PW_ColumnService {
 	 * 获得所有栏目排序后的列表
 	 * @return array
 	 */
-	function getAllOrderColumns($id = 0) {
+	function getAllOrderColumns($id = 0,$username = '') {
 		if (empty($id)) $id = 0;
 		$columns = $this->findAllColumns();
 		$result = array();
 		if ($id) $result[$id] = $columns[$id];
 		foreach ($columns as $column) {
+			//if ($username && !$column['allowoffer'] && !checkEditPurview($username,$column['column_id'])) continue;
 			if ($column['parent_id'] == $id) {
 				$column['level'] = 0;
-				$result[$column['column_id']] = $column;
-				$this->_getColumns($columns, $column['column_id'], $result, 1);
+				if ($column['allowoffer'] || !$username || $username && checkEditPurview($username,$column['column_id'])) {
+					$result[$column['column_id']] = $column;
+				}
+				$this->_getColumns($columns, $column['column_id'], $result, 1,$username);
 			}
 		}
 		return $result;
@@ -248,12 +251,15 @@ class PW_ColumnService {
 		return C::loadDB($this->_module_name);
 	}
 
-	function _getColumns($columns, $cid, & $result, $l = 1) {
+	function _getColumns($columns, $cid, & $result, $l = 1,$username=0) {
 		foreach ($columns as $c) {
+			//if ($username && !$c['allowoffer'] && !checkEditPurview($username,$c['column_id'])) continue;
 			if ($c['parent_id'] == $cid) {
 				$c['level'] = $l;
-				$result[$c['column_id']] = $c;
-				$this->_getcolumns($columns, $c['column_id'], $result, $l + 1);
+				if ($c['allowoffer'] || !$username || $username && checkEditPurview($username,$c['column_id'])) {
+					$result[$c['column_id']] = $c;
+				}
+				$this->_getcolumns($columns, $c['column_id'], $result, $l + 1,$username);
 			}
 		}
 	}

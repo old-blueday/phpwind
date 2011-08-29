@@ -1,6 +1,6 @@
 <?php
 !function_exists('adminmsg') && exit('Forbidden');
-include_once(D_P."data/bbscache/bg_config.php");
+include_once pwCache::getPath(D_P."data/bbscache/bg_config.php");
 
 if (!$action){
 	ifcheck($bg_ifopen,'ifopen');
@@ -17,7 +17,7 @@ if (!$action){
 	}
 	include PrintHack('admin');exit;
 }else{
-	InitGP(array('config','groups'));
+	S::gp(array('config','groups'));
 	if (is_array($groups)){
 		$config['bg_groups'] = ','.implode(',',$groups).',';
 	} else {
@@ -25,9 +25,9 @@ if (!$action){
 	}
 	foreach($config as $key => $value){
 		$db->pw_update(
-			"SELECT hk_name FROM pw_hack WHERE hk_name=".pwEscape($key),
-			"UPDATE pw_hack SET hk_value=".pwEscape($value)."WHERE hk_name=".pwEscape($key),
-			"INSERT INTO pw_hack SET hk_name=".pwEscape($key).",hk_value=".pwEscape($value)
+			"SELECT hk_name FROM pw_hack WHERE hk_name=".S::sqlEscape($key),
+			"UPDATE pw_hack SET hk_value=".S::sqlEscape($value)."WHERE hk_name=".S::sqlEscape($key),
+			"INSERT INTO pw_hack SET hk_name=".S::sqlEscape($key).",hk_value=".S::sqlEscape($value)
 		);
 	}
 	updatecache_bg();
@@ -43,6 +43,6 @@ function updatecache_bg(){
 		$blogdb .= "\$$hk_name=".pw_var_export($hk_value).";\r\n";
 	}
 	$blogdb .= "\n?>";
-	writeover(D_P.'data/bbscache/bg_config.php', $blogdb);
+	pwCache::setData(D_P.'data/bbscache/bg_config.php', $blogdb);
 }
 ?>

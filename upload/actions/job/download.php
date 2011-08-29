@@ -1,11 +1,10 @@
 <?php
 !defined('P_W') && exit('Forbidden');
-
 set_time_limit(300);
-$aid = (int)GetGP('aid');
+$aid = (int)S::getGP('aid');
 empty($aid) && Showmsg('job_attach_error');
-
-InitGP(array('type'), 'GP');
+S::gp(array('type','check'), 'GP');
+require_once (R_P . 'require/credit.php');
 
 if (!$windid && ($userdb = getCurrentOnlineUser()) && $userdb['ip'] == $onlineip) {
 	$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
@@ -16,15 +15,21 @@ if (!$windid && ($userdb = getCurrentOnlineUser()) && $userdb['ip'] == $onlineip
 	$userrvrc = round($winddb['rvrc'] / 10, 1);
 	$windid = $winddb['username'];
 	if (file_exists(D_P . "data/groupdb/group_$groupid.php")) {
-		require_once Pcv(D_P . "data/groupdb/group_$groupid.php");
+		require_once pwCache::getPath(S::escapePath(D_P . "data/groupdb/group_$groupid.php"));
 	} else {
-		require_once (D_P . "data/groupdb/group_1.php");
+		require_once pwCache::getPath(D_P . "data/groupdb/group_1.php");
 	}
 	define('FX', 1);
 }
-
 $downloadServer = getDownloadFactory($type);
 $downloadServer->init($aid);
+
+if (empty($type) && $check) {
+	S::gp(array('mt'));
+	$msg = $downloadServer->check();
+	require_once PrintEot('ajax');
+	ajax_footer();
+}
 if (($return = $downloadServer->execute()) !== true) {
 	Showmsg($return);
 }
@@ -34,7 +39,6 @@ $fgeturl =& $downloadServer->getUrl();
 $filename = basename("$attachdir/" . $attach['attachurl']);
 $fileext = substr(strrchr($attach['attachurl'], '.'), 1);
 $filesize = 0;
-
 if (strpos($pwServer['HTTP_USER_AGENT'], 'MSIE') !== false && $fileext == 'torrent') {
 	$attachment = 'inline';
 } else {
@@ -50,7 +54,6 @@ if ($db_charset == 'utf-8') {
 		$attach['name'] = $chs->Convert($attach['name']);
 	}
 }
-
 if ($db_attachhide && $attach['size'] > $db_attachhide && $attach['type'] == 'zip' && !defined('FX')) {
 	ObHeader($fgeturl[0]);
 } elseif ($fgeturl[1] == 'Local') {
@@ -127,7 +130,7 @@ function getCurrentOnlineUser() {
 		return $userdb ? array('uid' => $userdb[8], 'ip' => $userdb[2]) : array();
 	} else {
 		$olid = (int)GetCookie('olid');
-		$userdb = $db->get_one("SELECT uid,ip FROM pw_online WHERE olid=" . pwEscape($olid) . ' AND uid>0');
+		$userdb = $db->get_one("SELECT uid,ip FROM pw_online WHERE olid=" . S::sqlEscape($olid) . ' AND uid>0');
 		return $userdb;
 	}
 }
@@ -175,7 +178,7 @@ class messageDownload extends downloadInterface {
 
 	function init($aid) {
 		$this->aid = $aid;
-		$this->attach = $this->_db->get_one("SELECT * FROM pw_attachs WHERE aid=" . pwEscape($aid));
+		$this->attach = $this->_db->get_one("SELECT * FROM pw_attachs WHERE aid=" . S::sqlEscape($aid));
 	}
 
 	function execute() {
@@ -186,7 +189,7 @@ class messageDownload extends downloadInterface {
 		if (!$this->url[0]) {
 			return 'job_attach_error';
 		}
-		$this->_db->update("UPDATE pw_attachs SET hits=hits+1 WHERE aid=" . pwEscape($this->aid));
+		$this->_db->update("UPDATE pw_attachs SET hits=hits+1 WHERE aid=" . S::sqlEscape($this->aid));
 		return true;
 	}
 }
@@ -203,7 +206,7 @@ class activeDownload extends downloadInterface {
 
 	function init($aid) {
 		$this->aid = $aid;
-		$this->attach = $this->_db->get_one("SELECT * FROM pw_actattachs WHERE aid=" . pwEscape($aid));
+		$this->attach = $this->_db->get_one("SELECT * FROM pw_actattachs WHERE aid=" . S::sqlEscape($aid));
 	}
 
 	function execute() {
@@ -214,7 +217,7 @@ class activeDownload extends downloadInterface {
 		if (!$this->url[0]) {
 			return 'job_attach_error';
 		}
-		$this->_db->update("UPDATE pw_actattachs SET hits=hits+1 WHERE aid=" . pwEscape($this->aid));
+		$this->_db->update("UPDATE pw_actattachs SET hits=hits+1 WHERE aid=" . S::sqlEscape($this->aid));
 		return true;
 	}
 }
@@ -234,6 +237,11 @@ class threadDownload extends downloadInterface {
 
 	var $admincheck;
 	var $foruminfo;
+	var $downloadmoney;
+	var $uploadcredit;
+
+	var $ifsale;
+	var $ifdown;
 
 	function threadDownload() {
 		global $db,$winddb,$groupid,$windid,$winduid,$_G;
@@ -246,6 +254,11 @@ class threadDownload extends downloadInterface {
 		$this->groupid =& $groupid;
 
 		$this->foruminfo = array();
+		$this->downloadmoney = '';
+		$this->uploadcredit = '';
+
+		$this->ifsale = 0;
+		$this->ifdown = 0;
 	}
 
 	function init($aid) {
@@ -258,10 +271,10 @@ class threadDownload extends downloadInterface {
 		if (($return = $this->check()) !== true) {
 			return $return;
 		}
-		if (($return = $this->downloadCredit()) !== true) {
+		if (($return = $this->deductDownloadCredit()) !== true) {
 			return $return;
 		}
-		if (($return = $this->checkAttachCredit()) !== true) {
+		if (($return = $this->deductSaleCredit()) !== true) {
 			return $return;
 		}
 		global $credit;
@@ -273,64 +286,74 @@ class threadDownload extends downloadInterface {
 		return true;
 	}
 
-	function downloadCredit() {
-		if ($this->_G['allowdownload'] != 1) {
+	function checkDownloadCredit() {
+		if ($this->_G['allowdownload'] != 1 || !$this->downloadmoney || $this->ifadmin()) {
 			return true;
 		}
-		global $uploadcredit,$downloadmoney;
-		$forumset = $this->foruminfo['forumset'];
-		list($uploadcredit, , $downloadmoney, ) = explode("\t", $forumset['uploadset']);
-		if ($downloadmoney) {
-			global $credit;
-			require_once (R_P . 'require/credit.php');
-			if ($downloadmoney > 0 && $credit->get($this->uid, $uploadcredit) < $downloadmoney) {
-				$GLOBALS['creditname'] = $credit->cType[$uploadcredit];
-				return 'download_money_limit';
-			}
-			$credit->addLog('topic_download',
-				array($uploadcredit => -$downloadmoney),
-				array(
-					'uid' => $this->uid,
-					'username' => $this->username,
-					'ip' => $GLOBALS['onlineip'],
-					'fname' => $this->foruminfo['name']
-				)
-			);
-			if (!$credit->set($this->uid, $uploadcredit, -$downloadmoney, false)) {
-				return 'undefined_action';
-			}
+		$this->ifdown = 2;
+		if ($this->ifDownloadAtt()) {
+			return true;
+		}
+		$this->ifdown = 1;
+		global $credit;
+		require_once (R_P . 'require/credit.php');
+		if ($this->downloadmoney > 0 && $credit->get($this->uid, $this->uploadcredit) < $this->downloadmoney) {
+			$GLOBALS['creditname'] = $credit->cType[$this->uploadcredit];
+			$GLOBALS['downloadmoney'] = $this->downloadmoney;
+			return 'download_money_limit';
+		}
+		return true;
+	}
+	
+	function deductDownloadCredit() {
+		if ($this->ifdown != 1) {
+			return true;
+		}
+		global $credit;
+		$this->_db->update("INSERT INTO pw_attachdownload SET " . S::sqlSingle(array(
+			'aid' => $this->aid,
+			'uid' => $this->uid,
+			'ctype' => $this->uploadcredit,
+			'cost' => $this->downloadmoney,
+			'createdtime' => $GLOBALS['timestamp']
+		)));
+		$credit->addLog('topic_download',
+			array($this->uploadcredit => -$this->downloadmoney),
+			array(
+				'uid' => $this->uid,
+				'username' => $this->username,
+				'ip' => $GLOBALS['onlineip'],
+				'fname' => $this->foruminfo['name']
+			)
+		);
+		if (!$credit->set($this->uid, $this->uploadcredit, -$this->downloadmoney, false)) {
+			return 'undefined_action';
 		}
 		return true;
 	}
 
 	function ifBuyAtt() {
-		return $this->_db->get_one("SELECT uid FROM pw_attachbuy WHERE aid=" . pwEscape($this->aid) . " AND uid=" . pwEscape($this->uid));
+		return $this->_db->get_one("SELECT uid FROM pw_attachbuy WHERE aid=" . S::sqlEscape($this->aid) . " AND uid=" . S::sqlEscape($this->uid));
 	}
 
-	function buyAttach() {
-		if ($this->ifBuyAtt()) {
+	function ifDownloadAtt() {
+		return $this->_db->get_one("SELECT uid FROM pw_attachdownload WHERE aid=" . S::sqlEscape($this->aid) . " AND uid=" . S::sqlEscape($this->uid));
+	}
+
+	function deductSaleCredit() {
+		if ($this->ifsale != 1) {
 			return true;
 		}
-		global $credit,$db_sellset,$uploadcredit,$downloadmoney,$creditName,$usercredit;
-		require_once (R_P . 'require/credit.php');
-
-		!$this->attach['ctype'] && $this->attach['ctype'] = 'money';
-		$usercredit = $credit->get($this->uid, $this->attach['ctype']);
-		$creditName = $credit->cType[$this->attach['ctype']];
-		$db_sellset['price'] > 0 && $this->attach['needrvrc'] = min($this->attach['needrvrc'], $db_sellset['price']);
-		if ($usercredit < $this->attach['needrvrc']) {
-			$GLOBALS['needrvrc'] = $this->attach['needrvrc'];
-			return ($downloadmoney > 0 && $uploadcredit == $this->attach['ctype']) ? 'job_attach_sale_download' : 'job_attach_sale';
-		}
-		$this->_db->update("INSERT INTO pw_attachbuy SET " . pwSqlSingle(array(
+		global $credit;
+		$this->_db->update("INSERT INTO pw_attachbuy SET " . S::sqlSingle(array(
 			'aid' => $this->aid,
 			'uid' => $this->uid,
 			'ctype' => $this->attach['ctype'],
 			'cost' => $this->attach['needrvrc'],
 			'createdtime' => $GLOBALS['timestamp']
 		)));
-		$credit->addLog('topic_attbuy',
-			array($attach['ctype'] => -$this->$attach['needrvrc']),
+		$credit->addLog('topic_attbuy', 
+			array($attach['ctype'] => -$this->attach['needrvrc']),
 			array(
 				'uid' => $this->uid,
 				'username' => $this->username,
@@ -338,8 +361,7 @@ class threadDownload extends downloadInterface {
 			)
 		);
 		$credit->set($this->uid, $this->attach['ctype'], -$this->attach['needrvrc'], false);
-		
-		if ($db_sellset['income'] < 1 || ($income = $this->_db->get_value("SELECT SUM(cost) AS sum FROM pw_attachbuy WHERE aid=" . pwEscape($this->aid))) < $db_sellset['income']) {
+		if ($db_sellset['income'] < 1 || ($income = $this->_db->get_value("SELECT SUM(cost) AS sum FROM pw_attachbuy WHERE aid=" . S::sqlEscape($this->aid))) < $db_sellset['income']) {
 			$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
 			$username = $userService->getUserNameByUserId($this->attach['uid']);
 			$credit->addLog('topic_attsell',
@@ -356,28 +378,61 @@ class threadDownload extends downloadInterface {
 		return true;
 	}
 
+	function saleCredit() {
+		if ($this->ifadmin()) {
+			return true;
+		}
+		$this->ifsale = 2;
+		if ($this->ifBuyAtt()) {
+			return true;
+		}
+		global $credit,$db_sellset,$creditName,$usercredit;
+		require_once (R_P . 'require/credit.php');
+
+		!$this->attach['ctype'] && $this->attach['ctype'] = 'money';
+		$usercredit = $credit->get($this->uid, $this->attach['ctype']);
+		$creditName = $credit->cType[$this->attach['ctype']];
+		$db_sellset['price'] > 0 && $this->attach['needrvrc'] = min($this->attach['needrvrc'], $db_sellset['price']);
+		$d = ($this->ifdown == 1 && $this->uploadcredit == $this->attach['ctype']) ? $this->downloadmoney : 0;
+		if ($usercredit < $this->attach['needrvrc'] + $d) {
+			$GLOBALS['needrvrc'] = $this->attach['needrvrc'];
+			$GLOBALS['downloadmoney'] = $this->downloadmoney;
+			return ($d) ? 'job_attach_sale_download' : 'job_attach_sale';
+		}
+		$this->ifsale = 1;
+		return true;
+	}
+
 	function needCredit() {
-		global $credit,$uploadcredit,$downloadmoney,$usercredit;
+		global $credit,$usercredit;
 		require_once (R_P . 'require/credit.php');
 		!$this->attach['ctype'] && $this->attach['ctype'] = 'rvrc';
 		$usercredit = $credit->get($this->uid, $this->attach['ctype']);
 		if ($usercredit < $this->attach['needrvrc']) {
 			$GLOBALS['needrvrc'] = $this->attach['needrvrc'];
 			$GLOBALS['creditName'] = $credit->cType[$this->attach['ctype']];
-			return ($downloadmoney > 0 && $uploadcredit == $this->attach['ctype']) ? 'job_attach_rvrc_download' : 'job_attach_rvrc';
+			$GLOBALS['downloadmoney'] = $this->downloadmoney;
+			return ($this->downloadmoney > 0 && $this->uploadcredit == $this->attach['ctype']) ? 'job_attach_rvrc_download' : 'job_attach_rvrc';
 		}
 		return true;
 	}
 
-	function checkAttachCredit() {
-		if ($this->attach['needrvrc'] < 1 || $this->admincheck) {
+	function ifadmin() {
+		if ($this->uid == $this->attach['uid'] || $this->admincheck) {
+			return true;
+		}
+		return false;
+	}
+
+	function checkNeedCredit() {
+		if ($this->attach['needrvrc'] < 1 || $this->ifadmin()) {
 			return true;
 		}
 		if (!$this->uid) {
 			return 'job_attach_special';
 		}
 		if ($this->attach['special'] == '2') {
-			return $this->buyAttach();
+			return $this->saleCredit();
 		} else {
 			return $this->needCredit();
 		}
@@ -401,12 +456,18 @@ class threadDownload extends downloadInterface {
 		if (($return = $this->_checkForum()) !== true) {
 			return $return;
 		}
+		if (($return = $this->checkDownloadCredit()) !== true) {
+			return $return;
+		}
+		if (($return = $this->checkNeedCredit()) !== true) {
+			return $return;
+		}
 		return true;
 	}
 
 	function _checkForum() {
 		$this->tid = $this->attach['tid'];
-		$thread = $this->_db->get_one("SELECT fid,tpcstatus,ifcheck FROM pw_threads WHERE tid=" . pwEscape($this->tid, false));
+		$thread = $this->_db->get_one("SELECT fid,tpcstatus,ifcheck FROM pw_threads WHERE tid=" . S::sqlEscape($this->tid, false));
 
 		if (getstatus($thread['tpcstatus'], 1) && !$thread['fid'] && $thread['ifcheck'] == '2') {
 			return true;
@@ -419,6 +480,9 @@ class threadDownload extends downloadInterface {
 		$pwforum->forumcheck($this->user, $this->groupid);
 		$this->foruminfo =& $pwforum->foruminfo;
 		$this->admincheck = ($this->groupid == '3' || $pwforum->isBM($this->username)) ? 1 : 0;
+		
+		$forumset = $this->foruminfo['forumset'];
+		list($this->uploadcredit, , $this->downloadmoney, ) = explode("\t", $forumset['uploadset']);
 
 		if (!$this->admincheck && !$pwforum->allowdownload($this->user, $this->groupid)) { //版块权限判断
 			return 'job_attach_forum';

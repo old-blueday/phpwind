@@ -1,7 +1,7 @@
 <?php
 !defined('P_W') && exit('Forbidden');
 require_once R_P . 'u/require/core.php';
-require_once(D_P . 'data/bbscache/o_config.php');
+require_once pwCache::getPath(D_P . 'data/bbscache/o_config.php');
 	$o_photos_creditset = unserialize($o_photos_creditset);
 require_once(R_P.'require/postfunc.php');
 
@@ -10,13 +10,13 @@ banUser();
 if (!$db_phopen) Showmsg('相册应用已关闭，新鲜事发图片功能不能使用');
 if ($o_weibophoto != 1) Showmsg('新鲜事发图片功能已关闭');
 
-$aid = $db->get_value("SELECT aid FROM pw_cnalbum WHERE atype='0' AND ownerid=".pwEscape($winduid). " AND isdefault=1 " .pwLimit(1));
+$aid = $db->get_value("SELECT aid FROM pw_cnalbum WHERE atype='0' AND ownerid=" . S::sqlEscape($winduid) . " AND isdefault=1 " . S::sqlLimit(1));
 if (!$aid) {
 	if ($groupid != 3 && $o_photos_groups && strpos($o_photos_groups,",$groupid,") === false) {
 		Showmsg('photos_group_right');
 	}
 	/* //unlimit
-	if ($o_albumnum2 > 0 && $o_albumnum2 <= $db->get_value("SELECT COUNT(*) AS count FROM pw_cnalbum WHERE atype='0' AND ownerid=" . pwEscape($winduid))) {
+	if ($o_albumnum2 > 0 && $o_albumnum2 <= $db->get_value("SELECT COUNT(*) AS count FROM pw_cnalbum WHERE atype='0' AND ownerid=" . S::sqlEscape($winduid))) {
 		Showmsg('colony_album_num2');
 	}
 	*/
@@ -41,7 +41,7 @@ if (!$aid) {
 		addLog($creditlog['Createalbum'],$windid,$winduid,'photos_Createalbum');
 	}
 	
-	$db->update("INSERT INTO pw_cnalbum SET " . pwSqlSingle(array(
+	$db->update("INSERT INTO pw_cnalbum SET " . S::sqlSingle(array(
 			'aname'		=> '默认相册',
 			'aintro'	=> '默认相册',
 			'atype'		=> 0,
@@ -57,7 +57,7 @@ if (!$aid) {
 !$aid && Showmsg('找不到默认相册');
 
 
-$rt = $db->get_one("SELECT aname,photonum,ownerid,private,lastphoto FROM pw_cnalbum WHERE atype='0' AND aid=" . pwEscape($aid));
+$rt = $db->get_one("SELECT aname,photonum,ownerid,private,lastphoto FROM pw_cnalbum WHERE atype='0' AND aid=" . S::sqlEscape($aid));
 if (empty($rt)) {
 	Showmsg('undefined_action');
 } elseif ($winduid != $rt['ownerid']) {
@@ -107,7 +107,7 @@ if (!$rt['private']) {
 	$usercache->update($winduid,'photos',$pid,$usercachedata);
 	*/
 }
-$db->update("UPDATE pw_cnalbum SET photonum=photonum+".pwEscape($photoNum,false).",lasttime=" . pwEscape($timestamp,false) . ',lastpid=' . pwEscape(implode(',',$lastpid)) . (!$rt['lastphoto'] ? ',lastphoto='.pwEscape($img->getLastPhoto()) : '') . " WHERE aid=" . pwEscape($aid));
+$db->update("UPDATE pw_cnalbum SET photonum=photonum+" . S::sqlEscape($photoNum,false) . ",lasttime=" . S::sqlEscape($timestamp,false) . ',lastpid=' . S::sqlEscape(implode(',',$lastpid)) . (!$rt['lastphoto'] ? ',lastphoto=' . S::sqlEscape($img->getLastPhoto()) : '') . " WHERE aid=" . S::sqlEscape($aid));
 countPosts("+$photoNum");
 
 //积分变动

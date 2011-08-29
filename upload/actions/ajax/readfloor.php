@@ -9,8 +9,10 @@ if (empty($tid) || empty($pids)) {
 $pidArr = array_unique(explode(',', $pids));
 $readdb = $_pids = array();
 
-$threadService = L::loadClass('threads', 'forum');
-$read = $threadService->getThreads($tid, in_array('tpc', $pidArr));
+//* $threadService = L::loadClass('threads', 'forum');
+//* $read = $threadService->getThreads($tid, in_array('tpc', $pidArr));
+$_cacheService = Perf::gatherCache('pw_threads');
+$read = (in_array('tpc', $pidArr)) ? $_cacheService->getThreadAndTmsgByThreadId($tid) : $_cacheService->getThreadByThreadId($tid);
 if (empty($read)) {
 	echo 'fail';ajax_footer();
 }
@@ -21,7 +23,7 @@ $ptable = $read['ptable'];
 $forumset = $foruminfo['forumset'];
 list(,,$downloadmoney,$downloadimg) = explode("\t",$forumset['uploadset']);
 
-$isGM = CkInArray($windid,$manager);
+$isGM = S::inArray($windid,$manager);
 $isBM = admincheck($foruminfo['forumadmin'], $foruminfo['fupadmin'], $windid);
 $admincheck = ($isGM || $isBM) ? 1 : 0;
 if (!$isGM) {#非创始人权限获取
@@ -39,21 +41,21 @@ if (!$isGM) {#非创始人权限获取
 if (in_array('tpc', $pidArr)) {
 	$read['pid'] = 'tpc';
 	$readdb[] = $read;
-	$read['aid'] && $read['ifhide'] && $_pids['tpc'] = 0;
+	$read['aid'] && $_pids['tpc'] = 0;
 	$pidArr = array_diff($pidArr, array('tpc'));
 }
 
 if ($pidArr) {
 	$pw_posts = GetPtable($ptable);
-	$query = $db->query("SELECT * FROM $pw_posts WHERE tid=" . pwEscape($tid) . " AND ifcheck='1' AND pid IN(" . S::sqlImplode($pidArr) . ')');
+	$query = $db->query("SELECT * FROM $pw_posts WHERE tid=" . S::sqlEscape($tid) . " AND ifcheck='1' AND pid IN(" . S::sqlImplode($pidArr) . ')');
 	while ($read = $db->fetch_array($query)) {
 		$readdb[] = $read;
-		$read['aid'] && $read['ifhide'] && $_pids[$read['pid']] = $read['pid'];
+		$read['aid'] && $_pids[$read['pid']] = $read['pid'];
 	}
 }
 $attachdb = array();
 if ($_pids) {
-	$query = $db->query('SELECT * FROM pw_attachs WHERE tid=' . pwEscape($tid) . " AND pid IN (" . pwImplode($_pids) . ")");
+	$query = $db->query('SELECT * FROM pw_attachs WHERE tid=' . S::sqlEscape($tid) . " AND pid IN (" . S::sqlImplode($_pids) . ")");
 	while ($rt = $db->fetch_array($query)) {
 		if ($rt['pid'] == '0') $rt['pid'] = 'tpc';
 		$attachdb[$rt['pid']][$rt['aid']] = $rt;

@@ -18,7 +18,7 @@ class diaryWeibo extends baseWeibo {
 	}
 	function init($id) {
 		$this->_did = $id;
-		$diaryDB = $this->_db->get_one("SELECT did,uid,username,subject,content,privacy FROM pw_diary WHERE did=".pwEscape($id));
+		$diaryDB = $this->_db->get_one("SELECT did,uid,username,subject,content,privacy FROM pw_diary WHERE did=".S::sqlEscape($id));
 		if (!$diaryDB) return false;
 		$uid = $diaryDB['uid'];
 		require_once(R_P.'require/bbscode.php');
@@ -50,7 +50,7 @@ class groupWeibo extends baseWeibo {
 	}
 	function init($id) {
 		$this->_cyid = $id;
-		$colonyDB = $this->_db->get_one("SELECT c.id,c.cname,c.admin,c.descrip,m.uid FROM pw_colonys c LEFT JOIN pw_members m ON c.admin=m.username WHERE c.id=".pwEscape($id));
+		$colonyDB = $this->_db->get_one("SELECT c.id,c.cname,c.admin,c.descrip,m.uid FROM pw_colonys c LEFT JOIN pw_members m ON c.admin=m.username WHERE c.id=".S::sqlEscape($id));
 		if (!$colonyDB) return false;
 		$content = sprintf("[url=%s] %s [/url]", $this->_url."&cyid=".$this->_cyid, $colonyDB['cname']);
 		$mailSubject =  getLangInfo('app','group_recommend');
@@ -118,11 +118,11 @@ class albumWeibo extends baseWeibo {
 	function init($id) {
 		global $cyid;
 		$this->_aid = $id;
-		$albumDB = $this->_db->get_one("SELECT aid,aname,ownerid,owner,lastphoto,aintro FROM pw_cnalbum WHERE aid=" . pwEscape($id));
+		$albumDB = $this->_db->get_one("SELECT aid,aname,ownerid,owner,lastphoto,aintro FROM pw_cnalbum WHERE aid=" . S::sqlEscape($id));
 		if (!$albumDB) return false;
 		$this->_url = !$cyid ? $this->_url."&uid=".$albumDB['ownerid']."&aid=".$this->_aid : $GLOBALS['db_bbsurl']."/apps.php?q=galbum&a=album&cyid=$cyid&aid=".$this->_aid;
 		$pids = array();
-		$query = $this->_db->query("SELECT pid FROM pw_cnphoto WHERE aid = ".pwEscape($albumDB['aid'])." LIMIT 10");
+		$query = $this->_db->query("SELECT pid FROM pw_cnphoto WHERE aid = ".S::sqlEscape($albumDB['aid'])." LIMIT 10");
 		while($rt = $this->_db->fetch_array($query)) {
 			$pids[] = $rt['pid'];
 		}
@@ -166,7 +166,7 @@ class photoWeibo extends baseWeibo {
 	function init($id) {
 		global $cyid;
 		$this->_pid = $id;
-		$photoDB = $this->_db->get_one("SELECT p.pid,p.path as basepath,p.pintro,p.ifthumb,a.ownerid,a.owner FROM pw_cnphoto p LEFT JOIN pw_cnalbum a ON p.aid=a.aid WHERE p.pid=" . pwEscape($id));
+		$photoDB = $this->_db->get_one("SELECT p.pid,p.path as basepath,p.pintro,p.ifthumb,a.ownerid,a.owner FROM pw_cnphoto p LEFT JOIN pw_cnalbum a ON p.aid=a.aid WHERE p.pid=" . S::sqlEscape($id));
 		if (!$photoDB) return false;
 		$this->_url = !$cyid ? $this->_url."&uid=".$photoDB['ownerid']."&pid=".$this->_pid : $GLOBALS['db_bbsurl']."/apps.php?q=galbum&a=view&cyid=$cyid&pid=".$this->_pid;
 		$content = "我觉得这图不错哦~~~";
@@ -211,7 +211,7 @@ class topicWeibo extends baseWeibo {
 		global $cyid;
 		$this->_tid = $id;
 		$pw_tmsgs = GetTtable($this->_tid);
-		$topicDB = $this->_db->get_one("SELECT t.tid,t.subject,t.anonymous,t.ifshield,t.authorid,t.author,t.postdate,tm.content FROM pw_threads t LEFT JOIN $pw_tmsgs tm ON t.tid=tm.tid WHERE t.tid=".pwEscape($this->_tid));
+		$topicDB = $this->_db->get_one("SELECT t.tid,t.subject,t.anonymous,t.ifshield,t.authorid,t.author,t.postdate,tm.content FROM pw_threads t LEFT JOIN $pw_tmsgs tm ON t.tid=tm.tid WHERE t.tid=".S::sqlEscape($this->_tid));
 		if (!$topicDB) return false;
 		$uid = $topicDB['authorid'];
 		$username = ($topicDB['anonymous'] == 1) ? $db_anonymousname : $topicDB['author'];		
@@ -263,13 +263,13 @@ class replyWeibo extends baseWeibo {
 		if (!$tid) return false;
 		$tid = (int)$tid;
 		$pw_posts = GetPtable('N',$tid);
-		$replyDB = $this->_db->get_one("SELECT p.pid,p.tid,p.anonymous,p.ifshield,p.subject as psubject,p.author,p.authorid,p.postdate,p.content,t.subject as tsubject FROM $pw_posts p LEFT JOIN pw_threads t ON p.tid=t.tid WHERE p.pid=".pwEscape($this->_pid));
+		$replyDB = $this->_db->get_one("SELECT p.pid,p.tid,p.anonymous,p.ifshield,p.subject as psubject,p.author,p.authorid,p.postdate,p.content,t.subject as tsubject FROM $pw_posts p LEFT JOIN pw_threads t ON p.tid=t.tid WHERE p.pid=".S::sqlEscape($this->_pid));
 		$uid = $replyDB['authorid'];
 		$subject = $replyDB['psubject'] ? $replyDB['psubject'] : 'Re:'.$replyDB['tsubject'];
 		$username = ($replyDB['anonymous'] == 1) ? $db_anonymousname : $replyDB['author'];
 		$this->_url = !$cyid ? $this->_url.$tid."&pid=".$this->_pid : $this->_url.$tid."&pid=".$this->_pid."&cyid=$cyid";
 		require_once(R_P.'require/bbscode.php');
-		$replyDB['content'] = strip_tags(convert($this->escapeStr($replyDB['content']),''));
+		$replyDB['content'] = strip_tags(convert($this->escapeStr(stripWindCode($replyDB['content'])),''));
 		$title = sprintf("[url=%s] %s [/url]",$this->_url,$subject);
 		$descrip = $content = ($replyDB['ifshield'] == 1) ? "该主题已屏蔽" : stripWindCode(substrs($replyDB['content'],100,'N'));
 		$content .= sprintf("------[url=%s] %s [/url]",$this->_url,$subject);

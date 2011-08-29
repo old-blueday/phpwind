@@ -23,7 +23,7 @@ include PrintMode('selecttpl');
 
 function getPreviewImage($dir) {
 	global $tplPath;
-	$imagePath = Pcv($tplPath.$dir.'/images/preview/demo.jpg');
+	$imagePath = S::escapePath($tplPath.$dir.'/images/preview/demo.jpg');
 	return file_exists($imagePath) ? 'mode/area/themes/'.$dir.'/images/preview/demo.jpg' : 'images/100.jpg';
 }
 ?>

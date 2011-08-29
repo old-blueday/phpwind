@@ -41,7 +41,7 @@ class replyPost {
 			return;
 		}
 		if (getstatus($this->tpcArr['tpcstatus'], 1)) {
-			$cyid = $this->db->get_value("SELECT cyid FROM pw_argument WHERE tid=" . pwEscape($this->tpcArr['tid']));
+			$cyid = $this->db->get_value("SELECT cyid FROM pw_argument WHERE tid=" . S::sqlEscape($this->tpcArr['tid']));
 			require_once(R_P . 'apps/groups/lib/colonypost.class.php');
 			$this->extraBehavior = new PwColonyPost($cyid);
 		}
@@ -68,7 +68,7 @@ class replyPost {
 		* 版块权限判断
 		*/
 		if (!$this->getReplyForumRight()) {
-			Showmsg('reply_forum_right');
+			return $this->post->showmsg('reply_forum_right');
 		}
 		if ($this->extraBehavior) {
 			if (($return = $this->extraBehavior->replyCheck()) !== true) {
@@ -92,7 +92,7 @@ class replyPost {
 	 * @return unknown_type
 	 */
 	function setPostFloor($pid) {
-		$sql = "INSERT INTO pw_postsfloor SET pid=" . pwEscape($pid) . ", tid=" . pwEscape($this->tid);
+		$sql = "INSERT INTO pw_postsfloor SET pid=" . S::sqlEscape($pid) . ", tid=" . S::sqlEscape($this->tid);
 		$this->db->update($sql);
 	}
 	
@@ -124,22 +124,25 @@ class replyPost {
 		);
 		$pw_posts = GetPtable($this->tpcArr['ptable']);
 		if ($db_plist && count($db_plist) > 1) {
-			$this->db->update("INSERT INTO pw_pidtmp(pid) VALUES(null)");
-			$pid = $this->db->insert_id();
+			//* $this->db->update("INSERT INTO pw_pidtmp(pid) VALUES(null)");
+			//* $pid = $this->db->insert_id();
+			$uniqueService = L::loadClass ('unique', 'utility');
+			$pid = $uniqueService->getUnique('post');	
 		} else {
 			$pid = '';
 		}
 		$pwSQL['pid'] = $pid;
-		$pwSQL = pwSqlSingle($pwSQL);
-		$this->db->update("INSERT INTO $pw_posts SET $pwSQL");
+		//$pwSQL = S::sqlSingle($pwSQL);
+		//$this->db->update("INSERT INTO $pw_posts SET $pwSQL");
+		pwQuery::insert($pw_posts, $pwSQL);
 		!$pid && $pid = $this->db->insert_id();
 		$this->tpcArr['openIndex'] && $this->setPostFloor($pid);
 		$this->pid = $pid;
 		if (is_object($this->att) && ($aids = $this->att->getAids())) {
-			$this->db->update("UPDATE pw_attachs SET " . pwSqlSingle(array(
+			$this->db->update("UPDATE pw_attachs SET " . S::sqlSingle(array(
 				'tid' => $this->tid,
 				'pid' => $this->pid
-			)) . ' WHERE aid IN(' . pwImplode($aids) . ')');
+			)) . ' WHERE aid IN(' . S::sqlImplode($aids) . ')');
 		}
 		if ($this->data['ifcheck'] == 1) {
 			$sqladd1 = '';
@@ -154,7 +157,8 @@ class replyPost {
 			} elseif ($ret & 1) {
 				$sqladd1 = "ifmail=ifmail-1,";
 			}
-			$this->db->update("UPDATE pw_threads SET {$sqladd1}replies=replies+1,hits=hits+1," . pwSqlSingle($sqladd) . " WHERE tid=" . pwEscape($this->tid));
+			//$this->db->update("UPDATE pw_threads SET {$sqladd1}replies=replies+1,hits=hits+1," . S::sqlSingle($sqladd) . " WHERE tid=" . S::sqlEscape($this->tid));
+			$this->db->update(pwQuery::buildClause("UPDATE :pw_table SET {$sqladd1} replies=replies+1,hits=hits+1," . S::sqlSingle($sqladd) . " WHERE tid = :tid", array('pw_threads',$this->tid)));
 		}
 		$this->post->updateUserInfo($this->type, $this->creditSet(), $this->data['content']);
 		$this->afterReply();
@@ -276,12 +280,16 @@ class replyPost {
 			updateDatanalyse($this->tid, 'threadPost', 1);
 			
 			// memcache refresh
-			$threadsObj = L::loadclass("threads", 'forum');
-			$threadsObj->clearThreadByThreadId($this->tid);
+			// $threadsObj = L::loadclass("threads", 'forum');
+			// $threadsObj->clearThreadByThreadId($this->tid);
 			
 			// memcache refresh
-			$threadlistObj = L::loadclass("threadlist", 'forum');
-			$threadlistObj->updateThreadIdsByForumId($this->forum->fid, $this->tid);
+			// $threadlistObj = L::loadclass("threadlist", 'forum');
+			// $threadlistObj->updateThreadIdsByForumId($this->forum->fid, $this->tid);
+				
+			Perf::gatherInfo('changeThreadWithThreadIds', array('tid'=>$this->tid));
+			Perf::gatherInfo('changeThreadWithForumIds', array('fid'=>$this->forum->fid));		
+			
 		}
 		if ($this->postdata->filter->filter_weight > 1) {
 			$this->postdata->filter->insert($this->tid, $this->pid, implode(',', $this->postdata->filter->filter_word), $this->postdata->filter->filter_weight);

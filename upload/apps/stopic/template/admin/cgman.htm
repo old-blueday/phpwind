@@ -41,7 +41,7 @@ EOT;
 print <<<EOT
  -->
 	<tr class="tr1">
-		<td class="td2"><input name="category_title[$list[id]]" type="text" value="$list[title]" class="input input_wa" /> <a href="$stopic_admin_url&job=$job&action=delete&categoryid=$list[id]">删除</a></td>
+		<td class="td2"><input name="category_title[$list[id]]" type="text" value="$list[title]" class="input input_wa" /> <a href="javascript:" onclick="isDel('$stopic_admin_url&job=$job&action=delete&categoryid=$list[id]')">删除</a></td>
 	</tr>
 <!-- 
 EOT;
@@ -61,6 +61,13 @@ print <<<EOT
 </table>
 </div>
 </form>
+<script language="javascript" type="text/javascript">
+	function isDel(url) {
+		if (confirm('是否确认删除？')) {
+			window.location.href=url;
+		}
+	}
+</script>
 <!--
 EOT;
 ?>

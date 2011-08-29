@@ -251,7 +251,7 @@ EOT;
 			<td>$uinfo[tel]</td>
 		</tr>
 		<tr>
-			<td>邮箱</td>
+			<td>电子邮箱</td>
 			<td>$uinfo[email]</td>
 		</tr>
 		<tr>
@@ -351,7 +351,7 @@ EOT;
 EOT;
 if($type == 'user') {print <<<EOT
 -->
-					<textarea rows="6" style="width:300px" name="atc_content" onkeydown="ajax.quickpost(event,this.form)">我很喜欢用户[url={$db_bbsurl}/u.php?uid={$uid}]{$username}[/url]的个人空间，特别推荐。\n\n他（她）的用户名:\n$title\n\n希望你能喜欢。</textarea>
+					<textarea rows="6" style="width:300px" name="atc_content" onkeydown="ajax.quickpost(event,this.form)">我很喜欢用户[url={$db_bbsurl}/{$db_userurl}{$uid}]{$username}[/url]的个人空间，特别推荐。\n\n他（她）的用户名:\n$title\n\n希望你能喜欢。</textarea>
 <!--
 EOT;
 }else{print <<<EOT
@@ -359,7 +359,7 @@ EOT;
 					<textarea rows="6" style="width:300px" name="atc_content" onkeydown="ajax.quickpost(event,this.form)">
 EOT;
 $uid || $uid = $u;print <<<EOT
-我在用户[url={$db_bbsurl}/u.php?uid={$uid}]{$username}[/url]的个人空间发现这个信息，认为很有价值，特别推荐。\n\n主要信息:\n$title\n\n描述:\n$descrip\n\n希望你能喜欢。</textarea>
+我在用户[url={$db_bbsurl}/{$db_userurl}{$uid}]{$username}[/url]的个人空间发现这个信息，认为很有价值，特别推荐。\n\n主要信息:\n$title\n\n描述:\n$descrip\n\n希望你能喜欢。</textarea>
 <!--
 EOT;
 }print <<<EOT
@@ -570,32 +570,40 @@ print <<<EOT
 		</tbody>
 		<!--
 EOT;
-if ($o_photos_gdcheck) {print <<<EOT
+if ($o_photos_gdcheck) {
+$gdSize = explode("\t",$db_gdsize);
+print <<<EOT
 -->
 		<tr>
 			<td>&nbsp;</td>
 			<td>
 				<div>认证码:</div>
-				<img id="ckcode" style="cursor:pointer;display:none;margin-bottom:5px;" onclick="this.src='ck.php?nowtime='+new Date().getTime();" alt="看不清楚，换一张" /><br />
-				<input class="input" onfocus="showCK();" type="text" name="gdcode" id="gdcode" style="width:50px;" tabindex="3"  />
+				<div id="ckcode" style="display:none;margin-bottom:5px;"></div>
+<script type="text/javascript" language="JavaScript" src="js/pw_authcode.js"></script>
+<script>
+var gdtype = $db_gdtype;
+var flashWidth = "$gdSize[0]";
+var flashHeight = "$gdSize[1]";
+</script>
+				<br />
+				<input class="input" onfocus="showgd();" type="text" name="gdcode" id="gdcode" style="width:50px;" tabindex="3"  />
 			</td>
 		</tr>
-<script language="JavaScript">
-function showCK(){
-	getObj('ckcode').style.display="";
-	if (getObj('ckcode').src.indexOf('ck.php') == -1) {
-		getObj('ckcode').src = 'ck.php?nowtime=' + new Date().getTime();
-	}
-}
-</script>
 <!--
 EOT;
-}if($o_photos_qcheck){print <<<EOT
+}if($db_question && $o_photos_qcheck){
+if($db_imagequestion){
+	$question = sprintf('<img src="ckquestion.php?q=%s">',$qkey);
+}else{
+	$question = $qkey<0 ? getMachineQuestion_1() :  $db_question[$qkey];
+}
+$q_a = $question.($showq && $qkey>0?" 答案:".$db_answer[$qkey] : '');
+print <<<EOT
 -->
 		<tr>
 			<td>&nbsp;</td>
 			<td>
-			<div>验证问题: {$db_question[$qkey]} （正确答案:{$db_answer[$qkey]}）</div>
+			<div>验证问题: {$q_a}</div>
 			<input class="input" name="qanswer" id="qanswer" size="25" tabindex="7" />
 			<input type="hidden" name="qkey" id="qkey" value="$qkey" />
 			</td>
@@ -694,7 +702,7 @@ if($value['ifshowdel']){print<<<EOT
 EOT;
 }print<<<EOT
 -->
-				<a href="javascript:;" class="fr mr10" style="display:none;" onclick="PW_Comment.simpleReply('$type','$id','{$value[username]}');" >回复</a><div class="title">$value[title]&nbsp;-&nbsp;<a href="u.php?uid={$value[uid]}" class="mr5 w">{$value[username]}</a><span class="s6 w">$value[postdate]</span>&nbsp;</div>
+				<a href="javascript:;" class="fr mr10" style="display:none;" onclick="PW_Comment.simpleReply('$type','$id','{$value[username]}');" >回复</a><div class="title">$value[title]&nbsp;-&nbsp;<a href="{$db_userurl}{$value[uid]}" class="mr5 w">{$value[username]}</a><span class="s6 w">$value[postdate]</span>&nbsp;</div>
             </dd>
         </dl>
 <!--
@@ -705,8 +713,8 @@ EOT;
         <dl class="cc">
             <dd class="d">
             	<!--input type="text"  class="replyip" -->
-                <p class="mb5"><textarea id="comm_input_{$type}_{$id}_0" name="title"></textarea></p>
-            	<span class="btn2"><span><button onclick="PW_Comment.sendComment('$type','$id','0','5');" type="button">回复</button></span></span>
+                <p class="mb5"><textarea id="comm_input_{$type}_{$id}_0" name="title"onkeydown="write_quickpost(event)" ></textarea></p>
+            	<span class="btn2"><span><button onclick="PW_Comment.sendComment('$type','$id','0','5');" type="button" id="replybutton">回复</button></span></span>
             </dd>
         </dl>
 	</div>
@@ -717,7 +725,7 @@ EOT;
 if($count>0){print<<<EOT
 -->
 		<dl class="cc" id="commentreplay_{$lastcomment[id]}">
-			<dd class="d"><div class="title"><span>{$lastcomment[title]}</span>&nbsp;-&nbsp;<a href="u.php?uid={$lastcomment[uid]}" class="mr5 w">{$lastcomment[username]}</a><span class="s6 w">{$lastcomment[postdate]}</span></div></dd>
+			<dd class="d"><div class="title"><span>{$lastcomment[title]}</span>&nbsp;-&nbsp;<a href="{$db_userurl}{$lastcomment[uid]}" class="mr5 w">{$lastcomment[username]}</a><span class="s6 w">{$lastcomment[postdate]}</span></div></dd>
 		</dl>
 		<dl class="cc">
 			<dd class="d"><a id="com_$value[id]" href="javascript:;" class="s6" onclick="PW_Comment.showCommList('groupwrite','$id',getObj('a_write_{$id}'))">全部{$count}条回复&raquo;</a></dd>
@@ -765,6 +773,12 @@ function getonmouseout(){
 	} catch(e){}
 };
 getonmouseout();
+function write_quickpost(event){
+	if((event.ctrlKey && event.keyCode == 13) || (event.altKey && event.keyCode == 83)){
+		getObj('replybutton').click();
+	}
+}
+
 </script>
 <!--
 EOT;
@@ -777,7 +791,7 @@ EOT;
 foreach($comment as $key => $value){print<<<EOT
 -->
         <dl class="cc" id="comment_{$value[id]}">
-            <dt><a href="u.php?uid={$value[uid]}" class="img_25"><i><img src="{$value[face]}" width="18" height="18" /></i></a></dt>
+            <dt><a href="{$db_userurl}{$value[uid]}" class="img_25"><i><img src="{$value[face]}" width="18" height="18" /></i></a></dt>
             <dd>
 <!--
 EOT;
@@ -789,7 +803,7 @@ EOT;
 }print<<<EOT
 -->
             <p class="title"><a id="huifu_{$value[id]}" class="arep fr cp" style="display: none;">回复</a>
-            <span class="gray mr5 fr">$value[postdate]</span><a href="u.php?uid={$value[uid]}" class="mr5">{$value[username]}</a>$value[title]</p></dd>
+            <span class="gray mr5 fr">$value[postdate]</span><a href="{$db_userurl}{$value[uid]}" class="mr5">{$value[username]}</a>$value[title]</p></dd>
         </dl>
 <!--
 EOT;
@@ -812,11 +826,11 @@ print <<<EOT
 -->
 <div class="redlA">
     <dl class="cc" id="comment_$insertid">
-        <dt><a href="u.php?uid={$winduid}" class="img_25"><i><img src="$face" width="18" height="18" /></i></a></dt>
+        <dt><a href="{$db_userurl}{$winduid}" class="img_25"><i><img src="$face" width="18" height="18" /></i></a></dt>
         <dd>
         	<a href="javascript:;" onclick="pwConfirm('你确定要删除吗？',this,function(){ajax.send('apps.php?q=ajax&a=commdel','id=$insertid',PW_Comment.delOneCommentResponse);});" class="adel fr" id="del_{$insertid}">删除</a>
         	<span class="gray mr5 fr">$postdate</span>
-        	<a href="u.php?uid={$winduid}" class="mr5">{$windid}</a>：$title
+        	<a href="{$db_userurl}{$winduid}" class="mr5">{$windid}</a>：$title
         </dd>
     </dl>
 </div>
@@ -862,7 +876,7 @@ EOT;
         <dt><a href="u.php"><img src="$face" width="30" height="30" /></a></dt>
         <dd>
         	<a onclick="pwConfirm('你确定要删除吗？',this,function(){ajax.send('apps.php?q=ajax&a=commdel','id=$insertid',PW_Comment.delOneCommentResponse);});" class="adel" href="javascript:;">删除</a>
-					<p class="mb5 f14"><a href="u.php?uid=$comment[uid]">{$windid}</a>：$title</p>
+					<p class="mb5 f14"><a href="{$db_userurl}$comment[uid]">{$windid}</a>：$title</p>
 				<cite class="gray">{$postdate}</cite>
         </dd>
     </dl>
@@ -875,7 +889,7 @@ EOT;
     <dl class="cc" id="comment_$insertid">
         <dd class="d">
 			<a class="adel fr" href="javascript:;" onclick="pwConfirm('你确定要删除吗？',this,function(){ajax.send('apps.php?q=ajax&a=commdel','id=$insertid',PW_Comment.delOneCommentResponse);});" id="del_$insertid">删除</a>
-        	<div class="title">$title&nbsp;-&nbsp;<a href="u.php?uid=$winduid" class="mr5 w">{$windid}</a><span class="s6 w">{$postdate}</span></div>
+        	<div class="title">$title&nbsp;-&nbsp;<a href="{$db_userurl}$winduid" class="mr5 w">{$windid}</a><span class="s6 w">{$postdate}</span></div>
         </dd>
     </dl>
 </div>
@@ -885,10 +899,10 @@ EOT;
 print <<<EOT
 -->
 <dl class="cc dl" id="board_{$thisid}">
-	<dt class="dt"><a href="u.php?uid={$winduid}" class="img_50"><i><img src="{$myface}" /></i></a></dt>
+	<dt class="dt"><a href="{$db_userurl}{$winduid}" class="img_50"><i><img src="{$myface}" /></i></a></dt>
     <dd class="dd">
     	<a href="javascript:;" onclick="pwConfirm('是否确定删除本条留言',this,function(){delBoard('{$thisid}')})" title="删除" class="adel">删除</a>
-    	<p class="title"><a href="u.php?uid={$winduid}" class="atitle">{$windid}</a>：{$title}</p>
+    	<p class="title"><a href="{$db_userurl}{$winduid}" class="atitle">{$windid}</a>：{$title}</p>
 	    <cite class="gray">{$postdate}</cite><span> - </span>
     	<a href="javascript:;" onclick="PW_Comment.createCommentInput('board',{$thisid},0)" class="reA">回复</a>
         <div id="commentbox_{$thisid}_0">

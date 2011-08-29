@@ -11,7 +11,7 @@ function getOneFriend($friendid){
 	global $db,$winduid;
 	!$winduid && Showmsg('not_login');
 	$friendid = (int) $friendid;
-	$friend = $db->get_one("SELECT m.uid,m.username,m.icon,m.honor,md.f_num FROM pw_friends f LEFT JOIN pw_members m ON f.friendid=m.uid LEFT JOIN pw_memberdata md ON f.friendid=md.uid WHERE f.uid=".pwEscape($winduid)." AND f.friendid=".pwEscape($friendid)." AND f.status=0");
+	$friend = $db->get_one("SELECT m.uid,m.username,m.icon,m.honor,md.f_num FROM pw_friends f LEFT JOIN pw_members m ON f.friendid=m.uid LEFT JOIN pw_memberdata md ON f.friendid=md.uid WHERE f.uid=".S::sqlEscape($winduid)." AND f.friendid=".S::sqlEscape($friendid)." AND f.status=0");
 	if ($friend) {
 		require_once(R_P.'require/showimg.php');
 		list($friend['face']) = showfacedesign($friend['icon'],1);
@@ -24,7 +24,7 @@ function getOneFriend($friendid){
 
 function isFriend($uid,$friend) {
 	global $db;
-	if ($db->get_value("SELECT uid FROM pw_friends WHERE uid=" . pwEscape($uid) . ' AND friendid=' . pwEscape($friend) . " AND status='0'")) {
+	if ($db->get_value("SELECT uid FROM pw_friends WHERE uid=" . S::sqlEscape($uid) . ' AND friendid=' . S::sqlEscape($friend) . " AND status='0'")) {
 		return true;
 	}
 	return false;
@@ -56,7 +56,7 @@ function getOneInfo($uid){
 function getLastPid($aid, $num = 5) {
 	global $db;
 	$lastpid = array();
-	$query = $db->query("SELECT pid FROM pw_cnphoto WHERE aid=" . pwEscape($aid) . " ORDER BY pid DESC LIMIT $num");
+	$query = $db->query("SELECT pid FROM pw_cnphoto WHERE aid=" . S::sqlEscape($aid) . " ORDER BY pid DESC LIMIT $num");
 	while ($rt = $db->fetch_array($query)) {
 		$lastpid[] = $rt['pid'];
 	}
@@ -196,14 +196,14 @@ function delComment($type,$typeid){
 	global $db;
 	$affected_rows = 0;
 	if (checkCommType($type)){
-		$db->update("DELETE FROM pw_comment WHERE type=".pwEscape($type)." AND typeid=".pwEscape($typeid));
+		$db->update("DELETE FROM pw_comment WHERE type=".S::sqlEscape($type)." AND typeid=".S::sqlEscape($typeid));
 		$affected_rows = $db->affected_rows();
 	}
 	return $affected_rows;
 }
 function delFeed($type,$typeid){
 	global $db;
-	$db->update("DELETE FROM pw_feed WHERE type=".pwEscape($type)." AND typeid=".pwEscape($typeid));
+	$db->update("DELETE FROM pw_feed WHERE type=".S::sqlEscape($type)." AND typeid=".S::sqlEscape($typeid));
 	$affected_rows = $db->affected_rows();
 	return $affected_rows;
 }
@@ -250,9 +250,11 @@ function countPosts($exp='+1') {
 	global $db;
 	$num = intval(trim($exp,'+-'));
 	if (strpos($exp,'+') !== false) {
-		$db->update("UPDATE pw_bbsinfo SET o_post=o_post+".pwEscape($num,false).",o_tpost=o_tpost+".pwEscape($num,false));
+		//* $db->update("UPDATE pw_bbsinfo SET o_post=o_post+".S::sqlEscape($num,false).",o_tpost=o_tpost+".S::sqlEscape($num,false));
+		$db->update(pwQuery::buildClause("UPDATE :pw_table SET o_post=o_post+".S::sqlEscape($num,false).",o_tpost=o_tpost+".S::sqlEscape($num,false), array('pw_bbsinfo')));
 	} else {
-		$db->update("UPDATE pw_bbsinfo SET o_post=o_post-".pwEscape($num,false).",o_tpost=o_tpost-".pwEscape($num,false));
+		//* $db->update("UPDATE pw_bbsinfo SET o_post=o_post-".S::sqlEscape($num,false).",o_tpost=o_tpost-".S::sqlEscape($num,false));
+		$db->update(pwQuery::buildClause("UPDATE :pw_table SET o_post=o_post-".S::sqlEscape($num,false).",o_tpost=o_tpost-".S::sqlEscape($num,false), array('pw_bbsinfo')));
 	}
 }
 
@@ -284,7 +286,7 @@ function banUser(){
 	if ($groupid == 6) {
 		$flag  = 0;
 		$bandb = $delban = array();
-		$query = $db->query("SELECT * FROM pw_banuser WHERE uid=".pwEscape($winduid)." AND fid='0'");
+		$query = $db->query("SELECT * FROM pw_banuser WHERE uid=".S::sqlEscape($winduid)." AND fid='0'");
 		while ($rt = $db->fetch_array($query)) {
 			if ($rt['type'] == 1 && $timestamp - $rt['startdate'] > $rt['days']*86400) {
 				$delban[] = $rt['id'];
@@ -292,13 +294,13 @@ function banUser(){
 				$bandb = $rt;
 			}
 		}
-		$delban && $db->update('DELETE FROM pw_banuser WHERE id IN('.pwImplode($delban).')');
+		$delban && $db->update('DELETE FROM pw_banuser WHERE id IN('.S::sqlImplode($delban).')');
 		if ($groupid == 6 && !isset($bandb)) {
 			$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
 			$userService->update($winduid, array('groupid' => -1));
 
-			$_cache = getDatastore();
-			$_cache->delete('UID_'.$winduid);
+			//* $_cache = getDatastore();
+			//* $_cache->delete('UID_'.$winduid);
 		}
 		if ($bandb) {
 			if ($bandb['type'] == 1) {
@@ -319,7 +321,7 @@ function banUser(){
 	}
 	if (GetCookie('force') && $winduid != GetCookie('force')) {
 		$force = GetCookie('force');
-		$bandb = $db->get_one("SELECT type FROM pw_banuser WHERE uid=".pwEscape($force)." AND fid='0'");
+		$bandb = $db->get_one("SELECT type FROM pw_banuser WHERE uid=".S::sqlEscape($force)." AND fid='0'");
 		if ($bandb['type'] == 3) {
 			Showmsg('ban_info3');
 		} else {
@@ -397,8 +399,8 @@ function updateMemberid($uid,$isown = true){
 		$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
 		$userService->update($uid, array('memberid' => $memberid));
 
-		$_cache = getDatastore();
-		$_cache->delete('UID_'.$uid);
+		//* $_cache = getDatastore();
+		//* $_cache->delete('UID_'.$uid);
 	}
 }
 
@@ -411,11 +413,11 @@ function addLog($creditlog,$username,$uid,$logtype){
 
 		if (isset($credit->cType[$key]) && $affect<>0 && isset($creditlog[$key])) {
 
-			$log['username'] = Char_cv($username);
+			$log['username'] = S::escapeChar($username);
 			$log['cname']	 = $credit->cType[$key];
 			$log['affect']	 = $affect;
 			$log['affect'] > 0 && $log['affect'] = '+'.$log['affect'];
-			$log['descrip'] = Char_cv(getLangInfo('creditlog',$logtype,$log));
+			$log['descrip'] = S::escapeChar(getLangInfo('creditlog',$logtype,$log));
 
 			$credit_pop .= $key.":".$log['affect'].'|';
 			$cLog[] = array($uid, $log['username'], $key, $affect, $timestamp, $logtype, $onlineip, $log['descrip']);
@@ -427,7 +429,7 @@ function addLog($creditlog,$username,$uid,$logtype){
 		$userService->update($uid, array(), array('creditpop' => $credit_pop));
 	}
 	if (!empty($cLog)) {
-		$db->update("INSERT INTO pw_creditlog (uid,username,ctype,affect,adddate,logtype,ip,descrip) VALUES ".pwSqlMulti($cLog,false));
+		$db->update("INSERT INTO pw_creditlog (uid,username,ctype,affect,adddate,logtype,ip,descrip) VALUES ".S::sqlMulti($cLog,false));
 	}
 	$cLog = array();
 }
@@ -447,23 +449,23 @@ function updateUserAppNum($uids,$type,$action='add',$num=0){
 
 	if ($action == 'recount') {
 		if ($type == 'diary') {
-			$query = $db->query("SELECT uid,COUNT(*) as count FROM pw_diary WHERE uid IN (".pwImplode($uids).") GROUP BY uid");
+			$query = $db->query("SELECT uid,COUNT(*) as count FROM pw_diary WHERE uid IN (".S::sqlImplode($uids).") GROUP BY uid");
 		} elseif ($type == 'photo') {
-			$query = $db->query("SELECT ca.ownerid as uid,COUNT(*) as count FROM pw_cnphoto cn LEFT JOIN pw_cnalbum ca ON cn.aid=ca.aid WHERE ca.atype='0' AND ca.ownerid IN (".pwImplode($uids).") GROUP BY ca.ownerid");
+			$query = $db->query("SELECT ca.ownerid as uid,COUNT(*) as count FROM pw_cnphoto cn LEFT JOIN pw_cnalbum ca ON cn.aid=ca.aid WHERE ca.atype='0' AND ca.ownerid IN (".S::sqlImplode($uids).") GROUP BY ca.ownerid");
 		} elseif ($type == 'owrite') {
-			$query = $db->query("SELECT uid,COUNT(*) as count FROM pw_owritedata WHERE uid IN (".pwImplode($uids).") GROUP BY uid");
+			$query = $db->query("SELECT uid,COUNT(*) as count FROM pw_owritedata WHERE uid IN (".S::sqlImplode($uids).") GROUP BY uid");
 		} elseif ($type == 'group') {
-			 $query = $db->query("SELECT uid,COUNT(*) as count FROM pw_cmembers WHERE uid IN (".pwImplode($uids).") AND ifadmin!= '-1' GROUP BY uid");
+			 $query = $db->query("SELECT uid,COUNT(*) as count FROM pw_cmembers WHERE uid IN (".S::sqlImplode($uids).") AND ifadmin!= '-1' GROUP BY uid");
 		} elseif ($type == 'share') {
-			$query = $db->query("SELECT uid, COUNT(*) as count FROM pw_share WHERE uid IN (".pwImplode($uids).") GROUP BY uid");
+			$query = $db->query("SELECT uid, COUNT(*) as count FROM pw_share WHERE uid IN (".S::sqlImplode($uids).") GROUP BY uid");
 		}
 		while ($rt = $db->fetch_array($query)) {
 			$uid = $rt['uid'];
 			$count = $rt['count'];
 			$db->pw_update(
-				"SELECT * FROM pw_ouserdata WHERE uid=".pwEscape($uid),
-				"UPDATE pw_ouserdata SET ".pwSqlSingle(array($keyname => $count))." WHERE uid=".pwEscape($uid),
-				"INSERT INTO pw_ouserdata SET ".pwSqlSingle(array('uid' => $uid,$keyname => $count))
+				"SELECT * FROM pw_ouserdata WHERE uid=".S::sqlEscape($uid),
+				"UPDATE pw_ouserdata SET ".S::sqlSingle(array($keyname => $count))." WHERE uid=".S::sqlEscape($uid),
+				"INSERT INTO pw_ouserdata SET ".S::sqlSingle(array('uid' => $uid,$keyname => $count))
 			);
 		}
 	} elseif ($action == 'add') {
@@ -474,15 +476,15 @@ function updateUserAppNum($uids,$type,$action='add',$num=0){
 		foreach ($userService->getByUserIds($uids) as $rt) {
 			$uid = $rt['uid'];
 			$db->pw_update(
-				"SELECT * FROM pw_ouserdata WHERE uid=".pwEscape($uid),
-				"UPDATE pw_ouserdata SET $keyname = $keyname + $num,$lastpost_keyname = '$timestamp' WHERE uid=".pwEscape($uid),
-				"INSERT INTO pw_ouserdata SET ".pwSqlSingle(array('uid' => $uid,$keyname => $num,$lastpost_keyname => $timestamp))
+				"SELECT * FROM pw_ouserdata WHERE uid=".S::sqlEscape($uid),
+				"UPDATE pw_ouserdata SET $keyname = $keyname + $num,$lastpost_keyname = '$timestamp' WHERE uid=".S::sqlEscape($uid),
+				"INSERT INTO pw_ouserdata SET ".S::sqlSingle(array('uid' => $uid,$keyname => $num,$lastpost_keyname => $timestamp))
 			);
 		}
 	} elseif ($action == 'minus') {
 		$num < 1 && $num = 1;
-		$db->update("UPDATE pw_ouserdata SET {$keyname}={$keyname}-" . pwEscape($num). " WHERE uid IN(" . pwImplode($uids) . ") AND {$keyname}>=" . pwEscape($num));
-		$db->update("UPDATE pw_ouserdata SET {$keyname}=0 WHERE uid IN(" . pwImplode($uids) . ") AND {$keyname}<" . pwEscape($num));
+		$db->update("UPDATE pw_ouserdata SET {$keyname}={$keyname}-" . S::sqlEscape($num). " WHERE uid IN(" . S::sqlImplode($uids) . ") AND {$keyname}>=" . S::sqlEscape($num));
+		$db->update("UPDATE pw_ouserdata SET {$keyname}=0 WHERE uid IN(" . S::sqlImplode($uids) . ") AND {$keyname}<" . S::sqlEscape($num));
 	}
 }
 
@@ -494,7 +496,7 @@ function getCommentDb($type,$typeids){
 	global $db,$groupid,$db_shield;
 	if(!checkCommType($type)) Showmsg('undefined_action');
 	$wordsfb = L::loadClass('FilterUtil', 'filter');
-	$query = $db->query("SELECT c.id,c.uid,c.username,c.title,c.postdate,c.typeid,c.ifwordsfb,m.icon as face,m.groupid FROM pw_comment c LEFT JOIN pw_members m ON c.uid=m.uid WHERE c.type=".pwEscape($type)." AND c.typeid IN (".pwImplode($typeids).") ORDER BY postdate ASC");
+	$query = $db->query("SELECT c.id,c.uid,c.username,c.title,c.postdate,c.typeid,c.ifwordsfb,m.icon as face,m.groupid FROM pw_comment c LEFT JOIN pw_members m ON c.uid=m.uid WHERE c.type=".S::sqlEscape($type)." AND c.typeid IN (".S::sqlImplode($typeids).") ORDER BY postdate ASC");
 	while ($rt = $db->fetch_array($query)) {
 		$rt['postdate'] = get_date($rt['postdate']);
 		list($rt['face'])	=  showfacedesign($rt['face'],1,'m');
@@ -517,11 +519,11 @@ function getCommentDbByTypeid($type,$typeid,$page,$url) {
 	if(!checkCommType($type)) Showmsg('undefined_action');
 	$wordsfb = L::loadClass('FilterUtil', 'filter');
 	$commentdb = $subcommentdb = array();
-	$count = $db->get_value("SELECT COUNT(*) FROM pw_comment WHERE type=".pwEscape($type)." AND typeid=".pwEscape($typeid)." AND upid='0'");
+	$count = $db->get_value("SELECT COUNT(*) FROM pw_comment WHERE type=".S::sqlEscape($type)." AND typeid=".S::sqlEscape($typeid)." AND upid='0'");
 	$numofpage = ceil($count/$db_perpage);
 	$start = ($page-1) * $db_perpage;
-	$limit = pwLimit($start,$db_perpage);
-	$query = $db->query("SELECT c.id,c.uid,c.username,c.title,c.postdate,c.typeid,c.upid,c.ifwordsfb,m.icon as face,m.groupid FROM pw_comment c LEFT JOIN pw_members m ON c.uid=m.uid WHERE c.type=".pwEscape($type)." AND c.typeid=".pwEscape($typeid)." AND upid='0' ORDER BY postdate DESC $limit");
+	$limit = S::sqlLimit($start,$db_perpage);
+	$query = $db->query("SELECT c.id,c.uid,c.username,c.title,c.postdate,c.typeid,c.upid,c.ifwordsfb,m.icon as face,m.groupid FROM pw_comment c LEFT JOIN pw_members m ON c.uid=m.uid WHERE c.type=".S::sqlEscape($type)." AND c.typeid=".S::sqlEscape($typeid)." AND upid='0' ORDER BY postdate DESC $limit");
 	while ($rt = $db->fetch_array($query)) {
 		$rt['postdate'] = get_date($rt['postdate']);
 		list($rt['face'])	=  showfacedesign($rt['face'],1,'m');
@@ -544,7 +546,7 @@ function getCommentDbByTypeid($type,$typeid,$page,$url) {
 		$commentdb[$rt['id']] = $rt;
 	}
 	if ($commentids) {
-		$query = $db->query("SELECT c.id,c.uid,c.username,c.title,c.postdate,c.typeid,c.upid,c.ifwordsfb,m.icon as face,m.groupid FROM pw_comment c LEFT JOIN pw_members m ON c.uid=m.uid WHERE c.type=".pwEscape($type)." AND c.typeid=".pwEscape($typeid)." AND upid IN (".pwImplode($commentids).") ORDER BY postdate ASC");
+		$query = $db->query("SELECT c.id,c.uid,c.username,c.title,c.postdate,c.typeid,c.upid,c.ifwordsfb,m.icon as face,m.groupid FROM pw_comment c LEFT JOIN pw_members m ON c.uid=m.uid WHERE c.type=".S::sqlEscape($type)." AND c.typeid=".S::sqlEscape($typeid)." AND upid IN (".S::sqlImplode($commentids).") ORDER BY postdate ASC");
 		while ($rt = $db->fetch_array($query)) {
 			$rt['postdate'] = get_date($rt['postdate']);
 			list($rt['face'])	=  showfacedesign($rt['face'],1,'m');
@@ -571,7 +573,7 @@ function getCommentDbByTypeid($type,$typeid,$page,$url) {
 function getAppleftinfo($u,$type=false) {
 	global $db,$db_plist,$winduid,$db_upgrade,$credit;
 	$userdb = array();
-	$userdb = $db->get_one("SELECT m.uid,m.username,m.email,m.groupid,m.icon,md.rvrc,md.money,md.credit,md.currency,md.digests,md.postnum,md.lastpost,md.onlinetime,ud.diarynum,ud.photonum,ud.owritenum,ud.groupnum,ud.sharenum,ud.diary_lastpost,ud.photo_lastpost,ud.owrite_lastpost,ud.group_lastpost,ud.share_lastpost FROM pw_members m LEFT JOIN pw_memberdata md ON m.uid=md.uid LEFT JOIN pw_ouserdata ud ON m.uid=ud.uid WHERE m.uid=".pwEscape($u));
+	$userdb = $db->get_one("SELECT m.uid,m.username,m.email,m.groupid,m.icon,md.rvrc,md.money,md.credit,md.currency,md.digests,md.postnum,md.lastpost,md.onlinetime,ud.diarynum,ud.photonum,ud.owritenum,ud.groupnum,ud.sharenum,ud.diary_lastpost,ud.photo_lastpost,ud.owrite_lastpost,ud.group_lastpost,ud.share_lastpost FROM pw_members m LEFT JOIN pw_memberdata md ON m.uid=md.uid LEFT JOIN pw_ouserdata ud ON m.uid=ud.uid WHERE m.uid=".S::sqlEscape($u));
 
 	$ismyfriend = isFriend($winduid,$u);
 	$friendcheck = getstatus($userdb['userstatus'], PW_USERSTATUS_CFGFRIEND, 3);
@@ -629,7 +631,7 @@ function pwLimitPages($count,$page,$pageurl) {
 	$numofpage = ($db_maxpage && $numofpage > $db_maxpage) ? $db_maxpage : $numofpage;
 	$page < 1 ? $page = 1 : ($page > $numofpage ? $page = $numofpage : null);
 	$pages = numofpage($count,$page,$numofpage,$pageurl,$db_maxpage);
-	$limit = pwLimit(($page-1) * $db_perpage,$db_perpage);
+	$limit = S::sqlLimit(($page-1) * $db_perpage,$db_perpage);
 	return array($pages,$limit);
 }
 
@@ -649,7 +651,7 @@ function updateGroupLevel($cyid, $gdb = array()) {
 		}
 	}
 	if ($lid <> $gdb['commonlevel']) {
-		$GLOBALS['db']->update("UPDATE pw_colonys SET commonlevel=" . pwEscape($lid) . ' WHERE id=' . pwEscape($cyid));
+		$GLOBALS['db']->update("UPDATE pw_colonys SET commonlevel=" . S::sqlEscape($lid) . ' WHERE id=' . S::sqlEscape($cyid));
 	}
 }
 ?>

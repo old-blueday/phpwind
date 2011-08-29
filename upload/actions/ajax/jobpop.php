@@ -4,7 +4,7 @@
 if (!$db_job_isopen || !$winduid) {
 	exit();
 }
-initGP(array("v", "job"));
+S::gp(array("v", "job"));
 if ($job == "cookie") {
 	$v = (in_array($v, array(0, 1))) ? $v : 0; /*设置cookie*/
 	Cookie("jobpop", $v);

@@ -202,6 +202,13 @@ New = function(aClass, aParams) {
 	new_.prototype = aClass;
 	return  new new_();
 };
+function openNewUrl(id,name,url){
+	parent.PW.Dialog({
+		'id': id,
+		'name': name,
+		'url': url
+	}).loadIframe(url);
+}
 </script>
 <!--
 EOT;

@@ -47,7 +47,7 @@ if (!$action) {
 
 	} elseif ($_POST['step'] == '3') {
 
-		InitGP(array('ttable'),'P');
+		S::gp(array('ttable'),'P');
 		if (is_array($ttable)) {
 			$ttable = arraySort($ttable,1);
 			foreach ($ttable as $key => $value) {
@@ -62,7 +62,7 @@ if (!$action) {
 
 	} elseif ($_POST['step'] == '5') {
 
-		InitGP(array('ktable','plistdb'),'P');
+		S::gp(array('ktable','plistdb'),'P');
 		setConfig('db_ptable', $ktable);
 
 		$plist = array();
@@ -129,7 +129,7 @@ if (!$action) {
 		}
 		if ($i == 1) {
 			extract($db->get_one("SELECT MAX(pid) AS pid FROM pw_posts"));
-			$db->update("REPLACE INTO pw_pidtmp SET pid=".pwEscape($pid,false));
+			$db->update("REPLACE INTO pw_pidtmp SET pid=".S::sqlEscape($pid,false));
 			$num = 1;
 		} else{
 			$num = max($num_a)+1;
@@ -147,7 +147,7 @@ if (!$action) {
 
 } elseif ($action == 'movedata') {
 
-	InitGP(array('step'));
+	S::gp(array('step'));
 
 	if (!$step) {
 
@@ -165,7 +165,7 @@ if (!$action) {
 		$pwServer['REQUEST_METHOD'] != 'POST' && PostCheck($verify);
 		set_time_limit(0);
 		$db_bbsifopen && adminmsg('bbs_open');
-		InitGP(array('tstart','tend','tfrom','tto','lines'));
+		S::gp(array('tstart','tend','tfrom','tto','lines'));
 
 		$tfrom = (int) $tfrom;
 		$tto   = (int) $tto;
@@ -182,25 +182,33 @@ if (!$action) {
 		}
 		$end = $tstart + $lines;
 		$end > $tend && $end = $tend;
-		$db->update("INSERT INTO $ttable SELECT * FROM $ftable WHERE tid>".pwEscape($tstart).'AND tid<='.pwEscape($end));
-		$db->update("DELETE FROM $ftable WHERE tid>".pwEscape($tstart)."AND tid<=".pwEscape($end));
-		$db->update("UPDATE pw_threads SET ptable=".pwEscape($tto)."WHERE tid>".pwEscape($tstart)."AND tid<=".pwEscape($end)."AND ptable=".pwEscape($tfrom));
-
+		$db->update("INSERT INTO $ttable SELECT * FROM $ftable WHERE tid>".S::sqlEscape($tstart).'AND tid<='.S::sqlEscape($end));
+		//$db->update("DELETE FROM $ftable WHERE tid>".S::sqlEscape($tstart)."AND tid<=".S::sqlEscape($end));
+		pwQuery::delete($ftable, 'tid>:tid1 AND tid<=:tid2', array($tstart, $end));
+		//$db->update("UPDATE pw_threads SET ptable=".S::sqlEscape($tto)."WHERE tid>".S::sqlEscape($tstart)."AND tid<=".S::sqlEscape($end)."AND ptable=".S::sqlEscape($tfrom));
+		pwQuery::update('pw_threads', 'tid>:tid AND tid<=:end AND ptable=:ptable', array($tstart, $end, $tfrom), array('ptable'=>$tto));
+		Perf::gatherInfo('changeThreadListWithThreadIds', array('tid'=>$tstart+1));
 		if ($end < $tend) {
 			$step++;
 			$j_url="$basename&action=$action&step=$step&tstart=$end&tend=$tend&tfrom=$tfrom&tto=$tto&lines=$lines";
 			adminmsg('table_change',EncodeUrl($j_url),2);
 		} else {
 
-			$_cache = getDatastore();
-			$_cache->flush();
-
+			//* $_cache = getDatastore();
+			//* $_cache->flush();
+			$_cacheService = perf::gatherCache('pw_membersdbcache');
+			$_cacheService->flush();
+			if (Perf::checkMemcache()){
+				$_cacheService = L::loadClass('cacheservice', 'utility');
+				$_cacheService->flush(PW_CACHE_MEMCACHE);			
+			}
+			
 			adminmsg('operate_success');
 		}
 	}
 } elseif ($action == 'movetmsg') {
 
-	InitGP(array('step','id'));
+	S::gp(array('step','id'));
 	$tlistdb = $db_tlist;
 
 	if (!$step) {
@@ -220,7 +228,7 @@ if (!$action) {
 		$pwServer['REQUEST_METHOD']!='POST' && PostCheck($verify);
 		set_time_limit(0);
 		$db_bbsifopen && adminmsg('bbs_open');
-		InitGP(array('tstart','lines','tmax','tmin'));
+		S::gp(array('tstart','lines','tmax','tmin'));
 		list($tidmin,$tidmax) = maxmin($id);
 		!$lines && $lines=5000;
 
@@ -242,8 +250,8 @@ if (!$action) {
 		$ftable = 'pw_tmsgs'.$id;
 		$ftable == $ttable && adminmsg('table_same');
 
-		$db->update("INSERT INTO $ttable SELECT * FROM $ftable WHERE tid>".pwEscape($tstart).'AND tid<='.pwEscape($end));
-		$db->update("DELETE FROM $ftable WHERE tid>".pwEscape($tstart).'AND tid<='.pwEscape($end));
+		$db->update("INSERT INTO $ttable SELECT * FROM $ftable WHERE tid>".S::sqlEscape($tstart).'AND tid<='.S::sqlEscape($end));
+		$db->update("DELETE FROM $ftable WHERE tid>".S::sqlEscape($tstart).'AND tid<='.S::sqlEscape($end));
 
 		if ($end < $tend) {
 			$j_url = "$basename&action=$action&step=$step&tstart=$end&lines=$lines&tmax=$tmax&tmin=$tmin&id=$id";
@@ -258,7 +266,7 @@ if (!$action) {
 	}
 } elseif ($action == 'delttable') {
 
-	InitGP('id','GP',2);
+	S::gp('id','GP',2);
 	$rt = $db->get_one("SHOW TABLE STATUS LIKE 'pw_tmsgs$id'");
 	if ($rt && $rt['Rows']) {
 		adminmsg('deltable_error2');
@@ -273,7 +281,7 @@ if (!$action) {
 
 } elseif ($action == 'delptable') {
 
-	InitGP('id','GP',2);
+	S::gp('id','GP',2);
 	if ($id == $db_ptable) {
 		adminmsg('delptable_error');
 	}

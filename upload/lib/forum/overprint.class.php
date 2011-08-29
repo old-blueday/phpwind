@@ -105,7 +105,7 @@ class PW_OverPrint {
 	}
 	function getOverPrintByThreadId($tid) {
 		$pw_tmsgs = GetTtable($tid);
-		return $this->_db->get_value("SELECT overprint FROM $pw_tmsgs WHERE tid=" . pwEscape($tid) . " LIMIT 1");
+		return $this->_db->get_value("SELECT overprint FROM $pw_tmsgs WHERE tid=" . S::sqlEscape($tid) . " LIMIT 1");
 	}
 	/**
 	 * 初始化获取帖子印戳
@@ -130,7 +130,8 @@ class PW_OverPrint {
 	}
 	function overprintThread($tid, $related) {
 		$pw_tmsgs = GetTtable($tid);
-		return $this->_db->update("UPDATE $pw_tmsgs SET overprint=" . pwEscape($related) . " WHERE tid=" . pwEscape($tid) . " LIMIT 1");
+		//* return $this->_db->update("UPDATE $pw_tmsgs SET overprint=" . S::sqlEscape($related) . " WHERE tid=" . S::sqlEscape($tid) . " LIMIT 1");
+		return pwQuery::update($pw_tmsgs, 'tid=:tid', array($tid), array('overprint'=>$related));
 	}
 	function getunRelatedsHTML($fid, $tid) {
 		$isOverPrint = $this->getOverPrintByThreadId($tid);
@@ -180,8 +181,9 @@ class PW_OverPrint {
 		}
 		$overPrintDao = $this->_getOverPrintDao();
 		$overPrints = $overPrintDao->getAll();
-		$overPrints = "\$overPrints=" . pw_var_export($overPrints) . ";";
-		writeover($this->getCacheFileName(), "<?php\r\n" . $overPrints . "\r\n?>");
+		$tmp_overPrints = "\$overPrints=" . pw_var_export($overPrints) . ";";
+		pwCache::setData($this->getCacheFileName(), "<?php\r\n" . $tmp_overPrints . "\r\n?>");
+		return $overPrints;
 	}
 	/**
 	 * 获取文件缓存
@@ -190,11 +192,11 @@ class PW_OverPrint {
 		if (!$this->_cache) {
 			return array();
 		}
-		include Pcv($this->getCacheFileName());
+		@include S::escapePath($this->getCacheFileName());
 		return $overPrints;
 	}
 	function getCacheFileName() {
-		return D_P . "data/bbscache/" . $this->_filename;
+		return pwCache::getPath(D_P . "data/bbscache/" . $this->_filename);
 	}
 	function getIconPath() {
 		return "images/overprint";
@@ -317,13 +319,15 @@ class PW_OverPrint {
 		}
 		return $result;
 	}
-	function getOverPrints() {
-		$overPrints = $this->getFileCache();
-		if ($overPrints) {
-			return $overPrints;
+	function getOverPrints($usercache = true) {
+		if($usercache){
+			$overPrints = $this->getFileCache();
+			if ($overPrints) {
+				return $overPrints;
+			}
 		}
-		$overPrintDao = $this->_getOverPrintDao();
-		return $overPrintDao->getAll();
+		$overPrints =  $this->setFileCache();
+		return ($overPrints) ? $overPrints : array();
 	}
 	function deleteOverPrint($id) {
 		$overPrintDao = $this->_getOverPrintDao();

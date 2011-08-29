@@ -133,9 +133,23 @@ if ($job == 'join'){print <<<EOT
 	<tr><td>匿名：</td><td><label for="anonymous"><input id="anonymous" type="checkbox" name="anonymous" value="1" />仅管理人员可见</label></td></tr>
 </table>
 <div class="popBottom">
-	<span class="btn2"><span><button name="ajaxsubmit" onclick="ajax.submit(this.form);" type="button">确认报名</button></span></span>
+	<span class="btn2"><span><button name="ajaxsubmit" onclick="return groupsubmit(this.form)" type="button">确认报名</button></span></span>
 </div>
 </form>
+<script type="text/javascript">
+groupsubmit = function(fp){
+	if(fp['realname'].value == ""){
+		ajax.showError('请填写真实姓名。');return false;
+	}
+	if(fp['mobile'].value == ""){
+		ajax.showError('请填写手机号码。');return false;
+	}
+	if((/^1[3-9]\d{9}$/.test(fp['mobile'].value)) == false){
+		ajax.showError('无效的手机号码。');return false;
+	}
+	ajax.submit(fp);
+}
+</script>
 </div>
 <!--
 EOT;
@@ -445,7 +459,7 @@ EOT;
 			<td>$uinfo[tel]</td>
 		</tr>
 		<tr class="tr3">
-			<td>邮箱</td>
+			<td>电子邮箱</td>
 			<td>$uinfo[email]</td>
 		</tr>
 		<tr class="tr3">
@@ -491,7 +505,7 @@ EOT;
 				<td><input type="text" class="input input_wa" name="tel" value="$uinfo[tel]" /></td>
 		</tr>
 		<tr class="tr3">
-				<td>邮箱</td>
+				<td>电子邮箱</td>
 				<td><input type="text" class="input input_wa" name="email" value="$uinfo[email]" /></td>
 		</tr>
 		<tr class="tr3">
@@ -500,13 +514,52 @@ EOT;
 		</tr>
 		<tr class="tr3">
 				<td>介绍说明</td>
-				<td><textarea name="introduce" id="introduce" class="textareaA mb5">$uinfo[introduce]</textarea><p id="introduce_warn" class="s6">限 255 字节</p></td>
+				<td><textarea name="introduce" onclick="" id="introduce" class="textareaA mb5">$uinfo[introduce]</textarea><p id="introduce_warn" class="s6">限 255 字节</p></td>
 		</tr>
 	</table>
-	<div class="popBottom"><span class="btn2"><span><button type="button" onclick="ajax.submit(this.form)">提 交</button></span></span></div>
+	<div id="warn"></div>
+	<div class="popBottom"><span class="btn2"><span><button type="button" onclick="checkPost(this.form);">提 交</button></span></span></div>
 	</form>
 </div>
 <script language="JavaScript">
+function checkPost(obj) {
+	if (obj.realname.value.length > 20) {
+		showError('真实姓名不能大于20字符',3000);
+		return false;
+	}
+	if (obj.tel.value.length > 15) {
+		showError('电话号码不能大于15字符',3000);
+		return false;
+	}
+	if (obj.email.value.length > 50) {
+		showError('电子邮箱不能大于50字符',3000);
+		return false;
+	}
+	if (obj.address.value.length > 255) {
+		showError('地址不能大于255字符',3000);
+		return false;
+	}
+	if (obj.introduce.value.length > 255) {
+		showError('介绍说明不能大于255字符',3000);
+		return false;
+	}
+	var reg = /^([\w|-|\.])+@([\w|-|\.])+(([\w|-|\.]{2,3}){1,2})$/;
+	if(obj.email.value.length != 0 && reg.test(obj.email.value) == false){
+		showError('电子邮箱格式不正确',3000);
+		return false;
+	}
+	ajax.submit(obj);
+}
+
+function showError(msg, time) {
+	var warn = document.getElementById("warn");
+	var html = "<div class=\"wrongTip\">"+msg+"</div>";
+	warn.innerHTML = html;
+	warn.style.display = '';
+	if(time){			
+		setTimeout(function(){warn.style.display = 'none';},time);
+	}
+}
 var charset = '$db_charset';
 setTimeout(function(){initCheckTextNum('realname','realname_warn',20);},300);
 setTimeout(function(){initCheckTextNum('address','address_warn',255);},300);
@@ -600,7 +653,7 @@ EOT;
 EOT;
 if($type == 'user') {print <<<EOT
 -->
-					<textarea class="textareaA" name="atc_content" onkeydown="ajax.quickpost(event,this.form)">我很喜欢用户[url={$db_bbsurl}/u.php?uid={$uid}]{$username}[/url]的个人空间，特别推荐。\n\n他（她）的用户名:\n$title\n\n希望你能喜欢。</textarea>
+					<textarea class="textareaA" name="atc_content" onkeydown="ajax.quickpost(event,this.form)">我很喜欢用户[url={$db_bbsurl}/{$db_userurl}{$uid}]{$username}[/url]的个人空间，特别推荐。\n\n他（她）的用户名:\n$title\n\n希望你能喜欢。</textarea>
 <!--
 EOT;
 }else{print <<<EOT
@@ -608,7 +661,7 @@ EOT;
 					<textarea class="textareaA" name="atc_content" onkeydown="ajax.quickpost(event,this.form)">
 EOT;
 $uid || $uid = $u;print <<<EOT
-我在用户[url={$db_bbsurl}/u.php?uid={$uid}]{$username}[/url]的个人空间发现这个信息，认为很有价值，特别推荐。\n\n主要信息:\n$title\n\n描述:\n$descrip\n\n希望你能喜欢。</textarea>
+我在用户[url={$db_bbsurl}/{$db_userurl}{$uid}]{$username}[/url]的个人空间发现这个信息，认为很有价值，特别推荐。\n\n主要信息:\n$title\n\n描述:\n$descrip\n\n希望你能喜欢。</textarea>
 <!--
 EOT;
 }print <<<EOT
@@ -804,32 +857,39 @@ print <<<EOT
         </tr>
 <!--
 EOT;
-if ($o_photos_gdcheck) {print <<<EOT
+if ($o_photos_gdcheck) {
+$gdSize = explode("\t",$db_gdsize);
+print <<<EOT
 -->
 		<tr>
 			<td>认证码</td>
 			<td>
-				<input class="input input_wc" onfocus="showCK();" type="text" name="gdcode" id="gdcode" tabindex="3"  /><br /><img id="ckcode" style="cursor:pointer;display:none;margin-bottom:5px;" onclick="this.src='ck.php?nowtime='+new Date().getTime();" alt="看不清楚，换一张" />
+<script type="text/javascript" src="js/pw_authcode.js"></script>
+<script>
+var flashWidth = "$gdSize[0]";
+var flashHeight = "$gdSize[1]";
+var gdtype = $db_gdtype;
+</script>
+				<input class="input input_wc" onfocus="showgd();" type="text" name="gdcode" id="gdcode" tabindex="3"  /><br />
+				<div id="ckcode" style="display:none;margin-bottom:5px;"></div>
 			</td>
 		</tr>
-<script language="JavaScript">
-function showCK(){
-	getObj('ckcode').style.display="";
-	if (getObj('ckcode').src.indexOf('ck.php') == -1) {
-		getObj('ckcode').src = 'ck.php?nowtime=' + new Date().getTime();
-	}
-}
-</script>
 <!--
 EOT;
-}if($o_photos_qcheck){
+}if($db_question && $o_photos_qcheck){
 $qkey = array_rand($db_question);
+if($db_imagequestion){
+	$question = sprintf('<img src="ckquestion.php?q=%s">',$qkey);
+}else{
+	$question = $qkey<0 ? getMachineQuestion_1() :  $db_question[$qkey];
+}
+$q_a = $question.($showq && $qkey>0?" 正确答案:".$db_answer[$qkey] : '');
 print <<<EOT
 -->
 		<tr>
 			<td>验证问答</td>
 			<td>
-			{$db_question[$qkey]}(正确答案:{$db_answer[$qkey]})<br />
+			{$q_a}<br />
 			<input class="input input_wc" name="qanswer" id="qanswer" size="25" tabindex="7" />
 			<input type="hidden" name="qkey" id="qkey" value="$qkey" />
 			</td>

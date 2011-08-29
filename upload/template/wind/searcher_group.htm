@@ -1,61 +1,40 @@
 <!--<?php print <<<EOT
 -->
-		<div class="content fl">
-        	<div class="s_dlA">
-<!-- 
+<div>
+	<table width="100%" cellpadding="0" cellspacing="0" height="300"><tr><td valign="top">
+	<div class="forum_main">
+<!--
 EOT;
 foreach($groups as $group){
 print <<<EOT
--->   
-				<dl>
-                	<dd class="img"><a href="apps.php?q=group&cyid={$group[id]}" target="_blank"><img src="$group[cnimg]" width="48" height="48"></a></dd>
-                	<dt><a href="apps.php?q=group&cyid={$group[id]}" target="_blank">$group[cname]</a></dt>
-                    <dd>$group[descrip]</dd>
-                    <dd class="cite">分类：<span class="mr20">$group[sname]</span>成员：<span class="mr20">$group[members]</span>积分：<span class="mr20">$group[credit]</span>更新时间：<span class="mr20">$group[createtime]</span></dd>
-                </dl>            
-<!-- 
-EOT;
-}
-print <<<EOT
--->   
-                <div class="pages">
-                   	$pager
-                </div>
-                <div class="c">&nbsp;</div>
-            </div>
-            <div class="h">
-      
-            </div>
-        </div>
-        <div class="sidebar fr">
+-->
+		<dl class="cc" style="height:85px;">
+			<dt><a href="apps.php?q=group&cyid={$group[id]}" target="_blank"><img class="img" src="$group[cnimg]" width="60" height="60"></a></dt>
+			<dd>
+				<div class="name"><a href="apps.php?q=group&cyid={$group[id]}" target="_blank" class="f16 b">$group[cname]</a></div>
+				<div class="seahr"></div>
+				<div class="text">$group[descrip]</div>
+				<div class="info">分类：{$group[sname]}，成员：{$group[members]}，积分：$group[credit]，更新：$group[createtime]</div>
+			</dd>
+		</dl>
 <!--
 EOT;
-if($hotwords){
-print <<<EOT
--->         
-        	<div class="p15 s_boxA">
-            	<h2>一周热门搜索</h2>
-                <ul>
-<!-- 
-EOT;
-foreach($hotwords as $hotword){
-print <<<EOT
--->                
-                	<li><a href="searcher.php?keyword={$hotword}&type=thread">$hotword</a></li>
-<!-- 
-EOT;
 }
 print <<<EOT
--->                 	
-                </ul>
-            </div>
-<!-- 
+-->
+	</div>
+	<div style="padding:10px 0 10px 20px;" class="cc">
+	$pager
+	</div>
+	<div style="padding-left:20px;">
+<!--
 EOT;
-}
+require printEOT('searcher_searchinput');
 print <<<EOT
--->              
-        </div>
-        <div class="c">&nbsp;</div>         
+-->
+		</div>
+	</td></tr></table>
+</div>       
 <!--
 EOT;
 ?>-->

@@ -2,6 +2,16 @@
 include_once PrintEot('left');
 if (empty($action)){print <<<EOT
 -->
+<div class="nav3 mb10">
+    <ul class="cc">
+		<li><a href="$jobUrl">缓存管理</a></li>
+		<li><a href="$jobUrl&adminitem=pwcache">PW缓存库</a></li>
+		<li><a href="$jobUrl&adminitem=threadcache">主题列表缓存</a></li>
+		<li><a href="$jobUrl&adminitem=guestcache">游客缓存</a></li>
+		<li class="current"><a href="$jobUrl&adminitem=guestdir">清空缓存</a></li>
+		<li><a href="$jobUrl&adminitem=blacklist">调用黑名单</a></li>
+    </ul>
+</div>
 <form action="$basename" method="post">
   <input type="hidden" name="action" value="delete" />
   <h2 class="h1"><span class="mr20">删除游客缓存文件</span><span class="linka">游客缓存文件统计共有:缓存文件 (<font color="red">{$g_num}</font>) 个；占用空间 (<font color="red">$g_size</font>) M</span></h2>

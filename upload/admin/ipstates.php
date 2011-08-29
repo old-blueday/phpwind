@@ -5,7 +5,7 @@ if ($action != 'submit' && $action != 'ipIndex') {
 	ifcheck($db_ipstates, 'ipstates');
 	include PrintEot('ipstates');
 } elseif ($_POST['action'] == "submit") {
-	InitGP(array('ipstates'), 'P');
+	S::gp(array('ipstates'), 'P');
 	setConfig('db_ipstates', $ipstates);
 	updatecache_c();
 	$navConfigService = L::loadClass('navconfig', 'site');

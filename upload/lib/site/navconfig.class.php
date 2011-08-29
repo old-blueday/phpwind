@@ -114,11 +114,25 @@ class PW_NavConfig {
 		return $navConfigDb->findSubNavsByType($navType, $parentNavId);
 	}
 	
+	function findNavConfigs(){
+		static $navConfigData = array();
+		if(!$navConfigData){
+			@include_once pwCache::getPath(D_P . 'data/bbscache/navcache.php',true);
+			$navConfigData = ($navConfigData) ? $navConfigData : $GLOBALS['navConfigData'];
+		}
+		if(!$navConfigData){
+			$navConfigDb = $this->_getNavConfigDB();
+			$navConfigData = $navConfigDb->findNavConfigs();
+		}
+		return $navConfigData;
+	}
+	
 	function findValidNavListByTypeAndPostion($navType, $postion, $currentPostion = array()) {
 		$relativeNavs = array();
 		$notValidParent = array();
 		$currentPostionsKeeper = array();
-		foreach ($this->findNavListByType($navType) as $nav) {
+		$navConfigData = $this->findNavConfigs();
+		foreach ((array)$navConfigData[$navType] as $nav) {
 			if (!$nav['isshow']) continue;
 			
 			$nav['iscurrent'] = false;
@@ -198,5 +212,26 @@ class PW_NavConfig {
 	function _decodeStyleField($styleField) {
 		$styleField = explode('|', $styleField);
 		return array('color'=>$styleField[0], 'b'=>$styleField[1], 'i'=>$styleField[2], 'u'=>$styleField[3]);
+	}
+
+	/**
+	 * 个人中心导航
+	 * 
+	 * @param string $type 导航类型
+	 * @param string $model 导航位置
+	 * @return array $homenavigation
+	 */
+	function userHomeNavigation($type,$model) {
+		if (!$type || !$model) return array();
+		$homenavigations = $this->findValidNavListByTypeAndPostion($type, $model);
+		if (!S::isArray($homenavigations)) return array();
+		$homenavigation = array();
+		$homenavigation['linkup'][] = array_shift($homenavigations);
+		$homenavigation['linkup'][] = array_shift($homenavigations);
+		$homenavigation['linkup'][] = array_shift($homenavigations);	
+		foreach ($homenavigations as $value) {
+			$homenavigation['linkdown'][] = $value;
+		}
+		return $homenavigation;
 	}
 }

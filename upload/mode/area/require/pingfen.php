@@ -2,7 +2,7 @@
 !defined('M_P') && exit('Forbidden');
 require_once(R_P.'require/credit.php');
 require_once R_P . 'require/pingfunc.php';
-require_once D_P . 'data/bbscache/forum_cache.php';
+require_once pwCache::getPath(D_P . 'data/bbscache/forum_cache.php');
 $credittype = $credittype ? $credittype : array();
 
 $userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
@@ -57,7 +57,7 @@ if ($winddb['groups']) {
 		is_numeric($gid) && $gids[] = $gid;
 	}
 	if ($gids) {
-		$gids = pwImplode($gids);
+		$gids = S::sqlImplode($gids);
 		require_once(R_P.'require/pw_func.php');
 		$query = $db->query("SELECT gid,rkey,rvalue FROM pw_permission WHERE uid='0' AND fid='0' AND gid IN($gids) AND rkey IN ('markset','markable') AND type='basic'");
 		while ($rt = $db->fetch_array($query)) {
@@ -120,7 +120,7 @@ if (!$step) {
 	}
 
 	$reason_sel = '';
-	$reason_a = explode("\n",$db_adminreason);
+	$reason_a = explode("\n",$db_admingradereason);
 	foreach ($reason_a as $k => $v) {
 		if ($v = trim($v)) {
 			$reason_sel .= "<option value=\"$v\">$v</option>";
@@ -129,12 +129,15 @@ if (!$step) {
 		}
 	}
 } elseif ($step ==2) {
-	InitGP(array('cids','addpoints','ifmsg','atc_content'),'P');
+	S::gp(array('cids','addpoints','ifmsg','atc_content'),'P');
 	$tid = $pushkey;
 	if (strlen($atc_content) > 100) pingfenMsg('showping_content_too_long');
+	if ($SYSTEM['enterreason'] && !$atc_content) {
+		pingfenMsg('enterreason');
+	}
 	require_once R_P.'require/bbscode.php';
 	if (count($cids)>6) pingfenMsg('评分个数超出限制');
-	$read = $db->get_one("SELECT * FROM pw_threads WHERE tid=".pwEscape($pushkey));
+	$read = $db->get_one("SELECT * FROM pw_threads WHERE tid=".S::sqlEscape($pushkey));
 
 	$fid = $read['fid'];
 	$affect = array();
@@ -228,10 +231,11 @@ if (!$step) {
 		));
 		$credit->set($read['authorid'], $cid, $addpoint, false);
 
-		$db->update("UPDATE pw_threads SET ifmark=ifmark+".pwEscape($addpoint)." WHERE tid=".pwEscape($tid));
+		//$db->update("UPDATE pw_threads SET ifmark=ifmark+".S::sqlEscape($addpoint)." WHERE tid=".S::sqlEscape($tid));
+		$db->update(pwQuery::buildClause("UPDATE :pw_table SET ifmark=ifmark+:ifmark  WHERE tid=:tid", array('pw_threads', $addpoint, $tid)));
 		$rpid = 0;
 
-		$pwSQL = pwSqlSingle(array(
+		$pwSQL = S::sqlSingle(array(
 			'fid'	=> $fid,
 			'tid'	=> $tid,
 			'pid'	=> $rpid,
@@ -244,9 +248,9 @@ if (!$step) {
 		$db->update("INSERT INTO pw_pinglog SET $pwSQL");
 		update_markinfo($fid, $tid, $rpid);
 
-		$threadobj = L::loadClass("threads", 'forum');
-		$threadobj->clearTmsgsByThreadId($tid);
-
+		//* $threadobj = L::loadClass("threads", 'forum');
+		//* $threadobj->clearTmsgsByThreadId($tid);
+		Perf::gatherInfo('changeThreadWithThreadIds', array('tid'=>$tid));
 
 		if ($ifmsg) {
 			$affect[] = "$name:$addpoint";
@@ -276,8 +280,8 @@ if (!$step) {
 		$messageInfo = array(
 			'create_uid' => $winduid,
 			'create_username' => $windid,
-			'title'=>getLangInfo('writemsg','pushto_title'),
-			'content'=>getLangInfo('writemsg','pushto_content',array(
+			'title'=>getLangInfo('writemsg',$action == 'pushto' ? 'pushto_title' : 'recommend_title'),
+			'content'=>getLangInfo('writemsg',$action == 'pushto' ? 'pushto_content' : 'recommend_content',array(
 				'manager'	=> $windid,
 				'fid'		=> $read['fid'],
 				'tid'		=> $read['tid'],

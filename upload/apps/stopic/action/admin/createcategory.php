@@ -2,7 +2,7 @@
 !defined('P_W') && exit('Forbidden');
 define('AJAX',1);
 
-InitGP(array('name'));
+S::gp(array('name'));
 
 $name = trim($name);
 if ('' == $name || $stopic_service->isCategoryExist($name)) {

@@ -3,7 +3,7 @@ print <<<EOT
 -->
 <div id='hiddenMessage' style="display:none"></div>
 <div class="contUser" id="content">
-<table width="100%"><tr class="vt"><td height="400">
+<table width="100%"><tr><td height="600" valign="top">
 	<div class="p15">
 	<h4 class="site mb5"><span>通知</span>(共{$noticeAllCount}条，<a href="$normalUrl&action=unread" class="s2"><b>{$notReadCount}</b>条未读通知</a>)</h4> 
 <!--
@@ -19,11 +19,25 @@ $upaction=$map[$smstype];
 $deltype = $redirect ? '' : $upaction;
 $message['content'] = convert($message['content'],$db_windpost);
 print <<<EOT
--->
+--> 
+<script type="text/javascript">
+function getpage(act){
+    ajax.send("$normalUrl&action=checkover&page=$page&smstype=$smstype&mid={$message[mid]}&rid={$message[rid]}&dir="+act,'',function(){
+         var rText = ajax.request.responseText.split('\t');
+         if (rText[0] == 'success'){
+             location.href = "$normalUrl&action="+act+"&page=$page&smstype=$smstype&mid={$message[mid]}&rid={$message[rid]}&redirect=$redirect";
+         }else{
+             showDialog('warning',(act == "next") ? "已经是最后一条！" : "已经是第一条！",3);return false;
+         }
+         return false;
+    });
+    return false;
+}
+</script>
  		<div class="mb10">
 			<span class="fr">
-				<a href="$normalUrl&action=previous&page=$page&smstype=$smstype&mid={$message[mid]}&rid={$message[rid]}&redirect=$redirect">上一条</a>&nbsp;&nbsp;|&nbsp;&nbsp;
-				<a href="$normalUrl&action=next&page=$page&smstype=$smstype&mid={$message[mid]}&rid={$message[rid]}&redirect=$redirect">下一条</a></span>
+				<a href="javascript:;" onclick="getpage('previous')">上一条</a>&nbsp;&nbsp;|&nbsp;&nbsp;
+				<a href="javascript:;" onclick="getpage('next')">下一条</a></span>
 			<a href="$normalUrl&page=$page&action=$upaction&redirect=$redirect">&lt;&lt;返回</a>
 		</div>
     <div id="showmessage"></div>

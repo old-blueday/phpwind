@@ -86,7 +86,7 @@ class AdminSearch {
 	function initResult($key) {
 		if (array_key_exists($key, $this->purview) && !isset($this->result[$key])) {
 			$this->result[$key] = array(
-				'name' => $this->purview[$key][0],
+				'name' => strip_tags($this->purview[$key][0]),
 				'url' => isset($this->lang[$key]['baseUrl']) ? $this->lang[$key]['baseUrl'] : $this->purview[$key][1],
 				'lang' => array()
 			);
@@ -95,7 +95,7 @@ class AdminSearch {
 	}
 
 	function redColorKeyword($text) {
-		return str_replace($this->keyword, '<font color="red">' . $this->keyword . '</font>', $text);
+		return preg_replace("/".$this->keyword."/i", "<font color='red'>" .$this->keyword. "</font>", $text);
 	}
 
 	function _strpos($string, $find) {

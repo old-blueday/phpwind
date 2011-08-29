@@ -43,7 +43,7 @@ class PW_OuserdataDB extends BaseDB {
 	 * @param $userIds
 	 */
 	function _parseSqlIn($userIds) {
-		return "IN (" . pwImplode($userIds) . ")";
+		return "IN (" . S::sqlImplode($userIds) . ")";
 	}
 	
 	/**

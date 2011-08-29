@@ -24,7 +24,7 @@ $newluck = $rt[$lucktype] + $num;
 
 $credit->set($winduid,$lucktype,$num);
 
-$db->update("UPDATE pw_usertool SET nums=nums-1 WHERE uid=".pwEscape($winduid)."AND toolid=".pwEscape($toolid));
+$db->update("UPDATE pw_usertool SET nums=nums-1 WHERE uid=".S::sqlEscape($winduid)."AND toolid=".S::sqlEscape($toolid));
 $logdata = array(
 	'type'		=>	'use',
 	'descrip'	=>	'tool_15_descrip',

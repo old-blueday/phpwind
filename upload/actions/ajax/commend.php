@@ -3,7 +3,7 @@
  * create by liaohu 2010-06-11
  */
 !defined('P_W') && exit('Forbidden');
-InitGP(array('fid','tid'), null, 2);
+S::gp(array('fid','tid'), null, 2);
 /**
  * 实例化类，输出执行结果
  * @var unknown_type
@@ -72,7 +72,7 @@ class commend{
 	 * @return unknown_type
 	 */
 	function getResult(){
-		$sql = "SELECT forumset,commend FROM " . $this->table . " WHERE fid=".pwEscape($this->fid);
+		$sql = "SELECT forumset,commend FROM " . $this->table . " WHERE fid=" . S::sqlEscape($this->fid);
 		$this->result = $this->db->get_one($sql);
 		if($this->result){
 			$this->setForumset();
@@ -89,12 +89,12 @@ class commend{
 		 * 更新数据库 
 		 * @var unknown_type
 		 */
-		$sql = "UPDATE ". $this->table ." SET ".
-			pwSqlSingle(array(
+		$sql = "UPDATE " . $this->table . " SET ".
+			S::sqlSingle(array(
 				"forumset" => serialize($this->forumset),
 				"commend" => serialize($this->commend)
 			))
-		."WHERE fid=".pwEscape($this->fid);
+		. "WHERE fid=" . S::sqlEscape($this->fid);
 		if($this->db->update($sql)){
 			$this->setMsg(true);
 		}

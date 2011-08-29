@@ -2,8 +2,8 @@
 !function_exists('readover') && exit('Forbidden');
 require_once(R_P.'require/bbscode.php');
 require_once(R_P.'require/showimg.php');
-include_once(D_P."data/bbscache/forumcache.php");
-include_once(D_P.'data/bbscache/customfield.php');
+include_once pwCache::getPath(D_P."data/bbscache/forumcache.php");
+include_once pwCache::getPath(D_P.'data/bbscache/customfield.php');
 
 if ($tid) {
 	if (!is_array($db_union)) {
@@ -11,9 +11,9 @@ if ($tid) {
 		$db_union[0] && $db_hackdb = array_merge((array)$db_hackdb,(array)unserialize($db_union[0]));
 	}
 	$readtpl = 'readtpl';
-	include_once Pcv(D_P."data/style/$tskin.php");
+	include_once S::escapePath(D_P."data/style/$tskin.php");
 	if (!file_exists(R_P."template/$tplpath/$readtpl.htm")) {
-		include_once Pcv(D_P."data/style/$db_defaultstyle.php");
+		include_once S::escapePath(D_P."data/style/$db_defaultstyle.php");
 		if (!file_exists(R_P."template/$tplpath/$readtpl.htm")) {
 			$tplpath = 'wind';
 		}
@@ -23,9 +23,9 @@ if ($tid) {
 	} else {
 		$css_path = D_P.'data/style/wind_css.htm';
 	}
-	include_once(D_P.'data/bbscache/md_config.php');
+	include_once pwCache::getPath(D_P.'data/bbscache/md_config.php');
 	if ($md_ifopen) {
-		include_once(D_P.'data/bbscache/medaldb.php');
+		include_once pwCache::getPath(D_P.'data/bbscache/medaldb.php');
 	}
 	$fieldadd = $tablaadd = '';
 	foreach ($customfield as $key => $val) {
@@ -37,7 +37,7 @@ if ($tid) {
 	$pw_tmsgs = GetTtable($tid);
 	$J_sql = "LEFT JOIN $pw_tmsgs tm ON t.tid=tm.tid LEFT JOIN pw_members m ON m.uid=t.authorid LEFT JOIN pw_memberdata md ON md.uid=t.authorid LEFT JOIN pw_polls p ON p.tid=t.tid";
 	$usehtm = 1;
-	$read = $db->get_one("SELECT t.* $S_sql $fieldadd FROM pw_threads t $J_sql $tablaadd WHERE t.tid=".pwEscape($tid));
+	$read = $db->get_one("SELECT t.* $S_sql $fieldadd FROM pw_threads t $J_sql $tablaadd WHERE t.tid=".S::sqlEscape($tid));
 	if (!$read) {
 		$usehtm = 0;
 	}
@@ -117,7 +117,7 @@ if ($tid) {
 		if ($read['replies'] > 0) {
 			$readnum = $db_readperpage - 1;
 			$pw_posts = GetPtable($read['ptable']);
-			$query = $db->query("SELECT t.*,m.uid,m.username,m.oicq,m.groupid,m.memberid,m.icon AS micon,m.hack,m.honor,m.signature,m.regdate,m.medals,m.userstatus,md.onlinetime,md.postnum,md.digests,md.rvrc,md.money,md.credit,md.currency,md.starttime,md.thisvisit,md.lastvisit $fieldadd FROM $pw_posts t LEFT JOIN pw_members m ON m.uid=t.authorid LEFT JOIN pw_memberdata md ON md.uid=t.authorid $tablaadd WHERE t.tid=".pwEscape($tid)."ORDER BY postdate LIMIT 0,$readnum");
+			$query = $db->query("SELECT t.*,m.uid,m.username,m.oicq,m.groupid,m.memberid,m.icon AS micon,m.hack,m.honor,m.signature,m.regdate,m.medals,m.userstatus,md.onlinetime,md.postnum,md.digests,md.rvrc,md.money,md.credit,md.currency,md.starttime,md.thisvisit,md.lastvisit $fieldadd FROM $pw_posts t LEFT JOIN pw_members m ON m.uid=t.authorid LEFT JOIN pw_memberdata md ON md.uid=t.authorid $tablaadd WHERE t.tid=".S::sqlEscape($tid)."ORDER BY postdate LIMIT 0,$readnum");
 			while ($read = $db->fetch_array($query)) {
 				if ($foruminfo['allowsell'] && strpos($read['content'],"[sell") !== false && strpos($read['content'],"[/sell]") !== false) {
 					$usehtm = 0;break;
@@ -138,7 +138,7 @@ if ($tid) {
 				$readdb[$key] = htmread($read,$start_limit++);
 				$db_menuinit .= ",'td_read_".$read['pid']."':'menu_read_".$read['pid']."'";
 			}
-			$authorids = pwImplode($authorids);
+			$authorids = S::sqlImplode($authorids);
 
 			if ($db_showcolony) {
 				$colonydb = array();
@@ -158,7 +158,7 @@ if ($tid) {
 					}
 				}
 				if ($cids) {
-					$cids = pwImplode($cids);
+					$cids = S::sqlImplode($cids);
 					$query = $db->query("SELECT uid,cid,value FROM pw_membercredit WHERE uid IN($authorids) AND cid IN($cids)");
 					while ($rt = $db->fetch_array($query)){
 						$customdb[$rt['uid']][$rt['cid']] = $rt['value'];
@@ -186,16 +186,16 @@ if ($tid) {
 			if (!is_dir(R_P.$db_readdir.'/'.$fid)) {
 				@mkdir(R_P.$db_readdir.'/'.$fid);
 				@chmod(R_P.$db_readdir.'/'.$fid,0777);
-				writeover(R_P."$db_readdir/$fid/index.html",'');
+				pwCache::setData(R_P."$db_readdir/$fid/index.html",'');
 				@chmod(R_P."$db_readdir/$fid/index.html",0777);
 			}
 			if (!is_dir(R_P.$db_readdir.'/'.$fid.'/'.$date)) {
 				@mkdir(R_P.$db_readdir.'/'.$fid.'/'.$date);
 				@chmod(R_P.$db_readdir.'/'.$fid.'/'.$date,0777);
-				writeover(R_P."$db_readdir/$fid/$date/index.html",'');
+				pwCache::setData(R_P."$db_readdir/$fid/$date/index.html",'');
 				@chmod(R_P."$db_readdir/$fid/$date/index.html",0777);
 			}
-			writeover(R_P."$db_readdir/$fid/$date/$tid.html",$content,"rb+",0);
+			pwCache::setData(R_P."$db_readdir/$fid/$date/$tid.html",$content, false, "rb+",0);
 			@chmod(R_P."$db_readdir/$fid/$date/$tid.html",0777);
 		} elseif (file_exists(R_P."$db_readdir/$fid/$date/$tid.html")) {
 			P_unlink(R_P."$db_readdir/$fid/$date/$tid.html");
@@ -204,7 +204,7 @@ if ($tid) {
 }
 function htmread($read,$start_limit) {
 	global $tpc_author,$count,$timestamp,$db_onlinetime,$db_bbsurl,$attachdir,$attachpath,$_G,$tablecolor,$readcolorone,$readcolortwo,$lpic,$ltitle,$imgpath,$db_ipfrom,$db_showonline,$stylepath,$db_windpost,$db_windpic,$fid,$tid,$attachments,$aids,$db_signwindcode,$md_ifopen,$_MEDALDB,$db_shield;
-	include_once(D_P.'data/bbscache/level.php');
+	include_once pwCache::getPath(D_P.'data/bbscache/level.php');
 	$read['lou'] = $start_limit;
 	$start_limit == $count-1 && $read['jupend'] = '<a name=lastatc></a>';
 

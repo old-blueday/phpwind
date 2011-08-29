@@ -1,7 +1,7 @@
 <?php
 !function_exists('readover') && exit('Forbidden');
 
-include_once (D_P.'data/bbscache/newinfo_config.php');
+include_once pwCache::getPath(D_P.'data/bbscache/newinfo_config.php');
 foreach ($nf_order as $key => $val) {
 	$updatetime = $nf_order[$key]['updatetime'] ? $nf_order[$key]['updatetime'] : 30;
 	if ($val['order'] && $val['cachetime']+$updatetime<$timestamp && $val['type'] != 'custom' && ($val['type'] != 'newpic' || !$val['mode'])) {
@@ -70,7 +70,7 @@ foreach ($nf_order as $key => $val) {
 		}
 		$nf_order[$key]['cachetime'] = $timestamp;
 		uasort($nf_order,'cacheTimeCmp');
-		writeover(D_P.'data/bbscache/newinfo_config.php',"<?php\r\n\$nf_config=".pw_var_export($nf_config).";\r\n\$nf_newinfodb=".pw_var_export($nf_newinfodb).";\r\n\$nf_order=".pw_var_export($nf_order).";\r\n?>");
+		pwCache::setData(D_P.'data/bbscache/newinfo_config.php',"<?php\r\n\$nf_config=".pw_var_export($nf_config).";\r\n\$nf_newinfodb=".pw_var_export($nf_newinfodb).";\r\n\$nf_order=".pw_var_export($nf_order).";\r\n?>");
 		break;
 	}
 }

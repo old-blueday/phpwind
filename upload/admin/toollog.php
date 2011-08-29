@@ -5,14 +5,14 @@ $basename="$admin_file?adminjob=toollog";
 require_once(R_P.'require/bbscode.php');
 
 if(!$action || $action == 'search'){
-	InitGP(array('page','keyword'));
+	S::gp(array('page','keyword'));
 	if($action == 'search' && $keyword){
-		$sqladd = "AND descrip LIKE ".pwEscape("%$keyword%");
+		$sqladd = "AND descrip LIKE ".S::sqlEscape("%$keyword%");
 	} else{
 		$sqladd = '';
 	}
 	$page<1 && $page = 1;
-	$limit = pwLimit(($page-1)*$db_perpage,$db_perpage);
+	$limit = S::sqlLimit(($page-1)*$db_perpage,$db_perpage);
 	$rt    = $db->get_one("SELECT COUNT(*) AS sum FROM pw_toollog WHERE type='转换' $sqladd");
 	$sum   = $rt['sum'];
 	$total = ceil($sum/$db_perpage);
@@ -28,7 +28,7 @@ if(!$action || $action == 'search'){
 	include PrintEot('toollog');
 	exit;
 } elseif($_POST['action'] == 'del'){
-	InitGP(array('selid'),'P');
+	S::gp(array('selid'),'P');
 	if(!$selid = checkselid($selid)){
 		$basename="javascript:history.go(-1);";
 		adminmsg('operate_error');

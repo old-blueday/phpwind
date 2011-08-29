@@ -20,7 +20,7 @@ class PW_ColonysDB extends BaseDB {
 		return $this->_count();
 	}
 	function getsIds($ids){
-		$query = $this->_db->query ( "SELECT id as colonyid,cname,cnimg FROM " . $this->_tableName. " WHERE id in( ".pwImplode($ids).") " );
+		$query = $this->_db->query ( "SELECT id as colonyid,cname,cnimg FROM " . $this->_tableName. " WHERE id in( ".S::sqlImplode($ids).") " );
 		return $this->_getAllResultFromQuery ( $query );
 	}
 	function getById($id){
@@ -34,7 +34,7 @@ class PW_ColonysDB extends BaseDB {
 		$_sql_type = $type=='credit' ? 'credit' : 'c.'.$type;
 		$_sql_credit = $this->_getCreditAdd($type);
 
-		$_sql = "SELECT c.id,c.styleid,c.cname,c.tnum,c.pnum,c.members,c.todaypost,c.createtime,c.cnimg,c.descrip,s.cname as stylename $_sql_credit FROM ".$this->_tableName." c LEFT JOIN pw_cnstyles s ON c.styleid=s.id WHERE 1 $_sqlAdd ORDER BY $_sql_type DESC ".pwLimit(0,$num);
+		$_sql = "SELECT c.id,c.styleid,c.cname,c.tnum,c.pnum,c.members,c.todaypost,c.createtime,c.cnimg,c.descrip,s.cname as stylename $_sql_credit FROM ".$this->_tableName." c LEFT JOIN pw_cnstyles s ON c.styleid=s.id WHERE 1 $_sqlAdd ORDER BY $_sql_type DESC ".S::sqlLimit(0,$num);
 		$temp = array();
 		$query = $this->_db->query($_sql);
 		while ($rt = $this->_db->fetch_array($query)) {
@@ -52,7 +52,7 @@ class PW_ColonysDB extends BaseDB {
 			return '';
 		}
 		if ($o_styledb[$classID]['upid'] != '0') {
-			return ' AND c.styleid=' . pwEscape($classID);
+			return ' AND c.styleid=' . S::sqlEscape($classID);
 		}
 		$array = array();
 		foreach ($o_styledb as $k => $v) {
@@ -60,11 +60,11 @@ class PW_ColonysDB extends BaseDB {
 				$array[] = $k;
 			}
 		}
-		return $array ? ' AND c.styleid IN(' . pwImplode($array) . ')' : ' AND c.styleid=' . pwEscape($classID);
+		return $array ? ' AND c.styleid IN(' . S::sqlImplode($array) . ')' : ' AND c.styleid=' . S::sqlEscape($classID);
 	}
 	function _getCreditAdd($type) {
 		if ($type!='credit') return '';
-		include(D_P . 'data/bbscache/o_config.php');
+		include pwCache::getPath(D_P . 'data/bbscache/o_config.php');
 		$tnum = $o_groups_upgrade['tnum'] ? $o_groups_upgrade['tnum'] : 0;
 		$pnum = $o_groups_upgrade['pnum'] ? $o_groups_upgrade['pnum'] : 0;
 		$members = $o_groups_upgrade['members'] ? $o_groups_upgrade['members'] : 0;
@@ -78,15 +78,25 @@ class PW_ColonysDB extends BaseDB {
 	 * 注意只提供搜索服务
 	 */
 	function countSearch($keywords){
-		$result = $this->_db->get_one ( "SELECT COUNT(*) as total FROM " . $this->_tableName . " WHERE cname like ".pwEscape("%$keywords%")." LIMIT 1" );
+		$result = $this->_db->get_one ( "SELECT COUNT(*) as total FROM " . $this->_tableName . " WHERE cname like ".S::sqlEscape("%$keywords%")." LIMIT 1" );
 		return ($result) ? $result['total'] : 0;
 	}
 	/**
 	 * 注意只提供搜索服务
 	 */
 	function getSearch($keywords,$offset,$limit){
-		$query = $this->_db->query ("SELECT c.*,s.cname as sname FROM " . $this->_tableName . " c LEFT JOIN pw_cnstyles s ON c.styleid = s.id WHERE c.cname like ".pwEscape("%$keywords%")." LIMIT ".$offset.",".$limit);
+		$query = $this->_db->query ("SELECT c.*,s.cname as sname FROM " . $this->_tableName . " c LEFT JOIN pw_cnstyles s ON c.styleid = s.id WHERE c.cname like ".S::sqlEscape("%$keywords%")." LIMIT ".$offset.",".$limit);
 		return $this->_getAllResultFromQuery ( $query );
+	}
+	
+	function countLatestColonys() {
+		$total = $this->_db->get_value("SELECT COUNT(*) as total FROM " . $this->_tableName ." LIMIT 1" );
+		return ($total<500) ? $total :500;
+	}
+	
+	function getLatestColonys($offset, $limit) {
+		$query = $this->_db->query ("SELECT c.*,s.cname as sname FROM " . $this->_tableName . " c LEFT JOIN pw_cnstyles s ON c.styleid = s.id ".$this->_Limit($offset, $limit));
+		return $this->_getAllResultFromQuery($query);
 	}
 }
 ?>

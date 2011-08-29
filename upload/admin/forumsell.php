@@ -5,9 +5,9 @@ $basename = "$admin_file?adminjob=forumsell";
 if (empty($action)) {
 
 	require_once(R_P.'require/credit.php');
-	include_once(D_P.'data/bbscache/forumcache.php');
-	InitGP(array('username'));
-	InitGP(array('page','uid','fid'),'GP',2);
+	include_once pwCache::getPath(D_P.'data/bbscache/forumcache.php');
+	S::gp(array('username'));
+	S::gp(array('page','uid','fid'),'GP',2);
 
 	$sql = "WHERE 1";
 	if ($username) {
@@ -20,13 +20,13 @@ if (empty($action)) {
 		$uid = $userdb['uid'];
 	}
 	if ($uid) {
-		$sql .= " AND fs.uid=".pwEscape($uid);
+		$sql .= " AND fs.uid=".S::sqlEscape($uid);
 	}
 	if ($fid) {
-		$sql .= " AND fs.fid=".pwEscape($fid);
+		$sql .= " AND fs.fid=".S::sqlEscape($fid);
 	}
 	$page < 1 && $page = 1;
-	$limit = pwLimit(($page-1)*$db_perpage,$db_perpage);
+	$limit = S::sqlLimit(($page-1)*$db_perpage,$db_perpage);
 	$rt = $db->get_one("SELECT COUNT(*) AS sum FROM pw_forumsell fs $sql");
 	$pages = numofpage($rt['sum'],$page,ceil($rt['sum']/$db_perpage),"$basename&uid=$uid&fid=$fid&");
 	$buydb = array();
@@ -41,7 +41,7 @@ if (empty($action)) {
 
 } elseif ($_POST['action'] == 'del') {
 
-	InitGP(array('selid'));
+	S::gp(array('selid'));
 	if (!$selid = checkselid($selid)) {
 		adminmsg('operate_error');
 	}

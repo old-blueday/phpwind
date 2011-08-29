@@ -55,7 +55,7 @@ function addonlinefile($offset,$uid) {
 	$acttime = get_date($timestamp,'m-d H:i');
 	$D_name = "data/bbscache/online.php";
 	if (!file_exists(D_P.$D_name)) {
-		writeover(D_P.$D_name,str_pad("<?php die;?>",96)."\n");
+		pwCache::setData(D_P.$D_name,str_pad("<?php die;?>",96)."\n");
 	}
 	if (GetCookie('hideid') != 1) {
 		$newonline = "$windid\t$timestamp\t$onlineip\t$fidwt\t$tidwt\t$groupid\t$wherebbsyou\t$acttime\t$uid\t";
@@ -89,7 +89,7 @@ function addguestfile($offset) {
 	$newonline = str_pad($newonline,$db_olsize)."\n";
 	$D_name = "data/bbscache/guest.php";
 	if (!file_exists(D_P.$D_name)) {
-		writeover(D_P.$D_name,str_pad("<?php die;?>",96)."\n");
+		pwCache::setData(D_P.$D_name,str_pad("<?php die;?>",96)."\n");
 	}
 	if (checkinline(D_P.$D_name,$offset,$onlineip)) {
 		$isModify = 0;
@@ -156,7 +156,7 @@ function ModifySelectFile($filename,$deny=0) {
 	}
 	if (isset($end)) ftruncate($fp,filesize($filename)+$end+$cutsize);
 	fclose($fp);
-	include_once(D_P.'data/bbscache/olcache.php');
+	include_once pwCache::getPath(D_P.'data/bbscache/olcache.php');
 	if ($filename === D_P."data/bbscache/guest.php") {
 		$guestinbbs = $olnum;
 		$userinbbs++;
@@ -165,11 +165,11 @@ function ModifySelectFile($filename,$deny=0) {
 		$guestinbbs++;
 	}
 	$olcache = "<?php\n\$userinbbs=$userinbbs;\n\$guestinbbs=$guestinbbs;\n?>";
-	writeover(D_P.'data/bbscache/olcache.php',$olcache);
+	pwCache::setData(D_P.'data/bbscache/olcache.php',$olcache);
 }
 function getuseraction($id,$action) {
 	global $forum;
-	include_once(D_P.'data/bbscache/forum_cache.php');
+	include_once pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
 	$name = $forum[$id]['name'];
 	if ($name) {
 		$name = preg_replace("/\<(.+?)\>/is","",$name);

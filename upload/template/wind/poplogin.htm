@@ -27,7 +27,7 @@ EOT;
 EOT;
 }if ($db_logintype & 4) {print <<<EOT
 -->
-				<option value="2">Email</option>
+				<option value="2">电子邮箱</option>
 <!--
 EOT;
 }} else {print <<<EOT
@@ -51,15 +51,22 @@ EOT;
 <!--
 EOT;
 if($db_gdcheck & 2){
+$gdSize = explode("\t",$db_gdsize);
 $time = time();
 print <<<EOT
 -->
 	<tr class="tr5">
 		<td>认证码</td>
-		<td>
-		<div style="display: none" id="popgdcode"><img src="ck.php?" align="absmiddle" style="cursor:pointer;" id="ckcode" alt="看不清楚，换一张" /></div>
-		<input class="input" type="text" name="gdcode" size="5" onfocus="showgdcode();"  tabindex="3"  />
-		<span style="cursor:pointer; margin-left:3px" onclick="showgdcode();" id="showtips">&nbsp;点此显示验证码</span>
+		<td><input class="input" type="text" name="gdcode" size="5" onfocus="showgd();"  tabindex="3"  />
+		<span style="cursor:pointer; margin-left:3px" onclick="showgd();" id="showtips">&nbsp;点此显示验证码</span>
+		<div id="ckcode" style="display:none;"></div>
+<script type="text/javascript" src="js/pw_authcode.js"></script>
+<script>
+var flashWidth = "$gdSize[0]";
+var flashHeight = "$gdSize[1]";
+var gdtype = $db_gdtype;
+//showGdCode();
+</script>
 		</td>
 	</tr>
 <!--
@@ -83,7 +90,6 @@ print <<<EOT
 		<td>您的答案</td>
 		<td><input type="text" name="answer" class="input" size="40" tabindex="5" /></td>
 	</tr>
-
 <!--
 EOT;
 }
@@ -92,14 +98,20 @@ print <<<EOT
 
 <!--
 EOT;
-list(,$loginq)	= explode("\t",$db_qcheck);
-if($loginq && $db_question){
+list(,$showq)	= explode("\t",$db_qcheck);
+if(($db_ckquestion & 2) && $db_question){
 $qkey = array_rand($db_question);
+if($db_imagequestion){
+	$question = '<img id="ckquestion" src="ckquestion.php?q='.$qkey.'&t='.$timestamp.'" align="top">';
+}else{
+	$question = $qkey<0 ? getMachineQuestion_1() :  $db_question[$qkey];
+}
+$q_a = $question.($showq && $qkey>0?" 正确答案:".$db_answer[$qkey] : '');
 print <<<EOT
 -->
 			<tr class="tr5">
 				<td>验证问答</td>
-				<td>问题：{$db_question[$qkey]}<br /><input class="input" type="text" name="qanswer" tabindex="7" /><input type="hidden" name="qkey" value="$qkey" />  正确答案:{$db_answer[$qkey]}</td>
+				<td><span class="fl">{$q_a}</span><input class="input fl" size="5" type="text" name="qanswer" tabindex="7" /><input type="hidden" name="qkey" value="$qkey" /> </td>
 			</tr>
 <!--
 EOT;
@@ -116,11 +128,6 @@ print <<<EOT
 <div class="c"></div>
 </form>
 <script language="JavaScript">
-function showgdcode(){
-	getObj('ckcode').src = 'ck.php?nowtime=' + new Date().getTime();
-	getObj("showtips").innerHTML="刷新验证码";
-	getObj("popgdcode").style.display = "block";
-}
 function showcustomquest(qid){
 	getObj("customquest").style.display = qid==-1 ? '' : 'none';
 }

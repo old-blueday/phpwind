@@ -185,31 +185,39 @@ print <<<EOT
 		</tbody>
 		<!--
 EOT;
-if ($o_photos_gdcheck) {print <<<EOT
+if ($o_photos_gdcheck) {
+$gdSize = explode("\t",$db_gdsize);
+print <<<EOT
 -->
 		<tr class="tr3">
 			<td>认证码:</td>
 			<td>
-				<img id="ckcode" style="cursor:pointer;display:none;margin-bottom:5px;" onclick="this.src='ck.php?nowtime='+new Date().getTime();" alt="看不清楚，换一张" /><br />
-				<input class="input" onfocus="showCK();" type="text" name="gdcode" id="gdcode" style="width:50px;" tabindex="3"  />
+<script type="text/javascript" src="js/pw_authcode.js"></script>
+<script>
+var flashWidth = "$gdSize[0]";
+var flashHeight = "$gdSize[1]";
+var gdtype = $db_gdtype;
+</script>
+				<div id="ckcode" style="display:none;margin-bottom:5px;"></div>
+				<br />
+				<input class="input" onfocus="showgd();" type="text" name="gdcode" id="gdcode" style="width:50px;" tabindex="3"  />
 			</td>
 		</tr>
-<script language="JavaScript">
-function showCK(){
-	getObj('ckcode').style.display="";
-	if (getObj('ckcode').src.indexOf('ck.php') == -1) {
-		getObj('ckcode').src = 'ck.php?nowtime=' + new Date().getTime();
-	}
-}
-</script>
 <!--
 EOT;
-}if($o_photos_qcheck){print <<<EOT
+}if($db_question && $o_photos_qcheck){
+if($db_imagequestion){
+	$question = '<img id="ckquestion" src="ckquestion.php?q='.$qkey.'&t='.$timestamp.'" align="top">';
+}else{
+	$question = $qkey<0 ? getMachineQuestion_1() :  $db_question[$qkey];
+}
+$q_a = $question.($showq && $qkey>0?" 正确答案:".$db_answer[$qkey] : '');
+print <<<EOT
 -->
 		<tr class="tr3">
 			<td>验证问题</td>
 			<td>
-			<div>{$db_question[$qkey]} （正确答案:{$db_answer[$qkey]}）</div>
+			<div>{$q_a}</div>
 			<input class="input" name="qanswer" id="qanswer" size="25" tabindex="7" />
 			<input type="hidden" name="qkey" id="qkey" value="$qkey" />
 			</td>
@@ -245,9 +253,11 @@ function fetchvalue() {
 	var pwd = getObj('c_ajax_pwdinfo').value;
 	var repwd = getObj('repwd_info').value;
 	var albumnum = "$o_maxphotonum";
+	var maxlength
 	if(albumnum == "" || albumnum == 0 || albumnum == "0"){
 		albumnum = "";
 	}else{
+		var maxlength = albumnum;
 		albumnum = '您还可以上传'+albumnum+'张照片';
 	}
 	if (IsElement('gdcode')){
@@ -278,21 +288,28 @@ function fetchvalue() {
 
 			//photoselect.vir.getElementsByTagName('h4')[0].innerHTML=aname;
 			aidsel.insertBefore(option,null);
+			aidsel.selectedIndex = aidsel.options.length-1;
+			getObj('aidsel_info').parentNode.getElementsByTagName('button')[0].innerHTML= aname;
 			var job = '$job';
 			if (job == 'flash') {
 				uploader.setAlbumId(aidsel.value);
-				showDialog('success','相册添加成功!',2,function(){	
+				showDialog('success','相册添加成功!',2,function(){
 				});
 			}
 			getObj('allowflash').innerHTML = albumnum;
-			showDialog('success','相册添加成功!',2);
+			showDialog('success','相册添加成功!',2,function(){
+			});
+			uploader.maxLength = maxlength;
+			uploader.countFile();
+			
 		} else if (rText[0] == 'limit_num') {
 			showDialog('error','您创建的相册已经达到'+rText[1]+'个',2);
+			
 		} else {
 			showDialog('error',rText[1] != '' ? rText[1] : '非法错误',2);
 		}
 		read.menu.style.top="300px";
-
+		closep();
 	});
 
 }

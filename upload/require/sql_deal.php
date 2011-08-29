@@ -6,7 +6,7 @@ function SQLCreate($sqlarray, $ifupdate=false) {
 	$query = '';
 	foreach ($sqlarray as $value) {		
 		if ( $value[0] == '#' ) continue;
-		$query .= $value;
+		$query = $value;
 		$lowquery = strtolower(substr($query,0,5));
 		if ($lowquery == 'drop ') continue;
 		if (substr($value,-1)==';' && ($ifupdate || !in_array($lowquery,array('delet','updat')))) {
@@ -50,7 +50,7 @@ function SQLDrop($sqlarray) {
 function FileArray($hackdir,$base='hack'){
 	if (!in_array($base,array('hack','mode'))) $base = 'hack';
 	if (function_exists('file_get_contents')) {
-		$filedata = @file_get_contents(Pcv(R_P."$base/$hackdir/sql.txt"));
+		$filedata = @file_get_contents(S::escapePath(R_P."$base/$hackdir/sql.txt"));
 	} else {
 		$filedata = readover(R_P."$base/$hackdir/sql.txt");
 	}

@@ -32,7 +32,17 @@ EOT;
 }else{print <<<EOT
 -->
 	<div class="boxA">
-		<h2><span class="mr10">日志</span></h2>
+		<h2>
+<!--
+EOT;
+if ($uid ==$winduid) {print <<<EOT
+-->	
+		<span class="fr" style="padding-top:2px;"><span class="btn_add"><span><button type="button" onClick="location.href='apps.php?q=diary&a=write';">写日志</button></span></span></span>
+<!--
+EOT;
+}print <<<EOT
+--><span class="mr10">日志</span>
+</h2>		
 		<div class="p10 cc">
 <!--
 EOT;
@@ -52,18 +62,19 @@ print <<<EOT
 -->
 					<dl class="dl">
 						<dt class="dt mb10">
+							<div class="mb5"><a href="{$basename}a=detail&did=$value[did]" class="b f14">{$value[subject]}</a></div>
+							<div class="gray">
+								<span class="mr5">{$value[postdate]}</span>
 <!--
 EOT;
 if ($space['uid'] == $winduid || $SYSTEM['deldiary']) {print <<<EOT
 -->
-							<a class="adel" href="javascript:;" onclick="pwConfirm('是否确认删除？',this,function(){delDiary('$value[did]','$value[uid]')})">删除</a>
+							<a class="s7" href="javascript:;" onclick="pwConfirm('是否确认删除？',this,function(){delDiary('$value[did]','$value[uid]')})">删除</a>
 <!--
 EOT;
 }print <<<EOT
 -->
-
-							<div class="mb5"><a href="{$basename}a=detail&did=$value[did]" class="f16 b">{$value[subject]}</a></div>
-							<div class="gray">{$value[postdate]}</div>
+							</div>
 						</dt>
 						<dd class="dd">
 							<p class="mb20">{$value[content]}</p>
@@ -158,17 +169,23 @@ EOT;
 -->
 				</div>
 				<h1 class="mb5">{$diary[subject]}</h1>
+				<div class="gray mb10">
+					<span class="mr5">{$diary[postdate]}</span>
 <!--
 EOT;
-if($space['uid'] == $winduid || $SYSTEM['deldiary']){print <<<EOT
--->                     
-						<a class="adel" href="javascript:;" onclick="pwConfirm('确认删除？',this,function(){delDiary('$diary[did]','$uid','read')})">删除</a>
-														
+if($space['uid'] == $winduid){print <<<EOT
+-->
+					<a class="s7" href="apps.php?q=diary&a=edit&did=$diary[did]">编辑</a>	
+<!--
+EOT;
+}if($space['uid'] == $winduid || $SYSTEM['deldiary']){print <<<EOT
+-->
+					<a class="s7" href="javascript:;" onclick="pwConfirm('确认删除？',this,function(){delDiary('$diary[did]','$uid','read')})">删除</a>
 <!--
 EOT;
 }print <<<EOT
 -->
-				<div class="gray mb10">{$diary[postdate]}</div>
+				</div>
 				<div class="contentText s5 f14 mb20" id="img-width">
 				<table style="table-layout: fixed;"><tr><td height="200" class="vt"><div class="mb10">{$diary[content]}</div>
 <!--
@@ -251,9 +268,39 @@ EOT;
 print <<<EOT
 -->	
 <div class="c mb10">&nbsp;</div>
-<div class="cc mb10 seeMore">
-	<a class="fl" href="{$basename}a=next&uid={$uid}&did=$diary[did]" onclick="return ajaxpage(this.href,'next','$fuid','$space');">下一篇</a>
-	<a  class="fr" href="{$basename}a=pre&uid={$uid}&did=$diary[did]" onclick="return ajaxpage(this.href,'pre','$fuid','$space');">上一篇</a>
+<div class="mb10">
+	<p class="mb5">下一篇：
+<!-- 
+EOT;
+if(empty($diaryNextName)){print <<<EOT
+-->
+<span>无</span>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+	<a href="{$basename}a=next&uid={$uid}&did=$diary[did]" onclick="return ajaxpage(this.href,'next','$fuid','$space');">{$diaryNextName}</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+</p>
+<p>上一篇：
+<!-- 
+EOT;
+if(empty($diaryPreName)){print <<<EOT
+-->
+<span>无</span>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+	<a href="{$basename}a=pre&uid={$uid}&did=$diary[did]" onclick="return ajaxpage(this.href,'pre','$fuid','$space');">{$diaryPreName}</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+</p>
 </div>
 <!--
 EOT;

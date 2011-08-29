@@ -6,7 +6,7 @@
  */
 $levelService = L::loadclass("AreaLevel", 'area');
 $baseUrl=$admin_file."?adminjob=mode&admintype=area_level_manage&";
-initGP(array('step','username','hasedit','hasattr','level','page','uid','super'));
+S::gp(array('step','username','hasedit','hasattr','level','page','uid','super'));
 $portalPageService = L::loadClass('portalpageservice', 'area');
 $channels = $portalPageService->getPortalInvokes(0,1);
 /*$channelService = L::loadclass("channelService", 'area');

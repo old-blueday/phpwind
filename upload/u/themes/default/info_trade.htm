@@ -1,0 +1,86 @@
+					<div style="display:none" id="info_trade">
+						<table width="100%" class="setTable">
+							<tr>
+								<th class="th">支付宝帐号</th>
+<!--
+EOT;
+if($trade[isbinded] == 'T' && $trade[alipay]){print<<<EOT
+-->
+								<td class="td"><input type="hidden" name="alipay" value="$trade[alipay]" />
+									<div class="s5 mb5">$trade[alipay]</div>
+									<ul style="line-height:24px;" class="mb10">
+										<li><span class="s3 mr10">&#8730;已通过身份验证</span><a href="act_alipay_push.php?action=user_authentication" target="_blank">重新验证</a></li>
+<!--
+EOT;
+if($trade[iscertified] == 'T'){print<<<EOT
+-->
+										<li><span class="s3">&#8730;已通过实名认证</span></li>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+										<li>尚未通过<a href="http://www.alipay.com" target="_blank">实名认证</a></li>
+<!--
+EOT;
+}print <<<EOT
+-->
+									</ul>	
+								</td>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+								<td class="td">
+									<input class="input input_wa" type="text" name="alipay" value="$trade[alipay]" />
+								</td>
+<!--
+EOT;
+}print <<<EOT
+-->
+							</tr>
+							<tr>
+								<th class="th">个人商品分类</th>
+								<td class="td">
+									<table width="240">
+										<tr>
+											<td width="60%" class="pb15">分类名</td>
+											<td class="pb15"><a href="javascript:;" class="s3" onclick="addtrade();">[添加]</a></td>
+										</tr>
+										<tbody id="trade_mode" style="display:none"><tr>
+											<td class="pb15"><input class="input" type="text" name="tradetype[]" size="18" /></td>
+											<td class="pb15"><a href="javascript:;" onclick="removetrade(this);">[删除]</a></td>
+										</tr></tbody>
+										<tbody id="trade_c">
+<!--
+EOT;
+if ($trade['tradetype']) {
+foreach ($trade['tradetype'] as $key => $value) {print <<<EOT
+-->
+										<tr>
+											<td class="pb15"><input class="input" type="text" name="tradetype[$key]" value="$value" size="18" /></td>
+											<td class="pb15"><a href="javascript:;" onclick="removetrade(this);">[删除]</a></td>
+										</tr>
+<!--
+EOT;
+}}print <<<EOT
+-->
+										</tbody>
+									</table>
+								</td>
+							</tr>
+						</table>
+						<div class="tac" style=" padding:1em">
+							<span class="btn"><span><button type="submit">保存资料</button></span></span>
+						</div>
+<script language="JavaScript">
+function addtrade() {
+	var s = getObj('trade_mode').firstChild.cloneNode(true);
+	getObj('trade_c').appendChild(s);
+}
+function removetrade(obj) {
+	var o = obj.parentNode.parentNode;
+	o.parentNode.removeChild(o);
+}
+addtrade();
+</script>
+					</div>

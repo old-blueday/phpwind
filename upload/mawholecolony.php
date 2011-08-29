@@ -5,9 +5,9 @@ if (isset($_GET['ajax'])) {
 require_once('global.php');
 require_once(R_P.'require/functions.php');
 $groupid == 'guest' && Showmsg('not_login');
-$isGM = CkInArray($windid,$manager);
+$isGM = S::inArray($windid,$manager);
 require_once(R_P.'require/writelog.php');
-InitGP(array('cyid','action','tidarray','seltid'));
+S::gp(array('cyid','action','tidarray','seltid'));
 $selids = $foruminfo = array();
 require_once(R_P . 'apps/groups/lib/colony.class.php');
 $newColony = new PwColony($cyid);
@@ -71,28 +71,28 @@ if (empty($_POST['step'])) {
 		$template = 'mawholecolony';
 	}
 } else {
-	InitGP(array('atc_content'),'P');
-	if ($db_enterreason && !$atc_content && !defined('AJAX')) {
+	S::gp(array('atc_content'),'P');
+	if ($SYSTEM['enterreason'] && !$atc_content && !defined('AJAX')) {
 		Showmsg('enterreason');
 	}
 }
 
 if ($action == 'toptopic') {
-	InitGP(array('topped'));
+	S::gp(array('topped'));
 	if (empty($_POST['step'])) {
 		if (is_numeric($seltid)) {
 			${'topped_'.intval($threaddb[$seltid]['topped'])} = 'checked';
 		}
 		require_once PrintEot($template);footer();
 	} else {
-		InitGP(array('ifmsg','timelimit'));
+		S::gp(array('ifmsg','timelimit'));
 		PostCheck();
 		(is_null($topped)) && Showmsg('mawhole_notopped');
 		$msgdb = $logdb = array();
 		$timelimit = PwStrtoTime($timelimit);
 		$toolfield = $timelimit > $timestamp && $topped ? $timelimit : '';
 
-		$query = $db->query("SELECT t.tid,t.fid,t.postdate,t.author,t.authorid,t.subject,a.topped,a.toolfield FROM pw_threads t LEFT JOIN pw_argument a ON t.tid=a.tid WHERE t.tid IN(".pwImplode($selids).")");
+		$query = $db->query("SELECT t.tid,t.fid,t.postdate,t.author,t.authorid,t.subject,a.topped,a.toolfield FROM pw_threads t LEFT JOIN pw_argument a ON t.tid=a.tid WHERE t.tid IN(".S::sqlImplode($selids).")");
 		$tid_fid = array();
 		while ($rt = $db->fetch_array($query)) {
 			$tid_fid[$rt['tid']] = $rt['fid'];
@@ -165,11 +165,11 @@ if ($action == 'toptopic') {
 			if ($toolfield || $rt['toolfield']) {
 				$t = explode(',',$rt['toolfield']);
 				$rt['toolfield'] = $toolfield.','.$t[1];
-				$pwSQL = pwSqlSingle(array(
+				$pwSQL = S::sqlSingle(array(
 					'topped'	=> $topped,
 					'toolfield'	=> $rt['toolfield']
 				));
-				$db->update("UPDATE pw_argument SET $pwSQL WHERE tid=".pwEscape($rt['tid']));
+				$db->update("UPDATE pw_argument SET $pwSQL WHERE tid=".S::sqlEscape($rt['tid']));
 			} else {
 				$tids[] = $rt['tid'];
 			}
@@ -179,7 +179,7 @@ if ($action == 'toptopic') {
 			writelog($val);
 		}
 		if($tids){
-			$db->update("UPDATE pw_argument SET topped=".pwEscape($topped)." WHERE tid IN(".pwImplode($tids).")");
+			$db->update("UPDATE pw_argument SET topped=".S::sqlEscape($topped)." WHERE tid IN(".S::sqlImplode($tids).")");
 		}
 		if (defined('AJAX')) {
 			Showmsg("thread_toptopic_success_ajax");
@@ -190,7 +190,7 @@ if ($action == 'toptopic') {
 	}
 	
 } elseif ($action == 'digest') {
-	InitGP(array('digest'));
+	S::gp(array('digest'));
 	if (empty($_POST['step'])) {
 		if (is_numeric($seltid)) {
 			${'digest_'.intval($threaddb[$seltid]['digest'])} = 'checked';
@@ -198,7 +198,7 @@ if ($action == 'toptopic') {
 		require_once PrintEot($template);footer();
 	} else {
 		PostCheck();
-		InitGP(array('ifmsg','nextto'));
+		S::gp(array('ifmsg','nextto'));
 		(is_null($digest)) && Showmsg('mawhole_nodigest');
 
 		//zhudong 群组积分配置策略：无关联群组取全站积分配置，关联群组取版块和全站综合积分配置
@@ -211,7 +211,7 @@ if ($action == 'toptopic') {
 		$del_money = abs($creditset['Undigest']['money']);
 
 		$msgdb = $logdb = array();
-		$query = $db->query("SELECT a.digest,t.tid,t.fid,t.postdate,t.author,t.authorid,t.subject FROM pw_argument a LEFT JOIN  pw_threads t ON a.tid=t.tid WHERE a.tid IN(".pwImplode($selids).")");
+		$query = $db->query("SELECT a.digest,t.tid,t.fid,t.postdate,t.author,t.authorid,t.subject FROM pw_argument a LEFT JOIN  pw_threads t ON a.tid=t.tid WHERE a.tid IN(".S::sqlImplode($selids).")");
 		while ($rt = $db->fetch_array($query)) {
 			if (!$rt['digest'] && $digest) {
 				if ($ifmsg) {
@@ -311,7 +311,7 @@ if ($action == 'toptopic') {
 		foreach ($logdb as $key => $val) {
 			writelog($val);
 		}
-		$db->update("UPDATE pw_argument SET digest=".pwEscape($digest)." WHERE tid IN(".pwImplode($selids).")",0);
+		$db->update("UPDATE pw_argument SET digest=".S::sqlEscape($digest)." WHERE tid IN(".S::sqlImplode($selids).")",0);
 		
 		if (defined('AJAX')) {
 			Showmsg("thread_digest_success_ajax");
@@ -333,16 +333,17 @@ if ($action == 'toptopic') {
 	} else {
 
 		PostCheck();
-		InitGP(array('locked'));
-		InitGP(array('ifmsg'),'P',2);
+		S::gp(array('locked'));
+		S::gp(array('ifmsg'),'P',2);
 		(is_null($locked)) && Showmsg('mawhole_nolock');
 
 		$msgdb = $logdb = array();
-		$query = $db->query("SELECT locked,tid,fid,postdate,author,authorid,subject FROM pw_threads WHERE tid IN(".pwImplode($selids).")");
+		$query = $db->query("SELECT locked,tid,fid,postdate,author,authorid,subject FROM pw_threads WHERE tid IN(".S::sqlImplode($selids).")");
 		while ($rt = $db->fetch_array($query)) {
 			if ($rt['locked']%3 <> $locked && $locked) {
 				$s = $rt['locked'] > 2 ? $locked + 3 : $locked;
-				$db->update('UPDATE pw_threads SET locked='.pwEscape($s).' WHERE tid='.pwEscape($rt['tid']));
+				//$db->update('UPDATE pw_threads SET locked='.S::sqlEscape($s).' WHERE tid='.S::sqlEscape($rt['tid']));
+				pwQuery::update('pw_threads', 'tid=:tid', array($rt['tid']), array('locked'=>$s));
 				if ($ifmsg) {
 					$msgdb[] = array(
 						'toUser'	=> $rt['author'],
@@ -376,7 +377,8 @@ if ($action == 'toptopic') {
 				);
 			} elseif ($rt['locked']%3 <> 0 && !$locked) {
 				$s = $rt['locked'] > 2 ? 3 : 0;
-				$db->update("UPDATE pw_threads SET locked='$s' WHERE tid=".pwEscape($rt['tid']));
+				//$db->update("UPDATE pw_threads SET locked='$s' WHERE tid=".S::sqlEscape($rt['tid']));
+				pwQuery::update('pw_threads', 'tid=:tid', array($rt['tid']), array('locked'=>$s));
 				if ($ifmsg) {
 					$msgdb[] = array(
 						'toUser'	=> $rt['author'],
@@ -428,7 +430,7 @@ if ($action == 'toptopic') {
 		require_once PrintEot($template);footer();
 	} else {
 		PostCheck();
-		InitGP(array('ifmsg','nextto','pushtime'));
+		S::gp(array('ifmsg','nextto','pushtime'));
 		if (!is_numeric($pushtime)) {
 			Showmsg('mawhole_erropushtime');
 		}
@@ -437,7 +439,7 @@ if ($action == 'toptopic') {
 		}
 		
 		$msgdb = $logdb = array();
-		$query = $db->query("SELECT tid,fid,postdate,author,authorid,subject FROM pw_threads WHERE tid IN(".pwImplode($selids).")");
+		$query = $db->query("SELECT tid,fid,postdate,author,authorid,subject FROM pw_threads WHERE tid IN(".S::sqlImplode($selids).")");
 		while ($rt = $db->fetch_array($query)) {
 			if ($ifmsg) {
 				$msgdb[] = array(
@@ -478,7 +480,7 @@ if ($action == 'toptopic') {
 
 		$pushtime < 0 && $pushtime = 1;
 		$uptime = $timestamp+$pushtime*3600;
-		$db->update("UPDATE pw_argument SET lastpost=".pwEscape($uptime)."WHERE tid IN(".pwImplode($selids).")");
+		$db->update("UPDATE pw_argument SET lastpost=".S::sqlEscape($uptime)."WHERE tid IN(".S::sqlImplode($selids).")");
 
 		if (defined('AJAX')){
 			Showmsg("thread_pushtopic_success_ajax");
@@ -502,17 +504,18 @@ if ($action == 'toptopic') {
 	} else {
 
 		PostCheck();
-		InitGP(array('ifmsg','nextto','timelimit','ifpush'));
+		S::gp(array('ifmsg','nextto','timelimit','ifpush'));
 	
 		$timelimit < 0 && $timelimit = 24;
 		$downtime = $timelimit * 3600;
 		$msgdb = $logdb = array();
-		$threadList = L::loadClass("threadlist", 'forum');
-		$query = $db->query("SELECT tid,fid,postdate,author,authorid,subject,locked FROM pw_threads WHERE tid IN(".pwImplode($selids).")");
+		//* $threadList = L::loadClass("threadlist", 'forum');
+		$query = $db->query("SELECT tid,fid,postdate,author,authorid,subject,locked FROM pw_threads WHERE tid IN(".S::sqlImplode($selids).")");
 		while ($rt = $db->fetch_array($query)) {
 			$sql = "locked='".($ifpush ? ($rt['locked']%3 + 3) : $rt['locked']%3)."'";
-			$db->update("UPDATE pw_argument SET lastpost=lastpost-".pwEscape($downtime)." WHERE tid=".pwEscape($rt['tid']));
-			$db->update("UPDATE pw_threads SET $sql WHERE tid=".pwEscape($rt['tid']));
+			$db->update("UPDATE pw_argument SET lastpost=lastpost-".S::sqlEscape($downtime)." WHERE tid=".S::sqlEscape($rt['tid']));
+			//$db->update("UPDATE pw_threads SET $sql WHERE tid=".S::sqlEscape($rt['tid']));
+			$db->update(pwQuery::buildClause("UPDATE :pw_table SET $sql WHERE tid=:tid", array('pw_threads', $rt['tid'])));
 			if ($ifmsg) {
 				$msgdb[] = array(
 					'toUser'	=> $rt['author'],
@@ -546,6 +549,7 @@ if ($action == 'toptopic') {
 				'reason'	=> stripslashes($atc_content)
 			);
 			//$threadList->updateThreadIdsByForumId($fid,$rt['tid'],$downtime);
+			Perf::gatherInfo('changeThreadWithForumIds', array('fid'=>$fid));
 		}
 		sendMawholeMessages($msgdb);
 		foreach ($logdb as $key => $val) {
@@ -563,7 +567,7 @@ if ($action == 'toptopic') {
 	if (empty($_POST['step'])) {
 
 		if (is_numeric($seltid)) {
-			$rt = $db->get_one("SELECT a.titlefont,t.author FROM pw_argument a LEFT JOIN pw_threads t ON a.tid=t.tid WHERE a.tid=".pwEscape($seltid));
+			$rt = $db->get_one("SELECT a.titlefont,t.author FROM pw_argument a LEFT JOIN pw_threads t ON a.tid=t.tid WHERE a.tid=".S::sqlEscape($seltid));
 			$titledetail = explode("~",$rt['titlefont']);
 			$titlecolor = $titledetail[0];
 			if ($titlecolor && !preg_match('/\#[0-9A-F]{6}/is',$titlecolor)) {
@@ -589,19 +593,19 @@ if ($action == 'toptopic') {
 
 	} else {
 		PostCheck();
-		InitGP(array('title1','title2','title3','title4','nextto','ifmsg','timelimit'));
+		S::gp(array('title1','title2','title3','title4','nextto','ifmsg','timelimit'));
 
 		if ($title1 && !preg_match('/#[0-9A-F]{6}/is',$title1)) {
 			Showmsg('mawhole_nodata');
 		}
 		!$selids && Showmsg('mawhole_nodata');
 
-		$titlefont = Char_cv("$title1~$title2~$title3~$title4~$title5~$title6~");
+		$titlefont = S::escapeChar("$title1~$title2~$title3~$title4~$title5~$title6~");
 		$ifedit = (!$title1 && !$title2 && !$title3 && !$title4) ? 0 : 1;
 		$toolfield = $timelimit>0 && $ifedit ? $timelimit*86400 + $timestamp : '';
 
 		$msgdb = $logdb = array();
-		$query = $db->query("SELECT a.tid,a.postdate,t.author,t.authorid,t.subject,a.toolfield FROM pw_argument a LEFT JOIN pw_threads t ON a.tid=t.tid WHERE a.tid IN(".pwImplode($selids).")");
+		$query = $db->query("SELECT a.tid,a.postdate,t.author,t.authorid,t.subject,a.toolfield FROM pw_argument a LEFT JOIN pw_threads t ON a.tid=t.tid WHERE a.tid IN(".S::sqlImplode($selids).")");
 		while ($rt = $db->fetch_array($query)) {
 			if ($ifmsg) {
 				$msgdb[] = array(
@@ -637,7 +641,7 @@ if ($action == 'toptopic') {
 			if ($toolfield || $rt['toolfield']) {
 				$t = explode(',',$rt['toolfield']);
 				$rt['toolfield'] = $t[0].','.$toolfield;
-				$db->update("UPDATE pw_argument SET titlefont=".pwEscape($titlefont).',toolfield='.pwEscape($rt['toolfield']).' WHERE tid='.pwEscape($rt['tid']));
+				$db->update("UPDATE pw_argument SET titlefont=".S::sqlEscape($titlefont).',toolfield='.S::sqlEscape($rt['toolfield']).' WHERE tid='.S::sqlEscape($rt['tid']));
 			} else {
 				$tids[] = $rt['tid'];
 			}
@@ -648,7 +652,7 @@ if ($action == 'toptopic') {
 		}
 	
 		if ($tids) {
-			$db->update("UPDATE pw_argument SET titlefont=".pwEscape($titlefont)." WHERE tid IN(". pwImplode($tids).")");
+			$db->update("UPDATE pw_argument SET titlefont=".S::sqlEscape($titlefont)." WHERE tid IN(". S::sqlImplode($tids).")");
 		}
 		if (defined('AJAX')){
 			Showmsg("thread_highlight_success_ajax");
@@ -664,7 +668,7 @@ if ($action == 'toptopic') {
 	} else {
 		require_once (R_P . 'require/app_core.php');
 		PostCheck();
-		InitGP(array('ifdel','ifmsg'));
+		S::gp(array('ifdel','ifmsg'));
 
 		$msgdb = array();
 
@@ -695,10 +699,10 @@ if ($action == 'toptopic') {
 				);
 			}
 			//更新群组中相关信息
-			//$db->update("DELETE FROM pw_argument WHERE tid=" . pwEscape($read['tid']));
+			//$db->update("DELETE FROM pw_argument WHERE tid=" . S::sqlEscape($read['tid']));
 //			$pw_posts = GetPtable($read['ptable']);
-//			$pnum = $db->get_value("SELECT count(*) FROM $pw_posts WHERE tid=".pwEscape($read['tid']));
-//			$db->update("UPDATE pw_colonys SET tnum=tnum-1, pnum=pnum-" . pwEscape($pnum+1) . ", todaypost=todaypost-" . pwEscape($pnum+1) . " WHERE id=". pwEscape($cyid));
+//			$pnum = $db->get_value("SELECT count(*) FROM $pw_posts WHERE tid=".S::sqlEscape($read['tid']));
+//			$db->update("UPDATE pw_colonys SET tnum=tnum-1, pnum=pnum-" . S::sqlEscape($pnum+1) . ", todaypost=todaypost-" . S::sqlEscape($pnum+1) . " WHERE id=". S::sqlEscape($cyid));
 		}
 		$delarticle->delTopic($readdb, $db_recycle, $ifdel, array('reason' => $atc_content));
 		countPosts('-1');
@@ -707,9 +711,10 @@ if ($action == 'toptopic') {
 		sendMawholeMessages($msgdb);
 	
 		if ($db_ifpwcache ^ 1) {
-			$db->update("DELETE FROM pw_elements WHERE type !='usersort' AND id IN(" . pwImplode($selids) . ')');
+			$db->update("DELETE FROM pw_elements WHERE type !='usersort' AND id IN(" . S::sqlImplode($selids) . ')');
 		}
-		P_unlink(D_P.'data/bbscache/c_cache.php');
+		//* P_unlink(D_P.'data/bbscache/c_cache.php');
+		pwCache::deleteData(D_P.'data/bbscache/c_cache.php');
 		
 		if (!defined('AJAX')) {
 			refreshto("thread.php?cyid=$cyid",'deltopic_success');
@@ -719,8 +724,8 @@ if ($action == 'toptopic') {
 	}
 
 } elseif ($action == 'type') {
-	include_once(D_P.'data/bbscache/cache_post.php');
-	include_once(D_P.'data/bbscache/forum_typecache.php');
+	include_once pwCache::getPath(D_P.'data/bbscache/cache_post.php');
+	include_once pwCache::getPath(D_P.'data/bbscache/forum_typecache.php');
 	$fid = $colony['classid'];
 	$t_db = (array)$topic_type_cache[$fid];
 	if (empty($_POST['step'])) {
@@ -749,17 +754,18 @@ if ($action == 'toptopic') {
 	} else {
 
 		PostCheck();
-		InitGP(array('type','subtype','ifmsg'));
+		S::gp(array('type','subtype','ifmsg'));
 		count($tidarray) > 500 && Showmsg('mawhole_count');
 		
 		$type = $subtype ? $subtype : $type;
-		$db->update('UPDATE pw_threads SET type='.pwEscape($type)." WHERE tid IN(".pwImplode($selids).")");
-
-		$threads = L::loadClass('Threads', 'forum');
-		$threads->delThreads($selids);
+		//$db->update('UPDATE pw_threads SET type='.S::sqlEscape($type)." WHERE tid IN(".S::sqlImplode($selids).")");
+		pwQuery::update('pw_threads', 'tid IN(:tid)', array($selids), array('type'=>$type));
+		
+		//* $threads = L::loadClass('Threads', 'forum');
+		//* $threads->delThreads($selids);
 
 		if ($ifmsg) {
-			$query = $db->query("SELECT tid,fid,author,authorid,subject,postdate FROM pw_threads WHERE tid IN(".pwImplode($selids).")");
+			$query = $db->query("SELECT tid,fid,author,authorid,subject,postdate FROM pw_threads WHERE tid IN(".S::sqlImplode($selids).")");
 			while (@extract($db->fetch_array($query))) {
 				M::sendNotice(
 					array($author),

@@ -65,7 +65,7 @@ a:hover{ text-decoration:underline;}
 .ml20{margin-left:20px;}
 .p10{padding:10px;}
 /*header*/
-.admin_logo{display:block;width:145px;height:70px;overflow:hidden;}
+.admin_logo{}
 .admin_topbar{padding:0 20px 10px;line-height:1.5;height:22px;overflow:hidden;}
 .admin_search{background-position:0 0;width:177px;height:22px;overflow:hidden;margin-right:20px;}
 .s-input,.s-btn{border:0;background:none;}
@@ -98,10 +98,13 @@ a:hover{ text-decoration:underline;}
 .menubar_ul{padding:10px 0 10px 10px;width:135px;}
 .menubar_ul li{width:100px;}
 .menubar_ul li:hover,.menubar_ul .current{width:135px;background-position:0px -70px;}
-.menubar_ul li a{padding-left:25px;line-height:28px;color:#555;display:block;border:1px solid #f2f2f2;}
+.menubar_ul li a{line-height:28px;color:#555;display:block;border:1px solid #f2f2f2;padding-left:25px;}
 .menubar_ul li a:hover,.menubar_ul .current a{border:1px solid #a4c2df;background-color:#ffffff;border-right:0;text-decoration:none;margin-right:0px;}
+.menubar_ul li a img{ position:absolute;margin-left:-21px;width:16px;height:16px;margin-top:6px;}
 
 #admin_hr{height:1px;line-height:1px;overflow:hidden;background:#ffffff;border-top:1px solid #ccc;width:123px;margin:5px 0;*margin:-5px 0 5px;padding:0;display:block;}
+
+
 #initiator-shortcut a{ background-position:5px 6px;}
 #config-shortcut a{ background-position:5px -154px;}
 #consumer-shortcut a{ background-position:5px -114px;}
@@ -113,8 +116,24 @@ a:hover{ text-decoration:underline;}
 #bbs-shortcut a{ background-position:5px -314px;}
 #area-shortcut a{ background-position:5px -354px;}
 #o-shortcut a{ background-position:5px -394px;}
-#cms-shortcut a{ background-position:5px -432px;}
-#house-shortcut a{ background-position:5px -474px;}
+
+#modelist-shortcut a{ background-position:5px -274px;}
+
+#initiator-shortcut img{visibility:hidden;}
+#config-shortcut img{visibility:hidden;}
+#consumer-shortcut img{visibility:hidden;}
+#contentforums-shortcut img{visibility:hidden;}
+#datacache-shortcut img{visibility:hidden;}
+#applicationcenter-shortcut img{visibility:hidden;}
+#markoperation-shortcut img{visibility:hidden;}
+#modemanage-shortcut img{visibility:hidden;}
+#bbs-shortcut img{visibility:hidden;}
+#area-shortcut img{visibility:hidden;}
+#o-shortcut img{visibility:hidden;}
+
+#modelist-shortcut img{visibility:hidden;}
+
+
 /*左边弹窗*/
 .menu_bg{width:130px;border:1px solid #a4c2df;}
 .menu_li{border:1px solid #ffffff;background:#ffffff;}

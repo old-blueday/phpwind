@@ -55,12 +55,21 @@ class usermodel {
 		)));
 		$uid = $this->db->insert_id();
 	
+		/**
 		$this->db->update("INSERT INTO pw_memberdata SET " . $this->base->sqlSingle(array(
 			'uid'		=> $uid,
 			'lastvisit'	=> $this->base->time,
 			'thisvisit'	=> $this->base->time,
 			'onlineip'	=> $this->base->onlineip
 		)));
+		**/
+		pwQuery::insert('pw_memberdata', array(
+			'uid'		=> $uid,
+			'lastvisit'	=> $this->base->time,
+			'thisvisit'	=> $this->base->time,
+			'onlineip'	=> $this->base->onlineip
+		));
+		
 		return $uid;
 	}
 

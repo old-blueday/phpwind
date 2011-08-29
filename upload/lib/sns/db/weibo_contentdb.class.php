@@ -38,7 +38,7 @@ class PW_Weibo_ContentDB extends BaseDB {
 				$sql .= ($sql ? ',' : '') . $key . '=' . $key . '+' . intval($value);
 			}
 		}
-		$this->_db->query('UPDATE ' . $this->_tableName . ' SET ' . $sql . ' WHERE mid=' . pwEscape($id));
+		$this->_db->query('UPDATE ' . $this->_tableName . ' SET ' . $sql . ' WHERE mid=' . S::sqlEscape($id));
 	}
 
 	function getWeibosByMid($mids){
@@ -48,7 +48,7 @@ class PW_Weibo_ContentDB extends BaseDB {
 	}
 
 	function getWeibosByType($type, $start, $limit) {
-		$sql = 'SELECT * FROM ' . $this->_tableName . ' WHERE type=' . pwEscape($type) . ' ORDER BY objectid DESC ' . pwLimit($start, $limit);
+		$sql = 'SELECT * FROM ' . $this->_tableName . ' WHERE type=' . S::sqlEscape($type) . ' ORDER BY objectid DESC ' . S::sqlLimit($start, $limit);
 		$query = $this->_db->query($sql);
 		return  $this->_getAllResultFromQuery($query);
 	}
@@ -58,9 +58,19 @@ class PW_Weibo_ContentDB extends BaseDB {
 			return array();
 		}
 		$objectIds = is_array($objectIds) ? $objectIds : array($objectIds);
-		$sql = 'SELECT mid,uid FROM '.$this->_tableName.' WHERE type = ' . pwEscape($type) . ' AND objectid in (' . pwImplode($objectIds).')';
+		$sql = 'SELECT mid,uid FROM '.$this->_tableName.' WHERE type = ' . S::sqlEscape($type) . ' AND objectid in (' . S::sqlImplode($objectIds).')';
 		$query = $this->_db->query($sql);
 		return  $this->_getAllResultFromQuery($query);
+	}
+	
+	function getMidsByObjectIdsAndType($objectIds, $type) {
+		if (!isset($type) || empty($objectIds)) {
+			return array();
+		}
+		$objectIds = is_array($objectIds) ? $objectIds : array($objectIds);
+		$sql = 'SELECT mid FROM '.$this->_tableName.' WHERE type = ' . S::sqlEscape($type) . ' AND objectid in (' . S::sqlImplode($objectIds).')';
+		$query = $this->_db->query($sql);
+		return $this->_getAllResultFromQuery($query);
 	}
 	
 	function getWeibos($page = 1,$perpage = 20){
@@ -75,7 +85,7 @@ class PW_Weibo_ContentDB extends BaseDB {
 	
 	function getWeibosByTypesAndNum($types = array(), $num = 10){
 		if (!$types || !is_array($types) || !$num) return false;
-		$sql = 'SELECT * FROM '.$this->_tableName.' WHERE type IN(' . pwImplode($types) .') ORDER BY mid DESC '.$this->_Limit($num);
+		$sql = 'SELECT * FROM '.$this->_tableName.' WHERE type IN(' . S::sqlImplode($types) .') ORDER BY mid DESC '.$this->_Limit($num);
 		$query = $this->_db->query($sql);
 		return  $this->_getAllResultFromQuery($query);
 	}
@@ -146,7 +156,7 @@ class PW_Weibo_ContentDB extends BaseDB {
 			$sql .= ' AND mid>' . intval($max - 1000);
 		}
 		if ($exclude) {
-			$sql .= ' AND uid NOT IN(' . pwImplode($exclude) . ')';
+			$sql .= ' AND uid NOT IN(' . S::sqlImplode($exclude) . ')';
 		}
 		$query = $this->_db->query("SELECT * FROM " . $this->_tableName . ' WHERE 1' . $sql . ' GROUP BY uid' . $this->_limit($num));
 		return $this->_getAllResultFromQuery($query);
@@ -158,7 +168,7 @@ class PW_Weibo_ContentDB extends BaseDB {
 	}
 	
 	function getPrevWeiboByType($uid, $type, $time) {
-		return $this->_db->get_one('SELECT * FROM ' . $this->_tableName . ' WHERE uid=' . pwEscape($uid) . ' AND postdate>' . pwEscape($time) . ' AND type=' . pwEscape($type) . ' ORDER BY postdate DESC LIMIT 1');
+		return $this->_db->get_one('SELECT * FROM ' . $this->_tableName . ' WHERE uid=' . S::sqlEscape($uid) . ' AND postdate>' . S::sqlEscape($time) . ' AND type=' . S::sqlEscape($type) . ' ORDER BY postdate DESC LIMIT 1');
 	}
 
 	function adminSearch($uids,$contents,$startDate,$endDate,$type,$orderby,$page = 1,$perpage = 20){
@@ -167,22 +177,22 @@ class PW_Weibo_ContentDB extends BaseDB {
 		} 
 		$sqlAdd = '';
 		if($uids && is_array($uids)){
-			$sqlAdd .= ' AND uid IN (' . pwImplode($uids) . ') ';
+			$sqlAdd .= ' AND uid IN (' . S::sqlImplode($uids) . ') ';
 		}
 		if($contents){
-			$sqlAdd .= ' AND content like '.pwEscape('%'.$contents.'%');
+			$sqlAdd .= ' AND content like '.S::sqlEscape('%'.$contents.'%');
 		}
 		if($startDate && is_numeric($startDate)){
-			$sqlAdd .= ' AND postdate >= ' . pwEscape($startDate);
+			$sqlAdd .= ' AND postdate >= ' . S::sqlEscape($startDate);
 		}
 		
 		if($endDate && is_numeric($endDate)){
-			$sqlAdd .= ' AND postdate <= ' . pwEscape($endDate);
+			$sqlAdd .= ' AND postdate <= ' . S::sqlEscape($endDate);
 		}
 		
 		$type = intval($type);
 		if($type >= 0 ){
-			$sqlAdd .= ' AND type = ' . pwEscape($type);
+			$sqlAdd .= ' AND type = ' . S::sqlEscape($type);
 		}
 		$orderby = in_array($orderby,array('desc','asc')) ? $orderby : 'desc';
 		$sql = 'SELECT count(*) FROM '.$this->_tableName.' WHERE 1=1 '.$sqlAdd;
@@ -202,7 +212,7 @@ class PW_Weibo_ContentDB extends BaseDB {
 			return false;
 		}
 		$mids = is_array($mids) ? $mids : array($mids);
-		$sql = 'DELETE FROM '.$this->_tableName.' WHERE mid IN (' . pwImplode($mids) . ') ';
+		$sql = 'DELETE FROM '.$this->_tableName.' WHERE mid IN (' . S::sqlImplode($mids) . ') ';
 		$this->_db->query($sql);
 		return true;
 	}
@@ -217,17 +227,17 @@ class PW_Weibo_ContentDB extends BaseDB {
 			switch ($key) {
 				case 'uidIn':
 				case 'uidsIn': $sqlAdd .= " AND a.authorid" . $this->_sqlIn($value);break;
-				case 'uidsNotIn': if ($value) $sqlAdd .= " AND a.authorid NOT IN (" . pwImplode($value) . ')';break;
-				case 'uidNotIn': $sqlAdd .= " AND a.authorid!=" . pwEscape($value);break;
+				case 'uidsNotIn': if ($value) $sqlAdd .= " AND a.authorid NOT IN (" . S::sqlImplode($value) . ')';break;
+				case 'uidNotIn': $sqlAdd .= " AND a.authorid!=" . S::sqlEscape($value);break;
 				case 'source': $sqlAdd .= " AND a.type" . $this->_sqlIn($value);break;
-				case 'contenttype': $sqlAdd .= " AND b.contenttype=" . pwEscape($value);break;
+				case 'contenttype': $sqlAdd .= " AND b.contenttype=" . S::sqlEscape($value);break;
 			}
 		}
 		return $sqlAdd;
 	}
 
 	function _sqlIn($ids) {
-		return (is_array($ids) && $ids) ? ' IN (' . pwImplode($ids) . ')' : '=' . pwEscape($ids);
+		return (is_array($ids) && $ids) ? ' IN (' . S::sqlImplode($ids) . ')' : '=' . S::sqlEscape($ids);
 	}
 	
 	function findMidsByUids($uids) {

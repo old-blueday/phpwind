@@ -1,11 +1,9 @@
 <?php
 !function_exists('adminmsg') && exit('Forbidden');
-$basename = "$admin_file?adminjob=customnav&admintype=$admintype";
-
-InitGP(array('action', 'type'));
-
+S::gp(array('action', 'type','adminitem'));
+empty($adminitem)  && $adminitem = 'navmain';
+$basename = "$admin_file?adminjob=customnav&adminitem=$adminitem";
 $navConfigService = L::loadClass('navconfig', 'site'); /* @var $navConfigService PW_NavConfig */
-
 $postions = array();
 foreach ($db_modes as $key => $value) {
 	if ($value['ifopen']) {
@@ -13,14 +11,13 @@ foreach ($db_modes as $key => $value) {
 	}
 }
 $postions['srch'] = array('m_name'=>'搜索', 'title'=>'搜索');
-
-
-if ('navmain' == $admintype) {
+$postions['group'] = array('m_name'=>'群组', 'title'=>'群组');
+if ('navmain' == $adminitem) {
 	if ('add' == $action) {
 		$navSelection = formSelect('parentid', '', array('0'=>'-顶级导航') + tmpGenerateNavSelectionArray($navConfigService->findSubNavListByType(PW_NAV_TYPE_MAIN)), 'id="parentNavId" class="select_wa"');
 		require PrintEOT("customnav");
 	} elseif ('save' == $action) {
-		InitGP(array('parentid', 'pos', 'title', 'link', 'view', 'alt', 'color', 'b', 'i', 'u', 'target', 'isshow', 'floattype', 'listtype', 'selflisttype'), 'P');
+		S::gp(array('parentid', 'pos', 'title', 'link', 'view', 'alt', 'color', 'b', 'i', 'u', 'target', 'isshow', 'floattype', 'listtype', 'selflisttype'), 'P');
 		
 		empty($title) && adminmsg("nav_empty_title");
 		$pos = is_array($pos) ? $pos : array();
@@ -53,11 +50,11 @@ if ('navmain' == $admintype) {
 		
 		adminmsg("operate_success", "$basename");
 	} elseif ('del' == $action) {
-		$navId = (int) GetGP('nid');
+		$navId = (int) S::getGP('nid');
 		$navConfigService->delete($navId);
 		adminmsg("operate_success", "$basename");
 	} elseif ('edit' == $action) {
-		InitGP(array('nid'));
+		S::gp(array('nid'));
 		!isset($nid) && adminmsg("undefine_action");
 		
 		$nav = $navConfigService->get($nid);
@@ -90,7 +87,7 @@ if ('navmain' == $admintype) {
 
 		require PrintEOT("customnav");
 	} elseif ('doedit' == $action) {
-		InitGP(array('nid', 'parentid', 'pos', 'title', 'link', 'view', 'alt', 'color', 'b', 'i', 'u', 'target', 'isshow', 'floattype', 'listtype', 'selflisttype'), 'P');
+		S::gp(array('nid', 'parentid', 'pos', 'title', 'link', 'view', 'alt', 'color', 'b', 'i', 'u', 'target', 'isshow', 'floattype', 'listtype', 'selflisttype'), 'P');
 		
 		empty($title) && adminmsg("nav_empty_title");
 		$pos = is_array($pos) ? $pos : array();
@@ -129,7 +126,7 @@ if ('navmain' == $admintype) {
 		
 		adminmsg("operate_success", "$basename");
 	} elseif ('editview' == $action) {
-		InitGP(array('view'), 'P');
+		S::gp(array('view'), 'P');
 		
 		if (!is_array($view) || !count($view)) adminmsg('没有要更新的数据');
 		
@@ -161,8 +158,10 @@ if ('navmain' == $admintype) {
 			$adds += (bool)$navConfigService->add(PW_NAV_TYPE_MAIN, array('nkey' => $key, 'pos' => '-1', 'title' => ($value['title'] ? $value['title'] : $value['m_name']), 'style' => '', 'link' => $link, 'alt' => '', 'target' => 0, 'view' => $vieworder[$key] ? $vieworder[$key] : $view++, 'upid' => 0, 'isshow' => $value['ifopen']));
 		}
 		
-		$view = 3;
-		include D_P.'data/bbscache/area_config.php';
+		$adds += (bool)$navConfigService->add(PW_NAV_TYPE_MAIN, array('nkey' => 'group', 'pos' => '-1', 'title' => '群组', 'style' => '', 'link' => 'group.php', 'alt' => '', 'target' => 0, 'view' => 3, 'upid' => 0, 'isshow' => 1));
+		
+		$view = 4;
+		include pwCache::getPath(D_P.'data/bbscache/area_config.php');
 		if (!$area_default_alias) {
 			$currentAlias = is_array($area_channels) ? current($area_channels) : array();
 			$area_default_alias = $currentAlias['alias'];
@@ -181,7 +180,7 @@ if ('navmain' == $admintype) {
 		require PrintEOT("customnav");
 	}
 	
-} elseif ('navside' == $admintype) {
+} elseif ('navside' == $adminitem) {
 	
 	$navType = in_array($type, array(PW_NAV_TYPE_HEAD_LEFT, PW_NAV_TYPE_HEAD_RIGHT, PW_NAV_TYPE_FOOT)) ? $type : PW_NAV_TYPE_HEAD_RIGHT;
 	$navTypeName = array(PW_NAV_TYPE_HEAD_RIGHT=>'顶部右侧导航', PW_NAV_TYPE_HEAD_LEFT=>'顶部左侧导航', PW_NAV_TYPE_FOOT=>'底部导航');
@@ -194,7 +193,7 @@ if ('navmain' == $admintype) {
 		$leftNavSelection = formSelect("parentid[$navTypeLeft]", '', array('0'=>'-顶级导航') + tmpGenerateNavSelectionArray($navConfigService->findSubNavListByType(PW_NAV_TYPE_HEAD_LEFT)), 'id="parentNav'.$navTypeLeft.'" class="select_wa" style="display:none;"');
 		require PrintEOT("customnav");
 	} elseif ('save' == $action) {
-		InitGP(array('newnavtype', 'parentid', 'pos', 'title', 'link', 'view', 'alt', 'color', 'b', 'i', 'u', 'target', 'isshow', 'listtype'), 'P');
+		S::gp(array('newnavtype', 'parentid', 'pos', 'title', 'link', 'view', 'alt', 'color', 'b', 'i', 'u', 'target', 'isshow', 'listtype'), 'P');
 
 		empty($title) && adminmsg("nav_empty_title", "$basename&type=$newnavtype" . ($newnavtype == $navTypeFoot ? '&action=footlist' : ''));
 		empty($newnavtype) && adminmsg('请选择导航类型');
@@ -227,7 +226,7 @@ if ('navmain' == $admintype) {
 		
 		adminmsg("operate_success", "$basename&type=$newnavtype" . ($newnavtype == $navTypeFoot ? '&action=footlist' : ''));
 	} elseif ('del' == $action) {
-		$navId = (int) GetGP('nid');
+		$navId = (int) S::getGP('nid');
 		
 		$nav = $navConfigService->get($navId);
 		if (!$nav) adminmsg('找不到导航链接配置');
@@ -236,7 +235,7 @@ if ('navmain' == $admintype) {
 		$navConfigService->delete($navId);
 		adminmsg("operate_success", "$basename&type=$navType" . ($navType == $navTypeFoot ? '&action=footlist' : ''));
 	} elseif ('edit' == $action) {
-		InitGP(array('nid'));
+		S::gp(array('nid'));
 		!isset($nid) && adminmsg("undefine_action");
 		
 		$nav = $navConfigService->get($nid);
@@ -265,7 +264,7 @@ if ('navmain' == $admintype) {
 
 		require PrintEOT("customnav");
 	} elseif ('doedit' == $action) {
-		InitGP(array('nid', 'parentid', 'pos', 'title', 'link', 'view', 'alt', 'color', 'b', 'i', 'u', 'target', 'isshow', 'listtype'), 'P');
+		S::gp(array('nid', 'parentid', 'pos', 'title', 'link', 'view', 'alt', 'color', 'b', 'i', 'u', 'target', 'isshow', 'listtype'), 'P');
 		
 		empty($title) && adminmsg("nav_empty_title");
 		$pos = is_array($pos) ? $pos : array();
@@ -304,7 +303,7 @@ if ('navmain' == $admintype) {
 		
 		adminmsg("operate_success", "$basename&type=$navType" . ($navType == $navTypeFoot ? '&action=footlist' : ''));
 	} elseif ('editview' == $action) {
-		InitGP(array('view'), 'P');
+		S::gp(array('view'), 'P');
 		
 		if (!is_array($view) || !count($view)) adminmsg('没有要更新的数据');
 		

@@ -339,18 +339,35 @@ EOT;
 	<tr><td>标题</td><td><input type="text" class="input input_wb" name="msg_title" maxlength="100" value="$subject" /></td></tr>
 <!--
 EOT;
-if($db_gdcheck & 8){print <<<EOT
+if($db_gdcheck & 8){
+$gdSize = explode("\t",$db_gdsize);
+print <<<EOT
 -->
-	<tr><td>认证码</td><td><img src="ck.php?nowtime=1" align="absmiddle" onclick="this.src='ck.php?nowtime=' + new Date().getTime();" style="cursor:pointer;" /><br /><input class="input" type="text" name="gdcode" size="8" /></td></tr>
+	<tr><td>认证码</td><td>
+<script type="text/javascript" src="js/pw_authcode.js"></script>
+<script>
+var flashWidth = "$gdSize[0]";
+var flashHeight = "$gdSize[1]";
+var gdtype = $db_gdtype;
+</script>
+	<input class="input" onfocus="showgd();" type="text" name="gdcode" size="8" />
+	<span id="ckcode" style="display:none;"></span>
+	</td></tr>
 <!--
 EOT;
-}if($msgq && $db_question){
+}if(($db_ckquestion & 8) && $db_question){
 $qkey = array_rand($db_question);
+if($db_imagequestion){
+	$question = '<img id="ckquestion" src="ckquestion.php?q='.$qkey.'&t='.$timestamp.'" align="top">';
+}else{
+	$question = $qkey<0 ? getMachineQuestion_1() :  $db_question[$qkey];
+}
+$q_a = $question.($showq && $qkey>0?" &nbsp;答案:".$db_answer[$qkey] : '');
 print <<<EOT
 -->
 	<!--
 	<tr><td>验证问题：</td>
-		<td><input class="input" type="text" name="qanswer" /><input type="hidden" name="qkey" value="$qkey" /> 问题$db_question[$qkey] &nbsp;正确答案:{$db_answer[$qkey]}</td></tr>
+		<td><input class="input" type="text" name="qanswer" /><input type="hidden" name="qkey" value="$qkey" /> 问题$q_a</td></tr>
 	 -->
 <!--
 EOT;
@@ -359,7 +376,19 @@ EOT;
 	<tr><td>内容</td><td><textarea name="atc_content" onkeydown="ajax.quickpost(event,this.form)" class="textareaA">$atc_content</textarea></td></tr>
 	</tbody>
 </table>
-<div class="popBottom"><span class="btn2"><span><button type="button" name="ajaxsubmit" onclick="ajax.submit(this.form);">提 交</button></span></span></div>
+<script type="text/javascript">
+msg_ajax = function(fp){
+	if(fp['msg_title'].value == ""){
+		ajax.showError('标题不能为空。');return false;
+	}
+	if(fp['atc_content'].value == ""){
+		ajax.showError('内容不能为空。');return false;
+	}
+	ajax.submit(fp);
+}
+
+</script>
+<div class="popBottom"><span class="btn2"><span><button type="button" name="ajaxsubmit" onclick="msg_ajax(this.form)">提 交</button></span></span></div>
 </form>
 </div>
 <!--
@@ -502,12 +531,16 @@ EOT;
 <input type="hidden" name="verify" value="$verifyhash" />
 <table width="100%">
 	<tr>
-		<td>站点名称</td>
+		<td>站点名称 <font color="#FF0000">*</font></td>
 		<td><input title="站点名称" name="linkname" class="input input_wa"></td>
 	</tr>
 	<tr>
-		<td>站点URL</td>
-		<td><input title="站点URL" name="linkurl" class="input input_wa"></td>
+		<td>站点URL <font color="#FF0000">*</font></td>
+		<td><input title="站点URL" name="linkurl" value="http://" class="input input_wa"></td>
+	</tr>
+	<tr>
+		<td>联系方式</td>
+		<td><input title="联系方式" name="username" class="input input_wa"></td>
 	</tr>
 	<tr>
 		<td>站点说明</td>
@@ -556,8 +589,21 @@ EOT;
 }elseif($action=='showface'){print <<<EOT
 -->
 <div class="mb10">
+<!--
+EOT;
+if ($pre_page && $pre_page < $page) {print <<<EOT
+-->
 	<a onclick="showSystemIcon($pre_page);" href="javascript:;" class="mr20">上一页</a>
+<!--
+EOT;
+}
+if ($next_page && $next_page > $page) {print <<<EOT
+-->
 	<a onclick="showSystemIcon($next_page);" href="javascript:;">下一页</a>
+<!--
+EOT;
+}print <<<EOT
+-->
 </div>
 <div class="profileFace">
 	<ul class="cc">
@@ -583,27 +629,45 @@ EOT;
 EOT;
 }elseif($action=='modify'){print <<<EOT
 -->
-<div style="width:400px;">
+<div style="width:450px;">
 <form action="ajax.php?action=$action" method="post" onsubmit="return false;">
 <input type="hidden" name="verify" value="$verifyhash" />
 <div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="cp adel" onclick="closep();">关闭</span>编辑帖子</div>
+<div style="display: none;" class="wrongTip"></div>
 <table width="100%" class="vt">
-	<tr><td width="50">作者:</td><td>$atcdb[author]</td></tr>
+	<tr><td width="60">作者:</td><td>$atcdb[author]</td></tr>
 	<tr><td>标题:</td><td><input class="input input_wb" type="text" name="atc_title" value="$atc_title" /></td></tr>
 <!--
 EOT;
-if(($db_gdcheck & 4) && $winddb['postnum'] < $db_postgd){print <<<EOT
+if(($db_gdcheck & 4) && (!$db_postgd || $winddb['postnum'] < $db_postgd)){
+$gdSize = explode("\t",$db_gdsize);
+print <<<EOT
 -->
 	<tbody><tr><td>认证码：</td>
-		<td><img src="ck.php?nowtime=1" align="absmiddle" onclick="this.src='ck.php?nowtime=' + new Date().getTime();" style="cursor:pointer;" /><br /><input class="input" type="text" name="gdcode" size="6" tabindex="2" maxlength="4" /></td></tr></tbody>
+		<td>
+<script type="text/javascript" src="js/pw_authcode.js"></script>
+<script>
+var flashWidth = "$gdSize[0]";
+var flashHeight = "$gdSize[1]";
+var gdtype = $db_gdtype;
+</script>
+<input class="input" type="text" name="gdcode" onfocus="showgd();" size="6" tabindex="2" maxlength="4" />
+<span id="ckcode" style="display:none;"></span>
+</td></tr></tbody>
 <!--
 EOT;
-}if($winddb['postnum'] < $postq && $db_question){
+}if(($db_ckquestion & 4) && (!$postq || $winddb[postnum] < $postq) && $db_question){
 $qkey = array_rand($db_question);
+if($db_imagequestion){
+	$question = '<img id="ckquestion" src="ckquestion.php?q='.$qkey.'&t='.$timestamp.'" align="top">';
+}else{
+	$question = $qkey<0 ? getMachineQuestion_1() :  $db_question[$qkey];
+}
+$q_a = $question.($showq && $qkey>0?" &nbsp;答案:".$db_answer[$qkey] : '');
 print <<<EOT
 -->
 	<tbody><tr><td>验证问题：</td>
-		<td><input class="input" type="text" name="qanswer" /><input type="hidden" name="qkey" value="$qkey" /> 问题$db_question[$qkey] &nbsp;正确答案:{$db_answer[$qkey]}</td></tr></tbody>
+		<td><span class="fl">{$q_a}</span><input class="input fl" type="text" size="5" name="qanswer" /><input type="hidden" name="qkey" value="$qkey" /></td></tr></tbody>
 <!--
 EOT;
 }print <<<EOT
@@ -618,33 +682,50 @@ EOT;
 <input type="hidden" name="pid" value="$pid" />
 <input type="hidden" value="$article" name="article" />
 <input type="hidden" value="1" name="atc_convert" />
-<div class="popBottom"><span class="btn2"><span><button type="button" name="ajaxsubmit" onclick="ajax.submit(this.form,edited);">提 交</button></span></span><span class="bt2"><span><button type="button" onclick="window.location.href='post.php?action=modify&fid=$fid&tid=$tid&pid=$pid&article=$article'">进入高级模式</button></span></span></div>
+<div class="popBottom"><span class="btn2"><span><button type="button" name="ajaxsubmit" onclick="ajax.send(this.form.getAttribute('action'),this.form,edited);">提 交</button></span></span><span class="bt2"><span><button type="button" onclick="window.location.href='post.php?action=modify&fid=$fid&tid=$tid&pid=$pid&article=$article'">进入高级模式</button></span></span></div>
 </form>
 </div>
 <!--
 EOT;
 }elseif($action=='quote'){print <<<EOT
 -->
-<div style="width:400px">
+<div style="width:450px">
 <form action="post.php?" method="post" name="quoteFORM">
 <input type="hidden" name="verify" value="$verifyhash" />
 <div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="cp adel" onclick="closep();">关闭</span>引用帖子</div>
 <table class="vt" width="100%">
-	<tr><td width="50">标题</td><td><input class="input input_wb" type="text" name="atc_title" value="$atc_title" /></td></tr>
+	<tr><td width="70">标题</td><td><input class="input input_wb" type="text" name="atc_title" value="$atc_title" /></td></tr>
 <!--
 EOT;
-if(($db_gdcheck & 4) && $winddb['postnum'] < $db_postgd){print <<<EOT
+if(($db_gdcheck & 4) && (!$db_postgd || $winddb['postnum'] < $db_postgd)){
+$gdSize = explode("\t",$db_gdsize);
+print <<<EOT
 -->
 	<tbody><tr><td>认证码：</td>
-		<td><img src="ck.php?nowtime=1" align="absmiddle" onclick="this.src='ck.php?nowtime=' + new Date().getTime();" style="cursor:pointer;" /><br /><input class="input" type="text" name="gdcode" size="6" tabindex="2" maxlength="4" /></td></tr></tbody>
+		<td>
+<script type="text/javascript" src="js/pw_authcode.js"></script>
+<script>
+var flashWidth = "$gdSize[0]";
+var flashHeight = "$gdSize[1]";
+var gdtype = $db_gdtype;
+</script>
+<input class="input" type="text" name="gdcode" onfocus="showgd();" size="6" tabindex="2" maxlength="4" />
+<span id="ckcode" style="display:none;"></span>
+</td></tr></tbody>
 <!--
 EOT;
-}if($winddb['postnum'] < $postq && $db_question){
+}if(($db_ckquestion & 4) && (!$postq || $winddb[postnum] < $postq) && $db_question){
 $qkey = array_rand($db_question);
+if($db_imagequestion){
+	$question = '<img id="ckquestion" src="ckquestion.php?q='.$qkey.'&t='.$timestamp.'" align="top">';
+}else{
+	$question = $qkey<0 ? getMachineQuestion_1() :  $db_question[$qkey];
+}
+$q_a = $question.($showq && $qkey>0?" &nbsp;答案:".$db_answer[$qkey] : '');
 print <<<EOT
 -->
 	<tbody><tr><td>验证问题：</td>
-		<td><input class="input" type="text" name="qanswer" /><input type="hidden" name="qkey" value="$qkey" /> 问题$db_question[$qkey] &nbsp;正确答案:{$db_answer[$qkey]}</td></tr></tbody>
+		<td>{$q_a}<input class="input" size="3" type="text" name="qanswer" /><input type="hidden" name="qkey" value="$qkey" /></td></tr></tbody>
 <!--
 EOT;
 }print <<<EOT
@@ -1235,7 +1316,7 @@ EOT;
 			<dl class="cc">
 				<dt><img src="$info[icon]" class="card-face" /></dt>
 				<dd>
-					<p class="card-title cc"><a href="u.php?uid=$info[uid]" class="fl b">$info[username]</a>
+					<p class="card-title cc"><a href="{$db_userurl}$info[uid]" class="fl b">$info[username]</a>
 <!--
 EOT;
 if($db_showonline && checkOnline($info['thisvisit'])){print <<<EOT
@@ -1294,7 +1375,7 @@ if(isset($db_hackdb['blog'][2]) && $db_hackdb['blog'][2] && $bg_ifopen){print <<
 EOT;
 }print <<<EOT
 -->
-					<!--<a href="u.php?uid=$info[uid]" class="card-profile" title="个人资料">个人资料</a>-->
+					<!--<a href="{$db_userurl}$info[uid]" class="card-profile" title="个人资料">个人资料</a>-->
 <!--
 EOT;
 if($groupid!='guest' && isset($db_hackdb['toolcenter']) && $db_toolifopen){print <<<EOT
@@ -1340,9 +1421,9 @@ EOT;
 		</div>
 		<div class="card-app">
 			<div class="p10">
-				<p class="mb10"><span class="mr20">他的朋友：<a href="u.php?uid=$info[uid]">{$info[f_num]}</a></span>&nbsp;&nbsp;&nbsp;
-				<span class="mr20">来访：<a href="u.php?uid=$info[uid]">{$info[visits]}</a></span>&nbsp;&nbsp;&nbsp;
-				<span>访问过：<a href="u.php?uid=$info[uid]">{$info[tovisits]}</a></span></p>
+				<p class="mb10"><span class="mr20">他的朋友：<a href="{$db_userurl}$info[uid]">{$info[f_num]}</a></span>&nbsp;&nbsp;&nbsp;
+				<span class="mr20">来访：<a href="{$db_userurl}$info[uid]">{$info[visits]}</a></span>&nbsp;&nbsp;&nbsp;
+				<span>访问过：<a href="{$db_userurl}$info[uid]">{$info[tovisits]}</a></span></p>
 				<p class="b">
 					<a href="apps.php?q=weibo&uid=$info[uid]">新鲜事</a><!--
 EOT;
@@ -1716,7 +1797,7 @@ if($pcid == '1'){print<<<EOT
 EOT;
 }print<<<EOT
 -->
-	<tr class="tr3"><td>匿名：</td><td><label><input type="checkbox" name="extra" value="1">&nbsp;仅发起人可见</label></td></tr>
+	<tr class="tr3"><td>匿名：</td><td><label><input type="checkbox" name="extra" value="1" checked>&nbsp;仅发起人可见</label></td></tr>
 </table>
 <div class="popBottom">
 <!--
@@ -1794,7 +1875,7 @@ EOT;
 EOT;
 if(empty($memberdb)){print <<<EOT
 -->
-<div style="padding:8px 15px;margin:0;" class="f12 blockquote">没有相关记录!</div>
+<div style="padding:8px 15px;margin:0;" class="f12 blockquote">暂时没有报名记录!</div>
 <!--
 EOT;
 }else{print <<<EOT
@@ -1878,10 +1959,10 @@ if($val[ifpay]==1){
 if ($jointype == 3) {
 	$mobile = $val['extra'] && $winduid!=$val[uid] ? '保密' : $val['mobile'];
 	$val[username] = $val['extra'] && $winduid!=$val[uid] ? '匿名' : $val[username];
-	$touidurl = $val['extra'] && $winduid!=$val[uid] ? 'javascript:;' : "u.php?uid=$val[uid]";
+	$touidurl = $val['extra'] && $winduid!=$val[uid] ? 'javascript:;' : "{$db_userurl}$val[uid]";
 } else {
 	$mobile = $val['mobile'];
-	$touidurl = "u.php?uid=$val[uid]";
+	$touidurl = "{$db_userurl}$val[uid]";
 }
 print <<<EOT
 -->
@@ -1891,7 +1972,7 @@ print <<<EOT
 EOT;
 if ($jointype == 1 || $jointype == 2) {print<<<EOT
 -->
-		<a href="javascript:;" id="message" onclick="sendmsg('pw_ajax.php?action=msg&touid=$val[uid]','','message')"><img src="$imgpath/email.gif"></a>
+		<a href="javascript:;" id="message" onclick="sendmsg('pw_ajax.php?action=msg&touid=$val[uid]','','message')"><img src="$imgpath/email.gif" align="absmiddle"></a>
 <!--
 EOT;
 }print<<<EOT
@@ -2141,7 +2222,7 @@ EOT;
 print <<<EOT
 -->
 <!-- splitTr --><!-- pingId:{$pingdata['id']} -->
-<span id="pingUserShow_{$pingdata['id']}"></span><img src="{$pingdata['icon']}" width="16" height="16" id="card_pingUserShow_{$pingdata[id]}" onmouseover="setTimeout(function(){showcard('{$pingdata['id']}','{$pingdata['uid']}','pingUserShow_')}, 700)" />
+<span id="pingUserShow_{$pingdata['id']}"></span><img src="{$pingdata['icon']}" width="16" height="16" id="card_pingUserShow_{$pingdata[id]}" onmouseover="setTimeout(function(){showcard('{$pingdata['id']}','{$pingdata['uid']}','pingUserShow_')}, 700)" align="absmiddle" />
 <!-- split -->
 <a target="_blank" href="u.php?username={$pingdata['pinger']}">{$pingdata['pinger']}</a>
 <!-- split -->
@@ -2213,7 +2294,7 @@ EOT;
 EOT;
 foreach ($arr as $key => $value) {print <<<EOT
 -->
-	<li onclick="userBinding.change('$value[uid]')"><a href="javascript:;" hidefocus="true">$value[username]</a></li>
+	<li onclick="userBinding.change('$value[uid]')"><a onclick="return false;" href="javascript:;" hidefocus="false">$value[username]</a></li>
 <!--
 EOT;
 }print <<<EOT
@@ -2379,7 +2460,7 @@ EOT;
 }else{print <<<EOT
 -->
 		<td rowspan="$value[rowspannum]">
-			<a href="u.php?uid=$value[uid]">$value[username]</a>
+			<a href="{$db_userurl}$value[uid]">$value[username]</a>
 			<a href="javascript:;" id="message" onclick="sendmsg('pw_ajax.php?action=msg&touid=$value[uid]','','message')"><img src="$imgpath/email.gif"></a>
 		</td>
 <!--
@@ -2627,7 +2708,7 @@ print<<<EOT
 		<td style="padding:0; width:456px;">
 			<div class="aa_alert410" style="padding:0; width:100%">
 			<table class="reg_infos" cellpadding="0" cellspacing="0">
-				<tr><td class="tar"></td><td><span class="gray">说明：带<font color="#FF0000">*</font>为必填选项</span></td></tr>
+				<tr><td class="tar"></td><td><span>说明：带<span class="s1">*</span>为必填选项</span></td></tr>
 				<tr>
 					<tr>
 						<td width="90" class="tar"><span style="color:red">*</span>报名人数：</td>
@@ -2671,7 +2752,7 @@ EOT;
 					</tr>
 					<tr>
 						<td class="tar">匿名：</td>
-						<td><input type="checkbox" name="ifanonymous" value="1" /> 仅发起人可见 </td>
+						<td><input type="checkbox" name="ifanonymous" value="1" checked /> 仅发起人可见 </td>
 					</tr>
 				</tr>
 			</table>
@@ -3025,7 +3106,7 @@ if($theMoreNum){
 		<td style="padding:0; width:456px;">
 			<div class="aa_alert410" style="padding:0; width:100%">
 			<table class="reg_infos" cellpadding="0" cellspacing="0">
-				<tr><td class="tar"></td><td><span class="gray">说明：带<font color="#FF0000">*</font>为必填选项</span></td></tr>
+				<tr><td class="tar"></td><td><span>说明：带<span class="s1">*</span>为必填选项</span></td></tr>
 				<tr>
 					<table width="100%">
 					<tr>
@@ -3826,41 +3907,107 @@ EOT;
 </form>
 <!--
 EOT;
-}} elseif ($action == 'attachbuy') {print <<<EOT
+}} elseif ($action == 'download') {print <<<EOT
 -->
-	<!--
+<div style="width:300px;">
+	<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><a class="adel" onclick="closep();" href="javascript:;">关闭</a>提示
+    </div>
+	<div class="p10">
+<!--
+EOT;
+	if ($msg !== true) {
+		$msg_info = getLangInfo('msg', $msg);print <<<EOT
+ -->
+		$msg_info
+<!--
+EOT;
+	} else {
+		if ($downloadServer->ifdown == 1) {print <<<EOT
+-->
+		版块下载附件需花费：{$downloadServer->downloadmoney} {$credit->cType[$downloadServer->uploadcredit]}<br />
+<!--
+EOT;
+		}
+		if ($downloadServer->attach['needrvrc'] && $downloadServer->attach['special'] == '2') {print <<<EOT
+-->	
+		该附件售价：{$downloadServer->attach[needrvrc]}{$credit->cType[$downloadServer->attach[ctype]]}，
+<!--
+EOT;
+			if ($downloadServer->ifsale == 1) {print <<<EOT
+-->
+			您目前的{$credit->cType[$downloadServer->attach[ctype]]}：{$GLOBALS[usercredit]}<br />
+<!--
+EOT;
+			} elseif ($downloadServer->ifsale == 2) {print <<<EOT
+-->
+			您已经支付过<br />
+<!--
+EOT;
+			} else {print <<<EOT
+-->
+			管理员和作者，无需扣除积分<br />
+<!--
+EOT;
+			}
+		}print <<<EOT
+-->
+		您确定要下载吗？
+<!--
+EOT;
+	}print <<<EOT
+-->
+	</div>
+	<div class="popBottom">
+<!--
+EOT;
+	if ($msg === true) { print <<<EOT
+-->
+    	<span class="btn2"><span><button type="button" onclick="javascript: location.href='job.php?action=download&aid=$aid&mt=$mt';closep();">确定</button></span></span>
+<!--
+EOT;
+	}print <<<EOT
+-->
+    	<span class="bt2"><span><button type="button" onclick="closep();">取消</button></span></span>
+    </div>
+</div>
+<!--
+EOT;
+} elseif ($action == 'attachbuy') {print <<<EOT
+-->
+<!--
 EOT;
 	if ($type == 'record') { print <<<EOT
 -->
-<div style="width:400px;">
-	<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><a class="adel" onclick="closep();" href="javascript:;">关闭</a>记录
+<div style="width:320px;">
+	<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><a class="adel" onclick="closep();" href="javascript:;">关闭</a>提示
     </div>
-    <table width="100%" cellspacing="0" cellpadding="0">
+    <div class="p10">
+		<table width="100%">
 <!--
 EOT;
 if (!$buy) {print <<<EOT
 -->
-    			<tr class="tr1 vt">
-                    <td class="td2">还没有人买过此附件</td>
-                </tr>
+			<tr class="tr3 vt">
+				<td class="td2">还没有人买过此附件</td>
+			</tr>
 <!--
 EOT;
 } else {print <<<EOT
 -->
-                <tr class="tr2">
-                    <td width="90">用户名</td>
-                    <td width="60">金额</td>
-                    <td>时间</td>
-                </tr>
+			<tr class="tr2">
+				<td width="90">用户名</td>
+				<td width="60">金额</td>
+				<td>时间</td>
+			</tr>
 <!--
 EOT;
 foreach ($buy as $value) {print <<<EOT
 -->
-                <tr class="tr1 vt">
-                    <td class="td2"><a href="u.php?uid={$value[uid]}" target="_blank">{$value[username]}</a></td>
-                    <td class="td2">{$value[cost]}{$value[ctype]}</td>
-                    <td class="td2 f10">{$value[createdtime]}</td>
-                </tr>
+			<tr class="tr3 vt">
+				<td class="td2"><a href="{$db_userurl}{$value[uid]}" target="_blank">{$value[username]}</a></td>
+				<td class="td2">{$value[cost]}{$value[ctype]}</td>
+				<td class="td2 f10">{$value[createdtime]}</td>
+			</tr>
 <!--
 EOT;
 }print <<<EOT
@@ -3869,10 +4016,11 @@ EOT;
 EOT;
 }print <<<EOT
 -->
-    </table>
-    <div class="popBottom">
-    	<span class="bt2"><span><button type="button" name="ajaxsubmit" onclick="closep();">关闭</button></span></span>
-    </div>
+		</table>
+	</div>
+	<div class="popBottom">
+		<span class="bt2"><span><button type="button" name="ajaxsubmit" onclick="closep();">关闭</button></span></span>
+	</div>
 </div>
 <!--
 EOT;
@@ -3996,7 +4144,7 @@ EOT;
 </div>
 <!--
 EOT;
-	}print <<<EOT
+}print <<<EOT
 -->
 <!--
 EOT;

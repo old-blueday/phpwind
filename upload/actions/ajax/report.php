@@ -2,11 +2,11 @@
 !defined('P_W') && exit('Forbidden');
 
 !$_G['allowreport'] && Showmsg('report_right');
-InitGP(array(
+S::gp(array(
 	'tid',
 	'pid'
 ), 'GP', '2');
-InitGP(array(
+S::gp(array(
 	'type',
 	'own'
 ));
@@ -19,7 +19,7 @@ if (is_int($own)) {
 }
 $ifown && Showmsg('report_own');
 
-$checkdata = $db->get_one("SELECT * FROM pw_report WHERE type=" . pwEscape($type) . " AND tid=" . pwEscape($tid) . " AND pid=" . pwEscape($pid));
+$checkdata = $db->get_one("SELECT * FROM pw_report WHERE type=" . S::sqlEscape($type) . " AND tid=" . S::sqlEscape($tid) . " AND pid=" . S::sqlEscape($pid));
 $checkdata && Showmsg('have_report');
 
 if (empty($_POST['step'])) {
@@ -27,10 +27,8 @@ if (empty($_POST['step'])) {
 	require_once PrintEot('ajax');
 	ajax_footer();
 } else {
-	InitGP(array(
-		'reason','ifsendmessage'
-	));
-	$pwSQL = pwSqlSingle(array(
+	S::gp(array('reason','ifsendmessage'));
+	$pwSQL = S::sqlSingle(array(
 		'tid' => $tid,
 		'pid' => $pid,
 		'uid' => $winduid,
@@ -62,10 +60,12 @@ function getSendToUsernames($type,$tid) {
 	if (!$type || !$tid) return $usernames;
 	switch ($type) {
 		case 'topic' :
-			$threadsService = L::loadClass('threads', 'forum'); /* @var $threadsService PW_threads */
-			$threads  = $threadsService->getThreads($tid);
+			//* $threadsService = L::loadClass('threads', 'forum'); /* @var $threadsService PW_threads */
+			//* $threads  = $threadsService->getThreads($tid);
+			$_cacheService = Perf::gatherCache('pw_threads');
+			$threads = $_cacheService->getThreadByThreadId($tid);			
 			$fid = $threads['fid'];
-			require_once(R_P.'lib/forum/forum.class.php');
+			L::loadClass('forum', 'forum', false);
 			$forumService = new PwForum($fid);
 			$foruminfo = $forumService->foruminfo;
 			$forumadmins = $foruminfo['forumadmin'];
@@ -111,7 +111,7 @@ function parseReportUrl($type, $pid, $tid) {
 			$url = 'apps.php?q=galbum&a=view&cyid='.$pid.'&pid='.$tid;
 			break;
 		case 'user':
-			$url = 'u.php?uid='.$tid;
+			$url = USER_URL.$tid;
 			break;
 		default :
 			$url = $pid ? "job.php?action=topost&tid=".$tid."&pid=".$pid : "read.php?tid=".$tid;

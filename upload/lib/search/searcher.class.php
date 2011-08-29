@@ -62,6 +62,7 @@ class PW_Searcher {
 	function searchGroups($keywords,$page = 1,$perpage = 20){
 		return $this->_service->searchGroups($keywords,$page,$perpage);
 	}
+	
 	/**
 	 * 公共搜索特殊信息
 	 * @return unknown_type
@@ -69,6 +70,15 @@ class PW_Searcher {
 	function searchSpecial($type='latest',$uid,$page=1,$perpage=50){
 		return $this->_service->getSpecialThreads($type,$uid,$page,$perpage);
 	}
+	
+	/**
+	 * 公共搜索默认信息
+	 * @return unknown_type
+	 */
+	function searchDefault($type='thread', $page=1, $perpage=50){
+		return $this->_service->getDefaultByType($type, $page, $perpage);
+	}
+		
 	/**
 	 * 后台帖子管理服务
 	 * @param $keywords
@@ -105,7 +115,7 @@ class PW_Searcher {
 			return $classes[$class];
 		}
 		if (!class_exists('Search_Base')) require (R_P . 'lib/search/search/base.search.php');
-		if (!class_exists($class)) include Pcv($filename);
+		if (!class_exists($class)) include S::escapePath($filename);
 		$classes[$class] = new $class();
 		return $classes[$class];
 	}

@@ -1,7 +1,7 @@
 <?php
 !function_exists('adminmsg') && exit('Forbidden');
 $basename .= '&admintype='.$admintype;
-include_once(D_P.'data/bbscache/inv_config.php');
+include_once pwCache::getPath(D_P.'data/bbscache/inv_config.php');
 require_once(R_P.'require/credit.php');
 $nav =  $action ? array($action=>'class = current') : 'class=current';
 if (empty($_POST['step'])) {
@@ -23,7 +23,7 @@ if (empty($_POST['step'])) {
 				}
 			}
 		}elseif($action == 'manager'){
-			InitGP(array('page','type','username'));
+			S::gp(array('page','type','username','receiver')); //搜索增加receiver@modify panjl@2010-11-2
 			$sql =  '';
 			$inv_days *= 86400;
 			$timediff = (int)($timestamp-$inv_days);
@@ -37,14 +37,17 @@ if (empty($_POST['step'])) {
 				$sql .= "AND i.ifused='1'";
 			}
 			if($username){
-				$sql .= ' AND m.username = '.pwEscape($username);
+				$sql .= ' AND m.username = '.S::sqlEscape($username);
+			}
+			if($receiver){ //搜索增加receiver@modify panjl@2010-11-2
+				$sql .= ' AND i.receiver = '.S::sqlEscape($receiver);
 			}
 			$db_showperpage = 20;
 			(!is_numeric($page) || $page<1) && $page = 1;
-			$limit = pwLimit(($page-1)*$db_showperpage,$db_showperpage);
+			$limit = S::sqlLimit(($page-1)*$db_showperpage,$db_showperpage);
 			$rt    = $db->get_one("SELECT COUNT(*) AS sum FROM pw_invitecode i LEFT JOIN pw_members m USING(uid)  WHERE 1=1 $sql");
-			$pages = numofpage($rt['sum'],$page,ceil($rt['sum']/$db_showperpage),"$basename&action=manager&type=$type&");
-		
+			$pages = numofpage($rt['sum'],$page,ceil($rt['sum']/$db_showperpage),"$basename&action=manager&type=$type&username=$username&");
+			$sql .= ' ORDER BY i.createtime desc ';
 			$query = $db->query("SELECT i.*,m.username FROM pw_invitecode i LEFT JOIN pw_members m USING(uid) WHERE 1=1 $sql $limit");
 			$invdb = array();
 			$i = 1;
@@ -67,11 +70,11 @@ if (empty($_POST['step'])) {
 			ifcheck($inv_linkopen,'linkopen');
 			ifcheck($inv_linktype,'linktype');
 		}elseif($action == 'statics'){
-			InitGP(array('page'));
+			S::gp(array('page'));
 			$db_showperpage = 20;
 			(!is_numeric($page) || $page<1) && $page = 1;
-			$limit = pwLimit(($page-1)*$db_showperpage,$db_showperpage);
-			$rt    = $db->get_one("SELECT COUNT(*) AS sum FROM pw_inviterecord");
+			$limit = S::sqlLimit(($page-1)*$db_showperpage,$db_showperpage);
+			$rt    = $db->get_one("SELECT count(distinct uid) as sum FROM pw_inviterecord ");
 			$pages = numofpage($rt['sum'],$page,ceil($rt['sum']/$db_showperpage),"$basename&action=statics&");
 			$query = $db->query("SELECT username,(SELECT COUNT(uid) FROM pw_inviterecord WHERE uid=a.uid and typeid=0) visitnum,(SELECT COUNT(uid) FROM pw_inviterecord WHERE uid=a.uid and typeid=1) registernum,reward,unit, create_time,typeid typeid FROM pw_inviterecord a GROUP BY uid ORDER BY create_time DESC $limit");	 
 			$invdb = array();
@@ -87,12 +90,13 @@ if (empty($_POST['step'])) {
 	include PrintEot('friend');exit;
 }else{
 	if($admintype == 'invite'){
-		if($_POST['step'] == '2'){		
-			InitGP(array('config','groups'),'P');
+		if($_POST['step'] == '2'){
+			S::gp(array('config','groups'),'P');
 			if(!is_numeric($config['open'])) $config['open']=1;
 			if(!is_numeric($config['days'])) $config['days']=10;
 			if(!is_numeric($config['limitdays'])) $config['limitdays']=0;
 			if(!is_numeric($config['costs'])) $config['costs']=1;
+			if($config['onlinesell'] && $config['price'] == 0) adminmsg('支付金额不能为0！');
 			if(is_array($groups)){
 				$config['groups'] = ','.implode(',',$groups).',';
 			} else {
@@ -100,14 +104,14 @@ if (empty($_POST['step'])) {
 			}
 			foreach($config as $key=>$value){
 				$db->pw_update(
-					"SELECT hk_name FROM pw_hack WHERE hk_name=".pwEscape("inv_$key"),
-					"UPDATE pw_hack SET hk_value=".pwEscape($value)."WHERE hk_name=".pwEscape("inv_$key"),
-					"INSERT INTO pw_hack SET hk_name=".pwEscape("inv_$key").",hk_value=".pwEscape($value)
+					"SELECT hk_name FROM pw_hack WHERE hk_name=".S::sqlEscape("inv_$key"),
+					"UPDATE pw_hack SET hk_value=".S::sqlEscape($value)."WHERE hk_name=".S::sqlEscape("inv_$key"),
+					"INSERT INTO pw_hack SET hk_name=".S::sqlEscape("inv_$key").",hk_value=".S::sqlEscape($value)
 				);
 			}
 			updatecache_inv();	
 		}elseif($_POST['step'] == "3"){
-			InitGP(array('selid'),'P');
+			S::gp(array('selid'),'P');
 			if (!$selid = checkselid($selid)) {
 				adminmsg('operate_error');
 			}
@@ -116,16 +120,16 @@ if (empty($_POST['step'])) {
 	}elseif($admintype == 'propagateset'){
 		
 		if($_POST['step'] == '2'){		
-			InitGP(array('config'),'P');
+			S::gp(array('config'),'P');
 			if(!is_numeric($config['linkopen'])) $config['linkopen']=0;
 			if(!is_numeric($config['linktype'])) $config['linktype']=0;
 			if(!is_numeric($config['linkscore'])) $config['linkscore']=0;			
 			
 			foreach($config as $key=>$value){
 				$db->pw_update(
-					"SELECT hk_name FROM pw_hack WHERE hk_name=".pwEscape("inv_$key"),
-					"UPDATE pw_hack SET hk_value=".pwEscape($value)."WHERE hk_name=".pwEscape("inv_$key"),
-					"INSERT INTO pw_hack SET hk_name=".pwEscape("inv_$key").",hk_value=".pwEscape($value)
+					"SELECT hk_name FROM pw_hack WHERE hk_name=".S::sqlEscape("inv_$key"),
+					"UPDATE pw_hack SET hk_value=".S::sqlEscape($value)."WHERE hk_name=".S::sqlEscape("inv_$key"),
+					"INSERT INTO pw_hack SET hk_name=".S::sqlEscape("inv_$key").",hk_value=".S::sqlEscape($value)
 				);
 			}
 			updatecache_inv();	

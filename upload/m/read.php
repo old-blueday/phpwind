@@ -3,7 +3,7 @@ require_once('wap_global.php');
 
 if($tid){
 	$pw_tmsgs = GetTtable($tid);
-	$rt = $db->get_one("SELECT t.fid,t.tid,t.subject,t.author,t.replies,t.locked,t.postdate,t.anonymous,t.ptable,tm.content,t.tpcstatus FROM pw_threads t LEFT JOIN $pw_tmsgs tm ON tm.tid=t.tid WHERE t.tid=".pwEscape($tid)." AND ifcheck=1");
+	$rt = $db->get_one("SELECT t.fid,t.tid,t.subject,t.author,t.replies,t.locked,t.postdate,t.anonymous,t.ptable,tm.content,t.tpcstatus FROM pw_threads t LEFT JOIN $pw_tmsgs tm ON tm.tid=t.tid WHERE t.tid=".S::sqlEscape($tid)." AND ifcheck=1");
 	if($rt['locked']==2){
 		wap_msg('read_locked');
 	}
@@ -13,12 +13,12 @@ if($tid){
 	$fid = $rt['fid'];
 	$openIndex 	= getstatus($rt['tpcstatus'], 2);	#高楼是否开启
 	forumcheck($fid,'read');
-	InitGP(array('page'));
+	S::gp(array('page'));
 	$page == 'e' && $page=65535;
 	$per = 5;
 	(int)$page<1 && $page=1;
 	if ($openIndex) {
-		$count = $db->get_value("SELECT COUNT(*) FROM pw_postsfloor WHERE tid =". pwEscape($rt['tid'])) . " LIMIT 1";
+		$count = $db->get_value("SELECT COUNT(*) FROM pw_postsfloor WHERE tid =". S::sqlEscape($rt['tid'])) . " LIMIT 1";
 	}else{
 		$count = $rt['replies'];
 	}
@@ -38,7 +38,7 @@ if($tid){
 
 	$satrt=($page-1)*$per;
 	$id=$satrt;
-	$limit=pwLimit($satrt,$per);
+	$limit=S::sqlLimit($satrt,$per);
 	$posts='';
 	$pw_posts = GetPtable($rt['ptable']);
 	
@@ -48,14 +48,14 @@ if($tid){
 		$start_limit < 0 && $start_limit = 0;
 		$end = $start_limit + $per;
 		$sql_floor = " AND f.floor > " . $start_limit ." AND f.floor <= ".$end." ";
-		$query = $db->query("SELECT f.pid FROM pw_postsfloor f WHERE f.tid = ". pwEscape($rt['tid']) ." $sql_floor ORDER BY f.floor");
+		$query = $db->query("SELECT f.pid FROM pw_postsfloor f WHERE f.tid = ". S::sqlEscape($rt['tid']) ." $sql_floor ORDER BY f.floor");
 		while ($r = $db->fetch_array($query)) {
 			$postIds[] = $r['pid'];
 		}
 		if ($postIds) {
-			$postIds && $sql_postId = " AND pid IN ( ". pwImplode($postIds,false) ." ) ";
+			$postIds && $sql_postId = " AND pid IN ( ". S::sqlImplode($postIds,false) ." ) ";
 			$query = $db->query("SELECT pid,ifcheck,subject,author,content,postdate,anonymous 
-				FROM $pw_posts WHERE tid=".pwEscape($rt[tid])." $sql_postId ORDER BY postdate ");
+				FROM $pw_posts WHERE tid=".S::sqlEscape($rt[tid])." $sql_postId ORDER BY postdate ");
 			while ($read = $db->fetch_array($query)) {
 				if ($read['ifcheck']!='1') {
 					$read['subject'] = '';
@@ -83,7 +83,7 @@ if($tid){
 			}
 		}
 	}else{
-		$query=$db->query("SELECT subject,author,content,postdate,anonymous FROM $pw_posts WHERE tid=".pwEscape($rt[tid])." AND ifcheck=1 ORDER BY postdate $limit");
+		$query=$db->query("SELECT subject,author,content,postdate,anonymous FROM $pw_posts WHERE tid=".S::sqlEscape($rt[tid])." AND ifcheck=1 ORDER BY postdate $limit");
 		while($ct=$db->fetch_array($query)){
 			if($ct['content']){
 				$id++;

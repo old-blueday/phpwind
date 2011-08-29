@@ -88,6 +88,7 @@ function N_pointstable($array){
 			$replace = str_replace(array('pw_','_'),array($PW,'\_'),$value[0]);
 			$query = $db->query("SHOW TABLE STATUS LIKE '{$replace}%'");
 			while ($rt = $db->fetch_array($query)) {
+				if (substr($rt['Name'],-5) == 'floor' || substr($rt['Name'],-6) == 'topped') continue;
 				if ($replace!=$rt['Name']) {
 					$rt['OldName'] = str_replace($PW,'pw_',$rt['Name']);
 					$returnarray[] = array($rt['OldName'],$value[1],str_replace(" $value[0] "," $rt[OldName] ",$value[2]));
@@ -371,13 +372,18 @@ function GetLang($lang,$EXT='php'){
 }
 
 function getfavor($tids) {
-	$tids  = explode('|',$tids);
+	if(!is_array($tids)){
+		return array(); 
+	} else {
+		unset($tids[0]);
+	}
 	$tiddb = array();
 	foreach ($tids as $key => $t) {
 		if ($t) {
 			$v = explode(',',$t);
 			foreach ($v as $k => $v1) {
-				$tiddb[$key][$v1] = $v1;
+				$key_temp = $key - 1;
+				$tiddb[$key_temp][$v1] = $v1;
 			}
 		}
 	}

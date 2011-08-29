@@ -45,7 +45,7 @@ class S {
 	 * @return boolean
 	 */
 	function inArray($param, $params) {
-		return (is_null($param) || !is_array($params) || !in_array($param, $params)) ? false : true;
+		return (!in_array((string)$param, (array)$params)) ? false : true;
 	}
 	/**
 	 * 是否是布尔型
@@ -138,7 +138,7 @@ class S {
 		S::slashes($_FILES);
 		$GLOBALS['pwServer'] = S::getServer(array('HTTP_REFERER','HTTP_HOST','HTTP_X_FORWARDED_FOR','HTTP_USER_AGENT',
 													'HTTP_CLIENT_IP','HTTP_SCHEME','HTTPS','PHP_SELF',
-													'REQUEST_URI','REQUEST_METHOD','REMOTE_ADDR',
+													'REQUEST_URI','REQUEST_METHOD','REMOTE_ADDR','SCRIPT_NAME',
 													'QUERY_STRING'));
 		!$GLOBALS['pwServer']['PHP_SELF'] && $GLOBALS['pwServer']['PHP_SELF'] = S::getServer('SCRIPT_NAME');
 	}

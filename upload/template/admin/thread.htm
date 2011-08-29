@@ -2,8 +2,7 @@
 include_once PrintEot('left');
 print <<<EOT
 -->
-<h2 class="h1 mb10"><a href="$admin_file?adminjob=app&admintype=appslist">返回基础应用列表</a></h2>
-
+<!-- <h2 class="h1 mb10"><a href="$admin_file?adminjob=app&admintype=appslist">返回基础应用列表</a></h2>-->
 <div class="admin_info mb10">
   <h3 class="h1"><b>提示信息</b></h3>
   <div class="legend">
@@ -14,8 +13,6 @@ print <<<EOT
 </div>
 <!--
 EOT;
-
-
 if(empty($action)){
 print <<<EOT
 -->
@@ -38,8 +35,8 @@ print <<<EOT
 -->
 
     <tr class="tr1 vt">
-      <td class="td1">全文索引搜索(关键字如果为空将使用默认搜索方式)</td>
-      <td class="td2"><input type="checkbox" name="sphinx" id="sphinxopen" value="1" $sphinxChecked />开启
+      <td class="td1">使用全文索引搜索</td>
+      <td class="td2"><input type="checkbox" name="sphinx" id="sphinxopen" value="1" $sphinxChecked />开启&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;sphinx开启之后才会显示该功能,使用全文索引将加快搜索速度.关键字如果为空将使用普通搜索方式
       </td>
     </tr>
     <tr class="tr1 vt">
@@ -66,8 +63,8 @@ print <<<EOT
       <td class="td1">所属版块</td>
       <td class="td2"><select name="fid"  class="select_wa mr20 fl">
           <option value='-1'>所有版块</option>$forumcache</select>
-        <!-- <input type="checkbox" name="ifkeep" value="1" checked>
-        保留精华置顶 -->
+         <input type="checkbox" name="ifkeep" value="1" {$ifkeep_Y}>
+        保留精华置顶
         </td>
     </tr>
 <!--
@@ -91,7 +88,7 @@ print <<<EOT
     <tr class="tr1 vt">
       <td class="td1">主题发表时间</td>
       <td class="td2">
-        <div class="input_img fl"><i onclick="this.nextSibling.onclick()" class="input_time" title="选择时间">选择时间</i><input type="text" name="pstarttime" id="pstarttime" value="$pStartString" onClick="javascript:ShowCalendar(this.id)" /></div><span class="p_lr_10 fl">至</span><div class="input_img fl mr20"><i class="input_time" title="选择时间">选择时间</i><input type="text" name="pendtime" id="pendtime" value="$pEndString" onClick="javascript:ShowCalendar(this.id)" /></div>可只用单个条件
+        <div class="input_img fl"><i onclick="this.nextSibling.onclick()" class="input_time" title="选择时间">选择时间</i><input type="text" name="pstarttime" id="pstarttime" value="$pStartString" onClick="javascript:ShowCalendar(this.id)" /></div><span class="p_lr_10 fl">至</span><div class="input_img fl mr20"><i class="input_time" onclick="this.nextSibling.onclick()" title="选择时间">选择时间</i><input type="text" name="pendtime" id="pendtime" value="$pEndString" onClick="javascript:ShowCalendar(this.id)" /></div>可只用单个条件
       </td>
     </tr>
 
@@ -99,13 +96,13 @@ print <<<EOT
     <tr class="tr1 vt" id="condition_0">
       <td class="td1">主题最后被回复时间</td>
       <td class="td2">
-      <div class="input_img fl"><i onclick="this.nextSibling.onclick()" class="input_time" title="选择时间">选择时间</i><input type="text" name="lstarttime" id="lstarttime" value="$lStartString" onClick="javascript:ShowCalendar(this.id)" /></div><span class="p_lr_10 fl">至</span><div class="input_img fl mr20"><i class="input_time " title="选择时间">选择时间</i><input type="text" name="lendtime" id="lendtime" value="$lEndString" onClick="javascript:ShowCalendar(this.id)" /></div>只可用单个条件
+      <div class="input_img fl"><i onclick="this.nextSibling.onclick()" class="input_time" title="选择时间">选择时间</i><input type="text" name="lstarttime" id="lstarttime" value="$lStartString" onClick="javascript:ShowCalendar(this.id)" /></div><span class="p_lr_10 fl">至</span><div class="input_img fl mr20"><i class="input_time " onclick="this.nextSibling.onclick()" title="选择时间">选择时间</i><input type="text" name="lendtime" id="lendtime" value="$lEndString" onClick="javascript:ShowCalendar(this.id)" /></div>可只用单个条件
       </td>
     </tr>
     <tr class="tr1 vt">
       <td class="td1">指定 tid 范围</td>
       <td class="td2">
-      <input type="text" class="input input_wa" name="tstart" value="$tstart"><span class="p_lr_10">-</span><input type="text" class="input input_wa mr20" name="tend" value="$tend"> 只可用单个条件
+      <input type="text" class="input input_wa" name="tstart" value="$tstart"><span class="p_lr_10">-</span><input type="text" class="input input_wa mr20" name="tend" value="$tend"> 可只用单个条件
       </td>
     </tr>
     <tr class="tr1 vt">
@@ -150,7 +147,9 @@ print <<<EOT
 <script type="text/javascript">
 getObj('advanceSearchButton').onclick = function() {
 	displayElement('advanceSearchBody','advanceSearchButton');
-	getObj('searchDisplay').value = getObj('advanceSearchBody').style.display;
+	if(getObj('searchDisplay')){
+		getObj('searchDisplay').value = getObj('advanceSearchBody').style.display;
+	}
 };
 if (null != getObj('sphinxopen')) {
 	getObj('sphinxopen').onclick = function() {
@@ -216,7 +215,7 @@ print <<<EOT
           <tr class="tr1 vt">
             <td class="td2"><input type="checkbox" name="delid[$topic[tid]]" value="$topic[fid]"></td>
             <td class="td2"><p class="lh_18"><a href="read.php?fid=$topic[fid]&tid=$topic[tid]" target="_blank" title="$topic[subject]">$topic[subject]</a></p></td>
-            <td class="td2"><a href="u.php?uid=$topic[authorid]" target=_blank>$topic[author]</a></td>
+            <td class="td2"><a href="{$db_userurl}$topic[authorid]" target=_blank>$topic[author]</a></td>
             <td class="td2">$topic[postdate]</td>
             <td class="td2">$topic[userip]</td>
             <td class="td2"><p class="lh_18"><a href="thread.php?fid=$topic[fid]" target="_blank">$topic[forumname]</a></p></td>
@@ -233,6 +232,7 @@ print <<<EOT
   <div class="cc mb10">$pages</div>
   <div class="mb10 tac">
 	<div class="mb5">扣除积分：<input type="radio" name="delcredit" value="1" /> 是 <input type="radio" name="delcredit" value="0" checked /> 否</div>
+	<span class="bt"><span><button type="button" onclick="CheckAll(document.del_tpc_form)">全 选</button></span></span>
 	<span class="btn"><span><button type="submit">删 除</button></span></span>
    </div>
 </form>
@@ -284,8 +284,8 @@ EOT;
 print <<<EOT
 -->
     <tr class="tr1 vt">
-      <td class="td1">全文索引搜索(关键字如果为空将使用默认搜索方式)</td>
-      <td class="td2"><input type="checkbox" name="sphinx" value="1" $sphinxChecked id="sphinxpostopen"/>开启</td>
+      <td class="td1">使用全文索引搜索</td>
+      <td class="td2"><input type="checkbox" name="sphinx" value="1" $sphinxChecked id="sphinxpostopen"/>开启 sphinx开启之后才会显示该功能,使用全文索引将加快搜索速度.关键字如果为空将使用普通搜索方式</td>
     </tr>
 
 <!--
@@ -334,7 +334,7 @@ print <<<EOT
       <td class="td1">指定 pid 范围</td>
       <td class="td2"><input type="text" class="input input_wa" name="pstart" value="$pstart">
         -
-        <input type="text" class="input input_wa mr20" name="pend" value="$pend">只可用于单个条件
+        <input type="text" class="input input_wa mr20" name="pend" value="$pend">
       </td>
     </tr>
     <tr class="tr1 vt">
@@ -378,7 +378,9 @@ function displayElement(elementId, isDisplay) {
 
 getObj('advanceSearchButton').onclick = function() {
 	displayElement('advanceSearchBody');
-	getObj('searchDisplay').value = getObj('advanceSearchBody').style.display;
+	if(getObj('searchDisplay')){
+		getObj('searchDisplay').value = getObj('advanceSearchBody').style.display;
+	}
 };
 if (null != getObj('sphinxpostopen')) {
 	getObj('sphinxpostopen').onclick = function() {
@@ -436,7 +438,7 @@ print <<<EOT
 -->
     <tr class="tr1 vt">
       <td class="td2"><input type="checkbox" name="delid[]" value="$post[pid]"></td>
-      <td class="td2"><a href="u.php?uid=$post[authorid]" target=_blank>$post[author]</a></td>
+      <td class="td2"><a href="{$db_userurl}$post[authorid]" target=_blank>$post[author]</a></td>
       <td class="td2">$post[userip]</td>
       <td class="td2">$post[postdate]</td>
       <td class="td2"><a href="thread.php?fid=$post[fid]" target="_blank">$post[forumname]</a></td>
@@ -453,6 +455,7 @@ print <<<EOT
   <div class="cc mb10">$pages</div>
   <div class="mb10 tac">
 	<div class="mb5">扣除积分：<input type="radio" name="delcredit" value="1" /> 是 <input type="radio" name="delcredit" value="0" checked /> 否</div>
+	<span class="bt"><span><button type="button" onclick="CheckAll(document.del_rpl_form)">全 选</button></span></span>
       <span class="btn"><span><button type="submit">删 除</button></span></span>
   </div>
 </form>

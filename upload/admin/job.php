@@ -4,10 +4,10 @@
 $jobService = L::loadclass("job", 'job'); /* @var $jobService PW_Job */
 
 if(empty($action)){
-	initGP(array("page",'step'));
+	S::gp(array("page",'step'));
 	
 	if($step == 2){
-		initGP(array('joblist'));
+		S::gp(array('joblist'));
 		$jobs = array();
 		foreach($joblist as $id=>$job){
 			$id = intval($id);
@@ -69,15 +69,21 @@ if(empty($action)){
 	$ajaxUrl = EncodeUrl($basename);
 	include PrintEot('job');exit;
 }elseif($action == 'add' || $action == 'edit'){
-	initGP(array('step','id'));
+	S::gp(array('step','id'));
 	if($step == 2){
-		initGP(array('title','description','starttime','endtime','period','reward','prepose','usergroup','member','number'));
-		initGP(array('auto','finish','display','factor','icon','id'));
+		S::gp(array('title','description','starttime','endtime','period','reward','prepose','usergroup','member','number'));
+		S::gp(array('auto','finish','display','factor','icon','id'));
 		if($title == "" ){
 			adminmsg($jobService->getLanguage("job_title_null"));
 		}
 		if($description == ""){
 			adminmsg($jobService->getLanguage("job_description_null"));
+		}
+		if($factor['job'] == 'doPost'){
+			include_once pwCache::getPath(D_P . 'data/bbscache/forum_cache.php');
+			if(isset($factor['doPost']['fid']) && isset($forum[$factor['doPost']['fid']]) && $forum[$factor['doPost']['fid']]['type'] == 'category'){
+				adminmsg('不能使用版块分类作为指定版块!',"$admin_file?adminjob=job&action=add");
+			}
 		}
 		$data['title'] = trim($title);
 		$data['description'] = trim($description);
@@ -100,6 +106,7 @@ if(empty($action)){
 		if($data['starttime'] && $data['endtime']){
 			$data['endtime'] < $data['starttime'] && 	adminmsg($jobService->getLanguage("job_stime_r_etime"));
 		}
+
 		/*奖励规则*/
 		$rCategory = isset($reward['category']) ? $reward['category'] : "none";
 		if($rCategory != 'none'){/*如果为空则过滤*/
@@ -258,10 +265,9 @@ if(empty($action)){
 	if(empty($job)){
 		$doAddFriend['type2'] = 'checked';
 	}
-	
 	include PrintEot('jobhander');exit;
 }elseif($action=="delete"){
-	initGP(array('id'));
+	S::gp(array('id'));
 	$id = intval($id);
 	if($id < 1){
 		adminmsg($jobService->getLanguage("job_id_null"));
@@ -269,7 +275,8 @@ if(empty($action)){
 	$result = $jobService->deleteJob($id);
 	$result && adminmsg('operate_success',"$basename&action=");	
 }elseif($action=="setting"){
-	initGP(array('isopen','ispop'));
+	S::gp(array('isopen','ispop'));
+	if ($isopen === null || $ispop === null) adminmsg('operate_error',"$basename&action=");	
 	setConfig ( 'db_job_isopen', $isopen );
 	setConfig ( 'db_job_ispop', $ispop );
 	updatecache_c ();

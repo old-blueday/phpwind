@@ -29,8 +29,9 @@
 .w_title_ip i{float:left;margin:0 2px 0;*margin-top:3px;}
 .w_input_text{font-style:normal;line-height:18px;padding:0 4px;color:#fff;margin-left:10px; position:absolute;right:-1px;bottom:25px;background:#ff0000;}
 
-#icontab{position:absolute;margin-top:-27px;margin-left:174px;*margin-left:-218px;cursor:pointer;left:none;}
-#icontab div{background:#f7f7f7;padding:3px 5px;border:1px solid #ccc;line-height:100%;}
+#icontab{position:absolute;margin-top:25px;z-index:1;width:230px;margin-left:-229px;}
+#icontab div{background:#f7f7f7;border:1px solid #ccc;line-height:100%;}
+#icontab div img{float:left;padding:3px;}
 
 #wordtip{position:absolute;margin-top:-26px;margin-left:-144px;line-height:25px;padding:0 5px;width:135px;display:none;}
 /*cate select*/

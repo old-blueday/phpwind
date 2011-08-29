@@ -2,22 +2,20 @@
 print <<<EOT
 -->
 <style type="text/css">
-/*商品*/
-.read-buy-img{overflow: hidden;}
-.read-buy-img img{width:250px;border:1px solid $forumcolortwo;padding:2px;text-align:center;background:$forumcolorone;}
-.read-buy-s{font-size:20px;font-weight:700;}
-.read-buy-s2{font-size:16px;font-weight:700;text-decoration:line-through;}
-.readbuy a{text-indent:-2000em;display:block;height:32px;width:157px;}
-.readbuy{background:url($imgpath/post/readbuy.png) left top no-repeat;width:157px;height:32px;margin:5px 0;}
+.read_buy td{padding-left:15px;}
+.read_buy .tr3 td,.read_buy .tr3 th{padding-left:10px;}
 </style>
-<div class="t5 f_one">
-<table width="100%" border="0" cellspacing="0" cellpadding="0">
-<tr><td rowspan="8" style="width:270px;padding:10px;border-bottom:0px;"><div class="read-buy-img"><img src="$tradedb[icon]"></div></td>
-	<td>商品名称 :<span class="f14 b">$tradedb[name]</span></td></tr>
+<div class="t">
+<div class="h" style="border-top:0;"><strong class="f14 b">商品名称 : $tradedb[name]</strong></div>
+<table width="100%" border="0" cellspacing="0" cellpadding="0" class="read_buy">
 	<tr>
-		<td>一 口 价 :<span class="read-buy-s s3">$tradedb[costprice]</span>市 场 价 :<span class="read-buy-s2 s3">$tradedb[price]</span></span></td>
+		<td rowspan="8" style="width:180px;padding:10px;"><img src="$tradedb[icon]" width="180" height="240" /></td>
+		<td></td>
 	</tr>
 	<tr>
+		<td>一 口 价 :<span class="f20 s2 mr20 b">$tradedb[costprice]</span>市 场 价 :<span style="text-decoration:line-through;">$tradedb[price]</span></td>
+	</tr>
+	<tr class="f_two">
 		<td>运　　费 :
 <!--
 EOT;
@@ -41,7 +39,7 @@ EOT;
 EOT;
 if ($tradedb['paymethod'] & 1) {print <<<EOT
 -->
-			线下交易<span></span>
+			线下交易
 <!--
 EOT;
 }if ($tradedb['paymethod'] & 2) {print <<<EOT
@@ -49,12 +47,13 @@ EOT;
 			支付宝交易
 <!--
 EOT;
-}print <<<EOT
+}
+print <<<EOT
 -->
 		</td>
 	</tr>
-	<tr>
-		<td>累计售出 :$tradedb[salenum] 件
+	<tr class="f_two">
+		<td>累计售出 :$tradedb[salenum2] 件
 <!--
 EOT;
 if ($tradedb['aliww']) {print <<<EOT
@@ -106,11 +105,26 @@ EOT;
 -->
 		<span>&nbsp;</span>所 在 地 :$tradedb[locus]</td>
 	</tr>
-	<tr>
+	<tr class="f_two">
 		<td>商品数量 : $tradedb[num]件<span>&nbsp;</span>浏 览 量 :$tradedb[hits]次</td>
 	</tr>
 	<tr>
-		<td style="border-bottom:0px;"><div class="readbuy"><a href="trade.php?action=buy&tid=$tid">我要购买</a></div></td>
+		<td>
+<!--
+EOT;
+if($tradedb[num] > 0){print <<<EOT
+-->
+		<a href="trade.php?action=buy&tid=$tid"><img src="$imgpath/post/readbuy.png" title="我要购买" /></a>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+		<img src="images/post/readbuyclose.png" alt="交易已结束">
+<!--
+EOT;
+}print <<<EOT
+-->
+		</td>
 	</tr>
 </table>
 </div>
@@ -120,11 +134,11 @@ if($action=='apply'){ print <<<EOT
 -->
 <form action="active.php" method="post">
 <div class="t">
-<table width="100%" align="center" cellspacing="0" cellpadding="0">
-<tr><th class="h" colspan="2">活动申请</th></tr>
+<div class="h" style="border-top:0;">活动申请</div>
+<table width="100%" class="read_buy">
 <tr class="tr3 tr">
 	<th width="20%">联系方式</th>
-	<th><input type="text" name="contact" /> &nbsp;Tel、QQ、Email 等</th>
+	<th><input type="text" name="contact" /> &nbsp;Tel、QQ、电子邮箱 等</th>
 </tr>
 <tr class="tr3 tr">
 	<th width="20%">留言：</th>
@@ -143,8 +157,8 @@ EOT;
 <form action="active.php" method="post">
 <input type="hidden" name="verify" value="$verifyhash" />
 <div class="t">
-<table width="100%" align="center" cellspacing="0" cellpadding="0">
-<tr><td class="h" colspan="8">活动成员</td></tr>
+<div class="h" style="border-top:0;">活动成员</div>
+<table width="100%" class="read_buy">
 <tr class="tr2">
 	<td width="8%">序号</td>
 	<td width="12%">姓名</td>
@@ -172,7 +186,7 @@ print <<<EOT
 -->
 <tr class="tr3">
 	<td>$i</td>
-	<td><a href="u.php?uid=$value[winduid]">$value[username]</a></td>
+	<td><a href="{$db_userurl}$value[winduid]">$value[username]</a></td>
 <!--
 EOT;
 if($value[gender]==1){ print <<<EOT
@@ -235,13 +249,13 @@ if($admincheck){ print <<<EOT
 <input type="radio" name="action" value="unpass" />拒绝
 <input type="radio" name="action" value="cancle" />取消活动<br><br>
 <input class="btn" type='button' name='chkall' value='全 选' onclick='CheckAll(this.form)' />
-<input class="btn" type='submit' value='提 交' /></div>
+<input class="btn" type='submit' value='提 交' />
+</div>
 <!--
 EOT;
 }else{ print <<<EOT
 -->
-<div style="text-align:center;margin-bottom:25px;"><input type="hidden" name="action" value="exit" />
-<input class="btn" type='submit' value='取消参加' /></div>
+<div class="tac p10"><input type="hidden" name="action" value="exit" /><span class="btn2"><span><button type="submit">取消参加</button></span></span></div>
 <!--
 EOT;
 } print <<<EOT

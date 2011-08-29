@@ -2,16 +2,65 @@
 include_once PrintEot('left');
 print <<<EOT
 -->
-<script type="text/javascript" src="js/global.js" ></script>
 <script type="text/javascript" src="js/color_picker.js" ></script>
+<script type="text/javascript" src="js/global.js" ></script>
+<script  language="JavaScript" src="js/pw_ajax.js"></script>
+<script language="javascript" type="text/javascript">
+//广告新增 图片链接 和 图片上传 切换js
+function isUploadOrLinkImg(radioObj, type) {
+	var uploadInput = document.getElementById("url_"+type);
+	var linkInput = document.getElementById("upload_"+type);
+	if (radioObj.value == 0) {
+		uploadInput.style.display = "";
+		linkInput.style.display = "none";
+	} else {
+		uploadInput.style.display = "none";
+		linkInput.style.display = "";
+	}
+}
+</script>
 <script language="JavaScript">
 function $(id){
 	return document.getElementById(id);
 }
 
 function showSelHtml(d,s) {
-	if(s) $(d).innerHTML = $(s).innerHTML;
+	if(s) {
+		$(d).innerHTML = $(s).innerHTML;
+		if(s == 'adimg' || s == 'adflash') $("descripstyle").style.display = "";
+		else $("descripstyle").style.display = "none";
+	}
 	else $(d).innerHTML = '';
+}
+
+function checkpost(obj) { 
+var txt_title = $("txt_title"); 
+var txt_url = $("txt_url");
+var txt_descrip = $("txt_descrip");
+var htmlcode = $("htmlcode");
+	if ($("adstxt").checked && txt_title.value == "") {
+			obj.txt_title.focus();
+			showDialog("error","文字内容不能为空",2);
+			return false;
+	} 
+	if ($("adstxt").checked && txt_url.value == "") {
+			obj.txt_url.focus();
+			showDialog("error","文字链接不能为空",2);
+			return false;
+	}
+	if (($("adsimg").checked || $("adsflash").checked) && txt_descrip.value == "") {
+			obj.txt_descrip.focus();
+			showDialog("error","广告描述不能为空",2);
+			return false;
+	}
+	if ($("adscode").checked && htmlcode.value == "") {
+			obj.htmlcode.focus();
+			showDialog("error","广告代码不能为空",2);
+			return false;
+	}
+}
+function ckdescripstyleEdit(){
+		getObj("descripstyleEdit").style.display = "none";
 }
 </script>
 <!--
@@ -163,6 +212,7 @@ EOT;
 		<input type="radio" name="job" value="del" />&nbsp;删除&nbsp;
 	</p>
 	<p>
+	<span class="bt"><span><button type="button" onclick="CheckAll(document.FORM)">全 选</button></span></span>
 	<span class="btn"><span><button type="submit" onclick="return confirm('您确认要进行此操作吗?');">提 交</button></span></span></p>
 </div>
 </form>
@@ -198,7 +248,7 @@ EOT;
 	</ul>
 </div>
 <script type="text/javascript" language="JavaScript" src="js/date.js"></script>
-<form method="post" name="FORM" action="$basename&job=save&">
+<form method="post" name="FORM" id="form1"  action="$basename&job=save&" enctype="multipart/form-data" onsubmit="return checkpost(document.FORM);">
 <input type="hidden" name="id" value="$id">
 <h2 class="h1">添加广告</h2>
 <div class="admin_table mb10">
@@ -207,10 +257,10 @@ EOT;
 		<td class="td1" style="border-bottom:0;">选择表现方式</td>
 		<td class="td2" style="border-bottom:0;">
 			<ul class="list_A list_80 cc mb5">
-				<li><input type="radio" name="config[type]" value="txt" onclick="showSelHtml('adSet','adtxt')" $type_txt />文字</li>
-				<li><input type="radio" name="config[type]" value="img" onclick="showSelHtml('adSet','adimg')" $type_img />图片</li>
-				<li><input type="radio" name="config[type]" value="code" onclick="showSelHtml('adSet','adcode')" $type_code />代码</li>
-				<li><input type="radio" name="config[type]" value="flash" onclick="showSelHtml('adSet','adflash')" $type_flash />Flash</li>
+				<li><input type="radio" name="config[type]" id="adstxt" value="txt" onclick="ckdescripstyleEdit();showSelHtml('adSet','adtxt')" $type_txt />文字</li>
+				<li><input type="radio"  name="config[type]" id="adsimg" value="img"  onclick="ckdescripstyleEdit();showSelHtml('adSet','adimg')" $type_img />图片</li>
+				<li><input type="radio" name="config[type]" id="adscode" value="code" onclick="ckdescripstyleEdit();showSelHtml('adSet','adcode')" $type_code />代码</li>
+				<li><input type="radio" name="config[type]" id="adsflash" value="flash" onclick="ckdescripstyleEdit();showSelHtml('adSet','adflash')" $type_flash />Flash</li>
 			</ul>
 		</td>
 		<td class="td2"><div class="help_a"></div></td>
@@ -219,14 +269,29 @@ EOT;
 		<td class="td2" colspan="3" style="padding:0;border-bottom:0;"><div id='adSet'></div></td>
 	</tr>
 	<tr class="tr1 vt">
-		<td class="td1">广告描述<span class="s1">*</span></td>
+		<td class="td1">广告描述
+<!--
+EOT;
+if($config['type'] == 'img' || $config['type'] == 'flash'){ print <<<EOT
+-->		
+		<span id="descripstyleEdit" class="s1" >*</span><span class="s1" id="descripstyle" >*</span>
+<!--
+EOT;
+}else{ print <<<EOT
+-->	
+	<span id="descripstyleEdit" class="s1"   ></span><span class="s1" id="descripstyle" >*</span>
+<!--
+EOT;
+} print <<<EOT
+-->		
+		</td>
 		<td class="td2">
-			<input type="text" class="input input_wb" name="advert[descrip]" value="$advert[descrip]">
+			<input type="text" class="input input_wb" id="txt_descrip" name="advert[descrip]" value="$advert[descrip]">
 		</td>
 		<td class="td2"><div class="help_a">广告信息描述，并不在前台显示</div> </td>
 	</tr>
 	<tr class="tr1 vt">
-		<td class="td1">选择广告位<span class="s1">*</span></td>
+		<td class="td1">选择广告位</td>
 		<td class="td2">
 			<select id="advert_ckey" name="advert[ckey]" class="select_wa" onchange="showSelCate(this.options[this.selectedIndex].value)">
 				<option value="" disabled>请选择要投放的广告位</option>
@@ -242,7 +307,7 @@ EOT;
 	</tr>
 	<tr class="tr1 vt">
 		<td class="td1">&nbsp;</td>
-		<td class="td2"><p class="mb10">广告展示的位置由广告位和所设置的广告范围决定,‘Ctrl’或‘Shift’键进行多选</p>
+		<td class="td2"><p id="modeSummary" style="display:none;" >广告展示的位置由广告位和所设置的广告范围决定,‘Ctrl’或‘Shift’键进行多选</p>
 			<div id="modeSet" class="fl mr10"></div>
 			<div id="pageSet" class="fl mr10"></div>
 			<div id="forumSet" class="fl mr10"></div>
@@ -298,7 +363,7 @@ EOT;
 					</tr>
 					<tr>
 						<td class="s4">按星期</td>
-						<td title="有效时间段内的按星期展示"><ul id="dweek_id" class="list_A list_80 cc" style="width:480px;"></ul><p>设置有效时间段内的具体展示日期。两种方式，任选其一，均可生效</p></td>
+						<td title="有效时间段内的按星期展示"><ul id="dweek_id" class="list_A list_80 cc" style="width:580px;"></ul><br/><p>设置有效时间段内的具体展示日期。两种方式，任选其一，均可生效</p></td>
 					</tr>
 					<tr title="可以设置有效时间段内每天的哪几个时间段显示">
 						<td class="s4">展示时间</td>
@@ -466,7 +531,11 @@ var setAdvert = {
 			var w="日一二三四五六".split("");
 			for (var i=0,len=maxWeekDays.length; i<len; i++)
 			{
+				if(maxWeekDays.length < 7) {
+				g[i]=[maxWeekDays[i]==0?7:maxWeekDays[i],"<li><input name='dweek[]' type=checkbox value='"+maxWeekDays[i]+"'  "+(selected.weeks[maxWeekDays[i]]?" checked":"")+">星期"+w[maxWeekDays[i]] + "</li>"];
+				} else {
 				g[i]=[maxWeekDays[i]==0?7:maxWeekDays[i],"<li><input name='dweek[]' type=checkbox value='"+i+"'  "+(selected.weeks[maxWeekDays[i]]?" checked":"")+">星期"+w[maxWeekDays[i]] + "</li>"];
+				}
 			}
 			g.sort();
 			for (var i=0,len=g.length; i<len; i++)
@@ -492,6 +561,7 @@ function showddate(stime,etime,data) {
 	getObj('dweek_id').innerHTML = a.weeks.join("");
 	getObj('dtime_id').innerHTML = "<select name='dtime[]' class='select_wa mb5' style='height:180px;' multiple><option value=''>&nbsp;</option>"+a.hours.join("")+"</select>";
 }
+
 <!--
 EOT;
 if ($showddate) {print <<<EOT
@@ -507,6 +577,7 @@ EOT;
 }print <<<EOT
 -->
 </script>
+
 <!--
 EOT;
 $config_link = is_array($config['link']) ? $config['link'][0] : $config['link'];
@@ -538,8 +609,8 @@ print <<<EOT
 	<table width="100%" cellspacing="0" cellpadding="0">
 		<tr class="tr1 vt">
 			<td class="td1">广告代码<span class="s1">*</span></td>
-			<td class="td2" width="360"><textarea name="config[htmlcode]" class="textarea">$config[htmlcode]</textarea></td>
-            <td class="td2"><div class="help_a">请填写广告代码，支持html代码,最大1024个字符</div></td>
+			<td class="td2" width="360"><textarea name="config[htmlcode]" id="htmlcode" class="textarea">$config[htmlcode]</textarea></td>
+            <td class="td2"><div class="help_a">请填写广告代码，支持html代码</div></td>
 		</tr>
 	</table>
 </div>
@@ -548,12 +619,12 @@ print <<<EOT
 	<table width="100%" cellspacing="0" cellpadding="0">
 		<tr class="tr1 vt">
 			<td class="td1">文字内容<span class="s1">*</span></td>
-			<td class="td2" width="360"><input type="text" class="input input_wb" name="config[title]" value="$config[title]"></td>
+			<td class="td2" width="360"><input type="text" class="input input_wb" name="config[title]" id="txt_title" value="$config[title]"></td>
 			<td class="td2"><div class="help_a"></div></td>
 		</tr>
 		<tr class="tr1 vt">
 			<td class="td1">文字链接<span class="s1">*</span></td>
-			<td class="td2"><input type="text" class="input input_wb" name="config[link]" value="$config_link"></td>
+			<td class="td2"><input type="text" class="input input_wb" id="txt_url" name="config[link]" value="$config_link"></td>
             <td class="td2"><div class="help_a">外链以http://开头</div></td>
 
 		</tr>
@@ -584,11 +655,17 @@ $url = $config[url][$i];
 $link = $config[link][$i];
 print <<<EOT
 -->
+
 		<tbody id="imglist_$num">
 			<tr class="tr1 vt">
-				<td class="td1">图片地址<span class="s1">*</span></td>
+				<td class="td1">图片地址</td>
 				<td class="td2" width="440">
-					<input type="text" class="input input_wb" name="config[url][$i]" value="$url">
+				图片链接：<input onclick="isUploadOrLinkImg(this, $num)" name="config[imgupload][$num]" type="radio" value="0" checked="checked" />&nbsp;&nbsp;&nbsp;&nbsp;
+					图片上传：<input onclick="isUploadOrLinkImg(this, $num)" accept="image/*" name="config[imgupload][$num]" type="radio" value="1" />
+					<br/>
+					<span id="url_$num"><input type="text" class="input input_wb" name="config[url][$num]" value="$url"></span>
+					<span id="upload_$num" style="display:none;"><input name="uploadurl_$num" class="input input_wb"  type="file" /></span>
+					
 <!--
 EOT;
 if($i == 0){
@@ -605,14 +682,26 @@ print <<<EOT
 EOT;
 }
 print <<<EOT
--->
+-->				
 				</td>
-                <td class="td2"><div class="help_a">外链以http://开头</div></td>
+                <td class="td2"><div class="help_a">
+<!--
+EOT;
+if($i == 0){
+print <<<EOT
+-->
+				外链以http://开头
+<!--
+EOT;
+}
+print <<<EOT
+-->	
+				<img src="$url" class="advImgShow" /></div></td>
 			</tr>
 			<tr class="tr1 vt">
-				<td class="td1">图片链接<span class="s1">*</span></td>
-				<td class="td2"><input type="text" class="input input_wb" name="config[link][$i]" value="$link"></td>
-                <td class="td2"><div class="help_a">外链以http://开头</div></td>
+				<td class="td1">图片链接</td>
+				<td class="td2"><input type="text" class="input input_wb" name="config[link][$num]" value="$link"></td>
+                <td class="td2"><div class="help_a"></div></td>
 			</tr>
 		</tbody>
 <!--
@@ -623,15 +712,21 @@ print <<<EOT
 -->
 		<tbody id="imglist_1">
 			<tr class="tr1 vt">
-				<td class="td1">图片地址<span class="s1">*</span></td>
+				<td class="td1">图片地址</td>
 				<td class="td2" width="460">
-					<input type="text" class="input input_wb" name="config[url][1]" value="">
+					图片链接：<input onclick="isUploadOrLinkImg(this, 1)" name="config[imgupload][1]" type="radio" value="0" checked="checked" />&nbsp;&nbsp;&nbsp;&nbsp;
+					图片上传：<input onclick="isUploadOrLinkImg(this, 1)" accept="image/*" name="config[imgupload][1]" type="radio" value="1" />
+					<br/>
+					<span id="url_1"><input type="text" class="input input_wb" name="config[url][1]" value=""></span>
+					<span id="upload_1" style="display:none;"><input name="uploadurl_1" class="input input_wb"  type="file" /></span>
 					<span class="bt2"><span><button name="button" type="button" onclick="imgAdverClass.add();">增加图片</button></span></span>
 				</td>
                 <td class="td2"><div class="help_a">外链以http://开头</div></td>
 			</tr>
+			
+
 			<tr class="tr1 vt">
-				<td class="td1">图片链接<span class="s1">*</span></td>
+				<td class="td1">图片链接</td>
 				<td class="td2"><input type="text" class="input input_wb" name="config[link][1]" value="http://"></td>
                 <td class="td2"><div class="help_a">外链以http://开头</div></td>
 			</tr>
@@ -650,7 +745,7 @@ print <<<EOT
                         <li>宽&nbsp;<input type="text" class="input input_wc" name="config[width]" value="$config[width]" /></li>
                      </ul>
 				</td>
-                <td class="td2"><div class="help_a">例如: 98% 或 120像素</div></td>
+                <td class="td2"><div class="help_a">例如: 98%(页面宽度和高度的98%) 或 120像素</div></td>
 			</tr>
 			<tr class="tr1 vt">
 				<td class="td1">图片提示</td>
@@ -664,8 +759,8 @@ print <<<EOT
 	<h2 class="h1">Flash广告</h2>
 	<table width="100%" cellspacing="0" cellpadding="0">
 		<tr class="tr1 vt">
-			<td class="td1">Flash链接<span class="s1">*</span></td>
-			<td class="td2" width="360"><input type="text" class="input" size="60" name="config[link]" value="$config_link"></td>
+			<td class="td1">Flash链接</td>
+			<td class="td2" width="360"><input type="text" class="input" size="60" name="config[link]"  value="$config_link"></td>
             <td class="td2"><div class="help_a">外链以http://开头</div></td>
 		</tr>
 		<tr class="tr1 vt">
@@ -677,7 +772,7 @@ print <<<EOT
                 </ul>
                 <p class="gray"></p></span>
 			</td>
-            <td class="td2"><div class="help_a">例如: 98% 或 120像素</div></td>
+            <td class="td2"><div class="help_a">例如: 98%(页面宽度和高度的98%) 或 120像素,为空时默认120px,120px</div></td>
 		</tr>
 	</table>
 </div>
@@ -734,16 +829,17 @@ EOT;
 EOT;
 for($i=1;$i<65;$i++){
 $tmpSelect = ${'lou_'.$i};
+$j = $i - 1;
 print <<<EOT
 -->
-		<option value="$i" $tmpSelect>&nbsp;&raquo; #{$i}</option>
+		<option value="$i" $tmpSelect>&nbsp;&raquo; #{$j}</option>
 <!--
 EOT;
 }print <<<EOT
 -->
 	</select>
 </div>
-<script src="js/pw_ajax.js"></script>
+
 <script language="JavaScript">
 function showSelCate(ckey) {
 	ckey=ckey.toLowerCase();
@@ -754,7 +850,6 @@ function showSelCate(ckey) {
 	showSelHtml('forumSet','');
 	showSelHtml('louSet','');
 	if (ckey) {
-
 		if (ckey.indexOf('forum.') != -1) {
 			showSelHtml('forumSet','c_forum');
 		}
@@ -763,11 +858,21 @@ function showSelCate(ckey) {
 			//showSelHtml('forumSet',ckey.indexOf('layer.index') != -1 ? 'c_forum_cate' : 'c_forum');
 		}
 		if (ckey.indexOf('site.') != -1 || ckey.indexOf('mode.') == -1) {
-			showSelHtml('modeSet','c_mode');
-			showSelHtml('pageSet','c_page');
-			showSelHtml('forumSet','c_forum');
+			if (ckey.indexOf('search.') != -1) {
+			} else {
+				showSelHtml('modeSet','c_mode');
+				showSelHtml('pageSet','c_page');
+				showSelHtml('forumSet','c_forum');
+			}
 		}
 		cateDescrip(ckey);
+		if (getObj('modeSet').innerHTML == "" && getObj('pageSet').innerHTML == "" && getObj('forumSet').innerHTML == "" && getObj('louSet').innerHTML == "") {
+			 getObj("modeSummary").style.display = "none";
+		 } else {
+		 	getObj("modeSummary").style.display = "block";
+		 }
+	} else {
+		getObj("modeSummary").style.display = "none";
 	}
 }
 function cateDescrip(ckey) {
@@ -961,8 +1066,8 @@ if (empty($job)){print <<<EOT
 <table width="100%" cellspacing="0" cellpadding="0" style="table-layout:fixed;">
 	<tr class="tr2 td_bgB">
 		<td width="40" class="tac"><span onclick="CheckAll(document.FORM)" class="cp">全选</span></td>
-		<td width="180">名称</td>
-		<td>标识符</td>
+		<td>名称</td>
+		<td width="250">标识符</td>
 		<td width="50">状态</td>
 		<td width="120">操作</td>
 	</tr>
@@ -1045,6 +1150,7 @@ EOT;
 		<span class="gray">(只删除广告位)</span>
 	</p>
 	<p>
+	<span class="bt"><span><button type="button" onclick="CheckAll(document.FORM)">全 选</button></span></span>
 	<span class="btn"><span><button type="submit" onclick="return confirm('您确认要进行此操作吗?');">提 交</button></span></span></p>
 </div>
 <!--
@@ -1073,7 +1179,7 @@ EOT;
 -->
 	</ul>
 </div>
-<form method="post" action="$basename&action=cate" onsubmit="checkData();return false;">
+<form method="post" name="FORM" action="$basename&action=cate" onsubmit="checkData(document.FORM);return false;">
 	<input type="hidden" name="job" value="$job" />
 	<input type="hidden" name="id" value="$id" />
 	<input type="hidden" name="step" value="2" />
@@ -1210,15 +1316,17 @@ print &lt;&lt;&lt;&#69;&#79;&#84;
 </textarea></div>
 </div>
 <script type="text/javascript">
-function checkData(){
+function checkData(obj){
     var regex = /^([a-zA-Z0-9_.]{1,32})$/i;
-    if(getObj("cate_name").value == ""){
-        alert("广告位名称不能为空");
-        return false;
-    }
+	if (getObj("cate_name").value == "") {
+		obj.cate_name.focus();
+		showDialog("error","广告位名称不能为空",2);
+		return false;
+	} 
     if(regex.test(getObj("cate_ckey").value) == false){
-        alert("广告标示符添加有误，只能为字母、数字、下划线和点号的组合");
-        return false;
+		obj.cate_ckey.focus();
+		showDialog("error","广告标示符添加有误，只能为字母、数字、下划线和点号的组合",2);
+		return false;
     }
     submit();
 }
@@ -1247,10 +1355,10 @@ print <<<EOT
 -->
 <style>
 .admin_adv {width:100%;}
-.admin_adv li{float:left;width:350px;padding:0 2em;line-height:25px;height:25px;border-right:1px dotted #ddd}
+.admin_adv li{float:left;width:350px;padding:0 2em;line-height:25px;height:25px;border-right:1px dotted #ddd;overflow:hidden;}
 .admin_adv li a.admin_adv_name{color:#0066cc;}
 .admin_adv li .st{color:#ff6600;}
-.admin_adv_ct {float:right;color:#999}
+.admin_adv_ct {float:right;color:#999;margin-left:5px;}
 .admin_adv_ct a{text-decoration:underline;color:#88aadd}
 #admin_adv:hover{ background:none}
 </style>
@@ -1272,7 +1380,7 @@ print <<<EOT
 EOT;
 foreach($benchs as $k=>$v){print <<<EOT
 -->
-				<li><a href="$basename&ckey=$k" class="admin_adv_name fl">$v[title]</a><div class="admin_adv_ct"> 共<span class="st">$v[num]</span>个广告&nbsp;&nbsp;<a href="$basename&ckey=$k&adverstatus=1">{$v[open]}个开启</a>&nbsp;&nbsp;<a  href="$basename&ckey=$k&adverstatus=0">{$v[close]}个关闭</a></div></li>
+				<li><div class="admin_adv_ct"> 共<span class="st">$v[num]</span>个广告&nbsp;&nbsp;<a href="$basename&ckey=$k&adverstatus=1">{$v[open]}个开启</a>&nbsp;&nbsp;<a  href="$basename&ckey=$k&adverstatus=0">{$v[close]}个关闭</a></div><a href="$basename&ckey=$k" class="admin_adv_name fl">$v[title]</a></li>
 <!--
 EOT;
 }print <<<EOT

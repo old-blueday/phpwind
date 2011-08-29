@@ -1,139 +1,286 @@
 <!--<?php 
 print <<<EOT
 -->
-		<div class="content fl">
+<!--
+EOT;
+$mainTmpStyle = $_COOKIE['searchtoggle']!=='0' ? 'list_main cc' : 'list_main cc sideClose';
+print <<<EOT
+-->
+	<div class="$mainTmpStyle" id="sidebar">
+	    <div class="list_menuBar">
+
+	                <div class="list_box bd_bot mb10">
+	                    <h2><a href="searcher.php?type=thread&keyword={$keyword}&step=2">全部版块</a></h2>
+<!-- 
+EOT;
+if ($searchForumPart1) {print <<<EOT
+-->
+	                    <ul class="ul">
+	                    
+<!-- 
+EOT;
+foreach ($searchForumPart1 as $key=>$value) {
+$value = strip_tags($value);
+print <<<EOT
+-->
+	                        <li id="fid_{$key}"><a href="searcher.php?type=thread&username=$username&fid=$key&keyword={$keyword}&step=2&diaryrange=$diaryrange&starttime=$starttime&endtime=$endtime">{$value}</a></li>
+	                        
+<!-- 
+EOT;
+}print <<<EOT
+-->
+	                    </ul>
+<!-- 
+EOT;
+}print <<<EOT
+-->
+
+<!--
+EOT;
+if ($searchForumPart2) {print <<<EOT
+-->
+						<ul class="ul" id ="morefids" style="display:none">
+<!-- 
+EOT;
+foreach ($searchForumPart2 as $key=>$value) {
+$value = strip_tags($value);
+print <<<EOT
+-->
+	
+	
+	                        <li id="fid_{$key}"><a href="searcher.php?type=thread&username=$username&fid=$key&keyword={$keyword}&step=2&diaryrange=$diaryrange&starttime=$starttime&endtime=$endtime&username=$username">{$value}</a></li>
+<!-- 
+EOT;
+}print <<<EOT
+-->
+	                    </ul>
+						<ul class="ul">
+							<li id="morebtn"><a href="javascript:;" class="list_openup" onclick="showmore();">更多版块</a></li>
+						</ul>
+<!-- 
+EOT;
+}print <<<EOT
+-->
+
+<!--
+EOT;
+if ($searchForumPart1 || $searchForumPart2) {
+print <<<EOT
+-->
+	<script language="JavaScript">setCurrent('fid_{$fid}','','current');</script>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+
+	                </div>
+	                <div class="list_box bd_bot">
+	                    <h2><a href="searcher.php?type=thread&keyword={$keyword}&step=2&diaryrange=$diaryrange">全部时间</a></h2>
+	                    <ul class="ul">
+							<li id="posttime_1"><a href="searcher.php?type=thread&keyword={$keyword}&step=2&posttime=1&diaryrange=$diaryrange">1小时内</a></li>
+							<li id="posttime_24"><a href="searcher.php?type=thread&keyword={$keyword}&step=2&posttime=24&diaryrange=$diaryrange">一天内</a></li>
+							<li id="posttime_168"><a href="searcher.php?type=thread&keyword={$keyword}&step=2&posttime=168&diaryrange=$diaryrange">一周内</a></li>
+							<li id="posttime_720"><a href="searcher.php?type=thread&keyword={$keyword}&step=2&posttime=720&diaryrange=$diaryrange">一个月内</a></li>
+	                    </ul>
+	                    <script language="JavaScript">setCurrent('posttime_{$posttime}','','current');</script>
+	                </div>
+	            </div>
+			<div class="list_content">
+			<div class="dlA">
+			
+<!--
+EOT;
+if ($adverts) {print <<<EOT
+-->
+	
+<!--
+EOT;
+	foreach ($adverts as $advert) {
+	print <<<EOT
+-->
+				<div class="promotion">
+					$advert
+				</div>
+<!--
+EOT;
+	}print <<<EOT
+-->
+<!--
+EOT;
+}print <<<EOT
+-->
+	
+	
 <!-- 
 EOT;
 if($admincheck || $superedit || $superdelete ){
 print <<<EOT
---> 		
-			<form action="mawhole.php?" method="post" id="search" name="SEARCH">
-			 <input type="hidden" value="$verifyhash" name="verify">
-			<input type="hidden" name="action" value="" id="action" />
-			<input type="hidden" name="fid" value="$fid" />
+-->		
+				<form action="mawhole.php?" method="post" id="search" name="SEARCH">
+				 <input type="hidden" value="$verifyhash" name="verify">
+				<input type="hidden" name="action" value="" id="action" />
+				<input type="hidden" name="fid" value="$fid" />
 <!-- 
 EOT;
 }
 print <<<EOT
 -->   	
-        	<div class="s_dlA">
+			<table width="100%" cellpadding="0" cellspacing="0"><tr><td valign="top" height="500">
 <!-- 
 EOT;
+$isGM = S::inArray($windid, $manager);
 foreach($threads as $thread){
 print <<<EOT
 -->       	
-            	<dl id="search_{$thread[tid]}">
-                	<dt>
+	            	<dl id="search_{$thread[tid]}">
+	                	<dt>
 <!-- 
 EOT;
 if($admincheck || $superedit ){
 print <<<EOT
 -->                   	
-                	<input type="checkbox" value="$thread[tid]" name="tidarray[]"> 
+	                	<input type="checkbox" value="$thread[tid]" name="tidarray[]"> 
 <!-- 
 EOT;
 }
 $threadUrl = ($threadrange == 3) ? "job.php?action=topost&tid=".$thread[tid]."&pid=".$thread[pid] : "read.php?tid=".$thread[tid];
 print <<<EOT
 -->                	
-                	<a href="{$threadUrl}" target="_blank">$thread[subject]</a></dt>
-                    <dd class="text">$thread[content]</dd>
-                    <dd class="cite"><a href="$db_bbsurl" target="_blank">论坛</a>&nbsp;&raquo;&nbsp;<a href="thread.php?fid={$thread[fid]}" target="_blank" class="mr20">{$thread[name]}</a>作者：<a href="u.php?uid=$thread[authorid]" target="_blank" class="mr20">$thread[author]</a>
-                    <span class="mr20">$thread[postdate]</span>
-<!-- 
-EOT;
-if($admincheck || $superedit ){
-print <<<EOT
--->                     
-                    <a href="post.php?action=modify&fid={$thread[fid]}&tid={$thread[tid]}&pid=tpc&article=0" target="_blank" class="s2">[编辑]</a>
-<!-- 
-EOT;
-}
-print <<<EOT
--->                      
-                    </dd>
-                </dl>
-<!-- 
-EOT;
-}
-print <<<EOT
---> 
-                <div class="pages">
-                   $pager
-                </div>
-                <div class="c">&nbsp;</div>
-            </div>
-<!-- 
-EOT;
-if($admincheck || $superdelete || $superedit ){
-print <<<EOT
--->              
-            <div class="h">
-            	<div class="manage">
-                <input name="" type="checkbox" value="" onclick="CheckAll(this.form)" >全选 
-<!-- 
-EOT;
-if($admincheck && $fid ){
-print <<<EOT
--->                                
-                <a href="javascript:;" onclick="searchSubmit('headtopic');">置顶</a><a href="javascript:;" onclick="searchSubmit('digest');">精华</a><a href="javascript:;" onclick="searchSubmit('lock');">锁定</a><a href="javascript:;" onclick="searchSubmit('pushtopic');">提前</a><a href="javascript:;" onclick="searchSubmit('downtopic');">压帖</a><a href="javascript:;" onclick="searchSubmit('edit');">加亮</a><a href="javascript:;" onclick="searchSubmit('type');">分类主题</a><a href="javascript:;" onclick="searchSubmit('move');">移动</a><a href="javascript:;" onclick="searchSubmit('copy');">复制</a><a href="javascript:;" onclick="searchSubmit('del');">删除</a>
-<!-- 
-EOT;
-}
-print <<<EOT
--->   
-<!-- 
-EOT;
-if( $superdelete && !$fid ){
-print <<<EOT
--->               
-                <a href="javascript:;" onclick="searchSubmit('delall');">删除</a>
-<!-- 
-EOT;
-}
-print <<<EOT
--->                 
-                </div>
-            </div>
-            </form>
-<!-- 
-EOT;
-}
-print <<<EOT
--->             
-        </div>
-
-        <div class="sidebar fr">
-        	<div>{$rightSearchResult}</div>
+	                	<a href="{$threadUrl}" target="_blank" class="tlink">$thread[subject]</a>
+						</dt>
+						<dd>
+						<div class="num">$thread[replies]条回复 - $thread[hits]次浏览</div>
+						<div class="text">$thread[content]</div>
+						<div class="author"><cite>$thread[postdate]</cite> - 
 <!--
 EOT;
-if($hotwords){
-print <<<EOT
--->         
-        	<div class="p15 s_boxA">
-            	<h2>一周热门搜索</h2>
-                <ul>
-<!-- 
+if(!$isGM && $thread['anonymous'] == 1){print <<<EOT
+-->
+匿名
+<!--
 EOT;
-foreach($hotwords as $hotword){
-print <<<EOT
--->                
-                	<li><a href="searcher.php?keyword={$hotword}&type=thread">$hotword</a></li>
-<!-- 
-EOT;
-}
-print <<<EOT
--->                 	
-                </ul>
-            </div>
+}else{print <<<EOT
+-->
+						作者: <a href="{$db_userurl}$thread[authorid]">$thread[author]</a>
 <!-- 
 EOT;
 }
 print <<<EOT
 -->
-        </div>
-        
-        <div class="c">&nbsp;</div>
+						 - <a href="thread.php?fid={$thread[fid]}">{$thread[name]}</a>
+<!-- 
+EOT;
+if($admincheck || $superedit ){
+print <<<EOT
+-->                     
+						- <a href="post.php?action=modify&fid={$thread[fid]}&tid={$thread[tid]}&pid=tpc&article=0" target="_blank" class="s2">编辑</a>
+<!-- 
+EOT;
+}
+print <<<EOT
+-->                  
+						</div>
+	                    </dd>
+	                </dl>
+<!-- 
+EOT;
+}
+print <<<EOT
+-->
+	                <div class="cc mb20">
+	                   $pager
+	                </div>
+			</td></tr></table>
+<!-- 
+EOT;
+if($admincheck || $superdelete || $superedit ){
+print <<<EOT
+-->
+	            	<div class="manage cc">
+	                <label><input name="" type="checkbox" value="" onclick="CheckAll(this.form)" >全选</label>
+<!-- 
+EOT;
+if($admincheck && $fid ){
+print <<<EOT
+-->                                
+	                <a href="javascript:;" onclick="searchSubmit('headtopic');">置顶</a><a href="javascript:;" onclick="searchSubmit('digest');">精华</a><a href="javascript:;" onclick="searchSubmit('lock');">锁定</a><a href="javascript:;" onclick="searchSubmit('pushtopic');">提前</a><a href="javascript:;" onclick="searchSubmit('downtopic');">压帖</a><a href="javascript:;" onclick="searchSubmit('edit');">加亮</a><a href="javascript:;" onclick="searchSubmit('type');">分类主题</a><a href="javascript:;" onclick="searchSubmit('move');">移动</a><a href="javascript:;" onclick="searchSubmit('copy');">复制</a><a href="javascript:;" onclick="searchSubmit('del');">删除</a>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+<!--
+EOT;
+if( $superdelete && !$fid ){
+print <<<EOT
+-->               
+	                <a href="javascript:;" onclick="searchSubmit('delall');">删除</a>
+<!-- 
+EOT;
+}
+print <<<EOT
+-->                 
+	                </div>
+	            </form>
+<!-- 
+EOT;
+}
+print <<<EOT
+-->  
+	
+	
+			</div>
+<!--
+EOT;
+require printEOT('searcher_searchinput');
+print <<<EOT
+-->
+		</div>
+		<div class="list_sideBar">
+<!--
+EOT;
+list($htmlAdvert,$arrayAdvert) = pwAdvert('Site.Search.Thread.Right','');
+if($htmlAdvert){print <<<EOT
+-->
+<div style="height:200px;width:200px;">
+<div class="tac mb5">$htmlAdvert</div>
+</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+					<div>{$rightSearchResult}</div>				
+<!--
+EOT;
+if($hotwords){
+print <<<EOT
+-->     
+					<div class="list_box">
+						<h2><a>热门搜索</a></h2>
+						<ul>
+<!-- 
+EOT;
+foreach($hotwords as $hotword){
+print <<<EOT
+-->
+							<li><a href="searcher.php?keyword={$hotword}&type=thread">$hotword</a></li>
+<!-- 
+EOT;
+}
+print <<<EOT
+--> 
+							
+						</ul>
+					</div>
+<!-- 
+EOT;
+}
+print <<<EOT
+-->
+
+				</div>
+	</div>
 <script type="text/javascript">
 	var searchSubmit = function(type){
 		if(!type) return false;
@@ -180,6 +327,25 @@ print <<<EOT
 			form.submit();
 		},0);
 	}
+
+	function toggleSidebar(){
+		var sidebar = getObj('sidebar');
+		var toggle = (sidebar.className == 'list_main cc') ? 0: 1;
+		getObj('sidebar').className = (sidebar.className == 'list_main cc')?"list_main cc sideClose " : "list_main cc";
+		getObj('siderInner').innerHTML = (sidebar.className == 'list_main cc')?"隐藏侧边栏":'显示侧边栏';
+		SetCookie('searchtoggle',toggle);
+	}
+
+	function showmore() {
+		var morefids = getObj('morefids');
+		morefids.style.display = (morefids.style.display == "block") ? 'none' : 'block';
+		if (morefids.style.display == 'none') {
+			getObj('morebtn').innerHTML = '<a href="javascript:;" class="list_openup" id="lessbtn" onclick="showmore();">更多版块</a>';
+		} else {
+			getObj('morebtn').innerHTML = '<a href="javascript:;" class="list_packup" id="lessbtn" onclick="showmore();">更少版块</a>';
+		}
+	}
+
 </script>
 <!--
 EOT;

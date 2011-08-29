@@ -2,7 +2,7 @@
 !function_exists('readover') && exit('Forbidden');
 define ( "H_R", R_P . 'hack/rate/' );
 define ( "L_R", R_P . "lib/rate/" );
-!$noAjax && InitGP ( array ("job", "objectid", "optionid", "typeid", "action", "elementid", "authorid" ) );
+!$noAjax && S::gp ( array ("job", "objectid", "optionid", "typeid", "action", "elementid", "authorid" ) );
 !$noAjax && !$typeid && Showmsg('评价参数错误');/**/
 class RateIndex {
 
@@ -286,7 +286,7 @@ class RateIndex {
         $filePath = $this->_getReteConfigFilePath ( $this->_typeId );
         if (! file_exists ( $filePath ) || time () - filemtime ( $filePath ) > 3600) {
             $weekHTML = $this->_buildWeekResultHtml ( $rateConfigs );
-            writeover ( $filePath, $weekHTML );//write ignore null or not
+            pwCache::setData ( $filePath, $weekHTML );//write ignore null or not
         } else {
             $weekHTML = readover ( $filePath );
         }
@@ -304,7 +304,7 @@ class RateIndex {
     }
 
     function _getReteConfigFilePath($typeId) {
-        return Pcv(D_P . '/data/bbscache/rate_week_' . $typeId . '.php');
+        return S::escapePath(D_P . '/data/bbscache/rate_week_' . $typeId . '.php');
     }
 
     function _getRateService() {

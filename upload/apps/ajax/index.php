@@ -6,29 +6,29 @@ $basename = 'apps.php?q='.$q.'&';
 
 define('AJAX','1');
 define('F_M',true);
-InitGP(array('a'));
+S::gp(array('a'));
 
 if (!in_array($a,array('showgroupwritecommlist'))) {
 	!$winduid && Showmsg('not_login');
 }
 
 require_once(R_P.'require/functions.php');
-include_once(D_P . 'data/bbscache/o_config.php');
+include_once pwCache::getPath(D_P . 'data/bbscache/o_config.php');
 
-$isGM = CkInArray($windid,$manager);
+$isGM = S::inArray($windid,$manager);
 !$isGM && $groupid==3 && $isGM=1;
 $tpc_author = $windid;
 
 if ($a == 'delshare') {
 
-	InitGP(array('id'),'',2);
+	S::gp(array('id'),'',2);
 	if (!$id) Showmsg('undefined_action');
-	$share = $db->get_one("SELECT * FROM pw_collection WHERE id=".pwEscape($id));
+	$share = $db->get_one("SELECT * FROM pw_collection WHERE id=".S::sqlEscape($id));
 	!$share && Showmsg('mode_o_no_share');
 	if ($winduid != $share['uid'] && !$isGM) {
 		Showmsg('mode_o_delshare_permit_err');
 	}
-	$db->update("DELETE FROM pw_collection WHERE id=".pwEscape($id));
+	$db->update("DELETE FROM pw_collection WHERE id=".S::sqlEscape($id));
 	if ($affected_rows = delAppAction('share',$id)) {
 		countPosts("-$affected_rows");
 	}
@@ -51,18 +51,18 @@ if ($a == 'delshare') {
 
 } elseif ($a == 'delfriend') {
 
-	InitGP(array('u'),'',2);
+	S::gp(array('u'),'',2);
 	if ($u) {
 		if ($friend = getOneFriend($u)) {
-			$db->update("DELETE FROM pw_friends WHERE (uid=".pwEscape($winduid)." AND friendid=".pwEscape($u).") OR (uid=".pwEscape($u)." AND friendid=".pwEscape($winduid).")");
+			$db->update("DELETE FROM pw_friends WHERE (uid=".S::sqlEscape($winduid)." AND friendid=".S::sqlEscape($u).") OR (uid=".S::sqlEscape($u)." AND friendid=".S::sqlEscape($winduid).")");
 			$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
-			
+
 			$userIds = array();
 			$user = $userService->get($winduid, false, true);
 			$user['f_num'] && $userIds[] = $winduid;
 			$user = $userService->get($u, false, true);
 			$user['f_num'] && $userIds[] = $u;
-			
+
 			count($userIds) && $userService->updatesByIncrement($userIds, array(), array('f_num' => -1));
 
 			echo "success|";ajax_footer();
@@ -74,7 +74,7 @@ if ($a == 'delshare') {
 	}
 } elseif ($a == 'addfriend') {
 
-	InitGP(array('u'),'',2);
+	S::gp(array('u'),'',2);
 	if ($u == $winduid) {
 		Showmsg('friend_selferror');
 	}
@@ -94,10 +94,10 @@ if ($a == 'delshare') {
 		$pwSQL = array();
 		$pwSQL[] = array($winduid,$u,$timestamp,0);
 		$pwSQL[] = array($u,$winduid,$timestamp,0);
-		$db->update("REPLACE INTO pw_friends(uid,friendid,joindate,status) VALUES ".pwSqlMulti($pwSQL,false));
+		$db->update("REPLACE INTO pw_friends(uid,friendid,joindate,status) VALUES ".S::sqlMulti($pwSQL,false));
 		$userService->updatesByIncrement(array($winduid, $u), array(), array('f_num'=>1));
 		$myurl = $db_bbsurl."/".$baseUrl."q=user&u=".$winduid;
-		
+
 		M::sendNotice(
 			array($toUserInfo['username']),
 			array(
@@ -111,7 +111,7 @@ if ($a == 'delshare') {
 				)),
 			)
 		);
-		
+
 		//job sign
 		$friendUserName = $toUserInfo['username'];
 		initJob($winduid,"doAddFriend",array('user'=>$friendUserName));
@@ -120,8 +120,8 @@ if ($a == 'delshare') {
 		Showmsg('mode_o_not_uid');
 	}
 } elseif ($a == 'showcommlist') {
-	
-	InitGP(array('type','id'),'P');
+
+	S::gp(array('type','id'),'P');
 	$id = (int)$id;
 	if (!$id) Showmsg('undefined_action');
 	if(!checkCommType($type)) Showmsg('undefined_action');
@@ -130,7 +130,7 @@ if ($a == 'delshare') {
 	$wordsfb = L::loadClass('FilterUtil', 'filter');
 	$orderby = $type == 'groupwrite' ? 'ASC' : 'DESC';
 	$comment = array();
-	$query = $db->query("SELECT c.*,m.icon as face,m.groupid FROM pw_comment c LEFT JOIN pw_members m ON c.uid=m.uid WHERE c.type=".pwEscape($type)." AND c.typeid=".pwEscape($id)." AND upid='0' ORDER BY c.postdate $orderby".pwLimit(0,100));
+	$query = $db->query("SELECT c.*,m.icon as face,m.groupid FROM pw_comment c LEFT JOIN pw_members m ON c.uid=m.uid WHERE c.type=".S::sqlEscape($type)." AND c.typeid=".S::sqlEscape($id)." AND upid='0' ORDER BY c.postdate $orderby".S::sqlLimit(0,100));
 	while ($rt = $db->fetch_array($query)) {
 		list($rt['postdate']) = getLastDate($rt['postdate'],0);
 		if ($rt['groupid'] == 6 && $db_shield && $groupid != 3) {
@@ -151,25 +151,25 @@ if ($a == 'delshare') {
 
 } elseif ($a == 'showgroupwritecommlist') {
 
-	InitGP(array('type','id'),'P');
+	S::gp(array('type','id'),'P');
 	$id = (int)$id;
 	if (!$id) Showmsg('undefined_action');
-	
+
 	//根据$id取出群组的ID
-	$cyid = $db->get_value("SELECT cyid FROM pw_cwritedata WHERE id=".pwEscape($id));
+	$cyid = $db->get_value("SELECT cyid FROM pw_cwritedata WHERE id=".S::sqlEscape($id));
 	require_once(R_P . 'apps/groups/lib/colony.class.php');
 	$newColony = new PwColony($cyid);
 	if (!$colony =& $newColony->getInfo()) {
 		Showmsg('data_error');
 	}
-	$isGM = CkInArray($windid,$manager);
+	$isGM = S::inArray($windid,$manager);
 	$ifadmin = ($colony['ifadmin'] == '1' || $colony['admin'] == $windid || $isGM || $SYSTEM['colonyright']);
 
 	require_once(R_P.'require/showimg.php');
 	require_once(R_P.'require/bbscode.php');
 	$wordsfb = L::loadClass('FilterUtil', 'filter');
 	$comment = array();
-	$query = $db->query("SELECT c.*,m.icon as face,m.groupid FROM pw_comment c LEFT JOIN pw_members m ON c.uid=m.uid WHERE c.type='groupwrite' AND c.typeid=".pwEscape($id)." AND upid='0' ORDER BY c.postdate ASC".pwLimit(0,100));
+	$query = $db->query("SELECT c.*,m.icon as face,m.groupid FROM pw_comment c LEFT JOIN pw_members m ON c.uid=m.uid WHERE c.type='groupwrite' AND c.typeid=".S::sqlEscape($id)." AND upid='0' ORDER BY c.postdate ASC".S::sqlLimit(0,100));
 	while ($rt = $db->fetch_array($query)) {
 		list($rt['postdate']) = getLastDate($rt['postdate'],0);
 		if ($rt['groupid'] == 6 && $db_shield && $groupid != 3) {
@@ -194,15 +194,15 @@ if ($a == 'delshare') {
 	require_once(R_P.'require/showimg.php');
 	require_once(R_P.'require/postfunc.php');
 	banUser();
-	InitGP(array('type','id','title','upid','position','other'),'P');
-	$title 	= str_replace('&#61;','=',$title);
+	S::gp(array('type','id','title','upid','position','other'),'P');
+	$title 	= nl2br(str_replace('&#61;','=',$title));
 	$id = (int)$id;
 	$upid = (int)$upid ? (int)$upid : 0;
 	if (!$id) Showmsg('undefined_action');
 	if(!checkCommType($type)) Showmsg('undefined_action');
 	$app_table = $id_filed = '';
 	list($app_table,$id_filed) = getCommTypeTable($type);
-	$count = $db->get_value("SELECT COUNT(*) AS count FROM pw_comment WHERE type=".pwEscape($type)." AND typeid=".pwEscape($id));
+	$count = $db->get_value("SELECT COUNT(*) AS count FROM pw_comment WHERE type=".S::sqlEscape($type)." AND typeid=".S::sqlEscape($id));
 	if ($count > 99) Showmsg('mode_o_com_count_max');
 	if (strlen($title)<3 || strlen($title)>200) {
 		Showmsg('mode_o_com_title_error');
@@ -222,16 +222,16 @@ if ($a == 'delshare') {
 		'postdate'	=> $timestamp,
 		'ifwordsfb' => $wordsfb->ifwordsfb(stripslashes($title))
 	);
-	$db->update("INSERT INTO pw_comment SET ".pwSqlSingle($data));
+	$db->update("INSERT INTO pw_comment SET ".S::sqlSingle($data));
 	$insertid = $db->insert_id();
 	if ($app_table && $id_filed) {
-		$db->update("UPDATE $app_table SET c_num=c_num+1 WHERE $id_filed=".pwEscape($id));
+		$db->update("UPDATE $app_table SET c_num=c_num+1 WHERE $id_filed=".S::sqlEscape($id));
 	}
 	if ($insertid) {
-		
+
 		//zhudong 当为群组的记录的时候，更改群组记录的发表时间
 		if ($type == 'groupwrite') {
-			$db->update("UPDATE pw_cwritedata SET replay_time=".pwEscape($timestamp)." WHERE id=".pwEscape($id));
+			$db->update("UPDATE pw_cwritedata SET replay_time=".S::sqlEscape($timestamp)." WHERE id=".S::sqlEscape($id));
 		}
 
 		countPosts('+1');
@@ -291,22 +291,22 @@ if ($a == 'delshare') {
 		Showmsg('undefined_action');
 	}
 } elseif ($a == 'commdel') {
-	InitGP(array('id'),'P',2);
+	S::gp(array('id'),'P',2);
 	if (!$id) Showmsg('undefined_action');
-	$thiscomm = $db->get_one("SELECT uid,type,typeid FROM pw_comment WHERE id=".pwEscape($id));
+	$thiscomm = $db->get_one("SELECT uid,type,typeid FROM pw_comment WHERE id=".S::sqlEscape($id));
 	if (!$isGM && $thiscomm['uid'] != $winduid) {
 		if ($thiscomm['type'] == 'groupwrite') {
-			$colony = $db->get_one("SELECT c.admin,cb.ifadmin FROM pw_cwritedata cw LEFT JOIN pw_colonys c ON cw.cyid=c.id LEFT JOIN pw_cmembers cb ON c.id=cb.colonyid AND cb.uid=" . pwEscape($winduid) . " WHERE cw.id=" . pwEscape($thiscomm['typeid']));
+			$colony = $db->get_one("SELECT c.admin,cb.ifadmin FROM pw_cwritedata cw LEFT JOIN pw_colonys c ON cw.cyid=c.id LEFT JOIN pw_cmembers cb ON c.id=cb.colonyid AND cb.uid=" . S::sqlEscape($winduid) . " WHERE cw.id=" . S::sqlEscape($thiscomm['typeid']));
 			if ($colony['admin'] != $windid && $colony['ifadmin'] != 1) {
 				Showmsg('mode_o_com_del_priv');
 			}
 		} elseif ($thiscomm['type'] == 'active') {
-			$colony = $db->get_one("SELECT c.admin,cb.ifadmin FROM pw_active a LEFT JOIN pw_colonys c ON a.cid=c.id LEFT JOIN pw_cmembers cb ON c.id=cb.colonyid AND cb.uid=" . pwEscape($winduid) . " WHERE a.id=" . pwEscape($thiscomm['typeid']));
+			$colony = $db->get_one("SELECT c.admin,cb.ifadmin FROM pw_active a LEFT JOIN pw_colonys c ON a.cid=c.id LEFT JOIN pw_cmembers cb ON c.id=cb.colonyid AND cb.uid=" . S::sqlEscape($winduid) . " WHERE a.id=" . S::sqlEscape($thiscomm['typeid']));
 			if ($colony['admin'] != $windid && $colony['ifadmin'] != 1) {
 				Showmsg('mode_o_com_del_priv');
 			}
 		} elseif ($thiscomm['type'] == 'groupphoto') {
-			$colony = $db->get_one("SELECT c.admin,cb.ifadmin FROM pw_cnphoto cp LEFT JOIN pw_cnalbum ca ON cp.aid=ca.aid LEFT JOIN pw_colonys c ON ca.ownerid=c.id LEFT JOIN pw_cmembers cb ON ca.ownerid=cb.colonyid AND cb.uid=" . pwEscape($winduid) . " WHERE cp.pid=" . pwEscape($thiscomm['typeid']));
+			$colony = $db->get_one("SELECT c.admin,cb.ifadmin FROM pw_cnphoto cp LEFT JOIN pw_cnalbum ca ON cp.aid=ca.aid LEFT JOIN pw_colonys c ON ca.ownerid=c.id LEFT JOIN pw_cmembers cb ON ca.ownerid=cb.colonyid AND cb.uid=" . S::sqlEscape($winduid) . " WHERE cp.pid=" . S::sqlEscape($thiscomm['typeid']));
 			if ($colony['admin'] != $windid && $colony['ifadmin'] != 1) {
 				Showmsg('mode_o_com_del_priv');
 			}
@@ -316,28 +316,28 @@ if ($a == 'delshare') {
 	}
 
 	$updatenum = 0;
-	$db->update("DELETE FROM pw_comment WHERE id=".pwEscape($id));
+	$db->update("DELETE FROM pw_comment WHERE id=".S::sqlEscape($id));
 	$updatenum += $db->affected_rows();
-	$db->update("DELETE FROM pw_comment WHERE upid=".pwEscape($id));
+	$db->update("DELETE FROM pw_comment WHERE upid=".S::sqlEscape($id));
 	$updatenum += $db->affected_rows();
 	list($app_table,$app_filed) = getCommTypeTable($thiscomm['type']);
 	if ($updatenum && $app_table && $thiscomm['typeid']) {
-		$db->update("UPDATE $app_table SET c_num=c_num-".pwEscape($updatenum)." WHERE $app_filed=".pwEscape($thiscomm['typeid']));
+		$db->update("UPDATE $app_table SET c_num=c_num-".S::sqlEscape($updatenum)." WHERE $app_filed=".S::sqlEscape($thiscomm['typeid']));
 	}
 	countPosts("-$updatenum");
 	echo "success\t$id";
 	ajax_footer();
 } elseif ($a == 'addfriendtype') {
-	InitGP(array('u','name'),'P');
+	S::gp(array('u','name'),'P');
 	$u = (int) $u;
 	if (!$u) Showmsg('undefined_action');
 	if ($u != $winduid && !$isGM) Showmsg('undefined_action');
 	if (strlen($name)<1 || strlen($name)>20) Showmsg('mode_o_addftype_name_leng');
-	$check = $db->get_one("SELECT ftid FROM pw_friendtype WHERE uid=".pwEscape($u)." AND name=".pwEscape($name));
+	$check = $db->get_one("SELECT ftid FROM pw_friendtype WHERE uid=".S::sqlEscape($u)." AND name=".S::sqlEscape($name));
 	if ($check) Showmsg('mode_o_addftype_name_exist');
-	$count = $db->get_value("SELECT COUNT(*) AS count FROM pw_friendtype WHERE uid=".pwEscape($u));
+	$count = $db->get_value("SELECT COUNT(*) AS count FROM pw_friendtype WHERE uid=".S::sqlEscape($u));
 	if ($count>=20) Showmsg('mode_o_addftype_length');
-	$db->update("INSERT INTO pw_friendtype(uid,name) VALUES(".pwEscape($u).",".pwEscape($name).")");
+	$db->update("INSERT INTO pw_friendtype(uid,name) VALUES(".S::sqlEscape($u).",".S::sqlEscape($name).")");
 	$id = $db->insert_id();
 	if ($id) {
 		echo "success\t$id";
@@ -346,36 +346,37 @@ if ($a == 'delshare') {
 		Showmsg('undefined_action');
 	}
 } elseif ($a == 'delfriendtype') {
-	InitGP(array('u','ftid'),'P',2);
+	S::gp(array('u','dtid'),'P',2);
+	$ftid = (int) $dtid;
 	$where = '';
 	if (!$isGM) {
 		if (!$u) Showmsg('undefined_action');
 		if ($u != $winduid) Showmsg('undefined_action');
-		$where .= " AND uid=".pwEscape($u);
+		$where .= " AND uid=".S::sqlEscape($u);
 	}
 
 	if (!$ftid) Showmsg('undefined_action');
-	$db->update("DELETE FROM pw_friendtype WHERE ftid=".pwEscape($ftid)."$where");
+	$db->update("DELETE FROM pw_friendtype WHERE ftid=".S::sqlEscape($ftid)."$where");
 	if ($db->affected_rows()) {
-		$db->update("UPDATE pw_friends SET ftid=0 WHERE ftid=".pwEscape($ftid));
+		$db->update("UPDATE pw_friends SET ftid=0 WHERE ftid=".S::sqlEscape($ftid));
 		echo "success";
 		ajax_footer();
 	} else {
 		Showmsg('undefined_action');
 	}
 } elseif ($a == 'eidtfriendtype') {
-	InitGP(array('u','ftid','name'),'P');
+	S::gp(array('u','dtid','name'),'P');
 	$u = (int) $u;
-	$ftid = (int) $ftid;
+	$ftid = (int) $dtid;
 	if (!$u) Showmsg('undefined_action');
 	if (!$isGM) {
 		if ($u != $winduid) Showmsg('mode_o_addftype_n');
 	}
 	if (!$ftid) Showmsg('undefined_action');
 	if (strlen($name)<1 || strlen($name)>20) Showmsg('mode_o_addftype_name_leng');
-	$check = $db->get_one("SELECT ftid FROM pw_friendtype WHERE uid=".pwEscape($u)." AND name=".pwEscape($name));
+	$check = $db->get_one("SELECT ftid FROM pw_friendtype WHERE uid=".S::sqlEscape($u)." AND name=".S::sqlEscape($name));
 	if ($check) Showmsg('mode_o_addftype_name_exist');
-	$db->update("UPDATE pw_friendtype SET name=".pwEscape($name)." WHERE uid=".pwEscape($u)." AND ftid=".pwEscape($ftid));
+	$db->update("UPDATE pw_friendtype SET name=".S::sqlEscape($name)." WHERE uid=".S::sqlEscape($u)." AND ftid=".S::sqlEscape($ftid));
 	if ($db->affected_rows()) {
 		echo "success";
 		ajax_footer();
@@ -386,12 +387,12 @@ if ($a == 'delshare') {
 
 	require_once(R_P.'require/postfunc.php');
 	banUser();
-	InitGP(array('uid','title'),'P');
+	S::gp(array('uid','title'),'P');
 	$title 	= str_replace('&#61;','=',$title);
 	$uid = (int)$uid;
 	if (!$uid) Showmsg('undefined_action');
 	if ($uid == $winduid) Showmsg('mode_o_board_self');
-	if (!isFriend($uid,$winduid)) Showmsg('mode_o_board_not_friend');
+//	if (!isFriend($uid,$winduid)) Showmsg('mode_o_board_not_friend'); //去掉非好友不能留言
 	if (strlen($title)>3 && strlen($title)>200) Showmsg('mode_o_board_too_lang');
 
 	$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
@@ -412,7 +413,7 @@ if ($a == 'delshare') {
 		'postdate'	=> $timestamp,
 		'ifwordsfb' => $wordsfb->ifwordsfb(stripslashes($title))
 	);
-	$db->update("INSERT INTO pw_oboard SET ".pwSqlSingle($data));
+	$db->update("INSERT INTO pw_oboard SET ".S::sqlSingle($data));
 	$thisid = $db->insert_id();
 
 	$userCache = L::loadClass('UserCache', 'user');//ismodify
@@ -458,14 +459,14 @@ if ($a == 'delshare') {
 	}
 } elseif ($a == 'delboard') {
 
-	InitGP(array('id'),'P',2);
+	S::gp(array('id'),'P',2);
 	if (!$id) Showmsg('undefined_action');
-	$board = $db->get_one("SELECT * FROM pw_oboard WHERE id=" . pwEscape($id));
+	$board = $db->get_one("SELECT * FROM pw_oboard WHERE id=" . S::sqlEscape($id));
 	if (!$board || (!$isGM && $board['uid'] != $winduid && $board['touid'] != $winduid)) {
 		Showmsg('undefined_action');
 	}
-	$db->update("DELETE FROM pw_oboard WHERE id=" . pwEscape($id));
-	
+	$db->update("DELETE FROM pw_oboard WHERE id=" . S::sqlEscape($id));
+
 	$userCache = L::loadClass('UserCache', 'user');//ismodify
 	$userCache->delete($board['touid'], 'messageboard');
 
@@ -476,10 +477,10 @@ if ($a == 'delshare') {
 
 } elseif ($a == 'showftlist') {
 
-	InitGP(array('u'),'P',2);
+	S::gp(array('u'),'P',2);
 	if (!$u) Showmsg('undefined_action');
 	if ($u != $winduid) Showmsg('undefined_action');
-	$query = $db->query("SELECT * FROM pw_friendtype WHERE uid=".pwEscape($u)." ORDER BY ftid");
+	$query = $db->query("SELECT * FROM pw_friendtype WHERE uid=".S::sqlEscape($u)." ORDER BY ftid");
 	$types = array();
 	while ($rt = $db->fetch_array($query)) {
 		$types[] = $rt;
@@ -494,16 +495,53 @@ if ($a == 'delshare') {
 
 } elseif ($a == 'setfriendtype') {
 
-	InitGP(array('friendid','ftid'),'P',2);
+	S::gp(array('friendid','ftid'),'P',2);
 	!$ftid && $ftid = 0;
 	if (!$friendid) Showmsg('undefined_action');
-	$db->update("UPDATE pw_friends SET ftid=".pwEscape($ftid)." WHERE uid=".pwEscape($winduid)." AND friendid=".pwEscape($friendid));
+	$db->update("UPDATE pw_friends SET ftid=".S::sqlEscape($ftid)." WHERE uid=".S::sqlEscape($winduid)." AND friendid=".S::sqlEscape($friendid));
 	echo "success";
 	ajax_footer();
 
+} elseif ($a == 'delcollecttype') { 
+	S::gp(array('u','dtid'),'P');
+	$collectionTypeService = L::loadClass('CollectionTypeService', 'collection'); /* @var $collectiontype PW_Collection */
+	$collectionService = L::loadClass('Collection', 'collection'); /* @var $collection PW_Collection */
+	if (!$u) Showmsg('undefined_action');
+	if ($u != $winduid) Showmsg('undefined_action');
+	if (!$dtid) Showmsg('undefined_action');	
+	if(!$collectionTypeService->delete($dtid)) Showmsg('undefined_action');
+	$collectionService->updateByCtid($dtid);
+	echo "success";
+	ajax_footer();
+} elseif ($a == 'addcollecttype') { 
+	S::gp(array('u','name'),'P');
+	if (strlen($name) > 20) Showmsg('stamp_name_length');
+	$collectionTypeService = L::loadClass('CollectionTypeService', 'collection'); /* @var $collectiontype PW_Collection */
+	$dataExist = $collectionTypeService->checkTypeExist((int)$u, $name);
+	if (!$dataExist) Showmsg('stamp_have_exist');
+	$data = array(
+		'uid'	=>	(int)$u,
+		'name'	=>	$name
+	);
+	$id = $collectionTypeService->insert($data);
+	(!$id) && Showmsg('undefined_action');
+	echo "success\t$id";
+	ajax_footer();
+} elseif ($a == 'editcollecttype') { 
+	S::gp(array('u','dtid','name'),'P');
+	if (strlen($name) > 20) Showmsg('stamp_name_length');
+	$collectionTypeService = L::loadClass('CollectionTypeService', 'collection'); /* @var $collectiontype PW_Collection */
+	$dataExist = $collectionTypeService->checkTypeExist((int)$u, $name, $dtid);
+	if (!$dataExist) Showmsg('stamp_have_exist');
+	$data = array(
+		'name'	=>	$name
+	);
+	$row = $collectionTypeService->update($data, $dtid);
+	($row<0) && Showmsg('undefined_action');
+	echo "success";
+	ajax_footer();
 } elseif ($a == 'adddiarytype') {
-
-	InitGP(array('u','name','b'),'P');
+	S::gp(array('u','name','b'),'P');
 	if ((int)$b == 1) {
 		echo "success\t$b";
 		ajax_footer();
@@ -511,7 +549,7 @@ if ($a == 'delshare') {
 	$u = (int) $u;
 
 	$diaryService = L::loadClass('Diary', 'diary'); /* @var $diaryService PW_Diary */
-	
+
 	$data = array(
 		'uid'	=>	$u,
 		'name'	=>	$name
@@ -525,16 +563,16 @@ if ($a == 'delshare') {
 	}
 } elseif ($a == 'deldiarytype') {
 
-	InitGP(array('u','dtid'),'P',2);
+	S::gp(array('u','dtid'),'P',2);
 	$where = '';
 	if (!$isGM) {
 		if (!$u) Showmsg('undefined_action');
 		if ($u != $winduid) Showmsg('undefined_action');
-		$where .= " AND uid=".pwEscape($u);
+		$where .= " AND uid=".S::sqlEscape($u);
 	}
 
 	if (!$dtid) Showmsg('undefined_action');
-	
+
 	$diaryService = L::loadClass('Diary', 'diary'); /* @var $diaryService PW_Diary */
 	$affected_rows = $diaryService->delDiaryTypeByDtid($dtid);
 	if ($affected_rows) {
@@ -545,10 +583,10 @@ if ($a == 'delshare') {
 	}
 } elseif ($a == 'eidtdiarytype') {
 
-	InitGP(array('u','dtid','name'),'P');
+	S::gp(array('u','dtid','name'),'P');
 	$u = (int) $u;
 	$dtid = (int) $dtid;
-	
+
 	$diaryService = L::loadClass('Diary', 'diary'); /* @var $diaryService PW_Diary */
 	$data = array(
 		'name'	=>	$name
@@ -562,7 +600,7 @@ if ($a == 'delshare') {
 	}
 } elseif ($a == 'deldiary') {
 
-	InitGP(array('id'),'',2);
+	S::gp(array('id'),'',2);
 	if (!$id) Showmsg('undefined_action');
 
 	$diaryService = L::loadClass('Diary', 'diary'); /* @var $diaryService PW_Diary */
@@ -573,14 +611,14 @@ if ($a == 'delshare') {
 	if ($weibo) {
 		$weiboService->deleteWeibos($weibo['mid']);
 	}
-//	$diary = $db->get_one("SELECT did,dtid,uid,username FROM pw_diary WHERE did=".pwEscape($id));
+//	$diary = $db->get_one("SELECT did,dtid,uid,username FROM pw_diary WHERE did=".S::sqlEscape($id));
 //	!$diary && Showmsg('mode_o_no_diary');
 //
 //	if ($winduid != $diary['uid'] && !$isGM) {
 //		Showmsg('mode_o_deldiary_permit_err');
 //	}
-//	$db->update("DELETE FROM pw_diary WHERE did=".pwEscape($id));
-//	$db->update("UPDATE pw_diarytype SET num=num-1 WHERE dtid=".pwEscape($diary['dtid']));
+//	$db->update("DELETE FROM pw_diary WHERE did=".S::sqlEscape($id));
+//	$db->update("UPDATE pw_diarytype SET num=num-1 WHERE dtid=".S::sqlEscape($diary['dtid']));
 	if ($affected_rows = delAppAction('diary',$id)) {
 		countPosts("-$affected_rows");
 	}
@@ -610,33 +648,33 @@ if ($a == 'delshare') {
 
 } elseif ($a == 'copydiary') {
 
-	InitGP(array('did','dtid','privacy'));
+	S::gp(array('did','dtid','privacy'));
 	if (!$did) Showmsg('undefined_action');
-	$diary = $db->get_one("SELECT d.did,d.aid,d.uid,d.dtid,d.subject,d.content,d.ifconvert,d.ifwordsfb,d.ifcopy,m.username FROM pw_diary d LEFT JOIN pw_members m USING(uid) WHERE d.did=".pwEscape($did));
+	$diary = $db->get_one("SELECT d.did,d.aid,d.uid,d.dtid,d.subject,d.content,d.ifconvert,d.ifwordsfb,d.ifcopy,m.username FROM pw_diary d LEFT JOIN pw_members m USING(uid) WHERE d.did=".S::sqlEscape($did));
 
 	!$diary['ifcopy'] && Showmsg('mode_o_copy_permit_err');
 
 	$diary['copyurl'] = $diary['uid']."|".$diary['username']."|{$GLOBALS[db_bbsurl]}/apps.php?q=diary&uid={$diary[uid]}&a=detail&did={$diary[did]}";
 
-	/*$rt = $db->get_one("SELECT name FROM pw_diarytype WHERE dtid=".pwEscape($diary['dtid'])." AND uid=".pwEscape($diary['uid']));
+	/*$rt = $db->get_one("SELECT name FROM pw_diarytype WHERE dtid=".S::sqlEscape($diary['dtid'])." AND uid=".S::sqlEscape($diary['uid']));
 	if ($rt['name']) {
-		$check = $db->get_one("SELECT dtid FROM pw_diarytype WHERE uid=".pwEscape($winduid)." AND name=".pwEscape($rt['name']));
-		$count = $db->get_value("SELECT COUNT(*) AS count FROM pw_diarytype WHERE uid=".pwEscape($winduid));
+		$check = $db->get_one("SELECT dtid FROM pw_diarytype WHERE uid=".S::sqlEscape($winduid)." AND name=".S::sqlEscape($rt['name']));
+		$count = $db->get_value("SELECT COUNT(*) AS count FROM pw_diarytype WHERE uid=".S::sqlEscape($winduid));
 		if (!$check && $count <= 20) {
-			$db->update("INSERT INTO pw_diarytype(uid,name,num) VALUES(".pwEscape($winduid).",".pwEscape($rt['name']).",1)");
+			$db->update("INSERT INTO pw_diarytype(uid,name,num) VALUES(".S::sqlEscape($winduid).",".S::sqlEscape($rt['name']).",1)");
 			$dtid = $db->insert_id();
 		} elseif ($count > 20) {
 			$dtid = 0;
 		} else {
 			$dtid = $check['dtid'];
-			$db->update("UPDATE pw_diarytype SET num=num+1 WHERE dtid=".pwEscape($dtid));
+			$db->update("UPDATE pw_diarytype SET num=num+1 WHERE dtid=".S::sqlEscape($dtid));
 		}
 	}*///分类不存在则自动生成分类
-	
+
 	$dtid = (int)$dtid;
 	$privacy = (int)$privacy;
-
-	$pwSQL = pwSqlSingle(array(
+   /**
+	$pwSQL = S::sqlSingle(array(
 		'uid'		=> $winduid,
 		'dtid'		=> $dtid,
 		'username'	=> $windid,
@@ -649,13 +687,25 @@ if ($a == 'delshare') {
 		'ifwordsfb'	=> $diary['ifwordsfb'],
 		'postdate'	=> $timestamp,
 	));
-
-
-	$db->update("INSERT INTO pw_diary SET $pwSQL");
+	$db->update("INSERT INTO pw_diary SET $pwSQL");****/
+	$pwSQL =array(
+		'uid'		=> $winduid,
+		'dtid'		=> $dtid,
+		'username'	=> $windid,
+		'privacy'	=> $privacy,
+		'subject'	=> $diary['subject'],
+//		'content'	=> $diary['content'],
+		'copyurl'	=> $diary['copyurl'],
+		'ifcopy'	=> $diary['ifcopy'],
+		'ifconvert'	=> $diary['ifconvert'],
+		'ifwordsfb'	=> $diary['ifwordsfb'],
+		'postdate'	=> $timestamp,
+	);
+	pwQuery::insert('pw_diary', $pwSQL);
 	$did = $db->insert_id();
-	
-	$db->update("UPDATE pw_diarytype SET num=num+1 WHERE uid=".pwEscape($winduid)." AND dtid=".pwEscape($dtid));//更新分类日志数
-	
+
+	$db->update("UPDATE pw_diarytype SET num=num+1 WHERE uid=".S::sqlEscape($winduid)." AND dtid=".S::sqlEscape($dtid));//更新分类日志数
+
 	//*=======拷贝图片待优化===========*//
 	$diaryAttachs = $diary['aid'] ? unserialize($diary['aid']) : array();
 	L::loadClass('upload', '', false);
@@ -681,14 +731,14 @@ if ($a == 'delshare') {
 			$attachurl = "$savedir/$filename";
 			$fileuplodeurl = "$attachdir/diary/$attachurl";
 			$uploadSerivce->postupload($a_url[0],$fileuplodeurl);
-			
+
 			if ($db_ifathumb) {
 				$thumbdir = "thumb/diary/$attachurl";
 				$thumburl = "$attachdir/$thumbdir";
 				$ifthumb = 1;
 				$thumbsize = $uploadSerivce->MakeThumb($fileuplodeurl,$thumburl,$db_athumbsize,$ifthumb);
 			}
-			
+
 			$data = array(
 			'did'		=> $did,				'uid'		=> $winduid,
 			'hits'		=> 0,					'name'		=> $at['name'],
@@ -698,23 +748,23 @@ if ($a == 'delshare') {
 			'uploadtime'=> $timestamp,			'descrip'	=> $at['descrip'],
 			'ifthumb'	=> 0
 			);
-			$db->update("INSERT INTO pw_attachs SET ".pwSqlSingle($data));
+			$db->update("INSERT INTO pw_attachs SET ".S::sqlSingle($data));
 			$aid = $db->insert_id();
 			$data['aid'] = $aid;
 			$aids[] = $data['aid'];
 			$diaryAid[$aid] = $data;
 		}
-	}	
+	}
 	//*=======拷贝图片===========*//
-	
+
 	$diaryAid = $diaryAid ? serialize($diaryAid) : '';
-	
+
 	if ($aids) {
 		preg_match_all('/attachment=(\d+)/i', $diary['content'], $result);
 		$diary['content'] = str_replace($result[1], $aids, $diary['content']);
 	}
-	
-	$db->update("UPDATE pw_diary SET aid = ".pwEscape($diaryAid).",content=".pwEscape($diary['content'])." WHERE did=".pwEscape($did)." AND uid=".pwEscape($winduid));
+	//$db->update("UPDATE pw_diary SET aid = ".S::sqlEscape($diaryAid).",content=".S::sqlEscape($diary['content'])." WHERE did=".S::sqlEscape($did)." AND uid=".S::sqlEscape($winduid));
+	pwQuery::update('pw_diary', 'did=:did AND uid=:uid', array($did, $winduid), array('aid' => $diaryAid, 'content' => $diary['content']));
 	countPosts('+1');
 	updateUserAppNum($winduid,'diary');
 	echo "success\t$did";ajax_footer();
@@ -726,7 +776,7 @@ if ($a == 'delshare') {
 			$value['iffeed'] && $checked[$key] = 'CHECKED';
 			$frienddb[$value['ftid']][] = $value;
 		}
-		$query = $db->query("SELECT * FROM pw_friendtype WHERE uid=".pwEscape($winduid)." ORDER BY ftid");
+		$query = $db->query("SELECT * FROM pw_friendtype WHERE uid=".S::sqlEscape($winduid)." ORDER BY ftid");
 		$friendtype = array();
 		while ($rt = $db->fetch_array($query)) {
 			$friendtype[$rt['ftid']] = $rt;
@@ -735,27 +785,27 @@ if ($a == 'delshare') {
 		$friendtype[0] = array('ftid' => 0,'uid' => $winduid,'name' => $no_group_name);
 		require_once PrintEot('m_ajax');ajax_footer();
 	} else {
-		InitGP(array('selid'));
+		S::gp(array('selid'));
 		if (!empty($selid)) {
-			$db->update("UPDATE pw_friends SET iffeed='1' WHERE uid=".pwEscape($winduid)." AND friendid IN (".pwImplode($selid).")");
-			$db->update("UPDATE pw_friends SET iffeed='0' WHERE uid=".pwEscape($winduid)." AND friendid NOT IN (".pwImplode($selid).")");
+			$db->update("UPDATE pw_friends SET iffeed='1' WHERE uid=".S::sqlEscape($winduid)." AND friendid IN (".S::sqlImplode($selid).")");
+			$db->update("UPDATE pw_friends SET iffeed='0' WHERE uid=".S::sqlEscape($winduid)." AND friendid NOT IN (".S::sqlImplode($selid).")");
 		} else {
-			$db->update("UPDATE pw_friends SET iffeed='0' WHERE uid=".pwEscape($winduid));
+			$db->update("UPDATE pw_friends SET iffeed='0' WHERE uid=".S::sqlEscape($winduid));
 		}
 		Showmsg('o_feedfriend_success');
 	}
 } elseif ($a == 'mutiuploadphoto') {
-	InitGP(array('aid'));
+	S::gp(array('aid'));
 	!$aid && Showmsg('select_ablum');
 	!$winduid && Showmsg('undefined_action');
-	$rt = $db->get_one("SELECT atype,ownerid,photonum FROM pw_cnalbum WHERE aid=" . pwEscape($aid));
+	$rt = $db->get_one("SELECT atype,ownerid,photonum FROM pw_cnalbum WHERE aid=" . S::sqlEscape($aid));
 	if (empty($rt)) {
 		Showmsg('undefined_action');
 	}
 	if ($rt['atype'] == 1) {
-		$colony = $db->get_one("SELECT * FROM pw_colonys WHERE id=" . pwEscape($rt['ownerid']));
+		$colony = $db->get_one("SELECT * FROM pw_colonys WHERE id=" . S::sqlEscape($rt['ownerid']));
 		$level = $colony['speciallevel'] ? $colony['speciallevel'] : $colony['commonlevel'];
-		$o_maxphotonum = $db->get_value("SELECT maxphotonum FROM pw_cnlevel WHERE id=" . pwEscape($level));
+		$o_maxphotonum = $db->get_value("SELECT maxphotonum FROM pw_cnlevel WHERE id=" . S::sqlEscape($level));
 	} else {
 		$winduid != $rt['ownerid'] && Showmsg('colony_phototype');
 	}
@@ -767,16 +817,16 @@ function getUserNameByTypeAndId($type,$id) {
 	global $db;
 	switch ($type) {
 		case 'share':
-			return $db->get_value("SELECT username FROM pw_collection WHERE id=".pwEscape($id));
+			return $db->get_value("SELECT username FROM pw_collection WHERE id=".S::sqlEscape($id));
 			break;
 		case 'write':
-			return $db->get_value("SELECT m.username FROM pw_owritedata o LEFT JOIN pw_members m ON o.uid=m.uid WHERE o.id=".pwEscape($id));
+			return $db->get_value("SELECT m.username FROM pw_owritedata o LEFT JOIN pw_members m ON o.uid=m.uid WHERE o.id=".S::sqlEscape($id));
 			break;
 		case 'photo':
-			return $db->get_value("SELECT uploader FROM pw_cnphoto WHERE pid=".pwEscape($id));
+			return $db->get_value("SELECT uploader FROM pw_cnphoto WHERE pid=".S::sqlEscape($id));
 			break;
 		case 'diary':
-			return $db->get_value("SELECT username FROM pw_diary WHERE did=".pwEscape($id));
+			return $db->get_value("SELECT username FROM pw_diary WHERE did=".S::sqlEscape($id));
 			break;
 		default:
 			return false;

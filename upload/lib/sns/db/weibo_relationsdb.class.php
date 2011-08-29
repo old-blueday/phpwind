@@ -34,7 +34,7 @@ class PW_Weibo_RelationsDB extends BaseDB {
 	}
 
 	function addRelation($fieldDatas){
-		$this->_db->update("INSERT INTO " . $this->_tableName . " (uid,mid,authorid,type,postdate) VALUES " . pwSqlMulti($fieldDatas,FALSE));
+		$this->_db->update("INSERT INTO " . $this->_tableName . " (uid,mid,authorid,type,postdate) VALUES " . S::sqlMulti($fieldDatas,FALSE));
 		return $this->_db->insert_id ();
 	}
 
@@ -59,7 +59,7 @@ class PW_Weibo_RelationsDB extends BaseDB {
 			return false;
 		}
 		$mids = is_array($mids) ? $mids : array($mids);
-		$sql = 'DELETE FROM '.$this->_tableName.' WHERE mid IN (' . pwImplode($mids) . ') ';
+		$sql = 'DELETE FROM '.$this->_tableName.' WHERE mid IN (' . S::sqlImplode($mids) . ') ';
 		$this->_db->query($sql);
 		return true;
 	}

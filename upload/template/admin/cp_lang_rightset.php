@@ -28,7 +28,7 @@ $lang=array(
 	'level'=>       '是否允许进行"用户组等级管理"',
 
 	'announcement'=>'是否允许进行"发布 | 管理 公告"',
-	'mailuser'=>    '是否允许进行"Email 群"',
+	'mailuser'=>    '是否允许进行"电子邮箱 群"',
 	'sendmsg'=>     '是否允许进行"消息群发"',
 	'giveuser'=>    '是否允许进行"节日礼物赠送功能"',
 

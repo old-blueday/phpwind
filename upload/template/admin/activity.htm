@@ -162,7 +162,7 @@ print <<<EOT
 		<td class="td2"><a href="read.php?tid=$value[tid]" target="_blank" class="unline">$value[subject]</a></td>
 		<td class="td2">{$activity_modeldb[$value[actmid]][name]}</td>
 		<td class="td2">{$forum[$value[fid]][name]}</td>
-		<td class="td2"><a href="u.php?uid=$value[authorid]" target="_blank" class="unline">$value[author]</a></td>
+		<td class="td2"><a href="{$db_userurl}$value[authorid]" target="_blank" class="unline">$value[author]</a></td>
 		<td class="td2">$value[postdate]</td>
 		<td class="td2">$value[recommend]</td>
 	</tr>
@@ -227,21 +227,21 @@ print <<<EOT
 <!--
 EOT;
 }elseif($action == 'edittopic'){print<<<EOT
---><div style="width:400px;">
+--><div style="width:500px;">
 <form name="form" method="post" action="$ajax_basename_add&" onsubmit="return false;">
 <input type="hidden" name="actid" value="$actid">
 <input type="hidden" name="step" value="2">
 <h2 class="h1" style="cursor:move" onmousedown="read.move(event);">编辑分类主题</h2>
 <div class="admin_table mb10">
-<table cellpadding="0" cellspacing="0" width="100%" style="table-layout:auto;">
+<table width="100%" >
 	<tr class="tr1 vt">
-		<td class="td2" style="width:75px;">分类主题名称</td>
+		<td class="td2" style="width:80px;">分类主题名称</td>
 		<td class="td2">$nameHtml</td>
 	</tr>
 	<tr class="tr1 vt">
 		<td class="td2">子分类启用</td>
 		<td class="td2">
-			<ul class="list_80 list_A">
+			<ul class="list_A list_120">
 				$selectmodel
 			</ul>
 		</td>

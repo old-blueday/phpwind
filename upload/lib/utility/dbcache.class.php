@@ -22,9 +22,9 @@ class PW_DBCache {
 	function delete($keys) {
 		if (!empty($keys)) {
 			if (is_array($keys)) {
-				$this->cache->update("DELETE FROM " . $this->table . " WHERE skey IN (" . pwImplode($keys, false) . ")");
+				$this->cache->update("DELETE FROM " . $this->table . " WHERE skey IN (" . S::sqlImplode($keys, false) . ")");
 			} else {
-				$this->cache->update("DELETE FROM " . $this->table . " WHERE skey=" . pwEscape($keys, false));
+				$this->cache->update("DELETE FROM " . $this->table . " WHERE skey=" . S::sqlEscape($keys, false));
 			}
 		}
 	}
@@ -40,7 +40,7 @@ class PW_DBCache {
 		$expire = $this->now + $expire;
 		$keys = array_keys($data);
 		if ($keys) {
-			$query = $this->cache->query("SELECT skey,vhash FROM " . $this->table . " WHERE skey IN (" . pwImplode($keys, false) . ")");
+			$query = $this->cache->query("SELECT skey,vhash FROM " . $this->table . " WHERE skey IN (" . S::sqlImplode($keys, false) . ")");
 			while ($rt = $this->cache->fetch_array($query)) {
 				$tmpvhash[$rt['skey']] = $rt['vhash'];
 			}
@@ -60,10 +60,10 @@ class PW_DBCache {
 			}
 		}
 		if ($dcache) {
-			$this->cache->update("REPLACE INTO " . $this->table . " (skey,expire,vhash,value) VALUES " . pwSqlMulti($dcache, false));
+			$this->cache->update("REPLACE INTO " . $this->table . " (skey,expire,vhash,value) VALUES " . S::sqlMulti($dcache, false));
 		}
 		if ($kcache) {
-			$this->cache->update("UPDATE " . $this->table . " SET expire=" . pwEscape($expire, false) . "WHERE skey IN (" . pwImplode($kcache, false) . ")");
+			$this->cache->update("UPDATE " . $this->table . " SET expire=" . S::sqlEscape($expire, false) . "WHERE skey IN (" . S::sqlImplode($kcache, false) . ")");
 		}
 		$this->_expire();
 	}
@@ -80,7 +80,7 @@ class PW_DBCache {
 			$expire = $this->now + $expire;
 			$v = $this->_serialize($value);
 			$vhash = md5($v);
-			$tmpvhash = $this->cache->get_value("SELECT vhash FROM " . $this->table . " WHERE skey=" . pwEscape($key, false));
+			$tmpvhash = $this->cache->get_value("SELECT vhash FROM " . $this->table . " WHERE skey=" . S::sqlEscape($key, false));
 			if ($vhash != $tmpvhash) {
 				$dcache = array(
 					'skey' => $key,
@@ -88,9 +88,9 @@ class PW_DBCache {
 					'vhash' => $vhash,
 					'value' => $v
 				);
-				$this->cache->update("REPLACE INTO " . $this->table . " SET " . pwSqlSingle($dcache, false));
+				$this->cache->update("REPLACE INTO " . $this->table . " SET " . S::sqlSingle($dcache, false));
 			} else {
-				$this->cache->update("UPDATE " . $this->table . " SET expire=" . pwEscape($expire, false) . "WHERE skey=" . pwEscape($key, false));
+				$this->cache->update("UPDATE " . $this->table . " SET expire=" . S::sqlEscape($expire, false) . "WHERE skey=" . S::sqlEscape($key, false));
 			}
 		}
 		$this->_expire();
@@ -105,12 +105,12 @@ class PW_DBCache {
 		if (empty($keys)) return array();
 		if (is_array($keys)) {
 			$data = array();
-			$query = $this->cache->query("SELECT skey,value FROM " . $this->table . " WHERE skey IN (" . pwImplode($keys, false) . ") AND expire > " . pwEscape($this->now, false));
+			$query = $this->cache->query("SELECT skey,value FROM " . $this->table . " WHERE skey IN (" . S::sqlImplode($keys, false) . ") AND expire > " . S::sqlEscape($this->now, false));
 			while ($rt = $this->cache->fetch_array($query)) {
 				$data[$rt['skey']] = $this->_unserialize($rt['value']);
 			}
 		} else {
-			$data = $this->cache->get_value("SELECT value FROM " . $this->table . " WHERE skey=" . pwEscape($keys, false) . "AND expire > " . pwEscape($this->now, false));
+			$data = $this->cache->get_value("SELECT value FROM " . $this->table . " WHERE skey=" . S::sqlEscape($keys, false) . "AND expire > " . S::sqlEscape($this->now, false));
 			$data = $this->_unserialize($data);
 		}
 		return $data;
@@ -129,7 +129,7 @@ class PW_DBCache {
 	function _expire() {
 		if (!$this->isExpire) {
 			$expire = $this->now - 86400;
-			$this->cache->update("DELETE FROM " . $this->table . " WHERE expire<" . pwEscape($expire, false));
+			$this->cache->update("DELETE FROM " . $this->table . " WHERE expire<" . S::sqlEscape($expire, false));
 			$this->isExpire = true;
 		}
 	}

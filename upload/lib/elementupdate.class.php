@@ -28,7 +28,16 @@ class ElementUpdate {
 		$this->updatetype = array();
 		$this->mark = $mark;
 	}
+	
+	function _inTidBlackList($tid) {
+		global $db_tidblacklist;
+		return ($db_tidblacklist && strpos(",$db_tidblacklist,", ",$tid,") !== false);
+	}
 
+	function _inUidBlackList($uid) {
+		global $db_uidblacklist;
+		return ($db_uidblacklist && strpos(",$db_uidblacklist,", ",$uid,") !== false);
+	}
 	/**
 	 * user sort update
 	 *
@@ -36,8 +45,11 @@ class ElementUpdate {
 	 */
 	function userSortUpdate($winddb) {
 		global $timestamp, $tdtime, $montime, $_CREDITDB;
+		if ($this->_inUidBlackList($winddb['uid'])) {
+			return false;
+		}
 		$usersort_judge = array();
-		include (D_P . 'data/bbscache/usersort_judge.php');
+		include pwCache::getPath(D_P . 'data/bbscache/usersort_judge.php');
 		$winddb['lastpost'] < $tdtime && $winddb['todaypost'] = 0;
 		$winddb['lastpost'] < $montime && $winddb['monthpost'] = 0;
 		$sorttype = array(
@@ -54,7 +66,7 @@ class ElementUpdate {
 			'f_num'
 		);
 		if ($_CREDITDB) {
-			$query = $this->db->query("SELECT cid,value FROM pw_membercredit WHERE uid=" . pwEscape($winddb['uid']));
+			$query = $this->db->query("SELECT cid,value FROM pw_membercredit WHERE uid=" . S::sqlEscape($winddb['uid']));
 			while ($rt = $this->db->fetch_array($query)) {
 				if (!$rt['value']) continue;
 				$winddb[$rt['cid']] = $rt['value'];
@@ -65,6 +77,10 @@ class ElementUpdate {
 		}
 		$change = $marks = array();
 		foreach ($sorttype as $value) {
+			if (in_array($value,$sorttype) && $winddb[$value]>PW_OVERFLOW_NUM) {
+				$this->_excuteOverflow($winddb['uid'],$value);
+				$winddb[$value] = 0;
+			}
 			if ($winddb[$value] > $usersort_judge[$value]) {
 				$marks[] = $value;
 				if ($value == 'rvrc') {
@@ -93,10 +109,10 @@ class ElementUpdate {
 			$marks[] = $rand_mark;
 		}
 		if ($marks && $change) {
-			$this->db->update("REPLACE INTO pw_elements(type,mark,id,value,addition,time) VALUES " . pwSqlMulti($change, false));
+			$this->db->update("REPLACE INTO pw_elements(type,mark,id,value,addition,time) VALUES " . S::sqlMulti($change, false));
 			$sortlist = array();
 			$dellist = array();
-			$query = $this->db->query("SELECT * FROM pw_elements WHERE type='usersort' AND mark IN (" . pwImplode($marks) . ") ORDER BY mark,value DESC");
+			$query = $this->db->query("SELECT * FROM pw_elements WHERE type='usersort' AND mark IN (" . S::sqlImplode($marks) . ") ORDER BY mark,value DESC");
 			while ($rt = $this->db->fetch_array($query)) {
 				if (($rt['mark'] == 'todaypost' && $rt['time'] < $tdtime) || (in_array($rt['mark'], array(
 					'monthpost',
@@ -121,12 +137,21 @@ class ElementUpdate {
 				}
 			}
 			if ($dellist) {
-				$this->db->update("DELETE FROM pw_elements WHERE eid IN (" . pwImplode($dellist) . ")");
+				$this->db->update("DELETE FROM pw_elements WHERE eid IN (" . S::sqlImplode($dellist) . ")");
 			}
 			if ($judge != $usersort_judge) {
-				writeover(D_P . 'data/bbscache/usersort_judge.php', "<?php\r\n\$usersort_judge=" . pw_var_export($judge) . ";\r\n?>");
+				pwCache::setData(D_P . 'data/bbscache/usersort_judge.php', "<?php\r\n\$usersort_judge=" . pw_var_export($judge) . ";\r\n?>");
 			}
 		}
+	}
+	/**
+	 * 处理异常数据
+	 * @param $uid
+	 * @param $type
+	 */
+	function _excuteOverflow($uid,$type) {
+		$userService = L::loadClass('userservice','user');
+		return $userService->update($uid,array(),array($type=>0));
 	}
 
 	/**
@@ -141,23 +166,23 @@ class ElementUpdate {
 		if (!($this->ifcache & 1024) || !$tid || !$fid) {
 			return false;
 		}
-		$eid = $this->db->get_value("SELECT eid FROM pw_elements WHERE type='hotfavor' AND mark=" . pwEscape($fid) . " AND id=" . pwEscape($tid));
+		$eid = $this->db->get_value("SELECT eid FROM pw_elements WHERE type='hotfavor' AND mark=" . S::sqlEscape($fid) . " AND id=" . S::sqlEscape($tid));
 
 		if ($eid) {
-			$this->db->update("UPDATE pw_elements SET value=value+1 WHERE eid=" . pwEscape($eid));
+			$this->db->update("UPDATE pw_elements SET value=value+1 WHERE eid=" . S::sqlEscape($eid));
 		} else {
-			$rt = $this->db->get_one("SELECT favors FROM pw_threads WHERE tid=" . pwEscape($tid));
+			$rt = $this->db->get_one("SELECT favors FROM pw_threads WHERE tid=" . S::sqlEscape($tid));
 			$rs = $this->db->get_one("SELECT value,eid FROM pw_elements WHERE type='hotfavor' ORDER BY value ASC");
 
 			if ($rt['favors'] > $rs['value']) {
-				$this->db->update("DELETE FROM pw_elements WHERE eid=" . pwEscape($rs['eid']));
+				$this->db->update("DELETE FROM pw_elements WHERE eid=" . S::sqlEscape($rs['eid']));
 				$favors = array(
 					'id' => $tid,
 					'mark' => $fid,
 					'value' => $rt['favors'],
 					'type' => 'hotfavor'
 				);
-				$this->db->update("REPLACE INTO pw_elements SET" . pwSqlSingle($favors, false));
+				$this->db->update("REPLACE INTO pw_elements SET" . S::sqlSingle($favors, false));
 			}
 		}
 		return true;
@@ -176,13 +201,13 @@ class ElementUpdate {
 			return false;
 		}
 
-		$eid = $this->db->get_value("SELECT eid FROM pw_elements WHERE type='newfavor' AND mark=" . pwEscape($fid) . " AND id=" . pwEscape($tid));
+		$eid = $this->db->get_value("SELECT eid FROM pw_elements WHERE type='newfavor' AND mark=" . S::sqlEscape($fid) . " AND id=" . S::sqlEscape($tid));
 
 		if ($eid) {
-			$this->db->update("UPDATE pw_elements SET value=value+1 WHERE eid=" . pwEscape($eid));
+			$this->db->update("UPDATE pw_elements SET value=value+1 WHERE eid=" . S::sqlEscape($eid));
 		} else {
-			$count = $this->db->get_value("SELECT COUNT(*) as count FROM pw_elements WHERE type='newfavor' AND mark=" . pwEscape($fid));
-			$rt = $this->db->get_one("SELECT favors FROM pw_threads WHERE tid=" . pwEscape($tid));
+			$count = $this->db->get_value("SELECT COUNT(*) as count FROM pw_elements WHERE type='newfavor' AND mark=" . S::sqlEscape($fid));
+			$rt = $this->db->get_one("SELECT favors FROM pw_threads WHERE tid=" . S::sqlEscape($tid));
 
 			if ($count < 20) {
 				$favors = array(
@@ -193,9 +218,9 @@ class ElementUpdate {
 					'addition' => $winduid . '|' . $windid,
 					'time' => $timestamp
 				);
-				$this->db->update("REPLACE INTO pw_elements SET" . pwSqlSingle($favors, false));
+				$this->db->update("REPLACE INTO pw_elements SET" . S::sqlSingle($favors, false));
 			} else {
-				$rs = $this->db->get_one("SELECT eid FROM pw_elements WHERE type='newfavor' AND mark=" . pwEscape($fid) . " ORDER BY time ASC");
+				$rs = $this->db->get_one("SELECT eid FROM pw_elements WHERE type='newfavor' AND mark=" . S::sqlEscape($fid) . " ORDER BY time ASC");
 				$favors = array(
 					'id' => $tid,
 					'mark' => $fid,
@@ -204,7 +229,7 @@ class ElementUpdate {
 					'addition' => $winduid . '|' . $windid,
 					'time' => $timestamp
 				);
-				$this->db->update("UPDATE pw_elements SET" . pwSqlSingle($favors, false) . " WHERE eid=" . pwEscape($rs['eid']));
+				$this->db->update("UPDATE pw_elements SET" . S::sqlSingle($favors, false) . " WHERE eid=" . S::sqlEscape($rs['eid']));
 			}
 		}
 		return true;
@@ -223,10 +248,13 @@ class ElementUpdate {
 		}
 		if (!$this->judge['hitsort']) {
 			$hitsort_judge = array();
-			include (D_P . 'data/bbscache/hitsort_judge.php');
+			include pwCache::getPath(D_P . 'data/bbscache/hitsort_judge.php');
 			$this->judge['hitsort'] = $hitsort_judge;
 		}
 		foreach ($threaddb as $thread) {
+			if ($this->_inTidBlackList($thread['tid'])) {
+				continue;
+			}
 			$thread['postdate'] = PwStrtoTime($thread['postdate']);
 			if ($this->ifcache & 16) {
 				if ($thread['hits'] > $hitsort_judge['hitsort'][$fid]) {
@@ -254,7 +282,6 @@ class ElementUpdate {
 					$this->updatetype['hitsortday'] = 1;
 				}
 			}
-
 			if ($this->ifcache & 64 && $thread['postdate'] > 7 * 24 * 3600) {
 				if ($thread['hits'] > $hitsort_judge['hitsortweek'][$fid]) {
 					$this->updatelist[] = array(
@@ -282,13 +309,13 @@ class ElementUpdate {
 	 */
 	function replySortUpdate($tid, $fid, $postdate, $replies) {
 		global $timestamp;
-		if (!($this->ifcache & 14)) {
+		if (!($this->ifcache & 14) || $this->_inTidBlackList($tid)) {
 			return false;
 		}
 		$special = (int) $this->special;
 		if (!$this->judge['replysort']) {
 			$replysort_judge = array();
-			include Pcv(D_P . 'data/bbscache/replysort_judge_' . $special . '.php');
+			include pwCache::getPath(S::escapePath(D_P . 'data/bbscache/replysort_judge_' . $special . '.php'));
 			$this->judge['replysort'] = $replysort_judge;
 		}
 
@@ -343,7 +370,7 @@ class ElementUpdate {
 	 * @return
 	 */
 	function newSubjectUpdate($tid, $fid, $postdate) {
-		if (!($this->ifcache & 128)) {
+		if (!($this->ifcache & 128) || $this->_inTidBlackList($tid)) {
 			return false;
 		}
 		$this->updatelist[] = array(
@@ -366,7 +393,7 @@ class ElementUpdate {
 	 * @return
 	 */
 	function newReplyUpdate($tid, $fid, $postdate) {
-		if (!($this->ifcache & 256)) {
+		if (!($this->ifcache & 256) || $this->_inTidBlackList($tid)) {
 			return false;
 		}
 		$this->updatelist[] = array(
@@ -458,10 +485,10 @@ class ElementUpdate {
 				$weektime = $timestamp - 7 * 24 * 3600;
 			}
 		}
-		$this->db->update("REPLACE INTO pw_elements (type,mark,id,value,addition,special) VALUES " . pwSqlMulti($this->updatelist, false));
+		$this->db->update("REPLACE INTO pw_elements (type,mark,id,value,addition,special) VALUES " . S::sqlMulti($this->updatelist, false));
 		$sortlist = array();
 		$dellis = array();
-		$query = $this->db->query("SELECT eid,type,value,addition FROM pw_elements WHERE type IN (" . pwImplode(array_keys($this->updatetype)) . ") AND mark=" . pwEscape($this->mark) . " AND special=" . pwEscape($special) . " ORDER BY type,value DESC");
+		$query = $this->db->query("SELECT eid,type,value,addition FROM pw_elements WHERE type IN (" . S::sqlImplode(array_keys($this->updatetype)) . ") AND mark=" . S::sqlEscape($this->mark) . " AND special=" . S::sqlEscape($special) . " ORDER BY type,value DESC");
 		while ($rt = $this->db->fetch_array($query)) {
 			if (strpos($rt['type'], 'day') && $rt['addition'] && $rt['addition'] < $todaytime) {
 				$dellist[] = $rt['eid'];
@@ -504,16 +531,16 @@ class ElementUpdate {
 			}
 		}
 		if ($dellist) {
-			$this->db->update("DELETE FROM pw_elements WHERE eid IN (" . pwImplode($dellist) . ")");
+			$this->db->update("DELETE FROM pw_elements WHERE eid IN (" . S::sqlImplode($dellist) . ")");
 		}
 		if ($judges) {
 			foreach ($judges as $key => $value) {
 				if ($key == 'replysort') {
 					if ($value != $this->judge['replysort']) {
-						writeover(D_P . 'data/bbscache/replysort_judge_' . $special . '.php', "<?php\r\n\$replysort_judge=" . pw_var_export($value) . ";\r\n?>");
+						pwCache::setData(D_P . 'data/bbscache/replysort_judge_' . $special . '.php', "<?php\r\n\$replysort_judge=" . pw_var_export($value) . ";\r\n?>");
 					}
 				} elseif ($key == 'hitsort') {
-					writeover(D_P . 'data/bbscache/hitsort_judge.php', "<?php\r\n\$hitsort_judge=" . pw_var_export($value) . ";\r\n?>");
+					pwCache::setData(D_P . 'data/bbscache/hitsort_judge.php', "<?php\r\n\$hitsort_judge=" . pw_var_export($value) . ";\r\n?>");
 				}
 			}
 		}

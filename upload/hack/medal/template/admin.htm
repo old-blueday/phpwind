@@ -37,7 +37,8 @@ if(empty($action)){print <<<EOT
              <li><input type="radio" value="1" name="config[md_ifopen]" $ifopen_Y>开启</li>
              <li><input type="radio" value="0" name="config[md_ifopen]" $ifopen_N>关闭</li>
          	</ul>
-		</td><td class="td2"><div class="help_a">需要到 <a href="javascript:;" onclick="parent.PW.Dialog({id:'navmode',url:'$admin_file?adminjob=customnav&admintype=navside&action=footlist&type=foot',name:'模块导航'});">运营工具-导航菜单管理</a> 中开启勋章链接，打开前台入口</div></td>
+		</td><td class="td2"><div class="help_a">功能开启后，请到“<a href="javascript:;" onclick="parent.PW.Dialog({id:'navside',url:'$admin_file?adminjob=customnav&admintype=navside&action=footlist&type=foot',name:'顶部底部导航'});">运营工具 ->导航菜单管理 –>顶部底部导航</a>”中设置此插件是否在前台显示
+		</div></td>
 	</tr>
 	<tr class="tr1 vt">
 		 <td class="td1">颁发/摘除勋章短消息通知</td>

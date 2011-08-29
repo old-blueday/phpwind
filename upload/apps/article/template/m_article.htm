@@ -1,10 +1,12 @@
 <!--<?php
 require_once(uTemplate::printEot('header'));
-//require_once(uTemplate::printEot('user_appleft'));
+require_once(uTemplate::printEot('user_appleft'));
 print <<<EOT
 -->
 <div class="contUser">
+<table width="100%"><tr><td valign="top" height="500">
 	<div class="p15">
+		<h4 class="site"><img src="u/images/module/article.png" align="absmiddle" class="mr10" /><span>帖子</span></h4>
 		<div class="navC">
 			<ul>
 				<li id="a_friend"><a href="{$basename}a=friend">好友新帖</a></li>
@@ -88,16 +90,22 @@ if ($see == 'topic') { print <<<EOT
 					<a id="ot_postdate" href="{$basename}ordertype=postdate&u=$u">最新发帖</a>&nbsp;|&nbsp;<a id="ot_lastpost" href="{$basename}ordertype=lastpost&u=$u">回复时间</a><script language="JavaScript">setCurrent('ot_$ordertype','ot_postdate','b s5');</script>
 <!--
 EOT;
+}elseif($see == "post"){print <<<EOT
+-->
+我的回复
+<!--
+EOT;
 }print <<<EOT
 -->
 					</td>
-					<td width="80" class="tac">回复/人气</td>
-					<td width="140">所属版块/发表日期</td>
+					<td width="90">所属版块</td>
+					<td width="90">最后发表</td> 
 				</tr>
 <!--
 EOT;
 if (!empty($article)) {
-foreach ($article as $key => $value) {print <<<EOT
+foreach ($article as $key => $value) {
+print <<<EOT
 -->
 				<tr class="tr3">
 					<td width="20"><img src="images/wind/thread/topicnew.gif" /></td>
@@ -125,14 +133,15 @@ EOT;
 EOT;
 }print <<<EOT
 -->
-						<a href="read.php?tid=$value[tid]" class="s5" target="_blank">{$value[subject]}</a>
+						<span><a href="read.php?tid=$value[tid]" class="s5" target="_blank">{$value[subject]}</a></span>
 <!--
 EOT;
 }print <<<EOT
--->
+--><span class="f10 s6">(<span class="s2">{$value[replies]}</span>/{$value[hits]})</span>
+						<!--span class="f10 gray" style="display:block;">发表于  $value[postdate]</span-->
 					</td>
-					<td class="tac"><span class="s2">{$value[replies]}</span><p class="f10 gray">{$value[hits]}</p></td>
-					<td><a href="thread.php?fid=$value[fid]" class="s5">{$value[forum]}</a><p class="f10 gray">{$value[postdate]}</p></td>
+					<td><a href="thread.php?fid=$value[fid]" class="s6">{$value[forum]}</a></td>
+					<td><span><a href="u.php?username={$value[lastposter]}" target="_blank">{$value[lastposter]}</a></span><p class="f10 s6">{$value[lastpost]}</p></td> 
 				</tr>
 <!--
 EOT;
@@ -167,10 +176,10 @@ EOT;
 		<div class="p10">
 			<table width="100%" class="mb10" style="table-layout:fixed;">
 				<tr class="tr2">
-					<td width="25">&nbsp;</td>
-					<td>标题</td>
-					<td width="80" class="tac">回复/人气</td>
-					<td width="180">所属版块/作者/时间</td>
+					<td width="25">&nbsp;</td> 
+					<td>标题</td> 
+					<td width="120">所属版块</td> 
+					<td width="90">最后发表</td> 
 				</tr>
 <!--
 EOT;
@@ -194,10 +203,12 @@ EOT;
 EOT;
 }print <<<EOT
 -->
-						<a href="read.php?tid=$value[tid]" class="s5" target="_blank">{$value[subject]}</a>
+						<span><a href="read.php?tid=$value[tid]" class="s5" target="_blank">{$value[subject]}</a></span>
+						<!--span class="f10 gray" style="display:block;">发表于  $value[postdate]</span-->
+						<span class="f10 s6">(<span class="s2">{$value[replies]}</span>/{$value[hits]})</span>
 					</td>
-					<td class="tac"><span class="s2">{$value[replies]}</span><p class="f10 gray">{$value[hits]}</p></td>
-					<td><a href="thread.php?fid=$value[fid]" class="s5">{$value[forum]}</a><p class="f10 gray"><a href="u.php?uid=$value[authorid]" class="s5 gray">$value[author]</a> {$value[postdate]}</p></td>
+					<td><a href="thread.php?fid=$value[fid]" class="s6">{$value[forum]}</a></td>
+					<td><span><a href="u.php?username={$value[lastposter]}" target="_blank">{$value[lastposter]}</a></span><span class="f10 s6" style="display:block;">{$value[lastpost]}</span></td> 
 				</tr>
 <!--
 EOT;
@@ -234,7 +245,7 @@ print <<<EOT
 EOT;
 if($pcid=='1'){print<<<EOT
 -->
-				<td width="60">购买数量</td>
+				<td width="80">购买数量</td>
 <!--
 EOT;
 }elseif($pcid=='2'){print<<<EOT
@@ -276,7 +287,7 @@ print<<<EOT
 			<tr>
 				<td><a href="read.php?tid=$value[tid]" target="_blank" class="s5">$value[subject]</a></td>
 				<td><a href="read.php?tid=$value[tid]#pcinfo" target="_blank">$value[nums]</a></td>
-				<td><a href="u.php?uid=$value[authorid]" target="_blank">$value[author]</a></td>
+				<td><a href="{$db_userurl}$value[authorid]" target="_blank">$value[author]</a></td>
 				<td>$state</td>
 				<td><a href="read.php?tid=$value[tid]#pcinfo" target="_blank" class="mr10">[详情]</a>
 <!--
@@ -349,7 +360,7 @@ print <<<EOT
 				<td><img src="$value[icon]" width="120" alt="$value[subject]" /></td>
 				<td><a href="read.php?tid=$value[tid]" class="s5" target="_blank">$value[subject]</a></td>
 				<td>$value[price]</td>
-				<td><a href="u.php?uid=$value[seller]" target="_blank">$value[username]</a></td>
+				<td><a href="{$db_userurl}$value[seller]" target="_blank">$value[username]</a></td>
 				<td><a class="mr10" href="trade.php?action=order&oid=$value[oid]" target="_blank">详情</a>$state</td>
 			</tr>
 <!--
@@ -422,7 +433,7 @@ print <<<EOT
 				<td><img src="$value[icon]" width="120" alt="" /></td>
 				<td><a href="read.php?tid=$value[tid]" class="s5" target="_blank">$value[subject]</a></td>
 				<td>$value[price]</td>
-				<td><a href="u.php?uid=$value[buyer]" target="_blank">$value[username]</a></td>
+				<td><a href="{$db_userurl}$value[buyer]" target="_blank">$value[username]</a></td>
 				<td><a class="mr10" href="trade.php?action=order&oid=$value[oid]" target="_blank">详情</a>$state</td>
 			</tr>
 <!--
@@ -441,6 +452,7 @@ EOT;
 -->
 	<div class="c"></div>
 	</div>
+</td></tr></table>
 </div>
 <!--
 EOT;

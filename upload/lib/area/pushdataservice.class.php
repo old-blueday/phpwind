@@ -155,7 +155,7 @@ class PW_PushDataService {
 		$invokepiece = $invokeService->getInvokePieceByInvokeId($invokepieceid);
 		if (isset($invokepiece['param']['tagrelate'])) {
 			require_once R_P.'mode/area/require/tagrelate.php';
-			$tagrelate = Char_cv(GetGP('tagrelate','P'));
+			$tagrelate = S::escapeChar(S::getGP('tagrelate','P'));
 			$data['tagrelate']	= getTagRelate($tagrelate);
 		}
 		if ($data['url']) {
