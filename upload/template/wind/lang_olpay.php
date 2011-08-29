@@ -17,5 +17,9 @@ $lang['olpay'] = array(
 
 	'olpay_4_title'		=> '注册码购买(订单号：$L[order_no])',
 	'olpay_4_content'	=> '购买论坛注册码',
+	
+	// 孔明灯 by chenyun 2011-07-8
+	'olpay_5_title'		=> '孔明灯购买(订单号：$L[order_no])',
+	'olpay_5_content'	=> '购买论坛孔明灯',
 );
 ?>

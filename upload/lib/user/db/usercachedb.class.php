@@ -67,7 +67,7 @@ class PW_UsercacheDB extends BaseDB {
 		while ($rt = $this->_db->fetch_array($query)) {
 			$num = (S::isArray($modes[$rt['type']])) ? S::int($modes[$rt['type']]['num']) : $modes[$rt['type']];
 			if ($num < $rt['num']) {
-				$array[$rt['type']] = array_slice($this->_unserialize($rt['value']), 0, $modes[$rt['type']], true);
+				$array[$rt['type']] = array_slice($this->_unserialize($rt['value']), 0, $num, true);
 			} elseif ($num == $rt['num']) {
 				$array[$rt['type']] = $this->_unserialize($rt['value']);
 			}

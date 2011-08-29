@@ -3,7 +3,7 @@ require_once(uTemplate::printEot('header'));
 require_once(uTemplate::printEot('user_appleft'));
 print <<<EOT
 -->
-<link rel="stylesheet" type="text/css" href="apps/activity/images/style.css" media="all" />
+<link rel="stylesheet" href="apps/activity/images/style.css?{$GLOBALS['wind_repair']}" />
 <div class="contUser">
 <table width="100%"><tr><td valign="top" height="500">
 	<div class="p15">
@@ -48,7 +48,7 @@ if ('feeslog' == $see) {print <<<EOT
 -->
 			<span class="mr10">活动名称</span>
 			<input class="mr10" type="text" size="10" name="activityname" value="$activityname" />
-			<span class="mr10">用户名</span>
+			<span class="mr10">交易者</span>
 			<input class="mr10" type="text" size="10" name="otherpartyname" value="$otherpartyname" />
 			<span class="mr10">活动状态</span>
 			$feesLogStatusSelectHtml
@@ -100,7 +100,7 @@ if ('feeslog' == $see) {
 					<th width="15%">活动名称/活动ID</th>
 					<th width="12%">活动状态</th>
 					<th width="15%">创建时间</th>
-					<th width="15%">对方</th>
+					<th width="15%">交易者</th>
 					<th width="8%">收入/支出</th>
 					<th width="18%">费用</th>
 					<th width="17%">说明</th>
@@ -185,10 +185,10 @@ EOT;
 } else {
 	if (!empty($activities)) {print <<<EOT
 -->
-<script language="JavaScript" src="js/global.js"></script>
-<script language="JavaScript" src="js/app_global.js"></script>
-<script language="JavaScript" src="apps/$appdir/js/activitytype.js"></script>
-<script language="javascript">
+<script type="text/javascript" src="js/global.js"></script>
+<script type="text/javascript" src="js/app_global.js"></script>
+<script type="text/javascript" src="apps/$appdir/js/activitytype.js"></script>
+<script type="text/javascript">
 function actRecommend(tid, actmid, obj) {
 	var a = "$a";
 	ajax.send("pw_ajax.php?action=activity&job=recommend&tid="+tid+"&actmid="+actmid,"",function(){

@@ -1,0 +1,48 @@
+<!--<?php
+if (!$isNotResetPassword) {
+print <<<EOT
+-->
+		<form action="profile.php?action=$action&t=unbind&type=$type" onsubmit="return false;" method="post">
+			<div class="popTop">解除绑定</div>
+			<div class="p15">你确定要解除绑定么？解除绑定后，你依然可以用{$windid}登录本站</div>
+			<div class="popBottom">
+				<span class="btn2"><span><button type="submit" onclick="ajax.submit(this.form)">解除绑定</button></span></span>
+				<span class="bt2"><span><button type="button" onclick="closep();">取消操作</button></span></span>
+			</div>
+		</form>
+<!--
+EOT;
+} else {
+print <<<EOT
+-->
+		<form action="profile.php?action=$action&t=resetandunbind&type=$type" onSubmit="return false;" method="post">
+		<input type="hidden" name="verify" value="$verifyhash" />
+		<div style="width:400px;">
+			<div class="popTop">解除绑定前请先创建密码</div>
+			<table cellpadding="0" cellspacing="0" width="100%" class="vt lh_24">
+				<tr><td colspan="2">你的社区帐号还是随机密码，重新创建密码后，即可使用社区帐号登录</td></tr>
+				<tr>
+					<td width="60">社区帐号</td>
+					<td>{$windid}</td>
+				</tr>
+				<tr>
+					<td>新密码</td>
+					<td><input class="input" type="password" size="25" name="resetpwd" value="" /></td>
+				</tr>
+				<tr>
+					<td>确认新密码 </td>
+					<td><input class="input" type="password" size="25" name="resetpwd_repeat" value="" /></td>
+				</tr>
+			</table>
+			
+			<div class="popBottom">
+				<span class="btn2"><span><button type="submit" onclick="ajax.submit(this.form)">创建密码并解绑</button></span></span>
+				<span class="bt2"><span><button type="button" onclick="closep();">取消操作</button></span></span>
+			</div>
+
+		</div>
+		</form>
+<!--
+EOT;
+}
+?>-->

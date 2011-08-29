@@ -2,8 +2,11 @@
 class spaceModelTemplate {
 
 	var $space = array();
+	var $winduid;
 
 	function spaceModelTemplate(&$space) {
+		global $winduid;
+		$this->winduid =& $winduid;
 		$this->space =& $space;
 	}
 
@@ -29,12 +32,16 @@ class spaceModelTemplate {
 	}
 
 	function info($value) {//个人资料模块
-    	global $isGM, $db_adminfile, $db_menuinit,$db_showonline,$imgpath,$db_appifopen,$db_siteappkey;
+    	global $isGM, $db_adminfile, $db_menuinit,$db_showonline,$imgpath,$db_appifopen,$db_siteappkey,$db_md_ifopen;
 	    /*** userapp **/
 		$app_array = array();
 		$appclient = L::loadClass('appclient');
 		$app_array = $appclient->userApplist($this->space['uid']);
-        $listmedals = getMedalIconsByUid($this->space['uid']);
+		/* 勋章-zhuli */
+		if ($db_md_ifopen) {
+			$medalService = L::loadClass('MedalService', 'medal'); /* @var $medalService PW_MedalService */
+			$listmedals = $medalService->getUserMedals($this->space['uid']); //获取会员已经拥有的勋章
+		}
         $attentionService = L::loadClass('Attention', 'friend'); /* @var $attentionService PW_Attention */
 		$isAttention = $attentionService->isFollow($GLOBALS['winduid'], $this->space['uid']);
         settype($this->space['follows'], "integer");
@@ -46,33 +53,31 @@ print<<<EOT
 <div id="space_info" class="boxA">
 	<h2 style="display:none;"></h2>
 	<div class="face tac mb5"><img src="$value[faceurl]" width="120" height="120" /></div>
-	<p class="tac lh_24 mb5"><strong class="f14 b">{$this->space['username']}</strong><!--
+	<p class="tac mb5">
+<!--
 EOT;
 		if ($db_showonline) {
+			$gender = $value['gender'] == 2 ? 'women' : 'man';
 			if (checkOnline($value['thisvisit'])){print <<<EOT
---><img src="$imgpath/online.png" title="在线" alt="在线" style="vertical-align:middle" /><!--
+--><span class="{$gender}_ol mr5" title="在线" alt="在线" style="display:inline-block; text-indent:0; float:none;"></span><!--
 EOT;
 			} else {
 print<<<EOT
---><img src="$imgpath/stealth.png" title="离线" alt="离线" style="vertical-align:middle" />
-<!--
+--><span class="{$gender}_unol mr5" title="离线" alt="离线" style="display:inline-block; text-indent:0; float:none;"></span><!--
 EOT;
 			}
 		}
 print <<<EOT
--->
+--><strong class="f14 b">{$this->space['username']}</strong>
 	</p>
-	
 	<p class="mb5">{$this->space['honor']}</p>
-	<div class="tac lh_24 mb5">
+	<div>
 <!--
 EOT;
 if ($listmedals) {
 foreach($listmedals as $medals){
 print <<<EOT
--->
-			<span>{$medals}</span>
-<!--
+--><a href="apps.php?q=medal" style="margin-right:4px;"><img  src="{$medals[smallimage]}" width="30" height="30" title="{$medals[name]}" /></a><!--
 EOT;
 }
 }
@@ -87,11 +92,11 @@ EOT;
 <!--
 EOT;
 			if (!$isAttention) {print <<<EOT
---><a href="javascript:;" onclick="Attention.add(this,'{$this->space['uid']}',0)" class="follow">关注</a>
+--><a href="javascript:;" onclick="Attention.add(this,'{$this->space['uid']}',0)" class="add_follow">加关注</a>
 <!--
 EOT;
 			} else {print <<<EOT
---><a href="javascript:;" class="following gray">关注中</a>，<a href="javascript:;" class="s7" onclick="pwConfirm('是否取消关注？',this,function(){Attention.del('{$this->space['uid']}')})">取消</a>
+--><a href="javascript:;" class="add_following">关注中</a>，<a href="javascript:;" class="s7" onclick="pwConfirm('是否取消关注？',this,function(){Attention.del('{$this->space['uid']}')})">取消</a>
 <!--
 EOT;
 			}print <<<EOT
@@ -125,7 +130,6 @@ EOT;
 			}
 print <<<EOT
 -->
-		<!-- <li><img src="u/images/space/si_5.png" class="mr5" /><a href="javascript:;" id="share_user" onclick="sendmsg('operate.php?action=share&ajax=1&type=user&id={$this->space['uid']}','',this.id);">分享用户</a></li> -->
 		$li
 		<li><img src="u/images/space/si_6.png" class="mr5" /><a href="pw_ajax.php?action=msg&touid={$this->space['uid']}" onclick="return ajaxurl(this);">发消息</a></li>
 		
@@ -133,7 +137,8 @@ print <<<EOT
 	</ul>
 <!--
 EOT;
-			}print <<<EOT
+			}
+print <<<EOT
 -->
 	<div class="line"></div>
 	<ul class="ulInfoA cc">
@@ -336,19 +341,21 @@ EOT;
 				</td>
 				<td>
 					<p class="mb10">
-						<a href="{$GLOBALS[db_userurl]}$v[uid]" class="b f14">$v[username]</a><!--
+<!--
 EOT;
+$gender = $v['gender'] == 2 ? 'women' : 'man';
 				if ($GLOBALS['db_showonline'] && $v['thisvisit'] + $GLOBALS['db_onlinetime']*1.5 > $GLOBALS['timestamp']) {print <<<EOT
---><img src="images/online.png" alt="在线" title="在线" style="vertical-align:middle" />
+--><span class="{$gender}_ol mr5" title="在线" alt="在线">在线</span>
 <!--
 EOT;
 				} else {print <<<EOT
---><img src="images/stealth.png" alt="离线" title="离线" style="vertical-align:middle" />
+--><span class="{$gender}_unol mr5" title="离线" alt="离线">离线</span>
 <!--
 EOT;
 				}
 print <<<EOT
 -->
+						<a href="{$GLOBALS[db_userurl]}$v[uid]" class="b f14">$v[username]</a>
 					</p>
 					<p class="lh_18">$v[honor]</p>
 				</td>
@@ -397,7 +404,9 @@ EOT;
 	<div class="article_list">
 <!--
 EOT;
+global $winduid,$groupid,$winddb;
 			foreach ($value as $v) {
+			if (($v['anonymous'] > 0 && ($v['authorid'] != $winduid)) || $v['password'] || ($v['allowvisit'] && !allowcheck($v['allowvisit'], $groupid, $winddb['groups'], $v['forumsid'], $winddb['visit']))) continue;
 				$v['forums'] = strip_tags($v['forums']);
 				$v['content'] = strip_tags($v['content']);
 			print <<<EOT
@@ -456,7 +465,7 @@ EOT;
 			print <<<EOT
 -->
 			<dl>
-                <dt><a href="read.php?tid=$v[tid]" class="line">$v[subject]</a></dt>
+                <dt><a href="job.php?action=topost&tid=$v[tid]&pid=$v[pid]" class="line" target="_blank">$v[subject]</a></dt>
                 <dd><p class="gray">$v[postdate] - 回复:$v[replies]，人气:$v[hits] - <a href="thread.php?fid=$v[forumsid]" class="gray">$v[forums]</a></p>$v[content]</dd>
             </dl>
 <!--
@@ -505,7 +514,7 @@ EOT;
 			$weiboService = L::loadClass('weibo', 'sns');
 print <<<EOT
 -->
-	<script language="javascript">var transmitAction = 'my';</script>
+	<script>var transmitAction = 'my';</script>
 	<script type="text/javascript" src="js/pw_weibo.js"></script>
 	<script type="text/javascript" src="apps/weibo/js/post.js"></script>
 	<div class="spaceSideB">
@@ -513,7 +522,7 @@ print <<<EOT
 <!--
 EOT;
 			foreach ($value as $key => $v) {
-				$method = $weiboService->getType($v['type']);
+				$method = $weiboService->getViewType($v['type']);
 				$weiboModelTemplate->$method($v);
 			}
 print <<<EOT
@@ -642,8 +651,8 @@ EOT;
     	global $db_charset,$imgpath,$stylepath,$db_htmdir;
 print <<<EOT
 -->
-<script language="JavaScript" src="js/app_comment.js"></script>
-<script language="JavaScript" src="u/js/board.js"></script>
+<script type="text/javascript" src="js/app_comment.js"></script>
+<script type="text/javascript" src="u/js/board.js"></script>
 <div class="boxA" id="space_messageboard">
     <h2>
 <!--
@@ -749,7 +758,7 @@ EOT;
 		</div>
 	</div>
 </div>
- <script language="javascript">
+ <script>
 var charset = '$db_charset';
 var imgpath   = '$imgpath';
 var stylepath = '$stylepath';
@@ -757,11 +766,11 @@ function addsmile(NewCode){
 	getObj('board').value += ' [s:'+NewCode+'] ';
 }
 function resetPos(o){
-	$('pw_box').style.top = o.getBoundingClientRect().top+ietruebody().scrollTop-227+'px'
+	getObj('pw_box').style.top = o.getBoundingClientRect().top+ietruebody().scrollTop-227+'px'
 }
 </script>
-<script src="$db_htmdir/js/face.js"></script>
-<script language="JavaScript" src="js/post.js"></script>
+<script type="text/javascript" src="$db_htmdir/js/face.js"></script>
+<script type="text/javascript" src="js/post.js"></script>
 <div id="menu_face" class="menu" style="display:none;"></div>
 <!--
 EOT;

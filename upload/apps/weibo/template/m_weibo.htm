@@ -4,7 +4,7 @@ require_once(uTemplate::printEot('user_appleft'));
 print <<<EOT
 -->
 <script type="text/javascript" src="js/pw_weibo.js"></script>
-<script language="javascript">
+<script>
 var transmitAction = '{$do}';
 </script>
 <div class="homeBg cc">
@@ -85,13 +85,13 @@ if (in_array($do,array('refer','receive'))) {
 print <<<EOT
 --> 
 			<div class="spaceTip cc" style="margin:10px 0 0;" id="atguide">
-				<a href="javascript:;" class="adel" onclick="closeGuide();">关闭</a>
-				<label for="ifshow" class="mr10 fr"><input type="checkbox" name="ifshow" id="ifshow" />&nbsp;知道了以后不再显示</label>
+				<a href="javascript:void(0);" class="adel" onclick="closeGuide();">关闭</a>
+				<a href="javascript:void(0);" class="mr10 fr" onclick="closeGuide(1);">知道了</a>
 				<span class="mr10">输入"@+用户名+空格+想说的话"，就能提到对方了哦~</span>
 			</div>
-<script language="javascript" type="text/javascript">
-function closeGuide() {
-	if (getObj('ifshow').checked == true) {
+<script>
+function closeGuide(ck) {
+	if (ck == 1) {
 		var date = new Date();
 		date.setTime(date.getTime()+86400000000);
 		document.cookie = "atguidehide=1;expires=" + date.toGMTString() + " ;path=/";
@@ -107,7 +107,7 @@ $commentNum = $winddb['newcomment']>0 ? '<span class="s2">[' . $winddb['newcomme
 print <<<EOT
 -->
 			<div class="p10 bdB"><a href="{$basename}do=refer" id="type_refer">@我的{$refertoNum}</a>&nbsp;|&nbsp;<a href="{$basename}do=receive" id="type_receive">收到的评论{$commentNum}</a></div>
-			<script language="JavaScript">setCurrent('type_{$do}','type_refer','b s5');</script>
+			<script>setCurrent('type_{$do}','type_refer','b s5');</script>
 <!--
 EOT;
 }print <<<EOT
@@ -124,6 +124,11 @@ if (in_array($do, array('lookround', 'attention', 'my', 'refer','topics'))) {
 				print <<<EOT
 -->
 			<!--一组-->
+<script type="text/javascript">
+window.onReady(function(){
+	var createtopic = '$createtopic';
+})
+</script>
 			<div class="cc" style="padding:22px 0 10px 0">
 				<span class="mr20 fl b" style="padding-top:1px;">关于<a href="apps.php?q=weibo&do=topics&topic={$topicName}" alt="{$topicGroup[topic][topicname]}" title="{$topicGroup[topic][topicname]}">"{$strTopicname}"</a>的新鲜事</span>
 <!-- 
@@ -149,7 +154,7 @@ EOT;
 EOT;
 if($topicGroup['weibo']){
 foreach($topicGroup['weibo'] as $key => $value){
-				$method = $weiboService->getType($value['type']);
+				$method = $weiboService->getViewType($value['type']);
 				$weiboModelTemplate->$method($value);
 }
 }
@@ -161,7 +166,7 @@ EOT;
 		}
 	}else{
 		foreach ($weiboList as $key => $value) {
-			$method = $weiboService->getType($value['type']);
+			$method = $weiboService->getViewType($value['type']);
 			$weiboModelTemplate->$method($value);
 		}
 	}
@@ -189,7 +194,7 @@ EOT;
 EOT;
 	} else {print <<<EOT
 -->
-				<div class="p15 f14 tac">没有搜到内容！</div>
+				<div class="p15 f14 tac">暂没有热门话题哦，不如你来创建一个话题吧!点击 <a href="apps.php?q=weibo&do=my&createtopic=1">创建话题</a></div>
 <!--
 EOT;
 	}
@@ -207,11 +212,11 @@ if ($commentList) {
 			$value['content'] = $value['content'];
 		}
 		$ifmycomment = $value['uid'] == $winduid ? false : true;
-		$method = $weiboService->getType($weibo['type']);
+		$method = $weiboService->getViewType($weibo['type']);
 print <<<EOT
 -->				
 				<dl class="dl cc">
-					<dt class="dt"><a href="{$db_userurl}{$value['uid']}"><img class="img" src="{$value['icon']}" alt="{$value['username']}" width="44" height="44" /></a></dt>
+					<dt class="dt"><a href="{$db_userurl}{$value['uid']}" class=" _cardshow" target="_blank" data-card-url="pw_ajax.php?action=smallcard&type=showcard&uid={$value[uid]}" data-card-key="{$value['username']}"><img class="img" src="{$value['icon']}" alt="{$value['username']}" width="44" height="44" /></a></dt>
 					<dd class="dd">
 <!--
 EOT;
@@ -222,7 +227,7 @@ EOT;
 EOT;
 		}print <<<EOT
 -->
-						<div class="title"><a href="{$db_userurl}{$value['uid']}">{$value['username']}</a>{$value['content']}</div>
+						<div class="title"><a href="{$db_userurl}{$value['uid']}" class=" _cardshow" target="_blank" data-card-url="pw_ajax.php?action=smallcard&type=showcard&uid={$value[uid]}" data-card-key="{$value['username']}">{$value['username']}</a>{$value['content']}</div>
 						<div class="gray cc">
 <!--
 EOT;
@@ -346,13 +351,16 @@ print <<<EOT
 EOT;
 }
 print <<<EOT
--->		<div class="mb20">
+-->
+			<div class="mb20 cc">
+				<div class="search">
         <form method="GET" action="apps.php">
         <input type="hidden" name="q" value="weibo" />
         <input type="hidden" name="do" value="topics" />
-      <input name="topic" id="search_topic" type="text" value="查找新鲜事" class="input gray mr5"/>
-				<span class="bt2"><span><button type="submit" onclick="return check_search_apps()">搜索</button></span></span>
+      <input name="topic" id="search_topic" type="text" value="查找新鲜事" class="gray sip" style="width:120px;margin-left:5px;" />
+				<button type="submit" onclick="return check_search_apps()">搜索</button>
         </form>
+				</div>
 			</div>
 <!--
 EOT;
@@ -407,10 +415,10 @@ EOT;
 foreach ($recommendUsers as $key => $value) {print <<<EOT
 -->
 				<dl class="dl cc">
-					<dt class="dt"><a href="{$db_userurl}$value[uid]" class="img_50"><i><img src="$value[face]" width="48" height="48" /></i></a></dt>
+					<dt class="dt"><a href="{$db_userurl}$value[uid]" class="img_50 _cardshow" target="_blank" data-card-url="pw_ajax.php?action=smallcard&type=showcard&uid={$value[uid]}" data-card-key="{$value['username']}"><i><img src="$value[face]" width="48" height="48" /></i></a></dt>
 					<dd class="dd3">
-						<p class="mb5"><a href="{$db_userurl}$value[uid]">{$value['username']}</a></p>
-						<p class="lh_18"><a href="javascript:;" onclick="return Attention.add(this,'{$value['uid']}',1)" class="follow">关注</a></p>
+						<p class="mb5"><a href="{$db_userurl}$value[uid]" class=" _cardshow" target="_blank" data-card-url="pw_ajax.php?action=smallcard&type=showcard&uid={$value[uid]}" data-card-key="{$value['username']}">{$value['username']}</a></p>
+						<p class="lh_18"><a href="javascript:;" onclick="return Attention.add(this,'{$value['uid']}',1)" class="add_follow">加关注</a></p>
 					</dd>
 				</dl>
 <!--
@@ -429,7 +437,7 @@ EOT;
 foreach ($weiboAuthorSort as $key => $value) {print <<<EOT
 -->
 				<dl class="dl cc">
-					<dt class="dt"><a href="{$db_userurl}$value[uid]" class="img_50"><i><img src="$value[icon]" width="48" height="48" /></i></a></dt>
+					<dt class="dt"><a href="{$db_userurl}$value[uid]" class="img_50 _cardshow" target="_blank" data-card-url="pw_ajax.php?action=smallcard&type=showcard&uid={$value[uid]}" data-card-key="{$value['username']}"><i><img src="$value[icon]" width="48" height="48" /></i></a></dt>
 					<dd class="dd3">
 						<p class="mb5"><a href="{$db_userurl}$value[uid]">$value[username]</a></p>
 						<span class="gray">被转次数：</span><strong>$value[counts]</strong>
@@ -470,6 +478,12 @@ if(getObj('search_topic')){
 function check_search_apps(){
 	if(getObj('search_topic').value == '查找新鲜事')  getObj('search_topic').value="";
 }
+var createtopic = '{$createtopic}';
+if (createtopic) {
+	if (content.value == dvalue) content.value = '';content.style.color = '';
+	setSelection();
+}
+
 </script>
 <!--
 EOT;

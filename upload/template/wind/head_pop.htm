@@ -1,8 +1,7 @@
 <!--<?php 
 print <<<EOT
 -->
-<script language="JavaScript" src="js/popup.js"></script>
-<div id="windlocation" style="position: absolute;visibility: hidden;height: 1;width: 1;top: 100;left: 50;z-index:9999" bgcolor="$tablecolor">
+<div id="windlocation" style="position: absolute;display:none;top: 100;left: 50;z-index:9999" bgcolor="$tablecolor">
 <table width="500" height="300" bgColor="$tablecolor" style="border: 1 outset">
 <tr><td align="center">
 <table width="480" height="280" style="border: 1 inset" class="f_one">
@@ -13,6 +12,47 @@ print <<<EOT
 <p>(此视窗将于 <span id="poplimit">5</span> 秒后自动关闭)</p>
 </td></tr></table></td></tr></table>
 </div>
+<script>
+(function(){
+	var timePopup=5;
+	var intervalOpen;
+	var adCount = 0;
+	var adDiv;
+	function initPopup() {
+		adDiv = getObj("windlocation").style;
+		adDiv.display ="";
+		showPopup();
+	}
+	function showPopup() {
+		if (adCount < timePopup * 10) {
+			adCount+=1;
+			if (is_ie) {
+				documentWidth  = ietruebody().offsetWidth/2+getLeft()-20;
+				documentHeight = ietruebody().offsetHeight/2+getTop()-20;
+			} else{
+				documentWidth  = self.innerWidth/2+window.pageXOffset-20;
+				documentHeight = self.innerHeight/2+window.pageYOffset-20;
+			}
+			adDiv.left = documentWidth-250 + 'px';
+			adDiv.top  = documentHeight-150 + 'px';
+			intervalOpen = setTimeout(function(){showPopup();},100);
+		} else {
+			clearTimeout(intervalOpen);
+			intervalOpen = null;
+		}
+	}
+	initPopup();
+	var interval = setInterval(function(){
+		timePopup--;
+		getObj("poplimit").innerHTML = timePopup;
+		if(timePopup===0){
+			clearInterval(interval);
+			interval = null;
+			adDiv.display = "none";
+		}
+	},1000);
+})();
+</script>
 <!--
 EOT;
 ?>

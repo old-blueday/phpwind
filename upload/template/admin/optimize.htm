@@ -246,7 +246,7 @@ foreach($_CREDITDB as $key=>$value){
 $ct_checked=strpos($db_showcustom,",$key,")!==false?'checked':'';
 $num++;print <<<EOT
 -->
-				<li"><input type="checkbox" name="showcustom[$key]" value="$key" $ct_checked>$value[0]</li>
+				<li><input type="checkbox" name="showcustom[$key]" value="$key" $ct_checked>$value[0]</li>
 <!--
 EOT;
 if($num==4){

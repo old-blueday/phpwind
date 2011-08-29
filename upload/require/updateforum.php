@@ -2,7 +2,7 @@
 !function_exists('readover') && exit('Forbidden');
 
 function updateforum($fid,$lastinfo='') {//TODO 慢查询
-	global $db,$db_fcachenum;
+	global $db,$db_fcachenum,$todayTopicNum;
 	$fm = $db->get_one("SELECT fup,type,password,allowvisit,f_type FROM pw_forums WHERE fid=".S::sqlEscape($fid));
 	if ($fm['type'] != 'category') {
 		$subtopics = $subrepliess = 0;
@@ -48,6 +48,7 @@ function updateforum($fid,$lastinfo='') {//TODO 慢查询
 					'subtopic'	=> $subtopics,
 					'lastpost'	=> $lastinfo
 				));
+		$todayTopicNum && $db->update("UPDATE pw_forumdata SET tpost = tpost+$todayTopicNum WHERE fid	=	" . S::sqlEscape($fid));
 		if ($fm['password'] != '' || $fm['allowvisit'] != '' || $fm['f_type'] == 'hidden') {
 			$lastinfo = '';
 		}
@@ -145,6 +146,20 @@ function updatetop() {
 			$fids[$rt['fid']]['top2']++;
 		}
 	}
+	//update kmd threads
+	$kmdService = L::loadClass('kmdservice', 'forum');
+	$kmdInfo = $kmdService->getKmdInfosByStatus(KMD_THREAD_STATUS_OK);
+	if (is_array($kmdInfo)){
+		$kmdTids = array();
+		foreach ($kmdInfo as $v){
+			if(!$v['tid'] || !$v['fid']) continue;
+			$kmdTids[$v['fid']][$v['tid']] = null;
+		}
+		foreach ($kmdTids as $fid=>$v){
+			$fids[$fid]['topthreads'] .= $fids[$fid] ? ','.implode(',', array_keys($v)) : implode(',', array_keys($v));
+		}
+	}
+	
 	//* $db->update("UPDATE pw_forumdata SET top1 = '', top2 = '' , topthreads = '' ");
 	pwQuery::update('pw_forumdata', null, null, array('top1'=>'', 'top2'=>'', 'topthreads'=>''));
 	$_fids = array();

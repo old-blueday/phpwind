@@ -1,0 +1,14 @@
+<!--<?php
+defined('W_P') or exit('Forbidden');
+print <<<EOT
+-->
+<div>本版块为加密版块,需密码验证( 游客无权登录此版块)</div>
+<div>请输入密码</div>
+<form action="index.php?a=forum&fid={$fid}" method="post" name="FORM">
+<input type="hidden" value="formpwd" name="wind_action"/>
+<div><input type="txt" value="" name="wind_pwd" />
+<input type="submit" value="提 交" /></div>
+</form>
+<!--
+EOT;
+?>-->

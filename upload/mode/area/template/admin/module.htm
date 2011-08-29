@@ -6,8 +6,6 @@ print <<<EOT
 EOT;
 if(empty($action)) {print <<<EOT
 -->
-<script language="JavaScript" src="js/global.js"></script>
-<script language="JavaScript" src="js/pw_ajax.js"></script>
 <div class="nav3 mb10">
 	<ul class="cc">
         <li class="current"><a href="javascript:;">模块管理</a></li>
@@ -57,7 +55,7 @@ EOT;
 foreach($modules as $module){
 $thisChannel = $portalPages[$module['sign']]['name'];
 $ifverify = $module['ifverify'] ? '开启':'关闭';
-$ifstate = $module['state'] ? '<font color="red">失效</font>':'使用中';
+$ifstate = ($module['state'] || !$module['sign']) ? '<font color="red">失效</font>':'使用中';
 print <<<EOT
 -->
         <tr class="tr1">
@@ -72,8 +70,8 @@ EOT;
 if (!$module['state'] && $thisChannel!="") {
 print <<<EOT
 -->
-            	<a href="$basename&action=editconfig&alias=$module[sign]&invokename=$module[invokename]&page=$page&keyword=$keyword" class="mr10" onclick="">[设置]</a>
-            	<a href="$basename&action=edittpl&alias=$module[sign]&invokename=$module[invokename]&page=$page&keyword=$keyword" class="mr10">[编辑模板]</a>
+            	<a href="$basename&action=editconfig&alias=$module[sign]&invokename=$module[name]&page=$page&keyword=$keyword" class="mr10" onclick="">[设置]</a>
+            	<a href="$basename&action=edittpl&alias=$module[sign]&invokename=$module[name]&page=$page&keyword=$keyword" class="mr10">[编辑模板]</a>
 <!--
 EOT;
 }print <<<EOT
@@ -84,7 +82,7 @@ EOT;
 if ($module['state'] || $thisChannel=="") {
 print <<<EOT
 -->
-            	<a href="javascript:;" onclick="delModule($module[id])" class="mr10">[删除]</a>
+            	<a href="javascript:;" onclick="delModule('$module[name]')" class="mr10">[删除]</a>
 <!--
 EOT;
 }print <<<EOT
@@ -98,16 +96,16 @@ EOT;
     </table>
     <div class="p10 cc">$pages</div>
 </div>
-<script src="js/pw_ajax.js" language="JavaScript"></script>
-<script src="js/global.js" language="JavaScript"></script>
+<script src="js/pw_ajax.js" type="text/javascript"></script>
+<script src="js/global.js" type="text/javascript"></script>
 <script>
 
-function delModule(id){
+function delModule(name){
 	if (!confirm("删除模块，将同时删除历史推送数据，是否确认删除？")){
 		return false;
 	}
 	var url = "$ajax_basename";
-	ajax.send(url,'action=del&id='+id,ajax.get);
+	ajax.send(url,'action=del&invokename='+name,ajax.get);
 }
 
 </script>
@@ -127,7 +125,7 @@ EOT;
 <div class="admin_table mb10">
 	<table width="100%">
     	<tr class="tr1 vt">
-            <td class="td2"><textarea name="tagcode" style="width:98%;height:200px;" >$pieceCode</textarea></td>
+            <td class="td2"><textarea name="tagcode" style="width:98%;height:200px;font-family:'Courier New', Courier, monospace;" >$pieceCode</textarea></td>
         </tr>
     </table>
 </div>
@@ -169,20 +167,21 @@ EOT;
 		<td>主题分类名称</td>
 		<td>主题分类链接</td>
 		<td>头像</td>
+		<td>数值</td>
 	</tr>
 	<tr>
 		<td class="bgA">属性名称</td>
 		<td class="bgA">属性\变量值</td>
 		<td class="bgB">title</td>
 		<td class="bgB">url</td>
-		<td class="bgB">images</td>
+		<td class="bgB">image</td>
 		<td class="bgB">descrip</td>
 		<td class="bgB">postdate</td>
 		<td class="bgB">forumname</td>
 		<td class="bgB">forumurl</td>
 		<td class="bgB">author</td>
 		<td class="bgB">authorid</td>
-		<td class="bgB">userid</td>
+		<td class="bgB">uid</td>
 		<td class="bgB">credit</td>
 		<td class="bgB">pnum</td>
 		<td class="bgB">tnum</td>
@@ -190,6 +189,7 @@ EOT;
 		<td class="bgB">topictypename</td>
 		<td class="bgB">topictypeurl</td>
 		<td class="bgB">icon</td>
+		<td class="bgB">value</td>
 	</tr>
 	<tr>
 		<td class="bgA">帖子排行</td>
@@ -210,6 +210,7 @@ EOT;
 		<td></td>
 		<td><span class="s3">&radic;</span></td>
 		<td><span class="s3">&radic;</span></td>
+		<td></td>
 		<td></td>
 	</tr>
 	<tr>
@@ -232,12 +233,14 @@ EOT;
 		<td><span class="s3">&radic;</span></td>
 		<td><span class="s3">&radic;</span></td>
 		<td></td>
+		<td></td>
 	</tr>
 	<tr>
 		<td class="bgA">标签排行</td>
 		<td class="bgA">tag</td>
 		<td><span class="s3">&radic;</span></td>
 		<td><span class="s3">&radic;</span></td>
+		<td></td>
 		<td></td>
 		<td></td>
 		<td></td>
@@ -266,6 +269,7 @@ EOT;
 		<td></td>
 		<td></td>
 		<td></td>
+		<td><span class="s3">&radic;</span></td>
 		<td></td>
 		<td></td>
 		<td></td>
@@ -273,7 +277,7 @@ EOT;
 		<td></td>
 		<td></td>
 		<td></td>
-		<td></td>
+		<td><span class="s3">&radic;</span></td>
 	</tr>
 	<tr>
 		<td class="bgA">日志排行</td>
@@ -295,6 +299,7 @@ EOT;
 		<td></td>
 		<td></td>
 		<td></td>
+		<td></td>
 	</tr>
 	<tr>
 		<td class="bgA">版块排行</td>
@@ -303,6 +308,7 @@ EOT;
 		<td><span class="s3">&radic;</span></td>
 		<td><span class="s3">&radic;</span></td>
 		<td><span class="s3">&radic;</span></td>
+		<td></td>
 		<td></td>
 		<td></td>
 		<td></td>
@@ -337,6 +343,7 @@ EOT;
 		<td></td>
 		<td></td>
 		<td></td>
+		<td></td>
 	</tr>
 	<tr>
 		<td class="bgA">群组主题</td>
@@ -352,9 +359,10 @@ EOT;
 		<td><span class="s3">&radic;</span></td>
 		<td></td>
 		<td></td>
-		<td><span class="s3">&radic;</span></td>
-		<td><span class="s3">&radic;</span></td>
-		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3"></span></td>
+		<td><span class="s3"></span></td>
+		<td><span class="s3"></span></td>
+		<td></td>
 		<td></td>
 		<td></td>
 		<td></td>
@@ -365,6 +373,7 @@ EOT;
 		<td><span class="s3">&radic;</span></td>
 		<td><span class="s3">&radic;</span></td>
 		<td><span class="s3">&radic;</span></td>
+		<td></td>
 		<td></td>
 		<td></td>
 		<td></td>
@@ -400,6 +409,7 @@ EOT;
 		<td></td>
 		<td></td>
 		<td></td>
+		<td></td>
 	</tr>
 	<tr>
 		<td class="bgA">友情链接</td>
@@ -408,6 +418,7 @@ EOT;
 		<td><span class="s3">&radic;</span></td>
 		<td><span class="s3">&radic;</span></td>
 		<td><span class="s3">&radic;</span></td>
+		<td></td>
 		<td></td>
 		<td></td>
 		<td></td>
@@ -442,6 +453,7 @@ EOT;
 		<td></td>
 		<td></td>
 		<td></td>
+		<td></td>
 	</tr>
 	<tr>
 		<td class="bgA">文章排行</td>
@@ -463,12 +475,14 @@ EOT;
 		<td></td>
 		<td></td>
 		<td></td>
+		<td></td>
 	</tr>
 	<tr>
 		<td class="bgA">栏目排行</td>
 		<td class="bgA">column</td>
 		<td><span class="s3">&radic;</span></td>
 		<td><span class="s3">&radic;</span></td>
+		<td></td>
 		<td></td>
 		<td></td>
 		<td></td>
@@ -503,6 +517,205 @@ EOT;
 		<td></td>
 		<td></td>
 		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+	</tr>
+    <tr>
+		<td class="bgA">微博排行</td>
+		<td class="bgA">weibosort</td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+	</tr>
+	<tr>
+		<td class="bgA">悬赏排行</td>
+		<td class="bgA">reward</td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3"></span></td>
+		<td></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td></td>
+		<td></td>
+	</tr>
+	<tr>
+		<td class="bgA">分类信息</td>
+		<td class="bgA">classify</td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3"></span></td>
+		<td></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td></td>
+		<td></td>
+	</tr>
+	<tr>
+		<td class="bgA">活动排行</td>
+		<td class="bgA">activity</td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td></td>
+		<td></td>
+	</tr>
+	<tr>
+		<td class="bgA">辩论排行</td>
+		<td class="bgA">debate</td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3"></span></td>
+		<td></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td></td>
+		<td></td>
+	</tr>
+	<tr>
+		<td class="bgA">商品排行</td>
+		<td class="bgA">trade</td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td></td>
+		<td></td>
+	</tr>
+	<tr>
+		<td class="bgA">团购排行</td>
+		<td class="bgA">pcvalue</td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td></td>
+		<td></td>
+	</tr>
+	<tr>
+		<td class="bgA">投票排行</td>
+		<td class="bgA">polls</td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3"></span></td>
+		<td></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td></td>
+		<td></td>
+	</tr>
+	<tr>
+		<td class="bgA">图酷排行</td>
+		<td class="bgA">tucool</td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td><span class="s3">&radic;</span></td>
+		<td><span class="s3">&radic;</span></td>
 		<td></td>
 		<td></td>
 	</tr>
@@ -560,6 +773,11 @@ b) <loop><li><a href=”{url}” target=”_blank”>{title,32}</a></li></loop>�
     
     支持php代码： 对于一些需要用程序做逻辑判断的模块，可在模块里面写php代码
 php写在<!--#  #-->标签中间
+
+c) 目前支持的参数格式化类型：
+	i)  字符类型：{title,20}		代表对title这个数据进行20个字节的截取
+	ii) 图片类型：{image,30,50}		代表对image这个图片数据进行30×50的图片缩略
+	iiI)时间类型：{postdate,Y-m-d}	代表对postdate这个数据进行类似于:2010-07-21的时间格式化
 </textarea> 
 </div>
 <!--
@@ -573,21 +791,39 @@ EOT;
     </ul>
 </div>
 <form action="$basename&action=editconfig" method="post">
+<h2 class="h1">模块属性设置</h2>
 <div class="admin_table mb10">
 	<table width="100%">
-		<tr><td colspan="2"><h2 class="h1" style="border-top:0;">模块属性设置</h2></td></tr>
 		<tr class="tr1 vt">
         	<td class="td1">模块id</td>
             <td class="td2">$invokename</td>
         </tr>
        <tr class="tr1 vt">
         	<td class="td1">开启推荐审核</td>
-            <td class="td2"><input type="radio" value="1" name="ifverify" $ifverify_Y />是&nbsp;&nbsp;&nbsp;<input type="radio" value="0" name="ifverify" $ifverify_N />否</td>
+            <td class="td2">
+							<ul class="list_A list_80">
+								<li><input type="radio" value="1" name="ifverify" $ifverify_Y />是</li>
+								<li><input type="radio" value="0" name="ifverify" $ifverify_N />否</li>
+							</ul>
+						</td>
         </tr>
         <tr class="tr1 vt">
         	<td class="td1">模块名称</td>
             <td class="td2"><input class="input input_wa" type="text" value="$invokedata[title]" name="title" /></td>
         </tr>
+		<tr class="tr1 vt">
+			<td class="td1">是否允许代码调用</td>
+			<td class="td2">
+					<ul class="list_A list_80">
+						<li><input type="radio" value="1" name="ifapi" $ifapi_Y />是</li>
+						<li><input type="radio" value="0" name="ifapi" $ifapi_N />否</li>
+					</ul>
+			</td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">模块调用代码</td>
+			<td class="td2">&#60;script src="{$db_bbsurl}/mode.php?m=area&q=api&id={$invokedata[id]}"&#62;&#60;/script&#62;</td>
+		</tr>
 	</table>
 	<table width="100%">
 <!--
@@ -628,12 +864,12 @@ EOT;
 print <<<EOT
 -->
 						</table>
+						</div>
 						</td>
 			        </tbody>
             	</table>
             </td>
         </tr>
-		
         <tr class="tr1 vt">
         	<td class="td1">调用个数</td>
             <td class="td2"><input type="text" value="$piece[num]" name="num[$piece[id]]" class="input input_wa"></td>
@@ -644,7 +880,11 @@ print <<<EOT
         </tr>
         <tr class="tr1 vt">
         	<td class="td1">只调用推送数据</td>
-            <td class="td2"><input type="radio" value="1" name="ifpushonly[$piece[id]]" $check_Y />是&nbsp;&nbsp;&nbsp;<input type="radio" value="0" name="ifpushonly[$piece[id]]" $check_N />否</td>
+            <td class="td2">
+					<ul class="list_A list_80">
+						<li><input type="radio" value="1" name="ifpushonly[$piece[id]]" $check_Y />是</li>
+						<li><input type="radio" value="0" name="ifpushonly[$piece[id]]" $check_N />否</li>
+					</ul></td>
         </tr>
 <!--
 EOT;
@@ -653,7 +893,15 @@ foreach($piece[param] as $value){print <<<EOT
 			$value
 <!--
 EOT;
-}}print <<<EOT
+}print <<<EOT
+-->
+		<tr class="tr1 vt">
+			<td class="td1">数据调用代码</td>
+			<td class="td2">{$db_bbsurl}/mode.php?m=area&q=api&type=data&id={$piece[id]}</td>
+		</tr>
+<!--
+EOT;
+}print <<<EOT
 -->
     </table>
 </div>
@@ -667,8 +915,8 @@ EOT;
 	<span class="btn"><span><button type="submit">提 交</button></span></span>
 </div>
 </form>
-<script src="js/pw_ajax.js" language="JavaScript"></script>
-<script src="js/global.js" language="JavaScript"></script>
+<script src="js/pw_ajax.js" type="text/javascript"></script>
+<script src="js/global.js" type="text/javascript"></script>
 <script>
 
 function pieceActionChange(pieceId,sourcetype) {

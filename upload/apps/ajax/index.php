@@ -8,7 +8,7 @@ define('AJAX','1');
 define('F_M',true);
 S::gp(array('a'));
 
-if (!in_array($a,array('showgroupwritecommlist'))) {
+if (!in_array($a,array('showgroupwritecommlist','stopiccommentbox'))) {
 	!$winduid && Showmsg('not_login');
 }
 
@@ -197,7 +197,7 @@ if ($a == 'delshare') {
 	banUser();
 	S::gp(array('type','id','title','upid','position','other'),'P');
 	
-	$title 	= nl2br(str_replace('&#61;','=',$title));
+	$title 	= nl2br(str_replace(array('&#61;','%26'),array('=','&'),$title));
 	$id = (int)$id;
 	$upid = (int)$upid ? (int)$upid : 0;
 	if (!$id) Showmsg('undefined_action');
@@ -421,7 +421,7 @@ if ($a == 'delshare') {
 	if (!$uid) Showmsg('undefined_action');
 	if ($uid == $winduid) Showmsg('mode_o_board_self');
 //	if (!isFriend($uid,$winduid)) Showmsg('mode_o_board_not_friend'); //去掉非好友不能留言
-	if (strlen($title)>3 && strlen($title)>200) Showmsg('mode_o_board_too_lang');
+	if (strlen(pwHtmlspecialchars_decode($title))>3 && strlen(pwHtmlspecialchars_decode($title))>200) Showmsg('mode_o_board_too_lang');
 
 	$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
 	$tousername = $userService->getUserNameByUserId($uid);
@@ -937,7 +937,35 @@ if ($a == 'delshare') {
 	}
 	$topicService->deleteAttentionedTopic($topic['topicid'],$winduid);
 	echo "success\t";ajax_footer();
-} 
+} elseif ($a == 'adddescrip') {
+	S::gp(array('descrip','aid','tid'));
+	if ($aid < 1 || $tid <1) Showmsg('undefined_action');
+	$attachsService = L::loadClass('attachs','forum');
+	if (!$attachsService->isEditAttachRight($aid,$tid)) Showmsg('您没有权限');
+	if (!$attachsService->updateByAid($aid,array('descrip'=>$descrip))) Showmsg('添加描述失败');
+	echo "success";
+	ajax_footer();
+} elseif ($a == 'commentsPic') {
+	S::gp(array('comments_content','tid','aid'));
+	if (!$comments_content || $tid <1 || $aid < 1) Showmsg('undefined_action');
+	
+	$pingService = L::loadClass('ping', 'forum');
+	if (($pingService->checkReplyRight($tid)) !== true) {
+		Showmsg('您不能对帖子进行回复');
+	}
+	$comments_content = $comments_content."\r\n\r\n[size=2][color=#a5a5a5]内容来自[/color][color=#4f81bd][url=".$db_bbsurl."/slide.php?tid=".$tid."#".$aid."][图酷][/url][/color] [/size]";
+	$pingService->addPost($tid, $comments_content);
+	echo "success";
+	ajax_footer();
+} elseif ($a == 'stopiccommentbox') {
+	if (!$winduid) {
+		S::gp(array('requesturl'));
+		require_once printEOT('m_ajax');
+	} else {
+		echo 'have_login';
+	}
+	ajax_footer();
+}  
 
 function getUserNameByTypeAndId($type,$id) {
 	global $db;

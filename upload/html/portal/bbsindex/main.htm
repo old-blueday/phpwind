@@ -1,39 +1,25 @@
 <!--<?php
 print <<<EOT
 -->
-<script language="javascript" src="mode/area/js/ddsliderplayer.js"></script>
+<script type="text/javascript" src="mode/area/js/ddsliderplayer.js"></script>
 <div class="newInfor">
 	<table width="100%">
-    	<tr class="vt">
-        	<th width="370">
-						<h4 class="hB"><pw id="今日热门@论坛首页" /></h4>
-						<div style="padding-left:10px;">
-							<pw id="幻灯片@论坛首页" />
-						</div>
-					</th>
-          <td>
-				<h4 class="hB">
-					<ul class="tabB" id="tabswi1_A" style="padding-left:5px;">
-						<pw id="TAB切换@论坛首页" />
-					</ul>
-				</h4>
-				<div class="pd15" id="tabswi1_B">
-					<div class="switchItem" style="display:none">
+		<tr>
+			<td colspan="2"><h4 class="hB mb10"><pw id="今日热门@论坛首页" /></h4></td>
+		</tr>
+		<tr class="vt">
+			<th width="360" height="240" style="padding-left:10px;">
+				<pw id="幻灯片@论坛首页" />
+			</th>
+			<td>
+				<div class="pd15">
+					<div class="switchItem">
 						<pw id="社区焦点@论坛首页" />
 					</div>
-					<div class="switchItem" style="display:none">
-						<pw id="最新动态@论坛首页" />
-					</div>
-					<div class="switchItem" style="display:none">
-						<pw id="热门推荐@论坛首页" />
-					</div>
 				</div>
-				<script>
-					ddSliderPlayers('tabswi1_B','tabswi1_A',0,'current');
-				</script>
-            </td>
-        </tr>
-    </table>
+			</td>
+		</tr>
+	</table>
 </div>
 <!--
 EOT;

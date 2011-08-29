@@ -170,7 +170,7 @@ $tpls=array(
 				</div>
 				<div class="c"></div>
 				<script type="text/javascript" src="js/sliderplayer.js"></script>
-				<script language="JavaScript">pwSliderPlayers("pwSlidePlayer");</script>',
+				<script type="text/javascript">pwSliderPlayers("pwSlidePlayer");</script>',
 		'image' => '10.jpg',
 	),
 	'10' => array(

@@ -86,6 +86,30 @@ EOT;
 					<label class="mr20"><input type="checkbox" name="photos_isfeed" value="1"{$photos_isfeed} />相册</label>
 					<label class="mr20"><input type="checkbox" name="group_isfeed" value="1"{$group_isfeed} />群组</label>
 			</div>
+			<div class="b f14 s7 mb15"><a name="friend"></a>@提到我的</div>
+			<div class="mb5">通过设置，以下人将可以@提到你</div>
+				<div class="p15 bgA mb20">
+					<div class="mb10">
+						<select name="at_isfeed">
+<!--
+EOT;
+$atFeed = array(
+	2=>'拒绝所有人@我',
+	1=>'仅我关注的可@我',
+	0=>'允许所有人@我',
+);
+foreach($atFeed as $k=>$v){
+$selected = $k == $at_isfeed ? ' selected' : '';
+print <<<EOT
+-->
+	<option value="$k"$selected>$v</option>
+<!--
+EOT;
+}print <<<EOT
+-->
+						</select>
+					</div>
+				</div>
 			<div class="b f14 s7 mb15"><a name="friend"></a>我关注的新鲜事</div>
 			<div class="mb5">通过设置，系统会帮你在众多新鲜事中筛选出你最关注的类型。</div>
 				<div class="p15 bgA mb20">
@@ -96,19 +120,22 @@ EOT;
 						<label class="mr20"><input type="checkbox" name="cnlesp_isfollow" value="1"{$cnlesp_isfollow} />关注的人</label>
 					</div>
 					<div>
-						来源：
-						<label class="mr20"><input type="checkbox" name="article_isfollow" value="1"{$article_isfollow} />帖子</label>
-						<label class="mr20"><input type="checkbox" name="diary_isfollow" value="1"{$diary_isfollow} />日志</label>
-						<label class="mr20"><input type="checkbox" name="photos_isfollow" value="1"{$photos_isfollow} />相册</label>
-						<label class="mr20"><input type="checkbox" name="group_isfollow" value="1"{$group_isfollow} />群组</label>
 <!--
 EOT;
-	if ($db_sinaweibo_status) {
+	/* platform weibo app */
+	if ($isSiteBindWeibo) {
 print <<<EOT
 -->
-						<label class="mr20"><input type="checkbox" name="sinaweibo_isfollow" value="1"{$sinaweibo_isfollow} />新浪微博</label>
+						来源：
 <!--
 EOT;
+		foreach ($bindTypes as $key => $title) {
+print <<<EOT
+-->
+						<label class="mr20"><input type="checkbox" name="$key" value="1" checked="checked" />$title</label>
+<!--
+EOT;
+		}
 	}
 print <<<EOT
 -->
@@ -120,70 +147,6 @@ print <<<EOT
 			
 		</div>
 		</form>
-		
-<!--sinaWeibo-->
-<!--
-EOT;
-if ($db_sinaweibo_status) {
-print <<<EOT
--->
-		<form action="profile.php?action=$action&t=setsync" method="post">
-		<input type="hidden" name="verify" value="$verifyhash" />
-		<div class="p15">
-
-			<div class="b f14 s7 mb15"><a name="friend"></a>新鲜事同步设置</div>
-			<div class="mb10">绑定新浪微博帐号，就可以随时随地同步你的新鲜事，让更多的朋友分享你的生活！</div>
-<!--
-EOT;
-	if ($isBindWeibo) {
-print <<<EOT
--->
-			<div class="mb10">
-				<img src="u/images/expand/sina_n.png" align="absmiddle" class="mr10" />
-				已同步到新浪微博 <a class="s3 mr20" target="_blank" href="http://t.sina.com.cn/{$bindInfo[info][id]}">{$bindInfo[info][name]}</a>
-				<!-- <span class="s3 mr20"></span> -->
-				<a href="profile.php?action=privacy&t=unbind">取消同步&gt;&gt;</a>
-			</div>
-			
-			<div class="mb5">我产生的新鲜事，通过设置，下面这些新鲜事将同步到新浪微博</div>
-			<div class="p15 bgA mb20">
-				<div>
-					<label class="mr20"><input type="checkbox" name="article_issync" value="1" {$article_issync} />帖子</label>
-					<label class="mr20"><input type="checkbox" name="diary_issync" value="1" {$diary_issync} />日志</label>
-					<label class="mr20"><input type="checkbox" name="photos_issync" value="1" {$photos_issync} />相册</label>
-					<label class="mr20"><input type="checkbox" name="group_issync" value="1" {$group_issync} />群组</label>
-				</div>
-				<div>
-					<label class="mr20"><input type="checkbox" name="transmit_issync" value="1" {$transmit_issync} />转发的新鲜事</label>
-					<label class="mr20"><input type="checkbox" name="comment_issync" value="1" {$comment_issync} />新鲜事的回复</label>
-				</div>
-			</div>
-			<div class="tac mb20">
-				<span class="btn"><span><button type="submit">提 交</button></span></span>
-			</div>
-<!--
-EOT;
-	} else {
-print <<<EOT
--->
-			<div class="mb10">
-				同步到 <img src="u/images/expand/sina.png" align="absmiddle" class="mr10" />
-				<a href="javascript:;" onclick="window.open('$bindSinaWeiboUrl', 'sinaWeiboBind', 'height=520, width=850, toolbar=no, menubar=no, scrollbars=no, resizable=no, location=no, status=no');">去新浪上设置同步&gt;&gt;</a>
-			</div>
-<!--
-EOT;
-	}
-print <<<EOT
--->
-			
-		</div>
-		</form>
-<!--
-EOT;
-}
-print <<<EOT
--->
-<!--sinaWeibo end-->
 
 <!--
 EOT;

@@ -11,6 +11,7 @@ if (isset($db_modes)) {
 		'area'	=> array('m_name' => '门户模式','ifopen' => 1,'title' => '门户'),
 		'o'		=> array('m_name' => '个人中心','ifopen' => 1,'title' => '个人中心'),
 		'cms'   => array('m_name' => '文章模式','ifopen' => 1,'title' => '文章'),
+		'wap'	=> array('m_name' => 'WAP设置','ifopen' => 1,'title' => 'wap')
 	);
 	$modepages = array ( 'area' => array ( 'index' => array ( 'name' => '首页','template' => 'index' ), 'cate' => array ( 'name' => '频道页','template' => 'cate' ), 'thread' => array ( 'name' => '列表页', 'template' => 'thread' ) ), 'o' => array ( 'index' => array ( 'name' => '首页', 'template' => 'index' ), 'm_home' => array ( 'name' => '动态', 'template' => 'm_home' ) ) );
 }

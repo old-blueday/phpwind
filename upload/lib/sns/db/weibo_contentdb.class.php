@@ -245,9 +245,12 @@ class PW_Weibo_ContentDB extends BaseDB {
 			return false;
 		}
 		$mids = is_array($mids) ? $mids : array($mids);
+		return pwQuery::delete($this->_tableName, 'mid IN (:mid)', array($mids));
+		/*
 		$sql = 'DELETE FROM '.$this->_tableName.' WHERE mid IN (' . S::sqlImplode($mids) . ') ';
 		$this->_db->query($sql);
 		return true;
+		*/
 	}
 	
 	function _isLegalNumeric($id){

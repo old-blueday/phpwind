@@ -7,4 +7,5 @@ $purview['area_level_manage'] = array('权限管理 ', "$admin_file?adminjob=mod
 $purview['area_selecttpl'] = array('模板中心', "$admin_file?adminjob=mode&admintype=area_selecttpl");
 $purview['area_static_manage'] = array('静态配置', "$admin_file?adminjob=mode&admintype=area_static_manage");
 $purview['area_module'] = array('模块管理', "$admin_file?adminjob=mode&admintype=area_module");
+$purview['area_page_manage'] = array('页面管理', "$admin_file?adminjob=mode&admintype=area_page_manage");
 ?>

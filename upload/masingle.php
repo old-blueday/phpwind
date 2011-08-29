@@ -118,7 +118,7 @@ if ($action == "topped") {
 	if (defined('AJAX')) {
 		Showmsg('ajaxma_success');
 	} else {
-		refreshto("read.php?tid={$tid}&displayMode=1&page=$page",'operate_success');
+		refreshto("read.php?tid={$tid}&ds=1&page=$page",'operate_success');
 	}
 
 } elseif ($action == "banuser") {
@@ -175,7 +175,7 @@ if ($action == "topped") {
 		if (defined('AJAX')) {
 			Showmsg('ajax_banuser_success');
 		} else {
-			refreshto("read.php?tid={$tid}&displayMode=1&page=$page",'operate_success');
+			refreshto("read.php?tid={$tid}&ds=1&page=$page",'operate_success');
 		}
 	}
 } elseif ($action == "banfree") {
@@ -201,7 +201,7 @@ if ($action == "topped") {
 		if (defined('AJAX')) {
 			Showmsg('ajax_banfree_success');
 		} else {
-			refreshto("read.php?tid={$tid}&displayMode=1&page=$page",'operate_success');
+			refreshto("read.php?tid={$tid}&ds=1&page=$page",'operate_success');
 		}
 	}
 } elseif ($action == "shield") {
@@ -313,7 +313,7 @@ if ($action == "topped") {
 			$StaticPage = L::loadClass('StaticPage');
 			$StaticPage->update($tid);
 		}
-		refreshto("read.php?tid=$tid&displayMode=1&page=$page",'operate_success');
+		refreshto("read.php?tid=$tid&ds=1&page=$page",'operate_success');
 	}
 } elseif ($action == 'remind') {
 
@@ -416,7 +416,7 @@ if ($action == "topped") {
 		if (defined('AJAX')) {
 			echo "success\t".str_replace(array("\n","\t"),array('<br />',''),$atc_content)."\t$windid";ajax_footer();
 		} else {
-			refreshto("read.php?tid=$tid&displayMode=1&page=$page",'operate_success');
+			refreshto("read.php?tid=$tid&ds=1&page=$page",'operate_success');
 		}
 	} else {
 
@@ -431,7 +431,7 @@ if ($action == "topped") {
 		if (defined('AJAX')) {
 			echo "cancle\t";ajax_footer();
 		} else {
-			refreshto("read.php?tid=$tid&displayMode=1&page=$page",'operate_success');
+			refreshto("read.php?tid=$tid&ds=1&page=$page",'operate_success');
 		}
 	}
 } elseif ($action == 'split') { //拆分帖子
@@ -460,7 +460,7 @@ if ($action == "topped") {
 		$splittype = (int)$splittype; //拆分类型
 		$pids = array(); //拆分的id
 		$lastPid = NULL; //拆分中最后一个帖子ID
-		$firstPid = NULL; //拆分的第一个帖子ID
+		$firstPid = NULL; //拆分的第一个帖子ID		
 		foreach ($selid as $k => $v) {
 			if(is_numeric($v)) {
 				$pids[] = $v;
@@ -476,7 +476,6 @@ if ($action == "topped") {
 		$istucool && $tucoolService = L::loadClass('Tucool','forum');
 		if ($selid[0] == 'tpc') { //需要拆分主题帖子
 			if ($splittype == 0) { //新帖操作
-
 				//判断和获取数据
 				$pw_tmsgs_tid = GetTtable($tid); //获取分表表名
 				$pw_posts_tid = GetPtable('N',$tid); //post表
@@ -489,7 +488,7 @@ if ($action == "topped") {
 				if($pidsNum == $splitTopic['replies'])  Showmsg("split_not_all"); //不允许全部帖子拆分
 
 				//拆到新帖子操作
-				$lastNewThreadPost = $db->get_one("SELECT * FROM $pw_posts_tid WHERE pid = ".S::sqlEscape($lastPid)); //新帖回复
+				$lastNewThreadPost = $lastPid ? $db->get_one("SELECT * FROM $pw_posts_tid WHERE pid = ".S::sqlEscape($lastPid)) : false; //新帖回复
 				if($lastNewThreadPost !== false){
 					$splitTopic['lastpost'] = $lastNewThreadPost['postdate'];
 					$splitTopic['lastposter'] = $lastNewThreadPost['author'];
@@ -501,8 +500,8 @@ if ($action == "topped") {
 				$splitTopic['subject'] = $splittitle;
 				unset($splitTopic['tid']);
 				$splitTopic['replies'] = $pidsNum; //回复数
-				$db->update("INSERT INTO pw_threads SET " . S::sqlSingle($splitTopic));
-				$newId = $db->insert_id();
+				$splitTopic['topped'] == 4 && $splitTopic['topped'] = 0;
+				$newId = pwQuery::insert("pw_threads" ,$splitTopic);
 
 				$pw_tmsgs = GetTtable($newId); //获取分表表名
 				$pw_posts = GetPtable('N',$newId); //获取分表表名
@@ -516,7 +515,7 @@ if ($action == "topped") {
 				}else{
 					$forumdata['topthreads'] = $forumdata['topthreads'].','.$newId;
 				}
-				if($splitTopic['topped'] > 0){
+				if($splitTopic['topped']){
 					$postTopArr = array();
 					$postTopArr['fid'] = $splitTopic['fid'];
 					$postTopArr['tid'] = $newId;
@@ -555,7 +554,8 @@ if ($action == "topped") {
 					'lastposter'=> $lastPost['author']
 				);
 				$pidsNum = $pidsNum + 1; //一个回复变主题
-				$db->update("UPDATE pw_threads SET " . S::sqlSingle($newTopicInfo) . " , replies = replies - $pidsNum  WHERE tid = ".S::sqlEscape($tid));
+				//$db->update("UPDATE pw_threads SET " . S::sqlSingle($newTopicInfo) . " , replies = replies - $pidsNum  WHERE tid = ".S::sqlEscape($tid));
+				pwQuery::update('pw_threads', "tid=:tid",array($tid),null,array(PW_EXPR=>array("replies=replies-{$pidsNum}")));	//回复
 				Perf::gatherInfo('changeThreads', array('tid'=>$tid));
 				$pwtmsgInfoMsg = array(
 					'userip'   =>  $newTopic['userip'],
@@ -572,8 +572,12 @@ if ($action == "topped") {
 
 				//评分操作
 				$db->update("UPDATE pw_pinglog SET tid = ".S::sqlEscape($splitid)." WHERE tid = ".S::sqlEscape($tid)." AND  pid = 0");
-				if($pidsStr) $db->update("UPDATE pw_pinglog SET tid = ".S::sqlEscape($splitid)." WHERE tid = ".S::sqlEscape($tid)." AND  pid in ($pidsStr)");
-				$db->update("UPDATE pw_pinglog SET  pid = 0 WHERE tid = ".S::sqlEscape($tid)." AND  pid =  ".S::sqlEscape($newTopic['pid'])." ");
+				if($pidsStr) {
+					//$db->update("UPDATE pw_pinglog SET tid = ".S::sqlEscape($splitid)." WHERE tid = ".S::sqlEscape($tid)." AND  pid in ($pidsStr)");
+					pwQuery::update('pw_pinglog', 'tid=:tid  AND pid IN(:pid)', array($tid,$pids), array('tid'=>$splitid));
+				}
+				//$db->update("UPDATE pw_pinglog SET  pid = 0 WHERE tid = ".S::sqlEscape($tid)." AND  pid =  ".S::sqlEscape($newTopic['pid'])." ");
+				pwQuery::update('pw_pinglog', 'tid=:tid  AND pid=:pid', array($tid,$newTopic['pid']), array('pid'=>0));
 				$pingService->update_markinfo($fid, $tid, 0);
 				$pingService->update_markinfo($fid, $splitid, 0);
 
@@ -631,7 +635,8 @@ if ($action == "topped") {
 				//拆分新帖数据更新操作
 				$lastPost = $db->get_one("SELECT * FROM $pw_posts WHERE tid = ".S::sqlEscape($splitid)." ORDER BY pid DESC LIMIT 1"); //最后回复帖
 				$pidsNumSplit = $pidsNum + 1;
-				$db->query("UPDATE pw_threads SET replies = replies + $pidsNumSplit , lastpost = ".S::sqlEscape($lastPost['postdate'])." , lastposter = ".S::sqlEscape($lastPost['author'])." WHERE  tid = ".S::sqlEscape($splitid));	//回复
+				//$db->query("UPDATE pw_threads SET replies = replies + $pidsNumSplit , lastpost = ".S::sqlEscape($lastPost['postdate'])." , lastposter = ".S::sqlEscape($lastPost['author'])." WHERE  tid = ".S::sqlEscape($splitid));	//回复
+				pwQuery::update('pw_threads', "tid=:tid",array($splitid),array('lastpost'=>$lastPost['postdate'],'lastposter'=>$lastPost['author']),array(PW_EXPR=>array("replies=replies+{$pidsNumSplit}")));	//回复
 				Perf::gatherInfo('changeThreads', array('tid'=>$splitid));
 
 				//被拆分的数据更新
@@ -673,8 +678,12 @@ if ($action == "topped") {
 
 				//评分操作
 				$db->update("UPDATE pw_pinglog SET tid = ".S::sqlEscape($splitid)." , pid = ".S::sqlEscape($postNewId)." WHERE tid = ".S::sqlEscape($tid)." AND  pid = 0");
-				if($pidsStr) $db->update("UPDATE pw_pinglog SET tid = ".S::sqlEscape($splitid)." WHERE tid = ".S::sqlEscape($tid)." AND  pid in ($pidsStr)");
-				$db->update("UPDATE pw_pinglog SET  pid = 0 WHERE tid = ".S::sqlEscape($tid)." AND  pid =  ".S::sqlEscape($postInfo['pid'])." ");
+				if($pidsStr) {
+					//$db->update("UPDATE pw_pinglog SET tid = ".S::sqlEscape($splitid)." WHERE tid = ".S::sqlEscape($tid)." AND  pid in ($pidsStr)");
+					pwQuery::update('pw_pinglog', 'tid=:tid  AND pid IN(:pid)', array($tid,$pids), array('tid'=>$splitid));
+				}
+				//$db->update("UPDATE pw_pinglog SET  pid = 0 WHERE tid = ".S::sqlEscape($tid)." AND  pid =  ".S::sqlEscape($postInfo['pid'])." ");
+				pwQuery::update('pw_pinglog', 'tid=:tid  AND pid=:pid', array($tid,$postInfo['pid']), array('pid'=>0));
 				$pingService->update_markinfo($fid, $tid, 0);
 				$pingService->update_markinfo($fid, $splitid, 0);
 
@@ -716,7 +725,8 @@ if ($action == "topped") {
 					'ptable'    => $db_ptable,//分表
 					'lastposter'=> $postInfo['author']
 				);
-				$db->update("INSERT INTO pw_threads SET " . S::sqlSingle($threadInfo));
+				//$db->update("INSERT INTO pw_threads SET " . S::sqlSingle($threadInfo));
+				$newId = pwQuery::insert("pw_threads" ,$threadInfo);
 				$newId = $db->insert_id();
 				$pw_tmsgs = GetTtable($newId); //获取分表表名
 				$pwtmsgInfo = array(
@@ -782,8 +792,14 @@ if ($action == "topped") {
 				Perf::gatherInfo('changeThreads', array('tid'=>$splitid));
 
 				//评分操作
-				if($pidsStr) $db->update("UPDATE pw_pinglog SET tid = ".S::sqlEscape($splitid)." WHERE tid = ".S::sqlEscape($tid)." AND  pid in ($pidsStr)");
-				if ($splittype == 0) $db->update("UPDATE pw_pinglog SET tid = ".S::sqlEscape($splitid)." , pid = 0 WHERE tid = ".S::sqlEscape($splitid)." AND  pid = ".S::sqlEscape($postInfo['pid']));
+				if($pidsStr) {
+					//$db->update("UPDATE pw_pinglog SET tid = ".S::sqlEscape($splitid)." WHERE tid = ".S::sqlEscape($tid)." AND  pid in ($pidsStr)");
+					pwQuery::update('pw_pinglog', 'tid=:tid  AND pid IN(:pid)', array($tid,$pids), array('tid'=>$splitid));
+				}
+				if ($splittype == 0) {
+					//$db->update("UPDATE pw_pinglog SET tid = ".S::sqlEscape($splitid)." , pid = 0 WHERE tid = ".S::sqlEscape($splitid)." AND  pid = ".S::sqlEscape($postInfo['pid']));
+					pwQuery::update('pw_pinglog', 'tid=:tid  AND pid =:pid', array($tid,$postInfo['pid']), array('tid'=>$splitid,'pid'=>0));
+				}
 				$pingService->update_markinfo($fid, $tid, 0);
 				$pingService->update_markinfo($fid, $splitid, 0);
 
@@ -818,7 +834,7 @@ if ($action == "topped") {
 				);
 		}
 
-		$refreshto = "read.php?tid=$tid&displayMode=1&page=$pahe";
+		$refreshto = "read.php?tid=$tid&ds=1&page=$pahe";
 		if (defined('AJAX')) {
 			Showmsg("ajaxma_success");
 		} else {
@@ -831,7 +847,7 @@ if ($action == "topped") {
 	S::gp(array('selid'));
 	empty($selid) && Showmsg('mawhole_nodata');
 	$pw_tmsgs = GetTtable($tid);
-	$tpcdb = $db->get_one("SELECT t.tid,t.fid,t.author,t.authorid,t.postdate,t.subject,t.topped,t.anonymous,t.ifshield,t.ptable,t.ifcheck,tm.aid FROM pw_threads t LEFT JOIN $pw_tmsgs tm ON tm.tid=t.tid WHERE t.tid='$tid'");
+	$tpcdb = $db->get_one("SELECT t.tid,t.fid,t.author,t.authorid,t.postdate,t.subject,t.topped,t.anonymous,t.ifshield,t.ptable,t.ifcheck,t.tpcstatus,tm.aid FROM pw_threads t LEFT JOIN $pw_tmsgs tm ON tm.tid=t.tid WHERE t.tid='$tid'");
 	if (!$tpcdb || $tpcdb['fid'] != $fid) {
 		Showmsg('undefined_action');
 	}
@@ -943,10 +959,10 @@ if ($action == "topped") {
 		$tucoolService = L::loadClass('tucool', 'forum');
 		$tucoolService->updateTucoolImageNum($tid);
 		
-		$refreshto = "read.php?tid=$tid&displayMode=1";
+		$refreshto = "read.php?tid=$tid&ds=1";
 		$delarticle = L::loadClass('DelArticle', 'forum');
 
-		if ($delarticle->delReply($threaddb, $db_recycle, $ifdel, true, array('reason' => $atc_content))) {
+		if ($delarticle->delReply($threaddb, $db_recycle, $ifdel, true, array('reason' => $atc_content,'tpcstatus' => $tpcdb['tpcstatus']))) {
 			$refreshto = "thread.php?fid=$fid";
 		}
 		if ($tpcdb['topped'] && $deltpc) {
@@ -992,7 +1008,7 @@ if ($action == "topped") {
 	//* Perf::gatherInfo('changeThreadWithForumIds', array('fid'=>$fid));
 	if ($db->affected_rows() > 0) {
 		$rt = $db->get_one("SELECT tid,author,postdate,subject FROM pw_threads WHERE fid=".S::sqlEscape($fid)."AND ifcheck='1' AND topped='0' ORDER BY lastpost DESC LIMIT 1");
-		$lastpost = $rt['subject']."\t".$rt['author']."\t".$rt['postdate']."\t"."read.php?tid=$rt[tid]&displayMode=1&page=e#a";
+		$lastpost = $rt['subject']."\t".$rt['author']."\t".$rt['postdate']."\t"."read.php?tid=$rt[tid]&ds=1&page=e#a";
 		//* $db->update("UPDATE pw_forumdata SET topic=topic+'1',article=article+'1',tpost=tpost+'1',lastpost=".S::sqlEscape($lastpost,false)." WHERE fid='$fid'");
 		$db->update(pwQuery::buildClause("UPDATE :pw_table SET topic=topic+'1',article=article+'1',tpost=tpost+'1',lastpost=:lastpost WHERE fid=:fid", array('pw_forumdata', $lastpost, $fid)));
 	}
@@ -1025,7 +1041,7 @@ if ($action == "topped") {
 			Showmsg('ajax_nextto');
 		}
 	} else {
-		refreshto("read.php?tid=$tid&displayMode=1&page=$page#$p",'operate_success');
+		refreshto("read.php?tid=$tid&ds=1&page=$page#$p",'operate_success');
 	}
 
 } elseif ($action == 'pingcp') {
@@ -1081,15 +1097,15 @@ if ($action == "topped") {
 		S::gp(array('selid'));
 
 		empty($selid) && Showmsg('masigle_nodata');
-		$db->update("UPDATE pw_pinglog SET ifhide=1 WHERE id IN(" . S::sqlImplode($selid) . ')');
+		//$db->update("UPDATE pw_pinglog SET ifhide=1 WHERE id IN(" . S::sqlImplode($selid) . ')');
+		pwQuery::update('pw_pinglog', 'id IN (:id)', array($selid), array('ifhide'=>1));
 		$pingService = L::loadClass("ping", 'forum');
 		$pingService->update_markinfo($tid, $pid);
-
 		if (defined('AJAX')) {
 			echo "success";
 			ajax_footer();
 		} else {
-			refreshto("read.php?tid=$tid&displayMode=1&page=$rpage",'operate_success');
+			refreshto("read.php?tid=$tid&ds=1&page=$rpage",'operate_success');
 		}
 	}
 } elseif ($action == 'viewip') {
@@ -1154,7 +1170,7 @@ if ($action == "topped") {
 		if (defined('AJAX')) {
 			Showmsg('masingle_banip_free');
 		} else {
-			refreshto("read.php?tid=$tid&displayMode=1&page=$page",'masingle_banip_free');
+			refreshto("read.php?tid=$tid&ds=1&page=$page",'masingle_banip_free');
 		}
 	}
 	$readdb['subject'] = substrs($readdb['subject'],35);
@@ -1193,7 +1209,7 @@ if ($action == "topped") {
 		if (defined('AJAX')) {
 			Showmsg('masingle_banip_ban');
 		} else {
-			refreshto("read.php?tid=$tid&displayMode=1&page=$page",'masingle_banip_ban');
+			refreshto("read.php?tid=$tid&ds=1&page=$page",'masingle_banip_ban');
 		}
 	}
 } elseif ($action == 'bansignature') {
@@ -1288,7 +1304,7 @@ if ($action == "topped") {
 		if (defined('AJAX')) {
 			Showmsg($showMsg);
 		} else {
-			refreshto("read.php?tid=$tid&displayMode=1&page=$page",$showMsg);
+			refreshto("read.php?tid=$tid&ds=1&page=$page",$showMsg);
 		}
 	}
 }

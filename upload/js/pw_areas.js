@@ -18,7 +18,7 @@ function addAreas(parentid, selectid, defaultid, hasFirst,isCascade) {
 	if (!obj) return false;
 	if (!defaultid) defaultid = -1;
 	var s = 0;
-	if (hasFirst) {
+	if (hasFirst || parentid == -1) {
 		obj.options[0] = new Option('请选择', '-1');
 		s = 1;
 	}
@@ -36,11 +36,14 @@ function addAreas(parentid, selectid, defaultid, hasFirst,isCascade) {
 		var selects = obj.parentNode.getElementsByTagName("select");
 		var current;
 		for (var x = 0; x < selects.length; x++) {
-			if (selects[x].id == selectid) current = x;
+			if (selects[x].id == selectid) {
+				current = x;
+			}
 		}
 		var lastAreaId = obj.value;
 		if (typeof(selects[current].onclick) == 'function' && selects[current]) selects[current].onclick(selects[current]);
 		for (var y = current + 1; y < selects.length; y++) {
+			if (selects[y]) selects[y].options[0] = new Option('请选择', '-1');
 			if (selects[y] && parent[lastAreaId]) {
 				for (var z = 0; z < parent[lastAreaId].length; z++) {
 					var otherAreaId = parent[lastAreaId][z];
@@ -80,14 +83,14 @@ function clearAreas(id, hasFirst) {
 
 function delArea(areaId,position){
 	pwConfirm("是否确认删除", position, function() {
-		ajax.send(ajaxurl,'&action=delArea&areaId='+areaId,function(){
+		ajax.send(ajaxurlarea,'&action=delArea&areaId='+areaId,function(){
 			var rText = ajax.request.responseText;
 			if (rText=='success') {
 				var province = getObj('province_areas').value;
 				var city = getObj('city_areas').value;
 				var parentid = getObj('parentid').value;
 				var provinceid = getObj('provinceid').value;
-				window.location.href = ajaxurl+'&province='+province+'&city='+city+'&parentid='+parentid+'&provinceid='+provinceid;
+				window.location.href = ajaxurlarea+'&province='+province+'&city='+city+'&parentid='+parentid+'&provinceid='+provinceid;
 			} else {
 				ajax.guide();
 			}

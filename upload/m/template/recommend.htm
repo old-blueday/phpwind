@@ -1,0 +1,75 @@
+<!--<?php
+defined('W_P') or exit('Forbidden');
+list($htmlAdvert,$arrayAdvert) = pwAdvert('Wap.Header',$fid,$lou,'thread');
+if($htmlAdvert){print <<<EOT
+-->
+	<div class="atop">$htmlAdvert</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+<div class="navigator">
+	<a href="#anch-2" id="anch-1" accesskey="1"><img alt="phpwind" src="$wapImages/x.gif" /></a>
+	<strong> 推荐话题</strong>
+</div>
+<!--
+EOT;
+if($db_waprecommend){
+$_style = $type ?  '' : 'class="current"';	
+print <<<EOT
+-->
+<div class="post_bottom">
+<a href="index.php?a=recommend" $_style>推荐</a>
+<!--
+EOT;
+foreach ($recommendTypes as $var) {
+$_style = $var[id] == $type ? 'class="current"' : '';
+print <<<EOT
+-->
+	&#8226 <a href="index.php?a=recommend&type=$var[id]" $_style>$var[typename]</a>
+<!--
+EOT;
+}print <<<EOT
+-->	
+</div>
+<div class="sectionidx">
+<!--
+EOT;
+foreach($recommendbs as $val){print <<<EOT
+-->
+$val[index]. <a href="$val[link]">$val[subject]</a>
+<!--
+EOT;
+if($val['tid']){print <<<EOT
+-->
+（回<a href="index.php?a=reply_all&tid=$val[tid]">$val[replies]</a>/阅$val[hits]）
+<br><span class="reply">[<a href="index.php?a=myhome&uid=$val[authorid]" class="reply_a">$val[lastposter]</a> $val[lastpost]]</span>
+<!--
+EOT;
+}if($val[ifupload]){print <<<EOT
+-->
+<img src="$wapImages/img.gif" />
+<!--
+EOT;
+}print <<<EOT
+-->
+<br/>
+<!--
+EOT;
+}print <<<EOT
+-->
+</div>
+$pages
+<!--
+EOT;
+}list($htmlAdvert,$arrayAdvert) = pwAdvert('Wap.Footer',$fid,$lou,'thread');
+if($htmlAdvert){print <<<EOT
+-->
+	<div class="abottom">$htmlAdvert</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+<!--
+EOT;
+?>-->

@@ -1,0 +1,51 @@
+<!--<?php
+include_once PrintEot('left');print <<<EOT
+-->
+<form action="$basename" method="post">
+<input type="hidden" name="step"  value="2"/>
+<h3 class="h1">云验证码设置</h3>
+<div class="admin_table mb10">
+		<table width="100%" cellspacing="0" cellpadding="0">
+		<tr class="tr1 vt">
+				<td class="td1">基本设置</td>
+				<td class="td2">
+					<ul class="list_A list_80">
+						<li><input type="radio" value="1" name="config[cloudgdcode]" $cloudgdcode_Y>开启</li>
+						<li><input type="radio" value="0" name="config[cloudgdcode]" $cloudgdcode_N>关闭</li>
+					</ul>
+				</td>
+				<td class="td2"><div class="help_a">开启后将使用云验证码，其他的验证码设置项对云验证码无效<br/>关闭则使用系统验证码<br/>云验证码能够有效增强系统的安全性， 并且降低系统资源的消耗</div></td>
+		</tr>
+	</table>
+</div>
+
+<input type="hidden" name="step"  value="2"/>
+<h3 class="h1">应用场景</h3>
+<div class="admin_table mb10">
+		<table width="100%" cellspacing="0" cellpadding="0">
+		<tr class="tr1 vt">
+			<td class="td1">开启验证码</td>
+			<td class="td2">
+				<ul class="list_A list_120">
+					<li><input type="checkbox" value="1" name="gdcheck[]" $gdcheck_0 /> 注册</li>
+					<li><input type="checkbox" value="2" name="gdcheck[]" $gdcheck_1 /> 前台登录</li>
+					<li><input type="checkbox" value="4" name="gdcheck[]" $gdcheck_2 /> 发帖</li>
+					<li><input type="checkbox" value="8" name="gdcheck[]" $gdcheck_3 /> 消息</li>
+					<li><input type="checkbox" value="32" name="gdcheck[]" $gdcheck_5 /> 后台登录</li>
+					<li><input type="checkbox" name="config[diary_gdcheck]" value="1" $gdcheck_diary />日志</li>
+					<li><input type="checkbox" name="config[photos_gdcheck]" value="1" $gdcheck_photos />创建相册</li>
+					<li><input type="checkbox" name="config[groups_gdcheck]" value="1" $gdcheck_groups />创建群组</li>
+					<li><input type="checkbox" name="config[groups_p_gdcheck]" value="1" $gdcheck_p_groups />群组发表新帖</li>
+					<li><input type="checkbox" value="16" name="gdcheck[]" $gdcheck_4 /> 其它</li>
+				</ul>
+			</td>
+			<td class="td2"><div class="help_a">请勾选需要开启验证码的操作</div></td>
+		</tr>
+	</table>
+</div>
+	<div class="tac mb10"><span id="submit" class="btn"><span><button type="submit" onfocus="blur();">提 交</button></span></span></div>
+</form>
+<!--
+EOT;
+include_once PrintEot('adminbottom');
+?>-->

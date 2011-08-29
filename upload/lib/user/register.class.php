@@ -36,6 +36,7 @@ class PW_Register {
 			' ',
 			"'",
 			'"',
+			'!',
 			'/',
 			'*',
 			',',
@@ -47,6 +48,7 @@ class PW_Register {
 			'#',
 			'%',
 			'?',
+			'。',
 			'　'
 		);
 	}
@@ -358,6 +360,7 @@ class PW_Register {
 	 */
 	function checkPwd($regpwd, $regpwdrepeat) {
 		list($regminpwd, $regmaxpwd) = explode("\t", L::reg('rg_pwdlen'));
+		list($regpwd, $regpwdrepeat) = array(html_entity_decode($regpwd), html_entity_decode($regpwdrepeat));
 		if (strlen($regpwd) < $regminpwd) {
 			Showmsg('reg_password_minlimit',$GLOBALS['showPwdLogin']);
 		} elseif ($regmaxpwd && strlen($regpwd) > $regmaxpwd) {

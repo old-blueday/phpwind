@@ -103,7 +103,7 @@ EOT;
 			if (times == 2){
 				times = 0;
 			}
-			var keyword = $('keyword').value;
+			var keyword = getObj('keyword').value;
 			if (keyword.length > 1) {
 				PW.Dialog({
 					id: "search",
@@ -190,7 +190,7 @@ EOT;
 				}
 				var lastMenu;
 				var lastClick;
-				var leftMenu=$('x-shortcuts').getElementsByTagName("LI");/*获取左侧菜单元素 原来是 * */
+				var leftMenu=getObj('x-shortcuts').getElementsByTagName("LI");/*获取左侧菜单元素 原来是 * */
 				var mouseover=function(evt){
 					var ev= evt||event;
 					var el = ev.srcElement ? ev.srcElement : ev.target;
@@ -226,7 +226,7 @@ EOT;
 							return;/*抑制错误,开发时需要调试*/
 							//return alert(e.message||e)
 						}
-						c.body = $('x-desktop');
+						c.body = getObj('x-desktop');
 						c.left = this.offsetWidth - c.body.offsetLeft + c.ROOT.scrollLeft-146;/*左边宽度*/
 						c.top = ev.clientY-ev.offsetY + c.ROOT.scrollTop-71;/*顶部高度 100=60(头高度)+40(箭头高度)*/
 						c.render();
@@ -249,7 +249,7 @@ EOT;
 
 					}
 				}
-				$('x-shortcuts').onmouseover =mouseover;
+				getObj('x-shortcuts').onmouseover =mouseover;
 				killMenu=function(){
 					for (var i in PW.Menu.all) {
 						PW.Menu.all[i].remove ? PW.Menu.all[i].remove() : 0;
@@ -264,7 +264,7 @@ EOT;
 				//Smenu = new PW.SettingsMenu().render();
 				//PW.Dialog({id:"home",name:'后台首页',url:"$admin_file?adminjob=admin&job=desktop"});
 				PW.openHome();
-				Cookie.get('tipOpened')?0:($("searchTip") || document.body).style.display='';
+				Cookie.get('tipOpened')?0:(getObj("searchTip") || document.body).style.display='';
 				window.onerror=function(){return true;};
 			});
 			/*默认页*/
@@ -273,7 +273,7 @@ EOT;
 			}
 			/*设置当前*/
 			PW.setCurrent = function(current){
-				var elements = $("x-shortcuts").getElementsByTagName("li");
+				var elements = getObj("x-shortcuts").getElementsByTagName("li");
 				for(var i=0;i<elements.length;i++){
 					elements[i].className = "";
 				}

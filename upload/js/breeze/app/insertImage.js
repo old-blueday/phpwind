@@ -40,7 +40,7 @@ Breeze.namespace('app.insertImage', function(B) {
 					<label class="B_mr5"><input type="checkbox" name="savetoalbum" value="1">同时保存到</label>\
 					<select name="albumid" disabled><option>选择相册</option></select>\
 				</span>\
-				<span id="B_picuploader_container"><span id="B_picuploader_flash"></span></span>\
+				<span id="B_picuploader_container"><span id="B_picuploader_flash"><span id="uploaderTmpSpan" style="display:none;"><embed style="display:none;" src="images/blank.swf" type="application/x-shockwave-flash" wmode="transparent"/><em class="s2" style="position:relative;top:3px;">该浏览器尚未安装flash插件，<a href="http://www.adobe.com/go/getflashplayer" target="_blank">点击安装</a></em></span></span></span>\
 			</div>\
 			<div class="B_mb5">\
 				<div class="B_file_imgTip B_cc">\
@@ -83,7 +83,7 @@ Breeze.namespace('app.insertImage', function(B) {
 		},
 		imageSelector = {
 			id :'editor-insertImage',
-			load : function(elem, editor) {
+			load : function(elem) {
 				var id = this.id;
 				B.require('util.dialog', function(B) {
 					B.util.dialog({
@@ -92,9 +92,9 @@ Breeze.namespace('app.insertImage', function(B) {
 						data: menuPop.create(),
 						reuse: true,
 						callback: function(popup) {
-							InsertImage();//事件处理类
+							InsertImage(myeditor);//事件处理类
 							initList();
-							editor.area.appendChild(popup.win);//转移弹窗位置
+							myeditor.area.appendChild(popup.win);//转移弹窗位置
 						}
 					}, elem);
 				});
@@ -234,10 +234,10 @@ Breeze.namespace('app.insertImage', function(B) {
     /**
      * ImageInsert类
      */   
-    function InsertImage(elem) {
-        var self = this;
-        if( !(self instanceof InsertImage) ) {
-		    return new InsertImage();
+    function InsertImage() {
+        var _self = this;
+        if( !(_self instanceof InsertImage) ) {
+		    return new InsertImage(myeditor);
 	    }
         B.require('event',function(B) {//add event for ImageInsert
             var selector = '#'+ imageSelector.id,
@@ -248,7 +248,7 @@ Breeze.namespace('app.insertImage', function(B) {
 				B.addEvent(B.$(selector + ' #B_picuploader_savetoalbum input'), 'click', activateAlbum);
 				if (B.hasClass(B.$(selector + ' #tab_local'), 'current')) {
 					B.require('global.uploader', function(){
-						uploader.init('picuploader');
+						uploader.init('picuploader',myeditor);
 					});
 				}
 			}
@@ -290,9 +290,9 @@ Breeze.namespace('app.insertImage', function(B) {
 						B.removeClass(n,'current');
 					});
 					B.addClass(this, 'current');
-					if(this.id == 'tab_local'){
-						B.require('global.uploader', function(){uploader.init('picuploader');});
-					} else if (this.id == 'tab_album') {
+					if(this.id === 'tab_local'){
+						B.require('global.uploader', function(){uploader.init('picuploader',myeditor);});
+					} else if (this.id === 'tab_album') {
 						loadImageList();
 					}
 					e.preventDefault();
@@ -317,19 +317,20 @@ Breeze.namespace('app.insertImage', function(B) {
 	 */
 	B.app.insertImage = function(elem, callback, editor) {
 	    insertTrigger = callback;
-		if (B.$('#'+imageSelector.id)){
+		myeditor = editor;
+		if (B.$('#'+imageSelector.id)){//如果HTML已经生成，那么直接弹出框，无需初始化组件
 			B.util.dialog({
 				id:imageSelector.id,
 				reuse: true,
 				callback:function(){
 					if (B.$('#' + imageSelector.id + ' #tab_local') && B.hasClass(B.$('#tab_local'), 'current')) {
-						uploader.init('picuploader');
+						uploader.init('picuploader',myeditor);
 					}
 				},
 				pos: ['leftAlign', 'bottom']
 			}, elem);
 		} else {
-			imageSelector.load(elem, editor);
+			imageSelector.load(elem, myeditor);
 		}
     }
 });

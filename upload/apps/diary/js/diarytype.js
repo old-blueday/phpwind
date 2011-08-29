@@ -67,7 +67,7 @@ function create_dtid(id) {/*写日志页分类添加*/
 				if (isNaN(dtid)==false) {
 					var option = elementBind('option');
 					option.innerHTML = name;
-					getObj('dtid_add').parentNode.getElementsByTagName('button')[0].innerHTML= name;
+					getObj('dtid_add').parentNode.getElementsByTagName('a')[0].innerHTML= name;
 					//var innername = document.createTextNode(name);
 					//option.appendChild(innername);
 					option.value = dtid;

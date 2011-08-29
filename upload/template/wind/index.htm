@@ -47,40 +47,21 @@ EOT;
 EOT;
 }print <<<EOT
 -->
-<div id="infobox">
+<div id="infobox" class="cc mb10">
 	<ul class="fr">
-<!--
-EOT;
-if ($db_shiftstyle == 1) {
-if($_COOKIE['widthCfg'] == 1){print <<<EOT
--->
-		<li><a id="widthCfg" href="javascript:shiftStyle();" class="s2">[切换到窄版]</a></li>
-<!--
-EOT;
-} else {print <<<EOT
--->
-		<li><a id="widthCfg" href="javascript:shiftStyle();" class="s2">[切换到宽版]</a></li>
-<!--
-EOT;
-}}print <<<EOT
--->
-		<li><a href="apps.php?q=article">我的帖子</a></li>
-		<li><a href="searcher.php?sch_time=newatc">查看新帖</a></li>
-		<li><a href="searcher.php?digest=1">精华区</a></li>
+		<li class="mr10"><a href="searcher.php?sch_time=newatc">新帖</a></li>
+		<li class="mr5"><a href="searcher.php?digest=1">精华</a></li>
 <!--
 EOT;
 if (!empty($shortcutforum)){print <<<EOT
---><li id="id_shortcut" onclick="read.open('menu_shortcut',this.id,0,22);"><a href="javascript:;" class="link_down"><span>书签</span></a></li>
+--><li id="id_shortcut" onClick="read.open('menu_shortcut',this.id,0,22);" class="fr pd5"><a href="javascript:;" class="link_down"><span>书签</span></a></li>
 <!--
 EOT;
-}if ($skincount >1){print <<<EOT
---><li id="td_skin"><a href="javascript:;"><img src="$imgpath/pwicon/style.gif" align="absmiddle" alt="论坛风格切换" /></a></li>
-<!--
-EOT;
-}print<<<EOT
---><!--a href="rss.php" target="_blank" title="RSS订阅本版面最新帖子"><img src="$imgpath/$stylepath/rss.png" align="absmiddle" alt="rss" /></a-->
-    </ul>
-	<ul class="pw_ulC cc">
+}
+print<<<EOT
+-->
+	</ul>
+	<ul class="pw_ulC fl">
 <!--
 EOT;
 if($db_todaypost){print <<<EOT
@@ -92,32 +73,34 @@ EOT;
 }print <<<EOT
 -->
         <li>最高日<em>$hposts</em></li>
-        <li>主题<em>$topics</em></li>
+        <!--li>主题<em>$topics</em></li-->
         <li>帖子<em>$article</em></li>
         <li>会员<em><a href="member.php">$totalmember</a></em></li>
         <li class="none">新会员<em>$newmember</em></li>
     </ul>
-</div>
-<div id="pw_content">
-<!--
-EOT;
-if($db_newinfoifopen) portalEcho('bbsindex');print <<<EOT
--->
-<div class="c mb10">&nbsp;</div>
+</div><div id="pw_content" class="mb10">
 <!--
 EOT;
 if($threadright){print<<<EOT
 -->
 <script type="text/javascript" src="http://app.phpwind.net/static/js/client.js"></script>
-<script language="JavaScript">
+<script>
 var server = new PwJs.Server("pwthread");
 server.start();
 </script>
 <!--
 EOT;
-}if($notice_A){print <<<EOT
+}print <<<EOT
 -->
-<div class="noticebg">
+<div class="pr">
+<!--
+EOT;
+if($db_newinfoifopen) portalEcho('bbsindex');
+if($notice_A){
+$noticebg_newinfo = $db_newinfoifopen ? ' noticebg_newinfo' : '';
+print <<<EOT
+-->
+<div class="noticebg{$noticebg_newinfo}">
 	<div id="notice">
 		<div id="notice0">
 			<ul>
@@ -134,7 +117,7 @@ EOT;
 		</div>
 	</div>
 </div>
-<script language="javascript">
+<script>
 function bbsNoticePlay(){
 	if (bbsNoticeH){
 		if(parseInt(bbsNoticeC.style.height)<bbsNoticeC.scrollHeight)
@@ -158,19 +141,19 @@ var bbsNoticeO = setTimeout(bbsNoticePlay,4000);
 </script>
 <!--
 EOT;
-}else{print <<<EOT
+}print <<<EOT
 -->
-<div class="c mb10">&nbsp;</div>
+</div>
 <!--
 EOT;
-}if($db_iftag && $db_tagindex && $tagdb = L::config('tagdb','tagdb')){print <<<EOT
+if($db_iftag && $db_tagindex && $tagdb = L::config('tagdb','tagdb')){print <<<EOT
 -->
 <div class="t">
 	<div class="h"><h3 class="cateT">热门标签</h3></div>
 	<div class="tTable">
 	<table width="100%" cellspacing="0" cellpadding="0">
 		<tr>
-			<td style="padding-top:10px;">
+			<td style="padding:10px 0;">
 <!--
 EOT;
 $num=0;
@@ -198,7 +181,7 @@ if($forumdb[$cate['fid']]){
 $_adindex++;
 if($cate['across']){print <<<EOT
 -->
-<div id="t_$cate[fid]">
+<div id="t_$cate[fid]" class="t">
     <div class="h"><a class="closeicon fr cp" onclick="return IndexDeploy('$cate[fid]',0)"><img id="img_$cate[fid]" alt="展开收起" src="$imgpath/$stylepath/index/cate_$cate[deploy_img].gif" /></a>
 <!--
 EOT;
@@ -308,7 +291,7 @@ EOT;
 EOT;
 }else{print <<<EOT
 -->
-<div id="t_$cate[fid]">
+<div id="t_$cate[fid]" class="t">
     <div class="h"><a class="closeicon fr cp" onclick="return IndexDeploy('$cate[fid]',0)"><img id="img_$cate[fid]" alt="展开收起" src="$imgpath/$stylepath/index/cate_$cate[deploy_img].gif" /></a>
 <!--
 EOT;
@@ -399,10 +382,12 @@ EOT;
 							<td class="re">
 <!--
 EOT;
-if($forums[au]){print <<<EOT
+if($forums[au]){
+$cardusername = urlencode($forums[au]);
+print <<<EOT
 -->
 									<p><a href="$forums[ft]" class="s4">$forums[t]</a></p>
-									<p class="fNum">{$forums[newtitle]} <a href="u.php?username={$forums[au]}">$forums[au]</a></p>
+									<p class="fNum">{$forums[newtitle]} <a href="u.php?username={$forums[au]}" target="_blank" class=" _cardshow" data-card-url="pw_ajax.php?action=smallcard&type=showcard&username={$cardusername}" data-card-key="{$forums['au']}">$forums[au]</a></p>
 <!--
 EOT;
 }if($forums[pic]=='lock'){print <<<EOT
@@ -433,7 +418,9 @@ if($htmlAdvert){print <<<EOT
 EOT;
 }}}print <<<EOT
 -->
-<script language="JavaScript" src="js/Deploy.js"></script>
+</div>
+<div class="t" style="overflow:hidden;">
+<div style="margin-top:-2px;">
 <!--
 EOT;
 if($db_indexlink==1){print <<<EOT
@@ -449,22 +436,18 @@ EOT;
 }print <<<EOT
 -->
 					<strong>友情链接</strong></div>
-<div class="tTable"><table cellspacing="0" cellpadding="0" width="100%" style="table-layout:fixed;">
+				<div class="tTable">
 <!--
 EOT;
 foreach($sharelink[0] as $share){ print <<<EOT
 -->
-			<tr>
-				<td>$share</td>
-			</tr>
+			$share
 <!--
 EOT;
 }print <<<EOT
 -->
-			<tr>
-				<td><div class="sharelink2 cc">$sharelink[1]</div></td>
-			</tr>
-</table></div>
+			<div class="sharelink2 cc">$sharelink[1]</div>
+			</div>
 <!--
 EOT;
 }if($db_indexshowbirth && $brithcache!='empty'){print <<<EOT
@@ -531,7 +514,9 @@ EOT;
 		</tr>
 	</table>
 </div>
+	</div>
 </div>
+<script type="text/javascript" src="js/Deploy.js"></script>
 <!--
 EOT;
 $head_pop && require PrintEot($head_pop);

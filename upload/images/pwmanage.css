@@ -1,5 +1,7 @@
 /*layout*/
 .pw_wrap{width:700px;}
+
+body{ font-family:Arial;}
 /*pop*/
 .admin_table table{}
 .admin_table .tr1{}
@@ -52,8 +54,6 @@ textarea{border: 1px solid; border-color: #c0c0c0 #ededed #ededed #c0c0c0;}
 /*menu*/
 .menu{position:absolute;background:#fff;border:1px solid #d7e6f2;}
 .menu a{display:block;padding:4px 8px;}
-.menu-post{border:1px solid #a6cbe7;}
-.menu-post .menu-b{background:#ffffff;border:3px solid #d5e6ed;}
 .menu-half li{width:46%;float:left;}
 .menu-half li a{float:left;}
 .user-table td{padding:1em 1em .5em 2em;}
@@ -86,5 +86,14 @@ textarea{border: 1px solid; border-color: #c0c0c0 #ededed #ededed #c0c0c0;}
 .s6{color:#666;}
 .f14{ font-size:14px;}
 .mb10{margin-bottom:10px;}
-.regCorrect,.regIgnore{padding:40px 0 60px 160px;background:#fff url(register/regright2.png) 60px 40px no-repeat;border:1px solid #bfccd8;width:320px;margin:0 auto;-moz-border-radius:5px;-webkit-border-radius:5px;}
+.regCorrect,.regIgnore{padding:40px 0 60px 160px;background:#fff url(register/regright_big.png) 60px 40px no-repeat;border:1px solid #bfccd8;width:320px;margin:0 auto;-moz-border-radius:5px;-webkit-border-radius:5px;}
 .regIgnore{ background:#fff url(register/ignore.png) 60px 0 no-repeat;padding-top:5px;}
+
+/**/
+.pw_label{margin:0 10px 10px;height:205px;overflow-y:scroll;}
+.pw_label table{border:1px solid #cbdaea;}
+.pw_label table td,.pw_label table th{border:1px solid #cbdaea; font-weight:100;padding:5px;font-family:'Courier New', Courier, monospace;}
+.pw_label table th{background:#f4f8fc;}
+.pw_label table .tr_title td,.pw_label table .tr_title th{background:#f4f8fc; font-weight:700;}
+.pw_label table tr:hover td{background:#f4f8fc;}
+.pw_label table tr:hover th{background:#ecf3f9;}

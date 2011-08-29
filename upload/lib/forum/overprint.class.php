@@ -136,7 +136,7 @@ class PW_OverPrint {
 	
 	function getMultiUnRelatedsHTML($fid, $tids) {
 		$html = '<div style="width:270px;">';
-		$html .= '<div class="h" onmousedown="read.move(event);" style="cursor: move;"><a href="javascript:;"><img class="fr" src="images/close.gif" onclick="closep();"/></a>印戳设置</div>';
+		$html .= '<div class="h" onmousedown="read.move(event);" style="cursor: move;"><a href="javascript:;" onclick="closep();" class="adel">close</a>印戳设置</div>';
 		$html .= '<input type="hidden" name="overprinttids" id="overprinttids" value="' . implode(',', $tids) . '" />';
 		/*中间印戳选择 start*/
 		$html .= '<div class="overprint_opl cc">';
@@ -162,7 +162,7 @@ class PW_OverPrint {
 	function getunRelatedsHTML($fid, $tid) {
 		$isOverPrint = $this->getOverPrintByThreadId($tid);
 		$html = '<div style="width:270px;">';
-		$html .= '<div class="h" onmousedown="read.move(event);" style="cursor: move;"><a href="javascript:;"><img class="fr" src="images/close.gif" onclick="closep();"/></a>印戳设置</div>';
+		$html .= '<div class="h" onmousedown="read.move(event);" style="cursor: move;"><a href="javascript:;" onclick="closep();" class="adel">close</a>印戳设置</div>';
 		/*中间印戳选择 start*/
 		$html .= '<div class="overprint_opl cc">';
 		/*元素*/

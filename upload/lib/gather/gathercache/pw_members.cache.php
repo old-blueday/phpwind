@@ -9,7 +9,7 @@ class GatherCache_PW_Members_Cache extends GatherCache_Base_Cache {
 	var $_prefix = 'member_';
 
 	var $_membersField = array ('uid' => null, 'username' => null, 'password' => null, 'safecv' => null, 'email' => null, 'groupid' => null, 'memberid' => null, 'groups' => null, 'icon' => null, 'gender' => null, 'regdate' => null, 'signature' => null, 'introduce' => null, 'oicq' => null, 'aliww' => null, 'icq' => null, 'msn' => null, 'yahoo' => null, 'site' => null, 'location' => null, 'honor' => null, 'bday' => null, 'lastaddrst' => null, 'yz' => null, 'timedf' => null, 'style' => null, 'datefm' => null, 't_num' => null, 'p_num' => null, 'attach' => null, 'hack' => null, 'newpm' => null, 'banpm' => null, 'msggroups' => null, 'medals' => null, 'userstatus' => null, 'shortcut' => null );
-	var $_memberDataField = array ('uid' => null, 'postnum' => null, 'digests' => null, 'rvrc' => null, 'money' => null, 'credit' => null, 'currency' => null, 'lastvisit' => null, 'thisvisit' => null, 'lastpost' => null, 'onlinetime' => null, 'monoltime' => null, 'todaypost' => null, 'monthpost' => null, 'uploadtime' => null, 'uploadnum' => null, 'follows' => null, 'fans' => null, 'newfans' => null, 'newreferto' => null, 'newcomment' => null, 'onlineip' => null, 'starttime' => null, 'postcheck' => null, 'pwdctime' => null, 'f_num' => null, 'creditpop' => null, 'jobnum' => null, 'lastmsg' => null, 'lastgrab' => null, 'punch' => null );
+	var $_memberDataField = array ('uid' => null, 'postnum' => null, 'digests' => null, 'rvrc' => null, 'money' => null, 'credit' => null, 'currency' => null, 'lastvisit' => null, 'thisvisit' => null, 'lastpost' => null, 'onlinetime' => null, 'monoltime' => null, 'todaypost' => null, 'monthpost' => null, 'uploadtime' => null, 'uploadnum' => null, 'follows' => null, 'fans' => null, 'newfans' => null, 'newreferto' => null, 'newcomment' => null, 'onlineip' => null, 'starttime' => null, 'postcheck' => null, 'pwdctime' => null, 'f_num' => null, 'creditpop' => null, 'jobnum' => null, 'lastmsg' => null, 'lastgrab' => null, 'punch' => null,'newnotice' => null, 'newrequest' => null );
 	var $_memberInfoField = array ('uid' => null, 'adsips' => null, 'credit' => null, 'deposit' => null, 'startdate' => null, 'ddeposit' => null, 'dstartdate' => null, 'regreason' => null, 'readmsg' => null, 'delmsg' => null, 'tooltime' => null, 'replyinfo' => null, 'lasttime' => null, 'digtid' => null, 'customdata' => null, 'tradeinfo' => null );
 	var $_singleRightField = array ('uid' => null, 'visit' => null, 'post' => null, 'reply' => null );
 
@@ -452,7 +452,7 @@ class GatherCache_PW_Members_Cache extends GatherCache_Base_Cache {
 		return true;
 	}
 
-	function clearCacheForMemberCreditByUserIds() {
+	function clearCacheForMemberCreditByUserIds($userIds) {
 		$userIds = ( array ) $userIds;
 		foreach ( $userIds as $uid ) {
 			$this->_cacheService->delete ( $this->_getMemberCreditKey ( $uid ) );
@@ -460,7 +460,7 @@ class GatherCache_PW_Members_Cache extends GatherCache_Base_Cache {
 		return true;
 	}
 
-	function clearCacheForCmemberAndColonyByUserIds() {
+	function clearCacheForCmemberAndColonyByUserIds($userIds) {
 		$userIds = ( array ) $userIds;
 		foreach ( $userIds as $uid ) {
 			$this->_cacheService->delete ( $this->_getCmemberAndColonyKey ( $uid ) );
@@ -468,6 +468,14 @@ class GatherCache_PW_Members_Cache extends GatherCache_Base_Cache {
 		return true;
 	}
 
+	function clearCacheForMemberTagsByUserIds($userIds) {
+		$userIds = ( array ) $userIds;
+		foreach ( $userIds as $uid ) {
+			$this->_cacheService->delete ( $this->_getMemberTagsKey ( $uid ) );
+		}
+		return true;
+	}
+	
 	/**
 	 * 不通过缓存直接从数据库获取一组用户基本信息
 	 *
@@ -646,7 +654,15 @@ class GatherCache_PW_Members_Cache extends GatherCache_Base_Cache {
 		return $this->_prefix . 'colony_uid_' . $userId;
 	}
 
-	
+	/**
+	 * 获取用户标签在memcache缓存的key
+	 *
+	 * @param int $userId 用户id
+	 * @return string
+	 */
+	function _getMemberTagsKey($userId) {
+		return $this->_prefix . 'membertag_uid_' . $userId;
+	}
 	
 	
 	/************************ 分隔符**********************************/
@@ -733,6 +749,27 @@ class GatherCache_PW_Members_Cache extends GatherCache_Base_Cache {
 		if (!$membersAndMemberData) return array();
 		$singleRight = $this->getSingleRightByUserId($userId);
 		return  (array)$membersAndMemberData + ($singleRight ? (array)$singleRight : $this->_singleRightField);
-	}		
-	
+	}	
+		
+	/**
+	 * 根据一个用户id获取用户标签
+	 * 
+	 * @param int $uid 用户id
+	 * @return array
+	 */
+	function getMemberTagsByUserid($userId) {
+		$userId = S::int ( $userId );
+		if ($userId < 1) {
+			return false;
+		}
+		$key = $this->_getMemberTagsKey ( $userId );
+		$result = $this->_cacheService->get ( $key );
+		if ($result === false) {
+			$memberTagsService = L::loadClass('memberTagsService', 'user');
+			$result = $memberTagsService->getMemberTagsByUidFromDB($userId);
+			$result = $result ? $result : array();
+			$this->_cacheService->set ( $key,  $result);
+		}
+		return $result;
+	}
 }

@@ -37,6 +37,7 @@ if (!$_POST['step']){
 	$db_logintype = 1;
 	$logininfo = checkpass($username, $password, $safecv, 0);
 	if (!is_array($logininfo)) {
+		$logininfo == 'login_jihuo' && $logininfo = 'userbinding_not_activated';
 		Showmsg($logininfo);
 	}
 	list($uid) = $logininfo;
@@ -75,7 +76,9 @@ if (!$_POST['step']){
 	}
 	$db->update("UPDATE pw_userbinding u LEFT JOIN pw_members m ON u.uid=m.uid SET m.userstatus=m.userstatus|(1<<11) WHERE u.id=" . S::sqlEscape($id));
 	_clearMembersCache($id);
-
+// defend start	
+	CloudWind::yunUserDefend('bindaccount', $winduid, $windid, $timestamp, 0, 101,'','','',array('uniqueid'=>$uid));
+// defend end
 	refreshto("profile.php?action=modify&info_type=binding",'operate_success', 2, true);
 } elseif ($_POST['step'] == '4') {
 

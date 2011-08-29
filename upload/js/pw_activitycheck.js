@@ -3,7 +3,7 @@ function()
 {
 	Form =
 	{};
-	var $ = function(s)
+	var getObj = function(s)
 	{
 		return  document.getElementById(s);
 	};
@@ -90,7 +90,7 @@ function()
 				ale[i].onblur = function()
 				{
 					var getc = this.getAttribute("check");
-					var a = $("tip_" + this.name);
+					var a = getObj("tip_" + this.name);
 					a ? a.parentNode.removeChild(a) : 0;
 					var newerror = this.getAttribute("error");
 					/**
@@ -373,8 +373,8 @@ function getPayMethod () {
 			}
 		}
 		return paymethod;
-	} else if ($('AlreadyPaid').value) {
-		return $('AlreadyPaid').value;
+	} else if (getObj('AlreadyPaid').value) {
+		return getObj('AlreadyPaid').value;
 	} else {
 		return false;
 	}

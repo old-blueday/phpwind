@@ -130,6 +130,7 @@ class PW_pieceOperate {
 		$string = '<select name="'.$htmlName.'[]" multiple="multiple" '.$selectHeight.'>';
 		foreach ($config as $key=>$value) {
 			$selected = S::inArray($key,$default) ? 'selected' : '';
+			if ($key==0 && count($default)>1) $selected = '';	//此逻辑可能会有问题，当遇到时，此代码可以去除
 			$string .= '<option value="'.$key.'" '.$selected.'>'.$value.'</option>';
 		}
 		$string .= '</select>';

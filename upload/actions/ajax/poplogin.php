@@ -8,13 +8,13 @@ S::gp(array(
 	'fpage',
 	'anchor',
 	'option',
-	'displayMode'
+	'ds'
 ));
 $jumpurl = $db_bbsurl . '/read.php?tid=' . $tid;
 ($page > 1) && $jumpurl .= '&page=' . $page;
 ($fpage) && $jumpurl .= '&fpage=' . $fpage;
 ($toread) && $jumpurl .= '&toread=' . $toread;
-$displayMode && $jumpurl .= '&displayMode=' . $displayMode;
+$ds && $jumpurl .= '&ds=' . $ds;
 $jumpurl .= "#" . $anchor;
 $descript = getDescript($option);
 require_once PrintEot('poplogin');

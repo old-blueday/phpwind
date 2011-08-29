@@ -3,7 +3,7 @@ require_once(uTemplate::printEot('header'));
 require_once(uTemplate::printEot('user_appleft'));
 print<<<EOT
 -->
-<script src="js/pw_weibo.js"></script>
+<script type="text/javascript" src="js/pw_weibo.js"></script>
 <script>
 var transmitAction = '{$USCR}';
 </script>
@@ -33,26 +33,26 @@ print <<<EOT
 EOT;
 }print <<<EOT
 -->
-<!--新鲜事同步提示-->
+<!-- platform weibo app -->
 <!--
 EOT;
-if ($db_sinaweibo_status) {
-	if ($isBindWeibo && !$_COOKIE['ifShowSinaWeiboBound']) {
+if ($isSiteBindWeibo) {
+	if (!$isUserBindOne && !$_COOKIE['ifShowWeiboBind']) {
 print <<<EOT
 -->
-		<div id="syncSinaWeibo" class="spaceTip cc" style="margin:10px 15px 0;">
-			<a href="javascript:;" class="adel" onclick="SetCookie('ifShowSinaWeiboBound','1');displayElement('syncSinaWeibo', false);">关闭</a>
-			<span class="mr10">你产生的新鲜事将同步到新浪微博。<a href="profile.php?action=privacy&t=weibo">进入设置同步类型</a></span>
+		<div id="weiboBind" class="spaceTip cc" style="margin:10px 15px 0;">
+			<a href="javascript:;" class="adel" onclick="SetCookie('ifShowWeiboBind','1');displayElement('weiboBind', false);">关闭</a>
+			<span class="mr10 cp" onclick="self.location='profile.php?action=weibobind';">使用帐号通可一键登录社区，并可同步内容到新浪微博、腾讯微博等各大热门站点，快来设置吧！</span>
 		</div>
 <!--
 EOT;
 	}
-	if (!$isBindWeibo && !$_COOKIE['ifShowSinaWeiboBind']) {
+	if ($isUserBindOne && !$_COOKIE['ifShowWeiboSet']) {
 print <<<EOT
 -->
-		<div id="syncSinaWeibo" class="spaceTip cc" style="margin:10px 15px 0;">
-			<a href="javascript:;" class="adel" onclick="SetCookie('ifShowSinaWeiboBind','1');displayElement('syncSinaWeibo', false);">关闭</a>
-			<span class="mr10 cp" onclick="self.location='profile.php?action=privacy&t=weibo';">新鲜事可以同步新浪微博啦～立即设置，随时随地的同步新鲜事，你的地盘你做主哦</span>
+		<div id="weiboBind" class="spaceTip cc" style="margin:10px 15px 0;">
+			<a href="javascript:;" class="adel" onclick="SetCookie('ifShowWeiboSet','1');displayElement('weiboBind', false);">关闭</a>
+			<span class="mr10 cp" onclick="self.location='profile.php?action=weibobind';">你已经成功使用帐号通，进入设置同步内容类型。</span>
 		</div>
 <!--
 EOT;
@@ -61,7 +61,7 @@ EOT;
 print <<<EOT
 -->
 <!--end-->
-		<div class="p20">
+		<div class="p15">
 <!--
 EOT;
 list($htmlAdvert,$arrayAdvert) = pwAdvert('Site.u.IndexCenter',$fid);
@@ -78,7 +78,7 @@ EOT;
 					<li {$nav['all']} class="current" onclick="filterWeibo(this,'all');"><a href="javascript:;" hidefocus="true">全部</a></li>
 					<li {$nav[string]} onclick="filterWeibo(this,'strings');"><a href="javascript:;" hidefocus="true">文字</a></li>
 					<li {$nav[img]} onclick="filterWeibo(this,'imgs');"><a href="javascript:;" hidefocus="true">图片</a></li>
-					<li {$nav[none]} onclick="filterWeibo(this,'filterall');var frm = getObj('feedAdmin');frm.style.display=((frm.style.display=='block')?('none'):('block'));"><a href="javascript:;" class="link_down"  hidefocus="true"><span>更多筛选</span></a></li>
+					<li {$nav[none]}><a href="javascript:;" class="link_down s4"  hidefocus="true" id="morechoose"><span>更多筛选</span></a></li>
 				</ul>
 <!--
 EOT;
@@ -148,12 +148,18 @@ EOT;
                             <label class="mr20"><input name="filter[source][group]" type="checkbox" value="1" checked />&nbsp;群组</label>
 <!-- 
 EOT;
-}if($GLOBALS['db_sinaweibo_status']){print <<<EOT
+}
+/* platform weibo app */
+if($isSiteBindWeibo){
+	foreach ($userBindList as $bindType => $userBind) {
+		if (!$userBind['config']['allowSync']['weibo']) {continue;}
+print <<<EOT
 -->
-                            <label class="mr20"><input name="filter[source][sinaweibo]" type="checkbox" value="1" checked />&nbsp;新浪微博</label>
+                            <label class="mr20"><input name="filter[source][$bindType]" type="checkbox" value="1" checked />&nbsp;{$userBind['config']['title']}</label>
                      
 <!-- 
 EOT;
+	}
 }print <<<EOT
 -->
 						</td>
@@ -174,7 +180,22 @@ EOT;
                 </form>
 				</table>
 			</div>
-
+<script>
+window.onReady(function(){
+	//投票高级选项显示隐藏切换
+	var morechoose=getObj("morechoose") || getObj("morechoose") || getObj("morechoose");
+	var feedAdmin=getObj("feedAdmin")
+	toggleDisplay(morechoose,feedAdmin,function(){
+		if(morechoose.arrow&&morechoose.arrow=="up"){
+			morechoose.className="link_up s4";
+			morechoose.innerHTML="<span>收起选项</span>";
+		}else{
+			morechoose.className="link_down s4";
+			morechoose.innerHTML="<span>更多筛选</span>";
+		}
+	})	
+})
+</script>
 			<div class="conFeed" style="padding-bottom:0;">
 <!--
 EOT;
@@ -278,7 +299,7 @@ EOT;
 if (in_array($contenttype, array('','all','string', 'img'))) {
 	if ($weiboList) {
 		foreach ($weiboList as $key => $value) {
-			$method = $weiboService->getType($value['type']);
+			$method = $weiboService->getViewType($value['type']);
 			$weiboModelTemplate->$method($value);
 		}
 		if ($weiboCount >= $perpage) {print <<<EOT
@@ -332,17 +353,43 @@ if ($o_weibopost != '0') {print <<<EOT
 				</ul>
 <!--
 EOT;
+}if ($medalList) {
+print <<<EOT
+-->
+		<div class="card_small mb20">
+		<div class="popBottom" style="background:none;">
+		<div class="card_page"><a href="javascript:void(0)" class="card_pre_old" id="u_card_pre" hidefocus="true">上一组</a><a href="javascript:void(0)" class="card_next" id="u_card_next" hidefocus="true">下一组</a></div>
+<div class="card_medal_wrap">						
+<ul class="cc" id="u_cardMedal" style="width:290px;">	
+<!--
+EOT;
+foreach ($medalList as $medals) {
+$isUserGet = ($medals['is_have'] == 1) ? 'class="open"' : '';
+print <<<EOT
+-->
+<li  onmouseover="medalInfo.show({$medals['medal_id']},'{$a}',this,event)" onmouseout="medalInfo.hidden({$medals['medal_id']},this,event)" {$isUserGet}><a href="apps.php?q=medal"><img src="{$medals[smallimage]}" width="30" height="30"  alt="{$medals[name]}" /></a></li>					
+<!--
+EOT;
+}
+print <<<EOT
+-->
+</ul>
+</div>
+</div>
+</div>
+<!--
+EOT;
 }
 if($o_punchopen && $showPunch ){
 if($isPunch) {print <<<EOT
 -->
-			<span class="fr" style="padding:0 30px 0 0;"><button id="punch" type="button" onclick="punchJob({$reloadMoney});" class="card">每日打卡</button></span>
+			<div class="card fr" id="punch" onclick="punchJob({$reloadMoney});"><span>{$punchText}</span></div>
 <!--
 EOT;
 }else{
 print <<<EOT
 -->
-				<span class="fr" style="padding:0 30px 0 0;"><button type="button" class="card card_old" disabled>每日打卡</button></span>
+				<div class="card fr card_old"><span>{$punchText}</span></div>
 <!--
 EOT;
 }}
@@ -354,56 +401,34 @@ print <<<EOT
 				<p>级别：<a href="profile.php?action=permission&gid={$winddb[memberid]}" onmouseover="getObj('tips').style.display=''" onmouseout="getObj('tips').style.display='none'">{$ltitle[$winddb[memberid]]}</a></p>
 				<div id="tips" class="popTips" style="display:none"><div class="fl"><div class="spaceTiptri"></div></div><div class="cc"><span class="fr">{$totalcredit}/{$last}</span>升级提示<div class="c"></div><div class="perCent"><div class="perValue" style="width:{$percent}%;"></div></div></div></div>
 			</div>
+<!-- platform weibo app -->
 <!--
 EOT;
-if ($listmedals) {
-print <<<EOT
--->
-		<div class="pd15 mb10">
-<!--
-EOT;
-foreach($listmedals as $value){
-print <<<EOT
--->
-			$value
-<!--
-EOT;
-}print <<<EOT
--->
-		</div>
-<!--
-EOT;
-}print <<<EOT
--->
-<!-- 新浪app开通 -->
-<!--
-EOT;
-if ($db_sinaweibo_status) {
-	if ($isBindWeibo) {
+if ($isSiteBindWeibo) {
 print <<<EOT
 -->
 		<div class="pd15">
 			<div class="expandApp">
-				<a href="profile.php?action=privacy&t=weibo">新鲜事，就是要随时随地同步！</a><br />
-				你已开通的同步方式：<img src="u/images/expand/sina_n.png" alt="sina" align="absmiddle" />
-			</div>
-		</div>
+				<a class="cc" href="profile.php?action=weibobind">帐号通一键登录，随时随地玩新鲜事！</a>
 <!--
 EOT;
-	} else {
+
+	foreach ($userBindList as $bindType => $userBind) {
+		$tmpLogo = $userBind['isBind'] ? $userBind['config']['logo16x16'] : $userBind['config']['logoGray16x16'];
+		$tmpTitle = $userBind['config']['title'] . ($userBind['isBind'] ? '（已绑定）' : '（未绑定）');
 print <<<EOT
 -->
-		<div class="pd15">
-			<div class="expandApp">
-				<img src="u/images/expand/sina_o.png" alt="sina" class="mr5" />
-				<a href="javascript:;" onclick="window.open('$bindSinaWeiboUrl', 'sinaWeiboBind', 'height=520, width=850, toolbar=no, menubar=no, scrollbars=no, resizable=no, location=no, status=no');">玩新鲜事，就是要随时随地！</a>
-				<br />
-				绑定新浪帐号，就可以同步新鲜事啦!
-			</div>
-		</div>
+			<img title="{$tmpTitle}" alt="{$tmpTitle}"  src="{$tmpLogo}" align="absmiddle" />
 <!--
 EOT;
 	}
+
+print <<<EOT
+-->
+			</div>
+		</div>
+<!--
+EOT;
 }
 print <<<EOT
 -->
@@ -426,10 +451,12 @@ EOT;
 print <<<EOT
 -->
 			</ol>
-			<div class="mb15">
-				<form method="GET" action="apps.php">
-				<input type="hidden" name="q" value="weibo" /><input type="hidden" name="do" value="topics" />
-				<input name="topic" id="search_topic" type="text" value="查找新鲜事" class="input gray mr5"/><span class="bt2"><span><button type="submit" onclick="return check_search_apps()">搜索</button></span></span></form>
+			<div class="mb15 cc">
+				<div class="search">
+					<form method="GET" action="apps.php">
+					<input type="hidden" name="q" value="weibo" /><input type="hidden" name="do" value="topics" />
+					<input name="topic" id="search_topic" type="text" value="查找新鲜事" class="gray sip" style="width:120px;margin-left:5px;" /><button type="submit" onclick="return check_search_apps()">搜索</button></form>
+				</div>
 			</div>
 <!--
 EOT;
@@ -556,8 +583,8 @@ $dateString = get_date($visitor['timestamp'], 'Y-m-d H:i');
 print <<<EOT
 -->
 					<li style="margin:5px 18px 0 1px;">
-							<a href="{$db_userurl}{$visitor[uid]}" class="i"><img src="{$visitor[icon]}" width="48" height="48" /></a>
-							<p class="n"><a href="{$db_userurl}{$visitor[uid]}" alt="{$visitor[username]}" title="{$visitor[username]}">{$visitor[username]}</a></p>
+							<a href="{$db_userurl}{$visitor[uid]}" class="i _cardshow" target="_blank" data-card-url="pw_ajax.php?action=smallcard&type=showcard&uid={$visitor[uid]}" data-card-key="{$visitor['username']}"><img src="{$visitor[icon]}" width="48" height="48" /></a>
+							<p class="n"><a href="{$db_userurl}{$visitor[uid]}" alt="{$visitor[username]}" title="{$visitor[username]}" class=" _cardshow" target="_blank" data-card-url="pw_ajax.php?action=smallcard&type=showcard&uid={$visitor[uid]}" data-card-key="{$visitor['username']}">{$visitor[username]}</a></p>
 							<p class="t gray"><span title="$dateString">{$visitor[visittime]}</span></p>
 					</li>
 <!--
@@ -589,25 +616,25 @@ if ($member[uid]) {print <<<EOT
 -->
 					<dl class="cc dl">
 							<dt class="dt">
-									<a href="{$db_userurl}{$member[uid]}" class="img_50"><i><img src="{$member[face]}" width="48" height="48" /></i></a>
+									<a href="{$db_userurl}{$member[uid]}" class="img_50 _cardshow" target="_blank" data-card-url="pw_ajax.php?action=smallcard&type=showcard&uid={$member[uid]}" data-card-key="{$member['username']}"><i><img src="{$member[face]}" width="48" height="48" /></i></a>
 							</dt>
 							<dd class="dd">
-									<p><a href="{$db_userurl}{$member[uid]}" class="b">{$member[username]}</a></p>
+									<p><a href="{$db_userurl}{$member[uid]}" class="b _cardshow" target="_blank" data-card-url="pw_ajax.php?action=smallcard&type=showcard&uid={$member[uid]}" data-card-key="{$member['username']}">{$member[username]}</a></p>
 <!--
 EOT;
 if ($member[honor]) {print <<<EOT
 -->
-									<div class="lh_18">{$member[honor]}</div>
+									<div class="lh_22">{$member[honor]}</div>
 <!--
 EOT;
 } else {print <<<EOT
 -->
-									<div class="lh_18">该用户暂无签名</div>
+									<div class="lh_22">该用户暂无签名</div>
 <!--
 EOT;
 }print <<<EOT
 -->
-									<a href="javascript:;" class="follow" onclick="return Attention.add(this,'{$member['uid']}',1)">关注</a>
+									<a href="javascript:;" class="add_follow" onclick="return Attention.add(this,'{$member['uid']}',1)">加关注</a>
 							</dd>
 					</dl>
 <!--
@@ -652,10 +679,10 @@ print <<<EOT
 -->
 					<dl class="cc dl">
 							<dt class="dt">
-									<a href="{$db_userurl}{$birthday[uid]}" class="img_50"><i><img src="{$birthday[face]}" width="48" height="48" /></i></a>
+									<a href="{$db_userurl}{$birthday[uid]}" class="img_50 _cardshow" target="_blank" data-card-url="pw_ajax.php?action=smallcard&type=showcard&uid={$birthday[uid]}" data-card-key="{$birthday['username']}"><i><img src="{$birthday[face]}" width="48" height="48" /></i></a>
 							</dt>
 							<dd class="dd">
-									<p><a href="{$db_userurl}{$birthday[uid]}" class="b">{$birthday[username]}</a></p>
+									<p><a href="{$db_userurl}{$birthday[uid]}" class="b _cardshow" target="_blank" data-card-url="pw_ajax.php?action=smallcard&type=showcard&uid={$birthday[uid]}" data-card-key="{$birthday['username']}">{$birthday[username]}</a></p>
 									<div class="lh_18">$birthdayTime</div>
 									<p><a href="javascript:;" onclick="sendmsg('pw_ajax.php?action=msg&touid=$birthday[uid]');" title="送祝福">送祝福</a></p>
 							</dd>
@@ -674,7 +701,7 @@ EOT;
 	</div>
 	<div class="c"></div>
 </div>
-<script>
+<script type="text/javascript">
 var td_setMenu = {pz : 21}
 if(getObj('myFace')){
 	getObj('myFace').onmouseover = function() {displayElement('toModifyFace', true);}
@@ -737,11 +764,15 @@ function punchJob(money) {
 		var punchObj = getObj('punch');
 		var response = eval(ajax.request.responseText)[0];
 		if (response['flag']) {
-			punchObj.className = "card card_old";
+			punchObj.className = "card card_old fr";
 			//punchObj.disabled = true;//解决ff缓存问题
 			punchObj.onclick = '';
-			floatMoney(response['message']);
-			getObj('money').innerHTML = ajax.runscript(moneys);
+			var infomation = response['message'].split('\t');
+			getObj('punch').innerHTML = "<span>连续" + infomation[1] + "天打卡</span>";
+			floatMoney(infomation[0]);
+			var num = infomation[0].split('+');
+			num = parseInt(num[1]);
+			if (num > 0) getObj('money').innerHTML = money + num;
 		//	showDialog("success",response['message']);
 		} else {
 			showDialog("error",response['message'],2);
@@ -892,9 +923,119 @@ function filterWeibo(obj,type){//切换新鲜事类别
 	getWeiboList('filterweibo', 1, 'weiboFeed', 1, type);	
 	},300);
 	getObj('feedAdmin').style.display = 'none';
+	getObj("morechoose").innerHTML="<span>更多筛选</span>";
+	getObj("morechoose").className="link_down s4";
+}
+onReady(function(){
+	if(getObj("u_cardMedal")){
+		var userMedal=new usercard();
+		userMedal.prev=getObj("u_card_pre");
+		userMedal.next=getObj("u_card_next");
+		userMedal.medalNum=5;
+		userMedal.wrapWidth=175;
+		userMedal.medalList=getObj("u_cardMedal");
+		if(userMedal.medalList.getElementsByTagName("li").length<=5){
+			userMedal.next.className="card_next_old";
+			return false;
+		}
+		userMedal.medalAni();
+	}
+})
+
+//勋章卡片显示
+var contains = document.compareDocumentPosition ? function(a, b){
+		return !!(a.compareDocumentPosition(b) & 16);
+	} : function(a, b){
+		return a !== b && (a.contains ? a.contains(b) : true);
+	};
+var medalInfo = {
+	inter:null,
+	time:200,
+	obj:null,
+	data:[],
+	status:0,
+	//显示勋章信息
+	show : function (medalid, action, e,evt) {
+		var self=this;
+		this.obj=e;
+		var ele=evt.relatedTarget||evt.fromElement;
+		if(ele==e||contains(e,ele)){
+			if(this.status==1){
+				return false;
+			}
+		}else{
+			if(this.inter){
+				clearTimeout(this.inter);
+			}
+			this.inter=setTimeout(function(){
+				if (parseInt(medalid) < 1) return false;
+				for(var i=0,len=medalInfo.data.length;i<len;i++){
+					if(medalInfo.data[i].k==medalid){
+						medalInfo.fillCont(medalInfo.data[i].v);
+						return false;
+					}
+				}
+				ajax.send('apps.php?q=medal&a=behavior','id=' + medalid + '&atype=' + action,function(){
+					var rText = ajax.request.responseText.split('\t');
+					if (rText[0] == 'success') {
+						medalInfo.data.push({"k":medalid,"v":rText[1]})
+						medalInfo.fillCont(rText[1]);
+					}
+				});
+			},this.time)
+		}
+	},
+	fillCont:function(str){
+						var mousePos = this.mousePos();
+						var obj = getObj('medal_info_show');
+						obj.innerHTML = str;
+						obj.style.left = mousePos.x-111+ 'px';
+						obj.style.top = mousePos.y+7 + 'px';	
+						fadeIn(obj);
+						this.status=1;
+	},
+	//隐藏勋章信息框
+	hidden : function (type,i,e) {
+		var ele=e.relatedTarget||e.toElement;
+		if(ele==i||contains(i,ele)){
+			if(this.status==0){
+				return false;
+			}
+		}else{
+			if(this.inter){
+				clearTimeout(this.inter);
+			}
+			var show_medal_info = document.getElementById('medal_info_show');
+			show_medal_info.style.display = 'none';
+			this.status=0;
+		}
+		
+	},
+	//鼠标坐标
+	mousePos : function (e) {
+		var dd = document.documentElement;
+        var db = document.body;
+        var stop = dd.scrollTop + db.scrollTop
+        var sleft = dd.scrollLeft + db.scrollLeft;
+        var cw = dd.clientWidth;
+        var ch = dd.clientHeight;
+        var bound = this.obj.getBoundingClientRect();
+        var left = bound.left;
+        var top = bound.top;
+        var h = this.obj.offsetHeight;
+        var w = this.obj.offsetWidth;
+        var oh = document.getElementById('medal_info_show').offsetHeight;
+        var ow = document.getElementById('medal_info_show').offsetWidth;
+        var x= (left + ow) > cw ? (sleft + left + w - ow) : (sleft + left);
+        var y= (top + oh + h) > ch ? (stop + top - oh) : (stop + top + h);
+		return {
+			x:x,y:y
+		}
+	}
 }
 </script>
-<script src="u/js/friend.js"></script>
+<script type="text/javascript" src="u/js/friend.js"></script>
+<div id="medal_info_show" style="display:none;position:absolute;" onmouseover="this.style.display=''" onmouseout="this.style.display='none'" ></div>
 <!--
 EOT;
 $o_weibopost == '0' && include printEot('writesmile');

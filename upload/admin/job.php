@@ -160,7 +160,7 @@ if(empty($action)){
 		adminmsg('operate_success',"$basename&action=");
 	}
 	/*是否开启道具、勋章和邀请码*/
-	$medalIsOpen      = $jobService->checkIsOpenMedal()      ? "" : "disabled";
+	$medalIsOpen      = $db_md_ifopen      ? "" : "disabled";
 	$inviteCodeIsOpen = $jobService->checkIsOpenInviteCode() ? "" : "disabled";
 	$toolsIsOpen      = $db_toolifopen ? "" : "disabled"; 
 	
@@ -187,7 +187,7 @@ if(empty($action)){
 	$r_credit = $tools  = $medal = $usergroup = $invitecode = array();
 	$r_credit['num']    = ($category == "credit") ? $reward['num'] : "";
 	$r_tools['num']     = ($category == "tools") ? $reward['num'] : "";
-	$r_medal['day']     = ($category == "medal") ? $reward['day'] : "";
+	//$r_medal['day']     = ($category == "medal") ? $reward['day'] : "";
 	$r_usergroup['day'] = ($category == "usergroup") ? $reward['day'] : "";
 	if($category == "invitecode"){
 		$r_invitecode['num'] = $reward['num'];

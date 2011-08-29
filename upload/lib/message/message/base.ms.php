@@ -1109,9 +1109,24 @@ class MS_Base {
 	 * 更新用户消息数
 	 * @param $userIds
 	 */
-	function _updateUserMessageNumbers($userIds) {
+	function _updateUserMessageNumbers($userIds,$category = null) {
 		$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
-		$userService->updatesByIncrement($userIds, array('newpm' => 1));
+		$messageServer = L::loadClass('message', 'message');
+		!S::isArray($userIds) && $userIds = array($userIds);
+		foreach ($userIds as $userid) {
+			list(,$messageNumber,$noticeNumber,$requestNumber,$groupsmsNumber) = $messageServer->countAllByUserId($userid);
+			switch ($category) {
+				case $this->_notice:
+					$userService->update($userid, array(), array('newnotice' => $noticeNumber));
+					break;
+				case $this->_request:
+					$userService->update($userid, array(), array('newrequest' => $requestNumber));
+					break;
+				default:
+					$userService->update($userid, array('newpm' => $messageNumber + $groupsmsNumber));
+			}
+		}
+		return true;
 	}
 	/**
 	 * 通过消息ID获取参与者

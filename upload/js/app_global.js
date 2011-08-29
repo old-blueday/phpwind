@@ -5,7 +5,7 @@ function pwConfirm(title,position,callback){
 		getObj('oldinfo').parentNode.removeChild(getObj('oldinfo'));
 	}
 	var container 	= elementBind('div','container_del','','position: absolute;z-index:1011');
-	($('upPanel')||document.body).appendChild(container);
+	(getObj('upPanel')||document.body).appendChild(container);
 	closefm = callback;
 	var pw_box = '<div class="popout"><table cellspacing="0" cellpadding="0" border="0"><tbody><tr><td class="bgcorner1"></td><td class="pobg1"></td><td class="bgcorner2"></td></tr><tr><td class="pobg4"></td><td><div id="box_container" class="popoutContent pr" style="width: 210px;height:78px;"><iframe frameborder="0" style="position:absolute;top:0;width:100%;height:100px;filter:Alpha(opacity=0);_filter:Alpha(opacity=0);opacity:.0;"></iframe><div style="position:absolute;width:100%;"><div class="p15 cc">'+title+'</div><div class="popBottom"><span class="btn2"><span><button onclick="delElement(\'container_del\');closefm();" type="button">确 定</button></span></span><span class="bt2"><span><button onclick="delElement(\'container_del\');" type="button">取消</button></span></span></div></div></div></td><td class="pobg2"></td></tr><tr><td class="bgcorner4"></td><td class="pobg3"></td><td class="bgcorner3"></td></tr></tbody></table></div>';
 	container.innerHTML = pw_box;
@@ -36,7 +36,7 @@ function pwConfirmExtend(title,position,callback){
 		getObj('oldinfo').parentNode.removeChild(getObj('oldinfo'));
 	}
 	var container 	= elementBind('div','container_del','','position: absolute;z-index:1011');
-	($('upPanel')||document.body).appendChild(container);
+	(getObj('upPanel')||document.body).appendChild(container);
 	closefm = callback;
 	var pw_box = '<div class="popout"><table cellspacing="0" cellpadding="0" border="0"><tbody><tr><td class="bgcorner1"></td><td class="pobg1"></td><td class="bgcorner2"></td></tr><tr><td class="pobg4"></td><td><div id="box_container" class="popoutContent pr" style="width: 210px;height:110px;"><iframe frameborder="0" style="position:absolute;top:0;width:100%;height:100px;filter:Alpha(opacity=0);_filter:Alpha(opacity=0);opacity:.0;"></iframe><div style="position:absolute;width:100%;"><div class="p15 cc" style="height:43px;overflow:hidden;">'+title+'</div><div class="popBottom"><span class="btn2"><span><button onclick="delElement(\'container_del\');closefm();" type="button">确 定</button></span></span><span class="bt2"><span><button onclick="delElement(\'container_del\');" type="button">取消</button></span></span></div></div></div></td><td class="pobg2"></td></tr><tr><td class="bgcorner4"></td><td class="pobg3"></td><td class="bgcorner3"></td></tr></tbody></table></div>';
 	container.innerHTML = pw_box;
@@ -152,47 +152,62 @@ function SETTOP ()
 	read.menu.style.top="50px";
 }
 /**为了能用***/
-function iPhotoForm(obj)
-{
-	try
-	{
-		var tds = obj.contentWindow.document.getElementsByTagName('span') || [];
-		var tipText = '';
-		
-		for (var i = 0; i < tds.length; i++)
-		{
-			if (tds[i].className == 'f14')
-			{
-				tipText = tds[i].innerHTML.replace(/<.+?>/g, '');
-				break;
-			}
-		}
-
-		if (obj.contentWindow.document.body.innerHTML.indexOf('操作完成') > 0)
-		{
-			showDialog('success', '上传成功!');
+function iPhotoForm(obj) {
+	try {
+		var data = loadReturnedData(obj);
+		if (!data) return false;
+		if (data.indexOf('操作成功') > -1) {
+			showDialog('success', '上传成功!', 2);
 			obj.onload = null;
 			SETTOP();
 			getObj('uploadPhotoForm').reset();
-			parent.location.href= basename;
-		} else
-		{
-			showDialog('error', tipText);
+			setTimeout("parent.location.href = '" + basename + "';", 2000);
+		} else {
+			showDialog('error', data);
 			SETTOP();
 		}
 	} catch(e){}
 }
-function iDiaryForm (obj)
-{
-	var tds = obj.contentWindow.document.getElementsByTagName('span') || [];
-	var tipText = '';
-	for (var i = 0; i < tds.length; i++)
-	{
-		if (tds[i].className == 'f14')
-		{
-			tipText = tds[i].innerHTML.replace(/<.+?>/g, '');
-			break;
+
+function loadReturnedData(obj) {
+	var _innerText = obj.contentWindow.document.documentElement.innerText;
+	var _textContent = obj.contentWindow.document.documentElement.textContent;
+	var data = '';
+	if (_innerText == undefined && _textContent==undefined) {
+		return false;
+	}
+	if (-[1,]) {
+		data = _textContent;
+	} else {
+		var rules = /<!\[CDATA\[([\s\S]+)\]\]>/.exec(_innerText);
+		if(rules && rules[1]){
+			data = rules[1].replace(/^\s+|\s+$/g, '');
+		} else {
+			var xmlDoc = obj.contentWindow.document.XMLDocument;
+			if(xmlDoc){
+				data = xmlDoc.text;
+			}else{
+				data = _innerText;
+			}
 		}
 	}
-	obj.contentWindow.document.body.innerHTML.indexOf('操作完成') == -1 ? (showDialog('error', tipText) & SETTOP() & (document.FORM.Submit.disabled = false)) : showDialog('success', '日志发表成功！') & (parent.location.href = 'apps.php?q=diary') & setEditorContent() & (SETTOP()) & getObj('FORM').reset();
+	return data;
+}
+
+function iDiaryForm (obj) {
+	try {
+		var data = loadReturnedData(obj);
+		if (!data) return false;
+		var rText = data.split('\t');
+		if (rText[0] == 'success') {
+			showDialog('success', '日志发表成功！', 2);
+			SETTOP();
+			getObj('FORM').reset();
+			setTimeout("parent.location.href = '" + rText[1] + "';", 2000);
+		} else {
+			document.FORM.Submit.disabled = false;
+			showDialog('error', data);
+			SETTOP();
+		}
+	} catch(e){}
 }

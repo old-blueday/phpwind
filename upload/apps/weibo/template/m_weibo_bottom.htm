@@ -9,8 +9,8 @@ print<<<EOT
 <meta name="description" content="phpwind" />
 <meta name="keywords" content="phpwind" />
 <base id="headbase" href="$db_bbsurl/" />
-<link rel="stylesheet" href="images/pw_core.css" />
-<link rel="stylesheet" href="u/images/style.css" />
+<link rel="stylesheet" href="images/pw_core.css?{$GLOBALS['wind_repair']}" />
+<link rel="stylesheet" href="u/images/style.css?{$GLOBALS['wind_repair']}" />
 <style type="text/css">
 html,body{padding:0;margin:0;background:#fff;overflow:hidden;}
 /*home info*/
@@ -28,9 +28,9 @@ html,body{padding:0;margin:0;background:#fff;overflow:hidden;}
 .limit{color:#444444;}
 .homeSk{background:url(u/themes/default/images/textarea.png) no-repeat;}
 </style>
-<SCRIPT type="text/javascript" LANGUAGE="JavaScript" src="js/core/core.js"></SCRIPT>
-<script type="text/javascript" language="JavaScript" src="js/pw_ajax.js"></script>
-<script language="JavaScript">
+<script type="text/javascript" src="js/core/core.js"></script>
+<script type="text/javascript" src="js/pw_ajax.js"></script>
+<script>
 var imgpath = '$imgpath';
 var verifyhash = '$verifyhash';
 var winduid = '$winduid';
@@ -56,8 +56,8 @@ print <<<EOT
 EOT;
 }print <<<EOT
 -->
-<script language="JavaScript" src="js/app_comment.js"></script>
-<script language="JavaScript" src="js/global.js"></script>
+<script type="text/javascript" src="js/app_comment.js"></script>
+<script type="text/javascript" src="js/global.js"></script>
 </body></html>
 <!--
 EOT;

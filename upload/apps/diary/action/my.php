@@ -293,7 +293,7 @@ if ($a == 'list') {//我的日志列表
 			$db->update("UPDATE pw_attachs SET did=" . S::sqlEscape($did) . " WHERE aid IN(" . S::sqlImplode($aids) . ")");
 		}
 
-		if (!$privacy && !$myAppsData['index_privacy']) {
+		if (!$privacy && !$myAppsData['index_privacy'] && !$myAppsData['diary_privacy']) {
 			$userCache = L::loadClass('Usercache', 'user');
 			$userCache->delete($winduid, 'carddiary');
 			updateDatanalyse($did,'diaryNew',$timestamp);
@@ -328,6 +328,9 @@ if ($a == 'list') {//我的日志列表
 		}
 		$url = "{$basename}a=detail&did=$did";
 		$msg = defined('AJAX') ?  "success\t".$url : 'operate_success';	
+		// defend start
+		CloudWind::YunPostDefend ( $winduid, $windid, $groupid, $did, $atc_title, $atc_content, 'diary' );
+		// defend end
 		refreshto($url,$msg);
 	}
 } elseif ($a == 'edit') {
@@ -514,6 +517,9 @@ if ($a == 'list') {//我的日志列表
 				countPosts("-$affected_rows");
 			}
 		}
+		// defend start
+		CloudWind::YunPostDefend ( $winduid, $windid, $groupid, $did, $atc_title, $atc_content, 'editdiary' );
+		// defend end
 		$url = "{$basename}a=detail&did=$did";
 		$msg = defined('AJAX') ?  "success\t".$url : 'operate_success';	
 		refreshto($url, $msg);

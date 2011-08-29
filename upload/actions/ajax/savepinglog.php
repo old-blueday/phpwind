@@ -16,7 +16,8 @@ if (!$isGM && !pwRights($pwforum->isBM($windid), 'pingcp', $rt['fid'])) {
 	Showmsg('mawhole_right');
 }
 
-$db->update("UPDATE pw_pinglog SET record=" . S::sqlEscape($record) . " WHERE id=" . S::sqlEscape($id));
+//$db->update("UPDATE pw_pinglog SET record=" . S::sqlEscape($record) . " WHERE id=" . S::sqlEscape($id));
+pwQuery::update('pw_pinglog', 'id=:id', array($id), array('record'=>$record));	
 
 echo "success";
 # memcache reflesh

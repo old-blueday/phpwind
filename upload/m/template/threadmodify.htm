@@ -1,0 +1,44 @@
+<!--<?php
+defined('W_P') or exit('Forbidden');
+if($action == 'modify'){print <<<EOT
+-->
+<div class="navigator">
+	<a href="#anch-end"><img alt="phpwind" src="$wapImages/x.gif" /></a>
+	<a href="index.php?a=list">$db_bbsname</a>
+	&gt;<a href="index.php?a=forum&fid=$fid">$foruminfo[name]</a>
+</div>
+<div class="post_title">
+	<strong>编辑主题：</strong>
+</div>
+<div class="post_form">
+  <form id="form1" method="post" action="index.php?a=post&action=modify">
+  <input type="hidden" name="step" value="2" />
+  <input type="hidden" name="fid" value={$fid} />
+  <input type="hidden" name="tid" value={$tid} />
+    <p>标题：</p>
+       <label>
+        <input name="subject" type="text" size="30" value="{$atcdb[subject]}" />
+      </label>
+    </p>
+    <p>内容：</p>
+    <p>
+      <label>
+        <textarea name="content"   style="width:98%; height:70px;">{$atcdb[content]}</textarea>
+      </label>
+    </p>
+    <p>
+      <label>
+        <input type="submit" name="button" id="button" value="提交" />
+      </label>
+    </p>
+    <p>
+      <label>
+        <input type="submit" name="upload" id="button" value="提交并附加图片"/>
+      </label>
+    </p>
+  </form>
+</div>
+<div class="post_reply"><a href="index.php?a=forum&fid=$fid">&laquo;返回</a></div>
+<!--
+EOT;
+}?>-->

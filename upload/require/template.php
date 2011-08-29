@@ -27,11 +27,9 @@ if ($tid) {
 	} else {
 		$css_path = D_P.'data/style/wind_css.htm';
 	}
-	//* include_once pwCache::getPath(D_P.'data/bbscache/md_config.php');
-	pwCache::getData(D_P.'data/bbscache/md_config.php');
-	if ($md_ifopen) {
-		//* include_once pwCache::getPath(D_P.'data/bbscache/medaldb.php');
-		pwCache::getData(D_P.'data/bbscache/medaldb.php');
+
+	if ($db_md_ifopen) {
+		$_MEDALDB = L::config('_MEDALDB', 'cache_read');
 	}
 	$fieldadd = $tablaadd = '';
 	foreach ($customfield as $key => $val) {
@@ -186,7 +184,9 @@ if ($tid) {
 			require_once(PrintEot($readtpl));
 			$ceversion = defined('CE') ? 1 : 0;
 			$content = str_replace(array('<!--<!---->','<!---->'),array('',''),ob_get_contents());
-			$content.= "<script language=\"JavaScript\" src=\"http://init.phpwind.net/init.php?sitehash={$db_sitehash}&v=$wind_version&c=$ceversion\"></script>";
+			$content.= "<script type=\"text/javascript\">(function(d,t){
+var url=\"http://init.phpwind.net/init.php?sitehash={$db_sitehash}&v=$wind_version&c=$ceversion\";
+var g=d.createElement(t);g.async=1;g.src=url;d.body.appendChild(g)}(document,\"script\"));</script>";
 			ob_end_clean();
 			ObStart();
 			if (!is_dir(R_P.$db_readdir.'/'.$fid)) {
@@ -209,7 +209,7 @@ if ($tid) {
 	}
 }
 function htmread($read,$start_limit) {
-	global $tpc_author,$count,$timestamp,$db_onlinetime,$db_bbsurl,$attachdir,$attachpath,$_G,$tablecolor,$readcolorone,$readcolortwo,$lpic,$ltitle,$imgpath,$db_ipfrom,$db_showonline,$stylepath,$db_windpost,$db_windpic,$fid,$tid,$attachments,$aids,$db_signwindcode,$md_ifopen,$_MEDALDB,$db_shield;
+	global $tpc_author,$count,$timestamp,$db_onlinetime,$db_bbsurl,$attachdir,$attachpath,$_G,$tablecolor,$readcolorone,$readcolortwo,$lpic,$ltitle,$imgpath,$db_ipfrom,$db_showonline,$stylepath,$db_windpost,$db_windpic,$fid,$tid,$attachments,$aids,$db_signwindcode,$db_md_ifopen,$_MEDALDB,$db_shield;
 	//* include_once pwCache::getPath(D_P.'data/bbscache/level.php');
 	extract(pwCache::getData(D_P.'data/bbscache/level.php', false));
 	$read['lou'] = $start_limit;
@@ -231,11 +231,11 @@ function htmread($read,$start_limit) {
 		$read['face']		= showfacedesign($read['micon']);
 		if ($db_ipfrom == 1) $read['ipfrom'] = ' From:'.$read['ipfrom'];
 
-		if ($md_ifopen && $read['medals']) {
+		if ($db_md_ifopen && $read['medals']) {
 			$medals = '';
 			$md_a = explode(',',$read['medals']);
 			foreach ($md_a as $key=>$value) {
-				if ($value) $medals .= "<img src=\"hack/medal/image/{$_MEDALDB[$value][picurl]}\" title=\"{$_MEDALDB[$value][name]}\" alt=\"{$_MEDALDB[$value][name]}\"> ";
+				if ($value) $medals .= "<img src=\"{$_MEDALDB[$value][smallimage]}\" title=\"{$_MEDALDB[$value][name]}\" /> ";
 			}
 			$read['medals'] = $medals.'<br />';
 		} else {

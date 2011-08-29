@@ -262,12 +262,21 @@ class PW_Active {
 	 */
 	function getHotActive($nums) {
 		global $timestamp;
-		$rt = $this->_db->get_one("SELECT * FROM pw_cache WHERE name='hotactive_3' AND time>" . S::sqlEscape($timestamp - 1800));
-		if ($rt) {
+		if (perf::checkMemcache()){
+			$_cacheService = Perf::gatherCache('pw_cache');
+			$rt =  $_cacheService->getCacheByName('hotactive_3');			
+		} else {
+			$rt = $this->_db->get_one("SELECT * FROM pw_cache WHERE name='hotactive_3'");
+		}
+		if ($rt && $rt['time'] > $timestamp - 1800) {
 			return unserialize($rt['cache']);
 		} else {
 			list($activedb) = $this->searchList(array('createtime_s' => $timestamp - 2592000), 3, 0, 'members', 'DESC');
-			$this->_db->update("REPLACE INTO pw_cache SET " . S::sqlSingle(array('name' => 'hotactive_3', 'cache' => serialize($activedb), 'time' => $timestamp)));
+			pwQuery::replace(
+				'pw_cache',
+				array('name' => 'hotactive_3', 'cache' => serialize($activedb), 'time' => $timestamp)
+			);
+			//$this->_db->update("REPLACE INTO pw_cache SET " . S::sqlSingle(array('name' => 'hotactive_3', 'cache' => serialize($activedb), 'time' => $timestamp)));
 			return $activedb;
 		}
 	}

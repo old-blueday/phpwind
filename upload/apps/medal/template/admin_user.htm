@@ -1,0 +1,254 @@
+<!--<?php
+if(!defined('AJAX')){
+	include_once PrintEot('left');
+	include_once PrintApp('admin_header');
+}
+print<<<EOT
+-->
+<!--
+EOT;
+if ($type == 'list') { 
+print<<<EOT
+-->
+<h2 class="h1">勋章会员筛选</h2>
+<div class="admin_table">
+  <table width="100%" cellspacing="0" cellpadding="0"><tr><td class="p15">
+<form action="$basename&action=user" method="post">
+勋章名称 <select name="searchName" class="mr10">
+<option value="">选择全部勋章</option>
+<!--
+EOT;
+foreach ($openMedal as $v) {
+$selected = ($searchName == $v['medal_id']) ? 'selected="selected"' : '';
+print<<<EOT
+-->
+<option value="{$v[medal_id]}" $selected>{$v[name]}</option>
+<!--
+EOT;
+}
+print<<<EOT
+-->
+</select>
+</select>勋章获取途径 <select name="searchType" class="mr10">
+<option value="">不选择任何途径</option>
+<!--
+EOT;
+$searchTypeArr[$searchType] = 'selected="selected"';
+foreach ($issueWay as $k => $v) {
+print<<<EOT
+-->
+<option value="$k" $searchTypeArr[$k]>{$v}</option>
+<!--
+EOT;
+}
+print<<<EOT
+-->
+</select>用户名 <input name="searchUsername" value="$searchUsername" type="text" class="input mr5" /><span class="btn2"><span><button type="submit">提 交</button></span></span>
+</form>
+</td></tr></table>
+</div>
+<form action="$basename&action=user&type=batch" method="post" name="FORM">
+<h2 class="h1"><span class="mr10 fl">勋章会员</span><a href="javascript:void(0)"  onclick="sendmsg('$basename&action=user&type=add','',this.id,'');" id="imgadd" class="btn_add fl"><i>颁发勋章</i></a></h2>
+<div class="admin_table mb10">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <tr class="tr2">
+      <td width="30"><span onclick="CheckAll(document.FORM)" class="cp">全选</span></td>
+      <td style="width:80px;">用户名</td>
+      <td style="width:120px;">勋章名称</td>
+      <td style="width:100px;">勋章图标</td>
+      <td style="width:100px;">勋章发放机制</td>
+      <td style="width:100px;">勋章获取途径</td>
+      <td style="width:100px;">勋章获得时间</td>
+      <td style="width:150px;">勋章有效期（天）</td>
+      <td>操作</td>
+    </tr>
+<!--
+EOT;
+if ($medalAwardCount == 0) {
+print<<<EOT
+-->
+    <tr>
+      <td class="p10" colspan="9"><div class="admin_tips">啊哦，没有你要的信息！</div></td>
+    </tr>
+<!--
+EOT;
+} else {
+foreach ($medalAward as $v) {
+$time = date('Y-m-d', $v['timestamp']);
+$deadline  = ($openMedal[$v[medal_id]][confine] == 0) ? '永久' : $openMedal[$v[medal_id]][confine];
+if ($openMedal[$v[medal_id]]['type'] == 1) $deadline = '永久';
+print<<<EOT
+-->
+    <tr class="tr1 vt">
+      <td class="td2">
+<!--
+EOT;
+if ($openMedal[$v[medal_id]]['type'] == 2) {
+print<<<EOT
+--> 
+ <input type="checkbox" name="selid[]" value="$v[award_id]">
+<!--
+EOT;
+}
+print<<<EOT
+-->	 	</td>
+      <td class="td2">{$v[username]}</td>
+      <td class="td2">{$openMedal[$v[medal_id]][name]}</td>
+      <td class="td2"><img src="{$openMedal[$v[medal_id]][smallimage]}" width="24" width="24"  /></td>
+      <td class="td2">{$typeArr[$openMedal[$v[medal_id]][type]]}</td>
+      <td class="td2">{$issueWay[$v[type]]}</td>
+      <td class="td2">{$time}</td>
+      <td class="td2">{$deadline}</td>
+      <td class="td2">
+<!--
+EOT;
+if (in_array($openMedal[$v[medal_id]]['type'],array(0,1))) {
+print<<<EOT
+-->	
+--
+<!--
+EOT;
+} else {
+print<<<EOT
+-->	 
+<a href="javascript:"  onclick="sendmsg('$basename&action=user&type=del&id=$v[award_id]','',this.id,'');" >[摘除]</a>
+<!--
+EOT;
+}
+print<<<EOT
+-->	    
+
+	  
+	  </td>
+    </tr>
+   
+<!--
+EOT;
+} }
+print<<<EOT
+-->
+  </table>
+</div>
+<div class="mt10 cc">$pages</div>
+<div class="mb10 tac">
+	<span class="bt"><span><button type="button" onclick="CheckAll(document.FORM)">全 选</button></span></span>
+	<span class="btn"><span><button type="button" onclick="var selid = getSelid();sendmsg('$basename&action=user&type=batchdel&id='+selid,'',this.id,'');" >摘 除</button></span></span>
+</div>
+<script type="text/javascript" src="js/core/core.js"></script>
+<script type="text/javascript" src="js/global.js"></script>
+<script type="text/javascript" src="js/pw_ajax.js"></script>
+<script type="text/javascript">
+function getSelid() {
+	var val = '';
+	var obj = document.getElementsByName('selid[]');
+	var len = obj.length;
+	for (var i=0;i<len;i++) {
+		if (obj[i].checked == true) {
+			val += obj[i].value + '|';
+		}
+	}
+	return val;
+}
+</script>
+<!--
+EOT;
+} elseif ($type == 'add') { 
+print<<<EOT
+-->
+<form name="form" method="post" action="$basename&action=user&type=adddo" onsubmit="return false;">
+  <input type="hidden" name="step" value="2">
+  <input type="hidden" name="id" value="$editValue[id]">
+	<div style="width:300px;">
+  <h2 class="h1" style="cursor:move" onmousedown="read.move(event);">颁发勋章</h2>
+  <div class="admin_table mb10">
+    <table cellpadding="0" cellspacing="0" width="100%">
+      <tr class="tr1 vt">
+        <td class="td2" style="width:60px;">用户名</td>
+        <td class="td2"><input name="username" class="input input_wa" maxlength="20" value="">
+          &nbsp;</td>
+      </tr>
+      <tr class="tr1 vt">
+        <td class="td2">勋章名称</td>
+        <td class="td2"><select name="medal_id" class="select_wa">
+<!--
+EOT;
+foreach ($openManualMedals as $v) {
+print<<<EOT
+-->
+<option value="{$v[medal_id]}">{$v[name]}</option>
+<!--
+EOT;
+}
+print<<<EOT
+-->		
+		</select></td>
+      </tr>
+      <tr class="tr1 vt">
+        <td class="td2">颁发理由</td>
+        <td class="td2"><textarea name="descrip" class="textarea" style="width:152px;resize:none;"></textarea></td>
+      </tr>
+    </table>
+  </div>
+  <div class="tac mb10">
+		<span class="btn2"><span><button type="button" onclick="ajax.submit(this.form,ajax.guide)">提 交</button></span></span>
+		<span class="bt2"><span><button type="button" onclick="closep();">取 消</button></span></span>
+	</div>
+	</div>
+</form>
+
+<!--
+EOT;
+} elseif ($type == 'del') {
+print<<<EOT
+-->
+<form name="form" method="post" action="$basename&action=user&type=deldo&id=$id" onsubmit="return false;">
+	<div style="width:300px;">
+		<h2 class="h1" style="cursor:move" onmousedown="read.move(event);">摘除勋章</h2>
+		<div class="admin_table mb10">
+			<table cellpadding="0" cellspacing="0" width="100%">
+				<tr class="tr1 vt">
+					<td class="td2">备注</td>
+					<td class="td2"><textarea name="descrip" class="textarea" style="width:152px;resize:none;"></textarea></td>
+				</tr>
+			</table>
+		</div>
+		<div class="tac mb10">
+			<span class="btn2"><span><button type="button" onclick="ajax.submit(this.form,ajax.guide)">提 交</button></span></span>
+			<span class="bt2"><span><button type="button" onclick="closep();">取 消</button></span></span>
+		</div>
+	</div>
+</form>
+
+<!--
+EOT;
+} elseif ($type == 'batchdel') {
+print<<<EOT
+-->
+<form name="form" method="post" action="$basename&action=user&type=batch&id=$id" onsubmit="return false;">
+	<div style="width:300px;">
+		<h2 class="h1" style="cursor:move" onmousedown="read.move(event);">批量摘除</h2>
+		<div class="admin_table mb10">
+			<table cellpadding="0" cellspacing="0" width="100%">
+				<tr class="tr1 vt">
+					<td class="td2">备注</td>
+					<td class="td2"><textarea name="descrip" class="textarea" style="width:152px;resize:none;"></textarea></td>
+				</tr>
+			</table>
+		</div>
+		<div class="tac mb10">
+			<span class="btn2"><span><button type="button" onclick="ajax.submit(this.form,ajax.guide)">提 交</button></span></span>
+			<span class="bt2"><span><button type="button" onclick="closep();">取 消</button></span></span>
+		</div>
+	</div>
+</form>
+<!--
+EOT;
+}
+print<<<EOT
+-->
+<!--
+EOT;
+if(!defined('AJAX')){
+	include_once PrintEot('adminbottom');
+}
+?>-->

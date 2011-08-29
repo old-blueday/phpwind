@@ -60,6 +60,7 @@ $lang['bbscode'] = array (
 'reward_cancle'			=> '[结束悬赏]',
 'reward_toadmin'		=> '[联系版主]',
 'reward_finished'		=> '此帖悬赏结束',
+'reward_timeout'		=> '此悬赏帖已过期',
 'reward_author'			=> '最佳答案获得者',
 'reward_best_get'		=> '最佳答案奖励',
 'reward_help_get'		=> '热心助人奖励',

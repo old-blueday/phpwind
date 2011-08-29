@@ -344,8 +344,8 @@ class threadDelfile extends delfileInterface {
 			$tucoolInfo = $tucoolService->get($this->tid);
 			if ($this->attach['attachurl'] == $tucoolInfo['cover']) {
 				$attachService = L::loadClass('attachs', 'forum'); /* @var $attachService PW_Attachs */
-				$cover = $attachService->getLatestAttachByTidType($this->tid);
-				$tucoolService->setCover($this->tid, $cover);
+				$coverInfo = $attachService->getLatestAttachInfoByTidType($this->tid);
+				$tucoolService->setCover($this->tid, $coverInfo['attachurl'],$coverInfo['ifthumb']);
 			}
 		}
 		if ($updateThreadCache) {

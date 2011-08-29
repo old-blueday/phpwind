@@ -12,22 +12,22 @@ print <<<EOT
     <div class="navB">
 	<a href="{$baseUrl}?type=post" class="postMes">写新消息</a>
         <ul class="one" style="padding-top:0;">
-            <li id="left_sms"><img src="u/images/message/sms.png">&nbsp;<a href="{$baseUrl}?type=sms">站内信</a><em>{$messageNumber}</em></li>
-            <li id="left_notice"><img src="u/images/message/notice.png">&nbsp;<a href="{$baseUrl}?type=notice">通知</a><em>{$noticeNumber}</em></li>
-            <li id="left_request"><img src="u/images/message/request.png">&nbsp;<a href="{$baseUrl}?type=request">请求</a><em>{$requestNumber}</em></li>
-            <li id="left_groupsms"><img src="u/images/message/groupsms.png">&nbsp;<a href="{$baseUrl}?type=groupsms">群消息</a><em>{$groupsmsNumber}</em></li>
+            <li id="left_sms"><a href="{$baseUrl}?type=sms" hidefocus="true"><img src="u/images/message/sms.png"><span>站内信</span><em style="color:#ff5500;">{$messageNumber}</em></a></li>
+            <li id="left_notice"><a href="{$baseUrl}?type=notice" hidefocus="true"><img src="u/images/message/notice.png"><span>通知</span><em style="color:#ff5500;">{$noticeNumber}</em></a></li>
+            <li id="left_request"><a href="{$baseUrl}?type=request" hidefocus="true"><img src="u/images/message/request.png"><span>请求</span><em style="color:#ff5500;">{$requestNumber}</em></a></li>
+            <li id="left_groupsms"><a href="{$baseUrl}?type=groupsms" hidefocus="true"><img src="u/images/message/groupsms.png"><span>群消息</span><em style="color:#ff5500;">{$groupsmsNumber}</em></a></li>
 <!-- 
 EOT;
 if($db_history){
 print <<<EOT
 -->			
-			<li id="left_history"><img src="u/images/message/history.png">&nbsp;<a href="{$baseUrl}?type=history">历史消息</a><em></em></li>
+			<li id="left_history"><a href="{$baseUrl}?type=history" hidefocus="true"><img src="u/images/message/history.png">历史消息</a></li>
 <!-- 
 EOT;
 }
 print <<<EOT
 -->				
-					<li id="left_shield"><img src="u/images/message/history.png">&nbsp;<a href="{$baseUrl}?type=shield">消息设置</a></li>
+					<li id="left_shield"><a href="{$baseUrl}?type=shield" hidefocus="true"><img src="u/images/message/history.png">消息设置</a></li>
         </ul>
     </div>
 <script type="text/javascript">

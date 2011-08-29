@@ -38,7 +38,7 @@ class PW_PushDataDB extends BaseDB {
 		
 		$_sql_order = $this->_getOrderSQL($array,'p');
 		$temp = array();
-		$_sql_final = "SELECT p.*,ip.invokename,i.title as invoketitle,pi.sign FROM ".$this->_tableName." p LEFT JOIN pw_invokepiece ip ON p.invokepieceid=ip.id LEFT JOIN pw_pageinvoke pi ON ip.invokename=pi.invokename LEFT JOIN pw_invoke i ON pi.invokename=i.name $_sql $_sql_order ".S::sqlLimit(($page-1)*$perPage,$perPage);
+		$_sql_final = "SELECT p.*,ip.invokename,i.title as invoketitle,i.sign FROM ".$this->_tableName." p LEFT JOIN pw_invokepiece ip ON p.invokepieceid=ip.id LEFT JOIN pw_invoke i ON ip.invokename=i.name $_sql $_sql_order ".S::sqlLimit(($page-1)*$perPage,$perPage);
 
 		$query	= $this->_db->query($_sql_final);
 		while ($rt = $this->_db->fetch_array($query)) {
@@ -116,10 +116,10 @@ class PW_PushDataDB extends BaseDB {
 
 			$temp .= " AND $invokepieceIdField IN (".S::sqlImplode($invokepieces).")";
 		} elseif ($array['alias']) {
-			$pageInvokeService = L::loadClass('pageinvokeservice', 'area');
+			$invokeService = L::loadClass('invokeservice', 'area');
 			$portalPageService = L::loadClass('portalpageservice', 'area');
 			$signType = $portalPageService->getSignType($array['alias']);
-			$invokepieces = $pageInvokeService->getEffectPageInvokePieces($signType,$array['alias']);
+			$invokepieces = $invokeService->getEffectPageInvokePieces($signType,$array['alias']);
 			if (!$invokepieces) return false;
 			$temp .= " AND $invokepieceIdField IN (".S::sqlImplode($invokepieces).")";
 		}

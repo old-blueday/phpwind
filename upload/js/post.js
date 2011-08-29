@@ -1,3 +1,6 @@
+/*
+descript:贴子页js
+*/
 var count = 1;
 var menushow = '';
 var picpath = imgpath+"/post/smile/";
@@ -7,7 +10,7 @@ var script = document.createElement("script");
 script.src = 'js/lang/zh_cn.js';
 header.appendChild(script);
 
-if (window.ActiveXObject) {
+if (document.documentElement.addBehavior) {
 	document.documentElement.addBehavior("#default#userdata");
 }
 
@@ -19,8 +22,8 @@ var PwFace = {
 	mainObj : null,
 
 	init : function(tabid, mainid, tabnum, perpage) {
-		PwFace.tabObj = $(tabid);
-		PwFace.mainObj = $(mainid);
+		PwFace.tabObj = getObj(tabid);
+		PwFace.mainObj = getObj(mainid);
 		if (typeof tabnum != 'undefined') PwFace.tabNum = tabnum;
 		if (typeof perpage != 'undefined') PwFace.perpage = perpage;
 		PwFace.initTab();
@@ -28,8 +31,8 @@ var PwFace = {
 	},
 
 	layout : function(o) {
-		$(o).className = 'wy_menu';
-		$(o).innerHTML = '<div class="wy_title cc" onmousedown="read.move(event)"><span style="float:right;margin:3px 0 0 5px;width:auto;cursor:pointer" onclick="closep();document.body.onclick=null;" title="关闭"><img src="'+imgpath+'/close.gif" alt="close" /></span><b id="doleft" style="display:none" class="down_left fl" onclick="PwFace.showTab(-1)" title="上一个">上一个</b><b id="doright" style="display:none" class="down_right fr" onclick="PwFace.showTab(1)" title="下一个">下一个</b><ul id="face_tab"></ul></div><div class="face_main"><ul class="cc" id="face_main"></ul><div id="face_page" class="face_pages cc"></div></div>';
+		getObj(o).className = 'wy_menu';
+		getObj(o).innerHTML = '<div class="wy_title cc" onmousedown="read.move(event)"><span class="adel" onclick="closep();document.body.onclick=null;" title="关闭">close.gif</span><b id="doleft" style="display:none" class="down_left fl" onclick="PwFace.showTab(-1)" title="上一个">上一个</b><b id="doright" style="display:none" class="down_right fr" onclick="PwFace.showTab(1)" title="下一个">下一个</b><ul id="face_tab"></ul></div><div class="face_main"><ul class="cc" id="face_main"></ul><div id="face_page" class="face_pages cc"></div></div>';
 	},
 
 	initTab : function() {
@@ -42,8 +45,8 @@ var PwFace = {
 
 	showTab : function(p) {
 		var index = -1;
-		var menus = PwFace.tabObj.getElementsByTagName('li');
-		for (var i = 0; i < menus.length; i++) {
+		var menus = PwFace.tabObj.getElementsByTagName('li'),len = menus.length;
+		for (var i = 0; i < len; i++) {
 			if (menus[i].style.display != "none") {
 				index = i;
 				break;
@@ -51,7 +54,7 @@ var PwFace = {
 		}
 		index += p;
 		if (index < 0 || index + PwFace.tabNum > menus.length) return;
-		for (i = 0; i < menus.length; i++){
+		for (i = 0; i < len; i++){
 			if (i >= index && i < index + PwFace.tabNum){
 				menus[i].style.display = "";
 			} else{
@@ -62,7 +65,7 @@ var PwFace = {
 
 	selectTab : function(id) {
 		var menus = PwFace.tabObj.getElementsByTagName('li');
-		for (var i = 0; i < menus.length; i++) {
+		for (var i = 0,len = menus.length; i < len; i++) {
 			menus[i].className = (menus[i].id.substr(3) == id) ? 'current' : '';
 		}
 	},
@@ -73,6 +76,7 @@ var PwFace = {
 		var sublist = faces[id];
 		if (PwFace.perpage > 0) {
 			var l = sublist.length;
+			if (is_ie) l -= 1;
 			var page = Math.max(Math.ceil(l/PwFace.perpage),1);
 			var _html = '';
 			if (page > 1) {
@@ -198,13 +202,13 @@ function showGeneralFace(a,b){
 }
 function initGeneralFaces() {
 	var response = ajax.XmlDocument();
-	var generalfaceid   = new Array();
-	var generalfacename = new Array();
-	var generalfacetype = new Array();
-	var generalfacecode = new Array();
+	var generalfaceid   = [];
+	var generalfacename = [];
+	var generalfacetype = [];
+	var generalfacecode = [];
 	var node = response.getElementsByTagName('items')[0].childNodes;
 	var j=0;
-	for(var i=0;i<node.length;i++){
+	for(var i=0,len = node.length;i < len;i++){
 		try{
 			generalfaceid[j]   = node[i].getAttribute('id');
 			generalfacename[j] = node[i].getAttribute('name');
@@ -233,8 +237,8 @@ function initGeneralFaces() {
 }
 function initGeneralFace(){
 	var response = ajax.XmlDocument();
-	var generalfaceid   = new Array();
-	var generalfacename = new Array();
+	var generalfaceid   = [];
+	var generalfacename = [];
 
 	var node = response.getElementsByTagName('subject')[0].childNodes;
 	var j=0;
@@ -247,9 +251,9 @@ function initGeneralFace(){
 	}
 	var num = 0;
 	var b='<a href="javascript:;" class="B_menu_adel" style="margin-top:2px;" onclick="closep();">关闭</a>';
-	for(f in generalfaceid){
+	for(var i = 0,j = generalfaceid.length;i < j; i++){
 		//兼容opera
-		try{b += '<ul class="B_fl"><li id="gb_'+num+'"><a href="javascript:;" unselectable="on" onclick="showGeneralFace(\'gb_'+num+'\','+generalfaceid[f]+');">'+generalfacename[f]+'</a></li></ul>';
+		try{b += '<ul class="B_fl"><li id="gb_'+num+'"><a href="javascript:;" unselectable="on" onclick="showGeneralFace(\'gb_'+num+'\','+generalfaceid[i]+');">'+generalfacename[i]+'</a></li></ul>';
 		num++;}catch(e){}
 	}
 	var a = {id:'menu_generalface',bid:'generalbuttons',sid:'showgeneralface',width:'300',height:'200',bhtml:b,shtml:''};
@@ -285,12 +289,12 @@ function showTab(id,p,n){
 	var o = getObj(id);
 	var f = o.getElementsByTagName("li");
 	var s = 0;
-	for(i=0;i<f.length;i++)
+	for(var i=0,len = f.length;i < len;i++)
 		if(f[i].style.display != "none"){s = i;break;}
 	s += p;
-	if(s<0 || s+n>f.length)return;
-	for(i=0;i<f.length;i++){
-		if(i>=s && i<s+n){
+	if(s < 0 || s + n > len) return;
+	for(var i = 0;i < len; i++){
+		if(i >= s && i< s + n){
 			f[i].style.display = "inline";
 		} else{
 			f[i].style.display = "none";
@@ -302,7 +306,7 @@ function selectMenu(id,sid){
 	var b = getObj(id);
 	b.onmousedown = read.move;
 	var f = b.getElementsByTagName("li");
-	for (var i=0; i<f.length; i++) {
+	for (var i=0,len=f.length; i < len; i++) {
 		f[i].className = f[i].id==sid ? "current" : '';
 	}
 }
@@ -382,7 +386,8 @@ function loadData(key){
 function setEditorContent(msg) {
 	msg=msg||"";
 	if (editor && editor.currentMode == 'default') {
-		editor.doc.body.innerHTML = editor.getSavedHTML(msg);
+		editor.textarea.value = msg;
+		editor.setHTML(editor.getHtmlFromUBB());
 	} else {
 		document.FORM.atc_content.value = msg;
 	}
@@ -406,4 +411,15 @@ function opendraft(id) {
 	}
 	event && (event.returnValue = false);
 	return false;
+}
+
+//贴子附件hover处理
+function postAttImgHover(menuid,tdid){
+	var menu = getObj(menuid);
+	var td = getObj(menuid);
+	menu.style.display = '';
+	td.parentNode.onmouseout = menu.onmmouseout = function(e) {
+		menu.style.display = 'none';
+	};
+	menu.onmouseover = function() {this.style.display = '';}
 }

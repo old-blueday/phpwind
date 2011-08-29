@@ -88,7 +88,7 @@ EOT;
 } elseif ($a == 'ajaxedit') {print <<<EOT
 -->
 <div style="width:400px">
-<script language="JavaScript" id="o_edit">
+<script type="text/javascript" id="o_edit">
 function o_edit() {
 	var str = ajax.request.responseText.split("\t");
 	if (str[0] == 'success') {
@@ -217,7 +217,7 @@ EOT;
 <input type="hidden" name="verify" value="$verifyhash" />
 <input type="hidden" name="step" value="2" />
 <input type="hidden" name="id" value="$id" />
-<div class="h" style="cursor:move" onmousedown="read.move(event);"><span class="fr" style="margin-top:2px;cursor:pointer" onclick="closep();"><img src="$imgpath/close.gif" /></span>群发短消息</div>
+<div class="h" style="cursor:move" onmousedown="read.move(event);"><span class="adel" onclick="closep();">close</span>群发短消息</div>
 <table cellspacing="0" cellpadding="0" width="440">
 	<tbody>
 	<tr><td align="center">标题</td><td><input type="text" class="input" name="subject" maxlength="100" size="50"/></td></tr>
@@ -381,7 +381,7 @@ EOT;
 		</table>
 		<div class="popBottom"><span class="btn2"><span><button type="submit" onclick="ajax.submit(this.form)">编辑相册</button></span></span><span class="bt2"><span><button type="button" onclick="closep();">取消</button></span></span></div>
 	</form>
-<script language="JavaScript">
+<script type="text/javascript">
 var charset = '$db_charset';
 setTimeout(function(){initCheckTextNum('ajax_aname','ajax_aname_warn',24);},300);
 setTimeout(function(){initCheckTextNum('ajax_aintro','ajax_aintro_warn',255);},300);
@@ -521,7 +521,7 @@ EOT;
 	<div class="popBottom"><span class="btn2"><span><button type="button" onclick="checkPost(this.form);">提 交</button></span></span></div>
 	</form>
 </div>
-<script language="JavaScript">
+<script type="text/javascript">
 function checkPost(obj) {
 	if (obj.realname.value.length > 20) {
 		showError('真实姓名不能大于20字符',3000);
@@ -564,7 +564,7 @@ var charset = '$db_charset';
 setTimeout(function(){initCheckTextNum('realname','realname_warn',20);},300);
 setTimeout(function(){initCheckTextNum('address','address_warn',255);},300);
 setTimeout(function(){initCheckTextNum('introduce','introduce_warn',255);},300);
-</SCRIPT>
+</script>
 <!--
 EOT;
 }}elseif($a=='recommend'){print <<<EOT
@@ -638,7 +638,7 @@ EOT;
 								</ul>
 							</div>
 						</div>
-<SCRIPT type="text/javascript" LANGUAGE="JavaScript" src="js/core/friendlist.js"></SCRIPT>
+<script type="text/javascript" src="js/core/friendlist.js"></script>
 
 		</td>
 	</tr>
@@ -672,7 +672,7 @@ EOT;
 <div class="popBottom"><span class="btn2"><span><button type="button" name="ajaxsubmit" style="width:80px;" onclick="ajax.submit(this.form);">提 交</button></span></span><span class="bt2"><span><button type="button" onclick="closep();">取消</button></span></span></div>
 </form>
 </div>
-<script language="javascript">
+<script type="text/javascript">
 var ifcheck = true;
 function CheckAll(form,match) {
 	for (var i = 0; i < form.elements.length; i++) {
@@ -735,7 +735,7 @@ EOT;
 </div>
 </div>
 </form>
-<SCRIPT type="text/javascript" LANGUAGE="JavaScript" src="js/core/friendlist.js"></SCRIPT>
+<script type="text/javascript" src="js/core/friendlist.js"></script>
 
 <!--
 EOT;
@@ -770,7 +770,7 @@ EOT;
 		<div class="popBottom"><span class="btn2"><span><button type="button" onclick="copyurl();return false;">提 交</button></span></span><span class="bt2"><span><button type="button" onclick="closep();">取消</button></span></span></div>
 	</form>
 </div>
-<script language="JavaScript">
+<script type="text/javascript">
 function copyurl() {
 	var dtid = getObj('dtidsel').value;
 	var privacy = getObj('prisel').value;
@@ -799,7 +799,7 @@ EOT;
 			</tr>
 		</table>
 	</form>
-<script language="JavaScript">
+<script type="text/javascript">
 function tourl() {
 	var aid = getObj('aidvalue').value;
 	var viewpwd = getObj('pwdvalue').value;
@@ -858,18 +858,14 @@ print <<<EOT
 <!--
 EOT;
 if ($o_photos_gdcheck) {
-$gdSize = explode("\t",$db_gdsize);
+$checkCode = L::loadClass('checkcode', 'site');
+$checkCodeString = $checkCode->getCheckCodeTemplate();
 print <<<EOT
 -->
 		<tr>
-			<td>认证码</td>
+			<td>验证码</td>
 			<td>
-<script type="text/javascript" src="js/pw_authcode.js"></script>
-<script>
-var flashWidth = "$gdSize[0]";
-var flashHeight = "$gdSize[1]";
-var gdtype = $db_gdtype;
-</script>
+$checkCodeString
 				<input class="input input_wc" onfocus="showgd();" type="text" name="gdcode" id="gdcode" tabindex="3"  /><br />
 				<div id="ckcode" style="display:none;margin-bottom:5px;"></div>
 			</td>
@@ -883,7 +879,7 @@ if($db_imagequestion){
 }else{
 	$question = $qkey<0 ? getMachineQuestion_1() :  $db_question[$qkey];
 }
-$q_a = $question.($showq && $qkey>0?" 正确答案:".$db_answer[$qkey] : '');
+$q_a = $question.($showq && $qkey>0?" （答案：".$db_answer[$qkey] . '）' : '');
 print <<<EOT
 -->
 		<tr>
@@ -907,7 +903,7 @@ EOT;
 	</table>
 	</form>
 </div>
-<script language="JavaScript">
+<script type="text/javascript">
 
 var charset = '$db_charset';
 var maxphotonum = '$maxphotonum';

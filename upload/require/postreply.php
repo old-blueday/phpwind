@@ -6,6 +6,11 @@
 if (!$pwforum->foruminfo['allowrp'] && !$pwpost->admincheck && $_G['allowrp'] == 0) {
 	Showmsg('reply_group_right');
 }
+//实名认证权限
+if ($db_authstate && !$pwpost->admincheck && $pwforum->forumset['auth_allowrp'] && true !== ($authMessage = $pwforum->authStatus($winddb['userstatus'],$pwforum->forumset['auth_logicalmethod']))) {
+	Showmsg($authMessage . '_rp');
+}
+
 if ($article == '0') {
 	$pw_tmsgs = GetTtable($tid);
 	$S_sql = ',m.uid,m.groupid,m.userstatus,tm.ifsign,tm.content';
@@ -134,13 +139,15 @@ if (empty($_POST['step'])) {
 	/**
 	 * 索引设计时为了减少空间,回复的主题可能为空,所以默认为回复主题!
 	 */
-	require_once PrintEot('post');footer();
+	require_once PrintEot('post');
+	CloudWind::yunSetCookie(SCR);
+	footer();
 
 } elseif ($_POST['step'] == 2) {
 
 	S::gp(array('atc_title','atc_content'), 'P', 0);
-	S::gp(array('atc_anonymous','atc_hideatt','atc_enhidetype','atc_credittype','flashatt','replytouser'), 'P');
-	S::gp(array('atc_iconid','atc_convert','atc_autourl','atc_usesign','atc_html','atc_hide','atc_requireenhide','atc_rvrc','atc_requiresell', 'atc_money'), 'P', 2);
+	S::gp(array('atc_anonymous','atc_hideatt','atc_enhidetype','atc_credittype','flashatt','replytouser','_usernames'), 'P');
+	S::gp(array('atc_iconid','atc_convert','atc_autourl','atc_usesign','atc_html','atc_hide','atc_requireenhide','atc_rvrc','atc_requiresell', 'atc_money', 'go_lastpage'), 'P', 2);
 	
 	S::gp(array('iscontinue'),'P');//ajax提交时有敏感词时显示是否继续
 	($db_sellset['price'] && (int) $atc_money > $db_sellset['price']) && Showmsg('post_price_limit');
@@ -159,6 +166,7 @@ if (empty($_POST['step'])) {
 	$postdata->setHide($atc_hide);
 	$postdata->setEnhide($atc_requireenhide, $atc_rvrc, $atc_enhidetype);
 	$postdata->setSell($atc_requiresell, $atc_money, $atc_credittype);
+	$postdata->setAtUsers($_usernames);
 	//$replypost->checkdata();
 	$postdata->conentCheck();
 	L::loadClass('attupload', 'upload', false);
@@ -173,23 +181,33 @@ if (empty($_POST['step'])) {
 	}
 	$replypost->setToUser($replytouser);
 	$postdata->iscontinue = (int)$iscontinue;
+	$postdata->setIfGoLastPage($go_lastpage);
 	$replypost->execute($postdata);
 	$pid = $replypost->getNewId();
-
+	// defend start	
+	CloudWind::yunUserDefend('postreply', $winduid, $windid, $timestamp, ($cloud_information[1] ? $timestamp - $cloud_information[1] : 0), ($pid ? 101 : 102),'',$postdata->data['content'],'','');
+	// defend end
 	if ($winduid && $tpcarray['special'] == 5) {
 		L::loadClass("post_5", 'forum/special', false);
 		$postdebate = new postSpecial($pwpost);
 		$postdebate->reply($tid, $pid);
 	}
+	pwHook::runHook('after_reply');
 
+	//defend start
+	CloudWind::YunPostDefend ( $winduid, $windid, $groupid, $pid, $atc_title, $atc_content, 'reply',array('tid'=>$tid,'fid'=>$fid,'forumname'=>$pwforum->foruminfo['name']) );
+	//defend end
+	
 	//job sign
+	/*
 	require_once(R_P.'require/functions.php');
-	$j_p = "read.php?tid=$tid&displayMode=1&page=e#a";
-	if ($db_htmifopen)
-		$j_p = urlRewrite ( $j_p );
 	$_cacheService = Perf::gatherCache('pw_threads');
 	$thread = ($page>1) ? $_cacheService->getThreadByThreadId($tid) : $_cacheService->getThreadAndTmsgByThreadId($tid);	
 	initJob($winduid,"doReply",array('tid'=>$tid,'user'=>$thread['author']));
+	*/
+	$j_p = "read.php?tid=$tid&ds=1&page=e#a";
+	if ($db_htmifopen)
+		$j_p = urlRewrite ( $j_p );
 	$pinfo = getLangInfo('refreshto', 'enter_thread');
 	defined('AJAX') && $pinfo = "success\t" . $j_p;
 	$flag = false;
@@ -199,6 +217,8 @@ if (empty($_POST['step'])) {
 			exit;
 		}
 		defined('AJAX') && $flag && ($pinfo = "continue\t" . getLangInfo('refreshto', $pinfo));
+	} elseif ($go_lastpage && !$postdata->getIfcheck()) {
+		$pinfo = getLangInfo('refreshto', 'success_check');
 	}
 	refreshto($j_p,$pinfo);
 }

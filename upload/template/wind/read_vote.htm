@@ -1,164 +1,122 @@
 <!--<?php
 print <<<EOT
 -->
-<style type="text/css">
-.vote-ol{margin-left:2.5em;list-style-type:decimal;line-height:2}
-</style>
-<div class="t">
-<form action="job.php?action=vote" method="post" name="vote">
-<input type="hidden" name="verify" value="$verifyhash" />
-<div class="h" style="border-top:0 none;">
-<!-- 
-EOT;
-if('no' === $viewvoter){
-print <<<EOT
--->
-<span class="fr"><a href="read.php?fid=$fid&tid=$tid&displayMode=1&viewvoter=$ifview">查看投票的会员</a></span>
-<!-- 
-EOT;
-}else{
-print <<<EOT
--->
-<span class="fr"><a href="read.php?fid=$fid&tid=$tid&displayMode=1&viewvoter=$ifview">隐藏投票的会员</a></span>
+						<!--投票开始-->
+						<div class="vote">
+							<h4><span class="b">最多可选{$readvote[mostvotes]}项，共有{$voters}人参与，</span>
 <!--
 EOT;
-}
-print <<<EOT
+if($viewvoter){print <<<EOT
 -->
-<strong>总共有<b>{$voters}</b>人参与本次投票 发起于:$tpc_date</strong>
+								<a href="javascript:void(0)" id="viewVoters" class="fn s4">查看参与人员</a>
 <!--
 EOT;
-if ($tpc_endtime) {print <<<EOT
+}if($readvote['modifiable'] && $action != 'modify'){print <<<EOT
 -->
-<strong> 至 $tpc_endtime 结束</strong>
+								<a href="read.php?fid=$fid&tid=$tid&displayMode=1&action=modify" class="fn s4">修改投票</a>
 <!--
 EOT;
 }print <<<EOT
 -->
-</div>
-<table width="100%" cellspacing="0" cellpadding="0">
-<tr class="tr3 f_two"><td colspan="2">
-<b>投票限制条件:</b> <br />
-<ol class="vote-ol">
+							</h4>
+							<table>
 <!--
 EOT;
-if ($readvote['regdatelimit']) {print <<<EOT
+$perValueClasses = array('','perbgA','perbgB','perbgC','perbgD');
+foreach ($votedb as $key => $vote) {
+	$perValueClass =$perValueClasses[++$i % 5];
+print <<<EOT
 -->
-<li>本投票只允许注册日期大于 $regdatelimit 会员投票 </li>
+								<tr>
+									<td colspan="3" class="vote_text">
 <!--
 EOT;
-}if ($readvote['multiple'] && $readvote['leastvotes'] > 1) {print <<<EOT
+if (!$vote_close && (!$readvote['havevote'] || $action == 'modify')) {
+	is_array($vote['voter']) && $vote['voterHtml'] = implode(' , ',$vote['voter']);
+print <<<EOT
 -->
-<li>至少选择个数:{$readvote[leastvotes]} </li>
+									<span class="vote_pick"><input type="$votetype" value="$key" id="votetype{$key}" name="voteid[]" onclick="checkVote(this)" autocomplete="off" /></span>
 <!--
 EOT;
-}if ($readvote['multiple'] && $readvote['mostvotes']) {print <<<EOT
--->
-<li>最多选择个数:{$readvote[mostvotes]} </li>
-<!--
-EOT;
-}if ($creditlimit) {print <<<EOT
--->
-<li>投票积分限制:
-<!--
-EOT;
-foreach ($credit->cType as $key => $value) {
-if (empty($creditlimit[$key])) continue;print <<<EOT
--->
-{$value}:$creditlimit[$key] &nbsp;
+}print <<<EOT
+--><label for="votetype{$key}">$vote[name]</label>
+									</td>
+								</tr>
+								<tr>
+									<td class="vote_numline">
+										<div class="perCent"><div class="perValue $perValueClass" style="width:{$vote['percent']}%;"><span></span></div></div>
+									</td>
+									<td class="vote_result"><div>{$vote['num']}<span class="gray">({$vote['percent']}%)</span></div></td>
+									<td>&nbsp;</td>
+								</tr>
+								<tr>
+									<td colspan="4">
+										<div class="vote_part">
+											{$vote['voterHtml']}
+										</div>
+									</td>
+								</tr>
 <!--
 EOT;
 }print <<<EOT
 -->
-</li>
-<!--
-EOT;
-}if($readvote['postnumlimit']) {print <<<EOT
--->
-<li>您的发帖数大于 {$readvote[postnumlimit]} 才能投票</li>
-<!--
-EOT;
-}print <<<EOT
--->
-</ol>
-</td>
-</tr>
-<!--
-EOT;
-foreach ($votedb as $key => $vote) {print <<<EOT
--->
-<tr class="tr3">
-<th>
+							</table>
 <!--
 EOT;
 if (!$vote_close && (!$readvote['havevote'] || $action == 'modify')) {print <<<EOT
 -->
-<input type="$votetype" value="$key" name="voteid[]" onclick="checkVote(this)" />
+							<div class="vote_Bot"><span class="btn2"><span><button type="button" onclick="vv.vote();">投票</button></span></span></div>
+<!--
+EOT;
+}print <<<EOT
+-->			
+						</div>
+<div class="popout" id="popoutViewVoters" style="display:none"><table border="0" cellspacing="0" cellpadding="0"><tbody><tr><td class="bgcorner1"></td><td class="pobg1"></td><td class="bgcorner2"></td></tr><tr><td class="pobg4"></td><td><div class="popoutContent">
+<div style="width:350px;">
+<div class="popTop"><a href="javascript:void(0)" class="adel" onclick="closep()">关闭</a>参与人员</div>
+	<div class="p15 partici">
+		<div class="mb10">
+			<select style="width:315px;" id="voteOptions" onchange="vv.set(this.value);">
+<!--
+EOT;
+foreach ($votedb as $key => $vote) {
+$vote[name] = substrs($vote[name],35);
+print <<<EOT
+-->
+				<option value="{$key}">{$vote[name]}</option>
+<!--
+EOT;
+}print <<<EOT
+-->	
+			</select>
+		</div>
+		<div id="voterList">
+<!--
+EOT;
+foreach ($votedb as $key => $vote) {print <<<EOT
+-->
+		<ul class="cc" id="voterList_$key" style="display:none">
+<!--
+EOT;
+	foreach((array)$vote['voter'] as $v){
+print <<<EOT
+-->
+
+			<li><a href="u.php?username=$v" class="s4" target="_blank">$v</a></li>
 <!--
 EOT;
 }print <<<EOT
 -->
-$vote[name]
-</th>
-<td><img src="$imgpath/post/vote/tab-two.gif" width="$vote[width]" height="15" align="absmiddle" />&nbsp;$vote[num]&nbsp;票</td></tr>
-<!--
-EOT;
-if ($vote['voter']) {print <<<EOT
--->
-<tr class="tr3"><td colspan="2" class="gray">&nbsp;&nbsp;$vote[voter]&nbsp;&nbsp;</td></tr>
-<!--
-EOT;
-}}print <<<EOT
--->
-<tr class="tr3"><th class="s3" style="border-bottom:0;">
-<!--
-EOT;
-if ($vote_close) {print <<<EOT
--->
-(本次投票已结束)
+		</ul>
 <!--
 EOT;
 }print <<<EOT
 -->
-</th>
-<td style="border-bottom:0;">
-<!--
-EOT;
-if ((!$readvote['havevote'] || $readvote['modifiable']) && $vote_close == 0) {print <<<EOT
--->
-<div>
-<!--
-EOT;
-if ($readvote['havevote'] && $action != 'modify' && $readvote['modifiable']) {print <<<EOT
--->
-&nbsp;* <b><a href="read.php?fid=$fid&tid=$tid&displayMode=1&action=modify">修改投票</a></b>
-<!--
-EOT;
-} else {
-if ($action == 'modify') {print <<<EOT
--->
-<input type="hidden" value="modify" name="voteaction" />
-<!--
-EOT;
-} print <<<EOT
--->
-<input type="hidden" value="$tid" name="tid" />
-<span class="btn2"><span><button type="submit">提 交</button></span></span>
-<!--
-EOT;
-}print <<<EOT
--->
+		</div>
+	</div>
 </div>
-<!--
-EOT;
-}print <<<EOT
--->
-</td>
-</tr>
-</table>
-</form>
-</div>
-<script language="JavaScript">
+</div></td><td class="pobg2"></td></tr><tr><td class="bgcorner4"></td><td class="pobg3"></td><td class="bgcorner3"></td></tr></tbody></table></div>
+<script type="text/javascript">
 var tempnum = 0;
 var voteid = '';
 var multi = '$readvote[mostvotes]';
@@ -183,10 +141,82 @@ function checkVote(obj){
 				tempnum = 1;
 			}
 		} else {
+			if (voteid){
+				var t = [],s=voteid.split('|');
+				for (var i in s){
+					s[i] != obj.value && t.push(s[i]); 
+				}
+				voteid = t.join('|');
+			}
 			tempnum--;
 		}
 	}
 }
+</script>
+
+<script type="text/javascript">
+var tid = "$tid";
+<!--
+EOT;
+if($readvote['modifiable'] && $action == 'modify'){print <<<EOT
+-->
+var voteaction = 'modify';
+<!--
+EOT;
+}print <<<EOT
+-->
+var pwVoters = function(){
+	this.click = getObj('viewVoters');
+	this.popoutViewVoters = getObj('popoutViewVoters');
+	this.voteOptions = getObj('voteOptions');
+	this.voterList = getObj('voterList');
+}
+pwVoters.prototype = {
+	"init" : function(){
+		var self = this;
+		if(!this.click){
+			return false;
+		}
+		addEvent(this.click,"click",function(){
+			//self.get(tid,0);
+			read.open(self.popoutViewVoters,self.click,3);
+			self.set(self.voteOptions.value);
+		});
+	},
+	"vote" : function(){
+		var self = this;
+		if (!voteid) {
+			showDialog('error','您还没有选择!',1);
+			return false;
+		}
+		var data = "tid=" + tid + "&voteid=" + voteid;
+		if(typeof (voteaction) != 'undefined') data += '&voteaction=' + voteaction;
+		ajax.send("job.php?action=vote",data, function(){
+			var rText = ajax.request.responseText.split('\t');
+			if (rText[0]=='success') {
+				showDialog('success','投票成功!',1);
+				setTimeout(function(){location.reload()},300);
+			} else {
+				showDialog('error',ajax.request.responseText,1);
+			}
+		});
+	},
+	"set" : function(key){
+		var childNodes = this.voterList.childNodes;
+		for (var i=0;j=childNodes.length,i<j;i++){
+			if (childNodes[i].id) {
+				getObj(childNodes[i].id).style.display = 'none';
+			}
+		}
+		if (getObj("voterList_" + key)) getObj("voterList_" + key).style.display = '';
+	}
+}
+var vv =null;
+window.onReady(function(){
+	vv = new pwVoters();
+	vv.init();
+	//addEvent(vv.voteOptions,"change", function(){alert(123);});
+});
 </script>
 <!--
 EOT;

@@ -4,10 +4,13 @@
 S::gp(array('uid','username'));
 
 $userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
-$userExistById   = $userService->isExist($uid);
-$userExistByName = $userService->isExistByUserName($username);
-if ($userExistById || $userExistByName) {
-	ObHeader('u.php?'.($username ? 'username='.$username : 'uid='.$uid));
+$uid && $userExistById   = $userService->isExist($uid);
+if($username){
+	$uid = $userService->getUserIdByUserName($username);
+	$userExistById =1;
+}
+if ($userExistById) {
+	ObHeader('u.php?uid='.$uid);
 } else {
 	Showmsg('用户不存在');
 }

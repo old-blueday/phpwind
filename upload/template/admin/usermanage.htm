@@ -373,9 +373,6 @@ EOT;
 EOT;
 if($customfield){print <<<EOT
 -->
-<script type="text/javascript" language="JavaScript" src="js/pw_ajax.js"></script>
-<script type="text/javascript" LANGUAGE="JavaScript" src="js/core/core.js"></script>
-<script language="JavaScript" src="js/global.js"></script>
 <h2 class="h1"></h2>
 <div class="admin_table mb10">
 <table width="100%" cellspacing="0" cellpadding="0">
@@ -398,7 +395,7 @@ print <<<EOT
 <input type="hidden" name="uid" value="$temUid" />
 <input type="hidden" name="step" value="2" />
 </form>
-<script language="JavaScript">
+<script type="text/javascript">
 function showcustomquest(qid){
   getObj("customquest").style.display = qid==-1 ? '' : 'none';
 }
@@ -818,15 +815,15 @@ print <<<EOT
   </div>
 </form>
 <script type="text/javascript">
-var ifcheck = [true, true];
+var whetherCheck = [true, true];
 function CheckAll2(form, n, match) {
 	for (var i = 0; i < form.elements.length; i++) {
 		var e = form.elements[i];
 		if (e.type == 'checkbox' && (typeof match == 'undefined' || e.name.match(match))) {
-			e.checked = ifcheck[n];
+			e.checked = whetherCheck[n];
 		}
 	}
-	ifcheck[n] = ifcheck[n] == true ? false : true;
+	whetherCheck[n] = whetherCheck[n] == true ? false : true;
 }
 </script>
 <!--

@@ -27,10 +27,10 @@ print <<<EOT
 EOT;
 }print <<<EOT
 -->
-<script language="JavaScript">
+<script>
 setCurrent('a_$action','a_own','current');
 </script>
-<script src="js/core/utils/changeView.js" language="JavaScript" type="text/javascript"></script>
+<script src="js/core/utils/changeView.js" type="text/javascript"></script>
 </ul>
 </div>
 <!--
@@ -69,7 +69,7 @@ EOT;
 }print <<<EOT
 -->
 <!-- submenu end -->
-<script language="JavaScript">
+<script>
 function setCurrentMenu(id,cname){
 	var cNode = document.getElementById(id);
 	if(cNode != null){
@@ -93,7 +93,7 @@ if($action=='memberHot'){
 }print <<<EOT
 -->
 </div></div>
-<script language="javascript" src="apps/$appdir/js/hot.js"></script>
+<script type="text/javascript" src="apps/$appdir/js/hot.js"></script>
 </td></tr></table>
 </div>
 <!--

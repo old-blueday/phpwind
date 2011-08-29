@@ -9,8 +9,8 @@ if(window.frameElement){
 	parent.location.href = window.location.href;
 }
 </script>
-<link href="images/admin/layout83/pw_reset.css?t=20101020.css" rel="stylesheet" />
-<link href="images/admin/layout83/style.css" rel="stylesheet" />
+<link href="images/admin/layout83/pw_reset.css?{$GLOBALS['wind_repair']}" rel="stylesheet" />
+<link href="images/admin/layout83/style.css?{$GLOBALS['wind_repair']}" rel="stylesheet" />
 <!--[if IE]>
 <style type="text/css">
 #modemanage a{width:58px;}
@@ -25,18 +25,18 @@ if(window.frameElement){
 		<td>
 			<div class="navA_wrap">
 				<ul id="B_main_block" class="navA">
-                	<li id="common"><a href="#common">常用</a></li>
+                	<li id="common"><a href="#common" hidefocus="true">常用</a></li>
 <!--
 EOT;
 foreach ($mainList as $key => $value) {
 print <<<EOT
 -->
-					<li id="$key"><a href="#$key">$value[name]</a></li>
+					<li id="$key"><a href="#$key" hidefocus="true">$value[name]</a></li>
 <!--
 EOT;
 }if ($minorList) {print <<<EOT
 -->
-					<li id="modemanage"><a href="#modemanage">模式</a></li>
+					<li id="modemanage"><a href="#modemanage" hidefocus="true">模式</a></li>
 <!--
 EOT;
 }print <<<EOT
@@ -46,6 +46,90 @@ EOT;
 					<p><a href="$db_bbsurl" class="mr10" target="_blank" title="前台首页"><img src="images/admin/layout83/linkHome.png" align="absmiddle"></a>{$admin_level}:<span class="mr10">$admin_name</span><a href="$admin_file?adminjob=quit">[注销]</a></p>
 				</div>
 			</div>
+<!--
+EOT;
+$bubbleInfo = $bubbleInfo ? pwJsonEncode(unserialize($bubbleInfo)) : '{}';
+!$uidForBubble && $uidForBubble = '';
+print <<<EOT
+-->
+<script>
+var userBubbleInfo = $bubbleInfo;
+var winduid = $uidForBubble;
+</script>
+<!--
+EOT;
+print <<<EOT
+-->
+<div class="fl" id="pw_all_tip_AdUniversity" style="display:none;">
+	<div style="position:absolute;z-index:99;margin-top:50px;margin-left:-21px;">
+		<table><tr><td>
+		<div class="pw_all_angle_top"></div>
+		<div class="pw_all_tip">
+			<a href="javascript:void(0)" class="adel">关闭</a>
+			<dl class="cc">
+				<dt>你还在为不知道如何运营网站<br>担心吗？来站长魔盒吧！</dt>
+				<dd><a class="bb_close" href="javascript:void(0)">知道了</a></dd>
+			</dl>
+		</div>
+		</td></tr></table>
+	</div>
+</div>
+<div class="fl" id="pw_all_tip_kmd" style="display:none;">
+	<div style="position:absolute;z-index:99;margin-top:50px;margin-left:-21px;">
+		<table><tr><td>
+		<div class="pw_all_angle_top"></div>
+		<div class="pw_all_tip">
+			<a href="javascript:void(0)" class="adel">关闭</a>
+			<dl class="cc">
+				<dt>赚钱啦赚钱啦……快来看看<br>支持微支付的新版孔明灯功能！<br>运营-孔明灯</dt>
+				<dd><a class="bb_close" href="javascript:void(0)">知道了</a></dd>
+			</dl>
+		</div>
+		</td></tr></table>
+	</div>
+</div>
+<div class="fl" id="pw_all_tip_account" style="display:none;">
+	<div style="position:absolute;z-index:99;margin-top:50px;margin-left:-21px;">
+		<table><tr><td>
+		<div class="pw_all_angle_top"></div>
+		<div class="pw_all_tip">
+			<a href="javascript:void(0)" class="adel">关闭</a>
+			<dl class="cc">
+				<dt>淘宝、支付宝、新浪、QQ统统都能登录！<br>帐号通开启：应用-应用中心</dt>
+				<dd><a class="bb_close" href="javascript:void(0)">知道了</a></dd>
+			</dl>
+		</div>
+		</td></tr></table>
+	</div>
+</div>
+<div class="fl" id="pw_all_tip_medal" style="display:none">
+	<div style="position:absolute;z-index:99;margin-top:50px;margin-left:-21px;">
+		<table><tr><td>
+		<div class="pw_all_angle_top"></div>
+		<div class="pw_all_tip">
+			<a href="javascript:void(0)" class="adel">关闭</a>
+			<dl class="cc">
+				<dt>想要更加丰富多彩的勋章功能吗？<br>来看看新的勋章功能吧！</dt>
+				<dd><a class="bb_close" href="javascript:void(0)">知道了</a></dd>
+			</dl>
+		</div>
+		</td></tr></table>
+	</div>
+</div>
+<div class="fl" id="pw_all_tip_cloudAuthCode" style="display:none">
+	<div style="position:absolute;z-index:99;margin-top:50px;margin-left:-21px;">
+		<table><tr><td>
+		<div class="pw_all_angle_top"></div>
+		<div class="pw_all_tip">
+			<a href="javascript:void(0)" class="adel">关闭</a>
+			<dl class="cc">
+				<dt>还在担心发帖机注册机神马的吗？<br/>快来开启云验证码吧！</dt>
+				<dd><a class="bb_close" href="javascript:void(0)">知道了</a></dd>
+			</dl>
+		</div>
+		</td></tr></table>
+	</div>
+</div>
 		</td>
 	</tr>
 	<tr class="trB">
@@ -485,9 +569,13 @@ function openWin(mid, url, nickname){
 			ob = findItem(ob[cls[0]].items, cls[1]);
 			arBread.innerHTML += '<em>&gt;</em><span class="admenu_down" data-id="'+cls[0]+'">'+ob.name+'</span>';
 		}
-		if(ob.items){
+		if(ob.items&&cls[2] && cls[2]){
 			ob = findItem(ob.items, cls[2]);
 			arBread.innerHTML += '<em>&gt;</em><span class="admenu_down" data-id="'+cls[0]+'-'+cls[1]+'">'+ob.name+'</span>';
+		}
+		if (mid=='config-wap'&&"$db_waprecommend"){
+			ob.name = '浏览设置';
+			url = '/admin.php?adminjob=wapconfig';
 		}
 		name = ob.name;
 		B.query('#breadCrumb span').addEvent('click', showBreadList);
@@ -747,7 +835,9 @@ function _showTips(isopen){
 	var iframes = B.$$('iframe');
 	var infos = [];
 	iframes.forEach(function(n){
-		infos = infos.concat(getElementsByClassName('admin_info', n.contentWindow.document));
+		if(n.id!="applicationcenter-admincollege-hacksource"){
+			infos = infos.concat(getElementsByClassName('admin_info', n.contentWindow.document));
+		}
 	});
 	var v = (isopen) ? "block" : "none";
 	if(infos){
@@ -760,7 +850,9 @@ function _showDesc(isopen){
 	var iframes = B.$$('iframe');
 	var infos = [];
 	iframes.forEach(function(n){
-		infos = infos.concat(getElementsByClassName('help_a', n.contentWindow.document));
+		if(n.id!="applicationcenter-admincollege-hacksource"){
+			infos = infos.concat(getElementsByClassName('help_a', n.contentWindow.document));
+		}
 	});
 	var v = (isopen) ? "block" : "none";
 	if(infos){
@@ -787,9 +879,100 @@ adminNavClass.initTips = initTips;
 
 window.onload = function(){
 	init();
+	var pw_bubble=new Bubble([{"name":"pw_all_tip_kmd","id":"markoperation"},{"name":"pw_all_tip_medal","id":"applicationcenter"},{"name":"pw_all_tip_AdUniversity","id":"applicationcenter"},{"name":"pw_all_tip_CloudTools","id":"cloudcomputing"},{"name":"pw_all_tip_account","id":"applicationcenter"},{"name":"pw_all_tip_cloudAuthCode","id":"cloudcomputing"}]);
+	pw_bubble.init();
 }
 adminSearchClass.init();
+var getObj = function(id){
+	return document.getElementById(id);
+};
+ var addEvent = document.addEventListener ? function(el,type,callback){
+          el.addEventListener( type, callback, !1 );
+        } : function(el,type,callback){
+          el.attachEvent( "on" + type, callback );
+        }
+
+	/*新功能气泡
+	*new Bubble(a,b).init();
+	*a:页面中的气泡元素ID  如: ["pw_all_tip_medal"]
+	*b:程序输出的对象，如: var userBubbleInfo = {"pw_all_tip_card":1};
+	*
+	*/
+	var Bubble=function(ids){
+		this.ids=ids;
+		this.info={};//程序输出的气泡ID，表示不显示此气泡
+		this.uid=(typeof winduid!="undefined")?winduid:null;
+	}
+	Bubble.prototype={
+		init:function(){
+			if(this.uid==null){
+				return false;
+			}
+			var self=this;
+			if(this.ids.length<1){
+				return false;
+			}
+			if(typeof userBubbleInfo!="undefined"){
+				this.info=userBubbleInfo;
+			}
+			var elems=[];
+			for(var i=0,len=this.ids.length;i<len;i++){
+				var name=this.ids[i].name;
+				var id=this.ids[i].id;
+				//判断该层是否可以显示
+				if(this.info[name]!=undefined){
+					continue;
+				}
+				if(!getObj(name)){
+					continue;
+				}
+				if(!getObj(id)){
+					continue;
+				}
+				//气泡元素
+				var obj=getObj(name);
+				//参照ID
+				var ele=getObj(id);
+				elems.push({k:name,v:obj,ele:ele});
+			}
+			if(elems.length>0){
+				var bubbleBox=elems[0].v;
+				var posBox=elems[0].ele;
+				var left=posBox.getBoundingClientRect().left;
+				var top=posBox.getBoundingClientRect().top;
+				bubbleBox.style.display="block";
+				bubbleBox.style.position="absolute";
+				bubbleBox.style.zIndex=1;
+				bubbleBox.style.left=left+"px";
+				bubbleBox.style.top=top+"px";
+				var btns=bubbleBox.getElementsByTagName("a");
+				for(var i=0,len=btns.length;i<len;i++){
+					var btn=btns[i];
+					(function(ele,obj,id){
+						addEvent(ele,"click",function(){
+							self.hide(obj,id,ele);
+							return false;
+						})
+					})(btn,bubbleBox,elems[0].k)
+				}
+			}
+		},
+		close:function(obj){
+			obj.style.display="none";
+		},
+		hide:function(obj,str,ele){
+			ajax.send("pw_ajax.php?action=bubble&uid="+this.uid+"&sign="+str,"",function(){
+				var href=ele.getAttribute("href");
+				if(href&&href.indexOf("javascript")==-1){
+					location.href=href;
+				}
+			});
+			this.close(obj);
+			return false;
+		}
+	}
 </script>
+<script src="js/pw_ajax.js"></script>
 <!--
 EOT;
 print <<<EOT

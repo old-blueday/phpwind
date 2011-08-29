@@ -1,7 +1,7 @@
 <!--<?php
 print <<<EOT
 -->
-<script language="javascript" type="text/javascript">
+<script type="text/javascript">
 	function cutStrContent(){
 		var content = document.getElementById('atc_content');
 		if(strlen(content.value) > 100 ) content.value = substr(content.value,100);
@@ -87,15 +87,13 @@ print <<<EOT
 	<tr id="ok3" class="tr3">
 		<td>评分理由:</td>
 		<td>
-			<div class="mb5">
-			<select onchange="this.form.atc_content.value=this.value;cutStrContent();" style="width:320px;" class="mb5">
-				<option value="">自定义</option>
-				<option value="">-------</option>
+			<input type="text" name="atc_content" onchange="cutStrContent();" onkeyup="cutStrContent();" onkeydown="cutStrContent();" id="atc_content" onkeydown="ajax.quickpost(event,this.form)" style="width:312px;" class="input" />
+			<div>
+			<select onchange="this.form.atc_content.value=this.value;cutStrContent();" size="6" style="width:320px;" class="mb5">
 				$reason_sel
 			</select>
 			</div>
 			<div>
-				<textarea name="atc_content" onchange="cutStrContent();" onkeyup="cutStrContent();" onkeydown="cutStrContent();" id="atc_content" onkeydown="ajax.quickpost(event,this.form)" class="textareaA mb5"></textarea>
 				<div id="atc_content_warn" class="gray">限100字节</div>
 			</div>
 		</td>
@@ -111,22 +109,16 @@ if($showReply){print <<<EOT
 <!-- 
 EOT;
 if(($db_gdcheck & 4) && (!$db_postgd || $winddb['postnum'] < $db_postgd)){
-$gdSize = explode("\t",$db_gdsize);
+$checkCode = L::loadClass('checkcode', 'site');
+$checkCodeString = $checkCode->getCheckCodeTemplate();
 print <<<EOT
 -->
 	<tr class="tr3" id="tr_gdcheck" style="display:none">
 		<td class="tar">验证码:</td>
 		<td>
-			<input class="input fl mr5" type="text" name="gdcode" size="5" />
+			<input class="input fl mr5" onfocus="showgd();" type="text" name="gdcode" size="5" />
 			<div id="ckcode" style="display:none"></div>
-<script type="text/javascript" src="js/pw_authcode.js"></script>
-<script>
-var tip = '看不清楚，换一张';
-var flashWidth = "$gdSize[0]";
-var flashHeight = "$gdSize[1]";
-var gdtype = $db_gdtype;
-showgd();
-</script>
+$checkCodeString
 	</td>
 </tr>
 <!--
@@ -140,7 +132,7 @@ if($db_imagequestion){
 }else{
 	$question = $qkey<0 ? getMachineQuestion_1() :  $db_question[$qkey];
 }
-$q_a = $question.($showq && $qkey>0?" 正确答案:".$db_answer[$qkey] : '');
+$q_a = $question.($showq && $qkey>0?" （答案：".$db_answer[$qkey] . '）' : '');
 print <<<EOT
 -->
 	<tr class="tr3" id="tr_ckquestion" style="display:none">
@@ -211,7 +203,7 @@ EOT;
 </form>
 <script type="text/javascript">
 function operateshowping() {
-	var thisform = $('pingForm');
+	var thisform = getObj('pingForm');
 	ajax.submit(thisform, function() {
 	//ajax.send('operate.php?action=showping&ajax=1',postp,function(){
 		var rText = ajax.request.responseText.split('\t');
@@ -220,10 +212,10 @@ function operateshowping() {
 			if (rText[2] != 'cancel') {
 				for (var i in showping) {
 					var m = 0;
-					var createpingbox = $('createpingbox_'+i);
-					var pingNum = $('pingNum_'+i);
+					var createpingbox = getObj('createpingbox_'+i);
+					var pingNum = getObj('pingNum_'+i);
 					if (createpingbox) {
-						$('mark_'+i).style.display = '';
+						getObj('mark_'+i).style.display = '';
 						for (var j in showping[i]) {
 							createpingbox.innerHTML = showPingCommentHTML(createpingbox,showping[i][j]) + createpingbox.innerHTML;
 							m++;
@@ -238,8 +230,8 @@ function operateshowping() {
 				}
 			} else {
 				for (var i in showping) {
-					var pingLog = $('pingLogTr_'+showping[i]) ? $('pingLogTr_'+showping[i]) : $('createpingLogTr_'+showping[i])
-					var pingNum = $('pingNum_'+i);
+					var pingLog = getObj('pingLogTr_'+showping[i]) ? getObj('pingLogTr_'+showping[i]) : getObj('createpingLogTr_'+showping[i])
+					var pingNum = getObj('pingNum_'+i);
 					if (pingLog){
 						pingLog.style.display = 'none';
 						var pingNums = pingNum.innerHTML ? parseInt(pingNum.innerHTML) : 0;
@@ -258,23 +250,23 @@ function showPingCommentHTML(element,showping) {
 }
 </script>
 
-<script language="JavaScript">
+<script>
 setTimeout(function() {
-	showoption($('c_model'));
+	showoption(getObj('c_model'));
 	initCheckTextNum('atc_content','atc_content_warn', 100);
 }, 100);
 //var readByRate = new PwMenu('raterange');
 
 function addoption() {
-	var s = $('c_model').firstChild.cloneNode(true);
+	var s = getObj('c_model').firstChild.cloneNode(true);
 	var td = s.getElementsByTagName('td');
 	var sel = s.getElementsByTagName('select')[0];
 	optionsel(sel);
 	td[4].innerHTML = '<a href="javascript:" class="s4" onclick="deloption(this)">[删除]</a>';
-	$('c_body').appendChild(s);
+	getObj('c_body').appendChild(s);
 }
 function deloption(o) {
-	$('c_body').removeChild(o.parentNode.parentNode);
+	getObj('c_body').removeChild(o.parentNode.parentNode);
 }
 
 var lineNode;
@@ -304,7 +296,7 @@ function getRate(e)
 
 function readByRateOpen(e)
 {
-	var menu_rate = $('menu_rate');
+	var menu_rate = getObj('menu_rate');
 	lineNode = e.parentNode.parentNode;
 	var ul = getObj('menu_rate').getElementsByTagName('ul')[0];
 	var tr = e.parentNode.parentNode;
@@ -318,8 +310,8 @@ function readByRateOpen(e)
 	ul.innerHTML=html;
 	menu_rate.style.display='block';
 	menu_rate.style.position='absolute';
-	menu_rate.style.top = 20+e.getBoundingClientRect().top - $('pw_box').getBoundingClientRect().top + 'px';
-	menu_rate.style.left = e.getBoundingClientRect().left - $('pw_box').getBoundingClientRect().left + 'px';
+	menu_rate.style.top = 20+e.getBoundingClientRect().top - getObj('pw_box').getBoundingClientRect().top + 'px';
+	menu_rate.style.left = e.getBoundingClientRect().left - getObj('pw_box').getBoundingClientRect().left + 'px';
 	document.body.onmousedown = function(){
 		document.body.onmousedown = null;
 		menu_rate.style.display = 'none';
@@ -329,11 +321,11 @@ function rateInput(val)
 {
 	var tr = lineNode;
 	tr.getElementsByTagName('input')[0].value = val;
-	$('menu_rate').style.display = 'none';
+	getObj('menu_rate').style.display = 'none';
 	document.body.onmousedown = null;
 }
 </script>
-<script language="javascript" id="showping_js">
+<script type="text/javascript" id="showping_js">
 function operatesel (id) {
 	if (id == '1') {
 		objCheck('ok1').style.display = '';
@@ -376,15 +368,13 @@ EOT;
 	<tr id="ok3" class="tr3">
 		<td>屏蔽理由:</td>
 		<td>
-			<div class="mb5">
-			<select onchange="this.form.atc_content.value=this.value;cutStrContent();" style="width:320px;" class="mb5">
-				<option value="">自定义</option>
-				<option value="">-------</option>
+			<input type="text" class="input" style="width:312px;" name="atc_content" onchange="cutStrContent();" onkeyup="cutStrContent();" onkeydown="cutStrContent();" id="atc_content" onkeydown="ajax.quickpost(event,this.form)" />
+			<div>
+			<select onchange="this.form.atc_content.value=this.value;cutStrContent();" style="width:320px;" size="6">
 				$reason_sel
 			</select>
 			</div>
 			<div>
-				<textarea name="atc_content" onchange="cutStrContent();" onkeyup="cutStrContent();" onkeydown="cutStrContent();" id="atc_content" onkeydown="ajax.quickpost(event,this.form)" class="textareaA mb5"></textarea>
 				<div id="atc_content_warn" class="gray">限100字节</div>
 			</div>
 		</td>
@@ -409,7 +399,7 @@ EOT;
 <input type="hidden" name="tid" value="$tid" />
 <input type="hidden" name="page" value="$page" />
 </form>
-<script language="JavaScript">
+<script>
 setTimeout(function() {
 	initCheckTextNum('atc_content','atc_content_warn', 100);
 }, 100);
@@ -440,15 +430,14 @@ EOT;
 	<tr id="ok3" class="tr3">
 		<td>提醒理由:</td>
 		<td>
+			<input type="text" class="input" style="width:312px;" name="atc_content" onchange="cutStrContent();" onkeyup="cutStrContent();" onkeydown="cutStrContent();" id="atc_content" onkeydown="ajax.quickpost(event,this.form)" />
 			<div class="mb5">
-			<select onchange="this.form.atc_content.value=this.value;cutStrContent();" style="width:320px;" class="mb5">
-				<option value="">自定义</option>
-				<option value="">-------</option>
+			<select onchange="this.form.atc_content.value=this.value;cutStrContent();" style="width:320px;" size="6" class="mb5">
 				$reason_sel
 			</select>
 			</div>
 			<div>
-				<textarea name="atc_content" onchange="cutStrContent();" onkeyup="cutStrContent();" onkeydown="cutStrContent();" id="atc_content" onkeydown="ajax.quickpost(event,this.form)" class="textareaA mb5"></textarea>
+				
 				<div id="atc_content_warn" class="gray">限100字节</div>
 			</div>
 		</td>
@@ -473,7 +462,7 @@ EOT;
 <input type="hidden" name="tid" value="$tid" />
 <input type="hidden" name="page" value="$page" />
 </form>
-<script language="JavaScript">
+<script>
 setTimeout(function() {
 	initCheckTextNum('atc_content','atc_content_warn', 100);
 }, 100);
@@ -547,12 +536,15 @@ print <<<EOT
 <!--
 EOT;
 	if ($db_gdcheck & 16) {
+$checkCode = L::loadClass('checkcode', 'site');
+$checkCodeString = $checkCode->getCheckCodeTemplate();
 print <<<EOT
 -->
 	<tr class="tr3">
 		<td align="center">验证码：</td>
-		<td><img src="ck.php?nowtime=1" align="absmiddle" onclick="this.src='ck.php?nowtime=' + new Date().getTime();" style="cursor:pointer;" /><br />
-			<input type="text" class="input" name="gdcode" size="8" />
+		<td><span id="ckcode" style="display:none;"></span>
+$checkCodeString
+		<br /><input type="text" onfocus="showgd();" class="input" name="gdcode" size="8" />
 		</td>
 	</tr>
 <!--
@@ -567,7 +559,7 @@ print <<<EOT
 <div class="popBottom"><span class="btn2"><span><button type="button" name="ajaxsubmit" onclick="ajax.submit(this.form);">提 交</button></span></span></div>
 </div>
 </form>
-<SCRIPT type="text/javascript" LANGUAGE="JavaScript" src="js/core/friendlist.js"></SCRIPT>
+<script type="text/javascript" src="js/core/friendlist.js"></script>
 <!--
 EOT;
 } elseif($action=='report') {
@@ -829,7 +821,7 @@ print <<<EOT
 								</ul>
 							</div>
 						</div>
-<SCRIPT type="text/javascript" LANGUAGE="JavaScript" src="js/core/friendlist.js"></SCRIPT>
+<script type="text/javascript" src="js/core/friendlist.js"></script>
 
 
 					</td>
@@ -895,7 +887,7 @@ print <<<EOT
 		</div>
 	</form>
 </div>
-<script language="JavaScript">
+<script>
 function shareOtherType(id){
 	getObj(id).style.display = '';
 	if (id == 'recommend_box') {
@@ -905,7 +897,7 @@ function shareOtherType(id){
 	}
 }
 </script>
-<script language="javascript">
+<script>
 var ifcheck = true;
 function CheckAll(form,match) {
 	for (var i = 0; i < form.elements.length; i++) {
@@ -943,13 +935,12 @@ print <<<EOT
 
 	<div style="width:443px;">
 		<div class="popTop cc" style="cursor:move" onmousedown="read.move(event);">
-			<a href="javascript:;" onclick="closep();" class="adel cp">关闭</a>发送到我的新鲜事
+			<a href="javascript:;" onclick="closep();" class="adel cp">关闭</a>转发此{$typeName}到我的新鲜事，再补充两句：
 		</div>
         <div class="p15 mb5">
-            转发此{$typeName}到我的新鲜事，再补充两句：
-            <div class="limit tar mb5" id="weibo_contentlimit">&nbsp;</div>
             <textarea class="textareaA mb5" name="atc_content" style="width:400px;" id="weibo_content" onkeyup="pw_weiboPost.checkWordLength();">{$content}</textarea>
            <div>
+						<div id="weibo_contentlimit" class="fr gray f10 mr5">&nbsp;</div>
            	<label><input id="ismessage"  name="ismessage" type="checkbox" value="1" onclick="change();"/>同时短消息推荐给好友</label>
             <div id="showmessage" class="wrongTip" style="display:none; margin-top:15px">隐藏</div>
             <table width="100%"  id="messagediv" style="display:none"><tbody>
@@ -959,7 +950,7 @@ print <<<EOT
                     <div class="input_img mb5 cc" onclick="getObj('usernames').focus();">
                         <em class="input_down" onclick="pwSearch.selectInit(event,'popout','message.php?type=ajax','action=friend',0)">选择好友</em>
                         <div id="get_friend">
-                        <input type="text" max="20" id="usernames" name="usernames" value="" onblur="pwSearch.blur()" onfocus="pwSearch.init('message.php?type=ajax','action=friend','resultd','searchResult')" onkeydown="pwSearch.move(event)" onkeyup="pwSearch.searchResult(event,200);" autocomplete=off disableautocomplete /></div>
+                        <input type="text" max="20" id="usernames" name="usernames" value="" onblur="pwSearch.blur()" onfocus="pwSearch.init('message.php?type=ajax','action=friend','resultd')" onkeydown="pwSearch.move(event)" onkeyup="pwSearch.searchResult(event,200);" autocomplete=off disableautocomplete /></div>
                     </div>
                     <p class="s6">请输入收件人名称（好友名称支持拼音首字母）</p>
                 </td>
@@ -980,7 +971,7 @@ print <<<EOT
 
 <script type="text/javascript" src="js/pw_search.js"></script>
 <script type="text/javascript" src="js/message.js"></script>
-<script language="javascript">
+<script>
 function change() {
 	if (getObj('ismessage').checked == false) {
 		getObj('messagediv').style.display = 'none';
@@ -990,15 +981,16 @@ function change() {
 	return true;
 }
 
+
 </script>
         </div>
 		<div class="popBottom">
-			<span class="btn2"><span><button type="button" style="width:80px;" onclick="post(this.form);">发送</button></span></span>
+			<span class="btn2"><span><button type="button" onclick="post(this.form);">发送</button></span></span>
 			<span class="bt2"><span><button type="button" onclick="closep();">取消</button></span></span>
 		</div>
 	</div>
 	</form>
-<script language="javascript">
+<script>
 function post(form) {
 	//	scrollTo(0,246);
 	if (getObj('ismessage').checked == true) {
@@ -1035,12 +1027,49 @@ function post(form) {
 	});
 }
 </script>
-<script type="text/javascript" language="JavaScript" src="apps/weibo/js/post.js"></script>
-<script language="javascript">
+<script type="text/javascript" src="apps/weibo/js/post.js"></script>
+<script>
 setTimeout(function(){
 	var pw_weiboPost = new weibo_post({form:'weibo_form',content:'weibo_content'});
 	pw_weiboPost.checkWordLength();
 }, 300);
+</script>
+<!--
+EOT;
+} elseif($action == 'commentsPic') {
+print<<<EOT
+-->
+	<form name="commentsPic_form" method="post" action="apps.php?q=ajax&a=commentsPic&ajax=1" id="commentsPic_form">
+    <input type="hidden" name="verify" value="$verifyhash" />
+    <input type="hidden" name="tid" value="$tid" />
+    <input type="hidden" name="aid" value="$aid" />
+	<div style="width:443px;">
+		<div class="popTop cc" style="cursor:move" onmousedown="read.move(event);">
+			<a href="javascript:;" onclick="closep();" class="adel cp">关闭</a>说点什么吧~
+		</div>
+        <div class="p15">
+            <textarea class="textareaA" name="comments_content" style="width:400px;" id="comments_content"></textarea>
+        </div>
+		<div class="popBottom">
+			<span class="btn2"><span><button type="button" onclick="commentspics(this.form);">评论</button></span></span>
+			<span class="bt2"><span><button type="button" onclick="closep();">取消</button></span></span>
+		</div>
+	</div>
+	</form>
+
+<script>
+function commentspics(form){
+	ajax.submit(form, function() {
+		var gotText = ajax.request.responseText;
+		if ('success' != gotText) {
+			showDialog("error", gotText);
+		} else {
+			showDialog('success', '发送成功!',1,function() {
+				window.location.reload();
+			});
+		}
+	})
+}
 </script>
 <!--
 EOT;

@@ -77,6 +77,10 @@ class PW_PollsSource extends SystemData {
 			$v['authorurl']	= 'u.php?uid='.$v['authorid'];
 			$v['forumname']	= getForumName($v['fid']);
 			$v['forumurl']	= getForumUrl($v['fid']);
+			if ($v['anonymous']) {
+				$v['author'] ='匿名';
+				$v['authorid'] = '';
+			}
 			list($v['topictypename'],$v['topictypeurl']) = getTopicType($v['type'],$v['fid']);
 			$v['addition'] = $v;
 			$data[$k] = $v;
@@ -96,14 +100,7 @@ class PW_PollsSource extends SystemData {
 	}
 	
 	function _cookFid($fid) {
-		if ($fid && is_numeric($fid)) return $fid;
-		if (S::isArray($fid)) {
-			foreach ($fid as $key=>$value) {
-				if (!$value) unset($fid[$key]);
-			}
-			if (S::isArray($fid)) return S::sqlImplode($fid);
-		}
-		return getCommonFid();
+		return getCookedCommonFid($fid);
 	}
 
 	function getSourceFilterTime($datas,$sorts = null){

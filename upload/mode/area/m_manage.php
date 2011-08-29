@@ -11,7 +11,6 @@ $db_ifjump = 1;
 $portalPageService = L::loadClass('portalpageservice', 'area');
 $levelService = L::loadclass("AreaLevel", 'area');
 $invokeService = L::loadClass('invokeservice', 'area');
-$pageInvokeService = L::loadClass('pageinvokeservice', 'area');
 
 S::gp(array("action","invokename","channelid","invokepieceid","page","selid","subinvoke","step","ifpush"));
 $IS_PROTAL = 0;
@@ -19,11 +18,10 @@ $invokename = trim(strip_tags($invokename));
 
 if (is_numeric($channelid)) {
 	$channelid = intval($channelid);
-	$pageInvokeInfo = $pageInvokeService->getPageInvokeByChannelIdAndName($channelid, $invokename);
 } elseif ($portalPageService->checkPortal($channelid)) {
 	$IS_PROTAL = 1;
-	$pageInvokeInfo = $pageInvokeService->getPageInvokeBySignAndName($channelid, $invokename);
 }
+$invokeInfo	= $invokeService->getInvokeByName($invokename);
 if (!in_array($action, array("pushto","fetch","recommend","success")) && !($userLevel = $levelService->getAreaLevel($winduid, $channelid, $invokename))) {
 	showmsg($levelService->language("area_no_level"));
 }
@@ -41,8 +39,6 @@ list($hasedit, $hasattr) = array(
 );
 if (empty($action) || "verify" == $action) {
 	$page = ($page > 1) ? $page : 1;
-	$invokeInfo = $invokeService->getInvokeByName($invokename);
-	if (!$invokeInfo) Showmsg('模块不存在');
 	list($bool, $channels, $invokes, $subInvokes) = $manageService->getFirstGrade($winduid, $channelid, $invokename);
 	$subInvokesSelect = $manageService->buildSelect($subInvokes, 'invokepieceid', 'invokepieceid', $invokepieceid, true, "选择位置");
 	$ifverify = $action ? 1 : 0;
@@ -118,29 +114,23 @@ if (empty($action) || "verify" == $action) {
 	}
 } elseif ("editconfig" == $action) {
 	(!$hasattr) && refreshto($baseUrl, '抱歉,你没有设置模块属性的权限');
-	$invokedata	= $pageInvokeInfo;
+	$invokedata	= $invokeInfo;
 
 	if (!$step) {
-		if (!$IS_PROTAL) {
-			$channelService = L::loadClass('channelService', 'area');
-			$alias = $channelService->getAliasByChannelId($channelid);
-		} else {
-			$alias = $channelid;
-		}
-		
+		$alias = $IS_PROTAL ? $channelid : $invokeInfo['sign'];
 		ifcheck($invokedata['ifverify'],'ifverify');
+		ifcheck($invokedata['ifapi'],'ifapi');
 		
 		$invokepieces = $invokeService->getInvokePieceForSetConfig($invokename);
 	} else {
 		S::gp(array('alias'));
 		S::gp(array('p_action','config','num','param','cachetime','ifpushonly','invokename','title'), 'GP');
-		S::gp(array('ifverify','pageinvokeid'),'P');
-		$pageInvokeService->updatePageInvoke($pageinvokeid,array('ifverify'=>(int)$ifverify));
-		
+		S::gp(array('ifverify','pageinvokeid','ifapi'),'P');
+		$invokeService->updateInvokeByName($invokename,array('ifapi'=>(int)$ifapi,'ifverify'=>(int)$ifverify));
 		$pieces = array();
 		foreach ($num as $key => $value) {
-			if (isset($param[$key][image])) {
-				$images = explode(',',$param[$key][image]);
+			if (isset($param[$key]['image']) && $param[$key]['image'] != 'default') {
+				$images = explode(',',$param[$key]['image']);
 				if ($images[0] == 0 || $images[1] == 0) refreshto($baseUrl . "action=editconfig", '图片宽度或者高度不可为0，请返回修改！');
 			}
 			$temp = array();
@@ -162,12 +152,7 @@ if (empty($action) || "verify" == $action) {
 } elseif ("edittpl" == $action) {
 	(!$hasedit) && refreshto($baseUrl, '抱歉,你没有编辑模块代码的权限');
 	if (!$step) {
-		if (!$IS_PROTAL) {
-			$channelService = L::loadClass('channelService', 'area');
-			$alias = $channelService->getAliasByChannelId($channelid);
-		} else {
-			$alias = $channelid;
-		}
+		$alias = $IS_PROTAL ? $channelid : $invokeInfo['sign'];
 		
 		$pieceCode = $portalPageService->getPiecesCode($alias, $invokename);
 	} else {
@@ -181,9 +166,10 @@ if (empty($action) || "verify" == $action) {
 		if ($tagcode === false) {
 			refreshto($baseUrl . "action=edittpl",'模板编辑功能不支持php代码，以及一些特殊字符,如有需求，请直接修改模板文件',5);
 		}
-		
+		if ($moduleConfigService->checkCodeTitles($tagcode)) {
+			refreshto($baseUrl . "action=edittpl",'模块名称有重复',5);
+		}
 		$portalPageService->updateModuleCode($alias, $invokename, $tagcode);
-		
 		refreshto($baseUrl . "action=edittpl", 'operate_success');
 	}
 } elseif ('source' == $action) {
@@ -231,11 +217,10 @@ EOT;
 		$default = $dataSourceService->getRelateInfoByKey($tempAction,$pushkey, $invokepiece['param']);
 		if ($default['image'] && $default['image'][0] != 'nopic') {
 			$selectImages = $default['image'];
-			$default['image'] = '';
 		} else {
 			$selectImages = '';
-			$default['image'] = '';
 		}
+		$default['image'] = '';
 	} else {
 		if (3 == $ifpush && $pushdataid) {
 			$pushdataService = L::loadClass('pushdataservice', 'area');
@@ -260,7 +245,6 @@ EOT;
 	}
 	$successLang = $ifrecommend ? '数据已推荐至相应模块！' : '您已成功的实现推送操作！';
 	require_once areaLoadFrontView('area_manage');
-	//footer();
 }
 /**
  * 公共业务组装 pushto、add和edit 三大业务公共服务 下拉联动
@@ -271,7 +255,7 @@ if (in_array($action, array("pushto","add","edit","recommend"))) {
 	if (!$step) {
 		$dataSourceService = L::loadClass('datasourceservice', 'area');
 		list($channelid, $invokename, $invokepieceid) = array(
-			($channelid ? $channelid : ($channelid ? $channelid : 0)),
+			($channelid ? $channelid : 0),
 			($invokename ? strip_tags(trim($invokename)) : ""),
 			($invokepieceid ? intval($invokepieceid) : "")
 		);
@@ -289,17 +273,6 @@ if (in_array($action, array("pushto","add","edit","recommend"))) {
 			$invokepiece = $invokeService->getInvokePieceByInvokeId($invokepieceid);
 			$inputs = $dataSourceService->getRelateHtmlForView($invokepiece['action']);
 			$push = array();
-		}
-		$channelsSelect = $manageService->buildSelect($channels, 'channel', 'channel', $channelid);
-
-		$invokesSelect = $manageService->buildSelect($invokes, 'invokename', 'invokename', $invokename, false, "选择模块");
-		$subInvokesSelect = $manageService->buildSelect($subInvokes, 'subinvoke', 'subinvoke', $invokepieceid, true, "选择位置");
-		$status = ("" != $invokename) ? 2 : 1;
-		if (1 == $ajax && $channelid) {
-			echo $status . "\t" . $invokesSelect . "\t" . $subInvokesSelect . "\t";
-			ajax_footer();
-		}
-		if ("add" == $action) {
 			$offsets = array(
 				0 => 'checked="checked"',
 				1 => "",
@@ -309,6 +282,15 @@ if (in_array($action, array("pushto","add","edit","recommend"))) {
 				5 => ""
 			);
 			$title = "添加";
+		}
+		$channelsSelect = $manageService->buildSelect($channels, 'channel', 'channel', $channelid);
+
+		$invokesSelect = $manageService->buildSelect($invokes, 'invokename', 'invokename', $invokename, false, "选择模块");
+		$subInvokesSelect = $manageService->buildSelect($subInvokes, 'subinvoke', 'subinvoke', $invokepieceid, true, "选择位置");
+		$status = ("" != $invokename) ? 2 : 1;
+		if (1 == $ajax && $channelid) {
+			echo $status . "\t" . $invokesSelect . "\t" . $subInvokesSelect . "\t";
+			ajax_footer();
 		}
 		$default = array();
 	} else {

@@ -125,7 +125,7 @@ if ($_POST['admin_pwd'] && $_POST['admin_name']) {
 	}
 	$admin_name = stripcslashes($_POST['admin_name']);
 	$safecv = $db_ifsafecv ? questcode($_POST['question'],$_POST['customquest'],$_POST['answer']) : '';
-	$CK = array($timestamp,$_POST['admin_name'],md5(PwdCode(md5($_POST['admin_pwd'])).$timestamp),$safecv);
+	$CK = array($timestamp,$_POST['admin_name'],md5(PwdCode(md5($_POST['admin_pwd'])).$timestamp.getHashSegment()),$safecv);
 	Cookie('AdminUser',StrCode(implode("\t",$CK)));
 } else {
 	$AdminUser = GetCookie('AdminUser');
@@ -136,14 +136,12 @@ if ($_POST['admin_pwd'] && $_POST['admin_name']) {
 }
 
 if (!empty($CK)) {
-	require_once S::escapePath(R_P."require/db_$database.php");
-	$db = new DB($dbhost,$dbuser,$dbpw,$dbname,$PW,$charset,$pconnect);
+	PwNewDB();
 	$rightset = checkpass($CK);
 } else {
 	$db = null;
 	$rightset = array();
 }
-
 if (empty($rightset)) {
 	if ($_POST['admin_name'] || $_POST['admin_pwd']) {
 		writeover($bbsrecordfile,'|'.str_replace('|','&#124;',S::escapeChar($_POST['admin_name'])).'|'.str_replace('|','&#124;',S::escapeChar($_POST['admin_pwd']))."|Logging Failed|$onlineip|$timestamp|\n",'ab');
@@ -178,7 +176,8 @@ if (empty($rightset)) {
 	$REQUEST_URI = trim($REQUEST_URI,'?#');
 	ObHeader($REQUEST_URI);
 }
-
+$bubbleInfo = $rightset['bubble'];
+$uidForBubble = $rightset['uid'];
 $admin_gid = $rightset['gid'];
 if ($db_ifsafecv && strpos($db_safegroup,",$admin_gid,")!==false && !$CK[3]) {
 	Cookie('AdminUser','',0);
@@ -238,9 +237,10 @@ function checkpass($CK) {
 	if (S::inArray($CK[1],$manager)) {
 		global $manager_pwd;
 		$v_key = array_search($CK[1],$manager);
+		$ifQuery = true; // In order ot get bubble info
 		if (!SafeCheck($CK,PwdCode($manager_pwd[$v_key]))) {
 			$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
-			$rt = $userService->getByUserName($CK[1]);
+			$rt = $userService->getByUserName($CK[1], true, true);
 
 			if (!SafeCheck($CK,PwdCode($rt['password'])) || $db_ifsafecv && $rt['safecv']!=$CK['3']) {
 				return false;
@@ -248,14 +248,21 @@ function checkpass($CK) {
 			if (!admincheck($rt['uid'],$rt['username'],$rt['groupid'],$rt['groups'],'check')) {
 				return false;
 			}
+			$ifQuery = false;
 		} elseif ($db_ifsafecv) {
 			$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
-			$rt = $userService->getByUserName($CK[1]);
+			$rt = $userService->getByUserName($CK[1], true, true);
 			if ($rt && $rt['safecv']!=$CK['3']) return false;
+			$ifQuery = false;
+		}
+		if ($ifQuery) {
+			$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
+			$rt = $userService->getByUserName($CK[1], true, true);
 		}
 		define('If_manager',1);
 		$rightset['gid'] = 3;
 		$rightset['all'] = 1;
+		$rightset['bubble'] = $rt['bubble'];
 		require GetLang('purview');
 		foreach ($purview as $key=>$value) {
 			$rightset[$key] = 1;
@@ -264,7 +271,7 @@ function checkpass($CK) {
 			$rightset[$key] = 1;
 		}
 	} else {
-		$rt = $db->get_one("SELECT m.uid,m.username,m.groupid,m.groups,m.password,m.safecv,m.groupid,u.gptype,p.rvalue as allowadmincp FROM pw_members m LEFT JOIN pw_usergroups u ON u.gid=m.groupid LEFT JOIN pw_permission p ON p.uid='0' AND p.fid='0' AND p.gid=m.groupid AND p.rkey='allowadmincp' WHERE m.username=".S::sqlEscape($CK[1]));
+		$rt = $db->get_one("SELECT m.uid,m.username,m.groupid,m.groups,m.password,m.safecv,m.groupid,u.gptype,p.rvalue as allowadmincp,md.bubble FROM pw_members m LEFT JOIN pw_usergroups u ON u.gid=m.groupid LEFT JOIN pw_permission p ON p.uid='0' AND p.fid='0' AND p.gid=m.groupid AND p.rkey='allowadmincp' LEFT JOIN pw_memberdata md ON md.uid = m.uid WHERE m.username=".S::sqlEscape($CK[1]));
 		if (!$rt['allowadmincp'] || ($rt['gptype']!='system' && $rt['gptype']!='special') || $db_ifsafecv && $rt['safecv'] != $CK['3']) {
 			return false;
 		}
@@ -284,6 +291,7 @@ function checkpass($CK) {
 			$rightset[$key] = (isset($purview[$key]) && $rightset[$key]==1) ? 1 : 0;
 		}
 		$rightset['gid'] = $rt['groupid'];
+		$rightset['bubble'] = $rt['bubble'];
 	}
 	$rightset['uid'] = $rt['uid'];
 	return $rightset;
@@ -316,7 +324,7 @@ function adminmsg($msg,$jumpurl='',$t=2,$langtype='admin') {
 	} elseif (!$basename) {
 		$basename = $REQUEST_URI;
 	}
-	if ($adminjob!='manager' && $db_adminrecord==1 && $basename!='javascript:history.go(-1);') {
+	if ($adminjob!='manager' && $db_adminrecord==1 && $basename!='javascript:history.go(-1);' && !$fromgd) {
 		$adminmsg = 2;
 	} else {
 		$adminmsg = 1;
@@ -328,7 +336,7 @@ function adminmsg($msg,$jumpurl='',$t=2,$langtype='admin') {
 	include PrintEot('message');
 	$cachetime = $timestamp-3600*24;
 	if (readover(D_P.'data/bbscache/none.txt')!='' || pwFilemtime(D_P.'data/bbscache/file_lock.txt')<$cachetime || pwFilemtime(D_P.'data/bbscache/info.txt')<$cachetime || pwFilemtime(D_P.'data/bbscache/userpay.txt')<$cachetime) {
-		echo '<script language="JavaScript">if (parent.notice) {parent.notice.location.href = "'.$admin_file.'?adminjob=notice";}</script>';
+		echo '<script type="text/javascript">if (parent.notice) {parent.notice.location.href = "'.$admin_file.'?adminjob=notice";}</script>';
 	}
 	afooter();
 }
@@ -570,6 +578,7 @@ function GdConfirm($code,$t=1) {
 		global $basename,$admin_file;
 		$t && Cookie('AdminUser','',0);
 		$basename = $admin_file;
+		$GLOBALS['fromgd'] = 1;
 		adminmsg('check_error');
 	}
 }

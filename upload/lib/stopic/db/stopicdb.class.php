@@ -107,6 +107,31 @@ class PW_STopicDB extends BaseDB {
 	}
 	
 	/**
+	 * 取count
+	 *
+	 * @param int $stopicId 专题id
+	 * @return array/null 找到返回专题数据，否则返回null
+	 */
+	function getCommentNum($stopicId) {
+		$stopicId = intval($stopicId);
+		if (!$stopicId) return false;
+		return $this->_db->get_value("SELECT commentnum FROM " . $this->_tableName . " WHERE stopic_id=" . intval($stopicId));
+	}
+	
+	function updateCommentnum($exp='+1',$stopicId) {
+		$stopicId = intval($stopicId);
+		if($stopicId < 1 || !$exp) return false;
+		
+		$num = intval(trim($exp,'+-'));
+		if (strpos($exp,'+') !== false) {
+			return $this->_db->update(pwQuery::buildClause("UPDATE :pw_table SET commentnum=commentnum+" . S::sqlEscape($num) . ' WHERE stopic_id=:stopic_id', array($this->_tableName, $stopicId)));
+		} else {
+			return $this->_db->update(pwQuery::buildClause("UPDATE :pw_table SET commentnum=commentnum-" . S::sqlEscape($num) . ' WHERE stopic_id=:stopic_id', array($this->_tableName, $stopicId)));
+		}
+		return false;
+	}
+	
+	/**
 	 * 获取未操作的专题
 	 * 
 	 * @return null|array 专题数据

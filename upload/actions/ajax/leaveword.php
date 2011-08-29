@@ -51,7 +51,9 @@ if (empty($_POST['step'])) {
 		pwCache::getData(D_P . 'data/bbscache/forum_cache.php');
 		$atc = $db->get_one("SELECT author,fid,subject,content,postdate FROM $pw_posts WHERE pid=" . S::sqlEscape($pid) . ' AND tid=' . S::sqlEscape($tid));
 		!$atc['subject'] && $atc['subject'] = substrs($atc['content'], 35);
-
+		if (strpos($atc['subject'],'[/URL]')!==false || strpos($atc['subject'],'[/url]')!==false) {
+			$atc['subject'] = preg_replace("/\[url\](.+?)\[\/url\]/is","$1", $atc['subject']);
+		}
 		M::sendNotice(
 			array($atc['author']),
 			array(

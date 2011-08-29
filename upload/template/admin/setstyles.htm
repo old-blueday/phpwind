@@ -85,7 +85,7 @@ EOT;
 EOT;
 }elseif($action=='edit' || $action=='add'){print <<<EOT
 -->
-<script type="text/javascript" language="JavaScript">
+<script type="text/javascript">
 function findPosX(obj) {
 	var curleft = 0;
 	if (obj.offsetParent) {
@@ -117,9 +117,9 @@ function pickReback(obj,color){
 	obj.style.color = color;
 }
 </script>
-<script type="text/javascript" language="JavaScript" src="js/global.js"></script>
-<script type="text/javascript" language="JavaScript" src="js/pw_ajax.js"></script>
-<script type="text/javascript" language="JavaScript" src="js/color_picker.js"></script>
+<script type="text/javascript" src="js/global.js"></script>
+<script type="text/javascript" src="js/pw_ajax.js"></script>
+<script type="text/javascript" src="js/color_picker.js"></script>
 <div class="nav3 mb10 ta">
   <ul class="cc">
     <li><a href="$basename">风格列表</a></li>
@@ -369,7 +369,7 @@ EOT;
 EOT;
 }print <<<EOT
 -->
-<script language="JavaScript">
+<script type="text/javascript">
 var bgcolor = getObj('bgcolor').value;
 if(bgcolor.search(/\#[a-fA-F0-9]{6}/) != -1){
 	var color = bgcolor.substr(bgcolor.search(/\#[a-fA-F0-9]{6}/),7);

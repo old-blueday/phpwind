@@ -2,7 +2,7 @@
 $style1 = $db_pwcode ? '' : 'none';
 $style2 = $db_setform ? '' : 'none';
 print <<<EOT
---><div style="display:none;"><link rel="stylesheet" type="text/css" href="$imgpath/post/c_editor/editor.css" /></div>
+--><div style="display:none;"><link rel="stylesheet" type="text/css" href="$imgpath/post/c_editor/editor.css?{$GLOBALS['wind_repair']}" /></div>
 <div class="wind_editor_con cc">
 	<div class="w_editor_but">
 		<ul class="cc fl">
@@ -58,9 +58,9 @@ print <<<EOT
 </div>
 <div class="wy_tips_A"><a href="javascript:" onclick="loadData('msg');">恢复数据</a> ┊ <a href="javascript:" onclick="opendraft(this.id);" id="newdraft">草稿箱</a></div>
 
-<script language="JavaScript" src="js/wind_c_editor.js"></script>
+<script type="text/javascript" src="js/wind_c_editor.js"></script>
 
-<script language="JavaScript">
+<script type="text/javascript">
 var charset='$db_charset';
 var editor = null;
 var bbsurl ="{$B_url}";

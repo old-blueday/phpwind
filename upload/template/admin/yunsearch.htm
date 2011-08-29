@@ -1,0 +1,44 @@
+<!--<?php
+include_once PrintEot('left');
+print <<<EOT
+-->
+<!--
+EOT;
+if($db_yunsearch_search){
+print <<<EOT
+-->
+<iframe id="yunsearch" name="yunsearch" frameborder="0" width="100%" height="800" scrolling="no" src="{$yunManageUrl}"></iframe>
+<!--
+EOT;
+}else{
+print <<<EOT
+-->
+<form action="$basename" method="post" enctype="multipart/form-data">
+<input name="step" value="2" type="hidden" />
+<div class="p10">
+	<h3 class="h1">云搜索基本设置</h3>
+	<div class="admin_table mb10">
+		<table cellpadding="0" cellspacing="0" width="100%">
+			<tr class="tr1">
+				<td class="td1">云搜索服务</td>
+				<td class="td2">
+					<ul class="list_A list_80">
+						<li><input type="radio" value="1" name="db_yunsearch_search" $yunsearch_search_Y>开启</li>
+						<li><input type="radio" value="0" name="db_yunsearch_search" $yunsearch_search_N>关闭</li>
+					</ul>
+				</td>
+			</tr>
+		</table>
+	</div>
+</div>
+<div class="p10 tac"><span class="btn"><span><button type="submit">提 交</button></span></span></div>
+</form>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+<!--
+EOT;
+include_once PrintEot('adminbottom');
+?>-->

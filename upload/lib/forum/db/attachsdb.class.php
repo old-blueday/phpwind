@@ -11,6 +11,12 @@ class PW_AttachsDB extends BaseDB {
 		return $this->_db->insert_id();
 	}
 
+	function insert($fieldsData) {
+		if(!S::isArray($fieldsData)) return false;
+		$this->_db->update("INSERT INTO " . $this->_tableName . " (uid,name,type,size,attachurl,uploadtime,descrip,ifthumb) VALUES  " . S::sqlMulti($fieldsData));
+		return true;
+	}
+	
 	function delete($aids) {
 		if (empty($aids)) return false;
 		$this->_db->update('DELETE FROM ' . $this->_tableName . ' WHERE aid' . $this->_sqlIn($aids));
@@ -61,9 +67,13 @@ class PW_AttachsDB extends BaseDB {
 	function getLatestAttachByTidType($tid,$type='img') {
 		return $this->_db->get_value("SELECT attachurl FROM " . $this->_tableName . ' WHERE tid=' . S::sqlEscape($tid) . ' AND pid=0 AND type=' . S::sqlEscape($type) . ' ORDER BY aid DESC Limit 1');
 	}
+
+	function getLatestAttachInfoByTidType($tid,$type='img') {
+		return $this->_db->get_one("SELECT attachurl,ifthumb FROM " . $this->_tableName . ' WHERE tid=' . S::sqlEscape($tid) . ' AND pid=0 AND type=' . S::sqlEscape($type) . ' ORDER BY aid DESC Limit 1');
+	}
 	
 	function countThreadImagesByTidUid($tid,$uid) {
-		return $this->_db->get_value("SELECT COUNT(*) FROM " . $this->_tableName . ' WHERE tid=' . S::sqlEscape($tid) . ' AND uid=' . S::sqlEscape($uid) . " AND type='img'");
+		return $this->_db->get_value("SELECT COUNT(*) FROM " . $this->_tableName . ' WHERE tid=' . S::sqlEscape($tid) . ' AND uid=' . S::sqlEscape($uid) . " AND type='img' AND fid>0");
 	}
 	
 	function countTopicImagesByTid($tid) {

@@ -11,24 +11,33 @@ print <<<EOT
 	<div class="menubar">
 		<div class="navB">
 			<ul class="one">
-				<li id="a_modify"><img src="u/images/set/modify.png">&nbsp;<a href="profile.php?action=modify">帐号</a></li>
+				<li id="a_modify"><a href="profile.php?action=modify" hidefocus="true"><img src="u/images/set/modify.png"><span>帐号</span></a></li>
 <!--
 EOT;
 if ($db_authstate) {print <<<EOT
 -->
-				<li id="a_auth"><img src="u/images/set/auth.png">&nbsp;<a href="profile.php?action=auth">认证</a></li>
+				<li id="a_auth"><a href="profile.php?action=auth" hidefocus="true"><img src="u/images/set/auth.png"><span>认证</span></a></li>
 <!--
 EOT;
 }print <<<EOT
 -->
-				<li id="a_privacy"><img src="u/images/set/privacy.png">&nbsp;<a href="profile.php?action=privacy">隐私</a></li>
-				<li id="a_userpay"><img src="u/images/set/userpay.png">&nbsp;<a href="userpay.php">积分</a></li>
-				<li id="a_permission"><img src="u/images/set/permission.png">&nbsp;<a href="profile.php?action=permission">权限</a></li>
+				<li id="a_privacy"><a href="profile.php?action=privacy" hidefocus="true"><img src="u/images/set/privacy.png"><span>隐私</span></a></li>
+				<li id="a_userpay"><a href="userpay.php" hidefocus="true"><img src="u/images/set/userpay.png"><span>积分</span></a></a></li>
+				<li id="a_permission"><a href="profile.php?action=permission" hidefocus="true"><img src="u/images/set/permission.png"><span>权限</span></a></li>
 <!--
 EOT;
+/* platform weibo app */
+$siteBindService = L::loadClass('WeiboSiteBindService', 'sns/weibotoplatform/service'); /* @var $siteBindService PW_WeiboSiteBindService */
+if ($siteBindService->isOpen()) {
+print <<<EOT
+-->
+				<li id="a_weibobind"><a href="profile.php?action=weibobind"><img src="u/images/expand/connect.png"><span>帐号通</span></a></li>
+<!--
+EOT;
+}
 if ($_G['atclog']) {print <<<EOT
 -->
-				 <li id="a_log"><img src="u/images/set/record.png">&nbsp;<a href="profile.php?action=log">操作记录</a></li>
+				 <li id="a_log"><a href="profile.php?action=log" hidefocus="true"><img src="u/images/set/record.png"><span>操作记录</span></a></li>
 <!--
 EOT;
 }print <<<EOT
@@ -41,7 +50,7 @@ EOT;
 			</ul-->
 		</div>
 	</div>
-<script language="JavaScript">
+<script>
 setCurrent('a_$b','a_modify','current');
 </script>
 <!--

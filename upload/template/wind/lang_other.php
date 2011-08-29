@@ -88,6 +88,7 @@ $lang['other'] = array(
 	'sort_digests'		=> '精华帖',
 	'sort_currency'		=> '$GLOBALS[db_currencyname]',
 	'sort_f_num'		=> '朋友数',
+	'sort_newUser'		=> '新会员',
 
 	'mawhole_copy'		=> '本帖被 $GLOBALS[windid] 从 {$GLOBALS[forum][$GLOBALS[fid]][name]} 复制到本区($GLOBALS[mgdate])',
 	'mawhole_move'		=> '本帖被 $GLOBALS[windid] 从 {$GLOBALS[forum][$GLOBALS[fid]][name]} 移动到本区($GLOBALS[mgdate])',

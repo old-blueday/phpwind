@@ -1,0 +1,161 @@
+<!--<?php
+defined('W_P') or exit('Forbidden');
+list($htmlAdvert,$arrayAdvert) = pwAdvert('Wap.Header',$fid,$lou,'thread');
+if($htmlAdvert){print <<<EOT
+-->
+	<div class="atop">$htmlAdvert</div>
+<!--
+EOT;
+}
+$linkhref = $fid ? "index.php?a=forum&fid=$fid" : "index.php";
+if (empty($fid) && empty($type)) {
+print <<<EOT
+-->
+<div class="section"><a href="#anch-2" id="anch-2" accesskey="3"><img alt="phpwind" src="$wapImages/x.gif" /></a>
+<strong>我的书签</strong></span></div>
+<div class="sectionidx">
+<!--
+EOT;
+foreach($wapfids as $key => $val){print <<<EOT
+-->
+<a href="index.php?a=forum&fid=$key">$val</a><br/>
+<!--
+EOT;
+}print <<<EOT
+-->
+<a href="index.php?a=list"><b>所有版块&raquo;</b></a></strong></div>
+
+<!--
+EOT;
+}else{
+$current_new = $current_hot = $current_digest = '';
+${'current_'.$type} = 'current';	
+print <<<EOT
+-->
+<div class="navigator">
+<a href="#anch-end" id="anch-01" accesskey="1">
+<img alt="phpwind" src="$wapImages/x.gif" /></a>
+<a href="$linkhref">$forumName</a>
+&nbsp;&nbsp;
+<span id="shortcut">
+<!--
+EOT;
+if (strpos($winddb['shortcut'],','.$fid.',') !== false) {
+print <<<EOT
+}
+-->
+	<a href="index.php?a=action&action=del&amp;fid=$fid"  title="将本版块移除我的书签" class="keepOn mr10">已收藏</a>
+<!--
+EOT;
+} elseif(!in_array($type,array('new','digest','hot'))) {
+print <<<EOT
+-->
+	<a href="index.php?a=action&action=add&amp;fid=$fid"  title="将本版块添加到我的书签" class="keep mr10">收藏</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+</span>
+</div>
+<div class="section">
+<a href="index.php?a=forum&fid=$fid&amp;type=new" class="$current_new">最新</a>
+ | 
+<a href="index.php?a=recommend">推荐</a>
+ | 
+<a href="index.php?a=forum&fid=$fid&amp;type=hot" class="$current_hot">热门</a>
+ | 
+<a href="index.php?a=forum&fid=$fid&amp;type=digest" class="$current_digest">精华</a>
+ | 
+<a href="index.php?a=post&fid=$fid">发帖</a>
+</div>
+
+<!--
+EOT;
+$sortType = array(1=>"24小时",2=>"3天",3=>"1周",4=>"1月");
+$current_1 = $current_2 = $current_3 = $current_4 = '';
+if($type == 'hot'){
+$t = $t?$t:4;
+${'current_'.$t} = 'current';	
+
+$sortType[$t] = "<strong>{$sortType[$t]}</strong>";
+print <<<EOT
+-->
+<div class="notice">
+<a href="index.php?a=forum&fid=$fid&amp;type=hot&amp;t=1" class="$current_1">{$sortType[1]}</a>
+ | 
+<a href="index.php?a=forum&fid=$fid&amp;type=hot&amp;t=2" class="$current_2">{$sortType[2]}</a>
+ | 
+<a href="index.php?a=forum&fid=$fid&amp;type=hot&amp;t=3" class="$current_3">{$sortType[3]}</a>
+ | 
+<a href="index.php?a=forum&fid=$fid&amp;type=hot&amp;t=4" class="$current_4">{$sortType[4]}</a>
+</div>
+<!--
+EOT;
+}foreach($tids as $key => $val){
+print <<<EOT
+-->
+<div>
+<a href="index.php?a=read&tid=$val[tid]">$val[subject]</a> 
+<!--
+EOT;
+if($val[topped]){print <<<EOT
+-->
+[顶]
+<!--
+EOT;
+}if($val[digest]){print <<<EOT
+-->
+[精]
+<!--
+EOT;
+}if($val[ifupload]==1){print <<<EOT
+-->
+[图]
+<!--
+EOT;
+}print <<<EOT
+-->
+（回<a href="index.php?a=reply_all&tid=$val[tid]">$val[replies]</a>/阅$val[hits]）<br />
+<span class="reply">[<a href="index.php?a=myhome&uid=$val[authorid]" class="reply_a">$val[author]</a> $val[postdate]]</span> </div>
+<!--
+EOT;
+}if($tids){
+print <<<EOT
+-->
+<div class="post_bottom"><a href="$nexturl">下一页</a>
+ | 
+<a href="$prevurl">上一页</a></div>
+<div class="section">
+<a href="index.php?a=forum&fid=$fid&amp;type=new"  class="$current_new">最新</a>
+ | 
+<a href="index.php?a=recommend">推荐</a>
+ | 
+<a href="index.php?a=forum&fid=$fid&amp;type=hot"  class="$current_hot">热门</a>
+ | 
+<a href="index.php?a=forum&fid=$fid&amp;type=digest"  class="$current_digest">精华</a>
+ | 
+<a href="index.php?a=post&fid=$fid">发帖</a><br />
+
+</div>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+<div class="search"><form action="index.php?a=search" method="post">
+<input type="text" name="q"  size="7" maxlenth="2000"/><input type="submit" value="搜索帖子" />
+<br />
+</form></div>
+<!--
+EOT;
+}list($htmlAdvert,$arrayAdvert) = pwAdvert('Wap.Footer',$fid,$lou,'thread');
+if($htmlAdvert){print <<<EOT
+-->
+	<div class="abottom">$htmlAdvert</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+<!--
+EOT;
+?>-->

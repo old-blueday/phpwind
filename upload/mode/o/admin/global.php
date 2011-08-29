@@ -28,6 +28,17 @@ if ( $action == 'setucenter' ) {
 	}else if($step == '2'){
 		S::gp(array('reward','usergroup'));
 		S::gp(array('config','configa'),'P',2);
+		$reward['credit']['min'] = intval($reward['credit']['min']);
+		$reward['credit']['max'] = intval($reward['credit']['max']);
+		$reward['credit']['step'] = intval($reward['credit']['step']);
+		if ($config['punchopen'] && ($reward['credit']['min'] < 1 || $reward['credit']['max'] < 1)) {
+			adminmsg('打卡奖励设置有误!');
+		}
+		
+		//每日递增步长
+		if ($reward['credit']['step'] < 1 || $reward['credit']['step'] > $reward['credit']['max'] - $reward['credit']['min']) {
+			$reward['credit']['step'] = 1;
+		}
 		
 		//每日打卡功能  结束
 		if($config['punchopen'] == 0) $config['punchopen'] = "0";

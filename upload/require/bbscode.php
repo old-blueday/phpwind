@@ -120,7 +120,7 @@ function convert($message,$allow,$type="post"){
 	if ($type == 'post') {
 		$t = 0;
 		while (strpos($message,'[table') !== false && strpos($message,'[/table]') !== false) {
-			$message = preg_replace('/\[table(?:=(\d{1,3}(?:%|px)?)(?:,(#\w{6}))?(?:,(#\w{6}))?(?:,(\d+))?)?\](.*?)\[\/table\]/eis', "tablefun('\\5','\\1','\\2','\\3','\\4')",$message);
+			$message = preg_replace('/\[table(?:=(\d{1,3}(?:%|px)?)(?:,(#\w{6})?)?(?:,(#\w{6})?)?(?:,(\d+))?)?\](.*?)\[\/table\]/eis', "tablefun('\\5','\\1','\\2','\\3','\\4')",$message);
 			if (++$t>4) break;
 		}
 		if ($allow['mpeg']) {
@@ -175,12 +175,11 @@ function copyctrl() {
 	return "<span style=\"display:none\"> $randval </span>&nbsp;<br />";
 }
 
-function attachment($message, &$attstr = array()) {
-	$matches = $aids = $attstr = array();
+function attachment($message) {
+	$matches = $aids = array();
 	preg_match_all('/\[(attachment|p_w_upload|p_w_picpath)=(\d+)\]/is', $message, $matches);
 	foreach ($matches[2] as $key => $aid) {
 		$aids[] = $aid;
-		$attstr[$aid] = $matches[1][$key];
 	}
 	return $aids;
 }
@@ -237,7 +236,14 @@ function cvurl($http,$url='',$name='',$ifdownload='',$checkurl) {
 	} elseif (!$name) {
 		$url = "<a href=\"$http$url\" target=\"_blank\" $addjs>$http$url</a>";
 	} elseif (!$http && $url) {
-		$url = "<a href=\"http://$url\" target=\"_blank\" $addjs>$name</a>";
+		if (strrpos($url, 'u.php?uid=') !== false) {
+			preg_match_all('/^u.php\?uid=(\d*)$/i', $url, $uids);
+			$uid = $uids[1][0];
+			$url = $db_bbsurl.'/'.$url;
+			$url = "<a class=\" _cardshow\" href=\"$url\" data-card-key=\"$name\" data-card-url=\"pw_ajax.php?action=smallcard&type=showcard&uid=".$uid."\" target=\"_blank\" $addjs>$name</a>";
+		} else {
+			$url = "<a href=\"http://$url\" target=\"_blank\" $addjs>$name</a>";
+		}
 	} elseif (!$ifdownload) {
 		$url = "<a href=\"$http$url\" target=\"_blank\" $addjs>$name</a>";
 	} else {
@@ -314,7 +320,7 @@ function phpcode($code){
 function qoute($code) {
 	global $code_num,$code_htm,$i_table;
 	$code_num++;
-	$code_htm[6][$code_num]="<blockquote class=\"blockquote3\"><div class=\"quote\">".getLangInfo('bbscode','qoute')." </div><div class=\"text\">".str_replace('\\"','"',$code)."</div></blockquote>";
+	$code_htm[6][$code_num]="<blockquote class=\"blockquote3\"><div class=\"text\" style=\"padding:15px;\">".str_replace('\\"','"',$code)."</div></blockquote>";
 	return "<\twind_code_$code_num\t>";
 }
 function ifpost($tid) {
@@ -342,7 +348,7 @@ function post($code) {
 		$r_ifpost = ifpost($tid);
 		$code_htm[3][$code_num] = "<h6 class=\"f12 quoteTips\" style=\"border-bottom:0;\">".getLangInfo('bbscode','bbcode_hide'.$r_ifpost)."</h6><div style=\"border:1px dotted #eca46a;border-top:0;\" class=\"p10\">".str_replace('\\"','"',$code)."</div>";
 	} else {
-		$code_htm[3][$code_num] = "<div id=\"hidden_{$code_num}_{$tpc_pid}\" class=\"f12 hidden quoteTips\" style=\"margin:10px 0;\">" . getLangInfo('bbscode','bbcode_hide') . "</div>";
+		$code_htm[3][$code_num] = "<div id=\"hidden_{$code_num}_{$tpc_pid}\" class=\"f12 quoteTips\" style=\"margin:10px 0;\">" . getLangInfo('bbscode','bbcode_hide') . "</div>";
 	}
 	return "<\twind_code_$code_num\t>";
 }
@@ -454,7 +460,7 @@ function wplayer($wmvurl,$width='',$height='',$auto='',$type='wmv'){
 	static $player_id = 0;
 	!$width && $width = 314;
 	!$height && $height = 256;
-    return (++$player_id == 1 ? "<script id=\"js_player\" src=\"js/player.js\"></script>" : '')."<div id=\"player_$player_id\"><span class=\"bt2\" style=\"margin-left:0;\"><span><button onclick=\"player('player_$player_id','$wmvurl','$width','$height','$type');\" type=\"button\">".getLangInfo('bbscode','player_'.$type)."</button></span></span></div>".($auto == '1' ? "<script language=\"JavaScript\">player('player_{$player_id}','$wmvurl','$width','$height','$type');</script>" : '');
+    return (++$player_id == 1 ? "<script id=\"js_player\" src=\"js/player.js\"></script>" : '')."<div id=\"player_$player_id\"><span class=\"bt2\" style=\"margin-left:0;\"><span><button onclick=\"player('player_$player_id','$wmvurl','$width','$height','$type');\" type=\"button\">".getLangInfo('bbscode','player_'.$type)."</button></span></span></div>".($auto == '1' ? "<script type=\"text/javascript\">player('player_{$player_id}','$wmvurl','$width','$height','$type');</script>" : '');
 }
 function showface($message) {
 	global $face,$db_cvtimes;
@@ -650,11 +656,11 @@ class attachShow {
 	function parseAttachs($pid, &$content, $isSelf) {
 		$array = array();
 		if ($attachs = $this->getAttachs($pid, $isSelf)) {
-			$aids = attachment($content, $attstr);
+			list($aids, $attTags) = $this->findAttachTags($content);
 			foreach ($attachs as $atype => $value) {
 				foreach ($value as $k => $v) {
 					if (in_array($k, $aids)) {
-						$content = $this->parseContent($content, $atype, $v, $attstr[$k]);
+						$content = $this->parseContent($content, $atype, $v, $attTags[$k]);
 					} else {
 						$array[$atype][$k] = $v;
 					}
@@ -678,6 +684,25 @@ class attachShow {
 		return $array;
 	}
 
+	function findAttachTags($message) {
+		$matches = $aids = $attTags = array();
+		preg_match_all('/\[(attachment|p_w_upload|p_w_picpath)=(\d+)\]/is', $message, $matches);
+		foreach ($matches[2] as $key => $aid) {
+			$aids[] = $aid;
+			$attTags[$aid] = $matches[1][$key];
+		}
+		return array($aids, $attTags);
+	}
+
+	function findPicAids($message) {
+		$matches = $aids = array();
+		preg_match_all('/\[(attachment)=(\d+)\]/is', $message, $matches);
+		foreach ($matches[2] as $key => $aid) {
+			$aids[] = $aid;
+		}
+		return $aids;
+	}
+	
 	function clearAttachTags($content) {
 		return preg_replace('/\[(attachment|p_w_upload|p_w_picpath)=\d+\]/is', '', $content);
 	}
@@ -720,8 +745,8 @@ class attachShow {
 		return $atype;
 	}
 
-	function parseContent($message, $atype, $att, $attstr = '') {
-		!$attstr && $attstr = 'attachment';
+	function parseContent($message, $atype, $att, $attTag = '') {
+		!$attTag && $attTag = 'attachment';
 		$html = '';
 		switch ($atype) {
 			case 'pic': $html = $this->parsePicHtml($att);break;
@@ -729,21 +754,21 @@ class attachShow {
 			case 'picurl':
 				$html = "&#36828;&#31243;&#22270;&#29255;：<a href=\"job.php?action=showimg&tid={$GLOBALS[tid]}&pid={$GLOBALS[tpc_pid]}&fid={$GLOBALS[fid]}&aid={$att[aid]}&verify={$att[verify]}\" target=\"_blank\">$att[name]</a>";break;
 		}
-		$message = str_replace("[$attstr={$att[aid]}]", "<span id=\"att_$att[aid]\" class=\"f12\">".$html.'</span>', $message);
+		$message = str_replace("[$attTag={$att[aid]}]", "<span id=\"att_$att[aid]\" class=\"f12\">".$html.'</span>', $message);
 		return $message;
 	}
 	
 	function parsePicHtml($att) {
 		global $forumcolorone,$forumcolortwo,$read,$isTucool,$isGM,$authorid;
-		$html  = "<span id=\"td_att$att[aid]\" onmouseover=\"read.open('menu_att{$att['aid']}','td_att{$att['aid']}');\" style=\"display:inline-block;\">$att[img]</span>";
-		$html .= "<div id=\"menu_att{$att[aid]}\" class=\"pw_menu\" style=\"display:none;\"><div style=\"border:1px solid $forumcolorone;background:$forumcolortwo;padding:5px 10px;\">";
+		$html  = "<span id=\"td_att$att[aid]\" onmouseover=\"postAttImgHover('menu_att{$att['aid']}','td_att{$att['aid']}');\" style=\"display:inline-block;\" class=\"J_attImg\">$att[img]</span>";
+		$html .= "<div id=\"menu_att{$att[aid]}\" class=\"fl\" style=\"display:none;\"><div class=\"pw_menu\" style=\"position:absolute;z-index:1;\"><div style=\"border:1px solid $forumcolorone;background:$forumcolortwo;padding:5px 10px;\">";
 		$att['descrip'] && $html .= "<p>描述:$att[descrip]</p>";
 		$html .= "<p><span class=\"mr10\">图片:$att[name]</span>";
 		if($att['dfadmin']) {
-			$setCoverHtml = ($isTucool && ($read['authorid'] == $authorid || $isGM)) ? sprintf('[<a class="cp s4" onclick="setcover(\'%s\',this);">设为封面</a>] ',$att[aid]) : '';
+			$setCoverHtml = ($isTucool && ($read['authorid'] == $authorid || $isGM)) ? sprintf('[<a class="cp s4" onclick="setcover(\'%s\',this);">设为封面</a>] ',$att['aid']) : '';
 			$html .= "{$setCoverHtml}[<a class=\"cp s4\" onclick=\"delatt('','$att[aid]','{$this->mode}');\">删除</a>]";
 		}
-		$html .= "</p></div></div>";
+		$html .= "</p></div></div></div>";
 		return $html;
 	}
 	
@@ -759,7 +784,7 @@ class attachShow {
 			$type = $att['special'] == 2 ? 2 : 1;
 			$html = $tmpLang['title'][$type] . "<span class=\"w\"><img src=\"$GLOBALS[imgpath]/$GLOBALS[stylepath]/file/$att[type].gif\" align=\"absmiddle\" /><a id=\"td_att{$att['aid']}\" href=\"{$this->downloadUrl}aid=$att[aid]\" onclick=\"return ajaxurl(this,'&check=1');\" onmouseover=\"read.open('menu_att{$att['aid']}','td_att{$att['aid']}');\" style=\"margin-left:5px;margin-right:10px;\">$att[name]</a></span>";
 			$att['type'] == 'img' && $this->viewHiddenAtt($att) && $html.= '<br>'.$att['img'].'<br>';
-			$html .= "<div id=\"menu_att{$att['aid']}\" class=\"pw_menu\" style=\"display:none;\"><div class=\"p10\"><ul>".
+			$html .= "<div id=\"menu_att{$att['aid']}\" class=\"pw_menu\" style=\"display:none;position:absolute\"><div class=\"p10\"><ul>".
 				"<li>&#31867;&#22411;: <span class=\"b s2\">{$tmpLang['type'][$type]}</span></li>".
 				"<li>&#19979;&#36733;: $att[hits]</li>".
 				"<li>{$tmpLang['need'][$type]}: {$att[needrvrc]}{$att[cname]}</li>".
@@ -821,10 +846,12 @@ class attachShow {
 	/**
 	 * static publick function
 	 */
-	function getMiniUrl($path, $ifthumb, $where) {
+	function getMiniUrl($path, $ifthumb, $where,$ifMini=true) {
 		$dir = '';
 		($ifthumb & 1) && $dir = 'thumb/';
-		($ifthumb & 2) && $dir = 'thumb/mini/';
+		if ($ifMini) {
+			($ifthumb & 2) && $dir = 'thumb/mini/';
+		}
 		if ($where == 'Local') return $GLOBALS['attachpath'] . '/' . $dir . $path;
 		if ($where == 'Ftp') return $GLOBALS['db_ftpweb'] . '/' . $dir . $path;
 		if (!is_array($GLOBALS['attach_url'])) return $GLOBALS['attach_url'] . '/' . $dir . $path;

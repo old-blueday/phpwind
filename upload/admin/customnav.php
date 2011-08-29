@@ -184,7 +184,11 @@ if ('navmain' == $adminitem) {
 } elseif ('navside' == $adminitem) {
 	
 	$navType = in_array($type, array(PW_NAV_TYPE_HEAD_LEFT, PW_NAV_TYPE_HEAD_RIGHT, PW_NAV_TYPE_FOOT)) ? $type : PW_NAV_TYPE_HEAD_RIGHT;
-	$navTypeName = array(PW_NAV_TYPE_HEAD_RIGHT=>'顶部右侧导航', PW_NAV_TYPE_HEAD_LEFT=>'顶部左侧导航', PW_NAV_TYPE_FOOT=>'底部导航');
+	$navTypeName = array(
+		//PW_NAV_TYPE_HEAD_RIGHT=>'顶部右侧导航', 
+		PW_NAV_TYPE_HEAD_LEFT=>'顶部左侧导航', 
+		PW_NAV_TYPE_FOOT=>'底部导航'
+	);
 	$navTypeRight = PW_NAV_TYPE_HEAD_RIGHT;
 	$navTypeLeft = PW_NAV_TYPE_HEAD_LEFT;
 	$navTypeFoot = PW_NAV_TYPE_FOOT;
@@ -325,7 +329,7 @@ if ('navmain' == $adminitem) {
 			$defaults = array(
 				array('pos' => '-1', 'title' => '联系我们', 'link' => '', 'view'=>1, 'target' => 0, 'isshow' => 1),
 				array('pos' => '-1', 'title' => '无图版', 'link' => 'simple/', 'view'=>2, 'target' => 0, 'isshow' => 1),
-				array('pos' => '-1', 'title' => '手机浏览', 'link' => 'm/index.php', 'view'=>3, 'target' => 0, 'isshow' => 1),
+				array('pos' => '-1', 'title' => '手机浏览', 'link' => 'm/introduce.php', 'view'=>3, 'target' => 0, 'isshow' => 1),
 			);
 			foreach ($defaults as $key => $value) {
 				$adds += (bool)$navConfigService->add(PW_NAV_TYPE_FOOT, $value);
@@ -399,9 +403,9 @@ if ('navmain' == $adminitem) {
 
 function tmpGetNavTitleStyle($styleSet) {
 	$fontstyle = "color:".$styleSet['color'].";";
-	if ($styleSet['b']) $fontstyle .= "font-weight='bolder';";
-	if ($styleSet['i']) $fontstyle .= "font-style='italic';";
-	if ($styleSet['u']) $fontstyle .= "text-decoration='underline';";
+	if ($styleSet['b']) $fontstyle .= "font-weight:bolder;";
+	if ($styleSet['i']) $fontstyle .= "font-style:italic;";
+	if ($styleSet['u']) $fontstyle .= "text-decoration:underline;";
 	return $fontstyle;
 }
 

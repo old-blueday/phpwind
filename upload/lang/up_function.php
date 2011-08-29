@@ -178,6 +178,45 @@ function Promptmsg($msg,$tostep=null,$fromstep=null,$lastid=null){
 	$msg = preg_replace("/{#(.+?)}/eis",'$\\1',$msg);
 	require(R_P.'lang/promptmsg.htm');footer();
 }
+
+function ajaxRedirect($tostep,$fromstep=null,$ajaxResult = 'continue'){
+	@extract($GLOBALS, EXTR_SKIP);
+	$url = "$basename?step=$tostep";
+	if (!empty($fromstep) && $times==$record && empty($lastid)) {
+		list($stepnum,$steptype) = explode('_',$start);
+		$end = (int)$stepnum+$record;
+		strlen($steptype) && $end .= "_$steptype";
+		$url = "$basename?step=$fromstep&start=$end";
+	} elseif (!empty($fromstep) && $times==$record && $lastid) {
+		list($stepnum,$steptype) = explode('_',$start);
+		$end = (int)$lastid;
+		strlen($steptype) && $end .= "_$steptype";
+		$url = "$basename?step=$fromstep&start=$end";
+	}
+	if ($limit < $max) {
+		$url = "$basename?step=$fromstep&start=$limit";
+	}
+	$msg = $steps[$step];
+	switch ($fromstep) {
+		case 2:
+			$tableNames = array_slice(array_keys($sqlarray), $start,5);
+			$tableNames && $msg .= '|' . implode('|',$tableNames);
+			break;
+		case 3:
+			$tableNames = array();
+			$sqlarray = ${"sqlarray_$steptype"};
+			$tmpTables = array_slice($sqlarray, $stepnum,$record);
+			foreach ($tmpTables as $v){
+				$tableNames[] = $v[0];
+			}
+			$tableNames && $msg .= '|' . implode('|',$tableNames);
+			break;
+	}
+	ob_end_clean();
+	ob_start();
+	echo "$ajaxResult\t$url\t$msg";
+	ajax_footer();
+}
 function footer(){
 	global $footer;
 	require_once(R_P.'lang/footer.htm');
@@ -432,5 +471,126 @@ function checkFields($tableName,$fieldName){
 	}
 }
 
+/**
+ * get table size
+ * return size
+ */
 
+function getTableSize(){
+	global $db;
+	$size = 0;
+	$unit = 'B';
+	$query = $db->query('SHOW TABLE STATUS');
+	while ($rt = $db->fetch_array($query)) {
+		$size += $rt['Index_length'];
+		$size += $rt['Data_length'];
+	}
+	return $size;
+}
+
+function getBaseSteps(){
+	return array(
+		1=> '检查文件目录',
+		2=> '创建数据表',
+		3=> '更新数据表结构',
+		4=> '更新数据表索引',
+	);
+}
+function getMedalImage($name) {
+	$image = '';
+	switch ($name) {
+		case '终身成就奖':
+			return 'zhongshenchengjiu.png';
+		case '优秀版主奖':
+		case '优秀斑竹奖':
+			return 'youxiubanzhu.png';
+		case '宣传大使奖':
+			return 'xuanchuandashi.png';
+		case '特殊贡献奖':
+			return 'teshugongxian.png';
+		case '金点子奖':
+			return 'jindianzi.png';
+		case '原创先锋奖':
+			return 'yuanchuangxianfeng.png';
+		case '贴图大师奖':
+			return 'tietudashi.png';
+		case '灌水天才奖':
+			return 'guanshuidashi.png';
+		case '新人进步奖':
+			return 'xinrenjinbu.png';
+		case '幽默大师奖':
+			return 'youmodashi.png';
+		default:
+			return 'teshugongxian.png';
+	}
+}
+
+function updateTableStructureForMerge($sourceTable) {
+	global $db;
+	$posts = array();
+	$query = $db->query("SHOW TABLE STATUS LIKE '$sourceTable%'");
+	while($result = $db->fetch_array($query)){
+		$key = $GLOBALS['PW'] ? substr(str_replace($GLOBALS['PW'], 'pw_', $result['Name']), strlen($sourceTable)) : substr($result['Name'],5);
+		if (!$key || ($key && !is_numeric($key))) continue;
+		$posts[] = $result['Name'];
+	}
+	if (count($posts) < 1) return array();
+	$fieldName = $changeFields = array();
+	$fieldName = buildTableFields($sourceTable);
+	foreach ($posts as $table) {
+		$crtFieldName = buildTableFields($table);
+		foreach ($fieldName as $field => $createSql) {
+			if (strtolower($createSql[0]) == strtolower($crtFieldName[$field][0])) continue;
+			$operate = !$crtFieldName[$field][0] ? ($createSql[2] ? "ADD $createSql[0]" : "ADD $createSql[0] AFTER `$createSql[1]`") : "CHANGE `$field` $createSql[0]";
+			$changeFields[] = array("$table", "$field", "ALTER TABLE `$table` $operate");
+		}
+	}
+	return $changeFields;
+}
+
+function buildTableFields($table) {
+	global $db;
+	$masterTable = $db->get_one("SHOW CREATE TABLE `$table`");
+	preg_match('/\((.+)\)/is', $masterTable['Create Table'], $master);
+	$master = explode("\n", trim($master[1]));
+	$fieldName = $keepPosition = array();
+	foreach ($master as $key => $value) {
+		$tmpFieldName = explode(' ', trim($value));
+		$tmpFieldName[0] = strtolower(str_replace('`', '', $tmpFieldName[0]));
+		$position = $tmpFieldName[0] == 'key' ? 1 : ($tmpFieldName[0] == 'unique' ? 2 : 0);
+		$tempName = str_replace('`', '', $tmpFieldName[$position]);
+		$keepPosition[$key] = $tempName;
+		$fieldName[$tempName] = array(trim($value, ','), $keepPosition[$key-1], $position);
+	}
+	return $fieldName;
+}
+
+function createMergeTable($table) {
+	global $db, $PW;
+	$posts = array();
+	$query = $db->query("SHOW TABLE STATUS LIKE 'pw_$table%'");
+	while($result = $db->fetch_array($query)){
+		$key = $PW ? substr(str_replace($GLOBALS['PW'], 'pw_', $result['Name']), strlen($table) + 3) : substr($result['Name'],5);
+		if ($key && !is_numeric($key)) continue;
+		$key = intval($key);
+		$posts[$key] = $result['Name'];
+	}
+	if (count($posts) <= 1) return false;
+	$mergeTable = 'pw_merge_' . $table;
+	$tableCreated = $db->get_one("SHOW TABLES LIKE '$mergeTable'");
+	if ($tableCreated) return false;
+
+	ksort($posts);
+	$createTableMatch = $charsetMatch = array();
+	$creatTable = $db->get_one("SHOW CREATE TABLE `pw_$table`");
+	preg_match('/\(.+\)/is', $creatTable['Create Table'], $createTableMatch);
+	preg_match('/CHARSET=([^;\s]+)/is', $creatTable['Create Table'], $charsetMatch);
+	$createTableSql = "CREATE TABLE `$mergeTable` " . $createTableMatch[0] . ' TYPE=MERGE UNION=(' . implode(',', $posts) . ') DEFAULT CHARSET=' . $charsetMatch[1] . ' INSERT_METHOD=LAST';
+	$db->query($createTableSql);
+
+	$success = $db->get_one("SHOW TABLE STATUS LIKE '$mergeTable'");
+	$config = $success['Engine'] ? 1 : 0;
+	setConfig("db_merge_$table", $config);
+	return true;
+}
 ?>

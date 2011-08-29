@@ -7,7 +7,7 @@ print<<<EOT
 		<ul class="one">
 			<li id="app_home"><a href="u.php"><img src="u/images/icon/home.png" />首页</a></li>
 			<li id="app_friend"><a href="u.php?a=friend"><img src="u/images/icon/friend.png" />朋友</a></li>
-			<li id="app_collection"><a href="apps.php?q=collection" style="background:url(u/images/icon/.png) 0 center no-repeat;"><img src="u/images/icon/collection.png" />收藏</a></li>
+			<li id="app_collection"><a href="apps.php?q=collection"><img src="u/images/icon/collection.png" />收藏</a></li>
 		</ul>
 		<ul class="one">
 			<li id="app_weibo"><a href="apps.php?q=weibo&do=topics"><img src="u/images/icon/record.png" />新鲜事</a></li>
@@ -66,7 +66,63 @@ print <<<EOT
 EOT;
 }print <<<EOT
 -->
+<!--
+EOT;
+if($db_md_ifopen){
+print <<<EOT
+-->
+			<li id="app_medal"><a href="apps.php?q=medal"><img src="u/images/icon/medal.png" />勋章</a></li>
+<!--
+EOT;
+}
+if($db_kmd_ifkmd){print <<<EOT
+-->
+			<li id="app_kmd">
+			<a href="apps.php?q=kmd"><img src="u/images/icon/kmd.png" />孔明灯</a></li>
+<!--
+EOT;
+}print <<<EOT
+-->
 		</ul>
+<!--
+EOT;
+if($db_md_ifopen){
+print <<<EOT
+-->
+<div class="fl"  id="pw_all_tip_medal" style="display:none;z-index:999;">
+	<div style="position:absolute;z-index:99;margin-left:70px;margin-top:2px;">
+		<table><tr><td><div class="pw_all_angle_left"></div>
+		<div class="pw_all_tip"><a href="javascript:void(0)" class="adel">关闭</a>
+		<dl class="cc">
+		<dt>新版社区勋章，玩法更多，申<br />请更简单！</dt>
+		<dd><a class="bb_close" href="javascript:void(0)">知道了</a></dd>
+		</dl>
+		</div></td></tr></table>
+	</div>
+</div>
+<!--
+EOT;
+}
+if($db_ifkmd){print <<<EOT
+-->
+<div class="fl" id="pw_all_tip_kmd" style="display:none;z-index:999;">
+	<div style="position:absolute;z-index:99;margin-left:70px;margin-top:2px;">
+		<table><tr><td>
+		<div class="pw_all_angle_left"></div>
+		<div class="pw_all_tip">
+			<a href="javascript:void(0)" class="adel">关闭</a>
+			<dl class="cc">
+				<dt>使用孔明灯，可以将你发布的<br />帖子置顶显示哦！</dt>
+				<dd><a class="mr10" href="apps.php?q=kmd&a=buy1">立即购买</a><a class="bb_close" href="javascript:void(0)">知道了</a></dd>
+			</dl>
+		</div>
+		</td></tr></table>
+	</div>
+</div>
+<!--
+EOT;
+}print <<<EOT
+-->
 <!--
 EOT;
 $app_array = getUserApplist();
@@ -111,7 +167,12 @@ EOT;
 }print <<<EOT
 -->
 
-<script language="JavaScript">
+<script type="text/javascript">
+window.onReady(function(){
+	//调用气泡
+		var pw_bubble=new Bubble([{"name":"pw_all_tip_kmd","id":"app_kmd"},{"name":"pw_all_tip_medal","id":"app_medal"}]);
+		pw_bubble.init();
+})
 setCurrent('app_$q','app_home','current');
 </script>
 <!--

@@ -23,7 +23,7 @@ class PW_DebateDB extends BaseDB {
 		$sqlWhere .= " AND t1.endtime >= $timestamp AND t.ifcheck = 1 AND t.fid != 0 ";
 		$blackListedTids = $this->_getBlackListedTids();
 		$blackListedTids && $sqlWhere .= ' AND t.tid NOT IN (' . $blackListedTids . ')';
-		$query = $this->_db->query("SELECT t1.*,t.tid,t.fid,t.author,t.authorid,t.subject,t.type,t.postdate,t.hits,t.replies FROM $this->_tableName t1 LEFT JOIN pw_threads t USING(tid) WHERE 1 $sqlWhere AND t.ifshield != 1 AND t.locked != 2   ORDER BY t.postdate $order ".S::sqlLimit($num));
+		$query = $this->_db->query("SELECT t1.*,t.tid,t.fid,t.author,t.authorid,t.subject,t.type,t.postdate,t.hits,t.replies,t.anonymous FROM $this->_tableName t1 LEFT JOIN pw_threads t USING(tid) WHERE 1 $sqlWhere AND t.ifshield != 1 AND t.locked != 2   ORDER BY t.postdate $order ".S::sqlLimit($num));
 		while ($row = $this->_db->fetch_array($query)) {
 			$posts[] = $row;
 		}
@@ -48,7 +48,7 @@ class PW_DebateDB extends BaseDB {
 		$sqlWhere .= " AND t1.endtime >= $timestamp AND t.ifcheck = 1  AND t.fid != 0 ";
 		$blackListedTids = $this->_getBlackListedTids();
 		$blackListedTids && $sqlWhere .= ' AND t.tid NOT IN (' . $blackListedTids . ')';
-		$query = $this->_db->query("SELECT t1.*,t.tid,t.fid,t.author,t.authorid,t.subject,t.type,t.postdate,t.hits,t.replies FROM $this->_tableName t1 LEFT JOIN pw_threads t USING(tid) WHERE 1 $sqlWhere AND t.ifshield != 1 AND t.locked != 2   ORDER BY t1.endtime $order ".S::sqlLimit($num));
+		$query = $this->_db->query("SELECT t1.*,t.tid,t.fid,t.author,t.authorid,t.subject,t.type,t.postdate,t.hits,t.replies,t.anonymous FROM $this->_tableName t1 LEFT JOIN pw_threads t USING(tid) WHERE 1 $sqlWhere AND t.ifshield != 1 AND t.locked != 2   ORDER BY t1.endtime $order ".S::sqlLimit($num));
 		while ($row = $this->_db->fetch_array($query)) {
 			$posts[] = $row;
 		}
@@ -73,7 +73,7 @@ class PW_DebateDB extends BaseDB {
 		$sqlWhere .= " AND t1.endtime >= $timestamp AND t.ifcheck = 1  AND t.fid != 0 ";
 		$blackListedTids = $this->_getBlackListedTids();
 		$blackListedTids && $sqlWhere .= ' AND t.tid NOT IN (' . $blackListedTids . ')';
-		$query = $this->_db->query("SELECT t1.*,(t1.obvote+t1.revote) AS count,t.tid,t.fid,t.author,t.authorid,t.subject,t.type,t.postdate,t.hits,t.replies FROM $this->_tableName t1 LEFT JOIN pw_threads t USING(tid) WHERE 1 $sqlWhere AND t.ifshield != 1 AND t.locked != 2   ORDER BY count $order ".S::sqlLimit($num));
+		$query = $this->_db->query("SELECT t1.*,(t1.obvote+t1.revote) AS count,t.tid,t.fid,t.author,t.authorid,t.subject,t.type,t.postdate,t.hits,t.replies,t.anonymous FROM $this->_tableName t1 LEFT JOIN pw_threads t USING(tid) WHERE 1 $sqlWhere AND t.ifshield != 1 AND t.locked != 2   ORDER BY count $order ".S::sqlLimit($num));
 		while ($row = $this->_db->fetch_array($query)) {
 			$posts[] = $row;
 		}
@@ -98,7 +98,7 @@ class PW_DebateDB extends BaseDB {
 		$sqlWhere .= " AND t1.endtime >= $timestamp AND t.ifcheck = 1  AND t.fid != 0 ";
 		$blackListedTids = $this->_getBlackListedTids();
 		$blackListedTids && $sqlWhere .= ' AND t.tid NOT IN (' . $blackListedTids . ')';
-		$query = $this->_db->query("SELECT t1.*,t.tid,t.fid,t.author,t.authorid,t.subject,t.type,t.postdate,t.hits,t.replies FROM $this->_tableName t1 LEFT JOIN pw_threads t USING(tid) WHERE 1 $sqlWhere AND t.ifshield != 1 AND t.locked != 2   ORDER BY t.replies $order ".S::sqlLimit($num));
+		$query = $this->_db->query("SELECT t1.*,t.tid,t.fid,t.author,t.authorid,t.subject,t.type,t.postdate,t.hits,t.replies,t.anonymous FROM $this->_tableName t1 LEFT JOIN pw_threads t USING(tid) WHERE 1 $sqlWhere AND t.ifshield != 1 AND t.locked != 2   ORDER BY t.replies $order ".S::sqlLimit($num));
 		while ($row = $this->_db->fetch_array($query)) {
 			$posts[] = $row;
 		}
@@ -123,7 +123,7 @@ class PW_DebateDB extends BaseDB {
 		$sqlWhere .= " AND t1.endtime >= $timestamp AND t.ifcheck = 1  AND t.fid != 0 ";
 		$blackListedTids = $this->_getBlackListedTids();
 		$blackListedTids && $sqlWhere .= ' AND t.tid NOT IN (' . $blackListedTids . ')';
-		$query = $this->_db->query("SELECT t1.*,t.tid,t.fid,t.author,t.authorid,t.subject,t.type,t.postdate,t.hits,t.replies FROM $this->_tableName t1 LEFT JOIN pw_threads t USING(tid) WHERE 1 $sqlWhere AND t.ifshield != 1 AND t.locked != 2   ORDER BY t.hits $order ".S::sqlLimit($num));
+		$query = $this->_db->query("SELECT t1.*,t.tid,t.fid,t.author,t.authorid,t.subject,t.type,t.postdate,t.hits,t.replies,t.anonymous FROM $this->_tableName t1 LEFT JOIN pw_threads t USING(tid) WHERE 1 $sqlWhere AND t.ifshield != 1 AND t.locked != 2   ORDER BY t.hits $order ".S::sqlLimit($num));
 		while ($row = $this->_db->fetch_array($query)) {
 			$posts[] = $row;
 		}

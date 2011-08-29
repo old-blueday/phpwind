@@ -28,13 +28,14 @@ if (!$action) {
 	$checkArr = array();
 	$md = ($db_mode && isset($db_modes[$db_mode])) ? $db_mode : 'bbs';
 	$checkArr[$md] = ' checked="checked"';
-
+	$db_modes = array_filter($db_modes);
+	
 	if ($fp = opendir(R_P.'mode')) {
 		$uninstall = $infodb = array();
 		while (($modedir = readdir($fp))) {
 			if (strpos($modedir,'.')===false) {
 				$modename = $modedir;
-				if (array_key_exists($modename,$db_modes)) {
+				if (array_key_exists($modename,$db_modes) || $modename == 'cloudcomputing') {
 					continue;
 				}
 				$modeuse = $db_mode == $modename ? 1 : 0;
@@ -52,8 +53,6 @@ if (!$action) {
 		}
 		closedir($fp);
 	}
-	
-
 } elseif ($action == 'install') {
 
 	require_once(R_P.'require/sql_deal.php');

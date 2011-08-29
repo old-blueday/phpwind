@@ -45,6 +45,8 @@ class PW_Authentication {
 			return 1;
 		} elseif (!$returnData->isMobile) {
 			return 2;
+		} elseif ($returnData->isBlack) {
+			return 8;
 		} elseif ((bool)$returnData->isCredit != $issendtocredit) {
 			return 3;
 		} elseif ($returnData->count >= $returnData->sendNum) {
@@ -145,6 +147,7 @@ class PW_Authentication {
 	}
 	
 	function updateCertificateStateByIds($ids,$state){
+		global $db_md_ifopen;
 		$states = $this->getCertificateStates();
 		if (!isset($states[$state]) || !S::isArray($ids)) return false;
 		$dao = $this->_getAuthCertificateDB();
@@ -159,9 +162,14 @@ class PW_Authentication {
 			}
 			$userService = L::loadClass('UserService','user');
 			$uids = array();
+			//颁发勋章
+			if ($db_md_ifopen) {
+				$medalService = L::loadClass('medalservice','medal');
+			}
 			foreach ($ids as $id) {
 				if($info = $dao->get($id)){
 					$userService->setUserStatus($info['uid'], PW_USERSTATUS_AUTHCERTIFICATE,$status);
+					$medalService && $medalService->awardMedalByIdentify($info['uid'],'shimingrenzheng');
 					$uids[] = $info['uid'];
 				}
 			}

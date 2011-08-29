@@ -1,0 +1,62 @@
+<!--<?php
+defined('W_P') or exit('Forbidden');
+function showhots($fid,$q){
+    global $thisp,$wapImages;
+    $thisp = 0;
+    $hots = search($fid);
+    
+    if($hots){
+        print <<<EOT
+-->
+您搜索的"<span style="color:red">$q</span>"结果如下：<br/>
+<!--
+EOT;
+    }else{
+
+    	       print <<<EOT
+-->
+抱歉，没有找到与"<span style="color:red">$q</span>"相关的帖子。<br/>
+<!--
+EOT;
+  	
+    }
+    foreach($hots as $key => $val){
+         $showImg = "";
+         $ding = ' ';
+         if($val[topped] > 0)$ding = "[顶]";
+         if($val[digest] > 0)$ding = $ding . "[精]";
+         if($val[ifupload] == 1)$ding = $ding . "[图]";
+        $thisp++;
+        print <<<EOT
+-->
+<div>$val[id].<a href="index.php?a=read&tid=$val[tid]">$val[subject]</a>{$ding}（回<a href="index.php?a=reply_all&tid=$val[tid]">$val[replies]</a>/阅$val[hits]）<br />
+<span class="reply">[<a href="index.php?a=myhome&uid=$val[authorid]" class="reply_a">$val[author]</a> $val[postdate]]</span> </div>
+<!--
+EOT;
+    }
+}
+print <<<EOT
+-->
+<div class="search"  style="background:#CAE4FF">
+<form action="index.php?a=search"  method="post">
+<input type="text" name="q" value="$q" size="7" maxlenth="2000"/><input type=submit value="搜帖子" />
+</form>
+</div>
+<div class="post_content">
+<!--
+EOT;
+if($q){
+print <<<EOT
+--> 
+<!--
+EOT;
+showhots($fid,$q);
+$q = rawurlencode($q);
+$url = "index.php?a=search&q=$q&amp;";
+$pages = getPages($page,$thisp,$url); 
+print <<<EOT
+-->
+</div><div>$pages</div>
+<!--
+EOT;
+}?>-->

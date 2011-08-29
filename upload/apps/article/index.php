@@ -30,8 +30,6 @@ if ($uid) {
 if (!$space =& $newSpace->getInfo()) {
 	Showmsg('您访问的空间不存在!');
 }
-$isGM = S::inArray($windid, $manager);
-!$isGM && $groupid==3 && $isGM=1;
 $indexRight = $newSpace->viewRight('index');
 $indexValue = $newSpace->getPrivacyByKey('index');
 $space =& $newSpace->getInfo();
@@ -73,44 +71,31 @@ if ($a == 'list' &&$indexRight) {
 			}
 		}
 	} elseif ($see == 'post') {
-		S::gp(array('ptable'));
-		if ($u!=$winduid) {
+		S::gp(array('ptable'), 'GP', 2);
+		$ischeck = (int) $ischeck;
+		$username = $windid;
+		if ($u != $winduid) {
 			$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
 			$username = $userService->getUserNameByUserId($u);
-		} else {
-			$username = $windid;
 		}
-
 		!isset($ptable) && $ptable = $db_ptable;
-		$pw_posts = GetPtable($ptable);
-
+		$pw_posts = !$db_merge_posts ? GetPtable($ptable) : 'pw_merge_posts';		
 		$fidoff = $isU ? array(0) : getFidoff($groupid);
-		$sqloff = ' AND p.fid NOT IN('.S::sqlImplode($fidoff).')';
-
-		$count = $db->get_value("SELECT COUNT(*) AS count FROM $pw_posts p WHERE p.authorid=".S::sqlEscape($u)." $sqloff");
+		$sqloff = ' AND p.fid NOT IN(' . S::sqlImplode($fidoff) . ')';
+		$count = $db->get_value("SELECT COUNT(*) AS count FROM $pw_posts p WHERE p.authorid=" . S::sqlEscape($u) . " $sqloff");
 		$nurl = $basename.'see=post&';
-		$p_list = $db_plist && count($db_plist)>1 ? $db_plist : array();
-		if ($p_list) {
-			if ($space == 1 && defined('F_M')) {
-				foreach ($p_list as $key => $val) {
-					$name = $val ? $val : ($key != 0 ? getLangInfo('other','posttable').$key : getLangInfo('other','posttable'));
-					$p_table .= "<li id=\"up_post$key\"><a href=\"{$nurl}ptable=$key\">".$name."</a></li>";
-				}
-			} else {
-				foreach ($p_list as $key => $val) {
-					$name = $val ? $val : ($key != 0 ? getLangInfo('other','posttable').$key : getLangInfo('other','posttable'));
-					$p_table .= "<li id=\"up_post$key\"><a href=\"{$nurl}ptable=$key\">".$name."</a></li>";
-				}
+		$p_list = S::isArray($db_plist) ? $db_plist : array();
+		if (!$db_merge_posts && $p_list) {	
+			foreach ($p_list as $key => $val) {
+				$name = $val ? $val : ($key != 0 ? getLangInfo('other','posttable').$key : getLangInfo('other','posttable'));
+				$p_table .= "<li id=\"up_post$key\"><a href=\"{$nurl}ptable=$key\">".$name."</a></li>";
 			}
-
 			$nurl .= "ptable=$ptable&";
 		}
-
-		list($pages,$limit) = pwLimitPages($count,$page,$nurl);
-
-		$query = $db->query("SELECT p.pid,p.postdate,t.tid,t.fid,t.subject,t.authorid,t.author,t.replies,t.hits,t.titlefont,t.anonymous,t.lastpost,t.lastposter FROM $pw_posts p LEFT JOIN pw_threads t USING(tid) WHERE p.authorid=".S::sqlEscape($u)." $sqloff ORDER BY p.postdate DESC $limit");
+		list($pages, $limit) = pwLimitPages($count, $page, $nurl);
+		$query = $db->query("SELECT p.pid,p.postdate,t.tid,t.fid,t.subject,t.authorid,t.author,t.replies,t.hits,t.titlefont,t.anonymous,t.lastpost,t.lastposter FROM $pw_posts p LEFT JOIN pw_threads t USING(tid) WHERE p.authorid=" . S::sqlEscape($u) . " $sqloff ORDER BY p.postdate DESC $limit");
 		while ($rt = $db->fetch_array($query)){
-			$rt['subject']	= substrs($rt['subject'],45);
+			$rt['subject']	= substrs($rt['subject'], 45);
 			if ($rt['anonymous'] && $rt['authorid'] != $winduid && !$isGM) {
 				$rt['author'] = $db_anonymousname;
 				$rt['authorid'] = 0;
@@ -184,7 +169,7 @@ if ($a == 'list' &&$indexRight) {
 		if ($job == 'trade') {
 			$count = $db->get_value("SELECT COUNT(*) FROM pw_tradeorder WHERE buyer=".S::sqlEscape($u));
 
-			list($pages,$limit) = pwLimitPages($count,$page,$basename."see=$see&");
+			list($pages,$limit) = pwLimitPages($count,$page,$basename."a=$a&");
 
 			$trade = array();
 			$query = $db->query("SELECT td.*,t.icon,m.username FROM pw_tradeorder td LEFT JOIN pw_trade t ON td.tid=t.tid LEFT JOIN pw_members m ON td.seller=m.uid WHERE td.buyer=".S::sqlEscape($u).' ORDER BY td.oid DESC '.$limit);
@@ -196,7 +181,7 @@ if ($a == 'list' &&$indexRight) {
 		} elseif ($job == 'onsale') {
 			$count = $db->get_value("SELECT COUNT(*) FROM pw_trade WHERE uid=".S::sqlEscape($u));
 
-			list($pages,$limit) = pwLimitPages($count,$page,$basename."see=$see&job=$job&");
+			list($pages,$limit) = pwLimitPages($count,$page,$basename."a=$a&job=$job&");
 
 			$trade = array();
 			$query = $db->query("SELECT * FROM pw_trade WHERE uid=".S::sqlEscape($u).' ORDER BY tid DESC '.$limit);
@@ -208,7 +193,7 @@ if ($a == 'list' &&$indexRight) {
 		} elseif ($job == 'saled') {
 			$count = $db->get_value("SELECT COUNT(*) FROM pw_tradeorder WHERE seller=".S::sqlEscape($u));
 
-			list($pages,$limit) = pwLimitPages($count,$page,$basename."see=$see&job=$job&");
+			list($pages,$limit) = pwLimitPages($count,$page,$basename."a=$a&job=$job&");
 
 			$trade = array();
 			$query = $db->query("SELECT td.*,t.icon,m.username FROM pw_tradeorder td LEFT JOIN pw_trade t ON td.tid=t.tid LEFT JOIN pw_members m ON td.buyer=m.uid WHERE td.seller=".S::sqlEscape($u).' ORDER BY td.oid DESC '.$limit);
@@ -235,6 +220,7 @@ if ($where) {
 			$rt['forum'] = strip_tags($forum[$rt['fid']]['name']);
 			$rt['postdate'] = formateDate($rt['postdate']);
 			$rt['lastpost']	= formateDate($rt['lastpost']);
+	//		$rt['authorid'] == $winduid && $rt['lastposter'] = $windid;
 			$rt['pcid'] = $rt['special'] > 20 ? $rt['special'] - 20 : 0;
 			if (!$isGM && $rt['anonymous']) {
 				$rt['author'] = $rt['authorid'] = '';

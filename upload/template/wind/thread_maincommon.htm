@@ -1,95 +1,117 @@
 <!--<?php print <<<EOT
 -->
+<style>
+/*旧版本兼容*/
+.tr3 td.subject{padding-left:10px;}
+.tr3 td.subject .adminbox{padding:0 0 0 0;margin:-3px 3px 0 0;*margin:0 0 0 -5px;width:auto;}
+</style>
 <table width="100%" style="table-layout:fixed;">
-	<tbody id="threadlist">
-		<tr class="tr4">
+	<tr class="tr2 thread_sort">
+		<td style="padding-left:12px;">
 <!--
 EOT;
-if($managecheck){print <<<EOT
--->
-			<td class="icon" width="50" style="padding:0;">&nbsp;</td>
-<!--
-EOT;
-}else{print <<<EOT
--->
-			<td class="icon" width="40" style="padding:0;">&nbsp;</td>
-<!--
-EOT;
-}
-$newwindowsChecked = $_COOKIE['newwindows']=='1' ? ' checked' : '';
 print <<<EOT
 -->
-			<td class="subject" style="padding-left:0;">
-				<label class="fr mr10 cp" for="newwindows"><input style="padding:0;margin:-1px 3px 0 0;" name="newwindows" id="newwindows" type="checkbox"{$newwindowsChecked} value="1" onclick="xinchuang()" />新窗</label>
-<script language="JavaScript">
+	<span class="checkbox fr mr10" id="newwindows" unselectable="on">新窗</span>
+<script>
 var orderThreadsClass = {
-	orderThreads : function(orderway){
-		var orderway = orderway || 'lastpost';
-		var form = document.createElement("form");
-		form.action = "{$pageUrl}{$urlall}{$viewbbs}&page=$page#tabA";
-		form.method = "post";
-		var h_type = this.createInput("hidden","type","$type");
-		var h_search = this.createInput("hidden","search","1000");
-		var h_special = this.createInput("hidden","special","$special");
-		var h_orderway = this.createInput("hidden","orderway",orderway);
-		var h_asc = this.createInput("hidden","asc","DESC");
-		form.appendChild(h_type);
-		form.appendChild(h_search);
-		form.appendChild(h_special);
-		form.appendChild(h_orderway);
-		form.appendChild(h_asc);
-		document.body.appendChild(form);
-		setTimeout(function(){/*ie6*/
-			form.submit();
-		},0);
-		return false;
-	},
-	createInput : function(type,name,value){
-		var hidden = document.createElement("input");
-		hidden.type = type;
-		hidden.name = name;
-		hidden.value = value;//↓
-		return hidden;
-	}
+orderThreads : function(orderway){
+	var orderway = orderway || 'lastpost';
+	var form = document.createElement("form");
+	form.action = "{$pageUrl}{$urlall}{$viewbbs}&page=$page#tabA";
+	form.method = "post";
+	var h_type = this.createInput("hidden","type","$type");
+	var h_search = this.createInput("hidden","search","1000");
+	var h_special = this.createInput("hidden","special","$special");
+	var h_orderway = this.createInput("hidden","orderway",orderway);
+	var h_asc = this.createInput("hidden","asc","DESC");
+	form.appendChild(h_type);
+	form.appendChild(h_search);
+	form.appendChild(h_special);
+	form.appendChild(h_orderway);
+	form.appendChild(h_asc);
+	document.body.appendChild(form);
+	setTimeout(function(){/*ie6*/
+		form.submit();
+	},0);
+	return false;
+},
+createInput : function(type,name,value){
+	var hidden = document.createElement("input");
+	hidden.type = type;
+	hidden.name = name;
+	hidden.value = value;//↓
+	return hidden;
+}
 }
 function orderThreads(orderway){
-	orderThreadsClass.orderThreads(orderway);
+orderThreadsClass.orderThreads(orderway);
 }
 </script>
-            <span class="mr20">排序：<a href="javascript:;" title="按发表时间排序" onclick="orderThreads('postdate');" id="thread_sort_postdate" {$orderClass[postdate]}><span>最新发帖</span></a>&nbsp;|&nbsp;<a href="javascript:;" title="按最后回复时间排序" onclick="orderThreads('lastpost');" id="thread_sort_lastpost" {$orderClass[lastpost]}><span>最后回复</span></a></span></td>
-            <td class="author">作者</td>
-            <td width="60">回复</td>
-            <td class="author">最后发表</td>
-        </tr>
+					排序：&nbsp; <a href="javascript:;" title="按发表时间排序" onclick="orderThreads('postdate');" id="thread_sort_postdate" {$orderClass[postdate]}>最新发帖</a>&nbsp;|&nbsp;<a href="javascript:;" title="按最后回复时间排序" onclick="orderThreads('lastpost');" id="thread_sort_lastpost" {$orderClass[lastpost]}>最后回复</a></td>
+		<td class="author">
+<!--
+EOT;
+if (S::isArray($threaddb)) {
+print <<<EOT
+-->
+<div id="pw_all_pos_usercard" style="width:0;height:0;line-height:0;font-size:0;overflow:hidden;">&nbsp;</div>
+<div class="fl" id="pw_all_tip_usercard" style="display:none;margin-left:-30px;margin-top:-35px;">
+	<div style="position:absolute;z-index:99;">
+		<table><tr><td style="padding:0;background:none;">
+		<div class="pw_all_tip">
+			<a href="javascript:void(0)" class="adel">关闭</a>
+			<dl class="cc">
+				<dt>鼠标上移，会显示小名片呢！</dt>
+				<dd><a class="bb_close" href="javascript:void(0)">知道了</a></dd>
+			</dl>
+		</div>
+		<div class="pw_all_angle_bot"></div>
+		</td></tr></table>
+	</div>
+</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+		作者</td>
+		<td width="60">回复</td>
+		<td class="author">最后发表</td>
+	</tr>
+</table>
+<table width="100%" style="table-layout:fixed;" class="z">
+	<tbody id="threadlist">
 <!--
 EOT;
 if($page==1 && $ifsort){
 if($NT_A){
 $NT_A[startdate] = get_date($NT_A[startdate]);
+$cardusername = urlencode($NT_A[author]);
 print <<<EOT
 -->
         <tr class="tr3">
-            <td class="icon tac"><img src="$imgpath/$stylepath/thread/anc.gif" alt="公告" /></td>
-            <td class="subject">站点公告: <a href="$NT_A[url]" class="mr10">$NT_A[subject]</a><a href="$NT_A[url]" class="f10">$NT_A[startdate]</a>
+            <td class="icon tar" width="30" height="28"><img src="$imgpath/$stylepath/thread/anc.gif" alt="公告" /></td>
+            <td class="subject f14">站点公告: <a href="$NT_A[url]" class="mr10">$NT_A[subject]</a><a href="$NT_A[url]" class="f10 gray">$NT_A[startdate]</a>
             </td>
             <td class="author">
-                <a href="u.php?username=$NT_A[rawauthor]">$NT_A[author]</a>
+                <a href="u.php?username=$NT_A[rawauthor]" target="_blank" class=" _cardshow" data-card-url="pw_ajax.php?action=smallcard&type=showcard&username={$cardusername}" data-card-key="{$NT_A[author]}">$NT_A[author]</a>
             </td>
-            <td class="num">&nbsp;</td>
+            <td class="num" width="60">&nbsp;</td>
             <td class="author">&nbsp;</td>
         </tr>
 <!--
 EOT;
 }if($NT_C){
 $NT_C[startdate] = get_date($NT_C[startdate]);
+$cardusername = urlencode($NT_A[author]);
 print <<<EOT
 -->
         <tr class="tr3">
-            <td class="icon tac"><img src="$imgpath/$stylepath/thread/anc.gif" alt="公告" /></td>
-            <td class="subject">分类公告: <a href="$NT_C[url]" class="mr10">$NT_C[subject]</a><a href="notice.php?fid=$NT_C[fid]" class="f10">$NT_C[startdate]</a>
+            <td class="icon tar" width="30" height="28"><img src="$imgpath/$stylepath/thread/anc.gif" alt="公告" /></td>
+            <td class="subject">分类公告: <a href="$NT_C[url]" class="mr10">$NT_C[subject]</a><a href="notice.php?fid=$NT_C[fid]" class="f10 gray">$NT_C[startdate]</a>
             </td>
-            <td class="author"><a href="u.php?username=$NT_C[rawauthor]">$NT_A[author]</a></td>
-            <td class="num">&nbsp;</td>
+            <td class="author"><a href="u.php?username=$NT_C[rawauthor]" target="_blank" class=" _cardshow" data-card-url="pw_ajax.php?action=smallcard&type=showcard&username={$cardusername}" data-card-key="{$NT_A[author]}">$NT_A[author]</a></td>
+            <td class="num" width="60">&nbsp;</td>
             <td class="author">&nbsp;</td>
         </tr>
 <!--
@@ -120,24 +142,22 @@ if($page==1 && $ifsort && $thread[topped]==0 && $tpc_topped==0){
 $tpc_topped=1;
 print <<<EOT
 -->
-					<tr class="tr4"><td colspan="5" class="tac">普通主题</td></tr>
+					<tr class="tr4"><td width="30"></td><td style="padding-left:0;">普通主题</td><td width="95"></td><td width="60"></td><td width="95"></td></tr>
 <!--
 EOT;
 }print <<<EOT
 -->
       		<tr class="tr3">
-            <td class="icon tac"><!--
+            <td class="icon tar" width="30"><!--
 EOT;
-if($managecheck){
-if ($thread['fid'] == $fid) {
-	$thread['adminbox'] = "<input type=\"checkbox\" autocomplete=\"off\" name=\"tidarray[]\" id=tid_{$thread[tid]} value=\"$thread[tid]\" onclick=\"postManage.show('postbatch','a_ajax_{$thread[tid]}')\" />";
-} else {
-	$thread['adminbox'] = "&nbsp;&nbsp;&nbsp;";
-}
-print <<<EOT
--->$thread[adminbox]<!--
+if($thread['specialsort']==PW_THREADSPECIALSORT_KMD){print <<<EOT
+-->
+	<a href="read.php?tid={$thread[tid]}" target="_blank">
+		<img src="$imgpath/pwicon/headtopic_4.gif" align="absmiddle" alt="孔明灯帖标志" title="孔明灯帖标志"/>
+	</a>
+<!--
 EOT;
-}if($thread[topped]){print <<<EOT
+}elseif($thread[topped]){print <<<EOT
 -->
 	<a href="read.php?tid={$thread[tid]}" target="_blank">
 		<img src="$imgpath/$stylepath/file/headtopic_$thread[topped].gif" align="absmiddle" alt="置顶帖标志" title="置顶帖标志"/>
@@ -160,12 +180,23 @@ if($thread[digest]){print <<<EOT
 			<img class="fr" src="$imgpath/$stylepath/file/digest_$thread[digest].gif" align="absmiddle" style="margin-top:4px;" alt="精华帖标志" title="精华帖标志" />
 <!--
 EOT;
+}if($managecheck){
+if ($thread['fid'] == $fid) {
+	$htmTopped = $thread[topped] ? ' topped="1"' : '';
+	$thread['adminbox'] = "<input{$htmTopped} type=\"checkbox\" class=\"adminbox\" autocomplete=\"off\" name=\"tidarray[]\" id=tid_{$thread[tid]} value=\"$thread[tid]\" onclick=\"postManage.show('postbatch','a_ajax_{$thread[tid]}')\" />";
+} else {
+	$thread['adminbox'] = "";
+}
+print <<<EOT
+-->$thread[adminbox]
+<!--
+EOT;
 }if($thread[modelid]>0){
 if($thread[topped] == 0){
 if(isset($postTopic->topicmodeldb[$thread[modelid]])){
 print<<<EOT
 -->
-			<a href="thread.php?fid=$fid&modelid=$thread[modelid]"  class="s4 f14">[{$postTopic->topicmodeldb[$thread[modelid]][name]}]</a>
+			<a href="thread.php?fid=$fid&modelid=$thread[modelid]"  class="s4 mr5 f14">[{$postTopic->topicmodeldb[$thread[modelid]][name]}]</a>
 <!--
 EOT;
 }}}print<<<EOT
@@ -179,15 +210,10 @@ $thread[pcid] = $thread[special]-20;
 if(isset($postCate->postcatedb[$thread[pcid]])){
 print<<<EOT
 -->
-	<a href="thread.php?fid=$fid&pcid=$thread[pcid]" class="f14 s4">[{$postCate->postcatedb[$thread[pcid]][name]}]</a>
+	<a href="thread.php?fid=$fid&pcid=$thread[pcid]" class="mr5 s4 f14">[{$postCate->postcatedb[$thread[pcid]][name]}]</a>
 <!--
 EOT;
-}}}if($thread[toolinfo]){print <<<EOT
--->
-    	<span class="s2 f14">[$thread[toolinfo]]</span>
-<!--
-EOT;
-}print <<<EOT
+}}}print <<<EOT
 -->
 			$thread[useriocn]
 <!--
@@ -196,10 +222,10 @@ if($forumset['addtpctype'] && $t_db[$thread['type']] && $thread['fid']==$fid){
 if ($upid = $t_db[$thread['type']]['upid']) {
 $tempTypeUpName = strip_tags($t_db[$upid][name]);
 $secondTempTypeUpName = str_ireplace($tempTypeUpName,'['.$tempTypeUpName.']',$t_db[$upid][name]);
-$upname = $t_db[$upid][logo] ? "<img src=\"{$t_db[$upid][logo]}\" alt=\"&nbsp;\">" : "$secondTempTypeUpName";
+$upname = $t_db[$upid][logo] ? "<img src=\"{$t_db[$upid][logo]}\" alt=\"&nbsp;\" align=\"absmiddle\">" : "$secondTempTypeUpName";
 print <<<EOT
 -->
-			<a href="thread.php?fid=$fid&type=$upid{$viewbbs}" class="f14 view s4">$upname</a>
+			<a href="thread.php?fid=$fid&type=$upid{$viewbbs}" class="view s4 mr5 f14">$upname</a>
 <!--
 EOT;
 }
@@ -208,142 +234,62 @@ $secondTempTypeName = str_ireplace($tempTypeName,'['.$tempTypeName.']',$t_db[$th
 $topictype = $t_db[$thread[type]][logo] ? "<img src=\"{$t_db[$thread[type]][logo]}\" alt=\"&nbsp;\">" : "$secondTempTypeName";
 print <<<EOT
 -->
-			<a href="thread.php?fid=$fid&type=$thread[type]{$viewbbs}" class="f14 s4 view">$topictype</a>
-<!--
-EOT;
-}if($thread['state'] == 0 && $thread['rewcredit'] > 0){print <<<EOT
--->
-			<span class="s2"> &#8212; 悬赏金额:$thread[rewcredit] &#8212; </span>
+			<a href="thread.php?fid=$fid&type=$thread[type]{$viewbbs}" class="mr5 s4 view f14">$topictype</a>
 <!--
 EOT;
 }
-$isNewWindowOpen = $newwindows == 1 ? 'target="_blank"' : '';
 print <<<EOT
 -->
-<a href="$thread[tpcurl]" name="readlink" $isNewWindowOpen id="a_ajax_$thread[tid]" class="subject_t f14">$thread[subject]</a>&nbsp; $thread[ifmark] $thread[titleadd] $thread[recommendadd]
-<!--
+<a href="$thread[tpcurl]" name="readlink" id="a_ajax_$thread[tid]" class="subject_t f14">$thread[subject]</a>$thread[titleadd]$thread[recommendadd]&nbsp;<!--
 EOT;
-if(isset($thread['colony'])){print <<<EOT
--->
-			<span class="s6 w" style="display:none;">[来自群：<a href="apps.php?q=group&cyid={$thread[colony][cyid]}" class="s6">{$thread[colony][cname]}</a>]</span>
-<!--
+if($thread[toolinfo]){print <<<EOT
+--><span class="s2 w">[$thread[toolinfo]]</span><!--
 EOT;
-}if($timestamp-$thread[lastpost]<=$db_newtime){print <<<EOT
--->
-			<img src="$imgpath/$stylepath/file/new.gif" align="absmiddle" title="新帖标志" alt="新帖标志" />
-<!--
+}if(isset($thread['colony'])){print <<<EOT
+--><span class="s6 w" style="display:none;">[来自群<a href="apps.php?q=group&cyid={$thread[colony][cyid]}" class="s6">{$thread[colony][cname]}</a>]</span><!--
 EOT;
 }if($forumset['inspect'] && $thread['inspect']){print <<<EOT
--->
-			<span class="w"><font color="red">[{$thread[inspect][1]} 阅至 {$thread[inspect][0]}楼]</font></span>
-<!--
+--><span class="w s1 mr5">[{$thread[inspect][1]}阅至{$thread[inspect][0]}楼]</span><!--
 EOT;
-}if($thread[ispage]){print <<<EOT
--->
-			<span class="w">$thread[ispage]</span>
+}if(getstatus($thread['tpcstatus'], 7)){print <<<EOT
+--><span class="s2 w">[抢楼帖]</span><!--
+EOT;
+}if($thread['state'] == 0 && $thread['rewcredit'] > 0){print <<<EOT
+--><span class="s2 w">[悬赏金额{$thread[rewcredit]}]</span><!--
+EOT;
+}print <<<EOT
+--><span class="s2 w">$thread[replyrewardtip]</span>$thread[ifmark]<!--
+EOT;
+if($thread[ispage]){print <<<EOT
+--><span class="w">$thread[ispage]</span><!--
+EOT;
+}if($timestamp-$thread[lastpost]<=$db_newtime){print <<<EOT
+--><img src="$imgpath/$stylepath/file/new.gif" align="absmiddle" title="新帖标志" alt="新帖标志" />
 <!--
 EOT;
 }print <<<EOT
 -->
             </td>
-            <td class="author"><a href="{$db_userurl}$thread[authorid]">$thread[author]</a><p>$thread[postdate]</p></td>
-            <td class="num"><em>$thread[replies]</em>/$thread[hits]</td>
-            <td class="author"><a href="u.php?username=$thread[lastposter]">$thread[lastposter]</a><p><a href="read.php?tid={$thread[tid]}&page=e#a" title="$thread[lstpdate]">$thread[lstptime] <span>&raquo;</span></a></p></td>
+            <td class="author">
+<!--
+EOT;
+$newtimeStyle = strtotime($thread['postdate'])>=$tdtime ?  'style="color:#ff5500;"'  : '' ;
+$cardusername = urlencode($thread[lastposter]);
+$thread['lastposter'] = (!$thread['replies'] && $thread['authorid'] == $winduid) ? $windid : $thread[lastposter] ;
+print <<<EOT
+-->
+						<a href="{$db_userurl}$thread[authorid]" class=" _cardshow" data-card-url="pw_ajax.php?action=smallcard&type=showcard&uid={$thread[authorid]}" target="_blank" data-card-key="{$thread['author']}">$thread[author]</a>
+						<p {$newtimeStyle}>$thread[postdate]</p></td>
+            <td class="num" width="60"><em>$thread[replies]</em>/$thread[hits]</td>
+            <td class="author"><a href="u.php?username=$thread[lastposter]" target="_blank" class=" _cardshow" data-card-url="pw_ajax.php?action=smallcard&type=showcard&username={$cardusername}" data-card-key="{$thread['lastposter']}">$thread[lastposter]</a><p><a href="read.php?tid={$thread[tid]}&page=e#a" title="$thread[lstpdate]">$thread[lstptime]</a></p></td>
         </tr>
-<!--
-EOT;
-if($managemode==1){
-if($db_ajax & 1){print <<<EOT
--->
-    <tr class="tr3"><td></td><td>
-	<div class="fr s8">[
-<!--
-EOT;
-if($isGM || $pwSystem[digestadmin]){print <<<EOT
--->
-		<a id="digest_$thread[tid]" style="cursor:pointer" onclick="sendmsg('mawhole.php?ajax=1&action=digest&fid=$thread[fid]&seltid=$thread[tid]','',this.id)" title="加入精华帖">精</a>
-<!--
-EOT;
-}if($isGM || $pwSystem[lockadmin]){print <<<EOT
--->
-		<a id="lock_$thread[tid]" style="cursor:pointer" onclick="sendmsg('mawhole.php?ajax=1&action=lock&fid=$thread[fid]&seltid=$thread[tid]','',this.id)" title="锁定帖子不让会员再回复帖子">锁定</a>
-<!--
-EOT;
-}if($isGM || $pwSystem[pushadmin]){print <<<EOT
--->
-		<a id="pushtopic_$thread[tid]" style="cursor:pointer" onclick="sendmsg('mawhole.php?ajax=1&action=pushtopic&fid=$thread[fid]&seltid=$thread[tid]','',this.id)" title="提前帖子">提</a>
-<!--
-EOT;
-}if($isGM || $pwSystem[downadmin]){print <<<EOT
--->
-		<a id="downtopic_$thread[tid]" style="cursor:pointer" onclick="sendmsg('mawhole.php?ajax=1&action=downtopic&fid=$thread[fid]&seltid=$thread[tid]','',this.id)" title="将帖子往后压">压帖</a>
-<!--
-EOT;
-}if($isGM || $pwSystem[coloradmin]){print <<<EOT
--->
-		<a id="edit_$thread[tid]" style="cursor:pointer" onclick="sendmsg('mawhole.php?ajax=1&action=edit&fid=$thread[fid]&seltid=$thread[tid]','',this.id)" title="编辑标题">亮</a>
-<!--
-EOT;
-}if($isGM || $pwSystem[topped]){print <<<EOT
--->
-<a id="headtopic_$thread[tid]" style="cursor:pointer" onclick="sendmsg('mawhole.php?ajax=1&action=headtopic&fid=$thread[fid]&seltid=$thread[tid]','',this.id)" title="置顶主题:将主题置顶,以便会员查看">顶</a>
-<!--
-EOT;
-}print <<<EOT
--->
-] </div><td colspan="4"></td></td></tr>
-<!--
-EOT;
-}else{print <<<EOT
--->
-    <tr class="tr3"><td></td><td>
-	<div class="fr s8"> [
-<!--
-EOT;
-if($isGM || $pwSystem['digestadmin']){print <<<EOT
--->
-		<a id="digest_$thread[tid]" href="mawhole.php?action=digest&fid=$thread[fid]&seltid=$thread[tid]" title="加入精华帖">精</a>
-<!--
-EOT;
-}if($isGM || $pwSystem['lockadmin']){print <<<EOT
--->
-		<a id="lock_$thread[tid]" href="mawhole.php?action=lock&fid=$thread[fid]&seltid=$thread[tid]" title="锁定帖子不让会员再回复帖子">锁定</a>
-<!--
-EOT;
-}if($isGM || $pwSystem['pushadmin']){print <<<EOT
--->
-		<a id="pushtopic_$thread[tid]" href="mawhole.php?action=pushtopic&fid=$thread[fid]&seltid=$thread[tid]" title="提前帖子">提</a>
-<!--
-EOT;
-}if($isGM || $pwSystem['downadmin']){print <<<EOT
--->
-		<a id="downtopic_$thread[tid]" href="mawhole.php?action=downtopic&fid=$thread[fid]&seltid=$thread[tid]" title="将帖子往后压">压帖</a>
-<!--
-EOT;
-}if($isGM || $pwSystem['coloradmin']){print <<<EOT
--->
-		<a id="edit_$thread[tid]" href="mawhole.php?action=edit&fid=$thread[fid]&seltid=$thread[tid]" title="编辑标题">亮</a>
-<!--
-EOT;
-}if($isGM || $pwSystem[topped]){print <<<EOT
--->
-	<a id="headtopic_$thread[tid]" href="mawhole.php?action=headtopic&fid=$thread[fid]&seltid=$thread[tid]" title="置顶主题:将主题置顶,以便会员查看">顶</a>
-<!--
-EOT;
-}print <<<EOT
--->
-		] </div><td colspan="4"></td></td></tr>
-<!--
-EOT;
-}}print <<<EOT
--->
 <!--
 EOT;
 }print <<<EOT
 -->
 	</tbody>
 </table>
-<script LANGUAGE="JavaScript">
+<script>
 function delload(){
 	var objTrs = getElementsByClassName('tr3',getObj('threadlist'));
 	var mover =	 function (){
@@ -363,27 +309,79 @@ function delload(){
 		objTrs[i].onmouseout =  mout;
 	}
 }
-window.onReady(delload);
+window.onReady(function(){
+	delload();
+	//调用气泡
+	var pw_bubble=new Bubble([{"name":"pw_all_tip_tucool","id":"pw_all_pos_tucool"},{"name":"pw_all_tip_usercard","id":"pw_all_pos_usercard"}]);
+		pw_bubble.init();
+	//新窗口切换
+	var openwin=new openWin();
+	openwin.init();	
+});
 
-//判断是否选中新窗口
-function xinchuang() { //新窗
-	var i;
-	var val = document.getElementById("newwindows");
-	var va  = document.getElementsByName("readlink");
-	if (val.checked == true) { //选中
-		for (i=0;i<va.length;i++) {
-			var vaa = va[i].setAttribute("target","_blank");
-		}
-		SetCookie("newwindows",1);
-	} else {
-		for (i=0;i<va.length;i++) {
-			var vaa = va[i].setAttribute("target","_self");
-		}
-		SetCookie("newwindows",0);
-	}
+
+//新窗口切换功能
+var openWin=function(){
+	this.obj=document.getElementById("newwindows");
+	this.links=document.getElementsByName("readlink");
+	this.cookieName="newwindows";
 }
-//自动加载
-//window.onReady(xinchuang);
+	openWin.prototype={
+		init:function(){
+			var self=this;
+			var ck=FetchCookie(this.cookieName);
+			if(ck==1){
+				this.add();
+			}else{
+				this.remove();
+			}
+			addEvent(this.obj,"click",function(){
+				self.toggle();
+			})
+			this.obj.onselectstart=function(){
+				return false;
+			}
+		},
+		add:function(){
+			if(hasClass(this.obj,"checkbox_checked")){
+				return false;
+			}else 
+			if(!hasClass(this.obj,"checkbox")){
+				addClass(this.obj,"checkbox_checked");
+			}else{
+				var classname=this.obj.className;
+				this.obj.className=classname.replace("checkbox","checkbox_checked");
+			}
+			for (i=0;i<this.links.length;i++) {
+				this.links[i].setAttribute("target","_blank");
+			}
+			SetCookie("newwindows",1);
+		},
+		remove:function(){
+			if(hasClass(this.obj,"checkbox")){
+				return false;
+			}else 
+			if(!hasClass(this.obj,"checkbox_checked")){
+				addClass(this.obj,"checkbox");
+			}else{
+				var classname=this.obj.className;
+				this.obj.className=classname.replace("checkbox_checked","checkbox");
+			}
+			for (i=0;i<this.links.length;i++) {
+				this.links[i].setAttribute("target","_self");
+			}
+			SetCookie("newwindows",0);
+		},
+		toggle:function(){
+			if (hasClass(this.obj,"checkbox_checked")) {
+				this.remove();
+			}else{
+				this.add();
+			}
+		}
+		
+	}
+
 </script>
 <!--
 EOT;

@@ -68,6 +68,7 @@ class PW_PcvalueSource extends SystemData {
 			$temp = geturl($v['pcattach']);
 			$v['image'] = $temp[0] ? $temp[0] : '';
 			$v['authorurl']	= 'u.php?uid='.$v['authorid'];
+			$v['author'] = $v['anonymous'] ? '匿名' : $v['author'];
 			$v['forumname']	= getForumName($v['fid']);
 			$v['forumurl']	= getForumUrl($v['fid']);
 			list($v['topictypename'],$v['topictypeurl']) = getTopicType($v['type'],$v['fid']);
@@ -89,14 +90,7 @@ class PW_PcvalueSource extends SystemData {
 	}
 	
 	function _cookFid($fid) {
-		if ($fid && is_numeric($fid)) return $fid;
-		if (S::isArray($fid)) {
-			foreach ($fid as $key=>$value) {
-				if (!$value) unset($fid[$key]);
-			}
-			if (S::isArray($fid)) return S::sqlImplode($fid);
-		}
-		return getCommonFid();
+		return getCookedCommonFid($fid);
 	}
 
 	function getPcvalueDao(){

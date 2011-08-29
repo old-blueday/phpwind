@@ -6,7 +6,7 @@ function Element(evtobj,info,infobox,relObj,required){
     if(required) this.d = required;
 }
 var ajaxclearhistory=false; //fixed for tt browser
-
+var regGdTimer;
 /*
  * initialize the inputs
  */
@@ -15,7 +15,7 @@ var ajaxclearhistory=false; //fixed for tt browser
     for (var i=0;i<e.length;i++) {
     	if (typeof(e[i].onfocus) == 'function') continue;
     	if(e[i].name == 'authmobile' || e[i].name == 'authverify') continue;
-		if (e[i].type == 'text' || e[i].type == 'password') {
+		if (e[i].type == 'text' || e[i].type == 'password' || e[i].type == 'email') {
 			e[i].noerror = 0;
 			e[i].onfocus 	= onFocus;
 			e[i].onblur 	= onBlur;
@@ -46,6 +46,7 @@ function onFocus(event){
     } else {
         obj = event.target;
     }
+	if (obj.id == 'gdcode') showgd('menu_gd');
 	if (getInfoBox(obj)) {
 		var lastid = eval(obj.id).m.length - 1;
 		if(eval(obj.id).m[lastid] == '') {
@@ -66,6 +67,8 @@ function onBlur(evnt){
     }
 	if (obj.id == 'invcode') {
 		setTimeout(function(){analyseData(obj);}, 100);
+	} else if(obj.id == 'gdcode') {
+		regGdTimer = setTimeout(function(){analyseData(obj);}, 500);
 	} else {
 		analyseData(obj);
 	}
@@ -99,21 +102,23 @@ function clickRadio(event) {
 }
 
 var ajaxCheckArray = new Array();
-function checkAll(){
+function checkAll(e){
+	var e = window.event || e;
+	if(e.preventDefault){e.preventDefault();}
+	e.returnValue = false;
     var result = 1;
-    
     //校验input
     var e =  document.getElementsByTagName("input");
     for(var i=0;i<e.length;i++){
-    	if(e[i].id == 'authmobile' && !/^1\d{10}$/.test(e[i].value) && $('mobileBox').style.display != 'none'){
-    		$('mobileauth_info').innerHTML = authInfo[1];
-    		$('mobileauth_info').style.display = '';
-    		e[i].onfocus = function(){$('mobileauth_info').style.display = 'none';}
-    	}else if(e[i].id == 'authverify' && e[i].value =='' && $('verifyBox').style.display != 'none'){
-    		$('authTips').className = 'wrong';
-    		$('authTips').innerHTML = authInfo[7];
-    		$('authTips').style.display = '';
-    		e[i].onfocus = function(){$('authTips').style.display = 'none';}
+    	if(e[i].id == 'authmobile' && !/^1\d{10}$/.test(e[i].value) && getObj('mobileBox').style.display != 'none'){
+    		getObj('mobileauth_info').innerHTML = authInfo[1];
+    		getObj('mobileauth_info').style.display = '';
+    		e[i].onfocus = function(){getObj('mobileauth_info').style.display = 'none';}
+    	}else if(e[i].id == 'authverify' && e[i].value =='' && getObj('verifyBox').style.display != 'none'){
+    		getObj('authTips').className = 'wrong';
+    		getObj('authTips').innerHTML = authInfo[7];
+    		getObj('authTips').style.display = '';
+    		e[i].onfocus = function(){getObj('authTips').style.display = 'none';}
     	}
 		if (e[i].id != 'pwuser' && e[i].id != 'customquest_l' && e[i].id != 'keyword') {
 			if(e[i].type == 'text' && e[i].id != 'regpwd' && e[i].id != 'regpwdrepeat' && e[i].id != 'registerclause'){
@@ -155,6 +160,7 @@ function checkAll(){
 			result &= extraresult;
 		}
 	}
+	
 	ajaxCheck(result);
 }
 
@@ -175,7 +181,7 @@ function ajaxCheck(result) {
 			return true;
 		}
 	} else {
-		var url 	= location.href;
+		var url 	= getRegAjaxCheckUrl();
 		var data 	= "action=regcheck&type=all&data=" + postData;
 		read.guide();
 		ajax.send(url,data,function() {
@@ -289,6 +295,14 @@ function analyseData(obj,isSubmit,isAsyc,asyc){
 	}
 }
 
+function getRegAjaxCheckUrl() {
+	//NEED GLOBAL VAR: regAjaxCheckUrl
+	if (typeof(regAjaxCheckUrl) == "undefined" || '' == regAjaxCheckUrl) {
+		return location.href;
+	}
+	return regAjaxCheckUrl;
+}
+
 function getInfoBox(obj){
 	if (typeof(obj) == 'object') {
 		if(obj.id){
@@ -322,14 +336,19 @@ function showResult(result,obj){
             getInfoBox(obj).className = falseclass;
             getInfoBox(obj).style.display = '';
 	        getInfoBox(obj).innerHTML =  typeof(obj) == 'object' ? eval(obj.id).m[result] : eval(obj).m[result];
-	        //obj.parentNode.focus();
+	       	if (obj.id == 'gdcode') changeAllKindsGdCode('sitegdcheck', getObj('menu_gd'));
 	        return false;
 	    }
 	    if(result == 0 ){
 			getInfoBox(obj).innerHTML = typeof(obj) == 'object' ? eval(obj.id).m[result] : eval(obj).m[result];
-			if (obj.id == 'invcode') getObj('buy_invitecode').style.display = 'none';
+			if (obj.id == 'invcode' && getObj('buy_invitecode')) getObj('buy_invitecode').style.display = 'none';
 			getInfoBox(obj).className = rightclass;
 			getInfoBox(obj).style.display = '';
+			if (obj.id == 'gdcode' && typeof(obj.onblur) == 'function') {
+				obj.readOnly = true;
+				obj.onblur = obj.onfocus = null;
+				removeGdcodeClickEvt(getObj('menu_gd'));	
+			}
 			return true;
 	    }
 	}
@@ -349,7 +368,7 @@ function checkRegName(obj,isSubmit){
 		obj.noerror = 0;
 		return 1;
 	}
-	var url 	= location.href;
+	var url 	= getRegAjaxCheckUrl();
 	var data 	= "action=regcheck&type=regname&username="+username;
 	getInfoBox(obj).innerHTML = "&nbsp;检测中，请稍等...";
 	ajax.send(url,data,function(){
@@ -393,7 +412,7 @@ function checkEmail(obj,isSubmit){
 		obj.noerror = 0;
 		return 1;
 	} else{
-		var url 	= location.href;
+		var url 	= getRegAjaxCheckUrl();
 		var data 	= "action=regcheck&type=regemail&email="+email;
 		getInfoBox(obj).innerHTML = "&nbsp;检测中，请稍等...";
 		ajax.send(url,data,function(){
@@ -440,7 +459,7 @@ function checkPwd(obj){
 		obj.noerror = 0;
 		return 7;
 	}
-	if(/[\\\/\&\'\"\*\,<>#\?% ]/.test(pwd)){
+	if(/[\\\/\&\'\"\*\,<>#\?%!。 ]/.test(pwd)){
 		obj.noerror = 0;
 		return 8;
 	}
@@ -504,15 +523,19 @@ function checkPwdRepeat(obj){
 function checkGDCode(obj,isSubmit){
 	var gdcode = obj.value;
 	if (isSubmit == true) {
-		ajaxCheckArray[obj.id] = {'noerror':obj.noerror,'type':'reggdcode','value':obj.value};
+		if (regGdTimer) {
+			clearTimeout(regGdTimer);
+		}
+		var tmpValue = encodeURIComponent(obj.value);
+		ajaxCheckArray[obj.id] = {'noerror':obj.noerror,'type':'reggdcode','value':tmpValue};
 		return;
 	}
 	if(gdcode==""){
 		obj.noerror = 0;
 		return 3;
 	}else{
-		var url 	= location.href;
-		var data 	= "action=regcheck&type=reggdcode&gdcode="+gdcode;
+		var url 	= getRegAjaxCheckUrl();
+		var data 	= "action=regcheck&type=reggdcode&gdcode="+encodeURIComponent(gdcode);
 		getInfoBox(obj).innerHTML = "&nbsp;检测中，请稍等...";
 		ajax.send(url,data,function(){
 			var response = parseInt(ajax.request.responseText);
@@ -533,6 +556,14 @@ function checkGDCode(obj,isSubmit){
 	}
 }
 
+function removeGdcodeClickEvt(obj) {
+	var elements = obj.getElementsByTagName("*");
+	for (var i = 0, j = elements.length; i < j; i++) {
+		if (typeof elements[i].onclick == 'function') elements[i].onclick = null;
+	}
+	return true;
+}
+
 function checkAnswer(obj,isSubmit){
 	var question= parseInt(getObj('regqkey').value);
 	var answer 	= obj.value;
@@ -543,7 +574,7 @@ function checkAnswer(obj,isSubmit){
 	if(answer==""){
 		return 2;
 	}else{
-		var url 	= location.href;
+		var url 	= getRegAjaxCheckUrl();
 		var data 	= "action=regcheck&type=qanswer&answer="+answer+"&question="+question;
 		getInfoBox(obj).innerHTML = "&nbsp;检测中，请稍等...";
 		ajax.send(url,data,function(){
@@ -567,7 +598,7 @@ function checkInvcode(obj,isSubmit){
 		return;
 	}
 	if(invcode){
-		var url 	= location.href;
+		var url 	= getRegAjaxCheckUrl();
 		var data 	= "action=regcheck&type=invcode&invcode="+invcode;
 		getInfoBox(obj).innerHTML = "&nbsp;检测中，请稍等...";
 		ajax.send(url,data,function(){
@@ -665,7 +696,7 @@ function checkField(obj,isSubmit){
 			showResult(0,obj);
 			return 0;
 		}
-		var url 	= location.href;
+		var url 	= getRegAjaxCheckUrl();
 		field = field.replace(/&/g,'%26');
 		var data 	= "action=regcheck&type=customerfield&fieldname="+obj.name+"&value="+field;
 		getInfoBox(obj).innerHTML = "&nbsp;检测中，请稍等...";

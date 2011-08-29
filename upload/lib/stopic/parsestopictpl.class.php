@@ -122,7 +122,7 @@ class PW_ParseStopicTpl {
 
 		$content = '';
 		foreach ($this->stopic['block_config'] as $layout_id => $blocks) {
-			$tmp = $this->_getLayoutContent($layout_id);
+			$tmp = $this->_getLayoutContent($layout_id,$stopic['stopic_id']);
 			$head = $this->ifadmin ? $this->_getLayoutHeadData($layout_id) : '';
 			$tmp = '<div id="'.$layout_id.'" class="layoutDraggable cc" width="100%">'.$head.$tmp.'</div>';
 			$content .= $tmp;
@@ -138,10 +138,10 @@ class PW_ParseStopicTpl {
 	 * @param string $layout_id 布局html的id
 	 * @return string
 	 */
-	function _getLayoutContent($layout_id) {
+	function _getLayoutContent($layout_id,$stopic_id) {
 		list($layout_type, ) = explode('_', $layout_id);
-		
 		$string = $this->getLayoutString($layout_type);
+
 		$string = str_replace('{REPLACE_LAYOUT_ID}', $layout_id, $string);
 
 		preg_match_all('/<div(.+?)>([^\x00]+?)<\/div>/is',$string,$match);
@@ -155,7 +155,8 @@ class PW_ParseStopicTpl {
 				continue;
 			}
 			$search[]	= $match[0][$key];
-			$replace[]	= $this->_getReplace($id,$value);
+
+			$replace[]	= $this->_getReplace($id,$value,$stopic_id);
 		}
 
 		return str_replace($search,$replace,$string);
@@ -227,13 +228,13 @@ class PW_ParseStopicTpl {
 	 * @param string $divconfig 布局容器的div配置属性
 	 * @return string
 	 */
-	function _getReplace($id,$divconfig) {
+	function _getReplace($id,$divconfig,$stopic_id) {
 		$temp = '';
 		$temp .= '<div'.$divconfig.'>';
 		$temp .= $this->ifadmin ? '&nbsp;' : '';
 		$temp .= $this->_getUnitsByPack($id);
 		$temp .= '</div>';
-		return $temp;
+		return (strrpos($temp,'{REPLACE_STOPIC_ID}') !== false) ? str_replace('{REPLACE_STOPIC_ID}', $stopic_id, $temp) : $temp;
 	}
 	
 	/**

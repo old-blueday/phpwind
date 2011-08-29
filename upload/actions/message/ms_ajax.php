@@ -1,16 +1,18 @@
 <?php
 !defined('P_W') && exit('Forbidden');
 S::gp(array('action'));
+define('FRIEND_SEPARATER', '#%');
 !in_array($action, array('friend', 'mark', 'del', 'postReply', 'overlook', 'post', 'agree', 'markgroup', 'shield',
 	'unshield','open','close','replay')) && ajaxExport("非法操作请返回");
 if (in_array($action, array('friend', 'agree','overlook'))) {
 	L::loadClass('friend', 'friend', false);
-	$friendObj = new PW_Friend('#%');
+	$friendObj = new PW_Friend(FRIEND_SEPARATER);
 }
 if(!$winduid) ajaxExport(array('bool' => $bool, 'message' => '你还没有登录'));
 if ('friend' == $action) {
+	/*
 	S::gp(array('gname'));
-	if ($gname == '-1') {
+	if ($gname == '-2') {
 		 $friend = $friendObj->getFriends($winduid);
 		 $group	 = $friendObj->getFriendColonys($winduid);
 		 $json	 = array('friend'=>$friend,'group'=>$group);
@@ -20,11 +22,27 @@ if ('friend' == $action) {
 	} elseif ($gname) {
 		 ajaxExport($friendObj->getFriendsByColony($winduid, $gname, 'name'));
 	} else {
-		 $friend = $friendObj->getFriends($winduid);
-		 $group	 = $friendObj->getFriendColonys($winduid);
-		 $json	 = array('friend'=>$friend,'group'=>$group);
-		 ajaxExport($json);
+		$friends = array();
+		$attentionService = L::loadClass('attention','friend');
+		$attentionList = $attentionService->getUidsInFollowList($winduid);
+		if(S::isArray($attentionList)) {
+			$userService = L::loadClass('userservice','user');
+			$friends = $userService->getUserNamesByUserIds($attentionList);
+		}
+		ajaxExport($friends);
 	}
+	*/
+	$attention = array();
+	$attentionService = L::loadClass('attention','friend');
+	$attentionList = $attentionService->getUidsInFollowList($winduid);
+	if(S::isArray($attentionList)) {
+		$userService = L::loadClass('userservice','user');
+		$attention = $userService->getUserNamesByUserIds($attentionList);
+	}
+	$friend = $friendObj->getFriends($winduid);
+	$json	 = array('friend'=>$friend,'attention'=>implode(FRIEND_SEPARATER,$attention));
+	ajaxExport($json);
+	
 } elseif ('mark' == $action) {
 	S::gp(array('rids'), 'GP');
 	empty($rids) && ajaxExport("非法操作请返回");
@@ -50,7 +68,7 @@ if ('friend' == $action) {
 	}
 	ajaxExport("删除操作成功!");
 } elseif ('postReply' == $action) {
-	S::gp(array('parentMid', 'atc_content','rid','gdcode','flashatt'), 'GP');
+	S::gp(array('parentMid', 'atc_content','rid','gdcode','flashatt','tid','ifMessagePostReply'), 'GP');
 	if(!$_G['allowmessege']) ajaxExport(array('bool' => false, 'message' => '你所在的用户组不能发送消息'));
 	if(($db_gdcheck & 8) && false === GdConfirm($gdcode,true)){
 		ajaxExport(array('bool' => false, 'message' => '你的验证码不正确或过期'));
@@ -70,7 +88,17 @@ if ('friend' == $action) {
 			S::gp(array('savetoalbum', 'albumid'), 'P', 2);
 			$messageAtt = new messageAtt($parentMid,$rid);
 			$messageAtt->setFlashAtt($flashatt, $savetoalbum, $albumid);
-			PwUpload::upload($messageAtt);
+			$attachData = PwUpload::upload($messageAtt);
+		}
+	}
+	if ($ifMessagePostReply) {
+		$pingService = L::loadClass('ping', 'forum');
+		if (($pingService->checkReplyRight($tid)) !== true) {
+			ajaxExport(array('bool' => false, 'message' => '您不能对帖子进行回复'));
+		}
+		$atc_content = $atc_content."\r\n\r\n[size=2][color=#a5a5a5]内容来自[短消息][/color] [/size]";
+		if ($result = $pingService->addPost($tid, $atc_content) !== true) {
+			ajaxExport(array('bool' => false, 'message' => $result));
 		}
 	}
 	ajaxExport(array('bool' => true, 'message' => '消息已发送'));

@@ -290,14 +290,12 @@ class RateIndex {
             if (! isset ( $weekResult [$config ['id']] ) || $config ['isopen'] == 0) {
                 continue;
             }
-            ($currentNum == 3) && $weekHTML .= '<span id="more" style="display:none;">';
             $weekHTML .= '<li>最' . $config ['title'] . '：';
             $weekHTML .= '<a href="' . $this->_bbsUrl . $weekResult [$config ['id']] ['objectInfo'] ['href'] . '" target="_blank">' . $weekResult [$config ['id']] ['objectInfo'] ['title'] . '</a>&nbsp;&nbsp;';
             $weekHTML .= '作者：<a href="' . $this->_bbsUrl . $weekResult [$config ['id']] ['objectInfo'] ['authorUrl'] . '" class="black" target="_blank">' . $weekResult [$config ['id']] ['objectInfo'] ['author'] . '</a>';
             $weekHTML .= '</li>';
             $currentNum ++;
         }
-        $weekHTML .= ($currentNum-1 >= 3) ?  '</span>' : '<span id="more" style="display:none;"></span>';
         return $weekHTML;
     }
 

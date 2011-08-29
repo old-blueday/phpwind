@@ -86,8 +86,9 @@ include printEot('writeurl');
 print <<<EOT
 -->
 </div>
+<script type="text/javascript" src="js/pw_weibo.js"></script>
 <script type="text/javascript" src="apps/weibo/js/post.js"></script>
-<script>
+<script type="text/javascript">
 var pw_weiboPost = new weibo_post({form:'weibo_form',content:'weibo_content',smile:'weibo_smile',url:'weibo_url',photo:'weibo_photo',nextdo:'{$nextDo}',weibotip:'{$GLOBALS[o_weibotip]}'});
 var content = getObj('weibo_content'),
 	dvalue = getObj('weibo_content').value;
@@ -138,16 +139,15 @@ EOT;
 	}
 
 	function weibo($value) {//普通新鲜事
-   
 print <<<EOT
 -->
 <dl class="dl cc">
 	<dt class="dt">
-		<a href="apps.php?q=weibo&uid={$value['authorid']}" class="img_50"><img src="{$value['icon']}" width="44" height="44" alt="{$value['username']}" /></a>
+		<a href="apps.php?q=weibo&uid={$value['authorid']}" class="img_50 _cardshow" target="_blank" data-card-url="pw_ajax.php?action=smallcard&type=showcard&uid={$value[authorid]}" data-card-key="{$value['username']}"><img src="{$value['icon']}" width="44" height="44" alt="{$value['username']}" /></a>
 	</dt>
 	<dd class="dd">
 		<div class="title">
-			<span class="uname"><a href="{$GLOBALS[db_userurl]}{$value['authorid']}">{$value['username']}</a>:&nbsp;</span>{$value['content']}
+			<span class="uname"><a href="{$GLOBALS[db_userurl]}{$value['authorid']}" class=" _cardshow" target="_blank" data-card-url="pw_ajax.php?action=smallcard&type=showcard&uid={$value[authorid]}" data-card-key="{$value['username']}">{$value['username']}</a>:&nbsp;</span>{$value['content']}
 		</div>
 <!--
 EOT;
@@ -181,11 +181,11 @@ print <<<EOT
 -->
 <dl class="dl cc">
 	<dt class="dt">
-		<a href="apps.php?q=weibo&uid={$value['authorid']}" class="img_50"><img src="{$value['icon']}" width="44" height="44" alt="{$value['username']}" /></a>
+		<a href="apps.php?q=weibo&uid={$value['authorid']}" class="img_50 _cardshow" target="_blank" data-card-url="pw_ajax.php?action=smallcard&type=showcard&uid={$value[authorid]}" data-card-key="{$value['username']}"><img src="{$value['icon']}" width="44" height="44" alt="{$value['username']}" /></a>
 	</dt>
 	<dd class="dd">
 		<div class="title">
-			<span class="uname"><a href="{$GLOBALS[db_userurl]}{$value['authorid']}">{$value['username']}</a> </span>转发:&nbsp;{$value['content']}
+			<span class="uname"><a href="{$GLOBALS[db_userurl]}{$value['authorid']}" class=" _cardshow" target="_blank" data-card-url="pw_ajax.php?action=smallcard&type=showcard&uid={$value[authorid]}" data-card-key="{$value['username']}">{$value['username']}</a> </span>转发:&nbsp;{$value['content']}
 		</div>
 <!--
 EOT;
@@ -238,7 +238,7 @@ EOT;
 print <<<EOT
 -->
 <div class="title">
-	<a href="{$GLOBALS[db_userurl]}{$value['authorid']}">{$value['username']}</a>:&nbsp;<a href="$url">{$value['extra']['title']}</a>
+	<a href="{$GLOBALS[db_userurl]}{$value['authorid']}" class=" _cardshow" target="_blank" data-card-url="pw_ajax.php?action=smallcard&type=showcard&uid={$value[authorid]}" data-card-key="{$value['username']}">{$value['username']}</a>:&nbsp;<a href="$url">{$value['extra']['title']}</a>
 </div>
 <div class="mb10">{$value['content']}</div>
 <!--
@@ -248,7 +248,7 @@ EOT;
 print <<<EOT
 -->
 <div class="mb10">
-	<a href="{$GLOBALS[db_userurl]}{$value['uid']}">{$value['username']}</a>:&nbsp;{$value['content']}
+	<a href="{$GLOBALS[db_userurl]}{$value['uid']}" class=" _cardshow" target="_blank" data-card-url="pw_ajax.php?action=smallcard&type=showcard&uid={$value[uid]}" data-card-key="{$value['username']}">{$value['username']}</a>:&nbsp;{$value['content']}
 </div>
 <!--
 EOT;
@@ -273,11 +273,11 @@ print <<<EOT
 -->
 <dl class="dl cc">
 	<dt class="dt">
-		<a href="apps.php?q=weibo&uid={$value['authorid']}" class="img_50"><img src="{$value['icon']}" width="44" height="44" alt="{$value['username']}" /></a>
+		<a href="apps.php?q=weibo&uid={$value['authorid']}" class="img_50 _cardshow" target="_blank" data-card-url="pw_ajax.php?action=smallcard&type=showcard&uid={$value[authorid]}" data-card-key="{$value['username']}"><img src="{$value['icon']}" width="44" height="44" alt="{$value['username']}" /></a>
 	</dt>
 	<dd class="dd">
 		<div class="title">
-			<span class="uname"><a href="{$GLOBALS[db_userurl]}{$value['authorid']}">{$value['username']}</a>:&nbsp;</span><!--
+			<span class="uname"><a href="{$GLOBALS[db_userurl]}{$value['authorid']}" class=" _cardshow" target="_blank" data-card-url="pw_ajax.php?action=smallcard&type=showcard&uid={$value[authorid]}" data-card-key="{$value['username']}">{$value['username']}</a>:&nbsp;</span><!--
 EOT;
 if ($value['content']) {print <<<EOT
 -->{$value['content']}<!--
@@ -313,11 +313,11 @@ print <<<EOT
 -->
 <dl class="dl cc">
 	<dt class="dt">
-		<a href="apps.php?q=weibo&uid={$value['authorid']}" class="img_50"><img src="{$value['icon']}" width="44" height="44" alt="{$value['username']}" /></a>
+		<a href="apps.php?q=weibo&uid={$value['authorid']}" class="img_50 _cardshow" target="_blank" data-card-url="pw_ajax.php?action=smallcard&type=showcard&uid={$value[authorid]}" data-card-key="{$value['username']}"><img src="{$value['icon']}" width="44" height="44" alt="{$value['username']}" /></a>
 	</dt>
 	<dd class="dd">
 		<div class="title">
-			<span class="uname"><a href="{$GLOBALS[db_userurl]}{$value['authorid']}">{$value['username']}</a>:&nbsp;</span>分享照片
+			<span class="uname"><a href="{$GLOBALS[db_userurl]}{$value['authorid']}" class=" _cardshow" target="_blank" data-card-url="pw_ajax.php?action=smallcard&type=showcard&uid={$value[authorid]}" data-card-key="{$value['username']}">{$value['username']}</a>:&nbsp;</span>分享照片
 		</div>
 <!--
 EOT;
@@ -344,11 +344,11 @@ print <<<EOT
 -->
 <dl class="dl cc">
 	<dt class="dt">
-		<a href="apps.php?q=weibo&uid={$value['authorid']}" class="img_50"><img src="{$value['icon']}" width="44" height="44" alt="{$value['username']}" /></a>
+		<a href="apps.php?q=weibo&uid={$value['authorid']}" class="img_50 _cardshow" target="_blank" data-card-url="pw_ajax.php?action=smallcard&type=showcard&uid={$value[authorid]}" data-card-key="{$value['username']}"><img src="{$value['icon']}" width="44" height="44" alt="{$value['username']}" /></a>
 	</dt>
 	<dd class="dd">
 		<div class="title">
-			<span class="uname"><a href="{$GLOBALS[db_userurl]}{$value['authorid']}">{$value['username']}</a>:&nbsp;</span><a href="apps.php?q=group&a=active&job=view&cyid={$value['extra']['cyid']}&id={$value['objectid']}" target="_blank">{$value['extra']['title']}</a>
+			<span class="uname"><a href="{$GLOBALS[db_userurl]}{$value['authorid']}" class=" _cardshow" target="_blank" data-card-url="pw_ajax.php?action=smallcard&type=showcard&uid={$value[authorid]}" data-card-key="{$value['username']}">{$value['username']}</a>:&nbsp;</span><a href="apps.php?q=group&a=active&job=view&cyid={$value['extra']['cyid']}&id={$value['objectid']}" target="_blank">{$value['extra']['title']}</a>
 		</div>
 		<div class="mb10">
 			{$value['content']}
@@ -373,11 +373,11 @@ print <<<EOT
 -->
 <dl class="dl cc">
 	<dt class="dt">
-		<a href="apps.php?q=weibo&uid={$value['authorid']}" class="img_50"><img src="{$value['icon']}" width="44" height="44" alt="{$value['username']}" /></a>
+		<a href="apps.php?q=weibo&uid={$value['authorid']}" class="img_50 _cardshow" target="_blank" data-card-url="pw_ajax.php?action=smallcard&type=showcard&uid={$value[authorid]}" data-card-key="{$value['username']}"><img src="{$value['icon']}" width="44" height="44" alt="{$value['username']}" /></a>
 	</dt>
 	<dd class="dd">
 		<div class="title">
-			<span class="uname"><a href="{$GLOBALS[db_userurl]}{$value['authorid']}">{$value['username']}</a>:&nbsp;</span><a href="apps.php?q=group&a=read&cyid={$value['extra']['cyid']}&tid={$value['objectid']}" target="_blank">{$value['extra']['title']}</a>
+			<span class="uname"><a href="{$GLOBALS[db_userurl]}{$value['authorid']}" class=" _cardshow" target="_blank" data-card-url="pw_ajax.php?action=smallcard&type=showcard&uid={$value[authorid]}" data-card-key="{$value['username']}">{$value['username']}</a>:&nbsp;</span><a href="apps.php?q=group&a=read&cyid={$value['extra']['cyid']}&tid={$value['objectid']}" target="_blank">{$value['extra']['title']}</a>
 		</div>
 		<div class="mb10">
 			{$value['content']}
@@ -402,11 +402,11 @@ print <<<EOT
 -->
 <dl class="dl cc">
 	<dt class="dt">
-		<a href="apps.php?q=weibo&uid={$value['authorid']}" class="img_50"><img src="{$value['icon']}" width="44" height="44" alt="{$value['username']}" /></a>
+		<a href="apps.php?q=weibo&uid={$value['authorid']}" class="img_50 _cardshow" target="_blank" data-card-url="pw_ajax.php?action=smallcard&type=showcard&uid={$value[authorid]}" data-card-key="{$value['username']}"><img src="{$value['icon']}" width="44" height="44" alt="{$value['username']}" /></a>
 	</dt>
 	<dd class="dd">
 		<div class="title">
-			<span class="uname"><a href="{$GLOBALS[db_userurl]}{$value['authorid']}">{$value['username']}</a>:&nbsp;</span>{$value['content']}
+			<span class="uname"><a href="{$GLOBALS[db_userurl]}{$value['authorid']}" class=" _cardshow" target="_blank" data-card-url="pw_ajax.php?action=smallcard&type=showcard&uid={$value[authorid]}" data-card-key="{$value['username']}">{$value['username']}</a>:&nbsp;</span>{$value['content']}
 		</div>
 		<div class="gray">
 <!--
@@ -428,11 +428,11 @@ print <<<EOT
 -->
 <dl class="dl cc">
 	<dt class="dt">
-		<a href="apps.php?q=weibo&uid={$value['authorid']}" class="img_50"><img src="{$value['icon']}" width="44" height="44" alt="{$value['username']}" /></a>
+		<a href="apps.php?q=weibo&uid={$value['authorid']}" class="img_50 _cardshow" target="_blank" data-card-url="pw_ajax.php?action=smallcard&type=showcard&uid={$value[authorid]}" data-card-key="{$value['username']}"><img src="{$value['icon']}" width="44" height="44" alt="{$value['username']}" /></a>
 	</dt>
 	<dd class="dd">
 		<div class="title">
-			<span class="uname"><a href="{$GLOBALS[db_userurl]}{$value['authorid']}">{$value['username']}</a>:&nbsp;</span><a href="apps.php?q=diary&a=detail&did={$value['objectid']}&uid={$value['authorid']}" target="_blank">{$value['extra']['title']}</a>
+			<span class="uname"><a href="{$GLOBALS[db_userurl]}{$value['authorid']}" class=" _cardshow" target="_blank" data-card-url="pw_ajax.php?action=smallcard&type=showcard&uid={$value[authorid]}" data-card-key="{$value['username']}">{$value['username']}</a>:&nbsp;</span><a href="apps.php?q=diary&a=detail&did={$value['objectid']}&uid={$value['authorid']}" target="_blank">{$value['extra']['title']}</a>
 		</div>
 		<div class="mb10">
 			{$value['content']}
@@ -453,15 +453,21 @@ EOT;
 	}
 
 	function article($value) {//帖子
+$atusersHtml = $replyHtml = '';
+if(S::isArray($value['extra']['atusers'])) {
+	foreach($value['extra']['atusers'] as $k=>$v){
+		$atusersHtml .= "&nbsp;<a href=\"u.php?uid=$k\" target=\"_blank\">@{$v}</a>";
+	}
+}
 print <<<EOT
 -->
 <dl class="dl cc">
 	<dt class="dt">
-		<a href="apps.php?q=weibo&uid={$value['authorid']}" class="img_50"><img src="{$value['icon']}" width="44" height="44" alt="{$value['username']}" /></a>
+		<a href="apps.php?q=weibo&uid={$value['authorid']}" class="img_50 _cardshow" target="_blank" data-card-url="pw_ajax.php?action=smallcard&type=showcard&uid={$value[authorid]}" data-card-key="{$value['username']}"><img src="{$value['icon']}" width="44" height="44" alt="{$value['username']}" /></a>
 	</dt>
 	<dd class="dd">
 		<div class="title">
-			<span class="uname"><a href="{$GLOBALS[db_userurl]}{$value['authorid']}">{$value['username']}</a>:&nbsp;</span><a href="read.php?tid={$value['objectid']}" target="_blank">{$value['extra']['title']}</a>
+			<span class="uname"><a href="{$GLOBALS[db_userurl]}{$value['authorid']}" class=" _cardshow" data-card-url="pw_ajax.php?action=smallcard&type=showcard&uid={$value[authorid]}" target="_blank" data-card-key="{$value['username']}">{$value['username']}</a>:{$replyHtml}&nbsp;</span><a href="read.php?tid={$value['objectid']}" target="_blank">{$value['extra']['title']}$atusersHtml</a>
 		</div>
 		<div class="mb10">
 			{$value['content']}
@@ -488,15 +494,16 @@ EOT;
 	}
     
     function cms($value) {//文章
+$weiboCmsViewUrl = urlRewrite("index.php?m=cms&q=view&id={$value['objectid']}");
 print <<<EOT
 -->
 <dl class="dl cc">
 	<dt class="dt">
-		<a href="apps.php?q=weibo&uid={$value['authorid']}" class="img_50"><img src="{$value['icon']}" width="44" height="44" alt="{$value['username']}" /></a>
+		<a href="apps.php?q=weibo&uid={$value['authorid']}" class="img_50 _cardshow" target="_blank" data-card-url="pw_ajax.php?action=smallcard&type=showcard&uid={$value[authorid]}" data-card-key="{$value['username']}"><img src="{$value['icon']}" width="44" height="44" alt="{$value['username']}" /></a>
 	</dt>
 	<dd class="dd">
 		<div class="title">
-			<span class="uname"><a href="{$GLOBALS[db_userurl]}{$value['authorid']}">{$value['username']}</a>:&nbsp;</span><a href="mode.php?m=cms&q=view&id={$value['objectid']}" target="_blank">{$value['extra']['title']}</a>
+			<span class="uname"><a href="{$GLOBALS[db_userurl]}{$value['authorid']}" class=" _cardshow" target="_blank" data-card-url="pw_ajax.php?action=smallcard&type=showcard&uid={$value[authorid]}" data-card-key="{$value['username']}">{$value['username']}</a>:&nbsp;</span><a href="{$weiboCmsViewUrl}" target="_blank">{$value['extra']['title']}</a>
 		</div>
 		<div class="mb10">
 			{$value['content']}
@@ -521,26 +528,20 @@ print <<<EOT
 EOT;
 	}
 	
-	function sinaweibo($value) {
+	function bindweibo($value) {
 print <<<EOT
 -->
 <dl class="dl cc">
 	<dt class="dt">
-		<a href="apps.php?q=weibo&uid={$value['authorid']}" class="img_50"><img src="{$value['icon']}" width="44" height="44" alt="{$value['username']}" /></a>
+		<a href="apps.php?q=weibo&uid={$value['authorid']}" class="img_50 _cardshow" target="_blank" data-card-url="pw_ajax.php?action=smallcard&type=showcard&uid={$value[authorid]}" data-card-key="{$value['username']}"><img src="{$value['icon']}" width="44" height="44" alt="{$value['username']}" /></a>
 	</dt>
 	<dd class="dd">
 		<div class="title">
-			<span class="uname"><a href="{$GLOBALS[db_userurl]}{$value['authorid']}">{$value['username']}</a>:&nbsp;</span>{$value['content']}
+			<span class="uname"><a href="{$GLOBALS[db_userurl]}{$value['authorid']}" class=" _cardshow" target="_blank" data-card-url="pw_ajax.php?action=smallcard&type=showcard&uid={$value[authorid]}" data-card-key="{$value['username']}">{$value['username']}</a>:&nbsp;</span>{$value['content']}
 		</div>
 <!--
 EOT;
-if ($value['extra']['sinaPhotos']) {
-	$extraPhotos = array();
-	foreach ($value['extra']['sinaPhotos'] as $tmpValue) {
-		$extraPhotos[] = array('path'=>$tmpValue['thumb'], 's_path'=>$tmpValue['middle']);
-	}
-	$this->_showPhotos($extraPhotos, false);
-}
+if ($value['extra']['photos']) $this->_showPhotos($value['extra']['photos'], false);
 if ($value['extra']['_hasVideo']) $this->_showVideo($value['extra']['_hasVideo']);
 print <<<EOT
 -->
@@ -548,11 +549,9 @@ print <<<EOT
 <!--
 EOT;
 $this->_operateButton($value);
-$sinaUserUrl = 'http://t.sina.com.cn/';
-$sinaUserUrl .= isset($value['sinaWeiboUserInfo']['id']) ? $value['sinaWeiboUserInfo']['id'] : '';
 print <<<EOT
 -->
-			<cite title="{$value['postdate_s']}"><a href="apps.php?q=weibo&do=detail&mid={$value['mid']}&uid={$value['authorid']}">{$value['lastdate']}</a> [来自 - <a target="_blank" href="$sinaUserUrl">新浪微博</a>]</cite>
+			<cite title="{$value['postdate_s']}">{$value['lastdate']} [来自 - <a target="_blank" href="{$value['bindUserInfo']['url']}">{$value['bindSiteInfo']['title']}</a>]</cite>
 		</div>
 		<div id="comment_{$value['mid']}{$this->_weiboDiv}"></div>
 	</dd>
@@ -578,7 +577,7 @@ EOT;
 if($value['mid']){
 if($isGM){print <<<EOT
 -->
-		<a href="javascript:void(0);" class="s7" onclick="deleteweibo('{$value['mid']}','$do','$page','weiboFeed','$this->_isTopic','$this->_topicName');return false;">删除</a>&nbsp;|&nbsp;<!--
+		<a href="javascript:void(0);" class="s7" id="delweibo_{$value['mid']}" onclick="deleteweibo('{$value['mid']}','$do','$page','weiboFeed','$this->_isTopic','$this->_topicName');return false;">删除</a>&nbsp;&nbsp;|&nbsp;&nbsp;<!--
 EOT;
 }
 if ($GLOBALS['o_weibopost'] != '0') {
@@ -589,23 +588,25 @@ if ($value['transmit'] > 0) {print <<<EOT
 -->({$value['transmit']})<!--
 EOT;
 }print <<<EOT
---></a>&nbsp;|&nbsp;<!--
+--></a>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="apps.php?q=collection&a=favor&type=weibo&ajax=1&id={$value['mid']}" onclick="return ajaxurl(this)" class="s7">收藏</a><!--
 EOT;
-}print <<<EOT
---><a href="javascript:void(0);" class="s7" onclick="getcomments('comment','{$value['mid']}','');return false;">评论<span id="commentnum_{$id}"><!--
+}
+$tid = ($value['type'] == 10) ? $value['objectid'] : '';
+print <<<EOT
+-->&nbsp;&nbsp;|&nbsp;&nbsp;<a href="javascript:void(0);" class="s7" onclick="getcomments('comment','{$value['mid']}','','','$tid');return false;">评论<span id="commentnum_{$id}"><!--
 EOT;
 if ($value['replies'] > 0) {print <<<EOT
 -->({$value['replies']})<!--
 EOT;
 }print <<<EOT
---></span></a>&nbsp;|&nbsp;<a href="apps.php?q=collection&a=favor&type=weibo&ajax=1&id={$value['mid']}" onclick="return ajaxurl(this)" class="s7">收藏</a></div>
+--></span></a></div>
 <!--
 EOT;
 	}}
 
 	function _showPhotos($value, $isLocalPhoto = true) {
 		static $kNum = 0;
-		if ($isLocalPhoto) {
+		if ($isLocalPhoto && count($value) && !isset($value[0]['thumb'])) {
 			$photolist = array();
 			foreach ($value as $photovalue) {
 				$photovalue['s_path'] = getphotourl($photovalue['path'], false, 'imgdel.jpg');
@@ -613,7 +614,10 @@ EOT;
 				$photolist[] = $photovalue;
 			}
 		} else {
-			$photolist = $value;
+			$photolist = array();
+			foreach ($value as $photovalue) {
+				$photolist[] =  array('path'=>$photovalue['thumb'], 's_path'=>$photovalue['middle']);
+			}
 		}
 		$count = count($photolist);
 		$photos = pwJsonEncode($photolist);
@@ -740,8 +744,8 @@ foreach ($list as $value) {
 print <<<EOT
 -->
 		<li style="height:52px;overflow:hidden;">
-			<a href="apps.php?q=weibo&uid={$value['authorid']}" class="img_50 mr10"><img src="{$value['icon']}" alt="{$value['username']}" /></a>
-			<p style="width:105px;overflow:hidden;"><span><a href="{$GLOBALS[db_userurl]}{$value['authorid']}">{$value['username']}:</a></span><!--
+			<a href="apps.php?q=weibo&uid={$value['authorid']}" class="img_50 mr10 _cardshow" target="_blank" data-card-url="pw_ajax.php?action=smallcard&type=showcard&uid={$value[authorid]}" data-card-key="{$value['username']}"><img src="{$value['icon']}" alt="{$value['username']}" /></a>
+			<p style="width:105px;overflow:hidden;"><span><a href="{$GLOBALS[db_userurl]}{$value['authorid']}" class=" _cardshow" target="_blank" data-card-url="pw_ajax.php?action=smallcard&type=showcard&uid={$value[authorid]}" data-card-key="{$value['username']}">{$value['username']}:</a></span><!--
 EOT;
 if ($value['type'] == 10) {
 $url = "read.php?tid={$value['objectid']}";
@@ -768,9 +772,7 @@ EOT;
 }print <<<EOT
 -->
 	</ul>
-    
-<script type="text/javascript">
-
+<script>
 (function(){
 	var interval;
 	function moveElement(elem, final_x, final_y, interval){

@@ -106,7 +106,7 @@ class PW_TopicDB extends BaseDB{
 		$num = intval($num);
 		$days = intval($days);
 		if (!$num || !$days) return array();
-		$query = $this->_db->query("SELECT t.*,COUNT(r.mid) AS counts FROM " . $this->_tableRelations . " AS r RIGHT JOIN " . $this->_tableName . ' AS t USING(topicid) WHERE t.crtime > ' . intval($days) . ' AND t.ifhot=1 GROUP BY r.topicid ORDER BY counts DESC' . $this->_limit($num));
+		$query = $this->_db->query("SELECT t.*,COUNT(r.mid) AS counts FROM " . $this->_tableRelations . " AS r RIGHT JOIN " . $this->_tableName . ' AS t USING(topicid) WHERE r.crtime > ' . intval($days) . ' AND t.ifhot=1 GROUP BY r.topicid ORDER BY counts DESC' . $this->_limit($num));
 		return $this->_getAllResultFromQuery($query, 'topicid');
 	}
 	

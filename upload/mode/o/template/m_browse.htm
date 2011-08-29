@@ -8,9 +8,9 @@ portalEcho('oindex');
 print<<<EOT
 -->
 	<div class="w710 fl" style="clear:left;">
-<script type="text/javascript" language="JavaScript" src="apps/weibo/js/post.js"></script>
-<script type="text/javascript" language="JavaScript" src="js/pw_weibo.js"></script>
-<script language="javascript">
+<script type="text/javascript" src="apps/weibo/js/post.js"></script>
+<script type="text/javascript" src="js/pw_weibo.js"></script>
+<script>
 var transmitAction = 'lookround';
 </script>
 		<div class="conFeed" id="weiboFeed0" style="padding-left:22px; display:block">
@@ -21,7 +21,7 @@ require_once uTemplate::printEot('weibo_model');
 //$weiboModelTemplate->photoPop();
 $weiboModelTemplate->setWeiboDiv('_0');
 foreach ($weiboHotTransmit as $key => $value) {
-	$method = $weiboService->getType($value['type']);
+	$method = $weiboService->getViewType($value['type']);
 	$weiboModelTemplate->$method($value);
 }
 
@@ -33,13 +33,13 @@ print <<<EOT
 EOT;
 $weiboModelTemplate->setWeiboDiv('_1');
 foreach ($weiboHotComment as $key => $value) {
-	$method = $weiboService->getType($value['type']);
+	$method = $weiboService->getViewType($value['type']);
 	$weiboModelTemplate->$method($value);
 }
 
 print <<<EOT
 -->
-		<script language="javascript">switchDiv(location.hash ? location.hash.substr(location.hash.length-1, 1) : 0 );</script>
+		<script>switchDiv(location.hash ? location.hash.substr(location.hash.length-1, 1) : 0 );</script>
 		</div>
 	</div>
 </div>

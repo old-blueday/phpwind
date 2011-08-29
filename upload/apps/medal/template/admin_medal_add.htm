@@ -1,0 +1,262 @@
+<!--<?php
+if(!defined('AJAX')){
+	include_once PrintEot('left');
+	include_once PrintApp('admin_header');
+}
+print<<<EOT
+-->
+<!--
+EOT;
+if ($type == 'add' || $type == 'edit') { 
+$title = ($type == 'add') ? '勋章添加' : '勋章编辑';
+$url = ($type == 'add') ? "$basename&type=adddo" : "$basename&type=editdo";
+print<<<EOT
+-->
+<form action="$url" method="post">
+<input name="id" type="hidden" value="$medal[medal_id]" />
+  <h2 class="h1">$title</h2>
+  <div class="admin_table mb10">
+    <table width="100%" cellspacing="0" cellpadding="0">
+      <tr class="tr1 vt">
+        <td class="td1">勋章名称</td>
+        <td class="td2"><input name="name" class="input input_wa" value="$medal[name]" maxlength="200"></td>
+        <td class="td2">&nbsp;</td>
+      </tr>
+      <tr class="tr1 vt">
+        <td class="td1">勋章图片</td>
+        <td class="td2"><a href="javascript:void(0)"  onclick="sendmsg('$basename&type=img','',this.id,initMedal);" id="imgadd"/>[选图]</a>
+<!--
+EOT;
+if ($type == 'edit') { 
+print<<<EOT
+-->
+<input name="image" type="hidden" id="image" value="$medal[image]" />
+<div id="imageShow"><img src="$medal[bigimage]" width="80" height="80" class="mr10" /><img src="$medal[smallimage]" width="24" height="24"  /></div>
+<!--
+EOT;
+} else {
+print<<<EOT
+-->		
+<input name="image" type="hidden" id="image" value="" />
+<div id="imageShow"><img src="images/blank.gif" style="background:url(images/nopreview.png);" width="80" height="80" class="mr10" /><img src="images/blank.gif" style="background:url(images/nopreview.png);" width="24" height="24" class="mr10" /></div>
+<!--
+EOT;
+}
+print<<<EOT
+-->
+        </td>
+        <td class="td2">
+					<p>图片规范：大图尺寸为120 X 120,小图尺寸为24 X 24，图片格式为.gif或者.png</p>
+					<p>存放位置：大图位置images/medal/big目录，小图位置images/medal/small目录</p>
+				</td>
+      </tr>
+      <tr class="tr1 vt">
+        <td class="td1">勋章描述</td>
+        <td class="td2"><textarea name="descrip"class="textarea">$medal[descrip]</textarea></td>
+        <td class="td2">&nbsp;</td>
+      </tr>
+      <tr class="tr1 vt">
+        <td class="td1">发放机制</td>
+        <td class="td2">
+					<ul class="list_A list_80">
+<!--
+EOT;
+if ($type == 'edit') { 
+$typeArr[$medal[type]] = 'checked="checked"';
+if ($type == 'edit') $enable = 'disabled="disabled"';  
+print<<<EOT
+-->
+					<li><input name="tp" type="radio" value="1" $enable checked="checked" $typeArr[1] onclick="changeType();" >自动勋章</li><li><input name="tp" type="radio" value="2" $enable $typeArr[2] onclick="changeType();" >
+<!--
+EOT;
+} else { 
+print<<<EOT
+-->
+					<li><input name="tp" type="radio" value="1" checked="checked" onclick="changeType();" >自动勋章</li><li><input name="tp" type="radio" value="2" onclick="changeType();" >
+<!--
+EOT;
+}
+print<<<EOT
+-->
+          手动勋章</li></ul></td>
+        <td class="td2">勋章添加成功后，此类型不可修改。自动勋章是指满足设定条件后系统自动发放勋章；手动勋章指用户申请或管理员手动颁发勋章。</td>
+      </tr>
+      <tr class="tr1 vt" id="medallimit" style="display:none;">
+        <td class="td1">勋章有效期</td>
+        <td class="td2"><input name="day" value="$medal[confine]" type="text" class="input input_wa mr5" />天</td>
+        <td class="td2">&nbsp;</td>
+      </tr>
+      <tr class="tr1 vt">
+        <td class="td1">可领取用户组</td>
+        <td class="td2">
+					<label for="allgroup"><input name="allgroup" type="checkbox" value="1" id="allgroup" onclick="checkAllGroup()">全选</label>
+          $creategroup </td>
+        <td class="td2">全选或者全部不选择，则所有用户都可以申请</td>
+      </tr>
+      <tr class="tr1 vt" id="medalcondition">
+        <td class="td1">勋章自动颁发条件</td>
+<!--
+EOT;
+$enable = '';
+if ($type == 'edit') $enable = 'disabled="disabled"';  
+print<<<EOT
+-->
+        <td class="td2"><p class="mb10"><select name="associate" $enable onchange="associateList()" id="associate" >
+<!--
+EOT;
+foreach ($medalCondition as $k => $v) { 
+	$selected = '';
+	if ($type == 'edit' && $k == $medal['associate']) $selected = 'selected';  
+print<<<EOT
+-->
+            <option value="{$k}" $selected>{$v}</option>
+<!--
+EOT;
+} print<<<EOT
+-->
+          </select><span style=" font-family:Simsun;margin:0 5px 0 8px; font-weight:700;">&gt;&nbsp;= </span><input name="confine" type="text" value="$medal[confine]" class="input input_wc" /></p>
+					<div id="associateShow"></div>
+          </td>
+        <td class="td2">当用户满足此条件时，勋章自动发放<!-- <div style="margin-top:20px;" id="associateShowMsg">获得更高等级勋章后，会自动替换较低等级勋章。</div> -->
+		</td>
+      </tr>
+    </table>
+  </div>
+  <div class="mb10 tac"><span class="btn"><span><button type="submit">提 交</button></span></span></div>
+</form>
+
+<script type="text/javascript">
+	
+	//会员组全部选中
+	function checkAllGroup() {
+		var allgroup = document.getElementById('allgroup');
+		var result = (allgroup.checked == true) ? true : false;
+		var e = document.getElementsByName('allow_group[]');
+		var len  = e.length;
+		for (var i=0; i<len; i++) {
+			e[i].checked = result;
+		}
+	}
+	
+	//切换发放机制
+	function changeType() {
+		var typeVal = document.getElementsByName('tp');
+		var len = typeVal.length;
+		var result;
+		for (var i=0; i<len; i++) {
+			if (typeVal[i].checked == true) {
+				result = typeVal[i].value;
+				break;
+			}
+		}
+		var medallimit = document.getElementById('medallimit');
+		var medalcondition = document.getElementById('medalcondition');
+		if (result == 1) {
+			medallimit.style.display = "none";
+			medalcondition.style.display = "";
+		} else {
+			medallimit.style.display = "";
+			medalcondition.style.display = "none";
+		}
+	}
+	
+	var medallist = eval($openMedal);
+	//自动颁发奖章的扩展列表
+	function associateList() {
+		var associateVal = document.getElementById("associate").value;
+		var len = medallist.length;
+		var result = '<div style="width:334px;text-align:center;"><div style="border:#CCCCCC 1px solid;background-color:#e4e4e4;" class="s3">已有同种勋章列表 </div><div style="width:100%;"><div style=" background-color:#f7f7f7;border-left:#CCCCCC 1px solid; width:50px; border-bottom:#CCCCCC 1px solid; border-right:#CCCCCC 1px solid; width:50px; float:left;">等级</div><div style="background-color:#F5F5F5;border-bottom:#CCCCCC 1px solid; border-right:#CCCCCC 1px solid; width:80px; float:left;">>=数值</div><div style="background-color:#F5F5F5;border-right:#CCCCCC 1px solid;border-bottom:#CCCCCC 1px solid; width:200px; float:left;">名称</div></div>';
+		var ii = 1;
+		for (var i=0; i<len; i++) {
+			if (associateVal == medallist[i].associate) {
+				result += '<div style="width:100%;background:#fff;"><div style="border:#CCCCCC 1px solid; width:80px;border-top:0 none; width:50px; float:left;">'+ii+'</div><div style="border-bottom:#CCCCCC 1px solid; border-right:#CCCCCC 1px solid; width:80px; float:left;">'+medallist[i].confine+'</div><div style="border-right:#CCCCCC 1px solid;border-bottom:#CCCCCC 1px solid; width:200px; float:left;">'+medallist[i].name+'</div></div>';
+			ii++;
+			}
+		}
+		if (ii == 1) { 
+			result = '';
+		} else {
+			result += '</div>';
+		}
+		document.getElementById("associateShow").innerHTML = result;
+		//document.getElementById("associateShowMsg").style.display = '';
+		
+	}
+	associateList(); //页面加载就执行
+	
+		//勋章图片选择
+	function toggleChecked(obj){
+		var checked=obj.checked;
+		obj.checked=obj.checked?"":"checked";
+	}
+	function contains(a, b){
+		//元素a是否包含元素B
+        if (document.compareDocumentPosition) {
+            return !!(a.compareDocumentPosition(b) & 16);
+        }
+        else {
+            return a !== b && (a.contains ? a.contains(b) : true);
+        }
+    }
+	function initMedal(){
+		var box_container=getObj("box_container");
+		var medalIconList=getObj("medalIconList").getElementsByTagName("li");
+		for(var i=0,len=medalIconList.length;i<len;i++){
+			(function(item,i){
+				item.onclick=function(){
+					toggleClass(this,"current");
+					var val=this.getAttribute("data-val");
+					getObj("image").value = val;
+					getObj("imageShow").innerHTML = "<img src='$imgpath/medal/big/"+val+"' width=\"80\" height=\"80\" class=\"mr10\"><img src='$imgpath/medal/small/"+val+"' width=\"24\" height=\"24\">";
+					read&&read.close();
+				}
+			})(medalIconList[i],i)
+		}
+		document.onmousedown=function(e){
+			var ele = window.event?window.event.srcElement:e.srcElement;
+			if(!contains(box_container,ele)){
+				read&&read.close();
+			}
+		}
+	}
+</script>
+<!--
+EOT;
+if ($type == 'edit') { 
+print<<<EOT
+-->
+<script type="text/javascript">changeType();</script>
+<!--
+EOT;
+} print<<<EOT
+-->
+
+<!--
+EOT;
+} elseif ($type == 'img') { print<<<EOT
+-->
+<h2 class="h1" style="cursor:move" onmousedown="read.move(event);">选图</h2>
+<div class="admin_table mb10" style="padding:10px;">
+  <ul id="medalIconList" class="medal_icon_list">
+<!--
+EOT;
+foreach ($medalImg as $k => $v) { print<<<EOT
+--> 
+    <li data-val="{$v}"><img src="$imgpath/medal/big/{$v}" width="80" height="80" /></li>
+<!--
+EOT;
+} print<<<EOT
+-->
+  </ul>
+</div>
+<div class="tac mb10"></div>
+<!--
+EOT;
+} print<<<EOT
+-->
+<!--
+EOT;
+if(!defined('AJAX')){
+	include_once PrintEot('adminbottom');
+}
+?>-->

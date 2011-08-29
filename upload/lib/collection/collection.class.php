@@ -151,6 +151,19 @@ class PW_Collection {
 		}
 		return $tids;
 	}
+	
+	function checkCollectionIds($ids,$uid) {
+		if (!S::isArray($ids)) return false; 
+		$collectionDB = $this->_getCollectionDB();
+		$result = $collectionDB->getUidsByIds($ids);
+		foreach ($result as $v) {
+			if ($v['uid'] != $uid || !$v['id']) continue;
+			$colids[] = $v['id'];
+		}
+		return $colids;
+	}
+
+	
 	/**
 	 * get PW_CollectionDB
 	 * 

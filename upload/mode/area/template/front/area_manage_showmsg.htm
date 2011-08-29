@@ -3,12 +3,13 @@ print <<<EOT
 <!doctype html>
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta charset="$db_charset" />
+<base id="headbase" href="$db_bbsurl/" />
 <script type="text/javascript" src="js/portal.js"></script>
 <script type="text/javascript" src="js/core/core.js"></script>
-<script language="JavaScript" src="mode/area/js/imagetype.js"></script>
-<link rel="stylesheet" type="text/css" href="images/pw_core.css" />
-<link rel="stylesheet" type="text/css" href="images/pwmanage.css" />
+<script type="text/javascript" src="mode/area/js/imagetype.js"></script>
+<link rel="stylesheet" href="images/pw_core.css?{$GLOBALS['wind_repair']}" />
+<link rel="stylesheet" href="images/pwmanage.css?{$GLOBALS['wind_repair']}" />
 <style>
 htm,body{overflow:hidden;height:500px;width:100%;}
 html {font-size:12px;}

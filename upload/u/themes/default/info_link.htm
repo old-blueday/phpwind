@@ -46,8 +46,8 @@ EOT;
 								</td>
 							</tr>
 							<tr>
-									<th class="th">
-											&nbsp;
+									<th class="th">&nbsp;
+											
 									</th>
 									<td class="td" style="padding:10px 13px;">
 										<span class="btn"><span><button type="submit">保存资料</button></span></span>
@@ -59,12 +59,12 @@ EOT;
 </div></div></td></tr></table>
 		</div>
 </div>
-<script type="text/javascript" src = "js/info.js"></script>
-<script language="JavaScript">
+<script type="text/javascript" src="js/info.js"></script>
+<script>
 var display = '$display';
 function checkMobile() {
 	var url = 'profile.php?action=auth&check_step=mobile';
-	var mobile = $('td_input_mobile').value;
+	var mobile = getObj('td_input_mobile').value;
 
 	if (mobile != '' && typeof (mobile) != 'undefined') {
 		url += '&check_mobile='+mobile;

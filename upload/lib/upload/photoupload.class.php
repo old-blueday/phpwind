@@ -71,13 +71,20 @@ class PhotoUpload extends uploadBehavior {
 		if ($this->attachs) {
 			$this->db->update("INSERT INTO pw_cnphoto (aid,pintro,path,uploader,uptime,ifthumb) VALUES " . S::sqlMulti($this->attachs));
 			$this->pid = $this->db->insert_id();
+			$cnalbum = $this->db->get_one("SELECT * FROM pw_cnalbum WHERE aid=". S::sqlEscape($this->aid));
 			if ($this->atype) {
-				updateDatanalyse($this->pid, 'groupPicNew', $timestamp);
+				if (!$cnalbum['private']) {
+					updateDatanalyse($this->pid, 'groupPicNew', $timestamp);
+				}
 			} else {
 				$statistics = L::loadClass('Statistics', 'datanalyse');
 				$statistics->photouser($winduid, count($this->attachs));
 			}
-			$this->db->update("UPDATE pw_cnalbum SET photonum=photonum+" . S::sqlEscape(count($this->attachs)) . ",lasttime=" . S::sqlEscape($timestamp) . " WHERE aid=" . S::sqlEscape($this->aid));
+			if (isset($cnalbum['lastphoto']) && !$cnalbum['lastphoto']) {
+				$lastphoto = $this->getLastPhotoThumb();
+				$lastphotosqlAdd = ",lastphoto= " . S::sqlEscape($lastphoto);
+			}
+			$this->db->update("UPDATE pw_cnalbum SET photonum=photonum+" . S::sqlEscape(count($this->attachs)) . ",lasttime=" . S::sqlEscape($timestamp) . $lastphotosqlAdd . " WHERE aid=" . S::sqlEscape($this->aid));
 		}
 		return true;
 	}

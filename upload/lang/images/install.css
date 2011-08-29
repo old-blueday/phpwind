@@ -1,0 +1,92 @@
+body, div, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6, pre, code, form, fieldset, legend, p, th, td {margin: 0;padding: 0;}
+img {border: 0;}
+cite,em,strong,th{font-style: inherit;font-weight: inherit;}
+input,button,textarea,select{font-family: inherit;font-size: inherit;font-style: inherit;font-weight: inherit;}
+input,button,textarea,select{*font-size: 100%;}
+ul {list-style: none;}
+table {border-collapse: collapse;border-spacing: 0;}
+th{text-align: left;}
+td,th,div{word-break:break-all;word-wrap:break-word}
+form{display:inline;}
+*{outline:none}
+/*html 5*/
+article, aside, canvas, details, embed, figcaption, figure, footer, header, hgroup, menu, nav, section, summary {display:block;margin:0;padding:0;}
+command, datalist, keygen, mark, meter, progress, rp, rt, ruby, time, wbr {display: inline;margin:0;padding:0;}
+/*clear both*/
+.cc{*zoom:1;}
+.cc:after{content:'\20';display:block;height:0;clear:both;visibility: hidden;}
+/*all style*/
+.b{ font-weight:700;}
+.w{white-space:nowrap}
+.tal{text-align:left}
+.tac{text-align:center}
+.tar{text-align:right}
+.fr{float:right}
+.fl{float:left}
+.pr{position:relative}
+.cp{cursor:pointer;}
+.vt,.vt td{vertical-align:top;}
+/*font size*/
+.f10{font-size:10px;-webkit-text-size-adjust:none;}
+.f12{font-size:12px}
+.f14{font-size:14px}
+.f16{font-size:16px;}
+.f20{font-size:20px;}
+.f24{font-size:24px;}
+.fn,.fn a{font-weight:normal}
+.s1{color:#ff0000;}
+/**/
+body{font:12px/1.5 Arial,Microsoft Yahei,Simsun;color:#000;background:url(../../images/wind/bg.jpg) center -20px repeat-x;}
+/*bg*/
+.header,.head{background:url(header.png) 0 0 repeat-x;}
+/*layout*/
+.wrap{margin:90px auto 0;border:1px solid #bdcfdd;border-top:2px solid #065792;-moz-box-shadow:0 0 5px #eaeaea;box-shadow:0 0 5px #eaeaea;width:720px;}
+.header{height:76px;padding:1px 1px 0 1px;}
+.head{height:76px; background-position:0 -78px;}
+.section{border:1px solid #fff;border-top:0 none;background:#f8fcff;}
+.main{background: url(main.png) 0 0 repeat-x;padding-top:25px;}
+.footer{ text-align:center;padding:15px 0;color:#7d8c9b;}
+.bottom{padding:0 0 15px;}
+/*pact*/
+.pact{border:1px solid #e5e9ed;background:#fff;width:650px;height:350px;padding:10px;overflow:hidden;display:block; overflow-y:scroll;margin:0 auto; font-family:Microsoft Yahei;line-height:1.3;margin-bottom:15px;outline:none;}
+/*version*/
+.version{float:right;margin:45px 25px 0 0; font-family:Simsun;color:#666666;}
+/*logo*/
+.logo_install,.logo_update{float:left;width:280px;height:76px;text-indent:-2000em;overflow:hidden;}
+.logo_install{background:url(logo_install.png) no-repeat;}
+.logo_update{background:url(logo_update.png) no-repeat;}
+/*btn*/
+.btn,.btn_old{display:inline-block;width:100px;height:30px;background:url(btn.png) no-repeat;font:bold 14px/30px Arial,Microsoft Yahei,Simsun; text-decoration:none;color:#333;margin:0 5px;border:1px solid #fff;}
+.btn:hover{ background-position:0 -30px;}
+.btn_old,.btn_old:hover{ background-position:0 -60px;color:#999; cursor:default;}
+/*step*/
+.step,.step li em,.step li{background:url(step.png) repeat-x;}
+.step{border-bottom:1px solid #dce1e5;height:60px;background-color:#fff;}
+.step li{float:left;height:60px;line-height:60px;width:33%; text-align:center; font-size:14px;color:#666;}
+.step li em{width:32px;height:32px; text-align:center;line-height:32px;display:inline-block; background-position:0 -70px; font-size:20px;color:#fff; font-family:Microsoft Yahei;margin-right:10px;}
+.step li.current{ background-position:right -106px; background-repeat:no-repeat; font-weight:700;color:#333;}
+.step li.current em{ background-position:-35px -70px;}
+.step li.on{ background-position:0 -176px;}
+.step li.on em{ background-position:-70px -70px;}
+/*server*/
+.server{padding:20px 20px 10px 65px;}
+.server table{margin-bottom:20px;}
+.server td{padding:3px 5px;}
+.server .td1{color:#417b9d;font-weight:700;}
+.server .input{border:1px solid; border-color:#abadb3 #e3e9ef #e3e9ef #abadb3;padding:3px;width:200px;}
+.server .input:hover,.server .input:focus{border:1px solid #0e85d5;}
+.server .gray{color:#bbb;}
+.server tr:hover .gray{color:#333;}
+/*icon*/
+.correct_span,.error_span{display:block;float:left;width:20px;height:16px;text-indent:-2000em;overflow:hidden;background:url(icon.png) no-repeat;margin-right:5px;}
+.error_span{ background-position:0 -23px;}
+/*install tip mysql list*/
+.install{border:1px solid #e5e9ed;background:#fff;width:660px;height:293px;padding:3px 5px;overflow:hidden; overflow-y:scroll;font-family:Microsoft Yahei;margin:15px auto 15px;}
+.install ul{line-height:1.8;}
+/*success_tip*/
+.success_tip{border:1px solid #e0e9f0;background:#fff url(complete.png) 110px center no-repeat;margin:30px 50px 130px;padding:50px 80px 50px 200px;line-height:2;}
+.success_tip a,.s4{color:#0166a5; text-decoration:none;}
+.success_tip a:hover{ text-decoration:underline;}
+.error_tip{ background-image:url(ignore.png)}
+/*founder login*/
+.login{border:1px solid #e0e9f0;background:#fff;margin:30px 120px 130px;}

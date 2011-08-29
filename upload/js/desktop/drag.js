@@ -1,7 +1,7 @@
 /**
  * 拖放对象方法库
  *使用方法：drag.DD(JSONArg);
- *JSONArg 为一个Object，如：{drag_obj:$('xx'),move_obj:$('xx2'),move_range:[],ifreturn:false,hiddenData:true,receivers:'',feedback:function(){},moving:function(){}}
+ *JSONArg 为一个Object，如：{drag_obj:getObj('xx'),move_obj:getObj('xx2'),move_range:[],ifreturn:false,hiddenData:true,receivers:'',feedback:function(){},moving:function(){}}
  *			drag_obj 拖动的对象
             move_obj 移动的对象
             _move_range 移动范围
@@ -17,9 +17,9 @@ function()
 	/**
 	 *加载一个兼容各个浏览器的js包。之后就可以用ie的方式来写事件，而不用去考虑兼容性问题。
 	 */
-    var IE = document.all || document.write("<script src='js/desktop/Compatibility.js'></sc" + "ript>");
+    var IE = document.all;
     IE ? document.execCommand('BackgroundImageCache', false, true) : 0;
-    var $ = function(s)
+    var getObj = function(s)
     {
         return document.getElementById(s);
     };
@@ -56,7 +56,7 @@ function()
         },
         boo: function(obj)
         {
-            return $(obj.id + '-body');
+            return getObj(obj.id + '-body');
         },
         setTop: function(obj)
         {
@@ -79,7 +79,7 @@ function()
             receivers = jsonArg.receivers,
             feedback = jsonArg.feedback,
             moving = jsonArg.moving;
-            if (!$('cover_drag_div'))
+            if (!getObj('cover_drag_div'))
             {
                 var cover = document.createElement("DIV");
                 with(cover.style)
@@ -97,7 +97,7 @@ function()
                 ROOT.appendChild(cover);
             }
 
-            var cover = $('cover_drag_div');
+            var cover = getObj('cover_drag_div');
 
             var hidenObject = jsonArg.body_obj || 0;
             move_obj.style.position = "absolute";
@@ -147,7 +147,7 @@ function()
                     move_range = [0, _move_range.offsetWidth - move_obj.offsetWidth, 0, _move_range.scrollHeight - move_obj.offsetHeight];
                 }
                 drag.setTop(move_obj);
-                $('cover_drag_div').style.display = "";
+                getObj('cover_drag_div').style.display = "";
                 beforeresizewin = [parent_node.offsetWidth, parent_node.offsetHeight];
                 MOUSEDOWN = true;
                 var docm = document;
@@ -290,7 +290,7 @@ function()
                     docm.onmousedown = null;
                     docm.onmousemove = null;
                     docm.onmouseup = null;
-                    $('cover_drag_div').style.display = "none";
+                    getObj('cover_drag_div').style.display = "none";
 
                     if (ifreturn)
                     {
@@ -338,7 +338,9 @@ function()
                         {
                             if (drag._hiddenLeft[id])
                             {
-                                clearTimeout(drag._tm); ! move_obj.autoHidden ? "": drag._tm = setTimeout("$('" + move_obj.uniqueID + "').style.left=0-$('" + move_obj.uniqueID + "').offsetWidth+15+'px'", 300);
+                                clearTimeout(drag._tm); ! move_obj.autoHidden ? "": drag._tm = setTimeout(function(){
+									move_obj.style.left=0-move_obj.offsetWidth+15+'px';	
+								}, 300);
                             }
                         }
                     } else
@@ -359,7 +361,9 @@ function()
                         move_obj.onmouseout = function()
                         {
                             if (drag._hiddenRight[id])
-                            { ! move_obj.autoHidden ? "": drag._tm = setTimeout("$('" + move_obj.uniqueID + "').style.left=$('" + parent_node.uniqueID + "').clientWidth+$('" + parent_node.uniqueID + "').scrollLeft-15+'px'", 300);
+                            { ! move_obj.autoHidden ? "": drag._tm = setTimeout(function(){
+									move_obj.style.left=parent_node.clientWidth+parent_node.scrollLeft-15+'px';
+								}, 300);
                             }
                         }
                     } else
@@ -475,7 +479,7 @@ function()
             }
             try
             {
-                $("track").innerHTML = match_obj.id;
+                getObj("track").innerHTML = match_obj.id;
             } catch(e)
             {}
             return match_obj;

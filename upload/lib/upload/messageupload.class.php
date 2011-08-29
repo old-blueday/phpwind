@@ -36,7 +36,7 @@ class messageAtt extends uploadBehavior {
 			$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
 			$userService->update($this->uid, array(), array('uploadnum' => 0));
 		}
-		if (($winddb['uploadnum'] + count($_FILES) + count($this->flashatt)) >= $_G['allownum']) {
+		if ($_G['allownum'] > 0 && ($winddb['uploadnum'] + count($_FILES) + count($this->flashatt)) >= $_G['allownum']) {
 			Showmsg('upload_num_error');
 		}
 	}

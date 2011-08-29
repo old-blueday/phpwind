@@ -1,0 +1,509 @@
+<!--<?php
+include_once PrintEot('left');
+$classBasic = $classKmdmanage = $classPaylog = $classCheck = $classUsermanage = '';
+$className = 'class' . ucfirst($adminitem);
+${$className} = ' class="current"';
+print<<<EOT
+-->
+<div class="nav3 mb10">
+	<ul class="cc">
+		<li{$classBasic}><a href="$jobUrl">基本设置</a></li>
+		<li{$classPaylog}><a href="$jobUrl&adminitem=paylog">支付管理</a></li>
+		<li{$classCheck}><a href="$jobUrl&adminitem=check">帖子审核</a></li>
+		<li{$classKmdmanage}><a href="$jobUrl&adminitem=kmdmanage">孔明灯管理</a></li>
+		<li{$classUsermanage}><a href="$jobUrl&adminitem=usermanage">用户管理</a></li>
+	</ul>
+</div>
+<!--
+EOT;
+if($adminitem == 'basic'){
+if($db_kmd_ifkmd){
+	$ifkmd_N .= " onclick=\"showtips('closetips');\"";
+}
+print <<<EOT
+-->
+<h2 class="h1">参数设置</h2>
+<form action="$basename" method="post">
+<input type="hidden" name="step" value="2">
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+	<tr class="tr1">
+		<td class="td1">孔明灯功能</td>
+		<td class="td2" width="420">
+			<ul class="list_A list_80">
+				<li><input name="config[kmd_ifkmd]" type="radio" value="1" $ifkmd_Y />开启</li>
+				<li><input name="config[kmd_ifkmd]" type="radio" value="0" $ifkmd_N />关闭</li>
+<script>
+function hidetips(obj) {
+	getObj(obj).style.display = 'none';
+}
+function showtips(obj) {
+	getObj(obj).style.display = '';
+}
+</script>
+				<div class="fl" id="closetips" style="display:none">
+   					<div style="position:absolute;margin-top:22px;">
+						<div class="popout">
+							<table border="0" cellspacing="0" cellpadding="0">
+								<tbody>
+									<tr><td class="bgcorner1"></td>
+										<td class="pobg1"></td>
+										<td class="bgcorner2"></td>
+									</tr>
+									<tr><td class="pobg4"></td>
+									<td>
+									<div class="popoutContent">
+									<div style="width:370px;">
+									<div class="popTop cc"><a href="javascript:;" class="del_img fr" onclick="hidetips('closetips')">关闭</a>友情提示
+									</div>
+									<p class="s4 cc p10">关闭后所有孔明灯将失效!</p>
+									</div></div></td>
+									<td class="pobg2"></td></tr>
+									<tr><td class="bgcorner4"></td><td class="pobg3"></td><td class="bgcorner3"></td></tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			</ul>
+		</td>
+		<td class="td2"><div class="help_a">关闭后，所有的孔明灯服务都将取消</div></td>
+	</tr>
+	<tr class="tr1">
+		<td class="td1">审核员</td>
+		<td class="td2"><input class="input input_wb" name="username" value="$db_kmd_reviewperson" /></td>
+		<td class="td2"><div class="help_a">孔明灯申请的审核员，有用户申请时会收到提醒短消息，多个帐号用,号隔开</div></td>
+	</tr>
+	<tr class="tr1">
+		<td class="td1">更换帖子设置</td>
+		<td class="td2">
+			<select name="config[kmd_deducttime]" class="select_wa">
+				<option value="1" $deducttime_1 >1小时</option>
+				<option value="3" $deducttime_3  >3小时</option>
+				<option value="6" $deducttime_6  >6小时</option>
+				<option value="12" $deducttime_12 >12小时</option>
+				<option value="24" $deducttime_24 >24小时</option>
+				<option value="48" $deducttime_48 >48小时</option>
+				<option value="72" $deducttime_72 >72小时</option>
+			</select>
+		</td>
+		<td class="td2"><div class="help_a">更换孔明灯中的帖子扣除的推广时间</div></td>
+	</tr>
+	<tr class="tr1">
+		<td class="td1 vt">费用设置</td>
+		<td class="td2">
+			<div class="admin_tableB">
+				<table>
+					<tr>
+						<td width="30" height="25">顺序</td>
+						<td width="170">套餐名称</td>
+						<td width="30">天数</td>
+						<td width="85">人民币（元）</td>
+						<td width="50">折扣</td>
+						<td>&nbsp;</td>
+					</tr>
+<!--
+EOT;
+foreach ($spreads as $key => $value){
+print <<<EOT
+-->
+					<tr height="30" id="kmd_$value[sid]">
+						<td><input  type="text" class="input input_wd" name="spreads[displayorder][$key]" value="$value[displayorder]"/></td>
+						<td><input  type="text" class="input input_wa" name="spreads[name][$key]" value="$value[name]"/></td>
+						<td><input type="text" class="input input_wd" name="spreads[day][$key]" value="$value[day]"/></td>
+						<td><input  type="text" class="input input_wc" name="spreads[price][$key]" value="$value[price]"/></td>
+						<td><input type="text" class="input" style="width:40px;" name="spreads[discount][$key]"  value="$value[discount]"/></td>
+						<td><a href="javascript:;" onclick="delPay('$value[sid]');">[删除]</a></td>
+					</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+<tbody id="tbody">
+</tbody>
+<tbody id="tmode" style="display:none"><tr>
+<td><input type="text" class="input input_wd mr5" name="newspreads[displayorder][]" value=""/>
+<td><input type="text" class="input input_wa" name="newspreads[name][]" value=""/>
+<td><input type="text" class="input input_wd" name="newspreads[day][]" value=""/>
+<td><input type="text" class="input input_wc" name="newspreads[price][]" value=""/>
+<td><input type="text" class="input" style="width:40px;" name="newspreads[discount][]" value=""/></td>
+<td>&nbsp;</td>
+</tr>
+</tbody>
+				</table>
+				<p><i class="expand expand_c"></i><a class="cp s3" onclick="addtype();">添加套餐</a></p>
+			</div>
+		</td>
+		<td class="td2"><div class="help_a"></div></td>
+	</tr>
+	<tr class="tr1">
+		<td class="td1 vt">联系方式</td>
+		<td class="td2">
+			<p class="mb5">电话：<input name="config[kmd_phone]" value="$db_kmd_phone" type="text" class="input input_wa" /></p>
+			<p class="mb5">手机：<input name="config[kmd_mobile]" value="$db_kmd_mobile" type="text" class="input input_wa" /></p>
+			<p class="mb5">旺旺：<input name="config[kmd_aliww]" value="$db_kmd_aliww" type="text" class="input input_wa" /></p>
+			<p class="mb5">ＱＱ：<input name="config[kmd_qq]" value="$db_kmd_qq" type="text" class="input input_wa" /></p>
+		</td>
+		<td class="td2"><div class="help_a">&nbsp;</div></td>
+	</tr>
+	<tr class="tr1">
+		<td class="td1 vt">支付方式</td>
+		<td class="td2">
+<!--
+EOT;
+if($ol_payto){
+print <<<EOT
+-->
+<p class="mb10"><span class="b">支付宝：</span><span class="mr10">$ol_payto</span><a href="admin.php?adminjob=userpay&adminitem=userpay" onClick="parent.PW.Dialog({id:'userpay',url:'$admin_file?adminjob=userpay&adminitem=userpay',name:'网上支付'});return false;">[修改]</a></p>
+<!--
+EOT;
+}else{
+print <<<EOT
+-->
+<p class="mb10"><span class="b">支付宝：</span><span class="mr10">您还没有添加支付宝帐号</span><a href="admin.php?adminjob=userpay&adminitem=userpay" onClick="parent.PW.Dialog({id:'userpay',url:'$admin_file?adminjob=userpay&adminitem=userpay',name:'网上支付'});return false;">[添加]</a></p>
+<!--
+EOT;
+}print <<<EOT
+-->
+			<div class="admin_tableB">
+				<table>
+					<tr class="vt" height="100">
+						<td class="b" width="80">银行转账：</td>
+						<td>
+							<p class="mb5">公司名称：<input name="config[kmd_company]" value="$db_kmd_company" type="text" class="input input_wa" /></p>
+							<p class="mb5">　　账户：<input name="config[kmd_account]" value="$db_kmd_account" type="text" class="input input_wa" /></p>
+							<p>　开户行：<input name="config[kmd_bank]" value="$db_kmd_bank" type="text" class="input input_wa" /></p>
+						</td>
+					</tr>
+					<tr class="vt">
+						<td class="b" width="80">现金：</td>
+						<td>
+							<p class="mb5">办理地址：<input name="config[kmd_address]" value="$db_kmd_address" type="text" class="input input_wb" /></p>
+						</td>
+					</tr>
+				</table>
+			</div>
+		</td>
+		<td class="td2"><div class="help_a"></div></td>
+	</tr>
+</table>
+</div>
+<div class="mb10 tac"><span class="btn"><span><button type="submit">提交</button></span></span></div>
+</form>
+<script type="text/javascript">
+function addtype(){
+	var s = getObj('tmode').firstChild.cloneNode(true);
+	getObj('tbody').appendChild(s);
+}
+function delPay(id) {
+	var url = '{$basename}&adminitem=basic&step=3&sid=' + id ;
+	if (!confirm("确定要删除此条费用吗？")) return false;
+	//var data = '?adminjob=kmd&action=delpay&sid='+id;
+	ajax.send(url,'',delPayR);
+}
+function delPayR(){
+	var sid = ajax.request.responseText.split("\t");
+	if (sid[0] == 'success') {
+	    delElement('kmd_'+sid[1]);
+	} else {
+		alert("删除错误！");
+	}
+}
+onReady(function(){
+	addtype();
+})
+
+</script>
+<!--
+EOT;
+}elseif($adminitem == 'paylog'){
+print <<<EOT
+-->
+<script type="text/javascript" src="js/date.js"></script>
+<h2 class="h1">支付管理</h2>
+<form action="$basename" method="post">
+<div class="p10 mb10">
+	<p class="mb10">
+		<span class="mr20">版块：<select name="fid"  class="select_wa"><option value='0'>所有版块</option>$forumcache</select></span>
+		<span class="mr20">购买者：<input name="username" type="text" class="input input_wa"  value="$username"/></span>
+		<span class="mr20">
+			购买时间：<input name="starttime" id="startTime"  title="开始时间" onClick="javascript:ShowCalendar(this.id)" type="text" class="input input_wc" value="$starttime" />
+			<span class="p_lr_10">至</span><input name="endtime" id="endTime" title="结束时间" onClick="javascript:ShowCalendar(this.id)" type="text" class="input input_wc" value="$endtime" />
+		</span>
+		<span class="btn2"><span><button type="submit">查找</button></span></span>
+		<p class="b" style="border-top:1px dashed #ccc;padding-top:10px;">
+			共购买孔明灯 <span class="s2">$count</span> 次，收入 <span class="s2">$income</span> 元
+		</p>
+	</p>
+</div>
+</form>
+<form action="$basename&action=manage" method="post" name="FORM" >
+<input type="hidden" name="step" value="2">
+<div class="admin_table mb10" style="border-top:1px solid #dde9f5;">
+  <table width="100%" cellspacing="0" cellpadding="0">
+	<tr class="tr2">
+		<td>购买者</td>
+		<td>版块</td>
+		<td>推广费用</td>
+		<td>支付方式</td>
+		<td>购买时间</td>
+		<td width="170">操作</td>
+	</tr>
+<!--
+EOT;
+if(S::isArray($payLogs)){
+foreach($payLogs as $k =>$v){
+	$v['createtime'] = get_date($v['createtime'],'Y-m-d H:i:s');
+print <<<EOT
+-->
+	<tr class="tr1 vt">
+		<td class="td2"><a href="u.php?uid={$v['uid']}" target="_blank">{$v['username']}</a></td>
+		<td class="td2"><a href="thread.php?fid={$v['fid']}" target="_blank">{$v['forumname']}</a></td>
+		<td class="td2">{$v['money']}元</td>
+		<td class="td2">{$kmdService->payTypes[$v['type']]}</td>
+		<td class="td2">{$v['createtime']}</td>
+<!--
+EOT;
+$actionHtml = '';
+if ($v['status'] == KMD_PAY_STATUS_NOTPAY){
+	$actionHtml = "<a onclick=\"javascript:return confirm('确认已收到货款，并将状态设置为已支付？')\" href=\"$basename&step=2&operater=1&payid={$v['id']}\">[确认支付]</a>&nbsp;
+					<a onclick=\"javascript:return confirm('确认删除付款记录？')\" href=\"$basename&step=2&operater=2&payid={$v['id']}\">[删除]</a>";
+} else if($v['status'] == KMD_PAY_STATUS_PAYED){
+	$actionHtml = "已支付";
+}
+print <<<EOT
+-->
+		<td class="td2">$actionHtml</td>
+	</tr>
+<!--
+EOT;
+}
+}else{
+print <<<EOT
+-->
+	<tr class="tr1"><td class="td2" colspan="7"><div class="admin_tips">啊哦！暂无相关信息</div></td></tr>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+</table>
+</div>
+<div class="cc">$pages</div>
+</form>
+<!--
+EOT;
+}elseif($adminitem == 'check'){
+print <<<EOT
+-->
+<h2 class="h1">帖子审核</h2>
+<form action="$basename" method="post">
+<div class="p10 mb10">
+	<p class="mb10">
+		<span class="mr20">版块：<select name="fid"  class="select_wa"><option value='0'>所有版块</option>$forumcache</select></span>
+		<span class="mr20">购买者：<input name="username" type="text" class="input input_wa"  value="$username"/></span>
+		<span class="btn2"><span><button type="submit">查找</button></span></span></p>
+	</p>
+</div>
+</form>
+<form action="$basename&action=manage" method="post" name="FORM" >
+<input type="hidden" name="step" value="2">
+<div class="admin_table mb10" style="border-top:1px solid #dde9f5;">
+  <table width="100%" cellspacing="0" cellpadding="0">
+	<tr class="tr2">
+		<td width="50"><span onclick="CheckAll(document.FORM)" class="cp">全选</span></td>
+		<td>购买者</td>
+		<td>帖子标题</td>
+		<td>版块</td>
+		<td width="170">操作</td>
+	</tr>
+<!--
+EOT;
+if(S::isArray($checks)){
+foreach($checks as $k =>$v){
+print <<<EOT
+-->
+	<tr class="tr1 vt">
+		<td class="td2"><input type="checkbox" name="kids[]" value="{$v['kid']}" /></td>
+		<td class="td2"><a href="u.php?uid={$v['uid']}" target="_blank">{$v['username']}</a></td>
+		<td class="td2"><a href="read.php?tid={$v['tid']}" target="_blank">{$v['subject']}</a></td>
+		<td class="td2"><a href="thread.php?fid={$v['fid']}" target="_blank">{$v['forumname']}</a></td>
+		<td class="td2">
+			<a href="$basename&step=2&operater=1&kid={$v['kid']}">[通过]</a>&nbsp;
+			<a href="$basename&step=2&operater=2&kid={$v['kid']}">[拒绝]</a>
+		</td>
+	</tr>
+<!--
+EOT;
+}
+}else{
+print <<<EOT
+-->
+	<tr class="tr1"><td class="td2" colspan="5"><div class="admin_tips">啊哦！暂无相关信息</div></td></tr>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+</table>
+</div>
+<div class="cc">$pages</div>
+<div class="tac p10">
+	<p class="mb10">选中操作:
+		<input type="radio" name="operater" value="1"  checked/>审核通过&nbsp;
+		<input type="radio" name="operater" value="2" />&nbsp;审核拒绝&nbsp;
+	</p>
+<span class="bt"><span><button type="button" onclick="CheckAll(document.FORM)">全 选</button></span></span>
+<span class="btn"><span><button type="submit">提 交</button></span></span>
+</div>
+</form>
+<!--
+EOT;
+}elseif($adminitem == 'kmdmanage'){
+print <<<EOT
+-->
+<script type="text/javascript" src="js/date.js"></script>
+<h2 class="h1">孔明灯管理<!-- &nbsp;<a style="margin-left:15px;" href="javascript:void(0);" onclick="javascript:sendmsg('{$basename}&step=3');">添加孔明灯</a> --></h2>
+<form action="$basename" method="post">
+<div class="p10 mb10">
+	<p class="mb10">
+		<span class="mr20">版块：<select name="fid"  class="select_wa"><option value='0'>所有版块</option>$forumcache</select></span>
+		<span class="mr20">状态：
+			<select name="status" class="select_wa"><option value='0'>所有状态</option>
+<!--
+EOT;
+for($i=1;$i<=4;$i++){
+$tmpSelected = $status == $i?' selected="selected"' : '';
+print <<<EOT
+-->
+<option value="$i"$tmpSelected>{$kmdService->threadStatus[$i]}</option>
+<!--
+EOT;
+}print <<<EOT
+-->
+			</select>
+		</span>
+		<span class="mr20">
+			推广时间：<input name="starttime" id="startTime"  title="开始时间" onClick="javascript:ShowCalendar(this.id)" type="text" class="input input_wc" value="$starttime" />
+			<span class="p_lr_10">至</span><input name="endtime" id="endTime" title="结束时间" onClick="javascript:ShowCalendar(this.id)" type="text" class="input input_wc" value="$endtime" />
+		</span>
+		<span class="mr20">购买者：<input name="username" type="text" class="input input_wa"  value="$username"/></span>
+		<span class="btn2"><span><button type="submit">查找</button></span></span>
+	</p>
+	<p>
+</div>
+</form>
+<form action="$basename" method="post" name="FORM" >
+<input type="hidden" name="step" value="2">
+<input type="hidden" name="operater" value="1">
+<div class="admin_table mb10" style="border-top:1px solid #dde9f5;">
+  <table width="100%" cellspacing="0" cellpadding="0">
+	<tr class="tr2">
+		<td width="50"><span onclick="CheckAll(document.FORM)" class="cp">全选</span></td>
+		<td>购买者</td>
+		<td>推广版块</td>
+		<td>推广时间</td>
+		<td>状态</td>
+		<td width="170">操作</td>
+	</tr>
+<!--
+EOT;
+if(S::isArray($kmdInfos)){
+foreach($kmdInfos as $v){
+	$v['starttime'] = get_date($v['starttime'],'Y-m-d H:i:s');
+	$v['endtime'] = get_date($v['endtime'],'Y-m-d H:i:s');
+	$actionHtml = "<a onclick=\"javascript:return confirm('确认回收该孔明灯？')\" href=\"$basename&step=2&operater=1&kid={$v['kid']}\">[撤销]</a>";
+	$v['tid'] && $actionHtml .= "&nbsp;<a href=\"read.php?tid={$v['tid']}\" target=\"_blank\">[查看]</a>";
+print <<<EOT
+-->
+<tr class="tr1">
+	<td class="td2"><input type="checkbox" name="kids[]" value="{$v['kid']}" /></td>
+	<td class="td2"><a href="u.php?uid={$v['uid']}" target="_blank">{$v['username']}</a></td>
+	<td class="td2"><a href="thread.php?fid={$v['fid']}" target="_blank">{$v['forumname']}</a></td>
+	<td class="td2">{$v['starttime']} 至 {$v['endtime']}</td>
+	<td class="td2">{$kmdService->threadStatus[$v['status']]}</td>
+	<td class="td2">$actionHtml</td>
+</tr>
+<!--
+EOT;
+}
+}else{
+print <<<EOT
+-->
+	<tr class="tr1"><td class="td2" colspan="6"><div class="admin_tips">啊哦！暂无相关信息</div></td></tr>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+</table>
+</div>
+<div class="cc">$pages</div>
+<div class="tac p10">
+<span class="bt"><span><button type="button" onclick="CheckAll(document.FORM)">全 选</button></span></span>
+<span class="btn"><span><button type="submit" name="hello">提 交</button></span></span>
+</div>
+</form>
+<!--
+EOT;
+}elseif($adminitem == 'usermanage'){
+print <<<EOT
+-->
+<h2 class="h1">用户管理</h2>
+<form action="$basename" method="post">
+<div class="p10">
+	<p class="mb10"><span class="mr20">用户名：
+	 <input name="username" type="text" class="input input_wa" value="$username" /></span>
+	<span class="btn2"><span><button type="submit">查找</button></span></span></p>
+	<p class="b" style="border-top:1px dashed #ccc;padding-top:10px;">
+		共 <span class="s2">$count</span>人购买孔明灯
+	</p>
+</div>
+</form>
+<div class="admin_table mb10" style="border-top:1px solid #dde9f5;">
+<table width="100%" cellspacing="0" cellpadding="0">
+	<tr class="tr2">
+		<td>用户名</td>
+		<td>真实姓名</td>
+		<td>手机</td>
+		<td>发票抬头</td>
+		<td>联系地址</td>
+		<td>操作</td>
+	</tr>
+<!--
+EOT;
+if($users){
+foreach($users as $value){
+print <<<EOT
+-->
+	<tr class="tr1">
+      <td class="td2"><a href="u.php?uid={$value['uid']}" target="_blank">{$value['username']}</a></td>
+      <td class="td2">{$value['realname']}</td>
+      <td class="td2">{$value['phone']}</td>
+	<td class="td2">{$value['invoice']}</td>
+	<td class="td2">{$value['address']}</td>
+	<td class="td2"><a href="$basename&adminitem=paylog&username={$value['username']}">购买记录</a></td>
+	</tr>
+	
+<!--
+EOT;
+}print <<<EOT
+-->
+</table>
+$pages
+</div>
+<!--
+EOT;
+}else{
+print <<<EOT
+-->
+<tr class="tr1"><td class="td2" colspan="6"><div class="admin_tips">啊哦！暂无相关信息</div></td></tr>
+
+<!--
+EOT;
+}
+}
+include_once PrintEot('adminbottom');
+?>-->
+
+

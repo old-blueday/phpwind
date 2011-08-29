@@ -29,35 +29,36 @@ if(empty($action)){
 	if(!$starttime || !$endtime || $startTime > $endTime){
 		adminmsg('时间范围输入有误',$basename);
 	}
-	$stepSize = 1;
+	$stepSize = 2;
 	if(!$step){
 		$step = $offset = 0;
 		$endTime = $endTime + 86400;
 		foreach($fids as $fid){
 			$fid = intval($fid);
 			if($fid < 1) continue;
-			$fids[] = $fid;
 		}
 	}else{
 		$fids = trim($fids);
 		$fids = explode(',',$fids);
 		if(!$fids) include PrintEot('tucool');
 	}
-	
+
 	$attachsService = L::loadClass('Attachs','forum');
 	$tuCoolService = L::loadClass('Tucool','forum');	
 	$totalNums = $totalNums ? intval($totalNums) : $attachsService->countTuCoolThreadNum(getSelectedTucoolForums(),$startTime,$endTime);
 	$haveBuild = $haveBuild ? intval($haveBuild) : 0;
 
  	foreach($fids as $fid){
+ 		$fid = intval($fid);
 		$tids = $attachsService->getTuCool($fid,$tucoolForums[$fid]['tucoolpic'],$startTime,$endTime,$offset,$stepSize);
 		$offset += $stepSize;
 		$count = count($tids);
+		
 		if($count < $stepSize){
 			array_shift($fids);
 			//更新不满足条件的图酷帖
 			$tuCoolService->renewToolThreads($fid);
-			$offset = 0;
+			if(count($fids) > 1) $offset = 0;
 			$haveBuild = $haveBuild + $count;
 		}else{
 			$haveBuild = $haveBuild + $stepSize;
@@ -68,7 +69,7 @@ if(empty($action)){
 			$db_ifftp or $attachsService->reBuildAttachs($tid);
 			$tuCoolService->updateTucoolImageNum($tid);
  		}
- 		if($fids && $totalNums){
+ 		if(!$fids || $totalNums){
 			$step++;
 			if(!$fids) adminmsg("数据更新完成",$basename);
 			$fids = trim(implode(",",$fids));

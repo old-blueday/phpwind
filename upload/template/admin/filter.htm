@@ -15,9 +15,7 @@ tr.tr1_hover .td2,tr.tr1_hover .td3{background:#fffaeb;border-top:1px solid #ffd
 tr.tr1_hover .td3{width:320px;}
 .admin_table tr.tr1_hover:hover .td3,.admin_table tr.tr1_hover:hover .td2{background:#fffaeb;}
 </style>
-<script language="JavaScript" src="js/global.js"></script>
-<script language="JavaScript" src="js/pw_ajax.js"></script>
-<script language="JavaScript">
+<script type="text/javascript" >
 var scanSwitch = 0;
 
 function getSearch()
@@ -61,7 +59,7 @@ function getConfirm()
 	sendmsg('{$basename}&action=synchronous&job=confirm');
 }
 
-function addClass(){
+function addClassConflict(){
 	sendmsg('{$basename}&action=class&job=add');
 }
 
@@ -405,7 +403,7 @@ EOT;
     <span class="bt"><span><button type="button" onclick="delWord();">删 除</button></span></span>
 </div>
 </form>
-<script language="JavaScript">
+<script type="text/javascript" >
 importShow();
 </script>
 <!--
@@ -423,7 +421,7 @@ print <<<EOT
 </div>
 <input type="hidden" name="job" value="scan">
 <h2 class="h1">
-	<span class="fl mr10">当前共{$count}个分类</span><a class="fl btn_add" href="javascript:;" onclick="addClass();" title="新建分类"><i>新建分类</i></a>
+	<span class="fl mr10">当前共{$count}个分类</span><a class="fl btn_add" href="javascript:;" onclick="addClassConflict();" title="新建分类"><i>新建分类</i></a>
 </h2>
 <div class="admin_table">
 <table width="100%" cellspacing="0" cellpadding="0">
@@ -564,7 +562,7 @@ EOT;
 -->
     </table>
 </div>
-<script type="text/javascript">
+<script type="text/javascript" >
 function intval(v) {
     v = parseInt(v);
     return isNaN(v) ? 0 : v;

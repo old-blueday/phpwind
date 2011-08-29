@@ -9,17 +9,16 @@ print <<<EOT
 .switch{margin-left:{$db_threadsidebarwidth}px;}
 .sideClose .switch{margin-left:0;}
 .sideClose .sidebar{display:none;}
-.fastpost .floot_left{width:0;border:0;display:none;}
-.sideClose .fastpost .floot_left{background:none;width:160px;display:table-cell;*display:block;}
-.sideClose .fastpost .t{margin-bottom:0;}
 .sidePd10{padding:0 10px;}
-.content_thread .hB{padding-left:20px;}
-.threadInfo td{padding-left:5px;}
 .sideClose .content_thread .sidePd10{padding:0;}
 .sideClose .content_thread .hB{padding-left:10px;}
 .sideClose .threadInfo td{padding-left:1px;}
+
+.f_tree .floot_left{width:{$db_threadsidebarwidth}px;}
+.f_tree .floot_left .pic{width:90px;height:90px;}
+.sideClose .floot_left{display:none;}
 </style>
-		<span class="fl"><a href="javascript:;" class="switch mr10" title="侧栏开关" onclick="toggleSidebar()">侧栏开关</a></span>
+		<span class="fl"><a href="javascript:;" class="switch mr10" title="侧栏开关" onclick="toggleSidebar()" hidefocus="true">侧栏开关</a></span>
 		<div class="sidebar">
     		<div class="myForum">
         <h6><a href="javascript:;" class="history" id="readlog" title="最近浏览的帖子" onclick="showViewLog('pw_ajax.php?action=readlog','',this.id);">历史记录</a>我的版块</h6>
@@ -107,6 +106,7 @@ function toggleSidebar(){
 	var toggle = (sidebar.className == 'f_tree cc') ? 0: 1;
 	SetCookie('toggle',toggle);	
 	getObj('sidebar').className = (sidebar.className == 'f_tree cc')?"f_tree cc sideClose":'f_tree cc';
+	getObj('header_floot_left').style.display = toggle ? '' : 'none';
 }
 </script>
 <!--

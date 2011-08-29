@@ -61,7 +61,8 @@ if (!$action) {
 		'manager_pwd' => $manager_pwd,
 		'db_hostweb' => $db_hostweb,
 		'db_distribute' => $db_distribute,
-		'attach_url' => $attach_url
+		'attach_url' => $attach_url,
+		'slaveConfigs' => $slaveConfigs
 	);
 	require_once(R_P.'require/updateset.php');
 	write_config($newconfig);
@@ -119,7 +120,8 @@ if (!$action) {
 			'manager_pwd' => $manager_pwd,
 			'db_hostweb' => $db_hostweb,
 			'db_distribute' => $db_distribute,
-			'attach_url' => $attach_url
+			'attach_url' => $attach_url,
+			'slaveConfigs' => $slaveConfigs
 		);
 		require_once(R_P.'require/updateset.php');
 		write_config($newconfig);
@@ -160,7 +162,8 @@ if (!$action) {
 			'manager_pwd' => $newmngpwd,
 			'db_hostweb' => $db_hostweb,
 			'db_distribute' => $db_distribute,
-			'attach_url' => $attach_url
+			'attach_url' => $attach_url,
+			'slaveConfigs' => $slaveConfigs
 		);
 		require_once(R_P.'require/updateset.php');
 		write_config($newconfig);

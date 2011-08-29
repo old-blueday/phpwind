@@ -87,8 +87,8 @@ print <<<EOT
 EOT;
 }print <<<EOT
 -->  
-<script language="JavaScript" src="js/core/changeview.js"></script>
-<script language="JavaScript">
+<script type="text/javascript" src="js/core/changeview.js"></script>
+<script type="text/javascript">
 var frist = New(changView,['list-box','li',1]);
 
 </script>
@@ -399,7 +399,7 @@ EOT;
 	</table>
 </div>
 <img id="imgpreview" src="$photo[path]" style="position:absolute;top:-10000px;" />
-<script language="JavaScript" src="js/app_comment.js"></script>
+<script type="text/javascript" src="js/app_comment.js"></script>
 <div style="width:600px;margin:20px auto;">
 <!--
 EOT;
@@ -408,8 +408,8 @@ require_once PrintEot('m_comment');print <<<EOT
 </div>
 <div class="c"></div>
 
-<script language="JavaScript" src="js/pw_photolist.js"></script>
-<script language="JavaScript">
+<script type="text/javascript" src="js/pw_photolist.js"></script>
+<script type="text/javascript">
 function ImgClick()
 {
 	var url = getObj('imgview');
@@ -459,7 +459,7 @@ function imgLoad(){
 }
 imgLoad();
 </script>
-<!--script type="text/javascript" LANGUAGE="JavaScript" src="js/core/space.js"></script-->
+<!--script type="text/javascript" src="js/core/space.js"></script-->
 <!--
 EOT;
 } elseif ($a == 'upload') {print <<<EOT
@@ -535,12 +535,13 @@ print <<<EOT
             <div class="g_photosbox">
                 <div id="viewimg" class="menu mb10" style="display:none;"></div>
                 <object id="mutiupload" name="mutiupload" classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" width="250" height="46">
-                  <param name="movie" value="$imgpath/photouploader.swf" />
+                  <param name="movie" value="$imgpath/photouploader.swf?d=0706" />
+				  <param name="wmode" value="transparent" />
                   <param name="FlashVars" value="url=$db_bbsurl%2Fjob.php%3Faction%3Dmutiuploadphoto"/>
                   <param name="allowScriptAccess" value="always" />
-                  <param name="wmode" value="transparent" />
+                  
                   <!--[if !IE]>-->
-                  <object type="application/x-shockwave-flash" data="$imgpath/photouploader.swf" width="250" height="46" FlashVars="url=$db_bbsurl%2Fjob.php%3Faction%3Dmutiuploadphoto"  allowScriptAccess="always">
+                  <object type="application/x-shockwave-flash" data="$imgpath/photouploader.swf?d=0706" width="250" height="46" FlashVars="url=$db_bbsurl%2Fjob.php%3Faction%3Dmutiuploadphoto" wmode="transparent"  allowScriptAccess="always">
                   <!--<![endif]-->
                     <p>你没有安装Flash!</p>
                   <!--[if !IE]>-->
@@ -549,9 +550,11 @@ print <<<EOT
                 </object>
 <script>
 swfobject.addLoadEvent(function(){
+	getallowflash(getObj('aidsel_info').value);
 	uploader.maxLength = {$o_maxfilesize};
 	uploader.baseurl ='{$basename}cyid=$cyid&';
 	uploader.init();
+	
 });
 swfobject.registerObject('mutiupload','10.0.0','js/expressInstall.swf');
 </script>
@@ -594,21 +597,15 @@ EOT;
 <!--
 EOT;
 if ($o_photos_gdcheck) {
-$gdSize = explode("\t",$db_gdsize);
+$checkCode = L::loadClass('checkcode', 'site');
+$checkCodeString = $checkCode->getCheckCodeTemplate();
 print <<<EOT
 -->
-				<p>认证码:</p>
+				<p>验证码:</p>
 				<p>
-				<span id="ckcode" style="display:none;margin-bottom:5px;">
-<script type="text/javascript" src="js/pw_authcode.js"></script>
-<script>
-var flashWidth = "$gdSize[0]";
-var flashHeight = "$gdSize[1]";
-var gdtype = $db_gdtype;
-showGdCode();
-</script>				
-				</span>
+				<span id="ckcode" style="display:none;margin-bottom:5px;"></span>
 				</p>
+$checkCodeString
 				<input class="input" onfocus="showgd();" type="text" name="gdcode" id="gdcode" size="5" tabindex="3"  />
 <div class="c mb10"></div>
 <!--
@@ -621,7 +618,7 @@ if($db_imagequestion){
 }else{
 	$question = $qkey<0 ? getMachineQuestion_1() :  $db_question[$qkey];
 }
-$q_a = $question.($showq && $qkey>0?" 正确答案:".$db_answer[$qkey] : '');
+$q_a = $question.($showq && $qkey>0?" （答案：".$db_answer[$qkey] . '）' : '');
 print <<<EOT
 -->
                 <p>验证问答: {$q_a}</p>
@@ -650,7 +647,7 @@ var charset = '$db_charset';
 initCheckTextNum('pintro_1','pintro_1_warn',255);
 initCheckTextNum('pintro_2','pintro_2_warn',255);
 initCheckTextNum('pintro_3','pintro_3_warn',255);
-getallowflash(getObj('aidsel_info').value);
+
 function getallowflash(aid) {
 	setTimeout(function(){ajax.send('{$basename}a=getallowflash&cyid=$cyid&aid='+aid,'',function() {
 		var rText = ajax.request.responseText.split('\\t');
@@ -760,7 +757,7 @@ print <<<EOT
         </tr>
     </table>
 </div>
-<script language="JavaScript">
+<script type="text/javascript">
 function getallowflash(aid) {
 	getObj('currentaid').value = aid;
 	setTimeout(function(){ajax.send('{$basename}a=getallowflash&cyid=$cyid&aid='+aid,'',function() {
@@ -780,7 +777,6 @@ function getallowflash(aid) {
 	});},100);
 	return false;
 }
-window.onReady(getallowflash,getObj('aidsel_info').value);
 function submitaction(url){
 	var aid = getObj('currentaid').value;
 	location.href = url + aid;
@@ -846,7 +842,7 @@ EOT;
         </tr>
     </table>
 </div>
-<script language="JavaScript">
+<script type="text/javascript">
 function selectPhoto(e){
 	var input = e.parentNode.getElementsByTagName('input')[0];
 	input.checked=!input.checked;
@@ -859,7 +855,6 @@ function getallowflash(aid) {
 				getObj('allowflash').innerHTML = '请选择相册';
 			} else if (rText[1]) {
 				getObj('allowflash').innerHTML = '该相册还可以上传'+rText[1]+'张照片';
-				//getObj('allowflash2').innerHTML = '你还可以上传'+rText[1]+'张照片';
 			} else {
 				getObj('allowflash').innerHTML = '请选择相册';
 			}
@@ -869,7 +864,6 @@ function getallowflash(aid) {
 	});},100);
 	return false;
 }
-window.onReady(getallowflash,getObj('aidsel_info').value);
 </script>
 <!--
 EOT;
@@ -931,22 +925,16 @@ EOT;
 <!--
 EOT;
 if ($o_photos_gdcheck) {
-$gdSize = explode("\t",$db_gdsize);
+$checkCode = L::loadClass('checkcode', 'site');
+$checkCodeString = $checkCode->getCheckCodeTemplate();
 print <<<EOT
 -->
 		<tr>
-			<th class="th">认证码</th>
+			<th class="th">验证码</th>
 			<td class="td">
 				<input class="input input_wc" onfocus="showgd();" type="text" name="gdcode" id="gdcode" tabindex="3"  /><br />
-				<span id="ckcode" style="display:none;margin-bottom:5px;">
-<script type="text/javascript" src="js/pw_authcode.js"></script>
-<script>
-var flashWidth = "$gdSize[0]";
-var flashHeight = "$gdSize[1]";
-var gdtype = $db_gdtype;
-showGdCode();
-</script>				
-				</span>
+				<span id="ckcode" style="display:none;margin-bottom:5px;"></span>
+$checkCodeString
 			</td>
 		</tr>
 <!--
@@ -959,7 +947,7 @@ if($db_imagequestion){
 }else{
 	$question = $qkey<0 ? getMachineQuestion_1() :  $db_question[$qkey];
 }
-$q_a = $question.($showq && $qkey>0?" 正确答案:".$db_answer[$qkey] : '');
+$q_a = $question.($showq && $qkey>0?" （答案：".$db_answer[$qkey] . '）' : '');
 print <<<EOT
 -->
 		<tr>
@@ -981,12 +969,12 @@ EOT;
     </table>
     </form>
 </div>
-<SCRIPT LANGUAGE="JavaScript">
+<script type="text/javascript">
 var charset = '$db_charset';
 initCheckTextNum('aname','aname_warn',24);
 initCheckTextNum('aintro','aintro_warn',255);
 
-</SCRIPT>
+</script>
 <!--
 EOT;
 }require_once(uTemplate::printEot('footer'));

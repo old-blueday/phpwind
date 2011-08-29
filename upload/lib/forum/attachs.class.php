@@ -7,6 +7,19 @@
  */
 class PW_Attachs {
 	
+	function insert($fieldsData) {
+		if (!S::isArray($fieldsData)) return false;
+		$attachsDao = $this->getAttachsDao();
+		return $attachsDao->insert($fieldsData);
+	}
+	
+	function updateByAid($aid,$fieldsData) {
+		$aid = intval($aid);
+		if ($aid < 1 || !S::isArray($fieldsData)) return false;
+		$attachsDao = $this->getAttachsDao();
+		return $attachsDao->updateById($aid,$fieldsData);
+	}
+	
 	function countMultiUpload($userId){
 		$userId = intval($userId);
 		if( $userId < 1 ){
@@ -81,6 +94,7 @@ class PW_Attachs {
 			//$foruminfo = L::forum($fid);
 			//if (!S::isArray($foruminfo)) continue;
 			//if(!$foruminfo['forumset']['iftucool'] || $foruminfo['forumset']['tucoolpic'] < 1) continue;
+			if ($forumset['tucoolpic'] < 1) continue;
 			$attachsDao = $this->getAttachsDao();
 			$count += $attachsDao->countTuCoolThreadNum($fid,$startTime,$endTime,$forumset['tucoolpic']);	
 		}	
@@ -94,7 +108,7 @@ class PW_Attachs {
 	 * return bool 
 	 */
 	function reBuildAttachs($tid){
-		global $attachdir,$db_ifftp;
+		global $attachdir,$db_ifftp,$db_athumbtype;
 		if ($db_ifftp) return false;
 		require_once (R_P . 'require/imgfunc.php');
 		$tid = intval($tid);
@@ -107,7 +121,7 @@ class PW_Attachs {
 			$srcfile = $attachdir . '/' . $v['attachurl'];
 			$this->createFolder(dirname($targtImg));
 			if(!file_exists($srcfile)) continue;
-			MakeThumb($srcfile, $targtImg, 200, 150,1);
+			MakeThumb($srcfile, $targtImg, 200, 150,$db_athumbtype);
 		}
 	}
 
@@ -127,6 +141,14 @@ class PW_Attachs {
 		$attachsDao = $this->getAttachsDao();
 		return $attachsDao->getLatestAttachByTidType($tid,$type);
 	}
+
+	function getLatestAttachInfoByTidType($tid,$type='img') {
+		$tid = intval($tid);
+		if ($tid < 1) return false;
+		$attachsDao = $this->getAttachsDao();
+		return $attachsDao->getLatestAttachInfoByTidType($tid,$type);
+	}
+
 	function delByids($ids) {
 		if(!$ids) return false;
 		$attachsDao = $this->getAttachsDao();
@@ -184,7 +206,8 @@ class PW_Attachs {
 		foreach ((array)$tmpAttachs as $v) {
 			if ($v['needrvrc']) continue;
 			$v[position] = '['.$i . '/' . $countNum.']';
-			$attachs[] = $v;
+			$v[json] = pwJsonEncode($v);
+			$attachs[$v[aid]] = $v;
 			$i++;
 		}
 		return $attachs;
@@ -200,27 +223,44 @@ class PW_Attachs {
 	}
 	
 	function getMiniDir($path, $where) {
-		if ($where == 'Local') {
-			$localMiniUrl = $GLOBALS['attachpath'] . '/thumb/mini/' . $path;
-			$localThumbUrl = $GLOBALS['attachpath'] . '/thumb/' . $path;
-			$localUrl = $GLOBALS['attachpath'] . '/' . $path;
-			$defaultUrl = $GLOBALS['imgpath'] . '/imgdel_h200.jpg';
-			if (file_exists($localMiniUrl)) return $localMiniUrl;
-			if (file_exists($localThumbUrl)) return $localThumbUrl;
-			if (file_exists($localUrl)) return $localUrl;
-			return $defaultUrl;
-		}
-		if ($where == 'Ftp') return $GLOBALS['db_ftpweb'] . '/thumb/mini/' . $path;
+		if ($where != 'Local') return false;
+		$localMiniUrl = $GLOBALS['attachpath'] . '/thumb/mini/' . $path;
+		$localThumbUrl = $GLOBALS['attachpath'] . '/thumb/' . $path;
+		$localUrl = $GLOBALS['attachpath'] . '/' . $path;
+		$defaultUrl = $GLOBALS['imgpath'] . '/imgdel_h200.jpg';
+		if (file_exists($localMiniUrl)) return $localMiniUrl;
+		if (file_exists($localThumbUrl)) return $localThumbUrl;
+		if (file_exists($localUrl)) return $localUrl;
+		return $defaultUrl;
+	}
+	
+	function getFtpMiniDir($path, $where, $ifthumb) {
+		if ($where == 'Ftp') return $ifthumb ? $GLOBALS['db_ftpweb'] . '/thumb/mini/' . $path : $GLOBALS['db_ftpweb'] . '/' . $path;
 		if (!is_array($GLOBALS['attach_url'])) return $GLOBALS['attach_url'] . '/thumb/mini/' . $path;
 		return $GLOBALS['attach_url'][0] . '/thumb/mini/' . $path;
 	}
-
-	function getThreadAttachMini($path) {
+	
+	function getThreadAttachMini($path,$ifthumb = null) {
 		if (!$path) return $GLOBALS['imgpath'] . '/imgdel_h200.jpg';
-		$attachUrl = geturl($path, 'show');
-		return $this->getMiniDir($path, $attachUrl[1]);
+		list($relativePath,$where) = geturl($path, 'show', $ifthumb);
+		return ($where == 'Local') ? $this->getMiniDir($path, $where) : $this->getFtpMiniDir($path, $where, $ifthumb);
 	}
 
+	function isEditAttachRight($aid,$tid) {
+		global $isGM,$winduid;
+		$aid = intval($aid);
+		$tid = intval($tid);
+		if ($aid <1 || $tid<1) return false;
+		$threadsService = L::loadClass('threads','forum');
+		$read = $threadsService->getByThreadId($tid);
+		if (!$read ) return false;
+		L::loadClass('forum', 'forum', false);
+		$pwforum = new PwForum($read['fid']);
+		if (!$pwforum->isForum()) return false;
+		$isBM = $pwforum->isBM($windid);
+		return ($isGM || $isBM || $read['authorid'] == $winduid) ? true : false;
+	}
+	
 	function getAttachsDao(){
 		static $sAttachsDao;
 		if(!$sAttachsDao){

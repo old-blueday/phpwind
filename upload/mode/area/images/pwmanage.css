@@ -110,8 +110,6 @@ textarea{border: 1px solid; border-color: #c0c0c0 #ededed #ededed #c0c0c0;}
 /*menu*/
 .menu{position:absolute;background:#fff;border:1px solid #d7e6f2;}
 .menu a{display:block;padding:4px 8px;}
-.menu-post{border:1px solid #a6cbe7;}
-.menu-post .menu-b{background:#ffffff;border:3px solid #d5e6ed;}
 .menu-half li{width:46%;float:left;}
 .menu-half li a{float:left;}
 .user-table td{padding:1em 1em .5em 2em;}

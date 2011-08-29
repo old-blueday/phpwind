@@ -5,6 +5,7 @@ Breeze.namespace('global.uploader', function(B){
 		picStatus: false,
 		data: {},
 		maxLength: attachConfig.attachnum,
+		onProgress:false,
 		amount: 0,
 		rand: Math.random(),
 		flash:null,
@@ -31,14 +32,15 @@ Breeze.namespace('global.uploader', function(B){
 		},
 		/**
 		 * 列出待上传的文件
+		 *返回数据Object [{desc:null,error:"",fileid:1,name:"Lighthouse.jpg",size:521276},{desc:null,error:"",fileid:1,name:"Lighthouse.jpg",size:521276}]
 		 */
 		list: function(queue) {
 			//列出列表
 			var str = '';
-			if(this.picStatus){
+			if(uploader.picStatus){
 				var  plist = B.$('#B_image_tile');
 			}
-			if (this.attachStatus){
+			if (uploader.attachStatus){
 				var qlist = B.$('#B_qlist');
 			}
 			queue.forEach(function(item){
@@ -61,6 +63,7 @@ Breeze.namespace('global.uploader', function(B){
 							break;
 					}
 				}
+				//上传出错处理
 				if (uploader.attachStatus){
 					str = '<dl id="B_uploaderfile_'+item.fileid+'" class="B_tmp'+(item.error?' B_error':'')+'" title="'+item.name+'"><dt title="附件信息"><div><b class="B_icoFile B_icoFile_'+ext+'">&nbsp;</b>'+item.name+'</div></dt><dd class="B_file_desc">'+status+'</dd><dd class="B_file_dd"><a href="javascript:;" onclick="return uploader.mutidel(this);" title="删除">删除</a></dd></dl>';
 					qlist.appendChild(B.createElement(str));
@@ -101,6 +104,7 @@ Breeze.namespace('global.uploader', function(B){
 		 * 进度控制
 		 */
 		progress:function(fileid,percent){
+			uploader.onProgress=true;
 			var pervalue;
 			if (uploader.current=='uploader'){
 				pervalue = B.$('#B_uploaderfile_'+fileid+' .B_per_value');
@@ -115,6 +119,13 @@ Breeze.namespace('global.uploader', function(B){
 		},
 		//单个文件上传成功
 		complete: function(fileid, str, name, size){
+			uploader.onProgress=false;
+			/*
+			*fileid 0
+			*str  {"aid":1523,"path":"attachment/thumb/Mon_1107/2_1_34c84c1a543a10d.jpg"}
+			*name  Penguins.jpg
+			*size 777835
+			*/
 			var newline, data;
 			try {
 				eval('data='+str);
@@ -131,6 +142,10 @@ Breeze.namespace('global.uploader', function(B){
 				});
 				return;
 			}
+			
+			uploader.data[data.aid] = [name, size, data.path];
+			uploader.amount++;
+			uploader.showRestCount();
 			if (uploader.attachStatus){
 				B.$('#B_uploaderfile_'+fileid+' .B_file_desc').innerHTML = '<input type="text" name="flashatt['+data.aid+'][desc]" />';
 				B.$('#B_uploaderfile_'+fileid+' .B_file_dd').innerHTML = '<a class="B_mr10">插入</a><a>删除</a>';
@@ -142,14 +157,19 @@ Breeze.namespace('global.uploader', function(B){
 					cfgs = B.$$('a', line);
 				line.id  = 'B_upload_'+data.aid;
 				B.addEvent(cfgs[0], 'mousedown', function(e){
-					editor.pasteHTML(B.editor.ubb2attach('[attachment='+data.aid+']'));
+					uploader.editor.pasteHTML(B.editor.ubb2attach('[attachment='+data.aid+']'));
 					e.preventDefault();
 				});
 				cfgs[1].onclick='';
 				B.addEvent(cfgs[1], 'click', uploader.del);
 				B.addEvent(B.$('.B_file_desc input', line), 'mousedown', function(){
-					editor.saveRng();
+					uploader.editor.saveRng();
 				});
+				//描述
+				(function(obj,data){
+					uploader.showDesc(obj,data);
+				})(B.$('.B_file_desc input', line),uploader.data[data.aid])
+				
 				B.removeClass(line, 'B_tmp');
 			}
 			if (uploader.picStatus) {
@@ -162,16 +182,47 @@ Breeze.namespace('global.uploader', function(B){
 				B.$('.B_del', line).onclick='';
 				B.addEvent(B.$('.B_del', line), 'click', uploader.del);
 				B.addEvent(B.$('img', line), 'mousedown', function(e){
-					editor.pasteHTML(B.editor.ubb2attach('[attachment='+data.aid+']'));
+					uploader.editor.pasteHTML(B.editor.ubb2attach('[attachment='+data.aid+']'));
 					e.preventDefault();
 				});
 				B.addEvent(B.$('input', line), 'mousedown', function(){
-					editor.saveRng();
+					uploader.editor.saveRng();
 				});
+				//描述
+				//uploader.showDesc(B.$('input', line),uploader.data[data.aid],data.aid);
+				(function(obj,data){
+					uploader.showDesc(obj,data);
+				})(B.$('input', line),uploader.data[data.aid])
 			}
-			uploader.data[data.aid] = [name, size, data.path];
-			uploader.amount++;
-			uploader.showRestCount();
+		},
+		showDesc:function(obj,data,input){
+				var preStr="请输入描述";
+				if(obj.value.replace(/\s+/g,'')==''){
+					obj.value=preStr;
+					obj.style.color="#888";
+				}
+				B.addEvent(obj,"focus",function(){
+					if(this.value==preStr){
+						this.value="";
+						this.style.color="#000";
+					}
+				})
+				B.addEvent(obj,"blur",function(){
+					if(this.value.replace(/\s+/g,'')==''){
+						this.value=preStr;
+						this.style.color="#888";
+					}
+				})
+				B.addEvent(obj,"keyup",function(){
+						var v=this.value;
+						if(data){
+							data[7]=v;
+						}
+						if(input){
+							//input.value=v;
+						}
+				})
+				
 		},
 		view:function(o){
 			var span = o.getElementsByTagName('span')[0]
@@ -224,6 +275,7 @@ Breeze.namespace('global.uploader', function(B){
 				pg.innerHTML = (--t<0) ?  warningStr : (pg.innerHTML==warningStr) ? '<div width="0%"></div>': pg.innerHTML;
 				return;
 			});
+			uploader.flash.beginUpload();
 		},
 		//单个删除
 		del: function(e){
@@ -240,6 +292,10 @@ Breeze.namespace('global.uploader', function(B){
 					delete uploader.data[id];
 					uploader.amount--;
 					uploader.showRestCount();
+					//清除由远程图片下载生成的隐藏域
+					if(B.$("#tmpRemoteHidden"+id)){
+						B.query("#tmpRemoteHidden"+id).remove();
+					}
 				} else {
 					ajax_guide();
 				}
@@ -263,7 +319,7 @@ Breeze.namespace('global.uploader', function(B){
 			e.preventDefault();
 		},
 		getRestCount: function(){
-			return uploader.maxLength - uploader.amount;
+			return this.maxLength - this.amount;
 		},
 		showRestCount: function(){
 			B.$$('.restCount').forEach(function(n){
@@ -276,7 +332,7 @@ Breeze.namespace('global.uploader', function(B){
 		insert2editor: function(e){
 			var upname = e.parentNode.parentNode.parentNode.getElementsByTagName('input')[0].name;
 			var attid = upname.substr(upname.indexOf('_')+1);
-			editor.focusEditor();
+			uploader.editor.focusEditor();
 			AddCode(' [attachment=' + attid + '] ','');
 		},
 		insert: function(elem){
@@ -357,8 +413,11 @@ Breeze.namespace('global.uploader', function(B){
 				},
 				attr = {id:'muti'+id, name:'muti'+id};
 
-			swfobject.embedSWF(imgpath + '/uploader.swf?'+uploader.rand, 'B_'+id+'_flash', "128", "22", "10.0.0", "js/expressInstall.swf", flashVar, params, attr, function(e){
+			swfobject.embedSWF(imgpath + '/uploader.swf?'+uploader.rand, 'B_'+id+'_flash', "95", "22", "10.0.0", "js/expressInstall.swf", flashVar, params, attr, function(e){
 				uploader.flash = e.ref;
+				if(getObj("uploaderTmpSpan")!=null){
+					getObj("uploaderTmpSpan").style.display="";
+				}
 			});
 		},
 		setPostData: function() {
@@ -382,8 +441,9 @@ Breeze.namespace('global.uploader', function(B){
 				setTimeout(uploader.initflash,100);
 			}
 		},
-		init: function(id){
+		init: function(id,editor){
 			uploader.current = id;
+			uploader.editor = editor;
 			if (typeof swfobject != 'undefined') {
 				if (uploader.flash) {
 					var pa = uploader.flash.parentNode,
@@ -393,10 +453,14 @@ Breeze.namespace('global.uploader', function(B){
 				}
 				uploader.showFlash(id);
 			} else {
-				loadjs('js/swfobject.js','','',function() {uploader.showFlash(id);});
+				B.require('request',function(){
+					B.getScript('js/swfobject.js',function() { uploader.showFlash(id); });
+				});
 			}
 			B.query('.B_tmp').remove();
-			if (id == 'uploader' && !uploader.attachStatus) {
+			//初始化附件
+			if (id == 'uploader') {
+				B.$("#B_qlist").innerHTML="";
 				if (typeof attachConfig.ifhide == 'undefined' || attachConfig.ifhide == 'disabled') {
 					B.query('.B_file_tips label').css('display', 'none');
 				} else if (attachConfig.ifhide == 'checked') {
@@ -405,7 +469,7 @@ Breeze.namespace('global.uploader', function(B){
 				if (typeof attachConfig.sell == 'undefined') {
 					B.query('#B_sm_cfg').css('display', 'none');
 				}
-				//已经存在的
+				//已经存在的(页面已输出的数据)
 				for(var i in attachConfig.list){
 					var itm = attachConfig.list[i],
 						ext = itm[0].substr(itm[0].lastIndexOf('.')+1),
@@ -426,20 +490,25 @@ Breeze.namespace('global.uploader', function(B){
 					var cfgs = B.$$('a', node);
 					B.addEvent(cfgs[2], 'click', uploader.deloldattach);
 					B.addEvent(cfgs[0], 'click', function(e){
-						editor.pasteHTML(B.editor.ubb2attach('[attachment='+this.parentNode.parentNode.id.substr(9)+']'));
+						uploader.editor.pasteHTML(B.editor.ubb2attach('[attachment='+this.parentNode.parentNode.id.substr(9)+']'));
 						e.preventDefault();
 					});
 					B.addEvent(B.$('.B_file_desc input', node), 'mousedown', function(){
-						editor.saveRng();
+						uploader.editor.saveRng();
 					});
 					//B.addEvent(B.$('.modify', node), 'click', uploader.modify);
 				}
+				//动态加入的数据
 				for(var i in uploader.data){
+					if(uploader.data[i].length<1){
+						return false;
+					}
 					var itm = uploader.data[i],
 						ext = itm[0].substr(itm[0].lastIndexOf('.')+1),
+						desc=itm[7]||"",
 						str = '<dl id="B_upload_'+i+'">\
 							<dt title="'+itm[0]+'"><div><b class="B_icoFile B_icoFile_'+ext+'">&nbsp;</b>'+itm[0]+'</div>\
-							</dt><dd class="B_file_desc"><input type="text" name="flashatt['+i+'][desc]">\
+							</dt><dd class="B_file_desc"><input type="text" name="flashatt['+i+'][desc]" value="'+desc+'">\
 							</dd><dd class="B_file_dd"><a class="B_mr10">插入</a>\
 							<a>删除</a></dd><dd class="B_file_set">\
 							<select class="B_mr5" name="flashatt['+i+'][special]" onchange="uploader.scurType(this)"><option>无</option><option value="2">出售</option><option value="1">加密</option></select>积分：<select class="B_mr10" name="flashatt[494][ctype]"><option>铜币</option></select>\
@@ -448,18 +517,25 @@ Breeze.namespace('global.uploader', function(B){
 					B.$('#B_qlist').appendChild(node);
 					var cfgs = B.$$('a', node);
 					B.addEvent(cfgs[0], 'click', function(e){
-						editor.pasteHTML(B.editor.ubb2attach('[attachment='+this.parentNode.parentNode.id.substr(9)+']'));
+						uploader.editor.pasteHTML(B.editor.ubb2attach('[attachment='+this.parentNode.parentNode.id.substr(9)+']'));
 						e.preventDefault();
 					});
 					B.addEvent(cfgs[1], 'click', uploader.del);
 					B.addEvent(B.$('.B_file_desc input', node), 'mousedown', function(){
-						editor.saveRng();
+						uploader.editor.saveRng();
 					});
+					//描述
+					(function(obj,data){
+						uploader.showDesc(obj,data);
+					})(B.$('.B_file_desc input', node),itm)
 				}
 				uploader.attachStatus = true;
 				uploader.setAllowFileType(B.$('#attach_allow_filetype'), attachConfig.filetype);
 			}
-			if (id == 'picuploader' && !uploader.picStatus) {
+			//初始化图片
+			if (id == 'picuploader') {
+				B.$("#B_image_tile").innerHTML="";
+				//页面输出的数据
 				for(var i in attachConfig.list){
 					var itm = attachConfig.list[i],
 						ext = itm[0].substr(itm[0].lastIndexOf('.')+1);
@@ -483,15 +559,20 @@ Breeze.namespace('global.uploader', function(B){
 						node = B.createElement(str);
 					B.$('#B_image_tile').appendChild(node);
 					B.addEvent(B.$('img', node), 'click', function(){
-						editor.pasteHTML(B.editor.ubb2attach('[attachment='+this.parentNode.parentNode.id.substr(12)+']'));
+						uploader.editor.pasteHTML(B.editor.ubb2attach('[attachment='+this.parentNode.parentNode.id.substr(12)+']'));
 					});
 					B.addEvent(B.$('a', node), 'click', uploader.deloldattach);
 					B.addEvent(B.$('input', node), 'mousedown', function(){
-						editor.saveRng();
+						uploader.editor.saveRng();
 					});
 				}
+				//动态加入的数据
 				for(var i in uploader.data){
+					if(uploader.data[i].length<1){
+						return false;
+					}
 					var itm = uploader.data[i],
+						desc=itm[7]||"",
 						ext = itm[2].substr(itm[2].lastIndexOf('.')+1);
 					if (['jpg', 'gif', 'png', 'jpeg', 'bmp'].indexOf(ext.toLowerCase()) < 0){
 						continue;
@@ -507,18 +588,22 @@ Breeze.namespace('global.uploader', function(B){
 								<div style="width: 100%;"></div>\
 							</div>\
 							<div class="B_file_ip">\
-								<input type="text" name="flashatt[' + i + '][desc]">\
+								<input type="text" name="flashatt[' + i + '][desc]" value="'+desc+'">\
 							</div>\
 						</li>',
 						node = B.createElement(str);
 					B.$('#B_image_tile').appendChild(node);
 					B.addEvent(B.$('.B_del', node), 'click', uploader.del);
 					B.addEvent(B.$('img', node), 'click', function(){
-						editor.pasteHTML('<img src="'+this.src+'"/>');
+						uploader.editor.pasteHTML(B.editor.ubb2attach('[attachment='+this.parentNode.parentNode.id.substr(12)+']'));
 					});
 					B.addEvent(B.$('input', node), 'mousedown', function(){
-						editor.saveRng();
+						uploader.editor.saveRng();
 					});
+					//描述
+					(function(obj,data){
+						uploader.showDesc(obj,data);
+					})(B.$('input', node),itm)
 				}
 				uploader.picStatus = true;
 				uploader.setAllowFileType(B.$('#image_allow_filetype'), imageConfig.filetype);

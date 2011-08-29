@@ -80,11 +80,18 @@ if (!$adminjob) {
 }
 
 function managerRight($adminjob) {
-	return If_manager && in_array($adminjob,array('rightset','manager','ystats','diyoption','optimize','modepage','sphinx','app','ajaxhandler'));
+	return If_manager && in_array($adminjob,array('rightset','manager','ystats','diyoption','optimize','modepage','sphinx','ajaxhandler'));
 }
 function adminRight($adminjob,$admintype){
+	list($adminjob,$admintype) = checkAdmintype($adminjob,$admintype);
 	$temp = $admintype ? $admintype : $adminjob;
 	return adminRightCheck($temp);
+}
+function checkAdmintype($adminjob,$admintype) {
+	if ($adminjob == 'app' && in_array($admintype,array('open','close'))) {
+		return array($adminjob,'onlineapp');
+	}
+	return array($adminjob,$admintype);
 }
 function getdirname($path=null){
 	if (!empty($path)) {

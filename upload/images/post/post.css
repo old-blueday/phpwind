@@ -20,7 +20,7 @@
 
 /*h*/
 .w_title_ip{float:left;height:25px;line-height:25px;}
-.w_title_ip input{width:340px;float:left;border:0;background:#fff;padding:0 5px;font:14px Arial;vertical-align:middle;margin-top:5px;}
+.w_title_ip input{width:340px;float:left;border:0;background:#fff;padding:0 5px; font-size:14px;vertical-align:middle;margin-top:5px;}
 .w_title_ip i{float:left;margin:0 2px 0;*margin-top:3px;}
 .w_input_text{font-style:normal;line-height:18px;padding:0 4px;color:#fff;margin-left:10px; position:absolute;right:-1px;bottom:25px;background:#ff0000;}
 
@@ -47,10 +47,7 @@
 .w_editor_up .w_tab_a .none_css a:hover{background-color:#f8f8f8;color:#3366cc;}
 .w_editor_up .w_tab_a .none_css .wy_tips:hover{color:#666;}
 
-.wy_tips{background:url(c_editor/w_edit_but.png) right center no-repeat;float:left;}
-.wy_tips i{display:none;}
-.wy_tips:hover{color:#333;_position:relative;text-decoration:none;}
-.wy_tips:hover i{display:block; position:absolute;border:1px solid #f8ad48;background:#fffeed;padding:5px 8px;color:#333;font-style:normal;line-height:150%;word-break:keep-all;word-wrap:no-wrap;}
+
 
 .w_editor_up .w_tab_a .current a{background:#fff;border-bottom:none;color:#333;padding-bottom:1px;}
 .w_editor_up_con{background-color:#ffffff;padding:10px;border-top:1px solid #ddd;}

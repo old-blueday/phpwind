@@ -66,7 +66,7 @@ class AttUpload extends uploadBehavior {
 		if ($this->post->user['uploadtime'] < $GLOBALS['tdtime']) {
 			$this->post->user['uploadnum'] = 0;
 		}
-		if (($this->post->user['uploadnum'] + count($_FILES) + count($this->flashatt)) > $this->post->_G['allownum']) {
+		if ($this->post->_G['allownum'] > 0 && ($this->post->user['uploadnum'] + count($_FILES) + count($this->flashatt)) > $this->post->_G['allownum']) {
 			Showmsg('upload_num_error');
 		}
 		if ($this->post->_G['allowupload'] == 1 && $this->uploadmoney) {
@@ -169,9 +169,10 @@ class AttUpload extends uploadBehavior {
 	}
 
 	function getThumbInfo($filename, $dir) {
+		global $db_athumbtype;
 		return array(
 			array($filename, 'thumb/' . $dir, $this->thumbsize),
-			array($filename, 'thumb/mini/' . $dir, "200\t150\t1")
+			array($filename, 'thumb/mini/' . $dir, "200\t150\t$db_athumbtype")
 		);
 	}
 

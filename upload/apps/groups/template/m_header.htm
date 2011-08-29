@@ -7,21 +7,14 @@
 <meta name="generator" content="phpwind $wind_version" />
 <meta name="description" content="$metaDescription" />
 <meta name="keywords" content="$metaKeywords" />
-<!--[if IE 9 ]>
-<meta name="msapplication-task" content="name=网站首页; action-uri=$db_bbsurl; icon-uri=$db_bbsurl/favicon.ico" />
-<meta name="msapplication-task" content="name=个人中心; action-uri=$db_bbsurl/u.php; icon-uri=$db_bbsurl/images/ico/home.ico" />
-<meta name="msapplication-task" content="name=我的帖子; action-uri=$db_bbsurl/apps.php?q=article; icon-uri=$db_bbsurl/images/ico/post.ico" />
-<meta name="msapplication-task" content="name=消息中心; action-uri=$db_bbsurl/message.php; icon-uri=$db_bbsurl/images/ico/mail.ico" />
-<meta name="msapplication-task" content="name=我的设置; action-uri=$db_bbsurl/profile.php; icon-uri=$db_bbsurl/images/ico/edit.ico" />
-<![endif]-->
 <base id="headbase" href="$db_bbsurl/" />
-<link rel="stylesheet" href="$imgpath/pw_core.css" />
-<link rel="stylesheet" href="$imgpath/toolbar.css" />
-<link rel="stylesheet" href="$imgpath/g/g_style.css" />
-<link rel="stylesheet" id="change2" href="$imgpath/g/{$colony[colonystyle]}/style.css" />
-<script type="text/javascript" language="JavaScript" src="js/core/core.js"></script>
-<script type="text/javascript" language="JavaScript" src="js/pw_ajax.js"></script>
-<script language="JavaScript">
+<link rel="stylesheet" href="$imgpath/pw_core.css?{$GLOBALS['wind_repair']}" />
+<link rel="stylesheet" href="$imgpath/toolbar.css?{$GLOBALS['wind_repair']}" />
+<link rel="stylesheet" href="$imgpath/g/g_style.css?{$GLOBALS['wind_repair']}" />
+<link rel="stylesheet" id="change2" href="$imgpath/g/{$colony[colonystyle]}/style.css?{$GLOBALS['wind_repair']}" />
+<script type="text/javascript" src="js/core/core.js"></script>
+<script type="text/javascript" src="js/pw_ajax.js"></script>
+<script>
 var imgpath = '$imgpath';
 var verifyhash = '$verifyhash';
 var modeimg = '$pwModeImg';
@@ -49,6 +42,13 @@ function resizeImg(ele){
 		}
 }
 </script>
+<!--[if IE 9 ]>
+<meta name="msapplication-task" content="name=网站首页; action-uri=$db_bbsurl; icon-uri=favicon.ico" />
+<meta name="msapplication-task" content="name=个人中心; action-uri=u.php; icon-uri=images/ico/home.ico" />
+<meta name="msapplication-task" content="name=我的帖子; action-uri=apps.php?q=article; icon-uri=images/ico/post.ico" />
+<meta name="msapplication-task" content="name=消息中心; action-uri=message.php; icon-uri=images/ico/mail.ico" />
+<meta name="msapplication-task" content="name=我的设置; action-uri=profile.php; icon-uri=images/ico/edit.ico" />
+<![endif]-->
 </head>
 <body onKeyDown="try{keyCodes(event);}catch(e){}">
 $msgsound
@@ -161,44 +161,25 @@ if ($winduid) {
 $db_menuinit .= ",'td_mymenu' : 'menu_mymenu'";
 print <<<EOT
 -->
-				<div id="td_mymenu">我的快捷通道</div>
-				<div id="menu_mymenu" class="pw_menu" style="display:none;">
-					<ul class="menuList" style="width:98px;">
+				<div id="td_mymenu">快捷通道</div>
+				<div id="menu_mymenu" style="display:none;">
+				<div id="fast_menu" class="pw_menu">
+					<ul class="menuList cc">
+						<li><a href="apps.php?q=article"><img src="u/images/icon/posts.png" alt="帖子" />帖子</a></li>
+						<li><a href="apps.php?q=medal"><img src="u/images/icon/medal.png" alt="勋章" />勋章</a></li>
+						<li><a href="u.php?a=friend"><img src="u/images/icon/friend.png" alt="关注" />关注</a></li>
+						<li><a href="jobcenter.php"><img src="u/images/icon/jobcenter.png" alt="任务" />任务</a></li>
 <!--
 EOT;
-if ($db_modes['o']['ifopen']) {print <<<EOT
+if ($db_ifkmd) {print <<<EOT
 -->
-						<li><a href="u.php" target="_blank"><img src="$imgpath/user-home.png" alt="空间" />个人中心</a></li>
-<!--
-EOT;
-}print <<<EOT
--->
-						<li><a href="apps.php?q=weibo"><img src="u/images/icon/record.png" alt="新鲜事" />我的新鲜事</a></li>
-<!--
-EOT;
-if ($db_dopen) {print <<<EOT
--->
-						<li><a href="apps.php?q=diary"><img src="u/images/icon/log.png" alt="日志" />我的日志</a></li>
-<!--
-EOT;
-}if ($db_phopen) {print <<<EOT
--->
-						<li><a href="apps.php?q=photos"><img src="u/images/icon/albums.png" alt="相册" />我的相册</a></li>
-<!--
-EOT;
-}print <<<EOT
--->
-						<li><a href="apps.php?q=article"><img src="u/images/icon/posts.png" alt="帖子" />我的帖子</a></li>
-<!--
-EOT;
-if ($db_groups_open) {print <<<EOT
--->
-						<li><a href="apps.php?q=groups"><img src="u/images/icon/groups.png" alt="群组" />我的群组</a></li>
+						<li><a href="apps.php?q=kmd&a=help"><img src="u/images/icon/kmd.png" alt="孔明灯" />孔明灯</a></li>
 <!--
 EOT;
 }print <<<EOT
 -->
 					</ul>
+				</div>
 				</div>
 <!--
 EOT;
@@ -360,7 +341,7 @@ print <<<EOT
 -->
 		</div>
 
-<script language="javascript">
+<script>
 var timeoutSpecifyId = {};
 
 function tmpClose(elementId) {
@@ -404,7 +385,7 @@ function ctrlSubMenu(parentId, subMenuId) {
 	        	<input type="hidden" value="$verifyhash" name="verify">
 	            <input value="2" type="hidden" name="step">
 	            <input value="thread" type="hidden" id="search_type" name="type">
-	            <div class="ip"><input id="search_input" type="text" value="搜索其实很简单！ (^_^)" class="gray" name="keyword" onFocus="searchFocus(this)" onBlur="searchBlur(this)" /></div>
+	            <div class="ip"><input id="search_input" type="text" value="搜索其实很简单！" class="gray" name="keyword" onFocus="searchFocus(this)" onBlur="searchBlur(this)" /></div>
 	            <div class="s_select" onMouseOut="this.firstChild.style.display='none';" onMouseOver="this.firstChild.style.display='block';"><ul onClick="getSearchType(event)"><li type="thread" style="display:none">帖子</li><li type="diary">日志</li><li type="user">用户</li><li type="forum">版块</li><li type="group">群组</li></ul><h6>帖子</h6></div>
 	            <button type="submit" class="fl cp">搜索</button>
             </form>
@@ -480,7 +461,7 @@ EOT;
 if($a == 'thread') {print<<<EOT
 -->
 			<span class="btn_add2 fr" style="margin:-5px 0 0 0;_position:relative;"><span><button type="button" onClick="checkPostRight();">发表话题</button></span></span>
-<SCRIPT LANGUAGE="JavaScript">
+<script>
 function checkPostRight() {
 	ajax.send('apps.php?q=group&a=checkpostright&cyid=$cyid','',function(){
 		if (ajax.request.responseText == 'ok'){
@@ -490,7 +471,7 @@ function checkPostRight() {
 		}
 	});
 }
-</SCRIPT>
+</script>
 <!--
 EOT;
 } else {
@@ -536,7 +517,7 @@ EOT;
 			</ul>
 		</div>
 		<div class="c"></div>
-<script language="JavaScript">
+<script>
 if(is_webkit)
 	getObj('bookmarkExplore').parentNode.removeChild(getObj('bookmarkExplore'));
 var copyurl = '';

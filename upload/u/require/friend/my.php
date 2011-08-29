@@ -116,8 +116,9 @@ if ($type == 'attention') {
 	$friendsAllUids = getFriendsIdArr($winduid);
 
 	if ($step == 2) {
-		S::gp(array('f_keyword'));
+		S::gp(array('f_keyword', 'decode'));
 		!isset($f_keyword) && Showmsg('pse_input_keyword');
+		$decode && $f_keyword = pwConvert($f_keyword, $db_charset, 'utf8');
 
 		if($according && !in_array($according,array('user','uid','email','tags'))){
 			showMsg("抱歉,搜索类型不存在");

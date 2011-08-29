@@ -9,7 +9,7 @@
 function()
 {
 	var IE6=navigator.userAgent.indexOf("MSIE 7.0")==-1&&navigator.userAgent.indexOf("MSIE 8.0")==-1&&navigator.userAgent.indexOf("MSIE 6.0")>0;
-	var $ = function(s)
+	var getObj = function(s)
     {
         return document.getElementById(s);
     };
@@ -26,22 +26,22 @@ function()
         var _this = this;
 		this.direct=this.direct||"up";
 		PW.Menu.all["startMenu"]=this;
-		$('startMenu').onmousedown=function(){event.cancelBubble=true;};
-        $('startMenu').onclick = function()
+		getObj('startMenu').onmousedown=function(){event.cancelBubble=true;};
+        getObj('startMenu').onclick = function()
         {
-        	if($('startPP')){
+        	if(getObj('startPP')){
         		startPanelShow.remove();
 				startPanelShow=0;
-				$('startMenu').clicked=false;
+				getObj('startMenu').clicked=false;
         		return false;
         	}
         	killMenu();/*删除左侧菜单*/
         	PW.setCurrent();/*设置当前*/
-			if($('startPP')&&$('startPP').style.display=='')
+			if(getObj('startPP')&&getObj('startPP').style.display=='')
 			{
 				startPanelShow.remove();
 				startPanelShow=0;
-				$('startMenu').clicked=false;
+				getObj('startMenu').clicked=false;
 				return
 			}
             var p = new PW.WPanel({
@@ -49,7 +49,7 @@ function()
 				direct:_this.direct
 			});
 
-			$('startMenu').clicked=true;
+			getObj('startMenu').clicked=true;
 			//var topFix=0;
 			//var hat="<div class=footStartPanel style='font-size:1px;line-height:16px;"+(IE6?"margin-top:"+topFix+";width:100%":"")+"'>&nbsp;</div>";
 			//var upDown={up:[hat,""],down:["",hat]};
@@ -57,7 +57,7 @@ function()
 			
 			var html = '<div class="startmenu pr"><ul>'+desk.list.simple(_this.items, _this.module, '')+'</ul><h2><a onclick="getObj(\'startPP\').style.display=\'none\';startPanelShow.remove();" class="del_img fr" href="javascript:;">关闭</a>常用功能项</h2></div>';
 			
-			p.render($('startMenu')).setHTML(html).onclick(function()
+			p.render(getObj('startMenu')).setHTML(html).onclick(function()
             {
 				if(this.url=="loginout")
 				{
@@ -84,9 +84,9 @@ function()
 			
 			_this.remove=function(){
 				startPanelShow=0;
-				$('startMenu').clicked=false;
+				getObj('startMenu').clicked=false;
 				p.remove();
-				$('startPanelImg')?$('startPanelImg').src='js/desktop/images/start.png':0;};
+				getObj('startPanelImg')?getObj('startPanelImg').src='js/desktop/images/start.png':0;};
 			_this.element=p.element;
         };
 

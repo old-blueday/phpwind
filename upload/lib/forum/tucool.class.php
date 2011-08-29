@@ -46,8 +46,8 @@ class PW_Tucool {
 		$threadService->setTpcStatusByThreadId($fieldData['tid'],5);
 		//set cover
 		$attachService = L::loadClass('attachs', 'forum'); /* @var $attachService PW_Attachs */
-		$cover = $attachService->getLatestAttachByTidType($fieldData['tid']);
-		$cover && $this->setCover($fieldData['tid'],$cover);
+		$coverInfo = $attachService->getLatestAttachInfoByTidType($fieldData['tid']);
+		$coverInfo && $this->setCover($fieldData['tid'],$coverInfo['attachurl'],$coverInfo['ifthumb']);
 		return true;
 	}
 	
@@ -274,11 +274,11 @@ class PW_Tucool {
 		return $tucoolDao->getTucoolThreadsByTids ($tids);
 	}
 	
-	function setCover($tid,$cover) {
+	function setCover($tid,$cover,$ifthumb) {
 		$tid = intval($tid);
 		if ($tid < 1) return false;
 		$tucoolDao = $this->_getTucoolDB();
-		$tucoolDao->update(array('cover'=> $cover),$tid);
+		$tucoolDao->update(array('cover'=>$cover,'ifthumb'=>$ifthumb),$tid);
 		return true;
 	}
 

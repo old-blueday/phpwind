@@ -1,0 +1,55 @@
+<!--<?php
+defined('W_P') or exit('Forbidden');print <<<EOT
+-->
+<div class="block"> <strong>个人资料</strong><br />
+	UID:   	$userdb[uid]<br />
+	用户名: $userdb[username]<br />
+	性别:	$userdb[gender]<br/>
+</div>
+<div class="block"> <strong>个人积分</strong><br />
+  {$credit->cType[rvrc]}:$userdb[rvrc] {$credit->cUnit[rvrc]} <br/>
+  {$credit->cType[money]}:$userdb[money] {$credit->cUnit[money]} <br/>
+  {$credit->cType[credit]}:$userdb[credit] {$credit->cUnit[credit]} <br/>
+  {$credit->cType[currency]}:$userdb[currency] {$credit->cUnit[currency]} <br/>
+  	综合积分:$totalcredit </div>
+  <div class="block"> <strong>详细信息</strong><br />
+    生日 : $userdb[bday]<br />
+    精华帖子 : $userdb[digests] <br />
+    发帖数量 : $userdb[postnum] <br />
+    今日发帖 : $userdb[todaypost] <br />
+    Email :  $userdb[email] <br />
+    在线时间 : $userdb[onlinetime]小时 <br />
+    注册时间 : $userdb[regdate] <br />
+<!--
+EOT;
+if($db_md_ifopen){print <<<EOT
+-->
+    	所获勋章:
+<!--
+EOT;
+    if($userdb['medals']){
+        foreach($userdb['medals'] as $value){
+            if($_MEDALDB[$value]){
+                print <<<EOT
+-->
+							<img src="../{$_MEDALDB[$value][smallimage]}" alt="{$_MEDALDB[$value][name]}" />
+<!--
+EOT;
+                }
+        }
+    }else{print <<<EOT
+-->
+								该用户还没有获得勋章
+<!--
+EOT;
+        }print <<<EOT
+-->
+    <br/>
+<!--
+EOT;
+    }print <<<EOT
+-->
+  最后登录 :   $userdb[lastvisit] </div>
+<!--
+EOT;
+?>-->

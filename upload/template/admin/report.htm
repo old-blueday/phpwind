@@ -1,6 +1,6 @@
 <!--<?php
 include_once PrintEot('left');
-if ($adminitem == 'content') {
+if ($admintype == 'reportcontent') {
 if (empty($action)) {print <<<EOT
 -->
 <div class="nav3 mb10 ta">
@@ -135,7 +135,7 @@ EOT;
 EOT;
 }print <<<EOT
 -->
-<script language="JavaScript">
+<script type="text/javascript">
 var basename = '$basename';
 function report_jump(type,action){
 	if (!action) {
@@ -148,11 +148,9 @@ function report_jump(type,action){
 </script>
 <!--
 EOT;
-}elseif ($adminitem == 'remind') {
+}elseif ($admintype == 'reportremind') {
 print <<<EOT
 -->
-<script type="text/javascript" language="JavaScript" src="js/global.js"></script>
-<script type="text/javascript" language="JavaScript" src="js/pw_ajax.js"></script>
 <div class="admin_info mb10">
 	<h2 class="h1">功能说明</h2>
 	<div class="legend">
@@ -215,7 +213,7 @@ print <<<EOT
 </div>
 <input type="hidden" name="isempty" id="isempty" value="$isEmpty" />
 </form>
-<script language="JavaScript">
+<script type="text/javascript">
 var basename = '$basename';
 var db_userurl = '$db_userurl';
 function showInput() {

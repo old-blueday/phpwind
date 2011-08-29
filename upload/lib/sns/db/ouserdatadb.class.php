@@ -28,6 +28,12 @@ class PW_OuserdataDB extends BaseDB {
 		return $this->_getAllResultFromQuery($qurey);
 	}
 
+	function findUserAtPrivacy($userIds) {
+		$qurey = $this->_db->query(" SELECT uid,at_isfeed FROM ".$this->_tableName . 
+				" WHERE uid " . $this->_parseSqlIn($userIds));
+		return $this->_getAllResultFromQuery($qurey);
+	}
+	
 	function findUserPhotoPrivacy($userIds) {
 		if(empty($userIds) || !is_array($userIds)){
 			return array();

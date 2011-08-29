@@ -1,14 +1,14 @@
-.login_tips{position:absolute;width:100%;z-index:1;text-align:center;height:171px;line-height:171px;background:#fff;border:1px solid;border-color:#aaa #ddd #ddd #aaa;}
-.fp_show{padding:10px;}
-.fp_show_tab .tab_right,.fp_show_tab .tab_left{display:block;border-top:5px transparent dotted;border-bottom:5px transparent dotted;width:0;height:0;overflow:hidden;padding:0; cursor:pointer;}
-.fp_show_tab .tab_right{border-right:5px transparent dotted;border-left:5px #6f6f6f solid;margin:5px 0 0 5px;float:right;}
-.fp_show_tab .tab_left{border-left:5px transparent dotted;border-right:5px #6f6f6f solid;margin:5px 5px 0 0;float:left;}
+.login_tips{position:absolute;width:100%;z-index:1;text-align:center;height:173px;line-height:171px;background:#fff;border:1px solid;border-color:#aaa #ddd #ddd #aaa;}
+.fp_show{padding:10px 10px 10px 0;}
+.fp_show_tab .tab_right,.fp_show_tab .tab_left{display:block;border-top:5px transparent dashed;border-bottom:5px transparent dashed;width:0;height:0;overflow:hidden;padding:0; cursor:pointer;}
+.fp_show_tab .tab_right{border-right:5px transparent dashed;border-left:5px #6f6f6f solid;margin:5px 0 0 5px;float:right;}
+.fp_show_tab .tab_left{border-left:5px transparent dashed;border-right:5px #6f6f6f solid;margin:5px 5px 0 0;float:left;}
 .fp_show_tab{height:22px;}
 .fp_show_tab ul{height:22px;_position:relative;_margin-bottom:-1px;white-space:nowrap;}
 .fp_show_tab li{float:left;margin-left:-1px;_position:relative;}
-.fp_show_tab li a{border:1px solid #d7d7d7;line-height:21px;height:21px;padding:0 10px;display:block;float:left;background:url(fp_editor_bg.png) 0 center repeat-x; white-space:nowrap;}
+.fp_show_tab li a{border:1px solid #d7d7d7;line-height:21px;height:21px; text-align:center;display:block;float:left;width:65px;background:url(fp_editor_bg.png) 0 center repeat-x; white-space:nowrap;}
 .fp_show_tab li a:hover{ text-decoration:none;color:#336699;}
-.fp_show_tab .current a{border-bottom:0;padding:0 10px 1px;background:#fff;}
+.fp_show_tab .current a{border-bottom:0;padding:0 0 1px;background:#fff;}
 .fp_show_cont{border:1px solid #d7d7d7;}
 .fp_show_cont ul{padding:5px 0 0 5px;height:205px;}
 .fp_show_cont li{float:left;width:50px;margin:0 3px 0 2px;display:inline;height:50px;overflow:hidden;}

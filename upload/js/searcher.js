@@ -127,9 +127,9 @@ var searcher = {
 	},
 	
 	searchSubmit : function (){
-		if(this.start > 0){
+		//if(this.start > 0){
 			this.$("searchform").submit();
-		}
+		//}
 		this.start++;
 	},
 	

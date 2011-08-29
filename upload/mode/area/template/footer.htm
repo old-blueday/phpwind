@@ -1,4 +1,5 @@
-<!--<?php print <<<EOT
+<!--<?php
+print <<<EOT
 -->
 </div>
 <div class="footer-wrap">
@@ -14,28 +15,33 @@ if($htmlAdvert){print <<<EOT
 EOT;
 }print <<<EOT
 -->
-<div class="c"></div>
 <div id="footer">
-<div id="mode-footer" class="mt">
-	<div class="bottom tac footNav">
-		<ul>
+	<div class="mb5">
+	<div class="bottom tac">
 <!--
 EOT;
-
+if(count($_Navbar['foot'])){
+	print <<<EOT
+-->
+<!--
+EOT;
 foreach($_Navbar['foot'] as $key => $value){
 	$html = buildNavLinkHtml($value['data']);
 print <<<EOT
--->
-			<li>$html</li>
+--><span class="mr10">$html</span><span class="gray mr10">|</span><!--
+EOT;
+};
+print <<<EOT
+--><a href="job.php?action=erasecookie&verify=$GLOBALS[loginhash]">清除Cookies</a>
 <!--
 EOT;
-}print <<<EOT
+};
+print <<<EOT
 -->
-		</ul>
 	</div>
-	<div id="footInfo" class="tac">
-	Powered by <a href="http://www.phpwind.net/" target="_blank">phpwind</a> <a href="http://www.phpwind.net/" target="_blank" class="s1">v$wind_version</a> <a href="http://www.phpwind.com/certificate.php?host={$pwServer['HTTP_HOST']}">Certificate</a> <span id="windspend">$db_icp</span><br />
- Code &copy;2003-2011 <a href="http://www.phpwind.com/" target="_blank">phpwind.com</a> Corporation <span id="stats"></span>$db_statscode
+	</div>
+	<div class="f10 s6 tac">
+		<p class="mb5" id="footInfo">Powered by <a href="http://www.phpwind.net/" target="_blank" class="s4">phpwind v{$wind_version}</a>&nbsp;<a href="http://www.phpwind.com/certificate.php?host={$pwServer['HTTP_HOST']}" target="_blank">Certificate</a> Copyright<br /> &copy;2003-2011 <a href="$db_bbsurl/" target="_blank">{$GLOBALS['db_bbsname']}</a> 版权所有 <a href="http://www.miibeian.gov.cn" target="_blank">$db_icp</a> $db_statscode <span id="stats"></span>
 <!--
 EOT;
 if($db_ystats_ifopen=='0'){print <<<EOT
@@ -48,21 +54,27 @@ if($db_ystats_ifopen=='0'){print <<<EOT
 EOT;
 }print <<<EOT
 -->
-	</div></div></div></div>
-<script language="JavaScript" src="js/global.js"></script>
+		</p>
+	</div>
+	</div></div>
+<script type="text/javascript" src="js/global.js"></script>
 <!--
 EOT;
 if($GLOBALS[ifEditAdmin] && !defined('AREA_STATIC')){
+$ifAdminview = (int) GetGP('adminview');
 print <<<EOT
 -->
-<script language="JavaScript" src="js/date.js"></script>
-<script language="JavaScript" src="mode/area/js/adminview.js"></script>
-<script language="javascript" src="mode/area/js/tagrelate.js"></script>
-<script language="JavaScript" src="js/color_picker.js"></script>
-<script language="JavaScript">
+<script type="text/javascript" src="js/date.js"></script>
+<script type="text/javascript" src="mode/area/js/adminview.js"></script>
+<script type="text/javascript" src="mode/area/js/tagrelate.js"></script>
+<script type="text/javascript" src="js/color_picker.js"></script>
+<script type="text/javascript">
 
 window.onReady(function () {
 	frontadmin = New(frontAdmin,['main','view-hover']);
+	//门户模块管理
+	var console=new ChannelManage($ifAdminview,av_url,av_alias,1);
+	console.init();
 });
 function pickReback(color){
 	getObj('color_show').style.backgroundColor = color;
@@ -104,9 +116,13 @@ EOT;
 }print <<<EOT
 -->
 </body></html>
-<script language="JavaScript">
+<script>
 var openmenu = {{$GLOBALS['db_menuinit']}};
-read.InitMenu();
+window.onReady(function(){
+	read.InitMenu();
+	//消息提示
+	new messageTip(90).init();
+});
 </script>
 
 <!--
@@ -114,7 +130,7 @@ EOT;
 if($GLOBALS['groupid'] != 'guest' && $GLOBALS['groupid'] != '' && $GLOBALS['db_toolbar']){print <<<EOT
 -->
 <!--[if IE 6]>
-<!--SCRIPT type="text/javascript" LANGUAGE="JavaScript" src="js/core/bottomforie6.js"></SCRIPT-->
+<!--SCRIPT type="text/javascript" src="js/core/bottomforie6.js"></SCRIPT-->
 <![endif]-->
 <!--
 EOT;

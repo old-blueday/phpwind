@@ -73,15 +73,15 @@ function getPosition($cid, $id = 0, $columns = array(), $cms_sitename = '') {
 		$columnService = C::loadClass('columnservice');
 		$columns = $columnService->findAllColumns();
 	}
-	$postion = $cms_sitename ? "<a href='index.php?m=cms'>$cms_sitename</a>":'<a href="index.php?m=cms">首页</a>';
-	if (!$cid) {return $postion . '&gt; 文章列表';}
+	$postion = $cms_sitename ? "<a href='index.php?m=cms'>$cms_sitename</a>":'<a href="index.php?m=cms">资讯</a>';
+	if (!$cid) {return $postion . '<em>&gt;</em>文章列表';}
 	$columnLists = getColumnList($columns, $cid);
 
 	foreach ($columnLists as $value) {
-		$postion .= '&gt; <a href="' . getColumnUrl($value['column_id']) . '">' . $value['name'] . '</a> ';
+		$postion .= '<em>&gt;</em><a href="' . getColumnUrl($value['column_id']) . '">' . $value['name'] . '</a>';
 	}
 	if (!$id) {return $postion;}
-	return $postion . '> 正文内容';
+	return $postion . '<em>&gt;</em>正文内容';
 }
 
 /**
@@ -141,6 +141,12 @@ function updateArticleHits() {
 		}
 		pwCache::deleteData($hitfile);
 	}
+}
+
+function checkReplyPurview() {
+	global $_G,$windid;
+	if (isGM($windid) || (isset($_G['cms_replypost']) && $_G['cms_replypost'])) return true;
+	return false;
 }
 
 class cmsTemplate {

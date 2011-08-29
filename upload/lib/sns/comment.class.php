@@ -66,10 +66,11 @@ class PW_Comment {
 		$userService = L::loadClass('UserService', 'user');
 		if($uid !== $weibos['uid']) $userService->updatesByIncrement($ruid, array(), array('newcomment' => 1));
 
-		//sinaweibo
-		if ($GLOBALS['db_sinaweibo_status'] && !$extra['isSinaComment']) {
-			$bindService = L::loadClass('WeiboBindService', 'sns/weibotoplatform'); /* @var $bindService PW_WeiboBindService */
-			if ($bindService->isLocalBind($uid, PW_WEIBO_BINDTYPE_SINA)) {
+		//platform weibo app
+		$siteBindService = L::loadClass('WeiboSiteBindService', 'sns/weibotoplatform/service'); /* @var $siteBindService PW_WeiboSiteBindService */
+		if ($siteBindService->isOpen() && !$extra['noSync']) {
+			$userBindService = L::loadClass('WeiboUserBindService', 'sns/weibotoplatform/service'); /* @var $userBindService PW_WeiboUserBindService */
+			if ($userBindService->isBindOne($uid)) {
 				unset($comment['extra']);
 				$syncer = L::loadClass('WeiboSyncer', 'sns/weibotoplatform'); /* @var $syncer PW_WeiboSyncer */
 				$syncer->sendComment($cid, $comment);
@@ -205,6 +206,16 @@ class PW_Comment {
 		$cmrelationsDao = L::loadDB('weibo_cmrelations','sns');
 		$cmrelationsDao->deleteCmRelationsByCids($cids);
 		return true;
+	}
+	
+	function checkCommentAuthor($cid,$uid=0){
+		$cid = intval($cid);
+		$uid = intval($uid);
+		$uid < 1 && $uid = $GLOBALS['winduid'];
+		$commentDao = L::loadDB('weibo_comment','sns');
+		$comment = $commentDao->get($cid);
+		if (!$comment) return false;
+		return $comment['uid'] == $uid;
 	}
 	/**
 	 * 删除某新鲜事下面所有的评论

@@ -19,7 +19,7 @@ Breeze.namespace('app.emotional', function (B) {
 	        id: 'breeze-emotional',
 	        load: function () {
 	            B.require('dom', 'event', function (B) {
-					var contain = B.createElement('<div class="B_menu B_p10B" id="' + emotionalSelector.id + '" style="display:none"></div>'),
+					var contain = B.createElement('<div class="B_menu B_p10B" id="' + emotionalSelector.id + '" style="display:none;z-index:2999"></div>'),
 					outer = B.createElement('<div style="width:271px"></div>'),
 					nav = B.createElement('<div class="B_menu_nav B_cc B_drag_handle"></div>'),
 					closeButton = B.createElement('<a style="margin-top: 7px;" class="B_menu_adel" href="javascript:;">×</a>'),

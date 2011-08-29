@@ -15,7 +15,7 @@ $removeNode=function(htmlElement)
  *根据ID获取节点对象
  *@param String id 节点id
  */
-$ = function(id) 
+getObj = function(id) 
 {
     return document.getElementById(id);
 };

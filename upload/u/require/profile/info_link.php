@@ -52,7 +52,9 @@ if (!$_POST['step']) {
 	//update customerfield data
 	$customfieldService = L::loadClass('CustomerFieldService', 'user'); /* @var $customfieldService PW_CustomerFieldService */
 	$customfieldService->saveProfileCustomerData('contact');
-	
+	// defend start	
+	CloudWind::yunUserDefend('editprofile', $winduid, $windid, $timestamp, 0, 101,'','','',array('profile'=>'updatelink'));
+	// defend end
 	//job sign
 	initJob($winduid,"doUpdatedata");
 	refreshto("profile.php?action=modify&info_type=$info_type",'operate_success',2,true);

@@ -7,7 +7,6 @@ pwCache::getData(D_P . 'data/bbscache/cache_thread.php');
 
 S::gp(array('cyid'), '', 2);
 S::gp(array('search','topicsearch','searchname'));
-
 if ($cyid) {
 	!$db_groups_open && Showmsg('groups_close');
 	S::gp(array('showtype'));
@@ -150,7 +149,7 @@ if ($foruminfo['forumadmin']) {
 		if ($value) {
 			if (!$db_adminshow) {
 				if ($key==10) {$admin_T['admin'].='...'; break;}
-				$admin_T['admin'] .= '<a href="u.php?username='.rawurlencode($value).'" class="s7">'.$value.'</a> ';
+				$admin_T['admin'] .= '<a href="u.php?username='.rawurlencode($value).'" target="_blank" class=" _cardshow" data-card-url="pw_ajax.php?action=smallcard&type=showcard&username='.rawurlencode($value).'" data-card-key='.$value.'>'.$value.'</a> ';
 			} else {
 				$admin_T['admin'] .= '<option value="'.$value.'">'.$value.'</option>';
 			}
@@ -175,7 +174,7 @@ $orderClass = array();//排序
 S::gp(array('subtype','search','orderway','asc','topicsearch'));
 S::gp(array('page','modelid','pcid','special','actmid','allactmid','allpcid','allmodelid'),'GP',2);
 
-($orderway && $asc == "DESC") ? $orderClass[$orderway] = "class='link_down current'" : (($search == 'img') ? $orderClass['tid'] = "class='link_down current'" : $orderClass['lastpost'] = "class='link_down current'");
+($orderway && $asc == "DESC") ? $orderClass[$orderway] = "class='s6 current'" : (($search == 'img') ? $orderClass['tid'] = "class='s6 current'" : $orderClass['lastpost'] = "class='s6 current'");
 
 $searchadd = $thread_children = $thread_online = $fastpost = '';
 
@@ -207,7 +206,9 @@ if ($foruminfo['aid']) {
 	require_once(R_P.'require/bbscode.php');
 	$foruminfo['rawauthor'] = rawurlencode($foruminfo['author']);
 	$foruminfo['startdate'] = get_date($foruminfo['startdate']);
-	$foruminfo['content'] = convert(str_replace(array("\n","\r\n"),'<br />',$foruminfo['content']),$db_windpost,'post');
+	$announcement = $db_windpost;
+	$announcement['picwidth'] = $db_threadsidebarifopen ? '800' : '910';
+	$foruminfo['content'] = convert(str_replace(array("\n","\r\n"),'<br />',$foruminfo['content']),$announcement,'post');
 }
 if (strpos($_COOKIE['deploy'],"\tthread\t")===false) {
 	$thread_img	 = 'fold';
@@ -412,11 +413,12 @@ $urlall	 = $threadBehavior->getUrlall();
 $urladd	 = $threadBehavior->getUrladd();
 $pageUrl = "thread.php?" . ($cyid ? "cyid=$cyid" : "fid=$fid");
 $pages	 = numofpage($count, $page, $numofpage, "{$pageUrl}{$urladd}{$viewbbs}&", $db_maxpage);
-
+require_once(R_P.'require/updateforum.php');
+	
 $threaddb = $threadBehavior->getThread($start_limit, !$theSpecialFlag);
 
 // 同步pw_hits_threads数据到pw_threads, 进行该操作的概率是1/100
-if ($db_hits_store == 1 &&  $timestamp % 100 == 0){
+if ($db_hits_store == 1 && $timestamp % 100 == 0){
 	$_tids = array();
 	foreach ($threaddb as $_threads){
 		$_tids[] = $_threads['tid'];
@@ -432,7 +434,7 @@ if ($db_hits_store == 1 &&  $timestamp % 100 == 0){
 //获取列表是否新窗打开的cookie
 $newwindows = $_COOKIE['newwindows'];
 $tucoolnewwindows = $_COOKIE['tucoolnewwindows'];
-$isAuthStatus = $isGM || ($pwforum->authStatus($winddb['userstatus']) === true);
+$isAuthStatus = $isGM || (!$forumset['auth_allowpost'] || $pwforum->authStatus($winddb['userstatus'],$forumset['auth_logicalmethod']) === true);
 //!$isAuthStatus && $N_allowtypeopen = false;
 if ($groupid != 'guest' && $db_threadshowpost == 1 && $_G['allowpost'] && $pwforum->allowpost($winddb,$groupid) && $isAuthStatus) {
 	$fastpost = 'fastpost';
@@ -480,6 +482,7 @@ if ($winddb['shortcut']) {
 if (defined('M_P') && file_exists(M_P.'thread.php')) {
 	require_once(M_P.'thread.php');
 }
+CloudWind::yunSetCookie(SCR,'',$fid);
 require_once PrintEot($threadBehavior->template);
 $noticecache = 900;
 $foruminfo['enddate'] && $foruminfo['enddate']<=$timestamp && $foruminfo['aidcache'] = $timestamp-$noticecache;
@@ -573,14 +576,15 @@ class baseThread {
 		$asc = $this->threadSearch->asc;
 		if ($allowtop) {
 			global $foruminfo,$db_perpage;
-			$rows = (int)($foruminfo['top2'] + $foruminfo['top1']);
+			$toptids = trim($foruminfo['topthreads'], ',');
+			$rows = count(explode(',', $toptids));
 			if ($start < $rows) {
 				$L = (int)min($rows - $start, $db_perpage);
 				$limit  = S::sqlLimit($start,$L);
 				$offset = 0;
 				$limit2 = $L == $db_perpage ? '' : $db_perpage - $L;
-				if ($toptids = trim($foruminfo['topthreads'], ',')) {
-					$query = $this->db->query("SELECT * FROM pw_threads WHERE tid IN($toptids) ORDER BY topped DESC,lastpost DESC $limit");
+				if ($rows && $toptids) {
+					$query = $this->db->query("SELECT * FROM pw_threads WHERE tid IN($toptids) ORDER BY specialsort DESC,lastpost DESC $limit");
 					while ($rt = $this->db->fetch_array($query)) {
 						$tpcdb[] = $rt;
 					}
@@ -641,7 +645,7 @@ class baseThread {
 		$this->analyseDataToCache($tpcdb);
 		$pwAnonyHide = $isGM || $pwSystem['anonyhide'];
 		$updatetop = 0;
-		$threaddb = $rewids = $cyids = array();
+		$threaddb = $rewids = $cyids = $replyReward = array();
 		$arrStatus = array(1 => 'vote', 2 => 'active', 3 => 'reward', 4 => 'trade', 5 => 'debate');
 		$attachtype	= array('1' => 'img', '2' => 'txt', '3' => 'zip');
 		foreach ($tpcdb as $key => $thread) {
@@ -653,17 +657,22 @@ class baseThread {
 				$thread['tpcurl'] = "$htmurl";
 			}
 			if ($thread['toolfield']) {
-				list($t,$e) = explode(',',$thread['toolfield']);
+				list($t,$e,$m) = explode(',',$thread['toolfield']);
 				$sqladd = '';
 				if ($t && $t<$timestamp) {
-					$sqladd .= ",toolinfo='',topped='0'";$t='';
+					$sqladd .= ",toolinfo='',specialsort=0,topped='0'";$t='';
 					$thread['topped']>0 && $updatetop=1;
 				}
 				if ($e && $e<$timestamp) {
 					$sqladd .= ",titlefont=''";$thread['titlefont']='';$e='';
 				}
+				if ($m && $m<$timestamp) {
+					$sqladd .= ",specialsort=0";$m='';
+					$kmdService = L::loadClass('kmdservice', 'forum');
+					$kmdService->initKmdInfoByTid($thread['tid']);
+				}
 				if ($sqladd) {
-					$thread['toolfield'] = $t.($e ? ','.$e : '');
+					$thread['toolfield'] = implode(',',array(0=>$t,1=>$e,2=>$m));
 					$this->db->update(pwQuery::buildClause("UPDATE :pw_table SET toolfield=:toolfield $sqladd WHERE tid=:tid", array('pw_threads', $thread['toolfield'], $thread['tid'])));
 					//* $threads = L::loadClass('Threads', 'forum');
 					//* $threads->delThreads($thread['tid']);
@@ -683,7 +692,7 @@ class baseThread {
 				$thread['subject'] = threadShield('shield_title');
 			}
 			if ($thread['ifmark']) {
-				$thread['ifmark'] = $thread['ifmark']>0 ? " <span class='gray tpage'>( +$thread[ifmark] )</span> " : " <span class='gray tpage w'>( $thread[ifmark] )</span> ";
+				$thread['ifmark'] = $thread['ifmark']>0 ? "<span class='gray tpage w'>&#xFF08;+$thread[ifmark]&#xFF09;</span>" : "<span class='gray tpage w'>&#xFF08;$thread[ifmark]&#xFF09;</span>";
 			} else {
 				unset($thread['ifmark']);
 			}
@@ -709,13 +718,14 @@ class baseThread {
 				$numofpage = ceil(($thread['topreplays']+$thread['replies']+1)/$db_readperpage);
 				$fpage = $page > 1 ? "&fpage=$page" : "";
 				$thread['ispage']=' ';
-				$thread['ispage'].=" <img src=\"$imgpath/$stylepath/file/multipage.gif\" align=\"absmiddle\" alt=\"pages\"> <span class=\"tpage\">";
+				$thread['ispage'].="&nbsp;<img src=\"$imgpath/$stylepath/file/multipage.gif\" align=\"absmiddle\" alt=\"pages\">&nbsp;<span class=\"tpage\">";
 				for($j=1; $j<=$numofpage; $j++) {
 					if ($j==6 && $j+1<$numofpage) {
 						$thread['ispage'].=" .. <a href=\"read.php?tid=$thread[tid]$fpage&page=$numofpage\">$numofpage</a>";
 						break;
 					} elseif ($j == 1) {
-						$thread['ispage'].=" <a href=\"read.php?tid=$thread[tid]$fpage\">$j</a>";
+						$thread['ispage'].="";
+		//				$thread['ispage'].=" <a href=\"read.php?tid=$thread[tid]$fpage\">$j</a>";
 					} else {
 						$thread['ispage'].=" <a href=\"read.php?tid=$thread[tid]$fpage&page=$j\">$j</a>";
 					}
@@ -770,6 +780,11 @@ class baseThread {
 			if (getstatus($thread['tpcstatus'], 1)) {
 				$cyids[] = $thread['tid'];
 			}
+			
+			if (getstatus($thread['tpcstatus'], 8)) {
+				$replyReward[] = $thread['tid'];
+			}
+			
 			$threaddb[$thread['tid']] = $thread;
 		}
 
@@ -842,6 +857,15 @@ class baseThread {
 				}
 			}
 		}
+		
+		if ($replyReward) {
+			$replyRewardService = L::loadClass('ReplyReward', 'forum');/* @var $replyRewardService PW_ReplyReward */
+			$replyRewardInfos = $replyRewardService->getRewardByTids($replyReward);
+			foreach ($replyRewardInfos as $value) {
+				$threaddb[$value['tid']]['replyrewardtip'] = '[回帖奖励' . intval($value['creditnum'] * $value['lefttimes']) . ']';
+			}
+		}
+
 		if ($updatetop) {
 			require_once(R_P.'require/updateforum.php');
 			updatetop();
@@ -948,9 +972,10 @@ class commonThread extends baseThread {
 				$R && $tpcdb = array_reverse($tpcdb);
 			}
 		}
+		//$tpcdb = $this->cookThreadHits($tpcdb); 
 		return $tpcdb;
 	}
-
+	
 	function setWhere() {
 		global $type,$special,$search,$modelid,$pcid,$actmid,$allactmid,$allpcid,$allmodelid;
 		$this->threadSearch->setType($type)
@@ -980,7 +1005,7 @@ class imgThread extends baseThread {
 
 	function getThread($start, $allowtop) {
 		list($offset, $limit2, $tpcdb, $R) = $this->getThreadSortWithToppedThread(true, $start);
-		$query = $this->db->query("SELECT t.*,ti.cover,ti.totalnum,ti.collectnum FROM pw_threads_img ti LEFT JOIN pw_threads t ON ti.tid=t.tid WHERE ti.fid=" . S::sqlEscape($this->fid) . " AND ti.ifcheck=1 AND ti.topped=0 ORDER BY {$this->threadSearch->order} {$this->threadSearch->asc} " . S::sqlLimit($offset, $limit2));
+		$query = $this->db->query("SELECT t.*,ti.cover,ti.totalnum,ti.collectnum,ti.ifthumb FROM pw_threads_img ti LEFT JOIN pw_threads t ON ti.tid=t.tid WHERE ti.fid=" . S::sqlEscape($this->fid) . " AND ti.ifcheck=1 AND ti.topped=0 ORDER BY {$this->threadSearch->order} {$this->threadSearch->asc} " . S::sqlLimit($offset, $limit2));
 		while ($thread = $this->db->fetch_array($query)) {
 			$tpcdb[] = $thread;
 		}
@@ -1012,7 +1037,7 @@ class imgThread extends baseThread {
 				$offset = 0;
 				$limit2 = $L == $db_perpage ? '' : $db_perpage - $L;
 				if ($toptids) {
-					$query = $this->db->query("SELECT t.*,ti.cover,ti.totalnum,ti.collectnum FROM pw_threads_img ti LEFT JOIN pw_threads t ON ti.tid=t.tid WHERE ti.tid IN($toptids) ORDER BY ti.topped DESC,ti.tid DESC $limit");
+					$query = $this->db->query("SELECT t.*,ti.cover,ti.totalnum,ti.collectnum,ti.ifthumb FROM pw_threads_img ti LEFT JOIN pw_threads t ON ti.tid=t.tid WHERE ti.tid IN($toptids) ORDER BY ti.topped DESC,ti.tid DESC $limit");
 					while ($rt = $this->db->fetch_array($query)) {
 						$tpcdb[] = $rt;
 					}
@@ -1308,14 +1333,14 @@ class threadSearch {
 	function getSqlAdd($allowtop = false) {
 		$sqladd = $this->sqladd;
 		$this->_ifcheck && $sqladd .= " AND t.ifcheck='1'";
-		$allowtop && $sqladd .= ' AND t.topped=0';
+		$allowtop && $sqladd .= ' AND t.specialsort=0';
 		return $sqladd;
 	}
 }
 function threadShield($code){
 	global $groupid;
 	$code = getLangInfo('bbscode',$code);
-	return "<span style=\"color:black; text-decoration:line-through;\">$code</span>";
+	return "<del>$code</del>";
 }
 function getThreadFactory($cyid, $search, $topicsearch) {
 	if ($cyid) {

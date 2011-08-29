@@ -51,10 +51,20 @@ function ImgLoad()
 		</div>
 		<div id="content">
 <script>
-function ajaxurl(o) {
+function ajaxurl(o,callback) {
 	read.obj = o;
-	ajax.send(o.href,'',ajax.get);
+	ajax.send(o.href,'',function(){
+		ajax.get();
+		callback&&callback();
+	});
 	return false;
+}
+function focusInp(){
+	if(getObj("pwdvalue")){
+		setTimeout(function(){
+			getObj("pwdvalue").focus();
+		},1000)
+	}
 }
 setCurrent('q_{$a_key}','q_index','current');
 </script>
@@ -314,6 +324,10 @@ EOT;
 				</div>
 				</div>
 			</div>
+<style>
+.aPre{width:35%;cursor:url(u/images/pre.cur),auto;}
+.aNext{width:35%;right:0;cursor:url(u/images/next.cur),auto;}
+</style>
 			<div class="contPhoto">
 			<div class="p_lr_10">
 				<div class="galbum_photo_con mb10">
@@ -541,19 +555,14 @@ print <<<EOT
 <!--
 EOT;
 if ($o_photos_gdcheck) {
-$gdSize = explode("\t",$db_gdsize);
+$checkCode = L::loadClass('checkcode', 'site');
+$checkCodeString = $checkCode->getCheckCodeTemplate();
 print <<<EOT
 -->
-			<div class="cc mb10"><div style="width:100px;" class="fl tar mr10">认证码: </div><input class="input" onfocus="showgd();" type="text" name="gdcode" id="gdcode" size="5" tabindex="3"  /> 
+			<div class="cc mb10"><div style="width:100px;" class="fl tar mr10">验证码: </div><input class="input" onfocus="showgd();" type="text" name="gdcode" id="gdcode" size="5" tabindex="3"  /> 
 				<span id="ckcode" style="display:none;vertical-align:top;">
-<script type="text/javascript" src="js/pw_authcode.js"></script>
-<script>
-var flashWidth = "$gdSize[0]";
-var flashHeight = "$gdSize[1]";
-var gdtype = $db_gdtype;
-showGdCode();
-</script>
 				</span>
+$checkCodeString
 			</div>
 <!--
 EOT;
@@ -563,7 +572,7 @@ if($db_imagequestion){
 }else{
 	$question = $qkey<0 ? getMachineQuestion_1() :  $db_question[$qkey];
 }
-$q_a = $question.($showq && $qkey>0?" 正确答案:".$db_answer[$qkey] : '');
+$q_a = $question.($showq && $qkey>0?" （答案：".$db_answer[$qkey] . '）' : '');
 print <<<EOT
 -->
 			<div class="cc mb5"><div style="width:100px;height:60px;" class="fl tar mr10">验证问答: </div>
@@ -642,9 +651,9 @@ EOT;
                       <param name="FlashVars" value="url=$db_bbsurl%2Fjob.php%3Faction%3Dmutiuploadphoto"/>
                       <param name="allowScriptAccess" value="always" />
                       <!--[if !IE]>-->
-                      <object type="application/x-shockwave-flash" data="$imgpath/photouploader.swf" width="250" height="42" FlashVars="url=$db_bbsurl%2Fjob.php%3Faction%3Dmutiuploadphoto&jsobject=uploader"  allowScriptAccess="always">
+                      <object type="application/x-shockwave-flash" data="$imgpath/photouploader.swf" width="250" height="42" FlashVars="url=$db_bbsurl%2Fjob.php%3Faction%3Dmutiuploadphoto&jsobject=uploader" wmode="transparent"  allowScriptAccess="always">
                       <!--<![endif]-->
-                        <p>Alternative content</p>
+                        <p><span style="display:none;"><embed src="images/blank.swf" type="application/x-shockwave-flash" wmode="transparent"/></span><em class="s2" style="position:relative;top:3px;">该浏览器尚未安装flash插件，<a href="http://www.adobe.com/go/getflashplayer" target="_blank">点击安装</a></em></p>
                       <!--[if !IE]>-->
                       </object>
                       <!--<![endif]-->
@@ -655,14 +664,11 @@ EOT;
 			</td>
 		</tr>
 	</table>
-<script>
-var wo=window.onload;
-window.onload=function()
-{
-wo?wo():0;
-uploader.init();
-uploader.baseurl = '$basename';
-};
+<script type="text/javascript">
+onReady(function(){
+	uploader.init();
+	uploader.baseurl = '$basename';
+})
 </script>
 </div>
 <!--
@@ -705,16 +711,13 @@ function getallowflash(aid) {
 			}catch(e){};
 			ajax.guide();
 		}
-		getObj('viewimg').style.display = '';
 	});
 	return false;
 }
-var wo2=window.onload;
-window.onload=function()
-{
-	wo2?wo2():0;
-	getallowflash(getObj('aidsel_info').value);
-};
+
+onReady(function(){
+		getallowflash(getObj('aidsel_info').value);
+})
 </script>
 <!--
 EOT;
@@ -786,22 +789,16 @@ EOT;
 <!--
 EOT;
 if ($o_photos_gdcheck) {
-$gdSize = explode("\t",$db_gdsize);
+$checkCode = L::loadClass('checkcode', 'site');
+$checkCodeString = $checkCode->getCheckCodeTemplate();
 print <<<EOT
 -->
 	<tr>
-		<th class="th">认证码</th>
+		<th class="th">验证码<span class="s1">*</span></th>
 		<td class="td">
 			<input class="input" onfocus="showgd();" type="text" name="gdcode" id="gdcode" style="width:50px;" tabindex="3"  />
-			<span id="ckcode" style="display:none; vertical-align:top;">
-<script type="text/javascript" src="js/pw_authcode.js"></script>
-<script>
-var flashWidth = "$gdSize[0]";
-var flashHeight = "$gdSize[1]";
-var gdtype = $db_gdtype;
-showGdCode();
-</script>		
-			</span>
+			<span id="ckcode" style="display:none; vertical-align:top;"></span>
+$checkCodeString
 		</td>
 	</tr>
 <!--
@@ -813,11 +810,11 @@ if($db_imagequestion){
 }else{
 	$question = $qkey<0 ? getMachineQuestion_1() :  $db_question[$qkey];
 }
-$q_a = $question.($showq && $qkey>0?" 正确答案:".$db_answer[$qkey] : '');
+$q_a = $question.($showq && $qkey>0?" （答案：".$db_answer[$qkey] . '）' : '');
 print <<<EOT
 -->
 	<tr>
-		<th class="th">验证问答</th>
+		<th class="th">验证问答<span class="s1">*</span></th>
 		<td class="td">
 		<div class="mb5"> {$q_a} </div>
 		<input class="input" name="qanswer" id="qanswer" size="25" tabindex="7" />
@@ -844,7 +841,7 @@ document.FORM.Submit.disabled = false;
 function checkpost(obj) {
 	if (obj.aname.value == "") {
 		obj.aname.focus();
-		showDialog("error","请输入<span class='warnFontStyle'>相册名</span>",2);
+		showDialog("error","请输入<span class='s1'>相册名</span>",2);
 		return false;
 	}
 	var position =getObj('submit');

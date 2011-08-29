@@ -126,7 +126,10 @@ class PW_ActivityForO extends PW_PostActivity {
 	}
 
 	function getGroupSignupHtml($data) {//群组活动的状态获取
+		global $winduid;
 		$replaceArray = $data;
+		require_once(A_P . 'groups/lib/active.class.php');
+		$newActive = new PW_Active();
 		if ($this->timestamp > $data['endtime']) {
 			$activityStatusKey = 'activity_is_ended';
 		} elseif ($this->timestamp > $data['deadline'] && $this->timestamp > $data['begintime']) {
@@ -135,6 +138,10 @@ class PW_ActivityForO extends PW_PostActivity {
 			$activityStatusKey = 'signup_is_ended';
 		} elseif ($data['limitnum'] && $data['members'] >= $data['limitnum']) {
 			$activityStatusKey = 'signup_number_limit_is_reached';
+		} elseif ($newActive->isJoin($data['id'], $winduid) && $winduid != $data['uid']) {
+			$activityStatusKey = 'activity_is_joined';
+		} elseif ($winduid == $data['uid']) {
+			$activityStatusKey = 'activity_group_edit';
 		} else {
 			$activityStatusKey = 'group_is_available_for_member';
 		}
@@ -177,6 +184,12 @@ class PW_ActivityForO extends PW_PostActivity {
 				break;
 			case 'activity_group_running'://群组活动的特殊状态
 				$html = '<span class=\"bt\"><span><button type=\"button\>活动进行中</button></span></span>';
+				break;
+			case 'activity_is_joined':
+				$html = "<span class=\"bt\"><span><button type=\"button\" id=\"active_quit\" onclick=\"sendmsg('apps.php?q=group&a=active&job=quit&cyid=".$replaceArray['cid']."&id=".$replaceArray['id']."', '', this.id);\">退出活动</button></span></span>";
+				break;
+			case 'activity_group_edit':
+				$html = "<span class=\"btn\"><span><button type=\"button\" onclick=\"window.location='apps.php?q=group&a=active&job=edit&cyid=".$replaceArray['cid']."&id=".$replaceArray['id']."'\">编辑活动</button></span></span>";
 				break;
 			default:
 				$html = '';

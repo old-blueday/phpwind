@@ -4,7 +4,7 @@ if($q=='blooming'){print <<<EOT
 <form action="apps.php?ajax=1&q=updata" method="post" onsubmit="return false;">
 <input type="hidden" name="tid" value="$tid" />
 <table width="100%" cellspacing="1" cellpadding="5">
-	<tr><th colspan="6" class="h" style="cursor:move" onmousedown="read.move(event);"><span class="fr" style="margin-top:2px;cursor:pointer" onclick="closep();"><img src="$imgpath/close.gif" /></span>帖子交换</th></tr>
+	<tr><th colspan="6" class="h" style="cursor:move" onmousedown="read.move(event);"><span class="adel" onclick="closep();">close</span>帖子交换</th></tr>
 	<tr>
 		<td>选择分类:
 			<select name="cid" style="width:120px;">
@@ -66,7 +66,7 @@ if ($do) {
 print <<<EOT
 -->
 <table width="400" cellspacing="0" cellpadding="5">
-<tr><th colspan="2" class="h" style="cursor:move" onmousedown="read.move(event);"><span class="fr" style="margin-top:2px;cursor:pointer" onclick="closep();"><img src="$imgpath/close.gif" /></span>充实内容</th></tr>
+<tr><th colspan="2" class="h" style="cursor:move" onmousedown="read.move(event);"><span class="adel" onclick="closep();">close</span>充实内容</th></tr>
 <tr><td colspan="2">
 <iframe id="pwthread" name="pwthread" scrolling="no" width="650" src="$app_url" frameborder="0"></iframe>
 </td></tr></table>
@@ -76,7 +76,7 @@ EOT;
 print <<<EOT
 -->
 <table width="400" cellspacing="0" cellpadding="5">
-<tr><th colspan="2" class="h" style="cursor:move" onmousedown="read.move(event);"><span class="fr" style="margin-top:2px;cursor:pointer" onclick="closep();"><img src="$imgpath/close.gif" /></span>精品下载</th></tr>
+<tr><th colspan="2" class="h" style="cursor:move" onmousedown="read.move(event);"><span class="adel" onclick="closep();">close</span>精品下载</th></tr>
 <tr>
 <td align="center">
 <a style="margin-left:40px;" href="javascript:;" id="" onclick="sendmsg('apps.php?q=appthread&do=good&forumid=$forumid','',this.id)" title="">批量导入精品帖</a></td>
@@ -92,7 +92,7 @@ require_once(uTemplate::printEot('user_appleft'));
 print<<<EOT
 -->
 <script type="text/javascript" src="{$db_server_url}/js/global.js"></script>
-<script language="JavaScript">
+<script>
 var server = new PwJs.Server("pwapp");
 server.registHandler('setTitle');
 server.start();

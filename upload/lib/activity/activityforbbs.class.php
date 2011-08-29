@@ -20,8 +20,8 @@ class PW_ActivityForBbs extends PW_PostActivity {
 		$activityPostFieldsHtml .= $this->getCheckPresetErrorMessage() . '
 		<script type="text/javascript" src="js/date.js"></script><script type="text/javascript">
 function addElement(basename) {
-	var s = $(basename+\'_child\').firstChild.cloneNode(true);
-	$(basename+\'_father\').appendChild(s);
+	var s = getObj(basename+\'_child\').firstChild.cloneNode(true);
+	getObj(basename+\'_father\').appendChild(s);
 }
 function delParentElement(obj) {
 	var o = obj.parentNode.parentNode;
@@ -416,11 +416,11 @@ function toggleCalendarInputValue(obj, defaultInputValue) {
 			$L = array(
 				'alreadySignup' => $this->getPeopleAlreadySignup(),
 			);
-			$this->getPeopleAlreadySignup() && $onfocus = 'onfocus="$(\'alert-alipay\').style.display=\'\';"';
+			$this->getPeopleAlreadySignup() && $onfocus = 'onfocus="getObj(\'alert-alipay\').style.display=\'\';"';
 
 			return '<span class="pr" style="padding-top:3px">
 			<input id="maxparticipant" '. $onfocus . '
-			 onblur="$(\'alert-alipay\').style.display=\'none\'; showError(this, getParticipantError(this, ' .$this->getPeopleAlreadySignup(). '));" class="input mr5" type="text" name="act[' . $data['fieldname'] . ']" value="' . $data['fieldvalue'] . '" size="' . $data['textwidth'] . '">
+			 onblur="getObj(\'alert-alipay\').style.display=\'none\'; showError(this, getParticipantError(this, ' .$this->getPeopleAlreadySignup(). '));" class="input mr5" type="text" name="act[' . $data['fieldname'] . ']" value="' . $data['fieldvalue'] . '" size="' . $data['textwidth'] . '">
 			<span id="alert-alipay" class="alert-alipay" style="display: none">' .($this->getPeopleAlreadySignup() ? getLangInfo('other','act_signup_info',$L) : '') . '<i></i></span>
 			</span>';
 		} else {
@@ -539,11 +539,11 @@ function toggleCalendarInputValue(obj, defaultInputValue) {
 <script type=\"text/javascript\">
 function changeFeeValue(value) {
 	if (value == 1) {
-		$('fees_default').value = $allPeopleText;
+		getObj('fees_default').value = $allPeopleText;
 	} else if (value == 2) {
-		$('fees_default').value = $maleText;
+		getObj('fees_default').value = $maleText;
 	} else if (value == 3) {
-		$('fees_default').value = $femaleText;
+		getObj('fees_default').value = $femaleText;
 	}
 }
 </script>";
@@ -701,16 +701,16 @@ function delpicture(id,actmid,tid,fieldid){
 		}
 	}
 	if (total == 4) {
-		$("img_picture_0").style.display = "";
+		getObj("img_picture_0").style.display = "";
 	}
 	fieldid = parseInt(fieldid);
 	id = parseInt(id);
 	fieldid = fieldid + id - 1;
-	ajax.send("pw_ajax.php?action=activity&job=delimg","actmid="+actmid+"&fieldid="+fieldid+"&tid="+tid+"&attachment="+$("fetch_"+id).value,function(){
+	ajax.send("pw_ajax.php?action=activity&job=delimg","actmid="+actmid+"&fieldid="+fieldid+"&tid="+tid+"&attachment="+getObj("fetch_"+id).value,function(){
 		var rText = ajax.request.responseText;
 		if (rText == "success") {
-			$("img_picture_" + id).style.display = "none";
-			$("img_picture_" + id).children[0].src = "";
+			getObj("img_picture_" + id).style.display = "none";
+			getObj("img_picture_" + id).children[0].src = "";
 			document.getElementsByName("act[picture" + id + "]")[0].value = "";
 		} else {
 			showDialog("error","' . getLangInfo('other','act_delete_fail') . '",2);return false;
@@ -727,13 +727,13 @@ function delpicture(id,actmid,tid,fieldid){
 					$data['fieldvalue'] = PW_PostActivity::getActivityImgUrl($data['fieldvalue'],true);
 					$imgs = "<span id=\"img_" . $data['fieldid'] . "\"><img src=\"{$data['fieldvalue']}\" width=\"195px\"/><a href=\"javascript:;\" onclick=\"delimg('$actmid','" . $data['fieldid'] . "');\">".getLangInfo('other','pc_delimg')."</a></span>";
 					$imgs .= "
-<script language=\"javascript\">
+<script>
 function delimg(actmid,fieldid) {
 ajax.send('pw_ajax.php?action=activity&job=delimg','actmid='+actmid+'&fieldid='+fieldid+'&tid='+'$tid',function(){
     var rText = ajax.request.responseText;
     if (rText == 'success') {
         showDialog('success','" . getLangInfo('other','act_delete_success') . "',2); return false;
-        $('img_'+fieldid).style.display = 'none';
+        getObj('img_'+fieldid).style.display = 'none';
     } else {
         showDialog('error','" . getLangInfo('other','act_delete_fail') . "',2);return false;
         return false;
@@ -871,7 +871,7 @@ ajax.send('pw_ajax.php?action=activity&job=delimg','actmid='+actmid+'&fieldid='+
 			$signupHtml = $this->getSignupHtml($activityValue);//获取报名状态
 		}
 
-		$FlashHtml .= "<div class=\"pwSlide-bg\"></div><ul id=\"SwitchNav\"></ul></div><script type=\"text/javascript\" src=\"js/sliderplayer.js\"></script><script language=\"JavaScript\">pwSliderPlayers('pwSlidePlayer');</script>";
+		$FlashHtml .= "<div class=\"pwSlide-bg\"></div><ul id=\"SwitchNav\"></ul></div><script type=\"text/javascript\" src=\"js/sliderplayer.js\"></script><script>pwSliderPlayers('pwSlidePlayer');</script>";
 		$flash == false && $FlashHtml = '';
 		$activityReadFieldsHtml = $FlashHtml.$activityReadFieldsHtml.$signupHtml.'</div>';
 
@@ -1290,7 +1290,7 @@ ajax.send('pw_ajax.php?action=activity&job=delimg','actmid='+actmid+'&fieldid='+
 	function getOrderMemberList($actmid,$tid,$fid,$paymethod,$authorid) {
 		global $imgpath;
 		$orderMemberList = "<div id=\"memberlist_show\"><div style=\"padding:13px 30px;\"><img src=\"$imgpath/loading.gif\" align=\"absbottom\" /> " . getLangInfo('other','act_loading_data') . "</div></div>
-<script language=\"javascript\">
+<script>
 var authorid = parseInt('$authorid');
 var paymethod = parseInt('$paymethod');
 
@@ -1305,7 +1305,7 @@ function ajaxget(url,tag) {
 	try {
 		ajax.send(url,'',function() {
 			if (ajax.request.responseText.indexOf('<') != -1) {
-				$(tag).innerHTML = ajax.request.responseText;
+				getObj(tag).innerHTML = ajax.request.responseText;
 			}
 		});
 		return false;
@@ -1380,7 +1380,7 @@ function additional() {//追加费用
 		global $groupid;
 		$isRecommendOrNot = !$isRecommend ? getLangInfo('other','act_recommend') : getLangInfo('other','act_cancel_recommend');
 		$actRecommendHtml = "<a id=\"actrecommend\" onclick=\"actRecommend('$tid', '$actmid', this);\" href=\"javascript:;\" title=\"$isRecommendOrNot\">$isRecommendOrNot</a>
-<script language=\"javascript\">
+<script>
 function actRecommend(tid, actmid, obj) {
 	ajax.send(\"pw_ajax.php?action=activity&job=recommend&tid=\"+tid+\"&actmid=\"+actmid,\"\",function(){
 		var rText = ajax.request.responseText.split('\t');
@@ -1567,7 +1567,7 @@ function actRecommend(tid, actmid, obj) {
 
 		$fieldService = L::loadClass('ActivityField', 'activity');
 		$searchhtml = "<form action=\"thread.php?fid=$fid".($actmid ? "&actmid=$actmid" : "&allactmid=1")."\" method=\"post\">";
-		$searchhtml .= "<input type=\"hidden\" name=\"topicsearch\" value=\"1\"><script language=\"JavaScript\" src=\"js/date.js\"></script><table>";
+		$searchhtml .= "<input type=\"hidden\" name=\"topicsearch\" value=\"1\"><script src=\"js/date.js\"></script><table>";
 		if ($actmid) {
 			$searchFieldDb = $fieldService->getEnabledAndSearchableFieldsByModelId($actmid);
 		} else {

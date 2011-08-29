@@ -22,7 +22,7 @@ var userBinding = {
 		var s = read.menu.getElementsByTagName('div');
 		for (var i = 0; i < s.length; i++) {
 			if (s[i].className == 'userbindingMenu') {
-				s[i].innerHTML = '<h5>帐号切换</h5>' + userBinding.menu.innerHTML;break;
+				s[i].innerHTML = userBinding.menu.innerHTML;break;
 			}
 		}
 	},

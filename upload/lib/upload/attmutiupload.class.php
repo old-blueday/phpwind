@@ -73,9 +73,10 @@ class AttMutiUpload extends uploadBehavior {
 	}
 
 	function getThumbInfo($filename, $dir) {
+		global $db_athumbtype;
 		return array(
 			array($filename, 'thumb/' . $dir, $this->thumbsize),
-			array($filename, 'thumb/mini/' . $dir, "200\t150\t1")
+			array($filename, 'thumb/mini/' . $dir, "200\t150\t$db_athumbtype")
 		);
 	}
 

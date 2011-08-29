@@ -1,28 +1,30 @@
 <!--<?php print <<<EOT
 -->
-<div class="c"></div>
-<div class="s-main fr">
-      <div class="s-h">$lang[admin_login]</div>
-      <div class="c-content">
-<form action="$basename?" method="post">
-          <table width="98%" style="line-height:30px;margin:3em 0;">
-            <tr>
-              <td width="40%" style="text-align:right;padding-right:2em;"> $lang[admin_name]</td>
-              <td><input class="inputA" type="text" name="admin_name" value="" style="height:22px; border:1px solid #999;"></td>
-            </tr>
-            <tr>
-              <td style="text-align:right;padding-right:2em;">$lang[admin_pwd]</td>
-              <td><input class="inputA" type="password" name="admin_pwd" value="" style="height:22px; border:1px solid #999;"></td>
-            </tr>
-            <tr>
-              <td></td>
-              <td><input name="submit" type="submit" value="$lang[admin_login_2]" class="btn2" /></td>
-            </tr>
-          </table>
-		  <input type="hidden" value="$jumpurl" name="jumpurl" />
-        </form>
-	</div></div>
-
+<form action="$basename?" method="post" id="loginForm">
+<section class="section">
+	<div class="main cc">
+		<div class="login">
+			<div class="server">
+				<table width="100%">
+					<tbody><tr>
+						<td colspan="2" class="td1">$lang[admin_login]</td>
+					</tr>
+					<tr>
+						<td width="100">$lang[admin_name]</td>
+						<td><input type="text" class="input" name="admin_name"></td>
+					</tr>
+					<tr>
+						<td width="100">$lang[admin_pwd]</td>
+						<td><input type="password" class="input" name="admin_pwd"></td>
+					</tr>
+				</tbody></table>
+				<div class="tac"><a class="btn tac" href="#" onclick="document.getElementById('loginForm').submit();return false;">$lang[admin_login_2]</a></div>
+			</div>
+		</div>
+	</div>
+</section>
+<input type="hidden" value="$jumpurl" name="jumpurl" />
+</form>
 <!--
 EOT;
 ?>-->

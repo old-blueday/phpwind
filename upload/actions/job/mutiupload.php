@@ -2,7 +2,7 @@
 !defined('P_W') && exit('Forbidden');
 
 if (empty($_POST['step'])) {
-	
+	header("Content-type: text/html; charset=$db_charset");
 	$_G['uploadtype'] && $db_uploadfiletype = $_G['uploadtype'];
 	$db_uploadfiletype = !empty($db_uploadfiletype) ? (is_array($db_uploadfiletype) ? $db_uploadfiletype : unserialize($db_uploadfiletype)) : array();
 	$filetype = '';
@@ -19,12 +19,13 @@ if (empty($_POST['step'])) {
 	S::gp(array(
 		'uid',
 		'type',
-		'verify'
+		'verify',
+		'ua'
 	), 'P');
 	S::gp(array('type'));
 
 	$uid = intval($uid);
-	$pwServer['HTTP_USER_AGENT'] = 'Shockwave Flash';
+	!$ua && $pwServer['HTTP_USER_AGENT'] = 'Shockwave Flash';
 	$swfhash = GetVerify($uid?$uid:'');
 	checkVerify('swfhash');
 
@@ -45,6 +46,9 @@ if (empty($_POST['step'])) {
 	}
 	if ($_G['allowupload'] == 0) {
 		showExtraMsg('upload_group_right');
+	}
+	if ($_G['allownum'] > 0 && $winddb['uploadnum'] >= $_G['allownum']) {
+		showExtraMsg('upload_num_error');
 	}
 	if ($type == 'active') {
 		L::loadClass('activeupload', 'upload', false);
@@ -70,7 +74,18 @@ if (empty($_POST['step'])) {
 		showExtraMsg($return);
 	}
 	PwUpload::upload($mutiupload);
-	echo pwJsonEncode($mutiupload->getAttachInfo());
+	$attachInfo = $mutiupload->getAttachInfo();
+	if ($ua && $attachInfo) {
+		$attachService = L::loadClass('attachs','forum');
+		if ($attachInfo['path']){
+			$tmp = $db_ifftp ? $db_ftpweb : $attachpath;
+			strpos($attachInfo['path'], "$tmp/") === 0 && $tmpPath = substr($attachInfo['path'], strlen("$tmp/"));
+			strpos($tmpPath, "thumb/") === 0 && $tmpPath = substr($tmpPath, 6);
+			$tmpPath && $attachInfo['path'] = $attachService->getThreadAttachMini($tmpPath);
+			$attachInfo['attachurl'] = $tmpPath ? $tmpPath : $attachInfo['path'];
+		}
+	}	
+	echo pwJsonEncode($attachInfo);
 	ajax_footer();
 }
 

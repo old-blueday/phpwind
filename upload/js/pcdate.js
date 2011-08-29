@@ -160,7 +160,7 @@ function ShowCalendar(idname,type,evt){
     table+="<table border='0' cellspacing='0' style='position:absolute;width:250px;background:#fff;border:1px solid #a9d5e9;'>";
     table+="<tr>";
     table+="<td class=\"h\" style='padding:5px 5px 4px 8px;'>";
-    table+="<span style='float:right;cursor:pointer;' title='关闭' onClick='javascript:HiddenCalendar()'><img src=\""+ imgpath +"/close.gif\" alt=\"close\" /></span>";
+    table+="<span class=\"adel\" title='关闭' onClick='javascript:HiddenCalendar()'>close</span>";
     table+="<select name='Year' id='Year' onChange='ShowDays()' style='font-family:Verdana; font-size:12px'>";
     for(i = thisyear - 35;i < (thisyear + 5);i++){ 
         table+="<option value=" + i + " " + (today.year == i ? "Selected" : "") + ">" + i + "</option>"; 
@@ -208,16 +208,16 @@ function ShowCalendar(idname,type,evt){
 	/**
 	 *ie6 的话是，上下结构的，所有的内容都在upPanel里，所以对话框都要插入到upPanel里
 	 */
-	if($('upPanel'))
+	if(getObj('upPanel'))
 	{
-		$('upPanel').appendChild(Cal);
+		getObj('upPanel').appendChild(Cal);
 	}
 	else
 	{
 		document.body.appendChild(Cal);
 	}
 	/*当前对象的位置取得可以通过clientX-鼠标和当前对象的边距来计算所得。*/
-	Cal.style.top=e.clientY-e.offsetY+(document.documentElement.scrollTop||document.body.scrollTop||($('upPanel')&&$('upPanel').scrollTop)||0)+obj2.offsetHeight+'px';
+	Cal.style.top=e.clientY-e.offsetY+(document.documentElement.scrollTop||document.body.scrollTop||(getObj('upPanel')&&getObj('upPanel').scrollTop)||0)+obj2.offsetHeight+'px';
 	Cal.style.left=e.clientX-e.offsetX+'px';
 	function hiddenCal ()
 	{

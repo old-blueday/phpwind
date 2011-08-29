@@ -1,87 +1,56 @@
-.wrap,#top{margin:auto;}
-#head,.main-wrap,#footer,#navA,#navB,#nav,.top{width:960px;margin:auto;}
-.main-wrap{margin-bottom:10px;}
 .lh_22{line-height:22px;height:22px;overflow:hidden;}
-#searchA{width:960px;}
-/*gray*/
-.gray{color:#888;}
 /*layout*/
-.main{width:960px;margin:50px auto;}
+.cms_cm{float:left;width:100%;min-height:1px;}
+.cms_cw{margin-right:29%;}
+.cms_sd{width:28%;float:left;margin-left:-28%;overflow:hidden;}
 
-.mr5{margin-right:5px;}
-.mr10{margin-right:10px;}
-.mr20{margin-right:20px;}
-.pdD{padding:.3em .5em}
-.pd5{padding:0 5px;}
-.pd15{padding:0 15px;}
-
-/*列表帖子页样式开始*/
-.cmsBg,.cmsBgbor{background:url(cmsBg.png) 999px 999px repeat-y;}
-.cmsBg{ background-position:0 0;width:960px;}
-.cmsBgbor{height:1px;overflow:hidden; background-position:-960px 0;}
-.cmsBoxbar{background:url(cmsBoxbar.png) no-repeat;height:12px;overflow:hidden;}
-
-#content{width:650px;overflow:hidden;}
-#sideBar{width:300px;}
-
-.cmsBoxA{padding:10px 25px 20px;background:url(cmsBoxA.png) repeat-x;margin:1px;}
-.cmsBoxA a{color:#024b90;}
-.cmsBoxA a:hover{color:#ff6600;}
-.cmsBoxA a.s7{color:#68b;}
-.cmsBoxA h1.f24{margin:20px 0 10px;color:#333;padding:0;}
-.cmsBoxB{padding:0 1px;}
-.cmsBoxB h2{line-height:30px;height:31px;padding:0 10px 0 25px;background:#ffffff url(cmsBoxB.png) 0 bottom; font-size:14px; font-weight:700;display:block;margin:0;}
+.cmsBoxA{padding:10px 25px 20px;}
+.cmsBoxB h2{display:block;}
 .cmsBoxB .fr{ font-size:12px; font-weight:100;}
-.cmsBoxC{border:1px solid #d3dbe6;padding:1px;background:url(cmsBoxA.png) 0 1px repeat-x;}
-.cmsBoxC_bg{}
-.cmsBoxC h2{font-size:14px;padding:13px 20px 5px;line-height:font-weight:700;display:block;}
-.cmsTable{}
-.cmsTable .th,.cmsTable .td{padding:8px 22px;}
-.cmsTable .th{ font-size:14px;}
-.cmsTable .td div td{padding:0 0 5px;}
-.pagedel{margin-top:10px;}
+
 .cmsDl dl{border-bottom:1px dotted #ccc;padding:15px 0;}
 .cmsDl dt{margin-bottom:5px;padding:0 3px;}
-.cmsDl dt span{ font-size:10px;float:right;color:#999999;}
+.cmsDl dt span{ font-size:10px;float:right;color:#999999;-webkit-text-size-adjust:none;margin-left:20px;}
 .cmsDl dd{line-height:18px;max-height:72px;padding:0 0 0 3px;}
-dd.checkBox{height:75px;width:25px;margin-left:-20px;overflow:hidden; position:absolute;}/*复选*/
+.cmsDl dd.checkBox{float:left;}
+.cmsDl dd.checkBox input{padding:0;margin:0 3px 0 0;}
+
 .cmsListA{padding:5px 10px;}
 .cmsListA li{line-height:22px;height:22px;overflow:hidden;}
-.cmsBoxB li a{color:#333333;}
-.cmsBoxB li a:hover{color:#ff6600;}
-
-.postInfo{background:#f7f7f7;padding:10px;border-bottom:1px solid #e4e4e4;}
-.postInfo li{float:left;width:49%;height:25px;line-height:25px;}
-.postInfo li em{display:inline-block;width:60px;}
-.postInfo td{padding:3px 3px;}
-
-.cmslistB li{float:left;width:50%;line-height:22px;height:22px;overflow:hidden;}
+.cmslistB li{float:left;width:49.5%;line-height:22px;height:22px;overflow:hidden;}
 .cmslistB li a{padding-left:10px;}
-.cmsForumlist{background:#fff;padding:7px;}
-.cmsForumlist li{height:30px;}
-.cmsForumlist li a{display:block;border:1px solid #e4e4e4;background:#fff url(cmsForumlist.png);font-size:14px;color:#333;margin:3px;line-height:22px;height:22px;overflow:hidden;}
-.cmsForumlist li a:hover,.cmsForumlist .current a{border:1px solid #cbeaf3;color:#024b90; background-position:0 -22px; text-decoration:none;}
+
 .cmsIconA li a{padding-left:10px; background:url(cmsIconA.png) 0 8px no-repeat;}
 .cmsIconA li a:hover{background-position:0 -14px;}
 .cmsIconB ul{padding-left:25px; background:url(cmsIconB.png) 0 4px no-repeat;}
+
 .cmsHr{height:0;border-bottom:1px dotted #ccc;overflow:hidden;margin:5px 0;}
-.reReading {border-bottom:1px dotted #ccc;padding-bottom:15px;}
-.reReading ul a{ font-size:14px;margin-right:20px;}
-.reReading ul span{ font-size:10px;color:#666;}
-.imgs img{display:block;}
-.mb20 .pages{float:right;}
-.pages a{color:#333;}
-.pages a:hover{color:#024b90;}
-/*面包屑*/
-#breadCrumb{padding:0 0 0 10px; font-family:Simsun;}
-#breadCrumb .fr{padding-top:0;}
-#breadCrumb a{margin-right:5px;}
-#breadCrumb .bts{margin-top:2px;}
-/*帖子信息*/
-.cmsTips{border-bottom:1px dotted #ccc;padding-bottom:10px;color:#666;}
-.cmsbreadCrumb{ background:url(cmsbreadCrumb.gif) 5px 2px no-repeat;padding-left:25px;color:#666;}
-.cmsbreadCrumb a{color:#333;}
+
+/*tips*/
+.wy_tips{background:url(images/post/c_editor/w_edit_but.png) right center no-repeat;float:left;}
+.wy_tips i{display:none;}
+.wy_tips:hover{color:#333;_position:relative;text-decoration:none;}
+.wy_tips:hover i{display:block; position:absolute;border:1px solid #f8ad48;background:#fffeed;padding:5px 8px;color:#333;font-style:normal;line-height:150%;word-break:keep-all;word-wrap:no-wrap;}
+
+/*评论*/
+.review .dl_wrap{float:left;width:100%;min-height:1px;border-top:1px dotted #e4e4e4;padding:10px 0;}
+.review .dt_face{float:left;width:60px;padding-top:5px;}
+.review .dd_cm{margin-left:65px;line-height:20px;padding-top:5px;color:#555;}
+.review .dd_cont{margin-bottom:5px;}
+.review .dd_cont img{ vertical-align:top;}
+.reply_content{margin-left:55px;}
+.review cite{padding-left:5px;}
+.review .dd_cm p.tar{color:#999;}
+.review .dd_cm p.tar a{margin:0 10px;}
+.dl_reply{border:1px solid #e4e4e4;background:#f9f9f9;margin-top:10px;padding:10px 10px 5px;-moz-border-radius:3px;-webkit-border-radius:3px;border-radius:3px;}
+.dl_reply ul{overflow:hidden;}
+.dl_reply li{border-top:1px dotted #e4e4e4;margin-top:-1px;padding:10px 0 10px 5px;}
+.dl_reply .img_35 img{ vertical-align:middle;padding:2px;background:#fff;border:1px solid #e4e4e4;float:left;}
+.dl_reply li .input{width:425px;float:left;margin:0 5px 0 50px;}
+.dl_reply li .bt2{float:left;}
+div.B_editor_buttom{display:none;}
 /*帖子内容区域*/
+.cmsTips{border-bottom:1px dotted #ccc;padding-bottom:10px;color:#666;}
 .summary{background:#f7fbff;border:1px dotted #ccc;padding:10px 15px;}
 .cmsContent{padding:0 3px 30px;line-height:1.8; font-size:14px;}
 .cmsContent img{max-width:550px;}
@@ -98,3 +67,10 @@ dd.checkBox{height:75px;width:25px;margin-left:-20px;overflow:hidden; position:a
 .cmsContent a:hover{text-decoration:underline}
 .cmsContent ol{list-style-type:decimal;}
 .cmsContent ul{list-style-type:disc;}
+.mb20 .pages{float:right;}
+/*发帖*/
+.postInfo{background:#f7f7f7;padding:20px;border:1px solid #e4e4e4;}
+.postInfo li{padding:5px 0;}
+.postInfo li em{display:inline-block;width:80px;}
+.postInfo li textarea{ vertical-align:top;}
+.postInfo td{padding:3px 3px;}

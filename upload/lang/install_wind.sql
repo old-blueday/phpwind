@@ -909,6 +909,7 @@ CREATE TABLE pw_attention (
   `friendid` int(10) NOT NULL default '0',
   `joindate` int(10) NOT NULL default '0',
   PRIMARY KEY  (`friendid`,`uid`),
+  KEY `idx_joindate` (`joindate`), 
   KEY `idx_uid_joindate` (`uid`,`joindate`),
   KEY `idx_friendid_joindate` (`friendid`,`joindate`)
 ) ENGINE=MyISAM;
@@ -1337,7 +1338,8 @@ CREATE TABLE pw_colonys (
   PRIMARY KEY  (id),
   UNIQUE KEY idx_cname (cname),
   KEY idx_admin (admin),
-  KEY idx_classid (classid)
+  KEY idx_classid (classid),
+  KEY idx_classid_vieworder (classid,vieworder)
 ) TYPE=MyISAM;
 
 DROP TABLE IF EXISTS pw_comment;
@@ -1646,8 +1648,8 @@ INSERT INTO pw_config (db_name, vtype, db_value, decrip) VALUES('db_rategroup', 
 INSERT INTO pw_config (db_name, vtype, db_value, decrip) VALUES('db_ratepower', 'string', 'a:3:{i:1;s:1:"0";i:2;s:1:"0";i:3;s:1:"0";}', '');
 INSERT INTO pw_config (db_name, vtype, db_value, decrip) values('db_job_isopen','string','1','');
 INSERT INTO pw_config (db_name, vtype, db_value, decrip) values('db_job_ispop','string','1','');
-INSERT INTO pw_config (db_name, vtype, db_value, decrip) values('db_newinfoifopen','string','1','');
-INSERT INTO pw_config (db_name, vtype, db_value, decrip) values('db_bbsradioifopen','string','1','');
+INSERT INTO pw_config (db_name, vtype, db_value, decrip) values('db_newinfoifopen','string','0','');
+INSERT INTO pw_config (db_name, vtype, db_value, decrip) values('db_bbsradioifopen','string','0','');
 INSERT INTO pw_config (db_name, vtype, db_value, decrip) VALUES ('db_portalstatictime', 'string', '1', '');
 INSERT INTO pw_config (db_name, db_value) VALUES ('db_classfile_compress', '1');
 INSERT INTO pw_config (db_name, db_value) VALUES ('db_cachefile_compress', '1');
@@ -1665,7 +1667,9 @@ INSERT INTO pw_config (db_name, vtype, db_value, decrip) VALUES ('db_search_type
 INSERT INTO pw_config (db_name, vtype, db_value, decrip) VALUES ('rg_regguide', 'string', '1', '');
 INSERT INTO pw_config (db_name, vtype, db_value, decrip) VALUES ('rg_recommendcontent', 'string', '&lt;div class=&quot;p10&quot;&gt;&lt;table width=&quot;100%&quot;&gt;&lt;tr&gt;&lt;td&gt;&lt;a href=&quot;html/channel/tucool/&quot;&gt;&lt;img src=&quot;images/register/thumb/tuku.jpg&quot; /&gt;&lt;/a&gt;&lt;/td&gt;&lt;td&gt;&lt;a href=&quot;apps.php?q=weibo&amp;do=topics&quot;&gt;&lt;img src=&quot;images/register/thumb/huati.jpg&quot; /&gt;&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/div&gt;', '');
 INSERT INTO pw_config (db_name, vtype, db_value, decrip) VALUES ('db_sharesite', 'string', '1', '');
-
+INSERT INTO pw_config (db_name, vtype, db_value, decrip) VALUES ('db_ifkmd', 'string', '1', ''),('db_kmd_ifcheck', 'string', '1', ''),('db_quality','string','90','');
+INSERT INTO pw_config (db_name, vtype, db_value, decrip) VALUES ('db_md_ifopen', 'string', '1', ''),('db_md_ifapply', 'string', '1', '');
+	
 DROP TABLE IF EXISTS pw_creditlog;
 CREATE TABLE pw_creditlog (
   id int(10) unsigned NOT NULL auto_increment,
@@ -1856,7 +1860,8 @@ CREATE TABLE pw_diary (
   c_num int(10) NOT NULL default '0',
   postdate int(10) unsigned NOT NULL default '0',
   PRIMARY KEY  (did),
-  KEY idx_uid (uid)
+  KEY idx_uid (uid),
+  KEY idx_postdate (postdate)
 ) TYPE=MyISAM;
 
 DROP TABLE IF EXISTS pw_diarytype;
@@ -2036,7 +2041,7 @@ CREATE TABLE pw_forums (
   name varchar(255) NOT NULL default '',
   descrip text NOT NULL,
   title varchar(255) NOT NULL default '',
-  dirname varchar(15) NOT NULL default '',
+  dirname varchar(30) NOT NULL default '',
   metadescrip varchar(255) NOT NULL default '',
   keywords varchar(255) NOT NULL default '',
   vieworder smallint(6) NOT NULL default '0',
@@ -2069,6 +2074,7 @@ CREATE TABLE pw_forums (
   ifhide tinyint(1) NOT NULL default '1',
   showsub tinyint(1) NOT NULL default '0',
   ifcms tinyint(1) unsigned NOT NULL default '0',
+  `allowrob` TINYINT( 3 ) UNSIGNED NOT NULL DEFAULT '0',
   PRIMARY KEY  (fid),
   KEY idx_fup (fup),
   KEY idx_ifsub_vieworder_fup (ifsub,vieworder,fup)
@@ -2100,7 +2106,7 @@ CREATE TABLE pw_forumsextra (
   PRIMARY KEY  (fid)
 ) TYPE=MyISAM;
 INSERT INTO `pw_forumsextra` (`fid`, `creditset`, `forumset`, `commend`, `appinfo`) VALUES
-(2, '', 'a:52:{s:21:"auth_cellphone_credit";s:1:"0";s:14:"auth_cellphone";s:1:"0";s:18:"auth_alipay_credit";s:1:"0";s:11:"auth_alipay";s:1:"0";s:4:"link";s:0:"";s:4:"lock";s:1:"0";s:7:"cutnums";s:1:"0";s:9:"threadnum";s:1:"0";s:7:"readnum";s:1:"0";s:7:"newtime";s:1:"0";s:13:"contentminlen";s:1:"0";s:8:"orderway";s:8:"lastpost";s:3:"asc";s:4:"DESC";s:11:"replayorder";s:1:"1";s:9:"addnotice";s:1:"0";s:10:"viewcolony";s:1:"0";s:12:"ifcolonycate";s:1:"0";s:11:"allowencode";s:1:"0";s:9:"anonymous";s:1:"0";s:4:"rate";s:1:"0";s:3:"dig";s:1:"0";s:7:"inspect";s:1:"0";s:9:"watermark";s:1:"0";s:9:"overprint";s:1:"0";s:7:"viewpic";s:1:"0";s:7:"ifthumb";s:1:"0";s:12:"postedittime";s:1:"0";s:8:"iftucool";s:1:"1";s:15:"iftucooldefault";s:1:"0";s:14:"iftucoolbrowse";s:1:"0";s:9:"tucoolpic";s:1:"1";s:9:"ifrelated";s:1:"0";s:11:"relatednums";s:1:"0";s:10:"relatedcon";s:7:"ownpost";s:13:"relatedcustom";a:0:{}s:7:"commend";s:1:"0";s:11:"autocommend";s:1:"0";s:11:"commendlist";s:0:"";s:10:"commendnum";s:1:"0";s:13:"commendlength";s:1:"0";s:11:"commendtime";s:1:"0";s:10:"addtpctype";s:1:"0";s:12:"allowtpctype";s:1:"0";s:8:"rvrcneed";s:1:"0";s:9:"moneyneed";s:1:"0";s:10:"creditneed";s:1:"0";s:11:"postnumneed";s:1:"0";s:9:"sellprice";a:0:{}s:9:"uploadset";s:9:"money			0";s:8:"rewarddb";s:6:"0	0	0	";s:9:"allowtime";s:0:"";s:9:"thumbsize";s:5:"575	0";}', '', '');
+(2, '', 'a:52:{s:21:"auth_cellphone_credit";s:1:"0";s:14:"auth_cellphone";s:1:"0";s:18:"auth_alipay_credit";s:1:"0";s:11:"auth_alipay";s:1:"0";s:4:"link";s:0:"";s:4:"lock";s:1:"0";s:7:"cutnums";s:1:"0";s:9:"threadnum";s:1:"0";s:7:"readnum";s:1:"0";s:7:"newtime";s:1:"0";s:13:"contentminlen";s:1:"0";s:8:"orderway";s:8:"lastpost";s:3:"asc";s:4:"DESC";s:11:"replayorder";s:1:"1";s:9:"addnotice";s:1:"0";s:10:"viewcolony";s:1:"0";s:12:"ifcolonycate";s:1:"0";s:11:"allowencode";s:1:"0";s:9:"anonymous";s:1:"0";s:4:"rate";s:1:"0";s:3:"dig";s:1:"0";s:7:"inspect";s:1:"0";s:9:"watermark";s:1:"0";s:9:"overprint";s:1:"0";s:7:"viewpic";s:1:"0";s:7:"ifthumb";s:1:"0";s:12:"postedittime";s:1:"0";s:8:"iftucool";s:1:"1";s:15:"iftucooldefault";s:1:"0";s:14:"iftucoolbrowse";s:1:"0";s:9:"tucoolpic";s:1:"5";s:9:"ifrelated";s:1:"0";s:11:"relatednums";s:1:"0";s:10:"relatedcon";s:7:"ownpost";s:13:"relatedcustom";a:0:{}s:7:"commend";s:1:"0";s:11:"autocommend";s:1:"0";s:11:"commendlist";s:0:"";s:10:"commendnum";s:1:"0";s:13:"commendlength";s:1:"0";s:11:"commendtime";s:1:"0";s:10:"addtpctype";s:1:"0";s:12:"allowtpctype";s:1:"0";s:8:"rvrcneed";s:1:"0";s:9:"moneyneed";s:1:"0";s:10:"creditneed";s:1:"0";s:11:"postnumneed";s:1:"0";s:9:"sellprice";a:0:{}s:9:"uploadset";s:9:"money			0";s:8:"rewarddb";s:6:"0	0	0	";s:9:"allowtime";s:0:"";s:9:"thumbsize";s:5:"575	0";}', '', '');
 
 DROP TABLE IF EXISTS pw_friends;
 CREATE TABLE pw_friends (
@@ -2236,7 +2242,8 @@ INSERT INTO pw_hack (hk_name, vtype, hk_value, decrip) VALUES('o_weibo_hottransm
 INSERT INTO pw_hack (hk_name, vtype, hk_value, decrip) VALUES('o_weibo_hotfansdays','string','1','');
 INSERT INTO pw_hack (hk_name, vtype, hk_value, decrip) VALUES('o_weibopost','string','1','');
 INSERT INTO pw_hack (hk_name, vtype, hk_value, decrip) VALUES('o_punchopen','string','1','');
-INSERT INTO pw_hack (hk_name, vtype, hk_value, decrip) VALUES('o_punch_reward','string','a:4:{s:4:"type";s:5:"money";s:3:"num";s:1:"5";s:8:"category";s:6:"credit";s:11:"information";s:17:"可获得 铜币 ";}','');
+INSERT INTO pw_hack (hk_name, vtype, hk_value, decrip) VALUES('o_punch_reward','string','a:6:{s:4:"type";s:5:"money";s:3:"min";s:1:"6";s:3:"max";s:2:"30";s:4:"step";s:1:"3";s:8:"category";s:6:"credit";s:11:"information";s:17:"可获得 铜币 ";}', '');
+
 
 DROP TABLE IF EXISTS pw_help;
 CREATE TABLE pw_help (
@@ -2323,10 +2330,19 @@ CREATE TABLE pw_invoke (
   tagcode TEXT NOT NULL,
   parsecode text NOT NULL,
   title varchar(80) NOT NULL default '',
+  `ifapi` tinyint(1) NOT NULL DEFAULT '0',
+  `scr` varchar(25) NOT NULL DEFAULT '',
+  `sign` varchar(25) NOT NULL DEFAULT '',
+  `pieces` varchar(255) NOT NULL DEFAULT '',
+  `state` tinyint(1) NOT NULL DEFAULT '0',
+  `ifverify` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY  (id),
   UNIQUE KEY idx_name (name),
-  KEY idx_title (title)
+  KEY idx_title (title),
+  KEY `idx_scr_sign` (`scr`,`sign`)
 ) TYPE=MyISAM;
+
+
 
 DROP TABLE IF EXISTS pw_invokepiece;
 CREATE TABLE pw_invokepiece (
@@ -2334,7 +2350,7 @@ CREATE TABLE pw_invokepiece (
   invokename varchar(50) NOT NULL default '',
   title varchar(50) NOT NULL default '',
   action varchar(30) NOT NULL default '',
-  config varchar(255) NOT NULL default '',
+  config TEXT NOT NULL default '',
   num smallint(6) NOT NULL default '0',
   param text NOT NULL,
   cachetime int(10) unsigned NOT NULL default '0',
@@ -2404,99 +2420,6 @@ CREATE TABLE pw_jober (
   KEY idx_userid_status (userid,status)
 ) ENGINE=MyISAM;
 
-DROP TABLE IF EXISTS pw_log_colonys;
-CREATE TABLE pw_log_colonys(
-    id int(10) unsigned not null auto_increment,
-    sid int(10) unsigned not null default '0',
-    operate tinyint(3) not null default '1',
-    modified_time int(10) unsigned not null default '0',
-    primary key(id),
-    unique key idx_sid_operate(sid,operate)
-)ENGINE=MyISAM;
-
-DROP TABLE IF EXISTS pw_log_diary;
-CREATE TABLE pw_log_diary(
-    id int(10) unsigned not null auto_increment,
-    sid int(10) unsigned not null default '0',
-    operate tinyint(3) not null default '1',
-    modified_time int(10) unsigned not null default '0',
-    primary key(id),
-    unique key idx_sid_operate(sid,operate)
-)ENGINE=MyISAM;
-
-DROP TABLE IF EXISTS pw_log_members;
-CREATE TABLE pw_log_members(
-    id int(10) unsigned not null auto_increment,
-    sid int(10) unsigned not null default '0',
-    operate tinyint(3) not null default '1',
-    modified_time int(10) unsigned not null default '0',
-    primary key(id),
-    unique key idx_sid_operate(sid,operate)
-)ENGINE=MyISAM;
-
-DROP TABLE IF EXISTS pw_log_posts;
-CREATE TABLE pw_log_posts(
-    id int(10) unsigned not null auto_increment,
-    sid int(10) unsigned not null default '0',
-    operate tinyint(3) not null default '1',
-    modified_time int(10) unsigned not null default '0',
-    primary key(id),
-    unique key idx_sid_operate(sid,operate)
-)ENGINE=MyISAM;
-
-DROP TABLE IF EXISTS pw_log_threads;
-CREATE TABLE pw_log_threads(
-    id int(10) unsigned not null auto_increment,
-    sid int(10) unsigned not null default '0',
-    operate tinyint(3) not null default '1',
-    modified_time int(10) unsigned not null default '0',
-    primary key(id),
-    unique key idx_sid_operate(sid,operate)
-)ENGINE=MyISAM;
-
-DROP TABLE IF EXISTS pw_medalinfo;
-CREATE TABLE pw_medalinfo (
-  id mediumint(8) NOT NULL AUTO_INCREMENT,
-  name varchar(40) NOT NULL default '',
-  intro varchar(255) NOT NULL default '',
-  picurl varchar(255) NOT NULL default '',
-  PRIMARY KEY  (id)
-) TYPE=MyISAM;
-INSERT INTO pw_medalinfo(id,name,intro,picurl) VALUES (1, '{#medalname_1}', '{#medaldesc_1}!','1.gif');
-INSERT INTO pw_medalinfo(id,name,intro,picurl) VALUES (2, '{#medalname_2}', '{#medaldesc_2}', '2.gif');
-INSERT INTO pw_medalinfo(id,name,intro,picurl) VALUES (3, '{#medalname_3}', '{#medaldesc_3}', '3.gif');
-INSERT INTO pw_medalinfo(id,name,intro,picurl) VALUES (4, '{#medalname_4}', '{#medaldesc_4}', '4.gif');
-INSERT INTO pw_medalinfo(id,name,intro,picurl) VALUES (5, '{#medalname_5}', '{#medaldesc_5}', '5.gif');
-INSERT INTO pw_medalinfo(id,name,intro,picurl) VALUES (6, '{#medalname_6}', '{#medaldesc_6}', '6.gif');
-INSERT INTO pw_medalinfo(id,name,intro,picurl) VALUES (7, '{#medalname_7}', '{#medaldesc_7}', '7.gif');
-INSERT INTO pw_medalinfo(id,name,intro,picurl) VALUES (8, '{#medalname_8}', '{#medaldesc_8}', '8.gif');
-INSERT INTO pw_medalinfo(id,name,intro,picurl) VALUES (9, '{#medalname_9}', '{#medaldesc_9}', '9.gif');
-INSERT INTO pw_medalinfo(id,name,intro,picurl) VALUES (10,'{#medalname_10}','{#medaldesc_10}','10.gif');
-
-DROP TABLE IF EXISTS pw_medalslogs;
-CREATE TABLE pw_medalslogs (
-  id int(10) NOT NULL auto_increment,
-  awardee varchar(40) NOT NULL default '',
-  awarder varchar(40) NOT NULL default '',
-  awardtime int(10) NOT NULL default '0',
-  timelimit tinyint(3) NOT NULL default '0',
-  state tinyint(3) NOT NULL default '0',
-  level smallint(6) NOT NULL DEFAULT '0',
-  action tinyint(3) NOT NULL default '0',
-  why varchar(255) NOT NULL default '',
-  PRIMARY KEY  (id),
-  KEY awardee (awardee)
-) TYPE=MyISAM;
-
-DROP TABLE IF EXISTS pw_medaluser;
-CREATE TABLE pw_medaluser (
-  id mediumint(8) unsigned NOT NULL auto_increment,
-  uid int(10) unsigned NOT NULL default '0',
-  mid SMALLINT(6) NOT NULL DEFAULT '0',
-  PRIMARY KEY  (id),
-  KEY idx_uid (uid)
-) TYPE=MyISAM;
-
 DROP TABLE IF EXISTS pw_membercredit;
 CREATE TABLE pw_membercredit (
   uid int(10) unsigned NOT NULL default '0',
@@ -2540,6 +2463,10 @@ CREATE TABLE pw_memberdata (
   lastmsg int(10) unsigned NOT NULL default 0,
   lastgrab int(10) unsigned NOT NULL default 0,
   punch int(10) unsigned not null default '0',
+  `shafa` MEDIUMINT( 8 ) NOT NULL DEFAULT '0',
+  `newnotice` MEDIUMINT( 8 ) NOT NULL DEFAULT '0',
+  `newrequest` MEDIUMINT( 8 ) NOT NULL DEFAULT '0',
+  `bubble` varchar(255) NOT NULL DEFAULT '',
   PRIMARY KEY uid (uid),
   KEY idx_postnum (postnum)
 ) TYPE=MyISAM;
@@ -2928,6 +2855,7 @@ CREATE TABLE pw_ouserdata (
   photos_isfollow tinyint(3) unsigned NOT NULL default '1',
   group_isfollow tinyint(3) unsigned NOT NULL default '1',
   sinaweibo_isfollow TINYINT(1) UNSIGNED NOT NULL DEFAULT '1',
+  `at_isfeed` TINYINT( 1 ) UNSIGNED NOT NULL DEFAULT '0',
   PRIMARY KEY  (uid)
 ) TYPE=MyISAM;
 INSERT INTO pw_ouserdata (uid, index_privacy, profile_privacy, info_privacy, credit_privacy, owrite_privacy, msgboard_privacy, photos_privacy, diary_privacy, article_isfeed, diary_isfeed, photos_isfeed, group_isfeed, visits, tovisits, tovisit, whovisit, diarynum, photonum, owritenum, groupnum, sharenum, diary_lastpost, photo_lastpost, owrite_lastpost, group_lastpost, share_lastpost) VALUES (1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, '', '', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
@@ -4269,7 +4197,7 @@ INSERT INTO pw_plan VALUES (1, '{#plan_2}', '*', '*', '20', '30', 0, 0, 0, 0, 'f
 INSERT INTO pw_plan VALUES (2, '{#plan_3}', '*', '*', '0', '*', 0, 0, 1, 0, 'birthday', '');
 INSERT INTO pw_plan VALUES (3, '{#plan_4}', '*', '1', '12', '30', 0, 0, 1, 0, 'rewardmsg', '');
 INSERT INTO pw_plan VALUES (4, '{#plan_5}', '15', '*', '2', '*', 0, 0, 0, 0, 'team', 'a:3:{s:10:"credittype";s:6:"credit";s:6:"credit";a:3:{i:3;s:3:"100";i:4;s:2:"60";i:5;s:2:"50";}s:6:"groups";s:5:"3,4,5";}');
-INSERT INTO pw_plan VALUES (5, '{#plan_6}', '16', '*', '18', '30', 0, 0, 0, 0, 'medal', '');
+INSERT INTO pw_plan VALUES (5, '{#plan_6}', '*', '*', '*', '30', 0, 1, 0, 1, 'medal', '');
 INSERT INTO pw_plan VALUES (6, '{#plan_7}', '*', '*', '22', '*', 0, 0, 0, 0, 'extragroup', '');
 INSERT INTO pw_plan VALUES (7,'广告到期提醒','*','*','9','*','0','0','0','1','alteradvert','');
 
@@ -4346,7 +4274,8 @@ CREATE TABLE pw_postsfloor (
   tid int(10) NOT NULL,
   floor int(10) NOT NULL AUTO_INCREMENT,
   pid int(10) NOT NULL default '0',
-  PRIMARY KEY (tid,floor)
+  PRIMARY KEY (tid,floor),
+  UNIQUE KEY `idx_pid` (`pid`)
 ) TYPE=MyISAM;
 
 DROP TABLE IF EXISTS pw_poststopped;
@@ -4916,13 +4845,14 @@ CREATE TABLE pw_threads (
   ifhide tinyint(3) NOT NULL default '0',
   inspect varchar(30) NOT NULL default '',
   tpcstatus int(10) unsigned NOT NULL default '0',
+  specialsort TINYINT(3) UNSIGNED NOT NULL DEFAULT '0',
   PRIMARY KEY  (tid),
   KEY idx_authorid (authorid),
   KEY idx_postdate (postdate),
   KEY idx_digest (digest),
   KEY idx_fid_type_ifcheck (fid,type,ifcheck),
   KEY idx_special (special),
-  KEY idx_fid_ifcheck_topped_lastpost (fid,ifcheck,topped,lastpost)
+  KEY idx_fid_ifcheck_specialsort_lastpost (fid,ifcheck,specialsort,lastpost)
 ) TYPE=MyISAM;
 
  
@@ -4936,6 +4866,7 @@ CREATE TABLE `pw_threads_img` (
   `cover` varchar(80) NOT NULL DEFAULT '',
   `ifcheck` TINYINT(3) NOT NULL DEFAULT '1',
   `topped` SMALLINT(6) NOT NULL DEFAULT '0',
+  `ifthumb` TINYINT( 3 ) UNSIGNED NOT NULL DEFAULT '0',
   PRIMARY KEY (`tid`),
   KEY `idx_fid_topped_tid` (`fid` ,`topped` , `tid`),
   KEY `idx_fid_topped_totalnum` (`fid` ,`topped` , `totalnum`)
@@ -5072,6 +5003,7 @@ CREATE TABLE pw_topictype (
  vieworder tinyint(3) NOT NULL default '0',
  upid smallint(6) unsigned NOT NULL default '0',
  ifsys tinyint(3) unsigned not null default '0',
+ `isdefault` TINYINT( 3 ) UNSIGNED NOT NULL DEFAULT '0',
  PRIMARY KEY  (id)
 ) TYPE=MyISAM;
 
@@ -5404,16 +5336,6 @@ CREATE TABLE pw_write_smiles (
   PRIMARY KEY  (smileid)
 ) TYPE=MyISAM;
 
-DROP TABLE IF EXISTS pw_log_forums;
-CREATE TABLE pw_log_forums(
-id int(10) unsigned not null auto_increment,
-sid int(10) unsigned not null default '0',
-operate tinyint(3) not null default '1',
-modified_time int(10) unsigned not null default '0',
-primary key(id),
-unique key idx_sid_operate(sid,operate)
-) TYPE=MyISAM;
-
 DROP TABLE IF EXISTS pw_log_setting;
 CREATE TABLE pw_log_setting(
     id int(10) unsigned not null auto_increment,
@@ -5433,3 +5355,438 @@ CREATE TABLE IF NOT EXISTS `pw_weibo_bind` (
   `info` text NOT NULL,
   UNIQUE KEY `uid_weibotype` (`uid`,`weibotype`)
 ) TYPE=MyISAM;
+
+DROP TABLE IF EXISTS pw_temp_keywords;
+CREATE TABLE IF NOT EXISTS `pw_temp_keywords` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `keyword` varchar(32) NOT NULL DEFAULT '',
+  `created_time` int(10) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM;
+
+DROP TABLE IF EXISTS pw_wappushtype;
+CREATE TABLE IF NOT EXISTS `pw_wappushtype` (
+  `id` smallint(6) unsigned NOT NULL AUTO_INCREMENT,
+  `sort` smallint(6) unsigned NOT NULL DEFAULT '0',
+  `typename` varchar(50) NOT NULL DEFAULT '', 
+  `state` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM;
+
+DROP TABLE IF EXISTS pw_wappush;
+CREATE TABLE IF NOT EXISTS `pw_wappush` (
+  `id` smallint(6) unsigned NOT NULL AUTO_INCREMENT,
+  `tid` int(10) unsigned NOT NULL DEFAULT '0',
+  `subject` varchar(200) NOT NULL DEFAULT '', 
+  `link` varchar(255) NOT NULL DEFAULT '', 
+  `typeid` smallint(6) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM ;
+
+DROP TABLE IF EXISTS pw_portalpage;
+CREATE TABLE IF NOT EXISTS `pw_portalpage` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `sign` varchar(50) NOT NULL DEFAULT '',
+  `title` varchar(255) NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idx_sign` (`sign`)
+) ENGINE=MyISAM;
+
+DROP TABLE IF EXISTS pw_cms_comment;
+CREATE TABLE IF NOT EXISTS `pw_cms_comment` (
+  `commentid` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `uid` int(10) unsigned NOT NULL DEFAULT '0',
+  `article_id` int(10) unsigned NOT NULL DEFAULT '0',
+  `content` varchar(255) NOT NULL DEFAULT '',
+  `replynum` smallint(6) unsigned NOT NULL DEFAULT '0',
+  `postdate` int(10) unsigned NOT NULL DEFAULT '0',
+  `ip` varchar(15) NOT NULL DEFAULT '',
+  PRIMARY KEY (`commentid`),
+  KEY `idx_articleid_postdate` (`article_id`,`postdate`)
+) ENGINE=MyISAM ;
+
+DROP TABLE IF EXISTS pw_cms_commentreply;
+CREATE TABLE IF NOT EXISTS `pw_cms_commentreply` (
+  `replyid` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `uid` int(10) unsigned NOT NULL DEFAULT '0',
+  `commentid` int(10) unsigned NOT NULL DEFAULT '0',
+  `content` varchar(255) NOT NULL DEFAULT '',
+  `postdate` int(10) unsigned NOT NULL DEFAULT '0',
+  `ip` varchar(15) NOT NULL DEFAULT '',
+  PRIMARY KEY (`replyid`),
+  KEY `idx_commentid_postdate` (`commentid`,`postdate`)
+) ENGINE=MyISAM ;
+
+DROP TABLE IF EXISTS pw_stopic_comment;
+CREATE TABLE IF NOT EXISTS `pw_stopic_comment` (
+  `commentid` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `uid` int(10) unsigned NOT NULL DEFAULT '0',
+  `stopic_id` int(10) unsigned NOT NULL DEFAULT '0',
+  `content` varchar(255) NOT NULL DEFAULT '',
+  `replynum` smallint(6) unsigned NOT NULL DEFAULT '0',
+  `postdate` int(10) unsigned NOT NULL DEFAULT '0',
+  `ip` varchar(15) NOT NULL DEFAULT '',
+  PRIMARY KEY (`commentid`),
+  KEY `idx_stopicid_postdate` (`stopic_id`,`postdate`)
+) ENGINE=MyISAM ;
+
+
+DROP TABLE IF EXISTS pw_stopic_commentreply;
+CREATE TABLE IF NOT EXISTS `pw_stopic_commentreply` (
+  `replyid` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `uid` int(10) unsigned NOT NULL DEFAULT '0',
+  `commentid` int(10) unsigned NOT NULL DEFAULT '0',
+  `content` varchar(255) NOT NULL DEFAULT '',
+  `postdate` int(10) unsigned NOT NULL DEFAULT '0',
+  `ip` varchar(15) NOT NULL DEFAULT '',
+  PRIMARY KEY (`replyid`),
+  KEY `idx_commentid_postdate` (`commentid`,`postdate`)
+) ENGINE=MyISAM ;
+
+
+DROP TABLE IF EXISTS pw_robbuild;
+CREATE TABLE IF NOT EXISTS `pw_robbuild` (
+  `tid` int(10) unsigned NOT NULL,
+  `authorid` int(10) unsigned NOT NULL DEFAULT '0',
+  `postdate` int(10) unsigned NOT NULL DEFAULT '0',
+  `starttime` int(10) unsigned NOT NULL DEFAULT '0',
+  `endtime` int(10) unsigned NOT NULL DEFAULT '0',
+  `endbuild` smallint(6) unsigned NOT NULL DEFAULT '0',
+  `awardbuilds` varchar(255) NOT NULL DEFAULT '',
+  `pids` text NOT NULL,
+  PRIMARY KEY (`tid`)
+) ENGINE=MyISAM ;
+
+DROP TABLE IF EXISTS pw_medal_info;
+CREATE TABLE IF NOT EXISTS `pw_medal_info` (
+ `medal_id` smallint(6) unsigned NOT NULL AUTO_INCREMENT,
+ `identify` varchar(30) NOT NULL DEFAULT '',
+ `name` varchar(80) NOT NULL DEFAULT '',
+ `descrip` varchar(255) NOT NULL,
+ `type` tinyint(3) NOT NULL DEFAULT '0',
+ `image` varchar(255) NOT NULL DEFAULT '',
+ `sortorder` int(10) NOT NULL DEFAULT '0',
+ `is_apply` tinyint(3) NOT NULL DEFAULT '1',
+ `is_open` tinyint(3) NOT NULL DEFAULT '1',
+ `allow_group` text NOT NULL,
+ `associate` varchar(30) NOT NULL DEFAULT '',
+ `confine` int(10) NOT NULL DEFAULT '0',
+ PRIMARY KEY (`medal_id`),
+ UNIQUE KEY `idx_identify` (`identify`),
+ KEY `idx_type` (`type`),
+ KEY `idx_sortorder` (`sortorder`),
+ KEY `idx_associate` (`associate`)
+) ENGINE=MyISAM;
+
+INSERT INTO `pw_medal_info` (`identify`, `name`, `descrip`, `type`, `image`, `sortorder`, `is_apply`, `is_open`, `allow_group`, `associate`, `confine`) VALUES
+('shequjumin', '社区居民', '拥有帐号并登录即可获得此勋章.', 1, 'shequjumin.png', 0, 1, 1, '', 'continue_login', 1),
+('zuiaishafa', '最爱沙发', '抢沙发总数达到100即可获得此勋章.', 1, 'zuiaishafa.png', 1, 1, 1, '', 'shafa', 100),
+('shequmingxing', '社区明星', '粉丝数达到100即可获得此勋章.', 1, 'shequmingxing.png', 2, 1, 1, '', 'fans', 100),
+('zhongshihuiyuan', '忠实会员', '连续登录7天即可获得此勋章.', 1, 'rexinhuiyuan.png', 3, 1, 1, '', 'continue_login', 7),
+('yuanchuangdaren', '原创达人', '连续发主题7天即可获得此勋章.', 1, 'yuanchuangdaren.png', 4, 1, 1, '', 'continue_thread_post', 7),
+('shequlaomo', '社区劳模', '连续发帖7天即可获得此勋章.', 1, 'shequlaomo.png', 5, 1, 1, '', 'continue_post', 7),
+('shimingrenzheng', '实名认证', '实名认证用户即可获得此勋章.', 0, 'shimingrenzheng.png', 6, 1, 1, '', '', 0),
+('chengxinshanghu', '诚信商户', '社区诚信商户,官方认证.', 2, 'chengxinshanghu.png', 7, 1, 1, '', '', 0),
+('xinrenjinbu', '新人进步', '新人有很大的进步可以得到这个奖章!', 2, 'xinrenjinbu.png', 8, 1, 1, '', '', 0),
+('zhongshenchengjiu', '终身成就', '谢谢您为社区发展做出的不可磨灭的贡献!', 2, 'zhongshenchengjiu.png', 9, 1, 1, '', '', 0),
+('xuanchuandashi', '宣传大使', '谢谢您为社区积极宣传,特颁发此奖!', 2, 'xuanchuandashi.png', 10, 1, 1, '', '', 0),
+('jindianzi', '金点子', '为社区提出建设性的建议被采纳,特颁发此奖!', 2, 'jindianzi.png', 11, 1, 1, '', '', 0),
+('youmodashi', '幽默大师', '您总是能给别人带来欢乐,谢谢您!', 2, 'youmodashi.png', 12, 1, 1, '', '', 0),
+('yuanchuangxianfeng', '原创先锋', '谢谢您积极发表原创作品,特颁发此奖!', 2, 'yuanchuangxianfeng.png', 13, 1, 1, '', '', 0),
+('teshugongxian', '特殊贡献', '您为论坛做出了特殊贡献,谢谢您!', 2, 'teshugongxian.png', 14, 1, 1, '', '', 0),
+('guanshuidashi', '灌水天才', '能够长期提供优质的社区水资源者,可得这个奖章!', 2, 'guanshuidashi.png', 15, 1, 1, '', '', 0),
+('youxiubanzhu', '优秀斑竹', '辛劳地为论坛付出劳动，收获快乐，感谢您!', 2, 'youxiubanzhu.png', 16, 1, 1, '', '', 0),
+('tietudashi', '贴图大师', '帖图高手,堪称大师!', 2, 'tietudashi.png', 17, 1, 1, '', '', 0);
+
+DROP TABLE IF EXISTS pw_medal_apply;
+CREATE TABLE IF NOT EXISTS `pw_medal_apply` (
+ `apply_id` int(10) NOT NULL AUTO_INCREMENT,
+ `uid` int(10) NOT NULL DEFAULT '0',
+ `medal_id` smallint(6) NOT NULL DEFAULT '0',
+ `timestamp` int(10) NOT NULL DEFAULT '0',
+ PRIMARY KEY (`apply_id`),
+ KEY `idx_uid` (`uid`),
+ KEY `idx_medal_id` (`medal_id`)
+) ENGINE=MyISAM;
+
+DROP TABLE IF EXISTS pw_medal_award;
+CREATE TABLE IF NOT EXISTS `pw_medal_award` (
+ `award_id` int(10) NOT NULL AUTO_INCREMENT,
+ `medal_id` smallint(6) NOT NULL DEFAULT '0',
+ `uid` int(10) NOT NULL DEFAULT '0',
+ `type` tinyint(3) NOT NULL DEFAULT '0',
+ `timestamp` int(10) NOT NULL DEFAULT '0',
+ `deadline` int(10) NOT NULL,
+ PRIMARY KEY (`award_id`),
+ UNIQUE KEY `idx_medalid_uid` (`medal_id`,`uid`),
+ KEY `idx_deadline` (`deadline`),
+ KEY `idx_uid` (`uid`),
+ KEY `idx_type` (`type`)
+) ENGINE=MyISAM;
+
+DROP TABLE IF EXISTS pw_medal_log;
+CREATE TABLE IF NOT EXISTS `pw_medal_log` (
+ `log_id` int(10) NOT NULL AUTO_INCREMENT,
+ `award_id` int(10) NOT NULL DEFAULT '0',
+ `medal_id` smallint(6) NOT NULL DEFAULT '0',
+ `timestamp` int(10) NOT NULL,
+ `type` tinyint(3) NOT NULL DEFAULT '0',
+ `descrip` varchar(255) NOT NULL DEFAULT '',
+ PRIMARY KEY (`log_id`)
+) ENGINE=MyISAM;
+
+DROP TABLE IF EXISTS pw_member_behavior_statistic;
+CREATE TABLE IF NOT EXISTS `pw_member_behavior_statistic` (
+  `uid` int(10) NOT NULL,
+  `behavior` tinyint(3) NOT NULL DEFAULT '0',
+  `lastday` int(10) NOT NULL,
+  `num` int(10) NOT NULL,
+  UNIQUE KEY `idx_uid_behavior` (`uid`,`behavior`)
+) ENGINE=MyISAM;
+
+DROP TABLE IF EXISTS pw_threads_at;
+CREATE TABLE IF NOT EXISTS `pw_threads_at` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `tid` int(10) unsigned NOT NULL DEFAULT '0',
+  `pid` int(10) unsigned NOT NULL DEFAULT '0',
+  `uid` int(10) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idx_tid_pid_uid` (`tid`,`pid`,`uid`)
+) ENGINE=MyISAM;
+
+DROP TABLE IF EXISTS pw_robbuildfloor;
+CREATE TABLE IF NOT EXISTS `pw_robbuildfloor` (
+  `tid` int(10) unsigned NOT NULL DEFAULT '0',
+  `floor` int(10) unsigned NOT NULL DEFAULT '0',
+  `pid` int(10) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`tid`,`floor`),
+  UNIQUE KEY `idx_pid` (`pid`)
+) ENGINE=MyISAM ;
+
+DROP TABLE IF EXISTS `pw_replyreward`;
+CREATE TABLE IF NOT EXISTS `pw_replyreward` (
+ `tid` int(10) unsigned NOT NULL,
+ `credittype` varchar(30) NOT NULL default '',
+ `creditnum` int(10) unsigned NOT NULL default '0',
+ `rewardtimes` smallint(5) unsigned NOT NULL default '0',
+ `repeattimes` tinyint(3) unsigned NOT NULL default '0',
+ `chance` tinyint(3) unsigned NOT NULL default '0',
+ `lefttimes` smallint(5) unsigned NOT NULL default '0',
+ PRIMARY KEY (`tid`)
+) ENGINE=MyISAM;
+
+DROP TABLE IF EXISTS `pw_replyrewardrecord`;
+CREATE TABLE IF NOT EXISTS `pw_replyrewardrecord` (
+ `tid` int(10) unsigned NOT NULL default '0',
+ `pid` int(10) unsigned NOT NULL default '0',
+ `uid` int(10) unsigned NOT NULL default '0',
+ `credittype` varchar(30) NOT NULL default '',
+ `creditnum` int(10) unsigned NOT NULL default '0',
+ `rewardtime` int(10) unsigned NOT NULL default '0',
+ UNIQUE KEY `idx_tid_pid` (`tid`,`pid`),
+ KEY `idx_uid` (`uid`)
+) ENGINE=MyISAM;
+
+DROP TABLE IF EXISTS `pw_kmd_info`;
+CREATE TABLE IF NOT EXISTS `pw_kmd_info` (
+  `kid` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `fid` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `uid` int(10) unsigned NOT NULL DEFAULT '0',
+  `tid` int(10) unsigned NOT NULL DEFAULT '0',
+  `status` tinyint(1) unsigned NOT NULL DEFAULT '0',
+  `starttime` int(10) unsigned NOT NULL DEFAULT '0',
+  `endtime` int(10) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`kid`),
+  KEY `idx_tid` (`tid`)
+) ENGINE=MyISAM ;
+
+ DROP TABLE IF EXISTS `pw_kmd_paylog`;
+CREATE TABLE IF NOT EXISTS `pw_kmd_paylog` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `kid` int(10) unsigned NOT NULL DEFAULT '0',
+  `fid` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `uid` int(10) unsigned NOT NULL DEFAULT '0',
+  `sid` int(10) unsigned NOT NULL DEFAULT '0',
+  `type` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `money` decimal(14,2) unsigned NOT NULL DEFAULT '0.00',
+  `status` tinyint(3) unsigned NOT NULL DEFAULT '1',
+  `createtime` int(10) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  KEY `idx_fid` (`fid`),
+  KEY `idx_uid` (`uid`),
+  KEY `idx_createtime` (`createtime`)
+) ENGINE=MyISAM;
+ 
+DROP TABLE IF EXISTS `pw_kmd_spread`;
+CREATE TABLE IF NOT EXISTS `pw_kmd_spread` (
+  `sid` int(10) NOT NULL AUTO_INCREMENT,
+  `displayorder` int(10) UNSIGNED NOT NULL DEFAULT '0',
+  `name` varchar(50) NOT NULL DEFAULT '',
+  `day` smallint(3) UNSIGNED NOT NULL DEFAULT '0',
+  `price` decimal(14,2) UNSIGNED NOT NULL DEFAULT '0.00',
+  `discount` DECIMAL( 2, 1 ) UNSIGNED NOT NULL DEFAULT '0.0',
+  PRIMARY KEY (`sid`)
+) ENGINE=MyISAM;
+
+INSERT INTO pw_kmd_spread (displayorder,name,day,price,discount) VALUES (1,'一周',7,100,9),(2,'一个月',30,400,'8.5'),(3,'一季度',90,1200,'8');
+
+DROP TABLE IF EXISTS `pw_kmd_user`;
+CREATE TABLE IF NOT EXISTS `pw_kmd_user` (
+  `uid` int(10) UNSIGNED NOT NULL DEFAULT 0,
+  `phone` varchar(15) DEFAULT NULL,
+  `realname` varchar(15) NOT NULL DEFAULT '',
+  `invoice` varchar(100) NOT NULL DEFAULT '',
+  `address` varchar(200) NOT NULL DEFAULT '',
+  PRIMARY KEY (`uid`)
+) ENGINE=MyISAM;
+
+DROP TABLE IF EXISTS `pw_weibo_login_session`;
+CREATE TABLE IF NOT EXISTS `pw_weibo_login_session` (
+  `sessionid` varchar(32) NOT NULL DEFAULT '',
+  `expire` int(10) unsigned NOT NULL DEFAULT '0',
+  `sessiondata` text NOT NULL,
+  PRIMARY KEY (`sessionid`)
+) ENGINE=MyISAM;
+
+DROP TABLE IF EXISTS `pw_weibo_login_user`;
+CREATE TABLE IF NOT EXISTS `pw_weibo_login_user` (
+  `uid` int(10) unsigned NOT NULL DEFAULT '0',
+  `hasresetpwd` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `createtime` int(10) unsigned NOT NULL DEFAULT '0',
+  `extra` text NOT NULL
+) ENGINE=MyISAM;
+
+ 
+DROP TABLE IF EXISTS pw_log_forums;
+CREATE TABLE pw_log_forums(     
+id int(10) unsigned not null auto_increment,     
+sid int(10) unsigned not null default '0',     
+operate tinyint(3) not null default '1',     
+modified_time int(10) unsigned not null default '0',     
+primary key(id),     
+unique key idx_sid_operate(sid,operate) 
+)ENGINE=MyISAM;
+
+ 
+DROP TABLE IF EXISTS pw_log_colonys;
+CREATE TABLE pw_log_colonys(
+    id int(10) unsigned not null auto_increment,
+    sid int(10) unsigned not null default '0',
+    operate tinyint(3) not null default '1',
+    modified_time int(10) unsigned not null default '0',
+    primary key(id),
+    unique key idx_sid_operate(sid,operate)
+)ENGINE=MyISAM;
+
+ 
+DROP TABLE IF EXISTS pw_log_members;
+CREATE TABLE pw_log_members(
+    id int(10) unsigned not null auto_increment,
+    sid int(10) unsigned not null default '0',
+    operate tinyint(3) not null default '1',
+    modified_time int(10) unsigned not null default '0',
+    primary key(id),
+    unique key idx_sid_operate(sid,operate)
+)ENGINE=MyISAM;
+
+
+DROP TABLE IF EXISTS pw_log_diary;
+CREATE TABLE pw_log_diary(
+    id int(10) unsigned not null auto_increment,
+    sid int(10) unsigned not null default '0',
+    operate tinyint(3) not null default '1',
+    modified_time int(10) unsigned not null default '0',
+    primary key(id),
+    unique key idx_sid_operate(sid,operate)
+)ENGINE=MyISAM;
+
+ 
+DROP TABLE IF EXISTS pw_log_posts;
+CREATE TABLE pw_log_posts(
+    id int(10) unsigned not null auto_increment,
+    sid int(10) unsigned not null default '0',
+    operate tinyint(3) not null default '1',
+    modified_time int(10) unsigned not null default '0',
+    primary key(id),
+    unique key idx_sid_operate(sid,operate)
+)ENGINE=MyISAM;
+
+ 
+DROP TABLE IF EXISTS pw_log_threads;
+CREATE TABLE pw_log_threads(
+    id int(10) unsigned not null auto_increment,
+    sid int(10) unsigned not null default '0',
+    operate tinyint(3) not null default '1',
+    modified_time int(10) unsigned not null default '0',
+    primary key(id),
+    unique key idx_sid_operate(sid,operate)
+)ENGINE=MyISAM;
+
+ 
+DROP TABLE IF EXISTS pw_log_attachs;
+CREATE TABLE pw_log_attachs(
+    id int(10) unsigned not null auto_increment,
+    sid int(10) unsigned not null default '0',
+    operate tinyint(3) not null default '1',
+    modified_time int(10) unsigned not null default '0',
+    primary key(id),
+    unique key idx_sid_operate(sid,operate)
+)ENGINE=MyISAM;
+
+DROP TABLE IF EXISTS pw_log_weibos;
+CREATE TABLE pw_log_weibos(
+    id int(10) unsigned not null auto_increment,
+    sid int(10) unsigned not null default '0',
+    operate tinyint(3) not null default '1',
+    modified_time int(10) unsigned not null default '0',
+    primary key(id),
+    unique key idx_sid_operate(sid,operate)
+)ENGINE=MyISAM;
+
+DROP TABLE IF EXISTS pw_yun_setting;
+CREATE TABLE `pw_yun_setting` (                      
+	`id` int(10) unsigned NOT NULL AUTO_INCREMENT,      
+	`setting` text,                                     
+	PRIMARY KEY (`id`)                                  
+ ) ENGINE=MyISAM ;
+
+
+DROP TABLE IF EXISTS pw_log_aggregate;
+CREATE TABLE `pw_log_aggregate` (                           
+	`id` int(10) unsigned NOT NULL AUTO_INCREMENT, 
+	`type` tinyint(3) NOT NULL DEFAULT '0',          
+ 	`sid` int(10) unsigned NOT NULL DEFAULT '0',            
+ 	`operate` tinyint(3) NOT NULL DEFAULT '1',              
+ 	`modified_time` int(10) unsigned NOT NULL DEFAULT '0',  
+	PRIMARY KEY (`id`),                                     
+ 	UNIQUE KEY `idx_sid_type_operate` (`sid`,`type`,`operate`)          
+) ENGINE=MyISAM ;
+
+
+DROP TABLE IF EXISTS pw_log_userdefend;
+CREATE TABLE `pw_log_userdefend` (	               
+	`id` int(10) unsigned NOT NULL AUTO_INCREMENT,  
+	`data` text,
+	PRIMARY KEY (`id`)	  
+) ENGINE=MyISAM ;
+
+
+DROP TABLE IF EXISTS pw_log_postdefend;
+CREATE TABLE `pw_log_postdefend` (	               
+	`id` int(10) unsigned NOT NULL AUTO_INCREMENT,  
+	`data` text,
+	PRIMARY KEY (`id`)	  
+) ENGINE=MyISAM;
+
+
+DROP TABLE IF EXISTS pw_log_postverify;
+CREATE TABLE `pw_log_postverify` (	               
+	`id` int(10) unsigned NOT NULL AUTO_INCREMENT,  
+	`type` int(10) unsigned NOT NULL DEFAULT '0',    
+	`tid` int(10) unsigned NOT NULL DEFAULT '0',   
+	`pid` int(10) unsigned NOT NULL DEFAULT '0', 
+	`modified_time` int(10) unsigned NOT NULL DEFAULT '0', 
+	PRIMARY KEY (`id`),
+	unique key idx_tid_pid (tid,pid),
+	KEY idx_modifiedtime(`modified_time`)
+) ENGINE=MyISAM;

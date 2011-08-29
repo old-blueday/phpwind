@@ -17,9 +17,7 @@ print <<<EOT
 EOT;
 }print <<<EOT
 -->
-<script language="JavaScript" src="js/wind_editor.js"></script>
-<script language="JavaScript" src="js/global.js"></script>
-<script  language="JavaScript" src="js/pw_ajax.js"></script>
+<script type="text/javascript" src="js/wind_editor.js"></script>
 <form name='FORM' action="$basename" method="post" onsubmit="return checkpost(document.FORM);">
 <h2 class="h1">邮件群发</h2>
 <div class="admin_table mb10">
@@ -56,7 +54,7 @@ EOT;
 -->
 					<li><input type='checkbox' name='sendto[]' value='-1'>普通会员</li>
 				</ul>
-				<span class="bt2"><span><button onclick="CheckAll(this.form)" value="全 选" name="chkall" onfocus="blur();" type="button">全 选</button></span></span>
+				<span class="bt2"><span><button onclick="ChecksAll(this.form)" value="全 选" name="chkall" onfocus="blur();" type="button">全 选</button></span></span>
 			</td>
 		</tr>
 	</tbody>
@@ -77,7 +75,7 @@ EOT;
 		<tbody id="group_4" style="display:none">
 			<tr class="tr1 vt">
 				<td class="td1">用户名 <span class="s1">*</span></td>
-				<td class="td2"><input type="text" name="touser" class="input input_wb fl mr10" /><span class="help_a">多个用户名用，分开</span></td>
+				<td class="td2"><input type="text" name="touser" class="input input_wb fl mr10" /><span class="help_a">多个用户名用,分开</span></td>
 			</tr>
 		</tbody>
 	<tr class="tr1 vt">
@@ -102,7 +100,16 @@ EOT;
 </form>
 
 <script type="text/javascript" src="js/date.js"></script>
-<SCRIPT LANGUAGE="JavaScript">
+<script type="text/javascript">
+function ChecksAll(form,match) {
+	for (var i = 0,j = form.elements.length; i < j; i++) {
+		var e = form.elements[i];
+		if (e.type == 'checkbox' && (typeof match == 'undefined' || e.name.match(match))) {
+			e.checked = ifcheck;
+		}
+	}
+	ifcheck = ifcheck == true ? false : true;
+}
 function sendtype(ID){
 	for(var i=0;i<5;i++){
 		try{
@@ -134,7 +141,7 @@ function checkpost(obj) {
 	} 
 	if (check == 0 && getObj('byRegName').checked == false && getObj('byLoginTime').checked == false && obj.touser.value == "" && online.checked == false) {
 		obj.touser.setAttribute("hasError", 1);
-		showDialog("error","接受用户不能为空",2);
+		showDialog("error","接收用户不能为空",2);
 		obj.subject.focus();
 		return false;
 	} 
@@ -157,7 +164,7 @@ for (var i=0;i<=4;i++){
       sendtype(i)
       }
 }
-</SCRIPT>
+</script>
 <!--
 EOT;
 } elseif ($action == 'send' || $action == 'confirm') {print <<<EOT

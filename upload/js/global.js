@@ -20,7 +20,7 @@ function PwMenu(id){
 	this.menu	= null;
 	this.mid	= id;
 	this.oCall  = null;
-	this.init(id);
+	this.init(id); 
 }
 
 PwMenu.prototype = {
@@ -65,13 +65,14 @@ PwMenu.prototype = {
 		if (typeof(element) == 'string') {
 			thisobj.innerHTML = element;
 		} else {
-			while (thisobj.hasChildNodes()) {
+			/*while (thisobj.hasChildNodes()) {
 				thisobj.removeChild(thisobj.firstChild);
-			}
+			}*/
+			thisobj.innerHTML = '';
 			thisobj.appendChild(element);
 		}
 		this.oCall = null;
-		if (typeof oCall == 'object' && oCall.open) {
+		if (oCall && oCall.open) {
 			this.oCall = oCall;
 			oCall.open();
 		}
@@ -79,7 +80,8 @@ PwMenu.prototype = {
 
 	move : function(e) {
 		if(is_ie){document.body.onselectstart = function(){return false;}}
-		var e  = is_ie ? window.event : e;
+		if(document.body.style.webkitUserSelect){document.body.style.webkitUserSelect = ''}
+		var e  = window.event || e;
 		var o  = this.menu||getPWBox(this.mid);
 		var x  = e.clientX;
 		var y  = e.clientY;
@@ -89,11 +91,12 @@ PwMenu.prototype = {
 		_.menu=_.menu||getPWBox(_.mid);
 		document.body.setCapture && _.menu.setCapture();
 		document.onmousemove = function(e) {
-			var e  = is_ie ? window.event : e;
+			var e  = window.event || e;
 			var x  = e.clientX;
 			var y  = e.clientY;
+			y=(y - _.h<0)?0:(y - _.h);
 			_.menu.style.left = x - _.w + 'px';
-			_.menu.style.top  = y - _.h + 'px';
+			_.menu.style.top  = y+ 'px';
 		};
 		document.onmouseup   = function() {
 			if(is_ie){document.body.onselectstart = function(){return true;}}
@@ -127,17 +130,19 @@ PwMenu.prototype = {
 	
 	closeByClick : function() {
 		document.onmousedown = function (e) {
-			var o = is_ie ? window.event.srcElement : e.target;
-			if (!issrc(o)) {
+			var e=e||window.event;
+			var o = e.target||e.srcElement;
+			var contain=contains(read.menu,o);
+			if (!contain) {
 				read.close();
-				document.onmousedown = '';
+				document.onmousedown = null;
 			}
 		}
 	},
 
 	closeByMove : function(id) {
 		var _=this;
-		getObj(id).onmouseout = function() {_.close();getObj(id).onmouseout = '';};
+		getObj(id).onmouseout = function() {_.close();getObj(id).onmouseout = null;};
 		_.menu.onmouseout = function() {_.close();}
 		_.menu.onmouseover = function() {clearTimeout(read.t);}
 	},
@@ -147,18 +152,21 @@ PwMenu.prototype = {
 		this.menu.onmouseout = '';
 		this.menu.style.display = '';
 		// this.menu.style.zIndex = 3000;
+		this.menu.style.position='absolute';
 		this.menu.style.left	= '-500px';
 		this.menu.style.visibility = 'visible';
 
 		if (typeof obj == 'string') {
 			obj = getObj(obj);
 		}
-		if (obj == null) {
+		if (!obj||obj == null) {
 			if (is_ie) {
-				this.menu.style.top  = (ietruebody().offsetHeight - this.menu.offsetHeight)/3 + getTop() +($('upPanel')?$('upPanel').scrollTop:0)+ 'px';
+				this.menu.style.top  = (ietruebody().offsetHeight - this.menu.offsetHeight)/3 + getTop() +(getObj('upPanel') ? getObj('upPanel').scrollTop:0)+ 'px';
 				this.menu.style.left = (ietruebody().offsetWidth - this.menu.offsetWidth)/2 + 'px';
 			} else {
-				this.menu.style.top  = (document.documentElement.clientHeight - this.menu.offsetHeight)/3 + getTop() + 'px';
+				var top = (document.documentElement.clientHeight - this.menu.offsetHeight)/3 + getTop();
+				if(top < 0){top = 0;}
+				this.menu.style.top  = top + 'px';
 				this.menu.style.left = (document.documentElement.clientWidth - this.menu.offsetWidth)/2 + 'px';
 			}
 		} else {
@@ -170,15 +178,14 @@ PwMenu.prototype = {
 				var offsetheight = ietruebody().offsetHeight;
 				var offsethwidth = ietruebody().offsetWidth;
 			} else {
-				var offsetheight = ietruebody().clientHeight;
-				var offsethwidth = ietruebody().clientWidth;
+				var offsetheight = document.documentElement.clientHeight;
+				var offsethwidth = document.documentElement.clientWidth;
 			}
 			/*
 			 * if (IsElement('upPanel') && is_ie) { var gettop = 0; } else { var
 			 * gettop = ; }
 			 */
 			var show_top = IsElement('upPanel') ? top - getObj('upPanel').scrollTop : top;
-
 			if (pz_h!=1 && (pz_h==2 || show_top < offsetheight/2)) {
 				top += getTop() + obj.offsetHeight;
 			} else {
@@ -187,10 +194,7 @@ PwMenu.prototype = {
 			if (pz_w!=1 && (pz_w==2 || left > (offsethwidth)*3/5)) {
 				left -= this.menu.offsetWidth - obj.offsetWidth - getLeft();
 			}
-			this.menu.style.top = top+ 'px';
-			if (top < 0) {
-				this.menu.style.top  = 0  + 'px';
-			}
+			this.menu.style.top = (top < 0 ? 0 : top) + 'px';
 			this.menu.style.left = left + 'px';
 			if (pz_w != 1 && left + this.menu.offsetWidth > document.body.offsetWidth+ietruebody().scrollLeft) {
 				this.menu.style.left = document.body.offsetWidth+ietruebody().scrollLeft-this.menu.offsetWidth-30 + 'px';
@@ -203,7 +207,7 @@ PwMenu.prototype = {
 		function setopen(a,b) {
 			if (getObj(a)) {
 				var type = null,pz = 0,oc;
-				if (typeof window[a] == 'object') {
+				if (window[a]) {
 					oc = window[a];
 					oc.type ? type = oc.type : 0;
 					oc.pz ? pz = oc.pz : 0;
@@ -261,13 +265,13 @@ function findPosY(obj) {
 	return curtop - getTop();
 }
 function in_array(str,a){
-	for (var i=0; i<a.length; i++) {
+	for (var i = 0,j = a.length; i < j; i++) {
 		if(str == a[i])	return true;
 	}
 	return false;
 }
 function loadjs(path, code, id, callBack) {
-	if (typeof id == 'undefined') id = '';
+	id = id || '';
 	if (id != '' && IsElement(id)) {
 		try{callBack?callBack():0;}catch(e){}
 		return false;
@@ -301,15 +305,16 @@ function loadjs(path, code, id, callBack) {
 	header.appendChild(s);
 	return true;
 }
-function keyCodes(e) {
-	if (read.menu.style.display == '' && e.keyCode == 27) {
-		read.close();
+addEvent(document,'keyup',function(e){
+	if(read.menu.style.display != 'none'){
+		if (e.keyCode == 27) {
+			read.close();
+		}
 	}
-}
+});
 
 function opencode(menu,td,id) {
-	document.body.onclick = null;
-	document.body.onmousedown=null;
+	document.body.onclick = document.body.onmousedown = null;
 	var id = id || 'ckcode';
 	if (read.IsShow() && read.menu.firstChild.id == id) return;
 	read.open(menu,td,2,11);
@@ -330,7 +335,6 @@ function opencode(menu,td,id) {
 		} else {
 			closep();
 			document.body.onmousedown = null;
-			document.body.onmousedown=null;
 		}
 	};
 
@@ -347,7 +351,7 @@ function getPWBox(type){
 }
 
 function getPWContainer(id,border){
-	if (typeof(id)=='undefined') id='';
+	id = id || '';
 	if (getObj(id||'pw_box')) {
 		var pw_box = getObj(id||'pw_box');
 	} else {
@@ -441,32 +445,6 @@ function char_cv(str){
 	return str;
 }
 
-/*function showDialog(type,message,autohide,callback) {
-	if (!type) type = 'warning';
-	var tar = '<div class="popBottom" style="text-align:right;">';
-	if (type == 'confirm' && typeof(callback) == 'function') {
-		temp = function () {
-			closep();
-			if (typeof(callback)=='function') {
-				callback();
-			}
-		}
-		var button = typeof(callback)=='function' ? '<span class="btn2"><span><button onclick="temp();" type="button">确定</button></span></span>' : '<span class="btn2"><span><button type="button">确定</button></span></span>';
-
-		tar += button+'</span></span>';
-	}
-	if (autohide) {
-		tar += '<div class="fl gray">本窗口'+autohide+'秒后关闭</div>';
-	}
-	tar += '<span class="bt2"><span><button onclick="closep();" type="button">关闭</button></span></span>';
-	var container = '<div style="width:350px;"><div class="popTop">提示</div><div class="popCont"><img src="'+imgpath+'/'+type+'_bg.gif" class="mr10" align="absmiddle" />'+message+'</div>'+tar+'</div>';
-	read.setMenu(container);
-	read.menupz();
-	if (autohide) {
-		window.setTimeout("closep()", (autohide * 1000));
-	}
-}*/
-
 function checkFileType() {
 	var fileName = getObj("uploadpic").value;
 	if (fileName != '') {
@@ -481,7 +459,7 @@ function checkFileType() {
 	}
 	return true;
 }
-var searchTxt = '搜索其实很简单！ (^_^)';
+var searchTxt = '搜索其实很简单！';
 function searchFocus(e){
 	if(e.value == searchTxt){
 		e.value='';
@@ -497,11 +475,7 @@ function searchBlur(e){
 	//e.parentNode.className = 'ip';
 }
 function getSearchType(event){
-	if (is_ie){
-		var n = window.event.srcElement;
-    } else {
-    	var n = event.target;
-    }
+	var n = event.srcElement || event.target;
 	if(n && n.tagName!='LI') return;
 	n.parentNode.parentNode.getElementsByTagName('h6')[0].innerHTML = n.innerHTML;
 	var lis = n.parentNode.getElementsByTagName('li');
@@ -511,16 +485,29 @@ function getSearchType(event){
 	n.style.display='none';
 	getObj('search_type').value=n.getAttribute('type');
 	n.parentNode.style.display='none';
+	//本版搜索
+	if (typeof(getObj('inner_forum')) != 'undefined'){
+		var inputs = n.parentNode.parentNode.parentNode.getElementsByTagName('input');
+		for(var i = 0,j=inputs.length;i < j;i++){
+			if (typeof(n.id) && n.id == 'inner_forum') {
+				eval("inputs[i].value = " + inputs[i].id + ';');
+			} else {
+				if (typeof(inputs[i].id) != 'undefined' && inputs[i].id.indexOf('ins_') == 0)
+				{
+					inputs[i].value = '';
+				}
+			}
+		}
+	}
 }
 function searchInput() {
 	if(getObj('search_input').value==searchTxt)
 		getObj('search_input').value='';
 	return true;
 }
-
-(function() {
-    if (window.showDlg) return;
-    var win = window,doc = win.document,
+//pw通用弹出框
+(function(win,doc) {
+    if (win.showDlg) return;
         isIE = !+'\v1', // IE浏览器
 	    isCompat = doc.compatMode == 'CSS1Compat',	// 浏览器当前解释模式
 	    IE6 = isIE && /MSIE (\d)\./.test(navigator.userAgent) && parseInt(RegExp.$1) < 7, // IE6以下需要用iframe来遮罩
@@ -528,7 +515,7 @@ function searchInput() {
         Typeis = function(o,type) {
 		    return Object.prototype.toString.call(o)==='[object ' + type + ']';
 	    }, // 判断元素类型
-        $ = function(o) {
+        getObj = function(o) {
             return Typeis(o,'String') ? doc.getElementById(o) : o;
         },
         $height = function(obj) {return parseInt(obj.style.height) || obj.offsetHeight}, // 获取元素高度
@@ -544,21 +531,6 @@ function searchInput() {
 			    left:body.scrollLeft || docEl.scrollLeft, top:body.scrollTop || docEl.scrollTop
 			}
 		},
-		getElementsByClassName = function(className, element) {
-		    var children = (element || document).getElementsByTagName('*');
-		    var elements = new Array();
-		    for (var i = 0; i < children.length; i++) {
-			    var child = children[i];
-			    var classNames = child.className.split(' ');
-			    for (var j = 0; j < classNames.length; j++) {
-				    if (classNames[j] == className) {
-					    elements.push(child);
-					    break;
-				    }
-			    }
-		    }
-		    return elements;
-	    },
         empty = function(){},
         defaultCfg = {   // 默认配置
             id:         'pw_dialog',
@@ -625,11 +597,11 @@ function searchInput() {
             if(!opt.showObj) {
                 var divStyle = 'z-index:'+ (opt.zIndex + 1) +';position:'+ (useFixed ? 'fixed' : 'absolute')+';';
                     maskStyle = (!opt.isMask ? 'display:none':'') + 'width:'+ getWinSize()[0] +'px;height:'+ getWinSize()[1] +'px;z-index:'+ opt.zIndex +';position:absolute;top:0;left:0;text-align:center;filter:alpha(opacity='+ opt.alpha*100 + ');opacity:'+ opt.alpha +';background-color:'+opt.backgroundColor;
-                    if(!$(opt.id)) {
+                    if(!getObj(opt.id)) {
                         box = document.createElement('div');
                         box.id = opt.id;
                     }else {
-                        box = $(opt.id);
+                        box = getObj(opt.id);
                     }
                     if (!opt.type) opt.type = defaultCfg.type;
 		            box.innerHTML = [
@@ -647,7 +619,7 @@ function searchInput() {
 		                        <div id="box_container" class="popoutContent">\
 		                            <div style="width:'+ opt.width +'px;">\
 		                                <div class="popTop">'+ opt.titleText +'</div>\
-		                                <div class="popCont"><img align="absmiddle" class="mr10" src="'+ icoPath + opt.type +'_bg.gif">'+ opt.message +'</div>\
+		                                <div class="popCont" style="padding-left:20px;padding-right:20px;"><img align="absmiddle" class="mr10" src="'+ icoPath + opt.type +'_bg.gif">'+ opt.message +'</div>\
 		                                <div style="text-align: right;" class="popBottom">\
 		                                '+ createButton() + '\
 		                                </div>\
@@ -710,7 +682,7 @@ function searchInput() {
                 }
                 
             }else{
-                var obj = $(opt.showObj);
+                var obj = getObj(opt.showObj);
                 if(obj.nodeType !== 1) {// 如果传进来的不是元素,直接return
                     return;
                 }
@@ -736,10 +708,10 @@ function searchInput() {
         },
         close:function() {
             var opt = this.options;
-            if(!opt.showObj && $(opt.id)) {
-                doc.body.removeChild($(opt.id));
-            }else if($(opt.showObj)) {
-                $(opt.showObj).style.display = 'none';
+            if(!opt.showObj && getObj(opt.id)) {
+                doc.body.removeChild(getObj(opt.id));
+            }else if(getObj(opt.showObj)) {
+                getObj(opt.showObj).style.display = 'none';
             }
             opt.onClose && opt.onClose();
         }
@@ -751,99 +723,609 @@ function searchInput() {
         Dialog(options);
     }
 	win['showDialog'] = win['showDlg'];
-})();
-//回到顶部
-var addLoadEvent =function( func){
-       var oldonload =window .onload ;
-       if(typeof oldonload !="function"){
-             window.onload=func;
-       }else{
-             window.onload=function (){
-                   if ( oldonload) {
-                         oldonload();
-                   }
-                   func();
-             }
-       }
-}
-var Tween={
-	Quad:{
-			easeOut: function(t,b,c,d){
-						return -c *(t/=d)*(t-2) + b;
-					},
-			easeInOut: function(t,b,c,d){
-						if ((t/=d/2) < 1) return c/2*t*t + b;
-						return -c/2 * ((--t)*(t-2) - 1) + b;
-					}		
-		}
-}
-var scrollBar=function(){
-	var that=this;
-	if(!document.getElementById("scrollBar")){
-		var ele=document.createElement("div");
-		ele.id="scrollBar";
-		ele.innerHTML='<a hideFocus="true" href="javascript:void(0)">回到顶部</a>';
-		document.body.appendChild(ele);
-	}else{
-		var ele=document.getElementById("scrollBar");
-	}
-	var barTxt="回到顶部";
-	var distance=100;//限定范围
-	var dd=document.documentElement;
-	var db=document.body;
-	var scrollTop;//顶部距离
-	this.setStyle=function(){
-		scrollTop=db.scrollTop||dd.scrollTop;//顶部距离
-		var sw=dd.scrollWidth;
-		var pos='right:50%;margin-right:-510px;';
-		var fullscreen=document.getElementById('fullscreenStyle');//判断屏幕状态
-		if((fullscreen&&!fullscreen.disabled)||sw<1020){//宽屏或者窗口宽度小于可见值时 1020=960+20*2+10*2
-				pos='right:5px;';
-		}
-		var ctxt=scrollTop>=distance?'':'display:none';
-		ele.style.cssText='position:fixed;'+pos+'bottom:75px;'+ctxt;
-	}
-	this.update=function(){//控制滑块显示 并修正IE6定位
-			scrollTop=db.scrollTop||dd.scrollTop;
-			ele.style.display=(scrollTop>=distance)?"block":"none";
-		if(!window.XMLHttpRequest){//如果IE6
-			var h=ele.offsetHeight;
-			var ch=document.documentElement.clientHeight;
-			ele.style.position="absolute";
-			ele.style.top=ch+scrollTop-h-75+"px";
-		}	
-	}
-	that.b=0;//初始值
-	that.c=0;//变化量
-	var d=10,t=0;//持续时间和增量
-	this.run=function(){
-		if(dd.scrollTop){
-			dd.scrollTop=Math.ceil(Tween.Quad.easeOut(t,that.b,that.c,d));
-		}else{
-			db.scrollTop = Math.ceil(Tween.Quad.easeOut(t,that.b,that.c,d));
-		}
-		if(t<d){ t++; setTimeout(that.run, 10); }else{t=0;}
-	}
-	ele.onclick=function(){
-		that.b=scrollTop;
-		that.c=-scrollTop;
-		that.run();
-		return false;
-	}
-	this.init=function(){
-		this.setStyle();
-		window.onscroll=function(){
-			that.update();
-		}
-		window.onresize=function(){
-			that.setStyle();
-			that.update();
-		}
-	}
-}
 
-var goTop;
-addLoadEvent(function(){
-	goTop=new scrollBar();
-	goTop.init();
-})
+	//tab切换
+	win.showTabSimple = function(tabNavs,tabBodys,callback){
+		if(tabNavs.length!=tabBodys.length){return false;}
+		tabBodys[0].style.display = 'block';//默认第一个显示
+		var len = tabNavs.length;
+		for (var i = 0; i < len; i++) {
+	    		(function(i){
+					addEvent(tabNavs[i],'click',function(e){
+						e.preventDefault();
+						for(var j = 0; j < len; j++){
+							tabBodys[j].style.display = 'none';
+							tabNavs[j].className = '';
+						}
+						tabNavs[i].className = 'current';
+						tabBodys[i].style.display = 'block';
+						callback && callback.call(this,tabNavs[i],tabBodys[i],i);
+					});
+				})(i);
+		}
+	};
+	//显示隐藏一个元素
+	win.toggleDisplay=function(handler,cont,callback){
+		if(!handler){
+			return false;
+		}
+		addEvent(handler,"click",function(e){
+			e.preventDefault();
+			var display = getStyle(cont,"display");
+			cont.style.display = (display=="none") ? "block" : "none";
+			handler.arrow = (display == "none") ? "up":"down";
+			callback && callback.call(handler);
+		})
+	};
+	//fadeIn,fadeOut
+	var fade = function(elem, flag){
+		elem.style.display = '';
+		elem.alpha = flag ? 1:100;
+		elem.style.opacity = (elem.alpha / 100);
+		elem.style.filter = 'alpha(opacity=' + elem.alpha + ')';
+		var value = elem.alpha;
+		(function(){
+			elem.style.opacity = (value / 100);
+			elem.style.filter = 'alpha(opacity=' + value + ')';
+			if (flag) {
+				value+=4;
+				if (value <= 100) {
+	            	setTimeout(arguments.callee, 14);//继续调用本身
+	        	}
+			}
+			else {
+				value-=4;
+				if (value >= 0) {
+	            	setTimeout(arguments.callee, 14);//继续调用本身
+	        	}
+			}
+	    })();
+	}
+	win.fadeIn = function(elem){fade(elem,true);};
+	win.fadeOut = function(elem){fade(elem,false);};
+	//回到顶部功能
+	win.scrollBar=function(){
+		var Tween={
+			Quad:{
+				easeOut: function(t,b,c,d){
+					return -c *(t/=d)*(t-2) + b;
+				},
+				easeInOut: function(t,b,c,d){
+					if ((t/=d/2) < 1) return c/2*t*t + b;
+					return -c/2 * ((--t)*(t-2) - 1) + b;
+				}		
+			}
+		}
+		var that = this;
+		if(!getObj("scrollBar")){
+			var ele = doc.createElement("div");
+			ele.id = "scrollBar";
+			ele.innerHTML='<a hideFocus="true" href="javascript:void(0)">回到顶部</a>';
+			doc.body.appendChild(ele);
+		}else{
+			var ele = getObj("scrollBar");
+		}
+		var barTxt="回到顶部";
+		var distance=200;//限定范围
+		var dd = doc.documentElement;
+		var db = doc.body;
+		var scrollTop;//顶部距离
+		this.setStyle = function(){
+			scrollTop = db.scrollTop || dd.scrollTop;//顶部距离
+			var sw = dd.scrollWidth;
+			var pos='right:50%;margin-right:-510px;';
+			var fullscreen = getObj('fullscreenStyle');//判断屏幕状态
+			if((fullscreen && !fullscreen.disabled) || sw<1020){//宽屏或者窗口宽度小于可见值时 1020=960+20*2+10*2
+				pos='right:5px;';
+			}
+			var ctxt=scrollTop >= distance ? '': 'display:none';
+			ele.style.cssText='position:fixed;'+pos+'bottom:75px;'+ctxt;
+		}
+		this.update=function(){//控制滑块显示 并修正IE6定位
+				scrollTop = db.scrollTop || dd.scrollTop;
+				ele.style.display=(scrollTop>=distance)?"block":"none";
+			if(!win.XMLHttpRequest){//如果IE6
+				var h = ele.offsetHeight;
+				var ch = doc.documentElement.clientHeight;
+				ele.style.position="absolute";
+				ele.style.top=ch+scrollTop-h-75+"px";
+			}	
+		}
+		that.b=0;//初始值
+		that.c=0;//变化量
+		var d = 10,t = 0;//持续时间和增量
+		this.run=function(){
+			if(dd.scrollTop){
+				dd.scrollTop=Math.ceil(Tween.Quad.easeOut(t,that.b,that.c,d));
+			}else{
+				db.scrollTop = Math.ceil(Tween.Quad.easeOut(t,that.b,that.c,d));
+			}
+			if(t<d){ t++; setTimeout(that.run, 10); }else{t=0;}
+		}
+		ele.onclick=function(){
+			that.b = scrollTop;
+			that.c =- scrollTop;
+			that.run();
+			return false;
+		}
+		this.init=function(){
+			this.setStyle();
+			win.onscroll=function(){
+				that.update();
+			}
+			win.onresize=function(){
+				that.setStyle();
+				that.update();
+			}
+		}
+	}
+	
+	//消息提示
+	win.messageTip=function(st){
+			if(!getObj("pw_all_tip")){
+				return false;
+			}
+			this.dd = document.documentElement;
+			this.db = document.body;
+			this.scrollTop=null;//顶部距离
+			this.ele=getObj("pw_all_tip");
+			this.closeBtn=getObj("pw_all_tclose");
+			this.st=st||90;
+			this.height=this.ele.offsetHeight;
+	}
+	messageTip.prototype={
+		init:function(){
+			if(!this.ele){
+				return false;
+			}
+			this.setStyle();
+			var self=this;
+			addEvent(this.closeBtn,"click",function(){
+				self.close();
+			})
+			addEvent(window,"scroll",function(){
+				self.update();
+			})
+			addEvent(window,"resize",function(){
+				self.setStyle();
+				self.update();
+			})
+		},
+		setStyle : function(){
+			this.scrollTop = this.db.scrollTop || this.dd.scrollTop;//顶部距离
+			var sw = this.dd.scrollWidth;
+			var pos='right:50%;margin-right:-480px;';
+			var fullscreen = getObj('fullscreenStyle');//判断屏幕状态
+			if((fullscreen && !fullscreen.disabled) || sw<980){//宽屏或者窗口宽度小于可见值时 980=960+10*2
+				pos='right:10px;';
+			}
+				this.ele.style.cssText='position:absolute;'+pos+'top:'+this.st+'px;';
+				this.ele.style.display="block";
+		},
+		update:function(){
+				this.scrollTop = this.db.scrollTop + this.dd.scrollTop;
+				var top=this.ele.getBoundingClientRect().top;
+				if(this.scrollTop>this.st){
+					if(!window.XMLHttpRequest){
+						this.ele.style.top=this.scrollTop+"px";
+					}else{
+						this.ele.style.position="fixed";
+						this.ele.style.top="0px";
+					}
+				}else{			
+					if(!!window.XMLHttpRequest){
+						this.ele.style.position="absolute";
+					}
+					this.ele.style.top=this.st+"px";
+				}
+				
+		},
+		close:function(){
+			var self = this,url="";
+			if(typeof pw_baseurl!="undefined"){
+				url=pw_baseurl+"/";
+			}
+			ajax.send(url+'pw_ajax.php?action=clearmessage','',function(){
+				var rText = ajax.request.responseText.split('\t');
+					self.ele.style.display="none";
+			});
+		}
+	}
+	
+	/*小名片 2011-06-30*/
+	win.usercard = function(){
+		this.id = "userCard";
+		this.actClass = "_cardshow";
+		this.obj = null;
+		this.popContent=null;
+		this.medalList=null;
+		this.medalNum=7;//每次移动几个
+		this.inter = null;
+		this.dock = false;
+		this.currHandler = null;//用来记录当前滑过的元素
+		this.wrapWidth=245;//.card_medal_wrap宽度
+		this.liWidth=35;
+		this.data=[];
+	}
+	usercard.prototype = {
+		"init": function(){
+			//初始化,绑定元素鼠标事件触发名片
+			var self = this;
+			var items = getElementsByClassName(this.actClass);
+			if(items.length<1){
+				return false;
+			}
+			for (var i = 0, len = items.length; i < len; i++) {
+				(function(item){
+					addEvent(item, "mouseover", function(e){
+						var t = this;
+						if (self.inter) {
+							clearTimeout(self.inter);
+						}
+						self.inter = setTimeout(function(){
+							self.show(t);
+						}, 500);
+						return false;
+					})
+					addEvent(item, "mouseout", function(e){
+						var t = this;
+						if (self.inter) {
+							clearTimeout(self.inter);
+						}
+						self.inter = setTimeout(function(){
+							if (!self.dock&&self.obj!=null) {
+								self.hide();
+							}
+						}, 1000);
+						return false;
+					})
+				})(items[i])
+			}
+			
+		},
+		"show": function(o){
+			//显示名片
+			var self = this;
+			//如果是刚刚滑过的元素
+			if (self.obj && self.currHandler && self.currHandler == o) {
+				self.obj.style.visibility="visible";
+				return false;
+			}
+			self.currHandler = o;
+			var obj = document.getElementById(this.id);
+			var popc=getObj("cardPopContent");
+			if (obj&&popc) {
+				popc.innerHTML = "";
+				this.obj = obj;
+			}
+			else {
+				this.obj = document.createElement("div");
+				this.obj.id = this.id;
+				this.obj.style.position = "absolute";
+				this.obj.innerHTML='<table border="0" cellspacing="0" cellpadding="0"><tbody><tr><td class="bgcorner1"></td><td class="pobg1"></td><td class="bgcorner2"></td></tr><tr><td class="pobg4"></td><td><div class="popoutContent" id="cardPopContent"></div></td><td class="pobg2"></td></tr><tr><td class="bgcorner4"></td><td class="pobg3"></td><td class="bgcorner3"></td></tr></tbody></table>';
+				document.body.appendChild(this.obj);
+			}
+			//初始隐藏
+			this.obj.style.visibility="hidden";
+			
+			this.popContent=getObj("cardPopContent");
+			
+			addEvent(this.obj, "mouseover", function(e){
+				if (!self.dock) {
+					self.dock = true;
+					self.obj.style.visibility="visible";
+				}
+			})
+			addEvent(this.obj, "mouseout", function(e){
+				var ele = e.relatedTarget || e.toElement;
+				if (!self.contains(self.obj, ele) && self.dock) {
+					self.hide();
+					self.dock = false;
+				}
+			})
+			this.create(o);
+			
+		},
+		"medalAni":function(){
+			if(!this.prev||!this.next){
+				return false;
+			}
+			var self=this;
+			var lis=this.medalList.getElementsByTagName("li");
+			var gw=lis.length*self.liWidth;
+			this.medalList.style.width=gw+"px";
+			var maxPan=(gw%self.wrapWidth!=0)?Math.floor(gw/self.wrapWidth)*self.wrapWidth:gw-self.wrapWidth;//最大允许偏移量
+			var timer;
+			var moveTo=function(elem,final_x,final_y,interval){
+				var xpos=parseInt(getStyle(self.medalList,"left"));
+				self.prev.className="card_pre";
+				self.next.className="card_next";
+				if(xpos==final_x){
+					return false;
+				}
+				if(xpos<final_x){
+					var dist=Math.ceil((final_x-xpos)/5);
+					xpos=xpos+dist;
+				}
+				if(xpos>final_x){
+					var dist=Math.ceil((xpos-final_x)/5);
+					xpos=xpos-dist;
+				}
+				if(xpos>=0){
+					elem.style.left="0px";
+					self.prev.className="card_pre_old";
+					self.next.className="card_next";
+					return false;
+				}
+				if(xpos<=-maxPan){
+					elem.style.left=-maxPan+"px";
+					self.prev.className="card_pre";
+					self.next.className="card_next_old";
+					return false;
+				}	
+				
+				elem.style.left=xpos+"px";
+				timer=setTimeout(function(){
+					moveTo(elem,final_x,final_y,interval);
+				},interval);
+			}
+			addEvent(this.prev,"click",function(){
+				var xpos=Math.abs(parseInt(getStyle(self.medalList,"left")));
+				var width=self.liWidth*self.medalNum
+				if(xpos%width!=0){
+					return false;
+				}
+				if(timer){
+					clearTimeout(timer);
+				}
+				var currLeft=parseInt(getStyle(self.medalList,"left"));
+				var final_x=currLeft+self.liWidth*self.medalNum;
+				moveTo(self.medalList,final_x,0,40)
+			})
+			addEvent(this.next,"click",function(){
+				var xpos=Math.abs(parseInt(getStyle(self.medalList,"left")));
+				var width=self.liWidth*self.medalNum
+				if(xpos%width!=0){
+					return false;
+				}
+				if(timer){
+					clearTimeout(timer);
+				}
+				var currLeft=parseInt(getStyle(self.medalList,"left"));
+				var final_x=currLeft-self.liWidth*self.medalNum;
+				moveTo(self.medalList,final_x,0,40)
+			})
+		},
+		"contains": function(a, b){
+			//元素a是否包含元素B
+			if (document.compareDocumentPosition) {
+				return !!(a.compareDocumentPosition(b) & 16);
+			}
+			else {
+				return a !== b && (a.contains ? a.contains(b) : true);
+			}
+		},
+		"updatePos": function(ele){
+			//更新名片位置
+			this.obj.style.visibility="visible";
+			var dd = document.documentElement;
+			var db = document.body;
+			var stop = dd.scrollTop + db.scrollTop
+			var sleft = dd.scrollLeft + db.scrollLeft;
+			var cw = dd.clientWidth;
+			var ch = dd.clientHeight;
+			var bound = ele.getBoundingClientRect();
+			var left = bound.left;
+			var top = bound.top;
+			var h = ele.offsetHeight;
+			var w = ele.offsetWidth;
+			var oh = this.obj.offsetHeight;
+			var ow = this.obj.offsetWidth;
+			this.obj.style.left = (left + ow) > cw ? (sleft + left + w - ow + "px") : (sleft + left + "px");
+			this.obj.style.top = (top + oh + h) > ch ? (stop + top - oh + "px") : (stop + top + h + "px");
+		},
+		"hide": function(){
+			//关闭(隐藏)名片
+			this.obj.style.visibility="hidden";
+		},
+		"create": function(ele){
+			//构建名片内容
+			var self=this;
+			var key=ele.getAttribute("data-card-key");
+			//除去后顾之忧
+			if(!key){
+				key=ele.getAttribute("data-card-url");
+			}
+			var data=this.data;
+			if(data.length>0){
+				for(var i=0,len=data.length;i<len;i++){
+					if(data[i].k==key){
+						this.fillCont(ele,data[i].v);
+						return false;
+					}
+				}
+			}
+			this.getData(ele,function(json){
+				var status=json.status||"";
+				if(status!="success"){
+					return false;
+				}
+				self.fillCont(ele,json);
+				self.data.push({"k":key,"v":json})
+			})
+			
+		},
+		"fillCont":function(ele,json){
+				var uid=json.uid||"";
+				var username=json.username||"";
+				var icon=json.icon||"images/face/none.gif";
+				var memtitle=json.memtitle||"";
+				var viewTid=json.viewTid||"";
+				var viewFid=json.viewFid||"";
+				var genderClass=json.genderClass||"";
+				var attention=json.attention||"";
+				var memberTags=json.memberTags||[];
+				var online=json.online == 1 ? "在线" : "离线";
+				var mine=json.mine||"";
+				var medals=json.medals||[];
+				var displayLen=this.wrapWidth/this.liWidth;//可显示的图标个数
+				var gender = genderClass == 2 ? 'women' : 'man';
+				var isonline = json.online == 1 ? '_ol' : '_unol';
+				var genderclass = gender+isonline;
+				//判断它正在看
+				var readHtml="";
+				if(viewTid!=""){
+					readHtml='<a href="read.php?tid='+(viewTid||'')+'" title="Ta正在看" class="w s4" target="_blank">(Ta正在看...)</a>';
+				}
+				else if(viewFid!="") {
+					readHtml='<a href="thread.php?fid='+(viewFid||'')+'" title="Ta正在看" class="w s4" target="_blank">(Ta正在看...)</a>';
+				}
+				//组合标签
+				var tagHtml=[];
+				var tagLen=memberTags.length;
+				for(var i=0,len=tagLen;i<len;i++){
+					var _tid=memberTags[i].tagid;
+					var _tname=memberTags[i].tagname;
+					var _tagclass = memberTags[i].className;
+					tagHtml.push('<a href="u.php?a=friend&type=find&decode=1&according=tags&step=2&f_keyword='+encodeURIComponent(_tname)+'" class='+_tagclass+' target="_blank">'+_tname+'</a>');
+				}
+				if(tagLen>3){
+					tagHtml.push('<a href="u.php?uid='+uid+'" title="查看更多"  target="_blank">...</a>');
+				}
+				tagHtml = (tagHtml == "") ? "还未设置个性标签哦" : tagHtml.join("，");
+				//勋章
+				var medalsHtml=[];
+				var medalsLen=medals.length;
+				for(var i=0,len=medalsLen;i<len;i++){
+					var _mclass = medals[i].isuser == 1 ? 'open' : '';
+					var _smallimage=medals[i].smallimage;
+					var _mname=medals[i].name;
+					medalsHtml.push('<li class='+_mclass+'><a href="apps.php?q=medal" target="_blank"><img src="'+_smallimage+'" wihdth="30" height="30" title="'+_mname+'"></a></li>');
+				}
+
+				var attentionHtml=[];
+				attentionHtml = mine ? '<a href="javascript:void(0)" onclick="'+(attention==1?'':'Attention.add(this,'+uid+',1)')+'" class="'+(attention==1?'add_following':'s4 add_follow')+' mr10">'+(attention==1?'已关注':'加关注')+'</a><span class="gray2 mr10">|</span><a href="javascript:void(0)" onclick="sendmsg(\'pw_ajax.php?action=msg&touid='+uid+'\', \'\', this)" class="s4">发消息</a>' : '';
+				//勋章html
+				var medalHtml='<div class="popBottom">\
+						'+((medalsLen>displayLen)?'<div class="card_page"><a href="javascript:void(0)" class="card_pre_old" id="card_pre">上一组</a><a href="javascript:void(0)" class="card_next" id="card_next">下一组</a></div>':'')+'\
+								<div class="card_medal_wrap">\
+									<ul class="cc" id="cardMedal">\
+										'+(medalsHtml.join(""))+'\
+									</ul>\
+								</div>\
+							</div>';			
+				var fragment = document.createDocumentFragment();
+				var card = document.createElement("div");
+				card.innerHTML = '<div class="card_small"><dl class="cc">\
+						<dt><a href="u.php?uid='+uid+'" target="_blank"><img src="'+icon+'" width="48" height="48" title="'+username+'"></a></dt>\
+						<dd>\
+							<span class="fr gray w">'+memtitle+'</span>\
+							<span class="'+genderclass+' mr5" title="'+online+'" alt="'+online+'" >在线</span><a href="u.php?uid='+uid+'" class="b mr5" target="_blank">'+username+'</a>'+readHtml+'\
+							<p><span class="w">标签：</span>'+tagHtml+'</p>\
+							<p class="tar">'+attentionHtml+'</p>\
+						</dd>\
+					</dl>\
+					'+(medalsLen>0?medalHtml:'')+'</div>';
+				fragment.appendChild(card);
+				//return fragment;
+				this.popContent.appendChild(fragment);
+				this.medalList=getObj("cardMedal");
+				this.prev=getObj("card_pre");
+				this.next=getObj("card_next");
+				this.updatePos(ele);
+				this.medalAni();
+		},
+		"getData":function(ele,callback){
+			var url=ele.getAttribute("data-card-url");
+			ajax.send(url,"",function(){
+				if(callback){
+					var data=ajax.request.responseText;
+					callback(eval("("+data+")"));
+				}
+			})
+		}
+	}
+	win.onReady(function(){
+			var goTop=new scrollBar();
+				goTop.init();
+				win.goTop=goTop;
+			new usercard().init();
+	});
+	/*新功能气泡
+	*new Bubble(a).init();
+	*a:页面中的气泡元素ID  如: [{"name":"pw_all_tip_kmd","id":"markoperation"},{"name":"pw_all_tip_medal","id":"applicationcenter"}]
+	*/
+	win.Bubble=function(ids){
+		this.ids=ids;
+		this.info={};//程序输出的气泡ID，表示不显示此气泡
+		this.uid=(typeof winduid!="undefined")?winduid:null;
+	}
+	Bubble.prototype={
+		init:function(){
+			if(this.uid==null){
+				return false;
+			}
+			var self=this;
+			if(this.ids.length<1){
+				return false;
+			}
+			if(typeof userBubbleInfo!="undefined"){
+				this.info=userBubbleInfo;
+			}
+			var elems=[];
+			for(var i=0,len=this.ids.length;i<len;i++){
+				var name=this.ids[i].name;
+				var id=this.ids[i].id;
+				//判断该层是否可以显示
+				if(this.info[name]!=undefined){
+					continue;
+				}
+				if(!getObj(name)){
+					continue;
+				}
+				if(!getObj(id)){
+					continue;
+				}
+				//气泡元素
+				var obj=getObj(name);
+				//参照ID
+				var ele=getObj(id);
+				elems.push({k:name,v:obj,ele:ele});
+			}
+			if(elems.length>0){
+				var bubbleBox=elems[0].v;
+				var posBox=elems[0].ele;
+				var left=posBox.getBoundingClientRect().left;
+				var top=posBox.getBoundingClientRect().top;
+				bubbleBox.style.display="block";
+				bubbleBox.style.position="absolute";
+				bubbleBox.style.left=left+"px";
+				bubbleBox.style.top=top+"px";
+				
+				var btns=bubbleBox.getElementsByTagName("a");
+				for(var i=0,len=btns.length;i<len;i++){
+					var btn=btns[i];
+					(function(ele,obj,id){
+						addEvent(ele,"click",function(){
+							self.hide(obj,id,ele);
+							return false;
+						})
+					})(btn,bubbleBox,elems[0].k)
+				}
+			}
+		},
+		close:function(obj){
+			obj.style.display="none";
+		},
+		hide:function(obj,str,ele){
+			ajax.send("pw_ajax.php?action=bubble&uid="+this.uid+"&sign="+str,"",function(){
+				var href=ele.getAttribute("href");
+				if(href&&href.indexOf("javascript")==-1){
+					location.href=href;
+				}
+			});
+			this.close(obj);
+			return false;
+		}
+	}
+})(window,document);

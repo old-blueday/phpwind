@@ -79,7 +79,7 @@ if (!$action) {
 
 	} else {
 
-		S::gp(array('config','safegroup','schcontrol'),'P');
+		S::gp(array('config','safegroup','schcontrol', 'showcustom'),'P');
 
 		$config['opensch'] = $schcontrol['opensch']."\t".$schcontrol['schstart']."\t".$schcontrol['schend'];
 		if ($safegroup) {
@@ -101,6 +101,8 @@ if (!$action) {
 				setConfig("db_$key", $value);
 			}
 		}
+		$config['showcustom'] = $showcustom ? (array) $showcustom : array();
+		setConfig("db_showcustom", $config['showcustom']);
 		updatecache_c();
 		updateoptimize($config,$type,'size');
 		adminmsg('operate_success');

@@ -88,9 +88,9 @@ class PW_TuCoolSource extends SystemData {
 				continue;
 			}
 			$v['value'] 	= $v['postdate'];
-			$v['hits'] 		= $v['hits'];
-			$v['totalnum'] 	= $v['totalnum'];
-			$v['collectnum'] = $v['collectnum'];
+			$v['hits'] 		= $v['hits'] ? $v['hits'] : 0;
+			$v['totalnum'] 	= $v['totalnum'] ? $v['totalnum'] : 0;
+			$v['collectnum'] = $v['collectnum'] ? $v['collectnum'] : 0;
 		//	$temp = geturl($v['cover']);
 		//	$v['image'] = $temp[0] ? $temp[0] : '';
 			$v['image']	= $attachsService->getThreadAttachMini($v['cover']);
@@ -141,15 +141,7 @@ class PW_TuCoolSource extends SystemData {
 	 * @return string
 	 */
 	function _cookFid($fid) {
-		if ($fid && is_numeric($fid)) return $fid;
-		if (S::isArray($fid)) {
-			foreach ($fid as $key=>$value) {
-				if (!$value) unset($fid[$key]);
-			}
-			if (S::isArray($fid)) return $fid;
-		}
-		$forumsService = L::loadClass('forums', 'forum');
-		return $forumsService->getAllForumIds();
+		return getCookedCommonFid($fid);
 	}
 
 	/**
@@ -161,6 +153,7 @@ class PW_TuCoolSource extends SystemData {
 	function filterForums($fid) {
 		$tmpfids = $this->_cookFid($fid);
 		$fids = array();
+		if ($tmpfids && !S::isArray($tmpfids)) return $tmpfids;
 		foreach ((array)$tmpfids as $v) {
 			$foruminfo = L::forum($v);
 			if (isset($foruminfo['forumset']['iftucool']) && !$foruminfo['forumset']['iftucool']) continue;

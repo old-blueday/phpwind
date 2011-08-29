@@ -18,7 +18,7 @@ print <<<EOT
 -->
 				<li id="a_friend"><a href="{$basename}a=friendslists">好友日志</a></li>
 				<li id="a_my"><a href="{$basename}">我的日志</a></li>
-<script language="JavaScript">
+<script type="text/javascript">
 setCurrent('a_$b','a_my','current');
 </script>
 			</ul>
@@ -241,7 +241,7 @@ EOT;
 EOT;
 require_once PrintEot('m_comment');print <<<EOT
 -->
-<script type="text/javascript" language="JavaScript" src="js/pw_lwd.js"></script>
+<script type="text/javascript" src="js/pw_lwd.js"></script>
 					
 
 				</div>
@@ -265,7 +265,7 @@ foreach($diaryDb as $value){
 $typename = !$value[dtid] ?  '默认分类' : $value[typename];
 $title = '所属:'.$value[username].'&nbsp;'.$value[title];
 $descrip = $value[subject];
-$author = "<a href=\"{$db_userurl}$value[uid]\" class=\"b s5\">$value[username]:</a> ";
+$author = "<a href=\"{$db_userurl}$value[uid]\" class=\"b s5 _cardshow\" target=\"_blank\" data-card-url=\"pw_ajax.php?action=smallcard&type=showcard&uid={$value[uid]}\" data-card-key=\"{$value[username]}\">$value[username]:</a> ";
 
 print <<<EOT
 -->
@@ -443,7 +443,7 @@ EOT;
 }print <<<EOT
 -->
 		</div>
-		<h1 class="mb5"><a href="{$db_userurl}$value[uid]" class="b s5">$diary[username]</a>: <span class="s4">{$diary[subject]}</span></h1>
+		<h1 class="mb5"><a href="{$db_userurl}$diary[uid]" class="b s5 _cardshow" target="_blank" data-card-url="pw_ajax.php?action=smallcard&type=showcard&uid={$diary['uid']}" data-card-key="{$diary['username']}">$diary[username]</a>: <span class="s4">{$diary[subject]}</span></h1>
 					<p class="mb10 gray"><span class="mr5">{$diary[postdate]}</span>
 <!--
 EOT;
@@ -509,7 +509,7 @@ if ($_G['allowreport']) {print <<<EOT
 EOT;
 }if($diary[ifcopy]){print <<<EOT
 --><span class="p_lr_10">|</span><a href="{$basename}a=copydiary&did=$diary[did]" onclick="return ajaxurl(this);" class="s7">转载</a>
-<script language="JavaScript">
+<script type="text/javascript">
 function ajaxurl(o) {
 	read.obj = o;
 	ajax.send(o.href,'',ajax.get);
@@ -530,8 +530,8 @@ if($rateSets[2] && isset($db_hackdb['rate'])){
 print <<<EOT
 -->	 
 						<link rel="stylesheet" type="text/css" href="hack/rate/images/rate.css" />
-						<script language="JavaScript" src="js/rate_ajax.js"></script>
-						<script language="javascript">
+						<script type="text/javascript" src="js/rate_ajax.js"></script>
+						<script type="text/javascript">
 						window.onload = function() {
 							rate.getVote("vote_box","{$db_bbsurl}/hack.php?H_name=rate&action=ajax","elementid=vote_box&typeid=2&objectid={$did}&authorid={$uid}");
 						};
@@ -582,7 +582,7 @@ EOT;
 EOT;
 require_once PrintEot('m_comment');print <<<EOT
 -->
-<script type="text/javascript" language="JavaScript" src="js/pw_lwd.js"></script>
+<script type="text/javascript" src="js/pw_lwd.js"></script>
 		</div>
 	</div>
 <!--
@@ -625,7 +625,7 @@ print <<<EOT
 			<input type="hidden" name="diraryAjax" value="1" />
 			<div>
 			<div class="mb10">
-			<input type="text" class="input input_wb mr10" name="atc_title" id="atc_title" value="$diary[subject]"/><span id="atc_title_warn" class="gray">限 $db_titlemax 字节</span>
+			<input type="text" class="input input_wb mr10" name="atc_title" id="atc_title" tabindex="1" value="$diary[subject]"/><span id="atc_title_warn" class="gray">限 $db_titlemax 字节</span>
 			<div id="menu_face" class="menu" style="display:none;"></div>
 			</div>
 			<div class="cc">
@@ -676,22 +676,16 @@ EOT;
 <!--
 EOT;
 if ($o_diary_gdcheck) {
-$gdSize = explode("\t",$db_gdsize);
+$checkCode = L::loadClass('checkcode', 'site');
+$checkCodeString = $checkCode->getCheckCodeTemplate();
 print <<<EOT
 -->
                 <tr class="tr3 vt">
                     <td>验证码:</td>
                     <td>
                         <input class="input" onfocus="showgd();" type="text" name="gdcode" id="gdcode" size="5" tabindex="3"  />
-                        <span id="ckcode" style="display:none;">
-<script type="text/javascript" src="js/pw_authcode.js"></script>
-<script>
-var flashWidth = "$gdSize[0]";
-var flashHeight = "$gdSize[1]";
-var gdtype = $db_gdtype;
-showGdCode();
-</script>
-					</span>
+                        <span id="ckcode" style="display:none;"></span>
+$checkCodeString
                     </td>
                 </tr>
 <!--
@@ -702,7 +696,7 @@ if($db_imagequestion){
 }else{
 	$question = $qkey<0 ? getMachineQuestion_1() :  $db_question[$qkey];
 }
-$q_a = $question.($showq && $qkey>0?" 正确答案:".$db_answer[$qkey] : '');
+$q_a = $question.($showq && $qkey>0?" （答案：".$db_answer[$qkey] . '）' : '');
 print <<<EOT
 -->
                 <tr class="tr3">
@@ -743,13 +737,13 @@ if($a == 'edit'){print <<<EOT
 EOT;
 }else{print <<<EOT
 -->
-<script language="JavaScript">setTimeout("document.FORM.atc_title.focus()",50);</script>
+<script type="text/javascript">setTimeout("document.FORM.atc_title.focus()",50);</script>
 <!--
 EOT;
 }print <<<EOT
 -->
-<script language="JavaScript">var stylepath = 'wind';</script>
-<script language="JavaScript">
+<script type="text/javascript">var stylepath = 'wind';</script>
+<script type="text/javascript">
 var charset = '$db_charset';
 var titlemax = '$db_titlemax';
 var postmax = '$db_postmax';
@@ -759,7 +753,7 @@ var cnt  = 0;
 document.FORM.Submit.disabled = false;
 function checkpost(obj) {
 	if (strlen(obj.atc_title.value) > $db_titlemax) {
-		showDialog("error","日志<span class='warnFontStyle'>标题</span>不能大于 <span class='warnFontStyle'>$db_titlemax</span> 个字节",2);
+		showDialog("error","日志<span class='s1'>标题</span>不能大于 <span class='s1'>$db_titlemax</span> 个字节",2);
 		obj.atc_title.focus();
 		return false;
 	}
@@ -767,7 +761,7 @@ function checkpost(obj) {
 		obj.atc_content.setAttribute("hasError", 1);
 		showDialog({
 			type: "error",
-			message: "日志<span class='warnFontStyle'>内容</span>不能少于 <span class='warnFontStyle'>$db_postmin</span> 个字节",
+			message: "日志<span class='s1'>内容</span>不能少于 <span class='s1'>$db_postmin</span> 个字节",
 			autoHide:2
 		});
 		return false;
@@ -775,7 +769,7 @@ function checkpost(obj) {
 		obj.atc_content.setAttribute("hasError", 1);
 		showDialog({
 			type: "error",
-			message: "日志<span class='warnFontStyle'>内容</span>不能大于 <span class='warnFontStyle'>$db_postmax</span> 个字节",
+			message: "日志<span class='s1'>内容</span>不能大于 <span class='s1'>$db_postmax</span> 个字节",
 			autoHide:2
 		});
 		return false;
@@ -824,23 +818,17 @@ function SubmitAjax(obj) {
 function showLoading(){
 	return "<div id=\"loading\" style=\"padding:20px;width:80%;text-align:center\"><img src=\""+imgpath+"/loading.gif\" align=\"absbottom\" alt=\"loading\" /> 正在加载数据...</div>";
 }
-window.onbeforeunload = function() {
-	var obj = document.FORM;
-	if (obj.atc_title.value !=='' || obj.atc_content.value !=='') {
-		return "你正在编辑的日志没有保存，离开会导致内容丢失，是否确定离开?";
-	}
-}
 </script>
-<script language="JavaScript" src="js/post.js"></script>
+<script type="text/javascript" src="js/post.js"></script>
 <!--
 EOT;
 }print <<<EOT
 -->
-<script language="JavaScript" src="apps/diary/js/diarytype.js"></script>
-<script language="JavaScript" src="js/app_type.js"></script>
-<script language="JavaScript" src="js/app_comment.js"></script>
+<script type="text/javascript" src="apps/diary/js/diarytype.js"></script>
+<script type="text/javascript" src="js/app_type.js"></script>
+<script type="text/javascript" src="js/app_comment.js"></script>
 <script type="text/javascript" src="js/select.js"></script>
-<script language="javascript">
+<script type="text/javascript">
 var ifcheck = true;
 function CheckAll(form,match) 
 {

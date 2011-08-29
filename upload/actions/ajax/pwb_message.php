@@ -24,7 +24,7 @@ foreach ($msgdb as $value) {
 }
 $str = '';
 if ($temp) {
-	$str = pwJsonEncode($temp);
+	$str = stripcslashes(pwJsonEncode($temp));
 }
 echo "success\t$str";
 ajax_footer();

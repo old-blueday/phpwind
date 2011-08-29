@@ -658,7 +658,7 @@ if ($action == 'setting') {
 					//重定向
 					$jumpurl = "$basename" . "&action=setting&importshow=1&success=".$success."&fail=".$fail;
 					$show = <<<EOT
-<script language="JavaScript">
+<script type="text/javascript">
 	location.href = "$jumpurl";
 </script>
 EOT;
@@ -1690,7 +1690,7 @@ function ajaxmsg($msg, $jumpurl='')
 <div style="padding:1.5em 3em">
 	$msg
 </div>
-<script language="JavaScript">
+<script type="text/javascript">
 function skip(){
 	location.href = "$jumpurl";
 }
@@ -1798,14 +1798,14 @@ function setAllDictionary()
 	$classid = getCloseClass();
 	$classid = S::sqlImplode($classid);
 
-	$querys = $db->query("SELECT word, type FROM pw_wordfb WHERE classid NOT IN ($classid)");
+	$querys = $db->query("SELECT word, type, wordreplace FROM pw_wordfb WHERE classid NOT IN ($classid)");
 	$content = "";
 	while ($value = $db->fetch_array($querys)) {
 		$weighing = $score[$value['type']];
+		$wordreplace = ($value['type'] == 3) ? '|'.$value['wordreplace'] : '';
 		$value['word'] = strtolower($value['word']);
-	  	$content.="".$value['word']."|".$weighing."\r\n";
+	  	$content.="".$value['word']."|".$weighing.$wordreplace."\r\n";
 	}
-
 	pwCache::setData($source_file, $content);//文本形式字典
 	pwCache::setData($bin_file,'');//二进制字典
 

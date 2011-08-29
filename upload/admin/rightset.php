@@ -65,7 +65,7 @@ if (!$action) {
 			$right = array();
 			$_modes = array('o', 'area', 'app', 'house', 'cms', 'dianpu', 'wot', 'photos', 'diary', 'groups', 'weibo');
 			foreach ($rightdb as $key => $value) {
-				if (!in_array($key, array('photos_manage', 'diary_manage', 'groups_manage', 'weibo_manage','photos_set', 'diary_set', 'groups_set', 'weibo_set'))) list($k1,$k2) = explode('_',$key);
+				if (!in_array($key, array('photos_manage', 'diary_manage', 'groups_manage', 'weibo_manage','photos_set', 'diary_set', 'groups_set', 'weibo_set', 'kmd_set', 'medal_manage'))) list($k1,$k2) = explode('_',$key);
 				if (in_array((string)$k1, $_modes)) {
 					$right[$key] = $value;
 				} else {

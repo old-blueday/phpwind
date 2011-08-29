@@ -140,10 +140,6 @@ if (empty($q)) {
 		)));
 		$cyid = $db->insert_id();
 		**/
-		require_once(A_P . 'groups/lib/imgupload.class.php');
-		$img = new CnimgUpload($cyid);
-		PwUpload::upload($img);
-		pwFtpClose($ftp);
 		$cyid = pwQuery::insert('pw_colonys', array(
 				'cname'		=> $cname,
 				//'classid'	=> $cid,
@@ -156,7 +152,10 @@ if (empty($q)) {
 				'descrip'	=> $descrip,
 				'titlefont' => $titlefont
 		));
-		
+		require_once(A_P . 'groups/lib/imgupload.class.php');
+		$img = new CnimgUpload($cyid);
+		PwUpload::upload($img);
+		pwFtpClose($ftp);
 		$db->update("UPDATE pw_cnstyles SET csum=csum+1 WHERE id IN (" . S::sqlImplode($styles) . ')');
 		if ($cnimg = $img->getImgUrl()) {
 			$cnimg = substr(strrchr($cnimg,'/'),1);

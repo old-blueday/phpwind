@@ -54,8 +54,10 @@ var checkboxClass = {
 		for(var i=0,length=boxs.length;i<length;i++){
 			if(boxs[i].type == 'checkbox' ){
 				var next = boxs[i].nextSibling;
-				next.onclick = function(){
-					this.previousSibling.click();
+				if(next.nodeType==1){
+					next.onclick = function(){
+						this.previousSibling.click();
+					}
 				}
 			}
 		}
@@ -67,9 +69,9 @@ function checkBoxs(obj,boxid){
 function checkBox(obj,relatedid){
 	checkboxClass.checkOne(obj,relatedid);
 }
-window.onload = function(){
-	checkboxClass.init();	
-}
+onReady(function(){
+	checkboxClass.init();
+})
 </script>
 <!-- 
 EOT;
@@ -207,13 +209,13 @@ EOT;
         </tr>
         <tr class="tr1 vt">
         	<td class="td1">负责频道</td>
-            <td class="td2">
+            <td class="td2" colspan="2">
             
 				<div class="admin_table_c" style="width:auto;" id="arealevel">
 				<table cellpadding="0" cellspacing="0">
 				
 					<tr class="vt">
-						<th class="s4" style="width:80px;"><input onclick="checkBoxs(this,'arealevel');" name="super" id="super" type="checkbox" value="1" $superCheck  /><span>全部权限</span></th>
+						<th class="s4" style="width:80px;"><input onclick="checkBoxs(this,'arealevel');" name="super" id="super" type="checkbox" value="1" $superCheck  />&nbsp;<span>全部权限</span></th>
 						<td>
 						</td>
 					</tr>
@@ -225,9 +227,9 @@ $channelCheck = ($userLevel['super'] || isset($level[$k])) ? "checked=checked" :
 print <<<EOT
 -->					
 					<tr class="vt">
-						<th class="s4" style="width:80px;"><input id="channel_$k" onclick="checkBoxs(this,'invokes_$k');" name="level[$k][name]" type="checkbox" value="$channel[name]" $channelCheck /><span>$channel[name]</span></th>
+						<th class="s4" style="width:120px;"><input id="channel_$k" onclick="checkBoxs(this,'invokes_$k');" name="level[$k][name]" type="checkbox" value="$channel[name]" $channelCheck />&nbsp;<span>$channel[name]</span></th>
 						<td>
-							<ul class="cc list_A list_120" id="invokes_$k">
+							<ul class="cc list_A list_160" style="width:auto;" id="invokes_$k">
 <!-- 
 EOT;
 if($channel[invokes]){

@@ -7,7 +7,7 @@ function()
 {
     var ROOT = document.documentElement;
 	var componentIndex=0
-	var $=function(id){return document.getElementById(id);};
+	var getObj=function(id){return document.getElementById(id);};
 	var ce=function(tag){return document.createElement(tag);};
 	PW.Button = baseClass.extend();
 	var _BP=PW.Button.prototype;
@@ -23,9 +23,9 @@ function()
 	_BP.render=function(obj)
 	{
 		componentIndex++;
-		if($("button_"+(this.id||componentIndex)))
+		if(getObj("button_"+(this.id||componentIndex)))
 		{
-			var btn=$("button_"+(this.id||componentIndex));
+			var btn=getObj("button_"+(this.id||componentIndex));
 		}
 		else
 		{

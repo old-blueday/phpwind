@@ -27,7 +27,7 @@ if (empty($action)) {print <<<EOT
 -->
 <div>
 <script type="text/javascript" src="{$db_server_url}/js/global.js"></script>
-<script language="JavaScript">
+<script>
 var server = new PwJs.Server("pwapp");
 server.start();
 </script>
@@ -37,7 +37,7 @@ server.start();
 EOT;
 } elseif ($action == 'my') {print <<<EOT
 -->	
-	<script language="JavaScript">
+	<script>
 function ajaxurl(o) {
 	showDialog('confirm','您确定要删除该应用吗？', 0, function() {
 		ajax.send(o.href,'',function() {

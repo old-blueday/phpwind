@@ -91,7 +91,8 @@ if ($a == 'list') {
 } elseif($a == 'dels') {
 	PostCheck();
 	S::gp(array('idarray'),'P',1);
-	$collectionService->delete($idarray);
+	$ids = $collectionService->checkCollectionIds($idarray,$winduid);
+	$collectionService->delete($ids);
 	refreshto("{$basename}type={$type}&",'operate_success');
 } elseif($a == 'remove') {
 	S::gp(array('ftype','idarray'));

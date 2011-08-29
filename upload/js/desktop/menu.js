@@ -8,7 +8,7 @@
 function()
 {
     var ROOT = document.documentElement;
-	var $=function(id){return document.getElementById(id);};
+	var getObj=function(id){return document.getElementById(id);};
 	var ce=function(tag){return document.createElement(tag);};
 	PW.Menu = baseClass.extend();
 	PW.Menu.all={};
@@ -42,7 +42,7 @@ function()
         this.self.appendChild(li);
         var _this = this;
 		li.onmouseover = function(){/*鼠标效果*/
-			var elements = $("menu_"+_this.id).getElementsByTagName("li");
+			var elements = getObj("menu_"+_this.id).getElementsByTagName("li");
 			for(var i=0;i<elements.length;i++){
 				elements[i].className = "";
 			}
@@ -109,7 +109,7 @@ function()
     };
     _MP.removeItem = function(id)
     {
-        this._remove($('menuItem_' + id));
+        this._remove(getObj('menuItem_' + id));
     };
     _MP.getPos = function(d)
     {
@@ -180,9 +180,9 @@ function()
         this.items = this.items || [];/*数据对象*/
         this.ROOT = ROOT;
         this.body = this.body || document.body;/*显示的区域*/
-        if ($("menu_" + this.id))
+        if (getObj("menu_" + this.id))
         {
-            var a = $("menu_" + this.id);
+            var a = getObj("menu_" + this.id);
 			this.self=a.lastChild;/*最后个子元素*/
         }
 		else
@@ -191,7 +191,7 @@ function()
             var a = ce("div");/*主菜单容器*/
 			//a.style.position="relative";
 			//a.className="menuIndex";
-			if(!$("arrow_div")&&!this.noArrow) /*指示*/
+			if(!getObj("arrow_div")&&!this.noArrow) /*指示*/
 			{
 			arrow=ce("DIV");
 			arrow.className="menu_s";

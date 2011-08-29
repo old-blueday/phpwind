@@ -1,0 +1,50 @@
+<!--<?php
+defined('W_P') or exit('Forbidden');print <<<EOT
+-->
+<div class="navigator"><a href="#anch-end"><img alt="phpwind" src="$wapImages/x.gif" /></a>
+<a href="index.php">$db_bbsname</a>
+</div>
+<div class="post_content">
+<!--
+EOT;
+$break = false;
+foreach($forum as $key => $value){
+	if ($fid) {
+		if ($break == false && $fid == $value['fid'] && $value['type'] == 'category') {
+			$break = true;
+		} else if ($break && $value['type'] == 'category') {
+			break;
+		} elseif ($break == false) {
+			continue;
+		}
+	}
+	$value[name] = wap_cv(strip_tags($value[name]));
+    if(in_array($key, $fids) && !$value['cms']){
+        if($value['type'] == 'category'){
+			if ($fid) {print <<<EOT
+-->
+<strong>$value[name]</strong><br />
+<!--
+EOT;
+			}else{print <<<EOT
+-->
+<strong><a href="index.php?a=list&fid=$key">$value[name]</a></strong><br />
+<!--
+EOT;
+			}
+		}else{
+		$add = $value['type'] == 'forum' ? "|-" : ($forum[$value['fup']]['type'] == 'forum' ? "|-|-" : "|-|-|-");
+print <<<EOT
+-->
+{$add}<a href="index.php?a=forum&fid=$key">$value[name]</a><br />
+<!--
+EOT;
+		}
+    }
+}
+print <<<EOT
+-->
+</div>
+<!--
+EOT;
+?>-->

@@ -1,0 +1,422 @@
+<!--<?php
+include_once PrintEot('left');
+if($action == 'add' || $action == 'edit'){
+print <<<EOT
+-->
+<div class="mb10 nav3">
+<ul id="basictype" class="cc">
+	<li><a href="$basename">广告管理</a></li>
+	<li class="current"><a href="$basename&action=add">添加广告</a></li>
+</ul>
+</div>
+<script type="text/javascript">
+function getObj(id){
+	return document.getElementById(id);
+}
+function showSelHtml(d,s) {
+	if(s) getObj(d).innerHTML = getObj(s).innerHTML;
+	else getObj(d).innerHTML = '';
+}
+</script>
+<script type="text/javascript" src="js/date.js"></script>
+<script type="text/javascript" src="js/color_picker.js" ></script>
+<form method="post" name="FORM" action="$basename&action=save&">
+<input type="hidden" name="id" value="$id">
+<h2 class="h1">添加广告</h2>
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+	<tr class="tr1 vt">
+		<td class="td1">选择表现方式</td>
+		<td class="td2">
+			<ul class="list_A list_80">
+				<li><input type="radio" name="config[type]" value="txt" onclick="showSelHtml('adSet','adtxt')" $type_txt /> 文字</li>
+				<li><input type="radio" name="config[type]" value="img" onclick="showSelHtml('adSet','adimg')" $type_img /> 图片</li>
+			</ul>
+		</td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td2" colspan="2" style="padding:0;border-bottom:0;"><div id='adSet'></div></td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">广告描述</td>
+		<td class="td2"><input type="text" class="input input_wa" size="70" name="advert[descrip]" value="$advert[descrip]"></td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">选择广告位</td>
+		<td class="td2">
+			<select class="select_wa" id="advert_ckey" name="advert[ckey]" onchange="showSelCate(this.options[this.selectedIndex].value)">$optCates</select>
+			<span class="gray" id="cateDescrip"></span>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2"><div id="winSet" style="padding-left:3em;"></div></td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">&nbsp;</td>
+		<td class="td2"><span>广告展示的位置由广告位和所设置的广告范围决定,‘Ctrl’或‘Shift’键进行多选</span><br />
+			<div id="pageSet" style="float:left;margin-right:1em;"></div>
+			<div id="forumSet" style="float:left;margin-right:1em;"></div>
+		</td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">显示顺序</td>
+		<td class="td2"><input type="text" class="input input_wc" name="advert[orderby]" value="$advert[orderby]" size="5">
+			<span class="gray">默认顺序为“0”</span>
+		</td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">是否上架</td>
+		<td class="td2"><div class="list_A list_80">
+			<ul class="cc"><li><input type="radio" name="advert[ifshow]" value="1" $ifshow_Y >是</li>
+			<li><input type="radio" name="advert[ifshow]" value="0" $ifshow_N >否</li></ul>
+			<span class="gray">上架后,广告位同时被开启</span></div>
+		</td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">有效时间</td>
+        <td class="td2">
+        	<div class="input_img">
+        	<i class="input_time">选择时间</i>
+        	<input type="text" name="advert[stime]" id="starttime" value="$advert[stime]" onClick="setAdvert.initDate(this.id);" /></div>
+			至
+			<div class="input_img"><i class="input_time">选择时间</i><input type="text" name="advert[etime]" id="endtime" value="$advert[etime]" onClick="setAdvert.initDate(this.id);" /></div>
+			<span class="gray">格式：yyyy-mm-dd</span>
+		</td>
+	</tr>
+</table>
+</div>
+<div class="mb10 tac"><span class="btn"><span><button type="submit">提 交</button></span></span></div>
+</form><br />
+<div style="display:none;" id="c_page" >
+<select name="pages[]" size="16" style="margin:2px;" multiple>
+	<option value="page" $selThread_page >&nbsp;&gt;&gt;所有页面 </option>
+	<option value="" disabled></option>
+	<option value="index" $selThread_index >&nbsp;&raquo; WAP首页</option>
+	<option value="thread" $selThread_thread >&nbsp;&raquo; 主题列表</option>
+	<option value="read" $selThread_read >&nbsp;&raquo; 帖子页面</option>
+</select></div>
+<div style="display:none;" id="c_forum" >
+<select name="fids[]" size="16" style="margin:2px;" multiple>
+	<option value="-1" $selFids_all>&nbsp;&gt;&gt;所有版块</option>
+	<option value="" disabled></option>
+	$forumcache
+</select></div>
+<div id="adtxt" style="display:none;">
+	<h2 class="h1" style="border-top:0 none;">文字广告</h2>
+	<table width="100%" cellspacing="0" cellpadding="0">
+		<tr class="tr1 vt">
+			<td class="td1">文字内容<span style="color:red">*</span></td>
+			<td class="td2"><input type="text" class="input input_wa" name="config[title]" value="$config[title]"></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">文字链接<span style="color:red">*</span></td>
+			<td class="td2"><input type="text" class="input input_wa" name="config[link]" value="$config[link]"> <span class="gray">外链以http://开头</span></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">文字颜色</td>
+			<td class="td2">
+			<div class="input_img fl mr5"><i title="选择颜色" class="input_color" onclick="showColorPicker(this,document.FORM,function(){getObj('color').value=color_picker;})">选择颜色</i>
+			<input type="text" name="config[color]" value="$config[color]" id="color"></div>
+			<!--<input type="text" class="input input_wa" size="10" name="config[color]" value="$config[color]"> <span class="gray">例如:red 或 #EF8684</span></td>-->
+			</td>
+		</tr>
+	</table>
+</div>
+<div id="adimg" style="display:none;">
+	<script src="js/desktop/adminadvert.js"></script>
+	<h2 class="h1" style="border-top:0 none;">图片广告</h2>
+	<table width="100%" cellspacing="0" cellpadding="0" id="imglist">
+		<tr class="tr1 vt">
+			<td class="td1">图片地址<span style="color:red">*</span> </td>
+			<td class="td2"><input type="text" class="input input_wa" name="config[url][1]" value="$config[url]"> <span class="gray">外链以http://开头</span></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">图片链接<span style="color:red">*</span> </td>
+			<td class="td2"><input type="text" class="input input_wa" name="config[link][1]" value="$config[link]"> <span class="gray">外链以http://开头</span></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">图片大小</td>
+			<td class="td2">
+				宽：<input type="text" class="input input_wc" name="config[width]" value="$config[width]" />
+				高：<input type="text" class="input input_wc" name="config[height]" value="$config[height]" /> <span class="gray">例如: 98% 或 120像素</span>
+			</td>
+		</tr>
+	</table>
+</div>
+<script src="js/pw_ajax.js"></script>
+<script type="text/javascript">
+function showSelCate(ckey) {
+	ckey=ckey.toLowerCase();
+	showSelHtml('pageSet','');
+	showSelHtml('forumSet','');
+	if (ckey) {
+		cateDescrip(ckey);
+		if (ckey.indexOf('wap.read') != -1) {
+			showSelHtml('forumSet','c_forum');
+		}else if (ckey.indexOf('wap.') != -1) {
+			showSelHtml('pageSet','c_page');
+			showSelHtml('forumSet','c_forum');
+		}
+	}
+}
+function cateDescrip(ckey) {
+	var descrip = JSONParse('$cateDescrip');
+	if (typeof descrip[ckey] != 'undefined')
+		getObj('cateDescrip').innerHTML = descrip[ckey];
+	else
+		getObj('cateDescrip').innerHTML = '';
+}
+var setAdvert = {
+    handler : '',
+    //init
+    initDate : function(id){
+        ShowCalendar(id);
+        setAdvert.handler = setInterval(function(){
+            setAdvert.checkDate(setAdvert.handler);
+        },1000);
+    },
+
+    checkDate : function(){
+        var starttime = getObj("starttime").value;
+        var endtime = getObj("endtime").value;
+        if(endtime == "" || starttime == ""){
+            return false;
+        }
+        var startD  = new Date(Date.parse(starttime.replace(/-/g,"/")));
+        var endD = new Date(Date.parse(endtime.replace(/-/g,"/")));
+        if(startD-endD>0){
+            getObj("endtime").value = "";
+            alert("抱歉，结束时间不能小于开始时间");
+            return false;
+        }
+        var startArray = starttime.split("-");
+        var endArray = endtime.split("-");
+        //not the same year
+        if(startArray[0]<endArray[0]){
+            return false;
+        }
+        //two month
+        if(endArray[1]-startArray[1] <=2){
+            var dateRange = setAdvert.getDateRange(starttime,endtime);
+            //setAdvert.disableDate(dateRange.days);
+            //setAdvert.disableWeek(dateRange.weeks);
+        }
+        if(endArray[1]==startArray[1] && endArray[2]==startArray[2]){
+            //
+        }
+        showddate(starttime,endtime);
+        clearInterval(setAdvert.handler);
+    },
+
+    getDateRange : function(starttime,endtime){
+        var unit_day = 86400*1000;
+        var startT = Date.parse(starttime.replace(/-/g,"/"));
+        var endT = Date.parse(endtime.replace(/-/g,"/"));
+        var startN = startT+unit_day;
+        var dateArray = [];
+        var weekArray = [];
+        for(i=startT;i<=endT;i+=unit_day){
+            var startND = new Date(i);
+            var td = startND.getDate();
+            var wd = startND.getDay();
+            dateArray.push(td);
+            weekArray.push(wd);
+        }
+        return {days:dateArray,weeks:weekArray};
+    },
+
+    disableDate : function(valids){
+        var ddate = getObj("ddate_id").getElementsByTagName("input");
+        for(i=0;i<ddate.length;i++){
+            var value = ddate[i].value;
+            if(valids.indexOf(value) == -1){
+                ddate[i].disabled = "disabled";
+            }
+        }
+    },
+
+    disableWeek : function(valids){
+        var dweek = getObj("dweek_id").getElementsByTagName("input");
+        for(i=0;i<dweek.length;i++){
+            var value = dweek[i].value;
+            if(valids.indexOf(value) != -1){
+                dweek[i].disabled = "disabled";
+            }
+        }
+    },
+
+    disableTime : function(valids){
+        var dtime = getObj("dtime_id").getElementsByTagName("option");
+        for(i=0;i<dtime.length;i++){
+             var value = dtime[i].value;
+             if(valids.indexOf(value) != -1){
+                dtime[i].disabled = "disabled";
+             }
+        }
+    }
+
+}
+showSelHtml('adSet','ad{$config[type]}');
+showSelCate(getObj('advert_ckey').value);
+</script>
+<!--
+EOT;
+}
+elseif(empty($action) || $action == 'search'){
+${'_advertype_'.$advertype} = in_array($advertype,$advertypes) ? 'selected' : '';
+${'_state_'.$state} = in_array($state,array('0','1')) ? 'selected' : '';
+print <<<EOT
+-->
+<div class="mb10 nav3">
+<ul id="basictype" class="cc">
+	<li class="current"><a href="$basename">广告管理</a></li>
+	<li><a href="$basename&action=add">添加广告</a></li>
+</ul>
+</div>
+<h2 class="h1">搜索</h2>
+<div class="admin_table mb10">
+<form action="$basename" method="post">
+<table width="100%" cellspacing="0" cellpadding="0">
+<tr class="tr3">
+	<td><select name="ckey" class="select_wa mr10"><option value="">广告位</option>$optCates</select><select name="advertype" class="select_wa mr10"><option value="">类型</option><option value="img" $_advertype_img>图片</option><option value="txt" $_advertype_txt>文字</option></select><select name="state" class="select_wa mr10"><option value="">状态</option><option value="1" $_state_1>上架</option><option value="0" $_state_0>下架</option></select>关键字：<input type="text" class="input input_wa mr10" name="keyword" value="$keyword"/><span class="btn2"><span><button type="submit">搜 索</button></span></span></td>
+</tr>
+</table>
+</form>
+</div>
+<div class="c"></div>
+<h2 class="h1">广告管理</h2>
+<div class="admin_table mb10">
+<form name="listform" action="$basename" method="post">
+<table width="100%" cellspacing="0" cellpadding="0">
+	<tr class="tr2">
+		<td width="5%" class="tac"><a onclick="CheckAll(document.listform)" style="cursor:pointer;">全选</a></td>
+		<td width="5%" class="tac">顺序</td>
+		<td>描述</td>
+		<td width="7%">类型</td>
+		<td width="15%">广告位</td>
+		<td width="12%">结束时间</td>
+		<td width="10%">状态</td>
+		<td style="60">操作</td>
+	</tr>
+
+<!--
+EOT;
+if($adverts){
+foreach ($adverts as $value){
+print <<<EOT
+-->
+	<tr class="tr1 vt">
+		<td class="td2 tac"><input type="checkbox" name="selid[]" value="$value[id]" /></td>
+		<td class="td2 tac">{$value['orderby']}</td>
+		<td class="td2"><a href="$basename&job=edit&id=$value[id]">{$value['descrip']}</a></td>
+		<td class="td2">
+<!--
+EOT;
+if($value['config']['type'] == 'txt'){print <<<EOT
+-->
+		文字
+<!--
+EOT;
+}elseif($value['config']['type'] == 'img'){print <<<EOT
+-->
+		图片
+<!--
+EOT;
+}print <<<EOT
+-->
+		</td>
+		<td class="td2">
+<!--
+EOT;
+if (!isset($cates[$value['ckey']])) {print <<<EOT
+-->
+		<font color=red>广告位不存在</font>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+
+		<a href="$basename&ckey={$value['ckey']}" >{$cates[$value['ckey']]['name']}</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+		</td>
+		<td class="td2">{$value['etime']}</td>
+		<td class="td2">
+<!--
+EOT;
+if(!$cates[$value['ckey']]['ifshow']){print <<<EOT
+-->
+			广告位关闭
+<!--
+EOT;
+}elseif($value['ifshow'] == 1){print <<<EOT
+-->
+			已上架
+<!--
+EOT;
+}elseif($value['uid'] && $value['ifshow'] == -1){print <<<EOT
+-->
+			<font color=red>未验证</font>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+			已下架
+<!--
+EOT;
+}if ($value['uid']) {print <<<EOT
+-->
+		<!-- 	<font color=blue>[租]</font> -->
+<!--
+EOT;
+}print <<<EOT
+-->
+		</td>
+		<td class="td2">
+			<a class="fourm-two" href="$basename&action=edit&id=$value[id]" title="编辑">[编辑]</a>
+			<a class="fourm-two" href="$basename&action=del&selid=$value[id]" onclick="if(!confirm('您确认要删除该广告吗?'))return false;" title="删除">[删除]</a>
+		</td>
+	</tr>
+<!--
+EOT;
+}}else{print <<<EOT
+-->
+<tr>
+   <td colspan="8" class="p10"><div class="admin_tips">啊哦，没有你要的信息！</div></td>
+
+</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+</table>
+<script type="text/javascript">
+function ifcheck(name){
+	var obj = document.getElementsByName(name);
+	for(var i=0;i<obj.length;i++){
+		if(obj[i].checked){
+			return confirm('确认要进行此操作吗？')
+		}
+	}
+	alert("请选择要进行操作的项");
+	return false;
+}
+</script>
+<div class="mb10">$pages</div>
+<div class="mb10 tac">
+	<p><span>选中操作：</span>
+	<label class="mr10"><input type="radio" name="action" value="show" checked/>上架</label>
+	<label class="mr10"><input type="radio" name="action" value="hide"/>下架</label>
+	<label><input type="radio" name="action" value="del"/>删除</label></p><br>
+	<p><span class="bt"><span><button type="button" onclick="CheckAll(this.form)">全 选</button></span></span>
+	<span class="btn"><span><button type="submit" onclick="return ifcheck('selid[]')">提 交</button></span></span>
+	</p>
+</div>
+</form>
+</div>
+<!--
+EOT;
+}include_once PrintEot('adminbottom');
+?>-->

@@ -423,7 +423,7 @@ print <<<EOT
             
             
 		</ul>
-		<script language="JavaScript">setCurrent('posttime_{$diarystarttime}','','current');</script>
+		<script>setCurrent('posttime_{$diarystarttime}','','current');</script>
 <!--
 EOT;
 if($hotwords){
@@ -562,7 +562,7 @@ require printEOT('searcher_searchinput');
 print <<<EOT
 -->
 	</div>
-<script language="JavaScript">
+<script>
 function favorforum(fid) {
 	ajax.send('pw_ajax.php?action=shortcut&fid='+fid,'',function(){
 		ajax.guide();

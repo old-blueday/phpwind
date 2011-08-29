@@ -59,7 +59,7 @@ h1 .old:hover{ text-decoration:underline;}
 .navA_wrap{overflow:hidden;min-width:800px;line-height:20px;height:45px;}
 .navA_wrap .fr{width:250px;}
 .navA{float:left;height:45px;padding-left:15px;}
-.navA li{float:left;font-family:Tahoma;margin-right:13px;width:48px;height:45px;}
+.navA li{float:left;font-family:Tahoma;margin-right:5px;width:48px;height:45px;}
 .navA li a{color:#488bd1;display:block; float:left;font-weight:700;background:url(navA.png) -999px -999px no-repeat;padding-top:25px;width:48px;text-align:center;outline:none;}
 .navA li a:hover{color:#1b6499;}
 #common a{ background-position:0 0;}
@@ -70,6 +70,7 @@ h1 .old:hover{ text-decoration:underline;}
 #applicationcenter a{ background-position:-250px 0;}
 #markoperation a{ background-position:-300px 0;}
 #datacache a{ background-position:-350px 0;}
+#cloudcomputing a{ background-position:-460px 0;}
 #modemanage{width:58px;}
 #modemanage a{background-position:-400px 0;padding-right:10px;}
 #common a:hover,#common .current{ background-position:0 -50px;}
@@ -81,6 +82,8 @@ h1 .old:hover{ text-decoration:underline;}
 #markoperation a:hover,#markoperation .current{ background-position:-300px -50px;}
 #datacache a:hover,#datacache .current{ background-position:-350px -50px;}
 #modemanage a:hover,#modemanage .current{ background-position:-400px -50px;}
+#cloudcomputing a:hover,#cloudcomputing .current{ background-position:-460px -50px;}
+
 .navA_wrap .fr{margin-top:10px;color:#444; font-family:Arial;}
 .navA_wrap .fr a{color:#444;}
 /*tabA*/
@@ -105,7 +108,8 @@ h1 .old:hover{ text-decoration:underline;}
 .tabA_next_old{ background-position:-13px -130px; float:right;}
 
 /*左侧菜单*/
-.menubar{padding-bottom:10px;}
+#B_menunav{width:140px;}
+.menubar{padding-bottom:10px;overflow:hidden;}
 .menubar dl{padding:5px 10px;}
 .menubar dt{padding:2px 0 1px;}
 .menubar dt a{color:#333;display:block;padding:3px 5px 3px 20px;background:url(menu_off.png) 5px center no-repeat;height:16px;line-height:16px;}

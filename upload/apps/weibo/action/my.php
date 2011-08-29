@@ -64,7 +64,7 @@ if ($do == 'post') {
 		Showmsg('undefined_action');
 	}
 } elseif ($do == 'my') {
-
+	S::gp(array('createtopic'),'G');
 	$count = $weiboService->getUserWeibosCount($winduid);
 	$pageCount = ceil($count / $perpage);
 	$page = validatePage($page,$pageCount);
@@ -139,7 +139,7 @@ if ($do == 'post') {
 	
 } elseif ($do == 'comment') {
 
-	S::gp(array('mid','identify','commentpage'), 'GP');
+	S::gp(array('mid','identify','commentpage','tid'), 'GP');
 	$perpage = 10;
 	$commentService = L::loadClass("comment","sns");
 	$count = $commentService->getCommentsCountByMid($mid);
@@ -150,7 +150,7 @@ if ($do == 'post') {
 
 } elseif ($do == 'postcomment') {
 
-	S::gp(array('mid','ifsendweibo','writeContent','identify'), 'GP');
+	S::gp(array('mid','ifsendweibo','writeContent','identify','tid','ifReplyThread'), 'GP');
 	$writeContent = nl2br($writeContent);
 	$commentService = L::loadClass("comment","sns");
 	if (($status = $commentService->commentCheck($writeContent)) !== true) {
@@ -166,6 +166,14 @@ if ($do == 'post') {
 			$weiboService->send($winduid, $writeContent, 'transmit',$mid, array());
 			$weiboService->updateCountNum(array('transmit' => 1), $mid);
 		}
+		if ($ifReplyThread) {
+			if (($weiboService->checkReplyRight($tid)) !== true) {
+				Showmsg('您不能对该贴进行回复');
+			}
+			$pingService = L::loadClass('ping', 'forum');
+			$atc_content = $writeContent."\r\n\r\n[size=2][color=#a5a5a5]内容来自[新鲜事][/color] [/size]";
+			$pingService->addPost($tid, $atc_content);
+		}
 		echo 'ok';
 	} else {
 		Showmsg("对于对方隐私设置，您的评论或者回复失败!");
@@ -173,16 +181,22 @@ if ($do == 'post') {
 	$id = $identify ? $mid.'_'.$identify : $mid;
 
 } elseif ($do == 'deletecomment') {
-
+	checkVerify();
 	S::gp(array('cid','mid'));
+	$weibo = $weiboService->getWeibosByMid($mid);
 	$commentService = L::loadClass("comment","sns");
-	if($commentService->deleteComment($cid)){
-		$weiboService->updateCountNum(array('replies' => -1), $mid,'plus');
+	if ($weibo['uid'] == $winduid || $commentService->checkCommentAuthor($cid) || S::inArray($windid, $manager)){
+		if($commentService->deleteComment($cid)){
+			$weiboService->updateCountNum(array('replies' => -1), $mid,'plus');
+		}
+		echo 'ok';
+	} else {
+		Showmsg("你没有权限删除该评论!");
 	}
-	echo 'ok';
+
 	
 } elseif($do == 'deleteweibo') {
-
+	checkVerify();
 	S::gp(array('mid'));
 	$weibo = $weiboService->getWeibosByMid($mid);
 	if ($weibo && ($weibo['uid'] == $winduid || $SYSTEM['delweibo'] || S::inArray($windid, $manager))) {
@@ -335,18 +349,33 @@ if (defined('AJAX')) {
 	$userCache = L::loadClass('UserCache', 'user');
 	$cacheData = $userCache->get($winduid, array('recommendUsers' => 3));
 	$recommendUsers = $cacheData['recommendUsers'];
-	
-	$rt = $db->get_one("SELECT * FROM pw_cache WHERE name='weiboAuthorSort_5' AND time>" . S::sqlEscape($timestamp - 86400));
-	if ($rt) {
+	if (perf::checkMemcache()){
+		$_cacheService = Perf::gatherCache('pw_cache');
+		$rt =  $_cacheService->getCacheByName('weiboAuthorSort_5');			
+	} else {
+		$rt = $db->get_one("SELECT * FROM pw_cache WHERE name='weiboAuthorSort_5'");
+	}
+	//$rt = $db->get_one("SELECT * FROM pw_cache WHERE name='weiboAuthorSort_5' AND time>" . S::sqlEscape($timestamp - 86400));
+	if ($rt && $rt['time'] > $timestamp - 86400) {
 		$weiboAuthorSort = unserialize($rt['cache']);
 		is_array($weiboAuthorSort) || $weiboAuthorSort = array();
 	} else {
 		$weiboAuthorSort = $weiboService->getAuthorSort(5);
+		pwQuery::replace(
+			'pw_cache',
+			array(
+				'name'	=> 'weiboAuthorSort_5',
+				'cache'	=> serialize($weiboAuthorSort),
+				'time'	=> $timestamp
+			)
+		);
+		/*
 		$db->update("REPLACE INTO pw_cache SET " . S::sqlSingle(array(
 			'name'	=> 'weiboAuthorSort_5',
 			'cache'	=> serialize($weiboAuthorSort),
 			'time'	=> $timestamp
 		)));
+		*/
 	}
 	/* 右侧话题排行 */
 	!$topicService && $topicService = L::loadClass('topic','sns'); /* @var $topicService PW_Topic */

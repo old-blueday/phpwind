@@ -34,21 +34,24 @@ EOT;
 <!--
 EOT;
 }print <<<EOT
---><a href="{$db_userurl}$value[uid]" class="b f14 mr5">$value[username]</a><!--
+-->
+<!--
 EOT;
+$gender = $value['gender'] == 2 ? 'women' : 'man';
 if(checkOnline($value['thisvisit'])){
 print <<<EOT
 -->
-<img src="images/online.png" alt="在线" title="在线" style="vertical-align:middle" />
+<span class="{$gender}_ol mr5" title="在线" alt="在线">在线</span>
 <!--
 EOT;
 } else {print <<<EOT
 -->
-<img src="images/stealth.png" alt="离线" title="离线" style="vertical-align:middle" />
+<span class="{$gender}_unol mr5" title="离线" alt="离线">离线</span>
 <!--
 EOT;
 }print <<<EOT
---></div>
+-->
+<a href="{$db_userurl}$value[uid]" class="b f14 mr5">$value[username]</a></div>
 <!--
 EOT;
 if ($value[honor]) {print <<<EOT

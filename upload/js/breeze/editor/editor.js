@@ -15,13 +15,14 @@ B.require('dom', 'event', function(B){
 	//过滤粘贴内容函数
 	function filterPasteData(dat){
 		 // Remove all SPAN tags
-		dat = dat.replace(/<\/?SPAN[^>]*>/gi, "" )
-			.replace(/<(\w[^>]*) class=([^ |>]*)([^>]*)/gi, "<$1$3")
-			.replace(/<(\w[^>]*) style="([^"]*)"([^>]*)/gi, "<$1$3")
-			.replace(/<(\w[^>]*) lang=([^ |>]*)([^>]*)/gi, "<$1$3")
-			.replace(/<\\?\?xml[^>]*>/gi, "")
-			.replace(/<\/?\w+:[^>]*>/gi, "")
-			.replace(/ /, " " );
+		/*dat = dat.replace(/<\/?SPAN[^>]*>/gi, "" )
+		.replace(/<(\w[^>]*) class=([^|>]*)([^>]*)/gi, "<$1$3")
+		.replace(/<(\w[^>]*) style="([^"]*)"([^>]*)/gi, "<$1$3")
+		.replace(/<(\w[^>]*) lang=([^ |>]*)([^>]*)/gi, "<$1$3")
+		.replace(/<\\?\?xml[^>]*>/gi, "")
+		.replace(/<\/?\w+:[^>]*>/gi, "")
+		.replace(/ /, " " )
+		.replace(/<(\/?)pre/gi,"<$1div");*/
 		// Transform <P> to <DIV>
 		var re = new RegExp("(<P)([^>]*>.*?)(<\/P>)","gi") ; // Different because of a IE 5.0 error
 		dat = dat.replace( re, "<div$2</div>" ) ;
@@ -37,7 +38,7 @@ B.require('dom', 'event', function(B){
 		this.editor = editor;
 		this.init = function() {
 			var self = this,
-				iframe = B.createElement('<iframe width="100%" frameborder="no" style="height:100%;display: block;"></iframe>'),
+				iframe = B.createElement('<iframe id="note_iframe" width="100%" frameborder="no" style="height:100%;display: block;"></iframe>'),
 				textareaHeight = B.height(this.editor.textarea) || 300,
 				style = {
 					//width: '100%',
@@ -55,11 +56,12 @@ B.require('dom', 'event', function(B){
 			var win = iframe.contentWindow,
 			doc = win.document;
 			doc.open();
+			var defaultText=B.toolbarCommands.fontSelector[5].defaultText;
 			doc.write('<html><head>\
-			<style>body{border:0px;font-family:arial;font-size:14px;margin:0;padding:0;line-height:1.5;word-break:break-all;word-wrap:break-word;}\
+			<style>body{border:0px;font-family:'+defaultText+';font-size:14px;margin:0;padding:0;line-height:1.8;word-wrap:break-word;height:100%;}\
 			p{margin:0;}img{border:0;max-width:320px;}\
 			table{border-collapse:collapse;font-size:14px;}pre{border:1px dashed #FF33FF;background:#FFddFF}\
-			.blockquote{zoom:1;border:1px dashed #CCC;background:#f7f7f7;padding:5px 10px;margin:0 10px;}\
+			.blockquote{zoom:1;border:1px dashed #CCC;background:#f7f7f7;padding:5px 10px;margin:10px 10px 0;}\
 			.B_code{border: 1px solid; border-color: #c0c0c0 #ededed #ededed #c0c0c0;margin:1em;padding:0 0 0 3em;overflow:hidden;background:#ffffff; font:12px/2 Simsun;}\
 			.B_code li{border-left:1px solid #ccc;background:#f7f7f7;padding:0 10px;}\
 			.B_code li:hover{background:#ffffff;color:#008ef1;}td{padding:0 5px;line-height:1.5;}\
@@ -102,7 +104,7 @@ B.require('dom', 'event', function(B){
 				this.setHTML('<div>'+(B.UA.opera?'&nbsp;':(B.UA.ie?'':'<br />'))+'</div>');
 			}
 			setTimeout(function(){
-				//if(B.UA.ie<7){//兼容IE6的後退功能,但是因此不能捕獲狀態
+				//if(B.UA.ie<7){//兼容IE6的後退功能,但是因此不能捕?@??態
 					//doc.designMode = 'on';
 				//} else {
 					self.setEditable();
@@ -116,6 +118,7 @@ B.require('dom', 'event', function(B){
 			}
 		}
 		this.command = function(command){
+			
 			if (command == 'Inserthorizontalrule'){
 				this.pasteHTML('<hr><br>');
 			} else if (command == 'PgFormat') {
@@ -123,6 +126,9 @@ B.require('dom', 'event', function(B){
 					B.css(n, 'text-indent', '2em');
 				});
 			} else {
+				if(B.UA.webkit&&command=="RemoveFormat"){
+					editDoc.execCommand("hilitecolor", false, "transparent");
+				}
 				editDoc.execCommand(command, false, null);
 			}
 		}
@@ -464,7 +470,7 @@ B.require('dom', 'event', function(B){
 		},
 		pasteCache: function(evt){
 			var doc = this.doc,
-				enableKeyDown=false
+				enableKeyDown=false,
 				self = this;
 			//create the temporary html editor
 			this.saveRng();
@@ -477,7 +483,6 @@ B.require('dom', 'event', function(B){
 			divTemp.style.position="absolute";
 			divTemp.style.overflow="hidden";
 			this.doc.body.appendChild(divTemp);
-			
 			//disable keyup,keypress, mousedown and keydown
             B.addEvent(this.doc, 'mousedown', block);
             B.addEvent(this.doc, 'keydown', block);
@@ -489,13 +494,13 @@ B.require('dom', 'event', function(B){
             //move the cursor to into the div
             var docBody=divTemp.firstChild,
             	rng = doc.createRange();
-			if(!B.UA.webkit){	
-				rng.setStart(docBody, 0);
-				rng.setEnd(docBody, 1);
-				sel.removeAllRanges();
-				sel.addRange(rng);
-			}
-			
+				if(!B.UA.webkit){  
+					 rng.setStart(docBody, 0);
+					 rng.setEnd(docBody, 1);
+					 sel.removeAllRanges();
+					 sel.addRange(rng);
+				 }
+
             var originText = doc.body.textContent;
             if (originText==='\uFEFF'){
             	originText="";
@@ -504,8 +509,7 @@ B.require('dom', 'event', function(B){
             setTimeout(function(){
 				var newData = '';
             	//get and filter the data after onpaste is done
-
-				if (divTemp.innerHTML === '\uFEFF'){
+				if (divTemp.innerHTML === '\uFEFF'){//webkit返回
 					newData="";
 					doc.body.removeChild(divTemp);
 					return;
@@ -522,7 +526,7 @@ B.require('dom', 'event', function(B){
 				//paste the new data to the editor
 				doc.execCommand('inserthtml', false, newData );
 				doc.body.removeChild(divTemp);
-			}, 0);
+			}, 16);
             //enable keydown,keyup,keypress, mousedown;
             enableKeyDown = true;
             B.removeEvent(doc, 'mousedown', block);
@@ -649,7 +653,15 @@ B.require('dom', 'event', function(B){
 		B.addEvent(elem, "mousedown", function(evt) {
 			editor.saveRng();
 			var mode = editor.modes[editor.currentMode];
-			mode[command](val);
+			if(editor.currentMode!='default'){
+				mode[command](val);
+			}else{
+				if((val=="JustifyCenter"&&mode.queryState("JustifyCenter")==true)||(val=="JustifyRight"&&mode.queryState("JustifyRight")==true)){
+					mode[command]("JustifyNone");
+				}else{
+					mode[command](val);
+				}
+			}
 			//editor.restoreRng();
 			evt.preventDefault();
 			editor.updateToolbar();
@@ -778,6 +790,8 @@ B.require('dom', 'event', function(B){
 	//插件方式
 	function PluginCommandController(command, val, elem, editor){
 		B.addEvent(elem, 'mousedown', function(evt){
+			//console.log(elem.parentNode.parentNode.parentNode.nextSibling.nextSibling);
+			//editor.textarea=elem.parentNode.parentNode.parentNode.nextSibling.nextSibling;
 			closeAll();
 			editor.saveRng();
 			var mode = editor.modes[editor.currentMode];
@@ -865,7 +879,8 @@ B.require('dom', 'event', function(B){
 		br: [null, null, brUI],
 		musicIcon: ['music', '虾米音乐', iconUI, PluginCommandController, 'insertCommand'],
 		magicIcon: ['magic', '动漫传情', iconUI, PluginCommandController, 'insertCommand'],
-		pageIcon: ['pagecut', '分页符', iconUI, PluginCommandController, 'insertCommand']
+		pageIcon: ['pagecut', '分页符', iconUI, PluginCommandController, 'insertCommand'],
+		remotePid: ['remotepic', '远程图片下载', iconUI, PluginCommandController, '']
 	};	
 	/**
 	 * 编辑器模块
@@ -911,14 +926,16 @@ B.require('dom', 'event', function(B){
 			return toolbarEl;
 		}
 		this.initToolBar = function(toolbar) {
-			var toolbarEl = B.$('#'+toolbar).childNodes;
-			for (var i = 0; i<toolbarEl.length; i++) {
+			var toolbar = B.$('.' + toolbar,this.textarea.parentNode);//ID为改class，为了考虑多编辑器的存在
+			var toolbarEl = toolbar.childNodes;
+			for (var i = 0 ,len = toolbarEl.length; i < len; i++) {
 				var t = toolbarEl[i];
-				if (t.nodeType == 1) {
-					this.commandBinding(t, B.toolbarCommands[t.id.substr(3)]);
+				if (t.nodeType === 1) {
+					var commandName = t.getAttribute('data-type').substr(3);
+					this.commandBinding(t, B.toolbarCommands[commandName]);
 				}
 			}
-			this.area = B.$('#'+toolbar).parentNode.parentNode.parentNode;
+			this.area = toolbar.parentNode.parentNode.parentNode;
 		}
 		this.commandBinding = function(el, binding) {
 			if (binding.length > 3){
@@ -1068,8 +1085,9 @@ B.require('dom', 'event', function(B){
 			if (typeof this.modes[this.currentMode] == 'function') {
 				var mode = this.modes[this.currentMode];
 				this.modes[this.currentMode] = new mode(this);
+				var self = this;
 				if (this.isQuickPost) {
-					var self = this;
+					
 					B.addEvent(this.modes[this.currentMode].editContainer, 'keydown', function(e) {
 						var keyDownCode = (typeof e.which != 'undefined') ? e.which : e.keyCode;
 						if ((e.ctrlKey && keyDownCode == 13) || (e.altKey && keyDownCode == 83)) {
@@ -1077,6 +1095,14 @@ B.require('dom', 'event', function(B){
 						}
 					});
 				}
+				if(this.allowAt&&this.currentMode=="default"){
+					B.require("app.at",function(){
+						var At=new B.app.at(self.modes[self.currentMode].iframe,self.allowAtLen||0);
+						At.init();
+						
+					})
+				}
+				
 			}
 		},
 		focus: function(){
@@ -1158,7 +1184,8 @@ B.require('dom', 'event', function(B){
 					width:viewportWidth + 'px',
 					height:viewportHeight + 'px',
 					top:0,
-					left:0
+					left:0,
+					zIndex:999
 				});
 				window.scrollTo(0, 0);
 				this.textarea.style.height = divHeight + 'px';//textarea同样高

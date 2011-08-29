@@ -47,13 +47,14 @@ print <<<EOT
       <td class="td1">将本系统作为</td>
       <td class="td2">
       	<ul class="cc list_80 list_A">
-           <li><input type=radio name="config[db_ppttype]" value="server" $type_server onclick="sendtype('server')">服务器端</li>
-           <li><input type=radio name="config[db_ppttype]" value="client" $type_client onclick="sendtype('client')">客户端</li>
+           <li><input type=radio name="config[db_ppttype]" id="pptserver" value="server" $type_server onclick="sendtype('server')">服务器端</li>
+           <li><input type=radio name="config[db_ppttype]" id="pptclient" value="client" $type_client onclick="sendtype('client')">客户端</li>
         </ul>
          </td>
     </tr>
   </table>
   </div>
+  <div id="server">
   <h2 class="h1">服务器端设置</h2>
   <div class="admin_table mb10">
   <table width="100%" cellspacing="0" cellpadding="0">
@@ -72,7 +73,9 @@ print <<<EOT
     </tr>
   </table>
   </div>
-  <h2 class="h1">客户器端设置</h2>
+  </div>
+  <div id="client">
+  <h2 class="h1">客户端设置</h2>
   <div class="admin_table mb10">
   <table width="100%" cellspacing="0" cellpadding="0">
     <tr class="tr1 vt">
@@ -110,6 +113,7 @@ EOT;
     </tr>
   </table>
   </div>
+  </div>
   <div class="mb10 tac">
     <span class="btn"><span><button type="submit">提 交</button></span></span>
   </div>
@@ -144,14 +148,21 @@ EOT;
       </ul>
     </div>
 </div>
-<SCRIPT LANGUAGE="JavaScript">
+<script type="text/javascript">
+var pptType = '$db_ppttype';
 function sendtype(show){
-	document.getElementById(show).style.display = "";
-	if(show=='server'){
-		document.getElementById('client').style.display = "none";
-	} else{
-		document.getElementById('server').style.display = "none";
-	}
+	try{
+		document.getElementById(show).style.display = "";
+		if(show=='server'){
+			document.getElementById('client').style.display = "none";
+			getObj('pptserver').checked = 'checked';
+			getObj('pptclient').checked = false;
+		} else{
+			document.getElementById('server').style.display = "none";
+			getObj('pptclient').checked = 'checked';
+			getObj('pptserver').checked = false;
+		}
+	}catch(e){}
 }
 var oldkey = "$db_pptkey";
 function generatekey(){
@@ -182,7 +193,11 @@ function SetType(type){
 	var regurl = {0 : '',1 : 'user_register.php',2 : 'member/index_do.php?fmdo=user&dopost=regnew',3 : 'reg.php',4 : 'register.php'};
 	getObj('regurl').value = regurl[type];
 }
-</SCRIPT>
+
+setTimeout(function(){
+	sendtype(pptType);
+}, 200);
+</script>
 <!--
 EOT;
 }include_once PrintEot('adminbottom');

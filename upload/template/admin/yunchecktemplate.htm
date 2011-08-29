@@ -1,0 +1,82 @@
+<!--<?php
+print <<<EOT
+-->
+<h2 class="h1">论坛概况</h2>
+<div class="admin_table mb10">
+	<table width="100%" class="mb10">
+		<tr class="tr1">
+			<td class="td1">论坛名称：</td>
+			<td class="td2">$bbsname</td>
+		</tr>
+		<tr class="tr1">
+			<td class="td1">论坛URL：</td>
+			<td class="td2">$bbsurl</td>
+		</tr>
+		<tr class="tr1">
+			<td class="td1">phpwind版本：</td>
+			<td class="td2">$bbsversion</td>
+		</tr>
+		<tr class="tr1">
+			<td class="td1">云服务版本：</td>
+			<td class="td2">$cloudversion</td>
+		</tr>
+<!-- 
+EOT;
+if($description){
+print <<<EOT
+-->		
+		<tr class="tr1">
+			<td class="td1">云服务状态：</td>
+			<td class="td2">$description</td>
+		</tr>
+<!-- 
+EOT;
+}
+print <<<EOT
+-->		
+	</table>
+	<h2 class="h1">环境检测</h2>
+	<table width="100%" class="mb20">
+		<tr class="tr1">
+			<td class="td1">parse_url函数：</td>
+			<td class="td2">$parse_url</td>
+		</tr>
+		<tr class="tr1">
+			<td class="td1">fsockopen函数：</td>
+			<td class="td2">$fsockopen</td>
+		</tr>
+		<tr class="tr1">
+			<td class="td1">DNS解析函数：</td>
+			<td class="td2">$gethostbyname</td>
+		</tr>
+<!-- 
+EOT;
+if($isgethostbyname){
+print <<<EOT
+-->
+		<tr class="tr1">
+			<td class="td1">云服务域名解析：</td>
+			<td class="td2"><span class="correct_span">&radic;</span><span class="mr10">$searchHost</span>DNS解析的IP：$searchIP</td>
+		</tr>
+		<tr class="tr1">
+			<td class="td1">云服务端口测试：</td>
+			<td class="td2"><span class="correct_span">&radic;</span>请求接口 $searchPort ，耗时 $searchPing 秒</td>
+		</tr>
+		<tr class="tr1">
+			<td class="td1">云盾域名解析：</td>
+			<td class="td2"><span class="correct_span">&radic;</span><span class="mr10">$defendHost</span>DNS解析的IP：$defendIp</td>
+		</tr>
+		<tr class="tr1">
+			<td class="td1">云盾端口测试：</td>
+			<td class="td2"><span class="correct_span">&radic;</span>请求接口 $defendPort ，耗时 $defendPing 秒</td>
+		</tr>
+<!-- 
+EOT;
+}
+print <<<EOT
+-->
+	</table>
+</div>
+<!--
+EOT;
+?>

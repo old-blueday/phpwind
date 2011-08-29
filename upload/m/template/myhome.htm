@@ -1,0 +1,167 @@
+<!--<?php
+defined('W_P') or exit('Forbidden');
+$author = $winduid == $uid ? '我' :  $userdb['username'];
+print <<<EOT
+-->
+<div class="page_title"><a href="#anch-end" id="anch-01" accesskey="1"><img alt="向下" src="$wapImages/x.gif" /></a><strong>个人空间</strong><em></em></div>
+<div class="notice"><em><a href="index.php?a=myfav&uid=$uid">我的论坛</a> &#8226; <a href="index.php?a=mybbs&uid=$uid">个人资料</a> &#8226; <a href="index.php?a=myphone&uid=$uid">手机信息</a></em></div>
+<div class="hline">
+  <table width="100%" border="0" cellspacing="2">
+    <tr>
+      <td style="line-height:1em;width:58px"><img src="$usericon" width="48" height="48" alt="头像"/><br />
+	  <em>
+<!--
+EOT;
+if($winduid == $uid){print <<<EOT
+-->
+	  <a href="index.php?a=upface">编辑头像</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+	  </em></td>
+      <td>$userdb[username]:
+<!--
+EOT;
+if($userdb['honor']){
+print <<<EOT
+--> 
+	  $userdb[honor]
+<!--
+EOT;
+}else{print <<<EOT
+-->	  
+	 <span class="reply"> 暂无签名<span>
+<!--
+EOT;
+}print <<<EOT
+-->
+	  </td>
+    </tr>
+  </table>
+</div>
+
+<!--
+EOT;
+print <<<EOT
+-->
+<div class="section">{$author}的论坛：</div>
+
+<div class="page_content">
+<div class="block"> <strong>{$author}的主题</strong><br />
+<div>
+<!--
+EOT;
+foreach($myArticles as $val){print <<<EOT
+-->
+<a href="$val[url]">$val[subject]</a>
+<!--
+EOT;
+if($val[digest]){print <<<EOT
+-->
+[精]<!-- img src='$wapImages/digest.gif' alt='精华'/ -->
+<!--
+EOT;
+}if($val[ifupload]==1){print <<<EOT
+-->
+[图]<!-- img src="$wapImages/img.gif" alt='附件' / -->	
+<!--
+EOT;
+}print <<<EOT
+-->	
+<br/>
+<!--
+EOT;
+}print <<<EOT
+-->
+</div>
+<!--
+EOT;
+if($myArticles  && count($myArticles) >=5 ){print <<<EOT
+-->
+<a href="index.php?a=myfav&type=my&uid=$uid">更多&raquo;</a></div>
+</li>
+<!--
+EOT;
+}print <<<EOT
+-->
+<div class="block"> <strong>{$author}的回复</strong><br />
+<div>
+<!--
+EOT;
+foreach($myReplaies as $val){print <<<EOT
+-->
+<a href="$val[url]">$val[subject]</a>
+<!--
+EOT;
+if($val[digest]){print <<<EOT
+-->
+[精]
+<!--
+EOT;
+}if($val[ifupload]==1){print <<<EOT
+-->
+[图]
+<!--
+EOT;
+}print <<<EOT
+-->
+<br/>
+<!--
+EOT;
+}print <<<EOT
+-->
+</div>
+<!--
+EOT;
+if($myReplaies && count($myReplaies) >=5 ){print <<<EOT
+-->
+<a href="index.php?a=myfav&type=re&uid=$uid">更多&raquo;</a></div>
+<!--
+EOT;
+}
+if($uid == $winduid){
+print <<<EOT
+-->
+<div class="block"> <strong>{$author}收藏的主题</strong><br />
+<div>
+<!--
+EOT;
+foreach($myFavThreads as $val){
+print <<<EOT
+-->
+<a href="$val[url]">$val[subject]</a>
+<!--
+EOT;
+if($val[digest]){print <<<EOT
+-->
+	[精]
+<!--
+EOT;
+}if($val[ifupload]==1){print <<<EOT
+-->
+	[图]
+<!--
+EOT;
+}print <<<EOT
+-->
+<br/>
+<!--
+EOT;
+}print <<<EOT
+-->
+</div>
+<!--
+EOT;
+if($myFavThreads  && count($myFavThreads) >=5 ){print <<<EOT
+-->
+<a href="index.php?a=myfav&type=fav&uid=$uid">更多&raquo;</a></div>
+<!--
+EOT;
+}}
+include printWAP('userbanner');print <<<EOT
+-->
+</div>
+<!--
+EOT;
+?>-->

@@ -214,9 +214,9 @@ if ($admintype == 'appset') {
 		adminmsg($response['result'],"$basename&admintype=$admintype");
 	}
 
-} elseif ($admintype == 'sinaweibo') {/*社区微博*/
-	$bindService = L::loadClass('weibobindservice', 'sns/weibotoplatform'); /* @var $bindService PW_WeiboBindService */
-	$appurl = $bindService->getAppConfigUrl();
+} elseif ($admintype == 'platformweiboapp') {
+	$siteBindService = L::loadClass('WeiboSiteBindService', 'sns/weibotoplatform/service'); /* @var $siteBindService PW_WeiboSiteBindService */
+	$appurl = $siteBindService->getAppConfigUrl();
 } elseif ($admintype == 'yunstatistics') {/*云统计*/
 	
 	$yunStatisticsUrl = $appclient->getYunStatisticsUrl();

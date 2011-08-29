@@ -121,6 +121,11 @@ var MC = {
 				MC.$("textarea").value = "";
 			}
 			window.setTimeout(function(){location.reload();},100);
+		}, function(){
+			try{
+				var gdcodes = getObj('changeGdCode');
+				if (typeof gdcodes.onclick == 'function') gdcodes.onclick();
+			}catch(e){}		
 		});
 		return false;
 	},
@@ -129,11 +134,9 @@ var MC = {
 	del : function(rid,type,subtype,page,otherid){
 		var dataUrl = MC.baseUrl+'?ajax=1&type='+type+'&action='+subtype+'&page='+page;
 		var url = MC.baseUrl+'?&type=ajax&action=del&rids[]='+rid;
-		MC.tips('confirm','确定要删除该消息?',0,function(){
-			MC.send(url,'',function(){
-				MC.nonRefresh(dataUrl,ajax.request.responseText,otherid);	
-			})
-		});
+		MC.send(url,'',function(){
+			MC.nonRefresh(dataUrl,ajax.request.responseText,otherid);	
+		})
 	},
 	group : function(message,data,type,page,otherid){
 		var dataUrl = MC.baseUrl+'?type='+type+'&page='+page+'&ajax=1';
@@ -203,7 +206,9 @@ var MC = {
 		MC.showSuccessTips(MC.$('hiddenMessage').innerHTML,otherid);
 		MC.fadeTips(otherid)},100);
 		MC.send(dataUrl,'',function(){
-			MC.$('content').innerHTML = ajax.request.responseText;											 
+			MC.$('content').innerHTML = ajax.request.responseText;
+				//重新初始化select
+				new sSelect(getObj('alltype'));
 		});	
 	},
 	/* 搜索功能 */

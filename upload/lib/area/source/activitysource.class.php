@@ -129,7 +129,7 @@ class PW_ActivitySource extends SystemData {
 				}
 			}
 			$v['image'] = $temp[0] ? $temp[0] : '';
-			$v['postdate'] = get_date($value['postdate'], 'Y-m-d');
+			$v['postdate'] = $value['postdate'];
 			$v['topictypename'] = $value['modelname'];
 			$v['topictypeurl'] = 'thread.php?fid=' . $value['fid'] . '&actmid=' . $value['actmid'];
 			$v['starttime'] = get_date($value['starttime'], 'Y-m-d');
@@ -200,14 +200,7 @@ class PW_ActivitySource extends SystemData {
 	 * @return string
 	 */
 	function _cookFid($fid) {
-		if ($fid && is_numeric($fid)) return $fid;
-		if (S::isArray($fid)) {
-			foreach ($fid as $key=>$value) {
-				if (!$value) unset($fid[$key]);
-			}
-			if (S::isArray($fid)) return S::sqlImplode($fid);
-		}
-		return getCommonFid();
+		return getCookedCommonFid($fid);
 	}
 	
 	/**

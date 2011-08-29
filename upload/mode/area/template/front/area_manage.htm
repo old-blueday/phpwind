@@ -3,12 +3,11 @@ print <<<EOT
 --><!doctype html>
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=$db_charset" />
-<script type="text/javascript" src="js/portal.js"></script>
+<meta charset="$db_charset" />
+<base id="headbase" href="$db_bbsurl/" />
 <script type="text/javascript" src="js/core/core.js"></script>
-<script language="JavaScript" src="mode/area/js/imagetype.js"></script>
-<link rel="stylesheet" type="text/css" href="images/pw_core.css" />
-<link rel="stylesheet" type="text/css" href="images/pwmanage.css" />
+<link rel="stylesheet" href="images/pw_core.css?{$GLOBALS['wind_repair']}" />
+<link rel="stylesheet" href="images/pwmanage.css?{$GLOBALS['wind_repair']}" />
 <style>
 htm,body{overflow:hidden;height:500px;width:100%;}
 html {font-size:12px;}
@@ -58,7 +57,7 @@ print <<<EOT
             <li $defaultCurrent><a href="$baseUrl">推送内容管理</a></li>
 <!--
 EOT;
-if($pageInvokeInfo[ifverify]){
+if($invokeInfo[ifverify]){
 print <<<EOT
 -->
             <li $verifyCurrent><a href="$baseUrl&action=verify">待审核内容</a></li>
@@ -80,7 +79,7 @@ print <<<EOT
 -->
 <!-- 
 EOT;
-if($action!='add' && $pageInvokeInfo[pieces]){
+if($action!='add' && $invokeInfo[pieces]){
 print <<<EOT
 -->         
             <li class="none"><a href="$baseUrl&action=add" class="s2">添加推送内容</a></li>
@@ -98,7 +97,7 @@ print <<<EOT
 -->
 <!--
 EOT;
-if(!$pageInvokeInfo[pieces] && !in_array($action,array('editconfig','edittpl','pushto','recommend','success'))){
+if(!$invokeInfo[pieces] && !in_array($action,array('editconfig','edittpl','pushto','recommend','success'))){
 print <<<EOT
 -->
 <div class="pwC_content_a">
@@ -129,9 +128,7 @@ EOT;
 if(in_array($action,array("pushto","edit","add","recommend"))){
 print <<<EOT
 -->
-<script type="text/javascript" src="js/global.js"></script>
-<script type="text/javascript" src="js/pw_ajax.js"></script>
-<script src="js/date.js" language="JavaScript"></script>
+<script type="text/javascript" src="js/portal.js"></script>
 <script type="text/javascript">
 	var initsubinvoke = '{$subinvoke}';
 	var selid = '$selid';
@@ -140,9 +137,9 @@ print <<<EOT
 	var pushdataid = '$pushdataid';
 	var ctop='0px';
 	var c=null;
-	window.onload = function(){
+	onReady(function(){
 		initPortal();
-	}
+	})
 	function addPingFen() {
 		if (getObj('pingfen').getElementsByTagName('tr').length>4) {
 			alert('评分类型超过操过');
@@ -193,32 +190,36 @@ print <<<EOT
 	function checktitlelength(num,titleid,wordid){
  		var titleLength = num;
 		setTimeout(function(){
-		var l = strlen($(titleid).value);
+		var l = strlen(getObj(titleid).value);
 		if(l<titleLength)
 		{
-			$(wordid).innerHTML='剩余'+(titleLength-l)+'个字节';
-			$(wordid).style.backgroundColor='#fffeed';
-			$(wordid).style.display='inline';
+			getObj(wordid).innerHTML='剩余'+(titleLength-l)+'个字节';
+			getObj(wordid).style.backgroundColor='#fffeed';
+			getObj(wordid).style.display='inline';
 		}
 		else if(l==titleLength)
 		{
-			$(wordid).innerHTML='已经达到最大字数限制';
-			$(wordid).style.backgroundColor='#ffd9d9';
-			$(wordid).style.display='inline';
+			getObj(wordid).innerHTML='已经达到最大字数限制';
+			getObj(wordid).style.backgroundColor='#ffd9d9';
+			getObj(wordid).style.display='inline';
 		}
 		else if(l>=titleLength)
 		{
-			$(wordid).innerHTML='已超出最大长度限制！';
-			$(wordid).style.backgroundColor='#ff9999';
-			$(wordid).style.display='inline';
-			$(titleid).value = substr($(titleid).value,titleLength);
+			getObj(wordid).innerHTML='已超出最大长度限制！';
+			getObj(wordid).style.backgroundColor='#ff9999';
+			getObj(wordid).style.display='inline';
+			getObj(titleid).value = substr(getObj(titleid).value,titleLength);
 		}
 		else
-			$(wordid).style.display='none';
+			getObj(wordid).style.display='none';
 		},100);
 	}
 </script>
-<script language="JavaScript" src="js/color_picker.js"></script>
+<script type="text/javascript" src="js/global.js"></script>
+<script type="text/javascript" src="js/pw_ajax.js"></script>
+<script type="text/javascript" src="js/date.js"></script>
+<script type="text/javascript" src="js/color_picker.js"></script>
+<script type="text/javascript" src="mode/area/js/imagetype.js"></script>
 <!--
 EOT;
 }

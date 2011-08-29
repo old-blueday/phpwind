@@ -270,10 +270,20 @@ class PW_MemberTagsService {
 	function getMemberTagsByUid($uid) {
 		$uid = intval($uid);
 		if ($uid <= 0) return array();
+		if (perf::checkMemcache()){
+			$_cacheService = Perf::gatherCache('pw_members');
+			return $_cacheService->getMemberTagsByUserid($uid);			
+		}
+		return $this->getMemberTagsByUidFromDB($uid);
+	}
+
+	function getMemberTagsByUidFromDB($uid) {
+		$uid = intval($uid);
+		if ($uid <= 0) return array();
 		$memberTagsDb = $this->_getMemberTagsDB();
 		return $memberTagsDb->getTagsByUid($uid);
 	}
-
+	
 	/**
 	 * 缓存100个热门标签
 	 * 
@@ -313,7 +323,14 @@ class PW_MemberTagsService {
 		}
 		return $tags;
 	}
-
+	
+	function countHotTagsNum() {
+		if (!file_exists($this->_memberTagDbFile)) $this->setTopCache();
+		extract(pwCache::getData($this->_memberTagDbFile, false));
+		if(!S::isArray($memberTagsData)) return 0;
+		return count($memberTagsData);	
+	}
+	
 	/**
 	 * 设置是否允许热门标签
 	 * 

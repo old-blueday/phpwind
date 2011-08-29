@@ -17,15 +17,49 @@ class PW_UserModeData {
 	}
 	
 	function get_article($uid, $num = 20) {
-		$array = array();
-		$query = $this->_db->query("SELECT tid,subject,postdate FROM pw_threads WHERE authorid=" . S::sqlEscape($uid) . ' AND ifcheck=1 AND fid!=0 ORDER BY tid DESC ' . S::sqlLimit($num));
+		$array = $tTable = array();
+		$query = $this->_db->query("SELECT t.tid,t.subject,t.postdate,t.replies,t.hits,t.anonymous,t.authorid,f.fid as forumsid,f.name as forums,f.allowvisit,f.password FROM pw_threads t LEFT JOIN pw_forums f ON t.fid=f.fid WHERE t.authorid=" . S::sqlEscape($uid) . " AND t.ifcheck=1 AND t.fid !=0 ORDER BY tid DESC " . S::sqlLimit($num));
 		while ($rt = $this->_db->fetch_array($query)) {
 			$rt['postdate'] = get_date($rt['postdate'], 'Y-m-d');
-			$array[] = $rt;
+			$rt['forums'] = substrs(stripWindCode($rt['forums']), 100, 'N');
+			$tTable[getTtable($rt['tid'])][] = $rt['tid'];
+			$array[$rt['tid']] = $rt;
+		}
+		foreach ($tTable as $pw_tmsgs => $ids) {
+			$query = $this->_db->query("SELECT tid,content FROM $pw_tmsgs WHERE tid IN (" . S::sqlImplode($ids) . ')');
+			while ($rt = $this->_db->fetch_array($query)) {
+				$array[$rt['tid']]['content'] = substrs(stripWindCode($rt['content']), 100, 'N');
+			}
 		}
 		return $array;
 	}
 
+	function get_reply($uid, $num = 20) {
+		$pw_posts = GetPtable($GLOBALS['db_ptable']);
+		$array = $tTable = $tids = array();
+		$query = $this->_db->query("SELECT DISTINCT tid FROM $pw_posts WHERE authorid=" . S::sqlEscape($uid) . " AND ifcheck=1 AND fid!=0 ORDER BY postdate DESC " . S::sqlLimit($num));
+		while ($rt = $this->_db->fetch_array($query)){
+			$tids[] = $rt['tid'];
+		}
+		if ($tids) {
+			$query = $this->_db->query("SELECT t.tid,t.subject,t.replies,t.hits,t.postdate,f.fid as forumsid,f.name as forums FROM pw_threads t LEFT JOIN pw_forums f ON t.fid=f.fid WHERE t.tid IN(" . S::sqlImplode($tids) . ") ORDER BY t.tid DESC");
+			while ($rt = $this->_db->fetch_array($query)){
+				$rt['subject']	= substrs($rt['subject'],45);
+				$rt['forums'] = substrs(stripWindCode($rt['forums']), 100, 'N');
+				list($rt['postdate']) = getLastDate($rt['postdate']);
+				$tTable[getTtable($rt['tid'])][] = $rt['tid'];
+				$array[$rt['tid']] = $rt;
+			}
+			foreach ($tTable as $pw_tmsgs => $ids) {
+				$query = $this->_db->query("SELECT tid,content FROM $pw_tmsgs WHERE tid IN (" . S::sqlImplode($ids) . ')');
+				while ($rt = $this->_db->fetch_array($query)) {
+					$array[$rt['tid']]['content'] = substrs(stripWindCode($rt['content']), 100, 'N');
+				}
+			}
+		}
+		return $array;
+	}
+	
 	function get_cardtopic($uid, $num = 1) {
 		require_once(R_P . 'require/functions.php');
 		$_sql_where = '';

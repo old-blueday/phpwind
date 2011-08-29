@@ -285,7 +285,7 @@ if ($job == 'user_authentication') {//用户身份验证
 	$postActForBbs = new PW_ActivityForBbs($data);
 
 	$data = array();
-	$author = $db->get_value('SELECT authorid FROM pw_threads WHERE tid = ' . $tid);
+	$author = $db->get_value('SELECT authorid FROM pw_threads WHERE tid = ' . S::sqlEscape($tid));
 	$isAdminright = $postActForBbs->getAdminRight($author);
 		
 	$db_perpage = 20;

@@ -1,0 +1,230 @@
+<!--<?php
+require_once(uTemplate::printEot('header'));
+require_once(uTemplate::printEot('user_appleft'));
+print <<<EOT
+-->
+<div class="contUser">
+  <div class="p15">
+    <h4 class="site"><img src="u/images/module/medal.png" align="absmiddle" class="mr10" /><span>勋章中心</span></h4>
+    <div class="navC mb10">
+      <ul>
+        <li {$current['all']}><a  href="{$basename}&a=all"  hidefocus="true">全部勋章</a></li>
+        <li {$current['my']}><a href="{$basename}&a=my" hidefocus="true">我的勋章</a></li>
+      </ul>
+    </div>
+    <div class="bdB mb10 cc p_lr_10">
+      <div class="medal_new fr">
+<!--
+EOT;
+if ($a == 'all') {
+print <<<EOT
+-->
+        <ul id="medal_new_list">
+<!--
+EOT;
+foreach ($awardMedal[0] as $v) {
+print <<<EOT
+-->
+          <li><img src="{$medalAll[$v[medal_id]][smallimage]}" width="24" height="24" /><a href="u.php?uid={$v[uid]}" data-card-url="pw_ajax.php?action=smallcard&type=showcard&uid={$v[uid]}" class="_cardshow mr5" target="_blank"  data-card-key="{$v['username']}">{$v[username]}</a>刚刚获得了{$medal[$v[medal_id]][name]}勋章..</li>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+        </ul>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+      </div>
+      共有勋章 <span class="b s2">{$medalCount}</span> 枚，你拥有 <span class="b s2">{$userMedalCount}</span> 枚 </div>
+    <table width="100%" height="450">
+      <tr>
+        <td valign="top">
+		<div class="medal_list">
+            <ul class="cc">
+<!--
+EOT;
+foreach ($medal as $v) {
+print <<<EOT
+-->
+<!--
+EOT;
+$isUserMedal = '';
+$isUserType  = 0;
+if ($v['is_have'] == 1) {
+	$isUserMedal = '<span class="img_receive">已领取</span>';
+	$isUserType = 1;
+} elseif ($db_md_ifapply && !in_array($v['medal_id'], $userApply) && ($v['type'] == 2) && (!$medalAll[$v[medal_id]]['allow_group'] || in_array($winddb[memberid], $medalAll[$v[medal_id]]['allow_group']))) {
+	$isUserMedal = '<span class="img_apply">可申请</span>';
+}
+print <<<EOT
+-->
+              <li onmouseover="medalInfo.show({$v[medal_id]},'{$a}',this,event)" onmouseout="medalInfo.hidden({$v[medal_id]},this,event)"><img src="{$v[bigimage]}" /><span class="w">{$v[name]}</span>{$isUserMedal}
+              </li>
+              <!--
+EOT;
+}
+print <<<EOT
+-->
+            </ul>
+          </div>
+</td>
+      </tr>
+    </table>
+  </div>
+</div>
+<div id="medal_info_show" style="display:none;position:absolute;" onmouseover="this.style.display=''" onmouseout="this.style.display='none'" ></div>
+<script type="text/javascript">
+var contains = document.compareDocumentPosition ? function(a, b){
+		return !!(a.compareDocumentPosition(b) & 16);
+	} : function(a, b){
+		return a !== b && (a.contains ? a.contains(b) : true);
+	};
+var medalInfo = {
+	inter:null,
+	time:200,
+	obj:null,
+	data:[],
+	status:0,
+	//显示勋章信息
+	show : function (medalid, action, e,evt) {
+		var self=this;
+		this.obj=e;
+		var ele=evt.relatedTarget||evt.fromElement;
+		if(ele==e||contains(e,ele)){
+			if(this.status==1){
+				return false;
+			}
+		}else{
+			if(this.inter){
+				clearTimeout(this.inter);
+			}
+			this.inter=setTimeout(function(){
+				if (parseInt(medalid) < 1) return false;
+				for(var i=0,len=medalInfo.data.length;i<len;i++){
+					if(medalInfo.data[i].k==medalid){
+						medalInfo.fillCont(medalInfo.data[i].v);
+						return false;
+					}
+				}
+				ajax.send('apps.php?q=medal&a=behavior','id=' + medalid + '&atype=' + action,function(){
+					var rText = ajax.request.responseText.split('\t');
+					if (rText[0] == 'success') {
+						medalInfo.data.push({"k":medalid,"v":rText[1]})
+						medalInfo.fillCont(rText[1]);
+					}
+				});
+			},this.time)
+		}
+	},
+	fillCont:function(str){
+						var mousePos = this.mousePos();
+						var obj = getObj('medal_info_show');
+						obj.innerHTML = str;
+						obj.style.left = mousePos.x-60+ 'px';
+						obj.style.top = mousePos.y-5 + 'px';	
+						fadeIn(obj);
+						this.status=1;
+	},
+	//隐藏勋章信息框
+	hidden : function (type,i,e) {
+		var ele=e.relatedTarget||e.toElement;
+		if(ele==i||contains(i,ele)){
+			if(this.status==0){
+				return false;
+			}
+		}else{
+			if(this.inter){
+				clearTimeout(this.inter);
+			}
+			var show_medal_info = document.getElementById('medal_info_show');
+			show_medal_info.style.display = 'none';
+			this.status=0;
+		}
+		
+	},
+	//鼠标坐标
+	mousePos : function (e) {
+		var dd = document.documentElement;
+        var db = document.body;
+        var stop = dd.scrollTop + db.scrollTop
+        var sleft = dd.scrollLeft + db.scrollLeft;
+        var cw = dd.clientWidth;
+        var ch = dd.clientHeight;
+        var bound = this.obj.getBoundingClientRect();
+        var left = bound.left;
+        var top = bound.top;
+        var h = this.obj.offsetHeight;
+        var w = this.obj.offsetWidth;
+        var oh = document.getElementById('medal_info_show').offsetHeight;
+        var ow = document.getElementById('medal_info_show').offsetWidth;
+        var x= (left + ow) > cw ? (sleft + left + w - ow) : (sleft + left);
+        var y= (top + oh + h) > ch ? (stop + top - oh) : (stop + top + h);
+		return {
+			x:x,y:y
+		}
+	}
+}
+</script>
+<!--
+EOT;
+//判断一下，如果申请的勋章人员超过2个，则调用这个循环的JS
+if (count($awardMedal[0]) > 2) {
+print <<<EOT
+-->
+<script type="text/javascript">
+var Marquee=function(id,height){
+	this.ele=document.getElementById(id);
+	if (this.ele) this.lis = this.ele.getElementsByTagName("li");
+	this.picH=height;
+	this.scrollstep=3;
+	this.scrolltime=50;
+	this.stoptime=5000;
+	this.tmpH=0;
+}
+
+Marquee.prototype={
+	"start":function(){
+		var self = this;
+		var child_div = self.ele.getElementsByTagName("li");
+		if(this.tmpH < this.picH){
+			this.tmpH += this.scrollstep;
+			if(this.tmpH > this.picH){
+				this.tmpH = this.picH;
+			}
+			self.ele.scrollTop = this.tmpH;
+			setTimeout(function(){
+				self.start();
+			},self.scrolltime);
+		}else{
+			this.tmpH = 0;
+			self.ele.appendChild(child_div[0]);
+			self.ele.appendChild(child_div[0]);
+			self.ele.scrollTop = 0;
+			setTimeout(function(){
+				self.start();
+			},self.stoptime);
+		}
+	},
+	"init":function(){
+		var self = this;
+		this.ele.innerHTML += this.ele.innerHTML;
+		if (typeof self.lis != 'undefined' && self.lis.length > 2) {
+			this.start();	
+		}
+	}
+}
+var marquee=new Marquee("medal_new_list",25);
+marquee.init();
+</script>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+<!--
+EOT;
+require_once(uTemplate::printEot('footer'));
+?>-->

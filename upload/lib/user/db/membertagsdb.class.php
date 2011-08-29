@@ -80,7 +80,7 @@ class PW_MemberTagsDB extends BaseDB {
 	function getTagsByUid($uid) {
 		$uid = intval($uid);
 		if ($uid < 1) return array();
-		$query = $this->_db->query("SELECT t.tagid,t.tagname FROM " . $this->_membertags_relations . " mt LEFT JOIN " . $this->_tableName . " t USING(tagid) WHERE mt.userid = " . $this->_addSlashes($uid) . " ORDER BY mt.crtime DESC");
+		$query = $this->_db->query("SELECT t.tagid,t.tagname,mt.userid,mt.userid as uid FROM " . $this->_membertags_relations . " mt LEFT JOIN " . $this->_tableName . " t USING(tagid) WHERE mt.userid = " . $this->_addSlashes($uid) . " ORDER BY mt.crtime DESC");
 		return $this->_getAllResultFromQuery($query);
 	}
 

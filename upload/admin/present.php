@@ -26,7 +26,7 @@ if (empty($action)) {
 	!$percount && $percount = 100;
 	empty($step) && $step = 1;
 	$start = ($step-1)*$percount;
-	$limit = S::sqlLimit($start,$percount);
+	//$limit = S::sqlLimit($start,$percount);
 
 	$creditlist = '';
 	$sendmessage .= '<br /><br /><b>'.getLangInfo('other','affect').'</b>';
@@ -113,6 +113,11 @@ if (empty($action)) {
 			));
 		}
 	}
+	//step by step
+	$usernames && $usernames = array_slice($usernames, $offset,$percount);
+	$pruids && $pruids = array_slice($pruids, $offset,$percount);
+	$u_a && $u_a = array_slice($u_a, $offset,$percount);
+	
 	if ($usernames) {
 		M::sendNotice($usernames,array('title' => $subject,'content' => $sendmessage));
 	}
@@ -123,7 +128,7 @@ if (empty($action)) {
 	if ($u_a) {
 		$credit->setus($u_a,$present);
 	}
-	$havesend = $step*$percount;
+	//$havesend = $step*$percount;
 	if ($count > $step*$percount) {
 		$step++;
 		$j_url = "$basename&action=$action&step=$step&count=$count&sendto=$sendto&touser=" . rawurlencode($touser) . "&subject=". rawurlencode($subject)."&by=$by&percount=$percount$creditlist";

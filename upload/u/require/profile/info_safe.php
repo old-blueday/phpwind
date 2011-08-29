@@ -30,9 +30,11 @@ if ( !$step ){
 			if ($propwd) {
 				S::inArray($windid,$manager) && Showmsg('pro_manager');
 				$propwd != $_POST['check_pwd'] && Showmsg('password_confirm');
+/*
 				if ($propwd != str_replace(array("\\",'&',' ',"'",'"','/','*',',','<','>',"\r","\t","\n",'#','%'),'',$propwd)) {
 					Showmsg('illegal_password');
 				}
+*/
 				list($rg_regminpwd,$rg_regmaxpwd) = explode("\t",$rg_pwdlen);
 				if (strlen($propwd)<$rg_regminpwd) {
 					Showmsg('reg_password_minlimit');
@@ -64,7 +66,7 @@ if ( !$step ){
 								}
 								break;
 							case 4:
-								if (!preg_match('/[^a-zA-Z0-9\\\/\&\'\"\*\,<>#\?% ]/',$propwd)) {
+								if (!preg_match('/[\\|\/|\&\'\"\*\,<>#\?%]/',$propwd)) {
 									Showmsg('reg_password_specialstring');
 								}
 								break;
@@ -116,7 +118,26 @@ if ( !$step ){
 	}
 	unset($upmemdata,$upmeminfo);
 
-	$userService->update($winduid, $pwSQL);
+	$result = $userService->update($winduid, $pwSQL);
+	// defend start	
+	CloudWind::yunUserDefend('editprofile', $winduid, $windid, $upmemdata['pwdctime'], 0, 101,'','','',array('profile'=>array_keys($pwSQL)));
+	// defend end
+
+	/* platform weibo app */
+	$siteBindService = L::loadClass('WeiboSiteBindService', 'sns/weibotoplatform/service'); /* @var $siteBindService PW_WeiboSiteBindService */
+	if ($siteBindService->isOpen() && $upmembers['password']) {
+		$weiboLoginService = L::loadClass('WeiboLoginService', 'sns/weibotoplatform/service'); /* @var $weiboLoginService PW_WeiboLoginService */
+		$weiboLoginService->setLoginUserPasswordHasReset($winduid);
+		
+		Cookie("winduser",StrCode($winduid."\t".PwdCode($upmembers['password'])."\t".$upmembers['safecv']));
+		Cookie("ck_info",$db_ckpath."\t".$db_ckdomain);
+		Cookie('lastvisit','',0);
+		//自动获取勋章_start
+		require_once(R_P.'require/functions.php');
+		doMedalBehavior($winduid,'continue_login');
+		//自动获取勋章_end
+	}
+
 	//* $_cache = getDatastore();
 	//* $_cache->delete('UID_'.$winduid);
 	initJob($winduid,"doUpdatedata");

@@ -1,9 +1,5 @@
-
-.tr3{font-size:12px;line-height:24px; color:#49779e;}
 .tr3 .w{margin-right:10px;}
 .tr3 td,.tr3 th{padding:.3em;padding-left:.8em;}
-.tr3:hover{background:#e6f2fc url(tr3_bg.gif) left bottom repeat-x;color:#49779e;}
-.tr3 .input:hover{border:1px solid #2897c7;}
 .tr3 td table tr td,.tr3 th table tr td{padding:.4em;padding-left:0;}
 .tr3 th{text-align:left;font-weight:normal;}
 

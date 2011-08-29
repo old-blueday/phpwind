@@ -97,7 +97,9 @@ class PW_Smile {
 	
 	
 	function _isSmileFileAllowed($fileName) {
-		return in_array(strtolower(end(explode(".", $fileName))), $this->_allowedFiles);
+		$fileValue = explode(".",$fileName);
+		if(!$fileValue) return false;
+		return in_array(strtolower(end($fileValue)), $this->_allowedFiles);
 	}
 	
 	function _getSmileBaseUrl($typeId = 0) {

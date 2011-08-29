@@ -1,0 +1,165 @@
+<!--<?php
+include_once PrintEot('left');
+print <<<EOT
+-->
+<!--
+EOT;
+print <<<EOT
+-->
+
+<!--
+EOT;
+if($step == 1){
+print <<<EOT
+-->
+<!--协议-->
+<style>
+/*aliyun*/
+.ali_agreement{border:5px solid #deeaf7;margin-bottom:20px;padding:1px;background:#c7daef;width:802px;}
+.ali_agreement_bg{background:#f9f9f9;padding:20px;width:760px;color:#333;line-height:1.8;border:1px solid #fff;}
+.ali_agreement h1{ font:bold 14px Arial; text-align:center;line-height:40px;}
+</style>
+<form action="$basename" method="post" enctype="multipart/form-data">
+<input name="step" value="2" type="hidden" />
+<div class="ali_agreement">
+	<div class="ali_agreement_bg">
+		<h1>phpwind云服务使用协议</h1>
+		<p>phpwind云服务是由杭州德天信息技术有限公司自主研发的基于云计算的社区运营解决方案。任何组织或个人在使用该服务前请务必保证您已经仔细阅读了下列条款。</p>
+		<p>&nbsp;</p>
+	<ol class="mb20">
+	<li>1、任何个人或组织，使用phpwind云服务均属自愿行为，杭州德天信息技术有限公司承诺尽其最大努力保证phpwind云服务的稳定，但不保证不发生任何故障，杭州德天信息技术有限公司产品用户须自行承担因使用phpwind云服务所带来的全部风险及损失。</li>
+	<li>   2、杭州德天信息技术有限公司有权自主决定是否批准德天产品用户的phpwind云服务的申请。出于技术、安全及业务发展规划等各种考虑，杭州德天信息技术有限公司可以在无需您另行同意的情况下随时独立的调整phpwind云服务的使用策略，包括但不限于：修改服务内容、中止或终止部分或全部服务、限制某个网站使用、德天产品用户（在某段时间内）的请求次数、请求的内容。即使德天用户网站已经批准使用phpwind云服务，杭州德天信息技术有限公司仍然有权根据用户投诉和反馈情况，自主决定暂停或终止德天用户网站phpwind云服务。由此带来的风险和损失，杭州德天信息技术有限公司不承担任何责任。</li>
+	<li>3、杭州德天信息技术有限公司无法承诺保证杭州德天信息技术有限公司用户网站是完全合法、稳定或者安全的，也无法保证杭州德天信息技术有限公司用户网站最终用户无不当或者违法行为，您应自行解决杭州德天信息技术有限公司产品用户与最终用户产生的任何纠纷或者诉讼，与杭州德天信息技术有限公司无关。</li>
+	<li>4、对于由于不可抗力因素、杭州德天信息技术有限公司无法控制的因素（包括黑客攻击、停断电等）或其他任何因素等造成服务中止或终止，而给您造成损失的，您同意放弃追究杭州德天信息技术有限公司责任的全部权利。</li>
+	<li>5、如果德天产品用户和杭州德天信息技术有限公司就phpwind云计算平台所投放的广告相关内容产生分歧，由德天用户和广告主双方协商解决，杭州德天信息技术有限公司不承担相应责任。</li>
+	<li>6、若您和德天之间发生任何纠纷或争议，首先应友好协商解决，协商不成的，您在此完全同意将纠纷或争议提交德天所在地杭州市西湖区人民法院管辖。杭州德天信息技术有限公司拥有对以上各项条款内容的解释权及修改权。</li>
+	</ol>
+	<div class="mb20 tac"><input name="agree" type="checkbox" value="1" id="ali_checkbox" style="vertical-align:middle;margin:-4px 0 0 0;" /><label for="ali_checkbox"> 我已仔细阅读并同意 《phpwind云服务使用协议》 </label></div>
+	<div class="tac mb20"><span class="btn"><span><button type="submit">下一步</button></span></span></div>
+	</div>
+</div>
+</form>
+<!--
+EOT;
+} elseif ($step == 2) {
+print <<<EOT
+-->
+<!--接口检测-->
+<form action="$basename" method="post" enctype="multipart/form-data">
+<input name="step" value="3" type="hidden" />
+<!--
+EOT;
+include_once PrintEot('yunchecktemplate');
+print <<<EOT
+-->
+<div class="tac mb10"><span class="btn"><span><button type="submit">下一步</button></span></span></div>
+</form>
+<!--
+EOT;
+} elseif ($step == 3) {
+print <<<EOT
+-->
+<!--站点信息-->
+<form action="$basename" method="post" enctype="multipart/form-data">
+<input name="step" value="4" type="hidden" />
+<h2 class="h1">论坛信息</h2>
+<div class="admin_table mb10">
+	<table width="100%">
+		<tr class="tr1">
+			<td class="td1">论坛URL：</td>
+			<td class="td2"><input type="text" name="siteurl" value="$bbsurl" class="input input_wb" /></td>
+		</tr>
+		<tr>
+			<td class="td1">论坛名称：</td>
+			<td class="td2"><input type="text" name="sitename" value="$bbsname"  class="input input_wb" /></td>
+		</tr>
+		<tr>
+			<td class="td1">论坛管理员：</td>
+			<td class="td2"><input type="text" name="bossname" class="input input_wb" /></td>
+		</tr>
+		<tr>
+			<td class="td1">手机号码：</td>
+			<td class="td2"><input type="text" name="bossphone" class="input input_wb" /></td>
+		</tr>
+	</table>
+</div>
+<div class="tac"><span class="btn"><span><button type="submit">下一步</button></span></span></div>
+</form>
+<!--
+EOT;
+} elseif ($step == 5) {
+print <<<EOT
+-->
+<!--正在审核-->
+<dl class="cc tip_wind" style="width:500px;margin:auto;">
+	<dt style="background:url(images/success_bg.gif) center center no-repeat;"></dt>
+	<dd style="width:360px;padding-top:30px;"><h4>云服务申请成功，预计将在24小时内为您开通！</h4></dd>
+</dl>
+<!--
+EOT;
+} else {
+print <<<EOT
+-->
+<!--
+EOT;
+if($yundescribe){
+print <<<EOT
+-->
+<div class="admin_info mb10">
+	<h3 class="h1"><b>云服务信息</b></h3>
+    <div class="legend">
+    $yundescribe
+    </div>
+</div>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+<h2 class="h1">云服务列表</h2>
+<div class="admin_table mb10">
+  <table width="100%" cellspacing="0" cellpadding="0" style="table-layout:fixed">
+    <tr class="tr1">
+      <td class="td2" width="40"><img src="images/admin/aliyun/ali_search.png" width="32" height="32" /></td>
+      <td class="td2" width="80"><span class="s4">云搜索</span></td>
+      <td class="td2" width="500">为您提供基于云计算技术的社区搜索服务。可有效降低服务器负载并提高站点的内容可读性。</td>
+      <td class="td2"><span class="bt2"><span><button type="button" onclick="location.href='$admin_file?adminjob=yunsearch';">查看</button></span></span></td>
+    </tr>
+		<tr class="tr1">
+      <td class="td2"><img src="images/admin/aliyun/ali_dun.png" width="32" height="32" /></td>
+      <td class="td2"><span class="s4">云盾</span></td>
+      <td class="td2">为您提供基于云计算技术的社区内容安全服务。可有效减少社区垃圾帖和非法内容。</td>
+      <td class="td2"><span class="bt2"><span><button type="button" onclick="location.href='$admin_file?adminjob=yundefend';">查看</button></span></span></td>
+    </tr>
+    <!-- 
+	<tr class="tr1">
+      <td class="td2"><img src="images/admin/aliyun/ali_im.png" width="32" height="32" /></td>
+      <td class="td2"><span class="s4">云聊</span></td>
+      <td class="td2">一款基于社区好友关系的及时通讯软件。使您的社区会员之间的互动更加直接、实时。</td>
+      <td class="td2"><span class="bt2"><span><button type="button">查看</button></span></span></td>
+    </tr>
+     -->
+		<tr class="tr1">
+      <td class="td2"><img src="images/admin/aliyun/ali_yanzheng.png" width="32" height="32" /></td>
+      <td class="td2"><span class="s4">云验证码</span></td>
+      <td class="td2">基于云存储技术的新一代验证码技术。可保障您的社区安全。</td>
+      <td class="td2"><span class="bt2"><span><button type="button" onclick="location.href='$admin_file?adminjob=cloudcaptcha';">查看</button></span></span></td>
+    </tr>
+		<tr class="tr1">
+      <td class="td2"><img src="images/admin/aliyun/ali_shiming.png" width="32" height="32" /></td>
+      <td class="td2"><span class="s4">实名认证</span></td>
+      <td class="td2">基于手机号码的会员认证体系，是您行进线下活动和精准营销的得力助手。</td>
+      <td class="td2"><span class="bt2"><span><button type="button" onclick="location.href='$admin_file?adminjob=authentication';">查看</button></span></span></td>
+    </tr>
+	</table>
+</div>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+<!--结束-->
+<!--
+EOT;
+include_once PrintEot('adminbottom');
+?>-->

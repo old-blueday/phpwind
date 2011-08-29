@@ -39,7 +39,7 @@ EOT;
 				<li id="type_web"><a href="{$basename}a=$a&type=web">网页</a></li>
 				<li id="type_multimedia"><a href="{$basename}a=$a&type=multimedia">多媒体</a></li>
 			</ul>		
-<script language="JavaScript">
+<script type="text/javascript">
 setCurrent('type_$type','type_all','current');
 </script>
 		</div>
@@ -88,7 +88,7 @@ EOT;
 -->
 		</div>
 	</div>
-<script language="javascript">
+<script type="text/javascript">
 setCurrent('dt_$ftype','dt_all','current');
 function Checkinfo() {
 	if (confirm('确定要删除该分类吗?')) {
@@ -151,7 +151,7 @@ foreach($collectionDb as $value){
 print <<<EOT
 -->            	
             </table>
-<script language="javascript">
+<script type="text/javascript">
 function  checkdel() {
 	var obj = document.docollection["idarray[]"];
 	var ar = obj.length ? obj:[obj];
@@ -231,21 +231,21 @@ EOT;
 EOT;
 print <<<EOT
 -->
-<script language="JavaScript" src="js/core/core.js"></script>
-<script language="JavaScript">
+<script type="text/javascript" src="js/core/core.js"></script>
+<script type="text/javascript">
 setCurrent('a_$a','a_self','current');
 </script>
 
-<script language="JavaScript">
+<script type="text/javascript">
 function ajaxurl(o) {
 	read.obj = o;
 	ajax.send(o.href,'',ajax.get);
 	return false;
 }
 </script>
-<script language="javascript" src="apps/$appdir/js/collection.js"></script>
-<script language="JavaScript" src="js/app_comment.js"></script>
-<script language="JavaScript" src="js/app_type.js"></script>
+<script type="text/javascript" src="apps/$appdir/js/collection.js"></script>
+<script type="text/javascript" src="js/app_comment.js"></script>
+<script type="text/javascript" src="js/app_type.js"></script>
 <!--
 EOT;
 require_once(uTemplate::printEot('footer'));

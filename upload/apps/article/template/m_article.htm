@@ -40,7 +40,7 @@ $see == 'trade' && $b = 'trade';
 print <<<EOT
 -->
 			</ul>
-<script language="JavaScript">
+<script type="text/javascript">
 setCurrent('a_$b','a_own','current');
 </script>
 		</div>
@@ -51,17 +51,17 @@ if ($a == 'list') {print <<<EOT
 <div class="cc filter">
 <h3>类型筛选：</h3> 
 <ul class="mr20"><li id="a_article"><a href="{$basename}" >我的主题</a></li> <li id="a_post"><a href="{$basename}see=post">我的回复</a></li></ul>
-<script language="JavaScript">setCurrent('a_$see','a_article','current');</script>
+<script type="text/javascript">setCurrent('a_$see','a_article','current');</script>
 <!--
 EOT;
 	if ($see == 'topic') { print <<<EOT
 -->
 <h3>选择时间：</h3>
 <ul><li id="post_0"><a href="{$basename}posttime=0">所有</a></li><li id="post_1"><a href="{$basename}posttime=1">一天</a></li><li id="post_2"><a href="{$basename}posttime=2">两天</a></li><li id="post_7"><a href="{$basename}posttime=7">一星期</a></li><li id="post_30"><a href="{$basename}posttime=30">一个月</a></li><li id="post_60"><a href="{$basename}posttime=60">两个月</a></li><li id="post_90"><a href="{$basename}posttime=90">三个月</a></li><li id="post_180"><a href="{$basename}posttime=180">半年</a></li><li id="post_365"><a href="{$basename}posttime=365">一年</a></li><li id="post_366"><a href="{$basename}posttime=366">一年以上</a></li></ul>
-<script language="javascript">setCurrent('post_$posttime','post_0','current');</script>
+<script type="text/javascript">setCurrent('post_$posttime','post_0','current');</script>
 <!--
 EOT;
-	}elseif ($see ==  'post' && $p_table) {
+	}elseif (!$db_merge_posts && $see == 'post' && $p_table) {
 print <<<EOT
 -->
 <h3>回复所在表:&nbsp;</h3>
@@ -82,7 +82,7 @@ print <<<EOT
 <!--
 EOT;
 if ($see == 'topic') { print <<<EOT
--->排序方式：<a id="ot_postdate" href="{$basename}ordertype=postdate&u=$u"><span>发帖时间</span></a>&nbsp;|&nbsp;<a id="ot_lastpost" href="{$basename}ordertype=lastpost&u=$u"><span>回复时间</span></a><script language="JavaScript">setCurrent('ot_$ordertype','ot_postdate','link_down s5');</script>
+-->排序方式：<a id="ot_postdate" href="{$basename}ordertype=postdate&u=$u"><span>发帖时间</span></a>&nbsp;|&nbsp;<a id="ot_lastpost" href="{$basename}ordertype=lastpost&u=$u"><span>回复时间</span></a><script type="text/javascript">setCurrent('ot_$ordertype','ot_postdate','link_down s5');</script>
 <!--
 EOT;
 }elseif($see == "post"){print <<<EOT
@@ -229,7 +229,7 @@ print <<<EOT
 <li id="a_mypost"><a href="{$basename}a=$a&see=mypost" >我发布的</a></li>
 </ul>
 </div>
-<script language="JavaScript">setCurrent('a_$see','a_myjoin','current');</script>
+<script type="text/javascript">setCurrent('a_$see','a_myjoin','current');</script>
 <div style="border-top:1px solid $uskin_bdA;">
 		<table width="100%" class="mb10" style="table-layout:fixed;">
 			<tr class="tr3">
@@ -317,7 +317,7 @@ EOT;
 <li id="a_saled" class="none"><a href="{$basename}a=$a&job=saled">已卖出的商品</a></li>
 </ul>
 </div>
-<script language="JavaScript">setCurrent('a_$job','a_trade','current');</script>
+<script type="text/javascript">setCurrent('a_$job','a_trade','current');</script>
 <div style="border-top:1px solid $uskin_bdA;">
 		<table width="100%" class="mb10" style="table-layout:fixed;">
 <!--
@@ -402,7 +402,7 @@ print <<<EOT
 				<td>商品名称</td>
 				<td class="tac" width="70">现价</td>
 				<td class="tac" width="90">买家</td>
-				<td width="100">交易状态</td>
+				<td width="120">交易状态</td>
 			</tr>						
 <!--
 EOT;

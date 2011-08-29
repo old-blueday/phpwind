@@ -109,5 +109,5 @@ if (empty($_POST['step'])) {
 			)
 		);
 	}
-	refreshto("read.php?tid=$rt[tid]&displayMode=1&page=$page", 'operate_success');
+	refreshto("read.php?tid=$rt[tid]&ds=1&page=$page", 'operate_success');
 }

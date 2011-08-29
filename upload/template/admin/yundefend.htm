@@ -1,0 +1,146 @@
+<!--<?php
+include_once PrintEot('left');
+print <<<EOT
+-->
+<!--
+EOT;
+print <<<EOT
+-->
+
+<div class="nav3 mb10">
+    <ul class="cc">
+      <li class="$current[config]"><a href="$basename">云盾配置</a></li>
+      <li class="$current[verify]"><a href="$basename&action=verify">云盾审核</a></li>
+    </ul>
+</div>
+<!--
+EOT;
+if(empty($action)){
+print <<<EOT
+-->
+
+<!--
+EOT;
+if($dundescribe){
+print <<<EOT
+-->
+<div class="admin_info mb10">
+	<h3 class="h1"><b>云盾信息</b></h3>
+    <div class="legend">
+    $dundescribe
+    </div>
+</div>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+<form action="$basename" method="post" enctype="multipart/form-data">
+<input name="step" value="2" type="hidden" />
+<div class="">
+	<h3 class="h1">云盾基本设置</h3>
+	<div class="admin_table mb10">
+		<table cellpadding="0" cellspacing="0" width="100%">
+			<tr class="tr1">
+				<td class="td1">云盾服务</td>
+				<td class="td2">
+					<ul class="list_A list_80">
+						<li><input type="radio" value="1" name="db_yundefend_shield" $yundefend_shield_Y>开启</li>
+						<li><input type="radio" value="0" name="db_yundefend_shield" $yundefend_shield_N>关闭</li>
+					</ul>
+				</td>
+			</tr>
+			<tr class="tr1">
+				<td class="td1">用户过滤</td>
+				<td class="td2">
+					<ul class="list_A list_80">
+						<li><input type="radio" value="1" name="db_yundefend_shielduser" $yundefend_shielduser_1 >禁言</li>
+						<li><input type="radio" value="2" name="db_yundefend_shielduser" $yundefend_shielduser_2 >删除</li>
+						<li><input type="radio" value="0" name="db_yundefend_shielduser" $yundefend_shielduser_0 >不处理</li>
+					</ul>
+				</td>
+			</tr>
+			<tr class="tr1">
+				<td class="td1">数据过滤</td>
+				<td class="td2">
+					<ul class="list_A list_80">
+						<li><input type="radio" value="1" name="db_yundefend_shieldpost" $yundefend_shieldpost_Y>审核</li>
+						<li><input type="radio" value="0" name="db_yundefend_shieldpost" $yundefend_shieldpost_N>不处理</li>
+					</ul>
+				</td>
+			</tr>
+		</table>
+	</div>
+</div>
+<div class="p10 tac"><span class="btn"><span><button type="submit">提 交</button></span></span></div>
+</form>
+<!--
+EOT;
+}elseif($action == 'verify' ){
+if($lists){
+print <<<EOT
+-->
+
+	<form action="$basename&action=verify" method="post" enctype="multipart/form-data">
+	<input name="step" value="2" type="hidden" />
+	<div class="admin_table mb10">
+		<h2 class="h1">
+			<span class="fl mr10">帖子/回复审核</span>
+		</h2>
+		<table width="100%" cellpadding="0" cellspacing="0">
+			<tr class="tr2">
+				<td>类型</td>
+				<td>作者</td>
+				<td>标题</td>
+				<td>内容</td>
+				<td>发布时间</td>
+				<td>操作</td>
+			</tr>
+<!--
+EOT;
+foreach($lists as $list){
+$id = intval($list['tid']).'_'.intval($list['pid']);
+$datatype = (intval($list['pid']) > 0) ? '回复' : '帖子';
+$postdate = date("Y-m-d H:i:s",$list[postdate]);
+print <<<EOT
+-->
+			<tr class="tr1 vt">
+				<td class="td2">$datatype</td>
+				<td class="td2">$list[author]</td>
+				<td class="td2"><textarea rows="4" cols="40">$list[subject]</textarea></td>
+				<td class="td2"><textarea rows="4" cols="60">$list[content]</textarea></td>
+				<td class="td2">$postdate</td>
+				<td class="td2">
+					<input type="radio" value="1" name="ids[$id]">审核
+					<input type="radio" value="2" name="ids[$id]" checked="checked">删除
+				</td>
+			</tr>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+		</table>
+	</div>
+	<div class="cc mb10">$pages</div>
+	<div class="p10 tac">
+		<span class="btn"><span><button type="submit">提 交</button></span></span>
+	</div>
+	</form>
+<!--
+EOT;
+}else{
+print <<<EOT
+-->	
+	<table width="100%" cellspacing="0" cellpadding="0">
+		<tbody><tr><td colspan="6" class="p10"><div class="admin_tips">啊哦，暂无审核数据！</div></td></tr></tbody>
+  	</table>
+<!--
+EOT;
+}}
+print <<<EOT
+-->	
+<!--
+EOT;
+include_once PrintEot('adminbottom');
+?>-->

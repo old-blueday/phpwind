@@ -15,7 +15,7 @@ print <<<EOT
 EOT;
 if ($value['content']['username']) {print <<<EOT
 -->
-    <span><a href="{$GLOBALS[db_userurl]}{$value['content']['uid']}">{$value['content']['username']}</a>：</span>
+    <span><a href="{$GLOBALS[db_userurl]}{$value['content']['uid']}" class=" _cardshow" target="_blank" data-card-url="pw_ajax.php?action=smallcard&type=showcard&uid={$value['content']['uid']}" data-card-key="{$value['content']['username']}">{$value['content']['username']}</a>：</span>
 <!--
 EOT;
 }print <<<EOT
@@ -39,7 +39,7 @@ print <<<EOT
 EOT;
 if ($value['content']['username']) {print <<<EOT
 -->
-    <span class="fl"><a href="{$GLOBALS[db_userurl]}{$value['content']['uid']}">{$value['content']['username']}</a>：</span>
+    <span class="fl"><a href="{$GLOBALS[db_userurl]}{$value['content']['uid']}" class=" _cardshow" target="_blank" data-card-url="pw_ajax.php?action=smallcard&type=showcard&uid={$value['content']['uid']}" data-card-key="{$value['content']['username']}">{$value['content']['username']}</a>：</span>
 <!--
 EOT;
 }print <<<EOT
@@ -64,7 +64,7 @@ print <<<EOT
 EOT;
 if ($value['content']['username']) {print <<<EOT
 -->
-    <p class="mb5"><a href="{$GLOBALS[db_userurl]}{$value['content']['uid']}">{$value['content']['username']}</a>：</p>
+    <p class="mb5"><a href="{$GLOBALS[db_userurl]}{$value['content']['uid']}" class=" _cardshow" target="_blank" data-card-url="pw_ajax.php?action=smallcard&type=showcard&uid={$value['content']['uid']}" data-card-key="{$value['content']['username']}">{$value['content']['username']}</a>：</p>
 <!--
 EOT;
 }print <<<EOT
@@ -92,7 +92,7 @@ print <<<EOT
 EOT;
 if ($value['content']['username']) {print <<<EOT
 -->
-    <span class="fl"><a href="{$GLOBALS[db_userurl]}{$value['content']['uid']}">{$value['content']['username']}</a>：</span>
+    <span class="fl"><a href="{$GLOBALS[db_userurl]}{$value['content']['uid']}" class=" _cardshow" target="_blank" data-card-url="pw_ajax.php?action=smallcard&type=showcard&uid={$value['content']['uid']}" data-card-key="{$value['content']['username']}">{$value['content']['username']}</a>：</span>
 <!--
 EOT;
 }print <<<EOT
@@ -116,7 +116,7 @@ EOT;
          
 print <<<EOT
 -->
-				<div class="s5 mb10"><a href="{$GLOBALS[db_userurl]}{$value['content']['authorid']}">{$value['username']}</a> 转发：{$content}</div>
+				<div class="s5 mb10"><a href="{$GLOBALS[db_userurl]}{$value['content']['authorid']}" class=" _cardshow" target="_blank" data-card-url="pw_ajax.php?action=smallcard&type=showcard&uid={$value['content']['authorid']}" data-card-key="{$value['username']}">{$value['username']}</a> 转发：{$content}</div>
 <!--
 EOT;
 			if ($extra['_hasVideo']) $this->_showVideo($extra['_hasVideo']);
@@ -237,7 +237,7 @@ EOT;
 print <<<EOT
 -->
 <div class="title">
-	<a href="{$GLOBALS[db_userurl]}{$value['uid']}">{$value['username']}</a>：<a href="$url">{$value['extra']['title']}</a>
+	<a href="{$GLOBALS[db_userurl]}{$value['uid']}" class=" _cardshow" target="_blank" data-card-url="pw_ajax.php?action=smallcard&type=showcard&uid={$value['uid']}" data-card-key="{$value['username']}">{$value['username']}</a>：<a href="$url">{$value['extra']['title']}</a>
 </div>
 <div>
 	{$value['content']}
@@ -249,7 +249,7 @@ EOT;
 print <<<EOT
 -->
 <div class="lh_22">
-	<a href="{$GLOBALS[db_userurl]}{$value['uid']}">{$value['username']}</a>：{$value['content']}
+	<a href="{$GLOBALS[db_userurl]}{$value['uid']}" class=" _cardshow" target="_blank" data-card-url="pw_ajax.php?action=smallcard&type=showcard&uid={$value['uid']}" data-card-key="{$value['username']}">{$value['username']}</a>：{$value['content']}
 </div>
 <!--
 EOT;
@@ -318,7 +318,7 @@ $photo['path'] = $photo['path'] == 'n' ? 'images/imgdel.jpg' : $photo['path'];
 
 print <<<EOT
 --> 
-           <li><img src="{$photo['path']}" onclick="weibo.showPhoto('{$photo[pid]}','{$photo[s_path]}','$kNum','$i')" onerror="this.src='$GLOBALS[imgpath]/imgdel.jpg'" onload="resizeImg(this)" /></li>
+           <li class="cp" onclick="weibo.showPhoto('{$photo[pid]}','{$photo[s_path]}','$kNum','$i')" style="cursor: url('u/images/zoomin.cur'),auto"><img src="{$photo['path']}" onerror="this.src='$GLOBALS[imgpath]/imgdel.jpg'" onload="resizeImg(this)" /></li>
             
 <!--
 EOT;
@@ -368,7 +368,7 @@ print <<<EOT
 EOT;
 if ($value['content']['username']) {print <<<EOT
 -->
-    <p class="mb5"><a href="{$GLOBALS[db_userurl]}{$value['content']['uid']}">{$value['content']['username']}</a>：</p>
+    <p class="mb5"><a href="{$GLOBALS[db_userurl]}{$value['content']['uid']}" class=" _cardshow" target="_blank" data-card-url="pw_ajax.php?action=smallcard&type=showcard&uid={$value['content']['uid']}" data-card-key="{$value['content']['username']}">{$value['content']['username']}</a>：</p>
 <!--
 EOT;
 }print <<<EOT
@@ -415,7 +415,7 @@ print <<<EOT
 EOT;
 if ($value['content']['username']) {print <<<EOT
 -->
-    <span><a href="{$GLOBALS[db_userurl]}{$value['content']['uid']}">{$value['content']['username']}</a>：</span>
+    <span><a href="{$GLOBALS[db_userurl]}{$value['content']['uid']}" class=" _cardshow" target="_blank" data-card-url="pw_ajax.php?action=smallcard&type=showcard&uid={$value['content']['uid']}" data-card-key="{$value['content']['username']}">{$value['content']['username']}</a>：</span>
 <!--
 EOT;
 }print <<<EOT
@@ -443,7 +443,7 @@ print <<<EOT
 EOT;
 if ($value['content']['username']) {print <<<EOT
 -->
-    <span><a href="{$GLOBALS[db_userurl]}{$value['content']['uid']}">{$value['content']['username']}</a>：</span>
+    <span><a href="{$GLOBALS[db_userurl]}{$value['content']['uid']}" class=" _cardshow" target="_blank" data-card-url="pw_ajax.php?action=smallcard&type=showcard&uid={$value['content']['uid']}" data-card-key="{$value['content']['username']}">{$value['content']['username']}</a>：</span>
 <!--
 EOT;
 }print <<<EOT
@@ -472,7 +472,7 @@ print <<<EOT
 EOT;
 if ($value['content']['username']) {print <<<EOT
 -->
-    <span><a href="{$GLOBALS[db_userurl]}{$value['content']['uid']}">{$value['content']['username']}</a>：</span>
+    <span><a href="{$GLOBALS[db_userurl]}{$value['content']['uid']}" class=" _cardshow" target="_blank" data-card-url="pw_ajax.php?action=smallcard&type=showcard&uid={$value['content']['uid']}" data-card-key="{$value['content']['username']}">{$value['content']['username']}</a>：</span>
 <!--
 EOT;
 }print <<<EOT
@@ -525,7 +525,7 @@ print <<<EOT
 EOT;
 if ($value['content']['username']) {print <<<EOT
 -->
-    <span><a href="{$GLOBALS[db_userurl]}{$value['content']['uid']}">{$value['content']['username']}</a>：</span>
+    <span><a href="{$GLOBALS[db_userurl]}{$value['content']['uid']}" class=" _cardshow" target="_blank" data-card-url="pw_ajax.php?action=smallcard&type=showcard&uid={$value['content']['uid']}" data-card-key="{$value['content']['username']}">{$value['content']['username']}</a>：</span>
 <!--
 EOT;
 }print <<<EOT
@@ -551,7 +551,7 @@ print <<<EOT
 EOT;
 if ($value['content']['username']) {print <<<EOT
 -->
-    <span><a href="{$GLOBALS[db_userurl]}{$value['content']['uid']}">{$value['content']['username']}</a>：</span>
+    <span><a href="{$GLOBALS[db_userurl]}{$value['content']['uid']}" class=" _cardshow" target="_blank" data-card-url="pw_ajax.php?action=smallcard&type=showcard&uid={$value['content']['uid']}" data-card-key="{$value['content']['username']}">{$value['content']['username']}</a>：</span>
 <!--
 EOT;
 }print <<<EOT
@@ -601,7 +601,7 @@ print <<<EOT
 -->
 <div id="photo_mask_{$num}" class="feedImgB" style="display:none;">
 		<p class="mb5"><a href="javascript:;" onclick="weibo.hidePhoto($num)" class="feediImgFold">收起</a>&nbsp;|&nbsp;<a href="javascript:;" class="artWork" target="_blank" onclick="this.href=weibo.bigPhotoUrl($num)">查看大图</a></p>
-	<div class="tac pr cc" style="overflow:hidden;">
+	<div class="tac pr cc" style="overflow:hidden;" id="photo_small_{$num}">
 			<div id="prephoto_{$num}" onclick="weibo.prevPhoto($num)" class="aPre" title="上一张" style="zoom:1;left:0;_padding-bottom:5000px;_margin-bottom:-5000px;"></div>
 			<div id="nextphoto_{$num}" onclick="weibo.nextPhoto($num)" class="aNext" title="下一张" style="zoom:1;bottom:0;top:0;_padding-bottom:5000px;_margin-bottom:-5000px;"></div>
 			<img src="javascript://" id="photo_path_{$num}" style="display:block;margin:0 auto;" />
@@ -610,8 +610,6 @@ print <<<EOT
 <!--
 EOT;
 	}
-    
-    
 }
 $collectionModelTemplate = new CollectionModelTemplate();
 ?>

@@ -1,20 +1,29 @@
 <!--<?php
 print <<<EOT
 -->
-<div style="width:350px;">
+<div style="width:330px;">
 <div class="popTop" onmousedown="read.move(event);" style="cursor:move"><a href="javascript:;" onclick="closep();" class="adel">删除</a>{$descript}</div>
-<form action="login.php?" method="post" name="login"><input
-	type="hidden" value="login.php" name="forward" /> <input type="hidden"
-	value="$jumpurl" name="jumpurl" /> <input type="hidden"
-	value="2" name="step" />
-<div class="p10 mb10">
+<form action="login.php?" method="post" name="login"><input type="hidden" value="" name="forward" /><input type="hidden" value="$jumpurl" name="jumpurl" /><input type="hidden" value="2" name="step" />
+<div class="p20">
 <table>
-	<tr class="tr5">
+	<tr>
 		<td width="80">
+<!--
+EOT;
+if (S::inArray($db_logintype, array(1, 2, 4))) {
+$loginTypeName = array(1 => array('用户名', 0), 2 => array('UID', 1), 4 => array('电子邮箱', 2));
+print <<<EOT
+-->	
+	{$loginTypeName[$db_logintype][0]}
+	<input type="hidden" name="lgt" value="{$loginTypeName[$db_logintype][1]}" />
+<!--
+EOT;
+} elseif ($db_logintype > 0 && $db_logintype < 8) {
+print <<<EOT
+-->
 			<select name="lgt">
 <!--
 EOT;
-if ($db_logintype>0 && $db_logintype < 8) {
 if ($db_logintype & 1) {print <<<EOT
 -->
 				<option value="0">用户名</option>
@@ -30,70 +39,45 @@ EOT;
 				<option value="2">电子邮箱</option>
 <!--
 EOT;
-}} else {print <<<EOT
+}print <<<EOT
 -->
-				<option value="0">用户名</option>
+			</select>	
+<!--
+EOT;
+} else {print <<<EOT
+-->
+			用户名
 <!--
 EOT;
 }print <<<EOT
 -->
-			</select>
 		</td>
-		<td><input name="pwuser" type="text" class="input" tabindex="1201" id="poppwuser"/></td>
+		<td><input name="pwuser" type="text" class="input input_wa" id="poppwuser"/></td>
 	</tr>
-
-	<tr class="tr5">
+	<tr>
 		<td>密　码</td>
-		<td><input name="pwpwd" type="password" class="input"  tabindex="1202" /></td>
+		<td><input name="pwpwd" type="password" class="input input_wa" /></td>
 	</tr>
-<!--
-EOT;
-if($db_gdcheck & 2){
-$gdSize = explode("\t",$db_gdsize);
-$time = time();
-print <<<EOT
--->
-	<tr class="tr5">
-		<td>验证码</td>
-		<td><input class="input" type="text" name="gdcode" size="5" onfocus="showgd();"  tabindex="1203"  />
-		<span style="cursor:pointer; margin-left:3px" onclick="showgd();" id="showtips">&nbsp;点此显示验证码</span>
-		<div id="ckcode" style="display:none;"></div>
-<script type="text/javascript" src="js/pw_authcode.js"></script>
-<script>
-var flashWidth = "$gdSize[0]";
-var flashHeight = "$gdSize[1]";
-var gdtype = $db_gdtype;
-//showGdCode();
-</script>
-		</td>
-	</tr>
-<!--
-EOT;
-}
-print <<<EOT
--->
-
 <!--
 EOT;
 if($db_ifsafecv){
 print <<<EOT
 -->
-	<tr class="tr5">
+	<tr>
 		<td>安全问题</td>
-		<td><select name="question" onchange="showcustomquest(this.value)" tabindex="1204">
+		<td><select name="question" onchange="showcustomquest(this.value)">
 			<option value="0">无安全问题</option><option value="1">我爸爸的出生地</option><option value="2">我妈妈的出生地</option><option value="3">我的小学校名</option><option value="4">我的中学校名</option><option value="5">我最喜欢的运动</option><option value="6">我最喜欢的歌曲</option><option value="7">我最喜欢的电影</option><option value="8" >我最喜欢的颜色</option><option value="-1">自定义问题</option>
-		</select>&nbsp;<input id="customquest" style="display:none" type="text" name="customquest" class="input" tabindex="1205" /></td>
+		</select>&nbsp;<input id="customquest" style="display:none" type="text" name="customquest" class="input" /></td>
 	</tr>
-	<tr class="tr5">
+	<tr>
 		<td>您的答案</td>
-		<td><input type="text" name="answer" class="input" tabindex="1206" /></td>
+		<td><input type="text" name="answer" class="input" /></td>
 	</tr>
 <!--
 EOT;
 }
 print <<<EOT
 -->
-
 <!--
 EOT;
 list(,$showq)	= explode("\t",$db_qcheck);
@@ -104,28 +88,85 @@ if($db_imagequestion){
 }else{
 	$question = $qkey<0 ? getMachineQuestion_1() :  $db_question[$qkey];
 }
-$q_a = $question.($showq && $qkey>0?" 正确答案:".$db_answer[$qkey] : '');
+$q_a = $question.($showq && $qkey>0?" （答案：".$db_answer[$qkey] . '）' : '');
 print <<<EOT
 -->
-			<tr class="tr5">
+			<tr class="vt">
 				<td>验证问答</td>
-				<td><span class="fl">{$q_a}</span><input class="input fl" size="5" type="text" name="qanswer" tabindex="1207" /><input type="hidden" name="qkey" value="$qkey" /> </td>
+				<td><p class="mb5">{$q_a}</p><input class="input input_wa" type="text" name="qanswer" /><input type="hidden" name="qkey" value="$qkey" /> </td>
 			</tr>
 <!--
 EOT;
 }
 print <<<EOT
 -->
-	<tr class="tr5">
+<!--
+EOT;
+if($db_gdcheck & 2){
+$checkCode = L::loadClass('checkcode', 'site');
+$checkCodeString = $checkCode->getCheckCodeTemplate();
+$time = time();
+print <<<EOT
+-->
+	<tr class="vt">
+		<td>验证码</td>
+		<td><input class="input" type="text" name="gdcode" size="5" onfocus="showgd();" />
+		<span style="cursor:pointer; margin-left:3px" onclick="showgd();" id="showtips">&nbsp;点此显示验证码</span>
+		<div id="ckcode" style="display:none;"></div>
+$checkCodeString
+		</td>
+	</tr>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+	<tr>
 		<td>&nbsp;</td>
-		<td><span class="btn2"><span><button type="submit" tabindex="1208">登录</button></span></span>&nbsp;&nbsp;<a href="sendpwd.php">忘记密码？</a></td>
+		<td><span class="btn2" style="margin:0 10px 0 0;"><span><button type="submit">登录</button></span></span>&nbsp;&nbsp;<a href="sendpwd.php">忘记密码？</a></td>
 	</tr>
 </table>
 </div>
-<div class="tr5 f14 tac mb10">没有帐号？&nbsp;&nbsp;&nbsp;<a href="$regurl" class="s4">注册一个吧!</a></div>
+<div class="popBottom tac">没有帐号？&nbsp;&nbsp;&nbsp;<a href="$regurl" class="s4">注册一个吧!</a></div>
+<!--
+EOT;
+/* platform weibo app --start */
+L::loadClass('WeiboLoginViewHelper', 'sns/weibotoplatform/viewhelper', false);
+$weiboLoginService = L::loadClass('WeiboLoginService', 'sns/weibotoplatform/service');
+$loginWays = $weiboLoginService->getLoginWays();
+if ($loginWays) {
+print <<<EOT
+-->
+
+	<link rel="stylesheet" href="u/images/expand/weibologin.css" />
+	<div class="p20">
+		<h4>使用合作网站帐号登录：</h4>
+		<ul class="waysList cc">
+<!--
+EOT;
+		foreach ($loginWays as $loginWay) {
+			$windowOpenScript = WeiboLoginViewHelper_WindowOpenScript($loginWay['type']);
+print <<<EOT
+-->
+			<li><a class="s4" title="使用{$loginWay['accountTitle']}登录" href="javascript:;" onclick="$windowOpenScript"><img src="{$loginWay['loginLogo']}" />{$loginWay['accountTitle']}</a></li>
+<!--
+EOT;
+		}
+print <<<EOT
+-->
+		</ul>
+	</div>
+<!--
+EOT;
+}
+/* platform weibo app --end */
+
+print <<<EOT
+-->
+
 <div class="c"></div>
 </form>
-<script language="JavaScript">
+<script>
 function showcustomquest(qid){
 	getObj("customquest").style.display = qid==-1 ? '' : 'none';
 }

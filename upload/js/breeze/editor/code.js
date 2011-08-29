@@ -53,7 +53,7 @@ B.namespace('editor.code', function(B){
 			showWin(elem);
 			insertTrigger = fn;
 		}else{
-			fn( shiftHTML(editor.getSelText()) );
+			fn( shiftHTML(editor.getSelHtml()) );
 		}
     }
 });

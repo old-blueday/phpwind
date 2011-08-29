@@ -12,7 +12,7 @@ Breeze.namespace('app.insertAttach', function (B) {
 		},
 		tattachSelector = {
 			id: 'editor-insertTattach',
-			load: function (elem, editor) {
+			load: function (elem, myeditor) {
 				var id = this.id;
 				B.require('util.dialog', function (B) {
 					B.util.dialog({
@@ -27,7 +27,7 @@ Breeze.namespace('app.insertAttach', function (B) {
 		<div style="padding-top:5px">\
 			<div class="B_mb10 cc">\
 				<a id="B_sm_cfg" href="javascript://" class="B_fr">显示“售密设置”</a>\
-				<span id="B_uploader_container"><span id="B_uploader_flash"></span></span>\
+				<span id="B_uploader_container"><span id="B_uploader_flash"><span id="uploaderTmpSpan" style="display:none;"><embed style="display:none;" src="images/blank.swf" type="application/x-shockwave-flash" wmode="transparent"/><em class="s2" style="position:relative;top:3px;">该浏览器尚未安装flash插件，<a href="http://www.adobe.com/go/getflashplayer" target="_blank">点击安装</a></em></span></span></span>\
 			</div>\
 			<div class="B_file">\
 				<div class="cc">\
@@ -50,10 +50,10 @@ Breeze.namespace('app.insertAttach', function (B) {
 						reuse: true,
 						callback: function (popup) {
 							B.require('global.uploader',function(){
-								uploader.init('uploader');
+								uploader.init('uploader',myeditor);
 								B.addEvent(B.$('#B_sm_cfg'), 'click', uploader.toggleSelect);
 							});
-							editor.area.appendChild(popup.win);
+							myeditor.area.appendChild(popup.win);
 						}
 					}, elem);
 				});
@@ -67,15 +67,16 @@ Breeze.namespace('app.insertAttach', function (B) {
     */
 	B.app.insertAttach = function (elem, callback, editor) {
 		insertTrigger = callback;
+		myeditor = editor;
 		if (B.$('#'+tattachSelector.id)){
 			B.util.dialog({
 				id: tattachSelector.id,
 				reuse: true,
-				callback:function(){uploader.init('uploader');},
+				callback:function(){uploader.init('uploader',myeditor);},
 				pos: ['leftAlign', 'bottom']
 			}, elem);
 		} else {
-			tattachSelector.load(elem, editor);
+			tattachSelector.load(elem, myeditor);
 		}
     }
 });

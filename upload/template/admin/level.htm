@@ -385,7 +385,7 @@ EOT;
 -->
 </ul>
 </div>
-<script language="JavaScript">
+<script type="text/javascript">
 var curObj;
 function showImg(_this) {
 	curObj = _this;
@@ -447,7 +447,6 @@ function showGroup(id,s) {
 	}
 }
 </script>
-<script src="js/global.js" language="JavaScript"></script>
 <!--
 EOT;
 } elseif ($action == 'editgroup') {print <<<EOT
@@ -495,7 +494,7 @@ EOT;
 	</ul>
     <a href="$basename" class="fl mt5 ">返回上一级<span class="f9">▲</span></a>
 </div>
-<script language="JavaScript">
+<script type="text/javascript">
 function level_jump(admin_file) {
 	var URL = document.mod.selectfid.options[document.mod.selectfid.selectedIndex].value;
 	location.href = admin_file + "?adminjob=level&action=editgroup&gid=" + URL;
@@ -547,10 +546,11 @@ print <<<EOT
 <!--
 EOT;
 foreach ($value as $k => $v) {
+$tmpTitle = $k == 'specialtopics' ? "<a href=\"javascript:;\">$v[title]</a>" : "<a href=\"$basename&action=setright&rkey=$k&gid=$gid\">$v[title]</a>";
 print <<<EOT
 -->
 	<tr class="tr1 vt">
-		<td class="td1"><a href="$basename&action=setright&rkey=$k&gid=$gid">$v[title]</a></td>
+		<td class="td1">$tmpTitle</td>
 <!--
 EOT;
 if ($k == 'markset') {
@@ -811,7 +811,7 @@ EOT;
 	</ul>
     <a href="$basename" class="fl mt5 ">返回上一级<span class="f9">▲</span></a>
 </div>
-<script language="JavaScript">
+<script type="text/javascript">
 function addcols(mode,ft){
 	var s = getObj(mode).firstChild.cloneNode(true);
 	getObj(ft).appendChild(s);

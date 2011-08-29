@@ -24,6 +24,9 @@ EOT;
 EOT;
 }print <<<EOT
 -->
+<script type="text/javascript" src="js/global.js"></script>
+<script type="text/javascript" src="js/pw_ajax.js"></script>
+<script type="text/javascript" src="js/admin.js"></script>
 <script type="text/javascript" src="js/desktop/plugin.js"></script>
 <script type="text/javascript">
 var allInputs = document.getElementsByTagName('input');
@@ -48,7 +51,7 @@ $rawbbsname = rawurlencode($db_bbsname);
 $ystat = $db_ystats_ifopen ? '0' : '1';
 $hash = md5($pwServer['HTTP_HOST'].$pwServer['HTTP_USER_AGENT'].$totalmember.$threads.$posts.$wind_version.$wind_repair.$db_charset);print <<<EOT
 -->
-<script language="JavaScript" src="http://nt.phpwind.net/notice.php?bbsname=$rawbbsname&totalmember=$totalmember&threads=$threads&posts=$posts&hits=$hits&yposts=$yposts&version=$wind_version&repair=$wind_repair&charset=$db_charset&c=$ceversion&u=$u&sysversion=$sysversion&dbversion=$dbversion&url=$s_url&ystat=$ystat&hash=$hash&from=$wind_from"></script>
+<script type="text/javascript" src="http://nt.phpwind.net/notice.php?bbsname=$rawbbsname&totalmember=$totalmember&threads=$threads&posts=$posts&hits=$hits&yposts=$yposts&version=$wind_version&repair=$wind_repair&charset=$db_charset&c=$ceversion&u=$u&sysversion=$sysversion&dbversion=$dbversion&url=$s_url&ystat=$ystat&hash=$hash&from=$wind_from"></script>
 <!--
 EOT;
 }if(!$showafooter){

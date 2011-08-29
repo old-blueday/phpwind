@@ -149,7 +149,9 @@ if (!$_POST['step']){
 		'site' => $prohomepage,'timedf' => $timedf
 	));
 	$userService->update($winduid, $pwSQL);
-
+	// defend start	
+	CloudWind::yunUserDefend('editprofile', $winduid, $windid, $timestamp, 0, 101,'','','',array('profile'=>'updatebase'));
+	// defend end
 	/* phpwind数据统计 */
 	/*if ($progender != $userdb['gender'] || $probday != $userdb['bday']) {
 		$statistics = L::loadClass('Statistics', 'datanalyse');
