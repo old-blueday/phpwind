@@ -102,6 +102,7 @@ class PW_CollectionDB extends BaseDB {
 			'6' => 'multimedia',//多媒体
 			'7' => 'cms',//文章
 			'8' => 'postfavor',//帖子 @modify panjl@2010-11-9
+			'9' => 'tucool',//图酷
 		);
 		return $typeList;
 	}

@@ -9,8 +9,11 @@ $USCR = 'user_home';
 $perpage = 20;
 require_once(R_P . 'u/lib/space.class.php');
 require_once(R_P.'require/functions.php');
-include_once pwCache::getPath(D_P.'data/bbscache/level.php');
-include_once pwCache::getPath(D_P.'data/bbscache/o_config.php');
+//* include_once pwCache::getPath(D_P.'data/bbscache/level.php');
+//* include_once pwCache::getPath(D_P.'data/bbscache/o_config.php');
+extract(pwCache::getData(D_P.'data/bbscache/level.php', false));
+extract(pwCache::getData(D_P.'data/bbscache/o_config.php', false));
+extract(pwCache::getData(D_P.'data/bbscache/dbreg.php', false));
 require_once(R_P.'require/credit.php');
 $newSpace = new PwSpace($winduid);
 $space = $newSpace->getInfo();
@@ -21,7 +24,7 @@ $winddb['medals'] && $listmedals = getMedalIconsByUid($winduid);
 $usercredit = array(                   	
 	'postnum'	=> $winddb['postnum'],
 	'digests'	=> $winddb['digests'],
-	'rvrc'		=> $winddb['rvrc'],
+	'rvrc'		=> $userrvrc,
 	'money'		=> $winddb['money'],
 	'credit'	=> $winddb['credit'],
 	'currency'	=> $winddb['currency'],
@@ -33,11 +36,23 @@ foreach ($credit->get($winduid,'CUSTOM') as $key => $value) {  //金钱、积分
 $upgradeset  = unserialize($db_upgrade);
 $totalcredit = CalculateCredit($usercredit,$upgradeset); 
 
+if ($o_punchopen) {
+	$punchReward  = unserialize($o_punch_reward);
+	$punch_moneyname = $credit->cType[$punchReward['type']];
+	$reloadMoney = $usercredit[$punchReward['type']]+$punchReward['num'];
+}
+$moneyType = $punch_moneyname ? $punch_moneyname : $db_moneyname; //显示金钱类型
+$moneyNum = $o_punchopen ? $usercredit[$punchReward['type']] : $winddb['money']; //显示金钱数字
+
 $last = $percent = 0;
 !$lneed && $lneed = array();
+$copyLneed = $lneed;
 foreach ($lneed as $key=>$value){
 	if($value > $totalcredit){
 		$last = $value;break;
+	} elseif ($totalcredit >= $value && $value == end($copyLneed)) {
+		$last = $value;
+		break;
 	}
 }
 $percent = $last ? ceil(($totalcredit/$last) * 100) : 0;
@@ -51,13 +66,24 @@ $weiboCount > 250 && $weiboService->deleteAttentionRelation($winduid, $weiboCoun
 $o_weibopost == '0' && $weiboLiveList = $weiboService->getWeiboLives(21);//新鲜事直播
 $weiboCount > 200 && $weiboCount = 200;
 $pages = numofpage($weiboCount, 1, ceil($weiboCount/20), 'apps.php?q=weibo&do=attention&', 10, 'weiboList.filterWeibo');
-
 if (!$db_toolbar) {
 	$pwForumList = array();
-	include_once pwCache::getPath(D_P.'data/bbscache/forumlist_cache.php');
+	//* include_once pwCache::getPath(D_P.'data/bbscache/forumlist_cache.php');
+	pwCache::getData(D_P.'data/bbscache/forumlist_cache.php');
 	if ($pwForumAllList && $GLOBALS['groupid'] == 3) {
 		$pwForumList = array_merge($pwForumList,$pwForumAllList);
 	}
+}
+
+//热门话题
+$topicService = L::LoadClass('topic','sns'); /* @var $topicService PW_Topic */
+$weiboHotTopics = $topicService->getWeiboHotTopics();
+$topicHot = array();
+$n = 0;
+foreach($weiboHotTopics as $key=>$topic){
+	if(++$n > 6 )break;
+	$topic['urlTopic'] = urlencode($topic['topicname']);
+	$topicHot[$key] = $topic;
 }
 
 (empty($winddb['honor']) || !$_G['allowhonor']) && $winddb['honor'] = getLangInfo('other','whattosay');
@@ -77,14 +103,18 @@ if ($db_job_isopen) {
 }
 list($isPunch,$showPunch) = isPunchRoutine();//每日打卡
 
-$modelList = array('recommendUsers' => 3,'visitor' => 6, 'friendsBirthday' => array('num' => 3,'expire' => 21600 ));
+$modelList = array('recommendUsers' => 3,'visitor' => 6, 'friendsBirthday' => array('num' => 3,'expire' => 21600 ), 'tags' => 8 );
 $o_weibopost == '0' && $modelList['friend'] = 6;
 $spaceData = $newSpace->getSpaceData($modelList);
 $o_weibopost == '0' && $myFriends = $spaceData['friend'];//我的好友
 $latestVisits = $spaceData['visitor'];//最近访客
 $recommendUsers = $spaceData['recommendUsers'];//我推荐关注模块
 $birthdays = $spaceData['friendsBirthday'];//好友生日
-
+$tmpmemberTags = $spaceData['tags'];//个人标签
+if (S::isArray($tmpmemberTags)) {
+	$memberTagsService = L::loadClass('memberTagsService', 'user');
+	$memberTags = $memberTagsService->makeClassTags($tmpmemberTags);
+}
 /* sinaweibo bind */
 if (!$db_sinaweibo_status) {
 	$isBindWeibo = false;

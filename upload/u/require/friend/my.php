@@ -104,13 +104,14 @@ if ($type == 'attention') {
 			$friends[$key]['attentionEach'] = 1;
 		}
 	}
+	$friendsAllUids = getFriendsIdArr($winduid);
 	$pages = numofpage($count,$page,ceil($count/$db_perpage),"{$thisbase}ftid=$ftype&");
 } elseif ($type == 'find') {
 
 	S::gp(array('step', 'according'));
 	$db_perpage = 12;
 	$according = $according ? $according : 'user';
-	${$according.'checked'} = 'checked="checked"';
+	${$according.'checked'} = 'selected="selected"';
 	//所有好友
 	$friendsAllUids = getFriendsIdArr($winduid);
 
@@ -118,7 +119,7 @@ if ($type == 'attention') {
 		S::gp(array('f_keyword'));
 		!isset($f_keyword) && Showmsg('pse_input_keyword');
 
-		if($according && !in_array($according,array('user','uid','email'))){
+		if($according && !in_array($according,array('user','uid','email','tags'))){
 			showMsg("抱歉,搜索类型不存在");
 		}
 
@@ -136,7 +137,6 @@ if ($type == 'attention') {
 				foreach ($users as $user) {
 					$uids[] = $user['uid'];
 				}
-
 				if ($uids) {
 					$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
 					foreach ($userService->getUsersWithMemberDataByUserIds($uids) as $rt) {
@@ -155,7 +155,6 @@ if ($type == 'attention') {
 						$members[] = $user;
 					}
 				}
-
 				$members && $pages = ($count) ? numofpage($count,$page,ceil($count/$db_perpage),$searchURL."&f_keyword=".urlencode($f_keyword)."&step=2&",null,'',true) : '';
 				break;
 
@@ -185,6 +184,36 @@ if ($type == 'attention') {
 					$members[] = $user;
 				}
 				break;
+
+			case "tags" :  //标签找人
+				$memberTagsService = L::loadClass('MemberTagsService','user');
+				list($count,$tagsUids,$memberTags) = $memberTagsService->getUidsByTagName($f_keyword, ($page - 1) * $db_perpage, $db_perpage);
+				$tagsUids = $tagsUids ? $tagsUids : array();
+				$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
+				$users = $userService->getByUserIds($tagsUids);
+				$users = $users ? $users : array();
+				foreach ($users as $user) {
+					$uids[] = $user['uid'];
+				}
+				if ($uids) {
+					foreach ($userService->getUsersWithMemberDataByUserIds($uids) as $rt) {
+						$memberdata[$rt['uid']] = $rt['thisvisit'];
+					}
+
+					$attentionSerivce = L::loadClass('attention', 'friend'); /* @var $attentionSerivce PW_Attention */
+					$myAttentionsInfo = $attentionSerivce->getFollowListByFriendids($winduid, $uids);
+					foreach ($myAttentionsInfo as $myAttentions) {
+						$myAttentionUids[] = $myAttentions['friendid'];
+					}
+					foreach($users as $key => $user) {
+						$user['thisvisit'] = $memberdata[$user['uid']];
+						list($user['face']) = showfacedesign($user['icon'], '1', 's');
+						in_array($user['uid'], $myAttentionUids) && $user['attention'] = 1;
+						$members[] = $user;
+					}
+				}
+				$members && $pages = ($count) ? numofpage($count,$page,ceil($count/$db_perpage),$searchURL."&f_keyword=".urlencode($f_keyword)."&step=2&according=tags&",null,'',true) : '';
+				break;
 		}
 	} else {
 
@@ -208,7 +237,7 @@ if ($type == 'attention') {
 
 			$mostFriendUids  = randArray($mostFriendUids, 6);
 			if ($mostFriendUids) {
-				$query = $db->query('SELECT m.uid,m.username,m.icon as face,m.honor,md.fans FROM pw_members m'. " LEFT JOIN pw_memberdata md ON m.uid = md.uid".' WHERE m.uid IN(' . S::sqlImplode($mostFriendUids) . ')');
+				$query = $db->query('SELECT m.uid,m.username,m.icon as face,m.honor,m.groupid,m.memberid,md.fans FROM pw_members m'. " LEFT JOIN pw_memberdata md ON m.uid = md.uid".' WHERE m.uid IN(' . S::sqlImplode($mostFriendUids) . ')');
 				while ($rt = $db->fetch_array($query)) {
 					list($rt['face']) = showfacedesign($rt['face'], '1', 's');
 					$mostFriends[] = $rt;
@@ -231,7 +260,7 @@ if ($type == 'attention') {
 			$onlineUserkeys = array_keys($onlineUsers);
 			$onlineUserkeys = randArray($onlineUserkeys, 6);
 			$onlineUids = $onlineUserkeys;
-			$query = $db->query("SELECT m.uid,m.username,m.email,m.icon as face,m.regdate,m.honor,m.gender as sex,md.thisvisit,md.fans" . " FROM pw_members m " . " LEFT JOIN pw_memberdata md ON m.uid = md.uid" . " WHERE m.uid IN(" . S::sqlImplode($onlineUserkeys) . ")" . " AND m.uid !=" . S::sqlEscape($winduid));
+			$query = $db->query("SELECT m.uid,m.username,m.email,m.icon as face,m.regdate,m.honor,m.gender as sex,m.groupid,m.memberid,md.thisvisit,md.fans" . " FROM pw_members m " . " LEFT JOIN pw_memberdata md ON m.uid = md.uid" . " WHERE m.uid IN(" . S::sqlImplode($onlineUserkeys) . ")" . " AND m.uid !=" . S::sqlEscape($winduid));
 			while ($rt = $db->fetch_array($query)) {
 				list($rt['face']) = showfacedesign($rt['face'], '1', 'm');
 				$rt['regdate'] = get_date($rt['regdate']);
@@ -253,7 +282,7 @@ if ($type == 'attention') {
 				in_array($mostFriend['uid'], $myAttentionUids) && $mostFriends[$key]['attention'] = 1;
 			}
 
-			foreach ($recommendUsers as $key=>$recommendUser) {
+			foreach ((array)$recommendUsers as $key=>$recommendUser) {
 				in_array($recommendUser['uid'], $myAttentionUids) && $recommendUsers[$key]['attention'] = 1;
 			}
 
@@ -268,15 +297,20 @@ if ($type == 'attention') {
 	$username = $windid;
 
 } elseif ($type == 'invite') {
+	if (!$rg_allowregister) ObHeader($basename.'a=friend&type=attention');
 	$spaceurl = $db_bbsurl.'/u.php?a=invite&uid='.$winduid;
 	/*xufazhang 08-17*/
 	$hash = appkey($winduid);
 	$spaceurl .= '&hash='.$hash;
 
 	require_once (R_P . 'require/credit.php');
-	include pwCache::getPath(D_P . 'data/bbscache/inv_config.php');
-	include pwCache::getPath(D_P . 'data/bbscache/mail_config.php');
-	include pwCache::getPath(D_P . 'data/bbscache/dbreg.php');
+	//* include pwCache::getPath(D_P . 'data/bbscache/inv_config.php');
+	//* include pwCache::getPath(D_P . 'data/bbscache/mail_config.php');
+	//* include pwCache::getPath(D_P . 'data/bbscache/dbreg.php');
+	extract(pwCache::getData(D_P . 'data/bbscache/inv_config.php', false));
+	extract(pwCache::getData(D_P . 'data/bbscache/mail_config.php', false));
+	extract(pwCache::getData(D_P . 'data/bbscache/dbreg.php', false));	
+	
 	$thisbase .= 'type=' . $type;
 	//$inv_linkcontent = $spaceurl."\r\n".$inv_linkcontent;
 	if ($rg_allowregister == 2) {
@@ -297,9 +331,11 @@ if ($type == 'attention') {
 		}
 	}
 } elseif ($type == 'inviteCode') {
+	if ($rg_allowregister != 2) ObHeader($basename.'a=friend&type=attention');
 	S::gp(array('step', 't'), 'GP');
 	require_once (R_P . 'require/credit.php');
-	include_once pwCache::getPath(D_P . "data/bbscache/inv_config.php");
+	//* include_once pwCache::getPath(D_P . "data/bbscache/inv_config.php");
+	pwCache::getData(D_P . "data/bbscache/inv_config.php");
 	$allowinvite = allowcheck($inv_groups, $groupid, $winddb['groups']) ? 1 : 0;
 	$usrecredit = ${'db_' . $inv_credit . 'name'};
 	$creditto = array('rvrc' => $userrvrc, 'money' => $winddb['money'], 'credit' => $winddb['credit'],
@@ -356,6 +392,22 @@ if ($type == 'attention') {
 	}
 } elseif ($type == 'birthday') {
 	$birthday = $winddb['bday'];
+	$customFieldService = L::loadClass('customerfield','user');
+	$fieldInfo = $customFieldService->getFieldByFieldName('bday');
+	switch ($fieldInfo['category']) {
+		case 'basic' :
+			$birthdayLink = 'base';
+			break;
+		case 'contact' :
+			$birthdayLink = 'link';
+			break;
+		case 'education' :
+			$birthdayLink = 'education';
+			break;
+		case 'other': 
+			$birthdayLink = 'other';
+			break;
+	}
 	$friendsService = L::loadClass('Friend', 'friend'); /* @var $friendsService PW_Friend */
 	$friendsBirthday = $friendsService->findUserFriendsBirthdayInPage($winduid, 20, 1, 25);
 }

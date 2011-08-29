@@ -35,8 +35,20 @@ class PW_OperateLog {
 	}
 	
 	function logForums($operate, $fields) {
-		return true;
+		if (! isset ( $fields ['fid'] )) {
+			return false;
+		}
+		$ids = (is_array ( $fields ['fid'] )) ? $fields ['fid'] : array ($fields ['fid'] );
+		return $this->_insertLog ( 'pw_log_forums', $ids, $operate );
 	}
+	
+	function logColonys($operate, $fields) {
+		if (! isset ( $fields ['id'] )) {
+			return false;
+		}
+		$ids = (is_array ( $fields ['id'] )) ? $fields ['id'] : array ($fields ['id'] );
+		return $this->_insertLog ( 'pw_log_colonys', $ids, $operate );
+	}	
 	
 	function _insertLog($tableName, $sids, $operate) {
 		if (! $tableName || ! S::isArray ( $sids ) || ! $operate)

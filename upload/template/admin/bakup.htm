@@ -159,7 +159,7 @@ if(!$action){print <<<EOT
     <table width="100%">
     <tr class="tr2 vt td_bgB">
 		<td width="30"><span onclick="CheckAll(document.FORM)" class="cp">全选</span></td>
-        <td>文件名</td>
+        <td>目录名</td>
         <td>版本</td>
         <td>备份时间</td>
         <td>卷号</td>
@@ -172,7 +172,7 @@ print <<<EOT
 -->
     <tr class="tr1 vt">
         <td class="td2"><input name="delfile[]" type="checkbox" value="$bakfile[name]" onclick="pwJsCheck(this)" /></td>
-        <td class="td2"><a href="data/$bakfile[name]">$bakfile[name]</a></td>
+        <td class="td2"><a href="data/sqlback/$bakfile[name]">$bakfile[name]</a></td>
         <td class="td2">$bakfile[version]</td>
         <td class="td2">$bakfile[time]</td>
         <td class="td2">$bakfile[num]</td>

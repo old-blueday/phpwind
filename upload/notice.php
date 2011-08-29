@@ -4,7 +4,8 @@ require_once('global.php');
 require_once(R_P.'require/forum.php');
 require_once(R_P.'require/bbscode.php');
 require_once(R_P.'require/header.php');
-include_once pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
+//* include_once pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
+pwCache::getData(D_P.'data/bbscache/forum_cache.php');
 
 $guide=array();
 $sql_select = '';

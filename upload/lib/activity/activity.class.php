@@ -5,7 +5,8 @@ class PW_Activity {
 	var $activitymodeldb;
 
 	function setActCache() {
-		include pwCache::getPath(D_P.'data/bbscache/activity_config.php');
+		//* include pwCache::getPath(D_P.'data/bbscache/activity_config.php');
+		extract(pwCache::getData(D_P.'data/bbscache/activity_config.php', false));
 		$this->activitycatedb = $activity_catedb;
 		$this->activitymodeldb = $activity_modeldb;
 	}

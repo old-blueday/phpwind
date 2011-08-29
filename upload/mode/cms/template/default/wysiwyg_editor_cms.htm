@@ -1,0 +1,45 @@
+<!--<?php
+$fileBtn = $db_allowupload ? ' fileBtn' : '';
+
+$imageConfigTabs = array();
+($db_allowupload && $_G['allowupload']) && $imageConfigTabs[] = 'local';
+($db_phopen && $winduid) && $imageConfigTabs[] = 'album';
+$imageConfigTabs[] = 'network';
+$imageConfigTabs = "'" . implode("','", $imageConfigTabs) . "'";
+print <<<EOT
+-->
+<link rel="stylesheet" type="text/css" href="js/breeze/editor/style/style.css" />
+<textarea id="textarea" name="atc_content" class="B_textarea" tabindex="200">{$atc_content}</textarea>
+<script src="$db_htmdir/js/face.js"></script>
+<script>var BREEZE_BASE_PATH = getBaseUrl() + 'js/breeze/';</script>
+<script src="js/breeze/core/base.js"></script>
+<script type="text/javascript">
+var attachConfig = {
+		'attachnum' : parseInt('$db_attachnum'),
+		'list' : {{$attach}},
+		'type' : 'cms',
+		'url' : 'pweditor.php?action=attach',
+		'filetype' : $attachAllow
+	},
+	imageConfig = {
+		tabs : [$imageConfigTabs],
+		url : 'pweditor.php?action=image',
+		filetype : $imageAllow
+	},
+	charset = '$db_charset',
+	editor,
+	toolbar = [
+		'fontSelector sizeSelector br boldIcon italicIcon underlineIcon strikethroughIcon foreColor backColor removeformat',
+		'leftIcon centerIcon rightIcon pgformatIcon br olIcon ulIcon indentIcon outdentIcon',
+		'hrIcon quoteIcon codeIcon undoIcon br linkIcon unlinkIcon tableIcon redoIcon',
+		'faceBtn photoBtn{$fileBtn} musicBtn videoBtn',
+		'pageIcon'
+	],
+	mini = 'fontSelector sizeSelector boldIcon italicIcon underlineIcon foreColor linkIcon leftIcon centerIcon rightIcon faceBtn photoBtn fileBtn';
+B.require('editor.editor', 'editor.ubb', function(B){
+	editor = B.editor(B.$('#textarea'), toolbar, mini, {'currentMode' : FetchCookie('editmode') == 1 ? 'UBB' : 'default', 'isSaveMode' : true});
+});
+</script>
+<!--
+EOT;
+?>

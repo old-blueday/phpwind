@@ -37,7 +37,6 @@ EOT;
 print <<<EOT
 -->
 			<li><a href="job.php?action=erasecookie&verify=$GLOBALS[loginhash]">清除Cookies</a></li>
-			<li><a href="javascript:scroll(0,0)">返回顶部</a></li>
 		</ul>
 <!--
 EOT;
@@ -46,7 +45,7 @@ print <<<EOT
 -->
 	</div>
 	<div class="f9 gray tac"><span id="windspend">$wind_spend Time now is:$ft_time, $ft_gzip $db_icp</span><br />
-	Powered by <a href="http://www.phpwind.net/" target="_blank">phpwind</a> <a href="http://www.phpwind.net/" target="_blank"><span class="b s2">v$wind_version</span></a> <a href="http://www.phpwind.com/certificate.php?host={$pwServer['HTTP_HOST']}">Certificate</a> Code &copy;2003-2010 <a href="http://www.phpwind.com/" target="_blank">phpwind.com</a> Corporation <span id="stats"></span>$db_statscode
+	Powered by <a href="http://www.phpwind.net/" target="_blank">phpwind</a> <a href="http://www.phpwind.net/" target="_blank"><span class="b s2">v$wind_version</span></a> <a href="http://www.phpwind.com/certificate.php?host={$pwServer['HTTP_HOST']}">Certificate</a> Code &copy;2003-2011 <a href="http://www.phpwind.com/" target="_blank">phpwind.com</a> Corporation <span id="stats"></span>$db_statscode
 <!--
 EOT;
 if($db_ystats_ifopen=='0'){print <<<EOT
@@ -63,7 +62,7 @@ EOT;
 </div>
 <!--
 EOT;
-if($GLOBALS['groupid'] != 'guest' && $GLOBALS['groupid'] != '' && $GLOBALS['db_toolbar'] && SCR != 'profile' && SCR != 'jobcenter' && SCR != 'message' && SCR != 'userpay'){
+if($GLOBALS['groupid'] != 'guest' && $GLOBALS['groupid'] != '' && $GLOBALS['db_toolbar'] && SCR != 'profile' && SCR != 'jobcenter' && SCR != 'message' && SCR != 'userpay' && SCR != 'register'){
 include_once PrintEot('bottom');
 }print <<<EOT
 -->
@@ -105,7 +104,7 @@ EOT;
 <script type="text/javascript" language="JavaScript" src="js/pw_jobcenter.js"></script>
 <!--
 EOT;
-if($winddb['jobnum'] > 0 && $db_job_ispop && !GetCookie('jobpop') && !in_array(SCR,array("jobcenter","searcher"))){
+if($winddb['jobnum'] > 0 && $_G['allowvisit'] && $db_job_ispop && !GetCookie('jobpop') && !in_array(SCR,array("jobcenter","searcher","register"))){
 print <<<EOT
 -->
 <script type="text/javascript">

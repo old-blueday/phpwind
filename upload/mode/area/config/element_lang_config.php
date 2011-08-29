@@ -10,6 +10,7 @@ return array(
 	'location'	=> '活动地点',
 	'num'		=> '人数',
 	'authorid'	=> '作者uid',
+	'authorurl' => '作者url',
 	'author'	=> '作者',
 	'replies'	=> '回复数',
 	'hits'		=> '点击数',
@@ -29,8 +30,10 @@ return array(
 	'popularity'	=> '人气',
 	'comments'	=> '点评',
 	'icon'	=>'头像',
+	'tags' =>'标签',
 	'topictypename'	=>'主题分类',
-	'topictypeurl'	=>'主题分类链接'
-
+	'topictypeurl'	=>'主题分类链接',
+	'collectnum' =>'收藏数',
+	'totalnum' => '总张数'
 );
 ?>

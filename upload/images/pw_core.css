@@ -7,7 +7,7 @@
 /*初始化结构*/
 body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,form,p,blockquote,th,td{margin: 0;padding: 0;}
 h1,h2,h3,h4,h5,h6{font-size: 100%;font-weight: normal;}
-ol,ul,li{list-style: none;}
+ul,li{list-style: none;}
 table {border-collapse: collapse;border-spacing: 0;}
 th{text-align: left;}
 td,th,div{word-break:break-all;word-wrap:break-word;}
@@ -36,7 +36,7 @@ html{ font-size:12px;}
 .c{clear:both;font:0px/0px Arial;overflow:hidden;height:0;width:0;}
 /*通用样式*/
 .b,b{ font-weight:700;}
-.w{white-space:nowrap}
+.w{white-space:nowrap;}
 .tal{text-align:left}
 .tac{text-align:center}
 .tar{text-align:right}
@@ -48,14 +48,14 @@ html{ font-size:12px;}
 .link_down span{padding:0 10px 0 0;background:url(down.png) center right no-repeat; display:inline-block; cursor:pointer;}
 .divHr{background:#eaeaea;height:1px;overflow:hidden;margin:10px 0;}
 /*通用字体*/
-.f9{font-size:10px;}
-.f10,small,.small{font-size:10px;}
+.f10,small,.small,.f9{font-size:10px;-webkit-text-size-adjust:none;}
 .f12{font-size:12px}
 .f14{font-size:14px}
 .f16{font-size:16px;}
 .f20{font-size:20px;}
 .f24{font-size:24px;}
 .fn,.fn a{font-weight:normal}
+html{_background-image:url(blank.gif);background-attachment:fixed;_overflow-x:hidden;}
 /*弹窗*/
 .popoutContent{background:#ffffff;border:1px solid #bbbbbb;}
 .bgcorner1,.bgcorner2,.bgcorner3,.bgcorner4,.pobg1,.pobg2,.pobg3,.pobg4{filter:Alpha(opacity=39);_filter:Alpha(opacity=39);opacity:.39;overflow:hidden;z-index:1005;line-height:0 }
@@ -94,10 +94,10 @@ html{ font-size:12px;}
 span.btn ,span.bt ,span.btn2 ,span.bt2 ,span.bts ,span.btn span ,span.bt span ,span.btn2 span ,span.bt2 span ,span.bts span{background:url(button.png) 9999px 9999px;}
 span.btn ,span.bt ,span.btn2 ,span.bt2 ,span.bts {padding:0 2px 0 0;zoom: 1;display: inline-block;vertical-align: middle; cursor: pointer; _display: inline;margin:0 3px;}
 span.btn button ,span.bt button ,span.btn2 button ,span.bt2 button ,span.bts button{display:block;overflow:visible;width:auto;_width:0;border:0 none;background:none;text-decoration:none;vertical-align:middle;white-space:nowrap;cursor:pointer;}
-span.btn span,span.bt span,span.bts span{display: block;padding:0 11px 0 13px;*padding:0 13px 0 15px;}
-span.btn button,span.bt button,span.bts button{height:27px;margin:0 -15px;padding:0 17px;line-height:27px;font-size:14px;font-weight:700;padding-bottom:4px;_padding-bottom:0px;}
+span.btn span,span.bt span,span.bts span{display: block;padding:0 11px 0 13px;}
+span.btn button,span.bt button,span.bts button{height:27px;margin:0 -13px;padding:0 15px;line-height:28px;font-size:14px;font-weight:700;padding-bottom:2px;_padding-bottom:0px;}
 span.btn2 span,span.bt2 span{display: block;padding:0 5px 0 7px;*padding:0 7px 0 9px;}
-span.btn2 button,span.bt2 button{height:21px;margin:0 -9px;padding:0 10px;line-height:21px;padding-bottom:4px;_padding-bottom:0px;}
+span.btn2 button,span.bt2 button{height:21px;margin:0 -9px;padding:0 10px;line-height:21px;padding-bottom:2px;_padding-bottom:0px;}
 span.btn{background-position:right 0;}
 span.btn span{background-position:0 0;}
 span.btn2{background-position:right -60px;}
@@ -109,7 +109,7 @@ span.bt2 span{ background-position:left -85px;}
 span.bts{ background-position:right -110px;}
 span.bts span{ background-position:0 -110px;}
 span.btn button,span.btn2 button{color:#ffffff;}
-span.bt button,span.bt2 button{color:#555555;}
+span.bt button,span.bt2 button{color:#333333;}
 span.bts button{color:#cd4604;}
 /*任务弹窗*/
 .menu_tasksA_title,.menu_close,.menu_tasksA_title:hover b,.tasks_join i,.tasks_startA,.tasks_startA_old,.tasks_startB,.tasks_startB_old,.tasks_apply,.tasks_apply_old,.tasks_again,.tasks_receiving,.tasks_quit{background:url(job/menu_tasksA.png);}
@@ -174,11 +174,11 @@ span.bts button{color:#cd4604;}
 .pages,.pages .pagesone{line-height:21px;height:21px;font-family:Tahoma;}
 .pages a,.pages b,.pages .pagesone{display:block;float:left;margin-right:3px;/*-moz-border-radius:3px;-webkit-border-radius:3px;*/}
 .pages a{border:1px solid #8dc1d7;background-color:#f9f9f9;padding:0 7px;color:#666;}
-.pages b,.pages a:hover{background-color:#76c3fb;color:#ffffff;border:1px solid #76c3fb;text-decoration:none;padding:0 7px;}
+.pages b,.pages a:hover,.pages .current{background-color:#76c3fb;color:#ffffff;border:1px solid #76c3fb;text-decoration:none;padding:0 7px;}
 .pages .fl{color:#666;padding:0 6px 0 3px;}
 .pages .pagesone{border:1px solid #8dc1d7;background-color:#ffffff;float:left;}
 .pages input{padding:0;float:left;;background:none;border:0;margin:4px 3px 0 3px;width:22px;}
-.pages button{height:21px;background-color:#f4f8fb;padding:0 4px;border:0;color:#666;border-left:1px solid #8dc1d7;cursor:pointer;float:left;}
+.pages button{height:21px;background-color:#f4f8fb;padding:0 4px;border:0 none;color:#666;border-left:1px solid #8dc1d7;cursor:pointer;float:left;margin:0;overflow:visible;}
 .fr .pages{_float:right;}/*ie6*/
 /*头部大登录*/
 .login{margin-top:15px;line-height:1.5;color:#666;}
@@ -207,7 +207,6 @@ textarea{border: 1px solid; border-color: #999999 #e1e1e1 #e1e1e1 #999999;paddin
 select{padding:1px;}
 .textareaA{width:332px;height:62px;overflow:auto;background:#fff;line-height:1.3;}
 .input{border:1px solid; border-color: #999999 #e1e1e1 #e1e1e1 #999999;padding:2px 3px;background:#fff; font-size:1em;color:#000;}
-.inputFocus{border:1px #ffaa00 solid !important;}
 .input:hover,.textareaA:hover,.input_img:hover{border:1px solid #23a6dd;}
 .input_wa{width:154px;}
 .input_wb{width:332px;}
@@ -230,6 +229,7 @@ select{padding:1px;}
 .rightTip{border:1px solid #92e290;background-color:#f5faf3;color:#008800; background-position:-56px 4px;}
 .wrongTip{border:1px solid #ff9a8f;background-color:#ffe4e1;color:#b91600;background-position:4px -56px;}
 .ignoreTip{border:1px solid #cccccc;background-color:#f7f7f7;color:#666;padding-left:10px;}
+.quoteTips{background:#fffae1 url(admin/lightbulb.png) 8px 8px no-repeat;padding:5px 10px 5px 28px;border:1px dotted #eca46a;}
 /*门户前台管理*/
 .view-current{position:relative;background:#ffffdb;*display:inline;padding:0;margin:0; list-style-position:outside}
 .view-bg{border:solid 1px #F60;}
@@ -323,8 +323,8 @@ select{padding:1px;}
 .pw_menu h5{border-top:1px solid #dddddd;display:block;margin:0 5px;color:#555555;font-weight:700;padding:5px 0 0 21px;background:url(pwicon/switch.gif) 2px 7px no-repeat;}
 .menu_userlist{scrollbar-face-color:#e5eef8;scrollbar-highlight-color:#e5eef8; scrollbar-shadow-color:#bfcfd8; scrollbar-3dlight-color:#bfcfd8; scrollbar-arrow-color: #bfcfd8; scrollbar-track-color:#f7fbff;scrollbar-darkshadow-color: #ffffff;scrollbar-base-color:#ccc;height:125px;overflow:auto;padding-top:3px;}
 .menu_userlist li{width:49.8%;float:left;padding-left:0;}
-.menu_userlist li a{display:block;line-height:25px;text-decoration:underline;padding-left:21px;color:#336699;margin-left:5px;}
-.menu_userlist li a:hover{background:url(pwicon/choose.gif) 1px 4px no-repeat;background-color:#e6f2fe;}
+.menu_userlist li a{display:block;line-height:25px;padding-left:21px;color:#336699;margin-left:5px; letter-spacing:1px;}
+.menu_userlist li a:hover{background:url(pwicon/choose.gif) 1px 4px no-repeat;background-color:#e6f2fe; text-decoration:none;color:#333;}
 /*menu*/
 .pw_menu{border:1px solid #a6cbe7;background:#fff;}
 .pw_menuBg{padding:0 10px 10px;}
@@ -346,7 +346,7 @@ select{padding:1px;}
 .menuSkin li:hover,.menuSkin li.current{border:2px solid #65b954;}
 .menuSkin li i{width:114px;height:60px;cursor:pointer;display:block;}
 .menuSkin li p{padding-top:5px;}
-.menuSkin li span{padding:6px 0 2px; text-align:center;display:block;cursor:pointer;}
+.menuSkin li span{padding:6px 0 2px; text-align:center;display:block;cursor:pointer;float:left;width:100%;}
 .menuSkin li input{padding:0;margin:0; vertical-align:middle;display:none;}
 .menuSkin li.current span,.menuSkin li.current p{background:url(register/regright.png) 95px 5px no-repeat;}
 /*warn*/
@@ -378,3 +378,8 @@ a.new_topbar_mes{background:url(email.gif) 0 4px no-repeat;padding-left:18px;col
 .menu_topup3 li{height:22px;overflow:hidden;}
 .menu_topup3 a{display:block;line-height:22px;padding:0 6px;color:#676767;height:22px;}
 .menu_topup3 a:hover{background-color:#e6f2fe; text-decoration:none;}
+.tpc_content ol,.tpc_content ol li{list-style-type:decimal;}
+.tpc_content ul,.tpc_content ul li{list-style-type:disc;}
+/*up top*/
+#scrollBar a{background:url(pwicon/top.png) no-repeat;width:19px;height:57px;display:block;overflow:hidden; text-indent:-2000em; cursor:pointer;}
+#scrollBar a:hover{ background-position: right 0;}

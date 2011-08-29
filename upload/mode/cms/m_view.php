@@ -8,6 +8,7 @@ S::gp(array('id', 'page'), '', 2);
 $stylepath = L::style('stylepath');
 $articleService = C::loadClass('articleservice'); /* @var $articleService PW_ArticleService */
 $articleModule = $articleService->getArticleModule($id);
+if($articleModule->ifcheck == 2) Showmsg(data_error);
 
 if (!is_object($articleModule) || (!isGM($windid) && !checkEditPurview($windid) && $articleModule->postDate > $timestamp)) Showmsg('文章不存在');
 $content = cookContent($articleModule, $page);
@@ -24,7 +25,8 @@ $pagePosition = getPosition($articleModule->columnId,$id,'',$cms_sitename);
 $pageCache = L::loadClass('pagecache', 'pagecache');
 $pageCacheConfig = C::loadClass('pagecacheconfigview', 'pagecache');
 $pageCache->init($pageCacheConfig);
-
+$tmpHotArticle = $pageCache->getData('hotArticle');
+$hotArticle = $articleService->filterArticles($tmpHotArticle);
 /* 记录hits */
 updateArticleHitsDatanalyse($articleModule->articleId, $articleModule->columnId, $articleModule->hits);
 $column = $columnService->findColumnById($articleModule->columnId);

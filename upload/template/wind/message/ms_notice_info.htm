@@ -1,4 +1,6 @@
 <!--<?php
+require_once (R_P . 'require/bbscode.php');
+$message['content'] = convert($message['content'], $windpost);
 $postTime = get_date($message['created_time']);
 print <<<EOT
 -->
@@ -15,27 +17,18 @@ print <<<EOT
 			系统
 		</td>
 	</tr>
-	<tr class="tr3" >
-		<td>
-			标&nbsp;题：
-		</td>
-		<td class="s5">
-			$message[title]
-		</td>
-	</tr>
 	<tr class="tr3">
 		<td>
-			时&nbsp;间：
+			时　间：
 		</td>
-		<td class="s5">
-			$postTime
-		</td>
+		<td class="s5">{$postTime}</td>
 	</tr>
 	<tr class="tr3">
 		<td style="vertical-align:top">
-			内&nbsp;容：                  
+			内　容：                  
 		</td>
 		<td class="s5">
+			<h1 class="mb10">$message[title]</h1>
 			$message[content]                	
 		</td>
 	</tr>

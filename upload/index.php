@@ -12,7 +12,8 @@ if ($db_channeldomain && $secdomain = array_search($pwServer['HTTP_HOST'], $db_c
 }
 selectMode($m);
 if (defined('M_P') && file_exists(M_P . 'index.php')) {
-	@include_once pwCache::getPath(S::escapePath(D_P . 'data/bbscache/' . $db_mode . '_config.php'));
+	//* @include_once pwCache::getPath(S::escapePath(D_P . 'data/bbscache/' . $db_mode . '_config.php'));
+	pwCache::getData(S::escapePath(D_P . 'data/bbscache/' . $db_mode . '_config.php'));
 	if (file_exists(M_P . 'require/core.php')) {
 		require_once (M_P . 'require/core.php');
 	}
@@ -21,8 +22,10 @@ if (defined('M_P') && file_exists(M_P . 'index.php')) {
 	exit();
 }
 
-include_once pwCache::getPath(D_P . 'data/bbscache/cache_index.php',true);
-include_once pwCache::getPath(D_P . 'data/bbscache/forum_cache.php',true);
+//* include_once pwCache::getPath(D_P . 'data/bbscache/cache_index.php',true);
+//* include_once pwCache::getPath(D_P . 'data/bbscache/forum_cache.php',true);
+pwCache::getData(D_P . 'data/bbscache/cache_index.php');
+pwCache::getData(D_P . 'data/bbscache/forum_cache.php');
 
 //notice
 $noticedb = array();
@@ -44,12 +47,15 @@ $newpic = (int) GetCookie('newpic');
 $forumdb = $catedb = $showsub = array();
 $c_htm = 0;
 $sqlwhere = '';
+$updateDaily = 1;
+
 if ($cateid > 0) {
 	$catestyle = $forum[$cateid]['style'];
 	($catestyle && file_exists(D_P . "data/style/$catestyle.php")) && $skin = $catestyle;
 	$_seo = array('title' => $forum[$cateid]['title'], 'metaDescription' => $forum[$cateid]['metadescrip'], 'metaKeywords' => $forum[$cateid]['keywords']);
 	bbsSeoSettings('thread', $_seo, $forum[$cateid]['name'], '');
 	$sqlwhere = 'AND (f.fid=' . S::sqlEscape($cateid) . ' OR f.fup=' . S::sqlEscape($cateid) . ')';
+	$updateDaily = 0;
 } elseif ($db_forumdir) {
 	require_once (R_P . 'require/dirname.php');
 }
@@ -72,8 +78,21 @@ if ($cookie_deploy = $_COOKIE['deploy']) {
 	$deployfids = array();
 }
 
-$query = $db->query("SELECT f.fid,f.name,f.type,f.childid,f.fup,f.logo,f.descrip,f.metadescrip,f.forumadmin,f.across,f.allowhtm,f.password,f.allowvisit,f.showsub,f.ifcms,fd.tpost,fd.topic,fd.article,fd.subtopic,fd.top1,fd.lastpost FROM pw_forums f LEFT JOIN pw_forumdata fd USING(fid) WHERE f.ifsub='0' AND f.ifcms!=2 $sqlwhere ORDER BY f.vieworder");
-while ($forums = $db->fetch_array($query)) {
+if (!$cateid && Perf::checkMemcache()) {
+	$_cacheService = Perf::getCacheService();
+	$_tmpForums = $_cacheService->get('all_forums_info');
+}
+
+if (!Perf::checkMemcache() || !$_tmpForums){
+	$query = $db->query("SELECT f.fid,f.name,f.type,f.childid,f.fup,f.logo,f.descrip,f.metadescrip,f.forumadmin,f.across,f.allowhtm,f.password,f.allowvisit,f.showsub,f.ifcms,fd.tpost,fd.topic,fd.article,fd.subtopic,fd.top1,fd.lastpost FROM pw_forums f LEFT JOIN pw_forumdata fd USING(fid) WHERE f.ifsub='0' AND f.ifcms!=2 $sqlwhere ORDER BY f.vieworder");
+	$_tmpForums = array();
+	while ($forums = $db->fetch_array($query)) {
+		$_tmpForums[$forums['fid']] = $forums;
+	}
+	!$cateid && Perf::checkMemcache() &&  $_cacheService->set('all_forums_info', $_tmpForums, 300);
+}
+
+foreach ($_tmpForums as $forums) {
 	if ($forums['type'] === 'forum') {
 		if ($forums['showsub'] && $forums['childid']) {
 			$showsub[$forums['fid']] = '';
@@ -101,8 +120,11 @@ while ($forums = $db->fetch_array($query)) {
 		}
 		$forums['allowhtm'] == 1 && $c_htm = 1;
 		if ($db_indexfmlogo == 2) {
-			if (!empty($forums['logo']) && strpos($forums['logo'], 'http://') === false && file_exists($attachdir . '/' . $forums['logo'])) {
-				$forums['logo'] = "$attachpath/$forums[logo]";
+			if (!empty($forums['logo']) && strpos($forums['logo'], 'http://') !== false) {
+				$forums['logo'] = $forums[logo];
+			} elseif (!empty($forums['logo'])) {
+				$forumLogo = geturl($forums[logo]);
+				$forums['logo'] = $forumLogo[0];
 			}
 		} elseif ($db_indexfmlogo == 1 && file_exists("$imgdir/$stylepath/forumlogo/$forums[fid].gif")) {
 			$forums['logo'] = "$imgpath/$stylepath/forumlogo/$forums[fid].gif";
@@ -152,7 +174,7 @@ while ($forums = $db->fetch_array($query)) {
 		}
 		$catedb[] = $forums;
 	}
-}
+} 
 $db->free_result($query);
 // View sub
 if (!empty($showsub)) {
@@ -197,9 +219,10 @@ $tposts  += $o_tpost;
 // online users
 Update_ol();
 if (empty($db_online)) {
-	include_once pwCache::getPath(D_P . 'data/bbscache/olcache.php',true);
+	include_once (D_P . 'data/bbscache/olcache.php');
 } else {
 	$userinbbs = $guestinbbs = 0;
+	/**
 	$query = $db->query("SELECT uid!=0 as ifuser,COUNT(*) AS count FROM pw_online GROUP BY uid!='0'");
 	while ($rt = $db->fetch_array($query)) {
 		if ($rt['ifuser']) {
@@ -207,10 +230,19 @@ if (empty($db_online)) {
 		} else {
 			$guestinbbs = $rt['count'];
 		}
+	}**/
+	
+	if (count($online_info =  explode("\t", GetCookie('online_info'))) == 3 && $timestamp - $online_info[0] < 60){
+		list(, $userinbbs, $guestinbbs) = $online_info;
+	}else {
+		$onlineService = L::loadClass('OnlineService', 'user');
+		$userinbbs = $onlineService->countOnlineUser();
+		$guestinbbs = $onlineService->countOnlineGuest();
+		Cookie('online_info', $timestamp . "\t" . $userinbbs . "\t" . $guestinbbs);
 	}
 }
 
-if($last_statistictime == 0 || get_date($timestamp,'G') - get_date($last_statistictime,'G') > 1 ||  $timestamp - $last_statistictime > 3600){
+if ($last_statistictime == 0 || get_date($timestamp,'G') - get_date($last_statistictime,'G') > 1 ||  $timestamp - $last_statistictime > 3600) {
 	$stasticsService = L::loadClass('Statistics', 'datanalyse');
 	$stasticsService->updateOnlineInfo();
 }
@@ -221,14 +253,16 @@ if ($db_indexonline) {
 	empty($online) && $online = GetCookie('online');
 	if ($online == 'yes') {
 		if ($usertotal > 2000 && !S::inArray($windid, $manager)) {
-			$online = 'no';
-			Cookie('online', $online);
+			//$online = 'no';
+			Cookie('online', 'no');
 		} else {
 			$index_whosonline = '';
 			$db_online = intval($db_online);
+			Cookie('online', $online);
 			include_once S::escapePath(R_P . "require/online_{$db_online}.php");
 		}
 	}
+	if ($online == 'no') Cookie('online', 'no');
 }
 $showgroup = $db_showgroup ? explode(',', $db_showgroup) : array();
 
@@ -237,15 +271,16 @@ if ($db_indexmqshare && $sharelink[1]) {
 	$sharelink[1] = "<marquee scrolldelay=\"100\" scrollamount=\"4\" onmouseout=\"if (document.all!=null){this.start()}\" onmouseover=\"if (document.all!=null){this.stop()}\" behavior=\"alternate\">$sharelink[1]</marquee>";
 }
 
-if ($db_hostweb == 1 && $groupid != 'guest' && !$cateid && $tdtcontrol < $tdtime && !defined('M_P')) {
+if ($db_hostweb == 1 && $updateDaily && $tdtcontrol < $tdtime && !defined('M_P')) {
 	require_once (R_P . 'require/updateforum.php');
 	updateshortcut();
 	pwQuery::update('pw_bbsinfo', 'id=:id', array(1), array('yposts' => $tposts, 'tdtcontrol' => $tdtime, 'o_tpost' => 0));
-	$db->update("UPDATE pw_forumdata SET tpost=0 WHERE tpost<>'0'");
+	//* $db->update("UPDATE pw_forumdata SET tpost=0 WHERE tpost<>'0'");
+	pwQuery::update('pw_forumdata', 'tpost<>:tpost', array(0), array('tpost'=>0));
 }
 
 // update posts hits
-if ($c_htm || $db_hithour) {
+if ($c_htm || $db_hits_store == 2) {
 	$db_hithour == 0 && $db_hithour = 4;
 	$hit_wtime = $hit_control * $db_hithour;
 	$hit_wtime > 24 && $hit_wtime = 0;

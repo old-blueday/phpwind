@@ -83,6 +83,7 @@ if ($action == 'showping') {
 		InitGP(array('cid','addpoint','ifmsg','atc_content','ifpost'), 'P');
 		if($ifpost){
 			$len = strlen($atc_content);
+			list($postq,$showq) = explode("\t", $db_qcheck);
 			PostCheck(1, ($db_gdcheck & 4) && (!$db_postgd || $winddb['postnum'] < $db_postgd), ($db_ckquestion & 4 && (!$postq || $winddb['postnum'] < $postq) && $db_question));
 			if($len < $db_postmin){
 				Showmsg("回复内容长度不能小于{$db_postmin}字节");
@@ -101,7 +102,7 @@ if ($action == 'showping') {
 				echo "success\t{$pingLog}";
 				ajax_footer();
 			} else {
-				refreshto("read.php?tid=$tid&page=$page#$jump_pid",'operate_success');
+				refreshto("read.php?tid=$tid&displayMode=1&page=$page#$jump_pid",'operate_success');
 			}
 		} else {
 			showmsg($return);
@@ -121,7 +122,7 @@ if ($action == 'showping') {
 				echo "success\t{$pingLog}\tcancel";
 				ajax_footer();
 			} else {
-				refreshto("read.php?tid=$tid&page=$page#$jump_pid",'operate_success');
+				refreshto("read.php?tid=$tid&displayMode=1&page=$page#$jump_pid",'operate_success');
 			}
 		} else {
 			showmsg($return);
@@ -230,7 +231,7 @@ if ($action == 'showping') {
 				$StaticPage->update($tid);
 			}
 		}
-		refreshto("read.php?tid=$tid&page=$page#$jump_pid",'operate_success');
+		refreshto("read.php?tid=$tid&displayMode=1&page=$page#$jump_pid",'operate_success');
 	}
 } elseif ($action == 'remind') {
 
@@ -286,7 +287,7 @@ if ($action == 'showping') {
 					pwQuery::update($pw_posts, 'pid=:pid AND tid=:tid', array($post['pid'], $tid), array('remindinfo' => $remindinfo));
 				} else {
 					$db->update("UPDATE $pw_tmsgs SET remindinfo=".S::sqlEscape($remindinfo).' WHERE tid='.S::sqlEscape($tid));
-					Perf::gatherInfo('changeThreadWithThreadIds', array('tid'=>$tid));		
+					Perf::gatherInfo('changeTmsgWithThreadIds', array('tid'=>$tid));		
 				}
 				if ($ifmsg) {
 					M::sendNotice(
@@ -334,11 +335,12 @@ if ($action == 'showping') {
 				if ($post['pid'] > 0) {
 					pwQuery::update($pw_posts, 'pid=:pid AND tid=:tid', array($post['pid'], $tid), array('remindinfo' => ''));
 				} else {
-					$db->update("UPDATE $pw_tmsgs SET remindinfo='' WHERE tid=".S::sqlEscape($tid));
+					//* $db->update("UPDATE $pw_tmsgs SET remindinfo='' WHERE tid=".S::sqlEscape($tid));
+					pwQuery::update($pw_tmsgs, 'tid=:tid', array($tid), array('remindinfo'=>''));
 				}
 			}
 		}
-		refreshto("read.php?tid=$tid&page=$page#$jump_pid",'operate_success');
+		refreshto("read.php?tid=$tid&displayMode=1&page=$page#$jump_pid",'operate_success');
 	}
 } elseif ($action == 'toweibo') {
 
@@ -346,11 +348,12 @@ if ($action == 'showping') {
 	$numbers = $messageService->statisticUsersNumbers(array($winduid));
 	$totalMessage = isset($numbers[$winduid]) ? $numbers[$winduid] : 0;
 	$max = (int)$_G['maxmsg'];
-	S::gp(array('type','id','tid','cyid'));
+	S::gp(array('type','id','tid','cyid','tucool'));
 	require_once(R_P. 'apps/weibo/lib/sendweibo.class.php');
 	$sendWeiboServer = getWeiboFactory($type);
 	$sendWeiboServer->init($id);
 	$content = $sendWeiboServer->getContent();
+	if ($tucool) $content = '这个帖子的图片不错哦~'.$content;
 	$mailSubject = $sendWeiboServer->getMailSubject();
 	$mailContent = $sendWeiboServer->getMailContent();
 	$pids = $sendWeiboServer->getPids();
@@ -394,7 +397,8 @@ if ($action == 'showping') {
 			$rs = $db->get_one("SELECT $sqlsel t.fid,f.forumadmin FROM $sqltab LEFT JOIN pw_forums f USING(fid) $sqladd");
 
 			if ($rs['forumadmin']) {
-				include_once pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
+				//* include_once pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
+				pwCache::getData(D_P.'data/bbscache/forum_cache.php');
 				$admin_a = explode(',',$rs['forumadmin']);
 				$iftpc = $pid ? '0' : '1';
 				M::sendMessage(
@@ -421,7 +425,7 @@ if ($action == 'showping') {
 		if (defined('AJAX')) {
 			Showmsg('report_success');
 		} else {
-			refreshto("read.php?tid=$tid&page=$page",'report_success');
+			refreshto("read.php?tid=$tid&displayMode=1&page=$page",'report_success');
 		}
 	}
 } else {

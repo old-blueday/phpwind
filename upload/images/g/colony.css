@@ -210,21 +210,13 @@ a.help_a:hover{text-decoration:none;position:relative;}
 a.help_a:hover i{display:block;}
 
 /*select*/
-.dropdown {outline:none;}
-.dropdown h4{cursor:default; text-indent:5px;}
+.dropdown {outline:none;border:solid 1px #AAA;display:inline-block;}
 .dropdown * {-moz-user-select:none;}
-.dropdown h4.over {}
-.dropdown div {}
-.dropdown span {position:absolute;}
 .dropdown ul{position:absolute;display:none;}
 .dropdown ul li{text-indent:5px;}
-.dropdown ul li.over{}
-.dropselectbox {background:#fff;}
-.dropdown {float:left;}
-.dropdown button{display:block;text-align:left;margin:0;padding-left:5px;height:21px; font:12px Arial, Helvetica, sans-serif; border:solid 1px #AAA;background:url(droparrow.gif) no-repeat right center;}
-.dropdown button.over{border-color:#369; background-image:url(droparrowover.gif);}
-.dropdown button.current{border-color:#003;}
-.dropdown ul{border:1px solid #AAA; background:#FFF;}
+.dropselectbox {background:#fff;padding:0; display:inline-block;}
+.dropdown button{display:inline-block;overflow:visible;text-align:left;margin:0;text-indent:5px;padding:0;height:19px;font-size:12px;background:url(droparrow.gif) no-repeat right center;text-decoration:none;vertical-align:middle;white-space:nowrap;cursor:pointer;border:0 none;padding-bottom:2px;*padding-bottom:0;}
+.dropdown ul{border:1px solid #AAA; background:#FFF;margin-top:19px;margin-left:-1px;}
 .dropdown ul li{background:#FFF;height:19px;display:block;cursor:default;font:400 12px/19px Arial, Helvetica, sans-serif;}
 .dropdown ul li.over{background:#369; color:#FFF;}
 

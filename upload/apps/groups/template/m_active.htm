@@ -222,6 +222,10 @@ EOT;
 $key_lang = array(1=>'出游',2=>'聚餐 ',3=>'舞会',4=>'户外',5=>'烧烤',6=>'其他');
 print <<<EOT
 -->
+<script>
+var db_urlcheck = "$db_urlcheck";
+var db_bbsurl = '$db_bbsurl';
+</script>
 	<div class="fl g_contentA">
     	<div class="g_tA">
 		<div class="p10" style="min-height:950px;_height:950px;">
@@ -350,10 +354,10 @@ print <<<EOT
 							<div class="mb10" id="att_$pic[aid]">
 <!--
 EOT;
-			if($pic['desc']){
+			if($pic['descrip']){
 print <<<EOT
 -->
-								描述:$pic[desc]<br />
+								描述:$pic[descrip]<br />
 <!--
 EOT;
 			}
@@ -384,10 +388,10 @@ print <<<EOT
 							<div class="mb10" id="att_$attach[aid]">
 <!--
 EOT;
-			if($attach['desc']){
+			if($attach['descrip']){
 print <<<EOT
 -->
-								描述:$attach[desc]<br />
+								描述:$attach[descrip]<br />
 <!--
 EOT;
 			}
@@ -760,6 +764,7 @@ EOT;
 		<form action="{$basename}a=$a&job=$job&cyid=$cyid" method="post" enctype="multipart/form-data" name="FORM" onsubmit="return checkpost(document.FORM);" >
 		<input type="hidden" name="step" value="3" />
 		<input type="hidden" name="id" value="$id" />
+		<input type="hidden" name="owner" value="{$active[uid]}" />
 			<table width="100%" border="0" cellspacing="0" cellpadding="0" class="g_table2 vt">
 				<tr>
 					<td width="120px">活动名称&nbsp;<span class="s1">*</span></td>
@@ -838,116 +843,8 @@ EOT;
 					<td>
 <!--
 EOT;
-require_once PrintEOT('wysiwyg_editor');
-if($isGM || $db_allowupload && $_G['allowupload']){print <<<EOT
--->
-							<div class="c mb10"></div>
-							<div class="w_editor_up">
-								<div style="height:23px;">
-									<div style="line-height:18px;padding:5px 0 0 10px;*padding:3px 0 0 10px;" class="fr"></div>
-									<ul class="w_tab_a cc">
-										<li class="current" id="formUploadBtn"><a href="javascript:;" hidefocus="true">普通上传</a></li>
-										<li id="batUploadBtn"><a href="javascript:;" hidefocus="true">批量上传</a></li>
-<!--
-EOT;
-if ($mutiupload > 0) {print <<<EOT
--->
-										<li id="flashAtt_use" class="none_css"><a href="javascript:;" onclick="flashAtt.use();" hidefocus="true" style="padding-right:0;">已有附件($mutiupload)</a></li>
-										<li id="flashAtt_clear" class="none_css"><a href="javascript:;" onclick="flashAtt.clear();" hidefocus="true">清空已有附件&nbsp;</a></li>
-<!--
-EOT;
-}print <<<EOT
--->
-										<!-- <li style="width:150px;"><table class="fl"><tr><td style="padding:5px 0 0 10px;*padding:0 0 0 10px;width:16px;"><input align="absbottom" name="atc_hideatt" type="checkbox" value="1" $htmlatt /></td><td style="padding:2px 0 0 0;">隐藏附件(回复可见)</td></tr></table></li> -->
-										<li class="none_css"><a href="javascript:;" class="wy_tips" style="padding-right:14px;">&nbsp;可上传类型<i style="width:250px;">$uploadfilesize</i></a></li>
-									</ul>
-								</div>
-<script type="text/javascript">
-$('formUploadBtn').onclick = function() {
-	var a=$('attach').getElementsByTagName("tr");
-	$('batUpload').style.display='none'
-	a[a.length-1].style.display='';
-	$('batUploadBtn').className="";
-	this.className="current";
-};
-$('batUploadBtn').onclick = function() {
-	var a=$('attach').getElementsByTagName("tr");
-	$('batUpload').style.display=''
-	a[a.length-1].style.display='none';
-	$('formUploadBtn').className="";
-	this.className="current";
-};
-initCheckTextNum('atc_title','atc_title_warn','$db_titlemax');
-initCheckTextNum('address','address_warn','$db_titlemax');
-initCheckTextNum('introduction','introduction_warn',130);
-</script>
-
-								<div class="w_editor_up_con">
-<!--
-EOT;
-if($attach){print <<<EOT
--->
-									<div class="cc">该帖包含附件<span class="gray">(不想保留的附件去掉√)</span> :
-										<table class="tr_p10" style="table-layout:fixed">
-											<tr class="gray">
-												<td width="20"></td>
-												<td width="220">附件</td>
-												<td width="180">描述</td>
-												<td width="65" style="display:none;">售/密</td>
-												<td width="65" style="display:none;">积分</td>
-												<td width="60" style="display:none;">价格</td>
-												<td width="100"></td>
-											</tr>
-											<tbody id="ajaxtable"></tbody>
-										</table>
-									</div>
-<script language="JavaScript">
-var attachs = {{$attach}};
-oldAtt.init();
-</script>
-<!--
-EOT;
-}print <<<EOT
--->
-									<div class="cc">
-										<table id="uploadFileInfo" class="uploadFileInfo" style="display:none;margin-bottom:10px;">
-											<tr class="s1">
-												<td>文件名</td><td width="15%">大小</td><td width="20%">上传进度</td><td width="5%">删</td>
-											</tr>
-											<tbody id="qlist"></tbody>
-										</table>
-										<table class="tr_p10" style="table-layout:fixed">
-											<tr valign="top" id="formUpload" class="gray">
-												<td width="250">上传附件 (图片、文件等)</td>
-												<td width="180">描述</td>
-												<td width="65" style="display:none;">售/密</td>
-												<td width="65" style="display:none;">积分</td>
-												<td width="60" style="display:none;">价格</td>
-												<td width="100">&nbsp;</td>
-											</tr>
-											<tbody id="attach"></tbody>
-										</table>
-										<div id="viewimg" class="menu menu_img" style="display:none;"></div>
-									</div>
-									<div id="batUpload" style="display:none;">
-										<div style="display:none">批量上传附件 <!-- <span id="attsize">(有效文件类型:$uploadfilesize)</span> --></div>
-										<!--  <div class="c"></div> -->
-										<!-- <div>批量上传附件 (图片、文件等，可多选)</div> -->
-										<div style="width:100%;padding:0 0 2px 10px;">
-											<div id="flashUploadPanel" style="width:196px;height:24px;"></div>
-										</div>
-									</div>
-									<div class="c"></div>
-								</div>
-							</div>
-<script language="JavaScript">
-var mutiupload = '$mutiupload';
-flashAtt.init();
-newAtt.create();
-</script>
-<!--
-EOT;
-}print <<<EOT
+require_once PrintEOT('wysiwyg_editor_active');
+print <<<EOT
 -->
 					</td>
 				</tr>
@@ -960,47 +857,51 @@ EOT;
 		</div>
 	</div>
 <SCRIPT LANGUAGE="JavaScript">
+initCheckTextNum('atc_title','atc_title_warn','$db_titlemax');
+initCheckTextNum('address','address_warn','$db_titlemax');
+initCheckTextNum('introduction','introduction_warn',130);
 document.FORM.Submit.disabled = false;
+var cnt = 0;
 function checkpost(obj) {
-	if (obj.title.value == "") {
-		obj.atc_title.focus();
-		showDialog("error","活动名称不能为空",2);
+	if (obj.atc_title.value == "") {
+		showDialog("error","活动名称不能为空",2,function(){obj.atc_title.focus();});
 		return false;
-	}　else if (obj.type.value == "") {
+	} else if (obj.type.value == "") {
 		obj.atc_title.focus();
 		showDialog("error","请选择活动类型",2);
 		return false;
-	}　else if (obj.limitnum.value && obj.limitnum.value != parseInt(obj.limitnum.value)) {
+	} else if (obj.limitnum.value && obj.limitnum.value != parseInt(obj.limitnum.value)) {
 		obj.limitnum.focus();
 		showDialog("error","人数上限类型为数字!",2);
 		return false;
-	}　else if (obj.price.value && obj.price.value != parseFloat(obj.price.value)) {
+	} else if (obj.price.value && obj.price.value != parseFloat(obj.price.value)) {
 		obj.price.focus();
 		showDialog("error","活动费用类型为数字!",2);
 		return false;
-	}　else if (!obj.begintime.value|| !obj.endtime.value) {
+	} else if (!obj.begintime.value|| !obj.endtime.value) {
 		obj.begintime.focus();
 		showDialog("error","请填写活动开始时间和结束时间!",2);
 		return false;
-	}　else if (compTime(obj.begintime.value,obj.endtime.value) == 1 || compTime(obj.begintime.value,obj.endtime.value) == 0) {
+	} else if (compTime(obj.begintime.value,obj.endtime.value) == 1 || compTime(obj.begintime.value,obj.endtime.value) == 0) {
 		obj.atc_title.focus();
 		showDialog("error","活动开始时间不能大于结束时间!",2);
 		return false;
-	}　else if (obj.deadline.value == "") {
+	} else if (obj.deadline.value == "") {
 		obj.deadline.focus();
 		showDialog("error","请填写报名截止时间!",2);
 		return false;
-	}　else if (compTime(obj.deadline.value,obj.endtime.value) == 1 || compTime(obj.deadline.value,obj.endtime.value) == 0) {
+	} else if (compTime(obj.deadline.value,obj.endtime.value) == 1 || compTime(obj.deadline.value,obj.endtime.value) == 0) {
 		obj.deadline.focus();
 		showDialog("error","报名截止时间不能大于活动结束时间!",2);
 		return false;
-	}　else if (obj.introduction.value == "") {
+	} else if (obj.introduction.value == "") {
 		obj.introduction.focus();
 		showDialog("error","请填写活动介绍!",2);
 		return false;
-	}　else if (obj.content.value == "") {
-		obj.content.focus();
-		showDialog("error","活动详情不为空!",2);
+	} else if (obj.atc_content.value == "") {
+		showDialog("error","活动详情不为空!",2,function(){
+			editor.focus();
+		});
 		return false;
 	}
 	document.FORM.Submit.disabled = true;
@@ -1040,27 +941,8 @@ function compTime(beginTime, endTime) {
     }
 }
 </SCRIPT>
-<!--
-EOT;
-if (R_P != D_P) {
-$facedb = readover(D_P.'data/bbscache/face.js');
-print <<<EOT
--->
-<script language="javascript">
-{$facedb}
-</script>
-<!--
-EOT;
-}else{print <<<EOT
--->
-<script language="JavaScript" src="data/bbscache/face.js"></script>
-<!--
-EOT;
-}print <<<EOT
--->
 	<div id="menu_face" class="menu" style="display:none;"></div>
 	<div id="menu_generalface" class="menu" style="display:none;"></div>
-	<script type="text/javascript">editor.init('$editor', 0);</script>
 <!--
 EOT;
 }print <<<EOT

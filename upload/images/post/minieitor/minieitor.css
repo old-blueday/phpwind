@@ -24,7 +24,7 @@
 .face_main{height:200px;overflow-Y:auto}
 .face_main ul{padding:5px 0 0 5px;}
 .face_main li{float:left;width:40px;margin:7px 7px 0;display:inline;}
-.face_main li img{max-width:32px;max-height:32px;padding:3px;}
+.face_main li img{max-width:32px;max-height:32px;padding:3px;_width:32px;_height:32px;float:left;}
 .face_main li a{border:1px solid #fff;display:block;float:left;}
 .face_main li a:hover{border:1px solid #76daff;}
 .face_pages{padding:10px 0 10px 10px;}

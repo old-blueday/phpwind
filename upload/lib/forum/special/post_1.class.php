@@ -60,7 +60,9 @@ class postSpecial {
 	function setOpts($opts, $oldopts = array()) {
 		$array = array();
 		foreach ($opts as $key => $value) {
+			$value = str_replace('&nbsp;', ' ', $value);
 			if ($value = trim($value)) {
+				$value = str_replace(' ', '&nbsp;', $value);
 				$array[$key] = array(stripslashes($value), isset($oldopts[$key][1]) ? $oldopts[$key][1] : 0);
 			}
 		}
@@ -70,7 +72,7 @@ class postSpecial {
 		} elseif ($vtcount > $this->maxselect) {
 			Showmsg('vote_num_limit');
 		}
-		$this->data['voteopts'] = serialize($array);
+		$this->data['voteopts'] = addslashes(serialize($array));
 
 		return $vtcount;
 	}
@@ -98,7 +100,7 @@ class postSpecial {
 		$timelimit < 0 && $timelimit = 0;
 		$postnumlimit < 0 && $postnumlimit = 0;
 		$regdatelimit = strtotime($regdatelimit);
-		$regdatelimit = $regdatelimit > $timestamp ? $timestamp : $regdatelimit;
+		//$regdatelimit = $regdatelimit > $timestamp ? $timestamp : $regdatelimit;
 
 		$creditlimit_temp = array();
 		foreach ($creditlimit as $key => $value) {
@@ -118,8 +120,14 @@ class postSpecial {
 	}
 
 	function initData() {
-		$vt_select = explode("\n", S::escapeChar(S::getGP('vt_select', 'P')));
-		$vtcount = $this->setOpts($vt_select);
+		$vt_select = S::escapeChar(S::getGP('vt_select', 'P'));
+		$options = array();
+		foreach ($vt_select as $key => $value) {
+			$value = trim(str_replace('&nbsp;', ' ', $value));
+			if (!$value) continue;
+			$options[] = str_replace(' ', '&nbsp;', $value);
+		}
+		$vtcount = $this->setOpts($options);
 		$this->setUp($vtcount);
 	}
 

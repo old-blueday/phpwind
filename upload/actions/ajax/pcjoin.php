@@ -84,7 +84,8 @@ if ($thelast != 1) {
 		//通知
 		$threadInfo = $db->get_one("SELECT * FROM pw_threads WHERE tid=".S::sqlEscape($tid));
 		$createTime = get_date($threadInfo['postdate']);
-		require_once pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
+		//* require_once pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
+		pwCache::getData(D_P.'data/bbscache/forum_cache.php');
 		M::sendNotice(
 			array($threadInfo['author']),
 			array(
@@ -102,7 +103,7 @@ if ($thelast != 1) {
 						'subject' => $threadInfo['subject']
 					)
 				),
-			),'notice_active','notice_active'
+			),'notice_postcate','notice_postcate'
 			);
 		
 		Showmsg('pcjoin_nextstep');

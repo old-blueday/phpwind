@@ -3,4 +3,197 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>phpwind寮
+<title>phpwind开发文档</title>
+<link rel="stylesheet" type="text/css" href="../images/pages.css" />
+</head>
+<body>
+        	<h1 class="h1A">文件目录结构</h1>
+            <div class="content cc">
+                      <P>phpwind V8.3 安装包为zip 的格式压缩，解压后的目录结构如下所示：
+<table width="80%" cellpadding="0" cellspacing="0" border="0" class="code">
+
+<tr><td width="30%" valign="top">
+<ul class="nolist" style="padding:0;margin:0;line-height:22px;">
+<li>./Index.htm  </li>
+<li>./docs/ </li>
+<li>./upload/ </li>
+	<li class="one">actions/ </li> 
+	<li class="one">admin/ </li> 
+	<li class="one">api/</li>
+	<li class="one">apps/</li>
+	<li class="one">attachment/ </li>
+	<li class="one">data/ </li>
+	<li class="one">hack/</li>
+    <li class="one">html/ </li>
+	<li class="one">images/	 </li>
+	<li class="one">ipdata/</li>
+	<li class="one">js/</li>
+	<li class="one">lang/ </li>
+	<li class="one">lib/ </li>
+	<li class="one">m/ </li>
+	<li class="one">mode/ </li>
+	<li class="one">require/</li>
+	<li class="one">simple/	</li>
+	<li class="one">template/ </li>
+	<li class="one">u/ </li>
+	<li class="one">uc_client/ </li>
+    <li class="one">act_alipay_push.php </li>
+    <li class="one">act_alipay_receive.php </li>
+	<li class="one">active.php </li>
+	<li class="one">admin.php </li>
+	<li class="one">ajax.php </li>
+	<li class="one">alipay.php </li>
+	<li class="one">apps.php </li>
+	<li class="one">cate.php </li>
+	<li class="one">ck.php	</li>
+    <li class="one">ckquestion.php	</li>
+	<li class="one">columns.php </li>
+	<li class="one">faq.php	</li>
+	<li class="one">favicon.ico </li>
+	<li class="one">forumcp.php </li>
+	<li class="one">global.php </li>
+    <li class="one">group.php </li>
+	<li class="one">hack.php </li>
+	<li class="one">header.php </li>
+	<li class="one">hitcache.php </li>
+	<li class="one">index.php </li>
+	<li class="one">install.php </li>
+	<li class="one">job.php	 </li>
+	<li class="one">jobcenter.php</li>
+	<li class="one">left.php </li>
+	<li class="one">licence.txt </li>
+	<li class="one">link.php </li>
+	<li class="one">login.php </li>
+	<li class="one">logo.gif </li>
+	<li class="one">masingle.php </li>
+	<li class="one">mawhole.php </li>
+	<li class="one">mawholecolony.php </li>
+	<li class="one">member.php </li>
+	<li class="one">message.php </li>
+	<li class="one">mode.php </li>
+	<li class="one">new.php	</li>
+	<li class="one">notice.php </li>
+	<li class="one">operate.php </li>
+	<li class="one">passport_client.php </li>
+	<li class="one">pay99bill.php </li>
+	<li class="one">paypal.php </li>
+    <li class="one">post.php </li>
+	<li class="one">profile.php </li>
+	<li class="one">push.php </li>
+	<li class="one">pw_ajax.php </li>
+	<li class="one">pw_api.php </li>
+    <li class="one">pweditor.php</li>
+	<li class="one">read.php </li>
+	<li class="one">register.php</li>
+	<li class="one">remail.php </li>
+	<li class="one">robots.txt </li>
+	<li class="one">rss.php </li>
+	<li class="one">search.php </li>
+	<li class="one">searcher.php </li>
+	<li class="one">sendemail.php </li>
+	<li class="one">sendpwd.php </li>
+	<li class="one">show.php </li>
+	<li class="one">sitemap.php </li>
+    <li class="one">slide.php</li>
+	<li class="one">sort.php </li>
+	<li class="one">tenpay.php </li>
+	<li class="one">thread.php </li>
+	<li class="one">trade.php</li>
+	<li class="one">u.php</li>
+	<li class="one">userpay.php </li>
+</ul></td>
+<td width="70%" valign="top">
+<ul class="nolist" style="padding:0;margin:0;line-height:22px;">
+	<li>使用说明引导页面</li>
+	<li>使用说明内容页</li>
+	<li>程序及相关文件（安装时，上传此目录下的所有文件）</li>
+	<li>站点原有过程拆分文件存放目录，如ajax程序等</li>
+	<li>系统后台操作相关文件</li> 
+	<li>二次开发接口文件目录</li>
+	<li>APP应用程序目录</li>
+	<li>附件存放目录</li>
+	<li>缓存数据存放目录</li>
+	<li>插件存放目录</li>
+    <li>论坛静态页面存放目录</li>
+	<li>系统图片存放目录</li>
+	<li>IP库</li>
+	<li>JavaScript文件存放目录</li>
+	<li>安装程序或升级程序语言包和模板存放目录</li>
+	<li>通用类库，具体操作的一些功能集合</li>
+	<li>wap文件存放目录</li>
+	<li>模式文件存放目录</li>	
+	<li>系统公用程序存放目录</li>
+	<li>无图版文件存放目录</li>
+	<li>模板文件存放目录</li>
+	<li>个人中心文件目录</li>
+	<li>用户中心相关文件存放目录</li>
+    <li>调用支付宝活动接口</li>
+    <li>接收支付宝活动接口</li>
+	<li>活动帖处理相关文件</li>
+	<li>系统后台入口文件</li>
+	<li>版块管理处ajax处理文件</li>
+	<li>支付宝支付相关处理文件</li>
+	<li>app 应用相关文件</li>
+	<li>版块分类页入口文件</li>
+	<li>验证码相关处理文件</li>
+    <li>图片验证问题文件</li>
+	<li>分栏相关处理文件</li>
+	<li>帮助相关处理文件</li>
+	<li>地址栏图标</li>
+	<li>前台版块管理文件 </li>
+	<li>系统核心处理文件</li>
+    <li>群组聚合页文件</li>
+	<li>插件入口文件</li>
+	<li>系统头部处理文件</li>
+	<li>点击缓存处理文件</li>
+	<li>系统首页</li>
+	<li>安装程序</li>
+	<li>用户基本操作处理文件</li>
+	<li>用户任务中心处理文件</li>
+	<li>系统分栏中的侧栏处理文件</li>
+	<li>phpwind 软件使用协议</li>
+	<li>帖子前后翻页、标签等相关操作</li>
+	<li>用户登入页面文件</li>
+	<li>系统logo图片</li>
+	<li>帖子阅读页或列表页，单个帖子的操作处理文件</li>
+	<li>帖子阅读页或列表页中，帖子批量操作处理文件</li>
+	<li>群组前台管理操作，置顶、精华、锁定、提前等</li>
+	<li>会员列表处理文件</li>
+	<li>短消息处理文件</li>
+	<li>模式入口文件</li>
+	<li>phpwind首页调用文件</li>
+	<li>公告处理相关文件</li>
+	<li>评分、分享、报告相关处理文件</li>
+	<li>通行证客户端处理文件</li>
+	<li>快钱支付处理相关文件</li>
+	<li>贝宝支付处理相关文件</li>
+	<li>帖子发表操作文件</li>
+	<li>前台管理中心页面</li>
+	<li>推荐主题</li>
+	<li>基本ajax操作文件</li>
+	<li>站点api接口引入文件</li>
+    <li>编辑器ajax响应文件</li>
+    <li>帖子阅读页面文件</li>
+	<li>用户注册页面文件</li>
+	<li>重发激活码的操作文件</li>
+	<li>搜索引擎蜘蛛的指导文件</li>
+	<li>rss订阅器处理相关</li>
+	<li>搜索处理文件</li>
+	<li>搜索处理文件</li>
+	<li>邮件发送处理文件</li>
+	<li>密码发送处理文件</li>
+	<li>论坛展区处理文件</li>
+	<li>站点地图</li>
+	<li>图酷幻灯方式浏览页</li>
+	<li>排行处理文件</li>
+	<li>财付通处理文件</li>
+	<li>帖子列表页文件</li>
+	<li>交易入口文件</li>
+	<li>用户中心入口文件</li>
+	<li>用户交易入口文件</li>
+</ul>
+</td></tr></table>
+</div>
+
+      </body>
+</html>

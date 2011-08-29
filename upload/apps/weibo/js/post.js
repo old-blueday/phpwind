@@ -15,6 +15,7 @@ weibo_post.prototype = {
 		this.weibotip		= j.weibotip,
 		this.dvalue 	= this.$(this.content).value;//后台设置的默认文字
 		var _			 = this;
+		var saveRng;
 
 		if(_.IsElement(j.content)) {
 			_.$(j.content).onkeyup = function()
@@ -51,15 +52,23 @@ weibo_post.prototype = {
 				_.displayElement('urlContainer', false);
 			};
 			
-			
+			_.$(j.url).onmousedown = function() {
+				var content = _.$(_.content);
+				//if(content.value === defaultTopic || content.value === _.dvalue){content.value='';}
+				if(document.selection){
+					_.saveRng = document.selection.createRange();
+					if(_.saveRng.parentElement().tagName != 'TEXTAREA')
+					{
+						saveRng=null;
+					}
+				}
+			}
 		}
 		
-		var saveRng;
 		if (_.IsElement('uploadPic')) {
-			
 			_.$('uploadPic').onmousedown = function() {
 				var content = _.$(_.content);
-				if(content.value === _.dvalue){content.value='';}
+				if(content.value === defaultTopic || content.value === _.dvalue){content.value='';}
 				if(document.selection){
 					saveRng = document.selection.createRange();
 					if(saveRng.parentElement().tagName != 'TEXTAREA')
@@ -127,7 +136,7 @@ weibo_post.prototype = {
 		if(len > this.wordLimit) {
 			value = '已超出<em>'+(len - this.wordLimit)+'</em>个字节';
 		} else {
-			value = '你还可以输入<em>'+(this.wordLimit - len)+'</em>个字节';
+			value = '<em>'+len+'/255</em>';
 		}
 		if(showobj != null) {
 			showobj.innerHTML = value;
@@ -149,7 +158,17 @@ weibo_post.prototype = {
 			insertContentToTextArea(content, codeText);
 			_.checkWordLength();
 		});
-		content.focus();
+		var len = defaultTopic.length;
+		var pos = content.value.indexOf(defaultTopic);
+		if (is_ie && pos >= 0) {
+			var range = content.createTextRange();
+			range.moveStart('character',-content.value.length);
+			range.moveEnd('character',-content.value.length);
+			range.collapse(true);
+			range.moveStart('character',pos+1);
+			range.moveEnd('character',len-2);
+			range.select();
+		} else {content.focus()};
 		var rect = thisobj.getBoundingClientRect();
 		this.$('smileContainer').style.left = rect.left+ietruebody().scrollLeft + 'px';
 		this.$('smileContainer').style.top = rect.top + ietruebody().scrollTop + 22 +'px';
@@ -169,6 +188,7 @@ weibo_post.prototype = {
 					_.$(_.content).value = '';
 				}
 				var codeText = '[s:' + this.title + ']';
+					if (content.value === defaultTopic) setSelection();
 					addSmileCallback(codeText);
 					hideSmile();
 				}
@@ -206,6 +226,8 @@ weibo_post.prototype = {
 			showDialog('error','链接地址出错，链接地址必须以:http://开头');
 			return false;
 		}
+		if (content.value === defaultTopic) setSelection();
+		this.saveRng && this.saveRng.select();
 		insertContentToTextArea(content, codeText);
 		this.displayElement('urlContainer', false);
 		if(content.value === this.dvalue){content.value='';}
@@ -242,7 +264,7 @@ weibo_post.prototype = {
 				if (picNum >= 4 ) {
 					_.displayElement('uploadPicload',false);
 					_.displayElement('uploadPicLoadding',true);
-					_.$('uploadPicLoadding').innerHTML = '上传照片不得超过4张';
+					_.$('uploadPicLoadding').innerHTML = '';
 					return false;
 				}
 			} else {
@@ -294,7 +316,7 @@ weibo_post.prototype = {
 			content.value = '分享图片';
 		}
 		
-		if (content.value == '' || strlen(content.value) >_this.wordLimit || content.value ===_this.dvalue ) return _this.shockWarning();
+		if (content.value == '' || strlen(content.value) >_this.wordLimit || content.value === _this.dvalue || content.value === defaultTopic) return _this.shockWarning();
 		weibo_submit.disabled = false;
 		ajax.send(_this.postUrl, thisForm, function() {
 			var gotText = ajax.request.responseText;

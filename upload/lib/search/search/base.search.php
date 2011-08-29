@@ -15,18 +15,20 @@ class Search_Base {
 	var $_maxResult = null;
 	var $_waitSegment = 0;
 	var $_isLevel = 1; //是否开启权限检查
+	var $_isBuildAttachs = 1; //是否图文并茂功能
 	var $_version = true; //php_version
 	
 
 	function Search_Base() {
-		global $timestamp, $winduid, $windid, $gorupid, $_G, $db_maxresult, $db_schwait;
+		global $timestamp, $winduid, $windid, $groupid, $_G, $db_maxresult, $db_schwait, $db_openbuildattachs;
 		$this->_userId = &$winduid;
 		$this->_username = &$windid;
-		$this->_groupId = &$gorupid;
+		$this->_groupId = &$groupid;
 		$this->_userGroup = &$_G;
 		$this->_waitSegment = &$db_schwait;
 		$this->_maxResult = ($db_maxresult) ? $db_maxresult : 500;
 		$this->_timestamp = &$timestamp;
+		$this->_isBuildAttachs = &$db_openbuildattachs;
 		$this->_version = (function_exists ( 'str_ireplace' )) ? true : false;
 	}
 	/**
@@ -35,12 +37,13 @@ class Search_Base {
 	 */
 	function _checkUserLevel() {
 		$userService = $this->_getUserService ();
-		if ($this->_userGroup ['searchtime'] > 0) {
+		if (!$this->_userGroup ['searchtime']) {
 			return true;
 		}
-		if (! ($memberInfo = $userService->get ( $this->_userId, false, true ))) {
-			return false;
-		}
+		
+		$memberInfo = $userService->get ( $this->_userId, false, false, true );
+		$memberInfo ['lasttime'] = $memberInfo ? $memberInfo ['lasttime'] : 0;
+		
 		if ($this->_timestamp - $memberInfo ['lasttime'] < $this->_userGroup ['searchtime']) {
 			return false;
 		}
@@ -56,8 +59,7 @@ class Search_Base {
 			return true;
 		if (file_exists ( D_P . 'data/bbscache/schwait_cache.php' )) {
 			if ($this->_timestamp - pwFilemtime ( D_P . 'data/bbscache/schwait_cache.php' ) > $this->_waitSegment) {
-				//* P_unlink(D_P.'data/bbscache/schwait_cache.php');
-				pwCache::deleteData ( D_P . 'data/bbscache/schwait_cache.php' );
+				P_unlink(D_P.'data/bbscache/schwait_cache.php');
 			} else {
 				return false;
 			}
@@ -74,7 +76,7 @@ class Search_Base {
 			return array ();
 		}
 		$keyword = trim ( ($keyword) );
-		$keyword = str_replace ( array ("&#160;", "&#61;", "&nbsp;", "&#60;", "<", ">", "&gt;", "(", ")", "&#41;" ), array (" " ), $keyword );
+		$keyword = str_replace ( array ("&#160;", "&#61;", "&nbsp;", "&#60;", "<", ">", "&gt;", "(", ")", "&#41;" ), ' ', $keyword );
 		$ks = explode ( " ", $keyword );
 		$keywords = array ();
 		foreach ( $ks as $v ) {
@@ -155,22 +157,25 @@ class Search_Base {
 	
 	/**
 	 * 获取最新帖子
+	 * @param $conditions
 	 * @param $page
 	 * @param $perpage
 	 * @return unknown_type
 	 */
-	function _getLatestThreads($page, $perpage = 50) {
+	function _getLatestThreads($conditions, $page, $perpage = 50) {
 		$page = intval ( $page );
 		$perpage = intval ( $perpage );
 		if (1 > $page || 1 > $perpage) {
 			return false;
 		}
 		$offset = ($page - 1) * $perpage;
+		$fid = intval($conditions['fid']);
+		list($starttime, $endtime) = $this->_checkTimeNodeCondition($conditions['starttime'], $conditions['endtime']);
 		$threadsDao = $this->getThreadsDao ();
-		if (! ($total = $threadsDao->getLatestThreadsCount ())) {
+		if (! ($total = $threadsDao->getLatestThreadsCount ($fid, $starttime, $endtime))) {
 			return array (false, false );
 		}
-		$result = $threadsDao->getLatestThreads ( $offset, $perpage );
+		$result = $threadsDao->getLatestThreads ($fid, $starttime, $endtime, $offset, $perpage );
 		return array ($total, $this->_buildThreads ( $result, array () ) );
 	}
 	
@@ -198,43 +203,54 @@ class Search_Base {
 	
 	/**
 	 * 获取精华帖子
+	 * @param $condition
+	 * @param $uid
 	 * @param $page
 	 * @param $perpage
 	 * @return unknown_type
 	 */
-	function _getDigestThreads($uid, $page, $perpage = 50) {
+	function _getDigestThreads($conditions = array(), $uid, $page, $perpage = 50) {
 		$page = intval ( $page );
 		$perpage = intval ( $perpage );
 		if (1 > $page || 1 > $perpage) {
 			return false;
 		}
+		
+		$fid = intval($conditions['fid']);
+		list($starttime, $endtime) = $this->_checkTimeNodeCondition($conditions['starttime'], $conditions['endtime']);
+		
 		$offset = ($page - 1) * $perpage;
+				
 		$threadsDao = $this->getThreadsDao ();
-		if (! ($total = $threadsDao->getDigestThreadsCount ( $uid ))) {
+		if (! ($total = $threadsDao->getDigestThreadsCount ($uid, $fid, $starttime, $endtime))) {
 			return array (false, false );
 		}
-		$result = $threadsDao->getDigestThreads ( $uid, array (1, 2 ), $offset, $perpage );
+		
+		$result = $threadsDao->getDigestThreads ( $uid, array (1, 2 ), $fid, $starttime, $endtime, $offset, $perpage );
 		return array ($total, $this->_buildThreads ( $result, array () ) );
 	}
 	
 	/**
 	 * 获取最新日志
+	 * @param $condition
 	 * @param $page
 	 * @param $perpage
 	 * @return unknown_type
 	 */
-	function _getLatestDiarys($page, $perpage = 50) {
+	function _getLatestDiarys($conditions = array(), $page, $perpage = 50) {
 		$page = intval ( $page );
 		$perpage = intval ( $perpage );
 		if (1 > $page || 1 > $perpage) {
 			return false;
 		}
+		
+		list($starttime, $endtime) = $this->_checkTimeNodeCondition($conditions['starttime'], $conditions['endtime']);
 		$offset = ($page - 1) * $perpage;
 		$diarysDao = $this->getDiarysDao ();
-		if (! ($total = $diarysDao->getLatestDiarysCount ())) {
+		if (! ($total = $diarysDao->getLatestDiarysCount ($starttime, $endtime))) {
 			return array (false, false );
 		}
-		$result = $diarysDao->getLatestDiarys ( $offset, $perpage );
+		$result = $diarysDao->getLatestDiarys ($starttime, $endtime, $offset, $perpage);
 		return array ($total, $this->_buildDiarys ( $result, array () ) );
 	}
 	
@@ -309,11 +325,11 @@ class Search_Base {
 	 * @param $perpage
 	 * @return unknown_type
 	 */
-	function getSpecialThreads($type = 'latest', $uid, $page = 1, $perpage = 50) {
+	function getSpecialThreads($type = 'latest', $uid, $page = 1, $perpage = 50, $expandCondition = array()) {
 		if ($type == 'digest') {
-			return $this->_getDigestThreads ( $uid, $page, $perpage );
+			return $this->_getDigestThreads ($expandCondition, $uid, $page, $perpage);
 		} elseif ($type == 'latest') {
-			return $this->_getLatestThreads ( $page, $perpage );
+			return $this->_getLatestThreads ($expandCondition, $page, $perpage);
 		} else {
 			return $this->_getTodayThreads ( $page, $perpage );
 		}
@@ -326,7 +342,7 @@ class Search_Base {
 	 * @param $perpage
 	 * @return unknown_type
 	 */
-	function getDefaultByType($type = 'thread', $page = 1, $perpage = 50) {
+	function getDefaultByType($type = 'thread', $page = 1, $perpage = 50, $expandConditions = array()) {
 		if (! $type)
 			return array ();
 		$page = intval ( $page );
@@ -336,10 +352,10 @@ class Search_Base {
 		}
 		switch ($type) {
 			case "thread" :
-				return $this->_getLatestThreads ( $page, $perpage );
+				return $this->_getLatestThreads ($expandConditions, $page, $perpage);
 				break;
 			case "diary" :
-				return $this->_getLatestDiarys ( $page, $perpage );
+				return $this->_getLatestDiarys ($expandConditions, $page, $perpage );
 				break;
 			case "user" :
 				return $this->_getLatestUsers ( $page, $perpage );
@@ -368,6 +384,7 @@ class Search_Base {
 			$forum = L::forum ( $t ['fid'] );
 			$t ['content'] = substrs ( stripWindCode ( strip_tags ( convert ( $t ['content'], array () ) ) ), 170 );
 			foreach ( $keywords as $keyword ) {
+				$keyword = stripslashes($keyword);
 				$keyword && $t ['subject'] = $this->_highlighting ( $keyword, $t ['subject'] );
 				$keyword && $t ['content'] = $this->_highlighting ( $keyword, $t ['content'] );
 			}
@@ -375,7 +392,72 @@ class Search_Base {
 			$t ['name'] = strip_tags ( $forum ['name'] );
 			$data [] = $t;
 		}
-		return $data;
+		return $this->_buildThreadsAttachs($data);
+	}
+	
+	function _buildThreadsAttachs($data) {
+		if (!$data || !S::isArray($data)) return array(); 
+		if (!$this->_isBuildAttachs) return $data;
+		foreach ($data as $value) {
+			if (!$value['ifupload']) continue;
+			$_tids[] = $value['tid'];
+		}
+		if (!$_tids) return $data;
+		$attachsDao = $this->getAttachsDao();
+		$_sql = " SELECT * FROM pw_attachs WHERE tid IN (".S::sqlImplode($_tids).") AND type='img' AND pid=0 AND special = 0 ORDER BY  aid ASC";
+		$_tempAttachsDb = $attachsDao->getSearch($_sql);
+		$_tempAttachsDb = $this->_getAttachs($_tempAttachsDb);
+		$reslut = array();
+		foreach ($data as $value) {
+			$value = ($_tempAttachsDb[$value['tid']]) ? array_merge($value, $_tempAttachsDb[$value[tid]]) : $value;
+			$reslut[] = $value;
+		}
+		return $reslut;
+	}
+	
+	function _getAttachs ($data) {
+		if (!$data || !S::isArray($data)) return array();
+		$result = $t = array();
+		foreach ($data as $value) {
+			$t['tid'] = $value['tid'];
+			$t['aid'] = $value['aid'];
+			$t['name'] = $value['name'];
+			$t['attachurl'] = $value['attachurl'];
+			$t['ifthumb'] = $value['ifthumb'];
+			$result[$value[tid]][] =  $t;
+		}
+		return $this->_buildAttachs($result);
+	}
+	
+	function _buildAttachs($data) {
+		if (!$data || !S::isArray($data)) return array();
+		$result = $t = array();
+		foreach ($data as $key=>$value) {
+			$t['imgTotal'] = count($value);
+			$t['firstImgName'] = $value[0]['name'];
+			$t['firstImgId'] = $value[0]['aid'];
+			$attachurl = $value[0]['attachurl'];
+			$ifthumb = $value[0]['ifthumb'];
+			$a_url = geturl($attachurl, 'show');
+			$t['firstImgUrl'] = $this->_getAttachMiniUrl($attachurl, $ifthumb, $a_url[1]);
+			
+			if (!file_exists($t['firstImgUrl'])) {//不考虑远程
+				$t['firstImgUrl'] = $this->_getAttachMiniUrl($attachurl, 1, $a_url[1]);
+			}
+			
+			$result[$key] = $t;
+		}
+		return $result;
+	}
+	
+	function _getAttachMiniUrl($path, $ifthumb, $where) {
+		$dir = '';
+		($ifthumb & 1) && $dir = 'thumb/';
+		($ifthumb & 2) && $dir = 'thumb/mini/';
+		if ($where == 'Local') return $GLOBALS['attachpath'] . '/' . $dir . $path;
+		if ($where == 'Ftp') return $GLOBALS['db_ftpweb'] . '/' . $dir . $path;
+		if (!is_array($GLOBALS['attach_url'])) return $GLOBALS['attach_url'] . '/' . $dir . $path;
+		return $GLOBALS['attach_url'][0] . '/' . $dir . $path;
 	}
 	
 	function _getPosts($postIds, $keywords, $tableName) {
@@ -441,6 +523,21 @@ class Search_Base {
 		return $tmp;
 	}
 	
+	function _getFilterDiaryByMysql() {
+		$_sqlWhere = '';	
+		$privacy = $this->_getDiaryPrivacy();
+		if ($privacy) {
+			$_sqlWhere .= " AND privacy IN(" . S::sqlImplode ( $privacy ) . ")";
+		}
+		return $_sqlWhere;
+	}
+	
+	/*日志权限 array(0,1,2) 全站可见，仅好友可见，仅自己可见*/
+	function _getDiaryPrivacy() {
+		$privacy = array();
+		return ($this->_groupId == 3) ? array() : array(0);
+	}
+	
 	function _buildForums($forums, $keywords) {
 		if (! $forums)
 			return array ();
@@ -499,6 +596,7 @@ class Search_Base {
 		}
 		return $result;
 	}
+		
 	/**
 	 * 注意关联函数 apps/groups/lib/colony.class.php
 	 * @param $info
@@ -512,9 +610,9 @@ class Search_Base {
 	function _highlighting($pattern, $subject) {
 		//return preg_replace('/(?<=[^\w=]|^)('.preg_quote($pattern,'/').')(?=[^\w=]|$)/si','<font color="red"><u>\\1</u></font>',$subject);
 		if ($this->_version) {
-			return str_ireplace ( $pattern, '<font color="red"><u>' . $pattern . '</u></font>', $subject );
+			return function_exists('mb_eregi_replace') ? mb_eregi_replace($pattern, '<font color="red"><u>' . $pattern . '</u></font>', $subject) : str_ireplace ( $pattern, '<font color="red"><u>' . $pattern . '</u></font>', $subject );
 		} else {
-			return str_replace ( $pattern, '<font color="red"><u>' . $pattern . '</u></font>', $subject );
+			return function_exists('mb_eregi_replace') ? mb_eregi_replace($pattern, '<font color="red"><u>' . $pattern . '</u></font>', $subject) : str_replace ( $pattern, '<font color="red"><u>' . $pattern . '</u></font>', $subject );
 		}
 	}
 	
@@ -537,14 +635,30 @@ class Search_Base {
 		if (! ($keywords = $this->_checkKeywordCondition ( $keywords ))) {
 			return array (false, false );
 		}
-		$page = $page > 1 ? $page : 1;
+		$page = $page > 1 ? intval($page) : 1;
+		$perpage = intval($perpage);
 		$offset = intval ( ($page - 1) * $perpage );
+		
+		$sql = "";
+		if ($keywords) {
+			$sql .= " AND name LIKE " . S::sqlEscape ( '%' . $keywords . '%' );
+		}
+		$sql .= $this->_getFilterForums();		
 		$forumsDao = $this->getForumsDao ();
-		if (! ($total = $forumsDao->countSearch ( $keywords ))) {
+		if (! ($total = $forumsDao->countSearch ( "SELECT COUNT(*) as total FROM pw_forums WHERE 1". $sql))) {
 			return array (false, false );
 		}
-		$result = $forumsDao->getSearch ( $keywords, $offset, $perpage );
+		$sql .= "  LIMIT " . $offset . "," . $perpage;
+		$result = $forumsDao->getSearch ( "SELECT * FROM pw_forums WHERE 1". $sql );
 		return array ($total, $this->_buildForums ( $result, $keywords ) );
+	}
+	
+	function _getFilterForums() {
+		$_sqlWhere = '';
+		if ($this->_groupId != 3) {
+			$_sqlWhere .= " AND f_type = 'forum'";
+		}
+		return $_sqlWhere;
 	}
 	
 	function _searchGroups($keywords, $page = 1, $perpage = 20) {
@@ -559,6 +673,17 @@ class Search_Base {
 		}
 		$result = $colonysDao->getSearch ( $keywords, $offset, $perpage );
 		return array ($total, $this->_buildGroups ( $result, $keywords ) );
+	}
+	/**
+	 * 新鲜事表DAO
+	 * @return unknown_type
+	 */
+	function getWeiboDao() {
+		static $sWeiboDao;
+		if (! $sWeiboDao) {
+			$sWeiboDao = L::loadDB ('weibo_content','sns');
+		}
+		return $sWeiboDao;
 	}
 	/**
 	 * 日志表DAO
@@ -649,6 +774,18 @@ class Search_Base {
 			$sSchcacheDao = L::loadDB ( 'schcache', 'search' );
 		}
 		return $sSchcacheDao;
+	}
+	
+	/**
+	 * 搜索附件表DAO
+	 * @return unknown_type
+	 */
+	function getAttachsDao() {
+		static $sAttachsDao;
+		if (! $sAttachsDao) {
+			$sAttachsDao = L::loadDB ( 'attachs', 'forum' );
+		}
+		return $sAttachsDao;
 	}
 	
 	/**

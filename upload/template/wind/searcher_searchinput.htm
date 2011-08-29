@@ -12,22 +12,17 @@ if ($type == 'thread') {
 }
 print <<<EOT
 -->
-<div class="list_search" style="$temStyleList; padding:15px 5px 15px 0">
-	<div class="search_all">
-		<div class="search_bg">
-			<div class="$temStyleSearch">
-			 <form action="searcher.php" method="post" id="searchformbottom" >
-				<input type="hidden" value="$verifyhash" name="verify">
-				<input value="2" class="s_input" type="hidden" name="step">
-				<input value="$type" class="s_input" type="hidden" name="type">
-				<input class="s_input" type="text" name="keyword" value="$keyword">
-				<span><button type="submit">搜 索</button></span>
-			 </form>
-			</div>
-		</div>
-	 </div>
+<form action="searcher.php" method="post" id="searchformbottom" >
+<input type="hidden" value="$verifyhash" name="verify">
+<input value="2" class="s_input" type="hidden" name="step">
+<input value="$type" class="s_input" type="hidden" name="type">
+<div class="search_bg mb20">
+	<div class="search_ip">
+	<input value="$keyword" class="s_input" type="text" size="70" name="keyword">
+	<span><button type="submit">搜 索</button></span>
+	</div>
 </div>
-<div class="c mb20">&nbsp;</div>
+</form>
 <!--
 EOT;
 ?>-->

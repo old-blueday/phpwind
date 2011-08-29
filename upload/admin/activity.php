@@ -59,7 +59,8 @@ if (empty($action)){ //活动分类管理
 } elseif ($action == 'topic') { //活动内容管理
 	S::gp(array('page','step','field','newfield', 'actmid'));
 	
-	@include_once pwCache::getPath(D_P. 'data/bbscache/activity_config.php');
+	//* @include_once pwCache::getPath(D_P. 'data/bbscache/activity_config.php');
+	pwCache::getData(D_P. 'data/bbscache/activity_config.php');
 	$Activity = L::loadClass('Activity', 'activity');
 	$fieldService = L::loadClass('ActivityField', 'activity');
 	//获取分类选项框
@@ -209,10 +210,9 @@ if (empty($action)){ //活动分类管理
 		S::gp(array('subject','atc_content','uids'));
 		$cache_file = D_P."data/bbscache/".substr(md5($admin_pwd),10,10).".txt";
 		if (!$nexto) {
-			//* writeover($cache_file,$atc_content);
 			pwCache::setData($cache_file,$atc_content);
 		} else {
-			$atc_content = readover($cache_file);
+			$atc_content = pwCache::getData($cache_file, false, true);
 		}
 
 		if (empty($subject) || empty($atc_content)) {

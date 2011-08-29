@@ -166,7 +166,7 @@ EOT;
 				<ul>
 <!--
 EOT;
-foreach ($pageCache->getData('hotArticle') as $value) {print <<<EOT
+foreach ((array)$hotArticle as $value) {print <<<EOT
 -->
 					<li><a href="{$value[url]}" target="_blank">{$value[subject]}</a></li>
 <!--

@@ -5,7 +5,8 @@ $basename = "$admin_file?adminjob=forumsell";
 if (empty($action)) {
 
 	require_once(R_P.'require/credit.php');
-	include_once pwCache::getPath(D_P.'data/bbscache/forumcache.php');
+	//* include_once pwCache::getPath(D_P.'data/bbscache/forumcache.php');
+	pwCache::getData(D_P.'data/bbscache/forumcache.php');
 	S::gp(array('username'));
 	S::gp(array('page','uid','fid'),'GP',2);
 

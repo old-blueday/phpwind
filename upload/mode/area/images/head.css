@@ -24,7 +24,7 @@ body{font-family:Verdana;color:#333;background:#fff url(bg.jpg) top center repea
 #td_mymenu_old{color:#888;}
 .navB,.navBbg{background:url(navB.png) right bottom repeat-x;}
 .navB{margin-bottom:5px;}
-.navBbg{padding:3px 0;background-position:left bottom;margin-right:4px;_position:relative;}
+.navBbg{padding:0;background-position:left bottom;margin-right:4px;_position:relative;}
 .navB ul{padding:4px 4px 4px 16px;}
 .navB li:hover,.navB li:hover a{background:url(navBcur.png) no-repeat;}
 .navB li:hover{ background-position:left 0;}
@@ -41,7 +41,7 @@ body{font-family:Verdana;color:#333;background:#fff url(bg.jpg) top center repea
 .searchA .ip input{border:0;background:none;padding:0;font:14px/16px Arial;width:100%;float:left;margin:0;}
 .s_select{float:left;border:1px solid #dddddd;border-left:0;margin-right:7px;background:#fff;width:49px;}
 .s_select h6{display:block;padding:0 15px 0 10px;height:24px;line-height:24px;cursor:pointer;background:url(../../../images/wind/down.png) 35px center no-repeat;color:#666;}
-.s_select ul{ position:absolute;border:1px solid #dddddd;background:#fff;line-height:22px;width:49px;margin:24px 0 0 -1px;display:none;}
+.s_select ul{ position:absolute;border:1px solid #dddddd;background:#fff;line-height:22px;width:49px;margin:24px 0 0 -1px;display:none;z-index:999;}
 .s_select ul li{padding:0 10px;cursor:pointer;}
 .s_select ul li:hover{background:#f7f7f7;}
 .searchA button{color:#333;width:45px;height:25px;border:0 none;background:url(search_btn.png) no-repeat; font-size:14px; font-weight:700;line-height:25px;padding:0 0 3px 0;}
@@ -65,3 +65,7 @@ body{font-family:Verdana;color:#333;background:#fff url(bg.jpg) top center repea
 .fr{float:right;}
 .t{color:#666;font-size:11px; letter-spacing:-1px;border:1px solid #a6cbe7;background:#fff;}
 .h{background:#f0f9ff;line-height:25px;height:25px;padding:0 10px;border-bottom:1px solid #a6cbe7;}
+
+.menuHalf{margin-right:-1px;padding:5px 0;}
+.menuHalf li{float:left;width:50%;border-right:1px dashed #d5e6ed;margin-right:-1px;}
+ul#post_typeChoose a{padding:0;}

@@ -188,6 +188,7 @@ EOT;
 EOT;
 }elseif($_POST['sendmsg']){print<<<EOT
 -->
+<script type="text/javascript" LANGUAGE="JavaScript" src="js/core/core.js"></script>
 <div class="nav3 mb10">
     <ul class="cc">
         <li><a href="$basename">活动分类管理</a></li>
@@ -195,7 +196,7 @@ EOT;
         <li class="current"><a href="javascript:;">群发消息</a></li>
     </ul>
 </div>
-<form name='FORM' action="$basename" method="post">
+<form name='FORM' onreset="mreset()" action="$basename" method="post">
 <input type="hidden" name="action" value="sendmsg" />
 <input type="hidden" name="step" value="2" />
 <input type="hidden" name="uids" value="$uids" />
@@ -212,7 +213,7 @@ EOT;
 		<td class="td2">
 <!--
 EOT;
-require_once PrintEot('wysiwyg_editor');
+require_once PrintEot('wysiwyg_editor_common');
 print <<<EOT
 -->
 		</td>
@@ -224,6 +225,13 @@ print <<<EOT
     <span class="bt"><span><button type="reset" value="">重 置</button></span></span>
 </div>
 </form>
+<script type="text/javascript">
+function mreset(){
+	editor.textarea.value='';
+	editor.doc.body.innerHTML='';
+	return true;
+}
+</script>
 <!--
 EOT;
 }elseif($action == 'edittopic'){print<<<EOT

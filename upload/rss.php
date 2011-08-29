@@ -64,7 +64,8 @@ if ($tid) {
 	$cache_path = D_P.'data/bbscache/rss_'.$fid.'_cache.xml';
 	if ($timestamp-pwFilemtime($cache_path) > $Rss_updatetime*60) {
 		L::loadClass('rss', 'utility', false);
-		require_once pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
+		//* require_once pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
+		pwCache::getData(D_P.'data/bbscache/forum_cache.php');
 		if ($db_tlist) {
 			@extract($db->get_one("SELECT MAX(tid) AS tid FROM pw_threads"));
 			$pw_tmsgs = GetTtable($tid);

@@ -34,7 +34,7 @@ if ($a == 'list') {
 		$count = !$type ? $collectionService->countByUid($winduid,$ftype) : $collectionService->countByUidAndType($winduid,$type,$ftype);
 		$page > ceil($count/$db_perpage) && $page = ceil($count/$db_perpage);
 		$collectionDb = ($count) ? (!$type ? $collectionService->findByUidInPage($winduid, $page, $db_perpage, $ftype) : $collectionService->findByUidAndTypeInPage($winduid, $type, $page, $db_perpage, $ftype)) : array();
-		$pages = numofpage($count,$page,ceil($count/$db_perpage),"{$basename}type=$type&");
+		$pages = numofpage($count,$page,ceil($count/$db_perpage),"{$basename}type=$type&ftype=$ftype&");
 
 } elseif ($a == 'post') {
 	$totalCollection = $collectionService->countByUid($winduid);

@@ -80,9 +80,11 @@ class Thread {
 		}
 
 		if (file_exists(D_P."data/groupdb/group_$groupid.php")) {
-			include pwCache::getPath(S::escapePath(D_P."data/groupdb/group_$groupid.php"));
+			//* include pwCache::getPath(S::escapePath(D_P."data/groupdb/group_$groupid.php"));
+			extract(pwCache::getData(S::escapePath(D_P."data/groupdb/group_$groupid.php", false)));
 		} else {
-			include pwCache::getPath(D_P.'data/groupdb/group_1.php');
+			//* include pwCache::getPath(D_P.'data/groupdb/group_1.php');
+			extract(pwCache::getData(D_P.'data/groupdb/group_1.php', false));
 		}
 		L::loadClass('post', 'forum', false);
 		require_once(R_P . 'require/bbscode.php');
@@ -95,8 +97,10 @@ class Thread {
 
 		$postdata = new topicPostData($pwpost);
 
-		include_once pwCache::getPath(D_P.'data/bbscache/cache_post.php');
-		include_once pwCache::getPath(D_P.'data/bbscache/forum_typecache.php');
+		//* include_once pwCache::getPath(D_P.'data/bbscache/cache_post.php');
+		extract(pwCache::getData(D_P.'data/bbscache/cache_post.php', false));
+		//* include_once pwCache::getPath(D_P.'data/bbscache/forum_typecache.php');
+		extract(pwCache::getData(D_P.'data/bbscache/forum_typecache.php', false));
 		$t_db = $topic_type_cache[$fid];
 		$postdata->setWtype($p_type, $p_sub_type, 1, $t_db);
 		$postdata->setTitle($title);
@@ -116,6 +120,79 @@ class Thread {
 		$topicpost->execute($postdata);
 		$tid = $topicpost->getNewId();
 		return new ApiResponse($tid);
+	}
+
+	function reply($tid, $author, $title, $content) {
+		global $winddb,$winduid,$windid,$groupid,$timestamp,$pwforum,$pwpost;
+		$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
+		$winddb = $userService->getByUserName($author, true, true);
+		if (empty($winddb)) {
+			return new ApiResponse('API_THREAD_AUTHOR_NOT_EXISTS');
+			//return new ErrorMsg(API_THREAD_AUTHOR_NOT_EXISTS, 'User not exists');
+		}
+		$winduid = $winddb['uid'];
+		$groupid = $winddb['groupid'];
+		$windid  = $winddb['username'];
+		$groupid == '-1' && $groupid = $winddb['memberid'];
+
+		if ($groupid == 6 || getstatus($winddb['userstatus'], PW_USERSTATUS_BANUSER)) {//会员禁言
+			return new ApiResponse('API_THREAD_THE_USER_BAN');
+		}
+
+		$tpcarray = $this->db->get_one("SELECT t.tid,t.fid,t.locked,t.ifcheck,t.author,t.authorid,t.postdate,t.lastpost,t.ifmail,t.special,t.subject,t.type,t.ifshield,t.anonymous,t.ptable,t.replies,t.tpcstatus FROM pw_threads t WHERE t.tid=" . pwEscape($tid));
+
+		L::loadClass('forum', 'forum', false);
+		$pwforum = new PwForum($tpcarray['fid']);
+		if (!$pwforum->isForum()) {
+			return new ApiResponse('THREAD_FORUM_NOT_EXIST');
+		}
+
+		L::loadClass('post', 'forum', false);
+		require_once(R_P . 'require/bbscode.php');
+		$pwpost = new PwPost($pwforum);
+		$pwpost->errMode = true;
+		$pwpost->forumcheck();
+		$pwpost->postcheck();
+
+		L::loadClass('replypost', 'forum', false);
+		$replypost = new replyPost($pwpost);
+		$replypost->setTpc($tpcarray);
+		$replypost->check();
+		
+		$postdata = new replyPostData($pwpost);
+		$postdata->setTitle($title);
+		$postdata->setContent($content);
+		$postdata->conentCheck();
+		
+		if ($pwpost->errMsg && $msg = reset($pwpost->errMsg)) {
+			return new ApiResponse('THREAD_SYSTEM_ERROR');
+		}
+		$replypost->execute($postdata);
+		$pid = $replypost->getNewId();
+
+		return new ApiResponse($pid);
+	}
+
+	function getreplies($tid, $offset = 0, $limit = 20) {
+		global $db_windpost;
+		require_once(R_P . 'require/bbscode.php');
+		$pw_posts = GetPtable('N', $tid);
+		$array = array();
+		$query = $this->db->query("SELECT * FROM $pw_posts WHERE tid=" . S::sqlEscape($tid) . " AND ifcheck='1' ORDER BY postdate ASC " . S::sqlLimit($offset, $limit));
+		while ($rt = $this->db->fetch_array($query)) {
+			$rt['content'] = convert($rt['content'], $db_windpost);
+			$array[$rt['pid']] = array(
+				'pid'		=> $rt['pid'],
+				'tid'		=> $rt['tid'],
+				'aid'		=> $rt['aid'],
+				'author'	=> $rt['author'],
+				'authorid'	=> $rt['authorid'],
+				'posttime'	=> $rt['postdate'],
+				'subject'	=> $rt['subject'],
+				'content'	=> $rt['content']
+			);
+		}
+		return new ApiResponse($array);
 	}
 
 	function getData($tids) {//获取帖子浏览数/回复数
@@ -182,9 +259,11 @@ class Thread {
 		$windid  = $winddb['username'];
 		$groupid == '-1' && $groupid = $winddb['memberid'];
 		if (file_exists(D_P."data/groupdb/group_$groupid.php")) {
-			include pwCache::getPath(S::escapePath(D_P."data/groupdb/group_$groupid.php"));
+			//* include pwCache::getPath(S::escapePath(D_P."data/groupdb/group_$groupid.php"));
+			extract(pwCache::getData(S::escapePath(D_P."data/groupdb/group_$groupid.php", false)));
 		} else {
-			include pwCache::getPath(D_P.'data/groupdb/group_1.php');
+			//* include pwCache::getPath(D_P.'data/groupdb/group_1.php');
+			extract(pwCache::getData(D_P.'data/groupdb/group_1.php', false));
 		}
 		L::loadClass('post', 'forum', false);
 		require_once(R_P . 'require/bbscode.php');
@@ -219,7 +298,8 @@ class Thread {
 
 		$postdata = new topicPostData($pwpost);
 
-		include_once pwCache::getPath(D_P.'data/bbscache/cache_post.php');
+		//* include_once pwCache::getPath(D_P.'data/bbscache/cache_post.php');
+		extract(pwCache::getData(D_P.'data/bbscache/cache_post.php', false));
 		$t_db = $topic_type_cache[$fid];
 		$postdata->setWtype($p_type, $p_sub_type, 0, $t_db);
 		$postdata->initData($postmodify);

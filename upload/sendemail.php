@@ -8,48 +8,37 @@ S::gp(array('action'));
 !$action && $action = 'mailto';
 
 if ($action == 'mailto') {
-
-	S::gp(array('uid','username'));
-	
-	$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
-	if ($username || is_numeric($uid)) {
-		if ($username) {
-			$userdb = $userService->getByUserName($username);
-		} else {
-			$userdb = $userService->get($uid);
-		}
-	} else {
+	S::gp(array('uid','username','step'));
+	$hasReceiver = false;
+	if ($uid || $username) {
+		$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
 		$userdb = '';
-	}
-	!$userdb && Showmsg('undefined_action');
+		if ($username || is_numeric($uid)) {
+			$userdb = $username ? $userService->getByUserName($username) : $userService->get($uid);
+		}
+		!$userdb && Showmsg('undefined_action');
 
-	$rt = $userService->get($winduid, false, false, true);
-	if ($timestamp-$rt['lasttime'] < 60) {
-		Showmsg('sendeamil_limit');
+		$rt = $userService->get($winduid, false, false, true);
+		($timestamp - $rt['lasttime'] < 60) && Showmsg('sendeamil_limit');
+		$hasReceiver = true;
 	}
-	if (empty($_POST['step'])) {
-
-		if (!getstatus($userdb['userstatus'], PW_USERSTATUS_RECEIVEMAIL) && $groupid != '3' && $groupid != '4') {
+	if (empty($step)) {
+		if ($hasReceiver && !getstatus($userdb['userstatus'], PW_USERSTATUS_RECEIVEMAIL) && $groupid != '3' && $groupid != '4') {
 			Showmsg('sendeamil_refused');
 		}
-		$to_mail = $userdb['email'];
-		$to_user = $userdb['username'];
-
-		if (!getstatus($userdb['userstatus'], PW_USERSTATUS_PUBLICMAIL) && $groupid != '3' && $groupid != '4') {
+		$to_mail = $hasReceiver ? $userdb['email'] : $db_ceoemail;
+		$to_user = $hasReceiver ? $userdb['username'] : '';
+		$hiddenmail = 0;
+		if ($hasReceiver && !getstatus($userdb['userstatus'], PW_USERSTATUS_PUBLICMAIL) && $groupid != '3' && $groupid != '4') {
 			$hiddenmail = 1;
-		} else {
-			$hiddenmail = 0;
 		}
 		require_once(PrintEot('sendmail'));footer();
-
 	} else {
-
 		PostCheck(1,$db_gdcheck & 16);
-
-		if (!getstatus($userdb['userstatus'], PW_USERSTATUS_RECEIVEMAIL) && $groupid != '3' && $groupid != '4') {
+		if ($hasReceiver && !getstatus($userdb['userstatus'], PW_USERSTATUS_RECEIVEMAIL) && $groupid != '3' && $groupid != '4') {
 			Showmsg('sendeamil_refused');
 		}
-		$sendtoemail = $userdb['email'];
+		$sendtoemail = $hasReceiver ? $userdb['email'] : $db_ceoemail;
 		S::gp(array('subject','atc_content','fromname','fromemail','sendtoname'));
 
 		if (empty($subject)) {
@@ -60,7 +49,7 @@ if ($action == 'mailto') {
 		} elseif (!ereg("^[-a-zA-Z0-9_\.]+\@([0-9A-Za-z][0-9A-Za-z-]+\.)+[A-Za-z]{2,5}$",$sendtoemail) || !ereg("^[-a-zA-Z0-9_\.]+\@([0-9A-Za-z][0-9A-Za-z-]+\.)+[A-Za-z]{2,5}$",$fromemail)) {
 			Showmsg('illegal_email');
 		}
-		
+		$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
 		$userService->update($winduid, array(), array(), array('lasttime'=>$timestamp));
 
 		require_once(R_P.'require/sendemail.php');

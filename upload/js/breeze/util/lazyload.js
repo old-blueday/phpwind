@@ -1,4 +1,4 @@
-﻿/*
+/*
 * lazyload 模块
 * 
 */
@@ -77,7 +77,6 @@ Breeze.namespace('util.lazyload', function(B) {
                     _loadAreas();
                 },self.delay);
 	        }
-	        
             B.addEvent(container,'scroll',function() {
                 _loadAll();
             });

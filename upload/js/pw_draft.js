@@ -4,12 +4,10 @@ function PwDraft(){
 }
 
 PwDraft.prototype = {
-	
 	insert : function(o){
 		var obj = o.parentNode.firstChild;
-		if(typeof editor != 'undefined' && typeof AddCode == 'function'){
-			editor.focusEditor();
-			AddCode(editor._editMode == "textmode" ? obj.value : codetohtml(obj.value),'');
+		if(typeof editor != 'undefined'){
+			editor.pasteHTML(B.editor.ubb2html(obj.value));
 		} else{
 			document.FORM.atc_content.value += obj.value;
 		}
@@ -17,13 +15,14 @@ PwDraft.prototype = {
 
 	update : function(o,id){
 		var msg = ajax.convert(o.parentNode.firstChild.value);
-		ajax.send('pw_ajax.php','action=draft&step=3&atc_content='+msg+'&did='+id,ajax.guide);
+		ajax.send('pw_ajax.php', 'action=draft&step=3&atc_content='+msg+'&did='+id, ajax.guide);
 	},
 
 	del : function(id,page){
-		ajax.send('pw_ajax.php','action=draft&step=4&did='+id,function(){
-			ajax.guide();
-			draft.pages(page);
+		ajax.send('pw_ajax.php', 'action=draft&step=4&did='+id, function(){
+			ajax.guide(function() {
+				draft.pages(page);
+			});
 		});
 	},
 

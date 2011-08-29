@@ -356,7 +356,7 @@ if ($fcache < 2) {
 
 	//Start Here pwcache
 	if (($db_ifpwcache&112) && pwFilemtime(D_P.'data/bbscache/hitsort_judge.php')<$timestamp-600) {
-		include_once pwCache::getPath(D_P.'data/bbscache/hitsort_judge.php');
+		extract(pwCache::getData(D_P.'data/bbscache/hitsort_judge.php', false));
 		$updatelist = $updatetype = array();
 		foreach ($tpcdb as $thread) {
 			if ($db_ifpwcache & 16) {
@@ -545,7 +545,8 @@ if ($fcache < 2) {
 	}
 	unset($tpcdb,$query,$topadd,$searchadd,$sql,$limit2,$R,$p_status,$updatetop,$rewids,$arrStatus);
 } else {
-	include_once pwCache::getPath(S::escapePath(D_P."data/bbscache/fcache_{$fid}_{$page}.php"));
+	//* include_once pwCache::getPath(S::escapePath(D_P."data/bbscache/fcache_{$fid}_{$page}.php"));
+	pwCache::getData(S::escapePath(D_P."data/bbscache/fcache_{$fid}_{$page}.php"));
 	if ($page == 1 && !$ifsort) {
 		foreach ($threaddb as $key => $value) {
 			$value['topped'] && $ifsort = 1;
@@ -584,7 +585,8 @@ if ($t_db[$type]['upid']) {
 $db_forcetype = $t_exits && $t_per=='2' && !$admincheck ? 1 : 0; // 是否需要强制主题分类
 
 $db_maxtypenum == 0 && $db_maxtypenum = 5;
-$db_menuinit .= ",'td_post' : 'menu_post','td_post1' : 'menu_post','td_special' : 'menu_special'";
+//$db_menuinit .= ",'td_post' : 'menu_post','td_post1' : 'menu_post','td_special' : 'menu_special'";
+$db_menuinit .= ",'td_special' : 'menu_special'";
 if ($winddb['shortcut']) {
 	$myshortcut = 'true';
 } else {

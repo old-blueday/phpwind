@@ -1,8 +1,9 @@
 <?php
 !defined('P_W') && exit('Forbidden');
 require_once R_P . 'u/require/core.php';
-require_once pwCache::getPath(D_P . 'data/bbscache/o_config.php');
-	$o_photos_creditset = unserialize($o_photos_creditset);
+//* require_once pwCache::getPath(D_P . 'data/bbscache/o_config.php');
+pwCache::getData(D_P . 'data/bbscache/o_config.php');
+$o_photos_creditset = unserialize($o_photos_creditset);
 require_once(R_P.'require/postfunc.php');
 
 banUser();
@@ -107,7 +108,7 @@ if (!$rt['private']) {
 	$usercache->update($winduid,'photos',$pid,$usercachedata);
 	*/
 }
-$db->update("UPDATE pw_cnalbum SET photonum=photonum+" . S::sqlEscape($photoNum,false) . ",lasttime=" . S::sqlEscape($timestamp,false) . ',lastpid=' . S::sqlEscape(implode(',',$lastpid)) . (!$rt['lastphoto'] ? ',lastphoto=' . S::sqlEscape($img->getLastPhoto()) : '') . " WHERE aid=" . S::sqlEscape($aid));
+$db->update("UPDATE pw_cnalbum SET lasttime=" . S::sqlEscape($timestamp,false) . ',lastpid=' . S::sqlEscape(implode(',',$lastpid)) . (!$rt['lastphoto'] ? ',lastphoto=' . S::sqlEscape($img->getLastPhoto()) : '') . " WHERE aid=" . S::sqlEscape($aid));
 countPosts("+$photoNum");
 
 //积分变动

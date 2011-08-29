@@ -133,6 +133,32 @@ class PW_OverPrint {
 		//* return $this->_db->update("UPDATE $pw_tmsgs SET overprint=" . S::sqlEscape($related) . " WHERE tid=" . S::sqlEscape($tid) . " LIMIT 1");
 		return pwQuery::update($pw_tmsgs, 'tid=:tid', array($tid), array('overprint'=>$related));
 	}
+	
+	function getMultiUnRelatedsHTML($fid, $tids) {
+		$html = '<div style="width:270px;">';
+		$html .= '<div class="h" onmousedown="read.move(event);" style="cursor: move;"><a href="javascript:;"><img class="fr" src="images/close.gif" onclick="closep();"/></a>印戳设置</div>';
+		$html .= '<input type="hidden" name="overprinttids" id="overprinttids" value="' . implode(',', $tids) . '" />';
+		/*中间印戳选择 start*/
+		$html .= '<div class="overprint_opl cc">';
+		/*元素*/
+		$list = $this->buildunRelatedsHTML($fid, '', '', true);
+		$list = $list ? $list : "<div class=\"tac p10\">没有可选择的印戳</div>";
+		$html .= $list;
+		$html .= '</div>';
+		/*中间印戳选择 end*/
+		$html .= "</div>";
+		$html .= '</div>';
+		return $html;
+	}
+	
+	function getMultiUnRelatedsHTMLWithoutDiv($fid, $tids) {
+		$html = '<div class="overprint_opl cc" style="height: auto" id="odiv">';
+		$list= $this->buildunRelatedsHTML($fid, '', '', true, true);
+		$list = $list ? $list : "<div class=\"tac p10\">没有可选择的印戳</div>";
+		$html .= $list . '</div>';
+		return $html;
+	}
+	
 	function getunRelatedsHTML($fid, $tid) {
 		$isOverPrint = $this->getOverPrintByThreadId($tid);
 		$html = '<div style="width:270px;">';
@@ -150,7 +176,7 @@ class PW_OverPrint {
 		$html .= '</div>';
 		return $html;
 	}
-	function buildunRelatedsHTML($fid, $tid, $isOverPrint) {
+	function buildunRelatedsHTML($fid, $tid, $isOverPrint, $isMulti = false, $withoutEvent = false) {
 		$overprints = $this->getOverPrintUnRelateds();
 		if (!$overprints) {
 			return '';
@@ -160,10 +186,16 @@ class PW_OverPrint {
 				continue;
 			}
 			$url = $this->getIconPath() . "/" . $overprint['icon'];
-			$html .= $this->buildunRelatedLI($tid, $fid, $overprint['id'], $overprint['title'], $url, $isOverPrint);
+			$html .= $isMulti ?  $this->buildMultiUnRelatedLI($fid, $overprint['id'], $overprint['title'], $url,$withoutEvent) : $this->buildunRelatedLI($tid, $fid, $overprint['id'], $overprint['title'], $url, $isOverPrint);
 		}
 		return $html;
 	}
+	
+	function buildMultiUnRelatedLI($fid, $oid, $title, $url, $withoutEvent = false) {
+		$img = '<img src="' . $url . '" height="40" width="40" title="' . $title . '" />';
+		return $withoutEvent ? "<a href=\"javascript:;\" onclick=\"setOid(this,'$oid');\">$img</a>" : '<a href="javascript:;" url="mawhole.php?action=multioverprint&step=2&ajax=1&fid=' . $fid . '&oid=' . $oid . '" onclick="return showOverPrint(this,1);">' . $img . '</a>';
+	}
+	
 	function buildunRelatedLI($tid, $fid, $oid, $title, $url, $isOverPrint) {
 		$style = ($isOverPrint == $oid) ? "current" : "";
 		$img = '<img src="' . $url . '" height="40" width="40" title="' . $title . '" />';
@@ -192,11 +224,12 @@ class PW_OverPrint {
 		if (!$this->_cache) {
 			return array();
 		}
-		@include S::escapePath($this->getCacheFileName());
+		//* @include S::escapePath($this->getCacheFileName());
+		extract(pwCache::getData(S::escapePath($this->getCacheFileName()), false));
 		return $overPrints;
 	}
 	function getCacheFileName() {
-		return pwCache::getPath(D_P . "data/bbscache/" . $this->_filename);
+		return D_P . "data/bbscache/" . $this->_filename;
 	}
 	function getIconPath() {
 		return "images/overprint";

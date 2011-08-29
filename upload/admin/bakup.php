@@ -6,7 +6,10 @@ empty($adminitem) && $adminitem = 'bakout';
 require_once (R_P.'admin/table.php');
 $job = S::getGP('job');
 !$job && $job = 'bakout';
+$bakupDir = D_P.'data/sqlback/';
+createFolder($bakupDir);
 $basename = "$admin_file?adminjob=bakup";
+
 	if ($job == 'bakout') {
 		//$basename .= "&job=bakout";
 		if (empty($action)) {
@@ -46,10 +49,11 @@ $basename = "$admin_file?adminjob=bakup";
 		if (!$step) {
 			$step  = 1;
 			$start = 0;
-			$pre = 'pw_'.get_date($timestamp,'md').'_'.randstr(10).'_';
+			$bakdir = 'pw_'.get_date($timestamp,'md').'_'.randstr(10);
+			$pre = $bakdir.'_';
 			$bakuptable = bakuptable($tabledb);
-			//* writeover(S::escapePath(D_P.'data/'.$pre.'table.tmp'), implode("|", $tabledb), 'wb');
-			pwCache::setData(S::escapePath(D_P.'data/'.$pre.'table.tmp'), implode("|", $tabledb), false, 'wb');
+			writeover(S::escapePath(D_P.'data/'.$pre.'table.tmp'), implode("|", $tabledb), 'wb');
+			//* pwCache::setData(S::escapePath(D_P.'data/'.$pre.'table.tmp'), implode("|", $tabledb), false, 'wb');
 		}
 		$f_num = ceil($step/2);
 		$filename = $pre.$f_num.'.sql';
@@ -60,18 +64,18 @@ $basename = "$admin_file?adminjob=bakup";
 		$c_n = $start;
 		if ($stop == 1) {
 			$files = $step-1;
-			//* trim($writedata) && writeover(D_P.'data/'.$filename, $bak.$writedata, 'ab');
-			trim($writedata) && pwCache::setData(D_P.'data/'.$filename, $bak.$writedata, false, 'ab');
+			trim($writedata) && writeover($bakupDir.$filename, $bak.$writedata, 'ab');
+			//* trim($writedata) && pwCache::setData(D_P.'data/'.$filename, $bak.$writedata, false, 'ab');
 			
-			$j_url = "$basename&action=$action&start=$start&tableid=$tableid&sizelimit=$sizelimit&step=$step&pre=$pre&rows=$rows";
+			$j_url = "$basename&action=$action&start=$start&tableid=$tableid&sizelimit=$sizelimit&step=$step&pre=$pre&bakdir=$bakdir&rows=$rows";
 			adminmsg('bakup_step', EncodeUrl($j_url), 2);
 		} else {
-			//* trim($writedata) && writeover(D_P.'data/'.$filename, $bak.$writedata, 'ab');
-			trim($writedata) && pwCache::setData(D_P.'data/'.$filename, $bak.$writedata, false, 'ab');
+			trim($writedata) && writeover($bakupDir.$filename, $bak.$writedata, 'ab');
+			//* trim($writedata) && pwCache::setData(D_P.'data/'.$filename, $bak.$writedata, false, 'ab');
 			
 			if ($step > 1) {
 				for ($i=1; $i<=$f_num; $i++) {
-					$bakfile .= '<a href="data/'.$pre.$i.'.sql" target="_blank">'.$pre.$i.'.sql</a><br>';
+					$bakfile .= '<a href="data/sqlback/'.$pre.$i.'.sql" target="_blank">'.$pre.$i.'.sql</a><br>';
 				}
 			}
 			@unlink(S::escapePath(D_P.'data/'.$pre.'table.tmp'));
@@ -101,11 +105,11 @@ $basename = "$admin_file?adminjob=bakup";
 	$basename .= "&job=bakin";
 	if (empty($action)) {
 		$filedb = array();
-		$handle = opendir(D_P.'data');
+		$handle = opendir($bakupDir);
 		while($file = readdir($handle)){
 			if((!$PW || eregi("^pw_",$file) || eregi("^$PW",$file)) && eregi("\.sql$",$file)){
 				$strlen=eregi("^$PW",$file) ? 16 + strlen($PW) : 19;
-				$fp=fopen(D_P."data/$file",'rb');
+				$fp=fopen($bakupDir.$file,'rb');
 				$bakinfo=fread($fp,200);
 				fclose($fp);
 				$detail=explode("\n",$bakinfo);
@@ -126,7 +130,7 @@ $basename = "$admin_file?adminjob=bakup";
 		S::gp(array('step','count','pre'));
 		if(!$count){
 			$count=0;
-			$handle=opendir(D_P.'data');
+			$handle=opendir($bakupDir);
 			while($file = readdir($handle)){
 				if(eregi("^$pre",$file) && eregi("\.sql$",$file)){
 					$count++;
@@ -138,7 +142,7 @@ $basename = "$admin_file?adminjob=bakup";
 		$sql=readover(D_P.'data/'.$pre.$step.'.sql');
 		bakindata($sql);
 		*/
-		bakindata(D_P.'data/'.$pre.$step.'.sql');
+		bakindata($bakupDir.$pre.$step.'.sql');
 		$i=$step;
 		$step++;
 		if($count > 1 && $step <= $count){
@@ -146,14 +150,15 @@ $basename = "$admin_file?adminjob=bakup";
 			adminmsg('bakup_in',EncodeUrl($j_url),2);
 		}
 		updatecache();
-		require(D_P . 'data/bbscache/config.php');
+		//require(D_P . 'data/bbscache/config.php');
+		extract(pwCache::getData(D_P . 'data/bbscache/config.php', false));
 		adminmsg('operate_success');
 	} elseif($action=='del'){
 		S::gp(array('delfile'),'P');
 		if(!$delfile) adminmsg('operate_error');
 		foreach($delfile as $key => $value){
 			if(eregi("\.sql$",$value)){
-				pwCache::deleteData(D_P."data/$value");
+				pwCache::deleteData($bakupDir."$value");
 			}
 		}
 		adminmsg('operate_success');
@@ -372,7 +377,7 @@ $basename = "$admin_file?adminjob=bakup";
 	if (!$step) {
 
 		$id < 1 && $id = '';
-		$pw_tmsgs = 'pw_tmsgs'.$id;
+		$pw_tmsgs = 'pw_tmsgs'.($id > 0 ? intval($id) : '');
 		@extract($db->get_one("SELECT MIN(tid) AS tmin,MAX(tid) AS tmax FROM $pw_tmsgs"));
 		list($tidmin,$tidmax) = maxmin($id);
 		$tiderror = '';
@@ -574,5 +579,14 @@ function bakindata($filename) {
 		}
 	}
 	$db->dbpre = $GLOBALS['PW'];
+}
+function createFolder($path) {
+	if (!is_dir($path)) {
+		createFolder(dirname($path));
+		@mkdir($path);
+		@chmod($path,0777);
+		@fclose(@fopen($path.'/index.html','w'));
+		@chmod($path.'/index.html',0777);
+	}
 }
 ?>

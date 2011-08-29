@@ -39,11 +39,11 @@ EOT;
 if($lists){
 foreach($lists as $list){
 $altTitle = strip_tags($list['data']['title']);
-$add_star=$list[ifbusiness] ==1 ?'<img src="images/star.png" height="13" align="absmiddle">':'';
+$add_star=$list[ifbusiness] ==1 ?'background:url(images/star.png) left 5px no-repeat;padding-left:12px;':'';
 print <<<EOT
 -->
                  <tr class="tr1 vt">
-	                <td class="td2"><p class="lh_18"><a href="{$list[data][url]}" title="$altTitle" target="_blank">{$add_star}{$list[data][title]}</a></p></td>
+	                <td class="td2"><p class="lh_22" style="{$add_star}"><a href="{$list[data][url]}" title="$altTitle" target="_blank">{$list[data][title]}</a></p></td>
 					<td class="td2"><p class="lh_22" title="$list[invokename]">$list[invoketitle]</p></td>
 					<td class="td2"><p class="lh_22" title="admin">$list[editor]</p></td>
 					<td class="td2">$list[grade]</td>

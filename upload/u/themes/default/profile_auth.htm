@@ -1,0 +1,561 @@
+<!--<?php
+require_once uTemplate::PrintEot('header');
+require_once uTemplate::PrintEot('profile_left');
+print <<<EOT
+-->
+        <div class="contUser">
+        	<div class="p15">
+            	<h4 class="site"><span>认证</span></h4>
+                <div class="navC">
+                    <ul id="infolist">
+						<li id="base"><a href="profile.php?action=auth" hidefocus="true">实名认证</a></li>
+<!--
+EOT;
+if ($check_step == 'mobile') {print <<<EOT
+-->
+						<li id="mobile"><a href="profile.php?action=auth&check_step=mobile" hidefocus="true">绑定手机</a></li>
+<!--
+EOT;
+} elseif ($check_step == 'authalipay') {print <<<EOT
+-->
+						<li id="authalipay"><a href="profile.php?action=auth">绑定支付宝</a></li>
+<!--
+EOT;
+} elseif ($check_step == 'certificate') {print <<<EOT
+-->
+						<li id="certificate"><a href="profile.php?action=auth&check_step=certificate">证件认证</a></li>
+<!--
+EOT;
+}print <<<EOT
+-->
+                    </ul>
+                </div>
+
+<!--
+EOT;
+if (empty($check_step)) {print <<<EOT
+-->
+				<table width="100%" height="450">
+					<tr>
+						<td class="vt">
+							<div class="p15">
+								<table width="100%" class="setTable">
+									<tr>
+										<th class="th">支付宝帐号</th>
+										<td class="td">
+											<input class="input input_wa" type="text" name="alipay" value="$trade[alipay]" />
+											<a href="javascript:void(0)" class="mr10"  onclick="window.open('profile.php?action=auth&check_step=alipay', 'alipayCredit', 'height=520, width=1050');">
+<!--
+EOT;
+if ($isAuthAlipay) {print <<<EOT
+-->
+												[修改]
+<!--
+EOT;
+} else {print <<<EOT
+-->
+												[绑定]
+<!--
+EOT;
+}print <<<EOT
+-->
+											</a>
+										</td>
+									</tr>
+									<tr>
+										<th class="th">手机号码</th>
+										<td class="td">
+<!--
+EOT;
+	if ($isAuthMobile) {print <<<EOT
+-->
+											<span id="td_span_mobile" class="mr20">$authmobile</span><img src="u/images/attest/mobile.gif" align="absmiddle" class="mr5"/>已绑定手机 <a id="a_edit_mobile" href="javascript:void(0);" onclick="return checkMobile('$userdb[authmobile]');">[修改]</a>
+<!--
+EOT;
+	} else {print <<<EOT
+-->
+											<input class="input input_wa" type="text" maxlength="16" name="proauthmobile" id="td_input_mobile" value="$userdb[authmobile]" />
+											<a href="javascript:void(0);" onclick="return checkMobile(getObj('td_input_mobile').value);" class="mr10">[绑定]</a>
+<!--
+EOT;
+	}
+print <<<EOT
+-->
+										</td>
+									</tr>
+<!-- 
+EOT;
+if($db_authcertificate){
+	if ($isAuthCertificate) {print <<<EOT
+-->
+									<tr>
+										<th class="th">证件认证</th>
+										<td class="td" style="padding-top:3px;"><span style="display:inline-block;width:166px;">$certificateInfo[number]</span><span class="s3">[已认证]</span></td>
+									</tr>
+<!-- 
+EOT;
+	} else {
+		if($certificateInfo){
+			if($certificateInfo['state'] == 1){print <<<EOT
+-->
+
+									<tr>
+										<th class="th">证件认证</th>
+										<td class="td" style="padding-top:3px;"><span style="display:inline-block;width:166px;">$certificateInfo[number]</span><span class="s2">[审核中]</span></td>
+									</tr>
+<!--
+EOT;
+			} elseif ($certificateInfo['state'] == 3){print <<<EOT
+-->
+									<tr>
+										<th class="th">证件认证</th>
+										<td class="td" style="padding-top:3px;"><span style="display:inline-block;width:166px;">$certificateInfo[number]</span><span class="s1">[未通过]</span> <a href="profile.php?action=auth&check_step=certificate">[重新申请]</a></td>
+									</tr>
+<!-- 
+EOT;
+			}
+		}else{print <<<EOT
+-->
+									<tr>
+										<th class="th">证件认证</th>
+										<td class="td" style="padding-top:3px;"><span style="display:inline-block;width:166px;">未认证</span><a href="profile.php?action=auth&check_step=certificate">[认证]</a></td>
+									</tr>
+<!-- 
+EOT;
+		}
+	}
+}
+	print <<<EOT
+-->
+									<tr>
+										<th class="th">帐号状态</th>
+										<td class="td">	
+<!--
+EOT;
+if ($isAuthAlipay) {print <<<EOT
+-->
+											<span><img src="u/images/attest/alipay.gif" align="absmiddle" class="mr5"/>已绑定支付宝</span>
+<!--
+EOT;
+} else {print <<<EOT
+-->
+											<span><img src="u/images/attest/alipay_old.gif" style="padding:0;border:0;" class="mr5">未绑定支付宝</span>
+<!--
+EOT;
+}if ($isAuthMobile) {print <<<EOT
+-->
+											<span><img src="u/images/attest/mobile.gif" align="absmiddle" class="mr5"/>已绑定手机</span>
+<!--
+EOT;
+} else {print <<<EOT
+-->
+											<span><img src="u/images/attest/mobile_old.gif" align="absmiddle" class="mr5" />未绑定手机</span>
+<!--
+EOT;
+}
+if($db_authcertificate){
+	if ($isAuthCertificate) {print <<<EOT
+-->
+											<span><img src="u/images/attest/docu.gif" align="absmiddle" class="mr5"/>已完成证件认证</span>
+<!--
+EOT;
+	} else {print <<<EOT
+-->
+											<span><img src="u/images/attest/docu_old.gif" align="absmiddle" class="mr5" />未完成证件认证</span>
+<!--
+EOT;
+	}
+}
+print <<<EOT
+-->
+<!--
+EOT;
+if ($db_authhelpurl) {print <<<EOT
+-->
+											<a href="$db_authhelpurl">如何绑定？</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+										</td>
+									</tr>
+								</table>
+							</div>
+						</td>
+					</tr>
+				</table>
+<script type="text/javascript">
+function checkMobile(mobile) {
+	var url = 'profile.php?action=auth&check_step=mobile';
+	if (typeof (mobile) != 'undefined' && mobile != '') {
+		url += '&check_mobile='+mobile;
+	}
+	window.location.href = url;
+	return false;
+}
+</script>
+<!--
+EOT;
+} elseif ($check_step == 'mobile') {print <<<EOT
+-->
+				<table width="100%" height="450">
+					<tr>
+						<td class="vt">
+							<div class="p15">
+								<div id="info_base">
+									<div class="cc mb15">
+										<ol class="steps">
+											<li class="current" id="check_step_1"><em>1</em>输入手机号码</li>
+											<li id="check_step_2"><em>2</em>输入验证码</li>
+											<li id="check_step_3"><em>3</em>手机绑定成功</li>
+										</ol>
+									</div>
+									<div class="p5" id="mobileBox" style="display:$authStep_1">
+										<table width="100%" class="setTable vt">
+											<tr>
+												<th class="th f14"><div class="lh_24">输入手机号码：</div></th>
+												<td class="td">
+													<div class="mb10">
+														<input id="promobile" name="promobile" type="text" class="input input_wa" style="margin-right:10px;height:19px;line-height:16px;font-size:14px;" value="$mobile"/>
+														<span class="btn"><span><button type="button" id="sendVerify">获取验证码</button></span></span>
+													</div>
+													<p id="p_show_msg" class="gray">此服务免费，验证码将以手机短信的形式发送到您的手机上</p>
+												</td>
+											</tr>
+										</table>
+									</div>
+									<div class="cc" style="border:1px solid #e4e4e4;background:#f7fbff;margin-bottom:15px;padding:13px 0 10px;display:$authStep_2" id="verifyBox">    
+										<table width="100%" class="setTable vt">
+											<tbody id="verifyingBox"><tr>
+												<th class="th f14"></th>
+												<td class="td">
+													<div style="color:#666;">
+														验证码已发送到<span id="mobileNumber">$mobile</span><span id="modifyMobile"></span>，如果超过{$waitTime}秒未收到验证码，您可以免费重新获取。
+														<p>
+															<span class="bt2" style="margin:5px 0 0;"><span><button type="button" id="timeRemainTips">
+<!-- 
+EOT;
+if ($remainTime > 0) {print <<<EOT
+-->
+			            									<font color="red">{$remainTime}秒</font>后重获验证码
+<!--
+EOT;
+} else {print <<<EOT
+-->
+															重获验证码
+<!--
+EOT;
+}print <<<EOT
+-->
+															</button></span></span>
+														</p>
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<th class="th f14"><div class="lh_24 tar">验证码：</div></th>
+												<td class="td">
+													<input class="input input_wa" type="text" maxlength="75" name="authverify" id="authverify" style="margin-right:10px;height:19px;line-height:16px;font-size:14px;" />
+													<span class="bt"><span><button type="button" id="checkVerify">验证</button></span></span>
+													<span id="p_show_msg_2"></span>
+												</td>
+											</tr></tbody>
+											<tbody id="verifyedBox" style="display:none"><tr>
+												<th class="th f14"></th>
+												<td class="td"><div class="s3" style="font-size:2em;padding:20px 0">手机绑定成功，<a href="profile.php?action=auth" class="f12">返回认证页面</a></div></td>
+											</tr></tbody>
+										</table>
+									</div>
+								</div>
+							</div>
+						</td>
+					</tr>
+				</table>
+<script type="text/javascript">
+var authBehavior = {
+	
+	remainTime : parseInt('$remainTime'),
+	waitTime : parseInt('$waitTime'),
+	authStep : parseInt('$authStep'),
+
+	intval : null,
+	type : 'profile',
+	info : new Array("",
+		"与服务器通信失败,请稍候再试",
+		"手机号码输入有误",
+		"该手机号码已经绑定实名认证",
+		"你今天获取验证码次数已达到上限",
+		"验证码输入有误",
+		"您的帐户尚未绑定手机认证",
+		"手机验证码不能为空"
+	),
+
+	mobile : getObj('promobile'),
+	tips : getObj('p_show_msg'),
+	
+	init : function() {
+		if (this.authStep == 2) this.showVerify();
+	},
+
+	checkSend : function() {
+		var _=this;
+		if (!/^1\d{10}$/.test(_.mobile.value)) {
+			_.getFailed(2);
+			return false;
+		}
+		_.setSendVerifyButton(false);
+		return true;
+	},
+
+	checkVerify : function() {
+		var _=this;
+		if (getObj('authverify').value == '') {
+			_.showTips(6);
+			getObj('authverify').onfocus = function(){_._showDefaultTips();}
+			return false;
+		}
+		_.setCheckVerifyButton(false);
+		return true;
+	},
+	
+	setSendVerifyButton : function(usable) {
+		getObj('sendVerify').disabled = (usable === false) ? true : false;
+	},
+
+	setCheckVerifyButton : function(usable) {
+		getObj('checkVerify').disabled = (usable === false) ? true : false;
+	},
+
+	getSendParam : function() {
+		return 'type=' + this.type + '&mobile=' + this.mobile.value;
+	},
+
+	getCheckParam : function() {
+		return 'step=2&type=' + this.type + '&mobile=' + this.mobile.value + '&authverify=' + getObj('authverify').value;
+	},
+
+	getFailed : function(code) {
+		var _=this;
+		_.showTips(code);
+		_.mobile.onfocus = function(){_._showDefaultTips();}
+		_.setSendVerifyButton(true);
+	},
+
+	showTips : function(code) {
+		var _=this;
+		_.tips.innerHTML = '<img src="u/images/attest/regwrong.png" style="vertical-align:middle;"> <font color=red>'+_.info[code]+'</font>';
+		_.tips.style.display = '';
+	},
+
+	_showDefaultTips : function() {
+		this.tips.innerHTML = '此服务免费，验证码将以手机短信的形式发送到您的手机上';
+	},
+
+	showVerify : function() {
+		var _=this;
+		_.tips = getObj('p_show_msg_2');
+		getObj('verifyBox').style.display = '';
+		getObj('mobileBox').style.display = 'none';
+		getObj('mobileNumber').innerHTML = this.mobile.value;
+		getObj('check_step_1').className = '';
+		getObj('check_step_2').className = 'current';
+		if(_.intval == null) _.intval = setInterval(function(){_.setCheckTime();},1000);
+	},
+
+	showSuccess : function() {
+		getObj('verifyingBox').style.display = 'none';
+		getObj('verifyedBox').style.display = '';
+		getObj('check_step_2').className = '';
+		getObj('check_step_3').className = 'current';
+	},
+
+	setCheckTime : function() {
+		var _=this;
+		_.remainTime -= 1;
+		if (_.remainTime > 0) {
+			getObj("timeRemainTips").innerHTML = '<font color="red">'+_.remainTime+'秒</font>后重获验证码';
+			getObj("modifyMobile").innerHTML = '';
+		} else {
+			clearInterval(_.intval);
+			_.intval = null;
+			_.remainTime = _.waitTime;
+			getObj("timeRemainTips").disabled = false;
+			getObj("timeRemainTips").innerHTML = '重获验证码';
+			/*
+			if(true){//修改手机号码
+				getObj("modifyMobile").innerHTML = '（<a href="javascript://" class="s4" >修改号码</a>）';
+				getObj("modifyMobile").onclick = function(){
+					getObj("modifyMobile").innerHTML = '';
+					getObj('mobileBox').style.display = '';
+					getObj('verifyBox').style.display = 'none';
+					return false;
+				}
+			}
+			*/
+			getObj("timeRemainTips").onclick = function() {
+				if (_.remainTime == _.waitTime || _.remainTime == 0) {
+					authObj.getVerify();
+				}
+			};
+		}
+	}
+}
+
+function auth(bev) {
+	this.bev = bev;
+	this.url = 'pw_ajax.php?action=auth';
+}
+
+auth.prototype.getVerify = function() {
+	if (!this.bev.checkSend()) {
+		return false;
+	}
+	var _=this;
+	ajax.send(this.url, this.bev.getSendParam(), function() {
+		var response = parseInt(ajax.request.responseText);
+		if (response > 0) {
+			_.bev.getFailed(response);
+		} else {
+			_.bev.showVerify();
+		}
+	});
+}
+auth.prototype.checkVerify = function() {
+	if (!this.bev.checkVerify()) {
+		return false;
+	}
+	var _=this;
+	ajax.send(this.url, this.bev.getCheckParam(), function() {
+		var response = parseInt(ajax.request.responseText);
+		if (response > 0) {
+			_.bev.showTips(response);
+			_.bev.setCheckVerifyButton(true);
+		} else {
+			_.bev.showSuccess();
+		}
+	});
+}
+
+authBehavior.init();
+var authObj = new auth(authBehavior);
+getObj('sendVerify').onclick = function() {
+	authObj.getVerify();
+}
+getObj('checkVerify').onclick = function() {
+	authObj.checkVerify();
+}
+</script>
+<!--
+EOT;
+} elseif ($check_step == 'authalipay') {print <<<EOT
+-->
+				<table width="100%" height="450">
+					<tr>
+						<td class="vt">
+							<div class="p15">
+								<div class="cc" style="border:1px solid #e4e4e4;background:#f7fbff;margin-bottom:15px;padding:13px 0 10px;display:$styleDisplayVerifyBox" id="verifyBox">    
+									<table width="100%" class="setTable vt">
+										<tr>
+											<th class="th f14"></th>
+											<td class="td">
+<!--
+EOT;
+if ($isSuccess) {print <<<EOT
+-->
+												<div class="s3" style="font-size:2em;padding:20px 0">支付宝绑定成功，<a href="profile.php?action=auth" class="f12">返回认证页面</a></div>
+<!--
+EOT;
+} else {print <<<EOT
+-->
+												<div class="s2" style="font-size:2em;padding:20px 0">支付宝绑定失败，<a href="profile.php?action=auth" class="f12">请返回后重新绑定</a></div>
+<!--
+EOT;
+}print <<<EOT
+-->
+											</td>
+										</tr>
+									</table>
+								</div>
+							</div>
+						</td>
+					</tr>
+				</table>
+<!--
+EOT;
+}elseif($check_step == 'certificate'){print <<<EOT
+-->
+				<form action="" method="post" enctype="multipart/form-data">
+				<input type="hidden" name="step" value="2" />
+				<table width="100%" height="280">
+					<tr>
+						<td class="vt">
+							<div class="p15">
+								<table width="100%" class="setTable">
+									<tr>
+										<th class="th">证件类型</th>
+										<td class="td">
+											<select class="select_wa" name="certificate[type]">
+												{$certificateTypesHtml}
+											</select>
+										</td>
+									</tr>
+									<tr>
+										<th class="th">证件图片</th>
+										<td class="td">
+											<div style="float:left;width:200px;">
+												<div class="cc b mb5">正面</div>
+												<img id="preview_1" width="148" height="100" class="img" style="filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod=image);" src="images/blank.gif">
+												<input name="certificateattach_1" type="file" class="input" style="width:160px;" id="p_1" accept="image/*" onchange="preview_img(1);" />
+											</div>
+											<div style="float:left;width:200px;">
+												<div class="cc b mb5">背面</div>
+												<img id="preview_2" width="148" height="100" class="img" style="filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod=image);" src="images/blank.gif">
+												<input name="certificateattach_2" type="file" class="input" style="width:160px;" id="p_2" accept="image/*" onchange="preview_img(2);" />
+											</div>
+										</td>
+									</tr>
+									<tr>
+										<th class="th">证件编号</th>
+										<td class="td"><input name="certificate[number]" type="text" class="input input_wb" />
+										</td>
+									</tr>
+								</table>
+							</div>
+						</td>
+					</tr>
+				</table>
+				<div style="padding: 1em;" class="tac">
+					<span class="btn"><span><button type="submit">提 交</button></span></span>
+				</div>
+				</form>
+<!--
+EOT;
+}print <<<EOT
+-->
+			</div>
+		</div>
+<script type="text/javascript">
+setCurrent('$check_step','base','current');
+/*
+function preview_img(id){
+	var photype = getObj('p_'+id);
+	var patn = /\.jpg$|\.jpeg$|\.png|\.bmp|\.gif$/i;
+	if(patn.test(photype.value)){
+		var Preview = getObj('preview_'+id);
+		if (is_gecko) {
+Preview.src = photype.files[0].getAsDataURL();
+		} else if (is_ie) {
+Preview.filters.item("DXImageTransform.Microsoft.AlphaImageLoader").src = photype.value;
+Preview.filters.item("DXImageTransform.Microsoft.AlphaImageLoader").sizingMethod = 'scale';
+		}
+	} else {
+		showDialog('error','您选择的似乎不是图像文件。',2);
+	}
+}
+*/
+</script>
+
+<!--
+EOT;
+require_once uTemplate::printEot('footer');
+?>-->

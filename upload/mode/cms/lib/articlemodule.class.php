@@ -155,20 +155,17 @@ class PW_ArticleModule extends PW_Module {
 	 * @param array $oldatt_desc
 	 * @param array $keep
 	 */
-	function setAttach($oldatt_desc = array(), $keep = array()) {
+	function setAttach($flashatt, $oldatt_desc = array()) {
 		global $db_allowupload, $_G;
 		$attachs = $this->attach ? $this->attach : array();
-		$attachs = $this->_cookOldAttachs($attachs, $oldatt_desc, $keep);
+		$attachs = $this->_cookOldAttachs($attachs, $oldatt_desc);
 		C::loadClass('articleupload', 'upload', false);
 		$uploaddb = array();
-		if ($db_allowupload && $_G['allowupload'] && (PwUpload::getUploadNum())) {
+		if ($db_allowupload && $_G['allowupload'] && (PwUpload::getUploadNum() || $flashatt)) {
 			$articleUpload = new ArticleUpload();
-			$uploaddb = PwUpload::upload($articleUpload, false);
-			foreach ($uploaddb as $key => $value) {
-				$value['name'] = $value['name'];
-				$value['descrip'] = S::escapeChar(S::getGP('atc_desc_' . $value['id'], 'P'));
-				$uploaddb[$key] = $value;
-			}
+			$articleUpload->setFlashAtt($flashatt, intval($_POST['savetoalbum']), intval($_POST['albumid']));
+			PwUpload::upload($articleUpload);
+			$uploaddb = $articleUpload->getAttachs();
 		}
 		$this->attach = (array)$attachs + (array)$uploaddb;
 	}
@@ -283,14 +280,10 @@ class PW_ArticleModule extends PW_Module {
 		return implode($this->PAGECUT, $contents);
 	}
 
-	function _cookOldAttachs($attachs, $oldatt_desc, $keep) {
+	function _cookOldAttachs($attachs, $oldatt_desc) {
 		foreach ($attachs as $key => $value) {
-			if (!S::inArray($value['attach_id'], $keep)) {
-				$value['attname'] = 'delete';
-			} else {
-				$value['descrip'] = $oldatt_desc[$value['attach_id']];
-				$value['attname'] = 'update';
-			}
+			$value['descrip'] = $oldatt_desc[$value['attach_id']];
+			$value['attname'] = 'update';
 			$attachs[$key] = $value;
 		}
 		return $attachs;

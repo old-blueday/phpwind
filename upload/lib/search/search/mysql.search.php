@@ -351,6 +351,200 @@ class Search_Mysql extends Search_Base {
 	}
 	
 	/*********************************************************************/
+	/**
+	 * 搜索版块统计信息
+	 * @param array $forumIds
+	 * @param string $keywords
+	 * @param int $range
+	 * @param string $userNames
+	 * @param int $starttime
+	 * @param int $endtime
+	 * @return array
+	 */
+	
+	
+	function searchForumGroups($keywords,$range,$userNames="",$starttime="",$endtime="",$forumIds=array(),$page=1,$perpage=20,$expand=array()) {
+		$result = $this->searchForumsGroupsWithCondition ($keywords,$range,$userNames,$starttime,$endtime,$forumIds,$page,$perpage,$expand);
+		return $this->_buildForumsTotal ($result);		
+	}
+	
+	function searchForumsGroupsWithCondition($keywords,$range,$userNames="",$starttime="",$endtime="",$forumIds=array(),$page=1,$perpage=20,$expand=array()) {
+		list ( $keywords, $users, $starttime, $endtime ) = $this->_checkForumsGroupsConditions ( $keywords, $userNames, $starttime, $endtime );
+		if ($userNames && ! $users)
+			return false;
+		$keywords = ($keywords) ? explode ( " ", $keywords ) : '';
+		switch ($range) {
+			case 1 :
+				$result = $this->_searchForumsGroupsWithSubject ($keywords, $users, $starttime, $endtime, $forumIds);
+				break;
+			case 2 :
+				$result = $this->_searchForumsGroupsWithSubjectAndContent ($keywords, $users, $starttime, $endtime, $forumIds);
+				break;
+			case 3 :
+				$result = $this->_searchForumsGroupsWithPosts ($keywords, $users, $starttime, $endtime, $forumIds);
+		}
+		return $result;
+	}
+
+
+	function _checkForumsGroupsConditions($keywords, $userNames = "", $starttime = "", $endtime = "") {
+		$keywords = $this->_checkKeywordCondition ( $keywords );
+		$keywords = ($keywords) ? $keywords : '';
+		$users = array ();
+		($userNames) ? $users = $this->_checkUserCondition ( $userNames ) : 0;
+		list ( $starttime, $endtime ) = $this->_checkTimeNodeCondition ( $starttime, $endtime );
+		return array ($keywords, $users, $starttime, $endtime );
+	}
+
+	/**
+	 * 按帖子标题搜索,统计版块数量
+	 * @param array $forumIds
+	 * @param string $keywords
+	 * @param array $users array('uid'=>'username')
+	 * @param int $starttime
+	 * @param int $endtime
+	 * @return array()
+	 */
+	function _searchForumsGroupsWithSubject($keywords, $users, $starttime, $endtime, $forumIds) {
+		$sql = "";
+		if ($keywords) {
+			foreach ( $keywords as $keyword ) {
+				$sql = ($sql) ? $sql . " " . $this->_mysqlMethod . " " : " AND ( " . $sql;
+				$sql .= " t.subject LIKE " . S::sqlEscape ( '%' . $keyword . '%' );
+			}
+			$sql .= " ) ";
+		}
+		
+		if ($forumIds) {
+			$forumIds = (is_array ( $forumIds )) ? $forumIds : array ($forumIds );
+			$sql .= " AND t.fid IN(" . S::sqlImplode ( $forumIds ) . ")";
+		}
+			
+		if ($this->_mysqlFilterIds) {
+			$sql .= " AND t.fid NOT IN(" . S::sqlImplode ( $this->_mysqlFilterIds ) . ")";
+		}
+
+		if ($users) {
+			$sql .= " AND t.authorid IN(" . S::sqlImplode ( array_keys ( $users ) ) . ")";
+		}
+
+		if ($starttime) {
+			$sql .= " AND t.postdate > " . S::sqlEscape ( $starttime );
+		}
+
+		if ($endtime) {
+			$sql .= " AND t.postdate < " . S::sqlEscape ( $endtime );
+		}
+		$sql .= " AND t.ifcheck = 1 AND t.fid != 0 ";
+		$sql .= " GROUP BY t.fid ";
+		$sql .= " ORDER BY total DESC";
+		$threadsDao = $this->getThreadsDao ();
+		return $threadsDao->getSearch ( "SELECT t.fid, COUNT(*) as total FROM pw_threads t WHERE 1 " . $sql);
+	}
+
+	/**
+	* 按标题与内容搜索帖子,统计版块数量
+	* @param array $forumIds
+	* @param string $keywords
+	* @param array $users
+	* @param int $starttime
+	* @param int $endtime
+	* @return array()
+	*/
+	function _searchForumsGroupsWithSubjectAndContent($keywords, $users, $starttime, $endtime, $forumIds) {
+		$sql = "";
+
+		if ($keywords) {
+			foreach ( $keywords as $keyword ) {
+				$sql = ($sql) ? $sql . " " . $this->_mysqlMethod . " " : " AND ( " . $sql;
+				$sql .= " ( t.subject LIKE " . S::sqlEscape ( '%' . $keyword . '%' ) . " OR tm.content LIKE " . S::sqlEscape ( '%' . $keyword . '%' ) . ") ";
+			}
+			$sql .= " ) ";
+		}
+
+		if ($forumIds) {
+			$forumIds = (is_array ( $forumIds )) ? $forumIds : array ($forumIds );
+			$sql .= " AND t.fid IN(" . S::sqlImplode ( $forumIds ) . ")";
+		}
+		
+		if ($this->_mysqlFilterIds) {
+			$sql .= " AND t.fid NOT IN(" . S::sqlImplode ( $this->_mysqlFilterIds ) . ")";
+		}
+		
+		if ($users) {
+			$sql .= " AND t.authorid IN(" . S::sqlImplode ( array_keys ( $users ) ) . ")";
+		}
+		if ($starttime) {
+			$sql .= " AND t.postdate > " . S::sqlEscape ( $starttime );
+		}
+		if ($endtime) {
+			$sql .= " AND t.postdate < " . S::sqlEscape ( $endtime );
+		}
+		$sql .= " AND t.ifcheck = 1  AND t.fid != 0 ";
+		$sql .= " GROUP BY t.fid ";
+		$sql .= " ORDER BY total DESC";
+		$threadsDao = $this->getThreadsDao ();
+		$tmsgsTable = $this->_getTmsgsTable ();
+		return $threadsDao->getSearch ( "SELECT t.fid, COUNT(*) as total FROM pw_threads t LEFT JOIN $tmsgsTable tm ON tm.tid=t.tid WHERE 1 " . $sql );
+	}
+	
+	/**
+	 * 按回复标题与内容搜索帖子,统计版块数量
+	 * @param array $forumIds
+	 * @param string $keywords
+	 * @param array $users
+	 * @param int $starttime
+	 * @param int $endtime
+	 * @return array()
+	 */
+	function _searchForumsGroupsWithPosts($keywords, $users, $starttime, $endtime, $forumIds) {
+		$sql = "";
+
+		if ($keywords) {
+			foreach ( $keywords as $keyword ) {
+				$sql = ($sql) ? $sql . " " . $this->_mysqlMethod . " " : " AND ( " . $sql;
+				$sql .= " ( p.subject LIKE " . S::sqlEscape ( '%' . $keyword . '%' ) . " OR p.content LIKE " . S::sqlEscape ( '%' . $keyword . '%' ) . ") ";
+			}
+			$sql .= " ) ";
+		}
+
+		if ($forumIds) {
+			$forumIds = (is_array ( $forumIds )) ? $forumIds : array ($forumIds );
+			$sql .= " AND p.fid IN(" . S::sqlImplode ( $forumIds ) . ")";
+		}
+
+		if ($this->_mysqlFilterIds) {
+			$sql .= " AND p.fid NOT IN(" . S::sqlImplode ( $this->_mysqlFilterIds ) . ")";
+		}
+		
+		if ($users) {
+			$sql .= " AND p.authorid IN(" . S::sqlImplode ( array_keys ( $users ) ) . ")";
+		}
+		if ($starttime) {
+			$sql .= " AND p.postdate > " . S::sqlEscape ( $starttime );
+		}
+		if ($endtime) {
+			$sql .= " AND p.postdate < " . S::sqlEscape ( $endtime );
+		}
+		$sql .= " AND p.ifcheck = 1 ";
+		$sql .= " GROUP BY p.fid ";
+		$sql .= " ORDER BY total DESC";
+		$threadsDao = $this->getThreadsDao ();
+		$postTable = $this->_getPostsTable ();
+		return $threadsDao->getSearch ( "SELECT p.fid, COUNT(*) as total FROM $postTable p WHERE 1 " . $sql );
+	}
+	
+	function _buildForumsTotal($forums) {
+		if (! $forums)
+			return array ();
+		$result = array ();
+		foreach ($forums as $value) {
+			$result[$value['fid']] = intval($value['total']);
+		}
+		return $result;
+	}
+	
+	/*********************************************************************/
 	function searchUsers($keywords, $page = 1, $perpage = 20) {
 		if (! ($keywords = $this->_checkKeywordCondition ( $keywords ))) {
 			return array (false, false );
@@ -367,9 +561,26 @@ class Search_Mysql extends Search_Base {
 		return array ($total, $this->_buildUsers ( $result ) );
 	}
 	/*********************************************************************/
-	function searchDiarys($keywords, $range, $userNames = "", $starttime = "", $endtime = "", $page = 1, $perpage = 20) {
+	/*
+	 * 新鲜事搜索
+	 * 
+	 * */
+	function searchWeibo($keywords, $userNames = "", $starttime = "", $endtime = "", $page = 1, $perpage = 20) {
 		list ( $keywords, $users, $starttime, $endtime ) = $this->_checkThreadConditions ( $keywords, $userNames, $starttime, $endtime );
 		if (! $keywords || ($userNames && ! $users))
+			return false;
+		$userIds = ($users) ? array_keys ( $users ) : array ();
+		$page = $page > 1 ? $page : 1;
+		$offset = intval ( ($page - 1) * $perpage );
+		$weiboDao = $this->_getWeiboDao();
+		$result = $weiboDao->search($keywords,'ALL', $offset, $perpage );
+		return $result;
+	}
+	
+	/*********************************************************************/
+	function searchDiarys($keywords, $range, $userNames = "", $starttime = "", $endtime = "", $page = 1, $perpage = 20) {
+		list ( $keywords, $users, $starttime, $endtime ) = $this->_checkThreadConditions ( $keywords, $userNames, $starttime, $endtime );
+		if ($userNames && ! $users)
 			return false;
 		$userIds = ($users) ? array_keys ( $users ) : array ();
 		$page = $page > 1 ? $page : 1;
@@ -409,6 +620,9 @@ class Search_Mysql extends Search_Base {
 		if ($users) {
 			$sql .= " AND username IN(" . S::sqlImplode ( $users ) . ")";
 		}
+		
+		$sql .= $this->_getFilterDiaryByMysql();
+		
 		if ($starttime) {
 			$sql .= " AND postdate > " . S::sqlEscape ( $starttime );
 		}
@@ -445,6 +659,9 @@ class Search_Mysql extends Search_Base {
 		if ($users) {
 			$sql .= " AND username IN(" . S::sqlImplode ( $users ) . ")";
 		}
+		
+		$sql .= $this->_getFilterDiaryByMysql();
+		
 		if ($starttime) {
 			$sql .= " AND postdate > " . S::sqlEscape ( $starttime );
 		}
@@ -481,6 +698,9 @@ class Search_Mysql extends Search_Base {
 		if ($users) {
 			$sql .= " AND username IN(" . S::sqlImplode ( $users ) . ")";
 		}
+		
+		$sql .= $this->_getFilterDiaryByMysql();
+			
 		if ($starttime) {
 			$sql .= " AND postdate > " . S::sqlEscape ( $starttime );
 		}
@@ -505,6 +725,13 @@ class Search_Mysql extends Search_Base {
 		return $this->_searchGroups ( $keywords, $page, $perpage );
 	}
 	
+	/**
+	 * 新鲜事DAO
+	 * @return PW_Weibo_ContentDB
+	 */
+	function _getWeiboDao() {
+		return L::loadDB('weibo_content','sns');
+	}
 	/**
 	 * 用户表DAO
 	 * @return PW_MembersDB

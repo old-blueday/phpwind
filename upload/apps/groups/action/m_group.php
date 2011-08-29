@@ -197,7 +197,8 @@ if (empty($a)) {
 		}
 	}
 	//用户浏览关注度
-	$db->update("UPDATE pw_colonys SET visit=visit+1 WHERE id=" . S::sqlEscape($cyid));
+	//* $db->update("UPDATE pw_colonys SET visit=visit+1 WHERE id=" . S::sqlEscape($cyid));
+	pwQuery::update('pw_colonys', 'id=:id', array($cyid), null, array(PW_EXPR=>array('visit=visit+1')));
 
 	list($isheader,$isfooter,$tplname,$isleft) = array(false, true, "m_group", true);
 
@@ -295,7 +296,7 @@ if (empty($a)) {
 		$J_sql = " LEFT JOIN $pw_tmsgs tm ON t.tid=tm.tid LEFT JOIN pw_members m ON m.uid=t.authorid LEFT JOIN pw_memberdata md ON m.uid=md.uid";
 	}
 	$read = $db->get_one("SELECT t.*{$S_sql},a.cyid,a.topped,a.digest FROM pw_threads t LEFT JOIN pw_argument a ON a.tid=t.tid{$J_sql} WHERE t.tid=" . S::sqlEscape($tid) . ' AND a.tid IS NOT NULL');
-
+	$titletop1 = 'Re:' . $read['subject']; 
 	if (empty($read) || $read['cyid'] != $cyid || $read['fid'] != $colony['classid'] || ($read['fid']==0 && $read['ifcheck']==1)) {
 		Showmsg('data_error');
 	}
@@ -307,8 +308,9 @@ if (empty($a)) {
 	$webPageTitle = $colonySeo->getPageTitle($read['subject'],$colony['cname']);
 	$metaDescription = $colonySeo->getPageMetadescrip($read['subject']);
 	$metaKeywords = $colonySeo->getPageMetakeyword($read['subject'],$colony['cname']);
-
-	$foruminfo = L::forum($read['fid']);
+	
+	$fid = $read['fid'];
+	$foruminfo = L::forum($fid);
 
 	$readdb	  = $_pids = $attachdb = array();
 	$ptable	  = $read['ptable'];
@@ -326,6 +328,7 @@ if (empty($a)) {
 		$read['aid'] && $_pids['tpc'] = 0;
 		$lou--;
 	}
+	pwQuery::update('pw_threads', 'tid=:tid', array($tid), null, array(PW_EXPR=>array('hits=hits+1')));
 	if ($read['replies'] > 0) {
 		list($pages, $limit) = pwLimitPages($read['replies'], $page, "{$basename}a=$a&cyid=$cyid&tid=$tid&");
 		$query = $db->query("SELECT t.*,m.uid,m.username,m.groupid,m.memberid,m.icon,m.userstatus,md.thisvisit FROM $pw_posts t LEFT JOIN pw_members m ON m.uid=t.authorid LEFT JOIN pw_memberdata md ON m.uid=md.uid WHERE t.tid=".S::sqlEscape($tid)." AND t.ifcheck='1' ORDER BY t.postdate $limit");
@@ -335,11 +338,9 @@ if (empty($a)) {
 		}
 	}
 	if ($_pids) {
-		$query = $db->query('SELECT * FROM pw_attachs WHERE tid=' . S::sqlEscape($tid) . " AND pid IN (" . S::sqlImplode($_pids) . ")");
-		while ($rt = $db->fetch_array($query)) {
-			if ($rt['pid'] == '0') $rt['pid'] = 'tpc';
-			$attachdb[$rt['pid']][$rt['aid']] = $rt;
-		}
+		extract(L::style());
+		$attachShow = new attachShow(($isGM || $pwSystem['delattach']), $forumset['uploadset']);
+		$attachShow->init($tid, $_pids);
 	}
 	$ifColonyAdmin = $ifadmin;
 	foreach ($readdb as $key => $read) {
@@ -347,14 +348,7 @@ if (empty($a)) {
 		$tpc_author = $read['author'];
 		$read['lou'] = ++$lou;
 		$db_menuinit .= ",'read_$read[lou]' : 'read_1_$read[lou]'";
-		$attachs = $aids = array();
-		if ($read['aid'] && isset($attachdb[$read['pid']])) {
-			$attachs = $attachdb[$read['pid']];
-			$read['ifhide'] > 0 && ifpost($tid) >= 1 && $read['ifhide'] = 0;
-			if (is_array($attachs) && !$read['ifhide']) {
-				$aids = attachment($read['content']);
-			}
-		}
+
 		if ($read['anonymous']) {
 			$anonymous = (!$isGM && $winduid != $read['authorid'] && !$pwSystem['anonyhide']);
 			$read['anonymousname'] = $GLOBALS['db_anonymousname'];
@@ -364,7 +358,7 @@ if (empty($a)) {
 		}
 
 		$read['ipfrom'] = $db_ipfrom==1 && $_G['viewipfrom'] ? $read['ipfrom'] : '';
-		$read['ip'] = ($ifadmin || $pwSystem['viewip']) ? 'IP:'.$read['userip'] : '';
+		$read['ip'] = $pwSystem['viewip'] ? 'IP:'.$read['userip'] : '';
 
 		if ($db_iftag && $read['tags']) {
 			list($read['tag'], $tpc_tag) = getReadTag($read['tags']);
@@ -400,40 +394,8 @@ if (empty($a)) {
 				//$tpc_tag && $db_readtag && $read['content'] = relatetag($read['content'], $tpc_tag);
 				strpos($read['content'],'[s:') !== false && $read['content'] = showface($read['content']);
 			}
-			if ($attachs && is_array($attachs) && !$read['ifhide']) {
-				if ($winduid == $read['authorid'] || $isGM || $pwSystem['delattach']) {
-					$dfadmin = 1;
-				} else {
-					$dfadmin = 0;
-				}
-				foreach ($attachs as $at) {
-					$atype = '';
-					$rat = array();
-					if ($at['type'] == 'img' && $at['needrvrc'] == 0 && (!$GLOBALS['downloadimg'] || !$GLOBALS['downloadmoney'] || $_G['allowdownload'] == 2)) {
-						$a_url = geturl($at['attachurl'],'show');
-						if (is_array($a_url)) {
-							$atype = 'pic';
-							$dfurl = '<br>'.cvpic($a_url[0], 1, $db_windpost['picwidth'], $db_windpost['picheight'], $at['ifthumb'] & 1);
-							$rat = array('aid' => $at['aid'], 'img' => $dfurl, 'dfadmin' => $dfadmin, 'desc' => $at['descrip']);
-						} elseif ($a_url == 'imgurl') {
-							$atype = 'picurl';
-							$rat = array('aid' => $at['aid'], 'name' => $at['name'], 'dfadmin' => $dfadmin, 'verify' => md5("showimg{$tid}{$read[pid]}{$fid}{$at[aid]}{$GLOBALS[db_hash]}"));
-						}
-					} else {
-						$atype = 'downattach';
-						if ($at['needrvrc'] > 0) {
-							!$at['ctype'] && $at['ctype'] = $at['special'] == 2 ? 'money' : 'rvrc';
-							$at['special'] == 2 && $GLOBALS['db_sellset']['price'] > 0 && $at['needrvrc'] = min($at['needrvrc'], $GLOBALS['db_sellset']['price']);
-						}
-						$rat = array('aid' => $at['aid'], 'name' => $at['name'], 'size' => $at['size'], 'hits' => $at['hits'], 'needrvrc' => $at['needrvrc'], 'special' => $at['special'], 'cname' => $GLOBALS['creditnames'][$at['ctype']], 'type' => $at['type'], 'dfadmin' => $dfadmin, 'desc' => $at['desc'], 'ext' => strtolower(substr(strrchr($at['name'],'.'),1)));
-					}
-					if (!$atype) continue;
-					if (in_array($at['aid'], $aids)) {
-						$read['content'] = attcontent($read['content'], $atype, $rat);
-					} else {
-						$read[$atype][$at['aid']] = $rat;
-					}
-				}
+			if ($read['aid'] && $GLOBALS['attachShow']->isShow($read['ifhide'], $tid)) {
+				$read += $GLOBALS['attachShow']->parseAttachs($read['pid'], $read['content'], $winduid == $read['authorid']);
 			}
 		}
 		list($read['icon']) = showfacedesign($read['icon'],1,'m');
@@ -444,7 +406,9 @@ if (empty($a)) {
 	list($isheader,$isfooter,$tplname,$isleft) = array(false, true, "m_group", true);
 
 } elseif ($a == 'post') {
+
 	L::loadClass('forum', 'forum', false);
+	$fid = $colony['classid'];
 	$pwforum = new PwForum($colony['classid']);
 
 	$a_key = 'thread';
@@ -464,18 +428,11 @@ if (empty($a)) {
 	}
 
 	if (empty($_POST['step'])) {
-		$htmlpost = $htmlatt = ($_G['allowhidden'] && ($pwforum->foruminfo['allowhide'] || empty($pwforum->foruminfo))) ? '' : 'disabled';
+		
+		$htmlpost = $attachHide = ($_G['allowhidden'] && ($pwforum->foruminfo['allowhide'] || empty($pwforum->foruminfo))) ? '' : 'disabled';
 		$editor = getstatus($winddb['userstatus'], PW_USERSTATUS_EDITOR) ? 'wysiwyg' : 'textmode';
-		$uploadfiletype = $uploadfilesize = ' ';
-		foreach ($db_uploadfiletype as $key => $value) {
-			$uploadfiletype .= $key.' ';
-			$uploadfilesize .= $key.':'.$value.'KB; ';
-		}
-		$mutiupload = 0;
-		if ($db_allowupload && $_G['allowupload']) {
-			$attachsService = L::loadClass('attachs', 'forum');
-			$mutiupload = intval($attachsService->countMultiUpload($winduid));
-		}
+		$GLOBALS += getAttachConfig();
+
 		list($isheader,$isfooter,$tplname,$isleft) = array(false, true, "m_group", true);
 
 	} else {
@@ -491,7 +448,13 @@ if (empty($a)) {
 		if (empty($colony['classid'])) {
 			$pwforum->foruminfo['allowhide'] = 1;
 		}
+		if ($db_tcheck) { //内容验证
+			$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
+			$userDataInfo = $userService->get($winduid, false, true, false);
+			$winddb['postcheck'] = $userDataInfo['postcheck'];
+		}
 		$pwpost  = new PwPost($pwforum);
+		$pwpost->fromGroup = true;
 		$pwpost->postcheck();
 
 		L::loadClass('topicpost', 'forum', false);
@@ -514,12 +477,10 @@ if (empty($a)) {
 
 		L::loadClass('attupload', 'upload', false);
 		if (PwUpload::getUploadNum() || $flashatt) {
-			$postdata->att = new AttUpload($winduid, $flashatt);
+			S::gp(array('savetoalbum', 'albumid'), 'P', 2);
+			$postdata->att = new AttUpload($winduid, $flashatt, $savetoalbum, $albumid);
 			$postdata->att->check();
-			$postdata->att->transfer();
-			PwUpload::upload($postdata->att);
 		}
-		
 		$postdata->iscontinue = $iscontinue;
 		
 		$topicpost->execute($postdata);
@@ -563,7 +524,8 @@ if (empty($a)) {
 	L::loadClass('forum', 'forum', false);
 	require_once(R_P . 'require/bbscode.php');
 	require_once(R_P . 'require/credit.php');
-
+	
+	$fid = $colony['classid'];
 	$pwforum = new PwForum($colony['classid']);
 	$pwpost  = new PwPost($pwforum);
 
@@ -571,18 +533,11 @@ if (empty($a)) {
 	$db_uploadfiletype = !empty($db_uploadfiletype) ? (is_array($db_uploadfiletype) ? $db_uploadfiletype : unserialize($db_uploadfiletype)) : array();
 
 	if (empty($_POST['step'])) {
-
+		
+		$htmlpost = $attachHide = ($_G['allowhidden'] && ($pwforum->foruminfo['allowhide'] || empty($pwforum->foruminfo))) ? '' : 'disabled';
+		$GLOBALS += getAttachConfig();
 		$editor = getstatus($winddb['userstatus'], PW_USERSTATUS_EDITOR) ? 'wysiwyg' : 'textmode';
-		$uploadfiletype = $uploadfilesize = ' ';
-		foreach ($db_uploadfiletype as $key => $value) {
-			$uploadfiletype .= $key.' ';
-			$uploadfilesize .= $key.':'.$value.'KB; ';
-		}
-		$mutiupload = 0;
-		if ($db_allowupload && $_G['allowupload']) {
-			$attachsService = L::loadClass('attachs', 'forum');
-			$mutiupload = intval($attachsService->countMultiUpload($winduid));
-		}
+	
 		S::gp(array('pid'), 'G');
 
 		$atc_title = "RE:$tpc[subject]";
@@ -644,10 +599,9 @@ if (empty($a)) {
 
 		L::loadClass('attupload', 'upload', false);
 		if (PwUpload::getUploadNum() || $flashatt) {
-			$postdata->att = new AttUpload($winduid, $flashatt);
+			S::gp(array('savetoalbum', 'albumid'), 'P', 2);
+			$postdata->att = new AttUpload($winduid, $flashatt, $savetoalbum, $albumid);
 			$postdata->att->check();
-			$postdata->att->transfer();
-			PwUpload::upload($postdata->att);
 		}
 		$replypost->execute($postdata);
 		
@@ -799,7 +753,8 @@ if (empty($a)) {
 	$f_id = $db->insert_id();
 
 	//tnum加一
-	$db->update("UPDATE pw_colonys SET writenum=writenum+'1' WHERE id=" . S::sqlEscape($cyid));
+	//* $db->update("UPDATE pw_colonys SET writenum=writenum+'1' WHERE id=" . S::sqlEscape($cyid));
+	pwQuery::update('pw_colonys', 'id=:id', array($cyid), null, array(PW_EXPR=>array('writenum=writenum+1')));
 	$colony['writenum']++;
 	updateGroupLevel($colony['id'], $colony);
 
@@ -835,8 +790,9 @@ if (empty($a)) {
 
 		$db->update("DELETE FROM pw_cwritedata WHERE id=" . S::sqlEscape($id));
 		$db->update("DELETE FROM pw_comment WHERE typeid=" . S::sqlEscape($id) . "AND type='groupwrite'");
-		$db->update("UPDATE pw_colonys SET writenum=writenum-'1' WHERE id=" . S::sqlEscape($cyid));
-
+		//* $db->update("UPDATE pw_colonys SET writenum=writenum-'1' WHERE id=" . S::sqlEscape($cyid));
+		pwQuery::update('pw_colonys', 'id=:id', array($cyid), null, array(PW_EXPR=>array('writenum=writenum-1')));
+		
 		$weiboService = L::loadClass('weibo','sns'); /* @var $weiboService PW_Weibo */
 		$weibo = $weiboService->getWeibosByObjectIdsAndType($id,'group_write');
 		if($weibo){
@@ -915,13 +871,13 @@ if (empty($a)) {
 						$typeCheck_6 = $objecterCheck_0 = ' checked';
 					}
 					$editor = getstatus($winddb['userstatus'], PW_USERSTATUS_EDITOR) ? 'wysiwyg' : 'textmode';
+
 					$_G['uploadtype'] && $db_uploadfiletype = $_G['uploadtype'];
 					$db_uploadfiletype = !empty($db_uploadfiletype) ? (is_array($db_uploadfiletype) ? $db_uploadfiletype : unserialize($db_uploadfiletype)) : array();
-					$uploadfiletype = $uploadfilesize = ' ';
-					foreach ($db_uploadfiletype as $key => $value) {
-						$uploadfiletype .= $key.' ';
-						$uploadfilesize .= $key.':'.$value.'KB; ';
-					}
+					$attachAllow = pwJsonEncode($db_uploadfiletype);
+					$imageAllow = pwJsonEncode(getAllowKeysFromArray($db_uploadfiletype, array('jpg','jpeg','gif','png','bmp')));
+					$attachUrl = 'pweditor.php?action=attach';
+
 					$attach = '';
 					if ($job == 'edit' && $attachdb = $newActive->getAttById($id)) {
 						foreach ($attachdb as $key => $value) {
@@ -930,32 +886,26 @@ if (empty($a)) {
 						}
 						$attach = rtrim($attach,',');
 					}
-					if ($db_allowupload && $_G['allowupload']) {
-						$attachsService = L::loadClass('attachs', 'forum');
-						$mutiupload = intval($attachsService->countMultiUpload($winduid));
-					}
-		
 					list($isheader,$isfooter,$tplname,$isleft) = array(false, true, "m_group", true);
 		
 				} else {
 		
-					S::gp(array('atc_title','introduction','atc_content'), 'P', 0);
-					S::gp(array('begintime', 'endtime', 'deadline', 'address', 'limitnum', 'price'), 'P');
+					S::gp(array('atc_title','introduction','atc_content'), 'P');
+					S::gp(array('begintime', 'endtime', 'deadline', 'address', 'limitnum', 'price', 'owner'), 'P');
 					S::gp(array('type', 'objecter'), 'P', 2);
 					if(strlen($atc_title) > $db_titlemax) Showmsg('active_title_length');
 					if(strlen($address) > $db_titlemax) Showmsg('active_address_length');
 					if(strlen($introduction) > 130) Showmsg('active_introduction_length');
 					if(strlen($atc_content) > 50000) Showmsg('active_atc_content_length');
-		
 					require_once(A_P . 'groups/lib/activepost.class.php');
 		
 					$activePost = new PwActivePost($cyid);
 					if ($job == 'edit') {
+						$activePost->setOwner($owner);
 						$activePost->initData($active);
 						if ($attachdb = $newActive->getAttById($id)) {
-							S::gp(array('keep'), 'P', 2);
 							S::gp(array('oldatt_desc'), 'P');
-							$activePost->initAttachs($attachdb, $keep, $oldatt_desc);
+							$activePost->initAttachs($attachdb, $oldatt_desc);
 						}
 					}
 					$activePost->setTitle($atc_title);
@@ -980,7 +930,8 @@ if (empty($a)) {
 						$id = $activePost->insertData();
 		
 						//activitynum加一
-						$db->update("UPDATE pw_colonys SET activitynum=activitynum+1 WHERE id=" . S::sqlEscape($cyid));
+						//* $db->update("UPDATE pw_colonys SET activitynum=activitynum+1 WHERE id=" . S::sqlEscape($cyid));
+						pwQuery::update('pw_colonys', 'id=:id', array($cyid), null, array(PW_EXPR=>array('activitynum=activitynum+1')));
 						$colony['activitynum']++;
 						updateGroupLevel($colony['id'], $colony);
 						$weiboService = L::loadClass('weibo','sns');/* @var $weiboService PW_Weibo */
@@ -1044,7 +995,6 @@ if (empty($a)) {
 					Showmsg('data_error');
 				}
 		
-		
 				//检查是否是群组的成员
 				$isJoin = $newActive->isJoin($id,$winduid);
 				require_once(R_P . 'require/showimg.php');
@@ -1061,36 +1011,10 @@ if (empty($a)) {
 				require_once(R_P . 'require/bbscode.php');
 				$active['content'] = convert($active['content'], $db_windpost);
 				if ($attachs = $newActive->getAttById($id)) {
-					$aids = attachment($active['content']);
-					if ($winduid == $active['uid'] || $isGM || $pwSystem['delattach']) {
-						$dfadmin = 1;
-					} else {
-						$dfadmin = 0;
-					}
-					foreach ($attachs as $at) {
-						$atype = '';
-						$rat = array();
-						if ($at['type'] == 'img') {
-							$a_url = geturl($at['attachurl'],'show');
-							if (is_array($a_url)) {
-								$atype = 'pic';
-								$dfurl = '<br>'.cvpic($a_url[0], 1, $db_windpost['picwidth'], $db_windpost['picheight'], $at['ifthumb']);
-								$rat = array('aid' => $at['aid'], 'img' => $dfurl, 'dfadmin' => $dfadmin, 'desc' => $at['descrip']);
-							} elseif ($a_url == 'imgurl') {
-								$atype = 'picurl';
-								$rat = array('aid' => $at['aid'], 'name' => $at['name'], 'dfadmin' => $dfadmin, 'verify' => md5("showimg{$tid}{$read[pid]}{$fid}{$at[aid]}{$GLOBALS[db_hash]}"));
-							}
-						} else {
-							$atype = 'downattach';
-							$rat = array('aid' => $at['aid'], 'name' => $at['name'], 'size' => $at['size'], 'hits' => $at['hits'], 'needrvrc' => $at['needrvrc'], 'special' => $at['special'], 'cname' => $GLOBALS['creditnames'][$at['ctype']], 'type' => $at['type'], 'dfadmin' => $dfadmin, 'desc' => $at['descrip'], 'ext' => strtolower(substr(strrchr($at['name'],'.'),1)));
-						}
-						if (!$atype) continue;
-						if (in_array($at['aid'], $aids)) {
-							$active['content'] = attcontent($active['content'], $atype, $rat);
-						} else {
-							$active[$atype][$at['aid']] = $rat;
-						}
-					}
+					extract(L::style());
+					$attachShow = new attachShow(($isGM || $pwSystem['delattach']), '', 0, 'active');
+					$attachShow->setData($attachs);
+					$active += $attachShow->parseAttachs('tpc', $active['content'], $winduid == $active['uid']);
 				}
 				$newActive->updateHits($id);
 				list($newactivedb) = $newActive->searchList(array('cid' => $cyid), 3, 0, 'id', 'DESC');
@@ -1341,7 +1265,7 @@ if (empty($a)) {
 				$memdb = array();
 				$query = $db->query("SELECT cm.*,m.icon,m.honor,md.thisvisit FROM pw_cmembers cm LEFT JOIN pw_members m ON cm.uid=m.uid LEFT JOIN pw_memberdata md ON m.uid=md.uid WHERE cm.colonyid=" . S::sqlEscape($cyid) . $sqlsel . " ORDER BY cm.{$order} DESC $limit");
 				while ($rt = $db->fetch_array($query)) {
-					list($rt['icon']) = showfacedesign($rt['icon'],1);
+					list($rt['icon']) = showfacedesign($rt['icon'],1,'m');
 					$memdb[$rt['username']] = $rt;
 				}
 				$colonyOwner = $memdb[$colony['admin']];
@@ -1462,7 +1386,8 @@ if (empty($a)) {
 	if (empty($_POST['step'])) {
 
 		S::gp("id",null,2);
-		@include_once(D_P.'data/bbscache/o_config.php');
+		//* @include_once(D_P.'data/bbscache/o_config.php');
+		extract(pwCache::getData(D_P.'data/bbscache/o_config.php', false));
 		$friend = getFriends($winduid) ? getFriends($winduid) : array();
 		foreach ($friend as $key => $value) {
 			$frienddb[$value['ftid']][] = $value;
@@ -1679,7 +1604,7 @@ if (empty($a)) {
 			$filetype = (is_array($db_uploadfiletype) ? $db_uploadfiletype : unserialize($db_uploadfiletype));
 			$default_type = array('gif','jpg','jpeg','bmp','png');
 			foreach ($default_type as $value) {
-				$cnimg_1[$value] = $o_imgsize ? $o_imgsize : $filetype[$value];
+				if (isset($filetype[$value])) $cnimg_1[$value] = $o_imgsize ? $o_imgsize : $filetype[$value];
 				$cnimg_2[$value] = 2048;
 			}
 			$set_banner = $colony['banner'] ? $colony['banner'] : $imgpath . '/g/' . $colony['colonystyle'] . '/preview.jpg';
@@ -1759,7 +1684,8 @@ if (empty($a)) {
 				}
 			}
 
-			$db->update("UPDATE pw_colonys SET " . S::sqlSingle($pwSQL) . ' WHERE id=' . S::sqlEscape($cyid));
+			//* $db->update("UPDATE pw_colonys SET " . S::sqlSingle($pwSQL) . ' WHERE id=' . S::sqlEscape($cyid));
+			pwQuery::update('pw_colonys', 'id=:id', array($cyid), $pwSQL);
 
 			refreshto("{$basename}cyid=$cyid&a=set&cyid=$cyid",'colony_setsuccess');
 		}
@@ -1783,7 +1709,8 @@ if (empty($a)) {
 					Showmsg('content_wordsfb');
 			}
 		}
-		$db->update("UPDATE pw_colonys SET " . S::sqlSingle($pwSQL) . ' WHERE id=' . S::sqlEscape($cyid));
+		//* $db->update("UPDATE pw_colonys SET " . S::sqlSingle($pwSQL) . ' WHERE id=' . S::sqlEscape($cyid));
+		pwQuery::update('pw_colonys', 'id=:id', array($cyid), $pwSQL);
 		refreshto("{$basename}cyid=$cyid",'colony_setsuccess');
 
 	} elseif ($t == 'style') {
@@ -1804,7 +1731,8 @@ if (empty($a)) {
 				'colonystyle' => $colonystyle
 			);
 
-			$db->update("UPDATE pw_colonys SET " . S::sqlSingle($pwSQL) . ' WHERE id=' . S::sqlEscape($cyid));
+			//* $db->update("UPDATE pw_colonys SET " . S::sqlSingle($pwSQL) . ' WHERE id=' . S::sqlEscape($cyid));
+			pwQuery::update('pw_colonys', 'id=:id', array($cyid), $pwSQL);
 
 			refreshto("{$basename}cyid=$cyid&a=set&t=$t",'colony_setsuccess');
 		}
@@ -1834,7 +1762,8 @@ if (empty($a)) {
 				'ifannouceopen'=>$ifannouceopen
 			);
 
-			$db->update("UPDATE pw_colonys SET " . S::sqlSingle($pwSQL) . ' WHERE id=' . S::sqlEscape($cyid));
+			//* $db->update("UPDATE pw_colonys SET " . S::sqlSingle($pwSQL) . ' WHERE id=' . S::sqlEscape($cyid));
+			pwQuery::update('pw_colonys', 'id=:id', array($cyid), $pwSQL);
 
 			refreshto("{$basename}cyid=$cyid&a=set&t=$t",'colony_setsuccess');
 		}
@@ -1920,7 +1849,8 @@ if (empty($a)) {
 				Showmsg('您选择的用户没有接受的权限!');
 			}
 
-			$db->update("UPDATE pw_colonys SET admin=" . S::sqlEscape($userdb['username']) . ' WHERE id=' . S::sqlEscape($cyid));
+			//* $db->update("UPDATE pw_colonys SET admin=" . S::sqlEscape($userdb['username']) . ' WHERE id=' . S::sqlEscape($cyid));
+			pwQuery::update('pw_colonys', 'id=:id', array($cyid), array('admin'=>$userdb['username']));
 
 			M::sendNotice(
 				array($userdb['username']),
@@ -1969,7 +1899,8 @@ if (empty($a)) {
 			}
 			updateUserAppNum($cMembers,'group','minus');
 			$db->update("DELETE FROM pw_cmembers WHERE colonyid=" . S::sqlEscape($cyid));
-			$db->update("DELETE FROM pw_colonys WHERE id=" . S::sqlEscape($cyid));
+			//* $db->update("DELETE FROM pw_colonys WHERE id=" . S::sqlEscape($cyid));
+			pwQuery::delete('pw_colonys', 'id=:id', array($cyid));
 			$db->update("UPDATE pw_cnclass SET cnsum=cnsum-1 WHERE fid=" . S::sqlEscape($colony['classid']) . " AND cnsum>0");
 			$db->update("DELETE FROM pw_argument WHERE cyid=" . S::sqlEscape($cyid));
 			$db->update("DELETE FROM pw_active WHERE cid=" . S::sqlEscape($cyid));
@@ -2030,7 +1961,8 @@ if (empty($a)) {
 			)
 		);
 
-		$db->update("UPDATE pw_colonys SET pnum=pnum-1, todaypost=todaypost-1 WHERE id=". S::sqlEscape($cyid));
+		//* $db->update("UPDATE pw_colonys SET pnum=pnum-1, todaypost=todaypost-1 WHERE id=". S::sqlEscape($cyid));
+		$db->update(pwQuery::buildClause("UPDATE :pw_table SET pnum=pnum-1, todaypost=todaypost-1 WHERE id=:id", array('pw_colonys', $cyid)));
 		$colony['pnum']--;
 		updateGroupLevel($colony['id'], $colony);
 
@@ -2046,7 +1978,8 @@ if (empty($a)) {
 
 	L::loadClass('forum', 'forum', false);
 	L::loadClass('post', 'forum', false);
-
+	
+	$fid = $colony['classid'];
 	$pwforum = new PwForum($colony['classid']);
 	$pwpost  = new PwPost($pwforum);
 	//$pwpost->forumcheck();
@@ -2070,16 +2003,7 @@ if (empty($a)) {
 	if (empty($_POST['step'])) {
 
 		$editor = getstatus($winddb['userstatus'], PW_USERSTATUS_EDITOR) ? 'wysiwyg' : 'textmode';
-		$uploadfiletype = $uploadfilesize = ' ';
-		foreach ($db_uploadfiletype as $key => $value) {
-			$uploadfiletype .= $key.' ';
-			$uploadfilesize .= $key.':'.$value.'KB; ';
-		}
-		$mutiupload = 0;
-		if ($db_allowupload && $_G['allowupload']) {
-			$attachsService = L::loadClass('attachs', 'forum');
-			$mutiupload = intval($attachsService->countMultiUpload($winduid));
-		}
+		$GLOBALS += getAttachConfig();
 
 		$attach = '';
 		if ($atcdb['attachs']) {
@@ -2089,7 +2013,7 @@ if (empty($a)) {
 			}
 			$attach = rtrim($attach,',');
 		}
-		!$htmlatt && $atcdb['ifhide'] && $htmlatt = 'checked';
+		!$attachHide && $atcdb['ifhide'] && $attachHide = 'checked';
 		$atc_content = str_replace(array('<','>','&nbsp;'),array('&lt;','&gt;',' '),$atcdb['content']);
 		if (strpos($atc_content,$db_bbsurl) !== false) {
 			$atc_content = str_replace('p_w_picpath',$db_picpath,$atc_content);
@@ -2100,7 +2024,7 @@ if (empty($a)) {
 	} else {
 
 		S::gp(array('atc_title','atc_content'), 'P', 0);
-		S::gp(array('atc_tags','atc_hideatt','flashatt','atc_convert'), 'P');
+		S::gp(array('atc_tags','atc_hideatt','flashatt','atc_convert','isAttachOpen'), 'P');
 
 		require_once(R_P . 'require/bbscode.php');
 		if ($postmodify->type == 'topic') {
@@ -2114,23 +2038,21 @@ if (empty($a)) {
 		$postdata->setTitle($atc_title);
 		$postdata->setContent($atc_content);
 		$postdata->setConvert($atc_convert);
-		$postdata->setHideatt($atc_hideatt);
+		$isAttachOpen && $postdata->setHideatt($atc_hideatt);
 		$postdata->setIfsign(1, 0);
 		$postdata->conentCheck();
 		$postdata->iscontinue = $iscontinue;
 
 		if ($postmodify->hasAtt()) {
-			S::gp(array('keep','oldatt_special','oldatt_needrvrc'), 'P', 2);
+			S::gp(array('oldatt_special','oldatt_needrvrc'), 'P', 2);
 			S::gp(array('oldatt_ctype','oldatt_desc'), 'P');
-			$postmodify->initAttachs($keep, $oldatt_special, $oldatt_needrvrc, $oldatt_ctype, $oldatt_desc);
+			$postmodify->initAttachs($oldatt_special, $oldatt_needrvrc, $oldatt_ctype, $oldatt_desc);
 		}
 		L::loadClass('attupload', 'upload', false);
 		if (PwUpload::getUploadNum() || $flashatt) {
 			$postdata->att = new AttUpload($winduid, $flashatt);
 			$postdata->att->check();
-			$postdata->att->transfer();
 			$postdata->att->setReplaceAtt($postmodify->replacedb);
-			PwUpload::upload($postdata->att);
 		}
 		$postmodify->execute($postdata);
 
@@ -2181,6 +2103,7 @@ if (empty($a)) {
 	if ($pid && is_numeric($pid)) {
 		$postmodify = new replyModify($tid, $pid, $pwpost);
 	} else {
+		$pid = 'tpc';
 		$postmodify = new topicModify($tid, 0, $pwpost);
 	}
 	$atcdb = $postmodify->init();
@@ -2219,10 +2142,6 @@ if (empty($a)) {
 
 		extract(L::style());
 
-		$aids = array();
-		if ($atcdb['attachs']) {
-			$aids = attachment($atc_content);
-		}
 		$leaveword = $atcdb['leaveword'] ? leaveword($atcdb['leaveword']) : '';
 		$content   = convert($atc_content.$leaveword, $db_windpost);
 
@@ -2237,41 +2156,11 @@ if (empty($a)) {
 			$content = addslashes($wordsfb->convert(stripslashes($content)));
 		}
 		$creditnames = pwCreditNames();
-
-		if ($aids) {
-			if ($winduid == $atcdb['authorid'] || $pwpost->isGM || pwRights($pwpost->isBM, 'delattach')) {
-				$dfadmin = 1;
-			} else {
-				$dfadmin = 0;
-			}
-			foreach ($atcdb['attachs'] as $at) {
-				if (!in_array($at['aid'], $aids)) {
-					continue;
-				}
-				$atype = '';
-				$rat = array();
-				if ($at['type'] == 'img' && $at['needrvrc'] == 0 && (!$downloadimg || !$downloadmoney || $_G['allowdownload'] == 2)) {
-					$a_url = geturl($at['attachurl'],'show');
-					if (is_array($a_url)) {
-						$atype = 'pic';
-						$dfurl = '<br>'.cvpic($a_url[0], 1, $db_windpost['picwidth'], $db_windpost['picheight'], $at['ifthumb']);
-						$rat = array('aid' => $at['aid'], 'img' => $dfurl, 'dfadmin' => $dfadmin, 'desc' => $at['descrip']);
-					} elseif ($a_url == 'imgurl') {
-						$atype = 'picurl';
-						$rat = array('aid' => $at['aid'], 'name' => $at['name'], 'dfadmin' => $dfadmin, 'verify' => md5("showimg{$tid}{$read[pid]}{$fid}{$at[aid]}{$db_hash}"));
-					}
-				} else {
-					$atype = 'downattach';
-					if ($at['needrvrc'] > 0) {
-						!$at['ctype'] && $at['ctype'] = $at['special'] == 2 ? 'money' : 'rvrc';
-						$at['special'] == 2 && $db_sellset['price'] > 0 && $at['needrvrc'] = min($at['needrvrc'], $db_sellset['price']);
-					}
-					$rat = array('aid' => $at['aid'], 'name' => $at['name'], 'size' => $at['size'], 'hits' => $at['hits'], 'needrvrc' => $at['needrvrc'], 'special' => $at['special'], 'cname' => $creditnames[$at['ctype']], 'type' => $at['type'], 'dfadmin' => $dfadmin, 'desc' => $at['descrip'], 'ext' => strtolower(substr(strrchr($at['name'],'.'),1)));
-				}
-				if ($atype) {
-					$content = attcontent($content, $atype, $rat);
-				}
-			}
+		
+		if ($atcdb['attachs']) {
+			$attachShow = new attachShow(($pwpost->isGM || pwRights($pwpost->isBM, 'delattach')), $pwforum->forumset['uploadset']);
+			$attachShow->setData($atcdb['attachs']);
+			$attachShow->parseAttachs($pid, $content, $winduid == $atcdb['authorid']);
 		}
 		$alterinfo && $content .= "<div id=\"alert_$pid\" style=\"color:gray;margin-top:30px\">[ $alterinfo ]</div>";
 		$atcdb['icon'] = $atcdb['icon'] ? "<img src=\"$imgpath/post/emotion/$atcdb[icon].gif\" align=\"left\" border=\"0\" />" : '';
@@ -2325,6 +2214,7 @@ if (empty($a)) {
 	!$ifadmin && Showmsg('undefined_action');
 
 	$messageServer = L::loadClass('message', 'message');
+	!$_G['multiopen'] && Showmsg('您没有群发消息权限');
 	if(!($messageServer->checkUserMessageLevle('sms',1))) Showmsg ( '你已超过每日发送消息数或你的消息总数已满' );
 
 	if (empty($_POST['step'])) {
@@ -2441,4 +2331,27 @@ if (empty($a)) {
 }
 require_once PrintEot('m_group');
 pwOutPut();
+
+function getAttachConfig() {
+	global $db_uploadfiletype, $db_sellset, $db_enhideset, $pwforum, $_G;
+	$conf = array();
+	$conf['attachAllow'] = pwJsonEncode($db_uploadfiletype);
+	$conf['imageAllow'] = pwJsonEncode(getAllowKeysFromArray($db_uploadfiletype, array('jpg','jpeg','gif','png','bmp')));
+
+	$sellCredit = $enhideCredit = array();
+	empty($db_sellset['type']) && $db_sellset['type'] = array('money');
+	empty($db_enhideset['type']) && $db_enhideset['type'] = array('rvrc');
+
+	foreach ($db_sellset['type'] as $key => $value) {
+		$sellCredit[$value] = pwCreditNames($value);
+	}
+	foreach ($db_enhideset['type'] as $key => $value) {
+		$enhideCredit[$value] = pwCreditNames($value);
+	}
+	list($conf['sellCredit'], $conf['enhideCredit']) = array(pwJsonEncode($sellCredit), pwJsonEncode($enhideCredit));
+	$conf['htmlsell'] = ($pwforum->foruminfo['allowsell'] && $_G['allowsell']) ? '' : 'disabled';
+	$conf['htmlhide'] = ($pwforum->forumset['allowencode'] && $_G['allowencode']) ? '' : 'disabled';
+
+	return $conf;
+}
 ?>

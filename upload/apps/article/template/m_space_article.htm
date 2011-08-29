@@ -3,6 +3,15 @@ include_once uTemplate::PrintEot('header');
 include_once uTemplate::PrintEot('space_appleft');
 print <<<EOT
 -->
+<style type="text/css">
+/*filter*/
+.filter{background:$uskin_bgC;padding:5px;border-top:1px solid $uskin_bdA;margin-bottom:1px;}
+.filter h3{float:left;line-height:20px;height:20px;overflow:hidden;}
+.filter ul{float:left;}
+.filter ul li{float:left;margin-right:10px;}
+.filter ul li a{line-height:20px;height:20px;overflow:hidden;float:left;display:block;}
+.filter ul li.current a{color:$uskin_textB;padding-right:10px;background:url(u/images/down.png) right center no-repeat;}
+</style>
 <div class="sideD">
 	<!--
 EOT;
@@ -38,32 +47,40 @@ EOT;
 $see = $a == 'goods' ? goods : $see;
 if ($see == 'topic') {print <<<EOT
 -->
-				<div class="contentC fl">
-					<table width="100%" class="mb10">  
-						<tr class="tr2 bgA">
-							<td colspan="2">&nbsp;
-								<a href="{$basename}ordertype=postdate" id="a_orderpostdate">最新发帖</a> | <a href="{$basename}ordertype=lastpost" id="a_orderlastpost">回复时间</a>
-								<script language="JavaScript">setCurrent('a_order{$ordertype}','a_orderpostdate','b s5');</script>
-							</td>
-							<td width="70" >所属版块</td> 
-							<td width="90" class="tac">回复/人气</td> 
-							<td width="70">最后发表</td>
-						</tr>     
+				<div class="cc filter">
+						<h3>类型筛选：</h3> 
+						<ul class="mr20"><li id="a_topic" class="current"><a href="{$basename}">主题</a></li><li id="a_post"><a href="{$basename}see=post">回复</a></li><li id="a_goods"><a href="{$basename}a=goods&job=onsale">商品</a></li></ul>
+						<h3>选择时间：</h3>
+						<ul><li id="post_0"><a href="{$basename}posttime=0">所有</a></li><li id="post_1"><a href="{$basename}posttime=1">一天</a></li><li id="post_2"><a href="{$basename}posttime=2">两天</a></li><li id="post_7"><a href="{$basename}posttime=7">一星期</a></li><li id="post_30"><a href="{$basename}posttime=30">一个月</a></li><li id="post_60"><a href="{$basename}posttime=60">两个月</a></li><li id="post_90"><a href="{$basename}posttime=90">三个月</a></li><li id="post_180"><a href="{$basename}posttime=180">半年</a></li><li id="post_365"><a href="{$basename}posttime=365">一年</a></li><li id="post_366"><a href="{$basename}posttime=366">一年以上</a></li></ul>
+				</div>
+<script language="javascript">setCurrent('post_$posttime','post_0','current');</script>
+				<div style="border-top:1px solid $uskin_bdA;">
+					<table width="100%" style="table-layout:fixed;">  
+						<tr class="tr3">
+							<td colspan="2">排序方式：<a href="{$basename}ordertype=postdate" id="a_orderpostdate"><span>发帖时间</span></a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="{$basename}ordertype=lastpost" id="a_orderlastpost"><span>回复时间</span></a>
+								<script language="JavaScript">setCurrent('a_order{$ordertype}','a_orderpostdate','link_down s5');</script>
+							</td> 
+							<td width="80">回复/人气</td>
+							<td width="100">最后发表</td>
+						</tr> 
+					</table>
+					<table width="100%" class="mb10" style="table-layout:fixed;">  
 <!--
 EOT;
 if (!empty($article)) {
 foreach ($article as $key => $value) {print <<<EOT
 -->
 						<tr class="tr3">
-							<td width="25"><img src="images/wind/thread/topicnew.gif" /></td>
-							<td>
-								<a href="read.php?tid=$value[tid]" target="_blank" class="f14">$value[subject]</a>
-								<span class="f10 gray" style="display:block;">{$value[postdate]}</span>
+							<td width="20" class="tac"><img src="images/wind/thread/topicnew.gif" /></td>
+							<td class="f14">
+								<a href="thread.php?fid=$value[fid]" class="mr5" target="_blank">[{$value[forum]}]</a><a href="read.php?tid=$value[tid]" target="_blank" class="s5">$value[subject]</a>
 							</td>
-							<td><a href="thread.php?fid=$value[fid]" class="s7" target="_blank">{$value[forum]}</a></td>
-							<td class="tac f10"><span class="s2">{$value[replies]}</span>/<span>{$value[hits]}</span></td>
-							<td>
-								<a href="u.php?username=$value[lastposter]" class="s7">$value[lastposter]</a>
+							<td width="80" class="f10">
+								<span class="s2">{$value[replies]}</span>/<span>{$value[hits]}</span>
+								<p>{$value[postdate]}</p>
+							</td>
+							<td width="100">
+								<a href="u.php?username=$value[lastposter]" class="s6">$value[lastposter]</a>
 								<p class="f10">{$value[lastpost]}</p>
 							</td> 
 						</tr>
@@ -81,54 +98,19 @@ EOT;
 					</table>
 					<div class="mt10">$pages</div>
 				</div>
-				<div class="sidebar fr">
-					<div class="boxC mb10">
-						<h3>类型筛选</h3>
-						<ul class="ulE">     
-							<li id="a_topic" class="current"><a href="{$basename}">主题</a></li> 
-							<li id="a_post"><a href="{$basename}see=post">回复</a></li>
-							<li id="a_goods"><a href="{$basename}a=goods&job=onsale">商品</a></li>
-						</ul>
-					</div>
-					<div class="boxC">
-						<h3>选择时间</h3>
-						<ul class="ulE">
-							<li id="post_0"><a href="{$basename}posttime=0">所有主题</a></li>
-							<li id="post_1"><a href="{$basename}posttime=1">1天内的主题</a></li>
-							<li id="post_2"><a href="{$basename}posttime=2">2天内的主题</a></li>
-							<li id="post_7"><a href="{$basename}posttime=7">1星期内的主题</a></li>
-							<li id="post_30"><a href="{$basename}posttime=30">1个月内的主题</a></li>
-							<li id="post_60"><a href="{$basename}posttime=60">2个月内的主题</a></li>
-							<li id="post_90"><a href="{$basename}posttime=90">3个月内的主题</a></li>
-							<li id="post_180"><a href="{$basename}posttime=180">6个月内的主题</a></li>
-							<li id="post_365"><a href="{$basename}posttime=365">1年内的主题</a></li>
-							<li id="post_366"><a href="{$basename}posttime=366">1年以上的主题</a></li>
-						</ul>
-						<script language="javascript">setCurrent('post_$posttime','post_0','current');</script>
-					</div>
-				</div>
 <!--
 EOT;
 } elseif ($see == 'post') {print <<<EOT
 -->
-				<div class="sidebar fr">
-					<div class="boxC mb10">
-						<h3>类型筛选</h3>
-						<ul class="ulE">        
-							<li id="a_topic"><a href="{$basename}"><span>主题</span></a></li> 
-							<li id="a_post"><a href="{$basename}see=post"><span>回复</span></a></li>
-							<li id="a_goods"><a href="{$basename}a=goods&job=onsale"><span>商品</span></a></li>
-						</ul>
-					</div>
+				<div class="filter cc"><h3>类型筛选：</h3><ul><li id="a_topic"><a href="{$basename}">主题</a></li><li id="a_post"><a href="{$basename}see=post">回复</a></li><li id="a_goods"><a href="{$basename}a=goods&job=onsale">商品</a></li></ul>
 				</div>
-				<div class="contentC fl">
-					<table width="100%" class="mb10" style="table-layout:fixed">  
-						<tr class="tr2 bgA">
-							<td width="25">&nbsp;</td> 
-							<td>&nbsp;标题/时间</td> 
-							<td width="80">版块</td> 
-							<td width="80" class="tac">回复/人气</td> 
-							<td width="70">最后发表</td>
+				<div style="border-top:1px solid $uskin_bdA;">
+					<table width="100%" class="mb10" style="table-layout:fixed;">  
+						<tr class="tr3">
+							<td width="20">&nbsp;</td> 
+							<td>标题</td> 
+							<td width="80">回复/人气</td> 
+							<td width="100">最后发表</td>
 						</tr>    
 <!--
 EOT;
@@ -136,15 +118,12 @@ if (!empty($article)) {
 foreach ($article as $key => $value) {print <<<EOT
 -->
 						<tr class="tr3">
-							<td><img src="images/wind/thread/topicnew.gif" /></td>
-							<td>
-								<a href="job.php?action=topost&tid=$value[tid]&pid=$value[pid]" target="_blank" class="f14">$value[subject]</a>
-								<span class="f10 gray" style="display:block;">{$value[postdate]}</span>
+							<td class="tac"><img src="images/wind/thread/topicnew.gif" /></td>
+							<td class="f14"><a href="thread.php?fid=$value[fid]" class="mr5" target="_blank">[{$value[forum]}]</a><a href="job.php?action=topost&tid=$value[tid]&pid=$value[pid]" target="_blank" class="s5">$value[subject]</a>
 							</td>
-							<td><a href="thread.php?fid=$value[fid]" class="s7" target="_blank">{$value[forum]}</a></td> 
-							<td class="tac f10"><span class="s2">{$value[replies]}</span>/{$value[hits]}</td>
+							<td class="f10"><span class="s2">{$value[replies]}</span>/{$value[hits]}<p>{$value[postdate]}</p></td>
 							<td>
-								<a href="u.php?username=$value[lastposter]" class="s7">$value[lastposter]</a>
+								<a href="u.php?username=$value[lastposter]" class="s6">$value[lastposter]</a>
 								<p class="f10">{$value[lastpost]}</p>
 							</td>
 						</tr>
@@ -160,23 +139,37 @@ EOT;
 }print <<<EOT
 -->
 					</table>
+				</div>
 					<div class="mt10">$pages</div>			
 <!--
 EOT;
 } elseif ($see =='goods') {print <<<EOT
 -->
-					<div class="contentC fl">  
-						<table width="100%" class="mb10">
+					<div class="cc filter">
+						<h3>类型筛选：</h3>
+						<ul class="mr20"><li id="a_topic"><a href="{$basename}"><span>主题</span></a></li><li id="a_post"><a href="{$basename}see=post"><span>回复</span></a></li><li id="a_goods"><a href="{$basename}a=goods&job=onsale"><span>商品</span></a></li></ul>
+						<h3>商品：</h3>
+						<ul><li id="uf_onsale"><a href="{$basename}a=goods&job=onsale">出售中的商品</a></li><!--
+EOT;
+if ($u == $winduid) {print <<<EOT
+--><li id="uf_buy"><a href="{$basename}a=goods">已买入的商品</a></li><!--
+EOT;
+}print <<<EOT
+--><li id="uf_saled"><a href="{$basename}a=goods&job=saled">已卖出的商品</a></li></ul>
+<script language="javascript">setCurrent('uf_$job','uf_buy','current');</script>
+					</div>
+					<div style="border-top:1px solid $uskin_bdA;">
+						<table width="100%" class="mb10" style="table-layout:fixed;">
 <!--
 EOT;
 if ($job == 'trade') {print <<<EOT
 -->
-							<tr class="tr2 bgA">
-								<td width="13%">商品图片</td>
+							<tr class="tr3">
+								<td width="60">商品图片</td>
 								<td>商品名称</td>
-								<td width="13%">现价</td>
-								<td width="15%">卖家</td>
-								<td width="18%">交易状态</td>
+								<td class="tac" width="70">现价</td>
+								<td class="tac" width="80">卖家</td>
+								<td width="100">交易状态</td>
 							</tr>
 <!--
 EOT;
@@ -185,12 +178,11 @@ foreach ($trade as $key => $value) {
 print <<<EOT
 -->
 							<tr class="tr3">
-									<td><img src="$value[icon]"  width="120" alt="" /></td>
-									<td><a href="read.php?tid=$value[tid]">$value[subject]</a></td>
-									<td>$value[price]</td>
-									<td><a href="{$db_userurl}$value[seller]">$value[username]</a></td>
-									<td>
-									<div><a style="color:blue;" href="trade.php?action=order&oid=$value[oid]">详情</a></div>
+									<td><img src="$value[icon]" class="img" width="40" height="40" /></td>
+									<td><a href="read.php?tid=$value[tid]" class="f14">$value[subject]</a></td>
+									<td class="tac">$value[price]</td>
+									<td class="tac"><a href="{$db_userurl}$value[seller]">$value[username]</a></td>
+									<td><a href="trade.php?action=order&oid=$value[oid]">详情</a><br />
 <!--
 EOT;
 if ($value['ifpay'] == 4) {print <<<EOT
@@ -215,7 +207,7 @@ EOT;
 EOT;
 } elseif ($value['ifpay'] == 0) {print <<<EOT
 -->
-									等待买家付款<br />
+									等待买家付款
 <!--
 EOT;
 }print <<<EOT
@@ -231,11 +223,11 @@ EOT;
 }} elseif ($job == 'onsale') {print <<<EOT
 -->
 							<tr class="tr3">
-									<td width="13%">商品图片</td>
+									<td width="60">商品图片</td>
 									<td>商品名称</td>
-									<td width="13%">现价</td>
-									<td width="15%">库存</td>
-									<td width="18%">出售数量</td>
+									<td class="tac" width="70">现价</td>
+									<td class="tac" width="70">库存</td>
+									<td class="tac" width="70">出售数量</td>
 							</tr>
 <!--
 EOT;
@@ -243,11 +235,11 @@ if (!empty($trade)) {
 foreach ($trade as $key => $value) {print <<<EOT
 -->
 							<tr class="tr3">
-									<td><img src="$value[icon]" width="40" height="40" /></td>
-									<td><a href="read.php?tid=$value[tid]">$value[name]</a></td>
-									<td>$value[costprice]</td>
-									<td>$value[num]</td>
-									<td>$value[salenum]</td>
+									<td class="tac"><img class="img" src="$value[icon]" width="40" height="40" /></td>
+									<td><a href="read.php?tid=$value[tid]" class="f14">$value[name]</a></td>
+									<td class="tac">$value[costprice]</td>
+									<td class="tac">$value[num]</td>
+									<td class="tac">$value[salenum]</td>
 							</tr>
 <!--
 EOT;
@@ -258,11 +250,11 @@ EOT;
 }} elseif ($job == 'saled'){print <<<EOT
 -->
 							<tr class="tr3">
-									<td width="13%">商品图片</td>
+									<td width="60">商品图片</td>
 									<td>商品名称</td>
-									<td width="13%">现价</td>
-									<td width="15%">买家</td>
-									<td width="18%">交易状态</td>
+									<td class="tac" width="70">现价</td>
+									<td class="tac" width="90">买家</td>
+									<td width="100">交易状态</td>
 							</tr>
 <!--
 EOT;
@@ -270,16 +262,16 @@ if (!empty($trade)) {
 foreach ($trade as $key => $value) {print <<<EOT
 -->
 							<tr class="tr3">
-									<td><img src="$value[icon]" width="40" height="40" /></td>
-									<td><a href="read.php?tid=$value[tid]">$value[subject]</a></td>
-									<td>$value[price]</td>
-									<td><a href="{$db_userurl}$value[buyer]">$value[username]</a></td>
+									<td><img src="$value[icon]" width="40" class="img" height="40" /></td>
+									<td><a href="read.php?tid=$value[tid]" class="f14">$value[subject]</a></td>
+									<td class="tac">$value[price]</td>
+									<td class="tac"><a href="{$db_userurl}$value[buyer]">$value[username]</a></td>
 									<td>
 <!--
 EOT;
 if($winduid == $u){print <<<EOT
 -->
-							<div><a style="color:blue;" href="trade.php?action=order&oid=$value[oid]">详情</a></div>
+							<a href="trade.php?action=order&oid=$value[oid]">详情</a><br />
 <!--
 EOT;
 }print <<<EOT
@@ -331,36 +323,7 @@ EOT;
 }print <<<EOT
 -->
 						<div class="mt10">$pages</div>
-					</div>	
-					<div class="fr sidebar">
-						<div class="boxC mb10">
-							<h3>类型筛选</h3>
-							<ul class="ulE">  
-								<li id="a_topic"><a href="{$basename}"><span>主题</span></a></li> 
-								<li id="a_post"><a href="{$basename}see=post"><span>回复</span></a></li>
-								<li id="a_goods"><a href="{$basename}a=goods&job=onsale"><span>商品</span></a></li>
-							</ul>
-						</div>
-						<div class="boxC">
-							<h3>商品</h3>
-							<div class="ulE">
-								<ul>
-									<li id="uf_onsale"><a href="{$basename}a=goods&job=onsale">出售中的商品</a></li>
-<!--
-EOT;
-if ($u == $winduid) {print <<<EOT
--->
-									<li id="uf_buy"><a href="{$basename}a=goods">已买入的商品</a></li>
-<!--
-EOT;
-}print <<<EOT
--->
-									<li id="uf_saled"><a href="{$basename}a=goods&job=saled">已卖出的商品</a></li>
-								</ul>
-								<script language="javascript">setCurrent('uf_$job','uf_buy','current');</script>
-							</div>
-						</div>
-					</div>                 	
+					</div>                	
 <!--
 EOT;
 }}print <<<EOT

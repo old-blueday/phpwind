@@ -8,10 +8,12 @@ $onlinearray = openfile(D_P."data/bbscache/online.php");
 $onlinearray =  array_unique($onlinearray);
 $count_ol = count($onlinearray);
 if ($onlinearray[0] == '') $count_ol = 0;
-
+$existsMembers = array();
 for ($i = 1; $i < $count_ol; $i++) {
 	if (strpos($onlinearray[$i],"\t") !== false) {
 		$onlinedb = explode("\t",$onlinearray[$i]);
+		if (S::inArray($onlinedb[8], $existsMembers)) continue;
+		$existsMembers[] = $onlinedb[8];
 		$inread = '';
 		if ($onlinedb[4]) $inread = '(Read)';
 		if (strpos($db_showgroup,",".$onlinedb[5].",") !== false) {

@@ -90,6 +90,7 @@ EOT;
 <script language="JavaScript" src="js/core/changeview.js"></script>
 <script language="JavaScript">
 var frist = New(changView,['list-box','li',1]);
+
 </script>
 <!--
 EOT;
@@ -149,7 +150,7 @@ empty($value[pintro]) && $value[pintro] = '没有照片描述';
 print <<<EOT
 -->     
       <li>
-      	<div class="aimg"><a href="{$basename}a=view&cyid=$cyid&pid=$value[pid]"><img src="$value[path]" /></a></div>
+      	<div class="aimg"><a href="{$basename}a=view&cyid=$cyid&pid=$value[pid]"><img src="$value[path]" onload="resizeImg(this)" /></a></div>
       	<p>$value[pintro]</p>
 <!--
 EOT;
@@ -228,7 +229,7 @@ foreach ($cnpho as $key => $value) {
 empty($value[pintro]) && $value[pintro] = '没有照片描述';
 print <<<EOT
 -->     
-      <li><div class="aimg"><a href="{$basename}a=view&cyid=$cyid&pid=$value[pid]"><img src="$value[path]" /></a></div>
+      <li><div class="aimg"><a href="{$basename}a=view&cyid=$cyid&pid=$value[pid]"><img src="$value[path]" onload="resizeImg(this)" /></a></div>
       <p>$value[pintro]</p>
 	  
 <!--
@@ -300,6 +301,8 @@ function ajaxdel(url, aid) {
 	})
 	return false;
 }
+var db_urlcheck = "$db_urlcheck";
+var db_bbsurl = '$db_bbsurl';
 </script>
 <div class="g_navB mb10">
 	<span class="fr">
@@ -350,12 +353,12 @@ EOT;
 if($value[pid]=='begin'||$value[pid]=='end'){
 print <<<EOT
 -->
-					<li><div class="aimg"><a href="javascript:;"><img src="$value[path]" /></a></div></li>
+					<li><div class="aimg"><a href="javascript:;"><img src="$value[path]" onload="resizeImg(this)" /></a></div></li>
 <!--
 EOT;
 } else {print <<<EOT
 -->
-					<li $ifsel><div class="aimg"><a href="{$basename}cyid=$cyid&a=view&pid=$value[pid]#g_navA"><img src="$value[path]" onload="if(this.width>60){this.width = 60;} else if(this.height>60){this.height=60;}" /></a></div></li>
+					<li $ifsel><div class="aimg"><a href="{$basename}cyid=$cyid&a=view&pid=$value[pid]#g_navA"><img src="$value[path]"  onload="resizeImg(this)" /></a></div></li>
 <!--
 EOT;
 }print <<<EOT
@@ -507,7 +510,7 @@ print <<<EOT
     <table width="70%" class="setTable vt">
     	<tr>
         	<th class="th">选择相册</th>
-            <td class="td"><div class="dropdown mr20"><select name="aid" class="select_wa mr10" id="aidsel_info" onchange="getallowflash(this.value);">{$options}</select></div>
+            <td class="td"><span class="dropdown mr20"><select name="aid" class="select_wa mr10" id="aidsel_info" onchange="getallowflash(this.value);">{$options}</select></span>
 <!--
 EOT;
 if ($ifadmin) {print <<<EOT
@@ -532,12 +535,12 @@ print <<<EOT
             <div class="g_photosbox">
                 <div id="viewimg" class="menu mb10" style="display:none;"></div>
                 <object id="mutiupload" name="mutiupload" classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" width="250" height="46">
-                  <param name="movie" value="images/uploader.swf" />
+                  <param name="movie" value="$imgpath/photouploader.swf" />
                   <param name="FlashVars" value="url=$db_bbsurl%2Fjob.php%3Faction%3Dmutiuploadphoto"/>
                   <param name="allowScriptAccess" value="always" />
                   <param name="wmode" value="transparent" />
                   <!--[if !IE]>-->
-                  <object type="application/x-shockwave-flash" data="images/uploader.swf" width="250" height="46" FlashVars="url=$db_bbsurl%2Fjob.php%3Faction%3Dmutiuploadphoto"  allowScriptAccess="always">
+                  <object type="application/x-shockwave-flash" data="$imgpath/photouploader.swf" width="250" height="46" FlashVars="url=$db_bbsurl%2Fjob.php%3Faction%3Dmutiuploadphoto"  allowScriptAccess="always">
                   <!--<![endif]-->
                     <p>你没有安装Flash!</p>
                   <!--[if !IE]>-->
@@ -546,11 +549,9 @@ print <<<EOT
                 </object>
 <script>
 swfobject.addLoadEvent(function(){
-	getallowflash(getObj('aidsel_info').value);
 	uploader.maxLength = {$o_maxfilesize};
 	uploader.baseurl ='{$basename}cyid=$cyid&';
 	uploader.init();
-	photoselect = new sSelect(getObj('aidsel_info'));
 });
 swfobject.registerObject('mutiupload','10.0.0','js/expressInstall.swf');
 </script>
@@ -641,12 +642,15 @@ EOT;
     </table>
 </form>
 </div>
-<script language="JavaScript">
+<script>
+window.onReady(function(){
+	var photoselect = new sSelect(getObj('aidsel_info'));
+})
 var charset = '$db_charset';
 initCheckTextNum('pintro_1','pintro_1_warn',255);
 initCheckTextNum('pintro_2','pintro_2_warn',255);
 initCheckTextNum('pintro_3','pintro_3_warn',255);
-
+getallowflash(getObj('aidsel_info').value);
 function getallowflash(aid) {
 	setTimeout(function(){ajax.send('{$basename}a=getallowflash&cyid=$cyid&aid='+aid,'',function() {
 		var rText = ajax.request.responseText.split('\\t');
@@ -827,7 +831,7 @@ empty($value[pintro]) && $value[pintro] = '没有照片描述';
 $pintro = substrs($value[pintro],10);
 print <<<EOT
 -->	
-      					<li><div class="aimg" onclick="selectPhoto(this)"><img style="cursor:pointer;" src="$value[path]" /></div><p><label for="sel_{$value[pid]}"><input  type="checkbox" id="sel_{$value[pid]}" name="selid[]" value="$value[pid]"   />$value[pintro]</label></p></li>
+      					<li><div class="aimg" onclick="selectPhoto(this)"><img style="cursor:pointer;" src="$value[path]" onload="resizeImg(this)" /></div><p><label for="sel_{$value[pid]}"><input  type="checkbox" id="sel_{$value[pid]}" name="selid[]" value="$value[pid]"   />$value[pintro]</label></p></li>
 <!--
 EOT;
 }print <<<EOT
@@ -981,6 +985,7 @@ EOT;
 var charset = '$db_charset';
 initCheckTextNum('aname','aname_warn',24);
 initCheckTextNum('aintro','aintro_warn',255);
+
 </SCRIPT>
 <!--
 EOT;

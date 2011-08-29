@@ -136,6 +136,34 @@ class PW_ColumnService {
 		return $result;
 	}
 
+	function getCurrentAndSubColumns($id) {
+		$columns = $this->findAllColumns();
+		if (!$id) return array($this->_getTopColumns($columns), array());
+		return array($this->_getSubs($columns, $id), $columns[$id]);
+	}
+
+	function _getTopColumns($columns) {
+		$_tmp = array();
+		foreach ($columns as $column) {
+			if (!$column['parent_id']) {
+				$_tmp[] = $column;
+			}
+		}
+		return $_tmp;
+	}
+
+	function _getSubs($columns, $id) {
+		$_tmp = array();
+		foreach ($columns as $column) {
+			if ($column['parent_id'] == $id) {
+				$_tmp[] = $column;
+			}
+		}
+		return $_tmp;
+	}
+		
+	
+	
 	/**
 	 * 更新栏目的SEO信息
 	 * @param array $data

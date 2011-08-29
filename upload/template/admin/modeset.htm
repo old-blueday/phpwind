@@ -19,21 +19,19 @@ print <<<EOT
       <td width="80">开启</td>
       <td>操作</td>
     </tr>
-	<tr class="tr1 vt">
+		<tr class="tr1 vt">
+      <td class="td2"><i id="bt_bbs" onclick="cateopen('$key')" class="expand expand_d"></i>论坛模式</td>
+      <td class="td2">&nbsp;</td>
+      <td class="td2"><input type="radio" name="defaultmode" value=''{$checkArr[bbs]} /></td>
+      <td class="td2"><input type="hidden" name="ifopen[]" value="bbs" /></td>
+      <td class="td2">&nbsp;</td>
+    </tr>
+		<tr class="tr1 vt">
       <td class="td2"><i id="bt_o" onclick="dmopen('o')" class="expand expand_d"></i>{$db_modes[o][m_name]}</td>
       <td class="td2"><input type="text" name="domain[o]" value="{$db_modedomain[o]}" class="input input_wa"></td>
       <td class="td2"><input type="radio" name="defaultmode" value="o"{$checkArr[o]} /></td>
       <td class="td2"><input type="hidden" name="ifopen[]" value="o" /></td>
       <td class="td2"><a title="更新缓存" href="$basename&action=fourmtypecache&m=o" class="mr20">[更新]</a></td>
-    </tr>
-    <tr class="tr1 vt">
-      <td class="td2"><!--<span id="bt_bbs" class="close fl" onclick="cateopen('$key')"></span>-->
-      <i id="bt_bbs" onclick="cateopen('$key')" class="expand expand_d"></i>论坛模式
-      </td>
-      <td class="td2">&nbsp;</td>
-      <td class="td2"><input type="radio" name="defaultmode" value=''{$checkArr[bbs]} /></td>
-      <td class="td2"><input type="hidden" name="ifopen[]" value="bbs" /></td>
-      <td class="td2">&nbsp;</td>
     </tr>
 <!--
 EOT;
@@ -58,7 +56,7 @@ print <<<EOT
 EOT;
 } else {print <<<EOT
 -->
-		<input type="checkbox" name="ifopen[]" value="1" checked="checked" readonly="readonly" disabled />
+		<input type="checkbox" name="ifopen[]" value="1" checked="checked" style="display:none;" readonly="readonly" disabled />
 <!--
 EOT;
 }print <<<EOT

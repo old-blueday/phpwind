@@ -93,9 +93,8 @@ if (empty($_POST['step'])) {
 		$atc_title = "Re:$replytitle";
 		$forumtitle = "$atc_title|$tpcarray[subject]|$forumtitle";
 	}
-	$atc_title = substrs(str_replace('&nbsp;',' ',$atc_title), $db_titlemax - 2);
+	$atc_title = substrs(str_replace('&nbsp;',' ',$atc_title), $db_titlemax - 3);
 	$db_metakeyword = str_replace(array('|',' - '),',',$forumtitle).'phpwind';
-
 	require_once(R_P.'require/header.php');
 	$msg_guide = $pwforum->headguide($guidename);
 	$post_reply = '';
@@ -168,10 +167,9 @@ if (empty($_POST['step'])) {
 	$return !== true && Showmsg($return);
 	end*/
 	if (PwUpload::getUploadNum() || $flashatt) {
-		$postdata->att = new AttUpload($winduid, $flashatt);
+		S::gp(array('savetoalbum', 'albumid'), 'P', 2);
+		$postdata->att = new AttUpload($winduid, $flashatt, $savetoalbum, $albumid);
 		$postdata->att->check();
-		$postdata->att->transfer();
-		PwUpload::upload($postdata->att);
 	}
 	$replypost->setToUser($replytouser);
 	$postdata->iscontinue = (int)$iscontinue;
@@ -186,7 +184,7 @@ if (empty($_POST['step'])) {
 
 	//job sign
 	require_once(R_P.'require/functions.php');
-	$j_p = "read.php?tid=$tid&page=e#a";
+	$j_p = "read.php?tid=$tid&displayMode=1&page=e#a";
 	if ($db_htmifopen)
 		$j_p = urlRewrite ( $j_p );
 	$_cacheService = Perf::gatherCache('pw_threads');

@@ -1,33 +1,165 @@
-<!--<?php print <<<EOT
+<!--<?php
+!$webPageTitle && $webPageTitle = $db_bbsname;
+$metaVersion = $wind_version;
+$wind_repair && $metaVersion .= '(' . $wind_repair . ')';
+print <<<EOT
 -->
-<div id="breadCrumb">
-<img src="$imgpath/$stylepath/thread/home.gif" class="breadHome" /><em class="breadEm"></em><a href="$db_bfn" title="$db_bbsname">$db_bbsname</a><em>&gt;</em>找回密码
+<!doctype html>
+<html>
+<head>
+<meta charset="$db_charset" />
+<title>$webPageTitle - Powered by phpwind</title>
+<meta name="generator" content="phpwind v{$metaVersion}" />
+<meta name="description" content="$metaDescription" />
+<meta name="keywords" content="$metaKeywords" />
+<SCRIPT type="text/javascript" language="JavaScript" src="js/core/core.js"></SCRIPT>
+<script type="text/javascript" language="JavaScript" src="js/pw_ajax.js"></script>
+
+<!--css-->
+<link rel="stylesheet" href="$imgpath/pw_core.css?101128" />
+<!--
+EOT;
+@include Pcv($css_path);
+print <<<EOT
+-->
+<link rel="stylesheet" href="$imgpath/register/register.css?110120" />
+</head>
+<body onKeyDown="try{keyCodes(event);}catch(e){}">
+<div class="wrap">
+<div id="header">
+	<div style="height:24px;"></div>
+		 <div id="head" class="cc">
+				<a href="$db_bbsurl/"><img src="$imgpath/$stylepath/logo.png" class="fl" title="phpwind" /></a>
+		</div>
 </div>
+<div class="main-wrap">
+<div id="main">
+<!--
+EOT;
+print<<<EOT
+-->
 <div id="pw_content">
 	<div class="p20">
 		<div class="regTitle cc">
-			<h5>密码发送程序</h5>
+			<h5>找回密码</h5>
 		</div>
 		<table width="100%"><tr><td class="vt" height="300" style="padding-bottom:30px;">
 		<form action="sendpwd.php?" method="POST">
 		<input type="hidden" value="2" name="step" />
 		<div class="regForm">
+<!-- 
+EOT;
+if($db_authstate && $db_authgetpwd){print <<<EOT
+-->
 			<dl class="cc">
-				<dt>用户名</dt>
-				<dd class="ip"><div><input type="text" name="pwuser" /></div></dd>
-			</dl>
+				<dt><select onChange="switchSetpwdType(this.value)" name="type" class="fr" id="setPwdType"><option value="1">手机找回</option><option value="2">邮箱找回</option></select></dt>
+				<dd style="line-height:30px;" class="s6">请输入您注册时填写的用户名及联系资料</dd>
+			 </dl>
+<!-- 
+EOT;
+}print <<<EOT
+-->
+				<dl class="cc" id="dl_pwusername" style="display:$authStep_1">
+					<dt>用户名</dt>
+					<dd class="ip"><div><input type="text" class="input" name="pwuser" id="pwuser" value="$verifyUsername" /></div></dd>
+				</dl>
+<!-- 
+EOT;
+if($db_authstate && $db_authgetpwd){print <<<EOT
+-->
+			<div id="setbyemail" style="display:none">
+				<dl class="cc">
+					<dt>电子邮箱</dt>
+					<dd class="ip"><div><input type="text" class="input" name="email" /></div></dd>
+				</dl>
+			</div>
+			<div id="setbymobile">
+				<div id="mobileBox" style="display:$authStep_1">
+					 <dl class="cc">
+						<dt>手机号码</dt>
+						<dd class="ip"><div><input type="text" class="input" name="authmobile" id="authmobile" value="$mobile" /></div></dd>
+						<dd><span class="bt"><span><button type="button" id="btnGetVerify">获取验证码</button></span></span></dd>
+					 </dl>
+					 <!--dl class="cc">
+						<dt>&nbsp;</dt>
+						<dd class="s6 tp" id="mobileauth_info">此服务免费，验证码将以手机短信的形式发送到您的手机上</dd>
+					 </dl-->
+				</div>
+				<div id="verifyBox" style="display:$authStep_2">
+			         <dl class="cc" style="min-height:auto;height:auto;">
+			            <dt id="pw_sername">用户名</dt>
+			            <dd class="ip"><span class="f14 b" style="line-height:28px;" id="usernameView">$verifyUsername</span></dd>
+			         </dl>
+			         <div style="border:1px solid #e4e4e4;background:#f7fbff;margin-bottom:15px;padding:10px 0;">
+			            <div style="padding:0 0 5px 115px;color:#666;">
+			            		验证码已发送到<span id="mobileNumber">$mobile</span>，如果超过{$waitTime}秒未收到验证码，您可以免费重新获取。
+			            		<p>
+			            			<span class="bt2" style="margin:5px 0;">
+			            				<span><button type="button" id="timeRemainTips">
+<!-- 
+EOT;
+if($remainTime > 0){print <<<EOT
+-->
+			            				<font color="red">{$remainTime}秒</font>后重获验证码
+<!--
+EOT;
+}else{print <<<EOT
+-->
+重获验证码
+<!--
+EOT;
+}print <<<EOT
+-->
+			            				</button></span>
+			            			</span>
+			            		</p>
+			            </div>
+			            <dl class="cc" style="height:auto;min-height:inherit;margin-bottom:5px;">
+			               <dt><label for="authverify">验证码</label></dt>
+			               <dd class="ip"><div style="background:#fff;"><input type="text" maxlength="75" name="authverify" id="authverify" autocomplete="off" /></div></dd>
+			               <dd class="tp"><span class="bt"><span><button type="button" id="verify">验证</button></span></span></dd>
+			            </dl>
+			         </div>
+	         	</div>
+
+				<div id="passwordBox" style="display:none">
+			         <dl class="cc">
+			            <dt>&nbsp;</dt>
+			            <dd class="ip"><span class="f14 b" style="line-height:28px;color:#008800;">验证完成，请重新设置新密码</span></dd>
+			         </dl>
+			         <dl class="cc">
+			            <dt>新密码</dt>
+			            <dd class="ip"><div><input type="password" name="new_pwd" /></div></dd>
+			         </dl>
+			         <dl class="cc">
+			            <dt>重复新密码</dt>
+			            <dd class="ip"><div><input type="password" name="pwdreapt" /></div></dd>
+			         </dl>
+				</div>
+				<dl class="cc" style="min-height:auto;height:auto;">
+					<dt>&nbsp;</dt>
+					<dd class="s6 tp" id="mobileauth_info" style="width:auto;">此服务免费，验证码将以手机短信的形式发送到您的手机上</dd>
+					<!--错误的话，把前面这些文字替换成后面的错误代码<div class="wrong">用户名与手机号码不匹配，请重新输入</div>-->
+				</dl>
+			</div>
+
+<!-- 
+EOT;
+}else{print <<<EOT
+-->
 			<dl class="cc">
 				<dt>电子邮箱</dt>
-				<dd class="ip"><div><input type="text" name="email" /></div></dd>
+				<dd class="ip"><div><input type="text" class="input" name="email" /></div></dd>
 			</dl>
 <!--
 EOT;
+}
 if($db_ifsafecv){print <<<EOT
 -->
 			<dl class="cc">
 				<dt>安全问题</dt>
 				<dd class="ip">
-					<select name="question" onchange="showcustomquest_0(this.value)" style="width:230px;margin-top:3px;">
+					<select name="question" onChange="showcustomquest_0(this.value)" style="width:230px;margin-top:3px;">
 						<option value="0">无安全问题</option><option value="1">我爸爸的出生地</option><option value="2">我妈妈的出生地</option><option value="3">我的小学校名</option><option value="4">我的中学校名</option><option value="5">我最喜欢的运动</option><option value="6">我最喜欢的歌曲</option><option value="7">我最喜欢的电影</option><option value="8" >我最喜欢的颜色</option><option value="-1">自定义问题</option>
 					</select>
 				</dd>
@@ -41,7 +173,7 @@ if($db_ifsafecv){print <<<EOT
 			<dl class="cc">
 				<dt>您的答案</dt>
 				<dd class="ip">
-        	<div><input type="text" name="answer" /></div>
+        	<div><input type="text" class="input" name="answer" /></div>
 				</dd>
 				<dd><div class="p5 s6">如果您设置了安全问题，需要填写正确的答案才能找回密码</div></dd>
       </dl>
@@ -52,9 +184,9 @@ $gdSize = explode("\t",$db_gdsize);
 print <<<EOT
 -->
 			<dl class="cc">
-				<dt>认证码</dt>
+				<dt>验证码</dt>
 				<dd class="ip ck">
-					<div><input id="gdcode" name="gdcode" value="" onfocus="showgd();" /></div>
+					<div><input id="gdcode" class="input" name="gdcode" value="" onFocus="showgd();" /></div>
 					<span id="menu_gd"></span>
 					<span id="ckcode" style="display:none">
 <script type="text/javascript" src="js/pw_authcode.js"></script>
@@ -82,11 +214,153 @@ EOT;
 		</td></tr></table>
 	</div>
 </div>
+<!-- 
+EOT;
+if($db_authstate && $db_authgetpwd){print <<<EOT
+-->
+<script language="JavaScript">
+var waitTime = parseInt('$waitTime');
+var timeRemain = parseInt('$remainTime');
+var authStep = parseInt('$authStep');
+var authInfo = new Array("",
+		"与服务器通信失败,请稍候再试",
+		"手机号码输入有误",
+		"您的帐户尚未绑定手机认证",
+		"你今天获取验证码次数已达到上限",
+		"验证码输入有误",
+		"手机验证码不能为空",
+		"手机号码不匹配"
+);
+function switchSetpwdType(type){
+	if(type == 1){
+		//手机取回
+		getObj("setbyemail").style.display = 'none';
+		getObj("setbymobile").style.display = '';
+		if(getObj('verifyBox').style.display != 'none' || getObj('passwordBox').style.display != 'none'){
+			getObj("dl_pwusername").style.display = 'none'
+		}
+	}else{
+		getObj("setbyemail").style.display = '';
+		getObj("setbymobile").style.display = 'none';
+		getObj("dl_pwusername").style.display = ''
+	}
+}
+
+/*手机认证找回密码*/
+var intval = null;
+var btnGetVerify = getObj('btnGetVerify');
+var mobile = getObj('authmobile');
+var pwuser = getObj('pwuser');
+var mobileTips = getObj('mobileauth_info');
+var defaultMobileTips = '此服务免费，验证码将以手机短信的形式发送到您的手机上';
+btnGetVerify.onclick = function(){/*获取验证码事件*/
+	if(pwuser.value == ''){
+		mobileTips.innerHTML = '<div class="wrong">请输入用户名</div>';
+	}else if(!/^1\d{10}$/.test(mobile.value)){
+		mobileTips.innerHTML = '<div class="wrong">'+authInfo[2]+'</div>';
+		mobile.onfocus = function(){mobileTips.innerHTML = defaultMobileTips;}
+	}else{
+		btnGetVerify.disabled = true;
+		verify(mobile.value,pwuser.value);
+	}
+	return false;
+}
+
+if(authStep == 2){
+	intval = setInterval("setCheckTime()",1000);
+}
+
+/*验证*/
+var authVerify = getObj('authverify');
+getObj('verify').onclick = function(){
+	getObj('verify').disabled = true;
+	if(authVerify.value == ''){
+		mobileTips.innerHTML = '<div class="wrong">请输入验证码</div>';
+		authVerify.onfocus = function(){mobileTips.innerHTML = defaultMobileTips;}
+	}else{
+		var url 	= location.href;
+		var data 	= "action=checkverify&authmobile="+mobile.value+"&pwuser="+pwuser.value+"&authverify="+authVerify.value;
+		ajax.send(url,data,function(){
+			var response = parseInt(ajax.request.responseText);
+			if (response > 0){
+				getObj('mobileauth_info').innerHTML = '<div class="wrong">'+authInfo[response]+'</div>';;
+			}else{
+				/*验证码正确*/
+				getObj('verifyBox').style.display = 'none';
+				getObj('passwordBox').style.display = '';
+				mobileTips.innerHTML = defaultMobileTips;
+			}
+		});
+	}
+	getObj('verify').disabled = false;
+}
+
+function setCheckTime() {
+	timeRemain -= 1;
+	if (timeRemain > 0) {
+		getObj("timeRemainTips").innerHTML = '<font color="red">'+timeRemain+'秒</font>后重获验证码';
+	} else {
+		clearInterval(intval);
+		intval = null;
+		timeRemain = waitTime;
+		getObj("timeRemainTips").disabled = false;
+		getObj("timeRemainTips").innerHTML = '重获验证码';
+		getObj("timeRemainTips").onclick=function(){
+			getObj("timeRemainTips").disabled = true;
+			verify(mobile.value,pwuser.value);
+		};
+	}
+}
+
+function verify(mobileNumber,username){
+	var url 	= location.href;
+	var data 	= "action=getverify&authmobile="+mobileNumber+"&pwuser="+pwuser.value;
+	getObj('mobileauth_info').innerHTML = defaultMobileTips;
+	ajax.send(url,data,function(){
+		var response = parseInt(ajax.request.responseText);
+		if (response > 0){
+			getObj('mobileauth_info').innerHTML = '<div class="wrong">'+authInfo[response]+'</div>';;
+		}else{
+			/*成功获取验证码*/
+			getObj('verifyBox').style.display = '';
+			getObj('mobileBox').style.display = 'none';
+			getObj('dl_pwusername').style.display = 'none';
+			getObj('mobileNumber').innerHTML = mobileNumber;
+			getObj('usernameView').innerHTML = username;
+			if(intval == null) intval = setInterval("setCheckTime()",1000);
+		}
+		getObj('btnGetVerify').disabled = false;
+	});
+}
+setTimeout(
+	function(){
+		var obj = getObj('setPwdType');
+		for(i=0;i<obj.options.length;i++){
+			if(obj.options[i].value == obj.value){
+				obj.options[i].selected=true;
+			}
+		}
+		switchSetpwdType(obj.value);
+	},100
+);
+
+//
+//end 
+</script>
+<!--
+EOT;
+}print <<<EOT
+-->
 <script language="JavaScript1.2">
 function showcustomquest_0(qid){
 	getObj("customquest_o").style.display = qid==-1 ? '' : 'none';
 }
 </script>
+</div></div><!--.main-wrap,#main End-->
+
+</div>
+
+</body></html>
 <!--
 EOT;
 ?>-->

@@ -9,13 +9,14 @@ function_exists('date_default_timezone_set') && date_default_timezone_set('Etc/G
 require_once(R_P.'require/common.php');
 S::filter();
 
-require_once pwCache::getPath(D_P.'data/bbscache/config.php');
+//* require_once pwCache::getPath(D_P.'data/bbscache/config.php');
+require_once (D_P.'data/sql_config.php');
+pwCache::getData(D_P.'data/bbscache/config.php');
 $timestamp = time();
 $db_cvtime!=0 && $timestamp += $db_cvtime*60;
 $onlineip = pwGetIp();
 
 require_once(R_P.'api/class_base.php');
-require_once pwCache::getPath(D_P.'data/sql_config.php');
 if ($database == 'mysqli' && Pwloaddl('mysqli') === false) {
 	$database = 'mysql';
 }
@@ -55,9 +56,7 @@ if ($response) {
 function GetLang($lang,$EXT='php'){//No use
 	return R_P."template/wind/lang_$lang.$EXT";
 }
-if (!function_exists('Pwloaddl')) {
-	function Pwloaddl($module, $checkFunction = 'mysqli_get_client_info') {
-		return extension_loaded($module) && $checkFunction && function_exists($checkFunction) ? true : false;
-	}
+function Pwloaddl($module, $checkFunction = 'mysqli_get_client_info') {
+	return extension_loaded($module) && $checkFunction && function_exists($checkFunction) ? true : false;
 }
 ?>

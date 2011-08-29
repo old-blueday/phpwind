@@ -1,9 +1,11 @@
 <!--<?php print <<<EOT
 -->
 <!--main begin-->
-<div class="list_main list_main_no">
-	<div class="list_content">
-		<table width="100%" cellpadding="0" cellspacing="0" height="300"><tr><td valign="top">
+<div class="main cc sideClose">
+	<div class="grid_3 cc mb20">
+		<div class="cm">
+			<div class="cw cc">
+			<div class="main_min">
 		<div class="dlA">
 <!--
 EOT;
@@ -37,9 +39,9 @@ print <<<EOT
 			<dl>
 				<dt><a href="apps.php?q=diary&uid={$diary[uid]}&a=detail&did={$diary[did]}" class="tlink" target="_blank">$diary[subject]</a></dt>
 				<dd>
-					<div class="num"></div>
+					<div class="num">$diary[c_num]条回复 - $diary[r_num]次浏览</div>
 					<div class="text">$diary[content]</div>
-					<div class="riji_author">作者：<a href="{$db_userurl}{$diary[uid]}" target="_blank" class="mr20">$diary[username]</a>查看：$diary[r_num]<span>|</span>回复：$diary[c_num]<span>|</span>发布时间：<cite>$diary[postdate]</cite></div>
+					<div class="author"><cite>$diary[postdate] - </cite>作者：<a href="{$db_userurl}{$diary[uid]}" target="_blank">$diary[username]</a></div>
 				</dd>
 			</dl>
 
@@ -57,14 +59,16 @@ print <<<EOT
 				<div class="c"></div>
 			</div>
 		</div>
+		</div>
 <!--
 EOT;
 require printEOT('searcher_searchinput');
 print <<<EOT
 -->
-		</td></tr></table>
-	</div>
-<div class="list_sideBar">
+			</div>
+		</div>
+		<div class="sd">
+			<div class="sidebar">
 <!--
 EOT;
 list($htmlAdvert,$arrayAdvert) = pwAdvert('Site.Search.Diary.Right','');
@@ -77,46 +81,59 @@ if($htmlAdvert){print <<<EOT
 EOT;
 }print <<<EOT
 -->
-		<div class="list_box">
-			<h2><a href="searcher.php?type=diary&keyword={$keyword}&step=2&diaryrange=$diaryrange">全部时间</a></h2>
-			<ul>	
-				<li id="posttime_1"><a href="searcher.php?type=diary&keyword={$keyword}&step=2&posttime=1&diaryrange=$diaryrange">1小时内</a></li>
-				<li id="posttime_24"><a href="searcher.php?type=diary&keyword={$keyword}&step=2&posttime=24&diaryrange=$diaryrange">一天内</a></li>
-				<li id="posttime_168"><a href="searcher.php?type=diary&keyword={$keyword}&step=2&posttime=168&diaryrange=$diaryrange">一周内</a></li>
-				<li id="posttime_720"><a href="searcher.php?type=diary&keyword={$keyword}&step=2&posttime=720&diaryrange=$diaryrange">一个月内</a></li>
-			</ul>
-			<script language="JavaScript">setCurrent('posttime_{$posttime}','','current');</script>
+	<div class="boxA">
+		<h2><a href="searcher.php?type=diary&keyword={$keyword}&step=2&diaryrange=$diaryrange">全部时间</a></h2>
+		<ul>	
+<!-- 
+EOT;
+if ($timesFilterList) {
+    $filterDateUrl = "searcher.php?type=diary&keyword={$keyword}&step=2&diaryrange=$diaryrange&";
+    foreach ($timesFilterList as $key=>$value) {
+print <<<EOT
+-->
+            <li id="posttime_{$value['starttime']}"><a href="{$filterDateUrl}diarystarttime={$value[starttime]}&diaryendtime={$value[endtime]}&">$value[title]</a></li>
+<!--
+EOT;
+    }
+}
+print <<<EOT
+-->
+            
+            
+		</ul>
+		<script language="JavaScript">setCurrent('posttime_{$diarystarttime}','','current');</script>
 <!--
 EOT;
 if($hotwords){
 print <<<EOT
 -->     
-						
-			<h2><a>热门搜索</a></h2>
-			<ul>
+					
+		<h2><a>热门搜索</a></h2>
+		<ul>
 <!-- 
 EOT;
 foreach($hotwords as $hotword){
 print <<<EOT
 -->
-			<li><a href="searcher.php?keyword={$hotword}&type=diary">$hotword</a></li>
+		<li><a href="searcher.php?keyword={$hotword}&type=diary">$hotword</a></li>
 <!-- 
 EOT;
 }
 print <<<EOT
 --> 
-								
-			</ul>
-					
+							
+		</ul>
+				
 <!-- 
 EOT;
 }
 print <<<EOT
 -->
-			
+		
+	</div>
+			</div>
 		</div>
 	</div>
-	<div class="c"></div>
 </div>
 <!--
 EOT;

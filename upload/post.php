@@ -6,7 +6,9 @@ if (isset($_POST['ajax']) && $_POST['ajax'] == 1) {
 require_once('global.php');
 L::loadClass('forum', 'forum', false);
 L::loadClass('post', 'forum', false);
-include_once pwCache::getPath(D_P.'data/bbscache/cache_post.php');
+//* include_once pwCache::getPath(D_P.'data/bbscache/cache_post.php');
+pwCache::getData(D_P.'data/bbscache/cache_post.php');
+
 /**
 * 版块缓冲文件
 */
@@ -19,10 +21,12 @@ if (!S::inArray($windid, $manager)) {
 	$pwpost->postcheck();
 }
 
-list($uploadcredit,$uploadmoney,,) = explode("\t", $pwforum->forumset['uploadset']);
-
 $foruminfo =& $pwforum->foruminfo;
 $forumset =& $pwforum->forumset;
+
+if ($forumset['link']) {
+	Showmsg('本版块为外链版块，禁止发帖');
+}
 
 S::gp(array('action','article','pid','page'));
 S::gp(array('special','modelid','pcid', 'cyid','actmid'),GP,2);
@@ -215,40 +219,50 @@ if (empty($_POST['step'])) {
 	!is_numeric($db_attachnum) && $db_attachnum = 1;
 	$htmlsell = ($pwforum->foruminfo['allowsell'] && $_G['allowsell']) ? '' : 'disabled';
 	$htmlhide = ($pwforum->forumset['allowencode'] && $_G['allowencode']) ? '' : 'disabled';
-	$htmlpost = $htmlatt = ($pwforum->foruminfo['allowhide'] && $_G['allowhidden']) ? '' : 'disabled';
+	$htmlpost = $attachHide = ($pwforum->foruminfo['allowhide'] && $_G['allowhidden']) ? '' : 'disabled';
 	$ifanonymous= ($pwpost->isGM || $pwforum->forumset['anonymous'] && $_G['anonymous']) ? '' : 'disabled';
 	$groupid   == 'guest' && $userrvrc = 0;
 	$atc_title  = $atc_content = $ifmailck = $selltype = $enhidetype = $alltype = '';
-	$uploadfiletype = $uploadfilesize = ' ';
-	foreach ($db_uploadfiletype as $key => $value) {
-		$uploadfiletype .= $key.' ';
-		$uploadfilesize .= $key.':'.$value.'KB; ';
-	}
+	$sellCredit = $enhideCredit = array();
+
+	$attachAllow = pwJsonEncode($db_uploadfiletype);
+	$imageAllow = pwJsonEncode(getAllowKeysFromArray($db_uploadfiletype, array('jpg','jpeg','gif','png','bmp')));
 	foreach ($credit->cType as $key => $value) {
 		$alltype .= "<option value=\"$key\">".$value."</option>";
 	}
 	foreach ($db_sellset['type'] as $key => $value) {
 		$selltype .= "<option value=\"$value\">".$credit->cType[$value]."</option>";
+		$sellCredit[$value] = $credit->cType[$value];
 	}
-	if(is_array($db_enhideset['type'])){
+	if (is_array($db_enhideset['type'])) {
 		foreach ($db_enhideset['type'] as $key => $value) {
-				$enhidetype .= "<option value=\"$value\">".$credit->cType[$value]."</option>";
+			$enhidetype .= "<option value=\"$value\">".$credit->cType[$value]."</option>";
+			$enhideCredit[$value] = $credit->cType[$value];
 		}
 	}
+	list($sellCredit, $enhideCredit) = array(pwJsonEncode($sellCredit), pwJsonEncode($enhideCredit));
+
 	require_once(R_P.'require/showimg.php');
 	list($postFaceUrl) = showfacedesign($winddb['icon'],1,'m');
 	/**
 	* 标题表情
 	*/
-	$icondb = array(
+	/*$icondb = array(
 		'1'=>'1.gif',	'2'=>'2.gif',
 		'3'=>'3.gif',	'4'=>'4.gif',
 		'5'=>'5.gif',	'6'=>'6.gif',
 		'7'=>'7.gif',	'8'=>'8.gif'
-	);
-	if ($db_allowupload && $_G['allowupload']) {
-		$attachsService = L::loadClass('attachs', 'forum');
-		$mutiupload = intval($attachsService->countMultiUpload($winduid));
+	);*/
+	$icondb = array();
+	if ($db_threademotion) {
+		$emotion = @opendir(S::escapeDir("$imgdir/post/emotion"));
+		while ($emotionimg = @readdir($emotion)) {
+			if ($emotionimg != "." && $emotionimg != ".." && $emotionimg != "" && preg_match("/^(\d+)\.(gif|jpg|png|bmp)$/i", $emotionimg, $emotionMatch)) {
+				$icondb[$emotionMatch[1]] = $emotionimg;
+			}
+		}
+		ksort($icondb);
+		@closedir($emotion);
 	}
 
 } else {
@@ -264,7 +278,8 @@ if (empty($_POST['step'])) {
 //默认动漫表情处理
 if ($db_windmagic && ($action == 'new' || ($action == 'modify' && $pid == 'tpc'))) {
 	$mDef = '';
-	@include_once pwCache::getPath(D_P."data/bbscache/myshow_default.php");
+	//* @include_once pwCache::getPath(D_P."data/bbscache/myshow_default.php");
+	pwCache::getData(D_P."data/bbscache/myshow_default.php");
 }
 if ($action == "new") {
 	require_once(R_P.'require/postnew.php');

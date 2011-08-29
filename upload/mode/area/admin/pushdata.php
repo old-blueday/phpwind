@@ -118,5 +118,14 @@ if (!$action || $action =='viewverify') {
 	$invokes = $portalPageService->getPageInvokesForSelect($alias,$ifverify);
 	echo pwJsonEncode($invokes);
 	ajax_footer();
+} elseif ($action == 'verifys') {
+	S::gp(array('selid'), '', 2);
+	if (!S::isArray($selid)) Showmsg('请选择要审核的推送内容');
+	foreach ($selid as $value) {
+		$value = (int) $value;
+		if (!$value) continue;
+		$pushdataService->verifyPushdata($value);
+	}
+	adminmsg('operate_success');
 }
 ?>

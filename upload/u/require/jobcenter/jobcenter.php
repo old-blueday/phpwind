@@ -136,7 +136,8 @@ if($action == "list"){
 } elseif($action == 'punch'){
 	//每日打卡
 	if($step == 2){
-		include_once pwCache::getPath(D_P . 'data/bbscache/o_config.php');
+		//* include_once pwCache::getPath(D_P . 'data/bbscache/o_config.php');
+		pwCache::getData(D_P . 'data/bbscache/o_config.php');
 		if(!$o_punchopen){
 			ajaxResponse('打卡功能已经关闭',false);
 		}
@@ -155,7 +156,7 @@ if($action == "list"){
 		}
 		procUnLock('punch_save', $winduid);
 		if($bool){
-			ajaxResponse('打卡成功!' . $information,true);
+			ajaxResponse($information,true);
 		}else{
 			ajaxResponse('打卡失败,请明天继续!',false);
 		}
@@ -186,6 +187,6 @@ function getPunchReward($reward){
 	));
 	$credit->set($winduid, $reward['type'], $reward['num']);
 	$unit = (isset($credit->cUnit[$reward['type']])) ? $credit->cUnit[$reward['type']] : '';
-	return array(true,'获得 '.$reward['num'].pwCreditNames($reward['type']));
+	return array(true,pwCreditNames($reward['type']).'+'.$reward['num']);
 }
 ?>

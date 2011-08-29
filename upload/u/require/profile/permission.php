@@ -31,7 +31,8 @@ if($step == '2'){
 }else if (!$fid) {
 
 	S::gp(array('gid'),'G',2);
-	include_once pwCache::getPath(D_P . 'data/bbscache/level.php');
+	//* include_once pwCache::getPath(D_P . 'data/bbscache/level.php');
+	pwCache::getData(D_P . 'data/bbscache/level.php');
 	$usercredit = array(
 		'postnum'	=> $winddb['postnum'],
 		'digests'	=> $winddb['digests'],
@@ -95,13 +96,12 @@ if($step == '2'){
 
 	$db->free_result($query);
 	$per['allowpcid1'] = strpos(','.$gRight['allowpcid'].',',',1,') !== false ? 1 : 0;  //团购帖
-	$per['allowpcid2'] = strpos(','.$gRight['allowpcid'].',',',2,') !== false ? 1 : 0;
+//	$per['allowpcid2'] = strpos(','.$gRight['allowpcid'].',',',2,') !== false ? 1 : 0;
 	$per['hide']	= $gRight['allowhide']		? 1 : 0;
 	$per['read']	= $gRight['allowread']		? 1 : 0;
 	$per['search']	= $gRight['allowsearch']	? 1 : 0;
 	$per['member']	= $gRight['allowmember']	? 1 : 0;
 	$per['profile']	= $gRight['allowprofile']	? 1 : 0;
-	$per['show']	= $gRight['show']			? 1 : 0;
 	$per['report']	= $gRight['allowreport']	? 1 : 0;
 	$per['upload']	= $gRight['upload']			? 1 : 0;
 	$per['portait']	= $gRight['allowportait']	? 1 : 0;
@@ -119,7 +119,7 @@ if($step == '2'){
 	$per['down']	= $gRight['allowdownload']	? 1 : 0;
 	$per['sort']	= $gRight['allowsort']		? 1 : 0;
 	$per['messege']	= $gRight['allowmessege']	? 1 : 0;
-	//	$per['active']	= $gRight['allowactive']	? 1 : 0;
+	$per['allowpcid2']	= $gRight['allowactivity']	? 1 : 0;
 	$per['reward']	= $gRight['allowreward']	? 1 : 0;
 	$per['anonymous'] = $gRight['anonymous']	? 1 : 0;
 	$per['leaveword'] = $gRight['leaveword']	? 1 : 0;
@@ -135,6 +135,7 @@ if($step == '2'){
 	foreach ($gRight['uploadtype'] as $key => $value) {
 		$per['uptype'] .= ($per['uptype'] ? ', ' : '')."$key:$value";
 	}
+	
 	unset($creditdb,$groups,$value,$ltitle,$gRight);
 
 }else{
@@ -144,8 +145,10 @@ if($step == '2'){
 		Showmsg('data_error');
 	}
 	(!$rt || $rt['type'] == 'category') && Showmsg('data_error');
-	wind_forumcheck($rt);
 	$forumset = $rt['forumset'];
+	if (!CkInArray($windid,$manager)) {
+		wind_forumcheck ($rt);
+	}
 	$forumset['link'] && Showmsg('data_error');
 
 	$per = $forumright = array();

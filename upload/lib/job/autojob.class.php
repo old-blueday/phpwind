@@ -69,6 +69,17 @@ class PW_AutoJob {
 					continue;
 				}
 			}
+			//实名认证
+			if (S::inArray($job['job'],array('doAuthAlipay','doAuthMobile'))) {
+				if (!$GLOBALS['db_authstate']) return false;
+				$userService = L::loadClass('UserService','user');
+				if ($job['job'] == 'doAuthAlipay' && $userService->getUserStatus($userid, PW_USERSTATUS_AUTHALIPAY)){
+					return false;
+				}
+				if ($job['job'] == 'doAuthMobile' && $userService->getUserStatus($userid, PW_USERSTATUS_AUTHMOBILE)){
+					return false;
+				}
+			}
 			$jobLists [$job ['id']] = $job;
 			$jobIds [] = $job ['id'];
 		}
@@ -163,7 +174,8 @@ class PW_AutoJob {
 		if (! $this->_cache) {
 			return array ();
 		}
-		@include_once pwCache::getPath ( S::escapePath ( $this->getCacheFileName () ), true );
+		//* @include_once pwCache::getPath ( S::escapePath ( $this->getCacheFileName () ), true );
+		extract(pwCache::getData(S::escapePath ( $this->getCacheFileName ()), false));
 		$jobLists = ($jobLists) ? $jobLists : $GLOBALS ['jobLists'];
 		if ($jobLists) {
 			return $jobLists;
@@ -237,7 +249,7 @@ class PW_AutoJob {
 		$joblists = $joblists ? $joblists : array ();
 		$num = 0;
 		foreach ( $joblists as $job ) {
-			if ($job ['isopen'] == 0)
+			if ($job ['isopen'] == 0 || $job['isuserguide'])
 				continue;
 			$num ++;
 		}

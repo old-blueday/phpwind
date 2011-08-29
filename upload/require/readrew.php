@@ -11,7 +11,7 @@ $rw_a_name	= is_numeric($rewdb['catype']) ? $_CREDITDB[$rewdb['catype']][0] : ${
 function Getrewhtml($lou,$ifreward,$pid) {
 	global $rewardtype,$rw_b_name,$rw_a_name,$groupid,$admincheck,$authorid,$winduid,$tid,$rewdb,$timeleave;
 
-	$html = "<div class=\"tips mb10\">";
+	$html = "<span class=\"tips mb10\">";
 	if ($lou == 0) {
 		if ($rewardtype == '0') {
 			$html .= '<span class="s2">'.getLangInfo('bbscode','rewarding');
@@ -49,7 +49,7 @@ function Getrewhtml($lou,$ifreward,$pid) {
 			$rewdb['caval']>0 && $html .= "[<a href=\"job.php?action=reward&tid=$tid&pid=$pid&type=2\" class=\"s4\">".getLangInfo('bbscode','reward_help')."</a>]";
 		}
 	}
-	$html .= "</div><div class=\"c\"></div>";
+	$html .= "</span>";
 	return $html;
 }
 ?>

@@ -7,6 +7,7 @@ print <<<EOT
     <ul class="cc">
         <li class="current"><a href="$admin_file?adminjob=advanced&adminitem=msphinx">Sphinx全文索引配置</a></li>
         <li><a href="$admin_file?adminjob=advanced&adminitem=mmemcache">Memcache 缓存配置</a></li>
+        <li><a href="$admin_file?adminjob=advanced&adminitem=distribute">分布式缓存配置</a></li>
     </ul>
 </div>
 <div class="admin_info mb10">
@@ -131,7 +132,11 @@ print <<<EOT
             <tr class="tr1 vt">
                 <td class="td1">[文章索引]名称 </td>
                 <td class="td2"><input type="text" name="cmsindex" value="$configure[cmsindex]"  id="cmsindex" class="input input_wa" /></td>
-            </tr>                                    
+            </tr> 
+            <tr class="tr1 vt">
+                <td class="td1">[新鲜事索引]名称 </td>
+                <td class="td2"><input type="text" name="weiboindex" value="$configure[weiboindex]"  id="weiboindex" class="input input_wa" /></td>
+            </tr>
         </table>
     </div>
 </div>
@@ -149,6 +154,7 @@ EOT;
     <ul class="cc">
         <li><a href="$admin_file?adminjob=advanced&adminitem=msphinx">Sphinx全文索引配置</a></li>
         <li class="current"><a href="$admin_file?adminjob=advanced&adminitem=mmemcache">Memcache 缓存配置</a></li>
+        <li><a href="$admin_file?adminjob=advanced&adminitem=distribute">分布式缓存配置</a></li>
     </ul>
 </div>
 <div class="admin_info mb10">
@@ -206,6 +212,57 @@ EOT;
 EOT;
 }print <<<EOT
 -->
+</form>
+<!--
+EOT;
+}elseif($adminitem == 'distribute'){print <<<EOT
+-->
+<div class="nav3 mb10">
+    <ul class="cc">
+        <li><a href="$admin_file?adminjob=advanced&adminitem=msphinx">Sphinx全文索引配置</a></li>
+        <li><a href="$admin_file?adminjob=advanced&adminitem=mmemcache">Memcache 缓存配置</a></li>
+        <li class="current"><a href="$admin_file?adminjob=advanced&adminitem=distribute">分布式缓存配置</a></li>
+    </ul>
+</div>
+<div class="admin_info mb10">
+    <h3 class="h1">介绍说明</h3>
+    <div class="legend">分布式缓存是指将集群内的缓存文件实现共享，使大量单独的物理机器能共享同一缓存数据，实现前端机器的无限扩展。<br />
+<font color="red">注意：开启分布式缓存会加大系统负载，仅当网站有多台服务器时确实需要分布式缓存的情况下才开启，否则都建议关闭！</font></div>
+</div>
+<h2 class="h1">分布式缓存配置</h2>
+<form action="{$baseUrl}" method="post" >
+<input type="hidden" name="step" value="2" />
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+	<tr class="tr1 vt">
+		<td class="td1">分布缓存服务</td>
+		<td class="td2">
+			请自行去除template/admin/advanced.htm中注释开启本服务
+			<!-- 
+        	<ul class="list_A list_80">
+            	<li><input type="radio" name="db_distribute" value="1" {$db_distribute_Y}/>开启</li>
+                <li><input type="radio" name="db_distribute" value="0" {$db_distribute_N}/>关闭</li>
+            </ul>
+             -->
+        </td>
+	</tr>
+	<!-- 
+	<tr class="tr1 vt">
+		<td class="td1">服务器主机地址</td>
+		<td class="td2"><input type="text" name="host" value="{$configure[host]}" id="host"  class="input input_wa" /></td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">服务器端口号</td>
+		<td class="td2"><input type="text" name="port" value="{$configure[port]}" id="port"  class="input input_wa" /></td>
+	</tr>
+	 -->
+</table>
+</div>
+<div class="tac p10">
+    <!--
+     <span class="btn"><span><button type="submit" name="save">保 存</button></span></span>
+    -->
+</div>
 </form>
 <!--
 EOT;

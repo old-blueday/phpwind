@@ -5,7 +5,7 @@ print <<<EOT
 -->
 <div class="admin_info mb10">
 	<h3 class="h1">优化方案说明</h3>
-	<div class="legend">负载优化:根据您的站点规模进行优化，您也可以在“查看设置”中自定义设置负载优化选项<br/>功能设置:根据您对功能的需求快速开启/关闭站点功能，您也可以在“查看设置”中自定义设置功能设置选项<br/>说明:选中任何一个负载优化和功能设置，在核心设置中的值都将改成该处所配置的值</div>
+	<div class="legend">负载优化:根据您的站点规模进行优化，您也可以在“查看设置”中自定义设置负载优化选项<br/>功能设置:根据您对功能的需求快速开启/关闭站点功能，您也可以在“查看设置”中自定义设置功能设置选项<br/>说明:选中任何一个负载优化和功能设置，在全局中的值都将改成该处所配置的值</div>
 </div>
 <form action=$basename method=post name="form1">
 <input type="hidden" name="action" value="size">
@@ -271,16 +271,6 @@ EOT;
 	</td>
     <td class="td2"><!--将在论坛上传的图片附件中加上您在下面设置的图片或文字水印<br />开启后请到版块设置里开启--></td>
 </tr>
-<tr class="tr1 vt">
-	<td class="td1">头像缩略</td>
-	<td class="td2">
-		<ul class="list_A list_80">
-			<li><input type=radio value=1 name="config[iffthumb]" $iffthumb_Y>开启</li>
-			<li><input type=radio value=0 name="config[iffthumb]" $iffthumb_N>关闭</li>
-        </ul>
-	</td>
-    <td class="td2"><!--论坛上的头像，按照一定比例，缩略成一张清晰的图片--></td>
-</tr>
 <tr class="tr1">
 	<td class="td1">WAP浏览</td>
 	<td class="td2">
@@ -528,7 +518,7 @@ EOT;
             	<li><input type=radio value=0 name="config[iffthumb]" $iffthumb_N>关闭</li>
             </ul>
         </td>
-        <td class="td2"><div class="help_a">论坛上的头像，按照一定比例，缩略成一张清晰的图片</div></td>
+        <td class="td2"><div class="help_a"></div></td>
     </tr>
     <tr class="tr1 vt">
         <td class="td1">附件缩略图功能</td>

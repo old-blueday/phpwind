@@ -19,6 +19,8 @@ if (empty($read)) {
 if (!($foruminfo = L::forum($read['fid']))) {
 	echo 'fail';ajax_footer();
 }
+extract(L::style());
+
 $ptable = $read['ptable'];
 $forumset = $foruminfo['forumset'];
 list(,,$downloadmoney,$downloadimg) = explode("\t",$forumset['uploadset']);
@@ -53,20 +55,16 @@ if ($pidArr) {
 		$read['aid'] && $_pids[$read['pid']] = $read['pid'];
 	}
 }
-$attachdb = array();
-if ($_pids) {
-	$query = $db->query('SELECT * FROM pw_attachs WHERE tid=' . S::sqlEscape($tid) . " AND pid IN (" . S::sqlImplode($_pids) . ")");
-	while ($rt = $db->fetch_array($query)) {
-		if ($rt['pid'] == '0') $rt['pid'] = 'tpc';
-		$attachdb[$rt['pid']][$rt['aid']] = $rt;
-	}
-}
-
 require_once(R_P . 'require/bbscode.php');
+
+if ($_pids) {
+	$attachShow = new attachShow(($isGM || $pwSystem['delattach']), $forumset['uploadset'], $forumset['viewpic']);
+	$attachShow->init($tid, $_pids);
+}
 foreach ($readdb as $key => $read) {
 	$readdb[$key] = viewread($read);
 }
-
+$GLOBALS += L::style('');
 require_once PrintEot('readfloor');
 ajax_footer();
 
@@ -94,61 +92,9 @@ function viewread($read) {
 		));
 	}
 	$read['content'] = convert($read['content'], $db_windpost);
-	$aids = array();
-	if ($read['aid']) {
-		$attachs = $GLOBALS['attachdb'][$read['pid']];
-		$read['ifhide'] > 0 && ifpost($tid) >= 1 && $read['ifhide'] = 0;
-		if (is_array($attachs) && !$read['ifhide']) {
-			$aids = attachment($read['content']);
-		}
-	}
-	if ($attachs && is_array($attachs) && !$read['ifhide'] && empty($viewpic)) {
-		if ($winduid == $read['authorid'] || $isGM || $pwSystem['delattach']) {
-			$dfadmin = 1;
-		} else {
-			$dfadmin = 0;
-		}
-		foreach ($attachs as $at) {
-			$atype = '';
-			$rat = array();	
-			
-			if ($at['type'] == 'img' && $at['needrvrc'] == 0 && (!$GLOBALS['downloadimg'] || !$GLOBALS['downloadmoney'] || $_G['allowdownload'] == 2)) {
-				$a_url = geturl($at['attachurl'],'show');
-				if (is_array($a_url)) {
-					$atype = 'pic';
-					$dfurl = '<br>'.cvpic($a_url[0], 1, $db_windpost['picwidth'], $db_windpost['picheight'], $at['ifthumb']);
-					$rat = array('aid' => $at['aid'], 'name' => $at['name'], 'img' => $dfurl, 'dfadmin' => $dfadmin, 'desc' => $at['descrip']);
-				} elseif ($a_url == 'imgurl') {
-					$atype = 'picurl';
-					$rat = array('aid' => $at['aid'], 'name' => $at['name'], 'dfadmin' => $dfadmin, 'verify' => md5("showimg{$tid}{$read[pid]}{$fid}{$at[aid]}{$GLOBALS[db_hash]}"));
-				}
-			} else {
-				$atype = 'downattach';
-				$rat = array('aid' => $at['aid'], 'name' => $at['name'], 'size' => $at['size'], 'hits' => $at['hits'],'special' => $at['special'], 'cname' => $GLOBALS['creditnames'][$at['ctype']], 'type' => $at['type'], 'dfadmin' => $dfadmin, 'desc' => $at['descrip'], 'ext' => strtolower(substr(strrchr($at['name'],'.'),1)));
-				if ($at['needrvrc'] > 0) {
-					!$at['ctype'] && $at['ctype'] = $at['special'] == 2 ? 'money' : 'rvrc';
-					if($at['type'] == 'img') {
-						$a_url = geturl($at['attachurl'],'show');
-						$dfurl = '<br>'.cvpic($a_url[0], 1, $db_windpost['picwidth'], $db_windpost['picheight'], $at['ifthumb']);
-						$rat['img'] = $dfurl;
-					}
-					if ($at['special'] == 2) {//出售
-						$GLOBALS['db_sellset']['price'] > 0 && $at['needrvrc'] = min($at['needrvrc'], $GLOBALS['db_sellset']['price']);
-						$rat['isBuy'] = false;
-						if (in_array($at['aid'],$buyAids)) $rat['isBuy'] = true;
-					} else {//加密
-						$creditdb[$at['ctype']] >= $at['needrvrc'] && $rat['isThrough'] = true;
-					}
-					$rat['needrvrc'] = $at['needrvrc'];
-				}
-			}
-			if (!$atype) continue;
-			if (in_array($at['aid'], $aids)) {
-				$read['content'] = attcontent($read['content'], $atype, $rat);
-			} else {
-				$read[$atype][$at['aid']] = $rat;
-			}
-		}
+	
+	if ($read['aid'] && $GLOBALS['attachShow']->isShow($read['ifhide'], $tid)) {
+		$read += $GLOBALS['attachShow']->parseAttachs($read['pid'], $read['content'], $winduid == $read['authorid']);
 	}
 	return $read;
 }

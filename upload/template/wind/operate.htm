@@ -124,6 +124,7 @@ showGdCode();
 <!--
 EOT;
 }
+list($postq,$showq) = explode("\t", $db_qcheck);
 if(($db_ckquestion & 4) && (!$postq || $winddb['postnum'] < $postq) && $db_question){
 $qkey = array_rand($db_question);
 if($db_imagequestion){
@@ -434,7 +435,7 @@ EOT;
 if($db_gdcheck & 16){print <<<EOT
 -->
 	<tr class="tr3">
-		<td class="tar">认证码：</td>
+		<td class="tar">验证码：</td>
 		<td>
 			<input class="input" type="text" name="gdcode" size="8" onfocus="try{opencode('menu_gd',this)}catch(e){}" /><span style="cursor:pointer; margin-left:3px" onclick="this.previousSibling.focus();">点此显示验证码</span>
 			<div class="menu" id="menu_gd" style="visibility:hidden;"><img src="ck.php?" align="absmiddle" style="cursor:pointer;" id="ckcode" alt="看不清楚，换一张" /></div>

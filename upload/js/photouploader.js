@@ -94,7 +94,11 @@ var uploader = {
 	finish:function(b){
 		if(!b){//没有可以上传的图片
 			closep();
-			showDialog('warning','上传失败，请重新选择照片!',2);
+			if (this.isAlbumFull == true) {
+				showDialog('warning','上传失败，请重新选择相册!',2);
+			} else {
+				showDialog('warning','上传失败，请重新选择照片!',2);
+			}
 		}else{
 			read.setMenu(uploader.jumpphoto(uploader.albumId));
 			read.menupz();//showDialog('success','上传成功！',2);
@@ -110,7 +114,7 @@ var uploader = {
 		{
 			if(!qlist.rows[i].error)
 			{
-				if(restLength)
+				if(restLength > 0)
 				{
 					qlist.rows[i].cells[3].innerHTML ='0%';
 					restLength--;

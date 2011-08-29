@@ -171,7 +171,7 @@ span.btn2,span.bt2{background-position:right -210px;}
 	.zt_stylebg{border:1px solid #ffffff; background-position:0 -290px;padding:4px; background-color:#e2eefa;}
 	.zt_stylebg td{padding:0 5px;color:#333;}
 	.zt_stylebg .layoutDragElement{margin-right:10px;width:35px;height:24px;float:left;}
-.td_bgA td{background:#f1faff;}
+.td_bgA td,.td_bgA{background:#f1faff;}
 .td_bgB td{ background-position:0 -360px; background-color:#f5fcff;}
 .admin_table .td_bgC .td2,.admin_table .td_bgC:hover .td2{background:#fff6e4;border-bottom:1px solid #fadbb6;}
 .admin_table .td_bgC .td1,.admin_table .td_bgC:hover .td1{background:#fdedda;border-bottom:1px solid #fadbb6;}
@@ -179,10 +179,11 @@ span.btn2,span.bt2{background-position:right -210px;}
 .admin_table .td_bgD .td2,.admin_table .td_bgD:hover .td2{background:#f5fcf5;border-bottom:1px solid #ceeace;}
 .admin_table .td_bgD .td1,.admin_table .td_bgD:hover .td1{background:#e6f8e6;border-bottom:1px solid #ceeace;}
 /*list*/
-.list_A{float:left;}
+.list_A{float:left;min-width:100px;zoom:1;}
 	.list_A li{height:22px;line-height:24px;overflow:hidden;cursor:default;float:left; clear:both; white-space:nowrap;}
 	.list_A .current,.list_B .current,.list_C .current{color:#008800;}
 	.list_A input,.list_B input{margin-right:3px;*margin-right:0px;_margin-top:-2px;}
+	.list_A li img{vertical-align:middle;}
 .list_B{}
 	.list_B li{height:26px;line-height:26px;overflow:hidden;}
 .list_C{float:left; clear:both;}
@@ -279,10 +280,11 @@ a.help_b{display:block;width:14px;height:14px;background-position:0 -30px;}
 	.menu_bg{border:1px solid #fff;background:#eff8ff;}
 		.menu_bg ul{padding:5px 10px;}
 		.menu_bg ul li{line-height:25px;height:25px;overflow:hidden;}
-.menu_level{border:5px solid #acd6ef;width:400px;}
-	.leve{height:300px;overflow-y:scroll;background:#ffffff;padding:15px 0;}
-	.leve li{float:left;line-height:30px;height:30px;*word-wrap:normal;*white-space:nowrap;list-style:none;width:45%;}
-	.leve img{width:80px;margin-right:8px;cursor:pointer;margin-left:2em;}
+.menu_level{border:5px solid #acd6ef;width:450px;}
+	.leve{height:300px;overflow-y:scroll;background:#ffffff;padding:5px 0 15px 15px;}
+	.leve li{float:left;line-height:30px;height:30px;list-style:none; white-space:nowrap;width:47%;}
+	.leve span{display:inline-block;width:50px;}
+	.leve img{cursor:pointer; vertical-align:middle;width:121px;}
 /*Tip Wind*/
 .tip_wind{border:5px solid #c2e4ff;background:#f7fcff; position:absolute;width:420px;}
 	.tip_wind dt{width:42px;height:42px;float:left;overflow:hidden;margin:20px 15px 20px 40px; background-position:-170px -30px;display:inline;}
@@ -337,3 +339,8 @@ a.help_b{display:block;width:14px;height:14px;background-position:0 -30px;}
 .adel:hover,.g_photosbox .updel:hover{ background-position:-34px -15px;}
 .aedit{ background-position:0 0;}
 .aedit:hover{ background-position:-34px 0;}
+
+.library{border-top:1px solid #dde9f5;}
+.library dl{border-bottom:1px solid #dde9f5;padding:10px 15px;}
+.library dl:hover{background:#f4f8fc;}
+.library dt,.library dd{float:left;line-height:21px;margin-right:5px;}

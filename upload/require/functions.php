@@ -65,7 +65,8 @@ function getCommonFid() {
 			$fids && $fids = substr($fids,1);
 			pwCache::setData(D_P.'data/bbscache/commonforum.php',"<?php\r\n\$fids = \"$fids\";\r\n?>");
 		} else {
-			include  pwCache::getPath(D_P.'data/bbscache/commonforum.php');
+			//* include  pwCache::getPath(D_P.'data/bbscache/commonforum.php');
+			extract(pwCache::getData(D_P.'data/bbscache/commonforum.php', false));
 		}
 	}
 	return $fids;
@@ -86,7 +87,8 @@ function getSpecialFid() {
 			$fids && $fids = substr($fids,1);
 			pwCache::setData(D_P.'data/bbscache/specialforum.php',"<?php\r\n\$fids = \"$fids\";\r\n?>");
 		} else {
-			include pwCache::getPath(D_P.'data/bbscache/specialforum.php');
+			//* include pwCache::getPath(D_P.'data/bbscache/specialforum.php');
+			extract(pwCache::getData(D_P.'data/bbscache/specialforum.php', false));
 		}
 	}
 	return $fids;
@@ -102,32 +104,36 @@ function getCateid($fid) {
 	}
 }
 
-function pwDelatt($path,$ifftp) {
+function pwDelThreadAtt($path, $ifftp, $ifthumb = 3) {
+	pwDelatt($path, $ifftp);
+	($ifthumb & 1) && pwDelatt('thumb/' . $path, $ifftp);
+	($ifthumb & 2) && pwDelatt('thumb/mini/' . $path, $ifftp);
+}
+
+function pwDelatt($path, $ifftp) {
 	if (strpos($path,'..') !== false) {
 		return false;
 	}
-	if (!file_exists("$GLOBALS[attachdir]/$path")) {
-		if (pwFtpNew($GLOBALS['ftp'],$ifftp)) {
-			$GLOBALS['ftp']->delete($path);
-			$GLOBALS['ftp']->delete('thumb/'.$path);
-		}
-	} else {
+	if (file_exists("$GLOBALS[attachdir]/$path")) {
 		P_unlink("$GLOBALS[attachdir]/$path");
-		if (file_exists("$GLOBALS[attachdir]/thumb/$path")) {
-			P_unlink("$GLOBALS[attachdir]/thumb/$path");
-		}
+	}
+	if (pwFtpNew($GLOBALS['ftp'], $ifftp)) {
+		$GLOBALS['ftp']->delete($path);
 	}
 	return true;
 }
+
 function pwFtpNew(&$ftp,$ifftp) {
 	if (!$ifftp) return false;
 	if (!is_object($ftp)) {
-		include pwCache::getPath(D_P . 'data/bbscache/ftp_config.php');
+		//* include pwCache::getPath(D_P . 'data/bbscache/ftp_config.php');
+		extract(pwCache::getData(D_P . 'data/bbscache/ftp_config.php', false));
 		L::loadClass('ftp', 'utility', false);
 		$ftp = new FTP($ftp_server,$ftp_port,$ftp_user,$ftp_pass,$ftp_dir);
 	}
 	return true;
 }
+
 function pwFtpClose(&$ftp) {
 	if (is_object($ftp) && method_exists($ftp,'close')) {
 		$ftp->close();
@@ -200,7 +206,8 @@ function getForumCache(){
 	if (!$temp_forum) {
 		global $forum;
 		if (!$forum) {
-			include pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
+			//* include pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
+			extract(pwCache::getData(D_P.'data/bbscache/forum_cache.php', false));
 		}
 		$temp_forum = $forum;
 	}
@@ -348,10 +355,15 @@ function GetOnlineUser() {
 	$onlineuser = array();
 
 	if ($db_online == 1) {
+		/**
 		$query = $db->query("SELECT username,uid FROM pw_online WHERE uid>0");
 		while ($rt = $db->fetch_array($query)) {
 			$onlineuser[$rt['uid']] = $rt['username'];
-		}
+		}**/
+		
+		$onlineService = L::loadClass('OnlineService', 'user');
+		$onlineuser = $onlineService->getOnlineUserName();			
+	
 	} else {
 		$onlinedb = openfile(D_P.'data/bbscache/online.php');
 		if (count($onlinedb) == 1) {
@@ -361,6 +373,7 @@ function GetOnlineUser() {
 		}
 		foreach ($onlinedb as $key => $value) {
 			if (trim($value)) {
+				if (strrpos($value,'<>')) continue;
 				$dt = explode("\t",$value);
 				$onlineuser[$dt[8]] = $dt[0];
 			}

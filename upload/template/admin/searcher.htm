@@ -29,13 +29,13 @@ print <<<EOT
 </div>
 <div id="stypestate" style="display:$display;">
 	<h2 class="h1">搜索设置</h2>
-	<form method="post" name="FORM" action="$basename&">
+	<form method="post" name="FORM" action="$basename&" id="FORM">
 	<input type="hidden" name="step" value="2">
 	<div class="admin_table mb10">
 	<table width="100%" cellspacing="0" cellpadding="0">
 		<tr class="tr1 vt">
 			<td class="td1">定时搜索</td>
-			<td class="td2">
+			<td class="td2" width="415">
 				<ul class="list_A list_80 cc fl mar20">
 					<li><input type="radio" value="1" name="schctl[opensch]" $opensch_Y>开启</li>
 					<li><input type="radio" value="0" name="schctl[opensch]" $opensch_N>关闭</li>
@@ -53,16 +53,16 @@ print <<<EOT
 			<td class="td2"><input name="config[maxresult]" value="$db_maxresult" class="input input_wa" /></td>
 			<td class="td2"><div class="help_a">搜索一次得到的结果数量</div></td>
 		</tr>
-		<tr class="tr1 vt">
+		<tr class="tr1 vt" style="display:none">
 			<td class="td1">搜索间隔时间[秒]</td>
 			<td class="td2"><input name="config[schwait]" value="$db_schwait" class="input input_wa" /></td>
 			<td class="td2"><div class="help_a">当搜索占用很大资源时可以设置此项，用于控制全站搜索频次。表示一个用户搜索一次后，自己或其他用户再次进行搜索所需要等待的时间。0或留空表示不限制</div></td>
 		</tr>
-		<tr class="tr1 vt">
+		<!--tr class="tr1 vt">
 			<td class="td1">热门搜索关键词</td>
 			<td class="td2"><textarea class="textarea" name="config[hotwords]">$db_hotwords</textarea></td>
 			<td class="td2"><div class="help_a">词语之间用英文逗号","分隔, 建议参考<a href="admin.php?adminjob=searcher&action=statistic">搜索统计</a>后填写</div></td>
-		</tr>
+		</tr-->
 		<tr class="tr1 vt">
 			<td class="td1">搜索过滤版块ID</td>
 			<td class="td2"><input name="config[filterids]" value="$db_filterids" class="input input_wa" /></td>
@@ -73,8 +73,8 @@ print <<<EOT
 			<td class="td1">搜索类型扩展</td>
 			<td class="td2">
 				<ul class="list_A list_120">
-					<li><input type="checkbox" value="diary" name="config[search_type_expand][]" {$search_type_expand['diary']} {$search_type_disabled['diary']}/> 日志</li>
-					<li><input type="checkbox" value="group" name="config[search_type_expand][]" {$search_type_expand['group']} {$search_type_disabled['group']}/> 群组</li>
+					<li><input type="checkbox" value="diary" name="config[search_type_expand][]" {$search_type_expand['diary']}/> 日志</li>
+					<li><input type="checkbox" value="group" name="config[search_type_expand][]" {$search_type_expand['group']}/> 群组</li>
 					<li><input type="checkbox" value="cms" name="config[search_type_expand][]" {$search_type_expand['cms']} /> 文章</li>
 				</ul>
 			</td>
@@ -90,11 +90,97 @@ print <<<EOT
 					<li><input type="checkbox" value="log_posts" name="config[operate_log][]" {$operate_log['log_posts']} /> 回复</li>
 					<li><input type="checkbox" value="log_diarys" name="config[operate_log][]" {$operate_log['log_diarys']} /> 日志</li>
 					<li><input type="checkbox" value="log_members" name="config[operate_log][]" {$operate_log['log_members']} /> 用户</li>
+					<li><input type="checkbox" value="log_colonys" name="config[operate_log][]" {$operate_log['log_colonys']} /> 群组</li>
 				</ul>
 			</td>
 			<td class="td2"><div class="help_a">如果开启操作行为记录,如帖子,将对帖子的新增,删除,更新行为进行记录,用于实现其它功能的扩展</div></td>
-		</tr>		
+		</tr>
+        <tr class="tr1 vt">
+            <td class="td1">图文并茂</td>
+            <td class="td2">
+                <ul class="list_A list_80 cc fl mar20">
+                    <li><input type="radio" value="1" name="config[openbuildattachs]" $openbuildattachs_Y>开启</li>
+                    <li><input type="radio" value="0" name="config[openbuildattachs]" $openbuildattachs_N>关闭</li>
+                </ul>
+                <div class="cc"></div>
+            </td>
+            <td class="td2"><div class="help_a">开启后搜索帖子和显示帖子中的图片</div></td>
+        </tr>
 	</table>
+    <div class="cc mb10"></div>
+    <h2 class="h1">热门关键字搜索设置</h2>
+    <table width="100%" cellspacing="0" cellpadding="0">
+        <tr class="tr1 vt">
+            <td class="td1">显示个数</td>
+            <td class="td2" width="415"><input name="hotwordsconfig[shownum]" value="$db_hotwordsconfig[shownum]" class="input input_wa" id="shownum"/></td>
+            <td class="td2"><div class="help_a">含自动调用和自定义关键字，0或者留空表示不显示热门关键字</div></td>
+        </tr>
+        <tr class="tr1 vt">
+            <td class="td1">自动调用</td>
+            <td class="td2">
+                <ul class="list_A list_80 cc fl mar20">
+                    <li><input type="radio" value="1" name="hotwordsconfig[openautoinvoke]" $openautoinvoke_Y  onclick="checkOpenInvoke();">开启</li>
+                    <li><input type="radio" value="0" name="hotwordsconfig[openautoinvoke]" $openautoinvoke_N onclick="checkOpenInvoke();">关闭</li>
+                </ul>
+                <div class="cc"></div>
+            </td>
+            <td class="td2"><div class="help_a"></div></td>
+        </tr>
+<!--
+EOT;
+$invokeperiodDisplay = $db_hotwordsconfig['openautoinvoke'] == 1 ? '' :'style = "display:none"';
+print <<<EOT
+-->
+        <tr class="tr1 vt" id="invokeperiod" {$invokeperiodDisplay}>
+            <td class="td1">自动调用周期</td>
+            <td class="td2"><input name="hotwordsconfig[invokeperiod]" value="{$db_hotwordsconfig[invokeperiod]}" class="input input_wa" /> 天</td>
+            <td class="td2"><div class="help_a">热门关键字将根据此周期筛选相应关键字，如输入“7”则代表调用7天内搜索最多的关键字，0或者留空表示不自动调用关键字</div></td>
+        </tr>
+        <tr class="tr1 vt">
+            <td class="td1">热门搜索关键字</td>
+            <td class="td2">
+						<div class="admin_tableB">
+             <table id="keywordhottable"><tr>
+                <td width="40">顺序</td>
+                <td width="180">关键字</td>
+                <td width="60">数据类型</td>
+                <td width="50"><!--
+EOT;
+if ($db_hotwordsconfig[shownum] > count($searchHotwords)) {
+print <<<EOT
+--><a href="javascript:;" class="s3" onclick="addtbody('cdiymode','cdiybody');">[添加]</a><!--
+EOT;
+}
+print <<<EOT
+-->
+                </td>
+            </tr>
+            <tbody id="cdiymode" style="display:none"><tr><td style="padding-bottom:5px;"><input name="new_view[vieworder][]" class="input input_wd" style="width:30px;"/></td><td><input name="new_view[keyword][]" class="input input_wa" /></td><td>自定义</td><td><a class="cp s4" onclick="deltbody(this);">[删除]</a></td></tr></tbody>
+<!--
+EOT;
+foreach ($searchHotwords as $key => $value) {
+$value[fromtype] = $value[fromtype] == 'custom' ? '自定义' : '自动调用';
+print <<<EOT
+--><tr><td style="padding-bottom:5px;"><input name="view[$value[id]][vieworder]" value="{$value[vieworder]}" class="input input_wd" style="width:30px;"/></td><td><input name="view[$value[id]][keyword]" value="{$value[keyword]}" class="input input_wa" /></td><td>{$value['fromtype']}</td><td><!--
+EOT;
+if ($value[fromtype] == "自定义") {
+print <<<EOT
+--><a class="cp s4" onclick="deltbody(this);getObj('FORM').submit();">[删除]</a><!--
+EOT;
+}print <<<EOT
+-->
+</td></tr><!--
+EOT;
+}print <<<EOT
+-->
+            <tbody id="cdiybody"></tbody>
+        </table>   
+            </div>
+            </td>
+            <td class="td2"><div class="help_a">此处显示的数量将根据热门“关键字搜索设置”中“显示个数”显示。<br />
+数据类型中“自动调用”指系统根据“自动调用周期”产生的关键字自动显示。<br />关键字建议参考<a href="$db_adminfile?adminjob=searcher&action=statistic">搜索统计</a>后填写</div></td>
+        </tr>  
+		</table>
 	<div class="cc mb10"></div>
 	<div class="tac mb10">
 	<span class="btn"><span><button type="submit">提 交</button></span></span>
@@ -102,7 +188,42 @@ print <<<EOT
 	</div>
 	</form>
 </div>		
+<script type="text/javascript">
+function addtbody(mode,tbody){
 
+	var num = getObj("keywordhottable").rows.length - 2;
+	var shownum = getObj("shownum").value;
+	if (num >= shownum) {
+		alert("你已经添加了"+shownum+'个关键字。如需添加更多请修改“热门关键字搜索设置”中“显示个数”。');
+		return false;
+	}
+	
+    if (getObj(mode)) {
+        var s = getObj(mode).firstChild.cloneNode(true);
+        getObj(tbody).appendChild(s);
+    }
+}
+function deltbody(obj){
+    var o = obj.parentNode.parentNode;
+    o.parentNode.removeChild(o);
+	return false;
+}
+
+function checkOpenInvoke()
+{
+	var obj = document.getElementsByName('hotwordsconfig[openautoinvoke]');
+     for(var i=0;i<obj.length;i++) {
+        if(obj[i].checked == true){
+           var commend = obj[i].value;
+           break;
+        }
+     }
+     getObj('invokeperiod').style.display = commend == 1 ? "" : 'none';
+     return true;
+}
+
+
+</script>
 
 <!--
 EOT;
@@ -181,8 +302,8 @@ EOT;
 <span class="fr">$pages</span>
       <ul>
            <li><span class="bt2"><span><button type="button" onclick="CheckAll(document.FORM)">全 选</button></span></span></li>
-           <li><input class="bt3" type="submit" value="删除" onclick="getObj('job').value='del';return confirm('您确认要进行此操作吗?');"></li>
-           <li><span class="btn2"><span><button type="submit" onclick="getObj('job').value='commit';">操作</button></span></span></li>
+           <li><span class="bt2"><span><button type="submit" onclick="getObj('job').value='del';return confirm('您确认要进行此操作吗?');">删 除</button></span></span></li>
+           <li><span class="bt2"><span><button type="submit" onclick="getObj('job').value='commit';">排 序</button></span></span></li>
       </ul>
 </div>
 
@@ -202,7 +323,7 @@ EOT;
 EOT;
 if($job=='edit'){print <<<EOT
 -->
-		<li class="current"><a href="$basename&action=$action&job=edit&id=$id">编辑广告</a></li>
+		<li class="current"><a href="$basename&action=$action&job=edit&id=$id">编辑推送</a></li>
 <!--
 EOT;
 }else{print <<<EOT
@@ -247,7 +368,7 @@ EOT;
 EOT;
 if ($showddate) {print <<<EOT
 -->
-			</p><div id='showddate'>
+			</p><div id='showddate'></div>
 <!--
 EOT;
 }else{print <<<EOT
@@ -518,7 +639,7 @@ EOT;
 	</div>
 	<div class="admin_info mb10" style="display: block;">
 	<h3 class="h1"><b>提示信息</b></h3>
-	<div class="legend"><ol><li>推荐的版块将在用户搜索时显示在帖子搜索的左侧</li></ol></div>
+	<div class="legend"><ol><li>推荐的版块将在用户搜索时展示在帖子搜索的左侧上方，未推荐的版块当用户点击“更多”时才会显示。</li><li>建议不要推荐过多板块以确保推荐效果。</li></ol></div>
 	</div>
 	<h2 class="h1">搜索</h2>
 	<div class="admin_table mb10">
@@ -550,13 +671,11 @@ print <<<EOT
 	<tr class="vt tr1" onmouseover="showAdd('$cate[fid]')" onmouseout="hiddenAdd('$cate[fid]')">
 		<td class="td3 tdcur">
 			<i id="bt_$cate[fid]" class="$tmpStyle" onclick="cateopen('$cate[fid]')"></i>
-			<input class="input input_wd mr5" name="order[$cate[fid]]" value="$cate[vieworder]" type="text">
 			<span class="fourm_name">$cate[name]</span>
 			<span class="fourm_name" id="fourm_edit_box_$cate[fid]"></span>
 			<font class="gray mr20">FID:$cate[fid]</font>&nbsp;&nbsp;
 		</td>
 		<td class="td2">
-						<input type="checkbox" name="fidcommend[$cate[fid]]" {$cate[isrecommend]}>
 		</td>
         <td class="td2">
            
@@ -571,6 +690,7 @@ if ($threaddb[$cate['fid']]) {print <<<EOT
 EOT;
 foreach ($threaddb[$cate['fid']] as $thread) {
 $isspace = str_repeat($space,$thread['type'] == 'forum' ? 0 : ($thread['type'] == 'sub' ? 1 : 2));
+$disabledByType = $thread['f_type'] != 'forum' ? 'disabled="disabled"' : '';
 print <<<EOT
 -->
 	<tr class="vt tr1" onmouseover="showAdd('$thread[fid]')" onmouseout="hiddenAdd('$thread[fid]')">
@@ -583,7 +703,7 @@ print <<<EOT
                 <font class="gray">FID:$thread[fid]</font>
 		</td>
 		<td class="td2">
-			<input type="checkbox" name="fidcommend[$thread[fid]]" {$thread[isrecommend]}>
+			<input type="checkbox" name="fidcommend[$thread[fid]]" {$thread[isrecommend]} {$disabledByType}>
 		</td>
 		<td class="td2">
             

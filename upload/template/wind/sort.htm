@@ -2,23 +2,23 @@
 -->
 <style type="text/css">
 .trbor td{border-bottom:0px;}
-.tr2 td{ padding-left:0}
-.tr2 th{ padding-left:5px;}
+.tr2 td{padding:6px 5px;color:#333;border-top:1px solid $tdcolor;border-bottom:1px solid $tdcolor;}
+.lh_18{line-height:18px;height:18px;overflow:hidden;}
 </style>
+
 <div id="breadCrumb">
 <!--
 EOT;
 if($cachetime){print <<<EOT
 -->
-<span class="fr">下次更新时间:$cachetime</span>
+<span class="fr mr5">下次更新时间:$cachetime</span>
 <!--
 EOT;
 }print <<<EOT
 -->
 <img src="$imgpath/$stylepath/thread/home.gif" class="breadHome" /><em class="breadEm"></em><a href="$db_bfn" title="$db_bbsname">$db_bbsname</a><em>&gt;</em><a href="sort.php">统计信息</a>
 </div>
-<div class="c"></div>
-<div id="pw_content">
+<div id="pw_content" class="cc">
 <div class="hB mb10">
 	<ul class="tabB cc">
 <!--
@@ -36,35 +36,35 @@ ${'tmpSort_'.($action ? $action : 'default')} = "class='current'";print <<<EOT
 		<li $tmpSort_article ><a href="sort.php?action=article">帖子排行</a></li>
 	</ul>
 </div>
-
 <div class="pd15">
 <!--
 EOT;
 if(empty($action)){print <<<EOT
 -->
-<div class="t"><table width="100%" align="center" cellspacing="0" cellpadding="0">
-<tr class="tr3 f_one trbor">
-<td width="33%" valign="top">
-<div style="padding-left:8%;text-align:left; line-height:150%"><b>会员统计</b><br /><br />
-会员总数:$bbsinfo[totalmember]<br /><br />
-最新注册会员:<a href="u.php?username=$bbsinfo[newmember]" target="_blank">$bbsinfo[newmember]</a></div>
+<div class="t"><table width="100%" cellspacing="0" cellpadding="0">
+<tr class="tr3 trbor vt">
+<td width="33%">
+<p class="mb10"><b>会员统计</b></p>
+<p class="mb10">会员总数:$bbsinfo[totalmember]</p>
+<p>最新注册会员:<a href="u.php?username=$bbsinfo[newmember]" target="_blank">$bbsinfo[newmember]</a></p>
 </td>
 
 <td width="33%" valign="top">
-<div style="padding-left:10%;text-align:left; line-height:150%"><b>帖子统计</b><br />
-主题数:$topic<br />
-帖子数:$article<br />
-今 日:$tposts<br />
-昨 日:$bbsinfo[yposts]<br />
-最高日:$bbsinfo[hposts]</div></td>
+<p class="mb10"><b>帖子统计</b></p>
+<p class="mb10">主题数:$topic</p>
+<p class="mb10">帖子数:$article</p>
+<p class="mb10">今 日:$tposts</p>
+<p class="mb10">昨 日:$bbsinfo[yposts]</p>
+<p class="mb10">最高日:$bbsinfo[hposts]</p>
+</td>
 
 <td width="33%" valign="top">
-<div style="padding-left:8%;text-align:left; line-height:150%"><b>在线统计</b><br />
-在线总数:$usertotal<br />
-会员数:$userinbbs<br />
-游客数:$guestinbbs<br />
-最高在线:$bbsinfo[higholnum]<br />
-发生在:$bbsinfo[higholtime]</div></td></tr></table></div>
+<p class="mb10"><b>在线统计</b></p>
+<p class="mb10">在线总数:$usertotal</p>
+<p class="mb10">会员数:$userinbbs</p>
+<p class="mb10">游客数:$guestinbbs</p>
+<p class="mb10">最高在线:$bbsinfo[higholnum]</p>
+<p class="mb10">发生在:$bbsinfo[higholtime]</p></td></tr></table></div>
 <!--
 EOT;
 }elseif($action=='ipstate'){print <<<EOT
@@ -75,9 +75,9 @@ EOT;
 EOT;
 if($type=='month'){print <<<EOT
 -->
-<tr class="tr2"><th colspan="2"><b>月到访IP统计</b>
-<a href="sort.php?action=ipstate&year=$p_year">< </a> $c_year <a href="sort.php?action=ipstate&year=$n_year">></a>
-</th></tr>
+<tr class="tr2"><td colspan="2"><b class="mr20">月到访IP统计</b>
+<a href="sort.php?action=ipstate&year=$p_year" class="mr10 s4 b">&lt;</a><span class="mr10">{$c_year}</span><a href="sort.php?action=ipstate&year=$n_year" class="s4 b">&gt;</a>
+</td></tr>
 <!--
 EOT;
 foreach($m_ipdb as $key => $ip){
@@ -85,19 +85,17 @@ $percent=round($ip[nums]/$summip*100,1);
 $imgwidth=floor(500*$ip[nums]/($summip+1));
 print <<<EOT
 -->
-<tr class="tr3 f_one"><th width="15%">$ip[month]
-<a href="sort.php?action=ipstate&type=day&month=$ip[_month]">查看</a></th>
+<tr class="tr3 f_one"><th width="90">$ip[month]
+<a href="sort.php?action=ipstate&type=day&month=$ip[_month]" class="s4">[查看]</a></th>
 <th><img src="$imgpath/post/vote/tab-two.gif" width="$imgwidth" height="10" /> $ip[nums]($percent%)</th></tr>
 <!--
 EOT;
 }}elseif($type=='day'){print <<<EOT
 -->
-<tr class="tr2"><th colspan="2">
-<a href="sort.php?action=ipstate&year=$Y"><b>月到访IP统计</b></a>
-<b>日到访IP统计</b>
-<a href="sort.php?action=ipstate&type=day&month=$p_month">< </a> $c_month
-<a href="sort.php?action=ipstate&type=day&month=$n_month">></a>
-</th></tr>
+<tr class="tr2"><td colspan="2">
+<a href="sort.php?action=ipstate&year=$Y" class="s4 b">月到访IP统计</a>&nbsp;&gt;&nbsp;<b class="mr20">日到访IP统计</b>
+<a href="sort.php?action=ipstate&type=day&month=$p_month" class="mr10 s4 b">&lt;</a><span class="mr10">{$c_month}</span><a href="sort.php?action=ipstate&type=day&month=$n_month" class="s4 b">&gt;</a>
+</td></tr>
 <!--
 EOT;
 foreach($d_ipdb as $key => $ip){
@@ -105,13 +103,12 @@ $percent=round($ip[nums]/$sumip*100,1);
 $imgwidth=floor(500*$ip[nums]/($sumip+1));
 print <<<EOT
 -->
-<tr class="tr3 f_one"><th width="15%">$ip[day]</th>
+<tr class="tr3 f_one"><th width="90">$ip[day]</th>
 <th><img src="$imgpath/post/vote/tab-two.gif" width="$imgwidth" height="10" /> $ip[nums]($percent%)</th></tr>
 <!--
 EOT;
 }}print <<<EOT
 -->
-<tr class="f_one"><td style="height:8px;" colspan="2"></td></tr>
 </table></div>
 <!--
 EOT;
@@ -322,73 +319,116 @@ EOT;
 EOT;
 }elseif($action=='admin'){ print <<<EOT
 -->
+<div class="mb10 cc tar">
+	<form action="$baseurl&" method="post">
+	<input type="hidden" name="step" value="2">
+	搜索：<select name="postStartDate" class="input mr5" > 
+			<option value="">请选择时间</option>
+<!--
+EOT;
+foreach($dateSelect as $key=>$value){
+$startSelected = ($key == $startDate) ? 'selected="selected"' : '';
+print <<<EOT
+-->
+			<option value="$value" $startSelected >$value</option>
+<!--
+EOT;
+}print <<<EOT
+-->
+		</select>
+	<span class="mr5">至</span>
+	<select name="postEndDate" class="input mr5" > 
+		<option value="">请选择时间</option>
+<!--
+EOT;
+foreach($dateSelect as $key=>$value){
+$endSelected = ($key == $endDate) ? 'selected="selected"' : '';
+print <<<EOT
+-->
+<option value="$value" $endSelected >$value</option>
+<!--
+EOT;
+}print <<<EOT
+-->
+	</select><input name="adminName" value="$adminName" type="text" size="28" class="input mr5" /><span class="bt2"><span><button type="submit">提 交</button></span></span>
+	</form>
+</div>
 <div class="t">
-<table width="100%" align="center" cellspacing="0" cellpadding="0">
-<tr class="tr2 tac">
-	<td>用户名</td>
-	<td><a href="$baseurl">系统头衔</a></td>
-	<td><a href="$baseurl&type=highlight">加亮</a>$sort_a[highlight]</td>
-	<td><a href="$baseurl&type=delete">删除</a>$sort_a[delete]</td>
-	<td><a href="$baseurl&type=credit">评分</a>$sort_a[credit]</td>
-	<td><a href="$baseurl&type=topped">置顶</a>$sort_a[topped]</td>
-	<td><a href="$baseurl&type=edit">编辑</a>$sort_a[edit]</td>
-	<td><a href="$baseurl&type=digest">精华</a>$sort_a[digest]</td>
-	<td><a href="$baseurl&type=copy">复制</a>$sort_a[copy]</td>
-	<td><a href="$baseurl&type=move">移动</a>$sort_a[move]</td>
-	<td><a href="$baseurl&type=locked">锁定</a>$sort_a[locked]</td>
-	<td><a href="$baseurl&type=push">提前</a>$sort_a[push]</td>
-	<td><a href="$baseurl&type=unite">合并</a>$sort_a[unite]</td>
-	<td><a href="$baseurl&type=shield">屏蔽</a>$sort_a[shield]</td>
-	<td><a href="$baseurl&type=remind">提醒</a>$sort_a[remind]</td>
-	<td><a href="$baseurl&type=total">总计$sort_a[total]</a></td>
+<table width="100%" cellspacing="0" cellpadding="0" style="table-layout:fixed;">
+<tr class="tr2">
+	<td width="80" style="padding-left:10px;">用户名</td>
+	<td width="100"><a href="$baseurl$urlAdd" class="link_down"><span>系统头衔</span></a></td>
+	<td class="tac"><a href="$baseurl&type=highlight$urlAdd" $sort_a[highlight]><span>加亮</span></a></td>
+	<td class="tac"><a href="$baseurl&type=delete$urlAdd" $sort_a[delete]><span>删除</span></a></td>
+	<td class="tac"><a href="$baseurl&type=credit$urlAdd" $sort_a[credit]><span>评分</span></a></td>
+	<td class="tac"><a href="$baseurl&type=topped$urlAdd" {$sort_a[topped]}><span>置顶</span></a></td>
+	<td class="tac"><a href="$baseurl&type=edit$urlAdd" {$sort_a[edit]}><span>编辑</span></a></td>
+	<td class="tac"><a href="$baseurl&type=digest$urlAdd" {$sort_a[digest]}><span>精华</span></a></td>
+	<td class="tac"><a href="$baseurl&type=copy$urlAdd" {$sort_a[copy]}><span>复制</span></a></td>
+	<td class="tac"><a href="$baseurl&type=move$urlAdd" {$sort_a[move]}><span>移动</span></a></td>
+    <td class="tac"><a href="$baseurl&type=down$urlAdd" {$sort_a[down]}><span>压帖</span></a></td>
+    <td class="tac"><a href="$baseurl&type=banuser$urlAdd" {$sort_a[banuser]}><span>禁言</span></a></td>
+	<td class="tac"><a href="$baseurl&type=locked$urlAdd" {$sort_a[locked]}><span>锁定</span></a></td>
+	<td class="tac"><a href="$baseurl&type=push$urlAdd" {$sort_a[push]}><span>提前</span></a></td>
+	<td class="tac"><a href="$baseurl&type=unite$urlAdd" {$sort_a[unite]}><span>合并</span></a></td>
+	<td class="tac"><a href="$baseurl&type=shield$urlAdd" {$sort_a[shield]}><span>屏蔽</span></a></td>
+	<td class="tac"><a href="$baseurl&type=remind$urlAdd" {$sort_a[remind]}><span>提醒</span></a></td>
+    <td class="tac" width="60"><a href="$baseurl&type=recycle$urlAdd" {$sort_a[recycle]}><span>还原帖子</span></a></td>
+    <td class="tac" width="60"><a href="$baseurl&type=deluser$urlAdd" {$sort_a[deluser]}><span>删除用户</span></a></td>
+	<td class="tac" width="60"><a href="$baseurl&type=total$urlAdd" {$sort_a[total]}><span>总计</span></a></td>
 </tr>
 <!--
 EOT;
 $f_class='f_one';
 foreach($admindb as $key => $admin){
-$f_class=$f_class=='f_one' ? 'f_two' : 'f_one';
+$f_class=$f_class=='f_one' ? 'f_one' : 'f_two';
+$highlight = $admin[highlight] ? $admin[highlight] : 0;
+$delete = $admin[delete] ? $admin[delete] : 0;
+$credit = $admin[credit] ? $admin[credit] : 0;
+$topped = $admin[topped] ? $admin[topped] : 0;
+$edit = $admin[edit] ? $admin[edit] : 0;
+$digest = $admin[digest] ? $admin[digest] : 0;
+$copy = $admin[copy] ? $admin[copy] : 0;
+$move = $admin[move] ? $admin[move] : 0;
+$down = $admin[down] ? $admin[down] : 0;
+$banuser = $admin[banuser] ? $admin[banuser] : 0;
+$locked = $admin[locked] ? $admin[locked] : 0;
+$push = $admin[push] ? $admin[push] : 0;
+$unite = $admin[unite] ? $admin[unite] : 0;
+$shield = $admin[shield] ? $admin[shield] : 0;
+$remind = $admin[remind] ? $admin[remind] : 0;
+$recycle = $admin[recycle] ? $admin[recycle] : 0;
+$deluser = $admin[deluser] ? $admin[deluser] : 0;
+$total = $admin[total] ? $admin[total] : 0;
 print <<<EOT
 -->
-<tr class="tr3 tac $f_class">
-	<td><a href="{$db_userurl}$admin[uid]" target="_blank">$key</a></td>
-	<td>{$ltitle[$admin[gid]]}<br /></td>
-	<td>$admin[highlight]<br /></td>
-	<td>$admin[delete]<br /></td>
-	<td>$admin[credit]<br /></td>
-	<td>$admin[topped]<br /></td>
-	<td>$admin[edit]<br /></td>
-	<td>$admin[digest]<br /></td>
-	<td>$admin[copy]<br /></td>
-	<td>$admin[move]<br /></td>
-	<td>$admin[locked]<br /></td>
-	<td>$admin[push]<br /></td>
-	<td>$admin[unite]<br /></td>
-	<td>$admin[shield]<br /></td>
-	<td>$admin[remind]<br /></td>
-	<td>$admin[total]<br /></td>
+<tr class="tr3 $f_class">
+	<td style="padding-left:10px;"><a href="{$db_userurl}$admin[uid]" target="_blank">$key</a></td>
+	<td>{$ltitle[$admin[gid]]}</td>
+	<td class="tac">$highlight</td>
+	<td class="tac">$delete</td>
+	<td class="tac">$credit</td>
+	<td class="tac">$topped</td>
+	<td class="tac">$edit</td>
+	<td class="tac">$digest</td>
+	<td class="tac">$copy</td>
+	<td class="tac">$move</td>
+    <td class="tac">$down</td>
+    <td class="tac">$banuser</td>
+	<td class="tac">$locked</td>
+	<td class="tac">$push</td>
+	<td class="tac">$unite</td>
+	<td class="tac">$shield</td>
+	<td class="tac">$remind</td>
+    <td class="tac">$recycle</td>
+    <td class="tac">$deluser</td>
+	<td class="tac">$total</td>
 </tr>
 <!--
 EOT;
 }print <<<EOT
 -->
-<tr class="f_one"><td style="height:8px;" colspan="16"></td></tr>
 </table></div>
-<div style="text-align:right;margin-bottom:25px;">月份:
-<!--
-EOT;
-foreach($month_a as $key=>$value){print <<<EOT
--->
-$value
-<!--
-EOT;
-}if($month!=$thismonth && $groupid=='3'){print <<<EOT
--->
-&nbsp;<a href="sort.php?action=delsort&month=$month&verify=$verifyhash"><b>删除该月记录</b></a>
-<!--
-EOT;
-}print <<<EOT
--->
-&nbsp;&nbsp;</div>
 <!--
 EOT;
 } else{print <<<EOT
@@ -417,15 +457,15 @@ $class=$id%2==0 ? "f_two" : "f_one";
 print <<<EOT
 -->
 <tr class="tr3 $class">
-<td style="border-right:0;width:30px;" class="tac">$id</td>
-<td style="border-right:0">
-<a href="$show_url=$sort[0]" target="_blank">$sort[1]</a>
+<td style="width:30px;" class="tac s6">$id</td>
+<td>
+<p class="lh_18"><a href="$show_url=$sort[0]" target="_blank" class="s4">$sort[1]</a></p>
 </td>
 <!--
 EOT;
 if($key!='digest'){print <<<EOT
 -->
-<td style="border-right:0;width:70px;" class="tar">$sort[2]</td>
+<td style="width:70px;" class="tac">$sort[2]</td>
 <!--
 EOT;
 }print <<<EOT
@@ -440,13 +480,13 @@ $class=$id%2==0 ? "f_two" : "f_one";
 print <<<EOT
 -->
 <tr class="tr3 $class">
-<td style="border-right:0;" class="tac">$id</td>
-<td style="border-right:0;"></td>
+<td class="tac s6">$id</td>
+<td></td>
 <!--
 EOT;
 if($key!='digest'){print <<<EOT
 -->
-<td style="border-right:0;" class="tar"></td>
+<td></td>
 <!--
 EOT;
 }print <<<EOT

@@ -117,8 +117,9 @@ class PW_NavConfig {
 	function findNavConfigs(){
 		static $navConfigData = array();
 		if(!$navConfigData){
-			@include_once pwCache::getPath(D_P . 'data/bbscache/navcache.php',true);
-			$navConfigData = ($navConfigData) ? $navConfigData : $GLOBALS['navConfigData'];
+			//* @include_once pwCache::getPath(D_P . 'data/bbscache/navcache.php',true);
+			extract(pwCache::getData(D_P . 'data/bbscache/navcache.php',false));
+			//* $navConfigData = ($navConfigData) ? $navConfigData : $GLOBALS['navConfigData'];
 		}
 		if(!$navConfigData){
 			$navConfigDb = $this->_getNavConfigDB();

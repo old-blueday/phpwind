@@ -18,7 +18,7 @@ if(!$action){print <<<EOT
 <div class="admin_info mb10">
 	<h3 class="h1"><b>提示信息</b></h3>
 	<div class="legend">自定义代码功能说明:<ol><li>自定义代码是 Wind Code 代码功能的扩展和延伸,仅对帖子有效</li>
-	<li>需在<a href="$admin_file?adminjob=settings&admintype=member"><font color="blue">信息发布</font></a>处开启后方可使用</li></ol></div>
+	<li>需在<a href="$admin_file?adminjob=editer"><font color="blue">编辑器->基本设置</font></a>中开启后方可使用</li></ol></div>
 </div>
 <form action="$basename" method="post" name="FORM">
 <input type="hidden" name="action" value="submit" />
@@ -33,7 +33,6 @@ if(!$action){print <<<EOT
 		<td width="80">标签代码</td>
 		<td width="200">标题</td>
 		<td width="80">图标</td>
-		<td width="80">类型</td>
 		<td>操作</td>
 	</tr>
 <!--
@@ -51,27 +50,6 @@ foreach($codedb as $key=>$value){print <<<EOT
 		<td class="td2">$value[name]</td>
 		<td class="td2">$value[title]</td>
 		<td class="td2"><img src="$imgpath/post/c_editor/$value[icon]" /></td>
-		<td class="td2">
-<!--
-EOT;
-if ($value['param'] == 0) {print <<<EOT
--->
- 只允许字符 
-<!--
-EOT;
-} elseif ($value['param'] == 1) {print <<<EOT
--->
- 字符和数字 
-<!--
-EOT;
-} elseif ($value['param'] == 2) {print <<<EOT
--->
- 只允许数字
-<!--
-EOT;
-}print <<<EOT
--->
-		</td>
 		<td class="td2"><a href="$basename&action=edit&id=$value[id]" title="编辑">[编辑]</a></td>
 	</tr>
 <!--
@@ -151,9 +129,9 @@ print <<<EOT
 -->
 		<div id="pat_$i" class="cc" style="display:none">
 			<span class="fl mr10"><b>参数{{$j}}:</b></span>
-			<ul class="list_A list_80 fl">
-				<li><input type="radio" name="pattern[$i]" value="0" $t_0 /> 只允许字符 </li>
-				<li><input type="radio" name="pattern[$i]" value="1" $t_1 /> 字符和数字 </li>
+			<ul class="list_A list_120">
+				<li><input type="radio" name="pattern[$i]" value="0" $t_0 /> 任意字符 </li>
+				<li><input type="radio" name="pattern[$i]" value="1" $t_1 /> 字母和数字 </li>
 				<li><input type="radio" name="pattern[$i]" value="2" $t_2 /> 只允许数字</li>
 			</ul>
 		</div>

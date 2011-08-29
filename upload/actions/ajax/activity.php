@@ -237,7 +237,8 @@ if ($job == 'user_authentication') {//用户身份验证
 			//版块信息、创建时间/
 			$threadInfo = $db->get_one("SELECT * FROM pw_threads WHERE tid=".S::sqlEscape($tid));
 			$createTime = get_date($threadInfo['postdate']);
-			require_once pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
+			//* require_once pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
+			pwCache::getData(D_P.'data/bbscache/forum_cache.php');
 			M::sendNotice(
 				array($authorUserName),
 				array(
@@ -284,7 +285,8 @@ if ($job == 'user_authentication') {//用户身份验证
 	$postActForBbs = new PW_ActivityForBbs($data);
 
 	$data = array();
-	$isAdminright = $postActForBbs->getAdminRight($authorid);
+	$author = $db->get_value('SELECT authorid FROM pw_threads WHERE tid = ' . $tid);
+	$isAdminright = $postActForBbs->getAdminRight($author);
 		
 	$db_perpage = 20;
 
@@ -308,7 +310,7 @@ if ($job == 'user_authentication') {//用户身份验证
 		}
 		$start = ($page-1)*$db_perpage;
 		$limit = S::sqlLimit($start,$db_perpage);
-		$pages = numofpage($count, $page, $numofpage, "pw_ajax.php?action=$action&job=$job&tid=$tid&paymethod=$paymethod&", null, 'ajaxview');
+		$pages = numofpage($count, $page, $numofpage, "pw_ajax.php?action=$action&job=$job&tid=$tid&authorid=$authorid&paymethod=$paymethod&", null, 'ajaxview');
 
 		$defaultValueTableName = getActivityValueTableNameByActmid();
 		$defaultValue = $db->get_one("SELECT fees,endtime,iscancel FROM $defaultValueTableName WHERE tid=".S::sqlEscape($tid));

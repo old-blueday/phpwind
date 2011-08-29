@@ -10,7 +10,7 @@ print <<<EOT
 <meta name="generator" content="phpwind $wind_version" />
 <meta name="description" content="$metaDescription" />
 <meta name="keywords" content="$metaKeywords" />
-<meta http-equiv="x-ua-compatible" content="ie=7" />
+<!--meta http-equiv="x-ua-compatible" content="ie=7" /-->
 <link rel='archives' title='$db_bbsname' href='$db_bbsurl/simple/' />
 <!--
 EOT;

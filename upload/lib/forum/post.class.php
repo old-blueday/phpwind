@@ -27,6 +27,7 @@ class PwPost {
 	var $hours;
 	var $errMsg = array();
 	var $errMode = false;
+	var $fromGroup = false;
 
 	function PwPost(&$forum) {
 		global $db,$winddb,$groupid,$_time,$_G,$manager,$windid,$winduid;
@@ -60,6 +61,9 @@ class PwPost {
 		if (!$this->isGM && !$this->forum->allowtime($this->hours) && !pwRights($this->isBM, 'allowtime')) {
 			return $this->showmsg('forum_allowtime');
 		}
+		if (!$this->isGM && ($return = $this->forum->authStatus($this->user['userstatus'])) !== true) {
+			return $this->showmsg($return);
+		}
 	}
 
 	function checkSpecial($special) {
@@ -75,15 +79,21 @@ class PwPost {
 
 	function postcheck() {
 		global $db_openpost,$db_postallowtime,$timestamp;
-		list($openpost, $poststart, $postend) = explode("\t", $db_openpost);
+		//list($openpost, $poststart, $postend) = explode("\t", $db_openpost);
+		list($openpost, $poststart, $poststartminute, $postend, $postendminute) = explode("\t", $db_openpost);
+		$minute = get_date($timestamp,'i');
 		$GLOBALS['db_poststart'] = $poststart;
+		$GLOBALS['db_poststartminute'] = $poststartminute;
 		$GLOBALS['db_postend'] = $postend;
+		$GLOBALS['db_postendminute'] = $postendminute;
 
 		if ($openpost == 1 && $this->groupid != 3 && $this->groupid != 4) {
-			if ($poststart < $postend && ($this->hours < $poststart || $this->hours >= $postend)) {
+			if ($poststart < $postend && (($this->hours < $poststart || ($this->hours == $poststart && $minute < $poststartminute)) || ($this->hours > $postend || ($this->hours == $postend && $minute > $postendminute)))) {
 				return $this->showmsg('post_openpost');
-			} elseif ($poststart > $postend && ($this->hours < $poststart && $this->hours >= $postend)) {
+			} elseif ($poststart > $postend && (($this->hours < $poststart || ($this->hours == $poststart && $minute < $poststartminute)) && ($this->hours > $postend || ($this->hours == $postend && $minute > $postendminute)))) {
 				return $this->showmsg('post_openpost');
+			} elseif ($poststart == $postend && $this->hours == $poststart && ($minute < $poststartminute || $minute > $postendminute)) {
+				return $this->showmsg('post_openpost');	
 			}
 		}
 		if ($this->groupid == '7') {
@@ -197,7 +207,11 @@ class PwPost {
 				'uploadtime'	=> $this->user['uploadtime'],
 				'uploadnum'		=> $this->user['uploadnum']
 			);
-			$db_tcheck && $pwSQL['postcheck'] = PwPost::tcheck($content);
+			if ($db_tcheck) {
+				$postcheck = unserialize($this->user['postcheck']);
+				$this->fromGroup ?  ($postcheck['group'] = PwPost::tcheck($content)) : ($postcheck['post'] = PwPost::tcheck($content));
+				$pwSQL['postcheck'] = serialize($postcheck);
+			}
 			$userService->update($this->uid, array(), $pwSQL);
 			$credit->runsql();
 			/**
@@ -405,13 +419,13 @@ class postData {
 	}
 
 	function setAttachs() {
-		if (is_object($this->att)) {
-			$this->data['ifupload'] = $this->att->ifupload;
-			$this->data['aid'] = $this->att->getAttachNum();
-			if ($idrelate = $this->att->getIdRelate()) {
-				foreach ($idrelate as $aid => $id) {
-					$this->data['content'] = str_replace("[upload=$id]", "[attachment=$aid]", $this->data['content']);
-				}
+		if (!is_object($this->att)) return;
+		$this->att->execute();
+		$this->data['ifupload'] = $this->att->ifupload;
+		$this->data['aid'] = $this->att->getAttachNum();
+		if ($idrelate = $this->att->getIdRelate()) {
+			foreach ($idrelate as $aid => $id) {
+				$this->data['content'] = str_replace("[upload=$id]", "[attachment=$aid]", $this->data['content']);
 			}
 		}
 	}
@@ -442,14 +456,14 @@ class postData {
 			$this->data['content'] = S::escapeChar($this->data['content']);
 		} else {
 			$this->data['content'] = preg_replace(
-			array("/<script.*>.*<\/script>/is","/<(([^\"']|\"[^\"]*\"|'[^']*')*?)>/eis","/javascript/i"),
-			array("","\$this->jscv('\\1')","java script"),
-			str_replace('.','&#46;',$this->data['content'])
+				array("/<script.*>.*<\/script>/is","/<(([^\"']|\"[^\"]*\"|'[^']*')*?)>/eis","/javascript/i"),
+				array("","\$this->jscv('\\1')","java script"),
+				str_replace('.','&#46;',$this->data['content'])
 			);
 		}
-		$this->setIfcheck();
-		$this->checkLinks();
+		//$this->setIfcheck();
 		$this->wordFilter();
+		$this->checkLinks();
 		$this->setAttachs();
 	}
 
@@ -510,6 +524,7 @@ class postData {
 
 	function wordFilter() {
 		$this->filter->getFilterResult($this->data['title'] . "\t" . $this->data['content']);
+		$this->setIfcheck();
 		if ($this->filter->filter_weight) {
 			$title_filter_word = '';
 			$titlelen = strlen($this->data['title']);
@@ -529,33 +544,35 @@ class postData {
 				$GLOBALS['banword'] = implode(',',$this->filter->filter_word);
 				return $this->post->showmsg('content_wordsfb');
 			}
-			if( ! $this->iscontinue &&  $this->filter->filter_weight == 2){
+			if (!$this->iscontinue &&  $this->filter->filter_weight == 2) {
 				$GLOBALS['banword'] = implode(',',$this->filter->filter_word);
 				return $this->showMsg('post_word_check');
-			};
-			if( ! $this->iscontinue && $this->filter->filter_weight == 3){
+			}
+			if (!$this->iscontinue && $this->filter->filter_weight == 3) {
 				$GLOBALS['banword'] = implode(',',$this->filter->filter_word);
 				return $this->showMsg('enter_words');
 			}
 			$this->data['ifwordsfb'] = 0;
 			return true;
 		}
-		if(! $this->iscontinue && !$this->getIfcheck()){
-				return $this->showMsg('post_check');
+		if (!$this->iscontinue && !$this->getIfcheck()) {
+			return $this->showMsg('post_check');
 		}
 		return true;
 	}
 
-	function showMsg($msg ){
-		if(defined('AJAX'))
-		return $this->post->showmsg("continue\t" . getLangInfo('refreshto', $msg));
-		else
+	function showMsg($msg ) {
+		if (defined('AJAX')) {
+			return $this->post->showmsg("continue\t" . getLangInfo('refreshto', $msg));
+		}
 		return $this->post->showmsg($msg);
 	}
 
 	function conentCheck() {
 		global $db_tcheck;
-		if ($db_tcheck && $this->post->user['postcheck'] == PwPost::tcheck($this->data['content'])) {
+		$postcheck = unserialize($this->post->user['postcheck']);
+		$checkValue = $this->post->fromGroup ? $postcheck['group'] : $postcheck['post'];
+		if ($db_tcheck && $checkValue == PwPost::tcheck($this->data['content'])) {
 			return $this->post->showmsg('content_same');
 		}
 	}
@@ -594,30 +611,30 @@ class postData {
 		}
 		if ($db_autoimg == 1) {
 			$message = preg_replace(
-			array("/(?<=[^\]a-z0-9-=\"'\\/])((https?|ftp):\/\/|www\.)([a-z0-9\/\-_+=.~!%@?#%&;:$\\│]+\.(gif|jpg|png))(?![\w\/\-+\.$&?#]{1})/i"),
-			array("[img]\\1\\3[/img]"),
+				array("/(?<=[^\]a-z0-9-=\"'(\\/])((https?|ftp):\/\/|www\.)([a-z0-9\/\-_+=.~!%@?#%&;:$\\│]+\.(gif|jpg|png))(?![\w\/\-+\.$&?#]{1})/i"),
+				array("[img]\\1\\3[/img]"),
 				' ' . $message
 			);
 			$message = substr($message,1);
 		}
 		$message = preg_replace(
-		array(
-				"/(?<=[^\]a-z0-9-=\"'\\/])((https?|ftp|gopher|news|telnet|mms|rtsp):\/\/|www\.)([a-z0-9\/\-_+=.~!%@?#%&;:$\\│\|]+)/i",
+			array(
+				"/(?<=[^\]a-z0-9-=\"'(\\/])((https?|ftp|gopher|news|telnet|mms|rtsp):\/\/|www\.)([a-z0-9\/\-_+=.~!%@?#%&;:$\\│\|]+)/i",
 				"/(?<=[^\]a-z0-9\/\-_.~?=:.])([_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4}))/i"
-				),
-				array(
+			),
+			array(
 				"[url]\\1\\3[/url]",
 				"[email]\\0[/email]"
-				),
+			),
 			' '.$message
-				);
-				if (is_array($this->code_htm)) {
-					foreach($this->code_htm as $key => $value){
-						$message = str_replace("<\twind_phpcode_$key\t>", $value, $message);
-					}
-				}
-				$message = substr($message,1);
-				return $message;
+		);
+		if (is_array($this->code_htm)) {
+			foreach($this->code_htm as $key => $value){
+				$message = str_replace("<\twind_phpcode_$key\t>", $value, $message);
+			}
+		}
+		$message = substr($message,1);
+		return $message;
 	}
 
 	function code_check($code){
@@ -800,17 +817,17 @@ class BbsTag {
 		if (!$tags) {
 			return '';
 		}
-		$tags = htmlspecialchars_decode($tags);
+		$tags = pwHtmlspecialchars_decode($tags);
 		$tags = stripslashes($tags);
 		$tags = str_replace(array('“','”'),'"',$tags);
 		$tags = preg_replace_callback('/("[^"]+")/', array($this,'callback'), $tags);
-		$this->tags = array_merge($this->tags,explode(" ",preg_replace('/\s+/is',' ',trim($tags))));
+		$this->tags = array_merge($this->tags,explode(" ",str_replace('/\s+/is',' ',trim($tags))));
 		$this->tags = array_unique($this->tags);
 		if (count($this->tags) > 5) {
 			return $this->post->showmsg("tags_num_limit");
-		}
+		} 
 		foreach ($this->tags as $key => $value) {
-			$this->tags[$key] = trim(str_replace('&nbsp;',' ',$this->tags[$key]));
+			$this->tags[$key] = trim(preg_replace('/&nbsp;/is',' ',$this->tags[$key]));
 			if (!$this->tags[$key]){
 				unset($this->tags[$key]);continue;
 			}
@@ -874,7 +891,8 @@ class BbsTag {
 	}
 
 	function relate($subject,$content){
-		@include pwCache::getPath(D_P.'data/bbscache/tagdb.php');
+		//* @include (D_P.'data/bbscache/tagdb.php');
+		extract(pwCache::getData(D_P . "data/bbscache/tagdb.php", false));
 		$i    = 0;
 		$tags = '';
 		if(!$tagdb){

@@ -106,7 +106,7 @@ class PW_ArticleService {
 
 	function _getNewArticles($count = 20) {
 		$articleDAO = $this->_getArticleDAO();
-		return $articleDAO->search('', '', '', '', 0, $count);
+		return $articleDAO->search('', '', '', 1, 0, $count);
 	}
 
 	/**
@@ -200,7 +200,7 @@ class PW_ArticleService {
 		}
 		return $results;
 	}
-
+	
 	/**
 	 * 获取文章bean
 	 * @param ini $articleId
@@ -320,7 +320,7 @@ class PW_ArticleService {
 		if (!$articleContentInfo) return false;
 		
 		foreach ($uploadIds as $key => $value) {
-			$articleContentInfo['content'] = str_replace("[upload=$key]", "[attachment=$value]", $articleContentInfo['content']);
+			$articleContentInfo['content'] = str_replace("[attachment=$key]", "[attachment=$value]", $articleContentInfo['content']);
 		}
 		$articleContentDAO->update(array('content' => $articleContentInfo['content']), $articleId);
 	}
@@ -345,6 +345,16 @@ class PW_ArticleService {
 		return array('article_id' => 'articleId', 'hits' => 'hits');
 	}
 
+	function filterArticles($articles) {
+		global $timestamp;
+		if (!S::isArray($articles)) return array();
+		foreach ($articles as $v) {
+			if ($v['postdate'] > $timestamp) continue;
+			$tmpArticle[] = $v;
+		}
+		return $tmpArticle;
+	}
+	
 	function _getArticleDAO() {
 		return C::loadDB('article');
 	}

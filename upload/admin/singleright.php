@@ -28,6 +28,9 @@ if (empty($action)) {
 
 	} elseif($job == 'setright') {
 		S::gp(array('uid','username'));
+		$username = trim($username);
+		$uid = (int) $uid;
+		(!$username && !$uid) && adminmsg('用户名不能为空');
 		if(!$_POST['step']){
 			if ($username) {
 				$men = $db->get_one("SELECT m.uid,sr.uid as ifset FROM pw_members m LEFT JOIN pw_singleright sr USING(uid) WHERE m.username=".S::sqlEscape($username));
@@ -38,7 +41,8 @@ if (empty($action)) {
 				$uid = $men['uid'];
 			}
 
-			include_once pwCache::getPath(D_P.'data/bbscache/forumcache.php');
+			//* include_once pwCache::getPath(D_P.'data/bbscache/forumcache.php');
+			pwCache::getData(D_P.'data/bbscache/forumcache.php');
 			list($hidefid,$hideforum) = GetHiddenForum();
 			$forumcache .= $hideforum;
 			$forumcache  = "<option></option>".$forumcache;
@@ -123,9 +127,11 @@ if (empty($action)) {
 		adminmsg('operate_success');
 	}
 } elseif ($action == 'user') {
-	include_once pwCache::getPath(D_P.'data/bbscache/level.php');
-	include_once pwCache::getPath(D_P.'data/bbscache/forumcache.php');
-
+	//* include_once pwCache::getPath(D_P.'data/bbscache/level.php');
+	//* include_once pwCache::getPath(D_P.'data/bbscache/forumcache.php');
+	pwCache::getData(D_P.'data/bbscache/level.php');
+	pwCache::getData(D_P.'data/bbscache/forumcache.php');
+	
 	S::gp(array('page','uid','fid','gid'),GP,2);
 	$username = S::escapeChar(S::getGP('username'));
 	$groupcache = $pageurl = '';$u_d = array();
@@ -181,8 +187,10 @@ if (empty($action)) {
 	$jschk = ($uid || $username || $fid || $gid) && $pages ? 'true' : 'false';
 	include PrintEot('singleright');exit;
 } elseif ($action == 'group') {
-	include_once pwCache::getPath(D_P.'data/bbscache/level.php');
-	include_once pwCache::getPath(D_P.'data/bbscache/forumcache.php');
+	//* include_once pwCache::getPath(D_P.'data/bbscache/level.php');
+	//* include_once pwCache::getPath(D_P.'data/bbscache/forumcache.php');
+	pwCache::getData(D_P.'data/bbscache/level.php');
+	pwCache::getData(D_P.'data/bbscache/forumcache.php');	
 
 	S::gp(array('page','fid','gid'),GP,2);
 	$groupcache = $pageurl = $sql = '';$g_d = array();
@@ -236,7 +244,8 @@ if (empty($action)) {
 	$f = $db->get_one("SELECT name,type FROM pw_forums WHERE fid=".S::sqlEscape($fid));
 	empty($f) && adminmsg('undefined_action',$jumpurl);
 
-	include_once pwCache::getPath(D_P.'data/bbscache/forumcache.php');
+	//* include_once pwCache::getPath(D_P.'data/bbscache/forumcache.php');
+	pwCache::getData(D_P.'data/bbscache/forumcache.php');
 	list($hidefid,$hideforum) = GetHiddenForum();
 	$forumcache .= $hideforum;
 

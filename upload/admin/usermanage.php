@@ -6,7 +6,7 @@ $basename = "$admin_file?adminjob=usermanage&adminitem=$adminitem";
 
 if ($adminitem == 'edit') {
 	if ($action == 'search') {
-		S::gp(array('groupid','schname','schuid','schname_s','schemail','userip','regdate','schlastvisit','orderway','asc','lines','page'));
+		S::gp(array('groupid','schname','schuid','schname_s','schemail','userip','regdate','schlastvisit','orderway','asc','lines','page','yz'));
 		S::gp(array('vaguename','vagueemail'));
 		if (!$groups && !$schname && !$schuid && !$schemail && !$groupid && !$userip && $regdate=='all' && $schlastvisit=='all') {
 			adminmsg('noenough_condition');
@@ -85,7 +85,7 @@ if ($adminitem == 'edit') {
 			$groupselect .= "<option value='$gid'>$group[grouptitle]</option>";
 		}
 		$schdb = array();
-		$query = $db->query("SELECT m.uid,m.username,m.email,m.groupid,m.memberid,m.regdate,md.lastvisit,md.postnum,md.onlineip FROM pw_members m LEFT JOIN pw_memberdata md ON md.uid=m.uid WHERE $sql $order $limit");
+		$query = $db->query("SELECT m.uid,m.username,m.email,m.groupid,m.memberid,m.regdate,m.yz,md.lastvisit,md.postnum,md.onlineip FROM pw_members m LEFT JOIN pw_memberdata md ON md.uid=m.uid WHERE $sql $order $limit");
 		while ($sch = $db->fetch_array($query)) {
 			$sch['regdate'] = get_date($sch['regdate']);
 			$sch['lastvisit'] = get_date($sch['lastvisit']);
@@ -105,7 +105,8 @@ if ($adminitem == 'edit') {
 	} elseif ($action == 'edit') {
 		S::gp(array('uid'),'GP',2);
 		$temUid = $uid;
-		include_once pwCache::getPath(D_P.'data/bbscache/customfield.php');
+		//* include_once pwCache::getPath(D_P.'data/bbscache/customfield.php');
+		pwCache::getData(D_P.'data/bbscache/customfield.php');
 		require_once(R_P.'require/showimg.php');
 		if (empty($_POST['step'])) {
 			$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
@@ -185,11 +186,13 @@ if ($adminitem == 'edit') {
 				require_once(R_P.'require/credit.php');
 				$custom_credits = $credit->get($uid,'CUSTOM');
 			}
+			$customerService = L::loadClass('CustomerFieldService','user');
+			$customerTemplate = $customerService->getAdminTemplate($uid);
 			include PrintEot('usermanage');exit;
 	
 		} elseif ($_POST['step'] == 2) {
 	
-			S::gp(array('groupid','groups','username','password','check_pwd','email','publicmail','receivemail','regdate','yz','userip','facetype','proicon','delupload','postnum','rvrc','money','deposit','ddeposit','credit','currency','onlinetime','site','location','oicq','icq','msn','yahoo','honor','gender','year','month','day','signature','introduce','banpm','question','customquest','answer','creditdb'),'P');
+			S::gp(array('groupid','groups','username','password','check_pwd','email','publicmail','receivemail','regdate','yz','userip','facetype','proicon','delupload','postnum','rvrc','money','deposit','ddeposit','credit','currency','onlinetime','site','location','oicq','icq','msn','aliww','yahoo','honor','gender','year','month','day','signature','introduce','banpm','question','customquest','answer','creditdb'),'P');
 			$basename .= "&action=edit&uid=$uid";
 			$upmembers = $uc_edit = array();
 	
@@ -290,8 +293,8 @@ if ($adminitem == 'edit') {
 					Showmsg('illegal_customimg');
 				}
 				$proicon = $httpurl[0];
-				$httpurl[1] = (int)$httpurl[1];
-				$httpurl[2] = (int)$httpurl[2];
+				$httpurl[1] = '';
+				$httpurl[2] = '';
 				$httpurl[3] = (int)$httpurl[3];
 				$httpurl[4] = (int)$httpurl[4];
 				list($user_a[2], $user_a[3]) = flexlen($httpurl[1], $httpurl[2], $httpurl[3], $httpurl[4]);
@@ -308,6 +311,9 @@ if ($adminitem == 'edit') {
 			if ($oldinfo['username'] != stripcslashes($username)) {
 				if (!$username) {
 					Showmsg('username_empty');
+				}
+				if (strlen($username) > 15) {
+					adminmsg('用户名长度不能大于15个字符');
 				}
 				$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
 				$isUsernameExist = $userService->getUserIdByUserName($username);
@@ -377,6 +383,7 @@ if ($adminitem == 'edit') {
 				'groupid'		=> $groupid,
 				'site'			=> $site,
 				'oicq'			=> $oicq,
+				'aliww'			=> $aliww,
 				'icq'			=> $icq,
 				'msn'			=> $msn,
 				'yahoo'			=> $yahoo,
@@ -426,17 +433,8 @@ if ($adminitem == 'edit') {
 				$userService->update($uid, array(), array(), array('deposit'=>$deposit,'ddeposit'=>$ddeposit));
 			}
 			if ($customfield) {
-				$memberInfoFields = array();
-				foreach ($customfield as $key => $val) {
-					$field = "field_".(int)$val['id'];
-					S::gp(array($field),'P');
-					if ($mi[$field] != $$field) {
-						$memberInfoFields[$field] = $$field;
-					}
-				}
-				if ($memberInfoFields) {
-					$userService->update($uid, array(), array(), $memberInfoFields);
-				}
+				$customfieldService = L::loadClass('CustomerFieldService','user');
+				$customfieldService->saveAdminCustomerData($uid);
 			}
 			$messageServer = L::loadClass('message', 'message'); 
 			$blacklist = array_unique(explode(',',$banpm));			
@@ -460,6 +458,7 @@ if ($adminitem == 'edit') {
 			if ($uid) {
 				$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
 				$rt = $userService->get($uid,true,true);
+				if ($rt['groupid'] == 7 && $groupid != 7) $userService->update($uid, array('yz' => 1));
 				$messageServer->grabMessage($uid,array(($rt['groupid'] == '-1') ? $rt['memberid'] : $rt['groupid'] ),max($rt['lastgrab'],$rt['regdate']));
 				if ($rt['groupid']==3 && $groupid!=3 && !If_manager) {
 					adminmsg('manager_right');
@@ -468,6 +467,7 @@ if ($adminitem == 'edit') {
 				} elseif ($rt['groupid']==5 && $groupid==-1 || $rt['groupid']!=5 && $groupid==5) {
 					adminmsg('setuser_forumadmin');
 				}
+				
 				$groups = $rt['groups'];
 				if ($groups && strpos($groups,','.$groupid.',')!==false) {
 					$groups = str_replace(','.$groupid.',',',',$groups);
@@ -513,11 +513,11 @@ if ($adminitem == 'edit') {
 	}
 } elseif ($adminitem == 'delete') {
 	if ($action == 'del') {
-		S::gp(array('groupid','schname','schemail','postnum','onlinetime','userip','regdate','schlastvisit','orderway','asc','lines','item'));
-		S::gp(array('page'),'GP',2);
+		S::gp(array('groupid','schname','schuid','schemail','postnum','onlinetime','userip','regdate','schlastvisit','orderway','asc','lines','item'));
+		S::gp(array('page','skipcheck'),'GP',2);
 		if (empty($_POST['step'])) {
 
-			if (!$schname && !$schemail && !$groupid && $regdate=='all' && $schlastvisit='all') {
+			if (!$skipcheck && !$schname && !$schuid && !$schemail && !$groupid && $regdate=='all' && $schlastvisit='all') {
 				adminmsg('noenough_condition');
 			}
 			is_array($item) && $item = array_sum($item);
@@ -542,6 +542,11 @@ if ($adminitem == 'edit') {
 				$schname = str_replace('*','%',$schname);
 				$sql .= " AND (m.username LIKE ".S::sqlEscape($schname).")";
 			}
+			if ($schuid!='') {
+				$schuid = intval($schuid);
+				$sql .= " AND m.uid = ".S::sqlEscape($schuid);
+			}
+		
 			if ($schemail != '') {
 				$schemail = str_replace('*','%',$schemail);
 				$sql .= " AND (m.email LIKE ".S::sqlEscape($schemail).")";
@@ -639,7 +644,8 @@ if ($adminitem == 'edit') {
 				foreach($userIds as $userId){
 					$colonyid =  $db->get_value("SELECT colonyid FROM pw_cmembers WHERE uid=".S::sqlEscape($userId));
 					$colonyMembers =  $db->get_value("SELECT count(id) FROM pw_cmembers WHERE colonyid =".S::sqlEscape($colonyid));
-					$db->update("UPDATE pw_colonys SET members=".S::sqlEscape($colonyMembers-1)." WHERE id= ".S::sqlEscape($colonyid));
+					//* $db->update("UPDATE pw_colonys SET members=".S::sqlEscape($colonyMembers-1)." WHERE id= ".S::sqlEscape($colonyid));
+					$db->update(pwQuery::buildClause("UPDATE :pw_table SET members=:members WHERE id=:id", array('pw_colonys', $colonyMembers-1, $colonyid)));
 					//* $db->update("DELETE FROM pw_cmembers WHERE uid=".S::sqlEscape($userId));
 					pwQuery::delete('pw_cmembers', 'uid=:uid', array($userId));
 				}
@@ -681,8 +687,13 @@ if ($adminitem == 'edit') {
 				$db->update("DELETE FROM pw_cwritedata WHERE uid IN (".S::sqlImplode($userIds).")");
 			}
 			if ($item & 128) {
+				$commentQuery = $db->query('SELECT cid FROM pw_weibo_comment WHERE uid IN (' . S::sqlImplode($userIds) . ')');
+				$commentIds = array();
+				while ($commentResults = $db->fetch_array($commentQuery)) {
+					$commentIds[] = $commentResults['cid'];
+				}
 				$db->update("DELETE FROM pw_comment WHERE uid IN (".S::sqlImplode($userIds).")");
-				
+				S::isArray($commentIds) && $db->update('DELETE FROM pw_weibo_cmrelations WHERE cid IN (' . S::sqlImplode($commentIds) . ')');
 				$db->update("DELETE FROM pw_weibo_comment WHERE uid IN (".S::sqlImplode($userIds).")");
 				$db->update("UPDATE pw_weibo_content SET replies=0 WHERE uid IN(".S::sqlImplode($userIds).")");
 			}
@@ -708,7 +719,7 @@ if ($adminitem == 'edit') {
 
 			$userCache = L::loadClass('userCache', 'user');
 			$userCache->delete($userIds);
-			adminmsg('operate_success', "$basename&action=$action&groupid=$groupid&schname=" . rawurlencode($schname)."&schemail=$schemail&postnum=$postnum&onlinetime=$onlinetime&regdate=$regdate&schlastvisit=$schlastvisit&orderway=$orderway&asc=$asc&lines=$lines&page=$page");
+			adminmsg('operate_success', "$basename&action=$action&groupid=$groupid&schname=" . rawurlencode($schname)."&schuid=$schuid&schemail=$schemail&postnum=$postnum&onlinetime=$onlinetime&regdate=$regdate&schlastvisit=$schlastvisit&orderway=$orderway&asc=$asc&lines=$lines&page=$page&skipcheck=1");
 		}
 	} else {
 		initGroupOptions();
@@ -732,7 +743,7 @@ if ($adminitem == 'edit') {
 				adminmsg('illegal_password');
 			}
 		}
-		if (strlen($username)>14 || strrpos($username,"|")!==false || strrpos($username,'.')!==false || strrpos($username,' ')!==false || strrpos($username,"'")!==false || strrpos($username,'/')!==false || strrpos($username,'*')!==false || strrpos($username,";")!==false || strrpos($username,",")!==false || strrpos($username,"<")!==false || strrpos($username,">")!==false) {
+		if (strlen($username)>15 || strrpos($username,"|")!==false || strrpos($username,'.')!==false || strrpos($username,' ')!==false || strrpos($username,"'")!==false || strrpos($username,'/')!==false || strrpos($username,'*')!==false || strrpos($username,";")!==false || strrpos($username,",")!==false || strrpos($username,"<")!==false || strrpos($username,">")!==false) {
 			adminmsg('illegal_username');
 		}
 		if (strrpos($password,"\r")!==false || strrpos($password,"\t")!==false || strrpos($password,"|")!==false || strrpos($password,"<")!==false || strrpos($password,">")!==false) {
@@ -753,7 +764,8 @@ if ($adminitem == 'edit') {
 		$register->setField('groupid', $groupid);
 		$register->setField('yz', 1);
 		$register->execute();
-		
+		$customfieldService = L::loadClass('CustomerFieldService','user');/* @var $customfieldService PW_CustomerFieldService */
+		$customfieldService->saveRegisterCustomerData();
 		if ($groupid <> '-1') {
 			admincheck($register->uid,$username,$groupid,'','update');
 		}

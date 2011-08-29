@@ -4,14 +4,13 @@ print <<<EOT
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=$db_charset" />
-<meta http-equiv="x-ua-compatible" content="ie=7" />
 <script type="text/javascript" src="js/portal.js"></script>
 <script type="text/javascript" src="js/core/core.js"></script>
 <script language="JavaScript" src="mode/area/js/imagetype.js"></script>
 <link rel="stylesheet" type="text/css" href="images/pw_core.css" />
 <link rel="stylesheet" type="text/css" href="images/pwmanage.css" />
 <style>
-htm,body{overflow:hidden;height:470px;}
+htm,body{overflow:hidden;height:500px;width:100%;}
 html {font-size:12px;}
 body {line-height: 1.5;}
 .lh_22{line-height:22px;height:22px;overflow:hidden;}
@@ -73,7 +72,7 @@ EOT;
 if($action=='add' || $action=='edit'){
 print <<<EOT
 -->
-            <li class="current"><a href="javascript:;">内容{$title}</a></li>
+            <li class="current"><a href="javascript:;">{$title}推送内容</a></li>
 <!--
 EOT;
 }

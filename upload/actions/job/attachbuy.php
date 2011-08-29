@@ -6,9 +6,15 @@ S::gp(array('aid','type','step'));
 
 //TODO lmq待优化
 if ($type == 'record') {
+	
 	require_once(R_P.'require/credit.php');
+	S::gp(array('page'), '', 2);
+	$page < 1 && $page = 1;
+	$db_perpage = 10;
+	$total = $db->get_value("SELECT COUNT(*) AS sum FROM pw_attachbuy WHERE aid=" . S::sqlEscape($aid));
+	$pages = numofpage($total, $page, ceil($total/$db_perpage), "job.php?action=attachbuy&type=record&aid=$aid&", null, 'ajaxurl');
 	$buy = array();
-	$query = $db->query("SELECT a.*,m.username FROM pw_attachbuy a LEFT JOIN pw_members m ON a.uid = m.uid WHERE a.aid=" . S::sqlEscape($aid));
+	$query = $db->query("SELECT a.*,m.username FROM pw_attachbuy a LEFT JOIN pw_members m ON a.uid = m.uid WHERE a.aid=" . S::sqlEscape($aid) . S::sqlLimit(($page - 1) * $db_perpage, $db_perpage));
 	while ($rt = $db->fetch_array($query)) {
 		$rt['createdtime'] = get_date($rt['createdtime'],'Y-m-d H:i:s');
 		$rt['ctype'] = $credit->cType[$rt['ctype']];

@@ -2,8 +2,8 @@
 -->
 
 <!--main begin-->
-<table width="100%" cellpadding="0" cellspacing="0"><tr><td valign="top" height="300">
-<div class="forum_main">
+
+<div class="forum_main main_min">
 <!-- 
 EOT;
 foreach($forums as $forum){
@@ -55,11 +55,11 @@ print <<<EOT
 --> 
 	<div class="c"></div>
 </div>
-</td></tr></table>
-<div style="padding:10px 0 10px 20px;" class="cc">
+
+<div style="padding:10px 0 20px 20px;">
 	$pager
 </div>
-<div style="padding-left:20px;">
+<div class="p10" style="width:555px;margin-left:auto;margin-right:auto;">
 <!--
 EOT;
 require printEOT('searcher_searchinput');

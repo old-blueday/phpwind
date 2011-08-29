@@ -9,7 +9,8 @@ if (!$f['forumsell']) {
 }
 $forumset = unserialize($f['forumset']);
 require_once(R_P.'require/credit.php');
-include_once pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
+//* include_once pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
+pwCache::getData(D_P.'data/bbscache/forum_cache.php');
 $fname = $forum[$fid]['name'];
 
 if (empty($_POST['step'])) {
@@ -48,7 +49,8 @@ if (empty($_POST['step'])) {
 		if ($forumset['sellprice'][$date]['rprice'] <= 0) {
 			Showmsg('undefined_action');
 		}
-		include_once pwCache::getPath(D_P.'data/bbscache/ol_config.php');
+		//* include_once pwCache::getPath(D_P.'data/bbscache/ol_config.php');
+		pwCache::getData(D_P.'data/bbscache/ol_config.php');
 		if (!$ol_onlinepay) {
 			Showmsg($ol_whycolse);
 		}

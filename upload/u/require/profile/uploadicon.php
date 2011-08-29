@@ -40,7 +40,7 @@ if (empty($_GET['step'])) {
 
 		$middleFile = PwUpload::savePath($db_ifftp, $filename, "$middleDir");
 		PwUpload::createFolder(dirname($middleFile));
-		pwCache::setData($middleFile, $data);
+		pwCache::writeover($middleFile, $data);
 
 		require_once(R_P.'require/imgfunc.php');
 		if (!$img_size = GetImgSize($middleFile,'jpg')) {

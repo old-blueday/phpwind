@@ -51,6 +51,12 @@ class Credit {
 		return new ApiResponse(1);
 	}
 
+	function set($uid, $ctype, $value) {
+		require_once(R_P . 'require/credit.php');
+		$credit->set($uid, $ctype, $value);
+		return new ApiResponse(true);
+	}
+
 	function getvalue($uid) {
 		require_once(R_P.'require/credit.php');
 		$getv = $credit->get($uid);

@@ -1,33 +1,47 @@
 <!--<?php
 print <<<EOT
 -->
-<div class="p15">
+<div class="p15 cc">
 <!--
 EOT;
 portalEcho('oindex');
 print<<<EOT
 -->
-<div class="w710 fl">
+	<div class="w710 fl" style="clear:left;">
 <script type="text/javascript" language="JavaScript" src="apps/weibo/js/post.js"></script>
 <script type="text/javascript" language="JavaScript" src="js/pw_weibo.js"></script>
 <script language="javascript">
 var transmitAction = 'lookround';
 </script>
-<div class="conFeed" id="weiboFeed">
+		<div class="conFeed" id="weiboFeed0" style="padding-left:22px; display:block">
 <!--
 EOT;
 include printEot('writesmile');
 require_once uTemplate::printEot('weibo_model');
-$weiboModelTemplate->photoPop();
-foreach ($weiboList as $key => $value) {
+//$weiboModelTemplate->photoPop();
+$weiboModelTemplate->setWeiboDiv('_0');
+foreach ($weiboHotTransmit as $key => $value) {
 	$method = $weiboService->getType($value['type']);
 	$weiboModelTemplate->$method($value);
 }
+
 print <<<EOT
 -->
-</div>
-</div>
-<div class="c"></div>
+		</div>
+		<div class="conFeed" id="weiboFeed1" style="padding-left:22px; display:none">
+<!--
+EOT;
+$weiboModelTemplate->setWeiboDiv('_1');
+foreach ($weiboHotComment as $key => $value) {
+	$method = $weiboService->getType($value['type']);
+	$weiboModelTemplate->$method($value);
+}
+
+print <<<EOT
+-->
+		<script language="javascript">switchDiv(location.hash ? location.hash.substr(location.hash.length-1, 1) : 0 );</script>
+		</div>
+	</div>
 </div>
 
 <!--

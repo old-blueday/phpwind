@@ -1,41 +1,106 @@
-﻿/*
+/*
 * app.insertImage 模块
 * 图片插入模块
 */
 Breeze.namespace('app.insertImage', function(B) {
 	var win = window,doc = document,
 	    defaultConfig = {
-	        rspHtmlPath:'demo/php/m_photos_editor.html',
+	        rspHtmlPath:imageConfig.url,
+			tabs:(typeof imageConfig.tabs == 'undefined') ? ['network'] : imageConfig.tabs,
+			tabname:{'local' : '本地图片', 'album':'相册图片','network':'网络图片'},
 	        callback:function(){}
 	    },
+		albumList = null,
+		isLoading = false,
+		menuPop = {
+			create : function() {
+				var html = '<div class="B_menu B_p10B">\
+	<div style="width: 480px;">\
+		<div class="B_menu_nav B_cc B_drag_handle">\
+			<a style="margin-top: 2px;" class="B_menu_adel B_close" href="#">×</a>\
+			<ul class="B_cc">';
+				defaultConfig.tabs.forEach(function(n){
+					html += '<li id="tab_'+n+'" class="B_tab_trigger"><a href="javascript:;">'+defaultConfig.tabname[n]+'</a></li>';
+				});
+				html += '</ul>\
+		</div>',
+					i = 0;
+				defaultConfig.tabs.forEach(function(n){
+					html += menuPop[n](i++ == 0 ? '' : 'none');
+				});
+				html += '</div>\
+	<input type="hidden" id="verifyhash" value="" />\
+</div>';
+				return html;
+			},
+			local : function(show) {
+				return '<div class="B_photo_con B_tab_panel" style="display:'+show+'">\
+			<div class="B_mb10 B_cc" style="height:25px;">\
+				<span class="B_fr" id="B_picuploader_savetoalbum">\
+					<label class="B_mr5"><input type="checkbox" name="savetoalbum" value="1">同时保存到</label>\
+					<select name="albumid" disabled><option>选择相册</option></select>\
+				</span>\
+				<span id="B_picuploader_container"><span id="B_picuploader_flash"></span></span>\
+			</div>\
+			<div class="B_mb5">\
+				<div class="B_file_imgTip B_cc">\
+					图片列表&nbsp;<span>(总共可以添加<span class="restCount s4"></span>个)</span>\
+				</div>\
+				<div class="B_file_img">\
+					<ul id="B_image_tile" class="B_cc"><li style="width:0;overflow:hidden;height:0px;padding:0;margin:0;"></li></ul>\
+				</div>\
+			</div>\
+			<div class="B_file_tips">\
+				<a class="B_helpA" style="float:right;padding:0 0 0 18px;width:auto;" onclick="event&&(event.returnValue=false)">可上传类型<i id="image_allow_filetype"></i></a>\
+				<div class="B_helpB">点击已上传图片插入到帖子</div>\
+			</div>\
+		</div>';
+			},
+			album : function(show) {
+				return '<div class="B_photo_con B_tab_panel" style="display:'+show+';">\
+		<div class="B_album_list B_mb5" style="display:none">\
+			<select id="album_list" name="aid"></select>\
+		</div>\
+		<div class="c"></div>\
+		<div class="popupList" id="noPhotoList" style="display:none">\
+			<div class="p10">相册下还没有照片，请先 <a href="apps.php?q=photos&a=upload&job=flash" class="s4" target="_blank">上传</a></div>\
+		</div>\
+		<div class="B_popupList B_mb10" id="photoList">\
+				<ul id="album" class="B_popUlone B_cc">\
+				</ul>\
+			</div>\
+			<div class="B_helpB">点击图片插入到帖子</div >\
+		</div>';
+			},
+			network : function(show) {
+				return '<div class="B_photo_con B_tab_panel" style="display:'+show+'">\
+			<div style="padding-bottom:30px;">\
+				<div class="B_tac B_p15 B_cc">图片地址：<input id="networkImg" size="50" type="text" class="input" value="http://" /></div>\
+				<div class="B_tac"><span class="B_btn2"><span><button type="button" id="btn_insertImg">插入图片</button></span></span></div>\
+			</div>\
+		</div>';
+			}
+		},
+		imageSelector = {
+			id :'editor-insertImage',
+			load : function(elem, editor) {
+				var id = this.id;
+				B.require('util.dialog', function(B) {
+					B.util.dialog({
+						pos: ['leftAlign','bottom'],
+						id: id,
+						data: menuPop.create(),
+						reuse: true,
+						callback: function(popup) {
+							InsertImage();//事件处理类
+							initList();
+							editor.area.appendChild(popup.win);//转移弹窗位置
+						}
+					}, elem);
+				});
+			}
+		};
 	    
-	    imageSelector = {
-	        id :'editor-insertImage',
-	        load : function(elem) {
-	            var id = this.id;
-	            B.require('request','util.dialog',function(B) {
-	                B.ajax({
-	                    url:defaultConfig.rspHtmlPath,
-	                    dataType:'html',
-	                    cache:false,
-	                    success:function(data) {
-                            B.util.dialog({
-                                pos: ['leftAlign','bottom'],
-                                id: id,
-                                data:data,
-                                reuse: true,
-                                callback:function(popup) {
-                                    InsertImage();//事件处理类
-                                }
-                            },elem);
-	                    }
-	                });
-	            });
-	        }
-	    }
-	    
-	
-	
 	/**
      * 隐藏面板
      */   
@@ -43,46 +108,15 @@ Breeze.namespace('app.insertImage', function(B) {
         B.$('#' + imageSelector.id).style.display = 'none';
     }
     //给相册图片添加选中事件
-    function addPhotoClick(contain) {
+    function addPhotoClick() {
         B.require('event',function() {
             B.$$('#' + imageSelector.id +' #photoList li').forEach(function(n) {
-                n['onmousedown'] = function(e){this.className = this.className == 'current' ? '' :'current'}
+                n['onmousedown'] = function(e){
+					insertTrigger('<img src="' + B.$('input', this).value + '" />');
+					//hideImageSelector();
+					//this.className = this.className == 'current' ? '' :'current'
+				}
             });
-        });
-    }
-    
-    function createAlbum() {
-        var aname = B.$('#albumName').value,
-            gdcode,qanswer,qkey;
-        if(B.$('#gdcode')) { gdcode = B.$('#gdcode').value; }
-        if(B.$('#qanswer')) { qanswer = B.$('#qanswer').value; }
-        if(B.$('#qkey')) { qkey = B.$('#qkey').value; }
-        if(aname=='') { alert('请输入相册名!');B.$('#albumName').focus();return false; }
-        if(B.$('#gdcode') && B.$('#gdcode').value === '') {
-            alert('请输入验证码!');B.$('#gdcode').focus();return false;
-        }
-        if(B.$('#qanswer') && B.$('#qanswer').value === '') {
-            alert('请输入问题答案!');B.$('#qanswer').focus();return false;
-        }
-        
-        B.ajax({
-            type:'post',
-            url:'apps.php?q=photos&a=create&verify='+window.verifyhash,
-            data: {step:2,checkpwd:1,private:0,aname:aname,gdcode:gdcode,qanswer:qanswer,qkey:qkey},
-            success:function(data) {
-                var rText = data.split('\t');
-                if (rText[0] == 'success') {
-                    var albumList = B.$('#album_list');
-		            albumList.options.add(new Option(aname,rText[1]),0);
-		            albumList.value=rText[1];
-		            B.$('#albumName').value='';
-		            B.$('#create_album_div').style.display='none';
-                }else if(rText[0] === 'limit_num'){
-                    alert('您创建的相册已经达到'+rText[1]+'个');
-                }else {
-                    alert(rText[1] != '' ? rText[1] : '未知错误');
-                }
-            }
         });
     }
     /**
@@ -92,36 +126,111 @@ Breeze.namespace('app.insertImage', function(B) {
         B.require('request',function(B) {
             B.ajax({
                 type:'post',
-                url:'apps.php?q=photos&a=pweditor&verify='+window.verifyhash,
-                data: {action:'listphotos',private:0,aid:albumId},
+                url:defaultConfig.rspHtmlPath + '&verify='+window.verifyhash,
+                data: {job:'listphotos',aid:albumId},
                 success :function(data) {
-                    var rText = data.split('\t'),
-                        albumHtml = '';
-                        if (rText[0] == 'success') {
-			                try{
-			                    var photos = B.JSONParse(rText[1]);
-			                    if (typeof(photos)=='object') {
-				                    for (var i in photos) {
-					                    if (typeof(photos[i])=='object') {
-						                    albumHtml += '<li><span></span><label><img data_src="'+ photos[i].thumbpath +'" width="56" height="56" /><input type="checkbox" value="' + photos[i].path + '" /></label></li>';
-					                    }
-				                    }
-				                    B.$('#album').innerHTML = albumHtml;
-				                    B.$('#photoList').style.display='';
-				                    B.$('#noPhotoList').style.display='none';
-			                    }
-			                }catch(e){}
-			                addPhotoClick(B.$('#photoList'));
-		                }else{
-			                B.$('#photoList').style.display='none';
-			                B.$('#noPhotoList').style.display='';
-		                }
+                    var rText = data.split('\t');
+					if (rText[0] == 'success') {
+						var photos = B.parseJSON(rText[1]);
+						showPhotos(photos);
+					}else{
+						showPhotos();
+					}
                 }
             });
         });
     };
-    
-    
+
+	function activateAlbum() {
+		var selector = '#'+ imageSelector.id;
+		if (this.checked === true && B.$(selector + ' #B_picuploader_savetoalbum select').disabled === true) {
+			B.$(selector + ' #B_picuploader_savetoalbum select').disabled = false;
+			if (albumList == null) {
+				B.require('request', function(B){
+					B.ajax({
+						type:'GET',
+						url:defaultConfig.rspHtmlPath + '&job=listalbum&verify='+window.verifyhash,
+						cache:false,
+						success :function(data) {
+							var rText = data.split('\t');
+							if (rText[0] == 'success') {
+								albumList = B.parseJSON(rText[1]);
+							} else {
+								albumList = [];
+							}
+							showSaveAlbumList();
+						}
+					});
+				});
+			} else {
+				showSaveAlbumList();
+			}
+		}
+	}
+
+	function showSaveAlbumList() {
+		var o = B.$('#'+ imageSelector.id + ' #B_picuploader_savetoalbum select');
+		if (albumList.length > 0) {
+			o.options.length = 0;
+			var i = 0;
+			albumList.forEach(function(n){
+				o.options[i++] = new Option(n[1], n[0]);
+			});
+		}
+	}
+
+	function showAlbumList() {
+		B.query('.B_album_list').css('display', '');
+		var i = 0;
+		albumList.forEach(function(n){
+			B.$('#album_list').options[i++] = new Option(n[1], n[0]);
+		});
+	}
+
+	function showPhotos(photos) {
+		if (photos && B.isArray(photos) && photos.length > 0) {
+			var albumHtml = '';
+			photos.forEach(function(n){
+				albumHtml += '<li><span></span><label><img src="'+ n.thumbpath +'" width="56" height="56" /><input type="checkbox" value="' + n.path + '" /></label></li>';
+			});
+			B.$('#album').innerHTML = albumHtml;
+			B.$('#photoList').style.display='';
+			B.$('#noPhotoList').style.display='none';
+			addPhotoClick(B.$('#photoList'));
+		} else {
+			B.$('#photoList').style.display='none';
+			B.$('#noPhotoList').style.display='';
+		}
+	}
+
+	function loadImageList() {
+		if (isLoading) return;
+		B.require('request', function(B){
+			B.ajax({
+				type:'GET',
+				url:defaultConfig.rspHtmlPath + '&verify='+window.verifyhash,
+				cache:false,
+				success :function(data) {
+					isLoading = true;
+					var rText = data.split('\t');
+					if (rText[0] == 'success') {
+						albumList = B.parseJSON(rText[1]);
+						showAlbumList();
+						var photos = B.parseJSON(rText[2]);
+						showPhotos(photos);
+					} else {
+						albumList = [];
+						showPhotos();
+					}
+				}
+			});
+		});
+	}
+	/**
+	 * 初始化列表
+	 */
+	function initList(){
+	}
     /**
      * ImageInsert类
      */   
@@ -131,95 +240,65 @@ Breeze.namespace('app.insertImage', function(B) {
 		    return new InsertImage();
 	    }
         B.require('event',function(B) {//add event for ImageInsert
-            var selector = '#'+ imageSelector.id;
-            addPhotoClick(B.$(selector));
-            
-            //点击创建相册按钮时显示创建区域
-            B.addEvent(B.$(selector + ' #btn_createAlbum'),'click',function() {
-                B.$(selector + ' .vt').style.display = 'block';
-            });
-            //验证码框第一次取得焦点时显示验证码图片
-            B.addEvent(B.$('#gdcode'),'focus',function() {
-                var s = B.$('#ckcode');
-                if(s.style.display === 'none') {
-                    s.src = 'http://127.0.0.1/pwdev/ck.php?nowtime=' + new Date().getTime();
-                    s.style.display = '';
-                }
-            });
-            
-            //点击取消隐藏创建相册元素
-            B.addEvent(B.$('#cancel_cerate'),'click',function() {
-                B.$('#create_album_table').style.display = 'none';
-            });
-            
-            //点击创建按钮产生事件
-            B.addEvent(B.$('#btn_create'),'click',function() {
-                createAlbum();
-            });
-            //创建相册时的验证码更新
-            B.addEvent(B.$('#ckcode'),'click',function() {
-                this.src = 'http://127.0.0.1/pwdev/ck.php?nowtime=' + new Date().getTime();
-            });
-            
-            //相册切换时载入相片
-            B.addEvent(B.$('#album_list'),'change',function() {
-                getPhotosByAlbumId(this.value);
-            });
-            //最终点击插入图片按钮事件
-            B.$('#btn_insertImg').onclick = function() {
-                var t = B.$(selector + ' li.current').title;
-                switch(t)
-	            {
-		            case 'album':
-			            B.$$('#photoList li.current input').forEach(function(n) {
-			                insertTrigger('<img src="' + n.value + '" />');
-			            });
-			            break;
-		            case 'local':
-			            var form = B.$('#uploadPhoto');
-			            form.action = 'php/form.ashx?q=photos&a=pweditor&verify='+ parent.verifyhash + '&action=upload',
-			            B.require('util.ajaxForm',function(B) {
-			                B.util.ajaxForm(form,function(data) {
-			                    insertTrigger('<img src="' + data + '" />');
-			                });
-			            });
-			            break;
-		            case 'network':
-			            insertTrigger('<img src="' + B.$('#networkImg').value + '" />');
-			            break;
-		            default:
-	            }
-            };
-            
-            
+            var selector = '#'+ imageSelector.id,
+				cfgs = B.$$(selector + ' .B_tab_trigger');
+			B.addClass(cfgs[0], 'current');
+
+			if (B.$(selector + ' #tab_local')) {
+				B.addEvent(B.$(selector + ' #B_picuploader_savetoalbum input'), 'click', activateAlbum);
+				if (B.hasClass(B.$(selector + ' #tab_local'), 'current')) {
+					B.require('global.uploader', function(){
+						uploader.init('picuploader');
+					});
+				}
+			}
+			if (B.$(selector + ' #tab_network')) {
+				//最终点击插入图片按钮事件
+				B.$('#btn_insertImg').onclick = function() {
+					insertTrigger('<img src="' + B.$('#networkImg').value + '" />');
+				};
+			}
+			if (B.$(selector + ' #tab_album') && B.hasClass(B.$(selector + ' #tab_album'), 'current')) {
+				loadImageList();
+			}
+			if (B.$('#album_list')){
+				B.$('#album_list').onchange = function(){
+					getPhotosByAlbumId(this.value);
+				};
+				/**
+				 * 产生相册中图片延迟加载效果
+				 */
+				B.require('util.lazyload',function(B) {
+					B.util.lazyload('img',{
+						container: B.$('#photoList')
+					});
+				});
+			}
             /**
              * 产生tab效果
              */
-            B.require('util.scrollable',function(B) {
-                B.util.tabs("#"+imageSelector.id);
-            });
-            
-            /**
-             * 产生相册中图片延迟加载效果
-             */
-            B.require('util.lazyload',function(B) {
-                B.util.lazyload('img',{
-                    container:B.$('#photoList')
-                });
-            });
+			B.require('util.scrollable',function(B) {
+				B.util.tabs("#"+imageSelector.id);
+			});
             
             /**
              * 切换tab时触发
              */
-            B.$$(selector + ' .B_tab_trigger').forEach(function(n) {
-                B.addEvent(n,'click',function(e) {
-                    B.$$(selector + ' .B_tab_trigger').forEach(function(n) {
-                        B.removeClass(n,'current');
-                    });
-                    B.addClass(this,'current');
+			cfgs.forEach(function(n) {
+				B.addEvent(n, 'click', function(e) {
+					cfgs.forEach(function(n) {
+						B.removeClass(n,'current');
+					});
+					B.addClass(this, 'current');
+					if(this.id == 'tab_local'){
+						B.require('global.uploader', function(){uploader.init('picuploader');});
+					} else if (this.id == 'tab_album') {
+						loadImageList();
+					}
+					e.preventDefault();
                 });
             });
-            window.verifyhash = B.$('#verifyhash').value;//服务器输出的verifyhash,ajax需要(为兼容PW)
+            //window.verifyhash = B.$('#verifyhash').value;//服务器输出的verifyhash,ajax需要(为兼容PW)
             /**
              * 关闭面板事件
              */
@@ -230,16 +309,27 @@ Breeze.namespace('app.insertImage', function(B) {
                 });
             });
         });
-        
-        
 	}
 	/**
 	 * @description 图片选择器
 	 * @params {String} 要产生图片选择器的元素
 	 * @params {Function} 点击图片后产生的回调函数
 	 */
-	B.app.insertImage = function(elem,callback) {
+	B.app.insertImage = function(elem, callback, editor) {
 	    insertTrigger = callback;
-		imageSelector.load(elem);
+		if (B.$('#'+imageSelector.id)){
+			B.util.dialog({
+				id:imageSelector.id,
+				reuse: true,
+				callback:function(){
+					if (B.$('#' + imageSelector.id + ' #tab_local') && B.hasClass(B.$('#tab_local'), 'current')) {
+						uploader.init('picuploader');
+					}
+				},
+				pos: ['leftAlign', 'bottom']
+			}, elem);
+		} else {
+			imageSelector.load(elem, editor);
+		}
     }
 });

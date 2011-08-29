@@ -6,7 +6,19 @@ print <<<EOT
 <table cellspacing="1" cellpadding="0" width="$tablewidth" $i_table align="center">
 <tr><td><table cellspacing="0" cellpadding="8" width="100%"><tr><td bgcolor="#FFFFFF">
 <b><a href="$DIR">$db_bbsname</a> -&gt; <a href="{$DIR}f$fid.html">$forumname</a> -&gt; <a href="{$DIR}t$tid.html">$subject</a> <a style="cursor:pointer;color:#f80" onclick="window.print();">[打印本页]</a></b>
-</td><td bgcolor="#FFFFFF" align="right"><b><a href="login.php">登录</a> -&gt; <a href="$db_registerfile">注册</a> -&gt; <a href="post.php?action=reply&fid=$fid&tid=$tid">回复主题</a> -&gt; <a href="post.php?fid=$fid">发表主题</a></b></td></tr>
+</td><td bgcolor="#FFFFFF" align="right"><b>
+<!--
+EOT;
+if (!$winduid) {
+print <<<EOT
+-->
+<a href="login.php">登录</a> -&gt; <a href="$db_registerfile">注册</a> -&gt; 
+<!--
+EOT;
+}
+print <<<EOT
+-->
+<a href="post.php?action=reply&fid=$fid&tid=$tid">回复主题</a> -&gt; <a href="post.php?fid=$fid">发表主题</a></b></td></tr>
 </table></td></tr>
 </table>
 <p><center>$pages</center></p>

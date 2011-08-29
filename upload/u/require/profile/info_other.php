@@ -1,11 +1,17 @@
 <?php
 !function_exists('readover') && exit('Forbidden');
 if (!$_POST['step']){
+	$customFieldsString = getCustomFieldsAndDefaultValue('other');
+	
 	require_once uTemplate::PrintEot('info_other');
 	pwOutPut();
 }else if( $_POST['step'] == '2' ){
 	PostCheck();
-	S::slashes($userdb);
+	//update customerfield data
+	$customfieldService = L::loadClass('CustomerFieldService', 'user'); /* @var $customfieldService PW_CustomerFieldService */
+	$customfieldService->saveProfileCustomerData('other');
+	
+	/*S::slashes($userdb);
 	$upmembers = $upmemdata = $upmeminfo = array();
 	foreach ($customfield as $value) {
 		$fieldvalue = S::escapeChar($_POST[$value['field']]);
@@ -24,6 +30,6 @@ if (!$_POST['step']){
 	if ($upmeminfo) {
 		$userService->update($winduid, array(), array(), $upmeminfo);
 	}
-	unset($upmeminfo);
+	unset($upmeminfo);*/
 	refreshto("profile.php?action=modify&info_type=$info_type",'operate_success',2,true);
 }

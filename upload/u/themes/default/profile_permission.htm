@@ -105,12 +105,12 @@ EOT;
 EOT;
 if ($fid) {print<<<EOT
 -->
-					<div class="mb10"><span class="f14 mr20">版块权限：<a href="profile.php?action=permission&fid=$fid" class="s2">$per[name]</a></span>查看用户权限：<a href="profile.php?action=permission">{$gp_grouptitle}</a>
+					<div class="mb10"><span class="f14 mr20">版块权限：<a href="profile.php?action=permission&fid=$fid" class="s2">$per[name]</a></span>查看用户权限：<a href="profile.php?action=permission">{$gp_grouptitle}</a></div>
 <!--
 EOT;
 } else {print <<<EOT
 -->
-					<div class="mb10"><span class="mr20 f14">现使用的级别为：<span class="s2">{$gp_grouptitle}</span></span>
+					<div class="mb10"><span class="mr20 f14">现使用的权限为：<span class="s2">{$gp_grouptitle}</span></span>
 					<!--
 EOT;
 if($groupselect){print <<<EOT
@@ -124,8 +124,7 @@ if($groupselect){print <<<EOT
 <!--
 EOT;
 }print <<<EOT
--->
-</div>
+--></div>
 <!--
 EOT;
 }print <<<EOT
@@ -215,35 +214,55 @@ $add = '+';
 					<tr class="tr6">
 						<th width="80">会员列表</th>
 						<td>{$_P[$per[member]]}</td>
-						<th width="80">展区功能</th>
-						<td>{$_P[$per[show]]}</td>
-						<th width="80">报告功能</th>
+						<th width="80">举报功能</th>
 						<td>{$_P[$per[report]]}</td>
+                        <th width="80">头像上传</th>
+						<td>{$_P[$per[upload]]}</td>
 					</tr>
 					<tr class="tr6">
-						<th width="80">头像上传</th>
-						<td>{$_P[$per[upload]]}</td>
 						<th width="80">自定义头像</th>
 						<td>{$_P[$per[portait]]}</td>
-						<th width="80">荣誉头衔</th>
-						<td>{$_P[$per[honor]]}</td>
-					</tr>
-					<tr class="tr6">
-						<th width="80">统计排行</th>
+                        <th width="80">统计排行</th>
 						<td>{$_P[$per[sort]]}</td>
 						<th width="80">发消息</th>
 						<td>{$_P[$per[messege]]}</td>
-						<th width="80">消息上限</th>
-						<td>{$per[maxmsg]}</td>
 					</tr>
 					<tr class="tr6">
-						<th width="80">收藏夹容量</th>
+						<th width="80">消息上限</th>
+						<td>{$per[maxmsg]}</td>
+                        <th width="80">收藏夹容量</th>
 						<td>{$per[maxfavor]}</td>
 						<th width="80">草稿箱容量</th>
 						<td>{$per[maxgraft]}</td>
+					</tr>
+<!--
+EOT;
+if($per['signnum'] != 0){print <<<EOT
+-->
+					<tr class="tr6">
 						<th width="80">签名大小上限</th>
 						<td>{$per[signnum]} [字节]</td>
+                        <th width="80"></th>
+						<td></td>
+                        <th width="80"></th>
+						<td></td>
 					</tr>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+					 <tr class="tr6">
+						<th width="80">签名大小上限</th>
+						<td>无限制</td>
+                        <th width="80"></th>
+						<td></td>
+                        <th width="80"></th>
+						<td></td>
+					</tr>
+<!--
+EOT;
+}print <<<EOT
+-->                    
 				</table>
 				<div class="h5"><strong>版块权限</strong></div>
 				<table width="100%" class="mb10" style="table-layout:fixed; word-wrap:break-word;">
@@ -299,10 +318,6 @@ $add = '+';
 						<td>{$_P[$per[down]]}</td>
 					</tr>
 					<tr class="tr6">
-						<th width="80">附件大小上限</th>
-						<td colspan="5">$per[uploadmaxsize] [k]</td>
-					</tr>
-					<tr class="tr6">
 						<th width="80">附件允许后缀</th>
 						<td colspan="5">$per[uptype] [k]</td>
 					</tr>
@@ -312,7 +327,6 @@ EOT;
 }print <<<EOT
 -->
 			</div>
-		</div>
 	</div>
 </div>
 <!--

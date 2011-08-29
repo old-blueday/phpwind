@@ -3,15 +3,22 @@ require_once(uTemplate::printEot('header'));
 require_once(uTemplate::printEot('user_appleft'));
 print<<<EOT
 -->
+<script src="js/pw_weibo.js"></script>
 <script>
 var transmitAction = '{$USCR}';
 </script>
 <div class="homeBg cc">
 	<div class="homeCont fl">
+		<div class="userInfo_home">
 <!--
 EOT;
 require_once uTemplate::printEot('weibo_model');
 $o_weibopost != '0' && $weiboModelTemplate->post('filterweibo',$faceurl);
+print <<<EOT
+-->
+		</div>
+<!--
+EOT;
 if ($o_weibopost == '0') {
 print <<<EOT
 -->
@@ -144,6 +151,7 @@ EOT;
 }if($GLOBALS['db_sinaweibo_status']){print <<<EOT
 -->
                             <label class="mr20"><input name="filter[source][sinaweibo]" type="checkbox" value="1" checked />&nbsp;新浪微博</label>
+                     
 <!-- 
 EOT;
 }print <<<EOT
@@ -171,12 +179,15 @@ EOT;
 <!--
 EOT;
 if($o_ifcommend){
+$userService = L::loadClass('UserService', 'user');
+$userInfo = $userService->get(intval($o_sender_uid));
+$sendFace = showfacedesign($userInfo['icon'], true, 'm');
 if($o_commendtype == 1){
 print <<<EOT
 -->
 <dl class="dl cc">
     <dt class="dt">
-        <a href="u.php?uid={$o_sender_uid}" target="_blank" class="img_50"><img src="{$o_sender_face}" width="44" height="44" alt="{$o_sender_username}" /></a>
+        <a href="u.php?uid={$o_sender_uid}" target="_blank" class="img_50"><img src="{$sendFace[0]}" width="44" height="44" alt="{$o_sender_username}" /></a>
     </dt>
     <dd class="dd">
         <div class="title">
@@ -196,7 +207,7 @@ if($o_commendtype == 0){
 print <<<EOT
 --> 
 <dl class="dl cc">
-                    <dt class="dt"><a href="u.php?uid={$o_sender_uid}" target="_blank" class="img_50"><img src="{$o_sender_face}" width="44" height="44" alt="{$o_sender_username}" /></a></dt>
+                    <dt class="dt"><a href="u.php?uid={$o_sender_uid}" target="_blank" class="img_50"><img src="{$sendFace[0]}" width="44" height="44" alt="{$o_sender_username}" /></a></dt>
                     <dd class="dd">
                         <div class="title">
                             <span class="uname"><a href="u.php?uid={$o_sender_uid}" target="_blank">{$o_sender_username}</a>：</span>今天给大家推荐了这些达人！
@@ -261,7 +272,6 @@ EOT;
 $weiboModelTemplate->photoPop();
 print <<<EOT
 -->
-			<script src="js/pw_weibo.js"></script>
 			<div class="conFeed" id="weiboFeed">
 <!--
 EOT;
@@ -288,52 +298,83 @@ EOT;
 		</div>
 	</div>
 	<div class="homeSide fr">
-		<div class="infoBox">
-			<div class="mb20">
-				<p class="mb10"><span class="f16 lh_24 b s5 mr5">{$windid}</span></p>
+		<div class="infoBox mb10">
+				<p class="mb10"><span class="f16 lh_24 b s5 mr5">{$windid}</span>
+<!--
+EOT;
+if (getstatus($space['userstatus'], PW_USERSTATUS_AUTHMOBILE)) {print <<<EOT
+-->	 
+					<img src="u/images/attest/mobile.gif" align="absmiddle" title="已绑定手机" />
+<!--
+EOT;
+}if (getstatus($space['userstatus'], PW_USERSTATUS_AUTHALIPAY)) {print <<<EOT
+-->
+					<img src="u/images/attest/alipay.gif" align="absmiddle" title="已绑定支付宝" />
+<!--
+EOT;
+}if (getstatus($space['userstatus'], PW_USERSTATUS_AUTHCERTIFICATE)) {print <<<EOT
+-->
+					<img src="u/images/attest/docu.gif" align="absmiddle" title="证件认证" />
+<!--
+EOT;
+}
+print <<<EOT
+-->
+				</p>
 <!--
 EOT;
 if ($o_weibopost != '0') {print <<<EOT
 -->
-			<ul class="cc ulInfoA">
-				<li class="none"><a href="u.php?a=friend&type=attention"><em>$winddb[follows]</em>关注</a></li>
-				<li><a href="u.php?a=friend&type=attentioned"><em>$winddb[fans]</em>粉丝</a></li>
-				<li><a href="u.php?a=friend&type=my"><em>$winddb[f_num]</em>好友</a></li>
-			</ul>
+				<ul class="cc ulInfoA">
+					<li class="none"><a href="u.php?a=friend&type=attention"><em>$winddb[follows]</em>关注</a></li>
+					<li><a href="u.php?a=friend&type=attentioned"><em>$winddb[fans]</em>粉丝</a></li>
+					<li><a href="u.php?a=friend&type=my"><em>$winddb[f_num]</em>好友</a></li>
+				</ul>
 <!--
 EOT;
 }
 if($o_punchopen && $showPunch ){
 if($isPunch) {print <<<EOT
 -->
-			<span class="fr" style="padding:0 30px 0 0;"><button id="punch" type="button" onclick="punchJob();" class="card">每日打卡</button></span>
+			<span class="fr" style="padding:0 30px 0 0;"><button id="punch" type="button" onclick="punchJob({$reloadMoney});" class="card">每日打卡</button></span>
 <!--
 EOT;
 }else{
 print <<<EOT
 -->
-			<span class="fr" style="padding:0 30px 0 0;"><button type="button" class="card card_old" disabled>每日打卡</button></span>
+				<span class="fr" style="padding:0 30px 0 0;"><button type="button" class="card card_old" disabled>每日打卡</button></span>
 <!--
 EOT;
-}}print <<<EOT
+}}
+$moneyNum = $moneyNum ? $moneyNum : 0;
+print <<<EOT
 -->
-				<p class="mb5">级别：<a href="profile.php?action=permission&gid={$winddb[memberid]}" onmouseover="getObj('tips').style.display=''" onmouseout="getObj('tips').style.display='none'">{$ltitle[$winddb[memberid]]}</a></p>
-				<div id="tips" class="popTips" style="width:140px;display:none"><div class="fl"><div class="spaceTiptri"></div></div><div class="cc"><span class="fr">{$totalcredit}/{$last}</span>升级提示<div class="c"></div><div class="perCent"><div class="perValue" style="width:{$percent}%;"></div></div></div></div>
-				<p>{$db_moneyname}：<a href="userpay.php">$winddb[money]</a></p>
+				<div class="pr"><div id="floatMoney" style="width:110px;display:none;"></div></div>
+				<p class="mb5">{$moneyType}：<a href="userpay.php"><strong id="money">$moneyNum</strong></a></p>
+				<p>级别：<a href="profile.php?action=permission&gid={$winddb[memberid]}" onmouseover="getObj('tips').style.display=''" onmouseout="getObj('tips').style.display='none'">{$ltitle[$winddb[memberid]]}</a></p>
+				<div id="tips" class="popTips" style="display:none"><div class="fl"><div class="spaceTiptri"></div></div><div class="cc"><span class="fr">{$totalcredit}/{$last}</span>升级提示<div class="c"></div><div class="perCent"><div class="perValue" style="width:{$percent}%;"></div></div></div></div>
 			</div>
-<div>
 <!--
 EOT;
 if ($listmedals) {
+print <<<EOT
+-->
+		<div class="pd15 mb10">
+<!--
+EOT;
 foreach($listmedals as $value){
 print <<<EOT
 -->
 			$value
 <!--
 EOT;
-}}print <<<EOT
---></div>
+}print <<<EOT
+-->
 		</div>
+<!--
+EOT;
+}print <<<EOT
+-->
 <!-- 新浪app开通 -->
 <!--
 EOT;
@@ -367,11 +408,34 @@ EOT;
 print <<<EOT
 -->
 		<div class="pd15">
+			<h5 class="h5"><strong class="mr10">热门话题</strong></h5>
+			<ol class="mb20 hotList">
+<!--
+EOT;
+if($topicHot) {
+	foreach($topicHot as $topic){
+	$strTopicname = substrs($topic[topicname],20);
+print <<<EOT
+-->
+	<li><a href="apps.php?q=weibo&do=topics&topic={$topic[urlTopic]}" alt="{$topic[topicname]}" title="{$topic[topicname]}">$strTopicname</a><!--span class="gray">($topic[counts])</span--></li>
+<!--
+EOT;
+		$topicNum++;
+	}
+}
+print <<<EOT
+-->
+			</ol>
+			<div class="mb15">
+				<form method="GET" action="apps.php">
+				<input type="hidden" name="q" value="weibo" /><input type="hidden" name="do" value="topics" />
+				<input name="topic" id="search_topic" type="text" value="查找新鲜事" class="input gray mr5"/><span class="bt2"><span><button type="submit" onclick="return check_search_apps()">搜索</button></span></span></form>
+			</div>
 <!--
 EOT;
 if($myFriends && $o_weibopost == '0') {print <<<EOT
 -->
-		<h5 class="h5"><span class="fr"><a href="u.php?a=friend&type=my" class="s6">更多</a></span><strong class="mr10"><a class="s6" href="u.php?a=friend&type=my">我的好友</a></strong></h5>
+		<h5 class="h5"><span class="fr"><a href="u.php?a=friend&type=my" class="s7">更多</a></span><strong class="mr10"><a class="s6" href="u.php?a=friend&type=my">我的好友</a></strong></h5>
 		<div class="ulB">
 		<ul class="cc">
 <!--
@@ -398,8 +462,8 @@ $tmpTitle = $isApplyJob ? '可申请任务' : '我的任务';
 $tmpLink = 'jobcenter.php' . ($isApplyJob ? '?action=list' : '');
 print <<<EOT
 -->
-			<h5 class="h5"><span class="fr"><a href="$tmpLink" class="s6">更多</a></span><strong class="mr10"><a class="s6" href="$tmpLink">$tmpTitle</a></strong></h5>
-			<div class="ulD mb20">
+			<h5 class="h5"><span class="fr"><a href="$tmpLink" class="s7">更多</a></span><strong class="mr10"><a class="s6" href="$tmpLink">$tmpTitle</a></strong></h5>
+			<div class="ulD mb10">
 				<ul class="cc">
 			
 <!--
@@ -423,7 +487,7 @@ $link = $opLink = 'self.location=\'jobcenter.php?action=start&id='. $job['id'] .
 }
 print <<<EOT
 -->
-									<li id="applyJob_{$job[id]}">
+					<li id="applyJob_{$job[id]}">
 <!--
 EOT;
 if (!empty($job['reward'])) {
@@ -434,8 +498,7 @@ print <<<EOT
 EOT;
 }
 print <<<EOT
---><a href="javascript:;" onclick="$opLink" title="$job[title]">$job[title]</a>
-									</li>
+--><a href="javascript:;" onclick="$opLink" title="$job[title]">$job[title]</a></li>
 <!--
 EOT;
 }print <<<EOT
@@ -445,18 +508,45 @@ EOT;
 <!--
 EOT;
 }
-if(empty($space[visits])){
+print <<<EOT
+-->
+
+			<h5 class="h5 mb5"><span class="fr"><a href="profile.php?action=modify&info_type=tags" class="s7">管理</a></span><strong class="mr10">个人标签</strong></h5>
+			<div class="space_tags cc mb20">
+<!--
+EOT;
+if($memberTags) {
+	foreach ($memberTags as $tags) {
+		$urlencodeTagName = urlencode($tags['tagname']);
+print <<<EOT
+-->
+				<a href="u.php?a=friend&type=find&type=find&according=tags&step=2&f_keyword=$urlencodeTagName" class="{$tags[className]}" target="_blank">$tags[tagname]</a>
+<!--
+EOT;
+}} else {
+print <<<EOT
+-->
+				<div class="gray">贴上标签，展示个性，找到更多共同爱好的人！</div>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+			</div>
+<!--
+EOT;
+ if(empty($space[visits])){
 $space[visits]="0";
 }print <<<EOT
 -->              
-			<h5 class="h5 mb5"><span class="fr">累积访客($space[visits])</span><strong class="mr10">最近访客</strong></h5>
+			<h5 class="h5 mb5"><span class="fr gray">累积访客($space[visits])</span><strong class="mr10">最近访客</strong></h5>
 			<div class="ulB mb20 cc">
 <!--
 EOT;
 if (empty($latestVisits)) {
 print <<<EOT
 -->
-					<div class="p10">暂无访客，<a href="u.php?a=friend&type=find">加几个好友</a>吧！</div>
+					<div>暂无访客，<a href="u.php?a=friend&type=find">加几个好友</a>吧！</div>
 <!--
 EOT;
 } else {
@@ -465,10 +555,10 @@ if (is_array($visitor)) {
 $dateString = get_date($visitor['timestamp'], 'Y-m-d H:i');
 print <<<EOT
 -->
-					<li>
-									<a href="{$db_userurl}{$visitor[uid]}" class="i"><img src="{$visitor[icon]}" width="48" height="48" /></a>
-									<p class="n"><a href="{$db_userurl}{$visitor[uid]}">{$visitor[username]}</a></p>
-									<p class="t gray"><span title="$dateString">{$visitor[visittime]}</span></p>
+					<li style="margin:5px 18px 0 1px;">
+							<a href="{$db_userurl}{$visitor[uid]}" class="i"><img src="{$visitor[icon]}" width="48" height="48" /></a>
+							<p class="n"><a href="{$db_userurl}{$visitor[uid]}" alt="{$visitor[username]}" title="{$visitor[username]}">{$visitor[username]}</a></p>
+							<p class="t gray"><span title="$dateString">{$visitor[visittime]}</span></p>
 					</li>
 <!--
 EOT;
@@ -485,7 +575,7 @@ if ($recommendUsers) {print <<<EOT
 EOT;
 if (count($recommendUsers) >=3) {print <<<EOT
 -->
-			<span class="fr"><a href="u.php?a=friend&type=find" class="s6">更多</a></span>
+			<span class="fr"><a href="u.php?a=friend&type=find" class="s7">更多</a></span>
 <!--
 EOT;
 }print <<<EOT
@@ -517,7 +607,7 @@ EOT;
 EOT;
 }print <<<EOT
 -->
-									<a href="javascript:;" class="s7 follow" onclick="return Attention.add(this,'{$member['uid']}',1)">加关注</a>
+									<a href="javascript:;" class="follow" onclick="return Attention.add(this,'{$member['uid']}',1)">关注</a>
 							</dd>
 					</dl>
 <!--
@@ -525,21 +615,27 @@ EOT;
 }}print <<<EOT
 -->
 			</div>
-			<div class="tac" style="margin-bottom:40px;"><a href="u.php?a=friend&type=invite"><img src="u/images/invite.png" alt="邀请好友来加入" /></a></div>
+<!--
+EOT;
+}if ($rg_allowregister != '0') {
+print <<<EOT
+-->
+			<div class="tac mb20"><a href="u.php?a=friend&type=invite"><img src="u/images/invite.png" alt="邀请好友来加入" /></a></div>
 <!--
 EOT;
 }print <<<EOT
 -->
-			<h5 class="h5 mb5"><strong class="mr10">好友生日</strong>
+			<h5 class="h5 mb5">
 <!--
 EOT;
 if (count($birthdays) > 2) {print<<<EOT
 -->
-			<span class="fr"><a href="u.php?a=friend&type=birthday" class="s6">更多</a></span>
+			<span class="fr"><a href="u.php?a=friend&type=birthday" class="s7">更多</a></span>
 <!--
 EOT;
 }print <<<EOT
 -->  
+			<strong class="mr10">好友生日</strong>
 			</h5>
 			<div class="dlC mb10">
 <!--
@@ -568,7 +664,7 @@ print <<<EOT
 EOT;
 }}else {print <<<EOT
 -->
-		<div class="p10">最近没有好友过生日!</div>
+		<div class="gray">最近没有好友过生日!</div>
 <!--
 EOT;
 }print <<<EOT
@@ -583,6 +679,30 @@ var td_setMenu = {pz : 21}
 if(getObj('myFace')){
 	getObj('myFace').onmouseover = function() {displayElement('toModifyFace', true);}
 	getObj('myFace').onmouseout = function() {displayElement('toModifyFace', false);}
+}
+if(getObj('search_topic')){
+	//str = "查找新鲜事";
+	getObj('search_topic').onfocus = function() {
+		if(getObj('search_topic').value == '查找新鲜事') getObj('search_topic').value="";
+		nowClass = getObj('search_topic').className;
+		getObj('search_topic').className = nowClass.replace("gray","");
+	}
+	getObj('search_topic').onClick = function() {
+		if(getObj('search_topic').value == '查找新鲜事') getObj('search_topic').value="";
+		nowClass = getObj('search_topic').className;
+		getObj('search_topic').className = nowClass.replace("gray","");
+	}
+	getObj('search_topic').onblur = function() {
+		if(getObj('search_topic').value == ""){
+			getObj('search_topic').value='查找新鲜事';
+			nowClass = getObj('search_topic').className;
+			getObj('search_topic').className = nowClass+" gray";
+		}
+	}
+}
+function check_search_apps(){
+	//str = "查找新鲜事";
+	if(getObj('search_topic').value == '查找新鲜事')  getObj('search_topic').value="";
 }
 function applyJob(jobId) {
 	var url = 'jobcenter.php?action=apply&verify=' + verifyhash;
@@ -603,26 +723,82 @@ function gainJobAward(jobId) {
 	ajax.send(url, "&id="+jobId+"&step=2", function() {
 		var response = eval(ajax.request.responseText)[0];
 		if (response['flag']) {
-			showDialog("success",response['message']);
+			showDialog("success",response['message'],2);
 		} else {
 			showDialog("error",response['message']);
 		}
 	});	
 }
-function punchJob() {
+function punchJob(money) {
 	var url = 'jobcenter.php?action=punch&verify=' + verifyhash;;
 	var _this = this;
 	ajax.send(url, "&step=2", function() {
+		var moneys = ''+money;
+		var punchObj = getObj('punch');
 		var response = eval(ajax.request.responseText)[0];
 		if (response['flag']) {
-			getObj('punch').className = "card card_old";
-			getObj('punch').disabled = true;
-			showDialog("success",response['message'],2);
+			punchObj.className = "card card_old";
+			//punchObj.disabled = true;//解决ff缓存问题
+			punchObj.onclick = '';
+			floatMoney(response['message']);
+			getObj('money').innerHTML = ajax.runscript(moneys);
+		//	showDialog("success",response['message']);
 		} else {
 			showDialog("error",response['message'],2);
 		}
 	});	
 }
+//floatMoney('铜币：+5');
+function floatMoney(assign){
+	var x=window.x||{};
+	x.creat=function(t,b,c,d){
+		this.t=t;
+		this.b=b;
+		this.c=c;
+		this.d=d;
+		this.op=1;
+
+		this.div = getObj('floatMoney');
+		this.div.style.position="absolute";
+		this.div.style.left="0";
+		this.div.style.color="#ff5500";
+		this.div.style.display="block";
+		this.div.innerText = assign;
+		this.div.textContent = assign;
+		this.run();
+	}
+	x.creat.prototype={
+		run:function(){
+			var me=this;
+			this.div.style.top=-this.c*(this.t/this.d)*(this.t/this.d)+this.b+"px";
+			this.t++;
+			this.q=setTimeout(function(){me.run()},15)
+			if(this.t==this.d){
+				clearTimeout(me.q);
+				setTimeout(function(){me.alpha();},10);
+			}
+		},
+		alpha:function(){
+			var me=this;
+			if("\v"=="v"){
+				this.div.style.filter="alpha(opacity="+this.op*100+")";
+				this.div.style.opacity=this.op;
+			;}
+			else{
+				this.div.style.filter="alpha(opacity="+this.op+")";
+				this.div.style.opacity=this.op;
+			}
+			this.op-=0.01;
+			this.w=setTimeout(function(){me.alpha()},5)
+			if(this.op<=0){
+				clearTimeout(this.w);
+				try{ document.body.removeChild(me.div);}catch(e){}
+			}
+		}
+	}
+	new x.creat(1,0,25,40);
+}
+
 function noticeJobCondition(jobId, conditionNotice) {
 	var url = 'jobcenter.php?action=start&id='+jobId;
 	var _this = this;
@@ -686,6 +862,12 @@ function changeStatus(url,rid,className){
 	}else{
 		ajax.send(httpUrl,'',callback,'','',true);
 	}
+	if(className == 'ignoreOneTip'){
+		showDialog('confirm','你确定要忽略请求吗?',0,function(){
+			ajax.send(httpUrl,'',callback,'','',true);})
+	}else{
+		ajax.send(httpUrl,'',callback,'','',true);
+	}
 	
 }
 
@@ -706,8 +888,9 @@ function filterWeibo(obj,type){//切换新鲜事类别
 		lis[i].className = '';
 	}
 	obj.className = 'current';
-
+	window.setTimeout(function(){
 	getWeiboList('filterweibo', 1, 'weiboFeed', 1, type);	
+	},300);
 	getObj('feedAdmin').style.display = 'none';
 }
 </script>

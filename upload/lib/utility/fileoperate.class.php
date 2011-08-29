@@ -52,7 +52,7 @@ class PW_FileOperate{
 	function copyFile($source,$dest) {
 		if (@copy($source,$dest)) return true;
 		if (is_readable($source)) {
-			pwCache::setData($dest,readover($source));
+			writeover($dest,readover($source));
 			if (file_exists($dest)) return true;
 		}
 

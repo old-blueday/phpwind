@@ -1,4 +1,5 @@
 <?php
+!defined('P_W') && exit('Forbidden');
 
 class PW_SinaWeiboContentTranslator {
 	var $_allowedTypes = array('article', 'diary', 'group_article', 'group_active', 'photos', 'group_photos');

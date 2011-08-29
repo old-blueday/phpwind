@@ -71,9 +71,13 @@ class PW_Weibo {
 
 	function escapeStr($str) {
 		if (!$str = trim($str)) return '';
-		return preg_replace('/(&nbsp;){1,}/', ' ', $str);
+		$tmp = preg_replace('/(&nbsp;){1,}/', ' ', $str);
+		return preg_replace_callback('/#([^#]+)#/', array(&$this,'_callbackTrimTopicStr'), $tmp);
 	}
 
+	function _callbackTrimTopicStr($matches){
+		return '#'.trim($matches[1]).'#';
+	}
 	/**
 	 * 发送新鲜事
 	 * @param int $uid 发送者
@@ -115,6 +119,9 @@ class PW_Weibo {
 		if ($extra['cyid']) {
 			$this->_addCnRelation($extra['cyid'], $mid);
 		}
+		if ($extra['topics']) {
+			$this->addTopics($extra['topics'],$mid);
+		}
 		$userCache = L::loadClass('Usercache', 'user');
 		$userCache->delete($uid, 'weibo');
 
@@ -142,7 +149,31 @@ class PW_Weibo {
 		if ($refer = $this->_analyseRefer($uid, $content)) {
 			$array['refer'] = $refer;
 		}
+		if ($topics = $this->_analyseTopics($content)) {
+			$array['topics'] = $topics;
+		}
 		return $array;
+	}
+
+	/**
+	 * 分析新鲜事内容中的#话题#
+	 * @param string $content 新鲜事内容
+	 * @return array $topics
+	 */
+	function _analyseTopics($content) {
+		$topics = array();
+		preg_match_all('/#([^#]+)#/U',$content,$matches) && $topics = $matches[1];
+		foreach ($topics as $k=>$v) {
+			$v = trim($v);
+			//话题内不允许含链接
+			if(preg_match("/(https?|ftp|gopher|news|telnet|mms|rtsp):\/\/[a-z0-9\/\-_+=.~!%@?%&;:$\\│\|]+(#.+)?/ie", $v)) continue;
+			if(!isset($v)) {
+				unset($topics[$k]);
+				continue;
+			}
+			$topics[$k] = $v;
+		}
+		return $topics;
 	}
 	
 	/**
@@ -229,6 +260,25 @@ class PW_Weibo {
 		return $affect;
 	}
 	
+	/**
+	 * 添加话题
+	 * @param array $topics 新鲜事中包含的话题
+	 * @param int mid 新鲜事id
+	 * @return int
+	 * @access public
+	 */
+	function addTopics($topics, $mid) {
+		if (!$topics || !is_array($topics) || !$mid) {
+			return false;
+		}
+		$topicService = L::LoadClass('topic','sns'); /* @var $topicService PW_Topic */
+		$array = $topicService->addTopic($topics);
+		if ($array) {
+			//添加topic 与weibo 关系
+			foreach ($array as $v)
+				$topicService->addTopicRelations($v,$mid);
+		}
+	}
 	function _addCnRelation($cyid,$mid){
 		if(!$this->_isLegalId($cyid) || !$this->_isLegalId($mid)){
 			return 0;
@@ -422,6 +472,60 @@ class PW_Weibo {
 		}
 		return $array;
 	}
+	
+	/**
+	 * 取得n天内的新鲜事热门转发
+	 * @param int $topicId
+	 * @return 
+	 */
+	function getHotTransmit($num){
+		$num = $num ? intval($num) : 20; 
+		if(!$num) return array();
+		extract (pwCache::getData(D_P.'data/bbscache/o_config.php',false));
+		$time = $this->_timestamp - ($o_weibo_hottransmitdays ? intval($o_weibo_hottransmitdays) * 86400 : 86400);
+		$contentDao = L::loadDB('weibo_content','sns');
+		$objectId = $contentDao -> getHotTransmit($num,$time);
+		if(!$objectId) return array();
+		$contentData = $contentDao -> getWeibosByMid($objectId);
+		if(!$contentData) return array();
+		$data = array();
+		foreach($objectId as $key => $v){
+			if(!$contentData[$v]){
+				unset($key);
+				continue; 
+			}
+			$data[] = $contentData[$v];
+		}
+		return $this->buildData($data,'uid');
+	}
+	
+	/**
+	 * 取得n天内的新鲜事热门评论
+	 * @param int $topicId
+	 * @return 
+	 */
+	function getHotComment($num){
+		$num = $num ? intval($num) : 20; 
+		if(!$num) return array();
+		extract (pwCache::getData(D_P.'data/bbscache/o_config.php',false));
+		$time = $this->_timestamp - ($o_weibo_hotcommentdays ? intval($o_weibo_hotcommentdays) * 86400 : 86400);
+		$contentDao = L::loadClass('comment','sns');
+		$objectIds = $contentDao -> getHotComment($num,$time);
+		if(!$objectIds) return array();
+		$contentDao = L::loadDB('weibo_content','sns');
+		$commentData = $contentDao -> getWeibosByMid($objectIds);
+		if(!$commentData) return array();
+		$data = array();
+		foreach($objectIds as $key => $v){
+			if(!$commentData[$v]){
+				unset($key);
+				continue; 
+			}
+			$data[] = $commentData[$v];
+		}
+		return $this->buildData($data,'uid');
+	}
+	
 	/**
 	 * 取得用户的新鲜事列表
 	 * @param int $uid 用户ID
@@ -454,7 +558,7 @@ class PW_Weibo {
 		if (($sqlArr = $this->_filterSql($uid, $filter)) === false) {
 			return 0;
 		}
-		$contentDao = L::loadDB('weibo_content','sns');
+		$contentDao = L::loadDB('weibo_content','sns');/* @var $contentDao PW_Weibo_ContentDB */
 		return $contentDao->getUserAttentionWeibosCount($uid, $sqlArr);
 	}
 	
@@ -622,6 +726,7 @@ class PW_Weibo {
 	 * return string
 	 */
 	function parseContent($content, &$extra) {
+		global $topic;
 		$this->_hasVideo = array();
 		$content = $this->_parseLink($content);
 		if ($this->_hasVideo) {
@@ -631,10 +736,30 @@ class PW_Weibo {
 			$uArray  = array_flip($extra['refer']);
 			$content = preg_replace('/@([^\\&\'"\/\*,<>\r\t\n\s#%?@:：]+)(?=\s?)/ie', "\$this->_parseRefer('\\1', \$uArray)", $content);
 		}
+		if ($extra['topics']) {
+			$content = pwHtmlspecialchars_decode($content,false);
+			if(preg_match('/^#\s+#$/', $content)) return $content;
+			$content = preg_replace_callback('/#([^#]+)#/U',array(&$this,'_callback_add_topic_url'),$content);
+		}
 		if (strpos($content,'[s:') !== false && strpos($content,']') !== false) {
 			$content = $this->_parseSmile($content);
 		}
+		
+		if ($topic && !$extra['topics']) {
+			$content = strip_tags($content);
+			$content = preg_replace('/' . preg_quote($topic,'/') . '/i', "<span class='s2'>$topic</span>", $content);
+		}
 		return $content;
+	}
+	
+	function _callback_add_topic_url($matches){
+		//global $topic;
+		//if ($topic) $matches[0] = preg_replace('~' . preg_quote($topic) . '~i', "<span class='s2'>$topic</span>", $matches[0]);
+		$pattern = "/(https?|ftp|gopher|news|telnet|mms|rtsp):\/\/[a-z0-9\/\-_+=.~!%@?%&;:$\\│\|]+(#.+)?/ie";
+		if (preg_match($pattern, $matches[1])){
+			return $matches[0];
+		}
+		return '<a href="apps.php?q=weibo&do=topics&topic=' . urlencode(strip_tags($matches[1],'<span>')) . '">' . strip_tags($matches[0],'<span>') . '</a>';
 	}
 	
 	/**
@@ -647,7 +772,8 @@ class PW_Weibo {
 		if (strpos($content,'[/URL]') !== false || strpos($content,'[/url]') !== false) {
 			$content = preg_replace("/\[url=([^\[]+?)\](.*?)\[\/url\]/is","<a href=\"\\1\" target=\"_blank\">\\2</a>", $content);
 		}
-		return preg_replace("/(?<!\shref=['\"])((https?|ftp|gopher|news|telnet|mms|rtsp):\/\/[a-z0-9\/\-_+=.~!%@?#%&;:$\\│\|]+)/ie", "\$this->_parseLinkContent('\\1')", $content);
+		//return preg_replace("/(?<!\shref=['\"])((https?|ftp|gopher|news|telnet|mms|rtsp):\/\/[a-z0-9\/\-_+=.~!%@?#%&;:$\\│\|]+)/ie", "\$this->_parseLinkContent('\\1')", $content);
+		return preg_replace("/(?<!\shref=['\"])((https?|ftp|gopher|news|telnet|mms|rtsp):\/\/[a-z0-9\/\-_+=.~!%@?%&;:$\\│\|]+(#.+)?)/ie", "\$this->_parseLinkContent('\\1')", $content);
 	}
 	
 	/**
@@ -857,9 +983,18 @@ class PW_Weibo {
 		$relationsDao->delRelationsByMid($mids);
 		$referstDao->deleteRefersByMid($mids);	
 		$cnrelationsDao->deleteCnrelationsByMid($mids);
+		$topicDao = L::loadDB('topic','sns');
 		//删除微博对应的评论
 		$commentService = L::loadClass("comment","sns"); /* @var $commentService PW_Comment */
 		$commentService->unionDeleteCommentsByMid($mids);
+		//删除与话题 的对应关系
+		$topicRelationsDao = L::loadDB('weibo_topicrelations','sns');
+		foreach ($mids as $mid) {
+			$topicIds = $topicRelationsDao->getTopicIdsByMid($mid);
+			if(!$topicIds) continue;
+			$topicRelationsDao->deleteRelationByMid($mid);
+			$topicDao->decreaseTopicNum($topicIds);
+		}
 		return true;
 	}
 	
@@ -974,7 +1109,7 @@ class PW_Weibo {
 	function getType($type) {
 		return isset($this->_mapflip[$type]) ? $this->_mapflip[$type] : 'weibo';
 	}
-	
+
 	function adminSearch($usernames,$contents,$startDate,$endDate,$type = 0 ,$orderby = 'desc',$page = 1,$perpage = 20){
 		if($usernames){
 			$usernames = is_array($usernames) ? $usernames : array($usernames);

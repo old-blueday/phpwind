@@ -7,13 +7,16 @@ class messageAtt extends uploadBehavior {
 	
 	var $db;
 	var $mid;
+	var $rid;
 	var $attachs;
 	var $replacedb = array();
+	var $fieldDatas = array();
 
-	function messageAtt($mid) {
+	function messageAtt($mid,$rid=0) {
 		global $db,$db_ifathumb,$db_athumbsize,$db_uploadfiletype,$winduid;
 		parent::uploadBehavior();
 		$this->mid = intval($mid);
+		$this->rid = intval($rid);
 		$this->uid = $winduid;
 		$this->db =& $db;
 		$this->ifthumb =& $db_ifathumb;
@@ -21,7 +24,7 @@ class messageAtt extends uploadBehavior {
 		$this->ftype = !is_array($db_uploadfiletype) ? unserialize($db_uploadfiletype) : $db_uploadfiletype;
 	}
 
-	function check($uploadnum) {
+	function check() {
 		global $db_allowupload,$_G,$winddb;
 		if (!$db_allowupload) {
 			Showmsg('upload_close');
@@ -33,84 +36,50 @@ class messageAtt extends uploadBehavior {
 			$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
 			$userService->update($this->uid, array(), array('uploadnum' => 0));
 		}
-		if (($winddb['uploadnum'] + $uploadnum ) >= $_G['allownum']) {
+		if (($winddb['uploadnum'] + count($_FILES) + count($this->flashatt)) >= $_G['allownum']) {
 			Showmsg('upload_num_error');
 		}
 	}
 	
-	function transfer($flashatt) {
-		global $attachdir,$db_enhideset,$db_sellset,$db_ifpwcache;
-		if (!$flashatt) {
+	function transfer() {
+		if (empty($this->flashatt)) {
 			return false;
 		}
-		$this->check(count($flashatt));
-		$flattids = array_keys($flashatt);
+		global $db_enhideset,$db_sellset,$db_ifpwcache,$timestamp;
+		require_once(R_P . 'require/functions.php');
 		$pw_attachs = L::loadDB('attachs', 'forum');
-		$attach = $pw_attachs->gets(array('tid'=>0, 'pid'=>0, 'uid'=>$this->uid,'aid'=>$flattids));
+		$saveAttach = $this->getSaveAttach($this->uid);
+		$deltmp = array();
+		$attach = $pw_attachs->gets(array('tid' => 0, 'pid' => 0, 'uid' => $this->uid, 'did' => 0, 'mid' => 0));
 		foreach ($attach as $rt) {
-			$value = $flashatt[$rt['aid']];
-			$rt['ifthumb'] = 0;
+			if (!isset($this->flashatt[$rt['aid']])) {
+				pwDelatt($rt['attachurl'], $this->ifftp);
+				$deltmp[] = $rt['aid'];
+				continue;
+			}
+			$saveAttach && $saveAttach->add($rt);
+			$value = $this->flashatt[$rt['aid']];
 			$rt['descrip'] = $value['desc'];
-			$rt['ext'] = strtolower(substr(strrchr($rt['name'],'.'),1));
-			$srcfile = "$attachdir/mutiupload/$rt[attachurl]";
-			$rt['fileuploadurl'] = $filename = $thumbname = preg_replace('/^0_/', "{$this->cid}_", $rt['attachurl']);
-			//$thumbdir = 'thumb/';
-			if ($savedir = $this->getSaveDir($rt['ext'])) {
-				$rt['fileuploadurl'] = $savedir . $filename;
-				//$thumbdir .= $savedir;
-			}
-			$source   = PwUpload::savePath(0, $filename, $savedir);
-			//$thumburl = PwUpload::savePath($this->ifftp, $thumbname, $thumbdir, 'thumb_');
-			/*
-			if (in_array($rt['ext'], array('gif','jpg','jpeg','png','bmp'))) {
-				require_once(R_P.'require/imgfunc.php');
-				if (!$img_size = GetImgSize($srcfile, $rt['ext'])) {
-					Showmsg('upload_content_error');
-				}
-				if ($this->allowThumb()) {
-					$thumbsize = PwUpload::makeThumb($srcfile, $thumburl, $this->getThumbSize(), $rt['ifthumb']);
-				}
-				if ($this->allowWaterMark()) {
-					PwUpload::waterMark($srcfile, $rt['ext'], $img_size);
-					$rt['ifthumb'] && PwUpload::waterMark($thumburl, $rt['ext']);
-				}
-			}
-			*/
-			if ($this->ifftp) {
-				if (!PwUpload::movetoftp($srcfile, $rt['fileuploadurl'])) continue;
-				//$rt['ifthumb'] && PwUpload::movetoftp($thumburl, "thumb/$rt[fileuploadurl]");
-			} else {
-				if (!PwUpload::movefile($srcfile, $source)) continue;
-			}
-			$this->db->update("INSERT INTO pw_attachs SET " . S::sqlSingle(array(
-				'uid'		=> $this->uid,
-				'mid'       => '1',
-				'hits'		=> 0,							'name'		=> $rt['name'],
-				'type'		=> $rt['type'],					'size'		=> $rt['size'],
-				'attachurl'	=> $rt['fileuploadurl'],
-				'uploadtime'=> $timestamp,					'descrip'	=> $rt['descrip'],
-				'ifthumb'	=> $rt['ifthumb']
-			)));
-			$aid = $this->db->insert_id();
 
-			$this->attachs[$aid] = array(
-				'aid'       => $aid,
+			$pw_attachs->updateById($rt['aid'], array(
+				'mid'       => '1',
+				'descrip'	=> $rt['descrip']
+			));
+			$this->attachs[$rt['aid']] = array(
+				'aid'       => $rt['aid'],
 				'name'      => $rt['name'],
 				'type'      => $rt['type'],
-				'attachurl' => $rt['fileuploadurl'],
+				'attachurl' => $rt['attachurl'],
 				'size'      => $rt['size'],
 				'hits'      => $rt['hits'],
 				'desc'		=> str_replace('\\','', $rt['descrip']),
 				'ifthumb'	=> $rt['ifthumb']
 			);
-			$fieldDatas[] = array('uid'=>$this->uid,'aid'=>$aid,'mid'=>$this->mid,'status'=>1);
+			$this->fieldDatas[] = array('uid' => $this->uid, 'aid' => $rt['aid'], 'mid' => $this->mid, 'rid' => $this->rid, 'status' => 1);
 		}
-		$messageService = L::loadClass("message", 'message');
-		if($fieldDatas){
-			$messageService->sendAttachs($fieldDatas);
-			$this->updateUploadnum(count($fieldDatas),$this->uid);
-		}
-		$pw_attachs->delete($flattids);
+		$saveAttach && $saveAttach->execute();
+		$deltmp && $pw_attachs->delete($deltmp);
+		return true;
 	}
 
 	function allowType($key) {
@@ -155,12 +124,12 @@ class messageAtt extends uploadBehavior {
 
 	function allowWaterMark() {
 		return true;
-		//return $this->forum->forumset['watermark'];
 	}
 
 	function update($uploaddb) {
 		global $timestamp;
-		$this->check(count($_FILES));
+		$this->check();
+		$this->transfer();
 		foreach ($uploaddb as $value) {
 			$value['name'] = addslashes($value['name']);
 			$value['descrip'] = S::escapeChar(S::getGP('atc_desc'.$value['id'], 'P'));
@@ -175,13 +144,14 @@ class messageAtt extends uploadBehavior {
 			)));
 			$aid = $this->db->insert_id();
 			$this->attachs[$aid] = $value;
-			$fieldDatas[] = array('uid'=>$this->uid,'aid'=>$aid,'mid'=>$this->mid,'status'=>1);
+			$this->fieldDatas[] = array('uid'=>$this->uid,'aid'=>$aid,'mid'=>$this->mid,'rid'=>$this->rid,'status'=>1);
 		}
 		$messageService = L::loadClass("message", 'message');
-		if($fieldDatas){
-			$messageService->sendAttachs($fieldDatas);
-			$this->updateUploadnum(count($fieldDatas),$this->uid);
+		if ($this->fieldDatas) {
+			$messageService->sendAttachs($this->fieldDatas);
+			$this->updateUploadnum(count($this->fieldDatas),$this->uid);
 		}
+		return true;
 	}
 	
 	function updateUploadnum($num,$uid){
@@ -197,6 +167,92 @@ class messageAtt extends uploadBehavior {
 
 	function getAttNum() {
 		return count($this->attachs);
+	}
+}
+
+class messageMutiUpload extends uploadBehavior {
+	
+	var $db;
+	var $attachs;
+
+	function messageMutiUpload($uid) {
+		global $db,$db_uploadfiletype;
+		parent::uploadBehavior();
+		$this->uid = $uid;
+		$this->db =& $db;
+		$this->ftype = !is_array($db_uploadfiletype) ? unserialize($db_uploadfiletype) : $db_uploadfiletype;
+	}
+
+	function check() {
+		global $db_allowupload,$_G,$winddb;
+		if (!$db_allowupload) {
+			return 'upload_close';
+		}
+		if ($_G['allowupload'] == 0) {
+			return 'upload_group_right';
+		}
+		return true;
+	}
+
+	function allowType($key) {
+		return true;
+	}
+
+	function getFilePath($currUpload) {
+		global $timestamp;
+		$prename  = substr(md5($timestamp . $currUpload['id'] . randstr(8)),10,15);
+		$filename = $this->cid . "_{$this->uid}_$prename." . preg_replace('/(php|asp|jsp|cgi|fcgi|exe|pl|phtml|dll|asa|com|scr|inf)/i', "scp_\\1", $currUpload['ext']);
+		$savedir = $this->getSaveDir($currUpload['ext']);
+		return array($filename, $savedir);
+	}
+
+	function getSaveDir($ext) {
+		global $db_attachdir;
+		$savedir = 'message/';
+		if ($db_attachdir) {
+			if ($db_attachdir == 2) {
+				$savedir .= "Type_$ext/";
+			} elseif ($db_attachdir == 3) {
+				$savedir .= 'Mon_'.date('ym').'/';
+			} elseif ($db_attachdir == 4) {
+				$savedir .= 'Day_'.date('ymd').'/';
+			} else {
+				$savedir .= "Cid_{$this->cid}/";
+			}
+		}
+		return $savedir;
+	}
+
+	function allowThumb() {
+		return false;
+	}
+
+	function allowWaterMark() {
+		return true;
+	}
+
+	function update($uploaddb) {
+		global $timestamp;
+		foreach ($uploaddb as $value) {
+			$value['name'] = pwConvert($value['name'], $db_charset, 'utf-8');
+			$this->db->update("INSERT INTO pw_attachs SET " . S::sqlSingle(array(
+				'uid'		=> $this->uid,
+				'hits'		=> 0,							'name'		=> $value['name'],
+				'type'		=> $value['type'],				'size'		=> $value['size'],
+				'attachurl'	=> $value['fileuploadurl'],
+				'uploadtime'=> $timestamp,					'ifthumb'	=> $value['ifthumb']
+			)));
+			$aid = $this->db->insert_id();
+			$value['aid'] = $aid;
+			$this->attachs[$aid] = $value;
+		}
+		return true;
+	}
+	
+	function getAttachInfo() {
+		$array = current($this->attachs);
+		list($path) = geturl($array['fileuploadurl'], 'lf', $array['ifthumb']);
+		return array('aid' => $array['aid'], 'path' => $path);
 	}
 }
 ?>

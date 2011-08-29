@@ -224,7 +224,7 @@ app_bottom.prototype = {
 						}}catch(e){}
 					} else {
 						var li = elementBind('li');
-						li.innerHTML = '<a href="message.php" target="_blank">您没有末读消息</a>';
+						li.innerHTML = '<a href="message.php" target="_blank">您没有未读消息</a>';
 						ul.appendChild(li);
 					}
 					div.appendChild(ul);
@@ -295,7 +295,7 @@ app_bottom.prototype = {
 						}}catch(e){}
 					} else {
 						var li = elementBind('li');
-						li.innerHTML = '<div>没有好友在线上 / <a href="u.php?a=friend">查看所有好友</a></div>';
+						li.innerHTML = '<div>没有好友在线上 / <a href="u.php?a=friend&type=my">查看所有好友</a></div>';
 						ul.appendChild(li);
 					}
 					handle.friendTemp = list;

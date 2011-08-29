@@ -17,15 +17,17 @@ $adds = 0;
 
 //MAIN
 $view = 20;
-$vieworder = array('area' => '1', 'bbs' => '2' ,'cms' => '3');
+$vieworder = array('area' => '1', 'bbs' => '2' ,'cms' => '5');
 foreach ($db_modes as $key => $value) {
 	$pos = array();
+	$value['ifopen'] = 1;
 	if (isset($db_modedomain[$key]) && $db_modedomain[$key]) {
 		$link = 'http://' . $db_modedomain[$key];
 	} elseif ('o' == $key) {
 		$pos = array('o');
 		$link = 'u.php';
-		$vieworder[$key] = 1;
+		$vieworder[$key] = 8;
+		$value['ifopen'] = 0;
 	} elseif ('cms' == $key) {
 		$value['title'] = '资讯';
 		$link = 'index.php?m=' . $key;
@@ -53,9 +55,10 @@ $adds += (bool)$navConfigService->add(PW_NAV_TYPE_MAIN, array('nkey' => 'area_ba
 $adds += (bool)$navConfigService->add(PW_NAV_TYPE_MAIN, array('nkey' => 'area_delicious', 'pos' => '-1', 'title' => '美食', 'style' => '', 'link' => 'html/channel/delicious', 'alt' => '', 'target' => 0, 'view' => 12, 'upid' => 2, 'isshow' => 1));
 $adds += (bool)$navConfigService->add(PW_NAV_TYPE_MAIN, array('nkey' => 'area_auto', 'pos' => '-1', 'title' => '汽车', 'style' => '', 'link' => 'html/channel/auto', 'alt' => '', 'target' => 0, 'view' => 13, 'upid' => 2, 'isshow' => 1));
 $adds += (bool)$navConfigService->add(PW_NAV_TYPE_MAIN, array('nkey' => 'area_decoration', 'pos' => '-1', 'title' => '家装', 'style' => '', 'link' => 'html/channel/decoration', 'alt' => '', 'target' => 0, 'view' => 14, 'upid' => 2, 'isshow' => 1));
+$adds += (bool)$navConfigService->add(PW_NAV_TYPE_MAIN, array('nkey' => 'area_tucool', 'pos' => array('bbs,area,cms,o,srch,group'), 'title' => '图酷', 'style' => '', 'link' => 'html/channel/tucool', 'alt' => '', 'target' => 0, 'view' => 4, 'upid' => 0, 'isshow' => 1));
 
-$adds += (bool)$navConfigService->add(PW_NAV_TYPE_MAIN, array('nkey' => 'group', 'pos' => array('bbs,area,cms,srch,group'), 'title' => '群组', 'style' => '', 'link' => 'group.php', 'alt' => '', 'target' => 0, 'view' => 4, 'upid' => 0, 'isshow' => 1));
-$adds += (bool)$navConfigService->add(PW_NAV_TYPE_MAIN, array('nkey' => '', 'pos' => array('bbs,area,cms,srch,group'), 'title' => '广场', 'style' => '', 'link' => 'index.php?m=o', 'alt' => '', 'target' => 0, 'view' => 5, 'upid' => 0, 'isshow' => 1));
+$adds += (bool)$navConfigService->add(PW_NAV_TYPE_MAIN, array('nkey' => 'group', 'pos' => array('bbs,area,cms,srch,group'), 'title' => '群组', 'style' => '', 'link' => 'group.php', 'alt' => '', 'target' => 0, 'view' => 6, 'upid' => 0, 'isshow' => 1));
+$adds += (bool)$navConfigService->add(PW_NAV_TYPE_MAIN, array('nkey' => '', 'pos' => array('bbs,area,cms,srch,group'), 'title' => '广场', 'style' => '', 'link' => 'index.php?m=o', 'alt' => '', 'target' => 0, 'view' => 7, 'upid' => 0, 'isshow' => 1));
 
 //$view = 3;
 //include D_P.'data/bbscache/area_config.php';
@@ -74,7 +77,7 @@ $adds += (bool)$navConfigService->add(PW_NAV_TYPE_MAIN, array('nkey' => '', 'pos
 //FOOT
 $db->update("DELETE FROM pw_nav WHERE type='foot' AND link IN (".pwImplode(array($db_ceoconnect, 'simple/', 'm/index.php')).")");
 $defaults = array(
-	array('pos' => '-1', 'title' => '联系我们', 'link' => 'sendemail.php?username=admin', 'view'=>1, 'target' => 0, 'isshow' => 1),
+	array('pos' => '-1', 'title' => '联系我们', 'link' => 'sendemail.php', 'view'=>1, 'target' => 0, 'isshow' => 1),
 	array('pos' => '-1', 'title' => '无图版', 'link' => 'simple/', 'view'=>2, 'target' => 0, 'isshow' => 1),
 	array('pos' => '-1', 'title' => '手机浏览', 'link' => 'm/index.php', 'view'=>3, 'target' => 0, 'isshow' => 1),
 );
@@ -121,7 +124,7 @@ foreach ($db_hackdb as $value) {
 
 $view = 1;
 //include R_P . 'lang/wind/cp_lang_all.php';
-$bbsNavConfig = "社区应用,app,,root\n"
+$bbsNavConfig = "会员应用,app,,root\n"
 	. "最新帖子,lastpost,searcher.php?sch_time=newatc,root\n"
 	. "精华区,digest,searcher.php?digest=1,root\n"
 	. "社区服务,hack,,root\n"
@@ -130,7 +133,7 @@ $bbsNavConfig = "社区应用,app,,root\n"
 	. "基本信息,sort_basic,sort.php,sort\n"
 	. "到访IP统计,sort_ipstate,sort.php?action=ipstate,sort\n"
 	. "管理团队,sort_team,sort.php?action=team,sort\n"
-	. "管理操作,sort_admin,sort.php?action=admin,sort\n"
+	. "管理统计,sort_admin,sort.php?action=admin,sort\n"
 	. "在线会员,sort_online,sort.php?action=online,sort\n"
 	. "会员排行,sort_member,sort.php?action=member,sort\n"
 	. "版块排行,sort_forum,sort.php?action=forum,sort\n"

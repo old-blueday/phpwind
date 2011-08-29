@@ -31,8 +31,9 @@ class PW_UserCache {
 			'colony',
 			//'share',
 			'messageboard',
-			'recommendUsers',
-			'friendsBirthday'
+			'recommendUsers',//回复帖子
+			'friendsBirthday',
+			'tags'
 		);
 	}
 	

@@ -5,6 +5,7 @@ $lang['refreshto'] = array(
 	'operate_success'		=> '操作完成',
 	'have_login'			=> '您已经顺利登录{$GLOBALS[showmsginfo]}',
 	'login_out'				=> '状态：您已经顺利退出网站{$GLOBALS[showmsginfo]}',
+	'after_delete'			=> '<a href=thread.php?fid={$GLOBALS[fid]}>[ 删除成功点击进入主题列表 ]</a>',
 	'enter_thread'			=> '<a href=thread.php?fid={$GLOBALS[fid]}>[ 发帖完毕点击进入主题列表 ]</a>',
 	'enter_words'			=> '你发布的内容包含敏感词“<font color=\'red\'>{$GLOBALS[banword]}</font>”，相关内容将被替换!',
 	'reg_success'			=> '恭喜您,完成注册现在可以开始使用您的会员权利了',
@@ -98,5 +99,6 @@ $lang['refreshto'] = array(
 	'act_refund_cost_error'		=> '退款金额大于最大可退数',
 	'act_alipay_sign_failure'	=> '数字签名认证失败',
 	'act_undefined_operate'		=> '非法操作',
+	'mode_o_photos_private_3'   => '该相册已加密，请输入正确密码.',
 );
 ?>

@@ -73,7 +73,7 @@ $gdSize = explode("\t",$db_gdsize);
 print <<<EOT
 -->
                                     <tr class="user-table">
-                                        <td>认证码</td>
+                                        <td>验证码</td>
                                         <td class="tal">
                                             <input class="input" onfocus="showgd();" type="text" name="gdcode" size="5" tabindex="3"  />
                                             <div id="ckcode" style="display:none;">
@@ -236,10 +236,19 @@ if ($winduid){print<<<EOT
 <div id="menu_userinfomore" class="cc menu_topup" style="display:none;">
 	<div style="width:26.5em;">
 		<ul class="menu-half cc">
-		<li>等级: $gp_grouptitle
 <!--
 EOT;
-if ($_G['allowhide']) {print <<<EOT
+if ($gp_gptype == 'member') {print <<<EOT
+-->
+		<li>等级: $gp_grouptitle</li>
+<!--
+EOT;
+} else {print <<<EOT
+-->
+		<li>身份: $gp_grouptitle</li>
+<!--
+EOT;
+}if ($_G['allowhide']) {print <<<EOT
 -->
 		<li>状态:
 <span style="cursor:pointer;" onclick="ajax.send('pw_ajax.php?action=changestate','',changeState)" id="online_state">
@@ -270,7 +279,6 @@ function changeState() {
 EOT;
 }print <<<EOT
 -->
-
 			<li>帖子: $winddb[postnum]</li>
 			<li>今日: $winddb[todaypost]</li>
 			<li>$db_rvrcname: $userrvrc $db_rvrcunit</li>
@@ -285,6 +293,7 @@ EOT;
 <div id="menu_profile" class="menu_topup3" style="display:none">
     <ul>
         <li><a href="profile.php?action=modify" target="_blank">帐号</a></li>
+		<li><a href="profile.php?action=auth" target="_blank">认证</a></li>
         <li><a href="profile.php?action=privacy" target="_blank">隐私</a></li>
         <li><a href="userpay.php" target="_blank">积分</a></li>
         <li><a href="profile.php?action=permission" target="_blank">权限</a></li>

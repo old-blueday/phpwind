@@ -27,7 +27,7 @@ print <<<EOT
 							<div><!--
 EOT;
 if (!$value['attention']) {print <<<EOT
---><a href="javascript:;" onclick="Attention.add(this,{$value[uid]},1);" class="fr follow s7">加关注</a><!--
+--><a href="javascript:;" onclick="Attention.add(this,{$value[uid]},1);" class="fr follow">关注</a><!--
 EOT;
 } else {print <<<EOT
 --><a href="javascript:;" class="fr following gray">关注中</a>

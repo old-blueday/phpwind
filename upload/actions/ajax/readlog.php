@@ -16,7 +16,8 @@ krsort($tids);
 Cookie('readlog', ',' . implode(',', $tids) . ',');
 $tids && $sql_tids = S::sqlImplode($tids);
 !$sql_tids && Showmsg('readlog_data_error');
-include_once pwCache::getPath(D_P . 'data/bbscache/forum_cache.php');
+//* include_once pwCache::getPath(D_P . 'data/bbscache/forum_cache.php');
+pwCache::getData(D_P . 'data/bbscache/forum_cache.php');
 $readb = $array = array();
 $query = $db->query("SELECT t.tid,t.fid,t.subject,t.author,t.authorid,t.anonymous,f.f_type,f.password,f.allowvisit FROM pw_threads t LEFT JOIN pw_forums f USING(fid) WHERE t.tid IN($sql_tids)");
 while ($rt = $db->fetch_array($query)) {

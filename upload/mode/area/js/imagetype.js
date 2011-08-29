@@ -18,7 +18,7 @@ var imageType = Class({},{
 			if (type == 'event') continue;
 			this.list[type].onclick = function () {
 				for (var i in _this.list) {
-					if (i == 'event') continue;
+					if (i == 'event' || !_this.list[i].id) continue;
 					getObj(_this.list[i].id+'_div').style.display = 'none';
 				}
 				getObj(this.id+'_div').style.display = '';

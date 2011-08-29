@@ -1,7 +1,8 @@
 <?php
 !defined('M_P') && exit('Forbidden');
 require_once(R_P.'require/forum.php');
-include_once pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
+//* include_once pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
+pwCache::getData(D_P.'data/bbscache/forum_cache.php');
 
 S::gp(array('cateid'),'GP',2);
 if (!$cateid && $secdomain = array_search($pwServer['HTTP_HOST'], $db_modedomain)) {

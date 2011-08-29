@@ -96,9 +96,11 @@ if(empty($action)){
 	$pwSendmail['sent'] = 0;
 	$pwSendmail['step'] = 0;
 	pwCache::setData($tmpCachefile,"<?php\r\ndie();\r\n?>\r\n".serialize($pwSendmail));
+	touch($tmpCachefile);
 	include PrintEot('sendmail');exit;
 } elseif ($action == 'confirm') {
-	$pwSendmail = readover($tmpCachefile);
+	//* $pwSendmail = readover($tmpCachefile);
+	$pwSendmail = pwCache::getData($tmpCachefile, false, true);
 	$pwSendmail = trim(substr($pwSendmail,19));
 	$pwSendmail = @unserialize($pwSendmail);
 	if (empty($pwSendmail)) {
@@ -110,7 +112,8 @@ if(empty($action)){
 } elseif ($action == 'groupsend') {
 	require_once(R_P.'require/sendemail.php');
 
-	$pwSendmail = readover($tmpCachefile);
+	//* $pwSendmail = readover($tmpCachefile);
+	$pwSendmail = pwCache::getData($tmpCachefile, false, true);
 	$pwSendmail = trim(substr($pwSendmail,19));
 	$pwSendmail = @unserialize($pwSendmail);
 	if (empty($pwSendmail)) {
@@ -158,6 +161,7 @@ if(empty($action)){
 	$count = $pwSendmail['count'];
 	if($pwSendmail['count'] > $pwSendmail['sent']){
 		pwCache::setData($tmpCachefile,"<?php\r\ndie();\r\n?>\r\n".serialize($pwSendmail));
+		touch($tmpCachefile);
 		$j_url = "$basename&action=$action";
 		adminmsg("sendmsg_step",EncodeUrl($j_url),1);
 	} else{

@@ -14,61 +14,80 @@ if ($read['aid']) {print <<<EOT
 EOT;
 	if ($read['ifhide']>0) {print <<<EOT
 -->
-							<blockquote class="blockquote mb10 cc hidden" id="hidden_att_{$read['pid']}">附件设置隐藏，需要回复后才能看到</blockquote>
+		<blockquote class="blockquote mb10 cc hidden" id="hidden_att_{$read['pid']}">附件设置隐藏，需要回复后才能看到</blockquote>
 <!--
 EOT;
 	} else {
-		if ($read['pic']) {
+		if ($read['pic']) {print <<<EOT
+-->
+		<div class="imgList">
+			<ul class="cc one">
+<!--
+EOT;
 			foreach ($read['pic'] as $pic) {
 				if ($pic) {
+					$pic['descrip'] = substrs($pic['descrip'],80);
+					$pic['name'] = substrs($pic['name'],80);
 print <<<EOT
 -->
-							<div class="mb10" id="att_$pic[aid]">
+				<li id="att_$pic[aid]">
+					<span id="att_pic_sub_$pic[aid]" style="display:inline-block;" onmouseover="read.open('att_pic_$pic[aid]','att_pic_sub_$pic[aid]')">$pic[img]</span>
+					<div class="pw_menu" style="position:absolute;display:none" id="att_pic_$pic[aid]">
+						<div style="border:1px solid $forumcolorone;background:$forumcolortwo;padding:5px 10px;">
 <!--
 EOT;
 					if($pic['desc']){
 print <<<EOT
 -->
-								描述:$pic[desc]<br />
+							<p>描述:$pic[descrip]</p>
 <!--
 EOT;
 					}
 print <<<EOT
 -->
-								图片:$pic[name] $pic[img]
+							<p><span class="mr10">图片:$pic[name]</span>
 <!--
 EOT;
 					if($pic['dfadmin']){
 print <<<EOT
 -->
-								[<a class="cp" onclick="delatt('$read[pid]','$pic[aid]');">删除</a>]
+							[<a class="cp" onclick="delatt('$read[pid]','$pic[aid]');">删除</a>]
 <!--
 EOT;
 					}
 print <<<EOT
 -->
-							</div>
+							</p>
+						</div>
+					</div>
+				</li>
 <!--
 EOT;
 				}
 			}
+print <<<EOT
+-->
+			</ul>
+		</div>
+<!--
+EOT;
 		}
 		if ($read['picurl']) {
 			foreach ($read['picurl'] as $k => $picture) {
 				if ($picture ){print <<<EOT
 -->
-							<div class="mb10" id="att_$k">远程图片:<a href="job.php?action=showimg&tid={$tid}&pid={$read[pid]}&fid={$fid}&aid={$k}&verify={$picture[verify]}" target="_blank">$picture[name]</a>
+		<div class="mb10" id="att_$k">远程图片:<a href="job.php?action=showimg&tid={$tid}&pid={$read[pid]}&fid={$fid}&aid={$k}&verify={$picture[verify]}" target="_blank">$picture[name]</a>
 <!--
 EOT;
 					if($picture['dfadmin']){print <<<EOT
 -->
-								[<a style="cursor:pointer" onclick="delatt('$read[pid]','$k');">删除</a>]
+			[<a style="cursor:pointer" onclick="delatt('$read[pid]','$k');">删除</a>]
 <!--
 EOT;
 					}
 print <<<EOT
 -->
-							</div>
+		</div>
 <!--
 EOT;
 				}
@@ -79,13 +98,13 @@ EOT;
 				if ($attach) {
 print <<<EOT
 -->
-							<div class="mb10" id="att_$attach[aid]">
+		<div class="mb10" id="att_$attach[aid]">
 <!--
 EOT;
 					if($attach['desc']){
 print <<<EOT
 -->
-								描述:$attach[desc]<br />
+			描述:$attach[desc]<br />
 <!--
 EOT;
 					}
@@ -99,7 +118,7 @@ EOT;
 						}
 print <<<EOT
 -->
-								附件: <img src="$imgpath/$stylepath/file/$attach[type].gif" align="absmiddle" /> <a $att_id href="job.php?action=download&aid=$attach[aid]&mt=$mt"> <font color="red">$attach[name]</font></a> ($attach[size] K) 下载次数:$attach[hits]
+			附件: <img src="$imgpath/$stylepath/file/$attach[type].gif" align="absmiddle" /> <a $att_id href="job.php?action=download&aid=$attach[aid]&mt=$mt"> <font color="red">$attach[name]</font></a> ($attach[size] K) 下载次数:$attach[hits]
 <!--
 EOT;
 					}
@@ -117,41 +136,41 @@ EOT;
 							}
 print <<<EOT
 -->
-								<img src="$imgpath/$stylepath/file/$attach[type].gif" align="absmiddle" />
-								<span class="s1">$attach[name]</span> ($attach[size] K) 已下载:{$attach[hits]}次 , <span class="mr10">售价:{$attach[needrvrc]}{$attach[cname]}</span><a href="job.php?action=attachbuy&type=record&aid=$attach[aid]" onclick="return ajaxurl(this);" title="查看" class="mr10 s4">[记录]</a> <a $att_id href="job.php?action=attachbuy&type=download&aid=$attach[aid]" onclick="return ajaxurl(this);" title="下载：{$attach[name]}"  class="mr10 s4">[下载]</a>
+			<img src="$imgpath/$stylepath/file/$attach[type].gif" align="absmiddle" />
+			<span class="s1">$attach[name]</span> ($attach[size] K) 已下载:{$attach[hits]}次 , <span class="mr10">售价:{$attach[needrvrc]}{$attach[cname]}</span><a href="job.php?action=attachbuy&type=record&aid=$attach[aid]" onclick="return ajaxurl(this);" title="查看" class="mr10 s4">[记录]</a> <a $att_id href="job.php?action=attachbuy&type=download&aid=$attach[aid]" onclick="return ajaxurl(this);" title="下载：{$attach[name]}"  class="mr10 s4">[下载]</a>
 <!--
 EOT;
 						} else {print <<<EOT
 -->
-								该附件已加密,拥有{$attach[needrvrc]}{$attach[cname]}才能下载
+			该附件已加密,拥有{$attach[needrvrc]}{$attach[cname]}才能下载
 <!--
 EOT;
 						}
 					} elseif (in_array($attach['ext'],array('mp3','wma','wmv','rm','swf'))) {
 print <<<EOT
 -->
-								<a class="cp s4" onclick="playatt('$attach[aid]');">[试播]</a>
+			<a class="cp s4" onclick="playatt('$attach[aid]');">[试播]</a>
 <!--
 EOT;
 					}
 					if ($attach['dfadmin']) {
 print <<<EOT
 -->
-								<a class="cp s4" onclick="delatt('$read[pid]','$attach[aid]');">[删除]</a>
+			<a class="cp s4" onclick="delatt('$read[pid]','$attach[aid]');">[删除]</a>
 <!--
 EOT;
 					}
 					if ($showImg) {
 print <<<EOT
 -->
-								{$attach["img"]}
+			{$attach["img"]}
 <!--
 EOT;
 					}
 print <<<EOT
 -->
 
-							</div>
+		</div>
 <!--
 EOT;
 				}

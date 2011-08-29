@@ -83,6 +83,7 @@ class GatherCache_PW_MembersDbCache_Cache extends GatherCache_Base_Cache {
 		$fieldinfo = '';
 		if (is_array($customfield)) {
 			foreach ($customfield as $value) {
+				if ($value['ifsys']) continue;
 				$fieldinfo .= ',mi.field_'.(int)$value['id'];
 			}
 		}

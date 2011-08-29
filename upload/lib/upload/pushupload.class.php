@@ -55,6 +55,7 @@ class PushUpload extends uploadBehavior {
 			$this->fileName = $value['fileuploadurl'];
 			$this->attachs[] = $fieldData;
 		}
+		return true;
 	}
 	
 	function getImagePath() {

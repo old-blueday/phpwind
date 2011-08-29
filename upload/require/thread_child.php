@@ -34,6 +34,7 @@ while($child = $db->fetch_array($query)){
 		if(!empty($child['logo']) && strpos($child['logo'],'http://') === false && file_exists($attachdir.'/'.$child['logo'])){
 			$child['logo'] = "$attachpath/$child[logo]";
 		}
+		if(!empty($child['logo'])) $child['pic'] = '';
 	} else {
 		$child['logo'] = '';
 	}

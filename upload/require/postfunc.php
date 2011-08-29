@@ -120,8 +120,9 @@ function lastinfo($fid,$allowhtm=0,$type='',$sys_type='') {
 	$htmurl   = $db_readdir.'/'.$fid.'/'.date('ym',$rt['postdate']).'/'.$rt['tid'].'.html';
 	$new_url  = file_exists(R_P.$htmurl) && $allowhtm && $sys_type!='1B' ? "$R_url/$htmurl" : "read.php?tid=$rt[tid]&page=e#a";
 	$lastpost = $subject."\t".addslashes($author)."\t".$rt['lastpost']."\t".$new_url;
-	$db->update("UPDATE pw_forumdata SET lastpost=".S::sqlEscape($lastpost).$topicadd." WHERE fid=".S::sqlEscape($fid));
-
+	//* $db->update("UPDATE pw_forumdata SET lastpost=".S::sqlEscape($lastpost).$topicadd." WHERE fid=".S::sqlEscape($fid));
+	$db->update(pwQuery::buildClause("UPDATE :pw_table SET lastpost=:lastpost $topicadd WHERE fid=:fid", array('pw_forumdata', $lastpost,$fid)));
+	
 	if ($foruminfo['type'] == 'sub' || $foruminfo['type'] == 'sub2') {
 		if ($foruminfo['password'] != '' || $foruminfo['allowvisit'] != '' || $foruminfo['f_type'] == 'hidden') {
 			$lastpost = '';
@@ -133,9 +134,11 @@ function lastinfo($fid,$allowhtm=0,$type='',$sys_type='') {
 		}
 		if ($lastpost || $fupadd) {
 			$db->update("UPDATE pw_forumdata SET $lastpost $fupadd WHERE fid=".S::sqlEscape($foruminfo['fup']));
+			Perf::gatherInfo('changeForumData', array('fid'=>$foruminfo['fup']));
 			if ($foruminfo['type'] == 'sub2') {
 				$rt1 = $db->get_one("SELECT fup FROM pw_forums WHERE fid=".S::sqlEscape($foruminfo['fup']));
 				$db->update("UPDATE pw_forumdata SET $lastpost $fupadd WHERE fid=".S::sqlEscape($rt1['fup']));
+				Perf::gatherInfo('changeForumData', array('fid'=>$rt1['fup']));
 			}
 		}
 	}
@@ -244,7 +247,7 @@ function check_data($type="new") {
 		}
 		$atc_content = html_check($atc_content);
 		/*
-		* 权限控制是否能发布自动播放的多媒体
+		* 权限控制是否能发布自动展开的多媒体
 		*/
 		foreach (array('wmv','rm','flash') as $key => $value) {
 			if (strpos(",{$GLOBALS[_G][media]},",",$value,") === false) {
@@ -398,7 +401,8 @@ function update_tag($tid,$tags) {
 	}
 }
 function relate_tag($subject,$content){
-	@include pwCache::getPath(D_P.'data/bbscache/tagdb.php');
+	//* @include (D_P.'data/bbscache/tagdb.php');
+	extract(pwCache::getData(D_P . "data/bbscache/tagdb.php", false));
 	$i    = 0;
 	$tags = '';
 	foreach ($tagdb as $tag => $num) {
@@ -433,7 +437,7 @@ function postupload($tmp_name,$filename) {
 		@chmod($filename,0777);
 		return true;
 	} elseif (is_readable($tmp_name)) {
-		pwCache::setData($filename,readover($tmp_name));
+		pwCache::writeover($filename,readover($tmp_name));
 		if (file_exists($filename)) {
 			@chmod($filename,0777);
 			return true;
@@ -451,7 +455,7 @@ function pwMovefile($dstfile,$srcfile) {
 		P_unlink($srcfile);
 		return true;
 	} elseif (is_readable($srcfile)) {
-		pwCache::setData($dstfile,readover($srcfile));
+		pwCache::writeover($dstfile,readover($srcfile));
 		if (file_exists($dstfile)) {
 			@chmod($dstfile,0777);
 			P_unlink($srcfile);

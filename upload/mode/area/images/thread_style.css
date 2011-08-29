@@ -47,12 +47,11 @@ blockquote{margin-left:10px;}
 .blockquote2 ol li:hover{background:#fff;color:#008ef1;}
 .blockquote2 ol li{list-style-type:decimal;}
 
-.blockquote3{clear:left;border:1px dashed #CCC;background:#f7f7f7 url($imgpath/blockquote3.png) right top no-repeat;padding:5px 10px;margin-left:0;}
+.blockquote3{clear:left;border:1px dashed #CCC;background:#f7f7f7 url(../blockquote3.png) right top no-repeat;padding:5px 10px;margin-left:0;}
 .blockquote3 .quote{color:#999;font-size:12px;}
 .blockquote3 .text{padding:0 10px 10px 10px;}
 
-.read_form{border-top:1px solid $tdcolor;border-left:1px solid $tdcolor;}
-.read_form td{height:20px;padding:0 5px;border-right:1px solid $tdcolor;border-bottom:1px solid $tdcolor;}
+.read_form td{height:20px;padding:0 5px;border-style:solid; border-width:1px;}
 
 .tip-bot{border-top:1px dashed #cccccc;padding:13px 0 0;}
 

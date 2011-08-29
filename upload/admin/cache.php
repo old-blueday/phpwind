@@ -47,13 +47,16 @@ function updatecache($array='') {
 function updatecache_f($return=0) {
 	global $db;
 	updatecache_fd(false);
-	$db->update("UPDATE pw_forums SET ifsub='0' WHERE type<3");
-	$db->update("UPDATE pw_forums SET ifsub='1' WHERE type>2");
+	//* $db->update("UPDATE pw_forums SET ifsub='0' WHERE type<3");
+	$db->update(pwQuery::buildClause("UPDATE :pw_table SET ifsub='0' WHERE type<3", array('pw_forums')));
+	
+	//* $db->update("UPDATE pw_forums SET ifsub='1' WHERE type>2");
+	$db->update(pwQuery::buildClause("UPDATE :pw_table SET ifsub='1' WHERE type>2", array('pw_forums')));
 
 	$t_typedb = getTopictypeCache();
 	$appdb = array();
 	$query = $db->query("SELECT f.*,fe.creditset,fe.forumset,fe.commend,fe.appinfo,c.ifopen as cnifopen FROM pw_forums f LEFT JOIN pw_forumsextra fe ON f.fid=fe.fid LEFT JOIN pw_cnclass c ON f.fid=c.fid ORDER BY f.vieworder,f.fid");
-	$fkeys = array('fid','fup','ifsub','childid','type','name','style','f_type','ifcms','ifhide','title','metadescrip','descrip','keywords');
+	$fkeys = array('fid','fup','ifsub','childid','type','name','style','f_type','ifcms','ifhide','title','metadescrip','descrip','keywords','forumadmin');
 	$catedb = $forumdb = $subdb1 = $subdb2 = $forum_cache = $fname= array();
 	while ($forums = $db->fetch_array($query)) {
 		$forums['topictype'] = $t_typedb[$forums['fid']];
@@ -184,7 +187,7 @@ function writeforumscache($forum) {
 			$forum[$key] = unserialize($value);
 		}
 	}
-	pwCache::setData(D_P."data/forums/fid_{$forum['fid']}.php","<?php\r\n\$foruminfo = ".pw_var_export($forum).";\r\n?>");
+	pwCache::setData( S::escapePath(D_P."data/forums/fid_{$forum['fid']}.php"),"<?php\r\n\$foruminfo = ".pw_var_export($forum).";\r\n?>");
 }
 function updatecache_fd($cacheforums=true) {
 	global $db;
@@ -235,9 +238,13 @@ function updatecache_i($return=0) {
 	global $db,$db_windpost,$timestamp;
 	//公告部分
 	require_once(R_P.'require/bbscode.php');
-	@include pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
-	$db->update("UPDATE pw_forumdata SET aid='0',aids='',aidcache='0'");
-	$db->update("UPDATE pw_announce SET ifconvert='0' WHERE ifconvert!='0'");
+	//* @include pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
+	extract(pwCache::getData(D_P.'data/bbscache/forum_cache.php', false));
+	//* $db->update("UPDATE pw_forumdata SET aid='0',aids='',aidcache='0'");
+	pwQuery::update('pw_forumdata', null, null, array('aid'=>0,'aids'=>0, 'aidcache'=>0));
+	
+	//* $db->update("UPDATE pw_announce SET ifconvert='0' WHERE ifconvert!='0'");
+	pwQuery::update('pw_announce','ifconvert!=:ifconvert', array(0), array('ifconvert'=>0));
 	$num = 0;
 	$sharelink = $notice_A = $notice_C = $C_cfid = $F_ffid = $F_fid = $cachedb = $cachetype = $newforum = array();
 	$query = $db->query("SELECT aid,fid,author,startdate,enddate,url,subject,content FROM pw_announce WHERE ifopen='1' AND (enddate=0 OR enddate>=".S::sqlEscape($timestamp).") ORDER BY vieworder,startdate DESC");
@@ -286,7 +293,8 @@ function updatecache_i($return=0) {
 			if (!$F_fid[$rt['fid']]['aid'] && $rt['startdate']<=$timestamp && (!$rt['enddate'] || $rt['enddate']>=$timestamp)) {
 				$F_fid[$rt['fid']]['aid'] = $rt['aid'];
 				if ($rt['content']!=convert($rt['content'],$db_windpost,2)) {
-					$db->update("UPDATE pw_announce SET ifconvert='1' WHERE aid=".S::sqlEscape($rt['aid'],false));
+					//* $db->update("UPDATE pw_announce SET ifconvert='1' WHERE aid=".S::sqlEscape($rt['aid'],false));
+					pwQuery::update('pw_announce','aid=:aid', array($rt['aid']), array('ifconvert'=>1));
 				}
 			} else {
 				$F_fid[$rt['fid']]['aids'] .= ",$rt[aid]";
@@ -306,7 +314,9 @@ function updatecache_i($return=0) {
 			$value['aids'] = substr($F_fid[$key]['aids'],1);
 			$value['aidcache'] = $timestamp;
 		}
-		$update && $db->update("UPDATE pw_forumdata SET ".S::sqlSingle(array('aid'=>$value['aid'],'aids'=>$value['aids'],'aidcache'=>$value['aidcache']))."WHERE fid=".S::sqlEscape($key));
+		//* $update && $db->update("UPDATE pw_forumdata SET ".S::sqlSingle(array('aid'=>$value['aid'],'aids'=>$value['aids'],'aidcache'=>$value['aidcache']))."WHERE fid=".S::sqlEscape($key));
+		$update && pwQuery::update('pw_forumdata', 'fid=:fid', array($key), array('aid'=>$value['aid'],'aids'=>$value['aids'],'aidcache'=>$value['aidcache']));
+
 		$newforum[$key] = $value;
 	}
 	//友情链接部分
@@ -337,8 +347,10 @@ function updatecache_i($return=0) {
 	if ($newforum != $forum) {
 		$cachetype['forum_cache'] = "\$forum=".pw_var_export($newforum).";";
 		pwCache::setData(D_P.'data/bbscache/forum_cache.php',"<?php\r\n{$cachetype[forum_cache]}\r\n?>");
-		@include pwCache::getPath(D_P.'data/bbscache/cache_read.php');
-		@include pwCache::getPath(D_P.'data/bbscache/forumcache.php');
+		//* @include pwCache::getPath(D_P.'data/bbscache/cache_read.php');
+		extract(pwCache::getData(D_P.'data/bbscache/cache_read.php', false));
+		//* @include pwCache::getPath(D_P.'data/bbscache/forumcache.php');
+		extract(pwCache::getData(D_P.'data/bbscache/forumcache.php', false));
 		$cachetype['forum_cache'] .= "\r\n\$forumcache='".str_replace(array("\\","'"),array("\\\\","\'"),$forumcache)."';\r\n\$topic_type_cache=".pw_var_export($topic_type_cache).";\r\n\$pwForumList=".pw_var_export($pwForumList).";";
 		$sql_in = ",'forum_cache'";
 	} else {
@@ -408,7 +420,7 @@ function updatecache_gp($group) {
 			$groupcache .= "\$gp_$key=".pw_var_export($value).";\r\n";
 		}
 	}
-	pwCache::setData(D_P."data/groupdb/group_$group[gid].php","<?php\r\n".$groupcache."?>");
+	pwCache::setData( S::escapePath(D_P."data/groupdb/group_$group[gid].php"),"<?php\r\n".$groupcache."?>");
 }
 function updatecache_gr($return=0) {
 	global $db;
@@ -599,16 +611,17 @@ function updatecache_c() {
 function updatecache_baseconfig(){
 	global $db;
 	$baseConfigNames = array('db_datastore' ,'db_memcache', 'db_classfile_compress', 'db_cachefile_compress', 'db_filecache_to_memcache');
-	$baseConfig = array();
+	$baseConfig = "<?php\r\n";
 	$query = $db->query('SELECT db_name,vtype,db_value FROM pw_config WHERE db_name IN (' . S::sqlImplode($baseConfigNames) . ')');	
 	while(@extract($db->fetch_array($query))){
 		$db_name = key_cv($db_name);
 		if ($vtype == 'array' && !is_array($db_value = unserialize($db_value))) {
 			$db_value = array();
 		}	
-		$baseConfig[$db_name] = $db_value;
+		$baseConfig .= "\$$db_name=".pw_var_export($db_value).";\r\n";
 	}
-	pwCache::setData(D_P . 'data/bbscache/baseconfig.php', $baseConfig, true);
+	$baseConfig .= "?>";
+	pwCache::writeover(D_P . 'data/bbscache/baseconfig.php', $baseConfig);
 }
 
 function updatecache_wcode() {
@@ -668,8 +681,8 @@ function updatecache_sy($name='') {
 		$style_css = addslashes(str_replace(array('<style type="text/css">','</style>'),'',$style_css[1]));
 		eval("\$style_css = \"$style_css\";");
 		//writeover(D_P."data/bbscache/$tplpath.css",$style_css);
-		pwCache::setData(D_P."data/bbscache/".$tplpath."_".$stylepath.".css",$style_css);
-		pwCache::setData(D_P."data/style/$name.php",str_replace("\?>","?>",$stylecontent));
+		pwCache::writeover(S::escapePath(D_P."data/bbscache/".$tplpath."_".$stylepath.".css"),$style_css);
+		pwCache::setData(S::escapePath(D_P."data/style/$name.php"),str_replace("\?>","?>",$stylecontent));
 		$sqlStyles[] = $name;
 	}
 	if (empty($name)) {
@@ -683,12 +696,14 @@ function updatecache_sy($name='') {
 		closedir($fp);
 		foreach ($styles as $key => $value) {
 			if (!in_array($value,$sqlStyles)) {
-				include S::escapePath(D_P."data/style/$value.php");
+				//* include S::escapePath(D_P."data/style/$value.php");
+				extract(pwCache::getData(S::escapePath(D_P."data/style/$value.php"), false));
+				
 				$style_css = explode('<!--css-->',readover(D_P."data/style/{$tplpath}_css.htm"));
 				$style_css = addslashes(str_replace(array('<style type="text/css">','</style>'),'',$style_css[1]));
 				eval("\$style_css = \"$style_css\";");
 				//writeover(D_P."data/bbscache/$tplpath.css",$style_css);
-				pwCache::setData(D_P."data/bbscache/".$tplpath."_".$stylepath.".css",$style_css);
+				pwCache::writeover(S::escapePath(D_P."data/bbscache/".$tplpath."_".$stylepath.".css"),$style_css);
 			}
 		}
 	}
@@ -697,7 +712,7 @@ function updatecache_sy($name='') {
 * 更新动作表情缓冲
 */
 function updatecache_p($return=0) {
-	global $db;
+	global $db,$db_htmdir;
 	$faces		= "\$faces=array(\r\n"; //表情组
 	$face		= "\$face=array(\r\n"; //表情
 	$jsface		= "var face=new Array();\n";
@@ -730,8 +745,8 @@ function updatecache_p($return=0) {
 	}
 	$faces	.= ");\r\n";
 	$face	.= ");";
-	pwCache::setData(D_P."data/bbscache/face.js",$jsdefault.$jsfacedb."\n".$jsface."\n".$jsfaces);
-	pwCache::setData(D_P."data/bbscache/postcache.php","<?php\r\n".$faces.$face."\r\n?>");
+	pwCache::writeover(R_P . $db_htmdir . '/js/face.js',$jsdefault.$jsfacedb."\n".$jsface."\n".$jsfaces);
+	pwCache::setData(D_P . "data/bbscache/postcache.php","<?php\r\n".$faces.$face."\r\n?>");
 
 	$cache = $faces.$face;
 	$db->pw_update(
@@ -957,7 +972,7 @@ function updatecache_conf($m,$hk = false,$filename = '') {
 		$confdb	.= "\${$rt['name']}=" . pw_var_export($rt['value']) . ";\r\n";
 	}
 	!$filename && $filename = $m.'_config.php';
-	pwCache::setData(D_P."data/bbscache/$filename","<?php\r\n".$confdb."?>");
+	pwCache::setData(S::escapePath(D_P."data/bbscache/$filename"),"<?php\r\n".$confdb."?>");
 }
 function updatecache_ml() {
 	global $db;
@@ -982,7 +997,7 @@ function updatecache_ftp() {
 function updatecache_field($return=0) {
 	global $db;
 	$customfield = array();
-	$query = $db->query("SELECT * FROM pw_customfield WHERE state='1' ORDER BY vieworder");
+	$query = $db->query("SELECT * FROM pw_customfield WHERE state='1' ORDER BY vieworder ASC");
 	while ($rt = $db->fetch_array($query)) {
 		$customfield[] = $rt;
 	}
@@ -1213,7 +1228,7 @@ function updateoptimize ($config=array(),$type=1,$o='') {
 	$configcache = "<?php\r\n\$optimize_conf=array(\r\n'$o'=>array(\r\n";
 	$configcache .= "'$type'=>".pw_var_export($optimize).",\r\n\r\n";
 	$configcache .= "),\r\n);\r\n?>";
-	pwCache::setData(D_P."data/bbscache/optimize_{$o}.php",$configcache);
+	pwCache::setData(S::escapePath(D_P."data/bbscache/optimize_{$o}.php"),$configcache);
 }
 
 /*缓存配置设置
@@ -1276,7 +1291,7 @@ function saveConfig(){
 					$db->update("UPDATE pw_config SET " . S::sqlSingle(array(
 						'db_value' => $configdb[$rt['db_name']][2], 'vtype' => $configdb[$rt['db_name']][1])) . ' WHERE db_name=' . S::sqlEscape($rt['db_name']));
 				}
-				$configdb[$rt['db_name']] = '';
+				unset($configdb[$rt['db_name']]);
 			}
 		}
 		$db->free_result($query);

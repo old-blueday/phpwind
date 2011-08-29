@@ -82,6 +82,14 @@ class PW_DiarySource extends SystemData {
 	 */
 	function _cookData($data) {
 		global $db_bbsurl;
+		if($data['uid']){
+			$userService = L::loadClass('userService', 'user');
+			$data['author'] = $userService->getUserNameByUserId($data['uid']);
+			$data['authorurl'] = 'u.php?uid='.$data['uid'];
+		}else{
+			$data['author'] = '';
+			$data['authorurl'] = '';
+		}
 		$data['url'] = $db_bbsurl . '/apps.php?q=diary&a=detail&did=' . $data['did'] . '&uid=' . $data['uid'];
 		$data['title'] = strip_tags($data['subject']);
 		$data['descrip'] = substrs(strip_tags(stripWindCode($data['content'])),100);

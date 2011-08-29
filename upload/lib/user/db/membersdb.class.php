@@ -6,6 +6,8 @@ class PW_MembersDB extends BaseDB {
 	var $_memberDataTableName = "pw_memberdata";
 	var $_memberInfoTableName = "pw_memberinfo";
 	var $_singleRightTableName = 'pw_singleright';
+	var $_userEducation = 'pw_user_education';
+	var $_userCareer = 'pw_user_career';
 	var $_primaryKey = 'uid';
 	
 	function get($id) {
@@ -174,8 +176,16 @@ class PW_MembersDB extends BaseDB {
 	function findUsersOrderByUserId($limit = 1) {
 		$limit = intval($limit);
 		if ($limit <= 0) return array();
-		
 		$query = $this->_db->query("SELECT * FROM " . $this->_tableName . " ORDER BY uid DESC LIMIT " . $limit);
+		return $this->_getAllResultFromQuery($query);
+	}
+	
+	function findNotBannedUsersOrderByUserId($limit = 1) {
+		global $db_uidblacklist;
+		$limit = intval($limit);
+		if ($limit <= 0) return array();
+		$db_uidblacklist && $sqlWhere .= ' AND uid NOT IN (' . $db_uidblacklist . ')';
+		$query = $this->_db->query("SELECT * FROM " . $this->_tableName . " WHERE groupid <> 6 ".$sqlWhere." ORDER BY uid DESC LIMIT " . $limit);
 		return $this->_getAllResultFromQuery($query);
 	}
 	
@@ -223,7 +233,122 @@ class PW_MembersDB extends BaseDB {
 		return $this->_getAllResultFromQuery ( $query, 'uid' );
 	}
 	
+	/**
+	 * 根据所在地apartment和userIds统计用户
+	 * 
+	 * @param int $apartment 所在地
+	 * @param array $userIds 用户ids
+	 * @return array
+	 */
+	function countUsersByApartmentAndUserIds($apartment,$userIds) {
+		$apartment = intval($apartment);
+		if ($apartment < 1 || !s::isArray($userIds)) return 0;
+		return $this->_db->get_value("SELECT COUNT(*) FROM " . $this->_tableName . " m LEFT JOIN " . $this->_memberDataTableName. " md USING(uid) WHERE m.uid IN(" . S::sqlImplode($userIds) . ") AND m.apartment = " . $this->_addSlashes($apartment));
+	}
 	
+	/**
+	 * 根据所在地apartment和userIds获取用户
+	 * 
+	 * @param int $apartment 所在地
+	 * @param array $userIds 用户ids
+	 * @return array
+	 */
+	function getUsersByApartmentAndUserIds($apartment,$userIds,$num) {
+		$apartment = intval($apartment);
+		$num = intval($num);
+		if ($apartment < 1 || $num < 1 || !s::isArray($userIds)) return array();
+		$query = $this->_db->query("SELECT m.uid FROM " . $this->_tableName . " m LEFT JOIN " . $this->_memberDataTableName. " md USING(uid) WHERE m.uid IN(" . S::sqlImplode($userIds) . ") AND m.apartment = " . $this->_addSlashes($apartment) . ' ' . $this->_Limit(0, $num));
+		return $this->_getAllResultFromQuery($query);
+	}
+	
+	/**
+	 * 根据家乡home和userIds统计用户
+	 * 
+	 * @param int $home 家乡
+	 * @param array $userIds 用户ids
+	 * @return array
+	 */
+	function countUsersByHomeAndUserIds($home,$userIds) {
+		$home = intval($home);
+		if ($home < 1 || !s::isArray($userIds)) return 0;
+		return $this->_db->get_value("SELECT COUNT(*) FROM " . $this->_tableName . " m LEFT JOIN " . $this->_memberDataTableName. " md USING(uid) WHERE m.uid IN(" . S::sqlImplode($userIds) . ") AND m.home = " . $this->_addSlashes($home));
+	}
+	
+	/**
+	 * 根据家乡home和userIds获取用户
+	 * 
+	 * @param int $home 家乡
+	 * @param array $userIds 用户ids
+	 * @return array
+	 */
+	function getUsersByHomeAndUserIds($home,$userIds,$num) {
+		$home = intval($home);
+		if ($home < 1 || !s::isArray($userIds)) return array();
+		$query = $this->_db->query("SELECT m.uid FROM " . $this->_tableName . " m LEFT JOIN " . $this->_memberDataTableName. " md USING(uid) WHERE m.uid IN(" . S::sqlImplode($userIds) . ") AND m.home = " . $this->_addSlashes($home) . " " . $this->_Limit(0, $num));
+		return $this->_getAllResultFromQuery($query);
+	}
+	
+	/**
+	 * 根据工作经历companyids和userIds统计用户
+	 * 
+	 * @param array $companyids
+	 * @param array $userIds 用户ids
+	 * @return array
+	 */
+	function countUsersByCompanyidAndUserIds($companyids,$userIds) {
+		if (!s::isArray($companyids) || !s::isArray($userIds)) return 0;
+		return $this->_db->get_value("SELECT COUNT(*) FROM " . $this->_tableName . " m LEFT JOIN " . $this->_memberDataTableName. " md USING(uid) LEFT JOIN " . $this->_userCareer. " mc USING(uid) WHERE m.uid IN(" . S::sqlImplode($userIds) . ") AND mc.companyid IN(" . S::sqlImplode($companyids) . ")");
+	}
+	
+	/**
+	 * 根据工作经历companyids和userIds获取用户
+	 * 
+	 * @param array $companyids
+	 * @param array $userIds 用户ids
+	 * @return array
+	 */
+	function getUsersByCompanyidAndUserIds($companyids,$userIds,$num) {
+		if (!s::isArray($companyids) || !s::isArray($userIds)) return array();
+		$query = $this->_db->query("SELECT m.uid FROM " . $this->_tableName . " m LEFT JOIN " . $this->_memberDataTableName. " md USING(uid) LEFT JOIN " . $this->_userCareer. " mc USING(uid) WHERE m.uid IN(" . S::sqlImplode($userIds) . ") AND mc.companyid IN(" . S::sqlImplode($companyids) . ") " . $this->_Limit(0, $num));
+		return $this->_getAllResultFromQuery($query);
+	}
+	
+	/**
+	 * 根据教育经历schoolids和userIds统计用户
+	 * 
+	 * @param array $schoolids
+	 * @param array $userIds 用户ids
+	 * @return array
+	 */
+	function countUsersBySchoolidsAndUserIds($schoolids,$userIds) {
+		if (!s::isArray($schoolids) || !s::isArray($userIds)) return 0;
+		return $this->_db->get_value("SELECT COUNT(*) FROM " . $this->_tableName . " m LEFT JOIN " . $this->_memberDataTableName. " md USING(uid) LEFT JOIN " . $this->_userEducation. " me USING(uid) WHERE m.uid IN(" . S::sqlImplode($userIds) . ") AND me.schoolid IN(" . S::sqlImplode($schoolids) . ")");
+	}
+	
+	/**
+	 * 根据教育经历companyids和userIds获取用户
+	 * 
+	 * @param array $companyids
+	 * @param array $userIds 用户ids
+	 * @return array
+	 */
+	function getUsersBySchoolidsAndUserIds($schoolids,$userIds,$num) {
+		if (!s::isArray($schoolids) || !s::isArray($userIds)) return array();
+		$query = $this->_db->query("SELECT m.uid FROM " . $this->_tableName . " m LEFT JOIN " . $this->_memberDataTableName. " md USING(uid) LEFT JOIN " . $this->_userEducation. " me USING(uid) WHERE m.uid IN(" . S::sqlImplode($userIds) . ") AND me.schoolid IN(" . S::sqlImplode($schoolids) . ") " . $this->_Limit(0, $num));
+		return $this->_getAllResultFromQuery($query);
+	}
+	
+	/**
+	 * 获取单条用户、教育、所在地、家乡、工作经历等信息
+	 * 
+	 * @param int $userId 用户id
+	 * @return array
+	 */
+	function getUserInfoByUserId($userId) {
+		$userId = intval($userId);
+		if ($userId < 1) return array();
+		return $this->_db->get_one("SELECT m.uid,m.apartment,m.home,me.schoolid,mc.companyid FROM " . $this->_tableName . " m LEFT JOIN " . $this->_userEducation. " me USING(uid) LEFT JOIN " . $this->_userCareer. " mc USING(uid) WHERE m.uid = " . $this->_addSlashes($userId));
+	}
 	/**
 	function getMemberAndDataAndInfo($userIds){
 		$query = $this->_db->query("SELECT m.uid,m.username,m.gender,m.oicq,m.aliww,m.groupid,m.memberid,m.icon AS micon ,m.hack,m.honor,m.signature,m.regdate,m.medals,m.userstatus,md.postnum,md.digests,md.rvrc,md.money,md.credit,md.currency,md.thisvisit,md.lastvisit,md.onlinetime,md.starttime,mi.customdata FROM pw_members m LEFT JOIN pw_memberdata md ON m.uid=md.uid LEFT JOIN pw_memberinfo mi ON mi.uid=m.uid WHERE m.uid IN (".S::sqlImplode($userIds).") ");

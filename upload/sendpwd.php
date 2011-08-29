@@ -1,23 +1,39 @@
 <?php
 define('SCR','sendpwd');
 require_once('global.php');
-require_once(R_P.'require/header.php');
-S::gp(array('action'));
+require (L::style('', $skinco, true));
+if ("wind" != $tplpath && file_exists(D_P.'data/style/'.$tplpath.'_css.htm')) {
+	$css_path = D_P.'data/style/'.$tplpath.'_css.htm';
+} else{
+	$css_path = D_P.'data/style/wind_css.htm';
+}
 
-$action != 'getback' && $action = 'sendpwd';
-if ($action=='sendpwd') {
-	if ($_POST['step']!=2) {
+S::gp(array('action'));
+!CkInArray($action ,array('getback','getverify','checkverify')) && $action = 'sendpwd';
+//!CkInArray($action ,array('getverify','checkverify')) && require_once(R_P.'require/header.php');;
+
+if ($action == 'sendpwd') {
+
+	if ($_POST['step'] != 2) {
+
+		if ($db_authstate && $db_authgetpwd) {
+			$authService = L::loadClass('Authentication', 'user');
+			list($authStep, $remainTime, $waitTime, $mobile) = $authService->getStatus('findpwd');
+			$authStep_1 = $authStep_2 = 'none';
+			${'authStep_' . $authStep} = '';
+			$verifyUsername = $authStep==1 ? '' : getCookie('findpwd_verifyUsername');
+		}
+
 		require_once(PrintEot('sendpwd'));footer();
+
 	} else {
+
 		PostCheck(0,$db_gdcheck & 16);
-		S::gp(array('pwuser', 'email', 'question', 'customquest', 'answer'));
+		S::gp(array('type','pwuser', 'email','authmobile', 'question', 'customquest', 'answer'));
 		
 		$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
 		$userarray = $userService->getByUserName($pwuser);
 		
-		if (strtolower($userarray['email']) != strtolower($email)) {
-			Showmsg('email_error',1);
-		}
 		if ($db_ifsafecv) {
 			require_once(R_P.'require/checkpass.php');
 			$safecv = questcode($question,$customquest,$answer);
@@ -25,35 +41,81 @@ if ($action=='sendpwd') {
 				Showmsg('safecv_error',1);
 			}
 		}
-		
 		if ($userarray) {
-			if ($timestamp - GetCookie('lastwrite') <= 60) {
-				$_G['postpertime'] = 60;
-				Showmsg('sendpwd_limit',1);
-			}
-			Cookie('lastwrite',$timestamp);
-			$send_email = $userarray['email'];
-			$submit		= md5($userarray['regdate'].substr($userarray['password'],10).$timestamp);
-			$sendtoname = $pwuser;
-			$pwuser		= rawurlencode($pwuser);
-			
-			require_once(R_P.'require/sendemail.php');
-			$sendinfo = sendemail($send_email,'email_sendpwd_subject','email_sendpwd_content','email_additional');
-			
-			if ($sendinfo===true) {
-				Showmsg('mail_success',1);
-			} elseif (is_string($sendinfo)) {
-				Showmsg($sendinfo,1);
+			if ($type == 1) {
+				//手机取回
+				S::gp(array('authverify','new_pwd','pwdreapt'));
+				$authService = L::loadClass('Authentication', 'user');
+				if (!$authService->checkverify($authmobile, $userarray['uid'], $authverify)) {
+					Showmsg('手机验证码填写错误',1);
+				}
+				if (!$new_pwd || $new_pwd != $pwdreapt) {
+					Showmsg('password_confirm',1);
+				} else {
+					$new_pwd = str_replace(array("\t","\r","\n"), '', stripslashes($new_pwd));
+					$new_pwd = md5($new_pwd);
+					$userService->update($userarray['uid'], array('password' => $new_pwd));
+					$authService->setCurrentInfo('findpwd');
+					Cookie('findpwd_verifyUsername', '', 0);
+					refreshto('login.php','password_change_success');
+				}
 			} else {
-				Showmsg('mail_failed',1);
+				//email取回
+				if (strtolower($userarray['email']) != strtolower($email)) {
+					Showmsg('email_error',1);
+				}
+				if ($timestamp - GetCookie('lastwrite') <= 60) {
+					$_G['postpertime'] = 60;
+					Showmsg('sendpwd_limit',1);
+				}
+				Cookie('lastwrite',$timestamp);
+				$send_email = $userarray['email'];
+				$submit		= md5($userarray['regdate'].substr($userarray['password'],10).$timestamp);
+				$sendtoname = $pwuser;
+				$pwuser		= rawurlencode($pwuser);
+				
+				require_once(R_P.'require/sendemail.php');
+				$sendinfo = sendemail($send_email,'email_sendpwd_subject','email_sendpwd_content','email_additional');
+				
+				if ($sendinfo===true) {
+					Showmsg('mail_success',1);
+				} elseif (is_string($sendinfo)) {
+					Showmsg($sendinfo,1);
+				} else {
+					Showmsg('mail_failed',1);
+				}
 			}
 		} else {
 			$errorname = $pwuser;
 			Showmsg('user_not_exists',1);
 		}
 	}
+} elseif ($action == 'getverify' || $action == 'checkverify') {
+	/*获取验证码|检验验证码*/
+	//PostCheck();
+	S::gp(array('authmobile','pwuser','authverify'));
+	$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
+	$userarray = $userService->getByUserName($pwuser);
+
+	if (!getstatus($userarray['userstatus'], PW_USERSTATUS_AUTHMOBILE) || !$userarray['authmobile']) {
+		echo 3;
+	} elseif ($userarray['authmobile'] != $authmobile) {
+		echo 7;
+	} else {
+		$authService = L::loadClass('Authentication', 'user');
+		if ($action == 'getverify') {
+			$status = $authService->getverify('findpwd', $authmobile, $userarray['uid'], true, 'findpwd');
+			Cookie('findpwd_verifyUsername', $userarray['username']);
+			echo $status;
+		} else {
+			$status = $authService->checkverify($authmobile, $userarray['uid'], $authverify);
+			echo $status ? 0 : 5;
+		}
+	}
+	ajax_footer();
 }
-if ($action=='getback') {
+
+if ($action == 'getback') {
 	S::gp(array('pwuser', 'submit', 'st'));
 	if (S::inArray($pwuser,$manager) || !$submit || !$st) {
 		Showmsg('undefined_action',1);
@@ -68,12 +130,18 @@ if ($action=='getback') {
 			}
 			if ($submit==md5($detail['regdate'].substr($detail['password'],10).$st)) {
 				if (empty($_POST['jop'])) {
+					$rg_config  = L::reg();
+					list($rg_regminpwd,$rg_regmaxpwd) = explode("\t", $rg_config['rg_pwdlen']);
+					require_once(R_P.'require/header.php');
 					require_once PrintEot('getpwd');footer();
 				} else {
 					S::gp(array('new_pwd','pwdreapt'));
 					if (!$new_pwd || $new_pwd!=$pwdreapt) {
 						Showmsg('password_confirm',1);
 					} else {
+						$GLOBALS['showPwdLogin'] = 1;
+						$register = L::loadClass('Register', 'user');
+						$register->checkPwd($new_pwd, $pwdreapt);
 						$new_pwd = str_replace(array("\t","\r","\n"), '', stripslashes($new_pwd));
 						$new_pwd = md5($new_pwd);
 						$userService->update($detail['uid'], array('password' => $new_pwd));

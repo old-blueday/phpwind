@@ -11,7 +11,12 @@ if ($db_menu) $db_menuinit .= ",'td_sort' : 'menu_sort'";
 //头部统一为论坛头部结束
 
 list($_Navbar,$_LoginInfo) = pwNavBar();
-
+foreach($_Navbar['main'] as $key => $value) {
+	if($value['subs']){
+		$ifHaveSubs=true;
+		break;
+	}
+}
 if( "wind" != $tplpath  && file_exists(D_P.'data/style/'.$tplpath.'_css.htm')){
 	$css_path = D_P.'data/style/'.$tplpath.'_css.htm';
 }else{

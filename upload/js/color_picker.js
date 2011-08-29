@@ -41,7 +41,7 @@ function colorCancel(){
 function checkFileType() {
 	var fileName = getObj("uploadpic").value;
 	if (fileName != '') {
-		var regTest = /\.(jpe?g|gif|png)$/gi;
+		var regTest = /\.(jpe?g|gif|png|bmp)$/gi;
 		var arrMactches = fileName.match(regTest);
 		if (arrMactches == null) {
 			getObj('fileTypeError').style.display = '';
@@ -52,6 +52,7 @@ function checkFileType() {
 	}
 	return true;
 }
+
 function showColorPicker(inputObj,formField,reback){
 	if(!color_picker_div){
 		color_picker_div = document.createElement('DIV');
@@ -173,6 +174,10 @@ function goBackFunction(){
 	if (rebackfunc && typeof rebackfunc == 'function') {
 		rebackfunc();	
 	}
+}
+
+function pickAjaxReback(color){
+	getObj('color_show').style.backgroundColor = color;
 }
 
 function createAllColorDiv(inputObj){

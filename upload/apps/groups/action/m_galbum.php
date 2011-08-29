@@ -20,7 +20,7 @@ if ($colony['viewtype'] == 1 && !in_array($a, array('editphoto', 'delphoto', 'de
 } elseif($colony['viewtype'] == '0') {
 	$cnclass['fid'] = $db->get_value("SELECT fid FROM pw_cnclass WHERE fid=" . S::sqlEscape($colony['classid']). " AND ifopen=1");
 }
-
+$colony['albumnum'] = abs($colony['albumnum']);
 require_once(R_P . 'require/bbscode.php');
 $newColony->initBanner();
 $groupRight =& $newColony->getRight();
@@ -248,7 +248,8 @@ if (empty($a)) {
 				'lasttime'	=> $timestamp,		'crtime'	=> $timestamp,
 				'memopen'   => 1
 			)));
-			$db->update("UPDATE pw_colonys SET albumnum=albumnum+1 WHERE id=" . S::sqlEscape($cyid));
+			//* $db->update("UPDATE pw_colonys SET albumnum=albumnum+1 WHERE id=" . S::sqlEscape($cyid));
+			pwQuery::update('pw_colonys', 'id=:id', array($cyid), null, array(PW_EXPR=>array('albumnum=albumnum+1')));
 		}
 		$query = $db->query("SELECT aid,aname,memopen FROM pw_cnalbum WHERE atype='1' AND ownerid=" . S::sqlEscape($cyid) . ' ORDER BY aid DESC');
 		while ($rt = $db->fetch_array($query)) {
@@ -314,7 +315,8 @@ if (empty($a)) {
 		require_once(R_P.'apps/groups/lib/group.class.php');
 		$colony = getGroupByCyid($cyid);
 
-		$db->update("UPDATE pw_colonys SET photonum=photonum+" . S::sqlEscape($photoNum) . " WHERE id=" . S::sqlEscape($cyid));
+		//* $db->update("UPDATE pw_colonys SET photonum=photonum+" . S::sqlEscape($photoNum) . " WHERE id=" . S::sqlEscape($cyid));
+		$db->update(pwQuery::buildClause("UPDATE :pw_table SET photonum=photonum+:photonum WHERE id=:id", array('pw_colonys', $photoNum, $cyid)));
 
 		$colony['photonum']+=$photoNum;
 		updateGroupLevel($colony['id'], $colony);
@@ -354,7 +356,6 @@ if (empty($a)) {
 		refreshto("{$basename}a=view&cyid=$cyid&pid=$pid",'operate_success');
 	}
 } elseif ($a == 'selalbum') {
-
 
 	if (!$ifadmin && (!$colony['ifcyer'] || $colony['ifadmin'] == '-1')) {
 		Showmsg('colony_cnmenber');
@@ -517,8 +518,8 @@ if (empty($a)) {
 			$photoNum = count($photos);
 			$lastpid = getLastPid($selaid, 4);
 			array_unshift($lastpid, $pid);
-
 			$db->update("UPDATE pw_cnalbum SET photonum=photonum+" . S::sqlEscape($photoNum) . ",lasttime=" . S::sqlEscape($timestamp) . ',lastpid=' . S::sqlEscape(implode(',',$lastpid)) . (!$selalbum['lastphoto'] ? ',lastphoto='.S::sqlEscape($lastphoto) : '') . " WHERE aid=" . S::sqlEscape($selaid));
+			$db->update(pwQuery::buildClause("UPDATE :pw_table SET photonum=photonum+" . S::sqlEscape($photoNum) . " WHERE id=:id", array('pw_colonys', $cyid)));
 			countPosts("+$photoNum");
 			if(!$selalbum['private']){
 				$weiboPhotos = array();
@@ -583,7 +584,8 @@ if (empty($a)) {
 	$upsql = $pwSQL ? ',' . S::sqlSingle($pwSQL) : '';
 	$db->update("UPDATE pw_cnalbum SET photonum=photonum-1{$upsql} WHERE aid=" . S::sqlEscape($photo['aid']));
 
-	$db->update("UPDATE pw_colonys SET photonum=photonum-1 WHERE id=" . S::sqlEscape($cyid));
+	//* $db->update("UPDATE pw_colonys SET photonum=photonum-1 WHERE id=" . S::sqlEscape($cyid));
+	$db->update(pwQuery::buildClause("UPDATE :pw_table SET photonum=photonum-1 WHERE id=:id", array('pw_colonys', $cyid)));
 
 	$weiboService = L::loadClass('weibo','sns'); /* @var $weiboService PW_Weibo */
 	$weibo = $weiboService->getWeibosByObjectIdsAndType($pid,'group_photos');
@@ -659,7 +661,8 @@ if (empty($a)) {
 		}
 		$db->update("DELETE FROM pw_cnphoto WHERE aid=" . S::sqlEscape($aid));
 		$db->update("DELETE FROM pw_cnalbum WHERE aid=" . S::sqlEscape($aid));
-		$db->update("UPDATE pw_colonys SET albumnum=albumnum-1,photonum=photonum-" . S::sqlEscape($album['photonum']) . " WHERE id=" . S::sqlEscape($cyid));
+		//* $db->update("UPDATE pw_colonys SET albumnum=albumnum-1,photonum=photonum-" . S::sqlEscape($album['photonum']) . " WHERE id=" . S::sqlEscape($cyid));
+		$db->update(pwQuery::buildClause("UPDATE :pw_table SET albumnum=albumnum-1,photonum=photonum-:photonum WHERE id=:id", array('pw_colonys', $album['photonum'], $cyid)));
 
 		$colony['albumnum']--;
 		$colony['photonum'] -= $album['photonum'];
@@ -791,8 +794,9 @@ if (empty($a)) {
 				'lasttime'	=> $timestamp,		'crtime'	=> $timestamp,
 				'memopen'   => $memopen
 		)));
-		$db->update("UPDATE pw_colonys SET albumnum=albumnum+1 WHERE id=" . S::sqlEscape($cyid));
 		$aid = $db->insert_id();
+		//* $db->update("UPDATE pw_colonys SET albumnum=albumnum+1 WHERE id=" . S::sqlEscape($cyid));
+		$db->update(pwQuery::buildClause("UPDATE :pw_table SET albumnum=albumnum+1 WHERE id=:id", array('pw_colonys', $cyid)));
 
 		$colony['albumnum']++;
 		updateGroupLevel($colony['id'], $colony);

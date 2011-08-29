@@ -8,7 +8,7 @@
 .sideA{width:200px;float:left;margin-right:10px;overflow:hidden;display:inline-block;}
 .sideB{width:540px;float:left;overflow:hidden;}
 .sideC{width:200px;float:right;overflow:hidden;}
-.sideD{width:750px;float:right;}
+.sideD{width:750px;float:right;min-height:400px;}
 
 #space_info{padding:15px 12px 10px; line-height:22px;}
 #space_info .face img{padding:4px; vertical-align:bottom; width:120px; height:120px;}

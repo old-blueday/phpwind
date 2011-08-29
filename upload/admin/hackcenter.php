@@ -25,7 +25,7 @@ if (!$action) {
 				if (function_exists('file_get_contents')) {
 					$filedata = @file_get_contents(R_P."hack/$hackdir/info.xml");
 				} else {
-					$filedata = readover(R_P."hack/$hackdir/info.xml");
+					$filedata = pwCache::readover(R_P."hack/$hackdir/info.xml");
 				}
 				if (preg_match('/\<hackname\>(.+?)\<\/hackname\>\s+\<ifopen\>(.+?)\<\/ifopen\>/is',$filedata,$infodb)) {
 					$infodb[1] && $hackname = S::escapeChar(str_replace(array("\n"),'',$infodb[1]));

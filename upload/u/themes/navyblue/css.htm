@@ -36,7 +36,7 @@ $uskin_boxbd = '#007bbf';						//小模块边框
 $uskin_boxhead = '#4485aa';						//小模块标题栏背景
 $uskin_boxheadbd = '#0e5e98';						//小模块标题栏下划线
 $uskin_boxheadText = '#ffffff';					//小模块标题文字颜色
-$uskin_boxlinkA = '#ffffff';					//小模块标题链接颜色
+$uskin_boxlinkA = '#fff';					//小模块标题链接颜色
 $uskin_boxlinkB = '#6fb0d6';					//小模块次要文字链接颜色
 
 //个人中心首页
@@ -111,21 +111,17 @@ a:hover,.line{ text-decoration:underline;}
 	.tips input{color:#7eb0d3;}
 	
 /*box*/
-.boxA,.boxB{border:1px solid $uskin_boxbd;background:#0c2d43;color:#bed3df;}
+.boxA,.boxB{border:1px solid $uskin_boxbd;background:#fff;}
 	.boxA h2,.boxB h2{background:$uskin_boxhead;border-bottom:1px solid $uskin_boxheadbd;color:$uskin_boxheadText;}
 	
 	.boxA h2 a{color:$uskin_boxlinkA;}
 	.boxA .s7{color:$uskin_boxlinkB;}
 .boxC{border:1px solid $uskin_bdB;}
-	.boxC h3{font-weight:700;color:$uskin_textA;}
-	.boxA .boxC h3{font-weight:700;color:#ffffff;}
-	.boxA .ulE li a{color:#d1edff;}
-    .boxA .ulE li a:hover{color:#d1edff;}
-	.boxA .ulE li.current,.boxA .ulE li:hover{background:#3c7fa7;}
-    .boxA .ulE li.current a{color:#fff;}
+
 
 /*home info*/
-.userInfo{}
+.userInfo_home{background: url(u/themes/$uskin/images/userInfo.jpg) 0 0 no-repeat;}
+	.userInfo{}
 		.userInfoweek .button{background:url(u/themes/$uskin/images/$uskin_homeBtn) no-repeat;color:$uskin_homeBtntext;text-shadow: 1px 1px 0 #2d6dbf;}
 		.userInfoweek .button:hover{ background-position:0 -28px;}
 		.homeSk_input{background:url(u/themes/$uskin/images/homeSk_input.png) no-repeat;}
@@ -192,7 +188,6 @@ h1{font-size:14px;font-weight:700;color:$uskin_textA;line-height:1.5;padding-top
 .dlA .dl2{background:$uskin_bgA;}
 .dlA .dl2 dt img{border:1px solid $uskin_bdA;background:$uskin_boxA;}
 .dlB .dl{border-bottom:1px dotted $uskin_bdD;}
-.sideB .dlB .dd p,.sideB .dlB .dd2 p,.sideA .dlB .dd p,.sideA .dlB .dd2 p,.sideC .dlB .dd p,.sideC .dlB .dd2 p,.sideD .dlB .dd p,.sideD .dlB .dd2 p{color:#fff;}
 .dlE dl{border-bottom:1px solid $uskin_bdA;}
 .dynamic .dd,.dynamic .dd2{border-bottom:1px dotted $uskin_bdA;}
 .feedImg img{border:1px solid $uskin_bdA;}
@@ -234,7 +229,7 @@ h1{font-size:14px;font-weight:700;color:$uskin_textA;line-height:1.5;padding-top
 .g_photosbox td{border-bottom:1px dotted $uskin_bdA;}
 .photoup dt{border:1px solid $uskin_bdD;}
 /* space setting */
-.moduleList li{border:1px solid #cce2ed; background-color:#1b4059;}
+.moduleList li{border:1px solid $uskin_bdB; background-color:$uskin_bgA;}
 .moduleList li .icon,.moduleList li label.fl{color:$uskin_textC;}
 /*help pop*/
 a.help_a i{border:1px solid $uskin_bdC;background:$uskin_bgB;color:$uskin_textA;}
@@ -263,21 +258,17 @@ a.help_a i{border:1px solid $uskin_bdC;background:$uskin_bgB;color:$uskin_textA;
 .friSelect{border-left:1px solid $uskin_bdA;}
 /*windows table*/
 .tA{border-top:1px solid #e8f5fb}
-.tA .tr td{background:#f2f9fd;border-bottom:1px solid #d7eef8;border-right:1px solid #f2f9fd;border-left:1px solid #f2f9fd;color:#698fa0;padding:5px 5px 5px 10px;}
-.tA td,.tA th{padding:5px;border-bottom:1px solid #e8f5fb;border-right:1px solid #fff;border-left:1px solid #fff; vertical-align:middle;line-height:21px;}
+.tA .tr td{background:#f2f9fd;border-bottom:1px solid #d7eef8;border-right:1px solid #f2f9fd;border-left:1px solid #f2f9fd;color:#698fa0;}
+.tA td,.tA th{border-bottom:1px solid #e8f5fb;border-right:1px solid #fff;border-left:1px solid #fff;}
 .tA tr:hover td,.tA tr:hover th{background:#f7fbff;border-bottom:1px solid #e8f5fb;border-right:1px solid #e8f5fb;border-left:1px solid #e8f5fb;color:#1d6180;}
 /*span color*/
 .s1{color:#f00;}/*red*/
 .s2{color:$uskin_textD;}/*org*/
 .s3{color:#080;}/*green*/
 .s4{color:$uskin_linkA;}/*blue*/
-.mb10 .s4{color:#fff;}
-h2 .s5{color:#fff;}
 .s5{color:$uskin_textA;}/*black*/
-.boxA .s5{color:#fff;}
 .s6{color:$uskin_textB;}
 .s7{color:$uskin_linkB}
-.place .s7{color:#c4e3f4;}
 .gray{color:$uskin_textC;}
 /*ie6 png 24*/
 .topwarp,.place div.one,.place div img,.navA,.popImgdel,.appNav_top,.appNav,.appNav_bottom,.logo img,.appNav .one li a img,h4.site img,.refresh img,.aset img{_behavior: url("u/images/iepngfix.htc");}

@@ -67,7 +67,7 @@ class PW_Element{
 			$sqladd .= ' AND e.special='.S::sqlEscape($special);
 			$sqladd .= $this->_getBlackList('e.id', $GLOBALS['db_tidblacklist']);
 			$fid && $sqladd .= " AND e.mark IN ($fid) ";
-			$query = $this->db->query("SELECT t.tid,t.fid,t.author,t.authorid,t.subject,t.type,t.postdate,t.hits,t.replies FROM pw_elements e LEFT JOIN pw_threads t ON e.id=t.tid WHERE e.type='newsubject' $sqladd ORDER BY e.value DESC ".S::sqlLimit($num));
+			$query = $this->db->query("SELECT t.tid,t.fid,t.author,t.authorid,t.subject,t.type,t.postdate,t.hits,t.replies FROM pw_elements e LEFT JOIN pw_threads t ON e.id=t.tid WHERE e.type='newsubject' $sqladd AND t.ifshield <> 1 AND t.locked <> 2 ORDER BY e.value DESC ".S::sqlLimit($num));
 			while ($rt = $this->db->fetch_array($query)) {
 				$posts[] = $this->_cookSubjectData($rt);
 			}
@@ -95,7 +95,7 @@ class PW_Element{
 		if ($this->ifpwcache & 256) {
 			$fid && $sqladd .= " AND e.mark IN ($fid) ";
 			$sqladd .= $this->_getBlackList('e.id', $GLOBALS['db_tidblacklist']);
-			$query = $this->db->query("SELECT t.tid,t.fid,t.author,t.authorid,t.subject,t.type,t.postdate,t.hits,t.replies FROM pw_elements e LEFT JOIN pw_threads t ON e.id=t.tid WHERE e.type='newreply' $sqladd ORDER BY e.value DESC ".S::sqlLimit($num));
+			$query = $this->db->query("SELECT t.tid,t.fid,t.author,t.authorid,t.subject,t.type,t.postdate,t.hits,t.replies FROM pw_elements e LEFT JOIN pw_threads t ON e.id=t.tid WHERE e.type='newreply' $sqladd AND t.ifshield != 1 ORDER BY e.value DESC ".S::sqlLimit($num));
 			while ($rt = $this->db->fetch_array($query)) {
 				$posts[] = $this->_cookSubjectData($rt);
 			}
@@ -122,7 +122,7 @@ class PW_Element{
 		$fid && $sqladd .= " AND fid IN ($fid) ";
 		$sqladd .= $special ? ' AND digest='.S::sqlEscape($special) : "AND digest>'0'";
 		$sqladd .= $this->_getBlackList('tid', $GLOBALS['db_tidblacklist']);
-		$sql	= "SELECT tid,fid,author,authorid,subject,type,postdate,hits,replies,digest FROM pw_threads FORCE INDEX (".getForceIndex('idx_digest').") WHERE ifcheck=1 $sqladd ORDER BY tid DESC ".S::sqlLimit($num);
+		$sql	= "SELECT tid,fid,author,authorid,subject,type,postdate,hits,replies,digest FROM pw_threads FORCE INDEX (".getForceIndex('idx_digest').") WHERE ifcheck=1 $sqladd AND ifshield != 1 AND locked != 2 ORDER BY tid DESC ".S::sqlLimit($num);
 		$query 	= $this->db->query($sql);
 		while($rt = $this->db->fetch_array($query)){
 			$posts[] = $this->_cookSubjectData($rt);
@@ -145,7 +145,8 @@ class PW_Element{
 		$num 	= intval($num) ? intval($num) : $this->defaultnum;
 		$sqladd = '';
 		if ($special==3) {
-			include pwCache::getPath(D_P."data/bbscache/toppeddb.php");
+			//* include pwCache::getPath(D_P."data/bbscache/toppeddb.php");
+			extract(pwCache::getData(D_P."data/bbscache/toppeddb.php", false));
 			if ($toppeddb[3][1]) {
 				$toptids = S::sqlImplode(explode(',',$toppeddb[3][1]));
 				$sqladd .= "AND tid IN($toptids)";
@@ -153,7 +154,8 @@ class PW_Element{
 				return false;
 			}
 		} elseif ($special==2 && $fid) {
-			include pwCache::getPath(D_P."data/bbscache/toppeddb.php");
+			//* include pwCache::getPath(D_P."data/bbscache/toppeddb.php");
+			extract(pwCache::getData(D_P."data/bbscache/toppeddb.php", false));
 			if ($toppeddb[2][$fid][2]) {
 				$toptids = S::sqlImplode(explode(',',$toppeddb[2][$fid][2]));
 				$sqladd .= "AND tid IN($toptids)";
@@ -173,6 +175,28 @@ class PW_Element{
 		}
 		return $posts;
 	}
+	
+	/**
+	 * 置顶帖调用
+	 *
+	 * @param int $num
+	 * @param array $round
+	 * @return array
+	 */
+	function areaTopSubject($round=0,$num=0){
+		$fid = $this->_cookFid($round);
+		$num 	= intval($num) ? intval($num) : $this->defaultnum;
+		$sqladd = '';
+		$fid && $sqladd .= " AND fid IN ($fid) ";
+		$sqladd .= $this->_getBlackList('tid', $GLOBALS['db_tidblacklist']);
+		$sql = "SELECT tid,fid,author,authorid,subject,type,postdate,hits,replies FROM pw_threads WHERE ifcheck='1'".$sqladd." AND topped > 0 AND ifshield != 1 AND locked != 2 ORDER BY lastpost DESC ".S::sqlLimit($num);
+		$posts = array();
+		$query = $this->db->query($sql);
+		while($rt = $this->db->fetch_array($query)){
+			$posts[] = $this->_cookSubjectData($rt);
+		}
+		return $posts;
+	}
 
 	function highLightSubject($round=0,$num=0,$special=0){
 		$fid = $this->_cookFid($round);
@@ -180,7 +204,7 @@ class PW_Element{
 		$sqladd = '';
 		$fid && $sqladd .= " AND t.fid IN ($fid) ";
 		$sqladd .= $this->_getBlackList('t.tid', $GLOBALS['db_tidblacklist']);
-		$sql = "SELECT DISTINCT t.tid,t.titlefont,t.fid,t.postdate,t.author,t.authorid,t.subject FROM pw_adminlog a LEFT JOIN pw_threads t ON a.field2=t.tid WHERE a.type='highlight' ".$sqladd." ORDER BY timestamp DESC ".S::sqlLimit($num);
+		$sql = "SELECT DISTINCT t.tid,t.titlefont,t.fid,t.postdate,t.author,t.authorid,t.subject FROM pw_adminlog a LEFT JOIN pw_threads t ON a.field2=t.tid WHERE a.type='highlight' ".$sqladd." AND t.ifshield != 1 AND t.locked != 2 ORDER BY timestamp DESC ".S::sqlLimit($num);
 		$posts = array();
 		$query = $this->db->query($sql);
 		while($rt = $this->db->fetch_array($query)){
@@ -247,6 +271,8 @@ class PW_Element{
 		if ($this->ifpwcache & 512) {
 			$delete = array();
 			$sqladd = '';
+			$blackListedTids = $this->_getBlackListedTids();
+			$blackListedTids && $sqladd .= ' AND t.tid NOT IN (' . $blackListedTids . ')';
 			$fid && $sqladd .= " AND e.mark IN ($fid) ";
 			$query = $this->db->query("SELECT e.eid,e.addition,e.special,t.tid,t.fid,t.author,t.authorid,t.subject,t.type,t.postdate,t.hits,t.replies,a.ifthumb FROM pw_elements e LEFT JOIN pw_threads t ON e.id=t.tid LEFT JOIN pw_attachs a ON e.value=a.aid WHERE e.type='newpic' $sqladd ORDER BY e.value DESC ".S::sqlLimit($num));
 			while ($rt = $this->db->fetch_array($query)) {
@@ -289,7 +315,7 @@ class PW_Element{
 	function userSort($round='postnum',$num=0,$special=true){
 		global $_CREDITDB;
 		$num = intval($num) ? intval($num) : $this->defaultnum;
-		$sorttype = array('money','rvrc','credit','currency','todaypost','monthpost','postnum','monoltime','onlinetime','digests','f_num');
+		$sorttype = array('money','rvrc','credit','currency','todaypost','monthpost','postnum','monoltime','onlinetime','digests','f_num','newUser','postMostUser');
 		foreach ($_CREDITDB as $key => $val) {
 			is_numeric($key) &&	$sorttype[] = $key;
 		}
@@ -298,15 +324,18 @@ class PW_Element{
 		!in_array($type,$sorttype) && Showmsg('undefined_action');
 		$sort = array();
 		if ($this->ifpwcache & 1) {
+			$blackListedUids = $this->_getBlackListedUids();
+			$blackListedUids && $sqlWhere .= ' AND e.id NOT IN (' . $blackListedUids . ')';
 			if (!$special) {
-				$sql = "SELECT id as uid,addition as title,value FROM pw_elements WHERE type='usersort' AND mark=".S::sqlEscape($type)." ORDER BY value DESC ".S::sqlLimit($num);
+				$sql = "SELECT id as uid,addition as title,value FROM pw_elements WHERE type='usersort'". $sqlWhere. "AND mark=".S::sqlEscape($type)." ORDER BY value DESC ".S::sqlLimit($num);
 			} else {
 				require_once(R_P.'require/showimg.php');
-				$sql = "SELECT e.id as uid,e.addition as title,e.value,m.icon,m.groupid,m.memberid FROM pw_elements e LEFT JOIN pw_members m ON e.id=m.uid WHERE e.type='usersort' AND e.mark=".S::sqlEscape($type)." ORDER BY e.value DESC ".S::sqlLimit($num);
+				$sql = "SELECT e.id as uid,e.addition as title,e.value,m.icon,m.groupid,m.memberid FROM pw_elements e LEFT JOIN pw_members m ON e.id=m.uid WHERE e.id=m.uid ". $sqlWhere. " AND e.type='usersort' AND e.mark=".S::sqlEscape($type)." AND m.groupid <> 6 ORDER BY e.value DESC ".S::sqlLimit($num);
 			}
 			$query = $this->db->query($sql);
 			while ($rt = $this->db->fetch_array($query)) {
 				$tem = array();
+				$tem['uid'] 	= $rt['uid'];
 				$tem['url'] 	= USER_URL.$rt['uid'];
 				$tem['title'] 	= $rt['title'];
 				$tem['value'] 	= $rt['value'];
@@ -342,7 +371,7 @@ class PW_Element{
 		global $_CREDITDB;
 		!($this->ifpwcache & 1) && Showmsg('undefined_action');
 		$num = intval($num) ? intval($num) : $this->defaultnum;
-		$sorttype = array('money','rvrc','credit','currency','todaypost','monthpost','postnum','monoltime','onlinetime','digests');
+		$sorttype = array('money','rvrc','credit','currency','todaypost','monthpost','postnum','monoltime','onlinetime','digests','newUser','postMostUser');
 		foreach ($_CREDITDB as $key => $val) {
 			is_numeric($key) &&	$sorttype[] = $key;
 		}
@@ -416,17 +445,18 @@ class PW_Element{
 				foreach ($_CREDITDB as $k => $v) {
 					$cType[$k] = $v[0];
 				}
-				$sql = "SELECT r.tid,r.cbtype,r.catype,r.cbval,r.caval,r.timelimit,t.fid,t.author,t.authorid,t.subject,t.type,t.postdate,t.hits,t.replies FROM pw_elements e LEFT JOIN pw_reward r ON e.id=r.tid LEFT JOIN pw_threads t ON e.id=t.tid WHERE e.type=".S::sqlEscape($type)." $sqladd ORDER BY e.value DESC".S::sqlLimit($num);
+				$sql = "SELECT r.tid,r.cbtype,r.catype,r.cbval,r.caval,r.timelimit,t.fid,t.author,t.authorid,t.subject,t.type,t.postdate,t.hits,t.replies FROM pw_elements e LEFT JOIN pw_reward r ON e.id=r.tid LEFT JOIN pw_threads t ON e.id=t.tid WHERE e.type=".S::sqlEscape($type)." $sqladd AND t.ifshield != 1 AND t.locked != 2 ORDER BY e.value DESC".S::sqlLimit($num);
 			} elseif ($special == 4) {
 				$sql = "SELECT t.tid,t.name,t.icon,t.price,e.mark as fid FROM pw_elements e LEFT JOIN pw_trade t ON e.id=t.tid WHERE e.type=".S::sqlEscape($type)." $sqladd ORDER BY e.value DESC".S::sqlLimit($num);
 			} else {
-				$sql = "SELECT t.tid,t.fid,t.author,t.authorid,t.subject,t.type,t.postdate,t.hits,t.replies FROM pw_elements e LEFT JOIN pw_threads t ON e.id=t.tid WHERE e.type=".S::sqlEscape($type)." $sqladd ORDER BY e.value DESC".S::sqlLimit($num);
+				$sql = "SELECT t.tid,t.fid,t.author,t.authorid,t.subject,t.type,t.postdate,t.hits,t.replies FROM pw_elements e LEFT JOIN pw_threads t ON e.id=t.tid WHERE e.type=".S::sqlEscape($type)." $sqladd AND t.ifshield != 1 AND t.locked != 2 ORDER BY e.value DESC".S::sqlLimit($num);
 			}
 			
 			$query = $this->db->query($sql);
 			while ($rt = $this->db->fetch_array($query)) {
 				$post = array();
 				$post['url'] 	= 'read.php?tid='.$rt['tid'];
+				$post['authorurl'] = 'u.php?uid=' . $rt['authorid'];
 				if ($special == 2) {
 					$post['title'] 	= $rt['subject'];
 					$post['value'] 	= $rt['deadline'];
@@ -501,7 +531,7 @@ class PW_Element{
 				$dayTime = PwStrtoTime(get_date(time(),'Ymd'));
 				$sqladd .= " AND t.postdate >= $dayTime";
 			}
-			$query = $this->db->query("SELECT t.tid,t.fid,t.author,t.authorid,t.subject,t.type,t.postdate,t.hits,t.replies FROM pw_elements e LEFT JOIN pw_threads t ON e.id=t.tid WHERE e.type=".S::sqlEscape($type)." $sqladd ORDER BY e.value DESC ".S::sqlLimit($num));
+			$query = $this->db->query("SELECT t.tid,t.fid,t.author,t.authorid,t.subject,t.type,t.postdate,t.hits,t.replies FROM pw_elements e LEFT JOIN pw_threads t ON e.id=t.tid WHERE e.type=".S::sqlEscape($type)." $sqladd AND t.ifshield != 1 AND t.locked != 2 ORDER BY e.value DESC ".S::sqlLimit($num));
 			while ($rt = $this->db->fetch_array($query)) {
 				if (!$rt['tid']) continue; 
 				$post = array();
@@ -509,6 +539,7 @@ class PW_Element{
 				$post['title'] 	= $rt['subject'];
 				$post['value'] 	= $rt['hits'];
 				$post['image']	= '';
+				$post['authorurl'] = 'u.php?uid=' . $rt['authorid'];
 				$post['forumname']	= getForumName($rt['fid']);
 				$post['forumurl']	= getForumUrl($rt['fid']);
 				list($post['topictypename'],$post['topictypeurl']) = getTopicType($rt['type'],$rt['fid']);
@@ -558,7 +589,9 @@ class PW_Element{
 		in_array($round,array('new','old')) || $round = 'new';
 		$num = intval($num) ? intval($num) : $this->defaultnum;
 		$order = $round=='new'? 'DESC':'';
-		$sql = "SELECT uid,username,regdate FROM pw_members ORDER BY uid $order".S::sqlLimit($num);
+		$blackListedUids = $this->_getBlackListedUids();
+		$blackListedUids && $sqlWhere .= ' AND uid NOT IN (' . $blackListedUids . ')';
+		$sql = "SELECT uid,username,regdate FROM pw_members WHERE 1 ".$sqlWhere." ORDER BY uid $order".S::sqlLimit($num);
 		$member = array();
 		$query = $this->db->query($sql);
 		while ($rt = $this->db->fetch_array($query)) {
@@ -617,17 +650,20 @@ class PW_Element{
 		if($bbsinfo['tdtcontrol'] < $tdtime && $db_hostweb == 1){
 			//* $this->db->update("UPDATE pw_bbsinfo SET yposts='$bbsinfo[tposts]',tdtcontrol='$tdtime' WHERE id=1");
 			pwQuery::update('pw_bbsinfo', 'id=:id', array(1), array('yposts'=>$bbsinfo[tposts], 'tdtcontrol'=>$tdtime));
-			$this->db->update("UPDATE pw_forumdata SET tpost=0 WHERE tpost<>'0'");
+			//* $this->db->update("UPDATE pw_forumdata SET tpost=0 WHERE tpost<>'0'");
+			pwQuery::update('pw_forumdata', 'tpost<>:tpost', array(0), array('tpost'=>0));
+			
 			$bbsinfo['yposts'] = $bbsinfo['tposts'];
 			$bbsinfo['tposts'] = '';
 		}
 		unset($bbsinfo['tdtcontrol']);
 		$bbsinfo['guest'] = $bbsinfo['users'] = 0;
 		if (!$db_online && file_exists(D_P.'data/bbscache/olcache.php')) {
-			include pwCache::getPath(D_P.'data/bbscache/olcache.php');
+			include (D_P.'data/bbscache/olcache.php');
 			$bbsinfo['guest'] = $guestinbbs;
 			$bbsinfo['users'] = $userinbbs;
 		} elseif ($db_online) {
+			/**
 			$userinbbs = $guestinbbs = 0;
 			$query = $this->db->query("SELECT uid!=0 as ifuser,COUNT(*) AS count FROM pw_online GROUP BY uid!='0'");
 			while($rt = $this->db->fetch_array($query)){
@@ -636,7 +672,10 @@ class PW_Element{
 				} else {
 					$bbsinfo['guest'] = $rt['count'];
 				}
-			}
+			}**/
+			$onlineService = L::loadClass('OnlineService', 'user');
+			$bbsinfo['users'] = $onlineService->countOnlineUser();		
+			$bbsinfo['guest'] = $onlineService->countOnlineGuest();			
 		}
 		$bbsinfo['usertotal'] = $bbsinfo['guest']+$bbsinfo['users'];
 		return $bbsinfo;
@@ -680,7 +719,8 @@ class PW_Element{
 		$sqladd = '';
 		$favors = array();
 		!$fid && $fid = getCommonFid();
-		isset($forum) || include pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
+		//* isset($forum) || include pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
+		isset($forum) || extract(pwCache::getData(D_P.'data/bbscache/forum_cache.php', false));
 
 		if ($this->ifpwcache & 1024) {
 			$fid && $sqladd .= " AND e.mark IN ($fid) ";
@@ -717,10 +757,11 @@ class PW_Element{
 		$sqladd = '';
 		$favors = array();
 		!$fid && $fid = getCommonFid();
-		isset($forum) || include pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
+		//* isset($forum) || include pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
+		isset($forum) || extract(pwCache::getData(D_P.'data/bbscache/forum_cache.php', false));
 
 		$fid && $sqladd .= " AND e.mark IN ($fid) ";
-		$query = $this->db->query("SELECT t.tid,t.fid,t.author,t.authorid,t.subject,t.hits,t.replies,t.postdate,t.hits,t.replies,t.favors,e.addition,e.time,t.replies,t.hits FROM pw_elements e LEFT JOIN pw_threads t ON e.id=t.tid WHERE e.type='newfavor' $sqladd ORDER BY e.value DESC ".S::sqlLimit($num));
+		$query = $this->db->query("SELECT t.tid,t.fid,t.author,t.authorid,t.subject,t.hits,t.replies,t.postdate,t.hits,t.replies,t.favors,e.addition,e.time,t.replies,t.hits FROM pw_elements e LEFT JOIN pw_threads t ON e.id=t.tid WHERE e.type='newfavor' $sqladd AND t.ifshield != 1 AND t.locked != 2 ORDER BY e.value DESC ".S::sqlLimit($num));
 		while ($rt = $this->db->fetch_array($query)) {
 			$favor = array();
 			$favor['url'] 	= 'read.php?tid='.$rt['tid'];
@@ -754,6 +795,7 @@ class PW_Element{
 	function _cookSubjectData($data) {
 		$post = array();
 		$post['url'] 	= 'read.php?tid='.$data['tid'];
+		$post['authorurl']	= 'u.php?uid='.$data['authorid'];
 		$post['title'] 	= $data['subject'];
 		$post['value'] 	= $data['postdate'];
 		$post['image']	= '';
@@ -762,6 +804,64 @@ class PW_Element{
 		list($post['topictypename'],$post['topictypeurl']) = getTopicType($data['type'],$data['fid']);
 		$post['addition'] = $data;
 		return $post;
+	}
+	
+	/**
+	 * 
+	 * 黑名单会员uid
+	 * @return array
+	 */
+	function _getBlackListedUids() {
+		global $db_uidblacklist;
+		return $db_uidblacklist;
+	}
+	
+	/**
+	 * 
+	 * 黑名单帖子
+	 * @return array
+	 */
+	function _getBlackListedTids() {
+		global $db_tidblacklist;
+		return $db_tidblacklist;
+	}
+
+	/**
+	 * 
+	 * 数据调用 一周内发图酷帖最多的用户排序
+	 * @param string $fids
+	 * @param int $num
+	 * @return array
+	 */
+	function getUsersByPostWeek($num) {
+		$num = intval($num);
+		if ($num < 1) return array();
+		$threadService = L::loadClass('threads', 'forum');
+		$uids = $threadService->getUidsByPostWeek($num);
+		if (!S::isArray($uids)) return array();
+		$tmpUids = array();
+		$blackListedUids = $this->_getBlackListedUids();
+		$notBlackedUids = array_diff($uids,$blackListedUids);
+		foreach ($notBlackedUids as $u) {
+			$tmpUids[] = $u['authorid'];
+			$userSort[$u[authorid]] = $u['coutNum']; 
+		}
+		$userService = L::loadClass('userService', 'user');
+		$userInfo = $userService->getByUserIds($tmpUids);
+		require_once R_P . 'require/showimg.php';
+		foreach ((array)$userInfo as $v) {
+			list($faceurl) = showfacedesign($v['icon'],1,'m'); 
+			$tmpuser['coutNum'] = $userSort[$v[uid]]; 
+			$tmpuser['uid'] = $v['uid'];
+			$tmpuser['username'] = $v['username'];
+			$tmpuser['faceurl'] = $faceurl;
+			$userData[] = $tmpuser; 
+		}
+		foreach ($userData as $key => $sort) {
+			$countNum[$key] = $sort['coutNum'];
+		}
+		array_multisort($countNum, SORT_DESC, $userData);
+		return $userData;
 	}
 }
 

@@ -27,7 +27,6 @@ if (file_exists(D_P."data/bbscache/hits.txt")) {
 		pwQuery::update('pw_bbsinfo', 'id=:id', array(1), array('hit_control'=>$hit_control, 'hit_tdtime'=>$tdtime));
 		unset($hitarray,$hits,$hits_a);
 	}
-	//* P_unlink(D_P."data/bbscache/hits.txt");
-	pwCache::deleteData(D_P."data/bbscache/hits.txt");
+	P_unlink(D_P."data/bbscache/hits.txt");
 }
 ?>

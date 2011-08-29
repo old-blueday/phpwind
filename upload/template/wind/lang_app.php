@@ -42,6 +42,7 @@ $lang['app'] = array (
 'multimedia'	=> '多媒体',
 'cms'			=> '文章',
 'postfavor'			=> '帖子',
+'tucool'			=> '图酷',
 'collection_type_name'	=> '[{$L[type]}] 收藏于: {$L[postdate]}',
 'collection_postfavor_name'	=> '[{$L[type]}] 更新于: {$L[postdate]}',
 'ajax_sendweibo_info' => '我在用户[url={$L[db_bbsurl]}/{$GLOBALS[db_userurl]}{$L[uid]}]{$L[username]}[/url]的个人空间发现这个信息，认为很有价值，特别推荐。\\n\\n主要信息:\\n{$L[title]}\\n\\n描述:\\n{$L[descrip]}\\n\\n希望你能喜欢。',

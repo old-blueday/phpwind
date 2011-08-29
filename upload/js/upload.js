@@ -323,6 +323,7 @@ var oldAtt = {
 var flashAtt = {
 
 	flashObj : null,
+	url : 'job.php?action=mutiupload&random=' + Math.floor(Math.random()*100),
 
 	init : function(isSimple) {
 		flashAtt.isSimple = isSimple;
@@ -330,17 +331,20 @@ var flashAtt = {
 			getObj('flash').parentNode.removeChild(getObj('flash'));
 			return;
 		}
-		var flashVar = {url: getObj('headbase').href + 'job.php?action=mutiupload&random='+Math.floor(Math.random()*100),mutiupload:(allowmutinum - mutiupload)};
+		var flashVar = {
+			url : getObj('headbase').href + escape(flashAtt.url),
+			mutiupload : (allowmutinum - mutiupload)
+		};
 		var params   = {
-				menu: "false",  
-				scale: "noScale",
-				allowScriptAccess: "always",
-				value:'always',
-				wmode:'transparent' 
+			menu: "false",
+			scale: "noScale",
+			allowScriptAccess: "always",
+			value:'always',
+			wmode:'transparent'
 		};
 		var attr = {id:'mutiupload',name:'mutiupload'};
 		swfobject.embedSWF(imgpath + '/upload.swf?'+Math.random(), "flashUploadPanel", "250", "46", "10.0.0", "js/expressInstall.swf",flashVar,params,attr,function(e){
-				flashAtt.flashObj = e.ref;
+			flashAtt.flashObj = e.ref;
 		});
 	},
 
@@ -429,8 +433,7 @@ var flashAtt = {
 					fname.appendChild(li);
 
 					var li = document.createElement("span");
-					if(!flashAtt.isSimple)
-					{
+					if (!flashAtt.isSimple) {
 						var a = document.createElement("a");
 						a.className    = 'bta';
 						a.unselectable = 'on';

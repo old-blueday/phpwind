@@ -1,26 +1,43 @@
 <!--<?php
+if (!($adminitem == 'guide' && $action == 'preview')) {
 include_once PrintEot('left');
-if(empty($action)){print <<<EOT
+${$adminitem} = 'class="current"';
+print <<<EOT
+-->
+<script type="text/javascript" language="JavaScript" src="js/global.js"></script>
+<script type="text/javascript" language="JavaScript" src="js/pw_ajax.js"></script>
+<div class="nav3 mb10 ta">
+    <ul class="cc">
+      <li $customfield><a href="$basename&adminitem=customfield">用户资料</a></li>
+      <li $guide><a href="$basename&adminitem=guide">新用户引导</a></li>
+      <li $area><a href="$basename&adminitem=area">地区管理</a></li>
+      <li $school><a href="$basename&adminitem=school">学校库管理</a></li>
+    </ul>
+</div>
+<!--
+EOT;
+if ($adminitem == 'customfield') {
+if(empty($action)){
+print <<<EOT
 -->
 <div class="admin_info mb10">
     <h3 class="h1"><b>提示信息</b></h3>
-    <div class="legend">此功能允许管理员自定义用户信息，用户在注册和编辑个人资料时填写这些栏目信息<br />允许编辑：当设置不允许用户编辑时，用户在第一次填写信息后，将不能自行修改自定义用户信息<br />必填内容：当设置为必填项目时，用户注册或编辑个人资料时，必须填写栏目信息后才能提交成功<br />用户组权限：当设置用户组权限后，只有指定用户组有权限查看自定义用户信息<br />帖子中显示：可以设置在帖子页面左侧用户信息处显示自定义用户信息</div>
+    <div class="legend"><ol><li>此功能允许管理员自定义用户信息，用户在注册和编辑个人资料时填写这些栏目信息</li><li>系统默认资料为不可编辑状态，操作管理不可用</li></ol></div>
 </div>
-<form method="post" action="$basename&" name="FORM">
-<input name="action" type="hidden" value="del">
-<h2 class="h1"><span class="fl mr10">用户栏目管理</span><a class="btn_add fl" href="$basename&action=add" hidefocus="true"><i>添加用户栏目</i></a></h2>
+<form method="post" action="$basename&adminitem=customfield" name="FORM">
+<input name="action" type="hidden" value="briefedit">
+<h2 class="h1"><span class="fl mr10">用户资料管理</span><a class="btn_add fl" href="$basename&action=add" hidefocus="true"><i>添加</i></a></h2>
 <div class="admin_table mb10">
     <table width="100%" cellspacing="0" cellpadding="0">
         <tr class="tr2">
-            <td width="30"><span onclick="CheckAll(document.FORM)" class="cp">全选</span></td>
-            <td width="30">顺序</td>
-            <td>栏目标题</td>
+            <td>前台显示顺序</td>
+            <td>资料分类</td>
+            <td>资料名称</td>
+            <td>资料首次填写区域</td>
             <td>启用</td>
-            <td>栏目类型</td>
-            <td>必填</td>
-            <td>允许编辑</td>
-            <td>帖子中显示</td>
-            <td>操作</td>
+            <td>必填项</td>
+            <td>允许修改</td>
+            <td>操作管理</td>
         </tr>
 <!--
 EOT;
@@ -33,29 +50,43 @@ EOT;
 -->
 <!--
 EOT;
-foreach($customfielddb as $key => $val){
-$state = $val[state] ? '开启' : '关闭';
-$required = $val[required] ? '开启' : '关闭';
-$editable = $val[editable] ? '开启' : '关闭';
-$viewinread = $val[viewinread] ? '开启' : '关闭';
-$type_sel=array(
-    '1'=>'单行文本框',
-    '2'=>'多行文本框',
-    '3'=>'单选框',
-);
-$type=$type_sel[$val[type]];
+foreach($customfielddb as $key => $value){
+$defaultbasic = $defaultcontact = $defaulteducation = $defaultother = $default1 = $default2 = $default0 = $checkstate = $checkrequired = $checkeditable = $isdisabled = $hiddenInput = '';
+${'default'.$value['category']} = ${'default'.$value['complement']} = 'selected';
+if ($value['title'] == '生日') {
+	$checkstate = 'checked';
+	$isdisabled = 'disabled = "true"';
+	$hiddenInput = "<input type=\"hidden\" name=\"field[$value[id]][state]\" value=\"1\" />";
+} else {
+	$value['state'] && $checkstate = 'checked';
+}
+$value['required'] && $checkrequired = 'checked';
+$value['editable'] && $checkeditable = 'checked';
+$managetip = $value['ifsys'] ? '编辑|删除' : "<a href=\"$basename&adminitem=customfield&action=edit&id=$value[id]\" >编辑</a>|<a href=\"$basename&adminitem=customfield&action=del&selid=$value[id]\">删除</a>";
 print <<<EOT
 -->
         <tr class="tr1">
-            <td class="td2"><input type="checkbox" name="selid[]" value="$val[id]" onclick="pwJsCheck(this)" /></td>
-            <td class="td2">$val[vieworder]</td>
-            <td class="td2">$val[title]</td>
-            <td class="td2">$state</td>
-            <td class="td2">$type</td>
-            <td class="td2">$required</td>
-            <td class="td2">$editable</td>
-            <td class="td2">$viewinread</td>
-            <td class="td2"><a href="$basename&action=edit&id=$val[id]">[编辑]</a></td>
+           	<td class="td2" width="80"><input type="text" class="input input_wd" name="field[$value[id]][vieworder]" value="$value[vieworder]" /></td>
+           	<td class="td2">
+           		<select name="field[$value[id]][category]">
+           			<option value="basic" $defaultbasic>基本资料</option>
+           			<option value="contact" $defaultcontact>联系方式</option>
+           			<option value="education" $defaulteducation>工作教育</option>
+           			<option value="other" $defaultother>其他资料</option>
+           		</select>
+						</td>
+           	<td class="td2">$value[title]</td>
+           	<td class="td2">
+           		<select name="field[$value[id]][complement]">
+           			<option value="1" $default1>注册流程</option>
+           			<option value="2" $default2>新用户引导</option>
+           			<option value="0" $default0>个人资料管理</option>
+           		</select>
+           	</td>
+           	<td class="td2"><input type="checkbox" name="field[$value[id]][state]" value="1" $checkstate $isdisabled />$hiddenInput</td>
+           	<td class="td2"><input type="checkbox" name="field[$value[id]][required]" value="1" $checkrequired /></td>
+           	<td class="td2"><input type="checkbox" name="field[$value[id]][editable]" value="1" $checkeditable /></td>
+           	<td class="td2">$managetip</td>
         </tr>
 <!--
 EOT;
@@ -63,16 +94,16 @@ EOT;
 -->
     </table>
 </div>
+$pages
 <div class="mb10 tac">
-	<span class="bt"><span><button type="button" onclick="CheckAll(document.FORM)">全 选</button></span></span>
-    <span class="btn"><span><button type="submit" name="delete" onfocus="blur();">删  除</button></span></span>
+	<span id="submit" class="btn"><span><button type="submit">提 交</button></span></span>
 </div>
 </form>
 <!--
 EOT;
 }elseif($action=='add' || $action=='edit'){print <<<EOT
 -->
-<form method="post" action="$basename&">
+<form method="post" action="$basename&adminitem=customfield">
 <input type="hidden" name="action" value="$action">
 <input type="hidden" name="step" value="2">
 <input type="hidden" name="id" value="$id">
@@ -82,50 +113,66 @@ $type_hidden
 EOT;
 if($action=='edit'){ print <<<EOT
 -->
-<span class="mr10">编辑用户栏目</span>
+<span class="mr10">编辑资料</span>
 <!--
 EOT;
-}else{ print <<<EOT
+}else{ 
+$defaultModify = 'checked="true"';
+$editable_0 = '';
+print <<<EOT
 -->
-<span class="mr10">添加用户栏目</span>
+<span class="mr10">添加新资料</span>
 <!--
 EOT;
-} print <<<EOT
+}
+print <<<EOT
 -->
 <a href="$basename" class="linka">返回上一级<span class="f9">▲</span></a></h2>
 <div class="admin_table mb10">
     <table width="100%" cellspacing="0" cellpadding="0">
+    	<tr class="tr1 vt">
+            <td class="td1">资料分类</td>
+            <td class="td2">
+            	<select name="category">
+           			<option value="basic" $default_basic>基本资料</option>
+           			<option value="contact" $default_contact>联系方式</option>
+           			<option value="education" $default_education>工作教育</option>
+           			<option value="other" $default_other>其他资料</option>
+           		</select>
+            </td>
+			<td class="td2"><div class="help_a" style="display: block;">下拉选择该项，将相关资料属性分类，前台显示为个人资料管理tab页名称</div></td>
+        </tr>
         <tr class="tr1 vt">
-            <td class="td1">栏目标题</td>
+            <td class="td1">资料名称</td>
             <td class="td2"><input type="text" class="input input_wa" name="title" value="$rt[title]"></td>
-			<td class="td2"><div class="help_a">请控制在50字节以内</div></td>
+			<td class="td2"><div class="help_a" style="display: block;">资料属性的名称，如生日、性别等，最大限制50个字节</div></td>
         </tr>
         <tr class="tr1 vt">
-            <td class="td1">栏目描述</td>
+            <td class="td1">资料名称描述</td>
             <td class="td2"><textarea name="descrip" class="textarea">$rt[descrip]</textarea></td>
-			<td class="td2"><div class="help_a">请控制在255字节以内</div></td>
+			<td class="td2"><div class="help_a" style="display: block;">作为资料引导说明资料属性的介绍，最大限制255个字节</div></td>
+        </tr>
+         <tr class="tr1 vt">
+            <td class="td1">帖子页资料显示</td>
+            <td class="td2">
+            	<ul class="list_A list_80">
+                	<li><input type="radio" name="viewinread" value="1" $viewinread_1>开启</li>
+                    <li><input type="radio" name="viewinread" value="0" $viewinread_0>关闭</li>
+                </ul>
+            </td>
+			<td class="td2"><div class="help_a" style="display: block;">启用时，该属性可以在帖子详细页的个人资料信息处显示</div></td>
         </tr>
         <tr class="tr1 vt">
-            <td class="td1">栏目启用</td>
+            <td class="td1">前台查看管理</td>
             <td class="td2">
             	<ul class="list_A list_80">
                 	<li><input type="radio" name="state" value="1" $state_1>开启</li>
                 	<li><input type="radio" name="state" value="0" $state_0>关闭</li>
                 </ul>
             </td>
-			<td class="td2"><div class="help_a">栏目填加后您可以选择暂时关闭该栏目使用</div></td>
+			<td class="td2"><div class="help_a" style="display: block;">启用时，该资料属性用户可以自己通过前台进行完善管理</div></td>
         </tr>
-        <tr class="tr1 vt">
-            <td class="td1">顺序</td>
-            <td class="td2"><input type="text" class="input input_wa" name="vieworder" value="$rt[vieworder]"></td>
-			<td class="td2"><div class="help_a"></div></td>
-        </tr>
-        <tr class="tr1 vt">
-            <td class="td1">长度控制</td>
-            <td class="td2"><input type="text" class="input input_wa" name="maxlen" value="$rt[maxlen]"></td>
-			<td class="td2"><div class="help_a">用户输入长度限制(最大:255字节)</div></td>
-        </tr>
-        <tr class="tr1 vt">
+         <tr class="tr1 vt">
             <td class="td1">必填内容</td>
             <td class="td2">
 				<ul class="list_A list_80">
@@ -133,27 +180,28 @@ EOT;
                     <li><input type="radio" name="required" value="0" $required_0>关闭</li>
                 </ul>
             </td>
-			<td class="td2"><div class="help_a">开启后，用户在注册和编辑个人资料时必须填写此项</div></td>
+			<td class="td2"><div class="help_a" style="display: block;">启用时，该属性在前台填写完善为必须填写此项</div></td>
         </tr>
-        <tr class="tr1 vt">
-            <td class="td1">在帖子中显示</td>
+         <tr class="tr1 vt">
+            <td class="td1">允许修改</td>
             <td class="td2">
             	<ul class="list_A list_80">
-                	<li><input type="radio" name="viewinread" value="1" $viewinread_1>开启</li>
-                    <li><input type="radio" name="viewinread" value="0" $viewinread_0>关闭</li>
-                </ul>
-            </td>
-			<td class="td2"><div class="help_a">开启后，此栏目会在帖子阅读页面左侧用户信息处显示</div></td>
-        </tr>
-        <tr class="tr1 vt">
-            <td class="td1">允许编辑</td>
-            <td class="td2">
-            	<ul class="list_A list_80">
-                	<li><input type="radio" name="editable" value="1" $editable_1>开启</li>
+                	<li><input type="radio" name="editable" value="1" $editable_1 $defaultModify>开启</li>
                     <li><input type="radio" name="editable" value="0" $editable_0>关闭</li>
                 </ul>
             </td>
-			<td class="td2"><div class="help_a">开启后，允许会员进行再次修改</div></td>
+			<td class="td2"><div class="help_a" style="display: block;">启用时，该属性在前台用户填写完善时可以重复修改项</div></td>
+        </tr>
+        <tr class="tr1 vt">
+            <td class="td1">资料首次填写区域</td>
+            <td class="td2">
+            	<select name="complement">
+           			<option value="1" $default_1>注册流程</option>
+           			<option value="2" $default_2>新用户引导</option>
+           			<option value="0" $default_0>个人资料管理</option>
+           		</select>
+            </td>
+			<td class="td2"><div class="help_a" style="display: block;">下拉选择该项，选择该用户属性首次填写管理的位置</div></td>
         </tr>
         <tr class="tr1 vt">
             <td class="td1">查看权限</td>
@@ -175,23 +223,59 @@ EOT;
 -->
                  </ul>
             </td>
-			<td class="td2"><div class="help_a">允许查看用户此栏目信息的用户组，不选将对所有用户组开放查看权限</div></td>
+			<td class="td2"><div class="help_a" style="display: block;">勾选相关项，查看用户该属性信息的用户组，不选默认为对所有用户组开放查看</div></td>
         </tr>
         <tr class="tr1 vt">
-            <td class="td1">栏目类型</td>
+            <td class="td1">前台显示顺序</td>
+            <td class="td2"><input type="text" class="input input_wa" name="vieworder" value="$rt[vieworder]"></td>
+			<td class="td2"><div class="help_a" style="display: block;">填写前台个人资料管理中该项的前后排序，相同资料属性分类的TAB页面前后排序</div></td>
+        </tr>
+        <tr class="tr1 vt">
+            <td class="td1">填写类型</td>
             <td class="td2">
-                <select name="type" class="select_wa" $type_disabled>
+                <select name="type" class="select_wa" id="selecttype" $type_disabled onChange="changeType(this.id);">
                     <option value="1" $type_1>单行文本框</option>
                     <option value="2" $type_2>多行文本框</option>
                     <option value="3" $type_3>单选框</option>
+                    <option value="4" $type_4>复选框</option>
+                    <option value="5" $type_5>下拉选项框</option>
+                    <option value="6" $type_6>年限填写类型</option>
+                    <option value="7" $type_7>地区填写类型</option>
                 </select>
             </td>
-			<td class="td2"><div class="help_a">一旦选定，请不要随意修改，否则将可能造成栏目信息显示错误</div></td>
+			<td class="td2"><div class="help_a" style="display: block;">前台资料完善管理的输入类型</div></td>
         </tr>
-        <tr class="tr1 vt">
+        <tr class="tr1 vt" id="texttype" style="display:none;">
             <td class="td1">选项内容</td>
-            <td class="td2"><textarea name="options" class="textarea">$rt[options]</textarea></td>
-			<td class="td2"><div class="help_a">当栏目类型为单选框时需要设置选项内容，每行为一个选项<br />格式:索引=内容，建议使用数字做索引。例如:<br />1=诺基亚<br />2=摩托罗拉<br />3=三星</div></td>
+            <td class="td2"><textarea name="options[text]" class="textarea">$rt[options]</textarea></td>
+			<td class="td2"><div class="help_a" id="textdescript" style="display: block;">当填写类型为单／复选框时需要设置选项内容，每行为一个选项<br />格式:索引=内容，建议使用数字做索引。例如:<br />1=诺基亚<br />2=摩托罗拉<br />3=三星</div></td>
+        </tr>
+        <tr class="tr1 vt" id="areatype" style="display:none;">
+            <td class="td1">地区前台显示</td>
+            <td class="td2">
+            	<span>
+	            	 <select name="options[province]" id="province" onChange="changeSubArea(this.value, 'city', 1);">
+	            	 	<option value="-1">请选择</option>
+	                </select>
+	                <select name="options[city]" id="city" onChange="changeSubArea(this.value, 'area', 1);">
+	                	<option value="-1">请选择</option>
+	                </select>
+	                <select name="options[area]" id="area">
+	                	<option value="-1">请选择</option>
+	                </select>
+                </span>
+            </td>
+			<td class="td2"><div class="help_a" style="display: block;">前台资料管理时，默认显示的所在区域</div></td>
+        </tr>
+        <tr class="tr1 vt" id="datetype" style="display:none;">
+            <td class="td1">默认年限显示选项</td>
+            <td class="td2"><input type="text" class="input" name="options[startdate]" value="{$rt[dateoptions][startdate]}" /> 至 <input type="text" class="input" name="options[enddate]" value="{$rt[dateoptions][enddate]}" /></td>
+			<td class="td2"><div class="help_a" style="display: block;">注册用户生日信息填写的年份输入区间，如1962-2010</div></td>
+        </tr>
+        <tr class="tr1 vt" id="contentlimit" style="display:none;">
+            <td class="td1">前台填写内容长度</td>
+            <td class="td2"><input type="text" class="input input_wa" name="maxlen" value="$rt[maxlen]"></td>
+			<td class="td2"><div class="help_a" style="display: block;">用户前台资料完善输入内容的最大字节限制(最大:255字节)</div></td>
         </tr>
     </table>
 </div>
@@ -199,7 +283,962 @@ EOT;
     <span class="btn"><span><button type="submit" name="add">提 交</button></span></span>
 </div>
 </form>
+$allAreas
+<script type="text/javascript">
+function changeType(id) {
+	var value = getObj(id).value;
+	if (value == 1) {
+		getObj('texttype').style.display = getObj('areatype').style.display = getObj('datetype').style.display = 'none';
+		getObj('contentlimit').style.display = '';
+	} else if (value == 2) {
+		getObj('contentlimit').style.display = getObj('texttype').style.display = getObj('areatype').style.display = getObj('datetype').style.display = 'none';
+	} else if (value == 3 || value == 4 || value == 5) {
+		getObj('contentlimit').style.display = getObj('areatype').style.display = getObj('datetype').style.display = 'none';
+		getObj('texttype').style.display = '';
+		if (value == 5) {
+			getObj('textdescript').innerHTML = '当填写类型为下拉方式时需要设置下拉选项内容，第一行为默认显示项<br />每行为一个选项格式:索引=内容，建议使用数字做索引。例如:<br />1=诺基亚<br />2=摩托罗拉<br />3=三星';
+		} else {
+			getObj('textdescript').innerHTML = '当填写类型为单／复选框时需要设置选项内容，每行为一个选项<br />格式:索引=内容，建议使用数字做索引。例如:<br />1=诺基亚<br />2=摩托罗拉<br />3=三星';
+		}
+	} else if (value == 6) {
+		getObj('contentlimit').style.display = getObj('areatype').style.display = getObj('texttype').style.display = 'none';
+		getObj('datetype').style.display = '';
+	} else if (value == 7) {
+		getObj('contentlimit').style.display = getObj('datetype').style.display = getObj('texttype').style.display = 'none';
+		getObj('areatype').style.display = '';
+	}
+}
+changeType('selecttype');
+</script>
+<script type="text/javascript" language="JavaScript" src="js/pw_areas.js"></script>
 <!--
 EOT;
-}include_once PrintEot('adminbottom');
+}} elseif ($adminitem == 'guide'){
+print <<<EOT
+-->
+<div class="admin_info mb10">
+    <h3 class="h1"><b>提示信息</b></h3>
+    <div class="legend"><ol><li>新用户引导，是针对通过注册控制开启在用户完成注册后首次登录网站需要经过的新用户步骤</li><li>可能认识的人自动调用规则提示：自动推荐可能感兴趣的人，根据用户完善的资料调用当前在线的同地区、同乡、同事、同学依次获取；</li><li>可能感兴趣的内容自动调用规则提示：自动推荐可能感兴趣的内容，是根据用户注册前浏览的话题来源，调用该话题所有版块或分类下当前最新的话题；当用户是直接注册的情况，系统默认调用社区最新的话题；</li></ol></div>
+</div>
+<form id="guideform" method="post" action="$basename&adminitem=guide" name="FORM">
+<input id="hiddenaction" name="action" type="hidden" value="edit">
+<h2 class="h1"><span class="fl mr10">新用户引导管理</span></h2>
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+	<tr class="tr1 vt">
+		<td class="td1">人工推荐名单</td>
+		<td class="td2"><textarea class="textarea" name="reg[recommendnames]">$rg_recommendnames</textarea></td>
+		<td class="td2">填写要推荐给新用户的会员用户名,每行一个，最大不超过12个，不填写前台显示为空</td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">人工推荐内容</td>
+		<td class="td2"><textarea class="textarea" name="reg[recommendcontent]" style="height: 300px;">$rg_recommendcontent</textarea></td>
+		<td class="td2">填写要推荐给新用户的内容，建议使用HTML，不填写前台显示为空</td>
+	</tr>
+</table>
+</div>
+<div class="mb10 tac">
+	<span id="submit" class="btn"><span><button type="button" onClick="previewContent('submit');">提 交</button></span></span>
+	<span class="bt"><span><button type="button" onClick="previewContent('preview');">预 览</button></span></span>
+</div>
+</form>
+<script language="javascript">
+var url = "$basename&adminitem=guide";
+function previewContent(type) {
+	if (type == 'preview') {
+		var windowname="win"+ new Date().getTime(); 
+		getObj('hiddenaction').value = 'preview';
+		newwindow = window.open(url,windowname,"");
+		getObj('guideform').target = windowname;
+	} else {
+		getObj('guideform').target = '_self';
+		getObj('hiddenaction').value = 'edit';
+	}
+	getObj('guideform').submit();
+}
+</script>
+<!--
+EOT;
+} elseif ($adminitem == 'area'){
+print <<<EOT
+-->
+<div class="admin_info mb10">
+    <h3 class="h1"><b>提示信息</b></h3>
+    <div class="legend">
+此功能允许管理员手动维护地区的联动关系及新增区域，用户在注册和编辑个人资料时更准确地定义归属区域<br />
+此功能的维护涉及全站所有的地域联动调用，请管理员根据实际的行政地域调整变化修改<br />
+	</div>
+</div>
+
+<form action="$ajaxurl&" method="post" id="editAreas" name="editAreas">
+<input type="hidden" name="action" value="editAreas" />
+<input type="hidden" name="parentid" id="parentid" />
+<input type="hidden" name="provinceid" id="provinceid" value="{$provinceid}"/>
+<h2 class="h1"><span class="fl mr10">地区管理</span></h2>
+<div class="cc td_bgA" style="padding:8px 15px;">
+		<span>
+		<select name="province" id="province_areas" onChange="countrySelect(this.value, 'city_areas', 1);">
+			<option value="-1">请选择</option>
+			</select>
+		 <select name="city" id="city_areas" onChange="countrySelect(this.value, '', 1);">
+			<option value="-1">请选择</option>
+			</select>
+		</span>
+$allAreas
+</div>
+<div class="admin_table mb10">
+	<div class="library">
+		<div id="createareas"></div>
+		<div id="modes"></div>
+		<div id="areaMode" style="display:none"><dl class="cc"><dt><input type="text" class="input input_wd" name="vieworders[]" /></dt><dd><input name="names[]" type="text" class="input input_wa" /></dd></dl></div>
+		<dl class="cc" id="add_middle"><dd style="width:80px;"><a onClick="addArea()" class="cp s3">添加</a></dd></dl>
+	</div>
+</div>
+<div class="p10 tac">
+   <span class="btn"><span><button type="submit">提 交</button></span></span>
+</div>
+
+</div>
+</form>
+<script type="text/javascript" language="JavaScript" src="js/pw_areas.js"></script>
+<script language="JavaScript" src="js/app_global.js"></script>
+<script language="javascript">
+var ajaxurl = '$ajaxurl';
+countrySelect('$parentid','');
+</script>
+<!--
+EOT;
+} elseif ($adminitem == 'school'){
+print <<<EOT
+-->
+
+<script language="JavaScript" src="js/app_global.js"></script>
+<script language="javascript">
+var ajaxurl = '$ajaxurl';
+function areasSelect(parentid,type,hasFirst,createsObj){
+	changeSubArea(parentid,type,hasFirst);
+	getObj('add_'+createsObj).style.display = 'none';
+	getObj('button_'+createsObj).style.display = 'none';
+	getObj('creates_'+createsObj).innerHTML = '';
+}
+
+function schoolsList(parentid,typeObj,createsObj,typeId){
+	if (parentid == '-1') {
+		getObj('add_'+createsObj).style.display = 'none';
+//		getObj('button_'+createsObj).style.display = 'none';
+		getObj('creates_'+createsObj).innerHTML = '';
+		return;
+	}
+	ajax.send("$ajaxurl",'action=universityList&parentid='+parentid+'&typeId='+typeId,function(){
+		var rText = ajax.request.responseText.split('\t');
+		if ('success' != rText[0]) showDialog('error','数据链接出错',2);
+		var schoolsData = JSONParse(rText[1]);
+		var schoolsHtml = buildSchoolsDataList(schoolsData);
+/*
+		if (typeObj == 'university' && schoolsData != '') {
+			var obj = getObj('select_'+typeObj);
+			obj.options.length=0;
+			obj.options.add(new Option("请选择","-1"));
+			for (i in schoolsData) {
+				obj.options.add(new Option(schoolsData[i].schoolname, schoolsData[i].schoolid));
+			}
+			getObj('button_college').style.display = 'none';
+			getObj('universityId').value = parentid;
+			getObj('editType').value = 'editSchool';
+		}
+*/
+		getObj('button_'+typeObj).style.display = '';
+		getObj('add_'+createsObj).style.display = '';
+		getObj('parentid_'+createsObj).value = parentid;
+		getObj('typeId_'+createsObj).value = typeId;
+		getObj('creates_'+createsObj).innerHTML = schoolsHtml;
+	});
+}
+
+function buildSchoolsDataList(schoolData){
+	if (schoolData == '') return '';
+	var buildHtml = '',s = 0;
+	for (i in schoolData) {
+		buildHtml += '<dl class="cc" id="school_'+schoolData[i].schoolid+'">';
+		buildHtml += '<dd><input name="schools['+schoolData[i].schoolid+'][schoolname]" onkeypress="return inputCheck(this);" type="text" class="input input_wb" value="'+schoolData[i].schoolname+'" /></dd>';
+		buildHtml += '<dd><a href="javascript:;" onclick="delSchool('+schoolData[i].schoolid+',this,3);" class="mr20">[删除]</a></dd>';
+		buildHtml += '</dl>';
+		s++;
+	}
+	return buildHtml;
+}
+/*
+function collegesList(parentid,typeObj,createsObj,typeId){
+	if (parentid == '-1') {
+		parentid = getObj('universityId').value;
+		getObj('parentid_'+createsObj).value = parentid;
+		schoolsList(parentid,'university','university',3);
+		exit;
+	}
+	ajax.send("$ajaxurl",'action=collegesList&parentid='+parentid,function(){
+		var rText = ajax.request.responseText.split('\t');
+		if ('success' != rText[0]) showDialog('error','数据链接出错',2);
+		var collegesData = JSONParse(rText[1]);
+		var collegesHtml = buildCollegesDataList(collegesData);
+		
+		getObj('button_'+createsObj).style.display = 'none';
+		getObj('button_'+typeObj).style.display = '';
+		getObj('parentid_'+createsObj).value = parentid;
+		getObj('typeId_'+createsObj).value = typeId;
+		getObj('editType').value = 'editCollege';
+		getObj('creates_'+createsObj).innerHTML = collegesHtml;
+	});
+	initEditType();
+}
+
+function buildCollegesDataList(collegesData){
+	if (collegesData == '') return '';
+	var buildHtml = '',s = 0;
+	for (i in collegesData) {
+		buildHtml += '<dl class="cc" id="college_'+collegesData[i].collegeid+'">';
+		buildHtml += '<dd><input name="colleges['+collegesData[i].collegeid+'][collegename]" onkeypress="return inputCheck(this);" type="text" class="input input_wb" value="'+collegesData[i].collegename+'" /></dd>';
+		buildHtml += '<dd><a href="javascript:;" onclick="delCollege('+collegesData[i].collegeid+',this);" class="mr20">[删除]</a></dd>';
+		buildHtml += '</dl>';
+		s++;
+	}
+	return buildHtml;
+}
+
+function delCollege(collegeId,position){
+	pwConfirm("是否确认删除", position, function() {
+		ajax.send("$ajaxurl",'&action=delCollege&collegeId='+collegeId,function(){
+			var rText = ajax.request.responseText;
+			if (rText=='success') {
+				delElement('college_'+collegeId);
+			} else {
+				ajax.guide();
+			}
+		});
+	})
+}
+
+function editCollege(form,createsObj){
+	ajax.send("$ajaxurl",form,function(){
+		var rText = ajax.request.responseText.split('\t');
+		if ('success' != rText[0]) showDialog('error','数据链接出错',2);
+		var collegesData = JSONParse(rText[1]);
+		getObj('list_'+createsObj).innerHTML = '';
+		getObj('creates_'+createsObj).innerHTML = buildCollegesDataList(collegesData);;
+	});
+}
+
+function delSchool(schoolId,position,typeId){
+	if (typeId == 3) {
+		ajax.send("$ajaxurl",'&action=checkIsTopSchool&schoolId='+schoolId,function(){	
+			var isTopSchool = ajax.request.responseText;
+			if (isTopSchool == "true") {
+				showDialog('error','该大学下面含有学院，请先删除学院，再进行此操作',2);
+				exit;
+			}
+			doDelSchool(schoolId,position,typeId);
+		});
+		
+	} else {
+		doDelSchool(schoolId,position,typeId);
+	}
+}
+*/
+
+function delSchool(schoolId,position,typeId) {
+	pwConfirm("是否确认删除", position, function() {
+		ajax.send("$ajaxurl",'&action=delSchool&schoolId='+schoolId+'&typeId='+typeId,function(){
+			var rText = ajax.request.responseText;
+			if (rText=='success') {
+				delElement('school_'+schoolId);
+			} else {
+				ajax.guide();
+			}
+		});
+	});
+}
+
+
+function addSchool(createsObj){
+	var modes = getObj('mode_'+createsObj).firstChild.cloneNode(true);
+	getObj('list_'+createsObj).appendChild(modes);
+}
+
+function editSchool(form,createsObj){
+	ajax.send("$ajaxurl",form,function(){
+		var rText = ajax.request.responseText.split('\t');
+		if ('success' != rText[0]) showDialog('error','数据链接出错');
+		var schoolsData = JSONParse(rText[1]);
+		getObj('list_'+createsObj).innerHTML = '';
+		getObj('creates_'+createsObj).innerHTML = buildSchoolsDataList(schoolsData);
+	});
+}
+
+function inputCheck(obj) {
+	var keyCode = event.keyCode;  
+	var converter = document.createElement("DIV");
+	inputValue = obj.value.replace(/ /g,"&nbsp;");  
+	converter.innerHTML = inputValue;
+	var output = converter.innerHTML;
+	if (output.length > 32 && keyCode != 8) {
+		return false;
+	}else{
+		return true;
+	}
+}
+</script>
+<div class="admin_info mb10">
+    <h3 class="h1"><b>提示信息</b></h3>
+    <div class="legend">
+此功能允许管理员手动维护学校的联动关系及新增区域，用户在注册和编辑个人资料时更准确地定义归属学校<br />
+此功能的维护涉及全站所有的学校字段联动调用，请管理员根据实际的学校库调整变化修改<br />
+	</div>
+</div>
+
+<form action="$ajaxurl&" method="post">
+<input type="hidden" name="action" value="editSchool" />
+<input type="hidden" name="parentid" id="parentid_university" />
+<input type="hidden" name="typeId" id="typeId_university" />
+<input type="hidden" name="universityId" id="universityId" />
+<h2 class="h1"><span class="fl mr10">大学管理</span></h2>
+<div class="cc td_bgA" style="padding:8px 15px;">
+	<span>
+		<select name="province" id="select_province" onChange="schoolsList(this.value,'university','university',3)">
+			<option value="-1">请选择</option>
+			$provinces
+		</select>
+		<!-- select name="university" id="select_university" onchange="collegesList(this.value,'college','university',3)">
+			<option value="-1">请选择</option>
+		</select -->
+	</span>
+</div>
+<div class="admin_table mb10">
+		<div class="library" id="creates_university"></div>
+		<div class="library" id="list_university"></div>
+		<div class="library" id="mode_university" style="display:none"><dl class="cc"><dd><input name="names[]" onKeyPress="return inputCheck(this);" type="text" class="input input_wb" /></dd></dl></div>
+		<div class="library" id="add_university" style="display:none"><dl class="cc"><dd style="width:80px;"><a onClick="addSchool('university')" class="cp s3">添加</a></dd></dl></div>
+<div class="p10 tac">
+   <span class="btn" id="button_university" style="display:none"><span><button type="button" onClick="editSchool(this.form,'university');">提 交</button></span></span>
+   <!--span class="btn" id="button_college" style="display:none"><span><button type="button" onclick="editCollege(this.form,'university');">提 交</button></span></span -->
+</div>
+</div>
+</form>
+
+<form action="$ajaxurl&" method="post">
+<input type="hidden" name="action" value="editSchool" />
+<input type="hidden" name="parentid" id="parentid_middle" />
+<input type="hidden" name="typeId" id="typeId_middle" />
+<h2 class="h1"><span class="fl mr10">中学管理</span></h2>
+<div class="cc td_bgA" style="padding:8px 15px;">
+            	<span>
+	            	 <select name="options[province_middle]" id="province_middle" onChange="areasSelect(this.value, 'city_middle',1,'middle');">
+	            	 	<option value="-1">请选择</option>
+	                </select>
+	                <select name="options[city_middle]" id="city_middle" onChange="areasSelect(this.value, 'area_middle',1,'middle');">
+	                	<option value="-1">请选择</option>
+	                </select>
+	                <select name="options[area_middle]" id="area_middle" onChange="schoolsList(this.value,'middle','middle',2)">
+	                	<option value="-1">请选择</option>
+	                </select>
+                </span>
+$allAreas
+</div>
+<div class="admin_table mb10">
+		<div class="library" id="creates_middle"></div>
+		<div class="library" id="list_middle"></div>
+		<div class="library" id="mode_middle" style="display:none"><dl class="cc"><dd><input name="names[]" onKeyPress="return inputCheck(this);" type="text" class="input input_wb" /></dd></dl></div>
+		<div class="library" id="add_middle" style="display:none"><dl class="cc"><dd style="width:80px;"><a onClick="addSchool('middle')" class="cp s3">添加</a></dd></dl></div>
+<div class="p10 tac">
+   <span class="btn" id="button_middle" style="display:none"><span><button type="button" onClick="editSchool(this.form,'middle');">提 交</button></span></span>
+</div>
+</div>
+</form>
+
+<form action="$ajaxurl&" method="post">
+<input type="hidden" name="action" value="editSchool" />
+<input type="hidden" name="parentid" id="parentid_elementary" />
+<input type="hidden" name="typeId" id="typeId_elementary" />
+<h2 class="h1"><span class="fl mr10">小学管理</span></h2>
+<div class="cc td_bgA" style="padding:8px 15px;">
+            	<span>
+	            	 <select name="options[province_elementary]" id="province_elementary" onChange="areasSelect(this.value, 'city_elementary',1,'elementary');">
+	            	 	<option value="-1">请选择</option>
+	                </select>
+	                <select name="options[city_elementary]" id="city_elementary" onChange="areasSelect(this.value, 'area_elementary',1,'elementary');">
+	                	<option value="-1">请选择</option>
+	                </select>
+	                <select name="options[area_elementary]" id="area_elementary" onChange="schoolsList(this.value,'elementary','elementary',1)">
+	                	<option value="-1">请选择</option>
+	                </select>
+                </span>
+$allAreas
+</div>
+<div class="admin_table mb10">
+		<div class="library" id="creates_elementary"></div>
+		<div class="library" id="list_elementary"></div>
+		<div class="library" id="mode_elementary" style="display:none"><dl class="cc"><dd><input name="names[]" onKeyPress="return inputCheck(this);" type="text" class="input input_wb" /></dd></dl></div>
+		<div class="library" id="add_elementary" style="display:none"><dl class="cc"><dd style="width:80px;"><a onClick="addSchool('elementary')" class="cp s3">添加</a></dd></dl></div>
+<div class="p10 tac">
+   <span class="btn" id="button_elementary" style="display:none"><span><button type="button" onClick="editSchool(this.form,'elementary');">提 交</button></span></span>
+</div>
+</div>
+</form>
+<script type="text/javascript" language="JavaScript" src="js/pw_areas.js"></script>
+<script>
+
+</script>
+<!--
+EOT;
+}
+include_once PrintEot('adminbottom');
+} else{
+print <<<EOT
+-->
+<!doctype html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=$db_charset" />
+<title>phpwind - Powered by phpwind</title>
+<meta name="description" content="" />
+<meta name="keywords" content="" />
+<link rel="stylesheet" type="text/css" href="$imgpath/pw_core.css?101128" media="all" />
+<!--css-->
+<style type="text/css"> 
+/*Spacing*/
+.pdD{padding:.3em .5em}
+.pd5{padding:0 5px;}
+.pd15{padding:0 15px;}
+/*form*/
+input.btn,input.bt{cursor:pointer;padding:.1em 1em;*padding:0 1em;font-size:9pt; line-height:130%; overflow:visible;}
+input.btn{border:1px solid #ff5500;background:#ff8800;margin:0 3px;color:#fff;}
+input.bt{border:1px solid #c2d8ee;background:#fff;margin:0 3px;color:#333;}
+/*layout*/
+html{background-color:#fff;overflow-y:scroll;}
+body{font-size:12px;font-family:Arial; color:#333;line-height: 1.5;background:#fff url(images/wind/bg.jpg) center top repeat-x;min-height:500px;}
+.wrap,#top{min-width:820px;margin:auto;}
+/*全局链接*/
+a{text-decoration:none;color:#333333;}
+a:hover,.alink a,.link{text-decoration:underline;}
+/*链接按钮*/
+.bta{cursor:pointer;color:#333333;padding:0 5px;margin:0 3px;white-space:nowrap;border:1px solid #d5e6ed;line-height:22px;background:#ffffff;}
+.bta:hover{border:1px solid #a6cbe7;text-decoration:none;}
+/*main color 数值自定义*/
+.f_one,.t_one,.r_one{background:#ffffff;}
+.f_two,.t_two,.r_two{background:#f3f9fb;}
+/*头部*/
+#head,.main-wrap,#footer,#searchA,#navA,#navB,.top{width:960px;margin:0 auto;max-width:1200px;}
+#search_wrap{background:#ddd;}
+#top{height:23px;border-bottom:1px solid #fff;background:url(images/wind/topbar.png) 0 bottom repeat-x;_background:#e9f1f4;line-height:23px;overflow:hidden;}
+.top li{float:left;margin-right:10px;}
+.top a{color:#666;}
+	/*导航*/
+	#navA{height:35px;background-color:#176eac;}
+	.navA,.navAL,.navAR,.navA li,.navA li a,#td_mymenu{background:url(images/wind/navA.png) 999em 999em no-repeat;}
+	.navAL,.navAR{width:5px;height:35px;}
+	.navAL{ background-position:0 -80px;_margin-right:-3px;}
+	.navAR{ background-position:0 -150px;_margin-left:-3px;}
+	.navA{ background-position:0 -115px;height:35px;overflow:hidden; background-repeat:repeat-x;}
+	.navA ul{font-size:14px;overflow:hidden;}
+	.navA li{float:left;margin-left:-1px;}
+	.navA li a{float:left;color:#ffffff;padding:0 15px;height:35px;line-height:35px;outline:none;font-weight:700; background-position:0 -35px;}
+	.navA li a:hover{text-decoration:none;color:#ffea00;}
+	.navA .current a,.navA .current:hover a,.navA .current a:hover{background-position:center top;display:inline;text-decoration:none;text-shadow:none;}
+		/*快捷导航*/
+		#td_mymenu{ background-position:-20px -150px;color:#fff;cursor:pointer;float:right;width:92px;height:23px;overflow:hidden;line-height:23px;padding-left:10px;margin:5px 2px 0 0;_display:inline}
+		#td_mymenu_old{color:#888;}
+	.navB,.navBbg{background:url(images/wind/navB.png) right bottom repeat-x;}
+	.navB{margin-bottom:5px;}
+	.navBbg{padding:3px 0;background-position:left bottom;margin-right:4px;_position:relative;}
+	.navB ul{padding:4px 4px 4px 16px;}
+	.navB li:hover,.navB li:hover a{background:url(images/wind/navBcur.png) no-repeat;}
+	.navB li:hover{ background-position:left 0;}
+	.navB li:hover a{ background-position:right 0;}
+	.navB li{float:left;height:23px;line-height:23px;margin:0 10px 0 0;}
+	.navB li a{display:block;padding:0 5px; font-size:14px;color:#666;}
+	.navB li a:hover{ text-decoration:none;color:#68b;}
+	/*搜索*/
+	#searchA{margin:2px auto 5px;height:41px;overflow:hidden;}
+	#searchA,.searchA_right{background:url(images/wind/searchA.png) no-repeat;}
+	.searchA_right{ background-position:right 0;height:41px;width:5px;}
+	.searchA{padding:8px 0 0 55px;}
+	.searchA .ip{width:330px;float:left;border:1px solid #dddddd;background:#fff;height:20px;padding:4px 5px 0;overflow:hidden;}
+	.searchA .ip input{border:0;background:none;padding:0;font:14px/16px Arial;width:100%;float:left;margin:0;}
+	.s_select{float:left;border:1px solid #dddddd;border-left:0;margin-right:7px;background:#fff;width:49px;}
+	.s_select h6{display:block;padding:0 15px 0 10px;height:24px;line-height:24px;cursor:pointer;background:url(images/wind/down.png) 35px center no-repeat;color:#666;}
+	.s_select ul{ position:absolute;border:1px solid #dddddd;background:#fff;line-height:22px;width:49px;margin:24px 0 0 -1px;display:none;}
+	.s_select ul li{padding:0 10px;cursor:pointer;}
+	.s_select ul li:hover{background:#f7f7f7;}
+	.searchA button{width:45px;height:25px;border:0 none;background:url(images/wind/search_btn.png) no-repeat; font-size:14px; font-weight:700;line-height:25px;padding:0 0 3px 0;}
+	.s_tags{padding:3px 0 0 15px; font-size:14px;height:20px;line-height:20px;overflow:hidden;margin:0;}
+	.s_tags a{margin:0 8px 0 0;color:#666;}
+	/*站点信息*/
+	#infobox{margin-bottom:5px;}
+	#infobox .fr li,#breadCrumb .fr li{float:left;padding:0 5px;}
+	#infobox .fr li a,#breadCrumb .fr li a{float:left;}
+	/*面包屑*/
+	#breadCrumb{zoom:1; border:1px solid #c1d8ea;background:#f5fafe;padding:0 5px 0 10px;margin-bottom:10px;}
+	#breadCrumb a{line-height:30px;}
+	#breadCrumb .fr{padding-top:7px;}
+	#breadCrumb .fr a{line-height:18px;}
+	#breadCrumb .fr .link_down{margin-top:-1px;}
+	#breadCrumb em{ font-family:Simsun;margin:0 5px;}
+	#breadCrumb .breadEm{height:30px;background:url(images/wind/breadEm.png) 0 0 no-repeat;width:10px;overflow:hidden;margin:0 3px;float:left;}
+	#breadCrumb img.breadHome{float:left;margin:6px 5px 0 0;}
+	/*站点信息*/
+	.pw_ulC{height:36px;overflow:hidden;}
+	.pw_ulC li{float:left;border-right:1px solid #ddd;padding:0 15px;}
+	.pw_ulC li em{display:block;color:#666; font-family:Arial;-webkit-transition: all 0.2s ease-out;-o-transition: all 0.2s ease-out;}
+	.pw_ulC li em a{color:#666;}
+	.pw_ulC li:hover em{-webkit-transform: scale(1.5);-o-transform: scale(1.5);}
+	.pw_ulC li.none{border:0;}
+	/*文字广告*/
+	.textMes{margin:0 auto 5px;border:1px solid #d5e6ed;border-bottom:0;background:#ffffff;}
+	.textMes .tr3 td,.textMes .tr3 th{border-bottom:1px solid #d5e6ed;padding:.4em .6em;border-top:0;}
+/*中间内容*/
+.main-wrap{margin-bottom:10px;}
+#pw_content{background:#ffffff;border:1px solid #c0d8ea;border-top:2px solid #065792;}
+.t{border:1px solid #a6cbe7;padding:1px;_display:inline-block;margin-bottom:10px;background:#ffffff;}
+.tTable{margin:0 10px;}
+#pw_content .t{border:0;padding:0;}
+	/*首页热榜*/
+	.newInfor h4{font-weight:700;overflow:hidden;color:#666;padding:0 0 0 10px;margin-bottom:10px;}
+	.newInfor .switchItem .view-hover,.newInfor .switchItem .view-current{min-height:240px;_height:240px;}
+	.newflash{width:360px;height:240px;overflow:hidden;}
+	.flashimg img{height:240px;margin-bottom:8px;}
+	.flashimg p a{color:#fff;font-weight:700;text-shadow:1px 1px 0px #333;}
+	.flashimg p{overflow:hidden;width:260px;bottom:4px;position:absolute;text-indent:12px;z-index:2;left:0;}
+	.flashBg{ position:absolute;bottom:0;width:100%;height:27px;background:#000;filter:alpha(opacity=60);-moz-opacity:0.6;opacity:0.6; z-index:1;}
+	.an{ position:absolute;right:5px;z-index:2;bottom:5px;}
+	.an li{float:left;margin-left:5px;}
+	.an li a{float:left;background:#fff;color:#333;overflow:hidden;line-height:16px;padding:0 3px;-webkit-transition: all 0.2s ease-out;-o-transition: all 0.2s ease-out;}
+	.an li.current a,.an li a:hover{background:#ff6600;color:#fff; text-decoration:none;}
+	.an li a:hover{-webkit-transform: scale(1.4);-o-transform: scale(1.4);}
+	.newHotA dd{padding:5px 0 10px;}
+	.newHotA{width:500px;}
+	.newHotB{}
+	.newHotB li{float:left;width:47.5%;padding-right:2%;line-height:22px;height:22px;overflow:hidden;}
+	.newHotB a{color:#004b91;}
+	.newHotB em a{color:#333;}
+	/*公告*/
+	.noticebg{border-top:1px dotted #ccc;margin:0 10px;}
+	#notice{padding:5px 5px 5px 5px;background:url(images/wind/file/anc.gif) 2px 5px no-repeat;}
+	#notice li{list-style:none;float:left;white-space:nowrap;padding-left:20px;height:18px;}
+	#notice a{padding-right:.5em;}
+	#notice0{width:98%;height:18px;line-height:18px;overflow-y:hidden;}
+	/*通用标题栏*/
+	.h{border-bottom:1px solid #d6e8f4;border-top:1px solid #d6e8f4;background:#f0f9ff url(images/wind/h.png) 0 0 repeat-x;color:#1b72af;padding:5px 10px;overflow:hidden;}
+	.h a{color:#1b72af}
+	.h span a,.h span{color:#5ea6d8;}
+	.h a span{ font-family:Verdana;}
+	.closeicon{height:16px;}
+	.cate_fold{padding:0 5px 0 5px;text-decoration:none;}
+	.cate_fold:hover{text-decoration:none;}
+	/*内容区域顶部标题栏*/
+	.hB{background:url(images/wind/hB.png) 0 bottom repeat-x;height:32px;line-height:32px;overflow:hidden;}
+		/*标题栏内tab切换*/
+		.tabB{margin-top:3px;height:32px;padding-left:10px;}
+		.tabB li{float:left;}
+		.tabB li a{color:#014c90; font-weight:100;padding:0 15px;float:left;line-height:25px;height:27px;padding-top:2px;}
+		.tabB li.current a{border:1px solid #dcdcdc;border-bottom:0;background:#ffffff;color:#333;padding-top:1px;}
+		.tabB li a:hover{ text-decoration:none;}
+	.content_thread .hB{padding-left:10px;}
+	/*h2版块名，h3分类版块名*/
+	h2{font-weight:700;display:inline;}
+	h2 a{color:#333;}
+	h3{font-weight:700;display:inline;}
+	h3 a:hover{ text-decoration:none;color:#ff5500;}
+	/*table表格*/
+	.tr3 td,.tr3 th{border-bottom:1px dotted #ddd;}
+	.tr3none th,.tr3none td{border-bottom:none;}
+	.tr3 .old,.tr3 .new,.tr3 .lock{padding:10px 5px 10px 45px;color:#444;font-weight:100;height:35px;}
+	.tr3 .old{background:url(images/wind/old.gif) 0 15px no-repeat;}/*旧主题版块*/
+	.tr3 .new{background:url(images/wind/new.gif) 0 15px no-repeat;}/*新主题版块*/
+	.tr3 .lock{background:url(images/wind/lock.gif) 0 15px no-repeat;}/*锁定版块*/
+	.tr2 td,.tr2 th{padding:3px 5px;color:#666;background:#f7fbff;border-bottom:1px dotted #d5e6ed;}
+	.tr2 th,.tr3 th{font-weight:100;}
+	.tr3 td,.tr3 th{padding:5px;}
+	td.num{color:#444; font-size:11px;-webkit-text-size-adjust:none;}
+	td.num em{color:#014c90;}
+	.re{width:220px;}
+	.author{width:95px;}
+	.author a{color:#444;}
+	.author p,.author p a{color:#999;font-size:11px;-webkit-text-size-adjust:none;}
+	.author p span{ font-family:Verdana;}
+	.view,.fNum,.fNum a,.adminlist a,.adminlist{color:#444;}
+	.tr3 td.icon{padding:5px 0;}
+	.icon div.tips{position:absolute;margin-left:-45px;background:#ffffcc;border:1px solid #cc6699;padding:3px 10px;}
+	.adminbox{padding:0 0 0 10px;width:25px;}
+	.tr3 td.subject{padding:5px 10px 5px 0;}
+	.tr4 td{padding:3px 5px;border-bottom:1px solid #eaeaea;color:#666;background:#f9f9f9;}
+	.tr4 td a{color:#6a99bf}
+	.tr4 td .current{color:#333;}
+	.z tr:hover td,.z tr:hover th{background-color:#f3f9fb;}
+	.bt0 td{border-top:0;}
+	.tr5 td{border:0;}
+	.threadCommon .tr3 td{line-height:1.3;}/*列表行高*/
+	.hrA{height:1px; background:#d5e6ed;color:#d5e6ed;border:0;margin:8px 0;overflow:hidden;}
+	/*old table*/
+	.t3 td{padding:2px 5px;}
+	/*发帖回复*/
+	.post,.replay{height:30px;overflow:hidden;width:74px; text-align:center;font:bold 14px/30px Simsun;}
+	.post:hover,.replay:hover{text-decoration:none;}
+	.replay{ background:url(images/wind/reply.png?101129) no-repeat;color:#d74700;}
+	.post{ background:url(images/wind/post.png?101129) no-repeat;color:#fff;}
+	.post:hover{color:#ffea00;}
+	/*列表页分类*/
+	.pw_ulA{height:auto;border-bottom:1px solid #c3d8eb;}
+	.pw_ulA ul{padding-bottom:8px;*padding-bottom:6px;padding-left:2px;}
+	.pw_ulA li{float:left;border-right:1px solid #ccc;margin-top:8px;}
+	.pw_ulA li a{line-height:14px;height:14px;padding:0 10px;float:left;color:#1b72af;font-weight:100; white-space:nowrap;}
+	.pw_ulA li a:hover{ text-decoration:none;}
+	.pw_ulA a span{ font-size:10px;}
+	.pw_ulA li.current a{color:#333; font-weight:700;}
+	/*版主推荐,群组列表*/
+	.pw_ulB{padding:10px 0 10px 10px;}
+	.pw_ulB li{line-height:22px;height:22px;overflow:hidden;}
+	.pw_ulB li a{padding-left:13px;background: url(images/pwicon/related_li.gif) 0 3px no-repeat;}
+	.pw_ulB li em a{padding:0;background:none;}
+	.pw_ulB .adel{margin:4px 40px 0 0 ;}
+	.pw_ulB .one{float:left;width:90px;margin:0 15px 0 0;}
+	.pw_ulB .one p,.pw_ulB .two p{text-align:center;height:22px;overflow:hidden;}
+	.pw_ulB .two{float:left;width:90px;margin:0 15px 10px 0;height:120px;}
+	.pw_ulB .two a{padding-left:0;background:none;}
+	/*侧栏版块列表*/
+	.pw_ulD{padding:5px;}
+	.pw_ulD li{padding:0 5px;}
+	.pw_ulD li:hover,.pw_ulD li.hover,.pw_ulD li.current{background:#daeef9;}
+	.pw_ulD li a{line-height:22px;height:22px;overflow:hidden;}
+	.pw_ulD li a:hover{ text-decoration:none;}
+	.pw_ulD li del{margin-top:3px;display:none;}
+	.pw_ulD li:hover del,.pw_ulD li.current del,.pw_ulD li.hover del{display:block;}
+	.sideForum {}
+	.sideForum .pw_ulD{border-top:1px solid #cfdfec;}
+	.sideForum .pw_ulD li.current{background:#2e84c1;}
+	.sideForum .pw_ulD li.current a{color:#fff;display:block;}
+	.sideForum dt{line-height:29px;height:29px;padding:0 10px; background:url(images/wind/thread/sideForumDt.gif) right 0;cursor:pointer;overflow:hidden;}
+	.sideForum dd{display:none;}
+	.sideForum .one dt{background-position:right -30px; font-weight:700;}
+	.sideForum .one dd{display:block;}
+	/*列表侧栏*/
+	.sidebar{float:left;overflow:hidden;margin-right:-1px;margin-bottom:-1px;}
+	.content_thread{background:#ffffff;min-height:600px;_height:600px;_float:right;}
+	.sideClose .content_thread{margin:0;border:0;float:none;}
+	.f_tree{background:#f7faff;}
+	/*列表操作图标*/
+	.history,.pw_ulD del,.switch,.keep,.keepOn,.rss,.competence{background:url(images/wind/thread/sideicon.gif) 9999px 9999px no-repeat;cursor:pointer;}
+	.history,.pw_ulD del{float:right;width:16px;height:16px;overflow:hidden;display:block;text-indent:-2000em;}
+	.history{ background-position:0 0;}
+	.switch{float:left;width:9px;height:27px;display:block; text-indent:-2000em;overflow:hidden; background-position:0 -40px;margin-top:1px; position:absolute;}
+	.switch:hover{ background-position:-9px -40px;}
+	.sideClose .switch{background-position:-1px -68px;width:8px;}
+	.sideClose .switch:hover{background-position:-10px -68px;}
+	.pw_ulD del{ background-position:0 -20px;}
+	.pw_ulD del:hover{ background-position:-20px -20px;}
+	.keep,.keepOn,.rss,.competence{float:left;padding-left:20px;background-position:-120px 0;line-height:18px;*line-height:20px;height:16px;margin-top:6px;}
+	.keep{color:#6688bb;}
+	.keep:hover{background-position:-120px -20px;color:#004b92; text-decoration:none;}
+	.keepOn,.keepOn:hover{ background-position:-120px -40px;color:#999999; text-decoration:none;}
+	.rss{background-position:-120px -60px;}
+	.competence{background-position:-120px -80px;}
+	/*侧栏收藏的版块*/
+	.myForum h6{color:#666;padding:6px 10px 5px;}
+	.myForum .pw_ulD li{height:22px;overflow:hidden;}
+	/*列表帖子类型tab*/
+	.tabA{border-bottom:1px solid #8dbfd6;background:#f0f9ff;height:28px;padding:0 10px;}
+	.tabA ul{_position:absolute;font-size:14px;overflow:hidden;}
+	.tabA li{float:left;margin-left:-1px;margin-top:6px;}
+	.tabA li a{float:left;color:#014c90;line-height:1.2;padding:0 15px;overflow:hidden;border-left:1px solid #8cc0d6;}
+	.tabA li a:hover{ text-decoration:none;color:#333;}
+	.tabA li.current{margin:0;}
+	.tabA li.current a{color:#333;border:1px solid #8cc0d6;line-height:27px;font-weight:700;border-top:2px solid #72b0d7;border-bottom:0;background:#fff;position:relative;}
+	/*帖子列表管理操作*/
+	.manageCheck{border-bottom:1px solid #d6e8f4;border-top:1px solid #d6e8f4;background:#f0f9ff;padding:5px 7px;margin-top:-1px;}
+	/*帖子楼层结构*/
+	.floot{ table-layout:fixed;}
+	.floot_left{width:160px;background:#f4fafe;border-right:1px solid #d5e6ed; vertical-align:top;}
+	.floot_leftdiv{padding:10px 10px 50px 15px;}
+	.floot_right{background:#ffffff;padding:10px 20px 0;vertical-align:top;}
+	.floot_bottom{vertical-align:bottom;padding:0 20px;}
+	.readTop{background:#f4fafe;}
+	/*楼层间*/
+	.flootbg{background:#d5e6ed;height:4px;border-top:1px solid #fff;border-bottom:1px solid #fff;}
+	/*帖子信息*/
+	.tipTop{padding:0 0 10px;border-bottom:1px dotted #ccc;margin-bottom:10px;}
+	/*印戳*/
+	.overprint{overflow:hidden;position:absolute;margin-left:440px;margin-top:-35px;}
+	.overprint_opl {height:200px;overflow:auto;}
+	.overprint_opl a{display:block;float:left;padding:3px;margin:3px}
+	.overprint_opl a.current{border:1px solid #ccc;padding:2px}
+	.overprint_opl a:hover{border:1px solid #ddd;padding:2px;background:#fff9f0}
+	/*帖子用户信息*/
+	.honor{color:#777;overflow:hidden;line-height:1.3;}
+	.user-infoWrap2 li{line-height:20px;height:20px;overflow:hidden;}
+	.user-infoWrap2 li em{float:left;width:60px;}
+	.user-pic{margin-left:-2px;}
+	.face_img img{padding:3px;border:1px solid #d5e6ed;background:#ffffff;}
+	/*帖子操作*/
+	.tipBottom{padding:10px 0;border-top:1px dotted #ccc;margin-top:10px;}
+	.readbot a{list-style:none;padding:0 0 0 1.5em;margin:0;float:left;cursor:pointer;background:url(images/wind/read/yin.gif) no-repeat;width:3.5em;height:16px;}
+	.readbot .r-quote:hover{background-position:0 0;}
+	.readbot .r-reply:hover {background-position:0 -20px;}
+	.readbot .r-score:hover {background-position:0 -40px;}
+	.readbot .r-keep:hover {background-position:0 -60px;}
+	.readbot .r-recommend:hover {background-position:0 -160px;}
+	.readbot .r-report:hover{background-position:0 -200px;}
+	.readbot .r-quote {background-position:0 -80px;}
+	.readbot .r-reply {background-position:0 -100px;}
+	.readbot .r-score {background-position:0 -120px;}
+	.readbot .r-keep {background-position:0 -140px;}
+	.readbot .r-recommend {background-position:0 -180px;}
+	.readbot .r-report {background-position:0 -220px;}
+	/*帖子标题*/
+	h1.read_h1{padding:0 20px;}
+	.read_h1,.read_h1 a{font-size:16px;color:#014c90; font-weight:700;line-height:1.2;padding:0;margin:0;}
+	/*帖子内容区域*/
+	blockquote{margin-left:12px;}
+	.tpc_content{font-family:Arial;padding:0 2px 20px;margin:0;line-height:1.8em;}
+	.tpc_content font{line-height:1.5em;}
+	.tpc_content a{text-decoration:none;color:#0070AF;}
+	.tpc_content a:hover{text-decoration:underline}
+	.tpc_content ol{list-style-type:decimal;}
+	.tpc_content ul{list-style-type:disc;}
+	.blockquote{zoom:1;padding:5px 8px 5px;line-height:1.3;background:#fffae1;margin:0 0 10px 0;}
+	.tips{border:1px solid #a6cbe7;background:#f3f9fb;padding:3px 10px;display:inline-block;_float:left;}
+	/*帖子代码*/
+	.blockquote2{border: 1px solid; border-color: #c0c0c0 #ededed #ededed #c0c0c0;margin:0px;padding:0 0 0 2em;line-height:2em;overflow:hidden;background:#ffffff;margin-left:0;}
+	.blockquote2 ol{margin:0 0 0 1.5em;padding:0;}
+	.blockquote2 ol li{border-left:1px solid #ccc;background:#f7f7f7;padding-left:10px;font-size:12px;font-family:"Courier New" serif;list-style-type:decimal-leading-zero;padding-right:1em;}
+	.blockquote2 ol li:hover{background:#ffffff;color:#008ef1;}
+	.blockquote2 ol li{list-style-type:decimal;}
+	/*帖子引用*/
+	.blockquote3{clear:left;border:1px dashed #CCC;background:#f7f7f7 url(../blockquote3.png) right top no-repeat;padding:5px 10px;margin-left:0;}
+	.blockquote3 .quote{color:#999;font-size:12px;}
+	.blockquote3 .text{padding:0 10px 10px 10px;}
+	/*帖子表格*/
+	.read_form td{height:20px;padding:0 5px;border-style:solid; border-width:1px;}
+	/*分割线*/
+	.sigline {background: url(images/wind/read/sigline.gif) left bottom no-repeat;height:16px;}
+	/*帖子签名*/
+	.signature {padding:10px 0 0 0;height:expression(this.scrollHeight>parseInt(this.currentStyle.maxHeight)?this.currentStyle.maxHeight:"auto");}
+	/*下载*/
+	.tpc_content .down{background:#f0f0f0 url(images/post/down.gif) 5px center no-repeat;padding:5px 5px 5px 30px;border: 1px solid; border-color: #cccccc #999999 #999999 #cccccc;color:#333;margin:0 10px 0 0;line-height:40px;font-size:12px;}
+	.tpc_content .down:hover{ text-decoration:none;color:#ff5500;}
+	/*分类信息*/
+	.cates{margin:0 0 10px;border-top:1px solid #e4e4e4; font-size:12px;}
+	.cates .cate-list li{line-height:28px;min-heiht:28px;_height:28px;font-weight:500;color:#444444; list-style:none;border-bottom:1px solid #e4e4e4;padding-left:110px;}
+	.cates .cate-list li{*zoom:1;}
+	.cates .cate-list li:after{content:'';display:block;height:0;clear:both;visibility: hidden;}
+	.cates .cate-list em{ font-style:normal;width:100px;float:left; text-align:right; font-weight:700;margin-left:-110px;}
+	.cates .cate-list cite{font-style:normal;}
+	.cates input{ vertical-align:middle;}
+	.cates .w{margin-right:10px;}
+	.cates .two{background:#f7f7f7;}
+	.cate_meg_player {float:right;padding:4px;background:#ffffff;border:1px solid #e4e4e4;border-top:0 none;}
+	/*帖子页flash*/
+	.readFlash{position:relative;height:160px;width:200px;overflow:hidden;text-align:center;}
+	.readFlash img{width:100%;height:100%;}
+	.readFlash ul {position:absolute;right:8px;bottom:8px;z-index:3;}
+	.readFlash ul li {list-style:none;float:left;width:18px;height:13px;line-height:13px;text-align:center;margin-left:2px;background:#ffffff;}
+	.readFlash ul li a {display:block;width:18px;height:13px;font-size:10px;font-family:Tahoma;color:#333333;}
+	.readFlash ul li a:hover,.flash ul li a.sel {color:#fff;text-decoration:none;background:#ffa900;}
+	/*评分*/
+	.score{border:1px solid #a6cbe6;line-height:22px;}
+	.score td{padding:2px 10px 2px 5px;}
+	.score th{padding:5px 0 0 5px;}
+	.score tr:hover{background:#f3f9fb;}
+	.scoreTop{border-bottom:1px dotted #ccc;margin:0 10px;padding:5px 3px;}
+	.scoreContent{margin:5px 10px;}
+	.scoreContent .adel{margin-top:5px;}
+	.scoreBottom{border-top:1px solid #a5cae5;padding:3px 13px;background:#f3f8fb;}
+	.score a{color:#0181ca;}
+	.scoreContent .current td{padding:0;}
+	.p_face{width:20px;}
+	.p_name{width:90px;}
+	/*友情链接*/
+	.sharelink{border-bottom:1px dotted #ddd;padding:5px 0;word-break: keep-all;}
+	.sharelink dt{padding-top:3px;}
+	.sharelink dd a{color:#369;}
+	.sharelink2{padding:5px 0;}
+	.sharelink2 a{margin-right:10px; white-space:nowrap;float:left;}
+	.sharelink2 img{margin-right:10px;}
+	/*生日会员*/
+	.brithcache span{float:left;width:100px;line-height:22px;height:22px;overflow:hidden;}
+/*底部*/
+#footer{padding:0 0 10px;}
+#footer a{color:#68b}
+.bottom{margin:0 auto;}
+.bottom ul{ padding:0 5px 5px;margin:0; list-style:none;}
+.bottom ul li{ padding:0 10px 0 0;display:inline;}
+.bottom ul li a{white-space:nowrap;}
+/*css3.0*/
+.history,del,.keep{-webkit-transition: all 0.2s ease-out;transition: all 0.2s ease-out;}
+/*分页-具体样式在pw_core里*/
+.pages a{border:1px solid #a6cbe7;background-color:#f9f9f9;color:#666;}
+.pages b,.pages a:hover{background-color:#72b0d7;color:#ffffff;border:1px solid #72b0d7;}
+.pages .fl{color:#666;}
+.pages .pagesone{border:1px solid #a6cbe7;background-color:#ffffff;}
+.pages button{background-color:#f4f8fb;color:#666;border-left:1px solid #a6cbe7;}
+/*menu*/
+.menu{position:absolute;background:#ffffff;border:1px solid #d5e6ed;}
+.menu a{display:block;padding:4px 8px;}
+/*下拉框*/
+.menu-post{border:1px solid #a6cbe7;}
+.menu-post .menu-b{background:#ffffff;border:3px solid #d5e6ed;}
+.menu_tasksA .menu-b{border-width:8px;}
+/*通用下拉外框*/
+.pw_menu{border:1px solid #a6cbe7;background:#ffffff;/*-webkit-box-shadow:2px 2px 2px #bbb;*/;}
+.pw_menuBg{padding:0 10px 10px;}
+.pw_menu h6{ position:absolute;margin-top:-18px;height:17px;border:1px solid #a6cbe7;background:#ffffff;border-bottom:0;right:-1px;padding:0 4px;*padding:0 5px;line-height:18px;}
+/*下拉列表*/
+.menuList{background:#ffffff;}
+.menuList a:hover{background:#e6f2fe;}
+/*双列下拉*/
+.menuHalf{margin-right:-1px;padding:5px 0;}
+.menuHalf li{float:left;width:50%;border-right:1px dashed #d5e6ed;margin-right:-1px;}
+ul#post_typeChoose a{padding:0;}
+/*关注*/
+.follow,.following{ background:url(u/images/follow.png) no-repeat;line-height:16px;}
+.follow{padding-left:16px; background-position:-4px -43px;_background-position:-4px -40px;}
+.following{padding-left:22px; background-position:-20px -22px;}
+/*全局颜色*/
+.s1{color:#f00;}/*red*/
+.s2{color:#f50;}/*org*/
+.s3{color:#7a0;}/*green*/
+.s4{color:#014c90;}/*blue*/
+.s5{color:#333;}/*black*/
+.s6{color:#666;}/*black*/
+.s7{color:$68b;}/*min blue*/
+.gray{color:#999;}
+.gray2{color:#bbb;}
+ /*自定义css*/
+</style><!--css-->
+
+<style type="text/css"> 
+/*注册结构*/
+.regTitle{border-bottom:1px solid #ededed;padding:0 5px 10px;margin-bottom:30px;}
+.regTitle h5{font-size:16px; font-weight:700;}
+.regForm-wrap{float:left;width:99%;min-height:250px;_height:250px;padding-top:10px;padding-bottom:50px;}
+.regForm{position:relative;margin-right:200px;}
+.regForm dl{min-height:43px;_height:43px;}
+.regForm dt{float:left;width:130px;text-align:right;margin-right:15px;line-height:28px;font-size:14px;}
+.regForm dd{float:left;}
+.regForm .ip{width:230px;margin-right:1px;}
+.regForm .ip div{padding:3px 3px 5px;*padding:4px 5px 4px;float:left;border:1px solid;border-color:#999 #ccc #ccc #999;background:#fff;}
+.regForm .ip div.hover,.regForm .ip div:hover{background:#fffbde;border:1px solid;border-color:#555 #aaa #aaa #555;}
+.regForm .ip .input{border:0;padding:0;margin:0;font:14px/15px Arial;background:none;width:100%;padding-top:2px;width:222px;*width:218px; font-weight:700;color:#333;}
+.regForm .tp{width:300px;}
+.regForm .tp div{padding:5px 10px 5px 28px;position:absolute;line-height:16px; white-space:nowrap;max-width:270px;}
+.regForm .tp .correct{border:0;background:url(images/register/regright.png) 6px 6px no-repeat;height:20px;}
+.regForm .tp .ignore{border:1px solid #e8e8e8;background:#f9f9f9 url(images/register/tp.png) 6px 6px no-repeat;color:#999;}
+.regForm .tp .wrong{border:1px solid #ebadb0;background:#fff2f5 url(images/register/regwrong.png) 6px 5px no-repeat;color:#b52726;padding-left:28px;}
+.regForm .tp img{vertical-align:middle;margin:5px 0 0 8px;}
+.regForm .if{ font-size:14px;padding-top:3px;}
+.regForm .if input{margin-top:-2px;}
+.regForm .if select{margin-right:10px; font-size:14px;}
+.regForm dd.ck input{width:50px}
+.regForm dd.ck div{margin-right:5px;}
+.regPre{margin:0 135px 10px 115px;}
+.regPre pre{border:1px solid;border-color:#999 #ccc #ccc #999;padding:5px 10px;line-height:1.5;color:#333;height:100px;overflow-x:hidden;overflow-y:scroll;}
+.regPre p{margin-bottom:5px;}
+.regLogin{float:left;margin-left:-190px;width:190px;border-left:1px dotted #dddddd;min-height:200px;_height:200px;}
+.regForm .btn,.regLogin .bt{margin-left:0;}
+
+.steps{padding:0;margin:5px 0 0;overflow:hidden;}
+.steps li{float:left;margin-left:-9px;margin-right:15px;_display:inline;padding-left:16px;height:17px; line-height:17px; background:url(images/register/regarrow.png) no-repeat 0 50%;color:#ababab;}
+.steps li em{float:left; margin-right:4px; width:17px; height:17px; text-align:center; color:#fff; font-family:Tahoma; font-weight:700; background:url(images/register/regstep.png) no-repeat 0 0}
+.steps li.current{color:#106bab}
+.steps li.current em{background-position:-17px 0;}
+
+.wy_menu_B{border:1px solid #aaa;background:#ffffff url(c_editor/wy_menu_bg.png) repeat-x; position:absolute;padding:5px 0;border-left:1px solid #ccc;border-top:1px solid #ccc;}
+.wy_menu_B a{color:#333;}
+.wy_menu_B a:hover{ text-decoration:none;color:#3366cc;}
+.wy_menu_B h4{display:block; font-size:14px; font-weight:700;color:#3366cc;padding:5px 10px;margin:0}
+.wy_menu_B .tr1{padding-left:70px;text-align:center;}
+.wy_menu_B .tr3{padding:4px 0 4px 10px;text-align:right;}
+.wy_menu_B td{padding:4px 0 4px 10px;text-align:right;}
+.wy_menu_B a.fr{color:#3366cc;}
+#qanswer_info img{margin:0 0 0 5px;height:21px;}
+
+.recommend{padding:15px 0 5px;}
+.recommend li{width:210px;float:left;height:90px;}
+.recommend li img{ vertical-align:middle;}
+.recommend li .face{width:48px;height:48px;padding:2px;border:1px solid #cccccc;margin:0 10px 0 8px;}
+
+.regAdd_mode{border:1px solid #ccc;background:#f7fbff;padding:15px 0 0 0;margin-bottom:10px;}
+
+.regCorrect,.regIgnore{padding-left:160px;padding-bottom:70px;background:url(images/register/register2.png) 60px 0 no-repeat;}
+.regWrong{}
+.regIgnore{ background:url(images/register/ignore.png) 60px 0 no-repeat;padding-top:5px;}
+
+.regList,.regList_img{padding:10px 0 20px;}
+.regList li{float:left;width:49.5%; font-size:14px;line-height:24px;height:24px;overflow:hidden; text-indent:15px;background:url(images/pwicon/related_li.gif) 0 8px no-repeat;}
+.regList_img li{float:left;width:100px; text-align:center;margin:10px;_display:inline;}
+</style>
+
+</head>
+<body onKeyDown="try{keyCodes(event);}catch(e){}">
+<div class="wrap">
+<div id="header">
+     <div id="head">
+        <table cellpadding="0" cellspacing="0" width="100%" height="80">
+            <tr>
+                <td><a href="$db_bbsurl"><img src="$imgpath/$stylepath/logo.png" class="fl" title="phpwind" /></a></td>
+                <td class="vt tar">
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+<div class="main-wrap">
+<div id="main">
+<div id="pw_content">
+	<div class="p20">
+		<div class="regTitle cc">
+			<h5 class="s6">恭喜您完成注册，完善以下信息让您的社区旅途更丰富！</h5>
+		</div>
+		<div class="cc">
+			<div class="regForm-wrap">
+				<div  style="padding-left:40px;">
+<!--
+EOT;
+if ($recommendcontent) {
+print<<<EOT
+-->
+					<h2 class="s6">精彩推荐</h2>
+					<div class="mb20">
+						$recommendcontent
+					</div>
+<!--
+EOT;
+} if ($latestImageThreads) {print<<<EOT
+-->
+					<h2 class="s6">可能感兴趣的内容</h2>
+					<ul class="cc regList_img">
+<!--
+EOT;
+foreach ($latestImageThreads as $thread) {
+print<<<EOT
+-->
+						<li><a href="read.php?tid=$thread[tid]"><img src="$thread[thumb]" onError="this.src='images/defaultactive.jpg'" width="100" height="100">$thread[subject]</a></li>
+<!--
+EOT;
+}print<<<EOT
+-->
+					</ul>
+<!--
+EOT;
+}print<<<EOT
+-->
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+</div></div><!--.main-wrap,#main End-->
+</div>
+</body>
+</html>
+<!--
+EOT;
+}
 ?>-->

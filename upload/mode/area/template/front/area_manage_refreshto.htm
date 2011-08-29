@@ -1,0 +1,29 @@
+<?php 
+print <<<EOT
+<!doctype html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta http-equiv="refresh" content="$statime;url=$URL">
+<script type="text/javascript" src="js/portal.js"></script>
+<script type="text/javascript" src="js/core/core.js"></script>
+<script language="JavaScript" src="mode/area/js/imagetype.js"></script>
+<link rel="stylesheet" type="text/css" href="images/pw_core.css" />
+<link rel="stylesheet" type="text/css" href="images/pwmanage.css" />
+<style>
+htm,body{overflow:hidden;height:500px;width:100%;}
+html {font-size:12px;}
+body {line-height: 1.5;}
+.lh_22{line-height:22px;height:22px;overflow:hidden;}
+a{color:#336699;text-decoration:none}
+a:hover{color:#ff5500;text-decoration:none}
+</style>
+</head>
+<div class="tipWrap">
+	<div class="regCorrect">
+		<p class="f14 mb10 b">{$content}</p>
+		<p class="f14"><a href="$URL" class="s4 f14" tabindex="20">如果您的浏览器没有自动跳转,请点击这里</a></p>
+	</div>
+</div>
+EOT;
+?>

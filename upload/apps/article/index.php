@@ -2,11 +2,15 @@
 !defined('A_P') && exit('Forbidden');
 
 $USCR = 'user_article';
-require_once pwCache::getPath(D_P."data/bbscache/forum_cache.php");
+//* require_once pwCache::getPath(D_P."data/bbscache/forum_cache.php");
+pwCache::getData(D_P."data/bbscache/forum_cache.php");
 require_once(R_P.'require/showimg.php');
-@include_once pwCache::getPath(D_P."data/bbscache/topic_config.php");
-@include_once pwCache::getPath(D_P."data/bbscache/postcate_config.php");
-include_once pwCache::getPath(D_P . 'data/bbscache/o_config.php');
+//* @include_once pwCache::getPath(D_P."data/bbscache/topic_config.php");
+pwCache::getData(D_P."data/bbscache/topic_config.php");
+//* @include_once pwCache::getPath(D_P."data/bbscache/postcate_config.php");
+pwCache::getData(D_P."data/bbscache/postcate_config.php");
+//* include_once pwCache::getPath(D_P . 'data/bbscache/o_config.php');
+pwCache::getData(D_P . 'data/bbscache/o_config.php');
 
 $isGM = S::inArray($windid,$manager);
 !$isGM && $groupid==3 && $isGM=1;
@@ -31,7 +35,8 @@ $isGM = S::inArray($windid, $manager);
 $indexRight = $newSpace->viewRight('index');
 $indexValue = $newSpace->getPrivacyByKey('index');
 $space =& $newSpace->getInfo();
-include_once pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
+//* include_once pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
+pwCache::getData(D_P.'data/bbscache/forum_cache.php');
 require_once(R_P.'require/functions.php');
 $fids = trim(getSpecialFid() . ",'0'",',');
 $shortcutforum = pwGetShortcut();
@@ -94,7 +99,7 @@ if ($a == 'list' &&$indexRight) {
 			} else {
 				foreach ($p_list as $key => $val) {
 					$name = $val ? $val : ($key != 0 ? getLangInfo('other','posttable').$key : getLangInfo('other','posttable'));
-					$p_table .= "<li><a id=\"up_post$key\" href=\"{$nurl}ptable=$key\">".$name."</a></li>";
+					$p_table .= "<li id=\"up_post$key\"><a href=\"{$nurl}ptable=$key\">".$name."</a></li>";
 				}
 			}
 
@@ -223,7 +228,7 @@ if ($where) {
 	$count = $db->get_value("SELECT count(*) as count FROM pw_threads WHERE $where AND fid != 0");
 	if ($count) {
 		list($pages,$limit) = pwLimitPages($count,$page,$thisbase);
-
+		!isset($userService) && $userService = L::loadClass('UserService', 'user'); 
 		$rs = $db->query("SELECT tid,fid,author,authorid,subject,postdate,lastpost,lastposter,replies,hits,titlefont,anonymous,modelid,special FROM pw_threads $force WHERE $where AND fid != 0 ORDER BY $ordertype DESC $limit");
 		while ($rt = $db->fetch_array($rs)) {
 			$rt['subject'] = substrs($rt['subject'],45);
@@ -234,14 +239,18 @@ if ($where) {
 			if (!$isGM && $rt['anonymous']) {
 				$rt['author'] = $rt['authorid'] = '';
 			}
+			$userInfo = $userService->get($rt['authorid']);
+			if($userInfo['groupid'] == 6 && !$isGM){
+				$rt['subject']	= '<span style=\"color:black;background-color:#ffff66\">用户被禁言,该主题自动屏蔽!</span>';
+			}
 			$article[] = $rt;
 		}
 	}
 }
 
 /*用户被禁言情况*/
-if($u != $winduid){
-	!isset($userService) && $userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
+/*if($u != $winduid){
+	!isset($userService) && $userService = L::loadClass('UserService', 'user'); 
 	$userInfo = $userService->get($u);
 	$gid = $userInfo['groupid'];
 }else{
@@ -251,7 +260,7 @@ if($gid == 6 && !$isGM){
 	foreach($article as $k=>$v){
 		$article[$k]['subject']	= '<span style=\"color:black;background-color:#ffff66\">用户被禁言,该主题自动屏蔽!</span>';
 	}	
-}
+}*/
 /*end*/
 
 if ($uid) {
@@ -261,7 +270,9 @@ if ($uid) {
 	require_once PrintEot('m_space_article');
 	pwOutPut();
 } else {
-	include_once pwCache::getPath(D_P . 'data/bbscache/o_config.php');
+	//* include_once pwCache::getPath(D_P . 'data/bbscache/o_config.php');
+	pwCache::getData(D_P . 'data/bbscache/o_config.php');
+
 	require_once PrintEot('m_article');
 	pwOutPut();
 }
@@ -278,7 +289,7 @@ function goodsicon($icon) {
 	if (file_exists($attachpath.'/'.$icon)) {
 		return $attachpath.'/'.$icon;
 	}
-	return $imgpath.'/goods_none.gif';
+	return $imgpath.'/noproduct.gif';
 }
 function getFidoff($gid) {
 	global $db;

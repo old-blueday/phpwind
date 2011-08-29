@@ -1,0 +1,540 @@
+<!--<?php
+if (!defined('AJAX')){
+include_once PrintEot('left');
+}print<<<EOT
+-->
+
+<!--
+EOT;
+if(empty($action)){print <<<EOT
+-->
+<div class="nav3 mb10 ta">
+  <ul class="cc">
+    <li class="current"><a href="javascript:;">基本设置</a></li>
+    <li><a href="$basename&action=teamList">团队列表</a></li>
+    <li><a href="$basename&action=actionList">团队考核</a></li>
+    <li><a href="$basename&action=sort">奖励发放</a></li>
+  </ul>
+</div>
+<div class="admin_info mb10">
+    <h3 class="h1">友情提示</h3>
+    <div class="legend">
+    	<ol>
+        	<li>方案以综合评分为考核结果</li>
+            <li>综合评分 = 所有 考核参数 * 考核权重 的和</li>
+            <li>如果权值为0，则表示参数不参与考核统计</li>
+        </ol>
+    </div>
+ </div>
+<form action="$basename&action=set" method="post">
+  <input type="hidden" name="action" value="set" />
+  <h2 class="h1">团队考核设置</h2>
+  <div class="admin_table mb10">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <tr class="tr1 vt">
+      <td class="td1">考核范围</td>
+      <td class="td2" width="390">
+        <ul class="cc list_A list_120">
+<!--
+EOT;
+foreach($group as $key=>$value){
+$ifcheck = in_array($value['gid'],$team['group']) ? 'checked' : '';
+print <<<EOT
+-->
+            <li>
+              <input type="checkbox" name="set[group][]" value="$value[gid]" $ifcheck />$value[grouptitle]
+             </li>
+<!--
+EOT;
+}print <<<EOT
+-->
+         </ul>
+        </td><td class="td2"></td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">综合评分
+       </td>
+      <td class="td2">
+     	 <div class="admin_table_b">
+              <table cellpadding="0" cellspacing="0">
+                  <tr>
+                    <td class="s4"  >参数</td>
+                    <td class="s4" >权重</td>
+                  </tr>
+                  <tr>
+                    <td>本月管理操作</td>
+                    <td><input type="text" class="input input_wc" name="set[param][opr]" value="{$team[param][opr]}" /></td>
+                  </tr>
+                  <tr>
+                    <td>本月发帖数量</td>
+                    <td><input type="text" class="input input_wc" name="set[param][post]" value="{$team[param][post]}" /></td>
+                  </tr>
+                  <tr>
+                    <td>本月在线时间[小时]</td>
+                    <td><input type="text" class="input input_wc mr5" name="set[param][oltime]" value="{$team[param][oltime]}" /></td>
+                  </tr>
+                </table>
+           </div>
+        </td><td class="td2"> <div class="help_a">本方案以综合评分为考核结果<br />综合评分 = 所有 考核参数 * 考核权重 的和<br />如果权值为0，则表示参数不参与考核统计</div></td>
+    </tr>
+    </table>
+    </div>
+    
+ <div class="admin_table mb10">
+  <table width="100%" cellspacing="0" cellpadding="0">
+     <h2 class="h1">奖励方案设置</h2>
+      <tr class="tr1 vt">
+      <td class="td1">自动发放奖励功能</td>
+      <td class="td2">
+      	<ul class="cc list_80 list_A mr10 fl">
+             <li><input type="radio" name="ifopen" value="1" $ifopen_Y />开启</li>
+             <li><input type="radio" name="ifopen" value="0" $ifopen_N />关闭</li>
+         </ul>
+	 </td><td class="td2"><div class="help_a">此功能需到 <a href="javascript:;" onclick="parent.PW.Dialog({id:'plantodo',url:'$admin_file?adminjob=plantodo',name:'计划任务'});">计划任务</a> 里设置自动发放的时间</div></td>
+    </tr>
+     <tr class="tr1 vt">
+      <td class="td1">考核合格分</td>
+      <td class="td2"><input type="text" class="input input_wa" name="set[eligibility]" value="{$team[eligibility]}" /></td>
+	  <td class="td2"><div class="help_a">当综合评分>=该值时，该管理成员是合格的<br />设为0，则不启用该功能</div></td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">基本奖励</td>
+      <td class="td2" colspan="2">
+      	<div class="admin_table_c" style="width:auto;">
+     	 <table cellpadding="0" cellspacing="0" width="100%" style="table-layout:fixed;">
+         	 <tr>
+           		 <td width="80">&nbsp;</td>
+<!--
+EOT;
+foreach($credit->cType as $key=>$c){print <<<EOT
+-->
+           		 <td>$c</td>
+<!--
+EOT;
+}print <<<EOT
+-->
+								<td>&nbsp;</td>
+         	 </tr>
+<!--
+EOT;
+foreach($group as $key=>$value){print <<<EOT
+-->
+         	 <tr>
+           		 <td class="s4">$value[grouptitle]</td>
+<!--
+EOT;
+foreach($credit->cType as $k=>$c){
+print <<<EOT
+-->
+           		 <td><input type="text" class="input" size="2" name="set[wages][$value[gid]][$k]" value="{$team[wages][$value[gid]][$k]}" /></td>
+<!--
+EOT;
+}print <<<EOT
+-->
+								<td>&nbsp;</td>
+         		 </tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+        	</table></div>
+				</td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">考核奖励
+        </td>
+      <td class="td2" colspan="2">
+      	<div class="admin_table_c">
+          <table cellpadding="0" cellspacing="0">
+              <tr>
+<!--
+EOT;
+foreach($credit->cType as $k=>$c){print <<<EOT
+-->
+           		 <td>$c</td>
+<!--
+EOT;
+}print <<<EOT
+-->
+         		 </tr>
+         		 <tr>
+<!--
+EOT;
+foreach($credit->cType as $k=>$c){print <<<EOT
+-->
+           		 <td><input type="text" class="input" size="2" name="set[bonus][$k]" value="{$team[bonus][$k]}" /></td>
+<!--
+EOT;
+}print <<<EOT
+-->
+                 </tr>
+             </table>
+         </div><div class="help_a">每单位综合评分奖励多少积分</div>
+        </td>
+    </tr>
+    </table>
+    </div>
+   
+ <div class="admin_table mb10">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <h2 class="h1">提醒设置</h2>
+    <tr class="tr1 vt">
+      <td class="td1">奖励提醒</td>
+      <td class="td2">
+     	 <ul class="cc list_80 list_A mr10 fl">
+             <li><input type="radio" name="set[ifmsg]" value="1" $ifmsg_Y />开启</li>
+             <li><input type="radio" name="set[ifmsg]" value="0" $ifmsg_N />关闭</li>
+         </ul>
+		</td><td class="td2"><div class="help_a">给团队成员发奖励时短消息提醒</div></td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">短消息标题</td>
+      <td class="td2"><input type="text" class="input input_wb" name="set[msgtitle]" value="$team[msgtitle]" /></td>
+	  <td class="td2"><div class="help_a"></div></td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">短消息内容</td>
+      <td class="td2">
+      	<div style="width:320px;border:1px solid #ccc;padding:5px 9px;background:#fff;" class="mb5">尊敬的 \$username：<br />
+         感谢你们对 \$db_bbsname 的支持!现特发 \$credit 作为奖励.<br />
+          操作日期 \$time
+          </div>
+        <textarea name="set[msgdata]" maxlength="200" class="textarea">$team[msgdata]</textarea></td>
+		<td class="td2"><div class="help_a">变量参数如下设置：<br />
+        1、\$username => 用户名<br />
+        2、\$db_bbsname => 论坛名<br />
+        3、\$credit => 奖励的积分<br />
+        4、\$time => 当前执行的时间<br />
+        5、使用方法参考左侧</div></td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">勉励信功能
+        </td>
+      <td class="td2">
+     	 <ul class="cc list_80 list_A mr10 fl">
+             <li><input type="radio" name="set[arouse]" value="1" $arouse_Y />开启</li>
+             <li> <input type="radio" name="set[arouse]" value="0" $arouse_N />关闭</li>
+         </ul>
+		</td><td class="td2"><div class="help_a">当设置考核合格分时，给不合格的团队成员发一封特殊的短消息，以勉励其工作</div></td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">勉励信内容
+        </td>
+      <td class="td2"><textarea name="set[arousemsg]"  class="textarea">$team[arousemsg]</textarea></td>
+	  <td class="td2"><div class="help_a">变量参数与短消息一致</div></td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">下次执行时间</td>
+      <td class="td2">$nexttime</td><td class="td2"><div class="help_a"></div></td>
+    </tr>
+  </table>
+  </div>
+  <div class="mb10 tac">
+    <span class="btn"><span><button type="submit">提 交</button></span></span>
+  </div>
+</form>
+</form>
+<!--
+EOT;
+} elseif($action=='teamList'){
+print <<<EOT
+-->
+<div class="nav3 mb10 ta">
+   <ul class="cc">
+    <li><a href="$basename">基本设置</a></li>
+    <li class="current"><a href="$basename&action=teamList">团队列表</a></li>
+    <li><a href="$basename&action=actionList">团队考核</a></li>
+    <li><a href="$basename&action=sort">奖励发放</a></li>
+    </ul>
+</div>
+<h2 class="h1">团队列表</h2>
+   <form action="$basename&action=teamList&dataOut=1" method="post" >
+ <div class="admin_table mb10">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <tr class="tr2">
+      <td>序号</td>
+      <td>用户名</td>
+      <td>用户组</td>
+      <td>注册时间</td>
+      <td>最后发表</td>
+      <td>最后登录</td>
+      <td width="180">操作版块</td>
+    </tr>
+<!--
+EOT;
+foreach($userInfo as $key => $value){
+$forumName = $value[forumName] ? "<span class='mr10'>$value[forumName]</span>" : "&nbsp;";
+print <<<EOT
+-->
+    <tr class="tr1 vt">
+     <td class="td2">$value[uid]</td>
+     <td class="td2">$key</td>
+     <td class="td2">{$ltitle[$value[groupid]]}</td>
+     <td class="td2">$value[regdate]</td>
+     <td class="td2">$value[lastvisit]</td>
+     <td class="td2">$value[lastpost]</td>
+      <td class="td2">
+<div class="fl" id="tips_$value[uid]" style="display:none">
+	    <div style="position:absolute;margin-top:22px;">
+			<div class="popout"><table border="0" cellspacing="0" cellpadding="0"><tbody><tr><td class="bgcorner1"></td><td class="pobg1"></td><td class="bgcorner2"></td></tr><tr><td class="pobg4"></td><td><div class="popoutContent"><div style="width:170px;"><div class="popTop"><a href="javascript:;" class="del_img fr" onclick="closep('tips_$value[uid]')">关闭</a>更多版块</div><p class="s4 cc p10">$value[forumNames]</p></div>
+</div></td><td class="pobg2"></td></tr><tr><td class="bgcorner4"></td><td class="pobg3"></td><td class="bgcorner3"></td></tr></tbody></table></div>
+		</div>
+		</div>
+			$forumName
+<!--
+EOT;
+if($value['forumNames']){print <<<EOT
+-->
+	    <a href="javascript:;" onClick="getObj('tips_$value[uid]').style.display=''">更多</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+	    </td>
+    </tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+  </table>
+    </div>
+    <div class="mb10 tac">
+    <span class="btn"><span><button type="submit" onfocus="blur();">导出</button></span></span>
+  </div>
+    </form>
+<script language="JavaScript">
+function closep(obj) {
+	getObj(obj).style.display = 'none';
+}
+</script>
+<!--
+EOT;
+} elseif($action=='actionList'){
+
+print <<<EOT
+-->
+<script type="text/javascript" language="JavaScript" src="js/date.js"></script>
+<div class="nav3 mb10 ta">
+   <ul class="cc">
+    <li><a href="$basename">基本设置</a></li>
+    <li><a href="$basename&action=teamList">团队列表</a></li>
+    <li class="current"><a href="javascript:;">团队考核</a></li>
+    <li><a href="$basename&action=sort">奖励发放</a></li>
+    </ul>
+</div>
+  <form action="$basename&action=actionList" method="post" >
+  <h2 class="h1">考核搜索</h2>
+  <input type="hidden" name="step" value="2">
+  <div class="admin_table mb10">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <tr class="tr1 vt">
+      <td class="td1">操作版块</td>
+      <td class="td2"><select name="fid"  class="select_wa mr20 fl">
+          <option value='0'>所有版块</option>$forumcache</select>
+        </td>
+    </tr>
+   
+    <tr class="tr1 vt">
+      <td class="td1">操作时间</td>
+      <td class="td2">
+        <div class="input_img fl"><i onclick="this.nextSibling.onclick()" class="input_time" title="选择时间">选择时间</i><input type="text" name="postStartTime" id="postStartTime" value="$postStartTime" onClick="javascript:ShowCalendar(this.id,1)" /></div><span class="p_lr_10 fl">至</span><div class="input_img fl mr20"><i class="input_time" onclick="this.nextSibling.onclick()" title="选择时间">选择时间</i><input type="text" name="postEndTime" id="postEndTime" value="$postEndTime" onClick="javascript:ShowCalendar(this.id,1)" /></div>可只用单个条件
+      </td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">用户名</td>
+      <td class="td2"><input type="text" class="input input_wa mr20" name="adminName" value="$adminName"></td>
+    </tr>
+
+  </table>
+  </div>
+  <div class="mb10 tac">
+    <span class="mr10"><span class="btn"><span><button type="submit">提 交</button></span></span></span>
+  </div>
+ </form>
+ <form action="$basename&action=actionList" method="post" >
+ <input type="hidden" name="step" value="2">
+ <input type="hidden" name="sortType" value="{$sortType}">
+ <input type="hidden" name="dataOut" value="1">
+ <input type="hidden" name="postStartTime" value="{$postStartTime}">
+ <input type="hidden" name="postEndTime" value="{$postEndTime}">
+ <input type="hidden" name="adminName" value="{$adminName}">
+ <input type="hidden" name="fid" value="{$fid}">
+  <h2 class="h1">结果列表</h2>
+  <div class="admin_table mb10">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <tr class="tr2">
+      <td>序号</td>
+      <td>用户名</td>
+      <td><a href="$baseurl&sortType=highlight$urlAdd"><span>加亮 $sort_a[highlight]</span></a></td>
+      <td><a href="$baseurl&sortType=delete$urlAdd"><span>删除 $sort_a[delete]</span></a></td>
+      <td><a href="$baseurl&sortType=credit$urlAdd"><span>评分 $sort_a[credit]</span></a></td>
+      <td><a href="$baseurl&sortType=topped$urlAdd"><span>置顶 $sort_a[topped]</span></a></td>
+
+      <td><a href="$baseurl&sortType=edit$urlAdd"><span>编辑 $sort_a[edit]</span></a></td>
+      <td><a href="$baseurl&sortType=digest$urlAdd"><span>精华 $sort_a[digest]</span></a></td>
+      <td><a href="$baseurl&sortType=copy$urlAdd"><span>复制 $sort_a[copy]</span></a></td>
+      <td><a href="$baseurl&sortType=move$urlAdd"><span>移动 $sort_a[move]</span></a></td>
+      <td><a href="$baseurl&sortType=down$urlAdd"><span>压帖 $sort_a[down]</span></a></td>
+      <td><a href="$baseurl&sortType=banuser$urlAdd"><span>禁言 $sort_a[banuser]</span></a></td>
+      
+      <td><a href="$baseurl&sortType=locked$urlAdd"><span>锁定 $sort_a[locked]</span></a></td>
+      <td><a href="$baseurl&sortType=push$urlAdd"><span>提前 $sort_a[push]</span></a></td>
+      <td><a href="$baseurl&sortType=unite$urlAdd"><span>合并 $sort_a[unite]</span></a></td>
+      <td><a href="$baseurl&sortType=shield$urlAdd"><span>屏蔽 $sort_a[shield]</span></a></td> 
+      <td><a href="$baseurl&sortType=remind$urlAdd"><span>提醒 $sort_a[read_remind]</span></a></td>
+      <td width="68"><a href="$baseurl&sortType=recycle$urlAdd"><span>还原帖子 $sort_a[recycle]</span></a></td>
+      <td width="68"><a href="$baseurl&sortType=deluser$urlAdd"><span>删除用户 $sort_a[deluser]</span></a></td>
+      <td><a href="$baseurl&sortType=total$urlAdd"><span>总计 $sort_a[total]</span></a></td>   
+    </tr>
+<!--
+EOT;
+$i = 0;
+foreach($admindb as $key => $value){
+$i ++;
+$highlight = $value[highlight] ? $value[highlight] : 0;
+$delete = $value[delete] ? $value[delete] : 0;
+$credit = $value[credit] ? $value[credit] : 0;
+$topped = $value[topped] ? $value[topped] : 0;
+$edit = $value[edit] ? $value[edit] : 0;
+$digest = $value[digest] ? $value[digest] : 0;
+$copy = $value[copy] ? $value[copy] : 0;
+$move = $value[move] ? $value[move] : 0;
+$down = $value[down] ? $value[down] : 0;
+$banuser = $value[banuser] ? $value[banuser] : 0;
+$locked = $value[locked] ? $value[locked] : 0;
+$push = $value[push] ? $value[push] : 0;
+$unite = $value[unite] ? $value[unite] : 0;
+$shield = $value[shield] ? $value[shield] : 0;
+$remind = $value[remind] ? $value[remind] : 0;
+$recycle = $value[recycle] ? $value[recycle] : 0;
+$deluser = $value[deluser] ? $value[deluser] : 0; 
+$total = $value[total] ? $value[total] : 0;
+print <<<EOT
+-->
+    <tr class="tr1 vt">
+      <td class="td2">$i</td>
+      <td class="td2">$key</td>
+      <td class="td2">$highlight</td>
+      <td class="td2">$delete</td>
+      <td class="td2">$credit</td>
+      <td class="td2">$topped</td>
+      <td class="td2">$edit</td>
+      <td class="td2">$digest</td>
+      <td class="td2">$copy</td>
+      <td class="td2">$move</td>
+      <td class="td2">$down</td>
+      <td class="td2">$banuser</td>
+      <td class="td2">$locked</td>
+      <td class="td2">$push</td>
+      <td class="td2">$unite</td>
+      <td class="td2">$shield</td>
+      <td class="td2">$remind</td>
+      <td class="td2">$recycle</td>
+      <td class="td2">$deluser</td>
+      <td class="td2">$total</td>
+    </tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+  </table>
+  </div>
+  <div class="mb10 tac">
+    <span class="btn"><span><button type="submit" onfocus="blur();">导出</button></span></span>
+  </div>
+  </form>
+<!--
+EOT;
+} elseif($action=='sort'){print <<<EOT
+-->
+<div class="nav3 mb10 ta">
+   <ul class="cc">
+    <li><a href="$basename">基本设置</a></li>
+    <li><a href="$basename&action=teamList">团队列表</a></li>
+    <li><a href="$basename&action=actionList">团队考核</a></li>
+    <li class="current"><a href="javascript:;">奖励发放</a></li>
+    </ul>
+</div>
+<form action="$basename&" method="post" onsubmit="return checkForm(this);">
+  <input type="hidden" name="action" value="payoff" />
+  <h2 class="h1">考核统计</h2>
+  <div class="admin_table mb10">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <tr class="tr2">
+      <td>用户名</td>
+      <td>头衔</td>
+      <td class="tac">管理统计</td>
+      <td class="tac">本月发帖</td>
+      <td class="tac">本月在线</td>
+      <td class="tac">综合评分</td>
+<!--
+EOT;
+foreach($credit->cType as $k=>$t){print <<<EOT
+-->
+      <td>$t</td>
+<!--
+EOT;
+}print <<<EOT
+-->
+    </tr>
+<!--
+EOT;
+foreach($admindb as $key=>$value){print <<<EOT
+-->
+    <tr class="tr1 vt">
+      <td class="td2">$key</td>
+      <td class="td2">{$ltitle[$value[groupid]]}</td>
+      <td class="td2 tac">$value[total]</td>
+      <td class="td2 tac">$value[monthpost]</td>
+      <td class="td2 tac">$value[monoltime]</td>
+      <td class="td2 tac">
+<!--
+EOT;
+if($value['assess']>$team['eligibility']){print <<<EOT
+-->
+        <span class="s3">$value[assess]</span>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+        <span class="s1">$value[assess]</span>
+        <input type="hidden" name="arouse[]" value="$value[uid]" />
+<!--
+EOT;
+}print <<<EOT
+-->
+      </td>
+<!--
+EOT;
+foreach($credit->cType as $k=>$t){print <<<EOT
+-->
+      <td class="td2"><input type="text" class="input" size="1" name="paycredit[$value[uid]][$k]" value="{$value[wages][$k]}" /></td>
+<!--
+EOT;
+}print <<<EOT
+-->
+    </tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+  </table>
+  </div>
+  <div class="mb10 tac">
+    <span class="btn"><span><button type="submit">给团队成员发奖励</button></span></span>
+  </div>
+</form>
+
+<script language="JavaScript">
+var ifopen = parseInt('$rt[ifopen]');
+function checkForm(obj) {
+	if (ifopen==1 && !confirm('您已经开启自动发放奖励的程序了，您确定继续吗?')) {
+		return false;
+	}
+	return true;
+}
+</script>
+<!--
+EOT;
+}include_once PrintEot('adminbottom');
+?>-->

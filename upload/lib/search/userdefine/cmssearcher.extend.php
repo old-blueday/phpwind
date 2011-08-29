@@ -50,6 +50,11 @@ class PW_SearchExtend_CMS_Searcher extends Search_Base {
 				$sql .= " subject LIKE " . S::sqlEscape ( '%' . $keyword . '%' );
 			}
 		}
+		
+		if ($this->_groupId != 3) {
+			$sql .= " AND postdate <=" . S::sqlEscape ( $this->_timestamp );
+		}
+		
 		$cmsDao = $this->getCmsDao ();
 		if (! ($total = $cmsDao->countSearch ( "SELECT COUNT(*) as total FROM pw_cms_article WHERE 1 " . $sql ))) {
 			return array (false, false );
@@ -128,6 +133,9 @@ class PW_SearchExtend_CMS_Searcher extends Search_Base {
 		$conditions ['perpage'] = $perpage;
 		$conditions ['index'] = (isset($this->_sphinx['cmsindex'])) ? $this->_sphinx['cmsindex'] : 'cmsindex';
 		$conditions ['sortby'] = 'postdate';
+		if ($this->_groupId != 3) {
+			$conditions ['filterRange'] = array( array('attribute' => 'postdate','min' => 0,'max' => $this->_timestamp,'exclude' => false));
+		}
 		$result = $_sphinxSearch->sphinxSearcher ( $conditions, 'id' );
 		$total = $result [0];
 		$searchs = $this->_getCmsByIds ( $result [1], $keywords );
@@ -153,11 +161,13 @@ class PW_SearchExtend_CMS_Searcher extends Search_Base {
 		$page = $page > 1 ? $page : 1;
 		$offset = intval ( ($page - 1) * $perpage );
 		$cmsDao = $this->getCmsDao ();
-		if (! ($total = $cmsDao->countSearch ( "SELECT count(*) as total FROM pw_cms_article" ))) {
+		$_sqlWhere = '';
+		$_sqlWhere .= " AND a.postdate <=" . S::sqlEscape ( $this->_timestamp );
+		if (! ($total = $cmsDao->countSearch ( "SELECT count(*) as total FROM pw_cms_article a WHERE 1 $_sqlWhere" ))) {
 			return array (false, false );
 		}
 		$total = ($total < 500) ? $total : 500;
-		$sql = "SELECT a.*,e.hits FROM pw_cms_article a LEFT JOIN pw_cms_articleextend e ON a.article_id=e.article_id ";
+		$sql = "SELECT a.*,e.hits FROM pw_cms_article a LEFT JOIN pw_cms_articleextend e ON a.article_id=e.article_id WHERE 1 $_sqlWhere";
 		$sql .= " ORDER BY postdate DESC";
 		$sql .= "  LIMIT " . $offset . "," . $perpage;
 		$result = $cmsDao->getSearch ( $sql );

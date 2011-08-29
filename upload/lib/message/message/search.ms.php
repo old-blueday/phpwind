@@ -71,7 +71,7 @@ class MS_Search extends MS_Base {
 	function manageMessage($keyWords,$startTime,$endTime,$sender,$isDelete,$page,$perpage){
 		$sql = '';
 		if($keyWords){
-			$sql .= " AND title LIKE ".S::sqlEscape("%".$keyWords."%")." OR content LIKE ".S::sqlEscape("%".$keyWords."%");
+			$sql .= " AND (title LIKE ".S::sqlEscape("%".$keyWords."%")." OR content LIKE ".S::sqlEscape("%".$keyWords."%") . ')';
 		}
 		if($startTime ){
 			$sql .= " AND created_time > ".S::sqlEscape($startTime);

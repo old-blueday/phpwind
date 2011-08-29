@@ -14,12 +14,12 @@ $lang['bbscode'] = array (
 'bbcode_encode3'		=> '对不起!您没有登录,请先<a href="login.php"><font color="red">登录论坛</font></a>.',
 
 'bbcode_sell_info'		=> '此帖售价 $L[value] $L[name],已有 $L[count] 人购买',
-'bbcode_sell_infonotice'=> '<font color="red" style="font-size:9pt;margin-right:30px">出售内容，购买后显示</font><a href="$L[buy]" onclick="return ajaxurl(this);" title="购买" class="mr10">购买</a>',
+'bbcode_sell_infonotice'=> '<span class="mr10">此段为出售的内容，购买后显示</span><!--a href="$L[buy]" onclick="return ajaxurl(this);">[购买]</a-->',
 
 'bbcode_sell_buy'		=> '购买人名单',
 'bbcode_sell_record_buy'=> '<a href="$L[record]" onclick="return ajaxurl(this);" title="查看记录" class="mr10"><font color="">[记录]</font></a> <a href="$L[buy]" onclick="return ajaxurl(this);" title="购买" class="mr10"><font color="">[购买]</font></a>',
 'bbcode_sell_submit'	=> '愿意购买,我买,我付钱',
-'bbcode_sell_notice'	=> '<b>购买后，将显示帖子中所有出售内容。<br>若发现会员采用欺骗的方法获取财富,请立刻举报,我们会对会员处以2-N倍的罚金,严重者封掉ID!</b>',
+'bbcode_sell_notice'	=> '购买后，将显示帖子中所有出售内容。<br>若发现会员采用欺骗的方法获取财富,请立刻举报,我们会对会员处以2-N倍的罚金,严重者封掉ID!',
 'seller'				=> '<b>卖家：</b>',
 'subject'				=> '<b>商品名称：</b>',
 'body'					=> '<b>商品描述：</b>',

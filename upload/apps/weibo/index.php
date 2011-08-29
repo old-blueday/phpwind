@@ -6,7 +6,8 @@ $page = intval($page);
 $page < 1 && $page = 1;
 $db_perpage = 10;
 
-include pwCache::getPath(R_P. 'data/bbscache/o_config.php');
+//* include pwCache::getPath(R_P. 'data/bbscache/o_config.php');
+pwCache::getData(R_P. 'data/bbscache/o_config.php');
 if(!$winduid && in_array($do,array('transmit','comment'))) Showmsg('not_login');
 if (!$space =& $newSpace->getInfo()) {
 	Showmsg('您访问的空间不存在!');

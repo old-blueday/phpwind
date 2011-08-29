@@ -77,7 +77,19 @@ print <<<EOT
             <td class="td2">$job[reward]</td>
             <td class="td2">$job[timetips]</td>
             <td class="td2">$job[period]</td>
-            <td class="td2"><a href="$basename&action=edit&id=$job[id]" class="mr20">[编辑]</a><a href="javascript:;" onclick="deleteJob('$ajaxUrl',$job[id]);">[删除]</a></td>
+            <td class="td2"><a href="$basename&action=edit&id=$job[id]" class="mr20">[编辑]</a>
+<!--
+EOT;
+if(!$job[isuserguide]){
+print <<<EOT
+-->
+            <a href="javascript:;" onclick="deleteJob('$ajaxUrl',$job[id]);">[删除]</a>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+            </td>
         </tr>
 <!--
 EOT;

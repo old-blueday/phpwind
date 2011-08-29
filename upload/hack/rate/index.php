@@ -200,7 +200,9 @@ class RateIndex {
         if (! $showVote) {
             list($typeTitle,$hotHref) = $this->_getTypeParams($typeId);
             $tips = ($this->_tips) ? $this->_tips : ''; //评价成功后提示积分信息
-            list ( $rateResultHtml, $total, $weekHTML ) = $this->_buildResultHTML ( $rateConfigs );
+            list ( $rateResultHtml, $total, $weekHTML) = $this->_buildResultHTML ( $rateConfigs );
+        } else {
+        	$rateResultHtml = $this->_buildVoteResultHTML($rateConfigs, $ajaxUrl);
         }
         include H_R . 'template/index.htm';
         !$this->_noAjax && ajax_footer ();
@@ -242,8 +244,26 @@ class RateIndex {
             $resultHTML .= '<div class="mood-one"><div class="mood-two" style="height:' . $percentage . '%;"></div></div>';
             $resultHTML .= '<img src="' . $this->_getDefaultImageUrl () . 'images/' . $config ['icon'] . '" /><br />' . $config ['title'] . '</a></td>';
         }
-        $weekHTML = ($this->_cache) ? $this->_get_RateConfigResultCache ( $rateConfigs ) : $this->_buildWeekResultHtml ( $rateConfigs );
+		$weekHTML = ($this->_cache) ? $this->_get_RateConfigResultCache ( $rateConfigs ) : $this->_buildWeekResultHtml ( $rateConfigs );
         return array ($resultHTML, $total, $weekHTML );
+    }
+    
+    function _buildVoteResultHTML($rateConfigs, $ajaxUrl) {
+    	$rateService = $this->_getRateService();
+        list ( $rateResults, $total ) = $rateService->getRateResultByTypeId ( $this->_typeId, $this->_objectId );
+        $resultHTML = "";
+        foreach ( $rateConfigs as $config ) {
+            if ($config ['isopen'] == 0) {
+                continue;
+            }
+            $voteNum = (isset ( $rateResults [$config ['id']] ['num'] )) ? $rateResults [$config ['id']] ['num'] : 0;
+            $percentage = ($total == 0) ? 100 : (100 - $voteNum / $total * 100);
+            $resultHTML .= '<td>' . $voteNum . '<br />';
+            $resultHTML .= '<div class="mood-one"><div class="mood-two" style="height:' . $percentage . '%;"></div></div>';
+            $resultHTML .= "<a href=\"javascript:;\" onclick=\"rate.voting('$this->_elementid', '$ajaxUrl','{$this->_objectId}', '$config[id]', '{$this->_typeId}','$this->_authorid');\" title=\"$config[tips]\">";
+            $resultHTML .= '<img src="' . $this->_getDefaultImageUrl () . 'images/' . $config ['icon'] . '" /><br />' . $config ['title'] . '</a></td>';
+        }
+        return $resultHTML;
     }
 
     function _getTypeParams($typeId){
@@ -286,9 +306,10 @@ class RateIndex {
         $filePath = $this->_getReteConfigFilePath ( $this->_typeId );
         if (! file_exists ( $filePath ) || time () - filemtime ( $filePath ) > 3600) {
             $weekHTML = $this->_buildWeekResultHtml ( $rateConfigs );
-            pwCache::setData ( $filePath, $weekHTML );//write ignore null or not
+            pwCache::setData ( s::escapePath($filePath), $weekHTML );//write ignore null or not
         } else {
-            $weekHTML = readover ( $filePath );
+            //* $weekHTML = readover ( $filePath );
+            $weekHTML = pwCache::getData(S::escapePath($filePath) , false, true);
         }
         return $weekHTML;
     }

@@ -329,10 +329,10 @@ EOT;
 												<td>头像链接 <input name="httpurl[0]" id="httpurl_url" value="$httpurl" class="input" type="text" size="40" /> 必须以 http://开头</td>
 											</tr>
 											<tr>
-												<td>头像宽度 <input name="httpurl[1]" value="$iconwidth" class="input" size="4" maxlength="3" /> 必须是 1 -- $db_imgwidth 之间的一个整数。</td>
+												<td> <input name="httpurl[1]" value="$iconwidth" class="input" size="4" maxlength="3" /> 必须是 1 -- $db_imgwidth 之间的一个整数。</td>
 											</tr>
 											<tr>
-												<td>头像高度 <input name="httpurl[2]" value="$iconheight" class="input" size="4" maxlength="3" /> 必须是 1 -- $db_imgheight 之间的一个整数。</td>
+												<td> <input name="httpurl[2]" value="$iconheight" class="input" size="4" maxlength="3" /> 必须是 1 -- $db_imgheight 之间的一个整数。</td>
 											</tr>
 										</table>
 										<input type="hidden" id="httpurl_w" name="httpurl[3]" />
@@ -345,7 +345,7 @@ if($db_bbsifopen != 1){print <<<EOT
 -->
 <div class="blockquote3">
 抱歉，站点正处于内部开放状态，只有在完全开放状态下，才能使用头像上传功能。<br />
-<span class="gray">（站点状态的后台设置路径：核心设置 &#187; 常规设置）</span>
+<span class="gray">（站点状态的后台设置路径：全局 &#187; 站点设置）</span>
 </div>
 <!--
 EOT;

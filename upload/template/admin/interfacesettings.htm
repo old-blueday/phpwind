@@ -117,7 +117,7 @@ if($adminitem=='index' || $settingdb['index']){print <<<EOT
 		<tr class="tr1 vt">
 			<td class="td1">在线显示用户组</td>
 			<td class="td2">$usergroup</td>
-			<td class="td2"><div class="help_a">请选择在线显示的用户组，复选框内填写用户组显示顺序。<br /><br /><font color="#0000FF">注：1、全不选这只显示“普通会员”。<br />2、在线图标存放在“images/所选风格的图片目录/group/用户组ID.gif”，如“images/wind/group/3.gif”。<br />在线图标以用户组ID命名，请检查图片是否存在，<b>不存在则无法正常显示</b></font>。 </div></td>
+			<td class="td2"><div class="help_a">请选择在线显示的用户组，复选框内填写用户组显示顺序。<br /><br /><font color="#0000FF">注：1、全不选则显示“普通会员”。<br />2、在线图标存放在“images/所选风格的图片目录/group/用户组ID.gif”，如“images/wind/group/3.gif”。<br />在线图标以用户组ID命名，请检查图片是否存在，<b>不存在则无法正常显示</b></font>。 </div></td>
 		</tr>
 		<tr class="tr1 vt">
 			<td class="td1">首页显示在线用户</td>
@@ -179,10 +179,20 @@ EOT;
 			<td class="td2"><div class="help_a">默认5个 </div></td>
 		</tr>
 		<tr class="tr1 vt">
-			<td class="td1">点击率延迟更新[小时]</td>
+			<td class="td1">点击数更新策略</td>
+			<td class="td2">
+				<ul class="list_A list_80">
+					<li><input type="radio" value="0" name="config[hits_store]" $hits_store_0>实时更新</li>
+					<li><input type="radio" value="1" name="config[hits_store]" $hits_store_1>数据库缓存</li>
+					<li><input type="radio" value="2" name="config[hits_store]" $hits_store_2>文本缓存</li>
+				</ul>				
+			</td>
+			<td class="td2"><div class="help_a">在站点访问压力过大时建议使用数据库缓存 </div></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">文本缓存延迟更新[小时]</td>
 			<td class="td2">
 				<select name="config[hithour]" class="select_wa">
-					<option value="0" $hithour_sel[0]>0</option>
 					<option value="1" $hithour_sel[1]>1</option>
 					<option value="4" $hithour_sel[4]>4</option>
 					<option value="6" $hithour_sel[6]>6</option>
@@ -191,8 +201,9 @@ EOT;
 					<option value="20" $hithour_sel[20]>24</option>
 				</select>
 			</td>
-			<td class="td2"><div class="help_a">设置为0则不使用此功能,使用生成html功能将自动使用此功能 </div></td>
-		</tr>
+			<td class="td2"><div class="help_a">点击数文件缓存更新时间,使用生成html功能将自动使用此功能 </div></td>
+		</tr>		
+		
 		<!--<tr class="tr1 vt">
 			<td class="td1"><span class="xia2">总置顶,分类置顶功能:</span><br />置顶3: 为总置顶。置顶2: 为分类置顶。置顶1:为本版块置顶</td>
 			<td class="td2">
@@ -296,6 +307,16 @@ EOT;
 			</td>
 			<td class="td2"><div class="help_a">在帖子阅读页个人信息栏显示会员加入的群组:</span> </div></td>
 		</tr> -->
+		<tr class="tr1 vt">
+			<td class="td1">阅读页个人信息显示</td>
+			<td class="td2">
+				<ul class="list_A list_80">
+					<li><input type="radio" value="1" name="config[readinfo]" $readinfo_Y>开启</li>
+					<li><input type="radio" value="0" name="config[readinfo]" $readinfo_N>关闭</li>
+				</ul>
+			</td>
+			<td class="td2"><div class="help_a">关闭后，阅读页楼层左侧用户等级下方的用户信息不再显示</div></td>
+		</tr>
 		<tr class="tr1 vt">
 			<td class="td1">选择要显示的积分</td>
 			<td class="td2">

@@ -18,7 +18,11 @@ if (!$windid && !in_array($action, array(
 	'pingpage',
 	'jobpop',
 	'showrandcolonys',
-	'activity'
+	'activity',
+	'showsearcherimg',
+	'changeuskin',
+	'showsearcherimg',
+	'pwschools'
 ))) {
 	Showmsg('not_login');
 }
@@ -29,6 +33,7 @@ $whiteActions = array(
 	'tag',
 	'relatetag',
 	'deldownfile',
+	'setcover',
 	'draft',
 	'msg',
 	'usetool',
@@ -105,7 +110,12 @@ $whiteActions = array(
 	'changewidthcfg',
 	'changesidebar',
 	'readfloor',
-	'collectiontype'
+	'collectiontype',
+	'deltag',
+	'auth',
+	'showsearcherimg',
+	'pwschools',
+	'changeuskin'
 );
 if (in_array($action, $whiteActions)) {
 	require S::escapePath(R_P . 'actions/ajax/' . $action . '.php');

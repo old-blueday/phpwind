@@ -57,7 +57,7 @@ var delay = 10;
 var x = 50,y = 60; //初始坐标
 var xin = true,yin = true;
 var step = 1;
-
+//alert(ietruebody().clientWidth)
 function ShowAd(floatCode){
 	var popup=document.createElement("DIV");
 	popup.id="floatAd";
@@ -75,8 +75,13 @@ function ShowAd(floatCode){
 }
 function floatAd(){
 	var L=T=0;
-	var R = ietruebody().clientWidth-obj.offsetWidth;
-	var B = ietruebody().clientHeight-obj.offsetHeight;
+	if(!-[1,]){
+		var R = ietruebody().clientWidth-obj.offsetWidth;
+		var B = ietruebody().clientHeight-obj.offsetHeight;
+	}else{
+		var R = document.documentElement.clientWidth-obj.offsetWidth;
+		var B = document.documentElement.clientHeight-obj.offsetHeight;
+	}
 	obj = document.getElementById("floatAd");
 	obj.style.left = x + getLeft() + "px";
 	obj.style.top = y + getTop() + "px";

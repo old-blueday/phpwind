@@ -32,6 +32,7 @@ function updateforum($fid,$lastinfo='') {//TODO 慢查询
 			$author  = addslashes($lt['lastposter']);
 			$lastinfo = $lt['tid'] ? $subject."\t".$author."\t".$lt['lastpost']."\t"."read.php?tid=$lt[tid]&page=e#a" : '' ;
 		}
+		/**
 		$db->update("UPDATE pw_forumdata"
 			. " SET ".S::sqlSingle(array(
 					'topic'		=> $topic,
@@ -40,6 +41,13 @@ function updateforum($fid,$lastinfo='') {//TODO 慢查询
 					'lastpost'	=> $lastinfo
 				))
 			. " WHERE fid=".S::sqlEscape($fid));
+		**/
+		pwQuery::update('pw_forumdata', 'fid=:fid', array($fid), array(
+					'topic'		=> $topic,
+					'article'	=> $article,
+					'subtopic'	=> $subtopics,
+					'lastpost'	=> $lastinfo
+				));
 		if ($fm['password'] != '' || $fm['allowvisit'] != '' || $fm['f_type'] == 'hidden') {
 			$lastinfo = '';
 		}
@@ -72,18 +80,21 @@ function updateForumCount($fid, $topic, $replies, $tpost = 0) {
 		$lastpost = ",lastpost=" . S::sqlEscape($subject."\t".$lt['lastposter']."\t".$lt['lastpost']."\t"."read.php?tid=$lt[tid]&page=e#a");
 	}
 	$db->update("UPDATE pw_forumdata SET article=article+'$article',topic=topic+'$topic',tpost=tpost+'$tpost'{$lastpost} WHERE fid=" . S::sqlEscape($fid));
-
+	Perf::gatherInfo('changeForumData', array('fid'=>$fid));
+	
 	if (($fm['type'] == 'sub' || $fm['type'] == 'sub2') && $fids = getUpFids($fid)) {
 		if ($fm['password'] != '' || $fm['allowvisit'] != '' || $fm['f_type'] == 'hidden') {
 			$lastpost = '';
 		}
 		$db->update("UPDATE pw_forumdata SET article=article+'$article',subtopic=subtopic+'$topic',tpost=tpost+'$tpost'{$lastpost} WHERE fid IN(" . S::sqlImplode($fids) . ')');
+		Perf::gatherInfo('changeForumData', array('fid'=>$fids));
 	}
 }
 
 function getUpFids($fid) {
 	global $forum;
-	isset($forum) || include_once pwCache::getPath(D_P . 'data/bbscache/forum_cache.php');
+	//* isset($forum) || include_once pwCache::getPath(D_P . 'data/bbscache/forum_cache.php');
+	isset($forum) || extract(pwCache::getData(D_P . 'data/bbscache/forum_cache.php', false));
 	$upfids = array();
 	$fid = $forum[$fid]['fup'];
 	while (in_array($forum[$fid]['type'], array('sub2','sub','forum'))) {
@@ -134,12 +145,14 @@ function updatetop() {
 			$fids[$rt['fid']]['top2']++;
 		}
 	}
-	$db->update("UPDATE pw_forumdata SET top1 = '', top2 = '' , topthreads = '' ");
+	//* $db->update("UPDATE pw_forumdata SET top1 = '', top2 = '' , topthreads = '' ");
+	pwQuery::update('pw_forumdata', null, null, array('top1'=>'', 'top2'=>'', 'topthreads'=>''));
 	$_fids = array();
 	foreach ($fids as $key => $value) {
 		if (is_array($value)) {
 			$_fids[] = $key;
-			$db->update("UPDATE pw_forumdata SET  " . S::sqlSingle($value) . " WHERE fid =  ".S::sqlEscape($key));
+			//* $db->update("UPDATE pw_forumdata SET  " . S::sqlSingle($value) . " WHERE fid =  ".S::sqlEscape($key));
+			pwQuery::update('pw_forumdata', 'fid=:fid', array($key), $value);
 		}
 	}
 	if (!empty($_fids)) {

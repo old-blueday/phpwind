@@ -41,7 +41,8 @@ foreach ($appsdb as $value) {
 
 //一页显示个数
 require_once (R_P . 'require/showimg.php');
-include_once pwCache::getPath(D_P . 'data/bbscache/level.php');
+//* include_once pwCache::getPath(D_P . 'data/bbscache/level.php');
+pwCache::getData(D_P . 'data/bbscache/level.php');
 $userdb = array();
 $app_with_count = array(
 	'topic',

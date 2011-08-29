@@ -196,7 +196,7 @@ class PW_STopicService {
 		ob_end_clean();
 		$stopicDir	= $this->getStopicDir($stopic_id, $stopic['file_name']);
 		$output = parseHtmlUrlRewrite($output, $db_htmifopen);
-		pwCache::setData($stopicDir,$output);
+		pwCache::writeover($stopicDir,$output);
 		ObStart();
 	}
 

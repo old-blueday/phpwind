@@ -6,7 +6,7 @@ $_no='否';
 
 $lang=array(
 
-	'settings'=>    '是否允许进行"核心设置"',
+	'settings'=>    '是否允许进行"全局"',
 	'updatecache'=> '是否允许进行"缓存数据管理"',
 	'postcache'=>   '是否允许进行"动作表情管理"',
 	'creathtm'=>    '是否允许进行"静态模板设置"',

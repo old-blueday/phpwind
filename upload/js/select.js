@@ -45,9 +45,9 @@ sSelect.getElementsByClass = function(searchClass,node,tag) {
 var _MP=sSelect.prototype;
 _MP.init=function()
 {
-	this.vir = document.createElement('div');
+	this.vir = document.createElement('span');
 	this.vir.className="dropselectbox";
-	this.vir.innerHTML='<button type="button"></button><ul><li></li></ul>';
+	this.vir.innerHTML='<div class="fl"><ul><li></li></ul></div><button type="button" onfocus="blur();"></button>';
 	this.vir.getElementsByTagName('button')[0].innerHTML = this.getSelectedText();
 	var opts='';
 	this.sel.parentNode.insertBefore(this.vir,this.sel);

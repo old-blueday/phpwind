@@ -5,10 +5,23 @@ require_once(R_P.'require/forum.php');
 
 empty($winduid) && wap_msg('not_login');
 
-list($db_openpost,$db_poststart,$db_postend) = explode("\t",$db_openpost);
-if ($db_openpost==1 && $db_poststart<$db_postend && ($_time['hours']<$db_poststart || $_time['hours']>$db_postend)) {
+//list($db_openpost,$db_poststart,$db_postend) = explode("\t",$db_openpost);
+list($db_openpost, $db_poststart, $db_poststartminute, $db_postend, $db_postendminute) = explode("\t", $db_openpost);
+$currentMinute = get_date($timestamp,'i');
+if ($db_openpost == 1 && $groupid != 3 && $groupid != 4) {
+	if ($db_poststart < $db_postend && (($_time['hours'] < $db_poststart || ($_time['hours'] == $db_poststart && $currentMinute < $db_poststartminute)) || ($_time['hours'] > $db_postend || ($_time['hours'] == $db_postend && $currentMinute > $db_postendminute)))) {
+		wap_msg("post_openpost");
+	} elseif ($db_poststart > $db_postend && (($_time['hours'] < $db_poststart || ($_time['hours'] == $db_poststart && $currentMinute < $db_poststartminute)) && ($_time['hours'] > $db_postend || ($_time['hours'] == $db_postend && $currentMinute > $db_postendminute)))) {
+		wap_msg("post_openpost");
+	} elseif ($db_poststart == $db_postend && $_time['hours'] == $db_poststart && ($currentMinute < $db_poststartminute || $currentMinute > $db_postendminute)) {
+		wap_msg("post_openpost");
+	}
+}
+/*
+if ($db_openpost==1 && $db_poststart<$db_postend && (($_time['hours'] < $db_poststart || ($_time['hours'] == $db_poststart && $currentMinute < $db_poststartminute)) || ($_time['hours'] > $db_postend || ($_time['hours'] == $db_postend && $currentMinute > $db_postendminute)))) {
 	wap_msg("post_openpost");
 }
+*/
 if (isban($winddb,$fid)) {
 	wap_msg('post_ban');
 }
@@ -100,7 +113,8 @@ if ($action == 'new') {
 		)));
 
 		$lastpost = $subject."\t".addslashes($windid)."\t".$timestamp."\t"."read.php?tid=$tid&page=e#a";
-		$db->update("UPDATE pw_forumdata SET lastpost=".S::sqlEscape($lastpost).",tpost=tpost+1,article=article+1,topic=topic+1 WHERE fid=".S::sqlEscape($fid));
+		//* $db->update("UPDATE pw_forumdata SET lastpost=".S::sqlEscape($lastpost).",tpost=tpost+1,article=article+1,topic=topic+1 WHERE fid=".S::sqlEscape($fid));
+		$db->update(pwQuery::buildClause("UPDATE :pw_table SET lastpost=:lastpost,tpost=tpost+1,article=article+1,topic=topic+1 WHERE fid=:fid", array('pw_forumdata', $lastpost, $fid)));
 
 		require_once(R_P.'require/credit.php');
 		$fm = $db->get_one("SELECT creditset FROM pw_forumsextra WHERE fid=".S::sqlEscape($fid));
@@ -213,7 +227,8 @@ if ($action == 'new') {
 		Perf::gatherInfo('changeThreadWithForumIds', array('fid'=>$fid));			
 
 		$lastpost = $subject."\t".addslashes($windid)."\t".$timestamp."\t"."read.php?tid=$tid&page=e#a";
-		$db->update("UPDATE pw_forumdata SET lastpost=".S::sqlEscape($lastpost).",tpost=tpost+1,article=article+1,topic=topic+1 WHERE fid=".S::sqlEscape($fid));
+		//* $db->update("UPDATE pw_forumdata SET lastpost=".S::sqlEscape($lastpost).",tpost=tpost+1,article=article+1,topic=topic+1 WHERE fid=".S::sqlEscape($fid));
+		$db->update(pwQuery::buildClause("UPDATE :pw_table SET lastpost=:lastpost,tpost=tpost+1,article=article+1,topic=topic+1 WHERE fid=:fid", array('pw_forumdata', $lastpost, $fid)));
 
 		require_once(R_P.'require/credit.php');
 		$fm = $db->get_one("SELECT creditset FROM pw_forumsextra WHERE fid=".S::sqlEscape($fid));

@@ -63,6 +63,27 @@ class S {
 	function isNum($param) {
 		return is_numeric($param) ? true : false;
 	}
+	
+	/**
+	 * 是否是有值 主要包含  0 '0' 为真
+	 * Enter description here ...
+	 * @param unknown_type $param
+	 */
+	function isNatualValue($param){
+		switch (gettype($param)) {
+			case 'string':
+			case 'integer':
+			case 'double':
+				return strlen($param) > 0;
+			break;
+			case 'array':
+				return S::isArray($param);
+				break;
+			default:
+				return $param ? true : false;
+			break;
+		}
+	}
 	/**
 	 * 加载类/函数文件
 	 * @param $file
@@ -177,7 +198,7 @@ class S {
 	 */
 	function escapeDir($dir) {
 		$dir = str_replace(array("'",'#','=','`','$','%','&',';'), '', $dir);
-		return trim(preg_replace('/(\/){2,}|(\\\){1,}/', '/', $dir), '/');
+		return rtrim(preg_replace('/(\/){2,}|(\\\){1,}/', '/', $dir), '/');
 	}
 	/**
 	 * 通用多类型转换

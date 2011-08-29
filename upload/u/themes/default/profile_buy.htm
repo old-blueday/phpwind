@@ -33,13 +33,17 @@ if (!$job) {print<<<EOT
 							</tr>
 <!--
 EOT;
-foreach ($specialdb as $key => $val) {print <<<EOT
+foreach ($specialdb as $key => $val) {
+	$strSellprice = !$val[sellprice] && !strlen($val[sellprice])? '-' : $val[sellprice] . $val[selltype] . '/天';
+	$strRmbprice = !$val[rmbprice] && !strlen($val[rmbprice])? '-' : $val[rmbprice] . '/天';
+	$strSelllimit = !$val[selllimit] && !strlen($val[selllimit])? '-' : $val[selllimit];
+print <<<EOT
 -->
 							<tr>
 								<td>$val[grouptitle]</td>
-								<td>{$val[sellprice]} {$val[selltype]}/天</td>
-								<td>{$val[rmbprice]} /天</td>
-								<td>{$val[selllimit]}</td>
+								<td>$strSellprice</td>
+								<td>$strRmbprice</td>
+								<td>$strSelllimit</td>
 								<td>$val[enddate]</td>
 								<td>
 <!--

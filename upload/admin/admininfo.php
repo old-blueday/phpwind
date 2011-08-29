@@ -107,7 +107,8 @@ if (!$job || $job == 'desktop') {
 		}
 	}
 
-	include_once pwCache::getPath(D_P.'data/bbscache/forumcache.php');
+	//* include_once pwCache::getPath(D_P.'data/bbscache/forumcache.php');
+	pwCache::getData(D_P.'data/bbscache/forumcache.php');
 	$sysinfo = array();
 	if ($admin_gid == '3') {
 		$cachetext = explode("\r\n",substr(readover(D_P.'data/bbscache/admin_cache.php'),12));
@@ -124,6 +125,7 @@ if (!$job || $job == 'desktop') {
 			$sysinfo['M5'] = $db->get_value("SELECT COUNT(*) FROM pw_administrators WHERE groupid in (5) OR groups LIKE ('%,5,%')");
 			$sysinfo['M7'] = $db->get_value("SELECT COUNT(*) AS sum FROM pw_members WHERE groupid='7'");
 			//$sysinfo['yz'] = $db->get_value("SELECT COUNT(*) AS sum FROM pw_members WHERE yz>1");
+			$sysinfo['bwd'] = $db->get_value("SELECT COUNT(*) FROM pw_filter WHERE state = '0'");
 			$sysinfo['sharelinks'] = $db->get_value("SELECT COUNT(*) FROM pw_sharelinks WHERE ifcheck=0");
 			$sysinfo['report'] = $db->get_value("SELECT COUNT(*) FROM pw_report WHERE state=0");
 			require_once(R_P.'admin/table.php');

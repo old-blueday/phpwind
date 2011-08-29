@@ -24,6 +24,17 @@ class PW_DatanalyseService {
 		$datanalyse = $this->_getDatanalyseServiceByType($type);
 		return $datanalyse->getDataAndNumsByAction($action, $num, $time);
 	}
+	
+	/**
+	 * @param string $type
+	 * @param string $action
+	 * @param int $num
+	 * @param int $time
+	 */
+	function getHotArticleByAction($type, $action, $num, $time) {
+		$datanalyse = $this->_getDatanalyseServiceByType($type);
+		return $datanalyse->getHotArticleByAction($action, $num, $time);
+	}
 
 	/**
 	 * 过滤支持的类型白名单

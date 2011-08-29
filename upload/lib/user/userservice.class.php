@@ -262,6 +262,19 @@ class PW_UserService {
 		$membersDb = $this->_getMembersDB();
 		return $membersDb->findUsersOrderByUserId($number);
 	}
+	
+	/**
+	 * 查找最新的几个未被禁言的用户
+	 * 
+	 * @return array
+	 */
+	function findNotBannedNewUsers($number = 10) {
+		$number = intval($number);
+		if ($number <= 0) return array();
+		
+		$membersDb = $this->_getMembersDB();
+		return $membersDb->findNotBannedUsersOrderByUserId($number);
+	}
 
 	/**
 	 * 获得Members全部数据的个数
@@ -581,6 +594,240 @@ class PW_UserService {
 			$fieldsData['uid'] = $userId;
 			return $memberInfoDb->insert($fieldsData);
 		}
+	}
+	
+	/**
+	 * 组装在线用户现居地、家乡、教育、工作经历等信息
+	 * 
+	 * @param int $userId 用户id
+	 * @return array
+	 */
+	function getOnLineUsers() {
+		global $winduid;
+		$onlineUsers = GetOnlineUser();
+		if (!s::isArray($onlineUsers)) return array();
+		$userIds = array();
+		foreach ($onlineUsers as $key => $v) {
+			if ($key == $winduid) continue;
+			$userIds[] = $key;
+		}
+		return $userIds;
+	}
+	
+	/**
+	 * 组装用户uids
+	 * 
+	 * @param array $fieldsData 用户信息
+	 * @return array
+	 */
+	function buildUids($fieldsData) {
+		$uids = array();
+		foreach ((array)$fieldsData as $v) {
+			$uids[] = $v['uid'];
+		}
+		return array_diff($uids,$winduid);
+	}
+	
+	/**
+	 * 组装用户信息uid、username、face、在线图标
+	 * 
+	 * @param array $uids
+	 * @return array
+	 */
+	function buildUserInfo($uids) {
+		if (!s::isArray($uids)) return array();
+		require_once(R_P.'require/showimg.php');
+		$userInfo = array();
+		foreach ((array)$this->getUsersWithMemberDataByUserIds($uids) as $data) {
+			$user['uid'] = $data['uid'];
+			$user['username'] = $data['username'];
+			$user['thisvisit'] = $data['thisvisit'];
+			list($user['face']) = showfacedesign($data['icon'], '1', 's');
+			$userInfo[] = $user;
+		}
+		return $userInfo;
+	}
+	
+	/**
+	 * 可能认识的人
+	 * 
+	 * @param int $userId 用户id
+	 * @return array
+	 */
+	function getMayKnownUserIds($fieldsData,$num = 12) {
+		$onlineUserIds = $this->getOnLineUsers();
+		if (!s::isArray($onlineUserIds)) return array();
+		if (count($onlineUserIds) <= $num) return $onlineUserIds;
+		
+		$tmpApartmentUsers = $this->getUsersByApartmentAndUserIds($fieldsData['apartment'],$onlineUserIds,$num);
+		$countApartmentUser = count($tmpApartmentUsers);
+		$apartmentUsers = $this->buildUids($tmpApartmentUsers);
+		if ($countApartmentUser >= $num) return $apartmentUsers;
+		$homeUids = array_diff($onlineUserIds,$apartmentUsers);
+		$homeNum = $num - $countApartmentUser;
+
+		$tmpHomeUsers = $this->getUsersByHomeAndUserIds($fieldsData['home'],$homeUids,$homeNum);
+		$countHomeUser = count($tmpHomeUsers);
+		$homeUsers = $this->buildUids($tmpHomeUsers);
+		if ($countHomeUser >= $homeNum) return array_merge($apartmentUsers,$homeUsers);
+		$companyUids = array_diff($homeUids,$homeUsers);
+		$companyNum = $homeNum - $countPlaceUser;
+			
+		$tmpCompanyUsers = $this->getUsersByCompanyidAndUserIds($fieldsData['companyid'],$companyUids,$companyNum);
+		$countCompanyUser = count($tmpCompanyUsers);
+		$companyUsers = $this->buildUids($tmpCompanyUsers);
+		if ($countCompanyUser >= $companyNum) return array_merge($apartmentUsers,$homeUsers,$companyUsers);
+		$educationUids = array_diff($companyUids,$companyUsers);
+		$educationNum = $companyNum - $countCompanyUser;
+
+		$tmpEducationUsers = $this->getUsersBySchoolidsAndUserIds($fieldsData['schoolid'],$educationUids,$educationNum);
+		$countEducationUser = count($tmpEducationUsers);
+		$educationUsers = $this->buildUids($tmpEducationUsers);
+		if ($countEducationUser >= $educationNum) return array_merge($apartmentUsers,$homeUsers,$companyUsers,$educationUsers);
+		$endUids = array_diff($educationUids,$educationUsers);
+		$endNum = $educationNum - $countEducationUser;
+		
+		return array_merge($apartmentUsers,$homeUsers,$companyUsers,$educationUsers,array_slice($endUids,0,$endNum));
+	}
+	
+	/**
+	 * 根据所在地apartment和userIds统计用户
+	 * 
+	 * @param int $apartment 所在地
+	 * @param array $userIds 用户ids
+	 * @return int
+	 */
+	function countUsersByApartmentAndUserIds($apartment,$userIds) {
+		$apartment = intval($apartment);
+		if ($apartment < 1 || !s::isArray($userIds)) return 0;
+		$membersDb = $this->_getMembersDB();
+		return $membersDb->countUsersByApartmentAndUserIds($apartment,$userIds);
+	}
+	
+	/**
+	 * 根据所在地apartment和userIds获取用户
+	 * 
+	 * @param int $apartment 所在地
+	 * @param array $userIds 用户ids
+	 * @return array
+	 */
+	function getUsersByApartmentAndUserIds($apartment,$userIds,$num) {
+		$apartment = intval($apartment);
+		if ($apartment < 1 || !s::isArray($userIds)) return array();
+		$membersDb = $this->_getMembersDB();
+		if ($this->countUsersByApartmentAndUserIds($apartment,$userIds) < 1) return array();
+		return $membersDb->getUsersByApartmentAndUserIds($apartment,$userIds,$num);
+	}
+	
+	/**
+	 * 根据家乡home和userIds统计用户
+	 * 
+	 * @param int $home 所在地
+	 * @param array $userIds 用户ids
+	 * @return int
+	 */
+	function countUsersByHomeAndUserIds($home,$userIds) {
+		$home = intval($home);
+		if ($home < 1 || !s::isArray($userIds)) return 0;
+		$membersDb = $this->_getMembersDB();
+		return $membersDb->countUsersByHomeAndUserIds($home,$userIds);
+	}
+	
+	/**
+	 * 根据家乡home和userIds获取用户
+	 * 
+	 * @param int $home 家乡
+	 * @param array $userIds 用户ids
+	 * @return array
+	 */
+	function getUsersByHomeAndUserIds($home,$userIds,$num) {
+		$home = intval($home);
+		if ($home < 1 || !s::isArray($userIds)) return array();
+		$membersDb = $this->_getMembersDB();
+		if ($this->countUsersByHomeAndUserIds($home,$userIds) < 1) return array();
+		return $membersDb->getUsersByHomeAndUserIds($home,$userIds,$num);
+	}
+	
+	/**
+	 * 根据工作经历companyids和userIds统计用户
+	 * 
+	 * @param array $companyids
+	 * @param array $userIds 用户ids
+	 * @return array
+	 */
+	function countUsersByCompanyidAndUserIds($companyids,$userIds) {
+		if (!s::isArray($companyids) || !s::isArray($userIds)) return 0;
+		$membersDb = $this->_getMembersDB();
+		return $membersDb->countUsersByCompanyidAndUserIds($companyids,$userIds);
+	}
+	
+	/**
+	 * 根据工作经历companyids和userIds获取用户
+	 * 
+	 * @param array $companyids
+	 * @param array $userIds 用户ids
+	 * @return array
+	 */
+	function getUsersByCompanyidAndUserIds($companyids,$userIds,$num) {
+		if (!s::isArray($companyids) || !s::isArray($userIds)) return array();
+		$membersDb = $this->_getMembersDB();
+		if ($this->countUsersByCompanyidAndUserIds($companyids,$userIds) < 1) return array();
+		return $membersDb->getUsersByCompanyidAndUserIds($companyids,$userIds,$num);
+	}
+	
+	/**
+	 * 根据教育经历schoolids和userIds统计用户
+	 * 
+	 * @param array $schoolids
+	 * @param array $userIds 用户ids
+	 * @return array
+	 */
+	function countUsersBySchoolidsAndUserIds($schoolids,$userIds) {
+		if (!s::isArray($schoolids) || !s::isArray($userIds)) return 0;
+		$membersDb = $this->_getMembersDB();
+		return $membersDb->countUsersBySchoolidsAndUserIds($schoolids,$userIds);
+	}
+	
+	/**
+	 * 根据教育经历schoolids和userIds获取用户
+	 * 
+	 * @param array $companyids
+	 * @param array $userIds 用户ids
+	 * @return array
+	 */
+	function getUsersBySchoolidsAndUserIds($schoolids,$userIds,$num) {
+		if (!s::isArray($schoolids) || !s::isArray($userIds)) return array();
+		$membersDb = $this->_getMembersDB();
+		if ($this->countUsersBySchoolidsAndUserIds($schoolids,$userIds) < 1) return array();
+		return $membersDb->getUsersByCompanyidAndUserIds($schoolids,$userIds,$num);
+	}
+	
+	/**
+	 * 获取单条用户、教育、所在地、家乡、工作经历等信息
+	 * 
+	 * @param int $userId 用户id
+	 * @return array
+	 */
+	function getUserInfoByUserId($userId) {
+		$userId = intval($userId);
+		if ($userId < 1) return array();
+		$membersDb = $this->_getMembersDB();
+		return $membersDb->getUserInfoByUserId($userId);
+	}
+	
+	/**
+	 * 用户组权限
+	 * 
+	 * @param int $groupId 用户组
+	 * @return array
+	 */
+	function getRightByGroupId($groupId){
+		static $groupRight;
+		if (file_exists(D_P . "data/groupdb/group_$groupId.php")) {
+			extract(pwCache::getData(S::escapePath(D_P . "data/groupdb/group_$groupId.php"),false));
+			$groupRight = $_G;
+		}
+		return $groupRight;
 	}
 
 	/**

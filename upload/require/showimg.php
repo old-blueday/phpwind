@@ -20,9 +20,10 @@ function showfacedesign($usericon,$show_a = null,$imgtype = null) {
 		!$tempuid && $tempuid = $tempdir;
 		if ((int)$tempuid > 0) {
 			global $db_ftpweb,$attachpath,$attachdir;
+			$user_a[6] && !$imgtype && $imgtype = 'm';
 			list($imgtypedir,$ifUseThumb) = getUploadTypeDir($imgtype,$user_a[5]);
 			$old_user_a_0 = $user_a[0];
-			if ($ifUseThumb == 1 && strpos($user_a[0],'.') != false) {
+			if ($ifUseThumb == 1 && !$user_a[6] && strpos($user_a[0],'.') != false) {
 				$user_a[0] = substr($user_a[0],0,strrpos($user_a[0],'.')+1).'jpg';
 			}
 			if ($db_ftpweb && !file_exists("$attachdir/$imgtypedir/$user_a[0]")) {
@@ -173,6 +174,7 @@ function setIcon($proicon, $facetype, $oldface) {
 	} else {
 		$oldface[1] == 3 && DelIcon($oldface[0]);
 	}
+	$usericon .= '|1';
 	strlen($usericon) > 255 && Showmsg('illegal_customimg');
 	return $usericon;
 }

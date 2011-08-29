@@ -64,20 +64,6 @@ DDSliderPlayer.prototype.go = function(t){
 	++this.curScreen;
 	return this;
 }
-function getElementsByClassName (className, parentElement){
-	if (typeof(parentElement)=='object') {
-		var elems = parentElement.getElementsByTagName("*");
-	} else {
-		var elems = (document.getElementById(parentElement)||document.body).getElementsByTagName("*");
-	}
-	var result=[];
-	for (i=0; j=elems[i]; i++) {
-	   if ((" "+j.className+" ").indexOf(" "+className+" ")!=-1) {
-			result.push(j);
-	   }
-	}
-	return result;
-}
 function ddHSlider(offX,eleid) {
 	document.getElementById(eleid).scrollLeft+=offX;
 }

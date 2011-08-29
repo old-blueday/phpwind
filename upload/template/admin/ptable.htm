@@ -8,6 +8,7 @@ print <<<EOT
 		<li ><a href="$basename&job=bakout">数据维护</a></li>
 		<li><a href="$basename&job=bakin">数据恢复</a></li>
 		<li class="current"><a href="$basename&job=ptable">数据库分卷</a></li>
+		<li><a href="$basename&job=ptable&action=movedata">数据转移</a></li>
 	</ul>
 </div>
 <div class="admin_info mb10">
@@ -186,6 +187,14 @@ EOT;
 EOT;
 }elseif($action=='movedata'){ print <<<EOT
 -->
+<div class="nav3 mb10">
+	<ul class="cc">
+		<li ><a href="$basename&job=bakout">数据维护</a></li>
+		<li><a href="$basename&job=bakin">数据恢复</a></li>
+		<li><a href="$basename&job=ptable">数据库分卷</a></li>
+		<li class="current"><a href="$basename&job=ptable&action=movedata">数据转移</a></li>
+	</ul>
+</div>
 <div class="admin_info mb10">
 	<h3 class="h1">功能说明</h3>
     <div class="legend">将“<b>源回复数据表</b>”里指定“<b>tid范围</b>”的回复数据转移到“<b>目标回复数据表</b>”，从而达到降低系统负载的目的，根据服务器负载情况调整“<b>每次转移帖子数</b>”</div>
@@ -200,11 +209,36 @@ EOT;
 	<table cellpadding="0" cellspacing="0" width="100%">
         <tr class="tr1 vt">
             <td class="td1">源回复数据表</td>
-            <td class="td2"><select name="tfrom" class="select_wa">$table_sel</select></td>
+            <td class="td2">
+<!--
+EOT;
+foreach ($table_sel as $k => $v){
+print <<<EOT
+-->
+	<input type="checkbox" name="tfroms[]" value="$k" />$v
+<!--
+EOT;
+}
+print <<<EOT
+-->
+            </td>
         </tr>
         <tr class="tr1 vt">
             <td class="td1">目标回复数据表</td>
-            <td class="td2"><select name="tto" class="select_wa">$table_sel</select></td>
+            <td class="td2">
+            <select name="tto" class="select_wa">
+<!--
+EOT;
+foreach ($table_sel as $k => $v){
+print <<<EOT
+-->
+            <option value="$k">$v</option>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+            </select></td>
         </tr>
         <tr class="tr1 vt">
             <td class="td1">指定 tid 范围</td>

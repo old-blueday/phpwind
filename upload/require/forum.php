@@ -103,7 +103,7 @@ function headguide($guidename,$onmouseover=true) {
 		$db_bfn_temp = $db_bfn;
 	}
 	if ($db_menu && $onmouseover) {
-		$headguide = "<img id=\"td_cate\" align=\"absmiddle\" src=\"$imgpath/$stylepath/thread/home.gif\" alt=\"forumlist\" onClick=\"return pwForumList(false,false,null,this);\" class=\"cp breadHome\" /><em class=\"breadEm\"></em><a href=\"$db_bfn_temp\" title=\"$db_bbsname\">$db_bbsname</a>" ;
+		$headguide = "<img id=\"td_cate\" align=\"absmiddle\" src=\"$imgpath/$stylepath/thread/home.gif\" title=\"快速跳转至其他版块\" onClick=\"return pwForumList(false,false,null,this);\" class=\"cp breadHome\" /><em class=\"breadEm\"></em><a href=\"$db_bfn_temp\" title=\"$db_bbsname\">$db_bbsname</a>" ;
 	} else{
 		$headguide = "<a href=\"$db_bfn_temp\" title=\"$db_bbsname\">$db_bbsname</a>" ;
 	}

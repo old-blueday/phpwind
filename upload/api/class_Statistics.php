@@ -74,6 +74,123 @@
  		return $iconArray[0];
  	}
  	
+ 	/**
+ 	 * 站点app安装情况(房产,商家导航,新浪微博,实名认证,云搜索)
+ 	 * @return array
+ 	 */
+ 	function getAppInstallState() {
+ 		$states = array('house' => 0, 'dianpu' => 0, 'sinaweibo' => 0, 'authentication' => 0, 'cloudsearch' => 0);
+ 		$query = $this->db->query("SELECT db_name, db_value FROM pw_config WHERE db_name IN ('db_modes', 'db_authstate')");
+ 		while ($rs = $this->db->fetch_array($query)) {
+ 			if ($rs['db_name'] == 'db_modes') {
+ 				$result = unserialize($rs['db_value']);
+ 				isset($result['house']) && $result['house']['ifopen'] == 1 && $states['house'] = 1;
+ 				isset($result['dianpu']) && $result['dianpu']['ifopen'] == 1 && $states['dianpu'] = 1;
+ 			} else {
+ 				$states['authentication'] = (int) $rs['db_value'];
+ 			}
+ 		}
+ 		$platformApiClient = $this->_getPlatformApiClient();
+		$sinaweiboResponse = $this->_jsonDecode($platformApiClient->get('weibo.stat.siteinfo'));
+		$states['sinaweibo'] = (int) $sinaweiboResponse['isOpen'];
+ 		return new ApiResponse($states);
+ 	}
+ 	
+ 	/**
+ 	 * 站点app安装时间(房产,商家导航,新浪微博,实名认证,云搜索)
+ 	 * @return array
+ 	 */
+ 	function getAppInstallTime() {
+ 		$installTime = array('house' => 0, 'dianpu' => 0, 'sinaweibo' => 0, 'authentication' => 0, 'cloudsearch' => 0);
+ 		$query = $this->db->query("SELECT name, updatetime FROM pw_statistics_daily WHERE name IN ('houseinstalltime', 'dianpuinstalltime', 'authinstalltime') and typeid = 0 and date = '0000-00-00' and value = 0");
+ 		while ($rs = $this->db->fetch_array($query)) {
+ 			switch ($rs['name']) {
+ 				case 'houseinstalltime' : 
+ 					$installTime['house'] = (int) $rs['updatetime'];
+ 					break;
+ 				case 'dianpuinstalltime' :
+ 					$installTime['dianpu'] = (int) $rs['updatetime'];
+ 					break;
+ 				case 'authinstalltime' :
+ 					$installTime['authentication'] = (int) $rs['updatetime'];
+ 					break;
+ 			}
+ 		}
+ 		$platformApiClient = $this->_getPlatformApiClient();
+		$sinaweiboResponse = $this->_jsonDecode($platformApiClient->get('weibo.stat.siteinfo'));
+		!empty($sinaweiboResponse['openTime']) && $installTime['sinaweibo'] = strtotime($sinaweiboResponse['openTime']);
+ 		return new ApiResponse($installTime);
+ 	}
+ 	
+ 	/**
+ 	 * 某日发帖人数
+ 	 * @param string $day 'Y-m-d'
+ 	 * @return int
+ 	 */
+ 	function getPostUserNumOfDay($day = null) {
+ 		$this->_setTimestamp($day);
+ 		$postUserNum = 0;
+ 		if ($this->db->server_info() > '4.1') {
+ 			$postUserNum = intval($this->db->get_value('SELECT COUNT(*) FROM (SELECT COUNT(*) FROM pw_threads WHERE postdate BETWEEN ' . S::sqlEscape($this->startTime) . ' AND ' . S::sqlEscape($this->endTime) . ' GROUP BY authorid) AS tmp'));
+ 		} else {
+ 			$this->db->query('CREATE TEMPORARY TABLE tmp_postusers SELECT COUNT(*) FROM pw_threads WHERE postdate BETWEEN ' . S::sqlEscape($this->startTime) . ' AND ' . S::sqlEscape($this->endTime) . ' GROUP BY authorid');
+ 			$postUserNum = intval($this->db->get_value('SELECT COUNT(*) FROM tmp_postusers'));
+ 		}
+ 		return new ApiResponse($postUserNum);
+ 	}
+ 	
+ 	/**
+ 	 * 注册会员的等级分布
+ 	 * @return array
+ 	 */
+ 	function getUserLevelDistribution() {
+ 		$userLevel = array();
+ 		$groupQuery = $this->db->query('SELECT grouptitle,gid FROM pw_usergroups WHERE gptype = "member"');
+ 		while ($groupResult = $this->db->fetch_array($groupQuery)) {
+ 			$userLevel[$groupResult['gid']] = array('groupname' => $groupResult['grouptitle'], 'count' => 0);
+ 		}
+ 		$query = $this->db->query('SELECT COUNT(*) AS count, memberid FROM pw_members WHERE groupid = -1 GROUP BY memberid');
+ 		while ($result = $this->db->fetch_array($query)) {
+ 			$userLevel[$result['memberid']]['count'] = $result['count'];
+ 		}
+ 		return new ApiResponse($userLevel);
+ 	}
+ 	
+ 	/**
+ 	 * 日发帖会员数分布(20帖以下,20-50帖,50-80帖,80-100帖,100帖以上)
+ 	 * @param string $day 'Y-m-d'
+ 	 * @return array
+ 	 */
+ 	function getPostUsersDistributionOfDay($day = null) {
+ 		$this->_setTimestamp($day);
+ 		$postUsersDistribution = array('under20' => 0, '20to50' => 0, '50to80'=> 0, '80to100' => 0, 'above100' => 0);
+ 		$query = $this->db->query('SELECT COUNT(*) AS count FROM pw_threads WHERE postdate BETWEEN ' . S::sqlEscape($this->startTime) . ' AND ' . S::sqlEscape($this->endTime) . ' GROUP BY authorid');
+ 		while ($result = $this->db->fetch_array($query)) {
+ 			if ($result['count'] > 100) {
+ 				$postUsersDistribution['above100'] += 1;
+ 			} elseif ($result['count'] >= 80) {
+ 				$postUsersDistribution['80to100'] += 1;
+ 			} elseif ($result['count'] >= 50) {
+ 				$postUsersDistribution['50to80'] += 1;
+ 			} elseif ($result['count'] >= 20) {
+ 				$postUsersDistribution['20to50'] += 1;
+ 			} else {
+ 				$postUsersDistribution['under20'] += 1;
+ 			}
+ 		}
+ 		return new ApiResponse($postUsersDistribution);
+ 	}
+ 	
+ 	/**
+ 	 * 站点使用的版本号
+ 	 * @return string
+ 	 */
+ 	function getSiteVersion() {
+ 		return new ApiResponse(WIND_VERSION);
+ 	}
+ 	
+
+ 	
 	/**
 	 * 某日登录会员数
 	 * 
@@ -102,7 +219,8 @@
 	 */
  	function getForums(){
  		$forums = array();
- 		include_once D_P .'data/bbscache/forum_cache.php';
+ 		//* include_once D_P .'data/bbscache/forum_cache.php';
+ 		extract(pwCache::getData( D_P .'data/bbscache/forum_cache.php', false));
  		if(is_array($forum)){
  			/*forums 列表*/
  			foreach ($forum as $k=>$v) {
@@ -209,7 +327,10 @@
 		if (empty($GLOBALS['db_online'])) {
 			include_once (D_P . 'data/bbscache/olcache.php');
 		} else {
-			$userinbbs = intval($this->db->get_value("SELECT COUNT(*) FROM `pw_online` WHERE uid!='0'"));
+			//* $userinbbs = intval($this->db->get_value("SELECT COUNT(*) FROM `pw_online` WHERE uid!='0'"));
+			
+			$onlineService = L::loadClass('OnlineService', 'user');
+			$userinbbs = $onlineService->countOnlineUser();				
 		} 		
  		return new ApiResponse($userinbbs);
  	}
@@ -829,5 +950,24 @@
  		}	 		
  		return new ApiResponse($photos);
  	}
+ 	
+ 	/**
+	 * @return PlatformApiClient
+	 */
+	function _getPlatformApiClient() {
+		static $client = null;
+		if (null === $client) {
+			global $db_sitehash, $db_siteownerid;
+			L::loadClass('client', 'utility/platformapisdk', false);
+			$client = new PlatformApiClient($db_sitehash, $db_siteownerid);
+		}
+		return $client;
+	}
+	
+	function _jsonDecode ($response) {
+		require_once(R_P . 'api/class_json.php');
+		$json = new Services_JSON(true);
+		return $json->decode($response);
+	}
  }
  

@@ -1,0 +1,175 @@
+<!--<?php
+!defined('P_W') && exit('Forbidden');
+L::loadClass('CustomerFieldTemplate', 'user',false);
+
+class customerFieldAdminTemplate extends PW_CustomerFieldTemplate {
+	
+	function customerFieldAdminTemplate(){
+		parent::PW_CustomerFieldTemplate();
+	}
+	
+	function formatRequriedHtml(){
+		$this->requriedHtml = $this->fieldInfo['required'] ? '<span class="s1">*</span>' : '';
+	}
+	function formatDescripHtml(){
+		$this->descripHtml = $this->fieldInfo['descrip'] ? '':' style="display:none"';
+	}
+
+	function getTemplateInput(){
+		return <<<EOT
+-->
+	<tr class="tr1 vt">
+		<td class="td1">{$this->fieldInfo['title']}</td>
+		<td class="td2"><input type="text" class="input input_wa" name="{$this->fieldInfo['fieldname']}" value="{$this->defaultValueHtml}" /></td>
+		<td class="td2"><div class="help_a">{$this->fieldInfo['descrip']}</div></td>
+	</tr>
+<!--
+EOT;
+	}
+
+	
+	function getTemplateTextarea(){
+		return <<<EOT
+-->
+	<tr class="tr1 vt">
+		<td class="td1">{$this->fieldInfo['title']}</td>
+		<td class="td2"><textarea class="textarea" name="{$this->fieldInfo['fieldname']}">{$this->defaultValueHtml}</textarea></td>
+	<td class="td2"><div class="help_a">{$this->fieldInfo['descrip']} </div></td></tr>
+<!--
+EOT;
+	}
+	
+	function getTemplateSelect(){	
+		return  <<<EOT
+-->
+	<tr class="tr1 vt">
+		<td class="td1">{$this->fieldInfo['title']}</td>
+		<td class="td2">
+			{$this->fieldInfo['html_select']}
+		</td><td class="td2"><div class="help_a">{$this->fieldInfo['descrip']}</div></td>
+	</tr>
+<!--
+EOT;
+	}
+
+	function getTemplateRadio(){
+		return <<<EOT
+-->
+	<tr class="tr1 vt">
+		<td class="td1">{$this->fieldInfo['title']}</td>
+		<td class="td2">
+			{$this->fieldInfo['html_radio']}
+		</td><td class="td2"><div class="help_a">{$this->fieldInfo['descrip']}</div></td>
+	</tr>
+<!--
+EOT;
+	}
+	
+	function getTemplateCheckbox(){
+		return <<<EOT
+-->
+	<tr class="tr1 vt">
+		<td class="td1">{$this->fieldInfo['title']}</td>
+		<td class="td2">
+			{$this->fieldInfo['html_checkbox']}
+		</td><td class="td2"><div class="help_a">{$this->fieldInfo['descrip']}</div></td>
+	</tr>
+<!--
+EOT;
+	}
+	
+	function getTemplateYear(){
+		return <<<EOT
+-->
+	<tr class="tr1 vt">
+		<td class="td1">{$this->fieldInfo['title']}</td>
+		<td class="td2">
+			{$this->fieldInfo['html_year']}
+		</td><td class="td2"><div class="help_a">{$this->fieldInfo['descrip']}</div></td>
+	</tr>
+<!--
+EOT;
+	}
+	function getTemplateArea(){	
+		return <<<EOT
+-->
+	<tr class="tr1 vt">
+		{$this->fieldInfo['html_areascripts']}
+		<td class="td1">{$this->fieldInfo['title']}</td>
+		<td class="td2">
+			{$this->fieldInfo['html_areaprovince']}
+			{$this->fieldInfo['html_areacity']}
+			{$this->fieldInfo['html_areaarea']}
+		</td><td class="td2"><div class="help_a">{$this->fieldInfo['descrip']}</div></td>
+	</tr>
+<!--
+EOT;
+	}
+
+	function getTemplateEducation(){
+		return <<<EOT
+-->
+	<tr class="tr1 vt">
+		<td class="td1">教育经历</td>
+		<td class="td2">
+			<div class="admin_table_b" style="width:auto;">
+			<div class="regAdd_mode" id="eduBox">
+				{$this->fieldInfo['html_eduscripts']}
+				{$this->defaultValueHtml}
+				<div id="eduItem">
+					<!--DEFAULT_VALUE_TEMPLATE-->
+					<div class="regAdd_mode_div">
+						<div class="cc mb10">
+							<span class="mr10">教育程度：<!--EDU_LEVEL-->{$this->fieldInfo['html_edulevel']}<!--END_EDU_LEVEL--></span>
+							<span class="mr10">学校名称：<!--EDU_NAME-->{$this->fieldInfo['html_eduname']}<!--END_EDU_NAME--></span>
+							<span class="mr10">入学年份：<!--EDU_YEAR-->{$this->fieldInfo['html_eduyear']}<!--END_EDU_YEAR--></span>
+						</div>
+					</div>
+					<!--END_DEFAULT_VALUE_TEMPLATE-->
+				</div>
+			</div>
+			<a href="javascript://" onclick="addEducation('eduItem','eduBox');">增加一个新经历</a>
+			</div>
+		</td>
+		<td class="td2"></td>
+	</tr>
+<!--
+EOT;
+	}
+		
+	function getTemplateCareer(){
+		return <<<EOT
+-->
+	<tr class="tr1 vt">
+		<td class="td1">工作经历</td>
+		<td class="td2">
+			<div class="admin_table_b" style="width:auto;">
+			<div class="regAdd_mode" id="careerBox">
+			{$this->fieldInfo['html_careerscripts']}
+				{$this->defaultValueHtml}
+				<div id="careerItem">
+				<!--DEFAULT_VALUE_TEMPLATE-->
+				<div class="regAdd_mode_div">
+					<div class="mb5">
+					<span class="mr10">公司名称：<!--CAREER_NAME-->{$this->fieldInfo['html_careername']}<!--END_CAREER_NAME--></span>
+					入职时间：<!--CAREER_DATE-->{$this->fieldInfo['html_careerdate']}<!--END_CAREER_DATE-->
+					</div>
+				</div>
+				<!--END_DEFAULT_VALUE_TEMPLATE-->
+				</div>
+			</div>
+			<a href="javascript://" onclick="addCareer('careerItem','careerBox');">增加一个新经历</a>
+			</div>
+		</td>
+		<td class="td2"></td>
+	</tr>
+<!--
+EOT;
+	}
+	/*
+	function getTemplateOicq(){
+		
+	}
+	*/
+}
+?>-->

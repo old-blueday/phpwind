@@ -49,6 +49,7 @@ if(empty($action)){
 		$lists['id']       = $job['id'];
 		$lists['sequence'] = $job['sequence'];
 		$lists['title']    = $job['title'];
+		$lists['isuserguide']    = $job['isuserguide'];
 		$lists['jobtype']  = $jobService->getJobType($jobService->getJobTypes($job['job']));
 		if(!$job['starttime'] && !$job['endtime']){
 			$timetips = "不限制";
@@ -71,16 +72,17 @@ if(empty($action)){
 }elseif($action == 'add' || $action == 'edit'){
 	S::gp(array('step','id'));
 	if($step == 2){
-		S::gp(array('title','description','starttime','endtime','period','reward','prepose','usergroup','member','number'));
+		S::gp(array('title','description','starttime','endtime','period','reward','prepose','usergroup','member','number','isuserguide'));
 		S::gp(array('auto','finish','display','factor','icon','id'));
 		if($title == "" ){
 			adminmsg($jobService->getLanguage("job_title_null"));
 		}
-		if($description == ""){
+		if($description == "" && !$isuserguide){
 			adminmsg($jobService->getLanguage("job_description_null"));
 		}
 		if($factor['job'] == 'doPost'){
-			include_once pwCache::getPath(D_P . 'data/bbscache/forum_cache.php');
+			//* include_once pwCache::getPath(D_P . 'data/bbscache/forum_cache.php');
+			pwCache::getData(D_P . 'data/bbscache/forum_cache.php');
 			if(isset($factor['doPost']['fid']) && isset($forum[$factor['doPost']['fid']]) && $forum[$factor['doPost']['fid']]['type'] == 'category'){
 				adminmsg('不能使用版块分类作为指定版块!',"$admin_file?adminjob=job&action=add");
 			}
@@ -173,6 +175,7 @@ if(empty($action)){
 	$endtime     = (isset($job['endtime']) && $job['endtime'] >0 )        ? get_date($job['endtime'],'Y-m-d H:i') : '';
 	$period      = (isset($job['period']) && $job['period'] > 0)            ? $job['period'] : '';
 	$icon        = (isset($job['icon']))       ? $job['icon'] : '';
+	$isuserguide = (isset($job['isuserguide'])) ? $job['isuserguide'] : '';
 	/*@todo reward data start*/
 	if($job){
 		$reward = unserialize($job['reward']);

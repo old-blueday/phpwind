@@ -1,4 +1,4 @@
-﻿/*
+/*
 * util.localStorage 模块
 * 跨浏览器本地存储
 */
@@ -13,7 +13,9 @@ Breeze.namespace('util.localStorage', function(B){
     *  目前没有考虑到存储javascript对象到本地,故此方法先预留,直接return value;
     */
     function serialize(value) {
-        return value;
+		if(value.replace(/\s+/g,'')!=''){
+			return value;
+		}
     }
     function deserialize(value) {
         return value;
@@ -55,10 +57,10 @@ Breeze.namespace('util.localStorage', function(B){
     }else if(doc.documentElement.addBehavior) {//ie
         var el = doc.documentElement;
         el.addBehavior('#default#userData');
-        el.load(localStorageName);
+		el.load(localStorageName);
         loc.set = function(key, val) {
-            el.setAttribute(key, serialize(val))
-            el.save(localStorageName)
+            el.setAttribute(key, serialize(val));
+            el.save(localStorageName);
         }
         loc.get = function(key) {
              return deserialize(el.getAttribute(key))

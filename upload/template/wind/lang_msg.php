@@ -36,7 +36,7 @@ $lang['msg'] = array (
 'style_bgimg_error'			=> '风格背景图地址错误',
 'style_name_error'			=> '风格名称中不可包含字符\'_\'',
 'style_color_error'			=> '风格颜色值格式错误',
-'sign_limit'				=> '签名不可超过 {$GLOBALS[_G][signnum]} 字节',
+'sign_limit'				=> '帖子签名不可超过 {$GLOBALS[_G][signnum]} 字节',
 'introduce_limit'			=> '自我简介不要超过 500 字节',
 'username_limit'			=> '为了避免论坛用户名混乱,用户名中禁止使用大写字母,请使用小写字母',
 'username_same'				=> '此用户名已经被注册,请选择其它用户名',
@@ -48,7 +48,7 @@ $lang['msg'] = array (
 'credit_error'				=> '自定义积分ID错误',
 'most_online'				=> '状态:发生错误,论坛在线会员数已经达到最大值{$GLOBALS[db_onlinelmt]},请稍后再来!',
 'ip_ban'					=> '您的IP被禁止，不能访问论坛',
-'check_error'				=> '认证码不正确或已过期',
+'check_error'				=> '验证码不正确或已过期',
 'qcheck_error'				=> '请输入正确的验证问题答案',
 'keyword_error'				=> '关键字必须被包含在主题中',
 'pse_input_keyword'			=> '请输入关键字',
@@ -129,6 +129,9 @@ $lang['msg'] = array (
 'forum_read_right'			=> '对不起,本版块只有特定会员才能浏览帖子!',
 'forum_former'				=> '本版块为正规版块,只有注册会员才能进入!',
 'forum_guestlimit'			=> '对不起，本版块只允许注册会员进入!',
+'forum_auth_cellphone'		=> '对不起，本版块需要<a href="profile.php?action=auth" class="s4 link">绑定手机</a>才能发帖!',
+'forum_auth_alipay'			=> '对不起，本版块需要<a href="profile.php?action=auth" class="s4 link">绑定支付宝</a>才能发帖!',
+'forum_auth_certificate'	=> '对不起，本版块需要<a href="profile.php?action=auth" class="s4 link">证件认证</a>才能发帖!',
 
 'sort_group_right'			=> '用户组权限：你所属的用户组不能查看统计与排行',
 
@@ -199,7 +202,7 @@ $lang['msg'] = array (
 'post_newrg_limit'			=> '新注册用户{$GLOBALS[db_postallowtime]}分钟内不能发帖！',
 'post_check'				=> '您还没通过管理员验证,需要通过管理员验证才能发言！',
 'post_verify'				=> '文章发表成功,本版块开启了发帖审核功能,请等待管理员审核!',
-'post_openpost'				=> '由于工作力度与时间原因, 站点开放发帖时间为 {$GLOBALS[db_poststart]}:00 点到 {$GLOBALS[db_postend]}:00 点 !',
+'post_openpost'				=> '由于工作力度与时间原因, 站点开放发帖时间为 {$GLOBALS[db_poststart]}:{$GLOBALS[db_poststartminute]} 到 {$GLOBALS[db_postend]}:{$GLOBALS[db_postendminute]} !',
 'post_allowtype'			=> '本版不允许发布该类型主题!',
 'post_recycle'				=> '本版为回收站，不能发帖',
 'vote_num_limit'			=> '投票选项个数超过最大限制（最大：{$GLOBALS[db_selcount]}个）。',
@@ -276,7 +279,7 @@ $lang['msg'] = array (
 'job_havebuy'				=> '您已经购买此帖.请不要重复!',
 'sell_error'				=> '出售价格错误',
 'job_buy_noenough'			=> '您的 {$GLOBALS[creditname]} 不足 {$GLOBALS[creditvalue]}，无法购买此帖!',
-'job_viewtody_close'		=> '后台核心设置关闭统计.需要管理员打开统计才能使用此功能!',
+'job_viewtody_close'		=> '后台数据-数据统计关闭统计.需要管理员打开统计才能使用此功能!',
 'job_favor_del'				=> '没有指定删除收藏的主题!',
 'job_favor_success'			=> '收藏成功!',
 'job_favor_error'			=> '您已经收藏过了',
@@ -325,7 +328,7 @@ $lang['msg'] = array (
 	</table>',
 
 'unenough_money'			=> '您的{$GLOBALS[creditname]}不足，不能购买相应的道具',
-'unenough_currency'			=> '您的{$GLOBALS[creditname]}不足，不能购买相应的道具 <a href="userpay.php?action=buy"><img border="0" src="{$GLOBALS[db_picpath]}/post/rechargeable.png"></a>',
+'unenough_currency'			=> '您的{$GLOBALS[creditname]}不足，不能购买相应的道具 </p><p class="mb10 f14">现在就去 <a href="userpay.php?action=buy"><img border="0" src="{$GLOBALS[db_picpath]}/post/rechargeable.png" align="absmiddle"></a>',
 'unenough_nums'				=> '您要转让的道具数量大于您拥有的道具数量。',
 'unenough_sellnum'			=> '您要购买的道具数量超过了用户出售的道具数量。',
 'unenough_toolnum'			=> '您的道具数量不足,无法进行转让操作.',
@@ -514,7 +517,8 @@ $lang['msg'] = array (
 'medal_nouser'				=> '用户不存在，或者您的输入有误',
 'medal_dellog'				=> '只有管理员才能删除勋章颁发日志',
 'medal_nomedal'				=> '请选择要授予的勋章！',
-'medal_iderror'				=> '数据有误，没有操作id',
+//'medal_iderror'				=> '数据有误，没有操作id',
+'medal_nobody'				=>'请选择操作对象',
 'medal_appclose'			=> '未开启勋章申请功能',
 
 'blog_close'				=> '系统没有开启博客功能',
@@ -649,6 +653,7 @@ $lang['msg'] = array (
 'illegal_request'			=> '非法请求，请返回重试!',
 'ftp_not_exists'			=> '您的 php 不支持 ftp ,请到后台关闭 ftp 功能!',
 'content_same'				=> '请勿连续发表相同内容的主题!',
+'weibo_content_same'        => '请勿连续发表相同内容的新鲜事!',
 'tofriend_msgerror'			=> '标题和内容不能为空,请填写!',
 'illegal_imgtype'			=> '非法图片类型',
 'pic_not_exists'			=> '该图片地址不存在或者没有权限查看该图片！',
@@ -1106,6 +1111,7 @@ $lang['msg'] = array (
 'act_copyfield_none'		=> '请选择要导入的子分类字段',
 'user_attention_exists'		=> "已关注",
 'weibo_link_close'			=> '新鲜事发链接功能已关闭',
+'illegal_authmobile'		=> '手机号码输入有误',
 //拆分帖子
 'split_no_thread'           => '没有要拆分的帖子',
 'split_no_splitid'          => '帖子ID未填写',
@@ -1117,5 +1123,13 @@ $lang['msg'] = array (
 'split_not_all'  => '不能全部帖子拆分',
 'stamp_have_exist'	=> '该名称的分类已存在，请重新修改名称',
 'stamp_name_length'	=> '收藏分类的名称长度为1～20字节',   
+//个人标签
+'u_tags_limit' => '标签名称的长度为1～16字节',
+'u_tagname_wordsfb' => '标签名称中含有非法字符，请返回修改',
+'u_tags_had' => '您已添加过该标签，请不要重复添加',
+'u_tagsnum_limit' => '标签的最大数量为10个',
+//话题
+'topic_notAttentioned' => '您未关注过该话题',
+'topic_attention_repeat' => '您已关注过该话题，请不要重复操作'
 );
 ?>

@@ -22,14 +22,15 @@ if (!$tidarray) {
 ($action == "delall") && deleteThreadsHander($tidarray); //搜索删除操作
 
 if (!in_array($action, array('type', 'check', 'del', 'move', 'copy', 'headtopic', 'digest', 'lock', 'pushtopic',
-	'downtopic', 'edit', 'unite', 'push', 'overprint','batch')) || empty($fid) || empty($tidarray)) {
+	'downtopic', 'edit', 'unite', 'push', 'overprint','batch','banuser','commend','multioverprint')) || empty($fid) || empty($tidarray)) {
 	Showmsg('undefined_action');
 }
 
 L::loadClass('forum', 'forum', false);
 require_once (R_P . 'require/updateforum.php');
 require_once (R_P . 'require/writelog.php');
-include_once pwCache::getPath(D_P . 'data/bbscache/forum_cache.php');
+//* include_once pwCache::getPath(D_P . 'data/bbscache/forum_cache.php');
+pwCache::getData(D_P . 'data/bbscache/forum_cache.php');
 
 L::loadClass('forum', 'forum', false);
 $pwforum = new PwForum($fid);
@@ -85,10 +86,17 @@ if (!$isGM) {
 			$admincheck = pwRights($isBM, 'downadmin');
 			break;
 		case 'overprint' :
+		case 'multioverprint' :
 			$admincheck = pwRights($isBM, 'overprint');
 			break;
 		case 'batch' :
 			$admincheck = true;
+			break;
+		case 'banuser' :
+			$admincheck = $SYSTEM['banuser'] > 0 ? true : false;
+			break;
+		case 'commend' :
+			$admincheck = $isBM;
 			break;
 		default :
 			$admincheck = false;
@@ -100,7 +108,7 @@ $tids = $threaddb = array();
 $mgdate = get_date($timestamp, 'Y-m-d');
 $template = 'ajax_mawhole';
 
-if (empty($_POST['step']) && !in_array($action,array('batch'))) {
+if (empty($_POST['step']) && !in_array($action,array('batch','commend'))) {
 	$reason_sel = '';
 	$reason_a = explode("\n", $db_adminreason);
 	foreach ($reason_a as $k => $v) {
@@ -110,6 +118,7 @@ if (empty($_POST['step']) && !in_array($action,array('batch'))) {
 			$reason_sel .= "<option value=\"\">-------</option>";
 		}
 	}
+	!S::isArray($tidarray) && $action == 'multioverprint' && $tidarray = explode(',',$tidarray);
 	foreach ($tidarray as $k => $v) {
 		is_numeric($v) && $tids[] = $v;
 	}
@@ -142,15 +151,17 @@ if (empty($_POST['step']) && !in_array($action,array('batch'))) {
 
 	S::gp(array('atc_content'), 'P');
 	if ($SYSTEM['enterreason'] && !$atc_content) {
-		!in_array($action,array('batch')) && Showmsg('enterreason');
+		!in_array($action,array('batch','commend','multioverprint')) && Showmsg('enterreason');
 	}
 }
 
 Perf::gatherInfo('changeThreadWithForumIds', array('fid'=>$fid));
 if ($action == 'type') {
 
-	include_once pwCache::getPath(D_P . 'data/bbscache/cache_post.php');
-	include_once pwCache::getPath(D_P . 'data/bbscache/forum_typecache.php');
+	//* include_once pwCache::getPath(D_P . 'data/bbscache/cache_post.php');
+	//* include_once pwCache::getPath(D_P . 'data/bbscache/forum_typecache.php');
+	pwCache::getData(D_P . 'data/bbscache/cache_post.php');
+	pwCache::getData(D_P . 'data/bbscache/forum_typecache.php');
 	$t_db = (array) $topic_type_cache[$fid];
 
 	if (empty($_POST['step'])) {
@@ -208,7 +219,7 @@ if ($action == 'type') {
 			}
 		}
 		if (!defined('AJAX')) {
-			refreshto("thread.php?fid=$fid{$viewbbs}", 'operate_success');
+			refreshto("thread.php?fid=$fid{$viewbbs}&search=all", 'operate_success');
 		} else {
 			Showmsg($singleAction ? 'operate_success' : 'ajaxma_success');
 		}
@@ -251,9 +262,10 @@ if ($action == 'type') {
 			$subject = 'Re:' . substrs($rt['subject'], 21);
 			$author = $rt['lastposter'];
 		}
-		$new_url = "read.php?tid=$rt[tid]&page=e#a";
+		$new_url = "read.php?tid=$rt[tid]&displayMode=1&page=e#a";
 		$lastpost = $subject . "\t" . $author . "\t" . $rt['lastpost'] . "\t" . $new_url;
-		$db->update('UPDATE pw_forumdata ' . ' SET lastpost=' . S::sqlEscape($lastpost, false) . ',tpost=tpost+' . $count . ',article=article+' . $count . ',topic=topic+' . $count . ' WHERE fid=' . S::sqlEscape($fid));
+		//* $db->update('UPDATE pw_forumdata ' . ' SET lastpost=' . S::sqlEscape($lastpost, false) . ',tpost=tpost+' . $count . ',article=article+' . $count . ',topic=topic+' . $count . ' WHERE fid=' . S::sqlEscape($fid));
+		$db->update(pwQuery::buildClause("UPDATE :pw_table SET lastpost=:lastpost,tpost=tpost+:tpost,article=article+:article,topic=topic+:topic WHERE fid=:fid", array('pw_forumdata', $lastpost,$count,$count,$count,$fid)));
 		//* P_unlink(D_P . 'data/bbscache/c_cache.php');
 		pwCache::deleteData(D_P . 'data/bbscache/c_cache.php');
 
@@ -267,7 +279,7 @@ if ($action == 'type') {
 						'reason' => stripslashes($atc_content)))));
 			}
 		}
-		refreshto("thread.php?fid=$fid{$viewbbs}", 'operate_success');
+		refreshto("thread.php?fid=$fid{$viewbbs}&search=all", 'operate_success');
 	}
 } elseif ($action == 'del') {
 
@@ -325,7 +337,7 @@ if ($action == 'type') {
 		sendMawholeMessages($msgdb);
 		
 		if (!defined('AJAX')) {
-			$url = ($jumptype == 'forumcp') ? "forumcp.php?action=edit&type=thread&fid=$fid{$viewbbs}" : "thread.php?fid=$fid{$viewbbs}";
+			$url = ($jumptype == 'forumcp') ? "forumcp.php?action=edit&type=thread&fid=$fid{$viewbbs}" : "thread.php?fid=$fid{$viewbbs}&search=all";
 			refreshto($url, 'operate_success');
 		} else {
 			Showmsg('ajax_mawhole_operate_success');
@@ -335,8 +347,11 @@ if ($action == 'type') {
 
 	if (empty($_POST['step'])) {
 
-		include_once pwCache::getPath(D_P . 'data/bbscache/cache_post.php');
-		include_once pwCache::getPath(D_P . 'data/bbscache/forum_typecache.php');
+		//* include_once pwCache::getPath(D_P . 'data/bbscache/cache_post.php');
+		//* include_once pwCache::getPath(D_P . 'data/bbscache/forum_typecache.php');
+		pwCache::getData(D_P . 'data/bbscache/cache_post.php');
+		pwCache::getData(D_P . 'data/bbscache/forum_typecache.php');
+		
 		//zhuli
 		$re = $db->query("SELECT fid,t_type FROM pw_forums ");
 		$forumArr = array();
@@ -379,7 +394,8 @@ if ($action == 'type') {
 				$forumadd .= "<option value='$rt[fid]'> &nbsp;|- $rt[name]</option>";
 			}
 		}
-		@include_once pwCache::getPath(D_P . 'data/bbscache/forumcache.php');
+		//* @include_once pwCache::getPath(D_P . 'data/bbscache/forumcache.php');
+		pwCache::getData(D_P . 'data/bbscache/forumcache.php');
 		require_once PrintEot($template);
 		footer();
 
@@ -415,6 +431,8 @@ if ($action == 'type') {
 
 		$cy_tids = array();
 		$query = $db->query("SELECT tid,fid as tfid,author,postdate,subject,replies,topped,ptable,ifcheck,tpcstatus,modelid,special FROM pw_threads WHERE tid IN(" . S::sqlImplode($mids) . ")");
+		//tucool
+		$tucoolService = L::loadClass('Tucool','forum');
 		while ($rt = $db->fetch_array($query)) {
 			S::slashes($rt);
 			@extract($rt);
@@ -495,9 +513,15 @@ if ($action == 'type') {
 			//$db->update("UPDATE $pw_posts SET fid=" . S::sqlEscape($to_id) . " WHERE tid IN(" . S::sqlImplode($mids) . ")");
 			pwQuery::update($pw_posts, 'tid IN(:tid)', array($mids), array('fid' => $to_id));
 		}
+		
+		//tucool
+		foreach ($mids as $tid){
+			$tucoolService->updateTucoolImageNum($tid);
+		}
+		//end tucool
 		updateForumCount($fid, -$topic_all, -$replies_all, -$todaypost);
 		updateForumCount($to_id, $topic_all, $replies_all, $todaypost);
-
+		
 		// $threadList = L::loadClass("threadlist", 'forum');
 		// $threadList->refreshThreadIdsByForumId($fid);
 		// $threadList->refreshThreadIdsByForumId($to_id);
@@ -515,7 +539,7 @@ if ($action == 'type') {
 		//* P_unlink(D_P . 'data/bbscache/c_cache.php');
 		pwCache::deleteData(D_P . 'data/bbscache/c_cache.php');
 		if (!defined('AJAX')) {
-			refreshto("thread.php?fid=$fid{$viewbbs}", 'operate_success');
+			refreshto("thread.php?fid=$fid{$viewbbs}&search=all", 'operate_success');
 		} else {
 			Showmsg('ajax_mawhole_operate_success');
 		}
@@ -524,8 +548,11 @@ if ($action == 'type') {
 
 	if (empty($_POST['step'])) {
 
-		include_once pwCache::getPath(D_P . 'data/bbscache/cache_post.php');
-		include_once pwCache::getPath(D_P . 'data/bbscache/forum_typecache.php');
+		//* include_once pwCache::getPath(D_P . 'data/bbscache/cache_post.php');
+		//* include_once pwCache::getPath(D_P . 'data/bbscache/forum_typecache.php');
+		pwCache::getData(D_P . 'data/bbscache/cache_post.php');
+		pwCache::getData(D_P . 'data/bbscache/forum_typecache.php');
+		
 		if ($topic_type_cache) {
 			foreach ($topic_type_cache as $key => $value) {
 				foreach ($value as $k => $v) {
@@ -554,7 +581,8 @@ if ($action == 'type') {
 				$forumadd .= "<option value='$rt[fid]'> &nbsp;|- $rt[name]</option>";
 			}
 		}
-		@include_once pwCache::getPath(D_P . 'data/bbscache/forumcache.php');
+		//* @include_once pwCache::getPath(D_P . 'data/bbscache/forumcache.php');
+		pwCache::getData(D_P . 'data/bbscache/forumcache.php');
 		require_once PrintEot($template);
 		footer();
 
@@ -586,6 +614,10 @@ if ($action == 'type') {
 				$readdb[] = $rt;
 			}
 		}
+		//tucool
+		$foruminfo = L::forum($to_id);
+		$istucool = $foruminfo['forumset']['iftucool'] && $foruminfo['forumset']['tucoolpic'];
+		$istucool && $tucoolService = L::loadClass('Tucool','forum');
 		foreach ($readdb as $key => $read) {
 			@extract($read);
 			//$topped > 1 && $updatetop = 1;
@@ -653,9 +685,9 @@ if ($action == 'type') {
 			);
 
 			//$db->update("INSERT INTO pw_threads SET $pwSQL");
-			pwQuery::insert('pw_threads', $pwSQL);
+			$newtid = pwQuery::insert('pw_threads', $pwSQL);
 
-			$newtid = $db->insert_id();
+		//	$newtid = $db->insert_id();
 
 			//分类信息处理
 			if ($modelid > 0) {
@@ -772,6 +804,9 @@ if ($action == 'type') {
 					pwQuery::update($pw_posts, 'pid=:pid', array($pid), array('content' => $content));
 				}
 			}
+			//tucool
+			$istucool && $tucoolService->updateTucoolImageNum($newtid);
+			
 		}
 		sendMawholeMessages($msgdb);
 		foreach ($logdb as $key => $val) {
@@ -784,7 +819,7 @@ if ($action == 'type') {
 		}
 		*/
 		if (! defined ( 'AJAX' )) {
-			refreshto ( "thread.php?fid=$fid{$viewbbs}", 'operate_success' );
+			refreshto ( "thread.php?fid=$fid{$viewbbs}&search=all", 'operate_success' );
 		} else {
 			Showmsg ( $singleAction ? 'operate_success' : 'ajaxma_success' );
 		}
@@ -793,8 +828,9 @@ if ($action == 'type') {
 
 	if (empty($_POST['step'])) {
 
-		include_once pwCache::getPath(D_P . 'data/bbscache/cache_post.php');
-		require_once pwCache::getPath(R_P . 'require/updateforum.php');
+		//* include_once pwCache::getPath(D_P . 'data/bbscache/cache_post.php');
+		pwCache::getData(D_P . 'data/bbscache/cache_post.php');
+		require_once (R_P . 'require/updateforum.php');
 		$selforums = '';
 		if (is_numeric($seltid)) {
 			$rt = $db->get_one('SELECT fid,topped,toolfield FROM pw_threads WHERE tid=' . S::sqlEscape($seltid));
@@ -966,7 +1002,7 @@ if ($action == 'type') {
 			}
 		} else {
 			if (!defined('AJAX')) {
-				refreshto("thread.php?fid=$fid{$viewbbs}", 'operate_success');
+				refreshto("thread.php?fid=$fid{$viewbbs}&search=all", 'operate_success');
 			} else {
 				Showmsg($singleAction ? 'operate_success' : 'ajaxma_success');
 			}
@@ -1022,11 +1058,15 @@ if ($action == 'type') {
 			}
 			if (!$rt['digest'] && $digest) {
 				if ($ifmsg) {
+					if($add_rvrc == 0) $affect = "{$db_moneyname}：+{$add_money}";
+					if($add_money == 0) $affect = "{$db_rvrcname}：+{$add_rvrc}";
+					if($add_money == 0 && $add_rvrc == 0) $affect = "无影响";
+					if($add_money != 0 && $add_rvrc != 0) $affect = "{$db_rvrcname}：+{$add_rvrc}，{$db_moneyname}：+{$add_money}";
 					$msgdb[] = array('toUser' => $rt['author'], 'title' => getLangInfo('writemsg', 'digest_title'),
 						'content' => getLangInfo('writemsg', 'digest_content', array('manager' => $windid,
 							'fid' => $fid, 'tid' => $rt['tid'], 'subject' => $rt['subject'],
 							'postdate' => get_date($rt['postdate']), 'forum' => strip_tags($forum[$fid]['name']),
-							'affect' => "{$db_rvrcname}：+{$add_rvrc}，{$db_moneyname}：+{$add_money}",
+							'affect' => $affect,
 							'admindate' => get_date($timestamp), 'reason' => stripslashes($atc_content))));
 				}
 				$credit->addLog('topic_Digest', $creditset['Digest'], array('uid' => $rt['authorid'],
@@ -1043,12 +1083,16 @@ if ($action == 'type') {
 					'reason' => stripslashes($atc_content));
 			} elseif ($rt['digest'] && !$digest) {
 				if ($ifmsg) {
+					if($del_rvrc == 0) $affect = "{$db_moneyname}：-{$del_money}";
+					if($del_money == 0) $affect = "{$db_rvrcname}：-{$del_rvrc}";
+					if($del_money == 0 && $del_rvrc == 0) $affect = "无影响";
+					if($del_money != 0 && $del_rvrc != 0) $affect = "{$db_rvrcname}：-{$del_rvrc}，{$db_moneyname}：-{$del_money}";
 					$msgdb[] = array('toUser' => $rt['author'],
 						'title' => getLangInfo('writemsg', 'undigest_title'),
 						'content' => getLangInfo('writemsg', 'undigest_content', array('manager' => $windid,
 							'fid' => $fid, 'tid' => $rt['tid'], 'subject' => $rt['subject'],
 							'postdate' => get_date($rt['postdate']), 'forum' => strip_tags($forum[$fid]['name']),
-							'affect' => "{$db_rvrcname}：-{$del_rvrc}，{$db_moneyname}：-{$del_money}",
+							'affect' => $affect,
 							'admindate' => get_date($timestamp), 'reason' => stripslashes($atc_content))));
 				}
 				$credit->addLog('topic_Undigest', $creditset['Undigest'], array('uid' => $rt['authorid'],
@@ -1056,7 +1100,6 @@ if ($action == 'type') {
 					'operator' => $windid));
 				$credit->sets($rt['authorid'], $creditset['Undigest'], false);
 				$credit->setMdata($rt['authorid'], 'digests', -1);
-
 				$logdb[] = array('type' => 'digest', 'username1' => $rt['author'], 'username2' => $windid,
 					'field1' => $fid, 'field2' => $rt['tid'], 'field3' => '', 'descrip' => 'undigest_descrip',
 					'timestamp' => $timestamp, 'ip' => $onlineip,
@@ -1066,7 +1109,6 @@ if ($action == 'type') {
 			}
 		}
 		$credit->runsql();
-
 		sendMawholeMessages($msgdb);
 		foreach ($logdb as $key => $val) {
 			writelog($val);
@@ -1100,7 +1142,7 @@ if ($action == 'type') {
 			}
 		} else {
 			if (!defined('AJAX')) {
-				refreshto("thread.php?fid=$fid{$viewbbs}", 'operate_success');
+				refreshto("thread.php?fid=$fid{$viewbbs}&search=all", 'operate_success');
 			} else {
 				Showmsg($singleAction ? 'operate_success' : 'ajaxma_success');
 			}
@@ -1213,7 +1255,7 @@ if ($action == 'type') {
 		//* $threads->delThreads($tids);
 		Perf::gatherInfo('changeThreadWithThreadIds', array('tid'=>$tids));
 		if (! defined ( 'AJAX' )) {
-			refreshto ( "thread.php?fid=$fid{$viewbbs}", 'operate_success' );
+			refreshto ( "thread.php?fid=$fid{$viewbbs}&search=all", 'operate_success' );
 		} else {
 			Showmsg ( $singleAction ? 'operate_success' : 'ajaxma_success' );
 		}
@@ -1259,7 +1301,7 @@ if ($action == 'type') {
 			}
 			if ($ifmsg) {
 				$msgdb[] = array('toUser' => $rt['author'], 'title' => getLangInfo('writemsg', 'push_title'),
-					'content' => getLangInfo('writemsg', 'push_content', array('manager' => $windid, 'fid' => $fid,
+					'content' => getLangInfo('writemsg', 'push_content', array('manager' => $windid, 'fid' => $fid, 'timelimit'=>$pushtime,
 						'tid' => $rt['tid'], 'subject' => $rt['subject'], 'postdate' => get_date($rt['postdate']),
 						'forum' => strip_tags($forum[$fid]['name']), 'admindate' => get_date($timestamp),
 						'reason' => stripslashes($atc_content))));
@@ -1314,7 +1356,7 @@ if ($action == 'type') {
 			}
 		} else {
 			if (!defined('AJAX')) {
-				refreshto("thread.php?fid=$fid{$viewbbs}", 'operate_success');
+				refreshto("thread.php?fid=$fid{$viewbbs}&search=all", 'operate_success');
 			} else {
 				Showmsg($singleAction ? 'operate_success' : 'ajaxma_success');
 			}
@@ -1405,7 +1447,7 @@ if ($action == 'type') {
 			defined('AJAX') && showOverPrint($overprint, $seltid, 'downtopic', 1, $nextto);
 		}
 		if (!defined('AJAX')) {
-			refreshto("thread.php?fid=$fid{$viewbbs}", 'operate_success');
+			refreshto("thread.php?fid=$fid{$viewbbs}&search=all", 'operate_success');
 		} else {
 			Showmsg($singleAction ? 'operate_success' : 'ajaxma_success');
 		}
@@ -1539,7 +1581,7 @@ if ($action == 'type') {
 			}
 		} else {
 			if (!defined('AJAX')) {
-				refreshto("thread.php?fid=$fid{$viewbbs}", 'operate_success');
+				refreshto("thread.php?fid=$fid{$viewbbs}&search=all", 'operate_success');
 			} else {
 				Showmsg($singleAction ? 'operate_success' : 'ajaxma_success');
 			}
@@ -1610,6 +1652,10 @@ if ($action == 'type') {
 		$pw_posts = GetPtable($todb['ptable']);
 		$remindinfo = getLangInfo('other', 'mawhole_unite');
 		$replies = 0;
+		//tucool
+		$foruminfo = L::forum($fid);
+		$istucool = $foruminfo['forumset']['iftucool'] && $foruminfo['forumset']['tucoolpic'];
+		$istucool && $tucoolService = L::loadClass('Tucool','forum');
 		foreach ($readdb as $key => $fromdb) {
 			getstatus($fromdb['tpcstatus'], 1) ? $fromColonyIds[] = $key : $fromArticleIds[] = $key;
 			if ($db_plist && count($db_plist) > 1) {
@@ -1683,13 +1729,20 @@ if ($action == 'type') {
 				'subject' => substrs($todb['subject'], 28), 'forum' => $forum[$fid]['name'],
 				'reason' => stripslashes($atc_content));
 			writelog($log);
+			$istucool && $tucoolService->delete($fromdb['tid']);
+			//更新评分
+			$oldPid = $fromdb['pid'] == 'tpc' ? 0 : $fromdb['pid'];
+			$db->update(pwQuery::buildClause('UPDATE :pw_table SET tid=:tid1,pid=:pid WHERE tid=:tid AND pid=0', array('pw_pinglog', $totid, $pid, $fromdb['tid'])));
+			$db->update(pwQuery::buildClause('UPDATE :pw_table SET tid=:tid1 WHERE tid=:tid AND pid>0', array('pw_pinglog', $totid, $fromdb['tid'])));
+			//更新elements
+			pwQuery::delete('pw_elements', 'id=:id AND type IN (:type)', array($fromdb['tid'], array('newpic','hitsort','hitsortday','hitsortweek','replysort','replysortday','replysortweek')));
 		}
 		//$db->update("UPDATE pw_threads SET replies=replies+" . S::sqlEscape($replies, false) . " WHERE tid=" . S::sqlEscape($totid));
 		$db->update(pwQuery::buildClause('UPDATE :pw_table SET replies=replies+:replies WHERE tid=:tid', array('pw_threads', $replies, $totid)));
 		$pw_tmsgs = GetTtable($totid);
 		//* $db->update("UPDATE $pw_tmsgs SET remindinfo=" . S::sqlEscape($remindinfo, false) . " WHERE tid=" . S::sqlEscape($totid));
 		pwQuery::update($pw_tmsgs, 'tid=:tid', array($totid), array('remindinfo'=>$remindinfo));
-
+		
 		updateforum($fid);
 		$weiboService = L::loadClass('weibo', 'sns');
 		$fromColonyIds && $weiboService->deleteWeibosByObjectIdsAndType($fromColonyIds,'group_article');
@@ -1707,8 +1760,9 @@ if ($action == 'type') {
 		//* $threads->delThreads($totid);
 		//* $threads->delThreads($fromdb['tid']);
 		Perf::gatherInfo('changeThreadWithThreadIds', array('tid'=>$fromdb['tid']));
+		$istucool && $tucoolService->updateTucoolImageNum($totid);
 		if (!defined('AJAX')) {
-			refreshto("read.php?tid=$totid{$viewbbs}", 'operate_success');
+			refreshto("read.php?tid=$totid{$viewbbs}&displayMode=1", 'operate_success');
 		} else {
 			Showmsg('ajax_unite_success');
 		}
@@ -1754,7 +1808,8 @@ if ($action == 'type') {
 	if ($cyid) {
 		!$db_groups_open && Showmsg('groups_close');
 		require_once(R_P . 'apps/groups/lib/colony.class.php');
-		include_once(D_P . 'data/bbscache/o_config.php');
+		//* include_once(D_P . 'data/bbscache/o_config.php');
+		extract(pwCache::getData(D_P . 'data/bbscache/o_config.php', false));
 		$newColony = new PwColony($cyid);
 		if (!$colony =& $newColony->getInfo()) {
 			Showmsg('data_error');
@@ -1783,6 +1838,118 @@ if ($action == 'type') {
 	}
 	require_once PrintEot('ajax_mawholebatch');
 	ajax_footer();
+} elseif ($action == 'banuser') {
+	!S::isArray($tidarray) && Showmsg('请选择要操作的帖子作者');
+	$tids = array();
+	foreach ($tidarray as $key => $value) {
+		is_numeric($value) && $tids[] = (int) $value;
+	}
+	
+	if (empty($_POST['step'])) {
+		pwCache::getData(D_P.'data/bbscache/cache_read.php');
+		$usernames = $userids = '';
+		$relations = array();
+		$query = $db->query('SELECT author, authorid, fid, tid FROM pw_threads WHERE tid IN(' . S::sqlImplode($tids) . ')');
+		while ($rt = $db->fetch_array($query)) {
+			$fid != $rt['fid'] && Showmsg('admin_forum_right');
+			if($rt['groupid'] == 6 || getstatus($rt['userstatus'], PW_USERSTATUS_BANUSER)) continue;
+			$userInfo[$rt['authorid']] = $rt['author'];
+			$relations[$rt['tid']] = $rt['authorid'];
+		}
+		$pwBanMax = $SYSTEM['banmax'];
+		require_once PrintEot($template);footer();
+
+	} else {
+
+		S::gp(array('limit','type','range','ifmsg','banip','relation'),'P',2);
+		S::gp(array('relation'),'P');
+		$relation = explode(',', $relation);
+		!S::isArray($relation) && Showmsg('请选择要禁言的作者');
+		$returnMessage = array();
+		$banuserService = L::loadClass('BanUser', 'user'); /* @var $banuserService PW_BanUser */
+		foreach ($relation as $value) {
+			list($tid, $uid) = explode(':', $value);
+			$params = array(
+				'tid' => $tid,
+				'limit' => $limit,
+				'type' => $type,
+				'banip' => $banip,
+				'range' => $range,
+				'ifmsg' => $ifmsg,
+				'reason' => $atc_content
+			);
+			$returnMessage[$uid] = $banuserService->ban($uid,$params);
+		}
+		foreach ($returnMessage as $k => $v) {
+			if (intval($v)) unset($returnMessage[$k]);
+		}
+		$failedUids = array_keys($returnMessage);
+		if ($failedUids) {
+			$failedUsernames = '';
+			$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
+			$failedUsers = $userService->getByUserIds($failedUids);
+			foreach ($failedUsers as $value) {
+				$failedUsernames .= $failedUsernames ? ",$value[username]" : $value['username'];
+			}
+			defined('AJAX') && Showmsg("禁言{$failedUsernames}的作者失败");
+			refreshto("thread.php?fid=$fid{$viewbbs}&search=all", "禁言{$failedUsernames}的作者失败");
+		}
+		defined('AJAX') && Showmsg('禁言成功');
+		refreshto("thread.php?fid=$fid{$viewbbs}&search=all", '禁言成功');
+	}
+} elseif ($action == 'commend') {
+	if (!$forumset['commend']) {
+		Showmsg('commend_close');
+	}
+	$tmpTids = $tids = array();
+	foreach ($tidarray as $value) {
+		$value = (int) $value;
+		if ($value < 1) continue;
+		$tmpTids[] = $value; 
+	}
+	!S::isArray($tmpTids) && Showmsg('请选择要操作的帖子');
+	$query = $db->query('SELECT tid, fid FROM pw_threads WHERE tid IN (' . S::sqlImplode($tmpTids) . ')');
+	while ($result = $db->fetch_array($query)) {
+		if ($result['fid'] != $fid) continue;
+		$tids[] = $result['tid'];
+	}
+	$commendlist = explode(',', $forumset['commendlist']);
+	$tids = array_diff($tids, $commendlist);
+	!S::isArray($tids) && Showmsg('operate_success');
+	if ($forumset['commendnum'] && (count($commendlist) + count($tids)) > $forumset['commendnum']) {
+		Showmsg('commendnum_limit');
+	}
+	require_once(R_P.'require/forum.php');
+	$forumset['commendlist'] .= ($forumset['commendlist'] ? ',' : '') . implode(',', $tids);
+	updatecommend($fid,$forumset);
+	Showmsg('operate_success');
+} elseif ($action == 'multioverprint') {
+	S::gp(array('step', 'oid'));
+	$tids = array();
+	!S::isArray($tidarray) && $tidarray = explode(',', $overprinttids);
+	foreach ($tidarray as $value) {
+		$value = (int) $value;
+		if ($value < 1) continue;
+		$tids[] = $value; 
+	}
+	!S::isArray($tids) && Showmsg('请选择要操作的帖子');
+	if ($step == 2) {
+		$oid = intval($oid);
+		$oid < 0 && defined('AJAX') && Showmsg('数据有误，请重试');
+		foreach ($tids as $tid) {
+			overPrint(1, $tid, '', $oid);
+		}
+		Perf::gatherInfo('changeThreadWithThreadIds', array('tid'=>$tids));
+		defined('AJAX') && Showmsg('operate_success');
+		refreshto("thread.php?fid=$fid{$viewbbs}&search=all", 'operate_success');
+	}
+	$overPrintService = L::loadclass("overprint", 'forum');
+	if (defined('AJAX')) {
+		echo $overPrintService->getMultiUnRelatedsHTML($fid, $tids);
+		footer();
+	}
+	$overPrintContent = $overPrintService->getMultiUnRelatedsHTMLWithoutDiv($fid, $tids);
+	require_once PrintEot($template);footer();
 }
 
 function showOverPrint($overprint, $tid, $operate, $status = 1, $nextto = '', $message = '', $oid = '-1') {
@@ -1812,7 +1979,7 @@ function showOverPrint($overprint, $tid, $operate, $status = 1, $nextto = '', $m
 		$GLOBALS['selids'] = $tid;
 		Showmsg('ajax_nextto');
 	}
-		$action = !$nextto ? '' : "nextto\tmawhole.php?action=" . $GLOBALS[nextto] . "&fid=" . $GLOBALS[fid] . "&ajax=1\tseltid=" . $tid . "\t" . $GLOBALS[nextto];
+	$action = !$nextto ? '' : "nextto\tmawhole.php?action=" . $GLOBALS[nextto] . "&fid=" . $GLOBALS[fid] . "&ajax=1\tseltid=" . $tid . "\t" . $GLOBALS[nextto];
 	$message = $message . "\toverprint\t" . $icon . "\t" . $action;
 	Showmsg($message);
 	footer();

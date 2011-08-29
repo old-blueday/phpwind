@@ -3,7 +3,8 @@
 
 if(!$action){
 	if(!$_POST['step']){
-		include_once pwCache::getPath(D_P.'data/bbscache/md_config.php');
+		//* include_once pwCache::getPath(D_P.'data/bbscache/md_config.php');
+		pwCache::getData(D_P.'data/bbscache/md_config.php');
 		ifcheck($md_ifopen,'ifopen');
 		ifcheck($md_ifmsg,'ifmsg');
 		ifcheck($md_ifapply,'ifapply');
@@ -74,11 +75,13 @@ if(!$action){
 } elseif($action=='del'){
 	S::gp(array('id'));
 	$db->update("DELETE FROM pw_medalinfo WHERE id=".S::sqlEscape($id));
+	$db->update("DELETE FROM `pw_medalslogs` WHERE level=".S::sqlEscape($id));//删除
 	$basename="$admin_file?adminjob=hack&hackset=medal&action=edit";
 	updatecache_mddb();
 	adminmsg('operate_success');
 }elseif($action=='selectimg'){
-	require_once pwCache::getPath(D_P.'data/bbscache/medaldb.php');
+	//* require_once pwCache::getPath(D_P.'data/bbscache/medaldb.php');
+	pwCache::getData(D_P.'data/bbscache/medaldb.php');
 	S::gp(array('thisid'));
 	$medalimgdir = H_P."/image/";
 	$medalimgs	= $haveused = array();

@@ -72,7 +72,7 @@ $lang['all'] = array (
 'mode_o_nav_friend'	=> '朋友',
 'mode_o_nav_browse'	=> '随便看看',
 
-'mode_bbs_nav'		=> "社区应用,app,,root\n"
+'mode_bbs_nav'		=> "会员应用,app,,root\n"
 						. "最新帖子,lastpost,searcher.php?sch_time=newatc,root\n"
 						. "精华区,digest,searcher.php?digest=1,root\n"
 						. "社区服务,hack,,root\n"

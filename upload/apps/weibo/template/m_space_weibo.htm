@@ -6,6 +6,23 @@ print <<<EOT
 <script type="text/javascript">
 var space_uid = '$uid';
 var transmitAction = 'my';
+
+function resizeImg(ele){
+	var a=ele;
+	if(a.width<30||a.height<30){
+		setTimeout(function(){
+			resizeImg(a);
+		},10)
+		return false;
+	}
+	if(a.width>100){
+		
+			a.width = 100;
+			
+		} else if(a.height>100){
+			a.height=100;
+		}
+}
 </script>
 <script type="text/javascript" src="js/pw_weibo.js"></script>
 <script type="text/javascript" src="apps/weibo/js/post.js"></script>
@@ -45,6 +62,7 @@ if ($weiboList) {
 	include_once PrintEot("writesmile");
 	require_once uTemplate::printEot('weibo_model');
 	$weiboModelTemplate->photoPop();
+	$do=='detail' && $weiboModelTemplate->showPhotoOnload(true);
 print <<<EOT
 -->
 			<div class="conFeed" id="weiboFeed">
@@ -60,12 +78,25 @@ EOT;
 <!--
 EOT;
 	}
+    if($do == 'detail' && $indexRight){
+    if($mid && $weiboList[0]['content'] == '' && !$weiboList[0]['type']){
 print <<<EOT
 -->
-			</div>	
+	<div class="f14 tac p15">此条新鲜事已删除！</div>
 <!--
 EOT;
-} else {print <<<EOT
+    }elseif($isGM || $weiboList['authorid']=$GLOBALS['winduid'] ) {
+print <<<EOT
+-->
+</div>
+	
+<script type="text/javascript">
+var transmitAction = 'reloaddelay';
+setTimeout(function(){getcomments('comment','{$value['mid']}','');},300);
+</script>
+<!--
+EOT;
+}}} else {print <<<EOT
 -->
 			<div class="f14 tac p15">这家伙好懒，一条新鲜事都没留下！</div>
 <!--

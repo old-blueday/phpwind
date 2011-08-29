@@ -13,13 +13,13 @@ EOT;
 if('no' === $viewvoter){
 print <<<EOT
 -->
-<span class="fr"><a href="read.php?fid=$fid&tid=$tid&viewvoter=$ifview">查看投票的会员</a></span>
+<span class="fr"><a href="read.php?fid=$fid&tid=$tid&displayMode=1&viewvoter=$ifview">查看投票的会员</a></span>
 <!-- 
 EOT;
 }else{
 print <<<EOT
 -->
-<span class="fr"><a href="read.php?fid=$fid&tid=$tid&viewvoter=$ifview">隐藏投票的会员</a></span>
+<span class="fr"><a href="read.php?fid=$fid&tid=$tid&displayMode=1&viewvoter=$ifview">隐藏投票的会员</a></span>
 <!--
 EOT;
 }
@@ -88,7 +88,7 @@ EOT;
 foreach ($votedb as $key => $vote) {print <<<EOT
 -->
 <tr class="tr3">
-<th width="40%">
+<th>
 <!--
 EOT;
 if (!$vote_close && (!$readvote['havevote'] || $action == 'modify')) {print <<<EOT
@@ -131,7 +131,7 @@ if ((!$readvote['havevote'] || $readvote['modifiable']) && $vote_close == 0) {pr
 EOT;
 if ($readvote['havevote'] && $action != 'modify' && $readvote['modifiable']) {print <<<EOT
 -->
-&nbsp;* <b><a href="read.php?fid=$fid&tid=$tid&action=modify">修改投票</a></b>
+&nbsp;* <b><a href="read.php?fid=$fid&tid=$tid&displayMode=1&action=modify">修改投票</a></b>
 <!--
 EOT;
 } else {

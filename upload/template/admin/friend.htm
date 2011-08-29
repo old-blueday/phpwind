@@ -7,6 +7,7 @@ print <<<EOT
     <ul class="cc">
         <li $nav><a href="$basename">基本设置</a></li>
         <li $nav[manager]><a href="$basename&action=manager">邀请码管理</a></li>
+        <li $nav[generator]><a href="$basename&action=generator">批量生成邀请码</a></li>
     </ul>
 </div>
 <!--
@@ -24,7 +25,7 @@ print <<<EOT
 	<tr class="tr1 vt">
 		<td class="td1">有效期限[天]</td>
 		<td class="td2"><input type="text" class="input input_wa" name="config[days]" value="$inv_days"></td>
-        <td class="td2"><div class="help_a">设置邀请码有效期限，如果购买有没有在有效期内使用，则失效</div></td>
+        <td class="td2"><div class="help_a">设置邀请码有效期限，如果购买后没有在有效期内使用，则失效</div></td>
 	</tr>
 	<tr class="tr1 vt">
 		<td class="td1">购买时间间隔[天]</td>
@@ -158,7 +159,9 @@ EOT;
 		<td width="*">邀请码</td>
 		<td width="12%">购买用户</td>
 		<td width="20%">购买时间</td>
+		<td width="20%">失效时间</td>
 		<td width="8%">状态</td>
+		<td width="8%">类型</td>
 		<td width="12%">注册用户</td>
 <!--
 EOT;
@@ -182,7 +185,9 @@ print <<<EOT
 		<td class="td2">$value[invcode]</td>
 		<td class="td2">$value[username]</td>
 		<td class="td2">$value[createtime]</td>
+		<td class="td2">$value[overtime]</td>
 		<td class="td2 gray">$value[used]</td>
+		<td class="td2">$value[type]</td>
 		<td class="td2"><a href="u.php?username={$value[receiver]}" target="blank">$value[receiver]</a></td>
 <!--
 EOT;
@@ -214,7 +219,36 @@ print <<<EOT
 </div>
 <!--
 EOT;
-}}
+}} elseif ($action == 'generator') {
+print <<<EOT
+-->
+<div class="admin_info mb10">
+	<h2 class="h1">提示信息</h2>
+	<div class="legend">
+    	<ol>
+        	<li>批量生成邀请码不会消耗生成者的积分</li>
+            <li>批量生成的邀请码会呈现在邀请码管理的列表中，类型为批量生成</li>
+        </ol>
+    </div>
+</div>
+<form name="generator" action="$basename&action=generator" method="post">
+<input type="hidden" name="step" value="2" />
+<h2 class="h1">
+	<span class="mr10">批量生成邀请码</span>
+</h2>
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+	<tr class="tr1 vt">
+		<td class="td1">生成数量</td>
+		<td class="td2"><input type="text" class="input input_wa" name="number" /></td>
+        <td class="td2"><div class="help_a">批量生成邀请码的个数，每次最多为100个</div></td>
+	</tr>
+</table>
+</div>
+<div class="tac mb10"><span class="btn"><span><button type="submit">提 交</button></span></span></div>
+<!--
+EOT;
+}
 print <<<EOT
 -->
 </form>

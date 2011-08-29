@@ -3,11 +3,11 @@ define ( 'SCR', 'searcher' );
 require_once ('global.php');
 $_searchHelper = new PW_SearchHelper ();
 $_searchHelper->checkLevel ();
-S::gp ( array ("keyword", "type", "condition", "fid", "step", "username", "starttime", "endtime", "threadrange", "diaryusername", "diarystarttime", "diaryendtime", "diaryrange", "page", "fid", "sch_time", "digest", 'authorid', "ttable", "ptable", "posttime" ) );
+S::gp ( array ("keyword", "type", "condition", "fid", "step", "username", "starttime", "endtime", "threadrange", "diaryusername", "diarystarttime", "diaryendtime", "diaryrange", "page", "fid", "sch_time", "digest", 'authorid', "ttable", "ptable", 'sortby' ) );
 if ($sch_time == 'newatc' || $digest == 1 || $sch_time == 'today') {
 	list ( $type, $condition ) = $_searchHelper->getSpecialCondition ();
 }
-$searchPassType = $db_search_type ? array_keys ( $db_search_type ) : array ('thread', 'diary', 'user', 'forum', 'group' );
+$searchPassType = $db_search_type ? array_keys ( $db_search_type ) : array_keys($_searchHelper->getDefaultSearcherType());
 if ($type && ! in_array ( $type, array_merge ( array ('special' ), ( array ) $searchPassType ) )) {
 	showMsg ( "抱歉,搜索类型不存在" );
 }
@@ -19,8 +19,12 @@ if ($type && ! $keyword) {//默认数据
 	$perpage = 50;
 	switch ($type) {
 		case "thread" :
-			list ( $total, $threads ) = $searcherService->searchDefault ( $type, $page, $perpage );
-			$pager = ($total) ? numofpage ( $total, $page, ceil ( $total / $perpage ), $searchURL . "searcher.php?type=$type&", null, '', true ) : '';
+			pwCache::getData ( D_P . 'data/bbscache/search_config.php');
+			list ( $searchForumPart1, $searchForumPart2 ) = $_searchHelper->getSearchForum ();
+			$timesFilterList =  $_searchHelper->getTimesFilterListByPostTimes ( array(1,24,168,720) );
+			$expandCondition = array ( 'fid' => $fid, 'starttime' => $starttime, 'endtime' => $endtime);
+			list ( $total, $threads ) = $searcherService->searchDefault ($type, $page, $perpage, $expandCondition);
+			$pager = ($total) ? numofpage ( $total, $page, ceil ( $total / $perpage ), $searchURL . "searcher.php?type=$type&fid=$fid&starttime=$starttime&endtime=$endtime&sortby=$sortby&", null, '', true ) : '';
 			break;
 		case "forum" :
 			list ( $total, $forums ) = $searcherService->searchDefault ( $type, $page, $perpage );
@@ -32,7 +36,9 @@ if ($type && ! $keyword) {//默认数据
 			$pager = ($total) ? numofpage ( $total, $page, ceil ( $total / $perpage ), $searchURL . "searcher.php?type=$type&", null, '', true ) : '';
 			break;
 		case "diary" :
-			list ( $total, $diarys ) = $searcherService->searchDefault ( $type, $page, $perpage );
+			$timesFilterList =  $_searchHelper->getTimesFilterListByPostTimes ( array(1,24,168,720) );
+			$expandCondition = array ('starttime' => $diarystarttime, 'endtime' => $diaryendtime);
+			list ( $total, $diarys ) = $searcherService->searchDefault ( $type, $page, $perpage, $expandCondition);
 			$pager = ($total) ? numofpage ( $total, $page, ceil ( $total / $perpage ), $searchURL . "searcher.php?type=$type&", null, '', true ) : '';
 			break;
 		case "group" :
@@ -40,8 +46,12 @@ if ($type && ! $keyword) {//默认数据
 			$pager = ($total) ? numofpage ( $total, $page, ceil ( $total / $perpage ), $searchURL . "searcher.php?type=$type&", null, '', true ) : '';
 			break;
 		case "special" :
-			list ( $total, $threads ) = $searcherService->searchSpecial ( $condition, $authorid, $page, $perpage );
-			$pager = ($total) ? numofpage ( $total, $page, ceil ( $total / $perpage ), $searchURL . "searcher.php?type=$type&condition=$condition&authorid=$authorid&", null, '', true ) : '';
+			pwCache::getData ( D_P . 'data/bbscache/search_config.php');
+			list ( $searchForumPart1, $searchForumPart2 ) = $_searchHelper->getSearchForum ();
+			$timesFilterList =  $_searchHelper->getTimesFilterListByPostTimes ( array(1,24,168,720) );
+			$expandCondition = array ( 'fid' => $fid, 'starttime' => $starttime, 'endtime' => $endtime);
+			list ( $total, $threads ) = $searcherService->searchSpecial ( $condition, $authorid, $page, $perpage , $expandCondition);
+			$pager = ($total) ? numofpage ( $total, $page, ceil ( $total / $perpage ), $searchURL . "searcher.php?type=$type&condition=$condition&authorid=$authorid&fid=$fid&starttime=$starttime&endtime=$endtime&", null, '', true ) : '';
 			break;
 		default :
 			$_extendSearcher = L::loadClass ( 'extendsearcher', 'search' );
@@ -51,7 +61,11 @@ if ($type && ! $keyword) {//默认数据
 			break;
 	}
 }
-if ($type && $keyword) {
+
+//*帖子搜索当没有关键字有用户情况走mysql搜索
+$isUseMysqlWithThread = (S::inArray($type, array('thread', 'diary')) && (!$keyword && ($username || $diaryusername))) ? true : false;
+
+if (($type && $keyword) || $isUseMysqlWithThread) {
 	(strtolower ( $GLOBALS ['pwServer'] ['REQUEST_METHOD'] ) == "post") && checkVerify ();
 	if (! $isSphinx && 2 == $step) {
 		if (! $searcherService->checkUserLevel ()) {
@@ -62,20 +76,23 @@ if ($type && $keyword) {
 		}
 	}
 	$keyword = strip_tags ( $keyword );
-	@include_once pwCache::getPath ( D_P . 'data/bbscache/search_config.php' );
+	//* @include_once pwCache::getPath ( D_P . 'data/bbscache/search_config.php' );
+	pwCache::getData ( D_P . 'data/bbscache/search_config.php');
 	switch ($type) {
 		case "thread" :
 			list ( $searchForumPart1, $searchForumPart2 ) = $_searchHelper->getSearchForum ();
 			$adverts = $_searchHelper->getSearchAdvert ( $keyword );
-			$posttime && list ( $starttime, $endtime ) = $_searchHelper->getStartAndEndTimeByUrl ( $posttime );
+			$timesFilterList =  $_searchHelper->getTimesFilterListByPostTimes ( array(1,24,168,720) );
 			$allowSearch = ($_G ['allowsearch'] > 0 && $_G ['allowsearch'] == 3) ? array (2, 3 ) : array (2 ); /* search range */
 			$threadrange = (in_array ( $threadrange, $allowSearch )) ? $threadrange : 1;
 			$ptable = min ( intval ( $ptable ), count ( $db_plist ) );
 			$ttable = min ( intval ( $ttable ), count ( $db_tlist ) );
-			$expand = array ("ttable" => $ttable, "ptable" => $ptable );
-			$threadrange = ($keyword) ? $threadrange : 1;
+			$q_sortby = $sortby = $_searchHelper->getSearchSortby ($sortby);
+			$sortby = $sortby != 'relation' ? $sortby : '';
+			$expand = array ("ttable" => $ttable, "ptable" => $ptable, 'sortby' =>$sortby);
 			list ( $total, $threads ) = $searcherService->searchThreads ( $keyword, $threadrange, $username, $starttime, $endtime, $fid, $page, $perpage, $expand );
-			$pager = ($total) ? numofpage ( $total, $page, ceil ( $total / $perpage ), $searchURL . "searcher.php?keyword=" . urlencode ( $keyword ) . "&type=$type&threadrange=$threadrange&username=" . urlencode ( $username ) . "&starttime=$starttime&endtime=$endtime&fid=$fid&", null, '', true ) : '';
+			$pager = ($total) ? numofpage ( $total, $page, ceil ( $total / $perpage ), $searchURL . "searcher.php?keyword=" . urlencode ( $keyword ) . "&type=$type&threadrange=$threadrange&username=" . urlencode ( $username ) . "&starttime=$starttime&endtime=$endtime&fid=$fid&sortby=$q_sortby&", null, '', true ) : '';			
+			$forumsTotal = $_searchHelper->searchForumGroups($keyword, $threadrange, $username, $starttime, $endtime, $fid, $page, $perpage, $expand);
 			break;
 		case "forum" :
 			list ( $total, $forums ) = $searcherService->searchForums ( $keyword, $page, $perpage );
@@ -88,7 +105,7 @@ if ($type && $keyword) {
 			break;
 		case "diary" :
 			$adverts = $_searchHelper->getSearchAdvert ( $keyword );
-			$posttime && list ( $diarystarttime, $diaryendtime ) = $_searchHelper->getStartAndEndTimeByUrl ( $posttime );
+			$timesFilterList =  $_searchHelper->getTimesFilterListByPostTimes ( array(1,24,168,720) );
 			list ( $total, $diarys ) = $searcherService->searchDiarys ( $keyword, $diaryrange, $diaryusername, $diarystarttime, $diaryendtime, $page, $perpage );
 			$pager = ($total) ? numofpage ( $total, $page, ceil ( $total / $perpage ), $searchURL . "searcher.php?keyword=" . urlencode ( $keyword ) . "&type=$type&diaryrange=$diaryrange&diaryusername=" . urlencode ( $diaryusername ) . "&diarystarttime=$diarystarttime&diaryendtime=$diaryendtime&", null, '', true ) : '';
 			break;
@@ -111,6 +128,7 @@ $typeTitle = $_searchHelper->getTypeTitle ( $type, $condition );
 
 $seoService = L::loadClass ( 'searcherseo', 'search' ); /* @var $seoService PW_SearchSEO */
 $webPageTitle = $seoService->getPageTitle ( $typeTitle, $keyword );
+
 $totaltime = number_format ( (pwMicrotime () - $P_S_T), 6 );
 
 $threadranges [1] = $diaryranges [1] = "checked=checked";
@@ -119,11 +137,15 @@ $total = ( int ) $total;
 
 $type = ($type) ? $type : "thread";
 //版块信息
-list ( $forumcache, $p_table, $t_table ) = $_searchHelper->getForumHtml ( $type );
+list ( $forumcache, $p_table, $t_table, $forumadd ) = $_searchHelper->getForumHtml ( $type );
 //帖子管理权限
 list ( $admincheck, $superdelete, $superedit ) = $_searchHelper->getThreadLevel ( $type, $fid );
 //关键字统计功能
 $_searchHelper->keywordStatistic ( $keyword );
+
+//热门关键字更新
+$_searchHelper->updateHotwords ();
+
 //热门搜索
 $hotwords = ($db_hotwords) ? explode ( ",", $db_hotwords ) : array ();
 //导航
@@ -173,15 +195,17 @@ class PW_SearchHelper {
 	function _getSpecialTypeTitle($condition) {
 		if (! $condition)
 			return array ();
-		$_lang = array ('digest' => '精华区', 'latest' => '最新贴', 'today' => '今日贴' );
+		$_lang = array ('digest' => '精华帖', 'latest' => '最新帖', 'today' => '今日帖' );
 		return $_lang [$condition];
 	}
 	
 	function _getTypeTitle($type) {
 		global $db_search_type;
-		if (! $db_search_type)
-			return array ();
-		return $db_search_type [$type];
+		if ($db_search_type) {
+			return $db_search_type [$type];
+		}
+		$defaultType = $this->getDefaultSearcherType();
+		return $defaultType[$type];
 	}
 	
 	function getSearchNav() {
@@ -205,6 +229,21 @@ class PW_SearchHelper {
 		$keywordStatisticServer->execute ();
 		return true;
 	}
+	
+	function updateHotwords() {
+		global $db_hotwordsconfig,$db_hotwordlasttime,$timestamp;
+		if (!$db_hotwordsconfig) return false;
+		$_config = unserialize($db_hotwordsconfig);
+		if (!$_config['openautoinvoke']) return false; 
+		$_timeNode = 90000;
+		if ($timestamp - $db_hotwordlasttime < $_timeNode) return false;
+		$_autoInvoke = array('isOpne'=> $_config['openautoinvoke'], 'period'=>$_config['invokeperiod']);
+		L::loadClass ( 'hotwordssearcher', 'search/userdefine' );
+		$hotwordsServer = new PW_HotwordsSearcher ();
+		$hotwordsServer->update($_autoInvoke, $_config['shownum']);
+		return true;
+	}
+	
 	function initCondition($page, $threadrange, $diaryrange) {
 		global $db_sphinx;
 		$isSphinx = ($db_sphinx ['isopen'] > 0) ? true : false; /* is mysql or sphinx */
@@ -213,6 +252,7 @@ class PW_SearchHelper {
 		$page = ($page > 1) ? $page : 1;
 		return array ($page, $isSphinx, $threadrange, $diaryrange );
 	}
+	
 	function checkLevel() {
 		global $_G, $groupid, $db_opensch, $db_schstart, $db_schend, $_time;
 		! $_G ['allowsearch'] && Showmsg ( 'search_group_right' );
@@ -226,19 +266,21 @@ class PW_SearchHelper {
 	}
 	
 	function getForumHtml($type) {
-		global $_G, $db_plist, $db_tlist, $groupid;
+		global $_G, $db_plist, $db_tlist, $groupid, $db_filterids;
 		if (! s::inArray ( $type, array ('thread', 'special' ) )) {
 			return array ('', '', '' );
 		}
 		$forumadd = $forumcache = '';
-		include pwCache::getPath ( D_P . "data/bbscache/forumcache.php" );
+		$notAllowedFids = $db_filterids ? explode(',',$db_filterids) : array();
+		//* include pwCache::getPath ( D_P . "data/bbscache/forumcache.php" );
+		extract(pwCache::getData( D_P . "data/bbscache/forumcache.php" , false));
 		$_forumsService = L::loadClass ( 'forums', 'forum' ); /* @var $_forumsService PW_Forums */
 		if ($forums = $_forumsService->getsNotCategory ()) {
 			foreach ( $forums as $rt ) {
 				$allowvisit = (! $rt ['allowvisit'] || $rt ['allowvisit'] != str_replace ( ",$groupid,", '', $rt ['allowvisit'] )) ? true : false;
 				if ($rt ['f_type'] == 'hidden' && $allowvisit) {
 					$forumadd .= "<option value=\"$rt[fid]\"> &nbsp;|- $rt[name]</option>";
-				} elseif ($rt ['password'] || ! $allowvisit) {
+				} elseif ($rt ['password'] || ! $allowvisit || S::inArray($rt['fid'], $notAllowedFids)) {
 					$forumcache = preg_replace ( "/\<option value=\"$rt[fid]\"\>(.+?)\<\/option\>\\r?\\n/is", '', $forumcache );
 				}
 			}
@@ -262,7 +304,7 @@ class PW_SearchHelper {
 				$t_table .= '</select>';
 			}
 		}
-		return array ($forumcache, $p_table, $t_table );
+		return array ($forumcache, $p_table, $t_table, $forumadd );
 	}
 	
 	function getThreadLevel($type, $fid) {
@@ -286,15 +328,29 @@ class PW_SearchHelper {
 		$superedit = ($SYSTEM ['superright'] && $SYSTEM ['deltpcs']) ? true : false;
 		return array ($admincheck, $superdelete, $superedit );
 	}
+
 	/**
-	 * 获得URL 传递的$starttime，$endtime时间
-	 * @param	int $posttime		1=1小时
-	 * @return 	array
+	 * 时间筛选列表 array(1=>1小时内,24=>一天内,168=>一周内，720=>一个月内)
+	 * @param int $postTimes
+	 * @return array
 	 */
-	function getStartAndEndTimeByUrl($posttime) {
+	function getTimesFilterListByPostTimes($postTimes = array(1,24,168,720)) {
+		if (!$postTimes || !S::isArray($postTimes)) return array('','');
+		$postTimeMapList = array(1=>"1小时内",24=>"一天内",168=>"一周内",720=>"一个月内");
+		$result = $temp = array();
+		foreach ($postTimes as $value) {
+			$value = intval($value);
+			$temp['title'] = $postTimeMapList[$value];
+			list($temp['starttime'],$temp['endtime']) = $this->_getStartAndEndTimeByPostTimes($value);
+			$result[] = $temp;
+		}
+		return $result;
+	}
+	
+	function _getStartAndEndTimeByPostTimes($posttime) {
 		global $timestamp;
 		if (! $posttime)
-			return array (false, false);
+			return array ('', '');
 		$posttime = ( int ) $posttime;
 		$starttime = $timestamp - $posttime * 60 * 60;
 		$endtime = $timestamp;
@@ -307,37 +363,28 @@ class PW_SearchHelper {
 	 * 解析搜索推荐数组 
 	 * @param unknown_type $array
 	 */
-	function getSearchForum() {
+	function getSearchForum() {		
 		global $s_searchforumdb;
 		if (! $s_searchforumdb) {
 			return array ($this->_getBBSForum (), array () );
 		}
-		$array = $s_searchforumdb;
-		$part1 = $part2 = array ();
-		if (! s::isArray ( $array ))
-			return array ();
-		$i = 0;
-		foreach ( $array as $key => $value ) {
-			if ($i < 10)
-				$part1 [$key] = $value;
-			if ($i >= 10 && $i <= 20)
-				$part2 [$key] = $value;
-			$i ++;
-		}
-		return array ($part1, $part2 );
+		$tempPart1 = $tempPart2 = array();
+		$forums = $this->_getBBSForum();
+		$tempPart1 = $s_searchforumdb;
+		$tempPart2 = array_diff($forums, $tempPart1);
+		return array ($tempPart1, $tempPart2 );
 	}
 	
 	function _getBBSForum() {
-		include_once pwCache::getPath ( D_P . 'data/bbscache/forum_cache.php' );
+		//* include_once pwCache::getPath ( D_P . 'data/bbscache/forum_cache.php' );
+		extract(pwCache::getData( D_P . 'data/bbscache/forum_cache.php' , false));
 		if (! s::isArray ( $forum ))
 			return array ();
 		$result = array ();
-		$i = 0;
 		foreach ( $forum as $key => $val ) {
-			if ($val ['type'] == 'category' || $i >= 10)
+			if ($val ['type'] == 'category' || $val ['f_type'] == 'hidden')
 				continue;
 			$result [$val ['fid']] = $val ['name'];
-			$i ++;
 		}
 		return $result;
 	}
@@ -371,6 +418,12 @@ class PW_SearchHelper {
 		return $forumadmin;
 	}
 	
+	function getSearchSortby($sortby) {
+		if (!$sortby) return 'postdate';
+		if (!S::inArray($sortby, array('relation','lastpost','postdate','replies'))) return 'postdate';
+		return $sortby;	
+	}
+	
 	/**
 	 * 获得搜索广告
 	 * 
@@ -394,6 +447,18 @@ class PW_SearchHelper {
 			}
 		}
 		return $result;
+	}
+	
+	function searchForumGroups($keywords,$threadrange,$userNames="",$starttime="",$endtime="", $forumIds = array(), $page = 1, $perpage = 20, $expand = array()) {
+		global $searcherService, $s_searchforumdb, $isSphinx;
+		if (!$isSphinx) return array();
+		$forumIds = $this->_getBBSForum();
+		$forumIds = $forumIds ? array_keys($forumIds) : array();
+		return $searcherService->searchForumGroups($keywords, $threadrange, $userNames, $starttime, $endtime, $forumIds, $page = 1, $perpage = 20, $expand = array());			
+	}
+	
+	function getDefaultSearcherType() {
+		return array ('thread'=>'帖子','diary'=>'日志','user'=>'用户','forum'=>'版块','group'=>'群组');
 	}
 }
 ?>

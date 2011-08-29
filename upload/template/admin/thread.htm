@@ -86,6 +86,10 @@ print <<<EOT
       <td class="td2"><input type="text" class="input input_wa mr20" name="author" value="$author">可使用通配符 "*"，多个作者用英文半角逗号","分隔</td>
     </tr>
     <tr class="tr1 vt">
+      <td class="td1">作者UID</td>
+      <td class="td2"><input type="text" class="input input_wa mr20" name="authorid" value="$authorid">多个作者UID用英文半角逗号","分隔</td>
+    </tr>
+    <tr class="tr1 vt">
       <td class="td1">主题发表时间</td>
       <td class="td2">
         <div class="input_img fl"><i onclick="this.nextSibling.onclick()" class="input_time" title="选择时间">选择时间</i><input type="text" name="pstarttime" id="pstarttime" value="$pStartString" onClick="javascript:ShowCalendar(this.id)" /></div><span class="p_lr_10 fl">至</span><div class="input_img fl mr20"><i class="input_time" onclick="this.nextSibling.onclick()" title="选择时间">选择时间</i><input type="text" name="pendtime" id="pendtime" value="$pEndString" onClick="javascript:ShowCalendar(this.id)" /></div>可只用单个条件
@@ -178,6 +182,7 @@ if (null != getObj('sphinxopen')) {
   <input type="hidden" name="hits" value="$hits">
   <input type="hidden" name="replies" value="$replies">
   <input type="hidden" name="author" value="$author">
+   <input type="hidden" name="authorid" value="$authorid">
   <input type="hidden" name="keyword" value="$keyword">
   <input type="hidden" name="userip" value="$userip">
   <input type="hidden" name="lines" value="$lines">
@@ -250,6 +255,7 @@ print <<<EOT
   <input type="hidden" name="hits" value="$hits">
   <input type="hidden" name="replies" value="$replies">
   <input type="hidden" name="author" value="$author">
+  <input type="hidden" name="authorid" value="$authorid">
   <input type="hidden" name="keyword" value="$keyword">
   <input type="hidden" name="userip" value="$userip">
   <input type="hidden" name="lines" value="$lines">
@@ -320,6 +326,12 @@ print <<<EOT
       <td class="td1">回复作者</td>
       <td class="td2">
         <input type="text" class="input input_wa mr20" name="author" value="$author">可使用通配符 "*"，多个作者用英文半角逗号","分隔
+      </td>
+    </tr>
+     <tr class="tr1 vt">
+      <td class="td1">回复作者uid</td>
+      <td class="td2">
+        <input type="text" class="input input_wa mr20" name="authorid" value="$authorid">可使用通配符 "*"，多个作者uid用英文半角逗号","分隔
       </td>
     </tr>
 
@@ -404,6 +416,7 @@ if (null != getObj('sphinxpostopen')) {
   <input type="hidden" name="pstart" value="$pstart">
   <input type="hidden" name="pend" value="$pend">
   <input type="hidden" name="author" value="$author">
+  <input type="hidden" name="author" value="$authorid">
   <input type="hidden" name="keyword" value="$keyword">
   <input type="hidden" name="userip" value="$userip">
   <input type="hidden" name="nums" value="$nums">
@@ -468,6 +481,7 @@ print <<<EOT
   <input type="hidden" name="pstart" value="$pstart">
   <input type="hidden" name="pend" value="$pend">
   <input type="hidden" name="author" value="$author">
+   <input type="hidden" name="authorid" value="$authorid">
   <input type="hidden" name="keyword" value="$keyword">
   <input type="hidden" name="userip" value="$userip">
   <input type="hidden" name="nums" value="$nums">

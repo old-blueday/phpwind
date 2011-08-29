@@ -9,7 +9,7 @@ require_once PrintEot('simple_header');
 $lastgrad=1;
 foreach($forum as $key => $value){
 	unset($forums['li_add'],$forums['cate']);
-	if($value['f_type']=='hidden' || (!$db_showcms && $value['cms'])){
+	if($value['f_type']=='hidden' || (!$db_showcms && $value['cms']) || $value['ifcms'] == 2){
 		continue;
 	}
 

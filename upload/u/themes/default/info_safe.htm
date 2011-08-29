@@ -37,7 +37,7 @@ if($ifppt){print <<<EOT
 							</tr>
 							<tr>
 								<th class="th">电子邮箱</th>
-								<td class="td"><input class="input input_wa" type="text" maxlength="75" id="proemail" name="proemail" value="$userdb[email]" />
+								<td class="td"><input class="input input_wa" type="text" maxlength="75" id="proemail" name="proemail" value="$userdb[email]" autocomplete="off" />
 								<label for="propublicemail"><input type="checkbox" id="propublicemail" name="propublicemail" value="1" $ifpublic />公开电子邮箱</label></td>
 							</tr>
 <!--
@@ -67,33 +67,33 @@ EOT;
 EOT;
 }print <<<EOT
 -->
-						</table>
+
 <!--
 EOT;
 if ($ifppt) {print <<<EOT
 -->
-						<div class="tac p10">
-							<span class="btn"><span><button type="submit">保存资料</button></span></span>
-						</div>
+							<tr>
+									<th class="th">
+											&nbsp;
+									</th>
+									<td class="td" style="padding:10px 13px;">
+										<span class="btn"><span><button type="submit">保存资料</button></span></span>
+									</td>
+							</tr>
 <!--
 EOT;
 }print <<<EOT
 -->
+						</table>
 					</div>
-<div id="userbinding-node" style="display:none">
+<div id="userbinding-node" style="display:none"></div>
 </form>
-</div></td></tr></table>
+</td></tr></table>
             </div>
         </div>
 <script type="text/javascript" src = "js/info.js"></script>
 <script language="JavaScript">
 var display = '$display';
-~function() {
-	var info_type = FetchCookie('pro_tab');
-	DelCookie('pro_tab');
-	if (!info_type) info_type = '$info_type';
-	selectTab(info_type);
-}();
 function checkpost(obj) {
 	if (obj.proemail.value == "") {
 		obj.proemail.focus();

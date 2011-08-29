@@ -24,6 +24,7 @@ function showDefaultMagic(){
 	if(F){
 		getObj("menu_magicshow").innerHTML = '<img class="lhcl_selectBox" id="'+magic_id+'" src="'+myshow+magic_id+'T.gif" alt="'+I18N['magicuse']+magic_name+'" title="'+I18N['magicuse']+magic_name+'" onclick="selectMagic(\''+magic_id+'\');">';
 		getObj("magicsmiliebox").style.display="";
+		if (IsElement('magicpreview')) getObj('magicpreview').innerHTML = '';
 		//getObj("btns").style.display="none";
 		//getObj("btnc").style.display="inline";
 	} else{
@@ -104,17 +105,17 @@ function clearp(id){
 	hideMagic();
 }
 function hideMagic(){
-try{
-	var o = getObj('player');
-	if(o){
-		if(is_ie){
-			o.innerHTML = '';
-		} else{
-			getObj('magic').src = '';
+	try{
+		var o = getObj('player');
+		if(o){
+			if(is_ie){
+				o.innerHTML = '';
+			} else{
+				getObj('magic').src = '';
+			}
+			o.style.display = 'none';
 		}
-		o.style.display = 'none';
-	}
-}catch(e){}
+	}catch(e){}
 }
 function showMagicDefault(){
 	op = 'magicpreview';
@@ -127,6 +128,7 @@ function showMagicDefault(){
 		read.open('menu_magicsmile','td_magicsmile','2');
 		showMagics(showmagicid,magicsid,1);
 	}
+	if (IsElement('previewmagic')) getObj('previewmagic').innerHTML = '';
 }
 function showMagics(showid,subjectid,page){
 	showmagicid = showid;
@@ -149,13 +151,13 @@ function NumOfPage(total,currentPage,showIndex){
 	} else if(currentPage<1){
 		currentPage=1;
 	}
-	pageIndex.push("<div style='height:6px;'><span style='margin:0 4px;cursor:pointer' onclick='showMagics(\""+showmagicid+"\","+magicsid+",1)'><img src='"+imgpath+"/wind/page_prev.gif' height='9' width='9'></span>");
+	pageIndex.push("<ul class=\"B_face_pages B_cc\"><li><a href=\"javascript:;\" onclick='showMagics(\""+showmagicid+"\","+magicsid+",1);return false;'>&laquo;</a></li>");
 	if(total<=showIndex){
 		for(var i=1;i<=total;i++){
 			if(i==currentPage){
-				pageIndex.push("<span style='margin:0 4px;'><b>"+i+"</b></span>");
+				pageIndex.push("<li><a href=\"javascript:;\" class=\"current\">"+i+"</a></li>");
 			} else{
-				pageIndex.push("<span style='margin:0 4px;cursor:pointer' onclick='showMagics(\""+showmagicid+"\","+magicsid+","+i+")'>"+i+"</span>");
+				pageIndex.push("<li><a href=\"javascript:;\" onclick='showMagics(\""+showmagicid+"\","+magicsid+","+i+");return false;'>"+i+"</a></li>");
 			}
 		}
 	} else{
@@ -172,17 +174,16 @@ function NumOfPage(total,currentPage,showIndex){
 		}
 		for(var i=startIndex;i<=endIndex;i++){
 			if(i==currentPage){
-				pageIndex.push("<span style='margin:0 4px;'><b>"+i+"</b></span>");
+				pageIndex.push("<li><a href=\"javascript:;\" class=\"current\">"+i+"</a></li>");
 			} else{
-				pageIndex.push("<span style='margin:0 4px;cursor:pointer' onclick='showMagics(\""+showmagicid+"\","+magicsid+","+i+")'>"+i+"</span>");
+				pageIndex.push("<li><a href=\"javascript:;\" onclick='showMagics(\""+showmagicid+"\","+magicsid+","+i+")'>"+i+"</a></li>");
 			}
 		}
 	}
-	pageIndex[pageIndex.length]="<span style='margin:0 4px;cursor:pointer' onclick='showMagics(\""+showmagicid+"\","+magicsid+","+total+")'><img src='"+imgpath+"/wind/page_next.gif' height='9' width='9'></span></div>";
-	return pageIndex.join('&nbsp;');
+	pageIndex[pageIndex.length]="<li><a href=\"javascript:;\" onclick='showMagics(\""+showmagicid+"\","+magicsid+","+total+")'>&raquo;</a></li></ul>";
+	return pageIndex.join('');
 }
 function initMagics(){
-
 	var response = ajax.XmlDocument();
 	var magicsid   = new Array();
 	var magicsname = new Array();
@@ -193,7 +194,6 @@ function initMagics(){
 	var page = i.getAttribute('page');
 	var node = i.childNodes;
 	var j=0;
-
 	for(var i=0;i<node.length;i++){
 		try{
 			magicsid[j]   = node[i].getAttribute('id');
@@ -205,7 +205,7 @@ function initMagics(){
 	}
 	var showface = getObj("magiclist");
 	showface.innerHTML = "";
-	for(i in magicsid){
+	for(var i=0; i<magicsid.length; i++){
 		try{var pic = document.createElement("img");
 		pic.style.margin = "3px";
 		pic.style.cursor = "pointer";
@@ -236,15 +236,15 @@ function initMagic(){
 			j++;
 		}catch(e){}
 	}
-	var s = '<div style="float:left;margin:5px"><div id="loading" style="width:200px;height:210px;border:1px solid #ccc;display:none;"></div><div id="magicpreview" style="width:200px;height:210px;border:1px solid #ccc;"></div><div style="margin-top:6px;text-align:center"><input class="btn" type="Button" value="'+I18N['preview']+'" onclick="previewMagic(200,210)"/><input class="btn" id="btnsm" type="button" value="'+I18N['use']+'" onclick="setMagic(this.id)" /></div></div><div id="magiclist" style="height:240px;"></div><div id="magicpage"></div>';
+	var s = '<div style="padding:10px 0 0 10px;width:590px;" class="B_cc"><div style="float:left;width:200px;margin-right:10px;"><div id="magicpreview" style="width:200px;height:210px;border:1px solid #ccc;"></div><div style="margin-top:6px;text-align:center"><span class="bt2"><span><button type="button" onclick="previewMagic(200,210)">'+I18N['preview']+'</button></span></span><span class="btn2"><span><button type="button" id="btnsm" onclick="setMagic(this.id)">'+I18N['use']+'</button></span></span></div></div><div class="fl" style="width:375px;height:270px;"><div id="loading" style="display:none;"></div><div id="magiclist" style="height:250px;"></div><div id="magicpage"></div></div></div>';
 	var num = 0;
-	var b='<span style="float:right;margin:3px 0 0 5px;width:auto;cursor:pointer" onclick="clearp(\'magiclist\');closep();showDefaultMagic();" title="关闭"><img src='+imgpath+'/close.gif></span><ul>';
-	for(f in magicid){
-		try{b += '<li id="mb_'+num+'" style="float:left" onclick="showMagics(\'mb_'+num+'\','+magicid[f]+',1);">'+magicname[f]+'</li>';
+	var b='<ul>';
+	for(var f=0; f<magicid.length; f++){
+		try{b += '<li id="mb_'+num+'" style="float:left" onclick="showMagics(\'mb_'+num+'\','+magicid[f]+',1);return false;"><a href="javascript:;">'+magicname[f]+'</a></li>';
 		num++;}catch(e){}
 	}
 	b += '</ul>';
-	var a = {id:'menu_magicsmile',bid:'magicbuttons',sid:'showMagic',width:'575',height:'260',bhtml:b,shtml:s};
+	var a = {id:'menu_magicsmile',bid:'magicbuttons',sid:'showMagic',bhtml:b,shtml:s};
 	initMenuTab(a,"9");
 	read.open('menu_magicsmile','td_magicsmile','2');
 	magicsid = magicid[0];

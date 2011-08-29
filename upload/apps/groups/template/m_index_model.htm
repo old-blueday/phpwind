@@ -190,7 +190,7 @@ print <<<EOT
 				<div class="one"><div class="two"><div class="tree"><div class="four">
 					<div class="sktextarea"><textarea name="text" id="writetext" onkeydown="write_quickpost(event)" onfocus="if(this.value == oldvalue)this.value=''">来，说两句吧…</textarea><div class="c"></div></div>
 					<div class="sk_open">
-						<span id="writebutton" class="btn3 fr"><span><button class="button" type="submit" onclick="submitwrite(document.forms['FORM'])" id="write_button">发表</button></span></span>
+						<span id="writebutton" class="btn3 fr"><span><button class="button" type="submit" onclick="groupSubmit(document.forms['FORM'])" id="write_button">发表</button></span></span>
 						<!--<span class="tosign"><label for="writetosign"><input id="writetosign" name="tosign" type="checkbox" value="1" onclick="if(this.checked == true){SetCookie('iftongbu','1');}else{SetCookie('iftongbu','0');}" {$check}>&nbsp;同步至我的记录</label></span>-->
 						<span id="showSmile" class="sk_show cp">表情</span>
 						<div style="position:absolute;display:none;width:100px;" id="smile" class="face_menu"></div>
@@ -216,7 +216,7 @@ function write_quickpost(event){
 	}
 }
 var oldvalue;
-function submitwrite(o) {
+function groupSubmit(o) {
 	if (getObj('writetext').value == '' || getObj('writetext').value == oldvalue) {
 		showDialog('error','记录内容必须在3～255个字节之间');
 		return false;

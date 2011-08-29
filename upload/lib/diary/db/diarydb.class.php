@@ -224,13 +224,33 @@ class PW_DiaryDB extends BaseDB {
 		return $this->_getAllResultFromQuery ( $query );
 	}
 	
-	function getLatestDiarysCount() {
-		$total = $this->_db->get_value("SELECT count(*) as total FROM ".$this->_tableName." WHERE privacy=0 ORDER BY did DESC ");
+	function getLatestDiarysCount($starttime, $endtime) {
+		$_sql_where = '';
+		
+		if ($starttime) {
+			$_sql_where .= " AND postdate > ".$this->_addSlashes($starttime);
+		}
+		
+		if ($endtime) {
+			$_sql_where .= " AND postdate < ".$this->_addSlashes($endtime);
+		}
+		
+		$total = $this->_db->get_value("SELECT count(*) as total FROM ".$this->_tableName." WHERE privacy=0 $_sql_where ORDER BY did DESC ");
 		return ($total<500) ? $total :500;
 	}
 
-	function getLatestDiarys($offset,$limit) {
-		$query = $this->_db->query ("SELECT * FROM ".$this->_tableName." WHERE privacy=0 ORDER BY did DESC ".$this->_Limit($offset, $limit));
+	function getLatestDiarys($starttime = '', $endtime = '', $offset, $limit) {
+		$_sql_where = '';
+		
+		if ($starttime) {
+			$_sql_where .= " AND postdate > ".$this->_addSlashes($starttime);
+		}
+		
+		if ($endtime) {
+			$_sql_where .= " AND postdate < ".$this->_addSlashes($endtime);
+		}
+		
+		$query = $this->_db->query ("SELECT * FROM ".$this->_tableName." WHERE privacy=0 $_sql_where ORDER BY did DESC ".$this->_Limit($offset, $limit));
 		return $this->_getAllResultFromQuery ( $query );
 	}
 }

@@ -20,7 +20,7 @@ var jobCenterClass = {
 		ajax.send(url, "&id="+id+"&step=2",function() {
 			var response = _this.convert(ajax.request.responseText);
 			if(response['flag']){
-				showDialog("success",response['message']);
+				showDialog("success",response['message'],2);
 				var obj = _this.$(_this.prefixApply+id);
 				obj.className = "tasks_apply_old";
 				//response['html']
@@ -85,7 +85,7 @@ var jobCenterClass = {
 			ajax.send(url, "&ajax=1");
 			var c = this.$("job_condition_"+id);
 			var message = c ? c.innerHTML : "按指定任务条件完成即可获取奖励";
-			showDialog("success",message);
+			showDialog("success",message,2);
 			return false;
 		}
 		this.hiddenPOP();
@@ -114,7 +114,7 @@ var jobCenterClass = {
 		ajax.send(url, "&id="+id+"&step=2",function() {
 			var response = _this.convert(ajax.request.responseText);
 			if(response['flag']){
-				showDialog("success",response['message']);
+				showDialog("success",response['message'],2);
 				var obj = _this.$(_this.prefixTbody+id);
 				if(obj){
 					obj.parentNode.removeChild(obj);
@@ -165,7 +165,7 @@ var jobCenterClass = {
 		ajax.send(url, "&id="+id+"&step=2",function() {
 			var response = _this.convert(ajax.request.responseText);
 			if(response['flag']){
-				showDialog("success",response['message']);
+				showDialog("success",response['message'],2);
 				/*移除对象*/
 				var obj = _this.$(_this.prefixTbody+id);
 				obj.parentNode.removeChild(obj);

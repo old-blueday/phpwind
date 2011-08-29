@@ -1,7 +1,7 @@
 <?php
 !defined('P_W') && exit('Forbidden');
-@include_once pwCache::getPath(D_P . 'data/bbscache/o_config.php');
-
+//* @include_once pwCache::getPath(D_P . 'data/bbscache/o_config.php');
+pwCache::getData(D_P . 'data/bbscache/o_config.php');
 if (empty($_POST['step'])) {
 	$filetype = '';
 	$db_uploadfiletype = array();
@@ -19,6 +19,7 @@ if (empty($_POST['step'])) {
 } else {
 	//验证码
 	//require_once(R_P.'require/postfunc.php');
+	$pwServer['HTTP_USER_AGENT'] = 'Shockwave Flash';
 	require_once (R_P. 'u/require/core.php');
 	S::gp(array(
 		'uid',
@@ -77,8 +78,8 @@ if (empty($_POST['step'])) {
 	
 	if ($rt['atype'] == 1) {
 		$cyid = $rt['ownerid'];
-		$db->update("UPDATE pw_colonys SET photonum=photonum+" . S::sqlEscape($photoNum, false) . ' WHERE id=' . S::sqlEscape($cyid));
-
+		//* $db->update("UPDATE pw_colonys SET photonum=photonum+" . S::sqlEscape($photoNum, false) . ' WHERE id=' . S::sqlEscape($cyid));		
+		$db->update(pwQuery::buildClause("UPDATE :pw_table SET photonum=photonum+:photonum WHERE id=:id", array('pw_colonys', $photoNum, $cyid)));
 		$colony['photonum']+= $photoNum;
 		updateGroupLevel($colony['id'], $colony);
 		if(!$rt['private']){
@@ -109,7 +110,10 @@ if (empty($_POST['step'])) {
 		updateDatanalyse($pid,'picNew',$timestamp);
 	}
 	
-	$db->update("UPDATE pw_cnalbum SET photonum=photonum+" . S::sqlEscape($photoNum, false) . ",lasttime=" . S::sqlEscape($timestamp, false) . ',lastpid=' . S::sqlEscape(implode(',', $lastpid)) . (!$rt['lastphoto'] ? ',lastphoto=' . S::sqlEscape($img->getLastPhoto()) : '') . " WHERE aid=" . S::sqlEscape($aid));
+	if (!$rt['lastphoto']) {
+		$db->update("UPDATE pw_cnalbum SET lastphoto=" . S::sqlEscape($img->getLastPhoto()) . " WHERE aid=" . S::sqlEscape($aid));
+	}
+	//$db->update("UPDATE pw_cnalbum SET photonum=photonum+" . S::sqlEscape($photoNum, false) . ",lasttime=" . S::sqlEscape($timestamp, false) . ',lastpid=' . S::sqlEscape(implode(',', $lastpid)) . (!$rt['lastphoto'] ? ',lastphoto=' . S::sqlEscape($img->getLastPhoto()) : '') . " WHERE aid=" . S::sqlEscape($aid));
 	
 	countPosts("+$photoNum");
 	

@@ -45,7 +45,8 @@ if ($type == "delete") {
 } else {
 
 	count($myshortcut) >= 6 && Showmsg('shortcut_numlimit');
-	require_once pwCache::getPath(D_P . 'data/bbscache/forum_cache.php');
+	//* require_once pwCache::getPath(D_P . 'data/bbscache/forum_cache.php');
+	pwCache::getData(D_P . 'data/bbscache/forum_cache.php');
 	$forumkeys = array_keys($forum);
 	!in_array($fid, $forumkeys) && Showmsg('undefined_action');
 	$myshortcut[] = $fid;

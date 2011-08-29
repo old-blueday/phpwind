@@ -3,11 +3,11 @@
 $basename = "$admin_file?adminjob=sitemap";
 
 if(!$action){
-	@include_once pwCache::getPath(D_P.'data/bbscache/sm_config.php');
+	//* @include_once pwCache::getPath(D_P.'data/bbscache/sm_config.php');
+	pwCache::getData(D_P.'data/bbscache/sm_config.php');
 	include PrintEot('sitemap');exit;
 } elseif($action == 'create'){
-	//* p_unlink(D_P.'data/bbscache/sitemap.xml');
-	pwCache::deleteData(D_P.'data/bbscache/sitemap.xml');
+	p_unlink(D_P.'data/bbscache/sitemap.xml');
 	adminmsg('operate_success');
 } elseif($_POST['action'] == 'baidu'){
 	S::gp(array('config'));

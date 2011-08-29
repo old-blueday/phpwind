@@ -1769,7 +1769,6 @@ function extend(cmdID) {
 		}else{
 			e.cancelBubble = true;
 		}
-
 	};
 	document.body.onmousedown = closeExtend;
 };
@@ -1807,7 +1806,7 @@ function insertform(id) {
 	var code = '<table class="t" width="60%">';
 	code += '<tr class="tr3"><td colspan=2><b>'+id+'</b></td></tr>'
 	var ds   = getObj('formstyle').getElementsByTagName('tr');
-	for (var i=1;i<ds.length;i++) {
+	for (var i=0;i<ds.length;i++) {
 		code += '<tr class="tr3"><td>'+ds[i].firstChild.innerHTML+'</td><td>'+ds[i].lastChild.firstChild.value+'</td></tr>';
 	}
 	code += '</table>';

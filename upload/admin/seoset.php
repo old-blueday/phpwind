@@ -4,7 +4,8 @@ S::gp(array('mode'), 'GP');
 $unSeoset = getUnSeoset();
 if (empty($mode) || $mode == 'bbs') {
 	if ($action == 'update') {
-		include pwCache::getPath(D_P . 'data/bbscache/forum_cache.php');
+		//* include pwCache::getPath(D_P . 'data/bbscache/forum_cache.php');
+		pwCache::getData(D_P . 'data/bbscache/forum_cache.php');
 		S::gp(array('seoset', 'forums'), 'p');
 		foreach ($forums as $key => $value) {
 			$forums[$key]['title'] = $value['title'] = S::escapeChar(strip_tags($value['title']));
@@ -72,17 +73,17 @@ if (empty($mode) || $mode == 'bbs') {
 	}
 } else {
 	if (in_array($mode, $unSeoset)) exit();
-	if (file_exists(D_P . 'data/bbscache/' . S::escapePath($mode) . '_config.php')) require_once D_P . 'data/bbscache/' . S::escapePath($mode) . '_config.php';
+	if (file_exists(D_P . 'data/bbscache/' . S::escapePath($mode) . '_config.php')) pwCache::getData(D_P . 'data/bbscache/' . S::escapePath($mode) . '_config.php');
 	if (file_exists(R_P . 'mode/' . S::escapePath($mode) . '/admin/seoset.php')) require_once S::escapePath(R_P . 'mode/' . S::escapePath($mode) . '/admin/seoset.php');
 	if (file_exists(R_P . 'mode/' . S::escapePath($mode) . '/config/seoset.php')) require_once S::escapePath(R_P . 'mode/' . S::escapePath($mode) . '/config/seoset.php');
 } 
 if ($mode == 'sitemap') {
 	if(!$action){
-		@include_once pwCache::getPath(D_P.'data/bbscache/sm_config.php');
+		//* @include_once pwCache::getPath(D_P.'data/bbscache/sm_config.php');
+		pwCache::getData(D_P.'data/bbscache/sm_config.php');
 		include PrintEot('sitemap');exit;
 	} elseif($action == 'create'){
-	//* p_unlink(D_P.'data/bbscache/sitemap.xml');
-		pwCache::deleteData(D_P.'data/bbscache/sitemap.xml');
+		p_unlink(D_P.'data/bbscache/sitemap.xml');
 		adminmsg('operate_success',"$basename&mode=sitemap");
 	} elseif($_POST['action'] == 'baidu'){
 		S::gp(array('config'));

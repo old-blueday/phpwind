@@ -54,6 +54,19 @@ function getLoginUser($uid) {
 	return $user;
 }
 
+	/**
+	 * 根据用户名获取Email
+	 * @param string $userName 用户名
+	 * @return string email
+	 */
+function getRegEmail($userName){
+	$userName = trim($userName);
+	if(!$userName) return false;
+	$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
+	$user = $userService->getByUserName($userName, true, false);
+	return $user['email'];
+}
+
 function checkpass($username, $password, $safecv, $lgt=0) {
 	global $db_ifsafecv,$db_ifpwcache,$db,$timestamp,$onlineip;
 	if (!checkLgt($lgt)) {

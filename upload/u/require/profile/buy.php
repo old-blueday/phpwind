@@ -83,7 +83,8 @@ if (empty($job)) {
 			if ($rt['sright']['rmbprice'] <= 0) {
 				Showmsg('undefined_action');
 			}
-			include_once pwCache::getPath(D_P.'data/bbscache/ol_config.php');
+			//* include_once pwCache::getPath(D_P.'data/bbscache/ol_config.php');
+			pwCache::getData(D_P.'data/bbscache/ol_config.php');
 			if (!$ol_onlinepay) {
 				Showmsg($ol_whycolse);
 			}

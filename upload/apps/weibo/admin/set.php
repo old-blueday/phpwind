@@ -2,13 +2,13 @@
 !function_exists('adminmsg') && exit('Forbidden');
 $weiboService = L::loadClass('weibo', 'sns');/* @var $weiboService PW_Weibo */
 require_once(R_P.'require/showimg.php');
-include_once pwCache::getPath(D_P.'data/bbscache/o_config.php');
+//* include_once pwCache::getPath(D_P.'data/bbscache/o_config.php');
+pwCache::getData(D_P.'data/bbscache/o_config.php');
 $nav = array("$action" => "class='current'");
 
 if (empty($action)) {
-
+	
 	if (empty($_POST['step'])) {
-		
 		require_once(R_P.'require/credit.php');
 		!is_array($creditset = unserialize($o_weibo_creditset)) && $creditset = array();
 		
@@ -23,6 +23,9 @@ if (empty($action)) {
 		ifcheck($o_weibopost, 'weibopost');
 		ifcheck($o_weibophoto, 'weibophoto');
 		ifcheck($o_weibourl, 'weibourl');
+		ifcheck($o_weibo_hottopicdays, 'weibo_hottopicdays');
+		ifcheck($o_weibo_hotcommentdays, 'weibo_hotcommentdays');
+		ifcheck($o_weibo_hottransmitdays, 'weibo_hottransmitdays');
 
 		$creategroup = ''; $num = 0;
 		foreach ($ltitle as $key => $value) {
@@ -39,13 +42,17 @@ if (empty($action)) {
 		
 	} else {
 		
-		S::gp(array('creditset','creditlog', 'weibophoto','weibopost', 'weibourl', 'weibotip'),'GP');
+		S::gp(array('creditset','creditlog', 'weibophoto','weibopost', 'weibourl', 'weibotip','weibo_hottopicdays','weibo_hotcommentdays','weibo_hotfansdays','weibo_hottransmitdays'),'GP');
 		S::gp(array('groups'),'GP',2);
 		
 		$updatecache = false;
 		$config['weibophoto'] = $weibophoto ? 1 : 0;
 		$config['weibopost'] = $weibopost ? 1 : 0;
 		$config['weibourl'] = $weibourl ? 1 : 0;
+		$config['weibo_hottopicdays'] = $weibo_hottopicdays ? intval($weibo_hottopicdays) : 7 ;
+		$config['weibo_hotcommentdays'] = $weibo_hotcommentdays ? intval($weibo_hotcommentdays) : 1 ;
+		$config['weibo_hottransmitdays'] = $weibo_hottransmitdays ? intval($weibo_hottransmitdays) : 1 ;
+		$config['weibo_hotfansdays'] = $weibo_hotfansdays ? intval($weibo_hotfansdays) : 1 ;
 		$config['weibo_creditset'] = '';
 		$config['weibotip'] = S::escapeStr($weibotip);
 		$config['weibo_groups'] = is_array($groups) ? ','.implode(',',$groups).',' : '';

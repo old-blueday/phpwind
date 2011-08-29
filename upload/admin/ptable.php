@@ -214,7 +214,7 @@ if (!$action) {
 	if (!$step) {
 
 		$id < 1 && $id = '';
-		$pw_tmsgs = 'pw_tmsgs'.$id;
+		$pw_tmsgs = 'pw_tmsgs'.($id > 0 ? intval($id) : '');
 		@extract($db->get_one("SELECT MIN(tid) AS tmin,MAX(tid) AS tmax FROM $pw_tmsgs"));
 		list($tidmin,$tidmax) = maxmin($id);
 		$tiderror = '';
@@ -247,7 +247,7 @@ if (!$action) {
 			$ttable = GetTtable($tstart+1);
 			$step = 3;
 		}
-		$ftable = 'pw_tmsgs'.$id;
+		$ftable = 'pw_tmsgs'.($id > 0 ? intval($id) : '');
 		$ftable == $ttable && adminmsg('table_same');
 
 		$db->update("INSERT INTO $ttable SELECT * FROM $ftable WHERE tid>".S::sqlEscape($tstart).'AND tid<='.S::sqlEscape($end));

@@ -4,7 +4,8 @@ define('W_P',__FILE__ ? substr(__FILE__,0,-16) : '../');
 require_once(W_P.'global.php');
 if(preg_match('/(mozilla|m3gate|winwap|openwave)/i', $pwServer['HTTP_USER_AGENT'])) ObHeader($_mainUrl);
 require_once(R_P.'m/wap_mod.php');
-include_once pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
+//* include_once pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
+pwCache::getData(D_P.'data/bbscache/forum_cache.php');
 
 if (!$db_wapifopen) {
 	wap_msg('wap_closed');

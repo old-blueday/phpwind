@@ -1,0 +1,446 @@
+<!--<?php
+include_once PrintEot('left');
+${'current' . $action} = 'class="current"';
+print <<<EOT
+-->
+<script language="JavaScript">
+function cateopen(id) {
+	var o = getObj('cate_' + id);
+	if (o == null) return;
+	if (o.style.display == 'none') {
+		o.style.display = '';
+		getObj('bt_' + id).className = 'expand expand_b';
+	} else {
+		o.style.display = 'none';
+		getObj('bt_' + id).className = 'expand expand_a';
+	}
+}
+
+function changeValue(threadid, key) {
+	phoneValue = getObj('changephone').value;
+	alipayValue = getObj('changealipay').value;
+	certificateauthValue = getObj('changecertificate').value;
+	value = ',' + threadid + ',';
+	if (key == 'cellphone') {
+		if (phoneValue.indexOf(value) < 0) {
+			 getObj('changephone').value =phoneValue + value;
+		} else {
+			 getObj('changephone').value = phoneValue.replace(value, '');
+		}
+	} else if (key == 'alipay') {
+		if (alipayValue.indexOf(value) < 0) {
+			getObj('changealipay').value =alipayValue + value;
+		}else {
+			getObj('changealipay').value = alipayValue.replace(value, '');
+		}
+	} else if (key == 'certificate') {
+		if (certificateauthValue.indexOf(value) < 0) {
+			getObj('changecertificate').value = certificateauthValue + value;
+		}else {
+			getObj('changecertificate').value = certificateauthValue.replace(value, '');
+		}
+	}
+}
+</script>
+<div class="nav3 mb10 ta">
+    <ul class="cc">
+      <li $currentstate><a href="$basename&action=state">应用状态</a></li>
+      <li $currentbasic><a href="$basename&action=basic">基本设置</a></li>
+      <li $currentforumpost><a href="$basename&action=forumpost">版块设置</a></li>
+      <li $currentforumcredit><a href="$basename&action=forumcredit">积分设置</a></li>
+      <li $currentstatic><a href="$basename&action=static">应用统计</a></li>
+      <li $currentsmsbuy><a href="$basename&action=smsbuy">短信购买</a></li>
+      <li $currentcertificateauth><a href="$basename&action=certificateauth">证件认证</a></li>
+    </ul>
+</div>
+<!--
+EOT;
+if($action == 'state'){
+print <<<EOT
+-->
+<form action="$basename&action=state" method="post" name="stateset">
+<input type="hidden" name="step" value="2" />
+<h2 class="h1">应用状态设置</h2>
+<div class="admin_table mb10">
+	<table width="100%" cellspacing="0" cellpadding="0">
+		<tr class="tr1 vt">
+			<td class="td1">状态设置</td>
+			<td class="td2">
+				<ul class="list_A list_80 cc">
+					<li><input type="radio" value="1" $authstate_Y name="authstate" />开启</li>
+					<li><input type="radio" value="0" $authstate_N name="authstate" />关闭</li>
+				</ul>
+			</td>
+        </tr>
+     </table>
+ </div>
+<div class="tac mb10">
+	<span class="btn"><span><button type="submit" name="submit" onfocus="blur();">提 交</button></span></span>
+</div>
+</form>
+<!--
+EOT;
+}elseif($action == 'basic'){
+print <<<EOT
+-->
+<form action="$basename&action=basic" method="post" name="basicset">
+<input type="hidden" name="step" value="2" />
+<h2 class="h1">基本设置</h2>
+<div class="admin_table mb10">
+	<table width="100%" cellspacing="0" cellpadding="0">
+		<tr class="tr1 vt">
+			<td class="td1">新用户注册手机认证</td>
+			<td class="td2">
+				<ul class="list_A list_80 cc">
+					<li><input type="radio" value="1" name="config[authreg]" {$openAuthreg} />开启</li>
+					<li><input type="radio" value="0" name="config[authreg]" {$closeAuthreg} />关闭</li>
+				</ul>
+			</td>
+			<td class="td2">开启该功能，仅当会员通过手机验证才能完成注册</td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">手机找回密码</td>
+			<td class="td2">
+				<ul class="list_A list_80 cc">
+					<li><input type="radio" value="1" name="config[authgetpwd]" {$openAuthpwd} />开启</li>
+					<li><input type="radio" value="0" name="config[authgetpwd]" {$closeAuthpwd} />关闭</li>
+				</ul>
+			</td>
+			<td class="td2">开启后，可通过手机验证码的方式帮助用户找回密码</td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">站点名称</td>
+			<td class="td2">
+				<input type="text" name="config[authsitename]" value="$db_authsitename" class="input input_wa" maxlength="20" />
+			</td>
+			<td class="td2">用于手机短信内容自定义</td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">证件认证</td>
+			<td class="td2">
+				<ul class="list_A list_80 cc">
+					<li><input type="radio" value="1" name="config[authcertificate]" {$openAuthcertificate} />开启</li>
+					<li><input type="radio" value="0" name="config[authcertificate]" {$closeAuthcertificate} />关闭</li>
+				</ul>
+			</td>
+			<td class="td2">开启该功能，启用证件认证功能</td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">帮助链接</td>
+			<td class="td2">
+				<input type="text" name="config[authhelpurl]" value="$db_authhelpurl" class="input input_wb" />
+			</td>
+			<td class="td2"></td>
+		</tr>
+	</table>
+</div>
+
+<div class="tac mb10">
+	<span class="btn"><span><button type="submit" name="submit" onfocus="blur();">提 交</button></span></span>
+</div>
+</form>
+<!--
+EOT;
+}elseif($action == 'forumpost'){
+print <<<EOT
+-->
+<form action="$basename&action=forumpost" method="post" name="forumpost">
+<input type="hidden" name="step" value="2" />
+<input type="hidden" name="changedphone" id="changephone" value="" />
+<input type="hidden" name="changedalipay" id="changealipay" value="" />
+<input type="hidden" name="changedcertificate" id="changecertificate" value="" />
+<h3 class="h1"><b>提示信息</b></h3>
+<div class="legend">开启后，在指定版块发帖、发布团购/活动/分类信息时，仅当会员通过认证才能继续操作</div>
+<h2 class="h1">版块设置</h2>
+<div class="admin_table mb10">
+<table id="ftable" cellspacing="0" cellpadding="0" width="100%">
+    <tr class="tr2">
+        <td>[顺序]版块名称</td>
+        <td width="160">绑定手机</td>
+        <td width="160">绑定支付宝</td>
+        <td>证件认证</td>
+    </tr>
+<!--
+EOT;
+foreach ($catedb as $cate) {
+$tmpStyle = $threaddb[$cate['fid']] ? 'expand expand_b' : 'expand expand_d';
+print <<<EOT
+-->
+    <tr class="vt tr1">
+		<td class="td3 tdcur">
+			<i id="bt_$cate[fid]" class="$tmpStyle" onclick="cateopen('$cate[fid]')"></i>
+			<span class="fourm_name" id="fourm_$cate[fid]">$cate[name]</span>
+		</td>
+		<td class="td2"></td>
+        <td class="td2"></td>
+        <td class="td2"></td>
+	</tr>
+<!--
+EOT;
+if ($threaddb[$cate['fid']]) {print <<<EOT
+-->
+	<tbody id="cate_$cate[fid]">
+<!--
+EOT;
+foreach ($threaddb[$cate['fid']] as $thread) {
+$forumset = unserialize($thread['forumset']);
+$checkCellphone = $forumset['auth_cellphone'] == 1 ? 'checked' : '';
+$checkAlipay = $forumset['auth_alipay'] == 1 ? 'checked' : '';
+$checkCertificateauth = $forumset['auth_certificate'] == 1 ? 'checked' : '';
+$isspace = str_repeat($space,$thread['type'] == 'forum' ? 0 : ($thread['type'] == 'sub' ? 1 : 2));
+print <<<EOT
+-->
+	<tr class="vt tr1">
+		<td class="td3">
+			{$isspace}
+            <i class="lower"></i>
+            <span id="fourm_$thread[fid]" class="fourm_name">$thread[name]</span>
+        </td>
+		<td class="td2">
+			<input type="checkbox" name="auth[$thread[fid]][cellphone]" value=1 onclick="changeValue($thread[fid],'cellphone');" $checkCellphone />
+		</td>
+		<td class="td2">
+            <input type="checkbox" name="auth[$thread[fid]][alipay]" value=1 onclick="changeValue($thread[fid],'alipay');" $checkAlipay />
+        </td>
+		<td class="td2">
+            <input type="checkbox" name="auth[$thread[fid]][certificate]" value=1 onclick="changeValue($thread[fid],'certificate');" $checkCertificateauth />
+        </td>
+	</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+	</tbody>
+<!--
+EOT;
+}}print <<<EOT
+-->
+</table>
+</div>
+<div class="tac mb10">
+	<span class="btn"><span><button type="submit" name="submit" onfocus="blur();">提 交</button></span></span>
+</div>
+</form>
+<!--
+EOT;
+}elseif($action == 'forumcredit'){
+print <<<EOT
+-->
+<form action="$basename&action=forumcredit" method="post" name="forumcredit">
+<input type="hidden" name="step" value="2" />
+<h3 class="h1"><b>提示信息</b></h3>
+<div class="legend">开启后，实名认证用户发帖可获得普通用户的×倍积分，留空表示不使用此功能</div>
+<h2 class="h1">积分奖励设置</h2>
+<div class="admin_table mb10">
+<table id="ftable" cellspacing="0" cellpadding="0" width="100%">
+    <tr class="tr2">
+        <td>[顺序]版块名称</td>
+        <td width="160">绑定手机发帖</td>
+        <td width="160">绑定支付宝发帖</td>
+        <td>绑定证件认证发帖</td>
+    </tr>
+<!--
+EOT;
+foreach ($catedb as $cate) {
+$tmpStyle = $threaddb[$cate['fid']] ? 'expand expand_b' : 'expand expand_d';
+print <<<EOT
+-->
+    <tr class="vt tr1">
+		<td class="td3 tdcur">
+			<i id="bt_$cate[fid]" class="$tmpStyle" onclick="cateopen('$cate[fid]')"></i>
+			<span class="fourm_name" id="fourm_$cate[fid]">$cate[name]</span>
+		</td>
+		<td class="td2"></td>
+        <td class="td2"></td>
+        <td class="td2"></td>
+	</tr>
+<!--
+EOT;
+if ($threaddb[$cate['fid']]) {print <<<EOT
+-->
+	<tbody id="cate_$cate[fid]">
+<!--
+EOT;
+foreach ($threaddb[$cate['fid']] as $thread) {
+$forumset = unserialize($thread['forumset']);
+$isspace = str_repeat($space,$thread['type'] == 'forum' ? 0 : ($thread['type'] == 'sub' ? 1 : 2));
+print <<<EOT
+-->
+	<tr class="vt tr1">
+		<td class="td3">
+			{$isspace}
+            <i class="lower"></i>
+            <span id="fourm_$thread[fid]" class="fourm_name">$thread[name]</span>
+        </td>
+		<td class="td2">
+			× <input class="input input_wc" type="text" name="auth[$thread[fid]][cellphone]" value="$forumset[auth_cellphone_credit]" />
+		</td>
+		<td class="td2">
+            × <input class="input input_wc" type="text" name="auth[$thread[fid]][alipay]" value="$forumset[auth_alipay_credit]" />
+        </td>
+		<td class="td2">
+            × <input class="input input_wc" type="text" name="auth[$thread[fid]][certificate]" value="$forumset[auth_certificate_credit]" />
+        </td>
+	</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+	</tbody>
+<!--
+EOT;
+}}print <<<EOT
+-->
+</table>
+</div>
+<div class="tac mb10">
+	<span class="btn"><span><button type="submit" name="submit" onfocus="blur();">提 交</button></span></span>
+</div>
+</form>
+<!--
+EOT;
+}elseif($action == 'static' || $action == 'smsbuy'){
+print <<<EOT
+-->
+<script type="text/javascript" src="http://apps.phpwind.net/js/global.js"></script>
+<script language="JavaScript">
+var server = new PwJs.Server("pwapp");
+server.start();
+</script>
+<iframe id="pwapp" name="pwapp" frameborder="0" width="100%" height="700" scrolling="auto" src="{$appurl}"></iframe>
+<!--
+EOT;
+}elseif($action == 'certificateauth'){print <<<EOT
+-->
+<script>
+var manageclass = {
+		certificateinfo : function (obj,forumid){
+			var form = getObj(forumid);
+			var page = obj.getAttribute("page");
+			if(!page){
+				page = getObj("input_page").value;
+			}
+			page = (page) ? page : 1;
+			form.page.value = page;
+			form.step.value = '';
+			setTimeout(function(){
+				form.submit();
+			},0);
+		}
+	}
+
+function initPost(state){
+	var form = getObj('certificate_form');
+	if (state == -1 && hasCheckedItem(form) && !confirm("删除操作无法还原,您确定要删除本条实名认证记录并删除用户上传的文件么？")) {
+		return false;
+	}
+	form.dostate.value = state;
+	form.submit();
+}
+function changeState(state){
+	document.location.href = "$basename&action=certificateauth&state=" + state;
+}
+
+function hasCheckedItem(form) {
+	var ifcheck = false;
+	var inputs = form.getElementsByTagName("input");
+	for (var i=0; i<inputs.length; i++) {
+		if (inputs[i].type == 'checkbox' && inputs[i].name == "selid[]" && inputs[i].checked == true) ifcheck = true;
+	}
+	return ifcheck;
+}
+</script>
+<script src="js/global.js"></script>
+<form action="$basename&action=certificateauth" method="post" name="certificate_form"  id="certificate_form">
+	<input type="hidden" name="page" value="$page">
+	<input type="hidden" name="step" value="2">
+	<input type="hidden" name="dostate" value="0">
+	<h3 class="h1">认证信息</h3>
+    <div class="admin_table mb10">
+		<table cellpadding="0" cellspacing="0" width="100%">
+          <tr class="tr2 vt td_bgB">
+            <td width="24"><span onclick="CheckAll(document.certificate_form)" class="cp">全选</span></td>
+            <td width="100">
+            	<select name="state" onchange="changeState(this.value);">
+            		<option value="0">全部</option>
+            		$stateHtml
+            	</select>
+            </td>
+            <td width="50">用户名</td>
+            <td width="150">提交时间</td>
+            <td width="100">证件类型</td>
+            <td width="100">证件图片</td>
+            <td>证件编号</td>
+          </tr>
+<!--
+EOT;
+if (empty($certificateInfo)) {print <<<EOT
+-->
+<tr><td class="p10" colspan="8"><div class="admin_tips">啊哦，没有你要的信息！</div></td></tr>
+<!--
+EOT;
+}else{
+	foreach($certificateInfo as $v){
+print <<<EOT
+-->
+          <tr class="tr1 vt">
+            <td class="td2"><input type="checkbox" name="selid[]" value="$v[id]"></td>
+            <td class="td2">$v[state]</td>
+            <td class="td2">$v[username]</td>
+            <td class="td2">$v[createtime]</td>
+            <td class="td2">$v[type]</td>
+            <td class="td2">
+<!-- 
+EOT;
+if($v[attach1]){print <<<EOT
+-->
+				<a href="$v[attach1]" target="_blank" onmouseover="getObj('tips1_$v[id]').style.display=''" onmouseout="getObj('tips1_$v[id]').style.display='none'">正面</a>
+				<div class="popout" id="tips1_$v[id]" style="display:none;position:absolute;left:10px;top:20px;"><table border="0" cellspacing="0" cellpadding="0"><tbody><tr><td class="bgcorner1"></td><td class="pobg1"></td><td class="bgcorner2"></td></tr><tr><td class="pobg4"></td><td><div class="popoutContent pr" style="width:480px;height:320px;">
+				<iframe frameborder='0' style='position:absolute;top:0;width:100%;height:320px;filter:Alpha(opacity=0);_filter:Alpha(opacity=0);opacity:.0;'></iframe>
+				<div  style="position:absolute;z-index:1;left:0;top:0;"><img src="$v[attach1]" width="480" height="320" /></div>
+				</div></td><td class="pobg2"></td></tr><tr><td class="bgcorner4"></td><td class="pobg3"></td><td class="bgcorner3"></td></tr></tbody></table></div>
+<!-- 
+EOT;
+}
+if($v[attach2]){print <<<EOT
+-->
+				<a href="$v[attach2]" target="_blank" onmouseover="getObj('tips2_$v[id]').style.display=''" onmouseout="getObj('tips2_$v[id]').style.display='none'">背面</a>
+				<div class="popout" id="tips2_$v[id]" style="display:none;position:absolute;left:10px;top:20px;"><table border="0" cellspacing="0" cellpadding="0"><tbody><tr><td class="bgcorner1"></td><td class="pobg1"></td><td class="bgcorner2"></td></tr><tr><td class="pobg4"></td><td><div class="popoutContent pr" style="width:480px;height:320px;">
+				<iframe frameborder='0' style='position:absolute;top:0;width:100%;height:320px;filter:Alpha(opacity=0);_filter:Alpha(opacity=0);opacity:.0;'></iframe>
+				<div  style="position:absolute;z-index:1;left:0;top:0;"><img src="$v[attach2]" width="480" height="320" /></div>
+				</div></td><td class="pobg2"></td></tr><tr><td class="bgcorner4"></td><td class="pobg3"></td><td class="bgcorner3"></td></tr></tbody></table></div>
+<!-- 
+EOT;
+}print <<<EOT
+-->
+            </td>
+            <td class="td2">$v[number]</td>
+          </tr>
+<!--
+EOT;
+}}
+print <<<EOT
+-->
+        </table>
+    </div>
+  <div class="cc mb10">$pagination</div>
+  <div class="mb10 tac">
+	<span class="btn">
+		<span><button type="button" onclick="initPost(2)">通过</button></span>
+	</span>
+	<span class="bt">
+		<span><button type="button" onclick="initPost(3)">拒绝</button></span>
+	</span>
+    <span class="bt"><span><button type="button" onclick="initPost(-1)">删 除</button></span></span>
+  </div>
+</form>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+
+<!--
+EOT;
+include_once PrintEot('adminbottom');
+?>-->

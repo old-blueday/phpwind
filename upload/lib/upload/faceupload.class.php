@@ -36,6 +36,7 @@ class FaceUpload extends uploadBehavior {
 
 	function update($uploaddb) {
 		$this->attachs = $uploaddb;
+		return true;
 	}
 
 	function getAttachs() {

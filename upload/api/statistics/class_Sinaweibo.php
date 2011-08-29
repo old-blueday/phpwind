@@ -156,6 +156,15 @@ class Statistics_Sinaweibo extends Statistics {
 	}
 	
 	/**
+	 * 新浪微博安装情况
+	 */
+	function getInstallInfo() {
+		$platformApiClient = $this->_getPlatformApiClient();
+		$response = $this->_jsonDecode($platformApiClient->get('weibo.stat.siteinfo'));
+		return new ApiResponse($response);
+	}
+	
+	/**
 	 * (30天)新浪与站点的用户top10的封装（数据量）
 	 * @param string $type 统计类型
 	 * @param int $days

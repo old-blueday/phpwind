@@ -145,7 +145,7 @@ print <<<EOT
 -->
 			<div class="c mb10"></div>
             <p class="mb10"><input name="shieldinfo[$key][$subkey]" type="checkbox" value="1"  onclick="checkAll(this,new Array($jsArray),'yes')" {$checked}>&nbsp;<span onclick="checkAll('shieldinfo[$key][$subkey]',new Array($jsArray),'no')">$subvalue[name]</span></p>
-            <ul class="ulC cc pl40 mb10">
+            <ul class="ulC cc mb20 belongs">
 <!--<?php
 EOT;
 foreach($subvalue['sub'] as $thirdkey => $thirdsub){
@@ -157,7 +157,7 @@ if($checked){
 }
 print <<<EOT
 --> 
-				<li><input name="shieldinfo[$key][$subkey][$thirdkey]" type="checkbox" value="1" onclick="up('shieldinfo[$key][$subkey]',new Array($jsArray),'yes')" {$control}>&nbsp;<span onclick="up('shieldinfo[$key][$subkey]',new Array($jsArray),'shieldinfo[$key][$subkey][$thirdkey]')">$thirdsub[name]</span></li>
+				<li style=""><input name="shieldinfo[$key][$subkey][$thirdkey]" type="checkbox" value="1" onclick="up('shieldinfo[$key][$subkey]',new Array($jsArray),'yes')" {$control}>&nbsp;<span onclick="up('shieldinfo[$key][$subkey]',new Array($jsArray),'shieldinfo[$key][$subkey][$thirdkey]')">$thirdsub[name]</span></li>
 <!--
 EOT;
 }

@@ -103,8 +103,10 @@ class PW_Ucuser {
 		pwQuery::update('pw_cmembers', 'uid=:uid', array($uid), array('username'=>$username));
 		
 		$this->db->update("UPDATE pw_area_level SET username=" . S::sqlEscape($username) . " WHERE uid=" . S::sqlEscape($uid));
-		$this->db->update("UPDATE pw_colonys SET admin=" . S::sqlEscape($username) . " WHERE admin=" . S::sqlEscape($oldname));
-		$this->db->update("UPDATE pw_announce SET author=" . S::sqlEscape($username) . " WHERE author=" . S::sqlEscape($oldname));
+		//* $this->db->update("UPDATE pw_colonys SET admin=" . S::sqlEscape($username) . " WHERE admin=" . S::sqlEscape($oldname));
+		pwQuery::update('pw_colonys', 'admin=:admin', array($oldname), array('admin'=>$username));
+		//* $this->db->update("UPDATE pw_announce SET author=" . S::sqlEscape($username) . " WHERE author=" . S::sqlEscape($oldname));
+		pwQuery::update('pw_announce','author=:author', array($oldname), array('author'=>$username));
 		$this->db->update("UPDATE pw_medalslogs SET awardee=" . S::sqlEscape($username) . " WHERE awardee=" . S::sqlEscape($oldname));
 
 		$upfid = array();

@@ -36,6 +36,7 @@ function ImgLoad()
 		},400);
 	}
 }
+
 </script>
 <img id="imgpre" src="$photo[path]" style="position:absolute;left:-10000px" onload="ImgLoad()" />
 	<div class="p15">
@@ -93,7 +94,7 @@ print <<<EOT
 -->
 				<div class="Albumbox cc">
 					<dl class="r_admininfo">
-					<dt class="Album"><a href="$viewurl" $ajaxclick><img src="$value[lastphoto]" onload="if(this.width>100){this.width = 100;} else if(this.height>100){this.height=100;}"  /></a></dt>
+					<dt class="Album"><a href="$viewurl" $ajaxclick><img src="$value[lastphoto]" onload="resizeImg(this)"  /></a></dt>
 					<dd>
 						<div class="c mb10">&nbsp;</div>
 						<p class="f16 b"><a href="$viewurl" $ajaxclick title="{$value[aname]}">{$value[sub_aname]}</a></p>
@@ -189,12 +190,12 @@ print <<<EOT
 EOT;
 foreach ($cnpho as $key => $value) {print <<<EOT
 -->
-					<li style="width:125px"><div class="aimg"><a href="{$basename}a=view&pid=$value[pid]{$friendurl}"><img src="$value[path]" /></a></div><p>
+					<li style="width:125px"><div class="aimg"><a href="{$basename}a=view&pid=$value[pid]{$friendurl}"><img onload="resizeImg(this)" src="$value[path]" /></a></div><p>
 <!--
 EOT;
 if ($isown || $photoService->isDelRight()) {print <<<EOT
 -->
-					<a href="javascript:;" class="adel" onclick="pwConfirm('是否确认删除?',this,function(){ajaxdel('$value[pid]')});" title="删除">删除</a><a href="{$basename}a=editphoto&pid=$value[pid]" class="aedit mr5" title="编辑">编辑</a>
+					<a href="javascript:;" class="adel" onclick="pwConfirmExtend('$deletePhotoCredit',this,function(){ajaxdel('$value[pid]')});" title="删除">删除</a><a href="{$basename}a=editphoto&pid=$value[pid]" class="aedit mr5" title="编辑">编辑</a>
 <!--
 EOT;
 }print <<<EOT
@@ -298,7 +299,7 @@ print <<<EOT
 EOT;
 } else {print <<<EOT
 -->
-								<div class="aimg"><a href="{$basename}a=view&pid=$value[pid]{$friendurl}#content"><img src="$value[path]" onload="if(this.width>100){this.width = 100;} else if(this.height>100){this.height=100;}" /></a></div>
+								<div class="aimg"><a href="{$basename}a=view&pid=$value[pid]{$friendurl}#content"><img src="$value[path]" onload="resizeImg(this);" /></a></div>
 <!--
 EOT;
 }print <<<EOT
@@ -325,7 +326,7 @@ EOT;
 								<div class="p15"><a href="javascript:;" class="fl">上一张</a></div>
 							</td>
 							<td height="400" style="vertical-align:middle">
-								<div class="tac p20" id="img-width"><img id="imgview" src="$photo[path]" onload="if(this.width>600){this.width = 600;}" /></div>
+								<div class="tac p20" id="img-width"><img id="imgview" title="新窗口打开原图" onclick="window.open('$photo[path]')" src="$photo[path]" onload="if(this.width>600){this.width = 600;}" /></div>
 							</td>
 							<td class="nextPhoto">
 								<div class="p15"><a href="javascript:;" class="fr">下一张</a></div>
@@ -341,7 +342,7 @@ if ($isown){print <<<EOT
 EOT;
 }if($isown || $photoService->isDelRight()){print <<<EOT
 -->
-<a href="javascript:;" onclick="pwConfirm('是否确认删除?',this,function(){ajaxdel('$photo[pid]')});" title="删除" class="s7">删除</a>
+<a href="javascript:;" onclick="pwConfirmExtend('$deletePhotoCredit',this,function(){ajaxdel('$photo[pid]')});" title="删除" class="s7">删除</a>
 <!--
 EOT;
 }print <<<EOT
@@ -451,7 +452,7 @@ EOT;
 								<input type="hidden" name="pid" value="$pid" />
 								<table cellpadding="0" cellspacing="0" width="100%" class="setTable">
 										<tr>
-												<th class="th">选择相册</th><td class="td"><div class="dropdown"><select name="aid" id="aidsel_info">{$options}</select></div></td>
+												<th class="th">选择相册</th><td class="td"><span class="dropdown"><select name="aid" id="aidsel_info">{$options}</select></span></td>
 										</tr>
 										<tr>
 												<th class="th">描述</th>
@@ -481,7 +482,7 @@ $formiframe=$shortcut?"<iframe src=javascript:; width=0 height=0 name='formifram
 if (empty($job)) {
 print <<<EOT
 -->
-<div class="p10 bdB mb10"><a href="{$basename}a=$a&job=flash&aid=$aid" class="current">批量上传</a></div>
+<div class="p10 bdB mb10"><a href="{$basename}a=$a&job=flash&aid=$aid"><span>批量上传</span></a>&nbsp;|&nbsp;<a href="{$basename}a=$a&aid=$aid" class="link_down s6"><span>普通上传</span></a></div>
 <div class="p10">
 <h5 class="h5 mb15"><strong>上传照片</strong></h5>
 <form action="{$basename}a=$a&job=$job" id="uploadPhotoForm" enctype="multipart/form-data" method="post" $shortcut >
@@ -496,7 +497,7 @@ $formiframe
 EOT;
 if ($options) {print <<<EOT
 -->
-				<div class="dropdown mr20"><select name="aid" id="aidsel_info" onchange="getallowflash(this.value);">{$options}</select></div>
+				<span class="dropdown mr20"><select name="aid" id="aidsel_info" onchange="getallowflash(this.value);">{$options}</select></span>
 				<a href="{$basename}a=createajax" onclick="return ajaxurl(this);" class="mr20">创建新相册</a>
 <!--
 EOT;
@@ -584,6 +585,7 @@ var charset = '$db_charset';
 initCheckTextNum('pintro_1','pintro_1_warn',255);
 initCheckTextNum('pintro_2','pintro_2_warn',255);
 initCheckTextNum('pintro_3','pintro_3_warn',255);
+/*
 function preview_img(id){
 	var photype = getObj('p_'+id);
 	var patn = /\.jpg$|\.jpeg$|\.png|\.bmp|\.gif$/i;
@@ -598,13 +600,13 @@ function preview_img(id){
 	} else {
 		showDialog('error','您选择的似乎不是图像文件。',2);
 	}
-}
+}*/
 </script>
 <!--
 EOT;
 } elseif ($job == 'flash') {print<<<EOT
 -->
-<div class="p10 bdB mb10"><a href="{$basename}a=$a&aid=$aid" class="current">普通上传</a></div>
+<div class="p10 bdB mb10"><a href="{$basename}a=$a&job=flash&aid=$aid" class="link_down s6"><span>批量上传</span></a>&nbsp;|&nbsp;<a href="{$basename}a=$a&aid=$aid"><span>普通上传</span></a></div>
 <div class="p10">
 <h5 class="h5 mb15"><strong>上传照片</strong></h5>
 <script type="text/javascript" src="js/photouploader.js"></script>
@@ -620,7 +622,7 @@ EOT;
 EOT;
 if ($options) {print <<<EOT
 -->
-				<div class="dropdown mr20"><select name="aid" id="aidsel_info" onchange="getallowflash(this.value);">{$options}</select></div>
+				<span class="dropdown mr20"><select name="aid" id="aidsel_info" onchange="getallowflash(this.value);">{$options}</select></span>
 				<a href="{$basename}a=createajax&job=flash" onclick="return ajaxurl(this);" class="mr20">创建新相册</a>
 <!--
 EOT;
@@ -632,23 +634,22 @@ EOT;
 		<tr>
 			<th class="th">选择照片</th>
 			<td class="td">
-				<p>单张照片不得大于{$o_maxfilesize}kb</p>
 				<div class="g_photosbox">
 					<div id="viewimg" class="menu mb10" style="display:none;"></div>
-                    <object id="mutiupload" name="mutiupload" classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" width="250" height="46">
-                      <param name="movie" value="images/uploader.swf" />
+                    <object id="mutiupload" name="mutiupload" classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" width="250" height="42">
+                      <param name="movie" value="$imgpath/photouploader.swf" />
+											<param name="wmode" value="transparent" />
                       <param name="FlashVars" value="url=$db_bbsurl%2Fjob.php%3Faction%3Dmutiuploadphoto"/>
                       <param name="allowScriptAccess" value="always" />
-                      <param name="wmode" value="transparent" />
                       <!--[if !IE]>-->
-                      <object type="application/x-shockwave-flash" data="images/uploader.swf" width="250" height="46" FlashVars="url=$db_bbsurl%2Fjob.php%3Faction%3Dmutiuploadphoto"  allowScriptAccess="always">
+                      <object type="application/x-shockwave-flash" data="$imgpath/photouploader.swf" width="250" height="42" FlashVars="url=$db_bbsurl%2Fjob.php%3Faction%3Dmutiuploadphoto&jsobject=uploader"  allowScriptAccess="always">
                       <!--<![endif]-->
                         <p>Alternative content</p>
                       <!--[if !IE]>-->
                       </object>
                       <!--<![endif]-->
                     </object>
-                    <table width="450"><tr><td class="wname">文件名</td><td>描述</td><td width="15%">大小</td><td width="25%">上传进度</td><td width="5%">删</td></tr><tbody id="qlist"></tbody></table>
+                    <table width="450"><tr><td class="wname">文件名</td><td>描述(单张照片不得大于{$o_maxfilesize}kb)</td><td width="15%">大小</td><td width="25%">上传进度</td><td width="5%">删</td></tr><tbody id="qlist"></tbody></table>
 					<div id="attsize"></div>
 				</div>
 			</td>
@@ -672,25 +673,39 @@ EOT;
 function getallowflash(aid) {
 	ajax.send('{$basename}a=getallowflash&aid='+aid,'',function() {
 		var job = '$job';
-		if(job == 'flash')
-		   uploader.setAlbumId(aid);
+		if(job == 'flash'){
+		   try{uploader.setAlbumId(aid);}catch(e){}
+		}
 		var rText = ajax.request.responseText.split('\\t');
 		if (rText[0] == 'ok') {
 			if ( rText[1] == 'infinite') {
-				if(job == "flash")
-					uploader.setLimits(Infinity);
+				if(job == "flash"){
+					try{uploader.setLimits(Infinity);}catch(e){};
+				}
+				try{uploader.isAlbumFull = false;}catch(e){};
 				getObj('allowflash').innerHTML = '';
 			} else if (rText[1]) {
-				if(job == "flash")
-					uploader.setLimits(rText[1]);
+				if(job == "flash"){
+					try{uploader.setLimits(rText[1]);}catch(e){};
+				}
 				getObj('allowflash').innerHTML = '您还可以上传'+rText[1]+'张照片';
-				uploader.countFile();
+				try{
+					uploader.isAlbumFull = false;
+					uploader.countFile();
+				}catch(e){};
 			} else {
 				getObj('allowflash').innerHTML = '请选择相册';
 			}
 		} else {
+			if(job == 'flash') uploader.setLimits(0);
+			getObj('allowflash').innerHTML = '此相册已满，请重新选择相册';
+			try{
+			uploader.isAlbumFull = true;
+			uploader.countFile();
+			}catch(e){};
 			ajax.guide();
 		}
+		getObj('viewimg').style.display = '';
 	});
 	return false;
 }
@@ -745,13 +760,13 @@ EOT;
 	</tr>
 	<tr>
 		<th class="th">可见度</th>
-		<td class="td"><div class="dropdown">
+		<td class="td"><span class="dropdown">
 			<select name="private" onchange="optionsel(this.value)" id="aidsel_info">
 				<option value="0" $select_0>全站用户可见</option>
 				<option value="1" $select_1>仅好友可见</option>
 				<option value="2" $select_2>仅自己可见</option>
 				<option value="3" $select_3>需要密码访问</option>
-			</select></div>
+			</select></span>
 		</td>
 	</tr>
 	<tbody id="photopwd" style="display:none">
@@ -815,7 +830,7 @@ EOT;
 -->
 	<tr>
 		<th class="th">&nbsp;</th>
-		<td class="td">
+		<td class="td" id="submit">
 		<span class="btn"><span><button type="submit" name="Submit">创建相册</button></span></span>
 		</td>
 	</tr>
@@ -832,7 +847,16 @@ function checkpost(obj) {
 		showDialog("error","请输入<span class='warnFontStyle'>相册名</span>",2);
 		return false;
 	}
-	SubmitAjax(obj);
+	var position =getObj('submit');
+	var createAlbumCredit = '$createAlbumCredit';
+	var createAlbum = '$createAlbum';
+	if (createAlbum) {
+		pwConfirmExtend(createAlbumCredit, position, function() {
+			SubmitAjax(obj);
+		});
+	} else {
+		SubmitAjax(obj);
+	}
 	return false;
 }
 //ajax提交数据

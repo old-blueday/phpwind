@@ -31,7 +31,8 @@ class postCate {
 	}
 
 	function getPcCache(){
-		@include_once pwCache::getPath(D_P.'data/bbscache/postcate_config.php');
+		//* @include_once pwCache::getPath(D_P.'data/bbscache/postcate_config.php');
+		extract(pwCache::getData(D_P.'data/bbscache/postcate_config.php', false));
 		$this->postcatedb =& $postcatedb;
 	}
 
@@ -253,7 +254,7 @@ class postCate {
 		$modeldb = explode(",",$this->forum->foruminfo['pcid']);
 
 		$selectmodelhtml = '';
-		$selectmodelhtml .= "<select name=\"pcid\" onchange=\"window.location.href='post.php?fid='+'$fid'+'&pcid='+this.value\" tabindex=\"2\">";
+		$selectmodelhtml .= "<select name=\"pcid\" onchange=\"window.onbeforeunload = function(){};window.location.href='post.php?fid='+'$fid'+'&pcid='+this.value\" tabindex=\"2\">";
 
 		foreach ($modeldb as $value) {
 			$selected = '';
@@ -300,7 +301,7 @@ class postCate {
 				$fieldone[$rt['fieldname']] = nl2br($fieldone[$rt['fieldname']]);
 			}
 			$rt['fieldvalue'] = $fieldone[$rt['fieldname']];
-			if (($rt['fieldvalue'] || $rt['fieldname'] == 'limitnum') && $rt['type'] != 'img' && $rt['type'] != 'upload'){
+			if ((S::isNatualValue($rt['fieldvalue']) || $rt['fieldname'] == 'limitnum') && $rt['type'] != 'img' && $rt['type'] != 'upload'){
 				$classname =  $i%2 == 0 ? 'two' : '';
 				$rt['rules'] && $rt['rules'] = unserialize($rt['rules']);
 				list($rt['name1'],$rt['name2']) = explode('{#}',$rt['name']);
@@ -390,7 +391,7 @@ class postCate {
 
 		$query = $this->db->query("SELECT fieldname,name,type,rules,ifmust,ifable FROM pw_pcfield WHERE pcid=".S::sqlEscape($this->pcid));
 		while ($rt = $this->db->fetch_array($query)) {
-			if ($rt['type'] != 'upload' && $rt['ifable'] && $rt['ifmust'] && !$postcate[$rt['fieldname']]) {
+			if ($rt['type'] != 'upload' && $rt['ifable'] && $rt['ifmust'] && !S::isNatualValue($postcate[$rt['fieldname']])) {
 				$db_topicname = $rt['name'];
 				Showmsg('topic_field_must');
 			}
@@ -461,7 +462,7 @@ class postCate {
 	}
 
 	function initSearchHtml($pcid) {/*获取前台团购搜索列表*/
-		global $fid;
+		global $fid, $searchname;
 
 		$searchhtml = "<form action=\"thread.php?fid=$fid&pcid=$pcid\" method=\"post\">";
 		$searchhtml .= "<input type=\"hidden\" name=\"topicsearch\" value=\"1\"><script language=\"JavaScript\" src=\"js/date.js\"></script><table>";
@@ -492,21 +493,23 @@ class postCate {
 				foreach (unserialize($rt['rules']) as $key => $value) {
 					$op_key = substr($value,0,strpos($value,'='));
 					$op_value = substr($value,strpos($value,'=')+1);
-					$searchhtml .= "<option value=\"".$op_key."\">".$op_value."</option>";
+					$selected = $searchname[$fieldid] == $op_key ? 'selected' : '';
+					$searchhtml .= "<option value=\"".$op_key."\" $selected>".$op_value."</option>";
 				}
 				$searchhtml .= '</select>';
 			} elseif ($type == 'checkbox') {
 				foreach(unserialize($rt['rules']) as $ck => $cv){
 					$op_key = substr($cv,0,strpos($cv,'='));
 					$op_value = substr($cv,strpos($cv,'=')+1);
-					$searchhtml .= "<input type=\"checkbox\" name=\"searchname[$fieldid][]\" value=\"$op_key\" /> $op_value ";
+					$checked = in_array($op_key, $searchname[$fieldid]) ? 'checked' : '';
+					$searchhtml .= "<input type=\"checkbox\" name=\"searchname[$fieldid][]\" value=\"$op_key\" $checked/> $op_value ";
 				}
 			} elseif ($type == 'calendar') {
-				$searchhtml .= "<input id=\"calendar_start_$rt[fieldid]\" type=\"text\" class=\"input\" name=\"searchname[$fieldid][start]\" onclick=\"ShowCalendar(this.id,1)\" size=\"$textsize\"/> - <input id=\"calendar_end_$rt[fieldid]\" type=\"text\" class=\"input\" name=\"searchname[$fieldid][end]\" onclick=\"ShowCalendar(this.id,1)\" size=\"$textsize\"/>";
+				$searchhtml .= "<input id=\"calendar_start_$rt[fieldid]\" type=\"text\" class=\"input\" name=\"searchname[$fieldid][start]\" value=\"{$searchname[$fieldid]['start']}\" onclick=\"ShowCalendar(this.id,1)\" size=\"$textsize\"/> - <input id=\"calendar_end_$rt[fieldid]\" type=\"text\" class=\"input\" name=\"searchname[$fieldid][end]\" value=\"{$searchname[$fieldid]['end']}\" onclick=\"ShowCalendar(this.id,1)\" size=\"$textsize\"/>";
 			} elseif ($type == 'range') {
-				$searchhtml .= "<input type=\"text\" size=\"5\" class=\"input\" name=\"searchname[$fieldid][min]\"/> - <input type=\"text\" size=\"5\" class=\"input\" name=\"searchname[$fieldid][max]\" size=\"$textsize\"/>";
+				$searchhtml .= "<input type=\"text\" size=\"5\" class=\"input\" name=\"searchname[$fieldid][min]\" value=\"{$searchname[$fieldid]['min']}\"/> - <input type=\"text\" size=\"5\" class=\"input\" name=\"searchname[$fieldid][max]\" value=\"{$searchname[$fieldid]['max']}\" size=\"$textsize\"/>";
 			} else {
-				$searchhtml .= "<input type=\"text\" size=\"$textsize\" name=\"searchname[".$fieldid."]\" value=\"\" class=\"input\">";
+				$searchhtml .= "<input type=\"text\" size=\"$textsize\" name=\"searchname[".$fieldid."]\" value=\"$searchname[$fieldid]\" class=\"input\">";
 			}
 			$searchhtml .= $name2."</td></tr>";
 		}

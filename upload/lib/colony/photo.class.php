@@ -393,7 +393,8 @@ class PW_Photo {
 		foreach($_FILES as $k=>$v){
 			(isset($v['name']) && $v['name'] != "") && $uploadNum++;
 		}
-		include_once pwCache::getPath(D_P.'data/bbscache/o_config.php');
+		//* include_once pwCache::getPath(D_P.'data/bbscache/o_config.php');
+		extract(pwCache::getData(D_P.'data/bbscache/o_config.php', false));
 		if($o_maxphotonum && ($albumInfo['photonum']+$uploadNum) > $o_maxphotonum ){
 			return 'colony_photofull';
 		}
@@ -407,14 +408,10 @@ class PW_Photo {
 		}
 		$photoNum = count($photos);
 		$pid = $img->getNewID();
-		$data = array(
-					'photonum' => intval($albumInfo['photonum'])+$photoNum,
-					'lasttime' => $this->_timestamp,
-				);
-		if(empty($albumInfo['lastphoto'])){
-			$data['lastphoto'] = $img->getLastPhotoThumb();
+	
+		if (empty($albumInfo['lastphoto'])) {
+			$albumDao->update(array('lastphoto' => $img->getLastPhotoThumb()), $aid);
 		}
-		$albumDao->update($data,$aid);				
 		return array($albumInfo,$pid,$photoNum,$photos);		
 	}
 	
@@ -505,13 +502,13 @@ class PW_Photo {
 			$result = $photoDao->getPhotosInfoByAid($photo['aid'],1,1);
 			$data['lastphoto'] = $this->getPhotoThumb($result[0]['path'],$result[0]['ifthumb']);
 		}
-		
 		$data['photonum'] = intval($photo['photonum'])-1;
 		$albumDao->update($data,$photo['aid']);
 		pwDelatt($photo['path'], $this->_dbifftp);
-		if($photo['ifthumb']){
-			pwDelatt($thumbPath, $this->_dbifftp);
-		}
+	//	if($photo['ifthumb']){
+		pwDelatt($thumbPath, $this->_dbifftp);
+	//		pwDelatt($path, $this->_dbifftp);
+	//	}
 		pwFtpClose($ftp);
 		$photo['uid'] = $this->_uid;
 		return $photo;
@@ -578,7 +575,8 @@ class PW_Photo {
 			!$paging && $this->_perpage = $album['photonum'];
 			$photoList = $photoDao->getPagePhotosInfoByAid($aid,$this->_page,$this->_perpage,1);
 			foreach ($photoList as $key => $value) {
-				$value['path']	= getphotourl($value['path'], $value['ifthumb'] && $ifthumb);
+				$value['defaultPath'] = $value['path'];
+				$value['path'] = getphotourl($value['path'], $value['ifthumb'] && $ifthumb);
 				if ($this->_dbshield && $userInfo['groupid'] == 6 && !$this->isPermission()) {
 					$value['path'] = $this->_pwModeImg.'/banuser.gif';
 				}

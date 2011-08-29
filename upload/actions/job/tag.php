@@ -11,7 +11,8 @@ $db_metakeyword = $metakeyword;
 $subject = $metakeyword . ' - ';
 $webPageTitle = $db_bbsname . '-' . $metakeyword;
 require_once (R_P . 'require/header.php');
-include_once pwCache::getPath(D_P . 'data/bbscache/forum_cache.php');
+//* include_once pwCache::getPath(D_P . 'data/bbscache/forum_cache.php');
+pwCache::getData(D_P . 'data/bbscache/forum_cache.php');
 
 $rs = $db->get_one('SELECT tagid,num FROM pw_tags WHERE tagname=' . S::sqlEscape($tagname));
 (!is_numeric($page) || $page < 1) && $page = 1;

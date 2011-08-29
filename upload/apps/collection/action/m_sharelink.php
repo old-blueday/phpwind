@@ -151,7 +151,8 @@ if ($type && in_array($type,array('user','photo','album','group','groupactive','
 /*
 * 用户组分享权限
 */
-include pwCache::getPath(D_P . 'data/bbscache/o_config.php');
+//* include pwCache::getPath(D_P . 'data/bbscache/o_config.php');
+pwCache::getData(D_P . 'data/bbscache/o_config.php');
 if ($groupid != 3 && $o_share_groups && strpos ( $o_share_groups, ",$groupid," ) === false) {
 	$shareGM = 1;
 }

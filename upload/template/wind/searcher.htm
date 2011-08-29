@@ -1,76 +1,195 @@
 <!--<?php print <<<EOT
 -->
-<div class="head cc">
-<h1 class="list_logo fl"><a href="$db_bbsurl/"><img src="images/wind/logo.png" title="$db_bbsname" /></a></h1>
-<div class="list_search fl">
-<form action="searcher.php" method="post" id="searchform"><input
-	type="hidden" value="$verifyhash" name="verify"> <input
-	value="2" class="s_input" type="hidden" name="step"> <input
-	value="thread" class="s_input" type="hidden" name="type"
-	id="hiddenType">
-<div class="fl">
-<!--
-EOT;
-require printEOT('searcher_advanced');
-print <<<EOT
---></div>
-<div class="search_all">
-<div id="searchType">
-<ul>
+<div class="header">
+<form action="searcher.php" method="post" id="searchform">
+<input type="hidden" value="$verifyhash" name="verify">
+<input value="2" class="s_input" type="hidden" name="step">
+<input value="thread" class="s_input" type="hidden" name="type" id="hiddenType">
+	<table width="100%"><tr>
+		<td width="176" class="vt"><h2 class="logo"><a href="$db_bbsurl/"><img src="images/wind/logo.png" title="$db_bbsname" /></a></h2></td>
+		<td>
+			<div id="searchType">
+				<ul>
 <!--
 EOT;
 if ($db_search_type) {
 	foreach ($db_search_type as $key=>$value) {
 print <<<EOT
 -->
-	<li id="{$key}"><a href="javascript:;">$value</a></li>
-	<!--
+					<li id="{$key}"><a href="javascript:;">$value</a></li>
+<!--
 EOT;
 	}
 } else {
 print <<<EOT
 -->
-	<li id="thread"><a href="javascript:;">帖子</a></li>
-	<li id="diary"><a href="javascript:;">日志</a></li>
-	<li id="user"><a href="javascript:;">用户</a></li>
-	<li id="forum"><a href="javascript:;">版块</a></li>
-	<li id="group"><a href="javascript:;">群组</a></li>
-	<!--
-EOT;
-}
-print <<<EOT
--->
-<script language="JavaScript">setCurrent('{$type}','thread','current');</script>
-</ul>
-</div>
-<div class="search_high"><a href="javascript:;" id="searchAdvanced">高级搜索</a></div>
-<div class="search_bg">
-<div class="search_ip"><input value="$keyword" class="s_input"
-	type="text" name="keyword"> <span>
-<button type="submit">搜 索</button>
-</span></div>
-</div>
-</div>
-</form>
-</div>
-</div>
+					<li id="thread"><a href="javascript:;">帖子</a></li>
+					<li id="diary"><a href="javascript:;">日志</a></li>
+					<li id="user"><a href="javascript:;">用户</a></li>
+					<li id="forum"><a href="javascript:;">版块</a></li>
+					<li id="group"><a href="javascript:;">群组</a></li>
 <!--
 EOT;
-if($keyword){
+}
+$keyword = stripslashes($keyword);
+print <<<EOT
+-->
+				</ul>
+			</div>
+			<script language="JavaScript">setCurrent('{$type}','thread','current');</script>
+			<div class="search_bg mr10">
+				<div class="search_ip">
+				<input value="$keyword" class="s_input" type="text" size="70" name="keyword">
+				<span><button type="submit">搜 索</button></span>
+				</div>
+			</div>
+			<a href="javascript:;" style="margin-top:8px;" class="fl" id="searchAdvanced">高级搜索</a>
+		</td>
+	</tr>
+	<tr>
+		<td></td>
+		<td>
+<!--
+EOT;
+require printEOT('searcher_advanced');
+print <<<EOT
+--></td>
+	</tr>
+	</table>
+</form>
+</div>
+
+<!--
+EOT;
+if($keyword || $isUseMysqlWithThread){
 	require printEOT('searcher_result');
 } else {
 	require printEOT('searcher_defaultresult');
 }
 print <<<EOT
 -->
-<script type="text/javascript" language="JavaScript" src="js/global.js"></script>
-<script type="text/javascript" language="JavaScript" src="js/date.js"></script>
+<style type="text/css">
+.aPre{cursor:url(u/images/pre.cur),auto;}
+.aNext{cursor:url(u/images/next.cur),auto;right:0;}
+</style>
+<div id="popImgbg" class="pImg_bg" style="display:none"></div>
+<div id="popImg" class="pImg_wrap" style="display:none"><table border="0" cellspacing="0" cellpadding="0"><tbody><tr><td class="bcr1"></td><td class="pibg1"></td><td class="bcr2"></td></tr><tr><td class="pibg4"></td><td><div class="pImg tac">
+<div id="imgLoading" class="imgLoading" style="margin:auto;">
+<div class="aPre" id="prevImg" title="上一张"></div>
+<div class="aNext" id="nextImg" title="下一张"></div>
+<img id="photo_path"  src="images/water/watermark.jpg" align="absmiddle" />
+</div>
+<div class="cc w" style="padding:10px 5px 5px;">
+	<div class="fl mr20" id="piccount"></div>
+	<a href="javascript://" class="pImg_close" onclick="closePopImg()">关闭</a>
+</div>
+</div></td><td class="pibg2"></td></tr><tr><td class="bcr4"></td><td class="pibg3"></td><td class="bcr3"></td></tr></tbody></table></div>
+<script type="text/javascript" src="js/global.js"></script>
+<script type="text/javascript" src="js/date.js"></script>
 <script type="text/javascript" src="js/searcher.js"></script>
 <script type="text/javascript">
 EOT;
 $type == 'special' && $type = "thread";
 print <<<EOT
 window.onReady(searcherInit,"$type"); 
+EOT;
+if (in_array($type, array('thread','special'))) {
+print <<<EOT
+	function toggleSidebar(){
+		var sidebar = getObj("sidebar");
+		var toggle = (sidebar.className == "main cc") ? 0: 1;
+		getObj('sidebar').className = (toggle == 0) ? "main cc sideClose " : "main cc";
+		getObj('siderInner').innerHTML = (toggle == 0)? "显示侧边栏": "隐藏侧边栏";
+		SetCookie('searchtoggle',toggle);
+	}
+
+	//图片预览
+	var preview, currentTid,  maxWidth, maxHeight, isLoading = false;
+	(function(){
+		var popbg = document.getElementById('popImgbg');
+		popbg.onmousedown = function(){
+			closePopImg();
+		}
+	})();
+	function imgCallback(str){
+		var text = ajax.request.responseText.split("\t");
+		if (text[0] == 'success'){
+			eval('var data ='+text[1]);
+			preview = new Image();
+			preview.onload = loadPreimg;
+			preview.src = data.view;
+			//修改左右箭头
+			var piccount = document.getElementById('piccount');
+			piccount.innerHTML = (data.total==1)?'':'第'+data.number+'张/共'+data.total+'张';
+			var prevImg = document.getElementById('prevImg'),
+				nextImg = document.getElementById('nextImg');
+			prevImg.style.display = nextImg.style.display =(data.total==1)? 'none': '';
+			prevImg.onclick = function(){
+				showImg(currentTid, data.imgid, 'prev');
+			};
+			nextImg.onclick = function(){
+				showImg(currentTid, data.imgid, 'next');
+			}
+		}else{
+			ajax.guide();
+		}
+	}
+	function loadPreimg(){
+		if(!isLoading){
+			return;
+		}
+		isLoading = false;
+		preview.onload = '';
+		var rect = document.compatMode === "CSS1Compat" ? document.documentElement : document.body;
+		maxHeight = rect.clientHeight-100;
+		maxWidth = rect.clientWidth-100;
+		var ratio = preview.width/preview.height;
+		//获取高宽
+		if(preview.width>maxWidth){
+			preview.width = maxWidth;
+			preview.height = maxWidth/ratio;
+		}
+		if(preview.height>maxHeight){
+			preview.height = maxHeight;
+			preview.width = maxHeight* ratio;
+		}
+		var popwin = document.getElementById('popImg'),
+			popbg =  document.getElementById('popImgbg'),
+			imgp = document.getElementById('photo_path'),
+			imgc = document.getElementById('imgLoading');
+		imgc.style.width = preview.width+'px';
+		imgc.style.height = preview.height+'px';
+		imgp.src = preview.src;
+		popbg.style.height = Math.max(rect.clientHeight-20, (document.documentElement.scrollHeight || document.body.scrollHeight))+'px';
+		popbg.style.display = popwin.style.display = 'block';
+		var w = popwin.clientWidth || parseInt(popwin.currentStyle.width),
+			h = popwin.clientHeight || parseInt(popwin.currentStyle.height);
+		popwin.style.left =( (document.documentElement.clientWidth || document.body.clientWidth)-w)/2 +'px';
+		popwin.style.top = ietruebody().scrollTop + ( (document.documentElement.clientHeight || document.body.clientHeight)-h)/2 +'px';
+	}
+	function showImg(tid, pid, direction){
+		//获取url
+		direction = direction || '';
+		isLoading = true;
+		var url = 'pw_ajax.php?action=showsearcherimg&tid='+tid+'&imgid='+pid + '&see=' +direction;
+		ajax.send(url ,  '',  imgCallback);
+		currentTid = tid;
+		return false;
+	}
+	function closePopImg(){
+		isLoading = false;
+		if(preview){
+			preview.onload = '';
+		}
+		var popwin = document.getElementById('popImg'),
+			popbg =  document.getElementById('popImgbg'),
+			imgp = document.getElementById('photo_path');
+		popbg.style.display = 'none';
+		popwin.style.display = 'none';
+	}
+EOT;
+}
+print <<<EOT
 </script>
 <!--
 EOT;

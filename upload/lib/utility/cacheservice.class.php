@@ -152,7 +152,7 @@ class Cache_Config_Default {
 	 * 唯一键值前缀
 	 */
 	function getUnique() {
-		return $GLOBALS['memcache']['hash'];
+		return $GLOBALS['db_memcache']['hash'];
 	}
 	
 	function getCurrentTime() {

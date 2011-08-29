@@ -1,8 +1,122 @@
  <!--<?php print <<<EOT
 -->
 <div id="breadCrumb">
-		<img align="absmiddle" src="$imgpath/wind/thread/home.gif" alt="forumlist" class="breadHome" /><em class="breadEm"></em><a href="$db_bfn_temp" title="$db_bbsname">$db_bbsname</a><em>&gt;</em>
+		<img align="absmiddle" src="$imgpath/wind/thread/home.gif" alt="forumlist" class="breadHome" /><em class="breadEm"></em><a href="$db_bfn_temp" title="$db_bbsname">$db_bbsname</a><em>&gt;</em><!--
+EOT;
+if($action=='del'){print <<<EOT
+-->
+				删除文章
 <!--
+EOT;
+}elseif($action=='move'){print <<<EOT
+-->
+				移动文章
+<!--
+EOT;
+}elseif($action=='copy'){print <<<EOT
+-->
+				复制文章
+<!--
+EOT;
+}elseif($action=='headtopic'){print <<<EOT
+-->
+				文章置顶操作
+<!--
+EOT;
+}elseif($action=='digest'){print <<<EOT
+-->
+				文章精华操作
+<!--
+EOT;
+}elseif($action=='type'){print <<<EOT
+-->
+				文章分类管理
+<!--
+EOT;
+}elseif($action=='check'){print <<<EOT
+-->
+				文章审核管理
+<!--
+EOT;
+}elseif($action=='lock'){print <<<EOT
+-->
+				文章锁定操作
+<!--
+EOT;
+}elseif($action=='pushtopic'){print <<<EOT
+-->
+				提前文章
+<!--
+EOT;
+}elseif($action=='edit'){print <<<EOT
+-->
+				加亮文章标题操作
+<!--
+EOT;
+}elseif($action=='unite'){print <<<EOT
+-->
+				主题合并操作
+<!--
+EOT;
+}elseif($action=='downtopic'){print <<<EOT
+-->
+				压帖操作
+<!--
+EOT;
+}elseif($action == 'push'){print <<<EOT
+-->
+				推送操作
+<!--
+EOT;
+}elseif($action == 'banuser'){print <<<EOT
+-->
+				禁言
+<!--
+EOT;
+}elseif($action == 'commend'){print <<<EOT
+-->
+				版主推荐
+<!--
+EOT;
+}elseif($action == 'multioverprint'){print <<<EOT
+-->
+				印戳
+<!--
+EOT;
+}print<<<EOT
+-->
+</div>
+<style type="text/css">
+.tr3 td,.tr3 th,.tr2 td,.tr2 th{padding-left:10px;}
+</style>
+<div id="pw_content">
+<!--
+EOT;
+if ($action == 'move') { 
+print <<<EOT
+-->
+<form name="form1" method="post" onsubmit="if(checkThreadCatesType()){return ajax_mawhole(this)};" action="mawhole.php?{$viewbbs}">
+<!--
+EOT;
+} else { 
+print <<<EOT
+-->
+<form name="form1" method="post" action="mawhole.php?{$viewbbs}" onsubmit="return ajax_mawhole(this);">
+<!--
+EOT;
+} print <<<EOT
+-->
+<input type="hidden" name="verify" value="$verifyhash" />
+<input type="hidden" name="action" value="$action" />
+<input type="hidden" name="fid"    value="$fid" />
+<input type="hidden" name="step"   value="2" />
+<input type="hidden" name="ajax"   value="1" />
+<!--
+EOT;
+if($threaddb){print <<<EOT
+-->
+<div class="t" style="margin-bottom:-1px;">
+<div class="h"><!--
 EOT;
 if($action=='del'){print <<<EOT
 -->
@@ -70,43 +184,15 @@ EOT;
 <!--
 EOT;
 }print<<<EOT
--->
-</div>
-<div id="pw_content">
-<!--
-EOT;
-if ($action == 'move') { 
-print <<<EOT
--->
-<form name="form1" method="post" onsubmit="if(checkThreadCatesType()){return ajax_mawhole(this)};" action="mawhole.php?{$viewbbs}">
-<!--
-EOT;
-} else { 
-print <<<EOT
--->
-<form name="form1" method="post" action="mawhole.php?{$viewbbs}" onsubmit="return ajax_mawhole(this);">
-<!--
-EOT;
-} print <<<EOT
--->
-<input type="hidden" name="verify" value="$verifyhash" />
-<input type="hidden" name="action" value="$action" />
-<input type="hidden" name="fid"    value="$fid" />
-<input type="hidden" name="step"   value="2" />
-<input type="hidden" name="ajax"   value="1" />
-<!--
-EOT;
-if($threaddb){print <<<EOT
--->
-<div class="t">
-<table width="100%" cellspacing="0" cellpadding="0" align="center">
-	<tr>
-		<td class="h" style="text-align:center" width="5%">ID</td>
-		<td class="h" style="text-align:center">标题</td>
-		<td class="h" style="text-align:center" width="15%">版块</td>
-		<td class="h" style="text-align:center" width="15%">作者</td>
-		<td class="h" style="text-align:center" width="8%">回复</td>
-		<td class="h" style="text-align:center" width="15%">发表时间</td>
+--></div>
+<table width="100%" cellspacing="0" cellpadding="0">
+	<tr class="tr2">
+		<td width="5%">ID</td>
+		<td>标题</td>
+		<td width="15%">版块</td>
+		<td width="15%">作者</td>
+		<td width="8%">回复</td>
+		<td width="15%">发表时间</td>
 	</tr>
 <!--
 EOT;
@@ -115,13 +201,13 @@ foreach($threaddb as $key=>$val){
 $id++;
 print <<<EOT
 -->
-	<tr class="tr3 tac">
-		<td><input type="checkbox" name="tidarray[]" value="$val[tid]" checked /></td>
-		<th>
-			<a href="read.php?tid=$val[tid]" target="_blank">$val[subject]</a>
-		</th>
+	<tr class="tr3">
+		<td><input type="checkbox" style="margin:0;padding:0;" name="tidarray[]" value="$val[tid]" checked /></td>
 		<td>
-			<a href="thread.php?fid=$val[fid]" target="_blank">{$forum[$val[fid]][name]}</a>
+			<a href="read.php?tid=$val[tid]" target="_blank" class="s4">$val[subject]</a>
+		</td>
+		<td>
+			<div style="line-height:18px;height:18px;overflow:hidden;"><a href="thread.php?fid=$val[fid]" target="_blank" title="{$forum[$val[fid]][name]}">{$forum[$val[fid]][name]}</a></div>
 		</td>
 		<td>
 <!--
@@ -154,8 +240,8 @@ EOT;
 <div class="t">
 <script language="JavaScript" src="js/date.js"></script>
 <script language="JavaScript" src="js/desktop/Compatibility.js"></script>
-<table width="100%" cellspacing="0" cellpadding="0" align="center">
-	<tr><td class="h" colspan="2">管理选项:</td></tr>
+<div class="h">管理选项:</div>
+<table width="100%" cellspacing="0" cellpadding="0">
 <!--
 EOT;
 if($action=='headtopic'){print <<<EOT
@@ -271,40 +357,41 @@ if($action=='headtopic'){print <<<EOT
 	}
 </script>
 	<tr class="tr3">
-		<th width="20%" style="text-align:right;">管理选项:</th>
+		<th width="80">管理选项:</th>
 <!--
 EOT;
 $_tight = pwRights($isBM,'topped');
 print <<<EOT
 -->
 		<th>
-			<input type="radio" name="topped" value="0" $topped_0 onclick="changeForums(this.value,'$selforums','$_tight')"/> 取消置顶
-			<input type="radio" name="topped" value="1" $topped_1 onclick="changeForums(this.value,'$selforums','$_tight')"/> 版块置顶
+			<label class="mr10"><input type="radio" name="topped" value="0" $topped_0 onclick="changeForums(this.value,'$selforums','$_tight')"/> 取消置顶</label>
+			<label class="mr10"><input type="radio" name="topped" value="1" $topped_1 onclick="changeForums(this.value,'$selforums','$_tight')"/> 版块置顶</label>
 
 <!--
 EOT;
 if(!$isGM && pwRights($isBM,'topped')==2){
 print <<<EOT
 -->
-			<input type="radio" name="topped" value="2" $topped_2 onclick="changeForums(this.value,'$selforums','$_tight')"/> 分类置顶
+			<label class="mr10"><input type="radio" name="topped" value="2" $topped_2 onclick="changeForums(this.value,'$selforums','$_tight')"/> 分类置顶</label>
 <!--
 EOT;
 } elseif($isGM || pwRights($isBM,'topped')==3 || pwRights($isBM,'topped')==4){
 print <<<EOT
 -->
-			<input type="radio" name="topped" value="2" $topped_2 onclick="changeForums(this.value,'$selforums','$_tight')"/> 分类置顶
-			<input type="radio" name="topped" value="3" $topped_3 onclick="changeForums(this.value,'$selforums','$_tight')"/> 全局置顶
+			<label class="mr10"><input type="radio" name="topped" value="2" $topped_2 onclick="changeForums(this.value,'$selforums','$_tight')"/> 分类置顶</label>
+			<label class="mr10"><input type="radio" name="topped" value="3" $topped_3 onclick="changeForums(this.value,'$selforums','$_tight')"/> 全局置顶</label>
 <!--
 EOT;
 }print <<<EOT
 -->
 		</th>
 	</tr>
-	<tr class="tr3" id="forumsDiv" style="display: none">
-		<th  width="20%" style="text-align:right;">选择置顶版块:<br>（按Ctrl可多选）</th>
+	<tr class="tr3 vt" id="forumsDiv" style="display: none">
+		<th width="80">选择置顶版块:</th>
 		<th>
 			<input type="hidden" value="" name="defaultSelForums" id="defaultSelForums"/>
-			<select multiple="multiple" size='10' name="selForums[]" id="selForums" style="min-width: 300px;"></select>
+			<select multiple="multiple" size='10' name="selForums[]" id="selForums" style="min-width: 300px; vertical-align:top;"></select>
+			<span class="gray">按Ctrl可多选</span>
 		</th>
 	</tr>
 <!--
@@ -313,9 +400,9 @@ if($forumset['overprint'] && ($isGM || pwRights($isBM,'overprint')==1 ) && check
 print <<<EOT
 -->
 <tr class="tr3">
-<td width="20%" align="right">印戳设置:</td>
+<td width="80">印戳设置:</td>
 	<td>
-		<input type="checkbox" name="overprint" value="1"  /> 同时显示印戳
+		<label class="mr10"><input type="checkbox" name="overprint" value="1"  /> 同时显示印戳</label>
 	</td>
 </tr>
 <!--
@@ -327,7 +414,7 @@ print <<<EOT
 changeForums('$deftopped','$selforums','$_tight');
 </script>
     <tr class="tr3">
-    	<th width="20%" style="text-align:right;">到期时间:</th>
+    	<th width="80">到期时间:</th>
     	<th><input class="input" type="text" name="timelimit" size="16" id="timelimit" value="$timelimit" onclick="ShowCalendar(this.id,1);" /></th></tr>
 <!--
 EOT;
@@ -350,11 +437,11 @@ EOT;
     }
 </script>
 	<tr class="tr3">
-	<th width="20%" style="text-align:right;">管理选项:</th>
+	<th width="80">管理选项:</th>
 	<th>
-		<input type="radio" name="digest" value="0" $digest_0 />取消精华
-		<input type="radio" name="digest" value="1" $digest_1 />精华I
-		<input type="radio" name="digest" value="2" $digest_2 />精华II
+		<label class="mr10"><input type="radio" name="digest" value="0" $digest_0 />取消精华</label>
+		<label class="mr10"><input type="radio" name="digest" value="1" $digest_1 />精华I</label>
+		<label class="mr10"><input type="radio" name="digest" value="2" $digest_2 />精华II</label>
 	</th>
 	</tr>
 <!--
@@ -363,9 +450,9 @@ if($forumset['overprint'] && ($isGM || pwRights($isBM,'overprint')==1 ) && check
 print <<<EOT
 -->
 <tr class="tr3">
-<td width="20%" align="right">印戳设置:</td>
+<td width="80">印戳设置:</td>
 	<td>
-		<input type="checkbox" name="overprint" value="1"  /> 同时显示印戳
+		<label><input type="checkbox" name="overprint" value="1"  /> 同时显示印戳</label>
 	</td>
 </tr>
 <!--
@@ -394,11 +481,11 @@ EOT;
 	}
 </script>
 	<tr class="tr3">
-	<th width="20%" style="text-align:right;">管理选项:</th>
+	<th width="80">管理选项:</th>
 	<th>
-	<input type="radio" name="locked" value="0" $lock_0 />解除锁定
-	<input type="radio" name="locked" value="1" $lock_1 />锁定
-	<input type="radio" name="locked" value="2" $lock_2 />关闭主题
+	<label class="mr10"><input type="radio" name="locked" value="0" $lock_0 />解除锁定</label>
+	<label class="mr10"><input type="radio" name="locked" value="1" $lock_1 />锁定</label>
+	<label class="mr10"><input type="radio" name="locked" value="2" $lock_2 />关闭主题</label>
 	</th>
 	</tr>
 
@@ -408,9 +495,9 @@ if($forumset['overprint'] && ($isGM || pwRights($isBM,'overprint')==1 ) && check
 print <<<EOT
 -->
 <tr class="tr3">
-<td width="20%" align="right">印戳设置:</td>
+<td width="80">印戳设置:</td>
 	<td>
-		<input type="checkbox" name="overprint" value="1"  /> 同时显示印戳
+		<label><input type="checkbox" name="overprint" value="1"  /> 同时显示印戳</label>
 	</td>
 </tr>
 <!--
@@ -424,8 +511,8 @@ EOT;
 }elseif($action=='pushtopic'){print <<<EOT
 -->
 	<tr class="tr3">
-		<th width="20%" style="text-align:right;">提前时间:</th>
-		<th><input type="text" class="input" name="pushtime" value="0" /> 小时
+		<th width="80">提前时间:</th>
+		<th><input type="text" class="input" size="3" name="pushtime" value="0" /> 小时
 <!--
 EOT;
 if($pushtime_top){print <<<EOT
@@ -438,7 +525,7 @@ EOT;
 		 </th>
 	</tr>
 	<tr class="tr3">
-		<th style="text-align:right;">管理选项:</th>
+		<th width="80">管理选项:</th>
 		<th>提前帖子</th>
 	</tr>
 <!--
@@ -447,9 +534,9 @@ if($forumset['overprint'] && ($isGM || pwRights($isBM,'overprint')==1 ) && check
 print <<<EOT
 -->
 <tr class="tr3">
-<td width="20%" align="right">印戳设置:</td>
+<td width="80">印戳设置:</td>
 	<td>
-		<input type="checkbox" name="overprint" value="1"  /> 同时显示印戳
+		<label><input type="checkbox" name="overprint" value="1"  /> 同时显示印戳</label>
 	</td>
 </tr>
 <!--
@@ -463,13 +550,14 @@ EOT;
 }elseif($action=='downtopic'){print <<<EOT
 -->
 	<tr class="tr3">
-		<th width="20%" style="text-align:right;">压后时间:</th>
+		<th width="80">压后时间:</th>
 		<th><input type="text" class="input" name="timelimit" value="24" /> (时)</th>
 	</tr>
 	<tr class="tr3">
-		<th style="text-align:right;">允许上浮:</th>
-		<th><input type="radio" name="ifpush" value="0" $lock_0 />开启
-		<input type="radio" name="ifpush" value="1" $lock_1 />关闭</th>
+		<th width="80">允许上浮:</th>
+		<th>
+			<label class="mr10"><input type="radio" name="ifpush" value="0" $lock_0 />开启</label>
+			<label class="mr10"><input type="radio" name="ifpush" value="1" $lock_1 />关闭</label></th>
 	</tr>
 <!--
 EOT;
@@ -477,9 +565,9 @@ if($forumset['overprint'] && ($isGM || pwRights($isBM,'overprint')==1 ) && check
 print <<<EOT
 -->
 <tr class="tr3">
-<td width="20%" align="right">印戳设置:</td>
+<td width="80">印戳设置:</td>
 	<td>
-		<input type="checkbox" name="overprint" value="1"  /> 同时显示印戳
+		<label class="mr10"><input type="checkbox" name="overprint" value="1"  /> 同时显示印戳</label>
 	</td>
 </tr>
 <!--
@@ -493,7 +581,7 @@ EOT;
 }elseif($action=='type'){print <<<EOT
 -->
 	<tr class="tr3">
-		<th width="20%" style="text-align:right;">选择主题分类:</th>
+		<th width="80">选择主题分类:</th>
 		<th>
 <!--
 EOT;
@@ -571,7 +659,7 @@ checkform = function(){
 </td>
 </tr>
 	<tr class="tr3">
-		<th width="20%" style="text-align:right;">选择目的版块:</th>
+		<th width="80">选择目的版块:</th>
 		<th><select name="to_id" id="to_id" onchange="getThreadCates(this.value)">$forumcache
 <!--
 EOT;
@@ -591,7 +679,7 @@ EOT;
 		</select></th>
 	</tr>
 	<tr class="tr3">
-		<th width="20%" style="text-align:right;">主题分类:</th>
+		<th width="80">主题分类:</th>
 		<th><div id="innerselect" class="fl"><select name="to_threadcate" id="to_threadcate" onchange="getSubType(this.value)">
 		<option value="">无主题分类</option>
 		</select></div><div id="subtypeselect" ></div></th>
@@ -687,15 +775,6 @@ function getSubType(id){
 EOT;
 }elseif($action=='edit'){print <<<EOT
 -->
-<style type="text/css">
-.pwnew span{float:left;margin-left:5px;}
-.pwnew a{padding:0;margin:0;display:block;height:16px;width:16px;float:left;line-height:16px;border:1px solid #dbe4e9;color:#333333;cursor:pointer;}
-.pwnew a:hover{border:1px solid #b0c8e0;background:#f9f9f9;color:#333333;}
-.pwnew .one,.pwnew .one:hover{border: 1px solid #333333;background:#cde2f6;color:#333333;}
-.pwnew b:hover,.pwnew i:hover{text-decoration:none;}
-.pwnew .two{background:url($imgpath/menu-down.gif) right center no-repeat;width:30px;cursor:pointer;}
-.pwnew .two:hover{background:$forumcolortwo url($imgpath/menu-down.gif) right center no-repeat;text-decoration:none;}
-</style>
 <script type="text/javascript" language="JavaScript" src="js/color_picker.js"></script>
 <script type="text/javascript">
 function pickReback(color){
@@ -725,13 +804,13 @@ function colorCancel(){
 }
 </script>
 	<tr class="tr3">
-		<th style="text-align:right;">管理选项:</th>
+		<th width="80">管理选项:</th>
 		<th>
 			<div class="pwnew tac">
 				<span title="粗体字"><b><a onclick="styleOnclick(this,'title2')" class="$stylename[1]">B</a></b></span>
 				<span title="斜体字"><i><a onclick="styleOnclick(this,'title3')" class="$stylename[2]">I</a></i></span>
 				<span title="下划线"><u><a onclick="styleOnclick(this,'title4')" class="$stylename[3]">U</a></u></span>
-				<span id="color_show" style="width:30px;margin-top:1px;border:1px solid $tablecolor;float:left;height:14px;background:$titlecolor;cursor:pointer;" title="点击取消颜色" onclick="colorCancel()"></span>
+				<span id="color_show" title="点击取消颜色" onclick="colorCancel()"></span>
 				<span title="颜色选择"><a class="two tal" onclick="showColorPicker(this,document.form1.title1,function(){pickReback(color_picker)})"><img src="$imgpath/pickcolor.gif"  /></a></span>
 				<input id="title1" name="title1" type="hidden" value="$titlecolor" />
 				<input id="title2" name="title2" type="hidden" value="{$titledetail[1]}" />
@@ -740,7 +819,7 @@ function colorCancel(){
 			</div>
 		</th>
 	</tr>
-	<tr class="tr3"><th style="text-align:right;">有效时间:</th>
+	<tr class="tr3"><th width="80">有效时间:</th>
 	<th><input class="input" type="text" name="timelimit" size="4" /> 天</th></tr>
 <!--
 EOT;
@@ -748,7 +827,7 @@ if($forumset['overprint'] && ($isGM || pwRights($isBM,'overprint')==1 ) && check
 print <<<EOT
 -->
 <tr class="tr3">
-<td width="20%" align="right">印戳设置:</td>
+<td width="80">印戳设置:</td>
 	<td>
 		<input type="checkbox" name="overprint" value="1"  /> 同时显示印戳
 	</td>
@@ -764,11 +843,11 @@ EOT;
 }elseif($action=='del'){print <<<EOT
 -->
 	<tr class="tr3">
-		<th width="20%" style="text-align:right;">扣除积分:</th>
+		<th width="80">扣除积分:</th>
 		<th>
-			<input  value="{$jumptype}" name="jumptype" type="hidden" />
-			<input type="radio" name="ifdel" value="1" checked />开启
-			<input type="radio" name="ifdel" value="0" />关闭
+			<input value="{$jumptype}" name="jumptype" type="hidden" />
+			<label class="mr10"><input type="radio" name="ifdel" value="1" checked />开启</label>
+			<label class="mr10"><input type="radio" name="ifdel" value="0" />关闭</label>
 		</th>
 	</tr>
 <!--
@@ -776,18 +855,18 @@ EOT;
 }elseif($action=='unite'){print <<<EOT
 -->
 	<tr class="tr3">
-		<th width="20%" style="text-align:right;">合并帖子:</th>
+		<th width="80">合并帖子:</th>
 		<th>
 <!--
 EOT;
 if($unitetype == 'from'){print <<<EOT
 -->
-		<input class="input" type="text" name="unitetid" size="15" /> (输入来源帖子的tid,多个用“,”分开)
+		<input class="input input_wa mr5" type="text" name="unitetid" /> (输入来源帖子的tid,多个用“,”分开)
 <!--
 EOT;
 } else{print <<<EOT
 -->
-		<input class="input" type="text" name="unitetid" size="15" /> ((输入来源帖子的tid,多个用“,”分开))
+		<input class="input input_wa mr5" type="text" name="unitetid" /> (输入来源帖子的tid,多个用“,”分开)
 <!--
 EOT;
 }print <<<EOT
@@ -800,7 +879,7 @@ EOT;
 }elseif($action == 'push'){print<<<EOT
 -->
 <tr class="tr3">
-	<th width="20%" style="text-align:right;">推送位置:</th>
+	<th width="80">推送位置:</th>
 	<th><b>{$pushs[$pushto][name]}</b></th>
 </tr>
 <!--
@@ -808,16 +887,16 @@ EOT;
 if($params[title]){print<<<EOT
 -->
 <tr class="tr3">
-	<th style="text-align:right;">标题:</th>
-	<th><input type="text" class="input" name="subject" value="$subject" size="54" /></th>
+	<th width="80">标题:</th>
+	<th><input type="text" class="input input_wb" name="subject" value="$subject" /></th>
 </tr>
 <!--
 EOT;
 }if($params[url]){print<<<EOT
 -->
 <tr class="tr3">
-	<th style="text-align:right;">链接:</th>
-	<th><input type="text" class="input" name="url" value="$url" size="54"/></th>
+	<th width="80">链接:</th>
+	<th><input type="text" class="input input_wb" name="url" value="$url"/></th>
 </tr>
 <!--
 EOT;
@@ -828,7 +907,7 @@ EOT;
 if($imgdb){print<<<EOT
 -->
 <tr class="tr3">
-	<th style="text-align:right;">图片选择</th>
+	<th width="80">图片选择</th>
 	<th>
 <!--
 EOT;
@@ -849,16 +928,16 @@ EOT;
 }print<<<EOT
 -->
 <tr class="tr3">
-	<th width="20%" style="text-align:right;">自定义图片:</th>
-	<th><input class="input" type="text" name="cimgurl" value="" size="54" /> ((如果设置自定义图片地址，以自定义图片为准))</th>
+	<th width="80">自定义图片:</th>
+	<th><input class="input" size="3" type="text" name="cimgurl" /> ((如果设置自定义图片地址，以自定义图片为准))</th>
 </tr>
 <!--
 EOT;
 }if($params[value]){print<<<EOT
 -->
-<tr class="tr3">
-	<th style="text-align:right;">摘要:</th>
-	<th><textarea name="content" value="$content" style="overflow:auto;width:300px;height:80px;" />$content</textarea></th>
+<tr class="tr3 vt">
+	<th width="80">摘要:</th>
+	<th><textarea name="content" value="$content" class="textareaA" />$content</textarea></th>
 </tr>
 <!--
 EOT;
@@ -872,35 +951,116 @@ EOT;
 <input type="hidden" name="pushto" value="$pushto" />
 <!--
 EOT;
+} elseif ($action == 'banuser') {
+$usernames = implode(',', $userInfo);
+$relation = '';
+foreach ($relations as $key => $value) {
+	$relation .= $relation ? ",$key:$value" : "$key:$value";
+}
+print <<<EOT
+-->
+<tr class="tr3">
+	<th width="80">禁言对象:</th>
+	<th>{$usernames}</th>
+</tr>
+<tr class="tr3">
+	<th width="80">禁言范围:</th>
+	<th>
+		<label class="mr20"><input type="radio" name="range" value="0" checked />{$forum[$fid][name]}</label>
+<!--
+EOT;
+if($isGM || $SYSTEM['banuser']){print <<<EOT
+-->
+		<label class="mr20"><input type="radio" name="range" value="1" />全局禁言</label>
+<!--
+EOT;
+if ($SYSTEM[banuserip]){print <<<EOT
+-->
+		<label><input type="checkbox" name="banip" value="1" /> 禁止该 IP</label>
+<!--
+EOT;
+}}print <<<EOT
+-->
+	</th>
+</tr>
+<tr class="tr3">
+	<th width="80">禁言类型:</th>
+	<th>
+		<label class="mr20"><input type="radio" name="type" value="1" checked />定期禁言</label>
+<!--
+EOT;
+if($isGM || $SYSTEM['bantype']){print <<<EOT
+-->
+			<label><input type="radio" name="type" value="2" />永久禁言</label>
+<!--
+EOT;
 }print <<<EOT
 -->
+	</th>
+</tr>
+<tr class="tr3">
+	<th width="80">禁言时间:</th>
+	<th><input class="input" type="text" name="limit" value="1" size="5" /> 天(最大天数<span class="s1">$pwBanMax</span>天)</th>
+</tr>
+<input type="hidden" name="relation" value="$relation" />
+<input type="hidden" name="fid" value="$fid" />
+<input type="hidden" name="step" value="3" />
+<!--
+EOT;
+} elseif ($action == 'multioverprint') {
+print <<<EOT
+-->
+$overPrintContent
+<input type="hidden" name="oid" id="oid" />
+<script language="javascript">
+function setOid(obj,oid) {
+	if (!oid) return false;
+	var divObj = getObj('odiv');
+	var aElements = divObj.getElementsByTagName('a');
+	for (var i=0;i<aElements.length;i++) {
+		aElements[i].className = '';
+	}
+	obj.className = 'current';
+	getObj('oid').value = oid;
+}
+</script>
+<!--
+EOT;
+}
+if ($action != 'multioverprint') {
+print <<<EOT
+-->
 	<tr class="tr3">
-		<th width="20%" style="text-align:right;">消息通知:</th>
+		<th width="80">消息通知:</th>
 		<th>
-			<input type="radio" name="ifmsg" value="1" checked />开启
-			<input type="radio" name="ifmsg" value="0" />关闭
+			<label class="mr10"><input type="radio" name="ifmsg" value="1" checked />开启</label>
+			<label class="mr10"><input type="radio" name="ifmsg" value="0" />关闭</label>
 		</th>
 	</tr>
-	<tr class="tr3">
-		<th style="text-align:right;">操作原因:</th>
-		<th>			<textarea name="atc_content" rows="8" cols="80"></textarea>
+	<tr class="tr3 vt">
+		<th width="80">操作原因:</th>
+		<th>
 <!--
 EOT;
 if($db_adminreason){print <<<EOT
 -->
-			<select name="" size="8" multiple onchange="this.form.atc_content.value=this.value">
+			<p><select class="select_wa mb5" style="border:1px solid #ccc;width:340px;" onchange="this.form.atc_content.value=this.value">
 				<option value="">自定义</option>
 				<option value="">-------</option>
 				$reason_sel
-			</select>
+			</select></p>
 <!--
 EOT;
 }print <<<EOT
 -->
-
+			<textarea name="atc_content" class="textareaA"></textarea>
 		</th>
 	</tr>
-	<tr><td></td><td style="padding:.5em 5em;">
+<!--
+EOT;
+}print <<<EOT
+-->
+	<tr><td>&nbsp;</td><td style="padding:.5em 7px;">
 <!--
 EOT;
 if(($action=='edit' || $action=='digest' || $action=='headtopic' || $action=='pushtopic') && $seltid){
@@ -916,7 +1076,8 @@ print <<<EOT
 EOT;
 } print <<<EOT
 -->
-&nbsp;<input class="btn" type="submit" name="Submit" value="提 交" style="margin-left:5px;" /><a class="btn3" style="cursor:pointer;" type="button" onclick="javascript:history.go(-1)" />返 回</a>
+<span class="mr10"><span class="btn"><span><button type="submit" name="Submit">提 交</button></span></span></span>
+<a class="s4 cp" onclick="javascript:history.go(-1)" />返 回</a>
 	</td></tr>
 </table></div>
 </form>
@@ -924,6 +1085,7 @@ EOT;
 <script type="text/javascript" src="js/pw_post.js"></script>
 <script type="text/javascript" src="js/global.js"></script>
 <script type="text/javascript">
+var action = '$action';
 function ajax_mawhole(obj){
 	if(typeof checkform == 'function'){
 		return checkform(obj);
@@ -949,7 +1111,7 @@ function ajax_mawhole(obj){
 		showDialog({message:'请选择要操作的帖子！',autoHide:3});
 		return false;
 	}
-	if (dbreason == 1 &&　obj.atc_content.value == ''){
+	if (dbreason == 1 && action != 'multioverprint' && obj.atc_content.value == ''){
 		showDialog({message:'请输入操作原因！',autoHide:3});
 		return false;
 	}

@@ -20,6 +20,7 @@ print <<<EOT
 <tr>
 <!--
 EOT;
+if ($groupId == 2) {
 foreach($rateConfigs as $config){
 if($config[isopen] == 1){
 print <<<EOT
@@ -28,6 +29,13 @@ print <<<EOT
 <!--
 EOT;
 }
+}
+} else {
+print <<<EOT
+-->
+	$rateResultHtml
+<!--
+EOT;
 }
 print <<<EOT
 -->

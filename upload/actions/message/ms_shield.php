@@ -29,7 +29,8 @@ if(empty($action)){
 		}
 		//屏蔽的用户组
 		if($_G['msggroup'] && $messageServer->getMsKey('blackgroup')){	
-			include_once pwCache::getPath(D_P.'data/bbscache/level.php');
+			//* include_once pwCache::getPath(D_P.'data/bbscache/level.php');
+			pwCache::getData(D_P.'data/bbscache/level.php');
 			$blackInsert = array();
 			foreach($ltitle as $key => $value){
 				if(!$blackgroup[$key]){
@@ -50,7 +51,8 @@ if(empty($action)){
     $allShieldCheck = $shield ? 0 : 1; 
     $config['blacklist'] && $blacklist = implode(',',unserialize($config['blacklist']));
 	if ($_G['msggroup']) {
-	 	include_once pwCache::getPath(D_P.'data/bbscache/level.php');	
+	 	//* include_once pwCache::getPath(D_P.'data/bbscache/level.php');	
+	 	pwCache::getData(D_P.'data/bbscache/level.php');	
 		$config['blackgroup'] && $blackgroup = unserialize($config['blackgroup']);
 		$allColonyCheck = $blackgroup ? 0 :1;
 		$usergroup = '';
@@ -113,6 +115,7 @@ function createHTML($applist){
 	            'name' => '站内信',
 	            'value' => 1,
 	            'sub' => array(
+						/* modified for phpwind8.5
 	                    'message' => array(
 	                    			'name'=>'好友给我空间的留言','value'=>1
 									 ),
@@ -124,6 +127,7 @@ function createHTML($applist){
 									'photo' => array('name'=>'好友评论我的相册','value'=>1),
 									)
 								),
+						*/
 			    		'ratescore'=>array('name'=>'评分','value'=>1),
 						'reply'=>array('name'=>'帖子回复','value'=>1)         	  
 	                )
@@ -132,7 +136,18 @@ function createHTML($applist){
 	    'notice' => array(
 	            'name'  => '通知',
 	            'value' => 1,
-	            'sub'   => array(	          
+	            'sub'   => array(
+	         			'guestbook' => array(
+	                    			'name'=>'好友给我空间的留言','value'=>1
+									 ),
+						'comment' => array(
+	                    		'name'=>'好友对我的评论',
+	                    		'value'=>1,
+	                    		'sub'=>array(
+									'diary' => array('name'=>'好友评论我的日志','value'=>1),
+									'photo' => array('name'=>'好友评论我的相册','value'=>1),
+									)
+								),	          
 	                	'postcate' => array(
 	                		'name' => '团购通知','value' => 1
 	                	),

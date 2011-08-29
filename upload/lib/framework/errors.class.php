@@ -1,4 +1,5 @@
 <?php
+!defined('P_W') && exit('Forbidden');
 /**
  * 错误与日志基类
  */
@@ -30,7 +31,7 @@ class PW_Errors {
 		$logFile = D_P.'data/error.log';
 		if (!$this->_logs) return false;
 		$temp = pw_var_export($this->_logs);
-		pwCache::setData($logFile,$temp, false, 'rb+');
+		pwCache::writeover($logFile,$temp, 'rb+');
 	}
 	/**
 	 * 检查是否有错误信息，有的话及时报错

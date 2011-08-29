@@ -97,10 +97,12 @@ if ($adminitem == 'level'){
 			}
 			empty($gid) && $gid = 1;
 			if (file_exists(D_P . "data/groupdb/group_$gid.php") && $gid != 1) {
-				include_once pwCache::getPath(S::escapePath(D_P . "data/groupdb/group_$gid.php"));
+				//* include_once pwCache::getPath(S::escapePath(D_P . "data/groupdb/group_$gid.php"));
+				pwCache::getData(S::escapePath(D_P . "data/groupdb/group_$gid.php"));
 				$default = 0;
 			} else {
-				include_once pwCache::getPath(D_P . "data/groupdb/group_1.php");
+				//* include_once pwCache::getPath(D_P . "data/groupdb/group_1.php");
+				pwCache::getData(D_P . "data/groupdb/group_1.php");
 				$default = 1;
 			}
 			$rgd = $db->get_one("SELECT grouptitle,gptype FROM pw_usergroups WHERE gid=" . S::sqlEscape($gid));
@@ -113,6 +115,7 @@ if ($adminitem == 'level'){
 			foreach ($ltitle as $key => $value) {
 				$groupselect .= "<option value=$key $selected_g[$key]>$value</option>";
 			}
+			$maxuploadsize = @ini_get('upload_max_filesize');
 			$uploadtype = unserialize($uploadtype);
 			foreach ($uploadtype as $key => $value) {
 				$upload_type .= "<tr>
@@ -277,10 +280,8 @@ if ($adminitem == 'level'){
 	
 			$levelHook = L::loadClass('levelhook');
 			$levelHook->init($db_modes, $_G,$SYSTEM);
-			//print_r($levelHook->getSystemLevels());exit;
 			
 			$extentSystem = $levelHook->getSystemLevels();
-	
 	
 			include PrintEot('level');
 			exit();
@@ -291,7 +292,8 @@ if ($adminitem == 'level'){
 			S::gp(array('maxsize'), 'P', 2);
 	
 			if (file_exists(D_P . "data/groupdb/group_$gid.php")) {
-				include_once pwCache::getPath(S::escapePath(D_P . "data/groupdb/group_$gid.php"));
+				//* include_once pwCache::getPath(S::escapePath(D_P . "data/groupdb/group_$gid.php"));
+				pwCache::getData(S::escapePath(D_P . "data/groupdb/group_$gid.php"));
 				$_M = array_merge($_G, $SYSTEM);
 			} else {
 				$_M = array();
@@ -675,7 +677,8 @@ if ($adminitem == 'level'){
 				}
 				$source = D_P . "data/tmp/group.txt";
 				if (postupload($upload, $source)) {
-					include_once pwCache::getPath(D_P . "data/bbscache/wordsfb.php");
+					//* include_once pwCache::getPath(D_P . "data/bbscache/wordsfb.php");
+					pwCache::getData(D_P . "data/bbscache/wordsfb.php");
 					$content = explode("\n", readover($source));
 					foreach ($content as $key => $value) {
 						list($gid, $title) = explode("=>", $value);

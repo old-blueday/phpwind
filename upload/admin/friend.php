@@ -1,7 +1,8 @@
 <?php
 !function_exists('adminmsg') && exit('Forbidden');
 $basename .= '&admintype='.$admintype;
-include_once pwCache::getPath(D_P.'data/bbscache/inv_config.php');
+//* include_once pwCache::getPath(D_P.'data/bbscache/inv_config.php');
+pwCache::getData(D_P.'data/bbscache/inv_config.php');
 require_once(R_P.'require/credit.php');
 $nav =  $action ? array($action=>'class = current') : 'class=current';
 if (empty($_POST['step'])) {
@@ -25,8 +26,7 @@ if (empty($_POST['step'])) {
 		}elseif($action == 'manager'){
 			S::gp(array('page','type','username','receiver')); //搜索增加receiver@modify panjl@2010-11-2
 			$sql =  '';
-			$inv_days *= 86400;
-			$timediff = (int)($timestamp-$inv_days);
+			$timediff = (int)($timestamp - $inv_days * 86400);
 			$sel = array($type => 'selected');
 			empty($type) && $type = '0';
 			if ($type == '1') {
@@ -61,6 +61,8 @@ if (empty($_POST['step'])) {
 					$rt['used'] = "<span class='s2'  >已注册</span>";
 				}
 				$rt['num']=($page-1)*$db_showperpage+$i++;
+				$rt['overtime'] = get_date(($rt['createtime'] + (int) $inv_days * 86400), 'Y-m-d H:i:s');
+				$rt['type'] = $rt['type'] == 2 ? '<span class=\'s3\'  >批量生成</span>' : '<span class=\'s3\'  >用户购买</span>';
 				$rt['createtime']=get_date($rt['createtime'],'Y-m-d H:i:s');
 				$invdb[]=$rt;
 			}
@@ -91,6 +93,21 @@ if (empty($_POST['step'])) {
 }else{
 	if($admintype == 'invite'){
 		if($_POST['step'] == '2'){
+			if ($action == 'generator') {
+				S::gp(array('number'));
+				if (!preg_match('/^\d+$/', $number)) adminmsg('生成数量必须为正整数',"$basename&action=generator");
+				$number = (int) $number;
+				!$number && adminmsg('生成的数量不能为空',"$basename&action=generator");
+				$number > 100 && adminmsg('每次生成数量最多为100个',"$basename&action=generator");
+				$invcode = $adminInfo = array();
+				$userService = L::loadClass('UserService', 'user');
+				$adminInfo = $userService->getByUserName($admin_name);
+				for ($i = 0; $i < $number; $i++) {
+					$invcode[] = array(randstr(16), $adminInfo['uid'], $timestamp, 2);
+				}
+				$db->update('INSERT INTO pw_invitecode (invcode, uid, createtime, type) VALUES ' . S::sqlMulti($invcode));
+				adminmsg('操作完成', "$basename&action=generator");
+			}
 			S::gp(array('config','groups'),'P');
 			if(!is_numeric($config['open'])) $config['open']=1;
 			if(!is_numeric($config['days'])) $config['days']=10;

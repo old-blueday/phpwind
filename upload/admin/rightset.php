@@ -18,7 +18,8 @@ if (!$action) {
 	if ($_POST['step']!=2) {
 		!$gid && adminmsg('rightset_setgroup');
 		require GetLang('left');
-		include_once pwCache::getPath(D_P.'data/bbscache/level.php');
+		//* include_once pwCache::getPath(D_P.'data/bbscache/level.php');
+		pwCache::getData(D_P.'data/bbscache/level.php');
 
 		$right = $db->get_value('SELECT value FROM pw_adminset WHERE gid='.S::sqlEscape($gid));
 		if (!$right || !(is_array($right = unserialize($right)))) {
@@ -62,9 +63,9 @@ if (!$action) {
 		!$gid && adminmsg('undefined_action');
 		if (!empty($rightdb) && is_array($rightdb)) {
 			$right = array();
-			$_modes = array('o', 'area', 'app', 'house', 'cms', 'dianpu', 'wot');
+			$_modes = array('o', 'area', 'app', 'house', 'cms', 'dianpu', 'wot', 'photos', 'diary', 'groups', 'weibo');
 			foreach ($rightdb as $key => $value) {
-				list($k1,$k2) = explode('_',$key);
+				if (!in_array($key, array('photos_manage', 'diary_manage', 'groups_manage', 'weibo_manage','photos_set', 'diary_set', 'groups_set', 'weibo_set'))) list($k1,$k2) = explode('_',$key);
 				if (in_array((string)$k1, $_modes)) {
 					$right[$key] = $value;
 				} else {
@@ -87,7 +88,7 @@ if (!$action) {
 		}
 		$db->update("REPLACE INTO pw_permission SET uid='0',fid='0',gid=".S::sqlEscape($gid).",rkey='allowadmincp',type='system',rvalue='1'");
 		updatecache_g($gid);
-		adminmsg('operate_success');
+		adminmsg('operate_success',$basename.'&action=edit&gid='.$gid);
 	}
 } elseif ($action=='delete') {
 	if ($_POST['step']!=2) {

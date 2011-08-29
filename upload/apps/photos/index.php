@@ -2,7 +2,8 @@
 !defined('A_P') && exit('Forbidden');
 !$db_phopen && Showmsg('photos_close');
 $USCR = 'user_photos';
-include_once pwCache::getPath(D_P.'data/bbscache/o_config.php');
+//* include_once pwCache::getPath(D_P.'data/bbscache/o_config.php');
+pwCache::getData(D_P.'data/bbscache/o_config.php');
 if ($db_question && $o_photos_qcheck) {
 	$qkey = array_rand($db_question);
 }
@@ -63,7 +64,7 @@ $isown = $photoService->isSelf();
 
 if ($isSpace) {
 	$USCR = 'space_photos';
-	S::gp('uid');
+//	S::gp('uid');
 	$newSpace = new PwSpace($uid ? $uid : $winduid);
 	$photoRight=$newSpace->viewRight('photos');
 	require_once S::escapePath($appEntryBasePath . 'action/view.php');

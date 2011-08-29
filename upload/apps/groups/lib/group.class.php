@@ -33,7 +33,8 @@ class PwGroup {
 
 	function getGroupsCreditset($type) {
 		global $o_groups_creditset;
-		include_once pwCache::getPath(D_P.'data/bbscache/o_config.php');
+		//* include_once pwCache::getPath(D_P.'data/bbscache/o_config.php');
+		extract(pwCache::getData(D_P.'data/bbscache/o_config.php', false));
 		$creditset = array_filter($creditset[$type],"group_filter");
 		$creditset = is_array($creditset) ? $creditset : array();
 		

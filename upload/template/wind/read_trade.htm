@@ -16,7 +16,7 @@ print <<<EOT
 		<td>一 口 价 :<span class="f20 s2 mr20 b">$tradedb[costprice]</span>市 场 价 :<span style="text-decoration:line-through;">$tradedb[price]</span></td>
 	</tr>
 	<tr class="f_two">
-		<td>运　　费 :
+		<td colspan="2">运　　费 :
 <!--
 EOT;
 if ($tradedb['transport']) {print <<<EOT
@@ -34,7 +34,7 @@ EOT;
 		</td>
 	</tr>
 	<tr>
-		<td>付款方式 :
+		<td colspan="2">付款方式 :
 <!--
 EOT;
 if ($tradedb['paymethod'] & 1) {print <<<EOT
@@ -44,16 +44,17 @@ if ($tradedb['paymethod'] & 1) {print <<<EOT
 EOT;
 }if ($tradedb['paymethod'] & 2) {print <<<EOT
 -->
-			支付宝交易
+			<span>&nbsp;</span>支付宝交易
 <!--
 EOT;
 }
+!$tradedb[salenum2] && $tradedb[salenum2] = 0;
 print <<<EOT
 -->
 		</td>
 	</tr>
 	<tr class="f_two">
-		<td>累计售出 :$tradedb[salenum2] 件
+		<td colspan="2">累计售出 : $tradedb[salenum2] 件
 <!--
 EOT;
 if ($tradedb['aliww']) {print <<<EOT
@@ -88,7 +89,7 @@ EOT;
 		</td>
 	</tr>
 	<tr>
-		<td>商品类型 :
+		<td width="300">商品类型 :
 <!--
 EOT;
 if ($tradedb['degree']) {print <<<EOT
@@ -102,14 +103,14 @@ EOT;
 <!--
 EOT;
 }print <<<EOT
--->
-		<span>&nbsp;</span>所 在 地 :$tradedb[locus]</td>
+-->	
+       </td><td>所 在 地 :$tradedb[locus]</td>
 	</tr>
 	<tr class="f_two">
-		<td>商品数量 : $tradedb[num]件<span>&nbsp;</span>浏 览 量 :$tradedb[hits]次</td>
+		<td>商品数量 : $tradedb[num]件</td><td>浏 览 量 :$tradedb[hits]次</td>
 	</tr>
 	<tr>
-		<td>
+		<td colspan="2">
 <!--
 EOT;
 if($tradedb[num] > 0){print <<<EOT

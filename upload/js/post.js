@@ -86,14 +86,23 @@ var PwFace = {
 		var _html = '';
 		for (var i = 0; i < sublist.length; i++) {
 			if (typeof sublist[i] != 'undefined')
-				_html += '<li><a title="'+face[sublist[i]][1]+'" href="javascript://" onclick="PwFace.addsmile('+sublist[i]+');return false;"><img src="' + picpath + face[sublist[i]][0] + '" alt=" '+face[sublist[i]][1]+'" /></a></li>';
+				_html += '<li><a title="'+face[sublist[i]][1]+'" href="javascript:void(0)" onMousedown="PwFace.addsmile('+sublist[i]+');return false;"><img src="' + picpath + face[sublist[i]][0] + '" alt=" '+face[sublist[i]][1]+'" /></a></li>';
 		}
 		PwFace.mainObj.innerHTML = _html;
 	},
 
 	addsmile : function(NewCode) {
-		if (typeof WYSIWYD != 'undefined' && editor != null) {
-			editor.addsmile(NewCode);
+		if (typeof B != 'undefined' && typeof B.editor != 'undefined' && editor != null) {
+			//editor.focus();
+			editor.pasteHTML('<img src="' + imgpath + '/post/smile/' + face[NewCode][0] + '" emotion="' + NewCode + '" /> ');
+			if(is_ie){
+				setTimeout(function(){
+				var rng = editor.getRng();
+				rng.collapse(false);
+				rng.select();
+				}, 100);
+			}
+
 		} else if (typeof addsmile == 'function') {
 			addsmile(NewCode);
 		}
@@ -237,10 +246,10 @@ function initGeneralFace(){
 		}catch(e){}
 	}
 	var num = 0;
-	var b='<span style="float:right;margin:3px 0 0 5px;width:auto;cursor:pointer" onclick="closep();"><img src="'+imgpath+'/close.gif" alt="关闭" /></span>';
+	var b='<a href="javascript:;" class="B_menu_adel" style="margin-top:2px;" onclick="closep();">关闭</a>';
 	for(f in generalfaceid){
 		//兼容opera
-		try{b += '<ul><li id="gb_'+num+'" style="float:left" unselectable="on" onclick="showGeneralFace(\'gb_'+num+'\','+generalfaceid[f]+');">'+generalfacename[f]+'</li></ul>';
+		try{b += '<ul class="B_fl"><li id="gb_'+num+'"><a href="javascript:;" unselectable="on" onclick="showGeneralFace(\'gb_'+num+'\','+generalfaceid[f]+');">'+generalfacename[f]+'</a></li></ul>';
 		num++;}catch(e){}
 	}
 	var a = {id:'menu_generalface',bid:'generalbuttons',sid:'showgeneralface',width:'300',height:'200',bhtml:b,shtml:''};
@@ -252,11 +261,10 @@ function initGeneralFace(){
 /**** myshow end****/
 
 function initMenuTab(arr,n,Y) {
-
 	var m = getObj(arr["id"]);
-	m.className			= "wy_menu";
+	m.className			= "B_menu B_p10 B_magic";
 
-	var b = elementBind('div',arr["bid"],'wy_title cc','width:'+arr["width"]+'px');
+	var b = elementBind('div',arr["bid"],'B_menu_nav B_cc B_menu_navB','width:'+arr["width"]+'px');
 
 	var s = elementBind('div',arr["sid"],'','background:#fff;width:'+(parseInt(arr["width"])+8)+'px;height:'+arr["height"]+'px;');
 	if(Y)s.style.overflowY	= "auto";
@@ -268,7 +276,7 @@ function initMenuTab(arr,n,Y) {
 	m.appendChild(b);
 	m.appendChild(c);
 	m.appendChild(s);
-	b.innerHTML = '<b class="down_left fl" title="上一套" onclick="showTab(\''+arr["bid"]+'\',-1,'+n+');">上一套</b>' + arr["bhtml"] + '<b class="down_right fr" onclick="showTab(\''+arr["bid"]+'\',1,'+n+');" title="下一套">下一套</b>';
+	b.innerHTML = '<a href="javascript:;" class="B_menu_adel" onclick="clearp(\'magiclist\');closep();showDefaultMagic();return false;" title="关闭">关闭</a><div class="B_menu_pre" style="margin-right:10px;" title="上一套" onclick="showTab(\''+arr["bid"]+'\',-1,'+n+');">上一套</div><div class="B_menu_next" style="float:right;" onclick="showTab(\''+arr["bid"]+'\',1,'+n+');" class="mr10" title="下一套">下一套</div>' + arr["bhtml"] + '';
 
 	b.style.cursor		= 'move';
 	showTab(arr["bid"],0,n);
@@ -299,7 +307,7 @@ function selectMenu(id,sid){
 	}
 }
 function showLoading(){
-	return "<div id=\"loading\" style=\"padding:20px;width:80%;text-align:center\"><img src=\""+imgpath+"/loading.gif\" align=\"absbottom\" alt=\"loading\" /> 正在加载数据...</div>";
+	return "<div id=\"loading\" style=\"padding:80px 0 0;text-align:center\"><img src=\""+imgpath+"/loading.gif\" align=\"absmiddle\" class=\"B_mr10\" />正在加载数据...</div>";
 }
 function strlen(str){
 	var len = 0;
@@ -373,19 +381,20 @@ function loadData(key){
  */
 function setEditorContent(msg) {
 	msg=msg||"";
-	if (typeof WYSIWYD == 'function' && editor._editMode == 'wysiwyg') {
-		editor._doc.body.innerHTML = codetohtml(msg);
+	if (editor && editor.currentMode == 'default') {
+		editor.doc.body.innerHTML = editor.getSavedHTML(msg);
 	} else {
 		document.FORM.atc_content.value = msg;
 	}
 }
 function savedraft() {
-	if (typeof WYSIWYD == 'function') {
-		var msg = editor._editMode == "textmode" ? editor.getHTML() : htmltocode(editor.getHTML());
+	var msg;
+	if ( editor && editor.getUBB ){
+		msg = editor.getUBB();
 	} else {
-		var msg = document.FORM.atc_content.value;
+		msg = document.FORM.atc_content.value;
 	}
-	ajax.send('pw_ajax.php','action=draft&step=2&atc_content='+ajax.convert(msg),ajax.guide);
+	ajax.send('pw_ajax.php','action=draft&step=2&atc_content='+ajax.convert(msg), ajax.guide);
 }
 function opendraft(id) {
 	if (typeof draft == 'object') {
@@ -395,4 +404,6 @@ function opendraft(id) {
 			opendraft(id);
 		});
 	}
+	event && (event.returnValue = false);
+	return false;
 }

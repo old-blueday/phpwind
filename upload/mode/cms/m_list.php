@@ -25,8 +25,13 @@ if (empty($action)) {
 	$pageCache = L::loadClass('pagecache', 'pagecache');
 	$pageCacheConfig = C::loadClass('pagecacheconfiglist', 'pagecache');
 	$pageCache->init($pageCacheConfig);
-	$columns = $columnService->getColumnsAndSubColumns($column);
+	$tmpHotArticle = $pageCache->getData('hotArticle');
+	$hotArticle = $articleService->filterArticles($tmpHotArticle);
 
+	list($columns, $columnInfo) = $columnService->getCurrentAndSubColumns($column);
+	if (!S::isArray($columns)) {
+		list($columns, $columnInfo) = $columnService->getCurrentAndSubColumns($columnInfo['parent_id']);
+	}
 	/* update hits */
 	/*$hitfile = D_P . "data/bbscache/cms_hits.txt";
 	$hitsize = @filesize($hitfile);

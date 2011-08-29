@@ -16,6 +16,7 @@ EOT;
 } else {print <<<EOT
 -->	
 		<li $nav[weibo]><a href="$basename&action=weibo">新鲜事管理</a></li>
+        <li $nav[topic]><a href="$basename&action=topic">话题管理</a></li>
 		<li $nav[comment]><a href="$basename&action=comment">评论管理</a></li>	
 <!--
 EOT;
@@ -25,7 +26,8 @@ EOT;
 </div>
 <!--
 EOT;
-if(!$action){print <<<EOT
+if(!$action){
+print <<<EOT
 -->
 <form action="$basename&" method="post">
   <input type="hidden" name="step" value="3">
@@ -80,7 +82,43 @@ if(!$action){print <<<EOT
     </tr>
   </table>
   </div>
+  
+  <h3 class="h1"><span class="mr20">新鲜事调用基本设置</span></h3>
+  <div class="admin_table mb10">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <tr class="tr1">
+    <td class="td1">热门评论间隔时间[天]</td>
+			<td class="td2">
+				<input type="text" value="$o_weibo_hotcommentdays" name="weibo_hotcommentdays" class="input input_wa" >
+			</td>
+    </tr>
+      <tr class="tr1">
+    <td class="td1">热门转发间隔时间[天]</td>
+			<td class="td2">
+				<input type="text" value="$o_weibo_hottransmitdays" name="weibo_hottransmitdays" class="input input_wa" >
+			</td>
+    </tr>
+      <tr class="tr1">
+    <td class="td1">新增粉丝间隔时间[天]</td>
+			<td class="td2">
+				<input type="text" value="$o_weibo_hotfansdays" name="weibo_hotfansdays" class="input input_wa" >
+			</td>
+    </tr>
+    </table>
+  </div>
 
+ <h3 class="h1"><span class="mr20">话题基本设置</span></h3>
+  <div class="admin_table mb10">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <tr class="tr1">
+    <td class="td1">热门话题榜缓存时间[天]</td>
+			<td class="td2">
+				<input type="text" value="$o_weibo_hottopicdays" name="weibo_hottopicdays" class="input input_wa" >
+			</td>
+    </tr>
+    </table>
+  </div>
+   
   <h3 class="h1"><span class="mr20">新鲜事积分奖惩设置</span><span class="linka">注:<b>威望积分</b>支持小数点后一位，其他积分只允许整数！</span></h3>
   <div class="admin_table mb10">
   <table width="100%" cellspacing="0" cellpadding="0">
@@ -197,8 +235,7 @@ EOT;
   <div class="mb10 tac">
     <span class="btn"><span><button type="submit">提 交</button></span></span>
    </div>
-</form>
-
+</form>	
 <form method="POST" action="$basename&action=weibo&" name="FORM">
   <input type="hidden" name="job" value="delete">
   <input type="hidden" name="content" value="$content">
@@ -209,6 +246,7 @@ EOT;
   <input type="hidden" name="ordertype" value="$ordertype">
   <input type="hidden" name="page" value="$page">
   <input type="hidden" name="lines" value="$lines">
+
   <h2 class="h1"><span class="mr10">新鲜事列表</span></h2>
 
   <div class="admin_table mb10">
@@ -232,11 +270,12 @@ EOT;
 }else{
 foreach ($weibos as $key => $weibo) {
 $type = $weiboService->getTypeDescript($weibo['type']);
+$content = S::stripTags($weibo[content]);
 print <<<EOT
 -->
     <tr class="tr1 vt">
       <td class="td2"><input type="checkbox" name="mids[]" value="$weibo[mid]"></td>
-      <td class="td2">$weibo[content]</td>
+      <td class="td2">$content</td>
       <td class="td2"><a href="{$db_userurl}$weibo[uid]" target="_blank">$weibo[username]</a></td>
       <td class="td2" title="$weibo[postdate_s]">{$weibo[lastdate]}</td>
       <td class="td2">$type</td>
@@ -264,6 +303,123 @@ function checkdel(){
 	}
 }
 </script>
+<!--
+EOT;
+}elseif($action == 'topic'){
+print <<<EOT
+-->
+<form method="POST" action="$basename&action=topic">
+  <h2 class="h1">话题搜索</h2>
+  <div class="admin_table mb10">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <tr class="tr1 vt">
+      <td class="td1">话题</td>
+      <td class="td2"><input name="topicname" class="input input_wa mr20" value="{$topicname}"></td>
+      <td class="td2">&nbsp;</td>
+    </tr>
+
+    <tr class="tr1 vt">
+      <td class="td1">热门话题</td>
+      <td class="td2">
+		<select name="ifhot" class="select_wa">
+         <option  value="0" $sel_0>所有</option>
+         <option  value="1" $sel_1>允许</option>
+          <option  value="2" $sel_2>不允许</option>
+		</select>
+    	</td>
+      <td class="td2">&nbsp;</td>
+    </tr>
+
+    <tr class="tr1 vt">
+      <td class="td1">使用次数</td>
+      <td class="td2">
+        <input type="text" name="startnum" class="input input_wc" value="{$startnum}">&nbsp;-&nbsp;<input type="text" name="endnum" class="input input_wc"  value="{$endnum}">
+      </td>
+      <td class="td2">&nbsp;</td>
+    </tr>
+  </table>
+  </div>
+  <div class="mb10 tac">
+    <span class="btn"><span><button type="submit">提 交</button></span></span>
+   </div>
+</form>
+<script type="text/javascript">
+    function hottopic(ifhot) {
+        window.location.href = '$basename&action=topic&job=list&ifhot='+ifhot;
+    }
+    </script>
+<form method="POST" action="$basename&action=topic&" name="FORM">
+  <input type="hidden" name="job" value="sethot">
+  <input type="hidden" name="topicname" value="$topicname">
+  <input type="hidden" name="ifhot" value="$ifhot">
+  <input type="hidden" name="startnum" value="$startnum">
+  <input type="hidden" name="endnum" value="$endnum">
+   <input type="hidden" name="page" value="$page">
+  <input type="hidden" name="ordertype" value="$ordertype">
+  <h2 class="h1"><span class="mr10">话题列表</span></h2>
+  <div class="admin_table mb10">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <tr class="tr2">
+      <td width="30"><span onclick="CheckAll(document.FORM)" class="cp">全选</span></td>
+      <td>话题名称</td>
+      <td>使用次数</td>
+      <td>热门话题状态</td>
+    </tr>
+<!--
+EOT;
+if (empty($topics)) {print <<<EOT
+-->
+<tr><td class="p10" colspan="9"><div class="admin_tips">啊哦，没有你要的信息！</div></td></tr>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+<!--
+EOT;
+foreach($topics as $key => $value){
+print <<<EOT
+-->
+    <tr class="tr1 vt">
+      <td class="td2"><input type="checkbox" name="topicid[]" value="$value[topicid]"></td>
+      <td class="td2">$value[topicname]</td>
+      <td class="td2">$value[num]</td>
+<!--
+EOT;
+if ($value[ifhot] == '1') {print <<<EOT
+-->
+      <td class="td2">允许</td>
+<!--
+EOT;
+} else {print <<<EOT
+-->
+      <td class="td2">不允许</td>
+<!--
+EOT;
+}print <<<EOT
+-->
+      <td class="td2">
+<!--
+EOT;
+print <<<EOT
+-->
+      </td>
+    </tr>
+<!--
+EOT;
+}}print <<<EOT
+-->
+  </table>
+  </div>
+  <div class="mt10 cc">$pages</div>
+  <div class="mb10 tac">
+   	<input type="radio" name="ifhot" value="1" checked/>允许为热门话题
+    <input type="radio" name="ifhot" value="2" />不允许为热门话题
+  </div>
+  <div class="mb10 tac">
+  <span class="bt"><span><button type="button" onclick="CheckAll(document.FORM)">全 选</button></span></span>
+   <span class="mr10"><span class="btn"><span><button type="submit">提 交</button></span></span></span>
+   </div>
+</form>
 <!--
 EOT;
 }elseif($action == 'comment'){
