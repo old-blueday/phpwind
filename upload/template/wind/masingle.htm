@@ -3,6 +3,9 @@
 <div id="breadCrumb">
 <img src="$imgpath/$stylepath/thread/home.gif" class="cp breadHome" /><em class="breadEm"></em><a href="$db_bfn" title="$db_bbsname">$db_bbsname</a><em>&gt;</em>管理选项
 </div>
+<style type="text/css">
+.tr3 td,.tr3 th,.tr2 td,.tr2 th{padding-left:10px;}
+</style>
 <div id="pw_content">
 <!--
 EOT;
@@ -11,9 +14,9 @@ if($action=='banuser'){print <<<EOT
 <form action="masingle.php?action=banuser" method="post">
 <input type="hidden" name="verify" value="$verifyhash" />
 <div class="t">
-<table width="100%" cellspacing="0" cellpadding="0" align="center">
+<table width="100%" cellspacing="0" cellpadding="0">
 	<tr><th class="h" colspan="2">会员禁言</th></tr>
-	<tr class="tr3"><td width="15%"  class="tar">禁言对象:</td>
+	<tr class="tr3"><td width="80">禁言对象:</td>
 		<td>$userinfo[username]
 <!--
 EOT;
@@ -37,56 +40,56 @@ print <<<EOT
 -->
 		</td>
 	</tr>
-	<tr class="tr3"><td class="tar">禁言范围:</td>
-	<td><input type="radio" name="range" value="0" checked />{$forum[$fid][name]}
+	<tr class="tr3"><td>禁言范围:</td>
+	<td><label class="mr20"><input type="radio" name="range" value="0" checked />{$forum[$fid][name]}</label>
 <!--
 EOT;
 if($isGM || $SYSTEM['banuser']==2){print <<<EOT
 -->
-	<input type="radio" name="range" value="1" />全局禁言
+	<label class="mr20"><input type="radio" name="range" value="1" />全局禁言</label>
 <!--
 EOT;
 if ($SYSTEM[banuserip]){print <<<EOT
 -->	
-	<input type="checkbox" name="banip" value="1" />禁止该 IP
+	<label class="mr20"><input type="checkbox" name="banip" value="1" />禁止该 IP</label>
 <!--
 EOT;
 }}print <<<EOT
 -->
 	</td></tr>
-	<tr class="tr3"><td class="tar">禁言类型:</td>
-		<td><input type="radio" name="type" value="1" checked />定期禁言
+	<tr class="tr3"><td>禁言类型:</td>
+		<td><label class="mr20"><input type="radio" name="type" value="1" checked />定期禁言</label>
 <!--
 EOT;
 if($isGM || $SYSTEM['bantype']){print <<<EOT
 -->
-			<input type="radio" name="type" value="2" />永久禁言
+			<label class="mr20"><input type="radio" name="type" value="2" />永久禁言</label>
 <!--
 EOT;
 }print <<<EOT
 -->
 		</td>
 	</tr>
-	<tr class="tr3"><td class="tar">禁言时间:</td>
+	<tr class="tr3"><td>禁言时间:</td>
 		<td><input class="input" type="text" name="limit" value="1" size="5" /> 天(最大天数<font color=blue>$pwBanMax</font>天)</td>
 	</tr>
-	<tr class="tr3"><td class="tar">消息通知:</td>
-		<td><input type="radio" name="ifmsg" value="1" checked />开启
-			<input type="radio" name="ifmsg" value="0" />关闭
+	<tr class="tr3"><td>消息通知:</td>
+		<td><label class="mr20"><input type="radio" name="ifmsg" value="1" checked />开启</label>
+			<label class="mr20"><input type="radio" name="ifmsg" value="0" />关闭</label>
 		</td>
 	</tr>
 	<tr class="tr3 vt">
-		<td class="tar">操作原因:</td>
-		<td><textarea name="atc_content" style="width:300px;height:124px"></textarea>
-			<select name="" size="8" multiple onchange="this.form.atc_content.value=this.value">
-				<option value="">自定义</option>
-				<option value="">-------</option>
+		<td>操作原因:</td>
+		<td>
+			<p><input type="text" class="input" style="width:312px;" name="atc_content" /></p>
+			<select name="" size="6" style="width:320px;" multiple onchange="this.form.atc_content.value=this.value">
 				$reason_sel
 			</select>
-
 		</td>
 	</tr>
-	<tr><td>&nbsp;</td><td style="padding:5px 6px;"><input class="btn" type="submit" value="提 交" /> <a class="btn3" style="cursor:pointer;" type="button" onclick="javascript:history.go(-1)" />返 回</a></td></tr>
+	<tr><td>&nbsp;</td><td style="padding:5px 6px;"><span class="btn2"><span><button type="submit">提 交</button></span></span>
+	<span class="bt2"><span><button type="button" onclick="javascript:history.go(-1)">返 回</button></span></span>
+</td></tr>
 </table></div>
 <input type="hidden" name="uid" value="$uid" />
 <input type="hidden" name="fid" value="$fid" />
@@ -102,22 +105,22 @@ EOT;
 <form action="masingle.php?action=banfree" method="post">
 <input type="hidden" name="verify" value="$verifyhash" />
 <div class="t">
-<table width="100%" cellspacing="0" cellpadding="0" align="center">
+<table width="100%" cellspacing="0" cellpadding="0">
 	<tr><th class="h" colspan="2">会员禁言</th></tr>
-	<tr class="tr3"><td width="15%"  class="tar">解禁对象:</td>
+	<tr class="tr3"><td width="80">解禁对象:</td>
 		<td>$userinfo[username]</td>
 	</tr>
-	<tr class="tr3"><td class="tar">消息通知:</td>
-		<td><input type="radio" name="ifmsg" value="1" checked />开启
-			<input type="radio" name="ifmsg" value="0" />关闭
+	<tr class="tr3"><td>消息通知:</td>
+		<td><label class="mr20"><input type="radio" name="ifmsg" value="1" checked />开启</label>
+			<label class="mr20"><input type="radio" name="ifmsg" value="0" />关闭</label>
 		</td>
 	</tr>
 	<tr class="tr3 vt">
-		<td class="tar">操作原因:</td>
-		<td><textarea name="atc_content" style="width:300px;height:124px"></textarea>
+		<td>操作原因:</td>
+		<td><textarea name="atc_content" style="width:320px;height:124px"></textarea>
 		</td>
 	</tr>
-	<tr><td>&nbsp;</td><td style="padding:5px 6px;"><input class="btn" type="submit" value="提 交" /> <a class="btn3" style="cursor:pointer;" type="button" onclick="javascript:history.go(-1)" />返 回</a></td></tr>
+	<tr><td>&nbsp;</td><td style="padding:5px 6px;"><span class="btn2"><span><button type="submit">提 交</button></span></span><span class="bt2"><span><button type="button" onclick="javascript:history.go(-1)">返 回</button></span></span></td></tr>
 </table></div>
 <input type="hidden" name="uid" value="$uid" />
 <input type="hidden" name="fid" value="$fid" />
@@ -133,10 +136,10 @@ EOT;
 <form action="masingle.php?action=shield" method="post">
 <input type="hidden" name="verify" value="$verifyhash" />
 <div class="t">
-<table width="100%" cellspacing="0" cellpadding="0" align="center">
+<table width="100%" cellspacing="0" cellpadding="0">
 	<tr><th class="h" colspan="2">单帖屏蔽</th>
 	</tr>
-	<tr class="tr3"><td width="15%" class="tar">屏蔽对象:</td>
+	<tr class="tr3"><td width="80">屏蔽对象:</td>
 <!--
 EOT;
 if($readdb['anonymous'] && !$isGM && !pwRights($isBM,'anonyhide')){ print <<<EOT
@@ -152,28 +155,27 @@ EOT;
 } print <<<EOT
 -->
 	</tr>
-	<tr class="tr3"><td class="tar">操作类型:</td>
-		<td><input type="radio" name="step" value="3" $check_Y />单帖屏蔽
-			<input type="radio" name="step" value="5" $check_N />取消屏蔽
+	<tr class="tr3"><td>操作类型:</td>
+		<td><label class="mr20"><input type="radio" name="step" value="3" $check_Y />单帖屏蔽</label>
+			<label class="mr20"><input type="radio" name="step" value="5" $check_N />取消屏蔽</label>
 		</td>
 	</tr>
-	<tr class="tr3"><td class="tar">消息通知:</td>
-		<td><input type="radio" name="ifmsg" value="1" checked />开启
-			<input type="radio" name="ifmsg" value="0" />关闭
+	<tr class="tr3"><td>消息通知:</td>
+		<td><label class="mr20"><input type="radio" name="ifmsg" value="1" checked />开启</label>
+			<label class="mr20"><input type="radio" name="ifmsg" value="0" />关闭</label>
 		</td>
 	</tr>
 	<tr class="tr3 vt">
-		<td class="tar">操作原因:</td>
-		<td><textarea name="atc_content" style="width:300px;height:124px"></textarea>
-		<select name="" size="8" multiple onchange="this.form.atc_content.value=this.value">
-				<option value="">自定义</option>
-				<option value="">-------</option>
+		<td>操作原因:</td>
+		<td>
+		<p><input type="text" class="input" style="width:312px;" name="atc_content" /></p>
+		<select name="" size="6" multiple onchange="this.form.atc_content.value=this.value" style="width:320px;">
 				$reason_sel
 			</select>
 
 		</td>
 	</tr>
-	<tr><td></td><td style="padding:5px 6px;"><input class="btn" type="submit" value="提 交" /> <a class="btn3" style="cursor:pointer;" type="button" onclick="javascript:history.go(-1)" />返 回</a></td></tr>
+	<tr><td>&nbsp;</td><td style="padding:5px 6px;"><span class="btn2"><span><button type="submit">提 交</button></span></span><span class="bt2"><span><button type="button" onclick="javascript:history.go(-1)">返 回</button></span></span></td></tr>
 </table></div>
 <input type="hidden" name="fid" value="$fid" />
 <input type="hidden" name="tid" value="$tid" />
@@ -187,10 +189,10 @@ EOT;
 <form action="masingle.php?action=bansignature" method="post">
 <input type="hidden" name="verify" value="$verifyhash" />
 <div class="t">
-<table width="100%" cellspacing="0" cellpadding="0" align="center">
+<table width="100%" cellspacing="0" cellpadding="0">
 	<tr><th class="h" colspan="2">禁止帖子签名</th>
 	</tr>
-	<tr class="tr3"><td width="15%" class="tar">操作对象:</td>
+	<tr class="tr3"><td width="80">操作对象:</td>
 <!--
 EOT;
 if($readdb['anonymous'] && !$isGM && !pwRights($isBM,'anonyhide')){ print <<<EOT
@@ -206,28 +208,25 @@ EOT;
 } print <<<EOT
 -->
 	</tr>
-	<tr class="tr3"><td class="tar">禁止类型:</td>
-		<td><input type="radio" name="step" value="3" $check_Y />禁止
-			<input type="radio" name="step" value="5" $check_N />解除
+	<tr class="tr3"><td>禁止类型:</td>
+		<td><label class="mr20"><input type="radio" name="step" value="3" $check_Y />禁止</label>
+			<label class="mr20"><input type="radio" name="step" value="5" $check_N />解除</label>
 		</td>
 	</tr>
-	<tr class="tr3"><td class="tar">消息通知:</td>
-		<td><input type="radio" name="ifmsg" value="1" checked />开启
-			<input type="radio" name="ifmsg" value="0" />关闭
+	<tr class="tr3"><td>消息通知:</td>
+		<td><label class="mr20"><input type="radio" name="ifmsg" value="1" checked />开启</label>
+			<label class="mr20"><input type="radio" name="ifmsg" value="0" />关闭</label>
 		</td>
 	</tr>
 	<tr class="tr3 vt">
-		<td class="tar">操作原因:</td>
-		<td><textarea name="atc_content" style="width:300px;height:124px"></textarea>
-		<select name="" size="8" multiple onchange="this.form.atc_content.value=this.value">
-				<option value="">自定义</option>
-				<option value="">-------</option>
+		<td>操作原因:</td>
+		<td><p><input type="text" class="input" style="width:312px;" name="atc_content" /></p>
+		<select size="6" multiple onchange="this.form.atc_content.value=this.value" style="width:320px;">
 				$reason_sel
 			</select>
-
 		</td>
 	</tr>
-	<tr><td></td><td style="padding:5px 6px;"><input class="btn" type="submit" value="提 交" /> <a class="btn3" style="cursor:pointer;" type="button" onclick="javascript:history.go(-1)" />返 回</a></td></tr>
+	<tr><td>&nbsp;</td><td style="padding:5px 6px;"><span class="btn2"><span><button type="submit">提 交</button></span></span><span class="bt2"><span><button type="button" onclick="javascript:history.go(-1)">返 回</button></span></span></td></tr>
 </table></div>
 <input type="hidden" name="fid" value="$fid" />
 <input type="hidden" name="tid" value="$tid" />
@@ -242,10 +241,10 @@ EOT;
 <input type="hidden" name="verify" value="$verifyhash" />
 <input type="hidden" name="step" value="3" />
 <div class="t">
-<table width="100%" cellspacing="0" cellpadding="0" align="center">
+<table width="100%" cellspacing="0" cellpadding="0">
 	<tr><th class="h" colspan="2">禁止ip</th>
 	</tr>
-	<tr class="tr3"><td width="15%" class="tar">用户名:</td>
+	<tr class="tr3"><td>用户名:</td>
 <!--
 EOT;
 if($readdb['anonymous'] && !$isGM && !pwRights($isBM,'anonyhide')){ print <<<EOT
@@ -262,17 +261,16 @@ EOT;
 -->
 	</tr>
 	<tr class="tr3 vt">
-		<td class="tar">操作原因:</td>
-		<td><textarea name="atc_content" style="width:300px;height:124px"></textarea>
-		<select name="" size="8" multiple onchange="this.form.atc_content.value=this.value">
-				<option value="">自定义</option>
-				<option value="">-------</option>
+		<td>操作原因:</td>
+		<td>
+		<p><input type="text" class="input" style="width:312px;" name="atc_content" /></p>
+		<select name="" size="6" multiple onchange="this.form.atc_content.value=this.value" style="width:320px;">
 				$reason_sel
 			</select>
 
 		</td>
 	</tr>
-	<tr><td></td><td style="padding:5px 6px;"><input class="btn" type="submit" value="提 交" /> <a class="btn3" style="cursor:pointer;" type="button" onclick="javascript:history.go(-1)" />返 回</a></td></tr>
+	<tr><td>&nbsp;</td><td style="padding:5px 6px;"><span class="btn2"><span><button type="submit">提 交</button></span></span><span class="bt2"><span><button type="button" onclick="javascript:history.go(-1)">返 回</button></span></span></td></tr>
 </table></div>
 <input type="hidden" name="fid" value="$fid" />
 <input type="hidden" name="tid" value="$tid" />
@@ -286,9 +284,9 @@ EOT;
 <form action="masingle.php?action=remind" method="post">
 <input type="hidden" name="verify" value="$verifyhash" />
 <div class="t">
-<table width="100%" cellspacing="0" cellpadding="0" align="center">
+<table width="100%" cellspacing="0" cellpadding="0">
 	<tr><th class="h" colspan="2">帖子管理提示</th></tr>
-	<tr class="tr3"><td width="15%" class="tar">提醒对象:</td>
+	<tr class="tr3"><td width="80">提醒对象:</td>
 <!--
 EOT;
 if($readdb['anonymous'] && !$isGM && !pwRights($isBM,'anonyhide')){ print <<<EOT
@@ -304,25 +302,25 @@ EOT;
 } print <<<EOT
 -->
 	</tr>
-	<tr class="tr3"><td class="tar">操作类型:</td>
+	<tr class="tr3"><td>操作类型:</td>
 		<td><input type="radio" name="step" value="3" checked />提醒管理
 			<input type="radio" name="step" value="5" />取消提醒
 		</td>
 	</tr>
-	<tr class="tr3"><td class="tar">消息通知:</td>
+	<tr class="tr3"><td>消息通知:</td>
 		<td><input type="radio" name="ifmsg" value="1" checked />开启
 			<input type="radio" name="ifmsg" value="0" />关闭
 		</td>
 	</tr>
-	<tr class="tr3 vt"><td class="tar">操作原因:</td>
-		<td><textarea name="atc_content" style="width:300px;height:124px">$remindinfo</textarea><select name="" size="8" multiple onchange="this.form.atc_content.value=this.value">
-				<option value="">自定义</option>
-				<option value="">-------</option>
+	<tr class="tr3 vt"><td>操作原因:</td>
+		<td>
+		<p><input type="text" class="input" style="width:312px;" name="atc_content" value="$remindinfo" /></p>
+<select name="" size="6" multiple onchange="this.form.atc_content.value=this.value" style="width:320px;">
 				$reason_sel
 			</select>
 		</td>
 	</tr>
-	<tr><td></td><td style="padding:5px 6px;"><input class="btn" type="submit" value="提 交" /> <a class="btn3" style="cursor:pointer;" type="button" onclick="javascript:history.go(-1)" />返 回</a></td></tr>
+	<tr><td>&nbsp;</td><td style="padding:5px 6px;"><span class="btn2"><span><button type="submit">提 交</button></span></span><span class="bt2"><span><button type="button" onclick="javascript:history.go(-1)">返 回</button></span></span></td></tr>
 </table></div>
 <input type="hidden" name="fid" value="$fid" />
 <input type="hidden" name="tid" value="$tid" />
@@ -348,7 +346,7 @@ EOT;
 }print <<<EOT
 -->
 <div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="adel cp" onclick="closep();">关闭</span>拆分操作</div>
-<script language="javascript" type="text/javascript">
+<script>
 function splitds() {
 	var val = document.getElementsByName('splittype');
 	var type;
@@ -373,42 +371,41 @@ function splitds() {
 
 }
 </script>
+<div class="t">
 <table width="100%" class="vt z">
-<tr class="tr3"><td width="15%" class="tar">拆分数量:</td><td>$splitNum 篇</td></tr>
+<tr class="tr3"><td width="80">拆分数量:</td><td>$splitNum 篇</td></tr>
 <tr class="tr3">
-	<td width="15%" class="tar">拆分目标:</td>
-	<td><input name="splittype" onclick="splitds()" type="radio" checked="checked" value="0" />新帖&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-	<input name="splittype" onclick="splitds()" type="radio" value="1" />合并到帖子
+	<td>拆分目标:</td>
+	<td><label class="mr20"><input name="splittype" onclick="splitds()" type="radio" checked="checked" value="0" />新帖</label>
+	<label class="mr20"><input name="splittype" onclick="splitds()" type="radio" value="1" />合并到帖子</label>
 	</td>
 </tr>
 <tr class="tr3" id="splittitle">
-	<td width="15%" class="tar">新帖标题:</td>
-	<td><input name="splittitle" class="input" size="50" />
-	</td>
+	<td>新帖标题:</td>
+	<td><input name="splittitle" class="input" size="50" /></td>
 </tr>
 <tr class="tr3" id="splitid" style="display:none;">
-	<td width="15%" class="tar">帖子ID:</td>
-	<td><input name="splitid" class="input" size="10" />
-	</td>
+	<td>帖子ID:</td>
+	<td><input name="splitid" class="input" size="10" /></td>
 </tr>
 <tr class="tr3">
-		<td width="15%" class="tar">消息通知:</td>
+		<td>消息通知:</td>
 		<td>
 			<label class="mr20"><input type="radio" name="ifmsg" value="1" checked />开启</label>
 			<label><input type="radio" name="ifmsg" value="0" />关闭</label>
 		</td>
 	</tr>
-	<tr class="tr3"><td width="15%" class="tar">操作原因:</td>
-		<td><textarea name="atc_content" onkeydown="ajax.quickpost(event,this.form)" style="width:300px;height:124px"></textarea><select style="width:320px;" onchange="this.form.atc_content.value=this.value" size="8" multiple>
-				<option value="">自定义</option>
-				<option value="">-------</option>
+	<tr class="tr3"><td>操作原因:</td>
+		<td>
+		<p><input type="text" class="input" style="width:312px;" name="atc_content" onkeydown="ajax.quickpost(event,this.form)" /></p>
+		<select style="width:320px;" onchange="this.form.atc_content.value=this.value" size="6" multiple>
 				$reason_sel
 			</select>
 		</td>
 	</tr>
-		<tr><td></td><td style="padding:5px 6px;"><input class="btn" type="submit" value="提 交" /> <a class="btn3" style="cursor:pointer;" type="button" onclick="javascript:history.go(-1)" />返 回</a></td></tr>
-</table></form>
-</div>
+	<tr><td>&nbsp;</td><td style="padding:5px 6px;"><span class="btn2"><span><button type="submit">提 交</button></span></span><span class="bt2"><span><button type="button" onclick="javascript:history.go(-1)">返 回</button></span></span></td></tr>
+</table>
+</div></form>
 <!--
 EOT;
 }elseif($action=='delatc'){print <<<EOT
@@ -430,27 +427,27 @@ EOT;
 <div class="t">
 <table width="100%" cellspacing="0" cellpadding="0">
 	<tr><th class="h" colspan="2">删除回复操作</th></tr>
-	<tr class="tr3"><td width="15%" class="tar">删除数量:</td><td>$count 篇</td></tr>
-	<tr class="tr3"><td class="tar">扣除积分:</td>
-		<td><input type="radio" name="ifdel" value="1" checked />开启
-			<input type="radio" name="ifdel" value="0" />关闭
+	<tr class="tr3"><td width="80">删除数量:</td><td>$count 篇</td></tr>
+	<tr class="tr3"><td>扣除积分:</td>
+		<td><label class="mr20"><input type="radio" name="ifdel" value="1" checked />开启</label>
+			<label class="mr20"><input type="radio" name="ifdel" value="0" />关闭</label>
 		</td>
 	</tr>
-	<tr class="tr3"><td class="tar">消息通知:</td>
-		<td><input type="radio" name="ifmsg" value="1" checked />开启
-			<input type="radio" name="ifmsg" value="0" />关闭
+	<tr class="tr3"><td>消息通知:</td>
+		<td><label class="mr20"><input type="radio" name="ifmsg" value="1" checked />开启</label>
+			<label class="mr20"><input type="radio" name="ifmsg" value="0" />关闭</label>
 		</td>
 	</tr>
-	<tr class="tr3 vt"><td class="tar">操作原因:</td>
-		<td><textarea name="atc_content" style="width:300px;height:124px"></textarea><select name="" size="8" multiple onchange="this.form.atc_content.value=this.value">
-				<option value="">自定义</option>
-				<option value="">-------</option>
+	<tr class="tr3 vt"><td>操作原因:</td>
+		<td>
+		<p><input type="text" class="input" style="width:312px;" name="atc_content" /></p>
+		<select name="" size="6" multiple onchange="this.form.atc_content.value=this.value" style="width:320px;">
 				$reason_sel
 			</select>
 
 		</td>
 	</tr>
-	<tr><td></td><td style="padding:5px 6px;"><input class="btn" type="submit" value="提 交" /> <a class="btn3" style="cursor:pointer;" type="button" onclick="javascript:history.go(-1)" />返 回</a></td></tr>
+	<tr><td>&nbsp;</td><td style="padding:5px 6px;"><span class="btn2"><span><button type="submit">提 交</button></span></span><span class="bt2"><span><button type="button" onclick="javascript:history.go(-1)">返 回</button></span></span></td></tr>
 </table></div></form>
 <!--
 EOT;
@@ -473,7 +470,7 @@ EOT;
 		<td width="15%">评分时间</td>
 		<td>评分理由</td>
 	</tr>
-<script language="javascript" type="text/javascript">
+<script>
 function cutStrContent(obj){
 	if(strlen(getObj(obj).value) > 100 ) {
 		getObj(obj).value = substr(getObj(obj).value,100);
@@ -499,15 +496,15 @@ print<<<EOT
 EOT;
 }print<<<EOT
 -->
-	<tr align="center">
+	<tr>
 		<td style="padding:.5em 1em" colspan="5">
 			<div class="cc">$pages</div>
 			<span class="fl"><input type="checkbox" onclick="CheckAll(this.form)" />全选</span>
-			<input class="btn" type="submit" value="删除" /> <a class="btn3" style="cursor:pointer;" type="button" onclick="javascript:history.go(-1)" />返 回</a>
+			<span class="mr20"><span class="bt2"><span><button type="submit">删除</button></span></span></span><a class="btn3" style="cursor:pointer;" type="button" onclick="javascript:history.go(-1)" />返 回</a>
 		</td>
 	</tr>
 </table></div></form>
-<script language="JavaScript">
+<script>
 function editrecord(id) {
 	var r = getObj('ping_' + id);
 	if (r.style.display == 'none') {
@@ -545,15 +542,15 @@ EOT;
 <div class="t">
 <table width="100%" cellspacing="0" cellpadding="0">
 	<tr><th class="h" colspan="2">版主已阅操作</th></tr>
-	<tr class="tr3"><td class="tar"  width="21%">消息通知:</td>
-		<td><input type="radio" name="ifmsg" value="1" checked />开启
-			<input type="radio" name="ifmsg" value="0" />关闭
+	<tr class="tr3"><td width="80">消息通知:</td>
+		<td><label class="mr20"><input type="radio" name="ifmsg" value="1" checked />开启</label>
+			<label class="mr20"><input type="radio" name="ifmsg" value="0" />关闭</label>
 		</td>
 	</tr>
-	<tr class="tr3 vt"><td class="tar">操作原因:</td>
-		<td><textarea name="atc_content" style="width:300px;height:124px"></textarea><select name="" size="8" multiple onchange="this.form.atc_content.value=this.value">
-				<option value="">自定义</option>
-				<option value="">-------</option>
+	<tr class="tr3 vt"><td>操作原因:</td>
+		<td>
+		<p><input type="text" class="input" style="width:312px;" name="atc_content" /></p>
+		<select name="" size="6" multiple onchange="this.form.atc_content.value=this.value" style="width:320px;">
 				$reason_sel
 			</select>
 		</td>
@@ -563,11 +560,12 @@ EOT;
 EOT;
 if ($iftypeavailable == 1) {print <<<EOT
 -->
-	<input type="checkbox" name="nextto" value="type">&nbsp;转移主题分类
+	<label class="mr10"><input type="checkbox" name="nextto" value="type">&nbsp;转移主题分类</label>
 <!--
 EOT;
 }print <<<EOT
---><input class="btn" type="submit" value="提 交" /> <a class="btn3" style="cursor:pointer;" type="button" onclick="javascript:history.go(-1)" />返 回</a></td></tr>
+-->
+<span class="btn2"><span><button type="submit">提 交</button></span></span><span class="bt2"><span><button type="button" onclick="javascript:history.go(-1)">返 回</button></span></span></td></tr>
 </table></div>
 </form>
 <!--

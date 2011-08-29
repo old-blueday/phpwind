@@ -8,11 +8,12 @@ print <<<EOT
 <meta name="generator" content="phpwind $wind_version" />
 <meta name="description" content="$metaDescription" />
 <meta name="keywords" content="$metaKeywords" />
-<link rel="stylesheet" href="images/pw_core.css?101128" />
-<link rel="stylesheet" href="images/search/style.css" />
-<SCRIPT type="text/javascript" LANGUAGE="JavaScript" src="js/core/core.js"></SCRIPT>
-<script type="text/javascript" language="JavaScript" src="js/pw_ajax.js"></script>
-<script language="JavaScript">
+<base id="headbase" href="$db_bbsurl/" />
+<link rel="stylesheet" href="images/pw_core.css?{$GLOBALS['wind_repair']}" />
+<link rel="stylesheet" href="images/search/style.css?{$GLOBALS['wind_repair']}" />
+<script type="text/javascript" src="js/core/core.js"></script>
+<script type="text/javascript" src="js/pw_ajax.js"></script>
+<script>
 var imgpath = '$imgpath';
 var verifyhash = '$verifyhash';
 var modeimg = '$pwModeImg';

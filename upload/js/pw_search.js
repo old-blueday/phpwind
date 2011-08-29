@@ -23,9 +23,13 @@ function pw_search(dstId,view,selectView,prefix){
 	this.browser = nav.indexOf('msie') != -1?nav.indexOf('opera') == -1?'ie':'opera':navigator.product == 'Gecko'?'gecko':'';
 	this.selDiv;
 	this.separater = '#%';
+	this.type=null;//调用的类型,目前为了消息中心做加,post 表示发帖，有title
+	this.callback=null;
 }
 //缓存数据，避免过多操作数据库
 pw_search.cached = new Array();
+pw_search.friend = new Array();
+pw_search.attention = new Array();
 pw_search.hasData=false;
 pw_search.inArray=function( elem, array ) {
 	if ( array.indexOf ) {
@@ -40,6 +44,7 @@ pw_search.inArray=function( elem, array ) {
 };
 pw_search.prototype = {
 	move:function(eArgs){
+		
 		 var e = eArgs ? eArgs : window.event;
 		 if( (e.keyCode==39 || e.keyCode==37) && this.dst.value==''){
 				var node = (e.keyCode==37)?this.dst.previousSibling:this.dst.nextSibling;
@@ -90,16 +95,42 @@ pw_search.prototype = {
 		}else if(e.keyCode==8&&this.dst.value==''){
 			var prev = this.dst.previousSibling;
 			prev&&prev.tagName=='SPAN' && this.dst.parentNode.removeChild(prev);
+			this.updateNum();
 		}else if(this.dst.value!='' && (e.keyCode==188||e.keyCode==32||e.keyCode==13)){
+				if(is_ie){
+						e.returnValue=false;
+					}else{
+						e.preventDefault();
+				}
+				var str=this.dst.value;
+				if(str==""||(pw_search.inArray(str,pw_search.cached)<0&&this.type=="post")){
+					return false;
+				}
 				if(this.itemIndex>=0)
 					return;
 				var _psearch = this;
 				setTimeout(function(){
-					_psearch.add(_psearch.dst.value.replace(/[,\s]/ig,''));
+					var str=_psearch.dst.value.replace(/[,\s]/ig,'');
+					if(pw_search.inArray(str,pw_search.cached)<0&&_psearch.type=="post"){
+						return false;
+					}
+					_psearch.add(str);
 				},100);
+				
+		}else if(this.dst.value==""&&e.keyCode==13){
+			if(is_ie){
+						e.returnValue=false;
+					}else{
+						e.preventDefault();
+					}
+			return false;
 		}
+		
 	},
-	init:function(url,data,resultId){
+	init:function(url,data,resultId,callback,initcb){//initcb 初始化数据后的回调用 可见编辑帖子
+		if(callback){
+			this.callback=callback;
+		}
 		this.createResultDiv(resultId);
 		_obj = this;
 		if(!pw_search.hasData){
@@ -107,10 +138,16 @@ pw_search.prototype = {
 				var str = ajax.request.responseText.toString();
 				var json = JSONParse(str);
 
-				pw_search.cached = json.friend?json.friend.split(_obj.separater):[];
-				pw_search.group = json.group?json.group.split(_obj.separater):[];
+				pw_search.friend = json.friend?json.friend.split(_obj.separater):[];
+				pw_search.attention = json.attention?json.attention.split(_obj.separater):[];
+				pw_search.cached = pw_search.attention;
+				//pw_search.cached = json.friend?json.friend.split(_obj.separater):[];
+				//pw_search.group = json.group?json.group.split(_obj.separater):[];
 
 				pw_search.hasData=true;
+				if(initcb){
+					initcb(_obj);
+				}
 			});
 		}
 	},
@@ -120,8 +157,14 @@ pw_search.prototype = {
 			return false;
 		}
 		if(e.keyCode==13 && this.result.length && pw_search.cached.length){
+			
 			if(this.itemIndex>-1){
 				this.resultDiv.getElementsByTagName('li')[this.itemIndex].onmousedown();
+				if(is_ie){
+					e.returnValue=false;
+				}else{
+					e.preventDefault();
+				}
 				return false;
 			}
 		}
@@ -147,6 +190,7 @@ pw_search.prototype = {
 			pwSearch.resultDiv.style.display='none';
 			document.onclick=null;
 		};
+		
 	},
 	focusRow:function(obj,index){
 		var ul = this.resultDiv.getElementsByTagName('ul')[0];
@@ -172,7 +216,7 @@ pw_search.prototype = {
 	createSelDiv:function(win){
 		this.selDiv=document.createElement('div');
 		this.selDiv.id=win;
-		this.selDiv.innerHTML='<table border="0" cellspacing="0" cellpadding="0"><tbody><tr><td class="bgcorner1"></td><td class="pobg1"></td><td class="bgcorner2"></td></tr><tr><td class="pobg4"></td><td><div class="popoutContent"><div class="popTop tar"><select name="" class="fn"><option value="-1">全部好友</option><option value="0">未分组</option></select></div><div class="friListA"><ul></ul></div><div class="popBottom"><span class="btn2" onclick="pwSearch.closeSel()"><span><button>确认</button></span></span><span class="bt2" onclick="pwSearch.closeSel()"><span><button>关闭</button></span></span></div></div></td><td class="pobg2"></td></tr><tr><td class="bgcorner4"></td><td class="pobg3"></td><td class="bgcorner3"></td></tr></tbody></table>';
+		this.selDiv.innerHTML='<table border="0" cellspacing="0" cellpadding="0"><tbody><tr><td class="bgcorner1"></td><td class="pobg1"></td><td class="bgcorner2"></td></tr><tr><td class="pobg4"></td><td><div class="popoutContent"><div class="popTop tar"><select name="" class="fn"><option value="-1">我关注的</option><option value="-2">我的好友</option></select></div><div class="friListA"><ul></ul></div><div class="popBottom"><span class="btn2" onclick="pwSearch.closeSel()"><span><button>确认</button></span></span><span class="bt2" onclick="pwSearch.closeSel()"><span><button>关闭</button></span></span></div></div></td><td class="pobg2"></td></tr><tr><td class="bgcorner4"></td><td class="pobg3"></td><td class="bgcorner3"></td></tr></tbody></table>';
 		this.selDiv.style.display='none';
 		this.selDiv.style.position="absolute";
 		this.selDiv.className='popout';
@@ -207,7 +251,11 @@ pw_search.prototype = {
 	},
 	putValue:function(obj){
 		clearTimeout(this.timer);
-		this.add(obj.innerHTML);
+		var str=obj.innerHTML;
+		if(pw_search.inArray(str,pw_search.cached)<0){
+			return false;
+		}
+		this.add(str);
 		this.resultDiv.style.display = 'none';
 		this.itemIndex=-1;
 		this.dst.focus();
@@ -239,6 +287,7 @@ pw_search.prototype = {
 		//var e = eArgs ? eArgs : window.event;
 		var item = e.parentNode.parentNode.parentNode;
 		item.parentNode.removeChild(item);
+		this.updateNum();
 	},
 	add:function(str){
 		var tmpObj = document.getElementsByName('_'+this.dst.name+'[]');
@@ -251,7 +300,10 @@ pw_search.prototype = {
 		str = str.replace(/\s/ig,'');
 		if(str=='')
 			return;
-		if(this.dst.parentNode.getElementsByTagName('span').length>=this.dst.getAttribute('max')){
+		var len=this.dst.parentNode.getElementsByTagName('span').length;
+		var max=this.dst.getAttribute('max');
+		var isUnlimit=!(max==""||max==0);//限制人数的情况下
+		if(isUnlimit&&len>=max){
 			if (this.dst.getAttribute('issearch') != 1) {
 				MC.showFailTips('最多只能同时发送'+this.dst.getAttribute('max')+'人').fadeTips();
 				return;
@@ -262,14 +314,24 @@ pw_search.prototype = {
 		if(!tmpArray.length || (tmpArray.length && pw_search.inArray(str,tmpArray) < 0)){
 			var item = document.createElement('span');
 			item.innerHTML='<a href="javascript://"><i>'+str+'<input type="hidden" name="_'+this.dst.name+'[]" id="_'+this.dst.name+'[]" value="'+str+'"><del class="x">删除</del></i></a>';
-			item.getElementsByTagName('del')[0].onclick=this.del;
+			var self=this;
+			item.getElementsByTagName('del')[0].onclick=function(e){
+				self.del(e);
+			}
 			this.dst.parentNode.insertBefore(item, this.dst);
-		}else
+			this.updateNum();
+		}else if(pw_search.inArray(str,tmpArray)>=0){
 			MC.showFailTips('用户名为'+str+'的已经在收件人列表中').fadeTips();
+		}
 		this.dst.value = '';
+		
+		return false;
 	},
 	//插件：列出列表
-	selectInit:function(e,win,url,data,offset){
+	selectInit:function(e,win,url,data,offset,callback){
+		if(callback){
+			this.callback=callback;
+		}
 		if (window.event) //停止事件冒泡
 			window.event.cancelBubble = true;
 		else
@@ -291,13 +353,31 @@ pw_search.prototype = {
 			this.createSelDiv(win);
 			offset=offset||0;
 			var select = this.selDiv.getElementsByTagName('select')[0];
+			//为@弹窗添加标题
+			if(this.type=="post"){
+				var title=document.createElement("div");
+				title.style.cssText="text-align:left;font-size:12px;font-weight:normal;float:left;";
+				select.style.margin="0";
+				if(select.style.cssFloat!=undefined){
+					select.style.cssFloat="right";	
+				}else{
+					select.style.styleFloat="right";
+				}
+				title.innerHTML="请选择你要@的人(已选<span id='pwSearchPercent'>0</span>人)";
+				select.parentNode.insertBefore(title,select);
+			}
+			//end
 			var _obj=this;
 			
 			//设置select
 			select.onchange=function(){
 				var val = select.value;
 				if(val<0){
-					_obj.sel_list = pw_search.cached;
+					if (val == -1){
+						pw_search.cached = _obj.sel_list = pw_search.attention;
+					} else if(val == -2){
+						pw_search.cached = _obj.sel_list = pw_search.friend;
+					}
 					_obj.showFriends();
 					_obj.selectFriends();
 				}else
@@ -314,8 +394,11 @@ pw_search.prototype = {
 					var str = ajax.request.responseText.toString();
 					var json = JSONParse(str);
 					
-					pw_search.cached = json.friend?json.friend.split(_obj.separater):[];
-					pw_search.group = json.group?json.group.split(_obj.separater):[];
+					//pw_search.cached = json.friend?json.friend.split(_obj.separater):[];
+					//pw_search.group = json.group?json.group.split(_obj.separater):[];
+					pw_search.friend = json.friend?json.friend.split(_obj.separater):[];
+					pw_search.attention = json.attention?json.attention.split(_obj.separater):[];
+					pw_search.cached = pw_search.attention;
 					pw_search.hasData=true;
 					_obj.sel_list = pw_search.cached;
 					_obj.showFriends();
@@ -330,15 +413,37 @@ pw_search.prototype = {
 		this.selectFriends();
 		//显示窗口
 		this.selDiv.style.display='';
-		this.selDiv.style.left=this.dst.parentNode.getBoundingClientRect().right-this.selDiv.clientWidth+ietruebody().scrollLeft+offset+'px';
-		this.selDiv.style.top=this.dst.parentNode.getBoundingClientRect().top+ietruebody().scrollTop+20+'px';
+		
+		
+		//更新弹窗位置  qianshan07-06
+		var ele=btn;
+        var dd = document.documentElement;
+        var db = document.body;
+        var stop = dd.scrollTop + db.scrollTop
+        var sleft = dd.scrollLeft + db.scrollLeft;
+        var cw = dd.clientWidth;
+        var ch = dd.clientHeight;
+        var bound = ele.getBoundingClientRect();
+        var left = bound.left;
+        var top = bound.top;
+        var h = ele.offsetHeight;
+        var w = ele.offsetWidth;
+        var oh = this.selDiv.offsetHeight;
+        var ow = this.selDiv.offsetWidth;
+        this.selDiv.style.left = (left + ow) > cw ? (sleft + left + w - ow + "px") : (sleft + left-ow+18 + "px");
+        this.selDiv.style.top = (top + oh + h) > ch ? (stop + top - oh-5 + "px") : (stop + top + h+4 + "px");
+		//=============
 		this.selDiv.style.zIndex = '1110';
 		btn.className="input_up";
 		document.onclick=function(){
 			pwSearch.closeSel();
 		};
+		this.updateNum();
 	},
 	getGroup:function(){
+		if(!pw_search.group){
+			return false;
+		}
 		var select = this.selDiv.getElementsByTagName('select')[0];
 		for(var i=pw_search.group.length-1;i>=0;i--){
 			select.options.add( new Option(pw_search.group[i], pw_search.group[i]) ); 
@@ -353,18 +458,21 @@ pw_search.prototype = {
 	    }
 		//var e=e||event,input;
 		//var target=e.srcElement;
+		var len=this.dst.parentNode.getElementsByTagName('span').length;
+		var max=this.dst.getAttribute('max');
+		var isUnlimit=!(max==""||max==0);
 		if(target.tagName!='INPUT'){
 			input=target.getElementsByTagName('input')[0];
-			if(!input.checked && this.dst.parentNode.getElementsByTagName('span').length>=this.dst.getAttribute('max')) {
-				this.closeSel();
+			if(!input.checked &&isUnlimit&&len>=max) {
+				//this.closeSel();
 				return;
 			}
 			input.checked=!input.checked;
 		}else{
 			input=target;
-			if(input.checked && this.dst.parentNode.getElementsByTagName('span').length>=this.dst.getAttribute('max')){
+			if(input.checked&&isUnlimit&&len>=max){
 				input.checked=!input.checked;
-				this.closeSel();
+				//this.closeSel();
 				return;
 			}
 		}
@@ -378,12 +486,40 @@ pw_search.prototype = {
 				}
 			}
 		}else{
-			this.add(input.value);
-			if (this.dst.parentNode.getElementsByTagName('span').length>=this.dst.getAttribute('max')) {
+			var str=input.value;
+			if(pw_search.inArray(str,pw_search.cached)<0){
+				return false;
+			}
+			
+			if (isUnlimit&&len>=max) {
 				this.closeSel();
 			}
+			this.add(str);
 			this.dst.focus();
 		}
+		this.updateNum();
+	},
+	updateNum:function(){
+		
+		//获取已选择数目带给回调函数
+		var eles=document.getElementsByName('_'+this.dst.name+'[]');
+		var len=eles&&eles.length||0;
+			if(this.callback!=null){
+				this.callback(len);
+			}
+		//更新选择人数
+		var max=this.dst.getAttribute("max");
+		var isUnlimit=!(max==""||max==0);//限制人数的情况下
+		var percentEle=getObj("pwSearchPercent");
+		if(percentEle){
+			percentEle.innerHTML=isUnlimit?(len+"/"+max):len;
+			if(len==max&&isUnlimit){
+				percentEle.style.color="#f00";
+			}else{
+				percentEle.style.color="#080";
+			}
+		}
+			
 	},
 	showFriends:function(){//显示列表
 		var ds = this.sel_list||[];
@@ -426,8 +562,19 @@ pw_search.prototype = {
 	},
 	blur:function(){
 		/*if(this.resultDiv && this.resultDiv.style.display!='none')
-			return;*/
-		this.timer = setTimeout('pwSearch.add(pwSearch.dst.value)',15);
+			return;*/	
+		/*针对快速回复所做的扩展*/	
+		var eles=document.getElementsByName('_'+this.dst.name+'[]');	
+		if(eles.length<1&&this.dst.value.replace(/\s*/g,"")==""&&getObj("at_input_tip")){
+			getObj("at_input_tip").style.display="";
+		}	
+		/*end*/
+		var str=pwSearch.dst.value;
+		if(this.type=="post"&&pw_search.inArray(str,pw_search.cached)<0){
+			return false;
+		}	
+		this.timer = setTimeout('pwSearch.add("'+str+'")',15);
+		
 	},
 	closeSel:function(){
 		this.selDiv.style.display='none';
@@ -438,6 +585,21 @@ pw_search.prototype = {
 		}
 		btn.className="input_down";
 		document.onclick=null;
+		if(getObj("showAt")){
+			getObj("showAt").style.display="none";
+		}
+	},
+	clear:function(){
+		if(!this.dst){
+			return false;
+		}
+		var tmpObj = this.dst.parentNode;
+		var spans=tmpObj.getElementsByTagName("span");
+		for(var i=0,len=spans.length;i<len;i++){
+			var item=tmpObj.firstChild;
+			tmpObj.removeChild(item)
+		}
+		this.updateNum();
 	}
 }
 var pwSearch = new pw_search('usernames');

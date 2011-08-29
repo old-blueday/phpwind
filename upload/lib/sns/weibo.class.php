@@ -33,7 +33,50 @@ class PW_Weibo {
 		$privacyService = L::loadClass('privacy','sns');
 		return $privacyService->getIsFeed($uid, $type);
 	}
-	
+	/*
+	function getAtPrivacyByUserNames($usernames){
+		$privacyService = L::loadClass('privacy','sns');
+		return $privacyService->getAtFeed($uid);
+	}
+	*/
+	/**
+	 * 过滤隐私设置的用户（返回允许被@的用户）
+	 * @return array $uids
+	 */
+	function filterPrivacyAtUsers($usernames,$uid = 0){
+		$uid = intval($uid);
+		$uid < 1 && $uid = $GLOBALS['winduid'];
+		$privacyService = L::loadClass('privacy','sns');
+		$attentionService = L::loadClass('attention','friend');
+		$checkAttentioned = array();
+		$returnUids = array();
+		$filterUsers = $privacyService->getAtFeedByUserNames($usernames);
+		//黑名单处理
+		$blackList = $attentionService->getBlackListToMe($uid,array_keys($filterUsers));
+		if (S::isArray($blackList)) {
+			foreach ($blackList as $v) {
+				unset($filterUsers[$v]);
+			}
+		}
+		foreach($filterUsers as $k=>$v) {
+			if ($v['at_isfeed'] == 0){
+				//允许所有人@
+				$returnUids[$k] = $v['username'];
+			} elseif ($v['at_isfeed'] == 1) {
+				//关注的人可@
+				$checkAttentioned[$k] = $v['username'];
+			}
+		}
+		//check attention
+		if ($checkAttentioned) {
+			foreach ($checkAttentioned as $k=>$v){
+				if ($attentionService->isFollow($k,$uid)){
+					$returnUids[$k] = $v;
+				} 
+			}
+		}
+		return $returnUids;
+	}
 	/**
 	 * 查看用户空间及相关应用隐私
 	 * @param int $uid
@@ -58,6 +101,14 @@ class PW_Weibo {
 		if (!$content && empty($ifempty)) return '新鲜事内容不为空';
 		if (strlen($content) > 255) return '新鲜事内容不能多于255字节';
 		$filterService = L::loadClass('FilterUtil', 'filter');
+		//过滤笑脸
+		$smileService = L::loadClass('smile','smile');
+		$tmpSmiles = $smileTags = array();
+		$tmpSmiles = $smileService->findByType();
+		foreach ($tmpSmiles as $v) {
+			$smileTags[] = $v['tag'];
+		}
+		$content = str_ireplace($smileTags, '', $content);
 		if (($GLOBALS['banword'] = $filterService->comprise($content)) !== false) {
 			return 'content_wordsfb';
 		}
@@ -68,6 +119,27 @@ class PW_Weibo {
 		global $o_weibo_groups;
 		return ($groupid == 3 || empty($o_weibo_groups) || strpos($o_weibo_groups,",$groupid,") !== false);
 	}
+	 
+	 function checkReplyRight($tid) {
+	 	global $isGM,$winddb,$isBM;
+	 	$threadService = L::loadClass('threads', 'forum');
+	 	L::loadClass('forum', 'forum', false);
+	 	$read = $threadService->getByThreadId($tid);
+	 	$pwforum = new PwForum($read['fid']);	
+	 	$forumset =& $pwforum->forumset;
+	 	if (getstatus($read['tpcstatus'], 7)) {
+			$robbuildService = L::loadClass('RobBuild', 'forum'); /* @var $robbuildService PW_RobBuild */
+			$robbuild = $robbuildService->getByTid($tid);
+			if ($robbuild['starttime'] > $this->_timestamp) return false;
+		}
+	 	$tpc_locked = $read['locked']%3<>0 ? 1 : 0;
+	 	$admincheck = ($isGM || $isBM) ? 1 : 0;
+	 	$isAuthStatus = $admincheck || (!$forumset['auth_allowrp'] || $pwforum->authStatus($winddb['userstatus'],$forumset['auth_logicalmethod']) === true);
+	 	if ($isAuthStatus && (!$tpc_locked || $SYSTEM['replylock']) && ($admincheck || $pwforum->allowreply($winddb, $groupid))) {
+	 		return true;
+	 	}
+	 	return false;
+	 }
 
 	function escapeStr($str) {
 		if (!$str = trim($str)) return '';
@@ -96,8 +168,14 @@ class PW_Weibo {
 		if ($this->_map[$type] > 9 && !$this->checkSendPrivacy($uid, $this->_privacyMapping($type))) {
 			return 0;
 		}
+		$fromThread = $extra['fid'] && $extra['title'];
+		if ($fromThread && $extra['atusers']) {
+			$extra['atusers'] = $this->filterPrivacyAtUsers($extra['atusers']);
+		}
+		//无@用户,回复不产生新鲜事
+		if (!$extra['atusers'] && $extra['pid']) return 0;
 		$content = $this->escapeStr($content);
-		$extra = array_merge((array)$extra, $this->_analyseContent($uid, $content));
+		$extra = $fromThread ? (array)$extra : array_merge((array)$extra, $this->_analyseContent($uid, $content));
 		$message = array(
 			'uid' => $uid,			'content' => $content,
 			'postdate' => $this->_timestamp,
@@ -113,9 +191,13 @@ class PW_Weibo {
 		}
 		$this->_addRelation($uid, $mid, $type);
 
-		if ($extra['refer']) {
+		if ($fromThread && $extra['atusers']) {
+			$extra['atusers'] && $this->addRefer(array_keys($extra['atusers']), $mid);
+		} elseif ($extra['refer']) {
+			$extra['refer'] = $this->filterPrivacyAtUsers($extra['refer']);
 			$this->addRefer(array_keys($extra['refer']), $mid);
 		}
+		
 		if ($extra['cyid']) {
 			$this->_addCnRelation($extra['cyid'], $mid);
 		}
@@ -125,10 +207,11 @@ class PW_Weibo {
 		$userCache = L::loadClass('Usercache', 'user');
 		$userCache->delete($uid, 'weibo');
 
-		//sinaweibo
-		if ($GLOBALS['db_sinaweibo_status'] && !in_array($type, array('sinaweibo')) && !$extra['isSinaForward']) {
-			$bindService = L::loadClass('WeiboBindService', 'sns/weibotoplatform'); /* @var $bindService PW_WeiboBindService */
-			if ($bindService->isLocalBind($uid, PW_WEIBO_BINDTYPE_SINA)) {
+		//platform weibo app
+		$siteBindService = L::loadClass('WeiboSiteBindService', 'sns/weibotoplatform/service'); /* @var $siteBindService PW_WeiboSiteBindService */
+		if ($siteBindService->isOpen() && !$siteBindService->isBind($type) && !$extra['noSync']) {
+			$userBindService = L::loadClass('WeiboUserBindService', 'sns/weibotoplatform/service'); /* @var $userBindService PW_WeiboUserBindService */
+			if ($userBindService->isBindOne($uid)) {
 				unset($message['extra']);
 				$syncer = L::loadClass('WeiboSyncer', 'sns/weibotoplatform'); /* @var $syncer PW_WeiboSyncer */
 				$syncer->send($mid, $type, $message, $extra);
@@ -162,7 +245,8 @@ class PW_Weibo {
 	 */
 	function _analyseTopics($content) {
 		$topics = array();
-		preg_match_all('/#([^#]+)#/U',$content,$matches) && $topics = $matches[1];
+		//preg_match_all('/#([^#]+)#/U',$content,$matches) && $topics = $matches[1];
+		preg_match_all('/#([^@&#!*\(\)]+)#/U',$content,$matches) && $topics = $matches[1];
 		foreach ($topics as $k=>$v) {
 			$v = trim($v);
 			//话题内不允许含链接
@@ -400,8 +484,13 @@ class PW_Weibo {
 		if (empty($mids) || (!is_numeric($mids) && !is_array($mids))) {
 			return array();
 		}
-		$contentDao = L::loadDB('weibo_content','sns');
-		$array = $contentDao->getWeibosByMid($mids);
+		if (perf::checkMemcache()){
+			$_cacheService = Perf::gatherCache('pw_weibo_content');
+			$array =  $_cacheService->getWeibosByMids($mids);			
+		} else {
+			$contentDao = L::loadDB('weibo_content','sns');
+			$array = $contentDao->getWeibosByMid($mids);
+		}
 		return is_array($mids) ? $array : current($array);
 	}
 	
@@ -622,11 +711,13 @@ class PW_Weibo {
 	
 	function _sourceSql($source) {
 		$source = $source ? $source : array();
-		if (!is_array($source) || count($source) >= 4) {
+		if (!is_array($source)) {
 			return array();
 		}
 		$array = array(0, 1, 2);
 		$map = $this->_compositeMap();
+		if (count($source) >= (count($map) - 5)) return array();
+		
 		foreach ($source as $key => $value) {
 			if (is_array($map[$key])) {
 				$array = array_merge($array, array_values($map[$key]));
@@ -666,8 +757,6 @@ class PW_Weibo {
 	 * return array
 	 */
 	function buildData($data, $field = 'uid') {
-		global $db_sinaweibo_status; //sinaweibo
-		
 		$uids = $tids = $tArr = array();
 		foreach ($data as $key => $value) {
 			$uids[] = $value[$field];
@@ -683,9 +772,12 @@ class PW_Weibo {
 		}
 		
 		$uinfo = $this->_getUserInfo($uids);
-		if ($db_sinaweibo_status) {
-			$bindService = L::loadClass('weibobindservice', 'sns/weibotoplatform'); /* @var $bindService PW_WeiboBindService */
-			$weiboUsersInfo = $bindService->getUsersLocalBindInfo(array_keys($uinfo), PW_WEIBO_BINDTYPE_SINA);
+		
+		/* platform weibo app */
+		$siteBindService = L::loadClass('WeiboSiteBindService', 'sns/weibotoplatform/service'); /* @var $siteBindService PW_WeiboSiteBindService */
+		if ($siteBindService->isOpen()) {
+			$userBindService = L::loadClass('WeiboUserBindService', 'sns/weibotoplatform/service'); /* @var $userBindService PW_WeiboUserBindService */
+			$usersBindInfo = $userBindService->getUsersLocalBindInfo(array_keys($uinfo));
 		}
 		foreach ($data as $key => $value) {
 			$value = $this->formatRecord($value, $uinfo[$value[$field]]['groupid']);
@@ -696,7 +788,13 @@ class PW_Weibo {
 			!is_array($uinfo[$value[$field]]) && $uinfo[$value[$field]] = array();
 			$data[$key] = array_merge((array)$value, $uinfo[$value[$field]]);
 			
-			if ($db_sinaweibo_status && $type == 'sinaweibo') $data[$key]['sinaWeiboUserInfo'] = $weiboUsersInfo[$value[$field]]['info'];
+			/* platform weibo app */
+			if ($siteBindService->isOpen() && $siteBindService->isBind($type)) {
+				$data[$key]['bindUserInfo'] = $usersBindInfo[$type][$value[$field]]['info'];
+				$data[$key]['bindSiteInfo'] = $siteBindService->getBindType($type);
+				$data[$key]['bindUserInfo']['url'] = $data[$key]['bindSiteInfo']['uidUrlPrefix'] . $data[$key]['bindUserInfo']['id'];
+				if (isset($data[$key]['extra']['sinaPhotos'])) $data[$key]['extra']['photos'] = $data[$key]['extra']['sinaPhotos']; //for compatible
+			}
 		}
 		return $data;
 	}
@@ -739,7 +837,7 @@ class PW_Weibo {
 		if ($extra['topics']) {
 			$content = pwHtmlspecialchars_decode($content,false);
 			if(preg_match('/^#\s+#$/', $content)) return $content;
-			$content = preg_replace_callback('/#([^#]+)#/U',array(&$this,'_callback_add_topic_url'),$content);
+			$content = preg_replace_callback('/#([^@&#!*\(\)]+)#/U',array(&$this,'_callback_add_topic_url'),$content);
 		}
 		if (strpos($content,'[s:') !== false && strpos($content,']') !== false) {
 			$content = $this->_parseSmile($content);
@@ -1049,7 +1147,7 @@ class PW_Weibo {
 			'group_photos' => 41,//群组相册
 			'group_active' => 42,//群组活动
 			'group_write' => 43,//群组记录/讨论
-			'sinaweibo' => 50, //sinaweibo
+			//NOTE please keep 50-59 for external weibo types
 		);
 		$this->_mapDescript = array(
 			'weibo' => '新鲜事',
@@ -1063,9 +1161,18 @@ class PW_Weibo {
 			'group_photos' => '群组相册',
 			'group_active' => '群组活动',
 			'group_write' => '群组记录',
-			'sinaweibo' => '新浪微博', //sinaweibo
 			'cms' => '文章',
 		);
+		
+		/* platform weibo app */
+		$siteBindService = L::loadClass('WeiboSiteBindService', 'sns/weibotoplatform/service'); /* @var $siteBindService PW_WeiboSiteBindService */
+		if ($siteBindService->isOpen()) {
+			foreach ($siteBindService->getBindTypes() as $key => $config) {
+				$this->_map[$key] = $config['typeId'];
+				$this->_mapDescript[$key] = $config['title'];
+			}
+		}
+		
 		$this->_mapflip = array_flip($this->_map);
 	}
 	
@@ -1110,6 +1217,19 @@ class PW_Weibo {
 		return isset($this->_mapflip[$type]) ? $this->_mapflip[$type] : 'weibo';
 	}
 
+	/**
+	 * 获取新鲜事展示类型（有些新鲜事类型可用同一展示模版）
+	 */
+	function getViewType($type) {
+		$weiboType = $this->getType($type);
+		
+		/* platform weibo app */
+		$siteBindService = L::loadClass('WeiboSiteBindService', 'sns/weibotoplatform/service'); /* @var $siteBindService PW_WeiboSiteBindService */
+		if ($siteBindService->isBind($weiboType)) return 'bindweibo';
+
+		return $weiboType;
+	}
+	
 	function adminSearch($usernames,$contents,$startDate,$endDate,$type = 0 ,$orderby = 'desc',$page = 1,$perpage = 20){
 		if($usernames){
 			$usernames = is_array($usernames) ? $usernames : array($usernames);

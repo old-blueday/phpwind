@@ -62,8 +62,9 @@ if (!$action) {
 		if ('2' == $from) {
 			$rt = $db->get_one("SELECT COUNT(*) AS sum FROM pw_argument a LEFT JOIN pw_recycle r ON a.tid=r.tid LEFT JOIN pw_threads t ON r.tid=t.tid WHERE r.pid='0' $sql");
 			$pages = numofpage($rt['sum'],$page,ceil($rt['sum']/$db_perpage), "$basename&from=2&keyword=" . rawurlencode($keyword) . "&cyid=$cyid&uid=$uid&admin=$admin&type=$type&");
-			$query = $db->query("SELECT r.*,t.subject,t.author,t.authorid,c.id AS cyid,c.cname FROM pw_argument a LEFT JOIN pw_recycle r ON r.tid=a.tid LEFT JOIN pw_threads t ON r.tid=t.tid LEFT JOIN pw_colonys c ON a.cyid=c.id WHERE r.pid='0' $sql ORDER BY deltime DESC $limit");
+			$query = $db->query("SELECT r.*,t.subject,t.author,t.authorid,t.postdate,c.id AS cyid,c.cname FROM pw_argument a LEFT JOIN pw_recycle r ON r.tid=a.tid LEFT JOIN pw_threads t ON r.tid=t.tid LEFT JOIN pw_colonys c ON a.cyid=c.id WHERE r.pid='0' $sql ORDER BY deltime DESC $limit");
 			while ($rt = $db->fetch_array($query)) {
+				$rt['postdate'] = get_date($rt['postdate']);
 				$rt['deltime'] = get_date($rt['deltime']);
 				$rt['subject'] = substrs($rt['subject'],50);
 				$recycledb[$rt['tid']] = $rt;
@@ -72,8 +73,9 @@ if (!$action) {
 		} else {
 			$rt    = $db->get_one("SELECT COUNT(*) AS sum FROM pw_recycle r LEFT JOIN pw_threads t USING(tid) WHERE r.pid='0' $sql");
 			$pages = numofpage($rt['sum'],$page,ceil($rt['sum']/$db_perpage),"$basename&from=$from&keyword=".rawurlencode($keyword)."&fid=$fid&uid=$uid&admin=$admin&type=$type&");
-			$query = $db->query("SELECT r.*,t.subject,t.author,t.authorid,t.tpcstatus FROM pw_recycle r LEFT JOIN pw_threads t USING(tid) WHERE r.pid='0' $sql ORDER BY deltime DESC $limit");
+			$query = $db->query("SELECT r.*,t.subject,t.author,t.authorid,t.postdate,t.tpcstatus FROM pw_recycle r LEFT JOIN pw_threads t USING(tid) WHERE r.pid='0' $sql ORDER BY deltime DESC $limit");
 			while ($rt = $db->fetch_array($query)) {
+				$rt['postdate'] = get_date($rt['postdate']);
 				$rt['deltime'] = get_date($rt['deltime']);
 				$rt['subject'] = substrs($rt['subject'],50);
 				$rt['fname']   = $forum[$rt['fid']]['name'];
@@ -269,7 +271,7 @@ if (!$action) {
 		} else {
 			$sql = "WHERE r.pid='0' AND (t.fid='0' OR t.ifshield='2')";
 		}
-		$query  = $db->query("SELECT r.*,t.special,t.ifshield,t.ifupload,t.ptable,t.replies,t.fid AS ckfid FROM pw_recycle r LEFT JOIN pw_threads t ON r.tid=t.tid $sql LIMIT 100");
+		$query  = $db->query("SELECT r.*,t.special,t.ifshield,t.ifupload,t.ptable,t.replies,t.fid,t.postdate AS ckfid FROM pw_recycle r LEFT JOIN pw_threads t ON r.tid=t.tid $sql LIMIT 100");
 		while (@extract($db->fetch_array($query))) {
 			$goon = 1;
 			$ids[] = $tid;

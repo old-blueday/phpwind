@@ -100,7 +100,7 @@ class PW_ClassifySource extends SystemData {
 			$v['forumurl'] = getForumUrl($value['fid']);
 			$v['author'] = $value['anonymous'] ? '匿名' : $value['author'];
 			$v['authorid'] = $value['authorid'];
-			$v['postdate'] = get_date($value['postdate'], 'Y-m-d');
+			$v['postdate'] = $value['postdate'];
 			$v['topictypename'] = $value['modelname'];
 			$v['topictypeurl'] = 'thread.php?fid=' . $value['fid'] . '&modelid=' . $value['modelid'];
 			$data[$key] = $v;
@@ -204,14 +204,7 @@ class PW_ClassifySource extends SystemData {
 	 * @return string
 	 */
 	function _cookFid($fid) {
-		if ($fid && is_numeric($fid)) return $fid;
-		if (S::isArray($fid)) {
-			foreach ($fid as $key=>$value) {
-				if (!$value) unset($fid[$key]);
-			}
-			if (S::isArray($fid)) return S::sqlImplode($fid);
-		}
-		return getCommonFid();
+		return getCookedCommonFid($fid);
 	}
 	
 	/**

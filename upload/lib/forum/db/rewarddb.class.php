@@ -19,11 +19,11 @@ class PW_RewardDB extends BaseDB {
 		$order !== 'DESC' && $order = 'ASC';
 		$posts = array();
 		$sqlWhere = '';
-		$fid && $sqlWhere .= " t.fid IN ($fid) ";
-		$timestamp && $sqlWhere = ' AND t1.timelimit > '. S::SqlEscape($timestamp);
+		$fid && $sqlWhere .= " AND t.fid IN ($fid) ";
+		$timestamp && $sqlWhere .= ' AND t1.timelimit > '. S::SqlEscape($timestamp);
 		$blackListedTids = $this->_getBlackListedTids();
 		$blackListedTids && $sqlWhere .= ' AND t.tid NOT IN (' . $blackListedTids . ')';
-		$query = $this->_db->query("SELECT t1.*,t.tid,t.fid,t.author,t.authorid,t.subject,t.type,t.postdate,t.hits,t.replies FROM $this->_tableName t1 LEFT JOIN pw_threads t USING(tid) WHERE 1 $sqlWhere AND t.ifshield != 1 AND t.locked != 2  AND t.state != 3 AND t.ifcheck = 1 AND t.fid != 0 ORDER BY t.postdate $order ".S::sqlLimit($num));
+		$query = $this->_db->query("SELECT t1.*,t.tid,t.fid,t.author,t.authorid,t.subject,t.type,t.postdate,t.hits,t.replies FROM $this->_tableName t1 LEFT JOIN pw_threads t USING(tid) WHERE 1 $sqlWhere AND t.ifshield != 1 AND t.locked != 2  AND t.state = 0 AND t.ifcheck = 1 AND t.fid != 0 ORDER BY t.postdate $order ".S::sqlLimit($num));
 		while ($row = $this->_db->fetch_array($query)) {
 			$posts[] = $row;
 		}
@@ -44,8 +44,8 @@ class PW_RewardDB extends BaseDB {
 		$order !== 'DESC' && $order = 'ASC';
 		$posts = array();
 		$sqlWhere = '';
-		$fid && $sqlWhere .= " t.fid IN ($fid) ";
-		$timestamp && $sqlWhere = ' AND t1.timelimit > '. S::SqlEscape($timestamp);
+		$fid && $sqlWhere .= " AND t.fid IN ($fid) ";
+		$timestamp && $sqlWhere .= ' AND t1.timelimit > '. S::SqlEscape($timestamp);
 		$blackListedTids = $this->_getBlackListedTids();
 		$blackListedTids && $sqlWhere .= ' AND t.tid NOT IN (' . $blackListedTids . ')';
 		$query = $this->_db->query("SELECT t1.*,t.tid,t.fid,t.author,t.authorid,t.subject,t.type,t.postdate,t.hits,t.replies FROM $this->_tableName t1 LEFT JOIN pw_threads t USING(tid) WHERE 1 $sqlWhere AND t.ifshield != 1 AND t.locked != 2  AND t.state != 3 AND t.ifcheck = 1 AND t.fid != 0 ORDER BY t1.cbval + t1.caval $order ".S::sqlLimit($num));
@@ -69,8 +69,8 @@ class PW_RewardDB extends BaseDB {
 		$order !== 'DESC' && $order = 'ASC';
 		$posts = array();
 		$sqlWhere = '';
-		$fid && $sqlWhere .= " t.fid IN ($fid) ";
-		$timestamp && $sqlWhere = ' AND t1.timelimit > '. S::SqlEscape($timestamp);
+		$fid && $sqlWhere .= " AND t.fid IN ($fid) ";
+		$timestamp && $sqlWhere .= ' AND t1.timelimit > '. S::SqlEscape($timestamp);
 		$blackListedTids = $this->_getBlackListedTids();
 		$blackListedTids && $sqlWhere .= ' AND t.tid NOT IN (' . $blackListedTids . ')';
 		$query = $this->_db->query("SELECT t1.*,t.tid,t.fid,t.author,t.authorid,t.subject,t.type,t.postdate,t.hits,t.replies FROM $this->_tableName t1 LEFT JOIN pw_threads t USING(tid) WHERE 1 $sqlWhere AND t.ifshield != 1 AND t.locked != 2  AND t.state != 3 AND t.ifcheck = 1 AND t.fid != 0 ORDER BY t.replies $order ".S::sqlLimit($num));
@@ -94,8 +94,8 @@ class PW_RewardDB extends BaseDB {
 		$order !== 'DESC' && $order = 'ASC';
 		$posts = array();
 		$sqlWhere = '';
-		$fid && $sqlWhere .= " t.fid IN ($fid) ";
-		$timestamp && $sqlWhere = ' AND t1.timelimit > '. S::SqlEscape($timestamp);
+		$fid && $sqlWhere .= " AND t.fid IN ($fid) ";
+		$timestamp && $sqlWhere .= ' AND t1.timelimit > '. S::SqlEscape($timestamp);
 		$blackListedTids = $this->_getBlackListedTids();
 		$blackListedTids && $sqlWhere .= ' AND t.tid NOT IN (' . $blackListedTids . ')';
 		$query = $this->_db->query("SELECT t1.*,t.tid,t.fid,t.author,t.authorid,t.subject,t.type,t.postdate,t.hits,t.replies FROM $this->_tableName t1 LEFT JOIN pw_threads t USING(tid) WHERE 1 $sqlWhere AND t.ifshield != 1 AND t.locked != 2  AND t.state != 3 AND t.ifcheck = 1 AND t.fid != 0 ORDER BY t.hits $order ".S::sqlLimit($num));

@@ -14,7 +14,7 @@ $USCR = 'user_app';
 $navConfigService = L::loadClass('navconfig', 'site');
 $homenavigation = $navConfigService->userHomeNavigation(PW_NAV_TYPE_MAIN, 'o');
 
-if (in_array($q, array('ajax', 'article', 'diary', 'galbum', 'group', 'groups', 'hot', 'photos', 'sharelink', 'stopic', 'topicadmin', 'activity', 'weibo', 'collection'))) {
+if (in_array($q, array('ajax', 'article', 'diary', 'galbum', 'group', 'groups', 'hot', 'photos', 'sharelink', 'stopic', 'topicadmin', 'activity', 'weibo', 'collection','medal','kmd'))) {
 	$pwModeImg = "$imgpath/apps";
 	require_once(R_P . 'u/lib/space.class.php');
 	require_once(R_P.'require/showimg.php');

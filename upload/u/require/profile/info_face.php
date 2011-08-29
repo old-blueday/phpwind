@@ -70,7 +70,10 @@ if (!$step){
 	pwFtpClose($ftp);
 
 	//update member
-	$usericon && $userService->update($winduid, array('icon'=>$usericon));
+	$usericon && $result = $userService->update($winduid, array('icon'=>$usericon));
+	// defend start
+	CloudWind::yunUserDefend('editprofile', $winduid, $windid, $timestamp, 0, (($result === true) ? 101 : 102),'','','',array('profile'=>'icon'));
+	// defend end
 	//* $_cache = getDatastore();
 	//* $_cache->delete('UID_'.$winduid);
 	//job sign

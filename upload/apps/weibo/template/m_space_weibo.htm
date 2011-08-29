@@ -69,12 +69,12 @@ print <<<EOT
 <!--
 EOT;
 	foreach ($weiboList as $key => $value) {
-		$method = $weiboService->getType($value['type']);
+		$method = $weiboService->getViewType($value['type']);
 		$weiboModelTemplate->$method($value);
 	}
 	if ($count > $perpage) {print <<<EOT
 -->
-				<div class="cc p10">$pages</div>
+		<div class="cc p10">$pages</div>
 <!--
 EOT;
 	}
@@ -88,24 +88,30 @@ EOT;
     }elseif($isGM || $weiboList['authorid']=$GLOBALS['winduid'] ) {
 print <<<EOT
 -->
-</div>
-	
 <script type="text/javascript">
 var transmitAction = 'reloaddelay';
 setTimeout(function(){getcomments('comment','{$value['mid']}','');},300);
 </script>
 <!--
 EOT;
-}}} else {print <<<EOT
+}}print <<<EOT
+-->
+			</div>
+<!--
+EOT;
+} else {print <<<EOT
 -->
 			<div class="f14 tac p15">这家伙好懒，一条新鲜事都没留下！</div>
 <!--
 EOT;
-}}print <<<EOT
+}print <<<EOT
 -->
-
 		</div>
     </div>
+<!--
+EOT;
+}print <<<EOT
+-->
 </div>
 <!--
 EOT;

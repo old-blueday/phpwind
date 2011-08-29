@@ -110,14 +110,7 @@ class PW_TradeSource extends SystemData {
 	}
 
 	function _cookFid($fid) {
-		if ($fid && is_numeric($fid)) return $fid;
-		if (S::isArray($fid)) {
-			foreach ($fid as $key=>$value) {
-				if (!$value) unset($fid[$key]);
-			}
-			if (S::isArray($fid)) return S::sqlImplode($fid);
-		}
-		return getCommonFid();
+		return getCookedCommonFid($fid);
 	}
 
 	function getTradeDao(){

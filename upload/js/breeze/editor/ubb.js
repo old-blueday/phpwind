@@ -27,7 +27,9 @@ var IMGPATH = 'images/post/smile/',
 		FontSize: 'size',
 		sell: 'sell',
 		PgFormat: 'paragraph',
-		removeformat: ''
+		removeformat: '',
+		undo:'undo',
+		redo:'redo'
 	};
 //TODO:假设类传过来了。
 var Editor = B.editor;
@@ -56,17 +58,18 @@ function UBBMode(editor){
 	
 	this.init = function() {
 		var editor = this.editor;
+		editor.codeModeBtn && (editor.codeModeBtn.className = 'B_onCodeMode');
 		B.addEvent(this.textarea, 'mousedown', function(){
 			editor.clearRng();
 		});
 		B.addEvent(this.textarea, 'keyup', function(){
 			editor.clearRng();
 		});
-		editor.codeModeBtn && (editor.codeModeBtn.className = 'B_onCodeMode');
 		editor.setAutoSave(this.textarea);
+		
 	}
 	this.command = function(command){
-		if(['Undo','Redo'].indexOf(command)>-1){
+		if(['undo','redo'].indexOf(command)>-1){
 			document.execCommand(command, false, null);
 			return;
 		}
@@ -84,6 +87,7 @@ function UBBMode(editor){
 			this._rng = removeFormat(textarea);
 			return;
 		}
+		
 		command = UBBCommands[command];
 		var commands = command.split(' '),
 			pretag = '[' + command.replace(/\s+/ig, '][') + ']',
@@ -182,7 +186,9 @@ UBBMode.prototype = {
 		}
 	},
 	clearRng: function() {
-		this._rng = null;
+		if(this._rng){
+			this._rng = null;
+		}
 	},
 	//恢复选区
 	restoreRng: function(){
@@ -300,6 +306,7 @@ Editor.prototype.getSavedHTML = function(){
 Editor.prototype.setHtmlMode = function(checkbox){
 	this.isUBB = !checkbox.checked;
 }
+Editor.prototype.ubb2html=ubb2html;
 function ubb2html(sUBB) {
 	var para = false;
 	if (sUBB.indexOf('[paragraph]') > -1){
@@ -314,8 +321,8 @@ function ubb2html(sUBB) {
 		arrcode[cnum]= '<ol class="B_code"><li>' + c.replace(/\r?\n/ig, '</li><li>') + '</li></ol>';
 		return "[\tubbcodeplace_"+cnum+"\t]";
 	});
-
-	if(B.UA.gecko){//firefox  font-weight;
+	sHtml=sHtml.replace(/\[(b|u|i|strike)\]\s*?\[\/(b|u|i|strike)\]/ig, '');
+	if(B.UA.gecko){//firefox  font-weight; 0526新增color
 		sHtml=sHtml.replace(/\[(\/?)(b|u|i|strike)\]/ig, function(all, pre, tag){
 			if (pre) return '</span>';
 			var str = '<span style="';
@@ -328,11 +335,12 @@ function ubb2html(sUBB) {
 			str += '">';
 			return str;
 		});
+		sHtml=sHtml.replace(/\[color\s*=\s*([^\]"]+?)(?:"[^\]]*?)?\s*\]/ig,'<span style="color:$1">');
+		sHtml=sHtml.replace(/\[\/color\]/ig,'</span>');
 	} else {//other  strong em u del 
 		sHtml=sHtml.replace(/\[(\/?)(b|u|i|strike)\]/ig, '<$1$2>');
 	}
 	sHtml=sHtml.replace(/\[(\/?)(sup|sub)\]/ig,'<$1$2>');
-	
 	sHtml=sHtml.replace(/\[color\s*=\s*([^\]"]+?)(?:"[^\]]*?)?\s*\]/ig,'<font color="$1">');
 	sHtml=sHtml.replace(/\[size\s*=\s*(\d+?)\s*\]/ig,'<font size="$1">');
 	sHtml=sHtml.replace(/\[font\s*=\s*([^\]"]+?)(?:"[^\]]*?)?\s*\]/ig,'<font face="$1">');
@@ -415,6 +423,8 @@ function txt2html(sHtml) {
 		all=all.replace(/[<>]/g,function(s){return {'<':'&lt;','>':'&gt;'}[s];});
 		return all;
 	});
+	sHtml=sHtml.replace(/\[s:(\d{1,3})]/ig, function(a,b){if(!face[b]){b=faces[defaultface][0]||'';}return '<img emotion="'+b+'" title="'+face[b][1]+'" src="' + IMGPATH + face[b][0] + '" />';});
+	sHtml = ubb2attach(sHtml);
 	return sHtml;
 }
 function html2txt(sHtml) {
@@ -424,13 +434,21 @@ function html2txt(sHtml) {
 		all=all.replace(/&amp;/ig, '&');
 		return all;
 	});
+	sHtml=sHtml.replace(/<img((\s+\w+\s*=\s*(["'])?.*?\3)*)\s*\/?>/ig,function(all,attr){
+		var emot=attr.match(/\s+emotion\s*=\s*(["']?)\s*(.+?)\s*\1(\s|$)/i);
+		if(emot)return '[s:'+emot[2]+']';
+		var attach=attr.match(/\s+attachment\s*=\s*(["']?)\s*(.+?)\s*\1(\s|$)/i);
+		if(attach)return '[attachment='+attach[2]+']';
+		return all;
+	});
 	return sHtml;
 }
+Editor.prototype.html2ubb=html2ubb;
 function html2ubb(sHtml) {
 	var formatColor = B.formatColor;
 	var mapSize1=[10, 12, 16, 19, 24, 32, 48];
 	var mapSize2=['x-small', 'small', 'medium', 'large', 'x-large', 'xx-large', '-webkit-xxx-large'];
-	var regSrc=/\s+src\s*=\s*(["']?)\s*(.+?)\s*\1(\s|$)/i,regWidth=/\s+width\s*=\s*(["']?)\s*(\d+(?:\.\d+)?%?)\s*\1(\s|$)/i,regHeight=/\s+height\s*=\s*(["']?)\s*(\d+(?:\.\d+)?%?)\s*\1(\s|$)/i,regBg=/(?:background|background-color|bgcolor)\s*[:=]\s*(["']?)\s*((rgb\s*\(\s*\d{1,3}%?,\s*\d{1,3}%?\s*,\s*\d{1,3}%?\s*\))|(#[0-9a-f]{3,6})|([a-z]{1,20}))\s*\1/i;
+	var regSrc=/\s+src\s*=\s*(["']?)\s*(.+?)\s*\1(\s|$)/i,regWidth=/\s+width\s*=\s*(["']?)\s*(\d+(?:\.\d+)?%?)\s*\1(\s|$)/i,regHeight=/\s+height\s*=\s*(["']?)\s*(\d+(?:\.\d+)?%?)\s*\1(\s|$)/i,regBg=/(?:background|background-color|bgcolor)\s*[:=]\s*(["']?)\s*((rgb\s*\(\s*\d{1,3}%?,\s*\d{1,3}%?\s*,\s*\d{1,3}%?\s*\))|(#[0-9a-f]{3,6})|((?!initial)[a-z]{1,20}))\s*\1/i;
 	var regBc=/(?:border-color|bordercolor)\s*[:=]\s*(["']?)\s*((rgb\s*\(\s*\d{1,3}%?,\s*\d{1,3}%?\s*,\s*\d{1,3}%?\s*\))|(#[0-9a-f]{3,6})|([a-z]{1,20}))\s*\1/i;
 	var regBw=/\s+border\s*=\s*(["']?)\s*(\d+(?:\.\d+)?)\s*\1(\s|$)/i;
 	var i,sUBB=String(sHtml),arrcode=new Array(),cnum=0,para=false;
@@ -451,15 +469,15 @@ function html2ubb(sHtml) {
 	sUBB=sUBB.replace(/<(\/?)(sup|sub)(\s+[^>]*?)?>/ig,'[$1$2]');
 	sUBB=sUBB.replace(/<hr[^>]*?\/?>/ig,'[hr]');
 
-	for(i=0;i<9;i++)sUBB=sUBB.replace(/<(span)(?:\s+[^>]*?)?\s+style\s*=\s*"((?:[^"]*?;)*\s*(?:font-weight|text-decoration|font-style|font-family|font-size|color|background|background-color)\s*:[^"]*)"(?: [^>]+)?>(((?!<\1(\s+[^>]*?)?>)[\s\S]|<\1(\s+[^>]*?)?>((?!<\1(\s+[^>]*?)?>)[\s\S]|<\1(\s+[^>]*?)?>((?!<\1(\s+[^>]*?)?>)[\s\S])*?<\/\1>)*?<\/\1>)*?)<\/\1>/ig,function(all,tag,style,content){
+	for(i=0;i<11;i++)sUBB=sUBB.replace(/<(span)(?:\s+[^>]*?)?\s+style\s*=\s*"((?:[^"]*?;)*\s*(?:font-weight|text-decoration|font-style|font-family|font-size|color|background|background-color)\s*:[^"]*)"(?: [^>]+)?>(((?!<\1(\s+[^>]*?)?>)[\s\S]|<\1(\s+[^>]*?)?>((?!<\1(\s+[^>]*?)?>)[\s\S]|<\1(\s+[^>]*?)?>((?!<\1(\s+[^>]*?)?>)[\s\S])*?<\/\1>)*?<\/\1>)*?)<\/\1>/ig,function(all,tag,style,content){
 		var bold=style.match(/(?:^|;)\s*font-weight\s*:\s*bold/i),
 			underline=style.match(/(?:^|;)\s*text-decoration\s*:[^;]*underline/i),
 			strike=style.match(/(?:^|;)\s*text-decoration\s*:[^;]*line-through/i)
 			italic=style.match(/(?:^|;)\s*font-style\s*:\s*italic/i),
-			fontface=style.match(/(?:^|;)\s*font-family\s*:\s*([^;]+)/i),
+			fontface=style.match(/(?:^|;)\s*font-family\s*:\s*\'?([^;']+)\'?/i),
 			size=style.match(/(?:^|;)\s*font-size\s*:\s*([^;]+)/i),
 			color=style.match(/(?:^|;)\s*color\s*:\s*([^;]+)/i),
-			back=style.match(/(?:^|;)\s*(?:background|background-color)\s*:\s*([^;]+)/i),
+			back=style.match(/(?:^|;)\s*(?:background|background-color)\s*:\s*(?!transparent)([^;]+)/i),
 			str=content;
 		if(fontface)str='[font='+fontface[1]+']'+str+'[/font]';
 		if(italic)str='[i]'+str+'[/i]';
@@ -478,11 +496,17 @@ function html2ubb(sHtml) {
 		}
 		return str;
 	});
+	if(B.UA.webkit!=undefined){
+		sUBB=sUBB.replace(/<div>\s*<br\s*\/>\s*<\/div>/ig,'\r\n');
+	}
 	for(i=0;i<3;i++)sUBB=sUBB.replace(/<(div|p)(?:\s+[^>]*?)?[\s"';]\s*(?:text-)?align\s*[=:]\s*(["']?)\s*(left|center|right)\s*\2[^>]*>(((?!<\1(\s+[^>]*?)?>)[\s\S])+?)<\/\1>/ig,'[align=$3]$4[/align]');
 	for(i=0;i<3;i++)sUBB=sUBB.replace(/<(center)(?:\s+[^>]*?)?>(((?!<\1(\s+[^>]*?)?>)[\s\S])*?)<\/\1>/ig,'[align=center]$2[/align]');
-	/*for(i=0;i<3;i++)sUBB=sUBB.replace(/<(p|div)(?:\s+[^>]*?)?\s+style\s*=\s*"((?:[^"]*?;)*\s*text-align\s*:[^"]*)"(?: [^>]+)?>(((?!<\1(\s+[^>]*?)?>)[\s\S]|<\1(\s+[^>]*?)?>((?!<\1(\s+[^>]*?)?>)[\s\S]|<\1(\s+[^>]*?)?>((?!<\1(\s+[^>]*?)?>)[\s\S])*?<\/\1>)*?<\/\1>)*?)<\/\1>/ig,function(all,tag,style,content){
-		
-	});*/
+	for(i=0;i<3;i++)sUBB=sUBB.replace(/<(p|div)(?:\s+[^>]*?)?\s+style\s*=\s*"((?:[^"]*?;)*\s*color\s*:[^"]*)"(?: [^>]+)?>(((?!<\1(\s+[^>]*?)?>)[\s\S]|<\1(\s+[^>]*?)?>((?!<\1(\s+[^>]*?)?>)[\s\S]|<\1(\s+[^>]*?)?>((?!<\1(\s+[^>]*?)?>)[\s\S])*?<\/\1>)*?<\/\1>)*?)<\/\1>/ig,function(all,tag,style,content){
+		var color=style.match(/(?:^|;)\s*color\s*:\s*([^;]+)/i),
+			str;
+		if(color)str='[color='+formatColor(color[1])+']'+content+'[/color]\r\n';
+		return str;
+	});
 	sUBB=sUBB.replace(/<a(?:\s+[^>]*?)?\s+href=(["'])\s*(.+?)\s*\1[^>]*>\s*([\s\S]*?)\s*<\/a>/ig,function(all,q,url,text){
 		if(!(url&&text))return '';
 		var tag='url',str;
@@ -495,6 +519,11 @@ function html2ubb(sHtml) {
 		return str+']'+text+'[/'+tag+']';
 	});
 	sUBB=sUBB.replace(/<img((\s+\w+\s*=\s*(["'])?.*?\3)*)\s*\/?>/ig,function(all,attr){
+		//ff6 fixbug
+		var src=attr.match(/\s+src\s*=\s*(["']?)\s*(.+?)\s*\1(\s|$)/i);
+		if(src[2].indexOf("chrome://livemargins")>-1){
+			return '';
+		}
 		var emot=attr.match(/\s+emotion\s*=\s*(["']?)\s*(.+?)\s*\1(\s|$)/i);
 		if(emot)return '[s:'+emot[2]+']';
 		var attach=attr.match(/\s+attachment\s*=\s*(["']?)\s*(.+?)\s*\1(\s|$)/i);
@@ -531,7 +560,7 @@ function html2ubb(sHtml) {
 				str+='='+w[2];
 				if (s && s[2]=='1') s=null;
 				if (b||c||s) {
-					str+=','+(b?B.formatColor(b[2]):'');
+					str+=','+(b?B.formatColor(b[2]):'#ffffff');
 					str+=','+(c?B.formatColor(c[2]):'');
 					str+=','+(s?s[2]:1);
 				}
@@ -542,7 +571,7 @@ function html2ubb(sHtml) {
 	sUBB=sUBB.replace(/<tr(\s+[^>]*?)?>/ig,function(all,attr){
 		var str='[tr';
 		if(attr){
-			var bg=attr.match(regBg)
+			var bg=attr.match(regBg);
 			if(bg)str+='='+bg[2];
 		}
 		return str+']';
@@ -595,7 +624,7 @@ function html2ubb(sHtml) {
 	sUBB=sUBB.replace(/<\/address>/ig,'[i]\n');
 	for(i=1;i<=cnum;i++)sUBB=sUBB.replace("[\tubbcodeplace_"+i+"\t]", arrcode[i]);
 	for(i=0;i<3;i++)sUBB=sUBB.replace(/([\s\S])<(div|p)(?:\s+[^>]*?)?>(((?!<\2(\s+[^>]*?)?>)[\s\S]|<\2(\s+[^>]*?)?>((?!<\2(\s+[^>]*?)?>)[\s\S]|<\2(\s+[^>]*?)?>((?!<\2(\s+[^>]*?)?>)[\s\S])*?<\/\2>)*?<\/\2>)*?)<\/\2>/ig,"$1\n$3");
-	sUBB=sUBB.replace(/<br\s*?\/?>/ig,"\n");/*if(B.UA.gecko>0)*///FF下使用
+	sUBB=sUBB.replace(/<br[^\/>]*?\/?>/ig,"\n");/*if(B.UA.gecko>0)*///FF下使用
 	if(para)sUBB = '[paragraph]'+sUBB;
 	//sUBB=sUBB.replace(/((\s|&nbsp;)*\r?\n){3,}/g,"\n\n");//限制最多2次换行
 	//sUBB=sUBB.replace(/^((\s|&nbsp;)*\r?\n)+/g,'');//清除开头换行
@@ -620,7 +649,7 @@ function ubb2attach(str){
 			var path = mixObj[$2][2],
 				ext = path.substr(path.lastIndexOf('.')+1);
 			if (['jpg', 'gif', 'png', 'jpeg', 'bmp'].indexOf(ext.toLowerCase()) >= 0){
-				if(!-[1,]){
+				if(B.UA.ie<=6){
 					var img=new Image();
 					img.src=path;
 					if(img.complete){
@@ -628,12 +657,15 @@ function ubb2attach(str){
 							return '<img src="'+path+'" width="320" attachment="'+$2+'">';
 						}
 					}else{
+						var _temp="tmp"+(+(new Date()));
 						img.onload=function(){
 							if(img.width>320){
-								return '<img src="'+path+'" width="320" attachment="'+$2+'">';
+								var _html=editor.getHTML().replace('temp="'+_temp+'"','width="320"');
+								editor.setHTML(_html);
 							}
 							img.onload=null;
 						}
+						return '<img src="'+path+'" temp="'+_temp+'" attachment="'+$2+'">';
 					}
 				}
 				

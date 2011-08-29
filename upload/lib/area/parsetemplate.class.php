@@ -28,23 +28,17 @@ class PW_ParseTemplate{
 	function tplParsePW(){
 		$invokeService = $this->_getinvokeService();
 		$reg = $this->_pregPW();
-		$replace = $invokes = array();
+		$replace = array();
 		foreach ($reg[1] as $id=>$val) {
 			$parsePW = $this->_initParesPW($val);
 			$pwName	= $this->_getPWName($parsePW);
 			if (!$pwName) continue;
 			$temp = $invokeService->getInvokeByName($pwName);
 			if (!$temp) {
-				print_r($pwName);exit;
-				Showmsg('parse pw error');
+				Showmsg($pwName.'parse pw error');
 			}
-			$replace[$id] = $temp['parsecode'];
-			
-			$replace[$id]	= $this->_adminDiv($replace[$id],$pwName,$temp['title']);
-			$invokePieces	= $invokeService->getInvokePieces($pwName);
-			$invokes[$pwName] = $invokePieces;
+			$replace[$id]	= $this->_adminDiv($temp['parsecode'],$pwName,$temp['title']);
 		}
-		$this->_updatePageConfig($invokes);
 		$this->string = str_replace($reg[0],$replace,$this->string);
 	}
 	
@@ -95,15 +89,6 @@ class PW_ParseTemplate{
 	}
 	function _getChannelService() {
 		return L::loadClass('channelservice', 'area');
-	}
-
-	function _updatePageConfig($invokes){
-		$pageInvokeService = L::loadClass('pageinvokeservice', 'area');
-		$pageInvokeService->updatePageInvokesState($this->type,$this->sign,'',1);
-		foreach ($invokes as $invokeName => $pieces) {
-			$pageInvokeService->addPageInvoke($this->type,$this->sign,$invokeName,$pieces);
-		}
-		$pageInvokeService->updatePageInvokesState($this->type,$this->sign,array_keys($invokes),0);
 	}
 }
 ?>

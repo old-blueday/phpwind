@@ -2,70 +2,27 @@
 <dl class="newHotA">
 <list num="1" action="subject" cachetime="1800" ifpushonly="0" title="焦点头条1" />
 <loop>
-	<dt><a href="{url}" class="b s2 f16">{title,50}</a></dt>
+	<dt><a href="{url}" class="b s4 f16" target="_blank">{title,50}</a></dt>
 	<dd class="s6">{descrip,320}</dd>
 </loop>
 </dl>
 <div class="newHotB">
 	<ul class="cc">
-		<list num="16" action="subject" cachetime="1800" ifpushonly="0" title="帖子列表1" />
+		<list num="14" action="subject" cachetime="1800" ifpushonly="0" title="帖子列表1" />
 		<loop>
-<li><em><a href="{forumurl}">【{forumname,10}】</a></em><a href="{url}">{title,50}</a></li>
+			<li><em><a href="{forumurl}" class="s2" target="_blank">[{forumname,10}]</a></em><a href="{url}" target="_blank">{title,50}</a></li>
 		</loop>
 	</ul>
 </div>
-<pw id="最新动态@论坛首页" />
-<dl class="newHotA">
 
-<list num="1" action="subject" cachetime="1800" ifpushonly="0" title="焦点头条2" />
-
-<loop>
-
-	<dt><a href="{url}" class="b s2 f16">{title,50}</a></dt>
-
-	<dd class="s6">{descrip,320}</dd>
-
-</loop>
-
-</dl>
-
-<div class="newHotB">
-
-	<ul class="cc">
-
-	<list num="16" action="subject" cachetime="1800" ifpushonly="0" title="帖子列表2" />
-		<loop>
-
-			<li><em><a href="{forumurl}">【{forumname,10}】</a></em><a href="{url}">{title,50}</a></li>
-		</loop>
-
-	</ul>
-
-</div>
-<pw id="热门推荐@论坛首页" />
-<dl class="newHotA">
-<list num="1" action="subject" cachetime="1800" ifpushonly="0" title="焦点头条3" />
-<loop>
-	<dt><a href="{url}" class="b s2 f16">{title,50}</a></dt>
-	<dd class="s6">{descrip,320}</dd>
-</loop>
-</dl>
-<div class="newHotB">
-	<ul class="cc">
-		<list num="16" action="subject" cachetime="1800" ifpushonly="0" title="帖子列表3" />
-		<loop>
-			<li><em><a href="{forumurl}">【{forumname,10}】</a></em><a href="{url}">{title,50}</a></li>
-		</loop>
-	</ul>
-</div>
 <pw id="幻灯片@论坛首页" />
 <div class="newflash pr">
 	<ul class="flashimg" id="SlayerA_1">
-	<list num="1" action="image" cachetime="1800" ifpushonly="0" title="图片播放器" />
+	<list num="5" action="image" cachetime="1800" ifpushonly="0" title="图片播放器" />
 <!--# $temp =array();#-->
 	<loop>
 <!--# $temp[] =$key+1;#-->
-		<li class="switchItem" style="display:none"><a href="{url}"><img width="360" height="240" src="{image,360,240}" /></a><p><a href="{url}">{title,30}</a></p></li>
+		<li class="switchItem" style="display:none"><a href="{url}#info" target="_blank"><img width="360" height="240" src="images/blank.gif" style="background:url({image,360,240}) center center no-repeat;" /></a><p><a href="{url}#info" target="_blank">{title,30}</a></p></li>
 	</loop>
 	</ul>
 	<div class="flashBg"></div>
@@ -76,12 +33,11 @@
 	</ul>
 </div>
 <script>
-ddSliderPlayers('SlayerA_1','SlayerA_2',6,'current');
+onReady(function(){
+	ddSliderPlayers('SlayerA_1','SlayerA_2',6,'current');
+})
+
 </script>
 
-<pw id="TAB切换@论坛首页" />
-<li class="switchNavItem"><a href="javascript:;">社区焦点</a></li>
-<li class="switchNavItem"><a href="javascript:;">最新动态</a></li>
-<li class="switchNavItem"><a href="javascript:;">热门推荐</a></li>
 <pw id="今日热门@论坛首页" />
 今日热门

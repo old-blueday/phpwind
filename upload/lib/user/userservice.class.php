@@ -367,6 +367,12 @@ class PW_UserService {
 		return $updates;
 	}
 	
+	function clearUserMessage($uid){
+		$uid = intval($uid);
+		if ($uid < 1) return false;
+		$this->update($uid, array('newpm'=>0), array('newfans'=>0,'newreferto'=>0,'newnotice'=>0,'newrequest'=>0));
+	}
+	
 	/**
 	 * 增量更新用户信息
 	 * 
@@ -526,15 +532,17 @@ class PW_UserService {
 	 * @param int $userId
 	 * @param string $activateCode 激活码
 	 * @param string $siteHash 站点hash
+	 * @param string $toemail 激活邮箱地址
 	 * @return bool 是否激活成功
 	 */
-	function activateUser($userId, $activateCode, $siteHash) {
+	function activateUser($userId, $activateCode, $siteHash,$toemail) {
 		$userId = (int) $userId;
 		$activateCode = trim($activateCode);
 		if ($userId <= 0 || '' == $activateCode) return false;
 		
 		$membersDb = $this->_getMembersDB();
 		$user = $membersDb->get($userId);
+		if($user['email'] != $toemail) return false;
 		if (!$user) return false;
 		
 		$comparedActivateCode = $this->_generateUserActivateCode($user, $siteHash);
@@ -830,6 +838,19 @@ class PW_UserService {
 		return $groupRight;
 	}
 
+	function getUserInfoWithFace($uids) {
+		if(!S::isArray($uids)) return array();
+		require_once (R_P . 'require/showimg.php');
+		$usersInfo = array();
+		$users = $this->getByUserIds($uids); //'m.uid','m.username','m.icon','m.groupid'
+
+		foreach ($users as $key => $value) {
+			list($value['icon']) = showfacedesign($value['icon'], 1, 's');
+			$usersInfo[$value['uid']] = $value;
+		}
+		return $usersInfo;
+	}
+	
 	/**
 	 * get PW_MembersDB
 	 * 

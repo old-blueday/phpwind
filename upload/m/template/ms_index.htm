@@ -1,0 +1,119 @@
+<!--<?php
+defined('W_P') or exit('Forbidden');
+if(empty($action)){
+print <<<EOT
+-->
+<div class="hline"><a href="index.php?a=ms_index&action=send">发新消息</a><br />
+<a href="index.php?a=ms_index&action=all">所有消息(<span class="new">{$notReadCount}</span>/{$smsAllCount})</a><br />
+<a href="index.php?a=ms_index&action=self">已发消息({$smsCount})</a><br />
+
+<!--
+EOT;
+}elseif($action == 'send'){
+print <<<EOT
+-->
+<div class="page_title"><strong>发新消息</strong></div>
+<div>
+  <form id="form1"  action="index.php?a=ms_index&action=send" method="post">
+	<input type="hidden" value="2" name="step"/>
+    * 用户名：<br />
+       <label><input name="pwuser" type="text" size="30"/></label><br />
+    * 标题 ：<br />
+       <label><input name="title" type="text" size="30"/></label><br />
+    * 内容 ：<br />
+      <label><textarea name="content"  style="width:98%; height:70px;"></textarea></label><br />
+      <label><input type="submit" name="button" id="button" value="发送" /></label>
+  </form>
+</div>
+<div>
+<a href="index.php?a=ms_index&action=all">所有消息</a>&nbsp;&nbsp;
+<a href="index.php?a=ms_index&action=self">已发消息</a>
+</div>
+<!--
+EOT;
+}elseif($action == 'all'){
+print <<<EOT
+-->
+<div class="page_title"><strong>所有消息</strong></div>
+<!--
+EOT;
+foreach($smsList as $key => $value){
+$value['content'] = strip_tags($value['content']);
+$value['create_username'] = $value['create_username'] == $windid ? '我' : $value['create_username'];
+$value['status'] = $value['status'] ? '[未读]' :'';
+print <<<EOT
+-->
+	<div class="hline">
+		<label><a href="index.php?a=myhome&uid={$value[uid]}">{$value[create_username]}</a><span>[{$value[modified_time_format]}]</span></label><br>
+		<label><a href="index.php?a=ms_index&action=info&mid={$value[mid]}&rid={$value[rid]}&page=$page&redirect=$action">{$value[title]}</a>{$value[status]}</label><br>
+		<!--<label>{$value[content]}</label>--></div>	
+<!--
+EOT;
+}print <<<EOT
+-->
+$pages
+<a href="index.php?a=ms_index&action=send">发新消息</a>&nbsp;&nbsp;
+<a href="index.php?a=ms_index&action=self">已发消息</a>
+<!--
+EOT;
+}elseif($action == 'self'){
+print <<<EOT
+-->
+<div class="page_title"><strong>已发消息</strong></div>
+<!--
+EOT;
+foreach($smsList as $key => $value){
+//$value['content'] = strip_tags($value['content']);
+print <<<EOT
+-->
+	<div class="hline">
+		<label><a href="index.php?a=myhome&uid={$value[uid]}">我</a><span>[{$value[modified_time_format]}]</span></label><br>
+		<label><a href="index.php?a=ms_index&action=info&mid={$value[mid]}&rid={$value[rid]}&page=$page&redirect=$action">{$value[title]}</a></label><br>
+		<label>{$value[content]}</label>
+	</div>	
+<!--
+EOT;
+}print <<<EOT
+-->
+$pages
+<a href="index.php?a=ms_index&action=send">发新消息</a>&nbsp;&nbsp;
+<a href="index.php?a=ms_index&action=all">所有消息</a>
+<!--
+EOT;
+} elseif ($action == 'info' || $action == 'up' || $action == 'down') {print <<<EOT
+-->
+<div class="page_title">参与者：{$userListHtml}</div>
+<!--
+EOT;
+$i = 0;
+foreach($smsList as $key => $value){
+//$value['content'] = strip_tags($value['content']);
+$reTitle = $i == 0 ? '<label>'.$value['title'].'</label><br/>' : '';
+print <<<EOT
+-->
+	<div class="hline">
+		<label><a href="index.php?a=myhome&uid={$value[uid]}">{$value[create_username]}</a><span>[{$value[modified_time_format]}]</span></label><br>
+		{$reTitle}
+		<label>{$value[content]}</label>
+	</div>	
+<!--
+EOT;
+$i++;
+}print <<<EOT
+-->
+<br>
+<div>
+  <form id="form1"  action="index.php?a=ms_index&action=post" method="post">
+  	  <input type="hidden" value="{$message[mid]}" name="parentMid"/>
+  	  <input type="hidden" value="{$message[rid]}" name="rid"/>
+      <label><textarea name="atc_content"  style="width:98%; height:70px;"></textarea></label><br />
+      <label><input type="submit" name="button" id="button" value="回复" /></label>
+  </form>
+</div>
+<div>
+<a href="$_url">返回</a>&nbsp;&nbsp;
+<a href="index.php?a=ms_index&action=up&redirect={$redirect}&rid={$message[rid]}">上一条</a>&nbsp;
+<a href="index.php?a=ms_index&action=down&redirect={$redirect}&rid={$message[rid]}">下一条</a></div>
+<!--
+EOT;
+}?>-->

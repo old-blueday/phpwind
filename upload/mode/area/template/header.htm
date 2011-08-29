@@ -7,21 +7,15 @@
 <meta name="generator" content="phpwind $wind_version" />
 <meta name="description" content="$metaDescription" />
 <meta name="keywords" content="$metaKeywords" />
-<!--[if IE 9 ]>
-<meta name="msapplication-task" content="name=网站首页; action-uri=$db_bbsurl; icon-uri=$db_bbsurl/favicon.ico" />
-<meta name="msapplication-task" content="name=个人中心; action-uri=$db_bbsurl/u.php; icon-uri=$db_bbsurl/images/ico/home.ico" />
-<meta name="msapplication-task" content="name=我的帖子; action-uri=$db_bbsurl/apps.php?q=article; icon-uri=$db_bbsurl/images/ico/post.ico" />
-<meta name="msapplication-task" content="name=消息中心; action-uri=$db_bbsurl/message.php; icon-uri=$db_bbsurl/images/ico/mail.ico" />
-<meta name="msapplication-task" content="name=我的设置; action-uri=$db_bbsurl/profile.php; icon-uri=$db_bbsurl/images/ico/edit.ico" />
-<![endif]-->
 <base id="headbase" href="$db_bbsurl/" />
-<link rel="stylesheet" href="$imgpath/pw_core.css?101128" />
-<link rel="stylesheet" href="mode/area/images/head.css" />
-<link rel="stylesheet" href="$channelImagePath/style.css" />
+<link rel="stylesheet" href="$imgpath/pw_core.css?{$GLOBALS['wind_repair']}" />
+<link rel="stylesheet" href="mode/area/images/head.css?{$GLOBALS['wind_repair']}" />
+<link rel="stylesheet" href="$channelImagePath/style.css?{$GLOBALS['wind_repair']}" />
 <!--#if($pwModeCss){#--><link rel="stylesheet" href="$pwModeCss" />
-<!--#}#--><script type="text/javascript" language="JavaScript" src="js/pw_ajax.js"></script>
-<SCRIPT type="text/javascript" LANGUAGE="JavaScript" src="js/core/core.js"></SCRIPT>
-<script language="JavaScript">
+<!--#}#--><script type="text/javascript" src="js/pw_ajax.js"></script>
+<script type="text/javascript" src="js/core/core.js"></script>
+<script>
+var pw_baseurl = "$db_bbsurl";
 var imgpath = '$imgpath';
 //var verifyhash = '$verifyhash';
 var modeimg = '$pwModeImg';
@@ -31,6 +25,13 @@ var windid	= '$windid';
 var groupid	= '$groupid';
 var channelid	= '$channelid';
 </script>
+<!--[if IE 9 ]>
+<meta name="msapplication-task" content="name=网站首页; action-uri=$db_bbsurl; icon-uri=favicon.ico" />
+<meta name="msapplication-task" content="name=个人中心; action-uri=u.php; icon-uri=images/ico/home.ico" />
+<meta name="msapplication-task" content="name=我的帖子; action-uri=apps.php?q=article; icon-uri=images/ico/post.ico" />
+<meta name="msapplication-task" content="name=消息中心; action-uri=message.php; icon-uri=images/ico/mail.ico" />
+<meta name="msapplication-task" content="name=我的设置; action-uri=profile.php; icon-uri=images/ico/edit.ico" />
+<![endif]-->
 </head>
 <body id="body">
 <!--
@@ -40,45 +41,6 @@ print <<<EOT
 -->
 <div id="top">
 	<div class="top">
-    	<span class="fr">
-<!--
-EOT;
-foreach($_Navbar['head_right'] as $key => $value){
-	$html = buildNavLinkHtml($value['data']);
-print <<<EOT
--->
-            <span class="mr10">$html</span>
-<!--
-EOT;
-	if (is_array($value['subs'])) {
-		$db_menuinit .= ",'nav_key_up_$key' : 'nav_key_sub_$key'"; //register
-print <<<EOT
--->
-			<div style="display: none;" class="pw_menu" id="nav_key_sub_{$key}">
-			<ul class="menuList">
-<!--
-EOT;
-		foreach ($value['subs'] as $value) {
-			$html = buildNavLinkHtml($value);
-print <<<EOT
--->
-				<li>$html</li>
-<!--
-EOT;
-		}
-print <<<EOT
--->
-			</ul>
-			</div>
-<!--
-EOT;
-	}
-
-}
-
-print <<<EOT
--->
-        </span>
     	<ul>
 <!--
 EOT;
@@ -143,35 +105,22 @@ EOT;
 list($htmlAdvert,$arrayAdvert) = pwAdvert('Site.Header',$fid);
 if($htmlAdvert){print <<<EOT
 -->
-<div class="tac mb5">$htmlAdvert</div>
+<div class="tac" style="line-height:1;">$htmlAdvert</div>
 <!--
 EOT;
 }print <<<EOT
 -->
-<script language="javascript">
+<script>
 function updateCache(alias){
 	var url = 'mode.php?m=area&q=static&alias='+alias;
 	ajax.send(url,'',ajax.get);
 }
 </script>
 <div id="header">
-	<div id="head">
-<!--
-EOT;
-if ($groupid != 'guest') {
-	$db_menuinit .= ",'td_profile' : 'menu_profile'";
-}
-print <<<EOT
--->
-		<table cellpadding="0" cellspacing="0" width="100%" height="80">
-			<tr>
-				<td><a href="$db_bbsurl" class="fl"><img src="images/wind/logo.png" class="fl" title="$area_sitename" /></a></td>
-				<td id="banner" align="right" class="vt">
-					<script language="javascript" src="mode.php?m=area&q=header&ifactive=$ifactive&alias=$alias&t=$timestamp"></script>
-				</td>
-			</tr>
-		</table>
-    </div>
+	<div id="head" class="cc">
+		<a href="$db_bbsurl" class="fl"><img src="images/wind/logo.png" class="fl" title="$area_sitename" /></a>
+		<script type="text/javascript" src="mode.php?m=area&q=header&ifactive=$ifactive&alias=$alias&t=$timestamp"></script>
+ </div>
 	<div class="nav_wrap">
 		<div id="navA">
 			<div class="navAL fl">&nbsp;</div>
@@ -182,45 +131,25 @@ EOT;
 $db_menuinit .= ",'td_mymenu' : 'menu_mymenu'";
 print <<<EOT
 -->
-				<div id="td_mymenu">我的快捷通道</div>
-				<div id="menu_mymenu" class="pw_menu" style="display:none;">
-					<ul class="menuList" style="width:98px;">
+				<div id="td_mymenu">快捷通道</div>
+				<div id="menu_mymenu" style="display:none;">
+				<div id="fast_menu" class="pw_menu">
+					<ul class="menuList cc">
+						<li><a href="apps.php?q=article"><img src="u/images/icon/posts.png" alt="帖子" />帖子</a></li>
+						<li><a href="apps.php?q=medal"><img src="u/images/icon/medal.png" alt="勋章" />勋章</a></li>
+						<li><a href="u.php?a=friend"><img src="u/images/icon/friend.png" alt="关注" />关注</a></li>
+						<li><a href="jobcenter.php"><img src="u/images/icon/jobcenter.png" alt="任务" />任务</a></li>
 <!--
 EOT;
-if ($db_modes['o']['ifopen']) {print <<<EOT
+if ($db_kmd_ifkmd) {print <<<EOT
 -->
-						<li><a href="u.php"><img src="$imgpath/user-home.png" />个人中心</a></li>
-<!--
-EOT;
-}print <<<EOT
--->
-						<li><a href="apps.php?q=weibo"><img src="u/images/icon/record.png" />我的新鲜事</a></li>
-<!--
-EOT;
-if ($db_dopen) {print <<<EOT
--->
-						<li><a href="apps.php?q=diary"><img src="u/images/icon/log.png" />我的日志</a></li>
-<!--
-EOT;
-}if ($db_phopen) {print <<<EOT
--->
-						<li><a href="apps.php?q=photos"><img src="u/images/icon/albums.png" />我的相册</a></li>
-
-<!--
-EOT;
-}print <<<EOT
--->
-						<li><a href="apps.php?q=article"><img src="u/images/icon/posts.png" />我的帖子</a></li>
-<!--
-EOT;
-if ($db_groups_open) {print <<<EOT
--->
-						<li><a href="apps.php?q=groups"><img src="u/images/icon/groups.png" />我的群组</a></li>
+						<li><a href="apps.php?q=kmd&a=help"><img src="u/images/icon/kmd.png" alt="孔明灯" />孔明灯</a></li>
 <!--
 EOT;
 }print <<<EOT
 -->
 					</ul>
+				</div>
 				</div>
 				<ul class="cc">
 <!--
@@ -341,7 +270,7 @@ EOT;
 print <<<EOT
 -->
 		</div>
-<script language="javascript">
+<script>
 var timeoutSpecifyId = {};
 
 function tmpClose(elementId) {
@@ -383,7 +312,7 @@ function ctrlSubMenu(parentId, subMenuId) {
 	        	<input type="hidden" value="$verifyhash" name="verify">
 	            <input value="2" type="hidden" name="step">
 	            <input value="thread" type="hidden" id="search_type" name="type">
-	            <div class="ip"><input id="search_input" type="text" value="搜索其实很简单！ (^_^)" class="gray" name="keyword" onFocus="searchFocus(this)" onBlur="searchBlur(this)" /></div>
+	            <div class="ip"><input id="search_input" type="text" value="搜索其实很简单！" class="gray" name="keyword" onFocus="searchFocus(this)" onBlur="searchBlur(this)" /></div>
 	            <div class="s_select" onMouseOut="this.firstChild.style.display='none';" onMouseOver="this.firstChild.style.display='block';"><ul onClick="getSearchType(event)"><!--
 EOT;
 if ($db_search_type) {
@@ -407,7 +336,7 @@ EOT;
 $hotwords = ($db_hotwords) ? explode(",",$db_hotwords) : array();
 if($hotwords){print <<<EOT
 -->
-            <span class="s2">热搜：</span>
+            <span>热搜：</span>
 <!--
 EOT;
 foreach($hotwords as $hotword){
@@ -422,7 +351,7 @@ print <<<EOT
             </div>
         </div>
     </div>
-<script language="JavaScript">
+<script>
 function searchCheck(o) {
 	getVerify(o);
 	return searchInput();

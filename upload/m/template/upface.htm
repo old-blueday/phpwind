@@ -1,0 +1,25 @@
+<!--<?php
+defined('W_P') or exit('Forbidden');
+print <<<EOT
+-->
+<div class="page_title"><a href="#anch-end" id="anch-01" accesskey="1"><img alt="向下" src="$wapImages/x.gif" /></a><em><a href="index.php?a=myhome">个人空间</a></em>&#8250;<strong>上传照片</strong></div>
+<div class="page_content">
+  <form id="form1" method="post" action="index.php?a=upface" enctype = "multipart/form-data">
+  <input type="hidden" value="2" name="step"/>
+    <p>
+      <label>1. 选择一个你想上传的头像(不超过 $GLOBALS[db_imgsize] KB）：<br />
+         <input name="attachment_" type="file" size="20" />
+      </label>
+    </p>
+    <p>    2. 点击&quot;上传头像&quot;按钮。</p>
+    <p>
+      <label>
+        <input type="submit" name="button" id="button" value="上传头像" />
+      </label>
+    </p>
+</form>
+</div>
+<div class="block"><a href="index.php?a=myhome">&laquo;返回</a></div>
+<!--
+EOT;
+?>-->

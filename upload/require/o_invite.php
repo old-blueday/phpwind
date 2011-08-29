@@ -70,7 +70,8 @@ function addSingleFriend($updatemem, $winduid, $frienduid, $timestamp, $status, 
 	if ($isAttention = $attentionService->isFollow($winduid, $frienduid)) {
 		$db->update("UPDATE pw_friends SET status = 0 WHERE uid=".S::sqlEscape($winduid)." AND friendid=".S::sqlEscape($frienduid));
 	} else {
-		$db->update("INSERT INTO pw_friends SET $pwSQL");
+		if($winduid != $frienduid)$db->update("INSERT INTO pw_friends SET $pwSQL");
+		$attentionService->addFollow($winduid, $frienduid,'','addFriend');
 	}
 	
 	if ($updatemem) {

@@ -190,7 +190,7 @@ EOT;
 			case $this->customerField->typeMap['area']:
 				$areaService = L::loadClass('AreasService', 'utility');
 				//$area = $areaService->getAreaByAreaId($value['area']);
-				$area = $areaService->getAreasByAreadIds(array_values($value));
+				$area = $areaService->getAreasByAreadIds(array_values((array)$value));
 				if(S::isArray($area)){
 					$data = sprintf(
 						'%s-%s-%s',

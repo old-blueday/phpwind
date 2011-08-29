@@ -25,8 +25,10 @@ class Invite {
 
 		$users = array();
 		$query = $this->db->query("SELECT friendid FROM pw_friends WHERE status='0' AND uid=" . S::sqlEscape($uid) . S::sqlLimit($start, $num));
+		$appclient = L::loadClass('appclient');
 		while ($rt = $this->db->fetch_array($query)) {
-			$app = $this->db->get_one("SELECT * FROM pw_userapp WHERE uid=".S::sqlEscape($rt['friendid'])." AND appid=".S::sqlEscape($appid));
+			//$app = $this->db->get_one("SELECT * FROM pw_userapp WHERE uid=".S::sqlEscape($rt['friendid'])." AND appid=".S::sqlEscape($appid));
+			$app = $appclient->getUserAppByUidAndAppid($rt['friendid'],$appid);
 			if (empty($app)) {
 				$users[] = $rt['friendid'];
 			}

@@ -209,36 +209,12 @@ EOT;
 	<table cellpadding="0" cellspacing="0" width="100%">
         <tr class="tr1 vt">
             <td class="td1">源回复数据表</td>
-            <td class="td2">
-<!--
-EOT;
-foreach ($table_sel as $k => $v){
-print <<<EOT
--->
-	<input type="checkbox" name="tfroms[]" value="$k" />$v
-<!--
-EOT;
-}
-print <<<EOT
--->
-            </td>
+            <td class="td2"><select name="tfrom" class="select_wa">$table_sel</select></td>
         </tr>
         <tr class="tr1 vt">
             <td class="td1">目标回复数据表</td>
             <td class="td2">
-            <select name="tto" class="select_wa">
-<!--
-EOT;
-foreach ($table_sel as $k => $v){
-print <<<EOT
--->
-            <option value="$k">$v</option>
-<!--
-EOT;
-}
-print <<<EOT
--->
-            </select></td>
+            <select name="tto" class="select_wa">$table_sel</select></td>
         </tr>
         <tr class="tr1 vt">
             <td class="td1">指定 tid 范围</td>
@@ -260,6 +236,14 @@ print <<<EOT
 EOT;
 }elseif($action=='movetmsg'){ print <<<EOT
 -->
+<div class="nav3 mb10">
+	<ul class="cc">
+		<li ><a href="$basename&job=bakout">数据维护</a></li>
+		<li><a href="$basename&job=bakin">数据恢复</a></li>
+		<li><a href="$basename&job=ptable">数据库分卷</a></li>
+		<li class="current"><a href="$basename&job=ptable&action=movedata">数据转移</a></li>
+	</ul>
+</div>
 <div class="admin_info mb10">
     <h3 class="h1"><b>提示信息</b></h3>
     <div class="legend">该功能将会把 $pw_tmsgs 表中不在设定 tid 范围内的数据，转移到相应的数据表中去!<br />
@@ -271,7 +255,6 @@ EOT;
 <input type="hidden" name="step" value="1" />
 <input type="hidden" name="tmin" value="$tmin" />
 <input type="hidden" name="tmax" value="$tmax" />
-<h2 class="h1">数据转移</h2>
 <h2 class="h1">
 	<span class="mr10">数据转移</span><a href="$basename" class="linka">返回上一级<span class="f9">▲</span></a>
 </h2>

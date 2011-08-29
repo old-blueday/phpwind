@@ -32,10 +32,10 @@ $db_menuinit = trim($db_menuinit, ',');
 print<<<EOT
 -->
 	<div class="c"></div>
-    </div>
+  </div>
 	<div class="foot">
-    	<div class="bottom cc tal">
-            <ul>
+		<div class="mb5">
+    <div class="bottom tac">
 <!--
 EOT;
 $navConfigService = L::loadClass('navconfig', 'site');
@@ -43,18 +43,27 @@ $_Navbar['foot'] = $navConfigService->findValidNavListByTypeAndPostion(PW_NAV_TY
 foreach($_Navbar['foot'] as $key => $value){
 	$html = buildNavLinkHtml($value['data']);
 print <<<EOT
+--><span class="mr10">$html</span><span class="gray mr10">|</span><!--
+EOT;
+}print <<<EOT
+--><a href="job.php?action=erasecookie&verify=$loginhash">清除Cookies</a>
+    </div>
+		</div>
+		<div class="f10 s6 tac">
+			<p class="mb5">Powered by <a href="http://www.phpwind.net/" target="_blank" class="s4">phpwind v{$wind_version}</a>&nbsp;<a href="http://www.phpwind.com/certificate.php?host={$pwServer['HTTP_HOST']}" target="_blank">Certificate</a> Copyright Time now is:$ft_time<br /> &copy;2003-2011 <a href="$db_bbsurl/" target="_blank">{$GLOBALS['db_bbsname']}</a> 版权所有 $ft_gzip $db_icp $db_statscode <span id="stats"></span>
+<!--
+EOT;
+if($db_ystats_ifopen=='0'){print <<<EOT
 -->
-				<li>$html</li>
+<script type="text/javascript" src="http://js.tongji.linezing.com/{$db_ystats_unit_id}/tongji.js"></script>
+<noscript>
+	<a href="http://www.linezing.com" target="_blank"><img alt="tongji" src="http://img.tongji.linezing.com/{$db_ystats_unit_id}/tongji.gif"/></a>
+</noscript>
 <!--
 EOT;
 }print <<<EOT
--->
-                <li><a href="job.php?action=erasecookie&verify=$loginhash">清除Cookies</a></li>
-            </ul>
-        </div>
-		$wind_spend, Time now is:$ft_time, $ft_gzip $db_icp<br>
-		Powered by <a href="http://www.phpwind.net/" target="_blank">phpwind</a> <a href="http://www.phpwind.net/" target="_blank"><span class="b s2">v$wind_version</span></a> <a href="http://www.phpwind.com/certificate.php?host={$pwServer['HTTP_HOST']}">Certificate</a> Code &copy;2003-2011 <a href="http://www.phpwind.com/" target="_blank">phpwind.com</a> Corporation <span id="stats"></span>$db_statscode
-    </div>
+--><span id="windspend">$wind_spend</span></p>
+		</div>
 </div>
 <!--
 EOT;
@@ -62,20 +71,23 @@ if($GLOBALS['groupid'] != 'guest' && $GLOBALS['groupid'] != '' && $GLOBALS['db_t
 include_once PrintEot('bottom');
 }print <<<EOT
 -->
-<script language="JavaScript" src="js/global.js"></script>
-<script language="JavaScript" src="js/app_global.js"></script>
+<script type="text/javascript" src="js/global.js"></script>
+<script type="text/javascript" src="js/app_global.js"></script>
 <!--
 EOT;
 if ($GLOBALS['__pwPortalEot'] && checkPortalRight()) {
 print <<<EOT
 -->
-<script language="JavaScript" src="js/date.js"></script>
-<script language="JavaScript" src="mode/area/js/adminview.js"></script>
-<script language="javascript" src="mode/area/js/tagrelate.js"></script>
-<script language="JavaScript" src="js/color_picker.js"></script>
-<script language="JavaScript">
+<script type="text/javascript" src="js/date.js"></script>
+<script type="text/javascript" src="mode/area/js/adminview.js"></script>
+<script type="text/javascript" src="mode/area/js/tagrelate.js"></script>
+<script type="text/javascript" src="js/color_picker.js"></script>
+<script>
 window.onReady(function(){
 	frontadmin = New(frontAdmin,['main','view-hover']);
+	//门户模块管理
+	var console=new ChannelManage(0,'','',0);
+	console.init();
 });
 </script>
 <!--
@@ -85,9 +97,13 @@ print <<<EOT
 -->
 </body>
 </html>
-<script language="JavaScript">
+<script>
 var openmenu = {{$GLOBALS['db_menuinit']}};
-window.onReady(function(){read.InitMenu();});
+window.onReady(function(){
+	read.InitMenu();
+	//消息提示
+	new messageTip(35).init();
+});
 WINDOW_LOADED=1;
 </script>
 <!--

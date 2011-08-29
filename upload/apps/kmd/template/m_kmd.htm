@@ -1,0 +1,416 @@
+<!--<?php
+require_once(uTemplate::printEot('header'));
+require_once(uTemplate::printEot('user_appleft'));
+print<<<EOT
+-->
+<div class="contUser">
+    <div class="p15">
+		<h4 class="site"><img src="u/images/module/jobcenter.png" align="absmiddle" class="mr10" /><span>孔明灯</span></h4>           	
+        <div class="navC">
+					<a href="apps.php?q=kmd&a=help" class="fr mr10">孔明灯帮助</a>
+					<ul>
+							<li $current[info]><a href="{$basename}a=info"  hidefocus="true">我的孔明灯</a></li>
+							<li $current[records]><a href="{$basename}a=records" hidefocus="true">购买记录</a></li>
+					</ul>
+					<span class="btn_add fl"><span><button onclick="window.location.href='{$basename}a=buy'">购买孔明灯</button></span></span>
+        </div>
+<!--
+EOT;
+if ($a == 'info') {
+print<<<EOT
+-->
+<!--
+EOT;
+if (S::isArray($unPayedInfos)) {
+print<<<EOT
+-->
+	<div style="padding-top:10px;">
+		<div style="padding:10px 25px;"><span class="b s2 mr10 f14">未支付提醒</span><span class="gray">（7天未支付将自动取消该申请）</span></div>
+		<div style="padding:0 10px;">
+			<div style="background:#fffeee;border:1px solid #d1d1ca;padding:0 10px 10px;">
+				<table width="100%">
+					<tr class="tr3 s5">
+						<td width="30">序号</td>
+						<td>推广套餐</td>
+						<td>申请时间</td>
+						<td>操作</td>
+					</tr>
+<!--
+EOT;
+$unPayedNum = 0;
+foreach ($unPayedInfos as $value) {
+$unPayedNum++;
+$tmpDiscount = (0 < $value['discount'] && $value['discount'] < 10) ? "$value[discount]折" : '无折扣';
+$spreadName = $value['name'] . ' / <span class="s2">' . $value['price'] . "元 {$tmpDiscount}</span>" . ' / <span class="s2">' . $value['day'] . "天</span>";
+$appliedTime = get_date($value['createtime'], 'Y-m-d');
+$actionName = $value['type'] == KMD_PAY_TYPE_ALIPAY ? "<a href=\"{$basename}a=buy&action=pay&pid=$value[id]\" class=\"s3\">支付</a>" : '待确认';
+print<<<EOT
+-->
+	<tr class="tr3">
+		<td class="tac">$unPayedNum</td>
+		<td>$spreadName</td>
+		<td width="160">$appliedTime</td>
+		<td width="100">$actionName</td>
+	</tr>
+<!--
+EOT;
+}print<<<EOT
+-->
+				</table>
+			</div>
+		</div>
+	</div>
+<!--
+EOT;
+}if (S::isArray($kmdInfos)) {print<<<EOT
+-->
+	<div style="padding:10px 20px;">
+		<table width="100%">
+			<tr class="tr3 s5">
+				<td width="30">序号</td>
+				<td>推广帖子</td>
+				<td>推广版块</td>
+				<td>推广时间</td>
+				<td>操作</td>
+			</tr>
+<!--
+EOT;
+$kmdNum = ($page - 1) * $db_perpage;
+foreach ($kmdInfos as $value) {
+$kmdNum++;
+$kmdTitle = $value['status'] == KMD_THREAD_STATUS_EMPTY ? '暂无推广帖子，请添加' : ($value['status'] == KMD_THREAD_STATUS_CHECK ? '<span class="s2">帖子审核中，请耐心等待</span>' : ($value['status'] == KMD_THREAD_STATUS_REJECT ? '<span class="s1">帖子未通过审核，请重新添加</span>' : "<a href=\"read.php?tid=$value[tid]\" target=\"_blank\">" . substrs($value['subject'], 60) . '</a>'));
+$leftTime = $value['endtime'] - $timestamp;
+$leftDay = floor($leftTime / 86400);
+$leftHour = floor(($leftTime - $leftDay * 86400) / 3600);
+$leftTimeTip = $leftTime > 0 ? "剩余：<span class=\"s2\">{$leftDay}天{$leftHour}小时</span>" : '已过期';
+print<<<EOT
+-->
+	<tr class="tr3">
+		<td class="tac">$kmdNum</td>
+		<td>$kmdTitle</td>
+		<td><a href="thread.php?fid=$value[fid]" target="_blank">$value[forumname]</a></td>
+		<td width="160">$leftTimeTip</td>
+		<td width="100">
+			<a href="{$basename}a=buy&action=renew&kid=$value[kid]" class="mr10">续费</a>
+<!--
+EOT;
+if (S::inArray($value['status'], array(KMD_THREAD_STATUS_EMPTY, KMD_THREAD_STATUS_REJECT))) {
+print<<<EOT
+-->
+	<a href="javascript:;" onclick="addThread('$value[kid]');" class="s3">添加帖子</a>
+<!--
+EOT;
+} elseif (S::inArray($value['status'], array(KMD_THREAD_STATUS_OK, KMD_THREAD_STATUS_CHECK))) {
+print<<<EOT
+-->
+	<a href="javascript:;" onclick="addThread('$value[kid]', 'changethread');">换个帖子</a>
+<!--
+EOT;
+}print<<<EOT
+-->
+		</td>
+	</tr>
+<!--
+EOT;
+}print<<<EOT
+-->
+		</table>
+	<div class="p10">{$numofpages}</div>
+	</div>
+<script type="text/javascript">
+function addThread(kid, actions) {
+	if (!kid) return false;
+	if (!actions) actions = '';
+	ajax.send(basename + 'a=addthread', 'kid=' + kid + '&action=' + actions, function(){
+		var rText = ajax.request.responseText.split('\t');
+		if (rText[0] == 'error') {
+			showDialog('error', rText[1], 2);
+		}
+		ajax.get();
+	});
+}
+</script>
+<!--
+EOT;
+}} elseif ($a == 'records') {print<<<EOT
+-->
+	<table width="100%">
+	 <tr class="tr3">
+		<td width="13">&nbsp;</td>
+		<td width="24">序号</td>
+		<td>推广版块</td>
+		<td width="160">推广费用</td>
+		<td width="160">购买时间</td>
+	</tr>
+<!--
+EOT;
+$recordsCount = ($page - 1) * $db_perpage;
+if (S::isArray($records)) {
+foreach ($records as $value) {
+$recordsCount++;
+$buyTime = get_date($value['createtime'], 'Y-m-d');
+print<<<EOT
+-->
+	<tr class="tr3">
+		<td width="13">&nbsp;</td>
+		<td class="tac">$recordsCount</td>
+		<td><a href="thread.php?fid=$value[fid]" target="_blank">$value[forumname]</a></td>
+		<td width="160"><span class="s2">$value[money] 元</span></td>
+		<td width="160">$buyTime</td>
+	</tr>
+<!--
+EOT;
+}}print<<<EOT
+-->
+	</table>
+	<div class="p10">{$numofpages}</div>
+<!--
+EOT;
+} elseif ($a == 'buy') {
+$action == 'pay' && $divInfo = 'display:none;';
+(!$action || $action == 'renew') && $divPay = 'display:none;';
+print<<<EOT
+-->
+	<form name="buykmd" action="{$basename}a=buy&action=save" method="post">
+<!--
+EOT;
+if ($action == 'renew') {
+print<<<EOT
+-->
+	<input type="hidden" name="kid" value="$kid" />
+<!--
+EOT;
+} elseif ($action == 'pay') {print<<<EOT
+-->
+	<input type="hidden" name="pid" value="$pid" />
+<!--
+EOT;
+}print<<<EOT
+-->
+	<div style="padding:0 20px; $divInfo " id="info">
+		<div style="padding:20px 5px 10px;" class="bdA"><span class="b s4 mr10 f14">推广信息</span></div>
+		<table width="100%">
+			<tr class="tr3">
+				<td width="80">推广版块：</td>
+				<td><select name="fid" id="fid" onchange="kmd.getLeftKmdNum(this, true);" $disabled>$forumcache</select></td>
+				<td><input type="hidden" name="fidvalidate" data-error="1" id="fidvalidate" value="" /></td>
+			</tr>
+			<tr class="tr3">
+				<td style="vertical-align:top;">推广套餐：</td>
+				<td>
+<!--
+EOT;
+$spreadsOptions = '';
+$firstOption = 0;
+foreach ($spreads as $value) {
+	$defaultOption = ++$firstOption == 1 ? 'checked' : '';
+	$discount = (0< $value['discount'] && $value['discount'] < 10) ? "<span class=\"s2\">$value[discount]</span>折" : '&nbsp;';
+	$spreadsOptions .= "<p class=\"mb10\"><label class=\"mr20 w\"><input name=\"spread\" type=\"radio\" style=\"margin:-3px 4px 0 0;\" value=\"$value[sid]\" $defaultOption />$value[name] <span class=\"s2\">$value[price]</span>元/<span class=\"s2\">$value[day]</span>天 {$discount}</label></p>";
+}print<<<EOT
+-->
+					$spreadsOptions
+				</td>
+				<td></td>
+			</tr>
+		</table>
+		<div style="padding:20px 5px 10px;" class="bdA"><span class="b s4 mr10 f14">联系资料</span></div>
+		  <table width="100%">
+			<tr class="tr3">
+				<td width="80">真实姓名：</td>
+				<td width="200"><input name="realname" id="realname" type="text" value="$userBuyInfo[realname]" class="input mr5 input_wa"/><span class="s1">*</span></td>
+				<td><span class="gray">用于孔明灯审核联系使用，请务必填写正确</span></td>
+			</tr>
+			<tr class="tr3">
+				<td>手机号码：</td>
+				<td><input name="phone" id="phone" type="text" value="$userBuyInfo[phone]" class="input mr5 input_wa"/><span class="s1">*</span></td>
+				<td><span class="gray">用于孔明灯审核联系使用，请务必填写正确</span></td>
+			</tr>
+			<tr class="tr3">
+				<td>发票抬头：</td>
+				<td><input name="invoice" type="text" value="$userBuyInfo[invoice]" class="input mr5 input_wa"/></td>
+				<td><span class="gray">公司填写企业名称，个人填写姓名</span></td>
+			</tr>
+			<tr class="tr3">
+				<td>联系地址：</td>
+				<td><input name="address" type="text" value="$userBuyInfo[address]" class="input mr5 input_wa"/></td>
+				<td><span class="gray">填写正确的联系地址，用于发票寄送</span></td>
+			</tr>
+		   </table>
+		<div class="tac p10"><span class="btn"><span><button onclick="return kmd.submitInfo();">去付款</button></span></span></div>
+	</div>
+	<div style="padding:0 20px; $divPay " id="pay">
+		<div style="padding:20px 5px 10px;" class="bdA"><span class="b s4 mr10 f14">推广信息</span></div>
+		<table width="100%">
+			<tr class="tr3">
+				<td width="80">推广版块：</td>
+				<td><span id="foruminfo">$tmpForumInfo</span></td>
+			</tr>
+			<tr class="tr3">
+				<td style="vertical-align:top;">推广费用：</td>
+				<td><span id="fee">$tmpSpreadInfo</span></td>
+			</tr>
+		</table>
+		<div style="padding:20px 5px 10px;" class="bdA mb15"><span class="b s4 mr10 f14">支付方式</span></div>
+<!--
+EOT;
+if ($ol_onlinepay && $ol_payto) {
+print<<<EOT
+-->
+			<div class="bdB mb15" style="padding:0 5px;">
+				<p class="mb5"><em style="display:inline-block;width:25px;"><input name="paytype" type="radio" value="1" $alipayChecked /></em><span class="f14 b s5">支付宝（推荐）</span></p>
+				<p class="gray mb10"><em style="display:inline-block;width:25px;">&nbsp;</em>支付宝支付方式，可供个人支付宝及企业支付宝支付。</p>
+				<div class="bgA boxA s5" style="padding:10px 0;margin-bottom:20px;">
+					<p class="mb5"><em style="display:inline-block;width:25px;">&nbsp;</em>支付宝账户：$ol_payto </p>
+				</div>
+			</div>
+<!--
+EOT;
+}if ($db_kmd_account && $db_kmd_bank) {print<<<EOT
+-->
+			<div class="bdB mb15">
+				<p class="mb5"><em style="display:inline-block;width:25px;"><input name="paytype" type="radio" value="2" $bankChecked /></em><span class="f14 b s5">银行转帐</span></p>
+				<p class="gray mb10"><em style="display:inline-block;width:25px;">&nbsp;</em>企业单位支付方式，仅限企业间的转账支付。</p>
+				<div class="bgA boxA s5" style="padding:10px 0;margin-bottom:20px;">
+					<p class="mb5"><em style="display:inline-block;width:25px;">&nbsp;</em>公司名称：$db_kmd_company</p>
+					<p class="mb5"><em style="display:inline-block;width:25px;">&nbsp;</em>账　　户：$db_kmd_account</p>
+					<p><em style="display:inline-block;width:25px;">&nbsp;</em>开 户 行：$db_kmd_bank</p>
+				</div>
+			</div>
+<!--
+EOT;
+}if ($db_kmd_address) {print<<<EOT
+-->
+			<div class="bdB mb15">
+				<p class="mb5"><em style="display:inline-block;width:25px;"><input name="paytype" type="radio" value="3" $cashChecked /></em><span class="f14 b s5">现金</span></p>
+				<p class="gray mb10"><em style="display:inline-block;width:25px;">&nbsp;</em>在以上2种方式都不能实现的情况下，携带现金到现场办理手续。</p>
+				<div class="bgA boxA s5" style="padding:10px 0;margin-bottom:20px;">
+					<p><em style="display:inline-block;width:25px;">&nbsp;</em>办理地址：$db_kmd_address</p>
+				</div>
+			</div>
+<!--
+EOT;
+}
+$db_kmd_phone && $db_kmd_phone = "联系电话：$db_kmd_phone";
+$db_kmd_mobile && $db_kmd_mobile = "手机：$db_kmd_mobile";
+$db_kmd_aliww && $db_kmd_aliww = "旺旺：$db_kmd_aliww";
+$db_kmd_qq && $db_kmd_qq = "QQ：$db_kmd_qq";
+print<<<EOT
+-->
+			<div class="spaceTip s5 mb20" style="padding:10px 30px;line-height:1.8;">
+				<p>支付成功后请电话联系网站工作人员进行确认，确保您的申请及时受理。</p>
+				<p> $db_kmd_phone $db_kmd_mobile $db_kmd_aliww $db_kmd_qq</p>
+			</div>
+<!--
+EOT;
+if ($action != 'pay') {
+print<<<EOT
+-->
+			<div class="tac p10"><span class="bt"><span><button onclick="return kmd.init('info');">上一步</button></span></span><span class="btn"><span><button type="submit">提交</button></span></span></div>
+<!--
+EOT;
+} else {print<<<EOT
+-->
+			<div class="tac p10"><span class="btn"><span><button type="submit">提交</button></span></span></div>
+<!--
+EOT;
+}print<<<EOT
+-->
+		</div>
+	</form>
+<script type="text/javascript">
+var action = '$action';
+var basename = '$basename';
+var jsonSpreads = JSONParse('$jsonSpreads');
+var kmd = {
+	'init' : function(type) {
+		type = type || action;
+		if (type == 'pay') {
+			getObj('info').style.display = 'none';
+			getObj('pay').style.display = '';
+		} else {
+			getObj('info').style.display = '';
+			getObj('pay').style.display = 'none';
+		}
+		return false;
+	},
+	'getLeftKmdNum' : function(obj, show) {
+		var fid = parseInt(obj.value);
+		if (fid <= 0) return false;
+		ajax.send(basename + 'a=ajax', 'fid=' + fid + '&action=' + action, function(){
+			var rText = ajax.request.responseText.split('\t');
+			if (rText[0] == 'error') {
+				getObj('fidvalidate').value = rText[1];
+				getObj('fidvalidate').setAttribute('data-error', 1);
+				show && showDialog('error', rText[1], 2);
+			} else if (rText[0] == 'success') {
+				if (rText[1] == 0) {
+					getObj('fidvalidate').value = '该版块孔明灯已售完，请尝试其他版块！';
+					getObj('fidvalidate').setAttribute('data-error', 1);
+					show && showDialog('error', '该版块孔明灯已售完，请尝试其他版块！', 2);
+				} else {
+					getObj('fidvalidate').setAttribute('data-error', 0);
+					getObj('fidvalidate').value = rText[1];
+				}
+			}
+		});
+	},
+	'submitInfo' : function() {
+		var _this = this;
+		var fidvalidate = getObj('fidvalidate');
+		var fidValid = fidvalidate.getAttribute('data-error');
+		if (fidValid == 1) {
+			var info = fidvalidate.value;
+			showDialog('error', info, 2);
+			return false;
+		}
+		if (getObj('realname').value == '') {
+			showDialog('error', '请填写真实姓名', 2);
+			return false;
+		}
+		if (getObj('phone').value == '') {
+			showDialog('error', '请填写手机号码', 2);
+			return false;
+		} else if (!/^1\d{10}$/.test(getObj('phone').value)) {
+			showDialog('error', '手机号码格式不正确', 2);
+			return false;
+		}
+		var forum = getObj('fid');
+		var fname = fidvalidate.value;
+		getObj('foruminfo').innerHTML = '<a href="thread.php' + '?fid=' + forum.value + '" target="_blank">' + fname + '</a>';
+		var spread = _this.getSpread();
+		var spreadInfo;
+		for (var i in jsonSpreads) {
+			if (jsonSpreads[i].sid == spread) {
+				spreadInfo = jsonSpreads[i];
+			}
+		}
+		if (spreadInfo) {
+			var discount = (0 < spreadInfo.discount && spreadInfo.discount < 10) ? spreadInfo.discount + '折' : '无折扣';
+			var money = (0 < spreadInfo.discount && spreadInfo.discount < 10) ? (spreadInfo.price * spreadInfo.discount / 10) : spreadInfo.price;
+			money = money.toFixed(2);
+			getObj('fee').innerHTML = '原价 ' + spreadInfo.price + '元，<span class="s2">' + discount + '</span>，应付 <span class="s2">' + money + '元</span>';
+		}
+		_this.init('pay');
+		return false;
+	},
+	'getSpread' : function() {
+		var spread = document.buykmd.spread;
+		for (var i = 0, len = spread.length; i < len; i++) {
+			if (spread[i].checked) return spread[i].value;
+		}
+	}
+};
+setTimeout(function(){
+	kmd.getLeftKmdNum(getObj('fid'), false);
+}, 100);
+</script>
+<!--
+EOT;
+}print<<<EOT
+-->
+    </div>
+</div>
+<!--
+EOT;
+require_once(uTemplate::printEot('footer'));
+?>

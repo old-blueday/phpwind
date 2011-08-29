@@ -338,7 +338,7 @@ function displaySuccess(form,ifdisplay){
 	}
 }
 
-function getcomments(action,mid,uid,identify){
+function getcomments(action,mid,uid,identify,tid){
 	var id = buildId(mid,identify);
 	var ajaxObj = getObj('option_'+id);
 	var commentObj = getObj('comment_'+id);
@@ -353,13 +353,13 @@ function getcomments(action,mid,uid,identify){
 		commentObj.removeChild(ajaxObj);
 	}else if(_id != undefined && getObj('comment_'+id+'_'+(_id^1)) && getObj('comment_'+id+'_'+(_id^1)).innerHTML.length>10){
 		getObj('comment_'+id+'_'+(_id^1)).removeChild(ajaxObj);
-		refreshcomment(action,mid,uid,identify);
+		refreshcomment(action,mid,uid,identify,'',tid);
 	}else {
-		refreshcomment(action,mid,uid,identify);
+		refreshcomment(action,mid,uid,identify,'',tid);
 	}
 }
 
-function refreshcomment(action,mid,uid,identify,page){
+function refreshcomment(action,mid,uid,identify,page,tid){
 	var url = 'apps.php?q=weibo&ajax=1&do='+action;
 	var id = buildId(mid,identify);
 	var commentObj = getObj('comment_'+id);
@@ -367,7 +367,7 @@ function refreshcomment(action,mid,uid,identify,page){
 		commentObj = getObj('weiboFeed0').style.display == 'block' ? getObj('comment_'+id+'_0') : getObj('comment_'+id+'_1');
 	}
 	
-	var data = buildData(mid,uid,identify,page);
+	var data = buildData(mid,uid,identify,page,tid);
 	ajax.send(url,data,function(){
 		var responseText = ajax.request.responseText;
 		if(responseText.length < 100) {
@@ -375,8 +375,36 @@ function refreshcomment(action,mid,uid,identify,page){
 			return false;
 		} else {
 			commentObj.innerHTML = responseText;
+			var textarea=commentObj.getElementsByTagName("textarea")[0];
+			textarea.focus();
+			if(textarea!=undefined){
+				   autoResizeTextarea(textarea);
+
+			}
 		}
 	});
+}
+
+function autoResizeTextarea(obj){
+		var d=document.createElement("div");
+		d.style.width=getStyle(obj,"width");
+		d.style.padding=getStyle(obj,"padding");
+		d.style.lineHeight=getStyle(obj,"lineHeight");
+		d.style.fontSize=getStyle(obj,"fontSize");
+		d.style.wordWrap="break-word";
+		d.style.visibility="hidden";  
+		
+		document.body.appendChild(d);
+		obj.onkeyup=function(e){
+			 var e=e||window.event;
+			 var keyCode=e.keyCode||e.which;
+			 d.innerHTML=this.value.replace(/\n/g,'<br/>');
+			 if(keyCode==13){
+				d.innerHTML+="<br/>";
+			 }
+			 this.style.height=d.offsetHeight+"px";
+			 wordlength(obj,255,"");
+		}
 }
 
 function buildId(mid,identify){
@@ -387,7 +415,7 @@ function buildId(mid,identify){
 	return  id;
 }
 
-function buildData(mid,uid,identify,page){
+function buildData(mid,uid,identify,page,tid){
 	var data = 'mid='+mid;
 	if(uid){
 		data += '&uids='+uid;
@@ -398,6 +426,9 @@ function buildData(mid,uid,identify,page){
 	if(page){
 		data += '&commentpage='+page;
 	}
+	if(tid){
+		data += '&tid='+tid;
+	}
 	return data;
 }
 
@@ -406,8 +437,8 @@ function postcomment(form){
 	var contentLen = strlen(content);
 	if(contentLen <= 0 || contentLen > 255 ){
 		shockwarning(form.writeContent);
-		showText = (contentLen <= 0 ? '评论内容不能为空' : '评论内容不能多于255字节');
-		showDialog("error", showText);
+	//	showText = (contentLen <= 0 ? '评论内容不能为空' : '评论内容不能多于255字节');
+	//	showDialog("error", showText);
 		return false;
 	}
 	var baseUrl = "apps.php?q=weibo&do=postcomment&ajax=1";
@@ -420,6 +451,7 @@ function postcomment(form){
 			var subdo = form.subdo.value;
 			var uid = form.uids.value;
 			var mid = form.mid.value;
+			var tid = form.tid.value;
 			var identify = form.identify.value;
 			var id = buildId(mid,identify);
 			var commentnum = getObj('commentnum_'+id);
@@ -435,7 +467,7 @@ function postcomment(form){
 				}
 				commentnum.innerHTML = str;
 			}			
-			refreshcomment(subdo,mid,uid,identify);
+			refreshcomment(subdo,mid,uid,identify,'',tid);
 		}else{
 			showDialog("error", responseText);
 		}
@@ -507,11 +539,12 @@ function deleteweibo(mid,action,page,menuId,isTopic,topicName){
 	var url = 'apps.php?q=weibo&ajax=1&do=deleteweibo&mid='+mid;
 	weibo_isTopic = isTopic;
 	weibo_topicName = topicName;
+	var delid = getObj('delweibo_'+mid);
 	if (getObj('weiboFeed0') != null && getObj('weiboFeed1') != null){
 		menuId = getObj('weiboFeed0').style.display == 'block' ? 'weiboFeed0' : 'weiboFeed1';
 	}	
-	showDialog('confirm', '你确定要删除此条新鲜事吗?',0, function(){
-		if (getObj(url) == null){
+	pwConfirm("你确定要删除此条新鲜事吗?", delid, function() {
+		if (getObj(mid) == null){
 			setTimeout(function() {location.reload();}, 300);
 		}	
 		ajax.send(url,'',function(){
@@ -607,6 +640,9 @@ function getWeiboList(action, page, menuId, uid, type) {
 		getObj('page').value = page;
 		ajax.submit(getObj('filterWeiboForm'), function() {
 			obj.innerHTML = ajax.runscript(ajax.request.responseText);
+			if(typeof usercard!="undefined"){
+				new usercard().init();
+			}
 		});
 	} else if (in_array(action, ['my', 'attention', 'lookround', 'refer', 'receive', 'conloy' ,'topics'])) {
 		if (weibo_isTopic == 1) action = 'topics';
@@ -639,11 +675,13 @@ function wordlength(obj, maxlimit, id) {
 	var len = strlen(obj.value);
 	var value = '';
 	if (len > maxlimit) {
+		obj.value=obj.value.substr(0,maxlimit);
 		value = '已超出<em>' + (len - maxlimit) + '</em>个字节';
+		return false;
 	} else {
 		value = '<em>' + len + '/255</em>';
 	}
-	var showobj = (typeof id == 'undefined') ? $('span_' + obj.id) : $(id);
+	var showobj = (typeof id == 'undefined') ? getObj('span_' + obj.id) : getObj(id);
 	if (showobj != null) {
 		showobj.innerHTML = value;
 		showobj.parentNode.getElementsByTagName('em')[0].className = (maxlimit - len > 0) ? '' : 's1';

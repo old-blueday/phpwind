@@ -49,13 +49,20 @@ class PW_BanUser {
 		$banip = intval($params['banip']);
 		$ifmsg = intval($params['ifmsg']);
 		$reason = $params['reason'];
-		
+
+		/*如果是版块禁言，获取帖子信息*/
+		if ($tid > 0) {
+			$postInfo = $this->getPostInfo($tid,$pid);
+			if($postInfo === false) return 'banuser_post_data_error';
+			$fid = $postInfo['fid'];
+			$userip = $postInfo['userip'];
+		}
 		if ($range == 1) {
 			//全局禁言
 			$tid = $fid = 0;
 		} else {
 			$range = 0;
-			unset($banip);
+//			unset($banip);
 		}
 		
 		if ($type != 1) {
@@ -68,15 +75,7 @@ class PW_BanUser {
 		$banuserDb = $this->_getBanUserDB();
 		$userinfo = $userService->get($uid);
 		if(!$userinfo) return 'undefined_action';
-		
-		/*如果是版块禁言，获取帖子信息*/
-		if ($tid > 0) {
-			$postInfo = $this->getPostInfo($tid,$pid);
-			if($postInfo === false) return 'banuser_post_data_error';
-			$fid = $postInfo['fid'];
-			$userip = $postInfo['userip'];
-		}
-		
+
 		/*判断是否已经禁言*/
 		$GLOBALS['username'] = $userinfo['username'];//GLOBAL
 		if ($userinfo['groupid'] == 6) {
@@ -157,9 +156,10 @@ class PW_BanUser {
 						)),
 					)
 			);
-
+	
 			if ($banip && $userip) {
 				require_once(R_P.'admin/cache.php');
+			
 				$rs = $this->db->get_one("SELECT db_name,db_value FROM pw_config WHERE db_name='db_ipban'");
 				if (strpos($rs['db_value'], $userip) === false) {//IP未被禁止才更新
 					$rs['db_value'] .= ($rs['db_value'] ? ',' : '').$userip;
@@ -168,28 +168,26 @@ class PW_BanUser {
 				}
 			}
 			$fid && $foruminfo = L::forum($fid);
-			if($foruminfo){
-				$log = array(
-					'type'      => 'banuser',
-					'username1' => $userinfo['username'],
-					'username2' => $GLOBALS['windid'],
-					'field1'    => $fid,
-					'field2'    => '',
-					'field3'    => '',
-					'descrip'   => 'banuser_descrip',
-					'timestamp' => $GLOBALS['timestamp'],
-					'ip'        => $GLOBALS['onlineip'],
-					'tid'		=> $tid,
-					'forum'		=> $foruminfo['name'],
-					'subject'	=> '',
-					'affect'	=> '',
-					'reason'	=> stripslashes($reason)
-				);
-				writelog($log);
-				if ($foruminfo['allowhtm']) {
+			$log = array(
+				'type'      => 'banuser',
+				'username1' => $userinfo['username'],
+				'username2' => $GLOBALS['windid'],
+				'field1'    => $fid,
+				'field2'    => '',
+				'field3'    => '',
+				'descrip'   => 'banuser_descrip',
+				'timestamp' => $GLOBALS['timestamp'],
+				'ip'        => $GLOBALS['onlineip'],
+				'tid'		=> $tid,
+				'forum'		=> $foruminfo['name'],
+				'subject'	=> '',
+				'affect'	=> '',
+				'reason'	=> stripslashes($reason)
+			);
+			writelog($log);
+			if($foruminfo && $foruminfo['allowhtm']){
 					$StaticPage = L::loadClass('StaticPage');
 					$StaticPage->update($tid);
-				}
 			}
 			$this->clearUserCache($uid);
 		}else{

@@ -3,8 +3,8 @@
 
 list($GLOBALS['db_ifupload'],$GLOBALS['db_imgheight'],$GLOBALS['db_imgwidth'],$GLOBALS['db_imgsize']) = explode("\t",$GLOBALS['db_upload']);
 //!$GLOBALS['db_imgwidth'] && !$GLOBALS['db_imgheight'] && $GLOBALS['db_imgwidth'] = 100;
-!$GLOBALS['db_imgwidth'] && $GLOBALS['db_imgwidth'] = 150;
-!$GLOBALS['db_imgheight'] && !$GLOBALS['db_imgheight'] = 150;
+!$GLOBALS['db_imgwidth'] && $GLOBALS['db_imgwidth'] = 120;
+!$GLOBALS['db_imgheight'] && !$GLOBALS['db_imgheight'] = 120;
 
 function showfacedesign($usericon,$show_a = null,$imgtype = null) {
 	global $imgpath;
@@ -58,8 +58,8 @@ function showfacedesign($usericon,$show_a = null,$imgtype = null) {
 	$imglen = '';
 	if ($user_a[1] == 2 || ($user_a[1] == 3 && !$imgtype) || $user_a[1] == 1) {
 		list($user_a[2],$user_a[3]) = getfacelen($user_a[2],$user_a[3]);
-		if ($user_a[2]) $imglen .= " width=\"$user_a[2]\"";
-		if ($user_a[3]) $imglen .= " height=\"$user_a[3]\"";
+		if ($user_a[2]) $imglen .= ($user_a[2] > 120) ? " width=120" : " width=\"$user_a[2]\"";
+		if ($user_a[3]) $imglen .= ($user_a[3] > 120) ? " height=120" : " height=\"$user_a[3]\"";
 	}
 	if (empty($show_a)) {
 		return "<img class=\"pic\" src=\"$faceurl\"$imglen border=\"0\" />";

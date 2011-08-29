@@ -1,0 +1,88 @@
+<!--<?php
+include_once PrintEot('left');
+include_once PrintApp('admin_header');
+print<<<EOT
+-->
+<form action="$basename&type=batch" method="post" name="FORM">
+<input type="hidden" name="delid" id="delid" value="">
+<h2 class="h1"><span class="mr10 fl">勋章列表</span><a href="{$basename}&type=add" class="btn_add fl"><i>添加新勋章</i></a></h2>
+<div class="admin_table mb10">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <tr class="tr2">
+      <td width="30"><span onclick="CheckAll(document.FORM)" class="cp">启用</span></td>
+      <td style="width:40px;">顺序</td>
+      <td width="160">勋章名称</td>
+      <td width="160">勋章说明</td>
+      <td width="70">勋章图标</td>
+      <td>勋章发放机制</td>
+      <td>操作</td>
+    </tr>
+<!--
+EOT;
+if (!$medal) { 
+print<<<EOT
+-->
+    <tr>
+      <td class="p10" colspan="9"><div class="admin_tips">啊哦，没有你要的信息！</div></td>
+    </tr>
+<!--
+EOT;
+} else { 
+foreach ($medal as $v) {
+$type = $typeArr[$v['type']];
+$isOpen = ($v['is_open'] == 1) ? 'checked="checked"' : '';
+print<<<EOT
+-->
+    <tr class="tr1 vt">
+      <td class="td2">
+	<input type="checkbox"  value="1" name="selid[$v[medal_id]]"  $isOpen>	  
+	  </td>
+      <td class="td2"><input name="sortorder[$v[medal_id]]" value="$v[sortorder]" type="text" class="input" style="width:20px;" maxlength="5" /></td>
+      <td class="td2"><input name="name[$v[medal_id]]" value="$v[name]" type="text" class="input input_wa" maxlength="255" /></td>
+      <td class="td2"><input name="descrip[$v[medal_id]]" value="$v[descrip]" type="text" class="input input_wa" /></td>
+      <td class="td2"><img width="24" width="24" src="{$v[smallimage]}"  /></td>
+      <td class="td2">$type</td>
+      <td class="td2">
+<!--
+EOT;
+if ($v['type'] == 0) {
+print<<<EOT
+-->	
+  <span style="color:#999999">系统默认</span>
+<!--
+EOT;
+} else {
+print<<<EOT
+-->	  
+	  <a href="$basename&type=edit&id=$v[medal_id]">[编辑]</a>&nbsp;&nbsp;<a href="javascript:" onclick="if (confirm('确认要删除,删除勋章将删除已经获取该勋章的会员信息？')) window.location.href='$basename&type=del&id=$v[medal_id]' ">[删除]</a>
+<!--
+EOT;
+}
+print<<<EOT
+-->	
+	  
+	  </td>
+    </tr>
+<!--
+EOT;
+} }
+print<<<EOT
+-->
+
+  </table>
+</div>
+<div class="mb10 tac"><span class="btn"><span><button type="submit">提 交</button></span></span></div>
+<script type="text/javascript">
+	function checkDelAll() {
+		if (confirm('确认要删除,删除勋章将删除已经获取该勋章的会员信息？')) {
+			document.getElementById('delid').value = 1;
+			return true;
+		} else {
+			return false;
+		}
+	}
+</script>
+<!--
+EOT;
+include_once PrintEot('adminbottom');
+?>-->

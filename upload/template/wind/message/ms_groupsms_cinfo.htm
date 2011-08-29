@@ -23,16 +23,21 @@ print <<<EOT
 			<td class="face"><a class="img_50" href="{$_linkUrl}"><i><img
 				width="48" height="48" src="{$value[face]}"></i></a></td>
 			<td class="name">
-			<p><a href="{$_linkUrl}">{$value[username]}</a>
+			<p>
 <!--
 EOT;
 if(checkOnline($value[thisvisit]) && $value[create_uid] != $winduid){
+$gender = $value['gender'] == 2 ? 'women' : 'man';
 print <<<EOT
 -->
-							<img src="images/online.png" alt="在线" title="在线" style="vertical-align:middle" />
+							<span class="{$gender}_ol mr5" title="在线" alt="在线">在线</span>
 <!--
 EOT;
-}if($value[create_uid] != $winduid){
+}print <<<EOT
+--><a href="{$_linkUrl}">{$value[username]}</a>
+<!--
+EOT;
+if($value[create_uid] != $winduid){
 print <<<EOT
 -->
 							<a class="send_message w" href="$baseUrl?type=post&username={$value[create_username]}">[发消息]</a>
@@ -43,7 +48,7 @@ EOT;
 			</p>
 			<em><span title="$value[created_time_detail]">{$value[created_time_format]}</span></em>
 			<td>
-        <a class="adel" href="javascript:;" onclick="MC.del('{$message[rid]}','$subtype','','$page','showmessageTip')">删除</a>
+        <a class="adel" href="javascript:;" onclick="pwConfirm('确定要删除该消息?', this, function(){MC.del('{$message[rid]}','$subtype','','$page','showmessageTip')})">删除</a>
 <!--
 EOT;
 if($listCount > 10){

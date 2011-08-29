@@ -75,8 +75,8 @@ if ($db_menu) $db_menuinit .= ",'td_sort' : 'menu_sort'";
 list($_Navbar,$_LoginInfo) = pwNavBar();
 
 //数据调用初始化
-$pageInvokeService = L::loadClass('pageinvokeservice', 'area');
-$pageConfig = $pageInvokeService->getEffectPageInvokePieces('channel',$alias);
+$invokeService = L::loadClass('invokeservice', 'area');
+$pageConfig = $invokeService->getEffectPageInvokePieces('channel',$alias);
 $tplGetData = L::loadClass('tplgetdata', 'area');
 $tplGetData->init($pageConfig);
 

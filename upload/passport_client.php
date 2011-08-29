@@ -7,6 +7,7 @@ S::gp(array('userdb'),'GP',0);
 if(!$db_pptifopen || $db_ppttype!='client'){
 	Showmsg('passport_close');
 }
+$forward = str_replace('&#61;', '=', $forward);
 if(empty($db_pptkey) || md5($action.$userdb.$forward.$db_pptkey) != $verify){
 	Showmsg('passport_safe');
 }

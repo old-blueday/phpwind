@@ -79,7 +79,7 @@ class PW_StaticPage {
 		$style = L::style(null, L::config('db_defaultstyle'));
 		foreach ($style as $key => $value) {
 			$this->vars[$key] = $value;
-			$GLOBALS[$key] = $style;
+			$GLOBALS[$key] = $value;
 		}
 		$this->vars['css_path'] = D_P . 'data/style/wind_css.htm';
 		
@@ -214,7 +214,9 @@ class PW_StaticPage {
 		include S::escapePath($this->tpl);
 		$ceversion = defined('CE') ? 1 : 0;
 		$content = str_replace(array('<!--<!---->', '<!---->'), array('', ''), ob_get_contents());
-		$content .= "<script language=\"JavaScript\" src=\"http://init.phpwind.net/init.php?sitehash={$db_sitehash}&v=$wind_version&c=$ceversion\"></script>";
+		$content .= "<script type=\"text/javascript\">(function(d,t){
+var url=\"http://init.phpwind.net/init.php?sitehash={$db_sitehash}&v=$wind_version&c=$ceversion\";
+var g=d.createElement(t);g.async=1;g.src=url;d.body.appendChild(g)}(document,\"script\"));</script>";
 		ob_end_clean();
 		ObStart();
 		if (!is_dir(R_P . $this->htmdir . '/' . $this->fid)) {
@@ -255,16 +257,17 @@ class PW_StaticPage {
 			$read['ontime'] = (int) ($read['onlinetime'] / 3600);
 			$tpc_author = $read['author'];
 			list($read['face'],,$httpWidth,$httpHeight,,,,$read['facesize']) = showfacedesign($read['micon'], true, 'm');
-			if ($httpWidth > $GLOBALS['db_imgwidth'] || $httpHeight > $GLOBALS['db_imgheight']) {
-				$read['facesize'] = ' width="' . $GLOBALS['db_imgwidth'] . '" height="' . $GLOBALS['db_imgheight'] . '"';
+			if ($httpWidth > 120 || $httpHeight > 120 || $read['facesize'] == '') {
+				$read['facesize'] = ' width="120" height="120"';
 			}
+			list($read['posttime']) = getLastDate($read['postdate']);
 			if ($db_ipfrom == 1) $read['ipfrom'] = ' From:' . $read['ipfrom'];
 			
 			if (L::config('md_ifopen', 'cache_read') && $read['medals']) {
 				$medals = '';
 				$md_a = explode(',', $read['medals']);
 				foreach ($md_a as $key => $value) {
-					if ($value) $medals .= "<img src=\"hack/medal/image/{$_MEDALDB[$value][picurl]}\" title=\"{$_MEDALDB[$value][name]}\" alt=\"{$_MEDALDB[$value][name]}\"> ";
+					if ($value) $medals .= "<img src=\"{$_MEDALDB[$value][smallimage]}\" title=\"{$_MEDALDB[$value][name]}\" /> ";
 				}
 				$read['medals'] = $medals . '<br />';
 			} else {

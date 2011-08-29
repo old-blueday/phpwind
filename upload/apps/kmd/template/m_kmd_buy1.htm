@@ -1,0 +1,141 @@
+<!--<?php
+require_once(uTemplate::printEot('header'));
+require_once(uTemplate::printEot('user_appleft'));
+print<<<EOT
+-->
+<div class="contUser">
+    <div class="p15">
+			<h4 class="site"><img src="u/images/module/lightbulb.png" align="absmiddle" class="mr10" /><span>孔明灯</span></h4>           	
+        <div class="navC">
+					<a href="apps.php?q=kmd&a=help" class="fr mr10">孔明灯帮助</a>
+            <ul>
+                <li class="current"><a  href="apps.php?q=kmd&a=help"  hidefocus="true">我的孔明灯</a></li>
+                <li><a href="apps.php?q=kmd&a=record" hidefocus="true">购买记录</a></li>
+            </ul>
+						<span class="btn_add fl"><span><button onclick="window.location.href='{$basename}a=buy1';">购买孔明灯</button></span></span>
+        </div>     
+		<div class="p15 cc">
+					<ol class="steps pr">
+						<li class="current"><em>1</em>填写推广信息</li>
+						<li><em>2</em>填写基本资料</li>
+						<li><em>3</em>支付</li>
+					</ol>
+				</div>
+				<div class="p10">
+					<table width="100%">
+						<tr class="tr3">
+							<td width="90" style="vertical-align:top;padding-top:15px;" class="b s5 tar f14">帖子链接：</td>
+							<td width="350" style="vertical-align:top"><p class="mb5"><input name="tpcurl" id="tpcurl" type="text" value="{$tpcurl}" class="input" style="width:330px;padding:5px;" /></p><p class="gray">请输入需要使用孔明灯的帖子链接，确认后系统自动获取帖子信息</p></td>
+							<td style="vertical-align:top"><span class="bt"><span><button onclick="checkKmdUrl();return false;" type="button">确认</button></span></span></td>
+						</tr>
+					</table>
+				<div style="display:none" id="threadInfo">	
+				<form action="{$basename}a=buy2" method="post" onSubmit="return checkTid();">
+				<div id="kinfo">
+				<table width="100%" >
+						<tr class="tr3">
+							<td width="90" class="tar">版块：</td>
+							<td width="360" id="kforum">&nbsp;</td>
+							<td>&nbsp;</td>
+						</tr>
+						<tr class="tr3">
+							<td class="tar">标题：</td>
+							<td><input name="ksubject" id="ksubject" type="text" class="input" style="width:332px;" readonly="readonly" />
+							<input type="hidden" name="tid" id="tid" value="0" />
+							</td>
+							<td>&nbsp;</td>
+						</tr>
+						<tr class="tr3">
+							<td style="vertical-align:top" class="tar">简介：</td>
+							<td><textarea name="kcontent" id="kcontent" class="textareaA" readonly="readonly"></textarea></td>
+							<td>&nbsp;</td>
+						</tr>
+						</table>
+					</div>	
+					<table width="100%">
+						<tr class="tr3">
+							<td class="tar b s5" style="vertical-align:top;width:90px;">推广套餐：</td>
+							<td>
+<!--
+EOT;
+$c = 1;
+foreach ($kmd_spread as $key => $value) {
+	if($sid){
+		$chd = $sid == $value['sid']? 'checked="checked"':'';
+	}elseif($c == 1){
+		$chd = 'checked="checked"';
+	}else{
+		$chd = '';
+	}	
+	$c++;
+	$discount = $value['discount'] ? $value['discount'].'折' : '';
+print <<<EOT
+-->								
+								<p class="mb10"><label class="mr20 w"><input name="sid" type="radio" $chd value="{$value['sid']}" style="margin:-3px 4px 0 0;" />{$value['day']}天/<span class="s2">{$value['rmb']}元 $discount</span></label></p>
+<!--
+EOT;
+}
+print <<<EOT
+-->															
+							</td>
+							<td>&nbsp;</td>
+						</tr>
+					</table>
+					<div class="tac p10"><span class="btn"><span><button type='submit'>下一步</button></span></span></div>
+				</form>
+				</div>
+				</div>
+    </div>
+</div> 
+<script type="text/javascript">
+function checkTid(){	
+	var checkNum=0;
+	var sidradio=document.getElementsByName("sid"); 
+	for(i=0;i<sidradio.length;i++){ 
+		if(sidradio[i].checked) { 
+			checkNum++; 
+			break; 
+		} 
+	}		
+	var tid = getObj('tid').value;	
+	if(tid<=0){
+		showDialog('error','请确认需要参与孔明灯的帖子！',3);
+		return false;
+	}else if(!checkNum){
+		showDialog('error','请选择要购买的套餐！',3);
+		return false;
+	}else{
+		return true;
+	}
+}
+function checkKmdUrl() {
+	var kinfo = getObj('kinfo');
+	var tpcurl = encodeURIComponent(getObj('tpcurl').value);
+	tpcurl = tpcurl.replace(/html/g,'htm');
+
+	ajax.send("{$basename}a=ajax",'tpcurl=' + tpcurl,function(){
+		var rText = ajax.request.responseText;		
+		if (rText.substring(0,7) == 'success'){	
+				kinfo.innerHTML = rText.substring(8);	
+				getObj('threadInfo').style.display="";			
+			 } else{				 
+			 	showDialog('error',rText,3);		
+			 }
+			 return false;
+	});
+}
+<!--
+EOT;
+if($tpcurl){
+print <<<EOT
+-->	
+checkKmdUrl();
+<!--
+EOT;
+}print <<<EOT
+-->	
+</script>
+<!--
+EOT;
+require_once(uTemplate::printEot('footer'));
+?>

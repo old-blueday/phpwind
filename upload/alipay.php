@@ -4,8 +4,8 @@ require_once(R_P.'require/posthost.php');
 //* include_once pwCache::getPath(D_P.'data/bbscache/ol_config.php');
 pwCache::getData(D_P.'data/bbscache/ol_config.php');
 
-S::gp(array('action','out_trade_no','trade_status','buyer_email','notify_id'));
-
+S::gp(array('action','out_trade_no','trade_status','buyer_email','notify_id','extra_common_param'));
+$ret_url = $extra_common_param ? getExtra($extra_common_param) : 'userpay.php';
 !empty($_POST) && $_GET = $_POST;
 $isPwPay = false;
 
@@ -36,7 +36,7 @@ if ($isPwPay) {
 	$veryfy_result1 = ($_GET['sign'] == md5(substr($arg,0,-1).$ol_alipaykey)) ? 'true' : 'false';
 }
 if (!eregi("true$",$veryfy_result1) || !eregi("true$",$veryfy_result2)) {
-	paymsg('userpay.php','alipay_failure','fail');
+	paymsg($ret_url,'alipay_failure','fail');
 }
 
 if (empty($action)) {
@@ -51,20 +51,19 @@ if (empty($action)) {
 		$rt = $db->get_one('SELECT c.*,m.username,m.groupid,m.groups FROM pw_clientorder c LEFT JOIN pw_members m USING(uid) WHERE order_no=' . S::sqlEscape($out_trade_no));
 		if (empty($rt)) {
 			procUnLock('alipay',$winduid);
-			paymsg('userpay.php','alipay_ordersfailure');
+			paymsg($ret_url,'alipay_ordersfailure');
 		}
 		$fee = $rt['number'] * $rt['price'];
 	
 		if ($fee != $_GET['total_fee'] || $_GET['seller_email'] != $ol_payto) {
 			procUnLock('alipay',$winduid);
-			paymsg('userpay.php','alipay_failure');
+			paymsg($ret_url,'alipay_failure');
 		}
 		if ($trade_status == 'TRADE_FINISHED' || $trade_status == 'TRADE_SUCCESS') {
 			if ($rt['state'] == 2) {
 				procUnLock('alipay',$winduid);
-				paymsg('userpay.php','alipay_orderssuccess');
+				paymsg($ret_url,'alipay_orderssuccess');
 			}
-			$ret_url = 'userpay.php';
 	
 			if (file_exists(R_P."require/olpay/pay_{$rt[type]}.php")) {
 				require_once S::escapePath(R_P."require/olpay/pay_{$rt[type]}.php");
@@ -74,7 +73,7 @@ if (empty($action)) {
 			paymsg($ret_url,'alipay_orderssuccess');
 		} else {
 			procUnLock('alipay',$winduid);
-			paymsg('userpay.php','alipay_topayfailure');
+			paymsg($ret_url,'alipay_topayfailure');
 		}
 	} else {
 		Showmsg('proclock');
@@ -119,5 +118,15 @@ function paymsg($url,$msg,$notify = 'success') {
 		refreshto($url,$msg);
 	}
 	exit($notify);
+}
+function getExtra($extra) {
+	$return = '';
+	$extra && $extra = explode('.',$extra);
+	if(S::isArray($extra)) {
+		foreach ($extra as $v) {
+			is_numeric($v) && $return .= chr($v);
+		}
+	}
+	return $return;
 }
 ?>

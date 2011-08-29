@@ -2,7 +2,7 @@
 if($step == 'email'){
 print <<<EOT
 -->
-<div class="popTop" onmousedown="read.move(event)" style="cursor:move"><span class="fr" style="margin-top:2px;cursor:pointer" onclick="closep();"><img src="$imgpath/close.gif" /></span>导入我的邮件联系人</div>
+<div class="popTop" onmousedown="read.move(event)" style="cursor:move"><span class="adel" onclick="closep();">close</span>导入我的邮件联系人</div>
 <div class="p15">
 <div id="message"></div>
 <form action="$normalUrl" method="post" name="EMAIL" onsubmit="return false">
@@ -37,7 +37,7 @@ print <<<EOT
 EOT;
 } elseif ($step == 'msn') {print <<<EOT
 -->
-<div class="popTop" onmousedown="read.move(event)" style="cursor:move"><span class="fr" style="margin-top:2px;cursor:pointer" onclick="closep();"><img src="$imgpath/close.gif" /></span>导入我的MSN联系人</div>
+<div class="popTop" onmousedown="read.move(event)" style="cursor:move"><span class="adel" onclick="closep();">close</span>导入我的MSN联系人</div>
 <div class="p15">
 <div id="message"></div>
 <form action="$normalUrl" method="post" name="EMAIL" onsubmit="return false">
@@ -79,7 +79,7 @@ EOT;
 EOT;
 } elseif ($step == 'csv'){print <<<EOT
 -->
-<div class="popTop" onmousedown="read.move(event)" style="cursor:move"><span class="fr" style="margin-top:2px;cursor:pointer" onclick="closep();"><img src="$imgpath/close.gif" /></span>导入我的邮件联系人</div>
+<div class="popTop" onmousedown="read.move(event)" style="cursor:move"><span class="adel" onclick="closep();">close</span>导入我的邮件联系人</div>
 <div class="p15">
 <div id="message"></div>
 <form action="$normalUrl" method="post" enctype="multipart/form-data" name="EMAIL"  onsubmit="return false">
@@ -106,7 +106,7 @@ EOT;
 } elseif ($step == 'simple') {print <<<EOT
 -->
 <div style="width:380px;">
-<div class="popTop" onmousedown="read.move(event)" style="cursor:move"><span class="fr" style="margin-top:2px;cursor:pointer" onclick="closep();"><img src="$imgpath/close.gif" /></span>发送邀请邮件</div>
+<div class="popTop" onmousedown="read.move(event)" style="cursor:move"><span class="adel" onclick="closep();">close</span>发送邀请邮件</div>
 <div class="p15">
 <div id="message"></div>
 	<input type="hidden" value="{$invcode}" name="invcodes" id="invcodes"/>
@@ -128,7 +128,7 @@ $_count = $friendCount + $notFriendCount;
 print <<<EOT
 -->
 <div>
-<div class="popTop" onmousedown="read.move(event)" style="cursor:move"><span class="fr" style="cursor:pointer" onclick="closep();"><img src="$imgpath/close.gif" /></span>导入我的邮件联系人</div>
+<div class="popTop" onmousedown="read.move(event)" style="cursor:move"><span class="adel" onclick="closep();">close</span>导入我的邮件联系人</div>
 <div class="mailFri p15">
 <!--
 EOT;
@@ -319,7 +319,7 @@ function simpleInvite(form){
 		showTips('请输入电子邮箱');
 		return false;
 	}
-	var email = email.replace(/\\n/ig,',').replace(/\\r/ig,',');
+	var email = email.replace(/\\n/ig,',').replace(/\\r/ig,'');
 	var type = '$rg_allowregister';
 	var step = '';
 	var data = 'value='+email;

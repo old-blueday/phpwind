@@ -4,10 +4,11 @@ $changeUrl = $changeUrl."&rnd = ".rand(1000,9999)."&";
 print <<<EOT
 -->
  <div>
+	<script type="text/javascript" src="js/portal.js"></script>
 	<script type="text/javascript">
-		window.onload = function(){
+		onReady(function(){
 			initFormSubInvoke();
-		}
+		})
 		var deleteTips = function(url){
 			if(confirm("你确定删除这条数据吗?")){
 					setTimeout(function(){

@@ -24,7 +24,7 @@ class PW_Attention {
 	 * @param $friendid 关注的对象
 	 * @param $limit	新鲜事数量
 	 */
-	function addFollow($uid, $friendid, $limit = 20) {//fixed
+	function addFollow($uid, $friendid, $limit = 20, $from = '') {//fixed
 		if (!$uid || !$friendid) return false;
 		if ($this->isFollow($uid, $friendid)) return 'user_attention_exists';
 	
@@ -39,7 +39,13 @@ class PW_Attention {
 		$userServer->updateByIncrement($uid, array(), array('follows' => 1));
 		$userServer->updateByIncrement($friendid, array(), array('fans' => 1, 'newfans' => 1));
 
-		$this->addUserWeiboRelationsByFriendid($friendid, $uid, $limit);
+		$medalservice = L::loadClass('medalservice','medal');
+		$medalservice->runAutoMedal($friendid,'fans','fans',1);
+
+		$friendService = L::loadClass('Friend', 'friend');
+		if (!$friendService->isFriend($uid,$friendid) || $from == 'addFriend') {
+			$this->addUserWeiboRelationsByFriendid($friendid, $uid, $limit);
+		}
 		return true;
 	}
 
@@ -74,9 +80,16 @@ class PW_Attention {
 		$userServer = L::loadClass('UserService', 'user');
 		$userServer->updateByIncrement($uid, array(), array('follows' => -1));
 		$userServer->updateByIncrement($friendid, array(), array('fans' => -1));
+
+		$medalservice = L::loadClass('medalservice','medal');
+		$medalservice->runAutoMedal($friendid,'fans','fans',-1);
 		
-		$this->delUserWeiboRelationsByFriendid($uid, $friendid);
-		
+		$friendService = L::loadClass('Friend', 'friend');
+		if ($friendService->isFriend($uid,$friendid)) {
+			$privacyService = L::loadClass('privacy','sns');
+			$myattention = $privacyService->getIsFollow($uid, 'friend');
+			!$myattention && $this->delUserWeiboRelationsByFriendid($uid, $friendid);
+		}
 		return true;
 	}
 	

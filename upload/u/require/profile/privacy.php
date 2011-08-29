@@ -65,12 +65,9 @@ if (empty($t)) {
 } elseif ($t == 'weibo') {
 
 	if (empty($_POST['step'])) {
-		/* sinaweibo bind */
-		$appendFetchField = $db_sinaweibo_status ? ', sinaweibo_isfollow' : '';
-		
 		$privacyCurrent = '';
 		$weiboCurrent = ' class="current"';
-		$userdb = $db->get_one("SELECT article_isfeed,diary_isfeed,photos_isfeed,group_isfeed,self_isfollow,friend_isfollow,cnlesp_isfollow, article_isfollow,diary_isfollow, photos_isfollow, group_isfollow".$appendFetchField." FROM pw_ouserdata WHERE uid=" . S::sqlEscape($winduid));
+		$userdb = $db->get_one("SELECT at_isfeed,article_isfeed,diary_isfeed,photos_isfeed,group_isfeed,self_isfollow,friend_isfollow,cnlesp_isfollow, article_isfollow,diary_isfollow, photos_isfollow, group_isfollow".$appendFetchField." FROM pw_ouserdata WHERE uid=" . S::sqlEscape($winduid));
 		if (!$userdb) {
 			$userdb = array(
 				'article_isfeed' => 1,
@@ -102,31 +99,17 @@ if (empty($t)) {
 		ifchecked('diary_isfollow', $userdb['diary_isfollow']);
 		ifchecked('photos_isfollow', $userdb['photos_isfollow']);
 		ifchecked('group_isfollow', $userdb['group_isfollow']);
-
-		/* sinaweibo bind */
-		if (!$db_sinaweibo_status) {
-			$isBindWeibo = false;
-		} else {
-			!isset($userdb['sinaweibo_isfollow']) && $userdb['sinaweibo_isfollow'] = 1;
-			ifchecked('sinaweibo_isfollow', $userdb['sinaweibo_isfollow']);
-			
-			$bindService = L::loadClass('weibobindservice', 'sns/weibotoplatform'); /* @var $bindService PW_WeiboBindService */
-			$bindInfo = $bindService->getLocalBindInfo($winduid, PW_WEIBO_BINDTYPE_SINA);
-			$isBindWeibo = (bool) $bindInfo;
-			if (!$isBindWeibo) {
-				$bindSinaWeiboUrl = $bindService->getBindUrl($winduid);
-			} else {
-				$syncer = L::loadClass('WeiboSyncer', 'sns/weibotoplatform'); /* @var $syncer PW_WeiboSyncer */
-				$syncSetting = $syncer->getUserWeiboSyncSetting($winduid);
-
-				ifchecked('article_issync', $syncSetting['article']);
-				ifchecked('diary_issync', $syncSetting['diary']);
-				ifchecked('photos_issync', $syncSetting['photos']);
-				ifchecked('group_issync', $syncSetting['group']);
-				ifchecked('transmit_issync', $syncSetting['transmit']);
-				ifchecked('comment_issync', $syncSetting['comment']);
+		$at_isfeed = $userdb['at_isfeed'];
+		
+		/* platform weibo app */
+		$siteBindService = L::loadClass('WeiboSiteBindService', 'sns/weibotoplatform/service'); /* @var $siteBindService PW_WeiboSiteBindService */
+		if ($siteBindService->isOpen()) {
+			$bindTypes = array();
+			foreach ($siteBindService->getBindTypes() as $key => $config) {
+				$bindTypes[$key . '_isfollow'] = $config['title'];
 			}
 		}
+		$isSiteBindWeibo = $siteBindService->isOpen();
 		
 		require_once uTemplate::printEot('profile_privacy');
 		pwOutPut();
@@ -134,7 +117,7 @@ if (empty($t)) {
 	} else {
 		
 		PostCheck();
-		S::gp(array('article_isfeed', 'diary_isfeed', 'photos_isfeed', 'group_isfeed', 'self_isfollow', 'friend_isfollow', 'cnlesp_isfollow', 'article_isfollow', 'diary_isfollow', 'photos_isfollow', 'group_isfollow'), 'P', 2);
+		S::gp(array('at_isfeed','article_isfeed', 'diary_isfeed', 'photos_isfeed', 'group_isfeed', 'self_isfollow', 'friend_isfollow', 'cnlesp_isfollow', 'article_isfollow', 'diary_isfollow', 'photos_isfollow', 'group_isfollow'), 'P', 2);
 
 		$pwSQL = array(
 			'uid'				=> $winduid,
@@ -143,6 +126,7 @@ if (empty($t)) {
 			'diary_isfeed'		=> $diary_isfeed ? 1 : 0,
 			'photos_isfeed'		=> $photos_isfeed ? 1 : 0,
 			'group_isfeed'		=> $group_isfeed ? 1 : 0,
+			'at_isfeed'			=> $at_isfeed ? $at_isfeed : 0,
 
 			'self_isfollow'		=> $self_isfollow ? 1 : 0,
 			'friend_isfollow'	=> $friend_isfollow ? 1 : 0,
@@ -154,12 +138,6 @@ if (empty($t)) {
 			'group_isfollow'	=> $group_isfollow ? 1 : 0,
 		);
 		
-		/* sinaweibo bind */
-		if ($db_sinaweibo_status) {
-			S::gp(array('sinaweibo_isfollow'), 'P', 2);
-			$pwSQL['sinaweibo_isfollow'] = $sinaweibo_isfollow ? 1 : 0;
-		}
-		
 		$db->pw_update(
 			"SELECT uid FROM pw_ouserdata WHERE uid=" . S::sqlEscape($winduid),
 			"UPDATE pw_ouserdata SET " . S::sqlSingle($pwSQL) . " WHERE uid=" . S::sqlEscape($winduid),
@@ -168,31 +146,10 @@ if (empty($t)) {
 
 		refreshto('profile.php?action=privacy&t=weibo','operate_success');
 	}
-} elseif ($t == 'unbind') {
-	$bindService = L::loadClass('weibobindservice', 'sns/weibotoplatform'); /* @var $bindService PW_WeiboBindService */
-	$got = $bindService->callPlatformUnBind($winduid, PW_WEIBO_BINDTYPE_SINA);
-
-	refreshto('profile.php?action=privacy&t=weibo','operate_success');
-} elseif ($t == 'setsync') {
-	PostCheck();
-	if ($db_sinaweibo_status) {
-		InitGP(array('article_issync', 'diary_issync', 'photos_issync', 'group_issync', 'transmit_issync', 'comment_issync'), 'P', 2);
-		$syncSetting = array(
-			'article' => (bool) $article_issync,
-			'diary' => (bool) $diary_issync,
-			'photos' => (bool) $photos_issync,
-			'group' => (bool) $group_issync,
-			'transmit' => (bool) $transmit_issync,
-			'comment' => (bool) $comment_issync,
-		);
-		$syncer = L::loadClass('WeiboSyncer', 'sns/weibotoplatform'); /* @var $syncer PW_WeiboSyncer */
-		$syncer->updateUserWeiboSyncSetting($winduid, $syncSetting);
-	}
-	refreshto('profile.php?action=privacy&t=weibo','operate_success');
-} elseif ($t == 'bindsuccess') {
+} elseif ($t == 'bindsuccess') { //TODO keep it till...
 	extract(L::style('',$skinco));
 	
-	$msg_info = '绑定新浪帐号成功（窗口将自动关闭）';
+	$msg_info = '绑定帐号成功（窗口将自动关闭）';
 	require_once uTemplate::printEot('profile_privacy_bindsuccess');
 	pwOutPut();
 }

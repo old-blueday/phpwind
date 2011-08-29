@@ -78,7 +78,7 @@ if ((!$isown || $a == 'friend') && $value['private'] == 3 && !$isGM) {
 	$cookiename = 'albumview_'.$value['aid'];
 	if ($value['albumpwd'] && PwdCode($value['albumpwd']) != GetCookie($cookiename)) {
 		$viewurl = "{$basename}a=viewalbum&aid=$value[aid]";
-		$ajaxclick = "onclick=\"return ajaxurl(this);\"";
+		$ajaxclick = "onclick=\"return ajaxurl(this,focusInp);\"";
 	} else {
 		$viewurl = "{$basename}a=album&aid=$value[aid]";
 		$ajaxclick = "";
@@ -355,8 +355,8 @@ if($rateSets[3] && isset($db_hackdb['rate'])){
 print <<<EOT
 -->
 <link rel="stylesheet" type="text/css" href="hack/rate/images/rate.css" />
-<script language="JavaScript" src="js/rate_ajax.js"></script>
-<script language="javascript">
+<script type="text/javascript" src="js/rate_ajax.js"></script>
+<script>
 window.onload = function() {
 rate.getVote("vote_box","{$db_bbsurl}/hack.php?H_name=rate&action=ajax","elementid=vote_box&typeid=3&objectid={$pid}&authorid={$u}");
 };
@@ -367,12 +367,12 @@ EOT;
 }
 print <<<EOT
 -->	
-<script language="JavaScript" src="js/pw_photolist.js"></script>
-<script language="JavaScript">
+<script type="text/javascript" src="js/pw_photolist.js"></script>
+<script>
 var photolist = new photoList('img_list','$pid','$aid');
 </script>
 <div class="c"></div>
-<script language="JavaScript">
+<script>
 var imgMaxWidth=600;
 var content = document.getElementById("img-width");
 ImgLoad(content);
@@ -439,7 +439,7 @@ function ImgLoad(obj){
 	}
 }
 </script>
-<script language="JavaScript" src="js/app_comment.js"></script>
+<script type="text/javascript" src="js/app_comment.js"></script>
 <div>
 <!--
 EOT;
@@ -455,7 +455,7 @@ EOT;
 		</div>
 	</div>
 </div>
-<script language="JavaScript">
+<script>
 function ajaxdel(pid) {
 	var u = '$u';
 	ajax.send('{$basename}a=delphoto&pid='+pid,'',function() {
@@ -468,10 +468,20 @@ function ajaxdel(pid) {
 	});
 	return false;
 }
-function ajaxurl(o) {
+function ajaxurl(o,callback) {
 	read.obj = o;
-	ajax.send(o.href,'',ajax.get);
+	ajax.send(o.href,'',function(){
+		ajax.get();
+		callback&&callback();
+	});
 	return false;
+}
+function focusInp(){
+	if(getObj("pwdvalue")){
+		setTimeout(function(){
+			getObj("pwdvalue").focus();
+		},100)
+	}
 }
 </script>
 <!--

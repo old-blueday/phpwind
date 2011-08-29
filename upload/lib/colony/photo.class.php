@@ -466,14 +466,20 @@ class PW_Photo {
 			foreach($list as $key => $value){
 				$phnum[$value['aid']] = $value['sum'];
 			}
-			if (empty($photo['lastphoto']) || $srcPhoto['path'] == $srcPhoto['lastphoto']) {
+			$srcPhoto['aid'] or	$srcPhoto = $this->getPhotoInfo($pid);
+			$srcAlbum = $this->getAlbumInfo($srcPhoto['aid']);
+			if (empty($srcAlbum['lastphoto']) || ($srcPhoto['lastphoto']?$srcPhoto['lastphoto']:$srcPhoto['path']) == $srcAlbum['lastphoto']) {
 				$result = $photoDao->getPhotosInfoByAid($srcPhoto['aid'],1,1);
 				$lastphoto = $this->getPhotoThumb($result[0]['path'],$result[0]['ifthumb']);
 			}
 			$srcAlbumPhotoNum = $phnum[$srcPhoto['aid']] ? $phnum[$srcPhoto['aid']] : 0;
 			$dstAlbumPhotoNum = $phnum[$aid] ? $phnum[$aid] : 0;
 			$albumDao->update(array('photonum'=>$dstAlbumPhotoNum),$aid);
-			$albumDao->update(array('photonum'=>$srcAlbumPhotoNum,'lastphoto'=>$lastphoto),$srcPhoto['aid']);		
+			$srcAlbumData = array('photonum'=>$srcAlbumPhotoNum);
+			$lastphoto && $srcAlbumData['lastphoto'] = $lastphoto;
+			$srcAlbumPhotoNum or $srcAlbumData['lastphoto'] = '';
+			$albumDao->update($srcAlbumData,$srcPhoto['aid']);		
+			$dstAlbumPhotoNum == 1 && $this->setCover($pid);
 		}
 		return true;
 	}

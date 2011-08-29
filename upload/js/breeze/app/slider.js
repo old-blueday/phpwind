@@ -1,15 +1,16 @@
 // JavaScript Document
 Breeze.namespace('app.slider', function(B) {
 	var  step = 5000;
-	var  Slider = function(selector){
+	var  Slider = function(selector,index){
         var self = this;
         if( !(self instanceof Slider) ) {
-		    return new Slider(selector);
+		    return new Slider(selector,index);
 	    }
 		this.elem = B.$(selector);
 		this.slider =  B.$('#B_slider');
 		this.slideContainer = this.slider.parentNode;
 		this.isAutoPlay = false;
+		this.startIndex=index||0;
 		this.init();
 	}
 	Slider.prototype = {
@@ -43,8 +44,7 @@ Breeze.namespace('app.slider', function(B) {
 				B.$$('a', self.slider).forEach(function(n){
 					B.addEvent(n, 'click', self.autoPlayCheck.bind(self));
 				});
-				//var link = B.$('a', this.slider);
-				var link = B.$('.B_slider a');
+				var link = B.$$('.B_slider a')[self.startIndex];
 				B.trigger(link, 'click');
 			});
 		},
@@ -53,11 +53,11 @@ Breeze.namespace('app.slider', function(B) {
 			if(this.isAutoPlay){
 				this.isAutoPlay = false;
 				el.className = 'play';
-				el.title = '播放';
+				el.innerHTML = '自动播放';
 			}else{
 				this.isAutoPlay = true;
 				el.className = 'stop';
-				el.title = '停止';
+				el.innerHTML = '停止播放';
 			}
 			this.autoPlayCheck();
 		},

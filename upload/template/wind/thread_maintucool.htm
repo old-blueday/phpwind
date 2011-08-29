@@ -13,17 +13,18 @@
 .imgView,.imgFav{width:17px;height:16px;overflow:hidden; text-indent:-2000em;display:block;margin-right:3px;}
 .imgView{background:url($imgpath/pwicon/view.png) no-repeat;}
 .imgFav{background:url($imgpath/pwicon/fav.png) no-repeat;}
+.pw_ulA{border-bottom:0 none;}
+.tr2 td{background:$headcolor;border-bottom:1px solid $headborder;}
 </style>
 	<table width="100%">
-		<tr class="tr4">
+		<tr class="tr2 thread_sort">
 			<td style="padding-left:12px;">
 <!--
 EOT;
-$newwindowsChecked = $_COOKIE['tucoolnewwindows'] === '0' ? '' : ' checked';
 print <<<EOT
 -->
-			<label class="fr mr10 cp" for="newwindows"><input style="padding:0;margin:-1px 3px 0 0;" name="newwindows" id="newwindows" type="checkbox"{$newwindowsChecked} value="1" onclick="xinchuang()" />新窗</label>
-<script language="JavaScript">
+			<span class="checkbox fr mr10" id="newwindows" unselectable="on">新窗</span>
+<script>
 var orderThreadsClass = {
 	orderThreads : function(orderway){
 		var orderway = orderway || 'tid';
@@ -58,7 +59,7 @@ function orderThreads(orderway){
 	orderThreadsClass.orderThreads(orderway);
 }
 </script>
-			排序：<a href="javascript:;" title="按图片数量" onclick="orderThreads('totalnum');" id="thread_sort_totalnum" {$orderClass[totalnum]}><span>图片数</span></a>&nbsp;|&nbsp;<a href="javascript:;" title="按发表时间排序" onclick="orderThreads('tid');" id="thread_sort_tid" {$orderClass[tid]}><span>最新发帖</span></a></td>
+			排序：<a href="javascript:;" title="按图片数量" onclick="orderThreads('totalnum');" id="thread_sort_totalnum" {$orderClass[totalnum]}>图片数</a>&nbsp;|&nbsp;<a href="javascript:;" title="按发表时间排序" onclick="orderThreads('tid');" id="thread_sort_tid" {$orderClass[tid]}>最新发帖</a></td>
 		</tr>
 	</table>
 	<div class="imgList">
@@ -67,9 +68,8 @@ function orderThreads(orderway){
 EOT;
 $attachsService = L::loadClass('attachs','forum');
 foreach($threaddb as $key => $thread){
-$isNewWindowOpen = ($newwindows == 1) ? "_blank" : "_self";
 if ($thread['ifshield']) $thread['cover'] = '';
-$attachImg = $attachsService->getThreadAttachMini($thread['cover']);
+$attachImg = $attachsService->getThreadAttachMini($thread['cover'],$thread['ifthumb']);
 $threadUrl = ($forumset[iftucool] && $forumset['iftucoolbrowse']) ? "slide.php?tid={$thread[tid]}" : "read.php?tid={$thread[tid]}";
 print <<<EOT
 -->
@@ -77,14 +77,19 @@ print <<<EOT
 			<li>
 				<dl>
 					<dt>
-						<a href="$threadUrl" name="readlink" target="$isNewWindowOpen"><img src="$imgpath/blank.gif" style="background:url($attachImg) center center no-repeat;" /></a>
+						<a href="$threadUrl#info" name="readlink" target="_self"><img src="$imgpath/blank.gif" style="background:url($attachImg) center center no-repeat;" /></a>
 						<span class="imgNum" title="共有{$thread[totalnum]}张图片">{$thread[totalnum]}</span>
 					</dt>
 					<dd>
 <div class="fr">
 <!--
 EOT;
-if($thread[topped]){print <<<EOT
+if($thread[topped]==4){print <<<EOT
+-->
+							<img src="$imgpath/pwicon/headtopic_$thread[topped].gif" alt="置顶帖标志" title="置顶帖标志" />
+<!--
+EOT;
+}elseif($thread[topped]){print <<<EOT
 -->
 							<img src="$imgpath/$stylepath/file/headtopic_$thread[topped].gif" alt="置顶帖标志" title="置顶帖标志" />
 <!--
@@ -108,7 +113,7 @@ EOT;
 }print <<<EOT
 --></div>
 						<h2><a href="$threadUrl" class="s4" name="readlink" $isNewWindowOpen>$thread[subject]</a></h2>
-						<p><a href="{$db_userurl}$thread[authorid]" class="mr20">$thread[author]</a><span class="f10"><a href="read.php?tid={$thread['tid']}&displayMode=1" class="s4" title="回复">$thread[replies]</a>&nbsp;/&nbsp;<span title="查看">$thread[hits]</span></span></p>
+						<p><a href="{$db_userurl}$thread[authorid]" class="mr20 _cardshow" data-card-url="pw_ajax.php?action=smallcard&type=showcard&uid={$thread[authorid]}" target="_blank" data-card-key="{$thread['author']}">$thread[author]</a><span class="f10"><a href="read.php?tid={$thread['tid']}&ds=1" class="s4" title="回复">$thread[replies]</a>&nbsp;/&nbsp;<span title="查看">$thread[hits]</span></span></p>
 					</dd>
 				</dl>
 			</li>
@@ -118,7 +123,7 @@ EOT;
 -->
 		</ul>
 	</div>
-<script LANGUAGE="JavaScript">
+<script>
 function delload(){
 	var objTrs = getElementsByClassName('tr3',getObj('threadlist'));
 	var mover =	 function (){
@@ -138,26 +143,77 @@ function delload(){
 		objTrs[i].onmouseout =  mout;
 	}
 }
-window.onReady(delload);
+window.onReady(function(){
+	delload();
+	//调用气泡
+	var pw_bubble=new Bubble([{"name":"pw_all_tip_tucool","id":"pw_all_pos_tucool"},{"name":"pw_all_tip_usercard","id":"pw_all_pos_usercard"}]);
+		pw_bubble.init();
+	//新窗口切换
+	var openwin=new openWin();
+	openwin.init();	
+});
 
-//判断是否选中新窗口
-function xinchuang() { //新窗
-	var i;
-	var val = document.getElementById("newwindows");
-	var va  = document.getElementsByName("readlink");
-	if (val.checked == true) { //选中
-		for (i=0;i<va.length;i++) {
-			var vaa = va[i].setAttribute("target","_blank");
-		}
-		SetCookie("tucoolnewwindows",1);
-	} else {
-		for (i=0;i<va.length;i++) {
-			var vaa = va[i].setAttribute("target","_self");
-		}
-		SetCookie("tucoolnewwindows",0);
-	}
+//新窗口切换功能
+var openWin=function(){
+	this.obj=document.getElementById("newwindows");
+	this.links=document.getElementsByName("readlink");
+	this.cookieName="newwindows";
 }
-xinchuang();
+	openWin.prototype={
+		init:function(){
+			var self=this;
+			var ck=FetchCookie(this.cookieName);
+			if(ck==1){
+				this.add();
+			}else{
+				this.remove();
+			}
+			addEvent(this.obj,"click",function(){
+				self.toggle();
+			})
+			this.obj.onselectstart=function(){
+				return false;
+			}
+		},
+		add:function(){
+			if(hasClass(this.obj,"checkbox_checked")){
+				return false;
+			}else 
+			if(!hasClass(this.obj,"checkbox")){
+				addClass(this.obj,"checkbox_checked");
+			}else{
+				var classname=this.obj.className;
+				this.obj.className=classname.replace("checkbox","checkbox_checked");
+			}
+			for (i=0;i<this.links.length;i++) {
+				this.links[i].setAttribute("target","_blank");
+			}
+			SetCookie("newwindows",1);
+		},
+		remove:function(){
+			if(hasClass(this.obj,"checkbox")){
+				return false;
+			}else 
+			if(!hasClass(this.obj,"checkbox_checked")){
+				addClass(this.obj,"checkbox");
+			}else{
+				var classname=this.obj.className;
+				this.obj.className=classname.replace("checkbox_checked","checkbox");
+			}
+			for (i=0;i<this.links.length;i++) {
+				this.links[i].setAttribute("target","_self");
+			}
+			SetCookie("newwindows",0);
+		},
+		toggle:function(){
+			if (hasClass(this.obj,"checkbox_checked")) {
+				this.remove();
+			}else{
+				this.add();
+			}
+		}
+		
+	}
 </script>
 <!--
 EOT;

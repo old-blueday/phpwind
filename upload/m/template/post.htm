@@ -1,0 +1,71 @@
+<!--<?php
+defined('W_P') or exit('Forbidden');
+if($showpost == 1){print <<<EOT
+-->
+<div class="navigator"><a href="#anch-end"><img alt="phpwind" src="$wapImages/x.gif" /></a>
+<a href="index.php">$db_bbsname</a>
+<!--
+EOT;
+    if($forumName){print <<<EOT
+-->
+&gt;<a href="index.php?a=forum&fid=$fid">$forumName</a></div>
+<!--
+EOT;
+        }print <<<EOT
+-->
+<div class="post_title"><strong>发表新主题</strong></div>
+<div class="post_form">
+  <form id="form1" method="post" action="$refer">
+    <p>标题：</p>
+       <label>
+        <input name="subject" type="text" size="30" />
+      </label>
+    </p>
+    <p>内容：</p>
+    <p>
+      <label>
+        <textarea name="content" style="width:98%; height:70px;"></textarea>
+      </label>
+<!--
+EOT;
+    if(!$fid){print <<<EOT
+-->
+    </p>
+       <p>版块：</p>
+    <p>
+      <label>
+<select name="fid" size="1">
+$cates
+</select>
+<!--
+EOT;
+        }print <<<EOT
+-->
+      </label>
+    </p>
+    <p>
+      <label>
+        <input type="submit" name="button" id="button" value="发表" />
+      </label>
+    </p>
+<!--
+EOT;
+if($_G['allowupload']){
+print <<<EOT
+-->
+      <p>
+      <label>
+        <input type="submit" name="upload" id="button" value="发表并附加图片"/>
+      </label>
+      </p>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+  </form>
+</div>
+<div class="post_reply"><a href="index.php?a=forum&fid=$fid">&laquo;返回</a></div>
+<!--
+EOT;
+}?>-->

@@ -702,7 +702,8 @@ if ($adminitem == 'edit') {
 				$userService = L::loadClass('userservice', 'user'); /* @var $userService PW_Userservice */
 				$userNames = $userService->getUserNamesByUserIds($userIds);
 				if ($userNames) {
-					$db->update("DELETE FROM pw_pinglog WHERE pinger IN (".S::sqlImplode($userNames).")");
+					//$db->update("DELETE FROM pw_pinglog WHERE pinger IN (".S::sqlImplode($userNames).")");
+					pwQuery::delete('pw_pinglog', 'pinger IN (:pinger)', array($userNames));
 				}
 
 				//收藏
@@ -822,12 +823,12 @@ if ($adminitem == 'edit') {
 		}
 		$oldinfo = array();
 		$uids = explode(',',$uids);
-		foreach ($uids as $key => $val) {
-			if (is_numeric($val)) {
-				if ($val == $newuid) {
+		foreach ($uids as $key => $value) {
+			if (is_numeric($value)) {
+				if ($value == $newuid) {
 					adminmsg('unituser_samename');
 				}
-				$rt = $userService->get($val, true, true, true);
+				$rt = $userService->get($value, true, true, true);
 				if (!$rt['uid']) {
 					adminmsg('unituser_username_error');
 				} else {

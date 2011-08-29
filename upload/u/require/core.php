@@ -364,6 +364,7 @@ function getCreditset($creditset,$type = true,$num = 1) {
 function updateMemberid($uid,$isown = true){
 	require_once(R_P . 'require/functions.php');
 	global $db,$winddb,$creditset,$db_upgrade,$credit,$lneed;
+	if (!is_object($credit)) require_once R_P.'require/credit.php';
 	$lneed || $lneed = L::config('lneed', 'level');
 	if ($isown == true) {
 		$userdb = $winddb;
@@ -697,6 +698,7 @@ function getUSeo($uscr) {
 		'article'	=> '帖子',
 		'diary'		=> '日志',
 		'weibo'		=> '新鲜事',
+		'kmd'		=> '孔明灯',
 		'galbum'	=> '相册',
 		'groups'	=> '群组',
 		'hot'		=> '热榜',
@@ -794,23 +796,11 @@ class USeo {
  * @return array
  */
 function getMedalIconsByUid($userId) {
-	global $winddb, $winduid;
-	if (!$userId)	return null;
-	if ($winduid == $userId) {
-		$userinfo = $winddb;
-	} else {
-		$userService = L::loadClass('UserService', 'user'); 
-		$userinfo = $userService->get($userId);
-	}
-	//* if (!$md_ifopen)  include pwCache::getPath(D_P.'data/bbscache/md_config.php');
-	if (!$md_ifopen)  extract(pwCache::getData(D_P.'data/bbscache/md_config.php', false));
-	//* if (!S::isArray($_MEDALDB))  include pwCache::getPath(D_P.'data/bbscache/medaldb.php');
-	if (!S::isArray($_MEDALDB))  extract(pwCache::getData(D_P.'data/bbscache/medaldb.php', false));
-	$medals = $medalsInfo = array();
-	if (!$userinfo['medals'])  return null;
-	$medals = explode(',',$userinfo['medals']);
+	$medalService = L::loadClass('medalservice','medal');
+	$medals = $medalService->getUserMedals($userId);
+
 	foreach ($medals as $value) {
-		$medalsInfo[] = "<img src=\"hack/medal/image/{$_MEDALDB[$value][picurl]}\" title=\"{$_MEDALDB[$value][name]}\" /> ";
+		$medalsInfo[] = "<img src=\"{$value[smallimage]}\" title=\"{$value[name]}\" /> ";
 	}
 	return $medalsInfo;
 }

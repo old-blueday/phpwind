@@ -1,6 +1,6 @@
 <?php
 defined('P_W') || exit('Forbidden');
-define('WIND_VERSION', '8.5,20110524');
+define('WIND_VERSION', '8.7beta,20110817');
 define('PW_USERSTATUS_BANUSER', 1); //是否禁言位 (版块禁言)
 define('PW_USERSTATUS_CFGFRIEND', 3); //设置朋友位
 //define('PW_USERSTATUS_NEWPM', 5); //是否有新短消息
@@ -31,6 +31,11 @@ define ('PW_CACHE_MEMCACHE', 'memcache' ); //内存缓存
 define ('PW_CACHE_FILECACHE', 'filecache' ); //文件缓存
 define ('PW_CACHE_DBCACHE', 'dbcache' ); //数据库缓存
 define ('PW_OVERFLOW_NUM',2000000000);	//数据溢出大小临界数
+
+define('PW_THREADSPECIALSORT_KMD',50);
+define('PW_THREADSPECIALSORT_TOP1',101);
+define('PW_THREADSPECIALSORT_TOP2',102);
+define('PW_THREADSPECIALSORT_TOP3',103);
 
 //* portal Start*//
 define ('PW_PORTAL_MAIN', 'main.htm' ); //可视化结构文件
@@ -265,7 +270,7 @@ function N_output_zip() {
 function ajax_footer() {
 	global $db_charset,$db_htmifopen;
 	if (defined('SHOWLOG')) Error::writeLog();
-	$output = str_replace(array('<!--<!--<!---->','<!--<!---->','<!---->-->','<!---->'),'', ob_get_contents());
+	$output = str_replace(array('<!--<!--<!---->','<!--<!---->','<!---->-->','<!---->','<!-- -->'),'', ob_get_contents());
 	if (P_W == 'admincp') {
 		$output = preg_replace(
 			"/\<form([^\<\>]*)\saction=['|\"]?([^\s\"'\<\>]+)['|\"]?([^\<\>]*)\>/ies",
@@ -972,6 +977,45 @@ function userSystemRight($name, $isBM, $type) {
 	return false;
 }
 
+/**
+ * 获取用户信息
+ *
+ * @global DB $db
+ * @param int $uid
+ * @return array
+ */
+function getUserByUid($uid) {
+	$uid = S::int($uid);
+	if ($uid < 1) return false;
+	if (perf::checkMemcache()){
+		$_cacheService = Perf::getCacheService();
+		$detail = $_cacheService->get('member_all_uid_' . $uid);
+		if ($detail && in_array(SCR, array('index', 'read', 'thread', 'post'))){
+			$_singleRight = $_cacheService->get('member_singleright_uid_' . $uid);
+			$detail	= ($_singleRight === false) ? false : (array)$detail + (array)$_singleRight;
+		}
+		if ($detail){
+			return $detail && $detail['groupid'] != 0 && isset($detail['md.uid']) ? $detail : false;
+		}
+		$cache = perf::gatherCache('pw_members');
+		if (in_array(SCR, array('index', 'read', 'thread', 'post'))){
+			$detail = $cache->getMembersAndMemberDataAndSingleRightByUserId($uid);
+		} else {
+			$detail = $cache->getAllByUserId($uid, true, true);
+		}
+		return $detail && $detail['groupid'] != 0 && isset($detail['md.uid']) ? $detail : false;
+	}else {
+		global $db;
+		$sqladd = $sqltab = '';
+		if (in_array(SCR, array('index', 'read', 'thread', 'post'))) {
+			$sqladd = (SCR == 'post') ? ',md.postcheck,sr.visit,sr.post,sr.reply' : (SCR == 'read' ? ',sr.visit,sr.reply' : ',sr.visit');
+			$sqltab = "LEFT JOIN pw_singleright sr ON m.uid=sr.uid";
+		}
+		$detail = $db->get_one("SELECT m.uid,m.username,m.password,m.safecv,m.email,m.bday,m.oicq,m.groupid,m.memberid,m.groups,m.icon,m.regdate,m.honor,m.timedf,m.style,m.datefm,m.t_num,m.p_num,m.yz,m.newpm,m.userstatus,m.shortcut,m.medals,md.lastmsg,md.postnum,md.rvrc,md.money,md.credit,md.currency,md.lastvisit,md.thisvisit,md.onlinetime,md.lastpost,md.todaypost,md.monthpost,md.onlineip,md.uploadtime,md.uploadnum,md.starttime,md.pwdctime,md.monoltime,md.digests,md.f_num,md.creditpop,md.jobnum,md.lastgrab,md.follows,md.fans,md.newfans,md.newreferto,md.newcomment,md.punch,md.bubble,md.newnotice,md.newrequest,md.shafa $sqladd FROM pw_members m LEFT JOIN pw_memberdata md ON m.uid=md.uid $sqltab WHERE m.uid=" . S::sqlEscape($uid) . " AND m.groupid<>'0' AND md.uid IS NOT NULL");
+		return $detail;
+	}
+}
+
 
 //积分业务
 
@@ -1065,18 +1109,25 @@ function PwdCode($pwd) {
  * @param bool $refreshCookie 是否刷新cookie
  * @return bool
  */
-function SafeCheck($cookieData, $pwdCode, $cookieName = 'AdminUser', $expire = 1800,$clearCookie = true ,$refreshCookie = true) {
-	global $timestamp;
+function SafeCheck($cookieData, $pwdCode, $cookieName = 'AdminUser', $expire = 1800, $clearCookie = true , $refreshCookie = true) {
+	global $timestamp, $db_cloudgdcode, $keepCloudCaptchaCode,$db_hash;
+	if (strtolower($cookieName) == 'cknum' && $db_cloudgdcode) {
+		$cloudCaptchaService = L::loadClass('cloudcaptcha', 'utility/captcha');
+		list($sessionid, $cloudckfailed) = array(getCookie('cloudcksessionid'), getCookie('cloudckfailed'));
+		$cloudckfailed && Cookie('cloudckfailed', '', 0);
+		$delflag = ($refreshCookie && !$keepCloudCaptchaCode) ? null : 0;
+		if (!$cloudckfailed) return $cloudCaptchaService->checkCode($sessionid, $pwdCode, $delflag);
+	}
 	if($timestamp - $cookieData[0] > $expire) {
 		Cookie($cookieName, '', 0);
 		return false;
-	} elseif ($cookieData[2] != md5($pwdCode . $cookieData[0])) {
+	} elseif ($cookieData[2] != md5($pwdCode . $cookieData[0] .getHashSegment())) {
 		$clearCookie && Cookie($cookieName, '', 0);
 		return false;
 	}
 	if ($refreshCookie) {
 		$cookieData[0] = $timestamp;
-		$cookieData[2] = md5($pwdCode . $cookieData[0]);
+		$cookieData[2] = md5($pwdCode . $cookieData[0] .getHashSegment());
 		Cookie($cookieName, StrCode(implode("\t", $cookieData)));
 	}
 	return true;
@@ -1363,24 +1414,23 @@ function portalEot($sign) {
 /*
  * 输出可视化的内容
  */
-function portalEcho($sign,$_viewer = '') {
+function portalEcho($sign,$_viewer = '',$name='') {
 	$GLOBALS['__pwPortalEot'] = 1;
 	global $timestamp;
+	extract(pwCache::getData(D_P.'data/bbscache/portal_config.php', false));
+	extract(pwCache::getData(D_P.'data/bbscache/portalhtml_config.php', false));
+	
 	$staticPath = S::escapePath(PORTAL_PATH . $sign .'/index.html');
 	$mainFile = S::escapePath(PORTAL_PATH . $sign . '/'.PW_PORTAL_MAIN);
 	$configFile = S::escapePath(PORTAL_PATH . $sign . '/'.PW_PORTAL_CONFIG);
 
-	$staticFileMTime = pwFilemtime($staticPath);
+	//$staticFileMTime = pwFilemtime($staticPath);
+	$staticFileMTime = isset($portalhtml_times[$sign]) ? $portalhtml_times[$sign] : 0;
 	$tplFileMTime = max(pwFilemtime($mainFile),pwFilemtime($configFile));
-
-	if (is_file(D_P.'data/bbscache/portal_config.php')) {
-		//* include pwCache::getPath(D_P.'data/bbscache/portal_config.php');
-		extract(pwCache::getData(D_P.'data/bbscache/portal_config.php', false));
-	}
 	if (($tplFileMTime>$staticFileMTime || ($GLOBALS['db_portalstatictime'] && $staticFileMTime<$timestamp-$GLOBALS['db_portalstatictime']*60) || !filesize($staticPath) || $portal_staticstate[$sign])) {
-		portalStatic($sign,$_viewer);
+		portalStatic($sign,$_viewer,$name);
 	}
-	$output .= readover($staticPath);
+	$output .= pwCache::getData($staticPath,false,true);
 
 	echo '-->'. $output . '<!--';
 }
@@ -1388,7 +1438,15 @@ function portalEcho($sign,$_viewer = '') {
  * 更新可视化页面的静态文件
  * @param $sign
  */
-function portalStatic($sign,$_viewer = '') {
+function portalStatic($sign,$_viewer = '',$name='') {
+	$portalPageService = L::loadClass('portalpageservice', 'area');
+	if (!$portalPageService->checkPortal($sign)) {
+		if ($name) {
+			$portalPageService->addPortalPage(array('sign'=>$sign,'title'=>$name));
+		} else {
+			Showmsg('函数portalEcho调用出错，请设置本函数的第三个参数，定义该调用页面的名称');
+		}
+	}
 	$lockName = 'portal_'.$sign;
 	if (!procLock($lockName)) return false;
 	$staticPath = S::escapePath(PORTAL_PATH.$sign);
@@ -1397,26 +1455,37 @@ function portalStatic($sign,$_viewer = '') {
 	$otherOutput = ob_get_contents();
 	ob_clean();
 
-	$pageInvokeService = L::loadClass('pageinvokeservice', 'area');
-	$pageConfig = $pageInvokeService->getEffectPageInvokePieces('other', $sign);
+	$invokeService = L::loadClass('invokeservice', 'area');
+	$pageConfig = $invokeService->getEffectPageInvokePieces('other', $sign);
 	$tplGetData = L::loadClass('tplgetdata', 'area');
 	$tplGetData->init($pageConfig);
 	require portalEot($sign);
 
 	$temp = ob_get_contents();
 	$temp = str_replace(array('<!--<!---->',"<!---->\r\n",'<!---->','<!-- -->',"\t\t\t"),'',$temp);
-	$success = pwCache::writeover($staticPath, $temp,'wb+');
+	//$success = pwCache::writeover($staticPath, $temp,'wb+');
+	$success = pwCache::setData($staticPath, $temp,false,'wb+');
 	procUnLock($lockName);
-	if (!$success && !pwCache::writeover($staticPath, $temp)&& !is_writable($staticPath)) {	//写入二次尝试
+	if (!$success && !$GLOBALS ['db_distribute'] && !pwCache::writeover($staticPath, $temp)&& !is_writable($staticPath)) {	//写入二次尝试
 		ob_end_clean();
 		ObStart();
 		Showmsg('请设置'.str_replace(R_P,'',$staticPath).'文件为可写，如果文件不存在，则新建一个空文件');
 	}
 	ob_clean();
-	$portalPageService = L::loadClass('portalpageservice', 'area');
 	$portalPageService->setPortalStaticState($sign,0);
 	updateCacheData();
+	setPortalHtmlTime($sign);
 	if ($otherOutput) echo $otherOutput;
+}
+
+function setPortalHtmlTime($sign) {
+	global $timestamp;
+	require_once(R_P.'admin/cache.php');
+	extract(pwCache::getData(D_P.'data/bbscache/portalhtml_config.php', false));
+	if (!$portalhtml_times) $portalhtml_times = array();
+	$portalhtml_times[$sign] = $timestamp;
+	setConfig('portalhtml_times', $portalhtml_times, null,true);
+	updatecache_conf('portalhtml', true);
 }
 
 function modeTemplate($srcTpl, $tarTpl) {
@@ -1492,77 +1561,14 @@ function updateCacheData() {
 		}
 	}
 }
-
-/**
- * 解析模板循环块
- *
- * @global string $SCR
- * @global int $fid
- * @param string $invokeName
- * @return array
- */
-function pwCycleLoops($invokeName) {
-	global $SCR, $fid;
-	$pw_invoke = L::loadDB('Invoke', 'area');
-	$config = $pw_invoke->getDataByName($invokeName);
-	if ($config['loops']) {return $config['loops'];}
-	return array();
-}
-
-//图片处理
-
-/**
- * 图片缩略
- *
- * @param string $sourceImg 原图地址
- * @param int $width
- * @param int $height
- * @return string
- */
-function minImage($sourceImg, $width, $height) {
-	static $mini = 0;
-	global $db_bbsurl, $attachdir, $db_attachname;
-	if (strpos($sourceImg, '://')) {return $sourceImg;}
-	if ($mini == 0) {
-		if (file_exists($attachdir . "/mini")) {
-			$mini = 1;
-		} else {
-			if (mkdir($attachdir . "/mini")) {
-				@chmod($attachdir . "/mini", 0777);
-				$mini = 1;
-			} else {
-				$mini = 2;
-			}
-		}
-	}
-	if ($mini == 1) {
-		$width = (int) $width;
-		$height = (int) $height;
-		if (!$width || !$height) {
-			Showmsg('minimage_wh_error');
-		}
-		$file_ext = end(explode('.', $sourceImg));
-		$imgname = substr(md5($sourceImg . $width . $height), 10, 10) . '.' . $file_ext;
-
-		$srcfile = ((strpos($sourceImg, $db_attachname) === 0 || strpos($sourceImg, 'images') === 0) ? R_P : $attachdir) . $sourceImg;
-		$targtImg = $attachdir . "/mini/" . $imgname;
-
-		if (file_exists($targtImg) && filemtime($targtImg)>filemtime($srcfile)) {return $db_bbsurl . '/' . $db_attachname . "/mini/" . $imgname;}
-		require_once (R_P . 'require/imgfunc.php');
-		$thumbsize = MakeThumb($srcfile, $targtImg, $width, $height,1);
-
-		if ($thumbsize) {
-			$fileurl = $db_bbsurl . '/' . $db_attachname . "/mini/" . $imgname;
-			return $fileurl;
-		} else {
-			return $sourceImg;
-		}
-	} else {
-		return $sourceImg;
-	}
-}
-
 //分页工具
+
+function getHashSegment($s = 2){
+	global $db_hash;
+	$s = intval($s);
+	$s > 3 && $s = 0;
+	return substr(md5($db_hash), $s * 8,8);
+}
 
 /**
  * 生成分页html
@@ -1576,33 +1582,41 @@ function minImage($sourceImg, $width, $height) {
  * @return string
  */
 function numofpage($count, $page, $numofpage, $url, $max = null, $ajaxCallBack = '') {
-	global $tablecolor;
-	$total = $numofpage;
-	if (!empty($max)) {
-		$max = (int) $max;
-		$numofpage > $max && $numofpage = $max;
-	}
-	if ($numofpage <= 1 || !is_numeric($page)) {
-		return '';
-	}
+	list($count, $page, $numofpage, $max) = array(intval($count), intval($page), intval($numofpage), intval($max));
+	if ($numofpage <= 1) return '';
+	($max && $numofpage > $max) && $numofpage = $max;
+	
 	$ajaxurl = $ajaxCallBack ? " onclick=\"return $ajaxCallBack(this.href);\"" : '';
 	list($url, $mao) = explode('#', $url);
 	$mao && $mao = '#' . $mao;
-	$pages = "<div class=\"pages\"><a href=\"{$url}page=1$mao\"{$ajaxurl}>&laquo;</a>";
-	for ($i = $page - 3; $i <= $page - 1; $i++) {
-		if ($i < 1) continue;
-		$pages .= "<a href=\"{$url}page=$i$mao\"{$ajaxurl}>$i</a>";
+	$pages = '<div class="pages">';
+	$preArrow = $nextArrow = $firstPage = $lastPage = '';
+	if ($numofpage > 7) {
+		list($pre, $next) = array($page - 1, $page + 1);
+		$page > 1 && $preArrow = "<a class=\"pages_pre\" href=\"{$url}page={$pre}$mao\"{$ajaxurl}>&#x4E0A;&#x4E00;&#x9875;</a>";
+		$page < $numofpage && $nextArrow = "<a class=\"pages_next\" href=\"{$url}page={$next}$mao\"{$ajaxurl}>&#x4E0B;&#x4E00;&#x9875;</a>";		
 	}
-	$pages .= "<b>$page</b>";
+	$page != 1 && $firstPage = "<a href=\"{$url}page=1$mao\"{$ajaxurl}>" . (($numofpage > 7 && $page - 3 > 1) ? '1...</a>' : '1</a>');
+	$page != $numofpage && $lastPage = "<a href=\"{$url}page={$numofpage}$mao\"{$ajaxurl}>" . (($numofpage > 7 && $page + 3 < $numofpage) ? "...$numofpage</a>" : "$numofpage</a>");
+	
+	list($tmpPages, $preFlag, $nextFlag) = array('', 0, 0);
+	$leftStart = ($numofpage - $page >= 3) ? $page - 2 : $page - (5 - ($numofpage - $page));
+	for ($i = $leftStart; $i < $page; $i++) {
+		if ($i <= 1) continue;
+		$tmpPages .= "<a href=\"{$url}page=$i$mao\"{$ajaxurl}>$i</a>";
+		$preFlag++;
+	}
+	$tmpPages .= "<b>$page</b>";
+	$nextFlag = 4 - $preFlag + (!$firstPage ? 1 : 0);
 	if ($page < $numofpage) {
-		$flag = 0;
-		for ($i = $page + 1; $i <= $numofpage; $i++) {
-			$pages .= "<a href=\"{$url}page=$i$mao\"{$ajaxurl}>$i</a>";
-			$flag++;
-			if ($flag == 4) break;
+		for ($i = $page + 1; $i < $numofpage && $i <= $page + $nextFlag; $i++) {
+			$tmpPages .= "<a href=\"{$url}page=$i$mao\"{$ajaxurl}>$i</a>";
 		}
 	}
-	$pages .= "<a href=\"{$url}page=$numofpage$mao\"{$ajaxurl}>&raquo;</a><div class=\"fl\">共{$total}页</div><span class=\"pagesone\"><input type=\"text\" size=\"3\" onkeydown=\"javascript: if(event.keyCode==13){var value = parseInt(this.value);var page=(value>$total) ? $total : value; " . ($ajaxurl ? "$ajaxCallBack('{$url}page='+page);" : " location='{$url}page='+page+'{$mao}';") . " return false;}\"><button onclick=\"javascript:var value = parseInt(this.previousSibling.value); var page=(value>$total) ? $total : value; " . ($ajaxurl ? "$ajaxCallBack('{$url}page='+page);" : " location='{$url}page='+page+'{$mao}';") . " return false;\">Go</button></span></div>";
+	$pages .= $preArrow . $firstPage . $tmpPages . $lastPage . $nextArrow;
+	$jsString = "var page=(value>$numofpage) ? $numofpage : value; " . ($ajaxurl ? "$ajaxCallBack('{$url}page='+page);" : " location='{$url}page='+page+'{$mao}';") . " return false;";
+	$numofpage > 7 && $pages .= "<div class=\"fl\">&#x5230;&#x7B2C;</div><input type=\"text\" size=\"3\" onkeydown=\"javascript: if(event.keyCode==13){var value = parseInt(this.value); $jsString}\"><div class=\"fl\">&#x9875;</div><button onclick=\"javascript:var value = parseInt(this.previousSibling.previousSibling.value); $jsString\">&#x786E;&#x8BA4;</button>";
+	$pages .= '</div>';
 	return $pages;
 }
 
@@ -1892,7 +1906,7 @@ function urlRewrite($url) {
 function pwHtmlspecialchars_decode ($string,$decodeTags = true) {
 	$string = str_replace('&amp;','&', $string);
 	$string =  str_replace(array( '&quot;', '&#039;', '&nbsp;','&#160;'), array('"', "'", ' ',' '), $string);
-	$decodeTags && $string = str_replace(array('&lt;', '&gt;',),array( '<', '>'),$string);
+	$decodeTags && $string = str_replace(array('&lt;', '&gt;','&#61;'),array( '<', '>','='),$string);
 	return $string;
 }
 
@@ -1900,8 +1914,31 @@ function pwHtmlspecialchars_decode ($string,$decodeTags = true) {
  * 获取强制索引名称
  */
 function getForceIndex($index) {
-	$indexdb = array('idx_postdate' => 'idx_postdate', 'idx_digest' => 'idx_digest', 'idx_uid_categoryid_modifiedtime' => 'idx_uid_categoryid_modifiedtime', 'idx_tid' => 'idx_tid' , 'idx_fid_ifcheck_topped_lastpost'=>'idx_fid_ifcheck_topped_lastpost');
+	$indexdb = array('idx_postdate' => 'idx_postdate', 'idx_digest' => 'idx_digest', 'idx_uid_categoryid_modifiedtime' => 'idx_uid_categoryid_modifiedtime', 'idx_tid' => 'idx_tid' , 'idx_fid_ifcheck_specialsort_lastpost'=>'idx_fid_ifcheck_specialsort_lastpost');
 	return $indexdb[$index];
+}
+
+/**
+ * 初始化数据库连接
+ */
+function PwNewDB() {
+	if (!is_object($GLOBALS['db'])) {
+		global $db, $database, $dbhost, $dbuser, $dbpw, $dbname, $PW, $charset, $pconnect;
+		require_once S::escapePath(R_P . "require/db_$database.php");
+		$db = new DB($dbhost, $dbuser, $dbpw, $dbname, $PW, $charset, $pconnect);
+	}
+}
+
+/**
+ * 来自手机
+ */
+function checkFromWap() {
+	static $fromMobile = array('nokia','sony','ericsson','motorola','samsung','java','philips','panasonic','ktouch','alcatel','lenovo','iphone','ipod','android','blackberry','meizu','netfront','symbian','ucweb','windowsce','palmsource','opera mini','opera mobi','cldc','midp','wap','mobile','benq', 'haier'); 
+	$userAgent = strtolower($_SERVER['HTTP_USER_AGENT']);
+	foreach ($fromMobile as $v) {
+		if (strrpos($userAgent,$v) !== false) return true;
+	}
+	return false;
 }
 
 //LOADER
@@ -2382,5 +2419,134 @@ class pwPack {
 		return $packService;
 	}
 }
+/**
+ * 
+ * 论坛扩展机制
+ *
+ */
+class pwHook{
+	/**
+	 * 添加不带返回值的的扩展
+	 * pwHook::runHook('post',array('uid'=>11));
+	 * @param string $hookName
+	 * @param array $params
+	 */
+	function runHook($hookName,$params = array()) {
+		if (!pwHook::checkHook($hookName)) return false;
+		$pwHook = pwHook::_getHook($hookName);
+		if ($params) $pwHook->setParams($params);
+		$pwHook->runHook();
+	}
+	/**
+	 * 添加一个带返回值的扩展
+	 * pwHook::runFilter('filteruid',$winduid,array('uid'=>11));
+	 * @param string $hookName
+	 * @param unknown_type $result
+	 * @param unknown_type $params
+	 */
+	function runFilter($hookName,$result,$params = array()) {
+		if (!pwHook::checkHook($hookName)) return $result;
+		$pwHook = pwHook::_getHook($hookName);
+		if ($params) $pwHook->setParams($params);
+		return $pwHook->runFilter($result);
+	}
+	/**
+	 * 判断该hook是否开启
+	 * @param string $name
+	 * @return bool
+	 */
+	function checkHook($name) {
+		global $db_hookset;
+		return isset($db_hookset[$name]) || in_array($name,pwHook::getSystemHooks());
+	}
+	
+	function getSystemHooks() {
+		return array(
+			'after_login',
+			'after_post',
+			'after_reply',
+		);
+	}
+	
+	function _getHook($name) {
+		static $hooks = array();
+		if (isset($hooks[$name])) return $hooks[$name];
+		L::loadClass('hook','hook',false);
+		$hooks[$name] = new PW_Hook($name);
+		return $hooks[$name];
+	}
+}
 
+class CloudWind{
+	
+	function yunPostDefend($authorid, $author, $groupid, $id, $title, $content, $type = 'thread', $expand = array()) {
+		require_once R_P . 'lib/cloudwind/yundefend.php';
+		return yunPostDefend( $authorid, $author, $groupid, $id, $title, $content, $type, $expand );
+	}
+	
+	function yunUserDefend($operate, $uid, $username, $accesstime, $viewtime, $status = 0, $reason = "", $content = "", $behavior = array(), $expand = array()) {
+		require_once R_P . 'lib/cloudwind/yundefend.php';
+		YunUserDefend ( $operate, $uid, $username, $accesstime, $viewtime, $status, $reason, $content, $behavior, $expand  );
+		Cookie("ci",'');
+		return true;
+	}
+	function yunSetCookie($name,$tid='',$fid='') {
+		global $timestamp;
+		if (!$name) return false;
+		Cookie("ci",$name."\t".$timestamp."\t".$tid."\t".$fid);
+	}
+	
+	function checkSync(){
+		if(!isset($GLOBALS['db_yunsearch_search']) && !isset($GLOBALS['db_yundefend_shield'])){
+			return false;
+		}
+		if($GLOBALS ['db_yun_model'] ['search_model'] != 100 || $GLOBALS ['db_yun_model'] ['userdefend_model'] == 100){
+			return true;
+		}
+		if($GLOBALS ['db_yun_model'] ['postdefend_model'] == 100 && SCR == 'read'){
+			return true;
+		}
+		return false;
+	}
+
+	function getUserInfo() {
+		$getCookie = GetCookie('ci');
+		if (!$getCookie) return array();
+		return explode("\t",$getCookie);
+	}
+
+	function sendUserInfo($cloud_information) {
+		if (!S::isArray($cloud_information)) return false;
+		list($operate,$leaveTime,$tid,$fid) = $cloud_information ? $cloud_information : array('','');
+
+		if (!in_array($operate, array('index','read', 'thread')) || $operate == SCR) return false;
+		$user = CloudWind::getOnlineUserInfo();
+		$viewTime = $GLOBALS['timestamp'] - $leaveTime ? $GLOBALS['timestamp'] - $leaveTime : '';
+		CloudWind::yunUserDefend('view'.$operate, $user['uid'], $user['username'], $leaveTime, $viewTime, 101,'','','',array('uniqueid'=>$tid.'-'.$fid));
+		return true;
+	}
+	
+	function getOnlineUserInfo() {
+		if (!$GLOBALS['winduid'] && !GetCookie('cloudClientUid')) {
+			Cookie("cloudClientUid",CloudWind::getNotLoginUid());
+		}
+		$cloudClientUid = GetCookie('cloudClientUid') ? GetCookie('cloudClientUid') : CloudWind::getNotLoginUid();
+		return array(
+			'uid'		=>	$GLOBALS['winduid'] ? $GLOBALS['winduid'] : $cloudClientUid,
+			'username'	=> 	$GLOBALS['windid'] ? $GLOBALS['windid'] : '游客'
+		);
+	}
+	
+	function getNotLoginUid() {
+		global $loginhash;
+		$length = strlen($loginhash);
+		for ($i=0;$i<$length;$i++) {
+			if ($i%2 == 0) $odd .= ord($loginhash[$i]);
+			if ($i%2 != 0) $even .= ord($loginhash[$i]);
+		}
+		return substrs("$odd+$even" , 8, 'N');
+	}
+	
+	
+}
 ?>

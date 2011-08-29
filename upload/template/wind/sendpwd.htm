@@ -12,26 +12,32 @@ print <<<EOT
 <meta name="generator" content="phpwind v{$metaVersion}" />
 <meta name="description" content="$metaDescription" />
 <meta name="keywords" content="$metaKeywords" />
-<SCRIPT type="text/javascript" language="JavaScript" src="js/core/core.js"></SCRIPT>
-<script type="text/javascript" language="JavaScript" src="js/pw_ajax.js"></script>
-
-<!--css-->
-<link rel="stylesheet" href="$imgpath/pw_core.css?101128" />
+<base id="headbase" href="$db_bbsurl/" />
+<link rel="stylesheet" href="$imgpath/pw_core.css?{$GLOBALS['wind_repair']}" />
 <!--
 EOT;
 @include Pcv($css_path);
 print <<<EOT
 -->
-<link rel="stylesheet" href="$imgpath/register/register.css?110120" />
+<link rel="stylesheet" href="$imgpath/register/register.css?{$GLOBALS['wind_repair']}" />
+<script type="text/javascript" src="js/core/core.js"></script>
+<script type="text/javascript" src="js/pw_ajax.js"></script>
 </head>
 <body onKeyDown="try{keyCodes(event);}catch(e){}">
 <div class="wrap">
 <div id="header">
-	<div style="height:24px;"></div>
+	<div class="head_top"></div>
 		 <div id="head" class="cc">
 				<a href="$db_bbsurl/"><img src="$imgpath/$stylepath/logo.png" class="fl" title="phpwind" /></a>
 		</div>
 </div>
+<script type="text/javascript">
+var imgpath = '$imgpath';
+var winduid = '$winduid';
+var windid	= '$windid';
+var groupid	= '$groupid';
+var basename = '$basename';
+</script>
 <div class="main-wrap">
 <div id="main">
 <!--
@@ -180,23 +186,16 @@ if($db_ifsafecv){print <<<EOT
 <!--
 EOT;
 }if($db_gdcheck & 16){
-$gdSize = explode("\t",$db_gdsize);
+$checkCode = L::loadClass('checkcode', 'site');
+$checkCodeString = $checkCode->getCheckCodeTemplate();
 print <<<EOT
 -->
 			<dl class="cc">
 				<dt>验证码</dt>
 				<dd class="ip ck">
 					<div><input id="gdcode" class="input" name="gdcode" value="" onFocus="showgd();" /></div>
-					<span id="menu_gd"></span>
-					<span id="ckcode" style="display:none">
-<script type="text/javascript" src="js/pw_authcode.js"></script>
-<script>
-var flashWidth = "$gdSize[0]";
-var flashHeight = "$gdSize[1]";
-var gdtype = $db_gdtype;
-showGdCode();
-</script>
-				</span>
+					<span id="ckcode" style="display:none"></span>
+$checkCodeString
 				</dd>
 				<dd></dd>
 			</dl>
@@ -218,7 +217,7 @@ EOT;
 EOT;
 if($db_authstate && $db_authgetpwd){print <<<EOT
 -->
-<script language="JavaScript">
+<script>
 var waitTime = parseInt('$waitTime');
 var timeRemain = parseInt('$remainTime');
 var authStep = parseInt('$authStep');
@@ -229,7 +228,8 @@ var authInfo = new Array("",
 		"你今天获取验证码次数已达到上限",
 		"验证码输入有误",
 		"手机验证码不能为空",
-		"手机号码不匹配"
+		"手机号码不匹配",
+		"您的手机号码已被列入黑名单"
 );
 function switchSetpwdType(type){
 	if(type == 1){
@@ -351,7 +351,7 @@ setTimeout(
 EOT;
 }print <<<EOT
 -->
-<script language="JavaScript1.2">
+<script>
 function showcustomquest_0(qid){
 	getObj("customquest_o").style.display = qid==-1 ? '' : 'none';
 }

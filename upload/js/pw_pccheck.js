@@ -8,7 +8,7 @@ function()
 {
     Form =
     {};
-    var $ = function(s)
+    var getObj = function(s)
     {
         return  document.getElementById(s);
     };
@@ -117,7 +117,7 @@ function()
                 var getc = this.getAttribute("check");
                 if (getc)
                 {
-                    var a = $("tip_" + this.name);
+                    var a = getObj("tip_" + this.name);
                     a ? a.parentNode.removeChild(a) : 0;
                     var newerror = this.getAttribute("error");
 					/**

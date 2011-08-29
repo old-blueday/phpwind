@@ -1,276 +1,55 @@
 <!--<?php
+$tradeDegree = $tradedb['degree'] ? '二手' : '全新';
+$tradeIcon = $tradedb['icon'] ? $tradedb['icon'] : 'images/imgdel_h200.jpg';
 print <<<EOT
 -->
-<style type="text/css">
-.read_buy td{padding-left:15px;}
-.read_buy .tr3 td,.read_buy .tr3 th{padding-left:10px;}
-</style>
-<div class="t">
-<div class="h" style="border-top:0;"><strong class="f14 b">商品名称 : $tradedb[name]</strong></div>
-<table width="100%" border="0" cellspacing="0" cellpadding="0" class="read_buy">
-	<tr>
-		<td rowspan="8" style="width:180px;padding:10px;"><img src="$tradedb[icon]" width="180" height="240" /></td>
-		<td></td>
-	</tr>
-	<tr>
-		<td>一 口 价 :<span class="f20 s2 mr20 b">$tradedb[costprice]</span>市 场 价 :<span style="text-decoration:line-through;">$tradedb[price]</span></td>
-	</tr>
-	<tr class="f_two">
-		<td colspan="2">运　　费 :
-<!--
+<!--商品开始-->
+		<div class="goodsPost f12">
+			<h5><span class="s4 mr5">[{$tradeDegree}]</span>{$tradedb[name]}</h5>
+			<table width="100%" class="vt mb10">
+				<tr>
+					<th width="212"><div class="goodsPost_player" style="background:#fff url({$tradeIcon}) center center no-repeat;"></div></th>
+					<td>
+						<ul>
+							<li class="r_two"><em>一&nbsp;&nbsp;口&nbsp;&nbsp;价：</em><strong class="f16 s2">￥{$tradedb[costprice]}</strong></li>
+							<li><em>市&nbsp;&nbsp;场&nbsp;&nbsp;价：</em><del>￥{$tradedb[price]}</del></li>
+							<li class="r_two"><em>运　　费：</em><!--
 EOT;
 if ($tradedb['transport']) {print <<<EOT
 -->
-			平邮: $tradedb[mailfee]元<span>&nbsp;</span>快递:$tradedb[expressfee]元<span>&nbsp;</span>EMS:$tradedb[emsfee]元
+			<span class="mr20">平邮: $tradedb[mailfee]元<span>&nbsp;</span>快递:$tradedb[expressfee]元<span>&nbsp;</span>EMS:$tradedb[emsfee]元</span>
 <!--
 EOT;
 } else {print <<<EOT
 -->
-			卖家承担
+			<span class="mr20">卖家承担</span>
 <!--
 EOT;
 }print <<<EOT
--->
-		</td>
-	</tr>
-	<tr>
-		<td colspan="2">付款方式 :
-<!--
+--><em>所&nbsp;&nbsp;在&nbsp;&nbsp;地：</em>{$tradedb[locus]}</li>
+							<li><em>付款方式：</em><!--
 EOT;
 if ($tradedb['paymethod'] & 1) {print <<<EOT
 -->
-			线下交易
-<!--
+			线下交易<!--
 EOT;
 }if ($tradedb['paymethod'] & 2) {print <<<EOT
 -->
-			<span>&nbsp;</span>支付宝交易
-<!--
+			支付宝交易<!--
 EOT;
 }
 !$tradedb[salenum2] && $tradedb[salenum2] = 0;
 print <<<EOT
 -->
-		</td>
-	</tr>
-	<tr class="f_two">
-		<td colspan="2">累计售出 : $tradedb[salenum2] 件
+							</li>
+							<li class="r_two"><em>商品数量：</em>$tradedb[num] 件</li>
+							<li><em>累计售出：</em><span class="b">$tradedb[salenum2]</span>&nbsp;件</li>
+						</ul>
+					</td>
+				</tr>
+			</table>
+			<div class="tac"><span class="btn"><span><button onclick="location.href='trade.php?action=buy&tid=$tid';return false;">我要购买</button></span></span></div>
+		</div>
 <!--
 EOT;
-if ($tradedb['aliww']) {print <<<EOT
--->
-			<span>&nbsp;</span>联系卖家:<a id="alitalkId0" onclick='sendMessage("cntaobao$tradedb[aliww]","cntaobao")'></a>
-<script language="JavaScript" type="text/javascript" src="http://img.im.alisoft.com/webim/js/website.js" charset='utf-8'></script>
-<iframe name="aliwangwangSendmsgShowFrame" id="showFrame" width=0 height=0 src="about:blank"></iframe>
-<script language="javascript">
-var OnLine = -1;
-</script>
-<script language="javascript"src="http://amos.im.alisoft.com/userstatus3.aw?uid=$tradedb[aliww]&site=cntaobao"></script>
-<script language="javascript">
-function showLamp() {
-	var obj = null;
-	obj = document.getElementById("alitalkId0");
-	if (OnLine == 1) {
-		obj.innerHTML = '<img src="http://img.im.alisoft.com/webim/images/myt_16_on.gif" border="0" width="16" height="16" align="absbottom" style="cursor:hand">';
-	} else {
-		obj.innerHTML = '<img src="http://img.im.alisoft.com/webim/images/myt_16_off.gif" border="0" width="16" height="16" align="absbottom" style="cursor:hand">';
-	}
-}
-showLamp();
-function sendMessage(talkId,userId) {
-	var p = "loginid=" + getSiteLoginId(talkId);
-	sendClientMsg( getSite(userId), getSiteLoginId(userId), getSite(talkId), getSiteLoginId(talkId), OnLine, p);
-}
-</script>
-<!--
-EOT;
-}print <<<EOT
--->
-		</td>
-	</tr>
-	<tr>
-		<td width="300">商品类型 :
-<!--
-EOT;
-if ($tradedb['degree']) {print <<<EOT
--->
-			二手
-<!--
-EOT;
-} else {print <<<EOT
--->
-			全新
-<!--
-EOT;
-}print <<<EOT
--->	
-       </td><td>所 在 地 :$tradedb[locus]</td>
-	</tr>
-	<tr class="f_two">
-		<td>商品数量 : $tradedb[num]件</td><td>浏 览 量 :$tradedb[hits]次</td>
-	</tr>
-	<tr>
-		<td colspan="2">
-<!--
-EOT;
-if($tradedb[num] > 0){print <<<EOT
--->
-		<a href="trade.php?action=buy&tid=$tid"><img src="$imgpath/post/readbuy.png" title="我要购买" /></a>
-<!--
-EOT;
-}else{print <<<EOT
--->
-		<img src="images/post/readbuyclose.png" alt="交易已结束">
-<!--
-EOT;
-}print <<<EOT
--->
-		</td>
-	</tr>
-</table>
-</div>
-<!--
-EOT;
-if($action=='apply'){ print <<<EOT
--->
-<form action="active.php" method="post">
-<div class="t">
-<div class="h" style="border-top:0;">活动申请</div>
-<table width="100%" class="read_buy">
-<tr class="tr3 tr">
-	<th width="20%">联系方式</th>
-	<th><input type="text" name="contact" /> &nbsp;Tel、QQ、电子邮箱 等</th>
-</tr>
-<tr class="tr3 tr">
-	<th width="20%">留言：</th>
-	<th><textarea name="message" rows="5" wrap="hard" cols="60"></textarea></th>
-</tr>
-</table></div>
-<div style="text-align:center;margin-bottom:25px;"><input type="hidden" name="action" value="apply" />
-<input type="hidden" name="verify" value="$verifyhash" />
-<input type="hidden" name="step" value="2" />
-<input type="hidden" name="tid" value="$tid" />
-<input class="btn" type="submit" value="提 交" /></div></form>
-<!--
-EOT;
-}elseif($action=='view'){ print <<<EOT
--->
-<form action="active.php" method="post">
-<input type="hidden" name="verify" value="$verifyhash" />
-<div class="t">
-<div class="h" style="border-top:0;">活动成员</div>
-<table width="100%" class="read_buy">
-<tr class="tr2">
-	<td width="8%">序号</td>
-	<td width="12%">姓名</td>
-	<td width="6%">性别</td>
-	<td width="12%">状态</td>
-	<td width="18%">申请时间</td>
-	<td width="12%">联系方式</td>
-	<td width="*">留言</td>
-<!--
-EOT;
-if($admincheck){ print <<<EOT
--->
-	<td width="5%"></td>
-<!--
-EOT;
-} print <<<EOT
--->
-</tr>
-<!--
-EOT;
-$i=0;
-foreach($actdb as $key=>$value){
-$i++;
-print <<<EOT
--->
-<tr class="tr3">
-	<td>$i</td>
-	<td><a href="{$db_userurl}$value[winduid]">$value[username]</a></td>
-<!--
-EOT;
-if($value[gender]==1){ print <<<EOT
--->
-	<td>男</td>
-<!--
-EOT;
-}elseif($value[gender]==2){ print <<<EOT
--->
-	<td>女</td>
-<!--
-EOT;
-}else{ print <<<EOT
--->
-	<td>保密</td>
-<!--
-EOT;
-}if($value[state]==1){ print <<<EOT
--->
-	<td><font color="blue">已审核</font></td>
-<!--
-EOT;
-}elseif($value[state]==2){ print <<<EOT
--->
-	<td><font color="red">已拒绝</font></td>
-<!--
-EOT;
-}else{ print <<<EOT
--->
-	<td>未审核</td>
-<!--
-EOT;
-}print <<<EOT
--->
-	<td>$value[applydate]</td>
-	<td>$value[contact]</td>
-	<td>$value[message]</td>
-<!--
-EOT;
-if($admincheck){ print <<<EOT
--->
-	<td><input type="checkbox" name="selid[]" value="$value[id]" /></td>
-<!--
-EOT;
-} print <<<EOT
--->
-</tr>
-<!--
-EOT;
-} print <<<EOT
--->
-</table></div>$pages<div class="c"></div>
-<input type="hidden" name="tid" value="$tid" />
-<!--
-EOT;
-if($admincheck){ print <<<EOT
--->
-<div style="text-align:center;margin-bottom:25px;">
-管理选项:<input type="radio" name="action" value="pass" checked />批准
-<input type="radio" name="action" value="unpass" />拒绝
-<input type="radio" name="action" value="cancle" />取消活动<br><br>
-<input class="btn" type='button' name='chkall' value='全 选' onclick='CheckAll(this.form)' />
-<input class="btn" type='submit' value='提 交' />
-</div>
-<!--
-EOT;
-}else{ print <<<EOT
--->
-<div class="tac p10"><input type="hidden" name="action" value="exit" /><span class="btn2"><span><button type="submit">取消参加</button></span></span></div>
-<!--
-EOT;
-} print <<<EOT
--->
-</form>
-<script language=JavaScript>
-function CheckAll(form){
-	for (var i=0;i<form.elements.length-5;i++){
-		var e = form.elements[i];
-		e.checked == true ? e.checked = false : e.checked = true;
-	}
-}
-</script>
-<!--
-EOT;
-}
 ?>

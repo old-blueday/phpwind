@@ -107,7 +107,7 @@ class PW_Ucuser {
 		pwQuery::update('pw_colonys', 'admin=:admin', array($oldname), array('admin'=>$username));
 		//* $this->db->update("UPDATE pw_announce SET author=" . S::sqlEscape($username) . " WHERE author=" . S::sqlEscape($oldname));
 		pwQuery::update('pw_announce','author=:author', array($oldname), array('author'=>$username));
-		$this->db->update("UPDATE pw_medalslogs SET awardee=" . S::sqlEscape($username) . " WHERE awardee=" . S::sqlEscape($oldname));
+		//$this->db->update("UPDATE pw_medalslogs SET awardee=" . S::sqlEscape($username) . " WHERE awardee=" . S::sqlEscape($oldname));
 
 		$upfid = array();
 		$query = $this->db->query("SELECT fid,forumadmin,fupadmin FROM pw_forums WHERE forumadmin LIKE " . S::sqlEscape("%,$oldname,%", false) . " OR fupadmin LIKE " . S::sqlEscape("%,$oldname,%", false));

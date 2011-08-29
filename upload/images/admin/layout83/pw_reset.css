@@ -38,3 +38,17 @@ form{display:inline;}
 .f20{font-size:20px;}
 .f24{font-size:24px;}
 .fn,.fn a{font-weight:normal}
+/*全站信息提示*/
+.pw_all_tip .adel,.pw_all_angle_top,.pw_all_angle_bot,.pw_all_tip dl,#pw_all_tip_tucool a.adel,.pw_all_angle_left{background:url(../../pw_all_tip.png) no-repeat; font-size:12px;}
+#pw_all_tip{z-index:999;}
+.pw_all_tip{padding:5px 10px;background:#ffffe3;border:1px solid #cccccc;line-height:20px;color:#333;-moz-border-radius:3px;-webkit-border-radius:3px;border-radius:3px; white-space:nowrap;}
+.pw_all_tip a.adel{right:10px;top:10px;width:12px;height:12px; position:absolute; background-position:-48px 0;padding:0;margin:0;border:0 none; background-color:none; text-indent:-2000em;}
+.pw_all_tip a.adel:hover{ background-position:-32px 0;}
+.pw_all_tip p{margin-right:30px;}
+.pw_all_tip a{color:#014c90;}
+.pw_all_angle_top,.pw_all_angle_bot{overflow:hidden; background-position:0 0; position:absolute;margin-left:40px;width:11px;height:7px;}
+.pw_all_angle_top{margin-top:-6px;}
+.pw_all_angle_bot{background-position:-16px 0;margin-top:-1px;}
+.pw_all_angle_left{ background-position:-65px 0;height:11px;width:7px; position:absolute;overflow:hidden;margin-top:10px;margin-left:-6px;}
+.pw_all_tip dl{padding:5px 15px 5px 40px; background-position:0 -16px;}
+.pw_all_tip dl dd{ text-align:right;padding-top:5px;}

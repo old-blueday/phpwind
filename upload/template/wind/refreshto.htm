@@ -1,25 +1,27 @@
 <?php
+$statime = intval($statime);
+$statime<1 and $statime = 1;
 print <<<EOT
 <!doctype html>
 <html>
 <head>
 <meta charset="$db_charset" />
 <title>{$webPageTitle}提示信息 - Powered by phpwind</title>
-<meta http-equiv="refresh" content="$statime;url=$URL">
-<SCRIPT type="text/javascript" language="JavaScript" src="js/core/core.js"></SCRIPT>
-<script type="text/javascript" language="JavaScript" src="js/pw_ajax.js"></script>
-<link rel="stylesheet" type="text/css" href="$imgpath/pw_core.css?101128" media="all" />
+<meta http-equiv="refresh" content="{$statime};url={$URL}">
+<base id="headbase" href="$db_bbsurl/" />
+<script type="text/javascript" src="js/core/core.js"></script>
+<script type="text/javascript" src="js/pw_ajax.js"></script>
+<link rel="stylesheet" href="$imgpath/pw_core.css?{$GLOBALS['wind_repair']}" />
 EOT;
 @include Pcv($css_path);
 print <<<EOT
 -->
-<link rel="stylesheet" type="text/css" href="$imgpath/register/register.css?110120" media="all" />
-<base id="headbase" href="$db_bbsurl/" />
+<link rel="stylesheet" href="$imgpath/register/register.css?{$GLOBALS['wind_repair']}" />
 </head>
 <body onKeyDown="try{keyCodes(event);}catch(e){}">
 <div class="wrap">
 	<div id="header">
-		<div style="height:24px;"></div>
+		<div class="head_top"></div>
 		<div id="head" class="cc"><a href="$db_bbsurl/"><img src="$imgpath/$stylepath/logo.png" class="fl" title="phpwind" /></a></div>
 	</div>
 	<div class="main-wrap">

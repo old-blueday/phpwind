@@ -4,7 +4,7 @@
 ~
 function()
 {
-    var $ = function(s)
+    var getObj = function(s)
     {
         return document.getElementById(s);
     };
@@ -25,7 +25,7 @@ function()
     PW.SettingsMenu.prototype.render = function()
     {
         var _this = this;
-        $('settingsMenu').onclick = function()
+        getObj('settingsMenu').onclick = function()
         {
 
             var p = new PW.WPanel({
@@ -33,7 +33,7 @@ function()
                 height: 300
             });
 			_this.menu=p;
-            p.render($('settingsMenu')).setHTML($('settingsPanel').innerHTML);
+            p.render(getObj('settingsMenu')).setHTML(getObj('settingsPanel').innerHTML);
 			p.element.style.zIndex=100;
         };
 		return this;

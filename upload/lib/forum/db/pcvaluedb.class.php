@@ -23,7 +23,7 @@ class PW_PcvalueDB extends BaseDB {
 		$order !== 'DESC' && $order = 'ASC';
 		$blackListedTids = $this->_getBlackListedTids();
 		$blackListedTids && $sqladd .= ' AND t.tid NOT IN (' . $blackListedTids . ')';
-		$query = $this->_db->query("SELECT t.tid,t.fid,t.author,t.authorid,t.subject,t.type,t.postdate,t.hits,t.replies,pc.pcattach FROM $this->_tableName pc LEFT JOIN pw_threads t USING(tid) WHERE 1 $sqladd ORDER BY t.tid $order " . S::sqlLimit($num));
+		$query = $this->_db->query("SELECT t.tid,t.fid,t.author,t.authorid,t.subject,t.type,t.postdate,t.hits,t.replies,t.anonymous,pc.pcattach FROM $this->_tableName pc LEFT JOIN pw_threads t USING(tid) WHERE 1 $sqladd ORDER BY t.tid $order " . S::sqlLimit($num));
 		return $this->_getAllResultFromQuery ( $query );
 	}
 	
@@ -45,7 +45,7 @@ class PW_PcvalueDB extends BaseDB {
 		$order !== 'DESC' && $order = 'ASC';
 		$blackListedTids = $this->_getBlackListedTids();
 		$blackListedTids && $sqladd .= ' AND t.tid NOT IN (' . $blackListedTids . ')';
-		$query = $this->_db->query("SELECT t.tid,t.fid,t.author,t.authorid,t.subject,t.type,t.postdate,t.hits,t.replies,pc.pcattach FROM $this->_tableName pc LEFT JOIN pw_threads t USING(tid) WHERE 1 $sqladd ORDER BY pc.endtime $order ".S::sqlLimit($num));
+		$query = $this->_db->query("SELECT t.tid,t.fid,t.author,t.authorid,t.subject,t.type,t.postdate,t.hits,t.replies,t.anonymous,pc.pcattach FROM $this->_tableName pc LEFT JOIN pw_threads t USING(tid) WHERE 1 $sqladd ORDER BY pc.endtime $order ".S::sqlLimit($num));
 		return $this->_getAllResultFromQuery ( $query );
 	}
 	
@@ -67,7 +67,7 @@ class PW_PcvalueDB extends BaseDB {
 		$order !== 'DESC' && $order = 'ASC';
 		$blackListedTids = $this->_getBlackListedTids();
 		$blackListedTids && $sqladd .= ' AND t.tid NOT IN (' . $blackListedTids . ')';
-		$query = $this->_db->query("SELECT t.tid,t.fid,t.author,t.authorid,t.subject,t.type,t.postdate,t.hits,t.replies,pc.pcattach FROM $this->_tableName pc LEFT JOIN pw_threads t USING(tid) WHERE 1 $sqladd ORDER BY t.replies $order,t.postdate $order " . S::sqlLimit($num));
+		$query = $this->_db->query("SELECT t.tid,t.fid,t.author,t.authorid,t.subject,t.type,t.postdate,t.hits,t.replies,t.anonymous,pc.pcattach FROM $this->_tableName pc LEFT JOIN pw_threads t USING(tid) WHERE 1 $sqladd ORDER BY t.replies $order,t.postdate $order " . S::sqlLimit($num));
 		return $this->_getAllResultFromQuery ( $query );
 	}
 
@@ -89,7 +89,7 @@ class PW_PcvalueDB extends BaseDB {
 		$order !== 'DESC' && $order = 'ASC';
 		$blackListedTids = $this->_getBlackListedTids();
 		$blackListedTids && $sqladd .= ' AND t.tid NOT IN (' . $blackListedTids . ')';
-		$query = $this->_db->query("SELECT t.tid,t.fid,t.author,t.authorid,t.subject,t.type,t.postdate,t.hits,t.replies,pc.pcattach FROM $this->_tableName pc LEFT JOIN pw_threads t USING(tid) WHERE 1 $sqladd ORDER BY t.hits $order " . S::sqlLimit($num));
+		$query = $this->_db->query("SELECT t.tid,t.fid,t.author,t.authorid,t.subject,t.type,t.postdate,t.hits,t.replies,t.anonymous,pc.pcattach FROM $this->_tableName pc LEFT JOIN pw_threads t USING(tid) WHERE 1 $sqladd ORDER BY t.hits $order " . S::sqlLimit($num));
 		return $this->_getAllResultFromQuery ( $query );
 	}
 	

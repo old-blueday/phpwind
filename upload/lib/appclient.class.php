@@ -69,24 +69,75 @@ class PW_AppClient {
 		} elseif (is_array($appids)) {
 			$sql_appid .= ' AND appid IN(' . S::sqlImplode($appids) . ')';
 		}
-		$query = $this->_db->query("SELECT uid,appid,appname FROM pw_userapp WHERE $sql_uid $sql_appid");
-		while ($rt = $this->_db->fetch_array($query)) {
-			if ($this->_appslist[$rt['appid']]) {
-				if ($arrt == 1) {
-					$this->_app_array[$rt['appid']] = $rt['appname'];
-				} elseif ($arrt == 2) {
-					$this->_app_array[$rt['uid']][$rt['appid']] = $rt;
-				} else {
-					$this->_app_array[] = $rt;
+			//$query = $this->_db->query("SELECT uid,appid,appname FROM pw_userapp WHERE $sql_uid $sql_appid");
+		if (perf::checkMemcache()){
+			$appids = is_array($appids) ? $appids : array(intval($appids));
+			$_cacheService = Perf::gatherCache('pw_userapp');
+			$array = $_cacheService->getUserappsCacheByUids($uids);
+			foreach($array as $v) {
+				if (in_array($v['appid'],$appids)) continue;
+				if ($this->_appslist[$v['appid']]) {
+					if ($arrt == 1) {
+						$this->_app_array[$v['appid']] = $v['appname'];
+					} elseif ($arrt == 2) {
+						$this->_app_array[$v['uid']][$v['appid']] = $v;
+					} else {
+						$this->_app_array[] = $v;
+					}
+				}
+			}	
+		} else {
+			$query = $this->_db->query("SELECT uid,appid,appname FROM pw_userapp WHERE $sql_uid $sql_appid");
+			while ($rt = $this->_db->fetch_array($query)) {
+				if ($this->_appslist[$rt['appid']]) {
+					if ($arrt == 1) {
+						$this->_app_array[$rt['appid']] = $rt['appname'];
+					} elseif ($arrt == 2) {
+						$this->_app_array[$rt['uid']][$rt['appid']] = $rt;
+					} else {
+						$this->_app_array[] = $rt;
+					}
 				}
 			}
 		}
+		
 		if (!$this->_app_array || !$this->appifopen) {
 			$this->_app_array = array();
 		}
 		return $this->_app_array;
 	}
-
+	function getUserAppsByUid($uid){
+		$uid = intval($uid);
+		$apps = array();
+		if (perf::checkMemcache()){
+			$apps = $_cacheService->getUserappsCacheByUids($uid);
+		} else {
+			$query = $this->_db->query("SELECT * FROM pw_userapp WHERE uid=".S::sqlEscape($uid));
+			while ($rt = $this->db->fetch_array($query)) {
+				$apps[] = $rt;
+			}
+		}
+		return $apps;
+	}
+	
+	function getUserAppByUidAndAppid($uid,$appid){
+		$uid = intval($uid);
+		$appid = intval($appid);
+		if (perf::checkMemcache()){
+			$apps = $_cacheService->getUserappsCacheByUids($uid);
+			foreach ($apps as $v){
+				if ($v['appid'] == $appid) return $v;		
+			}
+		} else {
+			return $this->_db->get_one("SELECT * FROM pw_userapp WHERE uid=".S::sqlEscape($uid)." AND appid=".S::sqlEscape($appid));
+		}
+		return array();
+	}
+	
+	function deleteUserAppByUidAndAppid($uid,$appid){
+		pwQuery::delete('pw_userapp', 'uid=:uid AND appid=:appid', array($uid,$appid));
+	}
+	
 	/** 获取版块APP信息
 	 *
 	 * @param int $fid 版块ID
@@ -526,7 +577,7 @@ class PW_AppClient {
 	}
 
 	/**
-	 * 登陆站长中心
+	 * 登录站长中心
 	 */
 	function loginWebmaster() {
 		

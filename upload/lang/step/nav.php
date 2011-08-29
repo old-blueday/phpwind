@@ -19,6 +19,7 @@ $adds = 0;
 $view = 20;
 $vieworder = array('area' => '1', 'bbs' => '2' ,'cms' => '5');
 foreach ($db_modes as $key => $value) {
+	if ($key == 'cloudcomputing') continue;
 	$pos = array();
 	$value['ifopen'] = 1;
 	if (isset($db_modedomain[$key]) && $db_modedomain[$key]) {
@@ -60,26 +61,13 @@ $adds += (bool)$navConfigService->add(PW_NAV_TYPE_MAIN, array('nkey' => 'area_tu
 $adds += (bool)$navConfigService->add(PW_NAV_TYPE_MAIN, array('nkey' => 'group', 'pos' => array('bbs,area,cms,srch,group'), 'title' => '群组', 'style' => '', 'link' => 'group.php', 'alt' => '', 'target' => 0, 'view' => 6, 'upid' => 0, 'isshow' => 1));
 $adds += (bool)$navConfigService->add(PW_NAV_TYPE_MAIN, array('nkey' => '', 'pos' => array('bbs,area,cms,srch,group'), 'title' => '广场', 'style' => '', 'link' => 'index.php?m=o', 'alt' => '', 'target' => 0, 'view' => 7, 'upid' => 0, 'isshow' => 1));
 
-//$view = 3;
-//include D_P.'data/bbscache/area_config.php';
-//if (!$area_default_alias) {
-//	$currentAlias = is_array($area_channels) ? current($area_channels) : array();
-//	$area_default_alias = $currentAlias['alias'];
-//}
-//$channelService=L::loadClass('channelService', 'area');
-//foreach ($channelService->getChannels() as $alias => $channel) {
-//	$link = "index.php?m=area&alias=".$alias;
-//	$isShow = in_array($alias, array('bbsindex', 'home')) ? 0 : 1; //$area_default_alias
-//	$adds += (bool)$navConfigService->add(PW_NAV_TYPE_MAIN, array('nkey' => 'area_'.$alias, 'pos' => '-1', 'title' => $channel['name'], 'link' => $link, 'view' => $view++, 'upid' => 0, 'isshow' => $isShow));
-//}
-
 
 //FOOT
 $db->update("DELETE FROM pw_nav WHERE type='foot' AND link IN (".pwImplode(array($db_ceoconnect, 'simple/', 'm/index.php')).")");
 $defaults = array(
 	array('pos' => '-1', 'title' => '联系我们', 'link' => 'sendemail.php', 'view'=>1, 'target' => 0, 'isshow' => 1),
 	array('pos' => '-1', 'title' => '无图版', 'link' => 'simple/', 'view'=>2, 'target' => 0, 'isshow' => 1),
-	array('pos' => '-1', 'title' => '手机浏览', 'link' => 'm/index.php', 'view'=>3, 'target' => 0, 'isshow' => 1),
+	array('pos' => '-1', 'title' => '手机浏览', 'link' => 'm/introduce.php', 'view'=>3, 'target' => 0, 'isshow' => 1),
 );
 foreach ($defaults as $key => $value) {
 	$adds += (bool)$navConfigService->add(PW_NAV_TYPE_FOOT, $value);
@@ -97,9 +85,9 @@ foreach ($defaults as $key => $value) {
 }
 
 
-//RIGHT
-$db->update("UPDATE pw_nav SET type=".pwEscape(PW_NAV_TYPE_HEAD_RIGHT)." WHERE type='head'");
-$db->update("DELETE FROM pw_nav WHERE type=".pwEscape(PW_NAV_TYPE_HEAD_RIGHT)." AND link=".pwEscape('faq.php'));
+//no RIGHT again from 8.7
+$db->update("UPDATE pw_nav SET type=".pwEscape(PW_NAV_TYPE_HEAD_LEFT)." WHERE type='head'");
+$db->update("DELETE FROM pw_nav WHERE type=".pwEscape(PW_NAV_TYPE_HEAD_LEFT)." AND link=".pwEscape('faq.php'));
 $defaults = array(
 	'hack' => array(
 		'data' => array('pos' => array('bbs,area,cms,srch,group'), 'nkey' => 'hack', 'title' => '社区服务', 'link' => '', 'view'=>1, 'target' => 0, 'isshow' => 1),
@@ -148,11 +136,11 @@ foreach (explode("\n", $bbsNavConfig) as $value) {
 }
 
 foreach ($defaults as $key => $value) {
-	$navId = $navConfigService->add(PW_NAV_TYPE_HEAD_RIGHT, $value['data']);
+	$navId = $navConfigService->add(PW_NAV_TYPE_HEAD_LEFT, $value['data']);
 	if (isset($value['subs'])) {
 		foreach ($value['subs'] as $sub) {
 			$sub['upid'] = $navId;
-			$navConfigService->add(PW_NAV_TYPE_HEAD_RIGHT, $sub);
+			$navConfigService->add(PW_NAV_TYPE_HEAD_LEFT, $sub);
 		}
 	}
 }

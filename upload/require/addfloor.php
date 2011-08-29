@@ -175,7 +175,7 @@ if ($db_threadrelated && $forumset['ifrelated'] && !($read['anonymous'] && in_ar
 		$relatedb = threadrelated($forumset['relatedcon']);
 	}
 }
-
+$isRobBuild = getstatus($read['tpcstatus'], 7) ? 1 : 0;
 list(,,$downloadmoney,$downloadimg) = explode("\t",$forumset['uploadset']);
 $subject  = $read['subject'];
 $authorid = $read['authorid'];
@@ -363,7 +363,8 @@ if ($db_hits_store == 0){
 //帖子浏览记录
 $readlog = str_replace(",$tid,",',',GetCookie('readlog'));
 $readlog.= ($readlog ? '' : ',').$tid.',';
-substr_count($readlog,',')>11 && $readlog = preg_replace("/[\d]+\,/i",'',$readlog,3);
+$readlogCount = substr_count($readlog,',');
+$readlogCount>11 && $readlog = preg_replace("/[\d]+\,/i",'',$readlog,$readlogCount-11);
 Cookie('readlog',$readlog);
 
 $favortitle = str_replace(array("&#39;","'","\"","\\"),array("‘","\\'","\\\"","\\\\"),$subject);
@@ -388,6 +389,7 @@ if ($db_hits_store == 1) {
 
 //帖子回复信息
 if ($read['replies'] > 0 && $topped_page_num < $db_readperpage) {
+	$isReplyReward = getstatus($read['tpcstatus'], 8);
 	$readnum	 = $db_readperpage;
 	$orderby = $orderby != 'desc' ? 'asc' : 'desc';
 	$pageinverse = $page > 20 && $page > ceil($numofpage/2) ? true : false;
@@ -415,6 +417,16 @@ if ($read['replies'] > 0 && $topped_page_num < $db_readperpage) {
 	}
 	$db->free_result($query);
 	$pageinverse && $readdb = array_reverse($readdb);
+	if ($isRobBuild) {
+		$robFloors = $db->get_value("SELECT floor FROM pw_robbuildfloor WHERE tid = ". S::sqlEscape($tid) ." AND pid = ". S::sqlEscape($pid));
+	}
+	
+	if ($isReplyReward) {
+		$replyRewardRecordService = L::loadClass('ReplyRewardRecord', 'forum');
+		$replyRewarRecord = $replyRewardRecordService->getRewardRecordByTidAndPid($tid, $pid);
+		$readdb[0]['replyreward'] = $replyRewarRecord;
+		unset($replyRewardRecordService, $replyRewarRecord);
+	}
 }
 array_push($_pids,$pid);
 $pwMembers = $colonydb = $customdb = array();
@@ -733,25 +745,32 @@ if ($ping_logs) {
 if('ajax_addfloor' == $_POST['type']){
 	global $db_htmifopen, $db_redundancy, $SCR, $groupid,$stylepath;
 	$read = $readdb[0];
-	
+	if ($read['pid']) {
+		$threadService = L::loadClass('threads','forum');
+		$atData = $threadService->getAtUsers($tid,array($read['pid']));
+		$read['atusers'] = $atData[$read['pid']];
+	}
 	if (is_numeric($winduid) && strlen($windpwd)>=16) {
 		$winddb	  = User_info();		
 		list($winduid,$groupid,$userrvrc,$windid,$_datefm,$_timedf,$credit_pop) = array($winddb['uid'],$winddb['groupid'],floor($winddb['rvrc']/10),$winddb['username'],$winddb['datefm'],$winddb['timedf'],$winddb['creditpop']);
 		
 		if ($credit_pop && $db_ifcredit) {//Credit Changes Tips
-			$credit_pop = str_replace(array('&lt;','&quot;','&gt;'),array('<','"','>'),$credit_pop);
-			$creditdb = explode('|',$credit_pop);
-			$credit_pop = S::escapeChar(GetCreditLang('creditpop',$creditdb['0']));
-	
-			unset($creditdb['0']);
-			foreach ($creditdb as $val) {
-				list($credit_1,$credit_2) = explode(':',$val);
-				$credit_pop .= '<span class="st2">'.pwCreditNames($credit_1).'&nbsp;<span class="f24">'.$credit_2.'</span></span>';
+			$credit_pop = str_replace(array('&lt;', '&quot;', '&gt;'), array('<', '"', '>'), $credit_pop);
+			list($tmpCreditPop, $creditOuterData) = array('', array());
+			$creditOuterData = explode(',', $credit_pop);
+			foreach ($creditOuterData as $value) {
+				$creditdb = explode('|', $value);
+				$tmpCreditPop .= ($tmpCreditPop ? '<br/>' : '') .  S::escapeChar(GetCreditLang('creditpop', $creditdb['0']));
+				unset($creditdb['0']);
+				foreach ($creditdb as $val) {
+					list($credit_1, $credit_2) = explode(':', $val);
+					$tmpCreditPop .= '<span class="st2">'.pwCreditNames($credit_1).'&nbsp;<span class="f24">'.$credit_2.'</span></span>';
+				}
 			}
+			$credit_pop = $tmpCreditPop;
 			$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
 			$userService->update($winduid, array(), array('creditpop' => ''));
 		}
-		
 	}
 
 	$db_ifcredit && $credit_pop && require PrintEot('credit_pop');
@@ -765,7 +784,7 @@ if('ajax_addfloor' == $_POST['type']){
 	ajax_footer();
 }
 function viewread($read,$start_limit) {
-	global $db,$_G,$isGM,$pwSystem,$groupid,$attach_url,$winduid,$tablecolor,$tpc_author,$tpc_buy,$tpc_pid,$tpc_tag,$count,$orderby,$pageinverse,$timestamp,$db_onlinetime,$attachdir,$attachpath,$readcolorone,$readcolortwo,$lpic,$ltitle,$imgpath,$db_ipfrom,$db_showonline,$stylepath,$db_windpost,$db_windpic,$db_signwindcode,$fid,$tid,$pid,$md_ifopen,$_MEDALDB,$rewardtype,$db_shield,$db_iftag,$db_readtag,$viewpic;
+	global $db,$_G,$isGM,$pwSystem,$groupid,$attach_url,$winduid,$tablecolor,$tpc_author,$tpc_buy,$tpc_pid,$tpc_tag,$count,$orderby,$pageinverse,$timestamp,$db_onlinetime,$attachdir,$attachpath,$readcolorone,$readcolortwo,$lpic,$ltitle,$imgpath,$db_ipfrom,$db_showonline,$stylepath,$db_windpost,$db_windpic,$db_signwindcode,$fid,$tid,$pid,$db_md_ifopen,$_MEDALDB,$rewardtype,$db_shield,$db_iftag,$db_readtag,$viewpic;
 	global $ping_logs;
 	if ($read['istop']=='topped') {
 		$read['lou'] = $read['floor'];
@@ -873,12 +892,12 @@ function viewread($read,$start_limit) {
 	} else{
 		$read['icon'] = '';
 	}
-	if ($md_ifopen && $read['medals']) {
+	if ($db_md_ifopen && $read['medals']) {
 		$medals = $ifMedalNotExist = '';
 		$md_a = explode(',',$read['medals']);
 		foreach ($md_a as $key => $value) {
 			if ($value && $_MEDALDB[$value]) {
-				$medals .= "<img src=\"hack/medal/image/{$_MEDALDB[$value][picurl]}\" title=\"{$_MEDALDB[$value][name]}\" /> ";
+				$medals .= "<a href=\"apps.php?q=medal\" target=\"_blank\"><img src=\"{$_MEDALDB[$value][smallimage]}\" width=\"30\" height=\"30\"  title=\"{$_MEDALDB[$value][name]}\" /></a>";
 			} else {
 				unset($md_a[$key]);
 				$ifMedalNotExist = 1;

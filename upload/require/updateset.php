@@ -29,7 +29,7 @@ function write_config($newconfig=array()){
 	} else {
 		include R_P."template/admin/cp_lang_all.php";
 	}
-	foreach (array('sqlinfo','dbhost','dbuser','dbname','database','PW','pconnect','charset','managerinfo','managername','hostweb','attach_url') as $I) {
+	foreach (array('sqlinfo','dbhost','dbuser','dbname','database','PW','pconnect','charset','managerinfo','managername','hostweb','attach_url','slaveConfig') as $I) {
 		eval('$lang[\'all\']['.$I.']="'.addcslashes($lang['all'][$I],'"').'";');
 	}
 	$writetofile =
@@ -84,7 +84,11 @@ function write_config($newconfig=array()){
 {$lang[all][attach_url]}
 */
 \$attach_url = array($att_url);
-".'?>';
-	pwCache::writeover(D_P.'data/sql_config.php',$writetofile);
+
+/**
+{$lang[all][slaveConfig]}
+*/
+\$slaveConfigs = ";
+	pwCache::writeover(D_P.'data/sql_config.php',$writetofile . pw_var_export($slaveConfigs). ";\r\n?>");
 }
 ?>

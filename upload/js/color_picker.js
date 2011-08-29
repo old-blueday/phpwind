@@ -36,7 +36,9 @@ function styleOnclick(e,obj){
 }
 function colorCancel(){
 	getObj('color_show').style.backgroundColor='#FFFFFF';
-	getObj('css[color]').value='';
+	if(getObj('css[color]')){
+		getObj('css[color]').value='';
+	}
 }
 function checkFileType() {
 	var fileName = getObj("uploadpic").value;

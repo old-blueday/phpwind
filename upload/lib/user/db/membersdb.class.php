@@ -227,7 +227,7 @@ class PW_MembersDB extends BaseDB {
 		"SELECT m.*, m.icon AS micon,
 		md.uid as `md.uid`, md.lastmsg,md.postnum,md.rvrc,md.money,md.credit,md.currency,md.lastvisit,md.thisvisit,md.onlinetime,md.lastpost,md.todaypost,
 		md.monthpost,md.onlineip,md.uploadtime,md.uploadnum,md.starttime,md.pwdctime,md.monoltime,md.digests,md.f_num,md.creditpop,
-		md.jobnum,md.lastgrab,md.follows,md.fans,md.newfans,md.newreferto,md.newcomment,md.postcheck,md.punch,
+		md.jobnum,md.lastgrab,md.follows,md.fans,md.newfans,md.newreferto,md.newcomment,md.postcheck,md.punch,md.shafa,md.newnotice,md.newrequest,md.bubble,
 		mi.customdata $fieldinfo FROM pw_members m LEFT JOIN pw_memberdata md ON m.uid=md.uid LEFT JOIN pw_memberinfo mi ON mi.uid=m.uid 
 		WHERE m.uid IN (".S::sqlImplode($userIds,false).")"	);	
 		return $this->_getAllResultFromQuery ( $query, 'uid' );

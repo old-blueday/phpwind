@@ -12,7 +12,7 @@ if($foruminfo[across]){
 print <<<EOT
 -->
 <div class="t" id="t_$cate[fid]">
-    <div class="h"><a class="fr closeicon" style="cursor:pointer;" onClick="return IndexDeploy('children',0)"><img id="img_children" alt="展开收起" src="$imgpath/$stylepath/index/cate_$children_img.gif" /></a><h3>子版块</h3></div>
+    <div class="f_two" style="padding:5px 10px;border-top:1px solid $tdcolor;border-bottom:1px solid $tdcolor;"><a class="fr closeicon" style="cursor:pointer;" onClick="return IndexDeploy('children',0)"><img id="img_children" alt="展开收起" src="$imgpath/$stylepath/index/cate_$children_img.gif" /></a><h3 class="s5">子版块</h3></div>
     <div class="tTable">
         <table width="100%" style="table-layout:fixed;">
         	<tbody id="cate_children" style="$cate_children">
@@ -37,12 +37,12 @@ print <<<EOT
 EOT;
 if ($forums['logo']) {print <<<EOT
 -->
-					<img src="$forums[logo]" class="fl mr10" alt="forumlogo" />
+					<a href="thread.php?fid=$forums[fid]" target="_blank"><img src="$forums[logo]" class="fl mr10" alt="forumlogo" /></a>
 <!--
 EOT;
 }print <<<EOT
 -->
-					<h2 class="mr10"><a href="thread.php?fid=$forums[fid]">$forums[name]</a></h2>
+					<h2 class="mr10"><a href="thread.php?fid=$forums[fid]" target="_blank">$forums[name]</a></h2>
 <!--
 EOT;
 if($db_todaypost && $forums[tpost]){print <<<EOT
@@ -96,7 +96,7 @@ EOT;
 if($threadright){print<<<EOT
 -->
 <script type="text/javascript" src="http://app.phpwind.net/static/js/client.js"></script>
-<script language="JavaScript">
+<script>
 var server = new PwJs.Server("pwthread");
 server.start();
 </script>
@@ -138,7 +138,7 @@ if($threadright && ($threadright[down][admin] || in_array(0,$threadright[down][o
 EOT;
 }print <<<EOT
 -->
-                    <h2><a href="thread.php?fid=$forums[fid]" id="fn_$forums[fid]" class="mr10">$forums[name]</a></h2>
+                    <h2><a href="thread.php?fid=$forums[fid]" id="fn_$forums[fid]" class="mr10"  target="_blank">$forums[name]</a></h2>
 <!--
 EOT;
 if($db_todaypost && $forums[tpost]){print <<<EOT
@@ -279,7 +279,7 @@ EOT;
 }
 if($foruminfo['viewsub'] == 3 || $foruminfo['viewsub'] == 1){print <<<EOT
 -->
-<script language="JavaScript" src="js/Deploy.js"></script>
+<script type="text/javascript" src="js/Deploy.js"></script>
 <!--
 EOT;
 }

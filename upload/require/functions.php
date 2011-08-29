@@ -71,6 +71,22 @@ function getCommonFid() {
 	}
 	return $fids;
 }
+/**
+ * 获取正常的fid
+ * @param int $fid
+ * @return string
+ */
+function getCookedCommonFid($fid) {
+	$commonForums = getCommonFid();
+	if ($fid && is_numeric($fid) && strpos($commonForums,"'".$fid."'")!==false) return $fid;
+	if (S::isArray($fid)) {
+		foreach ($fid as $key=>$value) {
+			if (!$value || strpos($commonForums,"'".$value."'")===false) unset($fid[$key]);
+		}
+		if (S::isArray($fid)) return S::sqlImplode($fid);
+	}
+	return $commonForums;
+}
 /*
  * 获取论坛的特殊版块id
  */
@@ -331,6 +347,19 @@ function initJob($userId,$jobName,$factor=array()){
 	$jobService = L::loadclass("job", 'job');
 	$jobService->jobController($userId,$jobName,$factor);
 }
+function doMedalBehavior($uid,$behavior,$lasttime=false) {
+	global $tdtime,$winddb,$db_md_ifopen;
+	if (!$db_md_ifopen) return array(false,'无需操作');
+	if ($lasttime && $lasttime>$tdtime) array(false,'无需操作');
+	
+	$behaviorService = L::loadClass('behaviorservice','user');
+	list($num,$change) = $behaviorService->doBehavior($uid,$behavior,$lasttime);
+	if ($num===false) return false;
+	if ($change ==0 && $behavior!='continue_login') return false;
+	$medalService = L::loadClass('medalservice','medal');
+	$temp = $winddb ? $winddb:$uid;
+	$medalService->runAutoMedal($temp,$behavior,$num,$change);
+}
 /*主题印戳*/
 function overPrint($overprint,$tid,$operate='',$oid=''){
 	if(!in_array($overprint,array(1,2))){
@@ -408,4 +437,57 @@ function getSelectHtml($options, $selected = '', $selectTagName = '') {
 		$return = "<select name=\"$selectTagName\">$return</select>";
 	}
 	return $return;
+}
+
+
+/**
+ * 图片缩略
+ *
+ * @param string $sourceImg 原图地址
+ * @param int $width
+ * @param int $height
+ * @return string
+ */
+function minImage($sourceImg, $width, $height) {
+	static $mini = 0;
+	global $db_bbsurl, $attachdir, $db_attachname,$_mainUrl;
+	if (strpos($sourceImg, '://')) {return $sourceImg;}
+	if (substr($sourceImg,strrpos($sourceImg,'.')+1) == 'gif') return ($_mainUrl ? $_mainUrl : $db_bbsurl). '/' .$sourceImg;
+	if ($mini == 0) {
+		if (file_exists($attachdir . "/mini")) {
+			$mini = 1;
+		} else {
+			if (mkdir($attachdir . "/mini")) {
+				@chmod($attachdir . "/mini", 0777);
+				$mini = 1;
+			} else {
+				$mini = 2;
+			}
+		}
+	}
+	if ($mini == 1) {
+		$width = (int) $width;
+		$height = (int) $height;
+		if (!$width || !$height) {
+			Showmsg('minimage_wh_error');
+		}
+		$file_ext = end(explode('.', $sourceImg));
+		$imgname = substr(md5($sourceImg . $width . $height), 10, 10) . '.' . $file_ext;
+
+		$srcfile = ((strpos($sourceImg, $db_attachname) === 0 || strpos($sourceImg, 'images') === 0) ? R_P : $attachdir) . $sourceImg;
+		$targtImg = $attachdir . "/mini/" . $imgname;
+
+		if (file_exists($targtImg) && filemtime($targtImg)>filemtime($srcfile)) {return ($_mainUrl ? $_mainUrl : $db_bbsurl) . '/' . $db_attachname . "/mini/" . $imgname;}
+		require_once (R_P . 'require/imgfunc.php');
+		$thumbsize = MakeThumb($srcfile, $targtImg, $width, $height,1);
+
+		if ($thumbsize) {
+			$fileurl = ($_mainUrl ? $_mainUrl : $db_bbsurl). '/' . $db_attachname . "/mini/" . $imgname;
+			return $fileurl;
+		} else {
+			return $sourceImg;
+		}
+	} else {
+		return $sourceImg;
+	}
 }

@@ -81,9 +81,9 @@ if ($a == 'own') {
 	foreach ($creditset as $key => $value) {
 		$moneyName = $credit->cType[$key];
 		$unit = $credit->cUnit[$key];
-		$credit_pop .= $value.$unit.$moneyName.",";
+		$creditPops .= $value.$unit.$moneyName.",";
 	}
-	$deletePhotoCredit = $creditset ? '删除照片会扣除积分：'.$credit_pop.'，继续吗？' : '是否确认删除?';
+	$deletePhotoCredit = $creditset ? '删除照片会扣除积分：'.$creditPops.'继续吗？' : '是否确认删除?';
 	
 	list($album,$cnpho) = $result;
 	$isown = $album['ownerid'] == $winduid ? '1' : '0';
@@ -113,9 +113,9 @@ if ($a == 'own') {
 	foreach ($creditset as $key => $value) {
 		$moneyName = $credit->cType[$key];
 		$unit = $credit->cUnit[$key];
-		$credit_pop .= $value.$unit.$moneyName.",";	
+		$creditPops .= $value.$unit.$moneyName.",";	
 	}
-	$deletePhotoCredit = $creditset ? '删除照片会扣除积分：'.$credit_pop.'继续吗？' : '是否确认删除?';
+	$deletePhotoCredit = $creditset ? '删除照片会扣除积分：'.$creditPops.'继续吗？' : '是否确认删除?';
 	
     list($photo,$nearphoto,$prePid,$nextPid) = $result;
 	$isown = $photo['ownerid'] == $winduid ? '1' : '0';
@@ -306,7 +306,12 @@ if ($a == 'own') {
 				//会员资讯缓存
 				$userCache = L::loadClass('Usercache', 'user');
 				$userCache->delete($winduid, 'cardphoto');
-				updateDatanalyse($pid,'picNew',$timestamp);
+				
+				$ouserDataService = L::loadClass('Ouserdata', 'sns'); /* @var $ouserDataService PW_Ouserdata */
+				$myAppsData = $ouserDataService->get($winduid);
+				if (!$myAppsData['photos_privacy']) {
+					updateDatanalyse($pid,'picNew',$timestamp);
+				}
 			}
 			//积分变动
 			require_once(R_P.'require/credit.php');
@@ -338,9 +343,9 @@ if ($a == 'own') {
 	foreach ($o_photos_creditset['Createalbum'] as $key => $value) {
 		$moneyName = $credit->cType[$key];
 		$unit = $credit->cUnit[$key];
-		$credit_pop .= $value.$unit.$moneyName.",";
+		$creditPops .= $value.$unit.$moneyName.",";
 	}
-	$createAlbumCredit = $o_photos_creditset['Createalbum'] ? '创建相册会扣除积分：'.$credit_pop.'继续吗？' : '是否确认创建?';
+	$createAlbumCredit = $o_photos_creditset['Createalbum'] ? '创建相册会扣除积分：'.$creditPops.'继续吗？' : '是否确认创建?';
 	$createAlbum = $o_photos_creditset['Createalbum'] ? $o_photos_creditset['Createalbum'] : '';
 	if (empty($step)) {
 		$rt = array();

@@ -3,7 +3,7 @@ include_once PrintEot('left');print <<<EOT
 -->
 <div class="admin_info mb10">
 	<h3 class="h1">插件安装步骤</h3>
-    <div class="legend"><ol><li>将插件文件上传到<b>插件目录(hack/)</b></li><li>在“<b>未安装插件</b>”列表中选择安装您需要的插件</li><li>插件安装后请到“<b><font color="blue">全局 ->导航设置 ->顶部右侧导航</b></font>”设置导航显示位置</li></ol></div>
+    <div class="legend"><ol><li>将插件文件上传到 <span class="b">插件目录(hack/)</span></li><li>在“<span class="b">未安装插件</span>”列表中选择安装您需要的插件</li><li>插件安装后请到“<a href="javascript:;" onclick="parent.PW.Dialog({id:'navside',url:'?adminjob=customnav',name:'导航设置'});"><span class="s4">全局 -> 导航设置</span></a>”设置导航显示位置</li></ol></div>
 </div>
 <form action="$basename" method="post">
   <input type="hidden" name="action" value="edit">
@@ -48,7 +48,7 @@ EOT;
     <span class="btn"><span><button type="submit">提 交</button></span></span>
    </div>
 </form>
-<script language="JavaScript">
+<script type="text/javascript">
 function checkhackset(){
 	return confirm("卸载插件将同时删除插件相关的数据，您确定要卸载此插件吗?");
 }

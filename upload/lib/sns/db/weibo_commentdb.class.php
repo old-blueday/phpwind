@@ -80,7 +80,7 @@ class PW_Weibo_CommentDB extends BaseDB {
 		if (!$this->_isLegalNumeric($uid)){
 			return array();
 		} 
-		$sql = 'SELECT count(*) FROM '.$this->_foreignTableName.' a LEFT JOIN '.$this->_tableName.' b ON a.cid = b.cid WHERE  a.uid = '.$this->_addSlashes($uid).' AND b.uid <> '.$this->_addSlashes($uid);
+		$sql = 'SELECT count(*) FROM '.$this->_foreignTableName.' a LEFT JOIN '.$this->_tableName.' b ON a.cid = b.cid WHERE  a.uid = '.$this->_addSlashes($uid);
 		return  $this->_db->get_value($sql);
 	}
 

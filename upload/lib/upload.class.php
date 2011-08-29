@@ -97,7 +97,7 @@ class PwUpload {
 		$thumbInfo = array();
 		$ifthumb = 0;
 		if ($upload['ext'] != 'swf') {
-			if ($bhv->allowThumb() && ($upload['ext'] != 'gif' || $GLOBALS['db_ifathumbgif'])) {
+			if ($bhv->allowThumb() && $upload['ext'] != 'gif') {
 				$thumbInfo = PwUpload::makeThumb($source, $bhv->getThumbInfo($filename, $savedir), $bhv->ifftp, $ifthumb);
 			}
 			$bhv->allowWaterMark() && PwUpload::waterMark($source, $upload['ext'], $img_size);

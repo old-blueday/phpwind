@@ -51,9 +51,9 @@ if (empty($t)) {print <<<EOT
 <style type="text/css">
 	@import url($imgpath/post/minieitor/minieitor.css);
 </style>
-<script type="text/javascript" language="JavaScript" src="js/color_picker.js"></script>
-<script type="text/javascript" language="JavaScript" src="js/mini_editor.js"></script>
-<script type="text/javascript">
+<script type="text/javascript" src="js/color_picker.js"></script>
+<script type="text/javascript" src="js/mini_editor.js"></script>
+<script>
 function pickReback(color){
 	getObj('color_show').style.backgroundColor = color;
 }
@@ -206,7 +206,7 @@ EOT;
     </table>
 	</form>
 </div>
-<script language="JavaScript">
+<script>
 var charset = '$db_charset';
 initCheckTextNum('cname','cname_warn',20);
 initCheckTextNum('annouce','annouce_warn',500);
@@ -494,9 +494,9 @@ EOT;
 EOT;
 }print <<<EOT
 -->
-<SCRIPT LANGUAGE="JavaScript">
+<script>
 setCurrent('set_{$t}','set_default','current');
-</SCRIPT>
+</script>
             </div>
         </div>
 	</div>

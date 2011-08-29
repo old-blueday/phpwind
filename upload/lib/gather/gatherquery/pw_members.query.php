@@ -91,7 +91,7 @@ class GatherQuery_UserDefine_PW_Members_Impl {
 	}
 	
 	function cleanMemberCacheWithUserIds($tableName, $fields) {
-		if (! isset ( $fields ['uid'] )) {
+		if (!isset( $fields['uid'] ) && !isset( $fields['userid'] )) {
 			return false;
 		}
 		$userIds = (is_array ( $fields ['uid'] )) ? $fields ['uid'] : array ($fields ['uid'] );
@@ -117,6 +117,10 @@ class GatherQuery_UserDefine_PW_Members_Impl {
 				break;
 			case 'pw_cmembers' :
 				$cache->clearCacheForCmemberAndColonyByUserIds ( $userIds );
+				break;
+			case 'pw_membertags_relations' :
+				$userIds = (is_array ( $fields ['userid'] )) ? $fields ['userid'] : array ($fields ['userid'] );
+				$cache->clearCacheForMemberTagsByUserIds ( $userIds );
 				break;
 		}
 		return true;

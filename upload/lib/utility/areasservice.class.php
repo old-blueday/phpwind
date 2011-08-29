@@ -215,7 +215,7 @@ class PW_AreasService {
 	 */
 	function buildAllAreasLists($initValues = array(),$forJs = false) {
 		static $sHasArea = null, $sKey = 0;
-		$areaString = $forJs?'':'<script language="javascript" type="text/javascript">';
+		$areaString = $forJs?'':'<script type="text/javascript">';
 		if (!isset($sHasArea)) {
 			$areas = $this->getAllAreas();
 			//if (!$areas) return false;
@@ -230,7 +230,7 @@ class PW_AreasService {
 			foreach ($initValues as $v) {
 				!$v['defaultid'] && $v['defaultid'] = -1;
 				!$v['hasfirst'] && !$v['hasfirst'] = 0;
-				!$forJs && $areaString .= "initValues[$sKey] = {'parentid':$v[parentid],'selectid':'$v[selectid]','defaultid':$v[defaultid],'hasfirst':$v[hasfirst]};\r\n";
+				!$forJs && $areaString .= "initValues[$sKey] = {'parentid':'$v[parentid]','selectid':'$v[selectid]','defaultid':$v[defaultid],'hasfirst':$v[hasfirst]};\r\n";
 				$sKey++;
 			}
 		}

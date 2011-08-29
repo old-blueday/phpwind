@@ -8,23 +8,21 @@ if($action=='leaveword'){print <<<EOT
 	<table width="100%">
 		<tr>
 			<td width="70">消息通知:</td>
-			<td><label vlsdd="mr20"><input type="radio" name="ifmsg" value="1" />开启</label><label><input type="radio" name="ifmsg" value="0" checked />关闭</label></td></tr>
+			<td><label class="mr20"><input type="radio" name="ifmsg" value="1" />开启</label><label><input type="radio" name="ifmsg" value="0" checked />关闭</label></td></tr>
 		<tr class="vt">
 			<td>留言内容:</td><td>
+			<input type="text" class="input mr5" style="width:312px;" name="atc_content" onkeydown="ajax.quickpost(event,this.form)" value="$rt[leaveword]" />
 <!--
 EOT;
 if($db_adminreason){print <<<EOT
 -->
-		<p class="mb5"><select name="" onchange="this.form.atc_content.value=this.value" style="width:320px;">
-			<option value="">自定义</option>
-			<option value="">-------</option>
+		<div><select name="" onchange="this.form.atc_content.value=this.value" style="width:320px;" size="6">
 			$reason_sel
-		</select></p>
+		</select></div>
 <!--
 EOT;
 }print <<<EOT
 -->
-		<textarea name="atc_content" onkeydown="ajax.quickpost(event,this.form)" class="textareaA">$rt[leaveword]</textarea>
 	</td></tr>
 </table>
 <input type="hidden" name="step" value="2" />
@@ -154,7 +152,7 @@ EOT;
 }if($db_replysitemail && getstatus($winddb['userstatus'],6)){print <<<EOT
 -->
 							| <a id="newrp" onclick="sendmsg('pw_ajax.php','action=newrp',this.id)" style="cursor:pointer;" class="s3">您的帖子有人回复</a>
-<script language="JavaScript">
+<script>
 function newrp() {
 	ajax.guide();
 	ajax.send('pw_ajax.php','action=newrp',function(){
@@ -194,7 +192,7 @@ EOT;
 							</span>
 							<a id="sethonor" onclick="sendmsg('pw_ajax.php','action=honor',this.id)" class="gray" style="cursor:pointer">编辑</a>
 							<div class="c"></div>
-<script language="JavaScript">
+<script>
 function honor() {
 	var str = ajax.request.responseText.split("\t");
 	if (str[0] == 'success') {
@@ -340,16 +338,12 @@ EOT;
 <!--
 EOT;
 if($db_gdcheck & 8){
-$gdSize = explode("\t",$db_gdsize);
+$checkCode = L::loadClass('checkcode', 'site');
+$checkCodeString = $checkCode->getCheckCodeTemplate();
 print <<<EOT
 -->
 	<tr><td>验证码</td><td>
-<script type="text/javascript" src="js/pw_authcode.js"></script>
-<script>
-var flashWidth = "$gdSize[0]";
-var flashHeight = "$gdSize[1]";
-var gdtype = $db_gdtype;
-</script>
+$checkCodeString
 	<input class="input" onfocus="showgd();" type="text" name="gdcode" size="8" />
 	<span id="ckcode" style="display:none;"></span>
 	</td></tr>
@@ -362,7 +356,7 @@ if($db_imagequestion){
 }else{
 	$question = $qkey<0 ? getMachineQuestion_1() :  $db_question[$qkey];
 }
-$q_a = $question.($showq && $qkey>0?" &nbsp;答案:".$db_answer[$qkey] : '');
+$q_a = $question.($showq && $qkey>0?" &nbsp;（答案：".$db_answer[$qkey] . '）' : '');
 print <<<EOT
 -->
 	<!--
@@ -628,7 +622,9 @@ EOT;
 </div>
 <!--
 EOT;
-}elseif($action=='modify'){print <<<EOT
+}elseif($action=='modify'){
+if (!$isKmd || $checkkmd) {
+print <<<EOT
 -->
 <div style="width:450px;">
 <form action="ajax.php?action=$action&ajax=1" method="post" onsubmit="return false;">
@@ -641,17 +637,13 @@ EOT;
 <!--
 EOT;
 if(($db_gdcheck & 4) && (!$db_postgd || $winddb['postnum'] < $db_postgd)){
-$gdSize = explode("\t",$db_gdsize);
+$checkCode = L::loadClass('checkcode', 'site');
+$checkCodeString = $checkCode->getCheckCodeTemplate();
 print <<<EOT
 -->
 	<tbody><tr><td>验证码：</td>
 		<td>
-<script type="text/javascript" src="js/pw_authcode.js"></script>
-<script>
-var flashWidth = "$gdSize[0]";
-var flashHeight = "$gdSize[1]";
-var gdtype = $db_gdtype;
-</script>
+$checkCodeString
 <input class="input" type="text" name="gdcode" onfocus="showgd();" size="6" tabindex="2" maxlength="4" />
 <span id="ckcode" style="display:none;"></span>
 </td></tr></tbody>
@@ -664,7 +656,7 @@ if($db_imagequestion){
 }else{
 	$question = $qkey<0 ? getMachineQuestion_1() :  $db_question[$qkey];
 }
-$q_a = $question.($showq && $qkey>0?" &nbsp;答案:".$db_answer[$qkey] : '');
+$q_a = $question.($showq && $qkey>0?" &nbsp;（答案：".$db_answer[$qkey] . '）' : '');
 print <<<EOT
 -->
 	<tbody><tr><td>验证问题：</td>
@@ -688,10 +680,21 @@ EOT;
 </div>
 <!--
 EOT;
-}elseif($action=='quote'){print <<<EOT
+} elseif ($isKmd == 1 && !$checkkmd) {print <<<EOT
+-->
+<div style="width:400px;">
+	<div class="popTop"><a onclick="closep();" href="javascript:;" class="adel">关闭</a><strong>友情提醒</strong></div>
+	<div class="mb10">
+		<div class="spaceTip s5" style="margin:10px 10px 0 10px;">编辑推广中的孔明灯帖将扣除 $db_kmd_deducttime 小时的推广时间，确认要编辑吗？</div>
+	</div>
+	<div class="popBottom"><span class="btn2"><span><button type="button" onclick="sendmsg('ajax.php?action=modify&fid=$fid&tid=$tid&pid=$pid&article=$article&checkkmd=1', '', '$objid');" >确定</button></span></span><span class="bt2"><span><button onclick="closep();" type="button">取消</button></span></span></div>
+</div>
+<!--
+EOT;
+}}elseif($action=='quote'){print <<<EOT
 -->
 <div style="width:450px">
-<form action="post.php?" method="post" name="quoteFORM">
+<form action="post.php?" method="post" name="quoteFORM" onsubmit="return checkpost(document.quoteFORM);">
 <input type="hidden" name="verify" value="$verifyhash" />
 <div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="cp adel" onclick="closep();">关闭</span>引用帖子</div>
 <table class="vt" width="100%">
@@ -699,17 +702,13 @@ EOT;
 <!--
 EOT;
 if(($db_gdcheck & 4) && (!$db_postgd || $winddb['postnum'] < $db_postgd)){
-$gdSize = explode("\t",$db_gdsize);
+$checkCode = L::loadClass('checkcode', 'site');
+$checkCodeString = $checkCode->getCheckCodeTemplate();
 print <<<EOT
 -->
 	<tbody><tr><td>验证码：</td>
 		<td>
-<script type="text/javascript" src="js/pw_authcode.js"></script>
-<script>
-var flashWidth = "$gdSize[0]";
-var flashHeight = "$gdSize[1]";
-var gdtype = $db_gdtype;
-</script>
+$checkCodeString
 <input class="input" type="text" name="gdcode" onfocus="showgd();" size="6" tabindex="2" maxlength="4" />
 <span id="ckcode" style="display:none;"></span>
 </td></tr></tbody>
@@ -722,7 +721,7 @@ if($db_imagequestion){
 }else{
 	$question = $qkey<0 ? getMachineQuestion_1() :  $db_question[$qkey];
 }
-$q_a = $question.($showq && $qkey>0?" &nbsp;答案:".$db_answer[$qkey] : '');
+$q_a = $question.($showq && $qkey>0?" &nbsp;（答案：".$db_answer[$qkey] . '）' : '');
 print <<<EOT
 -->
 	<tbody><tr><td>验证问题：</td>
@@ -741,14 +740,16 @@ EOT;
 <input type="hidden" value="$action" name="action" />
 <input type="hidden" value="$fid" name="fid" />
 <input type="hidden" value="$tid" name="tid" />
+<input type="hidden" value="1" name="ajax">
+<input type="hidden" name="iscontinue" value="0">
 <input type="hidden" value="$article" name="article" />
 <input type="hidden" value="1" name="atc_usesign" />
 <input type="hidden" value="1" name="atc_convert" />
 <input type="hidden" value="cn0zz" name="_hexie" id="_hexiequote" />
-<div class="popBottom"><span class="btn2"><span><button type="submit" name="ajaxsubmit">提 交</button></span></span><span class="bt2"><span><button type="button" onclick="window.location.href='post.php?action=quote&fid=$fid&tid=$tid&pid=$pid&article=$article&page=$page#breadCrumb'">进入高级模式</button></span></span></div>
+<div class="popBottom"><span class="btn2"><span><button type="submit" name="Submit">提 交</button></span></span><span class="bt2"><span><button type="button" onclick="window.location.href='post.php?action=quote&fid=$fid&tid=$tid&pid=$pid&article=$article&page=$page#breadCrumb'">进入高级模式</button></span></span></div>
 </form>
 </div>
-<script language="JavaScript">
+<script>
 <!--
 EOT;
 $tmpVerify = GetVerify($onlineip.$GLOBALS['winddb']['regdate'].$fid.$tid);print <<<EOT
@@ -763,7 +764,7 @@ EOT;
 <input type="hidden" name="verify" value="$verifyhash" />
 <input type="hidden" name="step" value="3" />
 <table width="250" cellspacing="0" cellpadding="5">
-	<tr><th class="h" colspan="2" style="cursor:move" onmousedown="read.move(event);"><span class="fr" style="margin-top:2px;cursor:pointer" onclick="closep();"><img src="$imgpath/close.gif" /></span>个性签名编辑</th></tr>
+	<tr><th class="h" colspan="2" style="cursor:move" onmousedown="read.move(event);"><span class="adel" onclick="closep();">close</span>个性签名编辑</th></tr>
 	<tr><td align="center"><textarea name="content" style="width:95%;height:60px">{$winddb[honor]}</textarea></td></tr>
 </table><ul><li style="text-align:center;padding:4px 0;"><input type="button" class="btn" onclick="ajax.submit(this.form,honor);" value=" 提 交 " /></li></ul></form>
 <!--
@@ -970,7 +971,7 @@ EOT;
 <div class="popBottom"><span class="btn2"><span><button type="button" name="ajaxsubmit" onclick="ajax.submit(this.form);">提 交</button></span></span></div>
 </div>
 </form>
-<script language="JavaScript">
+<script>
 
 function addFriendType(){
 	var typeinputbox = getObj('typeinputbox');
@@ -1174,7 +1175,7 @@ EOT;
 -->
 <table cellspacing="0" cellpadding="5" width="450px">
 	<tbody>
-	<tr><th class="h" colspan="2" style="cursor:move" onmousedown="read.move(event);"><span class="fr" style="margin-top:2px;cursor:pointer" onclick="closep();"><img src="$imgpath/close.gif" /></span>
+	<tr><th class="h" colspan="2" style="cursor:move" onmousedown="read.move(event);"><span class="adel" onclick="closep();">close</span>
 <!--
 EOT;
 if ($type == 'personal') {print <<<EOT
@@ -1237,17 +1238,11 @@ print <<<EOT
 <form action="pw_ajax.php?action=$action" method="post" onsubmit="return false;">
 <input type="hidden" name="verify" value="$verifyhash" />
 <div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="adel cp" onclick="closep();">删除</span>{$ch_type}举报</div>
-<table width="380" cellspacing="0" cellpadding="0">
-<tr><td>
-感谢您能一起协助我们管理站点，我们会尽快处理您的举报内容！
-</td></tr>
-<tr>
-<td><div class="p10"><textarea id="reason" name="reason" class="textareaA"></textarea></div>
-</td></tr>
-<tr>
-<td><div style="margin-left:5px"><label><input type="checkbox"  name="ifsendmessage" checked value="1"/>{$sendtitle}</label></div>
-</td></tr>
-</table>
+<div class="p10">
+	<div class="mb10">感谢您能一起协助我们管理站点，我们会尽快处理您的举报内容！</div>
+	<div class="mb5"><textarea id="reason" name="reason" class="textareaA"></textarea></div>
+	<div><label><input type="checkbox"  name="ifsendmessage" checked value="1"/>{$sendtitle}</label></div>
+</div>
 <input type="hidden" name="step" value="2" />
 <input type="hidden" name="tid" value="$tid" />
 <input type="hidden" name="pid" value="$pid" />
@@ -1306,7 +1301,7 @@ EOT;
 </div>
 </div>
 </form>
-<script type="text/javascript" language="JavaScript" src="js/core/friendlist.js"></script>
+<script type="text/javascript" src="js/core/friendlist.js"></script>
 <!--
 EOT;
 }elseif ($action == 'showcard') {print <<<EOT
@@ -1337,12 +1332,12 @@ EOT;
 if ($winduid != $uid) {
 	if ($info[isMyAttention]) {print <<<EOT
 -->
-			<a href="javascript:;" onclick="pwConfirm('是否取消关注？',this,function(){Attention.del('{$info[uid]}')})" title="取消关注" class="fr gray following">关注中</a>
+			<a href="javascript:;" onclick="pwConfirm('是否取消关注？',this,function(){Attention.del('{$info[uid]}')})" title="取消关注" class="fr add_following">关注中</a>
 <!--
 EOT;
 	} else {print <<<EOT
 -->
-			<a href="javascript:;" onclick="Attention.add(this,'{$info['uid']}',0)" class="follow fr">加关注</a>
+			<a href="javascript:;" onclick="Attention.add(this,'{$info['uid']}',0)" class="add_follow fr">加关注</a>
 <!--
 EOT;
 	}
@@ -1604,7 +1599,7 @@ EOT;
 EOT;
 print <<<EOT
 -->
-<script language="javascript">
+<script>
 function showTypeTab(p, n, tag){
 	var o = getObj('t_typedb');
 	var f = o.getElementsByTagName(tag);
@@ -1679,9 +1674,8 @@ EOT;
 print<<<EOT
 -->
 <input type="hidden" name="topicsearch" value="1">
+<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="adel" onclick="closep();">close</span>高级搜索</div>
 <table width="350px" cellspacing="0" cellpadding="5">
-	<tr><th class="h" colspan="2" style="cursor:move" onmousedown="read.move(event);"><span class="fr" style="margin-top:2px;cursor:pointer" onclick="closep();"><img src="$imgpath/close.gif" /></span>高级搜索</th></tr>
-
 <!--
 EOT;
 $vieworder_mark = 0;
@@ -1696,12 +1690,12 @@ if ($value['vieworder'] == 0) {
 if($actmid || $allactmid){print<<<EOT
 print<<<EOT
 -->
-					<tr><td width="30%">{$value[name][0]}：</td><td>{$value[name][1]}$value[searchhtml]{$value[name][2]}</td></tr>
+					<tr><td width="30%">{$value[name][0]}：</td><td style="padding-right:10px;">{$value[name][1]}$value[searchhtml]{$value[name][2]}</td></tr>
 <!--
 EOT;
 }else{print<<<EOT
 -->
-					<tr><td width="30%">$value[name1]：</td><td>$value[searchhtml]$value[name2]</td></tr>
+					<tr><td width="30%">$value[name1]：</td><td style="padding-right:10px;">$value[searchhtml]$value[name2]</td></tr>
 <!--
 EOT;
 }}else{
@@ -1709,12 +1703,12 @@ if($vieworder_mark != $value['vieworder']){
 if($actmid || $allactmid){print<<<EOT
 print<<<EOT
 -->
-					<tr><td width="30%">{$value[name][0]}：</td><td>{$value[name][1]}$value[searchhtml]{$value[name][2]}
+					<tr><td width="30%">{$value[name][0]}：</td><td style="padding-right:10px;">{$value[name][1]}$value[searchhtml]{$value[name][2]}
 <!--
 EOT;
 }else{print<<<EOT
 -->
-					<tr><td width="30%">$value[name1]：</td><td>$value[searchhtml]$value[name2]
+					<tr><td width="30%">$value[name1]：</td><td style="padding-right:10px;">$value[searchhtml]$value[name2]
 <!--
 EOT;
 }}else{
@@ -1738,8 +1732,8 @@ if($vieworder_mark != 0){print<<<EOT
 EOT;
 }print<<<EOT
 -->
-				<tr><td colspan="2"><center><input type="submit" name="submit" value="搜索"></center></td></tr>
 </table>
+<div class="popBottom"><span class="btn2"><span><button type="submit">搜索</button></span></span></div>
 </form>
 <!--
 EOT;
@@ -2241,7 +2235,7 @@ EOT;
 			$pidstr = $pid ? $pid : 'tpc';
 print <<<EOT
 -->
-&nbsp;<a style="display:none;" id="pingDel_{$pingdata['id']}" href="javascript:void(0);" onclick="delPingLog('$fid', '$tid', '$pidstr', '{$pingdata['id']}')"><img src="$imgpath/close.gif" /></a>
+&nbsp;<a style="display:none;" class="adel" id="pingDel_{$pingdata['id']}" href="javascript:void(0);" onclick="delPingLog('$fid', '$tid', '$pidstr', '{$pingdata['id']}')">close</a>
 <!--
 EOT;
 		}
@@ -2288,8 +2282,9 @@ print <<<EOT
 EOT;
 } elseif ($action == 'showuserbinding') {print <<<EOT
 -->
-<div style="padding:0 5px 0 0;width:312px;">
+<div style="padding:0 5px 5px 0;width:312px;">
 <div class="menu_userlist">
+<h5>帐号切换</h5>
 <ul class="cc">
 <!--
 EOT;
@@ -2333,7 +2328,7 @@ if($job == 'upload'){print<<<EOT
 	<tr><td align="center"><input class="btn" name="step" type="hidden" value="2"><input class="btn" onclick="ajax.submit(this.form, callback)" type="submit" value="提交"><input class="btn" type="button" value="关闭" onclick="closep();"></td></tr>
 </table>
 </form>
-<script  language="javascript">
+<script>
 var db_ifftp = '$db_ifftp';
 var db_ftpweb = '$db_ftpweb';
 var attachpath;
@@ -2353,9 +2348,9 @@ function callback(){
 				continue;
 			} else {
 				document.getElementsByName(element_name)[0].value = str[1];
-				$("img_picture_" +i).children[0].src = attachpath + "/" + str[1] ;
-				$("img_picture_" +i).style.display = "";
-				$("img_picture_0").style.display = "none";
+				getObj("img_picture_" +i).children[0].src = attachpath + "/" + str[1] ;
+				getObj("img_picture_" +i).style.display = "";
+				getObj("img_picture_0").style.display = "none";
 				break;
 			}
 		}
@@ -2703,7 +2698,7 @@ print<<<EOT
 <table width="100%" cellspacing="0" cellpadding="5">
 <tbody>
 	<tr>
-		<th onmousedown="read.move(event);" style="cursor: move; font-weight:bold;" colspan="2" class="h"><span onclick="closep();" style="margin-top: 2px; cursor: pointer;" class="fr"><img src="$imgpath/close.gif" /></span>活动报名</th>
+		<th onmousedown="read.move(event);" style="cursor: move; font-weight:bold;" colspan="2" class="h"><span class="adel" onclick="closep();">close</span>活动报名</th>
 	</tr>
 	<tr>
 		<td style="padding:0; width:456px;">
@@ -2779,14 +2774,14 @@ EOT;
 </tbody>
 </table>
 </form>
-<script language="javascript">
+<script>
 function messageCheck(frm,checkid) {
 	setTimeout(function(){
 		var message = '';
 		var submitdisabled = false;
 		var theMoreNum = parseInt('$theMoreNum');
 
-		if (objCheck($('signupnumCheck')) && (checkid == 'all' || checkid == 'signupnumCheck')) {
+		if (objCheck(getObj('signupnumCheck')) && (checkid == 'all' || checkid == 'signupnumCheck')) {
 			var signupnum = 0;
 			var signup = document.getElementsByName('signup[]');
 
@@ -2820,37 +2815,37 @@ function messageCheck(frm,checkid) {
 					submitdisabled = true;
 				}
 			}
-			$('signupnumCheck').innerHTML = message;
+			getObj('signupnumCheck').innerHTML = message;
 		}
-		if (objCheck($('nicknameCheck')) && (checkid == 'all' || checkid == 'nicknameCheck')) {
-			if ($('nickname').value == '') {
+		if (objCheck(getObj('nicknameCheck')) && (checkid == 'all' || checkid == 'nicknameCheck')) {
+			if (getObj('nickname').value == '') {
 				message = '<font color="red">请输入称呼</font>';
 				submitdisabled = true;
 			} else {
 				message = '';
 			}
-			$('nicknameCheck').innerHTML = message;
+			getObj('nicknameCheck').innerHTML = message;
 		}
-		if (objCheck($('mobileCheck')) && (checkid == 'all' || checkid == 'mobileCheck')) {
-			if ($('mobile').value == '') {
+		if (objCheck(getObj('mobileCheck')) && (checkid == 'all' || checkid == 'mobileCheck')) {
+			if (getObj('mobile').value == '') {
 				message = '<font color="red">请输入手机号码</font>';
 				submitdisabled = true;
-			} else if ($('mobile').value.match(/^1(3|5|8)\d{9}$/) == null && $('mobile').value) {
+			} else if (getObj('mobile').value.match(/^1(3|5|8)\d{9}$/) == null && getObj('mobile').value) {
 				message = '<font color="red">输入手机号码有误，请重新输入</font>';
 				submitdisabled = true;
 			} else {
 				message = '';
 			}
-			$('mobileCheck').innerHTML = message;
+			getObj('mobileCheck').innerHTML = message;
 		}
-		if (objCheck($('addressCheck')) && (checkid == 'all' || checkid == 'addressCheck')) {
-			if ($('address').value.match(/^[-\+]?\d+$/) != null && $('address').value) {
+		if (objCheck(getObj('addressCheck')) && (checkid == 'all' || checkid == 'addressCheck')) {
+			if (getObj('address').value.match(/^[-\+]?\d+$/) != null && getObj('address').value) {
 				message = '<font color="red">地址不能为全数字，请重新输入</font>';
 				submitdisabled = true;
 			} else {
 				message = '';
 			}
-			$('addressCheck').innerHTML = message;
+			getObj('addressCheck').innerHTML = message;
 		}
 
 		if (submitdisabled == false && checkid == 'all') {
@@ -2867,7 +2862,7 @@ EOT;
 -->
 <table width="100%" cellspacing="0" cellpadding="5">
 	<tr>
-		<th class="h" colspan="3" style="cursor:move" onmousedown="read.move(event);"><span class="fr" style="margin-top:2px;cursor:pointer" onclick="closep();"><img src="$imgpath/close.gif" /></span>报名限制</th>
+		<th class="h" colspan="3" style="cursor:move" onmousedown="read.move(event);"><span class="adel" onclick="closep();">close</span>报名限制</th>
 	</tr>
 	<tr><td>对不起，发起人限制只有其好友可报名，是否加他为好友？<a href="javascript:;" style="cursor: pointer;" onclick="sendmsg('pw_ajax.php?action=addfriend&touid=$authorid','',this.id);" title="加为好友">+加为好友</a></td></tr>
 </table>
@@ -2878,7 +2873,7 @@ EOT;
 <table width="100%" cellspacing="0" cellpadding="5">
 <tbody>
 	<tr>
-		<th onmousedown="read.move(event);" style="cursor: move; font-weight:bold;" colspan="2" class="h"><span onclick="loadMemberList();" style="margin-top: 2px; cursor: pointer;" class="fr"><img src="$imgpath/close.gif" /></span>支付费用</th>
+		<th onmousedown="read.move(event);" style="cursor: move; font-weight:bold;" colspan="2" class="h"><span onclick="loadMemberList();" class="adel">close</span>支付费用</th>
 	</tr>
 	<tr>
 		<td style="padding:0; width:456px;">
@@ -2961,7 +2956,7 @@ print<<<EOT
 <table width="100%" cellspacing="0" cellpadding="5">
 <tbody>
 	<tr>
-		<th onmousedown="read.move(event);" style="cursor: move; font-weight:bold;" colspan="2" class="h"><span onclick="closep();" style="margin-top: 2px; cursor: pointer;" class="fr"><img src="$imgpath/close.gif" /></span><strong class="s3">{$detailinfo[username]}</strong>的报名信息：</th>
+		<th onmousedown="read.move(event);" style="cursor: move; font-weight:bold;" colspan="2" class="h"><span class="adel" onclick="closep();">close</span><strong class="s3">{$detailinfo[username]}</strong>的报名信息：</th>
 	</tr>
 	<tr>
 		<td style="padding:0; width:456px;"><div class="aa_alert410" style="padding:0; width:100%">
@@ -3101,7 +3096,7 @@ if($theMoreNum){
 <table width="100%" cellspacing="0" cellpadding="5">
 <tbody>
 	<tr>
-		<th onmousedown="read.move(event);" style="cursor: move; font-weight:bold;" colspan="2" class="h"><span onclick="closep();" style="margin-top: 2px; cursor: pointer;" class="fr"><img src="$imgpath/close.gif" /></span>报名修改</th>
+		<th onmousedown="read.move(event);" style="cursor: move; font-weight:bold;" colspan="2" class="h"<span class="adel" onclick="closep();">close</span>报名修改</th>
 	</tr>
 	<tr>
 		<td style="padding:0; width:456px;">
@@ -3173,7 +3168,7 @@ EOT;
 </tbody>
 </table>
 </form>
-<script language="javascript">
+<script>
 function messageCheck(frm,checkid) {
 	setTimeout(function(){
 		var message = '';
@@ -3181,7 +3176,7 @@ function messageCheck(frm,checkid) {
 		var theMoreNum = parseInt('$theMoreNum');
 		var ownernums = parseInt('$ownernums');
 
-		if (objCheck($('signupnumCheck')) && (checkid == 'all' || checkid == 'signupnumCheck')) {
+		if (objCheck(getObj('signupnumCheck')) && (checkid == 'all' || checkid == 'signupnumCheck')) {
 			var signupnum = 0;
 			var signup = document.getElementsByName('signup[]');
 
@@ -3215,37 +3210,37 @@ function messageCheck(frm,checkid) {
 					submitdisabled = true;
 				}
 			}
-			$('signupnumCheck').innerHTML = message;
+			getObj('signupnumCheck').innerHTML = message;
 		}
-		if (objCheck($('nicknameCheck')) && (checkid == 'all' || checkid == 'nicknameCheck')) {
-			if ($('nickname').value == '') {
+		if (objCheck(getObj('nicknameCheck')) && (checkid == 'all' || checkid == 'nicknameCheck')) {
+			if (getObj('nickname').value == '') {
 				message = '<font color="red">请输入称呼</font>';
 				submitdisabled = true;
 			} else {
 				message = '';
 			}
-			$('nicknameCheck').innerHTML = message;
+			getObj('nicknameCheck').innerHTML = message;
 		}
-		if (objCheck($('mobileCheck')) && (checkid == 'all' || checkid == 'mobileCheck')) {
-			if ($('mobile').value == '') {
+		if (objCheck(getObj('mobileCheck')) && (checkid == 'all' || checkid == 'mobileCheck')) {
+			if (getObj('mobile').value == '') {
 				message = '<font color="red">请输入手机号码</font>';
 				submitdisabled = true;
-			} else if ($('mobile').value.match(/^1(3|5|8)\d{9}$/) == null && $('mobile').value) {
+			} else if (getObj('mobile').value.match(/^1(3|5|8)\d{9}$/) == null && getObj('mobile').value) {
 				message = '<font color="red">输入手机号码有误，请重新输入</font>';
 				submitdisabled = true;
 			} else {
 				message = '';
 			}
-			$('mobileCheck').innerHTML = message;
+			getObj('mobileCheck').innerHTML = message;
 		}
-		if (objCheck($('addressCheck')) && (checkid == 'all' || checkid == 'addressCheck')) {
-			if ($('address').value.match(/^[-\+]?\d+$/) != null && $('address').value) {
+		if (objCheck(getObj('addressCheck')) && (checkid == 'all' || checkid == 'addressCheck')) {
+			if (getObj('address').value.match(/^[-\+]?\d+$/) != null && getObj('address').value) {
 				message = '<font color="red">地址不能为全数字，请重新输入</font>';
 				submitdisabled = true;
 			} else {
 				message = '';
 			}
-			$('addressCheck').innerHTML = message;
+			getObj('addressCheck').innerHTML = message;
 		}
 
 		if (submitdisabled == false && checkid == 'all') {
@@ -3269,7 +3264,7 @@ EOT;
 <table width="100%" cellspacing="0" cellpadding="5">
 <tbody>
 	<tr>
-		<th onmousedown="read.move(event);" style="cursor: move; font-weight:bold;" colspan="2" class="h"><span onclick="closep();" style="margin-top: 2px; cursor: pointer;" class="fr"><img src="images/close.gif" /></span>确认支付</th>
+		<th onmousedown="read.move(event);" style="cursor: move; font-weight:bold;" colspan="2" class="h"><span class="adel" onclick="closep();">close</span>确认支付</th>
 	</tr>
 	<tr>
 		<td><div class="aa_alert410">
@@ -3297,7 +3292,7 @@ EOT;
 <table width="100%" cellspacing="0" cellpadding="5">
 <tbody>
 	<tr>
-		<th onmousedown="read.move(event);" style="cursor: move; font-weight:bold;" colspan="2" class="h"><span onclick="closep();" style="margin-top: 2px; cursor: pointer;" class="fr"><img src="$imgpath/close.gif" /></span>提示</th>
+		<th onmousedown="read.move(event);" style="cursor: move; font-weight:bold;" colspan="2" class="h"><span class="adel" onclick="closep();">close</span>提示</th>
 	</tr>
 	<tr>
 		<td>
@@ -3338,7 +3333,7 @@ EOT;
 <input type="hidden" name="authorid" value="$authorid" />
 <table cellspacing="0" cellpadding="0" width="440">
 	<tbody>
-	<tr><th class="h" colspan="2" style="cursor:move" onmousedown="read.move(event);"><span class="fr" style="margin-top:2px;cursor:pointer" onclick="closep();"><img src="$imgpath/close.gif" /></span>群发短消息</th></tr>
+	<tr><th class="h" colspan="2" style="cursor:move" onmousedown="read.move(event);"><span class="adel" onclick="closep();">close</span>群发短消息</th></tr>
 	<tr><td align="center">标题</td><td><input type="text" class="input" name="subject" maxlength="100" size="50"/></td></tr>
 	<tr><td align="center">内容</td><td><textarea name="atc_content" rows="8" style="width:330px"></textarea></td></tr>
 	</tbody>
@@ -3360,7 +3355,7 @@ if($thelast != '1'){print <<<EOT
 <table width="100%" cellspacing="0" cellpadding="5">
 <tbody>
 	<tr>
-		<th onmousedown="read.move(event);" style="cursor: move; font-weight:bold;" colspan="2" class="h"><span onclick="closep();" style="margin-top: 2px; cursor: pointer;" class="fr"><img src="$imgpath/close.gif" /></span>退款</th>
+		<th onmousedown="read.move(event);" style="cursor: move; font-weight:bold;" colspan="2" class="h"><span class="adel" onclick="closep();">close</span>退款</th>
 	</tr>
 	<tr>
 		<td><div class="aa_alert410">
@@ -3387,7 +3382,7 @@ if($thelast != '1'){print <<<EOT
 </tbody>
 </table>
 </form>
-<script language="javascript">
+<script>
 function messageCheck(frm,checkid) {
 	setTimeout(function(){
 		var submitdisabled = false;
@@ -3395,8 +3390,8 @@ function messageCheck(frm,checkid) {
 		var morecost = '$morecost';
 		var message = '';
 
-		if (objCheck($('personalcost'))) {
-			var thecost = $('costvalue').value - "0";
+		if (objCheck(getObj('personalcost'))) {
+			var thecost = getObj('costvalue').value - "0";
 			var costtest = /^(([1-9]\d*)|0)(\.\d{0,2})?$/;
 			if (!costtest.test(thecost) || thecost == 0){
 				message = '<font color="red">退款费用必须为整数或小数，小数点后不超过2位</font>';
@@ -3407,16 +3402,16 @@ function messageCheck(frm,checkid) {
 				submitdisabled = true;
 				reasonShow = false;
 			} else if (thecost) {
-				message = '退款费用<span class="b s3" id="">'+$('costvalue').value+'</span>元</span>';
+				message = '退款费用<span class="b s3" id="">'+getObj('costvalue').value+'</span>元</span>';
 			} else {
 				message = '';
 			}
 		}
-		if ($('reason').value == '' && reasonShow == true && (checkid == 'all' || checkid == 'reason')) {
+		if (getObj('reason').value == '' && reasonShow == true && (checkid == 'all' || checkid == 'reason')) {
 			message = '<font color="red">请输入您的退款原因或费用说明，最多128个字</font>';
 			submitdisabled = true;
 		}
-		$('personalcost').innerHTML = message;
+		getObj('personalcost').innerHTML = message;
 
 		if (submitdisabled == false && checkid == 'all') {
 			ajax.submit(frm);
@@ -3429,23 +3424,23 @@ function messageCheck(frm,checkid) {
 
 function checkAdditionalReasonLength(){
 	setTimeout(function(){
-		$('ajaxsubmit').disabled = false;
-		var l = strlen($('reason').value);
+		getObj('ajaxsubmit').disabled = false;
+		var l = strlen(getObj('reason').value);
 		if(l < 128 && l > 0) {
-			$('wordtip').innerHTML='剩余'+(128-l)+'个字节';
-			$('wordtip').style.backgroundColor='#fffeed';
-			$('wordtip').style.display='inline';
+			getObj('wordtip').innerHTML='剩余'+(128-l)+'个字节';
+			getObj('wordtip').style.backgroundColor='#fffeed';
+			getObj('wordtip').style.display='inline';
 		} else if (l == 128) {
-			$('wordtip').innerHTML='已经达到最大字数限制';
-			$('wordtip').style.backgroundColor='#ffd9d9';
-			$('wordtip').style.display='inline';
+			getObj('wordtip').innerHTML='已经达到最大字数限制';
+			getObj('wordtip').style.backgroundColor='#ffd9d9';
+			getObj('wordtip').style.display='inline';
 		} else if (l >= 128) {
-			$('wordtip').innerHTML='已经超过最大字数限制！';
-			$('wordtip').style.backgroundColor='#ff9999';
-			$('wordtip').style.display='inline';
-			$('ajaxsubmit').disabled = true;
+			getObj('wordtip').innerHTML='已经超过最大字数限制！';
+			getObj('wordtip').style.backgroundColor='#ff9999';
+			getObj('wordtip').style.display='inline';
+			getObj('ajaxsubmit').disabled = true;
 		} else {
-			$('wordtip').style.display='none';
+			getObj('wordtip').style.display='none';
 		}
 	},100);
 }
@@ -3495,7 +3490,7 @@ EOT;
 <table width="100%" cellspacing="0" cellpadding="5">
 <tbody>
 	<tr>
-		<th onmousedown="read.move(event);" style="cursor: move; font-weight:bold;" colspan="2" class="h"><span onclick="closep();" style="margin-top: 2px; cursor: pointer;" class="fr"><img src="$imgpath/close.gif" /></span>追加费用</th>
+		<th onmousedown="read.move(event);" style="cursor: move; font-weight:bold;" colspan="2" class="h"><span class="adel" onclick="closep();">close</span>追加费用</th>
 	</tr>
 <!--
 EOT;
@@ -3521,15 +3516,15 @@ if(empty($more)){print <<<EOT
 			<div class="tac">
 				<input type="button" id="ajaxsubmit" class="btn" name="ajaxsubmit" onclick="messageCheck(this.form,'all');" value="追加费用" />
 			</div>
-<script language="javascript">
+<script>
 function messageCheck(frm,checkid) {
 	setTimeout(function(){
 		var submitdisabled = false;
 		var reasonShow = true;
 		var message = '';
 
-		if (objCheck($('personalcost'))) {
-			var thecost = $('costvalue').value - "0";
+		if (objCheck(getObj('personalcost'))) {
+			var thecost = getObj('costvalue').value - "0";
 			var costtest = /^(([1-9]\d*)|0)(\.\d{0,2})?$/;
 			if (!costtest.test(thecost) || thecost == 0){
 				message = '<font color="red">追加费用必须为整数或小数，小数点后不超过2位</font>';
@@ -3540,16 +3535,16 @@ function messageCheck(frm,checkid) {
 				submitdisabled = true;
 				reasonShow = false;
 			} else if (thecost) {
-				message = '费用<span class="b s3" id="">'+$('costvalue').value+'</span>元</span>';
+				message = '费用<span class="b s3" id="">'+getObj('costvalue').value+'</span>元</span>';
 			} else {
 				message = '';
 			}
 		}
-		if ($('reason').value == '' && reasonShow == true && (checkid == 'all' || checkid == 'reason')) {
+		if (getObj('reason').value == '' && reasonShow == true && (checkid == 'all' || checkid == 'reason')) {
 			message = '<font color="red">请输入您的退款原因或费用说明，最多128个字</font>';
 			submitdisabled = true;
 		}
-		$('personalcost').innerHTML = message;
+		getObj('personalcost').innerHTML = message;
 
 		if (submitdisabled == false && checkid == 'all') {
 			ajax.submit(frm,additional);
@@ -3601,9 +3596,9 @@ EOT;
 			<div class="tac">
 				<input type="button" id="ajaxsubmit" class="btn" name="ajaxsubmit" onclick="messageCheck(this.form,'all');" value="追加费用" />
 			</div>
-<script language="javascript">
+<script>
 function addNewMember() {
-	var username = $('newid').value;
+	var username = getObj('newid').value;
 	var elements = document.getElementsByTagName('input');
 
 	ajax.send("pw_ajax.php?action=activity&job=addnewmember",'username=' + username+'&tid='+'$tid',function(){
@@ -3612,27 +3607,27 @@ function addNewMember() {
 			for (var i = 0,len = elements.length; i < len; i++) {
 				if (elements[i].name.indexOf('uids') != -1) {
 					if (elements[i].value == rText[1]) {
-						$('errordesc').innerHTML = '<font color="red">用户名已在报名列表中</font>';
+						getObj('errordesc').innerHTML = '<font color="red">用户名已在报名列表中</font>';
 						return false;
 					}
 				}
 			}
-			var aidsel = $('newmemberhtml');
+			var aidsel = getObj('newmemberhtml');
 			var option = elementBind('li');
 			option.innerHTML = '<input type="checkbox" name="uids[]" id="box_'+rText[1]+'" value="'+rText[1]+'" onclick="calculateOtherCost();" checked/>&nbsp;<label for="name1">'+rText[2]+'</label> &nbsp;<input type="text" name="cost_['+rText[1]+']" id="'+rText[1]+"\" class=\"input\" size=\"4\" style=\"color:#999\" onblur=\"messageCheck('1','totalcostHtml');\" /> <span> &nbsp;元</span>";
 			aidsel.insertBefore(option,null);
-			$('errordesc').innerHTML = '';
+			getObj('errordesc').innerHTML = '';
 		} else if (rText[0] == 'authorerror') {
-			$('errordesc').innerHTML = '<font color="red">无法添加自己</font>';
+			getObj('errordesc').innerHTML = '<font color="red">无法添加自己</font>';
 			return false;
 		} else if (rText[0] == 'exist') {
-			$('errordesc').innerHTML = '<font color="red">用户名已在报名列表中</font>';
+			getObj('errordesc').innerHTML = '<font color="red">用户名已在报名列表中</font>';
 			return false;
 		} else if (rText[0] == 'error') {
-			$('errordesc').innerHTML = '<font color="red">用户名不存在或为空</font>';
+			getObj('errordesc').innerHTML = '<font color="red">用户名不存在或为空</font>';
 			return false;
 		} else {
-			$('errordesc').innerHTML = '<font color="red">非法操作</font>';
+			getObj('errordesc').innerHTML = '<font color="red">非法操作</font>';
 			return false;
 		}
 	});
@@ -3640,14 +3635,14 @@ function addNewMember() {
 
 function calculateCost() {
 	setTimeout(function(){
-		var thecost = $('costvalue').value - "0";
+		var thecost = getObj('costvalue').value - "0";
 		var costtest = /^(([1-9]\d*)|0)(\.\d{0,2})?$/;
 		var totalcost = 0;//总额
 		var message = '';
 
 		if (thecost != '' && !costtest.test(thecost)){
-			$('totalcostHtml').innerHTML = '<font color="red">追加费用必须为整数或小数，小数点后不超过2位</font>';
-			$('ajaxsubmit').disabled = true;
+			getObj('totalcostHtml').innerHTML = '<font color="red">追加费用必须为整数或小数，小数点后不超过2位</font>';
+			getObj('ajaxsubmit').disabled = true;
 			return false;
 		}
 		var elements = document.getElementsByTagName('input');
@@ -3659,40 +3654,40 @@ function calculateCost() {
 			}
 		}
 		for (var i = 0,len = elements.length; i < len; i++) {
-			if (elements[i].name.indexOf('cost_') != -1 && $('box_'+elements[i].id).checked == true) {
-				if ($('selectvalue').value == 'personal' && thecost) {//每个人
+			if (elements[i].name.indexOf('cost_') != -1 && getObj('box_'+elements[i].id).checked == true) {
+				if (getObj('selectvalue').value == 'personal' && thecost) {//每个人
 					elements[i].value = thecost;
 					if (thecost > 2000) {
 						message = '<font color="red">单人单笔费用不能超过2000元</font>';
-						$('ajaxsubmit').disabled = true;
+						getObj('ajaxsubmit').disabled = true;
 					}
-				} else if ($('selectvalue').value == 'total' && thecost) {//总共
+				} else if (getObj('selectvalue').value == 'total' && thecost) {//总共
 					elements[i].value = (thecost/count).toFixed(2) - "0";
 					if (elements[i].value > 2000) {
 						message = '<font color="red">单人单笔费用不能超过2000元</font>';
-						$('ajaxsubmit').disabled = true;
+						getObj('ajaxsubmit').disabled = true;
 					}
 				}
 			}
 		}
 		if (message) {
-			$('totalcostHtml').innerHTML = message;
+			getObj('totalcostHtml').innerHTML = message;
 			return false;
 		}
 
-		if ($('selectvalue').value == 'personal') {//每个人
+		if (getObj('selectvalue').value == 'personal') {//每个人
 			totalcost = count*thecost;
-		} else if ($('selectvalue').value == 'total') {//总共
+		} else if (getObj('selectvalue').value == 'total') {//总共
 			totalcost = thecost;
 		}
-		$('totalcostHtml').innerHTML = '共<span class="b s3">'+count+'</span>人，总额<span class="b s3">'+totalcost.toFixed(2)+'</span>元';
+		getObj('totalcostHtml').innerHTML = '共<span class="b s3">'+count+'</span>人，总额<span class="b s3">'+totalcost.toFixed(2)+'</span>元';
 		if (totalcost && totalcost == 0) {
-			$('totalcostHtml').innerHTML = '<font color="red">追加费用必须为整数或小数，小数点后不超过2位</font>';
-			$('ajaxsubmit').disabled = true;
+			getObj('totalcostHtml').innerHTML = '<font color="red">追加费用必须为整数或小数，小数点后不超过2位</font>';
+			getObj('ajaxsubmit').disabled = true;
 		} else if (!totalcost) {
-			$('totalcostHtml').innerHTML = '';
+			getObj('totalcostHtml').innerHTML = '';
 		} else {
-			$('ajaxsubmit').disabled = false;
+			getObj('ajaxsubmit').disabled = false;
 		}
 	},100);
 }
@@ -3707,12 +3702,12 @@ function messageCheck(frm,checkid) {
 		var reasonShow = true;
 		var message = '';
 
-		if (objCheck($('totalcostHtml'))) {
+		if (objCheck(getObj('totalcostHtml'))) {
 			var elements = document.getElementsByTagName('input');
 			for (var i = 0,len = elements.length; i < len; i++) {
 				if (elements[i].name.indexOf('uids') != -1 && elements[i].checked == true) {
 					count ++;
-				} else if (elements[i].name.indexOf('cost_') != -1 && $('box_'+elements[i].id).checked == true) {
+				} else if (elements[i].name.indexOf('cost_') != -1 && getObj('box_'+elements[i].id).checked == true) {
 					tempcost = elements[i].value - "0";
 					if (tempcost != '' && !costtest.test(tempcost)){
 						message = '<font color="red">追加费用必须为整数或小数，小数点后不超过2位</font>';
@@ -3737,11 +3732,11 @@ function messageCheck(frm,checkid) {
 				message = '共<span class="b s3">'+count+'</span>人，总额<span class="b s3">'+totalcost.toFixed(2)+'</span>元';
 			}
 		}
-		if ($('reason').value == '' && reasonShow == true && (checkid == 'all' || checkid == 'reason')) {
+		if (getObj('reason').value == '' && reasonShow == true && (checkid == 'all' || checkid == 'reason')) {
 			message = '<font color="red">请输入您的退款原因或费用说明，最多128个字</font>';
 			submitdisabled = true;
 		}
-		$('totalcostHtml').innerHTML = message;
+		getObj('totalcostHtml').innerHTML = message;
 
 		if (submitdisabled == false && checkid == 'all') {
 			ajax.submit(frm,additional);
@@ -3760,7 +3755,7 @@ EOT;
 </tbody>
 </table>
 </form>
-<script language="javascript">
+<script>
 function Checktext(obj,id){
 	if (obj.className.indexOf('gray')!=-1) {
 		obj.value = '';
@@ -3782,23 +3777,23 @@ function Checktext(obj,id){
 
 function checkAdditionalReasonLength(){
 	setTimeout(function(){
-		$('ajaxsubmit').disabled = false;
-		var l = strlen($('reason').value);
+		getObj('ajaxsubmit').disabled = false;
+		var l = strlen(getObj('reason').value);
 		if(l < 250 && l > 0) {
-			$('wordtip').innerHTML='剩余'+(250-l)+'个字节';
-			$('wordtip').style.backgroundColor='#fffeed';
-			$('wordtip').style.display='inline';
+			getObj('wordtip').innerHTML='剩余'+(250-l)+'个字节';
+			getObj('wordtip').style.backgroundColor='#fffeed';
+			getObj('wordtip').style.display='inline';
 		} else if (l == 250) {
-			$('wordtip').innerHTML='已经达到最大字数限制';
-			$('wordtip').style.backgroundColor='#ffd9d9';
-			$('wordtip').style.display='inline';
+			getObj('wordtip').innerHTML='已经达到最大字数限制';
+			getObj('wordtip').style.backgroundColor='#ffd9d9';
+			getObj('wordtip').style.display='inline';
 		} else if (l >= 250) {
-			$('wordtip').innerHTML='已经超过最大字数限制！';
-			$('wordtip').style.backgroundColor='#ff9999';
-			$('wordtip').style.display='inline';
-			$('ajaxsubmit').disabled = true;
+			getObj('wordtip').innerHTML='已经超过最大字数限制！';
+			getObj('wordtip').style.backgroundColor='#ff9999';
+			getObj('wordtip').style.display='inline';
+			getObj('ajaxsubmit').disabled = true;
 		} else {
-			$('wordtip').style.display='none';
+			getObj('wordtip').style.display='none';
 		}
 	},100);
 }
@@ -3816,7 +3811,7 @@ EOT;
 <table width="100%" cellspacing="0" cellpadding="5">
 <tbody>
 	<tr>
-		<th onmousedown="read.move(event);" style="cursor: move; font-weight:bold;" colspan="2" class="h"><span onclick="closep();" style="margin-top: 2px; cursor: pointer;" class="fr"><img src="$imgpath/close.gif" /></span>支付费用</th>
+		<th onmousedown="read.move(event);" style="cursor: move; font-weight:bold;" colspan="2" class="h"><span class="adel" onclick="closep();">close</span>支付费用</th>
 	</tr>
 	<tr>
 		<td style="padding:0; width:330px;">

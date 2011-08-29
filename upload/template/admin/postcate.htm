@@ -75,8 +75,6 @@ EOT;
     <button type="submit" value="提 交">提 交</button>
     </span></span> </div>
 </form>
-<script type="text/javascript" language="JavaScript" src="js/global.js"></script>
-<script type="text/javascript" language="JavaScript" src="js/pw_ajax.js"></script>
 <!--
 EOT;
 } elseif ($action == 'postcate') {print <<<EOT
@@ -104,7 +102,7 @@ EOT;
 -->
   </select>
 </h2>
-<script language="JavaScript">
+<script type="text/javascript">
 function tovalue(pcid) {
 	window.location.href = '$admin_file?adminjob=postcate&action=postcate&pcid='+pcid;
 }
@@ -124,7 +122,7 @@ if($pcid){print<<<EOT
     <a id="show" href="javascript:;" onclick="showasearch()">高级搜索</a>
 </div>
 </form>
-<script language="JavaScript">
+<script type="text/javascript">
 function showasearch(id){
 	if (getObj('asearch').style.display == 'none') {
 		getObj('asearch').style.display = '';
@@ -181,7 +179,7 @@ EOT;
   <div class="cc mb10">$pages</div>
   <div class="mb10 tac">
 	<span class="bt2"><span><button type="button" onclick="CheckAll(document.FORM)">全 选</button></span></span>
-	<input type="submit" onclick="if(!confirm('是否确认删除帖子？')){return false;}" value="删 除" class="bt3" />
+	<input type="submit" onclick="return hasChecked(document.FORM);" value="删 除" class="bt3" />
 	<input type="submit" name="sendmsg" onclick='CheckAll(this.form)' value="群发消息" class="bt3" />
 
   	<!--span class="bt"><span><button type="button" name="chkall" onclick='CheckAll(this.form)'>全 选</button></span></span>
@@ -189,11 +187,25 @@ EOT;
     <span class="bt"><span><button type="submit" name="sendmsg" value="1">群发消息</button></span></span-->
 </div>
 </form>
+<script>
+function hasChecked(obj) {
+	var flag = false;
+	for (var i=0; i<obj.elements.length-1; i++){
+		var e = obj.elements[i];
+		if(e.type=='checkbox' && e.checked == true) flag = true;
+	}
+	if (flag == false) {
+		showDialog('error', '没有选择操作对象', 2);
+		return false;
+	} else {
+		return confirm('是否确认删除帖子？');
+	}
+}
+</script>
 <!--
 EOT;
 }elseif($_POST['sendmsg']){print<<<EOT
 -->
-<script type="text/javascript" LANGUAGE="JavaScript" src="js/core/core.js"></script>
 <div class="nav3 mb10">
     <ul class="cc">
       <li><a href="$basename">团购</a></li>
@@ -226,9 +238,9 @@ print <<<EOT
   </table>
   </div>
 
-<script type="text/javascript" language="JavaScript" src="js/pw_ajax.js"></script>
-<script language="JavaScript" src="js/post.js"></script>
-<script language="JavaScript" src="js/global.js"></script>
+<script type="text/javascript" src="js/pw_ajax.js"></script>
+<script type="text/javascript" src="js/post.js"></script>
+<script type="text/javascript" src="js/global.js"></script>
 
 <div id="menu_face" class="menu" style="display:none;"></div>
 <div id="menu_generalface" class="menu" style="display:none;"></div>
@@ -300,8 +312,8 @@ EOT;
 </div>
 <h3 class="h1"><span class="fl mr10">修改 <span class="s2">{$postcatedb[$pcid][name]}</span> 字段</span><a href="javascript:;" onclick="sendmsg('$ajax_basename_add','pcid=$pcid',this.id);" id="addfield" class="btn_add fl"><i>添加字段</i></a></h3>
 
-<script type="text/javascript" language="JavaScript" src="js/global.js"></script>
-<script type="text/javascript" language="JavaScript" src="js/pw_ajax.js"></script>
+<script type="text/javascript" src="js/global.js"></script>
+<script type="text/javascript" src="js/pw_ajax.js"></script>
 <!--
 EOT;
 if(empty($step)){print<<<EOT
@@ -432,7 +444,7 @@ $topichtml
 EOT;
 }print<<<EOT
 -->
-<script language="JavaScript">
+<script type="text/javascript">
 var basename = '$basename';
 var pcid = '$pcid';
 var ajax_basename_edit = '$ajax_basename_edit';
@@ -488,46 +500,48 @@ function editIndex(pcid,fieldid,type) {
 }
 
 function ShowType(id){
-	if(id == 'radio' || id == 'checkbox' || id == 'select') {
-		getObj('content_des').innerHTML = '在“选项内容”中设置选项，一个选项一行，格式为“1=***” ，“=”后为要显示的内容，确保“=”前的数字不是相同的';
-	} else if(id == 'number') {
-		getObj('content_des').innerHTML = '数值范围表示发表帖子时，输入框中填写的数字必须在此设置的范围内，留空则不限制';
-	} else if(id == 'calendar') {
-		getObj('content_des').innerHTML = '发帖和搜索时弹出日期选择框';
-	} else if(id == 'text') {
-		getObj('content_des').innerHTML = '输入框，最大字节长度为255';
-	} else if(id == 'url') {
-		getObj('content_des').innerHTML = '该字段内容浏览时会显示成超链接，最大字节长度为255';
-	} else if(id == 'email') {
-		getObj('content_des').innerHTML = '可以控制输入内容符合电子邮件格式，最大字节长度为255';
-	} else if(id == 'textarea') {
-		getObj('content_des').innerHTML = '文本输入框，最大字节长度为6500';
-	} else if (id == 'img') {
-		getObj('content_des').innerHTML = '可以输入图片链接，浏览时将在图片播放器中显示，最大字节长度为255';
-	} else if (id == 'upload') {
-		getObj('content_des').innerHTML = '可上传图片，浏览时将在图片播放器中显示';
-	} else if(id == 'range') {
-		getObj('content_des').innerHTML = '发帖时表现形式为文本框，但搜索时显示为两个文本框，输入最大值和最小值后，可以搜索出范围内的记录。比如发帖时输入100，搜索时输入“1-150”可以查询到结果';
-	}
-
-	getObj('content_box').style.display = '';
-
-	if (id == 'radio' || id == 'checkbox' || id == 'select'){
-		getObj('content_rules').style.display = '';
-		getObj('content_number').style.display = 'none';
-	} else if (id == 'number'){
-		getObj('content_rules').style.display = 'none';
-		getObj('content_number').style.display = '';
-	} else {
-		getObj('content_rules').style.display = 'none';
-		getObj('content_number').style.display = 'none';
-	}
-
-	for (var i=0;i<getObj('fieldtype').options.length ; i++ ){
-		if(id==getObj('fieldtype').options[i].value) {
-			getObj('fieldtype').options[i].selected = true;
+	try {
+		if(id == 'radio' || id == 'checkbox' || id == 'select') {
+			getObj('content_des').innerHTML = '在“选项内容”中设置选项，一个选项一行，格式为“1=***” ，“=”后为要显示的内容，确保“=”前的数字不是相同的';
+		} else if(id == 'number') {
+			getObj('content_des').innerHTML = '数值范围表示发表帖子时，输入框中填写的数字必须在此设置的范围内，留空则不限制';
+		} else if(id == 'calendar') {
+			getObj('content_des').innerHTML = '发帖和搜索时弹出日期选择框';
+		} else if(id == 'text') {
+			getObj('content_des').innerHTML = '输入框，最大字节长度为255';
+		} else if(id == 'url') {
+			getObj('content_des').innerHTML = '该字段内容浏览时会显示成超链接，最大字节长度为255';
+		} else if(id == 'email') {
+			getObj('content_des').innerHTML = '可以控制输入内容符合电子邮件格式，最大字节长度为255';
+		} else if(id == 'textarea') {
+			getObj('content_des').innerHTML = '文本输入框，最大字节长度为6500';
+		} else if (id == 'img') {
+			getObj('content_des').innerHTML = '可以输入图片链接，浏览时将在图片播放器中显示，最大字节长度为255';
+		} else if (id == 'upload') {
+			getObj('content_des').innerHTML = '可上传图片，浏览时将在图片播放器中显示';
+		} else if(id == 'range') {
+			getObj('content_des').innerHTML = '发帖时表现形式为文本框，但搜索时显示为两个文本框，输入最大值和最小值后，可以搜索出范围内的记录。比如发帖时输入100，搜索时输入“1-150”可以查询到结果';
 		}
-	}
+
+		getObj('content_box').style.display = '';
+
+		if (id == 'radio' || id == 'checkbox' || id == 'select'){
+			getObj('content_rules').style.display = '';
+			getObj('content_number').style.display = 'none';
+		} else if (id == 'number'){
+			getObj('content_rules').style.display = 'none';
+			getObj('content_number').style.display = '';
+		} else {
+			getObj('content_rules').style.display = 'none';
+			getObj('content_number').style.display = 'none';
+		}
+
+		for (var i=0;i<getObj('fieldtype').options.length ; i++ ){
+			if(id==getObj('fieldtype').options[i].value) {
+				getObj('fieldtype').options[i].selected = true;
+			}
+		}
+	} catch(e){}
 }
 </script>
 <!--
@@ -620,7 +634,7 @@ EOT;
     <span class="btn"><span><button type="submit">提 交</button></span></span>
   </div>
 </form>
-<script language="JavaScript">
+<script type="text/javascript">
 function tovalue(pcid) {
 	window.location.href = '$admin_file?adminjob=postcate&action=rightset&pcid='+pcid;
 }
@@ -802,7 +816,7 @@ EOT;
     <span class="bt2"><span><button type="button" onclick="closep();">取 消</button></span></span>
 </div>
 </form>
-<script language="JavaScript">
+<script type="text/javascript">
 var type = '$type';
 setTimeout(function(){ShowType(type);},300);
 </script>

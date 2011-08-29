@@ -5,7 +5,7 @@ print <<<EOT
 <div class="contUser" id="content">
 <table width="100%"><tr><td height="600" valign="top">
 	<div class="p15">
-	<h4 class="site mb5"><span>通知</span>(共{$noticeAllCount}条，<a href="$normalUrl&action=unread" class="s2"><b>{$notReadCount}</b>条未读通知</a>)</h4> 
+	<h4 class="site mb5"><span>通知</span>(共{$noticeAllCount}条，<a href="$normalUrl&action=unread"><b>{$notReadCount}</b>条未读通知</a>)</h4> 
 <!--
 EOT;
 if ($action == 'info' || $action == 'next' || $action == 'previous') {
@@ -97,11 +97,10 @@ print <<<EOT
                     <em class="gray">{$value[modified_time_format]}</em>
                 </td>
                 <td class="value">
-                	<h4 $_b><a href="$normalUrl&action=info&page=$page&smstype=$value[typeid]&rid={$value[rid]}&mid={$value[mid]}&redirect={$redirect}">{$value[title]}</a></h4>  	
+                	<h4 $_b><a class="mr5" href="$normalUrl&action=info&page=$page&smstype=$value[typeid]&rid={$value[rid]}&mid={$value[mid]}&redirect={$redirect}">{$value[title]}</a><em class="s2 fn">{$_tip}</em></h4>  	
                     <p class="lh_18">{$content}</p>
-                    <em class="s2">{$_tip}</em>    
                 </td>
-                <td class="del"><a id="del_{$value[rid]}" href="javascript:;" onclick="MC.del('$value[rid]','notice','$action','$page')" class="adel">删除</a></td>
+                <td class="del"><a id="del_{$value[rid]}" href="javascript:;" onclick="pwConfirm('确定要删除该消息?', this, function(){MC.del('$value[rid]','notice','$action','$page')})" class="adel">删除</a></td>
 			</tr>
 <!--
 EOT;

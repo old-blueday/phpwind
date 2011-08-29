@@ -5,8 +5,8 @@ $tmpVerify = GetVerify($onlineip.$GLOBALS['winddb']['regdate'].$fid.$tid);
 if(strlen($readdb[0][subject])>77) $readdb[0][subject] = substr($readdb[0][subject],0,77);
 print <<<EOT
 -->
-<link rel="stylesheet" type="text/css" href="$imgpath/post/fast_editor.css" media="all" />
-<link rel="stylesheet" type="text/css" href="js/breeze/editor/style/style.css" />
+<link rel="stylesheet" href="$imgpath/post/fast_editor.css" />
+<link rel="stylesheet" href="js/breeze/editor/style/style.css" />
 <form name="FORM" method="post" action="{$basename}a=reply&cyid=$cyid" enctype="multipart/form-data" onsubmit="return checkpost(document.FORM);" id="anchor">
 <input type="hidden" name="step" value="3" />
 <input type="hidden" name="tid" value="$tid" />
@@ -23,23 +23,23 @@ EOT;
 if ($winduid) {print<<<EOT
 -->
                 <p class="gName mb5 cc">
-					<a href="{$db_userurl}$winduid" target="_blank" class="mr5 fl">$windid</a>
 <!--
 EOT;
-	if ($db_showonline) {
-		if (checkOnline($winddb['thisvisit'])) {print <<<EOT
+if($db_showonline){
+$gender = $read['gender'] == 2 ? 'women' : 'man';
+if(checkOnline($read['thisvisit'])){print <<<EOT
 -->
-					<span class="card-online" title="在线">在线</span>
+					<span class="{$gender}_ol mr5" title="在线" alt="在线">在线</span>
 <!--
 EOT;
-		} else {print<<<EOT
+}else{print <<<EOT
 -->
-					<span class="card-offline" title="离线">离线</span>
+					<span class="{$gender}_unol mr5" title="离线" alt="离线">离线</span>
 <!--
 EOT;
-		}
-	}print <<<EOT
+}}print <<<EOT
 -->
+					<a href="{$db_userurl}$winduid" target="_blank" class="mr5">$windid</a>
 				</p>
 <!--
 EOT;
@@ -70,12 +70,12 @@ print <<<EOT
 					<div class="B_tar">
 						<a href="javascript:gotoEditor();" class="fr" hidefocus="true" id="gotoedit">进入高级模式</a>
 					</div>
-					<ul><li id="edit_toolbar">
-						<a href="javascript:;" class="B_ico" title="加粗" id="wy_boldIcon" hidefocus="true" style="display:block"><div class="B_boldIcon B_do"></div></a>
-						<div class="B_icoDown" style="display: block;" id="wy_foreColor"><a href="javascript://" class="B_ico"><div class="B_foreColor B_do1" title="文字颜色"><span style="background-color: rgb(255, 0, 0);"></span>文字颜色</div></a><em class="B_do1"></em></div>
-						<a href="javascript:;" class="B_ico" title="插入链接" id="wy_linkIcon" hidefocus="true" style="display:block"><div class="B_linkIcon B_do"></div></a>
-						<a href="javascript:;" class="B_icoBig" title="图片" id="wy_photoBtn" hidefocus="true" style="display:block"><div class="B_photoIcon B_do"></div></a>
-						<a href="javascript:;" class="B_icoBig" title="附件" id="wy_fileBtn" hidefocus="true" style="display:block"><div class="B_fileIcon B_do"></div></a>
+					<ul><li class="edit_toolbar">
+						<a href="javascript:;" class="B_ico" title="加粗" data-type="wy_boldIcon" hidefocus="true" style="display:block"><div class="B_boldIcon B_do"></div></a>
+						<div class="B_icoDown" style="display: block;" data-type="wy_foreColor"><a href="javascript://" class="B_ico"><div class="B_foreColor B_do1" title="文字颜色"><span style="background-color: rgb(255, 0, 0);"></span>文字颜色</div></a><em class="B_do1"></em></div>
+						<a href="javascript:;" class="B_ico" title="插入链接" data-type="wy_linkIcon" hidefocus="true" style="display:block"><div class="B_linkIcon B_do"></div></a>
+						<a href="javascript:;" class="B_icoBig" title="图片" data-type="wy_photoBtn" hidefocus="true" style="display:block"><div class="B_photoIcon B_do"></div></a>
+						<a href="javascript:;" class="B_icoBig" title="附件" data-type="wy_fileBtn" hidefocus="true" style="display:block"><div class="B_fileIcon B_do"></div></a>
 					</li></ul>
 				</div>
 				<textarea id="textarea" name="atc_content" style="width:100%;height:140px;padding:0;margin:0;border:0 none;overflow:auto;"></textarea>
@@ -84,22 +84,16 @@ print <<<EOT
 <!--
 EOT;
 if ($o_groups_p_gdcheck) {
-	$gdSize = explode("\t",$db_gdsize);
+$checkCode = L::loadClass('checkcode', 'site');
+$checkCodeString = $checkCode->getCheckCodeTemplate();
 print <<<EOT
 -->
 				<dl class="cc">
-					<dt class="dtA">认证码: </dt>
+					<dt class="dtA">验证码: </dt>
 					<dd>
 						<input class="input" type="text" name="gdcode" size="5" tabindex="6" onfocus="showgd();" id="fs_gdcode"/>
-						<div id="ckcode" style="display:none">
-<script type="text/javascript" src="js/pw_authcode.js"></script>
-<script>
-var flashWidth = "$gdSize[0]";
-var flashHeight = "$gdSize[1]";
-var gdtype = $db_gdtype;
-showGdCode();
-</script>
-						</div>
+						<div id="ckcode" style="display:none"></div>
+$checkCodeString
 					</dd>
 				</dl>
 <!--
@@ -114,7 +108,7 @@ if ($o_groups_p_qcheck && $db_question) {
 	} else {
 		$question = $qkey<0 ? getMachineQuestion_1() :  $db_question[$qkey];
 	}
-	$q_a = $question.($showq && $qkey>0?" 正确答案:".$db_answer[$qkey] : '');
+	$q_a = $question.($showq && $qkey>0?" （答案：".$db_answer[$qkey] . '）' : '');
 print <<<EOT
 -->
 <style type="text/css">
@@ -154,10 +148,16 @@ EOT;
 <!--
 EOT;
 $imageConfigTabs = array();
-($db_allowupload && $_G['allowupload']) && $imageConfigTabs[] = 'local';
+($db_allowupload && $_G['allowupload'] && (!$_G['allownum'] || $winddb['uploadnum'] < $_G['allownum'])) && $imageConfigTabs[] = 'local';
 ($db_phopen && $winduid) && $imageConfigTabs[] = 'album';
 $imageConfigTabs[] = 'network';
 $imageConfigTabs = "'" . implode("','", $imageConfigTabs) . "'";
+//max attachnum
+if ($_G['allownum'] > 0 && $_G['allownum'] - $winddb['uploadnum']<$db_attachnum){
+	$maxAttachnum = $_G['allownum'] - $winddb['uploadnum'];
+} else {
+	$maxAttachnum = $db_attachnum;
+}
 print <<<EOT
 -->
 <script type="text/javascript">
@@ -169,7 +169,7 @@ var bbsurl ="{$B_url}";
 var BREEZE_BASE_PATH = getBaseUrl() + 'js/breeze/';
 var editor = null;
 var attachConfig = {
-		'attachnum' : parseInt('$db_attachnum'),
+		'attachnum' : parseInt('$maxAttachnum'),
 		'list' : {},
 		'postData' : {fid : '$fid'},
 		'filetype' : $attachAllow
@@ -184,7 +184,7 @@ function loadEditor(e) {
 	var o = e.srcElement || e.target;
 	if (o.id == 'gotoedit') return;
 
-	$('fp_editor').onclick = '';
+	getObj('fp_editor').onclick = '';
 	loadjs('js/breeze/core/base.js', '', '', function() {
 		B.require('editor.editor', 'editor.ubb', function(B){
 			editor = B.editor(B.$('#textarea'), 'edit_toolbar', 'boldIcon foreColor linkIcon photoBtn fileBtn',{'currentMode' : 'UBB'});
@@ -226,8 +226,8 @@ function gotoEditor() {
 </script>
 </div>
 <script src="$db_htmdir/js/face.js"></script>
-<script language="JavaScript" src="js/post.js"></script>
-<script language="javascript">
+<script type="text/javascript" src="js/post.js"></script>
+<script type="text/javascript">
 document.FORM.Submit.disabled = false;
 var charset = '$db_charset';
 var stylepath = '$stylepath';
@@ -240,20 +240,20 @@ PwFace.init('face_tab', 'face_main', 3, 16);
  }*/
 function checkpost(obj){
 	if(obj.atc_title.value==""){
-		showDialog("error","话题回复<span class='warnFontStyle'>标题</span>不能为空",2);
+		showDialog("error","话题回复<span class='s1'>标题</span>不能为空",2);
 		obj.atc_title.focus();
 		return false;
 	} else if(strlen(obj.atc_title.value)>$db_titlemax){
-		showDialog("error","话题回复<span class='warnFontStyle'>标题</span>不能超过 <span class='warnFontStyle'>$db_titlemax</span> 个字节",2);
+		showDialog("error","话题回复<span class='s1'>标题</span>不能超过 <span class='s1'>$db_titlemax</span> 个字节",2);
 		obj.atc_title.focus();
 		return false;
 	}
 	if(strlen(obj.atc_content.value)<$db_postmin){
-		showDialog("error","话题回复<span class='warnFontStyle'>内容</span>不能少于 <span class='warnFontStyle'>$db_postmin </span>个字节",2);
+		showDialog("error","话题回复<span class='s1'>内容</span>不能少于 <span class='s1'>$db_postmin </span>个字节",2);
 		obj.atc_content.focus();
 		return false;
 	} else if(strlen(obj.atc_content.value)>$db_postmax){
-		showDialog("error","话题回复<span class='warnFontStyle'>内容</span>不能大于 <span class='warnFontStyle'>$db_postmax </span>个字节",2);
+		showDialog("error","话题回复<span class='s1'>内容</span>不能大于 <span class='s1'>$db_postmax </span>个字节",2);
 		obj.atc_content.focus();
 		return false;
 	}
@@ -305,7 +305,7 @@ function checklength(theform,postmaxchars){
 	showDialog("warning",'您的信息已有字节数: '+strlen(theform.atc_content.value)+' 字节'+message);
 }
 function addsmile(NewCode){
-    $('textarea').value += ' [s:'+NewCode+'] ';
+    getObj('textarea').value += ' [s:'+NewCode+'] ';
 }
 window.onbeforeunload = function() {
 	saveData('msg', document.FORM.atc_content.value);

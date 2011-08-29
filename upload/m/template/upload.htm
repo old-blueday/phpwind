@@ -1,0 +1,40 @@
+<!--<?php
+defined('W_P') or exit('Forbidden');print <<<EOT
+-->
+<div class="navigator"><a href="#anch-end"><img alt="$db_bbsname" src="$wapImages/x.gif" /></a><a href="index.php?a=list">$db_bbsname</a>&gt;<a href="index.php?a=forum&fid=$fid">$pwforum->name</a></div>
+<div class="post_title"><strong>给帖子附加图片</strong></div>
+<div class="post_form">
+  <form id="form1" method="post" action="index.php?a=upload" enctype = "multipart/form-data">
+  <input type="hidden" name="tid" value="$tid">
+  <input type="hidden" name="fid" value="$fid">
+  <input type="hidden" name="step" value="2">
+    <p>
+      <label>1. 选择一个你想上传的图片：<br />
+         <input name="attachment_" type="file" size="20" />
+      </label>
+    </p>
+    <p>     2. 点击&quot;上传图片&quot;按钮。</p>
+<!--
+EOT;
+if($atthtml){
+print <<<EOT
+-->
+    <p> 	3. 已经存在的附件，去掉选中表示删除此附件</p>
+    <p>
+    	$atthtml
+    </p>
+<!--
+EOT;
+}print <<<EOT
+-->
+    <p>
+      <label>
+        <input type="submit" name="button" id="button" value="上传图片" />
+      </label>
+    </p>
+</form>
+</div>
+<div class="post_reply"><a href="index.php?a=read&tid=$tid&amp;fid=$fid">&laquo;返回帖子</a></div>
+<!--
+EOT;
+?>-->

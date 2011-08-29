@@ -208,6 +208,7 @@ class PW_Job {
 			$lists = array();
 			$lists['id'] = $job['id'];
 			$lists['title'] = $job['title'];
+			$lists['step'] = $job['step'];
 			$lists['description'] = html_entity_decode($job['description']);
 			$lists['period'] = ($job['period']) ? '每隔' . $job['period'] . '小时可以申请一次' : "一次性任务";
 			$reward = '';
@@ -219,6 +220,7 @@ class PW_Job {
 			$isFactor = (isset($job['factor']) && $job['factor'] != '') ? true : false;
 			if ($isFactor) {
 				$factor = unserialize($job['factor']);
+				$lists['factor'] = $factor;
 			}
 			$lists['timelimit'] = (isset($factor['limit']) && $factor['limit'] != "") ? $factor['limit'] : "不限制";
 			/*前置任务*/
@@ -254,6 +256,16 @@ class PW_Job {
 						$lists['btn'] = $this->getJobBtn($job['id'], "start", $link);
 						($job['finish'] == 0) && $lists['qbtn'] = $this->getJobBtn($job['id'], "quit", $info); /*是否可放弃*/
 					} elseif ($status == 1) {
+						if ($factor && isset($factor['limit']) && $factor['limit'] > 0) {
+							$jober = $this->getJoberByJobId($userId, $job['id']);
+							if ($jober['last'] + $factor['limit'] * $this->_hour < $this->_timestamp) {
+								$this->updateJober(array(
+									'status' => 5
+								), $jober['id']);
+								$this->reduceJobNum($userid);
+								continue;
+							}
+						}
 						$lists['btn'] = $this->getJobBtn($job['id'], "start_old", $link);
 						($job['finish'] == 0) && $lists['qbtn'] = $this->getJobBtn($job['id'], "quit", $info);
 					} elseif ($status == 2) {
@@ -379,25 +391,21 @@ class PW_Job {
 			$jobIds[] = $job['id'];
 			$tmp[$job['id']] = $job;
 		}
-		$jober = $this->getJoberByJobIds($userid, $jobIds);
-		if ($jober) {
+		$jobers = $this->getInProcessJobersByUserIdAndJobIds($userid, $jobIds);
+		if (!S::isArray($jobers)) return false;
+		$isSuccess = false;
+		foreach ($jobers as $jober) { //完成所有已经开始的并且符合条件的任务
 			//任务完成
-			if ($jober['status'] >= 2) {
-				return array();
-			}
+			if ($jober['status'] >= 2) continue;
 			$job = $tmp[$jober['jobid']]; /*当前任务*/
-			if ($jober['total'] > 0 && $job['period'] < 1) {
-				return array();
-			}
+			if ($jober['total'] > 0 && $job['period'] < 1) continue;
 			$current = $next = $this->_timestamp;
 			/*是否周期性任务*/
 			if (isset($job['period']) && $job['period'] != 0) {
 				$next = $current + $job['period'] * $this->_hour;
 			}
 			$status = $this->jobFinishController($job, $jober, $factor); /*任务完成状态*/
-			if ($status == 0) {
-				return array();
-			}
+			if ($status == 0) continue;
 			$data = array();
 			//($status > 2 ) &&  $data['last'] = $current;
 			$data['current'] = $jober['current'] + 1; /*当前步数*/
@@ -405,8 +413,11 @@ class PW_Job {
 			$data['next'] = $next; /*周期性任务下一个时间开始点*/
 			$data['status'] = $status;
 			$this->updateJober($data, $jober['id']);
+			$isSuccess = true;
 		}
+		return $isSuccess;
 	}
+	
 	function jobFinishController($job, $jober, $factor = array()) {
 		if (!$factor) {
 			return 2; /*为空表示直接完成任务*/
@@ -942,31 +953,8 @@ class PW_Job {
 	/*勋章奖励*/
 	function jobRewardMedal($userid, $reward) {
 		$medalId = $reward['type'];
-		//检查用户是否存在同样勋章
-		$userService = $this->_getUserService();
-		$user = $userService->get($userid);
-		if (!$user) {
-			return false;
-		}
-		
-		$medals = array();
-		if (isset($user['medals'])) {
-			$medals = explode(",", $user['medals']);
-			if (in_array($medalId, $medals)) {
-				return true;
-			}
-			$medals[] = $medalId;
-			$medalIds = implode(",", $medals);
-		} else {
-			$medalIds = $medalId;
-		}
-		$userService->update($userid, array('medals' => $medalIds));
-		
-		$medaluser = array(
-			'uid' => $userid,
-			'mid' => $medalId
-		);
-		$this->_db->update("INSERT INTO pw_medaluser SET " . S::sqlSingle($medaluser));
+		$medalService = L::loadClass('medalservice','medal');
+		$medalService->awardMedal($userid,$medalId);
 	}
 	/*用户组奖励*/
 	function jobRewardUsergroup($userid, $reward) {
@@ -1148,6 +1136,12 @@ class PW_Job {
 		$joberDao = $this->_getJoberDao();
 		return $joberDao->getsByJobIds($userid, $jobIds);
 	}
+	
+	function getInProcessJobersByUserIdAndJobIds($userid, $jobIds) {
+		$joberDao = $this->_getJoberDao();
+		return $joberDao->getInProcessJobersByUserIdAndJobIds($userid, $jobIds);
+	}
+	
 	function getJobersByJobIds($userid, $ids) {
 		$joberDao = $this->_getJoberDao();
 		return $joberDao->getJobersByJobIds($userid, $ids);
@@ -1424,7 +1418,7 @@ class PW_Job {
 
 			case "medal":
 				$title = explode(" ", $reward['information']);
-				return array('prefix'=>$title[0], 'title'=>$title[1], 'suffix'=>$title[2], 'num'=>$reward['day'] * $num, 'unit'=>'天');
+				return array('prefix'=>$title[0], 'title'=>$title[1], 'suffix'=>$title[2]);
 				break;
 
 			case "usergroup":
@@ -1457,7 +1451,7 @@ class PW_Job {
 
 			case "medal":
 				$medals = $this->getMedals();
-				return "可获得勋章 " . $medals[$reward['type']] . " 有效期 ";
+				return "可获得勋章 " . $medals[$reward['type']];
 				break;
 
 			case "usergroup":
@@ -1518,11 +1512,13 @@ class PW_Job {
 	* 获取勋章
 	*/
 	function getMedals() {
-		$query = $this->_db->query("SELECT * FROM pw_medalinfo");
+		$medalService = L::loadClass('MedalService', 'medal'); /* @var $medalService PW_MedalService */
+		$medials = $medalService->getAllOpenManualMedals();
 		$result = array();
-		while ($rs = $this->_db->fetch_array($query)) {
-			$result[$rs['id']] = $rs['name'];
+		foreach ($medials as $v) {
+			$result[$v['medal_id']] = $v['name'];
 		}
+	
 		return $result;
 	}
 	/*
@@ -1634,16 +1630,8 @@ class PW_Job {
 		return R_P . "data/bbscache/jobs.php";
 	}
 	function checkIsOpenMedal() {
-		$fileName = D_P . 'data/bbscache/md_config.php';
-		if (!is_file($fileName)) {
-			return false;
-		}
-		//* @include pwCache::getPath(S::escapePath($fileName));
-		extract(pwCache::getData(S::escapePath($fileName), false));
-		if ($md_ifopen) {
-			return true;
-		}
-		return false;
+		global $db_md_ifopen;
+		return $db_md_ifopen ? true:false;
 	}
 	function checkIsOpenInviteCode() {
 		$fileName = D_P . 'data/bbscache/dbreg.php';

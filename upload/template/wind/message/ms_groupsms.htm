@@ -5,7 +5,7 @@ print <<<EOT
 <div class="contUser" id="content">
 <table width="100%"><tr><td height="600" valign="top">
 <div class="p15">
-	<h4 class="site mb5"><span>群消息</span>(共{$groupsmsAllCount}条，<a href="$normalUrl&action=unread" class="s2"><b>{$notReadCount}</b>条未读消息</a>)</h4>
+	<h4 class="site mb5"><span>群消息</span>(共{$groupsmsAllCount}条，<a href="$normalUrl&action=unread"><b>{$notReadCount}</b>条未读消息</a>)</h4>
 <!--
 EOT;
 if($action == 'info' || $action == 'up' || $action == 'down'){print <<<EOT
@@ -130,9 +130,8 @@ print <<<EOT
 		<em><span title="$value[modified_time]">{$value[modified_time_format]}</span></em>
 		</td>
 		<td class="value">
-		<h4 $_b><a href="$normalUrl&action=info&smstype={$value[typeid]}&page=$page&mid={$value[mid]}&rid={$value[rid]}">{$value[title]}</a></h4>
+		<h4 $_b><a class="mr5" href="$normalUrl&action=info&smstype={$value[typeid]}&page=$page&mid={$value[mid]}&rid={$value[rid]}">{$value[title]}</a><em class="s2 fn">{$_tip}</em></h4>
 		<p class="lh_18">{$value[content]}</p>
-        <em class="s2">{$_tip}</em>
 		</td>
 		<td class="del">
 <!--
@@ -158,7 +157,7 @@ print <<<EOT
 EOT;
 }else{print <<<EOT
 -->
-		<a id="del_{$value[rid]}" href="javascript:;" onclick="MC.group('确定要屏蔽该条多人消息吗?','action=shield&mid=$value[mid]&rid=$value[rid]','$type','$page','showmessageTip')" title="接收但不提醒">屏蔽</a>
+		<a id="del_{$value[rid]}" href="javascript:;" onclick="MC.group('确定要屏蔽该条多人消息吗?','action=shield&mid=$value[mid]&rid=$value[rid]','$type','$page','showmessageTip')" title="接收但不提醒" alt="接收但不提醒">屏蔽</a>
 <!--
 EOT;
 }}print <<<EOT

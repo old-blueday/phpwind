@@ -27,7 +27,7 @@ EOT;
 </div>
 <div class="admin_info mb10">
     <h3 class="h1"><b>提示信息</b></h3>
-    <div class="legend">本功能在恢复备份数据的同时,将覆盖原有数据,请确定是否需要恢复,以免造成数据损失<br />数据恢复功能只能恢复由当前版本导出的数据文件,其他软件导出格式可能无法识别<br />如果一个备份文件有多个分卷，您只需任选一个备份文件导入，程序会自动导入其他分卷</div>
+    <div class="legend">本功能在恢复备份数据的同时,将覆盖原有数据,请确定是否需要恢复,以免造成数据损失<br />数据恢复功能只能恢复由当前版本导出的数据文件,其他软件导出格式可能无法识别<br />如果一个备份文件有多个分卷，您只需任选一个备份文件导入，程序会自动导入其他分卷<br />选择类型为目录的备份文件后，使用“导入指定表的备份数据”功能，就可以只导入这个表的备份数据</div>
 </div>
 <!--
 EOT;
@@ -69,25 +69,57 @@ EOT;
 <h2 class="h1">
 <!--
 EOT;
-if($type == 'pw'){print <<<EOT
+if($type == 'pw'){
+$operateTips = 'phpwind自带数据表';
+$pwStyle = 'style="color:#008800"';
+print <<<EOT
 -->
-phpwind数据库表
+phpwind自带数据表
 <!--
 EOT;
-} elseif ($type == 'other'){print <<<EOT
+} elseif ($type == 'other'){
+$operateTips = '非phpwind自带数据表';
+$NotPwStyle = 'style="color:#008800"';
+print <<<EOT
 -->
-其他数据库表
+非phpwind自带数据表
 <!--
 EOT;
-} else {print <<<EOT
+} else {
+$operateTips = '数据表(包括phpwind自带数据表与非phpwind自带数据表)';
+$allStyle = 'style="color:#008800"';
+print <<<EOT
 -->
-数据库表
+数据表
 <!--
 EOT;
 }print <<<EOT
 -->
-<span class="linka"><a href="$basename">所有</a> / <a href="$basename&t=pw">PW表</a> / <a href="$basename&t=other">非PW表</a></span></h2>
+</h2>
 <div class="admin_table mb10">
+	<table width="100%" align=center cellspacing="0" cellpadding="0">
+		<tr class="tr1 vt">
+			<td class="td1">数据表类型</td>
+            <td class="td2">
+				<ul class="list_A list_80">
+					<li style="width:80px;"><a href="$basename" $allStyle>所有数据表</a></li>
+					<li style="width:120px;"><a href="$basename&t=pw" $pwStyle>phpwind自带数据表</a></li>
+					<li style="width:120px;"><a href="$basename&t=other" $NotPwStyle>非phpwind自带数据表</a></li>
+				</ul>
+			</td>
+        </tr>
+        <tr class="tr1 vt">
+			<td class="td1">要操作的数据表</td>
+            <td class="td2">
+				<ul class="list_A">
+					<li class="current"><input type="radio" name="tablerange" value="all" checked="checked" onclick="tableRange();" /> 全部$operateTips</li>
+					<li><input type="radio" name="tablerange" value="custom" onclick="getObj('tablelists').style.display=''" /> 自定义选择</li>
+				</ul>
+			</td>
+        </tr>
+    </table>
+</div>
+<div class="admin_table mb10" id="tablelists" style="display:none">
     <table width="100%">
         <tr class="tr2 vt td_bgB">
 			<td width="70"><span onclick="CheckAll(document.FORM)" class="cp">全选</span></td>
@@ -127,11 +159,48 @@ EOT;
 -->
 	</table>
 </div>
-<h2 class="h1"><b>分卷备份</b></h2>
+<h2 class="h1">数据备份选项</h2>
 <div class="admin_table mb10">
 	<table width="100%" align=center cellspacing="0" cellpadding="0">
+		<tr class="tr1 vt">
+			<td class="td1">数据插入方式</td>
+            <td class="td2">
+				<ul class="list_A cc">
+					<li><input type="radio" name="insertmethod" value="common" checked="checked" />普通方式</li>
+					<li><input type="radio" name="insertmethod" value="extend" />扩展插入</li>
+				</ul>
+				&nbsp;一条INSERT语句对应一个记录<br/>&nbsp;一条INSERT语句对应多个记录
+			</td>
+        </tr>
         <tr class="tr1 vt">
-            <td class="td2"><input type="text" class="input input_wa" name="sizelimit" value="2048">&nbsp;每个分卷文件长度</td>
+			<td class="td1">分卷备份</td>
+            <td class="td2"><input type="text" class="input input_wa" name="sizelimit" value="2048">&nbsp;每个分卷文件长度(单位: KB)</td>
+        </tr>
+		<tr class="tr1 vt">
+			<td class="td1">压缩备份文件</td>
+            <td class="td2">
+<!--
+EOT;
+if ($isZlibEnabled) {
+print <<<EOT
+-->
+				<ul class="list_A list_80 cc">
+					<li><input type="radio" name="compress" value="1" checked="checked" />开启</li>
+					<li><input type="radio" name="compress" value="0" />关闭</li>
+				</ul>
+				&nbsp;压缩备份文件以减少占用的空间
+<!--
+EOT;
+} else {
+print <<<EOT
+-->
+				Zlib库没有开启，无法使用压缩功能
+<!--
+EOT;
+}
+print <<<EOT
+-->
+			</td>
         </tr>
     </table>
 </div>
@@ -143,23 +212,81 @@ EOT;
 		<input type="radio" name="action" value="optimize" />&nbsp;优化&nbsp;
 	</p>
 	<p>
-	<span class="bt"><span><button type="button" onclick="CheckAll(document.FORM)">全 选</button></span></span>
+	<!--<span class="bt"><span><button type="button" onclick="CheckAll(document.FORM)">全 选</button></span></span>-->
 	<span class="btn"><span><button type="submit" onclick="return confirm('您确认要进行此操作吗?');">提 交</button></span></span></p>
+</div>
+</form>
+<script type="text/javascript">
+function tableRange() {
+	getObj('tablelists').style.display='none';
+	var elements = document.FORM.getElementsByTagName('input');
+	for (var i=0; i < elements.length; i++) {
+		if (elements[i].type != 'checkbox' || elements[i].name != 'tabledb[]') continue;
+		elements[i].checked = 'checked';
+		if (typeof elements[i].onclick == 'function') elements[i].onclick();
+	}
+	return true;
+}
+
+setTimeout(function(){checkAllConflict(document.FORM);}, 100);
+
+function checkAllConflict(form){
+	var ifcheck = null;
+	for (var i=0;i<form.elements.length-1;i++){
+		var e = form.elements[i];
+		if(e.type=='checkbox'){
+			if (ifcheck === null) ifcheck = !e.checked;
+			e.checked = ifcheck;
+			if (typeof e.onclick == 'function') e.onclick();
+		}
+	}
+	return ifcheck;
+}
+</script>
+<!--
+EOT;
+}}elseif($job=='bakin'){
+if(!$action || $action == 'listsubcat'){
+$action == 'listsubcat' && $isSub = '<input type="hidden" name="issub" value="1">';
+if ($action == 'listsubcat' && $showRecover) {
+print <<<EOT
+-->
+<h2 class="h1"><b>单表恢复</b></h2>
+<form method="post" action="$basename" name="FORM">
+<input type="hidden" name="action" value="singlerestore" />
+<input type="hidden" name="pre" value="$pre" />
+<div class="admin_table mb10">
+	<table width="100%" align=center cellspacing="0" cellpadding="0">
+		<tr class="tr1 vt">
+			<td class="td1">数据表</td>
+            <td class="td2">
+				<input class="input input_wa" type="text" name="tablename" value="" />
+			</td>
+			<td class="td2">
+			&nbsp;输入要恢复的数据表名称<br/> &nbsp;注意:该操作会将当前备份文件目录 ($pre) 中该表的数据恢复到数据库
+			</td>
+        </tr>
+    </table>
+</div>
+<div class="tac mb10">
+<p><span class="btn"><span><button type="submit">提 交</button></span></span></p>
 </div>
 </form>
 <!--
 EOT;
-}}elseif($job=='bakin'){
-if(!$action){print <<<EOT
+}
+print <<<EOT
 -->
 <form method="post" action="$basename" name="FORM">
 <input type="hidden" name="action" value="del">
+$isSub
 <h2 class="h1"><b>站点备份文件</b></h2>
 <div class="admin_table mb10">
     <table width="100%">
     <tr class="tr2 vt td_bgB">
 		<td width="30"><span onclick="CheckAll(document.FORM)" class="cp">全选</span></td>
         <td>目录名</td>
+		<td>类型</td>
         <td>版本</td>
         <td>备份时间</td>
         <td>卷号</td>
@@ -168,15 +295,17 @@ if(!$action){print <<<EOT
 <!--
 EOT;
 foreach($filedb as $id=>$bakfile){
+$fileLink = $bakfile['isdir'] ? ($bakfile['nosub'] ? "data/sqlback/$bakfile[pre]/$bakfile[name]" : "$basename&action=listsubcat&pre=$bakfile[name]") : "data/sqlback/$bakfile[name]";
 print <<<EOT
 -->
     <tr class="tr1 vt">
         <td class="td2"><input name="delfile[]" type="checkbox" value="$bakfile[name]" onclick="pwJsCheck(this)" /></td>
-        <td class="td2"><a href="data/sqlback/$bakfile[name]">$bakfile[name]</a></td>
+        <td class="td2"><a href="$fileLink">$bakfile[name]</a></td>
+		<td class="td2">$bakfile[type]</td>
         <td class="td2">$bakfile[version]</td>
         <td class="td2">$bakfile[time]</td>
         <td class="td2">$bakfile[num]</td>
-        <td class="td2"><a href="$basename&action=bakincheck&pre=$bakfile[pre]">导入</a></td>
+        <td class="td2"><a href="$basename&action=bakincheck&pre=$bakfile[pre]&isdir=$bakfile[isdir]">导入</a></td>
     </tr>
 <!--
 EOT;
@@ -190,7 +319,7 @@ EOT;
     <span class="bt"><span><button type="submit" name="delete" onclick="return checkset('此功能不可恢复,您确认要删除选中的备份文件！');">删除备份</button></span></span>
 </div>
 </form>
-<script language=JavaScript>
+<script type="text/javascript">
 function checkset(confirm_info)
 {
 	if(confirm(confirm_info)){
@@ -205,7 +334,7 @@ EOT;
 }elseif($action=='bakincheck'){
 print <<<EOT
 -->
-<form action="$basename&action=bakin&pre=$pre" method="post">
+<form action="$basename&action=bakin&pre=$pre&isdir=$isdir" method="post">
 <h2 class="h1"><b>提示信息</b></h2>
 <div class="admin_table mb10">
     <table width="100%" cellspacing="0" cellpadding="0">

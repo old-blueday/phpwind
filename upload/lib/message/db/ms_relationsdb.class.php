@@ -43,6 +43,12 @@ class PW_Ms_RelationsDB extends BaseDB {
 		$result = $this->_db->get_one("SELECT COUNT(*) as total FROM " . $this->_tableName . " force index(" . $this->_tableIndex . ") WHERE uid = " . $this->_addSlashes($userId) . " AND categoryid=" . $this->_addSlashes($categoryId) . " ORDER BY modified_time DESC LIMIT 1 ");
 		return $result['total'];
 	}
+	function countAllByUserId($userId) {
+		$userId = intval($userId);
+		if ($userId < 1) return array();
+		$query = $this->_db->query("SELECT COUNT(*) as total,categoryid FROM " . $this->_tableName . " WHERE uid = " . S::sqlEscape($userId) . " AND status = 1 GROUP BY categoryid");
+		return $this->_getAllResultFromQuery($query,'categoryid');
+	}
 	function getRelationsByStatus($userId, $categoryId, $status, $offset, $limit) {
 		$query = $this->_db->query("SELECT * FROM " . $this->_tableName . " WHERE uid = " . $this->_addSlashes($userId) . " AND categoryid=" . $this->_addSlashes($categoryId) . " AND status=" . $this->_addSlashes($status) . " ORDER BY modified_time DESC LIMIT " . $offset . "," . $limit);
 		return $this->_getAllResultFromQuery($query);

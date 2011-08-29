@@ -1,0 +1,20 @@
+<!--<?php
+defined('W_P') or exit('Forbidden');
+include_once (D_P . "data/bbscache/dbreg.php");
+if($windid){print <<<EOT
+-->
+$windid <a href="index.php?a=quit">[退出]</a>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+<a href="index.php?a=login">登录</a>
+<!--
+EOT;
+if($rg_allowregister && $db_wapregist){print <<<EOT
+-->
+ &#8226;
+<a href="index.php?a=register">注册</a>
+<!--
+EOT;
+}}?>-->

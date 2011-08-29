@@ -147,11 +147,11 @@ function getMessageIconByStatus($value) {
 	if ($value['status'] == '1') {
 		$_img = $winduid == $value['create_uid'] ? 'sendun.png' : 'reun.png';
 		$_b = 'class="b"';
-		$_tip = '(有新消息未读)';
+		$_tip = '(未读)';
 	} elseif ($value['status'] == 2) {
 		$_img = $winduid == $value['create_uid'] ? 'sendun.png' : 'reun.png';
 		$_b = 'class="b"';
-		$_tip = '(有新回复未读)';
+		$_tip = '(未读)';
 	} else {
 		$_img = $winduid == $value['create_uid'] ? 'sendread.png' : 'reread.png';
 		$_b = '';

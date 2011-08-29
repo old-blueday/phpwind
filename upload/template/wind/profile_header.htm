@@ -11,10 +11,10 @@
 <base id="headbase" href="$db_bbsurl/" />
 <link rel="stylesheet" type="text/css" href="$imgpath/wind-reset.css" />
 <link rel="stylesheet" type="text/css" href="$imgpath/user/style.css" />
-<script type="text/javascript" language="JavaScript" src="js/pw_ajax.js"></script>
-<script type="text/javascript" LANGUAGE="JavaScript" src="js/core/core.js"></script>
-<script type="text/javascript" LANGUAGE="JavaScript" src="js/core/tab.js"></script>
-<script language="JavaScript">
+<script type="text/javascript" src="js/pw_ajax.js"></script>
+<script type="text/javascript" src="js/core/core.js"></script>
+<script type="text/javascript" src="js/core/tab.js"></script>
+<script>
 var imgpath = '$imgpath';
 var verifyhash = '$verifyhash';
 var winduid = '$winduid';
@@ -70,7 +70,7 @@ EOT;
         	<a href="u.php"><b>$windid</b></a><a href="$loginouturl">退出</a><i></i><a href="u.php">个人空间</a><i></i><a href="faq.php">帮助</a><i></i><span><a id="td_omainNav" href="$_mainUrl" class="o_top_down"><span class="fl cp">返回社区首页</span><span class="f9">▼</span></a></span>
         </div>
         </div>
-<script language="JavaScript">setCurrent('pro_{$pro_tab}', 'pro_index', 'current');</script>
+<script>setCurrent('pro_{$pro_tab}', 'pro_index', 'current');</script>
     </div>
 <div id="menu_omainNav" style="display:none;">
 	<div class="o_top_menu" style="width:106px;">
@@ -93,8 +93,8 @@ EOT;
 </div>
 <script type="text/javascript">
 var td_omainNav = {
-	open : function(){ $('td_omainNav').parentNode.className = 'current';},
-	close : function(){ $('td_omainNav').parentNode.className = '';}
+	open : function(){ getObj('td_omainNav').parentNode.className = 'current';},
+	close : function(){ getObj('td_omainNav').parentNode.className = '';}
 };
 </script>
 <!--

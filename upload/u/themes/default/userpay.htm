@@ -14,7 +14,7 @@ print <<<EOT
                         <li id="pay_list"><a href="userpay.php?action=list" hidefocus="true">订单记录</a></li>
                         <li id="pay_log"><a href="userpay.php?action=log" hidefocus="true">积分日志</a></li>
                         <li id="pay_change"><a href="userpay.php?action=change" hidefocus="true">积分转换</a></li>
-<script language="javascript">
+<script>
 var action = "$action";
 if (action == 'pay') {
 	action = 'buy';
@@ -201,7 +201,7 @@ EOT;
 										<div class="tac" style="padding:1em;"><span class="btn"><span><button type="submit" id="buysubmit">提交订单</button></span></span></div>
 									</div>
 								</form>
-							<script language="JavaScript">
+							<script>
 								var creditinfo = $creditinfo;
 								function payinfo(c) {
 									getObj('payinfo').innerHTML = '当前汇率:' + creditinfo[c][0] + ' ' + creditinfo[c][2] + ' = ￥1（最低 ' + creditinfo[c][1] + ' 元人民币 ）';
@@ -230,7 +230,7 @@ print<<<EOT
 								<table width="100%" class="mb20 s5">
 									<tr>
 										<td><b>订单状态说明:</b><ol>
-	<li>未支付订单:未充值成功的订单，用户尚未付款成功</li>
+	<li>未完成订单:未充值成功的订单，用户尚未付款成功</li>
 	<li>已完成订单:已充值成功的订单，用户已经完成付款，{$db_currencyname}充值成功.</li></ol></td>
 									</tr>
 								</table>

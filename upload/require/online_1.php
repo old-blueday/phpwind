@@ -119,7 +119,7 @@ $flag = -1;
 foreach ($onlinedb as $key => $val) {
 	$flag++;
 	if ($flag % 7 == 0) $index_whosonline .= '</tr><tr>';
-	$index_whosonline .= "<td style=\"padding:0 0 5px;border:0;width:14%\"><img src=\"$imgpath/$stylepath/group/$val[img].gif\" align=\"absmiddle\"> <a href=\"". USER_URL ."$val[uid]\" title=\"$val[onlineinfo]\">$val[username]</a></td>";
+	$index_whosonline .= "<td style=\"padding:0 0 5px;border:0;width:14%\"><img src=\"$imgpath/$stylepath/group/$val[img].gif\" align=\"absmiddle\"> <a href=\"". USER_URL ."$val[uid]\" title=\"$val[onlineinfo]\" target=\"_blank\" class=\" _cardshow\" data-card-url=\"pw_ajax.php?action=smallcard&type=showcard&uid=".$val[uid]."\" data-card-key=\"$val[username]\">$val[username]</a></td>";
 }
 $index_whosonline .= '</tr></table></div>';
 

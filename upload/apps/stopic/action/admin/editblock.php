@@ -165,7 +165,7 @@ if (!$step) {
 	$stopic_service->updateUnitByFild($stopic_id, $block_id, array('title'=>$block_title,'data'=>$block_data));
 	$result	= array(
 		'title'		=> stripslashes($block_title),
-		'content'	=> $stopic_service->getHtmlData($block_data, $block_type, $block_id),
+		'content'	=> ($block_type == 'comment') ? '' : $stopic_service->getHtmlData($block_data, $block_type, $block_id),
 	);
 	
 	$result	= pwJsonEncode($result);

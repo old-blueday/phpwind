@@ -13,10 +13,12 @@ var imageType = Class({},{
 	
 	_init	: function () {
 		var _this = this;
-		
 		for (var type in this.list) {
 			if (type == 'event') continue;
 			this.list[type].onclick = function () {
+				if (this.id == 'imagetype_select') {
+					setTimeout(function(){_this._defaultSelect();}, 100);
+					}
 				for (var i in _this.list) {
 					if (i == 'event' || !_this.list[i].id) continue;
 					getObj(_this.list[i].id+'_div').style.display = 'none';
@@ -41,5 +43,16 @@ var imageType = Class({},{
 				};
 			}
 		}
+	},
+	_defaultSelect : function () {
+		var list = getObj('imagetype_select_div');
+		if (!list) return false;
+		var images = list.getElementsByTagName('li');
+		var hasDefault = false;
+		for (var i=0;i<images.length;i++) {
+			if (images.className == 'current' && i != 0) hasDefault = true;
+		}
+		if (hasDefault) return false;
+		images[0].onclick();
 	}
 });

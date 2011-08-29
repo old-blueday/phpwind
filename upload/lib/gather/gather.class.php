@@ -133,7 +133,7 @@ class PW_Gather {
 				$extendTableNames ['pw_posts' . ($k ? $k : '')] = 'pw_posts';
 			}
 		}
-		$tableNames = array ('pw_tmsgs' => 'pw_threads',  'pw_memberinfo' => 'pw_members', 'pw_memberdata' => 'pw_members', 'pw_singleright' => 'pw_members', 'pw_membercredit' => 'pw_members', 'pw_banuser' => 'pw_members', 'pw_cmembers' => 'pw_members', 'pw_forumdata' => 'pw_forums', 'pw_announce' => 'pw_forums');
+		$tableNames = array ('pw_tmsgs' => 'pw_threads',  'pw_memberinfo' => 'pw_members', 'pw_memberdata' => 'pw_members', 'pw_singleright' => 'pw_members', 'pw_membercredit' => 'pw_members', 'pw_banuser' => 'pw_members', 'pw_cmembers' => 'pw_members', 'pw_membertags_relations' => 'pw_members', 'pw_forumdata' => 'pw_forums', 'pw_announce' => 'pw_forums');
 		$tableNames += $extendTableNames;
 		return (isset ( $tableNames [$tablename] )) ? $tableNames [$tablename] : $tablename;
 	}

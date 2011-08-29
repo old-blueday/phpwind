@@ -1,7 +1,7 @@
 <!--<?php
 if ($a == 'del') {print <<<EOT
 -->
-<script language="JavaScript" id="o_del">
+<script type="text/javascript" id="o_del">
 function o_del() {
 	var rText = ajax.request.responseText.split('\\t');
 	if (rText[0] == 'del') {
@@ -28,7 +28,7 @@ function o_del() {
 EOT;
 } elseif ($a == 'edit') {print <<<EOT
 -->
-<script language="JavaScript" id="o_edit">
+<script type="text/javascript" id="o_edit">
 function o_edit() {
 	var rText = ajax.request.responseText.split('\\t');
 	if (rText[0] == 'edit') {
@@ -188,7 +188,7 @@ EOT;
 			</tr>
 		</table>
 	</form>
-<script language="JavaScript">
+<script type="text/javascript">
 var charset = '$db_charset';
 setTimeout(function(){initCheckTextNum('ajax_aname','ajax_aname_warn',24);},300);
 setTimeout(function(){initCheckTextNum('ajax_aintro','ajax_aintro_warn',255);},300);
@@ -215,7 +215,7 @@ EOT;
 } elseif ($a == 'uintro') {print <<<EOT
 -->
 	<table cellpadding="0" cellspacing="0" width="400">
-		<tr><th colspan="2" class="h" style="cursor:move" onmousedown="read.move(event);"><span class="fr" style="margin-top:2px;cursor:pointer" onclick="closep();"><img src="$imgpath/close.gif" /></span>通讯资料</th></tr>
+		<tr><th colspan="2" class="h" style="cursor:move" onmousedown="read.move(event);"><span class="adel" onclick="closep();">close</span>通讯资料</th></tr>
 		<tr>
 			<td width="30%">用户</td>
 			<td>
@@ -349,7 +349,7 @@ EOT;
 								</ul>
 							</div>
 						</div>
-<SCRIPT type="text/javascript" LANGUAGE="JavaScript" src="js/core/friendlist.js"></SCRIPT>
+<script type="text/javascript" src="js/core/friendlist.js"></script>
 
 		</td>
 	</tr>
@@ -383,7 +383,7 @@ EOT;
 <span class="bt2"><span><button type="button" onclick="closep();">取消</button></span></span>
 </li></ul></form>
 </div>
-<script language="javascript">
+<script type="text/javascript">
 var ifcheck = true;
 function CheckAll(form,match) {
 	for (var i = 0; i < form.elements.length; i++) {
@@ -446,7 +446,7 @@ EOT;
 </div>
 </div>
 </form>
-<SCRIPT type="text/javascript" LANGUAGE="JavaScript" src="js/core/friendlist.js"></SCRIPT>
+<script type="text/javascript" src="js/core/friendlist.js"></script>
 
 <!--
 EOT;
@@ -479,7 +479,7 @@ EOT;
 		</table>
 		<div class="popBottom"><span class="btn2"><span><button type="button" onclick="copyurl();return false;">提 交</button></span></span><span class="bt2"><span><button type="button" onclick="closep();">取消</button></span></span></div>
 	</form></div>
-<script language="JavaScript">
+<script type="text/javascript">
 function copyurl() {
 	var dtid = getObj('dtidsel').value;
 	var privacy = getObj('prisel').value;
@@ -508,7 +508,7 @@ EOT;
 			</tr>
 		</table>
 	</form>
-<script language="JavaScript">
+<script type="text/javascript">
 function tourl() {
 	var aid = getObj('aidvalue').value;
 	var viewpwd = getObj('pwdvalue').value;
@@ -573,7 +573,8 @@ print <<<EOT
 		<!--
 EOT;
 if ($o_photos_gdcheck) {
-$gdSize = explode("\t",$db_gdsize);
+$checkCode = L::loadClass('checkcode', 'site');
+$checkCodeString = $checkCode->getCheckCodeTemplate();
 print <<<EOT
 -->
 		<tr>
@@ -581,12 +582,7 @@ print <<<EOT
 			<td>
 				<div>验证码:</div>
 				<div id="ckcode" style="display:none;margin-bottom:5px;"></div>
-<script type="text/javascript" src="js/pw_authcode.js"></script>
-<script>
-var flashWidth = "$gdSize[0]";
-var flashHeight = "$gdSize[1]";
-var gdtype = $db_gdtype;
-</script>
+$checkCodeString
 				<br />
 				<input class="input" onfocus="showgd();" type="text" name="gdcode" id="gdcode" style="width:50px;" tabindex="3"  />
 			</td>
@@ -599,7 +595,7 @@ if($db_imagequestion){
 }else{
 	$question = $qkey<0 ? getMachineQuestion_1() :  $db_question[$qkey];
 }
-$q_a = $question.($showq && $qkey>0?" 正确答案:".$db_answer[$qkey] : '');
+$q_a = $question.($showq && $qkey>0?" （答案：".$db_answer[$qkey] . '）' : '');
 print <<<EOT
 -->
 		<tr>
@@ -622,7 +618,7 @@ EOT;
 			</td>
 		</tr>
 	</table>
-<script language="JavaScript">
+<script type="text/javascript">
 var charset = '$db_charset';
 setTimeout(function(){initCheckTextNum('c_ajax_aname','c_ajax_aname_warn',24);},300);
 setTimeout(function(){initCheckTextNum('c_ajax_aintro','c_ajax_aintro_warn',255);},300);

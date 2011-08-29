@@ -19,7 +19,7 @@ Breeze.namespace('editor.createLink', function (B) {
 				pos: ['leftAlign', 'bottom'],
                 data: '<div class="B_menu B_p10B">\
 	                    <div style="width:310px;">\
-		                    <div class="B_h"><a href="#" class="B_menu_adel B_close">×</a>插入URL链接</div>\
+		                    <div class="B_h B_drag_handle"><a href="#" class="B_menu_adel B_close">×</a>插入URL链接</div>\
 		                    <div class="B_tableA">\
 			                    <table width="100%" class="B_mb10" id="B_link_table">\
 				                    <tr>\

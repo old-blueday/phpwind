@@ -158,10 +158,14 @@ EOT;
 		//$id = md5(microtime());
 		$id = $this->fieldInfo['fieldname'];
 		if(!S::isArray($this->defaultValue)){
-			$basicValue = array(
+			$basicValue = !S::isArray($this->fieldInfo['options']) ? array(
 				array('parentid'=>0,'selectid'=>'province_'.$id,'defaultid'=>'','hasfirst'=>1),
 				array('parentid'=>-1,'selectid'=>'city_'.$id,'defaultid'=>'','hasfirst'=>1),
 				array('parentid'=>-1,'selectid'=>'area_'.$id,'defaultid'=>'','hasfirst'=>1)
+			) : array(
+				array('parentid'=>0,'selectid'=>'province_'.$id,'defaultid'=>intval($this->fieldInfo['options']['province']),'hasfirst'=>1),
+				array('parentid'=>intval($this->fieldInfo['options']['province']),'selectid'=>'city_'.$id,'defaultid'=>intval($this->fieldInfo['options']['city']),'hasfirst'=>1),
+				array('parentid'=>intval($this->fieldInfo['options']['city']),'selectid'=>'area_'.$id,'defaultid'=>intval($this->fieldInfo['options']['area']),'hasfirst'=>1)
 			);
 		} else {
 			$basicValue = array(

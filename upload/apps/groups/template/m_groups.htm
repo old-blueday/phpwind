@@ -33,11 +33,11 @@ EOT;
 EOT;
 if($weiboList){print <<<EOT
 -->
-<script type="text/javascript" language="JavaScript" src="apps/weibo/js/post.js"></script>
-<script language="javascript">
+<script type="text/javascript" src="apps/weibo/js/post.js"></script>
+<script>
 var transmitAction = '';
 </script>
-<script language="JavaScript" src="js/pw_weibo.js"></script>
+<script type="text/javascript" src="js/pw_weibo.js"></script>
 <table width="100%">
 <tr>
 <td height="400" class="vt">
@@ -314,8 +314,8 @@ EOT;
 -->
 	</ul>
 	<div class="mb10 cc">$pages</div>
-<script language="JavaScript" src="js/core/changeview.js"></script>
-<script language="JavaScript">
+<script type="text/javascript" src="js/core/changeview.js"></script>
+<script>
 var frist = New(changView,['list-groups','li',1]);
 </script>
 <div class="c"></div>
@@ -498,7 +498,7 @@ EOT;
 		</div>
 		</div>
 	</div>
-<script language="JavaScript">
+<script>
 setCurrent('cid_$styleid','cid_all','current');
 </script>
 	<div class="c"></div>
@@ -506,8 +506,8 @@ setCurrent('cid_$styleid','cid_all','current');
 EOT;
 } elseif ($a == 'create') {print <<<EOT
 -->
-<script type="text/javascript" language="JavaScript" src="js/color_picker.js"></script>
-<script type="text/javascript" language="JavaScript" src="js/mini_editor.js"></script>
+<script type="text/javascript" src="js/color_picker.js"></script>
+<script type="text/javascript" src="js/mini_editor.js"></script>
 <div class="homeCont">
 <div class="p15">
 	<div class="navC mb10">
@@ -646,7 +646,7 @@ EOT;
 }print<<<EOT
 --></i></a>
 						
-           <script language="JavaScript">
+           <script>
             function show_image(id,pic_url) {
 				getObj('q_' + id).value = 1;
 				getObj('p_' + id).value = "";
@@ -661,21 +661,15 @@ EOT;
 <!--
 EOT;
 if ($o_groups_gdcheck) {
-$gdSize = explode("\t",$db_gdsize);
+$checkCode = L::loadClass('checkcode', 'site');
+$checkCodeString = $checkCode->getCheckCodeTemplate();
 print <<<EOT
 -->
 	<tr>
 		<th class="th">验证码<span class="s1">*</span></th>
 		<td class="td">
-			<div id="ckcode" style="display:none;margin-bottom:1px;">
-<script type="text/javascript" src="js/pw_authcode.js"></script>
-<script>
-var flashWidth = "$gdSize[0]";
-var flashHeight = "$gdSize[1]";
-var gdtype = $db_gdtype;
-showGdCode();
-</script>
-			</div>
+			<div id="ckcode" style="display:none;margin-bottom:1px;"></div>
+$checkCodeString
 			<div><input class="input" onfocus="showgd();" type="text" name="gdcode" id="gdcode" style="width:50px;" tabindex="3"  /></div>
 		</td>
 	</tr>
@@ -688,7 +682,7 @@ if($db_imagequestion){
 }else{
 	$question = $qkey<0 ? getMachineQuestion_1() :  $db_question[$qkey];
 }
-$q_a = $question.($showq && $qkey>0?" 正确答案:".$db_answer[$qkey] : '');
+$q_a = $question.($showq && $qkey>0?" （答案：".$db_answer[$qkey] . '）' : '');
 print <<<EOT
 -->
 	<tr>
@@ -710,7 +704,7 @@ EOT;
 </table>
 </form><div id="divload"></div>
 	</div>
-<script language="JavaScript">
+<script>
 var charset = '$db_charset';
 initCheckTextNum('cname','cname_warn',20);
 initCheckTextNum('descrip','descrip_warn',255);
@@ -752,18 +746,18 @@ function checkpost(obj) {
 	var cname = obj.cname.value;
 	if (obj.cname.value == "") {
 		obj.cname.focus();
-		showDialog("error","请输入群组<span class='warnFontStyle'>名称</span>",2);
+		showDialog("error","请输入群组<span class='s1'>名称</span>",2);
 		return false;
 	}　else if (strlen(obj.cname.value) > 20) {
 		obj.cname.focus();
-		showDialog("error","群组<span class='warnFontStyle'>名称</span>不能大于<span class='warnFontStyle'>20</span>个字节",2);
+		showDialog("error","群组<span class='s1'>名称</span>不能大于<span class='s1'>20</span>个字节",2);
 		return false;
 	}　else if (strlen(obj.descrip.value) > 255) {
 		obj.descrip.focus();
-		showDialog("error","群组<span class='warnFontStyle'>简介</span>不能大于<span class='warnFontStyle'>255</span>个字节",2);
+		showDialog("error","群组<span class='s1'>简介</span>不能大于<span class='s1'>255</span>个字节",2);
 		return false;
 	}　else if (!obj.firstgradestyle.value) {
-		showDialog("error","请选择群组<span class='warnFontStyle'>分类</span>",2);
+		showDialog("error","请选择群组<span class='s1'>分类</span>",2);
 		return false;
 	} 
 	SubmitAjax(obj);

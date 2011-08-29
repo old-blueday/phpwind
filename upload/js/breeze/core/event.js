@@ -196,11 +196,23 @@ Breeze.namespace('event', function (B) {
     * @example B.get("#one")("live","click",fn);
     **/
 	trigger: function (el, type){
-		return B.UA.ie ? el[type]() : el['on'+type]({
+		/*return B.UA.ie ? el[type]() : el['on'+type]({
 			type: type,
 			target: el
-		});
-	}
+		});*/
+		if (el.events && el.events[type]){
+				var handles = el.events[type];
+				for(var i in handles){
+					var handle = handles[i];
+					if(B.isFunction(handle)){
+						var evt = {};
+						evt.preventDefault = function(){};
+						evt.target = el;
+						handle.call(handle,evt);
+					}
+				}
+			}
+		}
 });
 
     // Prevent memory leaks in IE

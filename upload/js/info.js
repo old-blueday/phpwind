@@ -55,5 +55,5 @@ function selectTab(tab) {
 			}
 		}
 	}
-	$('userbinding-node').style.display = (tab == 'binding') ? '' : 'none';
+	getObj('userbinding-node').style.display = (tab == 'binding') ? '' : 'none';
 }

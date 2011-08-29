@@ -29,6 +29,7 @@ class GatherQuery_UserDefine_PW_Threads {
 			$this->_service->cleanThreadCacheWithForumIds ( $fields, $expand );
 		}
 		$this->_service->updateThreadImage('update',$fields,$expand);
+		//$this->_service->updateThreadsIndexer('update',$fields,$expand);
 	}
 	
 	function delete($tableName, $fields, $expand = array()) {
@@ -39,6 +40,7 @@ class GatherQuery_UserDefine_PW_Threads {
 			$this->_service->cleanThreadCacheWithForumIds ( $fields );
 		}
 		$this->_service->updateThreadImage('delete',$fields,$expand);
+		//$this->_service->updateThreadsIndexer('delete',$fields,$expand);
 	}
 	
 	function select($tableName, $fields, $expand = array()) {
@@ -125,5 +127,62 @@ class GatherQuery_UserDefine_PW_Threads_Impl {
 			isset($expand['topped']) && $GLOBALS['db']->update('UPDATE pw_threads_img SET topped='.intval($expand['topped']).' WHERE tid IN ('. S::sqlImplode($tids) . ')');
 			isset($expand['fid']) && $GLOBALS['db']->update('UPDATE pw_threads_img SET fid='.intval($expand['fid']).' WHERE tid IN ('. S::sqlImplode($tids) . ')');
 		}
+	}
+	
+	/**
+	 * 更新帖子索引表内容
+	 * @param string $operate
+	 * @param array $fields
+	 * @param array $expand
+	 */
+	function updateThreadsIndexer($operate, $fields,$expand = array()){
+		/*
+		if ($operate == 'insert') {
+			$threadsIndexerDB = L::loadDB('threadsindexer','forum');
+			$threadsIndexerDB->add($fields);
+		}*/
+		if (!$sqlWhere = $this->_buildWhereStatement($fields)) return false;
+		if ($operate == 'delete') {
+			return $GLOBALS['db']->update('DELETE FROM pw_threadsindexer '. $sqlWhere);
+		}
+		if ($operate == 'update') {
+			if (!$sqlUpdate = $this->_buildUpdateStatement($expand)) return false;
+			return $GLOBALS['db']->update("UPDATE pw_threadsindexer SET $sqlUpdate $sqlWhere");
+		}
+	}
+	
+	/**
+	 * 组装where条件
+	 * @param array $fields
+	 * @return string
+	 */
+	function _buildWhereStatement($fields) {
+		if (!S::isArray($fields)) return '';
+		$sqlWhere = '';
+		foreach ($fields as $k=>$v) {
+			$tmpString = S::isArray($v) ? sprintf('%s IN (%s)',$k,S::sqlImplode($v)) : sprintf('%s=%s',$k,S::sqlEscape($v));
+			$sqlWhere .= $sqlWhere ? " AND $tmpString" : "WHERE $tmpString";
+		}
+		return $sqlWhere;
+	}
+	
+	/**
+	 * 组装update语句
+	 * @param unknown_type $expand
+	 */
+	function _buildUpdateStatement($expand) {
+		$expand = $this->_filterThreadsindexerFields($expand);
+		if (!S::isArray($expand)) return '';
+		$sqlUpdate = array();
+		foreach ($expand as $k=>$v) {
+			$sqlUpdate[] = sprintf('%s=%s',$k,S::sqlEscape($v));
+		}
+		return implode(',' , $sqlUpdate);
+	}
+	
+	function _filterThreadsindexerFields($fields){
+		if (!S::isArray($fields)) return false;
+		$allowedFields = array('tid','fid','authorid','ifcheck','type','postdate','lastpost','topped','digest','special');
+		return array_intersect($allowedFields, $fields);
 	}
 }

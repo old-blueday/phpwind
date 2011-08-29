@@ -19,7 +19,7 @@ if ($timestamp-pwFilemtime($cachefile)>=$sm_updatePeri*3600) {
 	} else {
 		$pw_tmsgs = 'pw_tmsgs';
 	}
-	$fidoff = array();
+	$fidoff = array('0');
 	$query = $db->query("SELECT fid,allowvisit,password,f_type,forumsell FROM pw_forums WHERE type<>'category'");
 	while ($rt = $db->fetch_array($query)) {
 		if ($rt['f_type'] == 'hidden' || $rt['password'] || $rt['forumsell'] || $rt['allowvisit']) {

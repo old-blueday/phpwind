@@ -33,6 +33,7 @@ if (S::getGP('action','P') == 'regcheck') {
 		echo $registerCheckService->checkEmail($email);
 	} elseif ($type == 'reggdcode') {
 		S::gp('gdcode','P');
+		$gdcode = pwConvert(rawurldecode($gdcode), $db_charset, 'utf-8');
 		echo $registerCheckService->checkGdcode($gdcode);
 	} elseif ($type == 'qanswer') {
 		S::gp(array('answer','question'),'P');
@@ -60,6 +61,7 @@ if (S::getGP('action','P') == 'regcheck') {
 					$return = $registerCheckService->checkEmail($value[2]);
 					break;
 				case 'reggdcode' :
+					$value[2] = pwConvert(rawurldecode($value[2]), $db_charset, 'utf-8');
 					$return = $registerCheckService->checkGdcode($value[2]);
 					break;
 				case 'qanswer' :
@@ -268,6 +270,11 @@ if (!$step) {
 		$userService = L::loadClass('userservice', 'user');/* @var $register PW_Register */
 		$userService->update($winduid,array('authmobile' => $authmobile));
 		$userService->setUserStatus($winduid, PW_USERSTATUS_AUTHMOBILE, true);
+		//颁发勋章
+		if ($db_md_ifopen) {
+			$medalService = L::loadClass('medalservice','medal');
+			$medalService->awardMedalByIdentify($winduid,'shimingrenzheng');
+		}
 	}
 	//$iptime=$timestamp+86400;
 	//Cookie("ifregip",$onlineip,$iptime);
@@ -292,6 +299,11 @@ if (!$step) {
 		Cookie("winduser",StrCode($winduid."\t".PwdCode($windpwd)."\t".$safecv));
 		Cookie("ck_info",$db_ckpath."\t".$db_ckdomain);
 		Cookie('lastvisit','',0);//将$lastvist清空以将刚注册的会员加入今日到访会员中
+		/*连续登录天数*/
+		if ($db_md_ifopen) {
+			require_once(R_P.'require/functions.php');
+			doMedalBehavior($winduid,'continue_login');
+		}
 	}
 	//发送短消息
 	if ($rg_config['rg_regsendmsg']) {
@@ -344,12 +356,12 @@ if (!$step) {
 	S::gp(array('email','newemail','regname','option','r'));
 	S::gp(array('facetype'),'G');
 	if (S::getGP('vip') == 'activating') {
-		S::gp(array('r_uid','pwd'),'G');
+		S::gp(array('r_uid','pwd','toemail'),'G');
 		$r_uid = (int)$r_uid;
 		
 		$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
 		if($rg_config['rg_emailcheck'] == 0) Showmsg('reg_jihuo_success');
-		if (!$userService->activateUser($r_uid, $pwd, $db_sitehash)) Showmsg('reg_jihuo_fail');
+		if (!$userService->activateUser($r_uid, $pwd, $db_sitehash,$toemail)) Showmsg('reg_jihuo_fail');
 		Cookie('regactivate',1);
 		require_once(PrintEot('register'));
 		footer();
@@ -379,6 +391,7 @@ if (!$step) {
 				$register = L::loadClass('Register', 'user');
 				$register->changeEmail($winduid,$newemail);
 				$email = $newemail;
+				$regemail = $newemail;
 			}
 			//if (!$r && $rg_config['rg_regsendemail'] && $ml_mailifopen) {
 				//sendemail($sendtoEmail,'email_welcome_subject','email_welcome_content','email_additional');

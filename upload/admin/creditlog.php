@@ -18,8 +18,9 @@ if (empty($action)) {
 	}
 
 	if ($clg && in_array($clg,$clgtb)) {
-		$pw_creditlog = 'pw_'.$clg;
+		$pw_creditlog = 'pw_' . $clg;
 	}
+	$pw_creditlog = $db_merge_creditlog ? 'pw_merge_creditlog' : $pw_creditlog;
 	$sqladd = "WHERE 1";
 	$urladd = '';
 	if ($username) {
@@ -53,7 +54,7 @@ if (empty($action)) {
 	(int)$page < 1 && $page = 1;
 	$limit = S::sqlLimit(($page-1)*$db_perpage,$db_perpage);
 	$rt    = $db->get_one("SELECT COUNT(*) AS sum FROM $pw_creditlog $sqladd");
-	$pages = numofpage($rt['sum'],$page,ceil($rt['sum']/$db_perpage), "$basename&uid=$uid&ctype=$ctype&stime=$stime&etime=$etime{$urladd}&");
+	$pages = numofpage($rt['sum'],$page,ceil($rt['sum']/$db_perpage), "$basename&uid=$uid&ctype=$ctype&clg=$clg&stime=$stime&etime=$etime{$urladd}&");
 	$query = $db->query("SELECT * FROM $pw_creditlog $sqladd ORDER BY adddate DESC $limit");
 	while ($rt = $db->fetch_array($query)) {
 		$rt['adddate'] = get_date($rt['adddate']);
@@ -169,7 +170,7 @@ if (empty($action)) {
 		$sql = str_replace($CreatTable['Table'],'pw_creditlog',$CreatTable['Create Table']);
 		$db->query("ALTER TABLE pw_creditlog RENAME pw_creditlog{$t_k}");
 		$db->query($sql);
-
+		updateMergeCreditlogTable();
 		adminmsg('operate_success');
 
 	} elseif ($_POST['step'] == '7') {
@@ -190,8 +191,32 @@ if (empty($action)) {
 				$db->query("DROP TABLE pw_{$value}");
 			}
 		}
-
+		updateMergeCreditlogTable();
 		adminmsg('operate_success');
 	}
+}
+
+function updateMergeCreditlogTable() {
+	global $db, $PW;
+	$createTable = array();
+	$query = $db->query("SHOW TABLE STATUS LIKE 'pw_creditlog%'");
+	while ($rt = $db->fetch_array($query)) {
+		$key = $PW ? substr(str_replace($GLOBALS['PW'], 'pw_', $rt['Name']), 12) : substr($rt['Name'],5);
+		if ($key && !is_numeric($key)) continue;
+		$createTable[] = $rt['Name'];
+	}
+	$creatTableStructure= $db->get_one("SHOW CREATE TABLE `pw_creditlog`");
+	preg_match('/\(.+\)/is', $creatTableStructure['Create Table'], $match);
+	preg_match('/CHARSET=([^;\s]+)/is', $creatTableStructure['Create Table'], $charsetMatch);
+	$db->query('DROP TABLE IF EXISTS `pw_merge_creditlog`');
+	ksort($createTable);
+	$createTableSql = 'CREATE TABLE `pw_merge_creditlog` ' . $match[0] . ' TYPE=MERGE UNION=(' . implode(',', $createTable) . ') DEFAULT CHARSET=' . $charsetMatch[1] . ' INSERT_METHOD=LAST';
+	$db->query($createTableSql);
+	
+	$success = $db->get_one("SHOW TABLE STATUS LIKE 'pw_merge_creditlog'");
+	$config = $success['Engine'] ? 1 : 0;
+	setConfig("db_merge_creditlog", $config);
+	updatecache_c();
+	return true;
 }
 ?>

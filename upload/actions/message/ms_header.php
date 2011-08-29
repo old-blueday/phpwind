@@ -1,12 +1,11 @@
 <?php
 !defined('P_W') && exit('Forbidden');
-list($messageNumber,$noticeNumber,$requestNumber,$groupsmsNumber) = $messageServer->getUserStatistics($winduid);
-if(in_array($subtype,array('sms','request','groupsms','notice'))){
-	$winddb['newpm'] = $messageNumber+$noticeNumber+$requestNumber+$groupsmsNumber;
-	$msgNumbers = array('sms'=>$messageNumber,'request'=>$requestNumber,'groupsms'=>$groupsmsNumber,'notice'=>$noticeNumber);
-	resetUserMsgCount($winddb['newpm']);
-	unset($msgNumbers);
-}
+list(,$messageNumber,$noticeNumber,$requestNumber,$groupsmsNumber) = $messageServer->countAllByUserId($winduid);
+$updateUserMessageTip = $updateUserDataMessageTip = array();
+($winddb['newpm'] != 0 && ($messageNumber + $groupsmsNumber != $winddb['newpm'])) && ($updateUserMessageTip['newpm'] = $winddb['newpm'] = $messageNumber + $groupsmsNumber);
+($winddb['newnotice'] != 0 && ($noticeNumber != $winddb['newnotice'])) && ($updateUserDataMessageTip['newnotice'] = $winddb['newnotice'] = $noticeNumber);
+($winddb['newrequest'] != 0 && ($requestNumber != $winddb['newrequest'])) && ($updateUserDataMessageTip['newrequest'] = $winddb['newrequest'] = $requestNumber);
+
 $messageNumber = $messageNumber ? '('.$messageNumber.')' : '';
 $noticeNumber = $noticeNumber ? '('.$noticeNumber.')' : '';
 $requestNumber = $requestNumber ? '('.$requestNumber.')' : '';
@@ -24,6 +23,10 @@ if($_G['maxmsg']){
 $newSpace = new PwSpace($winduid);
 if (!$space =& $newSpace->getInfo()) {
 	Showmsg('您访问的空间不存在!');
+}
+if (S::isArray($updateUserMessageTip) || S::isArray($updateUserDataMessageTip)) {
+	$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
+	$userService->update($winduid, $updateUserMessageTip, $updateUserDataMessageTip);
 }
 //* include_once pwCache::getPath(D_P . 'data/bbscache/o_config.php');
 pwCache::getData(D_P . 'data/bbscache/o_config.php');

@@ -217,7 +217,7 @@ class topicWeibo extends baseWeibo {
 		$username = ($topicDB['anonymous'] == 1) ? $db_anonymousname : $topicDB['author'];		
 		$descrip = $topicDB['subject'];
 		$this->_url = !$cyid ? $this->_url.$this->_tid : $GLOBALS['db_bbsurl']."/apps.php?q=group&a=read&cyid=$cyid&tid=".$this->_tid;
-		$content = sprintf("[url=%s] %s [/url]", $this->_url, $topicDB['subject']);
+		$content = sprintf("[url=%s] %s [/url]", urlRewrite($this->_url), $topicDB['subject']);
 		$title = $content;
 		$mailSubject =  getLangInfo('app','topic_recommend');
 		$mailContent = getLangInfo('app','ajax_sendweibo_info',array(

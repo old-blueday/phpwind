@@ -19,7 +19,7 @@ class PwSpaceModel {
 		$this->_db = & $GLOBALS['db'];
 		$this->_isGM =& $GLOBALS['isGM'];
 		$this->spaceinfo = $base->info;
-		$this->_cacheModes = array('friend', 'weibo', 'colony', 'tags', 'messageboard', 'recommendUsers'); //'article'
+		$this->_cacheModes = array('friend', 'weibo', 'colony', 'tags', 'messageboard', 'recommendUsers', 'article', 'reply'); //'article'
 	}
 
 	function get($uid, $config) {
@@ -28,15 +28,12 @@ class PwSpaceModel {
 			$userCache = L::loadClass('UserCache', 'user'); /* @var $userCache PW_UserCache */
 			$array = $userCache->get($uid, $config);
 		}
-		//var_dump($array['article']);
 		foreach ($config as $key => $value) {
 			if (!isset($array[$key])) {
 				if ($method = $this->_getMethod($key, 'get')) {
-					//var_dump($method);
-					$array[$key] = $this->$method($uid, $value);
+					$array[$key] = $this->$method($uid, is_array($value) ? $value['num'] : $value);
 				}
 			} elseif ($method = $this->_getMethod($key, 'adorn')) {
-					//var_dump($method);
 				$array[$key]  = $this->$method($array[$key]);
 			}
 		}
@@ -136,7 +133,7 @@ class PwSpaceModel {
 		}
 		return $array;
 	}
-	
+	/*
 	function adorn_article($data){
 		if(!$data || !is_array($data)) return array();
 		foreach($data as $value){
@@ -173,7 +170,7 @@ class PwSpaceModel {
 			$array[]		= $rt;
 		}
 		return $array;
-	}
+	}*/
 /*
 	function get_favorites($uid, $num) {
 		$query = $this->_db->query("SELECT p.content,p.postdate FROM pw_collection p WHERE p.uid=".S::sqlEscape($uid)." AND p.type='postfavor' ORDER BY p.postdate DESC LIMIT $num");

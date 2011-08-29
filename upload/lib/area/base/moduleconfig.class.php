@@ -3,12 +3,9 @@
 
 class PW_ModuleConfig{
 	
-	function afterUpdate($sign) {
-		
-	}
-	function getPath($sign) {
-		
-	}
+	function afterUpdate($sign) {}
+	function getPath($sign) {}
+	function getType() {}
 	/*
 	 * 根据配置文件修改数据库中的配置
 	 */
@@ -17,7 +14,7 @@ class PW_ModuleConfig{
 		$configFile = $this->_getConfigFile($sign);
 		
 		$moduleConfigService = $this->_getModuleConfigService();
-		$moduleConfigService->updateInvokesByModuleConfig($templateFile,$configFile);
+		$moduleConfigService->updateInvokesByModuleConfig($templateFile,$configFile,$this->getType(),$sign);
 	}
 
 	/**
@@ -41,6 +38,7 @@ class PW_ModuleConfig{
 		$configFile = $this->_getConfigFile($sign);
 		$moduleConfigService = $this->_getModuleConfigService();
 		$moduleConfigService->updateModuleCode($configFile,$name,$code);
+		$this->_updateIndexFileTime($sign);
 		$this->afterUpdate($sign);
 	}
 	
@@ -48,7 +46,13 @@ class PW_ModuleConfig{
 		$configFile = $this->_getConfigFile($sign);
 		$moduleConfigService = $this->_getModuleConfigService();
 		$moduleConfigService->updateModuleByConfig($configFile,$name,$pieceConfig,$title);
+		$this->_updateIndexFileTime($sign);
 		$this->afterUpdate($sign);
+	}
+
+	function _updateIndexFileTime($sign) {
+		$indexFile = $this->_getIndexFile($sign);
+		touch($indexFile,'1000000000');
 	}
 	
 	function _getIndexFile($sign) {

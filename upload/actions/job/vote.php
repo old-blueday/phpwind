@@ -1,6 +1,6 @@
 <?php
 !defined('P_W') && exit('Forbidden');
-
+define('AJAX',1);
 PostCheck();
 $rt = $db->get_one('SELECT t.fid,t.tid,t.postdate,t.lastpost,t.state,t.locked,t.ifcheck,p.* FROM pw_polls p LEFT JOIN pw_threads t ON p.tid=t.tid WHERE p.tid=' . S::sqlEscape($tid));
 !$rt && Showmsg('data_error');
@@ -19,6 +19,8 @@ if ($groupid == '3' || $groupid == '4' || admincheck($foruminfo['forumadmin'], $
 } else {
 	$admincheck = 0;
 }
+
+
 //用户组权限验证
 $_G['allowvote'] == 0 && Showmsg('job_vote_right');
 if ((!$admincheck && $locked > 0) || ($foruminfo['forumset']['lock'] && $timestamp - $postdate > (int) $foruminfo['forumset']['lock'] * 86400 && !$admincheck)) {
@@ -35,6 +37,7 @@ S::gp(array(
 	'voteaction'
 ), 'P');
 $votearray = unserialize($voteopts);
+!is_array($voteid) && $voteid = explode('|',$voteid);
 
 if (empty($voteid) || !is_array($voteid)) {
 	Showmsg('job_vote_sel');
@@ -111,5 +114,5 @@ if ($foruminfo['allowhtm'] == 1) {
 	$StaticPage = L::loadClass('StaticPage');
 	$StaticPage->update($tid);
 }
-empty($j_p) && $j_p = "read.php?tid=$tid&displayMode=1";
-refreshto($j_p, 'operate_success');
+empty($j_p) && $j_p = "read.php?tid=$tid&ds=1";
+refreshto($j_p, defined('AJAX') ? "success\toperate_success" : 'operate_success');

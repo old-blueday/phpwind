@@ -1,0 +1,157 @@
+<!--<?php
+defined('W_P') or exit('Forbidden');
+list($htmlAdvert,$arrayAdvert) = pwAdvert('Wap.Header',$fid,$lou,'read');
+if($htmlAdvert){print <<<EOT
+-->
+	<div class="atop">$htmlAdvert</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+<div class="navigator">
+	<a href="#anch-end"><img alt="$db_bbsname" src="$wapImages/x.gif" /></a>
+	<a href="index.php">$db_bbsname</a>&gt;<a href="index.php?a=forum&fid=$fid">$forumName</a>
+</div>
+<div class="post_title">主题：<strong>$rt[subject] </strong>
+</div>
+<!--
+EOT;
+list($htmlAdvert,$arrayAdvert) = pwAdvert('Wap.Read.Header',$rt['fid']);
+if($htmlAdvert){print <<<EOT
+-->
+	<div class="atop">$htmlAdvert</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+<div class="editit">
+<a href="index.php?a=myhome&uid=$rt[authorid]">$rt[author]</a>发表于 $rt[postdate] 
+</div>
+<div class="post_content">$content</div>
+<div class="post_img">
+<!--
+EOT;
+if($imgs){
+	 foreach($imgs as $img){
+     	if($img['descrip']){print <<<EOT
+-->
+	 	    $img[descrip]
+<!--
+EOT;
+	    }print <<<EOT
+-->
+	    {$img['img']}
+<!--
+EOT;
+	}
+}print <<<EOT
+-->
+</div>
+
+<!--
+EOT;
+if($downloads){
+     foreach($downloads as $attach){
+         if($attach){
+             if($attach['descrip']){print <<<EOT
+-->
+					描述:$attach[descrip]<br />
+<!--
+EOT;
+                 }
+             $att_id = $db_attfg ? "id=\"fg_$attach[aid]\"" : '';print <<<EOT
+-->
+						附件: <img src="{$imgpath}/wind/file/$attach[type].gif" align="absmiddle" />
+						<a $att_id href="index.php?a=job&action=download&amp;aid=$attach[aid]&amp;tid=$tid" > <font color="red">$attach[name]</font></a>
+						($attach[size] K) 下载次数:$attach[hits]
+<!--
+EOT;
+             if ($attach['needrvrc']){
+                 $at_lang = $attach['special'] == 2 ? '售价' : '需要';
+                print <<<EOT
+-->
+						该附件被加密,需要{$attach[needrvrc]}{$attach[cname]}以上积分才能下载
+<!--
+EOT;
+                 }print <<<EOT
+-->
+			<br/>
+<!--
+EOT;
+            }
+    }
+}
+if($editright || $delright){
+print <<<EOT
+-->
+<div class="editit">
+<!--
+EOT;
+if ($editright) {
+print <<<EOT
+-->
+<a href="index.php?a=post&action=modify&tid=$tid&fid=$fid">编辑</a>
+<!--
+EOT;
+}
+if($delright){
+print <<<EOT
+-->
+&middot;<a href="index.php?a=mawhole&fid=$fid&seltid=$tid">删除</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+
+<!--
+EOT;
+list($htmlAdvert,$arrayAdvert) = pwAdvert('Wap.Read.Footer',$fid);
+if($htmlAdvert){print <<<EOT
+-->
+	<div class="atop">$htmlAdvert</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+<div class="pages">
+$yxqw
+</div>
+<div class="post_reply">
+<strong>回帖($rt[replies])：</strong><br/>
+<!--
+EOT;
+if($postdb){
+    foreach($postdb as $key => $val){
+         $showImg = "";
+         //if($val[aid])$showImg = "[图]";
+         print <<<EOT
+-->
+         <a href='index.php?a=reply&tid=$tid&amp;pid=$val[pid]'>$val[id]楼</a>:$val[content]$showImg<br/>
+<!--
+EOT;
+}}
+include printWAP('quickreply');print <<<EOT
+-->
+<a href="index.php?a=reply_all&tid=$tid">全部回帖($rt[replies])&raquo;</a></div>
+<div class="reply_content">
+<a href="index.php?a=reply_all&tid=$tid&amp;order=2">最新回帖</a><br />
+<a href="index.php?a=addtofav&tid=$tid">收藏本帖</a><br />
+<a href="index.php?a=post&fid=$fid">发新帖</a></div>
+<!--
+EOT;
+list($htmlAdvert,$arrayAdvert) = pwAdvert('Wap.Footer',$fid,$lou,'read');
+if($htmlAdvert){print <<<EOT
+-->
+	<div class="atop">$htmlAdvert</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+<!--
+EOT;
+?>-->

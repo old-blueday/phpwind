@@ -1,0 +1,401 @@
+<!--<?php
+print <<<EOT
+-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=$db_charset" />
+<link href="images/weibo.css" rel="stylesheet" type="text/css" />
+<SCRIPT type="text/javascript" language="JavaScript" src="{$db_bbsurl}js/ajax.js"></SCRIPT>
+<title>分享到微博-新浪微博-随时随地分享身边的新鲜事儿</title>
+</head>
+<body>
+<!--
+EOT;
+if ($action == 'isfollow'){
+print <<<EOT
+-->
+<!--- 分享成功，关注官方 --->
+<form action="share.php?type=sinaweibo&action=follow" method="POST">
+	<div class="reg_wrap"> 
+		<!-- 顶部 LOGO -->
+		<div class="TopName">
+			<div class="logo"></div>
+			<a href="http://weibo.com" target="_blank" class="logoLink"></a>
+			<div class="op" id="login_info"><span>正在使用 {$weiboName} 帐号</span></div>
+		</div>
+		
+		<!-- /顶部 LOGO -->
+		<div class="reg_main"><b class="bg_regTop"></b><b class="bg_deco_b"></b>
+			<div class="reg_pub">
+				<div class="notice">
+					<h2>分享成功！</h2>
+				</div>
+				<div class="pw-weibo">
+					<p class="pw-check"><input type="checkbox" name="isfollow" value="1" checked="checked" id="checkbox1"><label for="checkbox1">关注站点官方微博，及时获取最新资讯：</label></p>
+					<p class="pw-concern">
+						<span class="pw-avatar"><a href="{$weiboAccount['url']}"><img src="{$weiboAccount['avatar']}" width="50" height="50"></a></span>
+						<a class="pw-name" href="{$weiboAccount['url']}">{$weiboAccount['name']}</a>
+					</p>
+					<p class="pw-action">
+						<a class="MIB_bigBtn MIB_bigBtnB" href="javascript:void(0);" onClick="document.forms[0].submit();"><cite>确定</cite></a>
+						<a class="pw-close" onclick="window.close();" href="javascript:;">关闭本页</a>
+					</p>
+				</div>
+			</div>
+		<b class="bg_regBot"></b></div>
+	</div>
+</form>
+<!--
+EOT;
+} else if ($action == 'followsuccess'){
+print <<<EOT
+-->
+<!--- 关注成功 --->
+<div class="reg_wrap"> 
+	<!-- 顶部 LOGO -->
+	<div class="TopName">
+		<div class="logo"></div>
+		<a href="http://weibo.com" target="_blank" class="logoLink"></a>
+		<div class="op" id="login_info"><span>正在使用 {$weiboName} 帐号</span></div>
+	</div>
+	
+	<!-- /顶部 LOGO -->
+	<div class="reg_main"><b class="bg_regTop"></b><b class="bg_deco_b"></b>
+		<div class="reg_pub">
+			<div class="n_Box">
+				<div class="n_login_sc2">
+					<h2>关注成功！</h2>
+					<p style="margin-bottom:15px;">你已关注站点官方微博<a href="{$weiboAccount['url']}">{$weiboAccount['name']}</a>，<br>可以第一时间获取最新资讯。<p>
+					<p>本页面三秒内自动关闭</p>
+					<div class="btn"><a class="MIB_bigBtn MIB_bigBtnB" onclick="window.close();" href="javascript:;"><cite>立即关闭本页</cite></a></div>
+				</div>
+			</div>
+		</div>
+	<b class="bg_regBot"></b></div>
+</div>
+<script>
+setTimeout(function() {
+	window.close();
+}, 3000);
+</script>
+<!--
+EOT;
+} else if ($action == 'followfail'){
+print <<<EOT
+-->
+<!--- 关注失败 --->
+<div class="reg_wrap"> 
+	<!-- 顶部 LOGO -->
+	<div class="TopName">
+		<div class="logo"></div>
+		<a href="http://weibo.com" target="_blank" class="logoLink"></a>
+		<div class="op" id="login_info"><span>正在使用 {$weiboName} 帐号</span></div>
+	</div>
+	
+	<!-- /顶部 LOGO -->
+	<div class="reg_main"><b class="bg_regTop"></b><b class="bg_deco_b"></b>
+		<div class="reg_pub">
+			<div class="n_Box">
+				<div class="n_login_sc2">
+					<h2>关注站点官方微博失败</h2>
+					<p style="margin-bottom:15px;"><p>
+					<p>本页面三秒内自动关闭</p>
+					<div class="btn"><a class="MIB_bigBtn MIB_bigBtnB" onclick="window.close();" href="javascript:;"><cite>立即关闭本页</cite></a></div>
+				</div>
+			</div>
+		</div>
+	<b class="bg_regBot"></b></div>
+</div>
+<script>
+setTimeout(function() {
+	window.close();
+}, 3000);
+</script>
+<!--
+EOT;
+} else if ($action == 'sharesuccess'){
+print <<<EOT
+-->
+<!--- 分享成功 --->
+<div class="reg_wrap"> 
+	<!-- 顶部 LOGO -->
+	<div class="TopName">
+		<div class="logo"></div>
+		<a href="http://weibo.com" target="_blank" class="logoLink"></a>
+		<div class="op" id="login_info"><span>正在使用 {$weiboName} 帐号</span></div>
+	</div>
+	
+	<!-- /顶部 LOGO -->
+	<div class="reg_main"><b class="bg_regTop"></b><b class="bg_deco_b"></b>
+		<div class="reg_pub">
+			<div class="n_Box">
+				<div class="n_login_sc2">
+					<h2>分享成功</h2>
+					<p style="margin-bottom:15px;"><p>
+					<p>本页面三秒内自动关闭</p>
+					<div class="btn"><a class="MIB_bigBtn MIB_bigBtnB" onclick="window.close();" href="javascript:;"><cite>立即关闭本页</cite></a></div>
+				</div>
+			</div>
+		</div>
+	<b class="bg_regBot"></b></div>
+</div>
+<script>
+setTimeout(function() {
+	window.close();
+}, 3000);
+</script>
+<!--
+EOT;
+} else if ($action == 'sharefail'){
+print <<<EOT
+-->
+<!--- 分享失败 --->
+<div class="reg_wrap"> 
+	<!-- 顶部 LOGO -->
+	<div class="TopName">
+		<div class="logo"></div>
+		<a href="http://weibo.com" target="_blank" class="logoLink"></a>
+		<div class="op" id="login_info"><span>正在使用 {$weiboName} 帐号</span></div>
+	</div>
+	
+	<!-- /顶部 LOGO -->
+	<div class="reg_main"><b class="bg_regTop"></b><b class="bg_deco_b"></b>
+		<div class="reg_pub">
+			<div class="n_Box">
+				<div class="n_login_sc2">
+					<h2>分享失败</h2>
+					<p style="margin-bottom:15px;">抱歉,您的分享没有成功,请重试<p>
+					<p>本页面三秒内自动关闭</p>
+					<div class="btn"><a class="MIB_bigBtn MIB_bigBtnB" onclick="window.close();" href="javascript:;"><cite>立即关闭本页</cite></a></div>
+				</div>
+			</div>
+		</div>
+	<b class="bg_regBot"></b></div>
+</div>
+<script>
+setTimeout(function() {
+	window.close();
+}, 3000);
+</script>
+<!--
+EOT;
+} else if ($action == 'bind'){
+print <<<EOT
+-->
+<!--- 绑定引导 --->
+<div class="reg_wrap"> 
+	<!-- 顶部 LOGO -->
+	<div class="TopName">
+		<div class="logo"></div>
+		<a href="http://weibo.com" target="_blank" class="logoLink"></a>
+		<div class="op" id="login_info"><span>正在使用 {$windid} 帐号</span></div>
+	</div>
+	
+	<!-- /顶部 LOGO -->
+	<div class="reg_main"><b class="bg_regTop"></b><b class="bg_deco_b"></b>
+		<div class="reg_pub">
+			<div class="n_Box">
+				<div class="n_login_sc2" style="width:400px;">
+					<h2>绑定帐号，分享更方便</h2>
+				    <p style="text-align:left;">将你的社区帐号{$windid}同新浪微博帐号绑定，可以更快的分享社区内容：<p>
+				    <p style="text-align:left;">1、只要社区帐号登录，即可成功分享精彩帖子，无需单独登录新浪微博</p>
+				    <p style="text-align:left;">2、你可以用新浪微博帐号登录社区</p>
+				    <p style="text-align:left;">3、你的帐号{$windid}在社区发布的帖子和新鲜事将可以同步到新浪微博</p>
+				    <p style="text-align:left;">4、你发表的新浪微博也可以同步到社区</p>
+					<div class="btn"><a style="vertical-align:middle;" class="MIB_bigBtn MIB_bigBtnB" href="javascript:(function(){window.open('$bindUrl','_blank','width=600,height=400');})()"><cite>立刻绑定</cite></a><a style="vertical-align:middle;" href="http://v.t.sina.com.cn/share/share.php?title={$title}&source=bookmark">直接分享</a></div>
+				</div>
+			</div>
+		</div>
+	<b class="bg_regBot"></b></div>
+</div>
+<!--
+EOT;
+}else{
+print <<<EOT
+-->
+<form action="share.php?type=sinaweibo&action=share" method="POST">
+	<div class="reg_wrap"> 
+		<!-- 顶部 LOGO -->
+		<div class="TopName">
+			<div class="logo"></div>
+			<a href="http://weibo.com" target="_blank" class="logoLink"></a>
+			<div class="op" id="login_info"><span>正在使用 {$weiboName} 帐号 | <a href="http://v.t.sina.com.cn/share/share.php?title={$title}&source=bookmark">换个帐号?</a></span></div>
+		</div>
+		
+		<!-- /顶部 LOGO -->
+		<div class="reg_main"><b class="bg_regTop"></b><b class="bg_deco_b"></b>
+			<div class="reg_pub reg_pub_new">
+				<div class="notice" id="tab_btn">
+					<ul>
+						<li class="curr"><a href="#">分享到微博</a></li>
+					</ul>
+				</div>
+				<div class="inputTxt">
+					<textarea cols="20" rows="5" id="fw_content" name="shareContent">{$shareContent}</textarea>
+					<dl>
+						<dt><img title="" alt="" class="wbIcon iconImg" src="http://timg1.sjs.sinajs.cn/platformstyle/images/common/transparent.gif"><a id="btn_forward" href="javascript:share_img();" class="">分享图片</a></dt>
+						<!-- 附带分享图片 -->
+						<dd style="display:none" id="pic_lst">
+							<div class="picList">
+<!--
+EOT;
+if ($attachImg) {
+print <<<EOT
+-->
+								<ul id="pic_lst_ul">
+<!--
+EOT;
+foreach ($attachImg as $key=>$img) {
+print <<<EOT
+-->
+									<li imgUrl="{$img}" class="" id="li_img_{$key}" onclick="selected_img(this, 'li_img_{$key}');"><a onClick="return false;" href="javascript:void(0);" hidefocus="true"><em><img class="pic" src="{$img}" width="100" height="100"><img alt="" class="ico_slt" src="http://timg1.sjs.sinajs.cn/platformstyle/images/common/transparent.gif"></em></a></li>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+								</ul>
+<!--
+EOT;
+} else {
+print <<<EOT
+-->
+								<p id="nopic" class="nopic"> <img width="14" height="14" title="" alt="" class="iconWarn" src="http://timg1.sjs.sinajs.cn/platformstyle/images/common/transparent.gif"> 没有可分享的图片. </p>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+							</div>
+							<div class="pageNum"> <a id="btn_cancel" class="cancel" href="javascript:cancel_share();">取消分享图片</a>  
+<!--
+EOT;
+if ($attachImg) {
+print <<<EOT
+-->							
+							<span> 
+							<a id="btn_prev"  href="javascript:prev_page();" style="display: none;">&lt;&lt;上一页</a> 
+							<strong id="pic_count">共{$photoCount}张</strong> 
+							<a id="btn_next" href="javascript:next_page();" style="display: none;">下一页&gt;&gt;</a> 
+							</span>
+<!--
+EOT;
+}
+print <<<EOT
+-->							
+							</div>
+						</dd>
+						<input type="hidden" value="" name="photo" id="share_pic" imgKey="">
+						<!-- //附带分享图片 -->
+					</dl>
+				</div>
+				<div class="submit" id="share2blog">
+					<span class="btn_turn"><a class="MIB_bigBtn MIB_bigBtnB" href="javascript:share();" id="btn_send"><cite>分享</cite></a></span>
+				</div>
+			</div>
+		<b class="bg_regBot"></b></div>
+	</div>
+</form>
+<script>
+var photoCount = {$photoCount};
+var page = 1;
+var pageNum = 5;
+
+function get_li() {
+	var cacheLi = [];
+	var pic_lst_ul = get_object("pic_lst_ul").childNodes;
+	for(var iLoop = 0; iLoop < pic_lst_ul.length; iLoop ++) {    
+		var li = pic_lst_ul[iLoop];
+		if ("LI" == li.nodeName)  {
+			li.style.display = 'none';
+			cacheLi.push(li);
+		}
+	}
+	return cacheLi;
+}
+
+function prev_page() {
+	var arr_li = get_li();
+	var li_length = arr_li.length;
+	var photo_index = (page-2)*pageNum;
+	if (photo_index < 0) photo_index = 0;
+
+	for (var i=0; i<li_length; i++) {
+		if (i< photo_index || i > photo_index + pageNum) continue;
+		
+		var li = arr_li[i];
+		li.style.display = '';
+	}
+	page--;
+	if (photo_index == 0) page = 1;
+	
+	if ((page-1)*pageNum <= 0)
+	{
+		get_object('btn_prev').style.display = 'none';
+	}
+	if (li_length > pageNum) get_object('btn_next').style.display = '';
+}
+
+function next_page() {
+	var arr_li = get_li();
+	var li_length = arr_li.length;
+	var photo_index = (page)*pageNum;
+	if (li_length < photo_index) return;
+
+	for (var i=0; i<li_length; i++) {
+		if (i< photo_index || i > photo_index + pageNum) continue;
+		var li = arr_li[i];
+		li.style.display = '';
+	}
+	page++;
+	if (li_length < (page)*pageNum)
+	{
+		get_object('btn_next').style.display = 'none';
+	}
+	get_object('btn_prev').style.display = '';
+}
+
+function share() {
+	document.forms[0].submit();
+}
+
+function share_img() {
+	var pic_lst = get_object('pic_lst');
+	pic_lst.style.display = '';
+}
+
+function cancel_share() {
+	var pic_lst = get_object('pic_lst');
+	pic_lst.style.display = 'none';
+	var share_pic = get_object('share_pic');
+	share_pic.value = '';
+	var imgKey = share_pic.getAttribute('imgKey');
+	var objImgKey = get_object(imgKey);
+	objImgKey.className = '';
+	share_pic.setAttribute('imgKey', '');
+}
+
+function selected_img(e, id) {
+	var share_pic = get_object('share_pic');
+	var imgKey = share_pic.getAttribute('imgKey');
+	if (id == imgKey) return ;
+
+	share_pic.value = e.getAttribute('imgUrl');
+	share_pic.setAttribute('imgKey', id);
+	e.className = 'on';
+	var objImgKey = get_object(imgKey);
+	objImgKey.className = '';
+}
+
+prev_page();
+</script>
+<!--
+EOT;
+}print <<<EOT
+-->
+</body>
+</html>
+<!--
+EOT;
+?>-->

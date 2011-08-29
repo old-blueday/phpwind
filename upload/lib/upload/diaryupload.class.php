@@ -36,7 +36,7 @@ class DiaryUpload extends uploadBehavior {
 		if ($winddb['uploadtime'] < $tdtime) {
 			$winddb['uploadnum'] = 0;
 		}
-		if (($winddb['uploadnum'] + count($_FILES) + count($this->flashatt)) >= $_G['allownum']) {
+		if ($_G['allownum'] > 0 && ($winddb['uploadnum'] + count($_FILES) + count($this->flashatt)) >= $_G['allownum']) {
 			Showmsg('upload_num_error');
 		}
 	}
@@ -251,7 +251,7 @@ class diaryMutiUpload extends uploadBehavior {
 		if ($winddb['uploadtime'] < $tdtime) {
 			$winddb['uploadnum'] = 0;
 		}
-		if ($winddb['uploadnum'] + count($_FILES) >= $_G['allownum']) {
+		if ($_G['allownum'] > 0 && $winddb['uploadnum'] + count($_FILES) >= $_G['allownum']) {
 			return 'upload_num_error';
 		}
 		return true;

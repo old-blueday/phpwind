@@ -1,0 +1,250 @@
+<!--<?php
+!$webPageTitle && $webPageTitle = $db_bbsname;
+$metaVersion = $wind_version;
+$wind_repair && $metaVersion .= '(' . $wind_repair . ')';
+print <<<EOT
+-->
+<!doctype html>
+<html>
+<head>
+<title>$webPageTitle - Powered by phpwind</title>
+<meta charset="$db_charset" />
+<meta name="generator" content="phpwind v{$metaVersion}" />
+<meta name="description" content="$metaDescription" />
+<meta name="keywords" content="$metaKeywords" />
+<script type="text/javascript" src="js/core/core.js"></script>
+<script type="text/javascript" src="js/pw_ajax.js"></script>
+<!--css-->
+<link rel="stylesheet" href="$imgpath/pw_core.css?{$GLOBALS['wind_repair']}" />
+<!--
+EOT;
+@include Pcv($css_path);
+print <<<EOT
+-->
+<link rel="stylesheet" href="$imgpath/register/register.css?{$GLOBALS['wind_repair']}" />
+</head>
+<body onKeyDown="try{keyCodes(event);}catch(e){}">
+<div class="wrap">
+<div id="header">
+		<div style="height:24px;"></div>
+		<div id="head" class="cc">
+				<a href="$db_bbsurl/"><img src="$imgpath/$stylepath/logo.png" class="fl" title="phpwind" /></a>
+		</div>
+</div>
+<div class="main-wrap">
+<div id="main">
+<!--
+EOT;
+print<<<EOT
+-->
+
+<div id="pw_content">
+	<div class="p20">
+		<div class="menu_tasksA_tab" style="margin-bottom:20px">
+		    <ul style="padding-left:80px;">
+		        <li><a style="font-size:14px; color:#333;" href="login.php?action=weibologinregister">完善帐号资料</a></li>
+		        <li class="current"><a style="font-size:14px; color:#333;" href="javascript:;">已有帐号？立即绑定</a></li>
+		    </ul>
+		</div>
+		<div class="cc">
+		<form action="login.php?action=weibologinbind" method="post" name="login">
+		<input type="hidden" value="2" name="step" />
+		<div class="regForm-wrap">
+		<div class="regForm">
+			<dl>
+				<dt></dt>
+				<dd style="font-size:14px;">
+				你将使用{$loginWay['title']}的帐号绑定本站帐号
+				</dd>
+			</dl>
+			<dl>
+				<dt>
+					<div style="height:26px;">
+<!--
+EOT;
+$arr_logintypename = array('用户名','UID','电子邮箱');
+if(count($_LoginInfo['logintype'])==1){
+$value = current($_LoginInfo['logintype']);
+print <<<EOT
+-->
+					$arr_logintypename[$value]
+<!--
+EOT;
+}elseif(count($_LoginInfo['logintype'])>1){
+print <<<EOT
+-->
+					<select name="lgt" style="padding:0;">
+<!--
+EOT;
+$i=1;
+foreach($_LoginInfo['logintype'] as $value){
+$str_checked = $i==1? 'selected':'';
+$i++;
+print <<<EOT
+-->
+					<option value="$value" $str_checked>$arr_logintypename[$value]</option>
+<!--
+EOT;
+}print <<<EOT
+-->
+					</select>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+							<input type="radio" name="lgt"  value="$value" checked />
+							<span id="login_$value">用户名</span>
+<!--
+EOT;
+}print <<<EOT
+-->
+					</div>
+				</dt>
+				<dd class="ip"><div class=""><input type="text" class="input" maxLength="60" name="pwuser" /></div></dd>
+				<dd class="tp"><div id="regname_info"></div></dd>
+			</dl>
+			<dl class="cc">
+				<dt>密　码</dt>
+				<dd class="ip"><div><input class="input mr10" type="password" maxLength="20" name="pwpwd" size="40" /></div></dd>
+				<dd></dd>
+			</dl>
+
+<!--
+EOT;
+if($db_ifsafecv){print <<<EOT
+-->
+			<dl class="cc">
+				<dt>安全问题</dt>
+				<dd class="ip">
+					<select name="question" onChange="showcustomquest(this.value)" style="width:230px;margin-top:3px;">
+						<option value="0">无安全问题</option><option value="1">我爸爸的出生地</option><option value="2">我妈妈的出生地</option><option value="3">我的小学校名</option><option value="4">我的中学校名</option><option value="5">我最喜欢的运动</option><option value="6">我最喜欢的歌曲</option><option value="7">我最喜欢的电影</option><option value="8" >我最喜欢的颜色</option><option value="-1">自定义问题</option>
+					</select>
+				</dd>
+      </dl>
+			<dl class="cc" id="customquestid" style="display:none">
+				<dt>自定义问题</dt>
+				<dd class="ip">
+        	<div><input type="text" name="customquest" /></div>
+				</dd>
+      </dl>
+			<dl class="cc">
+				<dt>您的答案</dt>
+				<dd class="ip mr5"><div><input type="text" class="input" name="answer" /></div></dd>
+				<dd><div class="p5 s6">如果您设置了安全问题，需要填写正确的答案才能登录站点</div></dd>
+			</dl>
+<!--
+EOT;
+}
+
+/* ignore
+if(($db_ckquestion & 2) && $db_question){
+$qkey = array_rand($db_question);
+if(!$question){
+	if($db_imagequestion){
+		$question = '<img id="ckquestion" style="margin:0;" src="ckquestion.php?q='.$qkey.'&t='.$timestamp.'">';
+	}else{
+		$question = $qkey<0 ? getMachineQuestion_1() :  $db_question[$qkey];
+	}
+}
+print <<<EOT
+-->
+      <dl class="cc">
+				<dt>验证问答</dt>
+				<dd class="ip"><div><input class="input" type="text" name="qanswer" /><input type="hidden" name="qkey" value="$qkey" /></div></dd>
+				<dd class="tp"><div class="ignore">{$question}
+<!--
+EOT;
+if($showq && $qkey>0){
+print <<<EOT
+-->
+					<p>答案：{$db_answer[$qkey]}</p>
+<!--
+EOT;
+}print <<<EOT
+--></div>
+				</dd>
+      </dl>
+<!--
+EOT;
+}
+*/
+
+/* ignore
+if($db_gdcheck & 2){
+$gdSize = explode("\t",$db_gdsize);
+print <<<EOT
+-->
+			<dl class="cc">
+				<dt>验证码</dt>
+				<dd class="ip ck">
+					<div><input id="gdcode" class="input" style="" name="gdcode" value="" /></div>
+					<span id="menu_gd"></span>
+<script type="text/javascript" src="js/pw_authcode.js"></script>
+<script>
+var flashWidth = "$gdSize[0]";
+var flashHeight = "$gdSize[1]";
+var gdtype = $db_gdtype;
+showGdCode();
+</script>
+				</dd>
+				<dd></dd>
+			</dl>
+<!--
+EOT;
+}
+*/
+print <<<EOT
+-->
+        <dl class="cc" style="display:none;">
+            <dt>隐身登录</dt>
+            <dd style="padding-top:5px;"><label for="hideid1" class="mr20"><input id="hideid1" name="hideid" type="radio" value="1" />开启</label><label for="hideid0"><input name="hideid" id="hideid0" type="radio" value="0" checked />关闭</label></dd>
+        </dl>
+        <dl class="cc" style="display:none;">
+            <dt>Cookie 有效期</dt>
+			<dd style="padding-top:5px;">
+				<select name="cktime">
+					<option value="31536000">一年</option>
+					<option value="2592000">一个月</option>
+					<option value="86400">一天</option>
+					<option value="3600">一小时</option>
+					<option value="0">即时</option>
+				</select>
+			</dd>
+        </dl>
+<!--
+EOT;
+if($weiboAccount && $weiboAccount[url]){print <<<EOT
+-->
+		<dl class="cc">
+			<dt>官方微博</dt>
+			<dd class="mr10" style="line-height: 28px;">
+				<label><input type="checkbox" name="isfollow" value="1" checked />关注本站官方微博：</label>
+				<a target="_blank" class="b s4" href="{$weiboAccount['url']}">{$weiboAccount['name']}</a>
+			</dd>
+			<dd class="tp"></dd>
+		</dl>
+<!--
+EOT;
+}print <<<EOT
+-->
+        <dl class="cc" style="margin-top:15px;">
+            <dt>&nbsp;</dt>
+            <dd><span class="btn"><span><button type="submit" name="submit">绑定帐号</button></span></span></dd>
+        </dl>
+
+		</div>
+		</div>
+		
+		</form>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+document.login.pwuser.focus();
+function showcustomquest(qid){
+	getObj("customquest").style.display = qid==-1 ? '' : 'none';
+}
+</script>
+<!--
+EOT;
+?>-->

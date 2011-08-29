@@ -33,7 +33,9 @@ Class OnlinePay {
 		$this->pwpay_partnerID = $GLOBALS['db_sitehash'];
 	}
 
-	function alipayurl($order_no, $fee, $paytype) {
+	//$extra给额外参数用,中文无效
+	function alipayurl($order_no, $fee, $paytype,$extra='') {
+
 		$param = array(
 			'_input_charset'	=> $this->charset,
 			'service'			=> 'create_direct_pay_by_user',
@@ -44,6 +46,7 @@ Class OnlinePay {
 			'body'				=> getLangInfo('olpay', "olpay_{$paytype}_content"),
 			'out_trade_no'		=> $order_no,
 			'total_fee'			=> $fee,
+			'extra_common_param' => $this->formatExtra($extra),
 			'seller_email'		=> $this->seller_email
 		);
 		if ($this->alipay_key && $this->alipay_partnerID) {
@@ -55,6 +58,16 @@ Class OnlinePay {
 		return $url;
 	}
 
+	function formatExtra($extra) {
+		$extraLen = strlen($extra);
+		if ($extraLen > 100) $extra = '';
+		if ($extra == '') return '';
+		$param = array();
+		for($i = 0,$cnt = strlen($extra);$i<$cnt;$i++){
+			$param[] = ord($extra{$i});
+		} 
+		return implode('.',$param); 
+	}
 	function alipay2url($param) {
 		$param['service']			= 'trade_create_by_buyer';
 		$param['_input_charset']	= $this->charset;

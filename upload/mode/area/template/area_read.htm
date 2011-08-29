@@ -5,13 +5,13 @@ print <<<EOT
 
 <!--
 EOT;
-if(($N_allowtypeopen && $foruminfo['allowtype'] != 1) || $N_allowtopicopen || $N_allowpostcateopen){print <<<EOT
+if(($N_allowtypeopen && ($foruminfo['allowtype'] != 1 || $modelids || $pcids || $_G['allowactivity'] && $firstactmid)) || $N_allowtopicopen || $N_allowpostcateopen){print <<<EOT
 -->
 <div id="menu_post" class="pw_menu tac" style="display:none;">
 	<ul class="menuList" style="width:70px;">
 <!--
 EOT;
-if($foruminfo['allowtype'] & 1 && $foruminfo['allowtype'] != 1){print <<<EOT
+if($foruminfo['allowtype'] & 1 && ($foruminfo['allowtype'] != 1 || $modelids || $pcids || $_G['allowactivity'] && $firstactmid)){print <<<EOT
 -->
 		<li><a href="post.php?fid=$fid" hidefocus="true">新  帖</a></li>
 <!--
@@ -130,7 +130,7 @@ EOT;
 }
 if($managecheck){print <<<EOT
 -->
-				[<a href="read.php?tid=$tid&viewbbs=1&displayMode=1">管理</a>]
+				[<a href="read.php?tid=$tid&viewbbs=1&ds=1">管理</a>]
 <!--
 EOT;
 }print <<<EOT
@@ -249,7 +249,7 @@ EOT;
 if($thread_read[lou]==0 && $pcid>0 && $winduid){print<<<EOT
 -->
 <a name="pcinfo"></a><div id="pc_show"><div style="padding:13px 30px;"><img src="$imgpath/loading.gif" align="absbottom" /> 正在加载数据...</div></div>
-<script language="javascript">
+<script>
 var isadminright = parseInt('$isadminright');
 var payway = parseInt('$payway');
 var ifend = parseInt('$ifend');
@@ -331,7 +331,7 @@ if(!$forumset['rate'] && $rateSets[1] && isset($db_hackdb['rate'])){
 print <<<EOT
 -->
 			<link rel="stylesheet" type="text/css" href="hack/rate/images/rate.css" />
-			<script language="JavaScript" src="js/rate_ajax.js"></script>
+			<script type="text/javascript" src="js/rate_ajax.js"></script>
 			<div class="c">&nbsp;</div>
 			<div id="vote_box" style="margin:10px 15px;">
 <!--
@@ -551,20 +551,15 @@ print <<<EOT
 <!--
 EOT;
 if($db_gdcheck & 4 && (!$db_postgd || $winddb['postnum'] < $db_postgd)){
-$gdSize = explode("\t",$db_gdsize);
+$checkCode = L::loadClass('checkcode', 'site');
+$checkCodeString = $checkCode->getCheckCodeTemplate();
 print <<<EOT
 -->
 <div class="mb5">
-认证码: <input class="input" type="text" name="gdcode" size="5" tabindex="6" onfocus="showgd();"/>
+验证码: <input class="input" type="text" name="gdcode" size="5" tabindex="6" onfocus="showgd();"/>
 		<span id="ckcode" style="display:none;">
-<script type="text/javascript" src="js/pw_authcode.js"></script>
-<script>
-var flashWidth = "$gdSize[0]";
-var flashHeight = "$gdSize[1]";
-var gdtype = $db_gdtype;
-showGdCode();
-</script>
 		</span>
+$checkCodeString
 </div>
 <!--
 EOT;
@@ -584,7 +579,7 @@ print <<<EOT
 EOT;
 if($showq && $qkey>0){print <<<EOT
 -->
- 正确答案:{$db_answer[$qkey]}
+ （答案：{$db_answer[$qkey]}）
 <!-- 
 EOT;
 }
@@ -600,7 +595,7 @@ EOT;
 EOT;
 print <<<EOT
 -->
-<script language="javascript">
+<script>
 	var charset = '$db_charset';
 	var imgpath   = '$imgpath';
 	var stylepath = '$stylepath';
@@ -608,9 +603,9 @@ print <<<EOT
 	    document.FORM.atc_content.value += ' [s:'+NewCode+'] ';
 	}
 </script>
-<script language="JavaScript" src="js/app_global.js"></script>
+<script type="text/javascript" src="js/app_global.js"></script>
 <script src="$db_htmdir/js/face.js"></script>
-<script language="JavaScript" src="js/post.js"></script>
+<script type="text/javascript" src="js/post.js"></script>
 <div id="menu_show" style="display: none;"></div>
 <div id="menu_face" class="menu" style="display: none;"></div>
 <div id="linkbox" style="display: none;"></div>
@@ -635,7 +630,7 @@ print <<<EOT
 <input type="hidden" name="ajax" value="1" />
 <input type="hidden" name="iscontinue" value="0" />
 </form>
-<script language="javascript">
+<script>
 function checkpost(obj) {
 	var action = "reply";
 	ajaxSubmit(obj);
@@ -672,7 +667,7 @@ function ajaxSubmit(obj) {
 }
 </script>
 
-<script language="javascript">
+<script>
 <!--
 EOT;
 $tmpVerify = GetVerify($onlineip.$GLOBALS['winddb']['regdate'].$fid.$tid);print <<<EOT

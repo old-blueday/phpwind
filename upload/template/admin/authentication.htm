@@ -3,7 +3,7 @@ include_once PrintEot('left');
 ${'current' . $action} = 'class="current"';
 print <<<EOT
 -->
-<script language="JavaScript">
+<script type="text/javascript">
 function cateopen(id) {
 	var o = getObj('cate_' + id);
 	if (o == null) return;
@@ -16,28 +16,23 @@ function cateopen(id) {
 	}
 }
 
-function changeValue(threadid, key) {
-	phoneValue = getObj('changephone').value;
-	alipayValue = getObj('changealipay').value;
-	certificateauthValue = getObj('changecertificate').value;
-	value = ',' + threadid + ',';
-	if (key == 'cellphone') {
-		if (phoneValue.indexOf(value) < 0) {
-			 getObj('changephone').value =phoneValue + value;
-		} else {
-			 getObj('changephone').value = phoneValue.replace(value, '');
-		}
-	} else if (key == 'alipay') {
-		if (alipayValue.indexOf(value) < 0) {
-			getObj('changealipay').value =alipayValue + value;
-		}else {
-			getObj('changealipay').value = alipayValue.replace(value, '');
-		}
-	} else if (key == 'certificate') {
-		if (certificateauthValue.indexOf(value) < 0) {
-			getObj('changecertificate').value = certificateauthValue + value;
-		}else {
-			getObj('changecertificate').value = certificateauthValue.replace(value, '');
+function changeValue(obj) {
+	var pattern = /^auth\[(\d+)]\[(.+)]$/;
+	if (! pattern.test(obj.name) || !RegExp.$2) return false;
+	var fid = RegExp.$1, item = RegExp.$2;
+	var changedItem = getObj('change' + item);
+	var changedItemValue = changedItem.value;
+	var value = ',' + fid + ',';
+	if (changedItemValue.indexOf(value) < 0) {
+		changedItem.value = changedItemValue + value;
+	} else {
+		changedItem.value = changedItemValue.replace(value,'');
+	}
+	//且 或 选择
+	if(obj.tagName == 'SELECT') {
+		var sp = obj.id.split('_');
+		if (sp[1]) {
+			getObj('logical_2_'+sp[1]).innerHTML = getObj('logical_1_'+sp[1]).innerHTML = obj.value == 1 ? '或' : '且';
 		}
 	}
 }
@@ -146,19 +141,29 @@ print <<<EOT
 -->
 <form action="$basename&action=forumpost" method="post" name="forumpost">
 <input type="hidden" name="step" value="2" />
-<input type="hidden" name="changedphone" id="changephone" value="" />
+<input type="hidden" name="changedcellphone" id="changecellphone" value="" />
 <input type="hidden" name="changedalipay" id="changealipay" value="" />
 <input type="hidden" name="changedcertificate" id="changecertificate" value="" />
+<input type="hidden" name="changedallowread" id="changeallowread" value="" />
+<input type="hidden" name="changedallowpost" id="changeallowpost" value="" />
+<input type="hidden" name="changedallowrp" id="changeallowrp" value="" />
+<input type="hidden" name="changedallowupload" id="changeallowupload" value="" />
+<input type="hidden" name="changedlogicalmethod" id="changelogicalmethod" value="" />
 <h3 class="h1"><b>提示信息</b></h3>
-<div class="legend">开启后，在指定版块发帖、发布团购/活动/分类信息时，仅当会员通过认证才能继续操作</div>
+<div class="legend mb10">开启后，在指定版块发帖、发布团购/活动/分类信息时，仅当会员通过认证才能继续操作</div>
 <h2 class="h1">版块设置</h2>
 <div class="admin_table mb10">
 <table id="ftable" cellspacing="0" cellpadding="0" width="100%">
     <tr class="tr2">
         <td>[顺序]版块名称</td>
-        <td width="160">绑定手机</td>
-        <td width="160">绑定支付宝</td>
-        <td>证件认证</td>
+        <td width="30">浏览</td>
+        <td width="30">发帖</td>
+        <td width="30">回复</td>
+        <td width="40" style="border-right:1px solid #dde9f5;">附件</td>
+        <td width="85" class="tac">绑定手机</td>
+        <td width="90" class="tac">绑定支付宝</td>
+        <td width="60" class="tac">证件认证</td>
+        <td>认证关系</td>
     </tr>
 <!--
 EOT;
@@ -171,9 +176,11 @@ print <<<EOT
 			<i id="bt_$cate[fid]" class="$tmpStyle" onclick="cateopen('$cate[fid]')"></i>
 			<span class="fourm_name" id="fourm_$cate[fid]">$cate[name]</span>
 		</td>
+		<td colspan="4" class="td2" style="border-right:1px solid #dde9f5;">&nbsp;</td>
 		<td class="td2"></td>
-        <td class="td2"></td>
-        <td class="td2"></td>
+		<td class="td2"></td>
+		<td class="td2"></td>
+    <td class="td2"></td>
 	</tr>
 <!--
 EOT;
@@ -187,24 +194,38 @@ $forumset = unserialize($thread['forumset']);
 $checkCellphone = $forumset['auth_cellphone'] == 1 ? 'checked' : '';
 $checkAlipay = $forumset['auth_alipay'] == 1 ? 'checked' : '';
 $checkCertificateauth = $forumset['auth_certificate'] == 1 ? 'checked' : '';
+//实名认证控制权限
+$checkAllowRead = $forumset['auth_allowread'] == 1 ? 'checked' : '';
+$checkAllowPost = $forumset['auth_allowpost'] == 1 ? 'checked' : '';
+$checkAllowRp = $forumset['auth_allowrp'] == 1 ? 'checked' : '';
+$checkAllowUpload = $forumset['auth_allowupload'] == 1 ? 'checked' : '';
+$checkLogicalMethod0 = $checkLogicalMethod1 = '';
+$forumset['auth_logicalmethod'] == 1 ? $checkLogicalMethod1 = ' selected' : $checkLogicalMethod0 = ' selected';
+$logicalText = $forumset['auth_logicalmethod'] == 1 ? '或' : '且';
 $isspace = str_repeat($space,$thread['type'] == 'forum' ? 0 : ($thread['type'] == 'sub' ? 1 : 2));
 print <<<EOT
 -->
 	<tr class="vt tr1">
-		<td class="td3">
-			{$isspace}
-            <i class="lower"></i>
-            <span id="fourm_$thread[fid]" class="fourm_name">$thread[name]</span>
-        </td>
-		<td class="td2">
-			<input type="checkbox" name="auth[$thread[fid]][cellphone]" value=1 onclick="changeValue($thread[fid],'cellphone');" $checkCellphone />
+		<td class="td3">{$isspace}<i class="lower"></i><span id="fourm_$thread[fid]" class="fourm_name">$thread[name]</span></td>
+		<td class="td2"><input type="checkbox" name="auth[$thread[fid]][allowread]" value=1 onclick="changeValue(this);" $checkAllowRead></td>
+		<td class="td2"><input type="checkbox" name="auth[$thread[fid]][allowpost]" value=1 onclick="changeValue(this);" $checkAllowPost></td>
+		<td class="td2"><input type="checkbox" name="auth[$thread[fid]][allowrp]" value=1 onclick="changeValue(this);" $checkAllowRp></td>
+		<td class="td2" style="border-right:1px solid #dde9f5;"><input type="checkbox" name="auth[$thread[fid]][allowupload]" value=1 onclick="changeValue(this);" $checkAllowUpload></td>
+		<td class="td2 tac">
+			<span id="logical_1_{$thread['fid']}" class="fr">$logicalText</span>
+			<input type="checkbox" class="mr5" name="auth[$thread[fid]][cellphone]" value=1 onclick="changeValue(this);" $checkCellphone />
 		</td>
+		<td class="td2 tac">
+			<span id="logical_2_{$thread['fid']}" class="fr">$logicalText</span>
+			<input type="checkbox" class="mr5" name="auth[$thread[fid]][alipay]" value=1 onclick="changeValue(this);" $checkAlipay />
+		</td>
+		<td class="td2 tac"><input type="checkbox" name="auth[$thread[fid]][certificate]" value=1 onclick="changeValue(this);" $checkCertificateauth /></td>
 		<td class="td2">
-            <input type="checkbox" name="auth[$thread[fid]][alipay]" value=1 onclick="changeValue($thread[fid],'alipay');" $checkAlipay />
-        </td>
-		<td class="td2">
-            <input type="checkbox" name="auth[$thread[fid]][certificate]" value=1 onclick="changeValue($thread[fid],'certificate');" $checkCertificateauth />
-        </td>
+			<select name="auth[{$thread['fid']}][logicalmethod]" onchange="changeValue(this);" id="logicalSel_{$thread['fid']}">
+				<option value="0"$checkLogicalMethod0>且</option>
+				<option value="1"$checkLogicalMethod1>或</option>
+			</select>
+		</td>
 	</tr>
 <!--
 EOT;
@@ -264,6 +285,9 @@ EOT;
 foreach ($threaddb[$cate['fid']] as $thread) {
 $forumset = unserialize($thread['forumset']);
 $isspace = str_repeat($space,$thread['type'] == 'forum' ? 0 : ($thread['type'] == 'sub' ? 1 : 2));
+$forumset['auth_cellphone_credit'] = $forumset['auth_cellphone_credit'] ? $forumset['auth_cellphone_credit'] : 1;
+$forumset['auth_alipay_credit'] = $forumset['auth_alipay_credit'] ? $forumset['auth_alipay_credit'] : 1;
+$forumset['auth_certificate_credit'] = $forumset['auth_certificate_credit'] ? $forumset['auth_certificate_credit'] : 1;
 print <<<EOT
 -->
 	<tr class="vt tr1">
@@ -303,7 +327,7 @@ EOT;
 print <<<EOT
 -->
 <script type="text/javascript" src="http://apps.phpwind.net/js/global.js"></script>
-<script language="JavaScript">
+<script type="text/javascript">
 var server = new PwJs.Server("pwapp");
 server.start();
 </script>
@@ -337,7 +361,7 @@ function initPost(state){
 	form.dostate.value = state;
 	form.submit();
 }
-function changeState(state){
+function changeAuthState(state){
 	document.location.href = "$basename&action=certificateauth&state=" + state;
 }
 
@@ -350,7 +374,6 @@ function hasCheckedItem(form) {
 	return ifcheck;
 }
 </script>
-<script src="js/global.js"></script>
 <form action="$basename&action=certificateauth" method="post" name="certificate_form"  id="certificate_form">
 	<input type="hidden" name="page" value="$page">
 	<input type="hidden" name="step" value="2">
@@ -361,7 +384,7 @@ function hasCheckedItem(form) {
           <tr class="tr2 vt td_bgB">
             <td width="24"><span onclick="CheckAll(document.certificate_form)" class="cp">全选</span></td>
             <td width="100">
-            	<select name="state" onchange="changeState(this.value);">
+            	<select name="state" onchange="changeAuthState(this.value);">
             		<option value="0">全部</option>
             		$stateHtml
             	</select>

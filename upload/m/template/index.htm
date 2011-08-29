@@ -1,0 +1,205 @@
+<!--<?php
+defined('W_P') or exit('Forbidden');print <<<EOT
+-->
+<div class="login">
+<!--
+EOT;
+include printWAP('loginbanner');print <<<EOT
+-->
+</div>
+<!--
+EOT;
+list($htmlAdvert,$arrayAdvert) = pwAdvert('Wap.Header',$fid,$lou,'index');
+if($htmlAdvert){print <<<EOT
+-->
+	<div class="atop">$htmlAdvert</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+<!--
+EOT;
+if($db_waprecommend){print <<<EOT
+-->
+<div class="hline"></div>
+<div class="section">
+	<a href="#anch-1" id="anch-0" accesskey="1" class="a_img"><img alt="向下" src="$wapImages/x.gif" /></a>
+<!--
+EOT;
+$i = 0;
+foreach ($recommendTypes as $var) {
+$_tag = $i == 0 ? '' : ' &#8226; ';
+$_style = $var[id] == $type ? 'style="font-weight:bolder"' : '';
+print <<<EOT
+-->
+	$_tag <span $_style><a href="index.php?a=recommend&type=$var[id]">$var[typename]</a></span>
+<!--
+EOT;
+$i++;
+}print <<<EOT
+-->	
+</div>
+<div class="sectionidx">
+<div>
+<!--
+EOT;
+foreach($recommendbs as $val){print <<<EOT
+-->
+<a href="$val[link]">$val[subject]</a>
+<!--
+EOT;
+if($val[ifupload]){print <<<EOT
+-->
+<img src="$wapImages/img.gif" />
+<!--
+EOT;
+}print <<<EOT
+-->
+<br/>
+<!--
+EOT;
+}
+$recommendurl = "index.php?a=recommend&" . ($type? "&amp;type=$type" : "");
+print <<<EOT
+-->
+</div>
+</div>
+<!--
+EOT;
+if($recommendbs && count($recommendbs) >= 4){print <<<EOT
+-->
+<div class="section1"><a href=$recommendurl >更多&raquo;</a></div>
+<!--
+EOT;
+}}if($db_waphottopictoday){
+print <<<EOT
+-->
+<div class="hline"></div>
+<div class="section"><a href="#anch-2" id="anch-1" class="a_img" accesskey="1"><img alt="phpwind" src="$wapImages/x.gif" /></a><strong>24小时热帖</strong></div>
+<div class="sectionidx">
+<div>
+<!--
+EOT;
+foreach($hots24 as $val){print <<<EOT
+-->
+<a href="index.php?a=read&tid={$val[addition][tid]}">$val[title]</a> 
+<!--
+EOT;
+if($val[addition][topped]){print <<<EOT
+-->
+[顶]<!-- img src='$wapImages/ding.gif' alt='顶'/ -->
+<!--
+EOT;
+}if($val[addition][digest]){print <<<EOT
+-->
+[精]<!-- img src='$wapImages/digest.gif' alt='精华'/ -->
+<!--
+EOT;
+}if($val[addition][ifupload]==1){print <<<EOT
+-->
+[图]<!-- img src="$wapImages/img.gif" alt='附件' / -->
+<!--
+EOT;
+}print <<<EOT
+-->
+<br/>
+<!--
+EOT;
+}print <<<EOT
+-->
+</div>
+</div>
+<!--
+EOT;
+if($hots24 && count($hots24)>= 4){print <<<EOT
+-->
+<div class="section1"><a href="index.php?a=forum&type=hot&t=1">更多&raquo;</a></div>
+<!--
+EOT;
+}}print <<<EOT
+-->
+<div class="section1"><a href="index.php?a=forum&type=new">查看新帖</a> | <a href="index.php?a=myfav&type=fav&from=index">我的收藏</a>&nbsp;&nbsp;</div>
+<!--
+EOT;
+if($db_waphottopicweek){print <<<EOT
+-->
+<div class="hline"></div>
+<div class="section"><a href="#anch-3" id="anch-2" class="a_img" accesskey="2"><img alt="phpwind" src="$wapImages/x.gif" /></a><strong>本周热帖</strong></div>
+<div class="sectionidx">
+<div>
+<!--
+EOT;
+foreach($hotsw7 as $val){print <<<EOT
+-->
+<a href="index.php?a=read&tid={$val[addition][tid]}">$val[title]</a> 
+<!--
+EOT;
+if($val[addition][topped]){print <<<EOT
+-->
+[顶]<!-- img src='$wapImages/ding.gif' alt='顶'/ -->
+<!--
+EOT;
+}if($val[addition][digest]){print <<<EOT
+-->
+[精]<!-- img src='$wapImages/digest.gif' alt='精华'/ -->
+<!--
+EOT;
+}if($val[addition][ifupload]==1){print <<<EOT
+-->
+[图]<!-- img src="$wapImages/img.gif" alt='附件' / -->
+<!--
+EOT;
+}print <<<EOT
+-->
+<br/>
+<!--
+EOT;
+}print <<<EOT
+-->
+</div>
+</div>
+<!--
+EOT;
+if($hotsw7 && count($hotsw7) >= 4){print <<<EOT
+-->
+<div class="section1"><a href="index.php?a=forum&type=hot&t=3">更多&raquo;</a></div>
+<!--
+EOT;
+}}
+if($_G['allowsearch'] != '0'){
+print <<<EOT
+-->
+<div class="search">
+<form action="index.php?a=search" method="post">
+<input type="text" name="q" size="7" maxlenth="2000"/>&nbsp;&nbsp;<input type=submit value="搜帖子" />
+<br /></form></div>
+<!--
+EOT;
+}print <<<EOT
+-->
+
+<div class="section"><a href="#anch-end" id="anch-3" accesskey="3" class="a_img"><img alt="phpwind" src="$wapImages/x.gif" /></a><strong>精彩导航</strong></span></div>
+<div class="sectionidx">
+<!--
+EOT;
+foreach($wapfids as $key => $val){print <<<EOT
+-->
+<a href="index.php?a=forum&fid=$key">$val</a><br/>
+<!--
+EOT;
+}print <<<EOT
+-->
+<a href="index.php?a=list"><b>所有版块&raquo;</b></a></strong></div>
+<!--
+EOT;
+list($htmlAdvert,$arrayAdvert) = pwAdvert('Wap.Footer',$fid,$lou,'index');
+if($htmlAdvert){print <<<EOT
+-->
+	<div class="abottom">$htmlAdvert</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+<!--
+EOT;
+?>-->

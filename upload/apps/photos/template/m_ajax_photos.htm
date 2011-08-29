@@ -76,7 +76,7 @@ EOT;
 		<div class="popBottom"><span class="btn2"><span><button type="submit" onclick="ajax.submit(this.form)">确定</button></span></span><span class="bt2"><span><button type="button" onclick="closep();">取消</button></span></span></div>
 		</div>
 	</form>
-<script language="JavaScript">
+<script>
 var charset = '$db_charset';
 setTimeout(function(){initCheckTextNum('ajax_aname','ajax_aname_warn',24);},300);
 setTimeout(function(){initCheckTextNum('ajax_aintro','ajax_aintro_warn',255);},300);
@@ -111,7 +111,7 @@ EOT;
 		<div class="p10"><input type="password" class="input input_wa" name="viewpwd" id="pwdvalue" maxlength="15" /></div>
 		<div class="popBottom"><span class="btn2"><span><button type="submit" onclick="tourl();">提 交</button></span></span><span class="bt2"><span><button type="button" onclick="closep();">取消</button></span></span></div>
 	</form></div>
-<script language="JavaScript">
+<script>
 function tourl() {
 	var aid = getObj('aidvalue').value;
 	var viewpwd = getObj('pwdvalue').value;
@@ -186,18 +186,14 @@ print <<<EOT
 		<!--
 EOT;
 if ($o_photos_gdcheck) {
-$gdSize = explode("\t",$db_gdsize);
+$checkCode = L::loadClass('checkcode', 'site');
+$checkCodeString = $checkCode->getCheckCodeTemplate();
 print <<<EOT
 -->
 		<tr class="tr3">
-			<td>验证码:</td>
+			<td>验证码:*</td>
 			<td>
-<script type="text/javascript" src="js/pw_authcode.js"></script>
-<script>
-var flashWidth = "$gdSize[0]";
-var flashHeight = "$gdSize[1]";
-var gdtype = $db_gdtype;
-</script>
+$checkCodeString
 				<div id="ckcode" style="display:none;margin-bottom:5px;"></div>
 				<br />
 				<input class="input" onfocus="showgd();" type="text" name="gdcode" id="gdcode" style="width:50px;" tabindex="3"  />
@@ -211,11 +207,11 @@ if($db_imagequestion){
 }else{
 	$question = $qkey<0 ? getMachineQuestion_1() :  $db_question[$qkey];
 }
-$q_a = $question.($showq && $qkey>0?" 正确答案:".$db_answer[$qkey] : '');
+$q_a = $question.($showq && $qkey>0?" （答案：".$db_answer[$qkey] . '）' : '');
 print <<<EOT
 -->
 		<tr class="tr3">
-			<td>验证问题</td>
+			<td>验证问题*</td>
 			<td>
 			<div>{$q_a}</div>
 			<input class="input" name="qanswer" id="qanswer" size="25" tabindex="7" />
@@ -229,7 +225,7 @@ EOT;
 	</table>
 	<div class="popBottom"><span class="btn2"><span><button type="submit" onclick="fetchvalue();">提 交</button></span></span><span class="bt2"><span><button type="button" onclick="closep();">取消</button></span></span></div>
 	</div>
-<script language="JavaScript">
+<script>
 var charset = '$db_charset';
 setTimeout(function(){initCheckTextNum('c_ajax_aname','c_ajax_aname_warn',24);},300);
 setTimeout(function(){initCheckTextNum('c_ajax_aintro','c_ajax_aintro_warn',255);},300);
@@ -277,7 +273,7 @@ function fetchvalue() {
 		showDialog('error','请输入问题答案',2);
         return false;
 	}
-	ajax.send("{$basename}a=create",'step=2&checkpwd=1&aname=' + aname + '&aintro=' + aintro + '&pwd=' + pwd + '&repwd=' + repwd + '&private=' + privated + '&gdcode=' + gdcode + '&qanswer=' + qanswer + '&qkey=' + qkey,function(){
+	ajax.send("{$basename}a=create",'step=2&checkpwd=1&aname=' + aname + '&aintro=' + aintro + '&pwd=' + pwd + '&repwd=' + repwd + '&private=' + privated + '&gdcode=' + gdcode + '&qanswer=' + qanswer + '&qkey=' + qkey + '&ajax=1',function(){
 		var rText = ajax.request.responseText.split('\\t');
 		if (rText[0] == 'success') {
 			var aidsel = getObj('aidsel_info');
@@ -289,7 +285,7 @@ function fetchvalue() {
 			//photoselect.vir.getElementsByTagName('h4')[0].innerHTML=aname;
 			aidsel.insertBefore(option,null);
 			aidsel.selectedIndex = aidsel.options.length-1;
-			getObj('aidsel_info').parentNode.getElementsByTagName('button')[0].innerHTML= aname;
+			getObj('aidsel_info').parentNode.getElementsByTagName('a')[0].innerHTML= aname;
 			var job = '$job';
 			if (job == 'flash') {
 				uploader.setAlbumId(aidsel.value);
@@ -305,8 +301,10 @@ function fetchvalue() {
 		} else if (rText[0] == 'limit_num') {
 			showDialog('error','您创建的相册已经达到'+rText[1]+'个',2);
 			
-		} else {
+		} else if (typeof rText[1] != 'undefined') {
 			showDialog('error',rText[1] != '' ? rText[1] : '非法错误',2);
+		} else {
+			showDialog('error',ajax.request.responseText,2);
 		}
 		read.menu.style.top="300px";
 		closep();

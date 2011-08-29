@@ -117,7 +117,6 @@ $page = floor($article/$db_readperpage) + 1;
 
 $hideemail = 'disabled';
 $icon = (int)$icon;
-
 if (empty($_POST['step'])) {
 
 	$attach = '';
@@ -130,6 +129,10 @@ if (empty($_POST['step'])) {
 		}
 		$attach = rtrim($attach,',');
 	}
+	//at users
+	$threadService = L::loadClass('threads','forum');
+	$atcdb['atusers'] = $threadService->getAtUsers($tid,array(intval($atcdb['pid'])));
+	//end atusers
 	if ($postmodify->type == 'topic') {
 		if ($pwforum->foruminfo['cms']) {
 			include_once(R_P.'require/c_search.php');
@@ -146,8 +149,28 @@ if (empty($_POST['step'])) {
 			$postSpecial = new postSpecial($pwpost);
 			$set = $postSpecial->resetInfo($tid, $atcdb);
 		}
+		if (getstatus($atcdb['tpcstatus'],7)) {
+			$robbuildService = L::loadClass("robbuild", 'forum');
+			$robSet = $robbuildService->resetInfo($tid);
+			if ($robSet['strstarttime'] < $timestamp) {
+				$robSet['isdisable'] = 1;
+			}
+			$setRobbuild = 'checked="checked"';
+		}
 		list($tags) = explode("\t", $atcdb['tags']);
 		$tags = htmlspecialchars($tags);
+		$replyReward = array();
+		if (getstatus($atcdb['tpcstatus'], 8)) {
+			$replyRewardService = L::loadClass('ReplyReward', 'forum');/* @var $replyRewardService PW_ReplyReward */
+			$replyReward = $replyRewardService->getRewardByTid($tid);
+			$replyrewardcredit = '';
+			foreach ($credit->cType as $key => $value) {
+				if (!$winddb[$key] && !$customCreditValue[$key]) continue;
+				$replyRewardDefaultCredit = $key == $replyReward['credittype'] ? 'selected' : '';
+				$replyrewardcredit .= "<option value=\"$key\" $replyRewardDefaultCredit >" . $value . "</option>";
+			}
+		}
+		($atcdb['specialsort'] == PW_THREADSPECIALSORT_KMD && $winduid == $atcdb['authorid']) && $isKmd = 1;
 	}
 	//empty($subject) && $subject = ' ';
 
@@ -167,7 +190,8 @@ if (empty($_POST['step'])) {
 		$replayorder_default = 'checked';
 	}
 	empty($atc_title) && $atc_title = ' ';
-	$atc_content = str_replace(array('<','>'),array('&lt;','&gt;'), $atcdb['content']);
+	$atc_content = $atcdb['ifsign'] > 1 ? $atcdb['content'] : str_replace(array('<','>'),array('&lt;','&gt;'), $atcdb['content']);
+	$atcdb['ifsign'] > 1 && $atc_content = str_replace('&', '&amp;', $atc_content);
 
 	if (strpos($atc_content,$db_bbsurl) !== false) {
 		$atc_content = str_replace('p_w_picpath',$db_picpath,$atc_content);
@@ -185,6 +209,7 @@ if (empty($_POST['step'])) {
 	$msg_guide = $pwforum->headguide($guidename);
 	$postMinLength = empty($pwpost->forum->foruminfo['forumset']['contentminlen']) ? $db_postmin : $pwpost->forum->foruminfo['forumset']['contentminlen'];
 
+	!getstatus($atcdb['tpcstatus'],7) && $foruminfo['allowrob'] = '';
 	require_once PrintEot('post');footer();
 
 } elseif ($_POST['step'] == 1) {
@@ -357,8 +382,8 @@ if (empty($_POST['step'])) {
 } elseif ($_POST['step'] == 2) {
 
 	S::gp(array('atc_title','atc_content'), 'P', 0);
-	S::gp(array('atc_email','replayorder','atc_anonymous','atc_newrp','atc_tags','atc_hideatt','magicid','magicname','atc_enhidetype','atc_credittype','flashatt'),'P');
-	S::gp(array('atc_iconid','atc_hide','atc_requireenhide','atc_rvrc','atc_requiresell','atc_money', 'atc_usesign', 'atc_html', 'p_type', 'p_sub_type', 'atc_convert', 'atc_autourl','isAttachOpen'), 'P', 2);
+	S::gp(array('atc_email','replayorder','atc_anonymous','atc_newrp','atc_tags','atc_hideatt','magicid','magicname','atc_enhidetype','atc_credittype','flashatt','buildIfcheck','robstarttime','robendtime','robendbuild','robawardbuilds', 'replyrewardcredit','_usernames'),'P');
+	S::gp(array('atc_iconid','atc_hide','atc_requireenhide','atc_rvrc','atc_requiresell','atc_money', 'atc_usesign', 'atc_html', 'p_type', 'p_sub_type', 'atc_convert', 'atc_autourl','isAttachOpen', 'replyreward'), 'P', 2);
 
 	S::gp(array('iscontinue'),'P');//ajax提交时有敏感词时显示是否继续
 	($db_sellset['price'] && (int) $atc_money > $db_sellset['price']) && Showmsg('post_price_limit');
@@ -394,7 +419,15 @@ if (empty($_POST['step'])) {
 	$postdata->setHide($atc_hide);
 	$postdata->setEnhide($atc_requireenhide, $atc_rvrc, $atc_enhidetype);
 	$postdata->setSell($atc_requiresell, $atc_money, $atc_credittype);
-
+	$postdata->setAtUsers($_usernames);
+	
+	if ($atcdb['specialsort'] == PW_THREADSPECIALSORT_KMD && $postmodify->type == 'topic' && $winduid == $atcdb['authorid']) {
+		$kmdService = L::loadClass('KmdService', 'forum');
+		$kmdInfo = $kmdService->getKmdInfoByTid($tid);
+		$postdata->setKmdInfo($kmdInfo);
+	}
+	
+	$special && $postdata->setData('special', $special);
 	if ($special && file_exists(R_P . "lib/forum/special/post_{$special}.class.php")) {
 		L::loadClass("post_{$special}", 'forum/special', false);
 		$postSpecial = new postSpecial($pwpost);
@@ -405,6 +438,22 @@ if (empty($_POST['step'])) {
 		S::gp(array('oldatt_ctype','oldatt_desc'), 'P');
 		$postmodify->initAttachs(/*$keep, */$oldatt_special, $oldatt_needrvrc, $oldatt_ctype, $oldatt_desc);
 	}
+	if (getstatus($atcdb['tpcstatus'],7) && $pid == 'tpc') {//抢楼
+		$robbuildService = L::loadClass("robbuild", 'forum');
+		$fieldsdata = array(
+			'authorid' 		=> $winduid,
+			'starttime' 	=> $robstarttime,
+			'endtime' 		=> $robendtime,
+			'endbuild' 		=> $robendbuild,
+			'awardbuilds' 	=> $robawardbuilds,
+			'postdate' 		=> $timestamp
+		);
+		if ($message = $robbuildService->checkAddData($foruminfo['allowtype'],$fieldsdata)) {
+			Showmsg($message);
+		}
+		$robbuildService->modifyData($tid,$fieldsdata);
+	}
+	
 	L::loadClass('attupload', 'upload', false);
 	/*上传错误检查
 	$return = PwUpload::checkUpload();
@@ -416,6 +465,7 @@ if (empty($_POST['step'])) {
 		$postdata->att->check();
 		$postdata->att->setReplaceAtt($postmodify->replacedb);
 	}
+	$postmodify->type == 'topic' && $postmodify->setReplyRewardData($replyrewardcredit, $replyreward);
 	$postdata->iscontinue = $iscontinue;
 	$postmodify->execute($postdata);
 
@@ -442,7 +492,11 @@ if (empty($_POST['step'])) {
 		$userService->setUserStatus($winduid, PW_USERSTATUS_REPLYEMAIL, $isAtcEmail);
 		$userService->setUserStatus($winduid, PW_USERSTATUS_REPLYSITEEMAIL, $isAtcNewrp);
 	}
-	defined('AJAX') && $pinfo = "success\t" . "read.php?tid=$tid&displayMode=1&page=$page&toread=1#$pid";
+	if (getstatus($atcdb['tpcstatus'],7) && $pid == 'tpc') {//抢楼
+		$robbuildService = L::loadClass("robbuild", 'forum');
+		$robbuildService->updateData($tid);
+	}
+	defined('AJAX') && $pinfo = "success\t" . "read.php?tid=$tid&ds=1&page=$page&toread=1#$pid";
 	$flag = false;
 	if(!$iscontinue){
 		if ($postdata->getIfcheck()) {
@@ -451,11 +505,14 @@ if (empty($_POST['step'])) {
 				isset($prompts['allowsell'])   && $pinfo = getLangInfo('refreshto',"post_limit_sell");
 				isset($prompts['allowencode']) && $pinfo = getLangInfo('refreshto',"post_limit_encode");
 			}else{
-				defined('AJAX') && $pinfo = "success\t" . "read.php?tid=$tid&displayMode=1&page=$page&toread=1#$pid";
+				defined('AJAX') && $pinfo = "success\t" . "read.php?tid=$tid&ds=1&page=$page&toread=1#$pid";
 			}
 		}
 	}
+	//defend start
+	CloudWind::YunPostDefend ( $winduid, $windid, $groupid, $tid, $atc_title, $atc_content, 'editthread',array('tid'=>$tid,'fid'=>$fid,'forumname'=>$pwforum->foruminfo['name'])  );
+	//defend end
 	defined('AJAX') && $flag && $pinfo = "continue\t" . getLangInfo('refreshto', $pinfo);	
-	refreshto("read.php?tid=$tid&displayMode=1&page=$page&toread=1#$pid", $pinfo);
+	refreshto("read.php?tid=$tid&ds=1&page=$page&toread=1#$pid", $pinfo);
 }
 ?>

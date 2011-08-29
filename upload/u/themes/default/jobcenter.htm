@@ -126,12 +126,16 @@ print <<<EOT
 <!--
 EOT;
 foreach($jobs as $job){
+	$processHtml = '';
+	if ($job['factor'] && $job['factor']['num'] > 0 && $job['factor']['fid']) {
+		$processHtml = '完成进度: ' . round($job['step']/$job['factor']['num'] * 100) . '%';
+	}
 print <<<EOT
 -->                     <tbody id="job_$job[id]">
                         <tr class="user-tr">
                             <td><img src="$job[icon]" width="48" height="48" /></td>
                             <td class="vam user-t current">
-                                <a href="javascript:;" class="text_open" hidefocus="true">$job[title]</a>
+                                <a href="javascript:;" class="text_open" hidefocus="true">$job[title]</a> $processHtml
                             </td>
                             <td class="s2 vam">$job[reward]</td>
                             <td>$job[btn]</td>
@@ -460,10 +464,12 @@ EOT;
 }
 print <<<EOT
 -->
-<script type="text/javascript" language="JavaScript" src="js/pw_jobcenter.js"></script>
-<script type="text/javascript">
-window.onReady(jobCenterInit);
-window.onReady(PW.accordion,'user-t','tasks_text_tr');
+<script type="text/javascript" src="js/pw_jobcenter.js"></script>
+<script>
+window.onReady(function(){
+	jobCenterInit();
+	PW.accordion("user-t","tasks_text_tr")
+})
 </script>
 <!--end-->
                 </div>

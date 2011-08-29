@@ -64,7 +64,8 @@ if ($action == 'weibo') {
 	//	$ifhot = $ifhot ? 1 : 2;
 		$topicService->setHotTopics($topicid,$ifhot);
 		//$weiboHotTopics = $topicService->getHotTopics(10,$days);
-		$rt = $db->update("delete FROM pw_cache WHERE name='weiboHotTopics_10'");
+		//$rt = $db->update("delete FROM pw_cache WHERE name='weiboHotTopics_10'");
+		pwQuery::delete('pw_cache', 'name=:name', array('weiboHotTopics_10'));
 		adminmsg('operate_success',"$basename&action=topic&job=list");
 	}else{
 		S::gp(array('topicname','ifhot','startnum','endnum','page','ordertype'));

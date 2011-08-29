@@ -25,6 +25,18 @@ if (!$windid && ($userdb = getCurrentOnlineUser()) && $userdb['ip'] == $onlineip
 }
 $downloadServer = getDownloadFactory($type);
 $downloadServer->init($aid);
+$attachInfo = $downloadServer->attach;
+if ($attachInfo['fid'] && $attachInfo['uid'] != $winduid) {
+	//实名认证权限
+	L::loadClass('forum', 'forum', false);
+	$pwforum = new PwForum($attachInfo['fid']);
+	if ($GLOBALS['db_authstate'] && true !== ($authMessage = $pwforum->authStatus($GLOBALS['winddb']['userstatus'],$pwforum->forumset['auth_logicalmethod']))) {
+		$msg = getLangInfo('msg',$authMessage . '_upload');
+		require_once PrintEot('ajax');
+		ajax_footer();
+	}
+}
+
 
 if (empty($type) && $check) {
 	S::gp(array('mt'));
@@ -142,15 +154,16 @@ function getCurrentOnlineUser() {
 }
 
 function getDownloadFactory($type) {
-	switch ($type) {
-		case 'active':
-			$obj = new activeDownload();break;
-		case 'message':
-			$obj = new messageDownload();break;
-		default:
-			$obj = new threadDownload();
+	if ($type == 'active') {
+		return new activeDownload();
+	} elseif ($type == 'message') {
+		return new messageDownload();
+	} elseif ($type && file_exists(R_P . "require/extents/attach/{$type}download.class.php")) {
+		$class = $type . 'Download';
+		require_once S::escapePath(R_P . "require/extents/attach/{$type}download.class.php");
+		return new $class();
 	}
-	return $obj;
+	return new threadDownload();
 }
 
 //Interface
@@ -493,6 +506,7 @@ class threadDownload extends downloadInterface {
 		if (!$this->admincheck && !$pwforum->allowdownload($this->user, $this->groupid)) { //版块权限判断
 			return 'job_attach_forum';
 		}
+		if ($this->groupid=='guest' && $this->_G['allowdownload'] == 0)  return 'download_not_login';
 		if (!$this->foruminfo['allowdownload'] && $this->_G['allowdownload'] == 0 && !$this->admincheck) { //用户组权限判断
 			return 'job_attach_group';
 		}

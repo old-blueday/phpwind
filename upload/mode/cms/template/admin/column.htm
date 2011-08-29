@@ -3,8 +3,6 @@ if (!defined('AJAX')) include_once PrintEot('left');
 if(empty($action)){
 print <<<EOT
 -->
-<script src="js/global.js" language="JavaScript"></script>
-<script src="js/pw_ajax.js" language="JavaScript"></script>
 <form action="$basename" method="post">
 <input type="hidden" value="editOrder" name="action">
 <div class="cc">
@@ -139,9 +137,9 @@ function selectedColumn(columnId){
 		}
 	}
 }
-window.setTimeout(function(){
+onReady(function(){
 	selectedColumn('$column[parent_id]');
-},10);
+})
 </script>
 <!--
 EOT;

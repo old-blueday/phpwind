@@ -3,18 +3,18 @@ print<<<EOT
 --><!doctype html>
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=$db_charset" />
+<meta charset="$db_charset" />
 <title>写日志</title>
 <meta name="generator" content="phpwind $wind_version" />
 <meta name="description" content="phpwind" />
 <meta name="keywords" content="phpwind" />
 <base id="headbase" href="$db_bbsurl/" />
-<link rel="stylesheet" type="text/css" href="images/pw_core.css" media="all" />
-<link rel="stylesheet" type="text/css" href="u/images/style.css" media="all" />
-<link rel="stylesheet" type="text/css" href="images/post/minieitor/minieitor.css" media="all" />
-<SCRIPT type="text/javascript" LANGUAGE="JavaScript" src="js/core/core.js"></SCRIPT>
-<script type="text/javascript" language="JavaScript" src="js/pw_ajax.js"></script>
-<script language="JavaScript">
+<link rel="stylesheet" href="images/pw_core.css?{$GLOBALS['wind_repair']}" />
+<link rel="stylesheet" href="u/images/style.css?{$GLOBALS['wind_repair']}" />
+<link rel="stylesheet" href="images/post/minieitor/minieitor.css?{$GLOBALS['wind_repair']}" />
+<script type="text/javascript" src="js/core/core.js"></script>
+<script type="text/javascript" src="js/pw_ajax.js"></script>
+<script type="text/javascript">
 var imgpath = '$imgpath';
 var verifyhash = '$verifyhash';
 var winduid = '$winduid';
@@ -39,7 +39,7 @@ if ($a == 'write' || $a == 'edit') {print <<<EOT
 				getObj('upPanel').style.overflowY="hidden";
 			}
 			</script><iframe style="width:0;height:0;overflow:hidden; visibility:hidden;" name="formTarget" src="javascript:;" onLoad="iDiaryForm(this)"></iframe>
-			<form action="{$basename}a=$a" method="post" enctype="multipart/form-data" onSubmit="return checkpost(document.FORM);" name="FORM" id="FORM" target="formTarget" />
+			<form action="{$basename}a=$a&diraryAjax=1" method="post" enctype="multipart/form-data" onSubmit="return checkpost(document.FORM);" name="FORM" id="FORM" target="formTarget" />
 			<input type="hidden" name="did" value="$did" />
 			<input type="hidden" name="dtided" value="$diary[dtid]" />
 			<input type="hidden" name="privacyed" value="$diary[privacy]" />
@@ -50,7 +50,7 @@ if ($a == 'write' || $a == 'edit') {print <<<EOT
 			<div><input type="text" class="input" name="atc_title" id="atc_title" value="$diary[subject]" size="70"/>&nbsp;<span id="atc_title_warn" class="gray">限 $db_titlemax 字节</span></div>
 			<div id="menu_face" class="menu" style="display:none;"></div>
 			<div style="padding:10px 0 0;">
-<script language="javascript">
+<script type="text/javascript">
 	var imgpath   = 'images';
 	var stylepath = 'wind';
 	function addsmile(NewCode){
@@ -62,11 +62,11 @@ if ($a == 'write' || $a == 'edit') {print <<<EOT
 	};
 </script>
 <script src="$db_htmdir/js/face.js"></script>
-<script language="JavaScript" src="js/global.js"></script>
-<script language="JavaScript" src="js/app_global.js"></script>
+<script type="text/javascript" src="js/global.js"></script>
+<script type="text/javascript" src="js/app_global.js"></script>
 					<div id="menu_show" style="display:none;"></div>
 					<div id="menu_face" class="menu" style="display:none;"></div>
-					<script language="JavaScript" src="js/post.js"></script>
+					<script type="text/javascript" src="js/post.js"></script>
 							<div id="linkbox" style="display:none;"></div>
                             <div class="minieitor_pw cc">
                                 <ul class="miniUl">
@@ -85,18 +85,14 @@ if ($a == 'write' || $a == 'edit') {print <<<EOT
 <!--
 EOT;
 if ($o_diary_gdcheck) {
-$gdSize = explode("\t",$db_gdsize);
+$checkCode = L::loadClass('checkcode', 'site');
+$checkCodeString = $checkCode->getCheckCodeTemplate();
 print <<<EOT
 -->
-	<div class="mb10">认证码: <input class="input mr5" type="text" name="gdcode" onFocus="showgd();" id="fs_gdcode" size="5" tabindex="3"  />
-<script type="text/javascript" src="js/pw_authcode.js"></script>
-<script>
-var flashWidth = "$gdSize[0]";
-var flashHeight = "$gdSize[1]";
-var gdtype = $db_gdtype;
-showGdCode();
-</script>
-				</div>
+	<div class="mb10">验证码: <input class="input mr5" type="text" name="gdcode" onfocus="showgd();" id="fs_gdcode" size="5" tabindex="3"  />
+		<span id="ckcode" style="display:none;"></span>
+$checkCodeString
+	</div>
 <!--
 EOT;
 }print <<<EOT
@@ -110,7 +106,7 @@ if($db_imagequestion){
 }else{
 	$question = $qkey<0 ? getMachineQuestion_1() :  $db_question[$qkey];
 }
-$q_a = $question.($showq && $qkey>0?" 正确答案:".$db_answer[$qkey] : '');
+$q_a = $question.($showq && $qkey>0?" （答案：".$db_answer[$qkey] . '）' : '');
 print <<<EOT
 -->
 				<div><span class="mr10">验证问题:</span>{$q_a}<input class="input" size="5" name="qanswer" id="qanswer" tabindex="7" /><input type="hidden" name="qkey" id="qkey" value="$qkey" /></div>
@@ -166,34 +162,34 @@ if($a == 'edit'){print <<<EOT
 EOT;
 }else{print <<<EOT
 -->
-<script language="JavaScript">setTimeout("document.FORM.atc_title.focus()",50);</script>
+<script type="text/javascript">setTimeout("document.FORM.atc_title.focus()",50);</script>
 <!--
 EOT;
 }print <<<EOT
 -->
-<script language="JavaScript">var stylepath = 'wind';</script>
+<script type="text/javascript">var stylepath = 'wind';</script>
 <script src="$db_htmdir/js/face.js"></script>
-<script language="JavaScript">
+<script type="text/javascript">
 var cnt  = 0;
 document.FORM.Submit.disabled = false;
 function checkpost(obj) {
 	if (obj.atc_title.value == "") {
-		showDialog("error","日志<span class='warnFontStyle'>标题</span>不能为空",2);
+		showDialog("error","日志<span class='s1'>标题</span>不能为空",2);
 		SETTOP();
 		obj.atc_title.focus();
 		return false;
 	} else if (strlen(obj.atc_title.value) > $db_titlemax) {
-		showDialog("error","日志<span class='warnFontStyle'>标题</span>不能大于 <span class='warnFontStyle'>$db_titlemax</span> 个字节",2);
+		showDialog("error","日志<span class='s1'>标题</span>不能大于 <span class='s1'>$db_titlemax</span> 个字节",2);
 		obj.atc_title.focus();
 		SETTOP();
 		return false;
 	}
 	if (strlen(obj.atc_content.value) < $db_postmin) {
-		showDialog("error","日志<span class='warnFontStyle'>内容</span>不能少于 <span class='warnFontStyle'>$db_postmin</span> 个字节",2);
+		showDialog("error","日志<span class='s1'>内容</span>不能少于 <span class='s1'>$db_postmin</span> 个字节",2);
 		SETTOP();
 		return false;
 	} else if (strlen(obj.atc_content.value) > $db_postmax) {
-		showDialog("error","日志<span class='warnFontStyle'>内容</span>不能大于 <span class='warnFontStyle'>$db_postmax</span> 个字节",2);
+		showDialog("error","日志<span class='s1'>内容</span>不能大于 <span class='s1'>$db_postmax</span> 个字节",2);
 		SETTOP();
 		return false;
 	}
@@ -202,20 +198,20 @@ function checkpost(obj) {
 	return true;
 }
 </script>
-<script language="JavaScript" src="js/post.js"></script>
+<script type="text/javascript" src="js/post.js"></script>
 <!--
 
 EOT;
 }print <<<EOT
 -->
-<script language="JavaScript" src="apps/$appdir/js/diarytype.js"></script>
-<script language="JavaScript" src="js/app_comment.js"></script>
-<SCRIPT type="text/javascript" LANGUAGE="JavaScript" src="js/core/friendlist.js"></SCRIPT>
+<script type="text/javascript" src="apps/$appdir/js/diarytype.js"></script>
+<script type="text/javascript" src="js/app_comment.js"></script>
+<script type="text/javascript" src="js/core/friendlist.js"></script>
 <!--
 EOT;
 if((empty($a) || $a == 'privacy' || $a == 'friend') && !empty($sum)) {print <<<EOT
 -->
-<SCRIPT type="text/javascript" LANGUAGE="JavaScript" src="js/core/space.js"></SCRIPT>
+<script type="text/javascript" src="js/core/space.js"></script>
 <!--
 EOT;
 }print <<<EOT

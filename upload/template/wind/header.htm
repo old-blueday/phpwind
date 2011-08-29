@@ -2,6 +2,11 @@
 !$webPageTitle && $webPageTitle = $db_bbsname;
 $metaVersion = $wind_version;
 $wind_repair && $metaVersion .= '(' . $wind_repair . ')';
+if ($GLOBALS['page']>1) {
+$tmpMetaPage = (int)$GLOBALS['page'];
+$webPageTitle .= ' - Page '.$tmpMetaPage;
+$metaDescription = 'Page '.$tmpMetaPage.' - '.$metaDescription;
+}
 print <<<EOT
 --><!doctype html>
 <html>
@@ -11,31 +16,8 @@ print <<<EOT
 <meta name="generator" content="phpwind v{$metaVersion}" />
 <meta name="description" content="$metaDescription" />
 <meta name="keywords" content="$metaKeywords" />
-<!--[if IE 9 ]>
-<meta name="msapplication-task" content="name=网站首页; action-uri=$db_bbsurl; icon-uri=$db_bbsurl/favicon.ico" />
-<meta name="msapplication-task" content="name=个人中心; action-uri=$db_bbsurl/u.php; icon-uri=$db_bbsurl/images/ico/home.ico" />
-<meta name="msapplication-task" content="name=我的帖子; action-uri=$db_bbsurl/apps.php?q=article; icon-uri=$db_bbsurl/images/ico/post.ico" />
-<meta name="msapplication-task" content="name=消息中心; action-uri=$db_bbsurl/message.php; icon-uri=$db_bbsurl/images/ico/mail.ico" />
-<meta name="msapplication-task" content="name=我的设置; action-uri=$db_bbsurl/profile.php; icon-uri=$db_bbsurl/images/ico/edit.ico" />
-<![endif]-->
-<link rel='archives' title='$db_bbsname' href='$db_bbsurl/simple/' />
-<!--
-EOT;
-if($fid){print <<<EOT
---><link rel="alternate" type="application/rss+xml" title="RSS" href="$db_bbsurl/rss.php?fid=$fid" />
-<!--
-EOT;
-}print <<<EOT
---><base id="headbase" href="$db_bbsurl/" />
-<!--
-EOT;
-if(SCR == 'read' && $link_ref_canonical){print <<<EOT
---><link rel="canonical" href="$link_ref_canonical" />
-<!--
-EOT;
-}print <<<EOT
--->
-<link rel="stylesheet" href="$imgpath/pw_core.css?101128" />
+<base id="headbase" href="$db_bbsurl/" />
+<link rel="stylesheet" href="$imgpath/pw_core.css?{$GLOBALS['wind_repair']}" />
 <!--
 EOT;
 @include Pcv($css_path);
@@ -45,91 +27,144 @@ if($pwModeCss){print <<<EOT
 EOT;
 }if(($db_shiftstyle == 1 && $_COOKIE['widthCfg'] == 1) || $db_shiftstyle == 2){print <<<EOT
 -->
-<link id="fullscreenStyle" rel="stylesheet" href="$imgpath/fullscreen.css" />
+<link id="fullscreenStyle" rel="stylesheet" href="$imgpath/fullscreen.css?{$GLOBALS['wind_repair']}" />
+<!--
+EOT;
+}
+SCR == 'post' && require PrintEot('post_css');
+SCR == 'read' && require PrintEot('read_css');
+print <<<EOT
+-->
+<script type="text/javascript" src="js/core/core.js"></script>
+<script type="text/javascript" src="js/pw_ajax.js"></script>
+<script>var imgpath = '$imgpath';var verifyhash = '$verifyhash';var modeimg = '$pwModeImg';var modeBase = '$baseUrl';var winduid = '$winduid';var windid	= '$windid';var groupid	= '$groupid';var basename = '$basename';var temp_basename = '$temp_basename';var db_shiftstyle = '$db_shiftstyle';var pw_baseurl = "$db_bbsurl";
+function shiftStyle(){
+	if(db_shiftstyle == 1){
+		if (getObj('widthCfg').innerHTML=='切换到宽版') {
+			if(!getObj('fullscreenStyle')) {
+					var l = document.createElement('link');
+					l.id="fullscreenStyle";
+					l.rel="stylesheet";
+					l.type="text/css";
+					l.href="$imgpath/fullscreen.css";
+					l.media="all";
+					document.body.appendChild(l);
+			}else {
+				getObj('fullscreenStyle').disabled = false;
+			}
+			getObj('widthCfg').innerHTML='切换到窄版';
+			var widthCfg = 1;
+		} else {
+			var widthCfg = 0;
+			getObj('fullscreenStyle').disabled=true;
+			getObj('widthCfg').innerHTML='切换到宽版';
+		}
+		SetCookie('widthCfg',widthCfg);
+		if(typeof goTop!="undefined"){
+			goTop.setStyle();
+		}
+		if(typeof messagetip!="undefined"&&typeof messagetip.db!="undefined"){
+			messagetip.setStyle();
+			messagetip.update();
+		}
+	}
+};
+</script>
+<!--[if IE 9 ]>
+<meta name="msapplication-task" content="name=网站首页; action-uri=$db_bbsurl; icon-uri=favicon.ico" />
+<meta name="msapplication-task" content="name=个人中心; action-uri=u.php; icon-uri=images/ico/home.ico" />
+<meta name="msapplication-task" content="name=我的帖子; action-uri=apps.php?q=article; icon-uri=images/ico/post.ico" />
+<meta name="msapplication-task" content="name=消息中心; action-uri=message.php; icon-uri=images/ico/mail.ico" />
+<meta name="msapplication-task" content="name=我的设置; action-uri=profile.php; icon-uri=images/ico/edit.ico" />
+<![endif]-->
+<link rel='archives' title="$db_bbsname" href="simple/" />
+<!--
+EOT;
+if($fid){print <<<EOT
+--><link rel="alternate" type="application/rss+xml" title="RSS" href="$db_bbsurl/rss.php?fid=$fid" />
 <!--
 EOT;
 }print <<<EOT
 -->
-<SCRIPT type="text/javascript" language="JavaScript" src="js/core/core.js"></SCRIPT>
-<script type="text/javascript" language="JavaScript" src="js/pw_ajax.js"></script>
-<script language="JavaScript">var imgpath = '$imgpath';var verifyhash = '$verifyhash';var modeimg = '$pwModeImg';var modeBase = '$baseUrl';var winduid = '$winduid';var windid	= '$windid';var groupid	= '$groupid';var basename = '$basename';var temp_basename = '$temp_basename';var db_shiftstyle = '$db_shiftstyle';
-function shiftStyle(){
-	if(db_shiftstyle == 1){
-	if (getObj('widthCfg').innerHTML=='[切换到宽版]') {
-		if(!getObj('fullscreenStyle')) {
-				var l = document.createElement('link');
-				l.id="fullscreenStyle";
-				l.rel="stylesheet";
-				l.type="text/css";
-				l.href="$imgpath/fullscreen.css";
-				l.media="all";
-				document.body.appendChild(l);
-		}else {
-			getObj('fullscreenStyle').disabled = false;
-		}
-		getObj('widthCfg').innerHTML='[切换到窄版]';
-		var widthCfg = 1;
-	} else {
-		var widthCfg = 0;
-		getObj('fullscreenStyle').disabled=true;
-		getObj('widthCfg').innerHTML='[切换到宽版]';
-	}
-	SetCookie('widthCfg',widthCfg);
-	if(goTop){
-		goTop.setStyle();
-	}
-	}
-};
-</script>
+<!--
+EOT;
+if(SCR == 'read' && $link_ref_canonical){print <<<EOT
+--><link rel="canonical" href="$link_ref_canonical" />
+<!--
+EOT;
+}print <<<EOT
+-->
 </head>
-<body onKeyDown="try{keyCodes(event);}catch(e){}">
-$msgsound
+<body>
 <!--
 EOT;
-if ($_Navbar['head_right'] || $_Navbar['head_left']) {
-print <<<EOT
+$hasNewMessage = $winddb['newpm'] || $winddb['newreferto'] || $winddb['newnotice'] || $winddb['newrequest'] || $winddb['newfans'];
+if($winduid && $hasNewMessage){print <<<EOT
 -->
-<div id="top">
-	<div class="top">
-    	<span class="fr">
+<div id="pw_all_tip" style="display:none;">
+<table><tr><td>
+<div class="pw_all_tip">
+	<a href="javascript:void(0)" class="adel" id="pw_all_tclose">关闭</a>
 <!--
 EOT;
-foreach($_Navbar['head_right'] as $key => $value){
-	$html = buildNavLinkHtml($value['data']);
-print <<<EOT
+	if($winddb['newpm']){print <<<EOT
 -->
-            <span class="mr10">$html</span>
+	<p>{$winddb['newpm']}条新站内信，<a href="message.php?type=sms">查看站内信</a></p>
 <!--
 EOT;
-	if (is_array($value['subs'])) {
-		$db_menuinit .= ",'nav_key_up_$key' : 'nav_key_sub_$key'"; //register
-print <<<EOT
+}if($winddb['newreferto']){print <<<EOT
 -->
-			<div style="display: none;" class="pw_menu" id="nav_key_sub_{$key}">
-			<ul class="menuList">
+	<p>{$winddb['newreferto']}条信息提到我，<a href="apps.php?q=weibo&do=refer">查看@我</a></p>
 <!--
 EOT;
-		foreach ($value['subs'] as $value) {
-			$html = buildNavLinkHtml($value);
-print <<<EOT
+}if($winddb['newnotice']){print <<<EOT
 -->
-				<li>$html</li>
+	<p>{$winddb['newnotice']}个新通知，<a href="message.php?type=notice">查看新通知</a></p>
 <!--
 EOT;
-		}
-print <<<EOT
+}if($winddb['newfans']){print <<<EOT
 -->
-			</ul>
-			</div>
+	<p>{$winddb['newfans']}个新关注，<a href="u.php?a=friend&type=attentioned">查看新关注</a></p>
 <!--
 EOT;
-	}
-
+}if($winddb['newrequest']){print <<<EOT
+-->
+	<p>{$winddb['newrequest']}个新请求，<a href="message.php?type=request">查看新请求</a></p>
+<!--
+EOT;
+}print <<<EOT
+-->
+</div></td></tr></table></div>
+<!--
+EOT;
 }
-
 print <<<EOT
 -->
-        </span>
+$msgsound
+<div id="top">
+	<div class="top cc">
+<!--
+EOT;
+if ($skincount >1){print <<<EOT
+--><a href="javascript:;" id="td_skin" class="fr" style="width:28px;overflow:hidden;"><img src="$imgpath/pwicon/style.gif" class="fr" style="margin:4px 5px 0 0;" alt="论坛风格切换" /></a><!--
+EOT;
+}print<<<EOT
+--><!--
+EOT;
+if ($db_shiftstyle == 1) {
+if($_COOKIE['widthCfg'] == 1){print <<<EOT
+--><a id="widthCfg" class="fr" href="javascript:shiftStyle();">切换到窄版</a><!--
+EOT;
+} else {print <<<EOT
+--><a id="widthCfg" class="fr" href="javascript:shiftStyle();">切换到宽版</a>	<!--
+EOT;
+}}print<<<EOT
+-->
+<!--
+EOT;
+if ($_Navbar['head_left']) {
+print <<<EOT
+-->
     	<ul>
 <!--
 EOT;
@@ -152,6 +187,7 @@ foreach($_Navbar['head_left'] as $key => $value){
 print <<<EOT
 -->
             <li>$html</li>
+        </ul>
 <!--
 EOT;
 	if (is_array($value['subs'])) {
@@ -176,45 +212,32 @@ print <<<EOT
 			</div>
 <!--
 EOT;
+		}
 	}
-
 }
-
 print <<<EOT
 -->
-        </ul>
-    </div>
+	</div>
 </div>
-<!--
-EOT;
-}
-print <<<EOT
--->
-<div class="wrap">
 <!--
 EOT;
 list($htmlAdvert,$arrayAdvert) = pwAdvert('Site.Header',$fid);
 if($htmlAdvert){print <<<EOT
 -->
-<div class="tac mb5">$htmlAdvert</div>
+<div class="tac" style="line-height:1;">$htmlAdvert</div>
 <!--
 EOT;
 }print <<<EOT
 -->
+<div class="wrap">
 <div id="header">
-     <div id="head">
-        <table cellpadding="0" cellspacing="0" width="100%" height="80">
-            <tr>
-                <td><a href="$db_bbsurl/"><img src="$imgpath/$stylepath/logo.png" class="fl" title="$db_bbsname" /></a></td>
-                <td id="banner" class="vt tar">
+     <div id="head" class="cc">
+        <a href="$db_bbsurl/"><img src="$imgpath/$stylepath/logo.png" class="fl" title="$db_bbsname" /></a></td>
 <!--
 EOT;
 require PrintEot('header_login');
 print <<<EOT
 -->
-                </td>
-            </tr>
-        </table>
     </div>
 <!--
 EOT;
@@ -231,50 +254,31 @@ if ($winduid) {
 $db_menuinit .= ",'td_mymenu' : 'menu_mymenu'";
 print <<<EOT
 -->
-				<div id="td_mymenu">我的快捷通道</div>
-				<div id="menu_mymenu" class="pw_menu" style="display:none;">
-					<ul class="menuList" style="width:98px;">
+				<div id="td_mymenu">快捷通道</div>
+				<div id="menu_mymenu" style="display:none;">
+				<div id="fast_menu" class="pw_menu">
+					<ul class="menuList cc">
+						<li><a href="apps.php?q=article"><img src="u/images/icon/posts.png" alt="帖子" />帖子</a></li>
+						<li><a href="apps.php?q=medal"><img src="u/images/icon/medal.png" alt="勋章" />勋章</a></li>
+						<li><a href="u.php?a=friend"><img src="u/images/icon/friend.png" alt="关注" />关注</a></li>
+						<li><a href="jobcenter.php"><img src="u/images/icon/jobcenter.png" alt="任务" />任务</a></li>
 <!--
 EOT;
-if ($db_modes['o']['ifopen']) {print <<<EOT
+if ($db_kmd_ifkmd) {print <<<EOT
 -->
-						<li><a href="u.php"><img src="$imgpath/user-home.png" alt="空间" />个人中心</a></li>
-<!--
-EOT;
-}print <<<EOT
--->
-						<li><a href="apps.php?q=weibo"><img src="u/images/icon/record.png" alt="新鲜事" />我的新鲜事</a></li>
-<!--
-EOT;
-if ($db_dopen) {print <<<EOT
--->
-						<li><a href="apps.php?q=diary"><img src="u/images/icon/log.png" alt="日志" />我的日志</a></li>
-<!--
-EOT;
-}if ($db_phopen) {print <<<EOT
--->
-						<li><a href="apps.php?q=photos"><img src="u/images/icon/albums.png" alt="相册" />我的相册</a></li>
-<!--
-EOT;
-}print <<<EOT
--->
-						<li><a href="apps.php?q=article"><img src="u/images/icon/posts.png" alt="帖子" />我的帖子</a></li>
-<!--
-EOT;
-if ($db_groups_open) {print <<<EOT
--->
-						<li><a href="apps.php?q=groups"><img src="u/images/icon/groups.png" alt="群组" />我的群组</a></li>
+						<li><a href="apps.php?q=kmd&a=help"><img src="u/images/icon/kmd.png" alt="孔明灯" />孔明灯</a></li>
 <!--
 EOT;
 }print <<<EOT
 -->
 					</ul>
 				</div>
+				</div>
 <!--
 EOT;
 } else {print <<<EOT
 -->
-				<div id="td_mymenu" style="cursor:pointer" onClick="read.open('menu_mymenu_old','td_mymenu',3);">我的快捷通道</div>
+				<div id="td_mymenu" style="cursor:pointer" onClick="read.open('menu_mymenu_old','td_mymenu',3);">快捷通道</div>
 				<div id="menu_mymenu_old" class="popout" style="display:none;"><table border="0" cellspacing="0" cellpadding="0"><tbody><tr><td class="bgcorner1"></td><td class="pobg1"></td><td class="bgcorner2"></td></tr><tr><td class="pobg4"></td><td><div class="popoutContent">
 						<div style="width:250px;">
 									<div class="p10">
@@ -311,7 +315,7 @@ foreach ($_Navbar['main'] as $key => $value) {
 	$currentClass = '';
 	if ($value['data']['iscurrent']) {
 		$currentClass = ' class="current"';
-		$currentMainNavKey = $key; 
+		$currentMainNavKey = $key;
 	}
 	$html = buildNavLinkHtml($value['data']);
 	$crossEvent = $verticalEvent = $currentEvent = '';
@@ -343,7 +347,7 @@ EOT;
 if($ifHaveSubs){
 $navBStyle = empty($_Navbar['main'][$currentMainNavKey]['subs']) ? 'style="display:none"' : '';
 print <<<EOT
--->		
+-->
 				<div id="navB" $navBStyle class="pr">
 <!--
 EOT;
@@ -444,7 +448,7 @@ EOT;
 print <<<EOT
 -->
      </div>
-<script language="javascript">
+<script>
 var timeoutSpecifyId = {};
 var navBStyle = '$navBStyle';
 
@@ -460,7 +464,7 @@ function tmpHideAllCross(currentSubMenuId,showNavB) {
 	}
     var elements = getElementsByClassName('navB', getObj('navB'));
     if(elements.length){
-        for (i=0; i<elements.length; i++) {
+        for (var i=0,len = elements.length; i<len; i++) {
             if (elements[i].id != '' && elements[i].id != currentSubMenuId) elements[i].style.display = 'none';
         }
     }
@@ -500,16 +504,46 @@ function ctrlSubMenu(parentId, subMenuId) {
     <div id="searchA">
     	<div class="searchA_right fr">&nbsp;</div>
         <div class="searchA cc">
+<script>
+var ins_method = 'AND';
+var ins_sch_area = '1';
+var ins_time = 'all';
+var ins_fid = '$fid';
+</script>
         	<form action="searcher.php" method="post" onSubmit="return searchInput();">
+<!--
+EOT;
+if (SCR == 'thread'){
+	print <<<EOT
+-->
+        		<input value="AND" type="hidden" name="method" id="ins_method">
+        		<input value="1" type="hidden" name="sch_area" id="ins_sch_area">
+        		<input value="all" type="hidden" name="sch_time" id="ins_time">
+        		<input value="$fid" type="hidden" name="fid" id="ins_fid">
+<!--
+EOT;
+}print <<<EOT
+-->
 	        	<input type="hidden" value="$verifyhash" name="verify">
 	            <input value="2" type="hidden" name="step">
 	            <input value="thread" type="hidden" id="search_type" name="type">
-	            <div class="ip"><input id="search_input" type="text" value="搜索其实很简单！ (^_^)" class="gray" name="keyword" onFocus="searchFocus(this)" onBlur="searchBlur(this)" /></div>
+	            <div class="ip"><input id="search_input" type="text" value="搜索其实很简单！" class="gray" name="keyword" onFocus="searchFocus(this)" onBlur="searchBlur(this)" /></div>
 	            <div class="s_select" onMouseOut="this.firstChild.style.display='none';" onMouseOver="this.firstChild.style.display='block';"><ul onClick="getSearchType(event)"><!--
 EOT;
+$schText = '帖子';
+$schStyle = ' style="display:none"';
+if (SCR == 'thread'){
+	$schText = '本版';
+	$schStyle = '';
+	print <<<EOT
+-->
+<li type="thread" style="display:none" id="inner_forum">本版</li>
+<!--
+EOT;
+}
 if ($db_search_type) {
 	foreach ($db_search_type as $key=>$value) {
-		$currentType = $key == 'thread' ? ' style="display:none"' : '';
+		$currentType = SCR != 'thread' && $key == 'thread' ? ' style="display:none"' : '';
 print <<<EOT
 --><li type="$key"$currentType>{$value}</li><!--
 EOT;
@@ -517,7 +551,7 @@ EOT;
 } else {
 print <<<EOT
 -->
-				<li type="thread" style="display:none">帖子</li>
+				<li type="thread"{$schStyle}>帖子</li>
 				<li type="diary">日志</li>
 				<li type="user">用户</li>
 				<li type="forum">版块</li>
@@ -525,7 +559,7 @@ print <<<EOT
 <!--
 EOT;
 }print <<<EOT
---></ul><h6 class="w">帖子</h6></div>
+--></ul><h6 class="w">$schText</h6></div>
 	            <button type="submit" class="fl cp">搜索</button>
             </form>
             <div class="s_tags">
@@ -534,19 +568,48 @@ EOT;
 $hotwords = ($db_hotwords) ? explode(",",$db_hotwords) : array();
 if($hotwords){print <<<EOT
 -->
-            <span class="s2">热搜：</span>
+            <span>热搜：</span>
 <!--
 EOT;
 foreach($hotwords as $hotword){
 print <<<EOT
--->
-                	<a href="searcher.php?keyword={$hotword}&type=thread">$hotword</a>
-<!--
+--><a href="searcher.php?keyword={$hotword}&type=thread" class="s4" target="_blank">$hotword</a><!--
 EOT;
 }}
 print <<<EOT
 -->
             </div>
+<!--
+EOT;
+/* platform weibo app --start */
+$weiboSiteBindInfoService = L::loadClass('WeiboSiteBindInfoService', 'sns/weibotoplatform/service'); /* @var $weiboSiteBindInfoService PW_WeiboSiteBindInfoService */
+$accounts = $weiboSiteBindInfoService->getOfficalAccounts();
+if ($accounts) {
+print <<<EOT
+-->
+<style type="text/css">
+.weibos{float:right;clear:right;height:22px;overflow:hidden;margin-top:-32px;*margin-top:-21px;padding-left:10px;}
+.weibos iframe{float:right;}
+</style>
+	<div class="weibos">
+<!--
+EOT;
+	foreach ($accounts as $type => $account) {
+print <<<EOT
+-->
+		$account[followButton]
+<!--
+EOT;
+	}
+print <<<EOT
+-->
+	</div>
+<!--
+EOT;
+}
+/* platform weibo app --end */
+print <<<EOT
+-->
         </div>
     </div>
 <!--
@@ -555,7 +618,7 @@ if ($skincount > 1) {print <<<EOT
 -->
 <div id="menu_skin" class="pw_menu" style="display:none;">
 	<div class="pw_menuBg">
-	<h6><img src="$imgpath/pwicon/style.gif" align="absmiddle" alt="风格切换" /></h6>
+		<div class="fl"><h6><img src="$imgpath/pwicon/style.gif" align="top" alt="风格切换" /></h6></div>
     <div class="c mb10">&nbsp;</div>
 		<ul class="cc menuSkin">
 <!--
@@ -578,7 +641,7 @@ print <<<EOT
 		</ul>
     </div>
 </div>
-<script language="JavaScript">var td_skin = {pz : 22}</script>
+<script>var td_skin = {pz : 22}</script>
 <!--
 EOT;
 }if (!empty($shortcutforum)) {print <<<EOT
@@ -597,29 +660,31 @@ EOT;
 -->
 	</ul>
 </div>
-<script language="JavaScript">var td_shortcut = {pz : 22}</script>
+<script>var td_shortcut = {pz : 22}</script>
 <!--
 EOT;
 }print <<<EOT
 -->
 </div>
+<div class="tac mb5">
 <!--
 EOT;
 list($htmlAdvert,$arrayAdvert) = pwAdvert('Site.NavBanner1',$fid);
 if($htmlAdvert){print <<<EOT
 -->
-<div class="tac mb5" style="line-height:1;">$htmlAdvert</div>
+$htmlAdvert
 <!--
 EOT;
 }
 list($htmlAdvert,$arrayAdvert) = pwAdvert('Site.NavBanner2',$fid);
 if($htmlAdvert){print <<<EOT
 -->
-<div class="tac mb5" style="line-height:1;">$htmlAdvert</div>
+$htmlAdvert
 <!--
 EOT;
 }print <<<EOT
 -->
+</div>
 <div class="main-wrap">
 <div id="main">
 <!--

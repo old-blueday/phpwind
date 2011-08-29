@@ -689,9 +689,9 @@ if (empty($action)) {
 							}
 						}
 					}
-					!$delids && $delids[$id][] = $id;
+					!$delids && $tmpdelids[$id][] = $id;
 				}
-				
+				$delids = $delids ? $delids : $tmpdelids;
 				foreach ($delids as $key=>$ids) {
 					foreach ($ids as $id) {
 						$cname  = $db->get_value("SELECT cname FROM pw_colonys WHERE styleid =" . S::sqlEscape($id));

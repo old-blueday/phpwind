@@ -61,7 +61,7 @@ a.s6:hover{ text-decoration:underline;}
 .tu_flash h3{ position:absolute;top:278px;color:#fff;z-index:1;right:135px;}
 .tu_flash_bg{position:absolute;top:270px;width:520px;height:30px;left:0;background:#000;filter:alpha(opacity=60);-moz-opacity:0.6;opacity:0.6; }
 .tu_flash .tu_flash_nav{float:right;width:120px;}
-.tu_flash .tu_flash_nav li{padding-left:6px;height:68px;margin-bottom:9px;}
+.tu_flash .tu_flash_nav li{padding-left:6px;height:68px;overflow:hidden;margin-bottom:9px;float:right;}
 .tu_flash .tu_flash_nav img{border:1px solid #cecece;padding:1px;background:#fff;width:110px;height:64px;}
 .tu_flash .tu_flash_nav li.current{background:url(tu_flash.png) no-repeat;}
 .tu_flash .tu_flash_nav li.current img{border:0 none;padding:2px;background:none;}

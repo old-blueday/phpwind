@@ -90,7 +90,7 @@ if ($type == 'topic'){print <<<EOT
       </table>
   </div>
 </form>
-<SCRIPT LANGUAGE="JavaScript">
+<script type="text/javascript">
 var typefrom = '$from';
 function changeFrom(value) {
 	var fromforum = getObj('fromforum');
@@ -109,7 +109,7 @@ function changeFrom(value) {
 window.onload = function(){
 	changeFrom(typefrom);
 }
-</SCRIPT>
+</script>
 <form action="$basename&type=topic&" method="post" name="form1">
   <h3 class="h1">帖子列表</h3>
   <div class="admin_table mb10">
@@ -137,8 +137,9 @@ EOT;
 -->
 
       <td>作者</td>
+      <td>发帖时间</td>
       <td>删除人</td>
-      <td>时间</td>
+      <td>删除时间</td>
     </tr>
 <!--
 EOT;
@@ -182,6 +183,7 @@ EOT;
 -->
 	  </td>
       <td class="td2"><a href="u.php?uid=$value[authorid]" target="_blank">$value[author]</a></td>
+      <td class="td2">$value[postdate]</td>
       <td class="td2">$value[admin]</td>
       <td class="td2">$value[deltime]</td>
     </tr>
@@ -268,7 +270,7 @@ EOT;
   </div>
 <input type="hidden" name="ptable" id="ptable" value="">
 </form>
-<SCRIPT LANGUAGE="JavaScript">
+<script type="text/javascript">
 var typefrom = '$from';
 function changeFrom(value) {
 	var fromforum = getObj('fromforum');
@@ -285,11 +287,13 @@ function changeFrom(value) {
 	}
 }
 window.onload = function(){
-	var ptable = getObj('select_ptable').value;
-	getObj('ptable').value = ptable;
+	if (getObj('select_ptable')) {
+		var ptable = getObj('select_ptable').value;
+		getObj('ptable').value = ptable;
+	}
 	changeFrom(typefrom);
 }
-</SCRIPT>
+</script>
 <form action="$basename&type=reply&" method="post" name="form1">
 <h3 class="h1"><span class="mr10">回复列表</span>
 <!--
@@ -404,7 +408,7 @@ EOT;
 EOT;
 }print <<<EOT
 -->
-<script language="JavaScript">
+<script type="text/javascript">
 function content(id){
 	var o = getObj('content_'+id);
 	o.style.display = o.style.display == 'none' ? '' : 'none';

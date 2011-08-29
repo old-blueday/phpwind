@@ -105,6 +105,13 @@ class PW_JoberDB extends BaseDB {
 		return $this->_db->get_one ( "SELECT * FROM " . $this->_tableName. "  WHERE jobid in(" .$ids. ") AND status <= 1 AND userid=".$this->_addSlashes ( $userid )." ORDER BY last DESC LIMIT 1" );
 	}
 	
+	/*查找所有正在进行中的任务*/
+	function getInProcessJobersByUserIdAndJobIds($userid, $ids) {
+		$userid = (int) $userid;
+		if(!S::isArray($ids) || $userid < 1) return array();
+		$query = $this->_db->query('SELECT * FROM ' . $this->_tableName . ' WHERE jobid IN(' . S::sqlImplode($ids) . ') AND status = 1 AND userid = ' . S::sqlEscape($userid) . ' ORDER BY last DESC');
+		return $this->_getAllResultFromQuery($query);
+	}
 
 	function getJobersByJobIds($userid,$ids) {
 		$userid = intval($userid);

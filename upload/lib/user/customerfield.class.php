@@ -51,7 +51,24 @@ class PW_CustomerField {
 		}
 		return $fields;
 	}
-
+	/**
+	 * 
+	 * 按分类取字段列表
+	 * @param string $categoryName
+	 * @return array
+	 */
+	function getFieldsnameByCategoryName($categoryName){
+		$fields = $tmpfields = array();
+		$categories = $this->_initCategoryMap();
+		if (!$categoryName || !isset($categories[$categoryName])) return $fields;
+		$dao = $this->_getCustomerFieldDao();
+		$fields = (array)$dao->getFieldsByCategoryName($categoryName);
+		foreach ($fields as $key => $value) {
+			if (!$value['fieldname']) continue;
+			$tmpfields[] = $value['fieldname'];
+		}
+		return $tmpfields;
+	}
 	/**
 	 * 
 	 * 根据资料首次填写区域获取字段列表

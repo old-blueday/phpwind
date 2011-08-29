@@ -43,6 +43,11 @@ class PW_CollectionDB extends BaseDB {
 		return $this->_get($id);
 	}
 
+	function getUidsByIds($ids){
+		$query = $this->_db->query("SELECT id,uid FROM ".$this->_tableName. " WHERE id IN (".S::sqlImplode($ids).")");
+		return $this->_getAllResultFromQuery($query);
+	}
+	
 	function countByUid($uid,$ftype = null) {
 		if (!$uid) return false; 
 		($ftype != 0) && $ctid = ' AND ctid = '.S::sqlEscape($ftype);

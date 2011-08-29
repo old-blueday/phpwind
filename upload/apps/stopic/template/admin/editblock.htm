@@ -7,13 +7,12 @@ print <<<EOT
 <h2 class="h1" style="cursor:move" onmousedown="read.move(event);"><a class="fr del_img" href="javascript:;" onclick="closep();" title="关闭">关闭</a>修改“{$block_name}”模块的内容</h2>
 <div class="admin_table mb10">
 <table cellspacing="0" cellpadding="0" width="100%" style="table-layout:auto;">
-
+<!--
 EOT;
 
 include stopic_use_block($block_type);
-
 print <<<EOT
-
+-->
 </table>
 </div>
 <div class="tac mb10">
@@ -25,7 +24,7 @@ print <<<EOT
 </div>
 </form>
 </div>
-<script language="javascript">
+<script type="text/javascript">
 function delTr (e) {
 	while (e && e.tagName.toLowerCase() != 'tr') {
 		e = e.parentNode;

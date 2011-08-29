@@ -8,7 +8,7 @@
 .sideA{width:200px;float:left;margin-right:10px;overflow:hidden;display:inline-block;}
 .sideB{width:540px;float:left;overflow:hidden;}
 .sideC{width:200px;float:right;overflow:hidden;}
-.sideD{width:750px;float:right;min-height:400px;}
+.sideD{width:750px;float:right;min-height:400px;overflow:hidden;}
 
 #space_info{padding:15px 12px 10px; line-height:22px;}
 #space_info .face img{padding:4px; vertical-align:bottom; width:120px; height:120px;}
@@ -105,14 +105,12 @@ div.sideA .spFriend p.lh_18,div.sideC .spFriend p.lh_18{width:110px;white-space:
 div.spaceSideB .conFeed{padding:0 10px 20px;}
 div.spaceSideB .conFeed .dl{width:auto;}
 div.spaceSideB .conFeed .dt{display:none;}
-div.spaceSideB .conFeed .dd{width:100%;}
+div.spaceSideB .conFeed .dd{width:700px;}
 div.spaceSideB .conFeed .dd .title .uname{display:none;}
 div.spaceSideB .redlB{padding:5px 10px;}
 div.spaceSideB .redlB .triangle{margin-top:-15px;}
-div.spaceSideB .redlB .dlA{width:440px;}
-div.spaceSideB .redlB .dtA{width:55px;}
-div.spaceSideB .redlB .ddA{width:385px;}
-div.spaceSideB .redlB .ddA textarea{width:375px;}
+div.spaceSideB .redlB .ddA{width:405px;}
+div.spaceSideB .redlB .ddA textarea{width:335px;}
 div.spaceSideB .redlB .mr20{margin-right:10px;}
 div.spaceSideB .redlB em,div.sideD .redlB em{display:inline;float:none;}
 div.sideA div.gray,div.sideC div.gray{display:none;}
@@ -126,7 +124,7 @@ div.sideA .redlB,div.sideC .redlB{display:none;}
 div.sideD .conFeed{padding:0 10px 20px;}
 div.sideD .conFeed .dl{width:auto;}
 div.sideD .conFeed .dt{display:none;}
-div.sideD .conFeed .dd{width:100%;}
+div.sideD .conFeed .dd{width:700px;padding:0 10px;}
 div.sideD .conFeed .dd .title .uname{display:none;}
 
 

@@ -6,22 +6,17 @@
 .tabB{padding-left:0;}
 .content_thread .hB{padding-left:10px;}
 .tr3 td,.tr3 th,.tr2 td,.tr2 th{border-bottom:1px solid #dae7f0;padding:5px 0 5px 10px;}
-.ftc{border:1px dotted #ccc;background:#f7f7f7;padding:10px;}
+.ftc{border:1px dotted #ccc;background:#f7f7f7;padding:10px;width:760px;}
 </style>
 <div id="breadCrumb">
-		<img align="absmiddle" src="$imgpath/$stylepath/thread/home.gif" alt="forumlist" class="breadHome" /><em class="breadEm"></em><a href="$db_bfn_temp" title="$db_bbsname">$db_bbsname</a>
-<!--
+		<img align="absmiddle" src="$imgpath/$stylepath/thread/home.gif" alt="forumlist" class="breadHome" /><em class="breadEm"></em><a href="$db_bfn_temp" title="$db_bbsname">$db_bbsname</a><!--
 EOT;
 if($forum_name){ print <<<EOT
--->
-		 <em>&gt;</em><a href="forumcp.php">版块管理</a><em>&gt;</em><a href="thread.php?fid=$fid">$forum_name</a>
-<!--
+--><em>&gt;</em><a href="thread.php?fid=$fid">$forum_name</a><em>&gt;</em><a href="forumcp.php">版块管理</a><!--
 EOT;
 }else{
 print <<<EOT
--->
-		 <em>&gt;</em><a href="forumcp.php">版块管理</a>
-<!--
+--><em>&gt;</em><a href="forumcp.php">版块管理</a><!--
 EOT;
 }
 print <<<EOT
@@ -32,10 +27,8 @@ print <<<EOT
 EOT;
 if(!$action){ print <<<EOT
 -->
-<div class="hB">
-	<ul class="tabB">
-    	<li class="current"><a href="javascript:;">基本统计信息</a></li>
-    </ul>
+<div class="h">
+	<h2>基本统计信息</h2>
 </div>
 <div class="t f_one">
 <table width="100%" cellspacing="0" cellpadding="0">
@@ -227,7 +220,7 @@ $starttime && $starttime = get_date($starttime,'Y-n-j');
 $endtime && $endtime = get_date($endtime,'Y-n-j');
 print <<<EOT
 -->
-<script language="JavaScript" src="js/date.js"></script>
+<script type="text/javascript" src="js/date.js"></script>
 <form action="forumcp.php?action=edit&type=$type&fid=$fid" method="post">
 <input type="hidden" name="ptable" value="$ptable"/>
 <div class="h">搜索</div>
@@ -294,7 +287,7 @@ EOT;
 	<tr><td colspan="8"><div class="tac p10"><span class="btn"><span><button type="submit" name="add">提 交</button></span></span></div></td></tr>
 </table>
 </form>
-<script language="JavaScript">
+<script>
 function delnotice(aid) {
 	if (!aid || !confirm('确定要删除此公告吗？')) {
 		return false;
@@ -307,7 +300,7 @@ function delnotice(aid) {
 EOT;
 }elseif(in_array($type,array('add','edit'))){print <<<EOT
 -->
-<script language="javascript" type="text/javascript" src="js/date.js"></script>
+<script type="text/javascript" src="js/date.js"></script>
 <form name="FORM" method="post" action="forumcp.php?">
 <input type="hidden" name="verify" value="$verifyhash" />
 <input type="hidden" name="action" value="$action">
@@ -350,7 +343,7 @@ print <<<EOT
 </table>
 </div>
 </form>
-<script language="JavaScript" src="js/wind_editor.js"></script>
+<script src="js/wind_editor.js"></script>
 <!--
 EOT;
 }elseif($type=='report'){ print <<<EOT
@@ -380,7 +373,7 @@ print <<<EOT
 		<td><a href="thread.php?fid=$report[fid]" target="_blank">$report[fname]</a></td>
 		<td><a href="read.php?tid=$report[tid]#$report[pid]" target="_blank">进入帖子</a></td>
 		<td><a target="_blank" href="{$db_userurl}$report[uid]">$report[username]</a></td>
-		<td><div style="line-height:18px;height:18px;overflow:hidden;" title="$report[reason]">$report[reason]</div></td>
+		<td><div style="line-height:18px;height:18px;overflow:hidden;width:400px;" title="$report[reason]">$report[reason]</div></td>
 <!--
 EOT;
 if($report[type]==1){ print <<<EOT
@@ -440,6 +433,7 @@ EOT;
 				 <div class="admin_table_c">
 						<table cellpadding="0" cellspacing="0" width="100%">
 								<tr class="tr2">
+										<td width="40">默认</td>
 										<td width="60">顺序</td>
 										<td width="175">名称</td>
 										<td width="350">图标URL</td>
@@ -448,9 +442,11 @@ EOT;
 <!--
 EOT;
 foreach ($typedb as $key => $value){
+$ifsetdefault = $value['isdefault'] ? 'checked' : '';
 print <<<EOT
 -->
 									<tr id="ttype_$value[id]">
+										<td><input type="radio" value="$key" name="t_set_default" $ifsetdefault /></td>
 										<td><input type="text" class="input" style="width:20px;" value="$value[vieworder]" name="t_view_db[$key]"></td>
 										<td><input type="text" class="input input_wa" value="$value[name]" name="t_db[$key]" /></td>
 										<td><input type="text" class="input input_wb" value="$value[logo]" name="t_logo_db[$key]" /></td>
@@ -463,6 +459,7 @@ EOT;
 print <<<EOT
 -->
 									<tr id="ttype_$v[id]">
+										<td></td>
 										<td>|&mdash;&nbsp;<input type="text" class="input" style="width:20px;" name="t_view_db[{$v[id]}]" value="$v[vieworder]"></td>
 										<td><input type="text" class="input input_wa" value="$v[name]" name="t_db[{$v[id]}]" /></td>
 										<td><input type="text" class="input input_wb" value="$v[logo]" name="t_logo_db[{$v[id]}]" /></td>
@@ -479,8 +476,8 @@ EOT;
 }print <<<EOT
 -->
 								<tbody id="tbody"></tbody>
-								<tbody id="tmode" style="display:none"><tr><td><input type="text" class="input" style="width:20px;" name="new_t_view_db[]"></td><td><input type="text" class="input input_wa" value="" name="new_t_db[]" /></td><td><input type="text" class="input input_wb" name="new_t_logo_db[]" /></td><td>&nbsp;</td></tr></tbody>
-								<tbody id="t_sub_mode" style="display:none"><tr><td>|&mdash;&nbsp;<input type="text" class="input" style="width:20px;" name="new_t_sub_view_db"></td><td><input type="text" class="input input_wa" value="" name="new_t_sub_db" /></td><td><input type="text" class="input input_wb" name="new_t_sub_logo_db" /></td><td>&nbsp;</td></tr></tbody>
+								<tbody id="tmode" style="display:none"><tr><td></td><td><input type="text" class="input" style="width:20px;" name="new_t_view_db[]"></td><td><input type="text" class="input input_wa" value="" name="new_t_db[]" /></td><td><input type="text" class="input input_wb" name="new_t_logo_db[]" /></td><td>&nbsp;</td></tr></tbody>
+								<tbody id="t_sub_mode" style="display:none"><tr><td></td><td>|&mdash;&nbsp;<input type="text" class="input" style="width:20px;" name="new_t_sub_view_db"></td><td><input type="text" class="input input_wa" value="" name="new_t_sub_db" /></td><td><input type="text" class="input input_wb" name="new_t_sub_logo_db" /></td><td>&nbsp;</td></tr></tbody>
 						</table>
 					</div>
        </td>
@@ -492,8 +489,8 @@ EOT;
 <input type="hidden" name="fid" value="$fid" />
 <input type="hidden" name="step" value="3" />
 </form>
-<script language="JavaScript" src="js/pw_ajax.js"></script>
-<script language="JavaScript">
+<script type="text/javascript" src="js/pw_ajax.js"></script>
+<script>
 function addtype(){
 	var s = getObj('tmode').firstChild.cloneNode(true);
 	getObj('tbody').appendChild(s);
@@ -571,7 +568,12 @@ foreach($threaddb as $key=>$thread){print <<<EOT
 	<td>
 <!--
 EOT;
-if($thread[topped]){print <<<EOT
+if($thread[specialsort]==PW_THREADSPECIALSORT_KMD){print <<<EOT
+-->
+<img src="$imgpath/pwicon/headtopic_4.gif" alt="孔明灯帖标志" align="absmiddle" />		
+<!--
+EOT;
+}elseif($thread[topped]){print <<<EOT
 -->
 <img src="$imgpath/$stylepath/file/headtopic_$thread[topped].gif" alt="置顶帖标志" align="absmiddle" />
 <!--
@@ -676,10 +678,10 @@ EOT;
 }print <<<EOT
 -->
 回复审核</div>
-<table width="100%">
+<table width="100%" class="z">
 <tr class="tr2">
 	<td width="35">选项</td>
-	<td>标题</td>
+	<td>回复内容</td>
 	<td width="100px">作者</td>
 	<td width="120px">发表日期</td>
 </tr>
@@ -689,7 +691,7 @@ foreach($postdb as $key=>$post){print <<<EOT
 -->
 <tr class="tr3">
 	<td><input type="checkbox" name="selid[]" value="$post[pid]" /></td>
-	<th onmouseover="this.className='f_two'" onmouseout="this.className='f_one'" onclick="content('$post[pid]');"><a href="job.php?action=topost&tid=$post[tid]&pid=$post[pid]" target="_blank" class="fr s4">[查看原帖]</a>$post[subject]</th>
+	<th onclick="content('$post[pid]');"><a href="job.php?action=topost&tid=$post[tid]&pid=$post[pid]" target="_blank" class="fr s4">[查看原帖]</a>$post[subject]</th>
 	<td><a href="{$db_userurl}$post[authorid]">$post[author]</a></td>
 	<td>$post[postdate]</td>
 </tr>
@@ -805,9 +807,8 @@ EOT;
 }print <<<EOT
 -->
 	<td>标题</td>
-	<td width="120px">发布时间</td>
-	<td width="90px">IP</td>
 	<td width="80px">作者</td>
+	<td width="120px">发帖时间</td>
 	<td width="80px">管理员</td>
 	<td width="120px">删除日期</td>
 </tr>
@@ -825,10 +826,9 @@ if($forumset[recycle]){print <<<EOT
 EOT;
 }print <<<EOT
 -->
-	<th class="cp" onclick="content('$thread[tid]');">$thread[subject]</th>
-	<td>$thread[postdate]</td>
-	<td>$thread[userip]</td>
+	<th class="cp" onclick="content('$thread[tid]');"><a href="thread.php?fid=$thread[fid]" target="_blank" class="fr s4">[来源版块]</a>$thread[subject]</th>
 	<td><a href="{$db_userurl}$thread[authorid]">$thread[author]</a></td>
+	<td>$thread[postdate]</td>
 	<td>$thread[admin]</td>
 	<td>$thread[deltime]</td>
 </tr>
@@ -910,8 +910,9 @@ EOT;
 }print <<<EOT
 -->
 	<td>标题</td>
-	<td width="100">作者</td>
-	<td width="100">管理员</td>
+	<td width="80">作者</td>
+	<td width="120">回帖时间</td>
+	<td width="80">管理员</td>
 	<td width="120">删除日期</td>
 </tr>
 <!--
@@ -930,6 +931,7 @@ EOT;
 -->
 	<th class="cp" onclick="content('$posts[pid]');"><a href="read.php?tid=$posts[tid]" target="_blank" class="fr s4">[查看主题帖]</a>$posts[subject]</th>
 	<td><a href="{$db_userurl}$posts[authorid]">$posts[author]</a></td>
+	<td>$posts[postdate]</td>
 	<td>$posts[admin]</td>
 	<td>$posts[deltime]</td>
 </tr>
@@ -977,14 +979,15 @@ EOT;
 </select>
 <!--
 EOT;
-}print <<<EOT
+}
+if($forumset[recycle]){print <<<EOT
 -->
 	<span class="bt"><span><button type="button" name="chkall" onclick="CheckAll(this.form)">全 选</button></span></span>
 	<span class="btn"><span><button type="submit" name="hello" onclick="return Psubmit(this.form)">提 交</button></span></span>
 </div></form>
 <!--
 EOT;
-}elseif($type=='addmsg'){
+}}elseif($type=='addmsg'){
 $adminsel = '<label class="mr10"><input type="checkbox" name="msgtype" value="1" checked>所有版主</label>';
 foreach ($adminname as $val) {
 	if($val!=$windid && $val){
@@ -1068,7 +1071,7 @@ EOT;
             </div>
         </div>
     </div>
-<script language="JavaScript">
+<script>
 /*function CheckAll(form){
 	for(var i=0;i<form.elements.length-2;i++){
 		var e = form.elements[i];

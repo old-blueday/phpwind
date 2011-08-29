@@ -1,32 +1,26 @@
 <?php
 !defined('P_W') && exit('Forbidden');
 class PW_moduleConfigService {
-	function PW_moduleConfigService() {
-		$this->__construct();
-	}
-	function __construct() {
-
-	}
 	/*
 	 * 根据配置文件修改数据库中的配置
 	 */
-	function updateInvokesByModuleConfig($templateFile,$configFile) {
+	function updateInvokesByModuleConfig($templateFile,$configFile,$type,$sign) {
 		$invokeService = $this->_getInvokeService();
-
+		$invokeService->updatePageInvokesState($type,$sign,'',1);
 		$this->_initPwContainer($templateFile,$configFile);
 		$modules = $this->_getModulesFromTemplate($templateFile);
-		
 		foreach ($modules as $module) {
 			$oldModuleInfo = $invokeService->getInvokeByName($module);
 			$newModulePiecesCode = $this->_getInvokeStringFromConfigFile($configFile,$module);
 			$newModuleTitle = $this->_getModuleTitle($configFile,$module);
 
 			$this->_processModuleTitle($module,$oldModuleInfo,$newModuleTitle);
-			$this->_processModuleTagCode($module,$oldModuleInfo,$newModulePiecesCode);
+			$this->_processModuleTagCode($module,$oldModuleInfo,$newModulePiecesCode,$type,$sign);
 		}
+		$invokeService->updatePageInvokesState($type,$sign,$modules,0);
 	}
 	
-	function _processModuleTagCode($module,$oldModuleInfo,$newModulePiecesCode) {		
+	function _processModuleTagCode($module,$oldModuleInfo,$newModulePiecesCode,$type,$sign) {		
 		if ($oldModuleInfo && $oldModuleInfo['tagcode'] == $newModulePiecesCode) return true;
 		
 		$invokeService = $this->_getInvokeService();
@@ -34,7 +28,7 @@ class PW_moduleConfigService {
 			$invokeService->updateInvokeTagCode($module,$newModulePiecesCode);
 			return true;
 		}
-		$invokeService->addInvoke($module,$newModulePiecesCode);
+		$invokeService->addInvoke($module,$newModulePiecesCode,$type,$sign);
 		return true;
 	}
 	
@@ -57,6 +51,11 @@ class PW_moduleConfigService {
 		$configFileString = $this->_getFileString($configFile,$ifCache);
 		preg_match('/<pw.+?id=([\'|"]?)'.$module.'(\\1).+?\/>/i',$configFileString,$match);
 		return $match[0] ? $match[0] : '';
+	}
+	function checkCodeTitles($code) {
+		preg_match_all("/<list([^\>]+)title\s?=\s?(['|\"]?)(.*?)(\\2)[^\>]+\/>/is",$code,$match);
+		$temp = $match[3];
+		return count(array_unique($temp)) == count($temp) ? false : true; 
 	}
 	/**
 	 * 获取文件中某个模块的模板

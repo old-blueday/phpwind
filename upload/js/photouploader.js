@@ -17,6 +17,11 @@ var uploader = {
 	 */
 	list:function(queue)
 	{
+		var restLength = this.getRestCount();
+		if(restLength<1){
+			showDialog('warning','此相册照片数量达到上限，无法上传!',2);
+			return false;
+		}
 		var qlist = document.getElementById('qlist');
 		while(j = qlist.rows.length)
 		{
@@ -30,7 +35,7 @@ var uploader = {
 			cel1.innerHTML = queue[i].name;
 			
 			var cel2 = tr.insertCell(1);
-			var desc = queue[i].desc===null?queue[i].name:queue[i].desc;
+			var desc = queue[i].desc===undefined?queue[i].name:queue[i].desc;
 			cel2.innerHTML = '<input type="text" value="'+desc+'" onchange="uploader.storage(this)" />';			
 			var cel3 = tr.insertCell(2);
 			cel3.innerHTML = uploader.getSize(queue[i].size);

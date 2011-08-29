@@ -7,16 +7,17 @@ print <<<EOT
 <div class="contUser" id="content">
 <table width="100%"><tr><td height="600" valign="top">
 	<div class="p15">
-        <a href="{$baseUrl}?type=search" class="fr mr5">消息搜索</a>
-        <h4 class="site mb5"><span>站内信</span>(共{$smsAllCount}条，<a href="$normalUrl&action=unread" class="s2"><b>{$notReadCount}</b>条未读消息</a>)</h4>
+        <a href="{$baseUrl}?type=search" class="fr mr5" style="margin-top:10px;">消息搜索</a>
+        <h4 class="site mb5"><span>站内信</span>(共{$smsAllCount}条，<a href="$normalUrl&action=unread"><b>{$notReadCount}</b>条未读消息</a>)</h4>
 <!--
 EOT;
 if($percent == '100%'){
 print <<<EOT
 -->
-<script type="text/javascript" src="js/global.js"></script>
 <script type="text/javascript">
-	showDialog('warning', '您的消息已满，您将不能正常收发消息，请及时<a href="message.php?type=clear">清理</a>');
+	/*onReady(function(){
+		showDialog('warning', '您的消息已满，您将不能正常收发消息，请及时<a href="message.php?type=clear">清理</a>');
+	})*/
 </script>
 		<div class="wrongTip mb15">您的消息已满，您将不能正常收发消息，请及时<a href="message.php?type=clear">清理</a>！</div>
 <!--
@@ -98,7 +99,7 @@ function getSmsList(rType){
 				</select></span></span>
 		 </div>
        <div id="showmessageTip"></div>
-       <table width="100%" class="mb10">
+       <table width="100%" class="mb10 z2">
 <!--
 EOT;
 if($emptyListTip){
@@ -119,6 +120,7 @@ list($_img,$_b,$_tip) = getMessageIconByStatus($value);
 $_col = getSubListHtml($value);
 $value[modified_time] = get_date($value[modified_time]);
 $value['content'] = strip_tags($value['content']);
+$value['title'] = substrs($value[title],45);
 $_title = getMessageIconTips($value['typeid'],$value['create_uid']);
 $_sendtype = $winduid == $value['create_uid'] ? '发给' : '来自';
 print <<<EOT
@@ -145,11 +147,10 @@ EOT;
 -->
 				 </p><em><span title="$value[modified_time]">{$value[modified_time_format]}</span></em></td>
 				 <td class="value">
-				 	<h4 $_b><a href="$normalUrl&action=info&boxname={$boxname}&page=$page&rid={$value[rid]}&itype={$itype}&smstype={$smstype}&mid={$value[mid]}&redirect=$redirect">{$value[title]}</a></h4>
+				 	<h4 $_b><a class="mr5" href="$normalUrl&action=info&boxname={$boxname}&page=$page&rid={$value[rid]}&itype={$itype}&smstype={$smstype}&mid={$value[mid]}&redirect=$redirect">{$value[title]}</a><em class="s2 fn">{$_tip}</em></h4>
 				 	<p class="lh_18">{$value[content]}</p>
-					<em class="s2">{$_tip}</em>
 				</td>
-				<td class="del"><a id="del_{$value[rid]}" href="javascript:;" onclick="MC.del('$value[rid]','sms','$action','$page','showmessageTip')" class="adel">删除</a></td>
+				<td class="del"><a id="del_{$value[rid]}" href="javascript:;" onclick="pwConfirm('确定要删除该消息?', this, function(){MC.del('$value[rid]','sms','$action','$page','showmessageTip')})" class="adel">删除</a></td>
 			</tr>
 <!--
 EOT;
@@ -165,8 +166,8 @@ if(count($smsList) >= $perpage){
 print <<<EOT
 -->
       <span class="mr5"><label><input id="checkall" name="checkall"  type="checkbox" value="" onclick="MC.CheckAll(this.form,this)">&nbsp;全选</label></span>
-	   	<span class="bt2"><span><button onclick="MC.mSubmit(this.form,'mark','sms','$smstype','$action','$page','showmessage')" type="button">标记已读</button></span></span>
-      <span class="bt2"><span><button onclick="MC.mSubmit(document.FORM,'del','sms','$smstype','$action','$page','showmessage')"  type="button">删除</button></span></span>
+	   	<span class="bt2"><span><button onclick="MC.mSubmit(this.form,'mark','sms','$action','$page','showmessage')" type="button">标记已读</button></span></span>
+      <span class="bt2"><span><button onclick="MC.mSubmit(document.FORM,'del','sms','$action','$page','showmessage')"  type="button">删除</button></span></span>
 <!--
 EOT;
 }print <<<EOT

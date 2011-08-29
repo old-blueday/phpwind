@@ -72,13 +72,13 @@ WYSIWYD.prototype.autoSave = function() {
 	if (!value) {
 		return;
 	}
-	$('autosave').style.display = 'none';
+	getObj('autosave').style.display = 'none';
 	var _=this;
 	if (_.mt) {
 		clearTimeout(_.mt);
 	}
 	_.mt = setTimeout(function() {
-		$('autosave').style.display = '';
+		getObj('autosave').style.display = '';
 		saveData('msg', _._editMode == 'textmode' ? _.getHTML() : htmltocode(_.getHTML()));
 		_.mt = null;
 	}, _.ct * 1000);
@@ -384,7 +384,7 @@ WYSIWYD.prototype.updateToolbar = function(noStatus) {
 				break;
 			//case "htmlmode": btn.state("active", !iftext);break;
 			//case "windcode": btn.state("active", iftext);break;
-			case 'windcode': $('wy_windcode').checked = iftext ? true : false;break;
+			case 'windcode': getObj('wy_windcode').checked = iftext ? true : false;break;
 			default:
 				try{
 					btn.state("active",(!iftext && btn.mover && doc.queryCommandState(cmd)));

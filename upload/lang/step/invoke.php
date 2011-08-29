@@ -281,7 +281,7 @@ EOT;
 				</div>
 				<div class="c"></div>
 				<script type="text/javascript" src="js/sliderplayer.js"></script>
-				<script language="JavaScript">pwSliderPlayers("pwSlidePlayer");</script>',
+				<script type="text/javascript">pwSliderPlayers("pwSlidePlayer");</script>',
 		'parsecode' => '<div id="pwSlidePlayer" class="pwSlide cc">
 <!--#
 	$tmpCount=0;
@@ -304,7 +304,7 @@ EOT;
 				</div>
 				<div class="c"></div>
 				<script type="text/javascript" src="js/sliderplayer.js"></script>
-				<script language="JavaScript">pwSliderPlayers("pwSlidePlayer");</script>',
+				<script type="text/javascript">pwSliderPlayers("pwSlidePlayer");</script>',
 		'ifloop' => '0',
 		'loops' => '',
 		'descrip' => '',
@@ -550,7 +550,7 @@ EOT;
 				</div>
 				<div class="c"></div>
 				<script type="text/javascript" src="js/sliderplayer.js"></script>
-				<script language="JavaScript">pwSliderPlayers("pwSlidePlayer");</script>',
+				<script type="text/javascript">pwSliderPlayers("pwSlidePlayer");</script>',
 		'parsecode' => '<div id="pwSlidePlayer" class="pwSlide cc">
 <!--#
 	$tmpCount=0;
@@ -573,7 +573,7 @@ EOT;
 				</div>
 				<div class="c"></div>
 				<script type="text/javascript" src="js/sliderplayer.js"></script>
-				<script language="JavaScript">pwSliderPlayers("pwSlidePlayer");</script>',
+				<script type="text/javascript">pwSliderPlayers("pwSlidePlayer");</script>',
 		'ifloop' => '0',
 		'loops' => '',
 		'descrip' => '',
@@ -692,7 +692,7 @@ EOT;
 				</div>
 				<div class="c"></div>
 				<script type="text/javascript" src="js/sliderplayer.js"></script>
-				<script language="JavaScript">pwSliderPlayers("pwSlidePlayer");</script>',
+				<script type="text/javascript">pwSliderPlayers("pwSlidePlayer");</script>',
 		'parsecode' => '<div id="pwSlidePlayer" class="pwSlide cc">
 <!--#
 	$tmpCount=0;
@@ -715,7 +715,7 @@ EOT;
 				</div>
 				<div class="c"></div>
 				<script type="text/javascript" src="js/sliderplayer.js"></script>
-				<script language="JavaScript">pwSliderPlayers("pwSlidePlayer");</script>',
+				<script type="text/javascript">pwSliderPlayers("pwSlidePlayer");</script>',
 		'ifloop' => '0',
 		'loops' => '',
 		'descrip' => '',
@@ -840,7 +840,7 @@ EOT;
 				</div>
 				<div class="c"></div>
 				<script type="text/javascript" src="js/sliderplayer.js"></script>
-				<script language="JavaScript">pwSliderPlayers("pwSlidePlayer");</script>',
+				<script type="text/javascript">pwSliderPlayers("pwSlidePlayer");</script>',
 		'parsecode' => '<div id="pwSlidePlayer" class="pwSlide cc">
 <!--#
 	$tmpCount=0;
@@ -863,7 +863,7 @@ EOT;
 				</div>
 				<div class="c"></div>
 				<script type="text/javascript" src="js/sliderplayer.js"></script>
-				<script language="JavaScript">pwSliderPlayers("pwSlidePlayer");</script>',
+				<script type="text/javascript">pwSliderPlayers("pwSlidePlayer");</script>',
 		'ifloop' => '0',
 		'loops' => '',
 		'descrip' => '',
@@ -1166,7 +1166,7 @@ EOT;
 				</div>
 				<div class="c"></div>
 				<script type="text/javascript" src="js/sliderplayer.js"></script>
-				<script language="JavaScript">pwSliderPlayers("pwSlidePlayer");</script>',
+				<script type="text/javascript">pwSliderPlayers("pwSlidePlayer");</script>',
 		'parsecode' => '<div id="pwSlidePlayer" class="pwSlide cc">
 <!--#
 	$tmpCount=0;
@@ -1189,7 +1189,7 @@ EOT;
 				</div>
 				<div class="c"></div>
 				<script type="text/javascript" src="js/sliderplayer.js"></script>
-				<script language="JavaScript">pwSliderPlayers("pwSlidePlayer");</script>',
+				<script type="text/javascript">pwSliderPlayers("pwSlidePlayer");</script>',
 		'ifloop' => '0',
 		'loops' => '',
 		'descrip' => '',
@@ -1441,7 +1441,7 @@ EOT;
 				</div>
 				<div class="c"></div>
 				<script type="text/javascript" src="js/sliderplayer.js"></script>
-				<script language="JavaScript">pwSliderPlayers("pwSlidePlayer");</script>',
+				<script type="text/javascript">pwSliderPlayers("pwSlidePlayer");</script>',
 		'parsecode' => '<div id="pwSlidePlayer" class="pwSlide cc">
 <!--#
 	$tmpCount=0;
@@ -1464,7 +1464,7 @@ EOT;
 				</div>
 				<div class="c"></div>
 				<script type="text/javascript" src="js/sliderplayer.js"></script>
-				<script language="JavaScript">pwSliderPlayers("pwSlidePlayer");</script>',
+				<script type="text/javascript">pwSliderPlayers("pwSlidePlayer");</script>',
 		'ifloop' => '0',
 		'loops' => '',
 		'descrip' => '',
@@ -1666,7 +1666,7 @@ EOT;
 				</div>
 				<div class="c"></div>
 				<script type="text/javascript" src="js/sliderplayer.js"></script>
-				<script language="JavaScript">pwSliderPlayers("pwSlidePlayer");</script>',
+				<script type="text/javascript">pwSliderPlayers("pwSlidePlayer");</script>',
 		'parsecode' => '<div id="pwSlidePlayer" class="pwSlide cc">
 <!--#
 	$tmpCount=0;
@@ -1689,7 +1689,7 @@ EOT;
 				</div>
 				<div class="c"></div>
 				<script type="text/javascript" src="js/sliderplayer.js"></script>
-				<script language="JavaScript">pwSliderPlayers("pwSlidePlayer");</script>',
+				<script type="text/javascript">pwSliderPlayers("pwSlidePlayer");</script>',
 		'ifloop' => '0',
 		'loops' => '',
 		'descrip' => '',
@@ -2039,7 +2039,7 @@ EOT;
 				</div>
 				<div class="c"></div>
 				<script type="text/javascript" src="js/sliderplayer.js"></script>
-				<script language="JavaScript">pwSliderPlayers("pwSlidePlayer");</script>',
+				<script type="text/javascript">pwSliderPlayers("pwSlidePlayer");</script>',
 		'parsecode' => '<div id="pwSlidePlayer" class="pwSlide cc">
 <!--#
 	$tmpCount=0;
@@ -2062,7 +2062,7 @@ EOT;
 				</div>
 				<div class="c"></div>
 				<script type="text/javascript" src="js/sliderplayer.js"></script>
-				<script language="JavaScript">pwSliderPlayers("pwSlidePlayer");</script>',
+				<script type="text/javascript">pwSliderPlayers("pwSlidePlayer");</script>',
 		'ifloop' => '0',
 		'loops' => '',
 		'descrip' => '',
@@ -2376,7 +2376,7 @@ EOT;
 				</div>
 				<div class="c"></div>
 				<script type="text/javascript" src="js/sliderplayer.js"></script>
-				<script language="JavaScript">pwSliderPlayers("pwSlidePlayer");</script>',
+				<script type="text/javascript">pwSliderPlayers("pwSlidePlayer");</script>',
 		'parsecode' => '<div id="pwSlidePlayer" class="pwSlide cc">
 <!--#
 	$tmpCount=0;
@@ -2399,7 +2399,7 @@ EOT;
 				</div>
 				<div class="c"></div>
 				<script type="text/javascript" src="js/sliderplayer.js"></script>
-				<script language="JavaScript">pwSliderPlayers("pwSlidePlayer");</script>',
+				<script type="text/javascript">pwSliderPlayers("pwSlidePlayer");</script>',
 		'ifloop' => '0',
 		'loops' => '',
 		'descrip' => '',
@@ -2769,7 +2769,7 @@ EOT;
 				</div>
 				<div class="c"></div>
 				<script type="text/javascript" src="js/sliderplayer.js"></script>
-				<script language="JavaScript">pwSliderPlayers("pwSlidePlayer");</script>',
+				<script type="text/javascript">pwSliderPlayers("pwSlidePlayer");</script>',
 		'parsecode' => '<div id="pwSlidePlayer" class="pwSlide cc">
 <!--#
 	$tmpCount=0;
@@ -2792,7 +2792,7 @@ EOT;
 				</div>
 				<div class="c"></div>
 				<script type="text/javascript" src="js/sliderplayer.js"></script>
-				<script language="JavaScript">pwSliderPlayers("pwSlidePlayer");</script>',
+				<script type="text/javascript">pwSliderPlayers("pwSlidePlayer");</script>',
 		'ifloop' => '0',
 		'loops' => '',
 		'descrip' => '',

@@ -31,8 +31,8 @@ while($child = $db->fetch_array($query)){
 	if ($db_indexfmlogo == 1 && file_exists("$imgdir/$stylepath/forumlogo/$child[fid].gif")) {
 		$child['logo'] = "$imgpath/$stylepath/forumlogo/$child[fid].gif";
 	} elseif ($db_indexfmlogo == 2) {
-		if(!empty($child['logo']) && strpos($child['logo'],'http://') === false && file_exists($attachdir.'/'.$child['logo'])){
-			$child['logo'] = "$attachpath/$child[logo]";
+		if(!empty($child['logo']) && strpos($child['logo'],'http://') === false){
+			list($child['logo']) = geturl($child['logo'],'lf');
 		}
 		if(!empty($child['logo'])) $child['pic'] = '';
 	} else {

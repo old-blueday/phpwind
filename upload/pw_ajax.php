@@ -22,7 +22,14 @@ if (!$windid && !in_array($action, array(
 	'showsearcherimg',
 	'changeuskin',
 	'showsearcherimg',
-	'pwschools'
+	'pwschools',
+	'cmsreply',
+	'smallcard',
+	'stopiccomment',
+	'stopiccommentbox',
+	'stopiclogin',
+	'clearmessage',
+	'bubble'
 ))) {
 	Showmsg('not_login');
 }
@@ -115,7 +122,16 @@ $whiteActions = array(
 	'auth',
 	'showsearcherimg',
 	'pwschools',
-	'changeuskin'
+	'changeuskin',
+	'cmsreply',
+	'smallcard',
+	'stopiccomment',
+	'stopiccommentbox',
+	'friends',
+	'quickpost',
+	'stopiclogin',
+	'clearmessage',
+	'bubble'
 );
 if (in_array($action, $whiteActions)) {
 	require S::escapePath(R_P . 'actions/ajax/' . $action . '.php');

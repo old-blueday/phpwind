@@ -67,7 +67,7 @@ EOT;
         <li><a onclick="openNewUrl('tpccheck','帖子审核','$admin_file?adminjob=tpccheck')" style="cursor:pointer"><img src="$imgpath/admin/main/tpc.png" alt="审核主题" />审核主题</a></li>
         <li><a onclick="openNewUrl('tpccheck','帖子审核','$admin_file?adminjob=tpccheck&action=postcheck')" style="cursor:pointer"><img src="$imgpath/admin/main/post.png" alt="审核回复" />审核回复</a></li>
         <li><a onclick="openNewUrl('share','审核链接','$admin_file?adminjob=share&state=0')" style="cursor:pointer"><img src="$imgpath/admin/main/share.png" alt="审核链接" />审核链接</a></li>
-        <li><a onclick="openNewUrl('report','帖子报告','$admin_file?adminjob=report')" style="cursor:pointer"><img src="$imgpath/admin/main/report.png" alt="帖子报告" />帖子报告</a></li>
+        <li><a onclick="openNewUrl('reportcontent','帖子报告','$admin_file?adminjob=report&admintype=reportcontent')" style="cursor:pointer"><img src="$imgpath/admin/main/report.png" alt="帖子报告" />帖子报告</a></li>
       </ul>
 </div>
 <div class="c"></div>
@@ -177,7 +177,7 @@ EOT;
 </table>
 </div>
 <div id="system"></div>
-<script language="JavaScript">
+<script type="text/javascript">
 function WhereToJump(id,name,v,url){
 	if (document.getElementById(v).value) {
 		openNewUrl(id,name,'$admin_file?' + url + document.getElementById(v).value);
@@ -301,7 +301,7 @@ if($admin_gid == '3'){print <<<EOT
             </tr>
             <tr class="tr1 vt">
                 <td class="td1">举报</td>
-                <td class="td2">未处理帖子举报数 {$sysinfo['report']} <a href="javascript:;" onclick="openNewUrl('report','举报管理','$admin_file?adminjob=report');">处理</a></td>
+                <td class="td2">未处理帖子举报数 {$sysinfo['report']} <a href="javascript:;" onclick="openNewUrl('reportcontent','举报管理','$admin_file?adminjob=report&admintype=reportcontent');">处理</a></td>
             </tr>
             <tr class="tr1 vt">
                 <td class="td1">论坛缓存</td>
@@ -393,7 +393,7 @@ EOT;
             </tr>
             <tr class="tr1 vt">
                 <td class="td1">举报</td>
-                <td class="td2">未处理帖子举报数 {$sysinfo['report']} <a href="javascript:;" onclick="openNewUrl('report','举报管理','$admin_file?adminjob=report');">处理</a></td>
+                <td class="td2">未处理帖子举报数 {$sysinfo['report']} <a href="javascript:;" onclick="openNewUrl('reportcontent','举报管理','$admin_file?adminjob=report&admintype=reportcontent');">处理</a></td>
             </tr>
             <tr class="tr1 vt">
                 <td class="td1">版块设置</td>
@@ -451,7 +451,7 @@ if ($db_adminrecord == 1){print <<<EOT
 EOT;
 }print <<<EOT
 -->
-<script language="JavaScript">
+<script type="text/javascript">
 function WhereToJump(id,name,v,url){
 	if (document.getElementById(v).value) {
 		openNewUrl(id,name,'$admin_file?' + url + document.getElementById(v).value);

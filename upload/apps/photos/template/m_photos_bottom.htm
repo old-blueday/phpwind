@@ -3,15 +3,15 @@ print <<<EOT
 --><!doctype html>
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=$db_charset" />
+<meta charset="$db_charset" />
 <title>上传照片</title>
 <base id="headbase" href="$db_bbsurl/" />
-<link rel="stylesheet" type="text/css" href="images/pw_core.css" media="all" />
-<link rel="stylesheet" type="text/css" href="u/images/style.css" media="all" />
-<script type="text/javascript" language="JavaScript" src="js/pw_ajax.js"></script>
-<script type="text/javascript" LANGUAGE="JavaScript" src="js/core/core.js"></script>
-<script type="text/javascript" LANGUAGE="JavaScript" src="js/core/tab.js"></script>
-<script language="JavaScript">
+<link rel="stylesheet" href="images/pw_core.css?{$GLOBALS['wind_repair']}" />
+<link rel="stylesheet" href="u/images/style.css?{$GLOBALS['wind_repair']}" />
+<script type="text/javascript" src="js/pw_ajax.js"></script>
+<script type="text/javascript" src="js/core/core.js"></script>
+<script type="text/javascript" src="js/core/tab.js"></script>
+<script>
 var imgpath = '$imgpath';
 var verifyhash = '$verifyhash';
 var winduid = '$winduid';
@@ -35,7 +35,7 @@ html,body{background:#fff;overflow:hidden;}
 </style>
 <body>
 <div style="background:#fff;height:600px;">
-<script language="JavaScript">
+<script>
 function ajaxurl(o) {
 	read.obj = o;
 	ajax.send(o.href,'',ajax.get);
@@ -52,7 +52,7 @@ print <<<EOT
 -->
 <div class="p10">
 $formiframe
-<form action="{$basename}a=$a&job=$job" id="uploadPhotoForm" enctype="multipart/form-data" method="post" $shortcut >
+<form action="{$basename}a=$a&ajax=1&job=$job" id="uploadPhotoForm" enctype="multipart/form-data" method="post" $shortcut >
 <input type="hidden" name="step" value="3" />
 <input type="hidden" name="verify" value="$verifyhash" />
 	<div class="mb10">
@@ -86,17 +86,13 @@ EOT;
 <!--
 EOT;
 if ($o_photos_gdcheck) {
-$gdSize = explode("\t",$db_gdsize);
+$checkCode = L::loadClass('checkcode', 'site');
+$checkCodeString = $checkCode->getCheckCodeTemplate();
 print <<<EOT
 -->
-	<div class="mb10">认证码: <input class="input mr5" type="text" name="gdcode" id="fs_gdcode" size="5" tabindex="3"  />
-<script type="text/javascript" src="js/pw_authcode.js"></script>
-<script>
-var flashWidth = "$gdSize[0]";
-var flashHeight = "$gdSize[1]";
-var gdtype = $db_gdtype;
-showGdCode();
-</script>
+	<div class="mb10">验证码: <input class="input mr5" type="text" onfocus="showgd();" name="gdcode" id="fs_gdcode" size="5" tabindex="3"  />
+		<span id="ckcode" style="display:none;"></span>
+$checkCodeString
 	</div>
 <!--
 EOT;
@@ -107,7 +103,7 @@ if($db_imagequestion){
 }else{
 	$question = $qkey<0 ? getMachineQuestion_1() :  $db_question[$qkey];
 }
-$q_a = $question.($showq && $qkey>0?" 正确答案:".$db_answer[$qkey] : '');
+$q_a = $question.($showq && $qkey>0?" （答案：".$db_answer[$qkey] . '）' : '');
 print <<<EOT
 -->
 	<div class="mb10">验证问答: {$q_a}
@@ -121,7 +117,7 @@ EOT;
 	<span class="btn" style="margin-left:0;"><span><button type="submit">开始上传</button></span></span>
 </form>
 </div>
-<script language="JavaScript">
+<script>
 var charset = '$db_charset';
 initCheckTextNum('pintro_1','pintro_1_warn',255);
 initCheckTextNum('pintro_2','pintro_2_warn',255);
@@ -131,7 +127,7 @@ initCheckTextNum('pintro_3','pintro_3_warn',255);
 EOT;
 }print<<<EOT
 -->
-<script language="JavaScript">
+<script>
 function getallowflash(aid) {
 	ajax.send('{$basename}a=getallowflash&aid='+aid,'',function() {
 		var rText = ajax.request.responseText.split('\\t');
@@ -156,7 +152,7 @@ getallowflash(getObj('aidsel_info').value);
 EOT;
 }print <<<EOT
 -->
-<script language="JavaScript">
+<script>
 function ajaxdel(pid) {
 	ajax.send('{$basename}a=delphoto&pid='+pid,'',function() {
 		var rText = ajax.request.responseText.split('\\t');
@@ -181,8 +177,8 @@ function ajaxSetCover(pid){
 }
 </script>
 </div>
-<script language="JavaScript" src="js/global.js"></script>
-<script language="JavaScript" src="js/app_global.js"></script>
+<script type="text/javascript" src="js/global.js"></script>
+<script type="text/javascript" src="js/app_global.js"></script>
 </body></html>
 <!--
 EOT;

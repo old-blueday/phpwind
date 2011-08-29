@@ -370,7 +370,7 @@ if (empty($job)) {
 				procUnLock('tool_buy',$winduid);
 				ObHeader($olpay->alipayurl($order_no, $toolinfo['rmb'] * $nums, 1));
 			}
-			if ($toolinfo['price'] <= 0) {
+			if ($toolinfo['price'] < 0) {
 				procUnLock('tool_buy',$winduid);
 				Showmsg('undefined_action');
 			}

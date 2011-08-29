@@ -161,7 +161,8 @@ if ($db_hits_store == 0){
 /***  帖子浏览记录  ***/
 $readlog = str_replace(",$tid,",',',GetCookie('readlog'));
 $readlog.= ($readlog ? '' : ',').$tid.',';
-substr_count($readlog,',')>11 && $readlog = preg_replace("/[\d]+\,/i",'',$readlog,3);
+$readlogCount = substr_count($readlog,',');
+$readlogCount>11 && $readlog = preg_replace("/[\d]+\,/i",'',$readlog,$readlogCount-11);
 Cookie('readlog',$readlog);
 
 $favortitle = str_replace(array("&#39;","'","\"","\\"),array("‘","\\'","\\\"","\\\\"),$subject);

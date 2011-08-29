@@ -8,7 +8,7 @@ var collection = {
 		var link = form.link.value;
 		var preg = /^http\:\/\/.{4,255}$/;
 		if (!preg.test(link)) {
-			this._showMessage('error','链接地址出错，链接地址必须以http://开头');
+			this._showMessage('error','链接地址出错，必须是正确的网址，且以“http://”开头');
 			return false;
 		}
 		form.submit();

@@ -241,7 +241,7 @@ class PW_packService {
 	}
 	
 	function flushCacheFile($filepath) {
-		$record = $this->_readover ( $this->_getCacheRecordFile ( $name ) );
+		$record = $this->_readover ( $this->_getCacheRecordFile () );
 		$packFiles = ($record) ? explode ( "\n", $record ) : array ();
 		if (! $packFiles) {
 			return false;

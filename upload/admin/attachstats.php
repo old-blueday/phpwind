@@ -21,7 +21,7 @@ if(empty($action)){
 		$attach['url'] = $attach['attachurl'];
 		$attach['imgurl'] = geturl($attach['attachurl'],'show');
 		$attach['imgurl'] = is_array($attach['imgurl']) ? $attach['imgurl'][0] : '';
-		$attach['forum'] = $forum[$attach['fid']]['name'];
+		$attach['forum'] = strip_tags($forum[$attach['fid']]['name']);
 		$M_hits[] = $attach;
 	}
 	$query = $db->query("SELECT * FROM pw_attachs ORDER BY size DESC LIMIT 20");
@@ -29,7 +29,7 @@ if(empty($action)){
 		$attach['url'] = $attach['attachurl'];
 		$attach['imgurl'] = geturl($attach['attachurl'],'show');
 		$attach['imgurl'] = is_array($attach['imgurl']) ? $attach['imgurl'][0] : '';
-		$attach['forum'] = $forum[$attach['fid']]['name'];
+		$attach['forum'] = strip_tags($forum[$attach['fid']]['name']);
 		$M_size[] = $attach;
 	}
 

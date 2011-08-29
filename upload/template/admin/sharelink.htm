@@ -9,8 +9,6 @@ include_once PrintEot('left');
 .cate_search span input{ vertical-align:middle;margin:0 3px;}
 .cate_search span select{margin:0 3px;}
 </style>
-<script type="text/javascript" language="JavaScript" src="js/global.js"></script>
-<script type="text/javascript" language="JavaScript" src="js/pw_ajax.js"></script>
 <!--
 EOT;
 if (empty($action)) {print <<<EOT
@@ -143,7 +141,7 @@ EOT;
 		<tr class="tr1 vt">
 			<td class="td1">分类</td>
 			<td class="td2">
-            <ul class="list_A list_120 cc mb10" style="width:600px;">
+            <ul class="list_A list_80 cc" style="width:600px;">
 <!--
 EOT;
 if ( $action == 'add' ) $ifcheck_N = 'checked';
@@ -165,7 +163,6 @@ EOT;
 		</tr>
 		<tr class="tr1 vt">
 			<td class="td1">状态</td>
-
 			<td class="td2">
 				<ul class="list_A list_80 cc">
 					<li><input type="radio" name="ifcheck" $ifcheck_Y value="1" />已审</li>
@@ -177,9 +174,9 @@ EOT;
 	</div>
 	<div class="tac mb10">
 		<span class="btn"><span><button type="submit">提 交</button></span></span>
-	</center>
+	</div>
 </form>
-<SCRIPT LANGUAGE="JavaScript">
+<script type="text/javascript">
 function checkpost(obj) { 
 	if (obj.name.value == "") {
 			obj.name.setAttribute("hasError", 1);
@@ -194,7 +191,7 @@ function checkpost(obj) {
 			return false;
 	} 
 }
-</SCRIPT>
+</script>
 <!--
 EOT;
 } elseif ($action == 'types') {print <<<EOT

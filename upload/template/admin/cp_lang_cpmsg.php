@@ -3,7 +3,7 @@
 
 $lang['cpmsg'] = array (
 
-'check_error'				=> '认证码错误',
+'check_error'				=> '验证码错误',
 'undefine_action'			=> '您没有权限进行此项操作或此功能未完成',
 'login_out'					=> '成 功 退 出 管 理<br><br><a href=index.php target=_blank>进 入 首 页</a>',
 'operate_error'				=> '没有选择操作对象',
@@ -104,9 +104,12 @@ $lang['cpmsg'] = array (
 'hackcenter_del_fail'       => '插件卸载完成删除以下文件夹失败，请手动删除<br> hack 目录下的 {$GLOBALS[id]} 目录',
 'hackcenter_del_success'	=> '插件卸载完成删除以下文件失败，请手动删除<br>{$GLOBALS[faildelfile]}',
 'bakup_in'					=> '正在导入第{$GLOBALS[i]}卷备份文件，程序将自动导入余下备份文件...',
-'bakup_out'					=> '已全部备份,备份文件保存在data目录下，备份文件为<br>$GLOBALS[bakfile]',
-'bakup_step'				=> '正在备份数据库表 $GLOBALS[t_name]: 共 $GLOBALS[rows] 条记录，已经备份至 $GLOBALS[c_n] 条记录<br>'
-								. '<br>已生成 $GLOBALS[f_num] 个备份文件，程序将自动备份余下部分',
+'bakup_siglerestore'		=> '正在导入位于第{$GLOBALS[step]}个文件中的数据，程序将自动导入余下数据...',
+'bakup_in_indexnot_exists'	=> '数据表索引文件不存在',
+'bakup_in_noindex'			=> '没有该表的备份数据',
+'bakup_out'					=> '已全部备份,备份文件保存在data/sqlback目录下，备份文件名为<br>$GLOBALS[bakfile]',
+'bakup_step'				=> '正在备份数据库表 $GLOBALS[currentTableName]: 共 $GLOBALS[totalRows] 条记录，已经备份至 $GLOBALS[currentPos] 条记录<br>'
+								. '<br>已生成 $GLOBALS[createdFileNum] 个备份文件，程序将自动备份余下部分',
 'attachstats_del'			=> '共删除{$GLOBALS[count]}条记录，{$GLOBALS[delnum]}个附件<br>已删除:<br>$GLOBALS[delname]',
 'attach_renew'				=> '附件修复完成',
 'attach_renew_wait'				=> '附件修复中，请稍候',
@@ -200,7 +203,7 @@ $lang['cpmsg'] = array (
 'illegal_request'			=> '非法请求，请返回重试!',
 'undefined_action'			=> '非法操作，请返回重试!',
 'bbs_open'					=> '由于数据操作较大，请先关闭论坛后，继续操作，'
-								. '<a href=$GLOBALS[admin_file]?adminjob=settings&admintype=basic target=blank style="color:blue">进入“全局-常规设置”</a>！',
+								. '<a href=$GLOBALS[admin_file]?adminjob=settings&admintype=basic target=blank style="color:blue">进入“全局-站点设置”</a>！',
 'table_change'				=> '数据转移中,请稍侯...<br />正在处理第 $GLOBALS[tstart] 到 $GLOBALS[end] 条帖子!',
 'table_same'				=> '请选择不同的数据表进行操作!',
 'only_numeric'				=> '请输入表下标,只允许数字!',
@@ -370,6 +373,16 @@ $lang['cpmsg'] = array (
 'app_register_error'			=> '通信失败，没有绑定成功，请查看<a href="http://faq.phpwind.net/answer-595">如何解决？</a>',
 'tpl_string_error'				=> '提交的模板数据非法，不支持字符：EOT;,<<<,?&gt;,&lt;?,&lt;!--#,#--&gt;',
 
+/* medal 勋章*/
+'medal_is_not_select'           => '您未选择任何选项',
+'medal_image_is_not_select'     => '请选择勋章图片',
+'medal_system_is_not_edit'      => '系统勋章不支持编辑',
+'medal_system_is_not_del'       => '系统勋章不能删除',
+'medal_username_error'          => '用户名不正确',
+'medal_ajax_operate_success'    => "操作成功\treload",
+'medal_error'                   => '操作失败',
+
+
 /****************APP增加语言****************/
     'filtermsg_thread_title'		=> '【敏感词】您发表的帖子含有敏感词!',
 	'filtermsg_thread_content'		=> '您发表的帖子：<a style="color:blue;" href="read.php?tid={$L[tid]}">{$L[subject]}</a>，包含敏感词，此帖子现已禁止浏览，审核通过后才可正常浏览。\n\n'
@@ -424,5 +437,20 @@ $lang['cpmsg'] = array (
 	'type_name_long'			=> '分类名称长度为空或过长，请保持在30个字节之内',
 	'type_name_exist'			=> '分类名称已存在',
 	'linkstype_add_success'	    => "友情链接分类添加完成\tjump\t{$GLOBALS[basename]}&action=types",
+	/*********孔明灯后台增加语言*************/
+     'kmd_spread_rank'           => '顺序空格内只能填入10位整数!',
+     'kmd_spread_name_len'            => '套餐名称空格内您输入的字符过长!',
+	 'kmd_spread_day'             => '天数空格内只能填入10位整数!',
+	 'kmd_spread_rmb'             => '人民币空格内只能填入整数和小数!',
+     'kmd_spread_discount'           => '折扣空格内只能填入10位整数!',
+	 'kmd_authstate_error'        => '开启孔明灯前,请开启实名认证功能!',
+	 'kmd_spread_space'           => '空格内只能填入10位整数!',
+	 'kmd_spread_name_null'            => '套餐名称不能为空!',
+	 'kmd_account'                => '开户帐号只能填入整数!',
+	 'kmd_manage_object_null'          => '没有选择操作对象!',
+	 'kmd_str_len'            => '您输入的字符过长!',
+     /*********孔明灯后台增加语言*************/								
+									
+									
 );
 ?>

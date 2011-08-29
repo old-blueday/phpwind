@@ -3,7 +3,7 @@
 .B_editor{border:1px solid;border-color:#aaa #ddd #ddd #aaa;margin:0;color:#333; font:12px/1.5 Arial;}
 .B_editor_fp .B_editor_buttom{display:none;}
 /*工具栏*/
-.B_textarea{width:100%;overflow:visible;font: 14px/1.5 Arial;height:300px;}
+.B_textarea{*width:100%!important;max-width:100%;min-width:100%;overflow:visible;font: 14px/1.5 Arial;height:300px;}
 .B_editor_toolbar{background:#f6f6f6;border-bottom:1px solid #e2e2e2;*zoom:1;overflow:hidden;}
 .B_editor_toolbar:after{content:'\20';display:block;height:0;clear:both;visibility: hidden;}
 .B_editor_toolbar ul{padding:5px 0;margin:0;margin-left:-1px;float:left;}
@@ -141,14 +141,14 @@
 .B_menu_nav .current{height:23px; position:relative;margin-bottom:-1px;}
 .B_menu_nav .current a{color:#555;}
 .B_menu_nav .none,.B_menu_nav .none:hover{border:0 none;}
-.B_menu_pre,.B_menu_next{display:block;border-top:5px transparent dotted;border-bottom:5px transparent dotted;width:0;height:0;overflow:hidden;padding:0; cursor:pointer;}
-.B_menu_pre{border-left:5px transparent dotted;border-right:5px #6f6f6f solid;margin:5px 10px 0 0;float:left;}
-.B_menu_next{border-right:5px transparent dotted;border-left:5px #6f6f6f solid;margin:5px 5px 0 5px;float:right;}
+.B_menu_pre,.B_menu_next{display:block;border-top:5px transparent dashed;border-bottom:5px transparent dashed;width:0;height:0;overflow:hidden;padding:0; cursor:pointer;}
+.B_menu_pre{border-left:5px transparent dashed;border-right:5px #6f6f6f solid;margin:5px 10px 0 0;float:left;}
+.B_menu_next{border-right:5px transparent dashed;border-left:5px #6f6f6f solid;margin:5px 5px 0 5px;float:right;}
 .B_menu_pre:hover{border-right:5px #409fdf solid;}
 .B_menu_next:hover{border-left:5px #409fdf solid;}
 /*form*/
-textarea,input,select{font:12px Arial;padding:1px 3px 0 3px;vertical-align:middle;margin-bottom:1px;}
-select{padding:1px;}
+.B_editor textarea,.B_editor input,.B_editor select{font:12px Arial;padding:1px 3px 0 3px;vertical-align:middle;margin-bottom:1px;}
+.B_editor select{padding:1px;}
 .B_input{border: 1px solid; border-color: #c0c0c0 #ededed #ededed #c0c0c0;padding:2px 0px 2px 2px;font-size:1.0em;vertical-align:middle;color:#000;background:#fff;}
 /*hr*/
 .B_hrA{border-bottom:1px solid #ccc;height:0;overflow:hidden;}
@@ -339,3 +339,14 @@ span.B_bt2 button{color:#333333;}
 .B_saveText i{display:none;font-style:normal;}
 .B_saveText.B_saved .B_saved{display:inline}
 .B_saveText.B_saving .B_saving{display:inline}
+/*@功能*/
+#tmpDiv{position:absolute;z-index:1;padding:0px;min-width:100px;_width:100px;white-space:nowrap;min-height:18px;border:1px solid #00B4FF;background:#fff;box-shadow:1px 1px 3px #ccc}
+.atlist li.hover,.atlist li:hover{background:#CBF3FF;}
+.atlist li a{display:block;padding:2px 2px;color:#666}
+.atlist li.hover a,.atlist li:hover a{font-weight:bold;color:#000;}
+
+/*remote*/
+.B_remote{height:140px;text-align:center;}
+.B_ico div.B_remotePid{background-position:-297px -57px;}
+.B_icoBig div.B_remotePid{background-position:6px -255px;}
+.B_remote_tip{position:absolute;bottom:1px;color:#f00;width:100%;right:3px;}

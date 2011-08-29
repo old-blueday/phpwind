@@ -15,7 +15,7 @@ function initPopup() {
 	}
 	showPopup();
 	getlimit();
-}
+}   
 function showPopup() {
 	if (adCount < timePopup * 10) {
 		adCount+=1;

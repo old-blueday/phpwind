@@ -153,6 +153,7 @@ if ($adminitem == 'level'){
 			ifcheck($allowread, 'allowread');
 			//ifcheck($allowpcid_sel['1'], 'allowpcid_sel');
 			ifcheck($allowmember, 'allowmember');
+			ifcheck($allowviewonlineread, 'allowviewonlineread');
 			ifcheck($allowprofile, 'allowprofile');
 			ifcheck($allowreport, 'allowreport');
 			ifcheck($allowmessege, 'allowmessege');
@@ -168,6 +169,8 @@ if ($adminitem == 'level'){
 			ifcheck($allowmodelid, 'allowmodelid');
 			ifcheck($allowactivity, 'allowactivity');
 			ifcheck($htmlcode, 'htmlcode');
+			//抢楼贴
+			ifcheck($robbuild, 'robbuild');	
 			//ifcheck($wysiwyg,'wysiwyg');
 			ifcheck($allowvisit, 'allowvisit');
 			ifcheck($allowhidden, 'allowhidden');
@@ -179,6 +182,8 @@ if ($adminitem == 'level'){
 			ifcheck($allowportait, 'allowportait');
 			ifcheck($allowhonor, 'allowhonor');
 			ifcheck($allowdelatc, 'allowdelatc');
+			ifcheck($allowat, 'allowat');
+			ifcheck($allowbuykmd, 'allowbuykmd');
 			${'allowsearch_' . (int) $allowsearch} = 'checked';
 			${'allowupload_' . (int) $allowupload} = 'checked';
 			${'allowdownload_' . (int) $allowdownload} = 'checked';
@@ -189,12 +194,14 @@ if ($adminitem == 'level'){
 			ifcheck($allowreward, 'allowreward');
 			ifcheck($viewvote, 'viewvote');
 			ifcheck($pmodifyvote, 'pmodifyvote');
-			ifcheck($modifyvote, 'modifyvote');
+			${'modifyvote_' . ($modifyvote ? 'Y' : 'N')} = 'selected';
 			ifcheck($viewipfrom, 'viewipfrom');
 			ifcheck($atclog, 'atclog');
 			//去掉展区功能@modify panjl@2010-11-2
 			//ifcheck($show, 'show');
 			ifcheck($atccheck, 'atccheck');
+			ifcheck($allowreplyreward, 'allowreplyreward');
+			ifcheck($allowremotepic, 'allowremotepic');
 			ifcheck($dig, 'dig');
 			ifcheck($leaveword, 'leaveword');
 			ifcheck($allowencode, 'allowencode');
@@ -290,7 +297,7 @@ if ($adminitem == 'level'){
 	
 			S::gp(array('othergroup', 'group', 'othergid', 'filetype', 'grouptitle'), 'P');
 			S::gp(array('maxsize'), 'P', 2);
-	
+
 			if (file_exists(D_P . "data/groupdb/group_$gid.php")) {
 				//* include_once pwCache::getPath(S::escapePath(D_P . "data/groupdb/group_$gid.php"));
 				pwCache::getData(S::escapePath(D_P . "data/groupdb/group_$gid.php"));
@@ -351,10 +358,33 @@ if ($adminitem == 'level'){
 			$levelHook->init($db_modes);
 			$extendRights = $levelHook->getRights();
 			$extendSystemRights = $levelHook->getSystemRights();
-	
+			
+			$specialTopics = array(
+				'allownewvote',
+				'modifyvote',
+				'allowreward',
+				'allowgoods',
+				'allowdebate',
+				'robbuild',
+				'allowmodelid',
+				'allowpcid',
+				'allowactivity',
+				'htmlcode',
+				'anonymous',
+				'allowhidden',
+				'allowsell',
+				'allowencode'
+			);
+			foreach ($specialTopics as $value) {
+				$group[$value] = intval($group[$value]);
+				if ($othergroup && in_array('specialtopics', $othergroup)) {
+					$othergroup[] = $value;
+				}
+			}
+			
 			$pwSQL = array();
 			foreach ($group as $key => $value) {
-				if (isset($basicdb[$key]) || in_array($key, $extendRights)) {
+				if (isset($basicdb[$key]) || in_array($key, $specialTopics) || in_array($key, $extendRights)) {
 					$keytype = 'basic';
 				} elseif (isset($sysfdb[$key]) && in_array($gptype, array('system', 'special'))) {
 					$keytype = 'systemforum';
@@ -372,12 +402,12 @@ if ($adminitem == 'level'){
 					$pwSQL[] = array(0, 0, $gid, $key, $keytype, $value);
 				}
 			}
-	
+
 			$upgid = array();
 			if ($pwSQL) {
 				$upgid[] = $gid;
 			}
-	
+
 			if ($othergroup) {
 				if ($othergid = array_diff($othergid, array($gid))) {
 					$query = $db->query("SELECT gid,gptype FROM pw_usergroups WHERE gid IN(" . S::sqlImplode($othergid) . ')');
@@ -385,7 +415,8 @@ if ($adminitem == 'level'){
 						if ($rt['gid'] != $gid) {
 							$ifup = 0;
 							foreach ($othergroup as $key => $value) {
-								if (isset($basicdb[$value]) || in_array($value, $extendRights)) {
+								if ($value == 'specialtopics') continue;
+								if (isset($basicdb[$value]) || in_array($value, $specialTopics) || in_array($value, $extendRights)) {
 									$keytype = 'basic';
 								} elseif (isset($sysfdb[$value]) && in_array($rt['gptype'], array('system',
 									'special'))) {
@@ -500,6 +531,7 @@ if ($adminitem == 'level'){
 					case 'pwdlimitime' :
 					case 'maxcstyles' :
 					case 'postlimit' :
+					case 'atnum' :
 					case 'postpertime' :
 					case 'edittime' :
 					case 'allownum' :

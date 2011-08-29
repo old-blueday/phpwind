@@ -1,77 +1,65 @@
 <!--<?php print <<<EOT
 -->
-<div class="main fr">
-	<div class="h">$lang[showmsg]</div>
-	<div class="m-content">
-		$msg
-	</div>
-
-	<center>
+<section class="section">
+<!--
+EOT;
+if ($_WIND == 'upto' && $step){
+if ($step == 'finish'){
+	$currentProcessClass = ' class="current"';
+}else{
+}
+print <<<EOT
+-->
+<div class="step">
+	<ul>
+		<li class="on"><em>1</em>升级提醒</li>
+		<li class="current"><em>2</em>升级数据</li>
+		<li><em>3</em>升级完成</li>
+	</ul>
+</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+	<div class="main cc">
+		<div class="success_tip error_tip" style="margin-bottom: 30px;">
+			<p>$msg</p>
+		</div>
 <!--
 EOT;
 if($gojs || $jump){print <<<EOT
 -->
-<script language="JavaScript">
+<script type="text/javascript">
 setTimeout(function(){{$url}},500);
 </script>
 <!--
 EOT;
 }print <<<EOT
 -->
-<form id="install" action="$basename?" method="post">
-	<input type="hidden" name="step" value="$tostep">
-	<input type="hidden" name="action" value="$toaction">
-	<input type="hidden" name="from" value="prompt">$input
-</form>
+		<form id="install" action="$basename?" method="post">
+			<input type="hidden" name="step" value="$tostep">
+			<input type="hidden" name="action" value="$toaction">
+			<input type="hidden" name="from" value="prompt">$input
+		</form>
+		<div class="bottom tac">
 <!--
 EOT;
 if(!$jump){
 if($toaction){print <<<EOT
 -->
-
-	<input type="button" class="btn4" value="$lang[step_pre]" title="$stepleft" onClick='window.location.href="javascript:history.go(-1)";'>
+	<a href="javascript:;" onclick='window.location.href="javascript:history.go(-1)";return false;' title="$stepleft" class="btn">$lang[step_pre]</a>
 <!--
 EOT;
 }print <<<EOT
 -->
-	<input type="button" class="btn2" title="$lang[step_next]" value="$lang[last]" onClick="$url" />
+	<a href="javascript:;" onclick="{$url}return false;" class="btn">$lang[last]</a>
 <!--
 EOT;
 }print <<<EOT
 -->
-	</center>
-      </div>
-
-	<div class="st-sidebar fl link3">
-		<ul class="step">
-<!--
-EOT;
-if (strpos("$basename","up") !== false || strpos("$basename","repair") !== false){print<<<EOT
--->
-		    <li class="step-normal"><span class="step-num">1</span>&nbsp;&nbsp;$lang[update_1]</li>
-			<li class="step-on"><span class="step-num_on">2</span>&nbsp;&nbsp;$lang[update_2]</li>
-			<li class="step-normal"><span class="step-num">3</span>&nbsp;&nbsp;$lang[update_3]</li>
-			<li class="step-sec">$lang[update_finish]</li>
-<!--
-EOT;
-}elseif(strpos("$basename","install.php") !== false){print<<<EOT
--->
-			<li class="step-normal"><span class="step-num">1</span>&nbsp;&nbsp;$lang[install_1]</li>
-			<li class="step-normal"><span class="step-num">2</span>&nbsp;&nbsp;$lang[install_2]</li>
-			<!-- <li class="step-normal"><span class="step-num">3</span>&nbsp;&nbsp;$lang[install_3]</li> -->
-			<li class="step-on"><span class="step-num_on">3</span>&nbsp;&nbsp;$lang[install_4]</li>
-			<!-- <li class="step-normal"><span class="step-num">5</span>&nbsp;&nbsp;$lang[install_5]</li> -->
-			<!-- <li class="step-normal"><span class="step-num">4</span>&nbsp;&nbsp;$lang[install_6]</li> -->
-			<li class="step-sec">$lang[install_finish]</li>
-<!--
-EOT;
-}print<<<EOT
--->
-		</ul>
-		<div class="set-faq">
-			$lang[step_problem]
-		</div>
 	</div>
+	</div>
+</section>
 <!--
 EOT;
 ?>-->

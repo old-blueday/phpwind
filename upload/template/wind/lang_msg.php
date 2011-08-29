@@ -6,6 +6,7 @@ $lang['msg'] = array (
 'undefined_action'			=> '非法操作,请返回',
 'no_jiechu'					=> '没有解除警告的权限,请返回',
 'not_login'					=> '您还没有登录或注册，暂时不能使用此功能!',
+'download_not_login'		=> '<span class="tips">您还没有登录或注册，暂时不能使用此功能，请您 <a href="login.php#breadCrumb" class="s4">登录</a>, 或者 <a href="register.php" class="s4">注册</a> 成为会员</span>',
 'proclock'					=> '服务器繁忙，请稍侯重试!',
 'visiter_login'				=> '只允许内部会员才能访问论坛!',
 'refresh_limit'				=> '论坛设置:刷新不要快于 $GLOBALS[db_refreshtime] 秒',
@@ -71,6 +72,7 @@ $lang['msg'] = array (
 'readvote_noright'			=> '对不起，您没有权限查看投票会员',
 
 'upload_group_right'		=> '用户组权限：你所属的用户组没有上传附件的权限',
+'download_group_right'		=> '用户组权限：你所属的用户组没有远程下载的权限',
 'upload_forum_right'		=> '对不起，本版块只有特定用户可以上传附件，请返回',
 'upload_close'				=> '附件上传功能已关闭',
 'upload_size_0'				=> '附件{$GLOBALS[atc_attachment_name]}的大小不能为0',
@@ -95,7 +97,7 @@ $lang['msg'] = array (
 'postnew_group_goods'		=> '用户组权限：你所属的用户组没有发起商品的权限',
 'postnew_group_debate'		=> '用户组权限：你所属的用户组没有发起辩论的权限',
 'post_price_limit'			=> '超过出售帖允许的积分大小',
-
+'postnew_group_robbuild'	=> '用户组权限：你所属的用户组没有发起抢楼帖的权限',
 'modify_noper'				=> '您无权限编辑别人的帖子',
 'modify_locked'				=> '该帖已被锁定，不可编辑',
 'modify_admin'				=> '您无权编辑管理员、总版主或论坛版主的帖子',
@@ -112,6 +114,9 @@ $lang['msg'] = array (
 'postfunc_content_limit'	=> '内容长度错误(请控制在  <font color="red">{$GLOBALS[db_postmin]}-{$GLOBALS[db_postmax]}</font> 字节)',
 'postfunc_content_threadlimit'	=>	'内容长度错误(本版块控制为  <font color="red">{$GLOBALS[contentMinLength]}-{$GLOBALS[db_postmax]}</font> 字节)',
 'postfunc_upgrade_error'	=> '无此提升方式',
+'post_limit_sell'		=> '您不能发起出售帖，请联系管理员',
+'post_limit_hide'		=> '您不能发起隐藏帖，请联系管理员',
+'post_limit_encode'		=> '您不能发起加密帖，请联系管理员',
 
 'msg_refuse'				=> '您发送的消息被用户<b>{$GLOBALS[errorname]}</b>拒绝',
 
@@ -129,9 +134,25 @@ $lang['msg'] = array (
 'forum_read_right'			=> '对不起,本版块只有特定会员才能浏览帖子!',
 'forum_former'				=> '本版块为正规版块,只有注册会员才能进入!',
 'forum_guestlimit'			=> '对不起，本版块只允许注册会员进入!',
-'forum_auth_cellphone'		=> '对不起，本版块需要<a href="profile.php?action=auth" class="s4 link">绑定手机</a>才能发帖!',
-'forum_auth_alipay'			=> '对不起，本版块需要<a href="profile.php?action=auth" class="s4 link">绑定支付宝</a>才能发帖!',
-'forum_auth_certificate'	=> '对不起，本版块需要<a href="profile.php?action=auth" class="s4 link">证件认证</a>才能发帖!',
+'forum_auth_cellphone'		=> '对不起，您需要<a href="profile.php?action=auth" class="s4 link">绑定手机</a>才能进行此操作!',
+'forum_auth_alipay'			=> '对不起，您需要<a href="profile.php?action=auth" class="s4 link">绑定支付宝</a>才能此操作!',
+'forum_auth_certificate'	=> '对不起，您需要<a href="profile.php?action=auth" class="s4 link">证件认证</a>才能此操作!',
+
+'forum_auth_cellphone_read'		=> '对不起，本版块需要<a href="profile.php?action=auth" class="s4 link">绑定手机</a>才能浏览!',
+'forum_auth_alipay_read'			=> '对不起，本版块需要<a href="profile.php?action=auth" class="s4 link">绑定支付宝</a>才能浏览!',
+'forum_auth_certificate_read'	=> '对不起，本版块需要<a href="profile.php?action=auth" class="s4 link">证件认证</a>才能浏览!',
+
+'forum_auth_cellphone_post'		=> '对不起，本版块需要<a href="profile.php?action=auth" class="s4 link">绑定手机</a>才能发表主题!',
+'forum_auth_alipay_post'			=> '对不起，本版块需要<a href="profile.php?action=auth" class="s4 link">绑定支付宝</a>才能发表主题!',
+'forum_auth_certificate_post'	=> '对不起，本版块需要<a href="profile.php?action=auth" class="s4 link">证件认证</a>才能发表主题!',
+
+'forum_auth_cellphone_rp'		=> '对不起，本版块需要<a href="profile.php?action=auth" class="s4 link">绑定手机</a>才能回复!',
+'forum_auth_alipay_rp'			=> '对不起，本版块需要<a href="profile.php?action=auth" class="s4 link">绑定支付宝</a>才能回复!',
+'forum_auth_certificate_rp'	=> '对不起，本版块需要<a href="profile.php?action=auth" class="s4 link">证件认证</a>才能回复!',
+//改为下载控制，数组key暂未改
+'forum_auth_cellphone_upload'		=> '对不起，本版块需要<a href="profile.php?action=auth" class="s4 link">绑定手机</a>才能下载附件!',
+'forum_auth_alipay_upload'			=> '对不起，本版块需要<a href="profile.php?action=auth" class="s4 link">绑定支付宝</a>才能下载附件!',
+'forum_auth_certificate_upload'	=> '对不起，本版块需要<a href="profile.php?action=auth" class="s4 link">证件认证</a>才能下载附件!',
 
 'sort_group_right'			=> '用户组权限：你所属的用户组不能查看统计与排行',
 
@@ -154,6 +175,9 @@ $lang['msg'] = array (
 'search_cate'				=> '不能搜索分类',
 'illegal_keyword'			=> '关键字非法.',
 'illegal_author'			=> '用户名非法.',
+'search_starttime_error'	=> '起始日期格式不正确',
+'search_endtime_error'		=> '结束日期格式不正确',
+'search_time_error'			=> '结束日期不能小于起始日期',
 
 'reg_email_fail'			=> '帐号需要激活,激活邮件发送失败,请联系管理员!',
 'reg_email_success'			=> '您的帐号需要激活,我们已经发送了一封邮件到您的电子邮箱，请查收!',
@@ -446,9 +470,9 @@ $lang['msg'] = array (
 'colony_viewcard'			=> '只有正式成员才能查看会员真实资料',
 'colony_cnmenber'			=> '不是本群组成员，无法执行此操作',
 'colony_creatalbum'			=> '你不是本群组成员，无法在此创建相册',
-'colony_aname_empty'		=> '<span class=\'warnFontStyle\'>相册名</span>不能为空',
-'colony_aname_toolang'		=> '<span class=\'warnFontStyle\'>相册名</span>不能超过<span class=\'warnFontStyle\'>24</span>个字符',
-'colony_aintro_toolang'		=> '<span class=\'warnFontStyle\'>相册描述</span>不能超过<span class=\'warnFontStyle\'>255</span>个字符',
+'colony_aname_empty'		=> '<span class=\'s1\'>相册名</span>不能为空',
+'colony_aname_toolang'		=> '<span class=\'s1\'>相册名</span>不能超过<span class=\'s1\'>24</span>个字符',
+'colony_aintro_toolang'		=> '<span class=\'s1\'>相册描述</span>不能超过<span class=\'s1\'>255</span>个字符',
 'colony_pubalbum'			=> '你不是管理员，不能创建公共相册',
 'colony_moneylimit'			=> '群组没有足够的余额来创建相册',
 'colony_album_num'			=> '相册数量达到最大，无法继续创建',
@@ -464,7 +488,7 @@ $lang['msg'] = array (
 'colony_select_photo'		=> '请选择要导入的图片',
 'colony_filetype'			=> '上传的不是一个图像文件',
 'colony_filesize'			=> '上传图片大小超过限制',
-'colony_uploadnull'			=> '上传图片不成功！请检查是否选择要上传的图片',
+'colony_uploadnull'			=> '上传不成功，图片超过限制或者未选择图片',
 'colony_ifadmin'			=> '你无权执行此项操作',
 'colony_update'				=> '该群组已经升级过，无法再次升级',
 'colony_updatemoney'		=> '群组 资金不足,无法升级.',
@@ -599,8 +623,8 @@ $lang['msg'] = array (
 'masingle_bansignature_noright' => '您没有权限禁止签名',
 'masingle_bansignature_hasrecord' => '错误操作，该用户的签名已经被禁止',
 'masingle_bansignature_norecord'  => '错误操作，该用户的签名未被禁止',
-'masingle_bansignature_ban'	  => '已经成功禁止{$GLOBALS[readdb][username]}的帖子签名显示',			
-'masingle_bansignature_free'  => '已经成功解除{$GLOBALS[readdb][username]}的帖子签名屏蔽',						
+'masingle_bansignature_ban'	  => "已经成功禁止{$GLOBALS[readdb][username]}的帖子签名显示\treload",			
+'masingle_bansignature_free'  => "已经成功解除{$GLOBALS[readdb][username]}的帖子签名屏蔽\treload",						
 'masingle_noip'				=> '要禁止的IP地址不能为空',
 'remind_data_empty'			=> '提示内容不能为空!',
 'remind_length'				=> '提示内容过长，请删掉一些!',
@@ -871,6 +895,7 @@ $lang['msg'] = array (
 'diary_gp_limit'			=> '用户组权限：你所属的用户组每日最多能发 {$GLOBALS[o_diarylimit]} 篇日志.',
 'diary_limit'				=> '灌水预防机制已经打开，在{$GLOBALS[o_diarypertime]}秒内不能发日志',
 'dairy_close'				=> '对不起！日志应用已关闭!',
+'kmd_close'				=> '对不起！孔明灯应用已关闭!',
 'groups_close'				=> '对不起！群组应用已关闭!',
 'share_close'				=> '对不起！分享应用已关闭',
 'photos_close'				=> '对不起！相册应用已关闭',
@@ -984,6 +1009,7 @@ $lang['msg'] = array (
 'userbinding_same'			=> '不能绑定本帐号，请选用其他帐号绑定!',
 'switchuser_error'			=> '你绑定的帐号密码已修改，请解除后重新绑定!',
 'userbinding_has'			=> '该帐号已绑定，请不要重复操作!',
+'userbinding_not_activated'	=> '你绑定的帐号还没有激活，请激活后重新绑定!',
 
 'app_siteappkey_notexist'	=> '你好，该论坛尚未同APP平台关联，无法使用任何来自APP平台的应用!',
 'post_allowpost'			=> '您无权发布该类型主题',
@@ -1128,6 +1154,7 @@ $lang['msg'] = array (
 'u_tagname_wordsfb' => '标签名称中含有非法字符，请返回修改',
 'u_tags_had' => '您已添加过该标签，请不要重复添加',
 'u_tagsnum_limit' => '标签的最大数量为10个',
+'enter_words'			=> '你发布的内容包含敏感词“{$GLOBALS[banword]}”，相关内容被替换，请及时更新',
 //话题
 'topic_notAttentioned' => '您未关注过该话题',
 'topic_attention_repeat' => '您已关注过该话题，请不要重复操作'

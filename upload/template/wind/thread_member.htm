@@ -168,7 +168,7 @@ if ($ifadmin && $group != 4) {print <<<EOT
 -->
 	<label for="checkall_button"><input type="checkbox" id="checkall_button" onclick="CheckAll(this.form)"/>&nbsp;全选</label>
 	<span class="bt2"><span><button id="senndmsg" onclick="fanoutMsg();return false;">群发消息</button></span></span>
-	<script language="JavaScript">
+	<script>
 	(function () {
 		fanoutMsg = function() {
 			var d = '';
@@ -198,7 +198,7 @@ EOT;
 -->
                 <span class="bt2"><span><button type="submit" onclick="submitStep('check');">审核会员</button></span></span>
                 <span class="bt2"><span><button type="submit" onclick="submitStep('del');" >踢出本群</button></span></span>
-<script language="JavaScript">
+<script>
 var ifcheck = true;
 function CheckAll(form) {
 	for (var i = 0; i < form.elements.length - 2; i++) {
@@ -208,7 +208,7 @@ function CheckAll(form) {
 	ifcheck = ifcheck == true ? false : true;
 }
 function submitStep(operateStep) {
-	$('operateStep').value = operateStep;
+	getObj('operateStep').value = operateStep;
 }
 </script>
 <!--
@@ -258,7 +258,7 @@ EOT;
         </div>
         </div>
     </div>
-<script language="JavaScript">
+<script>
 setCurrent('group_{$group}','group_all','current');
 </script>
 <!--
@@ -404,7 +404,7 @@ print <<<EOT
 </div>	
 	<div class="c mb20">&nbsp;</div>
 </div>
-<SCRIPT type="text/javascript" LANGUAGE="JavaScript" src="js/core/friendlist.js"></SCRIPT>
+<script type="text/javascript" src="js/core/friendlist.js"></script>
 <!--
 EOT;
 }print <<<EOT

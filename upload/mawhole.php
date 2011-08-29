@@ -262,7 +262,7 @@ if ($action == 'type') {
 			$subject = 'Re:' . substrs($rt['subject'], 21);
 			$author = $rt['lastposter'];
 		}
-		$new_url = "read.php?tid=$rt[tid]&displayMode=1&page=e#a";
+		$new_url = "read.php?tid=$rt[tid]&ds=1&page=e#a";
 		$lastpost = $subject . "\t" . $author . "\t" . $rt['lastpost'] . "\t" . $new_url;
 		//* $db->update('UPDATE pw_forumdata ' . ' SET lastpost=' . S::sqlEscape($lastpost, false) . ',tpost=tpost+' . $count . ',article=article+' . $count . ',topic=topic+' . $count . ' WHERE fid=' . S::sqlEscape($fid));
 		$db->update(pwQuery::buildClause("UPDATE :pw_table SET lastpost=:lastpost,tpost=tpost+:tpost,article=article+:article,topic=topic+:topic WHERE fid=:fid", array('pw_forumdata', $lastpost,$count,$count,$count,$fid)));
@@ -313,8 +313,8 @@ if ($action == 'type') {
 		foreach ($readdb as $key => $read) {
 			$read['fid'] != $fid && Showmsg('admin_forum_right');
 			if ($ifmsg) {
-				$msg_delrvrc && $msg_delrvrc="-{$msg_delrvrc}";
-				$msg_delmoney && $msg_delmoney="-{$msg_delmoney}";
+				$msg_delrvrc && $tmp_msg_delrvrc="-{$msg_delrvrc}";
+				$msg_delmoney && $tmp_msg_delmoney="-{$msg_delmoney}";
 				$msgdb[] = array(
 					'toUser' => $read['author'],
 					'title' => getLangInfo('writemsg', 'del_title'),
@@ -325,7 +325,7 @@ if ($action == 'type') {
 						'subject' => $read['subject'],
 						'postdate' => get_date($read['postdate']),
 						'forum' => strip_tags($forum[$fid]['name']),
-						'affect' => "{$db_rvrcname}:{$msg_delrvrc},{$db_moneyname}:{$msg_delmoney}",
+						'affect' => "{$db_rvrcname}:{$tmp_msg_delrvrc},{$db_moneyname}:{$tmp_msg_delmoney}",
 						'admindate' => get_date($timestamp),
 						'reason' => stripslashes($atc_content)
 					))
@@ -430,7 +430,7 @@ if ($action == 'type') {
 		$updatetop = $todaypost = $topic_all = $replies_all = 0;
 
 		$cy_tids = array();
-		$query = $db->query("SELECT tid,fid as tfid,author,postdate,subject,replies,topped,ptable,ifcheck,tpcstatus,modelid,special FROM pw_threads WHERE tid IN(" . S::sqlImplode($mids) . ")");
+		$query = $db->query("SELECT tid,fid as tfid,author,postdate,subject,replies,topped,ptable,ifcheck,tpcstatus,modelid,special,specialsort FROM pw_threads WHERE tid IN(" . S::sqlImplode($mids) . ")");
 		//tucool
 		$tucoolService = L::loadClass('Tucool','forum');
 		while ($rt = $db->fetch_array($query)) {
@@ -470,7 +470,6 @@ if ($action == 'type') {
 			}
 			//分类信息处理
 
-
 			//团购处理
 			if ($special > 20) {
 				$pcid = $special - 20;
@@ -481,13 +480,37 @@ if ($action == 'type') {
 			//团购处理
 
 			//置顶帖处理
-			if ($topped) {
+			if ($specialsort) {
 				$updatetop = 1;
-				$_topped = $db->get_one("SELECT * FROM pw_poststopped WHERE fid=" . S::sqlEscape($fid) . " AND tid=" . S::sqlEscape($tid) . " AND pid='0'");
-				if ($_topped) {
-					$db->update("UPDATE pw_poststopped SET uptime = " . S::sqlEscape($to_id) . " WHERE tid= " . S::sqlEscape($tid) . " AND pid = '0' AND fid = " . S::sqlEscape($fid));
-					$db->update("REPLACE INTO pw_poststopped (fid,tid,pid,floor,uptime,overtime) values
-						(" . S::sqlEscape($to_id) . "," . S::sqlEscape($tid) . ",'0'," . S::sqlEscape($_topped['floor']) . "," . S::sqlEscape($to_id) . "," . S::sqlEscape($_topped['overtime']) . ") ");
+				if ($specialsort == PW_THREADSPECIALSORT_KMD) {//孔明灯
+					/*
+					if (!$toForuminfo) {
+						$toForuminfo = L::forum($to_id);
+						$toForuminfo = $toForuminfo['forumset'];
+					}
+					$kmdService = L::loadClass('kmdservice', 'forum');
+					if (!$toForuminfo['ifkmd']){//目标版块未开启孔明灯
+						$kmdService->initThreadInfoByTid($tid);
+					} else {
+						$leftKmd = $kmdService->getLeftKmdNumsByFid($to_id);
+						$kmdInfo = $kmdService->getKmdInfoByTid($tid);
+						//开启,孔明灯数量未达上限，则更新
+						if ($leftKmd && is_array($kmdInfo)) {
+							$kmdService->updateKmdInfo(array('fid'=>$to_id),$kmdInfo['kid']);
+						} else {
+							$kmdService->initThreadInfoByTid($tid);
+						}
+					}
+					*/
+					$kmdService = L::loadClass('kmdservice', 'forum');
+					$kmdService->initThreadInfoByTid($tid);
+				} else {//置顶帖
+					$_topped = $db->get_one("SELECT * FROM pw_poststopped WHERE fid=" . S::sqlEscape($fid) . " AND tid=" . S::sqlEscape($tid) . " AND pid='0'");
+					if ($_topped) {
+						$db->update("UPDATE pw_poststopped SET uptime = " . S::sqlEscape($to_id) . " WHERE tid= " . S::sqlEscape($tid) . " AND pid = '0' AND fid = " . S::sqlEscape($fid));
+						$db->update("REPLACE INTO pw_poststopped (fid,tid,pid,floor,uptime,overtime) values
+							(" . S::sqlEscape($to_id) . "," . S::sqlEscape($tid) . ",'0'," . S::sqlEscape($_topped['floor']) . "," . S::sqlEscape($to_id) . "," . S::sqlEscape($_topped['overtime']) . ") ");
+					}
 				}
 			}
 			//置顶帖处理
@@ -552,6 +575,11 @@ if ($action == 'type') {
 		//* include_once pwCache::getPath(D_P . 'data/bbscache/forum_typecache.php');
 		pwCache::getData(D_P . 'data/bbscache/cache_post.php');
 		pwCache::getData(D_P . 'data/bbscache/forum_typecache.php');
+		$re = $db->query("SELECT fid,t_type FROM pw_forums ");
+		$forumArr = array();
+		while($row = $db->fetch_array($re)) {
+			$forumArr[$row['fid']] = $row;
+		}
 		
 		if ($topic_type_cache) {
 			foreach ($topic_type_cache as $key => $value) {
@@ -559,13 +587,21 @@ if ($action == 'type') {
 					$v['name'] = strip_tags($v['name']);
 					if ($v['upid'] == 0) {
 						$t_typedb[$key][$k] = $v['name'];
+						$t_typedb[$key][0]  = $forumArr[$key]['t_type'];
 					} else {
 						$t_subtypedb[$key][$v['upid']][$k] = $v['name'];
 					}
 				}
 			}
 		}
-
+		
+		if ($forum) {
+			$forum_temp = array();
+			foreach($forum as $val){
+				$forum_temp[$val['fid']] = $val['fup'];
+			}
+			$forum_temp = pwJsonEncode($forum_temp);
+		}
 		if ($t_typedb) {
 			$t_typedb = pwJsonEncode($t_typedb);
 		}
@@ -832,8 +868,11 @@ if ($action == 'type') {
 		pwCache::getData(D_P . 'data/bbscache/cache_post.php');
 		require_once (R_P . 'require/updateforum.php');
 		$selforums = '';
+		$isKmd = false;
 		if (is_numeric($seltid)) {
 			$rt = $db->get_one('SELECT fid,topped,toolfield FROM pw_threads WHERE tid=' . S::sqlEscape($seltid));
+			$rt['topped'] == 4 && $isKmd = true;
+			
 			if ($fid != $rt['fid']) {
 				Showmsg('admin_forum_right');
 			}
@@ -847,6 +886,15 @@ if ($action == 'type') {
 				$selforums .= $rt['fid'] . ',';
 			}
 			$selforums && $selforums = ',' . $selforums;
+		}
+		if (is_array($tidarray)) {
+			foreach ($tidarray as $k => $v) {
+				if (is_numeric($v)) {
+					$selids[] = $v;
+				}
+			}
+			$maxTopped = $db->get_value("SELECT MAX(topped) FROM pw_threads WHERE tid IN(" . S::sqlImplode($selids) . ")");
+			$maxTopped == 4 && $isKmd = true;
 		}
 		list($catedbs, $top_1, $top_2, $top_3) = getForumListForHeadTopic($fid);
 
@@ -882,7 +930,7 @@ if ($action == 'type') {
 		!in_array($fid, $selForums) && $selForums[] = $fid;
 		!checkForHeadTopic($topped, $fid, $selForums) && Showmsg('admin_forum_right');
 		count($tidarray) > 500 && Showmsg('mawhole_count');
-		$tids = $selids = $ttable_a = $threadIds = array();
+		$kmdTids = $tids = $selids = $ttable_a = $threadIds = array();
 		if (is_array($tidarray)) {
 			foreach ($tidarray as $k => $v) {
 				if (is_numeric($v)) {
@@ -898,7 +946,7 @@ if ($action == 'type') {
 		$timelimit = PwStrtoTime($timelimit);
 		$toolfield = $timelimit > $timestamp && $topped ? $timelimit : '';
 
-		$query = $db->query("SELECT tid,fid,postdate,author,authorid,subject,topped,toolfield FROM pw_threads WHERE tid IN(" . S::sqlImplode($selids) . ")");
+		$query = $db->query("SELECT tid,fid,postdate,author,authorid,subject,topped,toolfield,specialsort FROM pw_threads WHERE tid IN(" . S::sqlImplode($selids) . ")");
 		$tid_fid = array();
 		while ($rt = $db->fetch_array($query)) {
 			$tid_fid[$rt['tid']] = $rt['fid'];
@@ -940,12 +988,23 @@ if ($action == 'type') {
 				$rt['toolfield'] = $toolfield . ',' . $t[1];
 				//$pwSQL = S::sqlSingle(array('topped' => $topped, 'toolfield' => $rt['toolfield']));
 				//$db->update("UPDATE pw_threads SET $pwSQL WHERE tid=" . S::sqlEscape($rt['tid']));
-				$pwSQL = array('topped' => $topped, 'toolfield' => $rt['toolfield']);
+				if ($topped > 0){
+					eval("\$specialSort = PW_THREADSPECIALSORT_TOP$topped;");
+				} else {
+					$specialSort = 0;
+				}
+				//置顶孔明灯帖，收回
+				if ($rt['specialsort'] == PW_THREADSPECIALSORT_KMD){
+					$kmdService = L::loadClass('kmdservice', 'forum');
+					$kmdService->initThreadInfoByTid($rt['tid']);
+				}
+				$pwSQL = array('topped' => $topped, 'toolfield' => $rt['toolfield'],'specialsort'=>$specialSort);
 				pwQuery::update('pw_threads', "tid=:tid", array($rt['tid']), $pwSQL);
 				//* $threads = L::loadClass('Threads', 'forum');
 				//* $threads->delThreads($rt['tid']);
 			} else {
 				$tids[] = $rt['tid'];
+				$rt['specialsort'] == PW_THREADSPECIALSORT_KMD && $kmdTids[] = $rt['tid'];
 			}
 		}
 		sendMawholeMessages($msgdb);
@@ -960,7 +1019,19 @@ if ($action == 'type') {
 		}
 		if ($tids) {
 			//$db->update("UPDATE pw_threads SET topped=" . S::sqlEscape($topped) . "WHERE tid IN(" . S::sqlImplode($tids) . ")");
-			pwQuery::update('pw_threads', "tid IN (:tid)", array($tids), array("topped"=>$topped));
+			if ($topped > 0){
+				eval("\$specialSort = PW_THREADSPECIALSORT_TOP$topped;");
+			} else {
+				$specialSort = 0;
+			}
+			//置顶孔明灯帖，收回帖子信息
+			if ($kmdTids){
+				$kmdService = L::loadClass('kmdservice', 'forum');
+				foreach ($kmdTids as $v){
+					$kmdService->initThreadInfoByTid($v);
+				}
+			}
+			pwQuery::update('pw_threads', "tid IN (:tid)", array($tids), array("topped"=>$topped,'specialsort'=>$specialSort));
 			// $threadList = L::loadClass("threadlist", 'forum');
 			// $threadList->refreshThreadIdsByForumId($fid);
 			// $threads = L::loadClass('Threads', 'forum');
@@ -1144,7 +1215,8 @@ if ($action == 'type') {
 			if (!defined('AJAX')) {
 				refreshto("thread.php?fid=$fid{$viewbbs}&search=all", 'operate_success');
 			} else {
-				Showmsg($singleAction ? 'operate_success' : 'ajaxma_success');
+				$successInfo = getLangInfo('msg', 'operate_success');
+				Showmsg($singleAction ? "$successInfo\treload" : 'ajaxma_success');
 			}
 		}
 	}
@@ -1634,7 +1706,7 @@ if ($action == 'type') {
 			$query = $db->query("SELECT * FROM pw_threads t LEFT JOIN $pw_tmsgs tm USING(tid) WHERE t.tid IN($val)");
 			while ($rt = $db->fetch_array($query)) {
 				$rt['fid'] != $fid && Showmsg('unite_fid_error');
-				if ($rt['tid'] != $totid && ($rt['topped'] || $rt['special'] || $rt['digest'] || $rt['toolinfo'])) {
+				if ($rt['tid'] != $totid && ($rt['topped'] || $rt['special'] || $rt['digest'] || $rt['toolinfo'] || $rt['specialsort'])) {
 					Showmsg('unite_limit');
 				}
 				$readdb[$rt['tid']] = $rt;
@@ -1732,8 +1804,10 @@ if ($action == 'type') {
 			$istucool && $tucoolService->delete($fromdb['tid']);
 			//更新评分
 			$oldPid = $fromdb['pid'] == 'tpc' ? 0 : $fromdb['pid'];
-			$db->update(pwQuery::buildClause('UPDATE :pw_table SET tid=:tid1,pid=:pid WHERE tid=:tid AND pid=0', array('pw_pinglog', $totid, $pid, $fromdb['tid'])));
-			$db->update(pwQuery::buildClause('UPDATE :pw_table SET tid=:tid1 WHERE tid=:tid AND pid>0', array('pw_pinglog', $totid, $fromdb['tid'])));
+			//$db->update(pwQuery::buildClause('UPDATE :pw_table SET tid=:tid1,pid=:pid WHERE tid=:tid AND pid=0', array('pw_pinglog', $totid, $pid, $fromdb['tid'])));
+			//$db->update(pwQuery::buildClause('UPDATE :pw_table SET tid=:tid1 WHERE tid=:tid AND pid>0', array('pw_pinglog', $totid, $fromdb['tid'])));
+			pwQuery::update('pw_pinglog', 'tid=:tid AND pid>0', array($fromdb['tid']), array('tid'=>$totid,'pid'=>$pid));
+			//pwQuery::update('pw_pinglog', 'tid=:tid AND pid>0', array($fromdb['tid']), array('tid'=>$totid));
 			//更新elements
 			pwQuery::delete('pw_elements', 'id=:id AND type IN (:type)', array($fromdb['tid'], array('newpic','hitsort','hitsortday','hitsortweek','replysort','replysortday','replysortweek')));
 		}
@@ -1762,7 +1836,7 @@ if ($action == 'type') {
 		Perf::gatherInfo('changeThreadWithThreadIds', array('tid'=>$fromdb['tid']));
 		$istucool && $tucoolService->updateTucoolImageNum($totid);
 		if (!defined('AJAX')) {
-			refreshto("read.php?tid=$totid{$viewbbs}&displayMode=1", 'operate_success');
+			refreshto("read.php?tid=$totid{$viewbbs}&ds=1", 'operate_success');
 		} else {
 			Showmsg('ajax_unite_success');
 		}
@@ -1861,12 +1935,13 @@ if ($action == 'type') {
 
 	} else {
 
-		S::gp(array('limit','type','range','ifmsg','banip','relation'),'P',2);
+		S::gp(array('limit','type','range','ifmsg','banip','relation','deltopic'),'P',2);
 		S::gp(array('relation'),'P');
 		$relation = explode(',', $relation);
 		!S::isArray($relation) && Showmsg('请选择要禁言的作者');
 		$returnMessage = array();
 		$banuserService = L::loadClass('BanUser', 'user'); /* @var $banuserService PW_BanUser */
+		$deltopic && $delarticleService = L::loadClass('DelArticle', 'forum');  /* @var $delarticle PW_DelArticle */
 		foreach ($relation as $value) {
 			list($tid, $uid) = explode(':', $value);
 			$params = array(
@@ -1879,6 +1954,13 @@ if ($action == 'type') {
 				'reason' => $atc_content
 			);
 			$returnMessage[$uid] = $banuserService->ban($uid,$params);
+			//删除主题
+			if ($returnMessage[$uid] !== true) continue;
+			if ($deltopic == 1) {
+				$delarticleService->delTopicByTids($tid);
+			} elseif ($deltopic == 2) {
+				$delarticleService->delTopicByUids($uid);
+			}
 		}
 		foreach ($returnMessage as $k => $v) {
 			if (intval($v)) unset($returnMessage[$k]);
@@ -1894,8 +1976,8 @@ if ($action == 'type') {
 			defined('AJAX') && Showmsg("禁言{$failedUsernames}的作者失败");
 			refreshto("thread.php?fid=$fid{$viewbbs}&search=all", "禁言{$failedUsernames}的作者失败");
 		}
-		defined('AJAX') && Showmsg('禁言成功');
-		refreshto("thread.php?fid=$fid{$viewbbs}&search=all", '禁言成功');
+		defined('AJAX') && $deltopic ? Showmsg('ajaxma_success') : Showmsg('禁言成功!');
+		refreshto("thread.php?fid=$fid{$viewbbs}&search=all", '禁言成功!');
 	}
 } elseif ($action == 'commend') {
 	if (!$forumset['commend']) {

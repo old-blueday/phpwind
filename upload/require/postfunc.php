@@ -661,7 +661,7 @@ function UploadFile($uid,$uptype = 'all',$thumbs = null){//fix by noizy
 function uploadmsg($uptype,$msg) {
 	if ($uptype == 'face' && defined('AJAX') && AJAX) {
 		$msg = S::escapeChar(getLangInfo('msg',$msg));
-		echo "<script language=\"JavaScript1.2\">parent.facepath('','','$msg','','');</script>";exit;
+		echo "<script type=\"text/javascript\">parent.facepath('','','$msg','','');</script>";exit;
 	} else {
 		Showmsg($msg);
 	}

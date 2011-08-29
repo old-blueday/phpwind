@@ -23,7 +23,16 @@ $newluck = $rt[$lucktype] + $num;
 
 
 $credit->set($winduid,$lucktype,$num);
-
+if ($num != 0) {
+	$creditType = $num > 0 ? 'hack_creditluckadd'  : 'hack_creditluckdel';
+	$credit->addLog($creditType, array($lucktype => $num), array(
+		'uid'		=> $winduid,
+		'username'	=> $windid,
+		'ip'		=> $onlineip,
+		'operator'	=> $windid
+	));
+	$credit->writeLog();
+}
 $db->update("UPDATE pw_usertool SET nums=nums-1 WHERE uid=".S::sqlEscape($winduid)."AND toolid=".S::sqlEscape($toolid));
 $logdata = array(
 	'type'		=>	'use',

@@ -18,14 +18,15 @@ print <<<EOT
 <!--
 EOT;
 	if ($db_showonline) {
+	$gender = $read['gender'] == 2 ? 'women' : 'man';
 		if (checkOnline($read['thisvisit'])) {print <<<EOT
 -->
-							<img src="images/online.png" title="在线" align="absmiddle">
+							<span class="{$gender}_ol mr5" title="在线" alt="在线">在线</span>
 <!--
 EOT;
 		} else {print<<<EOT
 -->
-							<img src="images/stealth.png" title="离线" align="absmiddle">
+							<span class="{$gender}_unol mr5" title="离线" alt="离线">离线</span>
 <!--
 EOT;
 		}
@@ -33,17 +34,6 @@ EOT;
 print <<<EOT
 -->
 							<a href="{$db_userurl}$read[authorid]">$read[author]</a>
-<!--
-EOT;
-if($isAuth){
-	print <<<EOT
--->
-<a href="profile.php?action=auth"><img src="u/images/attest/certificate.gif" title="实名认证用户" /></a>
-<!--
-EOT;
-}
-print <<<EOT
--->
 						</div>
 					<div class="floot_leftdiv">
 <!--
@@ -53,14 +43,26 @@ EOT;
 						<div class="readHonor">$read[honor]</div>
 <!--
 EOT;
-	}print <<<EOT
+	}
+$topPostId = '';
+$read['istop'] == 'topped' && $topPostId = 'tp_';
+print <<<EOT
+-->
+<!--
+EOT;
+if($isAuth){
+	print <<<EOT
+--><span class="fl"><a href="profile.php?action=auth" class="certificate"><img src="u/images/attest/certificate.gif" title="实名认证用户" align="absmiddle" /></a></span><!--
+EOT;
+}
+print <<<EOT
 -->
 						<div class="readFace">
 							<div class="fl">
 								<div class="card" style="display:none" id="readFace_{$read[lou]}" onmouseover="this.style.display='';" onmouseout="this.style.display='none';">
 									<dl class="cc">
 										<dt class="fl">
-											<div class="cc"><a href="{$db_userurl}$read[authorid]" class="face_img"><img class="pic" src="{$read[face]}" {$read[facesize]} border="0" title="$read[author]" /></a></div>
+											<div class="cc"><a href="{$db_userurl}$read[authorid]" class="face_img"><img class="pic" src="$imgpath/blank.gif" style="background:$forumcolorone url({$read[face]}) center center no-repeat;" {$read[facesize]} border="0" title="$read[author]" /></a></div>
 											<p>UID：$read[authorid]</p>
 <!--
 EOT;
@@ -156,7 +158,8 @@ EOT;
 }print<<<EOT
 -->
 						</a>
-						<div class="readLevel mb5"><span>级别: <a href="profile.php?action=permission&gid=$read[groupid]">{$read[level]}</a></span><img src="$imgpath/$stylepath/level/$read[lpic].gif" /></div>
+						<div class="readLevel mb5"><span>级别： <a href="profile.php?action=permission&gid=$read[groupid]">{$read[level]}</a></span><img src="$imgpath/$stylepath/level/$read[lpic].gif" /></div>
+						<div class="read_medals">$read[medals]</div>
 						<div class="readUser_info cc mb10">
 <!--
 EOT;
@@ -194,7 +197,7 @@ print<<<EOT
 EOT;
 if ($read['authorid'] != 0 && $read['authorid'] != $winduid) {print<<<EOT
 -->
-								<li><a href="javascript:;" onclick="Attention.add(this,'{$read['authorid']}',0)" class="add_fol">关注Ta</a></li>
+								<li><a href="javascript:;" onclick="Attention.add(this,'{$read['authorid']}',0)" class="add_fol">加关注</a></li>
 								<li><a href="javascript:;" onclick="sendmsg('pw_ajax.php?action=msg&touid=$read[authorid]');" class="add_mes">发消息</a></li>
 <!--
 EOT;
@@ -234,7 +237,6 @@ print <<<EOT
 -->
 							</ul>
 						</div>
-						<div>$read[medals]</div>
 					</div>
 				</td>
 				<td class="floot_right" id="td_$read[pid]"><a name="post_$read[pid]"></a>
@@ -255,6 +257,7 @@ print <<<EOT
 						<span class="fr">
 <!--
 EOT;
+	
 	if ($authorid == $winduid && $read['authorid'] != $authorid && $_G['leaveword']) {print <<<EOT
 -->
 							<a onclick="sendmsg('pw_ajax.php?action=leaveword&tid=$tid&pid=$read[pid]','',this.id)" id="word_$read[pid]" title="楼主留言" class="mr5 cp s6">留言</a>
@@ -425,10 +428,21 @@ EOT;
 						</div>
 <!--
 EOT;
-	}print <<<EOT
--->					
+}
+if ($read['replyreward']) {
+print<<<EOT
+-->
+						<div class="reply_reward mb15"><span>回帖奖励</span><em>+ {$read['replyreward']['creditnum']}</em></div>
 <!--
 EOT;
+	}
+	if (in_array($read[lou],(array)$robFloors)) {
+print<<<EOT
+-->
+						<div class="rob_floors_win">恭喜抢中本楼</div>
+<!--
+EOT;
+	}
 	list($htmlAdvert,$arrayAdvert) = pwAdvert('Mode.Forum.Layer.TidUp',$fid,$read[lou]+1);
 	if ($htmlAdvert) {print <<<EOT
 -->
@@ -448,17 +462,17 @@ print <<<EOT
 EOT;
 if($read['standpoint']==1){print <<<EOT
 -->
-						<div class="dig3 fl"><span class="fl">正方支持者</span><div class="fl" onClick="dodebate('votepid_$read[pid]',$tid,$read[pid])">支持:<span id="votepid_$read[pid]">$read[vote]</span></div></div>
+						<div class="debate_square_btn fl"><span class="fl">正方支持者</span><div class="fl" onClick="dodebate('votepid_$read[pid]',$tid,$read[pid])">支持:<span id="votepid_$read[pid]">$read[vote]</span></div></div>
 <!--
 EOT;
 }elseif($read['standpoint']==2){print <<<EOT
 -->
-						<div class="dig4 fl"><span class="fl">反方支持者</span><div class="fl" onClick="dodebate('votepid_$read[pid]',$tid,$read[pid])">支持:<span id="votepid_$read[pid]">$read[vote]</span></div></div>
+						<div class="debate_anti_btn fl"><span class="fl">反方支持者</span><div class="fl" onClick="dodebate('votepid_$read[pid]',$tid,$read[pid])">支持:<span id="votepid_$read[pid]">$read[vote]</span></div></div>
 <!--
 EOT;
 }else{print <<<EOT
 -->
-						<div class="dig5 tac fl">我是中立者</div>
+						<div class="debate_neutral_btn">我是中立者</div>
 <!--
 EOT;
 }print <<<EOT
@@ -545,7 +559,7 @@ EOT;
 -->
 						<div class="f14 mb10"><a name="pcinfo"></a><div id="pc_show"><div style="padding:13px 30px;"><img src="$imgpath/loading.gif" align="absbottom" /> 正在加载数据...</div></div>
 						</div>
-<script language="javascript">
+<script>
 var isadminright = parseInt('$isadminright');
 var payway = parseInt('$payway');
 var ifend = parseInt('$ifend');
@@ -869,6 +883,16 @@ if ($viewpic) {print <<<EOT
 <!--
 EOT;
 }
+if ($read['atusers']){
+$atusersHtml = '';
+foreach($read['atusers'] as $v){
+	$atusersHtml .= " <a href=\"u.php?username=$v\" target=\"_blank\" class=\"s4\">@{$v}</a>";
+}print <<<EOT
+-->
+				<div class="at_icon mb10">本帖提到的人: $atusersHtml</div>
+<!--
+EOT;
+}
 print <<<EOT
 -->
 <!--评分-->
@@ -974,7 +998,7 @@ EOT;
 print <<<EOT
 -->
 <input id="pingPageNum_{$read['pid']}" type="hidden" value="2" />
-<script language="javascript">
+<script>
 getObj('pingPageNum_{$read["pid"]}').value = 2;
 </script>
 					</div>
@@ -1026,8 +1050,8 @@ EOT;
 if($read[pid] == 'tpc' && !$forumset[rate] && $rateSets[1] && isset($db_hackdb['rate']) ){
 print <<<EOT
 -->
-						<link rel="stylesheet" type="text/css" href="hack/rate/images/rate.css" media="all" />
-						<script language="JavaScript" src="js/rate_ajax.js"></script>
+						<link rel="stylesheet" href="hack/rate/images/rate.css" />
+						<script type="text/javascript" src="js/rate_ajax.js"></script>
 						<div id="vote_box" class="mb10 cc">
 <!--
 EOT;
@@ -1050,6 +1074,7 @@ print <<<EOT
 <!--
 EOT;
 if ($db_sharesite == 1 && $read[pid] == 'tpc'){
+$summary = substrs($read[content],100);
 print <<<EOT
 -->
 									<div class="shareAll cc mb10">
@@ -1057,7 +1082,8 @@ print <<<EOT
 										<a href="javascript:void(0)" onclick="window.open('http://share.jianghu.taobao.com/share/addShare.htm?title='+encodeURIComponent(document.title.substring(0,76))+'&url='+encodeURIComponent(location.href)+'&content=','_blank','scrollbars=no,width=600,height=450,left=75,top=20,status=no,resizable=yes'); void 0" title="淘江湖">淘江湖</a>
 										<a href="javascript:(function(){window.open('http://v.t.sina.com.cn/share/share.php?title='+encodeURIComponent(document.title)+'&url='+encodeURIComponent(location.href)+'&source=bookmark','_blank','width=450,height=400');})()" title="新浪微博" style="background-position:0 -20px;">新浪</a>
 										<a href="javascript:void(0)" onclick="window.open( 'http://v.t.qq.com/share/share.php?url='+encodeURIComponent(document.location)+'&appkey=&site=&title='+encodeURI(document.title),'', 'width=700, height=680, top=0, left=0, toolbar=no, menubar=no, scrollbars=no, location=yes, resizable=no, status=no' );" title="QQ微博" style="background-position:0 -40px;">QQ微博</a>
-										<a href="javascript:void(0);" onclick="window.open('http://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url='+encodeURIComponent(document.location.href));return false;" title="QQ空间" style="background-position:0 -60px;">QQ空间</a>
+										<a href="javascript:void(0);" 
+										onclick="window.open('http://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url='+encodeURIComponent('http://phpwind.net/read-htm-tid-1333976.html')+'&title='+encodeURIComponent(document.title)+'&summary='+encodeURIComponent('$summary'));return false;" title="QQ空间" style="background-position:0 -60px;">QQ空间</a>
 										<a href="javascript:d=document;t=d.selection?(d.selection.type!='None'?d.selection.createRange().text:''):(d.getSelection?d.getSelection():'');void(kaixin=window.open('http://www.kaixin001.com/~repaste/repaste.php?&rurl='+escape(d.location.href)+'&rtitle='+escape(d.title)+'&rcontent='+escape(d.title),'kaixin'));kaixin.focus();" title="开心" style="background-position:0 -80px;">开心</a>
 										<a href="javascript:void((function(s,d,e){if(/renren\.com/.test(d.location))return;var f='http://share.renren.com/share/buttonshare?link=',u=d.location,l=d.title,p=[e(u),'&title=',e(l)].join('');function%20a(){if(!window.open([f,p].join(''),'xnshare',['toolbar=0,status=0,resizable=1,width=626,height=436,left=',(s.width-626)/2,',top=',(s.height-436)/2].join('')))u.href=[f,p].join('');};if(/Firefox/.test(navigator.userAgent))setTimeout(a,0);else%20a();})(screen,document,encodeURIComponent));" title="人人" style="background-position:0 -100px;">人人</a>
 										<a href="javascript:void(function(){var d=document,e=encodeURIComponent,s1=window.getSelection,s2=d.getSelection,s3=d.selection,s=s1?s1():s2?s2():s3?s3.createRange().text:'',r='http://www.douban.com/recommend/?url='+e(d.location.href)+'&title='+e(d.title)+'&sel='+e(s)+'&v=1',x=function(){if(!window.open(r,'douban','toolbar=0,resizable=1,scrollbars=yes,status=1,width=450,height=330'))location.href=r+'&r=1'};if(/Firefox/.test(navigator.userAgent)){setTimeout(x,0)}else{x()}})()" title="豆瓣" style="background-position:0 -120px;">豆瓣</a>
@@ -1266,10 +1292,16 @@ print <<<EOT
 	</div>
 <!--
 EOT;
-	if($newPopMenus){
+	if($isReplyRewardSuccess){
 		print <<<EOT
 -->
-<script language="JavaScript">
+<span id="isreplyrewardsuccess"></span>
+<!--
+EOT;
+	}if($newPopMenus){
+		print <<<EOT
+-->
+<script>
 if(typeof openmenu == 'undefined'){
 	openmenu = {};
 }

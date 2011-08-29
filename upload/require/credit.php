@@ -87,7 +87,13 @@ Class PwCredit {
 		if (isset($this->cType[$cType])) {
 			if (isset($this->getUser[$uid][$cType])) return $this->getUser[$uid][$cType];
 			if (is_numeric($cType)) {
-				$getv = $db->get_value('SELECT value FROM pw_membercredit WHERE uid=' . S::sqlEscape($uid) . ' AND cid=' . S::sqlEscape($cType));
+				if (perf::checkMemcache()){
+					$_cacheService = Perf::gatherCache('pw_members');
+					$userCredit = $_cacheService->getMemberCreditByUserIds(array($uid));
+					$getv = $userCredit[$uid][$cType];
+				} else {
+					$getv = $db->get_value('SELECT value FROM pw_membercredit WHERE uid=' . S::sqlEscape($uid) . ' AND cid=' . S::sqlEscape($cType));
+				}
 				empty($getv) && $getv = 0;
 			} else {
 				$getv = $db->get_value("SELECT $cType FROM pw_memberdata WHERE uid=" . S::sqlEscape($uid));
@@ -101,9 +107,15 @@ Class PwCredit {
 				$getv = $db->get_one("SELECT money,FLOOR(rvrc/10) AS rvrc,credit,currency FROM pw_memberdata WHERE uid=" . S::sqlEscape($uid));
 			}
 			if ($GLOBALS['_CREDITDB'] && $cType != 'COMMON') {
-				$query = $db->query("SELECT cid,value FROM pw_membercredit WHERE uid=" . S::sqlEscape($uid));
-				while ($rt = $db->fetch_array($query)) {
-					$getv[$rt['cid']] = $rt['value'];
+				if (perf::checkMemcache()){
+					$_cacheService = Perf::gatherCache('pw_members');
+					$userCredit = $_cacheService->getMemberCreditByUserIds(array($uid));
+					$getv = $userCredit[$uid];
+				} else {
+					$query = $db->query("SELECT cid,value FROM pw_membercredit WHERE uid=" . S::sqlEscape($uid));
+					while ($rt = $db->fetch_array($query)) {
+						$getv[$rt['cid']] = $rt['value'];
+					}
 				}
 			}
 			$this->getUser[$uid] = $getv;
@@ -197,8 +209,7 @@ Class PwCredit {
 		
 		$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
 		foreach ($setUser as $uid => $setv) {
-			$updateUser = array();
-			$increaseUser = array();
+			$updateUser = $increaseUser = array();
 			foreach ($setv as $cid => $v) {
 				if ($this->check($cid) && ($v <> 0 || !$isAdd)) {
 					if (isset($retv[$uid][$cid])) {
@@ -241,6 +252,7 @@ Class PwCredit {
 			$cacheUids[] = 'UID_'.$uid;
 			$cacheCredits[] = 'UID_CREDIT_'.$uid;
 		}
+		
 		
 //		if ($cacheUids) {
 //			$_cache = getDatastore();

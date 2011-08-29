@@ -102,8 +102,8 @@ EOT;
 }
 print <<<EOT
 -->  
-<script language="JavaScript" src="js/core/changeview.js"></script>
-<script language="JavaScript">
+<script type="text/javascript" src="js/core/changeview.js"></script>
+<script>
 var frist = New(changView,['list-box','li',1]);
 </script>
 <!--
@@ -381,7 +381,7 @@ EOT;
 		</tr>
 	</table>
 </div>
-<script language="JavaScript" src="js/app_comment.js"></script>
+<script type="text/javascript" src="js/app_comment.js"></script>
 <div style="width:600px;margin:20px auto;">
 <!--
 EOT;
@@ -389,8 +389,8 @@ require_once PrintEot('m_comment');print <<<EOT
 -->
 </div>
 <div class="c"></div>
-<script language="JavaScript" src="js/pw_photolist.js"></script>
-<script language="JavaScript">
+<script type="text/javascript" src="js/pw_photolist.js"></script>
+<script type="text/javascript">
 var photolist = new photoList('img_list','$pid','$aid');
 function ajaxpage(url,type) {
 	ajax.send(url,'',function() {
@@ -433,7 +433,7 @@ function ImgLoad(obj) {
 	}
 }
 </script>
-<script type="text/javascript" LANGUAGE="JavaScript" src="js/core/space.js"></script>
+<script type="text/javascript" src="js/core/space.js"></script>
 </div>
 <!--
 EOT;
@@ -513,7 +513,7 @@ print <<<EOT
                   <object type="application/x-shockwave-flash" data="images/uploader.swf" width="250" height="46" FlashVars="url=$db_bbsurl%2Fjob.php%3Faction%3Dmutiuploadphoto"  allowScriptAccess="always">
                   <param name="wmode" value="transparent" />
                   <!--<![endif]-->
-                    <p>Alternative content</p>
+                    <p><span style="display:none;"><embed src="images/blank.swf" type="application/x-shockwave-flash" wmode="transparent"/></span><em class="s2" style="position:relative;top:3px;">该浏览器尚未安装flash插件，<a href="http://www.adobe.com/go/getflashplayer" target="_blank">点击安装</a></em></p>
                   <!--[if !IE]>-->
                   </object>
                   <!--<![endif]-->
@@ -558,20 +558,14 @@ EOT;
 <!--
 EOT;
 if ($o_photos_gdcheck) {
-$gdSize = explode("\t",$db_gdsize);
+$checkCode = L::loadClass('checkcode', 'site');
+$checkCodeString = $checkCode->getCheckCodeTemplate();
 print <<<EOT
 -->
-				<p>认证码:</p>
+				<p>验证码:</p>
 				<p>
-				<div id="ckcode" style="display:none;margin-bottom:5px;">
-<script type="text/javascript" src="js/pw_authcode.js"></script>
-<script>
-var flashWidth = "$gdSize[0]";
-var flashHeight = "$gdSize[1]";
-var gdtype = $db_gdtype;
-showGdCode();
-</script>
-				</div>
+				<div id="ckcode" style="display:none;margin-bottom:5px;"></div>
+$checkCodeString
 				</p>
 				<input class="input" onfocus="showgd();" type="text" name="gdcode" id="gdcode" size="5" tabindex="3"  />
 <div class="c mb10"></div>
@@ -584,7 +578,7 @@ if($db_imagequestion){
 }else{
 	$question = $qkey<0 ? getMachineQuestion_1() :  $db_question[$qkey];
 }
-$q_a = $question.($showq && $qkey>0?" （正确答案:".$db_answer[$qkey]."）" : '');
+$q_a = $question.($showq && $qkey>0?" （答案：".$db_answer[$qkey]."）" : '');
 print <<<EOT
 -->
                 <p>验证问答: $q_a</p>
@@ -605,7 +599,7 @@ EOT;
     </table>
 </form>
 </div>
-<script language="JavaScript">
+<script>
 swfobject.addLoadEvent(function(){
 	getallowflash(getObj('aidsel_info').value);
 	uploader.maxLength = {$o_maxfilesize};
@@ -735,7 +729,7 @@ print <<<EOT
         </tr>
     </table>
 </div>
-<script language="JavaScript">
+<script>
 function getallowflash(aid) {
 	getObj('currentaid').value = aid;
 	setTimeout(function(){ajax.send('apps.php?q=galbum&cyid=$cyid&a=getallowflash&aid='+aid,'',function() {
@@ -821,7 +815,7 @@ EOT;
         </tr>
     </table>
 </div>
-<script language="JavaScript">
+<script>
 function selectPhoto(e){
 	var input = e.parentNode.getElementsByTagName('input')[0];
 	input.checked=!input.checked;
@@ -904,21 +898,17 @@ EOT;
         </tr>
 <!--
 EOT;
-if ($o_photos_gdcheck) {print <<<EOT
+if ($o_photos_gdcheck) {
+$checkCode = L::loadClass('checkcode', 'site');
+$checkCodeString = $checkCode->getCheckCodeTemplate();
+print <<<EOT
 -->
 		<tr>
-			<th class="th">认证码</th>
+			<th class="th">验证码</th>
 			<td class="td">
 				<input class="input input_wc" onfocus="showgd();" type="text" name="gdcode" id="gdcode" tabindex="3"  /><br />
-				<div id="ckcode" style="display:none;margin-bottom:5px;">
-<script type="text/javascript" src="js/pw_authcode.js"></script>
-<script>
-var flashWidth = "$gdSize[0]";
-var flashHeight = "$gdSize[1]";
-var gdtype = $db_gdtype;
-showGdCode();
-</script>
-				</div>
+				<div id="ckcode" style="display:none;margin-bottom:5px;"></div>
+$checkCodeString
 			</td>
 		</tr>
 <!--
@@ -930,7 +920,7 @@ if($db_imagequestion){
 }else{
 	$question = $qkey<0 ? getMachineQuestion_1() :  $db_question[$qkey];
 }
-$q_a = $question.($showq && $qkey>0?" 正确答案:".$db_answer[$qkey] : '');
+$q_a = $question.($showq && $qkey>0?" （答案：".$db_answer[$qkey] . '）' : '');
 print <<<EOT
 -->
 		<tr>
@@ -952,10 +942,10 @@ EOT;
     </table>
     </form>
 </div>
-<SCRIPT LANGUAGE="JavaScript">
+<script>
 initCheckTextNum('aname','aname_warn',24);
 initCheckTextNum('aintro','aintro_warn',255);
-</SCRIPT>
+</script>
 <!--
 EOT;
 }print <<<EOT

@@ -44,15 +44,33 @@ class Rss {
 		}
 		$this->rssItem .= "</item>\n";
 	}
+/*added for YunLiao 1.2: start*/
+	function getItems(){
+		return $this->rssItem;
+	}
 	
+	function getRss(){
+		$all = $this->rssHeader;
+		$all .= $this->rssChannel;
+		$all .= $this->rssItem;
+		$all .= "</channel></rss>";
+		return $all;
+	}
+/*added for YunLiao 1.2: end*/
 	function generate($rss_path) {
-		
+	/*modded for YunLiao 1.2: start*/
+/* original -- start*/
+		/*
 		$all = $this->rssHeader;
 		$all .= $this->rssChannel;
 		$all .= $this->rssImage;
 		$all .= $this->rssItem;
 		$all .= "</channel></rss>";
-		pwCache::writeover($rss_path, $all);
+		*/
+/* original -- end*/
+		$all = $this->getRss();
+/*modded for YunLiao 1.2: end*/
+		pwCache::setData($rss_path, $all);
 	}
 }
 ?>

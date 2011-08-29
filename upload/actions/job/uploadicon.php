@@ -106,7 +106,7 @@ if (empty($_GET['step'])) {
 		$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
 		$userService->update($winduid, array('icon'=>$usericon));
 		//* $db->update("DELETE FROM pw_datastore WHERE skey=". S::sqlEscape("UID_".$winduid). " LIMIT 1");
-		
+
 		//job sign
 		initJob($winduid, "doUpdateAvatar");
 		if ($from != 'reg') refreshto('profile.php?action=modify&info_type=face', 'upload_icon_success');

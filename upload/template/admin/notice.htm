@@ -2,7 +2,6 @@
 include_once PrintEot('left');
 if(in_array($action,array('add','edit'))){print <<<EOT
 -->
-<script type="text/javascript" LANGUAGE="JavaScript" src="js/core/core.js"></script>
 <form name="FORM" method="post" action="$basename&" onsubmit="return checkpost(document.FORM);">
 	<input type="hidden" name="action" value="$action">
 	<input type="hidden" name="aid" value="$aid">
@@ -76,9 +75,9 @@ print <<<EOT
 	</tr>
 </table>
 </div>
-<script type="text/javascript" language="JavaScript" src="js/pw_ajax.js"></script>
-<script language="JavaScript" src="js/post.js"></script>
-<script language="JavaScript" src="js/global.js"></script>
+<script type="text/javascript" src="js/pw_ajax.js"></script>
+<script type="text/javascript" src="js/post.js"></script>
+<script type="text/javascript" src="js/global.js"></script>
 
 <div id="menu_face" class="menu" style="display:none;"></div>
 <div id="menu_generalface" class="menu" style="display:none;"></div>
@@ -86,8 +85,8 @@ print <<<EOT
 	<span class="btn"><span><button type="submit">提 交</button></span></span>
 </div>
 </form>
-<script language="JavaScript" src="js/date.js"></script>
-<script language="JavaScript">
+<script type="text/javascript" src="js/date.js"></script>
+<script type="text/javascript">
 var ckdisplay = '$ckdisplay';
 function viewdetail(){
 	obj = document.getElementById('ifurl');
@@ -250,7 +249,7 @@ EOT;
 	<span class="btn"><span><button type="submit">提 交</button></span></span>
 </div>
 </form>
-<script language="JavaScript">
+<script type="text/javascript">
 function delnotice(aid){
 	if (!aid || !confirm('确定要删除此公告吗？')) {
 		return false;

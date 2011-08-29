@@ -371,7 +371,7 @@ print <<<EOT
 			</tr>
 		</table>
 	</form>
-<script language="JavaScript">
+<script type="text/javascript">
 var charset = '$db_charset';
 initCheckTextNum('writetext','writetext_warn',255);
 function write_quickpost(event){
@@ -493,7 +493,7 @@ $i++;
 -->
 	</div>
 	<div>$pages</div>
-<script language="JavaScript" src="js/app_comment.js"></script>
+<script type="text/javascript" src="js/app_comment.js"></script>
 <script>
 function showshow(id)
 {
@@ -696,7 +696,7 @@ print <<<EOT
 </div>
 	<div class="c mb20">&nbsp;</div>
 </div>
-<SCRIPT type="text/javascript" LANGUAGE="JavaScript" src="js/core/friendlist.js"></SCRIPT>
+<script type="text/javascript" src="js/core/friendlist.js"></script>
 <!--
 EOT;
 } elseif ($a == 'read') {print <<<EOT
@@ -773,24 +773,25 @@ foreach ($readdb as $key => $read) {print <<<EOT
         <tr class="vt">
             <td rowspan="2" class="floot_left">
                 <div class="p10">
-					<p class="gName mb5 cc">
-                    <a href="{$db_userurl}$read[authorid]" class="fl" target="_blank">$read[author]</a>
+									<p class="gName mb5 cc">
 <!--
 EOT;
 if($db_showonline){
+$gender = $read['gender'] == 2 ? 'women' : 'man';
 if(checkOnline($read['thisvisit'])){print <<<EOT
 -->
-					<img src="images/online.png" title="在线" />
+					<span class="{$gender}_ol mr5" title="在线" alt="在线">在线</span>
 <!--
 EOT;
 }else{print <<<EOT
 -->
-					<img src="images/stealth.png" title="离线" />
+					<span class="{$gender}_unol mr5" title="离线" alt="离线">离线</span>
 <!--
 EOT;
 }}print <<<EOT
 -->
-					</p>
+                  <a href="{$db_userurl}$read[authorid]" target="_blank">$read[author]</a>
+								</p>
                 <p class="mb5"><a href="{$db_userurl}$read[authorid]" class="gFace" target="_blank"><img src="$read[icon]" width="120" height="120" /></a></p>
                 </div>
             </td>
@@ -988,12 +989,12 @@ EOT;
 if($ifadmin || $readdb[0][locked]%3 != 1){
 if ($read['lou']==0) {print <<<EOT
 -->
-   <a href="javascript:" onclick="postreply('回 楼主($read[anonymousname]) 的帖子');" class="mr10">回复</a>
+   <a href="javascript:" onclick="grouppostreply('回 楼主($read[anonymousname]) 的帖子');" class="mr10">回复</a>
 <!--
 EOT;
 } else {print <<<EOT
 -->
-   <a href="javascript:" onclick="postreply('回 $read[lou]楼($read[author]) 的帖子');" class="mr10">回复</a>
+   <a href="javascript:" onclick="grouppostreply('回 $read[lou]楼($read[author]) 的帖子');" class="mr10">回复</a>
 <!--
 EOT;
 }print <<<EOT
@@ -1045,7 +1046,7 @@ if($ifadmin || $readdb[0][locked]%3 != 1){
 -->
 </div>
 <div id="menu_show" style="display:none;"></div>
-<script language="javascript">
+<script>
 var charset = '$db_charset';
 var db_bbsurl = '$db_bbsurl';
 var db_urlcheck = '$db_urlcheck';
@@ -1057,9 +1058,20 @@ var fid = '$colony[classid]';
 function addsmile(NewCode){
 	getObj('textarea').value += ' [s:'+NewCode+'] ';
 }
+function grouppostreply(txt) {
+	if (typeof document.FORM != "undefined") {
+		document.FORM.atc_title.value = txt;
+		if (txt.match(/\((.+?)\)/ig)) {
+			if (document.FORM.replytouser) document.FORM.replytouser.value = RegExp.$1;
+		}
+		document.FORM.atc_content.focus();
+	} else {
+		window.location = 'post.php?action=reply&fid='+fid+'&tid='+tid;
+	}
+}
 </script>
 <script src="$db_htmdir/js/face.js"></script>
-<script type="text/javascript" language="JavaScript" src="js/pw_lwd.js"></script>
+<script type="text/javascript" src="js/pw_lwd.js"></script>
 <div id="menu_face" class="menu" style="display:none;"></div>
 <!--
 EOT;
@@ -1091,7 +1103,7 @@ EOT;
 .bta{cursor:pointer;color:#333333;padding:0 8px;margin:0 3px;white-space:nowrap;border:1px solid #d5e6ed;line-height:22px;background:#ffffff;}
 .bta:hover{border:1px solid #a6cbe7;text-decoration:none;}
 </style>
-<script language="JavaScript" src="js/swfobject.js"></script>
+<script type="text/javascript" src="js/swfobject.js"></script>
 <div class="r_content">
   <div>
     <div class="c"></div>
@@ -1111,7 +1123,14 @@ EOT;
      </div>
 <!--
 EOT;
-}if ($isGM || ($db_allowupload && $_G['allowupload']) || $attach) {print <<<EOT
+}
+//max attachnum
+if ($_G['allownum'] > 0 && $_G['allownum'] - $winddb['uploadnum']<$db_attachnum){
+	$maxAttachnum = $_G['allownum'] - $winddb['uploadnum'];
+} else {
+	$maxAttachnum = $db_attachnum;
+}
+if ($isGM || ($db_allowupload && $_G['allowupload'] && (!$_G['allownum'] || $winddb['uploadnum'] < $_G['allownum'])) || $attach) {print <<<EOT
 -->
 <table cellPadding="0" cellSpacing="0" style="display:none" width="100%">
 	<tbody id="att_mode"><tr>
@@ -1122,14 +1141,14 @@ EOT;
 		<td></td></tr>
 	</tbody>
 </table>
-<script language="JavaScript">
-var allowmutinum = parseInt('$db_attachnum');
+<script>
+var allowmutinum = parseInt('$maxAttachnum');
 var allow_ext = '$uploadfiletype';
 var allow_size = '$uploadfilesize';
 var attachnum = parseInt('$db_attachnum');
 </script>
-<script type="text/javascript" language="JavaScript" src="js/swfobject.js"></script>
-<script type="text/javascript" language="JavaScript" src="js/upload.js"></script>
+<script type="text/javascript" src="js/swfobject.js"></script>
+<script type="text/javascript" src="js/upload.js"></script>
 <script>
 var icontab=0;
 function show_icontab() {
@@ -1194,7 +1213,7 @@ $tags == '' && $tags = '标签之间空格隔开，最多可填写5个';
 print <<<EOT
 -->
             <div class="cc mb10">
-                <script type="text/javascript" language="JavaScript" src="js/pw_tags.js"></script>
+                <script type="text/javascript" src="js/pw_tags.js"></script>
                 <div><input id="atc_tags" class="input gray fl mr5" name="atc_tags" size="40" value="$tags" tabindex="3" autocomplete="off" onfocus="tag.init();document.getElementById('atc_tags').value='';" /><span class="bt2 fl"><span><button type="button" onclick="tag.get()">提取标签</button></span></span>
                 <a onclick="return false;" href="javascript:;" class="wy_tips" style="padding-right:14px;margin:3px 0 0 10px;">&nbsp;什么是标签<i style="width:200px;">标签是您给您的文章指定的关键字，设置适当的标签能便于他人快速的找到您的文章，最多可填写5个，每个3-15字节</i></a></div>
                 <div class="c"></div>
@@ -1208,20 +1227,14 @@ EOT;
 <!--
 EOT;
 if($o_groups_p_gdcheck){
-$gdSize = explode("\t",$db_gdsize);
+$checkCode = L::loadClass('checkcode', 'site');
+$checkCodeString = $checkCode->getCheckCodeTemplate();
 print <<<EOT
 -->
 <input class="input mr10" type="text" name="gdcode" size="8" tabindex="2" onfocus="showgd();" />
 <span class="cp" onclick="showgd();">点击刷新验证码</span>
-<div id="ckcode" style="display:none">
-<script type="text/javascript" src="js/pw_authcode.js"></script>
-<script>
-var flashWidth = "$gdSize[0]";
-var flashHeight = "$gdSize[1]";
-var gdtype = $db_gdtype;
-showGdCode();
-</script>
-</div>
+<div id="ckcode" style="display:none"></div>
+$checkCodeString
 <!--
 EOT;
 }if($db_question && $o_groups_p_qcheck){
@@ -1231,7 +1244,7 @@ if($db_imagequestion){
 }else{
 	$question = $qkey<0 ? getMachineQuestion_1() :  $db_question[$qkey];
 }
-$q_a = $question.($showq && $qkey>0?" 正确答案:".$db_answer[$qkey] : '');
+$q_a = $question.($showq && $qkey>0?" （答案：".$db_answer[$qkey] . '）' : '');
 print <<<EOT
 -->
 验证问题:{$q_a}&nbsp;&nbsp;<input class="input" type="text" name="qanswer" />
@@ -1255,14 +1268,14 @@ EOT;
 			</form>
 		</div>
 </div>
-<script language="JavaScript">var stylepath = 'wind';</script>
+<script>var stylepath = 'wind';</script>
 <form name="preview" action="job.php?action=preview" method="post" target="preview_page">
 	<input type="hidden" name="atc_content" value="" />
 	<input type="hidden" name="pcinfo" value="" />
 	<input type="hidden" name="pcid" value="$pcid" />
 	<input type="hidden" name="modelid" value="$modelid" />
 </form>
-<script language="JavaScript">
+<script>
 function gopreview() {
 	editor.save();
 	document.preview.atc_content.value=document.FORM.atc_content.value;
@@ -1285,21 +1298,21 @@ var cnt  = 0;
 document.FORM.Submit.disabled = false;
 function checkpost(obj) {
 	if (obj.atc_title.value == "") {
-		showDialog("error","话题<span class='warnFontStyle'>标题</span>不能为空",2);
+		showDialog("error","话题<span class='s1'>标题</span>不能为空",2);
 		obj.atc_title.focus();
 		return false;
 	} else if (strlen(obj.atc_title.value) > $db_titlemax) {
-		showDialog("error","话题<span class='warnFontStyle'>标题</span>不能大于 <span class='warnFontStyle'>$db_titlemax </span>个字节",2);
+		showDialog("error","话题<span class='s1'>标题</span>不能大于 <span class='s1'>$db_titlemax </span>个字节",2);
 		obj.atc_title.focus();
 		return false;
 	}
 	if (strlen(obj.atc_content.value) < $db_postmin) {
-		showDialog("error","话题<span class='warnFontStyle'>内容</span>不能少于 <span class='warnFontStyle'>$db_postmin </span>个字节",2);
-		editor.focusEditor();
+		showDialog("error","话题<span class='s1'>内容</span>不能少于 <span class='s1'>$db_postmin </span>个字节",2);
+		editor.focus();
 		return false;
 	} else if (strlen(obj.atc_content.value) > $db_postmax) {
-		showDialog("error","话题<span class='warnFontStyle'>内容</span>不能大于 $db_postmax 个字节",2);
-		editor.focusEditor();
+		showDialog("error","话题<span class='s1'>内容</span>不能大于 $db_postmax 个字节",2);
+		editor.focus();
 		return false;
 	}
 	if (IsElement('atc_tags') && obj.atc_tags.value == '标签之间空格隔开，最多可填写5个') {
@@ -1346,16 +1359,10 @@ function SubmitAjax(obj) {
 function showLoading(){
 	return "<div id=\"loading\" style=\"padding:20px;width:80%;text-align:center\"><img src=\""+imgpath+"/loading.gif\" align=\"absbottom\" alt=\"loading\" /> 正在加载数据...</div>";
 }
-window.onbeforeunload = function() {
-	var obj = document.FORM;
-	if (obj.atc_title.value !=='' || obj.atc_content.value !==''/* ||  obj.attachment_1.value !==''*/){
-		return "你正在编辑的话题没有保存，离开会导致内容丢失，是否确定离开?";
-	}
-}
 initCheckTextNum('atc_title','atc_title_warn','$db_titlemax');
 </script>
-<script language="JavaScript" src="js/post.js"></script>
-<script language="JavaScript">
+<script type="text/javascript" src="js/post.js"></script>
+<script>
 var dataStorage = {
 	save : function() {
 		if (PwStorage.save('msg', editor._editMode == 'textmode' ? editor.getHTML() : htmltocode(editor.getHTML()))) {
@@ -1462,14 +1469,15 @@ EOT;
 <!--
 EOT;
 if($db_showonline){
-if (checkOnline($value['thisvisit'])){print <<<EOT
+$gender = $read['gender'] == 2 ? 'women' : 'man';
+if(checkOnline($read['thisvisit'])){print <<<EOT
 -->
-								<span class="card-online" title="在线">在线</span>
+					<span class="{$gender}_ol mr5" title="在线" alt="在线">在线</span>
 <!--
 EOT;
-}else{print<<<EOT
+}else{print <<<EOT
 -->
-								<span class="card-offline" title="离线">离线</span>
+					<span class="{$gender}_unol mr5" title="离线" alt="离线">离线</span>
 <!--
 EOT;
 }}print <<<EOT
@@ -1542,7 +1550,7 @@ if ($_G['multiopen']) {
 print <<<EOT
 -->
 			<span class="bt2"><span><button id="senndmsg" onclick="fanoutMsg();return false;">群发消息</button></span></span>
-<script language="JavaScript">
+<script>
 (function () {
 	fanoutMsg = function() {
 		var d = '';
@@ -1571,7 +1579,7 @@ EOT;
 -->
 			<span class="bt2"><span><button type="submit" onclick="submitStep('check');">审核会员</button></span></span>
 			<span class="bt2"><span><button type="submit" onclick="submitStep('del');" >踢出本群</button></span></span>
-<script language="JavaScript">
+<script>
 var ifcheck = true;
 function CheckAll(form) {
 	for (var i = 0; i < form.elements.length - 2; i++) {
@@ -1581,7 +1589,7 @@ function CheckAll(form) {
 	ifcheck = ifcheck == true ? false : true;
 }
 function submitStep(operateStep) {
-	$('operateStep').value = operateStep;
+	getObj('operateStep').value = operateStep;
 }
 </script>
 <!--
@@ -1628,7 +1636,7 @@ EOT;
             </div>
         </div>
     </div>
-<script language="JavaScript">
+<script>
 setCurrent('group_{$group}','group_all','current');
 </script>
 <!--
@@ -1726,8 +1734,8 @@ if (empty($t)) {print <<<EOT
 <style type="text/css">
 	@import url($imgpath/post/minieitor/minieitor.css);
 </style>
-<script type="text/javascript" language="JavaScript" src="js/color_picker.js"></script>
-<script type="text/javascript" language="JavaScript" src="js/mini_editor.js"></script>
+<script type="text/javascript" src="js/color_picker.js"></script>
+<script type="text/javascript" src="js/mini_editor.js"></script>
 <script type="text/javascript">
 function pickReback(color){
 	getObj('color_show').style.backgroundColor = color;
@@ -1882,7 +1890,7 @@ EOT;
     </table>
 	</form>
 </div>
-<script language="JavaScript">
+<script>
 var charset = '$db_charset';
 initCheckTextNum('cname','cname_warn',20);
 initCheckTextNum('mini_descrip','mini_descrip_warn',255);
@@ -2155,9 +2163,9 @@ EOT;
 EOT;
 }print <<<EOT
 -->
-<SCRIPT LANGUAGE="JavaScript">
+<script>
 setCurrent('set_{$t}','set_default','current');
-</SCRIPT>
+</script>
 <!--
 EOT;
 }require_once(uTemplate::printEot('footer'));

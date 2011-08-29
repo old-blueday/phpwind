@@ -1,6 +1,6 @@
 <!--<?php
 if (!defined('AJAX')) {print <<<EOT
---><div style="height:25px;">&nbsp;</div><link rel="stylesheet" href="images/toolbar.css?2010412" />
+--><div style="height:25px;">&nbsp;</div><link rel="stylesheet" href="images/toolbar.css?{$GLOBALS['wind_repair']}" />
 <div class="startbar-wrapper fixed">
 <!--[if IE 6]>
 <iframe frameborder="0" style="position:absolute;width:98%;height:25px;filter:Alpha(opacity=0);" scrolling="no"></iframe>
@@ -14,7 +14,7 @@ if ($_COOKIE['toolbarhide'] && !defined('AJAX')) {print <<<EOT
 	<div class="startbar-close fl" id="startbar-open" onclick="ajaxShowToolBar();" title="显示快捷栏"></div>
 </div>
 </div>
-<script language="Javascript">
+<script>
 function ajaxShowToolBar(){
 	ajax.send('pw_ajax.php?action=showbottom','',responseAjaxShowToolBar);
 }
@@ -311,8 +311,8 @@ EOT;
 -->
 <div style="padding:5px 10px;border-top:1px solid #dedede;"><a href="profile.php" class="fr" target="_blank">我的设置</a><a href="$db_bbsurl">返回首页</a></div>
 </div>
-<script language="JavaScript" src="js/bottom.js"></script>
-<script language="JavaScript">
+<script src="js/bottom.js"></script>
+<script>
 function submitwrite(o) {
 	if (getObj('writetext').value == '' || getObj('writetext').value == '想说点什么?') {
 		showDialog('error','记录内容必须在3～255个字节之间');

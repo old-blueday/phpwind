@@ -72,7 +72,7 @@ class GetInfo {
 					if ($type == 'newsubject') {
 						$forumpost = $this->db->get_value("SELECT topic FROM pw_forumdata WHERE fid=" . S::sqlEscape($fid, false));
 						if ($forumpost < 100) {
-							$forceindex = 'FORCE INDEX('.getForceIndex('idx_fid_ifcheck_topped_lastpost').')';
+							$forceindex = 'FORCE INDEX('.getForceIndex('idx_fid_ifcheck_specialsort_lastpost').')';
 						} else {
 							$forceindex = 'FORCE INDEX('.getForceIndex('idx_postdate').')';
 						}
@@ -114,11 +114,11 @@ class GetInfo {
 					foreach ($_CREDITDB as $k => $v) {
 						$cType[$k] = $v[0];
 					}
-					$sql = "SELECT r.tid,r.cbtype,r.catype,r.cbval,r.caval,r.timelimit,t.fid,t.author,t.authorid,t.subject,t.type,t.postdate,t.hits,t.replies FROM pw_threads t LEFT JOIN pw_reward r ON t.tid=r.tid WHERE t.ifcheck='1' AND t.anonymous != 1 AND t.ifshield != 1 AND t.locked != 2 $sqladd ORDER BY t.tid DESC " . S::sqlLimit($num);
+					$sql = "SELECT r.tid,r.cbtype,r.catype,r.cbval,r.caval,r.timelimit,t.fid,t.author,t.authorid,t.subject,t.type,t.postdate,t.hits,t.replies ,t.lastpost FROM pw_threads t LEFT JOIN pw_reward r ON t.tid=r.tid WHERE t.ifcheck='1' AND t.anonymous != 1 AND t.ifshield != 1 AND t.locked != 2 $sqladd ORDER BY t.tid DESC " . S::sqlLimit($num);
 				} elseif ($special == 4) {
 					$sql = "SELECT tr.tid,tr.name,tr.icon,tr.price,t.fid FROM pw_threads t LEFT JOIN pw_trade tr ON t.tid=tr.tid WHERE t.ifcheck='1' AND t.anonymous != 1 AND t.ifshield != 1 AND t.locked != 2 $sqladd ORDER BY t.tid DESC " . S::sqlLimit($num);
 				} else {
-					$sql = "SELECT t.tid,t.fid,t.author,t.authorid,t.subject,t.type,t.postdate,t.hits,t.replies FROM pw_threads t $forceindex WHERE ifcheck=1 AND t.anonymous != 1 AND t.ifshield != 1 AND t.locked != 2 $sqladd ORDER BY postdate DESC " . S::sqlLimit($num);
+					$sql = "SELECT t.tid,t.fid,t.author,t.authorid,t.subject,t.type,t.postdate,t.hits,t.replies,t.lastpost FROM pw_threads t $forceindex WHERE ifcheck=1 AND t.anonymous != 1 AND t.ifshield != 1 AND t.locked != 2 $sqladd ORDER BY postdate DESC " . S::sqlLimit($num);
 				}
 			}
 		} elseif ($type == 'newreply') {
@@ -133,7 +133,7 @@ class GetInfo {
 				if ($this->reality == false) {
 					$sql = "SELECT tid AS id,postdate AS value FROM pw_threads WHERE tid IN(" . S::sqlImplode($tids) . ") AND anonymous != 1 AND ifshield != 1 AND locked != 2 ORDER BY lastpost DESC";
 				} else {
-					$sql = "SELECT tid,fid,author,authorid,subject,type,postdate,hits,replies FROM pw_threads WHERE tid IN(" . S::sqlImplode($tids) . ") AND anonymous != 1 AND ifshield != 1 AND locked != 2 ORDER BY lastpost DESC";
+					$sql = "SELECT tid,fid,author,authorid,subject,type,postdate,hits,replies,lastpost FROM pw_threads WHERE tid IN(" . S::sqlImplode($tids) . ") AND anonymous != 1 AND ifshield != 1 AND locked != 2 ORDER BY lastpost DESC";
 				}
 			} else {
 				return false;
@@ -155,18 +155,18 @@ class GetInfo {
 					foreach ($_CREDITDB as $k => $v) {
 						$cType[$k] = $v[0];
 					}
-					$sql = "SELECT r.tid,r.cbtype,r.catype,r.cbval,r.caval,r.timelimit,t.fid,t.author,t.authorid,t.subject,t.type,t.postdate,t.hits,t.replies FROM pw_threads t LEFT JOIN pw_reward r ON t.tid=r.tid WHERE t.ifcheck='1' AND t.replies>0 AND t.ifshield != 1 AND t.locked != 2 $sqladd ORDER BY t.replies DESC " . S::sqlLimit($num);
+					$sql = "SELECT r.tid,r.cbtype,r.catype,r.cbval,r.caval,r.timelimit,t.fid,t.author,t.authorid,t.subject,t.type,t.postdate,t.hits,t.replies,t.lastpost FROM pw_threads t LEFT JOIN pw_reward r ON t.tid=r.tid WHERE t.ifcheck='1' AND t.replies>0 AND t.ifshield != 1 AND t.locked != 2 $sqladd ORDER BY t.replies DESC " . S::sqlLimit($num);
 				} elseif ($special == 4) {
 					$sql = "SELECT tr.tid,tr.name,tr.icon,tr.price,t.fid,t.postdate FROM pw_threads t LEFT JOIN pw_trade tr ON t.tid=tr.tid WHERE t.ifcheck='1' AND t.replies>0 AND t.ifshield != 1 AND t.locked != 2 $sqladd ORDER BY t.replies DESC " . S::sqlLimit($num);
 				} else {
-					$sql = "SELECT t.tid,t.fid,t.author,t.authorid,t.subject,t.type,t.postdate,t.hits,t.replies FROM pw_threads t WHERE t.ifcheck='1' AND t.replies>0 AND t.ifshield != 1 AND t.locked != 2 $sqladd ORDER BY t.replies DESC " . S::sqlLimit($num);
+					$sql = "SELECT t.tid,t.fid,t.author,t.authorid,t.subject,t.type,t.postdate,t.hits,t.replies,t.lastpost FROM pw_threads t WHERE t.ifcheck='1' AND t.replies>0 AND t.ifshield != 1 AND t.locked != 2 $sqladd ORDER BY t.replies DESC " . S::sqlLimit($num);
 				}
 			}
 		} elseif ($type == 'hitsort') {
 			if ($this->reality == false) {
 				$sql = "SELECT tid AS id,hits AS value,postdate AS addition FROM pw_threads WHERE ifcheck='1' AND hits>0 AND ifshield != 1 AND locked != 2 $sqladd ORDER BY hits DESC " . S::sqlLimit($num);
 			} else {
-				$sql = "SELECT tid,fid,author,authorid,subject,type,postdate,hits,replies FROM pw_threads WHERE ifcheck='1' AND hits>0 AND ifshield != 1 AND locked != 2 $sqladd ORDER BY hits DESC " . S::sqlLimit($num);
+				$sql = "SELECT tid,fid,author,authorid,subject,type,postdate,hits,replies,lastpost FROM pw_threads WHERE ifcheck='1' AND hits>0 AND ifshield != 1 AND locked != 2 $sqladd ORDER BY hits DESC " . S::sqlLimit($num);
 			}
 		}
 		$posts = array();
@@ -332,6 +332,7 @@ class GetInfo {
 	 * @return array
 	 */
 	function newAttach($type, $fid = 0, $num = 0, $hour = 0) {
+		require_once(R_P.'require/bbscode.php');
 		global $timestamp, $db_ftpweb, $attachpath;
 		$attachtype = array(
 			'img',
@@ -361,17 +362,15 @@ class GetInfo {
 			$content = $this->db->get_value("SELECT content FROM $pw_tmsgs WHERE tid=" . S::sqlEscape($tid));
 			$atc_content = substrs(stripWindCode($content), 30);
 			if ($this->reality == true) {
-				$pic = geturl($attach['attachurl'], 'show', $attach['ifthumb']);
-				if (is_array($pic)) {
-					$tem = array();
-					$tem['url'] = 'read.php?tid=' . $attach['tid'];
-					$tem['title'] = $attach['subject'];
-					$tem['value'] = $atc_content;
-					$tem['image'] = $pic[0];
-					$tem['forumname'] = getForumName($attach['fid']);
-					$tem['forumurl'] = getForumUrl($attach['fid']);
-					$tem['addition'] = $attach;
-				}
+				$tem = array();
+				$tem['url'] = 'read.php?tid=' . $attach['tid'];
+				$tem['title'] = $attach['subject'];
+				$tem['value'] = $atc_content;
+				$tem['image'] = $this->_getImageUrl($attach['attachurl'], $attach['ifthumb']);
+				$tem['forumname'] = getForumName($attach['fid']);
+				$tem['forumurl'] = getForumUrl($attach['fid']);
+				$tem['addition'] = $attach;
+
 				$attachs[] = $tem;
 			} else {
 				if ($attachs[$attach['id']]) continue;
@@ -385,6 +384,11 @@ class GetInfo {
 			}
 		}
 		return $attachs;
+	}
+	function _getImageUrl($url,$ifthumb) {
+		$pic = geturl($url,'show');
+		$miniUrl = attachShow::getMiniUrl($url, $ifthumb, $pic[1],false);
+		return $miniUrl;
 	}
 	function _getUserMark() {
 		return array(

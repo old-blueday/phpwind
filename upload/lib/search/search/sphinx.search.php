@@ -273,8 +273,9 @@ class Search_Sphinx extends Search_Base {
 	 * 组装搜索结果页数据 总数/IDs/关键字
 	 */
 	function _buildSphinxResult($result,$id = 'id'){
+		global $db_charset;
 		L::loadClass('Chinese', 'utility/lang', false);
-		$chs = new Chinese('utf8','gbk');
+		$chs = new Chinese('utf8', $db_charset);
 		foreach ( $result["words"] as $word => $info ){
 			$words[] = $chs->Convert($word);
 		}
@@ -350,13 +351,14 @@ class Search_Sphinx extends Search_Base {
 	}
 	
 	function charsetReverse($keyword){
+		global $db_charset;
 		if($this->_sphinxCharset == 2){
 			return $keyword;
 		}
 		static $sCharset;
 		if(!$sCharset){
 			L::loadClass('Chinese', 'utility/lang', false);
-			$sCharset = new Chinese('gbk','utf8');
+			$sCharset = new Chinese($db_charset, 'utf8');
 		}
 		return $sCharset->Convert($keyword);
 	}

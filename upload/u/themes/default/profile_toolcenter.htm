@@ -265,7 +265,7 @@ EOT;
 		<div class="bdB pb10 mb10 p_lr_10">
 			<a href="profile.php?action=toolcenter">道具商店</a>&nbsp;|&nbsp;<a href="profile.php?action=toolcenter&job=user"  class="s5 b">二手市场</a>
 		</div>
-				<form action="profile.php?action=toolcenter&" method="post" onsubmit="if(checkSubmit()){this.submit.disabled=true;}else{return false;}">
+				<form action="profile.php?action=toolcenter&" method="post" onsubmit="return checkSubmit();">
 					<input type="hidden" name="job" value="buyuser" />
 					<input type="hidden" name="step" value="2" />
 					<input type="hidden" name="id" value="$id" />
@@ -362,7 +362,7 @@ EOT;
 						</tr>
 						</table>
 				</form>
-<script language="JavaScript">
+<script>
 function checkSubmit() {
 if (1 * getObj('nums').value <= 0) {
 	alert("请您输入要购买的个数");
@@ -370,9 +370,8 @@ if (1 * getObj('nums').value <= 0) {
 } else {
 	return confirm("该操作将购买该道具 " + getObj('nums').value + " 个，您确定么？");
 }
-return false;
 }
-checkradio();
+//checkradio();
 </script>
 <!--
 EOT;
@@ -502,7 +501,7 @@ print <<<EOT
 -->
 				</tr>
 			</table>
-<script language="javascript">
+<script>
 	function checkset(tool_msg){
 		if(!confirm('使用该道具' +tool_msg+' 确认要使用这个道具？')){
 			return false;
@@ -649,7 +648,7 @@ EOT;
 						</tr>
 					</table>
 				</form>
-<script language="JavaScript">
+<script>
 function checkradio() {
 	var radio = getObj('checkradio').getElementsByTagName('input');
 	if (radio.length > 0) {
@@ -657,7 +656,7 @@ function checkradio() {
 	}
 }
 function checkSubmit() {
-	var nums = $('nums');
+	var nums = getObj('nums');
 	var re   =  /^[0-9]*[1-9][0-9]*$/;
 	if (!re.test(nums.value))
 	{
@@ -687,7 +686,7 @@ EOT;
 <script>
 				function checkForm()
 				{
-					var nums = $('nums');
+					var nums = getObj('nums');
 					var re   =  /^[0-9]*[1-9][0-9]*$/;
 					if (!re.test(nums.value))
 					{
@@ -800,7 +799,7 @@ EOT;
 -->
                 </tr>
                 </table>              
-<script language="JavaScript">
+<script>
 function checkset(tool_msg){
 	if(!confirm('使用该道具' +tool_msg+'，确认要使用这个道具！')){
 		return false;
@@ -870,25 +869,23 @@ if ($toolid == 3) {print <<<EOT
                 <input type="hidden" name="tid" value="$tid" />
                 <input type="hidden" name="toolid" value="$toolid" />
                 <input type="hidden" name="step" value="2" />
-                <table width="340" cellspacing="1" cellpadding="5">
-                    <tr><th class="h" style="cursor:move" onmousedown="read.move(event);"><span class="fr" style="margin-top:2px;cursor:pointer" onclick="read.close();"><img src="$imgpath/close.gif" /></span><b>道具使用</b></th></tr>
-                    <tr><td>
-                    <input type="checkbox" name="title2" value="1" /><img src="$imgpath/post/editor/bold.gif" />
-                    <input type="checkbox" name="title3" value="1" /><img src="$imgpath/post/editor/italic.gif" />
-                    <input type="checkbox" name="title4" value="1" /><img src="$imgpath/post/editor/underline.gif" />
-                    <br /><br />
-                    &nbsp;颜色
-                    <input name="title1" type="radio" value="" />不使用
-                    <input name="title1" type="radio" value="red" /><font color="red">红色</font>
-                    <input name="title1" type="radio" value="blue" /><font color="blue">蓝色</font>
-                    <input name="title1" type="radio" value="green" /><font color="green">绿色</font>
-                    <input name="title1" type="radio" value="orange" /><font color="orange">橙色</font>
-                    <input name="title1" type="radio" value="silver" /><font color="silver">银色</font>
-                    </td></tr>
-                </table>
-                <ul>
-                	<li style="text-align:center;padding:4px 0;"><input type="button" class="btn" onclick="ajax.submit(this.form);" value="提 交" /></li>
-                </ul>
+								<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="adel" onclick="read.close();">close</span><b>道具使用</b></div>
+								<div class="p15">
+									<p class="mb10">样式：
+										<label class="mr10"><input type="checkbox" name="title2" value="1" /><img src="$imgpath/post/editor/bold.gif" align="absmiddle" /></label>
+										<label class="mr10"><input type="checkbox" name="title3" value="1" /><img src="$imgpath/post/editor/italic.gif" align="absmiddle" /></label>
+										<label class="mr10"><input type="checkbox" name="title4" value="1" /><img src="$imgpath/post/editor/underline.gif" align="absmiddle" /></label>
+									</p>
+                  <p class="mb10">颜色：
+                    <label class="mr10"><input name="title1" type="radio" value="" />不使用</label>
+                    <label class="mr10"><input name="title1" type="radio" value="red" /><font color="red">红色</font></label>
+                    <label class="mr10"><input name="title1" type="radio" value="blue" /><font color="blue">蓝色</font></label>
+                    <label class="mr10"><input name="title1" type="radio" value="green" /><font color="green">绿色</font></label>
+                   	<label class="mr10"><input name="title1" type="radio" value="orange" /><font color="orange">橙色</font></label>
+                   	<label class="mr10"><input name="title1" type="radio" value="silver" /><font color="silver">银色</font></label>
+									</p>
+								</div>
+								<div class="popBottom"><span class="btn2"><span><button onclick="ajax.submit(this.form);" type="button">提交</button></span></span></div>
             </form>
 <!--
 EOT;
@@ -900,7 +897,7 @@ EOT;
                 <input type="hidden" name="step" value="2" />
                 <table width="340" cellspacing="0" cellpadding="0">
                 	<tr>
-                    	<th class="h" colspan="2" style="cursor:move" onmousedown="read.move(event);"><span class="fr" style="margin-top:2px;cursor:pointer" onclick="read.close();"><img src="$imgpath/close.gif" /></span><b>道具使用</b></th>
+                    	<th class="h" colspan="2" style="cursor:move" onmousedown="read.move(event);"><span class="adel" onclick="read.close();">close</span><b>道具使用</b></th>
                     </tr>
                 	<tr>
                 	<td width="35%" align="center"> 请输入新的用户名：</td><td><input type="text" class="input" name="pwuser" /></td>

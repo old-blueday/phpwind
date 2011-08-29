@@ -21,13 +21,15 @@ class replyPost {
 	var $replyToUser;
 
 	var $extraBehavior = null;
+	var $timestamp;
 	
 	function replyPost(&$post) {
-		global $db;
+		global $db,$timestamp;
 		$this->db = & $db;
 		$this->post = & $post;
 		$this->forum = & $post->forum;
 		$this->type = 'Reply';
+		$this->timestamp = $timestamp;
 	}
 	
 	function setTpc($arr) {
@@ -85,13 +87,24 @@ class replyPost {
 				return $this->post->showmsg($return);
 			}
 		}
+		if (getstatus($this->tpcArr['tpcstatus'], 7)) {
+			$robbuildService = L::loadClass('RobBuild', 'forum'); /* @var $robbuildService PW_RobBuild */
+			$robbuild = $robbuildService->getByTid($this->tid);
+			if ($robbuild['starttime'] > $this->timestamp) {
+				$robbuild['starttime'] = get_date($robbuild['starttime'],'Y-m-d H:i');
+				$this->post->showmsg("亲,不要急哦,抢楼活动开始时间：{$robbuild['starttime']}");
+			}
+			if ($robbuild['status']) {
+				$this->post->showmsg("亲,抢楼活动已经结束了哦");
+			}
+		}
 	}
 	
 	function setPostData(&$postdata) {
 		$this->postdata = & $postdata;
 		$this->att = & $postdata->att;
 		$this->data = $postdata->getData();
-		if (stripslashes($this->data['title']) == 'Re:' . $this->tpcArr['subject']) {
+		if ((stripslashes($this->data['title']) == 'Re:' . $this->tpcArr['subject']) || (strlen($this->data['title']) > 98 && strrpos($this->data['title'],'Re:') === 0)) {
 			$this->data['title'] = '';
 		}
 	}
@@ -104,8 +117,9 @@ class replyPost {
 	function setPostFloor($pid) {
 		$sql = "INSERT INTO pw_postsfloor SET pid=" . S::sqlEscape($pid) . ", tid=" . S::sqlEscape($this->tid);
 		$this->db->update($sql);
+		return $this->db->insert_id();
 	}
-	
+
 	function execute($postdata) {
 		global $db_cvtime, $db_ptable, $onlineip, $db_plist;
 		$this->setPostData($postdata);
@@ -146,7 +160,11 @@ class replyPost {
 		//$this->db->update("INSERT INTO $pw_posts SET $pwSQL");
 		pwQuery::insert($pw_posts, $pwSQL);
 		!$pid && $pid = $this->db->insert_id();
-		$this->tpcArr['openIndex'] && $this->setPostFloor($pid);
+		$this->tpcArr['openIndex'] && $floor = $this->setPostFloor($pid);
+		if (getstatus($this->tpcArr['tpcstatus'], 7)) {
+			$robbuildService = L::loadClass ( "robbuild", 'forum' );
+			$robbuildService->setRobbuilds($pid,$floor,$this->tid);
+		}
 		$this->pid = $pid;
 		if (is_object($this->att) && ($aids = $this->att->getAids())) {
 			$this->db->update("UPDATE pw_attachs SET " . S::sqlSingle(array(
@@ -176,8 +194,25 @@ class replyPost {
 			}
 			$this->db->update("UPDATE pw_threads SET {$sqladd1}replies=replies+1,hits=hits+1," . S::sqlSingle($sqladd) . " WHERE tid=" . S::sqlEscape($this->tid));
 			Perf::gatherInfo('changeThreads', array('tid'=>$this->tid));
+
+			$userCache = L::loadClass('Usercache', 'user');
+			$userCache->delete($this->data['authorid'], 'reply');
 		}
-		$this->post->updateUserInfo($this->type, $this->userCreidtSet(), $this->data['content']);
+		//weibo
+		$weiboService = L::loadClass('weibo','sns');/* @var $weiboService PW_Weibo */ 
+		$weiboContent = substrs(stripWindCode($weiboService->escapeStr(strip_tags($this->data['content']))), 125);
+		$weiboExtra = array(
+						'title' => stripslashes($this->tpcArr['subject']),
+						'fid' => $this->forum->fid,
+						'fname' => $this->forum->name,
+						'atusers' =>$this->data['atusers'],
+						'pid'	=> $this->pid
+					);
+		$weiboService->send($this->post->uid,$weiboContent,'article',$this->tid,$weiboExtra);
+		$threadService = L::loadClass('threads','forum');
+		$threadService->setAtUsers($this->tid,$this->pid,$this->data['atusers']);
+		//end weibo
+		if ($this->data['ifcheck'] == 1) $this->post->updateUserInfo($this->type, $this->userCreidtSet(), $this->data['content']);
 		$this->afterReply();
 
 		if ($this->extraBehavior) {
@@ -203,7 +238,7 @@ class replyPost {
 						'tid' => $this->tid,
 						'pid' => $this->pid,
 						'windid' => $windid,
-						'content'	=> substrs(strip_tags($this->data['content']), 60, 'Y')
+						'content'	=> substrs(strip_tags($this->data['content']), 100, 'Y')
 					)),
 				),
 				'sms_reply',
@@ -251,7 +286,7 @@ class replyPost {
 						'tid' => $this->tid,
 						'pid' => $this->pid,
 						'windid' => $windid,
-						'content'	=> substrs(strip_tags(stripWindCode($this->data['content'])), 60, 'Y')
+						'content'	=> substrs(strip_tags(stripWindCode($this->data['content'])), 100, 'Y')
 					)),
 				),
 				'sms_reply',
@@ -334,6 +369,5 @@ class replyPost {
 		}
 		return $right;
 	 }
-	
 }
 ?>

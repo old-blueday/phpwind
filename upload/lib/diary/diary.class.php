@@ -210,7 +210,7 @@ class PW_Diary {
 		}
 		$GLOBALS += L::style();
 		require_once(R_P.'require/bbscode.php');
-		$attachShow = new attachShow($isGM);
+		$attachShow = new attachShow($isGM,'',false,'diary');
 		$attachShow->setData($attachs);
 		return $attachShow->parseAttachs('tpc', $content, $winduid == $authorid);
 	}

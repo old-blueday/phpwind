@@ -149,7 +149,7 @@ EOT;
 print <<<EOT
 -->
 </tr></table></div>
-<script language="JavaScript">
+<script type="text/javascript">
 function checkset(tool_msg){
 	if(!confirm('使用该道具' +tool_msg+'，确认要使用这个道具！')){
 		return false;
@@ -724,7 +724,7 @@ print <<<EOT
 </tr></table></div>
 </td></tr>
 
-<script language="javascript">
+<script type="text/javascript">
 function checkset(tool_msg){
 	if(!confirm('使用该道具' +tool_msg+' 确认要使用这个道具？')){
 		return false;
@@ -944,7 +944,7 @@ print <<<EOT
 </div>
 </form>
 
-<script language="JavaScript">
+<script type="text/javascript">
 function checkradio() {
 	var radio = getObj('checkradio').getElementsByTagName('input');
 	if (radio.length > 0) {
@@ -1101,7 +1101,7 @@ print <<<EOT
 </div>
 
 </form>
-<script language="JavaScript">
+<script type="text/javascript">
 function checkSubmit() {
 	if (1 * getObj('nums').value <= 0) {
 		alert("请您输入要购买的个数");

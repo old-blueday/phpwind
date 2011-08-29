@@ -1,0 +1,119 @@
+<!--<?php
+require_once(uTemplate::printEot('header'));
+require_once(uTemplate::printEot('user_appleft'));
+print<<<EOT
+-->
+<div class="contUser">
+    <div class="p15">
+			<h4 class="site"><img src="u/images/module/lightbulb.png" align="absmiddle" class="mr10" /><span>孔明灯</span></h4>           	
+        <div class="navC">
+            <ul>
+                <li class="current"><a  href="apps.php?q=kmd"  hidefocus="true">我的孔明灯</a></li>
+                <li><a href="apps.php?q=kmd&a=record" hidefocus="true">购买记录</a></li>
+            </ul>
+			<span class="btn_add fl"><span><button onclick="window.location.href='{$basename}a=buy1';">购买孔明灯</button></span></span>
+        </div>
+        <div class="p15 cc">
+					<ol class="steps pr">
+						<li><em>1</em>填写推广信息</li>
+						<li><em>2</em>填写基本资料</li>
+						<li class="current"><em>3</em>支付</li>
+					</ol>
+				</div>
+				<div class="p10">
+				<form action="{$basename}a=pay" method="post" >
+					<input type="hidden" name="kid" id="kid" value="{$kid}" />
+					<table width="100%">
+						<tr class="tr3">
+							<td width="90" class="tar">推广帖子：</td>
+							<td><a href="{$tpcurl}" target="_blank">{$tpcdb['subject']}</a></td>
+						</tr>
+						<tr class="tr3">
+							<td class="tar">推广费用：</td>
+							<td>原价 {$spreadInfo['rmb']}元
+<!--
+EOT;
+if ($spreadInfo['discount']) {
+	$s_pay = $spreadInfo['discount']*$spreadInfo['rmb']/10;
+print <<<EOT
+-->	
+，<span class="s2">{$spreadInfo['discount']}折</span>，应付 <span class="s2">{$s_pay}元</span>
+<!--
+EOT;
+}
+print <<<EOT
+-->	
+</td>
+						</tr>
+						<tr class="tr3">
+							<td class="tar" style="vertical-align:top;">支付方式：</td>
+							<td>
+<!--
+EOT;
+if ($ol_payto&&$ol_onlinepay) {	
+	$radiocheck = $kmddb['pay_type']<2 ? 'checked="checked"' : '';
+print <<<EOT
+-->								
+								<div class="bdB mb15">
+									<p class="mb5"><em style="display:inline-block;width:25px;"><input name="pay_type" type="radio" value="1" $radiocheck /></em><span class="f14 b s5">支付宝（推荐）</span></p>
+									<p class="gray mb10"><em style="display:inline-block;width:25px;">&nbsp;</em>支付宝支付方式，可供个人支付宝及企业支付宝支付。</p>
+									<div class="bgA boxA s5" style="padding:10px 0;margin-bottom:20px;">
+										<p class="mb5"><em style="display:inline-block;width:25px;">&nbsp;</em>支付宝账户：{$ol_payto} </p>										
+									</div>
+								</div>
+<!--
+EOT;
+}print <<<EOT
+-->									
+<!--
+EOT;
+if ($kmd_config['account']&&$kmd_config['bank_name']) {	
+	$radiocheck = $kmddb['pay_type']==2 ? 'checked="checked"' : '';
+print <<<EOT
+-->										
+								<div class="bdB mb15">
+									<p class="mb5"><em style="display:inline-block;width:25px;"><input name="pay_type" type="radio" $radiocheck value="2" /></em><span class="f14 b s5">银行转帐</span></p>
+									<p class="gray mb10"><em style="display:inline-block;width:25px;">&nbsp;</em>企业单位支付方式，仅限企业间的转账支付。</p>
+									<div class="bgA boxA s5" style="padding:10px 0;margin-bottom:20px;">
+										<p class="mb5"><em style="display:inline-block;width:25px;">&nbsp;</em>公司名称：{$kmd_config['company']}</p>
+										<p class="mb5"><em style="display:inline-block;width:25px;">&nbsp;</em>账　　户：{$kmd_config['account']}</p>
+										<p><em style="display:inline-block;width:25px;">&nbsp;</em>开 户 行：{$kmd_config['bank_name']}</p>
+									</div>
+								</div>
+<!--
+EOT;
+}print <<<EOT
+-->								
+<!--
+EOT;
+if ($kmd_config['address']) {	
+	$radiocheck = $kmddb['pay_type']==3 ? 'checked="checked"' : '';
+print <<<EOT
+-->									
+								<div class="bdB mb15">
+									<p class="mb5"><em style="display:inline-block;width:25px;"><input name="pay_type" type="radio" value="3" $radiocheck /></em><span class="f14 b s5">现金</span></p>
+									<p class="gray mb10"><em style="display:inline-block;width:25px;">&nbsp;</em>在以上2种方式都不能实现的情况下，携带现金到现场办理手续。</p>
+									<div class="bgA boxA s5" style="padding:10px 0;margin-bottom:20px;">
+										<p><em style="display:inline-block;width:25px;">&nbsp;</em>办理地址：{$kmd_config['address']}</p>
+									</div>
+								</div>
+<!--
+EOT;
+}print <<<EOT
+-->									
+							</td>
+						</tr>
+					</table>
+					<div class="tac p10"><span class="bt"><span><button onclick="window.location.href='{$basename}a=buy2&tid={$tid}&sid={$sid}';return false;">上一步</button></span></span><span class="btn"><span><button  type='submit'>提交</button></span></span></div>
+				</form>
+				</div>
+				<div class="spaceTip s5" style="padding:20px;">
+					{$kmd_config['contact']}
+				</div>        
+    </div>
+</div>        
+        
+<!--
+EOT;
+require_once(uTemplate::printEot('footer'));
+?>

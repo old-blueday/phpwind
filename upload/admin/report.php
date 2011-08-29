@@ -1,9 +1,9 @@
 <?php
 !function_exists('adminmsg') && exit('Forbidden');
-S::gp(array('action','adminitem'));
-!$adminitem && $adminitem = 'content';
-$basename="$admin_file?adminjob=report&adminitem=$adminitem";
-if ($adminitem == 'content') {
+S::gp(array('action'));
+!$admintype && $admintype = 'reportcontent';
+$basename="$admin_file?adminjob=report&admintype=$admintype";
+if ($admintype == 'reportcontent') {
 	if(empty($action) || $action == 'deal'){
 		S::gp(array('page','type'));
 		(!is_numeric($page) || $page < 1) && $page=1;
@@ -75,7 +75,7 @@ if ($adminitem == 'content') {
 		adminmsg('operate_success');
 	
 	}
-} elseif ($adminitem == 'remind') {
+} elseif ($admintype == 'reportremind') {
 	!$action && $action = 'list';
 	$remindMember = array();
 	$remindMember = $db->get_value("SELECT db_value FROM pw_config WHERE db_name = 'report_remind'");

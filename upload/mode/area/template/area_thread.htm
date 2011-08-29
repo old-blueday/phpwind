@@ -4,13 +4,13 @@ print <<<EOT
 -->
 <!--
 EOT;
-if(($N_allowtypeopen && $foruminfo['allowtype'] != 1) || $N_allowtopicopen || $N_allowpostcateopen){print <<<EOT
+if(($N_allowtypeopen && ($foruminfo['allowtype'] != 1 || $modelids || $pcids || $_G['allowactivity'] && $firstactmid)) || $N_allowtopicopen || $N_allowpostcateopen){print <<<EOT
 -->
 <div id="menu_post" class="pw_menu tac" style="display:none;">
 	<ul class="menuList" style="width:70px;">
 <!--
 EOT;
-if($foruminfo['allowtype'] & 1 && $foruminfo['allowtype'] != 1){print <<<EOT
+if($foruminfo['allowtype'] & 1 && ($foruminfo['allowtype'] != 1 || $modelids || $pcids || $_G['allowactivity'] && $firstactmid)){print <<<EOT
 -->
 		<li><a href="post.php?fid=$fid" title="新 帖" hidefocus="true">新帖</a></li>
 <!--
@@ -111,7 +111,7 @@ EOT;
 -->
 
         </span></div>
-<script language="JavaScript">
+<script>
 setCurrent('pc_$a','pc_all','current');
 </script>
     </div>
@@ -196,7 +196,7 @@ EOT;
 EOT;
 }print <<<EOT
 -->
-<script language="javascript">
+<script>
 <!--
 EOT;
 if($i > $db_maxtypenum){print<<<EOT

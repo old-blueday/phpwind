@@ -23,6 +23,32 @@ class PW_STopicService {
 	var $_stopicConfig = null;
 
 	/**
+	 * 获取专题评论数
+	 * 
+	 * @return int
+	 */
+	function getCommentNum($stopicId) {
+		$stopicId = intval($stopicId);
+		if (!$stopicId) return false;
+		$stopicDB = $this->_getSTopicDB();
+		return $stopicDB->getCommentNum($stopicId);
+	}
+	
+	/**
+	 * 更新回复数
+	 * 
+	 * @param array $fieldsData
+	 * @param int $commentid 
+	 * @return boolean 
+	 */
+	function updateCommentnum($num,$stopicId) {
+		$stopicId = intval($stopicId);
+		if($stopicId < 1 || !$num) return false;
+		$stopicDB = $this->_getSTopicDB();
+		return $stopicDB->updateCommentnum($num,$stopicId);
+	}
+	
+	/**
 	 * 获取专题可用布局列表
 	 * 
 	 * @return array 专题布局列表数组

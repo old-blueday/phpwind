@@ -14,16 +14,32 @@ class PW_WeiboBindDB extends BaseDB {
 		return $data;
 	}
 	
-	function gets($userIds, $weiboType) {
-		if (!$userIds || '' == $weiboType) return array();
+	function gets($userIds) {
+		if (!$userIds) return array();
 		
 		$query = $this->_db->query("SELECT * FROM " . $this->_tableName . " 
-			WHERE uid IN (" . $this->_getImplodeString($userIds) . ") AND weibotype=" . $this->_addSlashes($weiboType));
+			WHERE uid IN (" . $this->_getImplodeString($userIds) . ")");
 		
 		$result = array();
 		while ($rt = $this->_db->fetch_array($query)) {
 			$rt['info'] =  $this->_decodeBindingInfo($rt['info']);
-			$result[$rt['uid']] = $rt;
+			$result[$rt['weibotype']][$rt['uid']] = $rt;
+		}
+		return $result;
+	}
+	
+	/**
+	 * @param unknown_type $userId
+	 * @return array weibotype as key
+	 */
+	function getAllByUserId($userId) {
+		if ($userId <= 0) return array();
+		$query = $this->_db->query("SELECT * FROM " . $this->_tableName . " WHERE uid=" . intval($userId));
+		
+		$result = array();
+		while ($rt = $this->_db->fetch_array($query)) {
+			$rt['info'] =  $this->_decodeBindingInfo($rt['info']);
+			$result[$rt['weibotype']] = $rt;
 		}
 		return $result;
 	}

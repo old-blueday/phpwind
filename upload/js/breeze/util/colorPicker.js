@@ -98,15 +98,16 @@ Breeze.namespace('util.colorPicker', function (B) {
                 callback: function () {
                     B.$$('#' + colorSelector.id + ' span').forEach(function (n) {
                         n.className = '';
-                        n.onclick = function () {
-                            B.$$("#" + colorSelector.id + ' .current').forEach(function (n) {
+						n.onmousedown=function(e){
+							B.$$("#" + colorSelector.id + ' .current').forEach(function (n) {
                                 n.className = '';
                             });
                             this.className = 'current';
                             var color = this.style.backgroundColor;
                             self.callback(B.formatColor(color));
                             hideColorSelector();
-                        };
+							return false;
+						}
                         if (B.formatColor(n.style.backgroundColor) == B.formatColor(self.defaultColor)) {
                             n.className = 'current';
                         }

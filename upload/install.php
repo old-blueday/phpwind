@@ -22,7 +22,7 @@ pwInitGlobals();
 !$_SERVER['PHP_SELF'] && $_SERVER['PHP_SELF'] = $_SERVER['SCRIPT_NAME'];
 $selfrpos = strrpos($_SERVER['PHP_SELF'],'/');
 $basename = substr($_SERVER['PHP_SELF'],$selfrpos+1);
-$bbsurl = 'http://'.$_SERVER['HTTP_HOST'].substr($_SERVER['PHP_SELF'],0,$selfrpos);
+$bbsurl = 'http://' . $_SERVER['HTTP_HOST'] . substr($_SERVER['PHP_SELF'], 0, $selfrpos);
 $crlf = GetCrlf();
 $onlineip = pwGetIp();
 $timestamp = time();
@@ -34,22 +34,22 @@ require_once(R_P.'lang/install_lang.php');
  */
 $_WIND			= 'install';
 $from_version	= '';
-$wind_version	= '8.5';
+list($wind_version, $versionDate) = explode(',', WIND_VERSION); 
 $wind_repair	= '';
 $wind_from		= '';//Customized version
-$_actionStep = array('index','readme','writable','database','createtable','hack',
-					'view','initdata','other','mode','custom',/*'testdata',*/'static',
+$_actionStep = array(/*'index',*/'readme', 'writable', 'database', 'createtable', 'hack',
+					'view', 'initdata', 'other', 'mode', 'custom',/*'testdata',*/ 'static',
 					/*'resources',*/'finish');
 
 $lockfile = 'install.lock';
 file_exists(D_P."data/$lockfile") && Promptmsg('have_file');
 
 InitGP(array('action','step'));
-$action || $action = 'index';
+$action || $action = 'readme';
 
 /**
  * 安装首页
- */
+
 if ($action == 'index') {
 	$footer = true;
 	$lang['log_install'] = str_replace('{#basename}',$basename,$lang['log_install']);
@@ -59,13 +59,18 @@ if ($action == 'index') {
 	@unlink(D_P."data/install.log");
 	pwViewHtml($action);exit;
 }
+*/
 
 /**
  * 版权阅读
  */
 if ($action == 'readme') {
-	$wind_licence = str_replace(array('  ',"\n"),array('&nbsp; ','<br />'),readover(R_P.'licence.txt'));
-	//writeover(D_P."data/install.log",$lang["success_1"]."\n",'ab+');
+	$wind_licence = readover(R_P.'licence.txt');
+	@unlink(D_P.'data/install_sys.sql');
+	@unlink(D_P.'data/install_hack.sql');
+	@unlink(D_P.'data/install_test.sql');
+	@unlink(D_P."data/install.log");
+	list($prev,$next) = getStepto($action);
 	pwViewHtml($action);exit;
 }
 
@@ -124,27 +129,30 @@ if ($action == 'writable') {
 		'html/portal/usermix/index.html'
 	);
 	$writelog = '';
-	$fileexist = $writable = array();
+	$writable = array();
 	foreach ($w_check as $filename) {
-		!N_writable(R_P.$filename) && $writable[] = $filename;
-		!file_exists(R_P.$filename) && $fileexist[] = $filename;
-		$writelog .= str_replace('{#filename}',$filename,$lang['success_2'])."\n";
+		!N_writable(R_P . $filename) && $writable[] = $filename;
 	}
 	if (file_exists(D_P.'data/sql_config.php') && !N_writable(D_P.'data/sql_config.php')) {
 		$writable[] = 'data/sql_config.php';
 	}
-	if ($fileexist) {
-		$filenames = implode('<br />',$fileexist);
-		Promptmsg('error_unfinds');
-	}
-	if ($writable) {
-		$filenames = implode('<br />',$writable);
-		Promptmsg('error_777s');
-	}
 
-	//writeover(D_P."data/install.log",$writelog,'ab+');
+	$recommendEnvironment = array(
+		'os' => $lang['env_os'],
+		'version' => '>= 5.0',
+		'upload' => '2M',
+		'space' => $lang['unlimited']
+	);
+	$lowestEnvironment = array(
+		'os' => $lang['unlimited'],
+		'version' => '4.3',
+		'upload' => $lang['unlimited'],
+		'space' => '50M'
+	);
+	$currentEnvironment = getCurrentEnvironment();
+	
 	list($prev,$next) = getStepto($action);
-	$action = $next;
+	pwViewHtml($action);exit;
 }
 
 /**
@@ -153,7 +161,7 @@ if ($action == 'writable') {
 if ($action == 'database') {
 	if ($step != 2) {
 		$phplinfo = PHP_VERSION;
-		$mysqlichecked = $phplinfo>='5.1.0' ? 'CHECKED' : '';
+		$mysqlichecked = $phplinfo >= '5.1.0' ? 'CHECKED' : '';
 		pwViewHtml($action);exit;
 	} else {
 		InitGP(array('dbhost','dbuser','dbpw','dbname','database','PW','manager','manager_pwd','manager_ckpwd','manager_email'));
@@ -161,37 +169,40 @@ if ($action == 'database') {
 		$mysqlimsg = '';
 		$input = "<input type=\"hidden\" name=\"manager_email\" value=\"$manager_email\">";
 		$input .= "<input type=\"hidden\" name=\"step\" value=\"2\">";
-		if (!file_exists(D_P.'data/sql_config.php') || $_POST['from']!='prompt') {
-			if (!N_writable(D_P.'data/sql_config.php')) {
+		if (!file_exists(D_P.'data/sql_config.php') || $_POST['from'] != 'prompt') {
+			if (!N_writable(D_P . 'data/sql_config.php')) {
 				$filename = 'data/sql_config.php';
 				Promptmsg('error_777');
 			}
 			if (!$dbhost || !$dbuser || !$dbname || !$PW || !$manager || !$manager_pwd) {
 				Promptmsg('error_nothing');
 			}
-			if ($manager_pwd!==$manager_ckpwd) {
+			if ($manager_pwd !== $manager_ckpwd) {
 				Promptmsg('error_ckpwd');
 			}
 			$manager_pwd = md5($manager_pwd);
-			$charset = str_replace('-','',$lang['db_charset']);
+			$charset = str_replace('-', '', $lang['db_charset']);
 			require R_P.'require/db_mysql.php';
-			$db = new DB($dbhost,$dbuser,$dbpw,'',$pconnect);
-			$mysqlinfo = mysql_get_server_info($db->sql);
-			if ($database=='mysqli') {
-				if ($mysqlinfo<'4.1.3') {
-					$database = 'mysql'; $mysqlimsg = $lang['error_mysqli'];
+			$db = new DB($dbhost, $dbuser, $dbpw, '', $pconnect);
+			$masterDb = $db->getMastdb();
+			$mysqlinfo = mysql_get_server_info($masterDb->sql);
+			if ($database == 'mysqli') {
+				if ($mysqlinfo < '4.1.3') {
+					$database = 'mysql';
+					$mysqlimsg = $lang['error_mysqli'];
 				} else {
 					ob_end_clean();
-					if (Pwloaddl('mysqli')===false) {
-						$database = 'mysql'; $mysqlimsg = $lang['error_mysqli'];
+					if (Pwloaddl('mysqli') === false) {
+						$database = 'mysql';
+						$mysqlimsg = $lang['error_mysqli'];
 					}
 					ob_start();
-					require(R_P.'lang/header.htm');
 					$steptitle = $step;
 				}
 			}
 
-			$manager = array($manager); $manager_pwd = array($manager_pwd);
+			$manager = array($manager);
+			$manager_pwd = array($manager_pwd);
 			$newconfig = array(
 				'dbhost' => $dbhost,
 				'dbuser' => $dbuser,
@@ -208,22 +219,23 @@ if ($action == 'database') {
 			);
 			$tplpath = 'wind';
 			require_once(R_P.'require/updateset.php');
-			write_config($newconfig); unset($newconfig);
+			write_config($newconfig);
+			unset($newconfig);
 
-			if ($mysqlinfo>'4.1') {
-				mysql_query("CREATE DATABASE IF NOT EXISTS `$dbname` DEFAULT CHARACTER SET $charset");
+			if ($mysqlinfo > '4.1') {
+				$db->query("CREATE DATABASE IF NOT EXISTS `$dbname` DEFAULT CHARACTER SET $charset");
 			} else {
-				mysql_query("CREATE DATABASE IF NOT EXISTS `$dbname`");
+				$db->query("CREATE DATABASE IF NOT EXISTS `$dbname`");
 			}
 			if (mysql_errno()) {
 				Promptmsg('error_nodatabase');
 			} elseif ($query = mysql_query("SELECT COUNT(*) FROM `$dbname`.{$PW}members")) {
-				Promptmsg('have_install',$action);
+				Promptmsg('have_install', $action);
 			}
 			mysql_select_db($dbname);
 		}
 
-		list($prev,$next) = getStepto($action);
+		list($prev, $next) = getStepto($action);
 		pwHeader("$basename?action=$next");exit;
 	}
 }
@@ -235,43 +247,44 @@ if ($action == 'createtable') {
 	if (!file_exists(D_P.'data/sql_config.php')) {
 		Promptmsg('config_noexists','database');
 	} else {
-		$db = pwNewDB();
+		$db = pwNewDBForInstall();
 	}
 	@set_time_limit(200);
+	@unlink(D_P."data/install.log");
 	require (D_P.'data/sql_config.php');
-	$t		 = getdate($timestamp+8*3600);
-	$tdtime  = (floor($timestamp/3600)-$t['hours'])*3600;
+	$t		 = getdate($timestamp + 8 * 3600);
+	$tdtime  = (floor($timestamp / 3600) - $t['hours']) * 3600;
 	$lang['db_bbsurl'] = $bbsurl;
 	$lang['db_manager'] = $manager[0];
-	$content = str_replace(array("\r","\n\n",";\n"),array('',"\n",";<wind>\n"),trim(readover(R_P.'lang/install_wind.sql')," \n"));
+	$content = str_replace(array("\r", "\n\n", ";\n"), array('', "\n", ";<wind>\n"), trim(readover(R_P . 'lang/install_wind.sql'), " \n"));
 
-	$db_floorname = array($lang['db_floorname_1'],$lang['db_floorname_2'],$lang['db_floorname_3'],$lang['db_floorname_4']);
+	$db_floorname = array($lang['db_floorname_1'], $lang['db_floorname_2'], $lang['db_floorname_3'], $lang['db_floorname_4']);
 	$db_sitemsg = array(
-		"reg"	=> array($lang['db_sitemsg_1'],$lang['db_sitemsg_2']),
+		"reg"	=> array($lang['db_sitemsg_1'], $lang['db_sitemsg_2']),
 		"login"	=> array($lang['db_sitemsg_3']),
-		"post"	=> array($lang['db_sitemsg_4'],$lang['db_sitemsg_5'],$lang['db_sitemsg_6']),
-		"reply"	=> array($lang['db_sitemsg_4'],$lang['db_sitemsg_5'],$lang['db_sitemsg_6']),
+		"post"	=> array($lang['db_sitemsg_4'], $lang['db_sitemsg_5'], $lang['db_sitemsg_6']),
+		"reply"	=> array($lang['db_sitemsg_4'], $lang['db_sitemsg_5'], $lang['db_sitemsg_6']),
 	);
 	$lang['db_floorname'] = addslashes(serialize($db_floorname));
 	$lang['db_sitemsg'] = addslashes(serialize($db_sitemsg));
-	$content = preg_replace("/{#(.+?)}/eis",'$lang[\'\\1\']',$content).'<wind>';
+	$content = preg_replace("/{#(.+?)}/eis", '$lang[\'\\1\']', $content) . '<wind>';
 
-	$content = explode("\n",$content);
+	$content = explode("\n", $content);
 	$writearray = array($lang['success_3']);
 	$writearray = SQLCreate($content);
 
 	$userstatus = 0;
-	setstatus($userstatus,7);
-	setstatus($userstatus,8);
+	setstatus($userstatus, 7);
+	setstatus($userstatus, 8);
 
-	$db->update("INSERT INTO pw_members (username,password,icon,email,groupid,memberid,regdate,userstatus,shortcut) VALUES ('$manager[0]','$manager_pwd[0]','none.gif|1|||','$manager_email','3','8','$timestamp','$userstatus',',article,write,diary,share,groups,photos,')");
+	$db->update("REPLACE INTO pw_members (username,password,icon,email,groupid,memberid,regdate,userstatus,shortcut) VALUES ('$manager[0]','$manager_pwd[0]','none.gif|1|||','$manager_email','3','8','$timestamp','$userstatus',',article,write,diary,share,groups,photos,')");
 	$uid = $db->insert_id();
-	$db->update("INSERT INTO pw_memberdata (uid,lastvisit,thisvisit) VALUES ('$uid','$timestamp','$timestamp')");
-	$db->update("INSERT INTO pw_bbsinfo (id,newmember,totalmember,tdtcontrol) VALUES ('1','$manager[0]','1','$tdtime')");
-	$db->update("INSERT INTO pw_administrators(uid,username,groupid,groups) VALUES('$uid','$manager[0]','3','')");
+	$db->update("REPLACE INTO pw_memberdata (uid,lastvisit,thisvisit) VALUES ('$uid','$timestamp','$timestamp')");
+	$db->update("REPLACE INTO pw_bbsinfo (id,newmember,totalmember,tdtcontrol) VALUES ('1','$manager[0]','1','$tdtime')");
+	$db->update("REPLACE INTO pw_administrators(uid,username,groupid,groups) VALUES('$uid','$manager[0]','3','')");
 
-	writeover(D_P."data/install.log",implode("\n",$writearray)."\n$lang[success_3_2]",'ab+');
-	list($prev,$next) = getStepto($action);
+	writeover(D_P . "data/install.log", implode("\n", $writearray) . "\n$lang[success_3_2]", 'ab+');
+	list($prev, $next) = getStepto($action);
 	pwHeader("$basename?action=$next");exit;
 }
 
@@ -280,36 +293,36 @@ if ($action == 'createtable') {
  */
 if ($action == 'initdata') {
 	if ($step != 2) {
-		$sqlcache = readover(D_P.'data/install_sys.sql');
+		$sqlcache = readover(D_P . 'data/install_sys.sql');
 		if (trim($sqlcache)) {
 			$input = "<input type=\"hidden\" name=\"step\" value=\"2\">";
-			Promptmsg('install_initdata',$action,true);
+			Promptmsg('install_initdata', $action, true);
 		} else {
-			@unlink(D_P.'data/install_sys.sql');
-			@unlink(D_P.'data/lock');
-			list($prev,$next) = getStepto($action);
+			@unlink(D_P . 'data/install_sys.sql');
+			@unlink(D_P . 'data/lock');
+			list($prev, $next) = getStepto($action);
 			pwHeader("$basename?action=$next");exit;
 		}
 	} else {
 		$input = "<input type=\"hidden\" name=\"step\" value=\"2\">";
 		@set_time_limit(200);
-		if (!file_exists(D_P.'data/sql_config.php')) {
-			Promptmsg('config_noexists','database');
+		if (!file_exists(D_P . 'data/sql_config.php')) {
+			Promptmsg('config_noexists', 'database');
 		} else {
-			$db = pwNewDB();
+			$db = pwNewDBForInstall();
 		}
-		$lockfile = D_P.'data/lock';
-		$fp = fopen($lockfile,'wb+');
-		flock($fp,LOCK_EX);
-		$sqlcache = readover(D_P.'data/install_sys.sql');
+		$lockfile = D_P . 'data/lock';
+		$fp = fopen($lockfile, 'wb+');
+		flock($fp, LOCK_EX);
+		$sqlcache = readover(D_P . 'data/install_sys.sql');
 		$update = SQLUpdate($sqlcache);
 		fclose($fp);
 		if ($update) {
-			Promptmsg('install_initdata',$action,true);
+			Promptmsg('install_initdata', $action, true);
 		} else {
-			@unlink(D_P.'data/install_sys.sql');
-			@unlink(D_P.'data/lock');
-			list($prev,$next) = getStepto($action);
+			@unlink(D_P . 'data/install_sys.sql');
+			@unlink(D_P . 'data/lock');
+			list($prev, $next) = getStepto($action);
 			pwHeader("$basename?action=$next");exit;
 		}
 	}
@@ -322,7 +335,7 @@ if ($action == 'hack') {
 	if (!file_exists(D_P.'data/sql_config.php')) {
 		Promptmsg('config_noexists','database');
 	} else {
-		$db = pwNewDB();
+		$db = pwNewDBForInstall();
 	}
 	if (0 && $step != 2) {
 		$uninstalldb = (array)HackList();
@@ -339,23 +352,23 @@ if ($action == 'hack') {
 			foreach ($hackdb as $value) {
 				if ($uninstalldb[$value][0]) {
 					$db_hackdb[$value] = $uninstalldb[$value];
-					$createcache .= trim(readover(R_P."hack/$value/sql.txt")," \n")."\n";
+					$createcache .= trim(readover(R_P . "hack/$value/sql.txt")," \n") . "\n";
 				}
 			}
 			if ($createcache) {
-				$createcache = explode("\n",str_replace(array("\r","\n\n",";\n"),array('',"\n",";<wind>\n"),$createcache.'<wind>'));
+				$createcache = explode("\n", str_replace(array("\r", "\n\n", ";\n"), array('', "\n", ";<wind>\n"), $createcache . '<wind>'));
 				if ($createcache) {
-					$writearray = SQLCreate($createcache,'hack');
+					$writearray = SQLCreate($createcache, 'hack');
 					$db_hackdb = addslashes(serialize($db_hackdb));
 				}
 			}
 			$db->update("REPLACE INTO pw_config(db_name,vtype,db_value) VALUES ('db_hackdb','array','$db_hackdb')");
 		}
 		$sqlcache = readover(D_P.'data/install_hack.sql');
-		$sqlcache && SQLUpdate($sqlcache,800,'hack');
-		writeover(D_P."data/install.log",$lang['success_4'],'ab+');
+		$sqlcache && SQLUpdate($sqlcache, 800, 'hack');
+		writeover(D_P . "data/install.log", $lang['success_4'], 'ab+');
 
-		list($prev,$next) = getStepto($action);
+		list($prev, $next) = getStepto($action);
 		pwHeader("$basename?action=$next");exit;
 		//Promptmsg('action_success',$next);
 	}
@@ -365,11 +378,11 @@ if ($action == 'hack') {
  * 显示安装日志
  */
 if ($action == 'view') {
-	include (D_P.'data/sql_config.php');
-	unset($dbhost,$dbuser,$dbpw,$dbname,$manager,$manager_pwd);
-	$log = readover(D_P."data/install.log")."\n";
-	$log = str_replace(array("\n",'pw_'),array('<wind>',$PW),$log).$lang['success_4_2'];
-	list($prev,$next) = getStepto($action);
+	include (D_P . 'data/sql_config.php');
+	unset($dbhost, $dbuser, $dbpw, $dbname, $manager, $manager_pwd);
+	$log = readover(D_P . "data/install.log") . "\n";
+	$log = str_replace(array("\n", 'pw_'), array('<wind>', $PW), $log) . $lang['success_4_2'];
+	list($prev, $next) = getStepto($action);
 	pwViewHtml($action);exit;
 }
 
@@ -380,17 +393,17 @@ if ($action == 'mode') {
 	if (0 && $step != 2) {
 		pwViewHtml($action);exit;
 	} else {
-		if (!file_exists(D_P.'data/sql_config.php')) {
-			Promptmsg('config_noexists','database');
+		if (!file_exists(D_P . 'data/sql_config.php')) {
+			Promptmsg('config_noexists', 'database');
 		} else {
-			$db = pwNewDB();
+			$db = pwNewDBForInstall();
 		}
 
-		require(R_P.'lang/step/modeset.php');
-		require(R_P.'lang/step/tpl.php');
-		writeover(D_P."data/install.log","$lang[success_5]");
+		require(R_P . 'lang/step/modeset.php');
+		require(R_P . 'lang/step/tpl.php');
+		writeover(D_P . "data/install.log", "$lang[success_5]");
 
-		list($prev,$next) = getStepto($action);
+		list($prev, $next) = getStepto($action);
 		pwHeader("$basename?action=$next");exit;
 	}
 }
@@ -399,22 +412,22 @@ if ($action == 'mode') {
  * 默认添加数据
  */
 if ($action == 'custom') {
-	if (!file_exists(D_P.'data/sql_config.php')) {
-		Promptmsg('config_noexists','database');
+	if (!file_exists(D_P . 'data/sql_config.php')) {
+		Promptmsg('config_noexists', 'database');
 	} else {
-		$db = pwNewDB();
+		$db = pwNewDBForInstall();
 	}
 
-	require(R_P.'lang/step/updatead.php');
-	require(R_P.'lang/step/topic.php');
-	require(R_P.'lang/step/pcfield.php');
-	require(R_P.'lang/step/nav.php');
-	require(R_P.'lang/step/pw_areas.php');
-	require(R_P.'lang/step/pw_school.php');
-    $areaService = L::LoadClass('areasservice','utility');
+	require(R_P . 'lang/step/updatead.php');
+	require(R_P . 'lang/step/topic.php');
+	require(R_P . 'lang/step/pcfield.php');
+	require(R_P . 'lang/step/nav.php');
+	require(R_P . 'lang/step/pw_areas.php');
+	require(R_P . 'lang/step/pw_school.php');
+    $areaService = L::LoadClass('areasservice', 'utility');
     $areaService->setAreaCache();
 
-	list($prev,$next) = getStepto($action);
+	list($prev, $next) = getStepto($action);
 	pwHeader("$basename?action=$next");exit;
 }
 
@@ -422,27 +435,27 @@ if ($action == 'custom') {
  * 生成站点各种信息，添加默认风格,更新缓存
  */
 if ($action == 'other') {
-	if (!file_exists(D_P.'data/sql_config.php')) {
-		Promptmsg('config_noexists','database');
+	if (!file_exists(D_P . 'data/sql_config.php')) {
+		Promptmsg('config_noexists', 'database');
 	} else {
-		$db = pwNewDB();
+		$db = pwNewDBForInstall();
 	}
 
-	$writeinto = str_pad('<?php die;?>',96)."\r\n";
-	writeover(D_P.'data/bbscache/online.php',$writeinto);
-	writeover(D_P.'data/bbscache/guest.php',$writeinto);
-	writeover(D_P.'data/bbscache/olcache.php',"<?php\r\n\$userinbbs=1;\r\n\$guestinbbs=0;\r\n?>");
+	$writeinto = str_pad('<?php die;?>', 96) . "\r\n";
+	writeover(D_P.'data/bbscache/online.php', $writeinto);
+	writeover(D_P.'data/bbscache/guest.php', $writeinto);
+	writeover(D_P.'data/bbscache/olcache.php', "<?php\r\n\$userinbbs=1;\r\n\$guestinbbs=0;\r\n?>");
 
-	mt_srand((double)microtime()*1000000);
+	mt_srand((double)microtime() * 1000000);
 
 	$rand = '0123%^&*45ICV%^&*B6789qazw~!@#$sxedcrikolpQWER%^&*TYUNM';
 	$randlen = strlen($rand);
-	for ($i=0;$i<10;$i++) {
-		$db_hash .= $rand[mt_rand(0,$randlen)];
+	for ($i=0; $i<10; $i++) {
+		$db_hash .= $rand[mt_rand(0, $randlen)];
 	}
 	$db_siteid      = generatestr(32);
 	$db_siteownerid = generatestr(32);
-	$db_sitehash = '10'.SitStrCode(md5($db_siteid.$db_siteownerid),md5($db_siteownerid.$db_siteid));
+	$db_sitehash = '10' . SitStrCode(md5($db_siteid . $db_siteownerid), md5($db_siteownerid . $db_siteid));
 
 	$db_windmagic = 0;
 	$db->update("REPLACE INTO pw_config(db_name,db_value) VALUES ('db_hash','$db_hash')");
@@ -454,13 +467,13 @@ if ($action == 'other') {
 	$db->update("REPLACE INTO pw_config SET db_name='db_ifpwcache',db_value= '567'");
 
 	//风格
-	$styles = array('wind' => '蓝色天空','wind8gray'=>'水墨江南','wind8black'=>'黑色旋风','wind8green'=>'绿之印象','wind8purple'=>'紫色梦幻','wind85' => '春意盎然');
-	$i = 1;$temp_styledb=array();
+	$styles = array('wind' => '蓝色天空', 'wind8gray'=>'水墨江南', 'wind8black'=>'黑色旋风', 'wind8green'=>'绿之印象', 'wind8purple'=>'紫色梦幻', 'wind85' => '春意盎然');
+	$i = 1; $temp_styledb = array();
 	foreach ($styles as $key => $value) {
-		if (!file_exists(D_P.'data/style/'.$key.'.php')) continue;
-		include Pcv(D_P.'data/style/'.$key.'.php');
+		if (!file_exists(D_P . 'data/style/' . $key . '.php')) continue;
+		include Pcv(D_P . 'data/style/' . $key . '.php');
 		$true_value = $value;
-		$temp_styledb[$key] = array($true_value,1);
+		$temp_styledb[$key] = array($true_value, 1);
 		$db->update("REPLACE INTO pw_styles SET sid='$i',name='$key',customname='".$true_value."',ifopen=1,stylepath='$stylepath',tplpath='$tplpath',yeyestyle='$yeyestyle',bgcolor='$bgcolor',linkcolor='$linkcolor',tablecolor='$tablecolor',tdcolor='$tdcolor',tablewidth='$tablewidth',mtablewidth='$mtablewidth',headcolor='$headcolor',headborder='$headborder',headfontone='$headfontone',headfonttwo='$headfonttwo',cbgcolor='$cbgcolor',cbgborder='$cbgborder',cbgfont='$cbgfont',forumcolorone='$forumcolorone',forumcolortwo='$forumcolortwo'");
 		$i++;
 	}
@@ -477,11 +490,43 @@ if ($action == 'other') {
 	require(R_P.'lang/step/writesmile.php');
 
 	//设置门户首页为默认首页
-	$update	= array('area_default_alias','string','home85','');
-	$db->update("REPLACE INTO pw_hack VALUES (".pwImplode($update).')');
+	$update	= array('area_default_alias', 'string', 'home85', '');
+	$db->update("REPLACE INTO pw_hack VALUES (" . pwImplode($update) . ')');
 
-	@unlink(D_P.'data/type_cache.php');
-	list($prev,$next) = getStepto($action);
+	//87默认数据
+	$query = $db->query("SELECT gid,gptype FROM pw_usergroups");
+	while ($value = $db->fetch_array($query)) {
+		switch ($value['gptype']) {
+			case 'system':
+			case 'special':
+			case 'member':
+				$db->update("REPLACE INTO pw_permission (uid ,fid ,gid,rkey,type,rvalue) VALUES (0,0,{$value['gid']},'allowat','basic','1')");
+				$db->update("REPLACE INTO pw_permission (uid ,fid ,gid,rkey,type,rvalue) VALUES (0,0,{$value['gid']},'allowreplyreward','basic','1')");
+				$db->update("REPLACE INTO pw_permission (uid ,fid ,gid,rkey,type,rvalue) VALUES (0,0,{$value['gid']},'allowremotepic','basic','1')");
+				break;
+		}
+		if ($value['gptype'] == 'system') {
+			$db->update("REPLACE INTO pw_permission (uid ,fid ,gid,rkey,type,rvalue) VALUES (0,0,{$value['gid']},'atnum','basic','10')");
+			$db->update("REPLACE INTO pw_permission (uid ,fid ,gid,rkey,type,rvalue) VALUES (0,0,{$value['gid']},'robbuild','basic','1')");
+		} else if($value['gptype'] == 'special') {
+			$db->update("REPLACE INTO pw_permission (uid ,fid ,gid,rkey,type,rvalue) VALUES (0,0,{$value['gid']},'atnum','basic','10')");
+		} else if($value['gptype'] == 'member') {
+			$db->update("REPLACE INTO pw_permission (uid ,fid ,gid,rkey,type,rvalue) VALUES (0,0,{$value['gid']},'atnum','basic','3')");
+		}
+	}
+	
+	$query = $db->query("SELECT fid,forumset FROM pw_forumsextra");
+	while ($value = $db->fetch_array($query)) {
+		$forumset = unserialize($value['forumset']);
+		$forumset['allowrob'] = 1;
+		$forumset['ifkmd'] = 1;
+		$forumset['kmdnumber'] = 3;
+		$forumset = serialize($forumset);
+		$db->update("UPDATE pw_forumsextra SET forumset='$forumset' WHERE fid={$value['fid']}");
+	}
+
+	@unlink(D_P . 'data/type_cache.php');
+	list($prev, $next) = getStepto($action);
 	pwHeader("$basename?action=$next");exit;
 }
 
@@ -499,7 +544,7 @@ if ($action == 'testdata') {
 	if (!file_exists(D_P.'data/sql_config.php')) {
 		Promptmsg('config_noexists','database');
 	} else {
-		$db = pwNewDB();
+		$db = pwNewDBForInstall();
 	}
 	$sqlcache = readover(D_P.'data/install_sys.sql');
 	$update = SQLUpdate($sqlcache,500);
@@ -542,46 +587,46 @@ if ($action == 'resources') {
 }
 
 if ($action == 'static') {
-	if (!file_exists(D_P.'data/sql_config.php')) {
-		Promptmsg('config_noexists','database');
+	if (!file_exists(D_P . 'data/sql_config.php')) {
+		Promptmsg('config_noexists', 'database');
 	} else {
-		$db = pwNewDB();
+		$db = pwNewDBForInstall();
 	}
-	require_once(R_P.'admin/cache.php');
-	updatecache_conf('area',true);
+	require_once(R_P . 'admin/cache.php');
+	updatecache_conf('area', true);
 	updatecache();
-	include_once(D_P.'data/bbscache/config.php');
+	include_once(D_P . 'data/bbscache/config.php');
 	$pwModeImg = "mode/area/images";
-	$imgpath	= $db_http		!= 'N' ? $db_http		: $db_picpath;
+	$imgpath = $db_http != 'N' ? $db_http : $db_picpath;
 	ObStart();
-	define('M_P',R_P."mode/area/");
-	define('AREA_PATH',R_P.'html/channel/');
-	include_once(M_P.'require/core.php');
-	define('AREA_STATIC','1');
+	define('M_P', R_P . "mode/area/");
+	define('AREA_PATH', R_P . 'html/channel/');
+	include_once(M_P . 'require/core.php');
+	define('AREA_STATIC', '1');
 	$db_mode = 'area';
 	$ChannelService = L::loadClass('channelService', 'area');
 	$channelsArray=$ChannelService->getChannels();
 	$ChannelService->updateAreaChannels();
 
-	require_once(R_P.'require/nav.php');
+	require_once(R_P . 'require/nav.php');
 
-	$alias = array('baby','decoration','auto','delicious','home85','tucool');
+	$alias = array('baby', 'decoration', 'auto', 'delicious', 'home85', 'tucool');
 	foreach ($alias as $value) {
 		$alias = $value;
-		require M_P.'index.php';
+		require M_P . 'index.php';
 		aliasStatic($alias);
 	}
 
-	list($prev,$next) = getStepto($action);
+	list($prev, $next) = getStepto($action);
 	pwHeader("$basename?action=$next");exit;
 }
 
 if ($action == 'finish') {
 	@set_time_limit(120);
-	if (!file_exists(D_P.'data/sql_config.php')) {
-		Promptmsg('config_noexists','database');
+	if (!file_exists(D_P . 'data/sql_config.php')) {
+		Promptmsg('config_noexists', 'database');
 	} else {
-		$db = pwNewDB();
+		$db = pwNewDBForInstall();
 	}
 	$db_htmdir = 'html';
 	if ($_GET['app'] == '1') {
@@ -612,12 +657,12 @@ if ($action == 'finish') {
 		);
 	}
 
-	setConfig('db_server_url','http://apps.phpwind.net');
-	updatemedal_list();
+	setConfig('db_server_url', 'http://apps.phpwind.net');
+	//updatemedal_list();
 	updatecache();
 	updatecache_cnc_s();
-	updatecache_conf('area',true);
-	updatecache_conf('o',true);
+	updatecache_conf('area', true);
+	updatecache_conf('o', true);
 
 //	$ipindex = L::loadClass('iptable', 'utility');
 //	$ipindex->createIpIndex();
@@ -625,18 +670,18 @@ if ($action == 'finish') {
 	$db_htmdir = 'html';
 	$db_bbsurl = $bbsurl;
 	ob_start();
-	define('A_P',R_P."apps/stopic/");
-	$stopic_service = L::loadClass('stopicservice','stopic');
+	define('A_P', R_P . "apps/stopic/");
+	$stopic_service = L::loadClass('stopicservice', 'stopic');
 	$stopic_service->creatStopicHtml(1);
 	ob_end_clean();
 
-	pwSetVersion('Install','Welcome to phpwind');
+	pwSetVersion('Install', 'Welcome to phpwind');
 
-	writeover(D_P."data/$lockfile",'LOCKED');
-	@unlink(D_P.'data/install_sys.sql');
-	@unlink(D_P.'data/install_hack.sql');
-	@unlink(D_P.'data/install_test.sql');
-	@unlink(D_P.'data/install.log');
+	writeover(D_P . "data/$lockfile",'LOCKED');
+	@unlink(D_P . 'data/install_sys.sql');
+	@unlink(D_P . 'data/install_hack.sql');
+	@unlink(D_P . 'data/install_test.sql');
+	@unlink(D_P . 'data/install.log');
 	@unlink($basename);
 
 	pwViewHtml($action);exit;
@@ -734,45 +779,45 @@ function SQLUpdate($sqlcache,$cutnum,$hack = null) {
 	return false;
 }
 function SQLCreate($sqlarray,$hack = null) {
-	global $db,$charset,$writearray,$lang;
+	global $db, $charset, $writearray, $lang;
 	$query = $updatesql = '';
 	$cachename = empty($hack) ? 'sys' : $hack;
 	foreach ($sqlarray as $value) {
-		$value = trim($value," \t");
-		if ($value && $value[0]!='#') {
+		$value = trim($value, " \t");
+		if ($value && $value[0] != '#') {
 			$query .= $value;
-			if (substr($value,-7)==';<wind>') {
-				$lowquery = strtolower(substr($query,0,5));
+			if (substr($value, -7) == ';<wind>') {
+				$lowquery = strtolower(substr($query, 0, 5));
 				$checkdrop = CheckDrop($value);
-				if (in_array($lowquery,array('drop ','creat'))) {
-					if ($cachename=='sys' || $checkdrop) {
-						if ($lowquery=='creat') {
-							$tablename = trim(substr($query,0,strpos($query,'(')));
-							$tablename = substr($tablename,strrpos($tablename,' ')+1);
-							$writearray[] = str_replace('{#tablename}',$tablename,$lang['success_3_1']);
-							$search = trim(substr(strrchr($value,')'),1));
-							$tabtype = substr(strchr($search,'='),1);
-							$tabtype = substr($tabtype,0,strpos($tabtype,strpos($tabtype,' ') ? ' ' : ';'));
+				if (in_array($lowquery, array('drop ', 'creat'))) {
+					if ($cachename == 'sys' || $checkdrop) {
+						if ($lowquery == 'creat') {
+							$tablename = trim(substr($query, 0, strpos($query,'(')));
+							$tablename = substr($tablename, strrpos($tablename, ' ') + 1);
+							$writearray[] = str_replace('{#tablename}', $tablename, $lang['success_3_1']);
+							$search = trim(substr(strrchr($value, ')'), 1));
+							$tabtype = substr(strchr($search, '='), 1);
+							$tabtype = substr($tabtype, 0, strpos($tabtype, strpos($tabtype, ' ') ? ' ' : ';'));
 							if ($db->server_info() >= '4.1') {
-								$replace = "ENGINE=$tabtype".($charset ? " DEFAULT CHARSET=$charset" : '').';';
+								$replace = "ENGINE=$tabtype" . ($charset ? " DEFAULT CHARSET=$charset" : '') . ';';
 							} else {
 								$replace = "TYPE=$tabtype;";
 							}
-							$query = str_replace(array($search,'<wind>'),array($replace,''),$query);
+							$query = str_replace(array($search, '<wind>'), array($replace, ''), $query);
 						} else {
-							$query = str_replace('<wind>','',$query);
+							$query = str_replace('<wind>', '', $query);
 						}
 						$db->query($query);
 					}
-				} elseif ((in_array($lowquery,array('inser','repla')) && ($cachename=='sys' || $checkdrop)) || ($lowquery=='alter' && $cachename!='sys' && $checkdrop && strpos(strtolower($query),'drop')===false)) {
-					$lowquery=='inser' && $query = 'REPLACE '.substr($query,6);
+				} elseif ((in_array($lowquery, array('inser', 'repla')) && ($cachename == 'sys' || $checkdrop)) || ($lowquery == 'alter' && $cachename != 'sys' && $checkdrop && strpos(strtolower($query), 'drop') === false)) {
+					$lowquery == 'inser' && $query = 'REPLACE ' . substr($query, 6);
 					$updatesql .= $query;
 				}
 				$query = '';
 			}
 		}
 	}
-	$updatesql && writeover(D_P."data/install_$cachename.sql",$updatesql);
+	$updatesql && writeover(D_P . "data/install_$cachename.sql", $updatesql);
 	return $writearray;
 }
 function getStepto($action) {
@@ -792,12 +837,11 @@ function pwViewHtml($action) {
 	require_once(R_P.'lang/header.htm');
 	require(R_P.'lang/install.htm');footer();
 }
-function Promptmsg($msg,$toaction=null,$jump=false){
+function Promptmsg($msg, $toaction = null, $jump = false){
 	@extract($GLOBALS, EXTR_SKIP);
 	$lang[$msg] && $msg = $lang[$msg];
-	$msg = preg_replace("/{#(.+?)}/eis",'$\\1',$msg);
+	$msg = preg_replace("/{#(.+?)}/eis", '$\\1', $msg);
 	$url = $backurl = 'javascript:history.go(-1);';
-	//$backmsg = !empty($tostep) ? $lang["promptmsg_{$tostep}"] : '';echo $backmsg;die;
 	if (!$toaction) {
 		$lang['last'] = $lang['back'];
 		@unlink("log$step.txt");
@@ -957,7 +1001,7 @@ function updatemedal_list(){
 	}
 	writeover(D_P.'data/bbscache/medals_list.php',$medaldb);
 }
-function &pwNewDB() {
+function &pwNewDBForInstall() {
 	if (!is_object($GLOBALS['db'])) {
 		global $charset,$manager,$PW;
 		include (D_P.'data/sql_config.php');
@@ -1015,5 +1059,26 @@ function updatecache_cnc() {
 		'INSERT INTO pw_hack SET ' . pwSqlSingle(array('hk_name' => 'o_classdb', 'vtype' => 'array', 'hk_value' => $classdb))
 	);
 	updatecache_conf('o',true);
+}
+
+function getCurrentEnvironment() {
+	global $lowestEnvironment;
+	$space = floor(disk_free_space(R_P) / (1024 * 1024)) . 'M';
+	$currentVersion = explode('.', PHP_VERSION);
+	$lowestVersion = explode('.', $lowestEnvironment['version']);
+	$version = '<span class="error_span">&times;</span>' . PHP_VERSION;
+	$currentUpload = ini_get('file_uploads') ? ini_get('upload_max_filesize') : 'unknow';
+
+	if ($currentVersion[0] > $lowestVersion[0] || ($currentVersion[0] == $lowestVersion[0] && $currentVersion[1] > $lowestVersion[1]) || ($currentVersion[0] == $lowestVersion[0] && $currentVersion[1] == $lowestVersion[1] && $currentVersion[2] >= $lowestVersion[2])) {
+		$version = '<span class="correct_span">&radic;</span>' . PHP_VERSION;
+	}
+	$upload = intval($currentUpload) >= intval($lowestEnvironment['upload']) ? '<span class="correct_span">&radic;</span>' . $currentUpload : '<span class="error_span">&times;</span>' . $currentUpload;
+	$space = intval($space) >= intval($lowestEnvironment['space']) ? '<span class="correct_span">&radic;</span>' . $space : '<span class="error_span">&times;</span>' . $space;
+	return array(
+		'os' => '<span class="correct_span">&radic;</span>' . PHP_OS,
+		'version' => $version,
+		'upload' => $upload,
+		'space' => $space
+	);
 }
 ?>

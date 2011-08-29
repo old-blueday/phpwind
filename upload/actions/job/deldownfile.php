@@ -51,10 +51,10 @@ if ($groupid != 'guest' && ($admincheck || $attach['uid'] == $winduid)) {
 	if ($foruminfo['allowhtm'] && $page == 1) {
 		$StaticPage = L::loadClass('StaticPage');
 		$StaticPage->update($tid);
-		empty($j_p) && $j_p = "read.php?tid=$tid&displayMode=1";
+		empty($j_p) && $j_p = "read.php?tid=$tid&ds=1";
 		refreshto($j_p, 'operate_success');
 	} else {
-		refreshto("read.php?tid=$tid&displayMode=1&page=$page", 'operate_success');
+		refreshto("read.php?tid=$tid&ds=1&page=$page", 'operate_success');
 	}
 } else {
 	Showmsg('job_attach_right');

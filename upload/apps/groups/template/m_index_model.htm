@@ -207,7 +207,7 @@ EOT;
 include printEot('writesmile');
 print <<<EOT
 -->
-<script language="JavaScript">
+<script>
 var charset = '$GLOBALS[db_charset]';
 initCheckTextNum('writetext','writetext_warn',255);
 function write_quickpost(event){
@@ -325,7 +325,7 @@ $i++;
 }print <<<EOT
 -->
 		</div>
-<script language="JavaScript" src="js/app_comment.js"></script>
+<script type="text/javascript" src="js/app_comment.js"></script>
 <script type="text/javascript">
 function showshow(id) {
 	if (document.getElementById('commentreplay_'+id)) {

@@ -40,6 +40,8 @@ $whiteActions = array(
 	'pweditor',
 	'pwschools',
 	'tofloor',//楼层直达
+	'remotedownload', //远程下载
+	'endrobbuild' // 结束抢楼
 );
 if (in_array($action, $whiteActions)) {
 	require S::escapePath(R_P . 'actions/job/' . $action . '.php');
@@ -120,7 +122,7 @@ function getuserdb($filename, $offset) {
 function checkCreditLimit($creditlimit) {
 	global $winddb, $winduid, $db;
 	$creditlimit = unserialize($creditlimit);
-	foreach ($creditlimit as $key => $value) {
+	foreach ((array)$creditlimit as $key => $value) {
 		if (in_array($key, array(
 			'money',
 			'rvrc',

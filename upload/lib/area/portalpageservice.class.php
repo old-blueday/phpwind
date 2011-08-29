@@ -62,11 +62,15 @@ class PW_PortalPageService {
 	 * @param $sign
 	 */
 	function getSignType($sign) {
-		$portalPages = $this->getOtherPortalPages();
-		if (isset($portalPages[$sign])) {
-			return 'other';
+		static $channels = array();
+		if (!$channels) {
+			$channelService = L::loadClass('channelService', 'area');
+			$channels = $channelService->getChannels();
 		}
-		return 'channel';
+		if (isset($channels[$sign])) {
+			return 'channel';
+		}
+		return 'other';
 	}
 	/**
 	 * 获取有效的channelid用于前台操作
@@ -115,8 +119,8 @@ class PW_PortalPageService {
 
 	function getPageInvokesForSelect($sign, $ifverify = 0,$ifHTML=0) {
 		$signType = $this->getSignType($sign);
-		$pageInvokeService = $this->_getPageInvokeService();
-		return $pageInvokeService->getPageInvokesForSelect($signType,$sign,$ifverify,$ifHTML);
+		$invokeService = L::loadClass('invokeservice', 'area');
+		return $invokeService->getPageInvokesForSelect($signType,$sign,$ifverify,$ifHTML);
 	}
 
 	function getPortalPages() {
@@ -138,6 +142,53 @@ class PW_PortalPageService {
 		}
 		return $portalPages;
 	}
+	/**
+	 * 向数据库添加一条数据
+	 * @param string $sign
+	 * @return array
+	 */
+	function getPortalPageInfo($sign) {
+		$portalPageDB = $this->_getPortalPageDB();
+		return $portalPageDB->getData($sign);
+	}
+	/**
+	 * 获取数据库中的页面存储数据
+	 * @return array
+	 */
+	function getPortalPagesFromDB() {
+		$portalPageDB = $this->_getPortalPageDB();
+		return $portalPageDB->getAll();
+	}
+	/**
+	 * 向数据表中添加一条数据
+	 * @param array $array
+	 * @return int | bool
+	 */
+	function addPortalPage($array) {
+		$array = $this->_cookPortalPageData($array);
+		if (!$array) return false;
+		$portalPageDB = $this->_getPortalPageDB();
+		return $portalPageDB->add($array);
+	}
+	
+	function deletePortalPage($sign) {
+		$portalPageDB = $this->_getPortalPageDB();
+		$portalPageDB->deleteBySign($sign);
+		
+		$invokeService = L::loadClass('invokeservice', 'area');
+		$pageInvokes = $invokeService->getPortalPageInvokes($sign);
+		foreach ($pageInvokes as $invoke) {
+			$invokeService->deleteInvoke($invoke['name']);
+		}
+	}
+	
+	function _cookPortalPageData($array) {
+		$temp = array();
+		if (!$array['sign'] || !$array['title']) return array();
+		$temp['sign'] = $array['sign'];
+		$temp['title'] = $array['title'];
+		return $temp;
+	}
 
 	function _getOtherPortalPages() {
 		global $db_modes;
@@ -150,6 +201,10 @@ class PW_PortalPageService {
 			if (!file_exists($portalPagesFile)) continue;
 			$pages = include ($portalPagesFile);
 			$result = array_merge($result,$pages);
+		}
+		$portalPagesFromDB = $this->getPortalPagesFromDB();
+		foreach ($portalPagesFromDB as $value) {
+			$result[$value['sign']] = $value['title'];
 		}
 		return $result;
 	}
@@ -166,11 +221,11 @@ class PW_PortalPageService {
 	function _getOtherPageInvokes($ifverify=0,$ifHTML = 0) {
 		$portalPages = $this->getOtherPortalPages();
 
-		$pageInvokeService = L::loadClass('pageinvokeservice', 'area');
+		$invokeService = L::loadClass('invokeservice', 'area');
 
 		$result = array();
 		foreach ($portalPages as $key=>$val) {
-			$temp = $pageInvokeService->getPortalInvokesForSelect($key,$ifverify,$ifHTML);
+			$temp = $invokeService->getPortalInvokesForSelect($key,$ifverify,$ifHTML);
 			if (!$temp) continue;
 			$result[$key]['name']=$val;
 			$result[$key]['invokes']= $this->_cookInvokes($temp);
@@ -183,11 +238,11 @@ class PW_PortalPageService {
 		$channels_info_array = array();
 		$channelService = $this->_getChannelService();
 		$channels_info=$channelService->getChannels();
-		$pageInvokeService = L::loadClass('pageinvokeservice', 'area');
+		$invokeService = L::loadClass('invokeservice', 'area');
 		if (!$channels_info) return $channels_info_array;
 
 		foreach ($channels_info as $val) {
-			$temp = $pageInvokeService->getChannelInvokesForSelect($val['alias'],$ifverify,$ifHTML);
+			$temp = $invokeService->getChannelInvokesForSelect($val['alias'],$ifverify,$ifHTML);
 			if (!$temp) continue;
 			$channels_info_array[$val['id']]['name']=$val['name'];
 			$channels_info_array[$val['id']]['invokes']= $this->_cookInvokes($temp);
@@ -208,11 +263,11 @@ class PW_PortalPageService {
 		return $temp;
 	}
 
-	function _getPageInvokeService() {
-		return L::loadClass('pageinvokeservice','area');
-	}
-
 	function _getChannelService() {
 		return L::loadClass('channelservice','area');
+	}
+	
+	function _getPortalPageDB() {
+		return L::loadDB('portalpage','area');
 	}
 }

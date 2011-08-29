@@ -1331,6 +1331,22 @@ class PW_Message {
 		$classes[$class] = new $class();
 		return $classes[$class];
 	}
-
+	
+	function matchTidByConetnt($content) {
+		if (strrpos($content,'read.php?tid=') === false) return false;
+		preg_match_all('/read.php\?tid=(.*)\]/U', $content, $matches);
+		$tid = intval($matches[1][0]);
+		return $tid ? $tid : false;
+	}
+	
+	function countAllByUserId($userId) {
+		$userId = intval($userId);
+		if ($userId < 1) return array();
+		$relationsDb = L::loadDB('ms_relations', 'message');
+		foreach ($relationsDb->countAllByUserId($userId) as $k=>$v) {
+			$result[$k] = $v['total'];
+		}
+		return $result;
+	}
 }
 

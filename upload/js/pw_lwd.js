@@ -5,7 +5,7 @@ function sendurl(obj,type,id,e,urlprefix) {
 		type = '1';
 		temptype = '16';
 	}
-	if (!(db_ajax & type) || typeof e != 'undefined' && e.ctrlKey) {
+	if (!(db_ajax & type) || e && e.ctrlKey) {
 		return true;
 	}
 	if(temptype == '16'){
@@ -22,13 +22,18 @@ function sendurl(obj,type,id,e,urlprefix) {
 			var str = href.split('-');
 			for (i=0; i<str.length; i++) {
 				url += str[i] + '=' + str[++i] + '&';
+				
 			}
 		} else {
 			url += href.substr(href.indexOf('?')+1);
 		}
-		if (typeof id == 'undefined' || id == '') id = obj.id;
-		if (typeof urlprefix != 'undefined') url = urlprefix + url;
-		sendmsg(url,'',id);
+		id = id || obj.id;
+		if (urlprefix){url = urlprefix + url;}
+		if (type == 4) {
+			sendmsg(url, 'objid=' + id,  id);
+		} else {
+			sendmsg(url, '', id);
+		}
 		return false;
 	} catch(e){
 		return true;
@@ -118,15 +123,74 @@ function copyUrl(o) {
 		prompt('按下 Ctrl+C 复制到剪贴板', copyurl+o)
 	}
 }
-function postreply(txt) {
-	if (typeof document.FORM != "undefined") {
-		document.FORM.atc_title.value = txt;
-		if (txt.match(/\((.+?)\)/ig)) {
-			if (document.FORM.replytouser) document.FORM.replytouser.value = RegExp.$1;
+function postreply(txt) {//回复弹出编辑器
+	clearEditorDialog();
+	read.guide();
+	var url="";
+	if(typeof pw_baseurl!="undefined"){
+		url=pw_baseurl+"/";
+	}
+	setTimeout(function(){ajax.send(url+'pw_ajax.php?action=quickpost&tid=' + tid + '&fid=' + fid,'',function(){
+
+		if (ajax.request.responseText != null && ajax.request.responseText.indexOf('popTop') != -1) {
+			read.setMenu(this.runscript(ajax.request.responseText), '');
+			read.menupz(read.obj);
+		} else {
+			closep();
+			ajax.guide();
 		}
-		document.FORM.atc_content.focus();
-	} else {
-		window.location = 'post.php?action=reply&fid='+fid+'&tid='+tid;
+		
+		if(!document.quickpostForm){return;}
+		var pwbox = getPWBox();
+		if(!is_ie6){//非IE6使用固定定位，IE6处理固定影响性能，所以放弃
+			 var st = pwbox.style;
+			 st.position = 'fixed';
+			 var dd=document.documentElement;
+			 var ch=dd.clientHeight;
+			 var oh=pwbox.offsetHeight;
+			 st.top=(ch-oh)/2+'px';
+		}
+		var box = getObj('qk_editor');
+		document.quickpostForm.setAttribute('action',document.FORM.getAttribute('action'));//复制底部FORM的action的hidden表单
+		getObj('quickpostHiddens').innerHTML = getObj('formHiddens').innerHTML;
+		box.onclick = function(e){
+			var e = e || window.event;
+			var o = e.srcElement || e.target;
+			if (hasClass(o,'gotoedit')) {return;}
+			var s = hasClass(o, 'B_do') ? o.parentNode : (hasClass(o, 'B_do1') ? o : null);
+			if(!box.getAttribute('data-loaded')){
+				loadjs(url+'js/breeze/core/base.js', '', '', function() {
+					B.require('editor.editor', 'editor.ubb', function(B){
+						B.editor(B.$('#quickpostArea'), 'edit_toolbar', 'boldIcon foreColor linkIcon faceBtn',{'currentMode' : 'UBB'});
+						box.setAttribute('data-loaded','1');//set loaded
+						if(s){
+							B.trigger(s,'mousedown');
+						}
+					});
+				});
+			}else{
+				if(s){
+					B.trigger(s,'mousedown');
+				}
+			}
+		};
+		if (txt.match(/\((.+?)\)/ig)) {
+			if (document.quickpostForm.replytouser) document.quickpostForm.replytouser.value = RegExp.$1;
+		}
+		document.quickpostForm.atc_title.value = txt;
+		document.quickpostForm.onsubmit = function(e){
+			checkpost(document.quickpostForm);
+			return false;
+			
+		}
+	});},100);
+	return false;
+}
+function clearEditorDialog(){
+	closep();
+	var elems=getElementsByClassName("B_menu");
+	for(var i=0,len=elems.length;i<len;i++){
+		elems[i].style.display="none";
 	}
 }
 function dig() {
@@ -166,8 +230,8 @@ function fontsize(text,id){
 
 if (typeof totalpage != 'undefined' && totalpage > 1) {
 	document.onkeydown = function(e) {
-		var e = is_ie ? window.event : e;
-		var tagname = is_ie ? e.srcElement.tagName : e.target.tagName;
+		var e = window.event || e;
+		var tagname = e.srcElement.tagName || e.target.tagName;
 		if (tagname == 'INPUT' || tagname == 'TEXTAREA') {
 			return;
 		}
@@ -290,13 +354,15 @@ function checkUrl(obj) {
 }
 
 function getFloorUrl(obj) {
-	var uid = getObj("hideUid").value;
-	var tid = getObj("tid").value;
-	var url = "job.php?action=tofloor&floor=" + obj.value + "&tid=" + tid;
-	if (uid > 0) {
-		url += "&uid=" + uid;
+	if(parseInt(obj.value) > 0){
+		var uid = getObj("hideUid").value;
+		var tid = getObj("tid").value;
+		var url = "job.php?action=tofloor&floor=" + obj.value + "&tid=" + tid;
+		if (uid > 0) {
+			url += "&uid=" + uid;
+		}
+		window.location = url;
 	}
-	window.location = url;
 }
 
 function viewIp(o) {
@@ -344,8 +410,9 @@ var loadFloor = {
 			if (rText == 'fail') return;
 			var tmpNode = document.createElement('div');
 			tmpNode.innerHTML = rText;
-			if (tmpNode.childNodes.length > 0) {
-				for (var i = 0; i < tmpNode.childNodes.length; i++) {
+			var len = tmpNode.childNodes.length;
+			if (len > 0) {
+				for (var i = 0; i < len; i++) {
 					var o = tmpNode.childNodes[i];
 					if (o.nodeType == 1 && o.id && o.id.substr(0,10) == 'readfloor_') {
 						for (var j = 0; j < o.childNodes.length; j++) {

@@ -45,26 +45,26 @@ if(empty($action)){print <<<EOT
 <tr class="tr3 trbor vt">
 <td width="33%">
 <p class="mb10"><b>会员统计</b></p>
-<p class="mb10">会员总数:$bbsinfo[totalmember]</p>
+<p class="mb5">会员总数:$bbsinfo[totalmember]</p>
 <p>最新注册会员:<a href="u.php?username=$bbsinfo[newmember]" target="_blank">$bbsinfo[newmember]</a></p>
 </td>
 
 <td width="33%" valign="top">
 <p class="mb10"><b>帖子统计</b></p>
-<p class="mb10">主题数:$topic</p>
-<p class="mb10">帖子数:$article</p>
-<p class="mb10">今 日:$tposts</p>
-<p class="mb10">昨 日:$bbsinfo[yposts]</p>
-<p class="mb10">最高日:$bbsinfo[hposts]</p>
+<p class="mb5">主题数:$topic</p>
+<p class="mb5">帖子数:$article</p>
+<p class="mb5">今 日:$tposts</p>
+<p class="mb5">昨 日:$bbsinfo[yposts]</p>
+<p class="mb5">最高日:$bbsinfo[hposts]</p>
 </td>
 
 <td width="33%" valign="top">
 <p class="mb10"><b>在线统计</b></p>
-<p class="mb10">在线总数:$usertotal</p>
-<p class="mb10">会员数:$userinbbs</p>
-<p class="mb10">游客数:$guestinbbs</p>
-<p class="mb10">最高在线:$bbsinfo[higholnum]</p>
-<p class="mb10">发生在:$bbsinfo[higholtime]</p></td></tr></table></div>
+<p class="mb5">在线总数:$usertotal</p>
+<p class="mb5">会员数:$userinbbs</p>
+<p class="mb5">游客数:$guestinbbs</p>
+<p class="mb5">最高在线:$bbsinfo[higholnum]</p>
+<p class="mb5">发生在:$bbsinfo[higholtime]</p></td></tr></table></div>
 <!--
 EOT;
 }elseif($action=='ipstate'){print <<<EOT

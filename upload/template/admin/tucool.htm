@@ -66,12 +66,12 @@ print <<<EOT
                     <span>共需处理 $totalNums 条数据，已处理 $haveBuild 条！<span>
                     </td>
                 </tr>
-<script language="JavaScript"> 
+<script type="text/javascript"> 
 
 function process(width) {
 	var haveBuild = {$haveBuild};
 	var totalNums = {$totalNums};
-	if (haveBuild < totalNums) var refresh = setTimeout("document.location='{$jumpUrl}';", 1000);
+	if (haveBuild <= totalNums) var refresh = setTimeout("document.location='{$jumpUrl}';", 1000);
 	getObj('progress').style.width = width;
 	
 }

@@ -84,6 +84,7 @@ class PW_DiarySource extends SystemData {
 		global $db_bbsurl;
 		if($data['uid']){
 			$userService = L::loadClass('userService', 'user');
+			$data['authorid'] = $data['uid'];
 			$data['author'] = $userService->getUserNameByUserId($data['uid']);
 			$data['authorurl'] = 'u.php?uid='.$data['uid'];
 		}else{

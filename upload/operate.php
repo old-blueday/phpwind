@@ -102,7 +102,7 @@ if ($action == 'showping') {
 				echo "success\t{$pingLog}";
 				ajax_footer();
 			} else {
-				refreshto("read.php?tid=$tid&displayMode=1&page=$page#$jump_pid",'operate_success');
+				refreshto("read.php?tid=$tid&ds=1&page=$page#$jump_pid",'operate_success');
 			}
 		} else {
 			showmsg($return);
@@ -122,7 +122,7 @@ if ($action == 'showping') {
 				echo "success\t{$pingLog}\tcancel";
 				ajax_footer();
 			} else {
-				refreshto("read.php?tid=$tid&displayMode=1&page=$page#$jump_pid",'operate_success');
+				refreshto("read.php?tid=$tid&ds=1&page=$page#$jump_pid",'operate_success');
 			}
 		} else {
 			showmsg($return);
@@ -231,7 +231,7 @@ if ($action == 'showping') {
 				$StaticPage->update($tid);
 			}
 		}
-		refreshto("read.php?tid=$tid&displayMode=1&page=$page#$jump_pid",'operate_success');
+		refreshto("read.php?tid=$tid&ds=1&page=$page#$jump_pid",'operate_success');
 	}
 } elseif ($action == 'remind') {
 
@@ -340,7 +340,7 @@ if ($action == 'showping') {
 				}
 			}
 		}
-		refreshto("read.php?tid=$tid&displayMode=1&page=$page#$jump_pid",'operate_success');
+		refreshto("read.php?tid=$tid&ds=1&page=$page#$jump_pid",'operate_success');
 	}
 } elseif ($action == 'toweibo') {
 
@@ -425,9 +425,13 @@ if ($action == 'showping') {
 		if (defined('AJAX')) {
 			Showmsg('report_success');
 		} else {
-			refreshto("read.php?tid=$tid&displayMode=1&page=$page",'report_success');
+			refreshto("read.php?tid=$tid&ds=1&page=$page",'report_success');
 		}
 	}
+} elseif ($action == 'commentsPic') {
+	S::gp(array('tid','aid'));
+	require_once PrintEot('ajax_operate');ajax_footer();
+
 } else {
 	Showmsg('undefined_action');
 }

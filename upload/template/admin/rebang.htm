@@ -9,7 +9,6 @@ print <<<EOT
     		<li>如果希望某用户拥有论坛推送模块的前台管理权限，请先在<a href="javascript:;" onclick="parent.PW.Dialog({id:'area_level_manage',url:'$admin_file?adminjob=mode&admintype=area_level_manage',name:'权限管理'});">权限管理</a>分配权限</li>
     	</ol>
     </div>
-</div>
 <!--
 EOT;
 if($action=='rebang'){
@@ -122,7 +121,7 @@ EOT;
   </div>
 </form>
 </div>
-<script language="JavaScript">
+<script type="text/javascript">
 var ip=1000;
 
 function setname(id,text){
@@ -251,7 +250,7 @@ EOT;
     </table>
     </div>
     </div>
-    <script language="JavaScript">
+    <script type="text/javascript">
 function seltype(show){
 	document.getElementById('custom').style.display = show == '1' ? '' : 'none';
 }

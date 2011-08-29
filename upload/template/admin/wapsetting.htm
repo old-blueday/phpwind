@@ -1,0 +1,244 @@
+<!--<?php
+include_once PrintEot('left');
+if(empty($action) || $action=='cpush'){
+print <<<EOT
+-->
+<script type="text/javascript">
+function ifcheck(name){
+	var obj = document.getElementsByName(name);
+	for(var i=0;i<obj.length;i++){
+		if(obj[i].checked){
+			return confirm('确认要进行此操作吗？')
+		}
+	}
+	alert("请选择要进行操作的项");
+	return false;
+}
+</script>
+<div class="nav3 mb10">
+<ul id="basictype" class="cc">
+	<li  class="current"><a style="cursor:pointer" href="$basename&action=cpush">内容推荐</a></li>
+	<li><a style="cursor:pointer"  href="$basename&action=pushtype">分类管理</a></li>
+</ul>
+</div>
+<!--
+EOT;
+if($step=='2'){
+$_tid = $tid ? $tid : "输入tid";
+print <<<EOT
+-->
+<div class="c"></div>
+<h2 class="h1">添加内容推荐</h2>
+<form action="$basename&action=$action" method="post">
+<input type="hidden" value="3" name="step"/>
+<input type="hidden" value="$threadb[tid]" name="tid"/>
+<input type="hidden" value="$pushdb[id]" name="id"/>
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+<!-- tr class="tr3">
+	<td colspan="2">可以直接输入外部链接，或通过输入帖子tid获取帖子地址</td>
+</tr -->
+<tr class="tr1 vt">
+	<td class="td1">帖子tid：</td>
+	<td class="td2"><input type="text" size="10" class="input gray input_wc" name="tid" value="$_tid" id="ftid" onclick="this.value='';"/><span class="bt2"><span><button onfocus="blur();" type="button" onclick="getThreadInfo();">导入帖子信息</button></span></span></td>
+</tr>
+<tr class="tr1 vt">
+	<td class="td1">链接地址：</td>
+	<td class="td2"><input type="text" class="input input_wa" value="$pushlink" name="link" size="30"/></td>
+</tr>
+<tr class="tr1 vt">
+	<td class="td1">标题：</td>
+	<td class="td2"><input type="text" class="input input_wa" value="$subject" name="subject" size="70"/> </td>
+</tr>
+<tr class="tr1 vt">
+	<td class="td1">分类：</td>
+	<td class="td2"><select name="pushtype" class="select_wa">
+<!--
+EOT;
+foreach($pushTypes as $type){
+$selected = $type[id] == $pushdb[typeid] ? 'selected' : '';
+print <<<EOT
+-->
+			<option value="$type[id]" $selected>$type[typename]</option>
+<!--
+EOT;
+}print <<<EOT
+-->
+		</select>
+	</td>
+</tr>
+</table>	
+</div>
+<div class="tac mb10"><span class="btn"><span><button type="submit">提 交</button></span></span></div>
+</form>
+<script type="text/javascript">
+function getThreadInfo(url){
+	var th = getObj('ftid').value;
+	location.href = '$basename&step=2&tid=' + th;
+}
+</script>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+<div class="c"></div>
+<h3 class="h1">搜索内容</h3>
+<div class="admin_table mb10">
+<form action="$basename&action=cpush" method="post">
+<table width="100%" cellspacing="0" cellpadding="0">
+<tr class="tr3">
+	<td width="30%">标题：<input type="text" class="input" name="subject" value="$subject"/> </td>
+	<td width="30%">分类：
+		<select name="pushtype">
+			<option value=""></option>
+<!--
+EOT;
+foreach($pushTypes as $type){
+$selected = $pushtype == $type[id] ? 'selected' : '';
+print <<<EOT
+-->
+			<option value="$type[id]" $selected>$type[typename]</option>
+<!--
+EOT;
+}print <<<EOT
+-->
+		</select></td>
+	<td><span class="bt2"><span><button value="搜 索" type="submit">搜 索</button></span></span></td>
+</tr>
+</table>
+</form>
+</div>
+<h2 class="h1"><span class="fl mr10">推荐列表</span><a hidefocus="true" href="$basename&step=2" class="btn_add fl"><i>添加推荐</i></a></h2>
+<form name="listform" action="$basename&" method="post">
+<input type="hidden" value="4" name="step"/>
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+<tr class="tr2">
+	<td width="5%"><a style="cursor: pointer;" onclick="CheckAll(document.listform)">全选</a></td>
+	<td width="25%">标题</td> 
+	<td width="40%">链接地址</td>
+	<td width="10%">所属分类</td>
+	<td>操作</td>
+</tr>
+<!--
+EOT;
+if($pushdbs){
+foreach($pushdbs as $pushdb){
+print <<<EOT
+-->
+<tr class="tr1 vt">
+	<td class="td2"><input type="checkbox" value="$pushdb[id]" name="pushid[]"/></td>
+	<td class="td2">$pushdb[subject]</td>
+	<td class="td2">$pushdb[link]</td>
+	<td class="td2">$pushdb[typename]</td>
+	<td class="td2"><a class="fourm-two" href="$basename&id=$pushdb[id]&step=2">[编辑]</a>
+		<a  class="fourm-two" onclick="if(!confirm('您确认要删除该推荐吗?'))return false;" href="$basename&action=$action&pushid=$pushdb[id]&subaction=del&step=4">[删除]</a></td>
+</tr>
+<!--
+EOT;
+}}else{print <<<EOT
+-->
+<tr>
+   <td colspan="5"><div class="admin_tips">啊哦，没有你要的信息！</div></td>
+
+</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+</table>
+</div>
+<br>
+<div class="cc mb10">$pages</div>
+<div class="tac mb10">
+<p class="mb10"><span>选中操作：</span><label><input value="move" name="subaction" type="radio" checked/>移动到</label>
+		<select name="pushtype">
+<!--
+EOT;
+foreach($pushTypes as $type){
+if($type['state']){
+print <<<EOT
+-->
+			<option value="$type[id]">$type[typename]</option>
+<!--
+EOT;
+}}print <<<EOT
+-->
+		</select>
+		&nbsp;<label><input value="del" name="subaction" type="radio" />删除</label>
+</p>
+<p>
+<span class="bt"><span><button onclick="CheckAll(this.form)" type="button">全 选</button></span></span>
+<span class="btn"><span><button onclick="return ifcheck('pushid[]')" type="submit">提 交</button></span></span>
+</p>
+</div>
+</form>
+<!--
+EOT;
+}}elseif($action == 'pushtype'){
+print <<<EOT
+-->
+<div class="nav3 mb10">
+	<ul id="basictype" class="cc">
+		<li><a style="cursor:pointer"  href="$basename&action=cpush">内容推荐</a></li>
+		<li class="current"><a style="cursor:pointer"  href="$basename&action=pushtype">分类管理</a></li>
+	</ul>
+</div>
+<div class="c"></div>
+<h3 class="h1"><span class="fl mr10">分类管理</span><a class="btn_add fl" href="javascript:;" onclick="adds();"><i>添加分类</i></a></h3>
+<form action="$basename&action=$action" name="form1" method="post">
+<input type="hidden" name="step" value="2"/>
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+	<tbody id="smode" style="display: none"><tr class="tr1 vt"><td class="td2 tac" width="8%"><input type="checkbox" name="states[new][]" value="1" checked /></td><td class="td2" width="10%"><input type="text" class="input input_wc" size="4" name="order[new][]" /></td><td class="td2"><input type="text" class="input input_wa" value="" name="typename[new][]"/></td><td class="td2"><a href="javascript:;" onclick="dels(this);"  class="fourm-two"><span class="del"></span></a></td></tr></tbody>
+	<tr class="tr2"><td class="tac">启用</td><td>顺序</td><td>分类名称</td><td></td></tr> 
+<!--
+EOT;
+if(is_array($pushTypes)){
+foreach($pushTypes as $type){
+$checked = $type['state'] ? 'checked' : '';
+print <<<EOT
+-->
+	<tr class="tr1 vt">
+		<td class="td2 tac" width="8%"><input type="checkbox" name="states[$type[id]]" value="1" $checked/></td>
+		<td class="td2" width="10%"><input type="text" class="input input_wc" size="4" name="order[$type[id]]" value="$type[sort]" /></td>
+		<td class="td2"><input type="text" class="input input_wa" value="$type[typename]" name="typename[$type[id]]"/></td>
+		<td class="td2"><a href="$basename&id=$type[id]&step=3" onclick="if(!confirm('您确认要删除该分类吗?'))return false;"  class="fourm-two">[删除]</a></td>
+	</tr>
+<!--
+EOT;
+}}print <<<EOT
+-->
+	<tbody id="sbody"></tbody>
+</table>
+</div>
+<div class="tac mb10">$pages</div>
+<div class="tac mb10">
+	<p><span class="bt"><span><button type="button" onclick="CheckAll(this.form)">全 选</button></span></span>
+	<span class="btn"><span><button type="submit" >提 交</button></span></span></p>
+</div>
+</form>
+<!--
+EOT;
+}print <<<EOT
+-->
+<script type="text/javascript">
+var index = 0;
+function adds() {
+	var s = getObj('smode').firstChild.cloneNode(true);
+	var inputs = s.getElementsByTagName("input"); 
+	inputs[0].name = 'states[new]['+index+']';
+	inputs[1].name = 'order[new]['+index+']';
+	inputs[2].name = 'typename[new]['+index+']';
+	index++;
+	getObj('sbody').appendChild(s);
+}
+function dels(obj) {
+	var o = obj.parentNode.parentNode;
+	o.parentNode.removeChild(o);
+}
+</script>
+<!--
+EOT;
+include_once PrintEot('adminbottom');
+?>-->

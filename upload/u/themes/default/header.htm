@@ -9,31 +9,24 @@ print<<<EOT
 <meta name="generator" content="phpwind $wind_version" />
 <meta name="description" content="$metaDescription" />
 <meta name="keywords" content="$metaKeywords" />
-<!--[if IE 9 ]>
-<meta name="msapplication-task" content="name=网站首页; action-uri=$db_bbsurl; icon-uri=$db_bbsurl/favicon.ico" />
-<meta name="msapplication-task" content="name=个人中心; action-uri=$db_bbsurl/u.php; icon-uri=$db_bbsurl/images/ico/home.ico" />
-<meta name="msapplication-task" content="name=我的帖子; action-uri=$db_bbsurl/apps.php?q=article; icon-uri=$db_bbsurl/images/ico/post.ico" />
-<meta name="msapplication-task" content="name=消息中心; action-uri=$db_bbsurl/message.php; icon-uri=$db_bbsurl/images/ico/mail.ico" />
-<meta name="msapplication-task" content="name=我的设置; action-uri=$db_bbsurl/profile.php; icon-uri=$db_bbsurl/images/ico/edit.ico" />
-<![endif]-->
-<base id="headbase" href="$db_bbsurl/" />
-<link rel="stylesheet" href="images/pw_core.css?101128" />
-<link rel="stylesheet" href="u/images/style.css" />
-<link rel="stylesheet" href="images/post/minieitor/minieitor.css" />
+<base id="headbase" href="$_mainUrl/" />
+<link rel="stylesheet" href="images/pw_core.css?{$GLOBALS['wind_repair']}" />
+<link rel="stylesheet" href="u/images/style.css?{$GLOBALS['wind_repair']}" />
+<link rel="stylesheet" href="images/post/minieitor/minieitor.css?{$GLOBALS['wind_repair']}" />
 <!--
 EOT;
 require_once(uTemplate::printEot('css'));
 if ($USCR == 'space_index') {print <<<EOT
 -->
-<link rel="stylesheet" href="u/images/usercenter.css" />
+<link rel="stylesheet" href="u/images/usercenter.css?{$GLOBALS['wind_repair']}" />
 <!--
 EOT;
 }print <<<EOT
 -->
-<script type="text/javascript" language="JavaScript" src="js/pw_ajax.js"></script>
-<script type="text/javascript" LANGUAGE="JavaScript" src="js/core/core.js"></script>
-<script type="text/javascript" LANGUAGE="JavaScript" src="js/core/tab.js"></script>
-<script language="JavaScript">
+<script type="text/javascript" src="js/core/core.js"></script>
+<script type="text/javascript" src="js/pw_ajax.js"></script>
+<script type="text/javascript" src="js/core/tab.js"></script>
+<script>
 var imgpath = '$imgpath';
 var verifyhash = '$verifyhash';
 var winduid = '$winduid';
@@ -60,13 +53,77 @@ function resizeImg(ele){
 		}
 }
 </script>
+<!--
+EOT;
+if ($winddb['bubble']) {
+$userBubbleInfo = pwJsonEncode(unserialize($winddb['bubble']));
+print <<<EOT
+-->
+<script type="text/javascript">
+var userBubbleInfo = $userBubbleInfo;
+</script>
+<!--
+EOT;
+}print <<<EOT
+-->
+<!--[if IE 9 ]>
+<meta name="msapplication-task" content="name=网站首页; action-uri=$db_bbsurl; icon-uri=favicon.ico" />
+<meta name="msapplication-task" content="name=个人中心; action-uri=u.php; icon-uri=images/ico/home.ico" />
+<meta name="msapplication-task" content="name=我的帖子; action-uri=apps.php?q=article; icon-uri=images/ico/post.ico" />
+<meta name="msapplication-task" content="name=消息中心; action-uri=message.php; icon-uri=images/ico/mail.ico" />
+<meta name="msapplication-task" content="name=我的设置; action-uri=profile.php; icon-uri=images/ico/edit.ico" />
+<![endif]-->
 </head>
 <body>
+<!--
+EOT;
+$hasNewMessage = $winddb['newpm'] || $winddb['newreferto'] || $winddb['newnotice'] || $winddb['newrequest'] || $winddb['newfans'];
+if($winduid && $hasNewMessage){print <<<EOT
+-->
+<div id="pw_all_tip" style="display:none;">
+<table><tr><td>
+<div class="pw_all_tip">
+	<a href="javascript:void(0)" class="adel" id="pw_all_tclose">关闭</a>
+<!--
+EOT;
+	if($winddb['newpm']){print <<<EOT
+-->
+	<p>{$winddb['newpm']}条新站内信，<a href="message.php?type=sms">查看站内信</a></p>
+<!--
+EOT;
+}if($winddb['newreferto']){print <<<EOT
+-->
+	<p>{$winddb['newreferto']}条信息提到我，<a href="apps.php?q=weibo&do=refer">查看@我</a></p>
+<!--
+EOT;
+}if($winddb['newnotice']){print <<<EOT
+-->
+	<p>{$winddb['newnotice']}个新通知，<a href="message.php?type=notice">查看新通知</a></p>
+<!--
+EOT;
+}if($winddb['newfans']){print <<<EOT
+-->
+	<p>{$winddb['newfans']}个新关注，<a href="u.php?a=friend&type=attentioned">查看新关注</a></p>
+<!--
+EOT;
+}if($winddb['newrequest']){print <<<EOT
+-->
+	<p>{$winddb['newrequest']}个新请求，<a href="message.php?type=request">查看新请求</a></p>
+<!--
+EOT;
+}print <<<EOT
+-->
+</div></td></tr></table></div>
+<!--
+EOT;
+}
+print <<<EOT
+-->
 <div class="warp">
 	<div class="header">
 	<div class="topbar">
 		<div class="topwarp cc">
-			<a href="index.php" class="logo"><img src="u/themes/$uskin/images/$uskin_logo" width="116" height="31" title="$o_sitename" /></a>
+			<a href="index.php" class="logo"><img src="u/images/logo.png" width="116" height="31" title="$o_sitename" /></a>
 			<div class="fl mr10">
 <!--
 EOT;
@@ -137,11 +194,7 @@ EOT;
 				<button type="submit">搜索</button>
 			</form>
 			</div>
-<script>
-
-if(is_webkit && getObj('bookmarkExplore')){
-	getObj('bookmarkExplore').parentNode.removeChild(getObj('bookmarkExplore'));
-}
+<script type="text/javascript">
 var timeoutSpecifier = null;
 function hideSubMenu(subMenuId) {
 	timeoutSpecifier = setTimeout(function() {
@@ -189,11 +242,17 @@ function selectSearchType() {
 	}
 }
 
-bindSearchTypes();
-getObj('submitSearch').onmouseover = function() {
-	selectSearchType();
-	ctrlSubMenu('submitSearch', 'searchTypeSelect');
-};
+
+onReady(function(){
+		if(is_webkit && getObj('bookmarkExplore')){
+			getObj('bookmarkExplore').parentNode.removeChild(getObj('bookmarkExplore'));
+		}
+		bindSearchTypes();
+		getObj('submitSearch').onmouseover = function() {
+			selectSearchType();
+			ctrlSubMenu('submitSearch', 'searchTypeSelect');
+		};
+})
 //getObj('submitSearch').onclick = function() {getObj('searchForm').submit();};
 </script>
 			<div class="fr">
@@ -204,7 +263,7 @@ $db_menuinit .= ",'td_userinfomore' : 'menu_userinfomore'";
 print <<<EOT
 -->
 				<a id="td_userinfomore" href="u.php" class="b link_down"><span>$windid</span></a>
-<script language="JavaScript">
+<script>
 var td_userinfomore = {
 	pz : 21,
 	open : function() {
@@ -218,26 +277,10 @@ var td_userinfomore = {
 }
 </script>
 				<a href="$loginouturl" class="mr10">退出</a><i>&nbsp;</i>
-<!--
-EOT;
-if($winddb['newpm']>0 && $_G['maxmsg']>=0){
-$tmpMsgNum = 0;
-$tmpMsgNum += $winddb['newpm'];
-$winddb['newreferto']>0 && $tmpMsgNum += $winddb['newreferto'];
-$winddb['newcomment']>0 && $tmpMsgNum += $winddb['newcomment'];
-$winddb['newfans']>0 && $tmpMsgNum += $winddb['newfans'];
-print <<<EOT
--->
-				<a href="message.php" class="newmes">消息<span class="s2">($tmpMsgNum)</span></a>
-<!--
-EOT;
-	}else{print <<<EOT
--->
 				<a href="message.php">消息</a>
 <!--
 EOT;
-	}
-	$db_menuinit .= ",'td_profile' : 'menu_profile'";
+$db_menuinit .= ",'td_profile' : 'menu_profile'";
 print <<<EOT
 -->
 				<a id="td_profile" href="profile.php" class="mr10 link_down"><span>设置</span></a><i>&nbsp;</i>
@@ -321,7 +364,7 @@ EOT;
 		</div>
 		</div>
 	</div>
-<script language="javascript">
+<script>
 /*
 EOT;
 if ($space['uid'] == $winduid) {print <<<EOT
@@ -390,47 +433,6 @@ print <<<EOT
 -->
 				$headtitle
 		</div>
-<!--
-EOT;
-if (!isset($_COOKIE['message_remind']) && ($winddb['newpm']>0||$winddb['newreferto']>0||$winddb['newfans']>0||$winddb['newcomment']>0)) {
-print <<<EOT
--->
-		<div class="fl p15" id="message_remind">
-			<div class="cc spaceTip fl">
-				<span class="fl">
-<!--
-EOT;
-$extraSplit = '';
-if ($winddb['newpm']>0) {print <<<EOT
--->
-					{$extraSplit}<a href="message.php"><span class="s6">有<span class="s2 b">$winddb[newpm]</span>条新消息</span></a>
-<!--
-EOT;
-$extraSplit = '，';
-}if ($winddb['newreferto']>0 || $winddb['newcomment']>0) {
-$tmpNum = $winddb['newreferto'] + $winddb['newcomment'];
-$tmpAction = ($winddb['newcomment'] > $winddb['newreferto']) ? 'receive' : 'refer';
-print <<<EOT
--->
-					{$extraSplit}<a href="apps.php?q=weibo&do=$tmpAction"><span class="s6">有<span class="s2 b">$tmpNum</span>人提到你</span></a>
-<!--
-EOT;
-$extraSplit = '，';
-}if ($winddb['newfans']>0) {print <<<EOT
--->
-					{$extraSplit}<a href="u.php?a=friend&type=attentioned"><span class="s6">有<span class="s2 b">$winddb[newfans]</span>人关注你</span></a>
-<!--
-EOT;
-}print <<<EOT
--->
-				</span>
-				<a href="javascript:;" class="adel" onClick="displayElement('message_remind',false);document.cookie='message_remind=1';return false;" style="float:left;">删除</a>
-			</div>
-		</div>
-<!--
-EOT;
-}print <<<EOT
--->
 	</div>
 <!--
 EOT;
@@ -462,8 +464,7 @@ EOT;
 EOT;
 if (getstatus($winddb['userstatus'],12)) {print <<<EOT
 -->
-	<base id="headbase" href="$db_bbsurl/" />
-	<script language="JavaScript" src="js/userbinding.js"></script>
+	<script type="text/javascript" src="js/userbinding.js"></script>
 <!--
 EOT;
 } print <<<EOT
@@ -501,7 +502,7 @@ EOT;
 EOT;
 }print <<<EOT
 --></span>
-<script language="JavaScript">
+<script>
 function changeState() {
 	var msg = ajax.request.responseText;
 	if (msg == 1){
@@ -626,7 +627,7 @@ print <<<EOT
 		</div>
 		</div>
 	</div>
-<script language="javascript">
+<script>
 /*
 EOT;
 if ($space['uid'] == $winduid) {print <<<EOT

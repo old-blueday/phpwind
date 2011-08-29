@@ -238,7 +238,12 @@ class PW_Topic{
 	 */
 	function getWeiboHotTopics(){
 		global $o_weibo_hottopicdays,$timestamp,$db;
-		$rt = $db->get_one("SELECT * FROM pw_cache WHERE name='weiboHotTopics_10'");
+		if (perf::checkMemcache()){
+			$_cacheService = Perf::gatherCache('pw_cache');
+			$rt =  $_cacheService->getCacheByName('weiboHotTopics_10');			
+		} else {
+			$rt = $db->get_one("SELECT * FROM pw_cache WHERE name='weiboHotTopics_10'");
+		}
 		$lastData = @unserialize($rt['cache']);
 		$weiboHotTopics = array();
 		if ($lastData && ($rt['time'] > $timestamp - 7200)) {
@@ -257,11 +262,21 @@ class PW_Topic{
 						$weiboHotTopics[$k]['change'] = 0;
 					}
 				}
+			/*	
 			$db->update("REPLACE INTO pw_cache SET " . S::sqlSingle(array(
 				'name'	=> 'weiboHotTopics_10',
 				'cache'	=> serialize($weiboHotTopics),
 				'time'	=> $timestamp
 			)));
+			*/
+			pwQuery::replace(
+				'pw_cache',
+				array(
+					'name'	=> 'weiboHotTopics_10',
+					'cache'	=> serialize($weiboHotTopics),
+					'time'	=> $timestamp
+				)
+			);
 		}
 		return $weiboHotTopics;
 	}

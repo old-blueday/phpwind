@@ -115,7 +115,7 @@ weibo_post.prototype = {
 	},
 	
 	shockWarning : function() {
-		var elementObj = $(this.content);
+		var elementObj = getObj(this.content);
 		var step = 4;
 		var itv = setInterval(function(){
 //			console.log(step);

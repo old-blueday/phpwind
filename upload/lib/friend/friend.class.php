@@ -584,7 +584,7 @@ class PW_Friend {
 		}
 
 		$attentionService = L::loadClass('attention', 'friend');
-		$attentionService->addFollow($uid, $touid);
+		$attentionService->addFollow($uid, $touid,20,'addFriend');
 		//$attentionService->addFollow($touid, $uid);
 
 		$userCache = L::loadClass('userCache', 'user');
