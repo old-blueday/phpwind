@@ -1,9 +1,11 @@
 <!--<?php print <<<EOT
 -->
 <!--main begin-->
-<div class="list_main list_main_no">
-	<div class="list_content">
-		<table width="100%" cellpadding="0" cellspacing="0" height="300"><tr><td valign="top">
+<div class="main cc sideClose">
+	<div class="grid_3 cc mb20">
+		<div class="cm">
+			<div class="cw cc">
+			<div class="main_min">
 		<div class="dlA">
 <!--
 EOT;
@@ -61,15 +63,15 @@ EOT;
 require printEOT('searcher_searchinput');
 print <<<EOT
 -->
-		</td></tr></table>
-	</div>
-<div class="list_sideBar">
+		</div></div></div>
+		<div class="sd">
+			<div class="sidebar">
 <!--
 EOT;
 if($hotwords){
 print <<<EOT
 -->     
-						<div class="list_box">
+						<div class="boxA">
 							<h2><a>热门搜索</a></h2>
 							<ul>
 <!-- 
@@ -91,8 +93,9 @@ EOT;
 }
 print <<<EOT
 -->
+		</div>
 	</div>
-	<div class="c"></div>
+	</div>
 </div>
 <!--
 EOT;

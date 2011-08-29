@@ -73,7 +73,8 @@ class PW_FilterUtil {
 
 	function loadWords() {
 		if (!is_array($this->fbwords)) {
-			include pwCache::getPath(D_P."data/bbscache/wordsfb.php");
+			//* include pwCache::getPath(D_P."data/bbscache/wordsfb.php");
+			extract(pwCache::getData(D_P."data/bbscache/wordsfb.php", false));
 			$this->fbwords	= (array)$wordsfb;
 			$this->replace	= (array)$replace;
 			$this->alarm	= (array)$alarm;
@@ -549,11 +550,14 @@ class Trie {
     function search($content, $dict_path) {
         if(empty($dict_path)) {
             $dict_path = $this->default_out_path;
+            $ifUpperCase = 1;
+        }else{
+        	$ifUpperCase = 0;
         }
         $words = $this->getBinaryDict($dict_path);
 		if ($words) {
 			$this->nodes = $words;
-			$matchs = $this->match($content);
+			$matchs = $this->match($ifUpperCase,$content);
 			return $matchs;
 		} else {
 			return false;
@@ -665,7 +669,8 @@ class Trie {
      * @param $s string 需要查找的文本
      * @return $ret array 查找到的关键词及权重
      */
-    function match($s) {
+    function match($ifUppCase,$s) {
+    	$ifUppCase == 1 && $s = strtolower($s);
         $isUTF8 = strtoupper(substr($GLOBALS['db_charset'],0,3)) === 'UTF' ? true : false;
         $ret = array();
         $cur = 0; //当前节点，初始为根节点
@@ -692,7 +697,7 @@ class Trie {
 				$i = $p; //把当前偏移设为回溯位置
             }
         }
-        return $ret;
+        return $ret;    
     }
 }
 

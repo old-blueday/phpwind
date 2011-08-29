@@ -8,6 +8,7 @@ $collectionService = L::loadClass('Collection', 'collection'); /* @var $collecti
 
 if ($a == 'del') {
 	S::gp(array('id'),'',2);
+	PostCheck();
 	if (!$id) Showmsg('undefined_action');
 	$collection = $collectionService->get($id);
 	!$collection && Showmsg('收藏不存在');
@@ -38,7 +39,7 @@ if ($a == 'del') {
 	$totalCollection = $collectionService->countByUid($winduid);
 	$totalCollection >= $_G['maxfavor'] && Showmsg('已达到用户组允许的收藏上限');
 	S::gp(array('id', 'type'));
-	!in_array($type,array('weibo','user','photo','album','group','groupactive','diary','topic','reply','cms','postfavor')) && Showmsg('undefined_action');
+	!in_array($type,array('weibo','user','photo','album','group','groupactive','diary','topic','reply','cms','postfavor','tucool')) && Showmsg('undefined_action');
 	!$id && Showmsg('data_error');
 
 	$collection = array();
@@ -92,7 +93,7 @@ if ($a == 'del') {
 				}				
 				if ($pids) {
 					foreach ($pids as $pid) {
-						updateDatanalyse($pid,'picFav',$timestamp);
+						updateDatanalyse($pid,'picFav',1);
 					}
 				}
 				$db->free_result($query);
@@ -106,7 +107,7 @@ if ($a == 'del') {
 			$collection['photo']['pintro']	= $photo['pintro'];
 			//$collection['photo']['username']	= $photo['uploader'];
 			$collection['photo']['image']	= getphotourl($photo['path'],$photo['ifthumb']);
-			updateDatanalyse($photo['pid'],'picFav',$timestamp);
+			updateDatanalyse($photo['pid'],'picFav',1);
 		}
 	} elseif ($type == 'group') {
 		$group 	= $db->get_one("SELECT id,cname,cnimg,admin FROM pw_colonys WHERE id=" . S::sqlEscape($id));
@@ -163,7 +164,20 @@ if ($a == 'del') {
 		$collection['lastpost'] = $favor['lastpost'];
 		$collection['link'] = $db_bbsurl.'/read.php?tid='.$id;
 		$collection['postfavor']['subject'] = $favor['subject'];
-	} 
+	} elseif ($type == 'tucool') {
+		$attachsService = L::loadClass('Attachs', 'forum');
+		$attach = $attachsService->getByAid($id);
+		!$attach && Showmsg('data_error');
+		$collection['type'] =  'tucool';
+		$collection['uid']	= $attach['uid'];
+		$collection['tucool']['image'] = $attachsService->getThreadAttachMini($attach['attachurl']);
+		$collection['link'] =  $attachpath.'/'.$attach['attachurl'];
+		$collection['tucool']['name']	= $attach['name'];
+		$threadService = L::loadClass('threads', 'forum');
+		$threads = $threadService->getByTid($attach[tid]);
+		$collection['tucool']['tid'] = $threads[tid];
+		$collection['tucool']['subject'] = $threads[subject];
+	}
 	
 	if ($collection['uid']) {
 		$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
@@ -184,6 +198,20 @@ if ($a == 'del') {
 					);
 					
 	if ($collectionService->insert($collectionDate)) {
+		if ($type == 'tucool' && $threads[tid]) {
+			$tucoolService = L::loadClass('tucool', 'forum');
+			$tucoolService->updateCollectNum($threads[tid]);
+		}
+	if($type == 'postfavor'){
+		$fid = $db->get_value('SELECT fid FROM pw_threads WHERE tid = '.S::sqlEscape($id));
+		L::loadClass('elementupdate', '', false);
+		$elementupdate = new ElementUpdate();
+		$elementupdate->newfavorUpdate($id, $fid);
+		if ($db_ifpwcache & 1024) {
+		$elementupdate->hotfavorUpdate($id, $fid);
+		}
+		updateDatanalyse($id, 'threadFav', 1);
+	}
 		Showmsg('job_favor_success');ajax_footer();
 	} else {
 		Showmsg('data_error');

@@ -3,4 +3,43 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>phpwind寮
+<title>phpwind开发文档</title>
+<link rel="stylesheet" type="text/css" href="../images/pages.css" />
+</head>
+<body>
+        	<h1 class="h1A">系统升级流程</h1>
+            <div class="content cc">
+           <h2>升级流程</h2>
+<p><b>一、升级准备：</b>
+<ol>
+<li>使用的论坛为7.5或以上版本（此版本以下的童鞋，请先将论坛升级至7.5）
+<li>确认您论坛的编码类型，并在<a href="http://www.phpwind.com/index.php?m=download" target="_blank">http://www.phpwind.com/index.php?m=download</a>下载对应编码类型的升级文件包；
+<li>确定升级起始时间，并暂时将论坛关闭（后台-全局-站点设置-站点状态）；
+<li>备份论坛数据，防止意外发生（后台-数据-数据库-数据维护）；
+<li>确定你站点的文件名、后台登录文件、附件目录等是否有所改动。
+    <br />
+    首页文件查看路径：后台-&gt;模式->论坛模式->界面设置->首页<br />
+    前台注册文件、后台登录文件查看路径：后台->全局->安全优化->安全控制
+    <br />
+    附件目录查看路径：后台-&gt;全局-&gt;安全优化-&gt;动态目录 <br /><b>特别声明</b>：（我们将系统文件中的wap目录，已经改名为m。大家在上传覆盖之前，务必将原系统的wap目录改成m。修改完成以后，wap的访问路径也应调整为 http://你的域名/m）
+<li>切换论坛风格到自带wind（后台-模式-论坛模式-风格模板）；
+<li>确认您论坛所在的环境。如果是Unix、linux系统，请注意文件属性（777）和上传形式（需要使用2进制上传方式）。
+</li>
+</ol><br/>
+<p><b>二、执行升级</b>
+<ol>
+<li>将升级包内 upload 目录中的全部文件和目录结构上传到服务器覆盖原论坛文件（注意是上传 upload 目录中的文件和目录，而不是上传包含 upload 目录本身的目录和结构）
+<li>上传up**to**.php到论坛程序根目录下。运行<U>你的域名/up**to**.php</U> 。（**，表示论坛版本）
+<li>按照操作提示，直至全部升级完毕。（默认无需人工干预）
+<li>升级完毕后，重新调整模板插件等，开始体验新功能！
+<br/>
+</li>
+</ol><br/>
+<h2>问题说明</h2>
+<p>升级详情查看：  <a href="http://www.phpwind.net/read-htm-tid-1251656.html" target="_black">http://www.phpwind.net/read-htm-tid-1251656.html</a> 。如果您在升级中碰到问题，请您查看<a href="http://faq.phpwind.net/" target="_black">《phpwind FAQ 文档帮助中心》</a>，我们为您准备了详细的图文升级教程，列举了升级常见问题的解决方法.如果您的论坛仍没有顺利的升级，请您访问 <a href="http://www.phpwind.net" target="_black">phpwind官方论坛</a> 我们将针对您的实际情况给出切实的解决方案。
+           </p> 
+		  
+</div>
+
+      </body>
+</html>

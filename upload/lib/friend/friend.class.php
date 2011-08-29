@@ -539,7 +539,7 @@ class PW_Friend {
 
 		$offset = ($page - 1) * $perpage;
 		$result = array();
-		$query = $this->_db->query("SELECT m.uid,m.username,m.icon as face,m.honor,md.thisvisit,md.lastvisit,md.fans,f.ftid,a.uid AS attention" .
+		$query = $this->_db->query("SELECT m.uid,m.username,m.icon as face,m.honor,m.groupid,m.memberid,md.thisvisit,md.lastvisit,md.fans,f.ftid,a.uid AS attention" .
 			" FROM pw_friends f" .
 			" LEFT JOIN pw_attention a ON f.uid=a.uid AND f.friendid=a.friendid" .
 			" LEFT JOIN pw_members m ON f.friendid=m.uid".

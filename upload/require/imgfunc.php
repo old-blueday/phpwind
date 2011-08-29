@@ -84,22 +84,27 @@ function MakeThumb($srcFile, &$dstFile, $dstW, $dstH, $cenTer = null, $sameFile 
 	$imgheight = $minitemp['height'];
 	$srcX = $srcY = 0;
 	if (!empty($cenTer)) {
-		if ($imgwidth < $imgheight) {
-			$srcY = round(($imgheight - $imgwidth) / 2);
-			$imgheight = $imgwidth;
+		$dsDivision = $imgheight / $imgwidth;
+		$fixDivision = $dstH / $dstW;
+		if ($dsDivision > $fixDivision) {
+			$tmpimgheight = $imgwidth * $fixDivision;
+			$srcY = round(($imgheight - $tmpimgheight) / 2);
+			$imgheight = $tmpimgheight;
 		} else {
-			$srcX = round(($imgwidth - $imgheight) / 2);
-			$imgwidth = $imgheight;
+			$tmpimgwidth = $imgheight / $fixDivision;
+			$srcX = round(($imgwidth - $tmpimgwidth) / 2); 
+			$imgwidth = $tmpimgwidth;
 		}
 	}
 	$dstX = $dstY = 0;
 	$thumb = $imagecreate($minitemp['dstW'], $minitemp['dstH']);
 	
-	if(function_exists('ImageColorAllocate') && function_exists('ImageColorTransparent')){
+	if (function_exists('ImageColorAllocate') && function_exists('ImageColorTransparent')) {
 		//背景透明处理
 		$black = ImageColorAllocate($thumb,0,0,0);
 		$bgTransparent = ImageColorTransparent($thumb,$black);
 	}
+
 	$imagecopyre($thumb, $minitemp['source'], $dstX, $dstY, $srcX, $srcY, $minitemp['dstW'], $minitemp['dstH'], $imgwidth, $imgheight);
 	MakeImage($minitemp['type'], $thumb, $dstFile);
 	imagedestroy($thumb);
@@ -130,14 +135,16 @@ function GetThumbInfo($srcFile, $dstW, $dstH, $cenTer = null) {
 	} elseif ($dstW > 0 && $dstH > 0) {
 		if (($imgdata['width'] / $dstW) < ($imgdata['height'] / $dstH)) {
 			if (!empty($cenTer)) {
-				$imgdata['dstW'] = $imgdata['dstH'] = $dstH;
+				$imgdata['dstW'] = $dstW;
+				$imgdata['dstH'] = $dstH;
 			} else {
 				$imgdata['dstW'] = round($dstH / $imgdata['height'] * $imgdata['width']);
 				$imgdata['dstH'] = $dstH;
 			}
 		} elseif (($imgdata['width'] / $dstW) > ($imgdata['height'] / $dstH)) {
 			if (!empty($cenTer)) {
-				$imgdata['dstW'] = $imgdata['dstH'] = $dstW;
+				$imgdata['dstW'] = $dstW;
+				$imgdata['dstH'] = $dstH;
 			} else {
 				$imgdata['dstW'] = $dstW;
 				$imgdata['dstH'] = round($dstW / $imgdata['width'] * $imgdata['height']);
@@ -147,8 +154,9 @@ function GetThumbInfo($srcFile, $dstW, $dstH, $cenTer = null) {
 			$imgdata['dstH'] = $dstH;
 		}
 	} else {
-		$imgdata['dstW'] = $imgdata['width'];
-		$imgdata['dstH'] = $imgdata['height'];
+		return false;
+		//$imgdata['dstW'] = $imgdata['width'];
+		//$imgdata['dstH'] = $imgdata['height'];
 	}
 	return $imgdata;
 }
@@ -189,12 +197,8 @@ function MakeImage($type, $image, $filename, $quality = '75') {
 function GetImgSize($srcFile, $srcExt = null) {
 	empty($srcExt) && $srcExt = strtolower(substr(strrchr($srcFile, '.'), 1));
 	$srcdata = array();
-	if (function_exists('read_exif_data') && in_array($srcExt, array(
-		'jpg',
-		'jpeg',
-		'jpe',
-		'jfif'
-	))) {
+	$exts = array('jpg', 'jpeg', 'jpe', 'jfif');
+	if (function_exists('read_exif_data') && in_array($srcExt, $exts)) {
 		$datatemp = @read_exif_data($srcFile);
 		$srcdata['width'] = $datatemp['COMPUTED']['Width'];
 		$srcdata['height'] = $datatemp['COMPUTED']['Height'];
@@ -202,12 +206,7 @@ function GetImgSize($srcFile, $srcExt = null) {
 		unset($datatemp);
 	}
 	!$srcdata['width'] && list($srcdata['width'], $srcdata['height'], $srcdata['type']) = @getimagesize($srcFile);
-	if (!$srcdata['type'] || ($srcdata['type'] == 1 && in_array($srcExt, array(
-		'jpg',
-		'jpeg',
-		'jpe',
-		'jfif'
-	)))) { //noizy fix
+	if (!$srcdata['type'] || ($srcdata['type'] == 1 && in_array($srcExt, $exts))) { //noizy fix
 		return false;
 	}
 	return $srcdata;
@@ -282,5 +281,42 @@ function modeImageThumb($srcFile, $dstFile, $dstX, $dstY) {
 	MakeImage($imgdata['type'], $thumb, $dstFile);
 	imagedestroy($thumb);
 	return 1;
+}
+
+/**
+ *  创建头像动态gif缩略图
+ * @param $imageSource
+ * @param $srcW
+ * @param $srcH
+ * @param $dstW
+ * @param $dstH
+ */
+function makeAvatarGifThumb($imageSource, $srcW, $srcH, $dstW, $dstH) {
+	if ($srcW <= $dstW && $srcH <= $dstH) return $imageSource;
+	$imageSource = imagecreatefromstring($imageSource);
+	list($imagecreate, $imagecopyre) = GetImageCreate('gif');
+	if (($srcW / $dstW) < ($srcH / $dstH)) {
+		$finalW = round($dstH / $srcH * $srcW);
+		$finalH = $dstH;
+	} elseif (($srcW / $dstW) > ($srcH / $dstH)) {
+		$finalW = $dstW;
+		$finalH = round($dstW / $srcW * $srcH);
+	} else {
+		$finalW = $dstW;
+		$finalH = $dstH;
+	}
+	$thumb = $imagecreate($finalW, $finalH);
+	if(function_exists('ImageColorAllocate') && function_exists('ImageColorTransparent')){
+		//背景透明处理
+		$black = ImageColorAllocate($thumb,0,0,0);
+		$bgTransparent = ImageColorTransparent($thumb,$black);
+	}
+	$imagecopyre($thumb, $imageSource, 0, 0, 0, 0, $finalW, $finalH, $srcW, $srcH);
+	ob_start();
+	imagegif($thumb);
+	imagedestroy($thumb);
+	$imageStream = ob_get_contents();
+	ob_end_clean();
+	return $imageStream;
 }
 ?>

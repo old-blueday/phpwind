@@ -326,6 +326,42 @@ class PW_Attention {
 	}
 	
 	/**
+	 * 获得新增粉丝用户 top10
+	 * return array
+	 */
+	function getTopFansUsers($num){
+		$num = intval($num);
+		if($num < 0) return array();
+		global $timestamp;
+		extract (pwCache::getData(D_P.'data/bbscache/o_config.php',false));
+		$time = $this->_timestamp - ($o_weibo_hotfansdays ? intval($o_weibo_hotfansdays) * 86400 : 86400);
+		$attentionDB = $this->_getAttentionDB();
+		$topUserIds = $attentionDB->getTopFansUser($time,$num);
+		$tagsService = L::loadClass('memberTagsService', 'user');
+		$tagsData = $tagsService->getTagsByUidsForSource($topUserIds);
+		$tags = array();
+		foreach($tagsData as $v){
+			$tags[$v['userid']][] = $v['tagname'];
+		}
+		$userService = L::loadClass('UserService','user');
+		require_once(R_P . 'require/showimg.php');
+		$userData = $userService->getByUserIds($topUserIds);
+		$newUsersInfo = array();
+		$data = array();
+		foreach ($topUserIds as $uid){
+			if(!$userData[$uid]) continue;
+			$data[] = $userData[$uid];
+		}
+		
+		foreach ($data as $key => $value) {
+			list($value['icon']) = showfacedesign($value['icon'], 1, 's');
+			$value['tags'] = S::isArray($tags[$value['uid']]) ? implode(' ', $tags[$value['uid']]) : $tags[$value['uid']];
+			$newUsersInfo[$key] = $value;
+		}
+		return $newUsersInfo;
+	}
+	
+	/**
 	 * Get PW_FriendDB
 	 * 
 	 * @access protected

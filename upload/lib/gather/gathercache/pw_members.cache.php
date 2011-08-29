@@ -390,6 +390,7 @@ class GatherCache_PW_Members_Cache extends GatherCache_Base_Cache {
 					$values[$k]['creditinfo'] = $values[$k]['credit'];
 					$values[$k][$tableAlias[$k]. 'credit'] = $values[$k]['credit'];
 				}
+				(!isset($result['credit']) && $table && $values[$k]['credit']) && $result['credit'] = $values[$k]['credit'];
 				$result += $values[$k];
 			}
 		}
@@ -655,7 +656,7 @@ class GatherCache_PW_Members_Cache extends GatherCache_Base_Cache {
 		$fieldinfo = '';
 		if (is_array($customfield)) {
 			foreach ($customfield as $value) {
-				$fieldinfo .= ',mi.field_'.(int)$value['id'];
+				!$value['ifsys'] && $fieldinfo .= ',mi.field_'.(int)$value['id'];
 			}
 		}
 		$membersDb = L::loadDB ( 'Members', 'user' );

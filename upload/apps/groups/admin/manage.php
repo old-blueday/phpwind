@@ -1,7 +1,8 @@
 <?php
 !function_exists('adminmsg') && exit('Forbidden');
 
-@include_once pwCache::getPath(D_P.'data/bbscache/o_config.php');
+//* @include_once pwCache::getPath(D_P.'data/bbscache/o_config.php');
+pwCache::getData(D_P.'data/bbscache/o_config.php');
 !$action && $action = 'argument';
 
 require_once(A_P . 'lib/colonys.class.php');
@@ -18,7 +19,7 @@ if ($action == 'argument') {
 		if ($ttype == '1') {
 
 			!$delid && adminmsg('operate_error');
-			$pw_tmsgs = 'pw_tmsgs' . $ttable;
+			$pw_tmsgs = 'pw_tmsgs' . ($ttable > 0 ? intval($ttable) : '');
 			$fidarray = $delaids = $specialdb = array();
 			$tmpDelids = $delid;
 			$delids = S::sqlImplode($delid);
@@ -127,7 +128,9 @@ if ($action == 'argument') {
 				$colony['pnum'] -= $value['pnum'];
 				updateGroupLevel($key, $colony);
 
-				$db->update("UPDATE pw_colonys SET tnum=tnum-" . S::sqlEscape($value['tnum']) . ", pnum=pnum-" . S::sqlEscape($value['pnum']) . ", todaypost=todaypost-" . S::sqlEscape($value['todaypost']) . " WHERE id=". S::sqlEscape($key));
+				//* $db->update("UPDATE pw_colonys SET tnum=tnum-" . S::sqlEscape($value['tnum']) . ", pnum=pnum-" . S::sqlEscape($value['pnum']) . ", todaypost=todaypost-" . S::sqlEscape($value['todaypost']) . " WHERE id=". S::sqlEscape($key));
+				$db->update(pwQuery::buildClause("UPDATE :pw_table SET tnum=tnum-:tnum, pnum=pnum-:pnum, todaypost=todaypost-:todaypost WHERE id=:id", array('pw_colonys', $value['tnum'], $value['pnum'], $value['todaypost'],$key)));
+				
 			}
 
 			foreach ($ptable_a as $key => $val) {
@@ -252,7 +255,8 @@ if ($action == 'argument') {
 		$tpre = 't';
 		if ($ttype == '1') {
 			$sqltab = 'pw_threads t';
-			$pw_tmsgs = 'pw_tmsgs' . $ttable;
+			//fix WooYun-2011-01549.感谢t00000by57在 http://www.wooyun.org/bug.php?action=view&id=1549 上的反馈
+			$pw_tmsgs = 'pw_tmsgs' . ($ttable > 0 ? intval($ttable) : '');
 			$tpre = 'tm';
 			$addpage .= "ttable=$ttable&";
 		} else {
@@ -351,7 +355,8 @@ if ($action == 'argument') {
 			$colony['albumnum'] -= $rt['sum'];
 			updateGroupLevel($rt['ownerid'], $colony);
 
-			$db->update("UPDATE pw_colonys SET albumnum=albumnum-" . S::sqlEscape($rt[sum]) . ",photonum=photonum-". S::sqlEscape($rt['photonum']) ." WHERE id=" . S::sqlEscape($rt['ownerid']));
+			//* $db->update("UPDATE pw_colonys SET albumnum=albumnum-" . S::sqlEscape($rt[sum]) . ",photonum=photonum-". S::sqlEscape($rt['photonum']) ." WHERE id=" . S::sqlEscape($rt['ownerid']));
+			$db->update(pwQuery::buildClause("UPDATE :pw_table SET albumnum=albumnum-:albumnum,photonum=photonum-:photonum WHERE id=:id", array('pw_colonys', $rt['sum'], $rt['photonum'], $rt['ownerid'])));
 		}
 
 		foreach ($selid as $key => $aid) {
@@ -508,6 +513,7 @@ if ($action == 'argument') {
 
 		S::gp(array('aid','cid','cname','aname','uploader','pintro','uptime_s','uptime_e','orderway','ordertype','lines','page','selid'));
 		require_once(R_P . 'u/require/core.php');
+		!$selid && adminmsg('operate_error',"$basename&action=photos&job=list&aid=$aid&cid=$cid&cname=".rawurlencode($cname)."&aname=".rawurlencode($aname)."&uploader=".rawurlencode($uploader)."&pintro=".rawurlencode($pintro)."&uptime_s=$uptime_s&uptime_e=$uptime_e&orderway=$orderway&ordertype=$ordertype&lines=$lines&page=$page&");
 		foreach ($selid as $key => $pid) {
 			$photo = $db->get_one("SELECT cp.path,ca.aid,ca.lastphoto,ca.lastpid,ca.ownerid FROM pw_cnphoto cp LEFT JOIN pw_cnalbum ca ON cp.aid=ca.aid WHERE cp.pid=" . S::sqlEscape($pid) . " AND ca.atype='1'");
 			if (empty($photo)) {
@@ -530,7 +536,8 @@ if ($action == 'argument') {
 			$colony['photonum']--;
 			updateGroupLevel($photo['ownerid'], $colony);
 
-			$db->update("UPDATE pw_colonys SET photonum=photonum-1 WHERE id=" . S::sqlEscape($photo['ownerid']));
+			//* $db->update("UPDATE pw_colonys SET photonum=photonum-1 WHERE id=" . S::sqlEscape($photo['ownerid']));
+			$db->update(pwQuery::buildClause("UPDATE :pw_table SET photonum=photonum-1 WHERE id=:id", array('pw_colonys', $photo['ownerid'])));
 
 			pwDelatt($photo['path'], $db_ifftp);
 			$lastpos = strrpos($photo['path'],'/') + 1;
@@ -789,7 +796,7 @@ if ($action == 'argument') {
 	if ($job == 'del') {
 
 		S::gp(array('selid','content','username','postdate_s','postdate_e','ordertype','page','lines'));
-		empty($selid) && adminmsg("no_write_selid","$basename&action=write");
+		empty($selid) && adminmsg("operate_error","$basename&action=write");
 		require_once(R_P. "u/require/core.php");
 		foreach ($selid as $key => $id) {
 			$writedb = $db->get_one("SELECT uid,cyid FROM pw_cwritedata WHERE id=".S::sqlEscape($id));
@@ -803,7 +810,8 @@ if ($action == 'argument') {
 			$colony['writenum']--;
 			updateGroupLevel($colony['id'], $colony);
 
-			$db->update("UPDATE pw_colonys SET writenum=writenum-1 WHERE id=". S::sqlEscape($writedb['cyid']));
+			//* $db->update("UPDATE pw_colonys SET writenum=writenum-1 WHERE id=". S::sqlEscape($writedb['cyid']));
+			$db->update(pwQuery::buildClause("UPDATE :pw_table SET writenum=writenum-1 WHERE id=:id", array('pw_colonys', $writedb['cyid'])));
 
 			$affected_rows = delAppAction('write',$id)+1;
 			countPosts("-$affected_rows");
@@ -888,7 +896,7 @@ if ($action == 'argument') {
 
 	require_once PrintApp('admin');
 
-} elseif ($action == 'thread') {
+/*} elseif ($action == 'thread') {
 
 	S::gp(array('cyid'));
 
@@ -905,7 +913,7 @@ if ($action == 'argument') {
 			$newColony->updateInfoCount(array('tnum' => $count));	
 		}	
 		adminmsg('operate_success',$j_url);	
-	}
+	}*/
 }
 
 function Delcnimg($filename) {

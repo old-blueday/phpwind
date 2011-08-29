@@ -23,9 +23,11 @@ EOT;
 			<div class="mb5">通过这个链接访问后，你可以获得<span class="s2">{$inv_linkscore}个{$credit->cType[$inv_linkcredit]}</span>奖励</div>
 <!--
 EOT;
-		}print <<<EOT
+		}
+$inviteUsername = rawurlencode($windid);
+print <<<EOT
 -->
-			<div class="mb10"><input type="text" value="$db_bbsurl/index.php?a=$windid" class="input mr5" size="90" id="copy_username"><span class="btn2"><span><button type="button" onclick="copyUrl(getObj('copy_username').value)">复制链接</button></span></span></div>
+			<div class="mb10"><input type="text" value="$db_bbsurl/index.php?a=$inviteUsername" class="input mr5" size="90" id="copy_username"><span class="btn2"><span><button type="button" onclick="copyUrl(getObj('copy_username').value)">复制链接</button></span></span></div>
 			<div><input type="text" value="$db_bbsurl/index.php?u=$winduid" class="input mr5" size="90" id="copy_uid"><span class="btn2"><span><button type="button" onclick="copyUrl(getObj('copy_uid').value)">复制链接</button></span></span></div>
 		</div>
 <!--
@@ -95,7 +97,7 @@ function inviteCode(form,type){
 	}
 	if(type == 'copy'){
 		if (is_ie) {
-			if(window.clipboardData.setData("Text",url)){
+			if(window.clipboardData.setData("Text",content)){
 				showDialog('success','已成功复制',1);
 			}
 		} else {
@@ -121,7 +123,7 @@ print <<<EOT
 <div class="p10">
 <h5 class="h5 mb10"><strong class="mr20">邀请码</strong></h5>
 <form method="post" action="" name="INVLINKS">
-<table width="100%" class="tA mb20">
+<table width="100%" class="tA mb10">
     <tr class="tr">
      	<td>
      		<label><input name="" type="checkbox" value="all" onclick="CheckAll(this.form)"> 全选</label>
@@ -136,20 +138,21 @@ $invlink = $db_bbsurl.'/'.$db_registerfile.'?invcode=' . $value['invcode'];
 print <<<EOT
 -->
     <tr>
-    	<td><p><input name="invlink" type="checkbox" value="{$value[invcode]}"></p></td>
-        <td><p><input type="text" value="{$invlink}" class="input" size="80" readonly="readonly"/></p></td>
+    	<td><input name="invlink" type="checkbox" value="{$value[invcode]}"></td>
+        <td><input type="text" value="{$invlink}" class="input" size="80" readonly="readonly"/></td>
         <td><p>{$value[overtime]}</p></td>
     </tr>
 <!--
 EOT;
 }print <<<EOT
 -->
+    <tr class="tr">
+    	<td><label><input name="" type="checkbox" value="all" onclick="CheckAll(this.form)"> 全选</label></td>
+      <td><span class="bt2"><span><button type="button" onclick="inviteCode(document.INVLINKS,'copy')">复制邀请链接到剪切板</button></span></span><span class="btn2"><span><button type="button" onclick="inviteCode(document.INVLINKS)">通过电子邮箱发送邀请链接</button></span></span></td>
+      <td>&nbsp;</td>
+    </tr>
 </table>	
-<div class="p10 tac">{$pages}</div>
-<div class="p10 tac">
-	<span class="bt"><span><button type="button" onclick="inviteCode(document.INVLINKS,'copy')">复制邀请链接到剪切板</button></span></span>
-	<span class="btn"><span><button type="button" onclick="inviteCode(document.INVLINKS)">通过电子邮箱发送邀请链接</button></span></span>
-</div>
+<div class="cc">{$pages}</div>
 </form>
 </div>
 <!--

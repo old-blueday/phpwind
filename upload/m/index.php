@@ -5,7 +5,7 @@ S::gp(array('prog'));
 if (!in_array($prog,array('index','cate','bbsinfo','login','quit','phone'))) {
 	$prog = 'index';
 }
-include_once pwCache::getPath(D_P.'data/bbscache/olcache.php');
+include_once (D_P.'data/bbscache/olcache.php');
 $total = $userinbbs + $guestinbbs;
 wap_header('index',$db_bbsname);
 

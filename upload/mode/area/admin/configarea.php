@@ -1,6 +1,7 @@
 <?php
 !defined('P_W') && exit('Forbidden');
-include_once pwCache::getPath(D_P.'data/bbscache/area_config.php');
+//* include_once pwCache::getPath(D_P.'data/bbscache/area_config.php');
+pwCache::getData(D_P.'data/bbscache/area_config.php');
 //频道相关服务
 $ChannelService = L::loadClass('channelService', 'area');
 $channelsArray=$ChannelService->getChannels();

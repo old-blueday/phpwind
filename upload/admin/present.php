@@ -16,7 +16,8 @@ if (empty($action)) {
 	if (!$step) {
 		pwCache::setData($cache_file,$atc_content);
 	} else {
-		$atc_content = readover($cache_file);
+		//* $atc_content = readover($cache_file);
+		$atc_content = pwCache::getData($cache_file, false, true);
 	}
 	if (empty($subject) || empty($atc_content)) {
 		adminmsg('sendmsg_empty');

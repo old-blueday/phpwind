@@ -1,1 +1,75 @@
-锘
+﻿<!-- hi IE,please go to Quirks Mode-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>phpwind8.3安装说明</title>
+<link rel="stylesheet" type="text/css" href="images/style.css" />
+<!--[if ie]>
+<style>
+#menubar,#content{ height:100%; top:0; bottom:0; border-top:80px solid #fff; z-index:0}
+</style><![endif]-->
+</head>
+
+<body>
+<div class="header">
+	<h1 class="logo"><a href="index.html">phpwind文档</a></h1>
+</div>
+<div class="companyinfo"><small>Powered by phpwind  &copy; 2003-2011 </small></div>
+<div class="space_top"></div>
+<div class="space_bottom"></div>
+<div id="menubar">
+	<div class="menubar">
+		<div class="nav" id="nav">
+			<ul>
+        <li class="current"><a href="content/index.html"  target="contentframe" >产品简介</a></li>
+        <li><a href="content/install.html"  target="contentframe" >安装指南</a> 
+        <div>
+						<p><a href="content/e.html" target="contentframe">系统环境安装</a></p>
+						<p><a href="content/d.html" target="contentframe">安装详细流程</a></p>
+						<p><a href="content/f.html" target="contentframe">文件目录结构</a></p>
+                        <p><a href="content/ug.html" target="contentframe">系统升级流程</a></p>
+                         <p><a href="content/ud.html" target="contentframe">功能更新列表</a></p>
+                         <p><a href="content/wamp.html" target="contentframe">wamp 简介</a></p>
+					</div>
+                    </li>
+        <li><a href="content/func.html"  target="contentframe" >功能使用</a></li> 
+				<li><a href="content/faq.html" target="contentframe">常见问题</a></li>
+				<li><a href="content/advanced.html" target="contentframe">高级应用</a>
+                <div>
+						<p><a href="content/style.html" target="contentframe">风格模板</a></p>
+						<p><a href="content/domain.html" target="contentframe"> 二级域名</a></p>
+						<p><a href="content/host.html" target="contentframe">插件安装</a></p>
+                        <p><a href="content/trans.html" target="contentframe">系统搬迁</a></p>
+                        <p><a href="content/tool.html" target="contentframe">转换工具</a></p>
+					</div>
+                </li>
+				<li><a href="content/seo.html" target="contentframe">SEO技巧</a>
+                <div>
+						<p><a href="content/seo1.html" target="contentframe">搜索引擎优化</a></p>
+						<p><a href="content/title.html" target="contentframe">SEO巧妙设置</a></p>
+						<p><a href="content/rewrite.html" target="contentframe">伪静态介绍</a></p>
+					</div>
+                </li>
+                	<li><a href="http://faq.phpwind.net/" target="contentframe">帮助中心</a>
+			</ul>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+var li = document.getElementById("nav");
+var tt = li.getElementsByTagName("li");
+for(i=0; i<tt.length; i++){
+	tt[i].onclick= function(){
+		for(j=0; j<tt.length; j++){
+			tt[j].className = "";
+			this.className  = "current";
+		}
+	}
+}
+</script>
+<div id="content">
+	<div style="float:left;height:100%;width:100%;"><iframe width="100%" height="100%"  frameborder="0" name="contentframe" src="content/index.html"></iframe></div>
+</div>
+</body>
+</html>

@@ -49,7 +49,7 @@ class PW_Weibo_RelationsDB extends BaseDB {
 
 	function deleteAttentionRelation($uid, $num) {
 		if ($num < 1) return 0;
-		$sql = 'DELETE FROM ' . $this->_tableName . ' WHERE uid=' . $this->_addSlashes($uid) . ' ORDER BY postdate ASC LIMIT ' . intval($num);
+		$sql = 'DELETE FROM ' . $this->_tableName . ' WHERE uid=' . $this->_addSlashes($uid);
 		$this->_db->update($sql);
 		return $this->_db->affected_rows();
 	}

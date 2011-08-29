@@ -184,11 +184,23 @@ Breeze.namespace('event', function (B) {
                         fn.call(el, e);
                     }
                 }
+				e.preventDefault();
             });
         });
+    },
 
-    }
-
+    /**
+    * @description 给存在或将出现的元素绑定事件
+    * @params {Object} 要触发事件元素
+    * @params {String} 事件类型
+    * @example B.get("#one")("live","click",fn);
+    **/
+	trigger: function (el, type){
+		return B.UA.ie ? el[type]() : el['on'+type]({
+			type: type,
+			target: el
+		});
+	}
 });
 
     // Prevent memory leaks in IE

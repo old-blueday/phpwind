@@ -13,7 +13,7 @@ $pageCount = $noticeCount = 0;
 $messageServer->grabMessage($winduid,array($groupid),max($winddb['lastgrab'],$winddb['regdate']));
 $noticeCount = $noticeAllCount = (int) $messageServer->countAllNotice($winduid);
 $noticeList = array();
-$chineseName = array('200' => '系统通知','201' => '团购通知','202'=>'活动通知','203'=>'应用通知',''=>$action == 'unread' ? '未读通知':'通知');
+$chineseName = array('200' => '系统通知','201' => '团购通知','202'=>'活动通知','203'=>'应用通知','204'=>'评论通知','205'=>'留言通知',''=>$action == 'unread' ? '未读通知':'通知');
 $action = $redirect && !in_array($action,array('previous','info','next','unread')) ? '' : $action;
 $selected = $action ? array($action=>'selected') : 'selected';
 $nav = $action && $action != 'unread' ? array($action=>'class = current') : ' class = current';
@@ -22,7 +22,7 @@ if (empty($action)) {
 	$page = validatePage($page,$pageCount);
 	$noticeList = $messageServer->getAllNotices($winduid, $page, $perpage);
 	$redirect = 1;
-}elseif(in_array($action,array('system','postcate','active','apps'))) {
+}elseif(in_array($action,array('system','postcate','active','apps','comment','guestbook'))) {
 	$smstype = $messageServer->getConst($type.'_'.$action);
 	$noticeCount = $messageServer->countNotice($winduid,$smstype);
 	$pageCount = ceil($noticeCount / $perpage);
@@ -68,7 +68,7 @@ if($smstype && in_array($action,array('info','next','previous'))){
 	$navtype = explode('_',$navtype);
 	$nav[$navtype[1]] = 'class = current';	
 }
-if(empty($action) || in_array($action,array('unread','system','postcate','active','apps'))){
+if(empty($action) || in_array($action,array('unread','system','postcate','active','apps','comment','guestbook'))){
 	if($action != 'unread'){ 	
 		$notReadCount = (int) $messageServer->countNoticesNotRead($winduid);
 		list($today, $yesterday, $tTimes, $yTimes, $mTimes) = getSubListInfo($noticeList);

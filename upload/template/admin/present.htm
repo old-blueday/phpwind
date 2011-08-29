@@ -2,7 +2,8 @@
 include_once PrintEot('left');
 if(empty($action)){print <<<EOT
 -->
-<form name='FORM' action="$basename" method="post" onsubmit="return checkpost(document.FORM);">
+<script type="text/javascript" LANGUAGE="JavaScript" src="js/core/core.js"></script>
+<form name='FORM' action="$basename" method="post" onreset="mreset()" onsubmit="return checkpost(document.FORM);">
 	<h2 class="h1">节日送礼</h2>
 	<div class="admin_table mb10">
 	<table width="100%" cellspacing="0" cellpadding="0">
@@ -79,7 +80,7 @@ EOT;
 			<td class="td2">
 <!--
 EOT;
-require_once PrintEot('wysiwyg_editor');
+require_once PrintEot('wysiwyg_editor_common');
 print <<<EOT
 -->
 			</td>
@@ -87,17 +88,12 @@ print <<<EOT
 	</table>
 	</div>
 
-<script type="text/javascript" LANGUAGE="JavaScript" src="js/core/core.js"></script>
 <script type="text/javascript" language="JavaScript" src="js/pw_ajax.js"></script>
 <script language="JavaScript" src="js/post.js"></script>
 <script language="JavaScript" src="js/global.js"></script>
 
-<script language="JavaScript" src="data/bbscache/face.js"></script>
 <div id="menu_face" class="menu" style="display:none;"></div>
 <div id="menu_generalface" class="menu" style="display:none;"></div>
-
-<script type="text/javascript">editor.init('wysiwyg', 0);</script>
-	
 	<input type="hidden" name="action" value="send" />
 	<div class="tac mb10">
 		<span class="btn"><span><button type="submit">提 交</button></span></span>
@@ -137,6 +133,11 @@ function checkpost(obj) {
 			obj.subject.focus();
 			return false;
 	} 
+}
+function mreset(){
+	editor.textarea.value='';
+	editor.doc.body.innerHTML='';
+	return true;
 }
 </script>
 <!--

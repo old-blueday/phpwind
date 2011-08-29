@@ -5,6 +5,7 @@ if ( !$step ){
 	if (!$db_pptifopen || $db_ppttype == 'server') {
 		$ifppt = true;
 	}
+	$ifpublic = $userService->getUserStatus($winduid, PW_USERSTATUS_PUBLICMAIL) ? 'checked' : '';
 	require_once uTemplate::PrintEot('info_safe');
 	pwOutPut();
 }else if($step == '2') {
@@ -13,7 +14,9 @@ if ( !$step ){
 	$upmembers = $upmemdata = $upmeminfo = array();
 	if ($ifppt) {
 
-		include_once pwCache::getPath(D_P.'data/bbscache/dbreg.php');
+		//* include_once pwCache::getPath(D_P.'data/bbscache/dbreg.php');
+		extract(pwCache::getData(D_P.'data/bbscache/dbreg.php', false));
+		
 		S::gp(array('propwd','proemail','question'),'P');
 		if ($propwd || $userdb['email'] != $proemail) {
 			if ($_POST['oldpwd']) {
@@ -72,7 +75,8 @@ if ( !$step ){
 				$upmemdata['pwdctime'] = $timestamp;
 			}
 			if ($userdb['email'] != $proemail) {
-				include_once pwCache::getPath(D_P.'data/bbscache/dbreg.php');
+				//* include_once pwCache::getPath(D_P.'data/bbscache/dbreg.php');
+				extract(pwCache::getData(D_P.'data/bbscache/dbreg.php', false));
 				$rg_emailcheck && Showmsg('pro_emailcheck');
 
 				$email_check = $userService->getByEmail($proemail); //TODO Need to add a method for check user exist with email in PW_UserService?
@@ -101,9 +105,7 @@ if ( !$step ){
 		}
 		$upmembers['safecv'] = $safecv;
 	}
-	$pwSQL = array_merge($upmembers, array(
-		'email' => $proemail, 'gender' => $progender, 'signature' => $prosign, 'introduce' => $prointroduce, 'oicq' => $prooicq, 'aliww' => $proaliww, 'icq' => $proicq, 'yahoo' => $proyahoo, 'msn' => $promsn, 'site' => $prohomepage, 'location' => $profrom, 'bday' => $probday,'timedf' => $timedf
-	));
+	$pwSQL = array_merge($upmembers, array('email' => $proemail));
 	//update memdata
 	if ($upmemdata) {
 		$userService->update($winduid, array(), $upmemdata);
@@ -113,10 +115,6 @@ if ( !$step ){
 		updateThreadTrade($upmeminfo,$winduid);
 	}
 	unset($upmemdata,$upmeminfo);
-	$pwSQL = array_merge($pwSQL, array(
-		'gender' => $progender, 'signature' => $prosign, 'introduce' => $prointroduce, 
-		'site' => $prohomepage, 'location' => $profrom, 'timedf' => $timedf
-	));
 
 	$userService->update($winduid, $pwSQL);
 	//* $_cache = getDatastore();

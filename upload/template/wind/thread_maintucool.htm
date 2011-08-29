@@ -1,0 +1,164 @@
+<!--<?php print <<<EOT
+-->
+<style type="text/css">
+.imgList ul{padding:0 13px 20px 3px;}
+.imgList li{float:left;width:25%;_width:24.8%;max-width:238px;}
+.imgList li dl{padding:10px 4px 10px 10px;}
+.imgList li dt{border:1px solid #e5e5e5;padding:10px;margin-bottom:8px;overflow:hidden; position:relative;}
+.imgList li:hover dt{border:1px solid $tablecolor;}
+.imgList li dt a img{border:0px solid #e9e7ea;background:#fff;display:block; text-align:center;width:100%;height:150px;}
+.imgList li dd{height:36px;overflow:hidden;}
+.imgList li dd h2{display:block;height:18px;font-weight:100;line-height:18px;overflow:hidden;}
+.imgList li .imgNum{padding:0 5px;height:18px;background:#fdfbf1;color:#6f6214;position:absolute;font-family:Simsun;right:10px;_right:15px;margin-top:-18px;}
+.imgView,.imgFav{width:17px;height:16px;overflow:hidden; text-indent:-2000em;display:block;margin-right:3px;}
+.imgView{background:url($imgpath/pwicon/view.png) no-repeat;}
+.imgFav{background:url($imgpath/pwicon/fav.png) no-repeat;}
+</style>
+	<table width="100%">
+		<tr class="tr4">
+			<td style="padding-left:12px;">
+<!--
+EOT;
+$newwindowsChecked = $_COOKIE['tucoolnewwindows'] === '0' ? '' : ' checked';
+print <<<EOT
+-->
+			<label class="fr mr10 cp" for="newwindows"><input style="padding:0;margin:-1px 3px 0 0;" name="newwindows" id="newwindows" type="checkbox"{$newwindowsChecked} value="1" onclick="xinchuang()" />新窗</label>
+<script language="JavaScript">
+var orderThreadsClass = {
+	orderThreads : function(orderway){
+		var orderway = orderway || 'tid';
+		var form = document.createElement("form");
+		form.action = "{$pageUrl}&search=img&page=$page#tabA";
+		form.method = "post";
+		var h_type = this.createInput("hidden","type","$type");
+		var h_search = this.createInput("hidden","search","1000");
+		var h_special = this.createInput("hidden","special","$special");
+		var h_orderway = this.createInput("hidden","orderway",orderway);
+		var h_asc = this.createInput("hidden","asc","DESC");
+		form.appendChild(h_type);
+		form.appendChild(h_search);
+		form.appendChild(h_special);
+		form.appendChild(h_orderway);
+		form.appendChild(h_asc);
+		document.body.appendChild(form);
+		setTimeout(function(){/*ie6*/
+			form.submit();
+		},0);
+		return false;
+	},
+	createInput : function(type,name,value){
+		var hidden = document.createElement("input");
+		hidden.type = type;
+		hidden.name = name;
+		hidden.value = value;//↓
+		return hidden;
+	}
+}
+function orderThreads(orderway){
+	orderThreadsClass.orderThreads(orderway);
+}
+</script>
+			排序：<a href="javascript:;" title="按图片数量" onclick="orderThreads('totalnum');" id="thread_sort_totalnum" {$orderClass[totalnum]}><span>图片数</span></a>&nbsp;|&nbsp;<a href="javascript:;" title="按发表时间排序" onclick="orderThreads('tid');" id="thread_sort_tid" {$orderClass[tid]}><span>最新发帖</span></a></td>
+		</tr>
+	</table>
+	<div class="imgList">
+		<ul class="cc">
+<!--
+EOT;
+$attachsService = L::loadClass('attachs','forum');
+foreach($threaddb as $key => $thread){
+$isNewWindowOpen = ($newwindows == 1) ? "_blank" : "_self";
+if ($thread['ifshield']) $thread['cover'] = '';
+$attachImg = $attachsService->getThreadAttachMini($thread['cover']);
+$threadUrl = ($forumset[iftucool] && $forumset['iftucoolbrowse']) ? "slide.php?tid={$thread[tid]}" : "read.php?tid={$thread[tid]}";
+print <<<EOT
+-->
+
+			<li>
+				<dl>
+					<dt>
+						<a href="$threadUrl" name="readlink" target="$isNewWindowOpen"><img src="$imgpath/blank.gif" style="background:url($attachImg) center center no-repeat;" /></a>
+						<span class="imgNum" title="共有{$thread[totalnum]}张图片">{$thread[totalnum]}</span>
+					</dt>
+					<dd>
+<div class="fr">
+<!--
+EOT;
+if($thread[topped]){print <<<EOT
+-->
+							<img src="$imgpath/$stylepath/file/headtopic_$thread[topped].gif" alt="置顶帖标志" title="置顶帖标志" />
+<!--
+EOT;
+}else{
+	if($thread[locked] == 1){print <<<EOT
+-->
+							<img src="$imgpath/$stylepath/thread/topiclock.gif" alt="锁定帖标志" title="锁定帖标志" />	
+<!--
+EOT;
+	}elseif($thread[locked] == 2){print <<<EOT
+-->
+							<img src="$imgpath/$stylepath/thread/topicclose.gif" alt="关闭帖标志" title="关闭帖标志" />	
+<!--
+EOT;
+}}if($thread[digest]){print <<<EOT
+-->
+							<img src="$imgpath/$stylepath/file/digest_$thread[digest].gif" alt="精华帖标志" title="精华帖标志" />
+<!--
+EOT;
+}print <<<EOT
+--></div>
+						<h2><a href="$threadUrl" class="s4" name="readlink" $isNewWindowOpen>$thread[subject]</a></h2>
+						<p><a href="{$db_userurl}$thread[authorid]" class="mr20">$thread[author]</a><span class="f10"><a href="read.php?tid={$thread['tid']}&displayMode=1" class="s4" title="回复">$thread[replies]</a>&nbsp;/&nbsp;<span title="查看">$thread[hits]</span></span></p>
+					</dd>
+				</dl>
+			</li>
+<!--
+EOT;
+}print <<<EOT
+-->
+		</ul>
+	</div>
+<script LANGUAGE="JavaScript">
+function delload(){
+	var objTrs = getElementsByClassName('tr3',getObj('threadlist'));
+	var mover =	 function (){
+		var delObj = getElementsByClassName('s6 w',this);
+		if(delObj.length>0){
+			delObj[0].style.display='';
+		}
+	};
+	var mout = function (){
+		var delObj = getElementsByClassName('s6 w',this);
+		if(delObj.length>0){
+			delObj[0].style.display='none';
+		}
+	};
+	for (var i=0;i<objTrs.length ; i++ ){
+		objTrs[i].onmouseover = mover;
+		objTrs[i].onmouseout =  mout;
+	}
+}
+window.onReady(delload);
+
+//判断是否选中新窗口
+function xinchuang() { //新窗
+	var i;
+	var val = document.getElementById("newwindows");
+	var va  = document.getElementsByName("readlink");
+	if (val.checked == true) { //选中
+		for (i=0;i<va.length;i++) {
+			var vaa = va[i].setAttribute("target","_blank");
+		}
+		SetCookie("tucoolnewwindows",1);
+	} else {
+		for (i=0;i<va.length;i++) {
+			var vaa = va[i].setAttribute("target","_self");
+		}
+		SetCookie("tucoolnewwindows",0);
+	}
+}
+xinchuang();
+</script>
+<!--
+EOT;
+?>

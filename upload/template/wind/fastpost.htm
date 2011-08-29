@@ -2,17 +2,17 @@
 $posturl = "post.php?fid=$fid".($psot_sta ? "&action=$psot_sta" : '').($tid ? "&tid=$tid" : '');
 $fastDo = $psot_sta ? '回复' : '发帖';
 $tmpVerify = GetVerify($onlineip.$GLOBALS['winddb']['regdate'].$fid.$tid);
+
+$imageConfigTabs = array();
+($db_allowupload && $_G['allowupload']) && $imageConfigTabs[] = 'local';
+($db_phopen && $winduid) && $imageConfigTabs[] = 'album';
+$imageConfigTabs[] = 'network';
+$imageConfigTabs = "'" . implode("','", $imageConfigTabs) . "'";
 print <<<EOT
 -->
 <script type="text/javascript" language="JavaScript" src="js/pw_ajax.js"></script>
 <link rel="stylesheet" type="text/css" href="$imgpath/post/fast_editor.css" media="all" />
-<table cellPadding="0" cellSpacing="0" style="display:none">
-	<tbody id="att_mode"><tr>
-		<td width="220"><input class="input" type="file" name="attachment_" style="width:155px;" autocomplete="off" /></td>
-		<td>描述 <input class="input" type="text" name="atc_desc" size="18" autocomplete="off" /></td>
-		<td></td></tr>
-	</tbody>
-</table>
+<link rel="stylesheet" type="text/css" href="js/breeze/editor/style/style.css" />
 <div class="t" style="padding:0;margin-bottom:0;">
 	<form name="FORM" method="post" action="post.php?fid=$fid" enctype="multipart/form-data" onsubmit="return checkpost(document.FORM);" id="anchor">
 	<input type="hidden" name="atc_usesign" value="1" />
@@ -30,7 +30,7 @@ print <<<EOT
 	<input type="hidden" name="verify" value="$verifyhash" />
 	<input type="hidden" value="cn0zz" name="_hexie" />
 	<input type="hidden" value="0" name="iscontinue" />
-	<div class="b h">快速$fastDo</div>
+	<div class="b h" style="border-top:0;">快速$fastDo</div>
 	<table width="100%" class="floot" style="table-layout:inherit;">
 		<tr class="vt">
 			<td class="floot_left">
@@ -71,48 +71,34 @@ print <<<EOT
 					</div>
 				</div>
 			</td>
-			<td style="background:#fff;">
-				<div class="fp_content pr">
-<!--
-EOT;
-if ($psot_sta == 'reply' && $anonymity) {print <<<EOT
--->
-					<div style="position:absolute;width:100%;z-index:1;text-align:center;top:48%;">您目前还是游客，请 <a id="fast_login" href="pw_ajax.php?action=poplogin&anchor=anchor&tid={$tid}&fpage={$fpage}&toread=$toread{$urladd}&page={$page}" onclick="sendmsg(this.href, '');return false;" class="s4">登录</a> 或 <a href="$db_registerfile" target="_blank" class="s4">注册</a></div>
-<script type="text/javascript">
-window.onReady(function(){document.FORM.onsubmit = function(){sendmsg(getObj('fast_login').href,'');return false;}});
-</script>
-<!--
-EOT;
-} print <<<EOT
--->
-					<div class="cc mb5">
-						<div class="pr fl mr5"><input type="text" class="input" id="atc_title" name="atc_title" value="$titletop1" size="40" /><span id="atc_title_warn" class="gray pd5" style="display:none; position:absolute;top:-20px;right:0;background:#fffff3;">限 $db_titlemax 字节</span></div>
+			<td style="padding:10px 0 10px 10px;">
+				<div class="cc mb5">
 <!--
 EOT;
 if (!$psot_sta && ($t_per>0 || $admincheck) && $t_exits == 1) {
 	$tmpHtml = ($t_sub_exits == 1) ? ' onchange="getSubType(this.value);"' : '';
 print <<<EOT
 -->
-						<select name="p_type" style="width:75px;" class="mr5"{$tmpHtml}>
-							<option value="0">不分类</option>
+					<select name="p_type" class="mr5"{$tmpHtml}>
+						<option value="0">不分类</option>
 <!--
 EOT;
 	foreach ($t_typedb as $key => $value) {
 		if ($value) {print <<<EOT
 -->
-							<option value="$key">$value[name]</option>
+						<option value="$key">$value[name]</option>
 <!--
 EOT;
 		}
 	}
 print <<<EOT
 -->
-						</select>
+					</select>
 <!--
 EOT;
 	if ($t_sub_exits == 1) {print <<<EOT
 -->
-						<select name="p_sub_type" id="p_sub_type" style="width:75px" class="mr5"><option value="">不分类</option></select>
+					<select name="p_sub_type" id="p_sub_type" class="mr5"><option value="">不分类</option></select>
 <!--
 EOT;
 	}
@@ -141,107 +127,105 @@ function getSubType(id){
 EOT;
 } elseif ($special === 'read_debate') {print <<<EOT
 -->
-						<select name="standpoint" id="standpoint" class="mr5">
-							<option value="0" $debate_0>闲聊一下</option>
+					<select name="standpoint" id="standpoint" class="mr5">
+						<option value="0" $debate_0>闲聊一下</option>
 <!--
 EOT;
 	if ($debatestand != 2) {print <<<EOT
 -->
-							<option value="1" $debate_1>正方观点</option>
+						<option value="1" $debate_1>正方观点</option>
 <!--
 EOT;
 	}
 	if ($debatestand != 1) {
 print <<<EOT
 -->
-							<option value="2" $debate_2>反方观点</option>
+						<option value="2" $debate_2>反方观点</option>
 <!--
 EOT;
 	}
 print <<<EOT
 -->
-						</select>
+					</select>
 <!--
 EOT;
 }print <<<EOT
 -->
-					</div>
+					<input type="text" maxlength="50" class="input mr10" id="atc_title" name="atc_title" value="$titletop1" size="40" /><span id="atc_title_warn">限{$db_titlemax} 字节</span>
+				</div>
 <!--
 EOT;
 if (isset($db_sitemsg['reply']['0']) && $db_sitemsg['reply']['0'] && $psot_sta) {
 print<<<EOT
 -->
-					<div style="background:#fffeed;padding:5px 10px;margin:0 0 5px;">{$db_sitemsg[reply][array_rand($db_sitemsg[reply])]}</div>
+				<div style="background:#fffeed;padding:5px 10px;margin:0 0 5px;">{$db_sitemsg[reply][array_rand($db_sitemsg[reply])]}</div>
 <!--
 EOT;
 } elseif (isset($db_sitemsg['post']['0']) && $db_sitemsg['post']['0']) {print<<<EOT
 -->
-					<div style="background:#fffeed;padding:5px 10px;margin:0 0 5px;">{$db_sitemsg[post][array_rand($db_sitemsg[post])]}</div>
+				<div style="background:#fffeed;padding:5px 10px;margin:0 0 5px;">{$db_sitemsg[post][array_rand($db_sitemsg[post])]}</div>
 <!--
 EOT;
 }print<<<EOT
 -->
-					<div class="fp_editor cc" id="fp_editor" onclick="loadEditor(event);">
-						<div class="fp_editor_but cc">
-							<a href="javascript:gotoEditor();" class="fr" hidefocus="true" id="gotoedit">进入高级模式</a>
-							<div>
-								<a href="javascript:;" title="加粗" id="wy_bold" hidefocus="true">加粗</a>
-								<a href="javascript:;" title="字体颜色" id="wy_forecolor" hidefocus="true">字体颜色</a>
-								<a href="javascript:;" title="背景" id="wy_hilitecolor" hidefocus="true">背景颜色</a>
-								<a href="javascript:;" title="插入链接" id="wy_createlink" hidefocus="true">插入链接</a>
-								<a href="javascript:;" title="图片" id="wy_insertimage" hidefocus="true">图片</a>
-							</div>
-						</div>
-						<div style="padding:0.5% 0 0 0.5%;width:99.5%;display:inline;float:left;">
-							<textarea id="textarea" name="atc_content" style="width:100%;height:140px;" onkeydown="quickpost(event)"></textarea>
-							<span id="autosave"></span><div id="menu_editor" class="wy_menu_B" style="display: none;"></div>
-						</div>
-					</div>
+
+
 <!--
 EOT;
-if ($db_allowupload && $_G['allowupload']) {
-	$_G['uploadtype'] && $db_uploadfiletype = $_G['uploadtype'];
-	$db_uploadfiletype = (is_array($db_uploadfiletype) ? $db_uploadfiletype : unserialize($db_uploadfiletype));
-	$uploadfiletype = $uploadfilesize = ' ';
-	foreach($db_uploadfiletype as $key=>$value)	{
-		$uploadfiletype .= $key.' ';
-		$uploadfilesize .= $key.':'.$value.'KB; ';
-	}
+if ($psot_sta == 'reply' && $anonymity) {print <<<EOT
+-->
+					<div class="fl pr" style="width:100%;">
+						<div class="login_tips">您目前还是游客，请 <a id="fast_login" href="pw_ajax.php?action=poplogin&anchor=anchor&tid={$tid}&fpage={$fpage}&toread=$toread{$urladd}&page={$page}" onclick="sendmsg(this.href, '');return false;" class="s4" hidefocus="true">登录</a> 或 <a href="$db_registerfile" target="_blank" class="s4" hidefocus="true">注册</a></div>
+					</div>
+					<script type="text/javascript">
+					window.onReady(function(){document.FORM.onsubmit = function(){sendmsg(getObj('fast_login').href,'');return false;}});
+					</script>
+<!--
+EOT;
+}print<<<EOT
+-->
+				<div class="B_editor B_editor_fp cc" id="fp_editor" onclick="loadEditor(event);">
+<!--
+EOT;
+$_G['uploadtype'] && $db_uploadfiletype = $_G['uploadtype'];
+$db_uploadfiletype = (is_array($db_uploadfiletype) ? $db_uploadfiletype : unserialize($db_uploadfiletype));
+$attachAllow = pwJsonEncode($db_uploadfiletype);
+$imageAllow = pwJsonEncode(getAllowKeysFromArray($db_uploadfiletype, array('jpg','jpeg','gif','png','bmp')));
 print <<<EOT
 -->
-					<div class="c mb10"></div>
-					<table width="100%">
-						<tbody id="attach"></tbody>
-					</table>
-<script type="text/javascript" language="JavaScript" src="js/upload.js"></script>
-<script language="javascript">
-var titlemax = '$db_titlemax';
-var postmax = '$db_postmax';
-var allowmutinum = parseInt('$db_attachnum');
-var allow_ext = '$uploadfiletype';
-var allow_size = '$uploadfilesize';
-/* tmp_attachnum,ajax post时attachnum错误引起可上传附件数量错误*/
-var tmp_attachnum = attachnum = parseInt('$db_attachnum');
-newAtt.create();
-initCheckTextNum('atc_title','atc_title_warn',titlemax);
-initCheckTextNum('atc_content','atc_content_warn',postmax);
-</script>
+					<div class="B_editor_toolbar B_editor_minitoolbar">
+						<div class="B_tar">
+						<a href="javascript:gotoEditor();" class="fr" hidefocus="true" id="gotoedit">进入高级模式</a>
+						</div>
+						<ul><li id="edit_toolbar">
+							<a href="javascript:;" class="B_ico" title="加粗" id="wy_boldIcon" hidefocus="true" style="display:block"><div class="B_boldIcon B_do"></div></a>
+							<div class="B_icoDown" style="display: block;" id="wy_foreColor"><a href="javascript://" class="B_ico"><div class="B_foreColor B_do1" title="文字颜色"><span style="background-color: rgb(255, 0, 0);"></span>文字颜色</div></a><em unselectable="on" class="B_do1"></em></div>
+							<a href="javascript:;" class="B_ico" title="插入链接" id="wy_linkIcon" hidefocus="true" style="display:block"><div class="B_linkIcon B_do"></div></a>
+							<a href="javascript:;" class="B_icoBig" title="插入图片" id="wy_photoBtn" hidefocus="true" style="display:block"><div class="B_photoIcon B_do"></div></a>
+<!--
+EOT;
+if ($db_allowupload && $_G['allowupload']) {print <<<EOT
+-->
+							<a href="javascript:;" class="B_icoBig" title="插入附件" id="wy_fileBtn" hidefocus="true" style="display:block"><div class="B_fileIcon B_do"></div></a>
 <!--
 EOT;
 }print <<<EOT
 -->
-					<div class="mb10">
+						</li></ul>
+					</div>
+					<textarea id="textarea" name="atc_content" style="width:100%;height:140px;padding:0;margin:0;border:0 none;overflow:auto;" onkeydown="quickpost(event)"></textarea>
+					<span id="autosave"></span><div id="menu_editor" class="wy_menu_B" style="display: none;"></div>
+				</div>
+				<div class="c mb10">&nbsp;</div>
 <!--
 EOT;
 if (($db_gdcheck & 4) && (!$db_postgd || $winddb['postnum'] < $db_postgd)) {
 	$gdSize = explode("\t",$db_gdsize);
 print <<<EOT
 -->
-						<dl class="cc">
-							<dt class="dtA">认证码: </dt>
-							<dd>
-								<input class="input" type="text" name="gdcode" size="5" tabindex="6" onfocus="showgd();" id="fs_gdcode"/>
-								<div id="ckcode" style="display:none">
+					<div class="cc mb5"><span style="line-height:24px;width:60px;float:left">认证码: </span>
+						<input class="input mr5" type="text" name="gdcode" size="5" tabindex="6" onfocus="showgd();" id="fs_gdcode"/>
+							<span id="ckcode" style="display:none">
 <script type="text/javascript" src="js/pw_authcode.js"></script>
 <script>
 var flashWidth = "$gdSize[0]";
@@ -249,9 +233,8 @@ var flashHeight = "$gdSize[1]";
 var gdtype = $db_gdtype;
 showGdCode();
 </script>
-								</div>
-							</dd>
-						</dl>
+							</span>
+					</div>
 <!--
 EOT;
 }
@@ -267,47 +250,40 @@ if (($db_ckquestion & 4) && (!$postq || $winddb[postnum] < $postq) && $db_questi
 	$q_a = $question.($showq && $qkey>0?" 正确答案:".$db_answer[$qkey] : '');
 print <<<EOT
 -->
-<style type="text/css">
-.dtA{width:75px;margin-right:5px;}
-.fpbtn{margin-left:80px;}
-</style>
-						<dl class="cc">
-							<dt class="dtA">验证问题：</dt><dd><span class="fl mr10">$q_a</span><input class="input fl" size="5" type="text" name="qanswer" /><input type="hidden" name="qkey" value="$qkey" /></dd>
-						</dl>
+					<div class="cc mb20"><span style="line-height:24px;width:60px;float:left">验证问题: </span><input class="input mr5" size="5" type="text" name="qanswer" /><input type="hidden" name="qkey" value="$qkey" />{$q_a}</div>
 <!--
 EOT;
 }print <<<EOT
 -->
-					</div>
-					<div><span class="mr20"><span class="btn" style="margin:0;"><span><button title="Ctrl+Enter快速发布" type="submit" name="Submit">提 交</button></span></span></span>
+				<div>
+					<span class="mr20"><span class="btn" style="margin:0;"><span><button title="Ctrl+Enter快速发布" type="submit" name="Submit"> 发 布 </button></span></span></span>
 					
 <!--
 EOT;
 if (0 != $tid) {print <<<EOT
 -->					
 					
-					<label for="go_lastpage"><input id="go_lastpage" type="checkbox" title="选定" name="go_lastpage" value="1" />&nbsp;回复后跳转到最后一页</label>
+					<label for="go_lastpage" class="s6"><input id="go_lastpage" type="checkbox" title="选定" name="go_lastpage" value="1" />&nbsp;回复后跳转到最后一页</label>
 					
 <!--
 EOT;
 }
 print <<<EOT
 -->							
-					</div>
 				</div>
 			</td>
 			<td style="width:250px;">
 				<div id="fp_face" class="fp_show">
 					<div class="fp_show_tab">
-						<b id="doleft" style="display:none" class="tab_left fl" onclick="PwFace.showTab(-1)" title="上一个">上一个</b>
-						<b id="doright" style="display:none" class="tab_right fr" onclick="PwFace.showTab(1)" title="下一个">下一个</b>
+						<b id="doleft" style="/*display:none*/" class="tab_left fl" onclick="PwFace.showTab(-1)" title="上一个">上一个</b>
+						<b id="doright" style="/*display:none*/" class="tab_right fr" onclick="PwFace.showTab(1)" title="下一个">下一个</b>
 						<ul id="face_tab"></ul>
 					</div>
 					<div class="fp_show_cont">
-                    	<div class="fp_show_height">
+						<div class="fp_show_height">
 							<ul class="cc" id="face_main"></ul>
-                        </div>
-                        <div id="face_page" class="fp_show_pages cc"></div>
+							<div id="face_page" class="fp_show_pages cc"></div>
+						</div>
 					</div>
 				</div>
 			</td>
@@ -317,45 +293,48 @@ print <<<EOT
 </div>
 <script type="text/javascript">
 document.FORM._hexie.value = '$tmpVerify';
+
+var titlemax = '$db_titlemax';
+var postmax = '$db_postmax';
+initCheckTextNum('atc_title','atc_title_warn',titlemax);
+//initCheckTextNum('atc_content','atc_content_warn',postmax);
+
 var charset='$db_charset';
 var bbsurl ="{$B_url}";
+var BREEZE_BASE_PATH = getBaseUrl() + 'js/breeze/';
 var editor = null;
-function WysiwygConfig() {
-	this.baseURL = document.baseURI || document.URL;
-	if (this.baseURL && this.baseURL.match(/(.*)\/([^\/]?)/)) {
-		this.baseURL = RegExp.$1 + "/";
-	}
-	this.imgURL = imgpath + "/post/c_editor/";
-
-	this.btnList = {
-		bold: [ true, editorcode, true ],
-		forecolor: [ true, showcolor, false ],
-		hilitecolor: [ true, showcolor, false ],
-		createlink: [ true, showcreatelink, false ],
-		unlink: [ true, editorcode, false ],
-		insertimage: [ true, insertImage, false ]
+var attachConfig = {
+		'attachnum' : parseInt('$db_attachnum'),
+		'list' : {},
+		'postData' : {fid : '$fid'},
+		'filetype' : $attachAllow
+	},
+	imageConfig = {
+		tabs : [$imageConfigTabs],
+		url : 'pweditor.php?action=image',
+		filetype : $imageAllow
 	};
-	this.selList = [];
-};
 function loadEditor(e) {
 	var e = is_ie ? event : e;
 	var o = e.srcElement || e.target;
 	if (o.id == 'gotoedit') return;
-
 	$('fp_editor').onclick = '';
-	loadjs('js/wind_c_editor.js', '', '', function() {
-		editor = new WYSIWYD();
-		editor.config = new WysiwygConfig();
-		editor.init();
-		if (o.id && o.id.match(/^wy\_/)) {
-			var key = o.id.substr(3);
-			if (typeof editor.config.btnList[key]) {
-				var cmd = editor.config.btnList[key][1];
-				cmd(key);
+
+	loadjs('js/breeze/core/base.js', '', '', function() {
+		B.require('editor.editor', 'editor.ubb', function(B){
+			editor = B.editor(B.$('#textarea'), 'edit_toolbar', 'boldIcon foreColor linkIcon photoBtn fileBtn',{'currentMode' : 'UBB'});
+			var s = B.hasClass(o, 'B_do') ? o.parentNode : (B.hasClass(o, 'B_do1') ? o : null);
+			if (s && s.events && s.events['mousedown']){
+				var handlers = s.events['mousedown'],evt = {};
+				evt.preventDefault = function(){};
+				for (var i in handlers) {
+					handlers[i](evt);
+				}
 			}
-		}
+		});
 	});
 }
+
 var dataStorage = {
 	save : function() {
 		if (PwStorage.save('msg', document.FORM.atc_content.value)) {
@@ -382,18 +361,10 @@ function gotoEditor() {
 </script>
 <!--
 EOT;
-$facedb = '';
-if (R_P != D_P) {
-	$facedb = readover(D_P.'data/bbscache/face.js');
-} else {print <<<EOT
--->
-<script language="JavaScript" src="data/bbscache/face.js"></script>
-<!--
-EOT;
-}
 $postMinLength = empty($forumset['contentminlen']) ? $db_postmin : $forumset['contentminlen'];
 print <<<EOT
 -->
+<script src="$db_htmdir/js/face.js"></script>
 <script language="JavaScript" src="js/post.js"></script>
 <script language="javascript">
 document.FORM.Submit.disabled = false;
@@ -403,7 +374,7 @@ var cate = '$db_forcetype';
 var cnt = 0;
 
 {$facedb}
-PwFace.init('face_tab', 'face_main', 3, 16);
+window.onReady(function(){PwFace.init('face_tab', 'face_main', 3, 16)});
 function checkpost(obj){
 	var action =  "{$psot_sta}";
 	if(cate==1 && obj.p_type!=null && obj.p_type.value==0){
@@ -469,6 +440,10 @@ function ajaxSubmit(obj){
 		if (rText[0] == 'success') {
 			window.onbeforeunload = function(){};
 			top.window.location =  rText[1];
+			document.FORM.atc_content.value = '';
+			if (typeof (document.FORM.qanswer) != 'undefined') document.FORM.qanswer.value = '';
+			if (typeof (document.FORM.gdcode) != 'undefined') document.FORM.gdcode.value = '';
+			document.FORM.iscontinue.value = 0;
 		}else if(rText[0] == 'continue'){
 			showDlg({type:'confirm',message:rText[1],okText:'继续',onOk:function(){
 				obj.iscontinue.value = 1;
@@ -477,6 +452,8 @@ function ajaxSubmit(obj){
 		}else{
 			showDlg('error', rText[0]);
 		}
+		try{getObj('ckquestion').src = getObj('ckquestion').src.replace(/t=\d+/,'t='+new Date().getTime()); }catch(e){}
+		try{getObj('changeGdCode').src = getObj('changeGdCode').src.replace(/nowtime=\d+/,'nowtime='+new Date().getTime());}catch(e){}
 		document.FORM.Submit.disabled = false;
 		return false;
 	});	
@@ -484,26 +461,26 @@ function ajaxSubmit(obj){
 function postfloor(){
 	var url = 'post.php?fid=$fid';
 	ajax.send(url, document.FORM, function() {
-		var rText = ajax.runscript(ajax.request.responseText);		
+		var changeCheck = true;
+		var rText = ajax.runscript(ajax.request.responseText);	
 		if (rText.indexOf('read_t') !== -1) {
 			document.forms['delatc'].innerHTML += rText;
-			/*请求成功后删除附件行多余列 zph*/
-			var attachRows = getObj('attach');
-			if (attachRows) {
-				while(attachRows.childNodes.length > 1){
-					attachRows.removeChild(attachRows.childNodes[1]);
-				}
-				attachnum = tmp_attachnum-1;
-			}
-			/* end */
 			document.FORM.reset();
+			if(editor) editor.reset();
 			loadFloor.showHidden(tid);
+			document.FORM.iscontinue.value = 0;
+			read.InitMenu();
 		} else {
 			var rText = ajax.request.responseText.split('\t');
 			if (rText[0] == 'success') {
 				window.onbeforeunload = function(){};
 				top.window.location =  rText[1];
+				document.FORM.atc_content.value = '';
+				if (typeof (document.FORM.qanswer) != 'undefined') document.FORM.qanswer.value = '';
+				if (typeof (document.FORM.gdcode) != 'undefined') document.FORM.gdcode.value = '';
+				document.FORM.iscontinue.value = 0;
 			}else if(rText[0] == 'continue'){
+				changeCheck = false;
 				showDlg({type:'confirm',message:rText[1],okText:'继续',onOk:function(){
 					document.FORM.iscontinue.value = 1;
 					ajaxSubmit(document.FORM);
@@ -512,8 +489,10 @@ function postfloor(){
 				showDlg('error', rText[0]);
 			}
 		}
-		try{getObj('ckquestion').src = getObj('ckquestion').src.replace(/t=\d+/,'t='+new Date().getTime()); }catch(e){}
-		try{getObj('reg_ckcode_img').src = getObj('reg_ckcode_img').src.replace(/nowtime=\d+/,'nowtime='+new Date().getTime());}catch(e){}
+		if (changeCheck) {
+			try{getObj('ckquestion').src = getObj('ckquestion').src.replace(/t=\d+/,'t='+new Date().getTime()); }catch(e){}
+			try{getObj('changeGdCode').src = getObj('changeGdCode').src.replace(/nowtime=\d+/,'nowtime='+new Date().getTime());}catch(e){}
+		}
 		cnt = 0;
 		document.FORM.Submit.disabled = false;
 		document.FORM.target = '';

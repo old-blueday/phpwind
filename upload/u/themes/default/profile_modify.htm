@@ -201,41 +201,46 @@ if (signnum) {
 						<table width="100%" class="setTable">
 							<tr>
 								<th class="th">支付宝帐号</th>
+								<td class="td">
 <!--
 EOT;
-if($trade[isbinded] == 'T' && $trade[alipay]){print<<<EOT
+if ($isAuthAlipay) {print<<<EOT
 -->
-								<td class="td"><input type="hidden" name="alipay" value="$trade[alipay]" />
 									<div class="s5 mb5">$trade[alipay]</div>
 									<ul style="line-height:24px;" class="mb10">
-										<li><span class="s3 mr10">&#8730;已通过身份验证</span><a href="act_alipay_push.php?action=user_authentication" target="_blank">重新验证</a></li>
+										<li><span class="s3 mr10">&#8730;已通过身份验证</span><a href="javascript:void(0)" class="mr10"  onclick="window.open('profile.php?action=auth&check_step=alipay', 'alipayCredit', 'height=520, width=1050');">重新验证</a></li>
 <!--
 EOT;
-if($trade[iscertified] == 'T'){print<<<EOT
+	if ($trade[iscertified] == 'T') {print<<<EOT
 -->
 										<li><span class="s3">&#8730;已通过实名认证</span></li>
 <!--
 EOT;
-}else{print <<<EOT
+	} else {print <<<EOT
 -->
 										<li>尚未通过<a href="http://www.alipay.com" target="_blank">实名认证</a></li>
 <!--
 EOT;
-}print <<<EOT
+	}
+print <<<EOT
 -->
-									</ul>	
-								</td>
+									</ul>
 <!--
 EOT;
-}else{print <<<EOT
+} else {print<<<EOT
 -->
-								<td class="td">
 									<input class="input input_wa" type="text" name="alipay" value="$trade[alipay]" />
-								</td>
 <!--
 EOT;
+	if ($db_authstate) {print <<<EOT
+-->
+									<a href="javascript:void(0)" class="mr10"  onclick="window.open('profile.php?action=auth&check_step=alipay', 'alipayCredit', 'height=520, width=1050');">[绑定]</a>
+<!--
+EOT;
+	}
 }print <<<EOT
 -->
+								</td>
 							</tr>
 							<tr>
 								<th class="th">个人商品分类</th>
@@ -285,6 +290,31 @@ addtrade();
 					</div>
 					<div style="display:none" id="info_link">
 						<table width="100%" class="setTable">
+							<tr>
+								<th class="th">手机号</th>
+								<td class="td">
+<!--
+EOT;
+if (!$db_authstate) {print <<<EOT
+-->
+									<input class="input" type="text" size="25" maxlength="16" name="proauthmobile" value="$userdb[authmobile]" />
+<!--
+EOT;
+} elseif ($isAuthMobile) {print <<<EOT
+-->
+									<span id="td_span_mobile" class="mr20">$authmobile</span><img src="u/images/attest/mobile.gif" align="absmiddle" class="mr5"/>已绑定手机 <a id="a_edit_mobile" href="profile.php?action=auth&check_step=mobile">[修改]</a>
+<!--
+EOT;
+} else {print <<<EOT
+-->
+									<input class="input" type="text" size="25" maxlength="16" name="proauthmobile" id="td_input_mobile" value="$userdb[authmobile]" />
+									<a href="javascript:void(0);" onclick="checkMobile();return false;" class="mr10">[绑定]</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+								</td>
+							</tr>
 							<tr>
 								<th class="th">QQ</th>
 								<td class="td"><input class="input" type="text" size="25" maxlength="12" name="prooicq" value="$userdb[oicq]" /></td>
@@ -366,10 +396,10 @@ EOT;
 												<td class="td"><span class="mr20">头像链接</span><input name="httpurl[0]" id="httpurl_url" value="$httpurl" class="input input_wb mr10" type="text" /> 必须以 http://开头</td>
 											</tr>
 											<tr>
-												<td class="td"><span class="mr20">头像宽度</span><input name="httpurl[1]" value="$iconwidth" class="input input_wc mr10" maxlength="3" onblur="if(1 <= this.value && this.value <= $db_imgwidth){document.images.useravatars.width = this.value;}" /> 必须是 1 -- $db_imgwidth 之间的一个整数。</td>
+												<td class="td"><span class="mr20"></span><input name="httpurl[1]" value="$iconwidth" class="input input_wc mr10" maxlength="3" onblur="if(1 <= this.value && this.value <= $db_imgwidth){document.images.useravatars.width = this.value;}" /> 必须是 1 -- $db_imgwidth 之间的一个整数。</td>
 											</tr>
 											<tr>
-												<td class="td"><span class="mr20">头像高度</span><input name="httpurl[2]" value="$iconheight" class="input input_wc mr10" maxlength="3" onblur="if(1 <= this.value &&  this.value <= $db_imgheight){document.images.useravatars.height = this.value;}" /> 必须是 1 -- $db_imgheight 之间的一个整数。</td>
+												<td class="td"><span class="mr20"></span><input name="httpurl[2]" value="$iconheight" class="input input_wc mr10" maxlength="3" onblur="if(1 <= this.value &&  this.value <= $db_imgheight){document.images.useravatars.height = this.value;}" /> 必须是 1 -- $db_imgheight 之间的一个整数。</td>
 											</tr>
 										</table>
                                         <div class="p15">当高度和宽度留空，或只设置一个值时，则根据图片原尺寸进行缩放</div>
@@ -383,7 +413,7 @@ if($db_bbsifopen != 1){print <<<EOT
 -->
 <div class="blockquote3">
 抱歉，站点正处于内部开放状态，只有在完全开放状态下，才能使用头像上传功能。<br />
-<span class="gray">（站点状态的后台设置路径：核心设置 &#187; 常规设置）</span>
+<span class="gray">（站点状态的后台设置路径：全局 &#187; 站点设置）</span>
 </div>
 <!--
 EOT;
@@ -701,6 +731,16 @@ function setFaceLen() {
 function selectTab(tab) {
 	showTabs('infolist', tab, 'li', 'current');
 	$('userbinding-node').style.display = (tab == 'binding') ? '' : 'none';
+}
+
+function checkMobile() {
+	var url = 'profile.php?action=auth&check_step=mobile';
+	var mobile = $('td_input_mobile').value;
+
+	if (mobile != '' && typeof (mobile) != 'undefined') {
+		url += '&check_mobile='+mobile;
+	}
+	window.location.href = url;
 }
 
 ~function() {

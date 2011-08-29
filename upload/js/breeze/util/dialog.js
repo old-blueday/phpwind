@@ -50,7 +50,8 @@ Breeze.namespace('util.dialog', function(B){
 		 * 弹窗弹出后的执行函数，可以用此绑定事件在里面。
 		 * @type Function
 		 */
-		callback: null
+		callback: null,
+		outWin: false
 	};
 	
 	/**
@@ -86,7 +87,7 @@ Breeze.namespace('util.dialog', function(B){
 			B.css(this.mask, 'display', 'none');
 		},
 		distory: function(){
-			B.removeElement(this.mask);
+			B.remove(this.mask);
 		},
 		resize: function(){
 			B.css(this.mask,{
@@ -104,7 +105,6 @@ Breeze.namespace('util.dialog', function(B){
 		if( !(this instanceof Dialog) ){
 			return new Dialog(setting, ele);
 		}
-		
 		/**
 		 * 最终的设置
 		 * @private {Setting}
@@ -115,12 +115,12 @@ Breeze.namespace('util.dialog', function(B){
 		
 		/*
 		* IE6隐藏select
-		*/
 		if(B.UA.ie === 6) {
 		    B.$$('select').forEach(function(n){
 		        n.style.visibility = 'hidden';
 		    });
 		}
+		*/
 		/**
 		 * 展开弹窗
 		 */
@@ -142,13 +142,17 @@ Breeze.namespace('util.dialog', function(B){
 				B.require('event', function(B){
 					B.$$query('.B_close', popwin)(B.addEvent, 'click', function(e){
 						self.closep();
+						e.preventDefault();
 					});
 				});
 			}else{
 				B.css(popwin, {display:'block', visibility:'hidden'});
 			}
 			//显示
-			self.win = B.$query(popwin)(layerOut, self.pos, self.posrel)(B.css, {visibility:'visible', backgroundColor:'#ffffff'})();
+			B.query(popwin)
+				.layerOut(self.pos, self.posrel, self.outWin)
+				.css({visibility:'visible', backgroundColor:'#ffffff'});
+			self.win = popwin;
 			self.callback && self.callback(self);
 			//绑定事件
 			if(self.autoHide){
@@ -206,7 +210,7 @@ Breeze.namespace('util.dialog', function(B){
 	 * 定位的位置
 	 * @type Array
 	 */
-	function layerOut(popwin, pos, rel)
+	function layerOut(popwin, pos, rel, isOutWin)
 	{
 		var res = rel ? B.offset(rel) : 
 			{
@@ -229,7 +233,7 @@ Breeze.namespace('util.dialog', function(B){
 			res.left -= B.width(popwin);
 			pos[0] == 'center' && (res.left /= 2);
 		}
-		res.left += B.scrollLeft();
+		//res.left += B.scrollLeft();
 		
 		//配置Y轴位置
 		if (pos[1].indexOf('bottom') > -1 || pos[1]=='center') {
@@ -241,37 +245,52 @@ Breeze.namespace('util.dialog', function(B){
 			res.top -= B.height(popwin);
 			pos[1] == 'center' && (res.top /= 2);
 		}
-		res.top += B.scrollTop();
+		//res.top += B.scrollTop();
 		
 		//配置偏移
 		pos[2] && (res.left += parseInt(pos[2]));
 		pos[3] && (res.top += parseInt(pos[3]));
 		
 		//防止移动到屏幕外面
-		if( res.left < B.scrollLeft() ){
-			res.left = B.scrollLeft();
-		}else if( res.left > B.scrollLeft()+B.width(window)-B.width(popwin) ){
-			res.left = B.scrollLeft()+B.width(window)-B.width(popwin);
+		if(!isOutWin){
+			if( res.left < B.scrollLeft() ){
+				res.left = B.scrollLeft();
+			}else if( res.left > B.scrollLeft()+B.width(window)-B.width(popwin) ){
+				res.left = B.scrollLeft()+B.width(window)-B.width(popwin);
+			}
+			
+			if( res.top < B.scrollTop() ){
+				res.top = B.scrollTop();
+			}else if( res.top > B.scrollTop()+B.height(window)-B.height(popwin) ){
+				res.top = B.scrollTop()+B.height(window)-B.height(popwin);
+			}
 		}
-		
-		if( res.top < B.scrollTop() ){
-			res.top = B.scrollTop();
-		}else if( res.top > B.scrollTop()+B.height(window)-B.height(popwin) ){
-			res.top = B.scrollTop()+B.height(window)-B.height(popwin);
-		}
-		
 		B.css(popwin, res);
 	}
-	
+	B.extend('layerOut', function() {
+		var arg = B.makeArray(arguments),finalEls = [];
+		for(var i = 0,j = this.nodes.length; i < j; i++) {
+			var el = this.nodes[i],
+				result = layerOut.apply(el,[el].concat(arg));
+			finalEls = finalEls.concat(B.makeArray(result || []));
+		}
+		//如果是获取元素,更新当前this.el
+		if(finalEls.length > 0){
+			this.nodes = finalEls;
+			this.length = finalEls.length;
+		}
+		return this;
+	});
 	/**
 	 * 提醒和警告
 	 */
-	B.util.alert = function(str){
+	B.util.alert = function(str, elem, p){
 		Dialog({
-			pos: ['center', 'center'],
-			data:'<div class="B_dialog_alert"><h4>警告</h4><p>'+str+'</p><div><input type="button" class="B_close" value="关闭" /></div></div>',
-			reuse: true,
-			mask:true
-		});
+			pos: p ? p : ['center', 'center'],
+			id:'dialog-alert',
+			data:'<div class="B_menu B_dialog_alert B_p10B"><div style="width:200px;"><h4 class="B_h B_drag_handle">警告</h4><p class="B_mb10">'+str+'</p><div class="tac"><span class="B_btn2"><span><button type="button" class="B_close">关闭</button></span></span></div></div></div>',
+			reuse: true/*,
+			//mask:true*/
+		},elem);
 	}
 });

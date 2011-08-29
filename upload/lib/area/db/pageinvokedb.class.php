@@ -7,7 +7,7 @@ class PW_PageInvokeDB extends BaseDB {
 	function searchPageInvokes($array,$page,$prePage = 20) {
 		$page = (int)$page-1 < 0 ? 0 : (int) $page-1;
 		$temp = array();
-		$_sql = "SELECT p.*,i.title FROM ".$this->_tableName." p LEFT JOIN ".$this->_joinTable." i ON p.invokename=i.name".$this->_getSearchSql($array,1).' ORDER by p.state ASC, p.id ASC '.S::sqlLimit($page*$prePage,$prePage);
+		$_sql = "SELECT p.*,i.title,i.name FROM ".$this->_tableName." p LEFT JOIN ".$this->_joinTable." i ON p.invokename=i.name".$this->_getSearchSql($array,1).' ORDER by p.state ASC, p.id ASC '.S::sqlLimit($page*$prePage,$prePage);
 		$query = $this->_db->query($_sql);
 		while ($rt = $this->_db->fetch_array($query)) {
 			$rt = $this->_unserializeData($rt);
@@ -16,7 +16,7 @@ class PW_PageInvokeDB extends BaseDB {
 		return $temp;
 	}
 	function searchCount($array) {
-		$_sql = "SELECT COUNT(*) as count FROM ".$this->_tableName.$this->_getSearchSql($array);
+		$_sql = "SELECT COUNT(*) as count FROM ".$this->_tableName." p LEFT JOIN ".$this->_joinTable." i ON p.invokename=i.name".$this->_getSearchSql($array);
 		return $this->_db->get_value($_sql);
 	}
 	function _getSearchSql($array,$ifJoin=0) {
@@ -25,7 +25,9 @@ class PW_PageInvokeDB extends BaseDB {
 		foreach ($array as $key=>$value) {
 			if ($key == 'invokename') {
 				$_sql_where .= " AND ".($ifJoin ? "p.":'')."invokename LIKE ".S::sqlEscape("%$value%");
-			} elseif ($key == 'sign' && $value) {
+			} elseif ($key == 'title') {
+				$_sql_where .= " AND ".($ifJoin ? "i.":'')."title LIKE ".S::sqlEscape("%$value%");
+			}  elseif ($key == 'sign' && $value) {
 				$_sql_where .= " AND ".($ifJoin ? "p.":'')."sign=".S::sqlEscape($value);
 			} else {
 				$_sql_where .= " AND ".($ifJoin ? "p.":'')."$key=".S::sqlEscape($value);
@@ -98,7 +100,7 @@ class PW_PageInvokeDB extends BaseDB {
 	}
 
 	function getStruct(){
-		return array('id','scr','sign','invokename','pieces','state','ifverify');
+		return array('id','scr','sign','invokename','pieces','state','ifverify','title');
 	}
 	function _checkData($data){
 		if (!is_array($data) || !count($data)) return null;

@@ -1,7 +1,7 @@
 <?php
 require_once('global.php');
 
-if ($c_htm || $db_hithour) {
+if ($c_htm || $db_hits_store == 2) {
 	if (@filesize(D_P.'data/bbscache/hits.txt')<5120) {
 		$lastupdate = $_COOKIE['lastupdate'];
 		$onbbstime = $timestamp-$lastupdate;
@@ -16,8 +16,7 @@ if ($c_htm || $db_hithour) {
 			fclose($handle);
 		}
 	} else {
-		//* @unlink(D_P.'data/bbscache/hits.txt');
-		@pwCache::deleteData(D_P.'data/bbscache/hits.txt');
+		@unlink(D_P.'data/bbscache/hits.txt');
 	}
 }
 ?>

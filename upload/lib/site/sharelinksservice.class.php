@@ -32,6 +32,7 @@ class PW_SharelinksService {
 			$relationService = L::loadClass('SharelinksRelationService', 'site');
 			$stid && $sids = $relationService->findSidByStid($stid);
 		}
+		if($stid && !$sids) return array();
 		$linksDb = $this->_getLinksDB();
 		return $linksDb->getData($num,$sids,$haveLogo);
 	}

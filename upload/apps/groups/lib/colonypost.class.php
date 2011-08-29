@@ -72,7 +72,8 @@ class PwColonyPost extends PwColony {
 		if ($postdata['ifcheck'] > 0) {
 			require_once(R_P . 'u/require/core.php');
 			//tnum加一
-			$this->_db->update("UPDATE pw_colonys SET tnum=tnum+'1',pnum=pnum+'1',todaypost=todaypost+'1' WHERE id=" . S::sqlEscape($this->cyid));
+			//* $this->_db->update("UPDATE pw_colonys SET tnum=tnum+'1',pnum=pnum+'1',todaypost=todaypost+'1' WHERE id=" . S::sqlEscape($this->cyid));
+			$this->_db->update(pwQuery::buildClause("UPDATE :pw_table SET tnum=tnum+1,pnum=pnum+1,todaypost=todaypost+1 WHERE id=:id", array('pw_colonys',$this->cyid)));
 			$this->info['tnum']++;
 			$this->info['pnum']++;
 			updateGroupLevel($this->cyid, $this->info);
@@ -121,7 +122,8 @@ class PwColonyPost extends PwColony {
 		if ($thread_locked < 3) {
 			$this->_db->update('UPDATE pw_argument SET lastpost=' . S::sqlEscape($timestamp) . ' WHERE tid=' . S::sqlEscape($tid) . ' AND lastpost< '.S::sqlEscape($timestamp));
 		}
-		$this->_db->update("UPDATE pw_colonys SET pnum=pnum+'1',todaypost=todaypost+1 WHERE id=" . S::sqlEscape($this->cyid));
+		//* $this->_db->update("UPDATE pw_colonys SET pnum=pnum+'1',todaypost=todaypost+1 WHERE id=" . S::sqlEscape($this->cyid));
+		$this->_db->update(pwQuery::buildClause("UPDATE :pw_table SET pnum=pnum+1,todaypost=todaypost+1 WHERE id=:id", array('pw_colonys',$this->cyid)));
 		$this->info['pnum']++;
 		updateGroupLevel($this->info['id'], $this->info);
 
@@ -141,7 +143,8 @@ class PwColonyPost extends PwColony {
 			$actions = '-';
 			$this->info['tnum']--;
 		}
-		$this->_db->update("UPDATE pw_colonys SET tnum=tnum{$actions}'1' WHERE id=" . S::sqlEscape($this->cyid));
+		//* $this->_db->update("UPDATE pw_colonys SET tnum=tnum{$actions}'1' WHERE id=" . S::sqlEscape($this->cyid));
+		$this->_db->update(pwQuery::buildClause("UPDATE :pw_table SET tnum=tnum{$actions}'1' WHERE id=:id", array('pw_colonys',$this->cyid)));
 		updateGroupLevel($this->cyid, $this->info);
 	}
 }

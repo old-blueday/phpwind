@@ -39,7 +39,7 @@ function creatguestcache($output) {
 				@mkdir(D_P."$db_guestdir/T_{$fid}");
 				@chmod(D_P."$db_guestdir/T_{$fid}", 0777);
 			}
-			pwCache::setData(D_P."$db_guestdir/T_{$fid}/{$fid}_{$page}.html",$output);
+			pwCache::writeover(D_P."$db_guestdir/T_{$fid}/{$fid}_{$page}.html",$output);
 			break;
 		case 'read' :
 			$tmp = 'R_'.intval($tid/500);
@@ -47,11 +47,11 @@ function creatguestcache($output) {
 				@mkdir(D_P."$db_guestdir/$tmp");
 				@chmod(D_P."$db_guestdir/$tmp", 0777);
 			}
-			pwCache::setData(D_P."$db_guestdir/$tmp/{$tid}_{$page}.html",$output);
+			pwCache::writeover(D_P."$db_guestdir/$tmp/{$tid}_{$page}.html",$output);
 			break;
 		case 'index' :
 			$indexpath = getguestIndexpath();
-			pwCache::setData($indexpath,$output);
+			pwCache::writeover($indexpath,$output);
 			break;
 	}
 }

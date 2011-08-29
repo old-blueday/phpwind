@@ -38,23 +38,29 @@ var MC = {
 	showSuccessTips : function(message,otherid){
 		if(!message) return false;
 		var mdiv = otherid ?  this.$(otherid) : this.$(this.showMessageId);
-		mdiv.innerHTML = message;
-		mdiv.className = "rightTip mb10";
-		mdiv.style.display = '';
+		try{
+			mdiv.innerHTML = message;
+			mdiv.className = "rightTip mb10";
+			mdiv.style.display = '';
+		} catch(e){}
 		return this;
 	},
 	showFailTips : function(message,otherid){
 		if(!message) return false;
 		var mdiv = otherid ?  this.$(otherid) : this.$(this.showMessageId);
-		mdiv.innerHTML = message;
-		mdiv.className = "wrongTip mb10";
-		mdiv.style.display = '';
+		try{
+			mdiv.innerHTML = message;
+			mdiv.className = "wrongTip mb10";
+			mdiv.style.display = '';
+		} catch(e){}
 		return this;
 	},
 	fadeTips : function(otherid){
 		clearTimeout(MC.timer);
 		var mdiv = otherid ?  this.$(otherid) : this.$(this.showMessageId);
-		this.timer = setTimeout(function(){mdiv.style.display = 'none';},3000);
+		if (mdiv) {
+			this.timer = setTimeout(function(){mdiv.style.display = 'none';},3000);
+		}
 	},
 	/* ajax get */
 	get : function(url,data,id){
@@ -79,6 +85,7 @@ var MC = {
 				document.getElementsByName("checkall")[i].checked=obj.checked;
 			}
 		var checkBox = form.rids;
+		if (typeof(checkBox) == 'undefined') return;
 		if(checkBox.value){
 			obj.checked ? checkBox.checked = true : checkBox.checked = false;
 		}else{
@@ -106,9 +113,13 @@ var MC = {
 			MC.fadeTips(otherid);
 			return false;
 		}
-		form.atc_content.value = htmltocode(replyContent);
+		//form.atc_content.value = htmltocode(replyContent);
 		MC.post(url,form,'',function(){
-			MC.$("textarea").value = "";
+			if (typeof editor == 'object') {
+				editor.reset();
+			} else {
+				MC.$("textarea").value = "";
+			}
 			window.setTimeout(function(){location.reload();},100);
 		});
 		return false;
@@ -335,6 +346,7 @@ var MC = {
 					icon.src = "u/images/message/sendread.png";
 					MC.$(emId+rid).innerHTML = '';
 				}
+				location.reload();
 			}else{
 				var pids = pid.split(',');
 				var returnValue = ajax.request.responseText;
@@ -366,11 +378,17 @@ var MC = {
 					}
 					checkBoxObj.checked = false;
 				}
+				location.reload();
 			}
+			
 		}
 		if(className == 'ignoreTip'){
 			MC.tips('confirm','你确定要忽略这些请求吗?',0,function(){
 				MC.post(httpUrl,'',callback,'','',true);})
+		}else if(className == 'ignoreOneTip'){
+			MC.tips('confirm','你确定要忽略请求吗?',0,function(){
+				MC.post(httpUrl,'',callback,'','',true);
+				})
 		}else{
 			MC.post(httpUrl,'',callback,'','',true);
 		}

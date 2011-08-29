@@ -19,6 +19,8 @@ class MS_Base {
 	var $_notice_postcate = 'notice_postcate'; //团购通知
 	var $_notice_active = 'notice_active'; //活动通知
 	var $_notice_apps = 'notice_apps'; //应用通知
+	var $_notice_comment = 'notice_comment'; //评论通知
+	var $_notice_guestbook = 'notice_guestbook'; //留言通知 
 	var $_request = 'request'; //请求
 	var $_request_friend = 'request_friend'; //好友请求
 	var $_request_group = 'request_group'; //群组请求
@@ -52,6 +54,7 @@ class MS_Base {
 	var $_nodeTime = 0; //每日起点时间 12:00
 	var $_super = 0; //超级权限开关 是否开启全局设置
 	
+	var $_c_relation_reply = 2; //关系类型,回复类型
 
 	var $_c_sms_num = 'sms_num'; //站内信消息数
 	var $_c_notice_num = 'notice_num'; //通知消息数
@@ -192,25 +195,76 @@ class MS_Base {
 			return false;
 		}
 		$relationsDao = $this->getRelationsDao();
-		if (!($relation = $relationsDao->getRelation($userId, $relationId)) || $relation['mid'] != $parentId) {
+		#if (!($relation = $relationsDao->getRelation($userId, $relationId)) || $relation['mid'] != $parentId) {
+		#	return false;
+		#}
+		if (!($relation = $relationsDao->getRelation($userId, $relationId))) {
 			return false;
 		}
 		if (!($result = $this->_doReply($userId, $parentId, $messageInfo))) {
 			return false;
 		}
-		$messagesDao->update(array('modified_time' => $this->_timestamp,'content' => $messageInfo['content']), $parentId);
-		$fieldData = array('status' => $this->_s_new_reply,'modified_time' => $this->_timestamp);
-		// history to normal type
+		if($this->getMapByTypeId($relation['typeid']) == $this->_sms ){
+			$messageInfo['title'] = 'RE:'.$message['title'];
+			$actor = (isset($message['expand']) && ($expand = unserialize($message['expand'])) && (isset($expand['actor']))) ? $expand['actor'] : array();
+			$this->_addReplyRelations($userId,$actor,$parentId,$relation['categoryid'],$relation['typeid'], $messageInfo);
+			$fieldData = array();
+		}else{
+			$messagesDao->update(array('modified_time' => $this->_timestamp,'content' => $messageInfo['content']), $parentId);
+			$fieldData = array('status' => $this->_s_new_reply,'modified_time' => $this->_timestamp);
+		}
 		$expand = ($message['expand']) ? unserialize($message['expand']) : array();
 		if ($relation['categoryid'] == $this->getMap($this->_history)) {
 			$expand = ($message['expand']) ? unserialize($message['expand']) : array();
 			$expand && $fieldData['categoryid'] = $expand['categoryid'];
 		}
 		$categoryId = ($fieldData['categoryid']) ? $fieldData['categoryid'] : $relation['categoryid'];
-		$relationsDao->updateRelationsByMessageId($fieldData, $parentId);
+		$fieldData && $relationsDao->updateRelationsByMessageId($fieldData, $parentId);
 		$this->_updateStatisticsByCategoryId($categoryId, $message, $userId);
 		return $result;
 	}
+	/**
+	 * 新增回复关系
+	 */
+	function _addReplyRelations($userId, $actor, $parentId, $categoryId, $typeId, $messageInfo){
+		if(!$actor && is_array($actor) && !$messageInfo && !is_array($messageInfo)){
+			return false;
+		}
+		$userIds = array();
+		foreach($actor as $tmpUserId){
+			($userId != $tmpUserId) && $userIds[] = $tmpUserId;
+		}
+		$userService = $this->_getUserService();
+		if(!($toUser = $userService->get($userIds[0]))){
+			return false;
+		}
+		$messageInfo['expand'] = serialize(array('categoryid' => $categoryId,'typeid' => $typeId, 'parentid' => $parentId));
+		$messageInfo['extra'] = serialize(array($toUser['username']));
+		if (!($messageId = $this->_addMessage($messageInfo))) {
+			return false;
+		}
+		$relations = array();
+		$userIds = array($toUser['uid'],$userId);
+		foreach ($userIds as $otherId) {
+			$relation = array();
+			$relation['uid']          = $otherId;
+			$relation['mid']          = $messageId;
+			$relation['categoryid']   = $categoryId;
+			$relation['typeid']       = $typeId;
+			$relation['status']       = ($otherId == $userId) ? $this->_s_have_read : $this->_s_not_read;
+			$relation['isown']        = ($otherId == $userId) ? $this->_s_self : $this->_s_other;
+			$relation['relation']     = $this->_c_relation_reply;
+			$relation['created_time'] = $relation['modified_time'] = $this->_timestamp;
+			$relations[] = $relation;
+		}
+		$relationsDao = $this->getRelationsDao();
+		if (!($relationId = $relationsDao->addReplyRelations($relations))) {
+			return false;
+		}
+		$this->_addSearch($userId, $toUser['uid'], $relationId, $messageId, $typeId);
+		return $messageId;
+	}
+	
 	function _doReply($userId, $parentId, $messageInfo) {
 		$userId = intval($userId);
 		$parentId = intval($parentId);
@@ -1036,7 +1090,7 @@ class MS_Base {
 						list($userIds) = $this->_getUserByUserNames($userNames);
 						$userIds = array_intersect($userIds, $receiveUserIds);
 						$this->_updateStatisticsByUserNames($userIds, null, $this->_groupsms, 1);
-						$this->_updateUserMessageNumbers($receiveUserIds);
+						$this->_updateUserMessageNumbers($userIds);
 					}
 				}
 				break;
@@ -1105,12 +1159,16 @@ class MS_Base {
 	 * @return unknown_type
 	 */
 	function maps() {
-		return array($this->_sms => 1,$this->_sms_message => 100,$this->_sms_rate => 101,$this->_sms_comment => 102,
-					$this->_sms_guestbook => 103,$this->_sms_share => 104,$this->_sms_reply => 105,$this->_notice => 2,
+		return array($this->_sms => 1,
+					$this->_sms_message => 100,$this->_sms_rate => 101,$this->_sms_comment => 102,
+					$this->_sms_guestbook => 103,$this->_sms_share => 104,$this->_sms_reply => 105,
+					$this->_notice => 2,
 					$this->_notice_system => 200,$this->_notice_postcate => 201,$this->_notice_active => 202,
-					$this->_notice_apps => 203,$this->_request => 3,$this->_request_friend => 300,
-					$this->_request_group => 301,$this->_request_active => 302,$this->_request_apps => 303,
-					$this->_groupsms => 4,$this->_groupsms_colony => 400,$this->_groupsms_normal => 401,
+					$this->_notice_apps => 203,$this->_notice_comment => 204,$this->_notice_guestbook => 205,
+					$this->_request => 3,
+					$this->_request_friend => 300,$this->_request_group => 301,$this->_request_active => 302,$this->_request_apps => 303,
+					$this->_groupsms => 4,
+					$this->_groupsms_colony => 400,$this->_groupsms_normal => 401,
 					$this->_groupsms_shield => 402,$this->_chat => 5,$this->_history => 0);
 	}
 	/**
@@ -1122,7 +1180,7 @@ class MS_Base {
 					$this->_sms => array($this->_sms_message,$this->_sms_rate,$this->_sms_comment,$this->_sms_guestbook,
 										$this->_sms_share,$this->_sms_reply),
 					$this->_notice => array($this->_notice_system,$this->_notice_postcate,$this->_notice_active,
-											$this->_notice_apps),
+											$this->_notice_apps,$this->_notice_comment,$this->_notice_guestbook),
 					$this->_request => array($this->_request_friend,$this->_request_group,$this->_request_active,
 											$this->_request_apps),
 					$this->_groupsms => array($this->_groupsms_colony,$this->_groupsms_normal,$this->_groupsms_shield));

@@ -79,7 +79,7 @@ class PW_PhotoSource extends SystemData {
 		$data['url'] = $db_bbsurl . '/apps.php?q=photos&a=view&pid=' . $data['pid'];
 		$data['title'] = $data['pintro'];
 		if($data['path'] && substr($rt['path'],0,7) != 'http://'){
-				$a_url = geturl($data['path'],'show','1');
+				$a_url = geturl($data['path']);
 				$data['imgurl'] = is_array($a_url) ? $a_url[0] : $a_url;
 		}
 		$data['image'] = $data['imgurl'];

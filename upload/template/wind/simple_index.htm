@@ -5,7 +5,19 @@ print <<<EOT
 <br />
 <table cellspacing="1" cellpadding="0" width="$tablewidth" $i_table align="center">
 <tr><td><table cellspacing="0" cellpadding="8" width="100%"><tr><td bgcolor="#FFFFFF">
-<b><a href="$DIR">$db_bbsname</a></b></td><td bgcolor="#FFFFFF" align="right"><B><A HREF="login.php">登录</A> -&gt; <A HREF="$db_registerfile">注册</A></B></td></tr>
+<b><a href="$DIR">$db_bbsname</a></b></td><td bgcolor="#FFFFFF" align="right">
+<!--
+EOT;
+if (!$winduid) {
+print <<<EOT
+-->
+<B><A HREF="login.php">登录</A> -&gt; <A HREF="$db_registerfile">注册</A></B>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+</td></tr>
 </table></td></tr>
 </table>
 <br />

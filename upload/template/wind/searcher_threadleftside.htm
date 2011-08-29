@@ -1,0 +1,149 @@
+<!--<?php 
+$filterFidUrl = "searcher.php?type=thread&step=2&keyword={$keyword}&username={$username}&threadrange={$threadrange}&threadrange={$threadrange}&starttime={$starttime}&endtime={$endtime}&";
+if ($condition == 'digest') {
+	$filterFidUrl = "searcher.php?digest=1&starttime={$starttime}&endtime={$endtime}&";
+}
+print <<<EOT
+-->
+<div class="menubar">
+	<div class="boxA bdA mb10">
+		<h2><a href="{$filterFidUrl}">全部版块</a></h2>
+<!-- 
+EOT;
+if ($searchForumPart1) {print <<<EOT
+-->
+		<ul class="ul">
+<!-- 
+EOT;
+foreach ($searchForumPart1 as $key=>$value) {
+if (!$value) continue;
+$value = strip_tags($value);
+($keyword && $isSphinx) && $forumsTotal[$key] = $forumsTotal[$key] ? "($forumsTotal[$key])" : "(0)";
+print <<<EOT
+-->
+            <li id="fid_{$key}"><a href="{$filterFidUrl}fid=$key">{$value}{$forumsTotal[$key]}</a></li>
+            
+<!-- 
+EOT;
+}print <<<EOT
+-->
+		</ul>
+<!-- 
+EOT;
+}print <<<EOT
+-->
+<!--
+EOT;
+if ($_COOKIE['isshowfidtoggle']) {
+	$morefidsStyle = 'display:block';
+    $morebtnStyle = 'list_openup list_packup';
+    $showfidMessage = '隐藏部分';
+} else {
+	$morefidsStyle = 'display:none';
+    $morebtnStyle = 'list_openup';
+    $showfidMessage = '更多';
+}
+if ($searchForumPart2) {print <<<EOT
+-->
+        <ul id ="morefids" class="ul" style="{$morefidsStyle}">
+<!-- 
+EOT;
+foreach ($searchForumPart2 as $key=>$value) {
+if (!$value) continue;
+$value = strip_tags($value);
+($keyword && $isSphinx) && $forumsTotal[$key] = $forumsTotal[$key] ? "($forumsTotal[$key])" : "(0)";
+print <<<EOT
+-->
+
+
+            <li id="fid_{$key}"><a href="{$filterFidUrl}fid=$key">{$value}{$forumsTotal[$key]}</a></li>
+<!-- 
+EOT;
+}print <<<EOT
+-->
+        </ul>
+				<div class="{$morebtnStyle}" id="morebtn">
+					<a href="javascript:;" onclick="showmore();">{$showfidMessage}</a>
+				</div>
+<!-- 
+EOT;
+}print <<<EOT
+-->
+<!--
+EOT;
+if ($searchForumPart1 || $searchForumPart2) {
+print <<<EOT
+-->
+<script language="JavaScript">
+setCurrent('fid_{$fid}','','current');
+function showmore() {
+	var morefids = getObj('morefids');
+	var isshowfid = (morefids.style.display == "block") ? 0: 1;
+	morefids.style.display = (isshowfid == 0) ? "none" : "block";
+	getObj('morebtn').className = (isshowfid == 0) ? "list_openup":'list_openup list_packup';
+	getObj('morebtn').innerHTML = (isshowfid == 0) ? "<a href=\"javascript:;\" onclick=\"showmore();\">更多</a>":'<a href=\"javascript:;\" onclick=\"showmore();\">隐藏部分</a>';
+	SetCookie('isshowfidtoggle',isshowfid);
+}
+</script>
+<!--
+EOT;
+}
+print <<<EOT
+-->	
+	</div>
+	<div class="boxA">
+<!--
+EOT;
+$filterDateUrl = "searcher.php?type=thread&step=2&keyword={$keyword}&username={$username}&threadrange={$threadrange}&threadrange={$threadrange}&fid={$fid}&";
+if ($condition == 'digest') {
+	$filterDateUrl = "searcher.php?digest=1&fid={$fid}&";
+}
+print <<<EOT
+-->
+		<h2><a href="{$filterDateUrl}">全部时间</a></h2>
+		<ul>
+<!-- 
+EOT;
+if ($timesFilterList) {
+    foreach ($timesFilterList as $key=>$value) {
+print <<<EOT
+-->
+			<li id="posttime_{$value['starttime']}"><a href="{$filterDateUrl}starttime={$value[starttime]}&endtime={$value[endtime]}&">$value[title]</a></li>
+<!--
+EOT;
+    }
+}
+print <<<EOT
+-->
+		</ul>
+        <script language="JavaScript">setCurrent('posttime_{$starttime}','','current');</script>
+	</div>
+
+<!--
+EOT;
+if ($keyword && $isSphinx) {
+$filterSortbyUrl = "searcher.php?type=thread&step=2&keyword={$keyword}&username={$username}&threadrange={$threadrange}&threadrange={$threadrange}&starttime={$starttime}&endtime={$endtime}&fid={$fid}&";
+print <<<EOT
+-->
+    <div class="boxA">
+
+		<h2><a>排序方式</a></h2>
+		<ul>
+        <li id="sortby_relation"><a href="{$filterSortbyUrl}sortby=relation&">按相关度</a></li>
+        <li id="sortby_replies"><a href="{$filterSortbyUrl}sortby=replies&">按回复数</a></li>     
+        <li id="sortby_postdate"><a href="{$filterSortbyUrl}sortby=postdate&">按发帖时间</a></li>
+		<li id="sortby_lastpost"><a href="{$filterSortbyUrl}sortby=lastpost&">按回复时间</a></li>
+		</ul>
+        <script language="JavaScript">setCurrent('sortby_{$sortby}','sortby_relation','current');</script>
+	</div>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+    
+    
+</div>
+<!--
+EOT;
+?>-->

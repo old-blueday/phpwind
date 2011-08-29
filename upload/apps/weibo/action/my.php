@@ -14,21 +14,29 @@ extract(L::config(null, 'o_config'));
 $whilelist = array(
 	'post','my','attention','refer','comment','lookround','filterweibo','ajax',
 	'transmit','postcomment','deletecomment','receive','replay','deleteweibo',
-	'conloy'
+	'conloy','topics','posttopic','page'
 );
+
 if (!in_array($do,$whilelist)) {
 	$do = 'my';
 }
 $nav = !in_array($do,array('receive'))  ? array($do => 'class="current"') : array('refer' => 'class="current"');
 $perpage = 20;
 if ($do == 'post') {
-
+	
 	PostCheck();
-	S::gp(array('atc_content'),'GP', 0);
+	S::gp(array('atc_content'),'GP');
 	S::gp(array('uploadPic', 'ismessage','type'), 'GP');
 	$type != 'sendweibo' && $type = 'weibo';
 	if ($o_weibourl != 1) {
 		preg_match('/http:\/\//i', $atc_content) && Showmsg('weibo_link_close');
+	}
+	if ($db_tcheck ){
+		require_once(R_P.'require/postfunc.php');
+		$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
+		$userInfo = $userService->get($winduid,false,true);
+		$userInfo['postcheck'] = unserialize($userInfo['postcheck']);
+		$userInfo['postcheck']['weibo'] == tcheck($atc_content) && Showmsg('weibo_content_same'); //内容验证
 	}
 	if (($return = $weiboService->sendCheck($atc_content, $groupid)) !== true) {
 		Showmsg($return);
@@ -46,6 +54,10 @@ if ($do == 'post') {
 		$extra['photos'] = $array;
 	}
 	if ($weiboService->send($winduid, $atc_content, $type, 0, $extra)) {
+		if ($db_tcheck) {
+			$userInfo['postcheck']['weibo'] = tcheck($atc_content);
+			$userService->update($winduid, array(), array('postcheck' => serialize($userInfo['postcheck'])));
+		}
 		weibocredit('weibo_Post');
 		Showmsg('mode_o_write_success');
 	}  else {
@@ -219,6 +231,7 @@ if ($do == 'post') {
 	$blackList = $attentionService->getBlackListToMe($winduid, array($weibo['uid']));
 	
 	if (empty($_POST['step'])) {
+		S::gp(array('istopic','topicname'), 'GP');
 		$uids = array($weibo['uid']);
 		if ($transmits) {
 			$uids[] = $transmits['uid'];
@@ -228,7 +241,7 @@ if ($do == 'post') {
 		$weibo = array_merge($weibo, $uInfo[$weibo['uid']]);
 		if ($transmits) {
 			$showInfo = array_merge($transmits, $uInfo[$transmits['uid']]);
-			$dString = ' ||@' . $weibo['username'] . '：' . $weibo['content'];
+			$dString = ' ||@' . $weibo['username'] . ':' . $weibo['content'];
 		} else {
 			$showInfo = $weibo;
 			$dString = '';
@@ -253,8 +266,8 @@ if ($do == 'post') {
 			}
 			if ($ifcomment) {
 				$commentService = L::loadClass("comment","sns");
-				if($commentService->comment($winduid,$tmid,$atc_content)){
-					$weiboService->updateCountNum(array('replies' => 1), $tmid);
+				if($commentService->comment($winduid,$mid,$atc_content)){
+					$weiboService->updateCountNum(array('replies' => 1), $mid);
 				}
 			}
 			echo "success";
@@ -262,6 +275,54 @@ if ($do == 'post') {
 		}  else {
 			Showmsg('undefined_action');
 		}
+	}
+} elseif ($do == 'topics') {
+	/*话题 聚合页*/
+	S::gp(array('topic'));
+	$weiboList = array();
+	$topicService = L::loadClass('topic','sns'); /* @var $topicService PW_Topic */
+	$weiboHotTopics = $topicService->getWeiboHotTopics();
+	if ($topic) {
+		$searcherService = L::loadclass ( 'searcher', 'search' ); /* @var $searcherService PW_Searcher */
+		list ($count, $weiboList) = $searcherService->searchWeibo($topic,'','','',$page);
+		//分页
+		$pageCount = ceil($count / $perpage);
+		$page = validatePage($page,$pageCount);
+		$pages = numofpage($count, $page, $pageCount, 'apps.php?q=weibo&do=topics&topic='.urlencode($topic).'&', null, 'weiboList.topics');
+		//end
+		is_array($weiboList) && $weiboList = $weiboService->buildData($weiboList);
+		$topicInfo = (array)$topicService->getTopicByName($topic);
+		$attentionedTopic = $topicService->getOneAttentionedTopic($topicInfo['topicid'],$winduid);
+	} elseif ($weiboHotTopics) {
+		$topicIds = array_keys($weiboHotTopics);
+		$relations = (array)$topicService->getWeiboByTopicIds($topicIds, 20);
+		$tmpWeibo = $weiboService->getWeibosByMid(array_keys($relations));
+		$tmpWeibo = $weiboService->buildData($tmpWeibo);
+		if (is_array($tmpWeibo)) {
+			//用户是否关注话题
+			$attentionedTopics = $topicService->getAttentionedTopicByTopicIds($topicIds,$winduid);
+			foreach ($relations as $k=>$v) {
+				!$weiboList[$v['topicid']]['topic'] && $weiboList[$v['topicid']]['topic'] = $weiboHotTopics[$v['topicid']];
+				$attentionedTopics[$v['topicid']] && $weiboList[$v['topicid']]['topic']['attentioned'] = 1;
+				$weiboList[$v['topicid']]['weibo'][] = $tmpWeibo[$k];
+			}
+		}
+	}
+} elseif ($do == 'posttopic') {
+	S::gp(array('step','topic'), 'P');
+} elseif ($do == 'page') {
+	S::gp(array('type','page'));
+	if($type == 'attentionedtopics') {
+		$page = intval($page);
+		$attentionedTopics = array();
+		$perpage = 10;
+		!$topicService && $topicService = L::loadClass('topic','sns');
+		$total = $topicService->getUserAttentionTopicNum($winduid);
+		$pageCount = ceil($total / $perpage);
+		$page = validatePage($page,$pageCount);
+		$total && $attentionedTopics = (array)$topicService->getUserAttentionTopics($winduid,$page,$perpage);
+		$page > 1 && $prepage = $page - 1;
+		$page < $pageCount && $nextpage = $page + 1;
 	}
 }
 
@@ -287,7 +348,18 @@ if (defined('AJAX')) {
 			'time'	=> $timestamp
 		)));
 	}
-
+	/* 右侧话题排行 */
+	!$topicService && $topicService = L::loadClass('topic','sns'); /* @var $topicService PW_Topic */
+	!$weiboHotTopics && $weiboHotTopics =$topicService->getWeiboHotTopics();
+	
+	/*获取用户关注的话题*/
+	$perpage = 10;
+	$attentionCount = $topicService->getUserAttentionTopicNum($winduid);
+	$attentionCount && $attentionedTopics = (array)$topicService->getUserAttentionTopics($winduid,1,$perpage);
+	$attentionCount > $perpage && $nextpage = 2;
+	
+	is_array($weiboHotTopics) || $weiboHotTopics = array();
+	/* end 右侧话题排行 */
 	require_once PrintEot('m_weibo');
 	pwOutPut();
 }
@@ -296,8 +368,8 @@ function weibocredit($action = 'weibo_Post'){
 	global $o_weibo_creditset,$o_weibo_creditlog,$onlineip,$winduid,$windid,$credit;
 	require_once(R_P.'require/credit.php');
 	$o_weibo_creditset = unserialize($o_weibo_creditset);
-	$type = $action == 'weibo_Post' ? true : false;
-	$creditset = getCreditset($o_weibo_creditset['Post'],$type);
+	$type = ($action == 'weibo_Post') ? true : false;
+	$creditset = ($type == true) ? getCreditset($o_weibo_creditset['Post'],$type) : getCreditset($o_weibo_creditset['Delete'],$type);
 	$creditset = array_diff($creditset,array(0));
 	//积分变动
 	if ($creditlog = unserialize($o_weibo_creditlog)) {

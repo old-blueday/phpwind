@@ -161,7 +161,9 @@ class PW_UserModeData {
 				'username' => $value['username'],
 				'honor' => $value['honor'],
 				'fans' => $value['fans'],
-				'face' => $value['face']
+				'face' => $value['face'],
+				'groupid' => $value['groupid'],
+				'memberid' => $value['memberid']
 			);
 		}
 		return $array;
@@ -170,6 +172,11 @@ class PW_UserModeData {
 	function get_friendsBirthday($uid, $value){
 		 $friendService = L::loadClass('friend','friend');
 		 return $friendService->findUserFriendsBirthdayInPage($uid, $value['num']);
+	}
+	
+	function get_tags($uid){
+		 $memberTagsService = L::loadClass('MemberTagsService','user');
+		 return $memberTagsService->getMemberTagsByUid($uid);
 	}
 }
 ?>

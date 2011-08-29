@@ -39,15 +39,13 @@ EOT;
 -->
 			</select>
 		</td>
-		<td><input name="pwuser" type="text" class="input" tabindex="1" id="poppwuser"/></td>
+		<td><input name="pwuser" type="text" class="input" tabindex="1201" id="poppwuser"/></td>
 	</tr>
 
 	<tr class="tr5">
 		<td>密　码</td>
-		<td><input name="pwpwd" type="password" class="input"  tabindex="2" /></td>
+		<td><input name="pwpwd" type="password" class="input"  tabindex="1202" /></td>
 	</tr>
-
-
 <!--
 EOT;
 if($db_gdcheck & 2){
@@ -56,8 +54,8 @@ $time = time();
 print <<<EOT
 -->
 	<tr class="tr5">
-		<td>认证码</td>
-		<td><input class="input" type="text" name="gdcode" size="5" onfocus="showgd();"  tabindex="3"  />
+		<td>验证码</td>
+		<td><input class="input" type="text" name="gdcode" size="5" onfocus="showgd();"  tabindex="1203"  />
 		<span style="cursor:pointer; margin-left:3px" onclick="showgd();" id="showtips">&nbsp;点此显示验证码</span>
 		<div id="ckcode" style="display:none;"></div>
 <script type="text/javascript" src="js/pw_authcode.js"></script>
@@ -82,13 +80,13 @@ print <<<EOT
 -->
 	<tr class="tr5">
 		<td>安全问题</td>
-		<td><select name="question" onchange="showcustomquest(this.value)" tabindex="4">
+		<td><select name="question" onchange="showcustomquest(this.value)" tabindex="1204">
 			<option value="0">无安全问题</option><option value="1">我爸爸的出生地</option><option value="2">我妈妈的出生地</option><option value="3">我的小学校名</option><option value="4">我的中学校名</option><option value="5">我最喜欢的运动</option><option value="6">我最喜欢的歌曲</option><option value="7">我最喜欢的电影</option><option value="8" >我最喜欢的颜色</option><option value="-1">自定义问题</option>
-		</select>&nbsp;<input id="customquest" style="display:none" type="text" name="customquest" class="input" size="17" tabindex="5" /></td>
+		</select>&nbsp;<input id="customquest" style="display:none" type="text" name="customquest" class="input" tabindex="1205" /></td>
 	</tr>
 	<tr class="tr5">
 		<td>您的答案</td>
-		<td><input type="text" name="answer" class="input" size="40" tabindex="5" /></td>
+		<td><input type="text" name="answer" class="input" tabindex="1206" /></td>
 	</tr>
 <!--
 EOT;
@@ -111,7 +109,7 @@ print <<<EOT
 -->
 			<tr class="tr5">
 				<td>验证问答</td>
-				<td><span class="fl">{$q_a}</span><input class="input fl" size="5" type="text" name="qanswer" tabindex="7" /><input type="hidden" name="qkey" value="$qkey" /> </td>
+				<td><span class="fl">{$q_a}</span><input class="input fl" size="5" type="text" name="qanswer" tabindex="1207" /><input type="hidden" name="qkey" value="$qkey" /> </td>
 			</tr>
 <!--
 EOT;
@@ -120,7 +118,7 @@ print <<<EOT
 -->
 	<tr class="tr5">
 		<td>&nbsp;</td>
-		<td><span class="btn2"><span><button type="submit" tabindex="6">登录</button></span></span>&nbsp;&nbsp;<a href="sendpwd.php">忘记密码？</a></td>
+		<td><span class="btn2"><span><button type="submit" tabindex="1208">登录</button></span></span>&nbsp;&nbsp;<a href="sendpwd.php">忘记密码？</a></td>
 	</tr>
 </table>
 </div>

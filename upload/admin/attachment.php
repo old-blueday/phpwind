@@ -4,13 +4,15 @@
 $db_perpage=50;
 $basename="$admin_file?adminjob=attachment";
 
-include pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
+//* include pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
+pwCache::getData(D_P.'data/bbscache/forum_cache.php');
 
 if($admin_gid == 5){
 	list($allowfid,$forumcache) = GetAllowForum($admin_name);
 	$sql = $allowfid ? "fid IN($allowfid)" : '0';
 } else{
-	include pwCache::getPath(D_P.'data/bbscache/forumcache.php');
+	//* include pwCache::getPath(D_P.'data/bbscache/forumcache.php');
+	pwCache::getData(D_P.'data/bbscache/forumcache.php');
 	list($hidefid,$hideforum) = GetHiddenForum();
 	if($admin_gid == 3){
 		$forumcache .= $hideforum;
@@ -314,8 +316,8 @@ function attachcheck($file){
 		P_unlink("$attachdir/thumb/$file");
 	} else{
 		strlen($file)>49 && $file=substr($file,0,49);
-		//* writeover($cache_file,str_pad($file,49)."\n","ab");
-		pwCache::setData($cache_file,str_pad($file,49)."\n", false, "ab");
+		writeover($cache_file,str_pad($file,49)."\n","ab");
+		//* pwCache::setData($cache_file,str_pad($file,49)."\n", false, "ab");
 	}
 }
 ?>

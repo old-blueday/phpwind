@@ -7,7 +7,7 @@ print <<<EOT
 .tab2{background:#e4e4e4;margin-top:4px;height:100px;}
 .tab2 .one{background:url($imgpath/post/vote/tab-one.gif) left center repeat-y;width:50px;}
 .tab2 .two{background:url($imgpath/post/vote/tab-two.gif) left center repeat-y;width:50px;}
-.vote{border:1px solid #e4e4e4;background:#f7f7f7;color:#333;padding:10px;}
+.vote{border:1px solid #e4e4e4;background:#f7f7f7;color:#333;padding:10px;overflow:hidden;width:220px;}
 .dig2{height:25px;line-height:25px;display:block;font-size:12px;background:#ffffee;width:80px;cursor: pointer;margin:.5em 0;color:#666;border:1px solid #ffd0a8;}
 .dig2:hover{text-decoration:none;border:1px solid #f5a25c;color:#ff6600;}
 .dig3,.dig4,.dig5{line-height:18px;}
@@ -21,6 +21,7 @@ print <<<EOT
 .dig3 div span,.dig4 div span{background:#fff;color:#333;}
 .vs-new{background:url($imgpath/post/vote/vs-new.png) no-repeat;width:110px;height:110px;}
 .vs-old{background:url($imgpath/post/vote/vs-old.png) no-repeat;width:110px;height:110px;}
+.bta{line-height:20px;height:20px;}
 </style>
 <div class="t">
 <!--
@@ -80,9 +81,9 @@ print <<<EOT
 -->
 </div>
 <div style="margin:auto;width:800px;" class="p10">
-	<table width="100%">
+	<table width="100%" style="table-layout:fixed;">
 		<tr>
-			<td width="40%">
+			<td>
 				<table border="0" cellspacing="0" cellpadding="0" width="100%;">
 					<tr>
 						<td valign="top">
@@ -105,7 +106,7 @@ print <<<EOT
 					</tr>
 				</table>
 			</td>
-			<td width="10%">
+			<td width="120">
 <!--
 EOT;
 if($debate[judge]){print <<<EOT
@@ -121,7 +122,7 @@ EOT;
 }print <<<EOT
 -->
 			</td>
-			<td width="40%">
+			<td>
 				<table border="0" cellspacing="0" cellpadding="0" width="100%;">
 					<tr>
 						<td style="width:100px;" class="tac">
@@ -163,8 +164,9 @@ EOT;
 -->
 <table border="0" cellspacing="0" cellpadding="0" width="100%;">
 <tr class="f_two tac gray"><td style="padding:5px;">
-<a href="read.php?tid=$tid">全部参与人员</a><span class="p_lr_10">|</span><a href="read.php?tid=$tid&stand=1">正方支持者</a><span class="p_lr_10">|</span><a href="read.php?tid=$tid&stand=3">中立者</a><span class="p_lr_10">|</span><a href="read.php?tid=$tid&stand=2">反方支持者</a></td></tr></table>
+<a href="read.php?tid=$tid&displayMode=1" id="stand_0">全部参与人员</a><span class="p_lr_10">|</span><a href="read.php?tid=$tid&stand=1&displayMode=1" id="stand_1">正方支持者</a><span class="p_lr_10">|</span><a href="read.php?tid=$tid&stand=3&displayMode=1" id="stand_3">中立者</a><span class="p_lr_10">|</span><a href="read.php?tid=$tid&stand=2&displayMode=1" id="stand_2">反方支持者</a></td></tr></table>
 <script type="text/javascript">
+setCurrent('stand_$stand','stand_0','b s4');
 function dodebate(id,tid,pid) {
 	var url;
 	if (typeof pid == 'undefined') {
@@ -177,12 +179,14 @@ function dodebate(id,tid,pid) {
 
 		if (typeof str[1] != 'undefined') {
 			if (str[1] == 'TID') {
+			try{
 				getObj('obvote').innerHTML = str[2];
 				getObj('revote').innerHTML = str[3];
 				getObj('obimgob').height = str[4]+'%';
 				getObj('reimgob').height = str[4]+'%';
 				getObj('obimgre').height = str[5]+'%';
 				getObj('reimgre').height = str[5]+'%';
+			}catch(e){}
 <!--
 EOT;
 if($fastpost && $groupid != 'guest'){print <<<EOT

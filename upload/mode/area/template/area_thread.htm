@@ -4,13 +4,13 @@ print <<<EOT
 -->
 <!--
 EOT;
-if($N_allowtypeopen || $N_allowtopicopen || $N_allowpostcateopen){print <<<EOT
+if(($N_allowtypeopen && $foruminfo['allowtype'] != 1) || $N_allowtopicopen || $N_allowpostcateopen){print <<<EOT
 -->
 <div id="menu_post" class="pw_menu tac" style="display:none;">
 	<ul class="menuList" style="width:70px;">
 <!--
 EOT;
-if($foruminfo['allowtype'] & 1){print <<<EOT
+if($foruminfo['allowtype'] & 1 && $foruminfo['allowtype'] != 1){print <<<EOT
 -->
 		<li><a href="post.php?fid=$fid" title="新 帖" hidefocus="true">新帖</a></li>
 <!--

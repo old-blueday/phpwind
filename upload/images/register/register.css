@@ -1,0 +1,55 @@
+#head{padding-bottom:10px;}
+.regTitle{border-bottom:1px solid #ededed;padding:0 5px 10px;margin-bottom:30px;}
+.regTitle h5{font-size:16px; font-weight:700;background:none;padding:0;color:#666;}
+.regForm-wrap{float:left;width:99%;min-height:80px;_height:80px;padding-top:10px;padding-bottom:50px;}
+.regForm{position:relative;margin-right:200px;width:auto;}
+.regForm dl{min-height:43px;_height:43px;}
+.regForm dt{float:left;width:130px;text-align:right;margin-right:15px;line-height:28px;font-size:14px;}
+.regForm dd{float:left;}
+.regForm .ip{width:230px;margin-right:5px;}
+.regForm .ip div{padding:3px 3px 5px;*padding:4px 5px 4px;float:left;border:1px solid;border-color:#999 #ccc #ccc #999;background:#fff;}
+.regForm .ip div.hover,.regForm .ip div:hover{background:#fffbde;border:1px solid;border-color:#555 #aaa #aaa #555;}
+.regForm .ip input{border:0;padding:0;margin:0 5px 0 0;font:12px/15px Arial;background:none;width:auto;font-weight:100;color:#333;}
+.regForm .ip .input{border:0;padding:0;margin:0;font:14px/15px Arial;background:none;width:100%;padding-top:2px;width:222px;*width:218px; font-weight:700;color:#333;}
+.regForm .ip textarea.input{overflow:auto;height:40px;line-height:18px;}
+.regForm .ip label{padding-top:4px;display:inline-block;font-size:14px;}
+.regForm .ip select{display:inline-block;margin:2px 10px 0 0;}
+.regForm .tp{width:300px;}
+.regForm .tp div{padding:5px 10px 5px 20px;position:absolute;line-height:16px;max-width:290px;}
+.regForm .tp .correct{border:0;background:url(regright.png) 6px 6px no-repeat;height:20px;}
+.regForm .tp .ignore{border:1px solid #e8e8e8;background:#f9f9f9 url(tp.png) 6px 6px no-repeat;color:#999;}
+.regForm .tp .wrong{border:1px solid #ebadb0;background:#fff2f5 url(regwrong.png) 6px 5px no-repeat;color:#b52726;padding-left:28px;}
+.regForm .tp img{vertical-align:middle;margin:5px 0 0 8px;}
+.regForm .if{ font-size:14px;padding-top:3px;}
+.regForm .if input{margin-top:-2px;}
+.regForm .if select{margin-right:5px; font-size:14px;}
+.regForm .mr15{margin-right:15px;}
+.regForm dd.ck .input{width:50px}
+.regForm dd.ck div{margin-right:5px;}
+.regPre{margin:0 135px 10px 115px;}
+.regPre pre{border:1px solid;border-color:#999 #ccc #ccc #999;padding:5px 10px;line-height:1.5;color:#333;height:100px;overflow-x:hidden;overflow-y:scroll;}
+.regPre p{margin-bottom:5px;}
+.regLogin{float:left;margin-left:-190px;width:190px;border-left:1px dotted #dddddd;min-height:200px;_height:200px;}
+.regForm .btn,.regLogin .bt{margin-left:0;}
+/*jindu*/
+.steps{padding:0;margin:5px 0 0;overflow:hidden;}
+.steps li{float:left;margin-left:-9px;margin-right:15px;_display:inline;padding-left:16px;height:17px; line-height:17px; background:url(regarrow.png) no-repeat 0 50%;color:#ababab;}
+.steps li em{float:left; margin-right:4px; width:17px; height:17px; text-align:center; color:#fff; font-family:Tahoma; font-weight:700; background:url(regstep.png) no-repeat 0 0}
+.steps li.current{color:#106bab}
+.steps li.current em{background-position:-17px 0;}
+/*tuijian*/
+.recommend{padding:15px 0 5px;*margin-bottom:30px;}
+.recommend li{width:210px;float:left;height:55px;overflow:hidden;margin-bottom:15px;}
+.recommend li img{ vertical-align:middle;}
+.recommend li .face{width:48px;height:48px;padding:2px;border:1px solid #cccccc;margin:0 10px 0 8px;}
+.regAdd_mode .regAdd_mode_div{border:1px solid #ccc;background:#f7fbff;padding:15px 0 0 0;margin-bottom:10px;}
+.regAdd_mode .regAdd_mode_div .tp{float:left;width:210px;height:30px;}
+.regAdd_mode .fr.mr20.s4{margin-top:15px;}
+.regCorrect,.regIgnore{padding-left:160px;padding-bottom:70px;background:url(regright2.png) 60px 0 no-repeat;}
+.regIgnore{ background:url(ignore.png) 60px 0 no-repeat;padding-top:5px;}
+.regList,.regList_img{padding:10px 0 20px;}
+.regList li{float:left;width:49.5%; font-size:14px;line-height:24px;height:24px;overflow:hidden; text-indent:15px;background:url(images/pwicon/related_li.gif) 0 8px no-repeat;}
+.regList_img li{float:left;width:100px; text-align:center;margin:10px;_display:inline;}
+/*face*/
+.profileFace{width:380px;}
+.profileFace li{float:left;margin:0 10px 10px 0;height:60px; cursor:pointer;}

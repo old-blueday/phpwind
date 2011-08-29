@@ -80,7 +80,7 @@ function messageEot($template) {
  * @param unknown_type $output
  */
 function ajaxExport($output) {
-	echo is_array($output) ? pwJsonEncode($output) : $output;
+	echo is_array($output) ? stripslashes(pwJsonEncode($output)) : $output;
 	ajax_footer();
 }
 

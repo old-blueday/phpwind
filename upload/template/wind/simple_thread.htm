@@ -6,7 +6,19 @@ print <<<EOT
 <table cellspacing="1" cellpadding="0" width="$tablewidth" $i_table align="center">
 <tr><td><table cellspacing="0" cellpadding="8" width="100%"><tr><td bgcolor="#FFFFFF">
 <b><a href="$DIR">$db_bbsname</a> -&gt; <a href="{$DIR}f$fid.html">$forumname</a></b>
-</td><td bgcolor="#FFFFFF" align="right"><B><A HREF="login.php">登录</A> -&gt; <A HREF="$db_registerfile">注册</A> -&gt; <A HREF="post.php?fid=$fid">发表主题</A></B></td></tr>
+</td><td bgcolor="#FFFFFF" align="right"><B>
+<!--
+EOT;
+if (!$winduid) {
+print <<<EOT
+-->
+<A HREF="login.php">登录</A> -&gt; <A HREF="$db_registerfile">注册</A> -&gt; 
+<!--
+EOT;
+}
+print <<<EOT
+-->
+<A HREF="post.php?fid=$fid">发表主题</A></B></td></tr>
 </table></td></tr>
 </table>
 <br />

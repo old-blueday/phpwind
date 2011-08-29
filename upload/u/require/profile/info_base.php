@@ -1,22 +1,30 @@
 <?php
 !function_exists('readover') && exit('Forbidden');
 
+if (!is_array($trade = unserialize($userdb['tradeinfo']))) {
+	$trade = array();
+}
+$isAuthAlipay = getstatus($userdb['userstatus'], PW_USERSTATUS_AUTHALIPAY);
+
 if (!$_POST['step']){
 
-	include_once pwCache::getPath(D_P.'data/bbscache/dbreg.php');
+	//* include_once pwCache::getPath(D_P.'data/bbscache/dbreg.php');
+	extract(pwCache::getData(D_P.'data/bbscache/dbreg.php', false));
 	require_once(R_P.'require/forum.php');
 	require_once(R_P.'require/credit.php');
 
-	$customdata = $custominfo = $sexselect = $yearslect = $monthslect = $dayslect = array();
+	$sexselect = $yearslect = $monthslect = $dayslect = array();
 	$ifpublic = $httpurl = $email_Y = $email_N = $prosign_Y = $prosign_N = '';
 	$ifsign = false;
 	getstatus($userdb['userstatus'], PW_USERSTATUS_PUBLICMAIL) && $ifpublic = 'checked';
 	${'email_' . (getstatus($userdb['userstatus'], PW_USERSTATUS_RECEIVEMAIL) ? 'Y' : 'N')} = 'checked';
 	${'prosign_' . (getstatus($userdb['userstatus'], PW_USERSTATUS_SHOWSIGN) ? 'Y' : 'N')} = 'checked';
-	$db_union[7] && list($customdata,$custominfo) = Getcustom($userdb['customdata']);
-
+	//$db_union[7] && list($customdata,$custominfo) = Getcustom($userdb['customdata']);
+	
+	$customFieldsString = getCustomFieldsAndDefaultValue('basic');
+	
 	$sexselect[(int)$userdb['gender']] = 'checked';
-	$tradeinfo = unserialize($userdb['tradeinfo']);
+	//$tradeinfo = unserialize($userdb['tradeinfo']);
 
 	if ($userdb['timedf']) {
 		$temptimedf = str_replace('.','_',abs($userdb['timedf']));
@@ -25,8 +33,8 @@ if (!$_POST['step']){
 
 	!$rg_timestart && $rg_timestart = 1960;
 	!$rg_timeend && $rg_timeend = 2010;
-	$getbirthday = explode('-',$userdb['bday']);
-	$yearslect[(int)$getbirthday[0]] = $monthslect[(int)$getbirthday[1]] = $dayslect[(int)$getbirthday[2]] = 'selected';
+	//$getbirthday = explode('-',$userdb['bday']);
+	//$yearslect[(int)$getbirthday[0]] = $monthslect[(int)$getbirthday[1]] = $dayslect[(int)$getbirthday[2]] = 'selected';
 
 	if ($userdb['signature'] || $userdb['introduce']) {
 		$SCR = 'post';
@@ -43,24 +51,28 @@ if (!$_POST['step']){
 	(strlen($_POST['prointroduce']) > 500) && Showmsg('introduce_limit');
 	//签名难
 	($_G['signnum'] && (strlen($_POST['prosign']) > $_G['signnum'])) && Showmsg('sign_limit');
-	S::gp(array('profrom', 'prohomepage', 'prohonor', 'prointroduce', 'prosign', 'timedf', 'customdata', 'alipay'),'P');
-	S::gp(array('newgroupid','progender', 'proyear', 'promonth', 'proday', 'showsign', 'proreceivemail'), 'P', 2);
+	S::gp(array('prohomepage', 'prohonor', 'prointroduce', 'prosign', 'timedf','alipay'),'P');
+	S::gp(array('newgroupid','showsign', 'proreceivemail'), 'P', 2);
 
-//	strlen($prointroduce)>500 && Showmsg('introduce_limit');
+	//strlen($prointroduce)>500 && Showmsg('introduce_limit');
 	if ($_G['allowhonor']) {
 		$prohonor = trim(substrs($prohonor,90));
 		$upmembers['honor'] = $prohonor;
 	}
+	
+	if($alipay && !preg_match('/^[-a-zA-Z0-9_\.]+\@([0-9A-Za-z][0-9A-Za-z-]+\.)+[A-Za-z]{2,5}$/',$alipay) || preg_match('/^[\d]{11}/',$alipay)) Showmsg('alipay_error');
 
-	//支付宝帐号验证
-	$trade['alipay'] = '';
-	if ($alipay) {
-		if (preg_match('/^[-a-zA-Z0-9_\.]+\@([0-9A-Za-z][0-9A-Za-z-]+\.)+[A-Za-z]{2,5}$/',$alipay) || preg_match('/^[\d]{11}/',$alipay)) {
-			$trade['alipay'] = stripslashes($alipay);
-		} else {
-			Showmsg('alipay_error');
+	/*支付宝帐号验证
+	if (!$isAuthAlipay) {
+		$trade['alipay'] = '';
+		if ($alipay) {
+			if (preg_match('/^[-a-zA-Z0-9_\.]+\@([0-9A-Za-z][0-9A-Za-z-]+\.)+[A-Za-z]{2,5}$/',$alipay) || preg_match('/^[\d]{11}/',$alipay)) {
+				$trade['alipay'] = stripslashes($alipay);
+			} else {
+				Showmsg('alipay_error');
+			}
 		}
-	}
+	}*/
 
 	require_once(R_P . 'require/bbscode.php');
 	$wordsfb = L::loadClass('FilterUtil', 'filter');
@@ -70,7 +82,7 @@ if (!$_POST['step']){
 		}
 	}
 
-	if ($db_union[7]) {
+	/*if ($db_union[7]) {
 		list($customdata) = Getcustom($customdata,false,true);
 		!empty($customdata) && $upmeminfo['customdata'] = addslashes(serialize($customdata));
 	}
@@ -78,7 +90,7 @@ if (!$_POST['step']){
 	$tradeinfo = $trade ? addslashes(serialize($trade)) : '';
 	if ($tradeinfo <> $userdb['tradeinfo']) {
 		$upmeminfo['tradeinfo'] = $tradeinfo;
-	}
+	}*/
 	//set signature state
 	$showsign = $showsign ? 1 : 0;
 	if ($db_signmoney && ($singstatus = getstatus($userdb['userstatus'], PW_USERSTATUS_SHOWSIGN)) != $showsign) {
@@ -115,11 +127,13 @@ if (!$_POST['step']){
 	}
 	
 	unset($upmemdata,$upmeminfo, $facetype, $customfield, $singstatus);
-
-	$probday = '';
+	//update customerfield data
+	$customfieldService = L::loadClass('CustomerFieldService', 'user'); /* @var $customfieldService PW_CustomerFieldService */
+	$customfieldService->saveProfileCustomerData('basic');
+	/*$probday = '';
 	if ($proyear || $promonth || $proday) {
 		$probday = $proyear.'-'.$promonth.'-'.$proday;
-	}
+	}*/
 	$cksign = convert($prosign,$db_windpic,2);
 	$signstatus = $cksign != $prosign ? 1 : 0;
 
@@ -131,39 +145,19 @@ if (!$_POST['step']){
 		$userService->setUserStatus($winduid, PW_USERSTATUS_RECEIVEMAIL, $proreceivemail);
 	}
 	$pwSQL = array_merge($upmembers, array(
-		'gender' => $progender, 'signature' => $prosign, 'introduce' => $prointroduce, 
-		'site' => $prohomepage, 'location' => $profrom, 'bday' => $probday, 'timedf' => $timedf
+		'signature' => $prosign, 'introduce' => $prointroduce, 
+		'site' => $prohomepage,'timedf' => $timedf
 	));
 	$userService->update($winduid, $pwSQL);
 
 	/* phpwind数据统计 */
-	if ($progender != $userdb['gender'] || $probday != $userdb['bday']) {
+	/*if ($progender != $userdb['gender'] || $probday != $userdb['bday']) {
 		$statistics = L::loadClass('Statistics', 'datanalyse');
 		$statistics->alertSexDistribution($userdb['gender'], $progender);
 		$statistics->alertAgeDistribution(intval($userdb['bday']), intval($probday));
-	}
+	}*/
 	//* $_cache = getDatastore();
 	//* $_cache->delete('UID_'.$winduid);
 	initJob($winduid,"doUpdatedata");
 	refreshto("profile.php?action=modify&info_type=$info_type",'operate_success',2,true);
-}
-
-function Getcustom($data,$unserialize=true,$strips=null){
-	global $db_union;
-	$customdata = array();
-	if (!$data || ($unserialize ? !is_array($data=unserialize($data)) : !is_array($data))) {
-		$data = array();
-	} elseif (!is_array($custominfo = unserialize($db_union[7]))) {
-		$custominfo = array();
-	}
-	if (!empty($data) && !empty($custominfo)) {
-		foreach ($data as $key => $value) {
-			if (!empty($strips)) {
-				$customdata[stripslashes(S::escapeChar($key))] = stripslashes(S::escapeChar($value));
-			} elseif ($custominfo[$key] && $value) {
-				$customdata[$key] = $value;
-			}
-		}
-	}
-	return array($customdata,$custominfo);
 }

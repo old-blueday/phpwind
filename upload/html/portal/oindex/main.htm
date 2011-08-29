@@ -1,62 +1,48 @@
 <!--<?php
 print <<<EOT
 -->
-
 	<div class="w210 fr">
-		<div>
-		<span class="tcorner"><span></span></span>
 		<div class="pane2">
 			<div class="pane2_warp">
-				<div class="hd"><pw id="社区达人标题@广场" /></div>
+				<div class="hd"><pw id="今日热门话题标题@广场" /></div>
 				<div class="bd">
-				<pw id="社区达人@广场" />
+					<ol class="hotList cc">
+						<pw id="今日热门话题@广场" />
+					</ol>
 				</div>
 			</div>
 		</div>
-		<span class="bcorner"><span></span></span>
-	  </div>
-	  <div class="mt15">
-		<span class="tcorner"><span></span></span>
-		<div class="pane2 pane3">
-			<div class="hd"><pw id="热门群组标题@广场" /></div>
-			<div class="bd">
-			<pw id="热门群组@广场" />
+		<div class="pane2 mt15">
+			<div class="pane2_warp">
+				<div class="hd"><pw id="今日人气用户标题@广场" /></div>
+				<div class="bd">
+					<ol class="hotList cc">
+						<pw id="今日人气用户@广场" />
+					</ol>
+				</div>
 			</div>
 		</div>
-		<span class="bcorner"><span></span></span>
-	  </div>
 	</div>
 	<div class="w710 fl">
-		<div class="cc">
-			<div class="pwSlideWrap fl">
-				<div class="pwSlide2">
-				<pw id="幻灯片@广场" />
-				</div>
-			</div>
-			<div class="w384 fr" id="topNews">
-			<pw id="推荐日志摘要@广场" />
-			<pw id="推荐日志列表@广场" />
-			</div>
+		<div class="daren">
+			<h2>社区达人推荐</h2>
+			<table width="100%">
+				<tr>
+					<td width="20"><a href="javascript:void(0)" onClick="daren.show(-1)" class="preLive" title="上一组">上一组</a></td>
+					<td>
+							<pw id="社区达人@广场" />
+					</td>
+					<td width="20"><a href="javascript:void(0)" onClick="daren.show(1)" class="nextLive" title="下一组">下一组</a></td>
+				</tr>
+			</table>
 		</div>
 		<div class="pane1 mt15">
 			<div class="hd">
-			<h2 class="tabbdvst">
-				<span class="fl"><pw id="热门帖子标题@广场" /></span>
-				
-				<ul class="tabAvst" id="hotbbstopicB">
-					<li class="switchNavItem">热门</li>
-					<li class="switchNavItem">最新</li>
-				</ul>
-				
-				</h2>
+			<h2><pw id="热门帖子标题@广场" /></h2>
 			</div>
-			<div class="c" style="margin-bottom:.5em"></div>
-			<div class="bd cc" id="hotbbstopicA">
-				<div class="switchItem" style="display:none"><pw id="热门帖子@广场" /></div>
-				<div class="switchItem" style="display:none"><pw id="最新帖子@广场" /></div>
+			<div class="cc">
+				<div class="switchItem"><pw id="热门帖子@广场" /></div>
 			</div>
-			<script>ddSliderPlayers('hotbbstopicA','hotbbstopicB',0,'current');</script>
-			
 		</div>
 		<div class="picture mt15">
 			<h2></h2>
@@ -65,8 +51,9 @@ print <<<EOT
 			</ul>
 			<span class="pic_r"></span>
 		</div>
+		
 		<div class="pane1 mt15">
-			<div class="hd"><pw id="最新新鲜事标题@广场" /></div>
+			<div class="hd"><span class="fr mr20"><a href="javascript:void(0)" id="switch_tag0" onmouseover="switchDiv(0)" class="s5 b">热门转发</a>&nbsp;|&nbsp;<a  href="javascript:void(0)" id="switch_tag1" onmouseover="switchDiv(1)" class="s6">热门评论</a></span><pw id="热门新鲜事标题@广场" /></div>
 		</div>
 	</div>
 	

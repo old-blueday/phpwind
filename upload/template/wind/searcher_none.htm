@@ -1,14 +1,94 @@
-<!--<?php print <<<EOT
+<!--<?php
+$mainTmpStyle = (in_array($type, array('thread', 'special')) && $_COOKIE['searchtoggle']!=='0') ? 'main cc' : 'main cc sideClose';
+
+if (!$fid) {
+	$mainTmpStyle = 'main cc sideClose';
+}
+
+print <<<EOT
 -->
-		<div class="content">
-        	<div class="p20 f14">
-        	<p class="f16 mb20">抱歉，没有找到与"<span class="s1">$keyword</span>"相关的{$typeTitle}。 </p>
-            <p class="mb10">相关建议：</p> 
-            <p class="mb5">&nbsp;&nbsp;&nbsp;看看输入的文字是否有误</p>
-            <p class="mb5">&nbsp;&nbsp;&nbsp;去掉可能不必要的字词，如“的”、“什么”等</p>
+<div class="$mainTmpStyle" id="sidebar">
+	<div class="grid_3 cc mb20">
+		<div class="md">		
+<!--
+EOT;
+require printEOT('searcher_threadleftside');
+print <<<EOT
+-->
+		</div>
+		<div class="cm">
+			<div class="cw cc">
+					<div class="p20 f14">
+					<p class="f16 mb20">抱歉，没有找到<!--
+EOT;
+if ($keyword) {
+print <<<EOT
+-->与"<em>{$keyword}</em>"<!--
+EOT;
+}
+print <<<EOT
+-->相关的{$typeTitle}。 </p>
+					<p class="mb10">相关建议：</p> 
+					<p class="mb5">&nbsp;&nbsp;&nbsp;看看输入的文字是否有误</p>
+					<p class="mb5">&nbsp;&nbsp;&nbsp;去掉可能不必要的字词，如“的”、“什么”等</p>
+<!--
+EOT;
+if ($fid && ($type == 'thread' || $type == 'special')) {print <<<EOT
+-->
+					<p class="mb5">&nbsp;&nbsp;&nbsp;<a href="{$filterFidUrl}">在所有版块中搜索</a></p>
+<!--
+EOT;
+}print <<<EOT
+-->
+					</div>
 			</div>
-        </div>
-        <div class="c">&nbsp;</div>
+		</div>
+		<div class="sd">
+			<div class="sidebar">
+<!--
+EOT;
+list($htmlAdvert,$arrayAdvert) = pwAdvert('Site.Search.Thread.Right','');
+if($htmlAdvert){print <<<EOT
+-->
+<div style="height:200px;width:200px;">
+<div class="tac mb5">$htmlAdvert</div>
+</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+					<div>{$rightSearchResult}</div>				
+<!--
+EOT;
+if($hotwords){
+print <<<EOT
+-->     
+					<div class="boxA">
+						<h2><a>热门搜索</a></h2>
+						<ul>
+<!-- 
+EOT;
+foreach($hotwords as $hotword){
+print <<<EOT
+-->
+							<li><a href="searcher.php?keyword={$hotword}&type=thread">$hotword</a></li>
+<!-- 
+EOT;
+}
+print <<<EOT
+--> 
+							
+						</ul>
+					</div>
+<!-- 
+EOT;
+}
+print <<<EOT
+-->
+			</div>
+		</div>
+	</div>
+</div>
 <!--
 EOT;
 ?>

@@ -26,7 +26,7 @@ if (empty($_GET['step'])) {
 	$ext = strtolower(substr(strrchr($_GET['filename'], '.'), 1));
 	$udir = str_pad(substr($winduid, -2), 2, '0', STR_PAD_LEFT);
 	
-	$source = PwUpload::savePath(0, "{$winduid}_tmp.$ext", "upload/$udir/");
+	//$source = PwUpload::savePath(0, "{$winduid}_tmp.$ext", "upload/$udir/");
 	if (!in_array(strtolower($ext), array(
 		'gif',
 		'jpg',
@@ -36,53 +36,63 @@ if (empty($_GET['step'])) {
 	))) {
 		Showmsg('undefined_action');
 	}
-	if (!file_exists($source)) {
+	/*if (!file_exists($source)) {
 		Showmsg('头像保存失败，图片大小请不要超过2M!');
-	}
+	}*/
 	$data = $_SERVER['HTTP_RAW_POST_DATA'] ? $_SERVER['HTTP_RAW_POST_DATA'] : file_get_contents('php://input');
 	
 	if ($data) {
-		
-		S::gp(array(
-			'from'
-		));
+		S::gp(array('from'));
 		require_once (R_P . 'require/showimg.php');
 		
-		$filename = "{$winduid}.jpg";
-		$normalDir = "upload/$udir/";
+		$filename = "{$winduid}.$ext";
+		//$normalDir = "upload/$udir/";
 		$middleDir = "upload/middle/$udir/";
 		$smallDir = "upload/small/$udir/";
 		$img_w = $img_h = 0;
 		
-		$middleFile = PwUpload::savePath($db_ifftp, $filename, "$middleDir", 'm_');
+		$middleFile = PwUpload::savePath($db_ifftp, $filename, $middleDir);
 		PwUpload::createFolder(dirname($middleFile));
-		//* writeover($middleFile, $data);
-		pwCache::setData($middleFile, $data);
+		writeover($middleFile, $data);
 		
 		require_once (R_P . 'require/imgfunc.php');
-		if (!$img_size = GetImgSize($middleFile, 'jpg')) {
+		if (!$img_size = GetImgSize($middleFile)) {
 			P_unlink($middleFile);
 			Showmsg('upload_content_error');
 		}
 		
-		$normalFile = PwUpload::savePath($db_ifftp, "{$winduid}.$ext", "$normalDir");
+		/*$normalFile = PwUpload::savePath($db_ifftp, "{$winduid}.$ext", "$normalDir");
 		PwUpload::createFolder(dirname($normalFile));
 		list($w, $h) = explode("\t", $db_fthumbsize);
 		if ($db_iffthumb && MakeThumb($source, $normalFile, $w, $h)) {
 			P_unlink($source);
 		} elseif (!PwUpload::movefile($source, $normalFile)) {
 			Showmsg('undefined_action');
-		}
-		list($img_w, $img_h) = getimagesize($normalFile);
-		
-		$smallFile = PwUpload::savePath($db_ifftp, $filename, "$smallDir", 's_');
+		}*/
+		list($img_w, $img_h) = getimagesize($middleFile);
+		$smallFile = PwUpload::savePath($db_ifftp, $filename, $smallDir);
 		$s_ifthumb = 0;
 		PwUpload::createFolder(dirname($smallFile));
-		if (MakeThumb($middleFile, $smallFile, 48, 48)) {
+		if ($ext == 'gif') {
+			L::loadClass('gifdecoder', 'utility', false);
+			L::loadClass('gif', 'utility', false);
+			$gifDecoder = new GIFDecoder($data);
+			$frames = $gifDecoder->GIFGetFrames();
+			if (!empty($frames)) {
+				foreach ($frames as $key => $value) {
+					$frames[$key] = makeAvatarGifThumb($value, $img_w, $img_h, 48, 48);
+				}
+				$anime = new GIFEncoder($frames, $gifDecoder->GIFGetDelays(), $gifDecoder->GIFGetLoop(), $gifDecoder->GIFGetDisposal(), $gifDecoder->GIFGetTransparentR(), $gifDecoder->GIFGetTransparentG(), $gifDecoder->GIFGetTransparentB(), 'bin');
+				$newGifData = $anime->getAnimation();
+				PwUpload::createFolder(dirname($smallFile));
+				pwCache::writeover($smallFile, $newGifData);
+				$s_ifthumb = 1;
+			}
+		} elseif (MakeThumb($middleFile, $smallFile, 48, 48)) {
 			$s_ifthumb = 1;
 		}
 		if ($db_ifftp) {
-			PwUpload::movetoftp($normalFile, $normalDir . "{$winduid}.$ext");
+			//PwUpload::movetoftp($normalFile, $normalDir . "{$winduid}.$ext");
 			PwUpload::movetoftp($middleFile, $middleDir . $filename);
 			$s_ifthumb && PwUpload::movetoftp($smallFile, $smallDir . $filename);
 		}
@@ -99,8 +109,15 @@ if (empty($_GET['step'])) {
 		
 		//job sign
 		initJob($winduid, "doUpdateAvatar");
-		
-		refreshto($from == 'reg' ? 'index.php' : 'profile.php?action=modify&info_type=face', 'upload_icon_success');
+		if ($from != 'reg') refreshto('profile.php?action=modify&info_type=face', 'upload_icon_success');
+		$jobService = L::loadclass('job', 'job');
+		$jobs = $jobService->getJobByJobName('doUpdateAvatar');
+		foreach ($jobs as $value) {
+			if (!S::isArray($value)) continue;
+			$jobService->jobGainController($winduid, $value['id']);
+		}
+		$verifyhash = GetVerify($winduid);
+		refreshto("$db_registerfile?step=finish&option=2&verify=$verifyhash", 'upload_icon_success');
 	
 	} else {
 		Showmsg('upload_icon_fail');

@@ -9,12 +9,12 @@ print <<<EOT
 EOT;
 if($managecheck){print <<<EOT
 -->
-			<td class="icon" width="55">&nbsp;</td>
+			<td class="icon" width="50" style="padding:0;">&nbsp;</td>
 <!--
 EOT;
 }else{print <<<EOT
 -->
-			<td class="icon" width="30">&nbsp;</td>
+			<td class="icon" width="40" style="padding:0;">&nbsp;</td>
 <!--
 EOT;
 }print <<<EOT
@@ -42,7 +42,7 @@ $thread['lstptime'] = get_date($thread['lastpost']);
 print <<<EOT
 -->
 	<tr class="tr3">
-		<td class="icon">
+		<td class="icon tac">
 <!--
 EOT;
 if($managecheck){
@@ -56,9 +56,20 @@ print <<<EOT
 	$thread[adminbox]
 <!--
 EOT;
+}if($thread[topped]){print <<<EOT
+-->
+	<a href="read.php?tid={$thread[tid]}" target="_blank">
+		<img src="$imgpath/$stylepath/file/headtopic_$thread[topped].gif" align="absmiddle" alt="置顶帖标志" title="置顶帖标志"/>
+	</a>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+	<a title="$tooltip" href="$thread[tpcurl]" target="_blank">$thread[status]</a>		
+<!--
+EOT;
 }print <<<EOT
 -->
-    <a title="打开新窗口" href="$thread[tpcurl]" target="_blank">$thread[status]</a>
 	</td>
 	<td class="subject f14" id="td_$thread[tid]">
 <!--
@@ -71,11 +82,6 @@ EOT;
 }if($thread[toolinfo]){print <<<EOT
 -->
     	<span class="f14 s3">[$thread[toolinfo]]</span>
-<!--
-EOT;
-}if($thread[topped]){print <<<EOT
--->
-			<img src="$imgpath/$stylepath/file/headtopic_$thread[topped].gif" style="margin-right:5px;" align="absmiddle" title="置顶帖标志"/>
 <!--
 EOT;
 }print <<<EOT
@@ -180,94 +186,9 @@ print<<<EOT
 EOT;
 }print<<<EOT
 -->
-	</tr>
+	</tr>  
 <!--
 EOT;
-if($managemode==1){
-$managemode_colspan = $colspannum -2;
-if($db_ajax & 1){print <<<EOT
--->
-    <tr class="tr3"><td></td><td>
-	<div class="fr s8">[
-<!--
-EOT;
-if($isGM || $pwSystem[digestadmin]){print <<<EOT
--->
-		<a id="digest_$thread[tid]" style="cursor:pointer" onclick="sendmsg('mawhole.php?ajax=1&action=digest&fid=$thread[fid]&seltid=$thread[tid]','',this.id)" title="加入精华帖">精</a>
-<!--
-EOT;
-}if($isGM || $pwSystem[lockadmin]){print <<<EOT
--->
-		<a id="lock_$thread[tid]" style="cursor:pointer" onclick="sendmsg('mawhole.php?ajax=1&action=lock&fid=$thread[fid]&seltid=$thread[tid]','',this.id)" title="锁定帖子不让会员再回复帖子">锁定</a>
-<!--
-EOT;
-}if($isGM || $pwSystem[pushadmin]){print <<<EOT
--->
-		<a id="pushtopic_$thread[tid]" style="cursor:pointer" onclick="sendmsg('mawhole.php?ajax=1&action=pushtopic&fid=$thread[fid]&seltid=$thread[tid]','',this.id)" title="提前帖子">提</a>
-<!--
-EOT;
-}if($isGM || $pwSystem[downadmin]){print <<<EOT
--->
-		<a id="downtopic_$thread[tid]" style="cursor:pointer" onclick="sendmsg('mawhole.php?ajax=1&action=downtopic&fid=$thread[fid]&seltid=$thread[tid]','',this.id)" title="将帖子往后压">压帖</a>
-<!--
-EOT;
-}if($isGM || $pwSystem[coloradmin]){print <<<EOT
--->
-		<a id="edit_$thread[tid]" style="cursor:pointer" onclick="sendmsg('mawhole.php?ajax=1&action=edit&fid=$thread[fid]&seltid=$thread[tid]','',this.id)" title="编辑标题">亮</a>
-<!--
-EOT;
-}if($isGM || $pwSystem[topped]){print <<<EOT
--->
-<a id="headtopic_$thread[tid]" style="cursor:pointer" onclick="sendmsg('mawhole.php?ajax=1&action=headtopic&fid=$thread[fid]&seltid=$thread[tid]','',this.id)" title="置顶主题:将主题置顶,以便会员查看">顶</a>
-<!--
-EOT;
-}print <<<EOT
--->
-] </div><td colspan="4"></td></td></tr>
-<!--
-EOT;
-}else{print <<<EOT
--->
-    <tr class="tr3"><td></td><td>
-	<div class="fr s8"> [
-<!--
-EOT;
-if($isGM || $pwSystem['digestadmin']){print <<<EOT
--->
-		<a id="digest_$thread[tid]" href="mawhole.php?action=digest&fid=$thread[fid]&seltid=$thread[tid]" title="加入精华帖">精</a>
-<!--
-EOT;
-}if($isGM || $pwSystem['lockadmin']){print <<<EOT
--->
-		<a id="lock_$thread[tid]" href="mawhole.php?action=lock&fid=$thread[fid]&seltid=$thread[tid]" title="锁定帖子不让会员再回复帖子">锁定</a>
-<!--
-EOT;
-}if($isGM || $pwSystem['pushadmin']){print <<<EOT
--->
-		<a id="pushtopic_$thread[tid]" href="mawhole.php?action=pushtopic&fid=$thread[fid]&seltid=$thread[tid]" title="提前帖子">提</a>
-<!--
-EOT;
-}if($isGM || $pwSystem['downadmin']){print <<<EOT
--->
-		<a id="downtopic_$thread[tid]" href="mawhole.php?action=downtopic&fid=$thread[fid]&seltid=$thread[tid]" title="将帖子往后压">压帖</a>
-<!--
-EOT;
-}if($isGM || $pwSystem['coloradmin']){print <<<EOT
--->
-		<a id="edit_$thread[tid]" href="mawhole.php?action=edit&fid=$thread[fid]&seltid=$thread[tid]" title="编辑标题">亮</a>
-<!--
-EOT;
-}if($isGM || $pwSystem[topped]){print <<<EOT
--->
-	<a id="headtopic_$thread[tid]" href="mawhole.php?action=headtopic&fid=$thread[fid]&seltid=$thread[tid]" title="置顶主题:将主题置顶,以便会员查看">顶</a>
-<!--
-EOT;
-}print <<<EOT
--->
-		] </div><td colspan="$managemode_colspan"></td></td></tr>
-<!--
-EOT;
-}}
 }
 print <<<EOT
 -->

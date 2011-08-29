@@ -1,7 +1,8 @@
 <?php
 !function_exists('adminmsg') && exit('Forbidden');
 
-@include_once pwCache::getPath(D_P.'data/bbscache/o_config.php');
+//* @include_once pwCache::getPath(D_P.'data/bbscache/o_config.php');
+pwCache::getData(D_P.'data/bbscache/o_config.php');
 !$action && $action = 'albums';
 if ($action == 'albums') {
 

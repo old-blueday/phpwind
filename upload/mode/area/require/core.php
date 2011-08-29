@@ -27,7 +27,7 @@ function areaLoadFrontView($action) {
 function aliasStatic($alias) {
 	$file = S::escapePath(AREA_PATH.$alias.'/index.html');
 	$output = cookTemplate();
-	pwCache::setData($file, $output);
+	pwCache::writeover($file, $output);
 	ob_clean();
 }
 

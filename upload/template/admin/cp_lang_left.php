@@ -33,9 +33,10 @@ $nav_left = array(
 					'reg',
 					'customfield',
 					'invite',
-					'propagateset',
+					'propagateset'
 				),
 			),
+			'authentication',
 			'credit',
 			'member',
 			'editer',
@@ -98,7 +99,13 @@ $nav_left = array(
 					'weibo_manage',
 					'o_comments',
 					'message',
-					'report',
+					'reportmanage' => array(
+						'name' => '举报管理',
+						'items' => array(
+							'reportcontent',
+							'reportremind'
+						)
+					),
 					'draftset',
 					'recycle',
 				/*),
@@ -135,6 +142,7 @@ $nav_left = array(
 			'datastate',
 			'ystats',
 			'creditlog',
+			'tucool',
 		),
 	),
 	'applicationcenter'	=> array(
@@ -185,6 +193,7 @@ $nav_left = array(
 			'present',
 			'share',
 			'plantodo',
+			'team'
 //			'setads',
 			//'sitemap',
 		),
@@ -224,6 +233,7 @@ $nav_left = array(
 		'name'	=> '个人中心',
 		'items'=> array(
 			'o_global',
+			'o_tags',
 			'o_skin',
 			'o_commend',
 		)

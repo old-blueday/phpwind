@@ -1,4 +1,4 @@
-﻿/*
+/*
 * chain 模块
 * 对Breeze提供链式操作功能
 */
@@ -25,7 +25,7 @@ Breeze.namespace('util.chain',function(B){
             /*
             * 适合选择器的操作方法
             */
-            ['addClass','removeClass','arrt','removeAttr','createElement','removeElement','css','data','parent','children','prev','next','siblings','addEvent','removeEvent','hide','show','slideDown','slideUp','fadeIn','fadeOut','html'].forEach(function(p) {
+            ['addClass','removeClass','arrt','removeAttr','createElement','remove','css','data','parent','children','prev','next','siblings','addEvent','removeEvent','hide','show','slideDown','slideUp','fadeIn','fadeOut','html'].forEach(function(p) {
                 _$.method(p,function() {
                     var arg = B.makeArray(arguments),finalEls = [];
                     //不光是有set操作,还会有get操作,当get元素集合时,需要改变当前的elements

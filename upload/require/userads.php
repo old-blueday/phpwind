@@ -1,7 +1,8 @@
 <?php
 !function_exists('readover') && exit('Forbidden');
 
-list($u,$a) = explode("\t",GetCookie('userads'));
+$useradsInfo = GetCookie('userads');
+$useradsInfo && (list($u,$a) = explode("\t",$useradsInfo));
 if (is_numeric($u) || ($a && strlen($a)<16)) {
 	PwNewDB();
 	$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
@@ -16,6 +17,7 @@ if (is_numeric($u) || ($a && strlen($a)<16)) {
 	}
 }
 Cookie('userads', '', 0);
+unset($useradsInfo);
 
 /**
  * 添加

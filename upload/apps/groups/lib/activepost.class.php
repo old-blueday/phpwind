@@ -18,12 +18,9 @@ class PwActivePost {
 		$active['poster'] && $this->data['poster'] = $active['poster'];
 	}
 
-	function initAttachs($attachdb, $keep, $oldatt_desc) {
-		$keep = (array)$keep;
+	function initAttachs($attachdb, $oldatt_desc) {
 		foreach ($attachdb as $key => $value) {
-			if (!in_array($key, $keep)) {
-				$this->delattach[$key] = $value;
-			} elseif (array_key_exists('replace_'.$key, $_FILES)) {
+			if (array_key_exists('replace_'.$key, $_FILES)) {
 				$GLOBALS['db_attachnum']++;
 				$value['descrip'] = $oldatt_desc[$key];
 				$this->replacedb[$key] = $value;
@@ -74,7 +71,12 @@ class PwActivePost {
 	function setMembers($members) {
 		$this->data['members'] = $members;
 	}
-
+	
+	function setOwner($uid) {
+		$uid = (int) $uid;
+		$this->data['uid'] = $uid;
+	}
+		
 	function _setPoster() {
 		L::loadClass('activeupload', 'upload', false);
 		$att = new activePoster($this->data['cid']);
@@ -92,9 +94,7 @@ class PwActivePost {
 		if ($this->replacedb) {
 			$this->att->setReplaceAtt($this->replacedb);
 		}
-		if ($_POST['flashatt'] && is_array($_POST['flashatt'])) {
-			$this->att->transfer($_POST['flashatt']);
-		}
+		$this->att->setFlashAtt($_POST['flashatt'], $_POST['savetoalbum'], $_POST['albumid']);
 		PwUpload::upload($this->att);
 	}
 

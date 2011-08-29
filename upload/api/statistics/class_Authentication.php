@@ -52,6 +52,17 @@ class Statistics_Authentication extends Statistics {
 		return new ApiResponse(array());
 	}
 	
+	/**
+	 * 某日的实名认证验证码发送量
+	 * @param string $day 'Y-m-d'
+	 * @return int
+	 */
+	function getCodeSentNumOfDay($day = null) {
+		$platformApiClient = $this->_getPlatformApiClient();
+		$day == null && $day = get_date(time(),'Y-m-d');
+		$response = (int) $this->_jsonDecode($platformApiClient->get('credit.statistics.countsitemobileverifybyday', array('day' => $day)));
+		return new ApiResponse($response);	
+	}
 
 	/**
 	 * @return PlatformApiClient

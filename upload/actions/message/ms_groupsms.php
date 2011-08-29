@@ -17,6 +17,10 @@ $selected_other = $action == 'other' ? 'selected' : '';
 
 $groupsmsCount = $groupsmsAllCount = (int) $messageServer->countAllGroupMessage($userId);
 $notReadCount = (int) $messageServer->countGroupMessagesNotRead($userId);
+//editer
+$uploadfiletype = ($db_uploadfiletype) ? unserialize($db_uploadfiletype) : array();
+$attachAllow = pwJsonEncode($uploadfiletype);
+$imageAllow = pwJsonEncode(getAllowKeysFromArray($uploadfiletype, array('jpg','jpeg','gif','png','bmp')));
 if (empty($action) || $action == 'all') {
 	$pageCount = ceil($groupsmsCount / $perpage);
 	$page = validatePage($page,$pageCount);

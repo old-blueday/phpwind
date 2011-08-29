@@ -30,9 +30,9 @@ if ($adminitem == 'updatecache') {
 		adminmsg('operate_success');
 	} elseif($_POST['action']=='online'){
 		$writeinto=str_pad("<?php die;?>",96)."\n";
-		pwCache::setData(D_P.'data/bbscache/online.php',$writeinto);
-		pwCache::setData(D_P.'data/bbscache/guest.php',$writeinto);
-		pwCache::setData(D_P.'data/bbscache/olcache.php',"<?php\n\$userinbbs=0;\n\$guestinbbs=0;\n?>");
+		pwCache::writeover(D_P.'data/bbscache/online.php',$writeinto);
+		pwCache::writeover(D_P.'data/bbscache/guest.php',$writeinto);
+		pwCache::writeover(D_P.'data/bbscache/olcache.php',"<?php\n\$userinbbs=0;\n\$guestinbbs=0;\n?>");
 		adminmsg('operate_success');
 	} elseif($action=='member'){
 		$pwServer['REQUEST_METHOD']!='POST' && PostCheck($verify);
@@ -100,9 +100,11 @@ if ($adminitem == 'updatecache') {
 	} elseif($action=='forum'){
 		$pwServer['REQUEST_METHOD']!='POST' && PostCheck($verify);
 		S::gp(array('step','percount'));
-		include_once pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
+		//* include_once pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
+		pwCache::getData(D_P.'data/bbscache/forum_cache.php');
 		if(!$step){
-			$db->update("UPDATE pw_forumdata SET topic=0,article=0,subtopic=0");
+			//* $db->update("UPDATE pw_forumdata SET topic=0,article=0,subtopic=0");
+			pwQuery::update('pw_forumdata', null, null, array('topic'=>0,'article'=>0, 'subtopic'=>0));
 		    $step=1;
 		}
 		!$percount && $percount=30;
@@ -117,10 +119,12 @@ if ($adminitem == 'updatecache') {
 			@extract($db->get_one("SELECT COUNT(*) AS topic,SUM( replies ) AS replies FROM pw_threads WHERE fid=".S::sqlEscape($fid)."AND ifcheck='1' AND topped<=3"));
 			$article=$topic+$replies;
 			if($type=='sub2' || $type=='sub'){
-				$db->update("UPDATE pw_forumdata SET article=article+".S::sqlEscape($article).",subtopic=subtopic+".S::sqlEscape($topic)."WHERE fid=".S::sqlEscape($fup));
+				//* $db->update("UPDATE pw_forumdata SET article=article+".S::sqlEscape($article).",subtopic=subtopic+".S::sqlEscape($topic)."WHERE fid=".S::sqlEscape($fup));
+				$db->update(pwQuery::buildClause("UPDATE :pw_table SET article=article+:article,subtopic=subtopic+:subtopic WHERE fid=:fid", array('pw_forumdata', $article, $topic, $fup)));
 				if($type == 'sub2'){
 					$fup=$forum[$fup]['fup'];
-					$db->update("UPDATE pw_forumdata SET article=article+".S::sqlEscape($article).',subtopic=subtopic+'.S::sqlEscape($topic).'WHERE fid='.S::sqlEscape($fup));
+					//* $db->update("UPDATE pw_forumdata SET article=article+".S::sqlEscape($article).',subtopic=subtopic+'.S::sqlEscape($topic).'WHERE fid='.S::sqlEscape($fup));
+					$db->update(pwQuery::buildClause("UPDATE :pw_table SET article=article+:article,subtopic=subtopic+:subtopic WHERE fid=:fid", array('pw_forumdata', $article, $topic, $fup)));
 				}
 			} elseif($type=='category'){
 				$topic=$article=0;
@@ -139,7 +143,8 @@ if ($adminitem == 'updatecache') {
 			} else{
 				$lastinfo='';
 			}
-			$db->update("UPDATE pw_forumdata SET topic=".S::sqlEscape($topic).',article=article+'.S::sqlEscape($article).',lastpost='.S::sqlEscape($lastinfo).' WHERE fid='.S::sqlEscape($fid));
+			//* $db->update("UPDATE pw_forumdata SET topic=".S::sqlEscape($topic).',article=article+'.S::sqlEscape($article).',lastpost='.S::sqlEscape($lastinfo).' WHERE fid='.S::sqlEscape($fid));
+			$db->update(pwQuery::buildClause("UPDATE :pw_table SET topic=:topic, article=article+:article,lastpost=:lastpost WHERE fid=:fid", array('pw_forumdata', $topic, $article, $lastinfo, $fid)));
 		}
 		if($goon){
 			adminmsg('updatecache_step',EncodeUrl($j_url));
@@ -361,7 +366,19 @@ if ($adminitem == 'updatecache') {
 		$_cacheService = Perf::gatherCache('pw_threads');
 		$_cacheService->clearCacheForThreadListByForumIds($fid);	
 		adminmsg('operate_success');
-		
+	}else if ($action == 'clearForumMemcache'){
+		$pwServer['REQUEST_METHOD']!='POST' && PostCheck($verify);
+		if (Perf::checkMemcache()){
+			// 清除index页面的版块缓存
+			$_cacheService = Perf::getCacheService();
+			$_cacheService->delete('all_forums_info');
+			// 清除thread页面版块缓存
+			$query = $db->query('SELECT fid FROM pw_forumdata');
+			while($rt = $db->fetch_array($query)){
+				$_cacheService->delete('forumdata_announce_' . $rt['fid']);
+			}
+		}
+		adminmsg('operate_success');		
 	} elseif ($action == 'flushMemcache'){
 		$pwServer['REQUEST_METHOD']!='POST' && PostCheck($verify);
 		//* $memcache = new ClearMemcache();
@@ -442,13 +459,15 @@ if ($adminitem == 'updatecache') {
 			$getinfo =& GetInfo::getInstance();
 			if (in_array($type,array('replysort','replysortday','replysortweek'))){
 				$step = intval(S::getGP('step'));
-				require_once pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
+				//* require_once pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
+				pwCache::getData(D_P.'data/bbscache/forum_cache.php');
 				$arr_forumkeys = array_keys($forum);
 	
 				$fourmlimit = array();
 				for ($j=0;$j<5;$j++) {
 					$replysort_judge = '';
-					@include_once pwCache::getPath(S::escapePath(D_P.'data/bbscache/replysort_judge_'.$j.'.php'));
+					//* @include_once pwCache::getPath(S::escapePath(D_P.'data/bbscache/replysort_judge_'.$j.'.php'));
+					pwCache::getData(S::escapePath(D_P.'data/bbscache/replysort_judge_'.$j.'.php'));
 					$replysort_judge && $fourmlimit[$j] = $replysort_judge;
 				}
 				if (!$step) {
@@ -520,11 +539,13 @@ if ($adminitem == 'updatecache') {
 				}
 			} elseif (in_array($type,array('hitsort','hitsortday','hitsortweek'))) {
 				$step = intval(S::getGP('step'));
-				require_once pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
+				//* require_once pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
+				pwCache::getData(D_P.'data/bbscache/forum_cache.php');
 				$arr_forumkeys = array_keys($forum);
 	
 				$fourmlimit = array();
-				@include_once pwCache::getPath(D_P.'data/bbscache/hitsort_judge.php');
+				//* @include_once pwCache::getPath(D_P.'data/bbscache/hitsort_judge.php');
+				pwCache::getData(D_P.'data/bbscache/hitsort_judge.php');
 				$hitsort_judge && $fourmlimit = $hitsort_judge;
 				if (!$step) {
 					$step = 0;
@@ -575,13 +596,15 @@ if ($adminitem == 'updatecache') {
 					}
 				}
 				pwCache::setData(D_P.'data/bbscache/hitsort_judge.php',"<?php\r\n\$hitsort_judge=".pw_var_export($fourmlimit).";\r\n?>");
+				touch(D_P.'data/bbscache/hitsort_judge.php');
 				if ($step < $total) {
 					adminmsg('updatecache_total_step',"$basename&action=update&type=$type&step=$step");
 				}
 			} elseif ($type=='usersort') {
-				include_once pwCache::getPath(D_P.'data/bbscache/usersort_judge.php');
+				//* include_once pwCache::getPath(D_P.'data/bbscache/usersort_judge.php');
+				pwCache::getData(D_P.'data/bbscache/usersort_judge.php');
 				$step = intval(S::getGP('step'));
-				$sorttype = array('money','rvrc','credit','currency','todaypost','monthpost','postnum','monoltime','onlinetime','digests','f_num');
+				$sorttype = array('money','rvrc','credit','currency','todaypost','monthpost','postnum','monoltime','onlinetime','digests','f_num','postMostUser');
 				foreach ($_CREDITDB as $key => $val) {
 					is_numeric($key) &&	$sorttype[] = $key;
 				}
@@ -615,7 +638,8 @@ if ($adminitem == 'updatecache') {
 				}
 			} elseif ($type=='newsubject') {
 				$step = intval(S::getGP('step'));
-				require_once pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
+				//* require_once pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
+				pwCache::getData(D_P.'data/bbscache/forum_cache.php');
 				$arr_forumkeys = array_keys($forum);
 				if (!$step) {
 					$step = 0;
@@ -651,7 +675,8 @@ if ($adminitem == 'updatecache') {
 				}
 			} elseif ($type == 'newreply') {
 				$step = intval(S::getGP('step'));
-				require_once pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
+				//* require_once pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
+				pwCache::getData(D_P.'data/bbscache/forum_cache.php');
 				$arr_forumkeys = array_keys($forum);
 				if (!$step) {
 					$step = 0;
@@ -688,7 +713,8 @@ if ($adminitem == 'updatecache') {
 			} elseif ($type == 'newpic') {
 				//adminmsg('newpic_not_needupdate');
 				$step = intval(S::getGP('step'));
-				require_once pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
+				//* require_once pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
+				pwCache::getData(D_P.'data/bbscache/forum_cache.php');
 				$arr_forumkeys = array_keys($forum);
 				if (!$step) {
 					$step = 0;
@@ -724,7 +750,8 @@ if ($adminitem == 'updatecache') {
 				}
 			} elseif ($type=='hotfavor') {
 				$step = intval(S::getGP('step'));
-				require_once pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
+				//* require_once pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
+				pwCache::getData(D_P.'data/bbscache/forum_cache.php');
 				$arr_forumkeys = array_keys($forum);
 				if (!$step) {
 					$step = 0;

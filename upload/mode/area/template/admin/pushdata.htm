@@ -185,10 +185,11 @@ EOT;
 <div class="tac mb10">
 	<p class="mb10">
 		<span>选中操作:</span>
-		<input type="radio" name="action" value="dels" />&nbsp;删除&nbsp;
+		<input type="radio" name="action" value="dels" id="delaction" />&nbsp;删除&nbsp;
+		<input type="radio" name="action" value="verifys" checked />&nbsp;审核&nbsp;
 	</p>
 	<p>
-	<span class="btn"><span><button type="submit" onclick="return confirm('您确认要进行此操作吗?');">提 交</button></span></span></p>
+	<span class="btn"><span><button type="submit" onclick="if (getObj('delaction').checked==true) {return confirm('您确认要进行此操作吗?');}">提 交</button></span></span></p>
 </div>
 </form>
 <script src="js/pw_ajax.js" language="JavaScript"></script>

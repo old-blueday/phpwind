@@ -4,11 +4,8 @@ function AjaxObj() {
 	var s = document.createElement('div');
 	s.style.display = 'none';
 	var n = 'iframe' + new Date().getTime();
-	//页面中有iframe的时候,会造成多个相同name的iframe,这时候提交时target有冲突,造成错误 @by chenchaoqun
-	//s.innerHTML = '<iframe id="ajaxiframe" name="ajaxiframe" width="0" height="0" src=""></iframe>';
 	s.innerHTML = '<iframe src="about:blank" id="' + n + '" name="' + n + '"></iframe>';
 	document.body.appendChild(s);
-	//document.body.insertBefore(s,document.body.childNodes[0]);
 	this.iframe = s.firstChild;
 
 	this.post = function(url,data) {
@@ -30,7 +27,6 @@ function AjaxObj() {
 					f.appendChild(el);
 				}
 			}
-			//document.body.appendChild(f);//ie6要用insertBefore
 			document.body.insertBefore(f,document.body.childNodes[0]);
 			f.submit();
 			document.body.removeChild(f);
@@ -50,6 +46,9 @@ function AjaxObj() {
 			self.frames[n].location.replace(url);//让iframe没有浏览历史
 			//this.iframe.src=url;
 		}
+	}
+	this.clearhistroy = function() {
+		self.frames[n].location.replace('about:blank');
 	}
 }
 function XMLhttp() {
@@ -87,16 +86,27 @@ XMLhttp.prototype = {
 				this.request.iframe.detachEvent('onload',ajax.load);
 				this.request.iframe.attachEvent('onload',ajax.load);
 			} else {
-				this.request.iframe.addEventListener('DOMContentLoaded',ajax.load,true);
+				this.request.iframe.addEventListener('load',ajax.load,true);
 			}
 		}
 	},
 
 	load : function() {
-		if (is_ie) {
-			ajax.request.responseText = (typeof ajax.request.iframe.contentWindow.document.XMLDocument != 'undefined') ? ajax.request.iframe.contentWindow.document.XMLDocument.text : null;
-		} else {
+		try{
 			ajax.request.responseText = ajax.request.iframe.contentWindow.document.documentElement.textContent;
+			if (typeof ajax.request.responseText == 'undefined'){
+				ajax.request.responseText = (typeof ajax.request.iframe.contentWindow.document.XMLDocument != 'undefined') ? ajax.request.iframe.contentWindow.document.XMLDocument.text : null;
+			}
+			if(!ajax.request.responseText){
+				var txt = ajax.request.iframe.contentWindow.document.documentElement.innerText;
+				var rules = /<!\[CDATA\[([\s\S]+)\]\]>/.exec(txt);
+				if(rules && rules[1]){
+					ajax.request.responseText = rules[1];
+				}
+			}
+		}catch(e){
+			
+			ajax.request.responseText = (typeof ajax.request.iframe.contentWindow.document.XMLDocument != 'undefined') ? ajax.request.iframe.contentWindow.document.XMLDocument.text : null;
 		}
 		if (ajax.request.iframe.detachEvent) {
 			ajax.request.iframe.detachEvent('onload',ajax.load);
@@ -108,10 +118,12 @@ XMLhttp.prototype = {
 			ajax.recall();
 			ajax.doscript();
 		}
+		//fixed for tt browser (register page)
+		if (typeof ajaxclearhistory == 'undefined')ajax.request.clearhistroy();
 	},
 
 	XmlDocument : function(obj) {
-		return is_ie ? ajax.request.iframe.contentWindow.document.XMLDocument : ajax.request.iframe.contentWindow.document;
+		return (!-[1,]) ? ajax.request.iframe.contentWindow.document.XMLDocument : ajax.request.iframe.contentWindow.document;
 	},
 
 	submit : function(obj,recall) {
@@ -181,7 +193,7 @@ XMLhttp.prototype = {
 			return false;
 	},
 
-	guide : function() {
+	guide : function(callback) {
 		if (ajax.request.responseText == null) {
 			ajax.request.responseText = '您请求的页面出错啦!';
 		}
@@ -192,7 +204,7 @@ XMLhttp.prototype = {
 			return false;
 		}
 		if (rText[1] != 'nextto') {
-			showDialog('',rText[0],2);
+			showDialog('', rText[0], 2, callback ? callback : null);
 		}
 		if (typeof(rText[1]) != 'undefined' && in_array(rText[1],['jump','nextto','reload'])) {
 			if (rText[1] == 'jump') {
@@ -350,9 +362,14 @@ function FetchCookie(name) {
 	return start==-1 ? null : unescape(document.cookie.substring(start+name.length+1,(end>start ? end : document.cookie.length)));
 }
 
-function showOverPrint(obj){
+function showOverPrint(obj,isMulti){
 	var url = obj.getAttribute("url");
-	sendmsg(url,'',obj.id);
+	if (!isMulti) {
+		sendmsg(url,'',obj.id);
+		return false;
+	}
+	var overprintTids = getObj('overprinttids').value;
+	sendmsg(url,'tidarray=' + overprintTids,obj.id);
 	return false;
 }
 

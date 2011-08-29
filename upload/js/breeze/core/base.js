@@ -46,6 +46,7 @@
 
 		isLoading = false,
 		loadingIndex = 0,
+		runVerson = '1.0',
 
 		startQueue = function () {
 		    if (loadQueue.length === 0) {
@@ -69,9 +70,10 @@
 		                    var basemod = mod.slice(0, i);
 		                    Breeze[basemod] || (Breeze[basemod] = {});
 		                }
-		                script.src = Breeze.path + mod.replace('.', '/') + '.js';
+		                script.src = Breeze.path + mod.replace('.', '/') + '.js?v='+runVerson;
 		                isQueue = false;
 		                isLoading = true;
+						//document.body.appendChild(script);
 		                document.getElementsByTagName('head')[0].appendChild(script);
 		            } else {
 		                startQueue();
@@ -99,9 +101,9 @@
         */
         Breeze = {
             version: '1.0.0',
-            path: function () {
+            path: BREEZE_BASE_PATH,/*function () {
                 return document.getElementById('B_script_base').src.replace('core/base.js', '');
-            } (),
+            } (),*/
             /**
             * @description 将参数中的js文件和函数加入管理队列<br />
             * 参数可以是字符串或者函数本身
@@ -421,7 +423,7 @@
         if (Array.prototype.some) {
             bindNative();
         } else {
-            B.require('native', bindNative);
+           B.require('native', bindNative);
         }
         /**
         * @name Breeze.$

@@ -1,7 +1,8 @@
 <?php
 !function_exists('readover') && exit('Forbidden');
 //set_time_limit(1000);
-@include pwCache::getPath(D_P.'data/bbscache/mail_config.php');
+//* @include pwCache::getPath(D_P.'data/bbscache/mail_config.php');
+extract(pwCache::getData(D_P.'data/bbscache/mail_config.php', false));
 
 $GLOBALS['M_db']= new Mailconfig(
 	array(
@@ -53,14 +54,14 @@ Class Mailconfig {
 	function mailmx($email,$retrys=3){
 		global $timestamp;
 		$domain=substr($email,strpos($email,'@')+1);
-		@include pwCache::getPath(D_P.'data/bbscache/mx_config.php');
+		@include (D_P.'data/bbscache/mx_config.php');
 
 		if(!$_MX[$domain] || $timestamp - pwFilemtime(D_P.'data/bbscache/mx_config.php') > 3600*24*10){
 			for($i=0;$i<$retrys;$i++){
 				$result = $this->GetMax($domain);
 				if($result !== false){
 					$_MX[$domain]=$result;
-					pwCache::setData(D_P.'data/bbscache/mx_config.php',"<?php\r\n\$_MX=".pw_var_export($_MX).";\r\n?>");
+					pwCache::writeover(D_P.'data/bbscache/mx_config.php',"<?php\r\n\$_MX=".pw_var_export($_MX).";\r\n?>");
 					$this->smtp['tomx']=$result;
 					return true;
 				}

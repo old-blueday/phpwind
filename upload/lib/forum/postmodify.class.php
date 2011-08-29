@@ -22,7 +22,7 @@ class postModify {
 	
 	var $atcdb = array();
 	var $oldattach = array();
-	var $delattach = array();
+	//var $delattach = array();
 	var $alterattach = array();
 	var $replacedb = array();
 
@@ -79,10 +79,10 @@ class postModify {
 		//版块编辑时间限制
 		L::loadClass('forum', 'forum', false);
 		global $postedittime,$windid,$winduid;
-		$pwforum = new PwForum($this->atcdb['fid']);
-		$isBM = $pwforum->isBM($windid);
+		//$pwforum = new PwForum($this->atcdb['fid']);
+		$isBM = $this->forum->isBM($windid);
 		$userSystemRight =  userSystemRight($windid, $isBM, 'deltpcs');
-		$postedittime = $pwforum->foruminfo['forumset']['postedittime'];
+		$postedittime = $this->forum->foruminfo['forumset']['postedittime'];
 		if (!$userSystemRight && $this->post->uid == $this->atcdb['authorid'] && $postedittime !== "" &&  $postedittime != 0 && ($timestamp - $this->atcdb['postdate']) >  $postedittime * 60) {
 			return $this->post->showmsg('modify_forumtimelimit');
 		}
@@ -120,20 +120,27 @@ class postModify {
 		return !empty($this->atcdb['attachs']);
 	}
 	
-	function initAttachs($keep, $oldatt_special, $oldatt_needrvrc, $oldatt_ctype, $oldatt_desc) {
+	function initAttachs(/*$keep, */$oldatt_special, $oldatt_needrvrc, $oldatt_ctype, $oldatt_desc) {
 		global $db_enhideset, $db_sellset, $db_attachnum;
-		$keep = (array) $keep;
+		//$keep = (array) $keep;
+		is_array($oldatt_special) || $oldatt_special = array();
+		is_array($oldatt_needrvrc) || $oldatt_needrvrc = array();
+		is_array($oldatt_ctype) || $oldatt_ctype = array();
+		is_array($oldatt_desc) || $oldatt_desc = array();
+
 		$oldattach = $this->atcdb['attachs'];
 		foreach ($oldattach as $key => $value) {
 			$isImg = ($value['type'] == 'img');
+			/*
 			if (!in_array($key, $keep)) {
 				$this->delattach[$key] = $value;
 			} else {
+				*/
 				$v = array(
-					'special' => $oldatt_special[$key],
-					'ctype' => $oldatt_ctype[$key],
-					'needrvrc' => $oldatt_needrvrc[$key],
-					'desc' => $oldatt_desc[$key]
+					'special' => isset($oldatt_special[$key]) ? $oldatt_special[$key] : $value['special'],
+					'ctype' => isset($oldatt_ctype[$key]) ? $oldatt_ctype[$key] : $value['ctype'],
+					'needrvrc' => isset($oldatt_needrvrc[$key]) ? $oldatt_needrvrc[$key] : $value['needrvrc'],
+					'desc' => isset($oldatt_desc[$key]) ? $oldatt_desc[$key] : $value['descrip']
 				);
 				if ($v['needrvrc'] > 0 && ($v['special'] == 1 && $this->post->allowencode && in_array($v['ctype'], $db_enhideset['type']) || $v['special'] == 2 && $this->post->allowsell && in_array($v['ctype'], $db_sellset['type']))) {
 				
@@ -156,7 +163,7 @@ class postModify {
 					$isImg && $this->newImgNum++;
 				}
 				$this->oldattach[$key] = $oldattach[$key];
-			}
+			//}
 			$isImg && $this->oldImgNum++;
 		}
 	}
@@ -164,19 +171,19 @@ class postModify {
 	function alterinfo() {
 		global $db_postedittime,$windid,$winduid,$manager,$groupid;
 		L::loadClass('forum', 'forum', false);
-		$pwforum = new PwForum($this->atcdb['fid']);
+		//$pwforum = new PwForum($this->atcdb['fid']);
 		$postedittime = (int)$db_postedittime * 60;
-		$isBM = $pwforum->isBM($windid);
+		$isBM = $this->forum->isBM($windid);
 		$userSystemRight =  userSystemRight($windid, $isBM, 'deltpcs');
 		if(S::inArray($windid, $manager) || $groupid == 3){
 			$alterinfo = '';
-		}elseif ($this->post->uid == $this->atcdb['authorid'] && ($db_postedittime == 0 || $this->atcdb['postdate'] + $postedittime < $GLOBALS['timestamp'])) {
+		}elseif ($this->post->uid == $this->atcdb['authorid'] && $db_postedittime != 0 && ($this->atcdb['postdate'] + $postedittime < $GLOBALS['timestamp'])) {
 			global $altername, $db_anonymousname, $timeofedit, $timestamp;
 			$altername = ($this->data['anonymous'] && $this->post->uid == $this->atcdb['authorid']) ? $db_anonymousname : $this->post->username;
 			$timeofedit = get_date($timestamp);
 			$alterinfo = getLangInfo('post', 'edit_post');
 			
-		} elseif ($userSystemRight &&  $this->post->uid != $this->atcdb['authorid'] && ($db_postedittime == 0 || $this->atcdb['postdate'] + $postedittime < $GLOBALS['timestamp'])) {
+		} elseif ($userSystemRight &&  $this->post->uid != $this->atcdb['authorid'] && $db_postedittime != 0 && ($this->atcdb['postdate'] + $postedittime < $GLOBALS['timestamp'])) {
 			global $altername, $db_anonymousname, $timeofedit, $timestamp;
 			$altername = ($this->data['anonymous'] && $this->post->uid == $this->atcdb['authorid']) ? $db_anonymousname : $this->post->username;
 			$timeofedit = get_date($timestamp);
@@ -241,12 +248,14 @@ class postModify {
 	}
 	
 	function updateAtt() {
+		/*
 		if ($this->delattach) {
 			require_once (R_P . 'require/functions.php');
 			require_once (R_P . 'require/updateforum.php');
 			delete_att($this->delattach);
 			pwFtpClose($GLOBALS['ftp']);
 		}
+		*/
 		if ($this->alterattach) {
 			$pw_attachs = L::loadDB('attachs', 'forum');
 			foreach ($this->alterattach as $aid => $v) {
@@ -439,12 +448,19 @@ class topicModify extends postModify {
 	function updateImgAtt() {
 		is_object($this->att) && $this->newImgNum += $this->att->getUploadImgNum();
 		if (!$this->newImgNum && $this->oldImgNum) {
-			$this->db->update("DELETE FROM pw_threads_img WHERE tid=" . S::sqlEscape($this->tid));
-		} elseif ($this->newImgNum && !$this->oldImgNum) {
+			//$this->db->update("DELETE FROM pw_threads_img WHERE tid=" . S::sqlEscape($this->tid));
+			$tucoolService = L::loadClass('tucool','forum');
+			$tucoolService->delete($this->tid);
+		} elseif ($this->newImgNum != $this->oldImgNum) {
+			$tucoolService = L::loadClass('tucool','forum');
+			$tucoolService->setforum($this->forum->foruminfo);
+			$tucoolService->updateTopicImgNum($this->tid,$this->newImgNum);
+			/*
 			$this->db->update("REPLACE INTO pw_threads_img SET " . S::sqlSingle(array(
 				'tid' => $this->tid,
 				'fid' => $this->data['fid']
 			)));
+			*/
 		}
 	}
 }
@@ -536,13 +552,19 @@ class replyModify extends postModify {
 		}
 		if ($pwSQL || $replies) {
 			$sql = trim(S::sqlSingle($pwSQL) . ',' . $replies, ',');
-			//$this->db->update("UPDATE pw_threads SET $sql WHERE tid=" . S::sqlEscape($this->tid));
-			$this->db->update(pwQuery::buildClause("UPDATE :pw_table SET $sql WHERE tid = :tid", array('pw_threads',$this->tid)));
+			$this->db->update("UPDATE pw_threads SET $sql WHERE tid=" . S::sqlEscape($this->tid));
+			Perf::gatherInfo('changeThreads', array('tid'=>$this->tid));
 		}
 	}
 
 	function updateImgAtt() {
-
+		is_object($this->att) && $this->newImgNum += $this->att->getUploadImgNum();
+		if ($this->newImgNum == $this->oldImgNum) {
+			return true;
+		} 
+		$tucoolService = L::loadClass('tucool','forum');
+		$tucoolService->setforum($this->forum->foruminfo);
+		$tucoolService->updateTucoolImageNum($this->tid);
 	}
 }
 ?>

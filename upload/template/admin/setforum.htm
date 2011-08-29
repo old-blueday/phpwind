@@ -558,6 +558,10 @@ EOT;
 <input type="hidden" name="action" value="edit" />
 <input type="hidden" name="step" value="2" />
 <input type="hidden" name="fid" value="$fid" />
+<input type="hidden" name="forumsetdb[auth_cellphone_credit]" value="$forumset[auth_cellphone_credit]" />
+<input type="hidden" name="forumsetdb[auth_cellphone]" value="$forumset[auth_cellphone]" />
+<input type="hidden" name="forumsetdb[auth_alipay_credit]" value="$forumset[auth_alipay_credit]" />
+<input type="hidden" name="forumsetdb[auth_alipay]" value="$forumset[auth_alipay]" />
 <input type="hidden" id="c_type" name="c_type" value="c_base" />
 <div class="admin_table mb10">
 	<h2 class="h1">
@@ -888,7 +892,7 @@ changeLogoType('$logotype');
 <tr class="tr1 vt">
 	<td class="td1">内容最小长度[字节]</td>
 	<td class="td2"><input type="text" class="input input_wa mr5" name="forumsetdb[contentminlen]" value="$forumset[contentminlen]" /></td>
-	<td class="td2"><div class="help_a"></div></td>
+	<td class="td2"><div class="help_a">帖子内容最小长度控制，0或留空使用 <a href="?adminjob=member" onclick="parent.PW.Dialog({id:'member',url:'?adminjob=member',name:'会员相关'});return false;">全局->会员相关->内容发布设置</a> 中设定的值</div></td>
 	<td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[forumsetdb][contentminlen]" value="1" /></div></td>
 </tr>
 <tr class="tr1 vt">
@@ -1239,7 +1243,7 @@ function check_viewsub(obj){
                 <li><input type="radio" value="0" name="forumsetdb[watermark]" $watermark_N />关闭</li>
             </ul>
         </td>
-        <td class="td2"><div class="help_a">开启后，版块内图片将使用核心设置->附件设置->水印设置的配置</div></td>
+        <td class="td2"><div class="help_a">开启后，版块内图片将使用全局->附件设置->水印设置的配置</div></td>
         <td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[forumsetdb][watermark]" value="1" /></div></td>
     </tr>
     <tr class="tr1 vt">
@@ -1311,23 +1315,54 @@ function check_viewsub(obj){
         <td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[forumsetdb][ifthumb]" value="1" /></div></td>
     </tr>
 	<tr class="tr1 vt">
-		<td class="td1">图片帖功能</td>
-		<td class="td2">
-			<ul class="cc list_80 fl list_A">
-                <li><input type="radio" value="1" name="forumsetdb[imgthread]" $imgthread_Y />开启</li>
-                <li><input type="radio" value="0" name="forumsetdb[imgthread]" $imgthread_N />关闭</li>
-            </ul>
-		</td>
-		<td class="td2"><div class="help_a">开启后，版块列表帖子类型增加图片帖功能</div></td>
-        <td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[forumsetdb][imgthread]" value="1" /></div></td>
-    </tr>
-	<tr class="tr1 vt">
 		<td class="td1">编辑时间约束[分钟]</td>
 		<td class="td2"><input type="text" class="input input_wa mr5" name="forumsetdb[postedittime]" value="$forumset[postedittime]" /></td>
 		<td class="td2"><div class="help_a">超过设定时间后拒绝用户编辑该版块帖子。0或留空表示不限制。管理人员不受限制</div></td>
 		<td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[forumsetdb][postedittime]" value="1" /></div></td>
 	</tr>
    </table>
+<h2 class="h1">图酷设置</h2>
+<table cellspacing="0" cellpadding="0" width="100%" class="mb10">
+	<tr class="tr1 vt">
+    	  <td class="td1">开启图酷</td>
+          <td class="td2">
+            <ul class="cc list_80 fl list_A">
+                <li><input type="radio" value="1" name="forumsetdb[iftucool]" $iftucool_Y />开启</li>
+                <li><input type="radio" value="0" name="forumsetdb[iftucool]" $iftucool_N />关闭</li>
+            </ul>
+        </td>
+        <td class="td2"><div class="help_a">此处可单独设置图酷功能是否开启</div></td>
+        <td class="td2" width="40"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[forumsetdb][iftucool]" value="1" /></div></td>
+    </tr>
+    <tr class="tr1 vt">
+    	  <td class="td1">默认列表</td>
+          <td class="td2">
+            <ul class="cc list_80 fl list_A">
+                <li><input type="radio" value="0" name="forumsetdb[iftucooldefault]" $iftucooldefault_N />全部</li>
+                <li><input type="radio" value="img" name="forumsetdb[iftucooldefault]" $iftucooldefault_Y />图酷</li>
+            </ul>
+        </td>
+        <td class="td2"><div class="help_a">帖子列表默认显示全部帖子或者图酷列表</div></td>
+        <td class="td2" width="40"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[forumsetdb][iftucooldefault]" value="1" /></div></td>
+    </tr>
+    <tr class="tr1 vt">
+    	  <td class="td1">帖子形式</td>
+          <td class="td2">
+            <ul class="cc list_80 fl list_A">
+                <li><input type="radio" value="1" name="forumsetdb[iftucoolbrowse]" $iftucoolbrowse_Y />幻灯</li>
+                <li><input type="radio" value="0" name="forumsetdb[iftucoolbrowse]" $iftucoolbrowse_N />帖子</li>
+            </ul>
+        </td>
+        <td class="td2"><div class="help_a">设置默认打开图酷帖的帖子表现形式</div></td>
+        <td class="td2" width="40"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[forumsetdb][iftucoolbrowse]" value="1" /></div></td>
+    </tr>
+    <tr class="tr1 vt">
+    	  <td class="td1">主楼图片</td>
+          <td class="td2"><input type="text" class="input input_wa mr5" name="forumsetdb[tucoolpic]" value="$forumset[tucoolpic]" /></td>
+        <td class="td2"><div class="help_a">图酷帖生成的标准，需要在主楼上传的图片底限</div></td>
+        <td class="td2" width="40"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[forumsetdb][tucoolpic]" value="1" /></div></td>
+    </tr>
+</table>
 <h2 class="h1">主题相关</h2>
 <table cellspacing="0" cellpadding="0" width="100%" class="mb10">
     <tr class="tr1 vt">
@@ -1386,7 +1421,7 @@ print <<<EOT
     <tr class="tr1 vt">
         <td class="td1">&nbsp;</td>
         <td class="td2"><input type="text" class="input input_wb" name="forumsetdb[relatedcustom][title][]" value="{$value[title]}"></td>
-        <td class="td2"><input type="text" class="input input_wb" name="forumsetdb[relatedcustom][linkurl][]" value="{$value[linkurl]}"></td>
+        <td class="td2"><input type="text" class="input input_wb" name="forumsetdb[relatedcustom][url][]" value="{$value[url]}"></td>
         <td class="td2">&nbsp;</td>
     </tr>
 <!--
@@ -1399,7 +1434,7 @@ EOT;
     <tr class="tr1 vt">
         <td class="td1">&nbsp;</td>
         <td class="td2"><input type="text" class="input input_wb" name="forumsetdb[relatedcustom][title][]"></td>
-        <td class="td2"><input type="text" class="input input_wb" name="forumsetdb[relatedcustom][linkurl][]"></td>
+        <td class="td2"><input type="text" class="input input_wb" name="forumsetdb[relatedcustom][url][]"></td>
         <td class="td2">&nbsp;</td>
     </tr>
 <!--
@@ -1412,7 +1447,7 @@ EOT;
         <tr class="tr1 vt">
             <td class="td1">&nbsp;</td>
             <td class="td2"><input type="text" class="input input_wb" name="forumsetdb[relatedcustom][title][]"></td>
-            <td class="td2"><input type="text" class="input input_wb" name="forumsetdb[relatedcustom][linkurl][]">
+            <td class="td2"><input type="text" class="input input_wb" name="forumsetdb[relatedcustom][url][]">
                 <a style="cursor:pointer;color:#FA891B" onclick="delrelated(this);">[删除]</a>
             </td>
             <td class="td2">&nbsp;</td>
@@ -1435,7 +1470,7 @@ if (relatedcon == 'custom') {
 	setTimeout('relatedsel("custom");',50);
 }
 function addrelated() {
-	var s = getObj('relatedmode').firstChild.cloneNode(true);
+	var s = getObj('relatedmode').rows[0].cloneNode(true);
 	getObj('relatedbody').appendChild(s);
 }
 function delrelated(obj) {
@@ -1512,7 +1547,7 @@ EOT;
     <tr class="tr1 vt">
         <td class="td1">标题最大字节数</td>
         <td class="td2"><input type="text" class="input input_wa" name="forumsetdb[commendlength]" value="$forumset[commendlength]" /></td>
-        <td class="td2"><div class="help_a"></div></td>
+        <td class="td2"><div class="help_a">最大值为30，当设定值超过30时前台截取为30字节</div></td>
         <td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[forumsetdb][commendlength]" value="1" /></div></td>
     </tr>
     <tr class="tr1 vt">
@@ -1550,6 +1585,7 @@ EOT;
             	<table cellpadding="0" cellspacing="0" style="table-layout:auto;">
                 	<tr>
                     	<td width="60">顺序</td>
+                    	<td width="80">系统组专用</td>
                     	<td width="95">名称</td>
                         <td width="95">图标URL</td>
                         <td><a class="cp s3" onclick="addtype();">[添加一级分类]</a></td>
@@ -1557,25 +1593,29 @@ EOT;
 <!--
 EOT;
 	foreach ($typedb as $key => $value){
+		$ifsystype = $value['ifsys'] ? 'checked' : '';
 print <<<EOT
 -->
                     <tr id="ttype_$value[id]">
                     	<td><input type="text" class="input input_wd" value="$value[vieworder]" name="t_view_db[$key]"></td>
+                    	<td><input type="checkbox" value="1" name="t_sys_db[$key]" $ifsystype /></td>
                         <td><input type="text" class="input input_wc" value="$value[name]" name="t_db[$key]" /></td>
                         <td><input type="text" class="input input_wc" value="$value[logo]" name="t_logo_db[$key]" /></td>
-                        <td><a href="javascript:;" onclick="addSubType($value[id]);" class="mr10">[添加二级分类]</a><a href="javascript:;" onclick="delTtype('$value[id]','top');">[删除]</a></td>
+                        <td><a href="javascript:;" onclick="addSubType($value[id]);" class="mr10">[添加二级分类]</a><a href="javascript:;" onclick="delTtype('$value[id]','top','$fid');">[删除]</a></td>
                     </tr>
 <!--
 EOT;
 		foreach ($subtypedb as $k => $v){
 			if ($key == $v['upid']){
+				$ifsubsystype = $v['ifsys'] ? 'checked' : '';
 print <<<EOT
 -->
                     <tr id="ttype_$v[id]">
                         <td>┠&nbsp;<input type="text" class="input input_wd" name="t_view_db[{$v[id]}]" value="$v[vieworder]"></td>
+                        <td><input type="checkbox" value="1" name="t_sys_db[{$v[id]}]" $ifsubsystype /></td>
                         <td><input type="text" class="input input_wc" value="$v[name]" name="t_db[{$v[id]}]" /></td>
                         <td><input type="text" class="input input_wc" value="$v[logo]" name="t_logo_db[{$v[id]}]" /></td>
-                        <td><a href="javascript:;" onclick="delTtype('$v[id]','sub');">[删除]</a></td>
+                        <td><a href="javascript:;" onclick="delTtype('$v[id]','sub','$fid');">[删除]</a></td>
                     </tr>
 <!--
 EOT;
@@ -1588,12 +1628,12 @@ EOT;
 	}print <<<EOT
 -->
 					<tbody id="tbody"></tbody>
-					<tbody id="tmode" style="display:none"><tr><td><input type="text" class="input input_wd mr5" name="new_t_view_db[]"></td><td><input type="text" class="input input_wc" value="" name="new_t_db[]" /></td><td><input type="text" class="input input_wc" name="new_t_logo_db[]" /></td><td>&nbsp;</td></tr></tbody>
-					<tbody id="t_sub_mode" style="display:none"><tr><td width="60">┠&nbsp;<input type="text" class="input input_wd mr5" name="new_t_sub_view_db"></td><td width="95"><input type="text" class="input input_wc" value="" name="new_t_sub_db" /></td><td width="95"><input type="text" class="input input_wc" name="new_t_sub_logo_db" /></td><td>&nbsp;</td></tr></tbody>
+					<tbody id="tmode" style="display:none"><tr><td><input type="text" class="input input_wd mr5" name="new_t_view_db[]"></td><td><input type="checkbox" value="1" name="new_t_sys_db[]" /></td><td><input type="text" class="input input_wc" value="" name="new_t_db[]" /></td><td><input type="text" class="input input_wc" name="new_t_logo_db[]" /></td><td>&nbsp;</td></tr></tbody>
+					<tbody id="t_sub_mode" style="display:none"><tr><td width="60">┠&nbsp;<input type="text" class="input input_wd mr5" name="new_t_sub_view_db"></td><td><input type="checkbox" value="1" name="new_t_sub_sys_db" /></td><td width="95"><input type="text" class="input input_wc" value="" name="new_t_sub_db" /></td><td width="95"><input type="text" class="input input_wc" name="new_t_sub_logo_db" /></td><td>&nbsp;</td></tr></tbody>
             	</table>
             </div>
         </td>
-        <td class="td2"><div class="help_a">图标URL支持外链（http://开头）</div></td>
+        <td class="td2"><div class="help_a">图标URL支持外链（http://开头），非系统组成员无法使用系统组专用的主题分类</div></td>
         <td class="td2" width="40"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[t_typemain]" value="1" /></div></td>
     </tr>
         
@@ -1631,21 +1671,22 @@ function addtype(){
 function addSubType(id) {
 	var inputs = getObj('t_sub_mode').getElementsByTagName('input');
 	inputs[0].name = "new_t_sub_view_db\["+id+"\]\[\]";
-	inputs[1].name = "new_t_sub_db\["+id+"\]\[\]";
-	inputs[2].name = "new_t_sub_logo_db\["+id+"\]\[\]";
+	inputs[1].name = "new_t_sub_sys_db\["+id+"\]\[\]";
+	inputs[2].name = "new_t_sub_db\["+id+"\]\[\]";
+	inputs[3].name = "new_t_sub_logo_db\["+id+"\]\[\]";
 	var s = getObj('t_sub_mode').firstChild.cloneNode(true);
 	getObj('t_sub_body_'+id).appendChild(s);
 }
 
 
-function delTtype(id,type) {
+function delTtype(id,type,fid) {
 	var url = '$ajaxurl';
 	if (type == 'top') {
 		if (!confirm("确定要删除此主题分类吗？删除此主题分类将同时删除其二级分类")) return false;
 	} else if (type == 'sub') {
 		if (!confirm("确定要删除此主题分类吗？")) return false;
 	}
-	var data = 'action=delttype&type='+type+'&id='+id+'&';
+	var data = 'action=delttype&type='+type+'&id='+id+'&fid='+fid;
 	setTimeout("ajax.send('" + url + "','" + data + "',delTtypeR)",200);
 }
 
@@ -1664,7 +1705,7 @@ addtype();
 </div>
 
 <div id="c_usercredit" style="display:none" class="admin_table mb10">
-	<h2 class="h1"><span class="mr20">版块积分设置</span><span class="linka">注:<font color="blue">威望积分</font>支持小数点后一位，其他积分只允许整数，留空则使用“核心设置-积分设置”处的默认值 ！</span></h2>
+	<h2 class="h1"><span class="mr20">版块积分设置</span><span class="linka">注:<font color="blue">威望积分</font>支持小数点后一位，其他积分只允许整数，留空则使用“全局-积分设置”处的默认值 ！</span></h2>
     <table cellspacing="0" cellpadding="0" width="100%" class="mb10">
         <tr class="tr2">
             <td width="60">积分名称</td>
@@ -1740,8 +1781,8 @@ EOT;
             <div class="admin_table_c">
                 <table cellpadding="0" cellspacing="0" width="100%">
                 	<tr>
-                        <td width="80">有效时间:</td>
-                         <td><input type="text" class="input input_wa mr10" name="rewarddb[0]" value="$rw_time" />[天]</td>
+                        <td width="70">有效时间:</td>
+                         <td width="260"><input type="text" class="input input_wa mr10" name="rewarddb[0]" value="$rw_time" />[天]<span></span></td>
                     </tr>
                     <tr>
                         <td>最佳答案:</td>
@@ -1750,7 +1791,9 @@ EOT;
                     <tr>
                         <td>热心助人:</td>
                         <td><input type="text" class="input input_wa mr10" name="rewarddb[2]" value="$rw_a_val" />[最小积分]</td>
+                        <td><div class="help_a">积分只能是整数</div></td>
                     </tr>
+                    
                     <tr class="vt">
                         <td>悬赏积分:</td>
                         <td>

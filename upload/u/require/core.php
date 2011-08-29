@@ -250,10 +250,10 @@ function countPosts($exp='+1') {
 	$num = intval(trim($exp,'+-'));
 	if (strpos($exp,'+') !== false) {
 		//* $db->update("UPDATE pw_bbsinfo SET o_post=o_post+".S::sqlEscape($num,false).",o_tpost=o_tpost+".S::sqlEscape($num,false));
-		$db->update(pwQuery::buildClause("UPDATE :pw_table SET o_post=o_post+".S::sqlEscape($num,false).",o_tpost=o_tpost+".S::sqlEscape($num,false), array('pw_bbsinfo')));
+		$db->update(pwQuery::buildClause("UPDATE :pw_table SET o_post=o_post+:o_post, o_tpost=o_tpost+:o_tpost", array('pw_bbsinfo',$num, $num)));
 	} else {
 		//* $db->update("UPDATE pw_bbsinfo SET o_post=o_post-".S::sqlEscape($num,false).",o_tpost=o_tpost-".S::sqlEscape($num,false));
-		$db->update(pwQuery::buildClause("UPDATE :pw_table SET o_post=o_post-".S::sqlEscape($num,false).",o_tpost=o_tpost-".S::sqlEscape($num,false), array('pw_bbsinfo')));
+		$db->update(pwQuery::buildClause("UPDATE :pw_table SET o_post=o_post-:o_post, o_tpost=o_tpost-:o_tpost", array('pw_bbsinfo',$num, $num)));
 	}
 }
 
@@ -647,7 +647,8 @@ function pwLimitPages($count,$page,$pageurl) {
 function updateGroupLevel($cyid, $gdb = array()) {
 	require_once(R_P . 'require/functions.php');
 	global $o_groups_upgrade, $o_groups_levelneed;
-	isset($o_groups_upgrade) || include pwCache::getPath(D_P . 'data/bbscache/o_config.php');
+	//* isset($o_groups_upgrade) || include pwCache::getPath(D_P . 'data/bbscache/o_config.php');
+	isset($o_groups_upgrade) || extract(pwCache::getData(D_P . 'data/bbscache/o_config.php', false));
 	$nums = CalculateCredit($gdb, $o_groups_upgrade);
 	arsort($o_groups_levelneed);
 	reset($o_groups_levelneed);
@@ -660,7 +661,8 @@ function updateGroupLevel($cyid, $gdb = array()) {
 		}
 	}
 	if ($lid <> $gdb['commonlevel']) {
-		$GLOBALS['db']->update("UPDATE pw_colonys SET commonlevel=" . S::sqlEscape($lid) . ' WHERE id=' . S::sqlEscape($cyid));
+		//* $GLOBALS['db']->update("UPDATE pw_colonys SET commonlevel=" . S::sqlEscape($lid) . ' WHERE id=' . S::sqlEscape($cyid));
+		pwQuery::update('pw_colonys', 'id=:id', array($cyid), array('commonlevel'=>$lid));
 	}
 }
 
@@ -800,8 +802,10 @@ function getMedalIconsByUid($userId) {
 		$userService = L::loadClass('UserService', 'user'); 
 		$userinfo = $userService->get($userId);
 	}
-	if (!$md_ifopen)  include pwCache::getPath(D_P.'data/bbscache/md_config.php');
-	if (!S::isArray($_MEDALDB))  include pwCache::getPath(D_P.'data/bbscache/medaldb.php');
+	//* if (!$md_ifopen)  include pwCache::getPath(D_P.'data/bbscache/md_config.php');
+	if (!$md_ifopen)  extract(pwCache::getData(D_P.'data/bbscache/md_config.php', false));
+	//* if (!S::isArray($_MEDALDB))  include pwCache::getPath(D_P.'data/bbscache/medaldb.php');
+	if (!S::isArray($_MEDALDB))  extract(pwCache::getData(D_P.'data/bbscache/medaldb.php', false));
 	$medals = $medalsInfo = array();
 	if (!$userinfo['medals'])  return null;
 	$medals = explode(',',$userinfo['medals']);

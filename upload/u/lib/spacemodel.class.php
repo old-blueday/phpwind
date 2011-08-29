@@ -19,7 +19,7 @@ class PwSpaceModel {
 		$this->_db = & $GLOBALS['db'];
 		$this->_isGM =& $GLOBALS['isGM'];
 		$this->spaceinfo = $base->info;
-		$this->_cacheModes = array('article', 'friend', 'weibo', 'colony', 'messageboard', 'recommendUsers');
+		$this->_cacheModes = array('friend', 'weibo', 'colony', 'tags', 'messageboard', 'recommendUsers'); //'article'
 	}
 
 	function get($uid, $config) {
@@ -28,12 +28,15 @@ class PwSpaceModel {
 			$userCache = L::loadClass('UserCache', 'user'); /* @var $userCache PW_UserCache */
 			$array = $userCache->get($uid, $config);
 		}
+		//var_dump($array['article']);
 		foreach ($config as $key => $value) {
 			if (!isset($array[$key])) {
 				if ($method = $this->_getMethod($key, 'get')) {
+					//var_dump($method);
 					$array[$key] = $this->$method($uid, $value);
 				}
 			} elseif ($method = $this->_getMethod($key, 'adorn')) {
+					//var_dump($method);
 				$array[$key]  = $this->$method($array[$key]);
 			}
 		}
@@ -75,6 +78,7 @@ class PwSpaceModel {
 				'gender'	=> $this->spaceinfo['gender'],
 				'location'	=> $this->spaceinfo['location'],
 				'bday'		=> $this->spaceinfo['bday'],
+				'authmobile' => $this->spaceinfo['authmobile'],
 			);
 		}
 		return $array;
@@ -117,21 +121,72 @@ class PwSpaceModel {
 		global $winduid;
 		$_sql_where = '';
 		if ($this->spaceinfo['isMe'] || $this->_isGM) {
-
+		
 		} elseif ($this->base->isFriend($winduid)) {
 			$_sql_where = ' AND a.private<2';
 		} else {
 			$_sql_where = ' AND a.private=0';
 		}
 		$array = array();
-		$query = $this->_db->query("SELECT b.pid,b.path,b.ifthumb FROM pw_cnalbum a LEFT JOIN pw_cnphoto b ON a.aid=b.aid WHERE a.atype='0' AND a.ownerid=" . S::sqlEscape($uid) . $_sql_where . ' AND b.pid IS NOT NULL ORDER BY b.pid DESC ' . S::sqlLimit($num));
+		$query = $this->_db->query("SELECT b.pid,b.path,b.ifthumb,b.pintro FROM pw_cnalbum a LEFT JOIN pw_cnphoto b ON a.aid=b.aid WHERE a.atype='0' AND a.ownerid=" . S::sqlEscape($uid) . $_sql_where . ' AND b.pid IS NOT NULL ORDER BY b.pid DESC ' . S::sqlLimit($num));
 		while ($rt = $this->_db->fetch_array($query)) {
 			$rt['path'] = getphotourl($rt['path'], $rt['ifthumb']);
+			$rt['title'] = substrs($rt['pintro'], 20);
 			$array[] = $rt;
 		}
 		return $array;
 	}
-
+	
+	function adorn_article($data){
+		if(!$data || !is_array($data)) return array();
+		foreach($data as $value){
+			$arrTid[] = $value['tid'];
+		}
+		if(!$arrTid || !is_array($arrTid)) return array();
+		$query = $this->_db->query("SELECT tid,subject,postdate,fid,replies,hits FROM pw_threads WHERE tid in (" . S::sqlImplode($arrTid) . ') AND ifcheck=1 AND fid!=0 ORDER BY tid DESC ');
+		while ($rt = $this->_db->fetch_array($query)) {
+			$rt['postdate'] = get_date($rt['postdate'], 'Y-m-d');
+			$pw_tmsgs = getTtable($rt['tid']);
+			$r2 = $this->_db->get_one("SELECT aid,content FROM $pw_tmsgs WHERE tid=" . S::sqlEscape($rt['tid']));
+			$rt['content'] = substrs(stripWindCode($r2['content']), 100, N);
+			$r3 = $this->_db->get_one("SELECT name FROM pw_forums WHERE fid=" . S::sqlEscape($rt['fid']));
+			$rt['forums'] = substrs(stripWindCode($r3['name']), 100, N);
+			$rt['forumsid'] = $rt['fid'];
+			$array[] = $rt;
+		}
+		return $array;
+	}
+	
+	function get_reply($uid, $num) {
+		$pw_posts = GetPtable($GLOBALS['db_ptable']);
+		$query = $this->_db->query("SELECT p.pid,p.postdate,t.tid,t.fid,t.subject,t.authorid,t.author,t.replies,t.hits,t.titlefont,t.anonymous,t.lastpost,t.lastposter FROM $pw_posts p LEFT JOIN pw_threads t USING(tid) WHERE p.authorid=".S::sqlEscape($uid)." ORDER BY p.postdate DESC LIMIT $num");
+		while ($rt = $this->_db->fetch_array($query)){
+			$rt['subject']	= substrs($rt['subject'],45);
+			$pw_tmsgs = getTtable($rt['tid']);
+			$r2 = $this->_db->get_one("SELECT aid,content FROM $pw_tmsgs WHERE tid=" . S::sqlEscape($rt['tid']));
+			$rt['content'] = substrs(stripWindCode($r2['content']), 100, N);
+			$r3 = $this->_db->get_one("SELECT name FROM pw_forums WHERE fid=" . S::sqlEscape($rt['fid']));
+			$rt['forums'] = substrs(stripWindCode($r3['name']), 100, N);
+			$rt['forumsid'] = $rt['fid'];
+			list($rt['postdate'])	= getLastDate($rt['postdate']);
+			list($rt['lastpost'])	= getLastDate($rt['lastpost']);
+			$array[]		= $rt;
+		}
+		return $array;
+	}
+/*
+	function get_favorites($uid, $num) {
+		$query = $this->_db->query("SELECT p.content,p.postdate FROM pw_collection p WHERE p.uid=".S::sqlEscape($uid)." AND p.type='postfavor' ORDER BY p.postdate DESC LIMIT $num");
+		while ($rt = $this->_db->fetch_array($query)){
+			$fav = unserialize($rt['content']);
+			$fav['subject'] = $fav['postfavor']['subject'];
+			$fav['postdate'] = get_date($rt['postdate']);
+			$fav['lastpost'] = get_date($fav['lastpost']);
+			$array[]		= $fav;
+		}
+		return $array;
+	}
+*/
 	function get_visitor($uid, $num) {
 		$visitors = unserialize($this->spaceinfo['visitors']);
 		$array = array();
@@ -166,7 +221,7 @@ class PwSpaceModel {
 		}
 		return $array;
 	}
-
+	
 	function adorn_messageboard($data) {
 		global $db_shield,$groupid;
 		if(!$data || !is_array($data)) return array();
@@ -214,6 +269,7 @@ class PwSpaceModel {
 		}
 		return $array;
 	}
+	
 
 	/**
 	 * 取得个人空间用户的综合积分

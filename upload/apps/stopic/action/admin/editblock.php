@@ -194,8 +194,9 @@ function stopic_use_block($type) {
 function stopicUploadImg($k) {
 	global $db_bbsurl;
 	$img = new StopicUpload($k);
-	$returnImg = PwUpload::upload($img, 0);
+	$returnImg = PwUpload::upload($img);
 	if (!is_array($returnImg) || count($returnImg) == 0) return false;
-	return $db_bbsurl."/attachment/".$returnImg[0]['fileuploadurl'];
+	$imageUrl = geturl($returnImg[0]['fileuploadurl']);
+	return $imageUrl[0];
 }
 ?>

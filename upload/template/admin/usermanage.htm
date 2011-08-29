@@ -36,11 +36,11 @@ EOT;
 	</tr>
 	<tr class="tr1 vt">
 		<td class="td1">用户名包含</td>
-		<td class="td2"><input type="text" class="input input_wa mr20" maxlength=14 name="schname" />可使用通配符 "*"<!-- <input type="checkbox" value="1" name="vaguename" /> 模糊搜索 --></td>
+		<td class="td2"><input type="text" class="input input_wa mr20" maxlength=15 name="schname" />可使用通配符 "*"<!-- <input type="checkbox" value="1" name="vaguename" /> 模糊搜索 --></td>
 		</tr>
 	<tr class="tr1 vt">	
 		<td class="td1">用户UID</td>
-		<td class="td2"><input type="text" class="input input_wa mr20" maxlength=14 name="schuid" />可使用通配符 "*"<!-- <input type="checkbox" value="1" name="vaguename" /> 模糊搜索 --></td>
+		<td class="td2"><input type="text" class="input input_wa mr20" maxlength=14 name="schuid" /><!-- <input type="checkbox" value="1" name="vaguename" /> 模糊搜索 --></td>
 		</tr>
 	<tr class="tr1 vt">
 		<td class="td1">电子邮箱</td>
@@ -269,14 +269,10 @@ EOT;
             <div id="face2" style="display:none;">
             	<table>
                 	<tr>
-                		<td><!--头像链接--></td>
-                        <td>宽:</td>
-                        <td>高:</td>
+                		<td>&nbsp;</td>
                     </tr>
                     <tr>
                 		<td><input type="text" class="input input_wa mr10" id="httpurl_url" name="httpurl[0]" value='$httpurl'></td>
-                        <td><input type=text size="5" name="httpurl[1]" class="input mr10" value='$iconwidth'></td>
-                        <td><input type=text size="5" name="httpurl[2]" class="input" value='$iconheight'></td>
                     </tr>
                 </table>
                 <input type="hidden" id="httpurl_w" name="httpurl[3]" />
@@ -342,16 +338,16 @@ EOT;
 		<td class="td2"><input type="text" class="input input_wa" name="location" value="$location" /></td><td class="td2"><div class="help_a"></div></td>
 	</tr>
 	<tr class="tr1 vt">
-		<td class="td1">QQ</td>
-		<td class="td2"><input type="text" class="input input_wa" name="oicq" value="$oicq" /></td>
-	<td class="td2"><div class="help_a"></div></td></tr>
-	<tr class="tr1 vt">
 		<td class="td1">ICQ</td>
 		<td class="td2"><input type="text" class="input input_wa" name="icq" value="$icq" /></td>
 	<td class="td2"><div class="help_a"></div></td></tr>
 	<tr class="tr1 vt">
 		<td class="td1">MSN</td>
 		<td class="td2"><input type="text" class="input input_wa" name="msn" value="$msn" /></td>
+	<td class="td2"><div class="help_a"></div></td></tr>
+	<tr class="tr1 vt">
+		<td class="td1">阿里旺旺</td>
+		<td class="td2"><input type="text" class="input input_wa" name="aliww" value="$aliww" /></td>
 	<td class="td2"><div class="help_a"></div></td></tr>
 	<tr class="tr1 vt">
 		<td class="td1">Yahoo</td>
@@ -361,58 +357,6 @@ EOT;
 		<td class="td1">个性签名</td>
 		<td class="td2"><input type="text" class="input input_wa" maxlength="75" name="honor" value="$honor" /></td>
 	<td class="td2"><div class="help_a"></div></td></tr>
-	<tr class="tr1 vt">
-		<td class="td1">性别</td>
-		<td class="td2">
-			<select name="gender" class="select_wa">
-				<option value="0" $sexselect[0]>保密</option>
-				<option value="1" $sexselect[1]>男</option>
-				<option value="2" $sexselect[2]>女</option>
-			</select>
-		</td><td class="td2"><div class="help_a"></div></td>
-	</tr>
-	<tr class="tr1 vt">
-		<td class="td1">生日</td>
-		<td class="td2">
-			<select name="year">
-				<option value="0000"></option>
-<!--
-EOT;
-for($i=1960;$i<2005;$i++){
-print <<<EOT
--->
-				<option value="$i" $yearslect[$i]>$i</option>
-<!--
-EOT;
-}print <<<EOT
--->
-			</select>&nbsp;年
-			<select name="month">
-				<option value="00"></option>
-<!--
-EOT;
-for($i=1;$i<13;$i++){print <<<EOT
--->
-				<option value="$i" $monthslect[$i]>$i</option>
-<!--
-EOT;
-}print <<<EOT
--->
-			</select>&nbsp;月
-			<select name="day">
-				<option value="00"></option>
-<!--
-EOT;
-for($i=1;$i<32;$i++){print <<<EOT
--->
-				<option value="$i" $dayslect[$i]>$i</option>
-<!--
-EOT;
-}print <<<EOT
--->
-			</select>&nbsp;日
-		</td><td class="td2"><div class="help_a"></div>
-	</tr>
 	<tr class="tr1 vt">
 		<td class="td1">帖子签名</td>
 		<td class="td2"><textarea class="textarea" name="signature">$signature</textarea></td>
@@ -429,40 +373,23 @@ EOT;
 EOT;
 if($customfield){print <<<EOT
 -->
+<script type="text/javascript" language="JavaScript" src="js/pw_ajax.js"></script>
+<script type="text/javascript" LANGUAGE="JavaScript" src="js/core/core.js"></script>
+<script language="JavaScript" src="js/global.js"></script>
 <h2 class="h1"></h2>
 <div class="admin_table mb10">
 <table width="100%" cellspacing="0" cellpadding="0">
 <!--
 EOT;
-foreach($customfield as $key=>$val){
-$field="field_".(int)$val[id];
-if($val[type]=='1'){
-$field_type="<input type=\"text\" size=\"30\" name=\"$field\" value=\"{$$field}\">";
-}elseif($val[type]=='2'){
-$field_type="<textarea name=\"$field\" rows=\"5\" cols=\"50\">{$$field}</textarea>";
-}elseif($val[type]=='3'){
-$field_type="<select name=\"$field\">";
-$options=explode("\n",$val[options]);
-foreach($options as $k=>$v){
-list($k,$v)=explode('=',$v);
-$type_sel=$$field==$k?'selected':'';
-$field_type.="<option value=\"$k\" $type_sel>$v</option>";
-}$field_type.="</select>";
-}print <<<EOT
--->
-	<tr class="tr1 vt">
-		<td class="td1">$val[title]<br>$val[descrip]</td>
-		<td class="td2">{$field_type}</td>
-	</tr>
-<!--
-EOT;
-}print <<<EOT
+echo $customerTemplate;
+print <<<EOT
 -->
 </table>
 </div>
 <!--
 EOT;
-}print <<<EOT
+}
+print <<<EOT
 -->
 <div class="tac mb10">
 	<span class="btn"><span><button type="submit">提 交</button></span></span>
@@ -530,7 +457,7 @@ EOT;
 <table width="100%" cellspacing="0" cellpadding="0">
 	<tr class="tr1 vt">
 		<td class="td1">用户名</td>
-		<td class="td2"><input type="text" class="input input_wa" maxlength="14" name="username"></td>
+		<td class="td2"><input type="text" class="input input_wa" maxlength="15" name="username"></td>
 	</tr>
 	<tr class="tr1 vt">
 		<td class="td1">密&#160;&#160;码</td>
@@ -590,7 +517,7 @@ EOT;
 	</tr>
 	<tr class="tr1 vt">
 		<td class="td1">用户名包含</td>
-		<td class="td2"><input type="text" class="input input_wa" maxlength=14 name="schname"></td>
+		<td class="td2"><input type="text" class="input input_wa" maxlength=15 name="schname"></td>
 	</tr>
 </table>
 </div>
@@ -712,6 +639,10 @@ if(empty($action)){print <<<EOT
     <tr class="tr1 vt">
       <td class="td1">用户名包含</td>
       <td class="td2"><input type="text" class="input input_wa mr20" maxlength=16 name="schname">  可使用通配符 "*"</td>
+    </tr>
+     <tr class="tr1 vt">
+      <td class="td1">用户UID</td>
+      <td class="td2"><input type="text" class="input input_wa mr20" maxlength=16 name="schuid"> </td>
     </tr>
     <tr class="tr1 vt">
       <td class="td1">电子邮箱</td>

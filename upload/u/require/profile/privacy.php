@@ -70,7 +70,7 @@ if (empty($t)) {
 		
 		$privacyCurrent = '';
 		$weiboCurrent = ' class="current"';
-		$userdb = $db->get_one("SELECT article_isfeed,diary_isfeed,photos_isfeed,group_isfeed,self_isfollow,friend_isfollow,cnlesp_isfollow, article_isfollow,diary_isfollow, photos_isfollow, group_isfollow ".$appendFetchField." FROM pw_ouserdata WHERE uid=" . S::sqlEscape($winduid));
+		$userdb = $db->get_one("SELECT article_isfeed,diary_isfeed,photos_isfeed,group_isfeed,self_isfollow,friend_isfollow,cnlesp_isfollow, article_isfollow,diary_isfollow, photos_isfollow, group_isfollow".$appendFetchField." FROM pw_ouserdata WHERE uid=" . S::sqlEscape($winduid));
 		if (!$userdb) {
 			$userdb = array(
 				'article_isfeed' => 1,
@@ -151,7 +151,7 @@ if (empty($t)) {
 			'article_isfollow'	=> $article_isfollow ? 1 : 0,
 			'diary_isfollow'	=> $diary_isfollow ? 1 : 0,
 			'photos_isfollow'	=> $photos_isfollow ? 1 : 0,
-			'group_isfollow'	=> $group_isfollow ? 1 : 0
+			'group_isfollow'	=> $group_isfollow ? 1 : 0,
 		);
 		
 		/* sinaweibo bind */

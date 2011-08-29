@@ -140,7 +140,8 @@ if ($action == 'buy') {
 			if (empty($trade['alipay'])) {
 				Showmsg('onlinepay_alipay');
 			}
-			include_once pwCache::getPath(D_P.'data/bbscache/ol_config.php');
+			//* include_once pwCache::getPath(D_P.'data/bbscache/ol_config.php');
+			pwCache::getData(D_P.'data/bbscache/ol_config.php');
 			require_once(R_P.'require/onlinepay.php');
 			$olpay = new OnlinePay($trade['alipay']);
 
@@ -286,7 +287,8 @@ if ($action == 'buy') {
 		Showmsg('onlinepay_alipay');
 	}
 
-	include_once pwCache::getPath(D_P.'data/bbscache/ol_config.php');
+	//* include_once pwCache::getPath(D_P.'data/bbscache/ol_config.php');
+	pwCache::getData(D_P.'data/bbscache/ol_config.php');
 	require_once(R_P.'require/onlinepay.php');
 	$olpay = new OnlinePay($trade['alipay']);
 

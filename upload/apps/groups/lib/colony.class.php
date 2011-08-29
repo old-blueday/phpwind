@@ -377,7 +377,8 @@ class PwColony {
 		if (empty($_sql_set))
 			return false;
 
-		$this->_db->update('UPDATE pw_colonys SET ' . $_sql_set . ' WHERE id=' . S::sqlEscape($this->cyid));
+		//* $this->_db->update('UPDATE pw_colonys SET ' . $_sql_set . ' WHERE id=' . S::sqlEscape($this->cyid));
+		$this->_db->update(pwQuery::buildClause("UPDATE :pw_table SET {$_sql_set} WHERE id=:id", array('pw_colonys',$this->cyid)));
 		require_once(R_P . 'u/require/core.php');
 		updateGroupLevel($this->cyid, $this->info);
 	}
@@ -458,7 +459,8 @@ class PwColony {
 			while (count($this->info['visitor']) > 50) {
 				array_pop($this->info['visitor']);
 			}
-			$this->_db->update("UPDATE pw_colonys SET visitor=" . S::sqlEscape(serialize($this->info['visitor'])) . ' WHERE id=' . S::sqlEscape($this->cyid));
+			//* $this->_db->update("UPDATE pw_colonys SET visitor=" . S::sqlEscape(serialize($this->info['visitor'])) . ' WHERE id=' . S::sqlEscape($this->cyid));
+			$this->_db->update(pwQuery::buildClause("UPDATE :pw_table SET visitor=:visitor WHERE id=:id", array('pw_colonys',serialize($this->info['visitor']), $this->cyid)));
 		}
 	}
 

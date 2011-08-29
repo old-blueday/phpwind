@@ -188,7 +188,7 @@ Breeze.namespace('dom', function(B){
 				el = document.createElement(str);
 			}else{
 				var div = document.createElement('div');
-				div.innerHTML = str;
+				div.innerHTML = B.trim(str);
 				el = div.firstChild;
 				div.removeChild(el);
 				delete div;
@@ -376,6 +376,21 @@ Breeze.namespace('dom', function(B){
             return newNode;
         },
 		/**
+		  * @param {HTMLElement} newNode
+		  * @param {HTMLElement} refNode
+		  * @description 插入到内部前面
+		  */
+		prepend: function(newNode, refNode){
+			 if (newNode && refNode) {
+				if (refNode.firstChild) {
+                    refNode.insertBefore(newNode, refNode.firstChild);
+                } else {
+                    refNode.appendChild(newNode);
+                }
+            }
+            return newNode;
+		},
+		/**
 		 * @params {String} c
 		 * @description 格式化颜色字符串，将rgb转换成16进制
 		 * @returns {String}
@@ -390,6 +405,16 @@ Breeze.namespace('dom', function(B){
 		
 		getComputedStyle: function(el){
 			return window.getComputedStyle ? window.getComputedStyle(el, null) : el.currentStyle;   
+		},
+		
+		show: function(el){
+			el.style.display = 'block';
+			return el;
+		},
+		
+		hide: function(el){
+			el.style.display = 'none';
+			return el;
 		}
 	};
 	/**

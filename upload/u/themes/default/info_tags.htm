@@ -1,0 +1,85 @@
+<!--<?php
+require_once uTemplate::PrintEot('header');
+require_once uTemplate::PrintEot('profile_left');
+print <<<EOT
+-->
+<div class="contUser">
+	<div class="p15">
+		<h4 class="site"><span>帐号</span></h4>
+<!--
+EOT;
+require_once uTemplate::PrintEot('info_nav');
+print <<<EOT
+-->
+		<table width="100%" height="450">
+		<tr><td class="vt"><div class="p15">
+			<div class="p10">
+				<div class="f16 mb10" style=" font-family:Microsoft YaHei;"><img src="u/images/icon/tags.png" align="absmiddle" class="mr5" />添加描述自己<span class="blue">职业</span>、<span class="s2">兴趣爱好</span>等方面的词语，让更多人找到你，让你找到更多同类</div>
+				<div class="tagBox">
+					<form id="addtag" name="addtag" action="profile.php?action=modify&info_type=tags" method="post">
+					<input type="hidden" id="tagsUid" value="$winduid" />
+						<div class="tagAdd fl">
+							<input type="text" name="tagname" id="tagname" class="input gray" style="width:200px;" value="添加标签，寻找好友" onFocus="addFocus(this)" onBlur="addBlur(this)" /><span class="bt2"><span><button type="button" onclick="addTag();"> &nbsp;添加标签&nbsp; </button></span></span>
+						</div>
+					</form>
+<!--
+EOT;
+if ($hotTags) { print <<<EOT
+-->
+					<div class="tagHave fr">
+						<h3 class="cc mb10"><a onClick="changeOne();" href="javascript:;" class="gray fr cp">换一组</a>你可能感兴趣的标签（点击直接添加）：</h3>
+						<ul class="tagSole cc" id="changetags">
+<!--
+EOT;
+	foreach ($hotTags as $value) { print <<<EOT
+-->
+							<li id="dis_$value[tagname]"><a onClick="addTag('$value[tagname]');" href="javascript:;">$value[tagname]</a></li>
+<!--
+EOT;
+	}print <<<EOT
+-->
+						</ul>
+					</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+				</div>
+				<h2 class="tagHd f14 s5 mb10">已选择的标签：</h2>
+					<ul class="cc tagList" id="createtags">
+<!--
+EOT;
+if ($memberTags) {
+	foreach ($memberTags as $tag) { 
+	$urlencodeTagName = urlencode($tag[tagname]);
+print <<<EOT
+-->
+						<li id="tag_{$tag[tagid]}"><a href="javascript:;"><span onClick="javascript:window.location='u.php?a=friend&type=find&type=find&according=tags&step=2&f_keyword=$urlencodeTagName';return false;">$tag[tagname]</span><del onclick="pwConfirm('是否删除该标签？',this,function(){delTag('{$tag[tagid]}')});" title="{$tag[tagname]}">×</del></a></li>
+<!--
+EOT;
+	}
+} else { print <<<EOT
+-->
+						<span class="p10 f14" id="dis_notages">您还没有添加标签</span>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+					</ul>
+				<h2 class="tagHd mb10">什么是标签：</h2>
+					<ul class="tagIntr gray">
+						<li>·标签是自定义描述自己职业、兴趣爱好的关键词，让更多人找到你，让你找到更多同类。</li>
+						<li>·已经添加的标签将显示在“我的个人空间”页面左侧栏以及帖子阅读页中，方便大家了解你。</li>
+						<li>·在此查看你自己添加的所有标签，还可以方便地管理，最多可添加10个标签。</li>
+						<li>·点击你已添加的标签，可以搜索到有同样兴趣的人。</li>
+					</ul>
+			</div>
+		</div></td></tr></table>
+	</div>
+</div>
+<SCRIPT type="text/javascript" LANGUAGE="JavaScript" src="js/tags.js"></SCRIPT>
+<!--
+EOT;
+require_once(uTemplate::printEot('footer'));
+?>-->

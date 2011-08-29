@@ -39,7 +39,16 @@ class PW_ArticleDB extends BaseDB {
 	 * @param array $ids
 	 */
 	function getArticlesByIds($ids) {
-		$_sql = "SELECT a.*,e.hits FROM " . $this->_tableName . " a LEFT JOIN " . $this->_extendTableName . " e ON a.article_id=e.article_id WHERE a.article_id IN (" . S::sqlImplode ( $ids ) . ")";
+		$_sql = "SELECT a.*,e.hits FROM " . $this->_tableName . " a LEFT JOIN " . $this->_extendTableName . " e ON a.article_id=e.article_id WHERE a.article_id IN (" . S::sqlImplode ( $ids ) . ") AND a.ifcheck != 2";
+		return $this->_getAllResultFromQuery ( $this->_db->query ( $_sql ) );
+	}
+	
+	/**
+	 * 根据文章ID获取热门文章列表
+	 * @param array $ids
+	 */
+	function getHotArticlesByIds($ids) {
+		$_sql = "SELECT a.*,e.hits FROM " . $this->_tableName . " a LEFT JOIN " . $this->_extendTableName . " e ON a.article_id=e.article_id WHERE a.article_id IN (" . S::sqlImplode ( $ids ) . ") AND a.ifcheck != 2 ORDER BY e.hits DESC";
 		return $this->_getAllResultFromQuery ( $this->_db->query ( $_sql ) );
 	}
 	

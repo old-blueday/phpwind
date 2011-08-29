@@ -6,7 +6,7 @@ if($groupid=='guest'){
 $arr_logintypename = array('用户名','UID','电子邮箱');
 print <<<EOT
 -->
-<form action="$db_bbsurl/login.php" name="login_FORM" method="post">
+<form action="$db_bbsurl/login.php" name="login_FORM" method="post" onsubmit="if((!getObj('nav_pwuser').value||getObj('nav_pwuser').value.indexOf('输入')===0)&& !getObj('showpwd').value){document.location.href='login.php';return false;}return true;">
 <input type="hidden" name="jumpurl" value="{$pwServer['HTTP_REFERER']}" />
 <input type="hidden" name="step" value="2" />
 <input type="hidden" name="cktime" value="31536000" />
@@ -62,8 +62,8 @@ EOT;
 print <<<EOT
 -->
 		</div>
-		<label style="width:65px;" class="fl s6"><input name="cktime" type="checkbox" value="31536000" style="margin-bottom:1px;padding:1px 3px 0;" tabindex="3"/>记住</label>
-		<a href="sendpwd.php" class="s6">找回密码</a>
+		<label style="width:65px;" class="fl s6"><input name="cktime" type="checkbox" value="31536000" style="margin-bottom:1px;padding:1px 3px 0;"/>记住</label>
+		<a href="sendpwd.php" class="s6" tabindex="9">找回密码</a>
 	</dd>
 	<dd class="tal">
 <!--
@@ -84,14 +84,14 @@ print <<<EOT
 					<tr>
 						<td width="70">认证码</td>
 						<td>
-							<input class="input" type="text" id="inputgdcode" name="gdcode" size="5" tabindex="12" onfocus="showgd('header_ckcode');" /><span style="cursor:pointer; margin-left:3px" onclick="this.previousSibling.focus();">点此显示验证码</span>
+							<input class="input" type="text" id="inputgdcode" name="gdcode" size="5" tabindex="3" onfocus="showgd('header_ckcode');" /><span style="cursor:pointer; margin-left:3px" onclick="this.previousSibling.focus();">点此显示验证码</span>
 							<div id="header_ckcode" style="display:none">
 <script type="text/javascript" src="js/pw_authcode.js"></script>
 <script>
 var flashWidth = "$gdSize[0]";
 var flashHeight = "$gdSize[1]";
 var gdtype = $db_gdtype;
-showGdCode();
+//showGdCode();
 </script>
 							</div>
 						</td>
@@ -110,7 +110,7 @@ print <<<EOT
 -->
 					<tr>
 						<td width="70">安全问题</td>
-						<td><p class="mb5"><select name="question" onchange="showcustomquest(this.value)" tabindex="13" class="select_wa">
+						<td><p class="mb5"><select name="question" onchange="showcustomquest(this.value)" tabindex="4" class="select_wa">
 							<option value="0">无安全问题</option>
 							<option value="1">我爸爸的出生地</option>
 							<option value="2">我妈妈的出生地</option>
@@ -121,12 +121,12 @@ print <<<EOT
 							<option value="7">我最喜欢的电影</option>
 							<option value="8">我最喜欢的颜色</option>
 							<option value="-1">自定义问题</option></select></p>
-							<input id="othercustomquest" style="display:none" name="customquest" class="input input_wa" tabindex="14" />
+							<input id="othercustomquest" style="display:none" name="customquest" class="input input_wa" />
 							</td>
 						</tr>
 					<tr>
 						<td>您的答案</td>
-						<td><input name="answer" class="input input_wa" tabindex="15" /></td>
+						<td><input name="answer" class="input input_wa" tabindex="5" /></td>
 					</tr>
 <!--
 EOT;
@@ -148,7 +148,7 @@ print <<<EOT
 					<tr>
 						<td width="70">验证问答</td>
 						<td><span class="fl">{$q_a}</span>
-							<input class="input" name="qanswer" size="5" tabindex="16" />
+							<input class="input" name="qanswer" size="5" tabindex="6" />
 							<input type="hidden" name="qkey" value="{$_LoginInfo['qkey']}" /></td>
 					</tr>
 <!--
@@ -166,8 +166,8 @@ EOT;
 print <<<EOT
 -->
 	    <input type="password" onfocus="if(IsElement('nav_logintab')) getObj('nav_logintab').style.display='';this.value='';if(getObj('header_ckcode') && getObj('header_ckcode').style.display=='none') getObj('inputgdcode').value='';var o_nav_logintab = IsElement('nav_logintab') ? getObj('nav_logintab') : ''; PW_popEvent(o_nav_logintab);" id="showpwd" name="pwpwd" class="input mr5 fl" style="width:128px;padding:2px 0 2px 3px;" tabindex="2" />
-	    <span class="fl" style="width:63px;"><span class="bt2"><span><button type="submit" style="width:60px;">登录</button></span></span></span>
-			<span class="btn2"><span><button type="button" onClick="location.href=getObj('headbase').href+'$regurl#breadCrumb';" style="width:60px;">注册</button></span></span>
+	    <span class="fl" style="width:63px;"><span class="bt2"><span><button name="head_login" type="submit" style="width:60px;" tabindex="7">登录</button></span></span></span>
+			<span class="btn2"><span><button type="button" onClick="location.href=getObj('headbase').href+'$regurl#breadCrumb';" style="width:60px;" tabindex="8">注册</button></span></span>
 	</dd>
 </dl>
 </form>
@@ -253,7 +253,6 @@ function selectLoginType(type,text){
 }
 
 //changeDefaultInputValue(default_input_value);
-</script>
 <!--
 EOT;
 } else {
@@ -384,7 +383,7 @@ EOT;
 print <<<EOT
 -->
 			</p>
-			<p>{$db_moneyname}：<a href="userpay.php" class="org mr20">$winddb[money] $db_moneyunit</a>{$db_rvrcname}：<a href="userpay.php" class="org mr20">$userrvrc $db_rvrcunit</a>级别：<a href="profile.php?action=permission
+			<p>{$db_moneyname}：<a href="userpay.php" class="org mr20">$winddb[money] $db_moneyunit</a>{$db_rvrcname}：<a href="userpay.php" class="org mr20">$userrvrc $db_rvrcunit</a>身份：<a href="profile.php?action=permission
 " class="org">{$gp_grouptitle}</a></p>
 		</dd>
 	</dl>
@@ -407,10 +406,19 @@ EOT;
 	<h6 style="left:-1px;right:auto;"><a href="u.php" class="b link_down"><span>$windid</span></a></h6>
 	<div>
 		<ul class="menu-half cc" style="width:26em;">
-		<li>等级: $gp_grouptitle
 <!--
 EOT;
-if ($_G['allowhide']) {print <<<EOT
+if ($gp_gptype == 'member') {print <<<EOT
+-->
+		<li>等级: $gp_grouptitle</li>
+<!--
+EOT;
+} else {print <<<EOT
+-->
+		<li>身份: $gp_grouptitle</li>
+<!--
+EOT;
+}if ($_G['allowhide']) {print <<<EOT
 -->
 		<li>状态:
 <span style="cursor:pointer;" onclick="ajax.send('pw_ajax.php?action=changestate','',changeState)" id="online_state">
@@ -456,6 +464,15 @@ EOT;
 	<h6><a href="profile.php?action=modify" class="link_down"><span>设置</span></a></h6>
     <ul style="width:50px;" class="menuList">
         <li><a href="profile.php?action=modify" target="_blank">帐号</a></li>
+<!--
+EOT;
+if ($db_authstate) {print <<<EOT
+-->
+		<li><a href="profile.php?action=auth" target="_blank">认证</a></li>
+<!--
+EOT;
+}print <<<EOT
+-->
         <li><a href="profile.php?action=privacy" target="_blank">隐私</a></li>
         <li><a href="userpay.php" target="_blank">积分</a></li>
         <li><a href="profile.php?action=permission" target="_blank">权限</a></li>

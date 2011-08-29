@@ -5,13 +5,13 @@
  * @2010-4-6 liuhui
  */
 class MS_Message extends MS_Base {
-	function sendMessage($userId, $userNames, $messageInfo, $typeId = null) {
+	function sendMessage($userId, $userNames, $messageInfo, $typeId = null ,$isSuper = false) {
 		$userId = intval($userId);
 		if (1 > $userId || "" == $userNames || !$messageInfo || !is_array($userNames)) {
 			return false;
 		}
 		$typeId = ($typeId) ? $typeId : $this->getmap($this->_sms_message);
-		if (!$this->_checkUserLevle($this->_sms, count($userNames), $typeId)) {
+		if (!$isSuper && !$this->_checkUserLevle($this->_sms, count($userNames), $typeId)) {
 			return false;
 		}
 		list($userNames, $categoryId, $typeId) = $this->_checkReceiver($userNames, $this->_sms, $typeId);
@@ -45,7 +45,7 @@ class MS_Message extends MS_Base {
 		if (1 > $userId || 1 > $toUserId) {
 			return false;
 		}
-		$messageInfo['expand'] = serialize(array('categoryid' => $categoryId,'typeid' => $typeId));
+		$messageInfo['expand'] = serialize(array('categoryid' => $categoryId,'typeid' => $typeId,'actor' => array($userId, $toUserId)));
 		$messageInfo['extra'] = serialize(array($userName));
 		if (!($messageId = $this->_addMessage($messageInfo))) {
 			return false;
@@ -163,7 +163,11 @@ class MS_Message extends MS_Base {
 		if (1 > $userId || 1 > $relationId) {
 			return false;
 		}
-		return $this->_getUpMsInfoByType($userId, $this->_sms, $relationId, $isown, $typeId);
+		$messageInfo = $this->_getUpMsInfoByType($userId, $this->_sms, $relationId, $isown, $typeId);
+		if(!$messageInfo){
+			return false;
+		}
+		return $this->getRealMessageInfo($messageInfo);
 	}
 	
 	/**
@@ -184,7 +188,28 @@ class MS_Message extends MS_Base {
 		if (1 > $userId || 1 > $relationId) {
 			return false;
 		}
-		return $this->_getDownMsInfoByType($userId, $this->_sms, $relationId, $isown, $typeId);
+		$messageInfo = $this->_getDownMsInfoByType($userId, $this->_sms, $relationId, $isown, $typeId);
+		if(!$messageInfo){
+			return false;
+		}
+		return $this->getRealMessageInfo($messageInfo);
+	}
+	
+	/**
+	 * 获取上下条的真正消息内容
+	 */
+	function getRealMessageInfo($messageInfo){
+		if(!is_array($messageInfo)){
+			return false;
+		}
+		if($messageInfo['relation'] != 2){
+			return $messageInfo;
+		}
+		$expand = (isset($messageInfo['expand'])) ? unserialize($messageInfo['expand']) : array();
+		if(!($parentMessage = $this->getMessage($expand['parentid']))){
+			return false;
+		}
+		return array_merge($messageInfo,$parentMessage);
 	}
 	
 	function getMessagesBySelf($userId, $typeId, $page, $perpage) {
@@ -411,5 +436,58 @@ class MS_Message extends MS_Base {
 		$relationsDao = $this->getRelationsDao();
 		return $relationsDao->getRelation($userId, $relationId);
 	}
+	
+	/**********************收件箱与发件箱功能*****************************************/
+	
+	function getInBox($userId, $page, $perpage){
+		$userId   = intval($userId);
+		$page     = intval($page);
+		$perpage  = intval($perpage);
+		if( 1 > $userId || 1 > $page || 1 > $perpage ){
+			return false;
+		}
+		return $this->_getsSpecialByIsown($userId, $this->_sms, null, $this->_s_other, $page, $perpage);
+	}
+	
+	function countInBox($userId){
+		$userId   = intval($userId);
+		if( 1 > $userId){
+			return false;
+		}
+		return $this->_countSpecialByIsown($userId, $this->_sms, null, $this->_s_other);
+	}
+	
+	function getOutBox($userId, $page, $perpage){
+		$userId   = intval($userId);
+		$page     = intval($page);
+		$perpage  = intval($perpage);
+		if( 1 > $userId || 1 > $page || 1 > $perpage ){
+			return false;
+		}
+		return $this->_getsSpecialByIsown($userId, $this->_sms, null, $this->_s_self, $page, $perpage);
+	}
+	
+	function countOutBox($userId){
+		$userId   = intval($userId);
+		if( 1 > $userId){
+			return false;
+		}
+		return $this->_countSpecialByIsown($userId, $this->_sms, null, $this->_s_self);
+	}
+	
+	function getMessageByTypeIdWithBoxName($userId, $typeId, $page, $perpage, $boxName = 'outbox'){
+		if($boxName == 'outbox'){
+			return $this->getMessagesBySelf($userId, $typeId, $page, $perpage);
+		}
+		return $this->getMessagesByOther($userId, $typeId, $page, $perpage);
+	}
+	
+	function countMessageByTypeIdWithBoxName($userId, $typeId, $boxName = 'outbox'){
+		if($boxName == 'outbox'){
+			return $this->countMessagesBySelf($userId, $typeId);
+		}
+		return $this->countMessagesByOther($userId, $typeId);
+	}
+	
 
 }

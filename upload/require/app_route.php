@@ -51,7 +51,8 @@ list ( $app, $route ) = app_specialRoute ( $q );
 $appdir = $app;
 list ( $basePath, $baseFile ) = app_router ( $app );
 
-@include_once pwCache::getPath(D_P . 'data/bbscache/o_config.php');
+//* @include_once pwCache::getPath(D_P . 'data/bbscache/o_config.php');
+pwCache::getData(D_P . 'data/bbscache/o_config.php');
 if ($groupid != 3 && $o_share_groups && strpos ( $o_share_groups, ",$groupid," ) === false) {
 	$shareGM = 1;
 }

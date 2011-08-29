@@ -61,6 +61,16 @@ class replyPost {
 		}
 		return $creditset;
 	}
+
+	function userCreidtSet() {
+		$creditset = $this->creditSet();
+		if (($times = $this->forum->authCredit($this->post->user['userstatus'])) > 1) {
+			foreach ($creditset as $key => $value) {
+				$value > 0 && $creditset[$key] *= $times;
+			}
+		}
+		return $creditset;
+	}
 	
 	function check() {
 		$this->post->checkUserCredit($this->creditSet());
@@ -143,6 +153,13 @@ class replyPost {
 				'tid' => $this->tid,
 				'pid' => $this->pid
 			)) . ' WHERE aid IN(' . S::sqlImplode($aids) . ')');
+			//tucool
+			$imgNum = $this->att->getUploadImgNum();
+			if ($this->forum->forumset['iftucool'] && $this->forum->forumset['tucoolpic'] && $imgNum) {
+				$tucoolService = L::loadClass('tucool','forum');
+				$tucoolService->setForum($this->forum->foruminfo);
+				$tucoolService->updateTucoolImageNum($this->tid);
+			}
 		}
 		if ($this->data['ifcheck'] == 1) {
 			$sqladd1 = '';
@@ -157,10 +174,10 @@ class replyPost {
 			} elseif ($ret & 1) {
 				$sqladd1 = "ifmail=ifmail-1,";
 			}
-			//$this->db->update("UPDATE pw_threads SET {$sqladd1}replies=replies+1,hits=hits+1," . S::sqlSingle($sqladd) . " WHERE tid=" . S::sqlEscape($this->tid));
-			$this->db->update(pwQuery::buildClause("UPDATE :pw_table SET {$sqladd1} replies=replies+1,hits=hits+1," . S::sqlSingle($sqladd) . " WHERE tid = :tid", array('pw_threads',$this->tid)));
+			$this->db->update("UPDATE pw_threads SET {$sqladd1}replies=replies+1,hits=hits+1," . S::sqlSingle($sqladd) . " WHERE tid=" . S::sqlEscape($this->tid));
+			Perf::gatherInfo('changeThreads', array('tid'=>$this->tid));
 		}
-		$this->post->updateUserInfo($this->type, $this->creditSet(), $this->data['content']);
+		$this->post->updateUserInfo($this->type, $this->userCreidtSet(), $this->data['content']);
 		$this->afterReply();
 
 		if ($this->extraBehavior) {
@@ -227,13 +244,14 @@ class replyPost {
 					'create_username' => $windid,
 					'title' => getLangInfo('writemsg','subject_reply_title',array(
 						'windid'	=> $windid,
+						'author'	=> $this->tpcArr['author'],
 						'title'		=> substrs(strip_tags($this->tpcArr['subject']), 30, 'Y')
 					)),
 					'content' => getLangInfo('writemsg','subject_reply_content',array(
 						'tid' => $this->tid,
 						'pid' => $this->pid,
 						'windid' => $windid,
-						'content'	=> substrs(strip_tags($this->data['content']), 60, 'Y')
+						'content'	=> substrs(strip_tags(stripWindCode($this->data['content'])), 60, 'Y')
 					)),
 				),
 				'sms_reply',

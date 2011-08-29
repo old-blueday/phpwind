@@ -33,7 +33,8 @@ if (empty($_POST['step'])) {
 	
 	PostCheck();
 	require_once (R_P . 'require/credit.php');
-	include_once pwCache::getPath(D_P . 'data/bbscache/forum_cache.php');
+	//* include_once pwCache::getPath(D_P . 'data/bbscache/forum_cache.php');
+	pwCache::getData(D_P . 'data/bbscache/forum_cache.php');
 	
 	if ($type == '1') {
 		//$db->update("UPDATE pw_threads SET state='1' WHERE tid=" . S::sqlEscape($tid));
@@ -108,5 +109,5 @@ if (empty($_POST['step'])) {
 			)
 		);
 	}
-	refreshto("read.php?tid=$rt[tid]&page=$page", 'operate_success');
+	refreshto("read.php?tid=$rt[tid]&displayMode=1&page=$page", 'operate_success');
 }

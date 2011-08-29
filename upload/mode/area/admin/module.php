@@ -7,7 +7,7 @@ $pageInvokeService = L::loadClass('pageinvokeservice', 'area');
 $portalPageService = L::loadClass('portalpageservice', 'area');
 
 if (!$action) {
-	S::gp(array('keyword','page','alias'));
+	S::gp(array('keyword','page','alias','title'));
 	
 	$page = (int) $page;
 	$page<=0 && $page =1;
@@ -21,10 +21,12 @@ if (!$action) {
 	if ($keyword) {
 		$param['invokename'] = $keyword;
 	}
-	
+	if ($title) {
+		$param['title'] = trim($title);
+	}
 	$ajax_basename = EncodeUrl($basename);
 	$modules = $pageInvokeService->searchPageInvokes($param,$page);	
-	$pages = $pageInvokeService->sreachPageInvokesPages($param,$page,$basename."&keyword=$keyword&alias=$alias&");
+	$pages = $pageInvokeService->sreachPageInvokesPages($param,$page,$basename."&keyword=$keyword&alias=$alias&id=$id&");
 	include PrintMode('module');exit;
 } elseif ($action=='edittpl') {
 	S::gp(array('alias','invokename','step','keyword','page'));

@@ -13,7 +13,7 @@ $uskin_headimg = '';	//头部背景图片
 $uskin_boxA = '#000000';					//全局内容背景颜色
 $uskin_bgA = '#222222';						//激活状态的标签背景等
 $uskin_bgB = '#ffffe3';						//提示，警告类背景
-$uskin_bgC = '#f9f9f9';						//灰色背景块
+$uskin_bgC = '#111111';						//灰色背景块
 $uskin_bgD = '#222222';						//浅蓝色背景块
 
 //全局线条
@@ -78,7 +78,7 @@ a:hover,.line{ text-decoration:underline;}
 
 /*foot*/
 .foot{color:$uskin_textC;}
-.foot a{color:$uskin_textB;}
+.foot a,div.contentText{color:$uskin_textB;}
 
 /*nav*/
 .navA{background:url(u/themes/$uskin/images/nv.png) 0 0 no-repeat;}
@@ -140,7 +140,7 @@ a:hover,.line{ text-decoration:underline;}
 .bgA{background:$uskin_bgA;}
 .bgB{background:$uskin_boxA;}
 /*title*/
-h1{font-size:14px;font-weight:700;color:$uskin_textA;line-height:1.5;padding-top:2px;}
+h1{font-size:14px;font-weight:700;color:#fff;line-height:1.5;padding-top:2px;}
 .h5{border-bottom:1px solid $uskin_bdB;}
 	.h5 li a{color:$uskin_textB;}
 	.h5 .tab a{}
@@ -192,7 +192,6 @@ h1{font-size:14px;font-weight:700;color:$uskin_textA;line-height:1.5;padding-top
 .dlA .dl2{background:$uskin_bgA;}
 .dlA .dl2 dt img{border:1px solid $uskin_bdA;background:$uskin_boxA;}
 .dlB .dl{border-bottom:1px dotted $uskin_bdD;}
-.dlB .dd p,.dlB .dd2 p{color:$uskin_textA;}
 .dlE dl{border-bottom:1px solid $uskin_bdA;}
 .dynamic .dd,.dynamic .dd2{border-bottom:1px dotted $uskin_bdA;}
 .feedImg img{border:1px solid $uskin_bdA;}
@@ -251,6 +250,8 @@ a.help_a i{border:1px solid $uskin_bdC;background:$uskin_bgB;color:$uskin_textA;
 .conFeed .dd .title{color:$uskin_textE;} /*weibo title*/
 .conFeed .dd cite a{color:$uskin_textC;}
 .forward{border:1px solid $uskin_bdA;background:$uskin_bgA;}
+.redlB{border:1px solid #333;background:#111;}
+.redlB .triangle{background:url(u/themes/$uskin/images/triangle.png) 0 bottom no-repeat;}
 .redlB .img{border:1px solid $uskin_bdA;background:$uskin_boxA;}
 .redlB .dlA{border-top:1px dotted $uskin_bdD;}
 .redlB .ddA textarea{border:1px solid $uskin_bdA;}
@@ -264,8 +265,8 @@ a.help_a i{border:1px solid $uskin_bdC;background:$uskin_bgB;color:$uskin_textA;
 .friSelect{border-left:1px solid $uskin_bdA;}
 /*windows table*/
 .tA{border-top:1px solid $uskin_textA;}
-.tA .tr td{background:#222222;color:#698fa0;padding:5px 5px 5px 10px;}
-.tA td,.tA th{padding:5px;border-bottom:1px solid $uskin_textA;border-top:0;vertical-align:middle;line-height:21px;}
+.tA .tr td{background:#222222;color:#698fa0;}
+.tA td,.tA th{border-bottom:1px solid $uskin_textA;border-top:0;}
 .tA tr:hover td,.tA tr:hover th{background:#222222;}
 /*span color*/
 .s1{color:#f00;}/*red*/
@@ -308,6 +309,7 @@ div.wy_tips_A{background:none;}
 
 .pw_menu{border:1px solid #ccc;}
 .pw_menu h6{border:1px solid #ccc;border-bottom:0;}
+.pw_menu a{color:$uskin_textB;}
 .menuList li a,.pw_menu h6 a{color:$uskin_textA;}
 .menuList li a:hover{background:#ddd;}
 /*expandApp*/

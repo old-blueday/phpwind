@@ -91,8 +91,9 @@ class PW_NavConfigDB extends BaseDB {
 		$_navCacheFilePath = $this->_getCacheFilePath();
 		static $navConfigData = array();
 		if (!$navConfigData && file_exists($_navCacheFilePath)) {
-			include_once pwCache::getPath($_navCacheFilePath,true);
-			$navConfigData = ($navConfigData) ? $navConfigData : $GLOBALS['navConfigData'];
+			//* include_once pwCache::getPath($_navCacheFilePath,true);
+			extract(pwCache::getData($_navCacheFilePath, false));
+			//* $navConfigData = ($navConfigData) ? $navConfigData : $GLOBALS['navConfigData'];
 		}
 		if (!isset($navConfigData[$navType])){
 			//* $navConfigData[$navType] = $this->findByTypeWithoutCache($navType);
@@ -106,8 +107,9 @@ class PW_NavConfigDB extends BaseDB {
 		static $navConfigData = array();
 		$_navCacheFilePath = $this->_getCacheFilePath();
 		if (!$navConfigData && file_exists($_navCacheFilePath)) {
-			include_once pwCache::getPath($_navCacheFilePath,true);
-			$navConfigData = ($navConfigData) ? $navConfigData : $GLOBALS['navConfigData'];
+			//* include_once pwCache::getPath($_navCacheFilePath,true);
+			extract(pwCache::getData($_navCacheFilePath, false));
+			//* $navConfigData = ($navConfigData) ? $navConfigData : $GLOBALS['navConfigData'];
 		}
 		if(!$navConfigData){
 			$navConfigData = $this->findAllByTypeWithoutCache();

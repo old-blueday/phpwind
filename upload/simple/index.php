@@ -2,7 +2,8 @@
 define('SIMPLEDIR', getindexdir(__FILE__));
 define('SIMPLE', 1);
 require_once (SIMPLEDIR . '/global.php');
-include_once pwCache::getPath(D_P . 'data/bbscache/forum_cache.php');
+//* include_once pwCache::getPath(D_P . 'data/bbscache/forum_cache.php');
+pwCache::getData(D_P . 'data/bbscache/forum_cache.php');
 
 /*
 * phpwind 是一个免费开源软件，您不需要支付任何费用就可以无限制使用。
@@ -68,6 +69,8 @@ if ($db_footertime == 1) {
 	$wind_spend = "Time $totaltime second(s),query:$qn";
 }
 include PrintEot('simple_footer');
+pwOutPut();
+/*
 $ceversion = defined('CE') ? 1 : 0;
 $output = str_replace(array('<!--<!---->', "<!---->\r\n", '<!---->'), '', ob_get_contents());
 if ($db_htmifopen) {
@@ -75,11 +78,11 @@ if ($db_htmifopen) {
 }
 $output .= "<script language=\"JavaScript\" src=\"http://init.phpwind.net/init.php?sitehash=$db_sitehash&v=$wind_version&c=$ceversion\"></script>";
 ob_end_clean();
-$db_obstart && function_exists('ob_gzhandler') ? ob_start('ob_gzhandler') : ob_start();
+ObStart();
 echo $output;
 flush();
 exit();
-
+*/
 function PageDiv($count, $page, $numofpage, $url, $max = null) {
 	global $tablecolor, $db_bbsurl;
 	$total = $numofpage;

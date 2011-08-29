@@ -139,6 +139,10 @@ if (empty($action) || "verify" == $action) {
 		
 		$pieces = array();
 		foreach ($num as $key => $value) {
+			if (isset($param[$key][image])) {
+				$images = explode(',',$param[$key][image]);
+				if ($images[0] == 0 || $images[1] == 0) refreshto($baseUrl . "action=editconfig", '图片宽度或者高度不可为0，请返回修改！');
+			}
 			$temp = array();
 			$temp['num'] = (int) $value;
 			$temp['action'] = $p_action[$key];
@@ -271,7 +275,8 @@ if (in_array($action, array("pushto","add","edit","recommend"))) {
 			($invokename ? strip_tags(trim($invokename)) : ""),
 			($invokepieceid ? intval($invokepieceid) : "")
 		);
-		list($bool, $channels, $invokes, $subInvokes) = $manageService->getFirstGrade($winduid, $channelid, $invokename, $ifverify);
+		$action == 'recommend' && $channelid === 0 && $selectDefaultId = -1;
+		list($bool, $channels, $invokes, $subInvokes) = $manageService->getFirstGrade($winduid, ($selectDefaultId ? $selectDefaultId : $channelid), $invokename, $ifverify);
 		if (!$bool && 1 == $ajax) {
 			echo "4\t抱歉,你没有管理权限";
 			ajax_footer();
@@ -303,7 +308,7 @@ if (in_array($action, array("pushto","add","edit","recommend"))) {
 				4 => "",
 				5 => ""
 			);
-			$title = "增加";
+			$title = "添加";
 		}
 		$default = array();
 	} else {

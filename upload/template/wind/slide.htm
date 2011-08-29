@@ -1,0 +1,193 @@
+<!--<?php
+$metaVersion = $wind_version;
+print <<<EOT
+--><!doctype html>
+<html>
+<head>
+<meta charset="$db_charset">
+<title>$read[subject]</title>
+<meta name="generator" content="phpwind v{$metaVersion}" />
+<link href="$imgpath/pw_core.css" rel="stylesheet" />
+<link href="$imgpath/slide/slide.css?101128" rel="stylesheet" media="all"/>
+<base id="headbase" href="$db_bbsurl/" />
+<!--[if IE 6]>
+<script src="$imgpath/slide/iepngfix_tilebg.js"></script>
+<![endif]--> 
+<script type="text/javascript" language="JavaScript" src="js/pw_ajax.js"></script>
+<script type="text/javascript" language="JavaScript" src="js/core/core.js"></script>
+<script language="JavaScript">
+var imgpath = '$imgpath';
+</script> 
+<style type="text/css">
+.preA{cursor:url(u/images/pre.cur),auto;}
+.nextA{cursor:url(u/images/next.cur),auto;right:0;}
+</style>
+</head>
+<body>
+	<div class="header">
+		<div class="head">
+			<div class="fr"><a href="thread.php?fid={$read[fid]}&search=img#tabA">&lt;&lt;返回图酷列表</a>&nbsp;|&nbsp;<!--a href="link.php?action=previous&fid=$fid&tid=$tid&fpage=$fpage&goto=previous">上一主题</a>&nbsp;|&nbsp;<a href="link.php?action=previous&fid=$fid&tid=$tid&fpage=$fpage&goto=next">下一主题</a>&nbsp;|&nbsp;--><a href="read.php?tid={$read['tid']}&displayMode=1">退出图酷模式&gt;&gt;</a></div>
+			<h1>$read[subject]</h1><span id="positionNum"></span>
+		</div>
+		<div class="BgA"></div>
+	</div>
+	<div class="content">
+		<img id="img_content" src="$imgpath/blank.gif" style="position:relative;">
+	</div>
+	<div class="page">
+		<a href="javascript:;" id="prePic" hidefocus="true" class="preA" title="上一张"><!--em>上一张</em--></a>
+		<a href="javascript:;" id="nextPic" hidefocus="true" class="nextA" title="下一张"><!--em>下一张</em--></a>
+	</div>
+	<div class="footer">
+		<div class="bottom">
+			<div style="width:100%;" class="fl">
+			<div id="B_slider_table">
+			<table height="70" style="table-layout:fixed;width:100%;">
+				<tr>
+					<td width="19"><a href="javascript:" title="上一组" class="preB" id="prePage"></a></td>
+					<td>
+          <div style="overflow:hidden;width:100%; position:relative;height:60px;padding-top:10px;">
+						<div class="B_slider" id="B_slider">
+<!--
+EOT;
+$attachsService = L::loadClass('attachs','forum');
+foreach ($tucoolAttachs as $attach) {
+$attachImg = geturl($attach['attachurl'], 'show');
+$attachurl = $attachImg[0];
+$smallAttachUrl = $attachsService->getThreadAttachMini($attach['attachurl']);
+print <<<EOT
+-->
+							<span><a href="{$attachurl}" id="$attach[aid]" name="$attach[position]"><img src="$imgpath/blank.gif" style="background:url({$smallAttachUrl}) center center no-repeat;" width="45" height="45"></a></span>
+<!--
+EOT;
+}print <<<EOT
+-->
+						</div>
+          </div>
+					</td>
+					<td width="19"><a id="nextPage" href="javascript:;" title="下一组" class="nextB"></a></td>
+				</tr>
+			</table>
+			</div>
+			</div>
+			<div class="bottomLeft">
+				<a href="javascript:;" class="play" title="播放" id="pause">播放</a>
+				<a href="javascript:;" class="stop" style="display:none;" title="停止">停止</a>
+			</div>
+			<div class="bottomRight">
+				<input type="hidden" id="attachId" name="attachId">
+<!--
+EOT;
+if($groupid!='guest' && $read['lou']==0){print <<<EOT
+-->
+				<a class="recommend" href="javascript:;" onClick="sendmsg('operate.php?action=toweibo&ajax=1&type=topic&id=$tid&tucool=1','',this.id);" title="发送到新鲜事" alt="发送到新鲜事">新鲜事</a>
+				<a href="javascript:;" onClick="collectionImg()" class="keep" title="收藏" alt="收藏">收藏</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+			</div>
+		</div>
+		<div class="BgA"></div>
+	</div>
+</body>
+<script>var BREEZE_BASE_PATH = document.getElementsByTagName('base')[0].href+'js/breeze/';</script>
+<script src="js/breeze/core/base.js"></script>
+<script src="js/global.js"></script>
+<script>
+document.onkeydown=keypage
+var back="thread.php?fid={$read[fid]}&search=img#tabA"
+var post="read.php?tid={$read['tid']}&displayMode=1"
+function keypage() {
+if (event.keyCode==76) location=back
+if (event.keyCode==80) location=post
+if (event.keyCode==39) slider.nextPic();
+if (event.keyCode==37) slider.prePic();
+}
+setTimeout(function(){
+	B.require( 'event', 'app.slider', init);
+}, 0);
+var slider;
+function init(){
+		//设计宽度
+		slider = B.app.slider('#B_slider_table');
+		//设定显示图
+		B.query('.B_slider a').addEvent('click', showPic);
+		B.addEvent(window, 'resize', resizeImg);
+		B.addEvent(window, 'keydown', keypage);
+}
+var preview, step = 0;
+function showPic(e){
+	var target = e.target;
+	if(target.tagName!='A'){
+		target = target.parentNode;
+	}
+	var url = target.href;
+	preview = new Image();
+	preview.onload = loadImg;
+	preview.src = url;
+	//切换current
+	B.require('dom', function(B){
+		B.$('.B_slider .current') &&B.query('.B_slider .current').removeClass( 'current');
+		B.addClass(target.parentNode, 'current');
+	});
+	var aid = target.id;
+	var position = target.name;
+	changeImg(aid,position);
+	e.preventDefault();
+	//拉黑
+   B.require('util.animate', function(){
+      B.query('#img_content').fadeOut(200, loadImg);
+   });
+}
+function resizePic(){
+	var maxHeight =  document.documentElement.clientHeight || document.body.clientHeight,
+		maxWidth = document.documentElement.clientWidth || document.body.clientWidth,
+		imgp = B.$('#img_content');
+	imgp.style.top = ( (document.documentElement.clientHeight || document.body.clientHeight)-imgp.height)/2 +'px';
+}
+function loadImg(){
+	if( (++step)%2 == 1 ){
+		return ;
+	}
+	imgp = resizeImg();
+	imgp.src=preview.src;
+	B.require('util.animate', function(){
+	  B.query('#img_content').fadeIn();
+	});
+}
+function resizeImg(){
+	var maxHeight =  document.documentElement.clientHeight || document.body.clientHeight,
+	maxWidth = document.documentElement.clientWidth || document.body.clientWidth,
+	ratio = preview.width/preview.height, pwidth = preview.width, pheight = preview.height;
+	//获取高宽
+	if(preview.width>maxWidth){
+		pwidth = maxWidth;
+		pheight = maxWidth/ratio;
+	}
+	if(preview.height>maxHeight){
+		pheight = maxHeight;
+		pwidth = maxHeight* ratio;
+	}
+	imgp = B.$('#img_content');
+	imgp.src=preview.src;
+	imgp.width = pwidth;
+	imgp.height = pheight;
+	imgp.style.top = ( (document.documentElement.clientHeight || document.body.clientHeight)-imgp.height)/2 +'px';
+	return imgp;
+}
+function changeImg(aid,position){
+	if (!aid || !position) showDialog('error','数据加载错误',2);
+	getObj('attachId').value = aid;
+	getObj('positionNum').innerHTML = position;
+}
+function collectionImg(){
+	var aid = getObj('attachId').value;
+	if (!aid) showDialog('error','数据加载错误',0);
+	ajax.send('apps.php?q=collection&a=favor&type=tucool&ajax=1&id='+aid, '', ajax.get);
+}
+</script>
+</html>
+<!--
+EOT;
+?>-->

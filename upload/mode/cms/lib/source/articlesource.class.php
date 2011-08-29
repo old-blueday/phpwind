@@ -76,7 +76,8 @@ class PW_ArticleSource extends SystemData {
 	function _getNewArticle($columnid, $num) {
 		global $timestamp;
 		$articleService = C::loadClass('articleservice');
-		return $articleService->searchAtricles($columnid, '', '', '', '',$timestamp, 0, $num);
+		$type = 1;
+		return $articleService->searchAtricles($columnid, '', '', $type, '',$timestamp, 0, $num);
 	}
 	function _getHotDayArticle($columnid, $num) {
 		return $this->_getHotArticle('hotday', $columnid, $num);
@@ -90,14 +91,13 @@ class PW_ArticleSource extends SystemData {
 		$date = PwStrtoTime(get_date($timestamp, 'Y-m-d'));
 		$tempDate = $type == 'hotday' ? 1 : 30;
 		$date = $date - $tempDate * 86400;
-		
 		$datanalyseService = $this->_getDatanalyseService();
 		$_action = array();
 		foreach ($columnid as $value) {
 			$_action[] = 'article_' . $value;
 		}
 		if (!$columnid) $_action = $datanalyseService->getAllActions('article');
-		return $datanalyseService->getDataByActionAndTime('article', $_action, $num, $date);
+		return $datanalyseService->getHotArticleByAction('article', $_action, $num, $date);
 	}
 	/**
 	 * 格式化数据统一输出
@@ -106,6 +106,8 @@ class PW_ArticleSource extends SystemData {
 	 */
 	function _cookData($data) {
 		global $db_bbsurl;
+		$data['author'] = $data['username'];
+		$data['authorurl'] = 'u.php?uid='.$data['userid'];
 		$data['url'] = urlRewrite($db_bbsurl . '/' . getArticleUrl($data['article_id']));
 		$data['title'] = strip_tags($data['subject']);
 		$data['forumname'] = $data['columnname'] = $this->_getColumnName($data['column_id']);

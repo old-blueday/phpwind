@@ -31,10 +31,12 @@ class Search_Sphinx extends Search_Base {
 	var $_server_user    = 'user';   //用户单服务器服置
 	var $_server_post    = 'post';   //回复单服务器服置
 	var $_server_diary   = 'diary';  //日志单服务器服置
+	var $_server_weibo   = 'weibo';  //新鲜事单服务器服置
 	var $_key_tindex     = 'tindex';  //帖子标题索引键
 	var $_key_tcindex 	 = 'tcindex'; //帖子内容索引键
 	var $_key_taindex	 = 'taindex'; //帖子索引键
 	var $_key_pindex  	 = 'pindex';  //回复索引键
+	var $_key_windex 	 = 'windex';  //新鲜事标题索引键
 	var $_key_dindex 	 = 'dindex';  //日志标题索引键
 	var $_key_dcindex	 = 'dcindex'; //日志内容索引键
 	var $_key_daindex	 = 'daindex'; //日志索引键
@@ -56,7 +58,7 @@ class Search_Sphinx extends Search_Base {
 		return $this->_checkWaitSegment();
 	}
 	function searchThreads($keywords,$range,$userNames="",$starttime="",$endtime="",$forumIds = array(),$page=1,$perpage=20,$expand=array()){
-		if(!($result = $this->_searchThreads($keywords,$range,$userNames,$starttime,$endtime,$forumIds,$page,$perpage))){
+		if(!($result = $this->_searchThreads($keywords,$range,$userNames,$starttime,$endtime,$forumIds,$page,$perpage,$expand['sortby']))){
 			return array(false,false);
 		}
 		//$threads = $this->_getThreads($result[1],$result[2]);
@@ -71,7 +73,7 @@ class Search_Sphinx extends Search_Base {
 	function manageThreads($keywords,$range,$userNames="",$starttime="",$endtime="",$forumIds = array(),$page=1,$perpage=20){
 		return $this->_searchThreads($keywords,$range,$userNames,$starttime,$endtime,$forumIds,$page,$perpage);
 	}
-	function _searchThreads($keywords,$range,$userNames="",$starttime="",$endtime="",$forumIds = array(),$page=1,$perpage=20){
+	function _searchThreads($keywords,$range,$userNames="",$starttime="",$endtime="",$forumIds = array(),$page=1,$perpage=20,$sortby=''){
 		list($keywords,$users,$starttime,$endtime) = $this->_checkThreadConditions($keywords,$userNames,$starttime,$endtime);
 		if(!$keywords || ($userNames && !$users )) return false;
 		$configs = $this->_getSphinxConfigs($this->_server_thread);
@@ -100,6 +102,7 @@ class Search_Sphinx extends Search_Base {
 		$this->_sphinxOffset      = $offset;
 		$this->_sphinxLimit       = $perpage;
 		$this->_sphinxKeywords    = $keywords;
+		$this->_sphinxSortBy      = ($sortby && in_array($sortby,array('postdate','lastpost','replies'))) ? $sortby : ''; 
 		$this->_sphinxIndex       = $this->_getSphinxMap($this->_getThreadRange($range));
 		$result = $this->_sphinxAssemble();
 		if ( $result === false ) return false;
@@ -145,7 +148,8 @@ class Search_Sphinx extends Search_Base {
 		$this->_sphinxOffset      = $offset;
 		$this->_sphinxLimit       = $perpage;
 		$this->_sphinxKeywords    = $keywords;
-		$this->_sphinxSortBy      = false;
+		$this->_sphinxSortBy      = 'groupid';
+		$this->_sphinxSort        = $this->_getSphinxSort('ASC');
 		$this->_sphinxIndex       = $this->_getSphinxMap($this->_key_mindex);
 		$result = $this->_sphinxAssemble();
 		if ( $result === false ){
@@ -163,6 +167,51 @@ class Search_Sphinx extends Search_Base {
 		return $this->_buildUsers($result);
 	}
 	/*****************************************************************************/
+	function searchWeibo($keywords,$userNames="",$starttime="",$endtime="",$page=1,$perpage=20){
+		if(!($result = $this->_searchWeibo($keywords,$userNames,$starttime,$endtime,$page,$perpage))){
+			return array(false,false);
+		}
+		$weibo = $this->_getweibo($result[1],$result[2]);
+		return array($result[0],$weibo);
+	}
+	function _searchWeibo($keywords,$userNames="",$starttime="",$endtime="",$page=1,$perpage=20){
+		list($keywords,$users,$starttime,$endtime) = $this->_checkThreadConditions($keywords,$userNames,$starttime,$endtime);
+		if(!$keywords || ($userNames && !$users) ) return false;
+		$configs = $this->_getSphinxConfigs($this->_server_weibo);
+		list($host,$port) = ($configs) ? $configs : $this->_getSphinxConfig();
+		$filter = $filterRange = array();
+		($users) ? $filter[] = array('attribute' => 'uid','values' => array_keys($users),'exclude' => false) : 0;
+		$filterRange = array( array('attribute' => 'postdate','min' => $starttime,'max' => $endtime,'exclude' => false));
+		$page = $page>1 ? $page : 1;
+		$offset = intval(($page - 1) * $perpage);
+		$this->_setDefaultSphinx();
+		$this->_sphinxHost        = $host;
+		$this->_sphinxPort        = $port;
+		$this->_sphinxMode        = $this->_getSphinxMode($this->_sphinxMethod);
+		$this->_sphinxFilter      = $filter;
+		$this->_sphinxFilterRange = $filterRange;
+		$this->_sphinxOffset      = $offset;
+		$this->_sphinxLimit       = $perpage;
+		$this->_sphinxKeywords    = $keywords;
+		$this->_sphinxIndex       = $this->_getSphinxMap($this->_key_windex);
+		$result = $this->_sphinxAssemble();
+		if ( $result === false ){
+			return false;
+		} 
+		return $this->_buildSphinxResult($result,'id');
+	}
+	function _getWeibo($mids,$keywords){
+		if(!$mids) return array();
+		$mids = explode(',',$mids);//
+		$weiboDao = $this->getWeiboDao();
+		if(!($result = $weiboDao->getWeibosByMid($mids))){
+			return array();
+		} 
+		//return $this->_buildWeibo($result,$keywords);
+		return $result;
+	}
+	
+	/*****************************************************************************/
 	function searchDiarys($keywords,$range,$userNames="",$starttime="",$endtime="",$page=1,$perpage=20){
 		if(!($result = $this->_searchDiarys($keywords,$range,$userNames,$starttime,$endtime,$page,$perpage))){
 			return array(false,false);
@@ -178,6 +227,8 @@ class Search_Sphinx extends Search_Base {
 		$filter = $filterRange = array();
 		($aids)  ? $filter[] = array('attribute' => 'aid','values' => $aids,'exclude' => false) : 0;
 		($users) ? $filter[] = array('attribute' => 'uid','values' => array_keys($users),'exclude' => false) : 0;
+		$privacy = $this->_getDiaryPrivacy();
+		($privacy)  ? $filter[] = array('attribute' => 'privacy','values' => $privacy,'exclude' => false) : 0;
 		$filterRange = array( array('attribute' => 'postdate','min' => $starttime,'max' => $endtime,'exclude' => false));
 		$page = $page>1 ? $page : 1;
 		$offset = intval(($page - 1) * $perpage);
@@ -214,6 +265,7 @@ class Search_Sphinx extends Search_Base {
 	function searchForums($keywords,$page=1,$perpage=20){
 		return $this->_searchForums($keywords,$page,$perpage);
 	}
+	
 	function searchGroups($keywords,$page=1,$perpage=20){
 		return $this->_searchGroups($keywords,$page,$perpage);
 	}
@@ -260,7 +312,11 @@ class Search_Sphinx extends Search_Base {
 			}
 		}
 		$this->_sphinxGroupBy && $sphinxAPI->SetGroupBy ( $this->_sphinxGroupBy, $this->_sphinxGroup, "@group desc" );
-		$this->_sphinxSortBy  && $sphinxAPI->SetSortMode ( $this->_sphinxSort, $this->_sphinxSortBy );
+		if ($this->_sphinxSortBy){
+			$sphinxAPI->SetSortMode ( $this->_sphinxSort, $this->_sphinxSortBy );
+		}else{
+			$sphinxAPI->SetSortMode ( SPH_SORT_RELEVANCE );
+		}
 		$sphinxAPI->SetLimits ( $this->_sphinxOffset, $this->_sphinxLimit, $this->_sphinxMaxMatch );
 		$sphinxAPI->SetRankingMode ( $this->_sphinxRanking );
 		$sphinxAPI->SetArrayResult ( true );
@@ -325,6 +381,7 @@ class Search_Sphinx extends Search_Base {
 			$this->_server_post   => array(),
 			$this->_server_user   => array(),
 			$this->_server_diary  => array(),
+			$this->_server_weibo  => array(),
 		);
 	}
 	/**
@@ -374,6 +431,7 @@ class Search_Sphinx extends Search_Base {
 			$this->_key_tcindex  => "tmsgsindex",        #帖子内容索引
 			$this->_key_taindex  => "threadsallindex",   #帖子索引
 			$this->_key_pindex   => "postsindex",        #回复索引
+			$this->_key_windex   => "weiboindex",        #新鲜事索引
 			$this->_key_dindex   => "diarysindex",        #日志标题索引
 			$this->_key_dcindex  => "diarycontentsindex", #日志内容索引
 			$this->_key_daindex  => "diaryallsindex",     #日志索引
@@ -393,6 +451,7 @@ class Search_Sphinx extends Search_Base {
 					   'tindex'  => "threadsindex",
 					   'tcindex' => "tmsgsindex",
 					   'pindex'  => "postsindex",
+					   'windex'  => 'weiboindex',
 					   'dindex'  => 'diarysindex',
 					   'dcindex' => 'diarycontentsindex',
 					   'cmsindex'=> 'cmsindex',					   
@@ -433,6 +492,91 @@ class Search_Sphinx extends Search_Base {
 	function _getSphinxAPI(){
 		L::loadClass('sphinx', 'utility', false);
 		return new SphinxClient ();
+	}
+	
+	/****************************分组数据服务****************************************/
+	/**
+	 * 搜索关键字版块分组信息
+	 * @version phpwind 8.5
+	 */
+	function searchForumGroups($keywords,$range,$userNames="",$starttime="",$endtime="",$forumIds=array(),$page=1,$perpage=20,$expand=array()) {
+		list($keywords,$users,$starttime,$endtime) = $this->_checkThreadConditions($keywords,$userNames,$starttime,$endtime);
+		if(!$keywords || ($userNames && !$users )) return false;
+		$configs = $this->_getSphinxConfigs($this->_server_thread);
+		list($host,$port) = ($configs) ? $configs : $this->_getSphinxConfig();
+		$filter = $filterRange = array();
+		if($users){
+			$filter[] = array('attribute' => 'authorid','values' => array_keys($users),'exclude' => false);
+		}
+		if($forumIds){
+			$forumIds = (is_array($forumIds)) ? $forumIds : array($forumIds);
+			$filter[] = array('attribute' => 'fid','values' => $forumIds,'exclude' => false);
+		}
+		if($this->_sphinxFilterIds){
+			$filter[] = array('attribute' => 'fid','values' => $this->_sphinxFilterIds,'exclude' => true);
+		}
+		$filter[] = array('attribute' => 'fid','values' => array(0),'exclude' => true);
+		$filterRange = array( array('attribute' => 'postdate','min' => $starttime,'max' => $endtime,'exclude' => false));
+		$this->_sphinxAPI         = $this->_getSphinxAPI ();
+		$this->_sphinxHost        = $host;
+		$this->_sphinxPort        = $port;
+		$this->_sphinxFilter      = $filter;
+		$this->_sphinxFilterRange = $filterRange;
+		$this->_sphinxGroupBy     = 'fid';
+		$this->_sphinxKeywords    = $keywords;
+		$this->_sphinxIndex = $this->_getSphinxMap($this->_getThreadRange($range));
+		$result = $this->_sphinxGroupSearcher ();
+		if ($result === false) {
+			return false;
+		}
+		return $this->_buildGroupSphinxResult ( $result, 'fid' );
+	}
+	
+	/**
+	 * 全文索引分组聚合器 
+	 * @version phpwind 8.5
+	 * @return unknown_type
+	 */
+	function _sphinxGroupSearcher() {
+		$sphinxAPI = $this->_sphinxAPI;
+		if (! $sphinxAPI)
+			return false;
+		$sphinxAPI->SetServer ( $this->_sphinxHost, ( int ) $this->_sphinxPort );
+		$sphinxAPI->SetConnectTimeout ( 1 );
+		$sphinxAPI->SetMatchMode ( SPH_MATCH_ALL );
+		if($this->_sphinxFilter){
+			foreach($this->_sphinxFilter as $filter) {
+				$sphinxAPI->SetFilter ($filter['attribute'],$filter['values'],$filter['exclude']);
+			}
+		}
+		if($this->_sphinxFilterRange){
+			foreach($this->_sphinxFilterRange as $filter){
+				$sphinxAPI->SetFilterRange ($filter['attribute'],$filter['min'],$filter['max'],$filter['exclude']);
+			}
+		}
+		$sphinxAPI->SetGroupBy ( $this->_sphinxGroupBy, SPH_GROUPBY_ATTR, "@count desc" );
+		$sphinxAPI->SetLimits ( 0, 1000, 1000 );
+		$sphinxAPI->SetArrayResult ( true );
+		return $sphinxAPI->Query ( $this->charsetReverse ( $this->_sphinxKeywords ), $this->_sphinxIndex );
+	}
+	/**
+	 * 全文索引分组聚合器 组装数组
+	 * @version phpwind 8.5
+	 * @return unknown_type
+	 */
+	function _buildGroupSphinxResult($result,$primaryId) {
+		if (! is_array ( $result ["matches"] )) {
+			return false;
+		}
+		$groups = array ();
+		foreach ( $result ["matches"] as $docinfo ) {
+			$attrs = $docinfo ['attrs'];
+			if (! is_array ( $attrs )) {
+				continue;
+			}
+			$groups [$attrs [$primaryId]] = $attrs ['@count'];
+		}
+		return $groups;
 	}
 	
 	

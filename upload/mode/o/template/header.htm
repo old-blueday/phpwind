@@ -5,21 +5,32 @@ print<<<EOT
 --><!doctype html>
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=$db_charset" />
+<meta charset="$db_charset" />
 <title>$webPageTitle - Powered by phpwind</title>
 <meta name="generator" content="phpwind $wind_version" />
 <meta name="description" content="$metaDescription" />
 <meta name="keywords" content="$metaKeywords" />
+<!--[if IE 9 ]>
+<meta name="msapplication-task" content="name=网站首页; action-uri=$db_bbsurl; icon-uri=$db_bbsurl/favicon.ico" />
+<meta name="msapplication-task" content="name=个人中心; action-uri=$db_bbsurl/u.php; icon-uri=$db_bbsurl/images/ico/home.ico" />
+<meta name="msapplication-task" content="name=我的帖子; action-uri=$db_bbsurl/apps.php?q=article; icon-uri=$db_bbsurl/images/ico/post.ico" />
+<meta name="msapplication-task" content="name=消息中心; action-uri=$db_bbsurl/message.php; icon-uri=$db_bbsurl/images/ico/mail.ico" />
+<meta name="msapplication-task" content="name=我的设置; action-uri=$db_bbsurl/profile.php; icon-uri=$db_bbsurl/images/ico/edit.ico" />
+<![endif]-->
 <base id="headbase" href="$db_bbsurl/" />
-<link rel="stylesheet" type="text/css" href="images/pw_core.css" media="all" />
-<link rel="stylesheet" type="text/css" href="u/images/style.css" media="all" />
-<link rel="stylesheet" type="text/css" href="u/images/visit/style.css" media="all" />
+<link rel="stylesheet" href="images/pw_core.css" />
+<link rel="stylesheet" href="u/images/style.css" />
+<link rel="stylesheet" href="u/images/visit/style.css" />
 <!--
 EOT;
 $uskin = 'default';
 require_once(uTemplate::printEot('css'));
 print <<<EOT
 -->
+<style type="text/css">
+body,html{background:#e7f4fa;}
+.warp{background:#e7f4fa url(images/wind/top.jpg) center top repeat-x;}
+</style>
 <script type="text/javascript" language="JavaScript" src="js/pw_ajax.js"></script>
 <script type="text/javascript" LANGUAGE="JavaScript" src="js/core/core.js"></script>
 <script type="text/javascript" LANGUAGE="JavaScript" src="js/core/tab.js"></script>
@@ -86,7 +97,7 @@ print <<<EOT
 				<input type="hidden" name="verify" value="$verifyhash">
 				<input type="hidden" name="step" value="2">
 				<input id="searchType" type="hidden" name="type" value="thread">
-				<span id="submitSearch" class="adown fl cp">搜索</span>
+				<span id="submitSearch" class="adown fl cp">帖子</span>
 				<div id="searchTypeSelect" class="fl" style="display:none;">
 					<ul>
 <!--
@@ -176,20 +187,56 @@ getObj('submitSearch').onmouseover = function() {
 	ctrlSubMenu('submitSearch', 'searchTypeSelect');
 };
 //getObj('submitSearch').onclick = function() {getObj('searchForm').submit();};
+function resizeImg(ele){
+	var a=ele;
+	if(a.width<30||a.height<30){
+		setTimeout(function(){
+			resizeImg(a);
+		},10)
+		return false;
+	}
+	if(a.width>100){
+		
+			a.width = 100;
+			
+		} else if(a.height>100){
+			a.height=100;
+		}
+}
 </script>
 			<div class="fr">
 <!--
 EOT;
-if ($winduid) {print <<<EOT
+if ($winduid) {
+$db_menuinit .= ",'td_userinfomore' : 'menu_userinfomore'";
+print <<<EOT
 -->
-				<a href="u.php" class="b">$windid</a>
+				<a id="td_userinfomore" href="u.php" class="b link_down"><span>$windid</span></a>
+<script language="JavaScript">
+var td_userinfomore = {
+	pz : 21,
+	open : function() {
+		if (typeof userBinding == 'object') {
+			userBinding.append();
+		}
+	},
+	close : function () {
+
+	}
+}
+</script>
 				<a href="$loginouturl" class="mr10">退出</a><i>&nbsp;</i>
 <!--
 EOT;
-	if($winddb['newpm']>0 && $_G['maxmsg']>=0){
+if($winddb['newpm']>0 && $_G['maxmsg']>=0){
+$tmpMsgNum = 0;
+$tmpMsgNum += $winddb['newpm'];
+$winddb['newreferto']>0 && $tmpMsgNum += $winddb['newreferto'];
+$winddb['newcomment']>0 && $tmpMsgNum += $winddb['newcomment'];
+$winddb['newfans']>0 && $tmpMsgNum += $winddb['newfans'];
 print <<<EOT
 -->
-				<a href="message.php" class="newmes">消息<span class="s2">($winddb[newpm])</span></a>
+				<a href="message.php" class="newmes">消息<span class="s2">($tmpMsgNum)</span></a>
 <!--
 EOT;
 	}else{print <<<EOT
@@ -198,17 +245,23 @@ EOT;
 <!--
 EOT;
 	}
-	$db_menuinit .= ",'td_profile' : 'menu_profile'";print <<<EOT
+	$db_menuinit .= ",'td_profile' : 'menu_profile'";
+print <<<EOT
 -->
-				<a id="td_profile" href="profile.php" class="mr10 link_down"><span>设置</span></a>
+				<a id="td_profile" href="profile.php" class="mr10 link_down"><span>设置</span></a><i>&nbsp;</i>
 <!--
 EOT;
 	if (CkInArray($windid, $manager) || $SYSTEM['allowadmincp']) {print <<<EOT
 -->
-				<i>&nbsp;</i><a href="$db_adminfile" target="_blank">系统设置</a>
+				<a href="$db_adminfile" target="_blank">系统设置</a>
 <!--
 EOT;
-	}
+}
+print <<<EOT
+-->
+
+<!--
+EOT;
 } else {print <<<EOT
 -->
 				<a href="$loginurl" class="mr10">登录</a><i>&nbsp;</i><a href="$regurl" class="mr10">注册</a>
@@ -237,6 +290,15 @@ if ($winduid) {print <<<EOT
 			<h6 style="left:-1px;"><a href="profile.php" class="link_down"><span>设置</span></a></h6>
 			<ul class="menuList" style="width:43px;">
 				<li><a href="profile.php?action=modify">帐号</a></li>
+<!--
+EOT;
+if ($db_authstate) {print <<<EOT
+-->
+		<li><a href="profile.php?action=auth" target="_blank">认证</a></li>
+<!--
+EOT;
+}print <<<EOT
+-->
 				<li><a href="profile.php?action=privacy">隐私</a></li>
 				<li><a href="userpay.php">积分</a></li>
 				<li><a href="profile.php?action=permission">权限</a></li>
@@ -246,7 +308,100 @@ if ($winduid) {print <<<EOT
 	</div>
 <!--
 EOT;
-} if ($homenavigation['linkdown']) {
+} if ($winduid) {print <<<EOT
+-->
+	<div id="menu_profile" style="display:none;">
+		<div style="margin-right:-6px;">
+		<div class="pw_menu" style="width:45px; position:relative;">
+			<h6 style="left:-1px;"><a href="profile.php" class="link_down"><span>设置</span></a></h6>
+			<ul class="menuList" style="width:43px;">
+				<li><a href="profile.php?action=modify">帐号</a></li>
+<!--
+EOT;
+if ($db_authstate) {print <<<EOT
+-->
+		<li><a href="profile.php?action=auth" target="_blank">认证</a></li>
+<!--
+EOT;
+}print <<<EOT
+-->
+				<li><a href="profile.php?action=privacy">隐私</a></li>
+				<li><a href="userpay.php">积分</a></li>
+				<li><a href="profile.php?action=permission">权限</a></li>
+			</ul>
+		</div>
+		</div>
+	</div>
+<!--
+EOT;
+if (getstatus($winddb['userstatus'],12)) {print <<<EOT
+-->
+	<base id="headbase" href="$db_bbsurl/" />
+	<script language="JavaScript" src="js/userbinding.js"></script>
+<!--
+EOT;
+} print <<<EOT
+-->
+	<div id="menu_userinfomore" style="display:none;">
+	<div style="margin-left:-7px;margin-top:-1px; position:relative;width:320px;">
+	<div class="cc pw_menu">
+		<h6 style="left:0px;right:auto;"><a href="u.php" class="b link_down"><span>{$windid}</span></a></h6>
+		<ul class="menu-half cc" style="width:26em;">
+<!--
+EOT;
+if ($gp_gptype == 'member') {print <<<EOT
+-->
+		<li>等级: $gp_grouptitle</li>
+<!--
+EOT;
+} else {print <<<EOT
+-->
+		<li>身份: $gp_grouptitle</li>
+<!--
+EOT;
+}if ($_G['allowhide']) {print <<<EOT
+-->
+		<li>状态:
+<span style="cursor:pointer;" onClick="ajax.send('pw_ajax.php?action=changestate','',changeState)" id="online_state"><!--
+EOT;
+if (GetCookie('hideid') == 1) {print <<<EOT
+--><img src="$imgpath/stealth.png" align="absmiddle" alt="隐身" />隐身<!--
+EOT;
+} else {print <<<EOT
+--><img src="$imgpath/online.png" align="absmiddle" alt="在线" />在线<!--
+EOT;
+}print <<<EOT
+--></span>
+<script language="JavaScript">
+function changeState() {
+	var msg = ajax.request.responseText;
+	if (msg == 1){
+		getObj('online_state').innerHTML = '<img src="$imgpath/stealth.png" align="absmiddle" alt="隐身" />隐身';
+	}else{
+		getObj('online_state').innerHTML = '<img src="$imgpath/online.png" align="absmiddle" alt="在线" />在线';
+	}
+}
+</script>
+			</li>
+<!--
+EOT;
+}print <<<EOT
+-->
+			<li>帖子: $winddb[postnum]</li>
+			<li>今日: $winddb[todaypost]</li>
+			<li>$db_rvrcname: $userrvrc $db_rvrcunit</li>
+			<li>$db_moneyname: $winddb[money] $db_moneyunit</li>
+			<li>$db_creditname: $winddb[credit] $db_creditunit</li>
+			<li>最后登录: <span class="f10">{$_LoginInfo['lastlodate']}</span></li>
+			<li style="width:90%">登录IP: <span class="f10">{$onlineip}</span></li>
+		</ul>
+		<div class="userbindingMenu"></div>
+	</div>
+	</div>
+	</div>
+<!--
+EOT;
+}if ($homenavigation['linkdown']) {
 print<<<EOT
 -->
 	<div id="menu_omainNav" style="display:none;">

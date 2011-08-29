@@ -31,7 +31,8 @@ S::gp(array('action'));
 
 switch ($action) {
 	case 'forum':
-		include_once pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
+		//* include_once pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
+		pwCache::getData(D_P.'data/bbscache/forum_cache.php');
 		S::gp(array('pre','fidin'));
 		$pre       = is_numeric($pre) ? $prefix[$pre] : $prefix[0];
 		$fids      = explode('_',$fidin);
@@ -60,7 +61,7 @@ switch ($action) {
 			}
 			$noticedb = str_replace('"','\"',$noticedb);
 			$noticedb = "document.write(\"$noticedb\");";
-			pwCache::setData($cachefile,$noticedb);
+			pwCache::writeover($cachefile,$noticedb);
 			procUnLock('new_js_notice');
 			echo $noticedb;
 		} else {
@@ -81,7 +82,8 @@ switch ($action) {
 					$rt=$db->get_one("SELECT SUM(fd.tpost) as tposts FROM pw_forums f LEFT JOIN pw_forumdata fd USING(fid) WHERE f.ifsub='0' AND f.cms!='1'");
 					//* $db->update("UPDATE pw_bbsinfo SET yposts=".S::sqlEscape($rt['tposts']).",tdtcontrol=".S::sqlEscape($tdtime)." WHERE id=1");
 					pwQuery::update('pw_bbsinfo', 'id=:id', array(1), array('yposts'=>$rt['tposts'], 'tdtcontrol'=>$tdtime));
-					$db->update("UPDATE pw_forumdata SET tpost=0 WHERE tpost<>'0'");
+					//* $db->update("UPDATE pw_forumdata SET tpost=0 WHERE tpost<>'0'");
+					pwQuery::update('pw_forumdata', 'tpost<>:tpost', array(0), array('tpost'=>0));
 				}
 			}
 			$info = '';
@@ -127,7 +129,7 @@ switch ($action) {
 			}
 			$info = str_replace('"','\"',$info);
 			$info = "document.write(\"$info\");";
-			pwCache::setData($cachefile,$info);
+			pwCache::writeover($cachefile,$info);
 			procUnLock('new_js_info');
 			echo $info ;
 		} else {
@@ -170,7 +172,7 @@ switch ($action) {
 				$userdb = str_replace('"','\"',$userdb);
 				$newlist .= "document.write(\"$userdb<br>\");\n";
 			}
-			pwCache::setData($cachefile,$newlist);
+			pwCache::writeover($cachefile,$newlist);
 			procUnLock('new_js_member');
 			echo $newlist;
 		} else {
@@ -184,7 +186,8 @@ switch ($action) {
 			$num	  = is_numeric($num) ? $num : 10;
 			$length	  = is_numeric($length) ? $length : 35;
 			$pre	  = is_numeric($pre) ? $prefix[$pre] : $prefix[0];
-			$fname && include_once pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
+			//* $fname && include_once pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
+			$fname && pwCache::getData(D_P.'data/bbscache/forum_cache.php');
 			$orderway = array(
 				'1'   => 'lastpost',
 				'2'   => 'postdate',
@@ -230,7 +233,7 @@ switch ($action) {
 				$article = str_replace('"','\"',$article);
 				$newlist .= "document.write(\"$article<br>\");\n";
 			}
-			pwCache::setData($cachefile,$newlist);
+			pwCache::writeover($cachefile,$newlist);
 			procUnLock('new_js_article');
 			echo $newlist;
 		} else {

@@ -14,7 +14,8 @@ if ($action == 'order') {
 		}
 	}
 	foreach ($updatedb as $key => $value) {
-		$value && $db->update("UPDATE pw_announce SET vieworder=".S::sqlEscape($key)."WHERE aid IN (".S::sqlImplode($value).')');
+		//* $value && $db->update("UPDATE pw_announce SET vieworder=".S::sqlEscape($key)."WHERE aid IN (".S::sqlImplode($value).')');
+		$value && pwQuery::update('pw_announce','aid IN (:aid)', array($value), array('vieworder'=>$key));
 	}
 	updatecache_i();
 	adminmsg('operate_success');
@@ -54,6 +55,7 @@ if ($action == 'order') {
 		$enddate && $enddate<=$startdate && adminmsg('annouce_time');
 //		!Datecheck($fid,$startdate,$enddate) && adminmsg('annouce_date');
 		S::gp(array('ifopen','vieworder'),'P',2);
+		/**
 		$db->update("INSERT INTO pw_announce"
 			. " SET " . S::sqlSingle(array(
 				'fid'		=> $fid,			'ifopen'	=> $ifopen,
@@ -62,6 +64,15 @@ if ($action == 'order') {
 				'url'		=> $url,			'subject'	=> $atc_title,
 				'content'	=> $atc_content
 		)));
+		**/
+		pwQuery::insert('pw_announce', array(
+				'fid'		=> $fid,			'ifopen'	=> $ifopen,
+				'vieworder'	=> $vieworder,	'author'	=> $admin_name,
+				'startdate'	=> $startdate,		'enddate'	=> $enddate,
+				'url'		=> $url,			'subject'	=> $atc_title,
+				'content'	=> $atc_content
+		));
+		
 		updatecache_i();
 		adminmsg('operate_success',$successurl);
 	}
@@ -108,6 +119,7 @@ if ($action == 'order') {
 		$enddate && $enddate<=$startdate && adminmsg('annouce_time');
 //		!Datecheck($fid,$startdate,$enddate,$aid) && adminmsg('annouce_date');
 		S::gp(array('ifopen','vieworder'),'P',2);
+		/**
 		$db->update("UPDATE pw_announce"
 			. " SET " . S::sqlSingle(array(
 					'fid'		=> $fid,			'ifopen'	=> $ifopen,
@@ -116,6 +128,13 @@ if ($action == 'order') {
 					'subject'	=> $atc_title,		'content'	=> $atc_content
 					))
 			. " WHERE aid=".S::sqlEscape($aid));
+		**/
+		pwQuery::update('pw_announce','aid=:aid', array($aid), array(
+					'fid'		=> $fid,			'ifopen'	=> $ifopen,
+					'vieworder'	=> $vieworder,	'startdate'	=> $startdate,
+					'enddate'	=> $enddate,		'url'		=> $url,
+					'subject'	=> $atc_title,		'content'	=> $atc_content
+					));	
 		updatecache_i();
 		adminmsg('operate_success',$successurl);
 	}
@@ -132,7 +151,8 @@ if ($action == 'order') {
 
 } else {
 
-	include_once pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
+	//* include_once pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
+	pwCache::getData(D_P.'data/bbscache/forum_cache.php');
 	$titledb = $namedb = array();
 	list($fids,$forumcache,$cmscache) = GetForumdb();
 	$pages = '';
@@ -186,7 +206,7 @@ if ($action == 'order') {
 	$annoucedb = array();
 	$query = $db->query("SELECT aid,fid,ifopen,vieworder,author,subject,startdate,enddate FROM pw_announce $sqlwhere ORDER BY fid,vieworder,startdate DESC".S::sqlLimit(($page-1)*$db_perpage,$db_perpage));
 	while ($rt = $db->fetch_array($query)) {
-		$rt['subject'] = htmlspecialchars(substrs(strip_tags($rt['subject']),30));
+		$rt['subject'] = substrs(strip_tags($rt['subject']),30);
 		$rt['starttime'] = $rt['startdate'] ? get_date($rt['startdate'],'Y-m-d H:i') : '--';
 		$rt['endtime'] = $rt['enddate'] ? get_date($rt['enddate'],'Y-m-d H:i') : '--';
 		$annoucedb[$rt['fid']][] = $rt;
@@ -205,7 +225,10 @@ function GetForumdb() {
 		list($fids,$forumcache) = GetAllowForum($admin_name);
 		$cmscache = '';
 	} else {
-		include pwCache::getPath(D_P.'data/bbscache/forumcache.php');
+		//* include pwCache::getPath(D_P.'data/bbscache/forumcache.php');
+		extract(pwCache::getData(D_P.'data/bbscache/forumcache.php', false));
+		$forumcache = preg_replace('/<option value="\d+">&gt;&gt; (.+?)<\/option>/is', '</optgroup><optgroup label="\\1">', $forumcache);
+		$forumcache = '<optgroup>' . $forumcache . '</optgroup>';
 		list($fids,$hideforum) = GetHiddenForum();
 		if ($admin_gid == 3) {
 			$fids = '';
@@ -229,7 +252,8 @@ function Checkright($fids,$fid) {
 	return true;
 }
 function Displayfid() {
-	include pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
+	//* include pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
+	extract(pwCache::getData(D_P.'data/bbscache/forum_cache.php', false));
 	$ckdisplay = ',-1,';
 	foreach ($forum as $value) {
 		if ($value['type'] == 'category') {

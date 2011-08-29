@@ -25,7 +25,7 @@ class MutiUpload extends uploadBehavior {
 
 	function getFilePath($currUpload) {
 		global $timestamp;
-		$savedir = '';
+		$savedir = 'mutiupload/';
 		$prename  = substr(md5($timestamp . $currUpload['id'] . randstr(8)),10,15);
 		$filename = "0_{$this->uid}_$prename." . preg_replace('/(php|asp|jsp|cgi|fcgi|exe|pl|phtml|dll|asa|com|scr|inf)/i', "scp_\\1", $currUpload['ext']);
 		return array($filename, $savedir);
@@ -43,7 +43,28 @@ class MutiUpload extends uploadBehavior {
 				'attachurl'	=> $value['fileuploadurl'],	'uploadtime'=> $timestamp,
 				'ifthumb'	=> $value['ifthumb']
 			)));
+			$aid = $this->db->insert_id();
+			$this->attachs[$aid] = array(
+				'aid'       => $aid,
+				'name'      => stripslashes($value['name']),
+				'type'      => $value['type'],
+				'attachurl' => $value['fileuploadurl'],
+				'needrvrc'  => $value['needrvrc'],
+				'special'	=> $value['special'],
+				'ctype'		=> $value['ctype'],
+				'size'      => $value['size'],
+				'hits'      => 0,
+				'desc'		=> str_replace('\\','',$value['descrip']),
+				'ifthumb'	=> $value['ifthumb']
+			);
 		}
+		return true;
+	}
+
+	function getAttachInfo() {
+		$array = current($this->attachs);
+		list($path) = geturl($array['attachurl'],'lf');
+		return array('aid' => $array['aid'], 'path' => $path);
 	}
 }
 ?>

@@ -1,4 +1,5 @@
 <?php
+!defined('P_W') && exit('Forbidden');
 
 class PW_SiteWeiboContentTranslator {
 	function translate($content) {

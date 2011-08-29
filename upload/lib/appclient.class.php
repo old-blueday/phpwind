@@ -9,25 +9,28 @@
 class PW_AppClient {
 	var $_db;
 	function PW_Appclient() {
-		global $db_siteappkey, $timestamp, $db_sitehash, $db_siteownerid, $db_siteid, $db_charset, $db_appifopen, $pwServer, $db_server_url;
+		global $db_siteappkey, $timestamp, $db_sitehash, $db_siteownerid, $db_siteid, $db_charset, $db_appifopen, $pwServer, $db_server_url,$db_bbsname;
 		$db_bbsurl = S::escapeChar("http://" . $pwServer['HTTP_HOST'] . substr($pwServer['PHP_SELF'], 0, strrpos($pwServer['PHP_SELF'], '/')));
 		if (!file_exists(D_P . "data/bbscache/forum_appinfo.php")) {
 			require_once (R_P . "admin/cache.php");
 			updatecache_f();
 		}
-		@include_once pwCache::getPath(D_P . "data/bbscache/forum_appinfo.php");
+		//* @include_once pwCache::getPath(D_P . "data/bbscache/forum_appinfo.php");
+		extract(pwCache::getData(D_P . "data/bbscache/forum_appinfo.php", false));
 		$this->_db = $GLOBALS['db'];
 		$this->appkey = $db_siteappkey;
 		$this->timestamp = $timestamp;
 		$this->siteid = $db_siteid;
 		$this->siteownerid = $db_siteownerid;
 		$this->sitehash = $db_sitehash;
+		$this->bbsname = $db_bbsname;
 		$this->bbsurl = $db_bbsurl;
 		$this->charset = $db_charset;
 		$this->appifopen = $db_appifopen;
 		$this->server_url = $db_server_url;
 		$this->appinfo = $forum_appinfo;
 	}
+
 	/**
 	 * 获取开启的APP列表
 	 */
@@ -47,6 +50,7 @@ class PW_AppClient {
 		}
 		return $this->_appsdb;
 	}
+
 	/**
 	 * 获取个人APP列表
 	 */
@@ -82,6 +86,7 @@ class PW_AppClient {
 		}
 		return $this->_app_array;
 	}
+
 	/** 获取版块APP信息
 	 *
 	 * @param int $fid 版块ID
@@ -125,6 +130,7 @@ class PW_AppClient {
 		}
 		return $newappinfodb;
 	}
+
 	/**
 	 * 获取数字签名
 	 */
@@ -132,6 +138,34 @@ class PW_AppClient {
 		$code = base64_encode(md5(md5($this->siteownerid . $this->appkey) . $this->timestamp . $this->sitehash) . $this->timestamp . '$sitehash=' . $this->sitehash);
 		return $code;
 	}
+
+	/**
+	 * 获取淘链接url地址
+	 */
+	function getTaojinUrl($system = 'index', $mode = 'index', $action = 'index'){
+		global $winduid, $windid;
+
+		$param = array(
+			'pw_appId'		=> '17',
+			'pw_uid'		=> $winduid,
+			'pw_siteurl'	=> $this->bbsurl,
+			'pw_t'			=> $this->timestamp,
+			'pw_system'		=> $system,
+			'pw_mode'		=> $mode,
+			'pw_action'		=> $action,
+			'pw_query'		=> $this->getApicode(),
+		);
+
+		$url = 'http://app.phpwind.net/pwbbsapi.php?m=taoke&';
+        ksort($param);
+        foreach ( $param as $key => $value ) {
+            $url .= "$key=" . urlencode ( $value ) . '&';
+        }
+        $hash = $param ['pw_system'] .'&'.$param ['pw_mode'].'&'.$param ['pw_action'] .'&'.$param ['pw_appId'] . '&' . $param ['pw_uid'] . '&' . $param ['pw_siteurl']  . '&' . $param ['pw_t'] . '&' . $param['pw_query'];
+        $url .= 'pw_sig=' . md5 ( $hash . $this->siteownerid );
+        return $url;
+	}
+
 	/**
 	 * 获取帖子交换上传列表
 	 */
@@ -162,29 +196,6 @@ class PW_AppClient {
 		return $url;
 	}
 
-	function getTaojinUrl($system = 'index', $mode = 'index', $action = 'index'){
-		global $winduid, $windid;
-
-		$param = array(
-			'pw_appId'		=> '17',
-			'pw_uid'		=> $winduid,
-			'pw_siteurl'	=> $this->bbsurl,
-			'pw_t'			=> $this->timestamp,
-			'pw_system'		=> $system,
-			'pw_mode'		=> $mode,
-			'pw_action'		=> $action,
-			'pw_query'		=> $this->getApicode(),
-		);
-
-		$url = 'http://app.phpwind.net/pwbbsapi.php?m=taoke&';
-        ksort($param);
-        foreach ( $param as $key => $value ) {
-            $url .= "$key=" . urlencode ( $value ) . '&';
-        }
-        $hash = $param ['pw_system'] .'&'.$param ['pw_mode'].'&'.$param ['pw_action'] .'&'.$param ['pw_appId'] . '&' . $param ['pw_uid'] . '&' . $param ['pw_siteurl']  . '&' . $param ['pw_t'] . '&' . $param['pw_query'];
-        $url .= 'pw_sig=' . md5 ( $hash . $this->siteownerid );
-        return $url;
-	}
 	/**
 	 * 获取帖子交换权限
 	 */
@@ -248,6 +259,7 @@ class PW_AppClient {
 		$url .= 'pw_sig=' . md5($arg . $this->siteownerid);
 		return $url;
 	}
+
 	/**
 	 * 获取在线APP列表
 	 */
@@ -269,6 +281,7 @@ class PW_AppClient {
 		$url .= 'pw_sig=' . md5($arg . $this->siteownerid);
 		return $url;
 	}
+
 	/**
 	 * APP论坛状态
 	 */
@@ -302,6 +315,7 @@ class PW_AppClient {
 		$str .= 'pw_sig=' . md5($arg . $this->siteownerid);
 		return $str;
 	}
+
 	/**
 	 * 判断是否为本地
 	 */
@@ -313,51 +327,308 @@ class PW_AppClient {
 		}
 		return $islocalhost;
 	}
+
 	/**
-	 * 自动注册APP帐号
+	 * 云统计
 	 */
-	function RegisterApp($host, $type = 'new', $siteid, $siteownerid, $sitehash) {
-		global $admin_name;
-		require_once (R_P . 'require/posthost.php');
-		//if (!$this->isLocalhost($host) && (!$this->appkey || $type == 'modify')) {
-		if (!$this->isLocalhost($host)) {
-			if ($type == 'modify') {
-				$a = 'modify';
-				$pw_query = '&pw_query=' . urlencode($this->getApicode());
-			} else {
-				$a = 'register';
-				$pw_query = '';
-				$siteid = $this->siteid;
-				$siteownerid = $this->siteownerid;
-				$sitehash = $this->sitehash;
-			}
-			$reginfo = array(
-				'pw_siteid' => $siteid,
-				'pw_siteownerid' => $siteownerid,
-				'pw_sitehash' => $sitehash,
-				'pw_pt' => $this->timestamp,
-				'pw_siteurl' => $this->bbsurl,
-				'pw_charset' => $this->charset,
-				'pw_username' => $admin_name
-			);
-			ksort($reginfo);
-			$str = '';
-			foreach($reginfo as $key => $val) {
-				$str .= $key . '=' . urlencode($val) . '&';
-			}
-			$sig = md5($str . $siteownerid);
-			$str .= 'pw_sig=' . $sig;
-			$data = PostHost('http://app.phpwind.net/pwbbsapi.php?', "m=register&a=$a&" . $str . $pw_query, 'POST');
-			$backdata = substr($data, strpos($data, '$backdata=') + 10);
-			return $backdata;
-			if (strpos($data, '$back=next') !== false) {
-				return 'next';
-			} else {
-				return 'end';
-			}
+	function getYunStatisticsUrl() {
+		$yunStatisticsUrl = 'http://tongji.phpwind.com/statistic/?' . $this->_bulidQueryString(array(
+			'app_key' => $this->sitehash,
+			'timestamp' => $this->timestamp,
+			'v' => '1.0',
+		), $this->siteownerid);
+		return $yunStatisticsUrl;
+	}
+
+	function _bulidQueryString($params ,$appKey) {
+		ksort($params);
+		reset($params);
+		$pairs = array();
+		foreach ($params as $key => $value) {
+			$pairs[] = urlencode($key) . '=' . $value;
+		}
+		$string = implode('&', $pairs);
+		$string.= '&sig=' . md5($string .'&' . $appKey);
+		return $string;
+	}
+
+	/*************************站长中心相关****************************/
+
+	/**
+	 * 确认帐号是否存在
+	 */
+	function checkUsername($appid) {
+		
+		if (empty($appid)) return false;
+
+		$siteappkey = $this->_checkUsername($appid);
+		
+		if (!empty($siteappkey['status'])) {
+			setConfig('db_siteappkey', $siteappkey['siteid']);
+			updatecache_c();
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * 确认帐号是否存在
+	 */
+	function _checkUsername($appid) {
+
+		$platformApiClient = $this->_getPlatformApiClient();
+		
+		$params = array(
+			'username' => $appid,
+			'charset' => $this->charset
+		);
+
+		L::loadClass('json', 'utility', false);
+		$Json = new Services_JSON(SERVICES_JSON_LOOSE_TYPE);
+		return $Json->decode($platformApiClient->post('webmaster.onlineapp.checkusername' ,$params));
+	}
+
+	/**
+	 * 注册站长中心帐号
+	 */
+	function registerWebmaster($fields) {
+
+		$params = $this->_checkRegisterWebmaster($fields);
+		if (empty($params)) return array('status' => false ,'code' => '-1');
+
+		$platformApiClient = $this->_getPlatformApiClient();
+
+		L::loadClass('json', 'utility', false);
+		$Json = new Services_JSON(SERVICES_JSON_LOOSE_TYPE);
+		return $Json->decode($platformApiClient->post('webmaster.onlineapp.register' ,$params));
+	}
+
+	/**
+	 * 注册前逻辑判断操作
+	 */
+	function _checkRegisterWebmaster($fields) {
+
+		isset($fields['username']) && $username = $fields['username'];
+		isset($fields['email']) && $email = $fields['email'];
+		isset($fields['password']) && $password = $fields['password'];
+		isset($fields['repassword']) && $repassword = $fields['repassword'];
+		
+		$params = array(
+			'username' => $username,
+			'email' => $email,
+			'password' => $password,
+			'repassword' => $repassword,
+			'siteid' => $this->siteid,
+			'siteownerid' => $this->siteownerid,
+			'sitehash' => $this->sitehash,
+			'timestamp' => $this->timestamp,
+			'sitename' => $this->bbsname,
+			'siteurl' => $this->bbsurl,
+			'charset' => $this->charset,
+		);
+
+		return $params;
+		
+	}
+
+	/**
+	 * 获取错误码信息
+	 */
+	function getErrorRegCodeMsg($code) {
+		switch ($code) {
+			case '2':
+				$msg = '请检查必填项是否正确';break;
+			case '3':
+				$msg = '请输入您的站点密钥！';break;
+			case '4':
+				$msg = '对不起，您填写的信息不匹配！';break;
+			case '5':
+				$msg = '对不起，您填写的用户名已被使用！';break;
+			case '6':
+				$msg = '对不起，您填写的邮箱格式有误！';break;
+			case '7':
+				$msg = '对不起，您填写的邮箱已被使用！';break;
+			case '8':
+				$msg = '对不起，您填写的域名格式有误！';break;
+			case '9':
+				$msg = '对不起，您填写的密码长度不正确，须6-20位';break;
+			case '10':
+				$msg = '对不起，您的密钥已被使用，请联系官方！';break;
+			case '11':
+				$msg = '对不起，您的操作未成功，请重试';break;
+			case '12':
+				$msg = '对不起，两次输入的密码不一致';break;
+			case '13':
+				$msg = '用户名长度必须在2-16个字之间';break;
+			default:
+				$msg = '对不起，通信失败，请重试';
+		}
+		return $msg;
+	}
+
+	/**
+	 * 关联站长中心帐号（重新登录）
+	 */
+	function linkWebmaster($fields) {
+
+		$params = $this->_checkLinkWebmaster($fields);
+
+		$platformApiClient = $this->_getPlatformApiClient();
+
+		L::loadClass('json', 'utility', false);
+		$Json = new Services_JSON(SERVICES_JSON_LOOSE_TYPE);
+
+		return $Json->decode($platformApiClient->post('webmaster.onlineapp.registerbyoldaccount' ,$params));
+		
+	}
+
+	/**
+	 * 关联前逻辑判断操作
+	 */
+	function _checkLinkWebmaster($fields) {
+		
+		isset($fields['username']) && $username = $fields['username'];
+		isset($fields['password']) && $password = $fields['password'];
+		
+		$params = array(
+			'username' => $username,
+			'password' => $password,
+			'siteid' => $this->siteid,
+			'siteownerid' => $this->siteownerid,
+			'sitehash' => $this->sitehash,
+			'charset' => $this->charset,
+		);
+
+		return $params;
+		
+	}
+
+	/**
+	 * 获取错误码信息
+	 */
+	function getErrorLinkCodeMsg($code) {
+		switch ($code) {
+			case '3':
+				$msg = '请输入您的站点密钥！';break;
+			case '4':
+				$msg = '对不起，用户名不存在！';break;
+			case '5':
+				$msg = '对不起，密码输入有误！';break;
+			case '6':
+				$msg = '对不起，您填写的信息不匹配！';break;
+			case '7':
+				$msg = '对不起，您的操作未成功，请重试';break;
+			default:
+				$msg = '对不起，通信失败，请重试';
+		}
+		return $msg;
+	}
+
+	/**
+	 * 登陆站长中心
+	 */
+	function loginWebmaster() {
+		
+		$platformApiClient = $this->_getPlatformApiClient();
+		
+		$params = array('siteappkey' => $this->appkey);
+		
+		return $platformApiClient->post('webmaster.onlineapp.login' ,$params);
+		
+	}
+
+	/**
+	 * 获取站长中心登录后页面
+	 */
+	function getLoginWebmasterUrl($appkey) {
+		
+		$platformApiClient = $this->_getPlatformApiClient();
+		
+		$params = array(
+			'siteurl' => $this->bbsurl,
+			'siteappkey' => $appkey
+		);
+
+		return $platformApiClient->buildPageUrl(0 ,'webmaster.onlineapp.index' ,$params);
+		
+	}
+
+	/**
+	 * 获取推荐应用信息
+	 */
+	function getOnlineAppList() {
+		
+		$platformApiClient = $this->_getPlatformApiClient();
+
+		return $platformApiClient->buildPageUrl(0 ,'webmaster.onlineapp.applist');
+		
+	}
+
+	/**
+	 * 判断url是否改动
+	 */
+	function isUrlChanged() {
+
+		$platformApiClient = $this->_getPlatformApiClient();
+	
+		$params = array(
+			'siteurl' => $this->bbsurl,
+			'siteappkey' => $this->appkey
+		);
+	
+		L::loadClass('json', 'utility', false);
+		$Json = new Services_JSON(SERVICES_JSON_LOOSE_TYPE);
+		return $Json->decode($platformApiClient->post('webmaster.onlineapp.checkurl' ,$params));
+		
+	}
+	
+	/**
+	 * 获取url改动后的信息
+	 */
+	function getUrlChangedMsg() {
+		
+		$isUrlChanged = $this->isUrlChanged();
+
+		if (empty($isUrlChanged['status'])) {
+
+			return $this->getErrorUrlCodeMsg($isUrlChanged['code']);
 		}
 		return false;
 	}
+
+	/**
+	 * 获取错误码信息
+	 */
+	function getErrorUrlCodeMsg($code) {
+		
+		switch ($code) {
+			case '1':
+				$msg = '站点资料的网址为空，请先通过应用首页修改资料！';break;
+			case '2':
+				$msg = false;break;
+			case '3':
+				$msg = '站点资料的网址和当前不一致，请先通过应用首页修改资料！';break;
+			default:
+				$msg = false;
+		}
+		return $msg;
+	}
+	
+	/**
+	 * 客户端生成服务
+	 */
+	function _getPlatformApiClient() {
+		static $client = null;
+		if (!$client) {
+			L::loadClass('client', 'utility/platformapisdk', false);
+			$client = new PlatformApiClient($this->sitehash, $this->siteownerid);
+		}
+		return $client;
+	}
+	/*************************站长中心相关****************************/
+
+
 	/**
 	 * 获取虾米音乐列表
 	 */
@@ -386,6 +657,7 @@ class PW_AppClient {
 		$data = unserialize($backdata);
 		return $data;
 	}
+
 	/**
 	 * 获取APP-iframe列表
 	 */
@@ -407,6 +679,7 @@ class PW_AppClient {
 		$url .= 'pw_sig=' . md5($arg . $this->siteownerid);
 		return $url;
 	}
+
 	/**
 	 * 移除用户个人APP
 	 */

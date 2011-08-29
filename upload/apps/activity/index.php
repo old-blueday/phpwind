@@ -2,7 +2,8 @@
 !defined('A_P') && exit('Forbidden');
 
 !$winduid && Showmsg('not_login');
-require_once pwCache::getPath(D_P."data/bbscache/forum_cache.php");
+//* require_once pwCache::getPath(D_P."data/bbscache/forum_cache.php");
+pwCache::getData(D_P."data/bbscache/forum_cache.php");
 require_once(R_P.'require/showimg.php');
 
 $USCR = 'user_activity';
@@ -22,7 +23,8 @@ if ($username && !$uid) {
 	$uid = $userService->getUserIdByUserName($username);
 }
 
-include pwCache::getPath(D_P. 'data/bbscache/o_config.php');
+//* include pwCache::getPath(D_P. 'data/bbscache/o_config.php');
+pwCache::getData(D_P. 'data/bbscache/o_config.php');
 require_once(R_P . 'u/lib/space.class.php');
 $newSpace = new PwSpace($uid ? $uid : $winduid);
 $space =& $newSpace->getInfo();

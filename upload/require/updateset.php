@@ -8,7 +8,8 @@ function write_config($newconfig=array()){
 			${$key} = $value;
 		}
 	} else {
-		include pwCache::getPath(D_P.'data/sql_config.php');
+		include (D_P.'data/sql_config.php');
+		//* extract(pwCache::getData(D_P.'data/sql_config.php', false));
 	}
 	$db_hostweb!=0 && $db_hostweb = 1;
 	!$pconnect && $pconnect = 0;
@@ -75,10 +76,15 @@ function write_config($newconfig=array()){
 \$db_hostweb = '$db_hostweb';
 
 /**
+{$lang[all][distribute]}
+*/
+\$db_distribute = '$db_distribute';
+
+/**
 {$lang[all][attach_url]}
 */
 \$attach_url = array($att_url);
 ".'?>';
-	pwCache::setData(D_P.'data/sql_config.php',$writetofile);
+	pwCache::writeover(D_P.'data/sql_config.php',$writetofile);
 }
 ?>

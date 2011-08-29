@@ -78,7 +78,9 @@ EOT;
 </tr></table></div>
 <!--
 EOT;
-}elseif($action=='edit'){ print <<<EOT
+}elseif($action=='edit'){
+${$type} = 'class="current"';
+print <<<EOT
 -->
 	<div id="sidebar" class="f_tree cc">
 		<div class="sidebar">
@@ -90,8 +92,8 @@ EOT;
                     <dt>内部留言</dt>
                     <dd>
                         <ul class="pw_ulD">
-                        	<li><a href="forumcp.php?action=edit&type=msg&fid=$fid">留言管理</a></li>
-                            <li><a href="forumcp.php?action=edit&type=addmsg&fid=$fid">添加留言</a></li>
+                        	<li $msg><a href="forumcp.php?action=edit&type=msg&fid=$fid">留言管理</a></li>
+                            <li $addmsg><a href="forumcp.php?action=edit&type=addmsg&fid=$fid">添加留言</a></li>
                         </ul>
                     </dd>
                 </dl><!--
@@ -118,14 +120,14 @@ if($isGM || $forumcp_type['addnotice'] == 1 || $forumcp_type['allowtpctype'] == 
 EOT;
 if($isGM || $forumcp_type['addnotice'] == 1){print <<<EOT
 -->
-                        	<li><a href="forumcp.php?action=edit&type=notice&fid=$fid">公告管理</a></li>
-                            <li><a href="forumcp.php?action=edit&type=add&fid=$fid">发布公告</a></li>
+                        	<li $notice><a href="forumcp.php?action=edit&type=notice&fid=$fid">公告管理</a></li>
+                            <li $add><a href="forumcp.php?action=edit&type=add&fid=$fid">发布公告</a></li>
 <!--
 EOT;
 }
 if($isGM || $forumcp_type['allowtpctype'] == 1){print <<<EOT
 -->
-                            <li><a href="forumcp.php?action=edit&type=f_type&fid=$fid">主题分类</a></li>
+                            <li $f_type><a href="forumcp.php?action=edit&type=f_type&fid=$fid">主题分类</a></li>
 <!--
 EOT;
 }print <<<EOT
@@ -141,9 +143,9 @@ EOT;
                     <dt>帖子管理</dt>
                     <dd>
                         <ul class="pw_ulD">
-                        	<li><a href="forumcp.php?action=edit&type=report&fid=$fid">报告帖</a></li>
-                            <li><a href="forumcp.php?action=edit&type=reward&fid=$fid">悬赏帖</a></li>
-                            <li><a href="forumcp.php?action=edit&type=thread&fid=$fid">主题列表</a></li>
+                        	<li $report><a href="forumcp.php?action=edit&type=report&fid=$fid">报告帖</a></li>
+                            <li $reward><a href="forumcp.php?action=edit&type=reward&fid=$fid">悬赏帖</a></li>
+                            <li $thread><a href="forumcp.php?action=edit&type=thread&fid=$fid">主题列表</a></li>
                         </ul>
                     </dd>
                 </dl>
@@ -155,8 +157,8 @@ if($isGM || pwRights($isBM,'viewcheck')){print <<<EOT
                     <dt>帖子审核</dt>
                     <dd>
                         <ul class="pw_ulD">
-                        	<li><a href="forumcp.php?action=edit&type=tcheck&fid=$fid">主题审核</a></li>
-                            <li><a href="forumcp.php?action=edit&type=pcheck&fid=$fid">回复审核</a></li>
+                        	<li $tcheck><a href="forumcp.php?action=edit&type=tcheck&fid=$fid">主题审核</a></li>
+                            <li $pcheck><a href="forumcp.php?action=edit&type=pcheck&fid=$fid">回复审核</a></li>
                         </ul>
                     </dd>
                 </dl>
@@ -168,8 +170,8 @@ EOT;
                     <dt>回收站</dt>
                     <dd>
                         <ul class="pw_ulD">
-                        	<li><a href="forumcp.php?action=edit&type=trecycle&fid=$fid">主题回收站</a></li>
-                            <li><a href="forumcp.php?action=edit&type=precycle&fid=$fid">回复回收站</a></li>
+                        	<li $trecycle><a href="forumcp.php?action=edit&type=trecycle&fid=$fid">主题回收站</a></li>
+                            <li $precycle><a href="forumcp.php?action=edit&type=precycle&fid=$fid">回复回收站</a></li>
                         </ul>
                     </dd>
                 </dl>
@@ -181,8 +183,8 @@ EOT;
                     <dt>版主特权</dt>
                     <dd>
                         <ul class="pw_ulD">
-                        	<li><a href="forumcp.php?action=edit&type=commend&fid=$fid">版主推荐列表</a></li>
-                            <li><a href="forumcp.php?action=edit&type=adminset&fid=$fid">副版主任免</a></li>
+                        	<li $commend><a href="forumcp.php?action=edit&type=commend&fid=$fid">版主推荐列表</a></li>
+                            <li $adminset><a href="forumcp.php?action=edit&type=adminset&fid=$fid">副版主任免</a></li>
                         </ul>
                     </dd>
                 </dl>
@@ -194,7 +196,7 @@ EOT;
                     <dt>版主特权</dt>
                     <dd>
                         <ul class="pw_ulD">
-                        	<li><a href="forumcp.php?action=edit&type=commend&fid=$fid">版主推荐列表</a></li>
+                        	<li $commend><a href="forumcp.php?action=edit&type=commend&fid=$fid">版主推荐列表</a></li>
                         </ul>
                     </dd>
                 </dl>
@@ -206,7 +208,7 @@ EOT;
                     <dt>版主特权</dt>
                     <dd>
                         <ul class="pw_ulD">
-                        	<li><a href="forumcp.php?action=edit&type=adminset&fid=$fid">副版主任免</a></li>
+                        	<li $adminset><a href="forumcp.php?action=edit&type=adminset&fid=$fid">副版主任免</a></li>
                         </ul>
                     </dd>
                 </dl>
@@ -335,10 +337,11 @@ EOT;
         </tr>
 		<tr class="tr3 vt">
         	<td>公告内容<br /><span class="s2">不支持 html 代码</span></td>
-            <td colspan="2">
+            <td colspan="2" style="padding-right:10px;">
 <!--
 EOT;
-include_once(R_P.'template/wind/editor.htm');print <<<EOT
+require PrintEot('wysiwyg_editor_common');
+print <<<EOT
 -->
 			</td></tr>
 		<tr>
@@ -358,11 +361,11 @@ EOT;
 <table width="100%" cellspacing="0" cellpadding="0">
 	<tr class="tr2">
 		<td width="25">ID</td>
-		<td>版块</td>
-		<td>帖子位置</td>
+		<td width="60">版块</td>
+		<td width="60">帖子位置</td>
 		<td width="90">反映用户</td>
 		<td>原因:</td>
-		<td width="60">报告类型:</td>
+		<td width="60">报告类型</td>
 		<td width="40">删除</td>
 	</tr>
 <!--
@@ -377,7 +380,7 @@ print <<<EOT
 		<td><a href="thread.php?fid=$report[fid]" target="_blank">$report[fname]</a></td>
 		<td><a href="read.php?tid=$report[tid]#$report[pid]" target="_blank">进入帖子</a></td>
 		<td><a target="_blank" href="{$db_userurl}$report[uid]">$report[username]</a></td>
-		<td>$report[reason]</td>
+		<td><div style="line-height:18px;height:18px;overflow:hidden;" title="$report[reason]">$report[reason]</div></td>
 <!--
 EOT;
 if($report[type]==1){ print <<<EOT
@@ -463,7 +466,7 @@ print <<<EOT
 										<td>|&mdash;&nbsp;<input type="text" class="input" style="width:20px;" name="t_view_db[{$v[id]}]" value="$v[vieworder]"></td>
 										<td><input type="text" class="input input_wa" value="$v[name]" name="t_db[{$v[id]}]" /></td>
 										<td><input type="text" class="input input_wb" value="$v[logo]" name="t_logo_db[{$v[id]}]" /></td>
-										<td><a href="forumcp.php?action=edit&type=f_type&fid=$fid&dodel=delttype&typename=sub&id=$value[id]" onclick="return confirm('确定要删除此主题分类吗？');">[删除]</a></td>
+										<td><a href="forumcp.php?action=edit&type=f_type&fid=$fid&dodel=delttype&typename=sub&id=$v[id]" onclick="return confirm('确定要删除此主题分类吗？');">[删除]</a></td>
 									</tr>
 <!--
 EOT;
@@ -622,7 +625,7 @@ foreach($threaddb as $key=>$thread){print <<<EOT
 -->
 <tr class="tr3 vt">
 	<td><input type="checkbox" name="selid[]" value="$thread[tid]" /></td>
-	<th onclick="content('$thread[tid]');" class="cp"><a href="read.php?tid=$thread[tid]" target="_blank" class="s4 fr">[查看原贴]</a>$thread[subject]</th>
+	<th onclick="content('$thread[tid]');" class="cp"><a href="read.php?tid=$thread[tid]" target="_blank" class="s4 fr">[查看原帖]</a>$thread[subject]</th>
 	<td><a href="{$db_userurl}$thread[authorid]">$thread[author]</a></td>
 	<td>$thread[postdate]</td>
 </tr>
@@ -686,7 +689,7 @@ foreach($postdb as $key=>$post){print <<<EOT
 -->
 <tr class="tr3">
 	<td><input type="checkbox" name="selid[]" value="$post[pid]" /></td>
-	<th onmouseover="this.className='f_two'" onmouseout="this.className='f_one'" onclick="content('$post[pid]');"><a href="job.php?action=topost&tid=$post[tid]&pid=$post[pid]" target="_blank" class="fr s4">[查看原贴]</a>$post[subject]</th>
+	<th onmouseover="this.className='f_two'" onmouseout="this.className='f_one'" onclick="content('$post[pid]');"><a href="job.php?action=topost&tid=$post[tid]&pid=$post[pid]" target="_blank" class="fr s4">[查看原帖]</a>$post[subject]</th>
 	<td><a href="{$db_userurl}$post[authorid]">$post[author]</a></td>
 	<td>$post[postdate]</td>
 </tr>
@@ -738,7 +741,7 @@ EOT;
 <!--
 EOT;
 $i=0;
-foreach($commend as $key=>$thread){
+foreach($commendThread as $key=>$thread){
 $i++;
 print <<<EOT
 -->
@@ -802,8 +805,10 @@ EOT;
 }print <<<EOT
 -->
 	<td>标题</td>
-	<td width="100px">作者</td>
-	<td width="100px">管理员</td>
+	<td width="120px">发布时间</td>
+	<td width="90px">IP</td>
+	<td width="80px">作者</td>
+	<td width="80px">管理员</td>
 	<td width="120px">删除日期</td>
 </tr>
 <!--
@@ -821,6 +826,8 @@ EOT;
 }print <<<EOT
 -->
 	<th class="cp" onclick="content('$thread[tid]');">$thread[subject]</th>
+	<td>$thread[postdate]</td>
+	<td>$thread[userip]</td>
 	<td><a href="{$db_userurl}$thread[authorid]">$thread[author]</a></td>
 	<td>$thread[admin]</td>
 	<td>$thread[deltime]</td>
@@ -862,8 +869,16 @@ EOT;
 }print <<<EOT
 -->
 </select>
+<!--
+EOT;
+if($forumset[recycle]){print <<<EOT
+-->
 	<span class="bt"><span><button type="button" onclick="CheckAll(this.form)">全 选</button></span></span>
 	<span class="btn"><span><button type="submit" name="hello" onclick="return Psubmit(this.form)">提 交</button></span></span>
+<!--
+EOT;
+}print <<<EOT
+-->
 </div></form>
 <!--
 EOT;
@@ -929,6 +944,10 @@ EOT;
 <input type="hidden" name="type" value="$type" />
 <input type="hidden" name="fid" value="$fid" />
 <div class="tac p10">
+<!--
+EOT;
+if($forumset[recycle]){print <<<EOT
+-->
 <select name="step" class="mr5">
 <!--
 EOT;
@@ -956,6 +975,10 @@ EOT;
 }print <<<EOT
 -->
 </select>
+<!--
+EOT;
+}print <<<EOT
+-->
 	<span class="bt"><span><button type="button" name="chkall" onclick="CheckAll(this.form)">全 选</button></span></span>
 	<span class="btn"><span><button type="submit" name="hello" onclick="return Psubmit(this.form)">提 交</button></span></span>
 </div></form>
@@ -1014,6 +1037,7 @@ EOT;
 <!--
 EOT;
 foreach($msgdb as $key=>$val){
+$val['ifuse'] = !S::inArray($val['uid'],$notManager) ? $val['ifuse'] : '';
 print <<<EOT
 -->
 <tr class="tr3">
@@ -1045,21 +1069,35 @@ EOT;
         </div>
     </div>
 <script language="JavaScript">
-function CheckAll(form){
+/*function CheckAll(form){
 	for(var i=0;i<form.elements.length-2;i++){
 		var e = form.elements[i];
-		if(e.type=='checkbox') e.checked = e.checked == true ? false : true;
+		if(e.type=='checkbox' && e.disabled == false) e.checked = e.checked == true ? false : true;
 	}
+}*/
+
+function CheckAll(form) {
+	var ifcheck = null;
+	for (var i=0;i<form.elements.length-2;i++){
+		var e = form.elements[i];
+		if(e.type=='checkbox' && e.disabled == false){
+			if (ifcheck === null) ifcheck = !e.checked;
+			e.checked = ifcheck;
+		}
+	}
+	return ifcheck;	
 }
+
 function content(id){
 	var o = getObj('content_'+id);
 	o.style.display = o.style.display == 'none' ? '' : 'none';
 }
 function Psubmit(form){
-	var ids = form['ids[]'];
+	//var ids = form['ids[]'];
+	var ids = form.getElementsByTagName('input');
 	var flag = false;
 	for(var i=0; i<ids.length; i++){
-		if(ids[i].checked){
+		if(ids[i].type == 'checkbox' && ids[i].name == 'ids[]' &&  ids[i].checked){
 			flag = true; break;
 		}
 	}
@@ -1089,6 +1127,34 @@ EOT;
 print <<<EOT
 -->
 </div>
+<script type="text/javascript">
+/*侧栏版块展开动态*/
+window.onReady(function(){
+	var div = document.getElementById("sideForum");
+	var tt = div.getElementsByTagName("dt");
+	for(i=0; i<tt.length; i++){
+		tt[i].index = i;
+		tt[i].onclick= function(){
+			document.cookie='hide_'+this.index+'='+(this.parentNode.className == 'one' ? 1 : 0);
+			this.parentNode.className = this.parentNode.className == 'one'?'':'one';
+		}
+	}
+	/*
+	var sfs = document.getElementById('shortcutforum').getElementsByTagName('li');
+	for (i=0;i<sfs.length;i++) {
+		sfs[i].onmouseover=function(){this.className='hover';}
+		sfs[i].onmouseout=function(){this.className='';}
+	}
+	*/
+});
+
+function toggleSidebar(){
+	var sidebar = getObj('sidebar');
+	var toggle = (sidebar.className == 'f_tree cc') ? 0: 1;
+	SetCookie('toggle',toggle);	
+	getObj('sidebar').className = (sidebar.className == 'f_tree cc')?"f_tree cc sideClose":'f_tree cc';
+}
+</script>
 <!--
 EOT;
 ?>-->

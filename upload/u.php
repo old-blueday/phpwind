@@ -2,7 +2,8 @@
 define('SCR','u');
 require_once('global.php');
 require_once(R_P . 'u/require/core.php');
-include_once pwCache::getPath(D_P . 'data/bbscache/o_config.php');
+//* include_once pwCache::getPath(D_P . 'data/bbscache/o_config.php');
+pwCache::getData(D_P . 'data/bbscache/o_config.php');
 $o_sitename = $o_sitename ? $o_sitename :  $db_bbsname;
 //导航
 $homenavigation = array();

@@ -18,11 +18,13 @@ print <<<EOT
 EOT;
 if($smstype == $messageServer->getConst('sms_rate')){
 	require messageEot('sms_rateinfo');
-}elseif($smstype == $messageServer->getConst('sms_message')){
+}elseif($smstype == $messageServer->getConst('sms_message') || $smstype == $messageServer->getConst('sms_reply')){
 	require messageEot('sms_smsinfo');
 }elseif($smstype == $messageServer->getConst('notice_system') ||  
 		$smstype == $messageServer->getConst('notice_postcate') || 
 		$smstype == $messageServer->getConst('notice_active') || 
+		$smstype == $messageServer->getConst('notice_comment') || 
+		$smstype == $messageServer->getConst('notice_guestbook') || 
 		$smstype == $messageServer->getConst('notice_apps')){
 	require messageEot('notice_info');
 }elseif($smstype == $messageServer->getConst('groupsms_colony')){
@@ -81,6 +83,7 @@ if($value['typeid'] == $messageServer->getConst('sms_message') ||
 		$value['typeid'] == $messageServer->getConst('request_group') || 
 		$value['typeid'] == $messageServer->getConst('notice_app')){
         $_link = "javascript:void(0)";
+        $fid = $value['create_uid'];
 }
 list($_img,$_b,$_tip) = getMessageIconByStatus($value);
 print <<<EOT
@@ -113,7 +116,9 @@ EOT;
 if($value['typeid'] == $messageServer->getConst('request_friend') ||  
 		$value['typeid'] == $messageServer->getConst('request_group') || 
 		$value['typeid'] == $messageServer->getConst('notice_app')){
-$requestDesc = getRequestTypeDes($value['typeid'],'');		
+      	$ifcheck = $value['extra']['check'];
+  		$check = $ifcheck == 1 ? '&check=1' : '';
+$requestDesc = getRequestTypeDes($value['typeid'],'',$ifcheck);		
 if(in_array($value['status'],array(0,4,5))){
 $class = $value['status'] == 4 ? 'ignoreTip' : 'rightTip';
 $statusInfo = $requestDesc[$value['status']];

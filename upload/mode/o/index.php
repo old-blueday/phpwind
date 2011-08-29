@@ -2,7 +2,9 @@
 !defined('M_P') && exit('Forbidden');
 $USCR = 'square_weibo';
 
-include_once pwCache::getPath(D_P.'data/bbscache/o_config.php');
+//* include_once pwCache::getPath(D_P.'data/bbscache/o_config.php');
+pwCache::getData(D_P.'data/bbscache/o_config.php');
+
 $o_sitename = $o_sitename ? $o_sitename : $db_bbsname;
 if (!$o_browseopen) {
 	ObHeader('u.php');
@@ -76,7 +78,7 @@ if (pwFilemtime($pwCacheFile) + 60 < $timestamp) {
 	if ($db_dopen && $o_indexset & 512) {
 		list($newDiarys,$diarytype) = browseDiary(8);
 	}
-	pwCache::setData($pwCacheFile,"<?php\r\n\$reGroups=".pw_var_export($reGroups).";\r\n\$hotsubject=".pw_var_export($hotsubject).";\r\n\$hotforum=".pw_var_export($hotforum).";\r\n\$hotuser=".pw_var_export($hotuser).";\r\n\$newDiarys=".pw_var_export($newDiarys).";\r\n\$diarytype=".pw_var_export($diarytype).";\r\n\$weiboList=".pw_var_export($weiboList).";\r\n\$albumdb=".pw_var_export($albumdb).";\r\n\$smphoto=".pw_var_export($smphoto).";\r\n\$newuser=".pw_var_export($newuser).";\r\n\$feeds=".pw_var_export($feeds).";\r\n?>");
+	pwCache::writeover($pwCacheFile,"<?php\r\n\$reGroups=".pw_var_export($reGroups).";\r\n\$hotsubject=".pw_var_export($hotsubject).";\r\n\$hotforum=".pw_var_export($hotforum).";\r\n\$hotuser=".pw_var_export($hotuser).";\r\n\$newDiarys=".pw_var_export($newDiarys).";\r\n\$diarytype=".pw_var_export($diarytype).";\r\n\$weiboList=".pw_var_export($weiboList).";\r\n\$albumdb=".pw_var_export($albumdb).";\r\n\$smphoto=".pw_var_export($smphoto).";\r\n\$newuser=".pw_var_export($newuser).";\r\n\$feeds=".pw_var_export($feeds).";\r\n?>");
 } else {
 	include_once S::escapePath($pwCacheFile);
 }

@@ -2,7 +2,8 @@
 !defined('R_P') && exit('Forbidden');
 $USCR = 'user_friend';
 require_once(R_P.'require/showimg.php');
-include_once pwCache::getPath(D_P . 'data/bbscache/dbreg.php');
+//* include_once pwCache::getPath(D_P . 'data/bbscache/dbreg.php');
+extract(pwCache::getData(D_P . 'data/bbscache/dbreg.php', false));
 $isGM = S::inArray($windid, $manager);
 !$isGM && $groupid==3 && $isGM=1;
 

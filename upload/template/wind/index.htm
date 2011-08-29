@@ -51,6 +51,7 @@ EOT;
 	<ul class="fr">
 <!--
 EOT;
+if ($db_shiftstyle == 1) {
 if($_COOKIE['widthCfg'] == 1){print <<<EOT
 -->
 		<li><a id="widthCfg" href="javascript:shiftStyle();" class="s2">[切换到窄版]</a></li>
@@ -61,7 +62,7 @@ EOT;
 		<li><a id="widthCfg" href="javascript:shiftStyle();" class="s2">[切换到宽版]</a></li>
 <!--
 EOT;
-}print <<<EOT
+}}print <<<EOT
 -->
 		<li><a href="apps.php?q=article">我的帖子</a></li>
 		<li><a href="searcher.php?sch_time=newatc">查看新帖</a></li>
@@ -73,7 +74,7 @@ if (!empty($shortcutforum)){print <<<EOT
 <!--
 EOT;
 }if ($skincount >1){print <<<EOT
---><li id="td_skin"><a href="javascript:;"><img src="$imgpath/pwicon/style.gif" align="absmiddle" alt="风格切换" /></a></li>
+--><li id="td_skin"><a href="javascript:;"><img src="$imgpath/pwicon/style.gif" align="absmiddle" alt="论坛风格切换" /></a></li>
 <!--
 EOT;
 }print<<<EOT
@@ -234,8 +235,7 @@ EOT;
 EOT;
 if($forums['logo']){print <<<EOT
 -->
-          		
-					<img src="$forums[logo]" class="fl mr10" alt="forumlogo" />
+          			<a href="thread.php?fid=$forums[fid]" target="_blank"><img src="$forums[logo]" class="fl mr10" alt="forumlogo" /></a>
 <!--
 EOT;
 }
@@ -407,7 +407,7 @@ if($forums[au]){print <<<EOT
 EOT;
 }if($forums[pic]=='lock'){print <<<EOT
 -->
-				认证版块
+				<div style="line-height:3;">认证版块</div>
 <!--
 EOT;
 }print <<<EOT
@@ -464,14 +464,10 @@ EOT;
 			<tr>
 				<td><div class="sharelink2 cc">$sharelink[1]</div></td>
 			</tr>
-<!--
-EOT;
-}print <<<EOT
--->
 </table></div>
 <!--
 EOT;
-if($db_indexshowbirth && $brithcache!='empty'){print <<<EOT
+}if($db_indexshowbirth && $brithcache!='empty'){print <<<EOT
 -->
 <div class="h b">生日会员</div>
 <div class="tTable"><table cellspacing="0" cellpadding="0" width="100%" style="table-layout:fixed;">

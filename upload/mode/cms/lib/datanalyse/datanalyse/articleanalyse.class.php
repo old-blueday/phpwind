@@ -28,6 +28,17 @@ class PW_Articleanalyse extends PW_Datanalyse {
 		}
 		return $_tmp;
 	}
+	
+	/**
+	 * 根据文章ID数组获取热门文章列表
+	 * @return array
+	 */
+	function _getHotArticlesByTags() {
+		if (empty($this->tags)) return array();
+		$articleDB = C::loadDB('article');
+		/* @var $articleDB PW_ArticleDB */
+		return $articleDB->getHotArticlesByIds($this->tags);
+	}
 
 	/**
 	 * 根据日志ID数组获得日志信息

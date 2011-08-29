@@ -10,7 +10,8 @@ if ($type == 'pwcode') {
 		$code[] = $rt;
 	}
 } else {
-	@include_once pwCache::getPath(D_P . 'data/bbscache/setform.php');
+	//* @include_once pwCache::getPath(D_P . 'data/bbscache/setform.php');
+	pwCache::getData(D_P . 'data/bbscache/setform.php');
 	S::gp(array('id'), 'GP', 2);
 	$setform = array();
 	if (isset($setformdb[$id])) {

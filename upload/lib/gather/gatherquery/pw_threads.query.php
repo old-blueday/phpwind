@@ -10,19 +10,25 @@ class GatherQuery_UserDefine_PW_Threads {
 	
 	function insert($tableName, $fields, $expand = array()) {
 		$this->_service->logThreads ( 'insert', $fields );
-		$this->_service->syncData ( 'insert', $fields );
+		$this->_service->syncData ( 'insert', $fields );		
+		if ($tableName == 'pw_threads' && $GLOBALS['db_hits_store'] == 1) $this->_service->updateHits($fields);
 		if (perf::checkMemcache ()) {
 			$this->_service->cleanThreadCacheWithForumIds ( $fields );
 		}
 	}
 	
 	function update($tableName, $fields, $expand = array()) {
-		$this->_service->logThreads ( 'update', $fields );
+		if (isset ( $expand ['fid'] ) && isset ( $expand ['ifcheck'] ) && $expand ['fid'] == 0 && $expand ['ifcheck'] == 1) {
+			$this->_service->logThreads ( 'delete', $fields ); //recycle thread
+		} else {
+			$this->_service->logThreads ( 'update', $fields );
+		}
 		$this->_service->syncData ( 'update', $fields );
 		if (perf::checkMemcache ()) {
 			$this->_service->cleanThreadCacheWithThreadIds ( $tableName, $fields );
 			$this->_service->cleanThreadCacheWithForumIds ( $fields, $expand );
 		}
+		$this->_service->updateThreadImage('update',$fields,$expand);
 	}
 	
 	function delete($tableName, $fields, $expand = array()) {
@@ -32,6 +38,7 @@ class GatherQuery_UserDefine_PW_Threads {
 			$this->_service->cleanThreadCacheWithThreadIds ( $tableName, $fields );
 			$this->_service->cleanThreadCacheWithForumIds ( $fields );
 		}
+		$this->_service->updateThreadImage('delete',$fields,$expand);
 	}
 	
 	function select($tableName, $fields, $expand = array()) {
@@ -90,5 +97,33 @@ class GatherQuery_UserDefine_PW_Threads_Impl {
 		isset ( $expand ['fid'] ) && $forumIds = array_merge ( $forumIds, (is_array ( $expand ['fid'] )) ? $expand ['fid'] : array ($expand ['fid'] ) );
 		$_cacheService = Perf::gatherCache ( 'pw_threads' );
 		$_cacheService->clearCacheForThreadListByForumIds ( $forumIds );
+	}
+	
+	/**
+	 * 当帖子点击数开启使用数据库缓存时，那么每次往pw_threads表插入数据时相应的需要在pw_hits_threads插入一条数据
+	 *
+	 * @param array $fields
+	 * @return boolean
+	 */
+	function updateHits($fields){
+		if (! isset ( $fields ['insert_id'] )) {
+			return false;
+		}
+		return $GLOBALS['db']->update('INSERT INTO pw_hits_threads SET tid='. S::sqlEscape(intval($fields ['insert_id'])) . ',hits='. S::sqlEscape(intval($fields ['hits'])));
+	}
+	
+	function updateThreadImage($operate, $fields,$expand = array()){
+		$tids = is_array($fields['tid']) ? $fields['tid'] : array($fields['tid']);
+		if (!$tids) return false;
+		//删除图酷
+		if ($operate == 'delete') {
+			return $GLOBALS['db']->update('DELETE FROM pw_threads_img WHERE tid IN ('. S::sqlImplode($tids) . ')');
+		}
+		//更新图酷
+		if($operate == 'update' && (isset($expand['ifcheck']) || isset($expand['topped']) || isset($expand['fid']))){
+			isset($expand['ifcheck']) && $GLOBALS['db']->update('UPDATE pw_threads_img SET ifcheck='.intval($expand['ifcheck']).' WHERE tid IN ('. S::sqlImplode($tids) . ')');
+			isset($expand['topped']) && $GLOBALS['db']->update('UPDATE pw_threads_img SET topped='.intval($expand['topped']).' WHERE tid IN ('. S::sqlImplode($tids) . ')');
+			isset($expand['fid']) && $GLOBALS['db']->update('UPDATE pw_threads_img SET fid='.intval($expand['fid']).' WHERE tid IN ('. S::sqlImplode($tids) . ')');
+		}
 	}
 }

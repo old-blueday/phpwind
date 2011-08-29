@@ -2,7 +2,8 @@
 !defined('A_P') && exit('Forbidden');
 
 S::gp(array('uid'), 2);
-include_once pwCache::getPath(D_P . 'data/bbscache/o_config.php');
+//* include_once pwCache::getPath(D_P . 'data/bbscache/o_config.php');
+pwCache::getData(D_P . 'data/bbscache/o_config.php');
 S::gp(array('page', 'ajax'));
 
 if ($q == "collection") {

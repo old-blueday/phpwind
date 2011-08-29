@@ -37,7 +37,7 @@ class PhotoUpload extends uploadBehavior {
 
 	function getThumbInfo($filename, $dir) {
 		return array(
-			array('s_' . $filename, $dir, "100\t100")
+			array('s_' . $filename, $dir, "100\t100"),
 		);
 	}
 
@@ -77,7 +77,9 @@ class PhotoUpload extends uploadBehavior {
 				$statistics = L::loadClass('Statistics', 'datanalyse');
 				$statistics->photouser($winduid, count($this->attachs));
 			}
+			$this->db->update("UPDATE pw_cnalbum SET photonum=photonum+" . S::sqlEscape(count($this->attachs)) . ",lasttime=" . S::sqlEscape($timestamp) . " WHERE aid=" . S::sqlEscape($this->aid));
 		}
+		return true;
 	}
 
 	function getAttachs() {

@@ -5,8 +5,10 @@ $basename="$admin_file?adminjob=forumlog";
 if(!$action){
 	require_once GetLang('logtype');
 	require_once(R_P.'require/bbscode.php');
-	include_once pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
-	include pwCache::getPath(D_P.'data/bbscache/forumcache.php');
+	//* include_once pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
+	pwCache::getData(D_P.'data/bbscache/forum_cache.php');
+	//* include pwCache::getPath(D_P.'data/bbscache/forumcache.php');
+	pwCache::getData(D_P.'data/bbscache/forumcache.php');
 	S::gp(array('page','username1','username2','fid','type'));
 	//增加所属板块@modify panjl@2010-11-2
 	$forumcache = str_replace("<option value=\"$fid\">","<option value=\"$fid\" selected>",$forumcache);

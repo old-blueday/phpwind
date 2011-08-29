@@ -49,7 +49,8 @@ class ElementUpdate {
 			return false;
 		}
 		$usersort_judge = array();
-		include pwCache::getPath(D_P . 'data/bbscache/usersort_judge.php');
+		//* include pwCache::getPath(D_P . 'data/bbscache/usersort_judge.php');
+		extract(pwCache::getData(D_P . 'data/bbscache/usersort_judge.php', false));
 		$winddb['lastpost'] < $tdtime && $winddb['todaypost'] = 0;
 		$winddb['lastpost'] < $montime && $winddb['monthpost'] = 0;
 		$sorttype = array(
@@ -248,7 +249,8 @@ class ElementUpdate {
 		}
 		if (!$this->judge['hitsort']) {
 			$hitsort_judge = array();
-			include pwCache::getPath(D_P . 'data/bbscache/hitsort_judge.php');
+			//* include pwCache::getPath(D_P . 'data/bbscache/hitsort_judge.php');
+			extract(pwCache::getData(D_P . 'data/bbscache/hitsort_judge.php', false));
 			$this->judge['hitsort'] = $hitsort_judge;
 		}
 		foreach ($threaddb as $thread) {
@@ -315,7 +317,8 @@ class ElementUpdate {
 		$special = (int) $this->special;
 		if (!$this->judge['replysort']) {
 			$replysort_judge = array();
-			include pwCache::getPath(S::escapePath(D_P . 'data/bbscache/replysort_judge_' . $special . '.php'));
+			//* include pwCache::getPath(S::escapePath(D_P . 'data/bbscache/replysort_judge_' . $special . '.php'));
+			extract(pwCache::getData(S::escapePath(D_P . 'data/bbscache/replysort_judge_' . $special . '.php'), false));
 			$this->judge['replysort'] = $replysort_judge;
 		}
 
@@ -541,6 +544,7 @@ class ElementUpdate {
 					}
 				} elseif ($key == 'hitsort') {
 					pwCache::setData(D_P . 'data/bbscache/hitsort_judge.php', "<?php\r\n\$hitsort_judge=" . pw_var_export($value) . ";\r\n?>");
+					touch(D_P.'data/bbscache/hitsort_judge.php');
 				}
 			}
 		}

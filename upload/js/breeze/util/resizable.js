@@ -1,4 +1,4 @@
-﻿/*
+/*
 * util.resizable 模块
 * resize支持
 */
@@ -25,7 +25,7 @@ Breeze.namespace('util.resizable', function(B) {
                cursor = this.onlyX ? 'e-resize' :(this.onlyY ? 's-resize' :'se-resize');
                B.css(this.obj,'display','block');
                B.css(this.handle,'cursor',cursor);
-               this.handle.onmousedown = this.start.bind(this);
+               B.addEvent(this.handle, 'mousedown', this.start.bind(this));
             },
             start:function(e) {
                 e = this.fixEvent(e);

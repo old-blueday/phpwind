@@ -1,8 +1,10 @@
 <?php
 !defined('P_W') && exit('Forbidden');
-require_once pwCache::getPath(D_P . 'data/bbscache/inv_config.php');
+//* require_once pwCache::getPath(D_P . 'data/bbscache/inv_config.php');
+pwCache::getData(D_P . 'data/bbscache/inv_config.php');
 require_once (R_P . 'u/lib/invite.class.php');
-require_once pwCache::getPath(D_P . 'data/bbscache/mail_config.php');
+//* require_once pwCache::getPath(D_P . 'data/bbscache/mail_config.php');
+pwCache::getData(D_P . 'data/bbscache/mail_config.php');
 S::gp(array('step'), 'GP');
 $normalUrl = "pw_ajax.php?action=friendinvite&";
 $invite = new PW_Invite();
@@ -63,6 +65,7 @@ if ($step == 'addressList') {
 	if ($emails) {
 		foreach ($emails as $key => $email) {
 			$emails[$key] = trim($email);
+			!isEmail($email) && ajaxExport('请输入正确的邮箱地址');
 			if (!$email || !isEmail($email)) {
 				unset($emails[$key]);
 			}
@@ -97,7 +100,8 @@ if ($step == 'addressList') {
 	$invite->sendInviteCode($emails);
 	ajaxExport('success');
 } elseif ($step == 'simple') {
-	require_once pwCache::getPath(D_P . 'data/bbscache/dbreg.php');
+	//* require_once pwCache::getPath(D_P . 'data/bbscache/dbreg.php');
+	extract(pwCache::getData(D_P . 'data/bbscache/dbreg.php', false));
 	$email_content = '';
 	if ($rg_allowregister == 1) {
 		$email_content .= $inv_linkcontent . "\r\n";
@@ -128,14 +132,16 @@ if ($step == 'addressList') {
 		}
 	}
 	S::gp(array('invnum'), 'GP');
-	(!is_numeric($invnum) || $invnum < 1) && $invnum = 1;
+	$invnum = (int) $invnum;
+	if ($invnum < 1) ajaxExport("购买的邀请码数量必须大于0");
+	//(!is_numeric($invnum) || $invnum < 1) && $invnum = 1;
 	if ($creditto[$inv_credit] < $invnum * $inv_costs) {
 		ajaxExport("您的积分不足以购买邀请码");
 	}
 	for ($i = 0; $i < $invnum; $i++) {
 		$invcode = randstr(16);
 		$db->update("INSERT INTO pw_invitecode" . " SET " . S::sqlSingle(array('invcode' => $invcode, 'uid' => $winduid,
-			'createtime' => $timestamp)));
+			'createtime' => $timestamp, 'type' => 1)));
 	}
 	$cutcredit = $invnum * $inv_costs;
 	$credit->addLog('hack_invcodebuy', array($inv_credit => -$cutcredit), array('uid' => $winduid,

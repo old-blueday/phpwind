@@ -111,5 +111,5 @@ if ($foruminfo['allowhtm'] == 1) {
 	$StaticPage = L::loadClass('StaticPage');
 	$StaticPage->update($tid);
 }
-empty($j_p) && $j_p = "read.php?tid=$tid";
+empty($j_p) && $j_p = "read.php?tid=$tid&displayMode=1";
 refreshto($j_p, 'operate_success');

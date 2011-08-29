@@ -2,7 +2,8 @@
 !defined('M_P') && exit('Forbidden');
 require_once(R_P.'require/credit.php');
 require_once R_P . 'require/pingfunc.php';
-require_once pwCache::getPath(D_P . 'data/bbscache/forum_cache.php');
+//* require_once pwCache::getPath(D_P . 'data/bbscache/forum_cache.php');
+pwCache::getData(D_P . 'data/bbscache/forum_cache.php');
 $credittype = $credittype ? $credittype : array();
 
 $userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
@@ -278,8 +279,6 @@ if (!$step) {
 	}
 	if ($ifmsg && $read['author']!=$windid) {
 		$messageInfo = array(
-			'create_uid' => $winduid,
-			'create_username' => $windid,
 			'title'=>getLangInfo('writemsg',$action == 'pushto' ? 'pushto_title' : 'recommend_title'),
 			'content'=>getLangInfo('writemsg',$action == 'pushto' ? 'pushto_content' : 'recommend_content',array(
 				'manager'	=> $windid,
@@ -293,12 +292,10 @@ if (!$step) {
 				'reason'	=> stripslashes($atc_content)
 			)),
 		);
-		M::sendMessage(
-			$winduid,
+		M::sendNotice(
 			array($read['author']),
 			$messageInfo,
-			'sms_ratescore',
-			'sms_rate'
+			'sms_ratescore'
 		);
 	}
 	$credit->runsql();

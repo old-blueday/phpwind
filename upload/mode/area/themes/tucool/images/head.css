@@ -1,0 +1,67 @@
+a{color:#006699;text-decoration:none;}
+a:hover{color:#ff5500;}
+.lh_22{line-height:22px;height:22px;overflow:hidden;}
+body{font-family:Verdana;color:#333;background:#fff url(bg.jpg) top center repeat-x; font-size:12px;}
+#header,#main,#footer{width:960px;margin:0 auto;}
+#main{margin-bottom:10px;}
+#top{height:23px;border-bottom:1px solid #fff;background:url(topbar.png) 0 bottom repeat-x;_background:#e9f1f4;line-height:23px;overflow:hidden;}
+.top{width:960px;margin:auto;}
+.top li{float:left;margin-right:10px;}
+.top a{color:#666;}
+/*nav*/
+#navA{height:35px;background-color:#176eac;}
+.navA,.navAL,.navAR,.navA li,.navA li a,#td_mymenu{background:url(navA.png) 999em 999em no-repeat;}
+.navAL,.navAR{width:5px;height:35px;}
+.navAL{ background-position:0 -80px;_margin-right:-3px;}
+.navAR{ background-position:0 -150px;_margin-left:-3px;}
+.navA{ background-position:0 -115px;height:35px;overflow:hidden; background-repeat:repeat-x;}
+.navA ul{font-size:14px;overflow:hidden;}
+.navA li{float:left;margin-left:-1px;}
+.navA li a{float:left;color:#ffffff;padding:0 15px;height:35px;line-height:35px;outline:none;font-weight:700; background-position:0 -35px;}
+.navA li a:hover{text-decoration:none;color:#ffea00;}
+.navA .current a,.navA .current:hover a,.navA .current a:hover{background-position:center top;display:inline;text-decoration:none;text-shadow:none;}
+#td_mymenu{ background-position:-20px -150px;color:#fff;cursor:pointer;float:right;width:92px;height:23px;overflow:hidden;line-height:23px;padding-left:10px;margin:5px 2px 0 0;_display:inline}
+#td_mymenu_old{color:#888;}
+.navB,.navBbg{background:url(navB.png) right bottom repeat-x;}
+.navB{margin-bottom:5px;}
+.navBbg{padding:3px 0;background-position:left bottom;margin-right:4px;_position:relative;}
+.navB ul{padding:4px 4px 4px 16px;}
+.navB li:hover,.navB li:hover a{background:url(navBcur.png) no-repeat;}
+.navB li:hover{ background-position:left 0;}
+.navB li:hover a{ background-position:right 0;}
+.navB li{float:left;height:23px;line-height:23px;margin:0 10px 0 0;}
+.navB li a{display:block;padding:0 5px; font-size:14px;color:#666;}
+.navB li a:hover{ text-decoration:none;color:#68b;}
+/*搜索*/
+#searchA{margin:2px 0 5px;height:41px;overflow:hidden;}
+#searchA,.searchA_right{background:url(searchA.png) no-repeat;}
+.searchA_right{ background-position:right 0;height:41px;width:5px;}
+.searchA{padding:8px 0 0 55px;}
+.searchA .ip{width:330px;float:left;border:1px solid #dddddd;background:#fff;height:20px;padding:4px 5px 0;overflow:hidden;}
+.searchA .ip input{border:0;background:none;padding:0;font:14px/16px Arial;width:100%;float:left;margin:0;}
+.s_select{float:left;border:1px solid #dddddd;border-left:0;margin-right:7px;background:#fff;width:49px;}
+.s_select h6{display:block;padding:0 15px 0 10px;height:24px;line-height:24px;cursor:pointer;background:url(../../../images/wind/down.png) 35px center no-repeat;color:#666;}
+.s_select ul{ position:absolute;border:1px solid #dddddd;background:#fff;line-height:22px;width:49px;margin:24px 0 0 -1px;display:none;}
+.s_select ul li{padding:0 10px;cursor:pointer;}
+.s_select ul li:hover{background:#f7f7f7;}
+.searchA button{color:#333;width:45px;height:25px;border:0 none;background:url(search_btn.png) no-repeat; font-size:14px; font-weight:700;line-height:25px;padding:0 0 3px 0;}
+.s_tags{padding:3px 0 0 15px; font-size:14px;height:20px;line-height:20px;overflow:hidden;margin:0;}
+#searchA .s_tags .s2{color:#ff5500 !important;}
+.searchA .gray{color:#999;}
+.s_tags a{margin:0 8px 0 0;color:#666;}
+/*bottom*/
+#footer{padding:10px 0;color:#666;}
+#footer a{color:#68b;}
+.bottom{margin:0 auto;}
+.bottom ul{ padding:0 5px 5px;margin:0; list-style:none;}
+.bottom ul li{ padding:0 10px 0 0;display:inline;}
+.bottom ul li a{white-space:nowrap;}
+/*登陆*/
+.login dd p .org{color:#ff5500;}
+.header,.top,.searchA,.login{ font-family:Arial;}
+.l_info a{color:#333;}
+/*ad结构*/
+.f_one{background:#f7fbff;}
+.fr{float:right;}
+.t{color:#666;font-size:11px; letter-spacing:-1px;border:1px solid #a6cbe7;background:#fff;}
+.h{background:#f0f9ff;line-height:25px;height:25px;padding:0 10px;border-bottom:1px solid #a6cbe7;}

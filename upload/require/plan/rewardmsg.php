@@ -1,7 +1,8 @@
 <?php
 !function_exists('readover') && exit('Forbidden');
 
-include pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
+//* include pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
+pwCache::getData(D_P.'data/bbscache/forum_cache.php');
 
 $query = $db->query("SELECT t.tid,t.fid,t.authorid,t.author,t.subject,t.postdate FROM pw_threads t LEFT JOIN pw_reward r USING(tid) WHERE t.special='3' AND t.state='0' AND r.timelimit<'$timestamp' ORDER BY t.postdate ASC LIMIT 100");
 $tids = $uiddb = array();

@@ -27,10 +27,10 @@ if (!file_exists($cachefile) || $timestamp - pwFilemtime($cachefile) > 43200) {
 	$data = PostHost($url);
 	if ($data && strpos($data, '<?xml') !== false) {
 		//* writeover($cachefile, $data);
-		pwCache::setData($cachefile, $data);
+		pwCache::writeover($cachefile, $data);
 	}
 }
 header("Content-Type: text/xml; charset=UTF-8");
-$data = readover($cachefile);
+$data = pwCache::readover($cachefile);
 echo $data;
 exit();

@@ -1,10 +1,37 @@
 <!--<?php
-if (in_array($do,array('filterweibo','lookround','refer','attention','my','conloy'))) {
+if (in_array($do,array('filterweibo','lookround','refer','attention','my','conloy','topics'))) {
 	if ($weiboList) {
 		require_once uTemplate::printEot('weibo_model');
-		foreach ($weiboList as $key => $value) {
-			$method = $weiboService->getType($value['type']);
-			$weiboModelTemplate->$method($value);
+		if($do == 'topics' && !$topic){
+			foreach ($weiboList as $topicid => $topicGroup){
+			$strTopicname = substrs($topicGroup[topic][topicname],20);
+				print <<<EOT
+-->
+			<!--一组-->
+			<div class="p10 cc" style="padding-bottom:5px;">
+				<span class="mr20 fl" style="padding-top:1px;">关于<a href="apps.php?q=weibo&do=topics&topic={$topicName}" alt="{$topicGroup[topic][topicname]}" title="{$topicGroup[topic][topicname]}">"{$strTopicname}"</a>的新鲜事</span><a href="#" class="sk_followTopic">关注该话题</a><span class="fl mr10" style="padding-top:3px;display:none;">已关注成功（<a href="#">取消关注</a>）</span><a href="javascript:void(0);" onclick="postTopic('{$topicGroup[topic][topicname]}');return false;" class="sk_participate">参与该话题</a>
+			</div>
+			<div class="bdA"></div>
+			<div class="p10 mb20" style="padding-top:5px;">
+<!-- 
+EOT;
+if($topicGroup['weibo']){
+	foreach($topicGroup['weibo'] as $key => $value){
+					$method = $weiboService->getType($value['type']);
+					$weiboModelTemplate->$method($value);
+	}
+}
+print <<<EOT
+-->
+			</div>
+<!--
+EOT;
+			}
+		}else{
+			foreach ($weiboList as $key => $value) {
+				$method = $weiboService->getType($value['type']);
+				$weiboModelTemplate->$method($value);
+			}
 		}
 		if ($count > $perpage) {print <<<EOT
 -->
@@ -174,7 +201,7 @@ if (!$blackList) {print <<<EOT
 EOT;
 }print <<<EOT
 -->
-			<div id="counter_{$id}">你还可以输入<em>255</em>个字符</div>
+			<div id="counter_{$id}" style="padding-top:2px;"><em>0/255</em></div>
 		</div>
 <!-- 
 EOT;
@@ -184,11 +211,24 @@ if($defaultString == $dString){
 	<script>
 		var atc_content = getObj('atc_content');
 		var defaultString = '$defaultString';
-		atc_content.style.color = 'gray';
+		var color = 'gray';
+		atc_content.style.color = color;
+		atc_content.onfocus = function() {
+			if(this.value === defaultString) {
+				this.value = '';this.style.color='';
+			}
+		}
+		atc_content.onblur = function(){
+			if(this.value === '') {
+		//		this.value = defaultString;
+				this.style.color = color;
+			}
+		}
 		atc_content.onclick = function(){
 			if(atc_content.innerHTML == defaultString)
 			atc_content.innerHTML = '';
 		}
+
 	</script>
 <!--
 EOT;
@@ -197,7 +237,7 @@ print <<<EOT
 -->
   </div>
 	<div class="popBottom"><span class="btn2"><span>
-    <button type="button" name="ajaxsubmit" onclick="transmitWeiboSubmitForm(this.form,'1','{$weibo['uid']}');">提 交</button>
+    <button type="button" name="ajaxsubmit" onclick="transmitWeiboSubmitForm(this.form,'1','{$weibo['uid']}','$istopic','$topicname');">转发</button>
 </span></span><span class="bt2"><span><button type="button" onclick="closep();">取消</button></span></span></div>
 </div>
 </form>
@@ -238,7 +278,7 @@ EOT;
 }
 print <<<EOT
 -->						
-					<span class="fr mr5 gray" id="counter_{$id}">你还可以输入<em>255</em>个字节</span>
+					<span class="fr mr5 gray" id="counter_{$id}"><em>0/255</em></span>
 				</p>
 			</dd>
 		</dl>
@@ -307,4 +347,52 @@ EOT;
 </div>
 <!--
 EOT;
-}?>-->
+} elseif ($do == 'page') {
+	//ajax分页
+	if($type == 'attentionedtopics'){
+	if($prepage || $nextpage){
+	$prepage && $prepage = '<a href="apps.php?q=weibo&do=page&type=attentionedtopics&ajax=1&page='.$prepage.'" onclick="return ajaxPage(this.href,\'attentionedList\');" class="fr s6 mr5">上一页</a>';
+	$nextpage && $nextpage = '<a href="apps.php?q=weibo&do=page&type=attentionedtopics&ajax=1&page='.$nextpage.'" onclick="return ajaxPage(this.href,\'attentionedList\');" class="fr s6">下一页</a>';
+	print <<<EOT
+-->
+				<li class="huati_next">$nextpage$prepage</li>
+<!--
+EOT;
+}
+		foreach ($attentionedTopics as $v) {
+		$strTopicname = substrs($v[topicname],20);
+print <<<EOT
+-->
+
+				<li><a href="apps.php?q=weibo&do=topics&topic={$v[topicname]}" alt="{$v[topicname]}" title="{$v[topicname]}">$strTopicname</a></li>
+<!--
+EOT;
+}
+	}
+} elseif ($do == 'posttopic') {
+$topicCutted = substrs($topic,20);
+print <<<EOT
+-->
+<form name="posttopicform" id="posttopicform" action="apps.php?q=weibo&do=post&ajax=1" onSubmit="return false;" method="post">
+<input type="hidden" name="step" value="3" />
+<div style="width:365px">
+	<div class="popTop" onmousedown="read.move(event);" style="cursor:move"><span class="adel cp" onclick="closep();">关闭</span>参与“{$topicCutted}”话题</div>
+	<div class="p10">
+		<textarea id="atc_content" name="atc_content" class="textareaA mb5" onkeyup="wordlength(this, 255, 'counter_posttopic')" onkeydown = "ctrlEnter(event,getObj('posttopicform'),posttopicWeiboSubmitForm)">#$topic#</textarea>
+		<div class="cc">
+			<span onclick="showcommentsmile(this, 'atc_content', 'counter_posttopic')" class="sk_show cp" id="showSmile">表情</span>
+			<div id="counter_posttopic" style="padding-top:2px;"><em>0/255</em></div>
+		</div>
+  </div>
+	<div class="popBottom"><span class="btn2"><span>
+    <button name="ajaxsubmit" id="weibo_submit" onclick="posttopicWeiboSubmitForm(this.form,'1','{$weibo['uid']}');">发表</button>
+</span></span><span class="bt2"><span><button type="button" onclick="closep();">取消</button></span></span></div>
+</div>
+</form>
+<script type="text/javascript">
+setTimeout(function(){wordlength(getObj( 'atc_content') , 255 , 'counter_posttopic' );}, 300);
+</script>
+<!--
+EOT;
+}
+?>-->

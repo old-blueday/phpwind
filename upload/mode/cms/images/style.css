@@ -31,6 +31,7 @@
 .cmsBoxA h1.f24{margin:20px 0 10px;color:#333;padding:0;}
 .cmsBoxB{padding:0 1px;}
 .cmsBoxB h2{line-height:30px;height:31px;padding:0 10px 0 25px;background:#ffffff url(cmsBoxB.png) 0 bottom; font-size:14px; font-weight:700;display:block;margin:0;}
+.cmsBoxB .fr{ font-size:12px; font-weight:100;}
 .cmsBoxC{border:1px solid #d3dbe6;padding:1px;background:url(cmsBoxA.png) 0 1px repeat-x;}
 .cmsBoxC_bg{}
 .cmsBoxC h2{font-size:14px;padding:13px 20px 5px;line-height:font-weight:700;display:block;}

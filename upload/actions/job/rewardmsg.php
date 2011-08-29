@@ -9,8 +9,8 @@ if (empty($rt) || $rt['timelimit'] > $timestamp || $rt['special'] != 3 || $rt['s
 }
 $rt['authorid'] != $winduid && Showmsg('reward_noright');
 !$rt['forumadmin'] && Showmsg('reward_no_forumadmin');
-include_once pwCache::getPath(D_P . 'data/bbscache/forum_cache.php');
-
+//* include_once pwCache::getPath(D_P . 'data/bbscache/forum_cache.php');
+pwCache::getData(D_P . 'data/bbscache/forum_cache.php');
 $admin_db = explode(',', substr($rt['forumadmin'], 1, -1));
 
 M::sendRequest(

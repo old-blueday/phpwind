@@ -21,15 +21,15 @@ if (!$action) {
 			$sourcetype = $sourceid = null;
 		}
 		$articleModule = $articleService->getArticleModuleFromSource($sourcetype, $sourceid);
-		$content = $articleModule->content;
+		$atc_content = $articleModule->content;
 		$articleModule->setColumnId($cid);
 
-		list($filetype, $filetypeinfo) = initFileTypeInfo($db_uploadfiletype);
+		list($attachAllow, $imageAllow) = initFileTypeInfo($db_uploadfiletype);
 		require_once (M_P . 'require/header.php');
 	} else {
 		S::gp(array('cms_subject', 'atc_content', 'cms_descrip'), 'P', 0);
 		S::gp(array('cms_sourcetype', 'cms_sourceid', 'cid', 'cms_jumpurl', 'cms_author', 'cms_frominfo',
-			'cms_fromurl', 'cms_relate', 'addnewpage', 'cms_timelimit'));
+			'cms_fromurl', 'cms_relate', 'addnewpage', 'cms_timelimit', 'flashatt'));
 		$cms_timelimit = ($cms_timelimit && (isGM($windid) || checkEditPurview($windid))) ? PwStrtoTime($cms_timelimit) : $timestamp;
 		$cms_jumpurl = ($cms_jumpurl && (isGM($windid) || checkEditPurview($windid))) ? $cms_jumpurl : '';
 		
@@ -60,7 +60,8 @@ if (!$action) {
 		$articleModule->setSourceType($cms_sourcetype);
 		$articleModule->setSourceId($cms_sourceid);
 		$articleModule->setRelate($cms_relate);
-		$articleModule->setAttach();
+		$articleModule->showError();//解决因错误导致附件丢失问题
+		$articleModule->setAttach($flashatt);
 		$articleModule->showError();
 
 		$result = $articleService->addArticle($articleModule);
@@ -103,17 +104,17 @@ if (!$action) {
 		$attach = initAttach($articleModule->attach);
 		$postdate = get_date($articleModule->postDate);
 
-		$content = $articleModule->getPageContent($page);
+		$atc_content = $articleModule->getPageContent($page);
 		$articleModule->showError();
 
 		$pages = $articleModule->getPages($page, CMS_BASEURL.'q=post&action=edit&id=' . $id . '&');
 
-		list($filetype, $filetypeinfo) = initFileTypeInfo($db_uploadfiletype);
+		list($attachAllow, $imageAllow) = initFileTypeInfo($db_uploadfiletype);
 		require_once (M_P . 'require/header.php');
 	} else {
 		S::gp(array('cms_subject', 'atc_content', 'cms_descrip'), 'P', 0);
 		S::gp(array('cms_sourcetype', 'cms_sourceid', 'cid', 'cms_jumpurl', 'cms_author', 'cms_frominfo',
-			'cms_fromurl', 'cms_relate', 'keep', 'oldatt_desc', 'addnewpage', 'cms_timelimit'));
+			'cms_fromurl', 'cms_relate', 'flashatt', 'oldatt_desc', 'addnewpage', 'cms_timelimit'));
 		$cms_timelimit = ($cms_timelimit && (isGM($windid) || checkEditPurview($windid))) ? PwStrtoTime($cms_timelimit) : $timestamp;
 		$cms_jumpurl = ($cms_jumpurl && (isGM($windid) || checkEditPurview($windid))) ? $cms_jumpurl : '';
 		PostCheck();
@@ -132,7 +133,8 @@ if (!$action) {
 		$articleModule->setRelate($cms_relate);
 		$articleModule->setSourceType($cms_sourcetype);
 		$articleModule->setSourceId($cms_sourceid);
-		$articleModule->setAttach($oldatt_desc, $keep);
+		$articleModule->showError();//解决因错误导致附件丢失问题
+		$articleModule->setAttach($flashatt, $oldatt_desc);
 		$articleModule->showError();
 
 		$result = $articleService->updateArticle($articleModule);
@@ -159,27 +161,21 @@ if (!$action) {
 		Showmsg('删除分页失败');
 	}
 }
-
 require cmsTemplate::printEot('post');
 footer();
 
 function initFileTypeInfo($db_uploadfiletype) {
-	$uploadfiletype = ($db_uploadfiletype) ? unserialize($db_uploadfiletype) : '';
-	$filetypeinfo = $filetype = '';
-	if ($uploadfiletype) {
-		foreach ($uploadfiletype as $type => $size) {
-			$filetype .= ' ' . $type . ' ';
-			$filetypeinfo .= $type . ":" . $size . "KB; ";
-		}
-	}
-	return array($filetype, $filetypeinfo);
+	$uploadfiletype = ($db_uploadfiletype) ? unserialize($db_uploadfiletype) : array();
+	$attachAllow = pwJsonEncode($uploadfiletype);
+	$imageAllow = pwJsonEncode(getAllowKeysFromArray($uploadfiletype, array('jpg','jpeg','gif','png','bmp')));
+	return array($attachAllow, $imageAllow);
 }
 
 function initAttach($attachs) {
 	$attach = '';
 	if ($attachs) {
 		foreach ($attachs as $key => $value) {
-			$attach .= "'$key' : ['$value[name]', '$value[size]', '$value[attachurl]', '$value[type]', '', '', '', '$value[descrip]'],";
+			$attach .= "'$key' : ['$value[name]', '$value[size]', '$value[attachurl]', '$value[type]', '0', '0', '', '$value[descrip]'],";
 		}
 		$attach = rtrim($attach, ',');
 	}

@@ -21,6 +21,7 @@ class PW_SubjectSource extends SystemData {
 					'newsubject'	=>'最新主题',
 					'newreply'		=>'最新回复',
 					'digestsubject'	=>'精华主题',
+					'topsubject'	=>'置顶主题',
 					'highlightsubject'	=>'加亮主题',
 					'replysortday'	=>'今日回复',
 					'replysortweek'	=>'近期回复',
@@ -46,6 +47,8 @@ class PW_SubjectSource extends SystemData {
 				return $element->newReply($fid,$num);
 			case 'digestsubject':
 				return $element->digestSubject($fid,$num);
+			case 'topsubject':
+				return $element->areaTopSubject($fid,$num);
 			case 'replysort':
 				return $element->replySort($fid,$num);
 			case 'hitsort':

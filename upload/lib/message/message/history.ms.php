@@ -53,6 +53,6 @@ class MS_History extends MS_Base {
 			return false;
 		}
 		$relationsDao = $this->getRelationsDao();
-		return $relationsDao->updateRelationsBySegmentTime(array('categoryid'=>$this->_history),$timeSegment);
+		return $relationsDao->updateRelationsBySegmentTime(array('categoryid'=>$this->getMap($this->_history)),$timeSegment);
 	}
 }

@@ -13,6 +13,7 @@ $purview = array(
 	'reg' => array('注册控制', "$admin_file?adminjob=settings&admintype=reg"),
 	'invite' => array('邀请注册', "$admin_file?adminjob=friend&admintype=invite"),
 	'propagateset' => array('宣传控制', "$admin_file?adminjob=friend&admintype=propagateset"),
+
 	'member' => array('会员相关', "$admin_file?adminjob=member"),
 	'editer' => array('编辑器', "$admin_file?adminjob=editer"),
 //	'pcache' => array('页面缓存', "$admin_file?adminjob=settings&admintype=pcache"),
@@ -37,7 +38,9 @@ $purview = array(
 	'recycle' => array('回收站', "$admin_file?adminjob=recycle"),
 	'draftset' => array('草稿箱', "$admin_file?adminjob=draftset"),
 	'tpccheck' => array('帖子审核', "$admin_file?adminjob=tpccheck"),
-	'report' => array('举报管理 ', "$admin_file?adminjob=report"),//注意后面的空格
+	'report' => array('举报管理', "$admin_file?adminjob=report"),//注意后面的空格
+	'reportcontent' => array('举报管理', "$admin_file?adminjob=report&adminitem=content"),
+	'reportremind' => array('举报提醒', "$admin_file?adminjob=report&adminitem=remind"),
 	'tagset' => array('标签管理', "$admin_file?adminjob=tagset"),
 	//'pwcode' => array('自定义代码格式', "$admin_file?adminjob=pwcode"),
 	//'setform' => array('预设帖子格式', "$admin_file?adminjob=setform"),
@@ -68,6 +71,7 @@ $purview = array(
 	//'adminlog' => array('后台管理日志', "$admin_file?adminjob=record&admintype=adminlog"),
 	//'forumlog' => array('前台管理日志', "$admin_file?adminjob=forumlog"),
 	'creditlog' => array('积分统计', "$admin_file?adminjob=creditlog"),
+	'tucool'=>array('图酷数据',"$admin_file?adminjob=tucool"),
 	//'adminrecord' => array('后台操作记录', "$admin_file?adminjob=adminrecord"),
 	/*'bakup' => array('数据维护', "$admin_file?adminjob=bakup"), 
 	'ptable' => array('数据库分卷', "$admin_file?adminjob=ptable"),*/
@@ -92,6 +96,7 @@ $purview = array(
 	'interfacesettings' => array('界面设置',"$admin_file?adminjob=interfacesettings"),
 	'rebang' => array('内容推送', "$admin_file?adminjob=rebang"),
 	'plantodo' => array('计划任务', "$admin_file?adminjob=plantodo"),
+	'team' => array('团队考核', "$admin_file?adminjob=team"),
 	'modeset' => array('模式设置', "$admin_file?adminjob=modeset"),
 	//'area_pushdata'	=> array('内容推送',"$admin_file?adminjob=mode&admintype=area_pushdata"),
 	//'cms_article' => array('内容管理',"$admin_file?adminjob=mode&admintype=cms_article"),	
@@ -105,7 +110,7 @@ $purview = array(
 	//'area_configarea'	=> array('门户页面静态化',"$admin_file?adminjob=mode&admintype=area_configarea"),
 	'area_module'	=> array('模块管理',"$admin_file?adminjob=mode&admintype=area_module"),
 	*/
-
+	'o_tags' => array('个人标签管理', "$admin_file?adminjob=mode&admintype=o_tags"),
 	'o_global' => array('个人中心设置', "$admin_file?adminjob=mode&admintype=o_global"),
 	'o_commend' => array('内容推送',"$admin_file?adminjob=mode&admintype=o_commend"),
 	'o_skin' => array('风格设置', "$admin_file?adminjob=mode&admintype=o_skin"),
@@ -130,10 +135,11 @@ $purview = array(
 	'o_comments' => array('评论管理', "$admin_file?adminjob=mode&admintype=o_comments"),
 	'taolianjie' => array('淘链接',"$admin_file?adminjob=app&admintype=taolianjie"),
 	'sinaweibo' => array('新浪微博',"$admin_file?adminjob=app&admintype=sinaweibo"),
-	'yunstatistics' => array('云统计<i class="beta">&nbsp;</i>',"$admin_file?adminjob=yunstatistics"),
+	'authentication' => array('实名认证',"$admin_file?adminjob=authentication"),
+	'yunstatistics' => array('云统计<i class="beta">&nbsp;</i>',"$admin_file?adminjob=app&admintype=yunstatistics"),
 	//'appslist' => array('基本设置', "$admin_file?adminjob=app&admintype=appslist"),
-	'appset' => array('应用设置', "$admin_file?adminjob=app&admintype=appset"),
-	'onlineapp' => array('小应用', "$admin_file?adminjob=app&admintype=onlineapp"),
+	'appset' => array('应用首页', "$admin_file?adminjob=app&admintype=appset"),
+	'onlineapp' => array('会员应用', "$admin_file?adminjob=app&admintype=onlineapp"),
 	'i9p' => array('随拍随发', "$admin_file?adminjob=app&admintype=i9p"),
 	'blooming' => array('帖子交换', "$admin_file?adminjob=app&admintype=blooming"),
 	'job' => array('任务中心', "$admin_file?adminjob=job"),
@@ -157,7 +163,7 @@ $purview = array(
 );
 
 //模式菜单加载
-include D_P . 'data/bbscache/config.php';
+extract(pwCache::getData( D_P . 'data/bbscache/config.php' , false));
 if ($db_modes) {
 	foreach ($db_modes as $key => $value) {
 		if ($value['ifopen'] && file_exists(R_P . 'mode/' . $key . '/config/cp_lang_purview.php')) {

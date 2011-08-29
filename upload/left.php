@@ -1,6 +1,7 @@
 <?php
 require_once('global.php');
-include_once pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
+//* include_once pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
+pwCache::getData(D_P.'data/bbscache/forum_cache.php');
 extract(L::style());
 
 $db_metakeyword = $metaKeywords;

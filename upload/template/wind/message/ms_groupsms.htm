@@ -10,10 +10,9 @@ print <<<EOT
 EOT;
 if($action == 'info' || $action == 'up' || $action == 'down'){print <<<EOT
 -->
-<div class="mb10"><span class="fr"> 
-<a href="javascript:;" onclick="getpage('up')">上一条</a>&nbsp;&nbsp;|&nbsp;&nbsp;
-<a href="javascript:;" onclick="getpage('down')">下一条</a></span>
-<a href="$normalUrl&page=$page">&lt;&lt;返回</a>
+<div class="mb10">
+<a href="$normalUrl&page=$page" class="mr20">&lt;&lt;返回</a>
+<a href="javascript:;" onclick="getpage('up')">上一条</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="javascript:;" onclick="getpage('down')">下一条</a>
 </div>
 <div id="showmessageTip"></div>
 <script>
@@ -29,7 +28,10 @@ function getpage(act){
 	});
 	return false;
 }
+var db_bbsurl = '$db_bbsurl';
+var db_urlcheck = '$db_urlcheck';
 </script>
+<script type="text/javascript" src="js/pw_lwd.js"></script>
 <!--
 EOT;
 if($message['typeid'] != $messageServer->getConst('groupsms_colony')){
@@ -55,11 +57,11 @@ function getSmsList(rType){
 <span class="mr5"><label><input name="" type="checkbox" value="" onclick="MC.CheckAll(this.form,this)">&nbsp;全选</label></span>
 <span class="bt2"><span><button onclick="MC.mSubmit(this.form,'markgroup','groupsms','$action','$page','showmessageTip')" type="button">标记已读</button></span></span>
 <span class="bt2"><span><button onclick="MC.mSubmit(document.FORM,'del','groupsms','$action','$page','showmessageTip')"  type="button">删除</button></span></span>
-<span style="margin:0 6px;">筛选：<select onchange="getSmsList(this.value)">
+<span style="margin:0 6px;">筛选：<span class="dropdown"><select onchange="getSmsList(this.value)" id="alltype">
 	<option value="all" $selected_all>全部</option>
 	<option value="self" $selected_self>我发起的群消息</option>
 	<option value="other" $selected_other>我收到的群消息</option>
-</select></span>
+</select></span></span>
 </div>
 <div id="showmessageTip"></div>
 <table width="100%" class="mb10 z2">
@@ -80,8 +82,11 @@ print <<<EOT
 EOT;
 }foreach($groupsmsList as $key => $value){
 $value[modified_time] = get_date($value[modified_time]);
-$_name = $value[typeid] == $messageServer->getConst('groupsms_colony') ? $value['cname'] : $value['create_username'];
-$_url = $value[typeid] == $messageServer->getConst('groupsms_colony') ? "apps.php?q=group&cyid={$value['colonyid']}" : "{$db_userurl}{$value['uid']}";
+sort($value['extra']);
+$isColony = ($value[typeid] == $messageServer->getConst('groupsms_colony')) ? true : false;
+$_name =  $isColony ? $value['cname'] : ($value['create_uid'] != $winduid ? $value['create_username'] : $value['extra'][0]);
+$_url = $isColony ? "apps.php?q=group&cyid={$value['colonyid']}" : ($value['create_uid'] != $winduid ? "u.php?uid={$value['create_uid']}" : "u.php?username={$value['extra'][0]}");
+$_tips = $isColony ? '' : ($value['create_uid'] != $winduid ? '' : ' 等');
 $_icon = $value[typeid] == $messageServer->getConst('groupsms_colony') ? $value['cnimg'] : $value['face'];
 list($_img,$_b,$_tip) = getMessageIconByStatus($value);
 if(in_array($value['colonyid'],$groups) || ($value['typeid'] == $messageServer->getConst('groupsms_shield'))){
@@ -90,32 +95,38 @@ if(in_array($value['colonyid'],$groups) || ($value['typeid'] == $messageServer->
 $_col = getSubListHtml($value);
 $value['content'] = strip_tags($value['content']);
 $_title = getMessageIconTips($value);
-$_sendtype = $winduid == $value['create_uid'] ? '发送给' : '来自于';
+$_sendtype = $winduid == $value['create_uid'] ? '群发给' : '来自于';
 print <<<EOT
 -->
 	{$_col}
 	<tr class="tr3">
 		<td class="pick"><input name="rids" type="checkbox" value="{$value[rid]}"></td>
 		<td class="icon"><img src="u/images/message/{$_img}" title="{$_title}"/></td>
-		<td class="face"><a href="{$_url}" class="img_30"><img
-			src="{$_icon}" width="30" height="30" /></a></td>
+<!--
+EOT;
+if (!$isColony || ($isColony && $value['cname'])) {
+print <<<EOT
+-->
+		<td class="face">
+			<a href="{$_url}" class="img_30"><img src="{$_icon}" width="30" height="30" /></a>
+		</td>
 		<td class="name">
-		<p>{$_sendtype}:
+		<p>{$_sendtype}:<a href="$_url">$_name</a> {$_tips}</p>
 <!--
 EOT;
-if($winduid == $value['create_uid']) {print<<<EOT
+} elseif ($isColony && !$value['cname']) {
+print <<<EOT
 -->
-				 <a href="{$db_userurl}{$value[extra][0]}">{$value[extra][0]}</a>
+		<td class="face">
+			<img src="images/g/groupnopic.gif" width="30" height="30" />
+		</td>
+		<td class="name">
+		<p>{$_sendtype}:该群组已删除</p>
 <!--
 EOT;
-}else{print<<<EOT
+}
+print <<<EOT
 -->
-				<a href="{$db_userurl}{$value[uid]}">{$value[create_username]}</a>
-<!--
-EOT;
-}print<<<EOT
--->
-				 </p>
 		<em><span title="$value[modified_time]">{$value[modified_time_format]}</span></em>
 		</td>
 		<td class="value">
@@ -184,6 +195,13 @@ EOT;
 </div>
 </td></tr></table>
 </div>
+<script type="text/javascript" src="js/select.js"></script>
+<script type="text/javascript">
+var ld=window.onload;
+window.onReady(function(){
+	new sSelect(getObj('alltype'));
+});
+</script>
 <!--
 EOT;
 if(!defined('AJAX')){

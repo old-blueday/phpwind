@@ -1,4 +1,4 @@
-﻿/*
+/*
 * ajaxForm 模块
 * 使form提交变成无刷新式的
 */
@@ -20,19 +20,37 @@ Breeze.namespace('util.ajaxForm', function (B) {
             } else if (frame.contentWindow) {
                 var d = frame.contentWindow.document;
             }
-            this.callback(d.body.innerHTML);
+			var data = (typeof d.documentElement != 'undefined') ?
+					d.documentElement.textContent :
+					d.body.innerHTML;
+            this.callback(data);
         },
         _initialize: function () {
             var self = this, form = self.form, callback = self.callback,
                     n = new Date().getTime(),
-		            d = document.createElement('div');
-            d.innerHTML = '<iframe style="display:none" src="about:blank" id="' + n + '" name="' + n + '"></iframe>';
+					f = B.createElement('<iframe style="display:none" src="javascript:void(0);" id="' + n + '" name="' + n + '"></iframe>');
+
+			if (f.attachEvent){
+				f.onreadystatechange = function () {
+                    if ( f.readyState == "complete" &&  f.src != 'javascript:void(0);' ) {
+						self._load(f);
+                    }
+                }
+			} else {
+				f.onload = function (){
+                    self._load(f);
+                }
+			}
+			document.body.appendChild(f);
+/*		            d = document.createElement('div');
+            d.innerHTML = 
             document.body.appendChild(d);
             var frame = document.getElementById(n);
-            if (frame.attachEvent) {
+			if (frame.attachEvent) {
                 frame.onreadystatechange = function () {
                     if (frame.readyState == "complete") {
-                        self._load(frame);
+						if(frame.src != 'javascript:void(0);' )
+							self._load(frame);
                     }
                 }
             } else {
@@ -40,6 +58,7 @@ Breeze.namespace('util.ajaxForm', function (B) {
                     self._load(frame);
                 }
             }
+*/
             form.setAttribute('target', n);
             form.method = 'post';
         }

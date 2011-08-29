@@ -73,7 +73,7 @@ class AdvUpload extends uploadBehavior{
 	 * @return bool
 	 */
 	function update($uploaddb) {
-		return true;
+		return $uploaddb;
 	}
 	
 	/**

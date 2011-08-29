@@ -1,0 +1,180 @@
+<!--<?php
+!defined('P_W') && exit('Forbidden');
+L::loadClass('CustomerFieldTemplate', 'user',false);
+
+class customerFieldRegisterTemplate extends PW_CustomerFieldTemplate {
+	
+	function customerFieldRegisterTemplate(){
+		parent::PW_CustomerFieldTemplate();
+	}
+	
+	function formatRequriedHtml(){
+		$this->requriedHtml = $this->fieldInfo['required'] ? '<span class="s1">*</span>' : '';
+	}
+	function formatDescripHtml(){
+		$this->descripHtml = '';
+	}
+
+	function getTemplateInput(){
+		return <<<EOT
+-->
+		<dl class="cc">
+			<dt>{$this->fieldInfo['title']}{$this->requriedHtml}</dt>
+			<dd class="ip"><div><input type="text" maxlength="{$this->fieldInfo['maxlen']}" name="{$this->fieldInfo['fieldname']}" class="input" id="{$this->fieldInfo['fieldname']}" value="{$this->defaultValueHtml}"></div></dd>
+			<dd class="tp"><div id="{$this->fieldInfo['fieldname']}_info"></div></dd>
+		</dl>
+<!--
+EOT;
+	}
+
+	
+	function getTemplateTextarea(){
+		return <<<EOT
+-->
+		<dl class="cc" style="padding-bottom:10px;">
+			<dt>{$this->fieldInfo['title']}{$this->requriedHtml}</dt>
+			<dd class="ip"><div><textarea name="{$this->fieldInfo['fieldname']}" class="input" id="{$this->fieldInfo['fieldname']}">{$this->defaultValueHtml}</textarea></div></dd>
+			<dd class="tp"><div id="{$this->fieldInfo['fieldname']}_info"></div></dd>
+		</dl>
+<!--
+EOT;
+	}
+	
+	function getTemplateSelect(){	
+		return  <<<EOT
+-->
+			<dl class="cc">
+				<dt>{$this->fieldInfo['title']}{$this->requriedHtml}</dt>
+				<dd class="ip">
+					{$this->fieldInfo['html_select']}
+				</dd>
+				<dd class="tp"><div id="{$this->fieldInfo['fieldname']}_info"></div></dd>
+			</dl>
+<!--
+EOT;
+	}
+
+	function getTemplateRadio(){
+		return <<<EOT
+-->
+			<dl class="cc">
+				<dt>{$this->fieldInfo['title']}{$this->requriedHtml}</dt>
+				<dd class="ip">
+					{$this->fieldInfo['html_radio']}
+				</dd>
+				<dd class="tp"><div id="{$this->fieldInfo['fieldname']}_info"></div></dd>
+			</dl>
+<!--
+EOT;
+	}
+	
+	function getTemplateCheckbox(){
+		return <<<EOT
+-->
+			<dl class="cc">
+				<dt>{$this->fieldInfo['title']}{$this->requriedHtml}</dt>
+				<dd class="ip">
+					{$this->fieldInfo['html_checkbox']}
+				</dd>
+				<dd class="tp"><div id="{$this->fieldInfo['fieldname']}_info"></div></dd>
+			</dl>
+<!--
+EOT;
+	}
+	
+	function getTemplateYear(){
+		return <<<EOT
+-->
+			<dl class="cc">
+				<dt>{$this->fieldInfo['title']}{$this->requriedHtml}</dt>
+				<dd class="ip">
+					{$this->fieldInfo['html_year']}
+				</dd>
+				<dd class="tp"><div id="{$this->fieldInfo['fieldname']}_info"></div></dd>
+			</dl>
+<!--
+EOT;
+	}
+	function getTemplateArea(){	
+		return <<<EOT
+-->
+			{$this->fieldInfo['html_areascripts']}
+			<dl class="cc">
+				<dt>{$this->fieldInfo['title']}{$this->requriedHtml}</dt>
+				<dd class="if">
+					{$this->fieldInfo['html_areaprovince']}
+					{$this->fieldInfo['html_areacity']}
+					{$this->fieldInfo['html_areaarea']}
+				</dd>
+				<dd class="tp"><div id="area_{$this->fieldInfo['fieldname']}_info"></div></dd>
+			</dl>
+<!--
+EOT;
+	}
+
+	function getTemplateEducation(){
+		return <<<EOT
+-->
+			<div class="regAdd_mode" id="eduBox">
+				{$this->fieldInfo['html_eduscripts']}
+				<a href="javascript://" class="fr mr20 s4 pr" onclick="addEducation('eduItem','eduBox');">增加一个新经历</a>
+				{$this->defaultValueHtml}
+				<div id="eduItem" class="regAdd_mode_div">
+					<!--DEFAULT_VALUE_TEMPLATE-->
+					<dl class="cc">
+						<dt>教育程度：{$this->requriedHtml}</dt>
+						<dd class="if">
+							{$this->fieldInfo['html_edulevel']}
+						</dd>
+					</dl>
+					<dl class="cc">
+						<dt>学校名称：{$this->requriedHtml}</dt>
+						<dd class="ip"><div>{$this->fieldInfo['html_eduname']}</div></dd>
+						<dd class="tp">{$this->fieldInfo['html_eduname_info']}</dd>
+					</dl>
+					<dl class="cc">
+						<dt>入学年份：{$this->requriedHtml}</dt>
+						<dd class="if">
+							{$this->fieldInfo['html_eduyear']}
+						</dd>
+					</dl>
+					<!--END_DEFAULT_VALUE_TEMPLATE-->
+				</div>
+			</div>
+<!--
+EOT;
+	}
+		
+	function getTemplateCareer(){
+		return <<<EOT
+-->
+			<div class="regAdd_mode" id="careerBox">
+				{$this->fieldInfo['html_careerscripts']}
+				<a href="javascript://" class="fr mr20 s4 pr" onclick="addCareer('careerItem','careerBox');">增加一个新经历</a>
+				{$this->defaultValueHtml}
+				<div id="careerItem" class="regAdd_mode_div">
+				<!--DEFAULT_VALUE_TEMPLATE-->
+				<dl class="cc">
+					<dt>公司名称：{$this->requriedHtml}</dt>
+					<dd class="ip"><div>{$this->fieldInfo['html_careername']}</div></dd>
+					<dd class="tp">{$this->fieldInfo['html_companyname_info']}</dd>
+				</dl>
+				<dl class="cc">
+					<dt>入职时间：{$this->requriedHtml}</dt>
+					<dd class="if">
+						{$this->fieldInfo['html_careerdate']}
+					</dd>
+				</dl>
+				<!--END_DEFAULT_VALUE_TEMPLATE-->
+				</div>
+			</div>
+<!--
+EOT;
+	}
+	/*
+	function getTemplateOicq(){
+		
+	}
+	*/
+}
+?>-->

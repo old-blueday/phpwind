@@ -26,7 +26,7 @@ var orderThreadsClass = {
 	orderThreads : function(orderway){
 		var orderway = orderway || 'lastpost';
 		var form = document.createElement("form");
-		form.action = "{$pageUrl}&page=$page#tabA";
+		form.action = "{$pageUrl}{$urlall}{$viewbbs}&page=$page#tabA";
 		form.method = "post";
 		var h_type = this.createInput("hidden","type","$type");
 		var h_search = this.createInput("hidden","search","1000");
@@ -56,7 +56,7 @@ function orderThreads(orderway){
 	orderThreadsClass.orderThreads(orderway);
 }
 </script>
-            <span class="mr20">排序：<a href="javascript:;" title="按发表时间排序" onclick="orderThreads('postdate');">最新发帖{$orderClass[postdate]}</a>&nbsp;|&nbsp;<a href="javascript:;" title="按最后回复时间排序" onclick="orderThreads('lastpost');">最后回复{$orderClass[lastpost]}</a></span></td>
+            <span class="mr20">排序：<a href="javascript:;" title="按发表时间排序" onclick="orderThreads('postdate');" id="thread_sort_postdate" {$orderClass[postdate]}><span>最新发帖</span></a>&nbsp;|&nbsp;<a href="javascript:;" title="按最后回复时间排序" onclick="orderThreads('lastpost');" id="thread_sort_lastpost" {$orderClass[lastpost]}><span>最后回复</span></a></span></td>
             <td class="author">作者</td>
             <td width="60">回复</td>
             <td class="author">最后发表</td>
@@ -146,11 +146,12 @@ EOT;
 EOT;
 }else{print <<<EOT
 -->
-	<a title="$tooltip" href="$thread[tpcurl]" target="_blank">$thread[status]</a></td>		
+	<a title="$tooltip" href="$thread[tpcurl]" target="_blank">$thread[status]</a>	
 <!--
 EOT;
 }print <<<EOT
 -->
+			</td>
             <td class="subject" id="td_$thread[tid]">
 <!--
 EOT;
@@ -164,7 +165,7 @@ if($thread[topped] == 0){
 if(isset($postTopic->topicmodeldb[$thread[modelid]])){
 print<<<EOT
 -->
-			<a href="thread.php?fid=$fid&modelid=$thread[modelid]"  class="s2 f14">{$postTopic->topicmodeldb[$thread[modelid]][name]}</a>
+			<a href="thread.php?fid=$fid&modelid=$thread[modelid]"  class="s4 f14">[{$postTopic->topicmodeldb[$thread[modelid]][name]}]</a>
 <!--
 EOT;
 }}}print<<<EOT
@@ -178,7 +179,7 @@ $thread[pcid] = $thread[special]-20;
 if(isset($postCate->postcatedb[$thread[pcid]])){
 print<<<EOT
 -->
-	<a href="thread.php?fid=$fid&pcid=$thread[pcid]" class="s2 f14">{$postCate->postcatedb[$thread[pcid]][name]}</a>
+	<a href="thread.php?fid=$fid&pcid=$thread[pcid]" class="f14 s4">[{$postCate->postcatedb[$thread[pcid]][name]}]</a>
 <!--
 EOT;
 }}}if($thread[toolinfo]){print <<<EOT
@@ -193,17 +194,21 @@ EOT;
 EOT;
 if($forumset['addtpctype'] && $t_db[$thread['type']] && $thread['fid']==$fid){
 if ($upid = $t_db[$thread['type']]['upid']) {
-$upname = $t_db[$upid][logo] ? "<img src=\"{$t_db[$upid][logo]}\" alt=\"&nbsp;\">" : "[{$t_db[$upid][name]}]";
+$tempTypeUpName = strip_tags($t_db[$upid][name]);
+$secondTempTypeUpName = str_ireplace($tempTypeUpName,'['.$tempTypeUpName.']',$t_db[$upid][name]);
+$upname = $t_db[$upid][logo] ? "<img src=\"{$t_db[$upid][logo]}\" alt=\"&nbsp;\">" : "$secondTempTypeUpName";
 print <<<EOT
 -->
-			<a href="thread.php?fid=$fid&type=$upid{$viewbbs}" class="f14 view">$upname</a>
+			<a href="thread.php?fid=$fid&type=$upid{$viewbbs}" class="f14 view s4">$upname</a>
 <!--
 EOT;
 }
-$topictype = $t_db[$thread[type]][logo] ? "<img src=\"{$t_db[$thread[type]][logo]}\" alt=\"&nbsp;\">" : "[{$t_db[$thread[type]][name]}]";
+$tempTypeName = strip_tags($t_db[$thread[type]][name]);
+$secondTempTypeName = str_ireplace($tempTypeName,'['.$tempTypeName.']',$t_db[$thread[type]][name]);
+$topictype = $t_db[$thread[type]][logo] ? "<img src=\"{$t_db[$thread[type]][logo]}\" alt=\"&nbsp;\">" : "$secondTempTypeName";
 print <<<EOT
 -->
-			<a href="thread.php?fid=$fid&type=$thread[type]{$viewbbs}" class="f14 view">$topictype</a>
+			<a href="thread.php?fid=$fid&type=$thread[type]{$viewbbs}" class="f14 s4 view">$topictype</a>
 <!--
 EOT;
 }if($thread['state'] == 0 && $thread['rewcredit'] > 0){print <<<EOT
@@ -211,21 +216,11 @@ EOT;
 			<span class="s2"> &#8212; 悬赏金额:$thread[rewcredit] &#8212; </span>
 <!--
 EOT;
-}print <<<EOT
--->
-<a href="$thread[tpcurl]" name="readlink" 
-<!--
-EOT;
-if ($newwindows == 1) {
-print <<<EOT
--->
-	target="_blank"  
-<!--
-EOT;
 }
+$isNewWindowOpen = $newwindows == 1 ? 'target="_blank"' : '';
 print <<<EOT
 -->
-id="a_ajax_$thread[tid]" class="subject_t f14">$thread[subject]</a>&nbsp; $thread[ifmark] $thread[titleadd] $thread[recommendadd]
+<a href="$thread[tpcurl]" name="readlink" $isNewWindowOpen id="a_ajax_$thread[tid]" class="subject_t f14">$thread[subject]</a>&nbsp; $thread[ifmark] $thread[titleadd] $thread[recommendadd]
 <!--
 EOT;
 if(isset($thread['colony'])){print <<<EOT

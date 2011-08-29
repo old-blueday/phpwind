@@ -11,45 +11,70 @@ if (empty($_POST['step'])) {
 	}
 	$pwServer['HTTP_USER_AGENT'] = 'Shockwave Flash';
 	$swfhash = GetVerify($winduid);
-	
-	echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?><swf><filetype>{$filetype}</filetype><uid>{$winduid}</uid><step>2</step><verify>{$swfhash}</verify></swf>";
+	echo pwJsonEncode(array('uid'=>$winduid,'step'=>2,'verify'=>$swfhash));
 
 } else {
 	
+	define('AJAX', 1);
 	S::gp(array(
 		'uid',
+		'type',
 		'verify'
 	), 'P');
+	S::gp(array('type'));
+
 	$uid = intval($uid);
-	$swfhash = GetVerify($uid);
+	$pwServer['HTTP_USER_AGENT'] = 'Shockwave Flash';
+	$swfhash = GetVerify($uid?$uid:'');
 	checkVerify('swfhash');
+
 	if (!$db_allowupload) {
-		Showmsg('upload_close');
+		showExtraMsg('upload_close');
 	}
 	$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
-	$rt = $userService->get($uid);//groupid,memberid
-	(!$rt) && Showmsg('not_login');
-	$groupid = $rt['groupid'] == '-1' ? $rt['memberid'] : $rt['groupid'];
+	$winddb = $userService->get($uid);//groupid,memberid
+	(!$winddb) && showExtraMsg('not_login');
+	$groupid = $winddb['groupid'] == '-1' ? $winddb['memberid'] : $winddb['groupid'];
+
 	if (file_exists(D_P . "data/groupdb/group_$groupid.php")) {
-		require_once pwCache::getPath(S::escapePath(D_P . "data/groupdb/group_$groupid.php"));
+		//* require_once pwCache::getPath(S::escapePath(D_P . "data/groupdb/group_$groupid.php"));
+		pwCache::getData(S::escapePath(D_P . "data/groupdb/group_$groupid.php"));
 	} else {
-		require_once pwCache::getPath(D_P . 'data/groupdb/group_1.php');
+		//* require_once pwCache::getPath(D_P . 'data/groupdb/group_1.php');
+		pwCache::getData(D_P . 'data/groupdb/group_1.php');
 	}
 	if ($_G['allowupload'] == 0) {
-		Showmsg('upload_group_right');
+		showExtraMsg('upload_group_right');
 	}
-	$_G['allownum'] = 15;
-	$attachsService = L::loadClass('attachs', 'forum');
-	$uploadnum = intval($attachsService->countMultiUpload($winduid));
-	if ($uploadnum >= $_G['allownum']) {
-		Showmsg('upload_num_error');
+	if ($type == 'active') {
+		L::loadClass('activeupload', 'upload', false);
+		$mutiupload = new activeMutiUpload($uid, intval($_POST['cid']));
+	} elseif ($type == 'diary') {
+		L::loadClass('diaryupload', 'upload', false);
+		$mutiupload = new diaryMutiUpload($uid);
+	} elseif ($type == 'message') {
+		L::loadClass('messageupload', 'upload', false);
+		$mutiupload = new messageMutiUpload($uid);
+	} elseif ($type == 'cms') {
+		require_once(R_P . 'mode/cms/lib/upload/articleupload.class.php');
+		$mutiupload = new articleMutiUpload($uid);
+	} elseif ($type && file_exists(R_P . "require/extents/attach/{$type}mutiupload.class.php")) {
+		$class = $type . 'MutiUpload';
+		require_once S::escapePath(R_P . "require/extents/attach/{$type}mutiupload.class.php");
+		$mutiupload = new $class($uid);
+	} else {
+		L::loadClass('attmutiupload', 'upload', false);
+		$mutiupload = new AttMutiUpload($uid, intval($_POST['fid']));
 	}
-	$_G['uploadtype'] && $db_uploadfiletype = $_G['uploadtype'];
-	$db_uploadfiletype = !empty($db_uploadfiletype) ? (is_array($db_uploadfiletype) ? $db_uploadfiletype : unserialize($db_uploadfiletype)) : array();
-	$attachdir .= '/mutiupload';
-	L::loadClass('mutiupload', 'upload', false);
-	$mutiupload = new MutiUpload($uid);
+	if (($return = $mutiupload->check()) !== true) {
+		showExtraMsg($return);
+	}
 	PwUpload::upload($mutiupload);
-	exit();
+	echo pwJsonEncode($mutiupload->getAttachInfo());
+	ajax_footer();
 }
 
+function showExtraMsg($msg) {
+	echo $msg;
+	ajax_footer();
+}

@@ -814,6 +814,19 @@ CREATE TABLE pw_announce (
   KEY idx_fid (fid)
 ) TYPE=MyISAM;
 
+ 
+DROP TABLE IF EXISTS pw_areas;
+CREATE TABLE `pw_areas` (
+  `areaid` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) NOT NULL DEFAULT '',
+  `joinname` varchar(150) NOT NULL DEFAULT '',
+  `parentid` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `vieworder` smallint(6) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`areaid`),
+  KEY `idx_name` (`name`),
+  KEY `idx_parentid_vieworder` (`parentid`,`vieworder`)
+) ENGINE=MyISAM ;
+
 DROP TABLE IF EXISTS pw_area_level;
 CREATE TABLE pw_area_level (
     uid int(10) unsigned not null default '0',
@@ -853,14 +866,14 @@ CREATE TABLE pw_attachbuy (
 ) TYPE=MyISAM;
 
 DROP TABLE IF EXISTS pw_attachdownload;
-CREATE TABLE IF NOT EXISTS `pw_attachdownload` (
-  `aid` int(10) unsigned NOT NULL,
-  `uid` int(10) unsigned NOT NULL,
-  `ctype` varchar(20) NOT NULL DEFAULT '0',
-  `cost` smallint(6) unsigned NOT NULL,
-  `createdtime` int(10) NOT NULL DEFAULT '0',
+CREATE TABLE pw_attachdownload (
+  `aid` int(10) unsigned not null,
+  `uid` int(10) unsigned not null,
+  `ctype` varchar(20) not null default '0',
+  `cost` smallint(6) unsigned not null default '0',
+  `createdtime` int(10) not null default '0',
   PRIMARY KEY (`aid`,`uid`)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 DROP TABLE IF EXISTS pw_attachs;
 CREATE TABLE pw_attachs (
@@ -897,8 +910,7 @@ CREATE TABLE pw_attention (
   `joindate` int(10) NOT NULL default '0',
   PRIMARY KEY  (`friendid`,`uid`),
   KEY `idx_uid_joindate` (`uid`,`joindate`),
-  KEY `idx_friendid_joindate` (`friendid`,`joindate`),
-  KEY `idx_joindate` (`joindate`)
+  KEY `idx_friendid_joindate` (`friendid`,`joindate`)
 ) ENGINE=MyISAM;
 
 DROP TABLE IF EXISTS pw_attention_blacklist;
@@ -907,6 +919,22 @@ CREATE TABLE pw_attention_blacklist (
   `touid` int(10) unsigned NOT NULL,
   PRIMARY KEY  (`uid`,`touid`)
 ) TYPE=MyISAM;
+
+DROP TABLE IF EXISTS pw_auth_certificate;
+CREATE TABLE IF NOT EXISTS `pw_auth_certificate` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `uid` int(10) NOT NULL DEFAULT '0',
+  `type` tinyint(3) NOT NULL DEFAULT '0',
+  `number` char(32) NOT NULL DEFAULT '',
+  `attach1` varchar(80) NOT NULL DEFAULT '',
+  `attach2` varchar(80) NOT NULL DEFAULT '',
+  `createtime` int(10) NOT NULL DEFAULT '0',
+  `admintime` int(10) NOT NULL DEFAULT '0',
+  `state` tinyint(3) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idx_uid` (`uid`),
+  KEY `idx_state` (`state`)
+) ENGINE=MyISAM;
 
 DROP TABLE IF EXISTS `pw_ban`;
 CREATE TABLE IF NOT EXISTS `pw_ban` (
@@ -984,13 +1012,24 @@ CREATE TABLE pw_cachedata (
   UNIQUE KEY idx_invokepieceid_fid_loopid (invokepieceid,fid,loopid)
 ) TYPE=MyISAM;
 
+DROP TABLE IF EXISTS pw_cache_distribute;
+CREATE TABLE pw_cache_distribute (
+    ckey char(32) not null default '',
+    cvalue text not null,
+    typeid tinyint(3) not null default '0',
+    expire int(10) unsigned not null default '0',
+    extra varchar(255) NOT NULL DEFAULT '',
+    primary key (ckey)
+) ENGINE=MyISAM;
+
+
 DROP TABLE IF EXISTS pw_cache_members;
-CREATE TABLE pw_cache_members(
+CREATE TABLE pw_cache_members (
     ckey char(32) not null default '',
     cvalue text not null,
     expire int(10) unsigned not null default '0',
     primary key (ckey)
-) TYPE=MyISAM;
+)ENGINE=MyISAM;
 
 DROP TABLE IF EXISTS pw_channel;
 CREATE TABLE pw_channel (
@@ -1009,11 +1048,13 @@ CREATE TABLE pw_channel (
   KEY idx_relatetheme (relate_theme),
   KEY idx_queue (queue)
 ) ENGINE=MyISAM;
-REPLACE INTO pw_channel VALUES(1, '首页', 'home','', 'home', '', '', '', '', 0);
-REPLACE INTO pw_channel VALUES(2, '亲子', 'baby','', 'baby', '', '', '', '', 0);
-REPLACE INTO pw_channel VALUES(3, '美食', 'delicious','', 'delicious', '', '', '', '', 0);
-REPLACE INTO pw_channel VALUES(4, '汽车', 'auto','', 'auto', '', '', '', '', 0);
-REPLACE INTO pw_channel VALUES(5, '家装', 'decoration','', 'decoration', '', '', '', '', 0);
+REPLACE INTO pw_channel VALUES(1, '首页', 'home85',0, 'home85', '', '', '', '', 0);
+REPLACE INTO pw_channel VALUES(2, '门户', 'home',0, 'home', '', '', '', '', 0);
+REPLACE INTO pw_channel VALUES(3, '亲子', 'baby', 0, 'baby', '', '', '', '', 0);
+REPLACE INTO pw_channel VALUES(4, '汽车', 'auto', 0, 'auto', '', '', '', '', 0);
+REPLACE INTO pw_channel VALUES(5, '美食', 'delicious', 0, 'delicious', '', '', '', '', 0);
+REPLACE INTO pw_channel VALUES(6, '家装', 'decoration', 0, 'decoration', '', '', '', '', 0);
+REPLACE INTO pw_channel VALUES(7, '图酷', 'tucool', 0, 'tucool', '', '', '', '', 0);
 
 DROP TABLE IF EXISTS pw_clientorder;
 CREATE TABLE pw_clientorder (
@@ -1130,7 +1171,7 @@ CREATE TABLE pw_cms_purview (
 
 DROP TABLE IF EXISTS pw_cnalbum;
 CREATE TABLE pw_cnalbum (
-  aid int(11) unsigned not null AUTO_INCREMENT,
+  aid int(10) unsigned not null AUTO_INCREMENT,
   aname varchar(50) NOT NULL default '',
   aintro varchar(200) NOT NULL default '',
   atype smallint(6) NOT NULL default '0',
@@ -1224,10 +1265,11 @@ CREATE TABLE pw_cnstyles (
   ifopen tinyint(3) NOT NULL default '1',
   csum int(10) NOT NULL default '0',
   upid smallint(10) NOT NULL default '0',
+  vieworder tinyint(3) unsigned not null default '0',
   PRIMARY KEY (id),
   KEY idx_cname (cname)
 ) ENGINE=MyISAM;
-REPLACE INTO pw_cnstyles VALUES('1','默认分类','1','0','0');
+REPLACE INTO pw_cnstyles VALUES('1','默认分类','1','0','0','1');
 
 DROP TABLE IF EXISTS pw_collection;
 CREATE TABLE pw_collection (
@@ -1259,7 +1301,7 @@ DROP TABLE IF EXISTS pw_colonys;
 CREATE TABLE pw_colonys (
   id smallint(6) unsigned NOT NULL auto_increment,
   classid smallint(6) NOT NULL default '0',
-  cname varchar(50) NOT NULL default '',
+  cname varchar(20) NOT NULL default '',
   admin varchar(20) NOT NULL default '',
   members int(10) NOT NULL default '0',
   ifcheck tinyint(3) NOT NULL default '0',
@@ -1295,8 +1337,7 @@ CREATE TABLE pw_colonys (
   PRIMARY KEY  (id),
   UNIQUE KEY idx_cname (cname),
   KEY idx_admin (admin),
-  KEY idx_classid (classid),
-  KEY idx_classid_vieworder (classid,vieworder)
+  KEY idx_classid (classid)
 ) TYPE=MyISAM;
 
 DROP TABLE IF EXISTS pw_comment;
@@ -1315,6 +1356,15 @@ CREATE TABLE pw_comment (
   KEY idx_upid (upid),
   KEY idx_postdate (postdate)
 ) TYPE=MyISAM;
+
+ 
+DROP TABLE IF EXISTS pw_company;
+CREATE TABLE `pw_company` (
+`companyid` int(11) unsigned  NOT NULL AUTO_INCREMENT ,
+`companyname` VARCHAR(60) NOT NULL DEFAULT '',
+ PRIMARY KEY (`companyid`),
+ UNIQUE KEY `idx_companyname` (`companyname`)
+) ENGINE = MYISAM;
 
 DROP TABLE IF EXISTS pw_config;
 CREATE TABLE pw_config (
@@ -1357,10 +1407,10 @@ INSERT INTO pw_config (db_name, db_value) VALUES ('db_hour', '20');
 INSERT INTO pw_config (db_name, db_value) VALUES ('db_http', 'N');
 INSERT INTO pw_config (db_name, db_value) VALUES ('db_attachurl', 'N');
 INSERT INTO pw_config (db_name, db_value) VALUES ('db_lp', '0');
-INSERT INTO pw_config (db_name, db_value) VALUES ('db_obstart', '0');
+INSERT INTO pw_config (db_name, db_value) VALUES ('db_obstart', '9');
 INSERT INTO pw_config (db_name, db_value) VALUES ('db_charset', '{#db_charset}');
 INSERT INTO pw_config (db_name, db_value) VALUES ('db_forcecharset', '0');
-INSERT INTO pw_config (db_name, db_value) VALUES ('db_defaultstyle', 'wind');
+INSERT INTO pw_config (db_name, db_value) VALUES ('db_defaultstyle', 'wind85');
 INSERT INTO pw_config (db_name, db_value) VALUES ('db_cvtime', '0');
 INSERT INTO pw_config (db_name, db_value) VALUES ('db_timedf', '8');
 INSERT INTO pw_config (db_name, db_value) VALUES ('db_datefm', 'Y-m-d H:i');
@@ -1388,7 +1438,7 @@ INSERT INTO pw_config (db_name, vtype, db_value) VALUES ('db_windpic', 'array' ,
 INSERT INTO pw_config (db_name, db_value) VALUES ('db_allowupload', '1');
 INSERT INTO pw_config (db_name, db_value) VALUES ('db_attachdir', '3');
 INSERT INTO pw_config (db_name, db_value) VALUES ('db_attachhide', '0');
-INSERT INTO pw_config (db_name, db_value) VALUES ('db_attachnum', '4');
+INSERT INTO pw_config (db_name, db_value) VALUES ('db_attachnum', '10');
 INSERT INTO pw_config (db_name, db_value) VALUES ('db_showreplynum', '5');
 INSERT INTO pw_config (db_name, db_value) VALUES ('db_selcount', '1000');
 INSERT INTO pw_config (db_name, db_value) VALUES ('db_replysendmail', '0');
@@ -1436,7 +1486,7 @@ INSERT INTO pw_config (db_name, db_value) VALUES ('db_watercolor', '#0000FF');
 INSERT INTO pw_config (db_name, db_value) VALUES ('db_waterpct', '85');
 INSERT INTO pw_config (db_name, db_value) VALUES ('db_jpgquality', '75');
 INSERT INTO pw_config (db_name, db_value) VALUES ('db_iffthumb', '1');
-INSERT INTO pw_config (db_name, db_value) VALUES ('db_ifathumb', '0');
+INSERT INTO pw_config (db_name, db_value) VALUES ('db_ifathumb', '1');
 INSERT INTO pw_config (db_name, db_value) VALUES ('db_signmoney', '0');
 INSERT INTO pw_config (db_name, db_value) VALUES ('db_wapifopen', '0');
 INSERT INTO pw_config (db_name, db_value) VALUES ('db_wapcharset', '0');
@@ -1457,17 +1507,16 @@ INSERT INTO pw_config (db_name, db_value) VALUES ('db_opensch', '0	0	0');
 INSERT INTO pw_config (db_name, db_value) VALUES ('db_gdcheck', '0');
 INSERT INTO pw_config (db_name, db_value) VALUES ('db_postgd', '0');
 INSERT INTO pw_config (db_name, db_value) VALUES ('db_gdstyle', '0');
-INSERT INTO pw_config (db_name, db_value) VALUES ('db_gdtype', '1');
-INSERT INTO pw_config (db_name, db_value) VALUES ('db_gdcontent', 'a:3:{i:1;s:1:"1";i:2;s:1:"0";i:3;s:1:"0";}');
+INSERT INTO pw_config (db_name, db_value) VALUES ('db_gdtype', '0');
 INSERT INTO pw_config (db_name, db_value) VALUES ('db_gdsize', '90	30	4');
-INSERT INTO pw_config (db_name, db_value) VALUES ('db_upload', '1	120	120	2048');
+INSERT INTO pw_config (db_name, db_value) VALUES ('db_upload', '1	120	120	20480');
 INSERT INTO pw_config (db_name, db_value) VALUES ('db_uploadfiletype', 'a:6:{s:3:"gif";s:4:"2000";s:3:"png";s:4:"2000";s:3:"zip";s:4:"2000";s:3:"rar";s:4:"2000";s:3:"jpg";s:4:"2000";s:3:"txt";s:4:"2000";}');
 INSERT INTO pw_config (db_name, db_value) VALUES ('db_creditset', 'a:6:{s:6:"Digest";a:5:{s:5:"money";s:1:"0";s:4:"rvrc";s:2:"10";s:6:"credit";s:1:"0";s:8:"currency";s:1:"0";i:1;s:1:"0";}s:4:"Post";a:5:{s:5:"money";s:1:"1";s:4:"rvrc";s:1:"1";s:6:"credit";s:1:"0";s:8:"currency";s:1:"0";i:1;s:1:"0";}s:5:"Reply";a:5:{s:5:"money";s:1:"1";s:4:"rvrc";s:1:"0";s:6:"credit";s:1:"0";s:8:"currency";s:1:"0";i:1;s:1:"0";}s:8:"Undigest";a:5:{s:5:"money";s:1:"0";s:4:"rvrc";s:2:"10";s:6:"credit";s:1:"0";s:8:"currency";s:1:"0";i:1;s:1:"0";}s:6:"Delete";a:5:{s:5:"money";s:1:"1";s:4:"rvrc";s:1:"1";s:6:"credit";s:1:"0";s:8:"currency";s:1:"0";i:1;s:1:"0";}s:8:"Deleterp";a:5:{s:5:"money";s:1:"1";s:4:"rvrc";s:1:"0";s:6:"credit";s:1:"0";s:8:"currency";s:1:"0";i:1;s:1:"0";}}');
 INSERT INTO pw_config (db_name, db_value) VALUES ('db_showgroup', ',3,4,5,16,');
-INSERT INTO pw_config (db_name, vtype,db_value) VALUES ('db_showcustom', 'array','a:2:{i:0;s:5:"money";i:1;s:4:"rvrc";}');
+INSERT INTO pw_config (db_name, vtype,db_value) VALUES ('db_showcustom', 'array','a:4:{i:0;s:5:"money";i:1;s:4:"rvrc";i:2;s:6:"credit";i:3;s:8:"currency";}');
 INSERT INTO pw_config (db_name, db_value) VALUES ('db_menu', '3');
 INSERT INTO pw_config (db_name, db_value) VALUES ('db_fthumbsize', '100	100');
-INSERT INTO pw_config (db_name, db_value) VALUES ('db_athumbsize', '575	0');
+INSERT INTO pw_config (db_name, db_value) VALUES ('db_athumbsize', '700	0');
 INSERT INTO pw_config (db_name, db_value) VALUES ('db_signgroup', ',5,6,7,16,8,9,10,11,12,13,14,15,');
 INSERT INTO pw_config (db_name, db_value) VALUES ('db_autoban', '0');
 INSERT INTO pw_config (db_name, db_value) VALUES ('db_wapfids', '');
@@ -1504,7 +1553,7 @@ INSERT INTO pw_config (db_name, db_value) VALUES ('db_htmifopen', '0');
 INSERT INTO pw_config (db_name, db_value) VALUES ('db_dir', '.php?');
 INSERT INTO pw_config (db_name, db_value) VALUES ('db_ext', '.html');
 INSERT INTO pw_config (db_name, db_value) VALUES ('db_upgrade', 'a:7:{s:7:"postnum";s:1:"1";s:7:"digests";s:1:"0";s:4:"rvrc";s:1:"0";s:5:"money";s:1:"0";s:6:"credit";s:1:"0";s:10:"onlinetime";s:1:"0";i:1;s:1:"0";}');
-INSERT INTO pw_config (db_name, db_value) VALUES ('ol_onlinepay', '1');
+INSERT INTO pw_config (db_name, db_value) VALUES ('ol_onlinepay', '0');
 INSERT INTO pw_config (db_name, db_value) VALUES ('ol_whycolse', '{#ol_whycolse}');
 INSERT INTO pw_config (db_name, db_value) VALUES ('ol_payto', '');
 INSERT INTO pw_config (db_name, db_value) VALUES ('ol_md5code', '');
@@ -1528,7 +1577,8 @@ INSERT INTO pw_config (db_name, db_value) VALUES ('db_allowtrade', '1');
 INSERT INTO pw_config (db_name, db_value) VALUES ('db_attachname', 'attachment');
 INSERT INTO pw_config (db_name, db_value) VALUES ('db_picpath', 'images');
 INSERT INTO pw_config (db_name, db_value) VALUES ('db_htmdir', 'html');
-INSERT INTO pw_config (db_name, db_value) VALUES ('db_readdir', 'read');
+INSERT INTO pw_config (db_name, db_value) VALUES ('db_readdir', 'html/read');
+INSERT INTO pw_config (db_name, db_value) VALUES ('db_stopicdir', 'html/stopic');
 INSERT INTO pw_config (db_name, db_value) VALUES ('db_guestdir', 'data/guestcache');
 INSERT INTO pw_config (db_name, db_value) VALUES ('ml_mailmethod', '1');
 INSERT INTO pw_config (db_name, db_value) VALUES ('ml_smtphost', '');
@@ -1592,22 +1642,29 @@ INSERT INTO pw_config (db_name, db_value) VALUES('db_iftag', '1');
 INSERT INTO pw_config (db_name, db_value) VALUES('db_readtag', '0');
 INSERT INTO pw_config (db_name, db_value) VALUES('db_tagindex', '20');
 INSERT INTO pw_config (db_name, db_value) VALUES('db_enhideset', 'a:1:{s:4:"type";a:1:{i:0;s:5:"money";}}');
-INSERT INTO pw_config (db_name, vtype, db_value, decrip) VALUES('db_rategroup', 'array', 'a:13:{i:8;s:2:"10";i:9;s:2:"10";i:10;s:2:"10";i:11;s:2:"10";i:12;s:2:"10";i:13;s:2:"10";i:14;s:2:"10";i:15;s:2:"10";i:4;s:2:"10";i:5;s:2:"10";i:17;s:2:"10";i:16;s:2:"10";i:2;s:2:"10";}', '');
-INSERT INTO pw_config (db_name, vtype, db_value, decrip) VALUES('db_ratepower', 'array', 'a:3:{i:1;s:1:"0";i:2;s:1:"0";i:3;s:1:"0";}', '');
+INSERT INTO pw_config (db_name, vtype, db_value, decrip) VALUES('db_rategroup', 'string', 'a:12:{i:8;s:1:"5";i:9;s:2:"10";i:10;s:2:"10";i:11;s:2:"10";i:12;s:2:"30";i:13;s:2:"30";i:14;s:2:"30";i:15;s:2:"50";i:4;s:4:"1000";i:5;s:3:"100";i:16;s:2:"50";i:2;s:1:"0";}', '');
+INSERT INTO pw_config (db_name, vtype, db_value, decrip) VALUES('db_ratepower', 'string', 'a:3:{i:1;s:1:"0";i:2;s:1:"0";i:3;s:1:"0";}', '');
 INSERT INTO pw_config (db_name, vtype, db_value, decrip) values('db_job_isopen','string','1','');
 INSERT INTO pw_config (db_name, vtype, db_value, decrip) values('db_job_ispop','string','1','');
-INSERT INTO pw_config (db_name, vtype, db_value, decrip) values('db_newinfoifopen','string','0','');
-INSERT INTO pw_config (db_name, vtype, db_value, decrip) values('db_bbsradioifopen','string','0','');
-INSERT INTO pw_config (db_name, db_value) values('db_hotwords', 'phpwind,PW');
+INSERT INTO pw_config (db_name, vtype, db_value, decrip) values('db_newinfoifopen','string','1','');
+INSERT INTO pw_config (db_name, vtype, db_value, decrip) values('db_bbsradioifopen','string','1','');
 INSERT INTO pw_config (db_name, vtype, db_value, decrip) VALUES ('db_portalstatictime', 'string', '1', '');
-INSERT INTO pw_config (db_name, db_value) VALUES ('db_classfile_compress', '0');
-INSERT INTO pw_config (db_name, db_value) VALUES ('db_cachefile_compress', '0');
+INSERT INTO pw_config (db_name, db_value) VALUES ('db_classfile_compress', '1');
+INSERT INTO pw_config (db_name, db_value) VALUES ('db_cachefile_compress', '1');
 INSERT INTO pw_config (db_name, db_value) VALUES ('db_filecache_to_memcache', '0');
 INSERT INTO pw_config (db_name, vtype, db_value, decrip) VALUES ('db_unique_strategy', 'string', 'db', '');
-INSERT INTO pw_config (db_name, vtype, db_value, decrip) VALUES ('db_postedittime', 'string', '10', '');
-INSERT INTO pw_config (db_name, vtype, db_value, decrip) VALUES ('db_portalstatictime', 'string', '15', '');
-INSERT INTO pw_config (db_name, vtype, db_value, decrip) VALUES ('db_search_type', 'array', 'a:5:{s:6:"thread";s:6:"帖子";s:5:"diary";s:6:"日志";s:4:"user";s:6:"用户";s:5:"forum";s:6:"版块";s:5:"group";s:6:"群组";}', '');
-INSERT INTO pw_config (db_name, db_value) VALUES ('db_admingradereason', '{#db_admingradereason}');
+INSERT INTO pw_config (db_name, vtype, db_value, decrip) VALUES ('db_search_type_expand', 'array', 'a:0:{}', '');
+INSERT INTO pw_config (db_name, vtype, db_value, decrip) VALUES ('db_search_type', 'array', 'a:6:{s:6:"thread";s:6:"帖子";s:3:"cms";s:6:"文章";s:5:"diary";s:6:"日志";s:4:"user";s:6:"用户";s:5:"forum";s:6:"版块";s:5:"group";s:6:"群组";}', '');
+INSERT INTO pw_config (db_name, vtype, db_value, decrip) VALUES ('db_operate_log', 'array', 'a:0:{}', '');
+INSERT INTO pw_config (db_name, vtype, db_value, decrip) VALUES ('db_shiftstyle', 'string', '1', '');
+INSERT INTO pw_config (db_name, vtype, db_value, decrip) VALUES ('db_hotwordsconfig', 'string', 'a:3:{s:7:"shownum";s:1:"5";s:14:"openautoinvoke";s:1:"1";s:12:"invokeperiod";s:1:"7";}', '');
+INSERT INTO pw_config (db_name, vtype, db_value, decrip) VALUES ('db_hotwords', 'string', '结婚,母婴,phpwind', '');
+INSERT INTO pw_config (db_name, vtype, db_value, decrip) VALUES ('rg_regguide', 'string', '1', '');
+INSERT INTO pw_config (db_name, vtype, db_value, decrip) VALUES ('db_openbuildattachs', 'string', '1', '');
+INSERT INTO pw_config (db_name, vtype, db_value, decrip) VALUES ('db_search_type', 'array', 'a:3:{s:6:"thread";s:6:"帖子";s:4:"user";s:6:"用户";s:5:"forum";s:6:"版块";}', '');
+INSERT INTO pw_config (db_name, vtype, db_value, decrip) VALUES ('rg_regguide', 'string', '1', '');
+INSERT INTO pw_config (db_name, vtype, db_value, decrip) VALUES ('rg_recommendcontent', 'string', '&lt;div class=&quot;p10&quot;&gt;&lt;table width=&quot;100%&quot;&gt;&lt;tr&gt;&lt;td&gt;&lt;a href=&quot;html/channel/tucool/&quot;&gt;&lt;img src=&quot;images/register/thumb/tuku.jpg&quot; /&gt;&lt;/a&gt;&lt;/td&gt;&lt;td&gt;&lt;a href=&quot;apps.php?q=weibo&amp;do=topics&quot;&gt;&lt;img src=&quot;images/register/thumb/huati.jpg&quot; /&gt;&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/div&gt;', '');
+INSERT INTO pw_config (db_name, vtype, db_value, decrip) VALUES ('db_sharesite', 'string', '1', '');
 
 DROP TABLE IF EXISTS pw_creditlog;
 CREATE TABLE pw_creditlog (
@@ -1640,6 +1697,7 @@ INSERT INTO pw_credits VALUES ('1', '{#credit_name}','{#credit_unit}', '{#credit
 DROP TABLE IF EXISTS pw_customfield;
 CREATE TABLE pw_customfield (
   id smallint(6) NOT NULL auto_increment,
+  category ENUM( 'basic', 'contact', 'education' , 'other' ) NOT NULL DEFAULT 'basic',
   title varchar(50) NOT NULL default '',
   maxlen smallint(6) NOT NULL default '0',
   vieworder smallint(6) NOT NULL default '0',
@@ -1651,8 +1709,23 @@ CREATE TABLE pw_customfield (
   descrip varchar(255) NOT NULL default '',
   viewright varchar(255) NOT NULL default '',
   options text NOT NULL,
+  complement tinyint unsigned NOT NULL default '0',
+  ifsys tinyint unsigned NOT NULL default '0',
+  fieldname varchar(32) NOT NULL default '',
   PRIMARY KEY  (id)
 ) TYPE=MyISAM;
+INSERT INTO `pw_customfield` (`category`, `title`, `maxlen`, `vieworder`, `type`, `state`, `required`, `viewinread`, `editable`, `descrip`, `viewright`, `options`, `complement`, `ifsys`, `fieldname`) VALUES 
+('basic', '性别', 0, 2, 3, 1, 0, 0, 1, '', '', '0=保密\r\n1=男\r\n2=女', 2, 1, 'gender'),
+('basic', '生日', 0, 3, 6, 1, 0, 0, 1, '', '', 'a:2:{s:9:"startdate";s:4:"1912";s:7:"enddate";s:4:"2011";}', 2, 1, 'bday'),
+('basic', '现居住地', 0, 4, 7, 1, 1, 0, 1, '', '', '', 1, 1, 'apartment'),
+('basic', '家乡', 0, 4, 7, 1, 0, 0, 1, '', '', '', 2, 1, 'home'),
+('basic', '支付宝账号', 60, 6, 1, 1, 0, 0, 1, '', '', '', 0, 1, 'alipay'),
+('education', '教育经历', 0, 6, 8, 1, 0, 0, 1, '', '', '', 2, 1, 'education'),
+('education', '工作经历', 0, 5, 9, 1, 0, 0, 1, '', '', '', 2, 1, 'career'),
+('contact', 'QQ', 12, 1, 1, 1, 0, 0, 1, '', '', '', 2, 1, 'oicq'),
+('contact', '阿里旺旺', 30, 1, 1, 1, 0, 0, 1, '', '', '', 0, 1, 'aliww'),
+('contact', 'Yahoo', 35, 1, 1, 1, 0, 0, 1, '', '', '', 0, 1, 'yahoo'),
+('contact', 'Msn', 35, 1, 1, 1, 0, 0, 1, '', '', '', 0, 1, 'msn');
 
 DROP TABLE IF EXISTS pw_cwritedata;
 CREATE TABLE pw_cwritedata (
@@ -1743,7 +1816,6 @@ CREATE TABLE pw_delta_diarys(
  primary key (id)
 )ENGINE=MyISAM;
 
-
 DROP TABLE IF EXISTS pw_delta_members;
 CREATE TABLE pw_delta_members(
  id int(10) unsigned not null auto_increment,
@@ -1784,8 +1856,7 @@ CREATE TABLE pw_diary (
   c_num int(10) NOT NULL default '0',
   postdate int(10) unsigned NOT NULL default '0',
   PRIMARY KEY  (did),
-  KEY idx_uid (uid),
-  KEY idx_postdate (postdate)
+  KEY idx_uid (uid)
 ) TYPE=MyISAM;
 
 DROP TABLE IF EXISTS pw_diarytype;
@@ -2004,7 +2075,6 @@ CREATE TABLE pw_forums (
 ) TYPE=MyISAM;
 INSERT INTO pw_forums (fid, fup, ifsub, childid, type, logo, name, descrip, dirname, keywords, vieworder, forumadmin, fupadmin, style, across, allowhtm, allowhide, allowsell, allowtype, copyctrl, allowencode, password, viewsub, allowvisit, allowread, allowpost, allowrp, allowdownload, allowupload, modelid, forumsell, pcid, f_type, f_check, t_type, cms, ifhide, showsub, ifcms) VALUES(1, 0, 0, 1, 'category', '', '默认分类', '', '', '', 0, '', '', '0', 0, 0, 1, 1, 3, 0, 1, '', 0, '', '', '', '', '', '', '', '', '', 'forum', 0, 0, 0, 1, 0, 0);
 INSERT INTO pw_forums (fid, fup, ifsub, childid, type, logo, name, descrip, dirname, keywords, vieworder, forumadmin, fupadmin, style, across, allowhtm, allowhide, allowsell, allowtype, copyctrl, allowencode, password, viewsub, allowvisit, allowread, allowpost, allowrp, allowdownload, allowupload, modelid, forumsell, pcid, f_type, f_check, t_type, cms, ifhide, showsub, ifcms) VALUES(2, 1, 0, 0, 'forum', '', '默认版块', '', '', '', 0, '', '', '0', 0, 0, 1, 1, 3, 0, 1, '', 0, '', '', '', '', '', '', '', '', '', 'forum', 0, 0, 0, 1, 0, 0);
-INSERT INTO pw_forumsextra (fid, creditset, forumset, commend, appinfo) VALUES(2,'','a:9:{s:8:"orderway";s:8:"lastpost";s:3:"asc";s:4:"DESC";s:11:"replayorder";s:1:"1";s:9:"addnotice";s:1:"1";s:9:"imgthread";s:1:"1";s:10:"relatedcon";s:1:"1";s:12:"allowtpctype";s:9:"money			0";s:9:"uploadset";s:1:"1";s:9:"thumbsize";s:7:"300	300";}','','');
 
 DROP TABLE IF EXISTS pw_forumsell;
 CREATE TABLE pw_forumsell (
@@ -2029,6 +2099,8 @@ CREATE TABLE pw_forumsextra (
   appinfo TEXT NOT NULL,
   PRIMARY KEY  (fid)
 ) TYPE=MyISAM;
+INSERT INTO `pw_forumsextra` (`fid`, `creditset`, `forumset`, `commend`, `appinfo`) VALUES
+(2, '', 'a:52:{s:21:"auth_cellphone_credit";s:1:"0";s:14:"auth_cellphone";s:1:"0";s:18:"auth_alipay_credit";s:1:"0";s:11:"auth_alipay";s:1:"0";s:4:"link";s:0:"";s:4:"lock";s:1:"0";s:7:"cutnums";s:1:"0";s:9:"threadnum";s:1:"0";s:7:"readnum";s:1:"0";s:7:"newtime";s:1:"0";s:13:"contentminlen";s:1:"0";s:8:"orderway";s:8:"lastpost";s:3:"asc";s:4:"DESC";s:11:"replayorder";s:1:"1";s:9:"addnotice";s:1:"0";s:10:"viewcolony";s:1:"0";s:12:"ifcolonycate";s:1:"0";s:11:"allowencode";s:1:"0";s:9:"anonymous";s:1:"0";s:4:"rate";s:1:"0";s:3:"dig";s:1:"0";s:7:"inspect";s:1:"0";s:9:"watermark";s:1:"0";s:9:"overprint";s:1:"0";s:7:"viewpic";s:1:"0";s:7:"ifthumb";s:1:"0";s:12:"postedittime";s:1:"0";s:8:"iftucool";s:1:"1";s:15:"iftucooldefault";s:1:"0";s:14:"iftucoolbrowse";s:1:"0";s:9:"tucoolpic";s:1:"1";s:9:"ifrelated";s:1:"0";s:11:"relatednums";s:1:"0";s:10:"relatedcon";s:7:"ownpost";s:13:"relatedcustom";a:0:{}s:7:"commend";s:1:"0";s:11:"autocommend";s:1:"0";s:11:"commendlist";s:0:"";s:10:"commendnum";s:1:"0";s:13:"commendlength";s:1:"0";s:11:"commendtime";s:1:"0";s:10:"addtpctype";s:1:"0";s:12:"allowtpctype";s:1:"0";s:8:"rvrcneed";s:1:"0";s:9:"moneyneed";s:1:"0";s:10:"creditneed";s:1:"0";s:11:"postnumneed";s:1:"0";s:9:"sellprice";a:0:{}s:9:"uploadset";s:9:"money			0";s:8:"rewarddb";s:6:"0	0	0	";s:9:"allowtime";s:0:"";s:9:"thumbsize";s:5:"575	0";}', '', '');
 
 DROP TABLE IF EXISTS pw_friends;
 CREATE TABLE pw_friends (
@@ -2117,7 +2189,7 @@ INSERT INTO pw_hack (hk_name, vtype, hk_value, decrip) VALUES('o_albumnum', 'str
 INSERT INTO pw_hack (hk_name, vtype, hk_value, decrip) VALUES('o_albumnum2', 'string', '2', '');
 INSERT INTO pw_hack (hk_name, vtype, hk_value, decrip) VALUES('o_maxphotonum', 'string', '20', '');
 INSERT INTO pw_hack (hk_name, vtype, hk_value, decrip) VALUES('o_mkdir', 'string', '1', '');
-INSERT INTO pw_hack (hk_name, vtype, hk_value, decrip) VALUES('o_maxfilesize', 'string', '500', '');
+INSERT INTO pw_hack (hk_name, vtype, hk_value, decrip) VALUES('o_maxfilesize', 'string', '2048', '');
 INSERT INTO pw_hack (hk_name, vtype, hk_value, decrip) VALUES('o_shownum', 'string', '500', '');
 INSERT INTO pw_hack (hk_name, vtype, hk_value, decrip) VALUES('o_attachdir', 'string', '2', '');
 INSERT INTO pw_hack (hk_name, vtype, hk_value, decrip) VALUES('o_uploadsize', 'string', 'a:5:{s:3:"jpg";s:3:"300";s:4:"jpeg";s:3:"300";s:3:"png";s:3:"400";s:3:"gif";s:3:"400";s:3:"bmp";s:3:"400";}', '');
@@ -2151,20 +2223,20 @@ INSERT INTO pw_hack (hk_name, vtype, hk_value, decrip) VALUES('o_hot_groups', 's
 INSERT INTO pw_hack (hk_name, vtype, hk_value, decrip) VALUES ('ft_member', 'string', '', '');
 INSERT INTO pw_hack (hk_name, vtype, hk_value, decrip) VALUES ('ft_update_num', 'string', '0', '');
 INSERT INTO pw_hack (hk_name, vtype, hk_value, decrip) VALUES ('ft_msg', 'string', '0', '');
-INSERT INTO pw_hack (hk_name, vtype, hk_value, decrip) VALUES('o_uskin','array','a:6:{s:5:"black";s:6:"黑色";s:7:"default";s:6:"翱翔";s:3:"ink";s:6:"山水";s:4:"love";s:6:"友情";s:8:"navgreen";s:6:"礼物";s:8:"navyblue";s:6:"深蓝";}','');
+INSERT INTO pw_hack (hk_name, vtype, hk_value, decrip) VALUES ('o_uskin', 'array', 'a:8:{s:5:"black";s:6:"黑色";s:7:"default";s:6:"翱翔";s:9:"default85";s:9:"蒲公英";s:3:"ink";s:6:"山水";s:4:"love";s:6:"友情";s:8:"navgreen";s:6:"礼物";s:8:"navyblue";s:6:"深蓝";s:6:"prayer";s:6:"祈祷";}', '');
 INSERT INTO pw_hack (hk_name, vtype, hk_value, decrip) VALUES('o_weibophoto','string','1','');
 INSERT INTO pw_hack (hk_name, vtype, hk_value, decrip) VALUES('o_weibourl','string','1','');
-INSERT INTO pw_hack VALUES('o_groups_upgrade','array','a:7:{s:4:"tnum";s:1:"1";s:4:"pnum";s:3:"0.2";s:7:"members";s:1:"1";s:8:"albumnum";s:3:"0.5";s:8:"photonum";s:1:"1";s:8:"writenum";s:1:"1";s:11:"activitynum";s:1:"2";}','');
-INSERT INTO pw_hack VALUES('o_groups_level','array','a:5:{i:1;s:12:"初级群组";i:2;s:12:"中级群组";i:3;s:12:"高级群组";i:4;s:12:"官方群组";i:5;s:12:"商业群组";}','');
-INSERT INTO pw_hack VALUES('o_groups_levelneed','array','a:3:{i:1;s:1:"0";i:2;s:3:"500";i:3;s:4:"1000";}','');
-INSERT INTO pw_hack VALUES ('area_statictime','string','15','');
-INSERT INTO pw_hack VALUES ('o_weibotip','string','有什么新鲜事想告诉大家？','');
-INSERT INTO pw_hack VALUES ('o_ifcommend','string','0','');
-INSERT INTO pw_hack VALUES ('o_senderid','string','1','');
-INSERT INTO pw_hack VALUES ('o_punchopen','string','1','');
-INSERT INTO pw_hack VALUES ('o_punch_reward','string','a:4:{s:4:"type";s:5:"money";s:3:"num";s:1:"5";s:8:"category";s:6:"credit";s:11:"information";s:17:"可获得 铜币 ";}','');
-INSERT INTO pw_hack (hk_name, vtype, hk_value, decrip) VALUES ('o_weibopost','string','1','');
-
+REPLACE INTO pw_hack VALUES('o_groups_upgrade','array','a:7:{s:4:"tnum";s:1:"1";s:4:"pnum";s:3:"0.2";s:7:"members";s:1:"1";s:8:"albumnum";s:3:"0.5";s:8:"photonum";s:1:"1";s:8:"writenum";s:1:"1";s:11:"activitynum";s:1:"2";}','');
+REPLACE INTO pw_hack VALUES('o_groups_level','array','a:5:{i:1;s:12:"初级群组";i:2;s:12:"中级群组";i:3;s:12:"高级群组";i:4;s:12:"官方群组";i:5;s:12:"商业群组";}','');
+REPLACE INTO pw_hack VALUES('o_groups_levelneed','array','a:3:{i:1;s:1:"0";i:2;s:3:"500";i:3;s:4:"1000";}','');
+REPLACE INTO pw_hack VALUES ('area_statictime','string','15','');
+INSERT INTO pw_hack (hk_name, vtype, hk_value, decrip) VALUES('o_weibo_hottopicdays','string','1','');
+INSERT INTO pw_hack (hk_name, vtype, hk_value, decrip) VALUES('o_weibo_hotcommentdays','string','1','');
+INSERT INTO pw_hack (hk_name, vtype, hk_value, decrip) VALUES('o_weibo_hottransmitdays','string','1','');
+INSERT INTO pw_hack (hk_name, vtype, hk_value, decrip) VALUES('o_weibo_hotfansdays','string','1','');
+INSERT INTO pw_hack (hk_name, vtype, hk_value, decrip) VALUES('o_weibopost','string','1','');
+INSERT INTO pw_hack (hk_name, vtype, hk_value, decrip) VALUES('o_punchopen','string','1','');
+INSERT INTO pw_hack (hk_name, vtype, hk_value, decrip) VALUES('o_punch_reward','string','a:4:{s:4:"type";s:5:"money";s:3:"num";s:1:"5";s:8:"category";s:6:"credit";s:11:"information";s:17:"可获得 铜币 ";}','');
 
 DROP TABLE IF EXISTS pw_help;
 CREATE TABLE pw_help (
@@ -2181,63 +2253,37 @@ CREATE TABLE pw_help (
   PRIMARY KEY  (hid),
   KEY idx_hup (hup)
 ) TYPE=MyISAM;
+INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES(1, 0, 0, '', 1, '账户', '', '', 0, 1);
+INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES(2, 1, 1, '1', 0, '注册登录', '', '<b>如何注册成会员？</b>\nphpwind 默认的注册方式非常简单，只需短短几秒钟的时间，即可成为站点会员。点击页面最左上角的"注册"，按照提示填写信息，提交即可，非常简单方便~\n正式会员将比游客享受更多的操作权限（站点设置不同，权限情况也将不同）。\n\n<b>如何登录？</b>\n已经成为正式会员了？那么点击页面最上角的"登录"进入登录页面，选择登录方式，填写登录信息即可完成登录。\n保存cookie可以让网页记录用户信息，方便下次登录。公用电脑，建议不保留。', 0, 1);
+INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES(3, 1, 1, '1', 0, '忘记密码', '', '<b>忘记登录密码怎么办？</b>\n没有关系，在登录页面点击"忘记密码"，填写注册邮箱就可以找回密码了哦~找回以后，请及时更改密码。\n如果你的邮箱无效或失效，请联系站点管理员。', 0, 1);
+INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES(4, 1, 1, '1', 0, '账户设置', '', '<b>如何修改我的用户信息？</b>\n登录后，点击页面最左上角的"设置"进入用户中心，可以查看和修改你的基本信息、扩展信息等。\n\n<b>如果制定我的个性头像？</b>\n登录后，进入用户中心，点击 头像 可以设置你的个性头像。根据权限分配的不同，你或许可以使用站点自带头像，或许可以使用头像链接，或许可以使用头像上传。\n\n<b>商品信息作什么用？</b>\n用户中心-商品信息，为你发布商品帖所使用的必要信息。支付宝账号--填写支付宝账号信息，如123@163.com。完成后在商品贴中可直接链入支付宝页面；商品分类--填写待出售的商品分类。完成后，为带出售商品的可用分类选项。', 0, 1);
+INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES(5, 1, 1, '1', 0, '隐私与安全', '', '<b>如何保证密码安全？</b>\n1.密码要保密，并经常更改。用户中心-账号设置-密码安全，可以进行密码修改\n2.填写正确常用的邮箱为注册邮箱信息。以便密码被盗或丢失时找回\n3.密码填写要尽量复杂，不使用生日、用户名等为密码信息\n4.定期为电脑杀毒，以防止盗号木马的困扰\n\n<b>交友安全</b>\n站点的信息交互性，让我们结识了很多志同道合的朋友。但是，有时候难免遇到交友不慎的尴尬。你可以进入用户中心->隐私，修改 加好友隐私。\n\n<b>个人信息安全</b>\n进入用户中心->隐私，设置 个人空间、空间留言的访问权限。\n\n<b>如何让站点操作不显示在动态中？</b>\n进入圈子->个人空间->应用管理，设置动态显示隐私', 0, 1);
+INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES(6, 1, 1, '1', 0, '积分使用', '', '<b>什么是积分？</b>\n积分，是站点内用于交易流通的媒介，可以是虚拟货币，也可以是威望、贡献值等。\n\n<b>如何获取积分？</b>\n站点提供多种方式发放积分，以鼓励会员在站点的活跃性。\n1.注册成为会员可以得到一定的积分值。\n2.发表主题或对某个主题进行回复，可以得到一定的积分。\n3.对某个主题进行评价，也可以得到一定的积分。\n4.参加站点组织的活动，赢取奖励\n5.成为站点某个版块管理员，为站点做点小贡献，可以获得不菲的薪资哦~\n\n<b>如何使用积分？</b>\n积分作为站点内用于交易的媒介，可以用于购买道具、特殊组权限、帖子签名等；\n同时威望、贡献值等信息，也能提升你在站点的荣誉度与可信度。', 0, 1);
+INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES(7, 0, 0, '', 1, '主题与回复', '', '', 0, 1);
+INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES(8, 7, 1, '7', 0, '发表主题', '', '<b>如何发表主题？</b>\n在帖子列表页面和帖子阅读页面，可以看到“发表新帖”图标，点击即可进入主题帖发布页面，如果没有发帖权限，会有提示“本论坛只有特定用户组才能发表主题,请到其他版块发贴,以提高等级!”出现。\n特别地，当鼠标停在“发表新帖”图标上时，如果你在该板块有发表交易贴、悬赏帖或投票帖的权限时，就会出现一个下拉菜单，菜单项里显示：交易、悬赏、投票，点击需要的帖子类型即可进入相应的主题发表页面发布新的主题。\n你也可以在帖子列表页面底部的快速发帖框发表普通主题帖。\n\n<b>如何发表匿名帖？</b>\n在帖子列表页面和帖子阅读页面，点击“发表新帖”图标进入发帖页面，在发帖时勾选内容编辑器下面的匿名帖复选框，或者在快速发帖处勾选（如果复选框呈灰色，说明该板块不允许发布匿名贴或者您的权限不够）。', 0, 1);
+INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES(9, 0, 0, '', 1, '站点应用', '', '', 0, 1);
+INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES(10, 9, 1, '9', 0, '记录', '', '<b>什么是记录？</b>\n记录即及时记录，似tweeter的类新鲜事，你可以随时发表感慨、晒晒心情。\n记录更可同步个人签名，显示于帖子阅读页个人头像上部，让更多的人了解和感触到你那刻的感想与心情。\n\n<b>什么是 @我的 ？</b>\n一般的记录显示在动态中，根据权限的不同，可以让好友或是站内所有人都查看阅读到。\n@我的，是记录的一种衍生。它可以单独对某个用户发起言论。只需要@+对方用户名+空格+想要对TA说的话，即可。', 0, 1);
+INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES(12, 9, 1, '9', 0, '应用组件', '', '<b>什么是应用组件？</b>\n应用组件是圈子中接入的第三方娱乐应用，提供了宠物、在线小游戏等多种游戏。具体规则信息等请查看对应的游戏应用。', 1, 1);
+INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES(13, 26, 1, '26', 0, 'windcode', '', '<table><tr class="tr3 tr"><td><font color="#5a6633" face="verdana">[quote]</font>被引用的内容，主要作用是在发帖时引用并回复具体楼层的帖子<font color="#5a6633" face="verdana">[/quote]</font></td><td><table cellpadding="5" cellspacing="1" width="94%" bgcolor="#000000" align="center"><tr><td class="f_one">被引用的帖子和您的回复内容</td></tr></table></td></tr><tr class="tr3 tr"><td><font color="#5a6633" face="verdana">[code]</font><font color="#5a6633"></font><font face="courier" color="#333333"><br />echo "phpwind 欢迎您!"\n</font><font color="#5a6633" face="verdana">[/code]</font></td><th><div class="tpc_content" id="read_553959"><h6 class="quote">Copy code</h6><blockquote id="code1">echo "PHPWind 欢迎您!"</blockquote></div></th></tr><tr class="tr3 tr"><td><font face="verdana" color="5a6633">[url]</font><font face="verdana">http://www.phpwind.net</font><font color="5a6633">[/url] </font></td><td><a href="http://www.phpwind.net" target="_blank"><font color="#000066">http://www.phpwind.net</font></a></td></tr><tr class="tr3 tr"><td><font face="verdana" color="5a6633">[url=http://www.phpwind.net]</font><font face="verdana">PHPWind</font><font color="5a6633">[/url]</font></td><td><a href="http://www.phpwind.net"><font color="000066">PHPWind</font></a></font></td></tr><tr class="tr3 tr"><td><font face="verdana" color="5a6633">[email]</font><font face="verdana">fengyu@163.com</font><font color="5a6633">[/email]</font></td><td><a href="mailto:fengyu@163.com"><font color="000066">fengyu@163.com</font></a></td></tr><tr class="tr3 tr"><td><font face="verdana" color="5a6633">[email=fengyu@163.com]</font><font face="verdana">email me</font><font color="5a6633">[/email]</font></td><td><a href="mailto:fengyu@163.com"><font color="000066">email me</font></a></td></tr><tr class="tr3 tr"> <td><font face="verdana" color="5a6633">[b]</font><font face="verdana">粗体字</font><font color="5a6633" face="verdana">[/b]</font> </td><td><font face="verdana"><b>粗体字</b></font> </td></tr><tr class="tr3 tr"><td><font face="verdana" color="5a6633">[i]</font><font face="verdana">斜体字<font color="5a6633">[/i]</font> </font></td><td><font face="verdana"><i>斜体字</i></font> </td></tr><tr class="tr3 tr"><td><font face="verdana" color="5a6633">[u]</font><font face="verdana">下划线</font><font color="5a6633">[/u]</font></td><td><font face="verdana"><u>下划线</u></font> </td></tr><tr class="tr3 tr"> <td><font face=verdana color=5a6633>[align=center(可以是向左left，向右right)]</font>位于中间<font color="5a6633">[/align]</font></td><td><font face="verdana"><div align="center">中间对齐</div></font></td></tr><tr class="tr3 tr"> <td><font face="verdana" color="5a6633">[size=4]</font><font face="verdana">改变字体大小<font color="5a6633">[/size] </font> </font></td><td><font face="verdana">改变字体大小 </font></td></tr><tr class="tr3 tr"> <td><font face="verdana" color="5a6633">[font=</font><font color="5a6633">楷体_gb2312<font face="verdana">]</font></font><font face="verdana">改变字体<font color="5a6633">[/font] </font> </font></td><td><font face="verdana"><font face=楷体_gb2312>改变字体</font> </font></td></tr><tr class="tr3 tr"> <td><font face="verdana" color="5a6633">[color=red]</font><font face="verdana">改变颜色<font color="5a6633">[/color] </font> </font></td><td><font face="verdana" color="red">改变颜色</font><font face="verdana"> </font></td></tr><tr class="tr3 tr"> <td><font face="verdana" color="5a6633">[img]</font><font face="verdana">http://www.phpwind.net/logo.gif<font color="5a6633">[/img]</font> </font></td><td><img src="logo.gif" /></font> </td></tr><tr class="tr3 tr"> <td><font face=宋体 color="#333333"><font color="#5a6633">[fly]</font>飞行文字特效<font color="#5a6633">[/fly]</font> </font></td><td><font face=宋体&nbsp; &nbsp; color="#333333"><marquee scrollamount="3" behavior="alternate" width="90%">飞行文字特效</marquee></font></td></tr><tr class="tr3 tr"> <td><font face=宋体 color="#333333"><font color="#5a6633">[move]</font>滚动文字特效<font color="#5a6633">[/move]</font> </font></td><td><font face=宋体 color="#333333"> <marquee scrollamount="3" width="90%">滚动文字特效</marquee></font></td></tr><tr class="tr3 tr"><td><font face=宋体 color="#333333"><font color="#5a6633">[flash=400,300]</font>http://www.phpwind.net/wind.swf<font color="#5a6633">[/flash]</font> </font></td><td><font face=宋体 color="#333333">将显示flash文件</font> </td></tr><tr class="tr3 tr"><td><font face=宋体 color="#333333"><font color="#5a6633">[iframe]</font>http://www.phpwind.net<font color="#5a6633">[/iframe]</font> </font></td><td><font face=宋体 color="#333333">将在帖子中粘贴网页(后台默认关闭)</font> </td></tr><tr class="tr3 tr"><td><font color=#5a6633>[glow=255(宽度),red(颜色),1(边界)]</font>要产生光晕效果的文字<font color="#5a6633">[/glow]</font></td><td align="center"><font face=宋体 color="#333333"><table width="255" style="filter:glow(color=red, direction=1)"><tr><td align="center">要产生彩色发光效果的文字</td></tr></table></font></td></tr></table>', 1, 1);
+INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES(16, 7, 1, '7', 0, '发表回复', '', '<b>如何发表回复？</b>\n1.回复主题：帖子阅读页面点击“回复”按钮进入回复页面，或使用页面下方的快速发帖框即可；\n2.回复某楼层：点击该楼层中的“回复”，转到到快速回复框进行回复', 0, 1);
+INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES(17, 7, 1, '7', 0, '附件使用', '', '<b>如何发表附件？</b>\n在帖子编辑页面底部附带了附件上传。\n1.普通上传，表示一次上传一个文件，点击[选择文件]选择本地的文件，插入到编辑内容后，才能上传。\n2.批量上传，一次最多可上次15个文件，点击[选择文件]选择本地的文件进行上传，上传完毕后插入到编辑内容。\n\n<b>如何设置附件购买？</b>\n附件普通上传时，设置查看附件需要消耗的积分类型、积分值即可。', 0, 1);
+INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES(24, 26, 1, '26', 0, '道具使用', '', '<b>如何拥有道具？</b>\n1.购买。在社区->道具中心，为站点的道具交易市场。你可以在这里购买需要的道具。\n2.转让。同样在社区->道具中心，你可以让你的好友低价转让他所拥有的道具。\n\n<b>如何使用道具？</b>\n进入帖子阅读页面，在每个用户的头像下，都有个“道具”图标，点击即可选择使用你想要的道具。\n同时，在主楼（即楼主发表的主题）头部右边，有个“使用道具”，点击后，可以对楼主进行特殊对待。', 0, 1);
+INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES(25, 1, 1, '1', 0, '会员组等级', '', '<b>会员组等级及提升方案</b>\n会员组等级为会员在站点内的权限划分，等级越高、获得的权限也越大。站点默认以发帖数为用户提升方案。\n具体如下：\n<table><tr><td><font color=bule>头衔</font></td><td>新手上路</td><td>侠客</td><td>骑士</td><td>圣骑士</td><td>精灵王</td><td>风云使者</td><td>光明使者</td><td>天使</td></tr><tr><td><font color=bule>发帖数</font></td><td>0</td><td>100</td><td>300</td><td>600</td><td>1000</td><td>5000</td><td>10000</td><td>50000</td></tr></table>', 0, 1);
+INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES(26, 0, 0, '', 1, '常用操作', '', '', 1, 1);
+INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES(27, 26, 1, '26', 0, '短消息', '', '<b>谁可以给我发消息？</b>\n站点内的所有人都可以给你发送短信息，无论你是在线、隐私还是离线状态。\n\n<b>如何给人发消息？</b>\n1.点击用户的头像，在用户信息栏你可以看到一个短信图标，点击可直接对TA发消息；\n2.进入用户中心->短消息中心->发新短消息，根据提示填写信息即可；\n3.收到短消息后的回复，也是哦~\n4.给他人的帖子评分时，也可以进行短消息提示哦~\n\n<b>什么是消息跟踪？</b>\n消息跟踪是记录你发送出去的消息状态。如果状态为已读，表示你发的消息已经被收信人阅读了；如果状态为未读，则表示你的收信人还没有时间或兴趣来打开这条消息，那么你还有机会来更改消息的内容哦，直接点击记录后面的[编辑]即可重新编辑。', 0, 1);
+INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES(28, 9, 1, '9', 0, '日志', '', '<b>如何写私密日志？</b>\n你只需要在编辑完成日志时，将权限设为“仅自己可见”即可。\n\n<b>如何推荐日志给好友？</b>\n在日志列表中，可以看到[分享]按钮，点击后，在推荐栏中填写相关信息即可。', 0, 1);
+INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES(29, 9, 1, '9', 0, '群组', '', '<b>如何创建群组？</b>\n基础app中点击“群组”进入添加新群组，根据提示信息提交即可。\n\n<b>如何设置群管理员？</b>\n如果你是群创始人，那么你就有权利去设定该群的管理员。进入群的成员列表，选择相关的成员设置为管理员即可。\n\n<b>群组可以设置私有吗？</b>\n群组可以设置成私有。\n1.将群组加入权限设置成不允许任何人加入。\n2.将群组内容设置为不公开。\n3.将群组相册设置为不公开。\n\n<b>如何找到他人的群？</b>\n基础app->群组->所有群组，可以查看到允许查看的所有群。', 0, 1);
+INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES(30, 9, 1, '9', 0, '评价', '', '<b>什么是评价?</b>\n评价即是对站点内容（包括帖子、日志、相册等）给予感受的一个概括和评价。因此，不要路过吧，好歹给个点击，发表你一下意见，或许哪天它的上榜还离不开你的轻轻一点哦。', 0, 1);
+INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES(31, 26, 1, '26', 0, '帖子举报', '', '<b>什么是举报？</b>\n协助站长进行帖子监控、举报不良帖子推荐优秀帖子。在帖子楼层操作栏点击“举报”填写理由并提交就能实现了对当前楼层帖子举报的操作。', 0, 1);
+INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES(32, 9, 1, '9', 0, '分享', '', '<b>如何使用分享？</b>\n基础app->分享，填写分享信息，提交即可。\n内容阅读页，点击"推荐"或"分享"，也可以直接分享该页内容给大家哦~。\n\n<b>如何分享视频？</b>\n填写视频所在网页的网址。(不需要填写视频的真实地址)\n\n<b>如何分享音乐？</b>\n填写音乐文件的网址。(后缀需要是mp3或者wma)\n\n<b>如何分享Flash？</b>\n填写 Flash 文件的网址。(后缀需要是swf)', 0, 1);
 
-INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('8','7','2','47,7','1','发表主题','','<b>如何发表主题？</b>\n在帖子列表页面和帖子阅读页面，可以看到“发表新帖”图标，点击即可进入主题帖发布页面，如果没有发帖权限，会有提示“本论坛只有特定用户组才能发表主题,请到其他版块发贴,以提高等级!”出现。\n特别地，当鼠标停在“发表新帖”图标上时，如果你在该板块有发表交易贴、悬赏帖或投票帖的权限时，就会出现一个下拉菜单，菜单项里显示：交易、悬赏、投票，点击需要的帖子类型即可进入相应的主题发表页面发布新的主题。\n你也可以在帖子列表页面底部的快速发帖框发表普通主题帖。\n\n<b>如何发表匿名帖？</b>\n在帖子列表页面和帖子阅读页面，点击“发表新帖”图标进入发帖页面，在发帖时勾选内容编辑器下面的匿名帖复选框，或者在快速发帖处勾选（如果复选框呈灰色，说明该板块不允许发布匿名贴或者您的权限不够）。','2','1');
-INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('77','58','2','51,58','0','如何创建群组？','','对于已登录的会员，在个人中心中点击“群组”进入添加新群组，根据提示信息提交即可。','0','0');
-INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('78','58','2','51,58','0','设置群管理员','','如果你是群创始人，那么你就有权利去设定该群的管理员。进入群的成员列表，选择相关的成员设置为管理员即可。','0','0');
-INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('79','58','2','51,58','0','群组设置私有','','群组可以设置成私有。\n1.将群组加入权限设置成不允许任何人加入。\n2.将群组内容设置为不公开。\n3.将群组相册设置为不公开。','0','0');
-INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('84','0','0','','1','新手导航','','','0','0');
-INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('85','0','0','','1','站点应用','','','0','0');
-INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('86','84','1','84','1','账号相关','','','0','0');
-INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('87','84','1','84','1','帖子相关','','','0','0');
-INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('88','84','1','84','1','个人中心相关','','个人中心是站点会员在网站社区中的“家”，在这里，会员可以发表日志，上传照片，关注好友以及使用各种在线应用。','0','0');
-INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('89','84','1','84','1','常用功能','','','0','0');
-INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('90','85','1','85','1','日志相关','','注册成为网站会员后，可以在自己的个人中心中记录日志，日志中可以上传附件，例如照片等信息，日志可以分类保存，并且可以设置浏览权限。','0','0');
-INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('91','85','1','85','0','相册相关','','注册成为网站会员后，可以在自己的个人中心中设置相册，上传照片，可以自定义相册名称，并且可以设置浏览权限。','0','0');
-INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('92','85','1','85','1','群组相关','','群组是具有相同话题和兴趣的会员交流的场所，会员可以查找感兴趣的群组并申请加入，待相关群主审核通过后就可进入群组。会员在获得站点授权后可以创建自己的群组。','0','0');
-INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('93','85','1','85','0','新鲜事相关','','会员可以随时发布新鲜事，关注你的会员会在第一时间获取到你的新鲜事信息，你也可以通过关注别人来获取别人的最新消息。','0','0');
-INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('94','86','2','84,86','0','如何注册成为会员？','','如果您还没有注册，是以游客状态浏览论坛的，在头部导航栏可以看到“您尚未　登录&nbsp; 注册”的字样，点击“注册”，填写相应的信息，就可以完成注册了。因站点设置的不同，游客的浏览及使用论坛的权限会受到很多限制，如果您喜欢本站，建议您马上注册。','0','0');
-INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('95','86','2','84,86','0','如何登录？','','如果您已经是注册会员，可以在网站首页头部的登录模块进行登录，也可以在页面头部导航栏点击“登录”，进入登录页面进行登录，在限制游客访问的页面，也会有登录提示页面出现。','0','0');
-INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('96','86','2','84,86','0','忘记密码改怎么办？','','如果您忘记密码，请在登录页面点击“找回密码” 并输入用户名，系统将自动发送密码到您注册时填写的电子邮箱中。','0','0');
-INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('97','86','2','84,86','0','如何编辑个人资料？','','点击页面右上角“设置-帐号”，进入设置账号的页面，就可以对自己的资料信息进行编辑和修改了。','0','0');
-INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('98','87','2','84,87','0','发表主题','','在帖子列表页面和帖子阅读页面，可以看到“新帖”图标，点击即可进入主题帖发布页面，如果没有发帖权限，会有提示“本论坛只有特定用户组才能发表主题,请到其他版块发帖,以提高等级!”出现。','0','0');
-INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('99','87','2','84,87','0','发表出售帖','','在帖子列表页面和帖子阅读页面，点击“新帖”图标进入主题帖发布页面，发帖时在帖子编辑器下方找到“出售此帖”，在前面的复选框理勾选（如果复选框呈灰色，说明该版块不允许发布交易帖或者您的权限不够），填写好会员读帖需要支付的金钱数量（注意不能超过支付最大值）。','0','0');
-INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('100','87','2','84,87','0','发表特殊主题','','在帖子列表页面和帖子阅读页面，当鼠标停在新帖图标上时，如果你在该版块有发表特殊主题（如投票帖、辩论帖等）的权限时，就会出现一个下拉菜单，菜单项里显示：投票、辩论，点击需要的帖子类型即可进入相应的主题发表页面发布新的主题。','0','0');
-INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('101','87','2','84,87','0','发表匿名帖','','在帖子列表页面和帖子阅读页面，点击“新帖”图标进入发帖页面，在编辑框上方的设置区内勾选“匿名”就可以发表匿名帖子。（如果复选框呈灰色，说明该版块不允许发布匿名帖或者您的权限不够）。','0','0');
-INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('102','87','2','84,87','0','发表回复','','在帖子阅读页面点击“回复”按钮进入回复页面回复主题帖，也可以在页面下方的快速发帖处进行回复。','0','0');
-INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('103','87','2','84,87','0','引用功能','','在需要引用的帖子楼层上点击引用，即可引用当前楼层内容，也可以用Wind Code代码进行引用，把需要引用的内容放入[quote] 您要引用的文字[/quote]中间即可。','0','0');
-INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('104','87','2','84,87','0','附件上传','','在发帖页面下的附件上传处点击浏览按钮，上传有效后缀类型的附件，同时可以在描述框对附件进行描述，并设置下载附件所需要的威望值。','0','0');
-INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('105','88','2','84,88','0','如何进入个人中心？','','站点会员在登录的状态下可以进入个人中心，点击页面右上角的“我的快捷通道-个人中心”就可以进入到个人中心了。','0','0');
-INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('106','88','2','84,88','0','如何添加好友？','','首先进入个人中心的朋友模块，然后可以选择添加好友的方式是查找好友或者邀请好友，查找好友的话，首先搜索到要添加为好友的用户，点击“加为好友”，然后待对方同意后，就可以成为好友了；邀请好友的话，首先向好友发送邀请链接，待好友注册后，操作“加为好友”，待对方确认后就可以添加为好友了。','0','0');
-INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('107','89','2','84,89','0','找回密码','','如果您忘记密码，请在登录页面点击“找回密码” 并输入用户名，系统将自动发送密码到您的有效电子邮箱中。','0','0');
-INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('108','89','2','84,89','0','收藏功能','','等于已登录的用户，在帖子阅读页的主题帖中，点击“收藏”按钮，可以将帖子收藏到自己的收藏夹中，会员可以在个人中心的收藏模块中查看历史收藏的帖子。','0','0');
-INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('109','89','2','84,89','0','短消息功能','','可以通过会员头像信息栏或者帖子楼层短消息按钮实现会员之间互发短消息。','0','0');
-INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('110','89','2','84,89','0','帖子举报功能','','协助站长进行帖子监控、举报不良帖子推荐优秀帖子的功能。在帖子楼层操作栏点击“举报”填写理由并提交就能实现了对当前楼层帖子举报的操作。','0','0');
-INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('111','90','2','85,90','0','如何发表日志？','','会员登录站点后，进入个人中心，点击右上角的“写日志”按钮就会进入撰写日志的页面，撰写完毕后，点击“提交”按钮，日志发表成功。','0','0');
-INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('112','90','2','85,90','0','如何设置浏览权限？','','在写新日志时，修改日志的隐私设置，目前日志的浏览权限分为全站可见、仅好友可见、尽自己可见三种类别。','0','0');
-INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('16','7','2','47,7','0','发表回复','','<b>如何发表回复？</b>\n1.回复主题：帖子阅读页面点击“回复”按钮进入回复页面，或使用页面下方的快速发帖框即可；\n2.回复某楼层：点击该楼层中的“回复”，转到到快速回复框进行回复','3','1');
-INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('17','7','2','47,7','0','附件使用','','<b>如何发表附件？</b>\n在帖子编辑页面底部附带了附件上传。\n1.普通上传，表示一次上传一个文件，点击[选择文件]选择本地的文件，插入到编辑内容后，才能上传。\n2.批量上传，一次最多可上次15个文件，点击[选择文件]选择本地的文件进行上传，上传完毕后插入到编辑内容。\n\n<b>如何设置附件购买？</b>\n附件普通上传时，设置查看附件需要消耗的积分类型、积分值即可。','4','1');
-INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('70','54','4','50,53,64,54','0','发表特殊主题','','在帖子列表页面和帖子阅读页面，当鼠标停在新帖图标上时，如果你在该版块有发表特殊主题（如投票帖、辩论帖等）的权限时，就会出现一个下拉菜单，菜单项里显示：投票、辩论，点击需要的帖子类型即可进入相应的主题发表页面发布新的主题。','0','0');
-INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('71','54','4','50,53,64,54','0','发表匿名帖','','在帖子列表页面和帖子阅读页面，点击“新帖”图标进入发帖页面，在编辑框上方的设置区内勾选“匿名”就可以发表匿名帖子。（如果复选框呈灰色，说明该版块不允许发布匿名帖或者您的权限不够）。','0','0');
-INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('72','54','4','50,53,64,54','0','发表回复','','在帖子阅读页面点击“回复”按钮进入回复页面回复主题帖，也可以在页面下方的快速发帖处进行回复。','0','0');
-INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('73','54','4','50,53,64,54','0','引用功能','','在需要引用的帖子楼层上点击引用，即可引用当前楼层内容，也可以用Wind Code代码进行引用，把需要引用的内容放入[quote] 您要引用的文字[/quote]中间即可。','0','0');
-INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('74','54','4','50,53,64,54','0','附件上传','','在发帖页面下的附件上传处点击浏览按钮，上传有效后缀类型的附件，同时可以在描述框对附件进行描述，并设置下载附件所需要的威望值。','0','0');
-INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('75','55','2','50,55','0','如何进入个人中心？','','站点会员在登录的状态下可以进入个人中心，点击页面右上角的“我的快捷通道-个人中心”就可以进入到个人中心了。','0','0');
-INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('76','55','2','50,55','0','如何添加好友？','','首先进入个人中心的朋友模块，然后可以选择添加好友的方式是查找好友或者邀请好友，查找好友的话，首先搜索到要添加为好友的用户，点击“加为好友”，然后待对方同意后，就可以成为好友了；邀请好友的话，首先向好友发送邀请链接，待好友注册后，操作“加为好友”，待对方确认后就可以添加为好友了。','0','0');
-INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('67','53','2','50,53','0','编辑个人资料','','点击页面右上角“设置-帐号”，进入设置账号的页面，就可以对自己的资料信息进行编辑和修改了。','0','0');
-INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('68','54','4','50,53,64,54','0','发表主题','','在帖子列表页面和帖子阅读页面，可以看到“新帖”图标，点击即可进入主题帖发布页面，如果没有发帖权限，会有提示“本论坛只有特定用户组才能发表主题,请到其他版块发帖,以提高等级!”出现。','0','0');
-INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('69','54','4','50,53,64,54','0','发表出售帖','','在帖子列表页面和帖子阅读页面，点击“新帖”图标进入主题帖发布页面，发帖时在帖子编辑器下方找到“出售此帖”，在前面的复选框理勾选（如果复选框呈灰色，说明该版块不允许发布交易帖或者您的权限不够），填写好会员读帖需要支付的金钱数量（注意不能超过支付最大值）。','0','0');
-INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('65','53','2','50,53','0','如何登录？','','如果您已经是注册会员，可以在网站首页头部的登录模块进行登录，也可以在页面头部导航栏点击“登录”，进入登录页面进行登录，在限制游客访问的页面，也会有登录提示页面出现。','0','0');
-INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('66','53','2','50,53','0','忘记密码怎么办','','如果您忘记密码，请在登录页面点击“找回密码” 并输入用户名，系统将自动发送密码到您注册时填写的电子邮箱中。','0','0');
-INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('54','64','3','50,53,64','1','帖子相关','','撒地方撒地方','0','0');
-INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('113','92','2','85,92','0','如何创建群组？','','对于已登录的会员，在个人中心中点击“群组”进入添加新群组，根据提示信息提交即可。','0','0');
-INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('64','53','2','50,53','1','注册成为会员？','','如果您还没有注册，是以游客状态浏览论坛的，在头部导航栏可以看到“您尚未　登录&nbsp; 注册”的字样，点击“注册”，填写相应的信息，就可以完成注册了。因站点设置的不同，游客的浏览及使用论坛的权限会受到很多限制，如果您喜欢这个论坛，建议您马上注册。','0','0');
-INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('40','39','2','38,39','0','设置模块属性','','','1','0');
-INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('41','39','2','38,39','0','设置模块书香','http://www.baidu.com','啊打三分啊打三分啊打三分啊打三分啊打三分啊打三分啊打三分啊打三分啊打三分啊打三分啊打三分啊打三分啊打三分','2','0');
-INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('42','13','2','26,13','0','啊打算分手','','','1','0');
-INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('43','8','3','47,7,8','0','发表主题三级标','','发表主题三级标题发表主题三级标题发表主题三级标题发表主题三级标题发表主题三级标题发表主题三级标题发表主题三级标题发表主题三级标题发表主题三级标题发表主题三级标题','0','0');
-INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('114','92','2','85,92','0','如何设置群管理员？','','如果你是群创始人，那么你就有权利去设定该群的管理员。进入群的成员列表，选择相关的成员设置为管理员即可。','0','0');
-INSERT INTO pw_help (hid, hup, lv, fathers, ifchild, title, url, content, vieworder, ispw) VALUES('115','92','2','85,92','0','群组是否可以设置为私有？','','群组可以设置成私有。\n1.将群组加入权限设置成不允许任何人加入。\n2.将群组内容设置为不公开。\n3.将群组相册设置为不公开。','0','0');
+ 
+DROP TABLE IF EXISTS pw_hits_threads;
+CREATE TABLE pw_hits_threads (
+  tid int(10) unsigned NOT NULL DEFAULT '0',
+  hits int(10) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (tid)
+) ENGINE=MyISAM;
 
 DROP TABLE IF EXISTS pw_invitecode;
 CREATE TABLE pw_invitecode (
@@ -2247,7 +2293,8 @@ CREATE TABLE pw_invitecode (
   receiver varchar(20) NOT NULL default '',
   createtime int(10) unsigned NOT NULL default '0',
   usetime int(10) unsigned NOT NULL default '0',
-  ifused tinyint(1) NOT NULL default '0',
+  ifused tinyint(3) NOT NULL default '0',
+  type tinyint(3) unsigned not null default 0,
   PRIMARY KEY  (id),
   KEY idx_uid (uid),
   KEY idx_invcode (invcode)
@@ -2277,7 +2324,8 @@ CREATE TABLE pw_invoke (
   parsecode text NOT NULL,
   title varchar(80) NOT NULL default '',
   PRIMARY KEY  (id),
-  UNIQUE KEY idx_name (name)
+  UNIQUE KEY idx_name (name),
+  KEY idx_title (title)
 ) TYPE=MyISAM;
 
 DROP TABLE IF EXISTS pw_invokepiece;
@@ -2286,7 +2334,7 @@ CREATE TABLE pw_invokepiece (
   invokename varchar(50) NOT NULL default '',
   title varchar(50) NOT NULL default '',
   action varchar(30) NOT NULL default '',
-  config text NOT NULL default '',
+  config varchar(255) NOT NULL default '',
   num smallint(6) NOT NULL default '0',
   param text NOT NULL,
   cachetime int(10) unsigned NOT NULL default '0',
@@ -2325,13 +2373,19 @@ CREATE TABLE pw_job (
   job varchar(255) NOT NULL default '',
   factor text,
   isopen tinyint(3) unsigned NOT NULL default '0',
+  isuserguide tinyint(3) unsigned NOT NULL default '0',
   PRIMARY KEY (id)
 ) ENGINE=MyISAM;
-INSERT INTO pw_job VALUES('1','更新个人头像','上传自己的头像，给大家留个好印象吧','','1259896560','0','0','a:4:{s:4:"type";s:5:"money";s:3:"num";s:2:"10";s:8:"category";s:6:"credit";s:11:"information";s:17:"可获得 铜币 ";}','2','8','0','0','0','1','0','1','0','doUpdateAvatar','a:1:{s:5:"limit";s:0:"";}','1');
-INSERT INTO pw_job VALUES('2','完善个人资料','要让大家了解你，就要先更新自己的个人资料哦','','1259896260','0','0','a:4:{s:4:"type";s:5:"money";s:3:"num";s:2:"10";s:8:"category";s:6:"credit";s:11:"information";s:17:"可获得 铜币 ";}','1','8','0','0','0','1','1','1','0','doUpdatedata','a:1:{s:5:"limit";s:0:"";}','1');
-INSERT INTO pw_job VALUES('3','给admin发送消息','要和大家熟悉起来，一定要学会发消息哦，还可以顺便问问题','','1259694720','0','0','a:4:{s:4:"type";s:5:"money";s:3:"num";s:2:"10";s:8:"category";s:6:"credit";s:11:"information";s:17:"可获得 铜币 ";}','3','8','0','0','0','1','1','1','0','doSendMessage','a:2:{s:4:"user";s:5:"admin";s:5:"limit";s:0:"";}','1');
-INSERT INTO pw_job VALUES('4','寻找并添加5个好友','去找找有没有志同道合的朋友？加他们为好友吧','','1259694780','0','0','a:4:{s:4:"type";s:5:"money";s:3:"num";s:2:"10";s:8:"category";s:6:"credit";s:11:"information";s:17:"可获得 铜币 ";}','4','8','0','0','0','1','1','1','0','doAddFriend','a:4:{s:4:"user";s:0:"";s:4:"type";s:1:"2";s:3:"num";s:1:"5";s:5:"limit";s:0:"";}','1');
-INSERT INTO pw_job VALUES('5','论坛每日红包','发红包咯！每天报到都有红包','','1259694840','0','24','a:4:{s:4:"type";s:5:"money";s:3:"num";s:2:"10";s:8:"category";s:6:"credit";s:11:"information";s:17:"可获得 铜币 ";}','7','','0','0','0','0','1','0','0','doSendGift','','1');
+INSERT INTO pw_job VALUES('1','更新个人头像','上传自己的头像，给大家留个好印象吧','','1259896560','0','0','a:4:{s:4:"type";s:5:"money";s:3:"num";s:2:"10";s:8:"category";s:6:"credit";s:11:"information";s:17:"可获得 铜币 ";}','2','8','0','0','0','1','0','1','0','doUpdateAvatar','a:1:{s:5:"limit";s:0:"";}','1', 0);
+INSERT INTO pw_job VALUES('2','完善个人资料','要让大家了解你，就要先更新自己的个人资料哦','','1259896260','0','0','a:4:{s:4:"type";s:5:"money";s:3:"num";s:2:"10";s:8:"category";s:6:"credit";s:11:"information";s:17:"可获得 铜币 ";}','1','8','0','0','0','1','1','1','0','doUpdatedata','a:1:{s:5:"limit";s:0:"";}','1', 0);
+INSERT INTO pw_job VALUES('3','给指定用户发送消息','要和大家熟悉起来，一定要学会发消息哦，还可以顺便问问题','','1259694720','0','0','a:4:{s:4:"type";s:5:"money";s:3:"num";s:2:"10";s:8:"category";s:6:"credit";s:11:"information";s:17:"可获得 铜币 ";}','3','8','0','0','0','1','1','1','0','doSendMessage','a:2:{s:4:"user";s:5:"admin";s:5:"limit";s:0:"";}','1', 0);
+INSERT INTO pw_job VALUES('4','寻找并添加5个好友','去找找有没有志同道合的朋友？加他们为好友吧','','1259694780','0','0','a:4:{s:4:"type";s:5:"money";s:3:"num";s:2:"10";s:8:"category";s:6:"credit";s:11:"information";s:17:"可获得 铜币 ";}','4','8','0','0','0','1','1','1','0','doAddFriend','a:4:{s:4:"user";s:0:"";s:4:"type";s:1:"2";s:3:"num";s:1:"5";s:5:"limit";s:0:"";}','1', 0);
+INSERT INTO pw_job VALUES('5','论坛每日红包','发红包咯！每天报到都有红包','','1259694840','0','24','a:4:{s:4:"type";s:5:"money";s:3:"num";s:2:"10";s:8:"category";s:6:"credit";s:11:"information";s:17:"可获得 铜币 ";}','7','','0','0','0','0','1','0','0','doSendGift','', 0, 0);
+INSERT INTO pw_job VALUES('6','实名认证-支付宝绑定', '支付宝：支付宝是现代电子商务信用环节中重要的一环绑定您的支付宝账号获得实名认证标识更能享有认证会员积分特权', '', 0, 0, 0, 'a:4:{s:4:"type";s:5:"money";s:3:"num";s:2:"10";s:8:"category";s:6:"credit";s:11:"information";s:17:"可获得 铜币 ";}', 2, '', 0, 0, 0, 1, 0, 0, 0, 'doAuthAlipay', 'a:1:{s:5:"limit";s:0:"";}', 0, 0);
+INSERT INTO pw_job VALUES('7','实名认证-手机绑定', '手机：绑定手机获得实名认证标识更能享有认证会员积分特权以及通过手机验证码找回密码功能让您的账号万无一失', '', 0, 0, 0, 'a:4:{s:4:"type";s:5:"money";s:3:"num";s:2:"10";s:8:"category";s:6:"credit";s:11:"information";s:17:"可获得 铜币 ";}', 2, '', 0, 0, 0, 1, 0, 0, 0, 'doAuthMobile', 'a:1:{s:5:"limit";s:0:"";}', 0, 0);
+INSERT INTO pw_job VALUES('8','新用户引导上传头像', '', '', 0, 0, 0, 'a:4:{s:4:"type";s:5:"money";s:3:"num";s:2:"10";s:8:"category";s:6:"credit";s:11:"information";s:17:"可获得 铜币 ";}', 2, '', 0, 0, 0, 1, 0, 0, 0, 'doUpdateAvatar', '', 1, 1);
+INSERT INTO pw_job VALUES('9','新用户引导完善资料', '', '', 0, 0, 0, 'a:4:{s:4:"type";s:4:"rvrc";s:3:"num";s:2:"20";s:8:"category";s:6:"credit";s:11:"information";s:17:"可获得 威望 ";}', 1, '', 0, 0, 0, 1, 0, 0, 0, 'doUpdatedata', '', 1, 1);
+INSERT INTO pw_job VALUES('10','新用户引导关注其他用户', '', '', 0, 0, 0, 'a:4:{s:4:"type";s:5:"money";s:3:"num";s:2:"10";s:8:"category";s:6:"credit";s:11:"information";s:17:"可获得 铜币 ";}', 1, '', 0, 0, 0, 1, 0, 0, 0, 'doAddFriend', '', 1, 1);
 
 DROP TABLE IF EXISTS pw_jober;
 CREATE TABLE pw_jober (
@@ -2471,14 +2525,14 @@ CREATE TABLE pw_memberdata (
   monthpost smallint(6) unsigned NOT NULL default '0',
   uploadtime int(10) unsigned NOT NULL default '0',
   uploadnum smallint(6) unsigned NOT NULL default '0',
-  follows mediumint(8) unsigned NOT NULL,
-  fans mediumint(8) unsigned NOT NULL,
-  newfans mediumint(8) unsigned NOT NULL,
-  newreferto mediumint(8) unsigned NOT NULL,
+  follows mediumint(8) unsigned NOT NULL default '0',
+  fans mediumint(8) unsigned NOT NULL default '0',
+  newfans mediumint(8) unsigned NOT NULL default '0',
+  newreferto mediumint(8) unsigned NOT NULL default '0',
   newcomment mediumint(8) unsigned NOT NULL DEFAULT '0',
   onlineip varchar(30) NOT NULL default '',
   starttime int(10) unsigned NOT NULL default '0',
-  postcheck varchar(16) NOT NULL default '',
+  postcheck varchar(255) NOT NULL default '',
   pwdctime int(10) unsigned NOT NULL default '0',
   f_num int(10) unsigned NOT NULL default '0',
   creditpop varchar(150) NOT NULL default '',
@@ -2550,11 +2604,38 @@ CREATE TABLE pw_members (
   medals varchar(255) NOT NULL default '',
   userstatus int(10) unsigned NOT NULL default '0',
   shortcut varchar(255) NOT NULL default '',
+  authmobile char(16) NOT NULL default '',
+  realname varchar(16) NOT NULL default '',
+  apartment int(10) unsigned NOT NULL default 0,
+  home int(10) unsigned NOT NULL default 0,
   PRIMARY KEY  (uid),
   UNIQUE KEY idx_username (username),
   KEY idx_groupid (groupid),
   KEY idx_email (email)
 ) TYPE=MyISAM;
+
+ 
+DROP TABLE IF EXISTS pw_membertags;
+CREATE TABLE `pw_membertags` (
+  `tagid` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `tagname` varchar(32) NOT NULL DEFAULT '',
+  `num` int(10) unsigned NOT NULL DEFAULT '0',
+  `ifhot` tinyint(3) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`tagid`),
+  UNIQUE KEY `idx_tagname` (`tagname`),
+  KEY `idx_ifhot_num` (`ifhot`,`num`)
+) ENGINE=MyISAM;
+
+ 
+DROP TABLE IF EXISTS pw_membertags_relations;
+CREATE TABLE `pw_membertags_relations` (
+  `tagid` int(10) unsigned NOT NULL DEFAULT '0',
+  `userid` int(10) unsigned NOT NULL DEFAULT '0',
+  `crtime` int(10) unsigned NOT NULL DEFAULT '0',
+  UNIQUE KEY `idx_tagid_userid` (`tagid`,`userid`),
+  KEY `idx_userid` (`userid`),
+  KEY `idx_crtime` (`crtime`)
+) ENGINE=MyISAM;
 
 DROP TABLE IF EXISTS pw_memo;
 CREATE TABLE pw_memo (
@@ -2602,6 +2683,18 @@ INSERT INTO pw_modehot VALUES(23, 0, 5, 'forumHot', '论坛版块排行', 'N;', 
 INSERT INTO pw_modehot VALUES(24, 23, 1, 'forumPost', '今日发帖排行', 'N;', 'N;', '1', '1', NULL);
 INSERT INTO pw_modehot VALUES(25, 23, 2, 'forumTopic', '主题排行', 'N;', 'N;', '0', '1', NULL);
 INSERT INTO pw_modehot VALUES(26, 23, 3, 'forumArticle', '文章排行', 'N;', 'N;', '0', '1', NULL);
+
+DROP TABLE IF EXISTS pw_mpageconfig;
+CREATE TABLE pw_mpageconfig (
+  id smallint(6) unsigned NOT NULL auto_increment,
+  mode varchar(20) NOT NULL default '',
+  scr varchar(20) NOT NULL default '',
+  fid smallint(6) unsigned NOT NULL default '0',
+  invokes text NOT NULL,
+  config text NOT NULL,
+  PRIMARY KEY  (id),
+  UNIQUE KEY idx_mode_scr_fid (mode,scr,fid)
+) TYPE=MyISAM;
 
 DROP TABLE IF EXISTS pw_ms_attachs;
 CREATE TABLE pw_ms_attachs (
@@ -2663,6 +2756,7 @@ CREATE TABLE pw_ms_relations (
   created_time int(10) NOT NULL default '0',
   actived_time int(10) NOT NULL default '0',
   modified_time int(10) NOT NULL default '0',
+  relation tinyint(3) not null default '1',
   PRIMARY KEY (rid),
   KEY idx_uid_categoryid_typeid_modifiedtime (uid,categoryid,typeid,modified_time),
   KEY idx_uid_categoryid_modifiedtime (uid,categoryid,modified_time),
@@ -2759,6 +2853,43 @@ CREATE TABLE pw_online (
   KEY idx_uid (uid),
   KEY idx_ip (ip)
 ) TYPE=HEAP;
+
+ 
+DROP TABLE IF EXISTS pw_online_statistics;
+CREATE TABLE pw_online_statistics (
+  name char(30) NOT NULL DEFAULT '',
+  value int(10) unsigned NOT NULL DEFAULT '0',
+  lastupdate int(10) NOT NULL DEFAULT '0',
+  PRIMARY KEY  (name)
+) ENGINE=MyISAM;
+
+DROP TABLE IF EXISTS pw_online_guest;
+CREATE TABLE pw_online_guest (
+  ip int(10) NOT NULL DEFAULT '0',
+  token tinyint unsigned NOT NULL DEFAULT '0',
+  lastvisit int(10) NOT NULL DEFAULT '0',
+  fid smallint(6) NOT NULL DEFAULT '0',
+  tid int(10) NOT NULL DEFAULT '0',
+  action tinyint(3) NOT NULL DEFAULT '0',
+  ifhide tinyint(1) NOT NULL DEFAULT '0',
+  primary key (ip, token),
+  KEY idx_ip(ip)
+) ENGINE=MEMORY;
+
+DROP TABLE IF EXISTS pw_online_user;
+CREATE TABLE pw_online_user (
+  uid int(10) unsigned NOT NULL default '0',
+  username char(15) NOT NULL DEFAULT '',
+  lastvisit int(10) NOT NULL DEFAULT '0',
+  ip int(10) NOT NULL default '0',
+  fid smallint(6) unsigned NOT NULL DEFAULT '0',
+  tid int(10) unsigned NOT NULL DEFAULT '0',
+  groupid tinyint(3) NOT NULL DEFAULT '0',
+  action tinyint(3) NOT NULL DEFAULT '0',
+  ifhide tinyint(1) NOT NULL DEFAULT '0',
+  PRIMARY KEY  (uid),
+  KEY idx_fid (fid)
+) ENGINE=MEMORY;
 
 DROP TABLE IF EXISTS pw_ouserdata;
 CREATE TABLE pw_ouserdata (
@@ -3094,6 +3225,7 @@ INSERT INTO pw_permission VALUES('0','0','3','imgwidth','basic','');
 INSERT INTO pw_permission VALUES('0','0','3','imgheight','basic','');
 INSERT INTO pw_permission VALUES('0','0','3','fontsize','basic','');
 INSERT INTO pw_permission VALUES('0','0','3','msggroup','basic','1');
+INSERT INTO pw_permission VALUES('0','0','3','multiopen','basic','1');
 INSERT INTO pw_permission VALUES('0','0','3','maxfavor','basic','100');
 INSERT INTO pw_permission VALUES('0','0','3','viewvote','basic','1');
 INSERT INTO pw_permission VALUES('0','0','3','atccheck','basic','1');
@@ -4091,13 +4223,6 @@ INSERT INTO pw_permission VALUES('0','0','15','allowcreate','basic','20');
 INSERT INTO pw_permission VALUES('0','0','3','tcanedit','systemforum','3,4,5');
 INSERT INTO pw_permission VALUES('0','0','4','tcanedit','systemforum','3,4,5');
 INSERT INTO pw_permission VALUES('0','0','5','tcanedit','systemforum','5');
-INSERT INTO pw_permission VALUES('0','0','3','bansignature','systemforum','1');
-INSERT INTO pw_permission VALUES('0','0','3','delalbum','systemforum','1');
-INSERT INTO pw_permission VALUES('0','0','3','deldiary','systemforum','1');
-INSERT INTO pw_permission VALUES('0','0','3','delweibo','systemforum','1');
-INSERT INTO pw_permission VALUES('0','0','3','delactive','systemforum','1');
-INSERT INTO pw_permission VALUES('0','0','3','recommendactive','systemforum','1');
-INSERT INTO pw_permission VALUES('0','0','3','banuserip','systemforum','1');
 
 DROP TABLE IF EXISTS pw_pidtmp;
 CREATE TABLE pw_pidtmp (
@@ -4398,6 +4523,17 @@ CREATE TABLE pw_schcache (
   KEY idx_schline (schline)
 ) TYPE=MyISAM;
 
+ 
+DROP TABLE IF EXISTS pw_school;
+CREATE TABLE `pw_school` (
+  `schoolid` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `schoolname` VARCHAR(32) NOT NULL DEFAULT '',
+  `areaid` int(11) NOT NULL DEFAULT '0',
+  `type` tinyint(3) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`schoolid`),
+  KEY `idx_areaid_type` (`areaid`,`type`)
+) ENGINE = MYISAM;
+
 DROP TABLE IF EXISTS pw_searchadvert;
 CREATE TABLE pw_searchadvert(
    `id` mediumint(8) unsigned not null auto_increment,
@@ -4413,12 +4549,28 @@ CREATE TABLE pw_searchadvert(
 )ENGINE=MyISAM;
 
 DROP TABLE IF EXISTS pw_searchforum;
-CREATE TABLE IF NOT EXISTS pw_searchforum (
+CREATE TABLE IF NOT EXISTS `pw_searchforum` (
   `id` smallint(6) unsigned not null auto_increment,
   `fid` smallint(6) unsigned not null default '0',
   `vieworder` smallint(6) not null default '0',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM;
+
+DROP TABLE IF EXISTS pw_searchhotwords;
+CREATE TABLE IF NOT EXISTS `pw_searchhotwords` (
+  id mediumint(8) unsigned not null auto_increment,
+  keyword varchar(32) not null default '',
+  vieworder tinyint(3) not null default '0',
+  fromtype enum('custom','auto') not null default 'custom',
+  posttime int(10) unsigned not null default '0',
+  expire int(10) unsigned not null default '0',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM;
+
+INSERT INTO `pw_searchhotwords` (`id`, `keyword`, `vieworder`, `fromtype`, `posttime`, `expire`) VALUES
+(1, '结婚', 1, 'custom', 1300247428, 0),
+(2, '母婴', 2, 'custom', 1300247428, 0),
+(3, 'phpwind', 3, 'custom', 1300712565, 0);
 
 DROP TABLE IF EXISTS pw_searchstatistic;
 CREATE TABLE IF NOT EXISTS `pw_searchstatistic` (
@@ -4469,8 +4621,7 @@ CREATE TABLE IF NOT EXISTS `pw_sharelinkstype` (
   `ifable` tinyint(3) unsigned not null default '0',
   PRIMARY KEY (`stid`)
 ) ENGINE=MyISAM;
-
-INSERT INTO `pw_sharelinkstype` (`stid`, `name`, `vieworder`, `ifable`) VALUES (1, '门户', 1, 1),(2, '论坛', 2, 1);
+INSERT INTO `pw_sharelinkstype` (`stid`, `name`, `vieworder`, `ifable`) VALUES (1, '分类一', 1, 1),(2, '分类二', 2, 1);
 
 DROP TABLE IF EXISTS pw_singleright;
 CREATE TABLE pw_singleright (
@@ -4491,21 +4642,61 @@ CREATE TABLE pw_smiles (
   type smallint(6) NOT NULL default '0',
   PRIMARY KEY  (id)
 ) TYPE=MyISAM;
-INSERT INTO pw_smiles (path,name,vieworder,type) VALUES ('default','{#smile}','1','0');
-INSERT INTO pw_smiles (path,vieworder,type) VALUES ('1.gif','0','1');
-INSERT INTO pw_smiles (path,vieworder,type) VALUES ('2.gif','0','1');
-INSERT INTO pw_smiles (path,vieworder,type) VALUES ('3.gif','0','1');
-INSERT INTO pw_smiles (path,vieworder,type) VALUES ('4.gif','0','1');
-INSERT INTO pw_smiles (path,vieworder,type) VALUES ('5.gif','0','1');
-INSERT INTO pw_smiles (path,vieworder,type) VALUES ('6.gif','0','1');
-INSERT INTO pw_smiles (path,vieworder,type) VALUES ('7.gif','0','1');
-INSERT INTO pw_smiles (path,vieworder,type) VALUES ('8.gif','0','1');
-INSERT INTO pw_smiles (path,vieworder,type) VALUES ('9.gif','0','1');
-INSERT INTO pw_smiles (path,vieworder,type) VALUES ('10.gif','0','1');
-INSERT INTO pw_smiles (path,vieworder,type) VALUES ('11.gif','0','1');
-INSERT INTO pw_smiles (path,vieworder,type) VALUES ('12.gif','0','1');
-INSERT INTO pw_smiles (path,vieworder,type) VALUES ('13.gif','0','1');
-INSERT INTO pw_smiles (path,vieworder,type) VALUES ('14.gif','0','1');
+
+INSERT INTO `pw_smiles` (`id`, `path`, `name`, `descipt`, `vieworder`, `type`) VALUES
+(1, 'default', '默认表情', '', 1, 0),
+(2, '1.gif', '', '', 0, 1),
+(3, '2.gif', '', '', 0, 1),
+(4, '3.gif', '', '', 0, 1),
+(5, '4.gif', '', '', 0, 1),
+(6, '5.gif', '', '', 0, 1),
+(7, '6.gif', '', '', 0, 1),
+(8, '7.gif', '', '', 0, 1),
+(9, '8.gif', '', '', 0, 1),
+(10, '9.gif', '', '', 0, 1),
+(11, '10.gif', '', '', 0, 1),
+(12, '11.gif', '', '', 0, 1),
+(13, '12.gif', '', '', 0, 1),
+(14, '13.gif', '', '', 0, 1),
+(15, '14.gif', '', '', 0, 1),
+(16, 'wangwang', '旺旺', '', 2, 0),
+(152, '9.gif', '', '', 0, 16),
+(151, '8.gif', '', '', 0, 16),
+(150, '7.gif', '', '', 0, 16),
+(149, '6.gif', '', '', 0, 16),
+(148, '5.gif', '', '', 0, 16),
+(147, '4.gif', '', '', 0, 16),
+(146, '37.gif', '', '', 0, 16),
+(145, '36.gif', '', '', 0, 16),
+(144, '35.gif', '', '', 0, 16),
+(143, '34.gif', '', '', 0, 16),
+(142, '33.gif', '', '', 0, 16),
+(141, '32.gif', '', '', 0, 16),
+(140, '31.gif', '', '', 0, 16),
+(139, '30.gif', '', '', 0, 16),
+(138, '3.gif', '', '', 0, 16),
+(137, '29.gif', '', '', 0, 16),
+(136, '28.gif', '', '', 0, 16),
+(135, '27.gif', '', '', 0, 16),
+(134, '26.gif', '', '', 0, 16),
+(133, '25.gif', '', '', 0, 16),
+(132, '24.gif', '', '', 0, 16),
+(131, '23.gif', '', '', 0, 16),
+(130, '22.gif', '', '', 0, 16),
+(129, '21.gif', '', '', 0, 16),
+(128, '20.gif', '', '', 0, 16),
+(127, '2.gif', '', '', 0, 16),
+(126, '19.gif', '', '', 0, 16),
+(125, '18.gif', '', '', 0, 16),
+(124, '17.gif', '', '', 0, 16),
+(123, '16.gif', '', '', 0, 16),
+(122, '15.gif', '', '', 0, 16),
+(121, '14.gif', '', '', 0, 16),
+(120, '13.gif', '', '', 0, 16),
+(119, '12.gif', '', '', 0, 16),
+(118, '11.gif', '', '', 0, 16),
+(117, '10.gif', '', '', 0, 16),
+(116, '1.gif', '', '', 0, 16);
 
 DROP TABLE IF EXISTS pw_space;
 CREATE TABLE pw_space (
@@ -4522,6 +4713,7 @@ CREATE TABLE pw_space (
   layout text NOT NULL,
   modelset text NOT NULL,
   descript VARCHAR(255) NOT NULL default '',
+  spacestyle tinyint(3) unsigned not null default '2',
   PRIMARY KEY (uid)
 ) ENGINE=MyISAM;
 
@@ -4531,6 +4723,18 @@ CREATE TABLE pw_sqlcv (
   var varchar(20) NOT NULL default '',
   PRIMARY KEY  (id)
 ) TYPE=MyISAM;
+
+DROP TABLE IF EXISTS `pw_statistics_daily`;
+CREATE TABLE IF NOT EXISTS `pw_statistics_daily` (
+  `id` int(11) unsigned not null AUTO_INCREMENT,
+  `name` char(32) not null default '',
+  `typeid` int(6) unsigned not null default '0',
+  `date` date not null default '0000-00-00',
+  `value` int(11) unsigned not null default '0',
+  `updatetime` int(11) unsigned not null default '0',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idx_name_date_typeid` (`name`,`date`,`typeid`)
+) ENGINE=MyISAM AUTO_INCREMENT=1;
 
 DROP TABLE IF EXISTS pw_stopic;
 CREATE TABLE pw_stopic (
@@ -4721,12 +4925,20 @@ CREATE TABLE pw_threads (
   KEY idx_fid_ifcheck_topped_lastpost (fid,ifcheck,topped,lastpost)
 ) TYPE=MyISAM;
 
+ 
 DROP TABLE IF EXISTS pw_threads_img;
 CREATE TABLE `pw_threads_img` (
   `tid` int(10) unsigned NOT NULL,
-  `fid` mediumint(8) unsigned NOT NULL,
-  PRIMARY KEY  (`tid`),
-  KEY `fid` (`fid`,`tid`)
+  `fid` smallint(6) unsigned NOT NULL DEFAULT '0',
+  `tpcnum` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `totalnum` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `collectnum` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `cover` varchar(80) NOT NULL DEFAULT '',
+  `ifcheck` TINYINT(3) NOT NULL DEFAULT '1',
+  `topped` SMALLINT(6) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`tid`),
+  KEY `idx_fid_topped_tid` (`fid` ,`topped` , `tid`),
+  KEY `idx_fid_topped_totalnum` (`fid` ,`topped` , `totalnum`)
 ) TYPE=MyISAM;
 
 DROP TABLE IF EXISTS pw_tmsgs;
@@ -4859,6 +5071,7 @@ CREATE TABLE pw_topictype (
  logo varchar(255) NOT NULL default '',
  vieworder tinyint(3) NOT NULL default '0',
  upid smallint(6) unsigned NOT NULL default '0',
+ ifsys tinyint(3) unsigned not null default '0',
  PRIMARY KEY  (id)
 ) TYPE=MyISAM;
 
@@ -4907,7 +5120,7 @@ CREATE TABLE pw_tradeorder (
   seller int(10) unsigned NOT NULL default '0',
   price decimal(6,2) NOT NULL default '0',
   quantity smallint(6) unsigned NOT NULL default '0',
-  transportfee decimal(4,2) NOT NULL default '0',
+  transportfee decimal(6,2) NOT NULL default '0',
   transport tinyint(3) unsigned NOT NULL default '0',
   buydate int(10) unsigned NOT NULL default '0',
   tradedate int(10) unsigned NOT NULL default '0',
@@ -4996,23 +5209,23 @@ CREATE TABLE pw_usergroups (
   KEY idx_gptype (gptype),
   KEY idx_grouppost (grouppost)
 ) TYPE=MyISAM;
-INSERT INTO pw_usergroups SET gid = 1,  gptype = 'default',grouptitle = 'default',    groupimg = '8', grouppost = 0, ifdefault=1;
-INSERT INTO pw_usergroups SET gid = 2,  gptype = 'default',grouptitle = '{#level_1}', groupimg = '8', grouppost = 0, ifdefault=0;
-INSERT INTO pw_usergroups SET gid = 3,  gptype = 'system', grouptitle = '{#level_3}', groupimg = '3', grouppost = 0, ifdefault=0;
-INSERT INTO pw_usergroups SET gid = 4,  gptype = 'system', grouptitle = '{#level_4}', groupimg = '4', grouppost = 0, ifdefault=0;
-INSERT INTO pw_usergroups SET gid = 5,  gptype = 'system', grouptitle = '{#level_5}', groupimg = '5', grouppost = 0, ifdefault=0;
-INSERT INTO pw_usergroups SET gid = 6,  gptype = 'default', grouptitle = '{#level_6}', groupimg = '8', grouppost = 0, ifdefault=0;
-INSERT INTO pw_usergroups SET gid = 7,  gptype = 'default', grouptitle = '{#level_7}', groupimg = '8', grouppost = 0, ifdefault=0;
-INSERT INTO pw_usergroups SET gid = 8,  gptype = 'member', grouptitle = '{#level_8}', groupimg = '8', grouppost = 0, ifdefault=0;
-INSERT INTO pw_usergroups SET gid = 9,  gptype = 'member', grouptitle = '{#level_9}', groupimg = '9', grouppost = 100, ifdefault=0;
-INSERT INTO pw_usergroups SET gid = 10, gptype = 'member', grouptitle = '{#level_10}',groupimg = '10',grouppost = 300, ifdefault=0;
-INSERT INTO pw_usergroups SET gid = 11, gptype = 'member', grouptitle = '{#level_11}',groupimg = '11',grouppost = 600, ifdefault=0;
-INSERT INTO pw_usergroups SET gid = 12, gptype = 'member', grouptitle = '{#level_12}',groupimg = '12',grouppost = 1000, ifdefault=0;
-INSERT INTO pw_usergroups SET gid = 13, gptype = 'member', grouptitle = '{#level_13}',groupimg = '13',grouppost = 5000, ifdefault=0;
-INSERT INTO pw_usergroups SET gid = 14, gptype = 'member', grouptitle = '{#level_14}',groupimg = '14',grouppost = 10000, ifdefault=0;
-INSERT INTO pw_usergroups SET gid = 15, gptype = 'member', grouptitle = '{#level_15}',groupimg = '14',grouppost = 50000, ifdefault=0;
-INSERT INTO pw_usergroups SET gid = 16, gptype = 'special',grouptitle = '{#level_16}',groupimg = '5', grouppost = 0, ifdefault=0;
-INSERT INTO pw_usergroups SET gid = 17, gptype = 'system',grouptitle = '门户编辑',groupimg = '17', grouppost = 0, ifdefault=0;
+INSERT INTO pw_usergroups SET gid = 1,  gptype = 'default',grouptitle = 'default',    groupimg = '0', grouppost = 0, ifdefault=1;
+INSERT INTO pw_usergroups SET gid = 2,  gptype = 'default',grouptitle = '{#level_1}', groupimg = '0', grouppost = 0, ifdefault=0;
+INSERT INTO pw_usergroups SET gid = 3,  gptype = 'system', grouptitle = '{#level_3}', groupimg = '21', grouppost = 0, ifdefault=0;
+INSERT INTO pw_usergroups SET gid = 4,  gptype = 'system', grouptitle = '{#level_4}', groupimg = '20', grouppost = 0, ifdefault=0;
+INSERT INTO pw_usergroups SET gid = 5,  gptype = 'system', grouptitle = '{#level_5}', groupimg = '19', grouppost = 0, ifdefault=0;
+INSERT INTO pw_usergroups SET gid = 6,  gptype = 'default', grouptitle = '{#level_6}', groupimg = '0', grouppost = 0, ifdefault=0;
+INSERT INTO pw_usergroups SET gid = 7,  gptype = 'default', grouptitle = '{#level_7}', groupimg = '0', grouppost = 0, ifdefault=0;
+INSERT INTO pw_usergroups SET gid = 8,  gptype = 'member', grouptitle = '{#level_8}', groupimg = '1', grouppost = 0, ifdefault=0;
+INSERT INTO pw_usergroups SET gid = 9,  gptype = 'member', grouptitle = '{#level_9}', groupimg = '2', grouppost = 100, ifdefault=0;
+INSERT INTO pw_usergroups SET gid = 10, gptype = 'member', grouptitle = '{#level_10}',groupimg = '3',grouppost = 300, ifdefault=0;
+INSERT INTO pw_usergroups SET gid = 11, gptype = 'member', grouptitle = '{#level_11}',groupimg = '4',grouppost = 600, ifdefault=0;
+INSERT INTO pw_usergroups SET gid = 12, gptype = 'member', grouptitle = '{#level_12}',groupimg = '5',grouppost = 1000, ifdefault=0;
+INSERT INTO pw_usergroups SET gid = 13, gptype = 'member', grouptitle = '{#level_13}',groupimg = '6',grouppost = 5000, ifdefault=0;
+INSERT INTO pw_usergroups SET gid = 14, gptype = 'member', grouptitle = '{#level_14}',groupimg = '7',grouppost = 10000, ifdefault=0;
+INSERT INTO pw_usergroups SET gid = 15, gptype = 'member', grouptitle = '{#level_15}',groupimg = '8',grouppost = 50000, ifdefault=0;
+INSERT INTO pw_usergroups SET gid = 16, gptype = 'special',grouptitle = '{#level_16}',groupimg = '16', grouppost = 0, ifdefault=0;
+INSERT INTO pw_usergroups SET gid = 17, gptype = 'system',grouptitle = '门户编辑',groupimg = '18', grouppost = 0, ifdefault=0;
 
 DROP TABLE IF EXISTS pw_usertool;
 CREATE TABLE pw_usertool (
@@ -5024,6 +5237,27 @@ CREATE TABLE pw_usertool (
   sellstatus tinyint(3) unsigned NOT NULL default '1',
   KEY idx_uid (uid)
 ) TYPE=MyISAM;
+
+DROP TABLE IF EXISTS pw_user_career;
+CREATE TABLE `pw_user_career` (
+`careerid` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+`uid` INT(11) UNSIGNED NOT NULL DEFAULT '0',
+`companyid` INT(11) UNSIGNED NOT NULL DEFAULT '0',
+`starttime` INT(11) NOT NULL DEFAULT '0',
+ PRIMARY KEY (`careerid`),
+ KEY `idx_uid_companyid` (`uid`,`companyid`)
+) ENGINE = MYISAM;
+
+DROP TABLE IF EXISTS pw_user_education;
+CREATE TABLE `pw_user_education` (
+`educationid` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+`uid` INT(11) UNSIGNED NOT NULL DEFAULT '0',
+`schoolid` INT(11) UNSIGNED NOT NULL DEFAULT '0',
+`educationlevel` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0',
+`starttime` INT(11) NOT NULL DEFAULT '0',
+ PRIMARY KEY (`educationid`),
+ KEY `idx_uid_schoolid` (`uid`,`schoolid`)
+) ENGINE = MYISAM;
 
 DROP TABLE IF EXISTS pw_voter;
 CREATE TABLE pw_voter (
@@ -5058,8 +5292,7 @@ CREATE TABLE pw_weibo_comment (
   `content` varchar(250) NOT NULL default '' ,
   `extra` text NOT NULL,
   `postdate` int(10) unsigned NOT NULL default '0' ,
-  KEY idx_mid_postdate( `mid` , `postdate` ),
-  KEY idx_postdate( `postdate` )
+  KEY idx_mid_postdate( `mid` , `postdate` )
 ) TYPE=MYISAM;
 
 DROP TABLE IF EXISTS pw_weibo_content;
@@ -5097,6 +5330,41 @@ CREATE TABLE pw_weibo_relations (
   KEY `idx_mid` (`mid`),
   KEY `idx_uid_postdate` (`uid`,`postdate`)
 ) TYPE=MyISAM;
+
+ 
+DROP TABLE IF EXISTS pw_weibo_topicattention;
+CREATE TABLE `pw_weibo_topicattention` (
+  `userid` int(10) unsigned NOT NULL DEFAULT '0',
+  `topicid` int(10) unsigned NOT NULL DEFAULT '0',
+  `crtime` int(10) unsigned NOT NULL DEFAULT '0',
+  `lasttime` int(10) unsigned NOT NULL DEFAULT '0',
+  UNIQUE KEY `idx_userid_topicid` (`userid`,`topicid`)
+) ENGINE=MyISAM;
+
+ 
+DROP TABLE IF EXISTS pw_weibo_topicrelations;
+CREATE TABLE `pw_weibo_topicrelations` (
+  `topicid` int(10) unsigned NOT NULL DEFAULT '0',
+  `mid` int(10) unsigned NOT NULL DEFAULT '0',
+  `crtime` int(10) unsigned NOT NULL DEFAULT '0',
+  UNIQUE KEY `idx_topicid_mid` (`topicid`,`mid`),
+  KEY `idx_mid` (`mid`),
+  KEY `idx_crtime` (`crtime`)
+) ENGINE=MyISAM;
+
+ 
+DROP TABLE IF EXISTS pw_weibo_topics;
+CREATE TABLE `pw_weibo_topics` (
+  `topicid` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `topicname` varchar(255) NOT NULL DEFAULT '',
+  `num` int(10) unsigned NOT NULL DEFAULT '0',
+  `ifhot` tinyint(3) NOT NULL DEFAULT '1',
+  `crtime` int(10) NOT NULL DEFAULT '0',
+  `lasttime` int(10) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`topicid`),
+  UNIQUE KEY `idx_topicname` (`topicname`),
+  KEY `idx_crtime_ifhot` (`crtime`,`ifhot`)
+) ENGINE=MyISAM;
 
 DROP TABLE IF EXISTS pw_windcode;
 CREATE TABLE pw_windcode (
@@ -5136,24 +5404,26 @@ CREATE TABLE pw_write_smiles (
   PRIMARY KEY  (smileid)
 ) TYPE=MyISAM;
 
-DROP TABLE IF EXISTS pw_cache_members;
-CREATE TABLE pw_cache_members(
-    ckey char(32) not null default '',
-    cvalue text not null,
-    expire int(10) unsigned not null default '0',
-    primary key (ckey)
+DROP TABLE IF EXISTS pw_log_forums;
+CREATE TABLE pw_log_forums(
+id int(10) unsigned not null auto_increment,
+sid int(10) unsigned not null default '0',
+operate tinyint(3) not null default '1',
+modified_time int(10) unsigned not null default '0',
+primary key(id),
+unique key idx_sid_operate(sid,operate)
 ) TYPE=MyISAM;
 
-DROP TABLE IF EXISTS pw_statistics_daily;
-CREATE TABLE IF NOT EXISTS `pw_statistics_daily` (
-  `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `name` char(32) NOT NULL DEFAULT '',
-  `typeid` int(6) UNSIGNED NOT NULL DEFAULT '0',
-  `date` date NOT NULL DEFAULT '0000-00-00',
-  `value` int(11) UNSIGNED NOT NULL DEFAULT '0',
-  `updatetime` int(11) UNSIGNED NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `idx_name_date_typeid` (`name`,`date`,`typeid`)
+DROP TABLE IF EXISTS pw_log_setting;
+CREATE TABLE pw_log_setting(
+    id int(10) unsigned not null auto_increment,
+    vector varchar(255) not null default '',
+    cipher varchar(255) not null default '',
+    field1 varchar(255) not null default '',
+    field2 varchar(255) not null default '',
+    field3 int(10) unsigned not null default '0',
+    field4 int(10) unsigned not null default '0',
+    primary key(id)
 ) TYPE=MyISAM;
 
 DROP TABLE IF EXISTS pw_weibo_bind;

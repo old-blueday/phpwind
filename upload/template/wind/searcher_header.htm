@@ -3,14 +3,13 @@ $type_tiele = $types[$type];
 print <<<EOT
 --><!doctype html><html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=$db_charset" />
+<meta charset="$db_charset" />
 <title>$webPageTitle Powered by phpwind</title>
 <meta name="generator" content="phpwind $wind_version" />
 <meta name="description" content="$metaDescription" />
 <meta name="keywords" content="$metaKeywords" />
-<link rel='archives' title='$db_bbsname' href='$db_bbsurl/simple/' />
-<link rel="stylesheet" type="text/css" href="images/pw_core.css?101128" media="all" />
-<link rel="stylesheet" type="text/css" href="images/search/style.css" media="all" />
+<link rel="stylesheet" href="images/pw_core.css?101128" />
+<link rel="stylesheet" href="images/search/style.css" />
 <SCRIPT type="text/javascript" LANGUAGE="JavaScript" src="js/core/core.js"></SCRIPT>
 <script type="text/javascript" language="JavaScript" src="js/pw_ajax.js"></script>
 <script language="JavaScript">
@@ -26,7 +25,7 @@ var temp_basename = '$temp_basename';
 </script>
 </head>
 <body>
-<div class="home_warp">
+<div class="wrap">
 <!--
 EOT;
 ?>-->

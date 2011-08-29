@@ -1,6 +1,6 @@
 <?php
 !defined('P_W') && exit('Forbidden');
-include_once (D_P . 'data/bbscache/level.php');
+pwCache::getData (D_P . 'data/bbscache/level.php');
 
 s::gp(array('action','job','step'));
 if (empty($action)) {
@@ -9,6 +9,7 @@ if (empty($action)) {
 		$db_schend = (int) $db_schend;
 		$db_schstart = (int) $db_schstart;
 		ifcheck($db_opensch, 'opensch');
+		ifcheck($db_openbuildattachs, 'openbuildattachs');
 		$db_maxresult = (int) $db_maxresult;
 		$db_schwait = (int) $db_schwait;
 		$db_hotwords = ($db_hotwords) ? $db_hotwords : '';
@@ -25,7 +26,21 @@ if (empty($action)) {
 				$search_type_expand[$key] = 'CHECKED';
 			}
 		}
+	
 		
+		$db_hotwordsconfig = $db_hotwordsconfig ? unserialize($db_hotwordsconfig) : array();
+		ifcheck($db_hotwordsconfig['openautoinvoke'], 'openautoinvoke');
+		
+		$_wheresql = $db_hotwordsconfig['openautoinvoke'] == 1 ? '' : " AND fromtype = 'custom'"; 
+		
+		$filterService = L::loadClass('FilterUtil', 'filter');
+		
+		$query = $db->query(" SELECT * FROM pw_searchhotwords WHERE 1 $_wheresql ORDER BY vieworder ASC, id DESC ".S::sqlLimit($db_hotwordsconfig['shownum']));
+		while ($rt = $db->fetch_array($query)) {
+			if (($GLOBALS['banword'] = $filterService->comprise($rt['keyword'])) !== false) continue;
+			$searchHotwords[] = $rt;
+		}
+
 //		if (!$db_dopen) {/*日志应用关闭*/
 //			$search_type_disabled['diary'] = "disabled";
 //			if ($search_type_expand['diary']) $search_type_expand['diary'] = "";
@@ -36,17 +51,18 @@ if (empty($action)) {
 //		}
 		
 	} else {
-		S::gp(array('schctl','config'));
+		S::gp(array('schctl','config','hotwordsconfig','view','new_view'));
 		$schctl['schstart'] > 23 && $schctl['schstart'] = 0;
 		$schctl['schend'] > 23 && $schctl['schend'] = 0;
 		$config['opensch'] = $schctl['opensch'] . "\t" . $schctl['schstart'] . "\t" . $schctl['schend'];
 		$config['maxresult'] = intval($config['maxresult']);
 		$config['schwait'] = intval($config['schwait']);
-		$config['hotwords'] = trim($config['hotwords']);
+//		$config['hotwords'] = trim($config['hotwords']);
 		$config['filterids'] = trim($config['filterids']);
 		$config['operate_log'] = (array)$config['operate_log'];
 		$config['search_type_expand'] = (array)$config['search_type_expand'];
-		if ($config['operate_log'] && array_diff($config['operate_log'], array('log_forums','log_threads','log_posts','log_diarys','log_members'))){
+		$config['openbuildattachs'] = $config['openbuildattachs'];
+		if ($config['operate_log'] && array_diff($config['operate_log'], array('log_forums','log_threads','log_posts','log_diarys','log_members', 'log_colonys'))){
 			showMsg("抱歉,操作行为记录类型不存在");
 		}
 		if ($config['search_type_expand'] && array_diff($config['search_type_expand'], array('cms','diary','group'))){
@@ -61,11 +77,95 @@ if (empty($action)) {
 				}
 			}
 			$config['filterids'] = implode(',',$filterids);
-		}		
+		}
+
+		$temp = $tempHotwords = array();
+	
+		$query = $db->query(" SELECT * FROM pw_searchhotwords ORDER BY vieworder ASC");
+		while ($rt = $db->fetch_array($query)) {
+			$temp['keyword'] = $rt['keyword'];
+			$temp['vieworder'] = $rt['vieworder'];
+			$tempHotwords[$rt['id']]= $temp;
+		}
+		
+		$_vieworder = array();
+		foreach ((array)$view as $tempId=>$value) {
+			if (!$value['keyword']) Showmsg('关键字不能为空');
+			$_vieworder[] = $value['vieworder'];
+			$value['vieworder'] = abs(intval($value['vieworder']));
+			$delHotwordsNoIds[] = $tempId;
+			if ($tempHotwords[$tempId]['keyword'] != $value['keyword']) {
+				$updateHotwordsDb[$tempId] = array('keyword'=>$value['keyword'],'vieworder'=>$value['vieworder'], 'fromtype'=>'custom');
+			} elseif ($tempHotwords[$tempId]['vieworder'] != $value['vieworder']) {
+				$updateHotwordsDb[$tempId] = array('keyword'=>$value['keyword'],'vieworder'=>$value['vieworder']);
+			} 
+		}
+		
+		
+/*		if ($_vieworder) {
+			if (count(array_unique($_vieworder)) < count($_vieworder)) {
+				Showmsg('顺序不能重复');
+			}
+		}*/
+		$filterService = L::loadClass('FilterUtil', 'filter');
+		if ($updateHotwordsDb) {
+			foreach ($updateHotwordsDb as $key=>$value) {
+				if (($GLOBALS['banword'] = $filterService->comprise($value['keyword'])) !== false) {
+					Showmsg('content_wordsfb');
+				}
+				$updateArr = array( 'keyword' => $value['keyword'], 'vieworder' => $value['vieworder']);
+				$value['fromtype'] && $updateArr = array_merge($updateArr, array('fromtype'=>$value['fromtype']));
+				//$db->update(" UPDATE pw_searchhotwords SET ".S::sqlSingle($updateArr)." WHERE id=".S::sqlEscape($key));
+				pwQuery::update('pw_searchhotwords', "id=:id", array($key), $updateArr);
+			}
+		}
+		
+		if (!$view) {
+			foreach ($tempHotwords as $key=>$value) {
+				if (!$key) continue;
+				$delHotwordsIds[] = $key;
+			}
+			$delHotwordsIds && pwQuery::delete('pw_searchhotwords', 'id IN(:id)', array($delHotwordsIds));
+		}
+		
+		if($delHotwordsNoIds) {
+			//$db->update(" DELETE FROM pw_searchhotwords WHERE id NOT IN(".S::sqlImplode($delHotwordsNoIds).")");
+			pwQuery::delete('pw_searchhotwords', 'id NOT IN(:id)', array($delHotwordsNoIds));
+		}
+		
+		foreach ((array)$new_view['keyword'] as $key=>$value) {
+			if (!$value) continue;
+			if (($GLOBALS['banword'] = $filterService->comprise($value)) !== false) {
+					Showmsg('content_wordsfb');
+			}
+			$tempKeywords[] = array(
+					'keyword' => $value,
+					'vieworder'	=> intval($new_view['vieworder'][$key]),
+					'fromtype'	=> 'custom',
+					'posttime'	=> $timestamp
+			);
+		}
+		if ($tempKeywords) {
+			$db->update ("INSERT INTO pw_searchhotwords(keyword,vieworder,fromtype,posttime) VALUES " . S::sqlMulti($tempKeywords));
+		}
+
+		$hotwordsconfig['shownum'] = abs(intval($hotwordsconfig['shownum']));
+		$hotwordsconfig['invokeperiod'] = abs(intval($hotwordsconfig['invokeperiod']));
+		$autoInvoke = array('isOpne'=> $hotwordsconfig['openautoinvoke'], 'period'=>$hotwordsconfig['invokeperiod']);		
+		L::loadClass ( 'hotwordssearcher', 'search/userdefine' );
+		$hotwordsServer = new PW_HotwordsSearcher ();
+		$hotwordsServer->update($autoInvoke, $hotwordsconfig['shownum']);
+		
+		if (!$hotwordsconfig['shownum']) setConfig ('db_hotwords', '');
+		if (!$hotwordsconfig['invokeperiod']) {
+			pwQuery::delete('pw_searchhotwords', 'fromtype=:id', array('auto'));
+		}
+		$config['hotwordsconfig'] = $hotwordsconfig ? serialize($hotwordsconfig) : '';
 		setConfig ('db_opensch', $config['opensch']);
+		setConfig ('db_openbuildattachs', $config['openbuildattachs']);
 		setConfig ('db_maxresult', $config['maxresult']);
 		setConfig ('db_schwait', $config['schwait']);
-		setConfig ('db_hotwords', $config['hotwords']);
+		setConfig ('db_hotwordsconfig', $config['hotwordsconfig']);
 		setConfig ('db_filterids', $config['filterids']);
 		setConfig ('db_operate_log', $config['operate_log']);
 		setConfigSearchTypeExpand($config['search_type_expand']);
@@ -182,7 +282,7 @@ if (empty($action)) {
 		adminmsg('operate_success',"$basename&action=$action");	
 	}
 } elseif ($action == 'forum') {
-	include_once(D_P.'data/bbscache/forumcache.php');
+	pwCache::getData(D_P.'data/bbscache/forumcache.php');
 	require_once(R_P.'require/updateforum.php');
 	$catedb = $forumdb = $subdb1 = $subdb2 = $searchforum = array();
 	$space  = '<i class="lower lower_a"></i>';
@@ -192,7 +292,7 @@ if (empty($action)) {
 	}
 	$db->free_result($query);
 	
-	$query = $db->query("SELECT fid,fup,type,name FROM pw_forums WHERE cms!='1' ORDER BY vieworder");
+	$query = $db->query("SELECT fid,fup,type,name,f_type FROM pw_forums WHERE cms!='1' ORDER BY vieworder");
 	while ($forums = $db->fetch_array($query)) {
 		$forums['name'] = Quot_cv(strip_tags($forums['name']));
 		$forums['vieworder'] = (int)$searchforum[$forums['fid']]['vieworder'];
@@ -293,9 +393,9 @@ if (empty($action)) {
 	}
 	$delSQL && $db->update("DELETE FROM pw_searchforum WHERE fid IN(".pwImplode($delSQL).")");
 	
-	if ($addSQL || $updateArr || $delSQL) {
+	//if ($addSQL || $updateArr || $delSQL) {
 		updatecache_search();
-	}
+	//}
 	adminmsg('operate_success',"$basename&action=forum");
 	
 } elseif ($action == 'statistic') {
@@ -324,7 +424,7 @@ if (empty($action)) {
 	}
 	
 	$statisticDb = array();
-	$sql = "SELECT keyword, count( num ) AS times FROM `pw_searchstatistic` WHERE 1 $addsql GROUP BY keyword ORDER BY times DESC LIMIT 0 , 500";	
+	$sql = "SELECT keyword, sum( num ) AS times FROM `pw_searchstatistic` WHERE 1 $addsql GROUP BY keyword ORDER BY times DESC LIMIT 0 , 500";
 	$qurey = $db->query($sql);
 	while ($rt = $db->fetch_array($qurey)) {
 		$rt['keyword'] = str_replace ( array ("&#160;", "&#61;", "&nbsp;", "&#60;", "<", ">", "&gt;", "(", ")", "&#41;" ), array (" " ), $rt['keyword'] );
@@ -354,7 +454,7 @@ function updatecache_search() {
 		$_cachedb[] = $t;
 	}
 	$_cachedb = $_cachedb ? $_cachedb : array();
-	$query = $db->query("SELECT fid,vieworder FROM pw_searchforum ORDER BY vieworder,fid DESC LIMIT 20");
+	$query = $db->query("SELECT fid,vieworder FROM pw_searchforum ORDER BY vieworder,fid DESC");
 	while ($rt = $db->fetch_array($query)) {
 		$fids[] = $rt['fid'];
 	}
@@ -366,12 +466,15 @@ function updatecache_search() {
 		while ($rt = $db->fetch_array($query)) {
 			$forumsDB[$rt['fid']] = $rt;
 		}
+		
 		$db->free_result($query);
 		foreach ($fids as $fid) {
+			if (!$forumsDB[$fid]['name']) continue;
 			$_cacheforumsdb[$fid] = $forumsDB[$fid]['name'];
 		
 		}
 	}
+	
 	pwCache::setData (D_P . 'data/bbscache/search_config.php', array('s_searchforumdb' => $_cacheforumsdb,'s_advertdb' => $_cachedb), true);
 }
 

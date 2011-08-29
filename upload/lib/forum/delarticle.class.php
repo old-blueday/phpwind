@@ -583,6 +583,16 @@ class PW_DelArticle {
 			$pw_attachs = L::loadDB('attachs', 'forum');
 			$attachdb += $pw_attachs->getByTid($deltpc, 0);
 			!$recycle && delete_tag(S::sqlImplode($deltpc));
+			/* 删除微博 */
+			$weiboService = L::loadClass('weibo','sns'); /* @var $weiboService PW_Weibo */
+			$weibos = $weiboService->getWeibosByObjectIdsAndType($deltpc, 'article');
+			if ($weibos) {
+				$mids = array();
+				foreach($weibos as $key => $weibo){
+					$mids[] = $weibo['mid'];
+				}
+				$weiboService->deleteWeibos($mids);
+			}
 		}
 		if ($_tids) {
 			$pw_attachs = L::loadDB('attachs', 'forum');
@@ -701,7 +711,8 @@ class PW_DelArticle {
 	function _reCountColony($tids) {
 		$query = $this->db->query("SELECT COUNT(*) AS tnum, SUM(b.replies+1) AS pnum, a.cyid FROM pw_argument a LEFT JOIN pw_threads b ON a.tid=b.tid WHERE a.tid IN(" . S::sqlImplode($tids) . ") AND b.fid>0 AND b.ifcheck='1' GROUP BY a.cyid");
 		while ($rt = $this->db->fetch_array($query)) {
-			$this->db->update("UPDATE pw_colonys SET tnum=tnum-" . S::sqlEscape($rt['tnum']) . ',pnum=pnum-' . S::sqlEscape($rt['pnum']) . ' WHERE id=' . S::sqlEscape($rt['cyid']));
+			//* $this->db->update("UPDATE pw_colonys SET tnum=tnum-" . S::sqlEscape($rt['tnum']) . ',pnum=pnum-' . S::sqlEscape($rt['pnum']) . ' WHERE id=' . S::sqlEscape($rt['cyid']));
+			$this->db->update(pwQuery::buildClause("UPDATE :pw_table SET tnum=tnum-:tnum,pnum=pnum-:pnum WHERE id=:id", array('pw_colonys', $rt['tnum'], $rt['pnum'], $rt['cyid'])));
 		}
 	}
 }

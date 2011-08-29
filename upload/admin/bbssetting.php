@@ -22,8 +22,8 @@ if ($step != 2){
 	$db_txtadnum = (int) $db_txtadnum;
 	ifcheck($db_adminset, 'adminset');
 	ifcheck($db_menu, 'menu');
-	ifcheck($db_readinfo, 'readinfo');
 	ifcheck($db_recycle, 'recycle');
+	${'shiftstyle_'.$db_shiftstyle} = 'checked';
 	include PrintEot('bbssetting');exit;
 } else {
 	S::gp(array('config'), 'P');

@@ -82,6 +82,7 @@ $lang['other'] = array(
 	'sort_todaypost'	=> '今日发帖',
 	'sort_monthpost'	=> '本月发帖',
 	'sort_monoltime'	=> '本月在线',
+	'sort_postMostUser' => '活跃图客',
 	'sort_replies'		=> '回复',
 	'sort_hits'			=> '人气',
 	'sort_digests'		=> '精华帖',

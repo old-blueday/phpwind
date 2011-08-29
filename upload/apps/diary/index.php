@@ -3,8 +3,10 @@
 
 !$db_dopen && Showmsg('dairy_close');
 $USCR = 'user_diary';
-include pwCache::getPath(R_P. 'data/bbscache/o_config.php');
-require_once pwCache::getPath(D_P."data/bbscache/forum_cache.php");
+//* include pwCache::getPath(R_P. 'data/bbscache/o_config.php');
+pwCache::getData(R_P. 'data/bbscache/o_config.php');
+//* require_once pwCache::getPath(D_P."data/bbscache/forum_cache.php");
+pwCache::getData(D_P."data/bbscache/forum_cache.php");
 require_once(R_P.'require/showimg.php');
 if (!$space =& $newSpace->getInfo()) {
 	Showmsg('您访问的空间不存在!');

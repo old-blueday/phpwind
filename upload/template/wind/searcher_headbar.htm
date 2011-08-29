@@ -9,7 +9,7 @@ EOT;
 if($groupid=='guest'){
 print <<<EOT
 -->
-			<div class="fr"><a href="login.php" title="登录" hidefocus="true">登陆</a>|<a href="$regurl"  title="注册" hidefocus="true">注册</a></div>
+			<div class="fr"><a href="login.php" title="登录" hidefocus="true">登录</a>|<a href="$regurl"  title="注册" hidefocus="true">注册</a></div>
 <!--
 EOT;
 } else {print <<<EOT
@@ -57,6 +57,15 @@ EOT;
 					<h6 style="left:-1px;padding-left:8px;"><a href="profile.php" class="link_down"><span>设置</span></a></h6>
 					<ul class="menuList" style="width:45px;">
 						<li><a href="profile.php?action=modify">帐号</a></li>
+<!--
+EOT;
+if ($db_authstate) {print <<<EOT
+-->
+		<li><a href="profile.php?action=auth" target="_blank">认证</a></li>
+<!--
+EOT;
+}print <<<EOT
+-->
 						<li><a href="profile.php?action=privacy">隐私</a></li>
 						<li><a href="userpay.php">积分</a></li>
 						<li><a href="profile.php?action=permission">权限</a></li>

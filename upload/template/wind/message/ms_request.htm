@@ -1,22 +1,27 @@
 <!--<?php
 print <<<EOT
 -->
+<script>
+var db_urlcheck = "$db_urlcheck";
+var db_bbsurl = '$db_bbsurl';
+</script>
+<script type="text/javascript" src="js/pw_lwd.js"></script>
 <div id='hiddenMessage' style="display:none"></div>
 <div class="contUser" id="content">
 <table width="100%"><tr><td height="600" valign="top">
     <div class="p15">
 	<h4 class="site mb5"><span>请求</span>(共{$requestAllCount}条，<a href="$normalUrl&action=unread" class="s2"><b>{$notReadCount}</b>条未处理请求</a>)</h4>
 <form action="$normalUrl&" method="post" name="FORM">
- 		<div class="mb10 bdA" style="padding-bottom:10px;">
+ 		<div class="mb10 bdA cc" style="padding-bottom:10px;">
             <span class="mr5"><input type="checkbox" value="" onclick="MC.CheckAll(this.form,this)" id="allup" name="all" />&nbsp;全选</span>
             <span class="bt2"><span><button onclick="MC.changeStatus('$baseUrl?&type=ajax&action=overlook','','ignoreTip','all')" type="button">忽略</button></span></span>
             <span class="bt2"><span><button onclick="MC.mSubmit(document.FORM,'del','request','$action','$page')" type="button">删除</button></span></span>
-						<span style="margin:0 6px;">筛选：<select onchange="MC.getTypeList('request',this.value)">
+						<span style="margin:0 6px;">筛选：<span class="dropdown"><select onchange="MC.getTypeList('request',this.value)" id="alltype">
             	<option value="" $selected>全部</option>
                 <option value="friend" $selected[friend]>好友请求</option>
                 <option value="group" $selected[group]>群组请求</option>
                 <option value="app" $selected[app]>应用请求</option>
-            </select></span>
+            </select></span></span>
         </div><div id="showmessage"></div>
         {$emptyListTip}
         <div class="dlC fl" style="width:100%;">
@@ -32,6 +37,7 @@ if($action == 'group' || $type[1] == 'group'){
 }
 if($action == 'friend' || $type[1] == 'friend'){
   	$fuid = '&fuid='.$value['create_uid'];
+  	$fid = $value['create_uid'];
 }
 $value[created_time] = get_date($value[created_time]);
 $requestDesc = getRequestTypeDes($value['typeid'],'',$ifcheck);
@@ -63,7 +69,7 @@ EOT;
 					<input type="hidden" value="false" name="skip_{$value[rid]}" id="skip_{$value[rid]}" />
 					<p id="tip_$value[rid]" name="tips"></p>
 					<p id="opt_$value[rid]" name="opts"><span class="btn2"><span><button onclick="MC.changeStatus('$baseUrl?&type=ajax&action=agree&typeid=$value[typeid]&fid[]=$value[create_uid]&rids[]=$value[rid]{$cyid}{$check}','{$value[rid]}','rightTip');" type="button">同意</button></span></span>
-                    <span class="bt2"><span><button onclick="MC.changeStatus('$baseUrl?&type=ajax&action=overlook&typeid=$value[typeid]&rids[]=$value[rid]{$fuid}{$cyid}','{$value[rid]}','ignoreTip')" type="button">忽略</button></span></span></p>
+                    <span class="bt2"><span><button onclick="MC.changeStatus('$baseUrl?&type=ajax&action=overlook&typeid=$value[typeid]&rids[]=$value[rid]{$fuid}{$cyid}','{$value[rid]}','ignoreOneTip')" type="button">忽略</button></span></span></p>
 <!--
 EOT;
 }print <<<EOT
@@ -100,6 +106,13 @@ EOT;
     </div>
 </td></tr></table>
 </div>
+<script type="text/javascript" src="js/select.js"></script>
+<script type="text/javascript">
+var ld=window.onload;
+window.onReady(function(){
+	new sSelect(getObj('alltype'));
+});
+</script>
 <!--
 EOT;
 if(!defined('AJAX')){

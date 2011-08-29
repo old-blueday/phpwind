@@ -10,7 +10,8 @@ if ($admin_gid == 5) {
 	list($allowfid, $forumcache) = GetAllowForum($admin_name);
 	$sql = $allowfid ? "fid IN($allowfid)" : '0';
 } else {
-	include pwCache::getPath(D_P . 'data/bbscache/forumcache.php');
+	//* include pwCache::getPath(D_P . 'data/bbscache/forumcache.php');
+	pwCache::getData(D_P . 'data/bbscache/forumcache.php');
 	list($hidefid, $hideforum) = GetHiddenForum();
 	if ($admin_gid == 3) {
 		$forumcache .= $hideforum;
@@ -28,7 +29,7 @@ if (empty($action)) {
 		$rt = $db->get_one("SELECT MAX(tid) AS mtid FROM pw_threads");
 		$pw_tmsgs = GetTtable($rt['mtid']);
 	} else {
-		$pw_tmsgs = $ttable > 0 ? 'pw_tmsgs' . $ttable : 'pw_tmsgs';
+		$pw_tmsgs = $ttable > 0 ? 'pw_tmsgs' . intval($ttable) : 'pw_tmsgs';
 	}
 	S::gp(array(
 		'fid',
@@ -39,6 +40,7 @@ if (empty($action)) {
 		'lstarttime',
 		'lendtime',
 		'author',
+		'authorid',
 		'keyword',
 		'userip',
 		'lines',
@@ -84,7 +86,7 @@ if (empty($action)) {
 	}
 	$threadTableSelections = $threadTableList ? formSelect('ttable', $ttable, $threadTableList, 'class="select_wa"') : '';
 	
-	if ($fid == '-1' && !$pstarttime && !$pendtime && !$tcounts && !$counts && !$lstarttime && !$lendtime && !$hits && !$replies && !$author && !$keyword && !$userip && !$tstart && !$tend) {
+	if ($fid == '-1' && !$pstarttime && !$pendtime && !$tcounts && !$counts && !$lstarttime && !$lendtime && !$hits && !$replies && !$author && !$authorid && !$keyword && !$userip && !$tstart && !$tend) {
 		$noticeMessage = getLangInfo('cpmsg', 'noenough_condition');
 	} else {
 		
@@ -95,9 +97,11 @@ if (empty($action)) {
 		$pendtime && $sqlPendtime = $pendtime + 86400;
 		$lendtime && $sqlLendtime = $lendtime + 86400;
 		if (is_numeric($fid) && $fid > 0) {
-			@include pwCache::getPath(D_P . "data/forums/fid_{$fid}.php");
+			//* @include pwCache::getPath(D_P . "data/forums/fid_{$fid}.php");
+			pwCache::getData(S::escapePath(D_P . "data/forums/fid_{$fid}.php"));
 			if(is_array($foruminfo) && isset($foruminfo['type']) && $foruminfo['type'] == 'category'){
-				@include pwCache::getPath(D_P . "data/bbscache/forumlist_cache.php");
+				//* @include pwCache::getPath(D_P . "data/bbscache/forumlist_cache.php");
+				pwCache::getData(D_P . "data/bbscache/forumlist_cache.php");
 				if(is_array($pwForumList[$fid]['child'])){
 					$fids = array_keys($pwForumList[$fid]['child']);
 					isset($pwForumAllList[$fid]['child']) && $fids = array_merge($fids,array_keys($pwForumAllList[$fid]['child']));
@@ -137,11 +141,16 @@ if (empty($action)) {
 		} elseif ($counts) {
 			$sql .= " AND char_length(tm.content)<" . S::sqlEscape($counts);
 		}
-		if ($author) {
-			$authorarray = explode(",", $author);
+		if ($author || $authorid) {
+			$authorarray = explode(",",($authorid) ? $authorid : $author);
 			foreach ($authorarray as $value) {
-				$value = str_replace('*', '%', $value);
-				$authorwhere .= " OR username LIKE " . S::sqlEscape($value, false);
+				if($authorarray=$authorid){
+					$value = intval($value);
+					$authorwhere .= " OR uid LIKE ".S::sqlEscape($value,false);
+				}else{
+					$value = str_replace('*','%',$value);
+					$authorwhere .= " OR username LIKE ".S::sqlEscape($value,false);					
+				}
 			}
 			$authorwhere = substr_replace($authorwhere, "", 0, 3);
 			$query = $db->query("SELECT uid FROM pw_members WHERE $authorwhere");
@@ -196,7 +205,8 @@ if (empty($action)) {
 		//$pages = numofpage($count, $page, $numofpage, "$basename&fid=$fid&ifkeep=$ifkeep&pstarttime=$pstarttime&pendtime=$pendtime&lstarttime=$lstarttime&lendtime=$lendtime&tstart=$tstart&tend=$tend&hits=$hits&replies=$replies&author=" . rawurlencode($author) . "&keyword=" . rawurlencode($keyword) . "&userip=$userip&lines=$lines&ttable=$ttable&tcounts=$tcounts&counts=$counts&sphinx=$sphinx&sphinxRange=$sphinxRange&searchDisplay=$searchDisplay&");
 		$pages = pagerforjs($count, $page, $numofpage, "onclick=\"manageclass.superdel(this,'superdel_tpc','')\"");
 		$delid = $topicdb = array();
-		include pwCache::getPath(D_P . 'data/bbscache/forum_cache.php');
+		//* include pwCache::getPath(D_P . 'data/bbscache/forum_cache.php');
+		pwCache::getData(D_P . 'data/bbscache/forum_cache.php');
 		while ($topic = $db->fetch_array($query)) {
 			if ($_POST['direct']) {
 				$delid[$topic['tid']] = $topic['fid'];
@@ -227,6 +237,7 @@ if (empty($action)) {
 		'lstarttime',
 		'lendtime',
 		'author',
+		'authorid',
 		'keyword',
 		'userip',
 		'lines',
@@ -259,7 +270,7 @@ if (empty($action)) {
 		$delarticle = L::loadClass('DelArticle', 'forum'); /* @var $delarticle PW_DelArticle */
 		$delarticle->delTopicByTids($delids, false, $delcredit);
 
-		adminmsg('operate_success', "$basename&fid=$fid&ifkeep=$ifkeep&pstarttime=$pstarttime&pendtime=$pendtime&lstarttime=$lstarttime&lendtime=$lendtime&tstart=$tstart&tend=$tend&hits=$hits&replies=$replies&author=" . rawurlencode($author) . "&keyword=" . rawurlencode($keyword) . "&userip=$userip&lines=$lines&ttable=$ttable&tcounts=$tcounts&counts=$counts&page=$page");
+		adminmsg('operate_success', "$basename&fid=$fid&ifkeep=$ifkeep&pstarttime=$pstarttime&pendtime=$pendtime&lstarttime=$lstarttime&lendtime=$lendtime&tstart=$tstart&tend=$tend&hits=$hits&replies=$replies&author=" . rawurlencode($author) . "&authorid=$authorid&keyword=" . rawurlencode($keyword) . "&userip=$userip&lines=$lines&ttable=$ttable&tcounts=$tcounts&counts=$counts&page=$page");
 	
 	}
 	
@@ -304,7 +315,7 @@ if (empty($action)) {
 
 		//* P_unlink(D_P . 'data/bbscache/c_cache.php');
 		pwCache::deleteData(D_P . 'data/bbscache/c_cache.php');
-		adminmsg('operate_success', "$basename&action=replylist&fid=$fid&tid=$tid&pstart=$pstart&pend=$pend&author=" . rawurlencode($author) . "&keyword=" . rawurlencode($keyword) . "&userip=$userip&tcounts=$tcounts&counts=$counts&nums=$nums&ptable=$ptable&page=$page");
+		adminmsg('operate_success', "$basename&action=replylist&fid=$fid&tid=$tid&pstart=$pstart&pend=$pend&author=" . rawurlencode($author) . "&authorid=$authorid&keyword=" . rawurlencode($keyword) . "&userip=$userip&tcounts=$tcounts&counts=$counts&nums=$nums&ptable=$ptable&page=$page");
 	}
 	
 } elseif ('replylist' == $action) {
@@ -319,6 +330,7 @@ if (empty($action)) {
 		'fid',
 		'tid',
 		'author',
+		'authorid',
 		'keyword',
 		'tcounts',
 		'counts',
@@ -353,7 +365,7 @@ if (empty($action)) {
 	}
 	$postTableSelections = $postTableList ? formSelect('ptable', $ptable, $postTableList, 'class="select_wa"') : '';
 
-	if (!$counts && !$tcounts && $fid == '-1' && !$keyword && !$tid && !$author && !$userip && !$pstart && !$pend) {
+	if (!$counts && !$tcounts && $fid == '-1' && !$keyword && !$tid && !$author && !$authorid && !$userip && !$pstart && !$pend) {
 		$noticeMessage = getLangInfo('cpmsg', 'noenough_condition');
 	} else {
 		if (is_numeric($fid) && $fid > 0) {
@@ -376,11 +388,16 @@ if (empty($action)) {
 			$sql .= " AND pid<" . S::sqlEscape($pend);
 		}
 		$forceIndex = '';
-		if ($author) {
-			$authorarray = explode(",", $author);
+		if ($author || $authorid) {
+			$authorarray = explode(",",($authorid) ? $authorid : $author);
 			foreach ($authorarray as $value) {
-				$value = addslashes(str_replace('*', '%', $value));
-				$authorwhere .= " OR username LIKE " . S::sqlEscape($value);
+				if($authorarray=$authorid){
+					$value = intval($value);
+					$authorwhere .= " OR uid LIKE ".S::sqlEscape($value,false);
+				}else{
+					$value = str_replace('*','%',$value);
+					$authorwhere .= " OR username LIKE ".S::sqlEscape($value,false);					
+				}
 			}
 			$authorwhere = substr_replace($authorwhere, "", 0, 3);
 			$authorids = array();
@@ -468,7 +485,7 @@ if (empty($action)) {
 	$rt = $db->get_one("SELECT COUNT(*) AS sum FROM $pw_posts WHERE tid=" . S::sqlEscape($tid) . 'AND pid<' . S::sqlEscape($pid));
 	$page = ceil(($rt['sum'] + 1.5) / $db_readperpage);
 	
-	ObHeader("read.php?tid=$tid&page=$page#$pid");
+	ObHeader("read.php?tid=$tid&page=$page&displayMode=1#$pid");
 }
 //delete pcid
 function _delPcTopic($pcdb) {

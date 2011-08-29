@@ -1,7 +1,8 @@
 <?php
 !function_exists('adminmsg') && exit('Forbidden');
 
-@include_once pwCache::getPath(D_P.'data/bbscache/o_config.php');
+//* @include_once pwCache::getPath(D_P.'data/bbscache/o_config.php');
+pwCache::getData(D_P.'data/bbscache/o_config.php');
 
 if (empty($_POST['step'])) {
 	
@@ -23,7 +24,7 @@ if (empty($_POST['step'])) {
 	
 	$array = array();
 	foreach ($style_name as $key => $value) {
-		!$value && $value = $key;
+	//	!$value && $value = $key;
 		$array[$key] = $value;
 	}
 	setConfig('o_uskin', $array, null, true);

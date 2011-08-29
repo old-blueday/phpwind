@@ -13,6 +13,7 @@ class PW_SubjectRelateData extends RelateData {
 		$thread['url'] 	= $this->_getSubjectUrl($thread['tid']);
 		$thread['title'] 	= $thread['subject'];
 		$thread['titlealt'] = $thread['subject'];
+		$thread['authorurl']= 'u.php?uid='.$thread['authorid'];
 		$thread['image']	= $this->_getImagesByTid($tid);
 		$thread['forumname']= getForumName($thread['fid']);
 		$thread['forumurl']	= getForumUrl($thread['fid']);

@@ -382,10 +382,19 @@ EOT;
 	<h6 style="left:-1px;right:auto;"><a href="u.php" class="b iconDroplink">$windid</a><span class="iconDrop"><i>▼</i></span></h6>
 	<div>
 		<ul class="menu-half cc" style="width:26em;">
-		<li>等级: $gp_grouptitle
 <!--
 EOT;
-if ($_G['allowhide']) {print <<<EOT
+if ($gp_gptype == 'member') {print <<<EOT
+-->
+		<li>等级: $gp_grouptitle</li>
+<!--
+EOT;
+} else {print <<<EOT
+-->
+		<li>身份: $gp_grouptitle</li>
+<!--
+EOT;
+}if ($_G['allowhide']) {print <<<EOT
 -->
 		<li>状态:
 <span style="cursor:pointer;" onclick="ajax.send('pw_ajax.php?action=changestate','',changeState)" id="online_state">
@@ -432,6 +441,15 @@ EOT;
 	<h6><a href="profile.php?action=modify" class="iconDroplink">设置</a><span class="iconDrop"><i>▼</i></span></h6>
     <ul style="width:50px;" class="menuList">
         <li><a href="profile.php?action=modify" target="_blank">帐号</a></li>
+<!--
+EOT;
+if ($db_authstate) {print <<<EOT
+-->
+		<li><a href="profile.php?action=auth" target="_blank">认证</a></li>
+<!--
+EOT;
+}print <<<EOT
+-->
         <li><a href="profile.php?action=privacy" target="_blank">隐私</a></li>
         <li><a href="userpay.php" target="_blank">积分</a></li>
         <li><a href="profile.php?action=permission" target="_blank">权限</a></li>

@@ -18,9 +18,11 @@ if (!$windid && GetCookie('winduser') && $ol_offset) {
 		$userrvrc = round($winddb['rvrc'] / 10, 1);
 		$windid = $winddb['username'];
 		if (file_exists(D_P . "data/groupdb/group_$groupid.php")) {
-			require_once pwCache::getPath(S::escapePath(D_P . "data/groupdb/group_$groupid.php"));
+			//* require_once pwCache::getPath(S::escapePath(D_P . "data/groupdb/group_$groupid.php"));
+			pwCache::getData(S::escapePath(D_P . "data/groupdb/group_$groupid.php"));
 		} else {
-			require_once pwCache::getPath(D_P . "data/groupdb/group_1.php");
+			//* require_once pwCache::getPath(D_P . "data/groupdb/group_1.php");
+			pwCache::getData(D_P . "data/groupdb/group_1.php");
 		}
 	}
 	define('FX', 1);

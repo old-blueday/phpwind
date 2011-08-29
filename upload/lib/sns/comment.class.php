@@ -40,10 +40,11 @@ class PW_Comment {
 		}
 		$content = $this->escapeStr($content);
 		$extra = array_merge((array)$extra, $this->_analyseContent($uid, $content));
-		$ruid = array($weibos['uid']);
+		/*$ruid = array($weibos['uid']);
 		if ($extra['refer']) {
 			$ruid = array_merge($ruid,array_keys($extra['refer']));
-		}
+		}*/
+		$ruid = $extra['refer'] ? array_keys($extra['refer']) : array($weibos['uid']);
 		$blacklist = $this->_actionBlackList($uid,$ruid,$extra);
 		if (empty($ruid) || in_array($weibos['uid'],$blacklist)) {
 			return 0;
@@ -63,7 +64,7 @@ class PW_Comment {
 		$data = $this->_getCmRelationsData($cid,$ruid);
 		$this->_addCmRelations($data);
 		$userService = L::loadClass('UserService', 'user');
-		$userService->updatesByIncrement($ruid, array(), array('newcomment' => 1));
+		if($uid !== $weibos['uid']) $userService->updatesByIncrement($ruid, array(), array('newcomment' => 1));
 
 		//sinaweibo
 		if ($GLOBALS['db_sinaweibo_status'] && !$extra['isSinaComment']) {
@@ -255,6 +256,7 @@ class PW_Comment {
 	function _buildData($data,$ifweibo){
 		$uids = $mids = $uinfo = $winfo = array();
 		foreach ($data as $key => $value) {
+			if (!$value['uid']) continue;
 			$uids[] = $value['uid'];
 			$mids[] = $value['mid'];
 		}
@@ -263,6 +265,7 @@ class PW_Comment {
 			$winfo = $this->_getWeiBosInfo($mids);
 		}
 		foreach($data as $key => $value){
+			if (!$value['uid']) continue;
 			$value = $this->_formatRecord($value, $uinfo[$value['uid']]['groupid']);
 			if($winfo){
 				$value['weibo'] = $winfo[$value['mid']];
@@ -328,6 +331,19 @@ class PW_Comment {
 		$weibos = $weiboService->getWeibosByMid($mids);
 		return $weiboService->buildData($weibos,'uid');
 		
+	}
+	
+	/**
+	 * 取得n天内评论次数最多的新鲜事Id
+	 * @param int $num 获取记录条数
+	 * @return array
+	 */
+	function getHotComment($num,$time){
+		$time = intval($time);
+		$num = intval($num);
+		if($time < 0 || $num < 0) return array();
+		$commentDao = L::loadDB('weibo_comment','sns');
+		return $commentDao->getHotComment($num=20,$time);
 	}
 	
 	/**

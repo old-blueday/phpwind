@@ -26,7 +26,7 @@ EOT;
 		<tr class="tr1 vt">
 			<td class="td1">站点状态</td>
 			<td id="bbsifopen" class="td2">
-				<ul class="list_A">
+				<ul class="list_A cc" style="float:none;width:200px;">
 					<li><input type="radio" value="1" name="config[bbsifopen]" $bbsifopen_1 onclick="showoption('bbsifopen',this.value)">完全开放</li>
 					<li><input type="radio" value="2" name="config[bbsifopen]" $bbsifopen_2 onclick="showoption('bbsifopen',this.value)">内部开放</li>
 					<li><input type="radio" value="0" name="config[bbsifopen]" $bbsifopen_0 onclick="showoption('bbsifopen',this.value)">完全关闭</li>
@@ -76,14 +76,13 @@ EOT;
 		<tr class="tr1 vt">
 			<td class="td1">定时发帖</td>
 			<td class="td2">
-				<ul class="list_A list_80 cc fl mar20">
+				<ul class="list_A list_80">
 					<li><input type="radio" value="1" name="postctl[openpost]" $openpost_Y>开启</li>
 					<li><input type="radio" value="0" name="postctl[openpost]" $openpost_N>关闭</li>
 				</ul>
-				<ul class="list_B list_120 fl cc">
-					<li>开启于[时]:&nbsp;<input name="postctl[poststart]" value="$db_poststart" class="input input_wd"></li>
-					<li>关闭于[时]:&nbsp;<input name="postctl[postend]" value="$db_postend" class="input input_wd"></li>
-				</ul>
+				<div class="c mb5"></div>
+					<p class="mb5">开启于&nbsp;<input name="postctl[poststart]" value="$db_poststart" class="input input_wd">&nbsp;时&nbsp;<input name="postctl[poststartminute]" value="$db_poststartminute" class="input input_wd">&nbsp;分</p>
+					<p class="mb5">关闭于&nbsp;<input name="postctl[postend]" value="$db_postend" class="input input_wd">&nbsp;时&nbsp;<input name="postctl[postendminute]" value="$db_postendminute" class="input input_wd">&nbsp;分</p>
 			</td>
 			<td class="td2"><div class="help_a">设置用户可以使用发帖功能的时间段(24小时制)，支持跨越零点设置。例如:用户在 每晚20:00 到 次日8:00 这段时间内可以使用发帖，发帖开启于(点)设为:<b>20</b>；发帖关闭于(点)设为:<b>8</b>。<br />管理员与总版主不受此限制</div></td>
 			</tr>
@@ -355,7 +354,7 @@ EOT;
 			<tr class="tr1 vt">
 				<td class="td1">在线用户时限[分钟]</td>
 				<td class="td2"><input name="config[onlinetime]" value="$db_onlinetime" class="input input_wa" /></td>
-				<td class="td2"><div class="help_a">在设定时间范围内，如果会员没有对站点进行任何操作，则会员会自动退出登录</div></td>
+				<td class="td2"><div class="help_a">在设定时间范围内，如果会员没有对站点进行任何操作，则会员的在线状态会变为离线状态</div></td>
 			</tr>
 			<tr class="tr1 vt">
 				<td class="td1">统计今日到访会员</td>
@@ -554,7 +553,7 @@ EOT;
 	<div class="admin_table mb10">
 	<table width="100%" cellspacing="0" cellpadding="0">
 		<tr class="tr1 vt">
-			<td class="td1">开启认证码</td>
+			<td class="td1">开启验证码</td>
 			<td class="td2">
 				<ul class="list_A list_120">
 					<li><input type="checkbox" value="1" name="gdcheck[]" $gdcheck_0 /> 注册</li>
@@ -655,8 +654,8 @@ EOT;
 						<td><a href="javascript:;" onclick="addtbody('qmode','qbody');" class="s3">[添加]</a></td>
 					</tr>
 					<tr>
-						<td>100以内的随机加减法运算</td>
-						<td>系统生成</td>
+						<td><input name="" value="100以内的随机加减法运算" class="input input_wa" disabled="disabled" /></td>
+						<td><input name="" value="系统生成" class="input input_wc" disabled="disabled" /></td>
 						<td><input type="checkbox" name="question[-1]" value="1" $db_question_1_Y /></td>
 					</tr>
 <!--
@@ -1085,7 +1084,7 @@ EOT;
 				</table>
 				</div>
 			</td>
-			<td class="td2"><div class="help_a">系统限制上传附件最大尺寸:{$maxuploadsize}</div></td>
+			<td class="td2"><div class="help_a"><font color="red">系统限制上传附件最大尺寸:{$maxuploadsize}</font></div></td>
 		</tr>
 	</table>
 	</div>
@@ -1767,9 +1766,9 @@ EOT;
 			<td class="td1">注册电子邮箱黑白名单</td>
 			<td class="td2">
 				<ul class="list_A mr20 fl">
-					<li><input type="radio" value="0" name="reg[emailtype]" $emailtype_0 onclick="emailType(0);">不启用</li>
-					<li><input type="radio" value="1" name="reg[emailtype]" $emailtype_1 onclick="emailType(1);">白名单</li>
-					<li><input type="radio" value="2" name="reg[emailtype]" $emailtype_2 onclick="emailType(2);">黑名单</li>
+					<li><input type="radio" value="0" id="emailtype_0" name="reg[emailtype]" $emailtype_0 onclick="emailType(0);">不启用</li>
+					<li><input type="radio" value="1" id="emailtype_1" name="reg[emailtype]" $emailtype_1 onclick="emailType(1);">白名单</li>
+					<li><input type="radio" value="2" id="emailtype_2" name="reg[emailtype]" $emailtype_2 onclick="emailType(2);">黑名单</li>
 				</ul>
 				<textarea name="reg[email]" class="textarea" id="reg_email">$rg_email</textarea>
 				<textarea name="reg[banemail]" class="textarea" id="reg_banemail">$rg_banemail</textarea>
@@ -1846,15 +1845,6 @@ EOT;
 			</td><td class="td2"><div class="help_a">新会员注册可得到的积分</div></td>
 				</tr>
 		<tr class="tr1 vt">
-			<td class="td1">会员注册生日年限</td>
-			<td class="td2">
-				<div class="input_img fl"><input name="reg[timestart]" type="text" value="$rg_timestart" /></div>
-				<span class="p_lr_10 fl">-</span>
-				<div class="input_img"><input name="reg[timeend]" type="text" value="$rg_timeend" /></div>
-			</td>
-			<td class="td2"><div class="help_a">默认是1960-2010</div></td>
-		</tr>
-		<tr class="tr1 vt">
 			<td class="td1">强制密码复杂度</td>
 			<td class="td2">
 				<ul class="list_A list_120">
@@ -1865,6 +1855,26 @@ EOT;
 				</ul>
 			</td>
 			<td class="td2"><div class="help_a">密码中必须存在所选字符类型，不选则为无限制</div></td>
+		</tr>
+        <tr class="tr1 vt">
+			<td class="td1">新用户注册手机认证</td>
+			<td class="td2">
+				<ul class="list_A list_80">
+					<li><input type="radio" value="1" name="config[authreg]" $authreg_Y>开启</li>
+					<li><input type="radio" value="0" name="config[authreg]" $authreg_N>关闭</li>
+				</ul>
+			</td>
+			<td class="td2"><div class="help_a">选择“开启”，则用户在注册时即需要验证绑定，请先进行<a href="$admin_file?adminjob=authentication&action=state">实名认证设置</a></div></td>
+		</tr>
+         <tr class="tr1 vt">
+			<td class="td1">新注册用户资料完善引导</td>
+			<td class="td2">
+				<ul class="list_A list_80">
+					<li><input type="radio" value="1" name="reg[regguide]" $regguide_Y>开启</li>
+					<li><input type="radio" value="0" name="reg[regguide]" $regguide_N>关闭</li>
+				</ul>
+			</td>
+			<td class="td2"><div class="help_a">选择“开启”，则用户注册成功后首次登录先进行资料完善，请先<a href="$admin_file?adminjob=customfield&adminitem=guide">设置引导资料内容</a></div></td>
 		</tr>
 	</table>
 </div>
@@ -1892,16 +1902,19 @@ function emailType(id) {
 		getObj('reg_email_des').style.display = '';
 		getObj('reg_banemail').style.display = 'none';
 		getObj('reg_banemail_des').style.display = 'none';
+		getObj('emailtype_1').checked = true;
 	} else if (id == 2) {
 		getObj('reg_email').style.display = 'none';
 		getObj('reg_email_des').style.display = 'none';
 		getObj('reg_banemail').style.display = '';
 		getObj('reg_banemail_des').style.display = '';
+		getObj('emailtype_2').checked = true;
 	} else if (id == 0) {
 		getObj('reg_email').style.display = 'none';
 		getObj('reg_email_des').style.display = 'none';
 		getObj('reg_banemail').style.display = 'none';
 		getObj('reg_banemail_des').style.display = 'none';
+		getObj('emailtype_0').checked = true;
 	}
 }
 function allowregister(id){
@@ -2025,7 +2038,7 @@ EOT;
 		<tr class="tr1 vt">
 			<td class="td1">在线显示用户组</td>
 			<td class="td2">$usergroup</td>
-			<td class="td2"><div class="help_a">请选择在线显示的用户组，复选框内填写用户组显示顺序。<br /><br /><font color="#0000FF">注：1、全不选这只显示“普通会员”。<br />2、在线图标存放在“images/所选风格的图片目录/group/用户组ID.gif”，如“images/wind/group/3.gif”。<br />在线图标以用户组ID命名，请检查图片是否存在，<b>不存在则无法正常显示</b></font>。 </div></td>
+			<td class="td2"><div class="help_a">请选择在线显示的用户组，复选框内填写用户组显示顺序。<br /><br /><font color="#0000FF">注：1、全不选则显示“普通会员”。<br />2、在线图标存放在“images/所选风格的图片目录/group/用户组ID.gif”，如“images/wind/group/3.gif”。<br />在线图标以用户组ID命名，请检查图片是否存在，<b>不存在则无法正常显示</b></font>。 </div></td>
 		</tr>
 		<tr class="tr1 vt">
 			<td class="td1">首页显示在线用户</td>
@@ -2089,7 +2102,7 @@ EOT;
 					<option value="20" $hithour_sel[20]>24</option>
 				</select>
 			</td>
-			<td class="td2"><div class="help_a">设置为0则不使用此功能,使用生成html功能将自动使用此功能 </div></td>
+			<td class="td2"><div class="help_a">点击数文件缓存更新时间,使用生成html功能将自动使用此功能 </div></td>
 		</tr>
 		<!--<tr class="tr1 vt">
 			<td class="td1"><span class="xia2">总置顶,分类置顶功能:</span><br />置顶3: 为总置顶。置顶2: 为分类置顶。置顶1:为本版块置顶</td>

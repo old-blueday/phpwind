@@ -5,14 +5,8 @@ $tmpVerify = GetVerify($onlineip.$GLOBALS['winddb']['regdate'].$fid.$tid);
 if(strlen($readdb[0][subject])>77) $readdb[0][subject] = substr($readdb[0][subject],0,77);
 print <<<EOT
 -->
-<table cellPadding="0" cellSpacing="0" style="display:none">
-	<tbody id="att_mode"><tr>
-		<td width="240"><input class="input" type="file" name="attachment_" size="25" /></td>
-		<td>描述 <input class="input" type="text" name="atc_desc" size="18" /></td>
-		<td style="height:25px;line-height:25px;"></td></tr>
-	</tbody>
-</table>
-<link rel="stylesheet" type="text/css" href="$imgpath/post/fast_editor.css" />
+<link rel="stylesheet" type="text/css" href="$imgpath/post/fast_editor.css" media="all" />
+<link rel="stylesheet" type="text/css" href="js/breeze/editor/style/style.css" />
 <form name="FORM" method="post" action="{$basename}a=reply&cyid=$cyid" enctype="multipart/form-data" onsubmit="return checkpost(document.FORM);" id="anchor">
 <input type="hidden" name="step" value="3" />
 <input type="hidden" name="tid" value="$tid" />
@@ -26,30 +20,31 @@ print <<<EOT
             <div class="p10">
 <!--
 EOT;
-if($winduid){print<<<EOT
+if ($winduid) {print<<<EOT
 -->
                 <p class="gName mb5 cc">
-					<a href="{$db_userurl}$winduid" target="_blank" class="mr5 fl" target="_blank">$windid</a>
+					<a href="{$db_userurl}$winduid" target="_blank" class="mr5 fl">$windid</a>
 <!--
 EOT;
-if($db_showonline){
-if (checkOnline($winddb['thisvisit'])){print <<<EOT
+	if ($db_showonline) {
+		if (checkOnline($winddb['thisvisit'])) {print <<<EOT
 -->
 					<span class="card-online" title="在线">在线</span>
 <!--
 EOT;
-}else{print<<<EOT
+		} else {print<<<EOT
 -->
 					<span class="card-offline" title="离线">离线</span>
 <!--
 EOT;
-}}print <<<EOT
+		}
+	}print <<<EOT
 -->
 				</p>
 <!--
 EOT;
 }
-list($fp_face) = showfacedesign($winddb['icon'],1);
+list($fp_face) = showfacedesign($winddb['icon'], 1, 'm');
 print <<<EOT
 -->
                 <p class="mb10">
@@ -58,40 +53,45 @@ print <<<EOT
 				</p>
             </div>
         </td>
-        <td class="floot_right">
-            <div class="fp_content">
-                <div class="cc" style="margin-bottom:12px;">
-                    <div class="pr fl"><input type="text" class="input" id="atc_title" name="atc_title" value="RE:{$resubject}" size="55" />
-                    <div class="w_input_text" id="atc_title_warn" style="display:none;">限 $db_titlemax 字节</div></div>
-                </div>
-
-                <div class="fp_editor cc" id="fp_editor" onclick="loadEditor(event);">
-                    <div class="fp_editor_but cc">
-                    <a href="javascript:gotoEditor();" class="fr" hidefocus="true" id="gotoedit">进入高级模式</a>
-                        <div>
-                            <a href="javascript:;" title="加粗" id="wy_bold" hidefocus="true">加粗</a>
-                            <a href="javascript:;" title="字体颜色" id="wy_forecolor" hidefocus="true">字体颜色</a>
-                            <a href="javascript:;" title="背景" id="wy_hilitecolor" hidefocus="true">背景颜色</a>
-                            <a href="javascript:;" title="插入链接" id="wy_createlink" hidefocus="true">插入链接</a>
-                            <a href="javascript:;" title="图片" id="wy_insertimage" hidefocus="true">图片</a>
-                        </div>
-                    </div>
-                    <div style="padding:0.5% 0 0 0.5%;width:99.5%;display:inline;float:left;">
-                        <textarea id="textarea" name="atc_content" style="width:100%;height:140px;" onkeydown="quickpost(event)"></textarea>
-                        <span id="autosave"></span><div id="menu_editor" class="wy_menu_B" style="display: none;"></div>
-                    </div>
-                </div>
-                <div class="mb10">
+        <td class="p10" style="background:#fff;">
+			<div class="cc mb5">
+				<input type="text" class="input mr10" id="atc_title" name="atc_title" value="$titletop1" size="40" /><span id="atc_title_warn">限{$db_titlemax} 字节</span>
+			</div>
+			<div class="B_editor B_editor_fp cc" id="fp_editor" onclick="loadEditor(event);">
 <!--
 EOT;
-if($o_groups_p_gdcheck){
-$gdSize = explode("\t",$db_gdsize);
+$_G['uploadtype'] && $db_uploadfiletype = $_G['uploadtype'];
+$db_uploadfiletype = (is_array($db_uploadfiletype) ? $db_uploadfiletype : unserialize($db_uploadfiletype));
+$attachAllow = pwJsonEncode($db_uploadfiletype);
+$imageAllow = pwJsonEncode(getAllowKeysFromArray($db_uploadfiletype, array('jpg','jpeg','gif','png','bmp')));
 print <<<EOT
 -->
-                    <dl class="cc">
-                        <dt class="dtA">认证码: </dt>
-                        <dd><input class="input" type="text" name="gdcode" size="5" tabindex="6" onfocus="showgd();" id="fs_gdcode"/><br />
-					<div id="ckcode" style="display:none">
+				<div class="B_editor_toolbar B_editor_minitoolbar">
+					<div class="B_tar">
+						<a href="javascript:gotoEditor();" class="fr" hidefocus="true" id="gotoedit">进入高级模式</a>
+					</div>
+					<ul><li id="edit_toolbar">
+						<a href="javascript:;" class="B_ico" title="加粗" id="wy_boldIcon" hidefocus="true" style="display:block"><div class="B_boldIcon B_do"></div></a>
+						<div class="B_icoDown" style="display: block;" id="wy_foreColor"><a href="javascript://" class="B_ico"><div class="B_foreColor B_do1" title="文字颜色"><span style="background-color: rgb(255, 0, 0);"></span>文字颜色</div></a><em class="B_do1"></em></div>
+						<a href="javascript:;" class="B_ico" title="插入链接" id="wy_linkIcon" hidefocus="true" style="display:block"><div class="B_linkIcon B_do"></div></a>
+						<a href="javascript:;" class="B_icoBig" title="图片" id="wy_photoBtn" hidefocus="true" style="display:block"><div class="B_photoIcon B_do"></div></a>
+						<a href="javascript:;" class="B_icoBig" title="附件" id="wy_fileBtn" hidefocus="true" style="display:block"><div class="B_fileIcon B_do"></div></a>
+					</li></ul>
+				</div>
+				<textarea id="textarea" name="atc_content" style="width:100%;height:140px;padding:0;margin:0;border:0 none;overflow:auto;"></textarea>
+			</div>
+			<div class="mb10">
+<!--
+EOT;
+if ($o_groups_p_gdcheck) {
+	$gdSize = explode("\t",$db_gdsize);
+print <<<EOT
+-->
+				<dl class="cc">
+					<dt class="dtA">认证码: </dt>
+					<dd>
+						<input class="input" type="text" name="gdcode" size="5" tabindex="6" onfocus="showgd();" id="fs_gdcode"/>
+						<div id="ckcode" style="display:none">
 <script type="text/javascript" src="js/pw_authcode.js"></script>
 <script>
 var flashWidth = "$gdSize[0]";
@@ -99,38 +99,39 @@ var flashHeight = "$gdSize[1]";
 var gdtype = $db_gdtype;
 showGdCode();
 </script>
-					</div>
-                        </dd>
-                    </dl>
+						</div>
+					</dd>
+				</dl>
 <!--
 EOT;
-}if($db_question && $o_groups_p_qcheck){
-$qkey = array_rand($db_question);
-if($db_imagequestion){
-	$question = sprintf('<img src="ckquestion.php?q=%s">',$qkey);
-}else{
-	$question = $qkey<0 ? getMachineQuestion_1() :  $db_question[$qkey];
 }
-$q_a = $question.($showq && $qkey>0?" 正确答案:".$db_answer[$qkey] : '');
+list($postq,$showq)=explode("\t",$db_qcheck);
+empty($winddb[postnum]) && $winddb[postnum]=0;
+if ($o_groups_p_qcheck && $db_question) {
+	$qkey = array_rand($db_question);
+	if ($db_imagequestion) {
+		$question = '<img id="ckquestion" src="ckquestion.php?q='.$qkey.'&t='.$timestamp.'" align="top">';
+	} else {
+		$question = $qkey<0 ? getMachineQuestion_1() :  $db_question[$qkey];
+	}
+	$q_a = $question.($showq && $qkey>0?" 正确答案:".$db_answer[$qkey] : '');
 print <<<EOT
 -->
 <style type="text/css">
 .dtA{width:75px;margin-right:5px;}
 .fpbtn{margin-left:80px;}
 </style>
-                    <dl class="cc">
-                        <dt class="dtA">验证问题:</dt>
-                        <dd><input class="input" type="text" name="qanswer" /> <input type="hidden" name="qkey" value="$qkey" />{$q_a}</dd>
-                    </dl>
+				<dl class="cc">
+					<dt class="dtA">验证问题：</dt><dd><span class="fl mr10">$q_a</span><input class="input fl" size="5" type="text" name="qanswer" /><input type="hidden" name="qkey" value="$qkey" /></dd>
+				</dl>
 <!--
 EOT;
 }print <<<EOT
 -->
-                </div>
-                <p><span class="mr10"><span class="btn"><span><button name="Submit" type="submit">写好了，发布</button></span></span></span><span class="s3">Ctrl + Enter 快速发布</span>
-				<div id="divload"></div>
-            </div>
-        </td>
+			</div>
+			<p><span class="mr10"><span class="btn"><span><button name="Submit" type="submit">写好了，发布</button></span></span></span><span class="s3">Ctrl + Enter 快速发布</span></p>
+			<div id="divload"></div>
+		</td>
         <td class="floot_right" width="250">
             <div id="fp_face" class="fp_show">
                 <div class="fp_show_tab">
@@ -150,49 +151,55 @@ EOT;
 </table>
 </div>
 </form>
+<!--
+EOT;
+$imageConfigTabs = array();
+($db_allowupload && $_G['allowupload']) && $imageConfigTabs[] = 'local';
+($db_phopen && $winduid) && $imageConfigTabs[] = 'album';
+$imageConfigTabs[] = 'network';
+$imageConfigTabs = "'" . implode("','", $imageConfigTabs) . "'";
+print <<<EOT
+-->
 <script type="text/javascript">
+var titlemax = '$db_titlemax';
+initCheckTextNum('atc_title','atc_title_warn',titlemax);
+
 var charset='$db_charset';
 var bbsurl ="{$B_url}";
+var BREEZE_BASE_PATH = getBaseUrl() + 'js/breeze/';
 var editor = null;
-var titlemax = '$db_titlemax';
-
-initCheckTextNum('atc_title','atc_title_warn',titlemax);
-function WysiwygConfig() {
-	this.baseURL = document.baseURI || document.URL;
-	if (this.baseURL && this.baseURL.match(/(.*)\/([^\/]?)/)) {
-		this.baseURL = RegExp.$1 + "/";
-	}
-	this.imgURL = imgpath + "/post/c_editor/";
-
-	this.btnList = {
-		bold: [ true, editorcode, true ],
-		forecolor: [ true, showcolor, false ],
-		hilitecolor: [ true, showcolor, false ],
-		createlink: [ true, showcreatelink, false ],
-		unlink: [ true, editorcode, false ],
-		insertimage: [ true, insertImage, false ]
+var attachConfig = {
+		'attachnum' : parseInt('$db_attachnum'),
+		'list' : {},
+		'postData' : {fid : '$fid'},
+		'filetype' : $attachAllow
+	},
+	imageConfig = {
+		tabs : [$imageConfigTabs],
+		url : 'pweditor.php?action=image',
+		filetype : $imageAllow
 	};
-	this.selList = [];
-};
 function loadEditor(e) {
 	var e = is_ie ? event : e;
 	var o = e.srcElement || e.target;
 	if (o.id == 'gotoedit') return;
 
 	$('fp_editor').onclick = '';
-	loadjs('js/wind_c_editor.js', '', '', function() {
-		editor = new WYSIWYD();
-		editor.config = new WysiwygConfig();
-		editor.init();
-		if (o.id && o.id.match(/^wy\_/)) {
-			var key = o.id.substr(3);
-			if (typeof editor.config.btnList[key]) {
-				var cmd = editor.config.btnList[key][1];
-				cmd(key);
+	loadjs('js/breeze/core/base.js', '', '', function() {
+		B.require('editor.editor', 'editor.ubb', function(B){
+			editor = B.editor(B.$('#textarea'), 'edit_toolbar', 'boldIcon foreColor linkIcon photoBtn fileBtn',{'currentMode' : 'UBB'});
+			var s = B.hasClass(o, 'B_do') ? o.parentNode : (B.hasClass(o, 'B_do1') ? o : null);
+			if (s && s.events && s.events['mousedown']){
+				var handlers = s.events['mousedown'],evt = {};
+				evt.preventDefault = function(){};
+				for (var i in handlers) {
+					handlers[i](evt);
+				}
 			}
-		}
+		});
 	});
 }
+
 var dataStorage = {
 	save : function() {
 		if (PwStorage.save('msg', document.FORM.atc_content.value)) {
@@ -218,18 +225,7 @@ function gotoEditor() {
 }
 </script>
 </div>
-<!--
-EOT;
-$facedb = '';
-if(R_P != D_P){
-$facedb = readover(D_P.'data/bbscache/face.js');
-}else{print <<<EOT
--->
-<script language="JavaScript" src="data/bbscache/face.js"></script>
-<!--
-EOT;
-}print <<<EOT
--->
+<script src="$db_htmdir/js/face.js"></script>
 <script language="JavaScript" src="js/post.js"></script>
 <script language="javascript">
 document.FORM.Submit.disabled = false;
@@ -238,7 +234,6 @@ var stylepath = '$stylepath';
 var cate = '$db_forcetype';
 var cnt = 0;
 
-{$facedb}
 PwFace.init('face_tab', 'face_main', 3, 16);
 /* window.onload = function (){
  PwFace.init('face_tab', 'face_main', 3, 16);

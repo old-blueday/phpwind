@@ -7,7 +7,8 @@ while ($rt = $db->fetch_array($query)) {
 	$namedb[] = $rt['awardee'];
 }
 if ($namedb) {
-	include_once pwCache::getPath(D_P.'data/bbscache/medaldb.php');
+	//* include_once pwCache::getPath(D_P.'data/bbscache/medaldb.php');
+	pwCache::getData(D_P.'data/bbscache/medaldb.php');
 	$pwSQL = $ids = $medaluser  = array();
 	$reason = S::escapeChar(getLangInfo('other','medal_reason'));
 	

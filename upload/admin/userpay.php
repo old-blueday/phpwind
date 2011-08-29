@@ -5,7 +5,8 @@ $basename = "$admin_file?adminjob=userpay&adminitem=$adminitem";
 empty($adminitem) && $adminitem = 'userpay';
 if ($adminitem == 'userpay'){
 	if (!$_POST['action']) {
-		include_once pwCache::getPath(D_P.'data/bbscache/ol_config.php');
+		//* include_once pwCache::getPath(D_P.'data/bbscache/ol_config.php');
+		pwCache::getData(D_P.'data/bbscache/ol_config.php');
 		!$ol_paypalcode && $ol_paypalcode=RandString('40');
 		ifcheck($ol_onlinepay,'onlinepay');
 		include PrintEot('userpay');exit;

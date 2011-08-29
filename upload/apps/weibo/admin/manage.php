@@ -3,7 +3,8 @@
 !$action && $action = 'weibo';
 $weiboService = L::loadClass('weibo', 'sns');/* @var $weiboService PW_Weibo */
 require_once(R_P.'require/showimg.php');
-include_once pwCache::getPath(D_P.'data/bbscache/o_config.php');
+//* include_once pwCache::getPath(D_P.'data/bbscache/o_config.php');
+pwCache::getData(D_P.'data/bbscache/o_config.php');
 $nav = array("$action" => "class='current'");
 
 if ($action == 'weibo') {
@@ -35,7 +36,7 @@ if ($action == 'weibo') {
 		$ascChecked = $ordertype == 'asc' ? 'checked' : '';
 		$descChecked = !$ascChecked ? 'checked' : '';
 		$weibotypeSelect = $weibotype == '-1' ? array('please'=>'selected') : array($weibotype=>'selected');
-			
+				
 		intval($lines) < 1 && $lines=30;
 		intval($page)  < 1 && $page = 1;
 		$urladd  = $content ? '&content='.rawurlencode($content) : '';
@@ -51,6 +52,36 @@ if ($action == 'weibo') {
 			$page = $numofpage;
 		}
 		$pages=numofpage($count,$page,$numofpage,"$basename&action=weibo&job=list$urladd&");
+		require_once PrintApp('admin');
+	}
+} elseif ($action == 'topic') {
+	$topicService = L::loadClass("topic","sns");
+	if ($job == 'sethot') {	
+		S::gp(array('topicid','ifhot'));
+		if (!$topicid) adminmsg('operate_error',"$basename&action=topic&job=list");
+		$urladd .=  '&ifhot='.$ifhot;
+		$urladd .=  '&topicid='.$topicid;
+	//	$ifhot = $ifhot ? 1 : 2;
+		$topicService->setHotTopics($topicid,$ifhot);
+		//$weiboHotTopics = $topicService->getHotTopics(10,$days);
+		$rt = $db->update("delete FROM pw_cache WHERE name='weiboHotTopics_10'");
+		adminmsg('operate_success',"$basename&action=topic&job=list");
+	}else{
+		S::gp(array('topicname','ifhot','startnum','endnum','page','ordertype'));
+		$page < 1 && $page = 1;
+		${'sel_'.$ifhot} = 'selected';
+		$perpage = 20;
+		$urladd  = $topicname ? '&topicname='.rawurlencode($topicname) : '';
+		$urladd .=  '&ifhot='.$ifhot;
+		$urladd .= ($startnum >= 0) ? '&startnum='.rawurlencode($startnum) : '';
+		$urladd .= ($endnum >= 0) ? '&endnum='.rawurlencode($endnum) : '';
+		$ordertype = $ordertype == 'desc' ? 'desc' : 'asc';
+		list($count,$topics) = $topicService->getAdminSearchResult($ifhot,$topicname,$startnum,$endnum,$ordertype,$page,$perpage);
+		$numofpage = ceil($count/$perpage);
+		if ($numofpage && $page > $numofpage) {
+			$page = $numofpage;
+		}
+		$pages=numofpage($count,$page,$numofpage,"$basename&action=topic&job=list$urladd&");
 		require_once PrintApp('admin');
 	}
 } elseif ($action == 'comment') {

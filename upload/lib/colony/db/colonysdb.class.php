@@ -64,7 +64,8 @@ class PW_ColonysDB extends BaseDB {
 	}
 	function _getCreditAdd($type) {
 		if ($type!='credit') return '';
-		include pwCache::getPath(D_P . 'data/bbscache/o_config.php');
+		//* include pwCache::getPath(D_P . 'data/bbscache/o_config.php');
+		extract(pwCache::getData(D_P . 'data/bbscache/o_config.php', false));
 		$tnum = $o_groups_upgrade['tnum'] ? $o_groups_upgrade['tnum'] : 0;
 		$pnum = $o_groups_upgrade['pnum'] ? $o_groups_upgrade['pnum'] : 0;
 		$members = $o_groups_upgrade['members'] ? $o_groups_upgrade['members'] : 0;

@@ -1,4 +1,4 @@
-﻿/*
+/*
 * util.toolbar 模块
 * 滚动页面toolbar功能
 */
@@ -26,12 +26,27 @@ Breeze.namespace('util.toolbar', function(B) {
                     //console.log(winST+","+elT)
                     if(winST > elT && winST < (exceedBottom+elH)) {
                         if(B.UA.ie == 6) {
-                            var top = document.documentElement.scrollTop;
+ 							if(!B.$("#B_tmp_blank")){
+							   var top = document.documentElement.scrollTop;
+								var blank = B.createElement('div');
+								blank.id = "B_tmp_blank";
+								blank.style.width = B.width(el) + 'px';
+								blank.style.height = B.height(el)+'px';
+								B.insertBefore(blank, el);
+							}
                             B.css(el,{'position':'absolute','top':''+top+'px','z-index':'999','width':''+elW+'px'});
                         }else {
-                            B.css(el,{'position':'fixed','top':'0px','z-index':'999','width':''+elW+'px'});
+							if(!B.$("#B_tmp_blank")){
+								var blank = B.createElement('div');
+								blank.id = "B_tmp_blank";
+								blank.style.width = B.width(el) + 'px';
+								blank.style.height = B.height(el)+'px';
+								B.insertBefore(blank, el);
+								B.css(el,{'position':'fixed','top':'0px','z-index':'999','width':''+elW+'px'});
+							}
                         }
                     }else {
+						B.query('#B_tmp_blank').remove();
                         B.css(el,{'position':'static'});
                     }
                 });

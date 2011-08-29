@@ -56,7 +56,8 @@ if ($action == 'add') {
 	}
 	ajax_footer();exit;
 } elseif ($action == 'del') {
-	include_once pwCache::getPath(D_P.'data/bbscache/area_config.php');
+	//* include_once pwCache::getPath(D_P.'data/bbscache/area_config.php');
+	pwCache::getData(D_P.'data/bbscache/area_config.php');
 	S::gp(array('id'));
 	$channel_info=$channelService->getChannelByChannelid($id);
 	if (!$channel_info) Showmsg("频道不存在");
@@ -128,7 +129,8 @@ if ($action == 'add') {
 		$channelService->updateDefaultAlias($defaultalias);
 		Showmsg("operate_success");
 	} else {
-		include_once pwCache::getPath(D_P.'data/bbscache/area_config.php');
+		//* include_once pwCache::getPath(D_P.'data/bbscache/area_config.php');
+		pwCache::getData(D_P.'data/bbscache/area_config.php');
 
 		$addUrl=$admin_file."?adminjob=mode&admintype=area_channel_manage&action=add&ajax=1";
 		$editUrl=$admin_file."?adminjob=mode&admintype=area_channel_manage&action=edit&ajax=1";

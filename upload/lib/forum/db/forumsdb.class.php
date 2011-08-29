@@ -2,6 +2,7 @@
 !defined('P_W') && exit('Forbidden');
 class PW_ForumsDB extends BaseDB {
 	var $_tableName  = 'pw_forums';
+	var $_extraTableName = 'pw_forumsextra';
 	var $_primaryKey = 'fid';
 	function insert($fieldData){
 		return $this->_insert($fieldData);
@@ -44,21 +45,27 @@ class PW_ForumsDB extends BaseDB {
 	/**
 	 * 注意只提供搜索服务
 	 */
-	function countSearch($keywords){
-		$result = $this->_db->get_one ( "SELECT COUNT(*) as total FROM " . $this->_tableName . " WHERE name like ".S::sqlEscape("%$keywords%")." LIMIT 1" );
+	function countSearch($sql){
+		$result = $this->_db->get_one ( $sql );
 		return ($result) ? $result['total'] : 0;
 	}
 	/**
 	 * 注意只提供搜索服务
 	 */
-	function getSearch($keywords,$offset,$limit){
-		$query = $this->_db->query ("SELECT * FROM " . $this->_tableName . " WHERE name like ".S::sqlEscape("%$keywords%")." LIMIT ".$offset.",".$limit);
+	function getSearch($sql){
+		$query = $this->_db->query ($sql);
 		return $this->_getAllResultFromQuery ( $query );
 	}
 	
-	function getFormusByFids($fids) {
+	function getFormusByFids($fids,$fields = '*') {
 		$fids = is_array($fids) ? $fids : array($fids);
-		$query = $this->_db->query ("SELECT * FROM " . $this->_tableName. " WHERE fid in( ".S::sqlImplode($fids).")");
+		$query = $this->_db->query ("SELECT $fields FROM " . $this->_tableName. " WHERE fid in( ".S::sqlImplode($fids).")");
+		return $this->_getAllResultFromQuery($query, 'fid');
+	}
+	
+	function getForumSetsByFids($fids){ 
+		$fids = is_array($fids) ? $fids : array($fids);
+		$query = $this->_db->query ("SELECT fid,forumset FROM " . $this->_extraTableName. " WHERE fid in( ".S::sqlImplode($fids).")");
 		return $this->_getAllResultFromQuery($query, 'fid');
 	}
 }

@@ -16,7 +16,8 @@ if (empty($see)) {
 	S::gp(array('actmid'),GP,2);
 	S::gp(array('timerange'),GP);
 	
-	@include_once pwCache::getPath(D_P."data/bbscache/activity_config.php");
+	// * @include_once pwCache::getPath(D_P."data/bbscache/activity_config.php");
+	pwCache::getData(D_P."data/bbscache/activity_config.php");
 
 	$where = " WHERE dv.ifrecycle=0";
 

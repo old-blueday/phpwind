@@ -102,7 +102,7 @@ $lang = array(
 			<span class="black" style="width:250px; float:left">html/portal/userlist/main.htm</span><span class="black" style="padding-right:2em">html/portal/userlist/config.htm</span><br/>
 			<span class="black" style="width:250px; float:left">html/portal/userlist/index.html</span><span class="black" style="padding-right:2em">html/portal/usermix/main.htm</span><br/>
 			<span class="black" style="width:250px; float:left">html/portal/usermix/config.htm</span><span class="black" style="padding-right:2em">html/portal/usermix/index.html</span><br/>
-			<span class="black" style="width:250px; float:left">html/stopic</span><span class="black" style="padding-right:2em"></span><br/>
+			<span class="black" style="width:250px; float:left">html/stopic</span><span class="black" style="padding-right:2em">js/</span><br/>
 		</div>
 		<p>第三步：</p><p>运行 <small>http://yourwebsite/upload/{#basename}</small> 安装程序，填入安装相关信息与资料，完成安装！</p>
 		<p>● Windows 服务器下安装方法</p><p>第一步：</p><p>使用ftp工具，将该软件包里的upload目录下的所有文件上传到您的空间，假设上传后目录为 upload。</p>
@@ -124,7 +124,7 @@ $lang = array(
 	'log_unionmsgt'		=> '欢迎您使用并测试phpwind V7.5 sp3 社区系统！',
 	'log_unionmsgc'		=> '尊敬的站长：\n\n　　欢迎您使用并测试phpwind V7.5 sp3社区系统。官方v6.3 RC演示于3月15日开放至今，版本经过多次调试与完善，已趋于稳定。在RC版公开测试期间，如发现BUG，或对这个版本有任何建议、意见，欢迎您进入此帖进行回复[url]http://www.phpwind.net/read.php?tid=603810[/url]。\n\n　　另外，从4月30日起，通过phpwind社区营销平台指导，站长将可以获得阿里妈妈提供的在线广告服务，由营销后台登记注册至阿里妈妈（[url]www.alimama.com[/url]）平台的站长，将会获得如下[b]独家优势[/b]：\n　　1.高优先级别享有阿里妈妈广告交易平台的众多功能，包括优先三包、优先享有更多广告推广模式等；\n　　2.phpwind社区营销平台累计收入超过100元的站长，将会直接享有网站最低收入保障服务，让您在稳定的收入下，获得更多价值；\n　　3.在未来，phpwind站长将会获得阿里妈妈广告交易平台的phpwind论坛插件，实现更多快捷、并具有独立优势的在线广告服务。\n　　同时，phpwind社区营销平台Google Adsense、下划线、主题帖营销第一期，将暂时停止投放。\n\n　　[b]详情请访问：[url]http://www.phpwind.net/read-htm-tid-602463.html[/url]。[/b]\n\nphpwind官方\n2008-4-29',
 	'log_update'		=> '<li><a href="http://www.phpwind.net/read-htm-tid-704022.html" target="_blank" class="black">门户模式化</a></li><li><a href="http://www.phpwind.net/read-htm-tid-681220.html" target="_blank" class="black">PW7.0之好友</a></li><li><a href="http://www.phpwind.net/read-htm-tid-677057.html" target="_blank" class="black">探索PW7.0之用户中心</a></li><li><a href="http://www.phpwind.net/read-htm-tid-679230.html" target="_blank" class="black">PW7.0 之 自定义风格</a></li><li><a href="http://www.phpwind.net/read-htm-tid-674290.html" target="_blank" class="black">PW7.0 之密码安全问题</a></li><li><a href="http://www.phpwind.net/read-htm-tid-680607.html" target="_blank" class="black">盘点7.0细节功能 (一）</a></li><li><a href="http://www.phpwind.net/read-htm-tid-680768.html" target="_blank" class="black">盘点7.0细节功能 (二）</a></li><li><a href="http://www.phpwind.net/read-htm-tid-681088.html" target="_blank" class="black">盘点7.0细节功能 (三）</a></li><li class="right"><a href="http://www.phpwind.net/thread-htm-fid-78.html" target="_blank" class="black">了解更多特性</a></li>',
-	'log_upto'			=> '<p>1、运行环境需求：PHP+MYSQL。</p><p>2、适用版本：{#from_version}。</p><p>3、升级步骤：</p><p>● Linux 或 Freebsd 服务器下安装方法。</p><p>第一步：</p><p>升级前请务必备份论坛文件与数据, 以免升级失败导致数据丢失</p><p>第二步：</p><p>请将 upload 目录内的 images 目录改名为论坛的图片目录名。注: 可以到论坛后台的 核心设置 里查看。</p><p>第三步：</p><p>使用ftp工具中的二进制模式，将该软件包里 upload 里的所有文件覆盖上传到您的论坛目录，假设上传后目录仍旧为 upload。将升级文件(<small>{#basename}</small>)上传到 upload 下</p><p>第四步：</p><p>运行 <small>http://yourwebsite/upload/{#basename}</small> 升级程序，按升级提示进行升级, 直到升级结束！</p><p>● Windows 服务器下安装方法。</p><p>第一步：</p><p>升级前请务必备份论坛文件与数据, 以免升级失败导致数据丢失</p><p>第二步：</p><p>请将 upload 目录内的 images 目录改名为论坛的图片目录名。注: 可以到论坛后台的 核心设置 里查看。</p><p>第三步：</p><p>使用ftp工具，将该软件包里 upload 里的所有文件覆盖上传到您的论坛目录，假设上传后目录仍旧为 upload。将升级文件(<small>{#basename}</small>)上传到 upload 下</p><p>第四步：</p><p>运行 <small>http://yourwebsite/upload/{#basename}</small> 升级程序，按升级提示进行升级, 直到升级结束！</p>',
+	'log_upto'			=> '<p>1、运行环境需求：PHP+MYSQL。</p><p>2、适用版本：{#from_version}。</p><p>3、升级步骤：</p><p>● Linux 或 Freebsd 服务器下安装方法。</p><p>第一步：</p><p>升级前请务必备份论坛文件与数据, 以免升级失败导致数据丢失</p><p>第二步：</p><p>请将 upload 目录内的 images 目录改名为论坛的图片目录名。注: 可以到论坛后台的 全局 里查看。</p><p>第三步：</p><p>使用ftp工具中的二进制模式，将该软件包里 upload 里的所有文件覆盖上传到您的论坛目录，假设上传后目录仍旧为 upload。将升级文件(<small>{#basename}</small>)上传到 upload 下</p><p>第四步：</p><p>运行 <small>http://yourwebsite/upload/{#basename}</small> 升级程序，按升级提示进行升级, 直到升级结束！</p><p>● Windows 服务器下安装方法。</p><p>第一步：</p><p>升级前请务必备份论坛文件与数据, 以免升级失败导致数据丢失</p><p>第二步：</p><p>请将 upload 目录内的 images 目录改名为论坛的图片目录名。注: 可以到论坛后台的 核心设置 里查看。</p><p>第三步：</p><p>使用ftp工具，将该软件包里 upload 里的所有文件覆盖上传到您的论坛目录，假设上传后目录仍旧为 upload。将升级文件(<small>{#basename}</small>)上传到 upload 下</p><p>第四步：</p><p>运行 <small>http://yourwebsite/upload/{#basename}</small> 升级程序，按升级提示进行升级, 直到升级结束！</p>',
 	'log_upto_t'		=> '升级须知',
 	'log_repair_t'		=> '更新须知',
 
@@ -207,17 +207,16 @@ $lang = array(
 	'step_pre'			=> '上一步',
 	'step_next'			=> '下一步',
 	'left_info'			=> '<dt style="margin:0;">更新记录</dt>
-        <dd style="padding-top:5px;"><a href="http://www.phpwind.net/read-htm-tid-1163917.html" target="_blank">phpwind8.3 新增功能优化列表</a></dd>
-        <dd><a href="http://www.phpwind.net/read-htm-tid-1165422.html" target="_blank">phpwind8.3 bug修复列表</a></dd>
+        <dd style="padding-top:5px;"><a href="http://www.phpwind.net/read-htm-tid-1251662.html" target="_blank">phpwind 8.5介绍帖</a></dd>
+        <dd><a href="http://www.phpwind.net/read-htm-tid-1251648.html" target="_blank">phpwind 8.5 bug修复列表</a></dd>
         <dt>帮助文档</dt>
-        <dd style="padding-top:5px;"><a href="http://www.phpwind.net/read-htm-tid-1163914.html" target="_blank">安装教程</a></dd>
-		<dd><a href="http://www.phpwind.net/read-htm-tid-1163915.html" target="_blank">升级教程</a></dd>
-		<dd><a href="http://www.phpwind.net/read-htm-tid-1164576.html" target="_blank">插件安装教程</a></dd>
-        <dd><a href="http://www.phpwind.net/read-htm-tid-1164575.html" target="_blank">风格安装教程</a></dd>
-        <dd><a href="http://www.phpwind.net/read-htm-tid-1164574.html" target="_blank">数据库结构手册</a></dd>
+        <dd style="padding-top:5px;"><a href="http://www.phpwind.net/read-htm-tid-1251651.html" target="_blank">安装教程</a></dd>
+		<dd><a href="http://www.phpwind.net/read-htm-tid-1251656.html" target="_blank">升级教程</a></dd>
+		<dd><a href="http://www.phpwind.net/read-htm-tid-1251658.html" target="_blank">插件安装教程</a></dd>
+        <dd><a href="http://www.phpwind.net/read-htm-tid-1251659.html" target="_blank">风格安装教程</a></dd>
+        <dd><a href="http://www.phpwind.net/read-htm-tid-1250119.html" target="_blank">数据库结构手册</a></dd>
         <dd><a href="http://www.phpwind.net/thread-htm-fid-54.html" target="_blank">在线反馈</a></dd>
-		<dd><a href="http://faq.phpwind.net" target="_blank">帮助中心</a></dd>
-		<dd><a href="http://www.phpwind.net/read-htm-tid-753172.html" target="_blank">什么是模式化</a></dd>',
+		<dd><a href="http://faq.phpwind.net/" target="_blank">帮助中心</a></dd>',
 	'step_problem'		=> '<p>操作过程中若遇到任何问题，</p> <p><a href="http://www.phpwind.net/thread-htm-fid-2.html" target="_blank"><strong>请到官方论坛寻求帮助</strong></a></p>',
 	'step_deldir'		=> '友情提示：请及时删除admin/code.php、template/admin/code.htm和hack/app整个文件夹',
 
@@ -228,7 +227,7 @@ $lang = array(
 	'update_finish'		=> '升级成功！',
 	'admin_name'		=> '创始人帐号：',
 	'admin_pwd'			=> '密码：',
-	'admin_login_2'		=> ' 登 陆 ',
+	'admin_login_2'		=> ' 登 录 ',
 	'login_error'		=> '用户名或密码错误，登录失败',
 
 	//install

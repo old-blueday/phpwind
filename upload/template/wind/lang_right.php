@@ -122,20 +122,20 @@ $lang['right'] = array (
 			'desc'	=> '开启后，此用户组的用户可以查看统计排行',
 			'html'	=> '<ul class="list_A list_80 cc"><li><input type="radio" value="1" name="group[allowsort]" $allowsort_Y />开启</li><li><input type="radio" value="0" name="group[allowsort]" $allowsort_N />关闭</li></ul>'
 		),
-		/*'alloworder'	=> array(
+		'alloworder'=> array(
 			'title'	=> '主题排序',
 			'html'	=> '<ul class="list_A list_80 cc"><li><input type="radio" value="1" name="group[alloworder]" $alloworder_Y />开启</li><li><input type="radio" value="0" name="group[alloworder]" $alloworder_N />关闭</li></ul>'
-		),*/
+		),
 		'viewipfrom'	=> array(
 			'title'	=> '查看ip来源',
-			'desc'	=> "如果论坛模式下界面设置中<a href=\"$admin_file?adminjob=settings&admintype=read\">帖子阅读页设置</a>关闭此功能，则此项设置无效",
+			'desc'	=> "如果论坛模式下界面设置中<a href=\"$admin_file?adminjob=interfacesettings&adminitem=read\">帖子阅读页设置</a>关闭此功能，则此项设置无效",
 			'html'	=> '<ul class="list_A list_80 cc"><li><input type="radio" value="1" name="group[viewipfrom]" $viewipfrom_Y />开启</li><li><input type="radio" value="0" name="group[viewipfrom]" $viewipfrom_N />关闭</li></ul>'
 		),
 		'searchtime'	=> array(
 			'title'	=> '两次搜索时间间隔[秒]',
 			'html'	=> '<input class="input input_wa" name="group[searchtime]" value="$searchtime" />'
 		),
-		'schtime' => array(
+		/*'schtime' => array(
 			'title'	=> '搜索发表时间范围',
 			'html'	=> '<select name="group[schtime]" class="select_wa">
 				<option value="all" $schtime_all>所有主题</option>
@@ -148,7 +148,7 @@ $lang['right'] = array (
 				<option value="15552000" $schtime_15552000>6个月内的主题</option>
 				<option value="31536000" $schtime_31536000>1年内的主题</option>
 			</select>'
-		),
+		),*/
 		'signnum' => array(
 			'title'	=> '帖子签名最大字节数',
 			'desc'	=> '为0则不限制',
@@ -156,17 +156,17 @@ $lang['right'] = array (
 		),
 		'imgwidth' => array(
 			'title'	=> '签名中的图片最大宽度',
-			'desc'	=> '留空使用核心里的设置',
+			'desc'	=> "留空使用<a href=\"$admin_file?adminjob=member\"  onclick=\"parent.PW.Dialog({id:'member',url:'$admin_file?adminjob=member',name:'会员相关'});return false;\">全局->会员相关->签名设置</a>里的设置",
 			'html'	=> '<input class="input input_wa" name="group[imgwidth]" value="$imgwidth" />'
 		),
 		'imgheight' => array(
 			'title'	=> '签名中的图片最大高度',
-			'desc'	=> '留空使用核心里的设置',
+			'desc'	=> "留空使用<a href=\"$admin_file?adminjob=member\"  onclick=\"parent.PW.Dialog({id:'member',url:'$admin_file?adminjob=member',name:'会员相关'});return false;\">全局->会员相关->签名设置</a>里的设置",
 			'html'	=> '<input class="input input_wa" name="group[imgheight]" value="$imgheight" />'
 		),
 		'fontsize'	=> array(
 			'title'	=> '签名中[size]标签最大值',
-			'desc'	=> '留空使用核心里的设置',
+			'desc'	=> "留空使用<a href=\"$admin_file?adminjob=member\"  onclick=\"parent.PW.Dialog({id:'member',url:'$admin_file?adminjob=member',name:'会员相关'});return false;\">全局->会员相关->签名设置</a>里的设置",
 			'html'	=> '<input class="input input_wa" name="group[fontsize]" value="$fontsize" />'
 		),
 		/*'maxmsg'	=> array(
@@ -283,7 +283,7 @@ $lang['right'] = array (
 			'html'	=> '<ul class="list_A list_80 cc"><li><input type="radio" value="1" name="group[htmlcode]" $htmlcode_Y />开启</li><li><input type="radio" value="0" name="group[htmlcode]" $htmlcode_N />关闭</li></ul>'
 		),
 		'media'	=> array(
-			'title'	=> '多媒体允许自动播放',
+			'title'	=> '多媒体允许自动展开',
 			'html'	=> '<ul class="list_A list_80 cc"><li><input type="checkbox" name="group[media][]" value="flash" $media_sel[flash] />flash</li><li>
 			<input type="checkbox" name="group[media][]" value="wmv" $media_sel[wmv] />wmv</li><li>
 			<input type="checkbox" name="group[media][]" value="rm" $media_sel[rm] />rm</li><li>
@@ -378,7 +378,7 @@ $lang['right'] = array (
 	'group' =>array(
 		'allowcreate'=>array(
 			'title'=>'允许创建群组个数',
-			'desc' =>"0 或 留空 表示没限制，需要在群组基础设置中开启<a href=\"$admin_file?adminjob=apps&admintype=app_groups\">允许创建新群组</a>才有效",
+			'desc' =>"0 或 留空 表示没限制，需要在群组基础设置中开启<a href=\"$admin_file?adminjob=apps&admintype=groups_set\">允许创建新群组</a>才有效",
 			'html'=>'<input size="35" class="input" value="$allowcreate" name="group[allowcreate]" />'
 		),
 		'allowjoin'=>array(
@@ -404,7 +404,7 @@ $lang['right'] = array (
 		),
 		'uploadtype'	=> array(
 			'title'	=> '附件上传的后缀和尺寸',
-			'desc'	=> '留空使用站点核心设置中的设置',
+			'desc'	=> "<font color=\"red\">系统限制上传附件最大尺寸为{$maxuploadsize},</font>留空则使用站点全局中的设置",
 			'html'	=> '<div class="admin_table_b"><table cellpadding="0" cellspacing="0">
 				<tbody id="mode" style="display:none"><tr>
 					<td><input class="input input_wc" name="filetype[]" value=""></td>
@@ -673,9 +673,9 @@ $lang['right'] = array (
 			'title'	=> '可编辑管理组帖子',
 			'desc'	=> '<font color=blue> 说明：</font>可编辑管理组的帖子',
 			'html'	=> '<ul class="list_A list_80 cc">
-			<li><label><input type="checkbox" name="group[tcanedit][]" value="3" $tcanedit_sel[3]/>管理员</label></li>
-			<li><label><input type="checkbox" name="group[tcanedit][]" value="4" $tcanedit_sel[4]/>总版主</label></li>
-			<li><label><input type="checkbox" name="group[tcanedit][]" value="5" $tcanedit_sel[5]/>论坛版主</label></li></ul>'
+			<li><label><input type="checkbox" name="group[tcanedit][]" value="3" $tcanedit_sel[3]/>' . $ltitle[3] . '</label></li>
+			<li><label><input type="checkbox" name="group[tcanedit][]" value="4" $tcanedit_sel[4]/>' . $ltitle[4] . '</label></li>
+			<li><label><input type="checkbox" name="group[tcanedit][]" value="5" $tcanedit_sel[5]/>' . $ltitle[5] . '</label></li></ul>'
 		),
 		'deldiary'	=> array(
 			'title'	=> '日志删除权限',

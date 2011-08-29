@@ -3,6 +3,7 @@
 class PW_ThreadsDB extends BaseDB {
 	var $_tableName  = 'pw_threads';
 	var $_tableName2 = 'pw_tmsgs';
+	var $_tableName3 = 'pw_threads_img';
 	var $_primaryKey = 'tid';
 	function insert($fieldData){
 		return $this->_insert($fieldData);
@@ -51,15 +52,7 @@ class PW_ThreadsDB extends BaseDB {
 		$query = $this->_db->query ( "SELECT t.*,th.content FROM ".$this->_tableName." t left join ".$this->_tableName2." th on t.tid=th.tid WHERE t.ifcheck = 1 AND t.fid != 0  AND t.tid in(".$threadIds.") ORDER BY t.postdate DESC" );
 		return $this->_getAllResultFromQuery ( $query );
 	}
-	function getLatestThreads($offset,$limit){
-		$threadIds = $this->_getLatestThreads($offset,$limit);
-		if(!$threadIds) return false;
-		$tmp = array();
-		foreach($threadIds as $t){
-			$tmp[] = $t['tid'];
-		}
-		return $this->getsBythreadIds($tmp);
-	}
+	
 	function _getFilterids(){
 		global $db_filterids;
 		$_sql_where='';
@@ -68,18 +61,95 @@ class PW_ThreadsDB extends BaseDB {
 		}
 		return $_sql_where;
 	}
-	function getLatestThreadsCount(){
+	function getLatestThreadsCount($forumIds, $starttime, $endtime){
 		$_sql_where=$this->_getFilterids();
-		$total=$this->countSearch("SELECT count(*) as total FROM ".$this->_tableName." t WHERE t.ifcheck = 1 ".$_sql_where." ORDER BY t.postdate DESC");
+		
+		if ($forumIds) {
+			$forumIds = (is_array ( $forumIds )) ? $forumIds : array ($forumIds );
+			$_sql_where .= " AND t.fid IN(" . S::sqlImplode ( $forumIds ) . ")";
+		}
+		
+		if ($starttime) {
+			$_sql_where .= " AND t.postdate > " . S::sqlEscape ( $starttime );
+		}
+		
+		if ($endtime) {
+			$_sql_where .= " AND t.postdate < " . S::sqlEscape ( $endtime );
+		}
+		
+		$total=$this->countSearch("SELECT count(*) as total FROM ".$this->_tableName." t WHERE t.ifcheck = 1 AND t.fid !=0 ".$_sql_where);
 		return ($total<500) ? $total :500;
 	}
-	function _getLatestThreads($offset,$limit){
+	
+	function getLatestThreads($forumIds, $starttime, $endtime, $offset, $limit){
+		$threadIds = $this->_getLatestThreads($forumIds, $starttime, $endtime, $offset,$limit);
+		if(!$threadIds) return false;
+		$tmp = array();
+		foreach($threadIds as $t){
+			$tmp[] = $t['tid'];
+		}
+		return $this->getsBythreadIds($tmp);
+	}
+	
+	function _getLatestThreads($forumIds, $starttime, $endtime, $offset, $limit){
 		$_sql_where=$this->_getFilterids();
-		$query = $this->_db->query ("SELECT t.tid FROM ".$this->_tableName." t WHERE t.ifcheck = 1 ".$_sql_where." ORDER BY t.postdate DESC LIMIT " . $offset . "," . $limit );
+		
+		if ($forumIds) {
+			$forumIds = (is_array ( $forumIds )) ? $forumIds : array ($forumIds );
+			$_sql_where .= " AND t.fid IN(" . S::sqlImplode ( $forumIds ) . ")";
+		}
+		
+		if ($starttime) {
+			$_sql_where .= " AND t.postdate > " . S::sqlEscape ( $starttime );
+		}
+		
+		if ($endtime) {
+			$_sql_where .= " AND t.postdate < " . S::sqlEscape ( $endtime );
+		}
+		
+		$query = $this->_db->query ("SELECT t.tid FROM ".$this->_tableName." t WHERE t.ifcheck = 1 AND t.ifshield != 1 ".$_sql_where." ORDER BY t.postdate DESC LIMIT " . $offset . "," . $limit );
 		return $this->_getAllResultFromQuery ( $query );
 	}
-	function getDigestThreads($uid, $digest, $offset, $limit){
-		$threadIds = $this->_getDigestThreads($uid,$digest,$offset,$limit);
+	
+	/**
+	 * 最新图片帖
+	 */
+	function getLatestImageThreads($limit){
+		$limit = intval($limit);
+		if (!$limit) return array();
+		$query = $this->_db->query ("SELECT t.tid,t.subject FROM ".$this->_tableName3." ti LEFT JOIN ".$this->_tableName." t USING(tid) WHERE t.ifcheck = 1 AND t.fid != 0 AND t.locked = 0 ORDER BY t.postdate DESC LIMIT ". $limit );
+		return $this->_getAllResultFromQuery ( $query ,'tid');
+	}
+	
+	function deleteTucoolThreadsByTids($tids){
+		return pwQuery::delete($this->_tableName3, 'tid IN (:tid)', array($tids));
+	}
+	function getDigestThreadsCount($uid, $forumIds, $starttime, $endtime){
+		$_sql_where=$this->_getFilterids();
+		
+		if ($uid) {
+			$_sql_where .=  ' AND t.authorid=' . S::sqlEscape($uid);
+		}
+		
+		if ($forumIds) {
+			$forumIds = (is_array ( $forumIds )) ? $forumIds : array ($forumIds );
+			$_sql_where .= " AND t.fid IN(" . S::sqlImplode ( $forumIds ) . ")";
+		}
+		
+		if ($starttime) {
+			$_sql_where .= " AND t.postdate > " . S::sqlEscape ( $starttime );
+		}
+		
+		if ($endtime) {
+			$_sql_where .= " AND t.postdate < " . S::sqlEscape ( $endtime );
+		}
+		
+		$total=$this->countSearch("SELECT count(*) as total FROM ".$this->_tableName." t WHERE t.ifcheck = 1{$_sql_where} AND t.digest IN ('1','2')");
+		return ($total<500) ? $total : 500;
+	}
+	
+	function getDigestThreads($uid, $digest,$forumIds, $starttime, $endtime, $offset, $limit){
+		$threadIds = $this->_getDigestThreads($uid,$digest,$forumIds,$starttime,$endtime,$offset,$limit);
 		if(!$threadIds) return false;
 		$tmp = array();
 		foreach($threadIds as $t){
@@ -88,21 +158,38 @@ class PW_ThreadsDB extends BaseDB {
 		return $this->getsBythreadIds($tmp);
 	}
 
-	function _getDigestThreads($uid,$digest,$offset,$limit){
-		$_sql_where = $uid ? ' AND t.authorid=' . S::sqlEscape($uid) : '';
-		$digest = (is_array($digest)) ? S::sqlImplode($digest) : $digest;
-		$query = $this->_db->query ( "SELECT t.tid FROM ".$this->_tableName." t WHERE t.ifcheck = 1{$_sql_where} AND t.digest IN (" .$digest. ") ORDER BY t.postdate DESC LIMIT " . $offset . "," . $limit );
+	function _getDigestThreads($uid, $digest, $forumIds, $starttime, $endtime, $offset, $limit){
+		$_sql_where=$this->_getFilterids();
+		
+		if ($uid) {
+			$_sql_where .=  ' AND t.authorid=' . S::sqlEscape($uid);
+		}
+		
+		if ($digest) {
+			$digest = (is_array ( $digest )) ? $digest : array ($digest );
+			$_sql_where .= " AND t.digest IN(" . S::sqlImplode ( $digest ) . ")";
+		}
+		
+		if ($forumIds) {
+			$forumIds = (is_array ( $forumIds )) ? $forumIds : array ($forumIds );
+			$_sql_where .= " AND t.fid IN(" . S::sqlImplode ( $forumIds ) . ")";
+		}
+		
+		if ($starttime) {
+			$_sql_where .= " AND t.postdate > " . S::sqlEscape ( $starttime );
+		}
+		
+		if ($endtime) {
+			$_sql_where .= " AND t.postdate < " . S::sqlEscape ( $endtime );
+		}
+		
+		$query = $this->_db->query ( "SELECT t.tid FROM ".$this->_tableName." t WHERE t.ifcheck = 1{$_sql_where} ORDER BY t.postdate DESC LIMIT " . $offset . "," . $limit );
 		return $this->_getAllResultFromQuery ( $query );
-	}
-	function getDigestThreadsCount($uid){
-		$_sql_where = $uid ? ' AND t.authorid=' . S::sqlEscape($uid) : '';
-		$total=$this->countSearch("SELECT count(*) as total FROM ".$this->_tableName." t WHERE t.ifcheck = 1{$_sql_where} AND t.digest IN ('1','2')");
-		return ($total<500) ? $total : 500;
 	}
 	
 	function getThreadsCountByPostdate($postdate) {
 		$_sql_where=$this->_getFilterids();
-		$total=$this->countSearch("SELECT count(*) as total FROM ".$this->_tableName." t WHERE t.ifcheck = 1 ".$_sql_where." AND postdate>=".S::sqlEscape($postdate). " ORDER BY t.postdate DESC");
+		$total=$this->countSearch("SELECT count(*) as total FROM ".$this->_tableName." t WHERE t.ifcheck = 1 ".$_sql_where." AND postdate>=".S::sqlEscape($postdate));
 		return $total;
 	}
 	
@@ -278,4 +365,9 @@ class PW_ThreadsDB extends BaseDB {
 		pwQuery::delete($this->_tableName, 'authorid=:authorid', array($authorId));
 		return $this->_db->affected_rows();
 	}
+	
+	function setTpcStatusByThreadIds($tids,$mask){
+		$this->_db->update("UPDATE $this->_tableName SET tpcstatus=tpcstatus & ".S::int($mask)." WHERE tid IN(".S::sqlImplode($tids).")");
+	}
+
 }

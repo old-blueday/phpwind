@@ -13,6 +13,8 @@
  * @package PW_Diary
  */
 class PW_Diary {
+	
+	var $attachShow;
 
 	function countFriendsDiarys($userIds, $diaryTypeId = null) {
 		$diaryDb = $this->_getDiaryDB();
@@ -201,59 +203,16 @@ class PW_Diary {
 	 * @param $content  	日志内容
 	 * @param $authorid		日志作者
 	 */
-	function _getAttachs($aid, $content, $authorid) {
+	function _getAttachs($aid, &$content, $authorid) {
 		global $winduid, $isGM;
-
+		if (!$aid || !($attachs = unserialize($aid)) || !is_array($attachs)) {
+			return array();
+		}
+		$GLOBALS += L::style();
 		require_once(R_P.'require/bbscode.php');
-		$attachs = $aids = array();
-		if (!$aid) return array();
-
-		$attachs = unserialize($aid);
-		if (is_array($attachs)) {
-			$aids = attachment($content);
-		}
-
-		if (!$attachs && !is_array($attachs)) return array();
-
-		if ($winduid == $authorid || $isGM) $dfadmin = 1;
-
-		$result = array();
-		$result = $this->_getAttachsContent($aids, $attachs, $content, $dfadmin);
-		return $result;
-	}
-
-	/**
-	 *
-	 * @param $aids		内容里的附件aids
-	 * @param $data		附件数据存储数组$attachs = unserialize($aid);
-	 * @param $content	日志内容
-	 * @param $dfadmin	管理权限
-	 */
-	function _getAttachsContent($aids, $data, $content, $dfadmin = 0) {
-		$result = array();
-		if (!$data && !is_array($data)) return array();
-		foreach ($data as $at) {
-			$atype = '';
-			$rat = array();
-			if ($at['type'] == 'img') {
-				$a_url = geturl($at['attachurl'],'show');
-
-				if (is_array($a_url)) {
-					$atype = 'pic';
-					$dfurl = '<br>'.cvpic($a_url[0], 1, 450, 0, $at['ifthumb']);
-					$rat = array('aid' => $at['aid'], 'img' => $dfurl, 'dfadmin' => $dfadmin, 'desc' => $at['desc']);
-				}
-			}
-			if (!$atype) continue;
-			if (in_array($at['aid'], $aids)) {
-				$content = attcontent($content, $atype, $rat);
-				$result['content'] = $content;
-			} else {
-				$result[$atype][$at['aid']] = $rat;
-			}
-		}
-
-		return $result;
+		$attachShow = new attachShow($isGM);
+		$attachShow->setData($attachs);
+		return $attachShow->parseAttachs('tpc', $content, $winduid == $authorid);
 	}
 
 	/**

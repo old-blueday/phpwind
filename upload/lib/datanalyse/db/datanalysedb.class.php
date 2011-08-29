@@ -34,6 +34,18 @@ class PW_DatanalyseDB extends BaseDB {
 		if (empty($time)) return $this->_getHistoryDataByActions($actions, $num);
 		return $this->_getDataByTimeAndActions($actions, $num, $time);
 	}
+	
+	/**
+	 * 根据时间获得热榜数据
+	 * @param string $action
+	 * @param int $time
+	 * @param int $num
+	 * @return array
+	 */
+	function getDataOderByTag($actions, $num, $time) {
+		if (empty($time)) return $this->_getHistoryDataByActions($actions, $num);
+		return $this->_getDataOderByTag($actions, $num, $time);
+	}
 
 	/**
 	 * @param array $actions
@@ -74,6 +86,20 @@ class PW_DatanalyseDB extends BaseDB {
 		$query = $this->_db->query("SELECT a.tag,SUM(a.num) AS nums FROM $this->_tableName a 
 			WHERE a.action IN (" . S::sqlImplode($actions) . ") AND a.timeunit >= " . S::sqlEscape($time) . " GROUP BY a.tag 
 			ORDER BY nums DESC LIMIT 0,$num");
+		return $this->_getAllResultFromQuery($query);
+	}
+	
+	/**
+	 * @param array $actions
+	 * @param int $num
+	 * @param int $time
+	 * @return array
+	 */
+	function _getDataOderByTag($actions, $num, $time) {
+		if (empty($actions) || empty($time)) return array();
+		$query = $this->_db->query("SELECT a.tag,SUM(a.num) AS nums FROM $this->_tableName a 
+			WHERE a.action IN (" . S::sqlImplode($actions) . ") AND a.timeunit >= " . S::sqlEscape($time) . " GROUP BY a.tag 
+			ORDER BY a.tag DESC LIMIT 0,$num");
 		return $this->_getAllResultFromQuery($query);
 	}
 

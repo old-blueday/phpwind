@@ -17,7 +17,7 @@ function newGdCode(obj) {
 function showGdCode(isreturn) {
 	var str;
 	if (gdtype == 1) {
-		str = '<img id="changeGdCode" src="ck.php?nowtime=1" align="top" class="cp" onclick="changeCkImage(this)" alt="看不清楚，换一张" title="看不清楚，换一张" align="absmiddle" /><a href="javascript:;" onclick="changeCkImage(this.previousSibling);return false;" style="margin-left:10px;" class="s4" id="changeGdCode_a">换一个</a>';
+		str = '<img id="changeGdCode" src="ck.php?nowtime=1" align="top" class="cp" onclick="changeCkImage(this)" alt="看不清楚，换一张" title="看不清楚，换一张" align="absmiddle" /><span onclick="changeCkImage(this.previousSibling);" style="margin-left:10px;" class="s4 cp" id="changeGdCode_a">换一个</span>';
 	} else {
 		//flash & voice
 		str = '<object align="top" classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=7,0,19,0"';
@@ -43,7 +43,7 @@ function showGdCode(isreturn) {
 
 function showgd(id){
 	var codeStr;
-	var id = id || 'ckcode'
+	var id = id || 'ckcode';
 	codeStr = showGdCode(1);
 	try{
 		if (getObj(id).style.display != '') {

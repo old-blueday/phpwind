@@ -1,58 +1,82 @@
-<!--<?php print <<<EOT
+<!--<?php
+!$webPageTitle && $webPageTitle = $db_bbsname;
+$metaVersion = $wind_version;
+$wind_repair && $metaVersion .= '(' . $wind_repair . ')';
+if (!defined('AJAX')) {print <<<EOT
 -->
-<style type="text/css">
-.wy_menu_B{border:1px solid #aaa;background:#ffffff url(c_editor/wy_menu_bg.png) repeat-x; position:absolute;padding:5px 0;border-left:1px solid #ccc;border-top:1px solid #ccc;}
-.wy_menu_B a{color:#333;}
-.wy_menu_B a:hover{ text-decoration:none;color:#3366cc;}
-.wy_menu_B h4{display:block; font-size:14px; font-weight:700;color:#3366cc;padding:5px 10px;margin:0}
-.wy_menu_B .tr1{padding-left:70px;text-align:center;}
-.wy_menu_B .tr3{padding:4px 0 4px 10px;text-align:right;}
-.wy_menu_B td{padding:4px 0 4px 10px;text-align:right;}
-.wy_menu_B a.fr{color:#3366cc;}
-#qanswer_info img{margin:0 0 0 5px;height:21px;}
-</style>
+<!doctype html>
+<html>
+<head>
+<meta charset="$db_charset" />
+<title>$webPageTitle - Powered by phpwind</title>
+<meta name="generator" content="phpwind v{$metaVersion}" />
+<meta name="description" content="$metaDescription" />
+<meta name="keywords" content="$metaKeywords" />
+<SCRIPT type="text/javascript" language="JavaScript" src="js/core/core.js"></SCRIPT>
+<script type="text/javascript" language="JavaScript" src="js/pw_ajax.js"></script>
+<!--css-->
+<link rel="stylesheet" href="$imgpath/pw_core.css?101128" />
 <!--
 EOT;
-if(GetGP('vip')=='activating'){print <<<EOT
+@include Pcv($css_path);
+}
+print <<<EOT
 -->
-<div id="breadCrumb">
-<img src="$imgpath/$stylepath/thread/home.gif" class="breadHome" /><em class="breadEm"></em><a href="$db_bfn" title="$db_bbsname">$db_bbsname</a><em>&gt;</em>注册
-</div>
-<div id="pw_content">
-	<div class="p20">
-		<div class="regTitle cc">
-			<h5>邮件激活</h5>
-		</div>
-		<table width="100%"><tr><td class="vt" height="200">
-		<form action="$db_registerfile?" method="post" name="register">
-		<input type="hidden" name="verify" value="$verifyhash" />
-		<input type="hidden" name="step" value="finish" />
-		<input type="hidden" name="option" value="1" />
-			<div class="f16 b tac mb20">亲爱的会员，您邮件激活成功。</div>
-			<div class="tac">
-				<span class="mr20"><span class="btn"><span><button onclick="window.location.href='$loginurl'" type="button">立即登录</button></span></span></span>
-				<a href="./$db_bfn" class="s4">先去逛逛</a>
-			</div>
-		</form>
-		</td></tr></table>
+<link rel="stylesheet" href="$imgpath/register/register.css?110120" />
+</head>
+<body onKeyDown="try{keyCodes(event);}catch(e){}">
+<!--
+EOT;
+if($step=='permit'){print <<<EOT
+-->
+<div style="width:480px;height:296px;">
+	<iframe frameborder='0' style='position:absolute;top:0;width:100%;height:306px;filter:Alpha(opacity=0);_filter:Alpha(opacity=0);opacity:.0;'></iframe>
+	<div style="position:absolute;width:480px;">
+		<div class="popTop" style="cursor:move;" onMouseDown="read.move(event);">条款内容</div>
+		<table width="100%">
+			<tr>
+				<td>
+					<div style="width:460px; height:220px;overflow-x:hidden; overflow-y:scroll; border:1px solid #eee" contenteditable="true">$rg_config[rg_rgpermit]</div>
+				</td>
+			</tr>
+		</table>
+		<div class="popBottom"><span class="btn2"><span><button type="button" id="regbutton" onClick="unpermit();">同 意</button></span></span></div>
 	</div>
 </div>
+<script language="JavaScript">
+getObj('regbutton').focus();
+
+function unpermit() {
+	getObj("registerclause").disabled = '';
+	getObj("registerclause").checked = 'checked';
+	closep();
+}
+</script>
 <!--
 EOT;
-}elseif(!$step && $step!=2){print <<<EOT
+}else{print <<<EOT
 -->
-<div id="breadCrumb">
-<img src="$imgpath/$stylepath/thread/home.gif" class="breadHome" /><em class="breadEm"></em><a href="$db_bfn" title="$db_bbsname">$db_bbsname</a><em>&gt;</em>注册
+<div class="wrap">
+<div id="header">
+		<div style="height:24px;"></div>
+		<div id="head" class="cc">
+				<a href="$db_bbsurl/"><img src="$imgpath/$stylepath/logo.png" class="fl" title="phpwind" /></a>
+		</div>
 </div>
+<div class="main-wrap">
+<div id="main">
+<!--
+EOT;
+if(!$step){print <<<EOT
+-->
 <div id="pw_content">
 	<div class="p20">
 		<div class="regTitle cc">
-			<span class="fr">已经拥有帐号？<a href="login.php#breadCrumb" class="s4">请在此登录</a></span>
-			<h5>注册<!--请填写以下必填信息完成注册--></h5>
+			<h5 class="s6">注册</h5>
 		</div>
-		<table width="100%"><tr><td class="vt" height="300" style="padding-bottom:30px;">
-		<form action="$db_registerfile?" method="post" name="register" onSubmit="return checkAll();">
-		<input type="hidden" value="$forward" name="forward" />
+		<div class="cc">
+		<form action="$db_registerfile?" method="post" name="register">
+		<input type="hidden" value="" name="forward" />
 		<input type="hidden" value="2" name="step" />
 		<input type="hidden" value="cn0zz" name="_hexie" />
 <!--
@@ -61,46 +85,93 @@ $tmpVerify = GetVerify($onlineip);print <<<EOT
 -->
 <script type="text/javascript">
 document.register._hexie.value='$tmpVerify';
+var imgpath = '$imgpath';var verifyhash = '$verifyhash';var modeimg = '$pwModeImg';var modeBase = '$baseUrl';var winduid = '$winduid';var windid	= '$windid';var groupid	= '$groupid';var basename = '$basename';var temp_basename = '$temp_basename';
 </script>
-		<div class="regForm">
+			<div class="regForm-wrap">
+			<div class="regForm">
 <!--
 EOT;
 if($db_sitemsg['reg']['0']){
 print<<<EOT
 -->
-<div class="blockquote mb20" style="margin-top:-30px;">{$db_sitemsg[reg][array_rand($db_sitemsg[reg])]}</div>
+			<div class="blockquote" style="margin-top:-20px;">{$db_sitemsg[reg][array_rand($db_sitemsg[reg])]}</div>
 <!--
 EOT;
 }print<<<EOT
 -->
-<!-- 输入框，悬停样式 hover 正确 current-->
-			<dl>
+			<dl class="cc">
 				<dt><label for="regname">用户名<span class="s1">*</span></label></dt>
-				<dd class="ip"><div class=""><input type="text" name="regname" id="regname" value="" maxlength="$regmaxname" /></div></dd>
+				<dd class="ip"><div><input type="text" name="regname" id="regname" value="" maxlength="$regmaxname" class="input" /></div></dd>
 				<dd class="tp"><div id="regname_info"></div></dd>
 			</dl>
-			<dl style="min-height:60px;_height:60px;">
+			<dl class="cc">
 				<dt><label for="regpwd">密&#160;&#160;码<span class="s1">*</span></label></dt>
-				<dd class="ip"><div><input type="password" maxlength="$regmaxpwd" name="regpwd" id="regpwd" onKeyUp="CreateRatePasswdReq(this,'$regminname');" /></div></dd>
+				<dd class="ip"><div><input type="password" maxlength="$regmaxpwd" name="regpwd" id="regpwd" class="input" onKeyUp="CreateRatePasswdReq(this,'$regminname');" /></div></dd>
 				<dd class="tp"><div id="pwd_info"></div></dd>
 			</dl>
-			<div style="margin:-30px 0 5px 115px;" class="cc">
-				<table id="passwdBar" width="230" class="fl mr5" style="margin-top:7px;background:#e5e9eb;">
+			<div style="margin:-10px 0 5px 145px;height:20px;" class="cc">
+				<table id="passwdBar" width="230" class="fl mr10" style="margin-top:7px;background:#e5e9eb;">
 					<tr>
 						<td id="posBar" style="width:0px;padding:0;border-right:0;height:4px;background:#e5e9eb;"></td>
 						<td id="negBar" style="padding:0;border-right:0;height:4px;background:#e5e9eb;"></td>
 					</tr>
 				</table>
-				<div id="passwdRating" class="fl gray">密码强度</div>
+				<div id="passwdRating" class="fl" style="color:#999;">密码强度</div>
 			</div>
 			<dl class="cc">
 				<dt><label for="regpwdrepeat">确认密码<span class="s1">*</span></label></dt>
-				<dd class="ip"><div><input type="password" maxlength="75" name="regpwdrepeat" id="regpwdrepeat" /></div></dd>
+				<dd class="ip"><div><input type="password" maxlength="75" class="input" name="regpwdrepeat" id="regpwdrepeat" /></div></dd>
 				<dd class="tp"><div id="pwdrepeat_info"></div></dd>
 			</dl>
+<!-- 
+EOT;
+if($db_authstate && $db_authreg){print <<<EOT
+-->
+		<div class="cc regAdd_mode" style="display:$authStep_1"  id="mobileBox">
+			<dl class="cc" style="height:auto;min-height:inherit;margin-bottom:5px;">
+				<dt><label for="authmobile">手机号码<span class="s1">*</span></label></dt>
+				<dd class="ip"><div style="background:#fff;"><input type="text" maxlength="75" class="input" name="authmobile" id="authmobile" value="$mobile" /></div></dd>
+				<dd class="tp"><span class="bt"><span><button type="button" id="btnGetVerify">获取验证码</button></span></span></dd>
+				<dd class="tp"><div class="wrong" id="mobileauth_info" style="display:none"></div></dd>
+			</dl>
+			<div style="padding-left:145px;" class="mb10 s6">此服务免费,验证码将以短信免费发送到您的手机</div>
+		</div>
+		<div class="cc regAdd_mode" style="display:$authStep_2" id="verifyBox">
+			<div style="padding:0 0 5px 145px;" class="s6">
+				验证码已发送到<span id="mobileNumber">$mobile</span><span id="modifyMobile"></span>，如果超过{$waitTime}秒未收到验证码，您可以免费重新获取。
+				<p>
+					<span class="bt2" style="margin:5px 0;"><span><button type="button" id="timeRemainTips">
+<!-- 
+EOT;
+if ($remainTime > 0) { print <<<EOT
+-->
+					<font color="red">{$remainTime}秒</font>后重获验证码
+<!--
+EOT;
+} else {print <<<EOT
+-->
+					重获验证码
+<!--
+EOT;
+}print <<<EOT
+-->
+					</button></span></span>
+				</p>
+			</div>
+			<dl class="cc mb10" style="height:auto;min-height:inherit;">
+				<dt><label for="authverify">验证码<span class="s1">*</span></label></dt>
+				<dd class="ip"><div style="background:#fff;"><input type="text" maxlength="75" name="authverify" id="authverify" class="input" /></div></dd>
+				<dd class="tp"><div class="correct" id="authTips" style="display:none"></div></dd>
+			</dl>
+		</div>
+<!-- 
+EOT;
+}print <<<EOT
+//TODO
+-->
 			<dl class="cc">
 				<dt><label for="regemail">电子邮箱<span class="s1">*</span></label></dt>
-				<dd class="ip"><div class=""><input type="text"  maxlength="75" name="regemail" value="" id="regemail"/></div>
+				<dd class="ip"><div class=""><input type="text"  maxlength="75" name="regemail" value="" class="input" id="regemail"/></div>
 				<!--p class="cc"><label><input type="checkbox" name="regemailtoall" value="1" style="width:auto;padding:0;margin:0;" /> 公开电子邮箱</label></p-->
 				</dd>
 				<dd class="tp"><div id="email_info">
@@ -108,31 +179,31 @@ EOT;
 EOT;
 if($rg_config['rg_emailtype'] == '1' && $rg_config['rg_email']){print <<<EOT
 -->
-					<div style="padding:0;position:relative;margin:-5px 0 0 -22px;width:390px;">为避免无法收取站点邮件，请使用以下电子邮箱进行注册:<br /><span class="s2">({$rg_config[rg_email]})</span></div>
+					<div style="padding:0;position:relative;margin:-5px 0 0 -16px;width:300px;">为避免无法收取站点邮件，请使用以下电子邮箱进行注册:<span class="s2">{$rg_config[rg_email]}</span></div>
 <!--
 EOT;
 } elseif($rg_config['rg_emailtype'] == '2' && $rg_config['rg_banemail']){print <<<EOT
 -->
-					<div style="padding:0;position:relative;margin:-5px 0 0 -22px;width:390px;">为避免无法收取站点邮件，以下电子邮箱无法进行注册:<br /><span class="s2">({$rg_config[rg_banemail]})</span></div>
+					<div style="padding:0;position:relative;margin:-5px 0 0 -16px;width:300px;">以下电子邮箱无法进行注册:<span class="s2">{$rg_config[rg_banemail]}</span></div>
 <!--
 EOT;
 }print<<<EOT
 --></div>
-				</dd>
-			</dl>
+		</dd>
+	</dl>
 <!--
 EOT;
 if($rg_config['rg_allowregister']==2){print <<<EOT
 -->
 			<dl>
 				<dt><label for="invcode">邀请注册码<span class="s1">*</span></label></dt>
-				<dd class="ip"><div><input type="text" value="$invcode" name="invcode" id="invcode" /></div></dd>
+				<dd class="ip"><div><input class="input" type="text" value="$invcode" name="invcode" id="invcode" /></div></dd>
 				<dd class="tp"><div id="invcode_info"></div>
 				<span>
 <!--
 EOT;
 if($inv_config['inv_onlinesell']){print <<<EOT
---><span id="buy_invitecode"><p class="p5"><a href="javascript:;" class="s4" onclick="insertOnlineSell();">购买邀请码</a></p></span>
+--><span id="buy_invitecode"><p class="p5"><a href="javascript:;" class="s4" onClick="insertOnlineSell();">购买邀请码</a></p></span>
 <!--
 EOT;
 }print <<<EOT
@@ -157,7 +228,7 @@ print <<<EOT
 -->
 			<dl>
 				<dt><label for="regpwdrepeat">防恶意注册<span class="s1">*</span></label></dt>
-				<dd class="ip"><div><input type="text" name="qanswer" id="qanswer" /><input type="hidden" id="regqkey" name="qkey" value="$qkey" /></div></dd>
+				<dd class="ip"><div><input class="input" type="text" name="qanswer" id="qanswer" /><input type="hidden" id="regqkey" name="qkey" value="$qkey" /></div></dd>
 				<dd class="tp"><div id="qanswer_info"></div></dd>							
 
 			</dl>
@@ -175,54 +246,8 @@ EOT;
 <!--
 EOT;
 }if($customfield){
-$fields = array();
-print <<<EOT
--->
-				<!--dl>
-					<dt><span class="bb b s4">附加信息</span></dt>
-					<dd>&nbsp;</dd>
-					<dd class="tp">&nbsp;</dd>
-				</dl-->
-<!--
-EOT;
-foreach($customfield as $key=>$val){
-$ids = '';
-$field="field_".(int)$val[id];
-$fieldinfo = $field."_info";
-$required=$val[required]?'<span class="s1">*</span>':'';
-$editable=(!$userdb[$field]||$val[editable])?'':'disabled';
-!$val[editable] && $val[descrip] .='(请认真填写该栏信息，填写后将不允许修改)';
-if($val[type]=='1'){
-	if($val[required]){
-		$fields[] = array('field'=>$field,'type'=>'text','descrip'=>$val[descrip]);
-		$ids = "id=\"$field\"";
-	}
-	$field_type="<div><input type=\"text\" name=\"$field\" $ids /></div>";
-}elseif($val[type]=='2'){
-	if($val[required]){
-		$fields[] = array('field'=>$field,'type'=>'textarea','descrip'=>$val[descrip]);
-		$ids = "id=\"$field\"";
-	}
-	$field_type="<textarea name=\"$field\" $ids style=\"width:222px;margin-bottom:10px;\" class=\"textareaA\"></textarea>";
-}elseif($val[type]=='3'){
-	$field_type="<select name=\"$field\" id=\"$field\">";
-	$options=explode("\n",$val[options]);
-	foreach($options as $k=>$v){
-		list($k,$v)=explode('=',$v);
-		$field_type.="<option value=\"$k\">$v</option>";
-	}
-	$field_type.="</select>";
-}
-print <<<EOT
--->
-			<dl class="cc">
-				<dt>$val[title]{$required}</dt>
-				<dd class="ip">{$field_type}</dd>
-				<dd class="tp"><div id="$fieldinfo" class="ignore">$val[descrip]</div></dd>
-			</dl>
-<!--
-EOT;
-}}print <<<EOT
+	echo $customfieldService->getRegisterTemplate();
+}print <<<EOT
 -->
 <!--
 EOT;
@@ -231,7 +256,7 @@ if($db_ifsafecv){print <<<EOT
 			<dl>
 				<dt>安全问题</dt>
 				<dd class="ip">
-					<select name="question" onchange="showcustomquest(this.value)" style="width:230px">
+					<select name="question" id="safequestion" onChange="showcustomquest(this.value)" style="width:230px">
 						<option value="0" id="question_0">无安全问题</option>
 	<option value="1">我爸爸的出生地</option>
 	<option value="2">我妈妈的出生地</option>
@@ -248,7 +273,7 @@ if($db_ifsafecv){print <<<EOT
 			</dl>
 			<dl id="customquested" style="display:none">
 				<dt>自定义问题</dt>
-				<dd class="ip"><div><input type="text" name="customquest"></div></dd>
+				<dd class="ip"><div><input class="input" type="text" name="customquest"></div></dd>
 				<dd class="tp">&nbsp;</dd>
 			</dl>
 			<dl>
@@ -261,11 +286,6 @@ EOT;
 }if($custominfo){
 print <<<EOT
 -->
-				<!--dl>
-					<dt><span class="bb b s4">选填信息</span></dt>
-					<dd>&nbsp;</dd>
-					<dd class="tp">&nbsp;</dd>
-				</dl-->
 <!--
 EOT;
 foreach($custominfo as $key=>$val){
@@ -273,7 +293,7 @@ if(substr($val[3],0,1)=='1'){print <<<EOT
 -->
 				<dl>
 					<dt>$val[0]</dt>
-					<dd class="ip"><div><input type="text" name="customdata[$key]" value="" /></div></dd>
+					<dd class="ip"><div><input class="input" type="text" name="customdata[$key]" value="" /></div></dd>
 					<dd class="tp"><div class="ignore">$val[1]</div></dd>
 				</dl>
 <!--
@@ -284,9 +304,9 @@ print <<<EOT
 -->
 
 				<dl class="cc mb10">
-						<dt><label for="gdcode">认证码<span class="s1">*</span></label></dt>
+						<dt><label for="gdcode">验证码<span class="s1">*</span></label></dt>
 						<dd class="ip ck">
-							<div><input id="gdcode" name="gdcode" value="" /></div>
+							<div><input id="gdcode" class="input" name="gdcode" value="" /></div>
 							<span id="menu_gd"></span>
 <script type="text/javascript" src="js/pw_authcode.js"></script>
 <script>
@@ -304,21 +324,28 @@ EOT;
 -->
 				<dl style="min-height:25px;" class="cc">
 					<dt>&nbsp;</dt>
-					<dd class="mr10"><label><input type="checkbox" name="rgpermit" value="1" id="registerclause" />&nbsp;我已阅读并完全同意 <a onclick="permit();" style="cursor:pointer" class="b s4">条款内容</a></label></dd>
+					<dd class="mr10"><label><input type="checkbox" name="rgpermit" value="1" id="registerclause" />&nbsp;我已阅读并完全同意 </label><a onClick="permit();" style="cursor:pointer" class="b s4">条款内容</a></dd>
 					<dd class="tp"><div id="registerclause_info"></div></dd>
 				</dl>
 				<dl>
 					<dt>&nbsp;</dt>
 					<dd>
-						<span class="btn"><span><button type="submit">提交注册</button></span></span>
-						<span class="bt"><span><button type="reset">重 置</button></span></span>
+						<span class="btn"><span><button type="button" onClick="checkAll();">提交注册</button></span></span>
 					</dd>
 					<dd class="regTips">
 					</dd>
 				</dl>
-		</div>
+			</div>
+			</div>
+			<div class="regLogin">
+				<div style="padding-left:20px;">
+					<p class="f14 mb5">已经拥有帐号？</p>
+					<p style="padding-bottom:50px;"><span class="bt"><span><button type="button" onClick="location.href='login.php#breadCrumb';">马上登录</button></span></span>
+					<!--p>使用合作网站帐号登录：</p-->
+				</div>
+			</div>
 		</form>
-		</td></tr></table>
+		</div>
 	</div>
 </div>
 <script type="text/javascript" language="JavaScript" src="js/pw_register.js"></script>
@@ -340,43 +367,45 @@ var falseclass	= "wrong";
 
 var pwdcomplex	= '$rg_config[rg_pwdcomplex]';
 var extracheck	= new Array();
+var checkboxArray = new Array();
+var radioArray = new Array();
 var regInfo 	= new Array();
-
+var regSelects  = new Array();
 regInfo[0] 		= new Array(
 						"",
-						"用户名长度错误！",
+						"用户名长度错误",
 						"此用户名包含不可接受字符或被管理员屏蔽,请选择其它用户名",
 						"为了避免站点用户名混乱,用户名中禁止使用大写字母,请使用小写字母",
-						"该用户名已经被注册，请选用其他用户名。" ,
-						"用户名不能为空！",
+						"该用户名已经被注册，请选用其他用户名" ,
+						"用户名不能为空",
 						"不能有空格，可以是中文，长度控制在 "+retminname+"-"+regmaxname+" 字节以内 " + (rglower?"区分大小写":"不区分大小写"));
 var regname 	= new Element("regname",regInfo[0],"regname_info");
 
 regInfo[1] 		= new Array(
 						" ",
-						"密码设置错误。密码中必须包含小写字母。",
-						"密码设置错误。密码中必须包含大写字母。",
-						"密码设置错误。密码中必须包含数字。",
-						"密码设置错误。密码中必须包含符号。",
-						"密码设置错误。密码长度过小。",
-						"密码设置错误。密码过长。",
-						"密码设置错误。密码不允许和用户名相同。",
+						"密码设置错误。密码中必须包含小写字母",
+						"密码设置错误。密码中必须包含大写字母",
+						"密码设置错误。密码中必须包含数字",
+						"密码设置错误。密码中必须包含符号",
+						"密码设置错误。密码长度过小",
+						"密码设置错误。密码过长",
+						"密码设置错误。密码不允许和用户名相同",
 						"密码设置错误。密码不允以下字符:\\ & ' \" ! / * , < > % # ?。",
-						"不允许注册帐号与密码相同。",
+						"不允许注册帐号与密码相同",
                         getPwdRule());
 var regpwd 		= new Element("regpwd",regInfo[1],"pwd_info");
 
 regInfo[2] 		= new Array(
 						" ",
-						"两次输入的密码不一致。请再输入一次您上面输入的密码。",
+						"两次输入的密码不一致。请再输入一次您上面输入的密码",
 						"请再输入一遍您上面填写的密码");
 var regpwdrepeat= new Element("regpwdrepeat",regInfo[2],"pwdrepeat_info");
 
 regInfo[3] 		= new Array(
 						" ",
-						"您的填写有误。",
-						"该电子邮箱已被注册，请更换别邮箱。",
-						"请填写真实并且最常用的电子邮箱。"+(regemail?"我们需要通过电子邮箱对您进行认证。":""),
+						"您的填写有误",
+						"该电子邮箱已被注册，请更换别邮箱",
+						"请填写真实并且最常用的电子邮箱"+(regemail?"我们需要通过电子邮箱对您进行认证":""),
 						"电子邮箱不是系统指定的邮箱地址，不能注册",
 						"请输入正确的电子邮箱地址");
 var regemail 	= new Element("regemail",regInfo[3],"email_info");
@@ -384,22 +413,22 @@ var regemail 	= new Element("regemail",regInfo[3],"email_info");
 if(parseInt("$db_gdcheck")&1){
 	regInfo[4] 	= new Array(
 						" ",
-						"验证码不正确。",
-						"登录已超时,请刷新验证码。",
-						"请输入验证码。"	);
+						"验证码不正确",
+						"登录已超时,请刷新验证码",
+						"请输入验证码"	);
 	var gdcode 	= new Element("regemail",regInfo[4],"gdcode_info");
 }
 if(getObj('regqkey')){
 	if(parseInt("$showq")>0 && parseInt("$qkey")>0){
 		regInfo[5] 	= new Array(
 						" ",
-						"验证答案错误。",
+						"验证答案错误",
 						"问题:$question 请输入答案:$db_answer[$qkey]");
 	}
 	else{
 		regInfo[5] 	= new Array(
 						" ",
-						"验证答案错误。",
+						"验证答案错误",
 						"问题:$question");
 	}
 	var qanswer = new Element("qanswer",regInfo[5],"qanswer_info");
@@ -408,15 +437,15 @@ if(parseInt("$rg_config[rg_allowregister]")==2){
 	var buy_invitecode = IsElement('buy_invitecode') ? getObj('buy_invitecode').innerHTML : '';
 	regInfo[6] 	= new Array(
 						" ",
-						"邀请码不能为空。",
-						"邀请码错误。",
-						"本站开启邀请注册,请填写邀请码!" + buy_invitecode);
+						"邀请码不能为空",
+						"邀请码错误",
+						"本站开启邀请注册,请填写邀请码" + buy_invitecode);
 	var invcode = new Element("invcode",regInfo[6],"invcode_info");
 }
 
 regInfo[7] 		= new Array(
-						"已同意。",
-						"请先确定已阅读并完全同意条款内容。");
+						"",
+						"请先确定已阅读并完全同意条款内容");
 var registerclause 	= new Element("registerclause",regInfo[7],"registerclause_info");
 
 regInfo[8] 		= new Array(
@@ -428,7 +457,6 @@ regInfo[9] 		= new Array(
 						" ",
 						"请输入答案");
 var answered 	= new Element("answered",regInfo[9],"answered_info");
-
 
 function permit() {
 	//getObj("registerclause").disabled = 'disabled';//b445
@@ -449,7 +477,7 @@ function getPwdRule(){
 		intiString 	+= "最大长度:"+regmaxpwd+" ";
 	}
 	if(regnpdifferf){
-		intiString	+= "密码不能与用户名相同。";
+		intiString	+= "密码不能与用户名相同";
 	}
 	if(!pwdcomplex){
 		return intiString;
@@ -478,39 +506,13 @@ function getPwdRule(){
 }
 <!--
 EOT;
-if(count($fields)){
+if($customfield){
+$registerScripts = $customfieldService->getRegisterScripts();
+}
 print <<<EOT
 -->
-var keep = 20;
-<!--
-EOT;
-foreach($fields as $field){
-print <<<EOT
--->
-<!--
-EOT;
-if($field[type]!='text'){
-print <<<EOT
--->
-getObj("$field[field]").onfocus 	= onFocus;
-getObj("$field[field]").onblur 		= onBlur;
-extracheck.push(getObj("$field[field]"));
-<!--
-EOT;
-}print <<<EOT
--->
-regInfo[keep] 	= new Array(
-						" ",
-						"本选项不能为空。",
-						"$field[descrip]");
-var $field[field] = new Element("$field[field]",regInfo[keep],"$field[field]"+"_info");
-keep++;
-<!--
-EOT;
-}}print <<<EOT
--->
-
-function showcustomquest(qid){
+$registerScripts
+function showcustomquest(qid) {
 	getObj("customquested").style.display = qid==-1 ? '' : 'none';
 }
 function insertOnlineSell() {
@@ -520,307 +522,365 @@ function insertOnlineSell() {
 	read.open('menu_editor','','2');
 }
 </script>
+<!-- 
+EOT;
+if ($db_authstate && $db_authreg) {print <<<EOT
+-->
+<script type="text/javascript">
+var waitTime = parseInt('$waitTime');
+var timeRemain = parseInt('$remainTime');
+var authStep = parseInt('$authStep');
+var authInfo = new Array("",
+	"与服务器通信失败,请稍候再试",
+	"手机号码输入有误",
+	"该手机号码已经绑定实名认证",
+	"你今天获取验证码次数已达到上限",
+	"验证码输入有误",
+	"您的帐户尚未绑定手机认证",
+	"手机验证码不能为空"
+);
+
+/*手机实名认证*/
+var url		= location.href;
+var intval	= null;
+
+var btnGetVerify = getObj('btnGetVerify');
+btnGetVerify.onclick = function(){/*获取验证码事件*/
+	var mobile = getObj('authmobile');
+	var mobileTips = getObj('mobileauth_info');
+	if(!/^1\d{10}$/.test(mobile.value)){
+		mobileTips.innerHTML = authInfo[2];
+		mobileTips.style.display = '';
+		mobile.onfocus = function(){mobileTips.style.display = 'none';}
+	}else{
+		btnGetVerify.disabled = true;
+		verify(mobile.value);
+	}
+	return false;
+}
+
+getObj('authverify').onblur = function(){
+	if(getObj('authverify').value != ''){
+		//检查验证码
+		var data 	= "action=auth&step=2&mobile="+getObj('authmobile').value+"&authverify="+getObj('authverify').value;
+		ajax.send(url,data,function(){
+		var response = parseInt(ajax.request.responseText);
+			if (response > 0){
+				getObj('authTips').innerHTML = authInfo[response];
+				getObj('authTips').className = 'wrong';
+			}else{
+				/*成功获取验证码*/
+				getObj('authTips').innerHTML = '';
+				getObj('authTips').className = 'correct';
+			}
+		});
+	}else{
+		getObj('authTips').innerHTML = authInfo[7];
+		getObj('authTips').className = 'wrong';
+		getObj('authTips').onfocus = function(){getObj('authTips').style.display = 'none';}
+	}
+	getObj('authTips').style.display = '';
+}
+
+var setCheckTime = function() {
+	timeRemain -= 1;
+	if (timeRemain > 0) {
+		getObj("timeRemainTips").innerHTML = '<font color="red">'+timeRemain+'秒</font>后重获验证码';
+		getObj("modifyMobile").innerHTML = '';
+		getObj("timeRemainTips").disabled = true;
+	} else {
+		clearInterval(intval);
+		intval = null;
+		timeRemain = waitTime;
+		getObj("timeRemainTips").disabled = false;
+		getObj("timeRemainTips").innerHTML = '重获验证码';
+		//if(true){//修改手机号码
+			getObj("modifyMobile").innerHTML = '（<a href="javascript://" class="s4" >修改号码</a>）';
+			getObj("modifyMobile").onclick = function(){
+				getObj("modifyMobile").innerHTML = '';
+				getObj('mobileBox').style.display = '';
+				getObj('verifyBox').style.display = 'none';
+				getObj('btnGetVerify').disabled = false;
+				return false;
+			}
+		//}
+		getObj("timeRemainTips").onclick=function(){
+			if (timeRemain == waitTime || timeRemain == 0) {
+				verify(getObj('authmobile').value);
+			}
+		};
+	}
+}
+
+function verify(mobileNumber){
+	var data 	= "action=auth&step=1&mobile="+mobileNumber;
+	getObj('mobileauth_info').style.display = 'none';
+	ajax.send(url,data,function(){
+		var response = parseInt(ajax.request.responseText);
+		if (response > 0){
+			getObj("timeRemainTips").disabled = false;
+			btnGetVerify.disabled = false;
+			getObj('mobileauth_info').innerHTML = authInfo[response];
+			getObj('mobileauth_info').style.display = '';
+		} else {
+			/*成功获取验证码*/
+			getObj('verifyBox').style.display = '';
+			getObj('mobileBox').style.display = 'none';
+			getObj('mobileNumber').innerHTML = mobileNumber;
+			if(intval == null) intval = setInterval(setCheckTime,1000);
+		}
+	});
+}
+if (authStep == 2) {
+	intval = setInterval(setCheckTime,1000);
+}
+//end
+</script>
+<!-- 
+EOT;
+}print <<<EOT
+-->
 <!--
 EOT;
 }elseif($step=='finish'){
-if($email && $rg_config['rg_emailcheck']){
+if(S::getGP('vip') == 'activating'){
+$jumpurl = "$db_registerfile?step=finish&varify=$verifyhash";
 print<<<EOT
 -->
-<div id="breadCrumb">
-<img src="$imgpath/$stylepath/thread/home.gif" class="breadHome" /><em class="breadEm"></em><a href="$db_bfn" title="$db_bbsname">$db_bbsname</a><em>&gt;</em>注册
-</div>
 <div id="pw_content">
 	<div class="p20">
 		<div class="regTitle cc">
-			<h5>注册</h5>
+			<h5 class="s6">邮件激活</h5>
 		</div>
-		<table width="100%"><tr><td class="vt" height="200" style="padding-left:200px;">
-		<div class="f16 b mb10">注册成功，请立即开通账户</div>
-		<div class="mb10">亲爱的会员，您已经通过电子邮箱{$email}注册成为{$db_bbsname}大家庭中的一员了。</div>
-		<div class="mb10">我们已经把激活电子邮箱发送到了{$email}电子邮箱，快去激活吧！</div>
-		<div class="mb20"><span class="mr20"><span class="btn"><span><button type="button" onclick="window.location.href='$emailurl'">去我的电子邮箱激活</button></span></span></span><a href="$db_registerfile?step=finish&email=$email&verify=$_GET[verify]&r=1" class="s4" target="_blank">再次发送激活电子邮箱</a></div>
-		<div class="ignoreTip fl"><p class="mb5">小贴士:如果你没有收到激活电子邮件，可能邮件被误放入垃圾电子邮件中了；</p>你还可以选择<a href="$db_registerfile?step=finish&email=$email&verify=$_GET[verify]&r=1" class="s4" target="_blank">再次发送激活电子邮箱</a>来接收激活电子邮件。</div>
-		</td></tr></table>
-	</div>
-</div>
-<!--
-EOT;
-}else{
-if(!$option){print<<<EOT
--->
-<div id="breadCrumb">
-<img src="$imgpath/$stylepath/thread/home.gif" class="breadHome" /><em class="breadEm"></em><a href="$db_bfn" title="$db_bbsname">$db_bbsname</a><em>&gt;</em>注册
-</div>
-<div id="pw_content">
-	<div class="p20">
-		<div class="regTitle cc">
-			<h5>注册</h5>
-		</div>
-		<form action="$db_registerfile?" method="post" name="register">
-		<input type="hidden" name="verify" value="$verifyhash" />
-		<input type="hidden" name="step" value="finish" />
-		<input type="hidden" name="option" value="1" />
-		<table width="100%"><tr><td class="vt" height="200" style="padding-left:200px;">
-		<div class="f16 b mb10">恭喜您！亲爱的会员，您已经注册成功。</div>
-		<div class="mb20"><span class="mr20"><span class="btn"><span><button type="submit">现在去完善资料</button></span></span></span><a href="./$db_bfn" class="s4">先去逛逛</a></div>
-		</td></tr></table>
-		</form>
-	</div>
-</div>
-<!--
-EOT;
-}elseif($option==1){print<<<EOT
--->
-<div id="breadCrumb">
-<img src="$imgpath/$stylepath/thread/home.gif" class="breadHome" /><em class="breadEm"></em><a href="$db_bfn" title="$db_bbsname">$db_bbsname</a><em>&gt;</em>完善资料
-</div>
-<div id="pw_content">
-	<div class="p20">
-		<div class="regTitle cc">
-			<h5>完善资料</h5>
-		</div>
-		<table width="100%"><tr><td class="vt" height="300">
-		<form action="$db_registerfile?" method="post">
-		<input type="hidden" name="step" value="finish" />
-		<input type="hidden" name="verify" value="$verifyhash" />
-		<input type="hidden" name="option" value="2" />
-			<div class="regForm">
-				<dl>
-					<dt><span class="bb b s4 f16">基本信息</span></dt>
-					<dd>&nbsp;</dd>
-					<dd class="tp">&nbsp;</dd>
-				</dl>
-				<dl class="cc">
-					<dt>性别</dt>
-					<dd class="f14">
-							<label class="mr20"><input type="radio" value="1" name="regsex" />男</label>
-							<label class="mr20"><input type="radio" value="2" name="regsex" />女</label>
-							<label class="mr20"><input type="radio" value="0" name="regsex" checked/>保密</label>
-					</dd>
-				</dl>
-				<dl class="cc">
-					<dt>生日</dt>
-					<dd class="f14">
-						<select name="regbirthyear" class="mr5">
-<!--
-EOT;
-if($rg_config['rg_timestart'] < $rg_config['rg_timeend'] && $rg_config['rg_timeend']){
-for($i=$rg_config['rg_timestart']; $i<=$rg_config['rg_timeend']; $i++){print <<<EOT
--->
-							<option value="$i">$i</option>
-<!--
-EOT;
-}}elseif($rg_config['rg_timestart'] > $rg_config['rg_timeend'] && $rg_config['rg_timeend']){
-for($i=$rg_config['rg_timestart']; $i>=$rg_config['rg_timeend'];$i--){print <<<EOT
--->
-							<option value="$i">$i</option>
-<!--
-EOT;
-}}print <<<EOT
--->
-						</select><span class="mr10">年</span>
-						<select name="regbirthmonth" class="mr5">
-<!--
-EOT;
-for($i=1;$i<=12;$i++){print <<<EOT
--->
-							<option value="$i">$i</option>
-<!--
-EOT;
-}print <<<EOT
--->
-						</select><span class="mr10">月</span>
-						<select name="regbirthday" class="mr5">
-<!--
-EOT;
-for($i=1;$i<=31;$i++){print <<<EOT
--->
-							<option value="$i">$i</option>
-<!--
-EOT;
-}print <<<EOT
--->
-						</select>日
-					</dd>
-				</dl>
-				<dl class="cc">
-					<dt>来自</dt>
-					<dd class="ip">
-						<div><input type="text" maxlength="20" name="regfrom" /></div>
-					</dd>
-				</dl>
-				<dl>
-					<dt><span class="bb b s4 f16">联系资料</span></dt>
-					<dd>&nbsp;</dd>
-					<dd class="tp">&nbsp;</dd>
-				</dl>
-				<dl class="cc">
-					<dt>QQ</dt>
-					<dd class="ip"><div><input type="text" maxlength="14" name="regoicq" value="" /></div></dd>
-				</dl>
-				<dl class="cc">
-					<dt>个人主页</dt>
-					<dd class="ip"><div><input type="text" maxlength="75" name="reghomepage" value="" /></dd>
-				</dl>
-				<dl class="cc">
-					<dt>帖子签名</dt>
-					<dd>
-						<textarea name="regsign" id="sign" class="textareaA" style="width:222px;"></textarea>
-						<div style="padding:.5em 0;" id="signid"></div>
-					</dd>
-				</dl>
-				<dl class="cc">
-					<dt>自我简介</dt>
-					<dd>
-						<textarea name="regintroduce" class="textareaA" style="width:222px;" id="regintroduce"></textarea>
-						<div style="padding:.5em 0;" id="regintroduceid"></div>
-					</dd>
-				</dl>
-				<dl class="cc">
-					<dt>&nbsp;</dt>
-					<dd>
-						<span class="btn"><span><button type="submit">下一步</button></span></span>
-						<span class="bt"><span><button type="button" onclick="location.href='./$db_bfn';">跳过</button></span></span>
-					</dd>
-					<dd class="regTips"></dd>
-				</dl>
+		<div class="cc">
+			<div class="regCorrect">
+<form action="$loginurl" method="post" name="activate">
+<input type="hidden" value="$verifyhash" name="verify"/>
+<input type="hidden" value="$jumpurl" name="jumpurl"/>
+				<p class="f14 mb10">亲爱的会员，您邮件激活成功。</p>
+				<p><span class="btn" style="margin:0 25px 0 0;"><span><button type="submit">立即登录</button></span></span><a href="./$db_bfn" class="s4">先去逛逛</a></p>
+</form>
 			</div>
-		</form>
-		</td></tr></table>
+		</div>
 	</div>
 </div>
-<script language="javascript" type="text/javascript">
-
-var charset = '$db_charset';
-var signnum = '$_G[signnum]';
-var introducenum = 500;
-
-initCheckTextNum('sign','signid',signnum);
-initCheckTextNum('regintroduce','regintroduceid',introducenum);
-</script>
 <!--
 EOT;
-}elseif($option==2 || $_POST['option']){print<<<EOT
+}elseif($rg_config['rg_emailcheck'] && !$winduid) {
+print<<<EOT
 -->
-<style type="text/css">
-/*profileFace*/
-.profileFace{width:340px;}
-.profileFace ul{padding:0 0 15px;}
-.profileFace li{float:left;cursor:pointer;width:62px;overflow:hidden;margin:0 10px 10px 0;}
-</style>
-<div id="breadCrumb">
-<img src="$imgpath/$stylepath/thread/home.gif" class="breadHome" /><em class="breadEm"></em><a href="$db_bfn" title="$db_bbsname">$db_bbsname</a><em>&gt;</em>完善资料
-</div>
 <div id="pw_content">
 	<div class="p20">
 		<div class="regTitle cc">
-			<h5>上传头像</h5>
+			<h5 class="s6">注册</h5>
 		</div>
-		<table width="100%"><tr><td class="vt" height="300">
-		<form id="creator" name="creator" action="$db_registerfile?" method="post" enctype="multipart/form-data" onsubmit="return setFaceLen()">
-		<input type="hidden" name="step" value="finish" />
-		<input type="hidden" name="verify" value="$verifyhash" />
-		<input type="hidden" name="option" value="3" />
-		<table width="100%" class="setTable vt">
-			<tr>
-				<td width="210" class="tar">
-					<img src="$imgpath/face/none.gif" name="useravatars" />
-				</td>
-				<td style="padding-left:20px;">
-				<div id="openchang">
-					<label class="mr20" for="facetype1"><input type="radio" id="facetype1" name="facetype" value="1" onclick="CkFaceType(this.value)">系统头像</label>
+        <div class="cc">
+<!--
+EOT;
+if($newemail && $_GET[verify] && $r==2){
+list(,$emailurl) = explode('@',$newemail);
+$emailurl = 'http://mail.'.$emailurl;
+print <<<EOT
+-->
+			<div class="regIgnore">
+			<p class="f14 mb10">邮箱修改成功，系统已经向您填写的<a href='$emailurl'>{$newemail}</a>的邮箱发送激活邮件，点击邮件中的链接即可完成激活。</p>
+				<p class="f14">如果没有收到激活邮件，您可以<a onClick="read.open('postbatch',this,2);" class="b s4 cp" target="_blank">更改邮箱</a>，或者<a href="$db_registerfile?step=finish&email=$newemail&verify=$_GET[verify]&r=1" class="b s4">重发激活邮件</a></p>
+			</div>
+<!--
+EOT;
+}elseif(($email || $newemail) && $r==3){
+$email = $email ? $email : $newemail;
+print <<<EOT
+-->
+			<div class="regIgnore">
+			<p class="f14 mb10">系统已经重新向您填写的<a href='$emailurl'>{$email}</a>的邮箱发送激活邮件，点击邮件中的链接即可完成激活。</p>
+				<p class="f14">如果没有收到激活邮件，您可以<a onClick="read.open('postbatch',this,2);" class="b s4 cp" target="_blank">更改邮箱</a>，或者<a href="$db_registerfile?step=finish&email=$email&verify=$_GET[verify]&r=1" class="b s4">重发激活邮件</a></p>
+			</div>
+
+<!--
+EOT;
+}elseif($email && $rg_config['rg_emailcheck'] && $_GET[verify]){
+print<<<EOT
+-->
+			<div class="regCorrect">
+				<p class="f14 mb10">恭喜您注册成功，系统已经向您填写的<a href='$emailurl'>{$email}</a>的邮箱发送激活邮件，点击邮件中的链接即可完成激活。</p>
+				<p class="f14">如果没有收到激活邮件，您可以<a onClick="read.open('postbatch',this,2);" class="b s4 cp" target="_blank">更改邮箱</a>，或者<a href="$db_registerfile?step=finish&email=$email&verify=$_GET[verify]&r=1" class="b s4">重发激活邮件</a></p>
+			</div>
+<!--
+EOT;
+}elseif($email && $rg_config['rg_emailcheck']) {
+print<<<EOT
+-->
+			<div class="regIgnore">
+				<p class="f14 mb10">对不起您尚未进行邮箱激活，请先前往您填写的<a href='$emailurl'>{$email}</a>邮箱，点击邮件中的链接即可完成激活</p>
+				<p class="f14">如果没有收到激活邮件，您可以<a onClick="read.open('postbatch',this,2);" class="b s4 cp" target="_blank">更改邮箱</a>，或者<a href="$db_registerfile?step=finish&email=$email&verify=$_GET[verify]&r=1" class="b s4">重发激活邮件</a></p>
+			</div>              
+<!--
+EOT;
+}
+$email = $email ? $email : $newemail;
+print<<<EOT
+-->          
+		</div>
+	</div>
+</div>
+<!-- //start post管理弹出 -->
+<div id="postbatch"  style="display:none">
+<div class="popout"><table border="0" cellspacing="0" cellpadding="0"><tbody><tr><td class="bgcorner1"></td><td class="pobg1"></td><td class="bgcorner2"></td></tr><tr><td class="pobg4"></td><td><div class="popoutContent">
+	<div class="popTop" style="cursor:move;" onmousedown = "read.move(event);">
+		<a href="javascript:void(0)" class="adel" onClick="closep()">关闭</a>
+		更改邮箱
+	</div>
+	<div class="p15 cc">
+    	<form action="$db_registerfile?step=finish" method="post" name="reregister">
+     	<input type="hidden" name="email" value="$email" />
+        <input type="hidden" name="verify" value="$verifyhash" />
+			<p class="mb10">说明：发送新的验证邮件后，上一封邮件自动失效</p>
+    	<p><input class="input input_wa mr5" type="text" name="newemail" maxlength="75px" value="$email" /><span class="btn2"><span><button type="submit">发送激活邮件</button></span></span></p>
+    	</form>
+    </div>
+</div></td><td class="pobg2"></td></tr><tr><td class="bgcorner4"></td><td class="pobg3"></td><td class="bgcorner3"></td></tr></tbody></table></div>
+</div>
+ <!-- //end reply管理弹出 -->
+<!--
+EOT;
+}elseif($rg_config['rg_regguide']) {
+if ($option == 1) {
+print<<<EOT
+-->
+<div id="pw_content">
+	<div class="p20">
+		<div class="regTitle cc">
+			<ol class="steps pr fr">
+				<li class="current"><em>1</em>设置头像</li>
+				<li><em>2</em>完善资料</li>
+				<li><em>3</em>关注感兴趣的人</li>
+			</ol>
+			<h5 class="s6">恭喜您完成注册，完善以下信息让您的社区旅途更丰富！</h5>
+		</div>
+		<div class="cc">
+			<div class="regForm-wrap">
+				<div class="regForm">
+					<form id="creator" name="creator" action="$db_registerfile?" method="post" enctype="multipart/form-data" onSubmit="return setFaceLen()">
+						<input type="hidden" name="step" value="finish" />
+						<input type="hidden" name="verify" value="$verifyhash" />
+						<input type="hidden" name="option" value="1" />
+						<input type="hidden" name="isupload" value="1" />
+					<dl class="cc">
+						<dt><img src="$imgpath/face/none.gif" name="useravatars" class="img" /></dt>
+						<dd>
+							<div id="openchang">
+<!--
+EOT;
+if(!($db_ifupload && $_G[upload])){
+$defaultCheckFirst = 'checked="checked"';
+}
+print <<<EOT
+-->
+								<label class="mr20" for="facetype1"><input type="radio" id="facetype1" name="facetype" $defaultCheckFirst value="1" onClick="CkFaceType(this.value)">系统头像</label>
 <!--
 EOT;
 if($_G[allowportait]){print <<<EOT
 -->
-					<label class="mr20" for="facetype2"><input type="radio" id="facetype2" name="facetype" value="2" onclick="CkFaceType(this.value)">头像链接</label>
+								<label class="mr20" for="facetype2"><input type="radio" id="facetype2" name="facetype" value="2" onClick="CkFaceType(this.value)">头像链接</label>
 <!--
 EOT;
 }if($db_ifupload && $_G[upload]){print <<<EOT
 -->
-					<label class="mr20" for="facetype3"><input type="radio" id="facetype3" name="facetype" value="3" onclick="CkFaceType(this.value)">头像上传</label>
+								<label class="mr20" for="facetype3"><input type="radio" id="facetype3" name="facetype" checked="checked" value="3" onClick="CkFaceType(this.value)">头像上传</label>
 <!--
 EOT;
 }print <<<EOT
 -->
-					<div class="c mb10"></div>
-					<div id="face1" style="display:none;">
-						<div id="iconbox">
-							<div class="mb10">
+								<div class="c mb10"></div>
+								<div id="face1">
+									<div id="iconbox">
 <!--
 EOT;
-if ($num >= 10) {print <<<EOT
+if ($num > 10) {print <<<EOT
 -->
-								<a onclick="showSystemIcon(0);" href="javascript:;" class="mr20">上一页</a>
-								<a onclick="showSystemIcon(2);" href="javascript:;">下一页</a>
+										<div class="mb10">
+											<a onClick="showSystemIcon(2);" href="javascript:;">下一页</a>
+										</div>
 <!--
 EOT;
 }print <<<EOT
 -->
-							</div>
-							<div class="profileFace">
-								<ul class="cc">
+										<div class="profileFace">
+											<ul class="cc">
 <!--
 EOT;
 foreach ($imgname_array as $key => $value) {print <<<EOT
 -->
-									<li onclick="showimage('$imgpath','$value')"><img src='$imgpath/face/$value' width="50" height="50" class="img"></li>
+												<li onClick="showimage('$imgpath','$value')"><img src='$imgpath/face/$value' width="50" height="50" class="img"></li>
 <!--
 EOT;
 }print <<<EOT
 -->
-								</ul>
-							</div>
-						</div>
-						<input type="hidden" name="proicon" value="$iconfile" />
-					</div>
-					<div id="face2" style="display:none;">
-						<div class="mb10"><span class="mr20">头像链接</span><input name="httpurl[0]" id="httpurl_url" value="$httpurl" class="input input_wb mr10" type="text" /> 必须以 http://开头</div>
-						<div class="mb10"><span class="mr20">头像宽度</span><input name="httpurl[1]" value="$iconwidth" class="input input_wc mr10" maxlength="3" onblur="if(1 <= this.value && this.value <= $db_imgwidth){document.images.useravatars.width = this.value;}" /> 必须是 1 -- $db_imgwidth 之间的一个整数。</div>
-						<div class="mb10"><span class="mr20">头像高度</span><input name="httpurl[2]" value="$iconheight" class="input input_wc mr10" maxlength="3" onblur="if(1 <= this.value &&  this.value <= $db_imgheight){document.images.useravatars.height = this.value;}" /> 必须是 1 -- $db_imgheight 之间的一个整数。</div>
-						<div>当高度和宽度留空，或只设置一个值时，则根据图片原尺寸进行缩放</div>
-						<input type="hidden" id="httpurl_w" name="httpurl[3]" />
-						<input type="hidden" id="httpurl_h" name="httpurl[4]" />
-					</div>
-					<div id="face3" style="display:none;">
+											</ul>
+										</div>
+									</div>
+									<input type="hidden" name="proicon" value="" />
+								</div>
+								<div id="face2" style="display:none;">
+									<div>
+										<p class="mb10"><span class="mr20">头像链接</span><input name="httpurl[0]" id="httpurl_url" value="$httpurl" class="input input_wb mr10" type="text" /> 必须以 http://开头</p>
+									</div>
+								<input type="hidden" id="httpurl_w" name="httpurl[3]" />
+								<input type="hidden" id="httpurl_h" name="httpurl[4]" />
+								</div>
+								<div id="face3" style="display:none;">
 <!--
 EOT;
 if($db_bbsifopen != 1){print <<<EOT
 -->
 <div class="blockquote3">
 抱歉，站点正处于内部开放状态，只有在完全开放状态下，才能使用头像上传功能。<br />
-<span class="gray">（站点状态的后台设置路径：核心设置 &#187; 常规设置）</span>
+<span class="gray">（站点状态的后台设置路径：全局 &#187; 站点设置）</span>
 </div>
 <!--
 EOT;
 }else{print <<<EOT
 -->
-						<object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" codebase=" http://fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=7,0,0,0" width="500" height="405" id="FlashVars" align="middle">
-							<param name="movie" value="js/face.swf" />
-							<param name="FlashVars" value="$icon_encode_url" />
-							<embed  width="500" height="405" src="js/face.swf" flashvars="$icon_encode_url" pluginspage="http://www.macromedia.com/shockwave/download/index.cgi?P1_Prod_Version=ShockwaveFlash"  type="application/x-shockwave-flash" />
-						</object>
+									<div style="overflow:hidden;">
+									<div style="margin-left:-20px;margin-top:-8px;">
+									<object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" codebase=" http://fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=10,0,0,0" width="500" height="405" id="FlashVars" align="middle">
+										<param name="movie" value="js/face.swf" />
+										<param name="FlashVars" value="$icon_encode_url" />
+										<param name="allowScriptAccess" value="always" />
+                    <param name="wmode" value="transparent" />
+										<embed  width="500" height="405" src="js/face.swf" flashvars="$icon_encode_url" pluginspage="http://www.macromedia.com/shockwave/download/index.cgi?P1_Prod_Version=ShockwaveFlash"  type="application/x-shockwave-flash" />
+									</object>
+									</div>
+									</div>
 <!--
 EOT;
 }print <<<EOT
 -->
-					</div>
+								</div>
+							</div>
+						</dd>
+					</dl>
+					<dl style="padding-top:10px;_padding-top:0;">
+						<dt>&nbsp;</dt>
+						<dd>
+							<span class="btn" id="register_success"><span><button type="submit">提交</button></span></span>
+							<span class="bt"><span><button onClick="javascript:location.replace('$skipUrl')" type="button">跳过</button></span></span>
+						</dd>
+					</dl>
+					</form>
 				</div>
-				</td>
-			</tr>
-		</table>
-		<div style="padding:1em 1em 1em 225px">
-			<span class="bt"><span><button type="button" onclick="javascript:history.go(-1);">上一步</button></span></span>
-			<span class="mr20"><span class="btn"><span><button type="submit" id="register_success">完成</button></span></span></span>
-			<a href="./$db_bfn" class="s4">跳过</a>
+
+			</div>
 		</div>
-	</form>
-	</td></tr></table>
 	</div>
 </div>
 <iframe id="hideframe" name="hideframe" width="0" height="0" marginwidth="0" frameborder="0" src="about:blank"></iframe>
 <script language="JavaScript">
 var display = '$display';
+var imgpath = '$imgpath';
+var defaultCheckType = '$defaultCheckFirst';
+
 function CkFaceType(value){
 	var facetype = document.getElementsByName('facetype');
 	for(i=0;i<facetype.length;i++){
@@ -837,7 +897,11 @@ function CkFaceType(value){
 		}
 	}
 }
-CkFaceType('1');
+if (defaultCheckType) {
+	CkFaceType('1');
+} else {
+	CkFaceType('3');
+}
 
 function setFaceLen() {
 	var v = 0;
@@ -889,7 +953,7 @@ function facepath(iconurl,iconfile,showmsg,iconwidth,iconheight){
 }
 function showSystemIcon(page) {
 	getObj('iconbox').innerHTML = '<div style="width:272px;"><div class="tac p10"><img src="'+imgpath+'/loading.gif" align="absmiddle" /> 正在加载数据...</div></div>';
-	ajax.send('pw_ajax.php','action=showface&page='+page,getIcon);
+	ajax.send('pw_ajax.php','action=showface&from=reg&page='+page,getIcon);
 }
 function getIcon() {
 	var iconlist = ajax.request.responseText;
@@ -914,32 +978,257 @@ function UpLoadFace(){
 		showDialog("error","请选择要上传附件");
 	}
 }
+var facetype = '$facetype';
+if (facetype) {
+	CkFaceType('$facetype');
+}
+//window.history.forward();
 </script>
 <!--
 EOT;
-}}}elseif($step=='permit'){print<<<EOT
+} elseif ($option == 2) {
+	$registerScripts = $customfieldService->getRegisterScripts(2);
+print<<<EOT
 -->
-<div style="width:480px;">
-<div class="popTop cp" onmousedown="read.move(event);">条款内容</div>
-<table width="100%">
-	<tr>
-		<td>
-			<div style="width:460px; height:220px; overflow:auto; border:1px solid #eee">
-				$rg_config[rg_rgpermit]
+<div id="pw_content">
+	<div class="p20">
+		<div class="regTitle cc">
+			<ol class="steps pr fr">
+				<li><em>1</em>设置头像</li>
+				<li class="current"><em>2</em>完善资料</li>
+				<li><em>3</em>关注感兴趣的人</li>
+			</ol>
+			<h5 class="s6">恭喜您完成注册，完善以下信息让您的社区旅途更丰富！</h5>
+		</div>
+		<div class="cc">
+			<div class="regForm-wrap">
+			<div class="regForm">
+			<form action="$db_registerfile?" method="post" name="register">
+				<input type="hidden" name="step" value="finish" />
+				<input type="hidden" name="verify" value="$verifyhash" />
+				<input type="hidden" name="option" value="2" />
+				<input type="hidden" name="notskip" value="1" />
+<!--
+EOT;
+echo $complementTemplate;
+print<<<EOT
+-->
+				<dl style="padding-top:10px;_padding-top:0;">
+					<dt>&nbsp;</dt>
+					<dd>
+						<span class="btn"><span><button type="button" onClick="checkAll();">提交</button></span></span>
+						<span class="bt"><span><button onClick="javascript:location.replace('$skipUrl')" type="button">跳过</button></span></span>
+					</dd>
+				</dl>
+			</form>
 			</div>
-		</td>
-	</tr>
-</table>
-<div class="popBottom"><span class="btn2"><span><button type="button" id="regbutton" onclick="unpermit();">同 意</button></span></span></div>
+			</div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript" language="JavaScript" src="js/pw_register.js"></script>
 <script language="JavaScript">
-getObj('regbutton').focus();
-
-function unpermit() {
-	getObj("registerclause").disabled = '';
-	getObj("registerclause").checked = 'checked';
-	closep();
-}
+var imgpath = '$imgpath';
+var extracheck	= new Array();
+var checkboxArray = new Array();
+var radioArray = new Array();
+var regInfo 	= new Array();
+var inticlass 	= "ignore";
+var rightclass	= "correct";
+var falseclass	= "wrong";
+$registerScripts
+window.history.forward();
 </script>
+<!--
+EOT;
+} elseif ($option == 3) {
+print<<<EOT
+-->
+<div id="pw_content">
+	<div class="p20">
+		<div class="regTitle cc">
+			<ol class="steps pr fr">
+				<li><em>1</em>设置头像</li>
+				<li><em>2</em>完善资料</li>
+				<li class="current"><em>3</em>好友推荐</li>
+			</ol>
+			<h5 class="s6">恭喜您完成注册，完善以下信息让您的社区旅途更丰富！</h5>
+		</div>
+		<div class="cc">
+			<div class="regForm-wrap">
+				<form id="creator" name="creator" action="$db_registerfile?" method="post" enctype="multipart/form-data">
+				<input type="hidden" name="step" value="finish" />
+				<input type="hidden" name="verify" value="$verifyhash" />
+				<input type="hidden" name="option" value="3" />
+				<input type="hidden" name="attention" value="1" />
+				<div style="padding-top:0;padding-left:50px;">
+
+<!--
+EOT;
+if ($rg_config['rg_recommendnames']) {
+print<<<EOT
+-->
+					<h2 class="s6">社区达人</h2>
+					<ul class="cc recommend">
+<!--
+EOT;
+foreach ($members as $user) {
+print<<<EOT
+-->
+						<li><input name="uids[]" type="checkbox" value="{$user[uid]}" checked><a href="u.php?uid=$user[uid]" target="_blank"><img src="{$user[face]}" class="face"></a><a href="u.php?uid=$user[uid]" target="_blank">{$user[username]}</a>
+<!--
+EOT;
+if(checkOnline($user['thisvisit'])){
+print <<<EOT
+-->
+						<img src="$imgpath/online.png" alt="在线" title="在线" style="vertical-align:middle" />
+<!--
+EOT;
+}print <<<EOT
+-->
+						</li>
+<!--
+EOT;
+} print<<<EOT
+-->
+					</ul>
+<!--
+EOT;
+} if ($mayKnownUsers) {print<<<EOT
+-->
+					<h2 class="s6">可能认识的人</h2>
+					<ul class="cc recommend">
+<!--
+EOT;
+foreach ($mayKnownUsers as $user) {
+print<<<EOT
+-->
+						<li><input name="uids[]" type="checkbox" value="{$user[uid]}" checked><a href="u.php?uid=$user[uid]" target="_blank"><img src="{$user[face]}" class="face"></a><a href="u.php?uid=$user[uid]" target="_blank">{$user[username]}</a>
+<!--
+EOT;
+if(checkOnline($user['thisvisit'])){
+print <<<EOT
+-->
+						<img src="$imgpath/online.png" alt="在线" title="在线" style="vertical-align:middle" />
+<!--
+EOT;
+}print <<<EOT
+-->
+						</li>
+<!--
+EOT;
+} print<<<EOT
+-->
+					</ul>
+<!--
+EOT;
+} print<<<EOT
+-->
+					</ul>
+<!--
+EOT;
+if (!$rg_config['rg_recommendnames'] && !$mayKnownUsers) {
+print<<<EOT
+-->
+					<div class="regIgnore">
+						<p class="f14 mb10">对不起，还没有可能您感兴趣的人，请联系站长通过后台配置！</p>
+					</div>
+<!--
+EOT;
+} print<<<EOT
+-->
+					<div style="padding-left:24px;"><span class="btn"><span><button type="submit">关注已选用户</button></span></span><span class="bt"><span><button onClick="javascript:location.replace('$skipUrl')" type="button">跳过</button></span></span></div>
+				</div>
+			  </form>
+			</div>
+		</div>
+	</div>
+</div>
+<script language="javascript">
+window.history.forward();
+</script>
+<!--
+EOT;
+} elseif ($option == 4) {
+print<<<EOT
+-->
+<div id="pw_content">
+	<div class="p20">
+		<div class="regTitle cc">
+			<h5 class="s6">恭喜您完成注册，赶紧去开始丰富的社区旅途吧！</h5>
+		</div>
+		<div class="cc">
+			<div class="regForm-wrap">
+				<div  style="padding-left:40px;">
+<!--
+EOT;
+if ($rg_recommendcontent) {
+print<<<EOT
+-->
+					<h2 class="s6">精彩推荐</h2>
+					<div class="mb20">
+						$rg_recommendcontent
+					</div>
+<!--
+EOT;
+} if ($latestImageThreads) {print<<<EOT
+-->
+					<h2 class="s6">可能感兴趣的内容</h2>
+					<ul class="cc regList_img">
+<!--
+EOT;
+foreach ($latestImageThreads as $thread) {
+print<<<EOT
+-->
+						<li><a href="read.php?tid=$thread[tid]"><img src="$thread[thumb]" onerror="this.src='images/defaultactive.jpg'" width="100" height="100">$thread[subject]</a></li>
+<!--
+EOT;
+}print<<<EOT
+-->
+					</ul>
+<!--
+EOT;
+}
+$indexurl = $db_bbsurl.'/'.$db_bfn;
+print<<<EOT
+-->
+					<div class="tac"><span class="bt2"><span><button type="button" onClick="location.href='$indexurl';">返回首页</button></span></span><span class="bt2"><span><button type="button" onClick="location.href='u.php?verify=$verifyhash';">前往个人中心</button></span></span></div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<script language="javascript">
+window.history.forward();
+</script>
+<!--
+EOT;
+}} else{
+$indexurl = $db_bbsurl.'/'.$db_bfn;
+print<<<EOT
+-->
+<div id="pw_content">
+	<div class="p20">
+		<div class="regTitle cc">
+			<h5 class="s6">注册成功</h5>
+		</div>
+		<div class="cc">
+			<div class="regCorrect">
+				<p class="f14 mb10">恭喜您注册成功，现在就开始精彩的旅程吧...</p>
+				<p><span style="margin-right:25px;"><a class="s4" href="$indexurl">返回首页</a></span><a href="u.php?verify=$verifyhash" class="s4">前往个人中心</a></p>
+			</div>
+		</div>
+	</div>
+</div>     
+<!--
+EOT;
+}} print<<<EOT
+-->
+</div></div><!--.main-wrap,#main End-->
+
+</div>
+
+</body></html>
 <!--
 EOT;
 }print <<<EOT
@@ -948,7 +1237,7 @@ EOT;
 <div class="popout"><table border="0" cellspacing="0" cellpadding="0"><tbody><tr><td class="bgcorner1"></td><td class="pobg1"></td><td class="bgcorner2"></td></tr><tr><td class="pobg4"></td><td>
 <div class="popoutContent">
 	<div style="width:400px;">
-		<div class="popTop" onmousedown="read.move(event);" style=" cursor:move;"><span class="adel cp" onclick="closep();">关闭</span>购买邀请码</div>
+		<div class="popTop" onMouseDown="read.move(event);" style=" cursor:move;"><span class="adel cp" onClick="closep();">关闭</span>购买邀请码</div>
 			<form action="$db_registerfile?" method="post">
 			<input type="hidden" name="action" value="pay" />
 			<input type="hidden" name="step" value="3" />

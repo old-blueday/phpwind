@@ -133,8 +133,7 @@ h1{margin:0 0 0 5px;font:bold 24px/25px Arial;}
 .blockquote3 .quote{color:#999;font-size:12px;}
 .blockquote3 .text{padding:0 10px 10px 10px;}
 
-.read_form{border-top:1px solid $tdcolor;border-left:1px solid $tdcolor;}
-.read_form td{height:20px;padding:0 5px;border-right:1px solid $tdcolor;border-bottom:1px solid $tdcolor;}
+.read_form td{height:20px;padding:0 5px;border-style:solid; border-width:1px;}
 
 .tip-bot{border-top:1px dashed #cccccc;margin:10px;padding-top:10px;;}
 

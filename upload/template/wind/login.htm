@@ -1,26 +1,60 @@
-<!--<?php print <<<EOT
+<!--<?php
+!$webPageTitle && $webPageTitle = $db_bbsname;
+$metaVersion = $wind_version;
+$wind_repair && $metaVersion .= '(' . $wind_repair . ')';
+print <<<EOT
 -->
-<div id="breadCrumb">
-<img src="$imgpath/$stylepath/thread/home.gif" class="cp breadHome" /><em class="breadEm"></em><a href="$db_bfn" title="$db_bbsname">$db_bbsname</a><em>&gt;</em>登录
+<!doctype html>
+<html>
+<head>
+<meta charset="$db_charset" />
+<title>$webPageTitle - Powered by phpwind</title>
+<meta name="generator" content="phpwind v{$metaVersion}" />
+<meta name="description" content="$metaDescription" />
+<meta name="keywords" content="$metaKeywords" />
+<SCRIPT type="text/javascript" language="JavaScript" src="js/core/core.js"></SCRIPT>
+<script type="text/javascript" language="JavaScript" src="js/pw_ajax.js"></script>
+<!--css-->
+<link rel="stylesheet" href="$imgpath/pw_core.css?101128" />
+<!--
+EOT;
+@include Pcv($css_path);
+print <<<EOT
+-->
+<link rel="stylesheet" type="text/css" href="$imgpath/register/register.css?110120" media="all" />
+</head>
+<body onKeyDown="try{keyCodes(event);}catch(e){}">
+<div class="wrap">
+<div id="header">
+		<div style="height:24px;"></div>
+		<div id="head" class="cc">
+				<a href="$db_bbsurl/"><img src="$imgpath/$stylepath/logo.png" class="fl" title="phpwind" /></a>
+		</div>
 </div>
+<div class="main-wrap">
+<div id="main">
+<!--
+EOT;
+print<<<EOT
+-->
 <div id="pw_content">
 	<div class="p20">
 		<div class="regTitle cc">
-			<span class="fr">还没有帐号？<a href="$db_registerfile#breadCrumb" class="s4">注册一个</a></span>
-			<h5>登录</h5>
+			<h5 class="s6">登录</h5>
 		</div>
-		<table width="100%"><tr><td class="vt" height="300" style="padding-bottom:30px;">
+		<div class="cc">
 		<form action="login.php?" method="post" name="login">
 		<input type="hidden" value="$forward" name="forward" />
 		<input type="hidden" value="$jumpurl" name="jumpurl" />
 		<input type="hidden" value="2" name="step" />
+		<div class="regForm-wrap">
 		<div class="regForm">
 <!--
 EOT;
 if($db_sitemsg['login']['0']){
 print<<<EOT
 -->
-			<div class="blockquote mb20" style="margin-top:-30px;">{$db_sitemsg[login][array_rand($db_sitemsg[login])]}</div>
+			<div class="blockquote" style="margin-top:-20px;">{$db_sitemsg[login][array_rand($db_sitemsg[login])]}</div>
 <!--
 EOT;
 }print<<<EOT
@@ -30,6 +64,7 @@ EOT;
 					<div style="height:26px;">
 <!--
 EOT;
+$arr_logintypename = array('用户名','UID','电子邮箱');
 if(count($_LoginInfo['logintype'])==1){
 $value = current($_LoginInfo['logintype']);
 print <<<EOT
@@ -59,7 +94,7 @@ EOT;
 EOT;
 }else{print <<<EOT
 -->
-							<input type="radio" name="lgt" value="$value" checked />
+							<input type="radio" name="lgt"  value="$value" checked />
 							<span id="login_$value">用户名</span>
 <!--
 EOT;
@@ -67,12 +102,12 @@ EOT;
 -->
 					</div>
 				</dt>
-				<dd class="ip"><div class=""><input type="text" maxLength="60" name="pwuser" tabindex="2" /></div></dd>
+				<dd class="ip"><div class=""><input type="text" class="input" maxLength="60" name="pwuser" /></div></dd>
 				<dd class="tp"><div id="regname_info"></div></dd>
 			</dl>
 			<dl class="cc">
 				<dt>密　码</dt>
-				<dd class="ip"><div><input class="input mr10" type="password" maxLength="20" name="pwpwd" size="40" tabindex="3" /></div></dd>
+				<dd class="ip"><div><input class="input mr10" type="password" maxLength="20" name="pwpwd" size="40" /></div></dd>
 				<dd><div class="p5"><a href="sendpwd.php#breadCrumb" class="s4" target="_blank">找回密码</a></div></dd>
 			</dl>
 
@@ -83,7 +118,7 @@ if($db_ifsafecv){print <<<EOT
 			<dl class="cc">
 				<dt>安全问题</dt>
 				<dd class="ip">
-					<select name="question" onchange="showcustomquest(this.value)" tabindex="4" style="width:230px;margin-top:3px;">
+					<select name="question" onChange="showcustomquest(this.value)" style="width:230px;margin-top:3px;">
 						<option value="0">无安全问题</option><option value="1">我爸爸的出生地</option><option value="2">我妈妈的出生地</option><option value="3">我的小学校名</option><option value="4">我的中学校名</option><option value="5">我最喜欢的运动</option><option value="6">我最喜欢的歌曲</option><option value="7">我最喜欢的电影</option><option value="8" >我最喜欢的颜色</option><option value="-1">自定义问题</option>
 					</select>
 				</dd>
@@ -91,12 +126,12 @@ if($db_ifsafecv){print <<<EOT
 			<dl class="cc" id="customquestid" style="display:none">
 				<dt>自定义问题</dt>
 				<dd class="ip">
-        	<div><input type="text" name="customquest" tabindex="5" /></div>
+        	<div><input type="text" name="customquest" /></div>
 				</dd>
       </dl>
 			<dl class="cc">
 				<dt>您的答案</dt>
-				<dd class="ip mr5"><div><input type="text" name="answer" tabindex="6" /></div></dd>
+				<dd class="ip mr5"><div><input type="text" class="input" name="answer" /></div></dd>
 				<dd><div class="p5 s6">如果您设置了安全问题，需要填写正确的答案才能登录站点</div></dd>
 			</dl>
 <!--
@@ -114,7 +149,7 @@ print <<<EOT
 -->
       <dl class="cc">
 				<dt>验证问答</dt>
-				<dd class="ip"><div><input class="input" type="text" name="qanswer" tabindex="7" /><input type="hidden" name="qkey" value="$qkey" /></div></dd>
+				<dd class="ip"><div><input class="input" type="text" name="qanswer" /><input type="hidden" name="qkey" value="$qkey" /></div></dd>
 				<dd class="tp"><div class="ignore">{$question}
 <!--
 EOT;
@@ -135,9 +170,9 @@ $gdSize = explode("\t",$db_gdsize);
 print <<<EOT
 -->
 			<dl class="cc">
-				<dt>认证码</dt>
+				<dt>验证码</dt>
 				<dd class="ip ck">
-					<div><input id="gdcode" name="gdcode" value="" /></div>
+					<div><input id="gdcode" class="input" style="" name="gdcode" value="" /></div>
 					<span id="menu_gd"></span>
 <script type="text/javascript" src="js/pw_authcode.js"></script>
 <script>
@@ -155,19 +190,34 @@ EOT;
 -->
         <dl class="cc">
             <dt>隐身登录</dt>
-            <dd style="padding-top:5px;"><label for="hideid1" class="mr20"><input id="hideid1" name="hideid" type="radio" value="1" />开启</label><label for="hideid0"><input name="hideid" id="hideid0" type="radio" value="0" checked tabindex="8" />关闭</label></dd>
+            <dd style="padding-top:5px;"><label for="hideid1" class="mr20"><input id="hideid1" name="hideid" type="radio" value="1" />开启</label><label for="hideid0"><input name="hideid" id="hideid0" type="radio" value="0" checked />关闭</label></dd>
         </dl>
         <dl class="cc">
-            <dt>Cookie 有效期:</dt>
-            <dd style="padding-top:5px;"><label for="cktime1" class="mr20"><input id="cktime1" type="radio" name="cktime" value="31536000" checked tabindex="9" />一年</label><label for="cktime2" class="mr20"><input id="cktime2" type="radio" name="cktime" value="2592000" />一个月</label><label for="cktime3" class="mr20"><input id="cktime3" type="radio" name="cktime" value="86400" />一天</label><label for="cktime4" class="mr20"><input id="cktime4" type="radio" name="cktime" value="3600" />一小时</label><label for="cktime5" class="mr20"><input type="radio" id="cktime5" name="cktime" value="0" />即时</label></dd>
+            <dt>Cookie 有效期</dt>
+			<dd style="padding-top:5px;">
+				<select name="cktime">
+					<option value="31536000">一年</option>
+					<option value="2592000">一个月</option>
+					<option value="86400">一天</option>
+					<option value="3600">一小时</option>
+					<option value="0">即时</option>
+				</select>
+			</dd>
         </dl>
         <dl class="cc">
             <dt>&nbsp;</dt>
             <dd><span class="btn"><span><button type="submit" name="submit">登录</button></span></span></dd>
         </dl>
 		</div>
+		</div>
+		<div class="regLogin">
+			<div style="padding-left:20px;">
+				<p class="f14 mb5">还没有帐号？</p>
+				<p style="padding-bottom:50px;"><span class="bt"><span><button type="button" onClick="location.href='$db_registerfile#breadCrumb';">注册一个</button></span></span></p>
+			</div>
+		</div>
 		</form>
-		</td></tr></table>
+		</div>
 	</div>
 </div>
 <script language="JavaScript">
@@ -177,6 +227,9 @@ function showcustomquest(qid){
 	
 }
 </script>
+</div></div><!--.main-wrap,#main End-->
+</div>
+</body></html>
 <!--
 EOT;
 ?>-->

@@ -186,13 +186,7 @@ if ($a == 'list') {//我的日志列表
 	//权限设置
 
 	$db_uploadfiletype = $o_uploadsize = !empty($o_uploadsize) ? unserialize($o_uploadsize) : array();
-
-	$uploadfiletype = $uploadfilesize = ' ';
-	foreach ($o_uploadsize as $key => $value) {
-		$uploadfiletype .= $key.' ';
-		$uploadfilesize .= $key.':'.$value.'KB; ';
-	}
-
+	$imageAllow = pwJsonEncode($db_uploadfiletype);
 
 	$myAppsData = array();
 	$ouserDataService = L::loadClass('Ouserdata', 'sns'); /* @var $ouserDataService PW_Ouserdata */
@@ -222,7 +216,7 @@ if ($a == 'list') {//我的日志列表
 		S::gp(array("privacy"));
 		require_once(R_P.'require/postfunc.php');
 		PostCheck(1,$o_diary_gdcheck,$o_diary_qcheck);
-		S::gp(array('dtid','privacy','ifcopy','ifsendweibo'),'P');
+		S::gp(array('dtid','privacy','ifcopy','ifsendweibo','flashatt','atc_title'),'P');
 		require_once(R_P.'require/bbscode.php');
 
 		$wordsfb = L::loadClass('FilterUtil', 'filter');
@@ -232,22 +226,26 @@ if ($a == 'list') {//我的日志列表
 		if (($banword = $wordsfb->comprise($_POST['atc_content'], false)) !== false) {
 			Showmsg('diary_content_wordsfb');
 		}
-
+		if (!$atc_title) $_POST['atc_title'] = get_date($timestamp,'Y.m.d').' 日志';
 		list($atc_title,$atc_content,$ifconvert,$ifwordsfb) = check_data('new');
+		if ($db_tcheck) { //内容验证
+			$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
+			$userDataInfo = $userService->get($winduid, false, true, false);
+			$postcheck = unserialize($userDataInfo['postcheck']);
+			$postcheck['diary'] == ($diaryCheck = tcheck($atc_content)) && Showmsg('diary_content_same');
+		}
 		//$db_tcheck && $winddb['postcheck'] == tcheck($atc_content) && Showmsg('diary_content_same'); //内容验证
-
 		$dtid = (int)$dtid;
 		$privacy = (int)$privacy;
 		$ifcopy = (int)$ifcopy;
 		$ifupload = 0;
 //		!$privacy && $ifcopy = 1;
-
-		//require_once(M_P.'require/upload.php');
-		//require_once(R_P.'require/app_upload.php');
+		
 		$aids = $attachs = array();
 		L::loadClass('diaryupload', 'upload', false);
-		if (PwUpload::getUploadNum()) {
-			$diaryUpload = new DiaryUpload($winduid);
+		if (PwUpload::getUploadNum() || $flashatt) {
+			S::gp(array('savetoalbum', 'albumid'), 'P', 2);
+			$diaryUpload = new DiaryUpload($winduid, $flashatt, $savetoalbum, $albumid);
 			$diaryUpload->check();
 			PwUpload::upload($diaryUpload);
 			$aids = $diaryUpload->getAids();
@@ -255,7 +253,6 @@ if ($a == 'list') {//我的日志列表
 			$attachIds = $diaryUpload->getAttachIds();
 			$ifupload = $diaryUpload->ifupload;
 		}
-
        /**
 		$pwSQL = S::sqlSingle(array(
 			'uid'		=> $winduid,
@@ -304,9 +301,9 @@ if ($a == 'list') {//我的日志列表
 				$weiboService = L::loadClass('weibo','sns');/* @var $weiboService PW_Weibo */
 				$atc_content = substrs(stripWindCode($weiboService->escapeStr($atc_content)), 125);
 				$weiboExtra = array(
-								'did' => $did,
-								'title' => stripslashes($atc_title),
-							);
+					'did' => $did,
+					'title' => stripslashes($atc_title),
+				);
 				$weiboService->send($winduid,$atc_content,'diary',$did,$weiboExtra);
 			}
 		}
@@ -325,6 +322,10 @@ if ($a == 'list') {//我的日志列表
 			addLog($creditlog['Post'],$windid,$winduid,'diary_Post');
 		}
 		updateUserAppNum($winduid,'diary');
+		if ($db_tcheck) {
+			$postcheck['diary'] = $diaryCheck;
+			$userService->update($winduid, array(), array('postcheck' => serialize($postcheck)));
+		}
 		$url = "{$basename}a=detail&did=$did";
 		$msg = defined('AJAX') ?  "success\t".$url : 'operate_success';	
 		refreshto($url,$msg);
@@ -332,12 +333,7 @@ if ($a == 'list') {//我的日志列表
 } elseif ($a == 'edit') {
 
 	$db_uploadfiletype = $o_uploadsize = !empty($o_uploadsize) ? unserialize($o_uploadsize) : array();
-
-	$uploadfiletype = $uploadfilesize = ' ';
-	foreach ($o_uploadsize as $key => $value) {
-		$uploadfiletype .= $key.' ';
-		$uploadfilesize .= $key.':'.$value.'KB; ';
-	}
+	$imageAllow = pwJsonEncode($db_uploadfiletype);
 
 	$sendWeiboPrivacy = false;
 
@@ -354,7 +350,7 @@ if ($a == 'list') {//我的日志列表
 			$attachs = unserialize($diary['aid']);
 			if (is_array($attachs)) {
 				foreach ($attachs as $key => $value) {
-					list($value['attachurl'],) = geturl('diary/'.$value['attachurl'],'lf');
+					list($value['attachurl'],) = geturl($value['attachurl'], 'lf');
 					$attach .= "'$key' : ['$value[name]', '$value[size]', '$value[attachurl]', '$value[type]', '$value[special]', '$value[needrvrc]', '$value[ctype]', '$value[desc]'],";
 				}
 				$attach = rtrim($attach,',');
@@ -384,7 +380,7 @@ if ($a == 'list') {//我的日志列表
 		
 	} elseif ($_POST['step'] == 2) {
 
-		S::gp(array('did','dtid','dtided','privacy','privacyed','ifcopy'),'P');
+		S::gp(array('did','dtid','dtided','privacy','privacyed','ifcopy','flashatt'),'P');
 
 		require_once(R_P.'require/bbscode.php');
 		require_once(R_P.'require/postfunc.php');
@@ -415,44 +411,34 @@ if ($a == 'list') {//我的日志列表
 		$aid = $db->get_value("SELECT aid FROM pw_diary WHERE uid=".S::sqlEscape($winduid)." AND did=".S::sqlEscape($did));
 
 		if ($aid) {
-			S::gp(array('keep','oldatt_special','oldatt_needrvrc'), 'P', 2);
-			S::gp(array('oldatt_ctype','oldatt_desc'), 'P');
+			S::gp(array('oldatt_desc'), 'P');
 			$oldattach = unserialize(stripslashes($aid));
 			foreach ($oldattach as $key => $value) {
-				if (!@in_array($key,$keep)) {
-					$unsetattach[$key] = $value;
-					unset($oldattach[$key]);
-				} else {
-					$v = array(
-						'special'	=> $oldatt_special[$key],		'ctype'		=> $oldatt_ctype[$key],
-						'needrvrc'	=> $oldatt_needrvrc[$key],		'desc'		=> $oldatt_desc[$key]
-					);
+				$v = array(
+					'special'	=> 0,		'ctype'		=> '',
+					'needrvrc'	=> 0,		'desc'		=> $oldatt_desc[$key]
+				);
+				$oldattach[$key] = array_merge($oldattach[$key], $v);
 
-					$v['needrvrc'] = $v['special'] = 0;
-					$v['ctype'] = '';
-
-					$oldattach[$key] = array_merge($oldattach[$key], $v);
-
-					if (array_key_exists('replace_'.$key, $_FILES)) {
-						$db_attachnum++;
-						$replacedb[$key] = $oldattach[$key];
-					} elseif ($value['ctype'] <> $v['ctype'] || $value['desc'] <> $v['desc']) {
-						$runsql[] = 'UPDATE pw_attachs SET ' . S::sqlSingle(array(
-							'needrvrc'	=> $v['needrvrc'],
-							'descrip'	=> $v['desc'],
-							'special'	=> $v['special'],
-							'ctype'		=> $v['ctype']
-						)) . ' WHERE aid=' . S::sqlEscape($key);
-					}
+				if (array_key_exists('replace_'.$key, $_FILES)) {
+					$db_attachnum++;
+					$replacedb[$key] = $oldattach[$key];
+				} elseif ($value['desc'] <> $v['desc']) {
+					$runsql[] = 'UPDATE pw_attachs SET ' . S::sqlSingle(array(
+						'needrvrc'	=> $v['needrvrc'],
+						'descrip'	=> $v['desc'],
+						'special'	=> $v['special'],
+						'ctype'		=> $v['ctype']
+					)) . ' WHERE aid=' . S::sqlEscape($key);
 				}
 			}
 		}
-		//require_once(M_P.'require/upload.php');
-		//require_once(R_P.'require/app_upload.php');
+
 		$aids = $attachs = array();
 		L::loadClass('diaryupload', 'upload', false);
-		if (PwUpload::getUploadNum()) {
-			$diaryUpload = new DiaryUpload($winduid);
+		if (PwUpload::getUploadNum() || $flashatt) {
+			S::gp(array('savetoalbum', 'albumid'), 'P', 2);
+			$diaryUpload = new DiaryUpload($winduid, $flashatt, $savetoalbum, $albumid);
 			$diaryUpload->check();
 			$diaryUpload->setReplaceAtt($replacedb);
 			PwUpload::upload($diaryUpload);

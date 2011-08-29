@@ -106,7 +106,8 @@ class PW_PortalPageService {
 	function getPortalStaticState() {
 		static $result = array();
 		if (!isset($result['state']) && is_file(D_P.'data/bbscache/portal_config.php')) {
-			include pwCache::getPath(D_P.'data/bbscache/portal_config.php');
+			//* include pwCache::getPath(D_P.'data/bbscache/portal_config.php');
+			extract(pwCache::getData(D_P.'data/bbscache/portal_config.php', false));
 			$result['state'] = $portal_staticstate;
 		}
 		return $result['state'] ? $result['state'] : array();

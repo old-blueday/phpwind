@@ -31,7 +31,7 @@ if (empty($action) || $action == 'all') {
 	$page = validatePage($page,$pageCount);
 	$requestList = $messageServer->getRequests($userId, $messageServer->getConst('request_group'), $page, $perpage);
 	$url = $normalUrl . '&action=group&';
-	!$requestCount && $emptyListTip = "<p class=\"tac p15 f14\">暂无任何群组请求，赶快去<a href=\"u.php?a=friend&type=find\">加群组</a>吧</p>";
+	!$requestCount && $emptyListTip = "<p class=\"tac p15 f14\">暂无任何群组请求，赶快去<a href=\"group.php?q=all\">加群组</a>吧</p>";
 } elseif ($action == 'app') {
 	$requestCount = $messageServer->countRequest($userId, $messageServer->getConst('request_apps'));
 	$pageCount = ceil($requestCount / $perpage);

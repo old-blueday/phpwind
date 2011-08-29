@@ -1,89 +1,60 @@
 <?php
 !defined('P_W') && exit('Forbidden');
-
 !$_G['allowreport'] && Showmsg('report_right');
-S::gp(array(
-	'tid',
-	'pid'
-), 'GP', '2');
-S::gp(array(
-	'type',
-	'own'
-));
-
-
-if (is_int($own)) {
-	$ifown = $winduid == $own ? '1' : '0';
-} else {
-	$ifown = $windid == $own ? '1' : '0';
-}
+S::gp(array('tid','pid'), 'GP', '2');
+S::gp(array('type','own'));
+$ifown = is_int($own) ? ($winduid == $own ? '1' : '0') : ($windid == $own ? '1' : '0');
 $ifown && Showmsg('report_own');
-
 $checkdata = $db->get_one("SELECT * FROM pw_report WHERE type=" . S::sqlEscape($type) . " AND tid=" . S::sqlEscape($tid) . " AND pid=" . S::sqlEscape($pid));
 $checkdata && Showmsg('have_report');
-
 if (empty($_POST['step'])) {
 	$ch_type = getLangInfo('other', $type);
 	require_once PrintEot('ajax');
 	ajax_footer();
 } else {
 	S::gp(array('reason','ifsendmessage'));
-	$pwSQL = S::sqlSingle(array(
-		'tid' => $tid,
-		'pid' => $pid,
-		'uid' => $winduid,
-		'type' => $type,
-		'reason' => $reason
-	));
+	$pwSQL = S::sqlSingle(array('tid' => $tid,'pid' => $pid,'uid' => $winduid,'type' => $type,'reason' => $reason));
 	if ($ifsendmessage) {
 		$usernames = getSendToUsernames($type, $tid);
-		$url = parseReportUrl($type,$pid,$tid); 
-		$mcontent = getLangInfo('writemsg', 'report_content_0_0',
-									array(
-										'type'=>getLangInfo('other',$type),
-										'admindate'=>get_date($timestamp),
-										'reason'=> $reason,
-										'url' => $db_bbsurl."/".$url,
-									)
-								);
-		M::sendNotice($usernames, array('title' => getLangInfo('writemsg', 'report_title'), 'content' => $mcontent));	
+		if (!empty($usernames)) {
+			$url = parseReportUrl($type,$pid,$tid); 
+			$mcontent = getLangInfo('writemsg', 'report_content_0_0',
+										array(
+											'type'=>getLangInfo('other',$type),
+											'admindate'=>get_date($timestamp),
+											'reason'=> $reason,
+											'url' => $db_bbsurl."/".$url,
+										)
+									);
+			M::sendNotice($usernames, array('title' => getLangInfo('writemsg', 'report_title'), 'content' => $mcontent));	
+		}
 	}
-	
 	$db->update("INSERT INTO pw_report SET $pwSQL");
 	Showmsg('report_success');
 }
 
-
 function getSendToUsernames($type,$tid) {
-	global $windid;
+	global $windid, $db;
 	$usernames = array();
 	if (!$type || !$tid) return $usernames;
-	switch ($type) {
-		case 'topic' :
-			//* $threadsService = L::loadClass('threads', 'forum'); /* @var $threadsService PW_threads */
-			//* $threads  = $threadsService->getThreads($tid);
-			$_cacheService = Perf::gatherCache('pw_threads');
-			$threads = $_cacheService->getThreadByThreadId($tid);			
-			$fid = $threads['fid'];
-			L::loadClass('forum', 'forum', false);
-			$forumService = new PwForum($fid);
-			$foruminfo = $forumService->foruminfo;
-			$forumadmins = $foruminfo['forumadmin'];
-			$forumadmins = explode(',',$forumadmins);
-			foreach ($forumadmins as $forumadmin) {
-				if (!$forumadmin || $forumadmin == $windid) continue;
-				$usernames[] = $forumadmin;
-			}
-		break;
-		
-		default :
-			$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */ 
-			$userInfos = $userService->getByGroupId('3');
-			foreach ($userInfos as $user) {
-				if (!$user || $user['username'] == $windid) continue;
-				$usernames[] = $user['username'];
-			}
-		break;
+	$remindUsernames = $db->get_value("SELECT db_value FROM pw_config WHERE db_name = 'report_remind'");
+	$remindUsernames = $remindUsernames ? unserialize($remindUsernames) : array();
+	foreach ($remindUsernames as $key => $value) {
+		if ($value['username'] == $windid) continue;
+		$usernames[] = $value['username'];
+	}
+	if ($type != 'topic') return $usernames;
+	$_cacheService = Perf::gatherCache('pw_threads');
+	$threads = $_cacheService->getThreadByThreadId($tid);			
+	$fid = $threads['fid'];
+	L::loadClass('forum', 'forum', false);
+	$forumService = new PwForum($fid);
+	$foruminfo = $forumService->foruminfo;
+	$forumadmins = $foruminfo['forumadmin'];
+	$forumadmins = explode(',',$forumadmins);
+	foreach ($forumadmins as $forumadmin) {
+		if (!$forumadmin || $forumadmin == $windid) continue;
+		$usernames[] = $forumadmin;
 	}
 	return $usernames;
 }

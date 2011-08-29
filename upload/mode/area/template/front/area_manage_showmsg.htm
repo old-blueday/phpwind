@@ -1,0 +1,35 @@
+<?php 
+print <<<EOT
+<!doctype html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<script type="text/javascript" src="js/portal.js"></script>
+<script type="text/javascript" src="js/core/core.js"></script>
+<script language="JavaScript" src="mode/area/js/imagetype.js"></script>
+<link rel="stylesheet" type="text/css" href="images/pw_core.css" />
+<link rel="stylesheet" type="text/css" href="images/pwmanage.css" />
+<style>
+htm,body{overflow:hidden;height:500px;width:100%;}
+html {font-size:12px;}
+body {line-height: 1.5;}
+.lh_22{line-height:22px;height:22px;overflow:hidden;}
+a{color:#336699;text-decoration:none}
+a:hover{color:#ff5500;text-decoration:none}
+</style>
+</head>
+<div class="tipWrap">
+	<div class="regCorrect">
+		<p class="f14 mb10 b">{$msg_info}</p>
+		<p class="f14"><a id="showback" href="javascript:;" onclick="var needReload = (is_ie ? history.length == 0 : history.length == 1); if(needReload){self.location.reload();}else{history.back();}return false;" class="link">返回继续操作</a></p>
+		<p>
+EOT;
+?>
+<?php
+		$dejump && $dejump!=1 && include_once PrintEot($dejump);
+print <<<EOT
+		</p>
+	</div>
+</div>
+EOT;
+?>

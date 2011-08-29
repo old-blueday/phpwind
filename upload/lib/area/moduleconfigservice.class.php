@@ -55,7 +55,7 @@ class PW_moduleConfigService {
 	}
 	function _getModulePWLine($configFile,$module,$ifCache = 1) {
 		$configFileString = $this->_getFileString($configFile,$ifCache);
-		preg_match('/<pw.+?id="'.$module.'".+?\/>/i',$configFileString,$match);
+		preg_match('/<pw.+?id=([\'|"]?)'.$module.'(\\1).+?\/>/i',$configFileString,$match);
 		return $match[0] ? $match[0] : '';
 	}
 	/**
@@ -79,7 +79,7 @@ class PW_moduleConfigService {
 		$data = '';
 		$start = 0;
 		$handle = @fopen($fileName, 'rb');
-		
+		if (!$handle) return $data;
 		while(!feof($handle)) {
 			$lineString = fgets($handle,4096);
 			if (!$start && preg_match('/<pw.+?id="'.$invokeName.'".+?\/>/i',$lineString)) {
@@ -105,7 +105,7 @@ class PW_moduleConfigService {
 		$newModuleString = $this->_createNewPieceCode($configFile,$name,$code);
 
 		$newString	= str_replace($oldModuleString,$newModuleString,$fileString);
-		$temp = pwCache::setData($configFile,$newString,false,'wb+');
+		$temp = pwCache::writeover($configFile,$newString,'wb+');
 		if (!$temp && !is_writable($configFile)) $this->_writeOverMessage($configFile);
 		clearstatcache();
 	}
@@ -140,9 +140,9 @@ class PW_moduleConfigService {
 		$pwLine = $this->_getModulePWLine($configFile,$name,0);
 		$newPWLine = $this->_createPWCode($name,$title);
 		
-		$configString = readover($configFile);
+		$configString = pwCache::readover($configFile);
 		$newString = str_replace($pwLine,$newPWLine,$configString);
-		$temp = pwCache::setData($configFile,$newString,false,'wb+');
+		$temp = pwCache::writeover($configFile,$newString, 'wb+');
 		if (!$temp && !is_writable($configFile)) $this->_writeOverMessage($configFile);
 		return true;
 	}
@@ -201,9 +201,9 @@ class PW_moduleConfigService {
 			
 			$newFileString = str_replace($reg[0][$key],$pwCode,$newFileString);
 		}
-		$temp = pwCache::setData($configFile,$data, false, 'ab+');
+		$temp = pwCache::writeover($configFile,$data, 'ab+');
 		if (!$temp && !is_writable($configFile)) $this->_writeOverMessage($configFile);
-		$temp = pwCache::setData($templateFile,$newFileString,false,'wb+');
+		$temp = pwCache::writeover($templateFile,$newFileString,'wb+');
 		if (!$temp && !is_writable($templateFile)) $this->_writeOverMessage($templateFile);
 	}
 	
@@ -246,11 +246,11 @@ class PW_moduleConfigService {
 	function _getFileString($file,$ifCache = 0) {
 		static $fileString = array();
 		if (!$ifCache) {
-			return readover($file);
+			return pwCache::readover($file);
 		}
 		$fileMD5String = md5($file);
 		if (!isset($fileString[$fileMD5String])) {
-			$fileString[$fileMD5String] = readover($file);
+			$fileString[$fileMD5String] = pwCache::readover($file);
 		}
 		return $fileString[$fileMD5String];
 	}
@@ -260,12 +260,12 @@ class PW_moduleConfigService {
 	 * @param $cateName
 	 */
 	function cookModuleIds($string,$cateName) {
-		preg_match_all('/(<pw.+?id="(.+?)"[^>]+?\/>)/i',$string,$reg);
+		preg_match_all('/<pw.+?id=([\'|"]?)(.+?)(\\1)[^>]+?\/>/i',$string,$reg);
 		$search = $replace = array();
 		foreach ($reg[2] as $k=>$v) {
-			$search[] = $reg[1][$k];
+			$search[] = $reg[0][$k];
 			$newModuleName = $this->_getNewModuleName($v,$cateName);
-			$replace[] = str_replace($v,$newModuleName,$reg[1][$k]);
+			$replace[] = str_replace($v,$newModuleName,$reg[0][$k]);
 		}
 		return str_replace($search,$replace,$string);
 	}
@@ -280,9 +280,9 @@ class PW_moduleConfigService {
 	}
 	
 	function _getModulesFromTemplate($templteFile) {
-		$fileString	= readover($templteFile);
-		preg_match_all('/<pw.+?id="(.+?)".+?\/>/i',$fileString,$reg);
-		return $reg[1];
+		$fileString	= pwCache::readover($templteFile);
+		preg_match_all('/<pw.+?id=([\'|"]?)(.+?)(\\1).+?\/>/i',$fileString,$reg);
+		return $reg[2];
 	}
 	function _createNewPieceCode($configFile,$name,$code) {
 		$pwLine = $this->_getModulePWLine($configFile,$name,0);

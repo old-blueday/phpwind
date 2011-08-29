@@ -1,10 +1,10 @@
 <?php
 !defined('P_W') && exit('Forbidden');
 
-S::gp(array('page'));
+S::gp(array('page','from'));
 (!is_numeric($page) || $page < 1) && $page = 1;
 $page > 1 && $pre_page = $page - 1;
-$db_perpage = 12;
+$db_perpage = $from == 'reg' ? 10 : 12;
 $img = @opendir("$imgdir/face");
 $num = $pagenum = 0;
 while ($imgname = @readdir($img)) {

@@ -1,8 +1,10 @@
 <?php
 !function_exists('readover') && exit('Forbidden');
 $wind_in = 'medal';
-include_once pwCache::getPath(D_P.'data/bbscache/md_config.php');
-include_once pwCache::getPath(D_P.'data/bbscache/medaldb.php');
+//* include_once pwCache::getPath(D_P.'data/bbscache/md_config.php');
+//* include_once pwCache::getPath(D_P.'data/bbscache/medaldb.php');
+pwCache::getData(D_P.'data/bbscache/md_config.php');
+pwCache::getData(D_P.'data/bbscache/medaldb.php');
 include_once(R_P.'require/showimg.php');
 !$md_ifopen && Showmsg('medal_close');
 
@@ -43,7 +45,8 @@ if (!$action) {
 	if (!file_exists(D_P.'data/bbscache/medals_list.php')) {
 		updatemedal_list();
 	}
-	$uids = substr(readover(D_P.'data/bbscache/medals_list.php'),12);
+	//* $uids = substr(readover(D_P.'data/bbscache/medals_list.php'),12);
+	$uids = substr(pwCache::getData(D_P.'data/bbscache/medals_list.php', false, true),12);
 	if ($uids) {
 		S::gp(array('page'));
 		(!is_numeric($page) || $page < 1) && $page = 1;
@@ -320,11 +323,11 @@ if (!$action) {
 			if (count($id)) {
 				$id = S::sqlImplode($id);
 			} else {
-				Showmsg('medal_iderror');
+				Showmsg('medal_nobody');
 			}
 		} else {
 			$id = (int)$id;
-			!$id && Showmsg('medal_iderror');
+			!$id && Showmsg('medal_nobody');
 		}
 		$medaluser = array();
 		$rs = $db->query("SELECT l.level,l.why,m.uid,m.username,m.medals FROM pw_medalslogs l LEFT JOIN pw_members m ON l.awardee=m.username WHERE l.id IN($id)");
@@ -404,14 +407,14 @@ if (!$action) {
 				}
 				$db->update("DELETE FROM pw_medalslogs WHERE id IN($id)");
 			} else {
-				Showmsg('medal_iderror');
+				Showmsg('medal_nobody');
 			}
 		} else {
 			$id = (int)$id;
-			!$id && Showmsg('medal_iderror');
+			!$id && Showmsg('medal_nobody');
 			if ($md_ifmsg) {
 				$rt = $db->get_one("SELECT awardee,level,why FROM pw_medalslogs WHERE id=".S::sqlEscape($id));
-				!$rt && Showmsg('medal_iderror');
+				!$rt && Showmsg('medal_nobody');
 				$medal = $rt['level'];
 				$reason = $rt['why'];
 				M::sendNotice(

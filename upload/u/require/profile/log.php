@@ -7,7 +7,8 @@ $page = (int)$page;
 require_once GetLang('logtype');
 require_once(R_P.'require/functions.php');
 require_once(R_P.'require/forum.php');
-include_once pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
+//* include_once pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
+pwCache::getData(D_P.'data/bbscache/forum_cache.php');
 $sqladd = "WHERE username1=".S::sqlEscape($windid,false);
 if ($type && $lang['logtype'][$type]) {
 	$sqladd .= " AND type=".S::sqlEscape($type);

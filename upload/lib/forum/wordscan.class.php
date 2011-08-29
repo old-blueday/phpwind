@@ -258,8 +258,11 @@ class PW_WordScan {
 	 * @desc 更新因帖子状态改变而影响的版块信息
 	 */
 	function updateCache($num) {
+		/**
 		$sql = "UPDATE pw_forumdata SET article=article-".S::sqlEscape($num,false).",topic=topic-".S::sqlEscape($num,false)." WHERE fid=".S::sqlEscape($this->fid);
 		$this->db->update($sql);
+		**/
+		$this->db->update(pwQuery::buildClause("UPDATE :pw_table SET article=article-:article,topic=topic-:topic WHERE fid=:fid", array('pw_forumdata', $num, $num, $this->fid)));
 	}
 	
 	/**
@@ -347,8 +350,11 @@ class PW_WordScan {
 			}
 			
 			# 更新版块文章数
+			/**
 			$sql = "UPDATE pw_forumdata SET article=article-".S::sqlEscape($article,false)." WHERE fid=".S::sqlEscape($this->fid);
 			$this->db->update($sql);
+			**/
+			$this->db->update(pwQuery::buildClause("UPDATE :pw_table SET article=article-:article WHERE fid=:fid", array('pw_forumdata', $article, $this->fid)));
 		}
 		
 		# 插入记录
@@ -390,7 +396,8 @@ class PW_WordScan {
 		global $db_plist;
 		
 		# 读取缓存
-		require_once pwCache::getPath(D_P.'data/bbscache/wordsfb_progress.php');
+		//* require_once pwCache::getPath(D_P.'data/bbscache/wordsfb_progress.php');
+		extract(pwCache::getData(D_P.'data/bbscache/wordsfb_progress.php', false));
 		$this->threaddb = unserialize($threaddb);
 		$this->catedb   = unserialize($catedb);
 		$temp_threaddb = unserialize($threaddb);
@@ -458,7 +465,8 @@ class PW_WordScan {
 		global $db_plist;
 		
 		# 读取缓存
-		require_once pwCache::getPath(D_P.'data/bbscache/wordsfb_progress.php');
+		//* require_once pwCache::getPath(D_P.'data/bbscache/wordsfb_progress.php');
+		extract(pwCache::getData(D_P.'data/bbscache/wordsfb_progress.php', false));
 		$this->threaddb = unserialize($threaddb);
 		$this->catedb   = unserialize($catedb);
 		$temp_threaddb = unserialize($threaddb);

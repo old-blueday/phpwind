@@ -1,7 +1,7 @@
 <?php
 !defined('P_W') && exit('Forbidden');
-include_once pwCache::getPath(D_P . 'data/bbscache/level.php');
-
+//* include_once pwCache::getPath(D_P . 'data/bbscache/level.php');
+pwCache::getData(D_P . 'data/bbscache/level.php');
 $basename .= '&admintype=' . $admintype;
 $basedb = array('basic', 'safe', 'att', 'credit', 'reg',
 				'index', 'thread', 'read', 'jsinvoke',
@@ -30,7 +30,7 @@ if ($_POST['step'] != 2) {
 		//state
 		${'bbsifopen_' . (int) $db_bbsifopen} = 'CHECKED';
 		//list($db_opensch,$db_schstart,$db_schend) = explode("\t",$db_opensch);
-		list($db_openpost, $db_poststart, $db_postend) = explode("\t", $db_openpost);
+		list($db_openpost, $db_poststart, $db_poststartminute, $db_postend, $db_postendminute) = explode("\t", $db_openpost);
 		$db_whybbsclose = str_replace(array('<br />', '<br>'), "\n", $db_whybbsclose);
 		$db_visituser = trim($db_visituser, ',');
 		//$db_schend = (int)$db_schend;
@@ -288,7 +288,8 @@ if ($_POST['step'] != 2) {
 		ifcheck($db_ifathumbgif, 'ifathumbgif');
 		$db_watermark == 1 ? $watermark_1 = 'checked' : ($db_watermark == 2 ? $watermark_2 = 'checked' : $watermark_0 = 'checked');
 		//ftp
-		@include_once pwCache::getPath(D_P . 'data/bbscache/ftp_config.php');
+		//* @include_once pwCache::getPath(D_P . 'data/bbscache/ftp_config.php');
+		pwCache::getData(D_P . 'data/bbscache/ftp_config.php');
 		(int) $ftp_port < 1 && $ftp_port = '21';
 		(int) $ftp_timeout < 1 && $ftp_timeout = '10';
 		ifcheck($db_ifftp, 'ifftp');
@@ -331,7 +332,8 @@ if ($_POST['step'] != 2) {
 	}
 	if ($admintype == 'reg' || $settingdb['reg']) {
 		require_once (R_P . 'require/credit.php');
-		require_once pwCache::getPath(D_P . 'data/bbscache/dbreg.php');
+		//* require_once pwCache::getPath(D_P . 'data/bbscache/dbreg.php');
+		extract(pwCache::getData(D_P . 'data/bbscache/dbreg.php', false));
 		$rg_rgpermit = str_replace(array('<br />', '<br>'), "", $rg_rgpermit);
 		$rg_welcomemsg = str_replace(array('<br />', '<br>'), "\n", $rg_welcomemsg);
 		$rg_whyregclose = str_replace(array('<br />', '<br>'), "\n", $rg_whyregclose);
@@ -344,11 +346,11 @@ if ($_POST['step'] != 2) {
 		ifcheck($rg_emailcheck, 'emailcheck');
 		ifcheck($rg_regsendmsg, 'regsendmsg');
 		ifcheck($rg_regsendemail, 'regsendemail');
+		ifcheck($db_authreg, 'authreg');
+		ifcheck($rg_regguide, 'regguide');
 		$check[$rg_allowregister] = 'checked = checked';
 		$rg_emailtype == 1 ? $emailtype_1 = 'checked' : ($rg_emailtype == 2 ? $emailtype_2 = 'checked' : $emailtype_0 = 'checked');
 
-		$rg_timeend = (int) $rg_timeend;
-		$rg_timestart = (int) $rg_timestart;
 		$db_postallowtime = (int) $db_postallowtime;
 		list($rg_regminpwd, $rg_regmaxpwd) = explode("\t", $rg_pwdlen);
 		list($rg_regminname, $rg_regmaxname) = explode("\t", $rg_namelen);
@@ -376,7 +378,8 @@ if ($_POST['step'] != 2) {
 		$gporder = explode(',', $db_showgroup);
 		$usergroup = '';
 		$num = 0;
-		include_once(D_P.'data/style/'.$db_defaultstyle.'.php');
+		//* include_once(D_P.'data/style/'.$db_defaultstyle.'.php');
+		extract(pwCache::getData(S::escapePath(D_P.'data/style/'.$db_defaultstyle.'.php'), false));
 		foreach ($ltitle as $key => $value) {
 			if ($key!=1 && $key!=2) {
 				$num++;
@@ -452,7 +455,8 @@ if ($_POST['step'] != 2) {
 			//$action = $_COOKIE['admin_email'];
 			!$action && $action = 'email';
 		}
-		include_once pwCache::getPath(D_P . 'data/bbscache/mail_config.php');
+		//* include_once pwCache::getPath(D_P . 'data/bbscache/mail_config.php');
+		pwCache::getData(D_P . 'data/bbscache/mail_config.php');
 		//mail
 		${'mailmethod_' . (int) $ml_mailmethod} = 'CHECKED';
 		$ml_smtppass = substr($ml_smtppass, 0, 1) . '********' . substr($ml_smtppass, -1);
@@ -567,10 +571,16 @@ if ($_POST['step'] != 2) {
 		$config['visitmsg'] = ieconvert($config['visitmsg']);
 		$config['whybbsclose'] = ieconvert($config['whybbsclose']);
 		$postctl['poststart'] > 23 && $postctl['poststart'] = 0;
+		$postctl['poststartminute'] = (int) $postctl['poststartminute'];
+		$postctl['postendminute'] = (int) $postctl['postendminute'];
+		$postctl['poststartminute'] > 59 && $postctl['poststartminute'] = 59;
+		$postctl['poststartminute'] < 0 && $postctl['poststartminute'] = 0;
+		$postctl['postendminute'] > 59 && $postctl['postendminute'] = 59;
+		$postctl['postendminute'] < 0 && $postctl['postendminute'] = 0;
 		$postctl['postend'] > 23 && $postctl['postend'] = 0;
 		$schctl['schstart'] > 23 && $schctl['schstart'] = 0;
 		$schctl['schend'] > 23 && $schctl['schend'] = 0;
-		$config['openpost'] = $postctl['openpost'] . "\t" . $postctl['poststart'] . "\t" . $postctl['postend'];
+		$config['openpost'] = $postctl['openpost'] . "\t" . $postctl['poststart'] . "\t" . $postctl['poststartminute'] . "\t" . $postctl['postend']. "\t" . $postctl['postendminute'];
 		$config['opensch'] = $schctl['opensch'] . "\t" . $schctl['schstart'] . "\t" . $schctl['schend'];
 		strlen($config['visituser']) > 0 && $config['visituser'] = ',' . trim($config['visituser']) . ',';
 		$config['visitgroup'] = $visitgroup ? ',' . implode(',', $visitgroup) . ',' : '';
@@ -773,7 +783,8 @@ if ($_POST['step'] != 2) {
 			$config['watermark'] = 0;
 		}
 		$config['athumbsize'] = $athumbsize['athumbwidth'] . "\t" . $athumbsize['athumbheight'];
-		@include_once pwCache::getPath(D_P . 'data/bbscache/ftp_config.php');
+		//* @include_once pwCache::getPath(D_P . 'data/bbscache/ftp_config.php');
+		pwCache::getData(D_P . 'data/bbscache/ftp_config.php');
 		if ($ftp['pass'] == substr($ftp_pass, 0, 1) . '********' . substr($ftp_pass, -1)) {
 			$ftp['pass'] = $ftp_pass;
 		}
@@ -869,7 +880,7 @@ if ($_POST['step'] != 2) {
 		}
 		S::gp(array('reg'), 'P', 0);
 
-		S::gp(array('namelen', 'pwdlen', 'regcredit'), 'P', 2);
+		S::gp(array('namelen', 'pwdlen', 'regcredit','authreg'), 'P', 2);
 		$reg['email'] = trim($reg['email'], ',');
 		$reg['banemail'] = trim($reg['banemail'], ',');
 		$reg['banname'] = trim($reg['banname'], ',');
@@ -877,9 +888,9 @@ if ($_POST['step'] != 2) {
 		$reg['rgpermit'] = nl2br(ieconvert($reg['rgpermit']));
 		$reg['welcomemsg'] = ieconvert($reg['welcomemsg']);
 		$reg['whyregclose'] = ieconvert($reg['whyregclose']);
-		if (abs($reg['timeend'] - $reg['timestart']) > 150) {
-			adminmsg('reg_timelimit');
-		}
+		if($reg['emailcheck'] == 0){
+			pwQuery::update('pw_members',1, 1, array('yz'=>1));
+		} 
 		if ($namelen['max'] < 1 || $namelen['max'] > 15) {
 			$namelen['max'] = 15;
 		}
@@ -970,7 +981,8 @@ if ($_POST['step'] != 2) {
 			}
 		} else {
 			//mail
-			@include_once pwCache::getPath(D_P . 'data/bbscache/mail_config.php');
+			//* @include_once pwCache::getPath(D_P . 'data/bbscache/mail_config.php');
+			pwCache::getData(D_P . 'data/bbscache/mail_config.php');
 			$s_ml_smtppass = substr($ml_smtppass, 0, 1) . '********' . substr($ml_smtppass, -1);
 			$mail['smtppass'] = $s_ml_smtppass == $mail['smtppass'] ? $ml_smtppass : $mail['smtppass'];
 			(int) $mail['smtpport'] < 1 && $mail['smtpport'] = 25;

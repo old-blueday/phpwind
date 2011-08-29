@@ -10,6 +10,10 @@ $t_db = (array)$foruminfo['topictype'];
 $tdbJson = array();
 if ($t_db) {
 	foreach ($t_db as $key => $value) {
+		if ($value['ifsys'] && $gp_gptype != 'system') {
+			unset($t_db[$key]);
+			continue;
+		}
 		$tdbJson[$value['id']]['name'] = strip_tags($value['name']);
 		$tdbJson[$value['id']]['upid'] = $value['upid'];
 		if ($value['upid'] != 0) {
@@ -118,6 +122,8 @@ if (empty($_POST['step'])) {
 
 	$attach = '';
 	if ($atcdb['attachs']) {
+		ksort($atcdb['attachs']);
+		reset($atcdb['attachs']);
 		foreach ($atcdb['attachs'] as $key => $value) {
 			list($value['attachurl'],) = geturl($value['attachurl'],'lf');
 			$attach .= "'$key' : ['$value[name]', '$value[size]', '$value[attachurl]', '$value[type]', '$value[special]', '$value[needrvrc]', '$value[ctype]', '$value[descrip]'],";
@@ -148,7 +154,7 @@ if (empty($_POST['step'])) {
 	$htmcheck = $atcdb['ifsign'] < 2 ? '' : 'checked';
 	//$htmlpost = !$htmlpost &&  ? 'checked' : ''; //TODO 回复隐藏
 	!$ifanonymous && $atcdb['anonymous'] && $ifanonymous = 'checked';
-	!$htmlatt && $atcdb['ifhide'] && $htmlatt = 'checked';
+	!$attachHide && $atcdb['ifhide'] && $attachHide = 'checked';
 	$atc_title = $atcdb['subject'];
 	$icon = (int)$atcdb['icon'];
 	$replayorder = bindec(getstatus($atcdb['tpcstatus'],4).getstatus($atcdb['tpcstatus'],3));
@@ -178,6 +184,7 @@ if (empty($_POST['step'])) {
 	require_once(R_P.'require/header.php');
 	$msg_guide = $pwforum->headguide($guidename);
 	$postMinLength = empty($pwpost->forum->foruminfo['forumset']['contentminlen']) ? $db_postmin : $pwpost->forum->foruminfo['forumset']['contentminlen'];
+
 	require_once PrintEot('post');footer();
 
 } elseif ($_POST['step'] == 1) {
@@ -192,6 +199,10 @@ if (empty($_POST['step'])) {
 	$pw_posts = GetPtable('N', $tid);
 	$rt = $db->get_one("SELECT COUNT(*) AS count FROM $pw_posts WHERE tid=".S::sqlEscape($tid)." AND ifcheck='1'");
 	$count = $rt['count'] + 1;
+	//admincheck
+	$isGM = S::inArray($windid,$manager);
+	$isBM = admincheck($foruminfo['forumadmin'],$foruminfo['fupadmin'],$windid);
+	$admincheck = ($isGM || $isBM) ? 1 : 0;
 	if ($article == 0 && !$admincheck && $count > 1) {
 		Showmsg('modify_replied');
 	}
@@ -339,15 +350,15 @@ if (empty($_POST['step'])) {
 		$StaticPage->update($tid);
 	}
 	if ($deltype == 'delrp') {
-		refreshto("read.php?tid=$tid",'enter_thread');
+		refreshto("read.php?tid=$tid",'after_delete');
 	} else {
-		refreshto("thread.php?fid=$fid",'enter_thread');
+		refreshto("thread.php?fid=$fid",'after_delete');
 	}
 } elseif ($_POST['step'] == 2) {
 
 	S::gp(array('atc_title','atc_content'), 'P', 0);
 	S::gp(array('atc_email','replayorder','atc_anonymous','atc_newrp','atc_tags','atc_hideatt','magicid','magicname','atc_enhidetype','atc_credittype','flashatt'),'P');
-	S::gp(array('atc_iconid','atc_hide','atc_requireenhide','atc_rvrc','atc_requiresell','atc_money', 'atc_usesign', 'atc_html', 'p_type', 'p_sub_type', 'atc_convert', 'atc_autourl'), 'P', 2);
+	S::gp(array('atc_iconid','atc_hide','atc_requireenhide','atc_rvrc','atc_requiresell','atc_money', 'atc_usesign', 'atc_html', 'p_type', 'p_sub_type', 'atc_convert', 'atc_autourl','isAttachOpen'), 'P', 2);
 
 	S::gp(array('iscontinue'),'P');//ajax提交时有敏感词时显示是否继续
 	($db_sellset['price'] && (int) $atc_money > $db_sellset['price']) && Showmsg('post_price_limit');
@@ -359,11 +370,11 @@ if (empty($_POST['step'])) {
 		$postdata->setTags($atc_tags);
 		$postdata->setMagic($magicid,$magicname);
 		$postdata->setIfmail($atc_email, $atc_newrp);
-		if($replayorder == 1){
+		if ($replayorder == 1) {
 			$postdata->setStatus('3','01');
 		} elseif ($replayorder == 2) {
 			$postdata->setStatus('3','10');
-		}else{
+		} else {
 			$postdata->setStatus('3','00');
 		}
 	} else {
@@ -376,7 +387,7 @@ if (empty($_POST['step'])) {
 
 	$postdata->setConvert($atc_convert, $atc_autourl);
 	$postdata->setAnonymous($atc_anonymous);
-	$postdata->setHideatt($atc_hideatt);
+	$isAttachOpen && $postdata->setHideatt($atc_hideatt);
 	$postdata->setIconid($atc_iconid);
 	$postdata->setIfsign($atc_usesign, $atc_html);
 
@@ -392,7 +403,7 @@ if (empty($_POST['step'])) {
 	if ($postmodify->hasAtt()) {
 		S::gp(array('keep','oldatt_special','oldatt_needrvrc'), 'P', 2);
 		S::gp(array('oldatt_ctype','oldatt_desc'), 'P');
-		$postmodify->initAttachs($keep, $oldatt_special, $oldatt_needrvrc, $oldatt_ctype, $oldatt_desc);
+		$postmodify->initAttachs(/*$keep, */$oldatt_special, $oldatt_needrvrc, $oldatt_ctype, $oldatt_desc);
 	}
 	L::loadClass('attupload', 'upload', false);
 	/*上传错误检查
@@ -400,11 +411,10 @@ if (empty($_POST['step'])) {
 	$return !== true && Showmsg($return);
 	end*/
 	if (PwUpload::getUploadNum() || $flashatt) {
-		$postdata->att = new AttUpload($winduid, $flashatt);
+		S::gp(array('savetoalbum', 'albumid'), 'P', 2);
+		$postdata->att = new AttUpload($winduid, $flashatt, $savetoalbum, $albumid);
 		$postdata->att->check();
-		$postdata->att->transfer();
 		$postdata->att->setReplaceAtt($postmodify->replacedb);
-		PwUpload::upload($postdata->att);
 	}
 	$postdata->iscontinue = $iscontinue;
 	$postmodify->execute($postdata);
@@ -425,20 +435,27 @@ if (empty($_POST['step'])) {
 		$postActForBbs->initData();
 		$postActForBbs->insertData($tid,$fid);
 	}
-	defined('AJAX') && $pinfo = "success\t" . "read.php?tid=$tid&page=$page&toread=1#$pid";
+	if ($postmodify->type == 'topic') {
+		$isAtcEmail = (int) $atc_email;
+		$isAtcNewrp = (int) $atc_newrp;
+		$userService = L::loadClass('UserService', 'user');
+		$userService->setUserStatus($winduid, PW_USERSTATUS_REPLYEMAIL, $isAtcEmail);
+		$userService->setUserStatus($winduid, PW_USERSTATUS_REPLYSITEEMAIL, $isAtcNewrp);
+	}
+	defined('AJAX') && $pinfo = "success\t" . "read.php?tid=$tid&displayMode=1&page=$page&toread=1#$pid";
 	$flag = false;
 	if(!$iscontinue){
 		if ($postdata->getIfcheck()) {
 			if($prompts = $pwpost->getprompt()){
-				isset($prompts['allowhide'])   && $pinfo = "post_limit_hide";
-				isset($prompts['allowsell'])   && $pinfo = "post_limit_sell";
-				isset($prompts['allowencode']) && $pinfo = "post_limit_encode";
+				isset($prompts['allowhide'])   && $pinfo = getLangInfo('refreshto',"post_limit_hide");
+				isset($prompts['allowsell'])   && $pinfo = getLangInfo('refreshto',"post_limit_sell");
+				isset($prompts['allowencode']) && $pinfo = getLangInfo('refreshto',"post_limit_encode");
 			}else{
-				defined('AJAX') && $pinfo = "success\t" . "read.php?tid=$tid&page=$page&toread=1#$pid";
+				defined('AJAX') && $pinfo = "success\t" . "read.php?tid=$tid&displayMode=1&page=$page&toread=1#$pid";
 			}
 		}
 	}
 	defined('AJAX') && $flag && $pinfo = "continue\t" . getLangInfo('refreshto', $pinfo);	
-	refreshto("read.php?tid=$tid&page=$page&toread=1#$pid", $pinfo);
+	refreshto("read.php?tid=$tid&displayMode=1&page=$page&toread=1#$pid", $pinfo);
 }
 ?>

@@ -24,7 +24,6 @@ class ActivityUpload extends uploadBehavior {
 			'jpeg' => $maxfilesize,				'bmp'  => $maxfilesize,
 			'png'  => $maxfilesize
 		);
-
 	}
 
 	function allowType($key) {
@@ -89,6 +88,7 @@ class ActivityUpload extends uploadBehavior {
 				$this->attachs['fileuploadurl'] = $value['fileuploadurl'];
 			}
 		}
+		return true;
 	}
 
 	function getAttachs() {

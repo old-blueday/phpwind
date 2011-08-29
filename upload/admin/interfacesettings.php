@@ -1,6 +1,6 @@
 <?php
 !defined('P_W') && exit('Forbidden');
-include_once pwCache::getPath(D_P . 'admin/cache.php');
+include_once (D_P . 'admin/cache.php');
 S::gp(array('$adminitem'));
 empty($adminitem) && $adminitem = 'index';
 $basename = "$admin_file?adminjob=interfacesettings&adminitem=".$adminitem;
@@ -50,6 +50,7 @@ if ($_POST['step'] != 2) {
 		ifcheck($db_threademotion, 'threademotion');
 		ifcheck($db_threadshowpost, 'threadshowpost');
 		ifcheck($db_threadsidebarifopen, 'threadsidebarifopen');
+		${'hits_store_' . intval($db_hits_store)} = 'CHECKED';
 		include PrintEot('interfacesettings');exit;
 	}
 	if ($adminitem == 'read' || $settingdb['read']) {
@@ -76,6 +77,7 @@ if ($_POST['step'] != 2) {
 		ifcheck($db_ifonlinetime, 'ifonlinetime');
 		ifcheck($db_threadrelated, 'threadrelated');
 		ifcheck($db_sharesite, 'sharesite');
+		ifcheck($db_readinfo, 'readinfo');
 		include PrintEot('interfacesettings');exit;
 	}
 	if ($adminitem == 'popinfo' || $settingdb['popinfo']) {
@@ -109,6 +111,13 @@ if ($_POST['step'] != 2) {
 	}
 	if ($adminitem == 'thread' || $settingdb['thread']) {
 		(int) $config['perpage'] < 1 && $config['perpage'] = 25;
+		
+		// pw_hits_threads 和 pw_threads数据互导
+		if ($db_hits_store == 1){ // 已经开启数据库缓存
+			$db->update('UPDATE pw_threads t INNER JOIN pw_hits_threads h ON t.tid=h.tid SET t.hits=h.hits') || adminmsg('将pw_hits_threads数据导入pw_threads时失败');
+		}else if($config['hits_store'] == 1){ // 现在开启使用数据库缓存
+			$db->update('REPLACE INTO pw_hits_threads (tid,hits) (SELECT tid,hits FROM pw_threads)') || adminmsg('将pw_threads数据导入pw_hits_threads时失败');
+		}
 	}
 	if ($adminitem == 'read' || $settingdb['read']) {
 		S::gp(array('showcustom'), 'P');
@@ -145,13 +154,14 @@ if ($_POST['step'] != 2) {
 	if ($adminitem == 'popinfo' || $settingdb['popinfo']) {
 		S::gp(array('sitemsg'), 'P');
 		$config['bindurl'] = trim($config['bindurl'], ',');
-		$sitemsg['reg'] = explode("\n", $sitemsg['reg']);
-		$sitemsg['login'] = explode("\n", $sitemsg['login']);
-		$sitemsg['post'] = explode("\n", $sitemsg['post']);
-		$sitemsg['reply'] = explode("\n", $sitemsg['reply']);
+		$sitemsg['reg'] = explode("\n", stripslashes($sitemsg['reg']));
+		$sitemsg['login'] = explode("\n", stripcslashes($sitemsg['login']));
+		$sitemsg['post'] = explode("\n", stripslashes($sitemsg['post']));
+		$sitemsg['reply'] = explode("\n", stripslashes($sitemsg['reply']));
 		$config['sitemsg'] = is_array($sitemsg) ? $sitemsg : array();
 	}
 	saveConfig();	
+	
 	if($adminFileChanged){
 		/*@fix 更改admin_file后引起的的404错误 */
 		echo '<script language="JavaScript">parent.location.href = "'.$config['adminfile'].'";</script>';

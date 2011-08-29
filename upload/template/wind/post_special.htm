@@ -11,7 +11,7 @@ EOT;
 if ($special == '1') {print <<<EOT
 -->
 	<tbody>
-		<tr class="f_two pp"><td width="90"><b>投票限制条件:</b></td><td>&nbsp;</td></tr>
+		<tr class="f_two pp"><td width="110"><b>投票限制条件:</b></td><td>&nbsp;</td></tr>
 		<tr class="pp">
 			<td>有效天数:</td>
 			<td><input class="input" type="text" name="timelimit" value="$set[timelimit]" size="1" $set[voteable] tabindex="3"/><span style="padding-right:3em;">
@@ -58,7 +58,7 @@ EOT;
 		</tr>
 	</tbody>
 	<tbody><tr class="pp f_two"><td>投票选项:</td>
-		<td>
+		<td id="voteoptions">
 <!--
 EOT;
 if ($action == 'modify') {
@@ -72,21 +72,52 @@ EOT;
 			<input class="input" type="text" maxLength="60" name="vt_selarray[]" size="60" value="" $set[voteable] tabindex="14"/> 新的投票项（留空忽略）<br />
 <!--
 EOT;
-} else {print <<<EOT
+} else {
+$db_selcount = (int) $db_selcount;
+print <<<EOT
 -->
-			<textarea name="vt_select" wrap="hard" tabindex="15" class="textareaA mb5">$vt_select</textarea>
+			选项：最多可填写{$db_selcount}个选项<br />
+			<span id="basevoteoption"><input class="input" type="text" style="margin-top:5px;" maxLength="60" name="vt_select[]" size="60" tabindex="15"/><a href="javascript:;" style="display:none;" onclick="deleteVoteOption(this);return false;"> 删除 </a><br /></span>
+<!--
+EOT;
+for ($i=0;$i<$db_selcount && $i <3;$i++) {
+print <<<EOT
+-->
+			<span><input class="input" type="text" style="margin-top:5px;" maxLength="60" name="vt_select[]" size="60" tabindex="15"/><a href="javascript:;" onclick="deleteVoteOption(this);return false;"> 删除 </a><br /></span>
 <!--
 EOT;
 }print <<<EOT
---><p class="s6">每行写一个投票选项，最多可以有 $db_selcount 个选项</p>
+--><p id="addVoteButton" class="s6"><a href="javascript:;" onclick="addVoteOption();return false;">增加一项</a></p>
+<!--
+EOT;
+}print <<<EOT
+-->
 		</td>
 	</tr></tbody>
+<script language="javascript">
+var selCount = $db_selcount;
+	function deleteVoteOption(obj) {
+		delElement(obj.parentNode);
+	}
+
+	function addVoteOption() {
+		var totalSpanNum = getObj('voteoptions').getElementsByTagName('span');
+		if (totalSpanNum.length >= selCount) return false;
+		var source = getObj('basevoteoption');
+		var target = source.cloneNode(true);
+		var aTag = target.getElementsByTagName('a');
+		aTag[0].style.display = '';
+		target.firstChild.value = '';
+		target.removeAttribute('id');
+		getObj('voteoptions').insertBefore(target, getObj('addVoteButton'));
+	}
+</script>
 <!--
 EOT;
 } elseif ($special == '2') { print <<<EOT
 -->
 		<tr class="f_two pp">
-			<td width="80">活动标题:<span class="s1">*</span></td>
+			<td width="110">活动标题:<span class="s1">*</span></td>
 			<td><input class="input input_wb" type="text" name="act_subject" value="$set[subject]" /></td>
 		</tr>
 		<tr class="pp">
@@ -161,7 +192,7 @@ EOT;
 } elseif ($special == '4') {print <<<EOT
 -->
 	<tr class="pp f_two">
-		<td width="80">商品名称:</td>
+		<td width="110">商品名称:</td>
 		<td><input class="input input_wa mr10" name="goodsname" value="$set[name]" size="30" /> <select name="degree"><option value="0" $set[degree_0]>全新</option><option value="1" $set[degree_1]>二手</option></select></td>
 	</tr>
 	<tr class="pp f_two">
@@ -204,7 +235,7 @@ EOT;
 		</td>
 	</tr>
 <script language="JavaScript">
-attachnum--;
+//attachnum--;
 function showmethod(v) {
 	getObj('logistics').style.display = v == 1 ? '' : 'none';
 }
@@ -215,7 +246,7 @@ EOT;
 } elseif ($special == '5') {print <<<EOT
 -->
 	<tbody>
-		<tr class="pp f_two"><td width="80">辩论结束时间:</td>
+		<tr class="pp f_two"><td width="110">辩论结束时间:</td>
 			<td><input class="input input_wa" type="text" name="endtime" value="$set[endtime]" id="endtime" onClick="javascript:ShowCalendar(this.id,1)" size="20" $set[debateable] />
 			</td>
 		</tr>

@@ -156,6 +156,10 @@ EOT;
       <td class="td1">按主题作者删除</td>
       <td class="td2"><input type="text" class="input input_wa mr20" name="author">可使用通配符 "*"，多个作者用英文半角逗号","分隔</td>
     </tr>
+     <tr class="tr1 vt">
+      <td class="td1">按作者UID删除</td>
+      <td class="td2"><input type="text" class="input input_wa mr20" name="authorid">多个UID用英文半角逗号","分隔</td>
+    </tr>
     <tr class="tr1 vt">
       <td class="td1">关键字</td>
       <td class="td2"><input type="text" class="input input_wa mr20" name="keyword">可使用通配符 "*"，多个关键字用英文半角逗号","分隔</td>
@@ -332,6 +336,7 @@ EOT;
           </tr>
 <!--
 EOT;
+if ($topicdb) {
 foreach($topicdb as $key=>$topic){
 if(!$topic[subject])continue;
 print <<<EOT
@@ -348,7 +353,14 @@ print <<<EOT
           </tr>
 <!--
 EOT;
-}print <<<EOT
+}}else{
+print <<<EOT
+-->
+		<tr><td class="p10" colspan="8"><div class="admin_tips">啊哦，没有你要的信息！</div></td></tr>
+<!--
+EOT;
+}
+print <<<EOT
 -->
         </table>
     </div>

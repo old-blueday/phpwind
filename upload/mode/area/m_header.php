@@ -3,7 +3,8 @@
 S::gp(array('alias','ifactive'),'G');
 
 extract(L::style('',$skinco));
-include_once pwCache::getPath(D_P.'data/bbscache/area_config.php');
+//* include_once pwCache::getPath(D_P.'data/bbscache/area_config.php');
+pwCache::getData(D_P.'data/bbscache/area_config.php');
 $chanelService = L::loadClass('channelService', 'area');
 $channelInfo = $chanelService->getChannelInfoByAlias($alias);
 $areaLevelService = L::loadClass('arealevel', 'area');

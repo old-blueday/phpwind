@@ -8,7 +8,11 @@ if (!$theSpecialFlag) {//分类、团购、活动不启用主题分类
 	$tdbJson = array();
 	if ($t_db) {
 		foreach ($t_db as $key => $value) {
-			$tdbJson[$value['id']]['name'] = strip_tags($value['name']);
+			if ($value['ifsys'] && $gp_gptype != 'system') {
+				unset($t_db[$key]);
+				continue;
+			}
+			$tdbJson[$value['id']]['name'] = $value['name'];
 			$tdbJson[$value['id']]['upid'] = $value['upid'];
 			if ($value['upid'] != 0) {
 				$tdbJson[$value['upid']]['sub'][] = $value['id'];
@@ -30,7 +34,6 @@ if (!$pwforum->foruminfo['allowpost'] && !$pwpost->admincheck && $_G['allowpost'
 	Showmsg('postnew_group_right');
 }
 $postSpecial = null;
-
 if ($special && file_exists(R_P . "lib/forum/special/post_{$special}.class.php")) {
 	L::loadClass("post_{$special}", 'forum/special', false);
 	$postSpecial = new postSpecial($pwpost);
@@ -88,6 +91,7 @@ if (empty($_POST['step'])) {
 	require_once PrintEot('post');footer();
 
 } elseif ($_POST['step'] == 2) {
+
 	S::gp(array('atc_title','atc_content'), 'P', 0);
 	S::gp(array('replayorder','atc_anonymous','atc_newrp','atc_tags','atc_hideatt','magicid','magicname','atc_enhidetype','atc_credittype','flashatt'),'P');
 	S::gp(array('atc_iconid','atc_email','digest','topped','atc_hide','atc_requireenhide','atc_rvrc','atc_requiresell','atc_money', 'atc_usesign', 'atc_html', 'p_type', 'p_sub_type', 'atc_convert', 'atc_autourl'), 'P', 2);
@@ -142,14 +146,13 @@ if (empty($_POST['step'])) {
 	$return !== true && Showmsg($return);
 	end*/
 	if (PwUpload::getUploadNum() || $flashatt) {
-		$postdata->att = new AttUpload($winduid, $flashatt);
+		S::gp(array('savetoalbum', 'albumid'), 'P', 2);
+		$postdata->att = new AttUpload($winduid, $flashatt, $savetoalbum, $albumid);
 		$postdata->att->check();
-		$postdata->att->transfer();
-		PwUpload::upload($postdata->att);
 	}
 	$postdata->iscontinue = (int)$iscontinue;
 	$topicpost->execute($postdata);
-
+	
 	$tid = $topicpost->getNewId();
 	defined('AJAX') && $pinfo = $pinfo.$tid;
 
@@ -165,13 +168,19 @@ if (empty($_POST['step'])) {
 	if ($postActForBbs) {//活动初始化
 		$postActForBbs->insertData($tid,$fid);
 	}
-	$j_p = "read.php?tid=$tid";
+	$isAtcEmail = (int) $atc_email;
+	$isAtcNewrp = (int) $atc_newrp;
+	$userService = L::loadClass('UserService', 'user');
+	$userService->setUserStatus($winduid, PW_USERSTATUS_REPLYEMAIL, $isAtcEmail);
+	$userService->setUserStatus($winduid, PW_USERSTATUS_REPLYSITEEMAIL, $isAtcNewrp);
+
+	$j_p = "read.php?tid=$tid&displayMode=1";
 	if ($db_htmifopen)
 		$j_p = urlRewrite ( $j_p );
-	if (empty($j_p) || $pwforum->foruminfo['cms']) $j_p = "read.php?tid=$tid";
+	if (empty($j_p) || $pwforum->foruminfo['cms']) $j_p = "read.php?tid=$tid&displayMode=1";
 	$pinfo = defined('AJAX') ? "success\t" . $j_p  : "";
 	
-	if(!$iscontinue){
+	if (!$iscontinue) {
 		if ($postdata->getIfcheck()) {
 			if($prompts = $pwpost->getprompt()){
 				isset($prompts['allowhide'])   && $pinfo = getLangInfo('refreshto',"post_limit_hide");

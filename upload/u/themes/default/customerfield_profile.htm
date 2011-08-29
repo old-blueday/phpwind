@@ -1,0 +1,254 @@
+<!--<?php
+!defined('P_W') && exit('Forbidden');
+L::loadClass('CustomerFieldTemplate', 'user',false);
+
+class customerFieldProfileTemplate extends PW_CustomerFieldTemplate {
+	var $disabled = false;/*是否允许修改*/
+	function customerFieldRegisterTemplate(){
+		parent::PW_CustomerFieldTemplate();
+	}
+	
+	function formatRequriedHtml(){
+		$this->requriedHtml = $this->fieldInfo['required'] ? '<span class="s1">*</span>' : '';
+	}
+	function formatDescripHtml(){
+		if (!$this->fieldInfo['descrip'] && $this->fieldInfo['type'] == $this->pwCustomerField->typeMap['input']){
+			$this->fieldInfo['descrip'] = $this->fieldInfo['maxlen'] ? '限'.$this->fieldInfo['maxlen'].'字节' : '';
+		}
+		$this->descripHtml = $this->fieldInfo['descrip'] ? '':' style="display:none"';
+	}
+
+	function getTemplateInput(){
+		return <<<EOT
+-->
+		<tr>
+            <th class="th">
+				{$this->fieldInfo['title']}{$this->requriedHtml}
+            </th>
+            <td class="td">
+                <input class="input input_wa mr10" {$this->disabledHtml} type="text" maxlength="{$this->fieldInfo['maxlen']}" name="{$this->fieldInfo['fieldname']}" value="{$this->defaultValueHtml}" />
+                <span {$this->descripHtml}>
+                    {$this->fieldInfo['descrip']}
+                </span>
+            </td>
+        </tr>
+<!--
+EOT;
+	}
+
+	
+	function getTemplateTextarea(){
+		return <<<EOT
+-->
+		<tr>
+			<th class="th">{$this->fieldInfo['title']}{$this->requriedHtml}</th>
+			<td class="td"><textarea {$this->disabledHtml} name="{$this->fieldInfo['fieldname']}" class="textareaA mb5">{$this->defaultValueHtml}</textarea>
+                <span {$this->descripHtml}>
+                    {$this->fieldInfo['descrip']}
+                </span>
+			</td>
+		</tr>
+<!--
+EOT;
+	}
+	
+	function getTemplateSelect(){	
+		return  <<<EOT
+-->
+		<tr>
+			<th class="th">{$this->fieldInfo['title']}{$this->requriedHtml}</th>
+			<td class="td">{$this->fieldInfo['html_select']}
+                <span {$this->descripHtml}>
+                    {$this->fieldInfo['descrip']}
+                </span>
+			</td>
+		</tr>
+<!--
+EOT;
+	}
+
+	function getTemplateRadio(){
+		return <<<EOT
+-->
+		<tr>
+            <th class="th">
+               {$this->fieldInfo['title']}{$this->requriedHtml}
+            </th>
+            <td class="td">
+                {$this->fieldInfo['html_radio']}
+                <span {$this->descripHtml}>
+                    {$this->fieldInfo['descrip']}
+                </span>
+            </td>
+        </tr>
+<!--
+EOT;
+	}
+	
+	function getTemplateCheckbox(){
+		return <<<EOT
+-->
+		<tr>
+            <th class="th">
+              {$this->fieldInfo['title']}{$this->requriedHtml}
+            </th>
+            <td class="td">
+                {$this->fieldInfo['html_checkbox']}
+                <span {$this->descripHtml}>
+                    {$this->fieldInfo['descrip']}
+                </span>
+            </td>
+        </tr>
+<!--
+EOT;
+	}
+	
+	function getTemplateYear(){
+		return <<<EOT
+-->
+		<tr><th class="th">
+                {$this->fieldInfo['title']}{$this->requriedHtml}
+            </th>
+            <td class="td">
+               {$this->fieldInfo['html_year']}
+                <span {$this->descripHtml}>
+                    {$this->fieldInfo['descrip']}
+                </span>
+            </td>
+        </tr>
+<!--
+EOT;
+	}
+	function getTemplateArea(){	
+		return <<<EOT
+-->
+		<tr>{$this->fieldInfo['html_areascripts']}<th class="th">
+                {$this->fieldInfo['title']}{$this->requriedHtml}
+            </th>
+            <td class="td">
+				{$this->fieldInfo['html_areaprovince']}
+				{$this->fieldInfo['html_areacity']}
+				{$this->fieldInfo['html_areaarea']}
+            </td>
+        </tr>
+<!--
+EOT;
+	}
+
+	function getTemplateEducation(){
+		$htmlAddNew = $this->disabled ? '' : '<p class="regAdd_mode_add"><a href="javascript://" class="s4" onclick="addEducation(\'eduItem\',\'eduBox\');">增加一个新经历</a></p>';
+		return <<<EOT
+-->
+		</table>
+			<div class="regAdd_mode cc">
+				<div class="regAdd_mode_title">教育经历{$this->requriedHtml}</div>
+				<div class="regAdd_mode_div">
+				{$this->fieldInfo['html_eduscripts']}
+				<div id="eduBox">
+				{$this->defaultValueHtml}
+				<div id="eduItem">
+					<!--DEFAULT_VALUE_TEMPLATE-->
+					<!--DELETE_BUTTON--><!--END_DELETE_BUTTON-->
+					<div>
+						<span class="mr10"><!--EDU_LEVEL-->{$this->fieldInfo['html_edulevel']}<!--END_EDU_LEVEL--></span>
+						<span class="mr10">学校名称：<!--EDU_NAME-->{$this->fieldInfo['html_eduname']}<!--END_EDU_NAME--></span>
+						<span class="mr10">入学年份：<!--EDU_YEAR-->{$this->fieldInfo['html_eduyear']}<!--END_EDU_YEAR--></span>
+					</div>
+					<!--END_DEFAULT_VALUE_TEMPLATE-->
+				</div>
+				</div>
+					$htmlAddNew
+				</div>
+			</div>
+			<table class="setTable">
+<!--
+EOT;
+	}
+		
+	function getTemplateCareer(){
+		$htmlAddNew = $this->disabled ? '' : '<p class="regAdd_mode_add"><a href="javascript://" class="s4" onclick="addCareer(\'careerItem\',\'careerBox\');">增加一个新经历</a></p>';
+		return <<<EOT
+-->
+		</table>
+			<div class="regAdd_mode cc">
+				<div class="regAdd_mode_title">工作经历{$this->requriedHtml}</div>
+				<div class="regAdd_mode_div">
+			{$this->fieldInfo['html_careerscripts']}
+				<div id="careerBox">
+					{$this->defaultValueHtml}
+					<div id="careerItem">
+					<!--DEFAULT_VALUE_TEMPLATE-->
+					<!--DELETE_BUTTON--><!--END_DELETE_BUTTON-->
+					<div>
+						<span class="mr10">公司名称：<!--CAREER_NAME-->{$this->fieldInfo['html_careername']}<!--END_CAREER_NAME--></span>
+						<span class="mr10">入职时间：<!--CAREER_DATE-->{$this->fieldInfo['html_careerdate']}<!--END_CAREER_DATE--></span>
+					</div>
+					<!--END_DEFAULT_VALUE_TEMPLATE-->
+					</div>
+				</div>
+					$htmlAddNew
+				</div>
+			</div>
+		   <table class="setTable">
+<!--
+EOT;
+	}
+	
+	function getTemplateAlipay(){
+		global $userdb,$db_authstate;
+		$isAuthAlipay = getstatus($userdb['userstatus'], PW_USERSTATUS_AUTHALIPAY);
+		$template = <<<EOT
+-->
+		<tr>
+            <th class="th">
+				{$this->fieldInfo['title']}{$this->requriedHtml}
+            </th>
+            <td class="td">
+
+<!--
+EOT;
+if ($isAuthAlipay) {$template .= <<<EOT
+-->
+			<div class="s5 mb5">{$this->defaultValueHtml}</div>
+			<ul style="line-height:24px;" class="mb10">
+				<li><span class="s3 mr10">&#8730;已通过身份验证</span><a href="javascript:void(0)" class="mr10"  onclick="window.open('profile.php?action=auth&check_step=alipay', 'alipayCredit', 'height=520, width=1050');">重新验证</a></li>
+<!--
+EOT;
+	if ($this->defaultValueHtml) {$template .= <<<EOT
+-->
+				<li><span class="s3">&#8730;已通过实名认证</span></li>
+<!--
+EOT;
+	} else {$template .=  <<<EOT
+-->
+				<li>尚未通过<a href="http://www.alipay.com" target="_blank">实名认证</a></li>
+<!--
+EOT;
+	}
+$template . <<<EOT
+-->
+			</ul>
+<!--
+EOT;
+} else {$template .= <<<EOT
+-->
+			<input class="input input_wa" type="text" name="alipay" value="{$this->defaultValueHtml}" {$this->disabledHtml} />
+<!--
+EOT;
+	if ($db_authstate) {$template .=  <<<EOT
+-->
+			<a href="javascript:void(0)" class="mr10"  onclick="window.open('profile.php?action=auth&check_step=alipay', 'alipayCredit', 'height=520, width=1050');">[绑定]</a>
+<!--
+EOT;
+	}
+}
+$template .= <<<EOT
+-->
+            </td>
+        </tr>
+<!--
+EOT;
+		return $template;
+	}
+}
+?>-->

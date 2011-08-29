@@ -5,7 +5,8 @@ $basename = "$admin_file?adminjob=creathtm&type=$type";
 $sqladd = "WHERE type<>'category' AND allowvisit='' AND f_type!='hidden' AND cms='0'";
 if (!$action) {
 
-	@include_once pwCache::getPath(D_P.'data/bbscache/forumcache.php');
+	//* @include_once pwCache::getPath(D_P.'data/bbscache/forumcache.php');
+	pwCache::getData(D_P.'data/bbscache/forumcache.php');
 	$num = 0;
 	$forumcheck = "<ul class=\"list_A list_120\">";
 
@@ -24,15 +25,20 @@ if (!$action) {
 } elseif ($_POST['action'] == 'submit') {
 
 	S::gp(array('selid'),'P');
+	$_tmpSelid = $selid;
 	$selid = checkselid($selid);
 	if ($selid === false) {
 		$basename = "javascript:history.go(-1);";
 		adminmsg('operate_error');
 	} elseif ($selid == '') {
-		$db->update("UPDATE pw_forums SET allowhtm='0' $sqladd");
+		//* $db->update("UPDATE pw_forums SET allowhtm='0' $sqladd");
+		$db->update(pwQuery::buildClause("UPDATE :pw_table SET allowhtm='0' $sqladd", array('pw_forums')));
 	} elseif ($selid) {
-		$db->update("UPDATE pw_forums SET allowhtm='1' $sqladd AND fid IN($selid)");
-		$db->update("UPDATE pw_forums SET allowhtm='0' $sqladd AND fid NOT IN($selid)");
+		//* $db->update("UPDATE pw_forums SET allowhtm='1' $sqladd AND fid IN($selid)");
+		//* $db->update("UPDATE pw_forums SET allowhtm='0' $sqladd AND fid NOT IN($selid)");
+		
+		$db->update(pwQuery::buildClause("UPDATE :pw_table SET allowhtm='1' $sqladd AND fid IN(:fid)", array('pw_forums', $_tmpSelid)));
+		$db->update(pwQuery::buildClause("UPDATE :pw_table SET allowhtm='0' $sqladd AND fid NOT IN(:fid)", array('pw_forums', $_tmpSelid)));
 	}
 	updatecache_f();
 	adminmsg('operate_success');
@@ -96,7 +102,8 @@ if (!$action) {
 	}
 } elseif ($_POST['action'] == 'delete') {
 
-	@include_once pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
+	//* @include_once pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
+	pwCache::getData(D_P.'data/bbscache/forum_cache.php');
 	S::gp(array('creatfid'),'P');
 	if (in_array('all',$creatfid)) {
 		$handle = opendir(R_P.$db_readdir.'/');

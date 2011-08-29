@@ -71,7 +71,7 @@ a:hover,.alink a,.link{text-decoration:underline;}
 	.s_select{float:left;border:1px solid #dddddd;border-left:0;margin-right:7px;background:#fff;width:49px;}
 	.s_select h6{display:block;padding:0 15px 0 10px;height:24px;line-height:24px;cursor:pointer;background:url($imgpath/$stylepath/down.png) 35px center no-repeat;color:#666;}
 	.s_select ul{ position:absolute;border:1px solid #dddddd;background:#fff;line-height:22px;width:49px;margin:24px 0 0 -1px;display:none;}
-	.s_select ul li{padding:0 10px;cursor:pointer;}
+	.s_select ul li{padding:0 10px;cursor:pointer;white-space:nowrap;}
 	.s_select ul li:hover{background:#f7f7f7;}
 	.searchA button{width:45px;height:25px;border:0 none;background:url($imgpath/$stylepath/search_btn.png) no-repeat; font-size:14px; font-weight:700;line-height:25px;padding:0 0 3px 0;}
 	.s_tags{padding:3px 0 0 15px; font-size:14px;height:20px;line-height:20px;overflow:hidden;margin:0;}
@@ -156,9 +156,9 @@ a:hover,.alink a,.link{text-decoration:underline;}
 	.tr3 td,.tr3 th{border-bottom:1px dotted #ddd;}
 	.tr3none th,.tr3none td{border-bottom:none;}
 	.tr3 .old,.tr3 .new,.tr3 .lock{padding:10px 5px 10px 45px;color:#444;font-weight:100;height:35px;}
-	.tr3 .old{background:url($imgpath/$stylepath/old.gif) 0 15px no-repeat;}/*旧主题版块*/
-	.tr3 .new{background:url($imgpath/$stylepath/new.gif) 0 15px no-repeat;}/*新主题版块*/
-	.tr3 .lock{background:url($imgpath/$stylepath/lock.gif) 0 15px no-repeat;}/*锁定版块*/
+	.tr3 .old{background:url($imgpath/$stylepath/old.gif) 0 center no-repeat;}/*旧主题版块*/
+	.tr3 .new{background:url($imgpath/$stylepath/new.gif) 0 center no-repeat;}/*新主题版块*/
+	.tr3 .lock{background:url($imgpath/$stylepath/lock.gif) 0 center no-repeat;}/*锁定版块*/
 	.tr2 td,.tr2 th{padding:3px 5px;color:$cbgfont;background:$cbgcolor;border-bottom:1px dotted $cbgborder;}
 	.tr2 th,.tr3 th{font-weight:100;}
 	.tr3 td,.tr3 th{padding:5px;}
@@ -177,6 +177,7 @@ a:hover,.alink a,.link{text-decoration:underline;}
 	.tr4 td{padding:3px 5px;border-bottom:1px solid #eaeaea;color:#666;background:#f9f9f9;}
 	.tr4 td a{color:#9ca86d}
 	.tr4 td .current{color:#333;}
+	.tr4 .link_down{margin-top:2px;display:inline-block;}
 	.z tr:hover td,.z tr:hover th{background-color:#fbfeee;}
 	.bt0 td{border-top:0;}
 	.tr5 td{border:0;}
@@ -196,6 +197,7 @@ a:hover,.alink a,.link{text-decoration:underline;}
 	.pw_ulA li{float:left;border-right:1px solid #ccc;margin-top:8px;}
 	.pw_ulA li a{line-height:14px;height:14px;padding:0 10px;float:left;color:#1b72af;font-weight:100; white-space:nowrap;}
 	.pw_ulA li a:hover{ text-decoration:none;}
+	.pw_ulA li a span{ font-size:12px;}
 	.pw_ulA a span{ font-size:10px;}
 	.pw_ulA li.current a{color:#333; font-weight:700;}
 	/*版主推荐,群组列表*/
@@ -213,7 +215,7 @@ a:hover,.alink a,.link{text-decoration:underline;}
 	.pw_ulD li{padding:0 5px;}
 	.pw_ulD li:hover,.pw_ulD li.hover{background:$tdcolor;}
 	.pw_ulD li.current{background:$tablecolor;}
-	.pw_ulD li a{line-height:22px;height:22px;overflow:hidden;}
+	.pw_ulD li a{line-height:22px;}
 	.pw_ulD li a:hover{ text-decoration:none;}
 	.pw_ulD li del{margin-top:3px;display:none;}
 	.pw_ulD li:hover del,.pw_ulD li.current del,.pw_ulD li.hover del{display:block;}
@@ -225,7 +227,7 @@ a:hover,.alink a,.link{text-decoration:underline;}
 	.sideForum .one dd{display:block;}
 	/*列表侧栏*/
 	.sidebar{float:left;overflow:hidden;margin-right:-1px;margin-bottom:-1px;}
-	.content_thread{background:$forumcolorone;min-height:600px;_height:600px;_float:right;}
+	.content_thread{background:$forumcolorone;_float:right;}
 	.sideClose .content_thread{margin:0;border:0;float:none;}
 	.f_tree{background:#fbfeee;}
 	.fastpost .floot_left{display:none;_width:0;_border:0;}
@@ -320,8 +322,7 @@ a:hover,.alink a,.link{text-decoration:underline;}
 	.blockquote3 .quote{color:#999;font-size:12px;}
 	.blockquote3 .text{padding:0 10px 10px 10px;}
 	/*帖子表格*/
-	.read_form{border-top:1px solid $tdcolor;border-left:1px solid $tdcolor;}
-	.read_form td{height:20px;padding:0 5px;border-right:1px solid $tdcolor;border-bottom:1px solid $tdcolor;}
+	.read_form td{height:20px;padding:0 5px;border-style:solid; border-width:1px;}
 	/*分割线*/
 	.sigline {background: url($imgpath/$stylepath/read/sigline.gif) left bottom no-repeat;height:16px;}
 	/*帖子签名*/
@@ -331,11 +332,9 @@ a:hover,.alink a,.link{text-decoration:underline;}
 	.tpc_content .down:hover{ text-decoration:none;color:#ff5500;}
 	/*分类信息*/
 	.cates{margin:0 0 10px;border-top:1px solid #e4e4e4; font-size:12px;}
-	.cates .cate-list li{line-height:28px;min-heiht:28px;_height:28px;font-weight:500;color:#444444; list-style:none;border-bottom:1px solid #e4e4e4;padding-left:110px;}
-	.cates .cate-list li{*zoom:1;}
-	.cates .cate-list li:after{content:'\20';display:block;height:0;clear:both;visibility: hidden;}
-	.cates .cate-list em{ font-style:normal;width:100px;float:left; text-align:right; font-weight:700;margin-left:-110px;}
-	.cates .cate-list cite{font-style:normal;}
+	.cates .cate-list li{line-height:1.5;font-weight:500;color:#444444;list-style:none;border-bottom:1px solid #e4e4e4;padding:5px 0;_padding:6px 0 4px;}
+	.cates .cate-list em{ font-style:normal;width:100px;display:inline-block;text-align:right; font-weight:700;}
+	.cates .cate-list cite{font-style:normal; display:inline-block;width:430px;vertical-align:top;font-family:Simsun;line-height:18px;}
 	.cates input{ vertical-align:middle;}
 	.cates .w{margin-right:10px;}
 	.cates .two{background:#f7f7f7;}
@@ -364,9 +363,9 @@ a:hover,.alink a,.link{text-decoration:underline;}
 	.sharelink{border-bottom:1px dotted #ddd;padding:5px 0;word-break: keep-all;}
 	.sharelink dt{padding-top:3px;}
 	.sharelink dd a{color:#369;}
-	.sharelink2{padding:5px 0;}
-	.sharelink2 a{margin-right:10px; white-space:nowrap;float:left;}
-	.sharelink2 img{margin-right:10px;}
+	.sharelink2{padding:5px 0 0;*padding:5px 0;}
+	.sharelink2 a{margin:0 10px 5px 0;white-space:nowrap;float:left;}
+	.sharelink2 img{float:left;}
 	/*生日会员*/
 	.brithcache span{float:left;width:100px;line-height:22px;height:22px;overflow:hidden;}
 /*底部*/
@@ -415,7 +414,7 @@ ul#post_typeChoose a{padding:0;}
 .regForm .ip div.current{background:#e0f9d0;}
 .regForm .ip div.hover,.regForm .ip div:hover{background:#fffbde;border:1px solid;border-color:#555 #aaa #aaa #555;}
 .regForm .ip input{border:0;padding:0;margin:0;font:14px/15px Arial;background:none;width:100%;padding-top:2px;width:222px;*width:218px; font-weight:700;color:#333;}
-.regForm .tp div{padding:5px 10px 5px 28px;position:absolute;line-height:16px;white-space:nowrap;}
+.regForm .tp div{padding:5px 10px 5px 28px;position:absolute;line-height:16px;}
 .regForm .tp .correct{border:0;background:url($imgpath/register/regright.png) 6px 6px no-repeat;height:20px;}
 .regForm .tp .ignore{border:1px solid #e8e8e8;background:#f9f9f9 url($imgpath/register/tp.png) 6px 6px no-repeat;color:#999;}
 .regForm .tp .wrong{border:1px solid #ebadb0;background:#fff2f5 url($imgpath/register/regwrong.png) 6px 5px no-repeat;color:#b52726;padding-left:28px;}
