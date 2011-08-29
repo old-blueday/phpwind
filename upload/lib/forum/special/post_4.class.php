@@ -46,7 +46,7 @@ class postSpecial {
 			'paym_4'	=> '',
 			'tspt_1'	=> 'checked'
 		);
-		$tinfo = $this->db->get_value("SELECT tradeinfo FROM pw_memberinfo WHERE uid=" . pwEscape($this->post->uid));
+		$tinfo = $this->db->get_value("SELECT tradeinfo FROM pw_memberinfo WHERE uid=" . S::sqlEscape($this->post->uid));
 		if (is_array($tinfo = unserialize($tinfo))) {
 			$tinfo['alipay'] && $set['paym_2'] = 'checked';
 			$tinfo['tradetype'] && $set['tradetype'] = $tinfo['tradetype'];
@@ -55,7 +55,7 @@ class postSpecial {
 	}
 
 	function resetInfo($tid, $atcdb) {
-		$reset = $this->db->get_one("SELECT t.*,mb.tradeinfo FROM pw_trade t LEFT JOIN pw_memberinfo mb USING(uid) WHERE t.tid=" . pwEscape($tid));
+		$reset = $this->db->get_one("SELECT t.*,mb.tradeinfo FROM pw_trade t LEFT JOIN pw_memberinfo mb USING(uid) WHERE t.tid=" . S::sqlEscape($tid));
 		$reset['tspt_' . $reset['transport']] = 'checked';
 		$reset['degree_' . $reset['degree']] = 'selected';
 		for ($i = 0; $i < 2; $i++) {
@@ -68,21 +68,21 @@ class postSpecial {
 	}
 
 	function _setData() {
-		$goodsname	= Char_cv(GetGP('goodsname'));
-		$price		= Char_cv(GetGP('price'));
-		$costprice	= Char_cv(GetGP('costprice'));
-		$locus		= Char_cv(GetGP('locus'));
-		$mailfee	= Char_cv(GetGP('mailfee'));
-		$expressfee	= Char_cv(GetGP('expressfee'));
-		$emsfee		= Char_cv(GetGP('emsfee'));
+		$goodsname	= S::escapeChar(S::getGP('goodsname'));
+		$price		= S::escapeChar(S::getGP('price'));
+		$costprice	= S::escapeChar(S::getGP('costprice'));
+		$locus		= S::escapeChar(S::getGP('locus'));
+		$mailfee	= S::escapeChar(S::getGP('mailfee'));
+		$expressfee	= S::escapeChar(S::getGP('expressfee'));
+		$emsfee		= S::escapeChar(S::getGP('emsfee'));
 
-		$degree = intval(GetGP('degree'));
-		$ptype = intval(GetGP('ptype'));
-		$goodsnum = intval(GetGP('goodsnum'));
-		$paymethod	= Char_cv(GetGP('paymethod'), 1);
-		$transport = intval(GetGP('transport'));
+		$degree = intval(S::getGP('degree'));
+		$ptype = intval(S::getGP('ptype'));
+		$goodsnum = intval(S::getGP('goodsnum'));
+		$paymethod	= S::escapeChar(S::getGP('paymethod'), 1);
+		$transport = intval(S::getGP('transport'));
 
-		!$goodsname && $goodsname = Char_cv($_POST['atc_title']);
+		!$goodsname && $goodsname = S::escapeChar($_POST['atc_title']);
 		if (!is_numeric($costprice) || $costprice <= 0) {
 			Showmsg('goods_setprice');
 		}
@@ -135,7 +135,7 @@ class postSpecial {
 	function insertData($tid) {
 		$this->data['tid'] = $tid;
 		$this->_setIcon();
-		$this->db->update("INSERT INTO pw_trade SET " . pwSqlSingle($this->data));
+		$this->db->update("INSERT INTO pw_trade SET " . S::sqlSingle($this->data));
 	}
 
 	function modifyData($tid) {
@@ -155,7 +155,7 @@ class postSpecial {
 		);
 		$this->data['icon'] && $pwSQL['icon'] = $this->data['icon'];
 
-		$this->db->update("UPDATE pw_trade SET " . pwSqlSingle($pwSQL) . " WHERE tid=" . pwEscape($tid));
+		$this->db->update("UPDATE pw_trade SET " . S::sqlSingle($pwSQL) . " WHERE tid=" . S::sqlEscape($tid));
 	}
 }
 ?>

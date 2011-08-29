@@ -3,10 +3,10 @@
 if(!$_G['allowmessege']) Showmsg ( 'msg_group_right' );
 $messageServer = L::loadClass('message', 'message');
 if(!($messageServer->checkUserMessageLevle('sms',1))) Showmsg ( '你已超过每日发送消息数或你的消息总数已满' );
-list(, , , $msgq) = explode("\t", $db_qcheck);
+list(,$showq) = explode("\t", $db_qcheck);
 
 if (empty($_POST['step'])) {
-	InitGP(array('touid','type'));
+	S::gp(array('touid','type'));
 	if(!$touid) Showmsg('请指定发送的用户');
 	$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
 	$reinfo = $userService->get($touid);//uid,username
@@ -19,15 +19,15 @@ if (empty($_POST['step'])) {
 } else {
 	
 	PostCheck(1, $db_gdcheck & 8);
-	InitGP(array(
+	S::gp(array(
 		'msg_title',
 		'pwuser'
 	), 'P');
-	InitGP(array(
+	S::gp(array(
 		'atc_content'
 	), 'P', 0);
 	
-	$atc_content = Char_cv(trim($atc_content));
+	$atc_content = S::escapeChar(trim($atc_content));
 	
 	if (!$atc_content || !$msg_title || !$pwuser) {
 		Showmsg('msg_empty');
@@ -45,7 +45,7 @@ if (empty($_POST['step'])) {
 	if (($banword = $wordsfb->comprise($atc_content, false)) !== false) {
 		Showmsg('content_wordsfb');
 	}
-	$msgq && Qcheck($_POST['qanswer'], $_POST['qkey']);
+	//$msgq && Qcheck($_POST['qanswer'], $_POST['qkey']);
 	
 	$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
 	$rt = $userService->getByUserName($pwuser); //uid,banpm,msggroups

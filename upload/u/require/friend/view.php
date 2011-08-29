@@ -24,7 +24,7 @@ $attentionSerivce = L::loadClass('attention', 'friend'); /* @var $attentionSeriv
 $myAttentionUids = $attentionSerivce->getUidsInFollowListByFriendids($winduid, $uids);
 
 foreach ($friends as $key => $friend) {
-	if (!CkInArray($friend['uid'], $myAttentionUids)) continue;
+	if (!S::inArray($friend['uid'], $myAttentionUids)) continue;
 	$friends[$key]['attention'] = true;
 }
 

@@ -12,47 +12,50 @@ if($managecheck){print <<<EOT
 EOT;
 }else{print <<<EOT
 -->
-			<td class="icon" width="30" style="padding:0;">&nbsp;</td>
+			<td class="icon" width="40" style="padding:0;">&nbsp;</td>
 <!--
 EOT;
-}print <<<EOT
+}
+$newwindowsChecked = $_COOKIE['newwindows']=='1' ? ' checked' : '';
+print <<<EOT
 -->
 			<td class="subject" style="padding-left:0;">
+				<label class="fr mr10 cp" for="newwindows"><input style="padding:0;margin:-1px 3px 0 0;" name="newwindows" id="newwindows" type="checkbox"{$newwindowsChecked} value="1" onclick="xinchuang()" />新窗</label>
 <script language="JavaScript">
-	    var orderThreadsClass = {
-		 	orderThreads : function(orderway){
-				var orderway = orderway || 'lastpost';
-				var form = document.createElement("form");
-				form.action = "{$pageUrl}&page=$page#tabA";
-				form.method = "post";
-				var h_type = this.createInput("hidden","type","$type");
-				var h_search = this.createInput("hidden","search","1000");
-				var h_special = this.createInput("hidden","special","$special");
-				var h_orderway = this.createInput("hidden","orderway",orderway);
-				var h_asc = this.createInput("hidden","asc","DESC");
-				form.appendChild(h_type);
-				form.appendChild(h_search);
-				form.appendChild(h_special);
-				form.appendChild(h_orderway);
-				form.appendChild(h_asc);
-				document.body.appendChild(form);
-				setTimeout(function(){/*ie6*/
-					form.submit();
-				},0);
-				return false;
-			},
-			createInput : function(type,name,value){
-				var hidden = document.createElement("input");
-				hidden.type = type;
-				hidden.name = name;
-				hidden.value = value;//↓
-				return hidden;
-			}
-    	}
-    	function orderThreads(orderway){
-	    	orderThreadsClass.orderThreads(orderway);
-	    }
-	</script>
+var orderThreadsClass = {
+	orderThreads : function(orderway){
+		var orderway = orderway || 'lastpost';
+		var form = document.createElement("form");
+		form.action = "{$pageUrl}&page=$page#tabA";
+		form.method = "post";
+		var h_type = this.createInput("hidden","type","$type");
+		var h_search = this.createInput("hidden","search","1000");
+		var h_special = this.createInput("hidden","special","$special");
+		var h_orderway = this.createInput("hidden","orderway",orderway);
+		var h_asc = this.createInput("hidden","asc","DESC");
+		form.appendChild(h_type);
+		form.appendChild(h_search);
+		form.appendChild(h_special);
+		form.appendChild(h_orderway);
+		form.appendChild(h_asc);
+		document.body.appendChild(form);
+		setTimeout(function(){/*ie6*/
+			form.submit();
+		},0);
+		return false;
+	},
+	createInput : function(type,name,value){
+		var hidden = document.createElement("input");
+		hidden.type = type;
+		hidden.name = name;
+		hidden.value = value;//↓
+		return hidden;
+	}
+}
+function orderThreads(orderway){
+	orderThreadsClass.orderThreads(orderway);
+}
+</script>
             <span class="mr20">排序：<a href="javascript:;" title="按发表时间排序" onclick="orderThreads('postdate');">最新发帖{$orderClass[postdate]}</a>&nbsp;|&nbsp;<a href="javascript:;" title="按最后回复时间排序" onclick="orderThreads('lastpost');">最后回复{$orderClass[lastpost]}</a></span></td>
             <td class="author">作者</td>
             <td width="60">回复</td>
@@ -125,11 +128,29 @@ EOT;
       		<tr class="tr3">
             <td class="icon tac"><!--
 EOT;
-if($thread[adminbox] && $managecheck){print <<<EOT
---><div class="fl" style="display:none;" id="manager_$thread[tid]"><div class="tips cp">管理</div></div>$thread[adminbox]<!--
+if($managecheck){
+if ($thread['fid'] == $fid) {
+	$thread['adminbox'] = "<input type=\"checkbox\" autocomplete=\"off\" name=\"tidarray[]\" id=tid_{$thread[tid]} value=\"$thread[tid]\" onclick=\"postManage.show('postbatch','a_ajax_{$thread[tid]}')\" />";
+} else {
+	$thread['adminbox'] = "&nbsp;&nbsp;&nbsp;";
+}
+print <<<EOT
+-->$thread[adminbox]<!--
+EOT;
+}if($thread[topped]){print <<<EOT
+-->
+	<a href="read.php?tid={$thread[tid]}" target="_blank">
+		<img src="$imgpath/$stylepath/file/headtopic_$thread[topped].gif" align="absmiddle" alt="置顶帖标志" title="置顶帖标志"/>
+	</a>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+	<a title="$tooltip" href="$thread[tpcurl]" target="_blank">$thread[status]</a></td>		
+<!--
 EOT;
 }print <<<EOT
---><a title="$tooltip" href="$thread[tpcurl]" target="_blank">$thread[status]</a></td>
+-->
             <td class="subject" id="td_$thread[tid]">
 <!--
 EOT;
@@ -143,12 +164,11 @@ if($thread[topped] == 0){
 if(isset($postTopic->topicmodeldb[$thread[modelid]])){
 print<<<EOT
 -->
-			<a href="thread.php?fid=$fid&modelid=$thread[modelid]" class="s2 f14">{$postTopic->topicmodeldb[$thread[modelid]][name]}</a>
+			<a href="thread.php?fid=$fid&modelid=$thread[modelid]"  class="s2 f14">{$postTopic->topicmodeldb[$thread[modelid]][name]}</a>
 <!--
 EOT;
 }}}print<<<EOT
 -->
-
 <!--
 EOT;
 if($thread[special]>20){
@@ -166,11 +186,6 @@ EOT;
     	<span class="s2 f14">[$thread[toolinfo]]</span>
 <!--
 EOT;
-}if($thread[topped]){print <<<EOT
--->
-			<img src="$imgpath/$stylepath/file/headtopic_$thread[topped].gif" align="absmiddle" alt="置顶帖标志" title="置顶帖标志"/>
-<!--
-EOT;
 }print <<<EOT
 -->
 			$thread[useriocn]
@@ -181,14 +196,14 @@ if ($upid = $t_db[$thread['type']]['upid']) {
 $upname = $t_db[$upid][logo] ? "<img src=\"{$t_db[$upid][logo]}\" alt=\"&nbsp;\">" : "[{$t_db[$upid][name]}]";
 print <<<EOT
 -->
-			<a href="thread.php?fid=$fid&type=$upid{$viewbbs}" class="f14">$upname</a>
+			<a href="thread.php?fid=$fid&type=$upid{$viewbbs}" class="f14 view">$upname</a>
 <!--
 EOT;
 }
 $topictype = $t_db[$thread[type]][logo] ? "<img src=\"{$t_db[$thread[type]][logo]}\" alt=\"&nbsp;\">" : "[{$t_db[$thread[type]][name]}]";
 print <<<EOT
 -->
-			<a href="thread.php?fid=$fid&type=$thread[type]{$viewbbs}" class="f14">$topictype</a>
+			<a href="thread.php?fid=$fid&type=$thread[type]{$viewbbs}" class="f14 view">$topictype</a>
 <!--
 EOT;
 }if($thread['state'] == 0 && $thread['rewcredit'] > 0){print <<<EOT
@@ -198,7 +213,19 @@ EOT;
 EOT;
 }print <<<EOT
 -->
-			<a href="$thread[tpcurl]" id="a_ajax_$thread[tid]" class="subject_t f14">$thread[subject]</a>&nbsp; $thread[ifmark] $thread[titleadd] $thread[recommendadd]
+<a href="$thread[tpcurl]" name="readlink" 
+<!--
+EOT;
+if ($newwindows == 1) {
+print <<<EOT
+-->
+	target="_blank"  
+<!--
+EOT;
+}
+print <<<EOT
+-->
+id="a_ajax_$thread[tid]" class="subject_t f14">$thread[subject]</a>&nbsp; $thread[ifmark] $thread[titleadd] $thread[recommendadd]
 <!--
 EOT;
 if(isset($thread['colony'])){print <<<EOT
@@ -224,8 +251,8 @@ EOT;
 }print <<<EOT
 -->
             </td>
-            <td class="author"><a href="u.php?uid=$thread[authorid]">$thread[author]</a><p>$thread[postdate]</p></td>
-            <td class="num"><em>$thread[replies]</em>$thread[hits]</td>
+            <td class="author"><a href="{$db_userurl}$thread[authorid]">$thread[author]</a><p>$thread[postdate]</p></td>
+            <td class="num"><em>$thread[replies]</em>/$thread[hits]</td>
             <td class="author"><a href="u.php?username=$thread[lastposter]">$thread[lastposter]</a><p><a href="read.php?tid={$thread[tid]}&page=e#a" title="$thread[lstpdate]">$thread[lstptime] <span>&raquo;</span></a></p></td>
         </tr>
 <!--
@@ -321,7 +348,7 @@ EOT;
 -->
 	</tbody>
 </table>
-<SCRIPT LANGUAGE="JavaScript">
+<script LANGUAGE="JavaScript">
 function delload(){
 	var objTrs = getElementsByClassName('tr3',getObj('threadlist'));
 	var mover =	 function (){
@@ -342,7 +369,27 @@ function delload(){
 	}
 }
 window.onReady(delload);
-</SCRIPT>
+
+//判断是否选中新窗口
+function xinchuang() { //新窗
+	var i;
+	var val = document.getElementById("newwindows");
+	var va  = document.getElementsByName("readlink");
+	if (val.checked == true) { //选中
+		for (i=0;i<va.length;i++) {
+			var vaa = va[i].setAttribute("target","_blank");
+		}
+		SetCookie("newwindows",1);
+	} else {
+		for (i=0;i<va.length;i++) {
+			var vaa = va[i].setAttribute("target","_self");
+		}
+		SetCookie("newwindows",0);
+	}
+}
+//自动加载
+//window.onReady(xinchuang);
+</script>
 <!--
 EOT;
 ?>

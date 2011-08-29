@@ -1,7 +1,7 @@
 <?php
 !defined('P_W') && exit('Forbidden');
 
-InitGP(array(
+S::gp(array(
 	'tid',
 	'thelast',
 	'authorid',
@@ -9,12 +9,12 @@ InitGP(array(
 ), GP, 2);
 
 if ($thelast != 1) {
-	//$sign = $db->get_value("SELECT sign FROM pw_postcate WHERE pcid=".pwEscape($pcid));
+	//$sign = $db->get_value("SELECT sign FROM pw_postcate WHERE pcid=" . S::sqlEscape($pcid));
 	
 
 	$pcvaluetable = GetPcatetable($pcid);
-	$fieldvalue = $db->get_one("SELECT objecter,limitnum,payway,deposit,price FROM $pcvaluetable WHERE tid=" . pwEscape($tid));
-	$membernum = $db->get_value("SELECT SUM(nums) FROM pw_pcmember WHERE tid=" . pwEscape($tid));
+	$fieldvalue = $db->get_one("SELECT objecter,limitnum,payway,deposit,price FROM $pcvaluetable WHERE tid=" . S::sqlEscape($tid));
+	$membernum = $db->get_value("SELECT SUM(nums) FROM pw_pcmember WHERE tid=" . S::sqlEscape($tid));
 	$payway = $fieldvalue['payway'];
 	
 	if (empty($_POST['step'])) {
@@ -27,7 +27,7 @@ if ($thelast != 1) {
 		ajax_footer();
 	} elseif ($_POST['step'] == '1') {
 		PostCheck();
-		InitGP(array(
+		S::gp(array(
 			'nums',
 			'phone',
 			'mobile',
@@ -76,15 +76,39 @@ if ($thelast != 1) {
 			'extra' => $extra,
 			'jointime' => $timestamp
 		);
-		$db->update("INSERT INTO pw_pcmember SET " . pwSqlSingle($sqlarray));
+		$db->update("INSERT INTO pw_pcmember SET " . S::sqlSingle($sqlarray));
 		
 		$pcmid = $db->insert_id();
 		$nextto = 'pcjoin';
 		
+		//通知
+		$threadInfo = $db->get_one("SELECT * FROM pw_threads WHERE tid=".S::sqlEscape($tid));
+		$createTime = get_date($threadInfo['postdate']);
+		require_once pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
+		M::sendNotice(
+			array($threadInfo['author']),
+			array(
+				'title' => getLangInfo('writemsg', 'activity_pcjoin_new_title', array(
+						'username' => $windid
+					)
+				),
+				'content' => getLangInfo('writemsg', 'activity_pcjoin_new_content', array(
+						'username' => $windid,
+						'uid' => $winduid,
+						'tid' => $tid,
+						'fid' => $threadInfo['fid'],
+						'createtime' =>$createTime,
+						'fname' => $forum[$threadInfo['fid']]['name'],
+						'subject' => $threadInfo['subject']
+					)
+				),
+			),'notice_active','notice_active'
+			);
+		
 		Showmsg('pcjoin_nextstep');
 	}
 } elseif ($thelast == 1) {
-	InitGP(array(
+	S::gp(array(
 		'deposit',
 		'nums',
 		'totalcash',
@@ -100,7 +124,7 @@ if ($thelast != 1) {
 
 function isFriend($uid, $friend) {
 	global $db;
-	if ($db->get_value("SELECT uid FROM pw_friends WHERE uid=" . pwEscape($uid) . ' AND friendid=' . pwEscape($friend) . " AND status='0'")) {
+	if ($db->get_value("SELECT uid FROM pw_friends WHERE uid=" . S::sqlEscape($uid) . ' AND friendid=' . S::sqlEscape($friend) . " AND status='0'")) {
 		return true;
 	}
 	return false;

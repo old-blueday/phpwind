@@ -33,15 +33,14 @@ print <<<EOT
     <tr class="tr1 vt">
     	<td class="td2">帖子tid[选填]</td>
         <td class="td2" colspan="2">
-       		<input type="text" id="tid" size="10" class="input input_wa mr5">
-			<span class="bt2"><span><button type="button" onclick="javascript:New(addFildData,['fildbody','filddata','tid']);">添加导航记录</button></span></span>
-		</td>
-        <td>&nbsp;</td>
+       	<input type="text" id="tid" size="10" class="input input_wa mr5">
+				<span class="bt2"><span><button type="button" onclick="javascript:New(addFildData,['fildbody','filddata','tid']);changeImguploadName();">添加导航记录</button></span></span>
+				</td>
 	</tr>
     <tr class="tr2 td_bgA">
         <td width="160">链接地址</td>
-        <td width="160">图片地址<span class="s1">*</span></td>
-        <td>&nbsp;</td>
+        <td>图片地址</td>
+        <td width="50">&nbsp;</td>
     </tr>
 <tbody id="fildbody">
 <!--
@@ -51,8 +50,8 @@ print <<<EOT
 -->
        <tr class="tr1 vt">
            <td class="td2"><input type="text" name="url[]" value="{$v[url]}" class="input input_wa"></td>
-           <td class="td2"><input type="text" name="image[]" value="{$v[image]}" class="input input_wa"></td>
-           <td class="td2"><a href="javascript:void(0);" onclick="delTr(this);">[删除]</a></td>
+           <td class="td2"><input type="text" name="image[]" value="{$v[image]}" class="input input_wa mr5"><input class="image_upload input mr5" name="image_upload[]" style="display:none" type="file" accept="image/*" /><input type="hidden" name="image_type[]" value="0" /><a id="modifImgType" href="javascript:" onclick="stopicImgType(0, 1, 2, this)">[上传]</a></td>
+           <td class="td2"><a href="javascript:void(0);" onclick="delTr(this);changeImguploadName();">[删除]</a></td>
        </tr>
 <!--
 EOT;
@@ -60,11 +59,11 @@ EOT;
 print <<<EOT
 -->
 </tbody>
-<tbody id="filddata" style="display:none;">
+<tbody id="filddata" style="display:none;" >
     <tr class="tr1 vt">
-        <td class="td2"><input type="text" name="url[]" value=""  class="input input_wa"></td>
-        <td class="td2"><input type="text" name="image[]" value=""  class="input input_wa"></td>
-        <td class="td2"><a href="javascript:void(0);" onclick="delTr(this);">[删除]</a></td>
+        <td class="td2"><input type="text" name="url[]" value="http://"  class="input input_wa"></td> 
+        <td class="td2"><input type="text" name="image[]" value=""  class="input input_wa mr5"><input class="image_upload input mr5" name="image_upload"   style="display:none" type="file" accept="image/*" /><input type="hidden" name="image_type[]" value="0" /><a  id="modifImgType" href="javascript:" onclick="stopicImgType(0, 1, 2, this)">[上传]</a></td>
+        <td class="td2"><a href="javascript:void(0);" onclick="delTr(this);changeImguploadName();">[删除]</a></td>
     </tr>
 </tbody>
 <!--

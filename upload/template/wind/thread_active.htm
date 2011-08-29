@@ -277,9 +277,9 @@ EOT;
                         	<strong>发起人：</strong>
                             <a href="javascript:;" onclick="sendmsg('operate.php?action=toweibo&ajax=1&type=groupactive&id=$active[id]','',this.id);" class="allForward mr20 fr">新鲜事</a>
                             <a href="apps.php?q=collection&a=favor&type=groupactive&ajax=1&id={$active[id]}" onclick="return ajaxurl(this)" class="mr10 allCollect fr">收藏</a>
-                        	</a><a href="u.php?uid=$active[uid]" target="_blank" class="img_25 mr10"><i><img src="$active[icon]" align="absmiddle" /></i></a><a href="u.php?uid=$active[uid]" target="_blank">$active[username]</a>
+                        	</a><a href="{$db_userurl}$active[uid]" target="_blank" class="img_25 mr10"><i><img src="$active[icon]" align="absmiddle" /></i></a><a href="{$db_userurl}$active[uid]" target="_blank">$active[username]</a>
                         </p>
-                        <p class="g_hF cc"><strong>活动时间：</strong>$active[begintime_s] - $active[endtime_s]</p>
+                        <p class="g_hF cc"><strong>活动时间：</strong>$active[begintime_s] 至 $active[endtime_s]</p>
                         <p class="g_hF cc"><strong>报名截止：</strong>$active[deadline_s]</p>
                         <p class="g_hF cc"><strong>地点：</strong>$active[address]</p>
                         <p class="g_hF cc"><strong>费用估计：</strong>
@@ -510,7 +510,7 @@ if ($value['anonymous'] == 1 && $groupid != 3 && $active['uid'] != $winduid && $
 EOT;
 } else {print <<<EOT
 -->
-                    <li><a href="u.php?uid=$value[uid]" target="_blank" class="i"><img src="$value[icon]" width="44" height="44" /></a><p class="n"><a href="u.php?uid=$value[uid]" title="$value[username]" target="_blank">$value[username]</a></p></li>
+                    <li><a href="{$db_userurl}$value[uid]" target="_blank" class="i"><img src="$value[icon]" width="44" height="44" /></a><p class="n"><a href="{$db_userurl}$value[uid]" title="$value[username]" target="_blank">$value[username]</a></p></li>
 <!--
 EOT;
 }}print <<<EOT
@@ -665,7 +665,7 @@ if ($value['anonymous'] == 1 && $groupid != 3 && $active['uid'] != $winduid && $
 EOT;
 } else {print <<<EOT
 -->
-			<li><a href="u.php?uid=$value[uid]" target="_blank" class="i"><img src="$value[icon]" width="44" height="44" /></a><p class="n"><a href="u.php?uid=$value[uid]" title="$value[username]" target="_blank">$value[username]</a></p></li>
+			<li><a href="{$db_userurl}$value[uid]" target="_blank" class="i"><img src="$value[icon]" width="44" height="44" /></a><p class="n"><a href="{$db_userurl}$value[uid]" title="$value[username]" target="_blank">$value[username]</a></p></li>
 <!--
 EOT;
 }}print <<<EOT
@@ -748,6 +748,7 @@ var allow_ext = '$uploadfiletype';
 var allow_size = '$uploadfilesize';
 var attachnum = parseInt('$db_attachnum');
 </script>
+<script type="text/javascript" language="JavaScript" src="js/swfobject.js"></script>
 <script type="text/javascript" language="JavaScript" src="js/upload.js"></script>
 <!--
 EOT;
@@ -888,9 +889,9 @@ EOT;
 if($attach){print <<<EOT
 -->
 									<div class="cc">该帖包含附件<span class="gray">(不想保留的附件去掉√)</span> :
-										<table class="tr_p10">
+										<table class="tr_p10" style="table-layout:fixed">
 											<tr class="gray">
-												<td width="11"></td>
+												<td width="20"></td>
 												<td width="220">附件</td>
 												<td width="180">描述</td>
 												<td width="65" style="display:none;">售/密</td>
@@ -916,7 +917,7 @@ EOT;
 											</tr>
 											<tbody id="qlist"></tbody>
 										</table>
-										<table class="tr_p10">
+										<table class="tr_p10" style="table-layout:fixed">
 											<tr valign="top" id="formUpload" class="gray">
 												<td width="250">上传附件 (图片、文件等)</td>
 												<td width="180">描述</td>

@@ -8,7 +8,7 @@ if (empty($action)) {
 	require_once(R_P.'require/forum.php');
 	require_once(R_P.'require/credit.php');
 
-	InitGP(array('page','username','uid','ctype','stime','etime','optype','clg'));
+	S::gp(array('page','username','uid','ctype','stime','etime','optype','clg'));
 
 	$pw_creditlog = 'pw_creditlog';
 	$clgtb = $logdb = array();
@@ -27,31 +27,31 @@ if (empty($action)) {
 		$member = $userService->getByUserName($username);
 		$uid = $member['uid'];
 	}
-	$uid && $sqladd .= " AND uid=".pwEscape($uid);
-	$ctype && $sqladd .= " AND ctype=".pwEscape($ctype);
+	$uid && $sqladd .= " AND uid=".S::sqlEscape($uid);
+	$ctype && $sqladd .= " AND ctype=".S::sqlEscape($ctype);
 	if ($stime) {
 		!is_numeric($stime) && $stime = PwStrtoTime($stime);
-		$sqladd .= " AND adddate>".pwEscape($stime);
+		$sqladd .= " AND adddate>".S::sqlEscape($stime);
 	}
 	if ($etime) {
 		!is_numeric($etime) && $etime = PwStrtoTime($etime);
-		$sqladd .= " AND adddate<".pwEscape($etime);
+		$sqladd .= " AND adddate<".S::sqlEscape($etime);
 	}
 	if ($optype) {
 		if (is_array($optype)) {
-			$sqladd .= " AND logtype IN(".pwImplode($optype).")";
+			$sqladd .= " AND logtype IN(".S::sqlImplode($optype).")";
 			foreach ($optype as $key => $value) {
 				$urladd .= "&optype[$key]=$value";
 			}
 		} else {
-			$sqladd .= " AND logtype".(strpos($optype,'_') !== false ? "=".pwEscape($optype) : " LIKE ".pwEscape("$optype%"));
+			$sqladd .= " AND logtype".(strpos($optype,'_') !== false ? "=".S::sqlEscape($optype) : " LIKE ".S::sqlEscape("$optype%"));
 			$urladd .= "&optype=$optype";
 		}
 	}
 
 	$db_perpage = 25;
 	(int)$page < 1 && $page = 1;
-	$limit = pwLimit(($page-1)*$db_perpage,$db_perpage);
+	$limit = S::sqlLimit(($page-1)*$db_perpage,$db_perpage);
 	$rt    = $db->get_one("SELECT COUNT(*) AS sum FROM $pw_creditlog $sqladd");
 	$pages = numofpage($rt['sum'],$page,ceil($rt['sum']/$db_perpage), "$basename&uid=$uid&ctype=$ctype&stime=$stime&etime=$etime{$urladd}&");
 	$query = $db->query("SELECT * FROM $pw_creditlog $sqladd ORDER BY adddate DESC $limit");
@@ -75,7 +75,7 @@ if (empty($action)) {
 
 	if (!empty($_POST['step'])) {
 
-		InitGP(array('username','ctype','stime','etime','optype','clg'));
+		S::gp(array('username','ctype','stime','etime','optype','clg'));
 
 		$sqladd = "WHERE 1";
 		$urladd = '';
@@ -89,25 +89,25 @@ if (empty($action)) {
 			$member = $userService->getByUserName($username);
 			$uid = $member['uid'];
 			if ($uid) {
-				$sqladd .= " AND uid=".pwEscape($uid);
+				$sqladd .= " AND uid=".S::sqlEscape($uid);
 				$urladd .= "&uid=$uid";
 			}
 		}
 		if ($ctype) {
-			$sqladd .= " AND ctype=".pwEscape($ctype);
+			$sqladd .= " AND ctype=".S::sqlEscape($ctype);
 		}
 		if ($stime) {
 			!is_numeric($stime) && $stime = PwStrtoTime($stime);
-			$sqladd .= " AND adddate>".pwEscape($stime);
+			$sqladd .= " AND adddate>".S::sqlEscape($stime);
 			$urladd .= "&stime=$stime";
 		}
 		if ($etime) {
 			!is_numeric($etime) && $etime = PwStrtoTime($etime);
-			$sqladd .= " AND adddate<".pwEscape($etime);
+			$sqladd .= " AND adddate<".S::sqlEscape($etime);
 			$urladd .= "&etime=$etime";
 		}
 		if ($optype && is_array($optype) && !in_array('all',$optype)) {
-			$sqladd .= " AND logtype IN(".pwImplode($optype).")";
+			$sqladd .= " AND logtype IN(".S::sqlImplode($optype).")";
 			foreach ($optype as $key => $value) {
 				$urladd .= "&optype[$key]=$value";
 			}
@@ -174,7 +174,7 @@ if (empty($action)) {
 
 	} elseif ($_POST['step'] == '7') {
 
-		InitGP(array('selid'));
+		S::gp(array('selid'));
 
 		if (empty($selid) || !is_array($selid)) {
 			adminmsg('operate_error');

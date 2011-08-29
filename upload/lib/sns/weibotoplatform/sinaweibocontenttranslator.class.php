@@ -1,16 +1,16 @@
 <?php
 
 class PW_SinaWeiboContentTranslator {
-	var $_allowedTypes = array('article', 'diary', 'group_article', 'group_active');
+	var $_allowedTypes = array('article', 'diary', 'group_article', 'group_active', 'photos', 'group_photos');
 	
 	function translate($siteWeiboType, $siteWeiboData, $siteWeiboExtra = array()) {
-		if (!in_array($siteWeiboType, $this->_allowedTypes)) return $this->_commonTranslate($siteWeiboData['content']);
+		if (!in_array($siteWeiboType, $this->_allowedTypes)) return $this->commonTranslate($siteWeiboData['content']);
 		
 		$translate = $this->_loadTranslate($siteWeiboType);
-		return $this->_commonTranslate($translate->translate($siteWeiboData, $siteWeiboExtra));
+		return $this->commonTranslate($translate->translate($siteWeiboData, $siteWeiboExtra));
 	}
 	
-	function _commonTranslate($content) {
+	function commonTranslate($content) {
 		$content = SinaWeiboSmileTranslator::translate($content);
 		$content = SinaWeiboWincodeTranslator::translate($content);
 		$content = str_replace(array('&gt;', '&lt;', '&amp;', '&quot;', '&#39;', '&#60;'), array('>', '<', '&', '"', "'", '<'), $content);
@@ -38,8 +38,7 @@ class SinaWeiboSmileTranslator {
 		$pattern = '|(\[s\:([^\[\]]+)\])|Uis';
 		return preg_replace($pattern, "[\\2]", $content);
 	}
-	
-	
+
 }
 
 class SinaWeiboWincodeTranslator {
@@ -92,6 +91,24 @@ class SinaWeiboContentTranslate_GroupActive extends BaseSinaWeiboContentTranslat
 	function translate($siteWeiboData, $siteWeiboExtra = array()) {
 		$url = $this->_getSiteBaseUrl() . "apps.php?q=group&a=active&job=view&cyid=" . $siteWeiboExtra['cyid'] . "&id=" . $siteWeiboData['objectid'];
 		return SinaWeiboContentTemplate::generateContent("群组活动", $siteWeiboExtra['title'], $siteWeiboData['content'], $url);
+	}
+}
+
+class SinaWeiboContentTranslate_Photos extends BaseSinaWeiboContentTranslate {
+	function translate($siteWeiboData, $siteWeiboExtra = array()) {
+		$url = $this->_getSiteBaseUrl() . "apps.php?q=photos&a=album&aid=" . $siteWeiboExtra['aid'];
+		$photoCount = count($siteWeiboExtra['photos']);
+		$photoCount = $photoCount > 0 ? $photoCount : 1;
+		return "我刚上传了" . $photoCount . "张照片" . " " . $url;
+	}
+}
+
+class SinaWeiboContentTranslate_GroupPhotos extends BaseSinaWeiboContentTranslate {
+	function translate($siteWeiboData, $siteWeiboExtra = array()) {
+		$url = $this->_getSiteBaseUrl() . "apps.php?q=galbum&a=album&cyid=" . $siteWeiboExtra['cyid'] . "&aid=" . $siteWeiboExtra['aid'];
+		$photoCount = count($siteWeiboExtra['photos']);
+		$photoCount = $photoCount > 0 ? $photoCount : 1;
+		return "我刚上传了" . $photoCount . "张群组照片" . " " . $url;
 	}
 }
 

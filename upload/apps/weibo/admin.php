@@ -2,9 +2,11 @@
 !function_exists('adminmsg') && exit('Forbidden');
 $weiboService = L::loadClass('weibo', 'sns');/* @var $weiboService PW_Weibo */
 require_once(R_P.'require/showimg.php');
-include_once(D_P.'data/bbscache/o_config.php');
+include_once pwCache::getPath(D_P.'data/bbscache/o_config.php');
 $nav = array("$action" => "class='current'");
+
 if (empty($action)) {
+
 	if (empty($_POST['step'])) {
 		
 		require_once(R_P.'require/credit.php');
@@ -21,7 +23,7 @@ if (empty($action)) {
 		ifcheck($o_weibopost, 'weibopost');
 		ifcheck($o_weibophoto, 'weibophoto');
 		ifcheck($o_weibourl, 'weibourl');
-			
+
 		$creategroup = ''; $num = 0;
 		foreach ($ltitle as $key => $value) {
 			if ($key != 1 && $key != 2 && $key !='6' && $key !='7' && $key !='3') {
@@ -37,16 +39,17 @@ if (empty($action)) {
 		
 	} else {
 		
-		InitGP(array('creditset','creditlog', 'weibophoto','weibopost', 'weibourl'),'GP');
-		InitGP(array('groups'),'GP',2);
+		S::gp(array('creditset','creditlog', 'weibophoto','weibopost', 'weibourl', 'weibotip'),'GP');
+		S::gp(array('groups'),'GP',2);
 		
 		$updatecache = false;
 		$config['weibophoto'] = $weibophoto ? 1 : 0;
 		$config['weibopost'] = $weibopost ? 1 : 0;
 		$config['weibourl'] = $weibourl ? 1 : 0;
 		$config['weibo_creditset'] = '';
+		$config['weibotip'] = S::escapeStr($weibotip);
 		$config['weibo_groups'] = is_array($groups) ? ','.implode(',',$groups).',' : '';
-		
+
 		if (is_array($creditset) && !empty($creditset)) {
 			foreach ($creditset as $key => $value) {
 				foreach ($value as $k => $v) {
@@ -59,9 +62,9 @@ if (empty($action)) {
 		foreach ($config as $key => $value) {
 			if (${'o_'.$key} != $value) {
 				$db->pw_update(
-					'SELECT hk_name FROM pw_hack WHERE hk_name=' . pwEscape("o_$key"),
-					'UPDATE pw_hack SET ' . pwSqlSingle(array('hk_value' => $value, 'vtype' => 'string')) . ' WHERE hk_name=' . pwEscape("o_$key"),
-					'INSERT INTO pw_hack SET ' . pwSqlSingle(array('hk_name' => "o_$key", 'vtype' => 'string', 'hk_value' => $value))
+					'SELECT hk_name FROM pw_hack WHERE hk_name=' . S::sqlEscape("o_$key"),
+					'UPDATE pw_hack SET ' . S::sqlSingle(array('hk_value' => $value, 'vtype' => 'string')) . ' WHERE hk_name=' . S::sqlEscape("o_$key"),
+					'INSERT INTO pw_hack SET ' . S::sqlSingle(array('hk_name' => "o_$key", 'vtype' => 'string', 'hk_value' => $value))
 				);
 				$updatecache = true;
 			}
@@ -69,9 +72,11 @@ if (empty($action)) {
 		$updatecache && updatecache_conf('o',true);
 		adminmsg('operate_success');
 	}
-}elseif ($action == 'weibo') {
+} elseif ($action == 'weibo') {
+
 	if ($job == 'delete') {
-		InitGP(array('mids','content','username','postdate_s','postdate_e','ordertype','page','lines','weibotype'));
+
+		S::gp(array('mids','content','username','postdate_s','postdate_e','ordertype','page','lines','weibotype'));
 		empty($mids) && adminmsg("no_weibo_mids","$basename&action=weibo");
 
 		$urladd  = $content ? '&content='.rawurlencode($content) : '';
@@ -85,8 +90,9 @@ if (empty($action)) {
 		$weiboService->deleteWeibos($mids);
 		adminmsg('operate_success',"$basename&action=weibo&job=list$urladd");
 		
-	} else {echo $username;
-		InitGP(array('content','username','postdate_s','postdate_e','ordertype','page','lines','weibotype'));
+	} else {
+
+		S::gp(array('content','username','postdate_s','postdate_e','ordertype','page','lines','weibotype'));
 		$weiboTypeDesc = $weiboService->getValueMapDescript();
 		$lines = $lines ? $lines : $db_perpage;
 		$postdateStartString = $postdate_s && is_numeric($postdate_s) ? get_date($postdate_s, 'Y-m-d') : $postdate_s;
@@ -94,8 +100,6 @@ if (empty($action)) {
 		$ascChecked = $ordertype == 'asc' ? 'checked' : '';
 		$descChecked = !$ascChecked ? 'checked' : '';
 		$weibotypeSelect = $weibotype == '-1' ? array('please'=>'selected') : array($weibotype=>'selected');
-		
-	
 			
 		intval($lines) < 1 && $lines=30;
 		intval($page)  < 1 && $page = 1;
@@ -107,7 +111,6 @@ if (empty($action)) {
 		$ordertype = $ordertype == 'asc' ? 'asc' : 'desc';
 		$urladd .= "&ordertype=$ordertype&lines=$lines";
 		
-		
 		list($count,$weibos) = $weiboService->adminSearch($username,$content,$postdate_s,$postdate_e,$weibotype,$ordertype,$page,$lines);
 		$numofpage = ceil($count/$lines);
 		if ($numofpage && $page > $numofpage) {
@@ -116,9 +119,11 @@ if (empty($action)) {
 		$pages=numofpage($count,$page,$numofpage,"$basename&action=weibo&job=list$urladd&");
 		require_once PrintApp('admin');
 	}
-}elseif($action == 'comment'){
+} elseif ($action == 'comment') {
+
 	if ($job == 'delete') {
-		InitGP(array('cids','content','username','postdate_s','postdate_e','ordertype','page','lines'));
+
+		S::gp(array('cids','content','username','postdate_s','postdate_e','ordertype','page','lines'));
 		empty($cids) && adminmsg("请选择要删除的新鲜事评论","$basename&action=comment");
 
 		$urladd  = $content ? '&content='.rawurlencode($content) : '';
@@ -134,14 +139,13 @@ if (empty($action)) {
 		adminmsg('operate_success',"$basename&action=comment&job=list$urladd");
 		
 	} else {
-		InitGP(array('content','username','postdate_s','postdate_e','ordertype','page','lines'));
+
+		S::gp(array('content','username','postdate_s','postdate_e','ordertype','page','lines'));
 		$lines = $lines ? $lines : $db_perpage;
 		$postdateStartString = $postdate_s && is_numeric($postdate_s) ? get_date($postdate_s, 'Y-m-d') : $postdate_s;
 		$postdateEndString = $postdate_e && is_numeric($postdate_e) ? get_date($postdate_e, 'Y-m-d') : $postdate_e;
 		$ascChecked = $ordertype == 'asc' ? 'checked' : '';
 		$descChecked = !$ascChecked ? 'checked' : '';
-		
-	
 			
 		intval($lines) < 1 && $lines=30;
 		intval($page)  < 1 && $page = 1;

@@ -117,13 +117,20 @@ print <<<EOT
 			<div class="tac mb20">
 				<span class="btn"><span><button type="submit">提 交</button></span></span>
 			</div>
-
+			
+		</div>
+		</form>
+		
 <!--sinaWeibo-->
 <!--
 EOT;
 if ($db_sinaweibo_status) {
 print <<<EOT
 -->
+		<form action="profile.php?action=$action&t=setsync" method="post">
+		<input type="hidden" name="verify" value="$verifyhash" />
+		<div class="p15">
+
 			<div class="b f14 s7 mb15"><a name="friend"></a>新鲜事同步设置</div>
 			<div class="mb10">绑定新浪微博帐号，就可以随时随地同步你的新鲜事，让更多的朋友分享你的生活！</div>
 <!--
@@ -137,6 +144,23 @@ print <<<EOT
 				<!-- <span class="s3 mr20"></span> -->
 				<a href="profile.php?action=privacy&t=unbind">取消同步&gt;&gt;</a>
 			</div>
+			
+			<div class="mb5">我产生的新鲜事，通过设置，下面这些新鲜事将同步到新浪微博</div>
+			<div class="p15 bgA mb20">
+				<div>
+					<label class="mr20"><input type="checkbox" name="article_issync" value="1" {$article_issync} />帖子</label>
+					<label class="mr20"><input type="checkbox" name="diary_issync" value="1" {$diary_issync} />日志</label>
+					<label class="mr20"><input type="checkbox" name="photos_issync" value="1" {$photos_issync} />相册</label>
+					<label class="mr20"><input type="checkbox" name="group_issync" value="1" {$group_issync} />群组</label>
+				</div>
+				<div>
+					<label class="mr20"><input type="checkbox" name="transmit_issync" value="1" {$transmit_issync} />转发的新鲜事</label>
+					<label class="mr20"><input type="checkbox" name="comment_issync" value="1" {$comment_issync} />新鲜事的回复</label>
+				</div>
+			</div>
+			<div class="tac mb20">
+				<span class="btn"><span><button type="submit">提 交</button></span></span>
+			</div>
 <!--
 EOT;
 	} else {
@@ -149,13 +173,17 @@ print <<<EOT
 <!--
 EOT;
 	}
+print <<<EOT
+-->
+			
+		</div>
+		</form>
+<!--
+EOT;
 }
 print <<<EOT
 -->
 <!--sinaWeibo end-->
-			
-		</div>
-		</form>
 
 <!--
 EOT;

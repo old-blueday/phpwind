@@ -31,7 +31,7 @@ class FaceUpload extends uploadBehavior {
 	function getFilePath($currUpload) {
 		$filename = $this->uid . '_tmp.' . $currUpload['ext'];
 		$savedir = 'upload/' . str_pad(substr($this->uid,-2),2,'0',STR_PAD_LEFT) . '/';
-		return array($filename, $savedir, '', '');
+		return array($filename, $savedir);
 	}
 
 	function update($uploaddb) {

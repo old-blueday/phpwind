@@ -140,7 +140,7 @@ EOT;
 -->
 				</h4>
 				<ul class="attr">
-					<li>活动时间：$value[starttime] - $value[endtime]</li>
+					<li>活动时间：$value[starttime] 至 $value[endtime]</li>
 					<li>活动地点：$value[location]</li>
 				</ul>
 				<p class="view_more">
@@ -187,7 +187,7 @@ EOT;
 if ($value[authorid]) {
 print <<<EOT
 -->
-						<a target="_blank" href="u.php?uid=$value[authorid]">$value[author]</a>
+						<a target="_blank" href="{$db_userurl}$value[authorid]">$value[author]</a>
 <!--
 EOT;
 } else {

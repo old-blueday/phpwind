@@ -424,7 +424,7 @@ if($ifppt){print <<<EOT
 -->
 							<tr>
 								<td width="120">原密码</td>
-								<td><input class="input" type="password" size="20" maxlength="75" name="oldpwd" value="" /> 修改密码或邮箱时需要密码验证</td>
+								<td><input class="input" type="password" size="20" maxlength="75" name="oldpwd" value="" /> 修改密码或电子邮箱时需要密码验证</td>
 							</tr>
 							<tr>
 								<td>新密码</td>
@@ -435,9 +435,9 @@ if($ifppt){print <<<EOT
 								<td><input class="input" type="password" size="20" maxlength="75" name="check_pwd" value="" /></td>
 							</tr>
 							<tr>
-								<td>E-MAIL</td>
+								<td>电子邮箱</td>
 								<td><input class="input" type="text" size="20" maxlength="75" name="proemail" value="$userdb[email]" />
-								<input type="checkbox" name="propublicemail" value="1" $ifpublic />公开邮箱</td>
+								<input type="checkbox" name="propublicemail" value="1" $ifpublic />公开电子邮箱</td>
 							</tr>
 <!--
 EOT;
@@ -1201,7 +1201,7 @@ EOT;
 								<td>
 									<span class="fr">
 										<select name="type" onchange="window.location=('profile.php?action=log&type='+this.options[this.selectedIndex].value)">
-										<option value="all">全 部</option>
+										<option value="all">全部</option>
 										<option value="topped" $type_sel[topped]>{$lang[logtype][topped]}</option>
 										<option value="digest" $type_sel[digest]>{$lang[logtype][digest]}</option>
 										<option value="highlight" $type_sel[highlight]>{$lang[logtype][highlight]}</option>

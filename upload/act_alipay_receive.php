@@ -2,7 +2,7 @@
 require_once('global.php');
 require_once(R_P.'require/posthost.php');
 
-InitGP(array('action','sign'));
+S::gp(array('action','sign'));
 
 !empty($_POST) && $_GET = $_POST;
 $url = '';
@@ -19,7 +19,7 @@ if (!eregi("true$",$veryfy_result)) {
 }
 
 if ($action == 'user_authentication') {//用户验证
-	InitGP(array('email','is_certified','is_success','user_id'));
+	S::gp(array('email','is_certified','is_success','user_id'));
 
 	if ($is_success == 'T' && $email && $user_id) {
 		$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
@@ -38,12 +38,12 @@ if ($action == 'user_authentication') {//用户验证
 		paymsg("profile.php?action=modify&info_type=trade",'act_authentication_fail');
 	}
 } elseif ($action == 'confirm_aa_detail_payment') {//订单支付
-	InitGP(array('is_success','out_trade_no','batch_detail_no','trade_status'));
+	S::gp(array('is_success','out_trade_no','batch_detail_no','trade_status'));
 
 	$is_success != 'T' && paymsg("read.php?tid=$tid",'act_toalipay_failure');
 	list(,$tid,$actuid) = explode("_",$out_trade_no);
 
-	$memberdb = $db->get_one("SELECT am.ifpay,am.uid,am.username,am.isadditional,am.totalcash,am.fromuid,am.fromusername,am.isrefund,am.ifanonymous,t.subject,t.authorid,t.author FROM pw_activitymembers am LEFT JOIN pw_threads t ON am.tid=t.tid WHERE actuid=".pwEscape($actuid));
+	$memberdb = $db->get_one("SELECT am.ifpay,am.uid,am.username,am.isadditional,am.totalcash,am.fromuid,am.fromusername,am.isrefund,am.ifanonymous,t.subject,t.authorid,t.author FROM pw_activitymembers am LEFT JOIN pw_threads t ON am.tid=t.tid WHERE actuid=".S::sqlEscape($actuid));
 	$memberdb['ifpay'] != 0 && paymsg("read.php?tid=$tid",'act_toalipay_payed');
 
 	if ($memberdb['isrefund']) {//退款的无法支付、匿名但没有权限的无法支付
@@ -51,7 +51,7 @@ if ($action == 'user_authentication') {//用户验证
 	}
 
 	$defaultValueTableName = getActivityValueTableNameByActmid();
-	$defaultValue = $db->get_one("SELECT paymethod FROM $defaultValueTableName WHERE tid=".pwEscape($tid));
+	$defaultValue = $db->get_one("SELECT paymethod FROM $defaultValueTableName WHERE tid=".S::sqlEscape($tid));
 	$defaultValue['paymethod'] != 1 && paymsg("read.php?tid=$tid",'act_undefined_operate');//只有支付方式为支付宝才可以支付
 
 	$payStatus = array(
@@ -60,8 +60,8 @@ if ($action == 'user_authentication') {//用户验证
 		'C' => '3',//交易关闭
 		'E' => '1',//交易成功
 	);
-	$db->update("UPDATE pw_activitymembers SET batch_detail_no=".pwEscape($batch_detail_no).",ifpay=".pwEscape($payStatus[$trade_status])." WHERE actuid=".pwEscape($actuid));
-	$db->update("UPDATE $defaultValueTableName SET updatetime=".pwEscape($timestamp)." WHERE tid=".pwEscape($tid));//报名列表动态时间
+	$db->update("UPDATE pw_activitymembers SET batch_detail_no=".S::sqlEscape($batch_detail_no).",ifpay=".S::sqlEscape($payStatus[$trade_status])." WHERE actuid=".S::sqlEscape($actuid));
+	$db->update("UPDATE $defaultValueTableName SET updatetime=".S::sqlEscape($timestamp)." WHERE tid=".S::sqlEscape($tid));//报名列表动态时间
 
 	/*支付成功费用流通日志*/
 	$data = array();
@@ -173,12 +173,12 @@ if ($action == 'user_authentication') {//用户验证
 	}
 	paymsg("read.php?tid=$tid",'act_aa_detail_success');
 } elseif ($action == 'refund_aa_payment') {//退款
-	InitGP(array('is_success','out_trade_no','refund_fee'));//创建订单有问题。
+	S::gp(array('is_success','out_trade_no','refund_fee'));//创建订单有问题。
 	
 	$is_success != 'T' && paymsg("read.php?tid=$tid",'act_refund_alipay_fail');
 	list(,$tid,$actuid) = explode("_",$out_trade_no);
 
-	$ifpay = $db->get_value("SELECT ifpay FROM pw_activitymembers WHERE actuid=".pwEscape($actuid));
+	$ifpay = $db->get_value("SELECT ifpay FROM pw_activitymembers WHERE actuid=".S::sqlEscape($actuid));
 	if ($ifpay != 1) {//未收到支付通知，但退款通知过来
 		/*查询订单状态*/
 		require_once(R_P . 'lib/activity/alipay_push.php');
@@ -187,7 +187,7 @@ if ($action == 'user_authentication') {//用户验证
 		/*查询订单状态*/
 	}
 
-	$memberdb = $db->get_one("SELECT am.ifpay,am.actmid,am.uid,am.username,am.totalcash,am.refundreason,am.refundcost,am.totalcash,am.isadditional,am.isrefund,t.subject,t.authorid,t.author FROM pw_activitymembers am LEFT JOIN pw_threads t ON am.tid=t.tid WHERE actuid=".pwEscape($actuid));
+	$memberdb = $db->get_one("SELECT am.ifpay,am.actmid,am.uid,am.username,am.totalcash,am.refundreason,am.refundcost,am.totalcash,am.isadditional,am.isrefund,t.subject,t.authorid,t.author FROM pw_activitymembers am LEFT JOIN pw_threads t ON am.tid=t.tid WHERE actuid=".S::sqlEscape($actuid));
 	$memberdb['ifpay'] != 1 && paymsg("read.php?tid=$tid",'act_refund_fail');
 
 	if ($memberdb['isrefund']) {//退款交易无法操作
@@ -195,10 +195,10 @@ if ($action == 'user_authentication') {//用户验证
 	}
 
 	$defaultValueTableName = getActivityValueTableNameByActmid();
-	$defaultValue = $db->get_one("SELECT paymethod FROM $defaultValueTableName WHERE tid=".pwEscape($tid));
+	$defaultValue = $db->get_one("SELECT paymethod FROM $defaultValueTableName WHERE tid=".S::sqlEscape($tid));
 	$defaultValue['paymethod'] != 1 && paymsg("read.php?tid=$tid",'act_undefined_operate');//只有支付方式为支付宝才可以退款
 
-	$tempcost = $db->get_value("SELECT SUM(totalcash) as sum FROM pw_activitymembers WHERE isrefund=1 AND fupid=".pwEscape($actuid));
+	$tempcost = $db->get_value("SELECT SUM(totalcash) as sum FROM pw_activitymembers WHERE isrefund=1 AND fupid=".S::sqlEscape($actuid));
 	if ($refund_fee > number_format(($memberdb['totalcash'] - $tempcost), 2, '.', '')) {
 		paymsg("read.php?tid=$tid",'act_refund_cost_error');
 	}
@@ -214,8 +214,8 @@ if ($action == 'user_authentication') {//用户验证
 		'isrefund'			=> 1,
 		'refundreason'		=> $memberdb['refundreason'],
 	);
-	$db->update("INSERT INTO pw_activitymembers SET " . pwSqlSingle($sqlarray));
-	$db->update("UPDATE $defaultValueTableName SET updatetime=".pwEscape($timestamp)." WHERE tid=".pwEscape($tid));//报名列表动态时间
+	$db->update("INSERT INTO pw_activitymembers SET " . S::sqlSingle($sqlarray));
+	$db->update("UPDATE $defaultValueTableName SET updatetime=".S::sqlEscape($timestamp)." WHERE tid=".S::sqlEscape($tid));//报名列表动态时间
 	$newactuid = $db->insert_id();
 	/*支付成功费用流通日志
 	退款成功

@@ -62,7 +62,7 @@ class PwColonyPost extends PwColony {
 		if (!$this->info) {
 			return false;
 		}
-		$this->_db->update("INSERT INTO pw_argument SET " . pwSqlSingle(array(
+		$this->_db->update("INSERT INTO pw_argument SET " . S::sqlSingle(array(
 			'tid'		=> $tid,
 			'cyid'		=> $this->info['id'],
 			'postdate'	=> $timestamp,
@@ -72,7 +72,7 @@ class PwColonyPost extends PwColony {
 		if ($postdata['ifcheck'] > 0) {
 			require_once(R_P . 'u/require/core.php');
 			//tnum加一
-			$this->_db->update("UPDATE pw_colonys SET tnum=tnum+'1',pnum=pnum+'1',todaypost=todaypost+'1' WHERE id=" . pwEscape($this->cyid));
+			$this->_db->update("UPDATE pw_colonys SET tnum=tnum+'1',pnum=pnum+'1',todaypost=todaypost+'1' WHERE id=" . S::sqlEscape($this->cyid));
 			$this->info['tnum']++;
 			$this->info['pnum']++;
 			updateGroupLevel($this->cyid, $this->info);
@@ -90,7 +90,7 @@ class PwColonyPost extends PwColony {
 			}
 		}
 		//更新群成员表里面的最后发言时间
-		$this->_db->update("UPDATE pw_cmembers SET lastpost=" . pwEscape($timestamp) . " WHERE uid=" . pwEscape($winduid));
+		$this->_db->update("UPDATE pw_cmembers SET lastpost=" . S::sqlEscape($timestamp) . " WHERE uid=" . S::sqlEscape($winduid));
 	}
 
 	function replyPost($pid, $tid, $postdata) {
@@ -100,7 +100,7 @@ class PwColonyPost extends PwColony {
 			return false;
 		}
 		require_once(R_P . 'u/require/core.php');
-		$count = $this->_db->get_value("SELECT COUNT(*) AS count FROM pw_group_replay WHERE uid=" . pwEscape($postdata['authorid']) . " AND tid=" . pwEscape($tid) . " AND is_read=0");
+		$count = $this->_db->get_value("SELECT COUNT(*) AS count FROM pw_group_replay WHERE uid=" . S::sqlEscape($postdata['authorid']) . " AND tid=" . S::sqlEscape($tid) . " AND is_read=0");
 		if ($count == 0) {
 			$pwSQL = array(
 				'uid'		=> $postdata['authorid'],
@@ -110,22 +110,23 @@ class PwColonyPost extends PwColony {
 				'num'		=> 1,
 				'add_time'	=> $timestamp
 			);
-			$this->_db->update('INSERT INTO pw_group_replay SET ' . pwSqlSingle($pwSQL));
+			$this->_db->update('INSERT INTO pw_group_replay SET ' . S::sqlSingle($pwSQL));
 		} else { 
-			$this->_db->update('UPDATE pw_group_replay SET add_time=' . pwEscape($timestamp) . ',num=num +1  WHERE uid=' . pwEscape($postdata['authorid'])." and tid=" . pwEscape($tid));
+			$this->_db->update('UPDATE pw_group_replay SET add_time=' . S::sqlEscape($timestamp) . ',num=num +1  WHERE uid=' . S::sqlEscape($postdata['authorid'])." and tid=" . S::sqlEscape($tid));
 		}
 		
-		$this->_db->update("UPDATE pw_threads SET lastpost=".pwEscape($timestamp)." WHERE tid=".pwEscape($tid)." AND locked<3 AND lastpost <".pwEscape($timestamp));
-		$thread_locked = $this->_db->get_value("SELECT locked FROM pw_threads WHERE tid=".pwEscape($tid));
+		//$this->_db->update("UPDATE pw_threads SET lastpost=".S::sqlEscape($timestamp)." WHERE tid=".S::sqlEscape($tid)." AND locked<3 AND lastpost <".S::sqlEscape($timestamp));
+		pwQuery::update('pw_threads', 'tid=:tid AND locked<:locked AND lastpost<:lastpost' , array($tid, 3, $timestamp), array('lastpost'=>$timestamp));
+		$thread_locked = $this->_db->get_value("SELECT locked FROM pw_threads WHERE tid=".S::sqlEscape($tid));
 		if ($thread_locked < 3) {
-			$this->_db->update('UPDATE pw_argument SET lastpost=' . pwEscape($timestamp) . ' WHERE tid=' . pwEscape($tid) . ' AND lastpost< '.pwEscape($timestamp));
+			$this->_db->update('UPDATE pw_argument SET lastpost=' . S::sqlEscape($timestamp) . ' WHERE tid=' . S::sqlEscape($tid) . ' AND lastpost< '.S::sqlEscape($timestamp));
 		}
-		$this->_db->update("UPDATE pw_colonys SET pnum=pnum+'1',todaypost=todaypost+1 WHERE id=" . pwEscape($this->cyid));
+		$this->_db->update("UPDATE pw_colonys SET pnum=pnum+'1',todaypost=todaypost+1 WHERE id=" . S::sqlEscape($this->cyid));
 		$this->info['pnum']++;
 		updateGroupLevel($this->info['id'], $this->info);
 
 		//更新群成员表里面的最后发言时间
-		$this->_db->update("UPDATE pw_cmembers SET lastpost=" . pwEscape($timestamp) . " WHERE uid=" . pwEscape($winduid));
+		$this->_db->update("UPDATE pw_cmembers SET lastpost=" . S::sqlEscape($timestamp) . " WHERE uid=" . S::sqlEscape($winduid));
 	}
 
 	function modifyRight() {
@@ -140,7 +141,7 @@ class PwColonyPost extends PwColony {
 			$actions = '-';
 			$this->info['tnum']--;
 		}
-		$this->_db->update("UPDATE pw_colonys SET tnum=tnum{$actions}'1' WHERE id=" . pwEscape($this->cyid));
+		$this->_db->update("UPDATE pw_colonys SET tnum=tnum{$actions}'1' WHERE id=" . S::sqlEscape($this->cyid));
 		updateGroupLevel($this->cyid, $this->info);
 	}
 }

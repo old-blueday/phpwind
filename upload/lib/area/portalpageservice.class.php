@@ -106,7 +106,7 @@ class PW_PortalPageService {
 	function getPortalStaticState() {
 		static $result = array();
 		if (!isset($result['state']) && is_file(D_P.'data/bbscache/portal_config.php')) {
-			include D_P.'data/bbscache/portal_config.php';
+			include pwCache::getPath(D_P.'data/bbscache/portal_config.php');
 			$result['state'] = $portal_staticstate;
 		}
 		return $result['state'] ? $result['state'] : array();
@@ -145,7 +145,7 @@ class PW_PortalPageService {
 			$result = include(R_P.'require/portalpages.php');
 		}
 		foreach ($db_modes as $key=>$value) {
-			$portalPagesFile = Pcv(R_P . 'mode/' . $key . '/config/portalpages.php');
+			$portalPagesFile = S::escapePath(R_P . 'mode/' . $key . '/config/portalpages.php');
 			if (!file_exists($portalPagesFile)) continue;
 			$pages = include ($portalPagesFile);
 			$result = array_merge($result,$pages);

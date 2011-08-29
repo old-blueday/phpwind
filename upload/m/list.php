@@ -3,9 +3,9 @@ require_once('wap_global.php');
 
 $listdb = array();
 if($fid){
-	InitGP(array('page'));
+	S::gp(array('page'));
 	$per = 10;
-	$fm  = $db->get_one("SELECT topic FROM pw_forumdata WHERE fid=".pwEscape($fid));
+	$fm  = $db->get_one("SELECT topic FROM pw_forumdata WHERE fid=".S::sqlEscape($fid));
 	$db_maxpage && $page > $db_maxpage && $page=$db_maxpage;
 	(!is_numeric($page) || $page < 1) && $page=1;
 	$totle = ceil($fm['topic']/$per);
@@ -17,8 +17,8 @@ if($fid){
 	$list  = '';
 	$satrt = ($page-1)*$per;
 	$id    = $satrt;
-	$limit = pwLimit($satrt,$per);
-	$query = $db->query("SELECT tid,author,subject,postdate,hits,replies,anonymous FROM pw_threads WHERE fid=".pwEscape($fid)." AND topped<3 AND ifcheck=1 ORDER BY topped DESC,lastpost DESC $limit");
+	$limit = S::sqlLimit($satrt,$per);
+	$query = $db->query("SELECT tid,author,subject,postdate,hits,replies,anonymous FROM pw_threads WHERE fid=".S::sqlEscape($fid)." AND topped<3 AND ifcheck=1 ORDER BY topped DESC,lastpost DESC $limit");
 	while($rt=$db->fetch_array($query)){
 		$id++;
 		$rt['anonymous'] && $rt['author'] = $db_anonymousname;

@@ -13,15 +13,15 @@ $postActForO = new PW_ActivityForO();
 $seeTitle = $postActForO->getSeeTitleBySee($see);
 
 if (empty($see)) {
-	InitGP(array('actmid'),GP,2);
-	InitGP(array('timerange'),GP);
+	S::gp(array('actmid'),GP,2);
+	S::gp(array('timerange'),GP);
 	
-	@include_once(D_P."data/bbscache/activity_config.php");
+	@include_once pwCache::getPath(D_P."data/bbscache/activity_config.php");
 
 	$where = " WHERE dv.ifrecycle=0";
 
 	if ($actmid) {
-		$where .= " AND dv.actmid=".pwEscape($actmid);
+		$where .= " AND dv.actmid=".S::sqlEscape($actmid);
 		$pageUrl .= 'actmid='.$actmid.'&';
 	}
 	if (!empty($timerange)) {	
@@ -29,7 +29,7 @@ if (empty($see)) {
 			$timerange = (int)$timerange;		
 			if ($timerange > 0) {
 				$startTimeBeforeTimestamp = $timestamp + $timerange;
-				$where .= " AND (dv.starttime <= ".pwEscape($startTimeBeforeTimestamp)."AND dv.starttime >".pwEscape($timestamp)."OR (dv.endtime <=".pwEscape($startTimeBeforeTimestamp)."And dv.endtime >".pwEscape($timestamp)." ))";
+				$where .= " AND (dv.starttime <= ".S::sqlEscape($startTimeBeforeTimestamp)."AND dv.starttime >".S::sqlEscape($timestamp)."OR (dv.endtime <=".S::sqlEscape($startTimeBeforeTimestamp)."And dv.endtime >".S::sqlEscape($timestamp)." ))";
 				$pageUrl .= 'timerange=%2B'.$timerange.'&';
 			}
 		}
@@ -39,14 +39,14 @@ if (empty($see)) {
 	if (empty($a)) { //我的活动
 		$authoridTidDb = $myTidDb = $allActivityIdsIHaveParticipated = array();
 		$fids = trim(getSpecialFid() . ",'0'",',');
-		$query = $db->query("SELECT tid FROM pw_threads WHERE authorid=".pwEscape($winduid) . " AND special=8 AND fid not IN($fids)");
+		$query = $db->query("SELECT tid FROM pw_threads WHERE authorid=".S::sqlEscape($winduid) . " AND special=8 AND fid not IN($fids)");
 		while ($rt = $db->fetch_array($query)) {
 			$authoridTidDb[] = $rt['tid'];//我发布的
 		}
 		$allActivityIdsIHaveParticipated = $postActForO->getAllParticipatedActivityIdsByUid($winduid);//我参与的
 		$myTidDb = array_merge($authoridTidDb,$allActivityIdsIHaveParticipated);
 		empty($myTidDb) && $myTidDb=array(-1);
-		is_array($myTidDb) && $myTidDb && $where .= " AND dv.tid IN (".pwImplode($myTidDb).")";
+		is_array($myTidDb) && $myTidDb && $where .= " AND dv.tid IN (".S::sqlImplode($myTidDb).")";
 	} elseif ($a == 'recommended') { //推荐的活动
 		$where .= " AND dv.recommend = 1";
 	}
@@ -75,7 +75,7 @@ if (empty($see)) {
 		}
 		
 		//获取活动报名人数
-		$query = $db->query("SELECT tid, SUM(signupnum) AS count FROM pw_activitymembers WHERE fupid=0 AND tid IN (".pwImplode($activityIds).") AND ifpay IN('0','1','2','4') GROUP BY tid");
+		$query = $db->query("SELECT tid, SUM(signupnum) AS count FROM pw_activitymembers WHERE fupid=0 AND tid IN (".S::sqlImplode($activityIds).") AND ifpay IN('0','1','2','4') GROUP BY tid");
 		while ($rt = $db->fetch_array($query)) {
 			if (array_key_exists($rt['tid'], $activities)) {
 				$activities[$rt['tid']]['signup'] = $rt['count'];
@@ -85,14 +85,14 @@ if (empty($see)) {
 
 } elseif ('fromgroup' == $see) { //来自群组
 	
-	InitGP(array('type'),GP,2);
-	InitGP(array('timerange'),GP);
+	S::gp(array('type'),GP,2);
+	S::gp(array('timerange'),GP);
 		
 	$where = " WHERE 1";
 	$timeSelectHtml = $postActForO->getTimeSelectHtml($timerange, 1, '');
 
 	if ($type) {
-		$where .= " AND a.type=".pwEscape($type);
+		$where .= " AND a.type=".S::sqlEscape($type);
 		$pageUrl .= 'type='.$type.'&';
 		${'type_'.$type} = 'selected';
 	}
@@ -101,7 +101,7 @@ if (empty($see)) {
 			$timerange = (int)$timerange;
 			if ($timerange > 0) {
 				$startTimeBeforeTimestamp = $timerange + $timestamp;
-				$where .= " AND (a.begintime <= ".pwEscape($startTimeBeforeTimestamp)."AND a.begintime >".pwEscape($timestamp)."OR (a.endtime <=".pwEscape($startTimeBeforeTimestamp)."And a.endtime >".pwEscape($timestamp)." ))";
+				$where .= " AND (a.begintime <= ".S::sqlEscape($startTimeBeforeTimestamp)."AND a.begintime >".S::sqlEscape($timestamp)."OR (a.endtime <=".S::sqlEscape($startTimeBeforeTimestamp)."And a.endtime >".S::sqlEscape($timestamp)." ))";
 				$pageUrl .= 'timerange=%2B'.$timerange.'&';
 			}
 		}
@@ -109,17 +109,17 @@ if (empty($see)) {
 	
 	if (empty($a)) { //我的活动
 		$authoridTidDb = $myTidDb = $allActivityIdsIHaveParticipated = array();
-		$query = $db->query("SELECT actid FROM pw_actmembers WHERE uid=" . pwEscape($winduid));
+		$query = $db->query("SELECT actid FROM pw_actmembers WHERE uid=" . S::sqlEscape($winduid));
 		while ($rt = $db->fetch_array($query)) {			
 			$allActivityIdsIHaveParticipated[] = $rt['actid'];//我参与的
 		}
-		$query = $db->query("SELECT id FROM pw_active WHERE uid=" . pwEscape($winduid));
+		$query = $db->query("SELECT id FROM pw_active WHERE uid=" . S::sqlEscape($winduid));
 		while ($rt = $db->fetch_array($query)) {			
 			$authoridTidDb[] = $rt['id'];//我发布的
 		}
 		$myTidDb = array_merge($authoridTidDb,$allActivityIdsIHaveParticipated);
 		empty($myTidDb) && $myTidDb=array(-1);
-		is_array($myTidDb) && $myTidDb && $where .= " AND a.id IN (".pwImplode($myTidDb).")";
+		is_array($myTidDb) && $myTidDb && $where .= " AND a.id IN (".S::sqlImplode($myTidDb).")";
 	} else { //所有活动
 		$where .= " ";
 	}
@@ -149,19 +149,19 @@ if (empty($see)) {
 	
 	$db_perpage = 30;
 	
-	InitGP(array('feeslogstatus', 'activityname', 'otherpartyname'),GP);
+	S::gp(array('feeslogstatus', 'activityname', 'otherpartyname'),GP);
 	$feesLogStatusSelectHtml = getSelectHtml($postActForO->getFeesLogStatus(), $feeslogstatus, 'feeslogstatus');
 
 	$uidDb = $authoridDb = $fromuidDb = $actpidDB = array();
-	$query = $db->query("SELECT actpid FROM pw_activitypaylog WHERE uid = ".pwEscape($winduid));
+	$query = $db->query("SELECT actpid FROM pw_activitypaylog WHERE uid = ".S::sqlEscape($winduid));
 	while ($rt = $db->fetch_array($query)) {
 		$uidDb[] = $rt['actpid'];
 	}
-	$query = $db->query("SELECT actpid FROM pw_activitypaylog WHERE authorid = ".pwEscape($winduid));
+	$query = $db->query("SELECT actpid FROM pw_activitypaylog WHERE authorid = ".S::sqlEscape($winduid));
 	while ($rt = $db->fetch_array($query)) {
 		$authoridDb[] = $rt['actpid'];
 	}
-	$query = $db->query("SELECT actpid FROM pw_activitypaylog WHERE fromuid = ".pwEscape($winduid));
+	$query = $db->query("SELECT actpid FROM pw_activitypaylog WHERE fromuid = ".S::sqlEscape($winduid));
 	while ($rt = $db->fetch_array($query)) {
 		$fromuidDb[] = $rt['actpid'];
 	}
@@ -169,20 +169,20 @@ if (empty($see)) {
 	$where = 'WHERE 1';
 	$actpidDB = array_merge($uidDb,$authoridDb,$fromuidDb);
 	empty($actpidDB) && $actpidDB =array(-1);
-	is_array($actpidDB) && $actpidDB && $where .= " AND log.actpid IN (".pwImplode($actpidDB).")";
+	is_array($actpidDB) && $actpidDB && $where .= " AND log.actpid IN (".S::sqlImplode($actpidDB).")";
 	
 	if ($feeslogstatus) {
-		$where .= " AND status = ".pwEscape($feeslogstatus);
+		$where .= " AND status = ".S::sqlEscape($feeslogstatus);
 		$pageUrl .= 'feeslogstatus='.$feeslogstatus.'&';
 	}
 	if ($activityname) {
-		$where .= " AND subject LIKE ".pwEscape('%'.$activityname.'%');
+		$where .= " AND subject LIKE ".S::sqlEscape('%'.$activityname.'%');
 		$pageUrl .= 'activityname='.$activityname.'&';
 	}
 	if ($otherpartyname) {
-		$where .= " AND (log.username LIKE ".pwEscape('%'.$otherpartyname.'%').
-					" OR author LIKE ".pwEscape('%'.$otherpartyname.'%').
-					" OR log.fromusername LIKE " . pwEscape('%' . $otherpartyname . '%') . 
+		$where .= " AND (log.username LIKE ".S::sqlEscape('%'.$otherpartyname.'%').
+					" OR author LIKE ".S::sqlEscape('%'.$otherpartyname.'%').
+					" OR log.fromusername LIKE " . S::sqlEscape('%' . $otherpartyname . '%') . 
 					") AND '" . $otherpartyname . "'!='" . $windid . "'";
 		$pageUrl .= 'otherpartyname='.$otherpartyname.'&';
 	}

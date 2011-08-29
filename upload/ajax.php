@@ -18,7 +18,7 @@ if ($groupid == 6 || getstatus($winddb['userstatus'], PW_USERSTATUS_BANUSER)) {
 	$pwSQL = '';
 	$flag  = 0;
 	$bandb = $delban = array();
-	$query = $db->query("SELECT * FROM pw_banuser WHERE uid=".pwEscape($winduid));
+	$query = $db->query("SELECT * FROM pw_banuser WHERE uid=".S::sqlEscape($winduid));
 	while ($rt = $db->fetch_array($query)) {
 		if ($rt['type'] == 1 && $timestamp - $rt['startdate'] > $rt['days']*86400) {
 			$delban[] = $rt['id'];
@@ -28,8 +28,8 @@ if ($groupid == 6 || getstatus($winddb['userstatus'], PW_USERSTATUS_BANUSER)) {
 			$flag = 1;
 		}
 	}
-	$delban && $db->update('DELETE FROM pw_banuser WHERE id IN('.pwImplode($delban).')');
-	
+	$delban && $db->update('DELETE FROM pw_banuser WHERE id IN('.S::sqlImplode($delban).')');
+
 	$updateUser = array();
 	if ($groupid == 6 && !isset($bandb[0])) {
 		$updateUser['groupid'] = -1;
@@ -41,9 +41,9 @@ if ($groupid == 6 || getstatus($winddb['userstatus'], PW_USERSTATUS_BANUSER)) {
 	if (count($updateUser)) {
 		$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
 		$userService->update($winduid, $updateUser);
-		
-		$_cache = getDatastore();
-		$_cache->delete('UID_'.$winduid);
+
+		//* $_cache = getDatastore();
+		//* $_cache->delete('UID_'.$winduid);
 	}
 	if ($bandb) {
 		$bandb = current($bandb);
@@ -64,7 +64,7 @@ if ($groupid == 6 || getstatus($winddb['userstatus'], PW_USERSTATUS_BANUSER)) {
 }
 if (GetCookie('force') && $winduid != GetCookie('force')) {
 	$force = GetCookie('force');
-	$bandb = $db->get_one('SELECT type FROM pw_banuser WHERE uid='.pwEscape($force).' AND fid=0');
+	$bandb = $db->get_one('SELECT type FROM pw_banuser WHERE uid='.S::sqlEscape($force).' AND fid=0');
 	if ($bandb['type'] == 3) {
 		Showmsg('ban_info3');
 	} else {
@@ -78,12 +78,12 @@ $montime >= $winddb['lastpost'] && $winddb['monthpost'] = 0;
 if ($_G['postlimit'] && $winddb['todaypost'] >= $_G['postlimit']) {
 	Showmsg('post_gp_limit');
 }
-list(,,$postq)	= explode("\t",$db_qcheck);
-InitGP(array('action'));
+list($postq,$showq)	= explode("\t",$db_qcheck);
+S::gp(array('action'));
 
 if ($action == 'modify') {
 
-	InitGP(array('pid','article'));
+	S::gp(array('pid','article'));
 	L::loadClass('postmodify', 'forum', false);
 	if ($pid && is_numeric($pid)) {
 		$postmodify = new replyModify($tid, $pid, $pwpost);
@@ -105,16 +105,28 @@ if ($action == 'modify') {
 	if ($winduid != $atcdb['authorid']) {
 		$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
 		$authordb = $userService->get($atcdb['authorid']);
-	  /**Begin modify by liaohu*/					
+	  /**Begin modify by liaohu*/
 		$pce_arr = explode(",",$GLOBALS['SYSTEM']['tcanedit']);
 		if (($authordb['groupid'] == 3 || $authordb['groupid'] == 4 || $authordb['groupid'] == 5) && !in_array($authordb['groupid'],$pce_arr)) {
 			Showmsg('modify_admin');
 		}
 		/**End modify by liaohu*/
 	}
-	if ($_G['edittime'] && ($timestamp - $atcdb['postdate']) > $_G['edittime'] * 60) {
+
+	//版块编辑时间限制
+	global $postedittime;
+	L::loadClass('forum', 'forum', false);
+	$pwforum = new PwForum($atcdb['fid']);
+	$isBM = $pwforum->isBM($windid);
+	$userSystemRight =  userSystemRight($windid, $isBM, 'deltpcs');
+	$postedittime = $pwforum->foruminfo['forumset']['postedittime'];
+	if (!$userSystemRight && $winduid == $atcdb['authorid'] && $postedittime !== "" &&   $postedittime != 0 && ($timestamp - $atcdb['postdate']) >  $postedittime * 60) {
+		Showmsg('modify_forumtimelimit');
+	}
+	if ( $winduid == $atcdb['authorid'] && $_G['edittime'] && ($timestamp - $atcdb['postdate']) > $_G['edittime'] * 60) {
 		Showmsg('modify_timelimit');
 	}
+
 	if (empty($_POST['step'])) {
 
 		$atcdb['anonymous'] && $atcdb['author'] = $db_anonymousname;
@@ -128,9 +140,9 @@ if ($action == 'modify') {
 
 	} else {
 
-		PostCheck(1,($db_gdcheck & 4) && $winddb['postnum'] < $db_postgd,$winddb['postnum'] < $postq);
+		PostCheck(1,($db_gdcheck & 4) && (!$db_postgd || $winddb['postnum'] < $db_postgd),$db_ckquestion & 4 && (!$postq || $winddb['postnum'] < $postq));
 
-		InitGP(array('atc_title','atc_content'), 'P', 0);
+		S::gp(array('atc_title','atc_content'), 'P', 0);
 		require_once(R_P.'require/bbscode.php');
 
 		if ($postmodify->type == 'topic') {
@@ -227,8 +239,8 @@ if ($action == 'modify') {
 	if (!$pwforum->foruminfo['allowrp'] && !$pwpost->admincheck && $_G['allowrp'] == 0) {
 		Showmsg('reply_group_right');
 	}
-	InitGP(array('pid','article','page'));
-
+	S::gp(array('pid','article','page'));
+	$page = (int)$page;
 	if ($article == '0') {
 		$pw_tmsgs = GetTtable($tid);
 		$S_sql = ',tm.ifsign,tm.content,m.uid,m.groupid,m.userstatus';
@@ -236,7 +248,7 @@ if ($action == 'modify') {
 	} else {
 		$S_sql = $J_sql = '';
 	}
-	$tpcarray = $db->get_one("SELECT t.fid,t.locked,t.ifcheck,t.author,t.authorid,t.subject,t.postdate,t.ifshield,t.anonymous,t.ptable $S_sql FROM pw_threads t $J_sql WHERE t.tid=".pwEscape($tid));
+	$tpcarray = $db->get_one("SELECT t.fid,t.locked,t.ifcheck,t.author,t.authorid,t.subject,t.postdate,t.ifshield,t.anonymous,t.ptable $S_sql FROM pw_threads t $J_sql WHERE t.tid=".S::sqlEscape($tid));
 	$pw_posts = GetPtable($tpcarray['ptable']);
 
 	if ($tpcarray['fid'] != $fid) {
@@ -257,7 +269,7 @@ if ($action == 'modify') {
 		$atcarray = $tpcarray;
 	} else {
 		!is_numeric($pid) && Showmsg('illegal_tid');
-		$atcarray = $db->get_one("SELECT p.author,p.subject,p.postdate,p.content,p.ifshield,p.anonymous,m.uid,m.groupid,m.userstatus FROM $pw_posts p LEFT JOIN pw_members m ON p.authorid=m.uid WHERE p.pid=".pwEscape($pid));
+		$atcarray = $db->get_one("SELECT p.author,p.subject,p.postdate,p.content,p.ifshield,p.anonymous,m.uid,m.groupid,m.userstatus FROM $pw_posts p LEFT JOIN pw_members m ON p.authorid=m.uid WHERE p.pid=".S::sqlEscape($pid));
 	}
 	if ($atcarray['ifshield'] == '1') {
 		$atcarray['content'] = shield('shield_article');
@@ -297,12 +309,12 @@ if ($action == 'modify') {
 } elseif ($action == 'subject') {
 
 	(!$pwpost->isGM && !pwRights($pwpost->isBM, 'deltpcs')) && Showmsg('undefined_action');
-	$atcdb = $db->get_one('SELECT authorid,subject FROM pw_threads WHERE tid=' . pwEscape($tid));
+	$atcdb = $db->get_one('SELECT authorid,subject FROM pw_threads WHERE tid=' . S::sqlEscape($tid));
 	empty($atcdb) && Showmsg('illegal_tid');
 	if ($winduid != $atcdb['authorid']) {
 		$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
 		$authordb = $userService->get($atcdb['authorid']);
-		/**Begin modify by liaohu*/					
+		/**Begin modify by liaohu*/
 		$pce_arr = explode(",",$GLOBALS['SYSTEM']['tcanedit']);
 		if (($authordb['groupid'] == 3 || $authordb['groupid'] == 4 || $authordb['groupid'] == 5) && !in_array($authordb['groupid'],$pce_arr)) {
 			Showmsg('modify_admin');
@@ -318,7 +330,7 @@ if ($action == 'modify') {
 	} else {
 
 		PostCheck();
-		InitGP(array('atc_content'),'P');
+		S::gp(array('atc_content'),'P');
 		$atc_content = html_entity_decode(urldecode($atc_content));
 		!$atc_content && Showmsg('content_empty');
 		if (!$atc_content || strlen($atc_content) > $db_titlemax) {
@@ -329,12 +341,12 @@ if ($action == 'modify') {
 			Showmsg('title_wordsfb');
 		}
 
-		$db->update('UPDATE pw_threads SET subject=' . pwEscape($atc_content) . ' WHERE tid=' . pwEscape($tid));
-
+		//$db->update('UPDATE pw_threads SET subject=' . S::sqlEscape($atc_content) . ' WHERE tid=' . S::sqlEscape($tid));
+		pwQuery::update('pw_threads', 'tid=:tid', array($tid), array('subject'=>$atc_content));
 		//临时修改，待改进
-		$threads = L::loadClass('Threads', 'forum');
-		$threads->delThreads($tid);
-		$rt = $db->get_one('SELECT titlefont FROM pw_threads WHERE tid='.pwEscape($tid));
+		//* $threads = L::loadClass('Threads', 'forum');
+		//* $threads->delThreads($tid);
+		$rt = $db->get_one('SELECT titlefont FROM pw_threads WHERE tid='.S::sqlEscape($tid));
 		if ($rt['titlefont']) {
 			$detail = explode("~",$rt['titlefont']);
 			$detail[0] && $atc_content = "<font color=$detail[0]>$atc_content</font>";

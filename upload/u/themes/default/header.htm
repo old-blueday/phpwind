@@ -11,7 +11,7 @@ print<<<EOT
 <meta name="keywords" content="$metaKeywords" />
 <meta http-equiv="x-ua-compatible" content="ie=7" />
 <base id="headbase" href="$db_bbsurl/" />
-<link rel="stylesheet" type="text/css" href="images/pw_core.css?100919" media="all" />
+<link rel="stylesheet" type="text/css" href="images/pw_core.css?101128" media="all" />
 <link rel="stylesheet" type="text/css" href="u/images/style.css" media="all" />
 <link rel="stylesheet" type="text/css" href="images/post/minieitor/minieitor.css" media="all" />
 <!--
@@ -44,168 +44,82 @@ var modeimg = '$pwModeImg';
 	<div class="header">
 	<div class="topbar">
 		<div class="topwarp cc">
-			<a href="index.php" class="logo"><img src="u/themes/$uskin/images/$uskin_logo" title="$o_sitename" /></a>
-			<div class="fl">
-				<a href="u.php">个人中心</a>
+			<a href="index.php" class="logo"><img src="u/themes/$uskin/images/$uskin_logo" width="116" height="31" title="$o_sitename" /></a>
+			<div class="fl mr10">
 <!--
 EOT;
-if ($o_browseopen) {print <<<EOT
+if ($homenavigation['linkup']) {
+	foreach($homenavigation['linkup'] as $key => $value) {
+	$currentClass = $value['data']['iscurrent'] ? 'class="current"' : '';
+	$html = buildNavLinkHtml($value['data']);
+	$crossEvent = (!$value['data']['iscurrent'] && 'cross' == $value['data']['floattype'] && $value['subs']) ? " onmouseover=\"ctrlSubMenu('nav_key_up_$key', 'nav_key_sub_$key');\" " : '';
+
+	$verticalEvent = (!$value['data']['iscurrent'] && 'vertical' == $value['data']['floattype'] && $value['subs']) ? " onmouseover=\"tmpHideAllCross('nav_key_sub_$key'); read.open('nav_key_sub_$key', 'nav_key_up_$key', null, 0, window['nav_key_up_$key']); \" " : '';
+
+	$currentEvent = $value['data']['iscurrent'] ? " onmouseover=\"tmpHideAllCross('nav_key_sub_$key'); \" " : '';
+print <<<EOT
 -->
-				<i>&nbsp;</i>
+				<span $currentClass $crossEvent $verticalEvent $currentEvent>$html</span>
+<!--
+EOT;
+} if ($o_browseopen) {print <<<EOT
+-->
 				<a href="mode.php?m=o">广场</a>
 <!--
 EOT;
-}print <<<EOT
--->
-<!--
-EOT;
-$db_menuinit .= ",'td_omainNav' : 'menu_omainNav'";
+} $db_menuinit .= ",'td_omainNav' : 'menu_omainNav'";
+ if (count($homenavigation['linkdown'])) {
 print <<<EOT
 -->
-				<i>&nbsp;</i>
-				<a id="td_omainNav" href="index.php" class="menudown">返回社区首页</a>
-			</div>
-			<div class="fr">
+				<a id="td_omainNav" class="link_down"><span id="td_omainNav" class="link_down">更多</span></a>
 <!--
 EOT;
-if ($winduid) {print <<<EOT
--->
-				<a href="u.php" class="b">$windid</a>
-				<a href="$loginouturl" class="mr10">退出</a><i>&nbsp;</i>
-<!--
-EOT;
-	if($winddb['newpm']>0 && $_G['maxmsg']>0){print <<<EOT
--->
-				<a href="message.php" class="newmes">消息($winddb[newpm])</a>
-<!--
-EOT;
-	}else{print <<<EOT
--->
-				<a href="message.php">消息</a>
-<!--
-EOT;
-	}
-	if($db_job_isopen){
-		$jobnum = ($winddb['jobnum']>0) ? "(".$winddb['jobnum'].")" : "";
-print <<<EOT
--->
-                <a href="jobcenter.php">任务<span>$jobnum</span></a>
-<!--
-EOT;
-	}
-	if($db_toolifopen){
-print <<<EOT
--->
-				<a href="profile.php?action=toolcenter">道具</a>
-<!--
-EOT;
-	}
-	$db_menuinit .= ",'td_profile' : 'menu_profile'";
-print <<<EOT
--->
-				<a id="td_profile" href="profile.php" class="mr10 menudown">设置</a><i>&nbsp;</i>
-<!--
-EOT;
-	if (CkInArray($windid, $manager) || $SYSTEM['allowadmincp']) {print <<<EOT
--->
-				<a href="$db_adminfile" target="_blank">系统设置</a>
-<!--
-EOT;
-	}
-} else {print <<<EOT
--->
-				<a href="$loginurl">登录</a>
-				<a href="$regurl" class="mr10">注册</a>
-<!--
-EOT;
+}
 }print <<<EOT
 -->
 			</div>
-		</div>
-	</div>
-<!--head begin-->
-<!--
-EOT;
-if (isset($isSpace) && $isSpace) {
-$style_banner = $space['banner_s'] ? " style=\"background:url({$space[banner_s]}) repeat;\"" : '';
-print <<<EOT
--->
-	<div class="head"{$style_banner}>
-		<div class="spBan">
-			<div class="site">
-				<h2 id="spaceName">
-					{$space['name']}
-					<a id="showNameEditLink" style="display:none;" class="s7 f12" href="u.php?a=set&tab=basic">[编辑]</a>
-				</h2>
-				<p>$space[descript]</p>
-				<p>{$db_bbsurl}/u.php?uid=$space[uid] &nbsp;<a href="javascript:;" id="bookmarkExplore" onClick="Addtoie('{$db_bbsurl}/u.php?uid=$space[uid]','{$space['name']}');" class="s7">[收藏]</a>&nbsp;<a href="javascript:;" onClick="CopyCode('{$db_bbsurl}/u.php?uid=$space[uid]')" class="s7">[复制]</a></p>
-			</div>
-			<div class="bannerBg"></div>
-		</div>
-		<div class="cc">
-		<div class="fr">
-			<div class="search fl">
+			<div class="search">
 			<form id="searchForm" action="searcher.php" method="post" target="_blank">
 				<input type="hidden" name="verify" value="$verifyhash">
 				<input type="hidden" name="step" value="2">
 				<input id="searchType" type="hidden" name="type" value="user">
-				<span id="submitSearch" class="adown fl cp">搜索</span>
+				<span id="submitSearch" class="adown fl cp">用户</span>
 				<div id="searchTypeSelect" class="fl" style="display:none;">
 					<ul>
-						<li id="searchType_user" class="current">用户</li>
-						<li id="searchType_thread">帖子</li>
-						<li id="searchType_diary">日志</li>
-						<li id="searchType_forum">版块</li>
-						<li id="searchType_group">群组</li>
+<!--
+EOT;
+if ($db_search_type) {
+	foreach ($db_search_type as $key=>$value) {
+		$currentType = $key == 'thread' ? 'class="current"' : '';
+print <<<EOT
+-->	
+				<li id="searchType_{$key}" $currentType>{$value}</li>
+<!--
+EOT;
+	}
+} else {
+print <<<EOT
+-->
+				<li id="searchType_thread" class="current">帖子</li>
+				<li id="searchType_diary">日志</li>
+				<li id="searchType_user">用户</li>
+				<li id="searchType_forum">版块</li>
+				<li id="searchType_group">群组</li>
+<!--
+EOT;
+}print <<<EOT
+-->
 					</ul>
 				</div>
 				<input id="searchKeyword" class="sip" name="keyword" type="text">
 				<button type="submit">搜索</button>
 			</form>
 			</div>
-<!--
-EOT;
-if ($winduid) {
-if ($space['isMe']) {print <<<EOT
--->
-			<span class="btn4 fl"><span><button onClick="location.href='u.php?a=set'">空间装扮</button></span></span>
-<!--
-EOT;
-}}print <<<EOT
--->
-		</div>
-		<div class="navA">
-			<ul>
-				<li class="current"><a href="u.php?uid=$space[uid]">首页</a></li>
-				<li><a href="apps.php?q=weibo&uid=$space[uid]">新鲜事</a></li>
-<!--
-EOT;
-if($GLOBALS['db_dopen']){print <<<EOT
--->
-				<li><a href="apps.php?q=diary&uid=$space[uid]">日志</a></li>
-<!--
-EOT;
-}print <<<EOT
--->
-<!--
-EOT;
-if($GLOBALS['db_phopen']){print <<<EOT
--->
-				<li><a href="apps.php?q=photos&uid=$space[uid]">相册</a></li>
-<!--
-EOT;
-}print <<<EOT
--->
-				<li><a href="apps.php?q=article&uid=$space[uid]">帖子</a></li>
-				<li class="none"><a href="u.php?a=info&uid=$space[uid]">个人资料</a></li>
-				<!-- <li><a href="apps.php?q=diary" class="down">更多</a></li> -->
-			</ul>
-		</div>
-		</div>
-	</div>
-<script language="javascript">
-if(is_webkit)
+<script>
+
+if(is_webkit && getObj('bookmarkExplore')){
 	getObj('bookmarkExplore').parentNode.removeChild(getObj('bookmarkExplore'));
+}
 var timeoutSpecifier = null;
 function hideSubMenu(subMenuId) {
 	timeoutSpecifier = setTimeout(function() {
@@ -259,7 +173,113 @@ getObj('submitSearch').onmouseover = function() {
 	ctrlSubMenu('submitSearch', 'searchTypeSelect');
 };
 //getObj('submitSearch').onclick = function() {getObj('searchForm').submit();};
-
+</script>
+			<div class="fr">
+<!--
+EOT;
+if ($winduid) {print <<<EOT
+-->
+				<a href="u.php" class="b">$windid</a>
+				<a href="$loginouturl" class="mr10">退出</a><i>&nbsp;</i>
+<!--
+EOT;
+if($winddb['newpm']>0 && $_G['maxmsg']>=0){
+$tmpMsgNum = 0;
+$tmpMsgNum += $winddb['newpm'];
+$winddb['newreferto']>0 && $tmpMsgNum += $winddb['newreferto'];
+$winddb['newcomment']>0 && $tmpMsgNum += $winddb['newcomment'];
+$winddb['newfans']>0 && $tmpMsgNum += $winddb['newfans'];
+print <<<EOT
+-->
+				<a href="message.php" class="newmes">消息<span class="s2">($tmpMsgNum)</span></a>
+<!--
+EOT;
+	}else{print <<<EOT
+-->
+				<a href="message.php">消息</a>
+<!--
+EOT;
+	}
+	$db_menuinit .= ",'td_profile' : 'menu_profile'";
+print <<<EOT
+-->
+				<a id="td_profile" href="profile.php" class="mr10 link_down"><span>设置</span></a><i>&nbsp;</i>
+<!--
+EOT;
+	if (CkInArray($windid, $manager) || $SYSTEM['allowadmincp']) {print <<<EOT
+-->
+				<a href="$db_adminfile" target="_blank">系统设置</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+				<a href="u.php?a=set&tab=skin"><img src="images/pwicon/style.gif" title="空间装扮" alt="空间装扮" align="top" /></a>
+<!--
+EOT;
+} else {print <<<EOT
+-->
+				<a href="$loginurl">登录</a>
+				<a href="$regurl" class="mr10">注册</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+			</div>
+		</div>
+	</div>
+<!--head begin-->
+<!--
+EOT;
+if (isset($isSpace) && $isSpace) {
+$style_banner = $space['banner_s'] ? " style=\"background:url({$space[banner_s]}) repeat;\"" : '';
+print <<<EOT
+-->
+	<div class="head"{$style_banner}>
+		<div class="spBan">
+			<div class="site">
+				<h2 id="spaceName">
+					{$space['name']}
+					<a id="showNameEditLink" style="display:none;" class="s7 f12" href="u.php?a=set&tab=basic">[编辑]</a>
+				</h2>
+				<p>$space[descript]</p>
+				<p>{$db_bbsurl}/{$db_userurl}$space[uid] &nbsp;<a href="javascript:;" id="bookmarkExplore" onClick="Addtoie('{$db_bbsurl}/{$db_userurl}$space[uid]','{$space['name']}');" class="s7">[收藏]</a>&nbsp;<a href="javascript:;" onClick="CopyCode('{$db_bbsurl}/{$db_userurl}$space[uid]')" class="s7">[复制]</a></p>
+			</div>
+			<div class="bannerBg"></div>
+		</div>
+		<div class="cc">
+		<div class="fr">
+				<span class="btn4 fl"><span><button onClick="location.href='{$db_bbsurl}/u.php?a=set'">空间装扮</button></span></span><span class="btn4 fl"><span><button onClick="location.href='{$db_bbsurl}/u.php'">个人中心</button></span></span>
+		</div>
+		<div class="navA">
+			<ul>
+				<li class="current"><a href="{$db_userurl}$space[uid]">首页</a></li>
+				<li><a href="apps.php?q=weibo&uid=$space[uid]">新鲜事</a></li>
+<!--
+EOT;
+if($GLOBALS['db_dopen']){print <<<EOT
+-->
+				<li><a href="apps.php?q=diary&uid=$space[uid]">日志</a></li>
+<!--
+EOT;
+}print <<<EOT
+-->
+<!--
+EOT;
+if($GLOBALS['db_phopen']){print <<<EOT
+-->
+				<li><a href="apps.php?q=photos&uid=$space[uid]">相册</a></li>
+<!--
+EOT;
+}print <<<EOT
+-->
+				<li><a href="apps.php?q=article&uid=$space[uid]">帖子</a></li>
+				<li class="none"><a href="u.php?a=info&uid=$space[uid]">个人资料</a></li>
+				<!-- <li><a href="apps.php?q=diary" class="down">更多</a></li> -->
+			</ul>
+		</div>
+		</div>
+	</div>
+<script language="javascript">
 /*
 EOT;
 if ($space['uid'] == $winduid) {print <<<EOT
@@ -279,7 +299,7 @@ print <<<EOT
 <!--
 EOT;
 } else {
-$s_lang = array('user' => array('个人中心','u.php','visit.png'), 'set' => array('设置','profile.php','visit.png'), 'msg' => array('消息','message.php','visit.png'));
+$s_lang = array('user' => array('个人中心','u.php','visit.png'), 'set' => array('设置','u.php','visit.png'), 'msg' => array('消息','message.php','visit.png'));
 list($uKey,$uValue) = explode('_', $USCR);
 $uKey = (isset($s_lang[$uKey])) ? $uKey : 'user';
 print <<<EOT
@@ -287,85 +307,9 @@ print <<<EOT
 	<div class="headB cc">
 <!--
 EOT;
-$db_menuinit .= ",'td_appMenu' : 'menu_appMenu'";
 print <<<EOT
 -->
-		<div class="fr appMenu cp" id="td_appMenu">快捷通道</div>
-		<div id="menu_appMenu" style="display:none;">
-			<div>
-				<div class="homeApp cc">
-					<div class="homeApptitle fr">快捷通道</div>
-					<div class="homeAppcont">
-						<ul class="homeApptwo cc">
-<!--
-EOT;
-if($db_dopen){print <<<EOT
--->
-							<li><a href="apps.php?q=diary" class="f14" style="background:url(u/images/icon/log.png) 0 5px no-repeat;">日志</a></li>
-<!--
-EOT;
-}if($GLOBALS['db_phopen']){print <<<EOT
--->
-							<li><a href="apps.php?q=photos" class="f14" style="background:url(u/images/icon/albums.png) 0 5px no-repeat;">相册</a></li>
-<!--
-EOT;
-}print <<<EOT
--->
-							<li><a href="apps.php?q=weibo" style="background:url(u/images/icon/record.png) 0 5px no-repeat;">新鲜事</a></li>
-							<li><a href="apps.php?q=article" style="background:url(u/images/icon/posts.png) 0 5px no-repeat;">帖子</a></li>
-<!--
-EOT;
-if($db_groups_open){print <<<EOT
--->
-							<li><a href="apps.php?q=groups" style="background:url(u/images/icon/groups.png) 0 5px no-repeat;">群组</a></li>
-<!--
-EOT;
-}print <<<EOT
--->
-							<li><a href="apps.php?q=collection" style="background:url(u/images/icon/collection.png) 0 5px no-repeat;">收藏</a></li>
-<!--
-EOT;
-if(!trim($o_hot_groups,',') || strpos($o_hot_groups,','.$winddb[groupid].',') !== false || ($winddb[groupid] == -1 && strpos($o_hot_groups,','.$winddb[memberid].',') !== false)){
-	$popedom = true;
-}else{
-	$popedom = false;
-}
-if($o_hot_open && $popedom){print <<<EOT
--->
-							<li><a href="apps.php?q=hot" style="background:url(u/images/icon/hot.png) 0 5px no-repeat;">热榜</a></li>
-<!--
-EOT;
-}print <<<EOT
--->
-							<li><a href="u.php?a=friend" style="background:url(u/images/icon/friend.png) 0 5px no-repeat;">朋友</a></li>
-							<li><a href="apps.php?q=activity" style="background:url(u/images/icon/activity.png) 0 5px no-repeat;">活动</a></li>
-<!--
-EOT;
-if ($db_appifopen && ($tmpAppArray = getUserApplist())) {
-	foreach ($tmpAppArray as $key => $value) {print <<<EOT
--->
-							<li><a href="apps.php?id=$value[appid]" style="background:url($db_server_url/images/icon/s{$value[appid]}.png) 0 5px no-repeat;">{$value[appname]}</a></li>
-<!--
-EOT;
-	}
-}print <<<EOT
--->
-						</ul>
-					</div>
-					<div class="homeAppbot">
-<!--
-EOT;
-if($db_appifopen && $db_siteappkey){print<<<EOT
--->
-					<a href="u.php?a=myapp" class="mr10">添加</a>
-<!--
-EOT;
-}print <<<EOT
--->
-					<a href="u.php?a=myapp&action=my">管理</a></div>
-				</div>
-			</div>
-		</div>
+		<a class="fr appMenu" href="{$db_userurl}$space[uid]">我的空间</a>	
 <!--
 EOT;
 if($GLOBALS['db_phopen']){print <<<EOT
@@ -380,83 +324,29 @@ EOT;
 if($GLOBALS['db_dopen']){print <<<EOT
 -->
 		<a class="fr aWrite" href="apps.php?q=diary&a=write">写日志</a>
-		<!--
+<!--
 EOT;
 }print <<<EOT
 -->
 		<div class="place fl">
-			<div>
-
 <!--
 EOT;
 $headtitle = '';
 switch($uValue){
-	case 'home':
-				 $headtitle   = "<img src='u/images/module/{$s_lang[$uKey][2]}' /><h2><a href=\"{$s_lang[$uKey][1]}\" class='s5'>{$s_lang[$uKey][0]}</a></h2>";
-				 $headtitle  .= "<a href=\"u.php?uid=$space[uid]\" class='s7'>我的主页</a>";
+	default:
+				 $headtitle   = "<div><a href=\"{$s_lang[$uKey][1]}\"><img src='u/images/p_logo.png' width=\"146\" height=\"39\" title=\"{$s_lang[$uKey][0]}\" /></a></div>";
 				 break;
-	case 'photo':
-				 $headtitle   = "<img src='u/images/module/photos.png' /><h2><a href='apps.php?q=photos' class='s5'>相册</a></h2>";
-				 $headtitle  .= "<a href='u.php' class='s7'>返回个人中心</a>";
-				 break;
-	case 'diary':
-				 $headtitle   = "<img src='u/images/module/diary.png' /><h2><a href='apps.php?q=diary' class='s5'>日志</a></h2>";
-				 $headtitle  .= "<a href='u.php' class='s7'>返回个人中心</a>";
-				 break;
-	case 'weibo':
-				 $headtitle   = "<img src='u/images/module/write.png' /><h2><a href='apps.php?q=weibo' class='s5'>新鲜事</a></h2>";
-				 $headtitle  .= "<a href='u.php' class='s7'>返回个人中心</a>";
-				 break;
-	case 'hot':
-				 $headtitle   = "<img src='u/images/module/hot.png' /><h2><a href='apps.php?q=hot' class='s5'>热榜</a></h2>";
-				 $headtitle  .= "<a href='u.php' class='s7'>返回个人中心</a>";
-				 break;
-	case 'article':
-				 $headtitle   = "<img src='u/images/module/article.png' /><h2><a href='apps.php?q=article' class='s5'>帖子</a></h2>";
-				 $headtitle  .= "<a href='u.php' class='s7'>返回个人中心</a>";
-				 break;
-	case 'activity':
-				 $headtitle   = "<img src='u/images/module/activity.png' /><h2><a href='apps.php?q=activity' class='s5'>活动</a></h2>";
-				 $headtitle  .= "<a href='u.php' class='s7'>返回个人中心</a>";
-				 break;
-	case 'groups':
-				 $headtitle   = "<img src='u/images/module/colony.png' /><h2><a href='apps.php?q=groups' class='s5'>群组</a></h2>";
-				 $headtitle  .= "<a href='u.php' class='s7'>返回个人中心</a>";
-				 break;
-	case 'friend':
-				 $headtitle   = "<img src='u/images/module/friend.png' /><h2><a href='u.php?a=friend' class='s5'>朋友</a></h2>";
-				 $headtitle  .= "<a href='u.php' class='s7'>返回个人中心</a>";
-				 break;
-	case 'jobcenter':
-				 $headtitle   = "<img src='u/images/module/jobcenter.png' /><h2><a href='jobcenter.php' class='s5'>任务</a></h2>";
-				 $headtitle  .= "<a href='u.php' class='s7'>返回个人中心</a>";
-				 break;
-	case 'toolcenter':
-				 $headtitle   = "<img src='u/images/module/toolcenter.png' /><h2><a href='profile.php?action=toolcenter' class='s5'>道具</a></h2>";
-			 	 $headtitle  .= "<a href='u.php' class='s7'>返回个人中心</a>";
-				 break;
-	case 'appid':
-				 $headtitle   = "<img src=\"$db_server_url/static/icon/{$appinfo[appid]}.png\" /><h2><a href=\"apps.php?id={$appinfo[appid]}\" class='s5'>{$appinfo[appname]}</a></h2>";
-			 	 $headtitle  .= "<a href='u.php' class='s7'>返回个人中心</a>";
-				 break;
-	case 'appset':
-				 $headtitle   = "<img src='u/images/module/appset.png' /><h2><a href='u.php?a=myapp&action=my' class='s5'>应用管理</a></h2>";
-			 	 $headtitle  .= "<a href='u.php' class='s7'>返回个人中心</a>";
-				 break;
-	case 'collection':
-				 $headtitle   = "<img src='u/images/module/collection.png' /><h2><a href='apps.php?q=collection' class='s5'>收藏</a></h2>";
-			 	 $headtitle  .= "<a href='u.php' class='s7'>返回个人中心</a>";
-				 break;
-	default :
-	 			$headtitle   = "<img src='u/images/module/{$s_lang[$uKey][2]}' /><h2><a href=\"{$s_lang[$uKey][1]}\" class='s5'>{$s_lang[$uKey][0]}</a></h2>";
-				$headtitle  .= "<a href='u.php' class='s7'>返回个人中心</a>";
+	case 'message':
+	 			$headtitle   = "<div class=\"one\"><img src='u/images/module/message.png' width=\"32\" height=\"32\" /><h2><a href=\"message.php\" class='s5'>{$s_lang[$uKey][0]}</a></h2><a href='u.php' class='s7'>返回个人中心</a></div>";
+				break;
+	case 'profile':
+	 			$headtitle   = "<div class=\"one\"><img src='u/images/module/{$s_lang[$uKey][2]}' width=\"32\" height=\"32\" /><h2><a href=\"profile.php\" class='s5'>{$s_lang[$uKey][0]}</a></h2><a href='u.php' class='s7'>返回个人中心</a></div>";
 				break;
 }
 
 print <<<EOT
 -->
 				$headtitle
-			</div>
 		</div>
 <!--
 EOT;
@@ -486,7 +376,7 @@ EOT;
 $extraSplit = '，';
 }if ($winddb['newfans']>0) {print <<<EOT
 -->
-					{$extraSplit}<a href="u.php?a=friend&type=attention&atype=attentioned"><span class="s6">有<span class="s2 b">$winddb[newfans]</span>人关注你</span></a>
+					{$extraSplit}<a href="u.php?a=friend&type=attentioned"><span class="s6">有<span class="s2 b">$winddb[newfans]</span>人关注你</span></a>
 <!--
 EOT;
 }print <<<EOT
@@ -502,12 +392,12 @@ EOT;
 	</div>
 <!--
 EOT;
-}print <<<EOT
+}if ($winduid) {print <<<EOT
 -->
 	<div id="menu_profile" style="display:none;">
 		<div style="margin-right:-6px;">
 		<div class="pw_menu" style="width:45px; position:relative;">
-			<h6 style="left:-1px;"><a href="profile.php" class="down">设置</a></h6>
+			<h6 style="left:-1px;"><a href="profile.php" class="link_down"><span>设置</span></a></h6>
 			<ul class="menuList" style="width:43px;">
 				<li><a href="profile.php?action=modify">帐号</a></li>
 				<li><a href="profile.php?action=privacy">隐私</a></li>
@@ -517,15 +407,19 @@ EOT;
 		</div>
 		</div>
 	</div>
+<!--
+EOT;
+}if ($homenavigation['linkdown']) {
+print<<<EOT
+-->
 	<div id="menu_omainNav" style="display:none;">
-		<div style="margin-left:-6px;">
+		<div style="margin-left:-7px;">
 		<div class="pw_menu" style="width:93px; position:relative;">
-			<h6 style="left:-1px;"><a href="$_mainUrl" class="down">返回社区首页</a></h6>
+			<h6 style="left:-1px;" class="link_down"><span>更多</span></h6>
 			<ul class="menuList" style="width:91px;">
 <!--
 EOT;
-$navConfigService = L::loadClass('navconfig', 'site');
-foreach($navConfigService->findValidNavListByTypeAndPostion(PW_NAV_TYPE_MAIN, 'o') as $key => $value) {
+foreach($homenavigation['linkdown'] as $key => $value) {
 print<<<EOT
 -->
 				<li><a href="{$value[data][link]}"><span>{$value[data][title]}</span></a></li>
@@ -537,18 +431,12 @@ EOT;
 		</div>
 		</div>
 	</div>
-	</div>
-	<div class="main">
-<!--
-EOT;
-if (!isset($isSpace) || !$isSpace) {print <<<EOT
--->
-		<span class="headTrgA"></span><span class="headTrgB"></span>
 <!--
 EOT;
 }print <<<EOT
 -->
-		<div class="c"></div>
+	</div>
+	<div class="main">
 <!--
 EOT;
 ?>-->

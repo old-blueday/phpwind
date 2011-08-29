@@ -8,7 +8,7 @@
 @effect:使用后，不能对该用户实现猪头术效果。
 
 ****/
-InitGP(array('uid'),'GP',2);
+S::gp(array('uid'),'GP',2);
 if($tooldb['type']!=2){
 	Showmsg('tooluse_type_error');  // 判断道具类型是否设置错误
 }
@@ -16,11 +16,11 @@ if(!$uid){
 	Showmsg('tooluse_nodefender');
 }
 
-$rt = $db->get_one("SELECT MAX(time) AS tooltime FROM pw_toollog WHERE touid=".pwEscape($uid)."AND filename='defend'");
+$rt = $db->get_one("SELECT MAX(time) AS tooltime FROM pw_toollog WHERE touid=".S::sqlEscape($uid)."AND filename='defend'");
 if($rt && $rt['tooltime']>$timestamp-3600*48){
 	Showmsg('tooluse_deused');
 }
-$db->update("UPDATE pw_usertool SET nums=nums-1 WHERE uid=".pwEscape($winduid)."AND toolid=".pwEscape($toolid));
+$db->update("UPDATE pw_usertool SET nums=nums-1 WHERE uid=".S::sqlEscape($winduid)."AND toolid=".S::sqlEscape($toolid));
 $logdata=array(
 	'type'		=>	'use',
 	'filename'	=>	'defend',

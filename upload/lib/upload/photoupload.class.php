@@ -34,9 +34,11 @@ class PhotoUpload extends uploadBehavior {
 	function allowThumb() {
 		return true;
 	}
-	
-	function getThumbSize() {
-		return "100\t100";
+
+	function getThumbInfo($filename, $dir) {
+		return array(
+			array('s_' . $filename, $dir, "100\t100")
+		);
 	}
 
 	function getFilePath($currUpload) {
@@ -51,11 +53,11 @@ class PhotoUpload extends uploadBehavior {
 		} else {
 			$savedir .= 'Mon_'.date('ym') . '/';
 		}
-		return array($filename, $savedir, 's_' . $filename, $savedir);
+		return array($filename, $savedir);
 	}
 
 	function update($uploaddb) {
-		global $windid,$timestamp,$pintro;
+		global $windid,$winduid,$timestamp,$pintro;
 		foreach ($uploaddb as $key => $value) {
 			$this->attachs[] = array(
 				'aid'		=> $this->aid,
@@ -67,9 +69,14 @@ class PhotoUpload extends uploadBehavior {
 			);
 		}
 		if ($this->attachs) {
-			$this->db->update("INSERT INTO pw_cnphoto (aid,pintro,path,uploader,uptime,ifthumb) VALUES " . pwSqlMulti($this->attachs));
+			$this->db->update("INSERT INTO pw_cnphoto (aid,pintro,path,uploader,uptime,ifthumb) VALUES " . S::sqlMulti($this->attachs));
 			$this->pid = $this->db->insert_id();
-			if ($this->atype) updateDatanalyse($this->pid, 'groupPicNew', $timestamp);
+			if ($this->atype) {
+				updateDatanalyse($this->pid, 'groupPicNew', $timestamp);
+			} else {
+				$statistics = L::loadClass('Statistics', 'datanalyse');
+				$statistics->photouser($winduid, count($this->attachs));
+			}
 		}
 	}
 
@@ -83,8 +90,8 @@ class PhotoUpload extends uploadBehavior {
 
 	function getLastPhoto() {
 		$tmp = end($this->attachs);
-		//$lastpos = strrpos($tmp['path'],'/') + 1;
-		//$tmp['ifthumb'] && $tmp['path'] = substr($tmp['path'], 0, $lastpos) . 's_' . substr($tmp['path'], $lastpos);
+		$lastpos = strrpos($tmp['path'],'/') + 1;
+		$tmp['ifthumb'] && $tmp['path'] = substr($tmp['path'], 0, $lastpos) . 's_' . substr($tmp['path'], $lastpos);
 		return $tmp['path'];
 	}
 	

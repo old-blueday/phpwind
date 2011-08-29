@@ -1,7 +1,7 @@
 <?php
 !defined('P_W') && exit('Forbidden');
 
-InitGP(array('param'));
+S::gp(array('param'));
 
 require_once(R_P . 'u/lib/space.class.php');
 $newSpace = new PwSpace($winduid);

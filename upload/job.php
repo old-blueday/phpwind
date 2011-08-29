@@ -3,7 +3,7 @@ define('SCR', 'job');
 require_once ('global.php');
 require_once (R_P . 'require/functions.php');
 
-InitGP(array(
+S::gp(array(
 	'action'
 ));
 $whiteActions = array(
@@ -34,9 +34,10 @@ $whiteActions = array(
 	'pcjoin', //团购，报名
 	'activity',//活动
 	'attachbuy', //出售附件
+	'pweditor',
 );
 if (in_array($action, $whiteActions)) {
-	require Pcv(R_P . 'actions/job/' . $action . '.php');
+	require S::escapePath(R_P . 'actions/job/' . $action . '.php');
 }
 
 function fseeks($fp, $dbtdsize, $seed) {
@@ -63,7 +64,7 @@ function return_value($tid, $rw_a_name, $rw_a_val) {
 		return;
 	}
 	$p_a = $u_a = array();
-	$query = $db->query("SELECT pid,author,authorid FROM $pw_posts WHERE tid=" . pwEscape($tid) . " AND ifreward='0' AND authorid!=" . pwEscape($authorid) . " GROUP BY authorid ORDER BY postdate ASC LIMIT $rw_a_val");
+	$query = $db->query("SELECT pid,author,authorid FROM $pw_posts WHERE tid=" . S::sqlEscape($tid) . " AND ifreward='0' AND authorid!=" . S::sqlEscape($authorid) . " GROUP BY authorid ORDER BY postdate ASC LIMIT $rw_a_val");
 	while ($user = $db->fetch_array($query)) {
 		$credit->addLog('reward_active', array(
 			$rw_a_name => 1
@@ -77,7 +78,8 @@ function return_value($tid, $rw_a_name, $rw_a_val) {
 		$u_a[] = $user['authorid'];
 		$rw_a_val--;
 	}
-	$p_a && $db->update("UPDATE $pw_posts SET ifreward='1' WHERE pid IN(" . pwImplode($p_a) . ')');
+	//$p_a && $db->update("UPDATE $pw_posts SET ifreward='1' WHERE pid IN(" . S::sqlImplode($p_a) . ')');
+	$p_a && pwQuery::update($pw_posts, 'pid IN(:pid)', array($p_a), array('ifreward' => '1'));
 	$u_a && $credit->setus($u_a, array(
 		$rw_a_name => 1
 	), false);
@@ -121,7 +123,7 @@ function checkCreditLimit($creditlimit) {
 			$key == 'rvrc' && $winddb[$key] = floor($winddb[$key]/10);
 			$winddb[$key] < $value && Showmsg('job_vote_creditlimit');
 		} else {
-			$user_credit = $db->get_value("SELECT value FROM pw_membercredit WHERE uid=" . pwEscape($winduid) . " AND cid=" . pwEscape($key));
+			$user_credit = $db->get_value("SELECT value FROM pw_membercredit WHERE uid=" . S::sqlEscape($winduid) . " AND cid=" . S::sqlEscape($key));
 			$user_credit < $value && Showmsg('job_vote_creditlimit');
 		}
 	}

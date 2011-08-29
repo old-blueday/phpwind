@@ -1,6 +1,6 @@
 <!--<?php
 require_once(uTemplate::printEot('header'));
-//require_once(uTemplate::printEot('user_appleft'));
+require_once(uTemplate::printEot('user_appleft'));
 print <<<EOT
 -->
 <div class="homeBg cc">
@@ -9,18 +9,20 @@ EOT;
 if (empty($a)) {print <<<EOT
 -->
 <div class="homeCont fl">
+<table width="100%"><tr><td valign="top" height="500">
 	<div class="p15">
+		<h4 class="site"><img src="u/images/module/colony.png" align="absmiddle" class="mr10" /><span>群组</span></h4>
 		<div class="navC">
+			<a href="group.php?q=all" class="fr"><img src="u/images/icon/groups.png" align="absmiddle" /> 所有群组</a>
 			<ul>
 				<li><a href="{$basename}a=friend">朋友的群</a></li>
 				<li class="current"><a href="{$basename}">我的群组</a></li>
-				<li><a href="{$basename}a=all">所有群组</a></li>
 			</ul>
 <!--
 EOT;
 if($o_newcolony){print<<<EOT
 -->
-			<span class="btn_add fl"><span><button onClick="location.href='{$basename}a=create';" type="button">创建群组</button></span></span>
+			<span class="btn_add fl"><span><button onClick="location.href='group.php?q=create';" type="button">创建群组</button></span></span>
 <!--
 EOT;
 }print<<<EOT
@@ -32,6 +34,9 @@ EOT;
 if($weiboList){print <<<EOT
 -->
 <script type="text/javascript" language="JavaScript" src="apps/weibo/js/post.js"></script>
+<script language="javascript">
+var transmitAction = '';
+</script>
 <script language="JavaScript" src="js/pw_weibo.js"></script>
 <table width="100%">
 <tr>
@@ -46,16 +51,9 @@ foreach ($weiboList as $key => $value) {
 	$method = $weiboService->getType($value['type']);
 	$weiboModelTemplate->$method($value);
 }
-if ($count >= $perpage) {print <<<EOT
 print <<<EOT
 -->
-		<div class="cc p10">
-			<div class="pages" style="float:right"><a href="javascript:;" onclick="getWeiboList('conloy', 2,'weiboFeed');">下一页</a></div>
-		</div>
-<!--
-EOT;
-}print <<<EOT
--->
+	<div class="cc" style="padding: 10px 3px;">$navPages</div>
 </div>
 </td>
 </tr>
@@ -71,6 +69,7 @@ EOT;
 -->
 		</div>
 	</div>
+</td></tr></table>
 </div>
 <div class="homeSide fr">
 	<div class="p10">
@@ -92,7 +91,7 @@ foreach ($apply as $key => $value) {print <<<EOT
 					<dd class="dd">
 						<p class="lh_18"><a href="apps.php?q=group&cyid=$value[id]">$value[cname]</a></p>
 						<p class="s5">申请时间:$value[addtime]</p>
-						<p class="s5">群主：<a href="u.php?uid=$value[uid]" target="_blank" class="s7">$value[admin]</a></p>
+						<p class="s5">群主：<a href="{$db_userurl}$value[uid]" target="_blank" class="s7">$value[admin]</a></p>
 					</dd>
 				</dl>
 <!--
@@ -120,7 +119,7 @@ foreach ($group_own as $key => $value) {print <<<EOT
 					<dd class="dd">
 						<p class="lh_18"><a href="apps.php?q=group&cyid=$value[id]">$value[cname]</a></p>
 						<p class="s5">$value[addtime] 创建</p>
-						<p class="s5">群主：<a href="u.php?uid=$value[uid]" target="_blank" class="s7">$value[admin]</a></p>
+						<p class="s5">群主：<a href="{$db_userurl}$value[uid]" target="_blank" class="s7">$value[admin]</a></p>
 					</dd>
 				</dl>
 <!--
@@ -135,7 +134,7 @@ foreach ($group_other as $key => $value) {print <<<EOT
 					<dd class="dd">
 						<p class="lh_18"><a href="apps.php?q=group&cyid=$value[id]">$value[cname]</a></p>
 						<p class="s5">$value[addtime] 加入</p>
-						<p class="s5">群主：<a href="u.php?uid=$value[uid]" target="_blank" class="s7">$value[admin]</a></p>
+						<p class="s5">群主：<a href="{$db_userurl}$value[uid]" target="_blank" class="s7">$value[admin]</a></p>
 					</dd>
 				</dl>
 <!--
@@ -157,18 +156,21 @@ EOT;
 EOT;
 } elseif ($a == 'my') {print <<<EOT
 -->
-	<div class="p15" style="background:$uskin_boxA;min-height:400px;">
+<div style="background:$uskin_boxA;">
+<table width="100%"><tr><td valign="top" height="500">
+	<div class="p15">
+		<h4 class="site"><img src="u/images/module/colony.png" align="absmiddle" class="mr10" /><span>群组</span></h4>
 		<div class="navC">
+			<a href="group.php?q=all" class="fr"><img src="u/images/icon/groups.png" align="absmiddle" /> 所有群组</a>
 			<ul>
 				<li><a href="{$basename}a=friend">朋友的群</a></li>
 				<li class="current"><a href="{$basename}">我的群组</a></li>
-				<li><a href="{$basename}a=all">所有群组</a></li>
 			</ul>
 <!--
 EOT;
 if($o_newcolony){print<<<EOT
 -->
-			<span class="btn_add fl"><span><button onClick="location.href='{$basename}a=create';" type="button">创建群组</button></span></span>
+			<span class="btn_add fl"><span><button onClick="location.href='group.php?q=create';" type="button">创建群组</button></span></span>
 <!--
 EOT;
 }print<<<EOT
@@ -231,22 +233,27 @@ EOT;
 	<div class="mb10 cc">$pages</div>
     </div>
 	</div>
+</td></tr></table>
+</div>
 <!--
 EOT;
 } elseif ($a == 'friend') {print <<<EOT
 -->
-	<div class="p15" style="background:$uskin_boxA;min-height:400px;">
+<div style="background:$uskin_boxA;">
+<table width="100%"><tr><td valign="top" height="500">
+	<div class="p15">
+		<h4 class="site"><img src="u/images/module/colony.png" align="absmiddle" class="mr10" /><span>群组</span></h4>
 		<div class="navC">
+			<a href="group.php?q=all" class="fr"><img src="u/images/icon/groups.png" align="absmiddle" /> 所有群组</a>
 			<ul>
 				<li class="current"><a href="{$basename}a=friend">朋友的群</a></li>
 				<li><a href="{$basename}">我的群组</a></li>
-				<li><a href="{$basename}a=all">所有群组</a></li>
 			</ul>
 <!--
 EOT;
 if($o_newcolony){print<<<EOT
 -->
-			<span class="btn_add fl"><span><button onClick="location.href='{$basename}a=create';" type="button">创建群组</button></span></span>
+			<span class="btn_add fl"><span><button onClick="location.href='group.php?q=create';" type="button">创建群组</button></span></span>
 <!--
 EOT;
 }print<<<EOT
@@ -275,17 +282,17 @@ EOT;
 if ($group) {
 foreach ($group as $value) {print <<<EOT
 -->
-		<li>
+		<li style="width:48%;">
 		<dl>
 		<dt><div><table style="height:100%;width:100%;"><tr><td class="tac"><a href="apps.php?q=group&cyid=$value[id]"><img src="$value[cnimg]" onload="imgResize(this,100)" /></a></td></tr></table></div></dt>
-		<dd><a href="apps.php?q=group&cyid=$value[id]" class="b f14">$value[cname]</a>
+		<dd style="width:260px;"><a href="apps.php?q=group&cyid=$value[id]" class="b f14">$value[cname]</a>
 			<div>该群好友：
 <!--
 EOT;
 $extra = '';
 foreach ($value['friends'] as $k => $v) {print <<<EOT
 -->
-				$extra<a href="u.php?uid=$k" target="_blank" class="s7">$v</a>
+				$extra<a href="{$db_userurl}$k" target="_blank" class="s7">$v</a>
 <!--
 EOT;
 $extra = '，';
@@ -314,23 +321,27 @@ var frist = New(changView,['list-groups','li',1]);
 <div class="c"></div>
 	</div>
 	</div>
+</td></tr></table>
+</div>
 <!--
 EOT;
 } elseif ($a == 'all') {print <<<EOT
 -->
 	<div class="homeCont fl">
+<table width="100%"><tr><td valign="top" height="400">
 	<div class="p15">
+		<h4 class="site"><img src="u/images/module/colony.png" align="absmiddle" class="mr10" /><span>群组</span></h4>
 		<div class="navC">
+			<a href="group.php?q=all" class="fr"><img src="u/images/icon/groups.png" align="absmiddle" /> 所有群组</a>
 			<ul>
 				<li><a href="{$basename}a=friend">朋友的群</a></li>
 				<li><a href="{$basename}">我的群组</a></li>
-				<li class="current"><a href="{$basename}a=all">所有群组</a></li>
 			</ul>
 <!--
 EOT;
 if($o_newcolony){print<<<EOT
 -->
-			<span class="btn_add fl"><span><button onClick="location.href='{$basename}a=create';" type="button">创建群组</button></span></span>
+			<span class="btn_add fl"><span><button onClick="location.href='group.php?q=create';" type="button">创建群组</button></span></span>
 <!--
 EOT;
 }print<<<EOT
@@ -398,6 +409,7 @@ EOT;
 		</div>
 		</div>
 	</div>
+	</td></tr></table>
 	</div>
 	<div class="homeSide fr">
 		<div class="p10">
@@ -423,14 +435,10 @@ EOT;
 <!--
 EOT;
 foreach ($o_style_relation as $key => $value) {
-if (empty($value)) {print <<<EOT
+print <<<EOT
 -->	
 <option value="$key">+<strong>{$o_styledb[$key]['cname']}</strong></option>
-<!--
-EOT;
-} else {print <<<EOT
--->
-		<option value="$key">+<strong>{$o_styledb[$key]['cname']}</strong></option>
+
 <!--
 EOT;
 foreach ($value as $k => $v) {print <<<EOT
@@ -443,7 +451,7 @@ EOT;
 
 <!--
 EOT;
-}}print <<<EOT
+}print <<<EOT
 -->
 							</select>
 						</td>
@@ -462,6 +470,7 @@ EOT;
 			</div></td><td class="pobg2"></td></tr><tr><td class="bgcorner4"></td><td class="pobg3"></td><td class="bgcorner3"></td></tr></tbody></table></div>
 		</div>
 		</div>
+		
 		<div class="mb10">
 			<h5 class="h5 s5"><strong>浏览群组分类</strong></h5>
 			<ul class="ulE">
@@ -469,14 +478,9 @@ EOT;
 <!--
 EOT;
 foreach ($o_style_relation as $key => $value) {
-if (empty($value)) {print <<<EOT
+print <<<EOT
 -->	
 				<li id="cid_$key"><cite>+</cite>&nbsp;<a href="{$basename}q=$q&a=all&styleid=$key">{$o_styledb[$key]['cname']}</a></li>
-<!--
-EOT;
-} else {print <<<EOT
--->
-				<li id="cid_$key"><cite>+</cite>&nbsp;{$o_styledb[$key]['cname']}</li>
 <!--
 EOT;
 foreach ($value as $k => $v) {print <<<EOT
@@ -488,7 +492,7 @@ EOT;
 -->
 <!--
 EOT;
-}}print <<<EOT
+}print <<<EOT
 -->
 			</ul>
 		</div>
@@ -507,17 +511,17 @@ EOT;
 <div class="homeCont">
 <div class="p15">
 	<div class="navC mb10">
+		<a href="group.php?q=all" class="fr"><img src="u/images/icon/groups.png" align="absmiddle" /> 所有群组</a>
 		<ul>
 			<li><a href="{$basename}a=friend">朋友的群</a></li>
 			<li><a href="{$basename}">我的群组</a></li>
-			<li><a href="{$basename}a=all">所有群组</a></li>
-			<li class="current"><a href="{$basename}a=create">创建新群组</a></li>
+			<li class="current"><a href="group.php?q=create">创建新群组</a></li>
 		</ul>
 <!--
 EOT;
 if($o_newcolony){print<<<EOT
 -->
-		<span class="btn_add fl"><span><button onClick="location.href='{$basename}a=create';" type="button">创建群组</button></span></span>
+		<span class="btn_add fl"><span><button onClick="location.href='group.php?q=create';" type="button">创建群组</button></span></span>
 <!--
 EOT;
 }print<<<EOT
@@ -564,6 +568,7 @@ var dosubmit = function(form){
 	<div class="p10">
 <form action="{$basename}a=$a" method="post" name="FORM" enctype="multipart/form-data" onsubmit="return checkpost(document.FORM);">
 <input type="hidden" name="step" value="3" />
+<input type="hidden" name="ajax" value="1" />
 <input type="hidden" name="verify" value="$verifyhash" />
 <table cellpadding="0" cellspacing="0" width="100%" class="setTable vt">
 	<tr>
@@ -582,7 +587,7 @@ var dosubmit = function(form){
 				<input id="title4" name="title4" type="hidden" value="{$titledetail[3]}" />
 			</div>
 			<div class="c mb5"></div>
-			<span id="cname_warn" class="gray">限 50 字节</span>
+			<span id="cname_warn" class="gray">限 20 字节</span>
 	    </td>
 	</tr>
 	<tr>
@@ -655,31 +660,41 @@ EOT;
 	</tr>
 <!--
 EOT;
-if ($o_groups_gdcheck) {print <<<EOT
+if ($o_groups_gdcheck) {
+$gdSize = explode("\t",$db_gdsize);
+print <<<EOT
 -->
 	<tr>
 		<th class="th">认证码<span class="s1">*</span></th>
 		<td class="td">
-			<img id="ckcode" style="cursor:pointer;display:none;margin-bottom:1px;" onclick="this.src='ck.php?nowtime='+new Date().getTime();" alt="看不清楚，换一张" />
-			<div><input class="input" onfocus="showCK();" type="text" name="gdcode" id="gdcode" style="width:50px;" tabindex="3"  /></div>
-<script language="JavaScript">
-function showCK(){
-	getObj('ckcode').style.display="";
-	if (getObj('ckcode').src.indexOf('ck.php') == -1) {
-		getObj('ckcode').src = 'ck.php?nowtime=' + new Date().getTime();
-	}
-}
+			<div id="ckcode" style="display:none;margin-bottom:1px;">
+<script type="text/javascript" src="js/pw_authcode.js"></script>
+<script>
+var flashWidth = "$gdSize[0]";
+var flashHeight = "$gdSize[1]";
+var gdtype = $db_gdtype;
+showGdCode();
 </script>
+			</div>
+			<div><input class="input" onfocus="showgd();" type="text" name="gdcode" id="gdcode" style="width:50px;" tabindex="3"  /></div>
 		</td>
 	</tr>
 <!--
 EOT;
-}if($o_groups_qcheck){print <<<EOT
+}if($db_question && $o_groups_qcheck){
+list(,$showq)=explode("\t",$db_qcheck);
+if($db_imagequestion){
+	$question = sprintf('<img src="ckquestion.php?q=%s">',$qkey);
+}else{
+	$question = $qkey<0 ? getMachineQuestion_1() :  $db_question[$qkey];
+}
+$q_a = $question.($showq && $qkey>0?" 正确答案:".$db_answer[$qkey] : '');
+print <<<EOT
 -->
 	<tr>
 		<th class="th">验证问题<span class="s1">*</span></th>
 		<td class="td">
-			<div> {$db_question[$qkey]} （正确答案:{$db_answer[$qkey]}）</div>
+			<div> {$q_a} </div>
 			<input class="input input_wa" name="qanswer" id="qanswer" tabindex="7" />
 			<input type="hidden" name="qkey" id="qkey" value="$qkey" />
 		</td>
@@ -693,11 +708,11 @@ EOT;
 		<td class="td"><span class="btn"><span><button type="submit" name="Submit">创建新群组</button></span></span></td>
 	</tr>
 </table>
-</form>
+</form><div id="divload"></div>
 	</div>
 <script language="JavaScript">
 var charset = '$db_charset';
-initCheckTextNum('cname','cname_warn',50);
+initCheckTextNum('cname','cname_warn',20);
 initCheckTextNum('descrip','descrip_warn',255);
 
 function setSecondstyle(id) {
@@ -731,42 +746,59 @@ function setSecondstyle(id) {
 	}
 }
 
+var cnt  = 0;
 document.FORM.Submit.disabled = false;
 function checkpost(obj) {
 	var cname = obj.cname.value;
-	if (cname){
-		ajax.send("apps.php?q=groups&a=checkcname&cname="+cname,'',function(){
-			var rText = ajax.request.responseText;
-			if (!rText){
-				obj.cname.focus();
-				showDialog("error","您输入的群组名称已经存在，请选择另一个名称。",2);
-				return false;
-			}
-		});
-	}
 	if (obj.cname.value == "") {
 		obj.cname.focus();
-		showDialog("error","群组名称不能为空",2);
+		showDialog("error","请输入群组<span class='warnFontStyle'>名称</span>",2);
 		return false;
-	}　else if (obj.cname.value.length > 50) {
+	}　else if (strlen(obj.cname.value) > 20) {
 		obj.cname.focus();
-		showDialog("error","群组名称不能大于50个字节",2);
+		showDialog("error","群组<span class='warnFontStyle'>名称</span>不能大于<span class='warnFontStyle'>20</span>个字节",2);
 		return false;
-	}　else if (obj.descrip.value.length > 255) {
+	}　else if (strlen(obj.descrip.value) > 255) {
 		obj.descrip.focus();
-		showDialog("error","群组简介不能大于255个字节",2);
+		showDialog("error","群组<span class='warnFontStyle'>简介</span>不能大于<span class='warnFontStyle'>255</span>个字节",2);
 		return false;
 	}　else if (!obj.firstgradestyle.value) {
-		showDialog("error","请选择群组分类",2);
+		showDialog("error","请选择群组<span class='warnFontStyle'>分类</span>",2);
 		return false;
 	} 
+	SubmitAjax(obj);
+	return false;
+}
+//ajax提交数据 zhuli
+function SubmitAjax(obj) {
 	document.FORM.Submit.disabled = true;
+	getObj('divload').innerHTML = showLoading();
 	cnt++;
-	if (cnt != 1) {
-		showDialog("warning","Submission Processing. Please Wait");
+	ajax.send("apps.php?q=groups&a=create", obj, function(){
+		if(undefined == ajax.request.responseText){
+			showDialog({
+				type: 'error',
+				message: '请求超时!'
+			});
+			document.FORM.Submit.disabled = false;
+			getObj('divload').innerHTML = '';
+			return false;
+		}
+		var rText = ajax.request.responseText.split('\t');
+		if (rText[0] == 'success') {
+			window.onbeforeunload = function(){};
+			top.window.location =  rText[1];
+		} else {
+			showDialog('error', rText[0]);
+		}
+		cnt = 0;
+		document.FORM.Submit.disabled = false;
+		getObj('divload').innerHTML = '';
 		return false;
-	}
-	return true;
+	});
+}
+function showLoading(){
+	return "<div id=\"loading\" style=\"padding:20px;width:80%;text-align:center\"><img src=\""+imgpath+"/loading.gif\" align=\"absbottom\" alt=\"loading\" /> 正在加载数据...</div>";
 }
 
 var firstgradestyle = getObj('firstgradestyle').value;

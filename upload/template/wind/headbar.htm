@@ -14,7 +14,7 @@ $msgsound
 EOT;
 if($groupid=='guest'){
 if ($db_ajax & 16) {
-$arr_logintypename = array('用户名','UID','Email');print <<<EOT
+$arr_logintypename = array('用户名','UID','电子邮箱');print <<<EOT
 -->
 				<a onclick="showLoginDiv();" title="展开登录框" style="cursor:pointer" hidefocus="true">登录</a><a href="$regurl" hidefocus="true">注册</a>
                 <div id="user-login" class="menu-post" style="display:none;">
@@ -68,13 +68,23 @@ EOT;
                                     </tr>
 <!--
 EOT;
-if($db_gdcheck & 2){print <<<EOT
+if($db_gdcheck & 2){
+$gdSize = explode("\t",$db_gdsize);
+print <<<EOT
 -->
                                     <tr class="user-table">
                                         <td>认证码</td>
                                         <td class="tal">
-                                            <input class="input" onfocus="showCK();" type="text" name="gdcode" size="5" tabindex="3"  />
-                                            <img id="ckcode" style="cursor:pointer;display:none" onclick="this.src='ck.php?nowtime='+new Date().getTime();" alt="看不清楚，换一张" />
+                                            <input class="input" onfocus="showgd();" type="text" name="gdcode" size="5" tabindex="3"  />
+                                            <div id="ckcode" style="display:none;">
+<script type="text/javascript" language="JavaScript" src="js/pw_authcode.js"></script>
+<script>
+var flashWidth = "$gdSize[0]";
+var flashHeight = "$gdSize[1]";
+var gdtype = $db_gdtype;
+showGdCode();
+</script>
+											</div>
                                         </td>
                                     </tr>
 <!--
@@ -94,11 +104,18 @@ EOT;
                                     </tr>
 <!--
 EOT;
-}if($_LoginInfo['qcheck']){print <<<EOT
+}if($_LoginInfo['qcheck'] && $db_question){
+if($db_imagequestion){
+	$question = '<img id="ckquestion" src="ckquestion.php?q='.$_LoginInfo['qkey'].'&t='.$timestamp.'" align="top">';
+}else{
+	$question = $_LoginInfo['qkey']<0 ? getMachineQuestion_1() :  $db_question[$_LoginInfo['qkey']];
+}
+$q_a = $question.($_LoginInfo['showq'] && $_LoginInfo['qkey']>0?" <br />答案:".$db_answer[$_LoginInfo['qkey']] : '');
+print <<<EOT
 -->
                                     <tr class="user-table">
                                         <td>验证问题</td>
-                                        <td class="tal">问题:{$db_question[$_LoginInfo['qkey']]}<br />正确答案:{$db_answer[$_LoginInfo['qkey']]}<br />
+                                        <td class="tal">问题:{$q_a}<br />
                                             <input class="input" name="qanswer" size="25" tabindex="7" />
                                             <input type="hidden" name="qkey" value="{$_LoginInfo['qkey']}" />
                                         </td>
@@ -157,7 +174,7 @@ var td_profile = {
 EOT;
 if (getstatus($winddb['userstatus'],12)) {print <<<EOT
 -->
-				<input type="hidden" id="url" value="$db_bbsurl"></input>
+				<base id="headbase" href="$db_bbsurl/" />
                 <script language="JavaScript" src="js/userbinding.js"></script>
 <!--
 EOT;

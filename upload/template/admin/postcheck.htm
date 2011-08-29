@@ -122,11 +122,11 @@ print <<<EOT
       	<a href="$admin_file?adminjob=content&type=post&tid=$post[tid]&id=$post[pid]">$post[subject]</a>
       	
       	&nbsp;&nbsp;&nbsp;
-      	<a href="post.php?action=modify&fid=$post[fid]&tid=$post[tid]&pic=tpc" target="_blank">编辑回帖</a>
+      	<a href="post.php?action=modify&fid=$post[fid]&tid=$post[tid]&pid=$post[pid]" target="_blank">编辑回帖</a>
       	
       	<br/>
       	
-      	作者：<a href="u.php?uid=$post[authorid]" target='_blank'>$post[author]</a>&nbsp;
+      	作者：<a href="{$db_userurl}$post[authorid]" target='_blank'>$post[author]</a>&nbsp;
       	
       	发表时间：$post[postdate]
       	
@@ -136,7 +136,7 @@ print <<<EOT
       		</td>
       <!--<td class="td2"><a href="$admin_file?adminjob=content&type=post&tid=$post[tid]&id=$post[pid]">$post[subject]</a></td>
       <td class="td2"><a href="read.php?tid=$post[tid]" target='_blank'>所在主题</a></td>
-      <td class="td2"><a href="u.php?uid=$post[authorid]" target='_blank'>$post[author]</a></td>
+      <td class="td2"><a href="{$db_userurl}$post[authorid]" target='_blank'>$post[author]</a></td>
       <td class="td2">$post[name]</td>
       <td class="td2">$post[postdate]</td>-->
     </tr>

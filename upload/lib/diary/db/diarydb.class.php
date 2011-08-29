@@ -34,7 +34,7 @@ class PW_DiaryDB extends BaseDB {
 	}
 	function getsByDids($dids){
 		if(!$dids) return false;
-		$dids = (is_array($dids)) ? pwImplode($dids) : $dids;
+		$dids = (is_array($dids)) ? S::sqlImplode($dids) : $dids;
 		$query = $this->_db->query ( "SELECT * FROM ".$this->_tableName." WHERE did in(".$dids.") ORDER BY postdate DESC " );
 		return $this->_getAllResultFromQuery ( $query );
 	}
@@ -154,8 +154,11 @@ class PW_DiaryDB extends BaseDB {
 	}
 	
 	function updateDiaryByDtid($data = array() ,$dtid) {
+		/**
 		$this->_db->update("UPDATE ".$this->_tableName.
 							" SET ". $this->_getUpdateSqlString($data). " WHERE dtid=".$this->_addSlashes($dtid));
+		**/
+		pwQuery::update('pw_diary', 'dtid=:dtid', array($dtid), $data);
 		return $this->_db->affected_rows();
 	}
 	
@@ -191,8 +194,12 @@ class PW_DiaryDB extends BaseDB {
 	
 	function delDiaryByUids($uids) {
 		if(!$uids) return false;
+		/**
 		$uids = is_array($uids) ? $this->_getImplodeString($uids) : $this->_addSlashes($uids);
 		return $this->_db->update("DELETE FROM ".$this->_tableName. " WHERE uid IN( " .$uids. " )");
+		**/
+		$uids = is_array($uids) ? $uids : array($uids);
+		return pwQuery::delete('pw_diary', 'uid IN(:uid)', array($uids));
 	}
 	
 	function delDiaryTypeByUids($uids) {
@@ -214,6 +221,16 @@ class PW_DiaryDB extends BaseDB {
 	 */
 	function getSearch($sql){
 		$query = $this->_db->query ($sql);
+		return $this->_getAllResultFromQuery ( $query );
+	}
+	
+	function getLatestDiarysCount() {
+		$total = $this->_db->get_value("SELECT count(*) as total FROM ".$this->_tableName." WHERE privacy=0 ORDER BY did DESC ");
+		return ($total<500) ? $total :500;
+	}
+
+	function getLatestDiarys($offset,$limit) {
+		$query = $this->_db->query ("SELECT * FROM ".$this->_tableName." WHERE privacy=0 ORDER BY did DESC ".$this->_Limit($offset, $limit));
 		return $this->_getAllResultFromQuery ( $query );
 	}
 }

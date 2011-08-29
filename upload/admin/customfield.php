@@ -18,7 +18,7 @@ if(empty($action)){
 		$editable_0		= 'checked';
 		include PrintEot('customfield');exit;
 	} else{
-		InitGP(array('title','descrip','state','vieworder','maxlen','required','viewinread','editable','groups','options'),'P');
+		S::gp(array('title','descrip','state','vieworder','maxlen','required','viewinread','editable','groups','options'),'P');
 		if(!$title){
 			adminmsg('operate_fail');
 		}
@@ -34,7 +34,7 @@ if(empty($action)){
 			}
 		}
 		$db->update("INSERT INTO pw_customfield"
-			. " SET ".pwSqlSingle(array(
+			. " SET ".S::sqlSingle(array(
 				'title'		=> $title,
 				'maxlen'	=> $maxlen,
 				'vieworder'	=> $vieworder,
@@ -56,9 +56,9 @@ if(empty($action)){
 		adminmsg('operate_success');
 	}
 } elseif($action=='edit'){
-	InitGP(array('id'));
+	S::gp(array('id'));
 	if(!$_POST['step']){
-		$rt = $db->get_one("SELECT * FROM pw_customfield WHERE id=".pwEscape($id));
+		$rt = $db->get_one("SELECT * FROM pw_customfield WHERE id=".S::sqlEscape($id));
 		if(!$rt){
 			adminmsg('fieldid_error');
 		}
@@ -74,7 +74,7 @@ if(empty($action)){
 		}
 		include PrintEot('customfield');exit;
 	} else{
-		InitGP(array('title','descrip','state','vieworder','maxlen','required','viewinread','editable','groups','options'),'P');
+		S::gp(array('title','descrip','state','vieworder','maxlen','required','viewinread','editable','groups','options'),'P');
 		$viewright = '';
 		if($groups){
 			foreach($groups as $key=>$val){
@@ -84,7 +84,7 @@ if(empty($action)){
 			}
 		}
 		$db->update("UPDATE pw_customfield"
-			. " SET " . pwSqlSingle(array(
+			. " SET " . S::sqlSingle(array(
 					'title'		=> $title,
 					'maxlen'	=> $maxlen,
 					'vieworder'	=> $vieworder,
@@ -97,12 +97,12 @@ if(empty($action)){
 					'viewright'	=> $viewright,
 					'options'	=> $options
 				))
-			. " WHERE id=".pwEscape($id));
+			. " WHERE id=".S::sqlEscape($id));
 		updatecache_field();
 		adminmsg('operate_success');
 	}
 } elseif($_POST['action']=='del'){
-	InitGP(array('selid'),'P');
+	S::gp(array('selid'),'P');
 	if(!$selids = checkselid($selid)){
 		$basename="javascript:history.go(-1);";
 		adminmsg('operate_error');
@@ -110,7 +110,7 @@ if(empty($action)){
 	$dropfield = '';
 	foreach($selid as $key=>$val){
 		if(is_numeric($val)){
-			$colums=$db->get_one("SHOW COLUMNS FROM pw_memberinfo LIKE ".pwEscape('field_'.$val));
+			$colums=$db->get_one("SHOW COLUMNS FROM pw_memberinfo LIKE ".S::sqlEscape('field_'.$val));
 			if($colums['Field']=='field_'.$val){
 				$dropfield .= $dropfield ? ",DROP field_$val" : "DROP field_$val";
 			}

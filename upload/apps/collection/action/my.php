@@ -3,191 +3,47 @@
 $USCR = 'user_collection';
 $baseUrl = 'apps.php?';
 $basename = 'apps.php?q='.$q.'&';
-InitGP(array('see', 'job'));
+S::gp(array('see', 'job'));
 $collectionService = L::loadClass('Collection', 'collection'); /* @var $collectionService PW_Collection */
-
+$db_perpage = 20;
 $a = $a ? $a : 'list';
-InitGP(array('type'));
+S::gp(array('type','ftype'));
 if ($a == 'list') {
-	if ($type != 'postfavor') {
-		$count = !$type ? $collectionService->countByUid($winduid) : $collectionService->countByUidAndType($winduid, $type);
-		$page > ceil($count/$db_perpage) && $page = ceil($count/$db_perpage);
-		$collectionDb = ($count) ? (!$type ? $collectionService->findByUidInPage($winduid, $page, $db_perpage) : $collectionService->findByUidAndTypeInPage($winduid, $type, $page, $db_perpage)) : array();
-		$pages = numofpage($count,$page,ceil($count/$db_perpage),"{$basename}type=$type&");
-	} else {
-		
-		InitGP(array('job','ftype'));
-		if (empty($job)) {
-			$page = (int)GetGP('page');
-			!$ftype && $ftype = 'all';
-			$ftype == '-1' && $ftype = 'def';
-			
-			$username = $windid;
-			$where = '';
-			
-			$favor = $db->get_one("SELECT tids,type FROM pw_favors WHERE uid=".pwEscape($winduid));
-			Add_S($favor);
-			$ftypeSelection = array();
-			if ($favor['type']) {
-				$ftypeid = explode(',',$favor['type']);
-				foreach ($ftypeid as $k => $v) {
-					$ftypeSelection[$k+1] = $v;
-				}
-			}
-			$ftypeSelection = formSelect('ftype', null, $ftypeSelection ? $ftypeSelection : array(0=>'无'), 'style="vertical-align:middle"');
-			
-			$tids = $ptids = array();
-			list($tiddb,$favor_num) = getfavor($favor['tids']);
-			if ($tiddb) {
-				if ($ftype == 'all') {
-					foreach ($tiddb as $key => $val) {
-						if ($val) {
-							$tids += $val;
-						}
-					}
-				} elseif ($ftype == 'def') {
-					$tids = $tiddb['0'];
-				} elseif ($tiddb[$ftype]) {
-					$tids = $tiddb[$ftype];
-				}
-				
-				$db_perpage = 20;
-				$page<1 && $page = 1;
-				$start_limit = intval(($page-1) * $db_perpage);
-				$count = count($tids);
-				$numofpage = ceil($count/$db_perpage);
-				$numofpage < 1 && $numofpage = 1;
-				$page > $numofpage && $page = $numofpage;
-				$pages = numofpage($count,$page,$numofpage,$basename."a=$a&type=$type&ftype=$ftype&");
-			}
-			if ($tids) {
-				$article = array();
-				$tids = pwImplode($tids);
-				$where .= ' ORDER BY postdate DESC';
-				$query = $db->query("SELECT fid,tid,subject,postdate,author,authorid,anonymous,replies,hits,titlefont FROM pw_threads WHERE tid IN($tids) $where");
-				while ($rt = $db->fetch_array($query)) {
-					$rt['subject']	= substrs($rt['subject'],45);
-					list($rt['postdate'],$rt['posttime']) = getLastDate($rt['postdate']);
-					$keyvalue		= get_key($rt['tid'],$tiddb);
-					if ($rt['anonymous'] && !in_array($groupid,array('3','4')) && $rt['authorid'] != $winduid) {
-						$rt['author']	= $db_anonymousname;
-						$rt['authorid'] = 0;
-					}
-					$ftype == 'all' && $tidarray[$keyvalue][$rt['tid']] = $rt['tid'];
-					$rt['forum']	= $forum[$rt['fid']]['name'];
-					$rt['sel']		= $ftypeid[$keyvalue-1];
-					$article[]		= $rt;
-				}
-				$article = array_slice($article,$start_limit,$db_perpage);
-			}
-			//$thisbase .= "a=$a&";
-			$favor_other_num = $db->get_value("SELECT count(*) as sum FROM pw_collection s WHERE s.uid=".pwEscape($winduid)." AND s.ifhidden=1");
-			$sum = (int)$favor_num + (int)$favor_other_num;
-			
-		} elseif ($job == 'addtype') {
-			PostCheck();
-			(!$ftype || strlen($ftype)>20) && Showmsg('favor_cate_error');
-			strpos($ftype,',') !== false && Showmsg('favor_cate_limit');
-			$favor   = $db->get_one("SELECT type FROM pw_favors WHERE uid=".pwEscape($winduid));
-			$newtype = $favor['type'];
-			$newtype.= $newtype ? ",".stripslashes($ftype) : stripslashes($ftype);
-			$newtype = addslashes(Char_cv($newtype));
-			if ($favor) {
-				$db->update("UPDATE pw_favors SET type=".pwEscape($newtype)."WHERE uid=".pwEscape($winduid));
-			} else{
-				$db->update("INSERT INTO pw_favors SET".pwSqlSingle(array('uid'=>$winduid,'type'=>$newtype)));
-			}
-			refreshto("{$basename}a=list&type={$type}&",'operate_success');
-		} elseif ($job == 'clear') {
-
-			PostCheck();
-			
-			InitGP(array('selid'),'P');
-			!$selid && Showmsg('sel_error');
-			$rs = $db->get_one("SELECT tids FROM pw_favors WHERE uid=".pwEscape($winduid));
-			if ($rs) {
-				list($tiddb) = getfavor($rs['tids']);
-
-				$db->update("UPDATE pw_threads SET favors=favors-1 WHERE tid IN (".pwImplode($selid).")");
-				$db->update("UPDATE pw_elements SET value=value-1 WHERE type='hotfavor' AND id IN (".pwImplode($selid).")");
-				$db->update("UPDATE pw_elements SET value=value-1 WHERE type='newfavor' AND id IN (".pwImplode($selid).")");
-
-				foreach ($selid as $key => $tid) {
-					foreach ($tiddb as $k => $v) {
-						if (in_array($tid,$v)) {
-							unset($tiddb[$k][$tid]);
-						}
-					}
-				}
-				foreach ($tiddb as $key => $val) {
-					if (empty($val)) {
-						unset($tiddb[$key]);
-					}
-				}
-				$newtids = makefavor($tiddb);
-				$db->update("UPDATE pw_favors SET tids=".pwEscape($newtids)."WHERE uid=".pwEscape($winduid));
-				refreshto("{$basename}type={$type}&",'operate_success');
-			} else {
-				Showmsg('job_favor_del');
-			}
-		} elseif ($job == 'change') {
-
-			PostCheck();
-			
-			InitGP(array('selid'),'P');
-			!$selid && Showmsg('sel_error');
-			$rs = $db->get_one("SELECT tids FROM pw_favors WHERE uid=".pwEscape($winduid));
-			if ($rs) {
-				list($tiddb) = getfavor($rs['tids']);
-				foreach ($selid as $key => $tid) {
-					if (!is_numeric($tid)) continue;
-					foreach ($tiddb as $k => $v) {
-						if (in_array($tid,$v)) {
-							unset($tiddb[$k][$tid]);
-						}
-					}
-					$tiddb[$ftype][$tid] = $tid;
-				}
-				foreach ($tiddb as $key => $val) {
-					if (empty($val)) {
-						unset($tiddb[$key]);
-					}
-				}
-				$newtids = makefavor($tiddb);
-				$db->update("UPDATE pw_favors SET tids=".pwEscape($newtids)."WHERE uid=".pwEscape($winduid));
-			}
-			refreshto("{$basename}type={$type}&",'operate_success');
-
-		}  elseif ($job == 'deltype') {
-
-			PostCheck();
-			
-			(int)$ftype<1 && Showmsg('type_error');
-			$tnum  = $ftype-1;
-			$rs    = $db->get_one("SELECT tids,type FROM pw_favors WHERE uid=".pwEscape($winduid));
-			list($tiddb) = getfavor($rs['tids']);
-			$ftypedb= explode(',',$rs['type']);
-			Add_S($ftypedb);
-			unset($ftypedb[$tnum]);
-			if ($tiddb[$ftype]) {
-				foreach ($tiddb[$ftype] as $key => $val) {
-					$tiddb['0'][$val] = $val;
-				}
-			}
-			unset($tiddb[$ftype]);
-			$newtids = makefavor($tiddb);
-			$newtype = Char_cv(implode(',',$ftypedb));
-			$db->update("UPDATE pw_favors SET ".pwSqlSingle(array('tids'=>$newtids,'type'=>$newtype))."WHERE uid=".pwEscape($winduid));
-			refreshto("{$basename}type={$type}&",'operate_success');
+		$collectionTypeService = L::loadClass('CollectionTypeService', 'collection');
+		$ftypeid = array();
+		$ftypeNum = array();
+		$ftypeSelection = array();
+		$ftypeNumTotal = 0; 
+	 
+		$ftypeData = $collectionTypeService->getTypesByUid($winduid);
+		$collectionService = L::loadClass('Collection', 'collection'); /* @var $collection PW_Collection */
+		$typeNumArr = $collectionService->countTypesByUid($winduid);
+		if (!is_array($typeNumArr)) $typeNumArr = array();
+		$defaultNum = ($typeNumArr[-1] ) ?  $typeNumArr[-1] : 0;
+		$ftypeNumTotal = $defaultNum;
+		foreach ($ftypeData as $val) {
+			$ftypeid[$val['ctid']] = $val['name'];
+			$ftypeNum[$val['ctid']] = ($typeNumArr[$val['ctid']]) ?  $typeNumArr[$val['ctid']] : 0;
+			$ftypeNumTotal = $ftypeNumTotal + $ftypeNum[$val['ctid']];
 		}
-	}
+		foreach ($ftypeid as $k => $v) {
+			$ftypeSelection[$k] = $v;
+		}
+		!$ftype && $ftype = 'all';
+
+		$count = !$type ? $collectionService->countByUid($winduid,$ftype) : $collectionService->countByUidAndType($winduid,$type,$ftype);
+		$page > ceil($count/$db_perpage) && $page = ceil($count/$db_perpage);
+		$collectionDb = ($count) ? (!$type ? $collectionService->findByUidInPage($winduid, $page, $db_perpage, $ftype) : $collectionService->findByUidAndTypeInPage($winduid, $type, $page, $db_perpage, $ftype)) : array();
+		$pages = numofpage($count,$page,ceil($count/$db_perpage),"{$basename}type=$type&");
+
 } elseif ($a == 'post') {
+	$totalCollection = $collectionService->countByUid($winduid);
+	$totalCollection >= $_G['maxfavor'] && Showmsg('已达到用户组允许的收藏上限');
 	PostCheck();
-	InitGP(array('link'),'P',1);
+	S::gp(array('link'),'P',1);
 	$link	= str_replace('&#61;','=',$link);
 	!$link && Showmsg('链接地址不能为空');
 	!preg_match("/^https?\:\/\/.{4,255}$/i", $link) && Showmsg('mode_share_link_error');
-
 	$share['uid'] = $winduid;
 	$share['username'] = $windid;
 	$share['link'] = $link;
@@ -234,14 +90,21 @@ if ($a == 'list') {
 	}
 } elseif($a == 'dels') {
 	PostCheck();
-	InitGP(array('idarray'),'P',1);
+	S::gp(array('idarray'),'P',1);
 	$collectionService->delete($idarray);
 	refreshto("{$basename}type={$type}&",'operate_success');
-}elseif ($a == 'recommend') {
+} elseif($a == 'remove') {
+	S::gp(array('ftype','idarray'));
+	!$idarray && Showmsg('undefined_action');
+	$return = $collectionService->remove($idarray,$ftype);
+	if($return === true) {
+		echo "success\t";ajax_footer();
+	}
+}  elseif ($a == 'recommend') {
 	define('AJAX',1);
 	define('F_M',true);
 	if (empty($_POST['step'])) {
-		InitGP(array('id'), null, 2);
+		S::gp(array('id'), null, 2);
 
 		$friend = getFriends($winduid);
 		if ($friend) {
@@ -249,7 +112,7 @@ if ($a == 'list') {
 				$frienddb[$value['ftid']][] = $value;
 			}
 		}
-		$query = $db->query("SELECT * FROM pw_friendtype WHERE uid=".pwEscape($winduid)." ORDER BY ftid");
+		$query = $db->query("SELECT * FROM pw_friendtype WHERE uid=".S::sqlEscape($winduid)." ORDER BY ftid");
 		$friendtype = array();
 		while ($rt = $db->fetch_array($query)) {
 			$friendtype[$rt['ftid']] = $rt;
@@ -258,7 +121,7 @@ if ($a == 'list') {
 		$friendtype[0] = array('ftid' => 0,'uid' => $winduid,'name' => $no_group_name);
 
 		$a = 'recommend';
-		$rt = $db->get_one("SELECT id,type,content,username FROM pw_collection WHERE id=" . pwEscape($id));
+		$rt = $db->get_one("SELECT id,type,content,username FROM pw_collection WHERE id=" . S::sqlEscape($id));
 
 		if (empty($rt)) {
 			Showmsg('data_error');

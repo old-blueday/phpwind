@@ -111,7 +111,7 @@ print <<<EOT
 		<td><input name="invcode" type="checkbox" value="{$value[id]}"></td>
 		<td>{$value[invcode]}</td>
 		<td>{$value[overtime]}</td>
-		<td><a href="u.php?uid={$userdb['uid']}">{$value[receiver]}</a></td>
+		<td><a href="{$db_userurl}{$userdb['uid']}">{$value[receiver]}</a></td>
 		<td>{$value[usetime]}</td>
 		<td>{$value[used]}</td>
 	</tr>

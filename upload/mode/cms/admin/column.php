@@ -1,6 +1,6 @@
 <?php
 !defined('P_W') && exit('Forbidden');
-InitGP(array('action'));
+S::gp(array('action'));
 $columnService = C::loadClass('columnservice');
 /* @var $columnService PW_ColumnService */
 if (empty($action)) {
@@ -12,16 +12,16 @@ if (empty($action)) {
 	$_action = "addsubmit";
 } elseif ($action == 'addsubmit') {
 	define('AJAX', 1);
-	InitGP(array('name', 'parentId', 'allowoffer', 'order', 'seotitle', 'seodesc', 'seokeywords'));
+	S::gp(array('name', 'parentId', 'allowoffer', 'order', 'seotitle', 'seodesc', 'seokeywords'));
 	if (empty($name)) Showmsg('栏目名称不能为空');
 	if (strlen($name) > 20) Showmsg('栏目名称长度不能超过20个字节');
-	if ($columnService->getColumnByName($name)) Showmsg('栏目名称已经存在');
+	//if ($columnService->getColumnByName($name)) Showmsg('栏目名称已经存在');
 	$datas = array(array($parentId, $name, (int)$order, $allowoffer, $seotitle, $seodesc, $seokeywords));
 	if (!$columnService->insertColumns($datas)) Showmsg('添加栏目失败');
 	Showmsg('ajaxma_success');
 } elseif ($action == 'edit') {
 	define('AJAX', 1);
-	InitGP(array('cid'));
+	S::gp(array('cid'));
 	if (empty($cid)) Showmsg('非法操作请返回');
 	$options = $columnService->getColumnOptions($cid);
 	$column = $columnService->findColumnById($cid);
@@ -29,7 +29,7 @@ if (empty($action)) {
 	$_action = "editsubmit";
 } elseif ($action == 'editsubmit') {
 	define('AJAX', 1);
-	InitGP(array('cid', 'name', 'parentId', 'allowoffer', 'order', 'seotitle', 'seodesc', 'seokeywords'));
+	S::gp(array('cid', 'name', 'parentId', 'allowoffer', 'order', 'seotitle', 'seodesc', 'seokeywords'));
 	if (empty($cid)) Showmsg('非法操作请返回');
 	if (empty($name)) Showmsg('栏目名称不能为空');
 	if (strlen($name) > 20) Showmsg('栏目名称长度不能超过20个字节');
@@ -38,14 +38,14 @@ if (empty($action)) {
 	if (!$columnService->updateColumn($cid, $data)) Showmsg('编辑栏目失败');
 	Showmsg('ajaxma_success');
 } elseif ($action == 'delete') {
-	InitGP(array('cid'));
+	S::gp(array('cid'));
 	if (empty($cid)) Showmsg('非法操作请返回', $basename);
 	if ($articles = $columnService->getArticlesByColumeId($cid)) Showmsg('该栏目下已存在文章数据，不可删除，请移除文章后再删除');
 	if ($columns = $columnService->getSubColumnsById($cid)) Showmsg('该栏目存在子栏目，不可删除，请移除子栏目后再删除');
 	if (!$columnService->deleteColumn($cid)) Showmsg('删除栏目失败');
 	Showmsg('删除栏目操作成功!', $basename);
 } elseif ($action == 'editOrder') {
-	InitGP(array('orders'));
+	S::gp(array('orders'));
 	if (!$columnService->updateColumnOrders($orders)) Showmsg('操作失败');
 	Showmsg('操作成功!', $basename);
 }

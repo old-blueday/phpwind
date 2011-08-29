@@ -2,7 +2,7 @@
 !defined('P_W') && exit('Forbidden');
 
 !$fid && Showmsg('undefined_action');
-initGP(array('type'));
+S::gp(array('type'));
 $myshortcut = explode(',', $winddb['shortcut']);
 foreach ($myshortcut as $key => $value) {
 	if (!$value || !is_numeric($value)) {
@@ -45,7 +45,7 @@ if ($type == "delete") {
 } else {
 
 	count($myshortcut) >= 6 && Showmsg('shortcut_numlimit');
-	require_once (D_P . 'data/bbscache/forum_cache.php');
+	require_once pwCache::getPath(D_P . 'data/bbscache/forum_cache.php');
 	$forumkeys = array_keys($forum);
 	!in_array($fid, $forumkeys) && Showmsg('undefined_action');
 	$myshortcut[] = $fid;

@@ -17,17 +17,26 @@ $adds = 0;
 
 //MAIN
 $view = 20;
-$vieworder = array('area' => '1', 'bbs' => '2');
+$vieworder = array('area' => '1', 'bbs' => '2' ,'cms' => '3');
 foreach ($db_modes as $key => $value) {
+	$pos = array();
 	if (isset($db_modedomain[$key]) && $db_modedomain[$key]) {
 		$link = 'http://' . $db_modedomain[$key];
 	} elseif ('o' == $key) {
+		$pos = array('o');
 		$link = 'u.php';
+		$vieworder[$key] = 1;
+	} elseif ('cms' == $key) {
+		$value['title'] = '资讯';
+		$link = 'index.php?m=' . $key;
+	} elseif ('bbs' == $key) {
+		$pos = array('bbs,area,cms,o,srch,group');
+		$link = 'index.php?m=' . $key;
 	} else {
 		$link = 'index.php?m=' . $key;
 	}
 	$adds += (bool)$navConfigService->add(PW_NAV_TYPE_MAIN, array('nkey' => $key,
-		'pos' => '-1',
+		'pos' => $pos ? $pos : array('bbs,area,cms,srch,group'),
 		'title' => ($value['title'] ? $value['title'] : $value['m_name']),
 		'style' => '',
 		'link' => $link,
@@ -39,19 +48,27 @@ foreach ($db_modes as $key => $value) {
 	));
 }
 
+//增加四个频道链接
+$adds += (bool)$navConfigService->add(PW_NAV_TYPE_MAIN, array('nkey' => 'area_baby', 'pos' => '-1', 'title' => '亲子', 'style' => '', 'link' => 'html/channel/baby', 'alt' => '', 'target' => 0, 'view' => 11, 'upid' => 2, 'isshow' => 1));
+$adds += (bool)$navConfigService->add(PW_NAV_TYPE_MAIN, array('nkey' => 'area_delicious', 'pos' => '-1', 'title' => '美食', 'style' => '', 'link' => 'html/channel/delicious', 'alt' => '', 'target' => 0, 'view' => 12, 'upid' => 2, 'isshow' => 1));
+$adds += (bool)$navConfigService->add(PW_NAV_TYPE_MAIN, array('nkey' => 'area_auto', 'pos' => '-1', 'title' => '汽车', 'style' => '', 'link' => 'html/channel/auto', 'alt' => '', 'target' => 0, 'view' => 13, 'upid' => 2, 'isshow' => 1));
+$adds += (bool)$navConfigService->add(PW_NAV_TYPE_MAIN, array('nkey' => 'area_decoration', 'pos' => '-1', 'title' => '家装', 'style' => '', 'link' => 'html/channel/decoration', 'alt' => '', 'target' => 0, 'view' => 14, 'upid' => 2, 'isshow' => 1));
 
-$view = 3;
-include D_P.'data/bbscache/area_config.php';
-if (!$area_default_alias) {
-	$currentAlias = is_array($area_channels) ? current($area_channels) : array();
-	$area_default_alias = $currentAlias['alias'];
-}
-$channelService=L::loadClass('channelService', 'area');
-foreach ($channelService->getChannels() as $alias => $channel) {
-	$link = "index.php?m=area&alias=".$alias;
-	$isShow = in_array($alias, array('bbsindex', 'home')) ? 0 : 1; //$area_default_alias
-	$adds += (bool)$navConfigService->add(PW_NAV_TYPE_MAIN, array('nkey' => 'area_'.$alias, 'pos' => '-1', 'title' => $channel['name'], 'link' => $link, 'view' => $view++, 'upid' => 0, 'isshow' => $isShow));
-}
+$adds += (bool)$navConfigService->add(PW_NAV_TYPE_MAIN, array('nkey' => 'group', 'pos' => array('bbs,area,cms,srch,group'), 'title' => '群组', 'style' => '', 'link' => 'group.php', 'alt' => '', 'target' => 0, 'view' => 4, 'upid' => 0, 'isshow' => 1));
+$adds += (bool)$navConfigService->add(PW_NAV_TYPE_MAIN, array('nkey' => '', 'pos' => array('bbs,area,cms,srch,group'), 'title' => '广场', 'style' => '', 'link' => 'index.php?m=o', 'alt' => '', 'target' => 0, 'view' => 5, 'upid' => 0, 'isshow' => 1));
+
+//$view = 3;
+//include D_P.'data/bbscache/area_config.php';
+//if (!$area_default_alias) {
+//	$currentAlias = is_array($area_channels) ? current($area_channels) : array();
+//	$area_default_alias = $currentAlias['alias'];
+//}
+//$channelService=L::loadClass('channelService', 'area');
+//foreach ($channelService->getChannels() as $alias => $channel) {
+//	$link = "index.php?m=area&alias=".$alias;
+//	$isShow = in_array($alias, array('bbsindex', 'home')) ? 0 : 1; //$area_default_alias
+//	$adds += (bool)$navConfigService->add(PW_NAV_TYPE_MAIN, array('nkey' => 'area_'.$alias, 'pos' => '-1', 'title' => $channel['name'], 'link' => $link, 'view' => $view++, 'upid' => 0, 'isshow' => $isShow));
+//}
 
 
 //FOOT
@@ -68,9 +85,9 @@ foreach ($defaults as $key => $value) {
 
 //LEFT
 $defaults = array(
-	array('pos' => array('bbs','area'), 'title' => '10分钟建站', 'link' => 'http://www.phpwind.com/easysite/index.php', 'view'=>1, 'target' => 1, 'isshow' => 1),
-	array('pos' => array('bbs','area'), 'title' => '轻松转换', 'link' => 'http://www.phpwind.net/convert.php', 'view'=>2, 'target' => 1, 'isshow' => 1),
-	array('pos' => array('bbs','area'), 'title' => '站长沙龙', 'link' => 'http://www.phpwind.com/salon/index.html', 'view'=>3, 'target' => 1, 'isshow' => 1),
+	array('pos' => array('bbs,area,cms,srch,group'), 'title' => '10分钟建站', 'link' => 'http://www.phpwind.com/easysite/index.php', 'view'=>1, 'target' => 1, 'isshow' => 1),
+	array('pos' => array('bbs,area,cms,srch,group'), 'title' => '轻松转换', 'link' => 'http://www.phpwind.net/convert.php', 'view'=>2, 'target' => 1, 'isshow' => 1),
+	array('pos' => array('bbs,area,cms,srch,group'), 'title' => '站长沙龙', 'link' => 'http://www.phpwind.com/salon/index.html', 'view'=>3, 'target' => 1, 'isshow' => 1),
 );
 foreach ($defaults as $key => $value) {
 	$adds += (bool)$navConfigService->add(PW_NAV_TYPE_HEAD_LEFT, $value);
@@ -82,15 +99,15 @@ $db->update("UPDATE pw_nav SET type=".pwEscape(PW_NAV_TYPE_HEAD_RIGHT)." WHERE t
 $db->update("DELETE FROM pw_nav WHERE type=".pwEscape(PW_NAV_TYPE_HEAD_RIGHT)." AND link=".pwEscape('faq.php'));
 $defaults = array(
 	'hack' => array(
-		'data' => array('pos' => array('bbs','area'), 'nkey' => 'hack', 'title' => '社区服务', 'link' => '', 'view'=>1, 'target' => 0, 'isshow' => 1),
+		'data' => array('pos' => array('bbs,area,cms,srch,group'), 'nkey' => 'hack', 'title' => '社区服务', 'link' => '', 'view'=>1, 'target' => 0, 'isshow' => 1),
 		'subs' => array(),
 	),
 	'sort' => array(
-		'data' => array('pos' => array('bbs','area'), 'nkey' => 'sort', 'title' => '统计排行', 'link' => 'sort.php', 'view'=>2, 'target' => 0, 'isshow' => 1),
+		'data' => array('pos' => array('bbs,area,cms,srch,group'), 'nkey' => 'sort', 'title' => '统计排行', 'link' => 'sort.php', 'view'=>2, 'target' => 0, 'isshow' => 1),
 		'subs' => array(),
 	),
 	'help' => array(
-		'data' => array('pos' => array('bbs','area'), 'title' => '帮助', 'link' => 'faq.php', 'view'=>3, 'target' => 0, 'isshow' => 1),
+		'data' => array('pos' => array('bbs,area,cms,srch,group'), 'title' => '帮助', 'link' => 'faq.php', 'view'=>3, 'target' => 0, 'isshow' => 1),
 	),
 );
 

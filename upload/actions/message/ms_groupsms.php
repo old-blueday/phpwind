@@ -7,7 +7,7 @@ empty($subtype) && $subtype = 'groupsms';
 $normalUrl = $baseUrl . "?type=$subtype";
 !empty($winduid) && $userId = $winduid;
 
-InitGP(array('smstype','page'), 'GP');
+S::gp(array('smstype','page'), 'GP');
 !$page && $page = 1;
 
 $selected_all = $selected_self = $selected_other = '';
@@ -46,7 +46,7 @@ if (empty($action) || $action == 'all') {
 	$url = "$normalUrl&action=other&";
 
 } elseif ($action == 'info') {
-	InitGP(array('mid', 'rid', 'page'), 'GP');
+	S::gp(array('mid', 'rid', 'page'), 'GP');
 	(empty($mid) || empty($rid)) && Showmsg("undefined_action");
 	if(!$relation = $messageServer->getRelation($userId,$rid)){
 		Showmsg("该条消息你无权查看");
@@ -65,7 +65,7 @@ if (empty($action) || $action == 'all') {
 		 $messageServer->markMessage($userId,$rid);
 	}	
 } elseif ($action == 'up') {
-	InitGP(array('rid'), 'GP');
+	S::gp(array('rid'), 'GP');
 	empty($rid) && Showmsg("undefined_action");
 	if (!($message = $messageServer->getGroupUpMessage($userId, $rid))) {
 		Showmsg("已经是第一条");
@@ -77,7 +77,7 @@ if (empty($action) || $action == 'all') {
 	}
 
 } elseif ($action == 'down') {
-	InitGP(array('rid'), 'GP');
+	S::gp(array('rid'), 'GP');
 	empty($rid) && Showmsg("undefined_action");
 	if (!($message = $messageServer->getGroupDownMessage($userId, $rid))) {
 		Showmsg("已经是最后一条");
@@ -88,11 +88,24 @@ if (empty($action) || $action == 'all') {
 		$attachs = $messageServer->showAttachs($userId, $message['mid']);
 	}
 
+}elseif($action == 'checkover'){
+	S::gp ( array ('rid', 'dir' ), 'GP' );
+	if($dir == 'up'){
+		$message = $messageServer->getGroupUpMessage( $userId, $rid);
+	}else{
+		$message = $messageServer->getGroupDownMessage( $userId, $rid);
+	}
+	if (($message)) {
+		echo( "success\t" );
+	}else{
+		echo("over\t");
+	}
+	ajax_footer();
 }
 
 $groups = $messageServer->getBlackColony($userId);
 if (empty($action) || in_array($action, array('all', 'self', 'other'))) {
-	list($today, $yesterday, $week, $tTimes, $yTimes, $wTimes, $mTimes) = getSubListInfo($groupsmsList);
+	list($today, $yesterday, $tTimes, $yTimes, $mTimes) = getSubListInfo($groupsmsList);
 	$pages = numofpage($groupsmsCount, $page, $pageCount, $url);
 }
 if($subtype == 'groupsms'){

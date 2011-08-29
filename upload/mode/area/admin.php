@@ -1,6 +1,6 @@
 <?php
 !function_exists('adminmsg') && exit('Forbidden');
-InitGP('p',null,'1');
+S::gp('p',null,'1');
 
 if ($p=='setpage') {
 	include(M_P.'/admin/setpage.php');

@@ -7,7 +7,7 @@ if($uid) {
 	if (!$userService->isExist($uid)) Showmsg('invite_user_not_exist');
 }
 
-InitGP(array('hash','type','id'));
+S::gp(array('hash','type','id'));
 
 //验证hash的合法性
 $hash != appkey($uid,$type) && Showmsg('mode_o_invite_hash_error');
@@ -22,7 +22,7 @@ if($type == 'group') {
 	$cyid = $newActive->getCyidById($id);
 	ObHeader("apps.php?q=group&a=active&job=view&cyid=$cyid&id=$id");
 } else {
-	ObHeader("u.php?uid=".$uid);
+	ObHeader(USER_URL.$uid);
 }
 
 ?>

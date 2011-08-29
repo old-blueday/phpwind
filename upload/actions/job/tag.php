@@ -2,7 +2,7 @@
 !defined('P_W') && exit('Forbidden');
 
 !$db_iftag && Showmsg('tag_closed');
-InitGP(array(
+S::gp(array(
 	'tagname',
 	'page'
 ));
@@ -11,13 +11,13 @@ $db_metakeyword = $metakeyword;
 $subject = $metakeyword . ' - ';
 $webPageTitle = $db_bbsname . '-' . $metakeyword;
 require_once (R_P . 'require/header.php');
-include_once (D_P . 'data/bbscache/forum_cache.php');
+include_once pwCache::getPath(D_P . 'data/bbscache/forum_cache.php');
 
-$rs = $db->get_one('SELECT tagid,num FROM pw_tags WHERE tagname=' . pwEscape($tagname));
+$rs = $db->get_one('SELECT tagid,num FROM pw_tags WHERE tagname=' . S::sqlEscape($tagname));
 (!is_numeric($page) || $page < 1) && $page = 1;
-$limit = pwLimit(($page - 1) * $db_readperpage, $db_readperpage);
+$limit = S::sqlLimit(($page - 1) * $db_readperpage, $db_readperpage);
 $pages = numofpage($rs['num'], $page, ceil($rs['num'] / $db_readperpage), "link.php?action=tag&tagname=" . rawurlencode($tagname) . "&");
-$query = $db->query('SELECT * FROM pw_tagdata tg LEFT JOIN pw_threads t USING(tid) WHERE tg.tagid=' . pwEscape($rs['tagid']) . $limit);
+$query = $db->query('SELECT * FROM pw_tagdata tg LEFT JOIN pw_threads t USING(tid) WHERE tg.tagid=' . S::sqlEscape($rs['tagid']) . ' order by t.lastpost desc  '.$limit);
 $tiddb = array();
 while ($rt = $db->fetch_array($query)) {
 	if ($rt['titlefont']) {

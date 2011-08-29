@@ -1,11 +1,11 @@
 <?php
 require_once('wap_global.php');
 
-InitGP(array('prog'));
+S::gp(array('prog'));
 if (!in_array($prog,array('index','cate','bbsinfo','login','quit','phone'))) {
 	$prog = 'index';
 }
-include_once(D_P.'data/bbscache/olcache.php');
+include_once pwCache::getPath(D_P.'data/bbscache/olcache.php');
 $total = $userinbbs + $guestinbbs;
 wap_header('index',$db_bbsname);
 
@@ -22,7 +22,7 @@ if ($prog == 'cate') {
 	$article = $rs['article'];
 	$tposts  = $rs['tposts'];
 } elseif ($prog == 'login') {
-	InitGP(array('lgt','pwuser','pwpwd','question','customquest','answer'),'P');
+	S::gp(array('lgt','pwuser','pwpwd','question','customquest','answer'),'P');
 	if ($windid) {
 		wap_msg('login_have');
 	} elseif ($pwuser && $pwpwd) {
@@ -34,7 +34,7 @@ if ($prog == 'cate') {
 	Loginout();
 	wap_msg('wap_quit','index.php');
 } elseif ($prog == 'phone') {
-	$pwServer['HTTP_ACCEPT_LANGUAGE'] = GetServer('HTTP_ACCEPT_LANGUAGE');
+	$pwServer['HTTP_ACCEPT_LANGUAGE'] = S::getServer('HTTP_ACCEPT_LANGUAGE');
 }
 require_once PrintEot('wap_index');
 wap_footer();

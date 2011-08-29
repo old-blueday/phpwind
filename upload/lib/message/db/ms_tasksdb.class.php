@@ -19,11 +19,11 @@ class PW_Ms_TasksDB extends BaseDB {
 		return $this->_count();
 	}
 	function addTasks($fieldDatas){
-		return $this->_db->update("INSERT INTO ".$this->_tableName." (oid,mid,created_time) VALUES  ".pwSqlMulti($fieldDatas,FALSE));
+		return $this->_db->update("INSERT INTO ".$this->_tableName." (oid,mid,created_time) VALUES  ".S::sqlMulti($fieldDatas,FALSE));
 	}
 	function getsByCreateTime($groupIds,$createTime){
 		if(!is_array($groupIds)) return false;
-		$query = $this->_db->query ( "SELECT * FROM " . $this->_tableName. " WHERE created_time > " .$this->_addSlashes($createTime)." AND oid in(".pwImplode($groupIds).")");
+		$query = $this->_db->query ( "SELECT * FROM " . $this->_tableName. " WHERE created_time > " .$this->_addSlashes($createTime)." AND oid in(".S::sqlImplode($groupIds).")");
 		return $this->_getAllResultFromQuery ( $query );
 	}
 }

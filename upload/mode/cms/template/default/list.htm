@@ -1,18 +1,24 @@
 <!--<?php print <<<EOT
 -->
 <link rel="stylesheet" type="text/css" href="$pwModeImg/style.css" media="all" />
-<div class="cmsbreadCrumb mb10">
+<div id="breadCrumb">
 <!--
 EOT;
-if(checkEditPurview($windid,$column) || getPostPurview($windid,$_G)){
+if(checkEditPurview($windid,$column)){
 print <<<EOT
 -->
-	<span class="bts fr pr" style="margin:-4px 0 0 0;"><span><button type="button" onClick="location.href='mode.php?m=cms&q=post&cid=$column';">发表文章</button></span></span>
+	<span class="bts fr pr"><span><button type="button" onClick="location.href='{$cmsBaseUrl}q=post&cid=$column';">发表文章</button></span></span>
 <!--
 EOT;
-}print <<<EOT
--->	
-	$pagePosition
+} if (!checkEditPurview($windid,$column) && getPostPurview($windid,$_G)){
+print <<<EOT
+-->
+	<span class="bts fr pr"><span><button type="button" onClick="location.href='{$cmsBaseUrl}q=post&cid=$column';">我要投稿</button></span></span>
+<!--
+EOT;
+} print <<<EOT
+-->
+	<img align="absmiddle" src="images/wind/thread/home.gif" alt="forumlist" class="breadHome" /><em class="breadEm"></em>$pagePosition
 </div>
 <div class="cmsBgbor">&nbsp;</div>
 	<div class="cmsBg">
@@ -34,6 +40,7 @@ $_flag = false;
 foreach($articleList as $article){
 $url = getArticleUrl($article[article_id]);
 $_column = $subColumns[$article['column_id']]['name'];
+$_columnparent = $subColumns[$article['column_id']]['parent_id'];
 $columnUrl = getColumnUrl($article[column_id]);
 $article[descrip] = trim($article[descrip]);
 $_href = $article['jumpurl'] ? 'href='.$article['jumpurl'].' target="_blank"' : 'href='.$url;
@@ -51,14 +58,30 @@ print <<<EOT
 EOT;
 }print <<<EOT
 -->
-					<dt><span>{$article[postdate]}</span><a {$_href} class="f14 b mr10">{$article[subject]}</a><a href="$columnUrl" class="s2 w">{$_column}</a></dt>
-					<dd><span class="mr20">{$article[descrip]}</span>
+					<dt><span>{$article[postdate]}</span><a  class="f14 b mr10" {$_href}>{$article[subject]}</a>
 <!--
 EOT;
-if(checkEditPurview($windid,$article['column_id'])){
+if ($_columnparent) {
 print <<<EOT
---><div class="tar">
+-->
+					<a href="$columnUrl" class="s2 w">{$_column}</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+					</dt>
+					<dd><span class="mr20">{$article[descrip]}</span>
+<div class="tar">
+<!--
+EOT;
+if(checkEditPurview($windid,$article['column_id']) || $article['userid'] == $winduid){
+print <<<EOT
+-->
 					<a href="{$basename}q=post&action=edit&id={$article[article_id]}" class="s7" target="_blank">[编辑]</a>
+<!--
+EOT;
+}if(checkEditPurview($windid,$article['column_id'])){print <<<EOT
+-->
 					<a href="javascript:;" onclick="cms_submit({$article[article_id]},'{$article[column_id]}')" class="s7 mr10">[删除]</a></div>
 <!--
 EOT;
@@ -80,7 +103,7 @@ if(!empty($articleList) && $_flag){
 print <<<EOT
 -->
 			<div>
-				<label class="mr20"><input name="all" type="checkbox" value="all" onclick="checkAll(document.FORM,this)"> 全选</label>
+				<label class="mr20" for="checkbox_one"><input name="all" id="checkbox_one" type="checkbox" value="all" onclick="checkAll(document.FORM,this)"> 全选</label>
 				<!--<span class="btn2"><span><button type="button">审核通过</button></span></span>-->
 				<span class="bt2"><span><button type="button" onclick="cms_submit_m(document.FORM,'{$article[column_id]}')">删除</button></span></span>
 			</div>

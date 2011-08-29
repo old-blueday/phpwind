@@ -1,7 +1,7 @@
 <?php
 !function_exists('adminmsg') && exit('Forbidden');
 $basename="$admin_file?adminjob=setstyles";
-require_once Pcv(R_P.'require/forum.php');
+require_once S::escapePath(R_P.'require/forum.php');
 
 if (!$action) {
 	ifcheck($db_showcss,'showcss');
@@ -9,25 +9,26 @@ if (!$action) {
 	include PrintEot('setstyles');exit;
 
 } elseif ($action == 'listedit') {
-	InitGP(array('ifopen','defaultstyle'));
-	InitGP(array('ifopen'),'GP',2);
-	$customname = GetGP('customname');
+	S::gp(array('ifopen','defaultstyle'));
+	S::gp(array('ifopen'),'GP',2);
+	$customname = S::getGP('customname');
 	$styledb = array();
 	$allstyles = getAllStyles();
 	foreach ($allstyles as $key => $value) {
 		empty($customname[$key]) && $customname[$key] = '';
 		if (empty($ifopen[$key])) {
 			$ifopen[$key] = '0';
-			$db->update("UPDATE pw_forums SET style='' WHERE style=".pwEscape($key,false));
+			//$db->update("UPDATE pw_forums SET style='' WHERE style=".S::sqlEscape($key,false));
+			pwQuery::update('pw_forums', 'style=:style', array($key), array('style' => ''));
 		}
 		$ifopen[$key] == '0' && $key == $defaultstyle && $defaultstyle = 'wind';
-		$ckstyle = $db->get_value("SELECT sid FROM pw_styles WHERE name=".pwEscape($key,false)." AND uid='0'");
+		include_once S::escapePath(D_P."data/style/$key.php");
+		$ckstyle = $db->get_value("SELECT sid FROM pw_styles WHERE name=".S::sqlEscape($key,false)." AND uid='0'");
 		if ($ckstyle){
-			$db->update("UPDATE pw_styles SET ".pwSqlSingle(array('customname'=>$customname[$key],'ifopen'=>$ifopen[$key]))."WHERE name=".pwEscape($key,false)." AND uid='0'");
+			$db->update("UPDATE pw_styles SET ".S::sqlSingle(array('customname'=>$customname[$key],'ifopen'=>$ifopen[$key]))."WHERE name=".S::sqlEscape($key,false)." AND uid='0'");
 		} else {
-			include_once Pcv(D_P."data/style/$key.php");
 			$db->update("INSERT INTO pw_styles"
-			. " SET " . pwSqlSingle(array(
+			. " SET " . S::sqlSingle(array(
 				'name'			=> $key,
 				'customname'    => $customname[$key],
 				'ifopen'  		=> $ifopen[$key],
@@ -52,7 +53,7 @@ if (!$action) {
 				'extcss'		=> $extcss
 			)));
 		}
-		$ifopen[$key] == 1 && $styledb[$key] = array($customname[$key],$ifopen[$key]);
+		$ifopen[$key] == 1 && $styledb[$key] = array($customname[$key],$ifopen[$key],$tplpath);
 	}
 	setConfig('db_styledb', $styledb);
 	setConfig('db_defaultstyle', $defaultstyle);
@@ -62,11 +63,11 @@ if (!$action) {
 
 } elseif ($action == 'edit') {
 
-	InitGP(array('sid'));
+	S::gp(array('sid'));
 
 	if (!$_POST['step']) {
 
-		include_once Pcv(D_P."data/style/$sid.php");
+		include_once S::escapePath(D_P."data/style/$sid.php");
 		ifcheck($yeyestyle,'yes');
 		$css_777   = pwWritable(D_P."data/style/{$tplpath}_css.htm") ? 1 : 0;
 		$style_css = readover(D_P."data/style/{$tplpath}_css.htm");
@@ -75,14 +76,14 @@ if (!$action) {
 
 		include PrintEot('setstyles');exit;
 	} else {
-		InitGP(array('setting'),'P');
+		S::gp(array('setting'),'P');
 		$basename .= "&action=edit&sid=$sid";
 		strpos($setting[7],'%')===false && strpos(strtolower($setting[7]),'px')===false && $setting[7].='px';
 		strpos($setting[8],'%')===false && strpos(strtolower($setting[8]),'px')===false && $setting[8].='px';
-		$rs = $db->get_one("SELECT sid FROM pw_styles WHERE name=".pwEscape($sid,false));
+		$rs = $db->get_one("SELECT sid FROM pw_styles WHERE name=".S::sqlEscape($sid,false));
 		if ($rs) {
 			$db->update("UPDATE pw_styles"
-				. " SET " . pwSqlSingle(array(
+				. " SET " . S::sqlSingle(array(
 						'stylepath'		=> $setting[0],
 						'tplpath'		=> $setting[1],
 						'yeyestyle'		=> $setting[2],
@@ -103,10 +104,10 @@ if (!$action) {
 						'forumcolortwo'	=> $setting[17],
 						'extcss'		=> $setting[18]
 					))
-				. ' WHERE name='.pwEscape($sid));
+				. ' WHERE name='.S::sqlEscape($sid));
 		} else {
 			$db->update("INSERT INTO pw_styles"
-				. " SET " . pwSqlSingle(array(
+				. " SET " . S::sqlSingle(array(
 					'name'			=> $sid,
 					'ifopen'		=> '1',
 					'stylepath'		=> $setting[0],
@@ -136,11 +137,11 @@ if (!$action) {
 /*
 } elseif ($_POST['action'] == 'editcss') {
 
-	InitGP(array('sid'),'P');
-	InitGP(array('style_css'),'P',0);
+	S::gp(array('sid'),'P');
+	S::gp(array('style_css'),'P',0);
 
 	$basename .= "&action=edit&sid=$sid";
-	include_once Pcv(D_P."data/style/$sid.php");
+	include_once S::escapePath(D_P."data/style/$sid.php");
 	if (!pwWritable(D_P."data/style/{$tplpath}_css.htm")) {
 		adminmsg('style_777');
 	}
@@ -155,7 +156,7 @@ if (!$action) {
 */
 } elseif ($_POST['action'] == 'setcss') {
 
-	InitGP(array('showcss'));
+	S::gp(array('showcss'));
 	
 	setConfig('db_showcss', $showcss);
 	updatecache_c();
@@ -174,8 +175,8 @@ if (!$action) {
 
 	} else {
 
-		InitGP(array('setting'),'P');
-		$setting[0] = Char_cv($setting[0]);
+		S::gp(array('setting'),'P');
+		$setting[0] = S::escapeChar($setting[0]);
 		if (empty($setting[0])) {
 			adminmsg('style_empty');
 		} elseif (file_exists(D_P."data/style/$setting[0].php")) {
@@ -190,11 +191,11 @@ if (!$action) {
 } elseif ($action == 'del') {
 
 	PostCheck($verify);
-	InitGP(array('sid'));
+	S::gp(array('sid'));
 	if ($sid == $skin) {
 		adminmsg('style_del_error');
 	}
-	$db->update("DELETE FROM pw_styles WHERE name=".pwEscape($sid,false));
+	$db->update("DELETE FROM pw_styles WHERE name=".S::sqlEscape($sid,false));
 
 	if (file_exists(D_P."data/style/$sid.php")) {
 		if (P_unlink(D_P."data/style/$sid.php")) {
@@ -216,7 +217,7 @@ function getAllStyles(){
 	$styles = array();
 	$query = $db->query("SELECT name,customname,ifopen FROM pw_styles WHERE uid='0'");
 	while($rt = $db->fetch_array($query)){
-		$styledb[$rt['name']] = array(Char_cv($rt['customname']),$rt['ifopen']);
+		$styledb[$rt['name']] = array(S::escapeChar($rt['customname']),$rt['ifopen']);
 	}
 	$fp = opendir(D_P."data/style/");
 	while ($skinfile = readdir($fp)) {

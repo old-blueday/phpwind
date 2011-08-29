@@ -2,7 +2,7 @@
 define('AJAX', '1');
 require_once ('global.php');
 require_once (R_P . 'require/functions.php');
-InitGP(array(
+S::gp(array(
 	'action'
 ));
 
@@ -89,6 +89,7 @@ $whiteActions = array(
 	'pingpage',
 	'delpinglog',
 	'clearpinglog',
+	'savepinglog',
 	'doclearpinglog',
 	'showuserbinding',
 	'switchuser',
@@ -103,10 +104,11 @@ $whiteActions = array(
 	'commend',
 	'changewidthcfg',
 	'changesidebar',
-	'readfloor'
+	'readfloor',
+	'collectiontype'
 );
 if (in_array($action, $whiteActions)) {
-	require Pcv(R_P . 'actions/ajax/' . $action . '.php');
+	require S::escapePath(R_P . 'actions/ajax/' . $action . '.php');
 } else {
 	Showmsg('undefined_action');
 }
@@ -170,9 +172,9 @@ function addSingleFriend($updatemem, $winduid, $frienduid, $timestamp, $status, 
 	global $db;	
 	$attentionService = L::loadClass('Attention', 'friend'); /* @var $attentionService PW_Attention */
 	if ($isAttention = $attentionService->isFollow($winduid, $frienduid)) {
-		$db->update("UPDATE pw_friends SET status = ".pwEscape($attentionService->_s_new_friend)." WHERE uid=".pwEscape($winduid)." AND friendid=".pwEscape($frienduid));
+		$db->update("UPDATE pw_friends SET status = ".S::sqlEscape($attentionService->_s_new_friend)." WHERE uid=".S::sqlEscape($winduid)." AND friendid=".S::sqlEscape($frienduid));
 	} else {
-		$pwSQL = pwSqlSingle(array(
+		$pwSQL = S::sqlSingle(array(
 						'uid' => $winduid,
 						'friendid' => $frienduid,
 						'joindate' => $timestamp,

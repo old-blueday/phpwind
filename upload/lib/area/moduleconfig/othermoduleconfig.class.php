@@ -7,6 +7,6 @@ class PW_OtherModuleConfig extends PW_ModuleConfig{
 	}
 	
 	function getPath($alias) {
-		return Pcv(PORTAL_PATH.$alias);
+		return S::escapePath(PORTAL_PATH.$alias);
 	}
 }

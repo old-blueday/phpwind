@@ -378,7 +378,7 @@ if($ifppt){print <<<EOT
 -->
 							<tr class="user-tr">
 								<td width="150">原密码</td>
-								<td><input class="input" type="password" size="20" maxlength="75" name="oldpwd" value="" /> 修改密码或邮箱时需要密码验证</td>
+								<td><input class="input" type="password" size="20" maxlength="75" name="oldpwd" value="" /> 修改密码或电子邮箱时需要密码验证</td>
 							</tr>
 							<tr class="user-tr">
 								<td>新密码</td>
@@ -389,9 +389,9 @@ if($ifppt){print <<<EOT
 								<td><input class="input" type="password" size="20" maxlength="75" name="check_pwd" value="" /></td>
 							</tr>
 							<tr class="user-tr">
-								<td>E-MAIL</td>
+								<td>电子邮箱</td>
 								<td><input class="input" type="text" size="20" maxlength="75" name="proemail" value="$userdb[email]" />
-								<input type="checkbox" name="propublicemail" value="1" $ifpublic />公开邮箱</td>
+								<input type="checkbox" name="propublicemail" value="1" $ifpublic />公开电子邮箱</td>
 							</tr>
 <!--
 EOT;
@@ -578,7 +578,7 @@ EOT;
 -->
 								<tr class="user-tr">
 									<!-- <td>$value[uid]</td> -->
-									<td><a href="u.php?uid=$value[uid]" target="_blank">$value[username]</a></td>
+									<td><a href="{$db_userurl}$value[uid]" target="_blank">$value[username]</a></td>
 									<td>{$ltitle[$value[groupid]]}</td>
 									<td>$value[regdate]</td>
 									<td><a href="apps.php?q=article&u=$value[uid]" target="_blank">$value[postnum]</a></td>

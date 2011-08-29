@@ -74,7 +74,7 @@ EOT;
 \$invitecode
 
 你也可以通过下面的链接进入我的个人空间
-http://test.phpwind.com/u.php?uid=\$uid
+http://test.phpwind.com/{$db_userurl}\$uid
 </textarea>
 <!--
 EOT;
@@ -90,7 +90,7 @@ EOT;
 print <<<EOT
 -->
 			</td>
-        <td class="td2"><div class="help_a">设置通过邮箱发送邀请链接的默认邮件内容。\$username为用户名，\$sitename为站点名称，\$invitecode为邀请码，\$uid为用户id</div></td>
+        <td class="td2"><div class="help_a">设置通过电子邮箱发送邀请链接的默认邮件内容。\$username为用户名，\$sitename为站点名称，\$invitecode为邀请码，\$uid为用户id</div></td>
 	</tr>	
 	<tr class="tr1 vt">
 		<td class="td1">邀请码在线支付功能</td>
@@ -121,8 +121,8 @@ EOT;
 <div class="admin_table mb10">
 <table width="100%" cellspacing="0" cellpadding="0">
 	<tr class="tr2">
-	<td width="5%">状态</td>
-	<td width="10%"> 
+	<td width="6%">状态</td>
+	<td width="22%"> 
 	    <select name="type"  class="select_wa">
 	    	<option value="0" $sel[0]>全部</option>
 	        <option value="1" $sel[1]>未使用</option>
@@ -130,13 +130,17 @@ EOT;
 	        <option value="3" $sel[3]>已注册</option>
 	    </select>
 	</td>
-	<td width="10%">
-		购买用户
-	</td>
-	<td width="10%">
+	<td width="11%">
+		购买用户	</td>
+	<td width="22%">
 		<input type="text" class="input input_wa" name="username" id="username" value="$username" />
 	</td>
-	<td><button name="add" >查找</button></td>
+	<td width="11%">
+		注册用户	</td>
+	<td width="22%">
+		<input type="text" class="input input_wa" name="receiver" id="receiver" value="$receiver" />
+	</td>
+	<td><button name="add" type="submit" >查找</button></td>
 	</tr>
 </table>
 </div>
@@ -233,13 +237,12 @@ print <<<EOT
 <div class="admin_info mb10">
     <h3 class="h1"><b>提示信息</b></h3>
     <div class="legend">
-1.功能说明: 通过这个功能，可以鼓励会员积极宣传网站。只要用户把网站的 url 推荐给其他朋友，并引导其他人访问网站。那他的积分数值将会根据设置增加， 会员通过这种方式获得的积分越多，表明该会员对网站的宣传力度越大!<br />
+1.功能说明: 通过这个功能，可以鼓励会员积极宣传网站。只要用户把带UID的url推荐给其他朋友，引导其他人访问网站，就可以获得积分奖励。<br />
 2.使用方法: 在站点任意一动态页面的 url 后加上 a=用户名 或 u=用户数字ID.比如以下方法均正确(用户名 yuling 数字ID: 3558)<br />
 &nbsp;&nbsp;http://www.phpwind.net/index.php?a=yuling<br />
 &nbsp;&nbsp;http://www.phpwind.net/index.php?u=3558<br />
 &nbsp;&nbsp;http://www.phpwind.net/read.php?tid=217205&a=yuling<br />
 &nbsp;&nbsp;http://www.phpwind.net/read.php?tid=217205&u=3558<br />
-3.通过邮箱联系人、MSN联系人邀请好友功能需php_curl.dll扩展支持
 </div></div>
 <form action="$basename" method="post">
 <input type="hidden" name="step" value="2">
@@ -247,31 +250,31 @@ print <<<EOT
 <div class="admin_table mb10">
 <table width="100%" cellspacing="0" cellpadding="0">
 	<tr class="tr1 vt">
-		<td class="td1">宣传奖励功能</td>
+		<td class="td1">宣传链接</td>
 		<td class="td2">
         	<ul class="list_A list_80">
             	<li><input type="radio" value="1" $linkopen_Y name="config[linkopen]" />开启</li>
                 <li><input type="radio" value="0" $linkopen_N name="config[linkopen]" />关闭</li>
             </ul>
         </td>
-        <td class="td2"><div class="help_a">开启后，用户可以复制个人中心-朋友-邀请好友中的宣传链接,发给你熟悉的人,来自每个ip的访问，可以赚取一定的宣传奖励</div></td>
+        <td class="td2"><div class="help_a">开启后，用户可以在个人中心-朋友-邀请好友中获取宣传链接</div></td>
 	</tr>
 	<tr class="tr1 vt">
-		<td class="td1">宣传奖励类型</td>
+		<td class="td1">宣传奖励要求</td>
 		<td class="td2">
         	<ul class="list_A list_80">
-            	<li><input type="radio" value="1" $linktype_Y name="config[linktype]" />完成注册</li>
                 <li><input type="radio" value="0" $linktype_N name="config[linktype]" />独立ip访问</li>
+            	<li><input type="radio" value="1" $linktype_Y name="config[linktype]" />完成注册</li>
             </ul>
         </td>
         <td class="td2">
         	<div class="help_a">
-        		独立IP访问:表示只要引导其他用户访问网站，宣传会员就会增加积分，但一个IP一天只奖励一次；<br/>完成注册:表示被引导访问的用户需要注册之后，宣传会员才会增加积分
+        		独立IP访问:表示只要引导其他用户访问网站，宣传会员就会增加积分；<br/>完成注册:表示被引导访问的用户需要注册之后，宣传会员才会增加积分
 			</div>
 		</td>
 	</tr>
 	<tr class="tr1 vt">
-		<td class="td1">宣传积分奖励类型</td>
+		<td class="td1">奖励积分类型</td>
 		<td class="td2">
         	<select name="config[linkcredit]" class="select_wa">
 <!--
@@ -290,15 +293,15 @@ EOT;
         <td class="td2"><div class="help_a"></div></td>
 	</tr>
     <tr class="tr1 vt">
-		<td class="td1">宣传积分奖励分数</td>
+		<td class="td1">奖励积分数量</td>
 		<td class="td2"><input type="text" class="input input_wa" name="config[linkscore]" value="$inv_linkscore"></td>
         <td class="td2"><div class="help_a"></div></td>
 	</tr>
-    <tr class="tr1 vt">
+    <!-- <tr class="tr1 vt">
 		<td class="td1">宣传链接默认内容</td>
 		<td class="td2"><textarea class="textarea" name="config[linkcontent]">$inv_linkcontent</textarea></td>
         <td class="td2"><div class="help_a"></div></td>
-	</tr>
+	</tr> -->
 </table>
 </div>
 <div class="tac mb10"><span class="btn"><span><button type="submit">提 交</button></span></span></div></form>

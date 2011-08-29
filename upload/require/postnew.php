@@ -19,9 +19,13 @@ if (!$theSpecialFlag) {//分类、团购、活动不启用主题分类
 
 	$t_per = $pwforum->foruminfo['t_type'];
 }
-
-$db_forcetype = $t_db && $t_per=='2' && !$pwpost->admincheck ? 1 : 0; // 是否需要强制主题分类
-
+$db_forcetype = 0; // 是否需要强制主题分类
+if ($t_db && $t_per=='2' && !$pwpost->admincheck && !S::inArray($groupid, array(3,4))) {
+	$extraGroups = array();
+	$winddb['groups'] && $extraGroups = array_filter(explode(',', $winddb['groups']));
+	$compareGroups = array_intersect($extraGroups, array(3, 4));
+	empty($compareGroups) && $db_forcetype = 1;
+}
 if (!$pwforum->foruminfo['allowpost'] && !$pwpost->admincheck && $_G['allowpost'] == 0) {
 	Showmsg('postnew_group_right');
 }
@@ -80,15 +84,16 @@ if (empty($_POST['step'])) {
 
 	require_once(R_P.'require/header.php');
 	$msg_guide = $pwforum->headguide($guidename);
-
+	$postMinLength = empty($pwpost->forum->foruminfo['forumset']['contentminlen']) ? $db_postmin : $pwpost->forum->foruminfo['forumset']['contentminlen'];
 	require_once PrintEot('post');footer();
 
 } elseif ($_POST['step'] == 2) {
+	S::gp(array('atc_title','atc_content'), 'P', 0);
+	S::gp(array('replayorder','atc_anonymous','atc_newrp','atc_tags','atc_hideatt','magicid','magicname','atc_enhidetype','atc_credittype','flashatt'),'P');
+	S::gp(array('atc_iconid','atc_email','digest','topped','atc_hide','atc_requireenhide','atc_rvrc','atc_requiresell','atc_money', 'atc_usesign', 'atc_html', 'p_type', 'p_sub_type', 'atc_convert', 'atc_autourl'), 'P', 2);
 
-	InitGP(array('atc_title','atc_content'), 'P', 0);
-	InitGP(array('replayorder','atc_anonymous','atc_newrp','atc_tags','atc_hideatt','magicid','magicname','atc_enhidetype','atc_credittype','flashatt'),'P');
-	InitGP(array('atc_iconid','atc_email','digest','topped','atc_hide','atc_requireenhide','atc_rvrc','atc_requiresell','atc_money', 'atc_usesign', 'atc_html', 'p_type', 'p_sub_type', 'atc_convert', 'atc_autourl'), 'P', 2);
-
+	S::gp(array('iscontinue'),'P');//ajax提交时有敏感词时显示是否继续
+	($db_sellset['price'] && (int) $atc_money > $db_sellset['price']) && Showmsg('post_price_limit');
 	require_once(R_P . 'require/bbscode.php');
 
 	$postdata = new topicPostData($pwpost);
@@ -96,7 +101,7 @@ if (empty($_POST['step'])) {
 	$postdata->setStatus('3',decbin($replayorder));
 	$postdata->setWtype($p_type, $p_sub_type, $t_per, $t_db, $db_forcetype);
 	$postdata->setTitle($atc_title);
-	$postdata->setContent($atc_content);
+	!$postdata->setContent($atc_content) && Showmsg('post_price_limit');
 
 	$postdata->setConvert($atc_convert, $atc_autourl);
 	$postdata->setTags($atc_tags);
@@ -132,15 +137,21 @@ if (empty($_POST['step'])) {
 		$postdata->setData('special', 8);
 	}
 	L::loadClass('attupload', 'upload', false);
+	/*上传错误检查
+	$return = PwUpload::checkUpload();
+	$return !== true && Showmsg($return);
+	end*/
 	if (PwUpload::getUploadNum() || $flashatt) {
 		$postdata->att = new AttUpload($winduid, $flashatt);
 		$postdata->att->check();
 		$postdata->att->transfer();
 		PwUpload::upload($postdata->att);
 	}
+	$postdata->iscontinue = (int)$iscontinue;
 	$topicpost->execute($postdata);
 
 	$tid = $topicpost->getNewId();
+	defined('AJAX') && $pinfo = $pinfo.$tid;
 
 	if ($postSpecial) {
 		$postSpecial->insertData($tid);
@@ -154,36 +165,24 @@ if (empty($_POST['step'])) {
 	if ($postActForBbs) {//活动初始化
 		$postActForBbs->insertData($tid,$fid);
 	}
-
-	$j_p = '';
-
+	$j_p = "read.php?tid=$tid";
+	if ($db_htmifopen)
+		$j_p = urlRewrite ( $j_p );
 	if (empty($j_p) || $pwforum->foruminfo['cms']) $j_p = "read.php?tid=$tid";
-	if ($postdata->getIfcheck()) {
-		if ($postdata->filter->filter_weight == 3) {
-			$pinfo = 'enter_words';
-			$banword = implode(',',$postdata->filter->filter_word);
-		} elseif($prompts = $pwpost->getprompt()){
-			isset($prompts['allowhide'])   && $pinfo = "post_limit_hide";
-			isset($prompts['allowsell'])   && $pinfo = "post_limit_sell";
-			isset($prompts['allowencode']) && $pinfo = "post_limit_encode";
-		}else{
-			$pinfo = 'enter_thread';
-		}
-	} else {
-		if ($postdata->filter->filter_weight == 2) {
-			$banword = implode(',',$postdata->filter->filter_word);
-			$pinfo = 'post_word_check';
-		} elseif ($postdata->linkCheckStrategy) {
-			$pinfo = 'post_link_check';
-		} else {
-			$pinfo = 'post_check';
+	$pinfo = defined('AJAX') ? "success\t" . $j_p  : "";
+	
+	if(!$iscontinue){
+		if ($postdata->getIfcheck()) {
+			if($prompts = $pwpost->getprompt()){
+				isset($prompts['allowhide'])   && $pinfo = getLangInfo('refreshto',"post_limit_hide");
+				isset($prompts['allowsell'])   && $pinfo = getLangInfo('refreshto',"post_limit_sell");
+				isset($prompts['allowencode']) && $pinfo = getLangInfo('refreshto',"post_limit_encode");
+			}
 		}
 	}
-	
 	//job sign
 	require_once(R_P.'require/functions.php');
 	initJob($winduid,"doPost",array('fid'=>$fid));
-		
 	refreshto($j_p, $pinfo);
 }
 ?>

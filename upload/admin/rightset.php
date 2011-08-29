@@ -1,7 +1,7 @@
 <?php
 !defined('P_W') && exit('Forbidden');
 
-InitGP(array('gid'),'GP',2);
+S::gp(array('gid'),'GP',2);
 if (!$action) {
 	$setdb = array(); $unsetdb = '';
 	$query = $db->query("SELECT g.gid,g.grouptitle,p.rvalue as allowadmincp FROM pw_usergroups g LEFT JOIN pw_permission p ON p.uid='0' AND p.fid='0' AND p.gid=g.gid AND p.rkey='allowadmincp' WHERE g.gptype IN ('system','special')");
@@ -18,9 +18,9 @@ if (!$action) {
 	if ($_POST['step']!=2) {
 		!$gid && adminmsg('rightset_setgroup');
 		require GetLang('left');
-		include_once(D_P.'data/bbscache/level.php');
+		include_once pwCache::getPath(D_P.'data/bbscache/level.php');
 
-		$right = $db->get_value('SELECT value FROM pw_adminset WHERE gid='.pwEscape($gid));
+		$right = $db->get_value('SELECT value FROM pw_adminset WHERE gid='.S::sqlEscape($gid));
 		if (!$right || !(is_array($right = unserialize($right)))) {
 			$right = array();
 		}
@@ -58,14 +58,14 @@ if (!$action) {
 		$checkvar && $checkvar = substr($checkvar,1);
 		include PrintEot('rightset');exit;
 	} else {
-		InitGP(array('rightdb'),'P',2);
+		S::gp(array('rightdb'),'P',2);
 		!$gid && adminmsg('undefined_action');
 		if (!empty($rightdb) && is_array($rightdb)) {
 			$right = array();
 			$_modes = array('o', 'area', 'app', 'house', 'cms', 'dianpu', 'wot');
 			foreach ($rightdb as $key => $value) {
 				list($k1,$k2) = explode('_',$key);
-				if (in_array($k1, $_modes)) {
+				if (in_array((string)$k1, $_modes)) {
 					$right[$key] = $value;
 				} else {
 					if ($k2) {
@@ -79,13 +79,13 @@ if (!$action) {
 		} else {
 			adminmsg('rightset_empty',$basename.'&action=edit&gid='.$gid);
 		}
-		$ckid = $db->get_value('SELECT gid FROM pw_adminset WHERE gid='.pwEscape($gid));
+		$ckid = $db->get_value('SELECT gid FROM pw_adminset WHERE gid='.S::sqlEscape($gid));
 		if ($ckid) {
-			$db->update('UPDATE pw_adminset SET value='.pwEscape($rightdb).' WHERE gid='.pwEscape($gid));
+			$db->update('UPDATE pw_adminset SET value='.S::sqlEscape($rightdb).' WHERE gid='.S::sqlEscape($gid));
 		} else {
-			$db->update('INSERT INTO pw_adminset SET '.pwSqlSingle(array('gid' => $gid,'value' => $rightdb)));
+			$db->update('INSERT INTO pw_adminset SET '.S::sqlSingle(array('gid' => $gid,'value' => $rightdb)));
 		}
-		$db->update("REPLACE INTO pw_permission SET uid='0',fid='0',gid=".pwEscape($gid).",rkey='allowadmincp',type='system',rvalue='1'");
+		$db->update("REPLACE INTO pw_permission SET uid='0',fid='0',gid=".S::sqlEscape($gid).",rkey='allowadmincp',type='system',rvalue='1'");
 		updatecache_g($gid);
 		adminmsg('operate_success');
 	}
@@ -95,7 +95,7 @@ if (!$action) {
 		pwConfirm('rightset_delgroup',$inputmsg);
 	} else {
 		!$gid && adminmsg('rightset_setgroup');
-		$db->update("REPLACE INTO pw_permission SET uid='0',fid='0',gid=".pwEscape($gid).",rkey='allowadmincp',type='system',rvalue='0'");
+		$db->update("REPLACE INTO pw_permission SET uid='0',fid='0',gid=".S::sqlEscape($gid).",rkey='allowadmincp',type='system',rvalue='0'");
 		updatecache_g($gid);
 		adminmsg('operate_success');
 	}

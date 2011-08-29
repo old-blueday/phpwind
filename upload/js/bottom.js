@@ -103,7 +103,7 @@ app_bottom.prototype = {
 <div class="sbar-title" onclick = "pw_bottom.hiddenTab();"> \
 		<span class="fr closeicon"><img src="'+img.src+'" alt=\"收起\" /></span><span class="b">新鲜事&nbsp;</span>\
 	</div>\
-	<div style="overflow:hidden;width:593px;height:180px;overflow:hidden;" class="sbar-box-b"><IFRAME id="pwifm_source" border=0 src="apps.php?q=weibo&a=post&s=1" frameBorder="0" width="100%" scrolling="no" height="100%"></IFRAME></div>';
+	<div style="overflow:hidden;width:593px;height:210px;overflow:hidden;" class="sbar-box-b"><IFRAME id="pwifm_source" border=0 src="apps.php?q=weibo&a=post&s=1" frameBorder="0" width="100%" scrolling="no" height="100%"></IFRAME></div>';
 		parent.appendChild(list);
 		list.style.zIndex="-1";
 		list.style.left="-1px";

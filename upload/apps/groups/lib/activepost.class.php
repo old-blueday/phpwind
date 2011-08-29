@@ -139,10 +139,10 @@ class PwActivePost {
 		global $db,$timestamp;
 		$this->data['members'] = 1;
 		$this->data['createtime'] = $timestamp;
-		$db->update("INSERT INTO pw_active SET " . pwSqlSingle($this->data));
+		$db->update("INSERT INTO pw_active SET " . S::sqlSingle($this->data));
 		$id = $db->insert_id();
 
-		$db->update("INSERT INTO pw_actmembers SET " . pwSqlSingle(array(
+		$db->update("INSERT INTO pw_actmembers SET " . S::sqlSingle(array(
 			'uid'		=> $GLOBALS['winduid'],
 			'actid'		=> $id,
 			'realname'	=> $GLOBALS['windid'],
@@ -156,14 +156,14 @@ class PwActivePost {
 
 	function updateData($id) {
 		global $db;
-		$db->update("UPDATE pw_active SET " . pwSqlSingle($this->data) . ' WHERE id=' . pwEscape($id));
+		$db->update("UPDATE pw_active SET " . S::sqlSingle($this->data) . ' WHERE id=' . S::sqlEscape($id));
 		
 		if ($this->delattach) {
 			foreach ($this->delattach as $key => $value) {
 				pwDelatt($value['attachurl'],$GLOBALS['db_ifftp']);
 				$value['ifthumb'] && pwDelatt("thumb/$value[attachurl]",$GLOBALS['db_ifftp']);
 			}
-			$db->update("DELETE FROM pw_actattachs WHERE aid IN (" . pwImplode(array_keys($this->delattach)) . ')');
+			$db->update("DELETE FROM pw_actattachs WHERE aid IN (" . S::sqlImplode(array_keys($this->delattach)) . ')');
 		}
 		if ($this->alterattach) {
 			foreach ($this->alterattach as $aid => $v) {

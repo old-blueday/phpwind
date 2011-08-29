@@ -84,14 +84,18 @@ if ($a == 'write' || $a == 'edit') {print <<<EOT
 				<div class="c"></div>
 <!--
 EOT;
-if ($o_diary_gdcheck) {print <<<EOT
+if ($o_diary_gdcheck) {
+$gdSize = explode("\t",$db_gdsize);
+print <<<EOT
 -->
-				<div class="mb10">
-					认证码:
-<input class="input" type="text" name="gdcode" size="5" tabindex="12" onFocus="try{opencode('menu_gd',this)}catch(e){}" /><span style="cursor:pointer; margin-left:3px" onClick="this.previousSibling.focus();">点此显示验证码</span>
-					<div class="menu" id="menu_gd" style="display:none;">
-						<img src="ck.php?" align="absmiddle" style="cursor:pointer;" id="ckcode" alt="看不清楚，换一张" />
-					</div>
+	<div class="mb10">认证码: <input class="input mr5" type="text" name="gdcode" onFocus="showgd();" id="fs_gdcode" size="5" tabindex="3"  />
+<script type="text/javascript" src="js/pw_authcode.js"></script>
+<script>
+var flashWidth = "$gdSize[0]";
+var flashHeight = "$gdSize[1]";
+var gdtype = $db_gdtype;
+showGdCode();
+</script>
 				</div>
 <!--
 EOT;
@@ -99,20 +103,17 @@ EOT;
 -->
 <!--
 EOT;
-if($o_diary_qcheck){print <<<EOT
+if($db_question && $o_diary_qcheck){
+list(,$showq)=explode("\t",$db_qcheck);
+if($db_imagequestion){
+	$question = '<img id="ckquestion" src="ckquestion.php?q='.$qkey.'&t='.$timestamp.'" align="top">';
+}else{
+	$question = $qkey<0 ? getMachineQuestion_1() :  $db_question[$qkey];
+}
+$q_a = $question.($showq && $qkey>0?" 正确答案:".$db_answer[$qkey] : '');
+print <<<EOT
 -->
-				<div>
-				<table cellpadding="0" cellspacing="0" width="600">
-					<tr class="f12">
-						<td>验证问题:</td>
-						<td>
-						{$db_question[$qkey]} （正确答案:{$db_answer[$qkey]}）
-						<input class="input" name="qanswer" id="qanswer" size="25" tabindex="7" />
-						<input type="hidden" name="qkey" id="qkey" value="$qkey" />
-						</td>
-					</tr>
-				</table>
-				</div>
+				<div><span class="mr10">验证问题:</span>{$q_a}<input class="input" size="5" name="qanswer" id="qanswer" tabindex="7" /><input type="hidden" name="qkey" id="qkey" value="$qkey" /></div>
 <!--
 EOT;
 }print <<<EOT
@@ -194,22 +195,22 @@ var cnt  = 0;
 document.FORM.Submit.disabled = false;
 function checkpost(obj) {
 	if (obj.atc_title.value == "") {
-		showDialog("error","标题不能为空",2);
+		showDialog("error","日志<span class='warnFontStyle'>标题</span>不能为空",2);
 		SETTOP();
 		obj.atc_title.focus();
 		return false;
 	} else if (strlen(obj.atc_title.value) > $db_titlemax) {
-		showDialog("error","标题超过最大长度 $db_titlemax 个字节",2);
+		showDialog("error","日志<span class='warnFontStyle'>标题</span>不能大于 <span class='warnFontStyle'>$db_titlemax</span> 个字节",2);
 		obj.atc_title.focus();
 		SETTOP();
 		return false;
 	}
 	if (strlen(obj.atc_content.value) < $db_postmin) {
-		showDialog("error","文章内容少于 $db_postmin 个字节",2);
+		showDialog("error","日志<span class='warnFontStyle'>内容</span>不能少于 <span class='warnFontStyle'>$db_postmin</span> 个字节",2);
 		SETTOP();
 		return false;
 	} else if (strlen(obj.atc_content.value) > $db_postmax) {
-		showDialog("error","文章内容大于 $db_postmax 个字节",2);
+		showDialog("error","日志<span class='warnFontStyle'>内容</span>不能大于 <span class='warnFontStyle'>$db_postmax</span> 个字节",2);
 		SETTOP();
 		return false;
 	}
@@ -227,7 +228,6 @@ EOT;
 <script language="JavaScript" src="apps/$appdir/js/diarytype.js"></script>
 <script language="JavaScript" src="js/app_comment.js"></script>
 <SCRIPT type="text/javascript" LANGUAGE="JavaScript" src="js/core/friendlist.js"></SCRIPT>
-
 <!--
 EOT;
 if((empty($a) || $a == 'privacy' || $a == 'friend') && !empty($sum)) {print <<<EOT
@@ -240,8 +240,10 @@ EOT;
 <script type="text/javascript" src="js/select.js"></script>
 <script type="text/javascript">
 var ld=window.onload;
-new sSelect(getObj('dtid_add'));
-new sSelect(getObj('dtid_pvc'));
+window.onReady(function(){
+	new sSelect(getObj('dtid_add'));
+	new sSelect(getObj('dtid_pvc'));
+})
 </script>
 </body></html>
 <!--

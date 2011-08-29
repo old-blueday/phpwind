@@ -2,12 +2,12 @@
 !function_exists('adminmsg') && exit('Forbidden');
 $basename = "$admin_file?adminjob=topiccate";
 
-InitGP(array('cateid','modelid'),GP,2);
+S::gp(array('cateid','modelid'),GP,2);
 
 
 if (empty($action)){
 
-	@include_once(D_P.'data/bbscache/topic_config.php');
+	@include_once pwCache::getPath(D_P.'data/bbscache/topic_config.php');
 	$topiccatedb = array();
 	$query = $db->query("SELECT cateid,name,ifable,vieworder,ifdel FROM pw_topiccate ORDER BY vieworder,cateid");
 	while ($rt = $db->fetch_array($query)) {
@@ -64,10 +64,10 @@ if (empty($action)){
 
 	include PrintEot('topiccate');
 }  elseif ($action == 'topic') {
-	InitGP(array('page','step','field','newfield'));
+	S::gp(array('page','step','field','newfield'));
 
 	$topicdb = $topiccatedb = $topicmodeldb = array();
-	@include_once(D_P.'data/bbscache/topic_config.php');
+	@include_once pwCache::getPath(D_P.'data/bbscache/topic_config.php');
 	foreach ($topicmodeldb as $value) {
 		$newmodeldb[$value['cateid']][] = $value;
 	}
@@ -76,7 +76,7 @@ if (empty($action)){
 
 	if ($modelid) {
 		$searchhtml = $asearchhtml = '';
-		$query = $db->query("SELECT fieldid,name,type,rules,ifsearch,ifasearch,vieworder FROM pw_topicfield WHERE ifable=1 AND (ifsearch=1 OR ifasearch=1) AND modelid=".pwEscape($modelid). "ORDER BY vieworder,fieldid");
+		$query = $db->query("SELECT fieldid,name,type,rules,ifsearch,ifasearch,vieworder FROM pw_topicfield WHERE ifable=1 AND (ifsearch=1 OR ifasearch=1) AND modelid=".S::sqlEscape($modelid). "ORDER BY vieworder,fieldid");
 		while ($rt = $db->fetch_array($query)) {
 			$rt['fieldvalue'] = $field[$rt['fieldid']];
 			$rt['rules'] && $rt['rules'] = unserialize($rt['rules']);
@@ -106,7 +106,7 @@ if (empty($action)){
 			$newfield = StrCode(serialize($field));
 		}
 		list($count,$tiddb,$alltiddb) = $searchTopic->getSearchvalue($newfield,'one',true,true);
-		is_array($tiddb) && $sql .= " AND tv.tid IN(".pwImplode($tiddb).")";
+		is_array($tiddb) && $sql .= " AND tv.tid IN(".S::sqlImplode($tiddb).")";
 		is_array($alltiddb) && $alltids = implode(',',$alltiddb);
 	}
 
@@ -118,7 +118,7 @@ if (empty($action)){
 			$alltiddb[] = $rt['tid'];
 		}
 		if ($alltiddb) {
-			$query = $db->query("SELECT tid FROM pw_threads WHERE tid IN(".pwImplode($alltiddb).")");
+			$query = $db->query("SELECT tid FROM pw_threads WHERE tid IN(".S::sqlImplode($alltiddb).")");
 			while ($rt = $db->fetch_array($query)) {
 				$threadb[$rt['tid']] = $rt['tid'];
 			}
@@ -130,7 +130,7 @@ if (empty($action)){
 		}
 
 		if (count($newtiddb) > 0) {
-			$db->update("DELETE FROM $tablename WHERE tid IN(".pwImplode($newtiddb).") AND ifrecycle=0");
+			$db->update("DELETE FROM $tablename WHERE tid IN(".S::sqlImplode($newtiddb).") AND ifrecycle=0");
 		}
 
 		is_array($threadb) && $alltids = implode(',',$threadb);
@@ -146,7 +146,7 @@ if (empty($action)){
 		$pages = numofpage($count,$page,$numofpage,"$admin_file?adminjob=topiccate&action=topic&modelid=$modelid&newfield=$newfield&step=$step&");
 		if ($step != 'search') {
 			$start = ($page-1)*$db_perpage;
-			$limit = pwLimit($start,$db_perpage);
+			$limit = S::sqlLimit($start,$db_perpage);
 		}
 		$query = $db->query("SELECT tv.tid,t.fid,t.subject,t.author,t.authorid,t.postdate FROM $tablename tv LEFT JOIN pw_threads t ON tv.tid=t.tid WHERE 1 AND ifrecycle=0 $sql ORDER BY t.postdate DESC $limit");
 		while ($rt = $db->fetch_array($query)) {
@@ -158,15 +158,15 @@ if (empty($action)){
 	include PrintEot('topiccate');exit;
 
 } elseif ($_POST['sendmsg'] || $action == 'sendmsg') {
-	InitGP(array('step','nexto'));
+	S::gp(array('step','nexto'));
 	if (empty($step)) {
-		InitGP(array('selid','alltids'));
+		S::gp(array('selid','alltids'));
 
 		if ($selid) {
-			$selid = pwImplode($selid);
+			$selid = S::sqlImplode($selid);
 		} elseif ($alltids) {
 			$alltids = explode(',',$alltids);
-			$selid = pwImplode($alltids);
+			$selid = S::sqlImplode($alltids);
 		} else {
 			adminmsg('operate_error',"$basename&action=topic");
 		}
@@ -178,10 +178,10 @@ if (empty($action)){
 		}
 		include PrintEot('topiccate');exit;
 	} elseif ($step == '2') {
-		InitGP(array('subject','atc_content','uids'));
+		S::gp(array('subject','atc_content','uids'));
 		$cache_file = D_P."data/bbscache/".substr(md5($admin_pwd),10,10).".txt";
 		if (!$nexto) {
-			writeover($cache_file,$atc_content);
+			pwCache::setData($cache_file,$atc_content);
 		} else {
 			$atc_content = readover($cache_file);
 		}
@@ -190,8 +190,8 @@ if (empty($action)){
 			adminmsg('sendmsg_empty','javascript:history.go(-1);');
 		}
 
-		$subject     = Char_cv($subject);
-		$sendmessage = Char_cv($atc_content);
+		$subject     = S::escapeChar($subject);
+		$sendmessage = S::escapeChar($atc_content);
 		$percount = 1;
 		empty($nexto) && $nexto = 1;
 
@@ -216,14 +216,14 @@ if (empty($action)){
 			$j_url = "$basename&action=$action&step=2&nexto=$nexto&subject=".rawurlencode($subject);
 			adminmsg("sendmsg_step",EncodeUrl($j_url),1);
 		} else {
-			P_unlink($cache_file);
+			pwCache::deleteData($cache_file);
 			adminmsg('operate_success',"$basename&action=topic");
 		}
 	}
 
 } elseif ($action == 'delthreads') {
 
-	InitGP(array('selid'));
+	S::gp(array('selid'));
 
 	!$selid && adminmsg('operate_error');
 	is_numeric($selid) && $selid = explode(',',$selid);
@@ -241,15 +241,19 @@ if (empty($action)){
 	$delarticle->delTopic($readdb, $db_recycle);
 
 	if ($db_ifpwcache ^ 1) {
-		$db->update("DELETE FROM pw_elements WHERE type !='usersort' AND id IN(" . pwImplode($delids) . ')');
+		$db->update("DELETE FROM pw_elements WHERE type !='usersort' AND id IN(" . S::sqlImplode($delids) . ')');
 	}
 
 	# $db->update("DELETE FROM pw_threads WHERE tid IN ($selids)");
 	# ThreadManager
-    $threadManager = L::loadClass("threadmanager", 'forum');
-	$threadManager->deleteByThreadIds($fid,$selids);
-
-	P_unlink(D_P.'data/bbscache/c_cache.php');
+    //* $threadManager = L::loadClass("threadmanager", 'forum');
+	//* $threadManager->deleteByThreadIds($fid,$selids);
+	$threadService = L::loadclass('threads', 'forum');
+	$threadService->deleteByThreadIds($delids);	
+	Perf::gatherInfo('changeThreadWithForumIds', array('fid'=>$fid));
+	
+	//* P_unlink(D_P.'data/bbscache/c_cache.php');
+	pwCache::deleteData(D_P.'data/bbscache/c_cache.php');	
 
 	adminmsg('operate_success',"$basename&action=topic&modelid=$modelid");
 
@@ -262,24 +266,24 @@ if (empty($action)){
 		$ifable_Y = 'checked';
 		include PrintEot('topiccate');ajax_footer();
 	} elseif ($_POST['step'] == 2) {
-		InitGP(array('name'));
-		InitGP(array('ifable','vieworder'),'P',2);
+		S::gp(array('name'));
+		S::gp(array('ifable','vieworder'),'P',2);
 
 		$name = trim(ieconvert($name));
 		if(!$name || strlen($name) > 14) adminmsg('topic_name');
 
-		$rt = $db->get_one("SELECT cateid FROM pw_topiccate WHERE name=".pwEscape($name));
+		$rt = $db->get_one("SELECT cateid FROM pw_topiccate WHERE name=".S::sqlEscape($name));
 		$rt['cateid'] && adminmsg('topic_name_exist');
 
 		$db->update("INSERT INTO pw_topiccate"
-			. " SET " . pwSqlSingle(array(
+			. " SET " . S::sqlSingle(array(
 				'name'=> $name                , 'ifable'=> $ifable,
 				'vieworder'=> $vieworder
 		)));
 		$cateid = $db->insert_id();
 
 		$db->update("INSERT INTO pw_topicmodel"
-			. " SET " . pwSqlSingle(array(
+			. " SET " . S::sqlSingle(array(
 				'name'		=> getLangInfo('other','pc_defaultmodel'),	'cateid'	=> $cateid,
 				'vieworder'	=> 0,										'ifable'	=> 1
 		)));
@@ -310,9 +314,9 @@ if (empty($action)){
 		$ajax_basename_add = EncodeUrl($basename."&action=edittopic&");
 
 		$selectmodel = '';
-		$topic = $db->get_one("SELECT cateid,name,ifable,vieworder,ifdel FROM pw_topiccate WHERE cateid=".pwEscape($cateid));
+		$topic = $db->get_one("SELECT cateid,name,ifable,vieworder,ifdel FROM pw_topiccate WHERE cateid=".S::sqlEscape($cateid));
 
-		$query = $db->query("SELECT name,modelid,cateid,ifable FROM pw_topicmodel WHERE cateid=".pwEscape($cateid));
+		$query = $db->query("SELECT name,modelid,cateid,ifable FROM pw_topicmodel WHERE cateid=".S::sqlEscape($cateid));
 		while ($rt = $db->fetch_array($query)) {
 			$checked = '';
 			if ($rt['ifable']) $checked = 'checked';
@@ -323,21 +327,21 @@ if (empty($action)){
 		include PrintEot('topiccate');ajax_footer();
 
 	} elseif ($_POST['step'] == 2) {
-		InitGP(array('name'));
-		InitGP(array('ifable','vieworder'),'P',2);
+		S::gp(array('name'));
+		S::gp(array('ifable','vieworder'),'P',2);
 
 		$name = trim(ieconvert($name));
 		if(!$name || strlen($name) > 14) adminmsg('topic_name');
 
-		$rt = $db->get_one("SELECT cateid FROM pw_topiccate WHERE name=".pwEscape($name));
+		$rt = $db->get_one("SELECT cateid FROM pw_topiccate WHERE name=".S::sqlEscape($name));
 		$rt['cateid'] != $cateid && $rt['cateid'] && adminmsg('topic_name_exist');
 
 		$db->update("UPDATE pw_topiccate"
-			. " SET " . pwSqlSingle(array(
+			. " SET " . S::sqlSingle(array(
 					'name'		=> $name,			'ifable'	=> $ifable,
 					'vieworder'	=> $vieworder
 					))
-			. " WHERE cateid=".pwEscape($cateid));
+			. " WHERE cateid=".S::sqlEscape($cateid));
 
 
 		!is_array($modelid) && $modelid = array();
@@ -349,8 +353,8 @@ if (empty($action)){
 			}
 		}
 		if ($updatedb) {
-			$db->update("UPDATE pw_topicmodel SET ifable=1 WHERE cateid=".pwEscape($cateid)." AND modelid IN (".pwImplode($updatedb).')');
-			$db->update("UPDATE pw_topicmodel SET ifable=0 WHERE cateid=".pwEscape($cateid)." AND modelid NOT IN (".pwImplode($updatedb).')');
+			$db->update("UPDATE pw_topicmodel SET ifable=1 WHERE cateid=".S::sqlEscape($cateid)." AND modelid IN (".S::sqlImplode($updatedb).')');
+			$db->update("UPDATE pw_topicmodel SET ifable=0 WHERE cateid=".S::sqlEscape($cateid)." AND modelid NOT IN (".S::sqlImplode($updatedb).')');
 		} else {
 			adminmsg('model_not_none');
 		}
@@ -359,7 +363,7 @@ if (empty($action)){
 		Showmsg('topic_edit_success');
 	}
 } elseif ($action == 'topiclist') {
-	InitGP(array('selid','vieworder','name'));
+	S::gp(array('selid','vieworder','name'));
 
 	!is_array($selid) && $selid = array();
 	$updatedb = array();
@@ -371,32 +375,32 @@ if (empty($action)){
 	}
 
 	if ($updatedb) {
-		$db->update("UPDATE pw_topiccate SET ifable=1 WHERE cateid IN (".pwImplode($updatedb).')');
-		$db->update("UPDATE pw_topiccate SET ifable=0 WHERE cateid NOT IN (".pwImplode($updatedb).')');
+		$db->update("UPDATE pw_topiccate SET ifable=1 WHERE cateid IN (".S::sqlImplode($updatedb).')');
+		$db->update("UPDATE pw_topiccate SET ifable=0 WHERE cateid NOT IN (".S::sqlImplode($updatedb).')');
 	} else {
 		$db->update("UPDATE pw_topiccate SET ifable=0");
 	}
 
 	foreach ($vieworder as $key => $value) {
-		$key && $db->update("UPDATE pw_topiccate SET vieworder=".pwEscape($value).",name=".pwEscape($name[$key])."WHERE cateid=".pwEscape($key));
+		$key && $db->update("UPDATE pw_topiccate SET vieworder=".S::sqlEscape($value).",name=".S::sqlEscape($name[$key])."WHERE cateid=".S::sqlEscape($key));
 	}
 	updatecache_topic();
 	adminmsg('operate_success',$basename);
 } elseif ($action == 'deltopic') {
-	$db->UPDATE("DELETE FROM pw_topiccate WHERE cateid=".pwEscape($cateid));
+	$db->UPDATE("DELETE FROM pw_topiccate WHERE cateid=".S::sqlEscape($cateid));
 	$delmodeldb = array();
-	$query = $db->query("SELECT modelid FROM pw_topicmodel WHERE cateid=".pwEscape($cateid));
+	$query = $db->query("SELECT modelid FROM pw_topicmodel WHERE cateid=".S::sqlEscape($cateid));
 	while ($rt = $db->fetch_array($query)) {
 		$tablename = GetTopcitable($rt['modelid']);
 		$db->query("DROP TABLE $tablename");
 		$delmodeldb[] = $rt['modelid'];
 	}
-	$delmodeldb && $db->UPDATE("DELETE FROM pw_topicfield WHERE modelid IN(".pwImplode($delmodeldb).")");
-	$db->UPDATE("DELETE FROM pw_topicmodel WHERE cateid=".pwEscape($cateid));
+	$delmodeldb && $db->UPDATE("DELETE FROM pw_topicfield WHERE modelid IN(".S::sqlImplode($delmodeldb).")");
+	$db->UPDATE("DELETE FROM pw_topicmodel WHERE cateid=".S::sqlEscape($cateid));
 	updatecache_topic();
 	adminmsg('operate_success',$basename);
 } elseif ($action == 'editmodel') {
-	InitGP(array('step'),GP,2);
+	S::gp(array('step'),GP,2);
 
 	$ajax_basename_add = EncodeUrl($basename."&action=addfield");
 
@@ -407,20 +411,20 @@ if (empty($action)){
 		$ajax_basename_delfield = EncodeUrl($basename."&action=delfield");
 		$ajax_basename_editindex = EncodeUrl($basename."&action=editindex");
 
-		$cateid = $db->get_value("SELECT cateid FROM pw_topiccate WHERE cateid=".pwEscape($cateid));
+		$cateid = $db->get_value("SELECT cateid FROM pw_topiccate WHERE cateid=".S::sqlEscape($cateid));
 		empty($cateid) && adminmsg('illegal_cateid_or_modelid');
 
 		if (empty($modelid)) {
-			$modelid = $db->get_value("SELECT modelid FROM pw_topicmodel WHERE cateid=".pwEscape($cateid)." ORDER BY vieworder ASC");
+			$modelid = $db->get_value("SELECT modelid FROM pw_topicmodel WHERE cateid=".S::sqlEscape($cateid)." ORDER BY vieworder ASC");
 		}
 		//获取主题模版
 
 		$modeldb = getModeldbByCateid($cateid);
 		//获取当前模板的字段内容
 		if ($modelid) {
-			$modelname = $db->get_value("SELECT name FROM pw_topicmodel WHERE modelid=".pwEscape($modelid));
+			$modelname = $db->get_value("SELECT name FROM pw_topicmodel WHERE modelid=".S::sqlEscape($modelid));
 
-			$query = $db->query("SELECT * FROM pw_topicfield WHERE modelid=".pwEscape($modelid)." ORDER BY vieworder,fieldid ASC");
+			$query = $db->query("SELECT * FROM pw_topicfield WHERE modelid=".S::sqlEscape($modelid)." ORDER BY vieworder,fieldid ASC");
 			while ($rt = $db->fetch_array($query)){
 				$rt['ifable_checked'] = $rt['ifable'] ? 'checked' : '';
 				$rt['ifsearch_checked'] = $rt['ifsearch'] ? 'checked' : '';
@@ -452,9 +456,9 @@ if (empty($action)){
 		include PrintEot('topiccate');exit;
 	} elseif ($step == '2') {
 
-		InitGP(array('ifable','vieworder','ifsearch','ifasearch','threadshow','ifmust','textsize'));
+		S::gp(array('ifable','vieworder','ifsearch','ifasearch','threadshow','ifmust','textsize'));
 		foreach ($vieworder as $key => $value) {
-			$db->update("UPDATE pw_topicfield SET ".pwSqlSingle(array('ifable'=>$ifable[$key],'vieworder'=>$value,'ifsearch'=>$ifsearch[$key],'ifasearch'=>$ifasearch[$key],'threadshow'=>$threadshow[$key],'ifmust'=>$ifmust[$key],'textsize'=>$textsize[$key]))." WHERE fieldid=".pwEscape($key));
+			$db->update("UPDATE pw_topicfield SET ".S::sqlSingle(array('ifable'=>$ifable[$key],'vieworder'=>$value,'ifsearch'=>$ifsearch[$key],'ifasearch'=>$ifasearch[$key],'threadshow'=>$threadshow[$key],'ifmust'=>$ifmust[$key],'textsize'=>$textsize[$key]))." WHERE fieldid=".S::sqlEscape($key));
 		}
 		adminmsg("operate_success",$basename."&action=editmodel&cateid=".$cateid."&modelid=".$modelid);
 
@@ -475,13 +479,13 @@ if (empty($action)){
 		$modeldb = getModeldbByCateid($cateid);
 		include PrintEot('topiccate');ajax_footer();
 	} else {
-		InitGP(array('vieworder'),'P',2);
-		InitGP(array('name'));
+		S::gp(array('vieworder'),'P',2);
+		S::gp(array('name'));
 		foreach ($name as $key => $value) {
 			strlen($value) > 30 && Showmsg('model_name_too_long');
 		}
 		foreach($name as $key => $value) {
-			$db->update("UPDATE pw_topicmodel SET ".pwSqlSingle(array('name'=>$name[$key],'vieworder'=>$vieworder[$key]))."WHERE modelid=".pwEscape($key));
+			$db->update("UPDATE pw_topicmodel SET ".S::sqlSingle(array('name'=>$name[$key],'vieworder'=>$vieworder[$key]))."WHERE modelid=".S::sqlEscape($key));
 		}
 		updatecache_topic();
 		echo "success\t$cateid\t$modelid";ajax_footer();
@@ -495,15 +499,15 @@ if (empty($action)){
 		include PrintEot('topiccate');ajax_footer();
 	} else {
 
-		InitGP(array('modename'));
+		S::gp(array('modename'));
 		if (strlen($modename) > 30) {
 			echo "mode_name_too_long\t";ajax_footer();
 		}
-		$oldmodel = $db->get_value("SELECT modelid FROM pw_topicmodel WHERE name=".pwEscape($modename)." AND cateid=".pwEscape($cateid));
+		$oldmodel = $db->get_value("SELECT modelid FROM pw_topicmodel WHERE name=".S::sqlEscape($modename)." AND cateid=".S::sqlEscape($cateid));
 		if ($oldmodel) {
 			echo "samename\t$cateid\t$modelid";ajax_footer();
 		}
-		$db->update("INSERT INTO pw_topicmodel SET name=".pwEscape($modename).",cateid=".pwEscape($cateid));
+		$db->update("INSERT INTO pw_topicmodel SET name=".S::sqlEscape($modename).",cateid=".S::sqlEscape($cateid));
 		$modelid = $db->insert_id();
 
 		$createsql = "CREATE TABLE ".$PW."topicvalue".$modelid." (tid mediumint(8) unsigned NOT NULL,fid SMALLINT( 6 ) UNSIGNED NOT NULL ,ifrecycle TINYINT(1) NOT NULL default 0,PRIMARY KEY (tid))";
@@ -539,7 +543,7 @@ if (empty($action)){
 		include PrintEot('topiccate');ajax_footer();
 
 	} elseif ($_POST['step'] == 2) {
-		InitGP(array('fieldtype','name','rule_min','rule_max','rules','descrip'));
+		S::gp(array('fieldtype','name','rule_min','rule_max','rules','descrip'));
 		if (empty($fieldtype)) Showmsg('fieldtype_not_exists');
 		if ($fieldtype == 'select' || $fieldtype == 'radio' || $fieldtype == 'checkbox') {
 			foreach(explode("\n",stripslashes($rules)) as $key => $value) {
@@ -549,7 +553,8 @@ if (empty($action)){
 			}
 			$s_rules = addslashes(serialize(explode("\n",stripslashes($rules))));
 		} elseif ($fieldtype == 'number') {
-			if (!$rule_min && $rule_max || $rule_min && !$rule_max) Showmsg('field_number_numerror');
+			$rule_min != '' && $rule_min = (int) $rule_min;
+			$rule_max != '' && $rule_max = (int) $rule_max;
 			$rule_min > $rule_max && Showmsg('field_number_error');
 			$s_rules = addslashes(serialize(array('minnum' => $rule_min,'maxnum' => $rule_max)));
 		} else {
@@ -559,11 +564,11 @@ if (empty($action)){
 			Showmsg('field_descrip_limit');
 		}
 
-		$db->update("INSERT INTO pw_topicfield SET ".pwSqlSingle(array('name'=>$name,'modelid' => $modelid,'type'=>$fieldtype,'rules'=>$s_rules,'descrip'=>$descrip)));
+		$db->update("INSERT INTO pw_topicfield SET ".S::sqlSingle(array('name'=>$name,'modelid' => $modelid,'type'=>$fieldtype,'rules'=>$s_rules,'descrip'=>$descrip)));
 		$fieldid = $db->insert_id();
 		$fieldname = 'field'.$fieldid;
 		$tablename = GetTopcitable($modelid);
-		$db->update("UPDATE pw_topicfield SET fieldname=".pwEscape($fieldname)." WHERE fieldid=".pwEscape($fieldid));
+		$db->update("UPDATE pw_topicfield SET fieldname=".S::sqlEscape($fieldname)." WHERE fieldid=".S::sqlEscape($fieldid));
 		/*$ckfieldname = $db->get_one("SHOW COLUMNS FROM $tablename LIKE '$fieldname'");
 		if ($ckfieldname) {
 			Showmsg('field_have_exists');
@@ -580,11 +585,11 @@ if (empty($action)){
 	define('AJAX',1);
 	if (!$_POST['step']) {
 		$ajax_basename_edit = EncodeUrl($basename."&action=editfield");
-		InitGP(array('fieldid'));
+		S::gp(array('fieldid'));
 		if (empty($fieldid)) Showmsg('field_not_select');
-		$fielddb = $db->get_one("SELECT name,fieldname,rules,type,descrip,modelid FROM pw_topicfield WHERE fieldid=".pwEscape($fieldid));
+		$fielddb = $db->get_one("SELECT name,fieldname,rules,type,descrip,modelid FROM pw_topicfield WHERE fieldid=".S::sqlEscape($fieldid));
 		$tablename = GetTopcitable($fielddb['modelid']);
-		$count = $db->get_value("SELECT COUNT(*) FROM $tablename WHERE ".$fielddb['fieldname']." != ''");//查找是否变量已有值
+		$count = $db->get_value("SELECT COUNT(*) FROM $tablename WHERE ".$fielddb['fieldname']." != '' AND ".$fielddb['fieldname']." != 0");//查找是否变量已有值
 		if ($count) $ifhidden = '1';
 
 		$rules = unserialize($fielddb['rules']);
@@ -600,37 +605,39 @@ if (empty($action)){
 		}
 		include PrintEot('topiccate');ajax_footer();
 	} elseif ($_POST['step'] == 2) {
-		InitGP(array('fieldtype','name','rule_min','rule_max','rules','fieldid','descrip'));
+		S::gp(array('fieldtype','name','rule_min','rule_max','rules','fieldid','descrip'));
 		if (empty($fieldid)) Showmsg('field_not_select');
 		if (empty($fieldtype)) Showmsg('fieldtype_not_exists');
 		if ($fieldtype == 'select' || $fieldtype == 'radio' || $fieldtype == 'checkbox') {
 			$s_rules = addslashes(serialize(explode("\n",stripslashes($rules))));
 		} elseif ($fieldtype == 'number') {
-			if (!$rule_min && $rule_max || $rule_min && !$rule_max) Showmsg('field_number_numerror');
+			$rule_min != '' && $rule_min = (int) $rule_min;
+			$rule_max != '' && $rule_max = (int) $rule_max;
 			$rule_min > $rule_max && Showmsg('field_number_error');
 			$s_rules = addslashes(serialize(array('minnum' => $rule_min,'maxnum' => $rule_max)));
 		} else {
 			$s_rules = '';
 		}
-
 		//查找字段在表，判断是否有数据，如有数据不可更改字段类型
-		$fielddb = $db->get_one("SELECT modelid,ifable,vieworder,ifsearch,ifasearch,threadshow,ifmust,type FROM pw_topicfield WHERE fieldid=".pwEscape($fieldid));
+		$fielddb = $db->get_one("SELECT modelid,ifable,vieworder,ifsearch,ifasearch,threadshow,ifmust,type FROM pw_topicfield WHERE fieldid=".S::sqlEscape($fieldid));
 		$tablename = GetTopcitable($fielddb['modelid']);
 		$fieldname = 'field'.$fieldid;
 
 		if ($fieldtype != $fielddb['type']) {
-			$count = $db->get_value("SELECT COUNT(*) FROM $tablename WHERE $fieldname != ''");
+			$count = $db->get_value("SELECT COUNT(*) FROM $tablename WHERE $fieldname != '' AND $fieldname != 0");
 			if ($count) Showmsg('can_not_modify_field_type');
+			$sql = getFieldSqlByType($fieldtype);
+			$db->query("ALTER TABLE $tablename CHANGE $fieldname $fieldname $sql");
 		}
 
-		$db->update("UPDATE pw_topicfield SET ".pwSqlSingle(array('name'=>$name,'type'=>$fieldtype,'rules'=>$s_rules,'descrip'=>$descrip))." WHERE fieldid=".pwEscape($fieldid));
+		$db->update("UPDATE pw_topicfield SET ".S::sqlSingle(array('name'=>$name,'type'=>$fieldtype,'rules'=>$s_rules,'descrip'=>$descrip))." WHERE fieldid=".S::sqlEscape($fieldid));
 
 		Showmsg('field_edit_success');
 	}
 } elseif ($action == 'showfield') {
 	define('AJAX',1);
-	InitGP(array('currentmodelid'));
-	$query = $db->query("SELECT fieldid,name FROM pw_topicfield WHERE modelid=".pwEscape($modelid));
+	S::gp(array('currentmodelid'));
+	$query = $db->query("SELECT fieldid,name FROM pw_topicfield WHERE modelid=".S::sqlEscape($modelid));
 
 	while ($rt = $db->fetch_array($query)) {
 		$fielddb[$rt['fieldid']] = $rt['name'];
@@ -639,21 +646,21 @@ if (empty($action)){
 	echo "success\t$fielddb";ajax_footer();
 } elseif ($action == 'copyfield') {
 	define('AJAX',1);
-	InitGP(array('copyfield'));
+	S::gp(array('copyfield'));
 	if (empty($copyfield) || !is_array($copyfield)) {
 		adminmsg('topiccate_copyfield_none');
 	}
-	$query = $db->query("SELECT name,type,rules,descrip FROM pw_topicfield WHERE fieldid IN (".pwImplode($copyfield).")");
+	$query = $db->query("SELECT name,type,rules,descrip FROM pw_topicfield WHERE fieldid IN (".S::sqlImplode($copyfield).")");
 	while ($rt = $db->fetch_array($query)) {
-		$name = $db->get_value("SELECT name FROM pw_topicfield WHERE modelid=".pwEscape($modelid));
-		$db->update("INSERT INTO pw_topicfield SET ".pwSqlSingle(array('name'=>$rt['name'],'fieldname'=>$rt['fieldname'],'modelid'=>$modelid,'type'=>$rt['type'],'rules'=>$rt['rules'],'descrip'=>$rt['descrip'])),false);
+		$name = $db->get_value("SELECT name FROM pw_topicfield WHERE modelid=".S::sqlEscape($modelid));
+		$db->update("INSERT INTO pw_topicfield SET ".S::sqlSingle(array('name'=>$rt['name'],'fieldname'=>$rt['fieldname'],'modelid'=>$modelid,'type'=>$rt['type'],'rules'=>$rt['rules'],'descrip'=>$rt['descrip'])),false);
 		$fieldid = $db->insert_id();
 		$fieldname = 'field'.$fieldid;
 		$tablename = GetTopcitable($modelid);
-		$db->update("UPDATE pw_topicfield SET fieldname=".pwEscape($fieldname)." WHERE fieldid=".pwEscape($fieldid));
+		$db->update("UPDATE pw_topicfield SET fieldname=".S::sqlEscape($fieldname)." WHERE fieldid=".S::sqlEscape($fieldid));
 		$ckfieldname = $db->get_one("SHOW COLUMNS FROM $tablename LIKE '$fieldname'");
 		if ($ckfieldname) {
-			$db->update("DELETE FROM pw_topicfield WHERE fieldid=".pwEscape($fieldid));
+			$db->update("DELETE FROM pw_topicfield WHERE fieldid=".S::sqlEscape($fieldid));
 			Showmsg('field_have_exists');
 		} else {
 			$sql = getFieldSqlByType($rt['type']);
@@ -664,12 +671,12 @@ if (empty($action)){
 
 } elseif ($action == 'delfield') {
 	define('AJAX',1);
-	InitGP(array('fieldid'));
-	$ckfield = $db->get_one("SELECT fieldid,modelid FROM pw_topicfield WHERE fieldid=".pwEscape($fieldid));
+	S::gp(array('fieldid'));
+	$ckfield = $db->get_one("SELECT fieldid,modelid FROM pw_topicfield WHERE fieldid=".S::sqlEscape($fieldid));
 	if ($ckfield) {
 		$tablename = GetTopcitable($ckfield['modelid']);
 		$fieldname = 'field'.$ckfield['fieldid'];
-		$db->update("DELETE FROM pw_topicfield WHERE fieldid=".pwEscape($fieldid));
+		$db->update("DELETE FROM pw_topicfield WHERE fieldid=".S::sqlEscape($fieldid));
 		$ckfield2 = $db->get_one("SHOW COLUMNS FROM $tablename LIKE '$fieldname'");
 		if ($ckfield2) {
 			$db->query("ALTER TABLE $tablename DROP $fieldname");
@@ -684,11 +691,11 @@ if (empty($action)){
 
 } elseif ($action == 'editindex') {
 	define('AJAX',1);
-	InitGP(array('type','fieldid'));
+	S::gp(array('type','fieldid'));
 	$tablename = GetTopcitable($modelid);
 	$fieldname = 'field'.$fieldid;
-	$fielddb = $db->get_one("SELECT * FROM pw_topicfield WHERE fieldid=".pwEscape($fieldid));
-	$field = $db->get_one("SHOW COLUMNS FROM $tablename LIKE ".pwEscape($fieldname));
+	$fielddb = $db->get_one("SELECT * FROM pw_topicfield WHERE fieldid=".S::sqlEscape($fieldid));
+	$field = $db->get_one("SHOW COLUMNS FROM $tablename LIKE ".S::sqlEscape($fieldname));
 	if (empty($fielddb) || empty($field)) {
 		Showmsg('field_not_exists');
 	}
@@ -713,19 +720,19 @@ if (empty($action)){
 			$db->query("ALTER TABLE $tablename DROP INDEX $fieldname");
 		}
 	}
-	$cateid = $db->get_value("SELECT cateid FROM pw_topicmodel WHERE modelid=".pwEscape($modelid));
+	$cateid = $db->get_value("SELECT cateid FROM pw_topicmodel WHERE modelid=".S::sqlEscape($modelid));
 
 	echo "success\t$cateid\t$modelid";ajax_footer();
 } elseif ($action == 'delmodel') {
 
 	define('AJAX',1);
 
-	$cateid = $db->get_value("SELECT cateid FROM pw_topicmodel WHERE modelid=".pwEscape($modelid));
-	$count = $db->get_value("SELECT COUNT(*) as count FROM pw_topicmodel WHERE cateid=".pwEscape($cateid));
+	$cateid = $db->get_value("SELECT cateid FROM pw_topicmodel WHERE modelid=".S::sqlEscape($modelid));
+	$count = $db->get_value("SELECT COUNT(*) as count FROM pw_topicmodel WHERE cateid=".S::sqlEscape($cateid));
 	if ($count == 1) Showmsg('model_mustone');
 
-	$db->update("DELETE FROM pw_topicmodel WHERE modelid=".pwEscape($modelid));
-	$db->update("DELETE FROM pw_topicfield WHERE modelid=".pwEscape($modelid));
+	$db->update("DELETE FROM pw_topicmodel WHERE modelid=".S::sqlEscape($modelid));
+	$db->update("DELETE FROM pw_topicfield WHERE modelid=".S::sqlEscape($modelid));
 	$tablename = GetTopcitable($modelid);
 	$query = $db->query("SELECT tid FROM $tablename");
 	while($rt = $db->fetch_array($query)){
@@ -745,7 +752,7 @@ if (empty($action)){
 
 function getModeldbByCateid($cateid) {
 	global $db;
-	$cateid && $sql = "WHERE cateid=".pwEscape($cateid);
+	$cateid && $sql = "WHERE cateid=".S::sqlEscape($cateid);
 	$query = $db->query("SELECT * FROM pw_topicmodel $sql ORDER BY vieworder ASC");
 	while ($rt = $db->fetch_array($query)){
 		$modedb[$rt['modelid']] = $rt;

@@ -1,22 +1,20 @@
 <?php
 define('SCR','post');
+if (isset($_POST['ajax']) && $_POST['ajax'] == 1) {
+	define("AJAX",1);
+}
 require_once('global.php');
 L::loadClass('forum', 'forum', false);
 L::loadClass('post', 'forum', false);
-include_once(D_P.'data/bbscache/cache_post.php');
+include_once pwCache::getPath(D_P.'data/bbscache/cache_post.php');
 /**
 * 版块缓冲文件
 */
-empty($fid) && Showmsg('undefined_action');
-/*Begin Add by liaohu for addfloor*/
-if('on' != $_POST['go_lastpage'] && 'ajax_addfloor' == $_POST['type']){
-	define("AJAX",1);	
-}
-/*End Add by liaohu for addfloor*/
 
+empty($fid) && Showmsg('undefined_action');
 $pwforum = new PwForum($fid);
 $pwpost  = new PwPost($pwforum);
-if (!CkInArray($windid, $manager)) {
+if (!S::inArray($windid, $manager)) {
 	$pwpost->forumcheck();
 	$pwpost->postcheck();
 }
@@ -26,8 +24,8 @@ list($uploadcredit,$uploadmoney,,) = explode("\t", $pwforum->forumset['uploadset
 $foruminfo =& $pwforum->foruminfo;
 $forumset =& $pwforum->forumset;
 
-InitGP(array('action','article','pid','page'));
-InitGP(array('special','modelid','pcid', 'cyid','actmid'),GP,2);
+S::gp(array('action','article','pid','page'));
+S::gp(array('special','modelid','pcid', 'cyid','actmid'),GP,2);
 $replacedb = array();
 $secondurl = "thread.php?fid=$fid";
 !$action && $action = "new";
@@ -62,7 +60,7 @@ if ($action == 'new') {
 		if (strpos(",".$_G['allowpcid'].",",",".$pcid.",") === false) {
 			Showmsg('post_allowpost');
 		}
-				$special = $modelid = $actmid = 0;
+		$special = $modelid = $actmid = 0;
 		$theSpecialFlag = true;
 	} elseif ($actmid > 0) {/*活动分类*/
 		L::loadClass('ActivityForBbs', 'activity', false);
@@ -115,7 +113,7 @@ if ($action == 'new') {
 			/*判断活动是否存在*/
 			if (!$pcid && !$modelid) {
 				L::loadClass('ActivityForBbs', 'activity', false);
-				$postActForBbs = new PW_ActivityForBbs($data);
+				$postActForBbs = new PW_ActivityForBbs($pwpost);
 
 				$actmiddb = explode(",",$pwforum->foruminfo['actmids']);
 				foreach ($actmiddb as $value) {
@@ -141,7 +139,7 @@ if ($action == 'new') {
 if ($groupid == 6 || getstatus($winddb['userstatus'], PW_USERSTATUS_BANUSER)) {
 	$flag  = 0;
 	$bandb = $delban = array();
-	$query = $db->query("SELECT * FROM pw_banuser WHERE uid=".pwEscape($winduid));
+	$query = $db->query("SELECT * FROM pw_banuser WHERE uid=".S::sqlEscape($winduid));
 	while ($rt = $db->fetch_array($query)) {
 		if ($rt['type'] == 1 && $timestamp - $rt['startdate'] > $rt['days']*86400) {
 			$delban[] = $rt['id'];
@@ -151,7 +149,7 @@ if ($groupid == 6 || getstatus($winddb['userstatus'], PW_USERSTATUS_BANUSER)) {
 			$flag = 1;
 		}
 	}
-	$delban && $db->update('DELETE FROM pw_banuser WHERE id IN('.pwImplode($delban).')');
+	$delban && $db->update('DELETE FROM pw_banuser WHERE id IN('.S::sqlImplode($delban).')');
 
 	$updateUser = array();
 	if ($groupid == 6 && !isset($bandb[0])) {
@@ -184,7 +182,7 @@ if ($groupid == 6 || getstatus($winddb['userstatus'], PW_USERSTATUS_BANUSER)) {
 }
 if (GetCookie('force') && $winduid != GetCookie('force')) {
 	$force = GetCookie('force');
-	$bandb = $db->get_one("SELECT type FROM pw_banuser WHERE uid=".pwEscape($force)." AND fid='0'");
+	$bandb = $db->get_one("SELECT type FROM pw_banuser WHERE uid=".S::sqlEscape($force)." AND fid='0'");
 	if ($bandb['type'] == 3) {
 		Showmsg('ban_info3');
 	} else {
@@ -201,10 +199,10 @@ $montime >= $winddb['lastpost'] && $winddb['monthpost'] = 0;
 if ($_G['postlimit'] && $winddb['todaypost'] >= $_G['postlimit']) {
 	Showmsg('post_gp_limit');
 }
-if ($action != "modify" && !$pwpost->isGM && $_G['postpertime'] && $timestamp>=$userlastptime && $timestamp-$userlastptime<=$_G['postpertime'] && !pwRights($pwpost->isBM,'postpers')) {
+if (!empty($_POST['step']) && !$pwpost->isGM && $_G['postpertime'] && $timestamp>=$userlastptime && $timestamp-$userlastptime<=$_G['postpertime'] && !pwRights($pwpost->isBM,'postpers')) {
 	Showmsg('post_limit');
 }
-list(,,$postq,,$showq) = explode("\t", $db_qcheck);
+list($postq,$showq) = explode("\t", $db_qcheck);
 $_G['uploadtype'] && $db_uploadfiletype = $_G['uploadtype'];
 $db_uploadfiletype = !empty($db_uploadfiletype) ? (is_array($db_uploadfiletype) ? $db_uploadfiletype : unserialize($db_uploadfiletype)) : array();
 empty($db_sellset['type']) && $db_sellset['type'] = array('money');
@@ -254,7 +252,7 @@ if (empty($_POST['step'])) {
 	}
 
 } else {
-	PostCheck(1, ($db_gdcheck & 4) && $winddb['postnum'] < $db_postgd, ($postq && $winddb['postnum'] < $postq));
+	PostCheck(1, ($db_gdcheck & 4) && (!$db_postgd || $winddb['postnum'] < $db_postgd), ($db_ckquestion & 4 && (!$postq || $winddb['postnum'] < $postq) && $db_question));
 	!$windid && $windid = '游客';
 	/*
 	if ($db_xforwardip && $_POST['_hexie'] != GetVerify($onlineip.$winddb['regdate'].$fid.$tid)) {
@@ -266,7 +264,7 @@ if (empty($_POST['step'])) {
 //默认动漫表情处理
 if ($db_windmagic && ($action == 'new' || ($action == 'modify' && $pid == 'tpc'))) {
 	$mDef = '';
-	@include_once(D_P."data/bbscache/myshow_default.php");
+	@include_once pwCache::getPath(D_P."data/bbscache/myshow_default.php");
 }
 if ($action == "new") {
 	require_once(R_P.'require/postnew.php');

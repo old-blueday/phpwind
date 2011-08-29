@@ -49,18 +49,6 @@ $arrSQL = array(
 
 	"REPLACE INTO pw_advert VALUES(16, 0, 0, 'Mode.Layer.Index', 0, 0, 1, 0, '论坛首页分类间~	~出现在首页分类层之间，一般以图片或文字显示，多条帖间广告时系统将随机选取一条显示', 'a:1:{s:7:\"display\";s:4:\"rand\";}');",
 
-	"REPLACE INTO pw_advert VALUES(17, 0, 0, 'Mode.area.IndexMain', 0, 0, 1, 0, '门户首页中间~	~门户首页循环广告下面的中间主要广告位,一般为图片广告', 'a:1:{s:7:\"display\";s:4:\"rand\";}');",
-
-	"REPLACE INTO pw_advert VALUES(18, 0, 0, 'Mode.Layer.area.IndexLoop', 0, 0, 1, 0, '门户首页循环~	~门户首页中间循环模块之间的广告投放，一般为图片广告', 'a:1:{s:7:\"display\";s:4:\"rand\";}');",
-
-	"REPLACE INTO pw_advert VALUES(19, 0, 0, 'Mode.Layer.area.IndexSide', 0, 0, 1, 0, '门户首页侧边~	~门户首页侧边每隔一个模块都有一个广告位显示,位置顺序对应选择的楼层数.一般为小图片广告', 'a:1:{s:7:\"display\";s:4:\"rand\";}');",
-
-	"REPLACE INTO pw_advert VALUES(20, 0, 0, 'Mode.Forum.area.CateMain', 0, 0, 1, 0, '门户频道中间~	~门户频道焦点下面的中间主要广告位,一般为图片广告', 'a:1:{s:7:\"display\";s:4:\"rand\";}');",
-
-	"REPLACE INTO pw_advert VALUES(21, 0, 0, 'Mode.Forum.Layer.area.CateLoop', 0, 0, 1, 0, '门户频道循环~	~门户频道中间循环模块之间的广告投放，一般为图片广告', 'a:1:{s:7:\"display\";s:4:\"rand\";}');",
-
-	"REPLACE INTO pw_advert VALUES(22, 0, 0, 'Mode.Forum.Layer.area.CateSide', 0, 0, 1, 0, '门户频道侧边~	~门户频道侧边每隔一个模块都有一个广告位显示,位置顺序对应选择的楼层数.一般为小图片广告', 'a:1:{s:7:\"display\";s:4:\"rand\";}');",
-
 	"REPLACE INTO pw_advert VALUES(23, 0, 0, 'Mode.Forum.Layer.area.ThreadTop', 0, 0, 1, 0, '门户帖子列表页右上~	~帖子列表页门户模式浏览时，右上方的广告位', 'a:1:{s:7:\"display\";s:4:\"rand\";}');",
 
 	"REPLACE INTO pw_advert VALUES(24, 0, 0, 'Mode.Forum.Layer.area.ThreadBtm', 0, 0, 1, 0, '门户帖子列表页右下~	~帖子列表页门户模式浏览时，右下方的广告位', 'a:1:{s:7:\"display\";s:4:\"rand\";}');",
@@ -68,6 +56,15 @@ $arrSQL = array(
 	"REPLACE INTO pw_advert VALUES(25, 0, 0, 'Mode.Forum.Layer.area.ReadTop', 0, 0, 1, 0, '门户帖子内容页右上~	~帖子内容页门户模式浏览时，右上方的广告位', 'a:1:{s:7:\"display\";s:4:\"rand\";}');",
 
 	"REPLACE INTO pw_advert VALUES(26, 0, 0, 'Mode.Forum.Layer.area.ReadBtm', 0, 0, 1, 0, '门户帖子内容页右下~	~帖子内容页门户模式浏览时，右下方的广告位', 'a:1:{s:7:\"display\";s:4:\"rand\";}');",
+
+	"REPLACE INTO `pw_advert` (`id`, `type`, `uid`, `ckey`, `stime`, `etime`, `ifshow`, `orderby`, `descrip`, `config`) VALUES
+(27, 0, 0, 'Site.Search.Thread.Right', 0, 0, 1, 0, '搜索帖子右侧广告~	~搜索帖子时，显示在页面的右侧', 'a:1:{s:7:\"display\";s:4:\"rand\";}');",
+
+	"REPLACE INTO `pw_advert` (`id`, `type`, `uid`, `ckey`, `stime`, `etime`, `ifshow`, `orderby`, `descrip`, `config`) VALUES
+(28, 0, 0, 'Site.Search.Diary.Right', 0, 0, 1, 0, '搜索日志右侧广告~	~搜索日志时，显示在页面的右侧', 'a:1:{s:7:\"display\";s:4:\"rand\";}');",
+
+	"REPLACE INTO `pw_advert` (`id`, `type`, `uid`, `ckey`, `stime`, `etime`, `ifshow`, `orderby`, `descrip`, `config`) VALUES
+(29, 0, 0, 'Site.u.IndexCenter', 0, 0, 1, 0, '个人中心首页广告位~	~', 'a:1:{s:7:\"display\";s:3:\"all\";}')",
 );
 
 foreach ($arrSQL as $sql) {

@@ -147,20 +147,20 @@ class PW_ActivityForO extends PW_PostActivity {
 	function getSignupHtmlByActivityKey ($key, $replaceArray = NULL) {
 		switch ($key) {
 			case 'signup_not_started_yet': //未开始报名
-				$html = '<span class=\"bt\"><span><button type=\"button\" disabled>报名未开始</button></span></span>';
+				$html = '<span class="bt"><span><button type="button" disabled>报名未开始</button></span></span>';
 				break;
 			case 'activity_is_cancelled': //报名结束但未达到最低人数限制，活动取消
-				$html = "<span class=\"bt\"><span><button type=\"button\" disabled>活动已取消</button></span></span>";
+				$html = '<span class="bt"><span><button type="button" disabled>活动已取消</button></span></span>';
 				break;
 			case 'activity_is_running':
 			case 'signup_is_ended': //正常情况下报名结束
-				$html = '<span class=\"bt\"><span><button type=\"button\" disabled>报名已结束</button></span></span>';
+				$html = '<span class="bt"><span><button type="button" disabled>报名已结束</button></span></span>';
 				break;
 			case 'activity_is_ended': //活动结束
-				$html = '<span class=\"bt\"><span><button type=\"button\" disabled>活动已结束</button></span></span>';
+				$html = '<span class="bt"><span><button type="button" disabled>活动已结束</button></span></span>';
 				break;
 			case 'signup_number_limit_is_reached': //报名人数已满
-				$html = '<span class=\"bt\"><span><button type=\"button\" disabled>报名人数已满</button></span></span>';
+				$html = '<span class="bt"><span><button type="button" disabled>报名人数已满</button></span></span>';
 				break;
 			case 'signup_is_available':
 			case 'signup_is_available_for_guest': //未登录状态报名提示
@@ -190,7 +190,7 @@ class PW_ActivityForO extends PW_PostActivity {
 	 */
 	function getAllParticipatedActivityIdsByUid ($uid) {
 		$activityIds = array();
-		$query = $this->db->query("SELECT DISTINCT tid FROM pw_activitymembers WHERE uid = ". pwEscape($uid));
+		$query = $this->db->query("SELECT DISTINCT tid FROM pw_activitymembers WHERE uid = ". S::sqlEscape($uid));
 		while ($rt = $this->db->fetch_array($query)) {
 			$activityIds[] = $rt['tid'];
 		}
@@ -201,7 +201,7 @@ class PW_ActivityForO extends PW_PostActivity {
 		$allActivityIdsIHaveParticipated = $this->getAllParticipatedActivityIdsByUid($uid);
 		$fids = trim(getSpecialFid() . ",'0'",',');
 		!empty($fids) && $where .= ($where ? ' AND ' : '')."dv.fid NOT IN($fids)";
-		$where .= ($where ? ' AND ' : ''). "(tr.authorid = ".pwEscape($uid).($allActivityIdsIHaveParticipated ? ' OR tr.tid IN ('.pwImplode($allActivityIdsIHaveParticipated).')' : '').')';
+		$where .= ($where ? ' AND ' : ''). "(tr.authorid = ".S::sqlEscape($uid).($allActivityIdsIHaveParticipated ? ' OR tr.tid IN ('.S::sqlImplode($allActivityIdsIHaveParticipated).')' : '').')';
 		$where && $where = " WHERE ".$where;
 		$activitynum = $this->db->get_value("SELECT COUNT(*) FROM pw_threads tr LEFT JOIN pw_activitydefaultvalue dv USING (tid) $where");
 		$activity_lastpost = $this->db->get_value("SELECT postdate FROM pw_threads tr LEFT JOIN pw_activitydefaultvalue dv USING (tid) $where ORDER BY postdate DESC LIMIT 1");
@@ -223,15 +223,15 @@ class PW_ActivityForO extends PW_PostActivity {
 				if ($rt['fromuid'] == $u){
 					$rt['otherParty'] = $rt['author'];
 					$rt['expenseOrIncome'] = 'expense';	
-					$rt['payDescription'] = '我帮<a href="u.php?uid=' . $rt['uid'] . '" target="_blank">' .  $rt['username'] . '</a>支付';
+					$rt['payDescription'] = '我帮<a href="'.USER_URL. $rt['uid'] . '" target="_blank">' .  $rt['username'] . '</a>支付';
 				}elseif($rt['uid'] == $u){
 					$rt['otherParty'] = $rt['author'];
 					$rt['expenseOrIncome'] = 'expense';	
-					$rt['payDescription'] = '<a href="u.php?uid=' . $rt['fromuid'] . '" target="_blank">' .  $rt['fromusername'] . '</a>帮我支付';
+					$rt['payDescription'] = '<a href="'.USER_URL. $rt['fromuid'] . '" target="_blank">' .  $rt['fromusername'] . '</a>帮我支付';
 				}elseif ($rt['authorid'] == $u){
 					$rt['otherParty'] = $rt['username'];
 					$rt['expenseOrIncome'] = 'income';	
-					$rt['payDescription'] = '<a href="u.php?uid=' . $rt['fromuid'] . '" target="_blank">' .  $rt['fromusername'] . '</a>帮<a href="u.php?uid=' . $rt['uid'] . '" target="_blank">' .  $rt['username'] . '</a>支付';
+					$rt['payDescription'] = '<a href="'.USER_URL. $rt['fromuid'] . '" target="_blank">' .  $rt['fromusername'] . '</a>帮<a href="' .USER_URL . $rt['uid'] . '" target="_blank">' .  $rt['username'] . '</a>支付';
 				}
 			}else{
 				$rt['otherParty'] = $rt['uid'] == $u ? $rt['author'] : $rt['username'];

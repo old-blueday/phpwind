@@ -5,7 +5,7 @@ if(isset($_GET['action']) && $_GET['action'] == 'ajax'){
 }
 require_once('global.php');
 
-InitGP(array('H_name'));
+S::gp(array('H_name'));
 if (preg_match('/^http/i',$H_name)) {
 	Showmsg($H_name);
 } elseif(!$db_hackdb[$H_name] || !is_dir(R_P.'hack/'.$H_name) || !file_exists(R_P."hack/$H_name/index.php")){

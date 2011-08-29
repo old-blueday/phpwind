@@ -56,8 +56,8 @@ class postReward {
 	}
 	
 	function setData() {
-		$bonus = Char_cv(GetGP('bonus', 'P'), true);
-		$ctype = Char_cv(GetGP('ctype', 'P'));
+		$bonus = S::escapeChar(S::getGP('bonus', 'P'), true);
+		$ctype = S::escapeChar(S::getGP('ctype', 'P'));
 		
 		$bonus['best'] < $this->b_val && Showmsg('credit_limit');
 		$bonus['active'] < $this->a_val && Showmsg('credit_limit');
@@ -125,7 +125,7 @@ class postReward {
 			global $timestamp;
 			$this->data['tid'] = $tid;
 			$this->data['timelimit'] = $timestamp + $this->valid * 86400;
-			$this->db->update("INSERT INTO pw_reward SET " . pwSqlSingle($this->data));
+			$this->db->update("INSERT INTO pw_reward SET " . S::sqlSingle($this->data));
 		}
 	}
 }

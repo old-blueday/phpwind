@@ -5,16 +5,16 @@ require_once (R_P . 'require/functions.php');
 
 !$winduid && Showmsg('not_login');
 
-InitGP(array('action'));
+S::gp(array('action'));
 
 if ('delactivity' == $action) {
-	InitGP(array('id'),'',2);
+	S::gp(array('id'),'',2);
 	if (!$id) {
 		echo 'undefined_action';
 		ajax_footer();
 	}
 	$delarticle = L::loadClass('DelArticle', 'forum');
-	$readdb = $delarticle->getTopicDb('tid='.pwEscape($id));
+	$readdb = $delarticle->getTopicDb('tid='.S::sqlEscape($id));
 	if (!$readdb){
 		echo 'mode_o_no_activity';
 		ajax_footer();

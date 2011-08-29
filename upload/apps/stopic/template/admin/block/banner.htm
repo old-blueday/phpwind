@@ -18,14 +18,13 @@ EOT;
 print <<<EOT
 -->
 </div>
-
 <!--
 EOT;
 } else {
 	if (empty($block_data['image'])) $block_data['image'] = $stopic_data['layout_config']['bannerurl'];
-	if (empty($block_data['title_left'])) $block_data['title_left'] = 50;
-	if (empty($block_data['title_top'])) $block_data['title_top'] = 50;
-	if (empty($block_data['title_size'])) $block_data['title_size'] = 50;
+	if ($block_data['title_left'] == "") $block_data['title_left'] = 50;
+	if ($block_data['title_top']  == "" ) $block_data['title_top'] = 50;
+	if ($block_data['title_size']  == "") $block_data['title_size'] = 50;
 print <<<EOT
 -->
 <tbody>
@@ -35,7 +34,10 @@ print <<<EOT
 	</tr>
 	<tr class="tr1 vt">
         	<td class="td2">横幅图片</td>
-            <td class="td2"><input type="text" id="{$block_id}_banner_image" name="banner_image" value="{$block_data[image]}" class="input input_wb"></td>
+            <td class="td2"><input type="text" id="{$block_id}_banner_image" name="banner_image" value="{$block_data[image]}" class="input input_wb">
+			<input name="image_upload_0" style="display:none" type="file" class="input input_wb" accept="image/*" />
+			<input type="hidden" name="image_type" value="0" />
+			<a id="modifImgType" class="mr10" href="javascript:" onclick="stopicImgType('modifImgType', 'banner_image', 'image_upload_0')">[上传]</a></td>
 	</tr>
 	<tr class="tr1 vt">
         	<td class="td2">文字标题</td>

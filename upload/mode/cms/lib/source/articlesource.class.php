@@ -34,7 +34,7 @@ class PW_ArticleSource extends SystemData {
 			),
 			'columnid' => array(
 				'name' => '选择栏目',
-				'type' => 'select',
+				'type' => 'mselect',
 				'value' => $this->_getColumns()
 			)
 		);
@@ -60,6 +60,8 @@ class PW_ArticleSource extends SystemData {
 	 * @param int $num
 	 */
 	function _getData($type, $columnid, $num) {
+		$columnid = is_array($columnid) ? $columnid:array($columnid);
+		if (count($columnid)==1 && $columnid[0]==0) $columnid = array();
 		switch ($type) {
 			case 'new':
 				return $this->_getNewArticle($columnid, $num);
@@ -72,9 +74,9 @@ class PW_ArticleSource extends SystemData {
 		}
 	}
 	function _getNewArticle($columnid, $num) {
+		global $timestamp;
 		$articleService = C::loadClass('articleservice');
-		$columnid = $columnid ? array($columnid):array();
-		return $articleService->searchAtricles($columnid, '', '', '', '', 0, $num);
+		return $articleService->searchAtricles($columnid, '', '', '', '',$timestamp, 0, $num);
 	}
 	function _getHotDayArticle($columnid, $num) {
 		return $this->_getHotArticle('hotday', $columnid, $num);
@@ -90,7 +92,10 @@ class PW_ArticleSource extends SystemData {
 		$date = $date - $tempDate * 86400;
 		
 		$datanalyseService = $this->_getDatanalyseService();
-		$_action = 'article_' . $columnid;
+		$_action = array();
+		foreach ($columnid as $value) {
+			$_action[] = 'article_' . $value;
+		}
 		if (!$columnid) $_action = $datanalyseService->getAllActions('article');
 		return $datanalyseService->getDataByActionAndTime('article', $_action, $num, $date);
 	}
@@ -101,9 +106,27 @@ class PW_ArticleSource extends SystemData {
 	 */
 	function _cookData($data) {
 		global $db_bbsurl;
-		$data['url'] = $db_bbsurl . '/' . getArticleUrl($data['article_id']);
+		$data['url'] = urlRewrite($db_bbsurl . '/' . getArticleUrl($data['article_id']));
 		$data['title'] = strip_tags($data['subject']);
+		$data['forumname'] = $data['columnname'] = $this->_getColumnName($data['column_id']);
+		$data['forumurl'] = $data['columnurl'] = getColumnUrl($data['column_id']);
 		return $data;
+	}
+	
+	function _getColumnName($cloumnId) {
+		$columns = $this->_getClomns();
+		foreach ($columns as $value) {
+			if ($value['column_id'] == $cloumnId) return $value['name'];
+		}
+		return '';
+	}
+	
+	function _getClomns() {
+		static $columns = array();
+		if ($columns) return $columns;
+		$columnService = C::loadClass('columnservice');
+		$columns = $columnService->findAllColumns();
+		return $columns;
 	}
 	
 	/**

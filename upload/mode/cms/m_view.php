@@ -2,11 +2,14 @@
 !defined('M_P') && exit('Forbidden');
 
 require_once (R_P . 'require/bbscode.php');
-InitGP(array('id', 'page'), '', 2);
+require_once (R_P . 'require/functions.php');
+S::gp(array('id', 'page'), '', 2);
 !$page && $page = 1;
+$stylepath = L::style('stylepath');
 $articleService = C::loadClass('articleservice'); /* @var $articleService PW_ArticleService */
 $articleModule = $articleService->getArticleModule($id);
-if (!is_object($articleModule)) Showmsg('文章不存在');
+
+if (!is_object($articleModule) || (!isGM($windid) && !checkEditPurview($windid) && $articleModule->postDate > $timestamp)) Showmsg('文章不存在');
 $content = cookContent($articleModule, $page);
 $postdate = get_date($articleModule->postDate);
 $pages = $articleModule->getPages($page, "{$basename}q=view&id=$id&");
@@ -16,7 +19,7 @@ $columnService = C::loadClass('columnservice');
 /* @var $columnService PW_columnService */
 $columns = $columnService->getColumnsAndSubColumns($articleModule->columnId);
 
-$pagePosition = getPosition($articleModule->columnId,$id);
+$pagePosition = getPosition($articleModule->columnId,$id,'',$cms_sitename);
 
 $pageCache = L::loadClass('pagecache', 'pagecache');
 $pageCacheConfig = C::loadClass('pagecacheconfigview', 'pagecache');
@@ -41,7 +44,7 @@ function cookContent($articleModule, $page) {
 	$articleModule->showError();
 	//$content = showface($content);
 	$content = str_replace(array(" "),'&nbsp;',$content);
-	$content = str_replace(array("\n","\r\n"),'<br>',trim($content,"\r\n \n \r"));
+	$content = str_replace(array("\n","\r\n"),'<br />',trim($content,"\r\n \n \r"));
 
 	if ($articleModule->ifAttach && is_array($articleModule->attach)) {
 		$aids = attachment($articleModule->content);
@@ -67,8 +70,7 @@ function getAttachHtml($attach) {
 	$html = '';
 	switch ($attach['type']) {
 		case 'img' :
-			$imageHtml = '<br>' . cvpic($attach['attachurl'], 1, '', '', $attach['ifthumb']);
-			$html = '<br><span>描述：' .($attach['descrip']?$attach['descrip'] : '暂无描述'). '</span><br><span>图片：' . $attach['name'] . '</span>' . $imageHtml;
+			$html = '<br>' . cvpic($attach['attachurl'], 1, '', '', $attach['ifthumb']);
 			break;
 		default :
 			$html = '<b>' . $attach['descrip'] . '</b>' . "<img src=\"$GLOBALS[imgpath]/" . L::style('stylepath') . "/file/$attach[type].gif\" align=\"absmiddle\" /><a href=\"{$basename}q=download&aid=$attach[attach_id]\" target=\"_blank\"> $attach[name]</a> ($attach[size] K)";
@@ -89,5 +91,14 @@ function cmsAttContent($message, $attach) {
 
 function isURL($url){
 	return preg_match('/^http:\/\/[A-Za-z0-9]*\.[A-Za-z0-9]*[\/=\?%\-&_~@\.A-Za-z0-9]*$/',$url);
+}
+
+function updateArticleHitsDatanalyse($aid, $cid, $num) {
+	$articleService = C::loadClass('articleservice');
+	/* @var $articleService PW_ArticleService */
+	$articleService->updateArticleHits($aid);
+	if (((int) $num % 13) == 0) {
+		updateDatanalyse($aid, 'article_' . $cid, (int) $num, true);
+	}
 }
 ?>

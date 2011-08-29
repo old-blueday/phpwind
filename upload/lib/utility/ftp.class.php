@@ -57,7 +57,7 @@ class FTP {
 		if ($savedir = dirname($remotefile)) {
 			$this->mkdir($savedir);
 		}
-		$remotefile = $this->rootpath . pwDirCv($remotefile);
+		$remotefile = $this->rootpath . S::escapeDir($remotefile);
 		if (!($fp = @fopen($localfile, 'rb'))) {
 			$this->showerror("Error：Cannot read file \"$localfile\"");
 		}
@@ -91,10 +91,10 @@ class FTP {
 		return preg_replace("/^[0-9]{3} ([0-9]+)\r\n/", "\\1", $size_port);
 	}
 	function delete($file) {
-		return $this->sendcmd('DELE', $this->rootpath . pwDirCv($file));
+		return $this->sendcmd('DELE', $this->rootpath . S::escapeDir($file));
 	}
 	function rename($oldname, $newname) {
-		$oldname = $this->rootpath . pwDirCv($oldname);
+		$oldname = $this->rootpath . S::escapeDir($oldname);
 		$this->sendcmd('RNFR', $oldname);
 		return $this->sendcmd('RNTO', $newname);
 	}
@@ -148,7 +148,7 @@ class FTP {
 		return true;
 	}
 	function mkdir($dir) {
-		$dir = explode('/', pwDirCv($dir));
+		$dir = explode('/', S::escapeDir($dir));
 		$dirs = '';
 		$result = false;
 		$base777 = base_convert(0777, 10, 8);

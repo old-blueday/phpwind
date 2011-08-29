@@ -1,14 +1,14 @@
 <?php
 !function_exists('adminmsg') && exit('Forbidden');
 $basename="$admin_file?adminjob=report";
-InitGP(array('action'));
+S::gp(array('action'));
 if(empty($action) || $action == 'deal'){
-	InitGP(array('page','type'));
+	S::gp(array('page','type'));
 	(!is_numeric($page) || $page < 1) && $page=1;
-	$limit= pwLimit(($page-1)*$db_perpage,$db_perpage);
+	$limit= S::sqlLimit(($page-1)*$db_perpage,$db_perpage);
 	$sql = $action == 'deal' ? "state='1'" : "state='0'";
 	if ($type) {
-		$sql .= " AND type=".pwEscape($type);
+		$sql .= " AND type=".S::sqlEscape($type);
 		${'select_'.$type} = 'selected';
 	}
 
@@ -28,7 +28,7 @@ if(empty($action) || $action == 'deal'){
 
 	include PrintEot('report');exit;
 } elseif ($action == 'done') {
-	InitGP(array('selid'));
+	S::gp(array('selid'));
 	!$selid && adminmsg('operate_error');
 
 	$selids = array();
@@ -36,7 +36,7 @@ if(empty($action) || $action == 'deal'){
 		is_numeric($value) && $selids[] =$value;
 	}
 	if($selids){
-		$selids=pwImplode($selids);
+		$selids=S::sqlImplode($selids);
 		$db->update("UPDATE pw_report SET state='1' WHERE id IN ($selids)");
 
 		$query = $db->query("SELECT r.tid,r.pid,r.uid,r.type,r.reason,m.username FROM pw_report r LEFT JOIN pw_members m ON r.uid=m.uid WHERE r.id IN($selids)");
@@ -61,13 +61,13 @@ if(empty($action) || $action == 'deal'){
 	adminmsg('operate_success');
 } elseif ($action == 'del') {
 
-	InitGP(array('selid'),'P');
+	S::gp(array('selid'),'P');
 	$delids = array();
 	foreach($selid as $value){
 		is_numeric($value) && $delids[] =$value;
 	}
 	if($delids){
-		$delids=pwImplode($delids);
+		$delids=S::sqlImplode($delids);
 		$db->update("DELETE FROM pw_report WHERE id IN ($delids)");
 	}
 	adminmsg('operate_success');
@@ -104,7 +104,7 @@ function getUrlByType($type,$tid,$pid,$uid = 0) {
 			$url = 'apps.php?q=galbum&a=view&cyid='.$pid.'&pid='.$tid;
 			break;
 		case 'user':
-			$url = 'u.php?uid='.$tid;
+			$url = USER_URL.$tid;
 			break;
 		default :
 			if ($pid) {
@@ -132,11 +132,11 @@ if($admin_gid == 5){
 }
 
 if(empty($_POST['action'])){
-	InitGP(array('page'));
+	S::gp(array('page'));
 	$type = $type==1 ? 1 : 0;
 	(!is_numeric($page) || $page < 1) && $page=1;
-	$limit= pwLimit(($page-1)*$db_perpage,$db_perpage);
-	$sql .= " AND r.type=".pwEscape($type);
+	$limit= S::sqlLimit(($page-1)*$db_perpage,$db_perpage);
+	$sql .= " AND r.type=".S::sqlEscape($type);
 
 	$rt=$db->get_one("SELECT COUNT(*) AS count FROM pw_report r LEFT JOIN pw_threads t ON t.tid=r.tid WHERE $sql");
 	$sum=$rt['count'];
@@ -150,13 +150,13 @@ if(empty($_POST['action'])){
 	}
 	include PrintEot('report');exit;
 } elseif($_POST['action']=='del'){
-	InitGP(array('selid'),'P');
+	S::gp(array('selid'),'P');
 	$delids = array();
 	foreach($selid as $value){
 		is_numeric($value) && $delids[] =$value;
 	}
 	if($delids){
-		$delids=pwImplode($delids);
+		$delids=S::sqlImplode($delids);
 		$db->update("DELETE FROM pw_report WHERE id IN ($delids)");
 	}
 	adminmsg('operate_success');

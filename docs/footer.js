@@ -1,3 +1,0 @@
-var str = '<div id="footer"><p>  <a href="http://faq.phpwind.net">PHPWind FAQ </a>  <a href="http://www.phpwind.net/">官方论坛</a>  <a href="http://download.phpwind.net/">软件下载</a>  <a href="http://www.uueasy.com/">免费论坛</a>   <a href="http://www.phpwind.com/">增值APP</a>       <a href="http://www.phpwind.net/read-htm-tid-695585.html">诚聘英才</a>   <a href="http://www.phpwind.com/aboutus.php">关于我们</a></p><p style="padding-top: 8px;">&nbsp; &nbsp; 杭州德天信息技术有限公司 Copyright&#169;2003-2009 PHPWind.com		<a href="http://www.miibeian.gov.cn/">浙ICP备06001596</a></p></div>';
-
-document.write(str);

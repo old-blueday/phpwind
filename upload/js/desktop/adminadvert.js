@@ -28,7 +28,7 @@ var imgAdverClass = {
 		/*template*/
 		var tr1 = this.createTR();
 		var td1 = this.createTD('图片地址');
-		var td2 = this.createTD('<input type="text" class="input input_wb" name="config[url]['+next+']" value=""> <a href="javascript:;">[移除]</a>');
+		var td2 = this.createTD('图片链接：<input onclick="isUploadOrLinkImg(this, '+next+')" name="config[imgupload]['+next+']" type="radio" value="0" checked="checked" />&nbsp;&nbsp;&nbsp;&nbsp;图片上传：<input onclick="isUploadOrLinkImg(this, '+next+')" name="config[imgupload]['+next+']" type="radio" value="1" /><br/><span id="url_'+next+'"><input type="text" class="input input_wb" name="config[url]['+next+']" value=""></span><span id="upload_'+next+'" style="display:none;"><input name="uploadurl_'+next+'" accept="image/*" class="input input_wb"  type="file" /></span>&nbsp;&nbsp;<a href="javascript:;">[移除]</a>');
 		var td5 = this.createTD('<div class="help_a">&nbsp;</div>');
 		td1.className="td1";
 		td2.className="td2";

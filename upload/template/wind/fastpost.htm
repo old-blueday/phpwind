@@ -13,11 +13,12 @@ print <<<EOT
 		<td></td></tr>
 	</tbody>
 </table>
-<div class="cc">
+<div class="t" style="padding:0;margin-bottom:0;">
 	<form name="FORM" method="post" action="post.php?fid=$fid" enctype="multipart/form-data" onsubmit="return checkpost(document.FORM);" id="anchor">
 	<input type="hidden" name="atc_usesign" value="1" />
 	<input type="hidden" name="replytouser" value="" />
 	<input type="hidden" name="atc_convert" value="1" />
+	<input type="hidden" name="atc_autourl" value="1" />
 	<input type="hidden" value="2" name="step" />
 	<input type="hidden" value="" name="type" />
 	<input type="hidden" value="$psot_sta" name="action" />
@@ -25,9 +26,11 @@ print <<<EOT
 	<input type="hidden" value="$cyid" name="cyid" />
 	<input type="hidden" value="$tid" name="tid" />
 	<input type="hidden" name="stylepath" value="$stylepath" />
+	<input type="hidden" name="ajax" value="1" />
 	<input type="hidden" name="verify" value="$verifyhash" />
 	<input type="hidden" value="cn0zz" name="_hexie" />
-  <div class="h b">快速$fastDo</div>
+	<input type="hidden" value="0" name="iscontinue" />
+	<div class="b h">快速$fastDo</div>
 	<table width="100%" class="floot" style="table-layout:inherit;">
 		<tr class="vt">
 			<td class="floot_left">
@@ -37,7 +40,7 @@ print <<<EOT
 EOT;
 if ($action != 'modify' && getstatus($winddb['userstatus'],12)) {print <<<EOT
 -->
-					<div class="cc menu_userA" id="div_userinfomore"><a href="javascript:;" hidefocus="true" onclick="userBinding.get('div_userinfomore');"><b>{$windid}</b><img src="$imgpath/pwicon/switch.gif" class="cp" alt="切换" align="absmiddle" /><i>切换帐号</i>　</a></div>
+						<div class="cc menu_userA" id="div_userinfomore"><a href="javascript:;" hidefocus="true" onclick="userBinding.get('div_userinfomore');"><b>{$windid}</b><i>切换帐号</i></a></div>
 <script language="JavaScript">
 var userinfomorediv = {
 	open : function() {
@@ -50,59 +53,70 @@ var userinfomorediv = {
 </script>
 <!--
 EOT;
-}else{print <<<EOT
+} else {print <<<EOT
 -->
-					<p class="b">$windid</p>
+						<p class="b">$windid</p>
 <!--
 EOT;
-}$fp_face = showfacedesign($winddb['icon']);
+}
+list($fp_face,,$httpWidth,$httpHeight,,,,$fp_size) = showfacedesign($winddb['icon'], true, 'm');
+if ($httpWidth > $db_imgwidth || $httpHeight > $db_imgheight) {
+	$fp_size = ' width="' . $db_imgwidth . '" height="' . $db_imgheight . '"';
+}
 print <<<EOT
 -->
 					</div>
 					<div class="cc">
-						<div class="face_img">{$fp_face}</div>
+						<div class="face_img"><img class="pic" src="{$fp_face}" {$fp_size} border="0" /></div>
 					</div>
 				</div>
 			</td>
 			<td style="background:#fff;">
-				<div class="fp_content">
+				<div class="fp_content pr">
+<!--
+EOT;
+if ($psot_sta == 'reply' && $anonymity) {print <<<EOT
+-->
+					<div style="position:absolute;width:100%;z-index:1;text-align:center;top:48%;">您目前还是游客，请 <a id="fast_login" href="pw_ajax.php?action=poplogin&anchor=anchor&tid={$tid}&fpage={$fpage}&toread=$toread{$urladd}&page={$page}" onclick="sendmsg(this.href, '');return false;" class="s4">登录</a> 或 <a href="$db_registerfile" target="_blank" class="s4">注册</a></div>
+<script type="text/javascript">
+window.onReady(function(){document.FORM.onsubmit = function(){sendmsg(getObj('fast_login').href,'');return false;}});
+</script>
+<!--
+EOT;
+} print <<<EOT
+-->
 					<div class="cc mb5">
 						<div class="pr fl mr5"><input type="text" class="input" id="atc_title" name="atc_title" value="$titletop1" size="40" /><span id="atc_title_warn" class="gray pd5" style="display:none; position:absolute;top:-20px;right:0;background:#fffff3;">限 $db_titlemax 字节</span></div>
 <!--
 EOT;
-if(!$psot_sta && ($t_per>0 || $admincheck) && $t_exits==1){
-	if ($t_sub_exits == 1) {print <<<EOT
+if (!$psot_sta && ($t_per>0 || $admincheck) && $t_exits == 1) {
+	$tmpHtml = ($t_sub_exits == 1) ? ' onchange="getSubType(this.value);"' : '';
+print <<<EOT
 -->
-						<select name="p_type" style="width:75px;" class="mr5" onchange="getSubType(this.value);">
-<!--
-EOT;
-	} else {print <<<EOT
--->
-						<select name="p_type" style="width:75px;" class="mr5">
-<!--
-EOT;
-	}print <<<EOT
--->
+						<select name="p_type" style="width:75px;" class="mr5"{$tmpHtml}>
 							<option value="0">不分类</option>
 <!--
 EOT;
-foreach($t_typedb as $key=>$value){
-if($value){print <<<EOT
+	foreach ($t_typedb as $key => $value) {
+		if ($value) {print <<<EOT
 -->
 							<option value="$key">$value[name]</option>
 <!--
 EOT;
-}}print <<<EOT
+		}
+	}
+print <<<EOT
 -->
 						</select>
 <!--
 EOT;
-if ($t_sub_exits == 1) {print <<<EOT
+	if ($t_sub_exits == 1) {print <<<EOT
 -->
 						<select name="p_sub_type" id="p_sub_type" style="width:75px" class="mr5"><option value="">不分类</option></select>
 <!--
 EOT;
-}print <<<EOT
+	}
+print <<<EOT
 -->
 <script language="JavaScript">
 function getSubType(id){
@@ -125,24 +139,26 @@ function getSubType(id){
 </script>
 <!--
 EOT;
-}elseif($special === 'read_debate'){print <<<EOT
+} elseif ($special === 'read_debate') {print <<<EOT
 -->
 						<select name="standpoint" id="standpoint" class="mr5">
 							<option value="0" $debate_0>闲聊一下</option>
 <!--
 EOT;
-if($debatestand != 2){print <<<EOT
+	if ($debatestand != 2) {print <<<EOT
 -->
 							<option value="1" $debate_1>正方观点</option>
 <!--
 EOT;
-}if($debatestand != 1){
+	}
+	if ($debatestand != 1) {
 print <<<EOT
 -->
 							<option value="2" $debate_2>反方观点</option>
 <!--
 EOT;
-}print <<<EOT
+	}
+print <<<EOT
 -->
 						</select>
 <!--
@@ -152,13 +168,13 @@ EOT;
 					</div>
 <!--
 EOT;
-if(isset($db_sitemsg['reply']['0']) && $db_sitemsg['reply']['0'] && $psot_sta){
+if (isset($db_sitemsg['reply']['0']) && $db_sitemsg['reply']['0'] && $psot_sta) {
 print<<<EOT
 -->
 					<div style="background:#fffeed;padding:5px 10px;margin:0 0 5px;">{$db_sitemsg[reply][array_rand($db_sitemsg[reply])]}</div>
 <!--
 EOT;
-}elseif(isset($db_sitemsg['post']['0']) && $db_sitemsg['post']['0']){print<<<EOT
+} elseif (isset($db_sitemsg['post']['0']) && $db_sitemsg['post']['0']) {print<<<EOT
 -->
 					<div style="background:#fffeed;padding:5px 10px;margin:0 0 5px;">{$db_sitemsg[post][array_rand($db_sitemsg[post])]}</div>
 <!--
@@ -183,14 +199,14 @@ EOT;
 					</div>
 <!--
 EOT;
-if($db_allowupload && $_G['allowupload']){
-$_G['uploadtype'] && $db_uploadfiletype = $_G['uploadtype'];
-$db_uploadfiletype = (is_array($db_uploadfiletype) ? $db_uploadfiletype : unserialize($db_uploadfiletype));
-$uploadfiletype = $uploadfilesize = ' ';
-foreach($db_uploadfiletype as $key=>$value)	{
-	$uploadfiletype .= $key.' ';
-	$uploadfilesize .= $key.':'.$value.'KB; ';
-}
+if ($db_allowupload && $_G['allowupload']) {
+	$_G['uploadtype'] && $db_uploadfiletype = $_G['uploadtype'];
+	$db_uploadfiletype = (is_array($db_uploadfiletype) ? $db_uploadfiletype : unserialize($db_uploadfiletype));
+	$uploadfiletype = $uploadfilesize = ' ';
+	foreach($db_uploadfiletype as $key=>$value)	{
+		$uploadfiletype .= $key.' ';
+		$uploadfilesize .= $key.':'.$value.'KB; ';
+	}
 print <<<EOT
 -->
 					<div class="c mb10"></div>
@@ -217,22 +233,38 @@ EOT;
 					<div class="mb10">
 <!--
 EOT;
-if(($db_gdcheck & 4) && $winddb['postnum'] < $db_postgd){print <<<EOT
+if (($db_gdcheck & 4) && (!$db_postgd || $winddb['postnum'] < $db_postgd)) {
+	$gdSize = explode("\t",$db_gdsize);
+print <<<EOT
 -->
 						<dl class="cc">
 							<dt class="dtA">认证码: </dt>
-							<dd><input class="input" type="text" name="gdcode" size="5" tabindex="6" onfocus="try{opencode('menu_gd',this)}catch(e){}" id="fs_gdcode"/><br />
-							<div class="menu" id="menu_gd" style="visibility:hidden;"><img src="ck.php?" align="absmiddle" style="cursor:pointer;" id="ckcode" alt="看不清楚，换一张" />
-							</div>
+							<dd>
+								<input class="input" type="text" name="gdcode" size="5" tabindex="6" onfocus="showgd();" id="fs_gdcode"/>
+								<div id="ckcode" style="display:none">
+<script type="text/javascript" src="js/pw_authcode.js"></script>
+<script>
+var flashWidth = "$gdSize[0]";
+var flashHeight = "$gdSize[1]";
+var gdtype = $db_gdtype;
+showGdCode();
+</script>
+								</div>
 							</dd>
 						</dl>
 <!--
 EOT;
-}list(,,$postq,,$showq)=explode("\t",$db_qcheck);
+}
+list($postq,$showq)=explode("\t",$db_qcheck);
 empty($winddb[postnum]) && $winddb[postnum]=0;
-if($winddb[postnum] < $postq && $db_question){
-$qkey = array_rand($db_question);
-$q_a = sprintf("{$db_question[$qkey]}%s",$showq?" 正确答案:{$db_answer[$qkey]}":'');
+if (($db_ckquestion & 4) && (!$postq || $winddb[postnum] < $postq) && $db_question) {
+	$qkey = array_rand($db_question);
+	if ($db_imagequestion) {
+		$question = '<img id="ckquestion" src="ckquestion.php?q='.$qkey.'&t='.$timestamp.'" align="top">';
+	} else {
+		$question = $qkey<0 ? getMachineQuestion_1() :  $db_question[$qkey];
+	}
+	$q_a = $question.($showq && $qkey>0?" 正确答案:".$db_answer[$qkey] : '');
 print <<<EOT
 -->
 <style type="text/css">
@@ -240,8 +272,7 @@ print <<<EOT
 .fpbtn{margin-left:80px;}
 </style>
 						<dl class="cc">
-							<dt class="dtA">验证问题:</dt>
-							<dd><input class="input" type="text" name="qanswer" /> <input type="hidden" name="qkey" value="$qkey" />$q_a</dd>
+							<dt class="dtA">验证问题：</dt><dd><span class="fl mr10">$q_a</span><input class="input fl" size="5" type="text" name="qanswer" /><input type="hidden" name="qkey" value="$qkey" /></dd>
 						</dl>
 <!--
 EOT;
@@ -252,11 +283,10 @@ EOT;
 					
 <!--
 EOT;
-if(0 != $tid){
-print <<<EOT
+if (0 != $tid) {print <<<EOT
 -->					
 					
-					<input id="go_lastpage" type="checkbox" title="选定" name="go_lastpage">&nbsp;回复后跳转到最后一页
+					<label for="go_lastpage"><input id="go_lastpage" type="checkbox" title="选定" name="go_lastpage" value="1" />&nbsp;回复后跳转到最后一页</label>
 					
 <!--
 EOT;
@@ -275,7 +305,7 @@ print <<<EOT
 					</div>
 					<div class="fp_show_cont">
                     	<div class="fp_show_height">
-						<ul class="cc" id="face_main"></ul>
+							<ul class="cc" id="face_main"></ul>
                         </div>
                         <div id="face_page" class="fp_show_pages cc"></div>
 					</div>
@@ -353,14 +383,16 @@ function gotoEditor() {
 <!--
 EOT;
 $facedb = '';
-if(R_P != D_P){
-$facedb = readover(D_P.'data/bbscache/face.js');
-}else{print <<<EOT
+if (R_P != D_P) {
+	$facedb = readover(D_P.'data/bbscache/face.js');
+} else {print <<<EOT
 -->
 <script language="JavaScript" src="data/bbscache/face.js"></script>
 <!--
 EOT;
-}print <<<EOT
+}
+$postMinLength = empty($forumset['contentminlen']) ? $db_postmin : $forumset['contentminlen'];
+print <<<EOT
 -->
 <script language="JavaScript" src="js/post.js"></script>
 <script language="javascript">
@@ -375,49 +407,80 @@ PwFace.init('face_tab', 'face_main', 3, 16);
 function checkpost(obj){
 	var action =  "{$psot_sta}";
 	if(cate==1 && obj.p_type!=null && obj.p_type.value==0){
-		showDialog("error","没有选择主题分类",2);
-		obj.p_type.focus();
+		showDlg({type:"error",message:"没有选择主题分类",onClose:function(){
+			obj.p_type.focus();	
+		}});
 		return false;
 	}
 	if(obj.atc_title.value==""){
 		if (action != 'reply'){
-			showDialog("error","标题不能为空",2);
-			obj.atc_title.focus();
+			showDlg({type:"error",message:"<font color='red'>标题</font> 不能为空。",onClose:function(){
+				obj.atc_title.focus();				
+			}});
 			return false;
 		}
 	} else if(strlen(obj.atc_title.value)>$db_titlemax){
-		showDialog("error","标题超过最大长度 $db_titlemax 个字节",2);
-		obj.atc_title.focus();
+		showDlg({type:"error",message:"标题超过最大长度 <font color='red'>$db_titlemax</font> 个字节。",onClose:function(){
+			obj.atc_title.focus();	
+		}});
 		return false;
 	}
-	if(strlen(obj.atc_content.value)<$db_postmin){
-		showDialog("error","文章内容少于 $db_postmin 个字节",2);
-		obj.atc_content.focus();
+	if(strlen(obj.atc_content.value)<$postMinLength){
+		showDlg({type:"error",message:"文章内容少于  <font color='red'>$postMinLength</font> 个字节。",onClose:function(){
+			obj.atc_content.focus();
+		}});
 		return false;
 	} else if(strlen(obj.atc_content.value)>$db_postmax){
-		showDialog("error","文章内容大于 $db_postmax 个字节",2);
-		obj.atc_content.focus();
+		showDlg({type:"error",message:"文章内容大于   <font color='red'>$db_postmax</font> 个字节。",onClose:function(){
+			obj.atc_content.focus();
+		}});
 		return false;
 	}
 	document.FORM.Submit.disabled = true;
-	cnt++;
-	if(cnt!=1){
-		showDialog("warning","Submission Processing. Please Wait");
-		return false;
-	}
-	//Begin Add by liaohu for addfloor
-	if (false == document.FORM['go_lastpage'].checked && 0 != document.FORM['tid'].value) {
+	if (document.FORM['go_lastpage'] && false == document.FORM['go_lastpage'].checked && 0 != document.FORM['tid'].value) {
 		document.FORM['type'].value = "ajax_addfloor";
 		postfloor();
 		return false;
 	};
-	//End Add by liaohu for addfloor
-	if (is_ie && newAtt.aid < 2) {
-		document.FORM.encoding = "application/x-www-form-urlencoded";
-	}	
-	return true;
+	try{
+		if (is_ie && newAtt.aid < 2) {
+			document.FORM.encoding = "application/x-www-form-urlencoded";
+		}
+	}catch(e){}
+	if (document.FORM['go_lastpage'] && true == document.FORM['go_lastpage'].checked){
+		document.FORM['ajax'].value = '';
+		return true;
+	}
+	ajaxSubmit(obj);
+	return false;
 }
-//Begin Add by liaohu for addfloor
+function ajaxSubmit(obj){
+	document.FORM.Submit.disabled = true;
+	ajax.send("post.php?fid=$fid", obj, function(){
+		if(undefined == ajax.request.responseText){
+			showDlg({
+				type: 'error',
+				message: "<font color=\'red\'>附件</font> 太大或网络原因，请求超时，请稍后再试!"
+			});
+			document.FORM.Submit.disabled = false;
+			return false;
+		}
+		var rText = ajax.request.responseText.split('\t');
+		if (rText[0] == 'success') {
+			window.onbeforeunload = function(){};
+			top.window.location =  rText[1];
+		}else if(rText[0] == 'continue'){
+			showDlg({type:'confirm',message:rText[1],okText:'继续',onOk:function(){
+				obj.iscontinue.value = 1;
+				ajaxSubmit(obj);
+			}});
+		}else{
+			showDlg('error', rText[0]);
+		}
+		document.FORM.Submit.disabled = false;
+		return false;
+	});	
+}
 function postfloor(){
 	var url = 'post.php?fid=$fid';
 	ajax.send(url, document.FORM, function() {
@@ -433,12 +496,25 @@ function postfloor(){
 				attachnum = tmp_attachnum-1;
 			}
 			/* end */
+			document.FORM.reset();
 			loadFloor.showHidden(tid);
 		} else {
-			showDialog("warning",rText);
+			var rText = ajax.request.responseText.split('\t');
+			if (rText[0] == 'success') {
+				window.onbeforeunload = function(){};
+				top.window.location =  rText[1];
+			}else if(rText[0] == 'continue'){
+				showDlg({type:'confirm',message:rText[1],okText:'继续',onOk:function(){
+					document.FORM.iscontinue.value = 1;
+					ajaxSubmit(document.FORM);
+				}});
+			}else{
+				showDlg('error', rText[0]);
+			}
 		}
+		try{getObj('ckquestion').src = getObj('ckquestion').src.replace(/t=\d+/,'t='+new Date().getTime()); }catch(e){}
+		try{getObj('reg_ckcode_img').src = getObj('reg_ckcode_img').src.replace(/nowtime=\d+/,'nowtime='+new Date().getTime());}catch(e){}
 		cnt = 0;
-		document.FORM.reset();
 		document.FORM.Submit.disabled = false;
 		document.FORM.target = '';
 		
@@ -456,7 +532,7 @@ function checklength(theform,postmaxchars){
 	} else{
 		message = '';
 	}
-	showDialog("warning",'您的信息已有字节数: '+strlen(theform.atc_content.value)+' 字节'+message);
+	showDlg({type:"warning",message:'您的信息已有字节数: <font color="red">'+strlen(theform.atc_content.value)+'</font> 字节'+message});
 }
 function addsmile(NewCode){
     $('textarea').value += ' [s:'+NewCode+'] ';
@@ -480,7 +556,6 @@ if (document.all) {
 } else {
 	window.addEventListener('load', showFace,false); //对于FireFox
 }
-
 </script>
 <!--
 EOT;

@@ -27,13 +27,11 @@ class CsvUpload extends uploadBehavior {
 		return true;
 	}
 
-
-
 	function getFilePath($currUpload) {
 		$filename	= $this->uid.'_'.'foxmail.'. $currUpload['ext'];
 		$savedir	= 'csv/';
 		$this->pathname = $this->getServerPath($filename,$savedir);
-		return array($filename, $savedir, '', '');
+		return array($filename, $savedir);
 	}
 
 	function update($uploaddb) {

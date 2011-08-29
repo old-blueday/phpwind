@@ -7,8 +7,7 @@
 /*invite*/
 .viewbox{border:1px solid #aebfd6;padding:10px;background:#f7fafe;line-height:1.5;}
 
-.content_thread a{text-decoration:none;color:#006699;}
-.content_thread a:hover{text-decoration:underline;}
+.content_thread .tr3 a{color:#333;}
 .g_navB{border-bottom:1px dashed #e4e4e4;margin-top:-5px;position:relative;padding:0 15px 5px;height:20px;}
 .g_navB .fr{color:#999;}
 .g_navB a{color:#68b;}

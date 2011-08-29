@@ -1,6 +1,6 @@
 <?php
 ! defined ( 'P_W' ) && exit ( 'Forbidden' );
-InitGP ( array ("page", "action", "background_check", "background_select", "background_update", "background_delete" ) );
+S::gp ( array ("page", "action", "background_check", "background_select", "background_update", "background_delete" ) );
 
 class BackGroundManage {
 	
@@ -50,13 +50,17 @@ class BackGroundManage {
 				$result = $this->stopic_service->deletePicture ( $pictureId );
 				(! $result) && Showmsg ( "对不起，背景图片已在使用中", $this->jump );
 			}
+			Showmsg ( "删除成功!", $this->jump );
 		}
 		if ($this->background_select != "" && $this->background_update != "") {
 			foreach ( $this->background_select as $pictureId => $categoryId ) {
 				$result = $this->stopic_service->updatePicture ( array ("categoryid" => $categoryId ), $pictureId );
 				//(! $result) && Showmsg ( "对不起，背景图片分类更新失败", $this->jump );
 			}
+			Showmsg ( "保存成功!", $this->jump );
 		}
+
+		
 	}
 	
 	function execute() {
@@ -91,7 +95,7 @@ class BackGroundManage {
 		foreach ( $categoryLists as $list ) {
 			$option .= '<option value="' . $list ['id'] . '" ' . (($categoryId > 0 && $list ['id'] == $categoryId) ? " selected=selected " : "") . '>' . $list ['title'] . '</option>';
 		}
-		$html .= '<select name="background_select[' . $pictureId . ']">';
+		$html .= '<select style="height:21px;" name="background_select[' . $pictureId . ']">';
 		$html .= '<option value="0" ' . (($categoryId == 0) ? " selected=selected " : "") . '>无分类</option>';
 		$html .= $option;
 		$html .= '	</select> ';
@@ -110,6 +114,6 @@ class BackGroundManage {
 $register = array ("stopic_service" => $stopic_service, "action" => $action, "pwService" => $pwServer, "background_select" => $background_select, "background_check" => $background_check, "background_update" => $background_update, "background_delete" => $background_delete, "stopic_handler_url" => $stopic_admin_url."&job=$job", "db_perpage" => $db_perpage, "page" => $page );
 $backgroundObject = new BackGroundManage ( $register );
 list ( $bool, $backgroundpages, $backgroundLists ) = $backgroundObject->execute ();
-include stopic_use_layout ( 'admin' );
 
+include stopic_use_layout ( 'admin' );
 ?>

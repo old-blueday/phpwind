@@ -9,7 +9,7 @@ $space =& $newSpace->getInfo();
 
 $basename = 'apps.php?q=' . $q . '&';
 
-include_once (D_P . 'data/bbscache/o_config.php');
+include_once pwCache::getPath(D_P . 'data/bbscache/o_config.php');
 include_once (R_P . 'require/showimg.php');
 include_once (R_P . 'require/credit.php');
 L::loadClass('datanalyse', 'datanalyse', false);
@@ -25,7 +25,7 @@ if (!trim($o_hot_groups, ',') || strpos($o_hot_groups, ',' . $winddb[groupid] . 
 
 $datanalyse = new Datanalyse();
 $hotDB = new HotDB($datanalyse);
-InitGP(array(
+S::gp(array(
 	'action', 
 	'sub', 
 	'fTime', 

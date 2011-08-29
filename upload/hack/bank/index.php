@@ -1,7 +1,7 @@
 <?php
 !function_exists('readover') && exit('Forbidden');
 $wind_in='bank';
-require_once(D_P.'data/bbscache/bk_config.php');
+require_once pwCache::getPath(D_P.'data/bbscache/bk_config.php');
 
 $groupid == 'guest' && Showmsg('not_login');
 $bk_open == '0'     && Showmsg('bk_close');
@@ -12,7 +12,7 @@ $bankdb = $userService->get($winduid, false, false, true);//deposit,startdate,dd
 require_once(R_P.'require/credit.php');
 $creditdb = $credit->get($winduid,'CUSTOM');
 
-InitGP(array('action'));
+S::gp(array('action'));
 
 if (empty($action)) {
 
@@ -56,7 +56,7 @@ if (empty($action)) {
 	!$bk_num && $bk_num=10;
 	if (!$bk_per || $timestamp - pwFilemtime(D_P."data/bbscache/bank_sort.php") > $bk_per*3600) {
 		$_DESPOSTDB = array();
-		$query = $db->query("SELECT i.uid,m.username,i.deposit,i.startdate FROM pw_memberinfo i LEFT JOIN pw_members m ON m.uid=i.uid ORDER BY i.deposit DESC LIMIT $bk_num");
+		$query = $db->query("SELECT i.uid,m.username,i.deposit,i.startdate FROM pw_memberinfo i LEFT JOIN pw_members m ON m.uid=i.uid ORDER BY i.deposit DESC ".S::sqlLimit($bk_num));
 		while ($deposit = $db->fetch_array($query)) {
 			if ($deposit['deposit']) {
 				$deposit['startdate'] = get_date($deposit['startdate']);
@@ -64,7 +64,7 @@ if (empty($action)) {
 			}
 		}
 		$_DDESPOSTDB = array();
-		$query = $db->query("SELECT i.uid,username,ddeposit,dstartdate FROM pw_memberinfo i LEFT JOIN pw_members m ON m.uid=i.uid ORDER BY ddeposit DESC LIMIT $bk_num");
+		$query = $db->query("SELECT i.uid,username,ddeposit,dstartdate FROM pw_memberinfo i LEFT JOIN pw_members m ON m.uid=i.uid ORDER BY ddeposit DESC ".S::sqlLimit($bk_num));
 		while ($deposit = $db->fetch_array($query)) {
 			if ($deposit['ddeposit']) {
 				$deposit['dstartdate'] = get_date($deposit['dstartdate']);
@@ -73,9 +73,9 @@ if (empty($action)) {
 		}
 		$wirtedb = savearray('_DESPOSTDB',$_DESPOSTDB);
 		$wirtedb.= "\n".savearray('_DDESPOSTDB',$_DDESPOSTDB);
-		writeover(D_P.'data/bbscache/bank_sort.php',"<?php\r\n".$wirtedb.'?>');
+		pwCache::setData(D_P.'data/bbscache/bank_sort.php',"<?php\r\n".$wirtedb.'?>');
 	}
-	include(D_P."data/bbscache/bank_sort.php");
+	include pwCache::getPath(D_P."data/bbscache/bank_sort.php");
 	require_once PrintHack('index');footer();
 }
 
@@ -85,7 +85,7 @@ if ($_POST['action'] && $bk_timelimit && ($timestamp-$bankdb['startdate']<$bk_ti
 
 if ($_POST['action'] == 'save') {
 
-	InitGP(array('savemoney','btype'),'P',2);
+	S::gp(array('savemoney','btype'),'P',2);
 	if (!is_numeric($savemoney) || $savemoney <= 0) {
 		Showmsg('bk_save_fillin_error');
 	}
@@ -141,7 +141,7 @@ if ($_POST['action'] == 'save') {
 
 } elseif ($_POST['action'] == 'draw') {
 
-	InitGP(array('drawmoney','btype'),'P',2);
+	S::gp(array('drawmoney','btype'),'P',2);
 	if (!is_numeric($drawmoney) || $drawmoney <= 0) {
 		Showmsg('bk_draw_fillin_error');
 	}
@@ -205,19 +205,19 @@ if ($_POST['action'] == 'save') {
 	if ($bk_virement != 1) {
 		Showmsg('bk_virement_close');
 	}
-	InitGP(array('to_money','pwuser','memo'));
+	S::gp(array('to_money','pwuser','memo'));
 	$to_money = (int)$to_money;
 	if (!is_numeric($to_money) || $to_money <= 0 || $to_money < $bk_virelimit) {
 		Showmsg('bk_virement_count_error');
 	}
-	$memo = Char_cv($memo);
+	$memo = S::escapeChar($memo);
 	strlen($memo) > 255 && $memo = substrs($memo,255);
 	$pwuser = trim($pwuser);
 	
 	$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
 	$userdb = $userService->getByUserName($pwuser);//uid,username
 	if (!$pwuser || !$userdb) {
-		$errorname = Char_cv($pwuser);
+		$errorname = S::escapeChar($pwuser);
 		Showmsg('user_not_exists');
 	}
 	if ($userdb['uid'] == $winduid) {
@@ -289,20 +289,20 @@ if ($_POST['action'] == 'save') {
 } elseif ($action == 'log') {
 
 	require_once GetLang('logtype');
-	InitGP(array('type','page','to'));
+	S::gp(array('type','page','to'));
 	$sqladd = '';
 	$select = array();
 	if ($type && in_array($type,array('bk_save','bk_draw','bk_vire'))) {
-		$sqladd = " AND type=".pwEscape($type);
+		$sqladd = " AND type=".S::sqlEscape($type);
 		$select[$type] = "selected";
 	}
 	(!is_numeric($page) || $page < 1) && $page = 1;
 	$sqlfiled = $to ? 'username2' : 'username1';
 
-	$limit = pwLimit(($page-1)*$db_perpage,$db_perpage);
-	$rt    = $db->get_one("SELECT COUNT(*) AS sum FROM pw_forumlog WHERE type LIKE 'bk\_%' AND $sqlfiled=".pwEscape($windid).$sqladd);
+	$limit = S::sqlLimit(($page-1)*$db_perpage,$db_perpage);
+	$rt    = $db->get_one("SELECT COUNT(*) AS sum FROM pw_forumlog WHERE type LIKE 'bk\_%' AND $sqlfiled=".S::sqlEscape($windid).$sqladd);
 	$pages = numofpage($rt['sum'],$page,ceil($rt['sum']/$db_perpage),"$basename&action=log&type=$type&to=$to&");
-	$query = $db->query("SELECT * FROM pw_forumlog WHERE type LIKE 'bk\_%' AND $sqlfiled=".pwEscape($windid).$sqladd." ORDER BY id DESC $limit");
+	$query = $db->query("SELECT * FROM pw_forumlog WHERE type LIKE 'bk\_%' AND $sqlfiled=".S::sqlEscape($windid).$sqladd." ORDER BY id DESC $limit");
 	while ($rt = $db->fetch_array($query)) {
 		$rt['date']   = get_date($rt['timestamp']);
 		$rt['descrip']= str_replace(array('[b]','[/b]'),array('<b>','</b>'),$rt['descrip']);

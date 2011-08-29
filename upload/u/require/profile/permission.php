@@ -1,16 +1,37 @@
 <?php
 !defined('R_P') && exit('Forbidden');
 
-InitGP(array('job'),'G');
-InitGP(array('gid','fid'),'G',2);
+S::gp(array('job'),'G');
+S::gp(array('gid','fid'),'G',2);
+S::gp(array('step'),'P',2);
 require_once(R_P.'require/functions.php');
 require_once(R_P.'require/credit.php');
 
-if (!$fid) {
+if($step == '2'){
+	S::gp('newgroupid','P',2);
+	$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
+	$userdb = $userService->get($winduid, true, true, true);
+	$upmembers = array();
+	if ($db_selectgroup && $newgroupid && $newgroupid != $userdb['groupid'] && $userdb['groups']) {
+		if (strpos($userdb['groups'],','.$newgroupid.',') === false) {
+			Showmsg('undefined_action');
+		} else {
+			if ($userdb['groupid'] == '-1') {
+				$groups = str_replace(",$newgroupid,",',',$userdb['groups']);
+				$groups == ',' && $groups = '';
+			} else {
+				$groups = str_replace(",$newgroupid,",",$userdb[groupid],",$userdb['groups']);
+			}
+			$upmembers['groupid']	= $newgroupid;
+			$upmembers['groups']	= $groups;
+		}
+	}
+	$userService->update($winduid,$upmembers);
+	refreshto("profile.php?action=permission",'头衔切换成功!',1,true);
+}else if (!$fid) {
 
-	InitGP(array('gid'),'G',2);
-	include_once(D_P . 'data/bbscache/level.php');
-
+	S::gp(array('gid'),'G',2);
+	include_once pwCache::getPath(D_P . 'data/bbscache/level.php');
 	$usercredit = array(
 		'postnum'	=> $winddb['postnum'],
 		'digests'	=> $winddb['digests'],
@@ -51,10 +72,27 @@ if (!$fid) {
 			Showmsg('per_error');
 		}
 	}
-	$query = $db->query("SELECT rkey,rvalue FROM pw_permission WHERE uid='0' AND fid='0' AND gid=".pwEscape($gid)."AND type='basic'");
+	$query = $db->query("SELECT rkey,rvalue FROM pw_permission WHERE uid='0' AND fid='0' AND gid=".S::sqlEscape($gid)."AND type='basic'");
 	while ($rt = $db->fetch_array($query)) {
 		$gRight[$rt['rkey']] = $rt['rvalue'];
 	}
+
+	//权限切换
+	$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
+	$userdb = $userService->get($winduid, true, true, true);
+	$groupselect = '';
+	if ($db_selectgroup && $userdb['groups']) {
+		$ltitle = L::config('ltitle', 'level');
+		$groupselect = $userdb['groupid']=='-1' ? '<option></option>' : "<option value=\"$userdb[groupid]\">".$ltitle[$userdb['groupid']]."</option>";
+		$groups = explode(',',$userdb['groups']);
+		foreach ($groups as $value) {
+			$ltitle = (is_array($ltitle)) ? $ltitle : array($ltitle);
+			if ($value && array_key_exists($value,$ltitle)) {
+				$groupselect .= "<option value=\"$value\">$ltitle[$value]</option>";
+			}
+		}
+	}
+
 	$db->free_result($query);
 	$per['allowpcid1'] = strpos(','.$gRight['allowpcid'].',',',1,') !== false ? 1 : 0;  //团购帖
 	$per['allowpcid2'] = strpos(','.$gRight['allowpcid'].',',',2,') !== false ? 1 : 0;
@@ -81,7 +119,7 @@ if (!$fid) {
 	$per['down']	= $gRight['allowdownload']	? 1 : 0;
 	$per['sort']	= $gRight['allowsort']		? 1 : 0;
 	$per['messege']	= $gRight['allowmessege']	? 1 : 0;
-//	$per['active']	= $gRight['allowactive']	? 1 : 0;
+	//	$per['active']	= $gRight['allowactive']	? 1 : 0;
 	$per['reward']	= $gRight['allowreward']	? 1 : 0;
 	$per['anonymous'] = $gRight['anonymous']	? 1 : 0;
 	$per['leaveword'] = $gRight['leaveword']	? 1 : 0;
@@ -99,7 +137,7 @@ if (!$fid) {
 	}
 	unset($creditdb,$groups,$value,$ltitle,$gRight);
 
-} else {
+}else{
 
 	require_once(R_P.'require/forum.php');
 	if (!($rt = L::forum($fid))) {

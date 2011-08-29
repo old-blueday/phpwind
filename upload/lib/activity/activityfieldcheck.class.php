@@ -53,7 +53,7 @@ class PW_ActivityFieldCheck extends Fieldcheck {
 	 * @return bool|FieldCheck 遇错返回false
 	 */
 	function _presetErrorMessage() {
-		require_once Pcv(GetLang('fielderror'));
+		require_once S::escapePath(GetLang('fielderror'));
 		$errorMessage = $lang['fielderror'];
 		if ($errorMessage) {
 			$this->_setErrorMessage($errorMessage);

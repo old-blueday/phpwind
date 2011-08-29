@@ -4,11 +4,11 @@ class PW_PushDataDB extends BaseDB {
 	var $_tableName = "pw_pushdata";
 
 	function get($id) {
-		$temp = $this->_db->get_one("SELECT * FROM ".$this->_tableName." WHERE id=".pwEscape($id));
+		$temp = $this->_db->get_one("SELECT * FROM ".$this->_tableName." WHERE id=".S::sqlEscape($id));
 		return $this->_initData($temp);
 	}
 	function delete($id) {
-		$this->_db->update("DELETE FROM ".$this->_tableName." WHERE id=".pwEscape($id));
+		$this->_db->update("DELETE FROM ".$this->_tableName." WHERE id=".S::sqlEscape($id));
 	}
 	function insertData($array){
 		global $timestamp;
@@ -22,12 +22,12 @@ class PW_PushDataDB extends BaseDB {
 		global $timestamp;
 		$array	= $this->_checkData($array);
 		if (!$array) return null;
-		$this->_db->update("UPDATE ".$this->_tableName." SET ".pwSqlSingle($array,false)." WHERE id=".pwEscape($id));
+		$this->_db->update("UPDATE ".$this->_tableName." SET ".S::sqlSingle($array,false)." WHERE id=".S::sqlEscape($id));
 	}
 	
 	function deleteByPiece($invokePieceId) {
 		$invokePieceId = (int) $invokePieceId;
-		$this->_db->update("DELETE FROM ".$this->_tableName." WHERE invokepieceid=".pwEscape($invokePieceId));
+		$this->_db->update("DELETE FROM ".$this->_tableName." WHERE invokepieceid=".S::sqlEscape($invokePieceId));
 	}
 	
 	function searchPushDatas($array,$page,$perPage=20) {
@@ -38,7 +38,7 @@ class PW_PushDataDB extends BaseDB {
 		
 		$_sql_order = $this->_getOrderSQL($array,'p');
 		$temp = array();
-		$_sql_final = "SELECT p.*,ip.invokename,i.title as invoketitle,pi.sign FROM ".$this->_tableName." p LEFT JOIN pw_invokepiece ip ON p.invokepieceid=ip.id LEFT JOIN pw_pageinvoke pi ON ip.invokename=pi.invokename LEFT JOIN pw_invoke i ON pi.invokename=i.name $_sql $_sql_order ".pwLimit(($page-1)*$perPage,$perPage);
+		$_sql_final = "SELECT p.*,ip.invokename,i.title as invoketitle,pi.sign FROM ".$this->_tableName." p LEFT JOIN pw_invokepiece ip ON p.invokepieceid=ip.id LEFT JOIN pw_pageinvoke pi ON ip.invokename=pi.invokename LEFT JOIN pw_invoke i ON pi.invokename=i.name $_sql $_sql_order ".S::sqlLimit(($page-1)*$perPage,$perPage);
 
 		$query	= $this->_db->query($_sql_final);
 		while ($rt = $this->_db->fetch_array($query)) {
@@ -56,7 +56,7 @@ class PW_PushDataDB extends BaseDB {
 		global $timestamp;
 		$temp = array();
 
-		$query	= $this->_db->query("SELECT * FROM ".$this->_tableName." WHERE invokepieceid=".pwEscape($invokepieceid)." AND ifverify=0 AND starttime<=".pwEscape($timestamp)." ORDER BY vieworder DESC,starttime DESC ".pwLimit(0,$num));
+		$query	= $this->_db->query("SELECT * FROM ".$this->_tableName." WHERE invokepieceid=".S::sqlEscape($invokepieceid)." AND ifverify=0 AND starttime<=".S::sqlEscape($timestamp)." ORDER BY vieworder DESC,starttime DESC ".S::sqlLimit(0,$num));
 		while ($rt = $this->_db->fetch_array($query)) {
 			$temp[$rt['id']] = $this->_initData($rt);
 		}
@@ -72,7 +72,7 @@ class PW_PushDataDB extends BaseDB {
 		if (!$array || !$array['invokepieceid'] || !$array['data']) {
 			return null;
 		}
-		$this->_db->update("INSERT INTO ".$this->_tableName." SET ".pwSqlSingle($array,false));
+		$this->_db->update("INSERT INTO ".$this->_tableName." SET ".S::sqlSingle($array,false));
 		return $this->_db->insert_id();
 	}
 	
@@ -107,21 +107,21 @@ class PW_PushDataDB extends BaseDB {
 		
 		$temp = $array['ifverify'] ? " WHERE $ifverifyField = 1 " : " WHERE $ifverifyField = 0 ";
 		if ($array['invokepiece']) {
-			$temp .= " AND $invokepieceIdField=".pwEscape($array['invokepiece']);
+			$temp .= " AND $invokepieceIdField=".S::sqlEscape($array['invokepiece']);
 		} elseif ($array['invoke']) {
 			$invokeService = L::loadClass('invokeservice', 'area');
 			$invokepieces = $invokeService->getInvokePieces($array['invoke']);
 			$invokepieces = array_keys($invokepieces);
 			if (!$invokepieces) return false;
 
-			$temp .= " AND $invokepieceIdField IN (".pwImplode($invokepieces).")";
+			$temp .= " AND $invokepieceIdField IN (".S::sqlImplode($invokepieces).")";
 		} elseif ($array['alias']) {
 			$pageInvokeService = L::loadClass('pageinvokeservice', 'area');
 			$portalPageService = L::loadClass('portalpageservice', 'area');
 			$signType = $portalPageService->getSignType($array['alias']);
 			$invokepieces = $pageInvokeService->getEffectPageInvokePieces($signType,$array['alias']);
 			if (!$invokepieces) return false;
-			$temp .= " AND $invokepieceIdField IN (".pwImplode($invokepieces).")";
+			$temp .= " AND $invokepieceIdField IN (".S::sqlImplode($invokepieces).")";
 		}
 		return $temp;
 		//TODO

@@ -23,6 +23,7 @@ function clearMessage(){
 </script>
 <div id='hiddenMessage' style="display:none"></div>
 <div class="contUser" id="content">
+<table width="100%"><tr><td height="600" valign="top">
     <div class="p15">
   	<h4 class="site"><span>消息中心设置</span></h4>
 	<div class="navC mb10">
@@ -32,7 +33,7 @@ function clearMessage(){
         </ul>
     </div>
    <div id="showmessage"></div>
-   <div class="tac p15">$tip</div>
+   <div class="tac spaceTip">$tip</div>
    <div class="p10">
   	  <form method="post" id="mainForm" name="FORM" action="$normalUrl&verify=$verifyhash" enctype = "multipart/form-data">
   	  		<input type="hidden" name="step" value="2"/>
@@ -47,6 +48,7 @@ function clearMessage(){
        </form> 
 	  </div>
       </div>
+</td></tr></table>
 </div>
 <!--
 EOT;

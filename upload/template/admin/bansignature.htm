@@ -1,0 +1,141 @@
+<!--<?php
+include_once PrintEot('left');
+if(empty($action)){
+print <<<EOT
+-->
+<div class="nav3 mb10 ta">
+    <ul class="cc">
+      <li class="current"><a href="$basename">查看禁止会员</a></li>
+      <li><a href="$basename&action=ban">签名禁止</a></li>
+    </ul>
+</div>
+<div class="admin_info mb10">
+	<h3 class="h1"><b>提示信息</b></h3>
+	<div class="legend">查看被禁止帖子签名显示的会员列表，可以解除禁止</div>
+</div>
+<form action="$basename&" method="post">
+<script language="javascript" src="js/date.js"></script>
+<h2 class="h1">搜索</h2>
+<div class="admin_table mb10">
+<!--
+EOT;
+$starttime && ($starttime = get_date($starttime, 'Y-m-d'));
+$endtime && ($endtime = get_date($endtime, 'Y-m-d'));
+print <<<EOT
+-->
+<table width="100%" cellspacing="0" cellpadding="0">
+	<tr class="tr1 vt">
+		<td class="td2" width="135">用户名:
+			<input type="text" class="input input_wc" name="banuser" value="$banuser" />
+		</td>
+		<td class="td2" width="135">管理员:
+			<input type="text" class="input input_wc" name="adminban" value="$adminban" />
+		</td>
+		<td class="td2" width="260">操作时间:
+			<input type="text" class="input input_wc" id="starttime" name="starttime" value="$starttime" onClick="javascript:ShowCalendar(this.id)" /> -
+			<input type="text" class="input input_wc" id="endtime" name="endtime" value="$endtime" onClick="javascript:ShowCalendar(this.id)" />
+		</td>
+		<td class="td2"><span class="bt2"><span><button type="submit" value="提 交">提 交</button></span></span></td>
+	</tr>
+</table>
+</div>
+</form>
+
+<form action="$basename&" method="post" name="listform" id="listform">
+<input type="hidden" name="action" value="freeban">
+<input type="hidden" name="returnurl" value="$url">
+<h2 class="h1">禁止用户列表<span class="fr">[共{$total}条结果]</span></h2>
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+	<tr class="tr2 td_bgB">
+		<td width="35"><span onclick="CheckAll(document.listform)" class="cp">解除</span></td>
+		<td width="100">用户名</td>
+		<td width="100">管理员</td>
+		<td>操作说明</td>
+		<td width="130">操作时间</td>
+		<td width="60">操作</td>
+	</tr>
+<!--
+EOT;
+if($total){
+foreach($result as $banInfo){
+print <<<EOT
+-->
+	<tr class="tr2 td_bgB">
+		<td width="35"><input type="checkbox" name="selid[]" value="$banInfo[id]"></td>
+		<td width="100"><a href="u.php?username=$banInfo[username]" target="_blank">$banInfo[username]</a></td>
+		<td width="100"><a href="u.php?username=$banInfo[admin]" target="_blank">$banInfo[admin]</a></td>
+		<td>$banInfo[reason]</td>
+		<td width="130">$banInfo[datetime]</td>
+		<td width="60"><a onclick="return confirm('确认操作?');" href="$basename&action=freeban&id=$banInfo[id]">[解禁]</a></td>
+	</tr>
+<!--
+EOT;
+}
+}else {
+print <<<EOT
+-->
+	<tr><td class="p10" colspan="9"><div class="admin_tips">啊哦，没有你要的信息！</div></td></tr>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+</table>
+</div>
+<div class="mb10 cc">$pages</div>
+<div class="tac mb10">
+	<span class="bt"><span><button type="button" name="chkall" onclick="CheckAll(this.form)">全 选</button></span></span>
+	<span class="btn"><span><button type="submit" name="hello">解禁</button></span></span>
+</div>
+</form>
+<!--
+EOT;
+}elseif($action == 'ban'){
+print <<<EOT
+-->
+<div class="nav3 mb10 ta">
+    <ul class="cc">
+      <li><a href="$basename">查看禁止会员</a></li>
+      <li class="current"><a href="$basename&action=ban">签名禁止</a></li>
+    </ul>
+</div>
+<div class="admin_info mb10">
+	<h3 class="h1"><b>提示信息</b></h3>
+	<div class="legend">禁止某个用户的帖子签名， 可以批量操作</div>
+</div>
+<form action="$basename&action=ban&step=2" method="post">
+<h2 class="h1">禁止用户帖子签名</h2>
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+	<tr class="tr1 vt">
+		<td class="td1">用户名</td>
+		<td class="td2"><input type="text" class="input input_wa" name="username"></td>
+		<td class="td2">可输入多个，用英文","隔开</td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">消息通知</td>
+		<td class="td2">
+			<label><input type="radio" name="ifmsg" value="1" checked />开启</label>
+			<label><input type="radio" name="ifmsg" value="0" />关闭</label>
+		</td>
+		<td class="td2"></td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">禁止理由</td>
+		<td class="td2"><textarea class="textarea" name="content"></textarea></td>
+		<td class="td2"></td>
+	</tr>
+</table>
+</div>
+<div class="tac mb10"><span class="btn"><span><button type="submit">提 交</button></span></span></div>
+</form>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+<!--
+EOT;
+include_once PrintEot('adminbottom');
+?>-->

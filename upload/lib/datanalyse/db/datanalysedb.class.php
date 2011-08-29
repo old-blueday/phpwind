@@ -7,8 +7,8 @@ class PW_DatanalyseDB extends BaseDB {
 
 	function getMaxNumByActionAndTime($action, $time, $top) {
 		empty($top) && $top = 1;
-		return $this->_db->get_value("SELECT num FROM $this->_tableName WHERE action = " . pwEscape($action) . " 
-						   AND timeunit = " . pwEscape($time) . " ORDER BY num DESC LIMIT $top,1");
+		return $this->_db->get_value("SELECT num FROM $this->_tableName WHERE action = " . S::sqlEscape($action) . " 
+						   AND timeunit = " . S::sqlEscape($time) . " ORDER BY num DESC LIMIT $top,1");
 	}
 
 	/**
@@ -44,7 +44,7 @@ class PW_DatanalyseDB extends BaseDB {
 		if (empty($actions) || empty($num)) return array();
 		$time = $this->_getHistoryTime();
 		$query = $this->_db->query("SELECT a.tag,SUM(a.num) AS nums FROM $this->_tableName a 
-			WHERE a.action IN (" . pwImplode($actions) . ") AND a.timeunit = " . pwEscape($time) . " GROUP BY a.tag 
+			WHERE a.action IN (" . S::sqlImplode($actions) . ") AND a.timeunit = " . S::sqlEscape($time) . " GROUP BY a.tag 
 			ORDER BY nums DESC LIMIT 0,$num");
 		return $this->_getAllResultFromQuery($query);
 	}
@@ -58,7 +58,7 @@ class PW_DatanalyseDB extends BaseDB {
 		if (empty($action) || empty($num)) return array();
 		$time = $this->_getHistoryTime();
 		$query = $this->_db->query("SELECT a.tag,SUM(a.num) AS nums FROM $this->_tableName a 
-			WHERE a.action = (" . pwEscape($action) . ") AND a.timeunit = " . pwEscape($time) . " GROUP BY a.tag 
+			WHERE a.action = (" . S::sqlEscape($action) . ") AND a.timeunit = " . S::sqlEscape($time) . " GROUP BY a.tag 
 			ORDER BY nums DESC,tag LIMIT 0,$num");
 		return $this->_getAllResultFromQuery($query);
 	}
@@ -72,7 +72,7 @@ class PW_DatanalyseDB extends BaseDB {
 	function _getDataByTimeAndActions($actions, $num, $time) {
 		if (empty($actions) || empty($time)) return array();
 		$query = $this->_db->query("SELECT a.tag,SUM(a.num) AS nums FROM $this->_tableName a 
-			WHERE a.action IN (" . pwImplode($actions) . ") AND a.timeunit >= " . pwEscape($time) . " GROUP BY a.tag 
+			WHERE a.action IN (" . S::sqlImplode($actions) . ") AND a.timeunit >= " . S::sqlEscape($time) . " GROUP BY a.tag 
 			ORDER BY nums DESC LIMIT 0,$num");
 		return $this->_getAllResultFromQuery($query);
 	}
@@ -85,7 +85,7 @@ class PW_DatanalyseDB extends BaseDB {
 	 */
 	function _getDataByTimeAndAction($action, $num, $time) {
 		$query = $this->_db->query("SELECT a.tag,SUM(a.num) AS nums FROM $this->_tableName a 
-			WHERE a.action = " . pwEscape($action) . " AND a.timeunit >= " . pwEscape($time) . " GROUP BY a.tag 
+			WHERE a.action = " . S::sqlEscape($action) . " AND a.timeunit >= " . S::sqlEscape($time) . " GROUP BY a.tag 
 			ORDER BY nums DESC LIMIT 0,$num");
 		return $this->_getAllResultFromQuery($query);
 	}
@@ -97,11 +97,11 @@ class PW_DatanalyseDB extends BaseDB {
 	 * @param int $time
 	 */
 	function deleteDataByTimeAndAction($action, $time, $num) {
-		return $this->_db->update("DELETE FROM $this->_tableName WHERE timeunit = " . pwEscape($time) . " AND action = " . pwEscape($action) . " AND num < " . pwEscape($num));
+		return $this->_db->update("DELETE FROM $this->_tableName WHERE timeunit = " . S::sqlEscape($time) . " AND action = " . S::sqlEscape($action) . " AND num < " . S::sqlEscape($num));
 	}
 
 	function deleteDataByActionAndTag($action, $tag) {
-		return $this->_db->update("DELETE FROM $this->_tableName WHERE action = " . pwEscape($action) . " AND tag IN ( " . pwImplode($tag) . ")");
+		return $this->_db->update("DELETE FROM $this->_tableName WHERE action = " . S::sqlEscape($action) . " AND tag IN ( " . S::sqlImplode($tag) . ")");
 	}
 
 	/**
@@ -109,7 +109,7 @@ class PW_DatanalyseDB extends BaseDB {
 	 * @param int $time
 	 */
 	function _deleteDataByTime($time) {
-		return $this->_db->update("DELETE FROM $this->_tableName WHERE timeunit <= " . pwEscape($time) . " AND timeunit != " . pwEscape($this->_getHistoryTime()));
+		return $this->_db->update("DELETE FROM $this->_tableName WHERE timeunit <= " . S::sqlEscape($time) . " AND timeunit != " . S::sqlEscape($this->_getHistoryTime()));
 	}
 
 	/**

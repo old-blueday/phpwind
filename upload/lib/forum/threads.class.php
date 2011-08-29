@@ -1,134 +1,70 @@
 <?php
-!defined('P_W') && exit('Forbidden');
+!function_exists('readover') && exit('Forbidden');
 
 /**
- * ThreadCache
+ * 帖子管理操作类
  * 
  * @package Thread
  */
 class PW_Threads {
-	var $_db;
-	var $_connect = FALSE;
-	var $_expire = 3600;
-	var $_exist = FALSE;
-	var $_prefixThreads = "threads_";
-	var $_prefixTmsgs = "tmsgs_";
-	
-	function PW_Threads() {
-		$this->_db = $GLOBALS['db'];
-		if ($this->_isMemecacheOpen()) {
-			$this->_exist = TRUE;
+
+	/**
+	 * 删除pw_threads表的一条记录
+	 *
+	 * @param int $threadId 帖子id
+	 * @return int
+	 */
+	function deleteByThreadId($threadId) {
+		$threadId = S::int($threadId);
+		if($threadId < 1){
+			return false;
 		}
+		$_dbService = L::loadDB('threads', 'forum');
+		return $_dbService->deleteByThreadId($threadId);
 	}
 	
-	function getThreads($tid, $isDetailed = false) {
-		if ($this->_exist == FALSE) {
-			return ($isDetailed ? $this->_getThreadsAndTmsgsByTidNoCache($tid) : $this->_getThreadsByTidNoCache($tid));
+	/**
+	 * 删除pw_threads表里一组记录
+	 *
+	 * @param array $threadIds 帖子id （数组格式）
+	 * @return int
+	 */	
+	function deleteByThreadIds($threadIds) {
+		$threadIds = (array) $threadIds;
+		$_dbService = L::loadDB('threads', 'forum');
+		return $_dbService->deleteByThreadIds($threadIds);
+	}
+	
+	/**
+	 * 根据板块id删除帖子
+	 *
+	 * @param int $forumId 板块id
+	 * @return int
+	 */
+	function deleteByForumId($forumId) {
+		$forumId = S::int($forumId);
+		if($forumId < 1){
+			return false;
 		}
-		return ($isDetailed ? array_merge($this->_getThreadsByTid($tid), $this->_getTmsgsByTid($tid)) : $this->_getThreadsByTid($tid));
+		$_dbService = L::loadDB('threads', 'forum');
+		return $_dbService->deleteByForumId($forumId);
 	}
 	
-	function delThreads($tids) {
-		if ($this->_exist == FALSE) return null;
-		if (is_array($tids)) {
-			foreach ($tids as $tid) {
-				$this->_delThreadsByTid($tid);
-				$this->_delTmsgsByTid($tid);
-			}
-		} else {
-			$this->_delThreadsByTid($tids);
-			$this->_delTmsgsByTid($tids);
+	/**
+	 * 根据作者id 删除帖子
+	 *
+	 * @param int $authorId 作者id
+	 * @return int
+	 */
+	function deleteByAuthorId($authorId) {
+		$authorId = S::int($authorId);
+		if($authorId < 1){
+			return false;
 		}
-	}
+		$_dbService = L::loadDB('threads', 'forum');
+		return $_dbService->deleteByAuthorId($authorId);
+	}	
 	
-	function clearThreadByThreadId($threadId) {
-		return $this->_delThreadsByTid($threadId);
-	}
-	
-	function clearTmsgsByThreadId($threadId) {
-		return $this->_delTmsgsByTid($threadId);
-	}
-	
-	function _delThreadsByTid($tid) {
-		if ($this->_exist == FALSE) return null;
-		$key = $this->_getThreadsKey($tid);
-		$memcacheConnection = $this->_getMemcacheConnection();
-		$memcacheConnection->delete($key);
-	}
-	
-	function _delTmsgsByTid($tid) {
-		if ($this->_exist == FALSE) return null;
-		$key = $this->_getTmsgsKey($tid);
-		$memcacheConnection = $this->_getMemcacheConnection();
-		$memcacheConnection->delete($key);
-	}
-	
-	function _getThreadsByTid($tid) {
-		if ($this->_exist == FALSE) return null;
-		$key = $this->_getThreadsKey($tid);
-		$memcacheConnection = $this->_getMemcacheConnection();
-		$result = $memcacheConnection->get($key);
-		if ($result === FALSE) {
-			$result = $this->_getThreadsByTidNoCache($tid);
-			if ($result) {
-				$memcacheConnection->set($key, $result, $this->_expire);
-			}
-		}
-		return $result ? $result : array();
-	}
-	
-	function _getTmsgsByTid($tid) {
-		if ($this->_exist == FALSE) return null;
-		$key = $this->_getTmsgsKey($tid);
-		$memcacheConnection = $this->_getMemcacheConnection();
-		$result = $memcacheConnection->get($key);
-		if ($result === FALSE) {
-			$result = $this->_getTmsgsByTidNoCache($tid);
-			if ($result) {
-				$memcacheConnection->set($key, $result, $this->_expire);
-			}
-		}
-		return $result ? $result : array();
-	}
-	
-	function _getTmsgsByTidNoCache($tid) {
-		$pw_tmsgs = GetTtable($tid);
-		$read = $this->_db->get_one("SELECT * FROM $pw_tmsgs WHERE tid=" . pwEscape($tid));
-		return $read;
-	}
-	
-	function _getThreadsByTidNoCache($tid) {
-		$read = $this->_db->get_one("SELECT * FROM pw_threads WHERE tid=" . pwEscape($tid));
-		return $read;
-	}
-	
-	function _getThreadsAndTmsgsByTidNoCache($tid) {
-		$pw_tmsgs = GetTtable($tid);
-		$read = $this->_db->get_one("SELECT t.* ,tm.* FROM pw_threads t LEFT JOIN $pw_tmsgs tm ON t.tid=tm.tid WHERE t.tid=" . pwEscape($tid));
-		return $read;
-	}
-	
-	function _getThreadsKey($tid) {
-		return $this->_prefixThreads . $tid;
-	}
-	
-	function _getTmsgsKey($tid) {
-		return $this->_prefixTmsgs . $tid;
-	}
-	
-	function _getMemcacheConnection() {
-		if ($this->_connect === FALSE) {
-			$this->_connect = L::loadClass('Memcache', 'utility');
-		}
-		return $this->_connect;
-	}
-	
-	function _getConnection() {
-		return $GLOBALS['db'];
-	}
-	
-	function _isMemecacheOpen() {
-		return class_exists("Memcache") && strtolower($GLOBALS['db_datastore']) == 'memcache';
-	}
 }
+
 ?>

@@ -32,7 +32,7 @@ print <<<EOT
         <td class="td2">
         	<a href="javascript:;" onclick="sendmsg('$basename&action=edit&cid={$c1[column_id]}','',this.id); return false" href="javascript:;"">[编辑]</a>
         	<a href="javascript:;" onclick="parent.PW.Dialog({'id': 'cms_article','name': '文章内容管理','url': '$admin_file?adminjob=mode&admintype=cms_article&cid={$c1[column_id]}','max': false});return false;">[内容管理]</a>
-        	<a href="mode.php?m=cms&q=list&column={$c1[column_id]}" target="_blank">[访问]</a>
+        	<a href="index.php?m=cms&q=list&column={$c1[column_id]}" target="_blank">[访问]</a>
         	<a href="$basename&action=delete&cid={$c1[column_id]}" onclick="return confirm('是否要删除该栏目')">[删除]</a>
         </td>
 	</tr>
@@ -77,7 +77,7 @@ EOT;
 $_mTitle =  ($action == 'add') ? "添加" : "编辑";
 print <<<EOT
 -->
-<form action="$basename&action=$_action" method="post" name="form">
+<form action="$basename&action=$_action&ajax=1" method="post" name="form">
 <input type="hidden" value="$column[column_id]" name="cid"/>
 <div class="popoutContent">
    	<h2 class="h1" style="cursor:move" onmousedown="read.move(event);"><a class="del_img fr" href="javascript:;" onclick="closep();">关闭</a>{$_mTitle}栏目</h2>

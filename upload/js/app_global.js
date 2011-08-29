@@ -4,7 +4,7 @@ function pwConfirm(title,position,callback){
 	if (objCheck('oldinfo')) {
 		getObj('oldinfo').parentNode.removeChild(getObj('oldinfo'));
 	}
-	var container 	= elementBind('div','container_del','','position: absolute;');
+	var container 	= elementBind('div','container_del','','position: absolute;z-index:1011');
 	($('upPanel')||document.body).appendChild(container);
 	closefm = callback;
 	var pw_box = '<div class="popout"><table cellspacing="0" cellpadding="0" border="0"><tbody><tr><td class="bgcorner1"></td><td class="pobg1"></td><td class="bgcorner2"></td></tr><tr><td class="pobg4"></td><td><div id="box_container" class="popoutContent"><div class="cc" style="width: 200px;"><div class="p15">'+title+'</div><div class="popBottom"><span class="btn2"><span><button onclick="delElement(\'container_del\');closefm();" type="button">确 定</button></span></span><span class="bt2"><span><button onclick="delElement(\'container_del\');" type="button">取消</button></span></span></div></div></div></td><td class="pobg2"></td></tr><tr><td class="bgcorner4"></td><td class="pobg3"></td><td class="bgcorner3"></td></tr></tbody></table></div>';
@@ -164,5 +164,5 @@ function iDiaryForm (obj)
 			break;
 		}
 	}
-	obj.contentWindow.document.body.innerHTML.indexOf('操作完成') == -1 ? (showDialog('fail', tipText) & SETTOP() & (document.FORM.Submit.disabled = false)) : showDialog('success', '日志发表成功！') & (parent.location.href = 'apps.php?q=diary') & setEditorContent() & (SETTOP()) & getObj('FORM').reset();
+	obj.contentWindow.document.body.innerHTML.indexOf('操作完成') == -1 ? (showDialog('error', tipText) & SETTOP() & (document.FORM.Submit.disabled = false)) : showDialog('success', '日志发表成功！') & (parent.location.href = 'apps.php?q=diary') & setEditorContent() & (SETTOP()) & getObj('FORM').reset();
 }

@@ -3,18 +3,18 @@
 
 require_once (R_P . 'require/bbscode.php');
 
-InitGP(array(
+S::gp(array(
 	'pcid',
 	'modelid'
 ), 'P', 2);
 
 $fielddb = array();
 $data = array();
-$atc_content = Char_cv(stripslashes(GetGP('atc_content', 'P')));
-$pcinfo = Char_cv(stripslashes(GetGP('pcinfo', 'P')));
+$atc_content = S::escapeChar(stripslashes(S::getGP('atc_content', 'P')));
+$pcinfo = S::escapeChar(stripslashes(S::getGP('pcinfo', 'P')));
 
 if ($modelid > 0) {
-	$query = $db->query("SELECT fieldid,fieldname FROM pw_topicfield WHERE modelid=" . pwEscape($modelid));
+	$query = $db->query("SELECT fieldid,fieldname FROM pw_topicfield WHERE modelid=" . S::sqlEscape($modelid));
 	while ($rt = $db->fetch_array($query)) {
 		$fielddb[$rt['fieldid']] = $rt['fieldname'];
 	}
@@ -25,7 +25,7 @@ if ($modelid > 0) {
 	$topicvalue = $postTopic->getTopicvalue($modelid, $pcdb);
 
 } elseif ($pcid > 0) {
-	$query = $db->query("SELECT fieldid,fieldname FROM pw_pcfield WHERE pcid=" . pwEscape($pcid));
+	$query = $db->query("SELECT fieldid,fieldname FROM pw_pcfield WHERE pcid=" . S::sqlEscape($pcid));
 	while ($rt = $db->fetch_array($query)) {
 		$fielddb[$rt['fieldname']] = $rt['fieldid'];
 	}

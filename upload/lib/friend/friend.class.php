@@ -25,7 +25,7 @@ class PW_Friend {
 	 * @return array 返回指定格式的好友列表
 	 */
 	function getFriendsByUid($uid) {
-		$sql = 'SELECT a.friendid, b.username FROM pw_friends a INNER JOIN pw_members b ON a.friendid = b.uid WHERE status = 0 AND a.uid = ' .pwEscape($uid);
+		$sql = 'SELECT a.friendid, b.username FROM pw_friends a INNER JOIN pw_members b ON a.friendid = b.uid WHERE status = 0 AND a.uid = ' .S::sqlEscape($uid);
 		return $this->_getAllResultFromSql($sql);
 	}
 
@@ -40,7 +40,7 @@ class PW_Friend {
 	 * @return array 返回指定格式的好友列表
 	 */
 	function getFriendsByColonyId($uid,$colonyid) {
-		$sql= 'SELECT username FROM pw_friends a INNER JOIN `pw_members` b ON a.friendid = b.uid WHERE status = 0 AND a.uid = ' .pwEscape($uid). ' AND ftid = ' .pwEscape($colonyid);
+		$sql= 'SELECT username FROM pw_friends a INNER JOIN `pw_members` b ON a.friendid = b.uid WHERE status = 0 AND a.uid = ' .S::sqlEscape($uid). ' AND ftid = ' .S::sqlEscape($colonyid);
 		return $this->_getAllResultFromSql($sql);
 	}
 	 /**
@@ -51,8 +51,8 @@ class PW_Friend {
 	 * @return array 返回指定格式的好友列表
 	 */
 	function getFriendsByColonyName($uid,$name) {
-		$result = $this->_db->get_one('select ftid from pw_friendtype where name=' . pwEscape($name));
-		$sql = 'SELECT username FROM pw_friends a INNER JOIN `pw_members` b ON a.friendid = b.uid WHERE status = 0 AND a.uid = ' .pwEscape($uid). ' AND ftid = ' . pwEscape($result['ftid']);
+		$result = $this->_db->get_one('select ftid from pw_friendtype where name=' . S::sqlEscape($name));
+		$sql = 'SELECT username FROM pw_friends a INNER JOIN `pw_members` b ON a.friendid = b.uid WHERE status = 0 AND a.uid = ' .S::sqlEscape($uid). ' AND ftid = ' . S::sqlEscape($result['ftid']);
 		return $this->_getAllResultFromSql($sql);
 	}
 
@@ -71,7 +71,7 @@ class PW_Friend {
 	 * @return array 返回指定格式的好友列表
 	 */
 	function getFriendColonysByUid($uid) {
-		$sql = 'SELECT ftid,name  FROM pw_friendtype WHERE uid =' .pwEscape($uid);
+		$sql = 'SELECT ftid,name  FROM pw_friendtype WHERE uid =' .S::sqlEscape($uid);
 		return $this->_getAllResultFromSql($sql);
 	}
 
@@ -121,8 +121,8 @@ class PW_Friend {
 	 */
 	function getUnValidFriends($uid,$friendid = 0) {
 		$friendid && !is_array($friendid) && $friendid = array($friendid);
-		$friendSql = $friendid ? ' AND f.uid IN('.pwImplode($friendid).')':'';
-		$sql = "SELECT f.uid,m.uid AS ifu,m.username,mf.uid AS iffriend FROM pw_friends f LEFT JOIN pw_members m ON f.uid=m.uid LEFT JOIN pw_friends mf ON f.friendid=mf.uid AND f.uid=mf.friendid AND mf.status='0' WHERE f.friendid=" . pwEscape($uid) . $friendSql."  AND f.status='1'";
+		$friendSql = $friendid ? ' AND f.uid IN('.S::sqlImplode($friendid).')':'';
+		$sql = "SELECT f.uid,m.uid AS ifu,m.username,mf.uid AS iffriend FROM pw_friends f LEFT JOIN pw_members m ON f.uid=m.uid LEFT JOIN pw_friends mf ON f.friendid=mf.uid AND f.uid=mf.friendid AND mf.status='0' WHERE f.friendid=" . S::sqlEscape($uid) . $friendSql."  AND f.status='1'";
 		return  $this->_getAllResultFromSql($sql);
 	}
 	/**
@@ -159,7 +159,7 @@ class PW_Friend {
 	 */
 	function validateFriends($uid,$friendUpdate) {
 		!is_array($friendUpdate) && $friendUpdate = array($friendUpdate);
-		$friendUpdate && $this->_db->update("UPDATE pw_friends SET status='0',descrip='',joindate=" . pwEscape($this->_timestamp) . " WHERE friendid=" .pwEscape($uid) . " AND uid IN(".pwImplode($friendUpdate).")");
+		$friendUpdate && $this->_db->update("UPDATE pw_friends SET status='0',descrip='',joindate=" . S::sqlEscape($this->_timestamp) . " WHERE friendid=" .S::sqlEscape($uid) . " AND uid IN(".S::sqlImplode($friendUpdate).")");
 		return count($friendUpdate);
 	}
 	/**
@@ -171,7 +171,7 @@ class PW_Friend {
 	 */
 	function addFriends($addFriend) {
 		!is_array($addFriend) && $addFriend = array($addFriend);
-		$addFriend && $this->_db->update("REPLACE INTO pw_friends (uid,friendid,status,joindate,descrip) VALUES ".pwSqlMulti($addFriend,false));
+		$addFriend && $this->_db->update("REPLACE INTO pw_friends (uid,friendid,status,joindate,descrip) VALUES ".S::sqlMulti($addFriend,false));
 		return count($addFriend);
 	}
 	/**
@@ -183,7 +183,7 @@ class PW_Friend {
 	 */
 	function getFriendCheck($friendid) {
 		!is_array($friendid) && $friendid = array($friendid);
-		$sql = "SELECT uid,userstatus FROM pw_members WHERE uid IN ( ".pwImplode($friendid)." )";
+		$sql = "SELECT uid,userstatus FROM pw_members WHERE uid IN ( ".S::sqlImplode($friendid)." )";
 		$result = $this->_getAllResultFromSql($sql);
 		$check = array();
 		foreach($result as $key=>$value){
@@ -202,7 +202,7 @@ class PW_Friend {
 	 */
 	function deleteMeFromFriends($uid,$delData) {
 		!is_array($delData) && $delData = array($delData);
-		$delData && $this->_db->update("DELETE FROM pw_friends WHERE friendid=".pwEscape($uid)." AND uid IN(".pwImplode($delData).")");
+		$delData && $this->_db->update("DELETE FROM pw_friends WHERE friendid=".S::sqlEscape($uid)." AND uid IN(".S::sqlImplode($delData).")");
 		return count($delData);
 	}
 	/**
@@ -215,7 +215,7 @@ class PW_Friend {
 	 */
 	function deleteFriendsFromMe($uid,$delData) {
 		!is_array($delData) && $delData = array($delData);
-		$delData && $this->_db->update("DELETE FROM pw_friends WHERE uid=".pwEscape($uid)." AND friendid IN(".pwImplode($delData).")");
+		$delData && $this->_db->update("DELETE FROM pw_friends WHERE uid=".S::sqlEscape($uid)." AND friendid IN(".S::sqlImplode($delData).")");
 		return count($delData);
 	}
 	/**
@@ -258,8 +258,8 @@ class PW_Friend {
 
 	function _sendAgreeNotice($friendid,$winduid) {
 		global $db;
-		$username = $db->get_value("SELECT username FROM pw_members WHERE uid=".pwEscape($friendid));
-		$winddb = $db->get_one("SELECT username,uid FROM pw_members WHERE uid=".pwEscape($winduid));
+		$username = $db->get_value("SELECT username FROM pw_members WHERE uid=".S::sqlEscape($friendid));
+		$winddb = $db->get_one("SELECT username,uid FROM pw_members WHERE uid=".S::sqlEscape($winduid));
 		if (!$username) return false;
 
 		M::sendNotice(
@@ -346,7 +346,7 @@ class PW_Friend {
 		if(!$this->isLegalUid($uid) && !$this->isLegalUid($friendid)) {
 			return array();
 		}
-		$friend = $this->_db->get_one("SELECT * FROM pw_friends WHERE uid=" . pwEscape($uid) . " AND friendid=" . pwEscape($friendid));
+		$friend = $this->_db->get_one("SELECT * FROM pw_friends WHERE uid=" . S::sqlEscape($uid) . " AND friendid=" . S::sqlEscape($friendid));
 		return $friend;
 	}
 
@@ -396,7 +396,7 @@ class PW_Friend {
 		if(!$this->isLegalUid($uid)){
 			return false;
 		}
-		$sql = 'SELECT f.friendid,m.groupid,f.ftid FROM pw_friends f INNER JOIN pw_members m ON f.friendid = m.uid WHERE f.status = 0 AND f.uid = ' .pwEscape($uid);
+		$sql = 'SELECT f.friendid,m.groupid,f.ftid FROM pw_friends f INNER JOIN pw_members m ON f.friendid = m.uid WHERE f.status = 0 AND f.uid = ' .S::sqlEscape($uid);
 		return $this->_getAllResultFromSql($sql);
 	}
 
@@ -437,8 +437,8 @@ class PW_Friend {
 	 */
 	function countUserFriends($uid, $ftype = null) {
 		$sqlAdd = "";
-		if (!is_null($ftype)) $sqlAdd .= "AND ftid=".pwEscape($ftype);
-		$sql = "SELECT COUNT(m.uid) FROM pw_friends f LEFT JOIN pw_members m ON f.friendid=m.uid WHERE m.uid IS NOT NULL AND f.uid =".pwEscape($uid)." AND status=0 ".$sqlAdd;
+		if (!is_null($ftype)) $sqlAdd .= "AND ftid=".S::sqlEscape($ftype);
+		$sql = "SELECT COUNT(m.uid) FROM pw_friends f LEFT JOIN pw_members m ON f.friendid=m.uid WHERE m.uid IS NOT NULL AND f.uid =".S::sqlEscape($uid)." AND status=0 ".$sqlAdd;
 		return $this->_db->get_value($sql);
 	}
 
@@ -464,6 +464,65 @@ class PW_Friend {
 	}
 
 	/**
+	 * 根据生日找出好友列表服务
+	 *
+	 * @param int $uid 用户uid
+	 * @param int $nums 排序个数
+	 * @param int $page 起始数
+	 * @param int $perpage 查找个数
+	 * @return array 
+	 */
+	function findUserFriendsBirthdayInPage($uid, $nums = 3, $page = 1, $perpage = 25) {
+		global $timestamp;
+		$uid = intval($uid);
+		if (!$uid)  return null;
+		$page = intval($page);
+		$perpage = intval($perpage);
+		if ($page <= 0 || $perpage <= 0) return array();
+		$offset = ($page - 1) * $perpage;
+		$birthdayInfo = array();
+		$query = $this->_db->query("SELECT m.uid,m.username,m.bday,m.icon as face " .
+			" FROM pw_friends f" .
+			" LEFT JOIN pw_members m ON f.friendid=m.uid".
+			" WHERE DAYOFYEAR( m.bday ) - DAYOFYEAR(CURDATE()) between 0 and 2 AND f.uid=" . S::sqlEscape($uid) . " AND f.status=0 " . $sqlAdd .S::sqlLimit($offset, $perpage)
+		);
+		while ($rt = $this->_db->fetch_array($query)) {
+			$bday = get_date(PwStrtoTime($rt['bday']), 'm-d');
+			$nowday = get_date($timestamp, 'm-d');
+			if($bday >= $nowday){
+				$birthdayInfo[] = $rt;
+			}
+		}
+		return $this->getBirthdaysByFriends($birthdayInfo,$nums);
+	}
+	
+	/**
+	 * 根据好友生日排序
+	 *
+	 * @param array $birthdayInfo 用户生日信息
+	 * @param $nums 排序个数
+	 * @return array 
+	 */
+	function getBirthdaysByFriends($birthdayInfo,$nums) {
+		require_once(R_P.'require/showimg.php');
+		if (!S::isArray($birthdayInfo)) return array();
+		$birthdays = $friendBirthday = array();
+		foreach ($birthdayInfo as $value) {
+			list($value['face']) = showfacedesign($value['face'], '1', 's');
+			$birthdays[$value['uid']] = $value;
+		}
+		foreach($birthdays as $key => $val) {
+			$day = explode('-',$val['bday']);
+			$friendBirthday[$val[uid]][bday] = $day['1'] .'-'. $day['2'];
+			$friendBirthday[$val[uid]][uid] = $val['uid'];
+			$friendBirthday[$val[uid]][username] = $val['username'];  
+			$friendBirthday[$val[uid]][face] = $val['face'];     
+		} 
+   		asort($friendBirthday);
+   		return array_slice($friendBirthday,0,$nums,true);
+	}
+	
+	/**
 	 * 根据用户找出好友列表数据
 	 *
 	 * @param int $uid
@@ -473,7 +532,7 @@ class PW_Friend {
 	 */
 	function findUserFriends($uid, $page = 1, $perpage = 20, $ftype = null) {
 		$sqlAdd = "";
-		if (!is_null($ftype)) $sqlAdd .= " AND f.ftid=".pwEscape($ftype);
+		if (!is_null($ftype)) $sqlAdd .= " AND f.ftid=".S::sqlEscape($ftype);
 		$page = intval($page);
 		$perpage = intval($perpage);
 		if ($page <= 0 || $perpage <= 0) return array();
@@ -485,8 +544,8 @@ class PW_Friend {
 			" LEFT JOIN pw_attention a ON f.uid=a.uid AND f.friendid=a.friendid" .
 			" LEFT JOIN pw_members m ON f.friendid=m.uid".
 			" LEFT JOIN pw_memberdata md ON f.friendid=md.uid".
-			" WHERE m.uid IS NOT NULL AND f.uid=" . pwEscape($uid) . " AND f.status=0 " . $sqlAdd .
-			" ORDER BY f.joindate DESC ".pwLimit($offset, $perpage)
+			" WHERE m.uid IS NOT NULL AND f.uid=" . S::sqlEscape($uid) . " AND f.status=0 " . $sqlAdd .
+			" ORDER BY f.joindate DESC ".S::sqlLimit($offset, $perpage)
 		);
 		while ($rt = $this->_db->fetch_array($query)) {
 			$result[] = $rt;
@@ -549,8 +608,8 @@ class PW_Friend {
 		if(!$uid || !$touid) return false;
 		$attentionService = L::loadClass('Attention', 'friend'); /* @var $attentionService PW_Attention */
 
-		$this->_db->update("DELETE FROM pw_friends WHERE uid=" . pwEscape($uid) . " AND friendid=" . pwEscape($touid));
-		$this->_db->update("DELETE FROM pw_friends WHERE uid=" . pwEscape($touid) . " AND friendid=" . pwEscape($uid));
+		$this->_db->update("DELETE FROM pw_friends WHERE uid=" . S::sqlEscape($uid) . " AND friendid=" . S::sqlEscape($touid));
+		$this->_db->update("DELETE FROM pw_friends WHERE uid=" . S::sqlEscape($touid) . " AND friendid=" . S::sqlEscape($uid));
 
 		$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
 		$user = $userService->get($uid, false, true);

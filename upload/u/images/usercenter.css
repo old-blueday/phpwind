@@ -5,7 +5,7 @@
 #Recent:           2010-4-17
 -------------------------------------*/
 .main{background:none;border:0;margin:0 auto;}
-.sideA{width:200px;float:left;margin-right:10px;overflow:hidden;}
+.sideA{width:200px;float:left;margin-right:10px;overflow:hidden;display:inline-block;}
 .sideB{width:540px;float:left;overflow:hidden;}
 .sideC{width:200px;float:right;overflow:hidden;}
 .sideD{width:750px;float:right;}
@@ -21,7 +21,6 @@
 /* from rate.css */
 .mood{line-height:24px;}
 .mood a{text-decoration:none;}
-.mood-bg{float:left;background:#f3f9fb;}
 .mood-bg2{padding-bottom:10px;}
 .mood-bg2 table img{width:32px;}
 .mood-title a,.mood-bg ul a{text-decoration:underline;color:#3366cc;}
@@ -75,6 +74,7 @@ div.sideC .ulB .n,div.sideA .ulB .n{margin:3px 0 0 0; font-weight:700;}
 div.sideA .g_listA ul,div.sideC .g_listA ul{padding:10px 0 0 40px;}
 div.sideA .g_listA li,div.sideC .g_listA li,div.sideB .g_listA li{float:left;width:115px;height:125px;overflow:hidden;}
 div.sideB .g_listA ul{padding:13px 0 0 18px;}
+div.sideD .g_listA ul{padding:13px 0 0 18px;}
 
 /*tiezi*/
 div.sideA .ulA span,div.sideC .ulA span{display:none;}
@@ -102,7 +102,7 @@ div.sideC .colony p.titleB a,div.sideA .colony p.titleB a{font-size:12px;}
 div.sideA .spFriend p.lh_18,div.sideC .spFriend p.lh_18{width:110px;white-space:nowrap;text-overflow:ellipsis;}
 
 /*weibo*/
-div.spaceSideB .conFeed{padding-right:13px;}
+div.spaceSideB .conFeed{padding:0 10px 20px;}
 div.spaceSideB .conFeed .dl{width:auto;}
 div.spaceSideB .conFeed .dt{display:none;}
 div.spaceSideB .conFeed .dd{width:100%;}
@@ -123,7 +123,7 @@ div.sideD .conFeed .dt{display:none;}
 div.sideD .conFeed .dd .title .uname{display:none;}
 div.sideA .redlB,div.sideC .redlB{display:none;}
 
-div.sideD .conFeed{padding-right:13px;}
+div.sideD .conFeed{padding:0 10px 20px;}
 div.sideD .conFeed .dl{width:auto;}
 div.sideD .conFeed .dt{display:none;}
 div.sideD .conFeed .dd{width:100%;}

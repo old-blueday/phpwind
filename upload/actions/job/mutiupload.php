@@ -16,7 +16,7 @@ if (empty($_POST['step'])) {
 
 } else {
 	
-	InitGP(array(
+	S::gp(array(
 		'uid',
 		'verify'
 	), 'P');
@@ -31,9 +31,9 @@ if (empty($_POST['step'])) {
 	(!$rt) && Showmsg('not_login');
 	$groupid = $rt['groupid'] == '-1' ? $rt['memberid'] : $rt['groupid'];
 	if (file_exists(D_P . "data/groupdb/group_$groupid.php")) {
-		require_once Pcv(D_P . "data/groupdb/group_$groupid.php");
+		require_once pwCache::getPath(S::escapePath(D_P . "data/groupdb/group_$groupid.php"));
 	} else {
-		require_once (D_P . 'data/groupdb/group_1.php');
+		require_once pwCache::getPath(D_P . 'data/groupdb/group_1.php');
 	}
 	if ($_G['allowupload'] == 0) {
 		Showmsg('upload_group_right');

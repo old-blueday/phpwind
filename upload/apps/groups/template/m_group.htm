@@ -76,7 +76,7 @@ EOT;
 <div class="mb10">
 	<h5 class="g_hA"><span class="b f14">群公告</span></h5>
 	<div class="p15 f14 tac">
-	非成员不能浏览，<a onclick="sendmsg('apps.php?q=group&cyid=$cyid&a=join','',this.id);" id="joincolony2" href="javascript:;">申请加入</a>吧！
+	你还没有加入本群组，<a onclick="sendmsg('apps.php?q=group&cyid=$cyid&a=join','',this.id);" id="joincolony2" href="javascript:;">申请加入</a>吧！
 	</div>
 </div>
 <!--
@@ -116,7 +116,15 @@ EOT;
 </div>
 <!--
 EOT;
-if($ifadmin){print<<<EOT
+if (!$colony['ifopen'] && !$ifadmin && !$colony['ifcyer'] ){print<<<EOT
+-->
+<p class="p15 mb20 tac f14">
+你还没有加入本群组，<a onclick="sendmsg('apps.php?q=group&cyid=$cyid&a=join','',this.id);" id="joincolony2" href="javascript:;">申请加入</a>吧！
+</p>
+<!--
+EOT;
+}else
+{if($ifadmin){print<<<EOT
 -->
 <form action="apps.php?q=topicadmin" method="post" name="mawhole">
  	<input type="hidden" name="fid" value="$colony[classid]">
@@ -205,7 +213,7 @@ EOT;
 		</td>
         <td>
         	<!--a class="userCard img_25 mr10"-->
-			<a href="u.php?uid=$value[authorid]" title="$value[author]" target="_blank"><img src="{$allFaceurl[$value[author]]}" width="18" height="18" align="absmiddle" /></a><a href="u.php?uid=$value[authorid]" title="$value[author]" target="_blank">$value[sub_author]</a></td>
+			<a href="{$db_userurl}$value[authorid]" title="$value[author]" target="_blank"><img src="{$allFaceurl[$value[author]]}" width="18" height="18" align="absmiddle" /></a><a href="{$db_userurl}$value[authorid]" title="$value[author]" target="_blank">$value[sub_author]</a></td>
         <td class="tac s6">
 			<span class="s2">$value[replies]</span>&nbsp;/&nbsp;$value[hits]
 		</td>
@@ -228,7 +236,7 @@ EOT;
 	<tr><td class="p15 f14 tac">
 <!--
 EOT;
-if (!$keyword) {print <<<EOT
+if(!$keyword){print <<<EOT
 -->
     暂无话题，我来第一个<a href="{$basename}a=post&cyid=$cyid" class="line s2">发表话题</a>吧！
 <!--
@@ -243,7 +251,7 @@ EOT;
     </td></tr>
 <!--
 EOT;
-}}print <<<EOT
+}}}print <<<EOT
 -->
 </table>
 <!--
@@ -315,8 +323,20 @@ print <<<EOT
 -->
 <div class="g_navB mb10">共{$colony['writenum']}篇</span></div>
 <div class="g_contentA fl">
-	<div class="p10">
-<div class="dlA">
+	<!--
+EOT;
+if (!$colony['ifwriteopen'] && !$ifadmin && (!$colony['ifcyer'] || $colony['ifadmin'] == '-1')) {print <<<EOT
+-->
+<p class="p15 mb20 tac f14">
+你还没有加入本群组，<a onclick="sendmsg('apps.php?q=group&cyid=$cyid&a=join','',this.id);" id="joincolony2" href="javascript:;">申请加入</a>吧！
+</p>
+ <!--
+EOT;
+}else{
+print <<<EOT
+-->
+    <div class="p10">
+    <div class="dlA">
 <form method="post" action="{$basename}cyid=$cyid&ajax=1&a=writepost" onsubmit="return false;" name="FORM">
 		<table width="100%">
 			<tr class="vt">
@@ -324,7 +344,7 @@ print <<<EOT
 			<td>
             <div class="sk">
            	<div class="one"><div class="two"><div class="tree"><div class="four">
-				<div class="sktextarea"><textarea name="text" id="writetext" onfocus="if(this.value == oldvalue)this.value=''">来，说两句吧…</textarea><div class="c"></div></div>
+				<div class="sktextarea"><textarea name="text" id="writetext" onkeydown="write_quickpost(event)" onfocus="if(this.value == oldvalue)this.value=''">来，说两句吧…</textarea><div class="c"></div></div>
                 <div class="sk_open">
                     <span id="writebutton" class="btn3 fr"><span><button class="button" type="submit" onclick="submitwrite(document.forms['FORM'])" id="write_button">发表</button></span></span>
 <!--
@@ -386,6 +406,7 @@ getObj('showSmile').onclick = function(e) {
 }
 applySmile(function(codeText) {
 	insertContentToTextArea(getObj('writetext'), codeText);
+	checkTextNum('writetext','writetext_warn',255,true);
 });
 </script>
 	<div id="writebox" class="mb10">
@@ -405,7 +426,7 @@ if($value[icon]){print <<<EOT
 -->
 
 
-		<dt class="dt"><a href="u.php?uid=$value[uid]" target="_blank" class="userCard img_50"  id="card_write_{$i}_{$value[uid]}"><img src="$value[icon]" width="44" height="44" /></a><span id="write_{$i}" style="height:1px" class="fr"></span></dt>
+		<dt class="dt"><a href="{$db_userurl}$value[uid]" target="_blank" class="userCard img_50"  id="card_write_{$i}_{$value[uid]}"><img src="$value[icon]" width="44" height="44" /></a><span id="write_{$i}" style="height:1px" class="fr"></span></dt>
 		<dd class="dd">
 <!--
 EOT;
@@ -417,7 +438,7 @@ if ($ifadmin || $value['uid'] == $winduid) {print <<<EOT
 EOT;
 }print <<<EOT
 -->
-		<p class="f14 mb15"><a href="u.php?uid=$value[uid]" target="_blank" class="mr5">$value[username]</a>：$value[content]</p>
+		<p class="f14 mb15"><a href="{$db_userurl}$value[uid]" target="_blank" class="mr5">$value[username]</a>：$value[content]</p>
 		<p class="gray mb10"><span class="mr5">{$value[postdate]}</span><!--通过{$db_blogsource[$value[source]]}--><span id="com_write_$value[id]"><a href="javascript:;" id='a_write_{$value[id]}' onclick="PW_Comment.showCommList('groupwrite','$value[id]',this);return false;">回复({$value[c_num]})</a></span>
         </p>
 		<div id="combox_groupwrite_{$value[id]}">
@@ -514,6 +535,10 @@ window.onReady(delload);
 </script>
     </div>
     </div>
+<!--
+EOT;
+}print <<<EOT
+-->
 </div>
 <div class="g_sidebarA fr">
 <!--
@@ -530,14 +555,14 @@ EOT;
 -->
 <div class="cc p10 mt30">
         <div class="g_contentC fl">
-            <div class="f14 b mb10">方法一：给好友发送 Email 邀请</div>
+            <div class="f14 b mb10">方法一：给好友发送电子邮件邀请</div>
             <form action="" method="post" id="inviteForm">
 			<input type="hidden" name="step" value="1">
 			<input type="hidden" name="type" value="$type">
 			<input type="hidden" name="cyid" value="$cyid">
 			<input type="hidden" name="id" value="$id">
-            <p class="mb5">好友的 Email</p>
-            <p class="mb5"><textarea name="emails" id="emails" class="textareaA" onclick="grayChange(this)" >多个 Email 用逗号 (,) 或者换行分隔</textarea></p>
+            <p class="mb5">好友的电子邮箱</p>
+            <p class="mb5"><textarea name="emails" id="emails" class="textareaA" onclick="grayChange(this)" >多个电子邮箱用逗号 (,) 或者换行分隔</textarea></p>
             <p id="emails_warning" class="maxlength-hint wrongTip" style="display: none;"></p>
             <div class="c mb20">&nbsp;</div>
             <p class="mb5">邀请附言</p>
@@ -560,14 +585,15 @@ function grayChange(obj) {
 	if (obj.className == 'gray') {
 		obj.className = '';
 	}
-	if (obj.value =='多个 Email 用逗号 (,) 或者换行分隔') {
+	if (obj.value =='多个电子邮箱用逗号 (,) 或者换行分隔') {
 		obj.value = '';
 	}
 }
 function copyUrl2(o) {
 	if (is_ie) {
-		window.clipboardData.setData("Text",o);
-		showDialog('success','已成功复制',1);
+		if(window.clipboardData.setData("Text",o)){
+			showDialog('success','已成功复制',1);
+		}
 	} else {
 		prompt('按下 Ctrl+C 复制到剪贴板', o)
 	}
@@ -745,24 +771,24 @@ foreach ($readdb as $key => $read) {print <<<EOT
             <td rowspan="2" class="floot_left">
                 <div class="p10">
 					<p class="gName mb5 cc">
-                    <a href="u.php?uid=$read[authorid]" class="fl" target="_blank">$read[author]</a>
+                    <a href="{$db_userurl}$read[authorid]" class="fl" target="_blank">$read[author]</a>
 <!--
 EOT;
 if($db_showonline){
 if(checkOnline($read['thisvisit'])){print <<<EOT
 -->
-					<span class="card-online" title="在线">在线</span>
+					<img src="images/online.png" title="在线" />
 <!--
 EOT;
 }else{print <<<EOT
 -->
-					<span class="card-offline" title="离线">离线</span>
+					<img src="images/stealth.png" title="离线" />
 <!--
 EOT;
 }}print <<<EOT
 -->
 					</p>
-                    <p class="mb10"><a href="u.php?uid=$read[authorid]" class="gFace" target="_blank"><img src="$read[icon]" width="120" height="120" /></a></p>
+                <p class="mb5"><a href="{$db_userurl}$read[authorid]" class="gFace" target="_blank"><img src="$read[icon]" width="120" height="120" /></a></p>
                 </div>
             </td>
             <td class="floot_right">
@@ -815,7 +841,20 @@ EOT;
 }print <<<EOT
 -->
                 </div>
-                <div class="p15">
+<style type="text/css">
+.tp_img img{max-width:700px;}
+</style>
+                <div class="p15 tp_img" style="overflow:hidden;">
+<!--
+EOT;
+if ($read[subject]) {print <<<EOT
+-->
+                    <h1 class="mb10" id="subject_{$read[pid]}">{$read[subject]}</h1>
+<!--
+EOT;
+}print <<<EOT
+-->
+                    <div class="tp_content" id="read_{$read[pid]}">$read[content]</div>
 <!--
 EOT;
 if($read['pic']){
@@ -847,16 +886,6 @@ EOT;
 EOT;
 }}}print <<<EOT
 -->
-<!--
-EOT;
-if ($read[subject]) {print <<<EOT
--->
-                    <h1 class="mb10" id="subject_{$read[pid]}">{$read[subject]}</h1>
-<!--
-EOT;
-}print <<<EOT
--->
-                    <div class="tp_content" id="read_{$read[pid]}">$read[content]</div>
 <!--
 EOT;
 if($read['aid'] && $read['ifhide']>0){print <<<EOT
@@ -896,7 +925,7 @@ if($attach['desc']){print <<<EOT
 EOT;
 }$att_id = $db_attfg ? "id=\"fg_$attach[aid]\"" : '';print <<<EOT
 -->
-						附件: <img src="$imgpath/$stylepath/file/$attach[type].gif" align="absmiddle" /> <a $att_id href="job.php?action=download&aid=$attach[aid]" target="_blank"> <font color="red">$attach[name]</font></a> ($attach[size] K) 下载次数:$attach[hits]
+						附件: <img src="$imgpath/$stylepath/file/$attach[type].gif" align="absmiddle" /> <a $att_id href="job.php?action=download&aid=$attach[aid]" onclick="return ajaxurl(this, '&check=1')"> <font color="red">$attach[name]</font></a> ($attach[size] K) 下载次数:$attach[hits]
 <!--
 EOT;
 if ($attach['needrvrc']) {
@@ -1070,10 +1099,13 @@ EOT;
 .wy_tips:hover i{display:block; position:absolute;border:1px solid #f8ad48;background:#fffeed;padding:2px 5px;color:#333;font-style:normal;line-height:130%;word-break:keep-all;word-wrap:no-wrap;}
 .w_editor_up .w_tab_a .current a{background:#fff;border-bottom:none;color:#333;padding-bottom:1px;}
 .w_editor_up_con{background-color:#ffffff;padding:10px;border-top:1px solid #ddd;}
+/*链接按钮*/
+.bta{cursor:pointer;color:#333333;padding:0 8px;margin:0 3px;white-space:nowrap;border:1px solid #d5e6ed;line-height:22px;background:#ffffff;}
+.bta:hover{border:1px solid #a6cbe7;text-decoration:none;}
 </style>
 <script language="JavaScript" src="js/swfobject.js"></script>
 <div class="r_content">
-  <div class="mt10">
+  <div>
     <div class="c"></div>
     <div class="g_navB mb10">
       <h5><a href="apps.php?q=group&a=thread&cyid=$cyid" class="fr">返回{$groupRight[modeset][thread][title]}列表</a>发表新话题</h5>
@@ -1097,6 +1129,7 @@ var allow_ext = '$uploadfiletype';
 var allow_size = '$uploadfilesize';
 var attachnum = parseInt('$db_attachnum');
 </script>
+<script type="text/javascript" language="JavaScript" src="js/swfobject.js"></script>
 <script type="text/javascript" language="JavaScript" src="js/upload.js"></script>
 <script>
 var icontab=0;
@@ -1137,6 +1170,8 @@ print <<<EOT
 			<input type="hidden" name="article" value="$article" />
 			<input type="hidden" name="verify" value="$verifyhash" />
 			<input type="hidden" value="1" name="atc_convert" />
+			<input type="hidden" name="ajax" value="1" />
+			<input type="hidden" name="iscontinue" value="0" />
             <span class="fr"><a onclick="loadData('msg');" href="javascript:">恢复数据</a>┊<a id="newdraft" onclick="opendraft(this.id);" href="javascript:">草稿箱</a></span>
             <div class="w_title_ip mr10"><input type="text" name="atc_title" id="atc_title" value="$atc_title" size="60" title="请输入标题" />
 			</div><span id="atc_title_warn" class="gray mt10">限 {$db_titlemax} 字节</span>
@@ -1163,8 +1198,8 @@ if ($isGM || $db_allowupload && $_G['allowupload']) {print <<<EOT
                     <div style="height:23px;">
                     <div style="line-height:18px;padding:5px 0 0 10px;*padding:3px 0 0 10px;" class="fr"></div>
                     <ul class="w_tab_a cc">
-                        <li class="current" id="formUploadBtn"><a href="javascript:;" hidefocus="true">普通上传</a></li>
-                        <li id="batUploadBtn"><a href="javascript:;" hidefocus="true">批量上传</a></li>
+                        <li class="current" id="formUploadBtn"><a onclick="return false;"  href="javascript:;" hidefocus="true">普通上传</a></li>
+                        <li id="batUploadBtn"><a onclick="return false;" href="javascript:;" hidefocus="true">批量上传</a></li>
 <!--
 EOT;
 if ($mutiupload > 0) {print <<<EOT
@@ -1201,9 +1236,9 @@ EOT;
 if($attach){print <<<EOT
 -->
 						<div class="cc">该帖包含附件<span class="gray">(不想保留的附件去掉√)</span> :
-							<table class="tr_p10">
+							<table class="tr_p10" style="table-layout:fixed">
 								<tr class="gray">
-									<td width="11"></td>
+									<td width="20"></td>
 									<td width="186">附件</td>
 									<td width="180">描述</td>
 									<td style="display:none;" width="65">售/密</td>
@@ -1229,7 +1264,7 @@ EOT;
                     </tr>
                     <tbody id="qlist"></tbody>
                 </table>
-                <table class="tr_p10">
+                <table class="tr_p10" style="table-layout:fixed">
                     <tr valign="top" id="formUpload" class="gray">
                         <td width="200">上传附件 (图片、文件等)</td>
                         <td width="180">描述</td>
@@ -1266,7 +1301,7 @@ print <<<EOT
             <div class="cc mb10">
                 <script type="text/javascript" language="JavaScript" src="js/pw_tags.js"></script>
                 <div><input id="atc_tags" class="input gray fl mr5" name="atc_tags" size="40" value="$tags" tabindex="3" autocomplete="off" onfocus="tag.init();document.getElementById('atc_tags').value='';" /><span class="bt2 fl"><span><button type="button" onclick="tag.get()">自动获取标签</button></span></span>
-                <a href="javascript:;" class="wy_tips" style="padding-right:14px;margin:3px 0 0 10px;">&nbsp;什么是标签<i style="width:200px;">标签是您给您的文章指定的关键字，设置适当的标签能便于他人快速的找到您的文章</i></a></div>
+                <a onclick="return false;" href="javascript:;" class="wy_tips" style="padding-right:14px;margin:3px 0 0 10px;">&nbsp;什么是标签<i style="width:200px;">标签是您给您的文章指定的关键字，设置适当的标签能便于他人快速的找到您的文章，最多可填写5个，每个3-15字节</i></a></div>
                 <div class="c"></div>
                 <fieldset id="tagmenu" style="border:1px solid #ccc;width:500px;padding:3px;margin:2px 0;display:none;"><legend>热门标签</legend><div style="height:80px;overflow-Y:auto;"></div></fieldset>
             </div>
@@ -1277,15 +1312,34 @@ EOT;
             <div class="cc mb10">
 <!--
 EOT;
-if($o_groups_p_gdcheck){print <<<EOT
+if($o_groups_p_gdcheck){
+$gdSize = explode("\t",$db_gdsize);
+print <<<EOT
 -->
-<input class="input mr10" type="text" name="gdcode" size="8" tabindex="2" onfocus="try{opencode('menu_gd',this)}catch(e){}" /><span id="ckcode" class="cp" onclick="this.previousSibling.focus();">点击刷新验证码</span><div class="menu" id="menu_gd" style="visibility:hidden;"><img src="ck.php?" align="absmiddle" style="cursor:pointer;" id="ckcode" alt="看不清楚，换一张" /></div>
+<input class="input mr10" type="text" name="gdcode" size="8" tabindex="2" onfocus="showgd();" />
+<span class="cp" onclick="showgd();">点击刷新验证码</span>
+<div id="ckcode" style="display:none">
+<script type="text/javascript" src="js/pw_authcode.js"></script>
+<script>
+var flashWidth = "$gdSize[0]";
+var flashHeight = "$gdSize[1]";
+var gdtype = $db_gdtype;
+showGdCode();
+</script>
+</div>
 <!--
 EOT;
-}if($o_groups_p_qcheck){
-$qkey = array_rand($db_question);print <<<EOT
+}if($db_question && $o_groups_p_qcheck){
+$qkey = array_rand($db_question);
+if($db_imagequestion){
+	$question = sprintf('<img src="ckquestion.php?q=%s">',$qkey);
+}else{
+	$question = $qkey<0 ? getMachineQuestion_1() :  $db_question[$qkey];
+}
+$q_a = $question.($showq && $qkey>0?" 正确答案:".$db_answer[$qkey] : '');
+print <<<EOT
 -->
-验证问题:{$db_question[$qkey]} &nbsp;答案:{$db_answer[$qkey]}&nbsp;&nbsp;<input class="input" type="text" name="qanswer" />
+验证问题:{$q_a}&nbsp;&nbsp;<input class="input" type="text" name="qanswer" />
 <input type="hidden" name="qkey" value="$qkey" />
 <!--
 EOT;
@@ -1302,6 +1356,7 @@ EOT;
                 <span class="bt"><span><button type="button" onclick="savedraft()">存为草稿</button></span></span>
             </div>
             <div class="c"></div>
+			<div id="divload"></div>
 			</form>
 		</div>
 </div>
@@ -1354,35 +1409,72 @@ var cnt  = 0;
 document.FORM.Submit.disabled = false;
 function checkpost(obj) {
 	if (obj.atc_title.value == "") {
-		showDialog("error","标题不能为空",2);
+		showDialog("error","话题<span class='warnFontStyle'>标题</span>不能为空",2);
 		obj.atc_title.focus();
 		return false;
 	} else if (strlen(obj.atc_title.value) > $db_titlemax) {
-		showDialog("error","标题超过最大长度 $db_titlemax 个字节",2);
+		showDialog("error","话题<span class='warnFontStyle'>标题</span>不能大于 <span class='warnFontStyle'>$db_titlemax </span>个字节",2);
 		obj.atc_title.focus();
 		return false;
 	}
 	if (strlen(obj.atc_content.value) < $db_postmin) {
-		showDialog("error","文章内容少于 $db_postmin 个字节",2);
+		showDialog("error","话题<span class='warnFontStyle'>内容</span>不能少于 <span class='warnFontStyle'>$db_postmin </span>个字节",2);
 		editor.focusEditor();
 		return false;
 	} else if (strlen(obj.atc_content.value) > $db_postmax) {
-		showDialog("error","文章内容大于 $db_postmax 个字节",2);
+		showDialog("error","话题<span class='warnFontStyle'>内容</span>不能大于 $db_postmax 个字节",2);
 		editor.focusEditor();
 		return false;
 	}
 	if (IsElement('atc_tags') && obj.atc_tags.value == '标签之间空格隔开，最多可填写5个') {
 		obj.atc_tags.value='';
 	}
+
+	SubmitAjax(obj);
+	return false;
+}
+
+//ajax提交数据 
+function SubmitAjax(obj) {
 	document.FORM.Submit.disabled = true;
+	getObj('divload').innerHTML = showLoading();
 	cnt++;
-
-	if (cnt != 1) {
-		showDialog("warning","Submission Processing. Please Wait");
+	ajax.send("{$basename}a=$a&cyid=$cyid", obj, function(){
+		if(undefined == ajax.request.responseText){
+			showDialog({
+				type: 'error',
+				message: '请求超时!'
+			});
+			document.FORM.Submit.disabled = false;
+			getObj('divload').innerHTML = "";
+			return false;
+		}
+		var rText = ajax.request.responseText.split('\t');
+		if (rText[0] == 'success') {
+			window.onbeforeunload = function(){};
+			window.location =  rText[1];
+	    }else if(rText[0] == 'continue'){ //敏感词
+			 showDialog({type:'confirm',message:rText[1],okText:'继续',onOk:function(){
+				obj.iscontinue.value = 1;
+				SubmitAjax(obj);
+			 }});
+		} else {
+			showDialog('error', rText[0]);
+		}
+		cnt = 0;
+		document.FORM.Submit.disabled = false;
+		getObj('divload').innerHTML = "";
 		return false;
+	});
+}
+function showLoading(){
+	return "<div id=\"loading\" style=\"padding:20px;width:80%;text-align:center\"><img src=\""+imgpath+"/loading.gif\" align=\"absbottom\" alt=\"loading\" /> 正在加载数据...</div>";
+}
+window.onbeforeunload = function() {
+	var obj = document.FORM;
+	if (obj.atc_title.value !=='' || obj.atc_content.value !=='' ||  obj.attachment_1.value !==''){
+		return "你正在编辑的话题没有保存，离开会导致内容丢失，是否确定离开?";
 	}
-
-	return true;
 }
 initCheckTextNum('atc_title','atc_title_warn','$db_titlemax');
 </script>
@@ -1429,8 +1521,16 @@ EOT;
 		<span class="mr20">共{$total}名成员</span>
 	</div>
 	<div class="g_contentA fl">
+ <!--
+EOT;
+if (!$colony['ifmemberopen'] && !$ifadmin && (!$colony['ifcyer'] || $colony['ifadmin'] == '-1')) {print <<<EOT
+-->
+<p class="p15 mb20 tac f14">
+你还没有加入本群组，<a onclick="sendmsg('apps.php?q=group&cyid=$cyid&a=join','',this.id);" id="joincolony2" href="javascript:;">申请加入</a>吧！
+</p>
 <!--
 EOT;
+}
 if(empty($memdb)) {print<<<EOT
 -->
 		<p class="p15 mb20 tac f14">{$lang_no_member[$group]}</p>
@@ -1466,11 +1566,11 @@ EOT;
 }print <<<EOT
 -->
                     <td width="70">
-                        <a href="u.php?uid=$value[uid]" target="_blank" class="img_50"><img src="$value[icon]" width="48" height="48" /></a>
+                        <a href="{$db_userurl}$value[uid]" target="_blank" class="img_50"><img src="$value[icon]" width="48" height="48" /></a>
                     </td>
                     <td>
                         <p class="mb5 cc">
-								<a href="u.php?uid=$value[uid]" target="_blank" class="b f14 mr5 fl">
+								<a href="{$db_userurl}$value[uid]" target="_blank" class="b f14 mr5 fl">
 								$value[username]
 <!--
 EOT;
@@ -1623,7 +1723,7 @@ foreach ($memdb as $key => $value) {
 $visittime = get_date($value[lastvisit], 'm月d日');
 print <<<EOT
 -->
-				<li><a href="u.php?uid=$value[uid]" class="i" target="_blank" title="$value[username]"><img src="{$value[icon]}" height="44" width="44" /></a><p class="n"><a href="u.php?uid=$value[uid]" title="$value[username]" target="_blank">$value[username]</a></p><p class="t">$visittime</p></li>
+				<li><a href="{$db_userurl}$value[uid]" class="i" target="_blank" title="$value[username]"><img src="{$value[icon]}" height="44" width="44" /></a><p class="n"><a href="{$db_userurl}$value[uid]" title="$value[username]" target="_blank">$value[username]</a></p><p class="t">$visittime</p></li>
 <!--
 EOT;
 }print<<<EOT
@@ -1686,7 +1786,7 @@ EOT;
 							<td><input type="text" class="input" name="tel" value="$uinfo[tel]" /></td>
 					</tr>
 					<tr>
-							<td>邮箱</td>
+							<td>电子邮箱</td>
 							<td><input type="text" class="input" name="email" value="$uinfo[email]" /></td>
 					</tr>
 					<tr>
@@ -2014,14 +2114,14 @@ EOT;
             </td>
         </tr>
         <tr>
-            <th class="th">话题浏览权限</th>
+            <th class="th">{$groupRight['modeset']['thread']['title']}浏览权限</th>
             <td class="td">
                 <label for="ifopen1" class="mr20"><input name="ifopen" id="ifopen1" type="radio" value="1" $ifopen_Y /> 任何人</label>
                 <label for="ifopen0"><input name="ifopen" id="ifopen0" type="radio" value="0" $ifopen_N /> 仅群组成员</label>
             </td>
         </tr>
         <tr>
-            <th class="th">记录浏览权限</th>
+            <th class="th">{$groupRight['modeset']['write']['title']}浏览权限</th>
             <td class="td">
                 <label for="ifwriteopen1" class="mr20"><input id="ifwriteopen1" name="ifwriteopen" type="radio" value="1" $ifwriteopen_Y /> 任何人</label>
                 <label for="ifwriteopen0"><input id="ifwriteopen0" name="ifwriteopen" type="radio" value="0" $ifwriteopen_N /> 仅群组成员</label>
@@ -2129,7 +2229,7 @@ foreach ($groupManager as $key => $value) {print <<<EOT
 			<tr>
 				<td width="45px"><input name="newmanager" type="radio" value="{$value['uid']}" /></td>
 				<td class="p10" width="70"><a href="javascript:;" class="img_50"><img src="$value[faceurl]" width="48" height="48" /></a></td>
-				<td width="215px"><a href="u.php?uid=$value[uid]" target="_blank">$value[username]</a><p class="s2">管理员</p></td>
+				<td width="215px"><a href="{$db_userurl}$value[uid]" target="_blank">$value[username]</a><p class="s2">管理员</p></td>
 				<!--td  width="210px" class="s6">最后发言：2010-12-12</td-->
 				<td><p><a href="pw_ajax.php?action=msg&touid=$value[uid]" onclick="return ajaxurl(this);">发送短信</a></p><p><a href="pw_ajax.php?action=addfriend&touid=$value[uid]" onclick="return ajaxurl(this);">加为好友</a></p>
               </td>

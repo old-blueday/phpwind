@@ -1,0 +1,321 @@
+<!--<?php
+//注意事项：
+//1，变量开头名必须为$uskin 主要是防止与系统的变量起冲突
+//2，其中直接写图片名称的变量，路径都对应风格包images文件夹里的同名文件
+
+//风格logo
+$uskin_logo = 'logo.png';
+
+//全局背景
+$uskin_bg = '#151515';						//背景颜色
+$uskin_bgimg = 'head_bg.jpg'; 		//全局背景图片
+$uskin_headimg = '';	//头部背景图片
+$uskin_boxA = '#000000';					//全局内容背景颜色
+$uskin_bgA = '#222222';						//激活状态的标签背景等
+$uskin_bgB = '#ffffe3';						//提示，警告类背景
+$uskin_bgC = '#f9f9f9';						//灰色背景块
+$uskin_bgD = '#222222';						//浅蓝色背景块
+
+//全局线条
+$uskin_bdA = '#222222';						//全局线条颜色A  灰色
+$uskin_bdB = '#333333';						//全局线条颜色B  蓝色
+$uskin_bdC = '#fae3b9';						//提示类边框
+$uskin_bdD = '#222222';						//虚线条颜色
+
+//全局文字
+$uskin_linkA = '#cccccc';					//文字链接颜色
+$uskin_linkB = '#8d8c9c';					//次要文字链接颜色
+$uskin_textA = '#333333';					//重要文字
+$uskin_textB = '#666666';					//默认文字
+$uskin_textC = '#666666';					//次要文字
+$uskin_textD = '#ff5500';					//全局橙色
+$uskin_textE = '#999999';					//新鲜事标题
+
+//我的空间 小模块
+$uskin_headTitle = '#d61515';			//我的空间 空间名称
+$uskin_boxbd = '#333333';					//小模块边框
+$uskin_boxhead = '#333333';				//小模块标题栏背景
+$uskin_boxheadbd = '#333333';			//小模块标题栏下划线
+$uskin_boxheadText = '#666666';		//小模块标题文字颜色
+$uskin_boxlinkA = '#adadad';			//小模块标题链接颜色
+$uskin_boxlinkB = '#6fb0d6';					//小模块次要文字链接颜色
+
+//个人中心首页
+$uskin_homeSk = 'textarea.png';		//新鲜事模块输入框背景
+$uskin_homeBtn = 'pub.png';				//新鲜事模块按钮
+$uskin_homeBtntext = '#ffffff';		//新鲜事模块按钮文字颜色
+$uskin_homeTip = '#444444';				//新鲜事模块字数限制文字颜色
+$uskin_homeSide = 'homebg.png';		//侧栏背景图片
+
+//设置，消息左侧栏背景
+$uskin_appBg = 'menubar.png';			//宽度为160px
+$uskin_appBgcur = 'navBcur.png';	//菜单激活状态时的背景
+
+print<<<EOT
+--><style type="text/css">
+/*body bg*/
+html{background-color:$uskin_bg;}
+body{color:$uskin_textB;font:12px Tahoma,Arial;}
+.warp{background:url(u/themes/$uskin/images/$uskin_bgimg) center 0 repeat-x;min-height:600px;}
+
+/*link*/
+a{color:$uskin_linkA; text-decoration:none;}
+a:hover,.line{ text-decoration:underline;}
+.s7{color:$uskin_linkB;}
+.s7:hover{color:$uskin_linkA;}
+/*head bg*/
+.header{/*background:url(u/themes/$uskin/images/$uskin_headimg) center top no-repeat;*/}
+
+/*space banner*/
+.spBan h2{color:$uskin_headTitle; font-weight:700;}
+.spBan p,h4.site span{color:$uskin_linkA;}
+
+/*main bg*/
+	.contUser{background:$uskin_boxA;}/*right -> content*/
+	
+/*menu app*/
+.menuApp{margin-top:35px;}
+
+/*foot*/
+.foot{color:$uskin_textC;}
+.foot a{color:$uskin_textB;}
+
+/*nav*/
+.navA{background:url(u/themes/$uskin/images/nv.png) 0 0 no-repeat;}
+.navA ul{ background:none;width:360px;}
+.navA li a{color:$uskin_linkA;font-size:14px;}
+.navA li a:hover{text-decoration:none;color:#fff;}
+.navA li.current a{background:none;}
+	/*left menubar list*/
+		.navB .one a{font-size:14px;color:$uskin_linkA;}
+		.navB a:hover{ text-decoration:none;}
+		.navB li em{color:#ff0000; font-style:normal;}
+		.navB .current a{color:$uskin_linkA;font-weight:700;}
+		.navB .current{background:url(u/themes/$uskin/images/$uskin_appBgcur) 10px 0 no-repeat;}
+		
+/*app nav*/
+.appNav_top{ background:url(u/themes/$uskin/images/appNav_top.png) no-repeat;}
+.appNav{ background:url(u/themes/$uskin/images/appNav.png) no-repeat;color:$uskin_textA;}
+.appNav ul{background:url(u/themes/$uskin/images/appNav_ul.png) left bottom no-repeat;}
+.appNav_bottom{ background:url(u/themes/$uskin/images/appNav_bottom.png) no-repeat;}
+.appNav a{color:#888888;}
+.appNav li.current{background:url(u/themes/$uskin/images/appNav_cur.png) right center no-repeat; font-weight:700;}
+
+	/*content nav one*/
+.navC{border-bottom:1px solid $uskin_bdB;}
+		.navC li{border-left:1px solid $uskin_bdB;border-right:1px solid $uskin_bdB;}
+			.navC li a{border-top:1px solid $uskin_bdB;background:$uskin_bgA;color:#676568;}
+			.navC li a:hover{background:$uskin_boxA;text-decoration:none;}
+			.navC .current,.navC li:hover{border-left:1px solid $uskin_bdB;border-right:1px solid $uskin_bdB;}
+			.navC li:hover a{border-top:1px solid $uskin_bdB;}
+			.navC .current a,.navC .current a:hover{background:$uskin_boxA;border-bottom:1px solid $uskin_boxA;color:$uskin_linkA;border-top:1px solid $uskin_bdB;}
+			.navC .current a{ font-weight:700;}
+		
+/*nav bottom tips*/
+	.tips input{color:#7eb0d3;}
+	
+/*box*/
+.boxA,.boxB{border:1px solid $uskin_boxbd;background:$uskin_boxA;}
+	.boxA h2,.boxB h2{background:$uskin_boxhead;border-bottom:1px solid $uskin_boxheadbd;color:$uskin_boxheadText;}
+	
+	.boxA h2 a{color:$uskin_boxlinkA;}
+.boxC{border:1px solid $uskin_bdB;}
+	.boxC h3{font-weight:700;color:$uskin_textA;}
+
+/*home info*/
+.userInfo{background:url(u/themes/$uskin/images/userInfo.jpg) 0 top no-repeat;}
+.weiboBg .userInfo{background:none;}
+		.userInfoweek .button{background:url(u/themes/$uskin/images/$uskin_homeBtn) no-repeat;color:$uskin_homeBtntext;text-shadow: 1px 1px 0 #2d6dbf;}
+		.userInfoweek .button:hover{ background-position:0 -28px;}
+		.homeSk_input{background:url(u/themes/$uskin/images/homeSk_input.png) no-repeat;}
+	.limit{color:$uskin_homeTip;}
+	.homeSk{background:url(u/themes/$uskin/images/$uskin_homeSk) no-repeat;}
+	.homeSk textarea{background:none;}
+	.sk_show,.sk_img,.sk_link{color:#666;}
+
+/*border*/
+.bdA{border-bottom:1px solid $uskin_bdA;}
+.bdB{border-bottom:1px dotted $uskin_bdA;}
+/*bg*/
+.bgA{background:$uskin_bgA;}
+.bgB{background:$uskin_boxA;}
+/*title*/
+h1{font-size:14px;font-weight:700;color:$uskin_textA;line-height:1.5;padding-top:2px;}
+.h5{border-bottom:1px solid $uskin_bdB;}
+	.h5 li a{color:$uskin_textB;}
+	.h5 .tab a{}
+	.h5 .tab a:hover{ text-decoration:none;background:$uskin_bgA;}
+	.h5 .tab .current a{border:1px solid $uskin_bdB;border-bottom:0;background:$uskin_boxA;}
+/*list*/
+.ulA li:hover,.ulA li.current{background:$uskin_bgA;}
+.ulA em{font-size:11px;}
+.ulE li a{color:$uskin_textB;}
+.ulE li.current,.ulE li:hover{background:$uskin_bgA;}
+.ulE li.current a{color:$uskin_linkA;}
+/*replay dl*/
+.redlA dl{background:$uskin_bgA;}
+.redlA .replyip{border:1px solid #c9ddec;background:#fff;color:$uskin_textA;}
+/*share*/
+.shareA{background:$uskin_boxA;border:1px solid $uskin_bdA;}
+.shareA span{border-left:1px solid $uskin_bdA;background:$uskin_bgA;}
+.shareA:hover{border:1px solid $uskin_linkA;background:$uskin_linkB;text-decoration:none;color:$uskin_boxA;}
+.shareA:hover span{border-left:1px solid $uskin_linkA;background:$uskin_linkB;}
+/*table*/
+.tr2 td{border-top:1px solid $uskin_bdA;border-bottom:1px dotted $uskin_bdA;}
+.tr2 td em{color:$uskin_textD;}
+.tr3 td{border-bottom:1px dotted $uskin_bdA;}
+.tr3 .s5{color:#999;}
+.tr3 .name em{color:$uskin_textC;}
+.tr3 .name{color:$uskin_textA;}
+.tr3 .value{color:$uskin_textC;}
+.tr3 .value .b a{color:$uskin_textA;}
+.z .tr5:hover td{background:$uskin_bgA;}
+.z2 .tr3:hover td{background:#fffaee;}
+.tr6 th{background:$uskin_bgA;}
+.tr6 td,.tr6 th{border-bottom:1px solid $uskin_bdB;color:$uskin_textB;}
+.user-tr:hover{background:$uskin_bgA;}
+/*jobcenter*/
+.tasks_text .one{background:$uskin_bgA;}
+/*mail add*/
+.mailFri dl{background:$uskin_bgA;}
+.mailFri .current dl{border:1px solid $uskin_bdC;background:$uskin_bgB;}
+/*search*/
+.search{border:1px solid #eaeceb;background:#fff;}
+.search .sip{background:#fff;}
+.search ul{border:1px solid $uskin_bdA;background:#fff;}
+.search ul li:hover,.search ul li.current{background:#ccc;}
+.search button{background:#fff url(u/images/search.png) 2px 2px no-repeat;}
+.spaceTip{background:$uskin_bgB;border:1px solid $uskin_bdC;}
+.spaceTip a{color:$uskin_linkA;}
+/*user list*/
+.dlA .dl{border-top:1px dotted $uskin_bdD;}
+.dlA .dl2{background:$uskin_bgA;}
+.dlA .dl2 dt img{border:1px solid $uskin_bdA;background:$uskin_boxA;}
+.dlB .dl{border-bottom:1px dotted $uskin_bdD;}
+.dlB .dd p,.dlB .dd2 p{color:$uskin_textA;}
+.dlE dl{border-bottom:1px solid $uskin_bdA;}
+.dynamic .dd,.dynamic .dd2{border-bottom:1px dotted $uskin_bdA;}
+.feedImg img{border:1px solid $uskin_bdA;}
+.feedImgB{border:1px solid $uskin_bdD;background:$uskin_bgC;color:$uskin_textC;}
+.feedImgB a{color:$uskin_linkB;}
+/*infoBox*/
+.ulInfoA li{border-left:1px solid $uskin_textA;}
+.ulInfoA li em{font-size:14px; font-weight:700; font-family:Tahoma, Geneva, sans-serif}
+.ulInfoA li a{color:$uskin_textB;}
+.ulInfoA li a em{color:$uskin_linkA;}
+.infoBox .s5{color:$uskin_linkA;}
+/*jobcenter*/
+.user-tr td,.user-tr3 td{border-top:1px dotted $uskin_bdA;}
+.user-tr img{border:1px solid $uskin_bdA;}
+.text_open{ font-size:14px;color:$uskin_textA;font-weight:700;}
+.text_open:hover{text-decoration:none;color:$uskin_linkA;}
+.current .text_open{text-decoration:none;color:$uskin_linkA;}
+.tasks_face_list li img{border:1px solid $uskin_bdA;}
+.tasks_text_tr td{border-top:0;}
+/*app groups list*/
+.dlC .dd .titleB{border-bottom:1px dotted $uskin_bdD;}
+.dlC .dd2 p.titleB{color:$uskin_textA;}
+/*hot*/
+.w300 h2{ font-size:14px;color:$uskin_textD; font-weight:700;}
+.w300-box{border:1px solid $uskin_bdA;}
+.w-390 .tr3:hover td{background:$uskin_bgA;}
+.today-user a{color:$uskin_textA;}
+.img-list-a .current dd{ font-size:14px;color:$uskin_textD; font-weight:700;}
+.img-list-a dl{border-bottom:1px solid $uskin_bdA;}
+.img-list-b li .aimg{background:$uskin_boxA;border:1px solid $uskin_bdA;}
+/*ap photo*/
+.g_listA li .aimg,.galbum_photo .g_listA li .aimg{background:$uskin_boxA;border:1px solid $uskin_bdB;}
+.g_listAC li.current div.aimg,.galbum_photo .g_listA li.current .aimg{border:1px solid $uskin_bdC;background:$uskin_bgB;}
+/*toolItem*/
+.toolItem{border-bottom:2px solid $uskin_bdA;}
+.toolItem th{font-weight:700}
+.toolItem .infos{border-bottom:1px dotted $uskin_bdD;}
+.toolInfo .toolTitle{background-color:$uskin_bgB; font-weight:800;border-top:2px solid $uskin_bdD;}
+/*flash upload*/
+.g_photosbox td{border-bottom:1px dotted $uskin_bdA;}
+.photoup dt{border:1px solid $uskin_bdD;}
+/* space setting */
+.moduleList li{border:1px solid $uskin_bdB; background-color:$uskin_bgA;}
+.moduleList li .icon,.moduleList li label.fl{color:$uskin_textC;}
+/*help pop*/
+a.help_a i{border:1px solid $uskin_bdC;background:$uskin_bgB;color:$uskin_textA;}
+/*conFeed*/
+.homeBg{background:$uskin_boxA url(u/themes/$uskin/images/$uskin_homeSide) right 0 repeat-y;}
+.feedsAll{background:$uskin_boxA url(u/themes/$uskin/images/$uskin_navC) repeat-x;border:1px solid $uskin_bdB;border-bottom:0;}
+/*space_info*/
+#space_info .face img{ border:1px solid $uskin_bdD;}
+#space_info .line{border-bottom:1px dotted $uskin_bdD;}
+.appList li a{color:$uskin_textA;}
+/*conFeed*/
+.conFeed .dl{border-bottom:1px dotted $uskin_bdD;}
+.conFeed .dd .title{color:$uskin_textE;} /*weibo title*/
+.conFeed .dd cite a{color:$uskin_textC;}
+.forward{border:1px solid $uskin_bdA;background:$uskin_bgA;}
+.redlB .img{border:1px solid $uskin_bdA;background:$uskin_boxA;}
+.redlB .dlA{border-top:1px dotted $uskin_bdD;}
+.redlB .ddA textarea{border:1px solid $uskin_bdA;}
+.forward .redlB{background:$uskin_boxA;border:1px solid $uskin_bdA;}
+.feedAdmin{border-bottom:1px dotted $uskin_bdD;}
+/*Friends List*/
+.friDl{border:1px solid $uskin_bdB;background:$uskin_bgD;}
+/*friends search*/
+.friSearch{background:$uskin_bgD;}
+.friSip{border:1px solid $uskin_bdA;}
+.friSelect{border-left:1px solid $uskin_bdA;}
+/*windows table*/
+.tA{border-top:1px solid $uskin_textA;}
+.tA .tr td{background:#222222;color:#698fa0;padding:5px 5px 5px 10px;}
+.tA td,.tA th{padding:5px;border-bottom:1px solid $uskin_textA;border-top:0;vertical-align:middle;line-height:21px;}
+.tA tr:hover td,.tA tr:hover th{background:#222222;}
+/*span color*/
+.s1{color:#f00;}/*red*/
+.s2{color:$uskin_textD;}/*org*/
+.s3{color:#080;}/*green*/
+.s4,a.allCollect,a.allForward{color:$uskin_linkA;}/*blue*/
+.s5{color:$uskin_textA;}/*black*/
+.s6{color:$uskin_textB;}
+.s7{color:$uskin_linkB;}
+.gray{color:$uskin_textC;}
+
+/*头像背景*/
+.img_50,.ulB li{background:url(u/themes/$uskin/images/facebg_a.png) no-repeat;}
+/*follow*/
+a.follow{background-color:$uskin_bdB;}
+a.follow:hover{background-color:$uskin_bdD;}
+.ddPhoto ul li{background:#111;}
+/*ie6 png 24*/
+.topwarp,.place div.one,.place div img,.navA,.popImgdel,.appNav_top,.appNav,.appNav_bottom,.logo img,.appNav .one li a img,h4.site img,.refresh img,.aset img{_behavior: url("u/images/iepngfix.htc");}
+.topwarp{background:url(u/themes/$uskin/images/top_bar.png) center top no-repeat;}
+.topbar i{background:#666;}
+.topbar a{color:#fff;float:left;}
+.place div h2 a{color:#fff;}
+/*分页*/
+.pages a{border:1px solid #666;background-color:$uskin_textA;color:#ccc;}
+.pages b,.pages a:hover{background-color:#000;color:#ffffff;border:1px solid #222222;}
+.pages .fl{color:#666;}
+.pages .pagesone{border:1px solid #666;background-color:$uskin_textA;}
+.pages button{background-color:#222;color:#666;border-left:1px solid #666;}
+/**/
+.replyTips{border:1px solid $uskin_bdA;background:$uskin_bgA;color:$uskin_textC;}
+/**/
+.r_admininfo dt.Album{background:#222;border:1px solid $uskin_textA;}
+.galbum_photo_con{border:2px solid $uskin_textA;background:#222;}
+.onePhototip{background:$uskin_textA;color:#ccc;}
+.wind_editor_con{background:#fff;}
+div.wy_tips_A{background:none;}
+.feedDown{border:1px solid $uskin_textA;background:#000;}
+.feedDown em{border:1px solid $uskin_textA;background:#000;border-bottom:0;}
+
+.pw_menu{border:1px solid #ccc;}
+.pw_menu h6{border:1px solid #ccc;border-bottom:0;}
+.menuList li a,.pw_menu h6 a{color:$uskin_textA;}
+.menuList li a:hover{background:#ddd;}
+/*expandApp*/
+.expandApp{border:1px solid $uskin_bdB;background:$uskin_boxA;}
+.msg span{position: absolute;font-size:14px;text-align:center; left: 600px; top: 294px; width: 350px; height: 17px; font-family: Arial; text-align: left; word-wrap: break-word;}
+
+#box_container .bgA{background:#f7fbff;border-bottom:1px solid #e4e4e4;color:#333;}
+</style>
+<!--
+EOT;
+?>-->

@@ -44,8 +44,8 @@ if (!$action) {
 					$filedata = readover(R_P."mode/$modedir/info.xml");
 				}
 				if (preg_match('/\<modename\>(.+?)\<\/modename\>\s+\<descrip\>(.+?)\<\/descrip\>/is',$filedata,$infodb)) {
-					$infodb[1] && $modename = Char_cv(str_replace(array("\n"),'',$infodb[1]));
-					$modedescrip = Char_cv(str_replace(array("\n"),'',$infodb[2]));
+					$infodb[1] && $modename = S::escapeChar(str_replace(array("\n"),'',$infodb[1]));
+					$modedescrip = S::escapeChar(str_replace(array("\n"),'',$infodb[2]));
 				}
 				$uninstall[] = array($modename,$modedescrip,$modedir);
 			}
@@ -57,7 +57,7 @@ if (!$action) {
 } elseif ($action == 'install') {
 
 	require_once(R_P.'require/sql_deal.php');
-	InitGP('mode',null,'1');
+	S::gp('mode',null,'1');
 	if ($mode && !array_key_exists($mode,$db_modes)) {
 		!file_exists(R_P.'mode/'.$mode) && adminmsg('mode_no_directory');
 		!file_exists(R_P.'mode/'.$mode.'/info.xml') && adminmsg('mode_no_info');
@@ -73,7 +73,7 @@ if (!$action) {
 		if (!$db_modes || !is_array($db_modes)) {
 			$db_modes = array();
 		}
-		$m_name = Char_cv($params['modename']);
+		$m_name = S::escapeChar($params['modename']);
 		$db_modes[$mode] = array(
 			'm_name'	=> $m_name,
 			'ifopen'	=> 1,
@@ -101,13 +101,13 @@ if (!$action) {
 			if (!empty($rt)) {
 				$db->update("UPDATE pw_config SET db_value=db_value|".$params['ifpwcache'].",vtype='string' WHERE db_name='db_ifpwcache'");
 			} else {
-				$db->update("INSERT INTO pw_config SET db_name='db_ifpwcache',vtype='string',db_value=".pwEscape($params['ifpwcache']));
+				$db->update("INSERT INTO pw_config SET db_name='db_ifpwcache',vtype='string',db_value=".S::sqlEscape($params['ifpwcache']));
 			}
 		}
 		$fp = opendir(D_P.'data/tplcache/');
 		while ($filename = readdir($fp)) {
 			if($filename=='..' || $filename=='.' || strpos($filename,'.htm')===false) continue;
-			P_unlink(Pcv(D_P.'data/tplcache/'.$filename));
+			P_unlink(S::escapePath(D_P.'data/tplcache/'.$filename));
 		}
 		closedir($fp);
 
@@ -135,7 +135,7 @@ if (!$action) {
 	}
 	updatecache_c();
 	updatecache_conf($mode);
-	$installfile = Pcv(R_P.'mode/'.$mode.'/config/install.php');
+	$installfile = S::escapePath(R_P.'mode/'.$mode.'/config/install.php');
 	if(is_file($installfile)) {
 		ObHeader($basename."&mode=$mode&action=setting");
 	}else{
@@ -143,32 +143,33 @@ if (!$action) {
 	}
 
 }elseif($action == 'setting'){
-	InitGP(array('mode','step'));
-	$installfile = Pcv(R_P.'mode/'.$mode.'/config/install.php');
+	S::gp(array('mode','step'));
+	$installfile = S::escapePath(R_P.'mode/'.$mode.'/config/install.php');
 	is_file($installfile) && require_once ($installfile);
 }elseif ($action == 'fourmtypecache') {
-	InitGP('m',null,'1');
+	S::gp('m',null,'1');
 	!array_key_exists($m,$db_modes) && adminmsg('mode_have_noopen');
 	$fp = opendir(D_P.'data/bbscache/');
 	while ($filename = readdir($fp)) {
 		if($filename=='..' || $filename=='.') continue;
 		if (strpos($filename,'mode_'.$m) !==false) {
-			P_unlink(Pcv(D_P.'data/bbscache/'.$filename));
+			//* P_unlink(S::escapePath(D_P.'data/bbscache/'.$filename));
+			pwCache::deleteData(S::escapePath(D_P.'data/bbscache/'.$filename));
 		}
 	}
 	closedir($fp);
 	$fp = opendir(D_P.'data/tplcache/');
 	while ($filename = readdir($fp)) {
 		if($filename=='..' || $filename=='.' || strpos($filename,'.htm')===false) continue;
-		if (strpos($filename,$m.'_') === 0) {
-			P_unlink(Pcv(D_P.'data/tplcache/'.$filename));
+		if (strpos($filename,$m.'_') === 0 || ($m == 'area' && strpos($filename,'portal_') === 0)) {
+			P_unlink(S::escapePath(D_P.'data/tplcache/'.$filename));
 		}
 	}
 	closedir($fp);
 	$fp = opendir($attachdir.'/mini/');
 	while ($filename = readdir($fp)) {
 		if($filename=='..' || $filename=='.') continue;
-		P_unlink(Pcv($attachdir.'/mini/'.$filename));
+		P_unlink(S::escapePath($attachdir.'/mini/'.$filename));
 	}
 	closedir($fp);
 	$pw_cachedata = L::loadDB('cachedata', 'area');
@@ -177,7 +178,7 @@ if (!$action) {
 
 } elseif ($action == 'uninstall') {
 
-	InitGP('m',null,'1');
+	S::gp('m',null,'1');
 	!array_key_exists($m,$db_modes) && adminmsg('mode_have_noopen');
 	require_once(R_P.'require/sql_deal.php');
 	$sqlarray = file_exists(R_P."mode/$m/sql.txt") ? FileArray($m,'mode') : array();
@@ -187,7 +188,7 @@ if (!$action) {
 	while ($filename = readdir($fp)) {
 		if ($filename == '..' || $filename == '.' || strpos($filename,'.htm') === false) continue;
 		if (strpos($filename,$m.'_') === 0) {
-			P_unlink(Pcv(D_P.'data/tplcache/'.$filename));
+			P_unlink(S::escapePath(D_P.'data/tplcache/'.$filename));
 		}
 	}
 	$pw_cachedata = L::loadDB('cachedata', 'area');
@@ -206,13 +207,13 @@ if (!$action) {
 	$navConfigService->deleteByKey($m);
 	
 	updatecache_c();
-	$uninstallfile = Pcv(R_P.'mode/'.$m.'/config/uninstall.php');
+	$uninstallfile = S::escapePath(R_P.'mode/'.$m.'/config/uninstall.php');
 	is_file($uninstallfile) && require_once ($uninstallfile);
 	adminmsg('operate_success');
 
 } elseif ($action == 'set') {
 
-	InitGP(array('defaultmode','ifopen','domain','title'),'P',1);
+	S::gp(array('defaultmode','ifopen','domain','title'),'P',1);
 
 	$temp = array();
 	foreach ($domain as $key => $value) {

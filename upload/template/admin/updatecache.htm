@@ -1,0 +1,241 @@
+<!--<?php
+include_once PrintEot('left');
+if($adminitem == 'updatecache'){
+print <<<EOT
+-->
+<div class="nav3 mb10">
+	<ul class="cc">
+		<li class="current"><a href="$jobUrl">缓存管理</a></li>
+		<li><a href="$jobUrl&adminitem=pwcache">PW缓存库</a></li>
+		<li><a href="$jobUrl&adminitem=threadcache">主题列表缓存</a></li>
+		<li><a href="$jobUrl&adminitem=guestcache">游客缓存</a></li>
+		<li><a href="$jobUrl&adminitem=guestdir">清空缓存</a></li>
+		<li><a href="$jobUrl&adminitem=blacklist">调用黑名单</a></li>
+	</ul>
+</div>
+<h2 class="h1">缓存管理</h2>
+<div class="admin_table mb10">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <form action="$basename&" method=post>
+      <input type="hidden" name=action value='cache'>
+      <tr class="tr1 vt">
+        <td class="td1">更新站点缓存</td>
+        <td class="td2"><span class="bt2"><span>
+          <button type="submit">更 新</button>
+          </span></span></td>
+        <td class="td2"><div class="help_a">数据转换后或前台不能正常访问时，可以使用此功能更新所有缓存</div></td>
+      </tr>
+    </form>
+    <form action="$basename&" method=post>
+      <input type="hidden" name=action value='bbsinfo'>
+      <tr class="tr1 vt">
+        <td class="td1">更新会员总数</td>
+        <td class="td2"><span class="bt2"><span>
+          <button type="submit">更 新</button>
+          </span></span></td>
+        <td class="td2"><div class="help_a">可修复会员总数统计错误问题</div></td>
+      </tr>
+    </form>
+    <form action="$basename&" method="post">
+      <input type="hidden" name="action" value="online">
+      <tr class="tr1 vt">
+        <td class="td1">初始化在线列表</td>
+        <td class="td2"><span class="bt2"><span>
+          <button type="submit">更 新</button>
+          </span></span></td>
+        <td class="td2"><div class="help_a">前台在线用户列表发生错乱时，可使用此功能修复</div></td>
+      </tr>
+    </form>
+    <form action="$basename&" method=post>
+      <input type="hidden" name=action value='topped'>
+      <tr class="tr1 vt">
+        <td class="td1">更新置顶帖统计</td>
+        <td class="td2"><span class="bt2"><span>
+          <button type="submit">更 新</button>
+          </span></span></td>
+        <td class="td2"><div class="help_a">置顶帖显示不正常，可使用此功能修复</div></td>
+      </tr>
+    </form>
+    <form action="$basename&" method=post>
+      <input type="hidden" name=action value='usergroup'>
+      <tr class="tr1 vt">
+        <td class="td1">更新系统组成员头衔</td>
+        <td class="td2"><span class="bt2"><span>
+          <button type="submit">更 新</button>
+          </span></span></td>
+        <td class="td2"><div class="help_a">使用此功能可修复版主头衔错误和系统组头衔错误的问题</div></td>
+      </tr>
+    </form>
+<!--
+EOT;
+if(!$isMemcachOpen){print <<<EOT
+-->
+    <form action="$basename&" method=post>
+      <input type="hidden" name=action value='flushDatastore'>
+      <tr class="tr1 vt">
+        <td class="td1">会员信息缓存</td>
+        <td class="td2"><span class="bt2"><span>
+          <button type="submit">更 新</button>
+          </span></span></td>
+        <td class="td2"><div class="help_a">更新帖子阅读页会员缓存信息</div></td>
+      </tr>
+    </form>
+<!--
+EOT;
+}print <<<EOT
+-->
+    <form action="$basename&" method=post>
+      <input type="hidden" name=action value='digest'>
+      <tr class="tr1 vt">
+        <td class="td1">修复精华帖统计</td>
+        <td class="td2"><input type="text" class="input input_wa mr5" name="percount" value=1000>
+          <span class="bt2"><span>
+          <button type="submit" value="每批更新个数">每批更新个数</button>
+          </span></span> </td>
+        <td class="td2"><div class="help_a">修复所有会员的精华帖个数统计</div></td>
+      </tr>
+    </form>
+    <form action="$basename&" method=post>
+      <input type="hidden" name=action value='forum'>
+      <tr class="tr1 vt">
+        <td class="td1">更新主题文章数统计</td>
+        <td class="td2"><input type="text" class="input input_wa mr5" name="percount" value="100">
+          <span class="bt2"><span>
+          <button type="submit" value="每批更新个数">每批更新个数</button>
+          </span></span> </td>
+        <td class="td2"><div class="help_a">更新所有版块的主题数和文章数统计<br/><span class="gray">数据转换后或前台文章数统计不正常时，可使用此功能修复</span></div></td>
+      </tr>
+    </form>
+    <form action="$basename&" method=post>
+      <input type="hidden" name=action value='group'>
+      <tr class="tr1 vt">
+        <td class="td1">更新会员组头衔</td>
+        <td class="td2"><input type="text" class="input input_wa mr5" name="percount" value=2000>
+          <span class="bt2"><span>
+          <button type="submit" value="每批更新个数">每批更新个数</button>
+          </span></span> </td>
+        <td class="td2"><div class="help_a">根据积分方案更新会员组头衔<br /><span class="gray">每次更改升级点数需求或会员组提升方式后需要使用此功能更新会员组头衔</span></div></td>
+      </tr>
+    </form>
+    <form action="$basename&" method=post>
+      <input type="hidden" name=action value='thread'>
+      <tr class="tr1 vt">
+        <td class="td1">更新主题的回复数统计</td>
+        <td class="td2"><input type="text" class="input input_wa mr5" name="percount" value="2000">
+          <span class="bt2"><span>
+          <button type="submit" value="每批更新个数">每批更新个数</button>
+          </span></span> </td>
+        <td class="td2"><div class="help_a">更新主题的回复数统计<br /><span class="gray">当浏览帖子页面回复显示不正常时，可以使用此功能修复 (不建议使用)</span></div></td>
+      </tr>
+    </form>
+    <form action="$basename&" method=post>
+      <input type="hidden" name=action value='appcount'>
+      <tr class="tr1 vt">
+        <td class="td1">更新用户APP统计</td>
+        <td class="td2"><input type="text" class="input input_wa mr5" name="percount" value="2000">
+          <span class="bt2"><span>
+          <button type="submit" value="每批更新个数">每批更新个数</button>
+          </span></span> </td>
+        <td class="td2"><div class="help_a">更新用户的应用(app)统计<br /><span class="gray">但用户的app统计不正确的时候（例如照片数量准确），可以使用此功能修复</span></div></td>
+      </tr>
+    </form>
+    <form action="$basename&" method="post">
+      <input type="hidden" name="action" value="updateMemberFriends"/>
+      <tr class="tr1 vt">
+        <td class="td1">修复用户好友数</td>
+        <td class="td2"><input type="text" class="input input_wa mr5" name="percount" value="1000"/>
+          <span class="bt2"><span>
+          <button type="submit" value="每批更新个数">每批更新个数</button>
+          </span></span> </td>
+        <td class="td2"><div class="help_a">修复用户好友数<br /><span class="gray">此操作将从新统计用户的好友个数</span></div></td>
+      </tr>
+    </form>
+    
+    <form action="$basename&" method="post">
+      <input type="hidden" name="action" value="member"/>
+      <tr class="tr1 vt">
+        <td class="td1">更新会员发帖数</td>
+        <td class="td2"><input type="text" class="input input_wa mr5" name="percount" value="1000"/>
+          <span class="bt2"><span>
+          <button type="submit" value="每批更新个数">每批更新个数</button>
+          </span></span> </td>
+        <td class="td2"><div class="help_a">提示:将根据数据库中的帖子记录来重新统计用户的发帖数<br /><span class="xia">不建议使用，除非您希望校正所有用户的发帖数为数据库中实际存在的帖子数</span></div></td>
+      </tr>
+    </form>    
+<!-- 
+    <form action="$basename&" method=post>
+      <input type="hidden" name=action value='clearClassCompressFile'>
+      <tr class="tr1 vt">
+        <td class="td1">类库压缩文件清除</td>
+        <td class="td2"><span class="bt2"><span>
+          <button type="submit" value="清 除">清 除</button>
+          </span></span></td>
+        <td class="td2"><div class="help_a">此操作将清除类库的压缩文件，到 <a href="?adminjob=settings&admintype=safe" onclick="parent.PW.Dialog({id:'safe',url:'?adminjob=settings&admintype=safe',name:'安全与优化'});return false;">全局->安全与优化->速度优化</a> 中可开启类库文件压缩功能</div></td>
+      </tr>
+    </form>    
+ -->
+    <form action="$basename&" method=post>
+      <input type="hidden" name=action value='clearCacheCompressFile'>
+      <tr class="tr1 vt">
+        <td class="td1">缓存压缩文件清除</td>
+        <td class="td2"><span class="bt2"><span>
+          <button type="submit" value="清 除">清 除</button>
+          </span></span></td>
+        <td class="td2"><div class="help_a">此操作将清除缓存的压缩文件，到 <a href="?adminjob=settings&admintype=safe" onclick="parent.PW.Dialog({id:'safe',url:'?adminjob=settings&admintype=safe',name:'安全与优化'});return false;">全局->安全与优化->速度优化</a> 中可开启缓存文件压缩功能</div></td>
+      </tr>
+    </form>
+<!--
+EOT;
+if($isUniqueStrategyOpen){
+print <<<EOT
+-->		    
+    <form action="$basename&" method=post>
+      <input type="hidden" name=action value='clearUniqueCache'>
+      <tr class="tr1 vt">
+        <td class="td1">清除主键缓存</td>
+        <td class="td2"><span class="bt2"><span>
+          <button type="submit" value="清 除">清 除</button>
+          </span></span></td>
+        <td class="td2"><div class="help_a">此操作将清除主键缓存，到 <a href="?adminjob=settings&admintype=safe" onclick="parent.PW.Dialog({id:'safe',url:'?adminjob=settings&admintype=safe',name:'安全与优化'});return false;">全局->安全与优化->速度优化</a> 中设置主键生成策略</div></td>
+      </tr>
+    </form>       
+<!--
+EOT;
+}if($isMemcachOpen){
+print <<<EOT
+-->
+    <form action="$basename&" method=post>
+      <input type="hidden" name=action value='clearMemcache'>
+      <tr class="tr1 vt">
+        <td class="td1" rowspan="1">清除指定版块的<br />Memcache缓存</td>
+        <td class="td2"><select name="fid">
+            $forumSelect
+          </select><span class="bt2"><span>
+          <button type="submit" value="清除">清除</button>
+          </span></span>
+        </td>
+        <td class="td2"><div class="help_a">实现指定版块Memcache清除</div></td>
+      </tr>
+    </form>
+    <form action="$basename&" method=post>
+      <input type="hidden" name=action value='flushMemcache'>
+      <tr class="tr1 vt">
+        <td class="td1">清除所有Memcache缓存</td>
+        <td class="td2"><span class="bt2"><span>
+          <button type="submit" value="清除">清除</button>
+          </span></span></td>
+        <td class="td2"><div class="help_a">此操作将清除Memcache中所有的缓存（如无特殊情况请勿使用）</div></td>
+      </tr>
+    </form>
+<!--
+EOT;
+}
+}print <<<EOT
+-->
+  </table>
+</div>
+<!--
+EOT;
+include_once PrintEot('adminbottom');
+?>
+-->

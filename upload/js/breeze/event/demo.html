@@ -1,0 +1,63 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<style>
+input{display:block}
+</style>
+<title>DEMO</title>
+</head>
+<body>
+<div>
+	<button id="tstbtn">button</button>
+</div>
+<button id="addEl">add Element</button>
+<div id="info"></div>
+<a href="http://www.baidu.com" id="la">link click</a>
+<img src = "http://msdn.microsoft.com/en-us/scriptjunkie/ee729203.junk_footer.png" />
+<img src = "http://img1.phpwind.net/attachout/thumb/Mon_1008/2_1977208_3ee003d2e877361.jpg" />
+<img src = 'http://www.chinaccnet.com/pw/zd66.gif' />
+
+
+
+
+<script type="text/javascript" src="../core/base.js"></script>
+<script type="text/javascript" src="../core/native.js"></script>
+<script type="text/javascript" src="event.js"></script>
+
+<script>
+Breeze.ready(function(){
+	document.getElementById("tstbtn").innerHTML = 'dom加载后,我变了!';
+});
+var btn = document.getElementById("la");
+Breeze.addEvent(btn,"click",function(e){
+	e.preventDefault();
+	alert(e.page.x);
+});
+Breeze.addEvent(btn,"click",function(e){
+	e.preventDefault();
+	alert(e.client.x);
+});
+//Breeze.removeEvent(btn,"click");
+
+
+
+var $= function (q,p){
+    return p?arguments.callee(p).getElementsByTagName(q)
+        :(typeof q == 'string' ? document.getElementById(q):q) 
+};
+
+Breeze.live(document.getElementsByTagName("input"),'focus',function (){
+   this.style.color='red'
+});
+
+$('addEl').onclick=function (){
+   var x= $('info').appendChild(document.createElement('INPUT'))
+   x.value='51js.com'
+}
+
+</script>
+
+
+</body>
+</html>

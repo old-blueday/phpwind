@@ -6,8 +6,8 @@ class CollectionModelTemplate {
 print <<<EOT
 -->
     <tr class="tr3 vt" id="collection_{$value['id']}">
-    <td width="20"><input type="checkbox" name="idarray[]" value="{$value['id']}" id="idarray[]"/></td>
-    <td>
+    <td width="20" style="vertical-align:top;"><input type="checkbox" name="idarray[]" value="{$value['id']}" id="idarray[]"/></td>
+    <td colspan="4">
     <a class="adel cp" onclick="pwConfirm('你确认要删除这条收藏吗？',this,function(){collection.del('{$value['id']}')})">删除</a>
     <div class="mb5 gray" id="title_{$value['id']}">{$value['title']}</div>
     <div class="lh_22">
@@ -15,12 +15,37 @@ print <<<EOT
 EOT;
 if ($value['content']['username']) {print <<<EOT
 -->
-    <span><a href="u.php?uid={$value['content']['uid']}">{$value['content']['username']}</a>：</span>
+    <span><a href="{$GLOBALS[db_userurl]}{$value['content']['uid']}">{$value['content']['username']}</a>：</span>
 <!--
 EOT;
 }print <<<EOT
 -->
     <a href="{$value['content']['link']}" target="_blank">{$value['content']['link']}</a></div>
+    </td>
+    </tr>		
+<!--
+EOT;
+	}
+	function postfavor($value) {//帖子
+print <<<EOT
+-->
+    <tr class="tr3 vt" id="collection_{$value['id']}">
+    <td width="20" style="vertical-align:top;"><input type="checkbox" name="idarray[]" value="{$value['id']}" id="idarray[]"/></td>
+    <td colspan="4">
+    <a class="adel cp" onclick="pwConfirm('你确认要删除这条收藏吗？',this,function(){collection.del('{$value['id']}')})">删除</a>
+    <div class="mb5 gray" id="title_{$value['id']}">{$value['title']}</div>
+    <div class="lh_22">
+<!--
+EOT;
+if ($value['content']['username']) {print <<<EOT
+-->
+    <span class="fl"><a href="{$GLOBALS[db_userurl]}{$value['content']['uid']}">{$value['content']['username']}</a>：</span>
+<!--
+EOT;
+}print <<<EOT
+-->
+     <a href="{$value['content']['link']}" target="_blank">{$value['content']['postfavor']['subject']}</a>
+    </div>
     </td>
     </tr>		
 <!--
@@ -34,15 +59,15 @@ EOT;
 print <<<EOT
 -->
 	<tr class="tr3 vt" id="collection_{$value['id']}">
-    <td width="20"><input type="checkbox" name="idarray[]" value="{$value['id']}" id="idarray[]"/></td>
-    <td>
+    <td width="20" style="vertical-align:top;"><input type="checkbox" name="idarray[]" value="{$value['id']}" id="idarray[]"/></td>
+    <td colspan="4">
     <a class="adel cp" onclick="pwConfirm('你确认要删除这条收藏吗？',this,function(){collection.del('{$value['id']}')})">删除</a>
     <div class="mb10 gray" id="title_{$value['id']}">{$value['title']}</div>
 <!--
 EOT;
 if ($value['content']['username']) {print <<<EOT
 -->
-    <span class="fl"><a href="u.php?uid={$value['content']['uid']}">{$value['content']['username']}</a>：</span>
+    <span class="fl"><a href="{$GLOBALS[db_userurl]}{$value['content']['uid']}">{$value['content']['username']}</a>：</span>
 <!--
 EOT;
 }print <<<EOT
@@ -66,7 +91,7 @@ EOT;
          
 print <<<EOT
 -->
-				<div class="s5 mb10"><a href="u.php?uid={$value['content']['authorid']}">{$value['username']}</a> 转发：{$content}</div>
+				<div class="s5 mb10"><a href="{$GLOBALS[db_userurl]}{$value['content']['authorid']}">{$value['username']}</a> 转发：{$content}</div>
 <!--
 EOT;
 			if ($extra['_hasVideo']) $this->_showVideo($extra['_hasVideo']);
@@ -187,7 +212,7 @@ EOT;
 print <<<EOT
 -->
 <div class="title">
-	<a href="u.php?uid={$value['uid']}">{$value['username']}</a>：<a href="$url">{$value['extra']['title']}</a>
+	<a href="{$GLOBALS[db_userurl]}{$value['uid']}">{$value['username']}</a>：<a href="$url">{$value['extra']['title']}</a>
 </div>
 <div>
 	{$value['content']}
@@ -199,7 +224,7 @@ EOT;
 print <<<EOT
 -->
 <div class="lh_22">
-	<a href="u.php?uid={$value['uid']}">{$value['username']}</a>：{$value['content']}
+	<a href="{$GLOBALS[db_userurl]}{$value['uid']}">{$value['username']}</a>：{$value['content']}
 </div>
 <!--
 EOT;
@@ -286,8 +311,8 @@ EOT;
 print <<<EOT
 -->
     <tr class="tr3 vt" id="collection_{$value['id']}">
-    <td width="20"><input type="checkbox" name="idarray[]" value="{$value['id']}" id="idarray[]"/></td>
-    <td>
+    <td width="20" style="vertical-align:top;"><input type="checkbox" name="idarray[]" value="{$value['id']}" id="idarray[]"/></td>
+    <td colspan="4">
     <a class="adel cp" onclick="pwConfirm('你确认要删除这条收藏吗？',this,function(){collection.del('{$value['id']}')})">删除</a>
     <div class="mb10 gray" id="title_{$value['id']}">{$value['title']}</div>
     <div class="mb5">
@@ -295,7 +320,7 @@ print <<<EOT
 EOT;
 if ($value['content']['username']) {print <<<EOT
 -->
-    <span><a href="u.php?uid={$value['content']['uid']}">{$value['content']['username']}</a>：</span>
+    <span><a href="{$GLOBALS[db_userurl]}{$value['content']['uid']}">{$value['content']['username']}</a>：</span>
 <!--
 EOT;
 }print <<<EOT
@@ -333,8 +358,8 @@ EOT;
 print <<<EOT
 -->
     <tr class="tr3 vt" id="collection_{$value['id']}">
-    <td width="20"><input type="checkbox" name="idarray[]" value="{$value['id']}" id="idarray[]"/></td>
-    <td>
+    <td width="20" style="vertical-align:top;"><input type="checkbox" name="idarray[]" value="{$value['id']}" id="idarray[]"/></td>
+    <td colspan="4">
     <a class="adel cp" onclick="pwConfirm('你确认要删除这条收藏吗？',this,function(){collection.del('{$value['id']}')})">删除</a>
     <div class="mb10 gray" id="title_{$value['id']}">{$value['title']}</div>
     <div class="mb5">
@@ -342,7 +367,7 @@ print <<<EOT
 EOT;
 if ($value['content']['username']) {print <<<EOT
 -->
-    <span><a href="u.php?uid={$value['content']['uid']}">{$value['content']['username']}</a>：</span>
+    <span><a href="{$GLOBALS[db_userurl]}{$value['content']['uid']}">{$value['content']['username']}</a>：</span>
 <!--
 EOT;
 }print <<<EOT
@@ -360,8 +385,8 @@ EOT;
 print <<<EOT
 -->
     <tr class="tr3 vt" id="collection_{$value['id']}">
-    <td width="20"><input type="checkbox" name="idarray[]" value="{$value['id']}" id="idarray[]"/></td>
-    <td>
+    <td width="20" style="vertical-align:top;"><input type="checkbox" name="idarray[]" value="{$value['id']}" id="idarray[]"/></td>
+    <td colspan="4">
     <a class="adel cp" onclick="pwConfirm('你确认要删除这条收藏吗？',this,function(){collection.del('{$value['id']}')})">删除</a>
     <div class="mb5 gray" id="title_{$value['id']}">{$value['title']}</div>
     <div class="s5 mb5"></div>
@@ -370,7 +395,7 @@ print <<<EOT
 EOT;
 if ($value['content']['username']) {print <<<EOT
 -->
-    <span><a href="u.php?uid={$value['content']['uid']}">{$value['content']['username']}</a>：</span>
+    <span><a href="{$GLOBALS[db_userurl]}{$value['content']['uid']}">{$value['content']['username']}</a>：</span>
 <!--
 EOT;
 }print <<<EOT
@@ -390,8 +415,8 @@ print <<<EOT
 -->
 	<tr class="tr3 vt" id="collection_{$value['id']}">
 
-                <td width="20"><input type="checkbox" name="idarray[]" value="{$value['id']}" id="idarray[]"/></td>
-                <td>
+                <td width="20" style="vertical-align:top;"><input type="checkbox" name="idarray[]" value="{$value['id']}" id="idarray[]"/></td>
+                <td colspan="4">
 								<a class="adel cp" onclick="pwConfirm('你确认要删除这条收藏吗？',this,function(){collection.del('{$value['id']}')})">删除</a>
                 <div class="mb10 gray" id="title_{$value['id']}">{$value['title']}</div>
                 <div class="mb10"><a href="{$value['content']['link']}" target="_blank">
@@ -399,7 +424,7 @@ print <<<EOT
 EOT;
 if ($value['content']['username']) {print <<<EOT
 -->
-    <span><a href="u.php?uid={$value['content']['uid']}">{$value['content']['username']}</a>：</span>
+    <span><a href="{$GLOBALS[db_userurl]}{$value['content']['uid']}">{$value['content']['username']}</a>：</span>
 <!--
 EOT;
 }print <<<EOT
@@ -443,8 +468,8 @@ EOT;
 print <<<EOT
 -->
     <tr class="tr3 vt" id="collection_{$value['id']}">
-    <td width="20"><input type="checkbox" name="idarray[]" value="{$value['id']}" id="idarray[]"/></td>
-    <td>
+    <td width="20" style="vertical-align:top;"><input type="checkbox" name="idarray[]" value="{$value['id']}" id="idarray[]"/></td>
+    <td  colspan="4">
     <a class="adel cp" onclick="pwConfirm('你确认要删除这条收藏吗？',this,function(){collection.del('{$value['id']}')})">删除</a>
     <div class="mb10 gray" id="title_{$value['id']}">{$value['title']}</div>
     <div class="mb5">
@@ -452,7 +477,7 @@ print <<<EOT
 EOT;
 if ($value['content']['username']) {print <<<EOT
 -->
-    <span><a href="u.php?uid={$value['content']['uid']}">{$value['content']['username']}</a>：</span>
+    <span><a href="{$GLOBALS[db_userurl]}{$value['content']['uid']}">{$value['content']['username']}</a>：</span>
 <!--
 EOT;
 }print <<<EOT
@@ -469,8 +494,8 @@ EOT;
 print <<<EOT
 -->
     <tr class="tr3 vt" id="collection_{$value['id']}">
-    <td width="20"><input type="checkbox" name="idarray[]" value="{$value['id']}" id="idarray[]"/></td>
-    <td>
+    <td width="20" style="vertical-align:top;"><input type="checkbox" name="idarray[]" value="{$value['id']}" id="idarray[]"/></td>
+    <td colspan="4">
     <a class="adel cp" onclick="pwConfirm('你确认要删除这条收藏吗？',this,function(){collection.del('{$value['id']}')})">删除</a>
     <div class="mb10 gray" id="title_{$value['id']}">{$value['title']}</div>
     <div class="mb5">
@@ -478,7 +503,7 @@ print <<<EOT
 EOT;
 if ($value['content']['username']) {print <<<EOT
 -->
-    <span><a href="u.php?uid={$value['content']['uid']}">{$value['content']['username']}</a>：</span>
+    <span><a href="{$GLOBALS[db_userurl]}{$value['content']['uid']}">{$value['content']['username']}</a>：</span>
 <!--
 EOT;
 }print <<<EOT
@@ -488,8 +513,7 @@ EOT;
     </tr>	
 <!--
 EOT;
-	}
-    
+	}   
    
    function _showVideo($value) {
 print <<<EOT
@@ -506,7 +530,7 @@ print <<<EOT
 <div id="photo_pop" class="popImg" style="position:absolute;z-index:2;display:none;">
 	<div class="p10 tac pr bgA">
 		<span class="popImgdel cp" onclick="weibo.hidePhoto()">关闭</span>
-		<table width="400" cellpadding="0" cellspacing="0">
+		<table cellpadding="0" cellspacing="0">
 			<tr>
 				<td>
 					<div class="fl" id="prephoto">

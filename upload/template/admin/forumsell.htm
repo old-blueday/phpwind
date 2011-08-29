@@ -2,6 +2,14 @@
 include_once PrintEot('left');
 print <<<EOT
 -->
+<div class="nav3 mb10">
+	<ul class="cc">
+		<li><a href="$admin_file?adminjob=setforum&adminitem=setforum">版块管理</a></li>
+		<li><a href="$admin_file?adminjob=setforum&adminitem=uniteforum">版块合并</a></li>
+		<li class="current"><a href="$admin_file?adminjob=setforum&adminitem=forumsell">版块出售记录</a></li>
+		<li><a href="$admin_file?adminjob=setforum&adminitem=creathtm">生成静态文件</a></li>
+	</ul>
+</div>
 <form action="$basename" method="post">
   <h2 class="h1">搜索</h2>
   <div class="admin_table mb10">
@@ -43,7 +51,7 @@ print <<<EOT
     <tr class="tr1 vt">
       <td class="td2">$i</td>
       <td class="td2"><a href="thread.php?fid=$value[fid]" target="_blank">{$forum[$value[fid]][name]}</a></td>
-      <td class="td2"><a href="u.php?uid=$value[uid]" target="_blank">$value[username]</a></td>
+      <td class="td2"><a href="{$db_userurl}$value[uid]" target="_blank">$value[username]</a></td>
       <td class="td2">$value[buydate]</td>
       <td class="td2">$value[overtime]
 <!--

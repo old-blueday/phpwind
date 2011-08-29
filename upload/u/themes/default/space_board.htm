@@ -46,7 +46,7 @@ EOT;
 foreach ($boards as $value) { print <<<EOT
 -->
                         <dl class="cc dl" id="board_{$value[id]}">
-                        	<dt class="dt"><a href="u.php?uid=$value[uid]" class="img_50"><i><img src="$value[face]" /></i></a></dt>
+                        	<dt class="dt"><a href="{$db_userurl}$value[uid]" class="img_50"><i><img src="$value[face]" /></i></a></dt>
                             <dd class="dd">
 <!--
 EOT;
@@ -58,7 +58,7 @@ EOT;
 } print <<<EOT
 -->
                             
-                            	<p class="title"><a href="u.php?uid=$value[uid]" class="atitle">{$value[username]}：</a>{$value[title]}</p>
+                            	<p class="title"><a href="{$db_userurl}$value[uid]" class="atitle">{$value[username]}：</a>{$value[title]}</p>
                             
                             	<cite class="gray">{$value[postdate]}</cite><span> - </span>
 <!--
@@ -78,7 +78,7 @@ if ($commentdb[$value['id']]) {
 foreach ($commentdb[$value['id']] as $key => $comment) {print <<<EOT
 -->
                                         <dl class="cc dl2" id="comment_{$comment[id]}">
-                                        	<dt><a href="u.php?uid=$comment[uid]"><img src="$comment[face]" width="30" height="30" /></a></dt>
+                                        	<dt><a href="{$db_userurl}$comment[uid]"><img src="$comment[face]" width="30" height="30" /></a></dt>
                                             <dd>
 <!--
 EOT;
@@ -89,7 +89,7 @@ if ($comment['uid'] == $winduid || $groupid == 3) {print <<<EOT
 EOT;
 }print <<<EOT
 -->
-                                            	<p class="mb5 f14"><a href="u.php?uid=$comment[uid]">$comment[username]</a>：$comment[title]</p>
+                                            	<p class="mb5 f14"><a href="{$db_userurl}$comment[uid]">$comment[username]</a>：$comment[title]</p>
                                             	<cite class="gray">$comment[postdate]</cite>
                                             </dd>
                                         </dl>

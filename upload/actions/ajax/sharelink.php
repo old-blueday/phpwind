@@ -11,26 +11,29 @@ if (empty($_POST['step'])) {
 } else {
 	
 	PostCheck();
-	InitGP(array(
+	S::gp(array(
 		'linkname',
 		'linkurl',
+		'username',
 		'linkdescrip',
 		'linklogo'
 	), 'P');
 	(!$linkname || !$linkurl) && Showmsg('sharelink_link_empty');
 	!$linkdescrip && $linkdescrip = '';
+	$username = !$username?$windid:$username.'('.$windid.')';
 	!$linklogo && $linklogo = '';
 	$linkurl = strtolower($linkurl);
 	strncmp($linkurl, 'http://', 7) != 0 && Showmsg('sharelink_link_error');
-	$rs = $db->get_one("SELECT sid FROM pw_sharelinks WHERE username=" . pwEscape($windid));
+	$rs = $db->get_one("SELECT sid FROM pw_sharelinks WHERE username=" . S::sqlEscape($username));
 	$rs && Showmsg('sharelink_apply_limit');
-	$pwSQL = pwSqlSingle(array(
+	$pwSQL = S::sqlSingle(array(
 		'name' => $linkname,
 		'url' => $linkurl,
+		'username' => $username,
 		'descrip' => $linkdescrip,
 		'logo' => $linklogo,
 		'ifcheck' => 0,
-		'username' => $windid
+		'username' => $username
 	));
 	$db->update("INSERT INTO pw_sharelinks SET $pwSQL");
 	

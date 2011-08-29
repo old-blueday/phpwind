@@ -1,9 +1,9 @@
 <?php
 require_once('global.php');
 
-InitGP(array('cmdno','pay_result','date','bargainor_id','transaction_id','sp_billno','total_fee', 'fee_type','attach','sign'));
+S::gp(array('cmdno','pay_result','date','bargainor_id','transaction_id','sp_billno','total_fee', 'fee_type','attach','sign'));
 
-include_once(D_P.'data/bbscache/ol_config.php');
+include_once pwCache::getPath(D_P.'data/bbscache/ol_config.php');
 
 if (!$ol_onlinepay) {
 	Showmsg($ol_whycolse);
@@ -25,7 +25,7 @@ if ($pay_result != "0" ) {
 	Showmsg( "支付失败");
 }
 
-$rt = $db->get_one("SELECT c.*,m.username FROM pw_clientorder c LEFT JOIN pw_members m USING(uid) WHERE order_no=".pwEscape($transaction_id));
+$rt = $db->get_one("SELECT c.*,m.username FROM pw_clientorder c LEFT JOIN pw_members m USING(uid) WHERE order_no=".S::sqlEscape($transaction_id));
 if (!$rt) {
 	refreshto('userpay.php','系统中没有您的充值订单，无法完成充值！');
 }
@@ -45,7 +45,7 @@ $credit->addLog('main_olpay',array($rt['paycredit'] => $currency),array(
 ));
 $credit->set($rt['uid'],$rt['paycredit'],$currency);
 
-$db->update("UPDATE pw_clientorder SET payemail=".pwEscape($buyer_email).",state=2 WHERE order_no=".pwEscape($transaction_id));
+$db->update("UPDATE pw_clientorder SET payemail=".S::sqlEscape($buyer_email).",state=2 WHERE order_no=".S::sqlEscape($transaction_id));
 
 M::sendNotice(
 	array($rt['username']),

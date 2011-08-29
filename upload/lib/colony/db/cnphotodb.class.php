@@ -149,14 +149,14 @@ class PW_CnPhotoDB extends BaseDB {
 	}
 	
 	function getDataByPids($pids) {
-		$pids = (is_array($pids)) ? pwImplode($pids) : $pids;
+		$pids = (is_array($pids)) ? S::sqlImplode($pids) : $pids;
 		$query = $this->_db->query("SELECT p.*, a.* FROM $this->_tableName p LEFT JOIN pw_cnalbum a ON p.aid = a.aid
 			WHERE p.pid IN (" . $pids . ") ");
 		return $this->_getAllResultFromQuery($query);
 	}
 	
 	function getDataByPidsAndPrivate($pids,$private = 0) {
-		$pids = (is_array($pids)) ? pwImplode($pids) : $pids;
+		$pids = (is_array($pids)) ? S::sqlImplode($pids) : $pids;
 		$query = $this->_db->query("SELECT p.*, a.* FROM $this->_tableName p LEFT JOIN pw_cnalbum a ON p.aid = a.aid
 			WHERE p.pid IN (" . $pids . ") AND a.private=".$this->_addSlashes($private));
 		return $this->_getAllResultFromQuery($query);

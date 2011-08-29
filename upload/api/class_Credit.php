@@ -24,11 +24,19 @@ class Credit {
 				foreach ($setv as $cid => $value) {
 					if (is_numeric($cid)) {
 						$value = intval($value);
+						/**
 						$this->db->pw_update(
-							"SELECT uid FROM pw_membercredit WHERE uid=" . pwEscape($uid) . ' AND cid=' . pwEscape($cid),
-							"UPDATE pw_membercredit SET value=" . pwEscape($value) .  ' WHERE uid=' . pwEscape($uid) . ' AND cid=' . pwEscape($cid),
-							"INSERT INTO pw_membercredit SET " . pwSqlSingle(array('uid' => $uid, 'cid' => $cid, 'value' => $value))
+							"SELECT uid FROM pw_membercredit WHERE uid=" . S::sqlEscape($uid) . ' AND cid=' . S::sqlEscape($cid),
+							"UPDATE pw_membercredit SET value=" . S::sqlEscape($value) .  ' WHERE uid=' . S::sqlEscape($uid) . ' AND cid=' . S::sqlEscape($cid),
+							"INSERT INTO pw_membercredit SET " . S::sqlSingle(array('uid' => $uid, 'cid' => $cid, 'value' => $value))
 						);
+						**/
+						
+						$this->db->pw_update(
+							"SELECT uid FROM pw_membercredit WHERE uid=" . S::sqlEscape($uid) . ' AND cid=' . S::sqlEscape($cid),
+							pwQuery::updateClause('pw_membercredit', 'uid=:uid AND cid=:cid', array($uid,$cid), array('value'=>$value)),
+							pwQuery::insertClause('pw_membercredit', array('uid' => $uid, 'cid' => $cid, 'value' => $value))
+						);						
 					} elseif (in_array($cid, array('money','rvrc','credit','currency'))) {
 						$cid == 'rvrc' && $value *= 10;
 						$updateMemberData[$cid] = intval($value);

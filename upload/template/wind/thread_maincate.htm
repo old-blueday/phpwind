@@ -1,11 +1,13 @@
-<!--<?php print <<<EOT
+<!--<?php 
+if($threaddb){
+print <<<EOT
 -->
 <table width="100%">
 	<tbody id="threadlist">
 	<tr class="tr4">
 <!--
 EOT;
-if($thread[adminbox] && $managecheck){print <<<EOT
+if($managecheck){print <<<EOT
 -->
 			<td class="icon" width="55">&nbsp;</td>
 <!--
@@ -43,7 +45,13 @@ print <<<EOT
 		<td class="icon">
 <!--
 EOT;
-if($thread[adminbox] && $managecheck){print <<<EOT
+if($managecheck){
+if ($thread['fid'] == $fid) {
+	$thread['adminbox'] = "<input type=\"checkbox\" autocomplete=\"off\" name=\"tidarray[]\" id=tid_{$thread[tid]} value=\"$thread[tid]\" onclick=\"postManage.show('postbatch','a_ajax_{$thread[tid]}')\" />";
+} else {
+	$thread['adminbox'] = "&nbsp;&nbsp;&nbsp;";
+}
+print <<<EOT
 -->
 	$thread[adminbox]
 <!--
@@ -259,15 +267,22 @@ EOT;
 		] </div><td colspan="$managemode_colspan"></td></td></tr>
 <!--
 EOT;
-}}print <<<EOT
+}}
+}
+print <<<EOT
 -->
-
+	</tbody>
+</table>
+<!-- 
+EOT;
+}else{
+print <<<EOT
+-->
+<div class="tac f14 p10">暂时没有内容</div>
 <!--
 EOT;
 }print <<<EOT
 -->
-	</tbody>
-</table>
 <SCRIPT LANGUAGE="JavaScript">
 function delload(){
 var objTrs = getElementsByClassName('tr3 t_one',getObj('threadlist'));

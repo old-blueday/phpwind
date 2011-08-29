@@ -1,8 +1,6 @@
 <?php
 !defined('P_W') && exit('Forbidden');
 
-L::loadClass('rate', 'rate', false);
-
 /**
  * 数据分析
  *
@@ -52,8 +50,8 @@ class Datanalyse {
 		}
 		if ($actions) {
 			$sql = "SELECT a.tag, SUM(a.num) AS num, a.action FROM pw_datanalyse a
-					WHERE action IN ( " . pwImplode($actions) . " )
-					AND timeunit >= " . pwEscape($this->getTimestamp('w')) . "
+					WHERE action IN ( " . S::sqlImplode($actions) . " )
+					AND timeunit >= " . S::sqlEscape($this->getTimestamp('w')) . "
 					GROUP BY a.tag,a.action  ORDER BY num DESC";
 			$query = $this->db->query($sql);
 			$result = array();
@@ -95,8 +93,8 @@ class Datanalyse {
 	 */
 	function clearData($action) {
 		//清理超时数据
-		$sql = "DELETE FROM pw_datanalyse WHERE action=" . pwEscape($action) . "
-				AND timeunit < " . pwEscape($this->overtimestamp) . " AND timeunit != " . pwEscape($this->historyTime);
+		$sql = "DELETE FROM pw_datanalyse WHERE action=" . S::sqlEscape($action) . "
+				AND timeunit < " . S::sqlEscape($this->overtimestamp) . " AND timeunit != " . S::sqlEscape($this->historyTime);
 		$this->db->update($sql);
 		
 		//保留每天的top 100
@@ -104,11 +102,11 @@ class Datanalyse {
 		$_w = "";
 		foreach($d_time as $t) {
 			$sql = "SELECT num FROM pw_datanalyse
-					WHERE action = " . pwEscape($action) . " AND timeunit = " . pwEscape($t) . "
+					WHERE action = " . S::sqlEscape($action) . " AND timeunit = " . S::sqlEscape($t) . "
 					ORDER BY num DESC LIMIT " . $this->getMaxNum() . ",1";
 			$rt = $this->db->get_value($sql);
 			if ($rt) {
-				$_w .= "( action = " . pwEscape($action) . " AND timeunit = " . pwEscape($t) . " AND num < " . pwEscape($rt) . " ) OR ";
+				$_w .= "( action = " . S::sqlEscape($action) . " AND timeunit = " . S::sqlEscape($t) . " AND num < " . S::sqlEscape($rt) . " ) OR ";
 			}
 		}
 		$_w = trim($_w, " OR");
@@ -147,7 +145,7 @@ class Datanalyse {
 	 */
 	function setDeleteTimePoint() {
 		$c = "timepoint=" . $this->nowtimestamp;
-		writeover(D_P . "data/bbscache/datanlyse.txt",$c);
+		pwCache::setData(D_P . "data/bbscache/datanlyse.txt",$c);
 	}
 
 	/**
@@ -241,18 +239,18 @@ class Datanalyse {
 	 */
 	function sortData($action, $type, $limit) {
 		if ($type == "today") {
-			$timeSpan = " AND a.timeunit = " . pwEscape($this->nowtimestamp);
+			$timeSpan = " AND a.timeunit = " . S::sqlEscape($this->nowtimestamp);
 		} else if ($type == "week") {
-			$timeSpan = " AND a.timeunit >= " . pwEscape($this->getTimestamp('w'));
+			$timeSpan = " AND a.timeunit >= " . S::sqlEscape($this->getTimestamp('w'));
 		} else if ($type == "month") {
-			$timeSpan = " AND a.timeunit >= " . pwEscape($this->getTimestamp('m'));
+			$timeSpan = " AND a.timeunit >= " . S::sqlEscape($this->getTimestamp('m'));
 		} else if ($type == "history") {
-			$timeSpan = " AND a.timeunit = " . pwEscape($this->historyTime);
+			$timeSpan = " AND a.timeunit = " . S::sqlEscape($this->historyTime);
 		}
 		if ($action == 'memberShareAll') {
-			$w_action = "a.action IN ( " . pwImplode($this->actions->share) . " )";
+			$w_action = "a.action IN ( " . S::sqlImplode($this->actions->share) . " )";
 		} else {
-			$w_action = "a.action = " . pwEscape($action);
+			$w_action = "a.action = " . S::sqlEscape($action);
 		}
 		if (in_array($action, $this->actions->member)) {
 			$joinTable = " LEFT JOIN pw_members m ON a.tag = m.uid ";
@@ -294,7 +292,7 @@ class Datanalyse {
 	function getForumSort($tags, $nums) {
 		if (!empty($tags) && !empty($nums)) {
 			$sql = "SELECT f.fid,f.name,fd.lastpost FROM pw_forumdata fd LEFT JOIN pw_forums f ON f.fid = fd.fid
-					WHERE f.fid IN ( " . pwImplode($tags) . " )";
+					WHERE f.fid IN ( " . S::sqlImplode($tags) . " )";
 			$query = $this->db->query($sql);
 			$result = array();
 			while ($rt = $this->db->fetch_array($query)) {
@@ -320,7 +318,7 @@ class Datanalyse {
 	function getPicSort($tags, $nums) {
 		if (!empty($tags) && !empty($nums)) {
 			$sql = "SELECT p.pid, p.path, p.uploader, p.uptime, p.pintro,  a.aid, a.ownerid, a.atype, p.ifthumb
-					FROM pw_cnphoto p LEFT JOIN pw_cnalbum a ON p.aid = a.aid WHERE p.pid IN ( " . pwImplode($tags) . " )";
+					FROM pw_cnphoto p LEFT JOIN pw_cnalbum a ON p.aid = a.aid WHERE p.pid IN ( " . S::sqlImplode($tags) . " )";
 			$query = $this->db->query($sql);
 			$result = array();
 			while ($rt = $this->db->fetch_array($query)) {
@@ -350,7 +348,7 @@ class Datanalyse {
 	function getDiarySort($tags, $nums) {
 		if (!empty($tags) && !empty($nums)) {
 			$sql = "SELECT d.did, d.subject, d.postdate, d.username, d.uid FROM pw_diary d
-					WHERE d.did IN ( " . pwImplode($tags) . " )";
+					WHERE d.did IN ( " . S::sqlImplode($tags) . " )";
 			$query = $this->db->query($sql);
 			$result = array();
 			while ($rt = $this->db->fetch_array($query)) {
@@ -374,7 +372,7 @@ class Datanalyse {
 	function getThreadSort($tags, $nums) {
 		if (!empty($tags) && !empty($nums)) {
 			$sql = "SELECT t.tid, t.fid, t.author, t.subject, t.postdate  FROM pw_threads t
-					WHERE t.tid IN ( " . pwImplode($tags) . " ) ";
+					WHERE t.tid IN ( " . S::sqlImplode($tags) . " ) ";
 			$query = $this->db->query($sql);
 			$result = array();
 			while ($rt = $this->db->fetch_array($query)) {
@@ -400,13 +398,13 @@ class Datanalyse {
 		if (!empty($tags) && !empty($nums)) {
 			$sql = "SELECT m.uid, m.icon, m.username, md.lastvisit
 					FROM pw_members m LEFT JOIN pw_memberdata md ON m.uid=md.uid
-					WHERE m.uid IN ( " . pwImplode($tags) . " ) ";
+					WHERE m.uid IN ( " . S::sqlImplode($tags) . " ) ";
 			$query = $this->db->query($sql);
 			$result = array();
 			while ($rt = $this->db->fetch_array($query)) {
 				$r['id'] = $rt['uid'];
 				$r['title'] = $rt['username'];
-				$r['url'] = "u.php?uid=" . $rt['uid'];
+				$r['url'] = USER_URL . $rt['uid'];
 				list($userIcon) = showfacedesign($rt["icon"], 1, 'm');
 				$r['image'] = $userIcon;
 				list($lastDate) = getLastDate($rt["lastvisit"]);
@@ -532,7 +530,7 @@ class DatanalyseAction {
 		'文章'
 	);
 	function DatanalyseAction() {
-		$this->rate = new PW_Rate();
+		$this->rate = L::loadClass('rate', 'rate');
 		$this->share = array(
 			"memberShareThread",
 			"memberShareDiary",

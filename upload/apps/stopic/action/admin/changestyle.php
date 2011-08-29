@@ -1,16 +1,16 @@
 <?php
 !defined('P_W') && exit('Forbidden');
 define('AJAX',1);
-InitGP(array('style'));
+S::gp(array('style','stopicid', 'blockid'));
+$stopicid = (int) $stopicid;
 $layout	= $stopic_service->getStyleConfig($style,'layout_set');
-if (!$layout) {
+if (!$layout || $stopicid === '' || $blockid === '') {
 	echo "error";
 	ajax_footer();
 }
 $layout['bannerurl'] = $stopic_service->getStyleBanner($style);
-
+$stopic_service->addUnit(array('stopic_id'=>$stopicid,'html_id'=>$blockid, 'title'=>'', 'data'=>array('image'=>$layout['bannerurl'])));
 $layout = styleJsonEncode($layout);
-
 echo "success\t".$layout;
 ajax_footer();
 

@@ -73,7 +73,7 @@ class PW_FilterUtil {
 
 	function loadWords() {
 		if (!is_array($this->fbwords)) {
-			include(D_P."data/bbscache/wordsfb.php");
+			include pwCache::getPath(D_P."data/bbscache/wordsfb.php");
 			$this->fbwords	= (array)$wordsfb;
 			$this->replace	= (array)$replace;
 			$this->alarm	= (array)$alarm;
@@ -124,7 +124,10 @@ class PW_FilterUtil {
 		foreach ($arr as $k => $v) {
 			list($table, $field) = $this->tablestruct($k);
 			if ($table && $v) {
-				$db->update("UPDATE $table SET ifwordsfb=" . pwEscape($val) . " WHERE $field IN (" . pwImplode($v) . ')');
+				/**
+				$db->update("UPDATE $table SET ifwordsfb=" . S::sqlEscape($val) . " WHERE $field IN (" . S::sqlImplode($v) . ')');
+				**/
+				pwQuery::update("{$table}", "$field IN (:$field)", array($v), array('ifwordsfb' => $val));
 			}
 		}
 	}
@@ -303,7 +306,7 @@ class PW_FilterUtil {
     	global $db,$timestamp;
 
     	//判断是否重复记录
-    	$sql = "SELECT id,state FROM pw_filter WHERE tid=".pwEscape($tid)." AND pid=".pwEscape($pid);
+    	$sql = "SELECT id,state FROM pw_filter WHERE tid=".S::sqlEscape($tid)." AND pid=".S::sqlEscape($pid);
     	$record = $db->get_one($sql);
 
 	    if (!$record) {
@@ -318,7 +321,7 @@ class PW_FilterUtil {
 				'updated_at' => $timestamp,
 	        );
 	        //插入新记录
-	        $db->update("INSERT INTO pw_filter SET " . pwSqlSingle($value));
+	        $db->update("INSERT INTO pw_filter SET " . S::sqlSingle($value));
     	} else {
     		if ($record['state'] == 2 || $record['state'] == 1) {
     			//处理数据
@@ -327,10 +330,10 @@ class PW_FilterUtil {
 					'filter' => $filter,
 					'created_at' => $timestamp,
 				);
-				$value = pwSqlSingle($value);
+				$value = S::sqlSingle($value);
 
     			//更新记录
-				$sql = "UPDATE pw_filter SET {$value} WHERE tid=".pwEscape($tid)." AND pid=" . pwEscape($pid);
+				$sql = "UPDATE pw_filter SET {$value} WHERE tid=".S::sqlEscape($tid)." AND pid=" . S::sqlEscape($pid);
 				$db->update($sql);
     		}
     	}
@@ -344,7 +347,7 @@ class PW_FilterUtil {
 	 */
 	function delete($tid, $pid) {
 		global $db;
-		$db->update("DELETE FROM pw_filter WHERE tid=" . pwEscape($tid) . " AND pid=" . pwEscape($pid));
+		$db->update("DELETE FROM pw_filter WHERE tid=" . S::sqlEscape($tid) . " AND pid=" . S::sqlEscape($pid));
 	}
 
 	/**

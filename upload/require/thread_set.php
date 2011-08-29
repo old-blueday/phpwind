@@ -3,17 +3,19 @@
 
 require_once(R_P . 'require/showimg.php');
 
-if (!($foruminfo = L::forum($fid))) {
+$pwforum = new PwForum($fid);
+if (!$pwforum->isForum(true)) {
 	Showmsg('data_error');
 }
+$foruminfo =& $pwforum->foruminfo;
 $groupRight =& $newColony->getRight();
 $pwModeImg = "$imgpath/apps";
 require_once(R_P . 'u/require/core.php');
-include_once(D_P . 'data/bbscache/o_config.php');
+include_once pwCache::getPath(D_P . 'data/bbscache/o_config.php');
 
 require_once(R_P . 'require/header.php');
-list($guidename,$forumtitle) = getforumtitle(forumindex($foruminfo['fup'],1));
-$msg_guide = headguide($guidename);
+list($guidename, $forumtitle) = $pwforum->getTitle();
+$msg_guide = $pwforum->headguide($guidename);
 
 $styleid = $colony['styleid'];
 $basename = "thread.php?cyid=$cyid&showtype=set";
@@ -26,7 +28,7 @@ list($faceurl) = showfacedesign($winddb['icon'], 1, 'm');
 !$ifadmin && Showmsg('undefined_action');
 $a_key = 'set';
 
-InitGP('t');
+S::gp('t');
 
 //获取功能权限
 $ifsetable = $newColony->getSetAble($t);
@@ -74,7 +76,7 @@ if (empty($t)) {
 
 	} else {
 		
-		InitGP(array('cname','p_type','firstgradestyle','secondgradestyle','annouce','descrip','q_1','q_2'),'P');
+		S::gp(array('cname','p_type','firstgradestyle','secondgradestyle','annouce','descrip','q_1','q_2'),'P');
 		$descrip = str_replace('&#61;' , '=', $descrip);
 		$annouce = str_replace('&#61;' , '=', $annouce);
 
@@ -82,7 +84,7 @@ if (empty($t)) {
 		!$cname && Showmsg('colony_emptyname');
 		strlen($cname) > 20 && Showmsg('colony_cnamelimit');
 		//(!$descrip || strlen($descrip) > 255) && Showmsg('colony_descriplimit');
-		if ($colony['cname'] != stripcslashes($cname) && $db->get_value("SELECT id FROM pw_colonys WHERE cname=" . pwEscape($cname))) {
+		if ($colony['cname'] != stripcslashes($cname) && $db->get_value("SELECT id FROM pw_colonys WHERE cname=" . S::sqlEscape($cname))) {
 			Showmsg('colony_samename');
 		}
 
@@ -105,8 +107,8 @@ if (empty($t)) {
 		$annouce[key($annouce)] = str_replace(array("\r","\n"),'',current($annouce));
 		$annouce = implode("\r\n",$annouce);
 		
-		InitGP(array('title1','title2','title3','title4'));
-		$titlefont = Char_cv("$title1~$title2~$title3~$title4~$title5~$title6~");
+		S::gp(array('title1','title2','title3','title4'));
+		$titlefont = S::escapeChar("$title1~$title2~$title3~$title4~$title5~$title6~");
 		
 		$pwSQL = array(
 			'cname'		=> $cname,
@@ -147,14 +149,14 @@ if (empty($t)) {
 			}
 		}
 		
-		$db->update("UPDATE pw_colonys SET " . pwSqlSingle($pwSQL) . ' WHERE id=' . pwEscape($cyid));
+		$db->update("UPDATE pw_colonys SET " . S::sqlSingle($pwSQL) . ' WHERE id=' . S::sqlEscape($cyid));
 
 		refreshto("{$basename}",'colony_setsuccess');
 	}
 
 } elseif ($t == 'annouce') {
 
-	InitGP(array('atc_content'),'P');
+	S::gp(array('atc_content'),'P');
 	$annouce = $atc_content;
 	strlen($annouce) > 15000 && Showmsg('colony_annoucelimit');
 	$annouce = explode("\n",$annouce,5);
@@ -171,7 +173,7 @@ if (empty($t)) {
 				Showmsg('content_wordsfb');
 		}
 	}
-	$db->update("UPDATE pw_colonys SET " . pwSqlSingle($pwSQL) . ' WHERE id=' . pwEscape($cyid));
+	$db->update("UPDATE pw_colonys SET " . S::sqlSingle($pwSQL) . ' WHERE id=' . S::sqlEscape($cyid));
 	refreshto("{$basename}",'colony_setsuccess');
 	
 } elseif ($t == 'style') {
@@ -188,12 +190,12 @@ if (empty($t)) {
 
 	} else {
 
-		InitGP(array('colonystyle'), 'P');
+		S::gp(array('colonystyle'), 'P');
 		$pwSQL = array(
 			'colonystyle' => $colonystyle
 		);
 
-		$db->update("UPDATE pw_colonys SET " . pwSqlSingle($pwSQL) . ' WHERE id=' . pwEscape($cyid));
+		$db->update("UPDATE pw_colonys SET " . S::sqlSingle($pwSQL) . ' WHERE id=' . S::sqlEscape($cyid));
 
 		refreshto("{$basename}&t=$t",'colony_setsuccess');
 	}
@@ -215,7 +217,7 @@ if (empty($t)) {
 
 	} else {
 
-		InitGP(array('ifcheck','ifopen','ifinforum','ifwriteopen','ifmemberopen','ifannouceopen'), 'P', 2);
+		S::gp(array('ifcheck','ifopen','ifinforum','ifwriteopen','ifmemberopen','ifannouceopen'), 'P', 2);
 		$pwSQL = array(
 			'ifcheck'	=> $ifcheck,
 			'ifopen'	=> $ifopen,
@@ -224,7 +226,7 @@ if (empty($t)) {
 			'ifannouceopen'=>$ifannouceopen
 		);
 
-		$db->update("UPDATE pw_colonys SET " . pwSqlSingle($pwSQL) . ' WHERE id=' . pwEscape($cyid));
+		$db->update("UPDATE pw_colonys SET " . S::sqlSingle($pwSQL) . ' WHERE id=' . S::sqlEscape($cyid));
 
 		refreshto("{$basename}&t=$t",'colony_setsuccess');
 	}
@@ -249,8 +251,8 @@ if (empty($t)) {
 
 	} else {
 
-		InitGP(array('tocid'));
-		InitGP(array('password'));
+		S::gp(array('tocid'));
+		S::gp(array('password'));
 
 		if (!threadSetCheckOwnerPassword($winduid, $password)) {
 			Showmsg('您输入的密码不正确!');
@@ -274,7 +276,7 @@ if (empty($t)) {
 	if (empty($_POST['step'])) {
 		
 		$groupManager = array();
-		$query = $db->query("SELECT c.uid,m.username,m.groupid,m.memberid,m.icon FROM pw_cmembers c LEFT JOIN pw_members m ON c.uid=m.uid WHERE c.ifadmin='1' AND c.colonyid=" . pwEscape($cyid));
+		$query = $db->query("SELECT c.uid,m.username,m.groupid,m.memberid,m.icon FROM pw_cmembers c LEFT JOIN pw_members m ON c.uid=m.uid WHERE c.ifadmin='1' AND c.colonyid=" . S::sqlEscape($cyid));
 
 		while ($rt = $db->fetch_array($query)) {
 			$rt['groupid'] == '-1' && $rt['groupid'] = $rt['memberid'];
@@ -289,14 +291,14 @@ if (empty($t)) {
 
 	} else {
 
-		InitGP(array('password'));
-		InitGP(array('newmanager'), 'GP', 2);
+		S::gp(array('password'));
+		S::gp(array('newmanager'), 'GP', 2);
 
 		if (!threadSetCheckOwnerPassword($winduid, $password)) {
 			Showmsg('您输入的密码不正确!');
 		}
 
-		$userdb = $db->get_one("SELECT m.username,m.groupid,m.memberid FROM pw_cmembers c LEFT JOIN pw_members m ON c.uid=m.uid WHERE c.ifadmin='1' AND c.colonyid=" . pwEscape($cyid) . ' AND c.uid=' . pwEscape($newmanager));
+		$userdb = $db->get_one("SELECT m.username,m.groupid,m.memberid FROM pw_cmembers c LEFT JOIN pw_members m ON c.uid=m.uid WHERE c.ifadmin='1' AND c.colonyid=" . S::sqlEscape($cyid) . ' AND c.uid=' . S::sqlEscape($newmanager));
 
 		if (empty($userdb)) {
 			Showmsg('请选择要转让的用户!');
@@ -306,7 +308,7 @@ if (empty($t)) {
 			Showmsg('您选择的用户没有接受的权限!');
 		}
 
-		$db->update("UPDATE pw_colonys SET admin=" . pwEscape($userdb['username']) . ' WHERE id=' . pwEscape($cyid));
+		$db->update("UPDATE pw_colonys SET admin=" . S::sqlEscape($userdb['username']) . ' WHERE id=' . S::sqlEscape($cyid));
 		
 		M::sendNotice(
 			array($userdb['username']),
@@ -336,12 +338,12 @@ if (empty($t)) {
 
 	} else {
 		
-		InitGP(array('password'));
+		S::gp(array('password'));
 
 		if (!threadSetCheckOwnerPassword($winduid, $password)) {
 			Showmsg('您输入的密码不正确!');
 		}
-		if ($db->get_value("SELECT COUNT(*) as sum FROM pw_cnalbum WHERE atype=1 AND ownerid=" . pwEscape($cyid)) > 0) {
+		if ($db->get_value("SELECT COUNT(*) as sum FROM pw_cnalbum WHERE atype=1 AND ownerid=" . S::sqlEscape($cyid)) > 0) {
 			Showmsg('colony_del_photo');
 		}
 		if ($colony['cnimg']) {
@@ -349,15 +351,15 @@ if (empty($t)) {
 			pwDelatt("cn_img/$colony[cnimg]",$db_ifftp);
 			pwFtpClose($ftp);
 		}
-		$query = $db->query("SELECT uid FROM pw_cmembers WHERE colonyid=".pwEscape($cyid)." AND ifadmin != '-1'");
+		$query = $db->query("SELECT uid FROM pw_cmembers WHERE colonyid=".S::sqlEscape($cyid)." AND ifadmin != '-1'");
 		while ($rt = $db->fetch_array($query)) {
 			$cMembers[] = $rt['uid'];
 		}
 		updateUserAppNum($cMembers,'group','minus');
-		$db->update("DELETE FROM pw_cmembers WHERE colonyid=" . pwEscape($cyid));
-		$db->update("DELETE FROM pw_colonys WHERE id=" . pwEscape($cyid));
-		$db->update("UPDATE pw_cnclass SET cnsum=cnsum-1 WHERE fid=" . pwEscape($colony['classid']) . " AND cnsum>0");
-		$db->update("DELETE FROM pw_argument WHERE cyid=" . pwEscape($cyid));
+		$db->update("DELETE FROM pw_cmembers WHERE colonyid=" . S::sqlEscape($cyid));
+		$db->update("DELETE FROM pw_colonys WHERE id=" . S::sqlEscape($cyid));
+		$db->update("UPDATE pw_cnclass SET cnsum=cnsum-1 WHERE fid=" . S::sqlEscape($colony['classid']) . " AND cnsum>0");
+		$db->update("DELETE FROM pw_argument WHERE cyid=" . S::sqlEscape($cyid));
 		
 		refreshto("apps.php?q=groups", '解散群组成功!');
 	}

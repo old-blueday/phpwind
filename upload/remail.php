@@ -2,7 +2,7 @@
 require_once('global.php');
 
 $windid && Showmsg('undefined_action');
-InitGP(array('uid'),'GP',2);
+S::gp(array('uid'),'GP',2);
 
 $userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
 $men = $userService->getUnactivatedUser($uid, '', $db_sitehash);
@@ -16,7 +16,7 @@ if (empty($_POST['step'])) {
 
 } else {
 
-	InitGP(array('password','rg_email','to_email'));
+	S::gp(array('password','rg_email','to_email'));
 	$men['password'] != md5($password) && Showmsg('password_error',1);
 	$rg_email != $men['email'] && Showmsg('email_error',1);
 	if ($to_email && !ereg("^[-a-zA-Z0-9_\.]+\@([0-9A-Za-z][0-9A-Za-z-]+\.)+[A-Za-z]{2,5}$",$to_email)) {

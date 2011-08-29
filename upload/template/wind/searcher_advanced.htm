@@ -1,0 +1,119 @@
+<!--<?php print <<<EOT
+-->          
+	<!-- 帖子高级选项部分 开始 -->
+    <div class="search_menu" id="advancedThread" style="display:none;position: absolute;margin-top:70px;z-index:11;">
+        <table width="100%" cellpadding="0" cellspacing="0">
+            <tr>
+                <td>作者</td>
+                <td>
+                    <a href="javascript:;" class="search_del" id="close">删除</a>
+                    <input name="username" type="text" class="input input_wa" value="">
+                </td>
+            </tr>
+
+            <tr>
+                <td width="65">帖子类型：</td>
+                <td>
+                    <label class="mr10"><input name="threadrange" type="radio" value="1" {$threadranges[1]} >&nbsp;主题标题</label>
+<!-- 
+EOT;
+if(in_array($_G['allowsearch'],array(2,3))){
+print <<<EOT
+-->                                
+                   <label class="mr10"><input name="threadrange" type="radio" value="2" {$threadranges[2]} onclick="searchertable('ttable');" >&nbsp;主题内容</label>
+<!-- 
+EOT;
+if(!$isSphinx){
+print <<<EOT
+-->
+                    <span id="ttable" style="display:none;" >$t_table</span>
+<!-- 
+EOT;
+}
+print <<<EOT
+-->                               	
+                    
+<!-- 
+EOT;
+}
+if($_G['allowsearch'] == 3){
+print <<<EOT
+-->                                 
+                    <label class="mr10"><input name="threadrange" type="radio" value="3" {$threadranges[3]} onclick="searchertable('ptable');" >&nbsp;回复内容</label>
+<!-- 
+EOT;
+if(!$isSphinx){
+print <<<EOT
+-->                               	
+                    <span id="ptable" style="display:none;" >$p_table</span>
+<!-- 
+EOT;
+}
+print <<<EOT
+-->                               	
+                    
+<!-- 
+EOT;
+}
+print <<<EOT
+-->
+                </td>
+            </tr>
+            <tr>
+                <td>所在版块</td>
+                <td>
+                    <select class="select_wa" name="fid">
+                    <option value=""></option>
+                        {$forumcache}
+<!--
+EOT;
+if($forumadd){print <<<EOT
+-->
+                    <option value=''>>> 隐藏版块</option>
+                        {$forumadd}
+<!--
+EOT;
+}print <<<EOT
+-->									
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>发表时间</td>
+                <td>
+									<input name="starttime" type="text" class="input" size="22" id="starttime"><img src="$imgpath/search/input_time.png" align="absmiddle" id="ts" class="input_time"><span>至</span>
+									<input name="endtime" type="text" class="input" size="22" id="endtime"><img src="$imgpath/search/input_time.png" align="absmiddle" id="te" class="input_time">
+                </td>
+            </tr>
+        </table>
+    </div>
+    <!-- 日志高级部分开始 -->
+    <div class="search_menu" id="advancedDiary" style="display:none;position: absolute; margin-top: 70px; z-index:11;">
+        <table width="100%">
+            <tr>
+                <td>作者</td>
+                <td>
+                    <a href="javascript:;" class="search_del" id="close2">删除</a>
+                    <input name="diaryusername" type="text" class="input input_wa" value="">
+                </td>
+            </tr>
+            <tr>
+                <td>日志类型</td>
+                <td>
+                    <label class="mr20"><input name="diaryrange" type="radio" value="3" {$diaryranges[3]} >&nbsp;全部</label>
+                    <label class="mr20"><input name="diaryrange" type="radio" value="1" {$diaryranges[1]} >&nbsp;仅标题</label>
+                    <label class="mr20"><input name="diaryrange" type="radio" value="2" {$diaryranges[2]} >&nbsp;仅正文</label>
+                </td>
+            </tr>
+            <tr>
+                <td>发表时间</td>
+                <td>
+									<input name="diarystarttime" type="text" class="input" size="22" id="diarystarttime"><img src="$imgpath/search/input_time.png" align="absmiddle" id="ts2" class="input_time"><span>至</span>
+									<input name="diaryendtime" type="text" class="input" size="22" id="diaryendtime"><img src="$imgpath/search/input_time.png" align="absmiddle" id="te2" class="input_time">
+                </td>
+            </tr>
+        </table>
+    </div>
+<!--
+EOT;
+?>

@@ -95,8 +95,9 @@ var frontAdmin = Class({},
 		configBox.style.top = rect.top+ietruebody().scrollTop-23+'px';
 		configBox.style.width = this.clientWidth+2+'px';
 		var altname = this.getAttribute('altname');
+		var invokename = this.getAttribute('invokename');
 		var channelId = this.getAttribute('channelid');
-		configBox.childNodes[1].innerHTML=altname;
+		configBox.childNodes[1].innerHTML=invokename;
 		configBox.childNodes[2].id=altname;
 		configBox.childNodes[2].channelId=channelId;
 		configBox.style.display='';
@@ -109,7 +110,14 @@ var frontAdmin = Class({},
 	},
 	
 	_initEditLink:	function () {
-		sendmsg((getObj('headbase') ? getObj('headbase').href : '') + 'mode.php?m=area&q=dialog&invokename='+encodeURI(this.id)+'&channelid='+this.channelId,'',this);//frontadmin
+		frontAdmin._sendmsg((getObj('headbase') ? getObj('headbase').href : '') + 'mode.php?m=area&q=dialog&invokename='+encodeURI(this.id)+'&channelid='+this.channelId,'',this);//frontadmin
+	},
+	
+	_sendmsg :function(url,data,id) {
+		portalBox = new PwMenu('portalBox');
+		portalBox.obj = (typeof id == 'undefined' || !id) ? null : getObj(id);
+		//portalBox.guide();
+		setTimeout(function(){ajax.send(url,data,function(){ajax.get(portalBox)});},100);
 	},
 	_mouseout: function () {
 		if(tmpdis.tout) {

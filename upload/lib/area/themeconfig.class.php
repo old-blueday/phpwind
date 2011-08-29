@@ -33,7 +33,7 @@ class PW_ThemeConfig{
 	}
 
 	function getThemeConfigFile($theme) {
-		$filedir = Pcv($this->config['dir'].'/'.$theme.'/'.$this->config['configfile']);
+		$filedir = S::escapePath($this->config['dir'].'/'.$theme.'/'.$this->config['configfile']);
 		if (file_exists($filedir)) {
 			return $filedir;
 		}

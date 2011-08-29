@@ -86,23 +86,32 @@ EOT;
 	</div>
 <!--
 EOT;
-if ($o_photos_gdcheck) {print <<<EOT
+if ($o_photos_gdcheck) {
+$gdSize = explode("\t",$db_gdsize);
+print <<<EOT
 -->
-	<div class="mb10">认证码: <input class="input mr5" onFocus="showCK();" type="text" name="gdcode" id="gdcode" size="5" tabindex="3"  /><img id="ckcode" style="cursor:pointer;display:none; vertical-align:top;" onClick="this.src='ck.php?nowtime='+new Date().getTime();" alt="看不清楚，换一张" align="absmiddle" />
-<script language="JavaScript">
-function showCK(){
-	getObj('ckcode').style.display="";
-	if (getObj('ckcode').src.indexOf('ck.php') == -1) {
-		getObj('ckcode').src = 'ck.php?nowtime=' + new Date().getTime();
-	}
-}
+	<div class="mb10">认证码: <input class="input mr5" type="text" name="gdcode" id="fs_gdcode" size="5" tabindex="3"  />
+<script type="text/javascript" src="js/pw_authcode.js"></script>
+<script>
+var flashWidth = "$gdSize[0]";
+var flashHeight = "$gdSize[1]";
+var gdtype = $db_gdtype;
+showGdCode();
 </script>
 	</div>
 <!--
 EOT;
-}if($o_photos_qcheck){print <<<EOT
+}if($o_photos_qcheck && $db_question){
+list(,$showq)=explode("\t",$db_qcheck);
+if($db_imagequestion){
+	$question = '<img id="ckquestion" src="ckquestion.php?q='.$qkey.'&t='.$timestamp.'" align="top">';
+}else{
+	$question = $qkey<0 ? getMachineQuestion_1() :  $db_question[$qkey];
+}
+$q_a = $question.($showq && $qkey>0?" 正确答案:".$db_answer[$qkey] : '');
+print <<<EOT
 -->
-	<div class="mb10">验证问答: {$db_question[$qkey]} （正确答案:{$db_answer[$qkey]}）
+	<div class="mb10">验证问答: {$q_a}
 		<input class="input" name="qanswer" id="qanswer" size="25" tabindex="7" />
 		<input type="hidden" name="qkey" id="qkey" value="$qkey" />
 	</div>

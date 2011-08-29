@@ -1,6 +1,20 @@
 <!--<?php
 include_once PrintEot('left');
-if (empty($action)){
+${'current' . $action} = 'class="current"';
+$adminitem == 'viewban' && $currentviewban = 'class="current"';
+print <<<EOT
+-->
+<div class="nav3 mb10 ta">
+    <ul class="cc">
+      <li $currentbanuser><a href="$basename&adminitem=banuser&action=banuser">手动禁言</a></li>
+      <li $currentautoban><a href="$basename&adminitem=banuser&action=autoban">自动禁言</a></li>
+      <li $currentfreeuser><a href="$basename&adminitem=banuser&action=freeuser">解除禁言</a></li>
+      <li $currentviewban><a href="$basename&adminitem=viewban">查看禁言</a></li>
+    </ul>
+</div>
+<!--
+EOT;
+if ($adminitem == 'banuser') {
 print <<<EOT
 -->
 <div class="admin_info mb10">
@@ -12,55 +26,22 @@ print <<<EOT
 	<li><font color=blue>强制禁言</font>:使用此功能禁言用户同时将禁言该用户的其他帐号的发表权限</li></ol>
 	<br />注:此功能可有效控制某些用户使用多个帐号破坏站点秩序</div>
 </div>
-<form action="$basename&" method=post>
-<input type="hidden" name="action" value="autoban">
-<h2 class="h1"><b>自动禁言设置</b></h2>
-<div class="admin_table mb10">
-<table width="100%" cellspacing="0" cellpadding="0">
-	<tr class="tr1 vt">
-		<td class="td1">是否使用此功能</td>
-		<td class="td2">
-			<ul class="list_A list_80 cc">
-				<li><input type=radio name=ban[autoban] value=1 $autoban_Y />开启</li>
-				<li><input type=radio name=ban[autoban] value=0 $autoban_N />关闭</li>
-			</ul>
-		</td>
-	</tr>
-	<tr class="tr1 vt">
-		<td class="td1">积分依据</td>
-		<td class="td2">
-			<select name=ban[banby]>
-				<option value=1 $select[1]>发帖</option>
-				<option value=2 $select[2]>{$db_rvrcname}</option>
-				<option value=3 $select[3]>{$db_moneyname}</option>
-			</select>
-		</td>
-	</tr>
-	<tr class="tr1 vt">
-		<td class="td1">类型</td>
-		<td class="td2">
-			<ul class="list_A ">
-				<li><input type=radio name=ban[bantype] value=1 $bantype_1 />定期禁言</li>
-				<li><input type=radio name=ban[bantype] value=2 $bantype_2 />永久禁言(不需要设定禁言期限)</li>
-			</ul>
-		</td>
-	</tr>
-	<tr class="tr1 vt">
-		<td class="td1">禁言期限[天]</td>
-		<td class="td2"><input type="text" class="input input_wa"  name='ban[banlimit]' value='$db_banlimit' /></td>
-	</tr>
-	<tr class="tr1 vt">
-		<td class="td1">积分小于</td>
-		<td class="td2"><input type="text" class="input input_wa" name='ban[banmax]' value='$db_banmax' /></td>
-	</tr>
-</table>
+<!--
+EOT;
+} else {
+print <<<EOT
+-->
+<div class="admin_info mb10">
+	<h3 class="h1"><b>提示信息</b></h3>
+	<div class="legend">禁言用户列表，管理员可使用此功能解除禁言用户</div>
 </div>
-<div class="tac mb10">
-	<span class="btn"><span><button type="submit">提 交</button></span></span>
-</div>
-</form>
-
-<form action="$basename&" method=post>
+<!--
+EOT;
+}
+if ($adminitem == 'banuser' && $action == 'banuser') {
+print <<<EOT
+-->
+<form action="$basename&adminitem=$adminitem" method=post>
 <h2 class="h1"><b>会员禁言</b></h2>
 <div class="admin_table mb10">
 <table width="100%" cellspacing="0" cellpadding="0">
@@ -91,10 +72,73 @@ print <<<EOT
 <div class="tac mb10">
 	<span class="btn"><span><button type="submit">提 交</button></span></span>
 </div>
+<input type="hidden" name="step" value=2 />
 <input type="hidden" name="action" value='banuser' />
 </form>
-
-<form action="$basename&" method=post>
+<!--
+EOT;
+} elseif ($adminitem == 'banuser' && $action == 'autoban') {
+print <<<EOT
+-->
+<form action="$basename&adminitem=$adminitem" method=post>
+<input type="hidden" name="action" value="autoban">
+<input type="hidden" name="step" value=2 />
+<h2 class="h1"><b>自动禁言设置</b></h2>
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+	<tr class="tr1 vt">
+		<td class="td1">自动禁言</td>
+		<td class="td2">
+			<ul class="list_A list_80 cc">
+				<li><input type=radio name=ban[autoban] value=1 $autoban_Y />开启</li>
+				<li><input type=radio name=ban[autoban] value=0 $autoban_N />关闭</li>
+			</ul>
+		</td>
+		<td class="td2"><div class="help_a">开启后，自动禁言生效</div></td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">积分依据</td>
+		<td class="td2">
+			<select name=ban[banby]>
+				<option value=1 $select[1]>发帖</option>
+				<option value=2 $select[2]>{$db_rvrcname}</option>
+				<option value=3 $select[3]>{$db_moneyname}</option>
+			</select>
+		</td>
+	    <td class="td2"><div class="help_a">与 <b>积分小于</b> 联合使用，是指当此类型的积分小于下方的设定值时，会被自动禁言</div></td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">类型</td>
+		<td class="td2">
+			<ul class="list_A ">
+				<li><input type=radio name=ban[bantype] value=1 $bantype_1 />定期禁言</li>
+				<li><input type=radio name=ban[bantype] value=2 $bantype_2 />永久禁言(不需要设定禁言期限)</li>
+			</ul>
+		</td>
+		<td class="td2"><div class="help_a">可以设定的禁言类型</div></td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">禁言期限[天]</td>
+		<td class="td2"><input type="text" class="input input_wa"  name='ban[banlimit]' value='$db_banlimit' /></td>
+		<td class="td2"><div class="help_a"></div></td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td1">积分小于</td>
+		<td class="td2"><input type="text" class="input input_wa" name='ban[banmax]' value='$db_banmax' /></td>
+		<td class="td2"><div class="help_a">设定禁言的积分上限值</div></td>
+	</tr>
+</table>
+</div>
+<div class="tac mb10">
+	<span class="btn"><span><button type="submit">提 交</button></span></span>
+</div>
+</form>
+<!--
+EOT;
+} elseif ($adminitem == 'banuser' && $action == 'freeuser') {
+print <<<EOT
+-->
+<form action="$basename&adminitem=$adminitem" method=post>
 <h2 class="h1"><b>解除禁言</b></h2>
 <div class="admin_table mb10">
 <table width="100%" cellspacing="0" cellpadding="0">
@@ -108,9 +152,127 @@ print <<<EOT
 	<span class="btn"><span><button type="submit">提 交</button></span></span>
 </div>
 <input type=hidden name=action value='freeuser' />
+<input type="hidden" name="step" value=2 />
 </form>
 <!--
 EOT;
-}include_once PrintEot('adminbottom');
+} elseif ($adminitem == 'viewban') {
+print <<<EOT
+-->
+<form action="$basename&adminitem=$adminitem" method="post">
+<script language="javascript" src="js/date.js"></script>
+<h2 class="h1">搜索</h2>
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+	<tr class="tr1 vt">
+		<td class="td2" width="150">禁言类型:
+			<select name="bantype">
+				<option value="">全部类型</option>
+				<option value="1">定期禁言</option>
+				<option value="2">永久禁言</option>
+				<option value="3">强制禁言</option>
+			</select>
+		</td>
+		<td class="td2" width="135">用户名:
+			<input type="text" class="input input_wc" name="banuser" />
+		</td>
+		<td class="td2" width="135">管理员:
+			<input type="text" class="input input_wc" name="adminban" />
+		</td>
+		<td class="td2" width="260">禁言时间:
+			<input type="text" class="input input_wc" id="starttime" name="starttime" onClick="javascript:ShowCalendar(this.id)" /> -
+			<input type="text" class="input input_wc" id="endtime" name="endtime" onClick="javascript:ShowCalendar(this.id)" />
+		</td>
+		<td class="td2"><span class="bt2"><span><button type="submit" value="提 交">提 交</button></span></span></td>
+	</tr>
+</table>
+</div>
+</form>
+
+<form action="$basename&adminitem=$adminitem" method="post">
+<input type="hidden" name="action" value="freeban">
+<h2 class="h1">禁言用户</h2>
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+	<tr class="tr2 td_bgB">
+		<td width="24">ID</td>
+		<td width="80">用户名</td>
+		<td width="60">禁言范围</td>
+		<td width="60">禁言类型</td>
+		<td width="110">禁言时间</td>
+		<td width="50">禁言天数</td>
+		<td width="50">管理员</td>
+		<td>禁言原因</td>
+		<td width="35">解禁?</td>
+	</tr>
+<!--
+EOT;
+$num=($page-1)*$db_perpage;
+foreach($bandb as $ban){
+$num++;
+print <<<EOT
+-->
+	<tr class="tr1 vt">
+		<td class="td2">$num</td>
+		<td class="td2"><a href="u.php?username={$ban[username]}" target="_blank">$ban[username]</a></td>
+		<td class="td2">
+<!--
+EOT;
+if($ban['fid']){print <<<EOT
+-->
+			<a href="thread.php?fid=$ban[fid]">{$forum[$ban[fid]][name]}</a>
+<!--
+EOT;
+}else{print <<<EOT
+-->
+			全局禁言
+<!--
+EOT;
+}print <<<EOT
+-->
+		</td>
+		<td class="td2">
+<!--
+EOT;
+if($ban['type']==1){print <<<EOT
+-->
+			定期禁言
+<!--
+EOT;
+}elseif($ban['type']==2){print <<<EOT
+-->
+			永久禁言
+<!--
+EOT;
+}elseif($ban['type']==3){print <<<EOT
+-->
+			强制禁言
+<!--
+EOT;
+}print <<<EOT
+-->
+		</td>
+		<td class="td2">$ban[date]</td>
+		<td class="td2">$ban[days]</td>
+		<td class="td2">$ban[admin]</td>
+		<td class="td2"><p class="lh_18" title="$ban[reason]">$ban[reason]</p></td>
+		<td class="td2">&nbsp;<input type="checkbox" name="free[]" value="$ban[uid]" onclick="pwJsCheck(this)" /></td>
+	</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+</table>
+</div>
+<div class="mb10 cc">$pages</div>
+<div class="tac mb10">
+	<span class="bt"><span><button type="button" name="chkall" onclick="CheckAll(this.form)">全 选</button></span></span>
+	<span class="btn"><span><button type="submit" name="hello">提 交</button></span></span>
+</div>
+</form>
+<!--
+EOT;
+}
+include_once PrintEot('adminbottom');
 ?>
 -->

@@ -1,21 +1,21 @@
 <?php
 !function_exists('readover') && exit('Forbidden');
-if ($inv_linkopen) {
+
+list($u,$a) = explode("\t",GetCookie('userads'));
+if (is_numeric($u) || ($a && strlen($a)<16)) {
 	PwNewDB();
-	if (advertRecord($uid)) {	
+	$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
+	$tmpUser = $u ? $userService->get($u) : $userService->getByUserName($a);
+	if ($tmpUser && advertRecord($tmpUser['uid'], $tmpUser['username'])) {
 		if (!$credit) {
 			require_once (R_P . 'require/credit.php');
 		}
-		if (empty($username)) {
-		$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
-		$username = $userService->getUserNameByUserId($uid);
-		}
-		$credit->addLog('other_propaganda', array($inv_linkcredit => $inv_linkscore), array('uid' => $uid,
-		'username' => $username, 'ip' => $onlineip));
-		$credit->set($uid, $inv_linkcredit, $inv_linkscore);
+		$credit->addLog('other_propaganda', array($inv_linkcredit => $inv_linkscore), array('uid' => $tmpUser['uid'],
+		'username' => $tmpUser['username'], 'ip' => $onlineip));
+		$credit->set($tmpUser['uid'], $inv_linkcredit, $inv_linkscore);
 	}
-	Cookie('userads', '', 0);
 }
+Cookie('userads', '', 0);
 
 /**
  * 添加
@@ -25,17 +25,11 @@ if ($inv_linkopen) {
  */
 function advertRecord($uid = 0, $username = '') {
 	global $onlineip, $timestamp, $db, $winduid, $inv_linktype, $inv_linkscore, $inv_linkcredit;
-	if (empty($uid)) {
+	if (empty($uid) || empty($username)) {
 		return false;
 	}
-	if (empty($username)) {
-		$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
-		$username = $userService->getUserNameByUserId($uid);
-		if (!$username) return false;
-	}
-	$sql = "SELECT ip FROM pw_inviterecord WHERE uid=" . pwEscape($uid) . " AND ip=" . pwEscape($onlineip) . "";
+	$sql = "SELECT ip FROM pw_inviterecord WHERE uid=" . S::sqlEscape($uid) . " AND ip=" . S::sqlEscape($onlineip) . "";
 	$rt = $db->get_one($sql);
-	
 	if ($rt && $rt['ip'] == $onlineip) {
 		return false;
 	}
@@ -47,8 +41,8 @@ function advertRecord($uid = 0, $username = '') {
 		'unit' => $inv_linkcredit, 
 		'ip' => $onlineip, 
 		'create_time' => $timestamp
-		);
-	$sql = 'INSERT INTO pw_inviterecord SET ' . pwSqlSingle($visit);
+	);
+	$sql = 'INSERT INTO pw_inviterecord SET ' . S::sqlSingle($visit);
 	$db->update($sql);
 	return true;
 }

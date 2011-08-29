@@ -1,11 +1,12 @@
 <!--<?php
 if(!defined('AJAX')) {
 require_once uTemplate::PrintEot('header');
-//require_once uTemplate::PrintEot('profile_left');
+require_once(uTemplate::printEot('user_appleft'));
 print <<<EOT
 -->
 <div class="contUser">
-	<div class="p15">            	
+	<div class="p15" style="min-height:450px;_height:450px;"> 
+		<h4 class="site"><img src="u/images/module/toolcenter.png" align="absmiddle" class="mr10" /><span>道具中心</span></h4>   
 <!--
 EOT;
 if (empty($job)) {
@@ -438,7 +439,7 @@ EOT;
 <!--
 EOT;
 if ($value['nums'] > 0) {
-if($value[type] == 1) {print <<<EOT
+if($value[type] == 1 || $value['toolid'] == 16) {print <<<EOT
 -->
 										<a href="profile.php?action=toolcenter&job=use&toolid=$id" class="usetool" onclick="alert('对不起，帖子相关道具请您到帖子页面使用');return false;">使用道具</a>
 <!--
@@ -865,7 +866,7 @@ EOT;
 EOT;
 if ($toolid == 3) {print <<<EOT
 -->
-            <form action="profile.php?action=toolcenter&job=ajax" method="post">
+            <form action="profile.php?action=toolcenter&job=ajax" method="post" onsubmit="return false;">
                 <input type="hidden" name="tid" value="$tid" />
                 <input type="hidden" name="toolid" value="$toolid" />
                 <input type="hidden" name="step" value="2" />
@@ -893,8 +894,9 @@ if ($toolid == 3) {print <<<EOT
 EOT;
 } elseif ($toolid == 8) {print <<<EOT
 -->
-            <form action="profile.php?action=toolcenter&job=ajax&" method="post">
+            <form action="profile.php?action=toolcenter&job=ajax&" method="post" onsubmit="return false;">
                 <input type="hidden" name="toolid" value="$toolid" />
+                <input type="hidden" name="job" value="ajax" />
                 <input type="hidden" name="step" value="2" />
                 <table width="340" cellspacing="0" cellpadding="0">
                 	<tr>

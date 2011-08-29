@@ -1,7 +1,7 @@
 <?php
 ! defined ( 'P_W' ) && exit ( 'Forbidden' );
 
-InitGP ( array ("action", "new_category_title", "category_title", "categoryid" ) );
+S::gp ( array ("action", "new_category_title", "category_title", "categoryid" ) );
 
 class CategoryManage {
 	
@@ -82,6 +82,5 @@ class CategoryManage {
 $register = array ("action" => $action, "stopic_service" => $stopic_service, "new_category_title" => $new_category_title, "admin_name" => $admin_name, "category_title" => $category_title, "categoryid" => $categoryid, "pwService" => $pwServer ,'jump'=>$stopic_admin_url."&job=$job");
 $categoryObject = new CategoryManage ( $register );
 $categoryLists = $categoryObject->getCategorysLists ();
-
 include stopic_use_layout ( 'admin' );
 ?>

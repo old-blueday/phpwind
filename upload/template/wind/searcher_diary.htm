@@ -1,64 +1,123 @@
 <!--<?php print <<<EOT
 -->
-		<div class="content fl">
-        	<div class="s_dlA">
+<!--main begin-->
+<div class="list_main list_main_no">
+	<div class="list_content">
+		<table width="100%" cellpadding="0" cellspacing="0" height="300"><tr><td valign="top">
+		<div class="dlA">
+<!--
+EOT;
+if ($adverts) {print <<<EOT
+-->
+	
+<!--
+EOT;
+	foreach ($adverts as $advert) {
+	print <<<EOT
+-->
+				<div class="promotion">
+					$advert
+				</div>
+<!--
+EOT;
+	}print <<<EOT
+-->
+<!--
+EOT;
+}print <<<EOT
+-->
+
 <!-- 
 EOT;
 foreach($diarys as $diary){
 $diary[dtid] = $diary[dtid] == 0 ? '-1' : $diary[dtid];
 print <<<EOT
 -->    
-				<dl>
-                <dt><a href="apps.php?q=diary&uid={$diary[uid]}&a=detail&did={$diary[did]}" target="_blank">$diary[subject]</a></dt>
-                    <dd class="text">$diary[content]</dd>
-                    <dd class="cite"><a href="apps.php?q=diary&uid={$diary[uid]}" target="_blank">日志</a>&nbsp;&raquo;&nbsp;<a href="apps.php?q=diary&uid={$diary[uid]}&dtid={$diary[dtid]}" target="_blank" class="mr20">$diary[type]</a>作者：<a href="u.php?uid={$diary[uid]}" target="_blank" class="mr20">$diary[username]</a>
-                    <span class="mr20">$diary[postdate]</span></dd>
-                </dl>
+
+			<dl>
+				<dt><a href="apps.php?q=diary&uid={$diary[uid]}&a=detail&did={$diary[did]}" class="tlink" target="_blank">$diary[subject]</a></dt>
+				<dd>
+					<div class="num"></div>
+					<div class="text">$diary[content]</div>
+					<div class="riji_author">作者：<a href="{$db_userurl}{$diary[uid]}" target="_blank" class="mr20">$diary[username]</a>查看：$diary[r_num]<span>|</span>回复：$diary[c_num]<span>|</span>发布时间：<cite>$diary[postdate]</cite></div>
+				</dd>
+			</dl>
+
 <!-- 
 EOT;
 }
 print <<<EOT
--->  
-                <div class="pages">
+-->  			
+			
+			
+			<div class="mb20">
+			<div class="pages">
                    $pager
                 </div>
-                <div class="c">&nbsp;</div>
-            </div>
-            <div class="h">
-        
-            </div>
-        </div>
-        
-        <div class="sidebar fr">
+				<div class="c"></div>
+			</div>
+		</div>
+<!--
+EOT;
+require printEOT('searcher_searchinput');
+print <<<EOT
+-->
+		</td></tr></table>
+	</div>
+<div class="list_sideBar">
+<!--
+EOT;
+list($htmlAdvert,$arrayAdvert) = pwAdvert('Site.Search.Diary.Right','');
+if($htmlAdvert){print <<<EOT
+-->
+<div style="height:200px;width:200px;">
+<div class="tac mb5">$htmlAdvert</div>
+</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+		<div class="list_box">
+			<h2><a href="searcher.php?type=diary&keyword={$keyword}&step=2&diaryrange=$diaryrange">全部时间</a></h2>
+			<ul>	
+				<li id="posttime_1"><a href="searcher.php?type=diary&keyword={$keyword}&step=2&posttime=1&diaryrange=$diaryrange">1小时内</a></li>
+				<li id="posttime_24"><a href="searcher.php?type=diary&keyword={$keyword}&step=2&posttime=24&diaryrange=$diaryrange">一天内</a></li>
+				<li id="posttime_168"><a href="searcher.php?type=diary&keyword={$keyword}&step=2&posttime=168&diaryrange=$diaryrange">一周内</a></li>
+				<li id="posttime_720"><a href="searcher.php?type=diary&keyword={$keyword}&step=2&posttime=720&diaryrange=$diaryrange">一个月内</a></li>
+			</ul>
+			<script language="JavaScript">setCurrent('posttime_{$posttime}','','current');</script>
 <!--
 EOT;
 if($hotwords){
 print <<<EOT
--->         
-        	<div class="p15 s_boxA">
-            	<h2>一周热门搜索</h2>
-                <ul>
+-->     
+						
+			<h2><a>热门搜索</a></h2>
+			<ul>
 <!-- 
 EOT;
 foreach($hotwords as $hotword){
 print <<<EOT
--->                
-                	<li><a href="searcher.php?keyword={$hotword}&type=diary">$hotword</a></li>
+-->
+			<li><a href="searcher.php?keyword={$hotword}&type=diary">$hotword</a></li>
 <!-- 
 EOT;
 }
 print <<<EOT
--->                 	
-                </ul>
-            </div>
+--> 
+								
+			</ul>
+					
 <!-- 
 EOT;
 }
 print <<<EOT
--->              
-        </div>
-        
-        <div class="c">&nbsp;</div>         
+-->
+			
+		</div>
+	</div>
+	<div class="c"></div>
+</div>
 <!--
 EOT;
 ?>

@@ -86,7 +86,7 @@ var PwFace = {
 		var _html = '';
 		for (var i = 0; i < sublist.length; i++) {
 			if (typeof sublist[i] != 'undefined')
-				_html += '<li><a title="'+face[sublist[i]][1]+'" href="javascript://" onclick="PwFace.addsmile('+sublist[i]+');"><img src="' + picpath + face[sublist[i]][0] + '" alt=" '+face[sublist[i]][1]+'" /></a></li>';
+				_html += '<li><a title="'+face[sublist[i]][1]+'" href="javascript://" onclick="PwFace.addsmile('+sublist[i]+');return false;"><img src="' + picpath + face[sublist[i]][0] + '" alt=" '+face[sublist[i]][1]+'" /></a></li>';
 		}
 		PwFace.mainObj.innerHTML = _html;
 	},
@@ -362,11 +362,10 @@ function loadData(key){
 		alert(I18N['loaddata_msg_none']);
 		return false;
 	} else if (typeof WYSIWYD == 'undefined' && document.FORM.atc_content.value != '' || typeof WYSIWYD == 'function' && editor.getHTML() != '') {
-		if (!confirm(I18N['loaddata_confirm'])) {
-			return false;
-		}
+		showDialog({type:'confirm',message:I18N['loaddata_confirm'],okText:'确认',onOk:function(){
+			setEditorContent(msg);
+		}})
 	}
-	setEditorContent(msg);
 }
 /*
  * 设置编辑器的内容

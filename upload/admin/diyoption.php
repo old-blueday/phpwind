@@ -40,7 +40,7 @@ if (!$action) {
 	$checkvar && $checkvar = substr($checkvar,1);
 	include PrintEot('diyoption');exit;
 } elseif ($action=='edit') {
-	InitGP(array('diydb'),'P');
+	S::gp(array('diydb'),'P');
 	if (is_array($diydb)) {
 		if (count($diydb)>15) adminmsg('diyoption_maxlength');
 		$diydb	= implode(',',$diydb);

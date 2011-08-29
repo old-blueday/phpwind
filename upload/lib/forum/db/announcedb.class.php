@@ -13,7 +13,7 @@ class PW_AnnounceDB extends BaseDB {
 		global $timestamp;
 		$num = (int) $num;
 		$query = $this->_db->query("SELECT * FROM $this->_tableName WHERE ifopen = '1' AND 
-			startdate <= " . pwEscape($timestamp) . " ORDER BY aid DESC LIMIT 0,$num");
+			startdate <= " . S::sqlEscape($timestamp) . " AND enddate=0 OR enddate>". S::sqlEscape($timestamp) ." ORDER BY aid DESC LIMIT 0,$num");
 		return $this->_getAllResultFromQuery($query);
 	}
 

@@ -1,7 +1,7 @@
 <?php
 !function_exists('adminmsg') && exit('Forbidden');
 
-@include_once(D_P.'data/bbscache/o_config.php');
+@include_once pwCache::getPath(D_P.'data/bbscache/o_config.php');
 
 if (empty($action)) {
 	if (empty($_POST['step'])) {
@@ -36,8 +36,8 @@ if (empty($action)) {
 		require_once PrintApp('admin');
 
 	} else {
-		InitGP(array('creditset','creditlog'),'GP');
-		InitGP(array('config','phopen','groups'),'GP',2);
+		S::gp(array('creditset','creditlog'),'GP');
+		S::gp(array('config','phopen','groups'),'GP',2);
 
 		require_once(R_P.'admin/cache.php');
 		setConfig('db_phopen', $phopen);
@@ -59,9 +59,9 @@ if (empty($action)) {
 		foreach ($config as $key => $value) {
 			if (${'o_'.$key} != $value) {
 				$db->pw_update(
-					'SELECT hk_name FROM pw_hack WHERE hk_name=' . pwEscape("o_$key"),
-					'UPDATE pw_hack SET ' . pwSqlSingle(array('hk_value' => $value, 'vtype' => 'string')) . ' WHERE hk_name=' . pwEscape("o_$key"),
-					'INSERT INTO pw_hack SET ' . pwSqlSingle(array('hk_name' => "o_$key", 'vtype' => 'string', 'hk_value' => $value))
+					'SELECT hk_name FROM pw_hack WHERE hk_name=' . S::sqlEscape("o_$key"),
+					'UPDATE pw_hack SET ' . S::sqlSingle(array('hk_value' => $value, 'vtype' => 'string')) . ' WHERE hk_name=' . S::sqlEscape("o_$key"),
+					'INSERT INTO pw_hack SET ' . S::sqlSingle(array('hk_name' => "o_$key", 'vtype' => 'string', 'hk_value' => $value))
 				);
 				$updatecache = true;
 			}
@@ -71,11 +71,11 @@ if (empty($action)) {
 	}
 } elseif ($action == 'albums') {
 	if ($job == 'delete') {
-		InitGP(array('selid','aname','owner','crtime_s','crtime_e','lasttime_s','lasttime_e','private','lines','orderway','ordertype'));
+		S::gp(array('selid','aname','owner','crtime_s','crtime_e','lasttime_s','lasttime_e','private','lines','orderway','ordertype'));
 		empty($selid) && adminmsg("no_album_selid", "$basename&action=albums");
 		require_once(R_P . 'u/require/core.php');
 		foreach ($selid as $key => $aid) {
-			$query = $db->query("SELECT cn.pid,cn.path,cn.ifthumb,ca.ownerid FROM pw_cnphoto cn LEFT JOIN pw_cnalbum ca ON cn.aid=ca.aid WHERE cn.aid=" . pwEscape($aid));
+			$query = $db->query("SELECT cn.pid,cn.path,cn.ifthumb,ca.ownerid FROM pw_cnphoto cn LEFT JOIN pw_cnalbum ca ON cn.aid=ca.aid WHERE cn.aid=" . S::sqlEscape($aid));
 			if (($num = $db->num_rows($query)) > 0) {
 				$affected_rows = 0;
 				while ($rt = $db->fetch_array($query)) {
@@ -90,28 +90,28 @@ if (empty($action)) {
 				pwFtpClose($ftp);
 				countPosts("-$affected_rows");
 			}
-			$db->update("DELETE FROM pw_cnphoto WHERE aid=" . pwEscape($aid));
-			$db->update("DELETE FROM pw_cnalbum WHERE aid=" . pwEscape($aid));
+			$db->update("DELETE FROM pw_cnphoto WHERE aid=" . S::sqlEscape($aid));
+			$db->update("DELETE FROM pw_cnalbum WHERE aid=" . S::sqlEscape($aid));
 		}
 		$uids = array_unique($uids);
 		updateUserAppNum($uids,'photo','recount');
 		adminmsg('operate_success',"$basename&action=albums&job=list&aname=".rawurlencode($aname)."&owner=".rawurlencode($owner)."&crtime_s=$crtime_s&crtime_e=$crtime_e&lasttime_s=$lasttime_s&lasttime_e=$lasttime_e&private=$private&lines=$lines&orderway=$orderway&ordertype=$ordertype&page=$page&");
 	} elseif ($job == 'edit') {
-		InitGP(array('aid'));
-		$album = $db->get_one("SELECT aid,aname,aintro,private FROM pw_cnalbum WHERE aid=".pwEscape($aid));
+		S::gp(array('aid'));
+		$album = $db->get_one("SELECT aid,aname,aintro,private FROM pw_cnalbum WHERE aid=".S::sqlEscape($aid));
 		empty($album) && Showmsg('album_not_exist',"$basename&action=albums");
 		if (empty($_POST['step'])) {
-			InitGP(array('aname','owner','crtime_s','crtime_e','lasttime_s','lasttime_e','private','lines','orderway','ordertype','page'));
+			S::gp(array('aname','owner','crtime_s','crtime_e','lasttime_s','lasttime_e','private','lines','orderway','ordertype','page'));
 			${'private_'.$album['private']} = 'selected';
 			require_once PrintApp('admin');
 		} else {
-			InitGP(array('aname','aintro','private'));
-			InitGP(array('url_aname','url_owner','url_crtime_s','url_crtime_e','url_lasttime_s','url_lasttime_e','url_private','url_lines','url_orderway','url_ordertype','url_page'));
-			$db->update("UPDATE pw_cnalbum SET ".pwSqlSingle(array('aname' => $aname,'aintro' => $aintro, 'private' => $private))." WHERE aid=".pwEscape($aid));
+			S::gp(array('aname','aintro','private'));
+			S::gp(array('url_aname','url_owner','url_crtime_s','url_crtime_e','url_lasttime_s','url_lasttime_e','url_private','url_lines','url_orderway','url_ordertype','url_page'));
+			$db->update("UPDATE pw_cnalbum SET ".S::sqlSingle(array('aname' => $aname,'aintro' => $aintro, 'private' => $private))." WHERE aid=".S::sqlEscape($aid));
 			adminmsg('operate_success',"$basename&action=albums&job=list&aname=".rawurlencode($url_aname)."&owner=".rawurlencode($url_owner)."&crtime_s=$url_crtime_s&crtime_e=$url_crtime_e&lasttime_s=$url_lasttime_s&lasttime_e=$url_lasttime_e&private=$url_private&lines=$url_lines&orderway=$url_orderway&ordertype=$url_ordertype&page=$url_page&");
 		}
 	} else {
-		InitGP(array('aname','owner','crtime_s','crtime_e','lasttime_s','lasttime_e','private','lines','orderway','ordertype','page', 'searchDisplay'));
+		S::gp(array('aname','owner','crtime_s','crtime_e','lasttime_s','lasttime_e','private','lines','orderway','ordertype','page', 'searchDisplay'));
 		
 		$photoPrivateSelection = array(
 			'-1'=>'不限制', 
@@ -152,32 +152,32 @@ if (empty($action)) {
 		$urladd = '';
 		if ($aname) {
 			$aname = str_replace('*','%',$aname);
-			$sql .= ' AND aname LIKE '.pwEscape($aname);
+			$sql .= ' AND aname LIKE '.S::sqlEscape($aname);
 			$urladd .= '&aname='.rawurlencode($aname);
 		}
 		if ($owner) {
 			$owner = str_replace('*','%',$owner);
-			$sql .= ' AND owner LIKE '.pwEscape($owner);
+			$sql .= ' AND owner LIKE '.S::sqlEscape($owner);
 			$urladd .= '&owner='.rawurlencode($owner);
 		}
 		if ($crtime_s) {
-			$sql .= ' AND crtime>='.pwEscape($crtime_s);
+			$sql .= ' AND crtime>='.S::sqlEscape($crtime_s);
 			$urladd .= "&crtime_s=$crtime_s";
 		}
 		if ($crtime_e) {
-			$sql .= ' AND crtime<='.pwEscape($crtime_e);
+			$sql .= ' AND crtime<='.S::sqlEscape($crtime_e);
 			$urladd .= "&crtime_e=$crtime_e";
 		}
 		if ($lasttime_s) {
-			$sql .= ' AND lasttime>='.pwEscape($lasttime_s);
+			$sql .= ' AND lasttime>='.S::sqlEscape($lasttime_s);
 			$urladd .= "&lasttime_s=$lasttime_s";
 		}
 		if ($lasttime_e) {
-			$sql .= ' AND lasttime<='.pwEscape($lasttime_e);
+			$sql .= ' AND lasttime<='.S::sqlEscape($lasttime_e);
 			$urladd .= "&lasttime_e=$lasttime_e";
 		}
 		if ($private != -1) {
-			$sql .= ' AND private='.pwEscape($private);
+			$sql .= ' AND private='.S::sqlEscape($private);
 			$urladd .= "&private=$private";
 		}
 		$orderway = $orderway == 'crtime' ? 'crtime' : 'lasttime';
@@ -193,7 +193,7 @@ if (empty($action)) {
 		}
 		$pages=numofpage($count,$page,$numofpage,"$basename&action=$action&job=list$urladd&");
 		$start = ($page-1)*$lines;
-		$limit = pwLimit($start,$lines);
+		$limit = S::sqlLimit($start,$lines);
 		$query = $db->query("SELECT aid,aname,private,ownerid,owner,photonum,lasttime,lastpid,crtime FROM pw_cnalbum WHERE $sql "."ORDER BY $orderway $ordertype ".$limit);
 		while ($rt = $db->fetch_array($query)) {
 			$rt['s_aname'] = substrs($rt['aname'],30);
@@ -214,25 +214,25 @@ if (empty($action)) {
 	${'ordertypedesc'} = 'checked';
 		
 	if ($job == 'delete') {
-		InitGP(array('aid','aname','uploader','pintro','uptime_s','uptime_e','orderway','ordertype','lines','page','selid'));
+		S::gp(array('aid','aname','uploader','pintro','uptime_s','uptime_e','orderway','ordertype','lines','page','selid'));
 		require_once(R_P . 'u/require/core.php');
 		foreach ($selid as $key => $pid) {
-			$photo = $db->get_one("SELECT cp.path,ca.aid,ca.lastphoto,ca.lastpid,ca.ownerid FROM pw_cnphoto cp LEFT JOIN pw_cnalbum ca ON cp.aid=ca.aid WHERE cp.pid=" . pwEscape($pid) . " AND ca.atype='0'");
+			$photo = $db->get_one("SELECT cp.path,ca.aid,ca.lastphoto,ca.lastpid,ca.ownerid FROM pw_cnphoto cp LEFT JOIN pw_cnalbum ca ON cp.aid=ca.aid WHERE cp.pid=" . S::sqlEscape($pid) . " AND ca.atype='0'");
 			if (empty($photo)) {
 				adminmsg('data_error',"$basename&action=photos");
 			}
 			$uids[] = $photo['ownerid'];
-			$db->update("DELETE FROM pw_cnphoto WHERE pid=" . pwEscape($pid));
+			$db->update("DELETE FROM pw_cnphoto WHERE pid=" . S::sqlEscape($pid));
 
 			$pwSQL = array();
 			if ($photo['path'] == $photo['lastphoto']) {
-				$pwSQL['lastphoto'] = $db->get_value("SELECT path FROM pw_cnphoto WHERE aid=" . pwEscape($photo['aid']) . " ORDER BY pid DESC LIMIT 1");
+				$pwSQL['lastphoto'] = $db->get_value("SELECT path FROM pw_cnphoto WHERE aid=" . S::sqlEscape($photo['aid']) . " ORDER BY pid DESC LIMIT 1");
 			}
 			if (strpos(",$photo[lastpid],",",$pid,") !== false) {
 				$pwSQL['lastpid'] = implode(',',getLastPid($photo['aid']));
 			}
-			$upsql = $pwSQL ? ',' . pwSqlSingle($pwSQL) : '';
-			$db->update("UPDATE pw_cnalbum SET photonum=photonum-1{$upsql} WHERE aid=" . pwEscape($photo['aid']));
+			$upsql = $pwSQL ? ',' . S::sqlSingle($pwSQL) : '';
+			$db->update("UPDATE pw_cnalbum SET photonum=photonum-1{$upsql} WHERE aid=" . S::sqlEscape($photo['aid']));
 
 			pwDelatt($photo['path'], $db_ifftp);
 			$lastpos = strrpos($photo['path'],'/') + 1;
@@ -248,7 +248,7 @@ if (empty($action)) {
 	} else {
 		
 		require_once(R_P . 'u/require/core.php');
-		InitGP(array('aid','aname','uploader','pintro','uptime_s','uptime_e','orderway','ordertype','lines','page'));
+		S::gp(array('aid','aname','uploader','pintro','uptime_s','uptime_e','orderway','ordertype','lines','page'));
 		
 		$cnpho = array();
 		$orderBySelection = array(
@@ -272,30 +272,30 @@ if (empty($action)) {
 		$urladd = '';
 		$sql = "ca.atype='0'";
 		if ($aid) {
-			$sql .= ' AND ca.aid ='.pwEscape($aid);
+			$sql .= ' AND ca.aid ='.S::sqlEscape($aid);
 			$urladd .= '&aid='.$aid;
 		}
 		if ($aname) {
 			$aname = str_replace('*','%',$aname);
-			$sql .= ' AND ca.aname LIKE '.pwEscape($aname);
+			$sql .= ' AND ca.aname LIKE '.S::sqlEscape($aname);
 			$urladd .= '&aname='.rawurlencode($aname);
 		}
 		if ($uploader) {
 			$uploader = str_replace('*','%',$uploader);
-			$sql .= ' AND cp.uploader LIKE '.pwEscape($uploader);
+			$sql .= ' AND cp.uploader LIKE '.S::sqlEscape($uploader);
 			$urladd .= '&uploader='.rawurlencode($uploader);
 		}
 		if ($pintro) {
 			$pintro = str_replace('*','%',$pintro);
-			$sql .= ' AND cp.pintro LIKE '.pwEscape($pintro);
+			$sql .= ' AND cp.pintro LIKE '.S::sqlEscape($pintro);
 			$urladd .= '&pintro='.rawurlencode($pintro);
 		}
 		if ($uptime_s) {
-			$sql .= ' AND cp.uptime>='.pwEscape($uptime_s);
+			$sql .= ' AND cp.uptime>='.S::sqlEscape($uptime_s);
 			$urladd .= "&uptime_s=$uptime_s";
 		}
 		if ($uptime_e) {
-			$sql .= ' AND cp.uptime<='.pwEscape($uptime_e);
+			$sql .= ' AND cp.uptime<='.S::sqlEscape($uptime_e);
 			$urladd .= "&uptime_e=$uptime_e";
 		}
 		switch ($orderway) {
@@ -331,7 +331,7 @@ if (empty($action)) {
 		}
 		$pages=numofpage($count,$page,$numofpage,"$basename&action=$action&job=list&lines=$lines$urladd&");
 		$start = ($page-1)*$lines;
-		$limit = pwLimit($start,$lines);
+		$limit = S::sqlLimit($start,$lines);
 		$query = $db->query("SELECT cp.pid,cp.aid,cp.path,cp.uploader,cp.uptime,cp.ifthumb,cp.hits,cp.c_num,ca.aname FROM pw_cnphoto cp LEFT JOIN pw_cnalbum ca ON cp.aid=ca.aid WHERE ".$sql." ".$sqladd." ".$limit);
 		$cnpho = array();
 		while ($rt = $db->fetch_array($query)) {

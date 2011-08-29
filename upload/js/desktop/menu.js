@@ -82,7 +82,7 @@ function()
                 var c = _this.getPos(this);
                 b.id = _this.id+"_"+a.id;/*级联定位*/
                 b.width = _this.width;
-                b.left = c[0] + this.offsetWidth - b.body.offsetLeft-170+20; /*新菜单左+宽 170+8 */
+                b.left = c[0] + this.offsetWidth - b.body.offsetLeft-150; /*新菜单左+宽 170+8 */
                 b.items = json.items;
 				var fixtop=50;
 				b.top = c[1] - b.body.offsetTop-72;
@@ -136,16 +136,15 @@ function()
 
             sty.left = (this.left+this.width>this.ROOT.offsetWidth?this.ROOT.offsetWidth-this.width:this.left) + "px";
 
-			var fixtop=100;
 			/*指示样式*/
 			//if(this.top+this.menu.offsetHeight>this.ROOT.offsetHeight-60)
 			//{
 				//var tt=this.top-(this.ROOT.offsetHeight-this.menu.offsetHeight-fixtop)+60;
 				//this.arrow?this.arrow.style.top=tt+"px":0;
 			//}
-
+			
             //sty.top = (this.top+this.menu.offsetHeight>this.ROOT.offsetHeight-37?this.ROOT.offsetHeight-this.menu.offsetHeight-fixtop:this.top) + "px";
-			sty.top = (this.top-26+this.menu.offsetHeight>this.ROOT.offsetHeight-60?this.ROOT.offsetHeight-this.menu.offsetHeight-fixtop:this.top-26) + "px";
+			sty.top = (this.top-26+this.menu.offsetHeight>this.ROOT.offsetHeight?this.ROOT.offsetHeight-this.menu.offsetHeight:this.top-26) + "px";
 			//sty.top = (this.top+this.menu.offsetHeight>this.ROOT.offsetHeight-60?this.ROOT.offsetHeight-this.menu.offsetHeight-fixtop:this.top) + "px";
 			sty.position = "absolute";
             //sty.display = "";

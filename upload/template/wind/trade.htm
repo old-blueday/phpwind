@@ -1,20 +1,23 @@
 <!--<?php
 if ($action == 'buy') {print <<<EOT
 -->
+<style type="text/css">
+.read_buy .tr3 td,.read_buy .tr3 th{padding-left:10px;border-bottom:0;}
+</style>
 <div id="breadCrumb">
-		<img src="$imgpath/$stylepath/thread/home-old.gif" align="absmiddle" />&nbsp;<a href="$db_bfn" title="$db_bbsname">$db_bbsname</a><em>&gt;</em>商品购买<em>&gt;</em><a href="read.php?tid=$tid">$trade[name]</a>
+<img src="$imgpath/$stylepath/thread/home.gif" class="breadHome" /><em class="breadEm"></em><a href="$db_bfn" title="$db_bbsname">$db_bbsname</a><em>&gt;</em>商品购买<em>&gt;</em><a href="read.php?tid=$tid">$trade[name]</a>
 </div>
 <form action="trade.php?action=buy" method="post">
 <input type="hidden" name="step" value="3" />
 <input type="hidden" name="tid" value="$tid" />
-<div class="t f_one">
-<table width="100%" cellspacing="0" cellpadding="0" align="center">
-	<tr><td class="h" colspan="2">确认商品交易</td></tr>
+<div class="t">
+<div class="h b" style="border-top:0;">确认商品交易</div>
+<table width="100%" class="read_buy vt">
 	<tr class="tr3">
-		<th style="width:20%;">商品名称:</th>
-		<td class="s8"><a href="read.php?tid=$tid">$trade[name]</a></td>
+		<th style="width:100px">商品名称:</th>
+		<td class="s8"><span class="mr10">$trade[name]</span><a href="read.php?tid=$tid" class="s4"  target="_blank">[查看原贴]</a></td>
 	</tr>
-	<tr class="tr3">
+	<tr class="tr3 f_two">
 		<th>当前价格:</th>
 		<td>$trade[costprice]</td>
 	</tr>
@@ -22,37 +25,40 @@ if ($action == 'buy') {print <<<EOT
 		<th>所 在 地:</th>
 		<td>$trade[locus]</td>
 	</tr>
-	<tr class="tr3">
+	<tr class="tr3 f_two">
 		<th>卖　　家:</th>
 		<td><a href="apps.php?q=article&a=goods&uid=$trade[uid]">$trade[username]</a></td>
 	</tr>
 	<tr class="tr3">
 		<th>收货地址:</th>
-		<td><input type="text" class="input" name="address" size="60" /> &nbsp;邮政编码: <input type="text" class="input" name="zip" size="8" /></td>
+		<td><input type="text" class="input input_wb" name="address" /></td>
+	</tr>
+	<tr class="tr3 f_two">
+		<th>邮政编码:</th>
+		<td><input type="text" class="input input_wa" name="zip" /></td>
 	</tr>
 	<tr class="tr3">
 		<th>收 货 人:</th>
-		<td><input type="text" class="input" name="consignee" /></td>
+		<td><input type="text" class="input input_wa" name="consignee" /></td>
 	</tr>
-	<tr class="tr3">
+	<tr class="tr3 f_two">
 		<th>联系电话:</th>
-		<td><input type="text" class="input" name="tel" /></td>
+		<td><input type="text" class="input input_wa" name="tel" /></td>
 	</tr>
 	<tr class="tr3">
 		<th>购买数量:</th>
-		<td><input type="text" class="input" name="quantity" value="1" size="6" /></td>
+		<td><input type="text" class="input input_wa" name="quantity" value="1" /></td>
 	</tr>
 <!--
 EOT;
 if ($trade['transport']) {print <<<EOT
 -->
-	<tr class="tr3">
+	<tr class="tr3 f_two">
 		<th>运送方式:</th>
 		<td>
-			<input type="radio" name="transport" value="1" /> 平邮:$trade[mailfee] 元<br />
-			<input type="radio" name="transport" value="2" /> 快递:$trade[expressfee] 元<br />
-			<input type="radio" name="transport" value="3" /> EMS：$trade[emsfee] 元<br />
-			<!-- 如果没有运费发生，您可以在拍下该商品后，要求卖家修改运费 -->
+			<label class="mr20"><input type="radio" name="transport" value="1" checked/> 平邮:$trade[mailfee] 元</label>
+			<label class="mr20"><input type="radio" name="transport" value="2" /> 快递:$trade[expressfee] 元</label>
+			<label class="mr20"><input type="radio" name="transport" value="3" /> EMS：$trade[emsfee] 元</label>如果没有运费发生，您可以在拍下该商品后，要求卖家修改运费
 		</td>
 	</tr>
 <!--
@@ -61,32 +67,38 @@ EOT;
 -->
 	<tr class="tr3">
 		<th>给卖家留言:</th>
-		<td><textarea name="descrip" style="width:360px;height:40px"></textarea></td>
+		<td><textarea name="descrip" class="textareaA"></textarea></td>
 	</tr>
-	<tr class="tr3"><td></td><td><input type="submit" class="btn" value="确认无误，购买" /></td></tr>
-	<tr class="f_one"><td style="height:8px;" colspan="2"></td></tr>
-</table></div>
+	<tr class="tr3">
+		<td>&nbsp;</td>
+		<td style="padding:10px 7px;"><span class="btn"><span><button type="submit">确认无误，购买</button></span></span></td>
+	</tr>
+</table>
+</div>
 </form>
 <!--
 EOT;
 } elseif ($action == 'order') {print <<<EOT
 -->
+<style type="text/css">
+.read_buy .tr3 td,.read_buy .tr3 th{padding-left:10px;border-bottom:0;}
+</style>
 <div id="breadCrumb">
-		<img src="$imgpath/$stylepath/thread/home-old.gif" align="absmiddle" />&nbsp;<a href="$db_bfn" title="$db_bbsname">$db_bbsname</a><em>&gt;</em>订单详细信息
+<img src="$imgpath/$stylepath/thread/home.gif" class="breadHome" /><em class="breadEm"></em><a href="$db_bfn" title="$db_bbsname">$db_bbsname</a><em>&gt;</em>订单详细信息
 </div>
-<div class="t f_one">
-<table width="100%" cellspacing="0" cellpadding="0">
-	<tr><th class="h" colspan="2">订单详细信息</th></tr>
-	<tr class="tr2"><th>订单商品信息</th><td></td></tr>
-	<tr class="tr3">
-		<th style="width:20%;">商品名称:</th>
+<div class="t">
+<div class="h b" style="border-top:0;">订单详细信息</div>
+<table width="100%" class="read_buy">
+	<tr class="tr3"><td width="100" class="f14 b">订单商品信息</td><td>&nbsp;</td></tr>
+	<tr class="tr3 f_two">
+		<th>商品名称:</th>
 		<td><a href="read.php?tid=$order[tid]">$order[subject]</a></td>
 	</tr>
 	<tr class="tr3">
 		<th>购买数量:</th>
 		<td>$order[quantity]</td>
 	</tr>
-	<tr class="tr3">
+	<tr class="tr3 f_two">
 		<th>商品单价:</th>
 		<td>$order[price]</td>
 	</tr>
@@ -94,7 +106,7 @@ EOT;
 		<th>购买日期:</th>
 		<td>$order[buydate]</td>
 	</tr>
-	<tr class="tr3">
+	<tr class="tr3 f_two">
 		<th>卖　　家:</th>
 		<td><a href="apps.php?q=article&a=goods&uid=$order[uid]">$order[username]</a></td>
 	</tr>
@@ -102,7 +114,7 @@ EOT;
 		<th>备　　注:</th>
 		<td>$order[descrip]</td>
 	</tr>
-	<tr class="tr2"><th>商品物流信息</th><td></td></tr>
+	<tr class="tr3 f_two"><td class="f14 b">商品物流信息</td><td></td></tr>
 	<tr class="tr3">
 		<th>运费方式:</th>
 		<td>
@@ -124,7 +136,7 @@ EOT;
 -->
 		</td>
 	</tr>
-	<tr class="tr3">
+	<tr class="tr3 f_two">
 		<th>收货地址:</th>
 		<td>$order[address]</td>
 	</tr>
@@ -132,33 +144,33 @@ EOT;
 		<th>收 货 人:</th>
 		<td>$order[consignee]</td>
 	</tr>
-	<tr class="tr3">
+	<tr class="tr3 f_two">
 		<th>联系电话:</th>
 		<td>$order[tel]</td>
 	</tr>
-	<tr class="tr2"><th>总金额及支付</th><td></td></tr>
-	<tr>
+	<tr class="tr3"><td class="f14 b">总金额及支付</td><td></td></tr>
+	<tr class="tr3 f_two">
 		<th>总金额:</th>
 		<td>$order[price] * $order[quantity] + $order[transportfee] = $totalpay</td>
 	</tr>
-	<tr class="tr3">
+	<tr class="tr3 vt">
 		<th>交易状态:</th>
 		<td>
 <!--
 EOT;
 if ($order['ifpay'] == 4) {print <<<EOT
 -->
-			<div style="margin:1em 0;color:#f00">交易失败</div>
+			<div class="s1">交易失败</div>
 <!--
 EOT;
 } elseif ($order['ifpay'] == 3) {print <<<EOT
 -->
-			<div style="margin:1em 0;color:#00f">交易完成</div>
+			<div style="color:#080;">交易完成</div>
 <!--
 EOT;
 } elseif ($order['ifpay'] == 2) {print <<<EOT
 -->
-			<div style="margin:1em 0;color:#00f">卖家已发货，确认收货</div>
+			<div class="s2">卖家已发货，确认收货</div>
 <!--
 EOT;
 if ($order['buyer'] == $winduid) {

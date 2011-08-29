@@ -24,7 +24,7 @@ class PwGroup {
 	}
 
 	function getGroupcateCreditset($type) {
-		$creditset = $this->db->get_value("SELECT creditset FROM pw_cnclass WHERE fid=".pwEscape($this->classid));
+		$creditset = $this->db->get_value("SELECT creditset FROM pw_cnclass WHERE fid=".S::sqlEscape($this->classid));
 		$creditset = unserialize($creditset);
 		$creditset = array_filter($creditset[$type],"group_filter");
 		$creditset = is_array($creditset) ? $creditset : array();
@@ -33,7 +33,7 @@ class PwGroup {
 
 	function getGroupsCreditset($type) {
 		global $o_groups_creditset;
-		include_once(D_P.'data/bbscache/o_config.php');
+		include_once pwCache::getPath(D_P.'data/bbscache/o_config.php');
 		$creditset = array_filter($creditset[$type],"group_filter");
 		$creditset = is_array($creditset) ? $creditset : array();
 		
@@ -42,7 +42,7 @@ class PwGroup {
 
 	function addArgument($tid){
 		global $timestamp;
-		$this->db->update("INSERT INTO pw_argument SET " . pwSqlSingle(array('tid' => $tid, 'cyid' => $this->colonyid, 'postdate' => $timestamp, 'lastpost' => $timestamp)));
+		$this->db->update("INSERT INTO pw_argument SET " . S::sqlSingle(array('tid' => $tid, 'cyid' => $this->colonyid, 'postdate' => $timestamp, 'lastpost' => $timestamp)));
 	}
 
 }
@@ -58,7 +58,7 @@ function group_filter($value) {
 
 function getGroupByCyid($cyid) {
 	global $winduid,$db;
-	$colony = $db->get_one("SELECT c.*,cm.id AS ifcyer,cm.ifadmin,cm.lastvisit FROM pw_colonys c LEFT JOIN pw_cmembers cm ON c.id=cm.colonyid AND cm.uid=" . pwEscape($winduid) . ' WHERE c.id=' . pwEscape($cyid));
+	$colony = $db->get_one("SELECT c.*,cm.id AS ifcyer,cm.ifadmin,cm.lastvisit FROM pw_colonys c LEFT JOIN pw_cmembers cm ON c.id=cm.colonyid AND cm.uid=" . S::sqlEscape($winduid) . ' WHERE c.id=' . S::sqlEscape($cyid));
 	empty($colony) && Showmsg('data_error');
 	return $colony;
 }

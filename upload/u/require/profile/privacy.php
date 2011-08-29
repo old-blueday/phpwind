@@ -1,7 +1,7 @@
 <?php
 !function_exists('readover') && exit('Forbidden');
 
-InitGP(array('t'));
+S::gp(array('t'));
 
 if (empty($t)) {
 
@@ -9,7 +9,7 @@ if (empty($t)) {
 		
 		$privacyCurrent = ' class="current"';
 		$weiboCurrent = '';
-		$userdb = $db->get_one("SELECT index_privacy,profile_privacy,info_privacy,credit_privacy,owrite_privacy,msgboard_privacy FROM pw_ouserdata WHERE uid=" . pwEscape($winduid));
+		$userdb = $db->get_one("SELECT index_privacy,profile_privacy,info_privacy,credit_privacy,owrite_privacy,msgboard_privacy FROM pw_ouserdata WHERE uid=" . S::sqlEscape($winduid));
 		${'index_'.$userdb['index_privacy']} = 'selected="selected"';
 		${'msgboard_'.$userdb['msgboard_privacy']} = 'selected="selected"';
 		${'friend_'.getstatus($winddb['userstatus'], PW_USERSTATUS_CFGFRIEND, 3)} = 'checked';
@@ -24,16 +24,16 @@ if (empty($t)) {
 	} else {
 
 		PostCheck();
-		InitGP(array('privacy', 'friendcheck'), 'P', 2);
-		InitGP(array('attentionblacklist'));
+		S::gp(array('privacy', 'friendcheck'), 'P', 2);
+		S::gp(array('attentionblacklist'));
 
 		$pwSQL = array('uid' => $winduid);
 		$pwSQL['index_privacy'] = $privacy['index'] < 0 || $privacy['index'] > 2 ? 0 : $privacy['index'];
 		$pwSQL['msgboard_privacy'] = $privacy['msgboard'] < 0 || $privacy['msgboard'] > 2 ? 0 : $privacy['msgboard'];
 		$db->pw_update(
-			"SELECT uid FROM pw_ouserdata WHERE uid=" . pwEscape($winduid),
-			"UPDATE pw_ouserdata SET " . pwSqlSingle($pwSQL) . " WHERE uid=" . pwEscape($winduid),
-			"INSERT INTO pw_ouserdata SET " . pwSqlSingle($pwSQL)
+			"SELECT uid FROM pw_ouserdata WHERE uid=" . S::sqlEscape($winduid),
+			"UPDATE pw_ouserdata SET " . S::sqlSingle($pwSQL) . " WHERE uid=" . S::sqlEscape($winduid),
+			"INSERT INTO pw_ouserdata SET " . S::sqlSingle($pwSQL)
 		);
 		if ($friendcheck != getstatus($winddb['userstatus'], PW_USERSTATUS_CFGFRIEND, 3)) {
 			$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
@@ -70,7 +70,7 @@ if (empty($t)) {
 		
 		$privacyCurrent = '';
 		$weiboCurrent = ' class="current"';
-		$userdb = $db->get_one("SELECT article_isfeed,diary_isfeed,photos_isfeed,group_isfeed,self_isfollow,friend_isfollow,cnlesp_isfollow, article_isfollow,diary_isfollow, photos_isfollow, group_isfollow ".$appendFetchField." FROM pw_ouserdata WHERE uid=" . pwEscape($winduid));
+		$userdb = $db->get_one("SELECT article_isfeed,diary_isfeed,photos_isfeed,group_isfeed,self_isfollow,friend_isfollow,cnlesp_isfollow, article_isfollow,diary_isfollow, photos_isfollow, group_isfollow ".$appendFetchField." FROM pw_ouserdata WHERE uid=" . S::sqlEscape($winduid));
 		if (!$userdb) {
 			$userdb = array(
 				'article_isfeed' => 1,
@@ -115,6 +115,16 @@ if (empty($t)) {
 			$isBindWeibo = (bool) $bindInfo;
 			if (!$isBindWeibo) {
 				$bindSinaWeiboUrl = $bindService->getBindUrl($winduid);
+			} else {
+				$syncer = L::loadClass('WeiboSyncer', 'sns/weibotoplatform'); /* @var $syncer PW_WeiboSyncer */
+				$syncSetting = $syncer->getUserWeiboSyncSetting($winduid);
+
+				ifchecked('article_issync', $syncSetting['article']);
+				ifchecked('diary_issync', $syncSetting['diary']);
+				ifchecked('photos_issync', $syncSetting['photos']);
+				ifchecked('group_issync', $syncSetting['group']);
+				ifchecked('transmit_issync', $syncSetting['transmit']);
+				ifchecked('comment_issync', $syncSetting['comment']);
 			}
 		}
 		
@@ -124,7 +134,7 @@ if (empty($t)) {
 	} else {
 		
 		PostCheck();
-		InitGP(array('article_isfeed', 'diary_isfeed', 'photos_isfeed', 'group_isfeed', 'self_isfollow', 'friend_isfollow', 'cnlesp_isfollow', 'article_isfollow', 'diary_isfollow', 'photos_isfollow', 'group_isfollow'), 'P', 2);
+		S::gp(array('article_isfeed', 'diary_isfeed', 'photos_isfeed', 'group_isfeed', 'self_isfollow', 'friend_isfollow', 'cnlesp_isfollow', 'article_isfollow', 'diary_isfollow', 'photos_isfollow', 'group_isfollow'), 'P', 2);
 
 		$pwSQL = array(
 			'uid'				=> $winduid,
@@ -146,14 +156,14 @@ if (empty($t)) {
 		
 		/* sinaweibo bind */
 		if ($db_sinaweibo_status) {
-			InitGP(array('sinaweibo_isfollow'), 'P', 2);
+			S::gp(array('sinaweibo_isfollow'), 'P', 2);
 			$pwSQL['sinaweibo_isfollow'] = $sinaweibo_isfollow ? 1 : 0;
 		}
 		
 		$db->pw_update(
-			"SELECT uid FROM pw_ouserdata WHERE uid=" . pwEscape($winduid),
-			"UPDATE pw_ouserdata SET " . pwSqlSingle($pwSQL) . " WHERE uid=" . pwEscape($winduid),
-			"INSERT INTO pw_ouserdata SET " . pwSqlSingle($pwSQL)
+			"SELECT uid FROM pw_ouserdata WHERE uid=" . S::sqlEscape($winduid),
+			"UPDATE pw_ouserdata SET " . S::sqlSingle($pwSQL) . " WHERE uid=" . S::sqlEscape($winduid),
+			"INSERT INTO pw_ouserdata SET " . S::sqlSingle($pwSQL)
 		);
 
 		refreshto('profile.php?action=privacy&t=weibo','operate_success');
@@ -161,8 +171,23 @@ if (empty($t)) {
 } elseif ($t == 'unbind') {
 	$bindService = L::loadClass('weibobindservice', 'sns/weibotoplatform'); /* @var $bindService PW_WeiboBindService */
 	$got = $bindService->callPlatformUnBind($winduid, PW_WEIBO_BINDTYPE_SINA);
-	//TODO json parser
 
+	refreshto('profile.php?action=privacy&t=weibo','operate_success');
+} elseif ($t == 'setsync') {
+	PostCheck();
+	if ($db_sinaweibo_status) {
+		InitGP(array('article_issync', 'diary_issync', 'photos_issync', 'group_issync', 'transmit_issync', 'comment_issync'), 'P', 2);
+		$syncSetting = array(
+			'article' => (bool) $article_issync,
+			'diary' => (bool) $diary_issync,
+			'photos' => (bool) $photos_issync,
+			'group' => (bool) $group_issync,
+			'transmit' => (bool) $transmit_issync,
+			'comment' => (bool) $comment_issync,
+		);
+		$syncer = L::loadClass('WeiboSyncer', 'sns/weibotoplatform'); /* @var $syncer PW_WeiboSyncer */
+		$syncer->updateUserWeiboSyncSetting($winduid, $syncSetting);
+	}
 	refreshto('profile.php?action=privacy&t=weibo','operate_success');
 } elseif ($t == 'bindsuccess') {
 	extract(L::style('',$skinco));

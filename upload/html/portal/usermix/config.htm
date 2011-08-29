@@ -1,0 +1,17 @@
+<pw id="个人中心_首页_图片" />
+<div>
+	<list num="1" action="user" cachetime="1800" ifpushonly="0" title="头条" />
+	<loop>
+		<a href="{url}" target="_blank"><img src="{image,100,80}" width="100" height="80" /><p>{title,12}</p></a>
+	</loop>
+</div>
+
+<pw id="个人中心_首页_日志" />
+<div class="title">
+	<list num="4" action="diary" cachetime="1" ifpushonly="0" title="日志" />
+	<loop>
+	    <p>
+	        <a href="{url}" target="_blank">{title,40}</a>
+	    </p>
+	</loop>
+</div>

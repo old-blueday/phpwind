@@ -19,17 +19,17 @@ class PW_Ms_MessagesDB extends BaseDB {
 		return $this->_count();
 	}
 	function getMessagesByMessageIds($messageIds){
-		$messageIds = is_array($messageIds) ? pwImplode($messageIds) : $messageIds;
+		$messageIds = is_array($messageIds) ? S::sqlImplode($messageIds) : $messageIds;
 		$query = $this->_db->query ( "SELECT * FROM " . $this->_tableName. " WHERE mid in (".$messageIds.") " );
 		return $this->_getAllResultFromQuery ( $query );
 	}
 	function deleteMessagesByMessageIds($messageIds){
-		$messageIds = is_array($messageIds) ? pwImplode($messageIds) : $messageIds;
+		$messageIds = is_array($messageIds) ? S::sqlImplode($messageIds) : $messageIds;
 		$query = $this->_db->query ( "DELETE FROM " . $this->_tableName. " WHERE mid in (".$messageIds.") " );
 		return $this->_db->affected_rows ();
 	}
 	function updateMessagesByMessageIds($fieldData,$messageIds){
-		$messageIds = is_array($messageIds) ? pwImplode($messageIds) : $messageIds;
+		$messageIds = is_array($messageIds) ? S::sqlImplode($messageIds) : $messageIds;
 		$this->_db->update ( "UPDATE " . $this->_tableName . " SET " . $this->_getUpdateSqlString ( $fieldData ) . " WHERE mid in (".$messageIds.") " );
 		return $this->_db->affected_rows ();
 	}

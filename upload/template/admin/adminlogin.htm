@@ -11,6 +11,7 @@ $db_bbsname || $db_bbsname = 'Hi,phpwind!';print <<<EOT
 body{padding:0;margin:0px;font-size:12px;color:#555;font-family:Verdana;}
 select{margin-left:1.5em;vertical-align:middle;border:1px solid #b4cceb;height:22px;font-size:12px;}
 #main{width:800px;margin:auto;}
+.c{clear:both;font:0px/0px Arial;overflow:hidden;height:0;width:0;}
 *{padding:0;margin:0}
 input{font-size:12px;}
 #wrap{background:url($imgpath/admin/login/top_01.png) center bottom no-repeat;height:170px;}
@@ -55,23 +56,32 @@ $verifyurl = EncodeUrl($REQUEST_URI,true);print <<<EOT
 				<INPUT TYPE="hidden" name="Login_f" value=1>
 				<INPUT TYPE="hidden" name="verify" value="$verifyurl">
                    <table cellpadding="0" cellspacing="0" width="100%">
-                        <tr><th>管理员账号</th><td><div class="logo-icon"><div class="pw"></div><input class="input pw2" name="admin_name" type="text" /></div></td></tr>
-                        <tr><th>密码</th><td><div class="logo-icon"><div class="pwpd"></div><input class="input pwpd2" type="password" name="admin_pwd" /></div></td></tr>
+                        <tr><th>管理员账号</th><td><div class="logo-icon"><div class="pw"></div><input class="input pw2" name="admin_name" type="text" tabindex="1" /></div></td></tr>
+                        <tr><th>密码</th><td><div class="logo-icon"><div class="pwpd"></div><input class="input pwpd2" type="password" name="admin_pwd" tabindex="2" /></div></td></tr>
 <!--
 EOT;
-if($db_gdcheck & 32){print <<<EOT
+if($db_gdcheck & 32){
+$gdSize = explode("\t",$db_gdsize);
+print <<<EOT
 -->
-                        <tr><th>认证码</th><td><div class="logo-icon"><div class="yan"></div><input class="input yan2" name="lg_num" id="lg_num" onfocus="try{opencode('menu_gd',this)}catch(e){}"  /></div>
-                        <style type="text/css">.menu{position:absolute;background:#666;border:1px solid $tablecolor;}</style>
-                        <div class="menu" id="menu_gd" style="visibility:hidden;"><img src="ck.php?admin=1" align="absmiddle" style="cursor:pointer;" id="ckcode" alt="看不清楚，换一张" /></div>
+                        <tr valign="top"><th>认证码</th><td height="60" style="padding-top:4px;"><div class="logo-icon"><div class="yan"></div><input class="input yan2" name="lg_num" id="lg_num" tabindex="3" /></div>
+												<div class="c"></div>
+                        <div id="menu_gd" style="margin:4px 0 0 18px;">
+<script type="text/javascript" language="JavaScript" src="js/pw_authcode.js"></script>
+<script>
+var flashWidth = "$gdSize[0]";
+var flashHeight = "$gdSize[1]";
+var gdtype = $db_gdtype;
+showGdCode();
+</script></div>
                         </td></tr>
 <!--
 EOT;
 }if($db_ifsafecv){print <<<EOT
 -->
-                        <tr><th>安全问题</th><td><select name="question" onchange="showcustomquest(this.value)" style="width:124px">
+                        <tr><th>安全问题</th><td><select name="question" tabindex="4" onchange="showcustomquest(this.value)" style="width:124px">
                         <option value="0">无安全问题</option><option value="1">我爸爸的出生地</option><option value="2">我妈妈的出生地</option><option value="3">我的小学校名</option><option value="4">我的中学校名</option><option value="5">我最喜欢的运动</option><option value="6">我最喜欢的歌曲</option><option value="7">我最喜欢的电影</option><option value="8" >我最喜欢的颜色</option><option value="-1">自定义问题</option></select></td></tr>
-						<tr id="customquest" style="display:none;"><th></th><td><input style="border: 1px solid; border-color: #8cb7e1 #e3f0fc #e3f0fc #8cb7e1;padding:2px 0 1px 2px;margin-left:1.5em;height:18px;" type="text" name="customquest"></td></tr>
+						<tr id="customquest" style="display:none;"><th></th><td><input tabindex="5" style="border: 1px solid; border-color: #8cb7e1 #e3f0fc #e3f0fc #8cb7e1;padding:2px 0 1px 2px;margin-left:1.5em;height:18px;" type="text" name="customquest"></td></tr>
                         <tr><th>请输入答案</th><td><div class="logo-icon"><div class="daan"></div><input class="input daan2" name="answer" type="text" /></div></td></tr>
 <!--
 EOT;

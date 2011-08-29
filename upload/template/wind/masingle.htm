@@ -1,7 +1,7 @@
 <!--<?php print <<<EOT
 -->
 <div id="breadCrumb">
-		<img src="$imgpath/$stylepath/thread/home-old.gif" align="absmiddle" />&nbsp;<a href="$db_bfn" title="$db_bbsname">$db_bbsname</a><em>&gt;</em>管理选项
+<img src="$imgpath/$stylepath/thread/home.gif" class="cp breadHome" /><em class="breadEm"></em><a href="$db_bfn" title="$db_bbsname">$db_bbsname</a><em>&gt;</em>管理选项
 </div>
 <div id="pw_content">
 <!--
@@ -14,20 +14,26 @@ if($action=='banuser'){print <<<EOT
 <table width="100%" cellspacing="0" cellpadding="0" align="center">
 	<tr><th class="h" colspan="2">会员禁言</th></tr>
 	<tr class="tr3"><td width="15%"  class="tar">禁言对象:</td>
-		<td>
+		<td>$userinfo[username]
 <!--
 EOT;
-if($userdb['anonymous'] && !$isGM && !pwRights($isBM,'anonyhide')){ print <<<EOT
+if($showTips){print <<<EOT
 -->
-			$db_anonymousname
+<span class="s1">（该用户为 <b>{$userLevel}</b>，
 <!--
 EOT;
-}else{ print <<<EOT
+if($otherGroups){print <<<EOT
 -->
-			$userdb[username]
+	隐含 <b>{$otherGroups}</b> 等用户组头衔
 <!--
 EOT;
-} print <<<EOT
+}print <<<EOT
+-->
+请确认是否要禁言）</span>
+<!--
+EOT;
+}
+print <<<EOT
 -->
 		</td>
 	</tr>
@@ -35,20 +41,24 @@ EOT;
 	<td><input type="radio" name="range" value="0" checked />{$forum[$fid][name]}
 <!--
 EOT;
-if($isGM || pwRights($isBM,'banuser')==2){print <<<EOT
+if($isGM || $SYSTEM['banuser']==2){print <<<EOT
 -->
 	<input type="radio" name="range" value="1" />全局禁言
+<!--
+EOT;
+if ($SYSTEM[banuserip]){print <<<EOT
+-->	
 	<input type="checkbox" name="banip" value="1" />禁止该 IP
 <!--
 EOT;
-}print <<<EOT
+}}print <<<EOT
 -->
 	</td></tr>
 	<tr class="tr3"><td class="tar">禁言类型:</td>
 		<td><input type="radio" name="type" value="1" checked />定期禁言
 <!--
 EOT;
-if($isGM || pwRights($isBM,'bantype')){print <<<EOT
+if($isGM || $SYSTEM['bantype']){print <<<EOT
 -->
 			<input type="radio" name="type" value="2" />永久禁言
 <!--
@@ -78,6 +88,38 @@ EOT;
 	</tr>
 	<tr><td>&nbsp;</td><td style="padding:5px 6px;"><input class="btn" type="submit" value="提 交" /> <a class="btn3" style="cursor:pointer;" type="button" onclick="javascript:history.go(-1)" />返 回</a></td></tr>
 </table></div>
+<input type="hidden" name="uid" value="$uid" />
+<input type="hidden" name="fid" value="$fid" />
+<input type="hidden" name="tid" value="$tid" />
+<input type="hidden" name="pid" value="$pid" />
+<input type="hidden" name="page" value="$page" />
+<input type="hidden" name="step" value="3" />
+</form>
+<!--
+EOT;
+}elseif($action=='banfree'){print <<<EOT
+-->
+<form action="masingle.php?action=banfree" method="post">
+<input type="hidden" name="verify" value="$verifyhash" />
+<div class="t">
+<table width="100%" cellspacing="0" cellpadding="0" align="center">
+	<tr><th class="h" colspan="2">会员禁言</th></tr>
+	<tr class="tr3"><td width="15%"  class="tar">解禁对象:</td>
+		<td>$userinfo[username]</td>
+	</tr>
+	<tr class="tr3"><td class="tar">消息通知:</td>
+		<td><input type="radio" name="ifmsg" value="1" checked />开启
+			<input type="radio" name="ifmsg" value="0" />关闭
+		</td>
+	</tr>
+	<tr class="tr3 vt">
+		<td class="tar">操作原因:</td>
+		<td><textarea name="atc_content" style="width:300px;height:124px"></textarea>
+		</td>
+	</tr>
+	<tr><td>&nbsp;</td><td style="padding:5px 6px;"><input class="btn" type="submit" value="提 交" /> <a class="btn3" style="cursor:pointer;" type="button" onclick="javascript:history.go(-1)" />返 回</a></td></tr>
+</table></div>
+<input type="hidden" name="uid" value="$uid" />
 <input type="hidden" name="fid" value="$fid" />
 <input type="hidden" name="tid" value="$tid" />
 <input type="hidden" name="pid" value="$pid" />
@@ -119,6 +161,105 @@ EOT;
 		<td><input type="radio" name="ifmsg" value="1" checked />开启
 			<input type="radio" name="ifmsg" value="0" />关闭
 		</td>
+	</tr>
+	<tr class="tr3 vt">
+		<td class="tar">操作原因:</td>
+		<td><textarea name="atc_content" style="width:300px;height:124px"></textarea>
+		<select name="" size="8" multiple onchange="this.form.atc_content.value=this.value">
+				<option value="">自定义</option>
+				<option value="">-------</option>
+				$reason_sel
+			</select>
+
+		</td>
+	</tr>
+	<tr><td></td><td style="padding:5px 6px;"><input class="btn" type="submit" value="提 交" /> <a class="btn3" style="cursor:pointer;" type="button" onclick="javascript:history.go(-1)" />返 回</a></td></tr>
+</table></div>
+<input type="hidden" name="fid" value="$fid" />
+<input type="hidden" name="tid" value="$tid" />
+<input type="hidden" name="pid" value="$pid" />
+<input type="hidden" name="page" value="$page" />
+</form>
+<!--
+EOT;
+}elseif($action=='bansignature'){ print <<<EOT
+-->
+<form action="masingle.php?action=bansignature" method="post">
+<input type="hidden" name="verify" value="$verifyhash" />
+<div class="t">
+<table width="100%" cellspacing="0" cellpadding="0" align="center">
+	<tr><th class="h" colspan="2">禁止帖子签名</th>
+	</tr>
+	<tr class="tr3"><td width="15%" class="tar">操作对象:</td>
+<!--
+EOT;
+if($readdb['anonymous'] && !$isGM && !pwRights($isBM,'anonyhide')){ print <<<EOT
+-->
+		<td>$db_anonymousname</td>
+<!--
+EOT;
+}else{ print <<<EOT
+-->
+		<td>$readdb[username]</td>
+<!--
+EOT;
+} print <<<EOT
+-->
+	</tr>
+	<tr class="tr3"><td class="tar">禁止类型:</td>
+		<td><input type="radio" name="step" value="3" $check_Y />禁止
+			<input type="radio" name="step" value="5" $check_N />解除
+		</td>
+	</tr>
+	<tr class="tr3"><td class="tar">消息通知:</td>
+		<td><input type="radio" name="ifmsg" value="1" checked />开启
+			<input type="radio" name="ifmsg" value="0" />关闭
+		</td>
+	</tr>
+	<tr class="tr3 vt">
+		<td class="tar">操作原因:</td>
+		<td><textarea name="atc_content" style="width:300px;height:124px"></textarea>
+		<select name="" size="8" multiple onchange="this.form.atc_content.value=this.value">
+				<option value="">自定义</option>
+				<option value="">-------</option>
+				$reason_sel
+			</select>
+
+		</td>
+	</tr>
+	<tr><td></td><td style="padding:5px 6px;"><input class="btn" type="submit" value="提 交" /> <a class="btn3" style="cursor:pointer;" type="button" onclick="javascript:history.go(-1)" />返 回</a></td></tr>
+</table></div>
+<input type="hidden" name="fid" value="$fid" />
+<input type="hidden" name="tid" value="$tid" />
+<input type="hidden" name="pid" value="$pid" />
+<input type="hidden" name="page" value="$page" />
+</form>
+<!--
+EOT;
+}elseif($action=='banuserip'){ print <<<EOT
+-->
+<form action="masingle.php?action=banuserip" method="post">
+<input type="hidden" name="verify" value="$verifyhash" />
+<input type="hidden" name="step" value="3" />
+<div class="t">
+<table width="100%" cellspacing="0" cellpadding="0" align="center">
+	<tr><th class="h" colspan="2">禁止ip</th>
+	</tr>
+	<tr class="tr3"><td width="15%" class="tar">用户名:</td>
+<!--
+EOT;
+if($readdb['anonymous'] && !$isGM && !pwRights($isBM,'anonyhide')){ print <<<EOT
+-->
+		<td>$db_anonymousname</td>
+<!--
+EOT;
+}else{ print <<<EOT
+-->
+		<td>$readdb[username]</td>
+<!--
+EOT;
+} print <<<EOT
+-->
 	</tr>
 	<tr class="tr3 vt">
 		<td class="tar">操作原因:</td>
@@ -187,6 +328,87 @@ EOT;
 <input type="hidden" name="tid" value="$tid" />
 <input type="hidden" name="pid" value="$pid" />
 <input type="hidden" name="page" value="$page" /></form>
+
+<!--
+EOT;
+}elseif($action=='split'){print <<<EOT
+-->
+<form action="masingle.php?action=split" method="post">
+<input type="hidden" name="verify" value="$verifyhash" />
+<input type="hidden" name="tid" value="$tid" />
+<input type="hidden" name="fid" value="$fid" />
+<input type="hidden" name="step" value="3" />
+<!--
+EOT;
+foreach($selid as $key=>$val){print <<<EOT
+-->
+<input type="hidden" name="selid[]" value="$val" />
+<!--
+EOT;
+}print <<<EOT
+-->
+<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="adel cp" onclick="closep();">关闭</span>拆分操作</div>
+<script language="javascript" type="text/javascript">
+function splitds() {
+	var val = document.getElementsByName('splittype');
+	var type;
+	for(var i = 0; i< val.length; i++){
+     if(val[i].checked){
+      	if (val[i].value== 1){ 
+	  		type = 1;
+	 	 }else {
+		 	type = 0;
+		 }
+	  }
+    }
+	var stitle = document.getElementById('splittitle');
+	var sid = document.getElementById('splitid');
+	if(type == 1){
+		stitle.style.display = 'none';
+		sid.style.display = '';
+	}else{
+		stitle.style.display = '';
+		sid.style.display = 'none';
+	}
+
+}
+</script>
+<table width="100%" class="vt z">
+<tr class="tr3"><td width="15%" class="tar">拆分数量:</td><td>$splitNum 篇</td></tr>
+<tr class="tr3">
+	<td width="15%" class="tar">拆分目标:</td>
+	<td><input name="splittype" onclick="splitds()" type="radio" checked="checked" value="0" />新帖&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	<input name="splittype" onclick="splitds()" type="radio" value="1" />合并到帖子
+	</td>
+</tr>
+<tr class="tr3" id="splittitle">
+	<td width="15%" class="tar">新帖标题:</td>
+	<td><input name="splittitle" class="input" size="50" />
+	</td>
+</tr>
+<tr class="tr3" id="splitid" style="display:none;">
+	<td width="15%" class="tar">帖子ID:</td>
+	<td><input name="splitid" class="input" size="10" />
+	</td>
+</tr>
+<tr class="tr3">
+		<td width="15%" class="tar">消息通知:</td>
+		<td>
+			<label class="mr20"><input type="radio" name="ifmsg" value="1" checked />开启</label>
+			<label><input type="radio" name="ifmsg" value="0" />关闭</label>
+		</td>
+	</tr>
+	<tr class="tr3"><td width="15%" class="tar">操作原因:</td>
+		<td><textarea name="atc_content" onkeydown="ajax.quickpost(event,this.form)" style="width:300px;height:124px"></textarea><select style="width:320px;" onchange="this.form.atc_content.value=this.value" size="8" multiple>
+				<option value="">自定义</option>
+				<option value="">-------</option>
+				$reason_sel
+			</select>
+		</td>
+	</tr>
+		<tr><td></td><td style="padding:5px 6px;"><input class="btn" type="submit" value="提 交" /> <a class="btn3" style="cursor:pointer;" type="button" onclick="javascript:history.go(-1)" />返 回</a></td></tr>
+</table></form>
+</div>
 <!--
 EOT;
 }elseif($action=='delatc'){print <<<EOT
@@ -239,12 +461,12 @@ EOT;
 <input type="hidden" name="tid" value="$tid" />
 <input type="hidden" name="pid" value="$pid" />
 <input type="hidden" name="fid" value="$fid" />
-<input type="hidden" name="page" value="$page" />
+<input type="hidden" name="rpage" value="$rpage" />
 <input type="hidden" name="step" value="2" />
 <div class="t">
-<table width="100%" cellspacing="0" cellpadding="0">
-	<tr><th class="h" colspan="5">管理评分记录 (注:只允许更改评分理由，不允许删除评分记录)</th>
-	<tr class="tr3" align="center">
+<div class="h">评分记录管理</div>
+<table width="100%" cellspacing="0" cellpadding="0" style=" table-layout:fixed;">
+	<tr class="tr3">
 		<td width="7%">选择</td>
 		<td width="12%">操作者</td>
 		<td width="12%">积分情况</td>
@@ -258,29 +480,46 @@ $disabled='';
 $val['ifable'] && $disabled='disabled';
 print<<<EOT
 -->
-	<tr class="tr3" align="center">
-		<td><input type="checkbox" id="s_$val[id]" name="selid[]" value="$val[id]" onclick="editrecord('$val[id]','$val[record]')" $disabled></td>
+	<tr class="tr3">
+		<td><input type="checkbox" name="selid[]" value="$val[id]"></td>
 		<td>$val[pinger]</td>
 		<td>$val[name] $val[point]</td>
 		<td>$val[pingdate]</td>
-		<td><span id="ping_$val[id]">$val[record]</span></td>
+		<td title="双击修改评分记录" ondblclick="editrecord('$val[id]')"><span id="ping_$val[id]">$val[record]</span><span id="edit_$val[id]" style="display:none"><input type="text" class="input input_wb" id="editbox_$val[id]" value="$val[record]"> <img title="保存" alt="保存" onclick="savePingLog('$val[id]');" src="$imgpath/post/c_editor/save.gif" style="cursor:pointer;" align="absmiddle"></span></td>
 	</tr>
 <!--
 EOT;
 }print<<<EOT
 -->
-	<tr align="center"><td style="padding:.5em 5em;" colspan="5"><input class="btn" type="submit" value="提 交" /> <a class="btn3" style="cursor:pointer;" type="button" onclick="javascript:history.go(-1)" />返 回</a></td></tr>
+	<tr align="center">
+		<td style="padding:.5em 1em" colspan="5">
+			<div class="cc">$pages</div>
+			<span class="fl"><input type="checkbox" onclick="CheckAll(this.form)" />全选</span>
+			<input class="btn" type="submit" value="删除" /> <a class="btn3" style="cursor:pointer;" type="button" onclick="javascript:history.go(-1)" />返 回</a>
+		</td>
+	</tr>
 </table></div></form>
 <script language="JavaScript">
-function editrecord(id,record){
-	var s = getObj('s_' + id);
+function editrecord(id) {
 	var r = getObj('ping_' + id);
-	if (s.checked == true) {
-		r.innerHTML = '<input type="text" name="record[' + id + ']" size="55" value="' + record + '">';
-	} else {
-		r.innerHTML = record;
+	if (r.style.display == 'none') {
+		return;
 	}
-
+	r.style.display = 'none';
+	getObj('edit_' + id).style.display = '';
+}
+function savePingLog(id) {
+	var record = getObj('editbox_' + id).value; 
+	ajax.send('pw_ajax.php?action=savepinglog&id=' + id + '&record=' + record, '', function() {
+		var rText = ajax.request.responseText;
+		if (rText == 'success') {
+			getObj('ping_' + id).innerHTML = record;
+			getObj('ping_' + id).style.display = '';
+			getObj('edit_' + id).style.display = 'none';
+		} else {
+			ajax.guide();
+		}
+	});
 }
 </script>
 <!--

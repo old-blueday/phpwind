@@ -1,0 +1,57 @@
+<!--<?php
+include_once PrintEot('left');
+${'dis'.$o_commendtype} = "style='display:none'";
+print <<<EOT
+-->
+<form method="post" action="{$basename}&action=commend">
+  <input type="hidden" value="2" name="step">
+  <h2 class="h1">首页内容推荐管理</h2>
+  <div class="admin_table mb10">
+  <table cellspacing="0" cellpadding="0" width="100%">
+    <tbody>
+    <tr class="tr1 vt">
+      <td class="td1">状态</td>
+      <td class="td2">
+       <ul class="cc list_80 fl list_A">
+           <li class="current"><input type="radio" checked="" value="1" name="config[ifcommend]" $ifcommend_Y>开启</li>
+           <li><input type="radio" value="0" name="config[ifcommend]" $ifcommend_N>关闭</li>
+         </ul>
+      </td><td class="td2"><div class="help_a">开启后，前台个人中心首页会显示推荐内容</div></td>
+    </tr>
+	<tr class="tr1 vt">
+      <td class="td1">显示发送者UID</td>
+      <td class="td2">
+      	<input type="text" value="{$o_senderid}" name="config[senderid]" class="input input_wa">
+      </td><td class="td2"><div class="help_a">此推送内容左侧的发送者头像将调用此ID对应的头像</div></td>
+    </tr>
+	<tr class="tr1 vt">
+      <td class="td1">选择推荐形式</td>
+      <td class="td2">
+      	 <ul class="cc list_120 fl list_A">
+      	 	<li><input type="radio" value="0" onclick="getObj('userAdiary').style.display='none';getObj('user').style.display='';" name="config[commendtype]"  $commendtype_N>单纯推荐用户</li>
+            <li class="current"><input type="radio" onclick="getObj('userAdiary').style.display='';getObj('user').style.display='none';" value="1" name="config[commendtype]"  $commendtype_Y>用户、日志都推荐</li>
+         </ul>
+      </td><td class="td2"><div class="help_a">推送内容在前台的呈现样式</div></td>
+    </tr>
+	<tr id="userAdiary" class="tr1 vt" {$dis0}>
+      <td class="td1"></td>
+      <td class="td2">
+      	<img src="images/admin/pw_pushA.gif"/>
+      </td><td class="td2"><div class="help_a"></div></td>
+    </tr>
+	<tr id="user" class="tr1 vt" {$dis1}>
+      <td class="td1"></td>
+      <td class="td2">
+      	<img src="images/admin/pw_pushB.gif"/>
+      </td><td class="td2"><div class="help_a"></div></td>
+    </tr>
+  </tbody></table>
+  </div>
+  <div class="mb10 tac">
+    <span class="btn"><span><button value="提 交" type="submit">提 交</button></span></span>
+  </div>
+</form>
+<!--
+EOT;
+include_once PrintEot('adminbottom');
+?>-->

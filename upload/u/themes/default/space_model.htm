@@ -34,7 +34,7 @@ class spaceModelTemplate {
 		$app_array = array();
 		$appclient = L::loadClass('appclient');
 		$app_array = $appclient->userApplist($this->space['uid']);
-        
+        $listmedals = getMedalIconsByUid($this->space['uid']);
         $attentionService = L::loadClass('Attention', 'friend'); /* @var $attentionService PW_Attention */
 		$isAttention = $attentionService->isFollow($GLOBALS['winduid'], $this->space['uid']);
         settype($this->space['follows'], "integer");
@@ -62,10 +62,23 @@ EOT;
 print <<<EOT
 -->
 	</p>
+	
 	<p class="mb5">{$this->space['honor']}</p>
-	<ul class="cc ulInfoA">
-		<li class="none"><a href="javascript:;" hidefocus="true" style="cursor:default;"><em>{$this->space['follows']}</em>关注</a></li><li><a href="javascript:;" hidefocus="true" style="cursor:default;"><em>{$this->space['fans']}</em>被关注</a></li><li><a href="javascript:;" hidefocus="true" style="cursor:default;"><em>{$this->space['visits']}</em>累计访客</a></li>
-	</ul>
+	<div class="tac lh_24 mb5">
+<!--
+EOT;
+if ($listmedals) {
+foreach($listmedals as $medals){
+print <<<EOT
+-->
+			<span>{$medals}</span>
+<!--
+EOT;
+}
+}
+print <<<EOT
+-->
+	</div>
 <!--
 EOT;
 		if (!$this->space['isMe']) {print <<<EOT
@@ -120,9 +133,14 @@ print <<<EOT
 	</ul>
 <!--
 EOT;
-		}
-		print <<<EOT
+			}print <<<EOT
 -->
+	<div class="line"></div>
+	<ul>
+		<li>关注：<span class="s5">{$this->space['follows']}</span></li>
+		<li>粉丝：<span class="s5">{$this->space['fans']}</span></li>
+		<li>访客：<span class="s5">{$this->space['visits']}</span></li>
+	</ul>
 	<div class="line"></div>
 	<ul>
 		<li><span>等级：</span><span class="s5">{$value['memtitle']}</span></li>
@@ -188,11 +206,11 @@ print <<<EOT
 		<a href="javascript:;" id="td_spaceAmdin">[管理快捷方式]</a>
 		<div class="pw_menu" style="position:absolute;display:none;" id="menu_spaceAmdin">
 			<ul class="menu-half cc" style="width:16em;">
-				<li><a href="{$db_adminfile}?adminjob=setuser&action=edit&uid={$this->space['uid']}" target="_blank">编辑用户</a></li>
+				<li><a href="{$db_adminfile}?adminjob=usermanage&adminitem=edit&action=edit&uid={$this->space['uid']}" target="_blank">编辑用户</a></li>
 				<li><a href="{$db_adminfile}?adminjob=banuser&username={$tmpName}" target="_blank">会员禁言</a></li>
 				<li><a href="{$db_adminfile}?adminjob=superdel&admintype=article&action=deltpc&fid=-1&ifkeep=1&author={$tmpName}&lines=30&ttable=auto" target="_blank">删除主题</a></li>
-				<li><a href="{$db_adminfile}?adminjob=thread&action=replylist&author={$tmpName}&nums=30" target="_blank">删除回复</a></li>
-				<li><a href="{$db_adminfile}?adminjob=superdel&admintype=delmember&action=del&schname={$tmpName}&groupid={$this->space['groupid']}&regdate=all&schlastvisit=all&item=14" target="_blank">清除用户</a></li>
+				<li><a href="{$db_adminfile}?adminjob=thread&admintype=article&action=replylist&author={$tmpName}&nums=30" target="_blank">删除回复</a></li>
+				<li><a href="{$db_adminfile}?adminjob=usermanage&adminitem=delete&action=del&schname={$tmpName}&groupid={$this->space['groupid']}&regdate=all&schlastvisit=all&item=14" target="_blank">清除用户</a></li>
 			</ul>
 		</div>
 	</p>
@@ -280,11 +298,11 @@ EOT;
 		<table width="100%" class="mb15" style="table-layout:fixed;">
 			<tr class="vt">
 				<td width="60">
-					<a href="u.php?uid=$v[uid]" class="img_50"><i><img src="$v[icon]" width="48" height="48" /></i></a>
+					<a href="{$GLOBALS[db_userurl]}$v[uid]" class="img_50"><i><img src="$v[icon]" width="48" height="48" /></i></a>
 				</td>
 				<td>
 					<p class="mb10">
-						<a href="u.php?uid=$v[uid]" class="b f14">$v[username]</a><!--
+						<a href="{$GLOBALS[db_userurl]}$v[uid]" class="b f14">$v[username]</a><!--
 EOT;
 				if ($GLOBALS['db_showonline'] && $v['thisvisit'] + $GLOBALS['db_onlinetime']*1.5 > $GLOBALS['timestamp']) {print <<<EOT
 --><img src="images/online.png" alt="在线" title="在线" style="vertical-align:middle" />
@@ -533,7 +551,7 @@ EOT;
 		foreach ($value[0] as $value1) { print <<<EOT
 -->
 			<dl class="cc dl" id="board_{$value1[id]}">
-				<dt class="dt"><a href="u.php?uid=$value1[uid]" class="img_50"><i><img src="$value1[face]" /></i></a></dt>
+				<dt class="dt"><a href="{$GLOBALS[db_userurl]}$value1[uid]" class="img_50"><i><img src="$value1[face]" /></i></a></dt>
 				<dd class="dd">
 <!--
 EOT;
@@ -544,7 +562,7 @@ EOT;
 EOT;
 			} print <<<EOT
 -->
-					<p class="title"><a href="u.php?uid=$value1[uid]" class="atitle">$value1[username]：</a>$value1[title]</p>
+					<p class="title"><a href="{$GLOBALS[db_userurl]}$value1[uid]" class="atitle">$value1[username]：</a>$value1[title]</p>
 					<cite class="gray">$value1[postdate]</cite><span> - </span>
 <!--
 EOT;
@@ -563,7 +581,7 @@ EOT;
 				foreach ($value[1][$value1['id']] as $comment) {print <<<EOT
 -->
 							<dl class="cc dl2" id="comment_{$comment[id]}">
-								<dt><a href="u.php?uid=$comment[uid]"><img src="$comment[face]" width="30" height="30" /></a></dt>
+								<dt><a href="{$GLOBALS[db_userurl]}$comment[uid]"><img src="$comment[face]" width="30" height="30" /></a></dt>
 								<dd>
 			                                 			
 <!--
@@ -575,7 +593,7 @@ EOT;
 EOT;
 					}print <<<EOT
 -->
-									<p class="mb5 f14"><a href="u.php?uid=$comment[uid]">$comment[username]</a>：$comment[title]</p>
+									<p class="mb5 f14"><a href="{$GLOBALS[db_userurl]}$comment[uid]">$comment[username]</a>：$comment[title]</p>
 									<cite class="gray">$comment[postdate]</cite>
 								</dd>
 							</dl>
@@ -636,6 +654,7 @@ EOT;
 	}
 
 	function diary($value) {//日志列表
+	global $winduid;
 print <<<EOT
 -->
 <div class="boxA" id="space_diary">
@@ -649,7 +668,16 @@ EOT;
 EOT;
 		}print <<<EOT
 -->
-		<span>日志</span>
+<span>日志</span>
+<!--
+EOT;
+if ($this->space['uid']==$winduid) {print <<<EOT
+-->	
+		<span class="fr" style="padding-top:2px;"><span class="btn_add"><span><button type="button" onClick="location.href='apps.php?q=diary&a=write';">写日志</button></span></span></span>
+<!--
+EOT;
+}print <<<EOT
+-->
 	</h2>
 <!--
 EOT;
@@ -665,7 +693,7 @@ EOT;
 print <<<EOT
 -->
 			<dl class="dl">
-				<dt class="dt"><a href="apps.php?q=diary&a=detail&did=$v[did]&uid=$v[uid]" class="f16 b">$v[subject]</a></dt>
+				<dt class="dt"><a href="apps.php?q=diary&a=detail&did=$v[did]&uid=$v[uid]" class="b">$v[subject]</a></dt>
 				<dd class="dd">
 					<p class="mb10">
 						<span class="mr10">$v[content]</span>
@@ -711,14 +739,14 @@ EOT;
 				if (is_array($v)) {print <<<EOT
 -->
 			<li>
-				<a href="u.php?uid=$v[uid]" class="i"><img src="$v[icon]" width="48" height="48" /></a>
-				<p class="n"><a href="u.php?uid=$v[uid]">$v[username]</a></p>
+				<a href="{$GLOBALS[db_userurl]}$v[uid]" class="i"><img src="$v[icon]" width="48" height="48" /></a>
+				<p class="n"><a href="{$GLOBALS[db_userurl]}$v[uid]">$v[username]</a></p>
 				<p class="lh_18">$v[honor]</p>
 <!--
 EOT;
 					if ($this->space['uid'] == $GLOBALS['winduid']) {print <<<EOT
 -->
-				<p class="t gray" title="$v[visittime_s]"><a href="u.php?uid=$v[uid]" class="fr s7">回访</a>$v[visittime]</p>
+				<p class="t gray" title="$v[visittime_s]"><a href="{$GLOBALS[db_userurl]}$v[uid]" class="fr s7">回访</a>$v[visittime]</p>
 <!--
 EOT;
 					}
@@ -763,8 +791,8 @@ EOT;
 				if (is_array($v)) {print <<<EOT
 -->
 			<li>
-				<a href="u.php?uid=$v[uid]" class="i"><img src="$v[icon]" width="48" height="48" /></a>
-				<p class="n"><a href="u.php?uid=$v[uid]">$v[username]</a></p>
+				<a href="{$GLOBALS[db_userurl]}$v[uid]" class="i"><img src="$v[icon]" width="48" height="48" /></a>
+				<p class="n"><a href="{$GLOBALS[db_userurl]}$v[uid]">$v[username]</a></p>
 				<p class="lh_18">$v[honor]</p>
 				<p class="t gray" title="$v[visittime_s]">$v[visittime]</p>
 			</li>

@@ -31,7 +31,7 @@ if (empty($_POST['action'])) {
 
 } else {
 
-	InitGP(array('upgrade'),'P');
+	S::gp(array('upgrade'),'P');
 	foreach ($upgrade as $key => $val) {
 		if (is_numeric($val)) {
 			$upgrade[$key] = $val;

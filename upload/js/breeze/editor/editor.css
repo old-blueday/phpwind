@@ -1,0 +1,86 @@
+@charset "utf-8";
+/* CSS Document */
+
+.B_editor_toolbar {
+	height:52px;
+	border:1px solid #ccc;
+	background:-moz-linear-gradient(top, #FFF, #E5E9EE);
+	cursor:default;
+}
+.B_editor_toolbar ul {
+	float:left;
+	padding:2px;
+}
+.B_editor_toolbar li {
+	float:left;
+	border-right:1px solid #ccc;
+}
+.B_icon,.B_color{
+	float:left;
+	margin:2px;
+}
+.B_selector{
+	margin:1px;
+	border:1px solid #CCC;
+	background:#fff;
+	float:left;
+	line-height:16px;
+}
+.B_icon.active, .B_color.active, .B_selector.active, .B_icon:hover,.B_color:hover,.B_selector:hover{
+	margin:1px;
+	background-color:#FFD96C;
+	border:1px solid #c29239;
+	-moz-border-radius:2px;
+	-webkit-border-radius:2px;
+	border-radius:2px;
+}
+.B_icon:hover,.B_color:hover,.B_selector:hover{
+	background:-moz-radial-gradient(50% 50%, circle farthest-corner, #FFCC00 30%, rgba(255, 255, 255, 0) 110%);
+	border:1px solid #c29239;
+}
+.B_selector{padding:0 5px;position:relative;}
+.B_selector span{float:left;display:block;}
+.B_selector ul{display:none;list-style-position:outside;min-width:100%;position:absolute;top:20px;background:#fff;border:1px solid #ccc;left:-2px}
+.B_selector li{float:none;border:none;padding:0 0 0 20px;line-height:1.5;}
+.B_selector li.active{background:#FC0;color:#0;}
+.B_icon{padding:3px 3px;}
+.B_color,.B_selector{padding:2px 3px;}
+.B_icon div,.B_color div,.B_selector div{
+	background-image:url(toolbar.png);
+	width:15px;
+}
+.B_icon div{height:14px;}
+.B_color div,.B_selector div{float:left;}
+
+div.B_dropdown{
+	background-position:-386px 50%;
+	height:14px;
+	width:7px;
+	margin-left:4px;
+	padding-left:2px;
+}
+.active div.B_dropdown,.B_editor_toolbar div:hover div.B_dropdown,.B_{
+	margin-left:3px;
+	border-left:1px solid #c29239;
+}
+.B_clear{clear:both;height:0;}
+.B_boldIcon {background-position:-32px 50%}
+.B_italicIcon {background-position:-48px 50%}
+.B_underlineIcon {background-position:-64px 50%}
+.B_foreColor {background-position:-80px 50%;height:12px;border-bottom:4px solid #F00;}
+.B_backColor {background-position:-96px 50%;height:12px;border-bottom:4px solid #FF0;}
+.B_leftIcon{background-position:-192px 50%;}
+.B_centerIcon{background-position:-208px 50%;}
+.B_rightIcon{background-position:-224px 50%;}
+.B_imageIcon{background-position:-112px 50%;}
+.B_orderedListIcon{background-position:-176px 50%;}
+.B_unorderedListIcon{background-position:-160px 50%;}
+.B_indentIcon{background-position:-128px 50%;}
+.B_outdentIcon{background-position:-144px 50%;}
+.B_horizontalruleIcon{background-position:-528px 50%}
+.B_linkIcon{background-position:-560px 50%;}
+.B_unlinkIcon{background-position:-560px 50%;}
+.B_codeIcon{background-position:-464px 50%;}
+
+.B_tableIcon{background-position:-544px 50%;}
+.B_quoteIcon{background-position:-512px 50%;}

@@ -11,7 +11,7 @@ $areaNav = $navConfigService->getByKey('area');
 $areaNavId = $areaNav && isset($areaNav['nid']) ? $areaNav['nid'] : 0;
 $navConfigService->update($areaNavId, array('floattype' => 'cross', 'listtype' => 'space', 'selflisttype' => 'space'));
 
-//主导航中增加：群组聚合
+//主导航中增加：门户频道
 $channelService = L::loadClass('channelService', 'area');
 foreach ($channelService->getChannels() as $alias => $channel) {
 	if (!$navConfigService->getByKey('area_' . $alias)) {
@@ -20,6 +20,8 @@ foreach ($channelService->getChannels() as $alias => $channel) {
 		$adds += (bool) $navConfigService->add(PW_NAV_TYPE_MAIN, array('nkey' => 'area_' . $alias, 'pos' => '-1', 'title' => $channel['name'], 'link' => $link, 'view' => $areaNav['view']++, 'upid' => 0, 'isshow' => $isShow));
 	}
 }
+//主导航中增加：群组聚合
+$adds += (bool)$navConfigService->add(PW_NAV_TYPE_MAIN, array('nkey' => 'group', 'pos' => '-1', 'title' => '群组', 'style' => '', 'link' => 'group.php', 'alt' => '', 'target' => 0, 'view' => 3, 'upid' => 0, 'isshow' => 1));
 
 //4.2.	原模式导航
 

@@ -40,7 +40,7 @@ class PW_ParseTemplate{
 			}
 			$replace[$id] = $temp['parsecode'];
 			
-			$replace[$id]	= $this->_adminDiv($replace[$id],$pwName);
+			$replace[$id]	= $this->_adminDiv($replace[$id],$pwName,$temp['title']);
 			$invokePieces	= $invokeService->getInvokePieces($pwName);
 			$invokes[$pwName] = $invokePieces;
 		}
@@ -83,8 +83,8 @@ class PW_ParseTemplate{
 		$this->string = tplParsePrint($this->string);
 	}
 
-	function _adminDiv($string,$id) {
-		$temp	= '<div class="view-hover" altname="'.$id.'" channelid="'.$this->sign.'">';
+	function _adminDiv($string,$id,$title) {
+		$temp	= '<div class="view-hover" invokename="'.($title ? $title : $id).'" altname="'.$id.'" channelid="'.$this->sign.'">';
 		$temp	.= $string;
 		$temp	.= '</div>';
 		return $temp;

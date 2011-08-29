@@ -2,7 +2,7 @@
 !defined('P_W') && exit('Forbidden');
 define('AJAX',1);
 
-InitGP(array('category', 'title'));
+S::gp(array('category', 'title'));
 
 
 $title = trim($title);

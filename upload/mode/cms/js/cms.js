@@ -1,5 +1,5 @@
 function cms_submit(id,column_id){
-	var sendUrl = 'mode.php?m=cms&q=list&action=del&ids=' + id + '&column_id='+column_id;
+	var sendUrl = 'index.php?m=cms&q=list&action=del&ids=' + id + '&column_id='+column_id;
 	showDialog('confirm','确定要删除该文章?',0,function(){
 		ajax.send(sendUrl,'',function(){
 			var rText = ajax.request.responseText;
@@ -14,13 +14,13 @@ function cms_submit(id,column_id){
 }
 
 function deleteArticle(id,cid){
-	var sendUrl = 'mode.php?m=cms&q=list&action=del&ids=' + id +'&column_id='+cid;
+	var sendUrl = 'index.php?m=cms&q=list&action=del&ids=' + id +'&column_id='+cid;
 	showDialog('confirm','确定要删除该文章?',0,function(){
 		ajax.send(sendUrl,'',function(){
 			var rText = ajax.request.responseText;
 			if (rText=='success') {
 				showDialog('success','文章删除成功!',2);
-				setTimeout("window.location.href='mode.php?m=cms&q=list&column="+cid+"';",2000);
+				setTimeout("window.location.href='index.php?m=cms&q=list&column="+cid+"';",2000);
 			} else {
 				ajax.guide();
 			}
@@ -45,7 +45,7 @@ function cms_submit_m(form,column_id){
 		showDialog('error','请至少选择一条文章',0);
 		return false;
 	}
-	var sendUrl = 'mode.php?m=cms&q=list&action=del&ids=' + aids + '&column_id' + column_id;
+	var sendUrl = 'index.php?m=cms&q=list&action=del&ids=' + aids + '&column_id' + column_id;
 	showDialog('confirm','确定要删除选中文章?',0,function(){
 		ajax.send(sendUrl,'',function(){
 			var rText = ajax.request.responseText;

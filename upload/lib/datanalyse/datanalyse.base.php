@@ -180,7 +180,7 @@ class PW_Datanalyse {
 	 */
 	function _readFileByKey($key, $value = '') {
 		$_filename = D_P . "data/bbscache/datanalyse.php";
-		if (file_exists($_filename)) include ($_filename);
+		if (file_exists($_filename)) include pwCache::getPath($_filename);
 		$_data = "\$overtimes=array(\r\n";
 		$_result = '';
 		foreach ((array) $overtimes as $k => $var) {
@@ -192,7 +192,7 @@ class PW_Datanalyse {
 			}
 		}
 		$_data .= "\t)";
-		writeover($_filename, "<?php\r\n" . $_data . "\r\n?>");
+		pwCache::setData($_filename, "<?php\r\n" . $_data . "\r\n?>");
 		return $_result;
 	}
 

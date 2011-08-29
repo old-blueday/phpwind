@@ -27,7 +27,7 @@ function wordlength(target,maxLength){
 </script>
 <div class="sideB" style="width:750px;">
 	<div class="boxA">
-	<table width="100%"><tr><td class="vt" height="436">
+	<table width="100%"><tr><td class="vt" height="600">
 			<div class="p15">
       	<h4 class="site"><img src="u/images/module/set.png" class="mr10" /><span>空间装扮</span></h4>
 				<div class="navC mb10">
@@ -65,8 +65,10 @@ function wordlength(target,maxLength){
 										var atm=getObj('banner');
 										var path = getObj('banner').value;
 										var maxUploadSize;
-										if('$maxuploadsize'){
+										if('$maxuploadsize'.indexOf('M')>-1){											
 										 	maxUploadSize=parseInt('$maxuploadsize'.split('M')[0])*1024*1024;
+										}else if('$maxuploadsize'.indexOf('K') >-1) {
+											maxUploadSize=parseInt('$maxuploadsize'.split('K')[0])*1024;
 										}else{
 											maxUploadSize=2048000;
 										}
@@ -135,20 +137,28 @@ EOT;
 				</div>
 				</div>
 				<div id="set_skin" style="display:$style_skin">
-					<h5 class="h5 mb10"><strong>选择你喜欢的风格</strong></h5>
-					<ul style="width:550px;margin:20px auto;">
+					<div class="b p10">选择你喜欢的风格</div>
+					<div style="padding:0 10px 40px;">
+						<ul class="cc menuSkin" style="width:auto;padding:0;background:none;" id="themesLi">
 <!--
 EOT;
 foreach ($o_uskin as $key => $value) {
+$style = ($key == $space['skin']) ? 'class="current"' : '';
 $ifcheck = ($key == $space['skin']) ? ' checked' : '';
 print <<<EOT
 -->
-						<li class="cc mb10"><label><input type="radio" name="spaceskin" value="$key" class="mr5" {$ifcheck} /><img src="u/themes/$key/images/preview.jpg" width="400" class="mr10" style="vertical-align:middle" /><span class="f14 b s4">$value</span></label></li>
+							<li {$style}>
+								<a href="javascript:;">
+									<i style="background:url(u/themes/$key/images/preview.jpg) no-repeat">&nbsp;</i>
+									<span><label for="skin{$key}"><input type="radio" name="spaceskin" value="$key" id="skin{$key}" class="mr5" {$ifcheck} />{$value}</label></span>
+								</a>
+							</li>
 <!--
 EOT;
 }print <<<EOT
 -->
-					</ul>
+						</ul>
+					</div>
 				</div>
 				<div id="set_model" style="display:$style_model">
 					<div class="moduleList mb15">
@@ -190,6 +200,16 @@ EOT;
 	</div>
 </div>
 <script type="text/javascript">window.onReady(function(){new pwTab('tabList', 'tab_', 'set_', 'spacemodeset');});</script>
+<script type="text/javascript">
+var lis = getObj('themesLi').getElementsByTagName('li');
+for(var i = 0,j = lis.length;i < j;i++){
+	lis[i].onclick = function(){
+		for(var i = 0;i<j;i++){lis[i].className = '';}
+		this.getElementsByTagName('input')[0].checked = 'checked';
+		this.className = 'current';
+	}
+}
+</script>
 <!--
 EOT;
 require_once(uTemplate::printEot('footer'));

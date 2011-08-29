@@ -12,8 +12,9 @@
 if($tooldb['type']!=1){
 	Showmsg('tooluse_type_error');  // 判断道具类型是否设置错误
 }
-$db->update("UPDATE pw_threads SET dig=dig-1 WHERE tid=".pwEscape($tid));
-$db->update("UPDATE pw_usertool SET nums=nums-1 WHERE uid=".pwEscape($winduid)."AND toolid=".pwEscape($toolid));
+//$db->update("UPDATE pw_threads SET dig=dig-1 WHERE tid=".S::sqlEscape($tid));
+pwQuery::update('pw_threads', 'tid=:tid', array($tid), null, array(PW_EXPR=>array('dig=dig-1')));
+$db->update("UPDATE pw_usertool SET nums=nums-1 WHERE uid=".S::sqlEscape($winduid)."AND toolid=".S::sqlEscape($toolid));
 $logdata = array(
 	'type'		=>	'use',
 	'nums'		=>	'',

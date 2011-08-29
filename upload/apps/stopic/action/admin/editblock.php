@@ -4,7 +4,7 @@ define('AJAX',1);
 
 $ajaxurl = EncodeUrl($basename.'&ajax=1');
 
-InitGP(array('step','block_id','stopic_id'));
+S::gp(array('step','block_id','stopic_id'));
 
 if (!$block_id || !$stopic_id) showmsg('undefined_error');
 $stopic_data = $stopic_service->getSTopicInfoById($stopic_id);
@@ -23,13 +23,13 @@ if (!$step) {
 	$block_job = '';
 	include stopic_use_layout ('ajax');
 } else {
-	InitGP(array('block_title'));
+	S::gp(array('block_title'));
 	$block_title = trim($block_title);
 	$block_data = array();
 	
 	//do it self
 	if ('thrd' == $block_type) {
-		InitGP(array('url','title'));
+		S::gp(array('url','title'));
 		if (is_array($title)) {
 			foreach ($title as $k => $v) {
 				$v = trim($v);
@@ -39,7 +39,7 @@ if (!$step) {
 			}
 		}
 	} elseif ('thrdSmry' == $block_type) {
-		InitGP(array('url','title','descrip'));
+		S::gp(array('url','title','descrip'));
 		if (is_array($title)) {
 			foreach ($title as $k => $v) {
 				$v = trim($v);
@@ -49,32 +49,53 @@ if (!$step) {
 			}
 		}
 	} elseif ('pic' == $block_type) {
-		InitGP(array('url','image'));
+		S::gp(array('url','image','image_upload','image_type'));
+		L::loadClass('stopicupload', 'upload', false);
 		if (is_array($image)) {
 			foreach ($image as $k => $v) {
-				$v = trim($v);
-				if ('' != $v) {
-					$block_data[] = array('image'=>$v, 'url'=>trim($url[$k]));
+				if ($image_type[$k] == 0) {
+					$v = trim($v);
+					if ('' != $v) {
+						$block_data[] = array('image'=>$v, 'url'=>trim($url[$k]));
+					}
+				} else {
+					$imgUrl = stopicUploadImg($k);
+					if ($imgUrl == false) continue;
+					$block_data[] = array('image'=>$imgUrl, 'url'=>trim($url[$k]));
 				}
 			}
 		}
 	} elseif ('picTtl' == $block_type) {
-		InitGP(array('url','image','title'));
+		S::gp(array('url','image','title','image_upload','image_type'));
+		L::loadClass('stopicupload', 'upload', false);
 		if (is_array($image)) {
 			foreach ($image as $k => $v) {
-				$v = trim($v);
-				if ('' != $v) {
-					$block_data[] = array('image'=>$v, 'url'=>trim($url[$k]), 'title'=>trim($title[$k]));
+				if ($image_type[$k] == 0) {
+					$v = trim($v);
+					if ('' != $v) {
+						$block_data[] = array('image'=>$v, 'url'=>trim($url[$k]),'title'=>trim($title[$k]));
+					}
+				} else {
+					$imgUrl = stopicUploadImg($k);
+					if ($imgUrl == false) continue;
+					$block_data[] = array('image'=>$imgUrl, 'url'=>trim($url[$k]),'title'=>trim($title[$k]));
 				}
 			}
 		}
 	} elseif ('picArtcl' == $block_type) {
-		InitGP(array('url','image','title','descrip'));
+		S::gp(array('url','image','title','descrip','image_upload','image_type'));
+		L::loadClass('stopicupload', 'upload', false);
 		if (is_array($image)) {
 			foreach ($image as $k => $v) {
-				$v = trim($v);
-				if ('' != $v) {
-					$block_data[] = array('image'=>$v, 'url'=>trim($url[$k]), 'title'=>trim($title[$k]), 'descrip'=>trim($descrip[$k]));
+				if ($image_type[$k] == 0) {
+					$v = trim($v);
+					if ('' != $v) {
+						$block_data[] = array('image'=>$v, 'url'=>trim($url[$k]),'title'=>trim($title[$k]),'descrip'=>trim($descrip[$k]));
+					}
+				} else {
+					$imgUrl = stopicUploadImg($k);
+					if ($imgUrl == false) continue;
+					$block_data[] = array('image'=>$imgUrl, 'url'=>trim($url[$k]),'title'=>trim($title[$k]),'descrip'=>trim($descrip[$k]));
 				}
 			}
 		}
@@ -89,17 +110,24 @@ if (!$step) {
 			}
 		}
 	} elseif ('picPlyr' == $block_type) {
-		InitGP(array('url','image','title'));
+		S::gp(array('url','image','title','image_upload','image_type'));
+		L::loadClass('stopicupload', 'upload', false);
 		if (is_array($image)) {
 			foreach ($image as $k => $v) {
-				$v = trim($v);
-				if ('' != $v) {
-					$block_data[] = array('image'=>$v, 'url'=>trim($url[$k]), 'title'=>trim($title[$k]));
+				if ($image_type[$k] == 0) {
+					$v = trim($v);
+					if ('' != $v) {
+						$block_data[] = array('image'=>$v, 'url'=>trim($url[$k]),'title'=>trim($title[$k]));
+					}
+				} else {
+					$imgUrl = stopicUploadImg($k);
+					if ($imgUrl == false) continue;
+					$block_data[] = array('image'=>$imgUrl, 'url'=>trim($url[$k]),'title'=>trim($title[$k]));
 				}
 			}
 		}
 	} elseif ('nvgt' == $block_type) {
-		InitGP(array('url', 'title', 'link_color', 'link_bgcolor'));
+		S::gp(array('url', 'title', 'link_color', 'link_bgcolor'));
 		$block_data['link_color'] = $link_color;
 		$block_data['link_bgcolor'] = $link_bgcolor;
 		if (is_array($title)) {
@@ -111,7 +139,12 @@ if (!$step) {
 			}
 		}
 	} elseif ('banner' == $block_type) {
-		InitGP(array('banner_image', 'banner_title', 'postion_left', 'postion_top', 'font_style', 'font_size', 'font_color'));
+		S::gp(array('banner_image', 'banner_title', 'postion_left', 'postion_top', 'font_style', 'font_size', 'font_color','image_type'));
+		if ($image_type == 1) {
+			L::loadClass('stopicupload', 'upload', false);
+			$imgUrl = stopicUploadImg(0);
+			if ($imgUrl !== false) $banner_image = $imgUrl;
+		}
 		$block_data = array(
 			'image' => $banner_image,
 			'title' => $banner_title,
@@ -122,24 +155,22 @@ if (!$step) {
 			'title_color' => $font_color,
 		);
 	} elseif ('spclTpc' == $block_type) {
-		InitGP(array('tid', 'height'), null, 2);
+		S::gp(array('tid', 'height'), null, 2);
 		$block_data = array(
 			'tid' => $tid,
 			'height' => $height,
 		);
 	}
 	stopic_stripslashes($block_data);
-	$isUpdate = $stopic_service->updateUnitByFild($stopic_id, $block_id, array('title'=>$block_title,'data'=>$block_data));
-	if ($isUpdate) {
-		$result	= array(
-			'title'		=> stripslashes($block_title),
-			'content'	=> $stopic_service->getHtmlData($block_data, $block_type, $block_id),
-		);
-		$result	= pwJsonEncode($result);
-		echo "success\t".$result;
-	} else {
-		echo 'error';
-	}
+	$stopic_service->updateUnitByFild($stopic_id, $block_id, array('title'=>$block_title,'data'=>$block_data));
+	$result	= array(
+		'title'		=> stripslashes($block_title),
+		'content'	=> $stopic_service->getHtmlData($block_data, $block_type, $block_id),
+	);
+	
+	$result	= pwJsonEncode($result);
+	$result = stripslashes($result);
+	echo "success\t".$result;
 	
 	ajax_footer();
 }
@@ -156,6 +187,15 @@ function stopic_stripslashes(&$array){
 	}
 }
 function stopic_use_block($type) {
-	return Pcv(A_P."/template/admin/block/$type.htm");
+	return S::escapePath(A_P."/template/admin/block/$type.htm");
+}
+
+//上传图片
+function stopicUploadImg($k) {
+	global $db_bbsurl;
+	$img = new StopicUpload($k);
+	$returnImg = PwUpload::upload($img, 0);
+	if (!is_array($returnImg) || count($returnImg) == 0) return false;
+	return $db_bbsurl."/attachment/".$returnImg[0]['fileuploadurl'];
 }
 ?>

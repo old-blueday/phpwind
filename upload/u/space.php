@@ -2,14 +2,20 @@
 !defined('R_P') && exit('Forbidden');
 $USCR = 'space_index';
 
-$isGM = CkInArray($windid,$manager);
+$isGM = S::inArray($windid,$manager);
 !$isGM && $groupid==3 && $isGM=1;
-if ($uid) {
-
-} elseif ($username) {
-	$uid = $db->get_value("SELECT uid FROM pw_members WHERE username=" . pwEscape($username));
+if ($username) {
+	$uid = $db->get_value("SELECT uid FROM pw_members WHERE username=" . S::sqlEscape($username));
 } else {
-	$uid = $winduid;
+	$uid = $uid ? intval($uid) : $winduid;
+}
+if ($uid) {
+	//* $_cache = getDatastore();
+	//* $_cache->delete(array("UID_$uid","UID_CREDIT_$uid","UID_GROUP_$uid"));
+	
+	//* perf::gatherInfo('changeMembersWithUserIds', array('uid'=>$uid));
+	//* perf::gatherInfo('changeMemberCreditWithUserIds', array('uid'=>$uid));
+	//* perf::gatherInfo('changeCmemberAndColonyWithUserIds', array('uid'=>$uid));
 }
 require_once(R_P . 'u/lib/space.class.php');
 $newSpace = new PwSpace($uid);
@@ -54,16 +60,16 @@ if ($winduid && !$space['isMe']) {
 		arsort($visitors);
 		if (count($visitors) > 9) array_pop($visitors);
 		$db->pw_update(
-			"SELECT uid FROM pw_space WHERE uid=" . pwEscape($uid),
-			"UPDATE pw_space SET visits=visits+'1',visitors=" . pwEscape(serialize($visitors),false) . " WHERE uid=" . pwEscape($uid),
-			"INSERT INTO pw_space SET " . pwSqlSingle(array(
+			"SELECT uid FROM pw_space WHERE uid=" . S::sqlEscape($uid),
+			"UPDATE pw_space SET visits=visits+'1',visitors=" . S::sqlEscape(serialize($visitors),false) . " WHERE uid=" . S::sqlEscape($uid),
+			"INSERT INTO pw_space SET " . S::sqlSingle(array(
 				'uid'		=> $uid,
 				'visits'	=> 1,
 				'visitors'	=> serialize($visitors)
 			),false)
 		);
 	}
-	$tovisitors = $db->get_value("SELECT tovisitors FROM pw_space WHERE uid=" . pwEscape($winduid));
+	$tovisitors = $db->get_value("SELECT tovisitors FROM pw_space WHERE uid=" . S::sqlEscape($winduid));
 	$tovisitors = unserialize($tovisitors);
 	is_array($tovisitors) || $tovisitors = array();
 
@@ -71,13 +77,16 @@ if ($winduid && !$space['isMe']) {
 		$tovisitors[$uid] = $timestamp;
 		arsort($tovisitors);
 		if (count($tovisitors) > 9) array_pop($tovisitors);
-		$db->update("UPDATE pw_space SET tovisits=tovisits+'1',tovisitors=" . pwEscape(serialize($tovisitors),false) .  " WHERE uid=" . pwEscape($winduid));
+		$db->update("UPDATE pw_space SET tovisits=tovisits+'1',tovisitors=" . S::sqlEscape(serialize($tovisitors),false) .  " WHERE uid=" . S::sqlEscape($winduid));
 	}
 	//猪头回收
 	$user_icon = explode('|',$space['icon']);
 	if($user_icon[4] && $space['tooltime'] < $timestamp-86400){
 		$space['icon'] = "$user_icon[0]|$user_icon[1]|$user_icon[2]|$user_icon[3]|0";
-		$db->update("UPDATE pw_members SET icon=".pwEscape($space['icon'],false)." WHERE uid=".pwEscape($space['uid']));
+		/**
+		$db->update("UPDATE pw_members SET icon=".S::sqlEscape($space['icon'],false)." WHERE uid=".S::sqlEscape($space['uid']));
+		**/
+		pwQuery::update('pw_members', 'uid =:uid', array($space['uid']), array('icon'=>$space['icon']));
 	}
 }
 

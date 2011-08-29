@@ -32,9 +32,9 @@ class PwColony {
 		$_sql_sel = $_sql_tab = '';
 		if ($winduid) {
 			$_sql_sel = ',cm.id AS ifcyer,cm.ifadmin,cm.lastvisit';
-			$_sql_tab = ' LEFT JOIN pw_cmembers cm ON c.id=cm.colonyid AND cm.uid=' . pwEscape($winduid);
+			$_sql_tab = ' LEFT JOIN pw_cmembers cm ON c.id=cm.colonyid AND cm.uid=' . S::sqlEscape($winduid);
 		}
-		$this->info = $this->_db->get_one("SELECT c.*{$_sql_sel} FROM pw_colonys c{$_sql_tab} WHERE c.id=" . pwEscape($this->cyid));
+		$this->info = $this->_db->get_one("SELECT c.*{$_sql_sel} FROM pw_colonys c{$_sql_tab} WHERE c.id=" . S::sqlEscape($this->cyid));
 		if ($this->info) {
 			$this->info['ifFullMember'] = ($this->info['ifcyer'] && $this->info['ifadmin'] != -1) ? 1 : 0;
 			list($this->info['cnimg'], $this->info['imgtype']) = PwColony::getColonyCnimg($this->info['cnimg']);
@@ -67,7 +67,7 @@ class PwColony {
 			}
 		}
 		/* end */
-		return ($rForumAdmin || $this->info['ifadmin'] == '1' || $this->info['admin'] == $windid || CkInArray($windid,$manager) || $SYSTEM['colonyright']);
+		return ($rForumAdmin || $this->info['ifadmin'] == '1' || $this->info['admin'] == $windid || S::inArray($windid,$manager) || $SYSTEM['colonyright']);
 	}
 	
 	/**
@@ -112,7 +112,7 @@ class PwColony {
 	function _setRight() {
 		$level = $this->info['speciallevel'] ? $this->info['speciallevel'] : $this->info['commonlevel'];
 		empty($level) && $level = 1;
-		$this->right = $this->_db->get_one("SELECT * FROM pw_cnlevel WHERE id=" . pwEscape($level));
+		$this->right = $this->_db->get_one("SELECT * FROM pw_cnlevel WHERE id=" . S::sqlEscape($level));
 		if (empty($this->right)) {
 			//$this->right = $this->_db->get_one("SELECT * FROM pw_cnlevel WHERE ltype='common' ORDER BY lpoint ASC LIMIT 1");
 			$this->right = array(
@@ -208,7 +208,7 @@ class PwColony {
 	 * return int
 	 */
 	function getArgumentCount($searchadd = '') {
-		$count = $this->_db->get_value('SELECT COUNT(*) AS count FROM pw_argument a LEFT JOIN pw_threads t ON a.tid=t.tid WHERE a.cyid=' . pwEscape($this->cyid) . $this->_getThreadWhere() . $searchadd);
+		$count = $this->_db->get_value('SELECT COUNT(*) AS count FROM pw_argument a LEFT JOIN pw_threads t ON a.tid=t.tid WHERE a.cyid=' . S::sqlEscape($this->cyid) . $this->_getThreadWhere() . $searchadd);
 		return (int)$count;
 	}
 	
@@ -223,7 +223,7 @@ class PwColony {
 	 */
 	function getArgument($searchadd, $start, $limit, $orderway = 'lastpost', $asc = 'DESC') {
 		$array = array();
-		$query = $this->_db->query("SELECT t.*,a.topped,a.lastpost,a.titlefont,a.digest,a.toolfield FROM pw_argument a LEFT JOIN pw_threads t ON a.tid=t.tid WHERE a.cyid=" . pwEscape($this->cyid) . $this->_getThreadWhere() . $searchadd . ' ORDER BY ' . ($orderway == 'lastpost' ? "a.topped $asc,a.lastpost" : "t.{$orderway}") . " $asc" . pwLimit($start, $limit));
+		$query = $this->_db->query("SELECT t.*,a.topped,a.lastpost,a.titlefont,a.digest,a.toolfield FROM pw_argument a LEFT JOIN pw_threads t ON a.tid=t.tid WHERE a.cyid=" . S::sqlEscape($this->cyid) . $this->_getThreadWhere() . $searchadd . ' ORDER BY ' . ($orderway == 'lastpost' ? "a.topped $asc,a.lastpost" : "t.{$orderway}") . " $asc" . S::sqlLimit($start, $limit));
 		while ($rt = $this->_db->fetch_array($query)) {
 			$array[] = $rt;
 		}
@@ -232,7 +232,7 @@ class PwColony {
 
 	function _getThreadWhere() {
 		$ifcheck = ($this->info['classid'] && $this->info['iftopicshowinforum']) ? 1 : 2;
-		return ' AND t.fid=' . pwEscape($this->info['classid']) . ' AND ifcheck=' . pwEscape($ifcheck);
+		return ' AND t.fid=' . S::sqlEscape($this->info['classid']) . ' AND t.ifcheck=' . S::sqlEscape($ifcheck);
 	}
 	
 	/**
@@ -267,7 +267,7 @@ class PwColony {
 	
 	function _checkJoinNum($uid) {
 		global $_G;
-		if ($_G['allowjoin'] > 0 && $_G['allowjoin'] <= $this->_db->get_value("SELECT COUNT(*) as sum FROM pw_cmembers WHERE uid=" . pwEscape($uid))) {
+		if ($_G['allowjoin'] > 0 && $_G['allowjoin'] <= $this->_db->get_value("SELECT COUNT(*) as sum FROM pw_cmembers WHERE uid=" . S::sqlEscape($uid))) {
 			return 'colony_joinlimit';
 		}
 		return true;
@@ -333,14 +333,22 @@ class PwColony {
 			));
 			$credit->sets($uid, $creditset);
 		}
-
-		$this->_db->update("INSERT INTO pw_cmembers SET " . pwSqlSingle(array(
+		/**
+		$this->_db->update("INSERT INTO pw_cmembers SET " . S::sqlSingle(array(
 			'uid'		=> $uid,
 			'username'	=> $username,
 			'ifadmin'	=> $this->info['ifcheck'] == 2 ? '0' : '-1',
 			'colonyid'	=> $this->cyid,
 			'addtime'	=> $GLOBALS['timestamp']
 		)));
+		**/
+		pwQuery::insert('pw_cmembers', array(
+			'uid'		=> $uid,
+			'username'	=> $username,
+			'ifadmin'	=> $this->info['ifcheck'] == 2 ? '0' : '-1',
+			'colonyid'	=> $this->cyid,
+			'addtime'	=> $GLOBALS['timestamp']
+		));
 
 		if ($this->info['ifcheck'] == 2) {
 			$this->updateInfoCount(array('members' => 1));	
@@ -369,7 +377,7 @@ class PwColony {
 		if (empty($_sql_set))
 			return false;
 
-		$this->_db->update('UPDATE pw_colonys SET ' . $_sql_set . ' WHERE id=' . pwEscape($this->cyid));
+		$this->_db->update('UPDATE pw_colonys SET ' . $_sql_set . ' WHERE id=' . S::sqlEscape($this->cyid));
 		require_once(R_P . 'u/require/core.php');
 		updateGroupLevel($this->cyid, $this->info);
 	}
@@ -377,7 +385,7 @@ class PwColony {
 	function _sendJoinMsg($frombbs) {
 		global $winduid,$windid;
 		$lang = array(
-			'cname' => Char_cv($this->info['cname']),
+			'cname' => S::escapeChar($this->info['cname']),
 			'colonyurl'
 		);
 		$group = $this->info['ifcheck'] == 1 ? '3' : '2';
@@ -395,12 +403,12 @@ class PwColony {
 					'create_uid' => $winduid,
 					'create_username' => $windid,
 					'title' => getLangInfo('writemsg', 'colony_join_title_check', array(
-						'cname'	=> Char_cv($this->info['cname'])
+						'cname'	=> S::escapeChar($this->info['cname'])
 					)),
 					'content' => getLangInfo('writemsg','colony_join_content_check',array(
 						'uid' => $winduid,
 						'username' => $windid,
-						'cname'	=> Char_cv($this->info['cname']),
+						'cname'	=> S::escapeChar($this->info['cname']),
 						'colonyurl' => $colonyurl
 					)),
 					'extra' => serialize(array('cyid' => $this->cyid,'check'=>1))
@@ -411,10 +419,10 @@ class PwColony {
 		} else {
 			M::sendNotice($managers, array(
 				'title' => getLangInfo('writemsg', 'colony_join_title',array(
-					'cname'	=> Char_cv($this->info['cname'])
+					'cname'	=> S::escapeChar($this->info['cname'])
 				)),
 				'content' => getLangInfo('writemsg', 'colony_join_content',array(
-					'cname'	=> Char_cv($this->info['cname']),
+					'cname'	=> S::escapeChar($this->info['cname']),
 					'colonyurl' => $colonyurl
 				))
 			));
@@ -450,7 +458,7 @@ class PwColony {
 			while (count($this->info['visitor']) > 50) {
 				array_pop($this->info['visitor']);
 			}
-			$this->_db->update("UPDATE pw_colonys SET visitor=" . pwEscape(serialize($this->info['visitor'])) . ' WHERE id=' . pwEscape($this->cyid));
+			$this->_db->update("UPDATE pw_colonys SET visitor=" . S::sqlEscape(serialize($this->info['visitor'])) . ' WHERE id=' . S::sqlEscape($this->cyid));
 		}
 	}
 
@@ -466,7 +474,7 @@ class PwColony {
 	}
 
 	function _sqlIn($ids) {
-		return (is_array($ids) && $ids) ? ' IN (' . pwImplode($ids) . ')' : '=' . pwEscape($ids);
+		return (is_array($ids) && $ids) ? ' IN (' . S::sqlImplode($ids) . ')' : '=' . S::sqlEscape($ids);
 	}
 
 	function _sqlMs($v) {
@@ -476,7 +484,7 @@ class PwColony {
 				$_sql_v .= '=-1';break;
 			case 0://普通会员
 			case 1://管理员
-				$_sql_v .= '=' . pwEscape($value);break;
+				$_sql_v .= '=' . S::sqlEscape($value);break;
 			case 2://非管理员
 				$_sql_v .= "!='1'";break;
 			case 3://验证会员
@@ -505,7 +513,7 @@ class PwColony {
 				case 'ifadmin':
 					$_sql_where .= " AND $_sql_field" . $this->_sqlMs($value);break;
 				case 'admin':
-					$_sql_where .= " AND $_sql_field=" . pwEscape($value);break;
+					$_sql_where .= " AND $_sql_field=" . S::sqlEscape($value);break;
 			}
 		}
 		return $_sql_where;
@@ -520,7 +528,7 @@ class PwColony {
 	 */
 	function checkTopicAdmin($action,$seltid) {
 		global $manager,$SYSTEM,$windid;
-		if (CkInArray($windid,$manager) || $SYSTEM['colonyright']) {
+		if (S::inArray($windid,$manager) || $SYSTEM['colonyright']) {
 			$ifadmin = 1;
 		} elseif ($this->info['ifadmin'] == '1' || $this->info['admin'] == $windid) {
 			if ($action == 'type') {//群组管理员对主题分类享有权限
@@ -560,7 +568,7 @@ class PwColony {
 			is_numeric($v) && $tids[] = $v;
 		}
 		if ($tids) {
-			$tids = pwImplode($tids);
+			$tids = S::sqlImplode($tids);
 			$query = $this->_db->query("SELECT a.*,t.* FROM pw_argument a LEFT JOIN pw_threads t ON a.tid=t.tid WHERE a.tid IN($tids)");
 			while ($rt = $this->_db->fetch_array($query)) {
 				if ($rt['cyid'] != $this->info['id']) {
@@ -593,7 +601,7 @@ class PwColony {
 	function getManager($num=0) {
 		$array = array();
 		$limit = $num ? 'LIMIT '.(int)$num : '';
-		$query = $this->_db->query("SELECT uid,username FROM pw_cmembers WHERE colonyid=" . pwEscape($this->cyid) . " AND ifadmin='1' ORDER BY addtime ASC $limit");
+		$query = $this->_db->query("SELECT uid,username FROM pw_cmembers WHERE colonyid=" . S::sqlEscape($this->cyid) . " AND ifadmin='1' ORDER BY addtime ASC $limit");
 		while ($rt = $this->_db->fetch_array($query)) {
 			$array[$rt['uid']] = $rt;
 		}
@@ -625,14 +633,14 @@ class PwColony {
 		$sql = $this->_sqlCompound($where);
 		$limit = $order = '';
 		if ($nums) {
-			$limit = pwLimit($start, $nums);
+			$limit = S::sqlLimit($start, $nums);
 		}
 		if ($orderway) {
 			!in_array($orderway, array('lastvisit', 'lastpost', 'ifadmin')) && $orderway = 'ifadmin';
 			$order = " ORDER BY $orderway DESC";
 		}
 		$array = array();
-		$query = $this->_db->query("SELECT uid,username,lastvisit FROM pw_cmembers WHERE colonyid=" . pwEscape($this->cyid) . $sql . $order . $limit);
+		$query = $this->_db->query("SELECT uid,username,lastvisit FROM pw_cmembers WHERE colonyid=" . S::sqlEscape($this->cyid) . $sql . $order . $limit);
 		while ($rt = $this->_db->fetch_array($query)) {
 			$array[$rt['uid']] = $rt;
 		}
@@ -653,7 +661,8 @@ class PwColony {
 		if ($array) {
 			$ids = array_keys($array);
 			require_once(R_P . 'u/require/core.php');
-			$this->_db->update("UPDATE pw_cmembers SET ifadmin='0' WHERE colonyid=" . pwEscape($this->cyid) . ' AND uid IN(' . pwImplode($ids) . ") AND ifadmin='-1'");
+			//* $this->_db->update("UPDATE pw_cmembers SET ifadmin='0' WHERE colonyid=" . S::sqlEscape($this->cyid) . ' AND uid IN(' . S::sqlImplode($ids) . ") AND ifadmin='-1'");
+			pwQuery::update('pw_cmembers', 'colonyid=:colonyid AND uid IN (:uid) AND ifadmin=:ifadmin', array($this->cyid, $ids, -1), array('ifadmin'=>0));
 			updateUserAppNum($ids, 'group');
 		}
 		$newMemberCount = count($array);
@@ -668,7 +677,7 @@ class PwColony {
 	function getLikeGroup() {
 		global $o_groups_upgrade;
 		$array = array();
-		$query = $this->_db->query("SELECT id,cname,cnimg,createtime,members,tnum,pnum,albumnum,photonum,writenum,activitynum FROM pw_colonys WHERE styleid=" . pwEscape($this->info['styleid']) . " AND id!=" . pwEscape($this->cyid) . " ORDER BY visit DESC LIMIT 4");
+		$query = $this->_db->query("SELECT id,cname,cnimg,createtime,members,tnum,pnum,albumnum,photonum,writenum,activitynum FROM pw_colonys WHERE styleid=" . S::sqlEscape($this->info['styleid']) . " AND id!=" . S::sqlEscape($this->cyid) . " ORDER BY visit DESC LIMIT 4");
 		while ($rt = $this->_db->fetch_array($query)) {
 			list($rt['cnimg']) = PwColony::getColonyCnimg($rt['cnimg']);
 			$rt['colonyNums'] = CalculateCredit($rt, $o_groups_upgrade);
@@ -699,10 +708,10 @@ class PwColony {
 				$ifable = $this->right['allowstyle'];
 				break;
 			case 'merge' :
-				$ifable = ((1 == $SYSTEM['colonyright'] || $colony['admin'] == $windid) && $groupRight['allowdisband']) ? '1' : '0';
+				$ifable = ((1 == $SYSTEM['colonyright'] || $colony['admin'] == $windid) && $groupRight['allowmerge']) ? '1' : '0';
 				break;
 			case 'attorn' :
-				$ifable = ((1 == $SYSTEM['colonyright'] || $colony['admin'] == $windid) && $groupRight['allowdisband']) ? '1' : '0';
+				$ifable = ((1 == $SYSTEM['colonyright'] || $colony['admin'] == $windid) && $groupRight['allowattorn']) ? '1' : '0';
 				break;
 			case 'disband' :
 				$ifable = ((1 == $SYSTEM['colonyright'] || $colony['admin'] == $windid) && $groupRight['allowdisband']) ? '1' : '0';

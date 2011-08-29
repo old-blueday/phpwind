@@ -31,7 +31,7 @@ class postCate {
 	}
 
 	function getPcCache(){
-		@include_once(D_P.'data/bbscache/postcate_config.php');
+		@include_once pwCache::getPath(D_P.'data/bbscache/postcate_config.php');
 		$this->postcatedb =& $postcatedb;
 	}
 
@@ -39,39 +39,40 @@ class postCate {
 		global $tid,$imgpath;
 		$postcatefielddb = array();
 		$postcatehtml = "
-<style>.tr3 .w{margin-right:10px;}
+<style>
+.pp td{padding:5px 10px;}
 .msg {
-	background: #fff url($imgpath/pccheck.gif) no-repeat -25px -75px;
+	background: #fff url($imgpath/pccheck.gif) no-repeat 0 -37px;
 	border: 1px solid #fff;
 	display: inline;
 	margin-left: 5px;
-	font-size:13px;
-	padding: 2px 2px 2px 18px;
-	vertical-align : -1px;
-	*vertical-align : 5px;
-	_vertical-align : 3px;
+	padding: 2px 2px 2px 20px;
+	vertical-align : -2px;
+	*vertical-align : 0;
 }
-
-.pass {
-	background-position: 1px -57px;
-	background-color: #E6FFE6;
-	border-color: #00BE00;
-}
-
 .error {
-	background-position: 1px -38px;
-	background-color: #FFF2E9;
-	border-color: #FF6600;
+	background-position: 2px -37px;
+	background-color: #fef1f0;
+	border-color: #ffb3b6;
+	color:#f14a10;
+	zoom:1;
+	height:17px;
+	overflow:hidden;
+}
+.pass {
+	background-position: 2px -57px;
+	width:22px;
+	height:21px;
 }
 </style><script language=\"JavaScript\" src=\"js/pw_pccheck.js\"></script>";
-		$postcatehtml .= "<script language=\"JavaScript\" src=\"js/date.js\"></script><script language=\"JavaScript\" src=\"js/desktop/Compatibility.js\"></script><table width=\"100%\"><tr class=\"tr3\"><td colspan=2>".getLangInfo('other','pc_must')."</td></tr>";
+		$postcatehtml .= "<script language=\"JavaScript\" src=\"js/date.js\"></script><script language=\"JavaScript\" src=\"js/desktop/Compatibility.js\"></script><table width=\"100%\"><tr class=\"pp f_two\"><td colspan=2>".getLangInfo('other','pc_must')."</td></tr>";
 
 		if ($tid) {
 			$pcid = (int)$pcid;
 			$pcvaluetable = GetPcatetable($pcid);
-			$fieldone = $this->db->get_one("SELECT * FROM $pcvaluetable WHERE tid=".pwEscape($tid));
+			$fieldone = $this->db->get_one("SELECT * FROM $pcvaluetable WHERE tid=".S::sqlEscape($tid));
 		}
-		$query = $this->db->query("SELECT fieldid,name,fieldname,type,rules,descrip,ifmust,vieworder,textsize FROM pw_pcfield WHERE pcid=".pwEscape($pcid)." AND ifable=1 ORDER BY vieworder,fieldid ASC");
+		$query = $this->db->query("SELECT fieldid,name,fieldname,type,rules,descrip,ifmust,vieworder,textsize FROM pw_pcfield WHERE pcid=".S::sqlEscape($pcid)." AND ifable=1 ORDER BY vieworder,fieldid ASC");
 		while ($rt = $this->db->fetch_array($query)) {
 			if ($tid) $rt['fieldvalue'] = $fieldone[$rt['fieldname']];
 			list($rt['name1'],$rt['name2']) = explode('{#}',$rt['name']);
@@ -83,18 +84,18 @@ class postCate {
 				foreach ($value as $k => $v) {
 					$v['tabindex'] = $tabindex;
 					$ifmust = '';
-					$v['ifmust'] && $ifmust = "<font color=\"#FF0000\">*</font>";
-					$postcatehtml .= "<tr class=\"tr3\"><td>$v[name1]{$ifmust}：</td><td>";
+					$v['ifmust'] && $ifmust = "<span class=\"s1\">*</span>";
+					$postcatehtml .= "<tr class=\"pp f_two\"><td width=\"100\">$v[name1]{$ifmust}：</td><td>";
 					$postcatehtml .= postCate::getCateType($v)." ".$v['name2'];
 					$postcatehtml .= " <span class='gray'>$v[descrip]</span></td></tr>";
 				}
 			} else {
-				$postcatehtml .= "<tr class=\"tr3\">";
+				$postcatehtml .= "<tr class=\"pp\">";
 				$i = 0;
 				foreach ($value as $k => $v) {
 					$v['tabindex'] = $tabindex;
 					$ifmust = '';
-					$v['ifmust'] && $ifmust = "<font color=\"#FF0000\">*</font>";
+					$v['ifmust'] && $ifmust = "<span class=\"s1\">*</span>";
 					if ($i == 0) {
 						$postcatehtml .= "<td style=\"width:100px;\">$v[name1]{$ifmust}：</td><td>";
 					}
@@ -232,11 +233,13 @@ class postCate {
 		} elseif ($data['type'] == 'calendar') {
 			!$data['fieldvalue'] && $data['fieldvalue'] = $timestamp;
 			$data['fieldvalue'] = get_date($data['fieldvalue'],'Y-n-j H:i');
-			$postcatehtml = "<input id=\"calendar_$data[fieldname]\" $pccheck type=\"text\" class=\"input\" name=\"postcate[$data[fieldname]]\" value=\"$data[fieldvalue]\" onclick=\"ShowCalendar(this.id,1)\" size=\"$textsize\" tabindex = \"{$data[tabindex]}\"/>";
+			($data['fieldname'] == "endtime") && $data['fieldvalue'] && $data['fieldvalue'] = $data[fieldname] ? $data[fieldvalue] : $this->_getLastMonthDay($timestamp);  //结束时间
+			($data['fieldname'] == "endtime") && $showError = "onblur=\"getCalendarError();\"";
+			$postcatehtml = "<input id=\"calendar_$data[fieldname]\" $showError $pccheck type=\"text\" class=\"input\" name=\"postcate[$data[fieldname]]\" value=\"$data[fieldvalue]\" onclick=\"ShowCalendar(this.id,1)\" size=\"$textsize\" tabindex = \"{$data[tabindex]}\"/>";
 		} elseif ($data['type'] == 'upload') {
 			$imgs = '';
 			$data['fieldvalue'] && $data['fieldvalue'] = postCate::getpcurl($data['fieldvalue'],1);
-			$data['fieldvalue'] && $imgs = "<span id=\"img_$data[fieldid]\"><img src=\"{$data[fieldvalue]}\" width=\"200px\"/><a href=\"javascript:;\" onclick=\"pcdelimg('$pcid','$data[fieldid]','postcate');\">".getLangInfo('other','pc_delimg')."</a></span>";
+			$data['fieldvalue'] && $imgs = "<span id=\"img_$data[fieldid]\"><img src=\"{$data[fieldvalue]}\" width=\"200px\"/><a href=\"javascript:;\" onclick=\"pcdelimg('$pcid','$data[fieldid]','postcate');return false;\">".getLangInfo('other','pc_delimg')."</a></span>";
 			$postcatehtml .= "<input type=\"file\" class=\"input\" name=\"postcate_$data[fieldid]\" size=\"$textsize\" tabindex = \"{$data[tabindex]}\">$imgs";
 		} else {
 			$postcatehtml = "";
@@ -268,7 +271,7 @@ class postCate {
 		global $tid,$db_charset;
 		$newpostcatevalue = $postcatevalue = $flashcatevalue = '';
 		$newpostcatevalue .= "<div class=\"cates\">";
-		$flashcatevalue .= "<div class=\"cate_meg_player\" ><style type=\"text/css\">.flash{height:150px;width:200px;}</style><div id=\"pwSlidePlayer\" class=\"readFlash\">";
+		$flashcatevalue .= "<div class=\"cate_meg_player\" ><div id=\"pwSlidePlayer\" class=\"readFlash\">";
 		$postcatevalue .= "<ul class=\"cate-list\">";
 
 		if(!isset($this->postcatedb[$pcid])) return;
@@ -278,11 +281,11 @@ class postCate {
 		} else {
 			$pcid = (int)$pcid;
 			$pcvaluetable = GetPcatetable($pcid);
-			$fieldone = $this->db->get_one("SELECT pv.*,SUM(pm.nums) as nums FROM $pcvaluetable pv LEFT JOIN pw_pcmember pm ON pv.tid=pm.tid WHERE pv.tid=".pwEscape($tid)." GROUP BY pv.tid");
+			$fieldone = $this->db->get_one("SELECT pv.*,SUM(pm.nums) as nums FROM $pcvaluetable pv LEFT JOIN pw_pcmember pm ON pv.tid=pm.tid WHERE pv.tid=".S::sqlEscape($tid)." GROUP BY pv.tid");
 		}
 
 
-		$query = $this->db->query("SELECT fieldid,fieldname,name,rules,type,vieworder FROM pw_pcfield WHERE pcid=".pwEscape($pcid)." ORDER BY vieworder,fieldid");
+		$query = $this->db->query("SELECT fieldid,fieldname,name,rules,type,vieworder FROM pw_pcfield WHERE pcid=".S::sqlEscape($pcid)." ORDER BY vieworder,fieldid");
 
 		$vieworder_mark = $i = $tmpCount = 0;
 		$flash = false;
@@ -290,7 +293,7 @@ class postCate {
 			if (($rt['type'] == 'img' || $rt['type'] == 'upload') && $fieldone[$rt['fieldname']]) {
 				$tmpCount++;
 				$rt['type'] == 'upload' && $fieldone[$rt['fieldname']] = postCate::getpcurl($fieldone[$rt['fieldname']],1);
-				$flashcatevalue .= "<div class=\"readFlash\" id=\"Switch_$rt[fieldname]\" style=\"display:none;\"><img src=\"{$fieldone[$rt[fieldname]]}\" width=\"200px\"/></div>";
+				$flashcatevalue .= "<div class=\"readFlash\" id=\"Switch_$rt[fieldname]\" style=\"display:none;\"><img src=\"{$fieldone[$rt[fieldname]]}\"/></div>";
 				$flash = true;
 			}
 			if ($rt['type'] == 'textarea') {
@@ -349,9 +352,9 @@ class postCate {
 		$sql = '';
 		$fielddb = array();
 		if ($type == 'more') {
-			is_array($pcid) && $sql .= " WHERE pcid IN(".pwImplode($pcid).")";
+			is_array($pcid) && $sql .= " WHERE pcid IN(".S::sqlImplode($pcid).")";
 		} elseif ($type == 'one') {
-			$pcid && $sql .= " WHERE pcid=".pwEscape($pcid);
+			$pcid && $sql .= " WHERE pcid=".S::sqlEscape($pcid);
 		} else {
 			$sql .= '';
 		}
@@ -383,9 +386,9 @@ class postCate {
 
 	function initData() {/*初始化上传信息*/
 		global $timestamp,$db_topicname,$tid,$limitnums;
-		$postcate = GetGP('postcate','P');
+		$postcate = S::getGP('postcate','P');
 
-		$query = $this->db->query("SELECT fieldname,name,type,rules,ifmust,ifable FROM pw_pcfield WHERE pcid=".pwEscape($this->pcid));
+		$query = $this->db->query("SELECT fieldname,name,type,rules,ifmust,ifable FROM pw_pcfield WHERE pcid=".S::sqlEscape($this->pcid));
 		while ($rt = $this->db->fetch_array($query)) {
 			if ($rt['type'] != 'upload' && $rt['ifable'] && $rt['ifmust'] && !$postcate[$rt['fieldname']]) {
 				$db_topicname = $rt['name'];
@@ -395,7 +398,7 @@ class postCate {
 				$postcate[$rt['fieldname']] && !is_numeric($postcate[$rt['fieldname']]) && Showmsg('telphone_error');
 			} elseif (in_array($rt['fieldname'],array('price','deposit','mprice'))) {
 				$postcate[$rt['fieldname']] && !is_numeric($postcate[$rt['fieldname']]) && Showmsg('numeric_error');
-				$postcate[$rt['fieldname']] = number_format($postcate[$rt['fieldname']], 2, '.', '');
+				$postcate[$rt['fieldname']] = number_format(floatval($postcate[$rt['fieldname']]), 2, '.', '');
 			}
 
 			if ($postcate[$rt['fieldname']]) {
@@ -423,7 +426,7 @@ class postCate {
 				}
 			}
 		}
-		$limitnums = $this->db->get_value("SELECT SUM(nums) as num FROM pw_pcmember WHERE tid=".pwEscape($tid));
+		$limitnums = $this->db->get_value("SELECT SUM(nums) as num FROM pw_pcmember WHERE tid=".S::sqlEscape($tid));
 		if ($postcate['limitnum'] && $limitnums > $postcate['limitnum']) {
 			Showmsg('pclimitnum_error');
 		}
@@ -444,9 +447,9 @@ class postCate {
 		$pcvaluetable = GetPcatetable($this->pcid);
 
 		$this->db->pw_update(
-			"SELECT tid FROM $pcvaluetable WHERE tid=".pwEscape($tid),
-			"UPDATE $pcvaluetable SET ".pwSqlSingle($this->data) . "WHERE tid=".pwEscape($tid),
-			"INSERT INTO $pcvaluetable SET " . pwSqlSingle($this->data)
+			"SELECT tid FROM $pcvaluetable WHERE tid=".S::sqlEscape($tid),
+			"UPDATE $pcvaluetable SET ".S::sqlSingle($this->data) . "WHERE tid=".S::sqlEscape($tid),
+			"INSERT INTO $pcvaluetable SET " . S::sqlSingle($this->data)
 		);
 
 		/*附件上传-淡定*/
@@ -463,7 +466,7 @@ class postCate {
 		$searchhtml = "<form action=\"thread.php?fid=$fid&pcid=$pcid\" method=\"post\">";
 		$searchhtml .= "<input type=\"hidden\" name=\"topicsearch\" value=\"1\"><script language=\"JavaScript\" src=\"js/date.js\"></script><table>";
 
-		$query = $this->db->query("SELECT fieldid,name,type,rules,ifsearch,ifasearch,textsize,vieworder FROM pw_pcfield WHERE pcid = ".pwEscape($pcid)." AND ifable='1' AND (ifsearch='1' OR ifasearch='1') ORDER BY vieworder,fieldid ASC");
+		$query = $this->db->query("SELECT fieldid,name,type,rules,ifsearch,ifasearch,textsize,vieworder FROM pw_pcfield WHERE pcid = ".S::sqlEscape($pcid)." AND ifable='1' AND (ifsearch='1' OR ifasearch='1') ORDER BY vieworder,fieldid ASC");
 		$vieworder_mark = $ifsearch = $ifasearch = 0;
 		while ($rt = $this->db->fetch_array($query)) {
 			if ($rt['ifasearch'] == 1) {
@@ -475,28 +478,8 @@ class postCate {
 			$fieldid = $rt['fieldid'];
 			list($name1,$name2) = explode('{#}',$rt['name']);
 
-			if ($rt['vieworder'] == 0) {
-				if ($type == 'checkbox' || $type == 'radio') {
-					$searchhtml .= "<tr><th>";
-				} else {
-					$searchhtml .= "<tr><th>";
-				}
-				$searchhtml .= $name1 ? $name1."：" : '';
-			} elseif ($rt['vieworder'] != 0) {
-				if ($vieworder_mark != $rt['vieworder']) {
-					if ($vieworder_mark != 0) $searchhtml .= "</td></tr>";
-
-					if ($type == 'checkbox' || $type == 'radio') {
-						$searchhtml .= "<tr><th>";
-					} else {
-						$searchhtml .= "<tr><th>";
-					}
-					$searchhtml .= $name1 ? $name1."：" : '';
-					$searchhtml .= "</th><td>";
-				} elseif ($vieworder_mark == $rt['vieworder']) {
-					$searchhtml .= $name1 ? $name1 : '';
-				}
-			}
+			$searchhtml .= "<tr><th>";
+			$searchhtml .= $name1 ? $name1."</th><td>" : '';
 
 			$op_key = $op_value = '';
 			if (!$rt['textsize'] || $rt['textsize'] >10) {
@@ -525,14 +508,9 @@ class postCate {
 			} else {
 				$searchhtml .= "<input type=\"text\" size=\"$textsize\" name=\"searchname[".$fieldid."]\" value=\"\" class=\"input\">";
 			}
-			if ($rt['vieworder'] == 0) {
-				$searchhtml .= $name2."</td></tr>";
-			} elseif ($rt['vieworder'] != 0) {
-				$searchhtml .= $name2;
-				$vieworder_mark = $rt['vieworder'];
-			}
+			$searchhtml .= $name2."</td></tr>";
 		}
-		$searchhtml .= "</td></tr><tr><th></th><td><span class=\"btn2\" style=\"margin-right:10px;\"><span><button type=\"submit\" name=\"submit\">".getLangInfo('other','pc_search')."</button></span></span>";
+		$searchhtml .= "<tr><th></th><td><span class=\"btn2\" style=\"margin-right:10px;\"><span><button type=\"submit\" name=\"submit\">".getLangInfo('other','pc_search')."</button></span></span>";
 		$ifsearch == 0 && $searchhtml = '</td></tr></table></form>';
 
 		$ifasearch == '1' && $searchhtml .= "<a id=\"aserach\" href=\"javascript:;\" onclick=\"sendmsg('pw_ajax.php?action=asearch&fid=$fid&pcid=$pcid','',this.id);\">".getLangInfo('other','pc_asearch')."</a></td></tr></table></form>";
@@ -551,20 +529,20 @@ class postCate {
 		$field = unserialize(StrCode($field,'DECODE'));
 
 		$sqladd = '';
-		$fid && $sqladd .= " fid=".pwEscape($fid);
+		$fid && $sqladd .= " fid=".S::sqlEscape($fid);
 		$fielddb = postCate::getFieldData($pcid,$type);
 
 		foreach ($field as $key => $value) {
 			if ($value) {
 				if (in_array($fielddb[$key]['type'],array('number','radio','select'))) {
-					$sqladd .= $sqladd ? " AND ".$fielddb[$key]['fieldname']."=".pwEscape($value) : $fielddb[$key]['fieldname']."=".pwEscape($value);
+					$sqladd .= $sqladd ? " AND ".$fielddb[$key]['fieldname']."=".S::sqlEscape($value) : $fielddb[$key]['fieldname']."=".S::sqlEscape($value);
 				} elseif ($fielddb[$key]['type'] == 'checkbox') {
 					$checkboxs = '';
 					foreach ($value as $cv) {
 						$checkboxs .= $checkboxs ? ','.$cv : $cv;
 					}
 					$value = '%,'.$checkboxs.',%';
-					$sqladd .= $sqladd ? " AND ".$fielddb[$key]['fieldname'] ." LIKE(".pwEscape($value).")" : $fielddb[$key]['fieldname'] ." LIKE(".pwEscape($value).")";
+					$sqladd .= $sqladd ? " AND ".$fielddb[$key]['fieldname'] ." LIKE(".S::sqlEscape($value).")" : $fielddb[$key]['fieldname'] ." LIKE(".S::sqlEscape($value).")";
 				} elseif ($fielddb[$key]['type'] == 'calendar' && ($value['start'] || $value['end'])) {
 
 					$value['start'] && $value['start'] = PwStrtoTime($value['start']);
@@ -572,15 +550,15 @@ class postCate {
 					if ($value['start'] > $value['end'] && $value['start'] && $value['end']) {
 						Showmsg('calendar_error');
 					}
-					$calendarEnd = trim(pwEscape($value['end']));
+					$calendarEnd = trim(S::sqlEscape($value['end']));
 					$sqladd .= $sqladd ?
-						 " AND ".$fielddb[$key]['fieldname'].">=".pwEscape($value['start']).($calendarEnd == "''"?'':" AND ".$fielddb[$key]['fieldname'].'<='.$calendarEnd) :
-						 $fielddb[$key]['fieldname'].">=".pwEscape($value['start']).($calendarEnd == "''"?'':" AND ".$fielddb[$key]['fieldname'].'<='.$calendarEnd);
+						 " AND ".$fielddb[$key]['fieldname'].">=".S::sqlEscape($value['start']).($calendarEnd == "''"?'':" AND ".$fielddb[$key]['fieldname'].'<='.$calendarEnd) :
+						 $fielddb[$key]['fieldname'].">=".S::sqlEscape($value['start']).($calendarEnd == "''"?'':" AND ".$fielddb[$key]['fieldname'].'<='.$calendarEnd);
 				} elseif (in_array($fielddb[$key]['type'],array('text','url','email','textarea'))) {
 					$value = '%'.$value.'%';
-					$sqladd .= $sqladd ? " AND ".$fielddb[$key]['fieldname'] ." LIKE(".pwEscape($value).")" : $fielddb[$key]['fieldname'] ." LIKE(".pwEscape($value).")";
+					$sqladd .= $sqladd ? " AND ".$fielddb[$key]['fieldname'] ." LIKE(".S::sqlEscape($value).")" : $fielddb[$key]['fieldname'] ." LIKE(".S::sqlEscape($value).")";
 				} elseif ($fielddb[$key]['type'] == 'range' && $value['min'] && $value['max']) {
-					$sqladd .= $sqladd ? " AND ".$fielddb[$key]['fieldname'].">=".pwEscape($value['min'])." AND ".$fielddb[$key]['fieldname']."<=".pwEscape($value['max']) : $fielddb[$key]['fieldname'].">=".pwEscape($value['min'])." AND ".$fielddb[$key]['fieldname']."<=".pwEscape($value['max']);
+					$sqladd .= $sqladd ? " AND ".$fielddb[$key]['fieldname'].">=".S::sqlEscape($value['min'])." AND ".$fielddb[$key]['fieldname']."<=".S::sqlEscape($value['max']) : $fielddb[$key]['fieldname'].">=".S::sqlEscape($value['min'])." AND ".$fielddb[$key]['fieldname']."<=".S::sqlEscape($value['max']);
 				} else {
 					$sqladd .= '';
 				}
@@ -590,7 +568,7 @@ class postCate {
 		if ($sqladd) {
 			!$page && $page = 1;
 			$start = ($page-1)*$db_perpage;
-			$limit = pwLimit($start,$db_perpage);
+			$limit = S::sqlLimit($start,$db_perpage);
 			$pcvaluetable = GetPcatetable($pcid);
 
 			$sqladd .= $sqladd ? " AND ifrecycle=0" : " ifrecycle=0";
@@ -693,7 +671,7 @@ class postCate {
 	function getViewright($pcid,$tid){/*是否允许查看参与人列表*/
 		global $groupid,$winduid,$isadminright;
 
-		$pcuid = $this->db->get_value("SELECT uid FROM pw_pcmember WHERE tid=".pwEscape($tid)." AND uid=".pwEscape($winduid));
+		$pcuid = $this->db->get_value("SELECT uid FROM pw_pcmember WHERE tid=".S::sqlEscape($tid)." AND uid=".S::sqlEscape($winduid));
 		if ($isadminright || strpos($this->postcatedb[$pcid]['viewright'],','.$groupid.',') !== false || $pcuid) {
 			return array($pcuid,1);
 		} else {
@@ -727,6 +705,21 @@ class postCate {
 
 		list($newpath) = geturl($newpath, 'show');
 		return $newpath;
+	}
+	
+	/**
+	 * 获取这个月最后一天
+	 */
+	function _getLastMonthDay($timestamp) { 
+		$date = get_date($timestamp);
+		$dateArr = explode(" ",$date);
+		$dateArr[0] = explode("-", $dateArr[0]);
+		$dateArr[0][1] = $dateArr[0][1] + 1;
+		$b = mktime(0,0,0,$dateArr[0][1],1,$dateArr[0][0]);
+		$b = $b - 1;
+		$c = date("Y-m-d",$b);
+		$c = $c." ".$dateArr[1];
+		return $c;
 	}
 }
 ?>

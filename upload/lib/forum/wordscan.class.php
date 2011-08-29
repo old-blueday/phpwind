@@ -138,7 +138,7 @@ class PW_WordScan {
 
 		foreach ($this->table_progress as $table => $progress) {
 			if ($table == 'pw_threads') {
-				$sql = "SELECT COUNT(*) FROM $table WHERE tid>".pwEscape($progress)." AND fid =".pwEscape($this->fid);
+				$sql = "SELECT COUNT(*) FROM $table WHERE tid>".S::sqlEscape($progress)." AND fid =".S::sqlEscape($this->fid);
 				$new = $this->db->get_value($sql);
 				if ($new) {//if (10 < $new) {
 					$this->table = $table;
@@ -149,7 +149,7 @@ class PW_WordScan {
 					return array('progress' => $this->progress, 'count' => $this->count);
 				}
 			} else {
-				$sql = "SELECT COUNT(*) FROM $table WHERE pid>".pwEscape($progress)." AND fid =".pwEscape($this->fid);
+				$sql = "SELECT COUNT(*) FROM $table WHERE pid>".S::sqlEscape($progress)." AND fid =".S::sqlEscape($this->fid);
 				$new = $this->db->get_value($sql);
 				if ($new) {//if (10 < $new) {
 					$this->table = $table;
@@ -171,7 +171,7 @@ class PW_WordScan {
 		# 获取主题信息,判断是否重复记录
 		$sql = " SELECT t.tid, t.subject, t.ifcheck, t.postdate, t.author, f.id, f.state "
 			 . " FROM $this->table AS t LEFT JOIN pw_filter AS f ON t.tid = f.tid"
-			 . " WHERE t.tid>".pwEscape($this->table_progress[$this->table])." AND t.fid =".pwEscape($this->fid)
+			 . " WHERE t.tid>".S::sqlEscape($this->table_progress[$this->table])." AND t.fid =".S::sqlEscape($this->fid)
 			 . " GROUP BY t.tid ORDER BY t.tid ASC LIMIT ".$this->pagesize;
 		$query = $this->db->query($sql);
 		
@@ -179,7 +179,7 @@ class PW_WordScan {
 		while ($thread = $this->db->fetch_array($query)) {
 			# 获取帖子内容
 			$pw_tmsgs = GetTtable($thread['tid']);
-			$sql = " SELECT content FROM $pw_tmsgs WHERE tid=".pwEscape($thread['tid']);
+			$sql = " SELECT content FROM $pw_tmsgs WHERE tid=".S::sqlEscape($thread['tid']);
 			$thread['content'] = $this->db->get_value($sql);
 			
 			# 扫描进度
@@ -199,8 +199,8 @@ class PW_WordScan {
 		
 				if ($this->dispose && $score > 0 && $thread['ifcheck']) {
 					# 更改审核状态
-					$sql = "UPDATE pw_threads SET ifcheck=0 WHERE tid = " .pwEscape($thread['tid']);
-					$this->db->update($sql);
+					//$sql = "UPDATE pw_threads SET ifcheck=0 WHERE tid = " .S::sqlEscape($thread['tid']);
+					pwQuery::update('pw_threads', 'tid=:tid', array($thread['tid']), array('ifcheck'=>0));
 					
 					$num++;
 							
@@ -222,8 +222,8 @@ class PW_WordScan {
 					
 					$compart = $insertString ? ',' : '';
 					# 处理数据
-					$insertString .= $compart . "( " . pwEscape($thread['tid']) . ", " . pwEscape($word) . ", "
-							      . pwEscape($thread['postdate']) . ")";					
+					$insertString .= $compart . "( " . S::sqlEscape($thread['tid']) . ", " . S::sqlEscape($word) . ", "
+							      . S::sqlEscape($thread['postdate']) . ")";					
 				} elseif ($thread['state']) {
 					# 如果是已经审核通过的再次被扫到,扫描到的结果+1
 					$this->result++;
@@ -234,10 +234,10 @@ class PW_WordScan {
 						'filter' => $word,
 						'created_at' => $thread['postdate'],
 					);
-					$value = pwSqlSingle($value);
+					$value = S::sqlSingle($value);
 		
 					# 更新记录
-					$sql = "UPDATE pw_filter SET {$value} WHERE pid=0 AND tid = " . pwEscape($thread['tid']);
+					$sql = "UPDATE pw_filter SET {$value} WHERE pid=0 AND tid = " . S::sqlEscape($thread['tid']);
 					$this->db->update($sql);
 				}
 			}
@@ -258,7 +258,7 @@ class PW_WordScan {
 	 * @desc 更新因帖子状态改变而影响的版块信息
 	 */
 	function updateCache($num) {
-		$sql = "UPDATE pw_forumdata SET article=article-".pwEscape($num,false).",topic=topic-".pwEscape($num,false)." WHERE fid=".pwEscape($this->fid);
+		$sql = "UPDATE pw_forumdata SET article=article-".S::sqlEscape($num,false).",topic=topic-".S::sqlEscape($num,false)." WHERE fid=".S::sqlEscape($this->fid);
 		$this->db->update($sql);
 	}
 	
@@ -270,8 +270,8 @@ class PW_WordScan {
 		# 获取帖子信息,判断是否重复记录
 		$sql = "SELECT p.pid,p.content,p.subject,t.tid,t.subject AS title,p.author,p.postdate,p.ifcheck,f.id,f.state "
 			 . "FROM $this->table AS p LEFT JOIN pw_threads AS t ON p.tid=t.tid LEFT JOIN pw_filter AS f ON p.pid = f.pid "
-			 . "WHERE p.tid > 0 AND p.pid>".pwEscape($this->table_progress[$this->table])
-			 ." AND t.fid =".pwEscape($this->fid)
+			 . "WHERE p.tid > 0 AND p.pid>".S::sqlEscape($this->table_progress[$this->table])
+			 ." AND t.fid =".S::sqlEscape($this->fid)
 			 . " GROUP BY p.pid ORDER BY p.pid ASC LIMIT ".$this->pagesize;
 		$query = $this->db->query($sql);		
 		while ($post = $this->db->fetch_array($query)) {
@@ -293,7 +293,7 @@ class PW_WordScan {
 				if ($this->dispose && $score > 0 && $post['ifcheck']) {
 					$tids[$post['tid']]++;
 					# 待审核
-					$sql = "UPDATE $this->table SET ifcheck=0 WHERE pid = " .pwEscape($post['pid']);
+					$sql = "UPDATE $this->table SET ifcheck=0 WHERE pid = " .S::sqlEscape($post['pid']);
 					$this->db->update($sql);
 						
 					# 发消息通知
@@ -312,8 +312,8 @@ class PW_WordScan {
 		
 					$compart = $insertSql ? ',' : '';
 					# 处理数据
-					$insertSql .= $compart . "( " . pwEscape($post['tid']) . ", " . pwEscape($post['pid']) 
-									  . ", " . pwEscape($word) . ", " . pwEscape($post['postdate']) . ")";
+					$insertSql .= $compart . "( " . S::sqlEscape($post['tid']) . ", " . S::sqlEscape($post['pid']) 
+									  . ", " . S::sqlEscape($word) . ", " . S::sqlEscape($post['postdate']) . ")";
 				} elseif ($post['state']) {					
 					# 如果是已经处理过的审核记录再次被扫到,扫描到的结果+1
 					$this->result++;
@@ -324,10 +324,10 @@ class PW_WordScan {
 						'filter' => $word,
 						'created_at' => $post['postdate'],
 					);
-					$value = pwSqlSingle($value);
+					$value = S::sqlSingle($value);
 		
 					# 更新记录
-					$sql = "UPDATE pw_filter SET {$value} WHERE tid=".pwEscape($post['tid'])." AND pid=" . pwEscape($post['pid']);
+					$sql = "UPDATE pw_filter SET {$value} WHERE tid=".S::sqlEscape($post['tid'])." AND pid=" . S::sqlEscape($post['pid']);
 					$this->db->update($sql);
 				}
 			}			
@@ -339,14 +339,15 @@ class PW_WordScan {
 				
 			foreach ($tids as $key => $value) {				
 				# 更新主题帖回复数
-				$sql = "UPDATE pw_threads SET replies=replies-".pwEscape($value,false)." WHERE tid=".pwEscape($key);
+				//$sql = "UPDATE pw_threads SET replies=replies-".S::sqlEscape($value,false)." WHERE tid=".S::sqlEscape($key);
+				$sql = pwQuery::buildClause('UPDATE :pw_table SET replies=replies-:replies WHERE tid=:tid', array('pw_threads', $value, $key));
 				$this->db->update($sql);
 				
 				$article += $value;
 			}
 			
 			# 更新版块文章数
-			$sql = "UPDATE pw_forumdata SET article=article-".pwEscape($article,false)." WHERE fid=".pwEscape($this->fid);
+			$sql = "UPDATE pw_forumdata SET article=article-".S::sqlEscape($article,false)." WHERE fid=".S::sqlEscape($this->fid);
 			$this->db->update($sql);
 		}
 		
@@ -389,13 +390,13 @@ class PW_WordScan {
 		global $db_plist;
 		
 		# 读取缓存
-		require_once(D_P.'data/bbscache/wordsfb_progress.php');
+		require_once pwCache::getPath(D_P.'data/bbscache/wordsfb_progress.php');
 		$this->threaddb = unserialize($threaddb);
 		$this->catedb   = unserialize($catedb);
 		$temp_threaddb = unserialize($threaddb);
 		
 		# 获取主题表
-		$sql = "SELECT COUNT(*) AS count FROM pw_threads WHERE fid =".pwEscape($this->fid);
+		$sql = "SELECT COUNT(*) AS count FROM pw_threads WHERE fid =".S::sqlEscape($this->fid);
 		$count = $this->db->get_value($sql);
 		
 		# 获取回复表
@@ -412,7 +413,7 @@ class PW_WordScan {
 		}
 			
 		foreach ($postslist as $pw_posts) {
-			$sql = "SELECT COUNT(*) AS count FROM $pw_posts WHERE fid =".pwEscape($this->fid);
+			$sql = "SELECT COUNT(*) AS count FROM $pw_posts WHERE fid =".S::sqlEscape($this->fid);
 			$postcount = $this->db->get_value($sql);
 			$count += $postcount;
 		}
@@ -446,7 +447,7 @@ class PW_WordScan {
 		$filecontent.="\$threaddb=".pw_var_export($threaddb).";\r\n";
 		$filecontent.="?>";
 		$cahce_file = D_P.'data/bbscache/wordsfb_progress.php';
-		writeover($cahce_file, $filecontent);
+		pwCache::setData($cahce_file, $filecontent);
 	}
 	
 	/**
@@ -457,13 +458,13 @@ class PW_WordScan {
 		global $db_plist;
 		
 		# 读取缓存
-		require_once(D_P.'data/bbscache/wordsfb_progress.php');
+		require_once pwCache::getPath(D_P.'data/bbscache/wordsfb_progress.php');
 		$this->threaddb = unserialize($threaddb);
 		$this->catedb   = unserialize($catedb);
 		$temp_threaddb = unserialize($threaddb);
 		
 		# 获取主题帖总数
-		$sql = "SELECT COUNT(*) AS count FROM pw_threads WHERE fid =".pwEscape($this->fid);
+		$sql = "SELECT COUNT(*) AS count FROM pw_threads WHERE fid =".S::sqlEscape($this->fid);
 		$count = $this->db->get_value($sql);
 		
 		# 获取回复表
@@ -481,7 +482,7 @@ class PW_WordScan {
 		
 		# 获取回复帖数量
 		foreach ($postslist as $pw_posts) {
-			$sql = "SELECT COUNT(*) AS count FROM $pw_posts WHERE fid =".pwEscape($this->fid);
+			$sql = "SELECT COUNT(*) AS count FROM $pw_posts WHERE fid =".S::sqlEscape($this->fid);
 			$postcount = $this->db->get_value($sql);
 			$count += $postcount;
 		}
@@ -516,7 +517,7 @@ class PW_WordScan {
 		$filecontent.="\$threaddb=".pw_var_export($threaddb).";\r\n";
 		$filecontent.="?>";
 		$cahce_file = D_P.'data/bbscache/wordsfb_progress.php';
-		writeover($cahce_file, $filecontent);
+		pwCache::setData($cahce_file, $filecontent);
 	}
 	
 	/*function getProgress()
@@ -562,7 +563,7 @@ class PW_WordScan {
 			$filecontent.="\$threaddb=".pw_var_export($threaddb).";\r\n";
 			$filecontent.="?>";
 			$cahce_file = D_P.'data/bbscache/wordsfb_progress.php';
-			writeover($cahce_file, $filecontent);
+			pwCache::setData($cahce_file, $filecontent);
 		}
 	}
 	

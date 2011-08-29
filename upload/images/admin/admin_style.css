@@ -61,7 +61,7 @@ a:hover,.line{ text-decoration:underline;}
 .none_pw{display:none;}
 .addform .none_pw{display:block;}
 /*bg*/
-.input_color,.input_time,.expand,.hide,.lower,.btn_add,.btn_add i,span.btn,span.bt,span.btn span,span.bt span,span.btn2,span.bt2,span.btn2 span,span.bt2 span,.td_bgB td,.del_img,.zt_stylebg,.tip_wind dt{background:url(index_icon.png) 0 0;}
+.input_color,.input_time,.expand,.hide,.lower,.btn_add,.btn_add i,span.btn,span.bt,span.btn span,span.bt span,span.btn2,span.bt2,span.btn2 span,span.bt2 span,.td_bgB td,.del_img,.zt_stylebg,.tip_wind dt,.help_b{background:url(index_icon.png) 0 0;}
 /*form*/
 textarea,input{font:12px/12px Arial;vertical-align:middle;}
 textarea{border: 1px solid; border-color: #999999 #e1e1e1 #e1e1e1 #999999;padding:3px;}
@@ -180,7 +180,7 @@ span.btn2,span.bt2{background-position:right -210px;}
 .admin_table .td_bgD .td1,.admin_table .td_bgD:hover .td1{background:#e6f8e6;border-bottom:1px solid #ceeace;}
 /*list*/
 .list_A{float:left;}
-	.list_A li{height:22px;line-height:24px;overflow:hidden;cursor:default;float:left; clear:both;}
+	.list_A li{height:22px;line-height:24px;overflow:hidden;cursor:default;float:left; clear:both; white-space:nowrap;}
 	.list_A .current,.list_B .current,.list_C .current{color:#008800;}
 	.list_A input,.list_B input{margin-right:3px;*margin-right:0px;_margin-top:-2px;}
 .list_B{}
@@ -217,10 +217,10 @@ span.btn2,span.bt2{background-position:right -210px;}
 	.tab_A .current a,.tab_A .current a:hover{border-color:#cbdaea;background:#f1faff;line-height:23px;height:23px;color:#333;}
 /*help*/
 .help_a{display:none;}
-/*a.help_a{display:block;width:14px;height:14px;background-position:0 -30px;margin-top:2px;}
-	a.help_a i{position:absolute;right:-4px;top:16px;font-style:normal;width:400px;border:1px solid #c1d7ec;background:#fff;padding:6px 10px 4px;line-height:1.5;display:none;}
-	a.help_a:hover{text-decoration:none;position:relative;}
-	a.help_a:hover i{display:block;}*/
+a.help_b{display:block;width:14px;height:14px;background-position:0 -30px;}
+	a.help_b i{position:absolute;left:0px;bottom:16px;font-style:normal;width:420px;border:1px solid #f1a554;background:#fffae1;padding:6px 10px 4px;line-height:1.5;display:none; font-weight:100;color:#333;}
+	a.help_b:hover{text-decoration:none;position:relative;}
+	a.help_b:hover i{display:block;}
 /*dl*/
 .search_dl{padding:0 15px 15px;border-bottom:1px solid #dde9f5;line-height:1.4;}
 	.search_dl dt{padding-bottom:5px;}
@@ -267,7 +267,7 @@ span.btn2,span.bt2{background-position:right -210px;}
 .pobg3{height:5px;}
 .pobg4{width:5px;}
 /*pop content*/
-.popTop{padding:5px 10px 3px 18px;font-weight:700;font-size:14px;color:#333;border-bottom:1px solid #d9e5f2;background:#eaf2fa;}
+.popTop{padding:5px 10px;font-weight:700;font-size:14px;color:#333;border-bottom:1px solid #d9e5f2;background:#eaf2fa;}
 .popTop select,.popTop input{ font-size:12px;}
 .popBottom{padding:5px 10px;background:#f7f7f7;border-top:1px solid #e4e4e4;text-align:right;}
 .popCont{margin:40px 0 60px;line-height:2;color:#333; text-align:center;}
@@ -316,3 +316,24 @@ span.btn2,span.bt2{background-position:right -210px;}
 .searchDown li{margin-bottom:1px;border-bottom:1px solid #d9eaf6;padding-bottom:1px;}
 .searchDown li a{display:block;line-height:25px;height:25px;padding:0 10px;color:#333;}
 .searchDown li a:hover{background:#e3f0f9;color:#333; text-decoration:none;}
+/* ad imgshow style*/
+.advImgShow{width:150px; height:100px; float:left;}
+/*time*/
+.pw_menu{border:1px solid #a6cbe7;background:#fff;}
+.timeSelect{padding:1px solid #fff;width:180px;color:#333;line-height:18px;}
+.timeSelect .input{width:20px;margin:0 5px;}
+.timeSelect table{margin-bottom:5px;}
+.timeSelect td,.timeSelect th{border-right:1px solid #d9e5f2;border-top:1px solid #d9e5f2; text-align:center; font-weight:100; font-family:Simsun;}
+.timeSelect th{background:#f7fbff;}
+.timeSelect td:hover{cursor:pointer;}
+.timeSelect select{ font-weight:100; font-size:12px;}
+.timeSelect .sun{color:#f50;}
+.timeSelect .sat{border-right:0 none;color:#080;}
+.timeSelect .current,.timeSelect .current:hover{background:#308cb2;color:#fff;}
+.timeSelect td span{display:block;border:1px solid #fff; cursor:pointer;-webkit-transition: all 0.5s ease-out;transition: all 0.2s ease-out;}
+.timeSelect td span:hover{background:#dfeaf5;}
+.adel,.aedit,.g_photosbox .updel{background:url(../del.png) 9999px 9999px no-repeat;width:12px;height:13px;text-indent:-2000em;display:block;overflow:hidden;float:right;padding:0;-webkit-transition: all 0.2s ease-out;}
+.adel,.g_photosbox .updel{ background-position:0 -15px}
+.adel:hover,.g_photosbox .updel:hover{ background-position:-34px -15px;}
+.aedit{ background-position:0 0;}
+.aedit:hover{ background-position:-34px 0;}

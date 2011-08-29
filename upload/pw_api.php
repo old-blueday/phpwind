@@ -7,16 +7,19 @@ define('D_P',R_P);
 function_exists('date_default_timezone_set') && date_default_timezone_set('Etc/GMT+0');
 
 require_once(R_P.'require/common.php');
-pwInitGlobals();
+S::filter();
 
-require_once(D_P.'data/bbscache/config.php');
+require_once pwCache::getPath(D_P.'data/bbscache/config.php');
 $timestamp = time();
 $db_cvtime!=0 && $timestamp += $db_cvtime*60;
 $onlineip = pwGetIp();
 
 require_once(R_P.'api/class_base.php');
-require_once(D_P.'data/sql_config.php');
-require_once Pcv(R_P."require/db_$database.php");
+require_once pwCache::getPath(D_P.'data/sql_config.php');
+if ($database == 'mysqli' && Pwloaddl('mysqli') === false) {
+	$database = 'mysql';
+}
+require_once S::escapePath(R_P."require/db_$database.php");
 
 $dirstrpos = strpos($pwServer['PHP_SELF'],$db_dir);
 if ($dirstrpos !== false) {
@@ -25,7 +28,7 @@ if ($dirstrpos !== false) {
 } else {
 	$tmp = $pwServer['PHP_SELF'];
 }
-$db_bbsurl = Char_cv("http://".$pwServer['HTTP_HOST'].substr($tmp,0,strrpos($tmp,'/')));
+$db_bbsurl = S::escapeChar("http://".$pwServer['HTTP_HOST'].substr($tmp,0,strrpos($tmp,'/')));
 
 if ($db_http != 'N') {
 	$imgpath = $db_http;
@@ -51,5 +54,10 @@ if ($response) {
 
 function GetLang($lang,$EXT='php'){//No use
 	return R_P."template/wind/lang_$lang.$EXT";
+}
+if (!function_exists('Pwloaddl')) {
+	function Pwloaddl($module, $checkFunction = 'mysqli_get_client_info') {
+		return extension_loaded($module) && $checkFunction && function_exists($checkFunction) ? true : false;
+	}
 }
 ?>

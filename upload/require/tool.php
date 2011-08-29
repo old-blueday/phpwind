@@ -32,11 +32,11 @@ function CheckUserTool($uid,$tooldb) {
 function writetoollog($log) {
 	global $db,$db_bbsurl;
 	$log['type']    = getLangInfo('toollog',$log['type']);
-	$log['filename']= Char_cv($log['filename']);
-	$log['username']= Char_cv($log['username']);
-	$log['descrip'] = Char_cv(getLangInfo('toollog',$log['descrip'],$log));
+	$log['filename']= S::escapeChar($log['filename']);
+	$log['username']= S::escapeChar($log['username']);
+	$log['descrip'] = S::escapeChar(getLangInfo('toollog',$log['descrip'],$log));
 
-	$db->update("INSERT INTO pw_toollog SET " . pwSqlSingle(array(
+	$db->update("INSERT INTO pw_toollog SET " . S::sqlSingle(array(
 		'type'		=> $log['type'],
 		'filename'	=> $log['filename'],
 		'nums'		=> $log['nums'],

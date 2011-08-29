@@ -17,6 +17,7 @@ class PW_GroupArticleSource extends SystemData {
 	
 	function _getData($sortType, $groupId = 0, $num) {
 		switch ($sortType) {
+			case '':
 			case 'newarticle' :
 				return $this->_getDataByNewArticle($groupId,$num);
 			case 'newreplye' :
@@ -34,14 +35,16 @@ class PW_GroupArticleSource extends SystemData {
 	
 	function _getDataForSort($type,$groupId,$num) {
 		global $db;
-		$_sql_order = $type=='newarticle' ? 'a.postdate' : 'a.lastpost';
+		$_sql_order = $type=='newarticle' ? 'a.tid' : 'a.lastpost';
 		$groupId = (int) $groupId;
 		$_sqlAddArray = array();
-		if ($groupId) $_sqlAddArray[] = 'a.cyid='.pwEscape($groupId);
+		if ($groupId) $_sqlAddArray[] = 'a.cyid='.S::sqlEscape($groupId);
 		if ($type=='newreplye') $_sqlAddArray[] = 't.replies>0';
+		$_sqlAddArray[] = '!(t.fid=0 AND t.ifcheck=1)';
+		$_sqlAddArray[] = 'cy.ifopen=1';
 		
 		$_sqlAdd = $_sqlAddArray ? ' WHERE '.implode(' AND ',$_sqlAddArray) : ' ';
-		$_sql = "SELECT t.tid,t.author,t.authorid,t.subject,t.type,t.postdate,t.hits,t.replies,t.lastposter,a.cyid,a.lastpost,cy.cname FROM pw_argument a LEFT JOIN pw_threads t ON a.tid=t.tid LEFT JOIN pw_colonys cy ON a.cyid=cy.id $_sqlAdd ORDER BY $_sql_order DESC".pwLimit(0,$num);
+		$_sql = "SELECT t.tid,t.author,t.authorid,t.subject,t.type,t.postdate,t.hits,t.replies,t.lastposter,a.cyid,a.lastpost,cy.cname FROM pw_argument a LEFT JOIN pw_threads t ON a.tid=t.tid LEFT JOIN pw_colonys cy ON a.cyid=cy.id $_sqlAdd ORDER BY $_sql_order DESC" . S::sqlLimit(0,$num);
 		$query = $db->query($_sql);
 		$temp = array();
 		while ($rt = $db->fetch_array($query)) {

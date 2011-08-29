@@ -167,7 +167,7 @@ class PW_Write {
 		$reslut = array();
 		foreach ($writedata as $writes) {
 			$writes['username'] = $touids[$writes['touid']];
-			if ($writes['touid']) $writes['content'] = '@<a href="u.php?uid=' . $writes['touid'] . '">' . $writes['username'] . '</a> ' . $writes['content'];
+			if ($writes['touid']) $writes['content'] = '@<a href="'.USER_URL. $writes['touid'] . '">' . $writes['username'] . '</a> ' . $writes['content'];
 			$reslut[] = $writes;
 		}
 		return array($this->parse($reslut), $pages, $count);
@@ -210,7 +210,7 @@ class PW_Write {
 		
 		$content = $this->_getTextWithPhoto($photoId, $text);
 		
-		$f_id = $this->send($winduid, array('touid' => $ruid, 'postdate' => $this->_getTimestamp(), 'isshare' => 0, 'source' => $source, 'content' => Char_cv($content)));
+		$f_id = $this->send($winduid, array('touid' => $ruid, 'postdate' => $this->_getTimestamp(), 'isshare' => 0, 'source' => $source, 'content' => S::escapeChar($content)));
 		
 		return array($f_id, $content);
 	
@@ -249,7 +249,7 @@ class PW_Write {
 		$photos = array();
 		
 		global $db;
-		$query = $db->query("SELECT * FROM pw_cnphoto WHERE pid IN (" . pwImplode($photoIds) . ")");
+		$query = $db->query("SELECT * FROM pw_cnphoto WHERE pid IN (" . S::sqlImplode($photoIds) . ")");
 		while ($rt = $db->fetch_array($query)) {
 			$photos[$rt['pid']] = array('photo'=> getphotourl($rt['path']), 'photoThumb'=>getphotourl($rt['path'], $rt['ifthumb']));
 		}
@@ -376,7 +376,7 @@ class PW_Write {
 			list($write['postdate']) = getLastDate($write['postdate']);
 			list($write['icon']) = showfacedesign($write['icon'], 1, 'm');
 			if ($write['touid'] && $write['username']) {
-				$write['content'] = '<a href="u.php?uid=' . $write['uid'] . '">' . $write['username'] . '</a> @<a href="u.php?&uid=' . $winduid . '">' . $windid . '</a> ' . $write['content'];
+				$write['content'] = '<a href="'.USER_URL. $write['uid'] . '">' . $write['username'] . '</a> @<a href="u.php?&uid=' . $winduid . '">' . $windid . '</a> ' . $write['content'];
 			}
 			$result[] = $write;
 		}

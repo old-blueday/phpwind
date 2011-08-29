@@ -9,7 +9,7 @@ if (!$_POST['step']) {
 	
 } else {
 	
-	InitGP(array('config'));
+	S::gp(array('config'));
 	$names = array_keys($config);
 
 	if ($_POST['step'] == 3) {
@@ -26,11 +26,11 @@ if (!$_POST['step']) {
 		}
 	}
 
-	$query = $db->query('SELECT db_name,vtype,db_value FROM pw_config WHERE db_name IN ('.pwImplode($names,false).')');
+	$query = $db->query('SELECT db_name,vtype,db_value FROM pw_config WHERE db_name IN ('.S::sqlImplode($names,false).')');
 	while ($rt = $db->fetch_array($query)) {
 		if (isset($config[$rt['db_name']])) {
 			if ($rt['db_value'] != $config[$rt['db_name']]) {
-				$db->update("UPDATE pw_config SET " . pwSqlSingle(array('db_value' => $config[$rt['db_name']], 'vtype' => 'string')) . ' WHERE db_name=' . pwEscape($rt['db_name']));
+				$db->update("UPDATE pw_config SET " . S::sqlSingle(array('db_value' => $config[$rt['db_name']], 'vtype' => 'string')) . ' WHERE db_name=' . S::sqlEscape($rt['db_name']));
 			}
 			$config[$rt['db_name']] = '';
 		}
@@ -44,7 +44,7 @@ if (!$_POST['step']) {
 			$config[$key]['value']=	$value;
 		}
 	}
-	$pwSqlMulti = pwSqlMulti($config);
+	$pwSqlMulti = S::sqlMulti($config);
 	$pwSqlMulti && $db->update('INSERT INTO pw_config (db_name,vtype,db_value) VALUES' . $pwSqlMulti);
 	updatecache_c();
 	adminmsg('operate_success');

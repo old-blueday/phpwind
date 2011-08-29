@@ -1,25 +1,30 @@
 <?php
 !defined('M_P') && exit('Forbidden');
-InitGP(array('page', 'action'));
+S::gp(array('page', 'action'));
 $articleService = C::loadClass('articleservice');
 /* @var $articleService PW_ArticleService */
 $db_perpage = 10;
 if (empty($action)) {
-	InitGP(array('column'));
-
+	S::gp(array('column'));
+	$column = (int) $column ? (int) $column : 0;
 	$columnService = C::loadClass('columnservice');
 	/* @var $columnService PW_columnService */
 	$subColumns = $columnService->getAllOrderColumns($column);
 	$subColumnIds = array_keys($subColumns);
-	$articleCount = $articleService->searchArticleCount($subColumnIds);
-	$page = validatePage($page, $articleCount);
-	$articleList = $articleService->searchAtricles($subColumnIds, '', '', '', '',($page - 1) * $db_perpage, $db_perpage);
-	$pages = numofpage($articleCount, $page, ceil($articleCount / $db_perpage), $basename . '&q=list&column=' . $column . '&');
-
+	if (isGM($windid) || checkEditPurview($windid,$column)) {
+		$articleCount = $articleService->searchArticleCount($subColumnIds,'','',1);
+		$page = validatePage($page, $articleCount);
+		$articleList = $articleService->searchAtricles($subColumnIds, '', '', 1, '', '', ($page - 1) * $db_perpage, $db_perpage);
+	} else {
+		$articleCount = $articleService->searchArticleCount($subColumnIds,'','',1,'',$timestamp);
+		$page = validatePage($page, $articleCount);
+		$articleList = $articleService->searchAtricles($subColumnIds, '', '', 1, '',$timestamp, ($page - 1) * $db_perpage, $db_perpage);
+	}
+	$pages = numofpage($articleCount, $page, ceil($articleCount / $db_perpage), $basename . 'q=list&column=' . $column . '&');
+		
 	$pageCache = L::loadClass('pagecache', 'pagecache');
 	$pageCacheConfig = C::loadClass('pagecacheconfiglist', 'pagecache');
 	$pageCache->init($pageCacheConfig);
-
 	$columns = $columnService->getColumnsAndSubColumns($column);
 
 	/* update hits */
@@ -28,9 +33,7 @@ if (empty($action)) {
 	if ($hitsize && $hitsize > 1024) {
 		updateArticleHits();
 	}*/
-
-	$pagePosition = getPosition($column);
-
+	$pagePosition = getPosition($column,'','',$cms_sitename);
 	$_definedSeo = array('title'=>$subColumns[$column]['seotitle'],
 						 'metaDescription'=>$subColumns[$column]['seodesc'],
 						 'metaKeywords'=>$subColumns[$column]['seokeywords']);
@@ -38,7 +41,7 @@ if (empty($action)) {
 	cmsSeoSettings('index',$_definedSeo,$subColumns[$column]['name']);
 } elseif ($action == 'del') {
 	define('AJAX', 1);
-	InitGP(array('ids','column_id'));
+	S::gp(array('ids','column_id'));
 	/*
 	if(!checkEditPurview($windid,$column_id)) {
 		Showmsg('您没有权限删除帖子');
@@ -55,7 +58,7 @@ if (empty($action)) {
 			Showmsg('您没有权限删除帖子');
 		}
 	}
-	if (!$articleService->deleteArticlesByIds($ids)) {
+	if (!$articleService->deleteArticlesToRecycle($ids)) {
 		echo 'error';
 		ajax_footer();
 	}

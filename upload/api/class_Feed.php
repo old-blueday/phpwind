@@ -15,10 +15,10 @@ class Feed {
 
 	function publishTemplatizedAction($uid, $descrip, $appid) {//插入动态信息
 		global $timestamp;
-		$rt = $this->db->get_one("SELECT * FROM pw_userapp WHERE uid=".pwEscape($uid)." AND appid=".pwEscape($appid));
+		$rt = $this->db->get_one("SELECT * FROM pw_userapp WHERE uid=".S::sqlEscape($uid)." AND appid=".S::sqlEscape($appid));
 		if ($rt['allowfeed']) {
-			$descrip = Char_cv($descrip);
-			$this->db->update("INSERT INTO pw_feed SET " . pwSqlSingle(array(
+			$descrip = S::escapeChar($descrip);
+			$this->db->update("INSERT INTO pw_feed SET " . S::sqlSingle(array(
 				'uid'		=> $uid,
 				'type'		=> 'app',
 				'descrip'	=> $descrip,
@@ -30,20 +30,20 @@ class Feed {
 	}
 
 	function insertAppinfo($uid,$appinfo = '',$appid) {//插入用户的单个应用的属性
-		$rt = $this->db->get_one("SELECT uid FROM pw_userapp WHERE uid=".pwEscape($uid)." AND appid=".pwEscape($appid));
+		$rt = $this->db->get_one("SELECT uid FROM pw_userapp WHERE uid=".S::sqlEscape($uid)." AND appid=".S::sqlEscape($appid));
 		if ($rt && $appinfo) {
 			$appinfo = serialize($appinfo);
-			$this->db->update("UPDATE pw_userapp SET appinfo=" .pwEscape($appinfo). "WHERE uid=".pwEscape($uid)." AND appid=".pwEscape($appid));
+			$this->db->update("UPDATE pw_userapp SET appinfo=" .S::sqlEscape($appinfo). "WHERE uid=".S::sqlEscape($uid)." AND appid=".S::sqlEscape($appid));
 			return new ApiResponse(true);
 		}
 		return new ApiResponse(false);
 	}
 
 	function insertAppevent($uid,$appevent = array(),$appid) {//插入用户的单个应用信息
-		$rt = $this->db->get_one("SELECT uid FROM pw_userapp WHERE uid=".pwEscape($uid)." AND appid=".pwEscape($appid));
+		$rt = $this->db->get_one("SELECT uid FROM pw_userapp WHERE uid=".S::sqlEscape($uid)." AND appid=".S::sqlEscape($appid));
 		if ($rt && $appevent) {
 			$appevent = serialize($appevent);
-			$this->db->update("UPDATE pw_userapp SET appevent=" .pwEscape($appevent). "WHERE uid=".pwEscape($uid)." AND appid=".pwEscape($appid));
+			$this->db->update("UPDATE pw_userapp SET appevent=" .S::sqlEscape($appevent). "WHERE uid=".S::sqlEscape($uid)." AND appid=".S::sqlEscape($appid));
 			return new ApiResponse(true);
 		}
 		return new ApiResponse(false);

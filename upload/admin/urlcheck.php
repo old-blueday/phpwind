@@ -11,7 +11,7 @@ if ($action != "unsubmit") {
 	include PrintEot('urlcheck');exit;
 
 } elseif ($_POST['action'] == "unsubmit") {
-	InitGP(array('urlinfo', 'ischeckurl', 'urlchecklimit', 'urlcheckstrategy', 'urlblackinfo', 'blurlcheckstrategy'),'P');
+	S::gp(array('urlinfo', 'ischeckurl', 'urlchecklimit', 'urlcheckstrategy', 'urlblackinfo', 'blurlcheckstrategy'),'P');
 	
 	$urlinfo = urlcheck_collectUrls($urlinfo);
 	setConfig('db_urlcheck', $urlinfo);

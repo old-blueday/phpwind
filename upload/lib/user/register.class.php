@@ -73,7 +73,7 @@ class PW_Register {
 		
 		foreach ($customfield as $key => $value) {
 			$field = "field_" . (int) $value['id'];
-			$v = Char_cv(GetGP($field, 'P'));
+			$v = S::escapeChar(S::getGP($field, 'P'));
 			if ($value['required'] && !$v) {
 				Showmsg('field_empty');
 			}
@@ -93,7 +93,7 @@ class PW_Register {
 		$custominfo = unserialize($db_union[7]);
 		if ($custominfo && $customdata) {
 			foreach ($customdata as $key => $val) {
-				$key = Char_cv($key);
+				$key = S::escapeChar($key);
 				$customdata[stripslashes($key)] = stripslashes($val);
 			}
 			$this->memberinfo['customdata'] = serialize($customdata);
@@ -167,7 +167,8 @@ class PW_Register {
 	
 	function _insertUser() {
 		global $timestamp, $onlineip, $credit;
-		$pwSQL = pwSqlSingle(array(
+		/**
+		$pwSQL = S::sqlSingle(array(
 			'uid' => $this->uid,
 			'username' => $this->data['username'],
 			'password' => $this->data['password'],
@@ -181,8 +182,23 @@ class PW_Register {
 			'newpm' => 0
 		));
 		$this->db->update("REPLACE INTO pw_members SET $pwSQL");
-		
-		$pwSQL = pwSqlSingle(array(
+		**/
+		$pwSQL = array(
+			'uid' => $this->uid,
+			'username' => $this->data['username'],
+			'password' => $this->data['password'],
+			'safecv' => $this->data['safecv'],
+			'email' => $this->data['email'],
+			'groupid' => $this->data['groupid'],
+			'memberid' => $this->data['memberid'],
+			'regdate' => $timestamp,
+			'yz' => $this->data['yz'],
+			'userstatus' => $this->data['userstatus'],
+			'newpm' => 0
+		);
+		pwQuery::replace('pw_members', $pwSQL);
+		/**
+		$pwSQL = S::sqlSingle(array(
 			'uid' => $this->uid,
 			'postnum' => 0,
 			'lastvisit' => $timestamp,
@@ -190,10 +206,24 @@ class PW_Register {
 			'onlineip' => $onlineip
 		));
 		$this->db->pw_update(
-			'SELECT uid FROM pw_memberdata WHERE uid=' . pwEscape($this->uid),
-			'UPDATE pw_memberdata SET ' . $pwSQL . ' WHERE uid=' . pwEscape($this->uid),
+			'SELECT uid FROM pw_memberdata WHERE uid=' . S::sqlEscape($this->uid),
+			'UPDATE pw_memberdata SET ' . $pwSQL . ' WHERE uid=' . S::sqlEscape($this->uid),
 			'INSERT INTO pw_memberdata SET ' . $pwSQL
 		);
+		**/
+		$pwSQL = array(
+			'uid' => $this->uid,
+			'postnum' => 0,
+			'lastvisit' => $timestamp,
+			'thisvisit' => $timestamp,
+			'onlineip' => $onlineip
+		);
+		$this->db->pw_update(
+			'SELECT uid FROM pw_memberdata WHERE uid=' . S::sqlEscape($this->uid),
+			pwQuery::updateClause('pw_memberdata', 'uid =:uid', array($this->uid), $pwSQL),
+			pwQuery::insertClause('pw_memberdata', $pwSQL)
+		);
+		
 		//$this->db->update("REPLACE INTO pw_memberdata SET $pwSQL");
 
 		require_once (R_P . 'require/credit.php');
@@ -205,11 +235,18 @@ class PW_Register {
 		$credit->sets($this->uid, L::reg('rg_regcredit'), false);
 		$credit->runsql();
 		
-		$this->db->update("UPDATE pw_bbsinfo SET newmember=" . pwEscape($this->data['username']) . ",totalmember=totalmember+1 WHERE id='1'");
-		
+		//* $this->db->update("UPDATE pw_bbsinfo SET newmember=" . S::sqlEscape($this->data['username']) . ",totalmember=totalmember+1 WHERE id='1'");
+		$this->db->update(pwQuery::buildClause("UPDATE :pw_table SET newmember=:newmember,totalmember=totalmember+1 WHERE id=:id", array('pw_bbsinfo',$this->data['username'],1)));
 		if ($this->memberinfo) {
-			$this->db->update("REPLACE INTO pw_memberinfo SET uid=" . pwEscape($this->uid) . ',' . pwSqlSingle($this->memberinfo));
+			/**
+			$this->db->update("REPLACE INTO pw_memberinfo SET uid=" . S::sqlEscape($this->uid) . ',' . S::sqlSingle($this->memberinfo));
+			**/
+			$_temp = array('uid' => $this->uid) + $this->memberinfo;
+			pwQuery::replace('pw_memberinfo', $_temp);
 		}
+
+		$statistics = L::loadClass('Statistics', 'datanalyse');
+		$statistics->register();
 	}
 	
 	function getRegUser() {
@@ -252,19 +289,19 @@ class PW_Register {
 			Showmsg('invcode_empty');
 		}
 		$inv_days = L::config('inv_days', 'inv_config') * 86400;
-		$this->inv = $this->db->get_one("SELECT id,uid FROM pw_invitecode WHERE invcode=" . pwEscape($invcode) . " AND ifused<'1' AND createtime>" . pwEscape($timestamp - $inv_days));
+		$this->inv = $this->db->get_one("SELECT id,uid FROM pw_invitecode WHERE invcode=" . S::sqlEscape($invcode) . " AND ifused<'1' AND createtime>" . S::sqlEscape($timestamp - $inv_days));
 		!$this->inv && Showmsg('illegal_invcode');
 	}
 	
 	function disposeInv() {
 		global $timestamp;
-		$this->db->update("UPDATE pw_invitecode SET " . pwSqlSingle(array(
+		$this->db->update("UPDATE pw_invitecode SET " . S::sqlSingle(array(
 			'receiver' => $this->data['username'],
 			'usetime' => $timestamp,
 			'ifused' => 1
-		)) . ' WHERE id=' . pwEscape($this->inv['id']));
+		)) . ' WHERE id=' . S::sqlEscape($this->inv['id']));
 		if ($this->inv['uid'] == 0) {
-			$this->db->update("UPDATE pw_clientorder SET uid=" . pwEscape($this->uid) . " WHERE type='4' AND uid='0' AND paycredit=" . pwEscape($this->inv['id']));
+			$this->db->update("UPDATE pw_clientorder SET uid=" . S::sqlEscape($this->uid) . " WHERE type='4' AND uid='0' AND paycredit=" . S::sqlEscape($this->inv['id']));
 		}
 	}
 	
@@ -281,7 +318,7 @@ class PW_Register {
 		if (!L::reg('rg_rglower') && !PW_Register::checkRglower($regname)) {
 			Showmsg('username_limit');
 		}
-		if (CkInArray(strtolower($regname), array(
+		if (S::inArray(strtolower($regname), array(
 			'guest',
 			'system'
 		))) {
@@ -399,7 +436,7 @@ class PW_Register {
 			$e_check == 1 && Showmsg('email_bancheck');
 		}
 		
-		$email_check = $this->db->get_one('SELECT COUNT(*) AS count FROM pw_members WHERE email=' . pwEscape($regemail));
+		$email_check = $this->db->get_one('SELECT COUNT(*) AS count FROM pw_members WHERE email=' . S::sqlEscape($regemail));
 		if ($email_check['count']) {
 			Showmsg('reg_email_have_same');
 		}

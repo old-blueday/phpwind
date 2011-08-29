@@ -153,9 +153,9 @@ var jobCenterClass = {
 	showConfirm : function(id, info){
 		var info = info || "是否确认放弃本次任务";
 		var _this = this;
-		showDialog("confirm",info,0,function(){
+		showDialog({type:"confirm",message:info,onOk:function(){
 			_this.submitQuit(id);
-		});
+		}});
 	},
 	
 	submitQuit : function(id){

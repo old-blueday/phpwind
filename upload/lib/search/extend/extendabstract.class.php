@@ -13,7 +13,7 @@ class PW_ExtendSearcherAbstract {
 	function _outputHtml($htmlFile, $params = array()) {
 		ob_start();
 		ob_implicit_flush(false);
-		require ($htmlFile);
+		require S::escapePath($htmlFile);
 		return ob_get_clean();
 	}
 	

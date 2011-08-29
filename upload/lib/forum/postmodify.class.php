@@ -26,6 +26,8 @@ class postModify {
 	var $alterattach = array();
 	var $replacedb = array();
 
+	var $newImgNum;
+	var $oldImgNum;
 	var $extraBehavior = null;
 	
 	function postModify($tid, $pid, &$post) {
@@ -36,6 +38,7 @@ class postModify {
 		$this->db = & $db;
 		$this->post = & $post;
 		$this->forum = & $post->forum;
+		$this->newImgNum = $this->oldImgNum = 0;
 	}
 	
 	function init() {
@@ -69,14 +72,25 @@ class postModify {
 			/**Begin modify by liaohu*/
 			$pce_arr = explode(",",$GLOBALS['SYSTEM']['tcanedit']);
 			if (($authordb['groupid'] == 3 || $authordb['groupid'] == 4 || $authordb['groupid'] == 5) && !in_array($authordb['groupid'],$pce_arr)) {
-				return $this->post->showmsg('modify_admin');			
+				return $this->post->showmsg('modify_admin');
 			}
 			/**End modify by liaohu*/
 		}
-		if ($this->post->_G['edittime'] && ($timestamp - $this->atcdb['postdate']) > $this->post->_G['edittime'] * 60) {
-			return $this->post->showmsg('modify_timelimit');
+		//版块编辑时间限制
+		L::loadClass('forum', 'forum', false);
+		global $postedittime,$windid,$winduid;
+		$pwforum = new PwForum($this->atcdb['fid']);
+		$isBM = $pwforum->isBM($windid);
+		$userSystemRight =  userSystemRight($windid, $isBM, 'deltpcs');
+		$postedittime = $pwforum->foruminfo['forumset']['postedittime'];
+		if (!$userSystemRight && $this->post->uid == $this->atcdb['authorid'] && $postedittime !== "" &&  $postedittime != 0 && ($timestamp - $this->atcdb['postdate']) >  $postedittime * 60) {
+			return $this->post->showmsg('modify_forumtimelimit');
+		}
+		if ($this->post->uid == $this->atcdb['authorid'] && $this->post->_G['edittime'] && ($timestamp - $this->atcdb['postdate']) > $this->post->_G['edittime'] * 60) {
+			return $this->post->showmsg('modify_timelimit'); 
 		}
 	}
+	
 	
 	function modifyLockedRight() {
 		if ($this->extraBehavior && $this->extraBehavior->modifyLockedRight()) {
@@ -111,6 +125,7 @@ class postModify {
 		$keep = (array) $keep;
 		$oldattach = $this->atcdb['attachs'];
 		foreach ($oldattach as $key => $value) {
+			$isImg = ($value['type'] == 'img');
 			if (!in_array($key, $keep)) {
 				$this->delattach[$key] = $value;
 			} else {
@@ -131,20 +146,41 @@ class postModify {
 				if (array_key_exists('replace_' . $key, $_FILES)) {
 					$db_attachnum++;
 					$this->replacedb[$key] = $oldattach[$key];
-				} elseif ($value['needrvrc'] != $v['needrvrc'] || $value['special'] != $v['special'] || $value['ctype'] != $v['ctype'] || $value['descrip'] != $v['desc']) {
-					$this->alterattach[$key] = $v;
+				} else {
+					if ($value['needrvrc'] != $v['needrvrc']
+						|| $value['special'] != $v['special']
+						|| $value['ctype'] != $v['ctype']
+						|| $value['descrip'] != $v['desc']) {
+						$this->alterattach[$key] = $v;
+					}
+					$isImg && $this->newImgNum++;
 				}
 				$this->oldattach[$key] = $oldattach[$key];
 			}
+			$isImg && $this->oldImgNum++;
 		}
 	}
 	
 	function alterinfo() {
-		if ($this->post->groupid != 3 && $this->atcdb['postdate'] + 300 < $GLOBALS['timestamp']) {
+		global $db_postedittime,$windid,$winduid,$manager,$groupid;
+		L::loadClass('forum', 'forum', false);
+		$pwforum = new PwForum($this->atcdb['fid']);
+		$postedittime = (int)$db_postedittime * 60;
+		$isBM = $pwforum->isBM($windid);
+		$userSystemRight =  userSystemRight($windid, $isBM, 'deltpcs');
+		if(S::inArray($windid, $manager) || $groupid == 3){
+			$alterinfo = '';
+		}elseif ($this->post->uid == $this->atcdb['authorid'] && ($db_postedittime == 0 || $this->atcdb['postdate'] + $postedittime < $GLOBALS['timestamp'])) {
 			global $altername, $db_anonymousname, $timeofedit, $timestamp;
 			$altername = ($this->data['anonymous'] && $this->post->uid == $this->atcdb['authorid']) ? $db_anonymousname : $this->post->username;
 			$timeofedit = get_date($timestamp);
 			$alterinfo = getLangInfo('post', 'edit_post');
+			
+		} elseif ($userSystemRight &&  $this->post->uid != $this->atcdb['authorid'] && ($db_postedittime == 0 || $this->atcdb['postdate'] + $postedittime < $GLOBALS['timestamp'])) {
+			global $altername, $db_anonymousname, $timeofedit, $timestamp;
+			$altername = ($this->data['anonymous'] && $this->post->uid == $this->atcdb['authorid']) ? $db_anonymousname : $this->post->username;
+			$timeofedit = get_date($timestamp);
+			$alterinfo = getLangInfo('post', 'edit_post');	
 		} else {
 			$alterinfo = '';
 		}
@@ -229,6 +265,7 @@ class postModify {
 				'pid' => $this->pid
 			));
 		}
+		$this->updateImgAtt();
 	}
 	
 	function editlog() {
@@ -269,7 +306,7 @@ class topicModify extends postModify {
 	}
 	
 	function getData() {
-		return $this->db->get_one("SELECT t.*,tm.content,tm.aid,tm.ifsign,tm.tags,tm.ifwordsfb,tm.magic FROM pw_threads t LEFT JOIN $this->pw_tmsgs tm USING(tid) WHERE t.tid=" . pwEscape($this->tid));
+		return $this->db->get_one("SELECT t.*,tm.content,tm.aid,tm.ifsign,tm.tags,tm.ifwordsfb,tm.magic FROM pw_threads t LEFT JOIN $this->pw_tmsgs tm USING(tid) WHERE t.tid=" . S::sqlEscape($this->tid));
 	}
 
 	function setBehavior() {
@@ -277,7 +314,7 @@ class topicModify extends postModify {
 			return;
 		}
 		if ($this->atcdb['tpcstatus'] && getstatus($this->atcdb['tpcstatus'], 1)) {
-			$cyid = $this->db->get_value("SELECT cyid FROM pw_argument WHERE tid=" . pwEscape($this->atcdb['tid']));
+			$cyid = $this->db->get_value("SELECT cyid FROM pw_argument WHERE tid=" . S::sqlEscape($this->atcdb['tid']));
 			if ($cyid) {
 				require_once(R_P . 'apps/groups/lib/colonypost.class.php');
 				$this->extraBehavior = new PwColonyPost($cyid);
@@ -328,7 +365,8 @@ class topicModify extends postModify {
 			$pwSQL['userip'] = $onlineip;
 			$pwSQL['ipfrom'] = $ipTable->getIpFrom($onlineip);
 		}
-		$this->db->update("UPDATE $this->pw_tmsgs SET " . pwSqlSingle($pwSQL) . " WHERE tid=" . pwEscape($this->tid));
+		//* $this->db->update("UPDATE $this->pw_tmsgs SET " . S::sqlSingle($pwSQL) . " WHERE tid=" . S::sqlEscape($this->tid));
+		pwQuery::update($this->pw_tmsgs, 'tid=:tid', array($this->tid), $pwSQL);
 		
 		$pwSQL = array(
 			'icon' => $this->data['icon'],
@@ -345,7 +383,9 @@ class topicModify extends postModify {
 		if ($this->data['anonymous'] != $this->atcdb['anonymous'] && $this->atcdb['postdate'] == $this->atcdb['lastpost']) {
 			$pwSQL['lastposter'] = $this->data['lastposter'];
 		}
-		$this->db->update("UPDATE pw_threads SET " . pwSqlSingle($pwSQL) . " WHERE tid=" . pwEscape($this->tid));
+		//$this->db->update("UPDATE pw_threads SET " . S::sqlSingle($pwSQL) . " WHERE tid=" . S::sqlEscape($this->tid));
+		pwQuery::update('pw_threads', 'tid = :tid' , array($this->tid), $pwSQL);
+		Perf::gatherInfo('changeThreadListWithThreadIds', array('tid'=>$this->tid));
 	}
 	
 	function afterModify() {
@@ -373,8 +413,9 @@ class topicModify extends postModify {
 		}
 		$this->updateForumsextra();
 		
-		$threads = L::loadClass('Threads', 'forum');
-		$threads->delThreads($this->tid);
+		//* $threads = L::loadClass('Threads', 'forum');
+		//* $threads->delThreads($this->tid);	
+		Perf::gatherInfo('changeThreadWithThreadIds', array('tid'=>$this->tid));	
 	}
 	
 	function updateForumsextra() {
@@ -388,10 +429,22 @@ class topicModify extends postModify {
 				}
 			}
 			if ($ifchange) {
-				$this->db->update("UPDATE pw_forumsextra SET commend = " . pwEscape(serialize($commend)) . " WHERE fid=" . $this->forum->fid);
+				$this->db->update("UPDATE pw_forumsextra SET commend = " . S::sqlEscape(serialize($commend)) . " WHERE fid=" . $this->forum->fid);
 				require_once (R_P . 'admin/cache.php');
 				updatecache_forums($this->forum->fid);
 			}
+		}
+	}
+
+	function updateImgAtt() {
+		is_object($this->att) && $this->newImgNum += $this->att->getUploadImgNum();
+		if (!$this->newImgNum && $this->oldImgNum) {
+			$this->db->update("DELETE FROM pw_threads_img WHERE tid=" . S::sqlEscape($this->tid));
+		} elseif ($this->newImgNum && !$this->oldImgNum) {
+			$this->db->update("REPLACE INTO pw_threads_img SET " . S::sqlSingle(array(
+				'tid' => $this->tid,
+				'fid' => $this->data['fid']
+			)));
 		}
 	}
 }
@@ -408,7 +461,7 @@ class replyModify extends postModify {
 	}
 	
 	function getData() {
-		return $this->db->get_one("SELECT p.*,t.subject as tsubject,t.tpcstatus FROM $this->pw_posts p LEFT JOIN pw_threads t ON p.tid=t.tid WHERE p.pid=" . pwEscape($this->pid));
+		return $this->db->get_one("SELECT p.*,t.subject as tsubject,t.tpcstatus FROM $this->pw_posts p LEFT JOIN pw_threads t ON p.tid=t.tid WHERE p.pid=" . S::sqlEscape($this->pid));
 	}
 	
 	function setBehavior() {
@@ -416,7 +469,7 @@ class replyModify extends postModify {
 			return;
 		}
 		if ($this->atcdb['tpcstatus'] && getstatus($this->atcdb['tpcstatus'], 1)) {
-			$cyid = $this->db->get_value("SELECT cyid FROM pw_argument WHERE tid=" . pwEscape($this->atcdb['tid']));
+			$cyid = $this->db->get_value("SELECT cyid FROM pw_argument WHERE tid=" . S::sqlEscape($this->atcdb['tid']));
 			if ($cyid) {
 				require_once(R_P . 'apps/groups/lib/colonypost.class.php');
 				$this->extraBehavior = new PwColonyPost($cyid);
@@ -456,7 +509,8 @@ class replyModify extends postModify {
 			$pwSQL['userip'] = $onlineip;
 			$pwSQL['ipfrom'] = $ipTable->getIpFrom($onlineip);
 		}
-		$this->db->update("UPDATE $this->pw_posts SET " . pwSqlSingle($pwSQL) . " WHERE pid=" . pwEscape($this->atcdb['pid']));
+		//$this->db->update("UPDATE $this->pw_posts SET " . S::sqlSingle($pwSQL) . " WHERE pid=" . S::sqlEscape($this->atcdb['pid']));
+		pwQuery::update($this->pw_posts, 'pid=:pid', array($this->atcdb['pid']), $pwSQL);
 	}
 	
 	function afterModify() {
@@ -464,7 +518,7 @@ class replyModify extends postModify {
 		$replies = '';
 		$pwSQL = array();
 		if ($this->data['anonymous'] != $this->atcdb['anonymous']) {
-			$lt = $this->db->get_one("SELECT pid FROM $this->pw_posts WHERE tid=" . pwEscape($this->tid) . " ORDER BY postdate DESC LIMIT 1");
+			$lt = $this->db->get_one("SELECT pid FROM $this->pw_posts WHERE tid=" . S::sqlEscape($this->tid) . " ORDER BY postdate DESC LIMIT 1");
 			if ($this->pid == $lt['pid']) {
 				$pwSQL['lastposter'] = $this->data['lastposter'];
 			}
@@ -481,9 +535,14 @@ class replyModify extends postModify {
 			$replies = "replies=replies{$action}'1'";
 		}
 		if ($pwSQL || $replies) {
-			$sql = trim(pwSqlSingle($pwSQL) . ',' . $replies, ',');
-			$this->db->update("UPDATE pw_threads SET $sql WHERE tid=" . pwEscape($this->tid));
+			$sql = trim(S::sqlSingle($pwSQL) . ',' . $replies, ',');
+			//$this->db->update("UPDATE pw_threads SET $sql WHERE tid=" . S::sqlEscape($this->tid));
+			$this->db->update(pwQuery::buildClause("UPDATE :pw_table SET $sql WHERE tid = :tid", array('pw_threads',$this->tid)));
 		}
+	}
+
+	function updateImgAtt() {
+
 	}
 }
 ?>

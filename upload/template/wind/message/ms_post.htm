@@ -17,7 +17,7 @@ print <<<EOT
 		scrollTo(0,246);
 		var unames = document.getElementsByName('_usernames[]');
 		if(maxmsg > 0 && totalmsg >= maxmsg){
-			MC.showFailTips("消息已满,发送失败.请及时清理");
+			MC.showFailTips("消息已满,发送失败.请及时<a href=\"message.php?type=clear\">清理</a>");
 			return false;
 		}
 		if(!unames || !unames.length){
@@ -151,7 +151,7 @@ print <<<EOT
                                     <a title="插入链接" id="wy_createlink" href="javascript:">插入链接</a>
                                     <a title="清除链接" id="wy_unlink" href="javascript:">清除链接</a>
                                     <a title="表格" id="wy_inserttable" href="javascript:">表格</a>
-                                    <a title="代码" id="wy_code" href="javascript:">代码</a><a title="分页" href="javascript://" onclick="pageCut()">分页</a>
+                                    <a title="代码" id="wy_code" href="javascript:">代码</a>
                                 </div>
                             </li>
                             <li class="li_icon_big">
@@ -213,7 +213,7 @@ EOT;
     <div class="cc">
 <!--已包含的附件的列表-->
 
-       <table id="attach" class="tr_p10">
+       <table id="attach" class="tr_p10" style="table-layout:fixed">
         <thead>
           <tr valign="top" class="gray" id="formUpload">
             <td width="200">上传附件 (图片、文件等)</td>
@@ -267,12 +267,22 @@ print <<<EOT
 <!--
 EOT;
 if($db_gdcheck & 8){
+$gdSize = explode("\t",$db_gdsize);
 print <<<EOT
 -->            
             <tr class="tr5 vt">
                 <td>认证码：</td>
-                <td><input class="input" type="text" name="gdcode" id="gdinput" size="5" onfocus="try{opencode('menu_gd',this)}catch(e){}" /><span class="cp" onclick="this.previousSibling.focus();">&nbsp;点此刷新验证码</span>
-			<div class="menu" id="menu_gd" style="display:none;"><img src="ck.php?" align="absmiddle" style="cursor:pointer;" id="ckcode" alt="看不清楚，换一张" /></div></td>
+                <td><input class="input" type="text" name="gdcode" id="gdinput" size="5" onfocus="showgd();" /><span class="cp" onclick="this.previousSibling.focus();">&nbsp;点此刷新验证码</span>
+				<span id="ckcode" style="display:none;">
+<script type="text/javascript" src="js/pw_authcode.js"></script>
+<script>
+var flashWidth = "$gdSize[0]";
+var flashHeight = "$gdSize[1]";
+var gdtype = $db_gdtype;
+showGdCode();
+</script>
+					</span>
+				</td>
             </tr>
 <!--
 EOT;

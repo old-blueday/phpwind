@@ -2,7 +2,7 @@
 !function_exists('adminmsg') && exit('Forbidden');
 $basename = "$admin_file?adminjob=activity";
 
-InitGP(array('actid','actmid'),GP,2);
+S::gp(array('actid','actmid'),GP,2);
 $categoryService = L::loadClass('ActivityCategory', 'activity');
 
 if (empty($action)){ //活动分类管理
@@ -57,9 +57,9 @@ if (empty($action)){ //活动分类管理
 
 	include PrintEot('activity');
 } elseif ($action == 'topic') { //活动内容管理
-	InitGP(array('page','step','field','newfield', 'actmid'));
+	S::gp(array('page','step','field','newfield', 'actmid'));
 	
-	@include_once(D_P. 'data/bbscache/activity_config.php');
+	@include_once pwCache::getPath(D_P. 'data/bbscache/activity_config.php');
 	$Activity = L::loadClass('Activity', 'activity');
 	$fieldService = L::loadClass('ActivityField', 'activity');
 	//获取分类选项框
@@ -104,7 +104,7 @@ if (empty($action)){ //活动分类管理
 			$newfield = StrCode(serialize($field));
 		}
 		list($count,$tiddb,$alltiddb) = $searchTopic->getSearchvalue($newfield,'one',true,true);
-		is_array($tiddb) && $sql .= " AND tv.tid IN(".pwImplode($tiddb).")";
+		is_array($tiddb) && $sql .= " AND tv.tid IN(" . S::sqlImplode($tiddb) . ")";
 		is_array($alltiddb) && $alltids = implode(',',$alltiddb);
 	}
 
@@ -115,7 +115,7 @@ if (empty($action)){ //活动分类管理
 			$alltiddb[] = $rt['tid'];
 		}
 		if ($alltiddb) {
-			$query = $db->query("SELECT tid FROM pw_threads WHERE tid IN(".pwImplode($alltiddb).")");
+			$query = $db->query("SELECT tid FROM pw_threads WHERE tid IN(" . S::sqlImplode($alltiddb) . ")");
 			while ($rt = $db->fetch_array($query)) {
 				$threadb[$rt['tid']] = $rt['tid'];
 			}
@@ -128,10 +128,10 @@ if (empty($action)){ //活动分类管理
 
 		if ($tablename && count($newtiddb) > 0) {
 			if ($defaultValueTableName) {
-				$db->update("DELETE FROM $defaultValueTableName WHERE tid IN(".pwImplode($newtiddb).") AND ifrecycle=0");
+				$db->update("DELETE FROM $defaultValueTableName WHERE tid IN(" . S::sqlImplode($newtiddb) . ") AND ifrecycle=0");
 			}
 			if ($userDefinedValueTableName) {
-				$db->update("DELETE FROM $userDefinedValueTableName WHERE tid IN(".pwImplode($newtiddb).") AND ifrecycle=0");
+				$db->update("DELETE FROM $userDefinedValueTableName WHERE tid IN(" . S::sqlImplode($newtiddb) . ") AND ifrecycle=0");
 			}
 		}
 
@@ -148,7 +148,7 @@ if (empty($action)){ //活动分类管理
 		$pages = numofpage($count,$page,$numofpage,"$basename&action=topic&actmid=$actmid&newfield=$newfield&step=$step&");
 		if ($step != 'search') {
 			$start = ($page-1)*$db_perpage;
-			$limit = pwLimit($start,$db_perpage);
+			$limit = S::sqlLimit($start,$db_perpage);
 		}
 		$addActmidSql = $actmid ? "AND actmid=$actmid" : '';
 		$query = $db->query("SELECT tv.tid, tv.recommend, tv.actmid, t.fid,t.subject,t.author,t.authorid,t.postdate 
@@ -167,12 +167,12 @@ if (empty($action)){ //活动分类管理
 	exit;
 
 } elseif ($_POST['setrecommend'] || $action == 'setrecommend' || $_POST['removerecommend'] || $action == 'removerecommend') { //设为或取消推荐
-	InitGP(array('selid','alltids'));
+	S::gp(array('selid','alltids'));
 	if ($selid) {
-		$selid = pwImplode($selid);
+		$selid = S::sqlImplode($selid);
 	} elseif ($alltids) {
 		$alltids = explode(',',$alltids);
-		$selid = pwImplode($alltids);
+		$selid = S::sqlImplode($alltids);
 	} else {
 		adminmsg('operate_error',"$basename&action=topic");
 	}
@@ -183,18 +183,18 @@ if (empty($action)){ //活动分类管理
 	} else {
 		$setValue = 0;
 	}
-	$db->update("UPDATE $defaultValueTableName SET recommend = ". pwEscape($setValue)." WHERE tid IN ($selid)");
+	$db->update("UPDATE $defaultValueTableName SET recommend = ". S::sqlEscape($setValue)." WHERE tid IN ($selid)");
 	adminmsg('operate_success',"$basename&action=topic");
 } elseif ($_POST['sendmsg'] || $action == 'sendmsg') {
-	InitGP(array('step','nexto'));
+	S::gp(array('step','nexto'));
 	if (empty($step)) {
-		InitGP(array('selid','alltids'));
+		S::gp(array('selid','alltids'));
 
 		if ($selid) {
-			$selid = pwImplode($selid);
+			$selid = S::sqlImplode($selid);
 		} elseif ($alltids) {
 			$alltids = explode(',',$alltids);
-			$selid = pwImplode($alltids);
+			$selid = S::sqlImplode($alltids);
 		} else {
 			adminmsg('operate_error',"$basename&action=topic");
 		}
@@ -206,10 +206,11 @@ if (empty($action)){ //活动分类管理
 		}
 		include PrintEot('activity');exit;
 	} elseif ($step == '2') {
-		InitGP(array('subject','atc_content','uids'));
+		S::gp(array('subject','atc_content','uids'));
 		$cache_file = D_P."data/bbscache/".substr(md5($admin_pwd),10,10).".txt";
 		if (!$nexto) {
-			writeover($cache_file,$atc_content);
+			//* writeover($cache_file,$atc_content);
+			pwCache::setData($cache_file,$atc_content);
 		} else {
 			$atc_content = readover($cache_file);
 		}
@@ -218,8 +219,8 @@ if (empty($action)){ //活动分类管理
 			adminmsg('sendmsg_empty','javascript:history.go(-1);');
 		}
 
-		$subject     = Char_cv($subject);
-		$sendmessage = Char_cv($atc_content);
+		$subject     = S::escapeChar($subject);
+		$sendmessage = S::escapeChar($atc_content);
 		$percount = 1;
 		empty($nexto) && $nexto = 1;
 
@@ -251,13 +252,14 @@ if (empty($action)){ //活动分类管理
 			$j_url = "$basename&action=$action&step=2&nexto=$nexto&subject=".rawurlencode($subject);
 			adminmsg("sendmsg_step",EncodeUrl($j_url),1);
 		} else {
-			P_unlink($cache_file);
+			//* P_unlink($cache_file);
+			pwCache::deleteData($cache_file);
 			adminmsg('operate_success',"$basename&action=topic");
 		}
 	}
 } elseif ($action == 'delthreads') {
 
-	InitGP(array('selid'));
+	S::gp(array('selid'));
 	!$selid && adminmsg('operate_error');
 	is_numeric($selid) && $selid = explode(',',$selid);
 	$delids = array();
@@ -274,21 +276,25 @@ if (empty($action)){ //活动分类管理
 	$delarticle->delTopic($readdb, $db_recycle);
 
 	if ($db_ifpwcache ^ 1) {
-		$db->update("DELETE FROM pw_elements WHERE type !='usersort' AND id IN(" . pwImplode($delids) . ')');
+		$db->update("DELETE FROM pw_elements WHERE type !='usersort' AND id IN(" . S::sqlImplode($delids) . ')');
 	}
 
 	# $db->update("DELETE FROM pw_threads WHERE tid IN ($selids)");
 	# ThreadManager
-	$threadManager = L::loadClass("threadmanager", 'forum');
-	$threadManager->deleteByThreadIds($fid,$selids);
-
-	P_unlink(D_P.'data/bbscache/c_cache.php');
+	//* $threadManager = L::loadClass("threadmanager", 'forum');
+	//* $threadManager->deleteByThreadIds($fid,$selids);
+	$threadService = L::loadclass('threads', 'forum');
+	$threadService->deleteByThreadIds($delids);
+	Perf::gatherInfo('changeThreadWithForumIds', array('fid'=>$fid));
+	
+	//P_unlink(D_P.'data/bbscache/c_cache.php');
+	pwCache::deleteData(D_P.'data/bbscache/c_cache.php');
 
 	adminmsg('operate_success',"$basename&action=topic&actmid=$actmid");
 
 } elseif ('topiclist' == $action) { //编辑活动主分类列表
-	InitGP(array('selid', 'vieworder', 'topiclist'), 'P', 2);
-	InitGP(array('name'), 'P');
+	S::gp(array('selid', 'vieworder', 'topiclist'), 'P', 2);
+	S::gp(array('name'), 'P');
 
 	foreach ($topiclist as $actid => $value) {
 		$thisIfAble		= $selid[$actid] == 1 ? 1 : 0;
@@ -308,7 +314,7 @@ if (empty($action)){ //活动分类管理
 	adminmsg('operate_success',$basename);
 } elseif ('edittopic' == $action) {
 	define('AJAX',1);
-	InitGP(array('step'), 'P', 2);
+	S::gp(array('step'), 'P', 2);
 
 	if (empty($step)) {
 
@@ -328,8 +334,8 @@ if (empty($action)){ //活动分类管理
 		ajax_footer();
 
 	} elseif (2 == $step) {
-		InitGP(array('name'),'P');
-		InitGP(array('ifable','vieworder'),'P',2);
+		S::gp(array('name'),'P');
+		S::gp(array('ifable','vieworder'),'P',2);
 
 		$fieldData = array('ifable' => $ifable, 'vieworder' => $vieworder);
 		if ($name) {
@@ -375,7 +381,7 @@ if (empty($action)){ //活动分类管理
 
 } elseif ('editmodel' == $action) {
 	$fieldService = L::loadClass('ActivityField', 'activity');
-	InitGP(array('step'),GP,2);
+	S::gp(array('step'),GP,2);
 
 	$ajax_basename_add = EncodeUrl($basename."&action=addfield");
 	$thisModel = $categoryService->getModel($actmid);
@@ -443,7 +449,7 @@ if (empty($action)){ //活动分类管理
 		include PrintEot('activity');
 		exit;
 	} elseif ('2' == $step) {
-		InitGP(array('fieldlist', 'sectionname', 'vieworder','ifable','ifsearch','ifasearch','threadshow','ifmust','textwidth'), P);
+		S::gp(array('fieldlist', 'sectionname', 'vieworder','ifable','ifsearch','ifasearch','threadshow','ifmust','textwidth'), P);
 		foreach ($fieldlist as $key => $value) {
 			$updateFields = array('textwidth' => $textwidth[$key]);
 			$fieldRow = $fieldService->getField($key);
@@ -462,7 +468,7 @@ if (empty($action)){ //活动分类管理
 			} else { //预设字段
 				//所有子分类预设字段共用默认查询、高级查询的设置
 				//$allModelUpdateFields = array('ifsearch'=>$ifsearch[$key],'ifasearch'=>$ifasearch[$key]);
-				//$db->update("UPDATE pw_activityfield SET " . pwSqlSingle($allModelUpdateFields) . " WHERE fieldname=" . pwEscape($fieldRow['fieldname']));
+				//$db->update("UPDATE pw_activityfield SET " . S::sqlSingle($allModelUpdateFields) . " WHERE fieldname=" . S::sqlEscape($fieldRow['fieldname']));
 				if (!$fieldRow['mustenable']) {
 					$updateFields['ifmust'] = $ifmust[$key];
 					$updateFields['ifable'] = $ifable[$key];
@@ -483,7 +489,7 @@ if (empty($action)){ //活动分类管理
 	}
 } elseif ('editmodelname' == $action) {
 
-	InitGP(array('step'),GP,2);
+	S::gp(array('step'),GP,2);
 	define('AJAX',1);
 	if (empty($step)) {
 		$ajax_basename_editmodelname	= EncodeUrl($basename.'&action=editmodelname&');
@@ -493,8 +499,8 @@ if (empty($action)){ //活动分类管理
 		include PrintEot('activity');
 		ajax_footer();
 	} elseif (2 == $step) {
-		InitGP(array('vieworder', 'modellist'),'P',2);
-		InitGP(array('name'));
+		S::gp(array('vieworder', 'modellist'),'P',2);
+		S::gp(array('name'));
 		foreach ($name as $key => $value) {
 			if (strlen($value) > 30) {
 				echo "model_name_too_long\t";ajax_footer();
@@ -519,14 +525,14 @@ if (empty($action)){ //活动分类管理
 
 } elseif ('addmodelname' == $action) {
 	define('AJAX',1);
-	InitGP(array('step'), 'P', 2);
+	S::gp(array('step'), 'P', 2);
 	if (empty($step)) {
 
 		$ajax_basename_addmodelname = EncodeUrl($basename.'&action=addmodelname');
 		include PrintEot('activity');
 		ajax_footer();
 	} elseif (2 == $step) {
-		InitGP(array('modename'));
+		S::gp(array('modename'));
 		if (strlen($modename) > 30) {
 			echo "mode_name_too_long\t";
 			ajax_footer();
@@ -892,7 +898,7 @@ if (empty($action)){ //活动分类管理
 	}
 } elseif ('addfield' == $action)  {
 	define('AJAX',1);
-	InitGP(array('step'), 'P', 2);
+	S::gp(array('step'), 'P', 2);
 
 	if (!$step) {
 		$ajax_basename_add			= EncodeUrl($basename."&action=addfield");
@@ -909,14 +915,14 @@ if (empty($action)){ //活动分类管理
 		ajax_footer();
 
 	} elseif (2 == $step) {
-		InitGP(array('fieldtype','name','rules','descrip'));
+		S::gp(array('fieldtype','name','rules','descrip'));
 		insertActivityFieldToDb($actmid, $fieldtype, $name, $descrip, 0, array('rules' => $rules));
 		Showmsg('act_field_add_success');
 	}
 } elseif ('editfield' == $action) {
 	define('AJAX',1);
-	InitGP(array('step'), 'P', 2);
-	InitGP(array('fieldid'),GP,2);
+	S::gp(array('step'), 'P', 2);
+	S::gp(array('fieldid'),GP,2);
 	$fieldService = L::loadClass('ActivityField', 'activity');
 	$fielddb = $fieldService->getField($fieldid);
 	$fielddb['ifdel'] || Showmsg('act_field_edit_forbidden');
@@ -949,7 +955,7 @@ if (empty($action)){ //活动分类管理
 		include PrintEot('activity');
 		ajax_footer();
 	} elseif (2 == $step) {
-		InitGP(array('fieldtype','name','rules','descrip'));
+		S::gp(array('fieldtype','name','rules','descrip'));
 		if (empty($fieldtype)) Showmsg('fieldtype_not_exists');
 		$s_rules = getFieldRules($fieldtype, $rules);
 
@@ -968,7 +974,7 @@ if (empty($action)){ //活动分类管理
 	}
 } elseif ('viewfield' == $action) {
 	define('AJAX',1);
-	InitGP(array('fieldid'),GP,2);
+	S::gp(array('fieldid'),GP,2);
 	$fieldService = L::loadClass('ActivityField', 'activity');
 	$fielddb = $fieldService->getField($fieldid);
 	empty($fielddb['fieldid']) && Showmsg('field_not_select');
@@ -996,7 +1002,7 @@ if (empty($action)){ //活动分类管理
 	ajax_footer();
 } elseif ('showfield' == $action) {
 	define('AJAX',1);
-	InitGP(array('currentactmid'));
+	S::gp(array('currentactmid'));
 	$fieldService = L::loadClass('ActivityField', 'activity');
 	$fielddb = $fieldService->getDeletableFieldsByModelId($actmid);
 
@@ -1013,7 +1019,7 @@ if (empty($action)){ //活动分类管理
 
 } elseif ('copyfield' == $action) {
 	define('AJAX',1);
-	InitGP(array('copyfield'));
+	S::gp(array('copyfield'));
 	if (empty($copyfield) || !is_array($copyfield)) {
 		Showmsg('act_copyfield_none');
 	}
@@ -1044,7 +1050,7 @@ if (empty($action)){ //活动分类管理
 
 } elseif ('delfield' == $action) {
 	define('AJAX',1);
-	InitGP(array('fieldid'),GP,2);
+	S::gp(array('fieldid'),GP,2);
 	$fieldService = L::loadClass('ActivityField', 'activity');
 	$ckfield = $fieldService->getField($fieldid);
 	if ($ckfield) {
@@ -1067,15 +1073,15 @@ if (empty($action)){ //活动分类管理
 } elseif ('editindex' == $action) {
 	define('AJAX',1);
 
-	InitGP(array('type'));
-	InitGP(array('fieldid'),GP,2);
+	S::gp(array('type'));
+	S::gp(array('fieldid'),GP,2);
 	$fieldService = L::loadClass('ActivityField', 'activity');
 	$fielddb = $fieldService->getField($fieldid);
 
 	$tablename = getActivityValueTableNameByActmid($actmid, 1, $fielddb['ifdel']);
 	$fieldname = $fielddb['fieldname'];
 
-	$field = $db->get_one("SHOW COLUMNS FROM $tablename LIKE ".pwEscape($fieldname));
+	$field = $db->get_one("SHOW COLUMNS FROM $tablename LIKE " . S::sqlEscape($fieldname));
 	if (empty($fielddb) || empty($field)) {
 		Showmsg('field_not_exists');
 	}
@@ -1180,11 +1186,11 @@ function insertActivityFieldToDb($actmid, $fieldtype, $name, $descrip, $isDefaul
 			$insertColumns[$column] = $option[$column];
 		}
 	}
-	$db->update("INSERT INTO pw_activityfield SET ".pwSqlSingle($insertColumns));
+	$db->update("INSERT INTO pw_activityfield SET " . S::sqlSingle($insertColumns));
 	if (!$isDefaultField) { //不是默认字段，则修改特殊字段表名
 		$fieldid = $db->insert_id();
 		$fieldname = 'field'.$fieldid;
-		$db->update("UPDATE pw_activityfield SET fieldname=".pwEscape($fieldname)." WHERE fieldid=".pwEscape($fieldid));
+		$db->update("UPDATE pw_activityfield SET fieldname=" . S::sqlEscape($fieldname)." WHERE fieldid=" . S::sqlEscape($fieldid));
 		$userDefinedValueTableName = getActivityValueTableNameByActmid($actmid, 1, 1);
 		$sql = getFieldSqlByType($fieldtype);
 		$db->query("ALTER TABLE $userDefinedValueTableName ADD $fieldname $sql");
@@ -1199,9 +1205,9 @@ function insertActivityFieldToDb($actmid, $fieldtype, $name, $descrip, $isDefaul
 function deleteTopicAndModelDataByActmid($actmid) {
 	global $db;
 	//删除子分类
-	$db->update("DELETE FROM pw_activitymodel WHERE actmid=".pwEscape($actmid));
+	$db->update("DELETE FROM pw_activitymodel WHERE actmid=" . S::sqlEscape($actmid));
 	//删除子分类字段
-	$db->update("DELETE FROM pw_activityfield WHERE actmid=".pwEscape($actmid));
+	$db->update("DELETE FROM pw_activityfield WHERE actmid=" . S::sqlEscape($actmid));
 
 	$userDefinedValueTableName = getActivityValueTableNameByActmid($actmid, 1, 1);
 	//删除子分类帖子数据
@@ -1215,7 +1221,7 @@ function deleteTopicAndModelDataByActmid($actmid) {
 	$db->query("DROP TABLE IF EXISTS $userDefinedValueTableName");
 	//删除子分类默认字段数据
 	$defaultValueTableName = getActivityValueTableNameByActmid();
-	$db->update("DELETE FROM $defaultValueTableName WHERE actmid=" . pwEscape($actmid));
+	$db->update("DELETE FROM $defaultValueTableName WHERE actmid=" . S::sqlEscape($actmid));
 }
 
 /**

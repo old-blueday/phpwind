@@ -5,7 +5,7 @@ require_once('global.php');
 if ($db_pptifopen && $db_ppttype == 'client') {
 	Showmsg('passport_login');
 }
-InitGP(array('action','forward'));
+S::gp(array('action','forward'));
 !$db_pptifopen && $forward = '';
 $pre_url = $pwServer['HTTP_REFERER'] ? $pwServer['HTTP_REFERER'] : $db_bbsurl.'/'.$db_bfn;
 
@@ -25,7 +25,7 @@ if ($groupid != 'guest' && $action != 'quit') {
 //		Showmsg('login_have');
 	}
 }
-list(,$loginq , , ,$showq) = explode("\t", $db_qcheck);
+list(,$showq) = explode("\t", $db_qcheck);
 if ($action == 'login') {
 
 	if (empty($_POST['step'])) {
@@ -40,7 +40,7 @@ if ($action == 'login') {
 			$arr_logintype[0] = 0;
 		}
 		if (GetCookie('o_invite') && $db_modes['o']['ifopen']==1) {
-			InitGP(array('jumpurl'));
+			S::gp(array('jumpurl'));
 		} else {
 			$jumpurl = $pre_url;
 		}
@@ -49,10 +49,10 @@ if ($action == 'login') {
 
 	} else {
 
-		PostCheck(0,$db_gdcheck & 2,$loginq,0);
+		PostCheck(0,$db_gdcheck & 2,$db_ckquestion & 2 && $db_question,0);
 		require_once(R_P . 'require/checkpass.php');
 
-		InitGP(array('pwuser','pwpwd','question','customquest','answer','cktime','hideid','jumpurl','lgt','keepyear'),'P');
+		S::gp(array('pwuser','pwpwd','question','customquest','answer','cktime','hideid','jumpurl','lgt','keepyear'),'P');
 
 		$jumpurl = str_replace(array('&#61;','&amp;'),array('=','&'),$jumpurl);
 
@@ -70,13 +70,14 @@ if ($action == 'login') {
 		list($winduid, $groupid, $windpwd, $showmsginfo) = $logininfo;
 		
 		/*update cache*/
-		$_cache = getDatastore();
-		$_cache->delete("UID_".$winduid);
+		//* $_cache = getDatastore();
+		//* $_cache->delete("UID_".$winduid);
+		perf::gatherInfo('changeMembersWithUserIds', array('uid'=>$winduid));
 		
 		if (file_exists(D_P."data/groupdb/group_$groupid.php")) {
-			require_once Pcv(D_P."data/groupdb/group_$groupid.php");
+			require_once pwCache::getPath(S::escapePath(D_P."data/groupdb/group_$groupid.php"));
 		} else {
-			require_once(D_P."data/groupdb/group_1.php");
+			require_once pwCache::getPath(D_P."data/groupdb/group_1.php");
 		}
 		(int)$keepyear && $cktime = '31536000';
 		$cktime != 0 && $cktime += $timestamp;
@@ -116,7 +117,7 @@ if ($action == 'login') {
 	require_once(R_P.'require/checkpass.php');
 
 	if ($groupid == '6') {
-		$bandb = $db->get_one("SELECT type FROM pw_banuser WHERE uid=".pwEscape($winduid)." AND fid='0'");
+		$bandb = $db->get_one("SELECT type FROM pw_banuser WHERE uid=".S::sqlEscape($winduid)." AND fid='0'");
 		if ($bandb['type'] == 3) {
 			Cookie('force',$winduid);
 		}

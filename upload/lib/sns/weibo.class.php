@@ -119,7 +119,7 @@ class PW_Weibo {
 		$userCache->delete($uid, 'weibo');
 
 		//sinaweibo
-		if ($GLOBALS['db_sinaweibo_status'] && !in_array($type, array('sinaweibo', 'photos', 'group_photos'))) {
+		if ($GLOBALS['db_sinaweibo_status'] && !in_array($type, array('sinaweibo')) && !$extra['isSinaForward']) {
 			$bindService = L::loadClass('WeiboBindService', 'sns/weibotoplatform'); /* @var $bindService PW_WeiboBindService */
 			if ($bindService->isLocalBind($uid, PW_WEIBO_BINDTYPE_SINA)) {
 				unset($message['extra']);
@@ -190,7 +190,7 @@ class PW_Weibo {
 		$_sql_add = in_array($typeKey, array('article','diary','photos','group')) ? " AND o.{$typeKey}_isfollow=1" : '';
 
 		//todo 根据以后策略再调整
-		$db->update("INSERT INTO pw_weibo_relations (uid,mid,authorid,type,postdate) SELECT a.uid, '$mid', '$uid', '{$this->_map[$type]}', '{$this->_timestamp}' FROM pw_attention a LEFT JOIN pw_friends f ON a.uid=f.uid AND a.friendid=f.friendid AND f.status=0 LEFT JOIN pw_ouserdata o ON a.uid=o.uid WHERE a.friendid=" . pwEscape($uid) . " AND a.uid!=a.friendid AND (o.uid IS NULL OR (o.friend_isfollow=1 AND f.uid IS NOT NULL OR o.cnlesp_isfollow=1 AND f.uid IS NULL)$_sql_add) ORDER BY a.joindate DESC LIMIT 1000");
+		$db->update("INSERT INTO pw_weibo_relations (uid,mid,authorid,type,postdate) SELECT a.uid, ".S::sqlEscape($mid).", ".S::sqlEscape($uid).", ".S::sqlEscape($this->_map[$type]).", ".S::sqlEscape($this->_timestamp)." FROM pw_attention a LEFT JOIN pw_friends f ON a.uid=f.uid AND a.friendid=f.friendid AND f.status=0 LEFT JOIN pw_ouserdata o ON a.uid=o.uid WHERE a.friendid=" . S::sqlEscape($uid) . " AND a.uid!=a.friendid AND (o.uid IS NULL OR (o.friend_isfollow=1 AND f.uid IS NOT NULL OR o.cnlesp_isfollow=1 AND f.uid IS NULL)$_sql_add) ORDER BY a.joindate DESC LIMIT 1000");
 	}
 
 	/**
@@ -368,6 +368,7 @@ class PW_Weibo {
 		return $this->buildData($weibos,'uid');
 	}
 	
+
 	/**
 	 * 取得新鲜事直播
 	 */
@@ -570,6 +571,7 @@ class PW_Weibo {
 			if ($type == 'transmit' && $value['objectid']) {
 				$tids[] = $value['objectid'];
 			}
+			$data[$key]['content'] = strip_tags($value['content'],'<a>');
 		}
 		if ($tids) {
 			$tArr = $this->getWeibosByMid($tids);
@@ -581,15 +583,14 @@ class PW_Weibo {
 			$bindService = L::loadClass('weibobindservice', 'sns/weibotoplatform'); /* @var $bindService PW_WeiboBindService */
 			$weiboUsersInfo = $bindService->getUsersLocalBindInfo(array_keys($uinfo), PW_WEIBO_BINDTYPE_SINA);
 		}
-		
 		foreach ($data as $key => $value) {
 			$value = $this->formatRecord($value, $uinfo[$value[$field]]['groupid']);
 			$type = $this->getType($value['type']);
 			if ($type == 'transmit' && ($transmit = $tArr[$value['objectid']])) {
-				$value['transmits'] = array_merge($this->formatRecord($transmit, $uinfo[$transmit['uid']]['groupid']), $uinfo[$transmit['uid']]);
+				$value['transmits'] = array_merge((array)$this->formatRecord($transmit, $uinfo[$transmit['uid']]['groupid']), (array)$uinfo[$transmit['uid']]);
 			}
 			!is_array($uinfo[$value[$field]]) && $uinfo[$value[$field]] = array();
-			$data[$key] = array_merge($value, $uinfo[$value[$field]]);
+			$data[$key] = array_merge((array)$value, $uinfo[$value[$field]]);
 			
 			if ($db_sinaweibo_status && $type == 'sinaweibo') $data[$key]['sinaWeiboUserInfo'] = $weiboUsersInfo[$value[$field]]['info'];
 		}
@@ -758,7 +759,7 @@ class PW_Weibo {
 	 * return string
 	 */
 	function _parseRefer($username, $uArray) {
-		return isset($uArray[$username]) ? '<a href="u.php?uid=' . $uArray[$username] . '">@' . $username . '</a>' : '@' . $username;
+		return isset($uArray[$username]) ? '<a href="'.USER_URL. $uArray[$username] . '">@' . $username . '</a>' : '@' . $username;
 	}
 
 	/**
@@ -816,6 +817,11 @@ class PW_Weibo {
 	 * @access public
 	 */
 	function getConloysWeibos($cyids,$page = 1,$perpage = 20){
+		if ($cyids == 'nocyids') {
+			$referDao = L::loadDB('weibo_cnrelations','sns');
+			$conloyWeibos = $referDao->getConloysWeibos('nocyids',$page,$perpage);
+			return $this->buildData($conloyWeibos, 'uid');
+		}
 		$cyids = is_array($cyids) ? $cyids : array($cyids);
 		if(empty($cyids)){
 			return array();
@@ -1004,6 +1010,21 @@ class PW_Weibo {
 		foreach($midTems as $mid) {
 			$mids[] = $mid['mid'];
 		}
+		return $this->deleteWeibos($mids);
+	}
+
+	function deleteWeibosByObjectIdsAndType($objectIds, $type) {
+		if (!isset($this->_map[$type]) || (!$this->_isLegalId($objectIds) && !is_array($objectIds))) {
+			return array();
+		}
+		$type = $this->_map[$type];
+		$mids = $tempMids = array();
+		$contentDao = L::loadDB('weibo_content','sns');
+		$tempMids = $contentDao->getMidsByObjectIdsAndType($objectIds, $type);
+		foreach ($tempMids as $mid) {
+			$mids[] = $mid['mid'];
+		}
+		if (!$mids) return false;
 		return $this->deleteWeibos($mids);
 	}
 	

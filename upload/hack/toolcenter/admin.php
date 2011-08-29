@@ -15,7 +15,7 @@ if (empty($job)) {
 
 	} else {
 
-		InitGP(array('toolifopen','allowtrade'),'P');
+		S::gp(array('toolifopen','allowtrade'),'P');
 		setConfig('db_toolifopen', $toolifopen);
 		setConfig('db_allowtrade', $allowtrade);
 		updatecache_c();
@@ -36,7 +36,7 @@ if (empty($job)) {
 
 	} elseif ($action == 'submit') {
 
-		InitGP(array('tools', 'vieworder'),'P');
+		S::gp(array('tools', 'vieworder'),'P');
 		$toolids = array(0);
 		if (is_array($tools)) {
 			foreach ($tools as $key => $value) {
@@ -48,11 +48,11 @@ if (empty($job)) {
 		while ($rt = $db->fetch_array($query)) {
 			if($rt['vieworder'] == $vieworder[$rt['id']]) continue;
 			is_numeric($vieworder[$rt['id']]) && $db->update("UPDATE pw_tools SET vieworder=".
-															pwEscape($vieworder[$rt['id']]).
+															S::sqlEscape($vieworder[$rt['id']]).
 															" WHERE id =($rt[id])");
 		}
 
-		$toolids = pwImplode($toolids);
+		$toolids = S::sqlImplode($toolids);
 		if ($toolids) {
 			$db->update("UPDATE pw_tools SET state='1' WHERE id IN($toolids)");
 			$db->update("UPDATE pw_tools SET state='0' WHERE id NOT IN($toolids)");
@@ -66,8 +66,8 @@ if (empty($job)) {
 		if (!$_POST['step']) {
 
 			if ($action == 'edit') {
-				InitGP(array('id'));
-				$rt = $db->get_one("SELECT * FROM pw_tools WHERE id=" . pwEscape($id));
+				S::gp(array('id'));
+				$rt = $db->get_one("SELECT * FROM pw_tools WHERE id=" . S::sqlEscape($id));
 				!$rt && adminmsg('operate_fail');
 			} else {
 				$rt = array();
@@ -125,7 +125,7 @@ if (empty($job)) {
 			include PrintHack('admin');exit;
 
 		} else{
-			InitGP(array('id','name','filename','vieworder','descrip','logo','state','price','stock','groupids','fids','condition','type','creditype','rmb'),'P');
+			S::gp(array('id','name','filename','vieworder','descrip','logo','state','price','stock','groupids','fids','condition','type','creditype','rmb'),'P');
 			if ($groupids) {
 				$condition['group'] = ','.implode(',',$groupids).',';
 			}
@@ -138,7 +138,7 @@ if (empty($job)) {
 			}
 			$condition = addslashes(serialize($condition));
 			if ($action == 'edit') {
-				$db->update("UPDATE pw_tools SET " . pwSqlSingle(array(
+				$db->update("UPDATE pw_tools SET " . S::sqlSingle(array(
 					'name'		=> $name,
 					'filename'	=> $filename,
 					'vieworder'	=> $vieworder,
@@ -151,9 +151,9 @@ if (empty($job)) {
 					'type'		=> $type,
 					'stock'		=> $stock,
 					'conditions'=> $condition
-				)) . " WHERE id=" . pwEscape($id));
+				)) . " WHERE id=" . S::sqlEscape($id));
 			} else{
-				$db->update("INSERT INTO pw_tools SET " . pwSqlSingle(array(
+				$db->update("INSERT INTO pw_tools SET " . S::sqlSingle(array(
 					'name'		=> $name,
 					'filename'	=> $filename,
 					'vieworder'	=> $vieworder,
@@ -180,17 +180,17 @@ if (empty($job)) {
 
 	if (!$action || $action == 'search') {
 
-		InitGP(array('username','page'));
+		S::gp(array('username','page'));
 		if ($action == 'search' && $username) {
-			$rt     = $db->get_one("SELECT uid FROM pw_members WHERE username=" . pwEscape($username));
-			$sqladd = "WHERE u.uid=".pwEscape($rt['uid'],false);
+			$rt     = $db->get_one("SELECT uid FROM pw_members WHERE username=" . S::sqlEscape($username));
+			$sqladd = "WHERE u.uid=".S::sqlEscape($rt['uid'],false);
 		} else {
 			$sqladd = '';
 		}
 		if (!is_numeric($page) || $page < 1) {
 			$page = 1;
 		}
-		$limit = pwLimit(($page-1)*$db_perpage,$db_perpage);
+		$limit = S::sqlLimit(($page-1)*$db_perpage,$db_perpage);
 		$rt    = $db->get_one("SELECT COUNT(*) AS sum FROM pw_usertool u $sqladd");
 		$sum   = $rt['sum'];
 		$total = ceil($sum/$db_perpage);
@@ -206,38 +206,38 @@ if (empty($job)) {
 
 	} elseif ($action == 'edit') {
 
-		InitGP(array('uid','id'));
+		S::gp(array('uid','id'));
 		(!is_numeric($uid) || !is_numeric($id)) && adminmsg('numerics_checkfailed');
 
 		if (empty($_POST['step'])) {
 
-			$rt = $db->get_one("SELECT u.*,t.name,t.stock,t.price,m.username FROM pw_usertool u LEFT JOIN pw_members m USING(uid) LEFT JOIN pw_tools t ON t.id=u.toolid WHERE u.uid=" . pwEscape($uid) . "AND u.toolid=" . pwEscape($id));
+			$rt = $db->get_one("SELECT u.*,t.name,t.stock,t.price,m.username FROM pw_usertool u LEFT JOIN pw_members m USING(uid) LEFT JOIN pw_tools t ON t.id=u.toolid WHERE u.uid=" . S::sqlEscape($uid) . "AND u.toolid=" . S::sqlEscape($id));
 			!$rt['creditype'] && $rt['creditype'] = 'currency';
 			include PrintHack('admin');exit;
 
 		} else {
 
-			InitGP(array('nums','sellnums','sellprice'));
-			$db->update("UPDATE pw_usertool SET " . pwSqlSingle(array(
+			S::gp(array('nums','sellnums','sellprice'));
+			$db->update("UPDATE pw_usertool SET " . S::sqlSingle(array(
 				'nums'		=> $nums,
 				'sellnums'	=> $sellnums,
 				'sellprice'	=> $sellprice
-			)) . " WHERE uid=".pwEscape($uid) . " AND toolid=".pwEscape($id));
+			)) . " WHERE uid=".S::sqlEscape($uid) . " AND toolid=".S::sqlEscape($id));
 			adminmsg('operate_success');
 		}
 	} elseif ($action == 'del') {
 
-		InitGP(array('uid','id'));
+		S::gp(array('uid','id'));
 		(!is_numeric($uid) || !is_numeric($id)) && adminmsg('numerics_checkfailed');
-		$db->update("DELETE FROM pw_usertool WHERE uid=" . pwEscape($uid) . "AND toolid=".pwEscape($id));
+		$db->update("DELETE FROM pw_usertool WHERE uid=" . S::sqlEscape($uid) . "AND toolid=".S::sqlEscape($id));
 		adminmsg('operate_success');
 	}
 } elseif ($job == 'tradelog') {
 
 	$basename = "$admin_file?adminjob=hack&hackset=toolcenter&job=tradelog";
-	InitGP(array('username','page'));
+	S::gp(array('username','page'));
 	if ($action == 'search' && $username) {
-		$rt     = $db->get_one("SELECT uid FROM pw_members WHERE username=" . pwEscape($username));
+		$rt     = $db->get_one("SELECT uid FROM pw_members WHERE username=" . S::sqlEscape($username));
 		$sqladd = "AND u.uid='$rt[uid]'";
 	} else {
 		$sqladd = '';
@@ -245,7 +245,7 @@ if (empty($job)) {
 	if (!is_numeric($page) || $page < 1) {
 		$page = 1;
 	}
-	$limit = pwLimit(($page-1)*$db_perpage,$db_perpage);
+	$limit = S::sqlLimit(($page-1)*$db_perpage,$db_perpage);
 	$rt    = $db->get_one("SELECT COUNT(*) AS sum FROM pw_usertool u WHERE sellnums!=0 $sqladd");
 	$sum   = $rt['sum'];
 	$total = ceil($sum/$db_perpage);
@@ -267,16 +267,16 @@ if (empty($job)) {
 	if (empty($action)) {
 
 		require_once(R_P.'require/bbscode.php');
-		InitGP(array('page','keyword'));
+		S::gp(array('page','keyword'));
 		if ($keyword) {
-			$sqladd = "WHERE descrip LIKE " . pwEscape("%$keyword%");
+			$sqladd = "WHERE descrip LIKE " . S::sqlEscape("%$keyword%");
 		} else {
 			$sqladd = '';
 		}
 		if (!is_numeric($page) || $page < 1) {
 			$page = 1;
 		}
-		$limit = pwLimit(($page-1)*$db_perpage,$db_perpage);
+		$limit = S::sqlLimit(($page-1)*$db_perpage,$db_perpage);
 		$rt    = $db->get_one("SELECT COUNT(*) AS sum FROM pw_toollog $sqladd");
 		$sum   = $rt['sum'];
 		$total = ceil($sum/$db_perpage);
@@ -290,7 +290,7 @@ if (empty($job)) {
 		}
 	} elseif ($action == 'del') {
 
-		InitGP(array('selid'));
+		S::gp(array('selid'));
 		if (!$selid = checkselid($selid)) {
 			$basename = "javascript:history.go(-1);";
 			adminmsg('operate_error');

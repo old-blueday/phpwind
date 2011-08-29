@@ -5,7 +5,7 @@ print <<<EOT
 .t table tr th{text-align:right;font-weight:normal;}
 </style>
 <div id="breadCrumb">
-		<img src="$imgpath/$stylepath/thread/home-old.gif" align="absmiddle" />&nbsp;<a href="$db_bfn" title="$db_bbsname">$db_bbsname</a><em>&gt;</em>活动中心<em>&gt;</em><a href="read.php?tid=$tid">$act[tsubject]</a>
+<img src="$imgpath/$stylepath/thread/home.gif" class="cp breadHome" /><em class="breadEm"></em><a href="$db_bfn" title="$db_bbsname">$db_bbsname</a><em>&gt;</em>活动中心<em>&gt;</em><a href="read.php?tid=$tid">$act[tsubject]</a>
 </div>
 <div class="t f_one">
 <table width="100%" align="center" cellspacing="0" cellpadding="0">
@@ -92,7 +92,7 @@ if($action=='apply'){ print <<<EOT
 <tr><td class="h" colspan="2">活动申请</td></tr>
 <tr class="tr3">
 	<th width="30%">联系方式：</th>
-	<td><input type="text" class="input" name="contact" /> &nbsp;Tel、QQ、Email 等</td>
+	<td><input type="text" class="input" name="contact" /> &nbsp;Tel、QQ、电子邮箱 等</td>
 </tr>
 <tr class="tr3">
 	<th>留言：</th>
@@ -147,7 +147,7 @@ print <<<EOT
 -->
 <tr class="tac tr3">
 	<td>$i</td>
-	<td><a href="u.php?uid=$value[winduid]">$value[username]</a></td>
+	<td><a href="{$db_userurl}$value[winduid]">$value[username]</a></td>
 <!--
 EOT;
 if($value[gender]==1){ print <<<EOT

@@ -119,6 +119,7 @@ $lang['creditlog'] = array (
 	* 其他
 	*/
 	'other_finishjob'   => '[b]{$L[username]}[/b] 完成 [b]{$GLOBALS[job]}[/b] 任务,获得系统 赠送的积分。\n奖励积分：[b]{$L[cname]}[/b]，影响：{$L[affect]}。',
+	'other_finishpunch'   => '[b]{$L[username]}[/b] 完成 [b]每日打卡[/b] 任务,获得系统 赠送的积分。\n奖励积分：[b]{$L[cname]}[/b]，影响：{$L[affect]}。',
 	'other_present'		=> '[b]{$L[username]}[/b] 获得由 [b]{$L[admin]}[/b] 操作节日送礼赠送的积分。\n赠送积分：[b]{$L[cname]}[/b]，影响：{$L[affect]}。',
 	'other_propaganda'  =>'[b]{$L[username]}[/b] 由于发送宣传链接获得赠送积分。\n赠送积分：[b]{$L[cname]}[/b]，影响：{$L[affect]}。',
 

@@ -19,7 +19,7 @@ function getDescripByTid($tid){
 	$tid = (int)$tid;
 	if (!$tid) return '';
 	$table	= GetTtable($tid);
-	$content= $db->get_value("SELECT content FROM $table WHERE tid=".pwEscape($tid));
+	$content= $db->get_value("SELECT content FROM $table WHERE tid=".S::sqlEscape($tid));
 	$content= preg_replace("/<((style|script).*?)>(.*?)<(\/\\1.*?)>/si","",$content);
 	$content= strip_tags(stripWindCode($content));
 	$content= trim($content);
@@ -27,10 +27,10 @@ function getDescripByTid($tid){
 }
 function Sql_cv($var){
 	global $db;
-	$db->update('INSERT INTO pw_sqlcv SET var='.pwEscape($var),0);
+	$db->update('INSERT INTO pw_sqlcv SET var='.S::sqlEscape($var),0);
 	$id = $db->insert_id();
-	$rt = $db->get_one('SELECT var FROM pw_sqlcv WHERE id='.pwEscape($id));
-	$db->update('DELETE FROM pw_sqlcv WHERE id='.pwEscape($id));
+	$rt = $db->get_one('SELECT var FROM pw_sqlcv WHERE id='.S::sqlEscape($id));
+	$db->update('DELETE FROM pw_sqlcv WHERE id='.S::sqlEscape($id));
 	return $rt['var'];
 }
 /* admin bench only */
@@ -63,9 +63,9 @@ function getCommonFid() {
 				$fids .= ",'$rt[fid]'";
 			}
 			$fids && $fids = substr($fids,1);
-			writeover(D_P.'data/bbscache/commonforum.php',"<?php\r\n\$fids = \"$fids\";\r\n?>");
+			pwCache::setData(D_P.'data/bbscache/commonforum.php',"<?php\r\n\$fids = \"$fids\";\r\n?>");
 		} else {
-			include (D_P.'data/bbscache/commonforum.php');
+			include  pwCache::getPath(D_P.'data/bbscache/commonforum.php');
 		}
 	}
 	return $fids;
@@ -84,9 +84,9 @@ function getSpecialFid() {
 				$fids .= ",'$rt[fid]'";
 			}
 			$fids && $fids = substr($fids,1);
-			writeover(D_P.'data/bbscache/specialforum.php',"<?php\r\n\$fids = \"$fids\";\r\n?>");
+			pwCache::setData(D_P.'data/bbscache/specialforum.php',"<?php\r\n\$fids = \"$fids\";\r\n?>");
 		} else {
-			include (D_P.'data/bbscache/specialforum.php');
+			include pwCache::getPath(D_P.'data/bbscache/specialforum.php');
 		}
 	}
 	return $fids;
@@ -122,7 +122,7 @@ function pwDelatt($path,$ifftp) {
 function pwFtpNew(&$ftp,$ifftp) {
 	if (!$ifftp) return false;
 	if (!is_object($ftp)) {
-		include (D_P . 'data/bbscache/ftp_config.php');
+		include pwCache::getPath(D_P . 'data/bbscache/ftp_config.php');
 		L::loadClass('ftp', 'utility', false);
 		$ftp = new FTP($ftp_server,$ftp_port,$ftp_user,$ftp_pass,$ftp_dir);
 	}
@@ -158,17 +158,17 @@ function getFriends($uid,$start=0,$num=0,$ftype=false,$show=false,$imgtype='m'){
 	}
 	if ($ftype !== false && $ftype !== '') {
 		$ftype	= (int)$ftype;
-		$where = ' AND f.ftid='.pwEscape($ftype);
+		$where = ' AND f.ftid='.S::sqlEscape($ftype);
 	}
 	$start	= (int) $start;
 	$num	= (int) $num;
 	if ($start || $num) {
 		!$num && $num = 8;
-		$limit = pwLimit($start,$num);
+		$limit = S::sqlLimit($start,$num);
 	} else {
 		$limit = '';
 	}
-	$rs = $db->query("SELECT $fild FROM pw_friends f LEFT JOIN pw_members m ON f.friendid=m.uid $left WHERE f.uid=".pwEscape($uid)." AND f.status=0 $where ORDER BY $order DESC $limit");
+	$rs = $db->query("SELECT $fild FROM pw_friends f LEFT JOIN pw_members m ON f.friendid=m.uid $left WHERE f.uid=".S::sqlEscape($uid)." AND f.status=0 $where ORDER BY $order DESC $limit");
 	$result = array();
 	if ($show) {
 		require_once(R_P.'require/showimg.php');
@@ -200,7 +200,7 @@ function getForumCache(){
 	if (!$temp_forum) {
 		global $forum;
 		if (!$forum) {
-			include(D_P.'data/bbscache/forum_cache.php');
+			include pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
 		}
 		$temp_forum = $forum;
 	}
@@ -214,6 +214,17 @@ function getForumUrl($fid){
 	}
 	return '';
 }
+/**
+ * 获取主题的主题分类名称及url
+ * @param $type
+ * @param $fid
+ * @return array
+ */
+function getTopicType($type,$fid) {
+	$foruminfo = L::forum($fid);
+	$topic_type = isset($foruminfo['topictype'][$type]) ? $foruminfo['topictype'][$type] : array();
+	return $topic_type ? array($topic_type['name'],getForumUrl($fid).'&type='.$type) : array('','');
+}
 
 function getmemberid($nums){
 	global $lneed;
@@ -226,6 +237,31 @@ function getmemberid($nums){
 		}
 	}
 	return $gid;
+}
+function getMembername($memberid) {
+	global $ltitle;
+	$ltitle || $ltitle = L::config('ltitle', 'level');
+	arsort($ltitle) ;reset($ltitle);
+	return  $ltitle[$memberid];
+}
+function getNextMemberid($memberid) {
+	global $lneed;
+	$lneed || $lneed = L::config('lneed', 'level');
+	asort($lneed,0); reset($lneed);
+	$memberneed =$lneed[$memberid];
+	foreach ($lneed as $key => $lowneed) {
+		if ($memberneed < $lowneed) {
+			$gid = $key;
+			break;
+		}
+	}
+	return $gid;
+}
+function getmemberNeed($memberid) {
+	global $lneed;
+	$lneed || $lneed = L::config('lneed', 'level');
+	arsort($lneed) ;reset($lneed);
+	return  (int)$lneed[$memberid];
 }
 function CalculateCredit($creditdb,$upgradeset) {
 	$credit = 0;
@@ -254,7 +290,7 @@ function updateDatanalyse($tag, $action, $num) {
 	if (!empty($tag) && !empty($action)) {
 		$isTdtime = $isHistory = 0;
 		$timeuints = array($tdtime,$history);
-		$query = $db->query("SELECT timeunit FROM pw_datanalyse WHERE tag=".pwEscape($tag)."AND action=".pwEscape($action));
+		$query = $db->query("SELECT timeunit FROM pw_datanalyse WHERE tag=".S::sqlEscape($tag)."AND action=".S::sqlEscape($action));
 		while($rs = $db->fetch_array($query)){
 			if($rs['timeunit'] == $tdtime){
 				$isTdtime = 1;
@@ -263,19 +299,19 @@ function updateDatanalyse($tag, $action, $num) {
 			}
 		}
 		if($isTdtime && $isHistory){
-			return $db->query("UPDATE LOW_PRIORITY pw_datanalyse SET num=num+".pwEscape($num) ." WHERE tag=".pwEscape($tag)."AND action=".pwEscape($action)."AND timeunit IN (".pwImplode($timeuints).")");
+			return $db->query("UPDATE LOW_PRIORITY pw_datanalyse SET num=num+".S::sqlEscape($num) ." WHERE tag=".S::sqlEscape($tag)."AND action=".S::sqlEscape($action)."AND timeunit IN (".S::sqlImplode($timeuints).")");
 		}elseif($isTdtime == 0 && $isHistory == 0){
-			return $db->query("REPLACE LOW_PRIORITY INTO pw_datanalyse (tag,action,timeunit,num) VALUES (".pwEscape($tag).",".pwEscape($action).",".pwEscape($tdtime).",".pwEscape($num)."),(".pwEscape($tag).",".pwEscape($action).",".pwEscape($history).",".pwEscape($num).")");
+			return $db->query("REPLACE LOW_PRIORITY INTO pw_datanalyse (tag,action,timeunit,num) VALUES (".S::sqlEscape($tag).",".S::sqlEscape($action).",".S::sqlEscape($tdtime).",".S::sqlEscape($num)."),(".S::sqlEscape($tag).",".S::sqlEscape($action).",".S::sqlEscape($history).",".S::sqlEscape($num).")");
 		}
 		if($isTdtime){
-			$db->query("UPDATE LOW_PRIORITY pw_datanalyse SET num=num+".pwEscape($num) ." WHERE tag=".pwEscape($tag)."AND action=".pwEscape($action)."AND timeunit=".pwEscape($tdtime));
+			$db->query("UPDATE LOW_PRIORITY pw_datanalyse SET num=num+".S::sqlEscape($num) ." WHERE tag=".S::sqlEscape($tag)."AND action=".S::sqlEscape($action)."AND timeunit=".S::sqlEscape($tdtime));
 		}else{
-			$db->query("REPLACE LOW_PRIORITY INTO pw_datanalyse SET tag=".pwEscape($tag).",action=".pwEscape($action).",timeunit=".pwEscape($tdtime).",num=".pwEscape($num));
+			$db->query("REPLACE LOW_PRIORITY INTO pw_datanalyse SET tag=".S::sqlEscape($tag).",action=".S::sqlEscape($action).",timeunit=".S::sqlEscape($tdtime).",num=".S::sqlEscape($num));
 		}
 		if($isHistory){
-			$db->query("UPDATE LOW_PRIORITY pw_datanalyse SET num=num+".pwEscape($num) ." WHERE tag=".pwEscape($tag)."AND action=".pwEscape($action)."AND timeunit=".pwEscape($history));
+			$db->query("UPDATE LOW_PRIORITY pw_datanalyse SET num=num+".S::sqlEscape($num) ." WHERE tag=".S::sqlEscape($tag)."AND action=".S::sqlEscape($action)."AND timeunit=".S::sqlEscape($history));
 		}else{
-			$db->query("REPLACE LOW_PRIORITY INTO pw_datanalyse SET tag=".pwEscape($tag).",action=".pwEscape($action).",timeunit=".pwEscape($history).",num=".pwEscape($num));
+			$db->query("REPLACE LOW_PRIORITY INTO pw_datanalyse SET tag=".S::sqlEscape($tag).",action=".S::sqlEscape($action).",timeunit=".S::sqlEscape($history).",num=".S::sqlEscape($num));
 		}
 	}
 }

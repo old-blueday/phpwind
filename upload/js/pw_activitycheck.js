@@ -31,13 +31,13 @@ function()
 			{
 				document[frm].Submit.disabled = false;
 				cnt = 0;
-				return  !! showDialog('error', '标题、内容不能为空或者有其他错误项',2);
+				return !! true;
 			}
 		}
 		/**
 		*这里不能用attachEvent来加事件，否则return  false也会提交表单
 		*/
-		document[frm].onsubmit = _e;
+		//document[frm].onsubmit = _e;
 		/**
 		*设置提示信息，内部方法
 		*@param nodeElement obj 节点
@@ -335,7 +335,7 @@ function getFeesMoneyError(obj, isMust) {
 function getMoneyError(obj, isMust) {
 	var money = obj.value;
 	money = parseFloat(money);
-	if ((obj.value && !obj.value.match(/^(([1-9]\d*)|0)(\.\d{0,2})?$/)) || (isMust && !money) || (obj.value && (money < 0 || !money))) {
+	if ((obj.value && !obj.value.match(/^(([1-9]\d*)|0)(\.\d{0,2})?$/)) || (isMust && money < 0) || (obj.value && (money < 0))) {
 		setErrorAttribute(obj, 1);
 		return 'invalid_money';
 	} else {

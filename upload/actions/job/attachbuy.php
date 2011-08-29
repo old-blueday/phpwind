@@ -1,14 +1,14 @@
 <?php
 !defined('P_W') && exit('Forbidden');
 
-InitGP(array('aid','type','step'));
+S::gp(array('aid','type','step'));
 !$aid && Showmsg('undefined_action');
 
 //TODO lmq待优化
 if ($type == 'record') {
 	require_once(R_P.'require/credit.php');
 	$buy = array();
-	$query = $db->query("SELECT a.*,m.username FROM pw_attachbuy a LEFT JOIN pw_members m ON a.uid = m.uid WHERE a.aid=".pwEscape($aid));
+	$query = $db->query("SELECT a.*,m.username FROM pw_attachbuy a LEFT JOIN pw_members m ON a.uid = m.uid WHERE a.aid=" . S::sqlEscape($aid));
 	while ($rt = $db->fetch_array($query)) {
 		$rt['createdtime'] = get_date($rt['createdtime'],'Y-m-d H:i:s');
 		$rt['ctype'] = $credit->cType[$rt['ctype']];
@@ -261,7 +261,7 @@ class threadDownload extends downloadInterface {
 	}
 
 	function ifBuyAtt() {
-		return $this->_db->get_one("SELECT uid FROM pw_attachbuy WHERE aid=" . pwEscape($this->aid) . " AND uid=" . pwEscape($this->uid));
+		return $this->_db->get_one("SELECT uid FROM pw_attachbuy WHERE aid=" . S::sqlEscape($this->aid) . " AND uid=" . S::sqlEscape($this->uid));
 	}
 
 	function ifadmin() {
@@ -301,7 +301,7 @@ class threadDownload extends downloadInterface {
 			return true;
 		}
 		global $credit;
-		$this->_db->update("INSERT INTO pw_attachbuy SET " . pwSqlSingle(array(
+		$this->_db->update("INSERT INTO pw_attachbuy SET " . S::sqlSingle(array(
 			'aid' => $this->aid,
 			'uid' => $this->uid,
 			'ctype' => $this->attach['ctype'],
@@ -318,7 +318,7 @@ class threadDownload extends downloadInterface {
 		);
 		$credit->set($this->uid, $this->attach['ctype'], -$this->attach['needrvrc'], false);
 		
-		if ($db_sellset['income'] < 1 || ($income = $this->_db->get_value("SELECT SUM(cost) AS sum FROM pw_attachbuy WHERE aid=" . pwEscape($this->aid))) < $db_sellset['income']) {
+		if ($db_sellset['income'] < 1 || ($income = $this->_db->get_value("SELECT SUM(cost) AS sum FROM pw_attachbuy WHERE aid=" . S::sqlEscape($this->aid))) < $db_sellset['income']) {
 			$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
 			$username = $userService->getUserNameByUserId($this->attach['uid']);
 			$credit->addLog('topic_attsell',
@@ -408,7 +408,7 @@ class threadDownload extends downloadInterface {
 	function _checkForum() {
 		
 		$this->tid = $this->attach['tid'];
-		$thread = $this->_db->get_one("SELECT fid,tpcstatus,ifcheck FROM pw_threads WHERE tid=" . pwEscape($this->tid, false));
+		$thread = $this->_db->get_one("SELECT fid,tpcstatus,ifcheck FROM pw_threads WHERE tid=" . S::sqlEscape($this->tid, false));
 
 		if (getstatus($thread['tpcstatus'], 1) && !$thread['fid'] && $thread['ifcheck'] == '2') {
 			return true;
@@ -427,7 +427,7 @@ class threadDownload extends downloadInterface {
 		}
 		$pwdcheck = GetCookie('pwdcheck');
 		
-		if ($pwforum->foruminfo['password'] != '' && ($groupid == 'guest' || $pwdcheck[$pwforum->fid] != $pwforum->foruminfo['password'] && !CkInArray($this->user['username'], $GLOBALS['manager']))) {
+		if ($pwforum->foruminfo['password'] != '' && ($groupid == 'guest' || $pwdcheck[$pwforum->fid] != $pwforum->foruminfo['password'] && !S::inArray($this->user['username'], $GLOBALS['manager']))) {
 			require_once (R_P . 'require/forumpw.php');
 		}
 		if (!$pwforum->allowvisit($this->user, $this->groupid)) {

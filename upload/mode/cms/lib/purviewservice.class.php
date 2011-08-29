@@ -1,5 +1,5 @@
 <?php
-!defined('M_P') && exit('Forbidden');
+!defined('P_W') && exit('Forbidden');
 
 /**
  * 用户权限管理相关

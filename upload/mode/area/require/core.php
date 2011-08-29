@@ -18,18 +18,24 @@ function checkEditAdmin($name,$cid,$pushtype='') {
 function areaLoadFrontView($action) {
 	
 	if (file_exists(M_P."template/front/$action.htm")) {
-		return Pcv(M_P."template/front/$action.htm");
+		return S::escapePath(M_P."template/front/$action.htm");
 	}
 	return false;
 }
 
 
-function aliasStatic($file) {
+function aliasStatic($alias) {
+	$file = S::escapePath(AREA_PATH.$alias.'/index.html');
 	$output = cookTemplate();
-	writeover($file, $output);
+	pwCache::setData($file, $output);
 	ob_clean();
 }
+
 function areaFooter() {
+	global $db_advertdb;
+	if (!defined('AREA_PAGE') && ($db_advertdb['Site.PopupNotice'] || $db_advertdb['Site.FloatLeft'] || $db_advertdb['Site.FloatRight'] || $db_advertdb['Site.FloatRand'])) {
+		require PrintEot('advert');
+	}
 	$output = cookTemplate();
 	echo ObContents($output);
 	unset($output);

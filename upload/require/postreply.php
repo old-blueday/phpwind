@@ -13,7 +13,7 @@ if ($article == '0') {
 } else {
 	$S_sql = $J_sql = '';
 }
-$tpcarray = $db->get_one("SELECT t.tid,t.fid,t.locked,t.ifcheck,t.author,t.authorid,t.postdate,t.lastpost,t.ifmail,t.special,t.subject,t.type,t.ifshield,t.anonymous,t.ptable,t.replies,t.tpcstatus $S_sql FROM pw_threads t $J_sql WHERE t.tid=" . pwEscape($tid));
+$tpcarray = $db->get_one("SELECT t.tid,t.fid,t.locked,t.ifcheck,t.author,t.authorid,t.postdate,t.lastpost,t.ifmail,t.special,t.subject,t.type,t.ifshield,t.anonymous,t.ptable,t.replies,t.tpcstatus $S_sql FROM pw_threads t $J_sql WHERE t.tid=" . S::sqlEscape($tid));
 $pw_posts = GetPtable($tpcarray['ptable']);
 $tpcarray['openIndex'] = getstatus($tpcarray['tpcstatus'], 2);
 //$t_date = $tpcarray['postdate'];//主题发表时间 bbspostguide 中用到
@@ -56,7 +56,7 @@ if (empty($_POST['step'])) {
 			$atcarray = $tpcarray;
 		} else {
 			!is_numeric($pid) && Showmsg('illegal_tid');
-			$atcarray = $db->get_one("SELECT p.author,p.authorid,p.subject,p.ifsign,p.postdate,p.content,p.ifshield,p.anonymous,m.uid,m.groupid,m.userstatus FROM $pw_posts p LEFT JOIN pw_members m ON m.uid=p.authorid WHERE p.pid=".pwEscape($pid));
+			$atcarray = $db->get_one("SELECT p.author,p.authorid,p.subject,p.ifsign,p.postdate,p.content,p.ifshield,p.anonymous,m.uid,m.groupid,m.userstatus FROM $pw_posts p LEFT JOIN pw_members m ON m.uid=p.authorid WHERE p.pid=".S::sqlEscape($pid));
 		}
 		if ($atcarray['ifshield']) {//单帖屏蔽
 			$atcarray['content'] = shield($atcarray['ifshield']=='1' ? 'shield_article' : 'shield_del_article');
@@ -99,14 +99,15 @@ if (empty($_POST['step'])) {
 	require_once(R_P.'require/header.php');
 	$msg_guide = $pwforum->headguide($guidename);
 	$post_reply = '';
+	$review_reply = '';
 
 	if ($db_showreplynum > 0) {
 		$wordsfb = L::loadClass('FilterUtil', 'filter');
 		$pwAnonyHide = $pwpost->isGM || pwRights($pwpost->isBM,'anonyhide');
-		$query = $db->query("SELECT p.author,p.authorid,p.subject,p.postdate,p.content,p.anonymous,p.ifconvert,p.ifwordsfb,p.ifshield,m.uid,m.groupid,m.userstatus FROM $pw_posts p LEFT JOIN pw_members m ON p.authorid=m.uid WHERE tid=".pwEscape($tid)."AND ifcheck='1' ORDER BY postdate DESC LIMIT 0,$db_showreplynum");
-
+		$query = $db->query("SELECT p.pid,p.author,p.authorid,p.subject,p.postdate,p.content,p.anonymous,p.ifconvert,p.ifwordsfb,p.ifshield,m.uid,m.groupid,m.userstatus FROM $pw_posts p LEFT JOIN pw_members m ON p.authorid=m.uid WHERE tid=".S::sqlEscape($tid)."AND ifcheck='1' ORDER BY postdate DESC LIMIT 0,$db_showreplynum");
 		while ($rt = $db->fetch_array($query)) {
 			$tpc_author = ($rt['anonymous'] && !$pwAnonyHide && $windid != $rt['author']) ? $db_anonymousname : $rt['author'];
+			$tpc_pid = $rt['pid'];
 			if ($rt['ifshield']) {
 				$groupid != '3' && $rt['content'] = shield($rt['ifshield'] == '1' ? 'shield_article' : 'shield_del_article');
 			} elseif ($groupid != 3 && $db_shield && $pwforum->forumBan($rt)) {
@@ -120,14 +121,17 @@ if (empty($_POST['step'])) {
 					$rt['content'] = showface($rt['content']);
 				}
 			}
-			$post_reply .= "<table align=center width=70% cellspacing=1 cellpadding=2 style='TABLE-LAYOUT: fixed;WORD-WRAP: break-word'><tr><td width=100%>$tpc_author:$rt[subject]<br /><br />$rt[content]</td></tr></table><hr size=1 color=$tablecolor width=80%>";
+			$review_content = substrs(stripWindCode($rt['content']),255);
+			$post_reply .= "<table width=\"100%\"><tr><td><div class=\"h b\">$tpc_author:$rt[subject]</div><div class=\"p10\">$rt[content]</div></td></tr></table>";
+			$review_reply .= "<table width=\"100%\"><tr><td><div class=\"h b\">$tpc_author:$rt[subject]</div><div class=\"p10\">$review_content</div></td></tr></table>";
 		}
 	}
 	if ($winduid && $tpcarray['special'] == 5) {
-		$debatestand = $db->get_value("SELECT standpoint FROM pw_debatedata WHERE pid='0' AND tid=".pwEscape($tid)."AND authorid=".pwEscape($winduid));
+		$debatestand = $db->get_value("SELECT standpoint FROM pw_debatedata WHERE pid='0' AND tid=".S::sqlEscape($tid)."AND authorid=".S::sqlEscape($winduid));
 		$debatestand = (int)$debatestand;
 		${'debate_'.$debatestand} = 'SELECTED';
 	}
+	$postMinLength = empty($pwpost->forum->foruminfo['forumset']['contentminlen']) ? $db_postmin : $pwpost->forum->foruminfo['forumset']['contentminlen'];
 	/**
 	 * 索引设计时为了减少空间,回复的主题可能为空,所以默认为回复主题!
 	 */
@@ -135,15 +139,17 @@ if (empty($_POST['step'])) {
 
 } elseif ($_POST['step'] == 2) {
 
-	InitGP(array('atc_title','atc_content'), 'P', 0);
-	InitGP(array('atc_anonymous','atc_hideatt','atc_enhidetype','atc_credittype','flashatt','replytouser'), 'P');
-	InitGP(array('atc_iconid','atc_convert','atc_autourl','atc_usesign','atc_html','atc_hide','atc_requireenhide','atc_rvrc','atc_requiresell', 'atc_money'), 'P', 2);
-
+	S::gp(array('atc_title','atc_content'), 'P', 0);
+	S::gp(array('atc_anonymous','atc_hideatt','atc_enhidetype','atc_credittype','flashatt','replytouser'), 'P');
+	S::gp(array('atc_iconid','atc_convert','atc_autourl','atc_usesign','atc_html','atc_hide','atc_requireenhide','atc_rvrc','atc_requiresell', 'atc_money'), 'P', 2);
+	
+	S::gp(array('iscontinue'),'P');//ajax提交时有敏感词时显示是否继续
+	($db_sellset['price'] && (int) $atc_money > $db_sellset['price']) && Showmsg('post_price_limit');
 	require_once(R_P . 'require/bbscode.php');
 
 	$postdata = new replyPostData($pwpost);
 	$postdata->setTitle($atc_title);
-	$postdata->setContent($atc_content);
+	!$postdata->setContent($atc_content) && Showmsg('post_price_limit');
 
 	$postdata->setConvert($atc_convert, $atc_autourl);
 	$postdata->setAnonymous($atc_anonymous);
@@ -156,16 +162,19 @@ if (empty($_POST['step'])) {
 	$postdata->setSell($atc_requiresell, $atc_money, $atc_credittype);
 	//$replypost->checkdata();
 	$postdata->conentCheck();
-
 	L::loadClass('attupload', 'upload', false);
+	/*上传错误检查
+	$return = PwUpload::checkUpload();
+	$return !== true && Showmsg($return);
+	end*/
 	if (PwUpload::getUploadNum() || $flashatt) {
 		$postdata->att = new AttUpload($winduid, $flashatt);
 		$postdata->att->check();
 		$postdata->att->transfer();
 		PwUpload::upload($postdata->att);
 	}
-
 	$replypost->setToUser($replytouser);
+	$postdata->iscontinue = (int)$iscontinue;
 	$replypost->execute($postdata);
 	$pid = $replypost->getNewId();
 
@@ -177,35 +186,22 @@ if (empty($_POST['step'])) {
 
 	//job sign
 	require_once(R_P.'require/functions.php');
-	$threads = L::loadClass('Threads', 'forum');
-	$thread = $threads->getThreads($tid,!($page>1));
+	$j_p = "read.php?tid=$tid&page=e#a";
+	if ($db_htmifopen)
+		$j_p = urlRewrite ( $j_p );
+	$_cacheService = Perf::gatherCache('pw_threads');
+	$thread = ($page>1) ? $_cacheService->getThreadByThreadId($tid) : $_cacheService->getThreadAndTmsgByThreadId($tid);	
 	initJob($winduid,"doReply",array('tid'=>$tid,'user'=>$thread['author']));
-
-	if ($postdata->getIfcheck()) {
-		if ($postdata->filter->filter_weight == 3) {
-			$pinfo = 'enter_words';
-			$banword = implode(',',$postdata->filter->filter_word);
-		} else {
-			$pinfo = 'enter_thread';
-		}
-		$j_p = "read.php?tid=$tid&page=e#a";
-		/*Begin Add by liaohu for addfloor*/
-		if('on' != $_POST['go_lastpage'] && 'ajax_addfloor' == $_POST['type']){
-			require_once Pcv(R_P.'require/addfloor.php');
+	$pinfo = getLangInfo('refreshto', 'enter_thread');
+	defined('AJAX') && $pinfo = "success\t" . $j_p;
+	$flag = false;
+	if (!$iscontinue && $postdata->getIfcheck()) {
+		if (!isset($_POST['go_lastpage']) && 'ajax_addfloor' == $_POST['type']) {
+			require_once S::escapePath(R_P.'require/addfloor.php');
 			exit;
 		}
-		refreshto($j_p,$pinfo);
-		/*Begin Add by liaohu for addfloor*/
-	} else {
-		if ($postdata->filter->filter_weight == 2) {
-			$banword = implode(',',$postdata->filter->filter_word);
-			$pinfo = 'post_word_check';
-		} elseif ($postdata->linkCheckStrategy) {
-			$pinfo = 'post_link_check';
-		}  else {
-			$pinfo = 'post_check';
-		}
-		refreshto("thread.php?fid=$fid",$pinfo);
+		defined('AJAX') && $flag && ($pinfo = "continue\t" . getLangInfo('refreshto', $pinfo));
 	}
+	refreshto($j_p,$pinfo);
 }
 ?>

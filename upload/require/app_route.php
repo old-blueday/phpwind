@@ -1,6 +1,6 @@
 <?php
 !function_exists('readover') && exit('Forbidden');
-InitGP ( array ( 'q' , 'u') );
+S::gp ( array ( 'q' , 'u') );
 if ($m == 'o') {
 	define ( 'F_M', TRUE );
 	# 圈子
@@ -51,7 +51,7 @@ list ( $app, $route ) = app_specialRoute ( $q );
 $appdir = $app;
 list ( $basePath, $baseFile ) = app_router ( $app );
 
-@include_once (D_P . 'data/bbscache/o_config.php');
+@include_once pwCache::getPath(D_P . 'data/bbscache/o_config.php');
 if ($groupid != 3 && $o_share_groups && strpos ( $o_share_groups, ",$groupid," ) === false) {
 	$shareGM = 1;
 }
@@ -66,7 +66,7 @@ if($space == 1 && !in_array($q,array('group','galbum'))){
 
 list ( $_Navbar, $_LoginInfo ) = pwNavBar ();
 
-require_once Pcv ( $baseFile );
+require_once S::escapePath ( $baseFile );
 
 if ($m == "o") {
 	$isheader && require_once PrintEot ( 'header' );

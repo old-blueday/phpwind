@@ -1,0 +1,15 @@
+<pw id="群组排行@群组聚合页面右侧" />
+<h3 class="cc">群组排行</h3>
+<pw id="top20@群组聚合页面右侧" />
+<ol class="ranking">
+<list num="20" action="group" cachetime="1800" ifpushonly="0" title="群组列表" />
+<loop>
+<!--#
+$creditclass = $key%2 == 0 ? '' : 'odd';
+$tempKey = $key+1<10 ? '0'.($key+1) : $key+1;
+#-->
+	<li class="$creditclass">
+		<a href="{url}" target="_blank"><em>$tempKey</em><span class="title">{title}</span><span class="order">{credit}</span></a>
+	</li>
+</loop>
+</ol>

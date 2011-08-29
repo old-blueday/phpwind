@@ -50,7 +50,7 @@ class PostIndexDB {
 		if ($tid) {
 			$sql = "SELECT t.tid, t.subject, t.replies, t.postdate, t.fid
 					FROM pw_threads t
-					WHERE t.tid IN ( ". pwImplode($tid) ." ) ORDER BY t.tid DESC";
+					WHERE t.tid IN ( ". S::sqlImplode($tid) ." ) ORDER BY t.tid DESC";
 			$query = $this->db->query ( $sql );
 			while ( $rt = $this->db->fetch_array ( $query ) ) {
 				list ( $lastDate ) = PostIndexUtility::getLastDate ( $rt ["postdate"] );
@@ -78,17 +78,17 @@ class PostIndexDB {
 			$tid[] = $rt['tid'];
 		}
 		if ($tid) {
-			$w_tid = " t.tid NOT IN ( ". pwImplode($tid) ." ) AND ";
+			$w_tid = " t.tid NOT IN ( ". S::sqlImplode($tid) ." ) AND ";
 		}
-		$sql = "SELECT COUNT(*) AS sum FROM pw_threads t WHERE $w_tid t.replies > " . pwEscape($replies);
+		$sql = "SELECT COUNT(*) AS sum FROM pw_threads t WHERE $w_tid t.replies > " . S::sqlEscape($replies);
 		$rt = $this->db->get_one ( $sql );
 		(! is_numeric ( $page ) || $page < 1) && $page = 1;
-		$limit = pwLimit ( ($page - 1) * $this->db_perpage, $this->db_perpage );
+		$limit = S::sqlLimit ( ($page - 1) * $this->db_perpage, $this->db_perpage );
 		$result ['pages'] = numofpage ( $rt ['sum'], $page, ceil ( $rt ['sum'] / $this->db_perpage ),
 		$this->basename . "&sub=y&action=search&replies=$replies&" );
 		$sql = "SELECT t.tid, t.subject, t.replies, t.postdate, t.fid
 				FROM pw_threads t
-				WHERE $w_tid t.replies > ".pwEscape($replies)." $limit";
+				WHERE $w_tid t.replies > ".S::sqlEscape($replies)." $limit";
 		$query = $this->db->query ( $sql );
 		while ( $rt = $this->db->fetch_array ( $query ) ) {
 			list ( $lastDate ) = PostIndexUtility::getLastDate ( $rt ["postdate"] );
@@ -105,7 +105,7 @@ class PostIndexDB {
 	function getThreadsById($tid){
 		$sql = "SELECT t.tid, t.subject, t.replies, t.postdate, t.fid
 				FROM pw_threads t
-				WHERE t.tid = ".pwEscape($tid)." AND t.tpcstatus & 2 = '0'";
+				WHERE t.tid = ".S::sqlEscape($tid)." AND t.tpcstatus & 2 = '0'";
 		$rt = $this->db->get_one($sql);
 		if ($rt) {
 			list ( $lastDate ) = PostIndexUtility::getLastDate ( $rt ["postdate"] );
@@ -138,10 +138,10 @@ class PostIndexDB {
 		$max_floor = $this->getMaxFloorByTid($tid);
 		$end = ($step * $this->p_c - 1) >= $max_floor ? $max_floor : ($step * $this->p_c - 1);
 		$next = $step + 1;
-		$sql = "DELETE FROM pw_postsfloor WHERE floor <= $end AND tid = ".pwEscape($tid);
+		$sql = "DELETE FROM pw_postsfloor WHERE floor <= $end AND tid = ".S::sqlEscape($tid);
 		$this->db->update ( $sql );
 		if ($end == $max_floor) {
-			$sql = "UPDATE pw_threads SET tpcstatus = tpcstatus & conv('fD',16,10) WHERE tid = ".pwEscape($tid);
+			$sql = "UPDATE pw_threads SET tpcstatus = tpcstatus & conv('fD',16,10) WHERE tid = ".S::sqlEscape($tid);
 			$this->db->update ( $sql );
 			$next = 0;
 		}
@@ -153,14 +153,15 @@ class PostIndexDB {
 
 		!$step && $step = 1;
 		if ($step == 1) {#@cn0zz 先更新帖子标志，避免删除过程中浏览帖子出现错乱
-			$sql = "UPDATE pw_threads SET tpcstatus = tpcstatus & (~2) WHERE tid = ".pwEscape($tid);
+			//$sql = "UPDATE pw_threads SET tpcstatus = tpcstatus & (~2) WHERE tid = ".S::sqlEscape($tid);
+			$sql = pwQuery::buildClause("UPDATE :pw_table SET tpcstatus = tpcstatus & (~2) WHERE tid = :tid", array('pw_threads', $tid));
 			$this->db->update ( $sql );
-			$threads = L::loadClass('Threads', 'forum');
-			$threads->delThreads($tid);
+			//* $threads = L::loadClass('Threads', 'forum');
+			//* $threads->delThreads($tid);
 		}
 		#@cn0zz 删除帖子索引，是全部清空该帖子的楼层，所以可直接使用LIMIT
-		$limit = pwLimit($this->p_c);
-		$sql = "DELETE FROM pw_postsfloor WHERE tid = ".pwEscape($tid).$limit;
+		$limit = S::sqlLimit($this->p_c);
+		$sql = "DELETE FROM pw_postsfloor WHERE tid = ".S::sqlEscape($tid).$limit;
 		$this->db->update ( $sql );
 		if ($this->db->affected_rows() < $this->p_c) {
 			return 0;
@@ -176,48 +177,49 @@ class PostIndexDB {
 	 */
 	function addPostIndex($tid,$step) {
 		$ptable = PostIndexDB::getPostTable ( $tid );
-		$rt = $this->db->get_one("SELECT count(*) AS sum FROM $ptable p WHERE p.tid = " .pwEscape($tid));
+		$rt = $this->db->get_one("SELECT count(*) AS sum FROM $ptable p WHERE p.tid = " .S::sqlEscape($tid));
 		$count = $rt['sum'];
 		!$step && $step = 1;
 		$next = $step + 1;
 		$start = ($step - 1) * $this->p_c;
-		$limit = pwLimit($start,$this->p_c);
+		$limit = S::sqlLimit($start,$this->p_c);
 		$sql = "SELECT p.tid, p.pid, p.postdate, p.authorid
 				FROM $ptable p
-				WHERE p.tid = ".pwEscape($tid)." ORDER BY p.postdate $limit";
+				WHERE p.tid = ".S::sqlEscape($tid)." ORDER BY p.postdate $limit";
 		$query = $this->db->query ( $sql );
 		while ( $rt = $this->db->fetch_array ( $query ) ) {
 			$f_data[] = array($rt ["tid"],$rt ["pid"]);
 		}
 		if (!empty($f_data)) {
-			$this->db->update ("INSERT INTO pw_postsfloor(tid,pid) VALUES " . pwSqlMulti($f_data));
+			$this->db->update ("INSERT INTO pw_postsfloor(tid,pid) VALUES " . S::sqlMulti($f_data));
 		}
 		$floor = $this->getMaxFloorByTid($tid);
 		if ($count > $floor) {
 			return $next;
 		}else{
 			#@cn0zz 添加索引完成后，才能修改帖子状态
-			$sql = "UPDATE pw_threads SET tpcstatus = tpcstatus | 2 WHERE tid =".pwEscape($tid);
+			//$sql = "UPDATE pw_threads SET tpcstatus = tpcstatus | 2 WHERE tid =".S::sqlEscape($tid);
+			$sql = pwQuery::buildClause("UPDATE :pw_table SET tpcstatus = tpcstatus | 2 WHERE tid = :tid", array('pw_threads', $tid));
 			$this->db->update ( $sql );
-			$threads = L::loadClass('Threads', 'forum');
-			$threads->delThreads($tid);
+			//* $threads = L::loadClass('Threads', 'forum');
+			//* $threads->delThreads($tid);
 			return 0;
 		}
 	}
 
 	function getMaxFloorByTid($tid){
 	/*
-		$rt = $this->db->get_one("SELECT max(floor) AS floor FROM pw_postsfloor WHERE tid=" . pwEscape($tid));
+		$rt = $this->db->get_one("SELECT max(floor) AS floor FROM pw_postsfloor WHERE tid=" . S::sqlEscape($tid));
 		!$rt['floor'] && $rt['floor'] = 0;
 		return $rt['floor'];
 	*/
 		#@cn0zz floor 唯一，可直接COUNT
-		$count = $this->db->get_value("SELECT COUNT(*) FROM pw_postsfloor WHERE tid=" . pwEscape($tid));
+		$count = $this->db->get_value("SELECT COUNT(*) FROM pw_postsfloor WHERE tid=" . S::sqlEscape($tid));
 		return $count;
 	}
 
 	function getPostTable($tid) {
-		$sql = "SELECT t.ptable FROM pw_threads t WHERE t.tid = ".pwEscape($tid);
+		$sql = "SELECT t.ptable FROM pw_threads t WHERE t.tid = ".S::sqlEscape($tid);
 		$rt = $this->db->get_one ( $sql );
 		$ptable = GetPtable ( $rt ['ptable'] );
 		return $ptable;

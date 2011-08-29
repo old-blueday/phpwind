@@ -6,6 +6,7 @@ print <<<EOT
 window.onload = function(){
 	initPortal();
 }
+
 </script>
 <form action="{$baseUrl}action={$action}&" method="post"  enctype="multipart/form-data" >
 <input type="hidden" name="step" value="2" />
@@ -80,14 +81,14 @@ print <<<EOT
 EOT;
 if($k=='descrip'){print <<<EOT
 -->
-						<textarea name="param[$k]" style="width:260px;height:92px" $add >{$value}</textarea>
+						<textarea name="param[$k]" onkeyup="checktitlelength($val,'pushto_info','wordtinfo');" onkeydown="checktitlelength($val,'pushto_info','wordtinfo');" style="width:260px;height:92px" id="pushto_info" >{$value}</textarea>&nbsp;&nbsp;<span id="wordtinfo"></span>
 <!--
 EOT;
 } elseif ($k=='title') {
 $value = strip_tags($value);
 print <<<EOT
 -->
-						<input type="text" class="input" size="40" name="param[$k]" value="{$value}" $add> 
+						<input type="text" onkeyup="checktitlelength($val,'pushto_title','wordtip');" onkeydown="checktitlelength($val,'pushto_title','wordtip');"   class="input" size="40" name="param[$k]"   value="{$value}" id="pushto_title">&nbsp;&nbsp;<span id="wordtip"></span>
 						<div class="pwnew tac">
 							<span title="粗体字"><a onclick="styleOnclick(this,'css[b]')" class="{$stylename[b]}">加粗</a></span>
 							<span title="斜体字"><a onclick="styleOnclick(this,'css[i]')" class="{$stylename[i]}">倾斜</a></span>
@@ -132,9 +133,19 @@ print <<<EOT
 							<span id="imagetype_input" class="mr10"><input $urlChecked name="select_imagetype" type="radio" />图片链接</span>
 						</p>
 						<div id="imagetype_input_div" $urlStyle>
+<!--
+EOT;
+if($value){
+print <<<EOT
+-->
 							<div style="background:#f7f7f7;border:1px solid #ccc;width:40px;height:40px;margin-right:10px;" class="fl">
 								<img src="$value" width="40" height="40" />
 							</div>
+<!--
+EOT;
+}
+print <<<EOT
+-->
 							<input id="image" name="param[image]" value="{$value}" size="40" class="input" type="text" />
 						</div>
 						<div id="imagetype_upload_div" $uploadStyle>
@@ -177,8 +188,8 @@ print <<<EOT
 			<td class="td2"><input class="input" type="text" size="15" name="starttime" id="starttime" onclick="ShowCalendar(this.id,1);getCurrentDatePos();" value="$push[starttime]"> (留空则立即显示)</td>
 		</tr>
 		<tr class="tr1 vt">
-			<td class="td1">商业推荐</td>
-			<td class="td2"><input type="radio" value="1" name="ifbusiness" $ifbusiness_Y/>是 <input type="radio" value="0" name="ifbusiness" $ifbusiness_N/>否</td>
+			<td class="td1">星号标签</td>
+			<td class="td2"><input type="radio" value="1" name="ifbusiness" $ifbusiness_Y/>是 <input type="radio" value="0" name="ifbusiness" $ifbusiness_N/>否&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(可以用星号标签标识该条数据为特殊推送，比如广告，以免误删)</td>
 		</tr>
 <!--
 EOT;

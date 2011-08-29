@@ -2,18 +2,18 @@
 define ( 'SCR', 'mode' );
 require_once ('global.php');
 require_once(R_P.'require/functions.php');
-$m = GetGP('m');
+$m = S::getGP('m');
+S::gp ( array ('q') );
 
-selectMode($m);
-InitGP ( array ('q') );
+selectMode($m,$q);
 
 /*APP 应用跳转*/
 if ($m == 'o' && $q) {
 	if ($q == 'user') {
-		InitGP(array('u'));
-		ObHeader ( "u.php?uid=$u");
+		S::gp(array('u'));
+		ObHeader ( USER_URL."=$u");
 	} elseif ($q == 'app') {
-		InitGP ( array ('id' ), 'G', 2 );
+		S::gp ( array ('id' ), 'G', 2 );
 		ObHeader ( "apps.php?id=$id" );
 	} elseif ($q == 'friend') {
 		ObHeader ( "u.php?a=friend" );
@@ -38,9 +38,17 @@ if ($m && $pwServer ['HTTP_HOST'] == $db_modedomain[$m]) {
 	$baseUrl = "mode.php?m=$m";
 	$basename = "mode.php?m=$m&";
 }
-
+if ($m == 'cms') {//兼容老版本入口
+	@include_once pwCache::getPath(S::escapePath(D_P . 'data/bbscache/cms_config.php'));
+	if (file_exists(M_P . 'require/core.php')) {
+		require_once (M_P . 'require/core.php');
+	}
+	$basename = "index.php?m=$m";
+	require_once S::escapePath ( M_P . "index.php" );
+	exit;
+}
 if (file_exists ( M_P . "m_{$q}.php" )) {
-	@include_once Pcv(D_P . 'data/bbscache/' . $db_mode . '_config.php');
+	@include_once pwCache::getPath(S::escapePath(D_P . 'data/bbscache/' . $db_mode . '_config.php'));
 	${$db_mode.'_sitename'} = ${$db_mode.'_sitename'} ? ${$db_mode.'_sitename'} : $db_bbsname;
 	 $db_mode == 'cms' && $db_bbsname = ${$db_mode.'_sitename'}; 
 
@@ -54,7 +62,7 @@ if (file_exists ( M_P . "m_{$q}.php" )) {
 	if (file_exists ( M_P . 'require/core.php' )) {
 		require_once (M_P . 'require/core.php');
 	}
-	require_once Pcv ( M_P . "m_{$q}.php" );
+	require_once S::escapePath ( M_P . "m_{$q}.php" );
 } else {
 	Showmsg ( 'undefined_action' );
 }

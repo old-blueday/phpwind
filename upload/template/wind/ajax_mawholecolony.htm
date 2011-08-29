@@ -213,9 +213,9 @@ EOT;
 <div class="popBottom">
 <!--
 EOT;
-if($db_enterreason){print <<<EOT
+if($SYSTEM['enterreason']){print <<<EOT
 -->
-<span class="btn2"><span><button type="button" name="ajaxsubmit" onclick="if(this.form.atc_content.value){ajax.submit(this.form);}else{alert('请输入操作理由！')}">提 交</button></span></span>
+<span class="btn2"><span><button type="button" name="ajaxsubmit" onclick="if(this.form.atc_content.value){ajax.submit(this.form);}else{alert('请输入操作原因！')}">提 交</button></span></span>
 <!--
 EOT;
 }else{print <<<EOT

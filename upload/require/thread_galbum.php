@@ -1,32 +1,33 @@
 <?php
 !function_exists('readover') && exit('Forbidden');
 
-InitGP(array('a'));
+S::gp(array('a'));
 
-if (!($foruminfo = L::forum($fid))) {
+$pwforum = new PwForum($fid);
+if (!$pwforum->isForum(true)) {
 	Showmsg('data_error');
 }
+$foruminfo =& $pwforum->foruminfo;
 $groupRight =& $newColony->getRight();
 $pwModeImg = "$imgpath/apps";
-include_once(D_P.'data/bbscache/o_config.php');
+include_once pwCache::getPath(D_P.'data/bbscache/o_config.php');
 
 require_once(R_P . 'u/require/core.php');
 require_once(R_P . 'require/header.php');
-list($guidename,$forumtitle) = getforumtitle(forumindex($foruminfo['fup'],1));
-$msg_guide = headguide($guidename);
+list($guidename, $forumtitle) = $pwforum->getTitle();
+$msg_guide = $pwforum->headguide($guidename);
 
 $styleid = $colony['styleid'];
 $basename = "thread.php?cyid=$cyid&showtype=galbum";
-
 if (empty($a)) {
 
-	InitGP(array('page'), null, 2);
-	$photonum = $db->get_value("SELECT SUM(photonum) AS photonum FROM pw_cnalbum WHERE ownerid=".pwEscape($cyid));
+	S::gp(array('page'), null, 2);
+	$photonum = $db->get_value("SELECT SUM(photonum) AS photonum FROM pw_cnalbum WHERE ownerid=".S::sqlEscape($cyid));
 	$photonum = (int)$photonum;
 	$db_perpage = 10;
 	list($pages,$limit) = pwLimitPages($colony['albumnum'],$page,"{$basename}&");
 	$album = array();
-	$query = $db->query("SELECT aid,aname,photonum,lastphoto,private,lasttime,memopen,crtime FROM pw_cnalbum WHERE atype='1' AND ownerid=" . pwEscape($cyid) . " ORDER BY aid DESC $limit");
+	$query = $db->query("SELECT aid,aname,photonum,lastphoto,private,lasttime,memopen,crtime FROM pw_cnalbum WHERE atype='1' AND ownerid=" . S::sqlEscape($cyid) . " ORDER BY aid DESC $limit");
 	while ($rt = $db->fetch_array($query)) {
 		$rt['sub_aname'] = substrs($rt['aname'],16);
 		$rt['lasttime'] = get_date($rt['lasttime'],'Y-m-d');
@@ -34,6 +35,7 @@ if (empty($a)) {
 		$rt['forbidden'] = ($colony['albumopen'] && $rt['private'] && !$ifadmin && (!$colony['ifcyer'] || $colony['ifadmin'] == '-1'));
 		$rt['lastphoto'] = $rt['forbidden'] ? "u/images/n.gif" : getphotourl($rt['lastphoto']);
 		$album[] = $rt;
+		$rt['memopen'] == 1 && $colony['ifFullMember'] && $uploadAvaliable = true;
 	}
 	require_once PrintEot('thread_galbum');
 	footer();
@@ -43,13 +45,13 @@ if (empty($a)) {
 	if (!$colony['albumopen'] && !$ifadmin && (!$colony['ifcyer'] || $colony['ifadmin'] == '-1')) {
 		Showmsg('colony_cnmenber');
 	}
-	$photonum = $db->get_value("SELECT count(*) AS count FROM pw_cnphoto t LEFT JOIN pw_cnalbum m ON t.aid=m.aid WHERE atype='1' AND m.ownerid=".pwEscape($cyid));
+	$photonum = $db->get_value("SELECT count(*) AS count FROM pw_cnphoto t LEFT JOIN pw_cnalbum m ON t.aid=m.aid WHERE atype='1' AND m.ownerid=".S::sqlEscape($cyid));
 	$photonum || $photonum = 0;
-	InitGP(array('page'), null, 2);
+	S::gp(array('page'), null, 2);
 	$db_perpage = 21;
 	list($pages,$limit) = pwLimitPages($photonum,$page,"{$basename}&a=$a&");
 	$photolist= array();
-	$query = $db->query("SELECT t.* FROM pw_cnphoto t LEFT JOIN pw_cnalbum m ON t.aid=m.aid WHERE atype='1' AND m.ownerid=".pwEscape($cyid) . " ORDER BY t.pid DESC $limit");
+	$query = $db->query("SELECT t.* FROM pw_cnphoto t LEFT JOIN pw_cnalbum m ON t.aid=m.aid WHERE atype='1' AND m.ownerid=".S::sqlEscape($cyid) . " ORDER BY t.pid DESC $limit");
 	while ($rt = $db->fetch_array($query)) {
 		$rt['photopath'] = getphotourl($rt['path']);
 		$rt['path'] = getphotourl($rt['path'], $rt['ifthumb']);
@@ -65,21 +67,25 @@ if (empty($a)) {
 
 } elseif ($a == 'album') {
 
-	InitGP(array('aid','page'), null, 2);
+	S::gp(array('aid','page'), null, 2);
 
 	$cnpho = array();
-	$album = $db->get_one("SELECT aname,aintro,ownerid,photonum,private,memopen FROM pw_cnalbum WHERE atype='1' AND aid=" . pwEscape($aid));
+	$album = $db->get_one("SELECT aname,aintro,ownerid,photonum,private,memopen FROM pw_cnalbum WHERE atype='1' AND aid=" . S::sqlEscape($aid));
 	if (empty($album)) {
 		Showmsg('data_error');
 	}
+	/*
 	if ($colony['albumopen'] && $album['private'] && !$ifadmin && (!$colony['ifcyer'] || $colony['ifadmin'] == '-1')) {
 		Showmsg('colony_cnmenber');
 	}
-
+	*/
+	if ($album['private'] && !$ifadmin && !$colony['ifFullMember']) {
+		Showmsg('colony_cnmenber');
+	}
 	$db_perpage = 21;
 	list($pages,$limit) = pwLimitPages($album['photonum'],$page,"{$basename}&a=album&aid=$aid&");
 	$tmpUrlAdd = '&a=album&aid=' . $aid;
-	$query = $db->query("SELECT c.pid,c.path,c.ifthumb,c.pintro,c.uptime,c.uploader,m.groupid FROM pw_cnphoto c LEFT JOIN pw_members m ON c.uploader=m.username WHERE c.aid=" . pwEscape($aid) . " ORDER BY c.pid $limit");
+	$query = $db->query("SELECT c.pid,c.path,c.ifthumb,c.pintro,c.uptime,c.uploader,m.groupid FROM pw_cnphoto c LEFT JOIN pw_members m ON c.uploader=m.username WHERE c.aid=" . S::sqlEscape($aid) . " ORDER BY c.pid $limit");
 	while ($rt = $db->fetch_array($query)) {
 		$rt['path'] = getphotourl($rt['path'], $rt['ifthumb']);
 		if ($rt['groupid'] == 6 && $db_shield && $groupid != 3) {
@@ -97,7 +103,7 @@ if (empty($a)) {
 
 	require_once(R_P.'require/bbscode.php');
 
-	InitGP(array('pid','page'), null, 2);
+	S::gp(array('pid','page'), null, 2);
 
 	$tmpUrlAdd = '&a=view&pid=' . $pid;
 	$nearphoto = array();
@@ -111,7 +117,7 @@ if (empty($a)) {
 	if ($photo['private'] && !$ifadmin && (!$colony['ifcyer'] || $colony['ifadmin'] == '-1')) {
 		Showmsg('colony_cnmenber');
 	}
-	$db->update("UPDATE pw_cnphoto SET hits=hits+1 WHERE pid=" . pwEscape($pid));
+	$db->update("UPDATE pw_cnphoto SET hits=hits+1 WHERE pid=" . S::sqlEscape($pid));
 
 	$aid = $photo['aid'];
 	$photo['uptime'] = get_date($photo['uptime']);
@@ -120,7 +126,7 @@ if (empty($a)) {
 		$photo['path'] = $pwModeImg.'/banuser.gif';
 		$photo['pintro'] = appShield('ban_photo_pintro');
 	}
-	$num = $db->get_value("SELECT COUNT(*) AS sum FROM pw_cnphoto WHERE aid=" . pwEscape($photo['aid']) . ' AND pid>=' . pwEscape($pid));
+	$num = $db->get_value("SELECT COUNT(*) AS sum FROM pw_cnphoto WHERE aid=" . S::sqlEscape($photo['aid']) . ' AND pid>=' . S::sqlEscape($pid));
 	$page = empty($page) ? 1 : $page;
 	list($commentdb,$subcommentdb,$pages) = getCommentDbByTypeid('groupphoto',$pid,$page,"thread.php?cyid=$cyid&showtype=galbum&a=view&pid=$pid&");
 
@@ -136,25 +142,25 @@ if (empty($a)) {
 		Showmsg('colony_cnmenber');
 	}
 	banUser();
-	InitGP(array('aid', 'job'));
+	S::gp(array('aid', 'job'));
 
 	$tmpUrlAdd .= '&a=upload' . ($job ? '&job=' . $job : '') . '&aid=' . $aid;
 
 	if (empty($_POST['step'])) {
 
 		$extra_url = $options = '';
-		$count = $db->get_value("SELECT COUNT(*) AS count FROM pw_cnalbum WHERE atype='1' AND ownerid=" . pwEscape($cyid));
+		$count = $db->get_value("SELECT COUNT(*) AS count FROM pw_cnalbum WHERE atype='1' AND ownerid=" . S::sqlEscape($cyid));
 		if (empty($count)) {
-			$db->update("INSERT INTO pw_cnalbum SET " . pwSqlSingle(array(
+			$db->update("INSERT INTO pw_cnalbum SET " . S::sqlSingle(array(
 				'aname'		=> '默认相册',		'aintro'	=> '',
 				'atype'		=> 1,				'private'	=> 0,
 				'ownerid'	=> $cyid,			'owner'		=> $colony['cname'],
 				'lasttime'	=> $timestamp,		'crtime'	=> $timestamp,
 				'memopen'   => 1
 			)));
-			$db->update("UPDATE pw_colonys SET albumnum=albumnum+1 WHERE id=" . pwEscape($cyid));
+			$db->update("UPDATE pw_colonys SET albumnum=albumnum+1 WHERE id=" . S::sqlEscape($cyid));
 		}
-		$query = $db->query("SELECT aid,aname,memopen FROM pw_cnalbum WHERE atype='1' AND ownerid=" . pwEscape($cyid) . ' ORDER BY aid DESC');
+		$query = $db->query("SELECT aid,aname,memopen FROM pw_cnalbum WHERE atype='1' AND ownerid=" . S::sqlEscape($cyid) . ' ORDER BY aid DESC');
 		while ($rt = $db->fetch_array($query)) {
 			if ($ifadmin || ($colony['ifFullMember'] && $rt['memopen'] == 1)) {
 				$memopen = 1;
@@ -171,10 +177,10 @@ if (empty($a)) {
 
 	} else {
 
-		InitGP(array('pintro'),'P');
+		S::gp(array('pintro'),'P');
 		!$aid && Showmsg('colony_albumclass');
 
-		PostCheck(1,$o_photos_gdcheck,$o_photos_qcheck);
+		PostCheck(1,$o_photos_gdcheck,$o_photos_qcheck && $db_question);
 		empty($pintro) && $pintro = array();
 
 		require_once(R_P.'require/bbscode.php');
@@ -184,7 +190,7 @@ if (empty($a)) {
 				Showmsg('content_wordsfb');
 			}
 		}
-		$rt = $db->get_one("SELECT aname,photonum,ownerid,lastphoto,memopen FROM pw_cnalbum WHERE atype='1' AND aid=" . pwEscape($aid));
+		$rt = $db->get_one("SELECT aname,photonum,ownerid,lastphoto,memopen FROM pw_cnalbum WHERE atype='1' AND aid=" . S::sqlEscape($aid));
 		if (empty($rt)) {
 			Showmsg('undefined_action');
 		} elseif ($cyid <> $rt['ownerid']) {
@@ -213,13 +219,13 @@ if (empty($a)) {
 		$lastpid = getLastPid($aid, 4);
 		array_unshift($lastpid, $pid);
 
-		$db->update("UPDATE pw_cnalbum SET photonum=photonum+" . pwEscape($photoNum) . ",lasttime=" . pwEscape($timestamp) . ',lastpid=' . pwEscape(implode(',',$lastpid)) . (!$rt['lastphoto'] ? ',lastphoto='.pwEscape($img->getLastPhoto()) : '') . " WHERE aid=" . pwEscape($aid));
+		$db->update("UPDATE pw_cnalbum SET photonum=photonum+" . S::sqlEscape($photoNum) . ",lasttime=" . S::sqlEscape($timestamp) . ',lastpid=' . S::sqlEscape(implode(',',$lastpid)) . (!$rt['lastphoto'] ? ',lastphoto='.S::sqlEscape($img->getLastPhoto()) : '') . " WHERE aid=" . S::sqlEscape($aid));
 		countPosts("+$photoNum");
 
 		require_once(R_P.'apps/groups/lib/group.class.php');
 		$colony = getGroupByCyid($cyid);
 
-		$db->update("UPDATE pw_colonys SET photonum=photonum+" . pwEscape($photoNum) . " WHERE id=" . pwEscape($cyid));
+		$db->update("UPDATE pw_colonys SET photonum=photonum+" . S::sqlEscape($photoNum) . " WHERE id=" . S::sqlEscape($cyid));
 
 		$colony['photonum']+=$photoNum;
 		updateGroupLevel($colony['id'], $colony);
@@ -243,20 +249,20 @@ if (empty($a)) {
 	if (!$ifadmin && (!$colony['ifcyer'] || $colony['ifadmin'] == '-1')) {
 		Showmsg('colony_cnmenber');
 	}
-	InitGP(array('page', 'selaid','aid'), null, 2);
+	S::gp(array('page', 'selaid','aid'), null, 2);
 	$tmpUrlAdd .= '&aid='.$aid.'&a=selalbum&selaid='.$selaid;
-	$calbum = $db->get_one("SELECT aid,aname,memopen,photonum FROM pw_cnalbum WHERE atype='1' AND aid=".pwEscape($aid));
+	$calbum = $db->get_one("SELECT aid,aname,memopen,photonum FROM pw_cnalbum WHERE atype='1' AND aid=".S::sqlEscape($aid));
 
 	//if($calbum['memopen']==0 && !$ifadmin){
 		//Showmsg('colony_album_memopen');
 	//}
 
 	$db_perpage = 10;
-	$total = $db->get_value("SELECT COUNT(*) FROM pw_cnalbum WHERE atype='0' AND ownerid=" . pwEscape($winduid));
+	$total = $db->get_value("SELECT COUNT(*) FROM pw_cnalbum WHERE atype='0' AND ownerid=" . S::sqlEscape($winduid));
 	list($pages,$limit) = pwLimitPages($total, $page, "{$basename}&a=$a&");
 
 	$album = array();
-	$query = $db->query("SELECT aid,aname,photonum,lastphoto FROM pw_cnalbum WHERE atype='0' AND ownerid=" . pwEscape($winduid) . " ORDER BY aid DESC $limit");
+	$query = $db->query("SELECT aid,aname,photonum,lastphoto FROM pw_cnalbum WHERE atype='0' AND ownerid=" . S::sqlEscape($winduid) . " ORDER BY aid DESC $limit");
 	while ($rt = $db->fetch_array($query)) {
 		$rt['sub_aname'] = substrs($rt['aname'],18);
 		$rt['lastphoto'] = getphotourl($rt['lastphoto']);
@@ -265,7 +271,7 @@ if (empty($a)) {
 	//增加select选项列表
 	$options = '';
 	$calbum = Array();
-	$query = $db->query("SELECT aid,aname,photonum,memopen FROM pw_cnalbum WHERE atype='1' AND ownerid=" . pwEscape($cyid) . ' ORDER BY aid DESC');
+	$query = $db->query("SELECT aid,aname,photonum,memopen FROM pw_cnalbum WHERE atype='1' AND ownerid=" . S::sqlEscape($cyid) . ' ORDER BY aid DESC');
 
 	while ($rt = $db->fetch_array($query)) {
 		if ($rt['aid'] == $aid) {
@@ -289,9 +295,9 @@ if (empty($a)) {
 	if (!$ifadmin && (!$colony['ifcyer'] || $colony['ifadmin'] == '-1')) {
 		Showmsg('colony_cnmenber');
 	}
-	InitGP(array('aid', 'selaid', 'page'));
+	S::gp(array('aid', 'selaid', 'page'));
 	$tmpUrlAdd .= '&aid='.$aid.'&a=selphoto&selaid='.$selaid;
-	$album = $db->get_one("SELECT aname,ownerid,photonum FROM pw_cnalbum WHERE atype='0' AND aid=" . pwEscape($aid));
+	$album = $db->get_one("SELECT aname,ownerid,photonum FROM pw_cnalbum WHERE atype='0' AND aid=" . S::sqlEscape($aid));
 	if (empty($album) || $album['ownerid'] != $winduid) {
 		Showmsg('data_error');
 	}
@@ -302,7 +308,7 @@ if (empty($a)) {
 		list($pages,$limit) = pwLimitPages($album['photonum'],$page,"{$basename}&a=selphoto&aid=$aid&selaid=$selaid&");
 
 		$options = '';
-		$query = $db->query("SELECT aid,aname,memopen FROM pw_cnalbum WHERE atype='1' AND ownerid=" . pwEscape($cyid) . ' ORDER BY aid DESC');
+		$query = $db->query("SELECT aid,aname,memopen FROM pw_cnalbum WHERE atype='1' AND ownerid=" . S::sqlEscape($cyid) . ' ORDER BY aid DESC');
 		while ($rt = $db->fetch_array($query)) {
 			if ($ifadmin || $rt['memopen'] == 1) {
 				$memopen = 1;
@@ -314,7 +320,7 @@ if (empty($a)) {
 			}
 		}
 		$cnpho = array();
-		$query = $db->query("SELECT pid,path,ifthumb FROM pw_cnphoto WHERE aid=" . pwEscape($aid) . " ORDER BY pid $limit");
+		$query = $db->query("SELECT pid,path,ifthumb FROM pw_cnphoto WHERE aid=" . S::sqlEscape($aid) . " ORDER BY pid $limit");
 		while ($rt = $db->fetch_array($query)) {
 			$rt['path'] = getphotourl($rt['path'], $rt['ifthumb']);
 			$cnpho[] = $rt;
@@ -324,7 +330,7 @@ if (empty($a)) {
 
 	} else {
 
-		InitGP(array('selid'));
+		S::gp(array('selid'));
 		if (!$selid || !is_array($selid)) {
 			Showmsg('colony_select_photo');
 		}
@@ -332,7 +338,7 @@ if (empty($a)) {
 			Showmsg('colony_albumclass');
 		}
 
-		$selalbum = $db->get_one("SELECT aname,photonum,ownerid,lastphoto,memopen FROM pw_cnalbum WHERE atype='1' AND aid=" . pwEscape($selaid));
+		$selalbum = $db->get_one("SELECT aname,photonum,ownerid,lastphoto,memopen FROM pw_cnalbum WHERE atype='1' AND aid=" . S::sqlEscape($selaid));
 		if (empty($selalbum)) {
 			Showmsg('undefined_action');
 		} elseif ($cyid <> $selalbum['ownerid']) {
@@ -361,7 +367,7 @@ if (empty($a)) {
 		$lastphoto = '';
 		$i = 1;
 		$photos = array();
-		$query = $db->query("SELECT * FROM pw_cnphoto WHERE aid=" . pwEscape($aid) . ' AND pid IN(' . pwImplode($selid) . ')');
+		$query = $db->query("SELECT * FROM pw_cnphoto WHERE aid=" . S::sqlEscape($aid) . ' AND pid IN(' . S::sqlImplode($selid) . ')');
 		while ($rt = $db->fetch_array($query)) {
 			if (file_exists($attachdir . '/' . $rt['path'])) {
 				$ext = strtolower(substr(strrchr($rt['path'],'.'),1));
@@ -397,14 +403,14 @@ if (empty($a)) {
 
 		if ($photos) {
 
-			$db->update("INSERT INTO pw_cnphoto (aid,pintro,path,uploader,uptime,ifthumb) VALUES " . pwSqlMulti($photos));
+			$db->update("INSERT INTO pw_cnphoto (aid,pintro,path,uploader,uptime,ifthumb) VALUES " . S::sqlMulti($photos));
 			$pid = $db->insert_id();
 
 			$photoNum = count($photos);
 			$lastpid = getLastPid($selaid, 4);
 			array_unshift($lastpid, $pid);
 
-			$db->update("UPDATE pw_cnalbum SET photonum=photonum+" . pwEscape($photoNum) . ",lasttime=" . pwEscape($timestamp) . ',lastpid=' . pwEscape(implode(',',$lastpid)) . (!$selalbum['lastphoto'] ? ',lastphoto='.pwEscape($lastphoto) : '') . " WHERE aid=" . pwEscape($selaid));
+			$db->update("UPDATE pw_cnalbum SET photonum=photonum+" . S::sqlEscape($photoNum) . ",lasttime=" . S::sqlEscape($timestamp) . ',lastpid=' . S::sqlEscape(implode(',',$lastpid)) . (!$selalbum['lastphoto'] ? ',lastphoto='.S::sqlEscape($lastphoto) : '') . " WHERE aid=" . S::sqlEscape($selaid));
 			countPosts("+$photoNum");
 			require_once(R_P . 'require/functions.php');
 			require_once(R_P.'require/credit.php');
@@ -431,11 +437,11 @@ if (empty($a)) {
 	}
 
 	banUser();
-	InitGP(array('aid'), null, 2);
+	S::gp(array('aid'), null, 2);
 	empty($aid) && Showmsg('data_error');
 	!$ifadmin && Showmsg('undefined_action');
 
-	$rt = $db->get_one("SELECT aid,aname,aintro,private,memopen FROM pw_cnalbum WHERE aid=" . pwEscape($aid) . " AND atype='1' AND ownerid=" . pwEscape($cyid));
+	$rt = $db->get_one("SELECT aid,aname,aintro,private,memopen FROM pw_cnalbum WHERE aid=" . S::sqlEscape($aid) . " AND atype='1' AND ownerid=" . S::sqlEscape($cyid));
 	if (empty($rt)) {
 		Showmsg('data_error');
 	}
@@ -450,8 +456,8 @@ if (empty($a)) {
 
 	} else {
 
-		InitGP(array('aname','aintro'),'P');
-		InitGP(array('private','memopen'),'P',2);
+		S::gp(array('aname','aintro'),'P');
+		S::gp(array('private','memopen'),'P',2);
 		!$aname && Showmsg('colony_aname_empty');
 		strlen($aname) > 24 && Showmsg('colony_aname_length');
 		$aintro && strlen($aintro) > 255 && Showmsg('colony_aintro_length');
@@ -465,7 +471,7 @@ if (empty($a)) {
 			Showmsg('post_wordsfb');
 		}
 
-		$db->update("UPDATE pw_cnalbum SET " . pwSqlSingle(array('aname' => $aname, 'aintro' => $aintro, 'private' => $private ? 1 : 0,'memopen'=>$memopen)) . ' WHERE aid=' . pwEscape($aid));
+		$db->update("UPDATE pw_cnalbum SET " . S::sqlSingle(array('aname' => $aname, 'aintro' => $aintro, 'private' => $private ? 1 : 0,'memopen'=>$memopen)) . ' WHERE aid=' . S::sqlEscape($aid));
 
 		refreshto("{$basename}&a=edit&aid=$aid",'operate_success');
 	}
@@ -473,7 +479,7 @@ if (empty($a)) {
 
 	!$ifadmin && Showmsg('undefined_action');
 	banUser();
-	InitGP(array('ajax','job'));
+	S::gp(array('ajax','job'));
 	if ($groupRight['albumnum'] > 0 && $groupRight['albumnum'] <= $colony['albumnum']) {
 		Showmsg('colony_album_num2');
 	}
@@ -493,8 +499,8 @@ if (empty($a)) {
 	} else {
 
 		require_once(R_P.'require/postfunc.php');
-		InitGP(array('aname','aintro'),'P');
-		InitGP(array('private','memopen'),'P',2);
+		S::gp(array('aname','aintro'),'P');
+		S::gp(array('private','memopen'),'P',2);
 		!$aname && Showmsg('colony_aname_empty');
 		strlen($aname) > 24 && Showmsg('colony_aname_length');
 		$aintro && strlen($aintro) > 255 && Showmsg('colony_aintro_length');
@@ -532,14 +538,14 @@ if (empty($a)) {
 		if ($creditlog = $o_groups_creditlog) {
 			addLog($creditlog['Createalbum'],$windid,$winduid,'groups_Createalbum');
 		}
-		$db->update("INSERT INTO pw_cnalbum SET " . pwSqlSingle(array(
+		$db->update("INSERT INTO pw_cnalbum SET " . S::sqlSingle(array(
 				'aname'		=> $aname,			'aintro'	=> $aintro,
 				'atype'		=> 1,				'private'	=> $private ? 1 : 0,
 				'ownerid'	=> $cyid,			'owner'		=> $colony['cname'],
 				'lasttime'	=> $timestamp,		'crtime'	=> $timestamp,
 				'memopen'   => $memopen
 		)));
-		$db->update("UPDATE pw_colonys SET albumnum=albumnum+1 WHERE id=" . pwEscape($cyid));
+		$db->update("UPDATE pw_colonys SET albumnum=albumnum+1 WHERE id=" . S::sqlEscape($cyid));
 		$aid = $db->insert_id();
 
 		$colony['albumnum']++;
@@ -557,11 +563,11 @@ if (empty($a)) {
 
 	ob_end_clean();
 	ObStart();
-	InitGP(array('aid'));
+	S::gp(array('aid'));
 
 	$aid = (int)$aid;
 	if ($aid) {
-		$photonums = $db->get_value("SELECT photonum FROM pw_cnalbum WHERE atype='1' AND aid=" . pwEscape($aid));
+		$photonums = $db->get_value("SELECT photonum FROM pw_cnalbum WHERE atype='1' AND aid=" . S::sqlEscape($aid));
 		$groupRight['maxphotonum'] && $photonums >= $groupRight['maxphotonum'] && Showmsg('colony_photofull');
 		$allowmutinum = $groupRight['maxphotonum'] - $photonums;
 	}

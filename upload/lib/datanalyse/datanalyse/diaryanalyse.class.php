@@ -25,7 +25,7 @@ class PW_Diaryanalyse extends PW_Datanalyse {
 			$rate = L::loadClass('rate', 'rate');
 			$_tmp = $rate->getRateDiaryHotTypes();
 		}
-		return array_keys($_tmp);
+		return is_array($_tmp) ? array_keys($_tmp) : array();
 	}
 
 	/**

@@ -6,7 +6,7 @@ define('M_P',R_P . "mode/$db_mode/");
 $channel = L::loadClass('channelService', 'area');
 $clist = $channel->getChannels();
 if ($action == 'update') {
-	InitGP(array('channellist'),'P');
+	S::gp(array('channellist'),'P');
 	foreach ($channellist as $key=>$value) {
 		if (!isset($clist[$key])) continue;
 		$seo = array(); 

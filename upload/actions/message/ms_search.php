@@ -6,7 +6,7 @@ if(isset($_GET['ajax']) && $_GET['ajax'] == 1){
 $normalUrl = $baseUrl . "?type=search";
 !empty($winduid) && $userId = $winduid;
 
-InitGP(array('page', '_usernames', 'smstype','usernames'), 'GP');
+S::gp(array('page', '_usernames', 'smstype','usernames'), 'GP');
 ($usernames) && $_usernames = (is_array($usernames)) ? $usernames : array($usernames);
 //empty($_usernames) && Showmsg("用户名不能为空");
 (empty($smstype) || $smstype == 'all') && $smstype = '';

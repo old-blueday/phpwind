@@ -131,7 +131,7 @@ print <<<EOT
 -->
       <tr class="tr1 vt">
         <td class="td2">{$lang[logtype][creditlog][$value[logtype]]}</td>
-        <td class="td2"><a href="u.php?uid=$value[uid]" target="_blank">$value[username]</a></td>
+        <td class="td2"><a href="{$db_userurl}$value[uid]" target="_blank">$value[username]</a></td>
         <td class="td2">{$credit->cType[$value[ctype]]}</td>
         <td class="td2">$value[affect]</td>
         <td class="td2">$value[descrip]</td>
@@ -409,6 +409,7 @@ EOT;
     </table>
   </div>
   <div class="mb10 tac">
+	<span class="bt"><span><button type="button" onclick="CheckAll(document.FORM)">全 选</button></span></span>
     <span class="btn"><span>
     <button type="submit" name="submit" value="删除">删除</button>
     </span></span> </div>

@@ -108,18 +108,34 @@ class api_client {
 	}
 
 	function callback($mode, $method, $params) {
-		if (!isset($this->classdb[$mode])) {
-			if (!file_exists(R_P.'api/class_' . $mode . '.php')) {
-				return new ErrorMsg(API_MODE_NOT_EXISTS, "Class($mode) Not Exists");
-			}
-			require_once Pcv(R_P.'api/class_' . $mode . '.php');
-			$this->classdb[$mode] = new $mode($this);
+		if (($return = $this->loadMode($mode)) !== true) {
+			return $return;
 		}
 		if (!method_exists($this->classdb[$mode], $method)) {
 			return new ErrorMsg(API_METHOD_NOT_EXISTS, "Method($method of $mode) Not Exists");
 		}
 		!is_array($params) && $params = array();
 		return @call_user_func_array(array(&$this->classdb[$mode], $method), $params);
+	}
+
+	function loadMode($mode) {
+		if (!isset($this->classdb[$mode])) {
+			list($model, $submodel) = explode('.', $mode);
+			$dir = R_P . 'api/';
+			if ($submodel) {
+				$dir .= strtolower($model) . '/';
+				$file = $submodel;
+				$className = $model . '_' . $submodel;
+			} else {
+				$className = $file = $model;
+			}
+			if (!file_exists($dir . 'class_' . $file . '.php')) {
+				return new ErrorMsg(API_MODE_NOT_EXISTS, "Class($mode) Not Exists");
+			}
+			require_once S::escapePath($dir . 'class_' . $file . '.php');
+			$this->classdb[$mode] = new $className($this);
+		}
+		return true;
 	}
 
 	function dataFormat($data) {

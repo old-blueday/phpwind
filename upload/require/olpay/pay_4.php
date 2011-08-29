@@ -24,9 +24,9 @@ if($invcodes){
 
 }
 if ($pwSQL) {
-	$db->update("INSERT INTO pw_invitecode (invcode,uid,createtime) VALUES " . pwSqlMulti($pwSQL));
+	$db->update("INSERT INTO pw_invitecode (invcode,uid,createtime) VALUES " . S::sqlMulti($pwSQL));
 	$inv_id = $db->insert_id();
-	$db->update("UPDATE pw_clientorder SET paycredit=" . pwEscape($inv_id) . ' WHERE id=' . pwEscape($rt['id']));
+	$db->update("UPDATE pw_clientorder SET paycredit=" . S::sqlEscape($inv_id) . ' WHERE id=' . S::sqlEscape($rt['id']));
 }
 require_once(R_P.'require/sendemail.php');
 $sendinfo = sendemail($rt['payemail'],'email_invite_subject','email_invite_content','email_additional');

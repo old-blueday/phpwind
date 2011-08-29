@@ -28,7 +28,9 @@ return array(
 	'business'	=> '商圈',
 	'popularity'	=> '人气',
 	'comments'	=> '点评',
-
+	'icon'	=>'头像',
+	'topictypename'	=>'主题分类',
+	'topictypeurl'	=>'主题分类链接'
 
 );
 ?>

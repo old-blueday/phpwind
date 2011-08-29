@@ -1,11 +1,13 @@
-<!--<?php print <<<EOT
+<!--<?php 
+if($threaddb){
+print <<<EOT
 -->
 <table width="100%" style="table-layout:fixed;">
 	<tbody id="threadlist">
 	<tr class="tr4">
 <!--
 EOT;
-if($thread[adminbox] && $managecheck){print <<<EOT
+if($managecheck){print <<<EOT
 -->
 		<td class="adminbox"></td>
 <!--
@@ -37,7 +39,13 @@ print <<<EOT
 	<tr class="tr3">
 <!--
 EOT;
-if($thread[adminbox] && $managecheck){print <<<EOT
+if($managecheck){
+if ($thread['fid'] == $fid) {
+	$thread['adminbox'] = "<input type=\"checkbox\" autocomplete=\"off\" name=\"tidarray[]\" id=tid_{$thread[tid]} value=\"$thread[tid]\" onclick=\"postManage.show('postbatch','a_ajax_{$thread[tid]}')\" />";
+} else {
+	$thread['adminbox'] = "&nbsp;&nbsp;&nbsp;";
+}
+print <<<EOT
 -->
 	<td class="adminbox">$thread[adminbox]</td>
 <!--
@@ -219,6 +227,13 @@ EOT;
 -->
 	</tbody>
 </table>
+<!-- 
+EOT;
+}else{
+print <<<EOT
+-->
+<div class="tac f14 p10">暂时没有内容</div>
 <!--
 EOT;
+}
 ?>

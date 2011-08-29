@@ -86,7 +86,7 @@ class PW_Adver {
 		$current = time();
 		$limit = $current + 24 * 3600 * $adverTime;
 		$date = date("Y月 m年 d日", $current) . "到" . date("Y月 m年 d日", $limit);
-		$query = $this->_db->query("SELECT * FROM pw_advert WHERE type=1 AND ckey=" . pwEscape($adverBench) . " AND stime<=" . $limit);
+		$query = $this->_db->query("SELECT * FROM pw_advert WHERE type=1 AND ckey=" . S::sqlEscape($adverBench) . " AND stime<=" . $limit);
 		$result = $during = array();
 		while ($rs = $this->_db->fetch_array($query)) {
 			$rs['stime'] = intval(($rs['stime'] > $current) ? $rs['stime'] : $current);

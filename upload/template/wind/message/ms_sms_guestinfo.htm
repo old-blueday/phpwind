@@ -3,7 +3,7 @@ $index = 0 ;
 $listCount = count($smsList);
 foreach($smsList as $key => $value){
 $value[created_time] = get_date($value[created_time]);
-$_linkUrl = "u.php?uid={$value['create_uid']}";
+$_linkUrl = "{$db_userurl}{$value['create_uid']}";
 $index++;
 if($index == 1){
 print <<<EOT

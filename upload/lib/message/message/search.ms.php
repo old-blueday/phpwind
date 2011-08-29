@@ -71,16 +71,16 @@ class MS_Search extends MS_Base {
 	function manageMessage($keyWords,$startTime,$endTime,$sender,$isDelete,$page,$perpage){
 		$sql = '';
 		if($keyWords){
-			$sql .= " AND title LIKE ".pwEscape("%".$keyWords."%")." OR content LIKE ".pwEscape("%".$keyWords."%");
+			$sql .= " AND title LIKE ".S::sqlEscape("%".$keyWords."%")." OR content LIKE ".S::sqlEscape("%".$keyWords."%");
 		}
 		if($startTime ){
-			$sql .= " AND created_time > ".pwEscape($startTime);
+			$sql .= " AND created_time > ".S::sqlEscape($startTime);
 		}
 		if($endTime ){
-			$sql .= " AND created_time < ".pwEscape($endTime);
+			$sql .= " AND created_time < ".S::sqlEscape($endTime);
 		}
 		if($sender){
-			$sql .= " AND create_username = ".pwEscape($sender);
+			$sql .= " AND create_username = ".S::sqlEscape($sender);
 		}
 		$sql = ($sql) ? " WHERE 1 ".$sql : '';
 		$messagesDao = $this->getMessagesDao();
@@ -153,7 +153,7 @@ class MS_Search extends MS_Base {
 		$categoryId = $this->getMap($category);
 		if( 0 > $categoryId) return false;
 		$relationsDao = $this->getRelationsDao();
-		$sql = " WHERE categoryid = ".pwEscape($categoryId);
+		$sql = " WHERE categoryid = ".S::sqlEscape($categoryId);
 		if($unRead){
 			$sql .= " AND status in(0,4,5) ";
 		}

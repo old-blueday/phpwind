@@ -4,7 +4,7 @@ define('W_P',__FILE__ ? substr(__FILE__,0,-16) : '../');
 require_once(W_P.'global.php');
 if(preg_match('/(mozilla|m3gate|winwap|openwave)/i', $pwServer['HTTP_USER_AGENT'])) ObHeader($_mainUrl);
 require_once(R_P.'m/wap_mod.php');
-include_once(D_P.'data/bbscache/forum_cache.php');
+include_once pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
 
 if (!$db_wapifopen) {
 	wap_msg('wap_closed');
@@ -18,7 +18,7 @@ if ($db_charset != 'utf8') {
 }
 function forumcheck($fid,$type) {
 	global $db,$groupid,$_G,$fm;
-	$fm = $db->get_one("SELECT f.password,f.allowvisit,f.allowread,f.f_type,f.f_check,f.allowpost,f.allowrp,fe.* FROM pw_forums f LEFT JOIN pw_forumsextra fe ON f.fid=fe.fid WHERE f.fid=".pwEscape($fid));
+	$fm = $db->get_one("SELECT f.password,f.allowvisit,f.allowread,f.f_type,f.f_check,f.allowpost,f.allowrp,fe.* FROM pw_forums f LEFT JOIN pw_forumsextra fe ON f.fid=fe.fid WHERE f.fid=".S::sqlEscape($fid));
 	$forumset = unserialize($fm['forumset']);
 	$fm['rvrcneed'] = $forumset['rvrcneed'];
 	$fm['moneyneed'] = $forumset['moneyneed'];
@@ -40,13 +40,13 @@ function wap_check($fid,$action) {
 		wap_msg('content_limit');
 	}
 
-	$fm = $db->get_one("SELECT f.forumadmin,f.fupadmin,f.password,f.allowvisit,f.f_type,f.f_check,f.allowpost,f.allowrp,fe.forumset FROM pw_forums f LEFT JOIN pw_forumsextra fe USING(fid) WHERE f.fid=".pwEscape($fid));
+	$fm = $db->get_one("SELECT f.forumadmin,f.fupadmin,f.password,f.allowvisit,f.f_type,f.f_check,f.allowpost,f.allowrp,fe.forumset FROM pw_forums f LEFT JOIN pw_forumsextra fe USING(fid) WHERE f.fid=".S::sqlEscape($fid));
 	$forumset  = unserialize($fm['forumset']);
 	if (!$fm || $fm['password']!='' || $fm['f_type']=='hidden' || $fm['allowvisit'] && @strpos($fm['allowvisit'],",$groupid,")===false) {
 		wap_msg('post_right');
 	}
 	if ($action == 'new') {
-		$isGM = CkInArray($GLOBALS['windid'],$GLOBALS['manager']);
+		$isGM = S::inArray($GLOBALS['windid'],$GLOBALS['manager']);
 		$isBM = admincheck($fm['forumadmin'],$fm['fupadmin'],$GLOBALS['windid']);
 		if ($fm['f_check']=='1' || $fm['f_check']=='3') {
 			wap_msg('post_right');

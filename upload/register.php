@@ -9,8 +9,8 @@ $inv_config = L::config(null, 'inv_config');
 list($regminname,$regmaxname) = explode("\t", $rg_config['rg_namelen']);
 list($rg_regminpwd,$rg_regmaxpwd) = explode("\t", $rg_config['rg_pwdlen']);
 
-if (GetGP('vip') == 'activating') {
-	InitGP(array('r_uid','pwd'),'G');
+if (S::getGP('vip') == 'activating') {
+	S::gp(array('r_uid','pwd'),'G');
 	$r_uid = (int)$r_uid;
 	
 	$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
@@ -26,13 +26,13 @@ if (GetGP('vip') == 'activating') {
 if ($db_pptifopen && $db_ppttype == 'client') {
 	Showmsg('passport_register');
 }
-list($regq, , , ,$showq) = explode("\t", $db_qcheck);
-if (GetGP('action','P') == 'regcheck') {
-	InitGP(array('type'),'P');
+list(,$showq) = explode("\t", $db_qcheck);
+if (S::getGP('action','P') == 'regcheck') {
+	S::gp(array('type'),'P');
 
 	if ($type == 'regname') {
 		L::loadClass('register', 'user', false);
-		InitGP('username','P');
+		S::gp('username','P');
 
 		if (!PW_Register::checkNameLen(strlen($username))) {
 			echo 1;
@@ -66,7 +66,7 @@ if (GetGP('action','P') == 'regcheck') {
 		}
 	} elseif ($type == 'regemail') {
 		sleep(1);
-		InitGP('email','P');
+		S::gp('email','P');
 		if (!$email || !preg_match("/\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/i", $email)) {
 			echo 1;
 			ajax_footer();
@@ -110,26 +110,26 @@ if (GetGP('action','P') == 'regcheck') {
 			echo 0;
 		}
 	} elseif ($type == 'reggdcode') {
-		InitGP('gdcode','P');
-		if (!$gdcode || !SafeCheck(explode("\t",StrCode(GetCookie('cknum'),'DECODE')),strtoupper($gdcode),'cknum',1800)) {
+		S::gp('gdcode','P');
+		if (!$gdcode || !SafeCheck(explode("\t",StrCode(GetCookie('cknum'),'DECODE')),strtoupper($gdcode),'cknum',1800,false,false)) {
 			echo 1;
 		} else {
 			echo 0;
 		}
 	} elseif ($type == 'qanswer') {
-		InitGP(array('answer','question'),'P');
-		if ($db_question && (!isset($db_answer[$question]) || $answer != $db_answer[$question])) {
+		S::gp(array('answer','question'),'P');
+		if (!$question || ( $question > 0 && $answer != $db_answer[$question]) || ($question < 0 && !SafeCheck(explode("\t", StrCode(GetCookie('ckquestion'), 'DECODE')), $answer, 'ckquestion', 1800,false,false))) {
 			echo 1;
 		} else {
 			echo 0;
 		}
 	} elseif ($type == 'invcode') {
-		InitGP('invcode','P');
+		S::gp('invcode','P');
 		if (empty($invcode)) {
 			echo 1;
 		} else {
 			$inv_config['inv_days'] *= 86400;
-			$inv = $db->get_one("SELECT id FROM pw_invitecode WHERE invcode=" . pwEscape($invcode) . " AND ifused<'2' AND createtime>" . pwEscape($timestamp - $inv_config['inv_days']));
+			$inv = $db->get_one("SELECT id FROM pw_invitecode WHERE invcode=" . S::sqlEscape($invcode) . " AND ifused<'2' AND createtime>" . S::sqlEscape($timestamp - $inv_config['inv_days']));
 			if (!$inv) {
 				echo 2;
 			} else {
@@ -139,19 +139,45 @@ if (GetGP('action','P') == 'regcheck') {
 	}
 	ajax_footer();
 
-} elseif (GetGP('action','P') == 'pay') {
+} elseif (S::getGP('action','P') == 'pay') {
 
-	include_once(D_P."data/bbscache/inv_config.php");
-	include_once(D_P.'data/bbscache/ol_config.php');
+	include_once pwCache::getPath(D_P."data/bbscache/inv_config.php");
+	include_once pwCache::getPath(D_P.'data/bbscache/ol_config.php');
 	if ($_POST['step'] == '3') {
-		InitGP(array('invnum','email'));
+		S::gp(array('invnum','email'));
 		if (!is_numeric($invnum) ||$invnum<1) $invnum = 1;
 		$order_no =str_pad('0',10,"0",STR_PAD_LEFT).get_date($timestamp,'YmdHis').num_rand(5);
 		$rt = array();
-		if (!preg_match('/^[a-z0-9\-_\.]{2,}@([a-z\-0-9]+\.)+[a-z]{2,3}$/i', $email) ){
-			Showmsg('邮箱地址格式有误，请重新填写!');
+	if ($rg_config['rg_emailtype'] == 1 && $rg_config['rg_email']) {
+			$e_check = 0;
+			$e_limit = explode(',', $rg_config['rg_email']);
+			foreach ($e_limit as $key => $val) {
+				if (strpos($email,"@".$val) !== false) {
+					$e_check = 1;
+					break;
+				}
+			}
+			if ($e_check == 0){
+				Showmsg('电子邮箱不是系统指定的邮箱地址，不能注册!');
+			}
 		}
-		$db->update("INSERT INTO pw_clientorder SET " . pwSqlSingle(array(
+		if ($rg_config['rg_emailtype'] == 2 && $rg_config['rg_banemail']){
+			$e_check = 0;
+			$e_limit = explode(',', $rg_config['rg_banemail']);
+			foreach ($e_limit as $key => $val) {
+				if (strpos($email,"@".$val) !== false) {
+					$e_check = 1;
+					break;
+				}
+			}
+			if ($e_check == 1){
+				Showmsg('请输入正确的电子邮箱地址!');
+			}
+		}
+		if (!preg_match('/^[a-z0-9\-_\.]{2,}@([a-z\-0-9]+\.)+[a-z]{2,3}$/i', $email) ){
+			Showmsg('电子邮箱地址格式有误，请重新填写!');
+		}
+		$db->update("INSERT INTO pw_clientorder SET " . S::sqlSingle(array(
 			'order_no'	=> $order_no,
 			'type'		=> 4,
 			'uid'		=> 0,
@@ -173,14 +199,15 @@ if (GetGP('action','P') == 'regcheck') {
 if ($rg_config['rg_allowregister'] == 0 || ($rg_config['rg_registertype'] == 1 && date('j',$timestamp) != $rg_config['rg_regmon']) || ($rg_config['rg_registertype'] == 2 && date('w',$timestamp) != $rg_config['rg_regweek'])) {
 	Showmsg($rg_config['rg_whyregclose']);
 }
-InitGP(array('forward')); !$db_pptifopen && $forward = '';
-InitGP(array('invcode','step','action'));
+S::gp(array('forward')); !$db_pptifopen && $forward = '';
+S::gp(array('invcode','step','action'));
 
 if ($rg_config['rg_allowsameip'] && file_exists(D_P.'data/bbscache/ip_cache.php') && !in_array($step,array('finish','permit'))) {
 	$ipdata  = readover(D_P.'data/bbscache/ip_cache.php');
 	$pretime = (int)substr($ipdata,13,10);
 	if ($timestamp - $pretime > $rg_config['rg_allowsameip'] * 3600) {
-		P_unlink(D_P.'data/bbscache/ip_cache.php');
+		//* P_unlink(D_P.'data/bbscache/ip_cache.php');
+		pwCache::deleteData(D_P.'data/bbscache/ip_cache.php');
 	} elseif (strpos($ipdata,"<$onlineip>") !== false) {
 		Showmsg('reg_limit');
 	}
@@ -207,17 +234,18 @@ if (!$step && $step != 2) {
 } elseif ($step == 2) {
 
 
-	PostCheck(0, $db_gdcheck & 1, $regq, 0);
+	PostCheck(0, $db_gdcheck & 1, $db_ckquestion & 1 && $db_question, 0);
 	if ($_GET['method'] || (!($db_gdcheck & 1) && $_POST['gdcode']) ||
-		(!$regq && ($_POST['qanswer'] || $_POST['qkey']))/* ||
+		(!($db_ckquestion & 1) && ($_POST['qanswer'] || $_POST['qkey']))/* ||
 		($db_xforwardip && $_POST['_hexie'] != GetVerify($onlineip))*/
 	) {
 		Showmsg('undefined_action');
 	}
 
-	InitGP(array('regreason','regname','regpwd','regpwdrepeat','regemail','customdata', 'regemailtoall','rgpermit'),'P');
-	InitGP(array('question','customquest','answer'),'P');
-
+	S::gp(array('regreason','regname','regpwd','regpwdrepeat','regemail','customdata', 'regemailtoall','rgpermit'),'P');
+	S::gp(array('question','customquest','answer'),'P');
+	
+	!$rgpermit && Showmsg('reg_permit_notchecked');
 	$sRegpwd = $regpwd;
 	$register = L::loadClass('Register', 'user');
 	/** @var $register PW_Register */
@@ -248,17 +276,14 @@ if (!$step && $step != 2) {
 	//Cookie("ifregip",$onlineip,$iptime);
 	if ($rg_config['rg_allowsameip']) {
 		if (file_exists(D_P.'data/bbscache/ip_cache.php')) {
-			writeover(D_P.'data/bbscache/ip_cache.php',"<$onlineip>","ab");
+			pwCache::setData(D_P.'data/bbscache/ip_cache.php',"<$onlineip>", false, "ab");
 		} else {
-			writeover(D_P.'data/bbscache/ip_cache.php',"<?php die;?><$timestamp>\n<$onlineip>");
+			pwCache::setData(D_P.'data/bbscache/ip_cache.php',"<?php die;?><$timestamp>\n<$onlineip>");
 		}
 	}
 	//addonlinefile();
 	if (GetCookie('userads') && $inv_linkopen && $inv_linktype == '1') {
-		list($uid,$a) = explode("\t",GetCookie('userads'));
-		if (is_numeric($uid) || ($a && strlen($a)<16)) {
-			require_once(R_P.'require/userads.php');
-		}
+		require_once(R_P.'require/userads.php');
 	}
 	if (GetCookie('o_invite') && $db_modes['o']['ifopen'] == 1) {
 		list($o_u,$hash,$app) = explode("\t",GetCookie('o_invite'));
@@ -284,7 +309,7 @@ if (!$step && $step != 2) {
 	}
 
 	//发送邮件
-	@include_once(D_P.'data/bbscache/mail_config.php');
+	@include_once pwCache::getPath(D_P.'data/bbscache/mail_config.php');
 	if ($rg_config['rg_emailcheck']) {
 		$verifyhash = GetVerify();
 		$rgyz = md5($rgyz . substr(md5($db_sitehash),0,5) . substr(md5($regname),0,5));
@@ -315,8 +340,8 @@ if (!$step && $step != 2) {
 
 } elseif ($step == 'finish') {
 
-	InitGP(array('email'),'G');
-	InitGP(array('option'));
+	S::gp(array('email'),'G');
+	S::gp(array('option'));
 	if ($option != 'uploadicon') {
 		require_once(R_P.'require/header.php');
 		PostCheck();
@@ -359,7 +384,7 @@ if (!$step && $step != 2) {
 
 	if ($option == '2') {
 
-		InitGP(array('reghomepage','regfrom','regintroduce','regsign','regsex','regbirthyear','regbirthmonth','regbirthday','regoicq'),'P');
+		S::gp(array('reghomepage','regfrom','regintroduce','regsign','regsex','regbirthyear','regbirthmonth','regbirthday','regoicq'),'P');
 		$regsex = (int)$regsex;
 		$regsex = $regsex ? $regsex : "0";
 		$rgbirth = (!$regbirthyear || !$regbirthmonth || !$regbirthday) ? '0000-00-00' : $regbirthyear."-".$regbirthmonth."-".$regbirthday;
@@ -389,6 +414,13 @@ if (!$step && $step != 2) {
 
 		$userService->update($winduid, array('gender' => $regsex, 'bday' => $rgbirth, 'location' => $regfrom, 'oicq' => $regoicq, 'site' => $reghomepage, 'signature' => $regsign, 'introduce' => $regintroduce));
 
+		/* phpwind数据统计 */
+		if ($regsex > 0 || $rgbirth != '0000-00-00') {
+			$statistics = L::loadClass('Statistics', 'datanalyse');
+			$statistics->alertSexDistribution(0, $regsex);
+			$statistics->alertAgeDistribution(0, intval($regbirthyear));
+		}
+
 		//flash头像上传参数
 		if ($db_ifupload && $_G['upload']) {
 
@@ -407,7 +439,7 @@ if (!$step && $step != 2) {
 
 	} elseif ($option == '3') {
 
-		InitGP(array('proicon','facetype'),'P');
+		S::gp(array('proicon','facetype'),'P');
 		require_once(R_P.'require/showimg.php');
 
 		//user icon

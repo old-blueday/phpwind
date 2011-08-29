@@ -22,7 +22,7 @@ print <<<EOT
 -->
 				<li>
 					<dl class="friDl cc p10 mr10 mb10">
-						<dt class="fl mr10"><a href="u.php?uid=$value[uid]" class="img_50"><img src="$value[face]" width="48" height="48" /></a></dt>
+						<dt class="fl mr10"><a href="{$db_userurl}$value[uid]" class="img_50"><img src="$value[face]" width="48" height="48" /></a></dt>
 						<dd>
 							<div><!--
 EOT;
@@ -34,7 +34,7 @@ EOT;
 <!--
 EOT;
 }print <<<EOT
---><a href="u.php?uid=$value[uid]" class="b f14 mr5">$value[username]</a><!--
+--><a href="{$db_userurl}$value[uid]" class="b f14 mr5">$value[username]</a><!--
 EOT;
 if(checkOnline($value['thisvisit'])){
 print <<<EOT

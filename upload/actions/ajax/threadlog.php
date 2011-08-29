@@ -12,7 +12,7 @@ foreach ($threadlog as $key => $value) {
 	}
 }
 Cookie('threadlog', $fids);
-include_once (D_P . 'data/bbscache/forum_cache.php');
+include_once pwCache::getPath(D_P . 'data/bbscache/forum_cache.php');
 $threaddb = array();
 foreach ($forum as $key => $value) {
 	if (in_array($key, $threadlog)) {

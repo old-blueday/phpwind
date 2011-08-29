@@ -14,8 +14,25 @@ if (If_manager) {
 	$nav_left = array_merge(array('initiator' => array('name' => $nav_manager['name'],'items' => $nav_manager['items'])),$nav_left);
 }
 unset($nav_manager);
-$diyoptions = $db_diy ? explode(',',$db_diy) : array('setforum','setuser','level','postcache','article');
 
+isset($adskin) ? Cookie('adskin',$adskin) : $adskin = GetCookie('adskin');
+/*
+if (empty($adskin)) {
+	$modeNav = array();
+	$flag = false;
+	foreach ($nav_left as $key => $value) {
+		if ($flag) {
+			$modeNav[$key] = $value;
+			$nav_left[$key] = array();
+			unset($nav_left[$key]);
+		}
+		$key == 'modemanage' && $flag = true;
+	}
+	$nav_left['modemanage']['items'] += $modeNav;
+}
+*/
+
+$diyoptions = $db_diy ? explode(',',$db_diy) : array('setforum','setuser','level','postcache','article');
 $newopration = getHotOpration();
 
 $menu		= new MenuStart();
@@ -31,7 +48,23 @@ $hotjsstr	= $hotmenu->myStruct();
 $headjsstr	= headSerialize();
 $db_guideshow = ($db_guideshow === null ) ? 1 : (($db_guideshow == 1) ? 1 : 0);/*init*/
 $ajaxurl = EncodeUrl($db_adminfile."?adminjob=ajaxhandler");
-include PrintEot('windowindex');
+
+if ($adskin) {
+	include PrintEot('windowindex');
+} else {
+	$mainList = $minorList = array();
+	$flag = 0;
+	foreach ($nav_left as $key => $value) {
+		$key == 'modelist' && $flag = 1;
+		if (!isset($headdb[$key])) continue;
+		if ($flag) {
+			$minorList[$key] = $value;
+		} else {
+			$mainList[$key] = $value;
+		}
+	}
+	include PrintEot('indexlayout83');
+}
 exit();
 
 function getMenuTree($item,$array){
@@ -103,7 +136,7 @@ function addToHead($arr){
 	global $headdb;
 	!is_array($headdb) && $headdb = array();
 	if (is_array($arr)) {
-		$headdb[] = $arr;
+		$headdb[$arr['id']] = $arr;
 	}
 }
 

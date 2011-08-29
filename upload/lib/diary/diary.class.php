@@ -121,8 +121,14 @@ class PW_Diary {
 		$diaryData = $this->findUserDiarys($userId, $page, $perpage, $diaryTypeId, $privacy);
 		$diaryRt = array();
 		$diaryAttachsData = array();
+		$gid = $groupid;
+		if($userId != $winduid){
+			$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
+			$userInfo = $userService->get($userId);
+			$gid = $userInfo['groupid'];
+		}
 		foreach ($diaryData as $diary) {
-			$diary['groupid'] = $groupid;
+			$diary['groupid'] = $gid;
 			list($diary['subject'], $diary['content']) = $this->_getContentANDSubjectByDiary($diary, TRUE, TRUE);
 			$diaryAttachsData = $this->_getAttachs($diary['aid'], $diary['content'], $diary['uid']);
 			$diaryAttachsData && $diary = array_merge($diary, $diaryAttachsData);
@@ -182,6 +188,7 @@ class PW_Diary {
 			$data['content'] = stripWindCode($this->escapeStr($data['content']));
 			$o_shownum && $data['content'] = substrs($data['content'],$o_shownum);
 		}
+		$data['content'] = preg_replace('/\[upload=(\d+)\]/Ui', "", $data['content']);
 		$data['content'] = str_replace("\n","<br />",$data['content']);
 		$result = array($data['subject'],$data['content']);
 		return $result;
@@ -229,7 +236,7 @@ class PW_Diary {
 			$atype = '';
 			$rat = array();
 			if ($at['type'] == 'img') {
-				$a_url = geturl('diary/'.$at['attachurl'],'show');
+				$a_url = geturl($at['attachurl'],'show');
 
 				if (is_array($a_url)) {
 					$atype = 'pic';
@@ -454,6 +461,15 @@ class PW_Diary {
 		return preg_replace('/(&nbsp;){1,}/', ' ', $str);
 	}
 	
+	function updateDiaryContentByAttach($did, $uploadIds) {
+		if (!$uploadIds) return false;
+		$diaryContent = $this->get($did);
+		if (!$diaryContent) return false;
+		foreach ($uploadIds as $key => $value) {
+			$diaryContent['content'] = str_replace("[upload=$key]", "[attachment=$value]", $diaryContent['content']);
+		}
+		$this->update(array('content' => $diaryContent['content']), $did);
+	}
 	/**
 	 * Get PW_DiaryDB
 	 *

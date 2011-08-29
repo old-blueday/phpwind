@@ -59,7 +59,7 @@ EOT;
 foreach ($commentdb as $key => $comment) {print <<<EOT
 -->
 								<dl class="cc dl" id="comment_{$comment[id]}">
-									<dt class="dt"><a href="u.php?uid=$comment[uid]" class="img_50"><img src="$comment[face]" width="44" height="44" /></a></dt>
+									<dt class="dt"><a href="{$db_userurl}$comment[uid]" class="img_50"><img src="$comment[face]" width="44" height="44" /></a></dt>
 									<dd class="dd">
 <!--
 EOT;
@@ -70,7 +70,7 @@ if ($comment[uid]==$winduid || $winduid==$u || $groupid==3) { print <<<EOT
 EOT;
 } print <<<EOT
 -->
-									<p class="title"><a href="u.php?uid=$comment[uid]" class="mr5">$comment[username]</a>：$comment[title] </p>
+									<p class="title"><a href="{$db_userurl}$comment[uid]" class="mr5">$comment[username]</a>：$comment[title] </p>
 									<cite class="gray">$comment[postdate]</cite> - 
 <!--
 EOT;
@@ -88,7 +88,7 @@ EOT;
 foreach ($subcommentdb[$comment['id']] as $k => $subcomment) {print <<<EOT
 -->
 											<dl class="cc dl2" id="comment_{$subcomment[id]}">
-												<dt><a href="u.php?uid=$subcomment[uid]"><img src="$subcomment[face]" width="30" height="30" /></a></dt>
+												<dt><a href="{$db_userurl}$subcomment[uid]"><img src="$subcomment[face]" width="30" height="30" /></a></dt>
 												<dd>
 <!--
 EOT;
@@ -99,7 +99,7 @@ if ($subcomment['uid'] == $winduid || $groupid == 3) {print <<<EOT
 EOT;
 }print <<<EOT
 -->
-											<p class="mb5 f14"><a href="u.php?uid=$subcomment[uid]" class="mr5">$subcomment[username]</a>：$subcomment[title]</p>
+											<p class="mb5 f14"><a href="{$db_userurl}$subcomment[uid]" class="mr5">$subcomment[username]</a>：$subcomment[title]</p>
 											<cite class="gray">$subcomment[postdate]</cite>
 											</dd>
 											</dl>	

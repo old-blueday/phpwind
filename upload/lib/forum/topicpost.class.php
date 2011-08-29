@@ -62,7 +62,8 @@ class topicPost {
 	function execute(&$postdata) {
 		global $timestamp, $db_ptable, $onlineip;
 		$this->setPostData($postdata);
-		$pwSQL = pwSqlSingle(array(
+		/*
+		$pwSQL = S::sqlSingle(array(
 			'fid' => $this->data['fid'],
 			'icon' => $this->data['icon'],
 			'author' => $this->data['author'],
@@ -87,12 +88,41 @@ class topicPost {
 			'ifhide' => $this->data['hideatt'],
 			'tpcstatus' => $this->data['tpcstatus'],
 			'modelid' => $this->data['modelid']
-		));
-		$this->db->update("INSERT INTO pw_threads SET $pwSQL");
+		));*/
+		//$this->db->update("INSERT INTO pw_threads SET $pwSQL");
+		$pwSQL = array(
+			'fid' => $this->data['fid'],
+			'icon' => $this->data['icon'],
+			'author' => $this->data['author'],
+			'authorid' => $this->data['authorid'],
+			'subject' => $this->data['title'],
+			'ifcheck' => $this->data['ifcheck'],
+			'type' => $this->data['w_type'],
+			'postdate' => $timestamp,
+			'lastpost' => $timestamp,
+			'lastposter' => $this->data['lastposter'],
+			'hits' => 1,
+			'replies' => 0,
+			'topped' => $this->data['topped'],
+			'digest' => $this->data['digest'],
+			'special ' => $this->data['special'],
+			'state' => 0,
+			'ifupload' => $this->data['ifupload'],
+			'ifmail' => $this->data['ifmail'],
+			'anonymous' => $this->data['anonymous'],
+			'ptable' => $db_ptable,
+			'ifmagic' => $this->data['ifmagic'],
+			'ifhide' => $this->data['hideatt'],
+			'tpcstatus' => $this->data['tpcstatus'],
+			'modelid' => $this->data['modelid']
+		);
+		pwQuery::insert('pw_threads', $pwSQL);
 		$this->tid = $this->db->insert_id();
 		# memcache refresh
-		$threadList = L::loadClass("threadlist", 'forum');
-		$threadList->updateThreadIdsByForumId($this->data['fid'], $this->tid);
+		// $threadList = L::loadClass("threadlist", 'forum');
+		// $threadList->updateThreadIdsByForumId($this->data['fid'], $this->tid);
+		//* Perf::gatherInfo('changeThreadWithForumIds', array('fid'=>$this->data['fid'])); //pwQuery::insert已经执行清理缓存
+		
 		$pw_tmsgs = GetTtable($this->tid);
 		
 		if (is_object($postdata->tag)) {
@@ -100,13 +130,17 @@ class topicPost {
 			$this->data['tags'] .= "\t" . $postdata->tag->relate($this->data['title'], $this->data['content']);
 		}
 		if (is_object($this->att) && ($aids = $this->att->getAids())) {
-			$this->att->pw_attachs->updateById($aids, array(
-				'tid' => $this->tid
-			));
+			$this->att->pw_attachs->updateById($aids, array('tid' => $this->tid));
+			if ($this->att->getUploadImgNum()) {
+				$this->db->update("INSERT INTO pw_threads_img SET " . S::sqlSingle(array(
+					'tid' => $this->tid,
+					'fid' => $this->data['fid']
+				)));
+			}
 		}
 		$ipTable = L::loadClass('IPTable', 'utility');
 		
-		$pwSQL = pwSqlSingle(array(
+		$pwSQL = S::sqlSingle(array(
 			'tid' => $this->tid,
 			'aid' => $this->data['aid'],
 			'userip' => $onlineip,
@@ -183,7 +217,7 @@ class topicPost {
 				if ($db_ifpwcache & 128) {
 					$elementupdate->newSubjectUpdate($this->tid, $this->forum->fid, $timestamp, $this->data['special']);
 				}
-				if (($db_ifpwcache & 512) && $this->att && $this->att->elementpic) {
+				if (($db_ifpwcache & 512) && $this->att && $this->att->elementpic && $this->_checkIfHidden()) {
 					$elementupdate->newPicUpdate($this->att->elementpic['aid'], $this->forum->fid, $this->tid, $this->att->elementpic['attachurl'], $this->att->elementpic['ifthumb'], $this->data['content']);
 				}
 				$elementupdate->updateSQL();
@@ -221,6 +255,17 @@ class topicPost {
 			$this->extraBehavior->topicCheck() && $right = true;
 		}
 		return $right;
+	 }
+
+	 function _checkIfHidden() {
+		if ($this->data['hideatt']) return false;
+		$patterns = array(
+			"/\[post\](.+?)\[\/post\]/eis",
+			"/\[hide=(.+?)\](.+?)\[\/hide\]/eis",
+			"/\[sell=(.+?)\](.+?)\[\/sell\]/eis"
+		);
+		$temp = preg_replace($patterns,'',$this->data['content']);
+		return $temp == $this->data['content'];
 	 }
 }
 ?>

@@ -1,7 +1,7 @@
 <?php
 !defined('P_W') && exit('Forbidden');
 
-initGP(array('job'),'GP');
+S::gp(array('job'),'GP');
 if (!$windid && !in_array($job,array('memberlist'))) {
 	Showmsg('not_login');
 }
@@ -32,7 +32,7 @@ if ($job == 'user_authentication') {//用户身份验证
 	}
 	ajax_footer();
 } elseif ($job == 'upload') {//附件上传
-	InitGP(array('actmid'),GP,2);
+	S::gp(array('actmid'),GP,2);
 	if ($_POST['step'] == 2){
 		L::loadClass('activityupload', 'upload', false);
 		require_once(R_P.'require/functions.php');
@@ -52,8 +52,8 @@ if ($job == 'user_authentication') {//用户身份验证
 
 } elseif ($job == 'delimg') {//删除附件
 
-		InitGP(array('tid','actmid','fieldid'),GP,2);
-		InitGP(array('attachment'),GP);
+		S::gp(array('tid','actmid','fieldid'),GP,2);
+		S::gp(array('attachment'),GP);
 		if (!$actmid || !$fieldid) {
 			echo 'fail';ajax_footer();
 		}
@@ -68,7 +68,7 @@ if ($job == 'user_authentication') {//用户身份验证
 				$tableName = getActivityValueTableNameByActmid($actmid, 0, 0);
 			}
 
-			$path = $db->get_value("SELECT $fieldname FROM $tableName WHERE tid=". pwEscape($tid));
+			$path = $db->get_value("SELECT $fieldname FROM $tableName WHERE tid=". S::sqlEscape($tid));
 			!$path && $path = $attachment;
 		} else {
 			$path = $attachment;
@@ -96,7 +96,7 @@ if ($job == 'user_authentication') {//用户身份验证
 		}
 
 		if ($tid) {
-			$db->update("UPDATE $tableName SET $fieldname='' WHERE tid=". pwEscape($tid));
+			$db->update("UPDATE $tableName SET $fieldname='' WHERE tid=". S::sqlEscape($tid));
 		}
 
 		echo 'success';
@@ -104,19 +104,19 @@ if ($job == 'user_authentication') {//用户身份验证
 
 } elseif ($job == 'recommend') {//推荐
 
-	InitGP(array('tid','actmid'),G,2);
-	if (!CkInArray($windid, $manager) && !$SYSTEM['recommendactive']) {
+	S::gp(array('tid','actmid'),G,2);
+	if (!S::inArray($windid, $manager) && !$SYSTEM['recommendactive']) {
 		echo "noright\t";
 	}
 	$defaultValueTableName = getActivityValueTableNameByActmid();
-	$rt = $db->get_one("SELECT recommend FROM $defaultValueTableName WHERE tid=".pwEscape($tid) . " AND actmid=" .pwEscape($actmid));
+	$rt = $db->get_one("SELECT recommend FROM $defaultValueTableName WHERE tid=".S::sqlEscape($tid) . " AND actmid=" .S::sqlEscape($actmid));
 	if ($rt) {
 		if ($rt['recommend'] == 1) {
 			$newrecommend = 0;
 		} else {
 			$newrecommend = 1;
 		}
-		$db->update("UPDATE $defaultValueTableName SET recommend=".pwEscape($newrecommend)." WHERE tid=".pwEscape($tid)." AND actmid=" .pwEscape($actmid));
+		$db->update("UPDATE $defaultValueTableName SET recommend=".S::sqlEscape($newrecommend)." WHERE tid=".S::sqlEscape($tid)." AND actmid=" .S::sqlEscape($actmid));
 
 		echo "success\t".$newrecommend;
 	} else {
@@ -126,7 +126,7 @@ if ($job == 'user_authentication') {//用户身份验证
 
 } elseif ($job == 'signup') {//报名
 
-	InitGP(array('tid','thelast','authorid','actmid'),GP,2);
+	S::gp(array('tid','thelast','authorid','actmid'),GP,2);
 
 	L::loadClass('ActivityForBbs', 'activity', false);
 	$postActForBbs = new PW_ActivityForBbs($data);
@@ -134,7 +134,7 @@ if ($job == 'user_authentication') {//用户身份验证
 	$data = array();
 
 	$defaultValueTableName = getActivityValueTableNameByActmid();
-		$defaultValue = $db->get_one("SELECT iscertified,iscancel,signupstarttime,signupendtime,endtime,minparticipant,maxparticipant,userlimit,fees,paymethod,batch_no,t.subject,t.authorid FROM $defaultValueTableName dv LEFT JOIN pw_threads t USING(tid) WHERE dv.tid=".pwEscape($tid));
+		$defaultValue = $db->get_one("SELECT iscertified,iscancel,signupstarttime,signupendtime,endtime,minparticipant,maxparticipant,userlimit,fees,paymethod,batch_no,t.subject,t.authorid FROM $defaultValueTableName dv LEFT JOIN pw_threads t USING(tid) WHERE dv.tid=".S::sqlEscape($tid));
 
 	if ($defaultValue['iscancel']) {//判断是否活动取消
 		Showmsg('act_signup_iscancel_error');
@@ -167,7 +167,7 @@ if ($job == 'user_authentication') {//用户身份验证
 		}
 
 		if (empty($_POST['step'])) {
-			$memberdb = $db->get_one("SELECT nickname,mobile FROM pw_activitymembers WHERE tid=".pwEscape($tid)."AND uid=".pwEscape($winduid). " AND fupid=0 AND isadditional=0 ORDER BY signuptime DESC" );
+			$memberdb = $db->get_one("SELECT nickname,mobile FROM pw_activitymembers WHERE tid=".S::sqlEscape($tid)."AND uid=".S::sqlEscape($winduid). " AND fupid=0 AND isadditional=0 ORDER BY signuptime DESC" );
 
 			$signupType = array();//报名人数类型
 			foreach ($feesdb as $key => $value) {
@@ -182,7 +182,7 @@ if ($job == 'user_authentication') {//用户身份验证
 			ajax_footer();
 		} elseif ($_POST['step'] == '2') {
 			PostCheck();
-			InitGP(array('signup','telephone','mobile','address','message','ifanonymous','nickname'));
+			S::gp(array('signup','telephone','mobile','address','message','ifanonymous','nickname'));
 
 			$totalsignupnums = 0;
 			$totalcash = 0;
@@ -223,17 +223,21 @@ if ($job == 'user_authentication') {//用户身份验证
 				'ifanonymous'	=> $ifanonymous,
 				'signuptime'	=> $timestamp
 			);
-			$db->update("INSERT INTO pw_activitymembers SET " . pwSqlSingle($sqlarray));
+			$db->update("INSERT INTO pw_activitymembers SET " . S::sqlSingle($sqlarray));
 			$actuid = $db->insert_id();
 			$nextto = 'signup';
-			$db->update("UPDATE $defaultValueTableName SET updatetime=".pwEscape($timestamp)." WHERE tid=".pwEscape($tid));//报名列表动态时间
+			$db->update("UPDATE $defaultValueTableName SET updatetime=".S::sqlEscape($timestamp)." WHERE tid=".S::sqlEscape($tid));//报名列表动态时间
 
 			$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
 			/*短消息通知 报名 发起人*/
 			$authorUserName = $userService->getUserNameByUserId($authorid);
-			if (!$authorUserName) {
+			if (!$authorUserName) { 
 				Showmsg('user_not_exists');
 			}
+			//版块信息、创建时间/
+			$threadInfo = $db->get_one("SELECT * FROM pw_threads WHERE tid=".S::sqlEscape($tid));
+			$createTime = get_date($threadInfo['postdate']);
+			require_once pwCache::getPath(D_P.'data/bbscache/forum_cache.php');
 			M::sendNotice(
 				array($authorUserName),
 				array(
@@ -245,22 +249,27 @@ if ($job == 'user_authentication') {//用户身份验证
 							'username' => $windid,
 							'uid' => $winduid,
 							'tid' => $tid,
+							'fid' => $threadInfo['fid'],
+							'createtime' =>$createTime,
+							'fname' => $forum[$threadInfo['fid']]['name'],
 							'subject' => $defaultValue['subject']
 						)
 					),
 				),'notice_active','notice_active'
 			);
+			
+			
 			Showmsg('act_signup_nextstep');
 		}
 	} elseif ($thelast == 1) {
-		InitGP(array('totalsignupnums','totalcash','actuid'));
+		S::gp(array('totalsignupnums','totalcash','actuid'));
 		$fees = '';
 		foreach ($feesdb as $value) {
 			$fees .= ($fees ? '，' : '') .$value['money'] . getLangInfo('other','act_RMB') . '/' . $value['condition'];
 		}
 		!$fees && $fees = getLangInfo('other','act_free');
 
-		$signupdetail = $db->get_value("SELECT signupdetail FROM pw_activitymembers WHERE actuid=".pwEscape($actuid));
+		$signupdetail = $db->get_value("SELECT signupdetail FROM pw_activitymembers WHERE actuid=".S::sqlEscape($actuid));
 		$signupnumsdb = unserialize($signupdetail);//报名人数
 		$signupdetail = '';
 		foreach ($signupnumsdb as $key => $value) {
@@ -269,7 +278,7 @@ if ($job == 'user_authentication') {//用户身份验证
 		require_once PrintEot('ajax');ajax_footer();
 	}
 } elseif ($job == 'memberlist') {//展示报名信息列表
-	InitGP(array('page','tid','fid','authorid','paymethod','actmid'),GP,2);
+	S::gp(array('page','tid','fid','authorid','paymethod','actmid'),GP,2);
 
 	L::loadClass('ActivityForBbs', 'activity', false);
 	$postActForBbs = new PW_ActivityForBbs($data);
@@ -280,7 +289,7 @@ if ($job == 'user_authentication') {//用户身份验证
 	$db_perpage = 20;
 
 	$count = $payMemberNums = $orderMemberNums = 0;
-	$query = $db->query("SELECT signupnum,ifpay FROM pw_activitymembers WHERE fupid=0 AND tid=".pwEscape($tid));
+	$query = $db->query("SELECT signupnum,ifpay FROM pw_activitymembers WHERE fupid=0 AND tid=".S::sqlEscape($tid));
 	while ($rt = $db->fetch_array($query)) {
 		if ($rt['ifpay'] != 3) {//费用关闭的不算
 			$orderMemberNums += $rt['signupnum'];//已报名人数
@@ -298,11 +307,11 @@ if ($job == 'user_authentication') {//用户身份验证
 			$page = $numofpage;
 		}
 		$start = ($page-1)*$db_perpage;
-		$limit = pwLimit($start,$db_perpage);
+		$limit = S::sqlLimit($start,$db_perpage);
 		$pages = numofpage($count, $page, $numofpage, "pw_ajax.php?action=$action&job=$job&tid=$tid&paymethod=$paymethod&", null, 'ajaxview');
 
 		$defaultValueTableName = getActivityValueTableNameByActmid();
-		$defaultValue = $db->get_one("SELECT fees,endtime,iscancel FROM $defaultValueTableName WHERE tid=".pwEscape($tid));
+		$defaultValue = $db->get_one("SELECT fees,endtime,iscancel FROM $defaultValueTableName WHERE tid=".S::sqlEscape($tid));
 		$feesdb = unserialize($defaultValue['fees']);
 		$isFree = count($feesdb) > 0 ? false : true;//判断该活动是否免费
 
@@ -310,9 +319,9 @@ if ($job == 'user_authentication') {//用户身份验证
 		$endtimeStatus = $defaultValue['endtime'] + 30*86400 - $timestamp;//结束时间后一个月,>0 则可以操作,< 0无法操作
 
 		$memberlistdb = $addmemberlistdb = $refundmemberlistdb = array();
-		$query = $db->query("SELECT * FROM pw_activitymembers WHERE fupid=0 AND tid=".pwEscape($tid)." ORDER BY (uid=".pwEscape($winduid).") DESC,ifpay ASC,actuid DESC $limit");//正常报名
+		$query = $db->query("SELECT * FROM pw_activitymembers WHERE fupid=0 AND tid=".S::sqlEscape($tid)." ORDER BY (uid=".S::sqlEscape($winduid).") DESC,ifpay ASC,actuid DESC $limit");//正常报名
 		while ($rt = $db->fetch_array($query)) {
-			$rt['signuptime'] = get_date($rt['signuptime'],'Y-n-j H:i:s');
+			$rt['signuptime'] = get_date($rt['signuptime'],'n-j H:i');
 			if ($rt['signupdetail']) {
 				$rt['signupdetail'] = unserialize($rt['signupdetail']);
 				foreach ($rt['signupdetail'] as $key => $value) {
@@ -325,12 +334,12 @@ if ($job == 'user_authentication') {//用户身份验证
 		if ($paymethod == 1 && $memberlistdb) {
 			$query = $db->query("SELECT * FROM pw_activitymembers WHERE isadditional=1 ORDER BY ifpay ASC,actuid DESC");//追加数组
 			while ($rt = $db->fetch_array($query)) {
-				$rt['signuptime'] = get_date($rt['signuptime'],'Y-n-j H:i:s');
+				$rt['signuptime'] = get_date($rt['signuptime'],'n-j H:i');
 				$addmemberlistdb[$rt['fupid']][] = $rt;
 			}
 			$query = $db->query("SELECT * FROM pw_activitymembers WHERE isrefund=1 ORDER BY actuid DESC");
 			while ($rt = $db->fetch_array($query)) {
-				$rt['signuptime'] = get_date($rt['signuptime'],'Y-n-j H:i:s');
+				$rt['signuptime'] = get_date($rt['signuptime'],'n-j H:i');
 				$refundmemberlistdb[$rt['fupid']][] = $rt;
 			}
 			
@@ -351,7 +360,7 @@ if ($job == 'user_authentication') {//用户身份验证
 		
 	require_once PrintEot('ajax');ajax_footer();
 } elseif ($job == 'detailshow') {//展示报名信息（详情）
-		InitGP(array('actuid','authorid','tid','paymethod','actmid'),GP,2);
+		S::gp(array('actuid','authorid','tid','paymethod','actmid'),GP,2);
 		$data = array();
 
 		L::loadClass('ActivityForBbs', 'activity', false);
@@ -359,12 +368,12 @@ if ($job == 'user_authentication') {//用户身份验证
 
 		$isAdminright = $postActForBbs->getAdminRight($authorid);
 
-		$detailinfo = $db->get_one("SELECT * FROM pw_activitymembers WHERE actuid=".pwEscape($actuid));
+		$detailinfo = $db->get_one("SELECT * FROM pw_activitymembers WHERE actuid=".S::sqlEscape($actuid));
 		if ($detailinfo['isrefund'] || $detailinfo['isadditional']  || $detailinfo['ifanonymous'] && !$isAdminright && $detailinfo['uid'] != $winduid) {//追加的无法查看、退款的无法查看、匿名但没有权限的无法查看
 			Showmsg('act_detailshow_error');
 		}
 		$defaultValueTableName = getActivityValueTableNameByActmid();
-		$defaultValue = $db->get_one("SELECT fees,endtime FROM $defaultValueTableName WHERE tid=".pwEscape($tid));
+		$defaultValue = $db->get_one("SELECT fees,endtime FROM $defaultValueTableName WHERE tid=".S::sqlEscape($tid));
 		$endtimeStatus = $defaultValue['endtime'] + 30*86400 - $timestamp;//结束时间后一个月,>0 则可以操作,< 0无法操作
 		$feesdb = unserialize($defaultValue['fees']);
 		$isFree = count($feesdb) > 0 ? false : true;//判断该活动是否免费
@@ -375,7 +384,7 @@ if ($job == 'user_authentication') {//用户身份验证
 		
 		if ($paymethod == 1) {
 			$addmemberlistdb = $refundfupdb = array();
-			$query = $db->query("SELECT actuid,totalcash,ifpay,refundcost FROM pw_activitymembers WHERE isadditional=1 AND fupid=".pwEscape($detailinfo['actuid']));
+			$query = $db->query("SELECT actuid,totalcash,ifpay,refundcost FROM pw_activitymembers WHERE isadditional=1 AND fupid=".S::sqlEscape($detailinfo['actuid']));
 			while ($rt = $db->fetch_array($query)) {
 				$addmemberlistdb[] = $rt;
 				if ($rt['refundcost']) {
@@ -386,7 +395,7 @@ if ($job == 'user_authentication') {//用户身份验证
 			}
 			if ($refundfupdb) {
 				$refundmemberlistdb = array();
-				$query = $db->query("SELECT actuid,totalcash,ifpay FROM pw_activitymembers WHERE isrefund=1 AND fupid IN(".pwImplode($refundfupdb).")");
+				$query = $db->query("SELECT actuid,totalcash,ifpay FROM pw_activitymembers WHERE isrefund=1 AND fupid IN(".S::sqlImplode($refundfupdb).")");
 				while ($rt = $db->fetch_array($query)) {
 					$refundmemberlistdb[] = $rt;
 				}
@@ -395,22 +404,22 @@ if ($job == 'user_authentication') {//用户身份验证
 		
 		require_once PrintEot('ajax');ajax_footer();
 } elseif ($job == 'modify') {//修改报名信息
-		InitGP(array('actmid','actuid','tid'),GP,2);
+		S::gp(array('actmid','actuid','tid'),GP,2);
 
 		$defaultValueTableName = getActivityValueTableNameByActmid();
-		$defaultValue = $db->get_one("SELECT signupstarttime,signupendtime,endtime,minparticipant,maxparticipant,userlimit,fees,paymethod FROM $defaultValueTableName WHERE tid=".pwEscape($tid));
+		$defaultValue = $db->get_one("SELECT signupstarttime,signupendtime,endtime,minparticipant,maxparticipant,userlimit,fees,paymethod FROM $defaultValueTableName WHERE tid=".S::sqlEscape($tid));
 
 		$feesdb = unserialize($defaultValue['fees']);//费用
 		$paymethod = $defaultValue['paymethod'];//支付方式
 
 		//已报名人数
-		$orderMemberNums = $db->get_value("SELECT SUM(signupnum) as sum FROM pw_activitymembers WHERE tid=".pwEscape($tid)." AND fupid=0 AND ifpay IN('0','1','2','4')");
+		$orderMemberNums = $db->get_value("SELECT SUM(signupnum) as sum FROM pw_activitymembers WHERE tid=".S::sqlEscape($tid)." AND fupid=0 AND ifpay IN('0','1','2','4')");
 
 		if (empty($_POST['step'])) {
 
 			$defaultValue['endtime'] + 30*86400 < $timestamp && Showmsg('act_modify_error');//活动结束超过30天无法修改
 
-			$signupinfo = $db->get_one("SELECT * FROM pw_activitymembers WHERE actuid=".pwEscape($actuid)." AND uid=".pwEscape($winduid));
+			$signupinfo = $db->get_one("SELECT * FROM pw_activitymembers WHERE actuid=".S::sqlEscape($actuid)." AND uid=".S::sqlEscape($winduid));
 			if ($signupinfo['isrefund'] || $signupinfo['isadditional']  || !$signupinfo) {//追加的无法修改、退款的无法修改、报名信息不存在
 				Showmsg('act_modify_error');
 			}
@@ -427,8 +436,8 @@ if ($job == 'user_authentication') {//用户身份验证
 			require_once PrintEot('ajax');ajax_footer();
 		} elseif ($_POST['step'] == '2') {
 			PostCheck();
-			InitGP(array('ownernums'),P,2);
-			InitGP(array('signup','telephone','mobile','address','message','ifanonymous','nickname'),P);
+			S::gp(array('ownernums'),P,2);
+			S::gp(array('signup','telephone','mobile','address','message','ifanonymous','nickname'),P);
 
 			$totalsignupnums = 0;
 			$totalcash = 0;
@@ -465,21 +474,21 @@ if ($job == 'user_authentication') {//用户身份验证
 				'ifanonymous'	=> $ifanonymous
 			);
 
-			$db->update("UPDATE pw_activitymembers SET " . pwSqlSingle($sqlarray)." WHERE actuid=".pwEscape($actuid)." AND uid=".pwEscape($winduid));
-			$db->update("UPDATE $defaultValueTableName SET updatetime=".pwEscape($timestamp)." WHERE tid=".pwEscape($tid));//报名列表动态时间
+			$db->update("UPDATE pw_activitymembers SET " . S::sqlSingle($sqlarray)." WHERE actuid=".S::sqlEscape($actuid)." AND uid=".S::sqlEscape($winduid));
+			$db->update("UPDATE $defaultValueTableName SET updatetime=".S::sqlEscape($timestamp)." WHERE tid=".S::sqlEscape($tid));//报名列表动态时间
 
 			echo "success";
 			ajax_footer();
 		}
 } elseif ($job == 'close') {//关闭报名信息
-	InitGP(array('actuid','paymethod','tid'),GP,2);
+	S::gp(array('actuid','paymethod','tid'),GP,2);
 
-	$memberdb = $db->get_one("SELECT am.ifpay,am.uid,am.username,am.tid,am.isadditional,am.isrefund,t.subject,t.authorid,t.author FROM pw_activitymembers am LEFT JOIN pw_threads t ON am.tid=t.tid WHERE actuid=".pwEscape($actuid));
+	$memberdb = $db->get_one("SELECT am.ifpay,am.uid,am.username,am.tid,am.isadditional,am.isrefund,t.subject,t.authorid,t.author FROM pw_activitymembers am LEFT JOIN pw_threads t ON am.tid=t.tid WHERE actuid=".S::sqlEscape($actuid));
 	$isadditional = $memberdb['isadditional'];//是否追加
 
 	if (empty($_POST['step'])) {
 		$defaultValueTableName = getActivityValueTableNameByActmid();
-		$defaultValue = $db->get_one("SELECT endtime FROM $defaultValueTableName WHERE tid=".pwEscape($tid));
+		$defaultValue = $db->get_one("SELECT endtime FROM $defaultValueTableName WHERE tid=".S::sqlEscape($tid));
 		$defaultValue['endtime'] + 30*86400 < $timestamp && Showmsg('act_endtime_toolong');//结束时间后一个月,>0 则可以操作,< 0无法操作
 
 		$memberdb['ifpay'] != 0 && Showmsg('act_close_payment_error');//只有未支付状态下可以操作
@@ -496,9 +505,9 @@ if ($job == 'user_authentication') {//用户身份验证
 			echo $is_success;
 			ajax_footer();
 		} else {
-			$db->update("UPDATE pw_activitymembers SET ifpay=3 WHERE actuid=".pwEscape($actuid));//费用关闭
+			$db->update("UPDATE pw_activitymembers SET ifpay=3 WHERE actuid=".S::sqlEscape($actuid));//费用关闭
 			$defaultValueTableName = getActivityValueTableNameByActmid();
-			$db->update("UPDATE $defaultValueTableName SET updatetime=".pwEscape($timestamp)." WHERE tid=".pwEscape($tid));//报名列表动态时间
+			$db->update("UPDATE $defaultValueTableName SET updatetime=".S::sqlEscape($timestamp)." WHERE tid=".S::sqlEscape($tid));//报名列表动态时间
 			//现金支付
 			/*短消息通知 删除报名者 发起人*/
 			M::sendNotice(
@@ -541,14 +550,14 @@ if ($job == 'user_authentication') {//用户身份验证
 		}
 	}
 } elseif ($job == 'confirmpay') {//确认支付
-	InitGP(array('tid','actuid','authorid','actmid'),GP,2);
+	S::gp(array('tid','actuid','authorid','actmid'),GP,2);
 	
-	$memberdb = $db->get_one("SELECT am.ifpay,am.uid,am.username,am.tid,am.totalcash,am.isadditional,am.isrefund,t.subject,t.authorid,t.author FROM pw_activitymembers am LEFT JOIN pw_threads t ON am.tid=t.tid WHERE am.actuid=".pwEscape($actuid));
+	$memberdb = $db->get_one("SELECT am.ifpay,am.uid,am.username,am.tid,am.totalcash,am.isadditional,am.isrefund,t.subject,t.authorid,t.author FROM pw_activitymembers am LEFT JOIN pw_threads t ON am.tid=t.tid WHERE am.actuid=".S::sqlEscape($actuid));
 	$defaultValueTableName = getActivityValueTableNameByActmid();
 
 	if (empty($_POST['step'])) {
 		
-		$defaultValue = $db->get_one("SELECT endtime FROM $defaultValueTableName WHERE tid=".pwEscape($tid));
+		$defaultValue = $db->get_one("SELECT endtime FROM $defaultValueTableName WHERE tid=".S::sqlEscape($tid));
 		$defaultValue['endtime'] + 30*86400 < $timestamp && Showmsg('act_endtime_toolong');//结束时间后一个月,>0 则可以操作,< 0无法操作
 		$memberdb['ifpay'] != 0 && Showmsg('act_confirmpay_error');
 		$winduid != $memberdb['authorid'] && Showmsg('act_confirmpay_noright');//只有发起人可以操作
@@ -565,10 +574,10 @@ if ($job == 'user_authentication') {//用户身份验证
 			$alipayPush->query_aa_detail_payment($tid,$actuid);
 			/*查询订单状态*/
 		}
-		$ifpay = $db->get_value("SELECT ifpay FROM pw_activitymembers WHERE actuid=".pwEscape($actuid));
+		$ifpay = $db->get_value("SELECT ifpay FROM pw_activitymembers WHERE actuid=".S::sqlEscape($actuid));
 		if ($ifpay == 0) {
-			$db->update("UPDATE pw_activitymembers SET ifpay=2 WHERE actuid=".pwEscape($actuid));//线下支付的ifpay=2
-			$db->update("UPDATE $defaultValueTableName SET updatetime=".pwEscape($timestamp)." WHERE tid=".pwEscape($tid));//报名列表动态时间
+			$db->update("UPDATE pw_activitymembers SET ifpay=2 WHERE actuid=".S::sqlEscape($actuid));//线下支付的ifpay=2
+			$db->update("UPDATE $defaultValueTableName SET updatetime=".S::sqlEscape($timestamp)." WHERE tid=".S::sqlEscape($tid));//报名列表动态时间
 		}
 
 		/*支付成功费用流通日志*/
@@ -630,14 +639,14 @@ if ($job == 'user_authentication') {//用户身份验证
 		ajax_footer();
 	}
 } elseif ($job == 'toalipay') {//去支付宝付款
-	InitGP(array('actuid','tid','actmid','signuper'),GP,2);
+	S::gp(array('actuid','tid','actmid','signuper'),GP,2);
 	if (empty($_POST['step'])) {
 		L::loadClass('ActivityForBbs', 'activity', false);
 		$postActForBbs = new PW_ActivityForBbs($data);
 
 		$data = array();
 
-		$memberdb = $db->get_one("SELECT am.ifpay,am.isrefund,am.uid,am.ifanonymous,t.authorid FROM pw_activitymembers am LEFT JOIN pw_threads t USING(tid) WHERE am.actuid=".pwEscape($actuid));
+		$memberdb = $db->get_one("SELECT am.ifpay,am.isrefund,am.uid,am.ifanonymous,t.authorid FROM pw_activitymembers am LEFT JOIN pw_threads t USING(tid) WHERE am.actuid=".S::sqlEscape($actuid));
 		$memberdb['authorid'] == $winduid && Showmsg('act_toalipay_authorid');//发起人无法替别人支付
 		$isAdminright = $postActForBbs->getAdminRight($memberdb['authorid']);
 		if ($memberdb['isrefund'] || $memberdb['ifanonymous'] && !$isAdminright && $memberdb['uid'] != $winduid) {//退款的无法支付、匿名但没有权限的无法支付
@@ -660,7 +669,7 @@ if ($job == 'user_authentication') {//用户身份验证
 			
 		$fromuid = $signuper == $winduid ? '-1' : $winduid;
 		$defaultValueTableName = getActivityValueTableNameByActmid();
-		$defaultValue = $db->get_one("SELECT dt.fees,dt.paymethod,dt.iscancel,dt.endtime,am.signupdetail,am.ifpay,am.totalcash,am.additionalreason FROM $defaultValueTableName dt LEFT JOIN pw_activitymembers am USING(tid) WHERE am.tid=".pwEscape($tid)." AND am.actuid=".pwEscape($actuid));
+		$defaultValue = $db->get_one("SELECT dt.fees,dt.paymethod,dt.iscancel,dt.endtime,am.signupdetail,am.ifpay,am.totalcash,am.additionalreason FROM $defaultValueTableName dt LEFT JOIN pw_activitymembers am USING(tid) WHERE am.tid=".S::sqlEscape($tid)." AND am.actuid=".S::sqlEscape($actuid));
 		$additionalreason = $defaultValue['additionalreason'];
 
 		!$defaultValue && Showmsg('undefined_action');//交易不存在
@@ -674,7 +683,7 @@ if ($job == 'user_authentication') {//用户身份验证
 		foreach ($feesdb as $value) {
 			$fees .= ($fees ? '，' : '') .$value['money'] . getLangInfo('other','act_RMB') . '/'.$value['condition'];
 		}
-		$signupdetail = $db->get_value("SELECT signupdetail FROM pw_activitymembers WHERE actuid=".pwEscape($actuid));
+		$signupdetail = $db->get_value("SELECT signupdetail FROM pw_activitymembers WHERE actuid=".S::sqlEscape($actuid));
 		if ($signupdetail) {
 			$signupnumsdb = unserialize($signupdetail);//报名人数
 			$signupdetail = '';
@@ -688,7 +697,7 @@ if ($job == 'user_authentication') {//用户身份验证
 	}
 	require_once PrintEot('ajax');ajax_footer();
 } elseif ($job == 'sendmsg') {//群发短消息
-		InitGP(array('tid','actmid','authorid'));
+		S::gp(array('tid','actmid','authorid'));
 		$data = array();
 
 		L::loadClass('ActivityForBbs', 'activity', false);
@@ -698,13 +707,13 @@ if ($job == 'user_authentication') {//用户身份验证
 		$isAdminright != 1 && Showmsg('act_sendmsg_noright');		
 
 		if (empty($_POST['step'])) {
-			$tid = $db->get_value("SELECT tid FROM pw_activitymembers WHERE tid=".pwEscape($tid));
+			$tid = $db->get_value("SELECT tid FROM pw_activitymembers WHERE tid=".S::sqlEscape($tid));
 			!$tid && Showmsg('act_sendmsg_fail');
 
 			require_once PrintEot('ajax');ajax_footer();
 		} elseif ($_POST['step'] == 2) {
 			PostCheck();
-			InitGP(array('subject','atc_content','tid','ifsave'));
+			S::gp(array('subject','atc_content','tid','ifsave'));
 			require_once(R_P.'require/common.php');
 
 			$msg_title   = trim($subject);
@@ -723,12 +732,12 @@ if ($job == 'user_authentication') {//用户身份验证
 				Showmsg('content_wordsfb');
 			}
 
-			$query = $db->query("SELECT uid FROM pw_activitymembers WHERE tid=".pwEscape($tid)." GROUP BY uid");
+			$query = $db->query("SELECT uid FROM pw_activitymembers WHERE tid=".S::sqlEscape($tid)." GROUP BY uid");
 			while ($rt = $db->fetch_array($query)) {
 				$uiddb[] = $rt['uid'];
 			}
 			$ifuids = $sqladd = $msglog = array();
-			$uids = pwImplode($uiddb);
+			$uids = S::sqlImplode($uiddb);
 			if ($uids) {
 				$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
 				$userNames = $userService->getUserNamesByUserIds($uids);
@@ -747,8 +756,8 @@ if ($job == 'user_authentication') {//用户身份验证
 			Showmsg('send_success');
 		}
 } elseif ($job == 'refund') {//退款
-	InitGP(array('actuid','actmid','tid','authorid','thelast'),GP,2);
-	$memberdb = $db->get_one("SELECT am.ifpay,am.isrefund,am.username,am.totalcash,t.authorid FROM pw_activitymembers am LEFT JOIN pw_threads t USING(tid) WHERE am.actuid=".pwEscape($actuid));
+	S::gp(array('actuid','actmid','tid','authorid','thelast'),GP,2);
+	$memberdb = $db->get_one("SELECT am.ifpay,am.isrefund,am.username,am.totalcash,t.authorid FROM pw_activitymembers am LEFT JOIN pw_threads t USING(tid) WHERE am.actuid=".S::sqlEscape($actuid));
 	if ($memberdb['isrefund'] || $memberdb['authorid'] != $winduid) {//退款交易无法操作、不是发起人无法操作
 		Showmsg('act_refund_noright');
 	}
@@ -756,7 +765,7 @@ if ($job == 'user_authentication') {//用户身份验证
 
 	if ($thelast != 1) {
 		$defaultValueTableName = getActivityValueTableNameByActmid();
-		$defaultValue = $db->get_one("SELECT paymethod,endtime,fees FROM $defaultValueTableName WHERE tid=".pwEscape($tid));
+		$defaultValue = $db->get_one("SELECT paymethod,endtime,fees FROM $defaultValueTableName WHERE tid=".S::sqlEscape($tid));
 		$feesdb = unserialize($defaultValue['fees']);//费用
 		$isFree = count($feesdb) > 0 ? false : true;//判断该活动是否免费
 		$isFree && Showmsg('act_refund_free');//免费的活动不能退款
@@ -766,10 +775,10 @@ if ($job == 'user_authentication') {//用户身份验证
 		$paymethod != 1 && Showmsg('act_toalipay_paymethod');//支付宝支付才能退款
 	}
 
-	$tempcost = $db->get_value("SELECT SUM(totalcash) as sum FROM pw_activitymembers WHERE isrefund=1 AND fupid=".pwEscape($actuid));//已退费用
+	$tempcost = $db->get_value("SELECT SUM(totalcash) as sum FROM pw_activitymembers WHERE isrefund=1 AND fupid=".S::sqlEscape($actuid));//已退费用
 	$morecost = $memberdb['totalcash'] - $tempcost;//剩余费用
 	if ($morecost == 0) {//退款完毕
-		$db->update("UPDATE pw_activitymembers SET ifpay=4 WHERE actuid=".pwEscape($actuid));
+		$db->update("UPDATE pw_activitymembers SET ifpay=4 WHERE actuid=".S::sqlEscape($actuid));
 		Showmsg('act_refund_cost_finish');
 	}
 
@@ -778,7 +787,7 @@ if ($job == 'user_authentication') {//用户身份验证
 
 			require_once PrintEot('ajax');ajax_footer();
 		} elseif ($_POST['step'] == 2) {
-			InitGP(array('reason','cost'));
+			S::gp(array('reason','cost'));
 
 			if ($cost == 0 || number_format($cost, 2, '.', '') > number_format($morecost, 2, '.', '') || !preg_match("/^(([1-9]\d*)|0)(\.\d{0,2})?$/", $cost)) {
 				Showmsg('act_refund_costerror');
@@ -793,25 +802,25 @@ if ($job == 'user_authentication') {//用户身份验证
 				'refundreason'	=> $reason,
 			);
 
-			$db->update("UPDATE pw_activitymembers SET ".pwSqlSingle($sqlArray)." WHERE actuid=".pwEscape($actuid));
+			$db->update("UPDATE pw_activitymembers SET ".S::sqlSingle($sqlArray)." WHERE actuid=".S::sqlEscape($actuid));
 
 			$nextto = 'refund';
 			Showmsg('act_refund_nextstep');
 		}
 	} elseif ($thelast == 1) {
-		InitGP(array('cost'));
+		S::gp(array('cost'));
 		require_once PrintEot('ajax');ajax_footer();
 	}	
 } elseif ($job == 'additional') {//追加费用
-	InitGP(array('actuid','tid','more','authorid','actmid'),GP,2);
+	S::gp(array('actuid','tid','more','authorid','actmid'),GP,2);
 
 	if (empty($more)) {
-		$memberdb = $db->get_one("SELECT isrefund,isadditional,uid,actmid,username,actuid FROM pw_activitymembers WHERE actuid=".pwEscape($actuid));
+		$memberdb = $db->get_one("SELECT isrefund,isadditional,uid,actmid,username,actuid FROM pw_activitymembers WHERE actuid=".S::sqlEscape($actuid));
 	}
 	$defaultValueTableName = getActivityValueTableNameByActmid();
 
 	if (empty($_POST['step'])) {
-		$defaultValue = $db->get_one("SELECT dt.paymethod,dt.iscancel,dt.endtime,dt.fees,t.authorid FROM $defaultValueTableName dt LEFT JOIN pw_threads t USING(tid) WHERE dt.tid=".pwEscape($tid));
+		$defaultValue = $db->get_one("SELECT dt.paymethod,dt.iscancel,dt.endtime,dt.fees,t.authorid FROM $defaultValueTableName dt LEFT JOIN pw_threads t USING(tid) WHERE dt.tid=".S::sqlEscape($tid));
 		$feesdb = unserialize($defaultValue['fees']);//费用
 		$isFree = count($feesdb) > 0 ? false : true;//判断该活动是否免费
 		$isFree && Showmsg('act_additional_free');//免费的活动不能追加费用
@@ -826,7 +835,7 @@ if ($job == 'user_authentication') {//用户身份验证
 		if (!empty($more)) {
 
 			$memberlist = array();
-			$query = $db->query("SELECT uid,username FROM pw_activitymembers WHERE fupid=0 AND tid=".pwEscape($tid). " GROUP BY uid");
+			$query = $db->query("SELECT uid,username FROM pw_activitymembers WHERE fupid=0 AND tid=".S::sqlEscape($tid). " GROUP BY uid");
 			while ($rt = $db->fetch_array($query)) {
 				$memberlist[$rt['uid']] = $rt['username'];
 			}
@@ -834,12 +843,12 @@ if ($job == 'user_authentication') {//用户身份验证
 			
 		require_once PrintEot('ajax');ajax_footer();
 	} elseif ($_POST['step'] == 2) {
-		InitGP(array('totalcost','uids','cost_','additionalreason'),P);
+		S::gp(array('totalcost','uids','cost_','additionalreason'),P);
 			
-		$db->update("UPDATE $defaultValueTableName SET updatetime=".pwEscape($timestamp)." WHERE tid=".pwEscape($tid));//报名列表动态时间
+		$db->update("UPDATE $defaultValueTableName SET updatetime=".S::sqlEscape($timestamp)." WHERE tid=".S::sqlEscape($tid));//报名列表动态时间
 
 		require_once R_P.'require/msg.php';
-		$thread = $db->get_one("SELECT subject FROM pw_threads WHERE tid=".pwEscape($tid));
+		$thread = $db->get_one("SELECT subject FROM pw_threads WHERE tid=".S::sqlEscape($tid));
 
 		if (empty($more)) {
 			if (!preg_match("/^(([1-9]\d*)|0)(\.\d{0,2})?$/", $totalcost) || $totalcost == 0) {
@@ -856,7 +865,7 @@ if ($job == 'user_authentication') {//用户身份验证
 				'isadditional'		=> 1,
 				'additionalreason'	=> $additionalreason,
 			);
-			$db->update("INSERT INTO pw_activitymembers SET " . pwSqlSingle($sqlarray));
+			$db->update("INSERT INTO pw_activitymembers SET " . S::sqlSingle($sqlarray));
 
 			/*短消息通知 追加费用 参与人*/
 			M::sendNotice(
@@ -881,7 +890,7 @@ if ($job == 'user_authentication') {//用户身份验证
 			echo "success";
 			ajax_footer();
 		} else {//批量追加		
-			$query = $db->query("SELECT * FROM pw_activitymembers WHERE fupid=0 AND isrefund=0 AND tid=".pwEscape($tid)." AND uid IN(".pwImplode($uids). ") GROUP BY uid ORDER BY signuptime DESC");
+			$query = $db->query("SELECT * FROM pw_activitymembers WHERE fupid=0 AND isrefund=0 AND tid=".S::sqlEscape($tid)." AND uid IN(".S::sqlImplode($uids). ") GROUP BY uid ORDER BY signuptime DESC");
 			while ($rt = $db->fetch_array($query)) {
 				$actmid = $rt['actmid'];
 				$memberdb[$rt['uid']] = $rt;
@@ -939,19 +948,19 @@ if ($job == 'user_authentication') {//用户身份验证
 				);
 
 			}
-			$db->update("INSERT INTO pw_activitymembers (fupid,tid,uid,actmid,username,totalcash,signuptime,isadditional,additionalreason) VALUES " . pwSqlMulti($sqlarray));
+			$db->update("INSERT INTO pw_activitymembers (fupid,tid,uid,actmid,username,totalcash,signuptime,isadditional,additionalreason) VALUES " . S::sqlMulti($sqlarray));
 			echo "success";
 			ajax_footer();
 		}
 	}
 } elseif ($job == 'addnewmember') {//追加费用时添加新用户
-	InitGP(array('tid'),P,2);
-	InitGP(array('username'),P);
+	S::gp(array('tid'),P,2);
+	S::gp(array('username'),P);
 	
 	$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
 	$uid = $userService->getUserIdByUserName($username);
-	$readcheck = $db->get_value("SELECT authorid FROM pw_threads WHERE tid=".pwEscape($tid)." AND authorid=". pwEscape($uid));
-	$check = $db->get_value("SELECT uid FROM pw_activitymembers WHERE fupid=0 AND tid=".pwEscape($tid)." AND uid=". pwEscape($uid));
+	$readcheck = $db->get_value("SELECT authorid FROM pw_threads WHERE tid=".S::sqlEscape($tid)." AND authorid=". S::sqlEscape($uid));
+	$check = $db->get_value("SELECT uid FROM pw_activitymembers WHERE fupid=0 AND tid=".S::sqlEscape($tid)." AND uid=". S::sqlEscape($uid));
 	if ($readcheck) {
 		echo "authorerror\t";
 	} elseif ($check) {
@@ -966,7 +975,7 @@ if ($job == 'user_authentication') {//用户身份验证
 
 function isFriend($uid,$friend) {
 	global $db;
-	if ($db->get_value("SELECT uid FROM pw_friends WHERE uid=" . pwEscape($uid) . ' AND friendid=' . pwEscape($friend) . " AND status='0'")) {
+	if ($db->get_value("SELECT uid FROM pw_friends WHERE uid=" . S::sqlEscape($uid) . ' AND friendid=' . S::sqlEscape($friend) . " AND status='0'")) {
 		return true;
 	}
 	return false;

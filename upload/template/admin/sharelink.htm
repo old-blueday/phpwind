@@ -1,7 +1,26 @@
 <!--<?php
+if (!defined('AJAX')){
 include_once PrintEot('left');
-if(empty($action)){print <<<EOT
+}print<<<EOT
 -->
+<style type="text/css">
+.cate_search{}
+.cate_search span{float:left;height:30px;line-height:30px;margin-right:10px;}
+.cate_search span input{ vertical-align:middle;margin:0 3px;}
+.cate_search span select{margin:0 3px;}
+</style>
+<script type="text/javascript" language="JavaScript" src="js/global.js"></script>
+<script type="text/javascript" language="JavaScript" src="js/pw_ajax.js"></script>
+<!--
+EOT;
+if (empty($action)) {print <<<EOT
+-->
+<div class="nav3 mb10">
+    <ul class="cc">
+        <li class="current"><a href="$basename">链接列表</a></li>
+        <li><a href="$basename&action=types">链接分类</a></li>
+    </ul>
+</div>
 <div class="admin_info mb10">
 	<h3 class="h1"><b>提示信息</b></h3>
 	<div class="legend"> 友情链接添加说明:<ol><li>特殊链接(显示顺序<0，每行显示一个)</li><li>普通连接(显示顺序>=0)</li></ol></div>
@@ -20,12 +39,13 @@ if(empty($action)){print <<<EOT
 	<table width="100%" cellspacing="0" cellpadding="0">
 		<tr class="tr2 vt td_bgB">
 			<td width="30"><span onclick="CheckAll(document.FORM)" class="cp">全选</span></td>
+			<td width="30">顺序</td>
 			<td width="18%">站点名称</td>
-			<td width="8%">顺序</td>
 			<td width="25%">站点URL</td>
 			<td width="*">站点说明</td>
-			<td width="8%">状态</td>
-			<td width="8%">操作</td>
+			<td width="100">分类</td>
+			<td width="50">状态</td>
+			<td width="50">操作</td>
 		</tr>
 <!--
 EOT;
@@ -41,10 +61,11 @@ print <<<EOT
 -->
 		<tr class="tr1 vt">
 			<td class="td2"><input type='checkbox' name='deiaid[]' value="$thread[sid]"></td>
+			<td class="td2"><input type="text" class="input input_wd" name="vieworder[$thread[sid]]" value="$thread[threadorder]" ></td>
 			<td class="td2"><a href="$basename&action=edit&sid=$thread[sid]">$thread[name]</a></td>
-			<td class="td2">$thread[threadorder]</td>
 			<td class="td2">$thread[url]</td>
 			<td class="td2">$thread[descrip]</td>
+			<td class="td2">$thread[type]</td>
 			<td class="td2">{$tmpstate}</td>
 			<td class="td2"><a href="$basename&action=edit&sid=$thread[sid]&state=$state" title="编辑">[编辑]</a></td>
 		</tr>
@@ -56,9 +77,11 @@ EOT;
 	</div>
 	<input name=action type=hidden value="del">
 	<div class="tac mb10">
-        <input name="delete" class="bt3" value="删 除" type="submit" />
-        <input name="unpass" class="bt3" value="未 审" type="submit" />
+		<span class="bt2"><span><button type="button" onclick="CheckAll(document.FORM)">全 选</button></span></span>
+        <input name="order" class="bt3" value="提 交" type="submit" />
         <input name="pass" class="btn3" value="审 核" type="submit" />
+        <input name="unpass" class="bt3" value="未 审" type="submit" />
+        <input name="delete" class="bt3" value="删 除" type="submit" />
 	</div>
 </form>
 <!--
@@ -69,7 +92,7 @@ EOT;
 	<h3 class="h1"><b>提示信息</b></h3>
 	<div class="legend"> 友情链接添加说明:<ol><li>特殊链接(显示顺序<0，每行显示一个)</li><li>普通连接(显示顺序>=0)</li></ol></div>
 </div>
-<form action="$basename" method=POST>
+<form name="checkform" action="$basename" method=POST onsubmit="return checkpost(document.checkform);" >
 	<input type=hidden name="action" value=$action />
 	<input type=hidden name="step" value="2" />
 	<input type=hidden name="sid" value=$sid />
@@ -93,19 +116,20 @@ EOT;
 	<div class="admin_table mb10">
 	<table cellspacing="0" cellpadding="0" width="100%">
 		<tr class="tr1 vt">
-			<td class="td1">站点名称</td>
+			<td class="td1">站点名称 <span class="s1">*</span></td>
 			<td class="td2"><input type="text" class="input input_wa" name="name" value='$name' /></td>
+		</tr>
+
+		<tr class="tr1 vt">
+			<td class="td1">站点URL <span class="s1">*</span></td>
+			<td class="td2"><input type="text" class="input input_wa" name="url" value='$url' /></td>
 		</tr>
 		<tr class="tr1 vt">
 			<td class="td1">显示顺序(默认为0)</td>
 			<td class="td2"><input type="text" class="input input_wa" name="threadorder" value='$threadorder' /></td>
 		</tr>
 		<tr class="tr1 vt">
-			<td class="td1">站点URL</td>
-			<td class="td2"><input type="text" class="input input_wa" name="url" value='$url' /></td>
-		</tr>
-		<tr class="tr1 vt">
-			<td class="td1">站点主人</td>
+			<td class="td1">联系方式</td>
 			<td class="td2"><input type="text" class="input input_wa" name="username" value='$username' /></td>
 		</tr>
 		<tr class="tr1 vt">
@@ -117,7 +141,31 @@ EOT;
 			<td class="td2"><input type="text" class="input input_wa" name="logo" value='$logo' /></td>
 		</tr>
 		<tr class="tr1 vt">
+			<td class="td1">分类</td>
+			<td class="td2">
+            <ul class="list_A list_120 cc mb10" style="width:600px;">
+<!--
+EOT;
+if ( $action == 'add' ) $ifcheck_N = 'checked';
+foreach ($typeCates as $key=>$value) {
+$ifable = '';
+if ($action == 'edit') {
+	($value[stid] && S::inArray($value[stid],$stids)) && $ifable = 'checked';
+}
+print <<<EOT
+--> 
+
+            <li><input type="checkbox" name="stid[]" value="$value[stid]" $ifable>$value[name]</li>
+<!--
+EOT;
+}print <<<EOT
+-->
+			</ul>
+            </td>
+		</tr>
+		<tr class="tr1 vt">
 			<td class="td1">状态</td>
+
 			<td class="td2">
 				<ul class="list_A list_80 cc">
 					<li><input type="radio" name="ifcheck" $ifcheck_Y value="1" />已审</li>
@@ -131,7 +179,123 @@ EOT;
 		<span class="btn"><span><button type="submit">提 交</button></span></span>
 	</center>
 </form>
+<SCRIPT LANGUAGE="JavaScript">
+function checkpost(obj) { 
+	if (obj.name.value == "") {
+			obj.name.setAttribute("hasError", 1);
+			showDialog("error","站点名称不能为空",2);
+			obj.name.focus();
+			return false;
+	} 
+	if (obj.url.value == "") {
+			obj.url.setAttribute("hasError", 1);
+			showDialog("error","站点url不能为空",2);
+			obj.url.focus();
+			return false;
+	} 
+}
+</SCRIPT>
 <!--
 EOT;
-}include_once PrintEot('adminbottom');
+} elseif ($action == 'types') {print <<<EOT
+-->
+<div class="nav3 mb10">
+    <ul class="cc">
+        <li><a href="$basename">链接列表</a></li>
+        <li class="current"><a href="$basename&action=types">链接分类</a></li>
+    </ul>
+</div>
+
+<form action="$basename" method="post" name="sharetype">
+<input type="hidden" name="action" value="edittype" />
+<h2 class="h1 cc"><span class="fl mr10">分类管理</span><a href="javascript:;" onclick="sendmsg('$ajax_basename_add','',this.id);" id="addtype" class="btn_add fl"><i>添加分类</i></a></h2>
+<div class="admin_table mb10">
+<table cellpadding="0" cellspacing="0" width="100%">
+	<tr class="tr2">
+		<td width="30" class="cp" onclick="CheckAll(document.sharetype)">启用</td>
+		<td style="width:80px;">顺序</td>
+		<td style="width:350px;">分类名称</td>
+		<td></td>
+	</tr>
+<!--
+EOT;
+foreach ($typeCates as $key => $value) {
+$ifable = '';
+if ($value[ifable]) $ifable = 'checked';
+print <<<EOT
+-->
+	<tr class="tr1 vt">
+		<td class="td2"><input type="checkbox" name="types[$value[stid]][ifable]" value="$value[stid]" $ifable></td>
+		<td class="td2"><input type="text" class="input input_wc" name="types[$value[stid]][vieworder]" value="$value[vieworder]"></td>
+		<td class="td2"><input name="types[$value[stid]][name]" type="text" class="input input_wb" value="$value[name]" /></td>
+		<td class="td2">
+            <a href="$basename&action=deltype&stid=$value[stid]" onclick="if(!confirm('删除友情链接分类将删除友情链接关系表中与该分类相关的所以数据，请确认')){return false;}" class="mr20">[删除]</a>
+        </td>
+	</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+</table>
+</div>
+<div class="mb10 tac"><span class="btn"><span><button type="submit">提 交</button></span></span></div>
+</form>
+
+<!--
+EOT;
+} elseif (in_array($action,array('addtype'))){print<<<EOT
+-->
+<form name="form" method="post" action="$ajax_basename_add&" onsubmit="return false;">
+<input type="hidden" name="stid" value="$stid">
+<input type="hidden" name="step" value="2">
+<h2 class="h1" style="cursor:move" onmousedown="read.move(event);">
+<!--
+EOT;
+if ($action == 'addtype'){print<<<EOT
+-->
+	添加分类
+<!--
+EOT;
+}print<<<EOT
+-->
+</h2>
+<div class="admin_table mb10">
+<table cellpadding="0" cellspacing="0" width="100%" style="table-layout:auto;">
+	<tr class="tr1 vt">
+		<td class="td2" style="width:75px;">分类名称</td>
+		<td class="td2"><input name="name" id="cate_name" class="input input_wa" value="$types[name]" maxlength="30">&nbsp;最多30个字节</td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td2">启用</td>
+		<td class="td2">
+       		<ul class="cc list_80 list_A mr10">
+                <li><input type="radio" name="ifable" value="1" $ifable_Y> 开启</li>
+                <li><input type="radio" name="ifable" value="0" $ifable_N> 关闭</li>
+            </ul>
+		</td>
+	</tr>
+	<tr class="tr1 vt">
+		<td class="td2">顺序</td>
+		<td class="td2"><input name="vieworder" class="input input_wa" value="0"></td>
+	</tr>
+</table>
+</div>
+<div class="tac mb10">
+<!--
+EOT;
+if ($action == 'addtype'){print<<<EOT
+-->
+	<span class="btn2"><span><button type="button" onclick="ajax.submit(this.form,ajax.guide)">提 交</button></span></span>
+	<span class="bt2"><span><button type="button" onclick="closep();">取 消</button></span></span>
+<!--
+EOT;
+}print<<<EOT
+-->
+</div>
+</form>
+<!--
+EOT;
+}if (!defined('AJAX')) {
+include_once PrintEot('adminbottom');
+}
 ?>-->

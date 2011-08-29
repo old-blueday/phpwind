@@ -3,19 +3,19 @@
 
 /**
  * APP相关
- * 
+ *
  * @package APP
  */
 class PW_AppClient {
 	var $_db;
 	function PW_Appclient() {
 		global $db_siteappkey, $timestamp, $db_sitehash, $db_siteownerid, $db_siteid, $db_charset, $db_appifopen, $pwServer, $db_server_url;
-		$db_bbsurl = Char_cv("http://" . $pwServer['HTTP_HOST'] . substr($pwServer['PHP_SELF'], 0, strrpos($pwServer['PHP_SELF'], '/')));
+		$db_bbsurl = S::escapeChar("http://" . $pwServer['HTTP_HOST'] . substr($pwServer['PHP_SELF'], 0, strrpos($pwServer['PHP_SELF'], '/')));
 		if (!file_exists(D_P . "data/bbscache/forum_appinfo.php")) {
 			require_once (R_P . "admin/cache.php");
 			updatecache_f();
 		}
-		@include_once (D_P . "data/bbscache/forum_appinfo.php");
+		@include_once pwCache::getPath(D_P . "data/bbscache/forum_appinfo.php");
 		$this->_db = $GLOBALS['db'];
 		$this->appkey = $db_siteappkey;
 		$this->timestamp = $timestamp;
@@ -56,14 +56,14 @@ class PW_AppClient {
 		$this->_appslist = $this->getApplist();
 		$sql_uid = $sql_appid = '';
 		if (is_numeric($uids)) {
-			$sql_uid .= ' uid=' . pwEscape($uids);
+			$sql_uid .= ' uid=' . S::sqlEscape($uids);
 		} elseif (is_array($uids)) {
-			$sql_uid .= ' uid IN(' . pwImplode($uids) . ')';
+			$sql_uid .= ' uid IN(' . S::sqlImplode($uids) . ')';
 		}
 		if (is_numeric($appids)) {
-			$sql_appid .= ' AND appid=' . pwEscape($appids);
+			$sql_appid .= ' AND appid=' . S::sqlEscape($appids);
 		} elseif (is_array($appids)) {
-			$sql_appid .= ' AND appid IN(' . pwImplode($appids) . ')';
+			$sql_appid .= ' AND appid IN(' . S::sqlImplode($appids) . ')';
 		}
 		$query = $this->_db->query("SELECT uid,appid,appname FROM pw_userapp WHERE $sql_uid $sql_appid");
 		while ($rt = $this->_db->fetch_array($query)) {
@@ -161,7 +161,7 @@ class PW_AppClient {
 		$url .= 'pw_sig=' . md5($hash . $this->siteownerid);
 		return $url;
 	}
-	
+
 	function getTaojinUrl($system = 'index', $mode = 'index', $action = 'index'){
 		global $winduid, $windid;
 
@@ -175,7 +175,7 @@ class PW_AppClient {
 			'pw_action'		=> $action,
 			'pw_query'		=> $this->getApicode(),
 		);
-		
+
 		$url = 'http://app.phpwind.net/pwbbsapi.php?m=taoke&';
         ksort($param);
         foreach ( $param as $key => $value ) {
@@ -380,7 +380,7 @@ class PW_AppClient {
 		$url .= 'pw_sig=' . md5($hash . $this->siteownerid);
 		require_once (R_P . 'require/posthost.php');
 		$backdata = PostHost($url, '', 'POST');
-		if (empty($data)) {
+		if (empty($backdata)) {
 			$backdata = PostHost($url, '', 'POST');
 		}
 		$data = unserialize($backdata);

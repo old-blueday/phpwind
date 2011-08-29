@@ -144,7 +144,12 @@ h1{float:left;margin:2px 0 0 10px;}
 
 .cate_menubar .fl{line-height:24px;}
 .cate_menubar .cc{margin-bottom:0;_margin-bottom:5px;}
+
 .menubar_box{border:1px solid #bee2fd;background:#f8fbfe;padding:10px;margin-bottom:10px;}
+.menubar_box table{width:100%;}
+.menubar_box th,.menubar_box td{padding:5px;border-bottom:1px dashed #ccc;}
+.menubar_box th{width:100px;}
+
 .menubar_tab{width:920px;}
 .menubar_tab a{float:left;border:1px solid #bee2fd;background:#fff;height:22px;line-height:22px;padding:0 10px; white-space:nowrap;margin:0 5px 5px 0;color:#434343;}
 .menubar_tab .current{background:#f8fbfe;color:#0066cc; font-weight:700;}

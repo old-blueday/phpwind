@@ -3,7 +3,7 @@ print <<<EOT
 -->
 <div id='hiddenMessage' style="display:none"></div>
 <div class="contUser" id="content">
-<table width="100%"><tr class="vt"><td height="400">
+<table width="100%"><tr><td height="600" valign="top">
 <div class="p15">
 	<h4 class="site mb5"><span>群消息</span>(共{$groupsmsAllCount}条，<a href="$normalUrl&action=unread" class="s2"><b>{$notReadCount}</b>条未读消息</a>)</h4>
 <!--
@@ -11,15 +11,29 @@ EOT;
 if($action == 'info' || $action == 'up' || $action == 'down'){print <<<EOT
 -->
 <div class="mb10"><span class="fr"> 
-<a href="$normalUrl&action=up&rid={$message[rid]}">上一条</a>&nbsp;&nbsp;|&nbsp;&nbsp;
-<a href="$normalUrl&action=down&rid={$message[rid]}">下一条</a></span>
+<a href="javascript:;" onclick="getpage('up')">上一条</a>&nbsp;&nbsp;|&nbsp;&nbsp;
+<a href="javascript:;" onclick="getpage('down')">下一条</a></span>
 <a href="$normalUrl&page=$page">&lt;&lt;返回</a>
 </div>
 <div id="showmessageTip"></div>
+<script>
+function getpage(act){
+	ajax.send("$normalUrl&action=checkover&rid={$message[rid]}&dir="+act,'',function(){
+		 var rText = ajax.request.responseText.split('\t');
+		 if (rText[0] == 'success'){
+			 location.href = "$normalUrl&action="+act+"&rid={$message[rid]}";
+		 }else{
+			 showDialog('warning',(act == "down") ? "已经是最后一条！" : "已经是第一条！",3);return false;
+		 }
+		 return false;
+	});
+	return false;
+}
+</script>
 <!--
 EOT;
 if($message['typeid'] != $messageServer->getConst('groupsms_colony')){
-	$linkUrl = "u.php?uid=";
+	$linkUrl = "{$db_userurl}";
 	require messageEot('groupsms_cinfo');
 }else{
 	$linkUrl = "apps.php?q=group&cyid=";
@@ -67,7 +81,7 @@ EOT;
 }foreach($groupsmsList as $key => $value){
 $value[modified_time] = get_date($value[modified_time]);
 $_name = $value[typeid] == $messageServer->getConst('groupsms_colony') ? $value['cname'] : $value['create_username'];
-$_url = $value[typeid] == $messageServer->getConst('groupsms_colony') ? "apps.php?q=group&cyid={$value['colonyid']}" : "u.php?uid={$value['uid']}";
+$_url = $value[typeid] == $messageServer->getConst('groupsms_colony') ? "apps.php?q=group&cyid={$value['colonyid']}" : "{$db_userurl}{$value['uid']}";
 $_icon = $value[typeid] == $messageServer->getConst('groupsms_colony') ? $value['cnimg'] : $value['face'];
 list($_img,$_b,$_tip) = getMessageIconByStatus($value);
 if(in_array($value['colonyid'],$groups) || ($value['typeid'] == $messageServer->getConst('groupsms_shield'))){
@@ -91,12 +105,12 @@ print <<<EOT
 EOT;
 if($winduid == $value['create_uid']) {print<<<EOT
 -->
-				 <a href="u.php?uid={$value[extra][0]}">{$value[extra][0]}</a>
+				 <a href="{$db_userurl}{$value[extra][0]}">{$value[extra][0]}</a>
 <!--
 EOT;
 }else{print<<<EOT
 -->
-				<a href="u.php?uid={$value[uid]}">{$value[create_username]}</a>
+				<a href="{$db_userurl}{$value[uid]}">{$value[create_username]}</a>
 <!--
 EOT;
 }print<<<EOT

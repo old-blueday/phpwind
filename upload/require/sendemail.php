@@ -1,7 +1,7 @@
 <?php
 !function_exists('readover') && exit('Forbidden');
 //set_time_limit(1000);
-@include (D_P.'data/bbscache/mail_config.php');
+@include pwCache::getPath(D_P.'data/bbscache/mail_config.php');
 
 $GLOBALS['M_db']= new Mailconfig(
 	array(
@@ -53,14 +53,14 @@ Class Mailconfig {
 	function mailmx($email,$retrys=3){
 		global $timestamp;
 		$domain=substr($email,strpos($email,'@')+1);
-		@include(D_P.'data/bbscache/mx_config.php');
+		@include pwCache::getPath(D_P.'data/bbscache/mx_config.php');
 
 		if(!$_MX[$domain] || $timestamp - pwFilemtime(D_P.'data/bbscache/mx_config.php') > 3600*24*10){
 			for($i=0;$i<$retrys;$i++){
 				$result = $this->GetMax($domain);
 				if($result !== false){
 					$_MX[$domain]=$result;
-					writeover(D_P.'data/bbscache/mx_config.php',"<?php\r\n\$_MX=".pw_var_export($_MX).";\r\n?>");
+					pwCache::setData(D_P.'data/bbscache/mx_config.php',"<?php\r\n\$_MX=".pw_var_export($_MX).";\r\n?>");
 					$this->smtp['tomx']=$result;
 					return true;
 				}
@@ -212,7 +212,7 @@ function sendemail($toemail,$subject,$message,$additional=null){
 	$additional = getLangInfo('email',$additional);
 	$send_subject = "=?$db_charset?B?".base64_encode(str_replace(array("\r","\n"), array('',' '),$subject)).'?=';
 	$send_message = chunk_split(base64_encode(str_replace("\r\n.", " \r\n..", str_replace("\n", "\r\n", str_replace("\r", "\n", str_replace("\r\n", "\n", str_replace("\n\r", "\r", $message)))))));
-	$send_from = "=?$db_charset?B?".base64_encode($windid)."?= <$fromemail>";
+	$send_from = "=?$db_charset?B?".base64_encode($db_bbsname)."?= <$fromemail>";
 	$send_to = "=?$db_charset?B?".base64_encode($sendtoname)."?= <$toemail>";
 	!empty($additional) && $additional && substr(str_replace(array("\r","\n"),array('','<rn>'),$additional),-4) != '<rn>' && $additional .= "\r\n";
 	$additional = "To: $send_to\r\nFrom: $send_from\r\nMIME-Version: 1.0\r\nContent-type: text/html; charset=$db_charset\r\n{$additional}Content-Transfer-Encoding: base64\r\n";

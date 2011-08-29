@@ -1,46 +1,44 @@
 <!--
 <?php
 print <<<EOT
---><link rel="stylesheet" type="text/css" href="{$pwModeImg}/area_read_style.css" />
-<link rel="stylesheet" type="text/css" href="images/post/c_editor/face.css" />
-<a href="post.php?fid=$fid" class="c_received fr" id="td_post">我要投稿</a>
+-->
 
 <!--
 EOT;
 if($N_allowtypeopen || $N_allowtopicopen || $N_allowpostcateopen){print <<<EOT
 -->
-<div id="menu_post" class="menu cc f14 tac" style="display:none;">
-	<div style="width:100px;">
+<div id="menu_post" class="pw_menu tac" style="display:none;">
+	<ul class="menuList" style="width:70px;">
 <!--
 EOT;
 if($foruminfo['allowtype'] & 1){print <<<EOT
 -->
-		<a href="post.php?fid=$fid" hidefocus="true">新  帖</a>
+		<li><a href="post.php?fid=$fid" hidefocus="true">新  帖</a></li>
 <!--
 EOT;
 }if($foruminfo['allowtype'] & 2 && $_G['allownewvote']){print <<<EOT
 -->
-		<a href="post.php?fid=$fid&special=1" hidefocus="true">投  票</a>
+		<li><a href="post.php?fid=$fid&special=1" hidefocus="true">投  票</a></li>
 <!--
 EOT;
 }if($foruminfo['allowtype'] & 4 && $_G['allowactive']){print <<<EOT
 -->
-		<a href="post.php?fid=$fid&special=2" hidefocus="true">活  动</a>
+		<li><a href="post.php?fid=$fid&special=2" hidefocus="true">活  动</a></li>
 <!--
 EOT;
 }if($foruminfo['allowtype'] & 8 && $_G['allowreward']){print<<<EOT
 -->
-		<a href="post.php?fid=$fid&special=3" hidefocus="true">悬  赏</a>
+		<li><a href="post.php?fid=$fid&special=3" hidefocus="true">悬  赏</a></li>
 <!--
 EOT;
 }if($foruminfo['allowtype'] & 16 && $_G['allowgoods']){print <<<EOT
 -->
-		<a href="post.php?fid=$fid&special=4" hidefocus="true">商  品</a>
+		<li><a href="post.php?fid=$fid&special=4" hidefocus="true">商  品</a></li>
 <!--
 EOT;
 }if($foruminfo['allowtype'] & 32 && $_G['allowdebate']){print <<<EOT
 -->
-		<a href="post.php?fid=$fid&special=5" hidefocus="true">辩  论</a>
+		<li><a href="post.php?fid=$fid&special=5" hidefocus="true">辩  论</a></li>
 <!--
 EOT;
 }
@@ -49,7 +47,7 @@ foreach($modelids as $value){
 if(isset($postTopic->topicmodeldb[$value]) && $postTopic->topicmodeldb[$value][ifable] && $postTopic->topiccatedb[$postTopic->topicmodeldb[$value][cateid]][ifable]){
 print <<<EOT
 -->
-	<a href="post.php?fid=$fid&modelid=$value" hidefocus="true">{$postTopic->topicmodeldb[$value][name]}</a>
+	<li><a href="post.php?fid=$fid&modelid=$value" hidefocus="true">{$postTopic->topicmodeldb[$value][name]}</a></li>
 <!--
 EOT;
 }}}
@@ -58,78 +56,36 @@ if(isset($postCate->postcatedb[$value]) && $postCate->postcatedb[$value][ifable]
 if(strpos(','.$_G['allowpcid'].',',','.$value.',') !== false){
 print <<<EOT
 -->
-	<a href="post.php?fid=$fid&pcid=$value" hidefocus="true">{$postCate->postcatedb[$value][name]}</a>
+	<li><a href="post.php?fid=$fid&pcid=$value" hidefocus="true">{$postCate->postcatedb[$value][name]}</a></li>
 <!--
 EOT;
 }}}print <<<EOT
 -->
-	</div>
+	</ul>
 </div>
 <!--
 EOT;
 }print <<<EOT
 -->
 <div id="breadCrumb">
-	<a href="$db_bbsurl/index.php?m=area">首页</a>
-	&raquo; <a href="cate.php?cateid=$cateid">{$forum[$cateid][name]}</a>
-	&raquo; $guidename
-</div>
 <!--
 EOT;
-if($modelid>0 || $pcid>0){
+if($N_allowtypeopen || $N_allowtopicopen || $N_allowpostcateopen){
 print <<<EOT
 -->
-<div class="cate_menubar">
-<div class="cc"><span class="fl">筛选：</span>
-<span class="menubar_tab fl">
-		 <a id="pc_all" href="thread.php?fid=$fid">全部</a>
-<!--
-EOT;
-if($modelid > 0){
-	$a = 'model_'.$modelid;
-} elseif ($pcid > 0) {
-	$a = 'pcid_'.$pcid;
-}
-if ($foruminfo['modelid']){
-foreach($modelids as $value){
-if(isset($postTopic->topicmodeldb[$value]) && $postTopic->topicmodeldb[$value][ifable] && $postTopic->topiccatedb[$postTopic->topicmodeldb[$value][cateid]][ifable]){
-print<<<EOT
--->
-		<a id="pc_model_$value" href="thread.php?fid=$fid&modelid=$value">{$postTopic->topicmodeldb[$value][name]}</a>
-<!--
-EOT;
-}}}
-if($foruminfo['pcid']){
-foreach($pcids as $value){
-if(isset($postCate->postcatedb[$value]) && $postCate->postcatedb[$value][ifable]){
-print<<<EOT
--->
-		<a id="pc_pcid_$value" href="thread.php?fid=$fid&pcid=$value">{$postCate->postcatedb[$value][name]}</a>
-<!--
-EOT;
-}}}print <<<EOT
--->
-</span>
-</div>
-<script language="JavaScript">
-setCurrent('pc_$a','pc_all','current');
-</script>
-<div class="c"></div>
-<div class="menubar_box cc">
-$initSearchHtml
-</div>
-<div class="c">&nbsp;</div>
-</div>
+	<a href="post.php?fid=$fid" class="c_received fr" id="td_post" style="line-height:18px;padding-top:0;">我要投稿</a>
 <!--
 EOT;
 }print <<<EOT
 -->
+	$msg_guide
+</div>
 <div class="cate_content fl">
 <div class="content_box_A">
 <table width="100%">
 	<tr class="vt">
 		<td height="400" style="padding:10px;">
-		<div class="h1 cc">
+		<div class="h1 cc"><h1>
 <!--
 EOT;
 if($modelid || $pcid>0){
@@ -145,18 +101,18 @@ if($modelid>0){
 if(isset($catename[$typename])){print <<<EOT
 print <<<EOT
 -->
-		<a href="thread.php?fid=$fid&$toid=$typename" class="s3 fl">[{$catename[$typename][name]}]</a>
+		<a href="thread.php?fid=$fid&$toid=$typename" style="color:#ff6600;">[{$catename[$typename][name]}]</a>
 <!--
 EOT;
 }}print <<<EOT
 -->
 
-		<h1>$subject</h1>
+		$subject</h1>
 		</div>
 		<div class="cate_r_tips">
-			<span>时间：{$thread_read['src_postdate']}</span>
-			<span>作者：<a href="u.php?uid={$thread_read['authorid']}" target="_blank">{$thread_read[author]}</a></span>
-			<span>阅读：<span class="s3">{$thread_read['hits']}</span></span>
+			<span>作者：<a href="{$db_userurl}{$thread_read['authorid']}" target="_blank">{$thread_read[author]}</a></span>
+			<span>{$thread_read['src_postdate']}</span>
+			<span>阅读：<span>{$thread_read['hits']}</span></span>
 			<span>
 <!--
 EOT;
@@ -218,18 +174,7 @@ if ($thread_read['pic']) {
 print <<<EOT
 -->
 						<div style="margin:5px 0;" id="att_$pic[aid]">
-<!--
-EOT;
-			if ($pic['desc']) {
-print <<<EOT
--->
-							描述：$pic[desc]<br />
-<!--
-EOT;
-			}
-print <<<EOT
--->
-							图片: $pic[img]
+							$pic[img]
 						</div>
 <!--
 EOT;
@@ -459,7 +404,7 @@ EOT;
 	</tr>
 </table>
 </div>
-<div class="content_box_A mt10">
+<div class="content_box_A mt10" id="newreply">
 <div class="box-reply">
 <h4>最新评论</h4>
 <!--
@@ -468,11 +413,11 @@ foreach ($readdb as $read) {
 	$read['postdate'] = get_date($read['src_postdate'], "Y-m-d H:i");
 print <<<EOT
 -->
-			<dl class="cc" style="margin-bottom:30px;">
-				<dt>{$read['face']}</dt>
+			<dl class="cc">
+				<dt><a href="{$db_userurl}{$read['authorid']}" target="_blank"><img title="{$read['author']}" src="{$read['face']}"></a></dt>
 				<dd>
 					<div class="title">
-						<a href="u.php?uid={$read['authorid']}" target="_blank" class="mr10">{$read['author']}</a>
+						<a href="{$db_userurl}{$read['authorid']}" target="_blank" class="mr10">{$read['author']}</a>
 						{$read['postdate']}
 <!--
 EOT;
@@ -595,26 +540,51 @@ print <<<EOT
 -->
 <div class="cc mt10" style="border-top: 1px solid #e4e4e4; padding-top: 10px; overflow: hidden;">
 <form name="FORM" method="post" action="post.php?" onsubmit="return checkpost(document.FORM);">
-<a href="post.php?fid=$fid" class="c_received fr" style="margin-top: 1px;" id="td_post1">我要投稿</a>
-<b>我要评论</b>
+<div class="cc mb5"><a href="post.php?fid=$fid" class="c_received fr" style="margin-top: 1px;" id="td_post1">我要投稿</a>
+<b>我要评论</b></div>
 <!--
 EOT;
-if(($db_gdcheck & 4) && $winddb['postnum'] < $db_postgd){
+if($db_gdcheck & 4 && (!$db_postgd || $winddb['postnum'] < $db_postgd)){
+$gdSize = explode("\t",$db_gdsize);
 print <<<EOT
 -->
-<div style="margin: 8px 20px 0 0;" class="fl">
-认证码: <input class="input" type="text" name="gdcode" size="5" tabindex="6" onfocus="try{opencode('menu_gd',this)}catch(e){}" /><br />
-<div class="menu" id="menu_gd" style="visibility:hidden;"><img src="ck.php?" align="absmiddle" style="cursor:pointer;" id="ckcode" alt="看不清楚，换一张" /></div>
+<div class="mb5">
+认证码: <input class="input" type="text" name="gdcode" size="5" tabindex="6" onfocus="showgd();" />
+		<span id="ckcode" style="display:none;">
+<script type="text/javascript" src="js/pw_authcode.js"></script>
+<script>
+var flashWidth = "$gdSize[0]";
+var flashHeight = "$gdSize[1]";
+var gdtype = $db_gdtype;
+showGdCode();
+</script>
+		</span>
 </div>
 <!--
 EOT;
 }
-list(,,$postq)=explode("\t",$db_qcheck);
-if($winddb[postnum] < $postq && $db_question){
+list($postq,$showq)=explode("\t",$db_qcheck);
+if($db_ckquestion & 4 && (!$postq || $winddb[postnum] < $postq) && $db_question){
 $qkey = array_rand($db_question);
+if($db_imagequestion){
+	$question = '<img id="ckquestion" src="ckquestion.php?q='.$qkey.'&t='.$timestamp.'" align="top">';
+}else{
+	$question = $qkey<0 ? getMachineQuestion_1() :  $db_question[$qkey];
+}
 print <<<EOT
 -->
-<div style="margin:8px 0 0 0;" class="fl">验证问题：{$db_question[$qkey]} <input class="input" type="text" name="qanswer" /> 正确答案:{$db_answer[$qkey]}<input type="hidden" name="qkey" value="$qkey" /></div>
+<div class="mb5">验证问题：{$question} <input class="input" type="text" name="qanswer" />
+<!-- 
+EOT;
+if($showq && $qkey>0){print <<<EOT
+-->
+ 正确答案:{$db_answer[$qkey]}
+<!-- 
+EOT;
+}
+print <<<EOT
+-->
+ <input type="hidden" name="qkey" value="$qkey" /></div>
 <!--
 EOT;
 }print <<<EOT
@@ -624,7 +594,6 @@ EOT;
 EOT;
 print <<<EOT
 -->
-<div class="c"></div>
 <script language="javascript">
 	var charset = '$db_charset';
 	var imgpath   = '$imgpath';
@@ -656,11 +625,11 @@ EOT;
 <div id="linkbox" style="display: none;"></div>
 
 <div style="margin: 8px 0 0 0;" class="o-operation cc">
-<span title="插入url链接" class="createlink" id="createlinkid" onClick="createLinkBox();">插入url链接</span>
-<span id="td_face" class="o-face" align="absmiddle" unselectable="on" onClick="showDefault();">添加表情</span>
+<span title="插入url链接" class="createlink" id="createlinkid" onClick="createLinkBox();"></span>
+<span title="添加表情" id="td_face" class="o-face" align="absmiddle" unselectable="on" onClick="showDefault();"></span>
 <div id="atc_content_warn" class="fr gray">限 $db_postmax 字节</div>
 </div>
-<textarea id="commentNews" name="atc_content" rows="8" style="width: 685px; border: 1px solid #ccc; height: 80px;"></textarea>
+<textarea id="commentNews" name="atc_content" rows="8" style="width:98%; border: 1px solid #ccc; height: 80px;"></textarea>
 <div class="c"></div>
 <input type="hidden" value="Re:{$subject}" name="atc_title"/>
 <input type="hidden" value="2" name="step" />
@@ -707,7 +676,7 @@ EOT;
 </div>
 <!--
 EOT;
-list($htmlAdvert,$arrayAdvert) = pwAdvert('Mode.Forum.Layer.area.ReadBtm',$fid,$num,$SCR);
+list($htmlAdvert,$arrayAdvert) = pwAdvert('Mode.Forum.Layer.area.ReadTop',$fid,$num,$SCR);
 if($htmlAdvert){print <<<EOT
 -->
 			<div class="box-bar">$htmlAdvert</div>
@@ -716,7 +685,7 @@ EOT;
 }print <<<EOT
 -->
 <div class="sidebar_box">
-<h2><span>相关主题</span></h2>
+<h2><span>最新话题</span></h2>
 <ul>
 <!--
 EOT;
@@ -740,6 +709,72 @@ if($htmlAdvert){print <<<EOT
 EOT;
 }print <<<EOT
 -->
+</div>
+<div id="menu_forumlist" style="display:none;">
+	<div class="sbar-box-a" style="width:700px;">
+		<div class="sbar-title" style="cursor:pointer" onclick="try{pw_bottom.hiddenTab();read.close();}catch(e){read.close();}">
+				<span class="adel">隐藏</span>
+				<span id="title_forumlist" class="b">快速跳转</span>
+		</div>
+		<div class="sbar-box-b">
+			<div class="forum-list-popout">
+<!--
+EOT;
+if ($GLOBALS['pwForumList']) {
+	$pwForumList = $GLOBALS['pwForumList'];
+} else {
+	$pwForumList = array();
+	include(D_P.'data/bbscache/forumlist_cache.php');
+	if ($pwForumAllList && $GLOBALS['groupid'] == 3) {
+		$pwForumList = array_merge($pwForumList,$pwForumAllList);
+	}
+}
+foreach($pwForumList as $key=>$value){
+	if (isset($value['child']) && is_array($value['child']) && count($value['child'])) {
+print <<<EOT
+-->
+			<dl class="cc">
+				<dt>
+<!--
+EOT;
+if($GLOBALS['m']){print<<<EOT
+-->
+				<a href="index.php?cateid=$key" target="_blank">$value[name]</a>
+<!--
+EOT;
+}else{print<<<EOT
+-->
+				<a href="index.php?cateid=$key">$value[name]</a>
+<!--
+EOT;
+}print<<<EOT
+-->
+				</dt>
+				<dd class="cc">
+<!--
+EOT;
+foreach($value['child'] as $k=>$v){
+if($GLOBALS['m']){print <<<EOT
+-->
+					<a href="thread.php?fid=$k" target="_blank" onclick="return pwForumList(true,gIsPost,$k,'',true);"><span>$v</span></a>
+<!--
+EOT;
+}else{print<<<EOT
+-->
+					<a href="thread.php?fid=$k" onclick="return pwForumList(true,gIsPost,$k);"><span>$v</span></a>
+<!--
+EOT;
+}}print <<<EOT
+-->
+				</dd>
+			</dl>
+<!--
+EOT;
+}}print <<<EOT
+-->
+			</div>
+		</div>
+	</div>
 </div>
 <!--
 EOT;

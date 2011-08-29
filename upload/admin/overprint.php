@@ -23,7 +23,7 @@ if(empty($action)){
 	$icons = $overPrintClass->getOverPrintIcons();
 	include PrintEot('overprint');exit;
 }elseif($action == "add"){
-	initGP(array('title','icon','related','isopen'));
+	S::gp(array('title','icon','related','isopen'));
 	$title = trim($title);
 	$icon = trim($icon);
 	$related = intval($related);
@@ -41,7 +41,7 @@ if(empty($action)){
 	(!$result) && adminmsg("主题印戳增加失败 ");
 	adminmsg('operate_success',"$basename&action=");
 }elseif($action == "manage"){
-	initGP(array('list'));
+	S::gp(array('list'));
 	!is_array($list) && adminmsg("提示的数据有误 ");
 	$overprints = array();
 	foreach($list as $id=>$v){
@@ -61,7 +61,7 @@ if(empty($action)){
 	}
 	adminmsg('operate_success',"$basename&action=");
 }elseif($action == "delete"){
-	initGP(array('id'));
+	S::gp(array('id'));
 	($id<0) && adminmsg("主题印戳ID错误");
 	$overPrintClass->deleteOverPrint($id); /*删除*/
 	adminmsg('operate_success',"$basename&action=");

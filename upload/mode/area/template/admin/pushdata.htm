@@ -28,6 +28,12 @@ EOT;
 -->
     </ul>
 </div>
+<div class="admin_info mb10">
+    <h2 class="h1">提示信息</h2>
+    <div class="legend">
+    如果希望某个帖子不显示在所有模块的自动调用数据中，可以在 数据-全站缓存-<a href="javascript:;" onclick="parent.PW.Dialog({id:'aboutcache',url:'$admin_file?adminjob=aboutcache&adminitem=blacklist',name:'全站缓存'});">调用黑名单</a> 中设置调用黑名单
+    </div>
+</div>
 <h2 class="h1">搜索条件</h2>
 <div class="admin_table mb10">
 <form action="$basename" method="post">
@@ -276,6 +282,7 @@ EOT;
 -->
 				</select>
            </td>
+		   <td class="td2"><div class="help_a">此推送内容所对应的模块</div></td>
        </tr>
        <tr class="tr1 vt">
            <td class="td1">排序等级</td>
@@ -289,6 +296,7 @@ EOT;
                    <li><label><input type="radio" name="offset" value="5" {$offsets[5]} />五等级</label></li>
                </ul>
            </td>
+		   <td class="td2"><div class="help_a">等级越高，排列越靠前</div></td>
        </tr>
 	</table>
 <div id="portalbox">
@@ -305,8 +313,10 @@ $name = $dataSourceService->getSourceLang($k,$invokepiece['action']);
 if (is_numeric($invokepiece[param][$k])) {
 if($k=='descrip'){
 $add = 'onKeyUp="countlen(this,\''.$invokepiece[param][$k].'\');"';
+$len = $invokepiece[param][$k];
 }else{
 $add = 'maxlength="'.$invokepiece[param][$k].'"';
+$len = $invokepiece[param][$k];
 }
 } else {
 $add = '';
@@ -320,14 +330,44 @@ print <<<EOT
 EOT;
 if($k=='descrip'){print <<<EOT
 -->
-				<textarea name="param[$k]" style="width:260px;height:92px" $add >$val</textarea>
+				<textarea name="param[$k]" style="width:260px;height:92px" id="pushto_info"  onkeyup="checktitlelength($len,'pushto_info','wordinfo');" onkeydown="checktitlelength($len,'pushto_info','wordinfo');" >$val</textarea>&nbsp;&nbsp;<span id="wordinfo"></span>
 <!--
 EOT;
 } elseif ($k=='title') {
 $val = strip_tags($val);
 print <<<EOT
 -->
-				<input type="text" class="input" size="40" name="param[$k]" value="$val" $add> 
+<script language="javascript" type="text/javascript">
+	//判断字数
+	function checktitlelength(num,titleid,wordid){
+ 		var titleLength = num;
+		setTimeout(function(){
+		var l = strlen($(titleid).value);
+		if(l<titleLength)
+		{
+			$(wordid).innerHTML='剩余'+(titleLength-l)+'个字节';
+			$(wordid).style.backgroundColor='#fffeed';
+			$(wordid).style.display='inline';
+		}
+		else if(l==titleLength)
+		{
+			$(wordid).innerHTML='已经达到最大字数限制';
+			$(wordid).style.backgroundColor='#ffd9d9';
+			$(wordid).style.display='inline';
+		}
+		else if(l>=titleLength)
+		{
+			$(wordid).innerHTML='已超出最大长度限制！';
+			$(wordid).style.backgroundColor='#ff9999';
+			$(wordid).style.display='inline';
+			$(titleid).value = substr($(titleid).value,titleLength);
+		}
+		else
+			$(wordid).style.display='none';
+		},100);
+	}
+</script>
+				<input type="text" class="input" size="40" id="pushto_title" name="param[$k]" value="$val" onkeyup="checktitlelength($len,'pushto_title','wordttitle');" onkeydown="checktitlelength($len,'pushto_title','wordttitle');">&nbsp;&nbsp;<span id="wordttitle"></span>
 			<div class="pwnew tac">
                     <span title="粗体字"><a onclick="styleOnclick(this,'css[b]')" class="{$stylename[b]}">加粗</a></span>
 					<span title="斜体字"><a onclick="styleOnclick(this,'css[i]')" class="{$stylename[i]}">倾斜</a></span>
@@ -391,6 +431,7 @@ EOT;
 print <<<EOT
 -->
 			</td>
+			<td class="td2"><div class="help_a"></div></td>
 		</tr>
 <!--
 EOT;
@@ -400,11 +441,13 @@ print <<<EOT
 
 		<tr class="tr1 vt">
 			<td class="td1">开始日期</td>
-			<td class="td2"><input type="text" class="input" size="15" name="starttime" id="starttime" onclick="ShowCalendar(this.id,1);" value="$push[starttime]"> (留空则立即显示)</td>
+			<td class="td2"><input type="text" class="input" size="15" name="starttime" id="starttime" onclick="ShowCalendar(this.id,1);" value="$push[starttime]"> </td>
+			<td class="td2"><div class="help_a">设定此推送内容在前台显示的开始时间，留空则立即显</div></td>
 		</tr>
 		<tr class="tr1 vt">
-			<td class="td1">商业推荐</td>
+			<td class="td1">星号标签</td>
 			<td class="td2"><input type="radio" value="1" name="ifbusiness" $ifbusiness_Y/>是 <input type="radio" value="0" name="ifbusiness" $ifbusiness_N/>否</td>
+			<td class="td2"><div class="help_a">可以用星号标签标识该条数据为特殊推送，比如广告，以免误删</div></td>
 		</tr>
 <!--
 EOT;

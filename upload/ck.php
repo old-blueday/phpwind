@@ -1,7 +1,7 @@
 <?php
 define('CK',1);
 require_once('global.php');
-if (GetServer('HTTP_IF_MODIFIED_SINCE') || GetServer('HTTP_IF_NONE_MATCH') || empty($_COOKIE) && !$pwServer['HTTP_USER_AGENT']) {
+if (S::getServer('HTTP_IF_MODIFIED_SINCE') || S::getServer('HTTP_IF_NONE_MATCH') || empty($_COOKIE) && !$pwServer['HTTP_USER_AGENT']) {
 	sendHeader('304');exit;
 }
 
@@ -12,14 +12,14 @@ if ($_GET['admin']) {
 
 header('Pragma:no-cache');
 header('Cache-control:no-cache');
-
-class CkCode {
+class CkCode{
 
 	var $width;
 	var $height;
 	var $num;
 	var $style;
 	var $gdtype;
+	var $gdcontent;
 
 	function CkCode() {
 		list($w,$h,$n) = explode("\t",$GLOBALS['db_gdsize']);
@@ -29,64 +29,22 @@ class CkCode {
 		$this->width	= $w;
 		$this->height	= $h;
 		$this->num		= (int)$n;
-		$this->style	= $GLOBALS['db_gdstyle'];
-		$this->gdtype	= $GLOBALS['db_gdtype'];
-		$this->gdtype	== 3 && $this->gdtype = mt_rand(0,2);
-	}
-
-	function background() {
-		$im  = imagecreatetruecolor($this->width,$this->height);
-		$bgs = array();
-
-		if (($this->style & 8) && function_exists('imagecreatefromjpeg') && function_exists('imagecopymerge')) {
-			if ($fp = @opendir($GLOBALS['imgdir'].'/ck/bg/')) {
-				while ($flie = @readdir($fp)) {
-					if (preg_match('/\.jpg$/i',$flie)) {
-						$bgs[] = $GLOBALS['imgdir'].'/ck/bg/'.$flie;
-					}
-				}
-				@closedir($fp);
-			}
+		$this->style	= $GLOBALS['db_gdstyle'];//识别难度
+		$this->gdtype	= $GLOBALS['db_gdtype'];//类型: 1-图片,2-Flash,3-语音
+		$this->gdcontent= $GLOBALS['db_gdcontent'];//内容: 1-数字,2-英文,3-中文
+		if(isset($this->gdcontent[3]) && ($this->gdtype == 2 || $this->gdtype == 3 || !function_exists('imagettftext') || !$this->checkChFonts()))
+			unset($this->gdcontent[3]);
+		if(is_array($this->gdcontent) && count($this->gdcontent)>0){
+			$this->gdcontent = array_rand($this->gdcontent);
+		}else{
+			$this->gdcontent = 2;
 		}
-		if ($bgs) {
-			$imbg = imagecreatefromjpeg($bgs[array_rand($bgs)]);
-			imagecopymerge($im,$imbg,0,0,mt_rand(0,200-$this->width),mt_rand(0,80-$this->height), $this->width,$this->height,100);
-			imagedestroy($imbg);
-		} else {
-			$c = array();
-			for ($i = 0; $i < 3; $i++) {
-				$c[$i]		= mt_rand(200, 255);
-				$step[$i]	= (mt_rand(100, 150) - $c[$i]) / $this->width;
-			}
-			for ($i = 0; $i < $this->width; $i++) {
-				imageline($im,$i,0,$i,$this->height,imagecolorallocate($im,$c[0],$c[1],$c[2]));
-				$c[0] += $step[0];
-				$c[1] += $step[1];
-				$c[2] += $step[2];
-			}
-		}
-		return $im;
 	}
-
-	function getColor(&$im) {
-		if ($this->style & 16) {
-			$color = imagecolorallocate($im,mt_rand(0,255),mt_rand(0,255),mt_rand(0,255));
-		} else {
-			static $color = null;
-			if (!isset($color)) {
-				$c_index = imagecolorat($im, 1, 1);
-				$c = imagecolorsforindex($im, $c_index);
-				$color = imagecolorallocate($im,255-$c['red'],255-$c['green'],255-$c['blue']);
-			}
-		}
-		return $color;
-	}
-
 	function getCode($type=null,$set=true) {
-		empty($type) && $type = $this->gdtype;
+		empty($type) && $type = $this->gdcontent;
 		$code = '';
 		switch ($type) {
-			case 2:
+			case 3:
 				global $db_charset,$lang;
 				require_once GetLang('ck');
 				$step = strtoupper($db_charset) == 'UTF-8' ? 3 : 2;
@@ -100,7 +58,7 @@ class CkCode {
 				}
 				$code = explode(',',wordwrap($code,3,',',1));
 				break;
-			case 1:
+			case 2:
 				$list = 'BCEFGHJKMPQRTVWXY2346789';
 				$len  = strlen($list) - 1;
 				for ($i = 0; $i < $this->num; $i++) {
@@ -109,176 +67,77 @@ class CkCode {
 				$set && $this->cookie($code);
 				break;
 			default:
-				$code = num_rand($this->num);
+				$list = '2346789';
+				$this->gdtype == 3 && $list .= '15';
+				$len = strlen($list) - 1;
+				mt_srand((double) microtime() * 1000000);
+				for ($i = 0; $i < $this->num; $i++) {
+					$code .= $list{mt_rand(0, $len)};
+				}
 				$set && $this->cookie($code);
 		}
 		return $code;
 	}
-
-	function ttffont(&$im) {
-		global $db_gdtype;
-		$codefont = $GLOBALS['imgdir'].($this->gdtype == 2 ? '/fonts/ch/' : '/fonts/en/');
-		$dirs = opendir($codefont);
-		$ttf = array();
-		while ($file = readdir($dirs)) {
-			if ($file != '.' && $file != '..' && preg_match('/\.ttf$/i',$file)) {
-				$ttf[] = $file;
-			}
-		}
-		@closedir($dirs);
-		if (empty($ttf)) return;
-
-		$size	= $this->height / ($this->gdtype == 2 ? 2.4 : 2);
-		$code	= $this->getCode();
-		$width	= $this->width / $this->num;
-
-		for ($i = 0; $i < $this->num; $i++) {
-			$dsize	= ($this->style & 2) ? mt_rand($size*0.8,$size*1.2) : $size;
-			$angle	= ($this->style & 4) ? mt_rand(-30, 30) : 0;
-			$color	= $this->getColor($im);
-			$font	= $codefont.$ttf[array_rand($ttf)];
-			$box	= $this->N_imagettfbbox($dsize,0,$font,$code[$i]);
-			$length = $width * $i;
-			$x = mt_rand($length,$length + $width - (max($box[2], $box[4]) - min($box[0], $box[6])));
-			$y = mt_rand(max($box[1],$box[3])-min($box[5],$box[7]),$this->height);
-			imagettftext($im,$dsize,$angle,$x,$y,$color,$font,$code[$i]);
-		}
-	}
-	function N_imagettfbbox($size,$angle,$fontfile,$text) {
-		if (function_exists('imagecreatetruecolor')) {
-			$im = imagecreatetruecolor(1,1);
-		} else {
-			$im = imagecreate(1,1);
-		}
-		$bbox = imagettftext($im,$size,$angle,0,0,imagecolorallocate($im,0,0,0),$fontfile,$text);
-		imagedestroy($im);
-		return $bbox;
-	}
-
-	function imgfont(&$im) {
-		$img = array();
-		if (function_exists('imagecreatefromgif')) {
-			$imgfont = $GLOBALS['imgdir'].'/ck/gif/';
-			$dirs = opendir($imgfont);
-			while ($file = readdir($dirs)) {
-				if ($file != '.' && $file != '..' && file_exists($imgfont.$file.'/2.gif')) {
-					$img[] = $file;
-				}
-			}
-			@closedir($dirs);
-		}
-		$code	= $this->getCode();
-		$width	= $this->width / $this->num;
-
-		for ($i = 0; $i < $this->num; $i++) {
-			$filepath = $img ? $imgfont.$img[array_rand($img)].'/'.strtolower($code[$i]).'.gif' : '';
-			$len  = $i * $width;
-			if ($filepath && file_exists($filepath)) {
-				$src_im = imagecreatefromgif($filepath);
-				list($srcW,$srcH) = getimagesize($filepath);
-				$dstW = $this->height/2;
-				$dstH = $dstW * $srcH / $srcW;
-				$x = mt_rand($len,$len + $width - $dstW);
-				$y = mt_rand(0,$this->height - $dstH);
-				if ($this->style & 16) {
-					imagecolorset($src_im,0,mt_rand(0,255),mt_rand(0,255),mt_rand(0,255));
-				}
-				if ($this->style & 2) {
-					$rate  = mt_rand(80,120)/100;
-					$dstW *= $rate;
-					$dstH *= $rate;
-				}
-				imagecopyresized($im, $src_im, $x, $y, 0, 0, $dstW, $dstH, $srcW, $srcH);
-			} else {
-				$color = $this->getColor($im);
-				$x = mt_rand($len,$len + $width - 10);
-				$y = mt_rand(10,$this->height - 10);
-				imagechar($im,5,$x,$y,$code[$i],$color);
-			}
-		}
-	}
-
-	function disturbcode(&$im) {
-		$code = $this->getCode(1,false);
-		$x = $this->width / $this->num;
-		$y = $this->height / 10;
-		$color	= $this->getColor($im);
-		for ($i = 0; $i <= 3; $i++) {
-			imagechar($im,5,$x*$i+mt_rand(0,$x-10),mt_rand($y,$this->height-10-$y),$code[$i],$color);
-		}
-	}
-
-	function disturbimg(&$im) {
-		$nums = $this->height / 10;
-		for ($i=0; $i <= $nums; $i++) {
-			$color	= $this->getColor($im);
-			$x = mt_rand(0,$this->width);
-			$y = mt_rand(0,$this->height);
-			if (mt_rand(0,1)) {
-				imagearc($im,$x,$y,mt_rand(0,$this->width),mt_rand(0,$this->height),mt_rand(0,360),mt_rand(0, 360),$color);
-			} else {
-				imageline($im,$x,$y,mt_rand(0,$this->width),mt_rand(0,$this->height),$color);
-			}
-		}
-	}
-
-	function ckgif() {
-		L::loadClass('gif', 'utility', false);
-		
-		$trueframe = mt_rand(1, 9);
-
-		$im = $this->background();
-		imagepng($im);
-		imagedestroy($im);
-		$bg = ob_get_contents();
-		ob_clean();
-
-		for ($i = 0; $i <= 9; $i++) {
-			$im = imagecreatefromstring($bg);
-			($this->style & 32) && $this->disturbimg($im);
-			$x[$i] = $y[$i] = 0;
-			if ($i == $trueframe) {
-				($this->style & 1 || $this->gdtype == 2) ? $this->ttffont($im) : $this->imgfont($im);
-				$d[$i] = mt_rand(250, 400);
-			} else {
-				$this->disturbcode($im);
-				$d[$i] = mt_rand(5, 15);
-			}
-			imagegif($im);
-			imagedestroy($im);
-			$frame[$i] = ob_get_contents();
-			ob_clean();
-		}
-		$anim = new GIFEncoder($frame, $d, 0, 0, 0, 0, 0, 'bin');
-		header('Content-type: image/gif');
-		echo $anim->getAnimation();
-	}
-
-	function ckpng() {
-		header('Content-type: image/png');
-		$im = $this->background();
-		($this->style & 32) && $this->disturbimg($im);
-		($this->style & 1 || $this->gdtype == 2) ? $this->ttffont($im) : $this->imgfont($im);
-		imagepng($im);
-		imagedestroy($im);
-	}
-
+	
 	function out() {
-		if (!function_exists('imagecreatetruecolor') || !function_exists('imagecolorallocate') || !function_exists('imagepng') || !function_exists('imagettftext')) {
-			header("ContentType: image/bmp");
-			$code = $this->getCode(4);
-			echo $this->Codebmp($code,$this->num);
-		} elseif (empty($_GET['nowtime'])) {
-			$im = $this->background();
-			imagepng($im);
-			imagedestroy($im);
-		} elseif (($this->style & 64) && function_exists('imagegif')) {
-			$this->ckgif();
-		} else {
-			$this->ckpng();
+		switch ($this->gdtype){
+			case 2:
+				$this->outputFlash();
+				//Flash
+				break;
+			case 3:
+				//语音
+				$this->outputAudio();
+				break;
+			default:
+				//图片
+				$this->outputImage();
 		}
 	}
-
+	
+	function outputAudio() {
+		$code = $this->getCode();
+		L::loadClass('audio', 'utility/captcha',false);
+		$audio = new PW_Audio();
+		$audio->setAudioPath(D_P . 'images/ck/audio/');
+		$audio->setCode($code);
+		$audio->outputAudio();
+	}
+	
+	function outputImage(){
+		if (!function_exists('imagecreatetruecolor') || !function_exists('imagecolorallocate') || !function_exists('imagepng')) {
+			header("ContentType: image/bmp");
+			$code = $this->getCode(1);
+			echo $this->Codebmp($code,$this->num);exit;
+		}
+		$code = $this->getCode();
+		L::loadClass('graphic', 'utility/captcha',false);
+		$graphic = new PW_Graphic($this->width,$this->height);
+		$graphic->backGround = $this->style & 8 ? 'image' : 'random';
+		
+		if (!empty($_GET['nowtime'])) {
+			$graphic->setCodes($code);
+			$this->gdcontent == 3 && $graphic->lang = 'ch';
+			$graphic->fontSize = $this->height / ($this->gdcontent == 3 ? 2.4 : 2);
+			if (($this->style & 64) && function_exists('imagegif')) {
+				$graphic->imageType = 'gif';
+			}
+			$this->style & 16 && $graphic->fontRandomColor = true;
+			$this->style & 4  && $graphic->fontRandomAngle = true;
+			$this->style & 2  && $graphic->fontRandomSize = true;
+			($this->style & 1 || $this->gdcontent == 3) && function_exists('imagettftext') && $graphic->fontRandomFamily = true;
+			$this->style & 32 && $graphic->disturbImg = true;
+		}
+		$graphic->display();
+	}
+	
+	function outputFlash(){
+		L::loadClass('flash', 'utility/captcha',false);
+		$flash = new PW_Flash($this->width,$this->height);
+		$flash->codes = $this->getCode();
+		$flash->display();
+	}
+	
 	function cookie($code) {
 		global $timestamp;
 		Cookie('cknum',StrCode($timestamp."\t\t".md5($code.$timestamp)));
@@ -326,6 +185,20 @@ class CkCode {
 			$chs = new Chinese($from_encoding,$to_encoding);
 			return $chs->Convert($str);
 		}
+	}
+	function checkChFonts(){
+		$codefont = $GLOBALS['imgdir'] . '/fonts/ch/';
+		if (file_exists($codefont)) {
+			$dirs = opendir($codefont);
+			while ($file = readdir($dirs)) {
+				if ($file != '.' && $file != '..' && preg_match('/\.ttf$/i',$file)) {
+					@closedir($dirs);
+					return true;
+				}
+			}
+			@closedir($dirs);
+		}
+		return false;
 	}
 }
 $ck = new CkCode();

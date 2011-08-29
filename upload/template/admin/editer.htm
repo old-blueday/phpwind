@@ -1,0 +1,165 @@
+<!--<?php
+include_once PrintEot('left');
+if ($adminitem == 'basic') {print <<<EOT
+-->
+<div class="nav3 mb10">
+    <ul class="cc">
+		<li class="current"><a href="$jobUrl">基本设置</a></li>
+		<li><a href="$jobUrl&adminitem=setform">预设帖子格式</a></li>
+		<li><a href="$jobUrl&adminitem=pwcode">自定义代码</a></li>
+		<li><a href="$jobUrl&adminitem=commonsmile">普通表情</a></li>
+		<li><a href="$jobUrl&adminitem=specialsmile">特殊表情</a></li>
+		
+    </ul>
+</div>
+<form action="$basename" method="post">
+<input type="hidden" name="step" value="2">
+<h3 class="h1">标签设置</h3>
+<div class="admin_table mb10">
+	<table width="100%" cellspacing="0" cellpadding="0">
+		<tr class="tr1 vt">
+			<td class="td1">帖子中标签转换控制</td>
+			<td class="td2"><input name="config[cvtimes]" value="$db_cvtimes" class="input input_wa" /></td>
+			<td class="td2"><div class="help_a">超过设定值以后，windcode以及表情代码等将不再转换。建议设置为10 - 30 之间，-1 为不限制</div></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">[img]标签</td>
+			<td class="td2">
+				<ul class="list_A list_80">
+					<li><input type="radio" value="1" name="windpost[pic]" $windpost_pic_Y>开启</li>
+					<li><input type="radio" value="0" name="windpost[pic]" $windpost_pic_N>关闭</li>
+				</ul>
+			</td>
+			<td class="td2"><div class="help_a">开启后，可使用[img]标签发表图片</div></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">[img]大小控制[像素]</td>
+			<td class="td2">
+				<ul class="list_C">
+					<li>宽:<input name="windpost[picwidth]" value="$db_windpost[picwidth]" class="input input_wc mr5" /></li>
+					<li>高:<input name="windpost[picheight]" value="$db_windpost[picheight]" class="input input_wc mr5" /></li>
+				</ul>
+			</td>
+			<td class="td2"><div class="help_a">超过设定值以后，图片将按照设定的大小等比缩略。留空不限制</div></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">[size]标签最大值控制</td>
+			<td class="td2"><input name="windpost[size]" value="$db_windpost[size]" class="input input_wa" /></td>
+			<td class="td2"><div class="help_a">最大字体控制。0或留空表示不限制</div></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">Wind Flash</td>
+			<td class="td2">
+				<ul class="list_A list_80">
+					<li><input type="radio" value="1" name="windpost[flash]" $windpost_flash_Y>开启</li>
+					<li><input type="radio" value="0" name="windpost[flash]" $windpost_flash_N>关闭</li>
+				</ul>
+			</td>
+			<td class="td2"><div class="help_a">开启后，会员可以发表flash帖子。建议关闭</div></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">多媒体标签</td>
+			<td class="td2">
+				<ul class="list_A list_80">
+					<li><input type="radio" value="1" name="windpost[mpeg]" $windpost_mpeg_Y>开启</li>
+					<li><input type="radio" value="0" name="windpost[mpeg]" $windpost_mpeg_N>关闭</li>
+				</ul>
+			</td>
+			<td class="td2"><div class="help_a">开启后，会员可以使用[wmv]标签发表多种多媒体文件 rm  wmv  mp3</div></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">iframe</td>
+			<td class="td2">
+				<ul class="list_A list_80">
+					<li><input type="radio" value="1" name="windpost[iframe]" $windpost_iframe_Y>开启</li>
+					<li><input type="radio" value="0" name="windpost[iframe]" $windpost_iframe_N>关闭</li>
+				</ul>
+			</td>
+			<td class="td2"><div class="help_a">开启后，会员可以直接用[iframe]标签调用某个页面。建议关闭</div></td>
+		</tr>
+	</table>
+</div>
+<h3 class="h1">功能设置</h3>
+<div class="admin_table mb10">
+	<table width="100%" cellspacing="0" cellpadding="0">
+		<tr class="tr1 vt">
+			<td class="td1">动漫传情</td>
+			<td class="td2">
+				<ul class="list_A list_80">
+					<li><input type="radio" value="1" name="config[windmagic]" $windmagic_Y>开启</li>
+					<li><input type="radio" value="0" name="config[windmagic]" $windmagic_N>关闭</li>
+				</ul>
+			</td>
+			<td class="td2"><div class="help_a">开启后，会员可以在帖子中添加动漫传情</div></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">发帖内容验证</td>
+			<td class="td2">
+				<ul class="list_A list_80">
+					<li><input type="radio" value="1" name="config[tcheck]" $tcheck_Y>开启</li>
+					<li><input type="radio" value="0" name="config[tcheck]" $tcheck_N>关闭</li>
+				</ul>
+			</td>
+			<td class="td2"><div class="help_a">开启该功能，会员将无法连续发表同一内容的主题</div></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">自定义代码格式</td>
+			<td class="td2">
+				<ul class="list_A list_80">
+					<li><input type="radio" value="1" name="config[pwcode]" $pwcode_Y>开启</li>
+					<li><input type="radio" value="0" name="config[pwcode]" $pwcode_N>关闭</li>
+				</ul>
+			</td>
+			<td class="td2"><div class="help_a">开启后，会员可使用站点自定义代码。可在<a href="$admin_file?adminjob=editer&adminitem=pwcode">自定义代码格式</a>中添加</div></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">预设帖子格式</td>
+			<td class="td2">
+				<ul class="list_A list_80">
+					<li><input type="radio" value="1" name="config[setform]" $setform_Y>开启</li>
+					<li><input type="radio" value="0" name="config[setform]" $setform_N>关闭</li>
+				</ul>
+			</td>
+			<td class="td2"><div class="help_a">开启后，会员可使用预设帖子格式发帖。可在<a href="$admin_file?adminjob=editer&adminitem=setform">帖子预设格式</a>中添加</div></td>
+		</tr>
+
+		<tr class="tr1 vt">
+			<td class="td1">自动贴图</td>
+			<td class="td2">
+				<ul class="list_A list_80">
+					<li><input type="radio" value="1" name="config[autoimg]" $autoimg_Y>开启</li>
+					<li><input type="radio" value="0" name="config[autoimg]" $autoimg_N>关闭</li>
+				</ul>
+			</td>
+			<td class="td2"><div class="help_a">开启后，网页图片可直接复制到编辑器中</div></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">发送回复通知邮件</td>
+			<td class="td2">
+				<ul class="list_A list_80">
+					<li><input type="radio" value="1" name="config[replysendmail]" $replysendmail_Y>开启</li>
+					<li><input type="radio" value="0" name="config[replysendmail]" $replysendmail_N>关闭</li>
+				</ul>
+			</td>
+			<td class="td2"><div class="help_a">开启后，当帖子被回复时，系统将发送邮件给帖子作者</div></td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">发送回复站内通知</td>
+			<td class="td2">
+				<ul class="list_A list_80">
+					<li><input type="radio" value="1" name="config[replysitemail]" $replysitemail_Y>开启</li>
+					<li><input type="radio" value="0" name="config[replysitemail]" $replysitemail_N>关闭</li>
+				</ul>
+			</td>
+			<td class="td2"><div class="help_a">开启后，当帖子被回复时，系统将发送站内短信息给帖子作者</div></td>
+		</tr>
+	</table>
+</div>
+<div class="mb10 tac">
+	<span class="btn"><span><button type="submit"  value="提 交">提 交</button></span></span>
+</div>
+</form>
+<!--
+EOT;
+}include_once PrintEot('adminbottom');
+?>-->

@@ -2,7 +2,7 @@
 /**
  * Warning: should be coded in php4
  */
-
+!function_exists('readover') && exit('Forbidden');
 class PlatformApiProtocol {
 	var $_appKey = '';
 	var $_appSecret = '';
@@ -56,8 +56,8 @@ class PlatformApiProtocol {
 	function getPlatformApiBaseUrl() {
 		if (!$this->_platformApiBaseUrl) {
 			$path = dirname(__FILE__) . '/config_platformurl.php';
-			$config = @include (realpath($path));
-			$this->_platformApiBaseUrl = $config ? $config : 'http://appsdevelop.test.phpwind.com/';
+			$config = @include S::escapePath((realpath($path)));
+			$this->_platformApiBaseUrl = $config ? $config : 'http://apps.phpwind.net/';
 		}
 		
 		return $this->_platformApiBaseUrl;
@@ -120,6 +120,7 @@ class PlatformApiProtocol {
 		if ($this->getFormat()) $params['format'] = $this->getFormat();
 		if ($this->getSignMethod()) $params['sign_method'] = $this->getSignMethod();
 		$params['v'] = $this->getVersion();
+		$params['site_v'] = $this->_getSiteVersion();
 		return $params;
 	}
 	
@@ -127,6 +128,10 @@ class PlatformApiProtocol {
 		$method = trim($method);
 		if ('' == $method) $this->_throwError('method should not be empty');
 		return $method;
+	}
+
+	function _getSiteVersion() {
+		return defined('WIND_VERSION') ? WIND_VERSION : '';
 	}
 	
 	function _throwError($msg) {
@@ -185,6 +190,18 @@ class PlatformApiClient extends PlatformApiProtocol {
 	function buildPublicPageUrl($method, $params = array()) {
 		$method = $this->_checkMethod($method);
 		return $this->_buildRequestUrl($method) . "?" . $this->_buildPublicQueryString($params);
+	}
+}
+
+class PlatformApiClientUtility {
+	function convertCharset($inCharset, $outCharset, $data) {
+		return pwConvert($data, $outCharset, $inCharset);
+	}
+	
+	function decodeJson($jsonString) {
+		L::loadClass('json', 'utility', false);
+		$json = new Services_JSON();
+		return $json->decode($jsonString);
 	}
 }
 

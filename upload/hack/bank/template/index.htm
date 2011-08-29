@@ -9,7 +9,7 @@
 .bank_jj li.current{height:auto;}
 </style>
 <div id="breadCrumb">
-		<img src="$imgpath/$stylepath/thread/home-old.gif" align="absmiddle" />&nbsp;<a href="$db_bfn?m=bbs" title="$db_bbsname">$db_bbsname</a><!--
+	<img src="$imgpath/$stylepath/thread/home.gif" class="cp breadHome" /><em class="breadEm"></em><a href="$db_bfn?m=bbs" title="$db_bbsname">$db_bbsname</a><!--
 EOT;
 if($action=='log'){print <<<EOT
 -->
@@ -165,7 +165,7 @@ print <<<EOT
 -->
 															<tr class="tr3 $class">
 																	<td style="border-right:0" width="10%">$id</td>
-																	<td style="border-right:0" width="25%"><a href="u.php?uid=$thread[0]">$thread[1]</a></td>
+																	<td style="border-right:0" width="25%"><a href="{$db_userurl}$thread[0]">$thread[1]</a></td>
 																	<td style="border-right:0" width="*">$thread[2] $db_moneyunit</td>
 																	<td style="border-right:0" class="smalltxt">$thread[3]</td>
 															</tr>
@@ -191,7 +191,7 @@ print <<<EOT
 -->
 																	<tr class="tr3 $class">
 																			<td style="border-right:0" width="10%">$id</td>
-																			<td style="border-right:0" width="25%"><a href="u.php?uid=$thread[0]">$thread[1]</a></td>
+																			<td style="border-right:0" width="25%"><a href="{$db_userurl}$thread[0]">$thread[1]</a></td>
 																			<td style="border-right:0" width="*">$thread[2] $db_moneyunit</td>
 																			<td style="border-right:0" class="smalltxt">$thread[3]</td>
 																	</tr>

@@ -5,7 +5,7 @@ if (empty($_GET['step'])) {
 	
 	define('AJAX', 1);
 	list($db_upload, $db_imglen, $db_imgwidth, $db_imgsize) = explode("\t", $db_upload);
-	InitGP(array(
+	S::gp(array(
 		'uid',
 		'verify'
 	));
@@ -43,7 +43,7 @@ if (empty($_GET['step'])) {
 	
 	if ($data) {
 		
-		InitGP(array(
+		S::gp(array(
 			'from'
 		));
 		require_once (R_P . 'require/showimg.php');
@@ -56,7 +56,8 @@ if (empty($_GET['step'])) {
 		
 		$middleFile = PwUpload::savePath($db_ifftp, $filename, "$middleDir", 'm_');
 		PwUpload::createFolder(dirname($middleFile));
-		writeover($middleFile, $data);
+		//* writeover($middleFile, $data);
+		pwCache::setData($middleFile, $data);
 		
 		require_once (R_P . 'require/imgfunc.php');
 		if (!$img_size = GetImgSize($middleFile, 'jpg')) {
@@ -94,7 +95,7 @@ if (empty($_GET['step'])) {
 		
 		$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
 		$userService->update($winduid, array('icon'=>$usericon));
-		$db->update("DELETE FROM pw_datastore WHERE skey=". pwEscape("UID_".$winduid). " LIMIT 1");
+		//* $db->update("DELETE FROM pw_datastore WHERE skey=". S::sqlEscape("UID_".$winduid). " LIMIT 1");
 		
 		//job sign
 		initJob($winduid, "doUpdateAvatar");

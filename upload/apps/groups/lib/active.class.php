@@ -23,7 +23,7 @@ class PW_Active {
 	function getActiveById($id) {
 		static $array = array();
 		if (!isset($array[$id])) {
-			$array[$id] = $this->_db->get_one("SELECT * FROM pw_active WHERE id=" . pwEscape($id));
+			$array[$id] = $this->_db->get_one("SELECT * FROM pw_active WHERE id=" . S::sqlEscape($id));
 		}
 		return $array[$id];
 	}
@@ -33,7 +33,7 @@ class PW_Active {
 	 * return array
 	 */
 	function getActiveInfoById($id) {
-		return $this->_db->get_one("SELECT a.*,m.username,m.icon FROM pw_active a LEFT JOIN pw_members m ON a.uid=m.uid WHERE a.id=" . pwEscape($id));
+		return $this->_db->get_one("SELECT a.*,m.username,m.icon FROM pw_active a LEFT JOIN pw_members m ON a.uid=m.uid WHERE a.id=" . S::sqlEscape($id));
 	}
 	
 	/**
@@ -42,7 +42,7 @@ class PW_Active {
 	 */
 	function getAttById($id) {
 		$array = array();
-		$query = $this->_db->query("SELECT * FROM pw_actattachs WHERE actid=" . pwEscape($id) . ' ORDER BY aid');
+		$query = $this->_db->query("SELECT * FROM pw_actattachs WHERE actid=" . S::sqlEscape($id) . ' ORDER BY aid');
 		while ($rt = $this->_db->fetch_array($query)) {
 			$array[$rt['aid']] = $rt;
 		}
@@ -54,7 +54,7 @@ class PW_Active {
 	 * return int
 	 */
 	function getActiveCount($cid) {
-		return (int)$this->_db->get_value("SELECT COUNT(*) AS sum FROM pw_active WHERE cid=" . pwEscape($cid));
+		return (int)$this->_db->get_value("SELECT COUNT(*) AS sum FROM pw_active WHERE cid=" . S::sqlEscape($cid));
 	}
 	
 	/**
@@ -66,7 +66,7 @@ class PW_Active {
 	 */
 	function getActiveList($cid, $nums, $start = 0) {
 		$array = array();
-		$query = $this->_db->query("SELECT * FROM pw_active WHERE cid=" . pwEscape($cid) . ' ORDER by id DESC ' . pwLimit($start, $nums));
+		$query = $this->_db->query("SELECT * FROM pw_active WHERE cid=" . S::sqlEscape($cid) . ' ORDER by id DESC ' . S::sqlLimit($start, $nums));
 		while ($rt = $this->_db->fetch_array($query)) {
 			$array[] = $this->convert($rt);
 		}
@@ -84,7 +84,7 @@ class PW_Active {
 			$total = (int)$this->_db->get_value("SELECT COUNT(*) AS sum FROM pw_active WHERE 1" . $sql);
 		}
 		if ($nums) {
-			$limit = pwLimit($start, $nums);
+			$limit = S::sqlLimit($start, $nums);
 		}
 		if ($orderway) {
 			!in_array($orderway, array('members','id')) && $orderway = 'id';
@@ -105,13 +105,13 @@ class PW_Active {
 	 */
 	function getRelateActive($id, $nums) {
 		$actids = $array = array();
-		$query = $this->_db->query("SELECT distinct(a.actid) FROM pw_actmembers a LEFT JOIN pw_actmembers b ON a.uid=b.uid WHERE a.actid!=" . pwEscape($id)." ORDER BY a.actid DESC " . pwLimit(0, $nums));
+		$query = $this->_db->query("SELECT distinct(a.actid) FROM pw_actmembers a LEFT JOIN pw_actmembers b ON a.uid=b.uid WHERE a.actid!=" . S::sqlEscape($id)." ORDER BY a.actid DESC " . S::sqlLimit(0, $nums));
 		while ($rt = $this->_db->fetch_array($query)) {
 			$actids[] = $rt['actid'];
 		}
 		$this->_db->free_result($query);
 		if (!$actids) return $array;
-		$query = $this->_db->query("SELECT id,title,cid,address,begintime,endtime,members,hits FROM pw_active WHERE id IN(".pwImplode($actids).") ORDER BY id DESC");
+		$query = $this->_db->query("SELECT id,title,cid,address,begintime,endtime,members,hits FROM pw_active WHERE id IN(".S::sqlImplode($actids).") ORDER BY id DESC");
 		while ($rt = $this->_db->fetch_array($query)) {
 			$array[] = $rt;
 		}
@@ -119,7 +119,7 @@ class PW_Active {
 	}
 
 	function sqlIn($ids) {
-		return (is_array($ids) && $ids) ? ' IN (' . pwImplode($ids) . ')' : '=' . pwEscape($ids);
+		return (is_array($ids) && $ids) ? ' IN (' . S::sqlImplode($ids) . ')' : '=' . S::sqlEscape($ids);
 	}
 
 	function sqlCompound($where) {
@@ -135,24 +135,24 @@ class PW_Active {
 				case 'uid':
 					$_sql_where .= " AND $_sql_field" . $this->sqlIn($value);break;
 				case 'type':
-					$_sql_where .= " AND type=" . pwEscape($value);break;
+					$_sql_where .= " AND type=" . S::sqlEscape($value);break;
 				case 'createtime_s':
-					$_sql_where .= " AND createtime>=" . pwEscape($value);break;
+					$_sql_where .= " AND createtime>=" . S::sqlEscape($value);break;
 				case 'createtime_e':
-					$_sql_where .= " AND createtime<=" . pwEscape($value);break;
+					$_sql_where .= " AND createtime<=" . S::sqlEscape($value);break;
 				case 'title':
-					$_sql_where .= " AND title LIKE " . pwEscape('%' . $value . '%');break;
+					$_sql_where .= " AND title LIKE " . S::sqlEscape('%' . $value . '%');break;
 				case 'activestate':
 					if ($value == 5) {
-						$_sql_where .= " AND endtime<" . pwEscape($timestamp);
+						$_sql_where .= " AND endtime<" . S::sqlEscape($timestamp);
 					} elseif($value == 4) {
-						$_sql_where .= " AND deadline<" . pwEscape($timestamp) . " AND begintime<" . pwEscape($timestamp) . " AND endtime>" . pwEscape($timestamp);
+						$_sql_where .= " AND deadline<" . S::sqlEscape($timestamp) . " AND begintime<" . S::sqlEscape($timestamp) . " AND endtime>" . S::sqlEscape($timestamp);
 					} elseif($value == 3) {
-						$_sql_where .= " AND deadline<" . pwEscape($timestamp) . " AND begintime>" . pwEscape($timestamp);
+						$_sql_where .= " AND deadline<" . S::sqlEscape($timestamp) . " AND begintime>" . S::sqlEscape($timestamp);
 					} elseif($value == 2) {
-						$_sql_where .= " AND limitnum!=0 AND members>=limitnum AND deadline>" . pwEscape($timestamp);
+						$_sql_where .= " AND limitnum!=0 AND members>=limitnum AND deadline>" . S::sqlEscape($timestamp);
 					} elseif($value == 1) {
-						$_sql_where .= " AND deadline>" . pwEscape($timestamp) . ' AND (limitnum=0 OR members<limitnum)';
+						$_sql_where .= " AND deadline>" . S::sqlEscape($timestamp) . ' AND (limitnum=0 OR members<limitnum)';
 					}
 					break;
 			}
@@ -183,7 +183,7 @@ class PW_Active {
 		if (($return = $this->checkJoinInfo($info)) !== true) {
 			return $return;
 		}
-		$this->_db->update("INSERT INTO pw_actmembers SET " . pwSqlSingle(array(
+		$this->_db->update("INSERT INTO pw_actmembers SET " . S::sqlSingle(array(
 			'uid'		=> $uid,
 			'actid'		=> $id,
 			'realname'	=> $info['realname'],
@@ -192,7 +192,7 @@ class PW_Active {
 			'address'	=> $info['address'],
 			'anonymous'	=> intval($info['anonymous'])
 		)));
-		$this->_db->update("UPDATE pw_active SET members=members+1 WHERE id=" . pwEscape($id));
+		$this->_db->update("UPDATE pw_active SET members=members+1 WHERE id=" . S::sqlEscape($id));
 		return true;
 	}
 	
@@ -250,7 +250,7 @@ class PW_Active {
 	 * return bool
 	 */
 	function isJoin($id, $uid) {
-		if ($this->_db->get_one("SELECT id FROM pw_actmembers WHERE actid=" . pwEscape($id) . ' AND uid=' . pwEscape($uid))) {
+		if ($this->_db->get_one("SELECT id FROM pw_actmembers WHERE actid=" . S::sqlEscape($id) . ' AND uid=' . S::sqlEscape($uid))) {
 			return true;
 		}
 		return false;
@@ -262,18 +262,18 @@ class PW_Active {
 	 */
 	function getHotActive($nums) {
 		global $timestamp;
-		$rt = $this->_db->get_one("SELECT * FROM pw_cache WHERE name='hotactive_3' AND time>" . pwEscape($timestamp - 1800));
+		$rt = $this->_db->get_one("SELECT * FROM pw_cache WHERE name='hotactive_3' AND time>" . S::sqlEscape($timestamp - 1800));
 		if ($rt) {
 			return unserialize($rt['cache']);
 		} else {
 			list($activedb) = $this->searchList(array('createtime_s' => $timestamp - 2592000), 3, 0, 'members', 'DESC');
-			$this->_db->update("REPLACE INTO pw_cache SET " . pwSqlSingle(array('name' => 'hotactive_3', 'cache' => serialize($activedb), 'time' => $timestamp)));
+			$this->_db->update("REPLACE INTO pw_cache SET " . S::sqlSingle(array('name' => 'hotactive_3', 'cache' => serialize($activedb), 'time' => $timestamp)));
 			return $activedb;
 		}
 	}
 
 	function updateHits($id, $hits = 1) {
-		$this->_db->update("UPDATE pw_active SET hits=hits+" . pwEscape($hits) . " WHERE id=" . pwEscape($id));
+		$this->_db->update("UPDATE pw_active SET hits=hits+" . S::sqlEscape($hits) . " WHERE id=" . S::sqlEscape($id));
 	}
 	
 	/**
@@ -281,9 +281,9 @@ class PW_Active {
 	 * void
 	 */
 	function quitActive($id, $uid) {
-		$this->_db->update("DELETE FROM pw_actmembers WHERE actid=" . pwEscape($id) . ' AND uid=' . pwEscape($uid));
+		$this->_db->update("DELETE FROM pw_actmembers WHERE actid=" . S::sqlEscape($id) . ' AND uid=' . S::sqlEscape($uid));
 		if ($this->_db->affected_rows() > 0) {
-			$this->_db->update("UPDATE pw_active SET members=members-1 WHERE id=" . pwEscape($id));
+			$this->_db->update("UPDATE pw_active SET members=members-1 WHERE id=" . S::sqlEscape($id));
 		}
 	}
 
@@ -297,7 +297,7 @@ class PW_Active {
 			if ($value['poster']) {
 				pwDelatt($value['poster'], $GLOBALS['db_ifftp']);
 			}
-			$this->_db->update("UPDATE pw_colonys SET activitynum=activitynum-1 WHERE id=". pwEscape($value['cid']));
+			$this->_db->update("UPDATE pw_colonys SET activitynum=activitynum-1 WHERE id=". S::sqlEscape($value['cid']));
 		}
 		$this->_db->update("DELETE FROM pw_actmembers WHERE actid" . $this->sqlIn($id));
 		$this->_db->update("DELETE FROM pw_active WHERE id" . $this->sqlIn($id));
@@ -308,9 +308,9 @@ class PW_Active {
 	 * return array
 	 */
 	function getActMembers($id, $nums = null, $start = 0) {
-		$limit = $nums ? pwLimit($start, $nums) : '';
+		$limit = $nums ? S::sqlLimit($start, $nums) : '';
 		$array = array();
-		$query = $this->_db->query("SELECT a.*,m.username,m.icon,anonymous FROM pw_actmembers a LEFT JOIN pw_members m ON a.uid=m.uid WHERE a.actid=" . pwEscape($id) . ' ORDER BY id ASC ' . $limit);
+		$query = $this->_db->query("SELECT a.*,m.username,m.icon,anonymous FROM pw_actmembers a LEFT JOIN pw_members m ON a.uid=m.uid WHERE a.actid=" . S::sqlEscape($id) . ' ORDER BY id ASC ' . $limit);
 		while ($rt = $this->_db->fetch_array($query)) {
 			list($rt['icon']) = showfacedesign($rt['icon'], 1, 'm');
 			$array[] = $rt;
@@ -319,7 +319,7 @@ class PW_Active {
 	}
 
 	function getCyidById($id) {
-		return $this->_db->get_value("SELECT cid FROM pw_active WHERE id=" . pwEscape($id));
+		return $this->_db->get_value("SELECT cid FROM pw_active WHERE id=" . S::sqlEscape($id));
 	}
 }
 ?>

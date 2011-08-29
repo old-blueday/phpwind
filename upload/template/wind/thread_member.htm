@@ -74,11 +74,11 @@ EOT;
 }print <<<EOT
 -->
                     <td width="70">
-                        <a href="u.php?uid=$value[uid]" target="_blank" class="img_50"><img src="$value[icon]" width="48" height="48" /></a>
+                        <a href="{$db_userurl}$value[uid]" target="_blank" class="img_50"><img src="$value[icon]" width="48" height="48" /></a>
                     </td>
                     <td>
                         <p class="mb5 cc">
-								<a href="u.php?uid=$value[uid]" target="_blank" class="b f14 mr5 fl">
+								<a href="{$db_userurl}$value[uid]" target="_blank" class="b f14 mr5 fl">
 								$value[username]
 <!--
 EOT;
@@ -229,7 +229,7 @@ foreach ($memdb as $key => $value) {
 $visittime = get_date($value[lastvisit], 'm月d日');
 print <<<EOT
 -->
-				<li><a href="u.php?uid=$value[uid]" class="i" target="_blank" title="$value[username]"><img src="{$value[icon]}" height="44" width="44" /></a><p class="n"><a href="u.php?uid=$value[uid]" title="$value[username]">$value[username]</a></p><p class="t">$visittime</p></li>
+				<li><a href="{$db_userurl}$value[uid]" class="i" target="_blank" title="$value[username]"><img src="{$value[icon]}" height="44" width="44" /></a><p class="n"><a href="{$db_userurl}$value[uid]" title="$value[username]">$value[username]</a></p><p class="t">$visittime</p></li>
 <!--
 EOT;
 }print<<<EOT
@@ -267,13 +267,13 @@ EOT;
 -->
 <div class="cc pd15">
         <div class="g_contentC fl">
-            <div class="f14 b mb10">方法一：给好友发送 Email 邀请</div>
+            <div class="f14 b mb10">方法一：给好友发送电子邮件邀请</div>
             <form action="thread.php?cyid=$cyid&showtype=member&a=invite" method="post" id="inviteForm">
 			<input type="hidden" name="step" value="1">
 			<input type="hidden" name="type" value="$type">
 			<input type="hidden" name="id" value="$id">
-            <p class="mb5">好友的 Email</p>
-            <p class="mb5"><textarea name="emails" id="emails" class="textareaA" onclick="grayChange(this)" >多个 Email 用逗号 (,) 或者换行分隔</textarea></p>
+            <p class="mb5">好友的电子邮箱</p>
+            <p class="mb5"><textarea name="emails" id="emails" class="textareaA" onclick="grayChange(this)" >多个电子邮箱用逗号 (,) 或者换行分隔</textarea></p>
             <p id="emails_warning" class="maxlength-hint wrongTip" style="display: none;"></p>
             <div class="c mb20">&nbsp;</div>
             <p class="mb5">邀请附言</p>
@@ -296,14 +296,15 @@ function grayChange(obj) {
 	if (obj.className == 'gray') {
 		obj.className = '';
 	}
-	if (obj.value =='多个 Email 用逗号 (,) 或者换行分隔') {
+	if (obj.value =='多个电子邮箱用逗号 (,) 或者换行分隔') {
 		obj.value = '';
 	}
 }
 function copyUrl2(o) {
 	if (is_ie) {
-		window.clipboardData.setData("Text",o);
-		showDialog('success','已成功复制',1);
+		if(window.clipboardData.setData("Text",o)){
+			showDialog('success','已成功复制',1);
+		}
 	} else {
 		prompt('按下 Ctrl+C 复制到剪贴板', o)
 	}

@@ -1,11 +1,13 @@
 <!--<?php
 require_once(uTemplate::printEot('header'));
-//require_once(uTemplate::printEot('user_appleft'));
+require_once(uTemplate::printEot('user_appleft'));
 $randnum = rand(1, 9999);
 print <<<EOT
 -->
 <div class="contUser">
+<table width="100%"><tr><td valign="top" height="500">
 <div class="p15">	
+	<h4 class="site"><img src="u/images/module/hot.png" align="absmiddle" class="mr10" /><span>热榜</span></h4>
 <!-- 热榜 tabs start -->
 <!--
 EOT;
@@ -92,6 +94,7 @@ if($action=='memberHot'){
 -->
 </div></div>
 <script language="javascript" src="apps/$appdir/js/hot.js"></script>
+</td></tr></table>
 </div>
 <!--
 EOT;

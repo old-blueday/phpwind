@@ -1,11 +1,9 @@
 <?php
 !defined('P_W') && exit('Forbidden');
 
-InitGP(array(
-	'aid'
-));
+S::gp(array('aid'));
 
-$rt = $db->get_one("SELECT * FROM pw_attachs WHERE aid=" . pwEscape($aid));
+$rt = $db->get_one("SELECT * FROM pw_attachs WHERE aid=" . S::sqlEscape($aid));
 $a_url = geturl($rt['attachurl']);
 if (empty($a_url) || $rt['needrvrc'] > 0) {
 	Showmsg('job_attach_error');

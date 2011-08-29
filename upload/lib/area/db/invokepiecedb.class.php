@@ -4,14 +4,14 @@ class PW_InvokePieceDB extends BaseDB {
 	var $_tableName = "pw_invokepiece";
 
 	function getDataById($id) {
-		$temp = $this->_db->get_one("SELECT * FROM ".$this->_tableName." WHERE id=".pwEscape($id));
+		$temp = $this->_db->get_one("SELECT * FROM ".$this->_tableName." WHERE id=".S::sqlEscape($id));
 		if (!$temp) return array();
 		return $this->_unserializeData($temp);
 	}
 	function getDatasByIds($ids) {
 		if (!is_array($ids) || !$ids) return array();
 		$temp	= array();
-		$query	= $this->_db->query("SELECT * FROM ".$this->_tableName." WHERE id IN(".pwImplode($ids).")");
+		$query	= $this->_db->query("SELECT * FROM ".$this->_tableName." WHERE id IN(".S::sqlImplode($ids).")");
 		while ($rt = $this->_db->fetch_array($query)) {
 			$temp[$rt['id']]	= $this->_unserializeData($rt);
 		}
@@ -20,7 +20,7 @@ class PW_InvokePieceDB extends BaseDB {
 
 	function getDatasByInvokeName($invokename) {
 		$temp = array();
-		$query = $this->_db->query("SELECT * FROM ".$this->_tableName." WHERE invokename=".pwEscape($invokename));
+		$query = $this->_db->query("SELECT * FROM ".$this->_tableName." WHERE invokename=".S::sqlEscape($invokename));
 		while ($rt = $this->_db->fetch_array($query)) {
 			$temp[$rt['id']]	= $this->_unserializeData($rt);
 		}
@@ -30,7 +30,7 @@ class PW_InvokePieceDB extends BaseDB {
 	function getDatasByInvokeNames($names) {
 		if (!is_array($names) || !$names) return null;
 		$temp = array();
-		$query = $this->_db->query("SELECT * FROM ".$this->_tableName." WHERE invokename IN(".pwImplode($names).")");
+		$query = $this->_db->query("SELECT * FROM ".$this->_tableName." WHERE invokename IN(".S::sqlImplode($names).")");
 		while ($rt = $this->_db->fetch_array($query)) {
 			$temp[]	= $this->_unserializeData($rt);
 		}
@@ -38,7 +38,7 @@ class PW_InvokePieceDB extends BaseDB {
 	}
 
 	function getDataByInvokeNameAndTitle($invokename,$title) {
-		$temp = $this->_db->get_one("SELECT * FROM ".$this->_tableName." WHERE invokename=".pwEscape($invokename)."AND title=".pwEscape($title));
+		$temp = $this->_db->get_one("SELECT * FROM ".$this->_tableName." WHERE invokename=".S::sqlEscape($invokename)."AND title=".S::sqlEscape($title));
 		if (!$temp) return array();
 		return $this->_unserializeData($temp);
 	}
@@ -46,7 +46,7 @@ class PW_InvokePieceDB extends BaseDB {
 	function updateById($id,$array) {
 		$array	= $this->_checkData($array);
 		if (!$array) return null;
-		$this->_db->update("UPDATE ".$this->_tableName." SET ".pwSqlSingle($array,false)." WHERE id=".pwEscape($id));
+		$this->_db->update("UPDATE ".$this->_tableName." SET ".S::sqlSingle($array,false)." WHERE id=".S::sqlEscape($id));
 	}
 
 	function insertData($array) {
@@ -55,7 +55,7 @@ class PW_InvokePieceDB extends BaseDB {
 			return null;
 		}
 
-		$this->_db->update("INSERT INTO ".$this->_tableName." SET ".pwSqlSingle($array,false));
+		$this->_db->update("INSERT INTO ".$this->_tableName." SET ".S::sqlSingle($array,false));
 		return $this->_db->insert_id();
 	}
 	function replaceData($array) {
@@ -63,16 +63,16 @@ class PW_InvokePieceDB extends BaseDB {
 		if (!$array || !$array['invokename'] || !$array['action'] || !$array['title'] || !$array['num'] || !$array['param']) {
 			return null;
 		}
-		$this->_db->update("REPLACE INTO ".$this->_tableName." SET ".pwSqlSingle($array,false));
+		$this->_db->update("REPLACE INTO ".$this->_tableName." SET ".S::sqlSingle($array,false));
 		return $this->_db->insert_id();
 	}
 	function deleteByInvokeName($name) {
-		$this->_db->update("DELETE FROM ".$this->_tableName." WHERE invokename=".pwEscape($name));
+		$this->_db->update("DELETE FROM ".$this->_tableName." WHERE invokename=".S::sqlEscape($name));
 	}
 
 	function deleteByInvokeNames($names){
 		if (!is_array($names) || !$names) return null;
-		$this->_db->update("DELETE FROM ".$this->_tableName." WHERE invokename IN(".pwImplode($names).")");
+		$this->_db->update("DELETE FROM ".$this->_tableName." WHERE invokename IN(".S::sqlImplode($names).")");
 	}
 
 	function insertDatas($array) {
@@ -84,7 +84,7 @@ class PW_InvokePieceDB extends BaseDB {
 	}
 
 	function deleteById($id) {
-		$this->_db->update("DELETE FROM ".$this->_tableName." WHERE id=".pwEscape($id));
+		$this->_db->update("DELETE FROM ".$this->_tableName." WHERE id=".S::sqlEscape($id));
 	}
 
 	function getStruct() {

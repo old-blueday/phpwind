@@ -5,7 +5,7 @@ if (isset($_GET['ajax'])) {
 require_once ('global.php');
 require_once (R_P . 'require/functions.php');
 $groupid == 'guest' && Showmsg('not_login');
-InitGP(array('action', 'tidarray', 'seltid', 'viewbbs', 'overprint','type'));
+S::gp(array('action', 'tidarray', 'seltid', 'viewbbs', 'overprint','type'));
 $viewbbs = $viewbbs ? "&viewbbs=$viewbbs" : "";
 
 $singleAction = false;
@@ -29,7 +29,7 @@ if (!in_array($action, array('type', 'check', 'del', 'move', 'copy', 'headtopic'
 L::loadClass('forum', 'forum', false);
 require_once (R_P . 'require/updateforum.php');
 require_once (R_P . 'require/writelog.php');
-include_once (D_P . 'data/bbscache/forum_cache.php');
+include_once pwCache::getPath(D_P . 'data/bbscache/forum_cache.php');
 
 L::loadClass('forum', 'forum', false);
 $pwforum = new PwForum($fid);
@@ -41,7 +41,7 @@ $pwforum->forumcheck($winddb, $groupid);
 $foruminfo =& $pwforum->foruminfo;
 $forumset =& $pwforum->forumset;
 
-$isGM = CkInArray($windid, $manager);
+$isGM = S::inArray($windid, $manager);
 $isBM = $pwforum->isBM($windid);
 if (!$isGM) {
 	switch ($action) {
@@ -115,7 +115,7 @@ if (empty($_POST['step']) && !in_array($action,array('batch'))) {
 	}
 	if ($tids) {
 		$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
-		$tids = pwImplode($tids);
+		$tids = S::sqlImplode($tids);
 		$query = $db->query("SELECT * FROM pw_threads WHERE tid IN($tids)");
 		while ($rt = $db->fetch_array($query)) {
 			if ($rt['fid'] != $fid && $groupid == 5) {
@@ -140,16 +140,17 @@ if (empty($_POST['step']) && !in_array($action,array('batch'))) {
 	}
 } else {
 
-	InitGP(array('atc_content'), 'P');
-	if ($db_enterreason && !$atc_content) {
+	S::gp(array('atc_content'), 'P');
+	if ($SYSTEM['enterreason'] && !$atc_content) {
 		!in_array($action,array('batch')) && Showmsg('enterreason');
 	}
 }
 
+Perf::gatherInfo('changeThreadWithForumIds', array('fid'=>$fid));
 if ($action == 'type') {
 
-	include_once (D_P . 'data/bbscache/cache_post.php');
-	include_once (D_P . 'data/bbscache/forum_typecache.php');
+	include_once pwCache::getPath(D_P . 'data/bbscache/cache_post.php');
+	include_once pwCache::getPath(D_P . 'data/bbscache/forum_typecache.php');
 	$t_db = (array) $topic_type_cache[$fid];
 
 	if (empty($_POST['step'])) {
@@ -180,7 +181,7 @@ if ($action == 'type') {
 	} else {
 
 		PostCheck();
-		InitGP(array('type', 'subtype', 'ifmsg'));
+		S::gp(array('type', 'subtype', 'ifmsg'));
 		count($tidarray) > 500 && Showmsg('mawhole_count');
 		$tids = array();
 		if (is_array($tidarray)) {
@@ -190,13 +191,14 @@ if ($action == 'type') {
 		}
 		$type = $subtype ? $subtype : $type;
 		!$tids && Showmsg('mawhole_nodata');
-		$db->update('UPDATE pw_threads SET type=' . pwEscape($type) . " WHERE tid IN(" . pwImplode($tids) . ") AND fid=" . pwEscape($fid));
+		//$db->update('UPDATE pw_threads SET type=' . S::sqlEscape($type) . " WHERE tid IN(" . S::sqlImplode($tids) . ") AND fid=" . S::sqlEscape($fid));
+		pwQuery::update('pw_threads', 'tid IN (:tid) AND fid=:fid', array($tids, $fid), array('type'=>$type));
 
-		$threads = L::loadClass('Threads', 'forum');
-		$threads->delThreads($tids);
+		//* $threads = L::loadClass('Threads', 'forum');
+		//* $threads->delThreads($tids);
 
 		if ($ifmsg) {
-			$query = $db->query("SELECT tid,fid,author,authorid,subject,postdate FROM pw_threads WHERE tid IN(" . pwImplode($tids) . ")");
+			$query = $db->query("SELECT tid,fid,author,authorid,subject,postdate FROM pw_threads WHERE tid IN(" . S::sqlImplode($tids) . ")");
 			while (@extract($db->fetch_array($query))) {
 				M::sendNotice(array($author), array('title' => getLangInfo('writemsg', 'change_type_title'),
 					'content' => getLangInfo('writemsg', 'change_type_content', array('manager' => $windid,
@@ -221,7 +223,7 @@ if ($action == 'type') {
 	} else {
 
 		PostCheck();
-		InitGP(array('ifmsg'));
+		S::gp(array('ifmsg'));
 		count($tidarray) > 500 && Showmsg('mawhole_count');
 		$tids = array();
 		$count = 0;
@@ -234,11 +236,13 @@ if ($action == 'type') {
 			}
 		}
 		!$tids && Showmsg('mawhole_nodata');
-		$db->update("UPDATE pw_threads SET ifcheck='1' WHERE tid IN(" . pwImplode($tids) . ") AND fid=" . pwEscape($fid));
-		$threadList = L::loadClass("threadlist", 'forum');
-		$threadList->refreshThreadIdsByForumId($fid);
-		$threads = L::loadClass('Threads', 'forum');
-		$threads->delThreads($tids);
+		//$db->update("UPDATE pw_threads SET ifcheck='1' WHERE tid IN(" . S::sqlImplode($tids) . ") AND fid=" . S::sqlEscape($fid));
+		pwQuery::update('pw_threads', 'tid IN (:tid) AND fid=:fid', array($tids, $fid), array('ifcheck'=>1));
+		// $threadList = L::loadClass("threadlist", 'forum');
+		// $threadList->refreshThreadIdsByForumId($fid);
+		// $threads = L::loadClass('Threads', 'forum');
+		// $threads->delThreads($tids);
+		//* Perf::gatherInfo('changeThreadWithForumIds', array('fid'=>$fid));
 		$rt = $db->get_one("SELECT tid,author,postdate,subject,lastpost,lastposter FROM pw_threads WHERE fid='$fid' AND ifcheck='1' AND topped='0' AND lastpost>0 ORDER BY lastpost DESC LIMIT 0,1");
 		if ($rt['postdate'] == $rt['lastpost']) {
 			$subject = substrs($rt['subject'], 21);
@@ -249,11 +253,12 @@ if ($action == 'type') {
 		}
 		$new_url = "read.php?tid=$rt[tid]&page=e#a";
 		$lastpost = $subject . "\t" . $author . "\t" . $rt['lastpost'] . "\t" . $new_url;
-		$db->update('UPDATE pw_forumdata ' . ' SET lastpost=' . pwEscape($lastpost, false) . ',tpost=tpost+' . $count . ',article=article+' . $count . ',topic=topic+' . $count . ' WHERE fid=' . pwEscape($fid));
-		P_unlink(D_P . 'data/bbscache/c_cache.php');
+		$db->update('UPDATE pw_forumdata ' . ' SET lastpost=' . S::sqlEscape($lastpost, false) . ',tpost=tpost+' . $count . ',article=article+' . $count . ',topic=topic+' . $count . ' WHERE fid=' . S::sqlEscape($fid));
+		//* P_unlink(D_P . 'data/bbscache/c_cache.php');
+		pwCache::deleteData(D_P . 'data/bbscache/c_cache.php');
 
 		if ($ifmsg) {
-			$query = $db->query("SELECT tid,fid,author,authorid,subject,postdate FROM pw_threads WHERE tid IN(" . pwImplode($tids) . ")");
+			$query = $db->query("SELECT tid,fid,author,authorid,subject,postdate FROM pw_threads WHERE tid IN(" . S::sqlImplode($tids) . ")");
 			while (@extract($db->fetch_array($query))) {
 				M::sendNotice(array($author), array('title' => getLangInfo('writemsg', 'check_title'),
 					'content' => getLangInfo('writemsg', 'check_content', array('manager' => $windid, 'fid' => $fid,
@@ -267,14 +272,14 @@ if ($action == 'type') {
 } elseif ($action == 'del') {
 
 	if (empty($_POST['step'])) {
-
+		S::gp(array('jumptype'));
 		require_once PrintEot($template);
 		footer();
 
 	} else {
 
 		PostCheck();
-		InitGP(array('ifdel', 'ifmsg'));/* ifdel 是否删除积分 ,ifmsg 是否发送消息 */
+		S::gp(array('ifdel', 'ifmsg', 'jumptype'));/* ifdel 是否删除积分 ,ifmsg 是否发送消息 */
 		count($tidarray) > 500 && Showmsg('mawhole_count');
 
 		$delids = $msgdb = array();
@@ -318,9 +323,10 @@ if ($action == 'type') {
 		$delarticle->delTopic($readdb, $db_recycle, $ifdel, array('reason' => $atc_content));
 
 		sendMawholeMessages($msgdb);
-
+		
 		if (!defined('AJAX')) {
-			refreshto("thread.php?fid=$fid{$viewbbs}", 'operate_success');
+			$url = ($jumptype == 'forumcp') ? "forumcp.php?action=edit&type=thread&fid=$fid{$viewbbs}" : "thread.php?fid=$fid{$viewbbs}";
+			refreshto($url, 'operate_success');
 		} else {
 			Showmsg('ajax_mawhole_operate_success');
 		}
@@ -329,20 +335,37 @@ if ($action == 'type') {
 
 	if (empty($_POST['step'])) {
 
-		include_once (D_P . 'data/bbscache/cache_post.php');
-		include_once (D_P . 'data/bbscache/forum_typecache.php');
+		include_once pwCache::getPath(D_P . 'data/bbscache/cache_post.php');
+		include_once pwCache::getPath(D_P . 'data/bbscache/forum_typecache.php');
+		//zhuli
+		$re = $db->query("SELECT fid,t_type FROM pw_forums ");
+		$forumArr = array();
+		while($row = $db->fetch_array($re)) {
+			$forumArr[$row['fid']] = $row;
+		}
+		
 		if ($topic_type_cache) {
 			foreach ($topic_type_cache as $key => $value) {
 				foreach ($value as $k => $v) {
 					$v['name'] = strip_tags($v['name']);
 					if ($v['upid'] == 0) {
 						$t_typedb[$key][$k] = $v['name'];
+						$t_typedb[$key][0]  = $forumArr[$key]['t_type']; //zhuli
 					} else {
 						$t_subtypedb[$key][$v['upid']][$k] = $v['name'];
 					}
 				}
 			}
 		}
+		
+		if ($forum) {
+			$forum_temp = array();
+			foreach($forum as $val){
+				$forum_temp[$val['fid']] = $val['fup'];
+			}
+			$forum_temp = pwJsonEncode($forum_temp);
+		}
+	
 		if ($t_typedb) {
 			$t_typedb = pwJsonEncode($t_typedb);
 		}
@@ -356,14 +379,14 @@ if ($action == 'type') {
 				$forumadd .= "<option value='$rt[fid]'> &nbsp;|- $rt[name]</option>";
 			}
 		}
-		@include_once (D_P . 'data/bbscache/forumcache.php');
+		@include_once pwCache::getPath(D_P . 'data/bbscache/forumcache.php');
 		require_once PrintEot($template);
 		footer();
 
 	} else {
 
 		PostCheck();
-		InitGP(array('to_id', 'ifmsg', 'to_threadcate', 'to_subtype'));
+		S::gp(array('to_id', 'ifmsg', 'to_threadcate', 'to_subtype'));
 
 		if ($forum[$to_id]['type'] == 'category') {
 			Showmsg('mawhole_error');
@@ -383,20 +406,20 @@ if ($action == 'type') {
 		$pw_attachs = L::loadDB('attachs', 'forum');
 		$pw_attachs->updateByTid($mids, array('fid' => $to_id));
 
-		$threads = L::loadClass('Threads', 'forum');
-		$threads->delThreads($mids);
+		//* $threads = L::loadClass('Threads', 'forum');
+		//* $threads->delThreads($mids);
+		Perf::gatherInfo('changeThreadWithThreadIds', array('tid'=>$mids));
 
-		$mids = pwImplode($mids);
+		//$mids = S::sqlImplode($mids);
 		$updatetop = $todaypost = $topic_all = $replies_all = 0;
 
 		$cy_tids = array();
-		$query = $db->query("SELECT tid,fid as tfid,author,postdate,subject,replies,topped,ptable,ifcheck,tpcstatus,modelid,special FROM pw_threads WHERE tid IN($mids)");
+		$query = $db->query("SELECT tid,fid as tfid,author,postdate,subject,replies,topped,ptable,ifcheck,tpcstatus,modelid,special FROM pw_threads WHERE tid IN(" . S::sqlImplode($mids) . ")");
 		while ($rt = $db->fetch_array($query)) {
-			Add_S($rt);
+			S::slashes($rt);
 			@extract($rt);
 			$tfid != $fid && Showmsg('admin_forum_right');
 			$ptable_a[$ptable] = 1;
-			$topped > 1 && $updatetop = 1;
 			$postdate > $tdtime && $todaypost += ($replies + 1);
 			$ifcheck && $topic_all++;
 			$replies_all += $replies;
@@ -425,7 +448,7 @@ if ($action == 'type') {
 			//分类信息处理
 			if ($modelid > 0) {
 				$tablename = GetTopcitable($modelid);
-				$db->update("UPDATE $tablename SET fid=" . pwEscape($to_id) . " WHERE tid=" . pwEscape($tid));
+				$db->update("UPDATE $tablename SET fid=" . S::sqlEscape($to_id) . " WHERE tid=" . S::sqlEscape($tid));
 			}
 			//分类信息处理
 
@@ -435,56 +458,62 @@ if ($action == 'type') {
 				$pcid = $special - 20;
 				$pcid = (int) $pcid;
 				$tablename = GetPcatetable($pcid);
-				$db->update("UPDATE $tablename SET fid=" . pwEscape($to_id) . " WHERE tid=" . pwEscape($tid));
+				$db->update("UPDATE $tablename SET fid=" . S::sqlEscape($to_id) . " WHERE tid=" . S::sqlEscape($tid));
 			}
 			//团购处理
 
-
 			//置顶帖处理
-			$flag = false;
-			if($topped){
-				$flag = true;
-				$_topped = $db->get_one("SELECT * FROM pw_poststopped WHERE fid=" . pwEscape($fid) . " AND tid=" . pwEscape($tid) . " AND pid='0'");
-				if($_topped){
-					$db->update("UPDATE pw_poststopped SET uptime = " . pwEscape($to_id) . " WHERE tid= " . pwEscape($tid) . " AND pid = '0' AND fid = " . pwEscape($fid));
+			if ($topped) {
+				$updatetop = 1;
+				$_topped = $db->get_one("SELECT * FROM pw_poststopped WHERE fid=" . S::sqlEscape($fid) . " AND tid=" . S::sqlEscape($tid) . " AND pid='0'");
+				if ($_topped) {
+					$db->update("UPDATE pw_poststopped SET uptime = " . S::sqlEscape($to_id) . " WHERE tid= " . S::sqlEscape($tid) . " AND pid = '0' AND fid = " . S::sqlEscape($fid));
 					$db->update("REPLACE INTO pw_poststopped (fid,tid,pid,floor,uptime,overtime) values
-						(" . pwEscape($to_id) . "," . pwEscape($tid) . ",'0'," . pwEscape($_topped['floor']) . "," . pwEscape($to_id) . "," . pwEscape($_topped['overtime']) . ") ");
+						(" . S::sqlEscape($to_id) . "," . S::sqlEscape($tid) . ",'0'," . S::sqlEscape($_topped['floor']) . "," . S::sqlEscape($to_id) . "," . S::sqlEscape($_topped['overtime']) . ") ");
 				}
 			}
 			//置顶帖处理
 		}
-		if ($flag) updatetop();
 		foreach ($logdb as $key => $val) {
 			writelog($val);
 		}
 		sendMawholeMessages($msgdb);
+
 		$remindinfo = strip_tags(getLangInfo('other', 'mawhole_move'));
 		$to_threadcate = $to_subtype ? $to_subtype : $to_threadcate;
-		$db->update("UPDATE pw_threads SET fid=" . pwEscape($to_id) . ",type=" . pwEscape($to_threadcate) . " WHERE tid IN($mids)");
+
+		//$db->update("UPDATE pw_threads SET fid=" . S::sqlEscape($to_id) . ",type=" . S::sqlEscape($to_threadcate) . " WHERE tid IN($mids)");
+		pwQuery::update('pw_threads', 'tid IN (:tid)', array($mids), array('fid'=>$to_id, 'type'=>$to_threadcate));
 
 		foreach ($ttable_a as $pw_tmsgs => $val) {
-			$val = pwImplode($val);
-			$db->update("UPDATE $pw_tmsgs SET remindinfo=" . pwEscape($remindinfo) . " WHERE tid IN($val)");
+			//* $val = S::sqlImplode($val);
+			//* $db->update("UPDATE $pw_tmsgs SET remindinfo=" . S::sqlEscape($remindinfo) . " WHERE tid IN($val)");
+			pwQuery::update($pw_tmsgs, 'tid IN (:tid)', array($val), array('remindinfo'=>$remindinfo));
 		}
 		foreach ($ptable_a as $key => $val) {
 			$pw_posts = GetPtable($key);
-			$db->update("UPDATE $pw_posts SET fid=" . pwEscape($to_id) . " WHERE tid IN($mids)");
+			//$db->update("UPDATE $pw_posts SET fid=" . S::sqlEscape($to_id) . " WHERE tid IN(" . S::sqlImplode($mids) . ")");
+			pwQuery::update($pw_posts, 'tid IN(:tid)', array($mids), array('fid' => $to_id));
 		}
 		updateForumCount($fid, -$topic_all, -$replies_all, -$todaypost);
 		updateForumCount($to_id, $topic_all, $replies_all, $todaypost);
 
-		$threadList = L::loadClass("threadlist", 'forum');
-		$threadList->refreshThreadIdsByForumId($fid);
-		$threadList->refreshThreadIdsByForumId($to_id);
+		// $threadList = L::loadClass("threadlist", 'forum');
+		// $threadList->refreshThreadIdsByForumId($fid);
+		// $threadList->refreshThreadIdsByForumId($to_id);
+		Perf::gatherInfo('changeThreadWithForumIds', array('fid'=>array($fid, $to_id)));
 
 		if (!empty($cy_tids)) {
-			$db->update("DELETE FROM pw_argument WHERE tid IN(" . pwImplode($cy_tids) . ')');
+			$db->update("DELETE FROM pw_argument WHERE tid IN(" . S::sqlImplode($cy_tids) . ')');
+			pwQuery::update('pw_threads', 'tid IN (:tid)', array($cy_tids), array('tpcstatus'=>0));
 		}
 
 		if ($updatetop) {
 			updatetop();
 		}
-		P_unlink(D_P . 'data/bbscache/c_cache.php');
+
+		//* P_unlink(D_P . 'data/bbscache/c_cache.php');
+		pwCache::deleteData(D_P . 'data/bbscache/c_cache.php');
 		if (!defined('AJAX')) {
 			refreshto("thread.php?fid=$fid{$viewbbs}", 'operate_success');
 		} else {
@@ -495,8 +524,8 @@ if ($action == 'type') {
 
 	if (empty($_POST['step'])) {
 
-		include_once (D_P . 'data/bbscache/cache_post.php');
-		include_once (D_P . 'data/bbscache/forum_typecache.php');
+		include_once pwCache::getPath(D_P . 'data/bbscache/cache_post.php');
+		include_once pwCache::getPath(D_P . 'data/bbscache/forum_typecache.php');
 		if ($topic_type_cache) {
 			foreach ($topic_type_cache as $key => $value) {
 				foreach ($value as $k => $v) {
@@ -525,14 +554,14 @@ if ($action == 'type') {
 				$forumadd .= "<option value='$rt[fid]'> &nbsp;|- $rt[name]</option>";
 			}
 		}
-		@include_once (D_P . 'data/bbscache/forumcache.php');
+		@include_once pwCache::getPath(D_P . 'data/bbscache/forumcache.php');
 		require_once PrintEot($template);
 		footer();
 
 	} else {
 
 		PostCheck();
-		InitGP(array('to_id', 'ifmsg', 'to_threadcate', 'to_subtype'));
+		S::gp(array('to_id', 'ifmsg', 'to_threadcate', 'to_subtype'));
 		if ($forum[$to_id]['type'] == 'category') {
 			Showmsg('mawhole_error');
 		}
@@ -546,11 +575,11 @@ if ($action == 'type') {
 			}
 		}
 		!$selids && Showmsg('mawhole_nodata');
-		$updatetop = 0;
+		//$updatetop = 0;
 		$ufid = $fid;
 		$to_threadcate = $to_subtype ? $to_subtype : $to_threadcate;
 		foreach ($ttable_a as $pw_tmsgs => $val) {
-			$val = pwImplode($val);
+			$val = S::sqlImplode($val);
 			$query = $db->query("SELECT * FROM pw_threads t LEFT JOIN $pw_tmsgs tm ON tm.tid=t.tid WHERE t.tid IN($val)");
 			while ($rt = $db->fetch_array($query)) {
 				$ufid != $rt['fid'] && Showmsg('admin_forum_right');
@@ -559,35 +588,80 @@ if ($action == 'type') {
 		}
 		foreach ($readdb as $key => $read) {
 			@extract($read);
-			$topped > 1 && $updatetop = 1;
+			//$topped > 1 && $updatetop = 1;
 			$toname = $forum[$to_id]['name'];
 			if ($ifmsg) {
-				$msgdb[] = array('toUser' => $author, 'title' => getLangInfo('writemsg', 'copy_title'),
-					'content' => getLangInfo('writemsg', 'copy_content', array('manager' => $windid, 'fid' => $fid,
-						'tid' => $tid, 'tofid' => $to_id, 'subject' => $subject, 'postdate' => get_date($postdate),
-						'forum' => strip_tags($forum[$fid]['name']), 'toforum' => $toname,
-						'admindate' => get_date($timestamp), 'reason' => stripslashes($atc_content))));
+				$msgdb[] = array(
+					'toUser' => $author,
+					'title' => getLangInfo('writemsg', 'copy_title'),
+					'content' => getLangInfo('writemsg', 'copy_content', array(
+						'manager' => $windid,
+						'fid' => $fid,
+						'tid' => $tid,
+						'tofid' => $to_id,
+						'subject' => $subject,
+						'postdate' => get_date($postdate),
+						'forum' => strip_tags($forum[$fid]['name']),
+						'toforum' => $toname,
+						'admindate' => get_date($timestamp),
+						'reason' => stripslashes($atc_content)
+					))
+				);
 			}
-			$logdb[] = array('type' => 'copy', 'username1' => $author, 'username2' => $windid, 'field1' => $fid,
-				'field2' => $tid, 'field3' => '', 'descrip' => 'copy_descrip', 'timestamp' => $timestamp,
-				'ip' => $onlineip, 'tid' => $tid, 'subject' => substrs($subject, 28), 'tofid' => $to_id,
-				'toforum' => $toname, 'forum' => $forum[$fid]['name'], 'reason' => stripslashes($atc_content));
-			$pwSQL = pwSqlSingle(array('fid' => $to_id, 'icon' => $icon, 'titlefont' => $titlefont,
-				'author' => $author, 'authorid' => $authorid, 'subject' => $subject, 'ifcheck' => $ifcheck,
-				'type' => $to_threadcate, 'postdate' => $postdate, 'lastpost' => $lastpost,
-				'lastposter' => $lastposter, 'hits' => $hits, 'replies' => $replies, 'topped' => $topped,
-				'locked' => $locked, 'digest' => $digest, 'special' => $special, 'ifupload' => $ifupload,
-				'ifmail' => $ifmail, 'ifshield' => $ifshield, 'anonymous' => $anonymous, 'ptable' => $db_ptable,
-				'modelid' => $modelid), false);
+			$logdb[] = array(
+				'type' => 'copy',
+				'username1' => $author,
+				'username2' => $windid,
+				'field1' => $fid,
+				'field2' => $tid,
+				'field3' => '',
+				'descrip' => 'copy_descrip',
+				'timestamp' => $timestamp,
+				'ip' => $onlineip,
+				'tid' => $tid,
+				'subject' => substrs($subject, 28),
+				'tofid' => $to_id,
+				'toforum' => $toname,
+				'forum' => $forum[$fid]['name'],
+				'reason' => stripslashes($atc_content)
+			);
+			$pwSQL = array(
+				'fid' => $to_id,
+				'icon' => $icon,
+				'titlefont' => ''/*$titlefont*/,
+				'author' => $author,
+				'authorid' => $authorid,
+				'subject' => $subject,
+				'ifcheck' => $ifcheck,
+				'type' => $to_threadcate,
+				'postdate' => $postdate,
+				'lastpost' => ($lastpost > $timestamp ? $timestamp : $lastpost),
+				'lastposter' => $lastposter,
+				'hits' => $hits,
+				'replies' => $replies,
+				'topped' => 0/*$topped*/,
+				'locked' => $locked,
+				'digest' => 0/*$digest*/,
+				'special' => $special,
+				'state' => $state,
+				'ifupload' => $ifupload,
+				'ifmail' => $ifmail,
+				'ifshield' => $ifshield,
+				'anonymous' => $anonymous,
+				'ptable' => $db_ptable,
+				'modelid' => $modelid
+			);
 
-			$db->update("INSERT INTO pw_threads SET $pwSQL");
+			//$db->update("INSERT INTO pw_threads SET $pwSQL");
+			pwQuery::insert('pw_threads', $pwSQL);
+
 			$newtid = $db->insert_id();
 
 			//分类信息处理
 			if ($modelid > 0) {
 				$modeliddb = $mSqldb = array();
 				$tablename = GetTopcitable($modelid);
-				$modeliddb = $db->get_one("SELECT * FROM $tablename WHERE tid=" . pwEscape($tid));
+				$modeliddb = $db->get_one("SELECT * FROM $tablename WHERE tid=" . S::sqlEscape($tid));
 				foreach (array_keys($modeliddb) as $value) {
 					if ($value != 'fid' && $value != 'tid') {
 						$mSqldb[$value] = $modeliddb[$value];
@@ -595,7 +669,7 @@ if ($action == 'type') {
 				}
 				$mSqldb['tid'] = $newtid;
 				$mSqldb['fid'] = $to_id;
-				$pwSQL = pwSqlSingle($mSqldb);
+				$pwSQL = S::sqlSingle($mSqldb);
 				$db->update("INSERT INTO $tablename SET $pwSQL");
 			}
 			//分类信息处理
@@ -607,7 +681,7 @@ if ($action == 'type') {
 				$pcid = (int) $pcid;
 				$tablename = GetPcatetable($pcid);
 				$pcdb = $mSqldb = array();
-				$pcdb = $db->get_one("SELECT * FROM $tablename WHERE tid=" . pwEscape($tid));
+				$pcdb = $db->get_one("SELECT * FROM $tablename WHERE tid=" . S::sqlEscape($tid));
 
 				foreach (array_keys($pcdb) as $value) {
 					if ($value != 'fid' && $value != 'tid') {
@@ -616,20 +690,21 @@ if ($action == 'type') {
 				}
 				$mSqldb['tid'] = $newtid;
 				$mSqldb['fid'] = $to_id;
-				$pwSQL = pwSqlSingle($mSqldb);
+				$pwSQL = S::sqlSingle($mSqldb);
 				$db->update("INSERT INTO $tablename SET $pwSQL");
 			}
 			//团购处理
 
 			# memcache refresh
-			$threadList = L::loadClass("threadlist", 'forum');
-			$threadList->updateThreadIdsByForumId($to_id, $newtid);
+			// $threadList = L::loadClass("threadlist", 'forum');
+			// $threadList->updateThreadIdsByForumId($to_id, $newtid);
+			Perf::gatherInfo('changeThreadWithForumIds', array('fid'=>$to_id));
 
 			$aid = str_replace("'", "\'", $aid);
 
 			if ($special == 1) {
-				$rs = $db->get_one("SELECT voteopts,modifiable,previewable,multiple,mostvotes,voters,timelimit,leastvotes,regdatelimit,creditlimit,postnumlimit FROM pw_polls WHERE tid=" . pwEscape($tid));
-				$pwSQL = pwSqlSingle(array('tid' => $newtid, 'voteopts' => $rs['voteopts'],
+				$rs = $db->get_one("SELECT voteopts,modifiable,previewable,multiple,mostvotes,voters,timelimit,leastvotes,regdatelimit,creditlimit,postnumlimit FROM pw_polls WHERE tid=" . S::sqlEscape($tid));
+				$pwSQL = S::sqlSingle(array('tid' => $newtid, 'voteopts' => $rs['voteopts'],
 					'modifiable' => $rs['modifiable'], 'previewable' => $rs['previewable'],
 					'multiple' => $rs['multiple'], 'mostvotes' => $rs['mostvotes'], 'voters' => $rs['voters'],
 					'timelimit' => $rs['timelimit'], 'leastvotes' => $rs['leastvotes'],
@@ -637,12 +712,14 @@ if ($action == 'type') {
 					'postnumlimit' => $rs['postnumlimit']), false);
 				$db->update("INSERT INTO pw_polls SET $pwSQL");
 
-				$query = $db->query("SELECT * FROM pw_voter WHERE tid=" . pwEscape($tid));
+				$query = $db->query("SELECT * FROM pw_voter WHERE tid=" . S::sqlEscape($tid));
 				while ($rt = $db->fetch_array($query)) {
 					$rt['tid'] = $newtid;
 					$voterdb[] = $rt;
 				}
-				$voterdb && $db->update("INSERT INTO pw_voter(tid,uid,username,vote,time) VALUES" . pwSqlMulti($voterdb));
+				$voterdb && $db->update("INSERT INTO pw_voter(tid,uid,username,vote,time) VALUES" . S::sqlMulti($voterdb));
+			} elseif ($special == 3) {
+				$db->update("INSERT INTO pw_reward (tid,cbtype,catype,cbval,caval,timelimit,author,pid) SELECT $newtid,cbtype,catype,cbval,caval,timelimit,author,pid FROM pw_reward WHERE tid=" . S::sqlEscape($tid));
 			}
 
 			$remindinfo = strip_tags(getLangInfo('other', 'mawhole_copy'));
@@ -654,34 +731,45 @@ if ($action == 'type') {
 			}
 			/* 插入帖子附件处理 */
 
-			$pwSQL = pwSqlSingle(array('tid' => $newtid, 'aid' => $aid, 'userip' => $userip, 'ifsign' => $ifsign,
+			$pwSQL = S::sqlSingle(array('tid' => $newtid, 'aid' => $aid, 'userip' => $userip, 'ifsign' => $ifsign,
 				'buy' => $buy, 'ipfrom' => $ipfrom, 'remindinfo' => $remindinfo, 'ifconvert' => $ifconvert,
 				'content' => $content), false);
 			$db->update("INSERT INTO $pw_tmsgs SET $pwSQL");
 
 			$pw_posts = GetPtable($ptable);
-			$query2 = $db->query("SELECT * FROM $pw_posts WHERE tid=" . pwEscape($tid));
+			$query2 = $db->query("SELECT * FROM $pw_posts WHERE tid=" . S::sqlEscape($tid));
 			$pw_posts = GetPtable($db_ptable);
 			while ($rt = $db->fetch_array($query2)) {
 				@extract($rt);
 				if ($db_plist && count($db_plist) > 1) {
-					$db->update("INSERT INTO pw_pidtmp(pid) values(null)");
-					$pid = $db->insert_id();
+					//* $db->update("INSERT INTO pw_pidtmp(pid) values(null)");
+					//* $pid = $db->insert_id();
+					$uniqueService = L::loadClass ('unique', 'utility');
+					$pid = $uniqueService->getUnique('post');					
 				} else {
 					$pid = '';
 				}
-				$pwSQL = pwSqlSingle(array('pid' => $pid, 'fid' => $to_id, 'tid' => $newtid, 'aid' => $aid,
+				/*$pwSQL = S::sqlSingle(array('pid' => $pid, 'fid' => $to_id, 'tid' => $newtid, 'aid' => $aid,
 					'author' => $author, 'authorid' => $authorid, 'icon' => $icon, 'postdate' => $postdate,
 					'subject' => $subject, 'userip' => $userip, 'ifsign' => $ifsign, 'alterinfo' => $alterinfo,
 					'remindinfo' => $remindinfo, 'ipfrom' => $ipfrom, 'ifconvert' => $ifconvert,
 					'ifcheck' => $ifcheck, 'content' => $content, 'ifshield' => $ifshield,
 					'anonymous' => $anonymous), false);
 				$db->update("INSERT INTO $pw_posts SET $pwSQL");
+				*/
+				$pwSQL =array('pid' => $pid, 'fid' => $to_id, 'tid' => $newtid, 'aid' => $aid,
+					'author' => $author, 'authorid' => $authorid, 'icon' => $icon, 'postdate' => $postdate,
+					'subject' => $subject, 'userip' => $userip, 'ifsign' => $ifsign, 'alterinfo' => $alterinfo,
+					'remindinfo' => $remindinfo, 'ipfrom' => $ipfrom, 'ifconvert' => $ifconvert,
+					'ifcheck' => $ifcheck, 'content' => $content, 'ifshield' => $ifshield,
+					'anonymous' => $anonymous);
+				pwQuery::insert($pw_posts, $pwSQL);
 				$pid || $pid = $db->insert_id();
 
 				if ($aid && ($aidRelation = copyAttachs($tid, $rt['pid'], $content, $newtid, $pid, $to_id))) {
 					$content = resetContentByAttach($content, $aidRelation);
-					$db->update("UPDATE $pw_posts SET content=" . pwEscape($content) . ' WHERE pid=' . pwEscape($pid));
+					//$db->update("UPDATE $pw_posts SET content=" . S::sqlEscape($content) . ' WHERE pid=' . S::sqlEscape($pid));
+					pwQuery::update($pw_posts, 'pid=:pid', array($pid), array('content' => $content));
 				}
 			}
 		}
@@ -690,20 +778,26 @@ if ($action == 'type') {
 			writelog($val);
 		}
 		updateforum($to_id);
+		/*
 		if ($updatetop) {
 			updatetop();
 		}
-		refreshto("thread.php?fid=$fid", 'operate_success');
+		*/
+		if (! defined ( 'AJAX' )) {
+			refreshto ( "thread.php?fid=$fid{$viewbbs}", 'operate_success' );
+		} else {
+			Showmsg ( $singleAction ? 'operate_success' : 'ajaxma_success' );
+		}
 	}
 } elseif ($action == 'headtopic') {
 
 	if (empty($_POST['step'])) {
 
-		include_once (D_P . 'data/bbscache/cache_post.php');
-		require_once (R_P . 'require/updateforum.php');
+		include_once pwCache::getPath(D_P . 'data/bbscache/cache_post.php');
+		require_once pwCache::getPath(R_P . 'require/updateforum.php');
 		$selforums = '';
 		if (is_numeric($seltid)) {
-			$rt = $db->get_one('SELECT fid,topped,toolfield FROM pw_threads WHERE tid=' . pwEscape($seltid));
+			$rt = $db->get_one('SELECT fid,topped,toolfield FROM pw_threads WHERE tid=' . S::sqlEscape($seltid));
 			if ($fid != $rt['fid']) {
 				Showmsg('admin_forum_right');
 			}
@@ -738,7 +832,8 @@ if ($action == 'type') {
 	} else {
 
 		PostCheck();
-		InitGP(array('topped', 'ifmsg', 'timelimit', 'nextto', 'selForums', 'defaultSelForums'));
+		S::gp(array('topped', 'ifmsg', 'timelimit', 'nextto', 'selForums', 'defaultSelForums'));
+		(is_null($topped)) && Showmsg('请选择置顶操作管理选项');
 		$topped = intval($topped);
 		$pwTopped = $isGM ? '3' : pwRights($isBM, 'topped');
 		if ($topped > $pwTopped) {
@@ -767,7 +862,7 @@ if ($action == 'type') {
 		$timelimit = PwStrtoTime($timelimit);
 		$toolfield = $timelimit > $timestamp && $topped ? $timelimit : '';
 
-		$query = $db->query("SELECT tid,fid,postdate,author,authorid,subject,topped,toolfield FROM pw_threads WHERE tid IN(" . pwImplode($selids) . ")");
+		$query = $db->query("SELECT tid,fid,postdate,author,authorid,subject,topped,toolfield FROM pw_threads WHERE tid IN(" . S::sqlImplode($selids) . ")");
 		$tid_fid = array();
 		while ($rt = $db->fetch_array($query)) {
 			$tid_fid[$rt['tid']] = $rt['fid'];
@@ -807,10 +902,12 @@ if ($action == 'type') {
 			if ($toolfield || $rt['toolfield']) {
 				$t = explode(',', $rt['toolfield']);
 				$rt['toolfield'] = $toolfield . ',' . $t[1];
-				$pwSQL = pwSqlSingle(array('topped' => $topped, 'toolfield' => $rt['toolfield']));
-				$db->update("UPDATE pw_threads SET $pwSQL WHERE tid=" . pwEscape($rt['tid']));
-				$threads = L::loadClass('Threads', 'forum');
-				$threads->delThreads($rt['tid']);
+				//$pwSQL = S::sqlSingle(array('topped' => $topped, 'toolfield' => $rt['toolfield']));
+				//$db->update("UPDATE pw_threads SET $pwSQL WHERE tid=" . S::sqlEscape($rt['tid']));
+				$pwSQL = array('topped' => $topped, 'toolfield' => $rt['toolfield']);
+				pwQuery::update('pw_threads', "tid=:tid", array($rt['tid']), $pwSQL);
+				//* $threads = L::loadClass('Threads', 'forum');
+				//* $threads->delThreads($rt['tid']);
 			} else {
 				$tids[] = $rt['tid'];
 			}
@@ -821,15 +918,18 @@ if ($action == 'type') {
 		}
 		$remindinfo = $topped ? getLangInfo('other', 'mawhole_top_2') : getLangInfo('other', 'mawhole_top_1');
 		foreach ($ttable_a as $pw_tmsgs => $val) {
-			$val = pwImplode($val);
-			$db->update("UPDATE $pw_tmsgs SET remindinfo=" . pwEscape($remindinfo) . "WHERE tid IN($val)");
+			//* $val = S::sqlImplode($val);
+			//* $db->update("UPDATE $pw_tmsgs SET remindinfo=" . S::sqlEscape($remindinfo) . "WHERE tid IN($val)");
+			pwQuery::update($pw_tmsgs, 'tid IN (:tid)', array($val), array('remindinfo'=>$remindinfo));
 		}
 		if ($tids) {
-			$db->update("UPDATE pw_threads SET topped=" . pwEscape($topped) . "WHERE tid IN(" . pwImplode($tids) . ")");
-			$threadList = L::loadClass("threadlist", 'forum');
-			$threadList->refreshThreadIdsByForumId($fid);
-			$threads = L::loadClass('Threads', 'forum');
-			$threads->delThreads($tids);
+			//$db->update("UPDATE pw_threads SET topped=" . S::sqlEscape($topped) . "WHERE tid IN(" . S::sqlImplode($tids) . ")");
+			pwQuery::update('pw_threads', "tid IN (:tid)", array($tids), array("topped"=>$topped));
+			// $threadList = L::loadClass("threadlist", 'forum');
+			// $threadList->refreshThreadIdsByForumId($fid);
+			// $threads = L::loadClass('Threads', 'forum');
+			// $threads->delThreads($tids);
+			Perf::gatherInfo('changeThreadWithForumIds', array('fid'=>$fid));
 		}
 		if (!empty($selids)) {
 			if ($topped) {
@@ -841,15 +941,16 @@ if ($action == 'type') {
 								'uptime' => $tid_fid[$_tid], 'overtime' => $toolfield);
 						}
 					}
-					$db->update("DELETE FROM pw_poststopped WHERE pid = '0' AND fid != '0' AND tid IN (" . pwImplode($selids) . ")");
-					if ($_topped) $db->update("REPLACE INTO pw_poststopped (fid,tid,pid,floor,uptime,overtime) values " . pwSqlMulti($_topped));
+					$db->update("DELETE FROM pw_poststopped WHERE pid = '0' AND fid != '0' AND tid IN (" . S::sqlImplode($selids) . ")");
+					if ($_topped) $db->update("REPLACE INTO pw_poststopped (fid,tid,pid,floor,uptime,overtime) values " . S::sqlMulti($_topped));
 				}
 			} else {
-				$db->update("DELETE FROM pw_poststopped WHERE tid IN (" . pwImplode($selids) . ") AND pid = '0' ");
+				$db->update("DELETE FROM pw_poststopped WHERE tid IN (" . S::sqlImplode($selids) . ") AND pid = '0' ");
 			}
 		}
 		updatetop();
 		delfcache($fid, $db_fcachenum);
+		Perf::gatherInfo('changeThreadWithForumIds', array('fid'=>$fid));
 		/*置顶印戳*/
 		if ($overprint) { /*过滤取消置顶*/
 			$seltid = $seltid ? $seltid : $threadIds;
@@ -876,7 +977,7 @@ if ($action == 'type') {
 	if (empty($_POST['step'])) {
 
 		if (is_numeric($seltid)) {
-			$rt = $db->get_one('SELECT fid,digest FROM pw_threads WHERE tid=' . pwEscape($seltid));
+			$rt = $db->get_one('SELECT fid,digest FROM pw_threads WHERE tid=' . S::sqlEscape($seltid));
 			if ($fid != $rt['fid']) {
 				Showmsg('admin_forum_right');
 			}
@@ -888,7 +989,7 @@ if ($action == 'type') {
 	} else {
 
 		PostCheck();
-		InitGP(array('digest', 'ifmsg', 'nextto'));
+		S::gp(array('digest', 'ifmsg', 'nextto'));
 		(is_null($digest)) && Showmsg('mawhole_nodigest');
 		count($tidarray) > 500 && Showmsg('mawhole_count');
 		$tids = $selids = $ttable_a = $threadIds = array();
@@ -903,7 +1004,8 @@ if ($action == 'type') {
 		}
 		!$tids && Showmsg('mawhole_nodata');
 
-		$selids = pwImplode($tids);
+		$tmpTids = $tids;
+		$selids = S::sqlImplode($tids);
 		require_once (R_P . 'require/credit.php');
 		$creditset = $credit->creditset($foruminfo['creditset'], $db_creditset);
 
@@ -970,15 +1072,18 @@ if ($action == 'type') {
 			writelog($val);
 		}
 		$remindinfo = $digest ? getLangInfo('other', 'mawhole_digest_2') : getLangInfo('other', 'mawhole_digest_1');
-		$db->update("UPDATE pw_threads SET digest=" . pwEscape($digest) . " WHERE tid IN($selids)", 0);
+		//$db->update("UPDATE pw_threads SET digest=" . S::sqlEscape($digest) . " WHERE tid IN($selids)", 0);
+		pwQuery::update('pw_threads', 'tid IN (:tid)', array($tmpTids), array('digest'=>$digest));
 		foreach ($ttable_a as $pw_tmsgs => $val) {
-			$val = pwImplode($val);
-			$db->update("UPDATE $pw_tmsgs SET remindinfo=" . pwEscape($remindinfo) . " WHERE tid IN($val)");
+			//* $val = S::sqlImplode($val);
+			//* $db->update("UPDATE $pw_tmsgs SET remindinfo=" . S::sqlEscape($remindinfo) . " WHERE tid IN($val)");
+			pwQuery::update($pw_tmsgs, 'tid IN (:tid)', array($val), array('remindinfo'=>$remindinfo));
 		}
-		$threads = L::loadClass('Threads', 'forum');
-		$threads->delThreads($tids);
+		//* $threads = L::loadClass('Threads', 'forum');
+		//* $threads->delThreads($tids);
 
 		delfcache($fid, $db_fcachenum);
+		Perf::gatherInfo('changeThreadWithForumIds', array('fid'=>$fid));
 
 		/*精华印戳*/
 		if ($overprint) {
@@ -1006,7 +1111,7 @@ if ($action == 'type') {
 	if (empty($_POST['step'])) {
 
 		if (is_numeric($seltid)) {
-			$rt = $db->get_one('SELECT fid,locked FROM pw_threads WHERE tid=' . pwEscape($seltid));
+			$rt = $db->get_one('SELECT fid,locked FROM pw_threads WHERE tid=' . S::sqlEscape($seltid));
 			if ($fid != $rt['fid']) {
 				Showmsg('admin_forum_right');
 			}
@@ -1019,7 +1124,10 @@ if ($action == 'type') {
 	} else {
 
 		PostCheck();
-		InitGP(array('locked', 'ifmsg'), 'P', 2);
+		S::gp(array('ifmsg'), 'P', 2);
+		S::gp(array('locked'), 'P');
+		(!is_string($locked) || !S::inArray($locked,array('0','1','2'))) && Showmsg('请选择锁定操作管理选项');
+		$locked = intval($locked);
 		count($tidarray) > 500 && Showmsg('mawhole_count');
 		$tids = $selids = $ttable_a = $threadIds = array();
 		if (is_array($tidarray)) {
@@ -1033,7 +1141,7 @@ if ($action == 'type') {
 		}
 		!$tids && Showmsg('mawhole_nodata');
 
-		$selids = pwImplode($tids);
+		$selids = S::sqlImplode($tids);
 		$msgdb = $logdb = array();
 		$query = $db->query("SELECT tid,fid,postdate,author,authorid,subject,locked FROM pw_threads WHERE tid IN($selids)");
 		while ($rt = $db->fetch_array($query)) {
@@ -1045,7 +1153,8 @@ if ($action == 'type') {
 					P_unlink(R_P . "$db_readdir/$fid/" . date('ym', $rt['postdate']) . "/$tid.html");
 				}
 				$s = $rt['locked'] > 2 ? $locked + 3 : $locked;
-				$db->update('UPDATE pw_threads SET locked=' . pwEscape($s) . ' WHERE tid=' . pwEscape($rt['tid']));
+				//$db->update('UPDATE pw_threads SET locked=' . S::sqlEscape($s) . ' WHERE tid=' . S::sqlEscape($rt['tid']));
+				pwQuery::update('pw_threads', "tid=:tid", array($rt['tid']), array("locked"=>$s));
 				if ($ifmsg) {
 					if ($locked == 2) {
 						$temp['title'] = 'lock_title_2';
@@ -1067,7 +1176,8 @@ if ($action == 'type') {
 					'reason' => stripslashes($atc_content));
 			} elseif ($rt['locked'] % 3 != 0 && !$locked) {
 				$s = $rt['locked'] > 2 ? 3 : 0;
-				$db->update("UPDATE pw_threads SET locked='$s' WHERE tid=" . pwEscape($rt['tid']));
+				//$db->update("UPDATE pw_threads SET locked='$s' WHERE tid=" . S::sqlEscape($rt['tid']));
+				pwQuery::update('pw_threads', "tid=:tid", array($rt['tid']), array("locked"=>$s));
 				if ($ifmsg) {
 					$msgdb[] = array('toUser' => $rt['author'], 'title' => getLangInfo('writemsg', 'unlock_title'),
 						'content' => getLangInfo('writemsg', 'unlock_content', array('manager' => $windid,
@@ -1088,8 +1198,9 @@ if ($action == 'type') {
 		}
 		$remindinfo = getLangInfo('other', 'mawhole_locked_' . $locked);
 		foreach ($ttable_a as $pw_tmsgs => $val) {
-			$val = pwImplode($val);
-			$db->update("UPDATE $pw_tmsgs SET remindinfo=" . pwEscape($remindinfo) . "WHERE tid IN($val)");
+			//* $val = S::sqlImplode($val);
+			//* $db->update("UPDATE $pw_tmsgs SET remindinfo=" . S::sqlEscape($remindinfo) . "WHERE tid IN($val)");
+			pwQuery::update($pw_tmsgs, 'tid IN (:tid)', array($val), array('remindinfo'=>$remindinfo));
 		}
 		/*锁定印戳*/
 		if ($overprint) {
@@ -1098,9 +1209,14 @@ if ($action == 'type') {
 			defined('AJAX') && showOverPrint($overprint, $seltid, 'lock', 1, $nextto);
 		}
 
-		$threads = L::loadClass('Threads', 'forum');
-		$threads->delThreads($tids);
-		refreshto("thread.php?fid=$fid{$viewbbs}", 'operate_success');
+		//* $threads = L::loadClass('Threads', 'forum');
+		//* $threads->delThreads($tids);
+		Perf::gatherInfo('changeThreadWithThreadIds', array('tid'=>$tids));
+		if (! defined ( 'AJAX' )) {
+			refreshto ( "thread.php?fid=$fid{$viewbbs}", 'operate_success' );
+		} else {
+			Showmsg ( $singleAction ? 'operate_success' : 'ajaxma_success' );
+		}
 	}
 } elseif ($action == 'pushtopic') {
 
@@ -1114,7 +1230,7 @@ if ($action == 'type') {
 	} else {
 
 		PostCheck();
-		InitGP(array('ifmsg', 'nextto', 'pushtime'));
+		S::gp(array('ifmsg', 'nextto', 'pushtime'));
 		if (!is_numeric($pushtime)) {
 			Showmsg('mawhole_erropushtime');
 		}
@@ -1131,7 +1247,8 @@ if ($action == 'type') {
 				}
 			}
 			$threadIds = $selids;
-			$selids = pwImplode($selids);
+			$tmpSelids = $selids;
+			$selids = S::sqlImplode($selids);
 		}
 		!$selids && Showmsg('mawhole_nodata');
 		$msgdb = $logdb = array();
@@ -1159,22 +1276,28 @@ if ($action == 'type') {
 		$remindinfo = getLangInfo('other', 'mawhole_push');
 		$pushtime < 0 && $pushtime = 1;
 		$uptime = $timestamp + $pushtime * 3600;
-		$db->update("UPDATE pw_threads SET lastpost=" . pwEscape($uptime) . "WHERE tid IN($selids)");
+		//$db->update("UPDATE pw_threads SET lastpost=" . S::sqlEscape($uptime) . "WHERE tid IN($selids)");
+		pwQuery::update('pw_threads', "tid IN (:tid)", array($tmpSelids), array('lastpost'=>$uptime));
+
 		# memcache refresh
-		$threadList = L::loadClass("threadlist", 'forum');
+		// $threadList = L::loadClass("threadlist", 'forum');
 		//$threadList->refreshThreadIdsByForumId($fid);
+		/*
 		foreach ($threadIds as $tid) {
 			$threadList->updateThreadIdsByForumId($fid, $tid, $pushtime * 3600);
-		}
+		}*/
+		Perf::gatherInfo('changeThreadWithForumIds', array('fid'=>$fid));
 
 		foreach ($ttable_a as $pw_tmsgs => $val) {
-			$val = pwImplode($val);
-			$db->update("UPDATE $pw_tmsgs SET remindinfo=" . pwEscape($remindinfo) . "WHERE tid IN($val)");
+			//* $val = S::sqlImplode($val);
+			//* $db->update("UPDATE $pw_tmsgs SET remindinfo=" . S::sqlEscape($remindinfo) . "WHERE tid IN($val)");
+			pwQuery::update($pw_tmsgs, 'tid IN (:tid)', array($val), array('remindinfo'=>$remindinfo));
 		}
 		delfcache($fid, $db_fcachenum);
+		Perf::gatherInfo('changeThreadWithForumIds', array('fid'=>$fid));
 
-		$threads = L::loadClass('Threads', 'forum');
-		$threads->delThreads($threadIds);
+		//* $threads = L::loadClass('Threads', 'forum');
+		//* $threads->delThreads($threadIds);
 
 		/*提前印戳*/
 		if ($overprint) {
@@ -1202,7 +1325,7 @@ if ($action == 'type') {
 	if (empty($_POST['step'])) {
 
 		if (is_numeric($seltid)) {
-			$rt = $db->get_one("SELECT locked FROM pw_threads WHERE tid=" . pwEscape($seltid));
+			$rt = $db->get_one("SELECT locked FROM pw_threads WHERE tid=" . S::sqlEscape($seltid));
 			if ($rt['locked'] > 2) {
 				$lock_1 = 'checked';
 			} else {
@@ -1217,7 +1340,7 @@ if ($action == 'type') {
 	} else {
 
 		PostCheck();
-		InitGP(array('ifmsg', 'nextto', 'timelimit', 'ifpush'));
+		S::gp(array('ifmsg', 'nextto', 'timelimit', 'ifpush'));
 		count($tidarray) > 500 && Showmsg('mawhole_count');
 		$selids = $ttable_a = $threadIds = array();
 		if (is_array($tidarray)) {
@@ -1228,20 +1351,21 @@ if ($action == 'type') {
 					$ttable_a[GetTtable($v)][] = $v;
 				}
 			}
-			$selids = pwImplode($selids);
+			$selids = S::sqlImplode($selids);
 		}
 		!$selids && Showmsg('mawhole_nodata');
 		$timelimit < 0 && $timelimit = 24;
 		$downtime = $timelimit * 3600;
 		$msgdb = $logdb = array();
-		$threadList = L::loadClass("threadlist", 'forum');
+		//* $threadList = L::loadClass("threadlist", 'forum');
 		$query = $db->query("SELECT tid,fid,postdate,author,authorid,subject,locked FROM pw_threads WHERE tid IN($selids)");
 		while ($rt = $db->fetch_array($query)) {
 			if ($fid != $rt['fid']) {
 				Showmsg('admin_forum_right');
 			}
 			$sql = ",locked='" . ($ifpush ? ($rt['locked'] % 3 + 3) : $rt['locked'] % 3) . "'";
-			$db->update("UPDATE pw_threads SET lastpost=lastpost-" . pwEscape($downtime) . " $sql WHERE tid=" . pwEscape($rt['tid']));
+			//$db->update("UPDATE pw_threads SET lastpost=lastpost-" . S::sqlEscape($downtime) . " $sql WHERE tid=" . S::sqlEscape($rt['tid']));
+			$db->update(pwQuery::buildClause("UPDATE :pw_table SET lastpost=lastpost-:lastpost $sql WHERE tid=:tid", array('pw_threads', $downtime, $rt['tid'])));
 			if ($ifmsg) {
 				$msgdb[] = array('toUser' => $rt['author'], 'title' => getLangInfo('writemsg', 'down_title'),
 					'content' => getLangInfo('writemsg', 'down_content', array('manager' => $windid,
@@ -1253,7 +1377,8 @@ if ($action == 'type') {
 				'field2' => $rt['tid'], 'field3' => '', 'descrip' => 'down_descrip', 'timestamp' => $timestamp,
 				'ip' => $onlineip, 'tid' => $rt['tid'], 'subject' => substrs($rt['subject'], 28),
 				'forum' => $forum[$fid]['name'], 'reason' => stripslashes($atc_content));
-			$threadList->updateThreadIdsByForumId($fid, $rt['tid'], $downtime);
+			//* $threadList->updateThreadIdsByForumId($fid, $rt['tid'], $downtime);
+				Perf::gatherInfo('changeThreadWithForumIds', array('fid'=>$fid));
 		}
 		sendMawholeMessages($msgdb);
 		foreach ($logdb as $key => $val) {
@@ -1262,13 +1387,16 @@ if ($action == 'type') {
 		$remindinfo = getLangInfo('other', 'mawhole_down');
 
 		foreach ($ttable_a as $pw_tmsgs => $val) {
-			$val = pwImplode($val);
-			$db->update("UPDATE $pw_tmsgs SET remindinfo=" . pwEscape($remindinfo) . " WHERE tid IN($val)");
+			//* $val = S::sqlImplode($val);
+			//* $db->update("UPDATE $pw_tmsgs SET remindinfo=" . S::sqlEscape($remindinfo) . " WHERE tid IN($val)");
+			pwQuery::update($pw_tmsgs, 'tid IN (:tid)', array($val), array('remindinfo'=>$remindinfo));
 		}
 		delfcache($fid, $db_fcachenum);
+		Perf::gatherInfo('changeThreadWithForumIds', array('fid'=>$fid));
 
-		$threads = L::loadClass('Threads', 'forum');
-		$threads->delThreads($threadIds);
+		//* $threads = L::loadClass('Threads', 'forum');
+		//* $threads->delThreads($threadIds);
+		Perf::gatherInfo('changeThreadWithThreadIds', array('tid'=>$threadIds));
 
 		/*压帖印戳*/
 		if ($overprint) {
@@ -1287,7 +1415,7 @@ if ($action == 'type') {
 	if (empty($_POST['step'])) {
 
 		if (is_numeric($seltid)) {
-			$rt = $db->get_one("SELECT fid,titlefont,author FROM pw_threads WHERE tid=" . pwEscape($seltid));
+			$rt = $db->get_one("SELECT fid,titlefont,author FROM pw_threads WHERE tid=" . S::sqlEscape($seltid));
 			if ($fid != $rt['fid']) {
 				Showmsg('admin_forum_right');
 			}
@@ -1318,7 +1446,7 @@ if ($action == 'type') {
 	} else {
 
 		PostCheck();
-		InitGP(array('title1', 'title2', 'title3', 'title4', 'nextto', 'ifmsg', 'timelimit'));
+		S::gp(array('title1', 'title2', 'title3', 'title4', 'nextto', 'ifmsg', 'timelimit'));
 		count($tidarray) > 500 && Showmsg('mawhole_count');
 
 		$selids = $tids = $ttable_a = $threadIds = array();
@@ -1331,13 +1459,13 @@ if ($action == 'type') {
 				}
 			}
 		}
-		$selids = pwImplode($selids);
+		$selids = S::sqlImplode($selids);
 		if ($title1 && !preg_match('/#[0-9A-F]{6}/is', $title1)) {
 			Showmsg('mawhole_nodata');
 		}
 		!$selids && Showmsg('mawhole_nodata');
 
-		$titlefont = Char_cv("$title1~$title2~$title3~$title4~$title5~$title6~");
+		$titlefont = S::escapeChar("$title1~$title2~$title3~$title4~$title5~$title6~");
 		$ifedit = (!$title1 && !$title2 && !$title3 && !$title4) ? 0 : 1;
 		$toolfield = $timelimit > 0 && $ifedit ? $timelimit * 86400 + $timestamp : '';
 
@@ -1363,10 +1491,11 @@ if ($action == 'type') {
 			if ($toolfield || $rt['toolfield']) {
 				$t = explode(',', $rt['toolfield']);
 				$rt['toolfield'] = $t[0] . ',' . $toolfield;
-				$db->update("UPDATE pw_threads SET titlefont=" . pwEscape($titlefont) . ',toolfield=' . pwEscape($rt['toolfield']) . ' WHERE tid=' . pwEscape($rt['tid']));
+				//$db->update("UPDATE pw_threads SET titlefont=" . S::sqlEscape($titlefont) . ',toolfield=' . S::sqlEscape($rt['toolfield']) . ' WHERE tid=' . S::sqlEscape($rt['tid']));
+				pwQuery::update('pw_threads', 'tid=:tid', array($rt['tid']), array('titlefont'=>$titlefont, 'toolfield'=>$rt['toolfield']));
 				/* clear thread cache*/
-				$threads = L::loadClass('Threads', 'forum');
-				$threads->delThreads($rt['tid']);
+				//* $threads = L::loadClass('Threads', 'forum');
+				//* $threads->delThreads($rt['tid']);
 			} else {
 				$tids[] = $rt['tid'];
 			}
@@ -1378,18 +1507,23 @@ if ($action == 'type') {
 		$remindinfo = getLangInfo('other', 'mawhole_edit_' . $ifedit);
 
 		if ($tids) {
-			$db->update("UPDATE pw_threads SET titlefont=" . pwEscape($titlefont) . " WHERE tid IN(" . pwImplode($tids) . ")");
+			//$db->update("UPDATE pw_threads SET titlefont=" . S::sqlEscape($titlefont) . " WHERE tid IN(" . S::sqlImplode($tids) . ")");
+			pwQuery::update('pw_threads', 'tid IN(:tid)', array($tids), array('titlefont'=>$titlefont));
 		}
+		$_arrThreadIds = array();
 		foreach ($ttable_a as $pw_tmsgs => $val) {
-			$val = pwImplode($val);
-			$db->update("UPDATE $pw_tmsgs SET remindinfo=" . pwEscape($remindinfo) . " WHERE tid IN($val)");
+			$_arrThreadIds[] = $val;
+			//* $val = S::sqlImplode($val);
+			//* $db->update("UPDATE $pw_tmsgs SET remindinfo=" . S::sqlEscape($remindinfo) . " WHERE tid IN($val)");
+			pwQuery::update($pw_tmsgs, 'tid IN (:tid)', array($val), array('remindinfo'=>$remindinfo));
 		}
 
-		$threads = L::loadClass('Threads', 'forum');
-		$threads->delThreads($tids);
+		//* $threads = L::loadClass('Threads', 'forum');
+		//* $threads->delThreads($tids);
 
 		delfcache($fid, $db_fcachenum);
-
+		Perf::gatherInfo('changeThreadWithForumIds', array('fid'=>$fid));
+		
 		/*加亮印戳*/
 		if ($overprint) {
 			$seltid = $seltid ? $seltid : $threadIds;
@@ -1431,7 +1565,7 @@ if ($action == 'type') {
 	} else {
 
 		PostCheck();
-		InitGP(array('unitetid', 'unitetype', 'ifmsg'));
+		S::gp(array('unitetid', 'unitetype', 'ifmsg'));
 		$totid = '';
 		$ttable_a = $readdb = array();
 
@@ -1449,12 +1583,12 @@ if ($action == 'type') {
 			}
 		}
 		if (empty($totid) || count($tidarray) < 2) {
-			Showmsg('unite_data_error');
+			Showmsg('请输入合并帖tid');
 		}
 
 		foreach ($ttable_a as $pw_tmsgs => $val) {
 			if (empty($val)) continue;
-			$val = pwImplode($val);
+			$val = S::sqlImplode($val);
 			$query = $db->query("SELECT * FROM pw_threads t LEFT JOIN $pw_tmsgs tm USING(tid) WHERE t.tid IN($val)");
 			while ($rt = $db->fetch_array($query)) {
 				$rt['fid'] != $fid && Showmsg('unite_fid_error');
@@ -1468,49 +1602,68 @@ if ($action == 'type') {
 		unset($readdb[$totid]);
 
 		if (!$todb || !$readdb) {
-			Showmsg('data_error');
+			//Showmsg('data_error');
+			Showmsg('帖子tid输入有误');
 		}
-
+		$fromArticleIds = $fromColonyIds = array();
 		$pw_attachs = L::loadDB('attachs', 'forum');
 		$pw_posts = GetPtable($todb['ptable']);
 		$remindinfo = getLangInfo('other', 'mawhole_unite');
 		$replies = 0;
 		foreach ($readdb as $key => $fromdb) {
+			getstatus($fromdb['tpcstatus'], 1) ? $fromColonyIds[] = $key : $fromArticleIds[] = $key;
 			if ($db_plist && count($db_plist) > 1) {
-				$db->update("INSERT INTO pw_pidtmp(pid) values(null)");
-				$pid = $db->insert_id();
+				//* $db->update("INSERT INTO pw_pidtmp(pid) values(null)");
+				//* $pid = $db->insert_id();
+				$uniqueService = L::loadClass ('unique', 'utility');
+				$pid = $uniqueService->getUnique('post');				
 			} else {
 				$pid = '';
 			}
-			$pwSQL = pwSqlSingle(array('pid' => $pid, 'fid' => $fid, 'tid' => $totid, 'aid' => $fromdb['aid'],
+			/*$pwSQL = S::sqlSingle(array('pid' => $pid, 'fid' => $fid, 'tid' => $totid, 'aid' => $fromdb['aid'],
 				'author' => $fromdb['author'], 'authorid' => $fromdb['authorid'], 'icon' => $fromdb['icon'],
 				'postdate' => $fromdb['postdate'], 'subject' => $fromdb['subject'], 'userip' => $fromdb['userip'],
 				'ifsign' => $fromdb['ifsign'], 'alterinfo' => $fromdb['alterinfo'], 'ipfrom' => $fromdb['ipfrom'],
 				'ifconvert' => $fromdb['ifconvert'], 'ifcheck' => $fromdb['ifcheck'],
 				'content' => $fromdb['content'], 'ifmark' => $fromdb['ifmark'], 'ifshield' => $fromdb['ifshield']), false);
 			$db->update("INSERT INTO $pw_posts SET $pwSQL");
+			*/
+			$pwSQL = array('pid' => $pid, 'fid' => $fid, 'tid' => $totid, 'aid' => $fromdb['aid'],
+				'author' => $fromdb['author'], 'authorid' => $fromdb['authorid'], 'icon' => $fromdb['icon'],
+				'postdate' => $fromdb['postdate'], 'subject' => $fromdb['subject'], 'userip' => $fromdb['userip'],
+				'ifsign' => $fromdb['ifsign'], 'alterinfo' => $fromdb['alterinfo'], 'ipfrom' => $fromdb['ipfrom'],
+				'ifconvert' => $fromdb['ifconvert'], 'ifcheck' => $fromdb['ifcheck'],
+				'content' => $fromdb['content'], 'ifmark' => $fromdb['ifmark'], 'ifshield' => $fromdb['ifshield']);
+			pwQuery::insert($pw_posts, $pwSQL);
 			!$pid && $pid = $db->insert_id();
 			$replies += $fromdb['replies'] + 1;
 
-			# $db->update('DELETE FROM pw_threads WHERE tid='.pwEscape($fromdb['tid']));
+			# $db->update('DELETE FROM pw_threads WHERE tid='.S::sqlEscape($fromdb['tid']));
 			# ThreadManager
-			$threadManager = L::loadClass("threadmanager", 'forum');
-			$threadManager->deleteByThreadId($fromdb['fid'], $fromdb['tid']);
+			//* $threadManager = L::loadClass("threadmanager", 'forum');
+			//* $threadManager->deleteByThreadId($fromdb['fid'], $fromdb['tid']);
+			$threadService = L::loadclass('threads', 'forum');
+			$threadService->deleteByThreadId($fromdb['tid']);
+			Perf::gatherInfo('changeThreadWithForumIds', array('fid'=>$fromdb['fid']));
 
 			$pw_tmsgsf = GetTtable($fromdb['tid']);
-			$db->update("DELETE FROM $pw_tmsgsf WHERE tid=" . pwEscape($fromdb['tid']));
-
+			//* $db->update("DELETE FROM $pw_tmsgsf WHERE tid=" . S::sqlEscape($fromdb['tid']));
+			pwQuery::delete($pw_tmsgsf, 'tid=:tid', array($fromdb['tid']));
+			
 			if ($db_guestread) {
 				require_once (R_P . 'require/guestfunc.php');
 				clearguestcache($fromdb['tid'], $replies);
 			}
 			if ($todb['ptable'] == $fromdb['ptable']) {
-				$db->update("UPDATE $pw_posts SET tid=" . pwEscape($totid) . ' WHERE tid=' . pwEscape($fromdb['tid']));
+				//$db->update("UPDATE $pw_posts SET tid=" . S::sqlEscape($totid) . ' WHERE tid=' . S::sqlEscape($fromdb['tid']));
+				pwQuery::update($pw_posts, 'tid=:tid', array($fromdb['tid']), array('tid' => $totid));
 			} else {
 				$pw_postsf = GetPtable($fromdb['ptable']);
-				$db->update("INSERT INTO $pw_posts SELECT * FROM $pw_postsf WHERE tid=" . pwEscape($fromdb['tid']));
-				$db->update("UPDATE $pw_posts SET tid=" . pwEscape($totid) . " WHERE tid=" . pwEscape($fromdb['tid']));
-				$db->update("DELETE FROM $pw_postsf WHERE tid=" . pwEscape($fromdb['tid']));
+				$db->update("INSERT INTO $pw_posts SELECT * FROM $pw_postsf WHERE tid=" . S::sqlEscape($fromdb['tid']));
+				//$db->update("UPDATE $pw_posts SET tid=" . S::sqlEscape($totid) . " WHERE tid=" . S::sqlEscape($fromdb['tid']));
+				pwQuery::update($pw_posts, 'tid=:tid', array($fromdb['tid']), array('tid' => $totid));
+				//$db->update("DELETE FROM $pw_postsf WHERE tid=" . S::sqlEscape($fromdb['tid']));
+				pwQuery::delete($pw_postsf, 'tid=:tid', array($fromdb['tid']));
 			}
 			if ($fromdb['aid']) {
 				$pw_attachs->updateByTid($fromdb['tid'], 0, array('pid' => $pid, 'tid' => $totid));
@@ -1531,23 +1684,29 @@ if ($action == 'type') {
 				'reason' => stripslashes($atc_content));
 			writelog($log);
 		}
-		$db->update("UPDATE pw_threads SET replies=replies+" . pwEscape($replies, false) . " WHERE tid=" . pwEscape($totid));
+		//$db->update("UPDATE pw_threads SET replies=replies+" . S::sqlEscape($replies, false) . " WHERE tid=" . S::sqlEscape($totid));
+		$db->update(pwQuery::buildClause('UPDATE :pw_table SET replies=replies+:replies WHERE tid=:tid', array('pw_threads', $replies, $totid)));
 		$pw_tmsgs = GetTtable($totid);
-		$db->update("UPDATE $pw_tmsgs SET remindinfo=" . pwEscape($remindinfo, false) . " WHERE tid=" . pwEscape($totid));
+		//* $db->update("UPDATE $pw_tmsgs SET remindinfo=" . S::sqlEscape($remindinfo, false) . " WHERE tid=" . S::sqlEscape($totid));
+		pwQuery::update($pw_tmsgs, 'tid=:tid', array($totid), array('remindinfo'=>$remindinfo));
 
 		updateforum($fid);
-		$tousername = $db->get_value("SELECT author FROM pw_threads WHERE tid=" . pwEscape($totid));
+		$weiboService = L::loadClass('weibo', 'sns');
+		$fromColonyIds && $weiboService->deleteWeibosByObjectIdsAndType($fromColonyIds,'group_article');
+		$fromArticleIds && $weiboService->deleteWeibosByObjectIdsAndType($fromArticleIds,'article');
+		$tousername = $db->get_value("SELECT author FROM pw_threads WHERE tid=" . S::sqlEscape($totid));
 		M::sendNotice(array($tousername), array('title' => getLangInfo('writemsg', 'unite_title'),
 			'content' => getLangInfo('writemsg', 'unite_content', array('manager' => $windid, 'fid' => $fid,
 				'tid' => $totid, 'subject' => $todb['subject'], 'postdate' => get_date($todb['postdate']),
 				'forum' => strip_tags($forum[$fid]['name']), 'admindate' => get_date($timestamp),
 				'reason' => stripslashes($atc_content)))));
 
-		sendMawholeMessages($msgdb);
+		if ($ifmsg) sendMawholeMessages($msgdb);
 
-		$threads = L::loadClass('Threads', 'forum');
-		$threads->delThreads($totid);
-		$threads->delThreads($fromdb['tid']);
+		//* $threads = L::loadClass('Threads', 'forum');
+		//* $threads->delThreads($totid);
+		//* $threads->delThreads($fromdb['tid']);
+		Perf::gatherInfo('changeThreadWithThreadIds', array('tid'=>$fromdb['tid']));
 		if (!defined('AJAX')) {
 			refreshto("read.php?tid=$totid{$viewbbs}", 'operate_success');
 		} else {
@@ -1556,7 +1715,7 @@ if ($action == 'type') {
 	}
 } elseif ($action == 'getthreadcates') {
 
-	$fid = (int) GetGP('fid');
+	$fid = (int) S::getGP('fid');
 	if (!($foruminfo = L::forum($fid))) {
 		Showmsg('data_error');
 	}
@@ -1573,7 +1732,7 @@ if ($action == 'type') {
 
 } elseif ($action == 'overprint') {
 
-	InitGP(array('step', 'oid'));
+	S::gp(array('step', 'oid'));
 	if ($step == 2) {
 		$oid = intval($oid);
 		$seltid = intval($seltid);
@@ -1581,8 +1740,9 @@ if ($action == 'type') {
 			defined('AJAX') && showOverPrint(1, $seltid, '', 0, '', "数据有误，请重试");
 		}
 		overPrint(1, $seltid, '', $oid);
-		$threads = L::loadClass('Threads', 'forum');
-		$threads->delThreads($seltid);
+		//* $threads = L::loadClass('Threads', 'forum');
+		//* $threads->delThreads($seltid);
+		Perf::gatherInfo('changeThreadWithThreadIds', array('tid'=>$seltid));
 		defined('AJAX') && showOverPrint(1, $seltid, '', 1, '', "恭喜，设置印戳完成", $oid);
 	}
 	$overPrintService = L::loadclass("overprint", 'forum');
@@ -1631,7 +1791,7 @@ function showOverPrint($overprint, $tid, $operate, $status = 1, $nextto = '', $m
 		Showmsg($message);
 		footer();
 	}
-	$overPrintService = L::loadclass("overprint", 'forum');
+	$overPrintService = L::loadclass("overprint", 'forum'); /* @var $overPrintService PW_OverPrint */
 	$message = $message ? $message : "操作成功!\treload";
 	if ($operate) {
 		$related = $overPrintService->getOperatesMaps($operate);
@@ -1684,10 +1844,17 @@ function deleteThreadsHander($tidarray) {
 		}
 		$threadIds[] = $v;
 	}
+	/**
 	$threadManager = L::loadclass('threadmanager', 'forum');
 	foreach($forums as $fid=>$threadIds){
 		$threadManager->deleteByThreadIds($fid,$threadIds);
+	}**/
+	$threadService = L::loadclass('threads', 'forum');
+	foreach ($forums as $fid=>$_threadIds){
+		$threadService->deleteByThreadIds($_threadIds);
+		Perf::gatherInfo('changeThreadWithForumIds', array('fid'=>$fid));
 	}
+
 	$delarticle = L::loadClass('DelArticle', 'forum');
 	$delarticle->delTopicByTids($threadIds,true);
 	echo getLangInfo('other', 'search_manager_success');
@@ -1719,26 +1886,40 @@ function sendMawholeMessages($msgdb) {
 }
 
 function copyAttachs($tid, $pid, $content, $newtid, $newpid, $newfid) {
-	global $db;
+	global $db,$db_ifpwcache;
 	$_aids = $array = array();
 	$newtid = (int)$newtid;
 	$newpid = (int)$newpid;
 	$newfid = (int)$newfid;
-	$query = $db->query("SELECT * FROM pw_attachs WHERE tid=" . pwEscape($tid) . " AND pid=" . pwEscape($pid));
+	$query = $db->query("SELECT * FROM pw_attachs WHERE tid=" . S::sqlEscape($tid) . " AND pid=" . S::sqlEscape($pid));
+	$count = $ifAttach = 0;
 	while ($rt = $db->fetch_array($query)) {
+		if (!$count && !$pid && $rt['type']=='img') {
+			$ifAttach = true;
+			$count++;
+		}
 		if (strpos($content, "[attachment=" . $rt['aid'] . "]") !== false) {
 			$db->update("INSERT INTO pw_attachs
 			(fid,uid,tid,pid,did,name,type,size,attachurl,hits,needrvrc,special,ctype,uploadtime,descrip,ifthumb)
 			SELECT $newfid,uid,$newtid,$newpid,did,name,type,size,attachurl,hits,needrvrc,special,ctype,uploadtime,descrip,ifthumb
-			FROM pw_attachs WHERE aid=" . pwEscape($rt['aid']));
+			FROM pw_attachs WHERE aid=" . S::sqlEscape($rt['aid']));
 			$array[$rt['aid']] = $db->insert_id();
 		} else {
 			$_aids[] = $rt['aid'];
 		}
 	}
 	if ($_aids) {
-		$db->update("INSERT INTO pw_attachs (fid,uid,tid,pid,did,name,type,size,attachurl,hits,needrvrc,special,ctype,uploadtime,descrip,ifthumb) SELECT $newfid,uid,$newtid,$newpid,did,name,type,size,attachurl,hits,needrvrc,special,ctype,uploadtime,descrip,ifthumb FROM pw_attachs WHERE tid=" . pwEscape($tid) . ' AND pid=' . pwEscape($pid) . ' AND aid IN (' . pwImplode($_aids) . ')');
+		$db->update("INSERT INTO pw_attachs (fid,uid,tid,pid,did,name,type,size,attachurl,hits,needrvrc,special,ctype,uploadtime,descrip,ifthumb) SELECT $newfid,uid,$newtid,$newpid,did,name,type,size,attachurl,hits,needrvrc,special,ctype,uploadtime,descrip,ifthumb FROM pw_attachs WHERE tid=" . S::sqlEscape($tid) . ' AND pid=' . S::sqlEscape($pid) . ' AND aid IN (' . S::sqlImplode($_aids) . ')');
 	}
+	//Start elementupdate
+	if ((($db_ifpwcache & 512) && $ifAttach)) {
+		L::loadClass('elementupdate', '', false);
+		$elementAttach = $db->get_one("SELECT * FROM pw_attachs WHERE tid=" . S::sqlEscape($newtid) . " AND pid=" . S::sqlEscape($pid));
+		$elementupdate = new ElementUpdate($newfid);
+		$elementupdate->newPicUpdate($elementAttach['aid'], $newfid, $newtid, $elementAttach['attachurl'], $elementAttach['ifthumb'], $content);
+		$elementupdate->updateSQL();
+	}
+	//End elementupdate
 	return $array;
 }
 

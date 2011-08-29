@@ -5,7 +5,7 @@ $basename="$admin_file?adminjob=ipban&job=ipsearch";
 if(empty($action) || $action == 'force'){
 	include PrintEot('ipsearch');exit;
 } elseif($action == 'byname'){
-	InitGP(array('username'));
+	S::gp(array('username'));
 	!$username && adminmsg('ipsearch_username');
 	$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
 	$rt = $userService->getByUserName($username);
@@ -14,8 +14,8 @@ if(empty($action) || $action == 'force'){
 	$pages = '';
 	$ipdb = array();
 	if($uids){
-		InitGP(array('page'),'GP',2);
-		$query=$db->query("SELECT m.uid,m.username,md.onlineip AS userip,md.thisvisit AS lasttime FROM pw_memberdata md LEFT JOIN pw_members m ON m.uid=md.uid WHERE md.onlineip!='' AND md.uid=".pwEscape($uids).'GROUP BY md.onlineip');
+		S::gp(array('page'),'GP',2);
+		$query=$db->query("SELECT m.uid,m.username,md.onlineip AS userip,md.thisvisit AS lasttime FROM pw_memberdata md LEFT JOIN pw_members m ON m.uid=md.uid WHERE md.onlineip!='' AND md.uid=".S::sqlEscape($uids).'GROUP BY md.onlineip');
 		while($rt=$db->fetch_array($query)){
 			$rt['lasttime']=get_date($rt['lasttime']);
 			$rt['userip']=strpos($rt['userip'],'|') ? substr($rt['userip'],0,strpos($rt['userip'],'|')) : $rt['userip'];
@@ -30,7 +30,7 @@ if(empty($action) || $action == 'force'){
 			}
 		}
 		foreach($ttable_a as $pw_tmsgs){
-			$query=$db->query("SELECT tm.userip,t.postdate AS lasttime,t.authorid AS uid,t.author AS username FROM pw_threads t LEFT JOIN $pw_tmsgs tm ON tm.tid=t.tid WHERE userip!='' AND t.authorid=".pwEscape($uids)."GROUP BY userip");
+			$query=$db->query("SELECT tm.userip,t.postdate AS lasttime,t.authorid AS uid,t.author AS username FROM pw_threads t LEFT JOIN $pw_tmsgs tm ON tm.tid=t.tid WHERE userip!='' AND t.authorid=".S::sqlEscape($uids)."GROUP BY userip");
 			while($rt=$db->fetch_array($query)){
 				$rt['lasttime']=get_date($rt['lasttime']);
 				$ipdb[]=$rt;
@@ -44,7 +44,7 @@ if(empty($action) || $action == 'force'){
 			}
 		}
 		foreach($ptable_a as $pw_posts){
-			$query=$db->query("SELECT userip,postdate AS lasttime,author AS username,authorid AS uid FROM $pw_posts WHERE userip!='' AND authorid=".pwEscape($uids)."GROUP BY userip");
+			$query=$db->query("SELECT userip,postdate AS lasttime,author AS username,authorid AS uid FROM $pw_posts WHERE userip!='' AND authorid=".S::sqlEscape($uids)."GROUP BY userip");
 			while($rt=$db->fetch_array($query)){
 				$rt['lasttime']=get_date($rt['lasttime']);
 				$ipdb[]=$rt;
@@ -67,12 +67,12 @@ if(empty($action) || $action == 'force'){
 	if($rt2['article']>300000){
 		adminmsg('ipsearch_force');
 	}
-	InitGP(array('userip'));
+	S::gp(array('userip'));
 	!$userip && adminmsg('ipsearch_userip');
 	$pages='';
 	$userdb=array();
 
-	$sql = "md.onlineip LIKE ".pwEscape("$userip%");
+	$sql = "md.onlineip LIKE ".S::sqlEscape("$userip%");
 	$query=$db->query("SELECT m.uid,m.username,m.email,md.thisvisit AS lasttime,md.postnum,md.onlineip AS userip FROM pw_memberdata md LEFT JOIN pw_members m ON m.uid=md.uid WHERE $sql GROUP BY m.username");
 	while($rt=$db->fetch_array($query)){
 		if(strpos($rt['userip'],'|')!==false){
@@ -84,7 +84,7 @@ if(empty($action) || $action == 'force'){
 		$userdb[] = $rt;
 	}
 
-	$sql = "tm.userip=".pwEscape($userip);
+	$sql = "tm.userip=".S::sqlEscape($userip);
 	$ttable_a = array('pw_tmsgs');
 	if($db_tlist){
 		foreach($db_tlist as $key=>$val){
@@ -115,7 +115,7 @@ if(empty($action) || $action == 'force'){
 		}
 	}
 	if($userdb){
-		InitGP(array('page'),'GP',2);
+		S::gp(array('page'),'GP',2);
 		$count=count($userdb);
 		$page < 1 && $page=1;
 		$start=($page-1)*50;

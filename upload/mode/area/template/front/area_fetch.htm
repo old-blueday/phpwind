@@ -116,13 +116,15 @@ EOT;
 EOT;
 if($key=='descrip'){print <<<EOT
 -->
-				<textarea name="param[$key]" style="width:260px;height:92px" $add >$default[$key]</textarea>
+				<textarea name="param[$key]" onkeyup="checktitlelength($value,'pushto_info','wordtinfo');" onkeydown="checktitlelength($value,'pushto_info','wordtinfo');" id="pushto_info" style="width:260px;height:92px"  >$default[$key]</textarea>&nbsp;&nbsp;<span id="wordtinfo"></span>
 <!--
 EOT;
 } elseif ($key=='title') {
 print <<<EOT
 -->
-			<div class="mb5"><input type="text" class="input" size="40" name="param[$key]" value="$default[$key]" $add></div>
+
+
+			<div class="mb5"><input type="text" id="pushto_title" onkeyup="checktitlelength($value,'pushto_title','wordtip');" onkeydown="checktitlelength($value,'pushto_title','wordtip');"  class="input" size="40" name="param[$key]" value="$default[$key]" >&nbsp;&nbsp;<span id="wordtip"></span></div>
 			<div class="pwnew tac">
           <span title="粗体字"><a onclick="styleOnclick(this,'css[b]')" class="$stylename[b]">加粗</a></span>
 					<span title="斜体字"><a onclick="styleOnclick(this,'css[i]')" class="$stylename[i]">倾斜</a></span>
@@ -182,8 +184,8 @@ print <<<EOT
 			<td class="td2"><input type="text" class="input" size="15" name="starttime" id="starttime" onclick="ShowCalendar(this.id,1);getCurrentDatePos()"> (留空则立即显示)</td>
 		</tr>
 		<tr class="tr1 vt">
-			<td class="td1">商业推荐</td>
-			<td class="td2"><input type="radio" value="1" name="ifbusiness" />是 <input type="radio" value="0" name="ifbusiness" checked />否</td>
+			<td class="td1">星号标签</td>
+			<td class="td2"><input type="radio" value="1" name="ifbusiness" />是 <input type="radio" value="0" name="ifbusiness" checked />否&nbsp;&nbsp;&nbsp;(可以用星号标签标识该条数据为特殊推送，比如广告，以免误删)</td>
 		</tr>
 <!--
 EOT;

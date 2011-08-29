@@ -38,7 +38,7 @@ class postSpecial {
 
 	function resetInfo($tid, $atcdb) {
 		global $timestamp;
-		$reset = $this->db->get_one("SELECT obtitle,retitle,endtime,umpire,judge FROM pw_debates WHERE tid=" . pwEscape($tid));
+		$reset = $this->db->get_one("SELECT obtitle,retitle,endtime,umpire,judge FROM pw_debates WHERE tid=" . S::sqlEscape($tid));
 		$reset['debateable'] = (!$reset['judge'] && $reset['endtime'] > $timestamp) ? '' : "disabled";
 		$reset['endtime'] = get_date($reset['endtime'], "Y-m-d H:i");
 
@@ -47,10 +47,10 @@ class postSpecial {
 
 	function _setData() {
 		global $timestamp;
-		$endtime = Char_cv(GetGP('endtime'));
-		$obtitle = Char_cv(GetGP('obtitle'));
-		$retitle = Char_cv(GetGP('retitle'));
-		$umpire  = Char_cv(GetGP('umpire'));
+		$endtime = S::escapeChar(S::getGP('endtime'));
+		$obtitle = S::escapeChar(S::getGP('obtitle'));
+		$retitle = S::escapeChar(S::getGP('retitle'));
+		$umpire  = S::escapeChar(S::getGP('umpire'));
 
 		$endtime = PwStrtoTime($endtime);
 		$endtime < $timestamp && Showmsg('debate_time');
@@ -60,7 +60,7 @@ class postSpecial {
 			Showmsg('debate_titlelen');
 		}
 		if ($umpire) {
-			$umpireuid = $this->db->get_value("SELECT uid FROM pw_members WHERE username=" . pwEscape($umpire));
+			$umpireuid = $this->db->get_value("SELECT uid FROM pw_members WHERE username=" . S::sqlEscape($umpire));
 			empty($umpireuid) && Showmsg('debate_noumpire');
 		}
 		$this->data['endtime'] = $endtime;
@@ -77,35 +77,35 @@ class postSpecial {
 
 	function insertData($tid) {
 		$this->data['tid'] = $tid;
-		$this->db->update("INSERT INTO pw_debates SET " . pwSqlSingle($this->data));
+		$this->db->update("INSERT INTO pw_debates SET " . S::sqlSingle($this->data));
 	}
 
 	function modifyData($tid) {
-		$debate = $this->db->get_one("SELECT endtime,judge FROM pw_debates WHERE tid=" . pwEscape($tid));
+		$debate = $this->db->get_one("SELECT endtime,judge FROM pw_debates WHERE tid=" . S::sqlEscape($tid));
 		if ($debate && (!$debate['judge'] && $debate['endtime'] > $timestamp)) {
 			$this->_setData();
 		}
 	}
 
 	function updateData($tid) {
-		$this->db->update("UPDATE pw_debates SET " . pwSqlSingle(array(
+		$this->db->update("UPDATE pw_debates SET " . S::sqlSingle(array(
 			'obtitle'	=> $this->data['obtitle'],
 			'retitle'	=> $this->data['retitle'],
 			'endtime'	=> $this->data['endtime'],
 			'umpire'	=> $this->data['umpire'],
 			'judge'		=> 0
-		)) . "WHERE tid=" . pwEscape($tid));
+		)) . "WHERE tid=" . S::sqlEscape($tid));
 	}
 
 	function reply($tid, $pid) {
 		global $timestamp;
-		$standpoint = (int)GetGP('standpoint');
+		$standpoint = (int)S::getGP('standpoint');
 		if ($standpoint == 1 || $standpoint == 2) {
 			$pwSQL = array();
 			$count = $upSQL = '';
-			$debatestand = $this->db->get_value("SELECT standpoint FROM pw_debatedata WHERE pid='0' AND tid=" . pwEscape($tid) . " AND authorid=" . pwEscape($this->post->uid));
+			$debatestand = $this->db->get_value("SELECT standpoint FROM pw_debatedata WHERE pid='0' AND tid=" . S::sqlEscape($tid) . " AND authorid=" . S::sqlEscape($this->post->uid));
 			if ($debatestand) {
-				$count = $this->db->get_value("SELECT COUNT(*) as count FROM pw_debatedata WHERE pid>'0' AND tid=" . pwEscape($tid) . " AND authorid=" . pwEscape($this->post->uid));
+				$count = $this->db->get_value("SELECT COUNT(*) as count FROM pw_debatedata WHERE pid>'0' AND tid=" . S::sqlEscape($tid) . " AND authorid=" . S::sqlEscape($this->post->uid));
 				$standpoint	= $debatestand;
 			}
 			$pwSQL[] = array(
@@ -140,8 +140,8 @@ class postSpecial {
 					$upSQL .= ($upSQL ? ',' : '').'revote=revote+1';
 				}
 			}
-			$upSQL && $this->db->update("UPDATE pw_debates SET $upSQL WHERE tid=" . pwEscape($tid));
-			$pwSQL && $this->db->update("INSERT INTO pw_debatedata (tid,pid,authorid,standpoint,postdate,vote,voteids) VALUES " . pwSqlMulti($pwSQL));
+			$upSQL && $this->db->update("UPDATE pw_debates SET $upSQL WHERE tid=" . S::sqlEscape($tid));
+			$pwSQL && $this->db->update("INSERT INTO pw_debatedata (tid,pid,authorid,standpoint,postdate,vote,voteids) VALUES " . S::sqlMulti($pwSQL));
 		}
 	}
 }

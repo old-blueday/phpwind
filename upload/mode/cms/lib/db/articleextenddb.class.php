@@ -1,5 +1,5 @@
 <?php
-!defined('M_P') && exit('Forbidden');
+!defined('P_W') && exit('Forbidden');
 
 class PW_ArticleExtendDB extends BaseDB {
 	var $_tableName = "pw_cms_articleextend";

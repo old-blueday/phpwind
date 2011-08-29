@@ -39,10 +39,34 @@ function()
                 return  !! showDialog('error', '标题、内容不能为空或者有其他错误项',2);
             }
         }
+        function _DateTotime (str) {
+        	var new_str = str.replace(/:/g,'-');
+        	new_str = new_str.replace(/ /g,'-');
+        	var arr = new_str.split("-");
+        	if (arr[3] || arr[4]) {
+        		var datum = new Date(Date.UTC(arr[0],arr[1]-1,arr[2],arr[3]-8,arr[4]));
+        	} else {
+        		var datum = new Date(Date.UTC(arr[0],arr[1]-1,arr[2]));
+        	}
+        	return datum.getTime()/1000;
+        }
+        function getCalendarError() {
+        	var startTimestamp;
+        	var endTimestamp;
+        	try {
+        		var newserror = getObj('tip_postcate[endtime]');
+        		startTimestamp = _DateTotime(getObj('calendar_begintime').value);
+        		endTimestamp = _DateTotime(getObj('calendar_endtime').value);
+        	}catch(e){}
+        	if(startTimestamp > endTimestamp) {
+        		newserror.className = "msg error";
+        		newserror.innerHTML='开始时间不能早于结束时间';
+        	}
+        }
 		/**
 		*这里不能用attachEvent来加事件，否则return  false也会提交表单
 		*/
-        document[frm].onsubmit = _e;
+        //document[frm].onsubmit = _e;
 		/**
 		*设置提示信息，内部方法
 		*@param nodeElement obj 节点
@@ -50,14 +74,13 @@ function()
         function _setNotic(obj, pass, range)
         {
             var a = document.createElement("div");
-            a.style.height = obj.offsetHeight + "px";
+            //a.style.height = obj.offsetHeight + "px";
             a.id = "tip_" + obj.name;
 			var newserror = obj.getAttribute("error");
-
             if (pass) {
                 a.className = "msg pass";
                 obj.setAttribute("hasError", 0);
-                a.innerHTML = obj.getAttribute("pass") || "验证通过";
+                a.innerHTML = obj.getAttribute("pass") || "&nbsp;";
             } else {
                 a.className = "msg error";
                 obj.setAttribute("hasError", 1);
@@ -157,7 +180,18 @@ function()
 						if (newerror == 'rang_error2' && (this.value == '' || this.value == 0)) {
 							isTrue = true;
 						} else {
-							var isTrue=	range[0] <= Math.floor(this.value) && range[1] >= Math.floor(this.value);
+							if (range[0] == 'n' || range[1] == 'n') {
+								if (range[0] == 'n' && range[1] != 'n') {
+									isTrue = range[1] >= Math.floor(this.value) ? true : false;
+								} else if (range[0] != 'n' && range[1] == 'n') {
+									isTrue = range[0] <= Math.floor(this.value) ? true : false;
+								} else {
+									regstr = /^\d+$/;
+									isTrue = regstr.test(this.value) ? true : false;
+								}
+							} else {
+								var isTrue=	this.value != '' && range[0] <= Math.floor(this.value) && range[1] >= Math.floor(this.value);
+							}
 						}
                     } else  {
                        try {
@@ -183,6 +217,7 @@ function()
 						}
                     }
                     _setNotic(this, isTrue, range);
+                    getCalendarError();
                 }
             }
         }

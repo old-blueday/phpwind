@@ -44,7 +44,8 @@ class INV_Csv{
 			$data = explode(',',$data);
 			if($i != 0){	
 				$value = '';
-				$key = $data[$point['email']];			
+				$key = $data[$point['email']];
+				$key = str_replace('"','',$key);
 				$point['nick'] && $value = $data[$point['nick']];
 				!$value &&  $value = $data[$point['name']];
 				!$value &&  $value = $data[$point['email']];						

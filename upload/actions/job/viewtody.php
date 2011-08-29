@@ -5,12 +5,12 @@ $wind_in = 'viewtody';
 if ($db_today == 0) {
 	Showmsg('job_viewtody_close');
 }
-InitGP(array(
+S::gp(array(
 	'page'
 ), 'GP', 2);
 require_once (R_P . 'require/header.php');
 $check_admin = "N";
-if (CkInArray($windid, $manager)) $check_admin = "Y";
+if (S::inArray($windid, $manager)) $check_admin = "Y";
 $page < 1 && $page = 1;
 $filename = D_P . 'data/bbscache/today.php';
 $dbtdsize = 100 + 1;

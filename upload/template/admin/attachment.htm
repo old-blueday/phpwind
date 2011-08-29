@@ -112,7 +112,7 @@ if(empty($action)){print <<<EOT
     <table cellspacing="0" cellpadding="0" width="100%">
         <tr class="tr2">
             <td width="40"><span onclick="CheckAll(document.FORM)" class="cp">全选</span></td>
-            <td width="20%">附件名</td>
+            <td>附件名</td>
             <td width="15%">附件大小</td>
             <td width="15%">上传时间</td>
             <td width="20%">所在主题</td>
@@ -165,6 +165,7 @@ EOT;
 </div>
 <div class="cc mb10">$pages</div>
 <div class="mb10 tac">
+	<span class="bt"><span><button type="button" onclick="CheckAll(document.FORM);">全 选</button></span></span>
 	<span class="btn"><span><button type="submit" name="hello" onfocus="blur();" onclick="return Checkdel();">删  除</button></span></span>
 </div>
 </form>
@@ -220,6 +221,7 @@ EOT;
 	</div>
 <div class="cc mb10">$pages</div>
 <div class="mb10 tac">
+	<span class="bt"><span><button type="button" onclick="CheckAll(document.MESSAGE);">全 选</button></span></span>
 	<span class="btn"><span><button type="submit" name="hello" onfocus="blur();" onclick="return Checkdel();">删  除</button></span></span>
 </div>
 </form>	
@@ -342,6 +344,7 @@ EOT;
 </div>
 <div class="cc mb10">$pages</div>
 <div class="mb10 tac">
+	<span class="bt"><span><button type="button" onclick="CheckAll(document.FORM);">全 选</button></span></span>
 	<span class="btn"><span><button type="submit" name="hello" onfocus="blur();" onclick="return Checkdel();">删  除</button></span></span>
 </div>
 </form>

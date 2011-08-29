@@ -38,7 +38,7 @@ class PwForum {
 	}
 
 	function getFromDB($fid) {
-		return $this->db->get_one("SELECT f.*,fe.creditset,fe.forumset,fe.commend FROM pw_forums f LEFT JOIN pw_forumsextra fe ON f.fid=fe.fid WHERE f.fid=" . pwEscape($fid));
+		return $this->db->get_one("SELECT f.*,fe.creditset,fe.forumset,fe.commend FROM pw_forums f LEFT JOIN pw_forumsextra fe ON f.fid=fe.fid WHERE f.fid=" . S::sqlEscape($fid));
 	}
 	
 	function isForum($allowcate = false) {
@@ -65,19 +65,21 @@ class PwForum {
 		if ($this->foruminfo['f_type'] == 'former' && $groupid == 'guest' && $_COOKIE) {
 			Showmsg('forum_former');
 		}
-		if (!empty($this->foruminfo['style']) && file_exists(D_P . "data/style/{$this->foruminfo[style]}.php")) {
-			$GLOBALS['skin'] = $this->foruminfo['style'];
-		}
 		$pwdcheck = GetCookie('pwdcheck');
-		
-		if ($this->foruminfo['password'] != '' && ($groupid == 'guest' || $pwdcheck[$this->fid] != $this->foruminfo['password'] && !CkInArray($user['username'], $GLOBALS['manager']))) {
-			require_once (R_P . 'require/forumpw.php');
+		if ($this->foruminfo['password'] != '' && ($groupid == 'guest' || $pwdcheck[$this->fid] != $this->foruminfo['password'] && !S::inArray($user['username'], $GLOBALS['manager']))) {
+			require_once (R_P . 'require/forumpassword.php');
 		}
 		if (!$this->allowvisit($user, $groupid)) {
 			Showmsg('forum_jiami');
 		}
 		if (!$this->foruminfo['cms'] && $this->foruminfo['f_type'] == 'hidden' && !$this->foruminfo['allowvisit']) {
 			Showmsg('forum_hidden');
+		}
+	}
+
+	function setForumStyle() {
+		if (!empty($this->foruminfo['style']) && file_exists(D_P . "data/style/{$this->foruminfo[style]}.php")) {
+			$GLOBALS['skinco'] = $this->foruminfo['style'];
 		}
 	}
 	
@@ -107,6 +109,16 @@ class PwForum {
 				$GLOBALS['forumset'] = $this->forumset;
 				Showmsg('forum_creditlimit');
 			}
+		}
+	}
+
+	function sellcheck($uid) {
+		if (!$this->foruminfo['forumsell']) {
+			return;
+		}
+		$rt = $this->db->get_one("SELECT MAX(overdate) AS u FROM pw_forumsell WHERE uid=" . S::sqlEscape($uid) . ' AND fid=' . S::sqlEscape($this->fid));
+		if ($rt['u'] < $GLOBALS['timestamp']) {
+			Showmsg('forum_sell');
 		}
 	}
 	
@@ -155,7 +167,7 @@ class PwForum {
 	
 	function getUpForum() {
 		global $forum, $fpage;
-		isset($forum) || include (D_P . 'data/bbscache/forum_cache.php');
+		isset($forum) || include pwCache::getPath(D_P . 'data/bbscache/forum_cache.php');
 		$upforum = array();
 		$upforum[] = array(
 			strip_tags($this->foruminfo['name']),
@@ -197,7 +209,7 @@ class PwForum {
 			$db_bfn_temp = $db_bfn;
 		}
 		if ($db_menu && $onmouseover) {
-			$headguide = "<img style=\"cursor:pointer\" id=\"td_cate\" src=\"$imgpath/" . L::style('stylepath') . "/thread/home.gif\" alt=\"forumlist\" onClick=\"return pwForumList(false,false,null,this);\" align=\"absmiddle\" /> <a href=\"$db_bfn_temp\" title=\"$db_bbsname\">$db_bbsname</a>";
+			$headguide = "<img id=\"td_cate\" src=\"$imgpath/" . L::style('stylepath') . "/thread/home.gif\" alt=\"forumlist\" onClick=\"return pwForumList(false,false,null,this);\" class=\"cp breadHome\" /><em class=\"breadEm\"></em><a href=\"$db_bfn_temp\" title=\"$db_bbsname\">$db_bbsname</a>";
 		} else {
 			$headguide = "<a href=\"$db_bfn\" title=\"$db_bbsname\">$db_bbsname</a>";
 		}
@@ -223,7 +235,7 @@ class PwForum {
 		if (isset($udb['groupid']) && isset($udb['userstatus'])) {
 			if ($udb['groupid'] == 6) {
 				$retu[$udb['uid']] = 1;
-			} elseif (getstatus($udb['userstatus'], PW_USERSTATUS_BANUSER) && ($rt = $this->db->get_one("SELECT uid FROM pw_banuser WHERE uid=" . pwEscape($udb['uid']) . " AND fid=" . pwEscape($this->fid)))) {
+			} elseif (getstatus($udb['userstatus'], PW_USERSTATUS_BANUSER) && ($rt = $this->db->get_one("SELECT uid FROM pw_banuser WHERE uid=" . S::sqlEscape($udb['uid']) . " AND fid=" . S::sqlEscape($this->fid)))) {
 				$retu[$udb['uid']] = 2;
 			}
 		} else {
@@ -235,8 +247,8 @@ class PwForum {
 				}
 			}
 			if ($uids) {
-				$uids = pwImplode($uids);
-				$query = $this->db->query("SELECT uid FROM pw_banuser WHERE uid IN ($uids) AND fid=" . pwEscape($this->fid));
+				$uids = S::sqlImplode($uids);
+				$query = $this->db->query("SELECT uid FROM pw_banuser WHERE uid IN ($uids) AND fid=" . S::sqlEscape($this->fid));
 				while ($rt = $this->db->fetch_array($query)) {
 					$retu[$rt['uid']] = 2;
 				}
@@ -266,24 +278,25 @@ class PwForum {
 					$newurl = "$R_url/$htmurl";
 				}
 			}
-			$lp = "lastpost=" . pwEscape($lastpost['subject'] . "\t" . $lastpost['author'] . "\t" . $lastpost['lastpost'] . "\t" . $newurl);
+			$lp = "lastpost=" . S::sqlEscape($lastpost['subject'] . "\t" . $lastpost['author'] . "\t" . $lastpost['lastpost'] . "\t" . $newurl);
 		}
 		if ($topicadd || $lp) {
 			$sql = trim($topicadd . ',' . $lp, ',');
-			$this->db->update("UPDATE pw_forumdata SET $sql WHERE fid=" . pwEscape($this->fid));
+			$this->db->update("UPDATE pw_forumdata SET $sql WHERE fid=" . S::sqlEscape($this->fid));
 		}
 		if ($this->foruminfo['type'] == 'sub' || $this->foruminfo['type'] == 'sub2') {
 			!$this->isOpen() && $lp = '';
 			if ($lp || $fupadd) {
 				$sql = trim($fupadd . ',' . $lp, ',');
-				$this->db->update("UPDATE pw_forumdata SET $sql WHERE fid=" . pwEscape($this->foruminfo['fup']));
+				$this->db->update("UPDATE pw_forumdata SET $sql WHERE fid=" . S::sqlEscape($this->foruminfo['fup']));
 				if ($this->foruminfo['type'] == 'sub2') {
-					$rt1 = $this->db->get_one("SELECT fup FROM pw_forums WHERE fid=" . pwEscape($this->foruminfo['fup']));
-					$this->db->update("UPDATE pw_forumdata SET $sql WHERE fid=" . pwEscape($rt1['fup']));
+					$rt1 = $this->db->get_one("SELECT fup FROM pw_forums WHERE fid=" . S::sqlEscape($this->foruminfo['fup']));
+					$this->db->update("UPDATE pw_forumdata SET $sql WHERE fid=" . S::sqlEscape($rt1['fup']));
 				}
 			}
 		}
 	}
+
 	/**
 	 * 获取系统在帖子列表对帖子的管理权限
 	 * @author zhudong

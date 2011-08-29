@@ -1,9 +1,10 @@
 <!--<?php
 require_once(uTemplate::printEot('header'));
-//require_once(uTemplate::printEot('user_appleft'));
+require_once(uTemplate::printEot('user_appleft'));
 print <<<EOT
 -->
 <div class="contUser">
+<table width="100%"><tr><td valign="top" height="500">
 <script type="text/javascript">
 var imgMaxWidth=600;
 function ImgLoad()
@@ -38,6 +39,7 @@ function ImgLoad()
 </script>
 <img id="imgpre" src="$photo[path]" style="position:absolute;left:-10000px" onload="ImgLoad()" />
 	<div class="p15">
+		<h4 class="site"><img src="u/images/module/photos.png" align="absmiddle" class="mr10" /><span>相册</span></h4>
 		<div class="navC">
 			<ul>
 				<li id="q_index"><a href="{$basename}a=friend">好友相册</a></li>
@@ -47,7 +49,7 @@ function ImgLoad()
 			<span class="btn_add fl"><span><button onClick="location.href='{$basename}a=create';" type="button">创建相册</button></span></span>
 		</div>
 		<div id="content">
-<script language="JavaScript">
+<script>
 function ajaxurl(o) {
 	read.obj = o;
 	ajax.send(o.href,'',ajax.get);
@@ -105,7 +107,7 @@ if ($value['ownerid'] == $winduid) {print <<<EOT
 <!--
 EOT;
 } else {print <<<EOT
---><a href="u.php?uid=$value[ownerid]" class="s7">$value[owner]</a><!--
+--><a href="{$db_userurl}$value[ownerid]" class="s7">$value[owner]</a><!--
 EOT;
 }if ($value['ownerid'] == $winduid || $SYSTEM['delalbum']) {print <<<EOT
 --> | <a href="{$basename}a=delalbum&aid=$value[aid]" onclick="return ajaxurl(this)" class="s7">删除相册</a>
@@ -257,7 +259,7 @@ EOT;
 			<div class="sidePhoto">
 				<div class="p_lr_10">
 				<div class="galbum_photo" id="imgtop">
-					<div id="img_list">
+					<div id="img_list" class="cc">
 <!--
 EOT;
 if($photo[photonum]>5){print<<<EOT
@@ -265,34 +267,9 @@ if($photo[photonum]>5){print<<<EOT
 						<div class="prePhoto mb5"><a onclick="return ajaxpage('{$basename}a=next&pid=$photo[pid]{$friendurl}','pre');">上一张</a></div>
 <!--
 EOT;
-}print<<<EOT
--->
-<!--
-EOT;
-foreach($nearphoto as $value){
-$ifsel = ($pid == $value[pid]) ? 'class="current"' : '';
-print <<<EOT
--->
-							<ul class="g_listA cc" id="imglist_{$value[pid]}">
-<!--
-EOT;
-if($value[pid]=='begin'||$value[pid]=='end'){
-print <<<EOT
--->
-								<li><div class="aimg"><a href="javascript:;"><img src="$value[path]" /></a></div></li>
-<!--
-EOT;
-} else {print <<<EOT
--->
-								<li $ifsel><div class="aimg"><a href="{$basename}a=view&pid=$value[pid]{$friendurl}"><img src="$value[path]" onload="if(this.width>100){this.width = 100;} else if(this.height>100){this.height=100;}" /></a></div></li>
-<!--
-EOT;
-}print <<<EOT
--->
-							</ul>
-<!--
-EOT;
-}print <<<EOT
+}
+
+print<<<EOT
 -->
 <!--
 EOT;
@@ -303,12 +280,36 @@ if($photo[photonum]>5){print<<<EOT
 EOT;
 }print <<<EOT
 -->
+							<ul class="g_listA">
+<!--
+EOT;
+foreach($nearphoto as $value){
+$ifsel = ($pid == $value[pid]) ? 'class="current"' : '';
+print <<<EOT
+-->
+							 <li id="imglist_{$value[pid]}" $ifsel>
+<!--
+EOT;
+if($value[pid]=='begin'||$value[pid]=='end'){
+print <<<EOT
+-->
+								<div class="aimg"><a href="javascript:;"><img src="$value[path]" /></a></div>
+<!--
+EOT;
+} else {print <<<EOT
+-->
+								<div class="aimg"><a href="{$basename}a=view&pid=$value[pid]{$friendurl}#content"><img src="$value[path]" onload="if(this.width>100){this.width = 100;} else if(this.height>100){this.height=100;}" /></a></div>
+<!--
+EOT;
+}print <<<EOT
+-->
+								</li>
+<!--
+EOT;
+}print <<<EOT
+-->
+							</ul>
 					</div>
-				</div>
-				<div class="p10">
-					<div>上传于{$photo[uptime]}</div>
-					<div>浏览（$photo[hits]）</div>
-					<div>评论（$photo[c_num]）</div>
 				</div>
 				</div>
 			</div>
@@ -333,7 +334,7 @@ EOT;
 					</table>
 					</div>
 					<div class="onePhototip">
-						<div class="fr s7"><a href="javascript:;" onclick="ImgClick();" class="s7">原图</a>&nbsp;┊&nbsp;<a href="javascript:;" onclick="sendmsg('pw_ajax.php?action=report&type=photo&tid=$pid&pid=$u','',this.id);" id="report_photo" class="s7">举报</a>&nbsp;┊&nbsp;<!--
+						<div class="fr s7" style="z-index:1200"><a href="javascript:;" onclick="ImgClick();" class="s7">原图</a>&nbsp;┊&nbsp;<a href="javascript:;" onclick="sendmsg('pw_ajax.php?action=report&type=photo&tid=$pid&pid=$u','',this.id);" id="report_photo" class="s7">举报</a>&nbsp;┊&nbsp;<!--
 EOT;
 if ($isown){print <<<EOT
 --><a href="javascript:;" onclick="pwConfirm('是否将本照片设为封面？',this,function(){ajaxSetCover('$photo[pid]')});" class="s7">设为封面</a>&nbsp;┊&nbsp;<!--
@@ -346,7 +347,7 @@ EOT;
 }print <<<EOT
 -->
 						</div>
-						<div>$photo[pintro]</div>
+						<div><span class="mr20">$photo[pintro]</span><span class="gray mr10">上传于{$photo[uptime]}</span><span class="gray">浏览：{$photo[hits]} / 评论：{$photo[c_num]}</span></div>
 					</div>
 				</div>
 				<div>
@@ -356,22 +357,22 @@ $rateSets = unserialize($db_ratepower);
 if($rateSets[3] && isset($db_hackdb['rate'])){
 print <<<EOT
 --><link rel="stylesheet" type="text/css" href="hack/rate/images/rate.css" />
-				<script language="JavaScript" src="js/rate_ajax.js"></script>
-				<script language="javascript">
+				<script src="js/rate_ajax.js"></script>
+				<script>
 				var before = window.onload;
 				window.onload = function() {
 					before ? before():0;
 					rate.getVote("vote_box","{$db_bbsurl}/hack.php?H_name=rate&action=ajax","elementid=vote_box&typeid=3&objectid={$pid}&authorid={$u}");
 				};
 				</script>						
-				<div id="vote_box" class="mt10"></div>
+				<div id="vote_box"></div>
 <!-- 
 EOT;
 }
 print <<<EOT
 -->	
-<script language="JavaScript" src="js/pw_photolist.js"></script>
-<script language="JavaScript">
+<script src="js/pw_photolist.js"></script>
+<script>
 var photolist = new photoList('img_list','$pid','$aid');
 
 function toBreakWord(intLen){
@@ -388,13 +389,13 @@ obj.innerHTML=strTemp;
 //if(document.getElementById  &&  !document.all)  toBreakWord(100)
 </script>
 <div class="c"></div>
-<script language="JavaScript" src="js/app_comment.js"></script>
+<script src="js/app_comment.js"></script>
 <div class="c mb10">&nbsp;</div>
 <!--
 EOT;
 require_once PrintEot('m_comment');print <<<EOT
 -->
-<script language="JavaScript">
+<script>
 
 function ImgClick()
 {
@@ -413,7 +414,7 @@ function ajaxpage(url,type) {
 		var rText = ajax.request.responseText.split('\t');
 		if (rText[0] == 'ok') {
 			if (rText[1]) {
-				window.location.href = tourl + '&pid=' + rText[1];
+				window.location.href = tourl + '&pid=' + rText[1] + '#content';
 			} else {			
 				var message = type == 'next' ? '已经是最后一张照片' : '已经是第一张照片';
 				showDialog('warning',message,2);
@@ -443,8 +444,8 @@ function bbimg()
 EOT;
 } elseif ($a == 'editphoto') {print <<<EOT
 -->
-<div class="tips">编辑照片<span class="p_lr_10">|</span><a href="{$basename}a=view&pid=$pid">返回照片</a></div>
-<div class="p15">
+<div class="p10 bdB mb10">编辑照片<span class="p_lr_10">|</span><a href="{$basename}a=view&pid=$pid">返回照片</a></div>
+<div class="p10">
 								<form action="{$basename}a=$a" method="post">
 								<input type="hidden" name="step" value="3" />
 								<input type="hidden" name="pid" value="$pid" />
@@ -456,14 +457,14 @@ EOT;
 												<th class="th">描述</th>
 												<td class="td"><textarea id="pintro" name="pintro" class="textareaA mb5">$photo[pintro]</textarea><div id="pintro_warn" class="gray">限 255 字节</div></td>
 										</tr>
-										<tr class="tr6">
+										<tr>
 												<th class="th">&nbsp;</th>
 												<td class="td"><span class="btn"><span><button type="submit">编辑照片</button></span></span>
 												</td>
 										</tr>
 								</table>
 								</form>
-<script language="JavaScript">
+<script>
 var charset = '$db_charset';
 initCheckTextNum('pintro','pintro_warn',255);
 </script>
@@ -480,8 +481,8 @@ $formiframe=$shortcut?"<iframe src=javascript:; width=0 height=0 name='formifram
 if (empty($job)) {
 print <<<EOT
 -->
-<div class="tips"><a href="{$basename}a=$a&job=flash&aid=$aid" class="current">批量上传</a></div>
-<div class="p15">
+<div class="p10 bdB mb10"><a href="{$basename}a=$a&job=flash&aid=$aid" class="current">批量上传</a></div>
+<div class="p10">
 <h5 class="h5 mb15"><strong>上传照片</strong></h5>
 <form action="{$basename}a=$a&job=$job" id="uploadPhotoForm" enctype="multipart/form-data" method="post" $shortcut >
 <input type="hidden" name="step" value="3" />
@@ -538,33 +539,34 @@ print <<<EOT
 		</div>
 <!--
 EOT;
-if ($o_photos_gdcheck) {print <<<EOT
+if ($o_photos_gdcheck) {
+$gdSize = explode("\t",$db_gdsize);
+print <<<EOT
 -->
-			<div class="cc mb10"><div style="width:100px;" class="fl tar mr10">认证码: </div><input class="input" onfocus="showCK();" type="text" name="gdcode" id="gdcode" size="5" tabindex="3"  /> <img id="ckcode" style="cursor:pointer;display:none; vertical-align:top;" onclick="this.src='ck.php?nowtime='+new Date().getTime();" alt="看不清楚，换一张" align="absmiddle" /></div>
-<script language="JavaScript">
-function showCK(){
-	getObj('ckcode').style.display="";
-	if (getObj('ckcode').src.indexOf('ck.php') == -1) {
-		getObj('ckcode').src = 'ck.php?nowtime=' + new Date().getTime();
-	}
-}
+			<div class="cc mb10"><div style="width:100px;" class="fl tar mr10">认证码: </div><input class="input" onfocus="showgd();" type="text" name="gdcode" id="gdcode" size="5" tabindex="3"  /> 
+				<span id="ckcode" style="display:none;vertical-align:top;">
+<script type="text/javascript" src="js/pw_authcode.js"></script>
+<script>
+var flashWidth = "$gdSize[0]";
+var flashHeight = "$gdSize[1]";
+var gdtype = $db_gdtype;
+showGdCode();
 </script>
+				</span>
+			</div>
 <!--
 EOT;
-}if($o_photos_qcheck){print <<<EOT
+}if($db_question && $o_photos_qcheck){
+if($db_imagequestion){
+	$question = sprintf('<img src="ckquestion.php?q=%s">',$qkey);
+}else{
+	$question = $qkey<0 ? getMachineQuestion_1() :  $db_question[$qkey];
+}
+$q_a = $question.($showq && $qkey>0?" 正确答案:".$db_answer[$qkey] : '');
+print <<<EOT
 -->
 			<div class="cc mb5"><div style="width:100px;height:60px;" class="fl tar mr10">验证问答: </div>
-			<div class="mb5">{$db_question[$qkey]} 
-<!--
-EOT;
-if($showq){print <<<EOT
--->
-			（正确答案:{$db_answer[$qkey]}）
-<!--
-EOT;
-}print <<<EOT
--->
-			</div>
+			<div class="mb5">{$q_a}</div>
 			<input class="input" name="qanswer" id="qanswer" size="25" tabindex="7" />
 			<input type="hidden" name="qkey" id="qkey" value="$qkey" /></div>
 <!--
@@ -577,7 +579,7 @@ EOT;
 	<div class="p10 tac"><span class="btn"><span><button type="submit">开始上传</button></span></span></div>
 </form>
 </div>
-<script language="JavaScript">
+<script>
 var charset = '$db_charset';
 initCheckTextNum('pintro_1','pintro_1_warn',255);
 initCheckTextNum('pintro_2','pintro_2_warn',255);
@@ -602,8 +604,8 @@ function preview_img(id){
 EOT;
 } elseif ($job == 'flash') {print<<<EOT
 -->
-<div class="tips"><a href="{$basename}a=$a&aid=$aid" class="current">普通上传</a></div>
-<div class="p15">
+<div class="p10 bdB mb10"><a href="{$basename}a=$a&aid=$aid" class="current">普通上传</a></div>
+<div class="p10">
 <h5 class="h5 mb15"><strong>上传照片</strong></h5>
 <script type="text/javascript" src="js/photouploader.js"></script>
 <script type="text/javascript" src="js/swfobject.js"></script>
@@ -652,7 +654,7 @@ EOT;
 			</td>
 		</tr>
 	</table>
-<script language="JavaScript">
+<script>
 var wo=window.onload;
 window.onload=function()
 {
@@ -666,7 +668,7 @@ uploader.baseurl = '$basename';
 EOT;
 }print <<<EOT
 -->
-<script language="JavaScript">
+<script>
 function getallowflash(aid) {
 	ajax.send('{$basename}a=getallowflash&aid='+aid,'',function() {
 		var job = '$job';
@@ -682,6 +684,7 @@ function getallowflash(aid) {
 				if(job == "flash")
 					uploader.setLimits(rText[1]);
 				getObj('allowflash').innerHTML = '您还可以上传'+rText[1]+'张照片';
+				uploader.countFile();
 			} else {
 				getObj('allowflash').innerHTML = '请选择相册';
 			}
@@ -725,9 +728,10 @@ EOT;
 -->
 	</div>
 <div class="p5">
-<form action="{$basename}a=$a" method="post">
+<form action="{$basename}a=$a"  name="FORM" method="post" onsubmit="return checkpost(document.FORM);">
 <input type="hidden" name="step" value="3" />
 <input type="hidden" name="aid" value="$aid" />
+<input type="hidden" name="ajax" value="1" />
 <input type="hidden" name="verify" value="$verifyhash" />
 <table cellpadding="0" cellspacing="0" width="100%" class="setTable">
 	<tr>
@@ -766,31 +770,41 @@ EOT;
 	</tbody>
 <!--
 EOT;
-if ($o_photos_gdcheck) {print <<<EOT
+if ($o_photos_gdcheck) {
+$gdSize = explode("\t",$db_gdsize);
+print <<<EOT
 -->
 	<tr>
 		<th class="th">认证码</th>
 		<td class="td">
-			<input class="input" onfocus="showCK();" type="text" name="gdcode" id="gdcode" style="width:50px;" tabindex="3"  />
-			<img id="ckcode" style="cursor:pointer;display:none; vertical-align:top;" onclick="this.src='ck.php?nowtime='+new Date().getTime();" alt="看不清楚，换一张" />
-<script language="JavaScript">
-function showCK(){
-getObj('ckcode').style.display="";
-if (getObj('ckcode').src.indexOf('ck.php') == -1) {
-getObj('ckcode').src = 'ck.php?nowtime=' + new Date().getTime();
-}
-}
-</script>
+			<input class="input" onfocus="showgd();" type="text" name="gdcode" id="gdcode" style="width:50px;" tabindex="3"  />
+			<span id="ckcode" style="display:none; vertical-align:top;">
+<script type="text/javascript" src="js/pw_authcode.js"></script>
+<script>
+var flashWidth = "$gdSize[0]";
+var flashHeight = "$gdSize[1]";
+var gdtype = $db_gdtype;
+showGdCode();
+</script>		
+			</span>
 		</td>
 	</tr>
 <!--
 EOT;
-}if($o_photos_qcheck){print <<<EOT
+}if($o_photos_qcheck && $db_question){
+list(,$showq)=explode("\t",$db_qcheck);
+if($db_imagequestion){
+	$question = sprintf('<img src="ckquestion.php?q=%s">',$qkey);
+}else{
+	$question = $qkey<0 ? getMachineQuestion_1() :  $db_question[$qkey];
+}
+$q_a = $question.($showq && $qkey>0?" 正确答案:".$db_answer[$qkey] : '');
+print <<<EOT
 -->
 	<tr>
 		<th class="th">验证问答</th>
 		<td class="td">
-		<div class="mb5"> {$db_question[$qkey]} （正确答案:{$db_answer[$qkey]}）</div>
+		<div class="mb5"> {$q_a} </div>
 		<input class="input" name="qanswer" id="qanswer" size="25" tabindex="7" />
 		<input type="hidden" name="qkey" id="qkey" value="$qkey" />
 		</td>
@@ -802,14 +816,57 @@ EOT;
 	<tr>
 		<th class="th">&nbsp;</th>
 		<td class="td">
-		<span class="btn"><span><button type="submit">创建相册</button></span></span>
+		<span class="btn"><span><button type="submit" name="Submit">创建相册</button></span></span>
 		</td>
 	</tr>
 </table>
-</form>
+</form><div id="divload"></div>
 </div>
 </div>
-<script language="JavaScript">
+<script>
+var cnt  = 0;
+document.FORM.Submit.disabled = false;
+function checkpost(obj) {
+	if (obj.aname.value == "") {
+		obj.aname.focus();
+		showDialog("error","请输入<span class='warnFontStyle'>相册名</span>",2);
+		return false;
+	}
+	SubmitAjax(obj);
+	return false;
+}
+//ajax提交数据
+function SubmitAjax(obj) {
+	document.FORM.Submit.disabled = true;
+	getObj('divload').innerHTML = showLoading();
+	cnt++;
+	ajax.send("apps.php?q=photos&a=create", obj, function(){
+		if(undefined == ajax.request.responseText){
+			showDialog({
+				type: 'error',
+				message: '请求超时!'
+			});
+			document.FORM.Submit.disabled = false;
+			getObj('divload').innerHTML = "";
+			return false;
+		}
+		var rText = ajax.request.responseText.split('\t');
+		if (rText[0] == 'success') {
+			window.onbeforeunload = function(){};
+			top.window.location =  rText[1];
+		} else {
+			showDialog('error', rText[0]);
+		}
+		cnt = 0;
+		document.FORM.Submit.disabled = false;
+		getObj('divload').innerHTML = "";
+		return false;
+	});
+}
+function showLoading(){
+	return "<div id=\"loading\" style=\"padding:20px;width:80%;text-align:center\"><img src=\""+imgpath+"/loading.gif\" align=\"absbottom\" alt=\"loading\" /> 正在加载数据...</div>";
+}
+
 var charset = '$db_charset';
 initCheckTextNum('aname','aname_warn',24);
 initCheckTextNum('aintro','aintro_warn',255);
@@ -831,7 +888,7 @@ function optionsel(id) {
 EOT;
 }print <<<EOT
 -->
-<script language="JavaScript">
+<script>
 function ajaxdel(pid) {
 	ajax.send('{$basename}&a=delphoto&pid='+pid,'',function() {
 		var rText = ajax.request.responseText.split('\\t');
@@ -858,9 +915,13 @@ function ajaxSetCover(pid){
 </div>
 <script type="text/javascript" src="js/select.js"></script>
 <script type="text/javascript">
-var photoselect = new sSelect(getObj('aidsel_info'));
+window.onReady(function(){
+	var photoselect = new sSelect(getObj('aidsel_info'));
+})
+
 </script>
 </div>
+</td></tr></table>
 </div>
 <!--
 EOT;

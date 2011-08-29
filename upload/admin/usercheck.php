@@ -1,12 +1,14 @@
 <?php
 !function_exists('adminmsg') && exit('Forbidden');
-$basename="$admin_file?adminjob=usercheck&admintype=$admintype";
+empty($adminitem) && $adminitem = 'checkreg';
+$jobUrl="$admin_file?adminjob=usercheck";
+$basename="$admin_file?adminjob=usercheck&adminitem=$adminitem";
 
 if(empty($_POST['action'])){
-	InitGP(array('page'),'GP',2);
-	if($admintype=='checkemail'){
+	S::gp(array('page'),'GP',2);
+	if($adminitem=='checkemail'){
 		$page < 1 && $page = 1;
-		$limit = pwLimit(($page-1)*$db_perpage,$db_perpage);
+		$limit = S::sqlLimit(($page-1)*$db_perpage,$db_perpage);
 		$rt    = $db->get_one("SELECT COUNT(*) AS sum FROM pw_members WHERE yz>1");
 		$pages = numofpage($rt['sum'],$page,ceil($rt['sum']/$db_perpage),"$basename&");
 
@@ -16,9 +18,9 @@ if(empty($_POST['action'])){
 			$member['regdate'] = get_date($member['regdate']);
 			$memdb_E[] = $member;
 		}
-	} elseif($admintype=='checkreg'){
+	} elseif($adminitem=='checkreg'){
 		$page < 1 && $page = 1;
-		$limit = pwLimit(($page-1)*$db_perpage,$db_perpage);
+		$limit = S::sqlLimit(($page-1)*$db_perpage,$db_perpage);
 		$rt    = $db->get_one("SELECT COUNT(*) AS sum FROM pw_members WHERE groupid='7'");
 		$pages = numofpage($rt['sum'],$page,ceil($rt['sum']/$db_perpage),"$basename&");
 
@@ -39,15 +41,16 @@ if(empty($_POST['action'])){
 	if($uids){
 		$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
 		if($type=='pass'){
-			if($admintype=='checkemail'){
+			if($adminitem=='checkemail'){
 				$userService->updates($uids, array('yz'=>1));
-			} elseif($admintype=='checkreg'){
+			} elseif($adminitem=='checkreg'){
 				$userService->updates($uids, array('groupid'=>-1));
 			}
 		} else{
 			$userService->deletes($uids);
 			$lastestUser = $userService->getLatestNewUser();
-			$db->update("UPDATE pw_bbsinfo SET ".pwSqlSingle(array('newmember'=>$lastestUser['username'],'totalmember'=>$userService->count()))."WHERE id='1'");
+			//* $db->update("UPDATE pw_bbsinfo SET ".S::sqlSingle(array('newmember'=>$lastestUser['username'],'totalmember'=>$userService->count()))."WHERE id='1'");
+			pwQuery::update('pw_bbsinfo', 'id=:id', array(1), array('newmember'=>$lastestUser['username'],'totalmember'=>$userService->count()));
 		}
 	}
 	adminmsg('operate_success');

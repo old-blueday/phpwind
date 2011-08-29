@@ -4,10 +4,10 @@ print <<<EOT
 -->
 <div class="c mb10"></div>
 <div id="showmessage"></div>
-<form action="$baseUrl?&type=ajax&action=postReply" name="REPLY" method="post"  onsubmit="return MC.sendPostReply('',document.REPLY)">
+<form action="$baseUrl?&type=ajax&action=postReply" name="FORM" method="post"  onsubmit="return MC.sendPostReply('$baseUrl?&type=ajax&action=postReply',document.FORM)">
 <table width="100%" style="table-layout:fixed;">
 	<tr class="tr3 vt">
-    	<td class="face" style="vertical-align:top;"><a class="img_50" href="u.php?uid=$winduid"><i><img width="48" height="48" src="{$face}"></i></a></td>
+    	<td class="face" style="vertical-align:top;"><a class="img_50" href="{$db_userurl}$winduid"><i><img width="48" height="48" src="{$face}"></i></a></td>
         <td>
         	<div class="p_lr_10">
             <div class="replyEditor mb10">
@@ -16,7 +16,7 @@ print <<<EOT
                 </ul>
                 <input type="hidden" id="rid" name="rid" value="{$message[rid]}"/>
                 <input type="hidden" id="parentMid" name="parentMid" value="{$message[mid]}"/>
-                <div class="textarea"><textarea id="textarea" name="atc_content"></textarea></div>
+                <div class="textarea"><textarea id="textarea" name="atc_content" onkeydown="quickpost(event)"></textarea></div>
                 <div class="c"></div>
             </div>
 <!--
@@ -33,7 +33,7 @@ EOT;
 }
 print <<<EOT
 -->              
-            <span class="btn" style="margin:0;"><span><button type="button" onclick="return MC.sendPostReply('$baseUrl?&type=ajax&action=postReply',document.REPLY)">发送</button></span></span>
+            <span class="btn" style="margin:0 10px 0 0;"><span><button type="submit" name="Submit">发送</button></span></span><span class="s3">Ctrl + Enter 快速发布</span>
             </div>
 		</td>
 	</tr>

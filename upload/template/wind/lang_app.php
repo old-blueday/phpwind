@@ -17,6 +17,8 @@ $lang['app'] = array (
 'album'			=> '相册',
 'reply'			=> '回复',
 'house'			=> '楼盘',
+'sale'          => '出售房源',
+'hire'          => '出租房源',
 
 'diary'			=> '日志',
 'topic'			=> '帖子',
@@ -39,10 +41,12 @@ $lang['app'] = array (
 'weibo'			=> '新鲜事',
 'multimedia'	=> '多媒体',
 'cms'			=> '文章',
+'postfavor'			=> '帖子',
 'collection_type_name'	=> '[{$L[type]}] 收藏于: {$L[postdate]}',
-'ajax_sendweibo_info' => '我在用户[url={$L[db_bbsurl]}/u.php?uid={$L[uid]}]{$L[username]}[/url]的个人空间发现这个信息，认为很有价值，特别推荐。\\n\\n主要信息:\\n{$L[title]}\\n\\n描述:\\n{$L[descrip]}\\n\\n希望你能喜欢。',
+'collection_postfavor_name'	=> '[{$L[type]}] 更新于: {$L[postdate]}',
+'ajax_sendweibo_info' => '我在用户[url={$L[db_bbsurl]}/{$GLOBALS[db_userurl]}{$L[uid]}]{$L[username]}[/url]的个人空间发现这个信息，认为很有价值，特别推荐。\\n\\n主要信息:\\n{$L[title]}\\n\\n描述:\\n{$L[descrip]}\\n\\n希望你能喜欢。',
 'ajax_sendweibo_groupinfo' => '我在群组“{$L[cname]}”发现这个信息，认为很有价值，特别推荐。\\n\\n主要信息:\\n{$L[title]}\\n\\n描述:\\n{$L[descrip]}\\n\\n希望你能喜欢。',
-'ajax_sendweibo_cmsinfo' => '我在文章中发现这个信息，认为很有价值，特别推荐。\\n\\n主要信息:\\n{$L[title]}\\n\\n描述:\\n{$L[descrip]}\\n\\n希望你能喜欢。',
+'ajax_sendweibo_cmsinfo' => '我发现了一篇文章，认为很有价值，特别推荐。\\n\\n主要信息:\\n{$L[title]}\\n\\n描述:\\n{$L[descrip]}\\n\\n希望你能喜欢。',
 'ajax_sendweibo_houseinfo' => '我发现一个楼盘：{$L[title]} &nbsp;认为很有价值，特别推荐给你。\\n楼盘位置: {$L[postion]} \\n希望你能喜欢。',
 );
 ?>

@@ -86,21 +86,26 @@ class PwSpaceModel {
 		$array = array();
 
 		$diaryService = L::loadClass('Diary', 'diary'); /* @var $diaryService PW_Diary */
+		$gid = $GLOBALS['groupid'];
 		if ($winduid != $uid) {
 			$friendsService = L::loadClass('Friend', 'friend'); /* @var $friendsService PW_Friend */
 			$isFriend = $friendsService->isFriend($winduid, $uid);
 			$diaryPrivacy = $isFriend !== true ? array(0) : array(0,1);
-			$sqlAdd = " AND d.privacy IN (".pwImplode($diaryPrivacy).")";
+			$sqlAdd = " AND d.privacy IN (".S::sqlImplode($diaryPrivacy).")";
+			$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
+			$userInfo = $userService->get($uid);
+			$gid = $userInfo['groupid'];
 		}
 		$query = $this->_db->query("SELECT d.*,".
 									" dt.name".
 									" FROM pw_diary d".
 									" LEFT JOIN pw_diarytype dt".
 									" ON d.dtid= dt.dtid".
-									" WHERE d.uid=" . pwEscape($uid) .$sqlAdd. ' ORDER BY d.did DESC '. pwLimit($num));
+									" WHERE d.uid=" . S::sqlEscape($uid) .$sqlAdd. ' ORDER BY d.did DESC '. S::sqlLimit($num));
 		while ($rt = $this->_db->fetch_array($query)) {
 			$rt['content']  = substrs($rt['content'], 500);
 			$rt['postdate'] = get_date($rt['postdate']);
+			$rt['groupid'] = $gid;
 			list($rt['subject'], $rt['content']) = $diaryService->filterDiaryContent($rt, true, true);
 			$rt['content'] = preg_replace('/\[(attachment|upload)=\d+\]/i', '', $rt['content']);
 			$array[] = $rt;
@@ -119,7 +124,7 @@ class PwSpaceModel {
 			$_sql_where = ' AND a.private=0';
 		}
 		$array = array();
-		$query = $this->_db->query("SELECT b.pid,b.path,b.ifthumb FROM pw_cnalbum a LEFT JOIN pw_cnphoto b ON a.aid=b.aid WHERE a.atype='0' AND a.ownerid=" . pwEscape($uid) . $_sql_where . ' AND b.pid IS NOT NULL ORDER BY b.pid DESC ' . pwLimit($num));
+		$query = $this->_db->query("SELECT b.pid,b.path,b.ifthumb FROM pw_cnalbum a LEFT JOIN pw_cnphoto b ON a.aid=b.aid WHERE a.atype='0' AND a.ownerid=" . S::sqlEscape($uid) . $_sql_where . ' AND b.pid IS NOT NULL ORDER BY b.pid DESC ' . S::sqlLimit($num));
 		while ($rt = $this->_db->fetch_array($query)) {
 			$rt['path'] = getphotourl($rt['path'], $rt['ifthumb']);
 			$array[] = $rt;

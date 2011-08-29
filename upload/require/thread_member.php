@@ -1,19 +1,21 @@
 <?php
 !defined('R_P') && exit('Forbidden');
 
-InitGP(array('a'));
+S::gp(array('a'));
 
-if (!($foruminfo = L::forum($fid))) {
+$pwforum = new PwForum($fid);
+if (!$pwforum->isForum(true)) {
 	Showmsg('data_error');
 }
+$foruminfo =& $pwforum->foruminfo;
 $groupRight =& $newColony->getRight();
 $pwModeImg = "$imgpath/apps";
 require_once(R_P . 'u/require/core.php');
-include_once(D_P . 'data/bbscache/o_config.php');
+include_once pwCache::getPath(D_P . 'data/bbscache/o_config.php');
 
 require_once(R_P . 'require/header.php');
-list($guidename,$forumtitle) = getforumtitle(forumindex($foruminfo['fup'],1));
-$msg_guide = headguide($guidename);
+list($guidename, $forumtitle) = $pwforum->getTitle();
+$msg_guide = $pwforum->headguide($guidename);
 
 $styleid = $colony['styleid'];
 $basename = "thread.php?cyid=$cyid&showtype=member";
@@ -27,7 +29,7 @@ if (empty($a)) {
 	if (empty($_POST['operateStep'])) {
 
 		require_once(R_P.'require/showimg.php');
-		InitGP(array('group', 'orderby'));
+		S::gp(array('group', 'orderby'));
 		$group && $tmpUrlAdd .= '&group='.$group;
 		$lang_no_member = array('2'=>'没有普通成员','3'=>'没有未验证会员','4'=>'没有最近访客');
 		$order_lastpost = $order_lastvisit = '';
@@ -53,7 +55,7 @@ if (empty($a)) {
 				$memdb = array();
 			}
 		} else {
-			InitGP(array('page'),GP,2);
+			S::gp(array('page'),GP,2);
 			$sqlsel = '';
 			if ($group == 1) {
 				$sqlsel = " AND cm.ifadmin='1'";
@@ -62,7 +64,7 @@ if (empty($a)) {
 			} elseif ($group == 3) {
 				$sqlsel = " AND cm.ifadmin='-1'";
 			}
-			$total = $db->get_value("SELECT COUNT(*) AS sum FROM pw_cmembers cm WHERE cm.colonyid=" . pwEscape($cyid) . $sqlsel);
+			$total = $db->get_value("SELECT COUNT(*) AS sum FROM pw_cmembers cm WHERE cm.colonyid=" . S::sqlEscape($cyid) . $sqlsel);
 			if ($total) {
 				if (in_array($orderby, array('lastpost', 'lastvisit'))) {
 					$order	= $orderby;
@@ -74,7 +76,7 @@ if (empty($a)) {
 				}
 				list($pages, $limit) = pwLimitPages($total,$page,"{$basename}&group=$group&$urladd");
 				$memdb = array();
-				$query = $db->query("SELECT cm.*,m.icon,m.honor,md.thisvisit FROM pw_cmembers cm LEFT JOIN pw_members m ON cm.uid=m.uid LEFT JOIN pw_memberdata md ON m.uid=md.uid WHERE cm.colonyid=" . pwEscape($cyid) . $sqlsel . " ORDER BY cm.{$order} DESC $limit");
+				$query = $db->query("SELECT cm.*,m.icon,m.honor,md.thisvisit FROM pw_cmembers cm LEFT JOIN pw_members m ON cm.uid=m.uid LEFT JOIN pw_memberdata md ON m.uid=md.uid WHERE cm.colonyid=" . S::sqlEscape($cyid) . $sqlsel . " ORDER BY cm.{$order} DESC $limit");
 				while ($rt = $db->fetch_array($query)) {
 					list($rt['icon']) = showfacedesign($rt['icon'],1);
 					$memdb[$rt['username']] = $rt;
@@ -92,39 +94,41 @@ if (empty($a)) {
 	} else {
 
 		!$ifadmin && Showmsg('undefined_action');
-		InitGP(array('selid'), 'P', 2);
+		S::gp(array('selid'), 'P', 2);
 
 		if (!$selid || !is_array($selid)) {
 			Showmsg('id_error');
 		}
 		$toUsers = array();
-		$operateStep = GetGP('operateStep','P');
+		$operateStep = S::getGP('operateStep','P');
 		switch ($operateStep) {
 			case 'addadmin':
 				($colony['admin'] != $windid && $groupid != 3) && Showmsg('colony_manager');
-				$query = $db->query("SELECT ifadmin,username FROM pw_cmembers WHERE colonyid=" . pwEscape($cyid) . ' AND uid IN(' . pwImplode($selid) . ") AND ifadmin!='1'");
+				$query = $db->query("SELECT ifadmin,username FROM pw_cmembers WHERE colonyid=" . S::sqlEscape($cyid) . ' AND uid IN(' . S::sqlImplode($selid) . ") AND ifadmin!='1'");
 				$newMemberCount = 0;
 				while ($rt = $db->fetch_array($query)) {
 					$rt['ifadmin'] == -1 && $newMemberCount++;
 					$toUsers[] = $rt['username'];
 				}
 				$newColony->updateInfoCount(array('members' => $newMemberCount));
-				$db->update("UPDATE pw_cmembers SET ifadmin='1' WHERE colonyid=" . pwEscape($cyid) . ' AND uid IN(' . pwImplode($selid) . ") AND ifadmin!='1'");
+				//* $db->update("UPDATE pw_cmembers SET ifadmin='1' WHERE colonyid=" . S::sqlEscape($cyid) . ' AND uid IN(' . S::sqlImplode($selid) . ") AND ifadmin!='1'");
+				pwQuery::update('pw_cmembers', 'colonyid=:colonyid AND uid IN (:uid) AND ifadmin!=:ifadmin', array($cyid, $selid, 1), array('ifadmin'=>1));
 				break;
 			case 'deladmin':
 				($colony['admin'] != $windid && $groupid != 3) && Showmsg('colony_manager');
-				$query = $db->query("SELECT username FROM pw_cmembers WHERE colonyid=" . pwEscape($cyid) . ' AND uid IN(' . pwImplode($selid) . ") AND ifadmin='1'");
+				$query = $db->query("SELECT username FROM pw_cmembers WHERE colonyid=" . S::sqlEscape($cyid) . ' AND uid IN(' . S::sqlImplode($selid) . ") AND ifadmin='1'");
 				while ($rt = $db->fetch_array($query)) {
 					$colony['admin'] == $rt['username'] && Showmsg('colony_delladminfail');
 					$toUsers[] = $rt['username'];
 				}
-				$db->update("UPDATE pw_cmembers SET ifadmin='0' WHERE colonyid=" . pwEscape($cyid) . ' AND uid IN(' . pwImplode($selid) . ") AND ifadmin='1'");
+				//* $db->update("UPDATE pw_cmembers SET ifadmin='0' WHERE colonyid=" . S::sqlEscape($cyid) . ' AND uid IN(' . S::sqlImplode($selid) . ") AND ifadmin='1'");
+				pwQuery::update('pw_cmembers', 'colonyid=:colonyid AND uid IN (:uid) AND ifadmin=:ifadmin', array($cyid, $selid, 1), array('ifadmin'=>0));
 				break;
 			case 'check':
 				$toUsers = $newColony->checkMembers($selid);
 				break;
 			case 'del':
-				$query = $db->query("SELECT username,ifadmin FROM pw_cmembers WHERE colonyid=" . pwEscape($cyid) . ' AND uid IN(' . pwImplode($selid) . ")");
+				$query = $db->query("SELECT username,ifadmin FROM pw_cmembers WHERE colonyid=" . S::sqlEscape($cyid) . ' AND uid IN(' . S::sqlImplode($selid) . ")");
 				while ($rt = $db->fetch_array($query)) {
 					if ($rt['username'] == $colony['admin']) {
 						Showmsg('colony_delfail');
@@ -136,7 +140,9 @@ if (empty($a)) {
 					$rt['ifadmin'] != -1 && $trueMemberCount++;
 					$toUsers[] = $rt['username'];
 				}
-				$db->update("DELETE FROM pw_cmembers WHERE colonyid=" . pwEscape($cyid) . " AND uid IN(" . pwImplode($selid) . ")");
+				//* $db->update("DELETE FROM pw_cmembers WHERE colonyid=" . S::sqlEscape($cyid) . " AND uid IN(" . S::sqlImplode($selid) . ")");
+				pwQuery::delete('pw_cmembers', 'colonyid=:colonyid AND uid IN (:uid)', array($cyid, $selid));
+				
 				$newColony->updateInfoCount(array('members' => -$trueMemberCount));
 				$colony['members'] -= $trueMemberCount;
 				updateGroupLevel($colony['id'], $colony);
@@ -150,10 +156,10 @@ if (empty($a)) {
 				$toUsers,
 				array(
 					'title' => getLangInfo('writemsg','o_' . $operateStep . '_title',array(
-						'cname'	=> Char_cv($colony['cname']),
+						'cname'	=> S::escapeChar($colony['cname']),
 					)),
 					'content' => getLangInfo('writemsg','o_' . $operateStep . '_content',array(
-						'cname'	=> Char_cv($colony['cname']),
+						'cname'	=> S::escapeChar($colony['cname']),
 						'curl'	=> "$db_bbsurl/{$basename}cyid=$cyid"
 					)),
 				)
@@ -168,7 +174,7 @@ if (empty($a)) {
 
 	if (empty($_POST['step'])) {
 
-		InitGP(array('selid', 'group'), null, 2);
+		S::gp(array('selid', 'group'), null, 2);
 
 		$uids = $usernames = array();
 
@@ -179,7 +185,7 @@ if (empty($a)) {
 				$usernames[] = $rt['username'];
 			}
 		} else {
-			$sql = ' WHERE colonyid=' . pwEscape($cyid) . ' AND uid<>' . pwEscape($winduid);
+			$sql = ' WHERE colonyid=' . S::sqlEscape($cyid) . ' AND uid<>' . S::sqlEscape($winduid);
 			switch ($group) {
 				case '1': $sql .= " AND ifadmin='1'";break;
 				case '2': $sql .= " AND ifadmin='0'";break;
@@ -203,8 +209,8 @@ if (empty($a)) {
 
 	} else {
 
-		InitGP(array('group'), null, 2);
-		InitGP(array('uids', 'subject', 'content'));
+		S::gp(array('group'), null, 2);
+		S::gp(array('uids', 'subject', 'content'));
 
 		if (!$content || !$subject) {
 			Showmsg('msg_empty');
@@ -227,7 +233,7 @@ if (empty($a)) {
 				$toUsers[] = $user['username'];
 			}
 		} else {
-			$sql = ' WHERE colonyid=' . pwEscape($cyid) . ' AND uid<>' . pwEscape($winduid);
+			$sql = ' WHERE colonyid=' . S::sqlEscape($cyid) . ' AND uid<>' . S::sqlEscape($winduid);
 			switch ($group) {
 				case '1': $sql .= " AND ifadmin='1'";break;
 				case '2': $sql .= " AND ifadmin='0'";break;
@@ -256,14 +262,14 @@ if (empty($a)) {
 } elseif ($a == 'invite') {
 
 	empty($winduid) && Showmsg('not_login');
-	InitGP(array('id','type'));
+	S::gp(array('id','type'));
 	require_once(R_P . 'require/functions.php');
 	$customdes = getLangInfo('other','invite_custom_des');
 	$tmpUrlAdd .= '&a=invite';
 
 	if ($type == 'groupactive') {
 		$invite_url = $db_bbsurl.'/u.php?a=invite&type=groupactive&id=' . $id . '&uid=' . $winduid . '&hash=' . appkey($winduid, $type);
-		$activeArray = $db->get_one("SELECT * FROM pw_active WHERE id=".pwEscape($id));
+		$activeArray = $db->get_one("SELECT * FROM pw_active WHERE id=".S::sqlEscape($id));
 		$objectName = $activeArray['title'];
 		$objectDescrip = substrs($activeArray['content'],30);
 		$activeId = $activeArray['id'];
@@ -279,13 +285,13 @@ if (empty($a)) {
 
 	if (empty($_POST['step'])) {
 
-		InitGP("id",null,2);
-		@include_once(D_P.'data/bbscache/o_config.php');
+		S::gp("id",null,2);
+		@include_once pwCache::getPath(D_P.'data/bbscache/o_config.php');
 		$friend = getFriends($winduid) ? getFriends($winduid) : array();
 		foreach ($friend as $key => $value) {
 			$frienddb[$value['ftid']][] = $value;
 		}
-		$query = $db->query("SELECT * FROM pw_friendtype WHERE uid=".pwEscape($winduid)." ORDER BY ftid");
+		$query = $db->query("SELECT * FROM pw_friendtype WHERE uid=".S::sqlEscape($winduid)." ORDER BY ftid");
 		$friendtype = array();
 		while ($rt = $db->fetch_array($query)) {
 			$friendtype[$rt['ftid']] = $rt;
@@ -298,7 +304,7 @@ if (empty($a)) {
 
 	} elseif($_POST['step'] == 1) { // 发送email邀请
 
-		InitGP(array('emails','customdes'),'P');
+		S::gp(array('emails','customdes'),'P');
 		strlen($emails)>200 && Showmsg('mode_o_email_toolang');
 		strlen($content)>200 && Showmsg('mode_o_extra_toolang');
 		if (strpos($emails,',') !== false) {
@@ -327,7 +333,7 @@ if (empty($a)) {
 
 	} elseif($_POST['step'] == 2) {
 
-		InitGP(array('sendtoname','touid'),'P');
+		S::gp(array('sendtoname','touid'),'P');
 
 		$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
 
@@ -351,7 +357,7 @@ if (empty($a)) {
 
 		$toUsers = $userService->getUserNamesByUserIds($uids);
 		$inColonyUsers = array();
-		$query = $db->query("SELECT username FROM pw_cmembers WHERE uid IN(".pwImplode($uids).") AND colonyid=".pwEscape($cyid));
+		$query = $db->query("SELECT username FROM pw_cmembers WHERE uid IN(".S::sqlImplode($uids).") AND colonyid=".S::sqlEscape($cyid));
 		while ($rt = $db->fetch_array($query)) {
 			$inColonyUsers[] = $rt['username'];
 		}

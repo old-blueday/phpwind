@@ -62,7 +62,7 @@ var newAtt = {
 			filesize =img.fileSize;
 		}
 		if(filesize && (filesize>maxUploadSize)){
-			showDialog('warning',attach_ext + '附件大小不能超过'+ maxUploadSize/1024 +'K');
+			showDialog('warning','<font color=\'red\'>' + attach_ext + '</font>附件大小不能超过 <font color=\'red\'>'+ maxUploadSize/1024 +'K </font>');
 			atm.value=null;
 			if(is_ie){
 				atm.select();
@@ -155,7 +155,7 @@ var newAtt = {
 		var img = new Image();
 		img.src = path+"?ra="+Math.random();
 		img.onload = function(){
-			getObj('viewimg').innerHTML =  '<div style="padding:6px;"><img src="' + img.src + '"' + ((this.width>maxwh || this.height>maxwh) ? (this.width > this.height ? ' width' : ' height') + '="' + maxwh + '"' : '') + ' /></div>';
+			getObj('viewimg').innerHTML =  '<div style="padding:5px;"><img src="' + img.src + '"' + ((this.width>maxwh || this.height>maxwh) ? (this.width > this.height ? ' width' : ' height') + '="' + maxwh + '"' : '') + ' /></div>';
 			read.open('viewimg', id, 3);
 		};
 	},
@@ -192,6 +192,12 @@ var newAtt = {
 		if (getObj('attach').hasChildNodes() == false) {
 			newAtt.create();
 		}
+		var delstring = new RegExp('\\[upload=' + id + '\\]', 'g');
+		if (typeof WYSIWYD == 'function') {
+			editor._editMode == 'textmode' ? editor._textArea.value = editor._textArea.value.replace(delstring, '') : editor._doc.body.innerHTML = editor._doc.body.innerHTML.replace(delstring, '');
+		} else {
+			document.FORM.atc_content.value = document.FORM.atc_content.value.replace(delstring, '');
+		}
 	},
 
 	add : function(o) {
@@ -223,7 +229,7 @@ var oldAtt = {
 			s.getElementsByTagName('input')[1].value	= attachs[i][7];
 
 			var fname = s.getElementsByTagName('td')[0];
-			fname.innerHTML = '<div style="width:220px;overflow:hidden;"><span id="attach_' + i + '" onmouseover="oldAtt.view(this);"><font color="red"><b>' + attachs[i][0] + '</b></font>&nbsp;(' + attachs[i][1] + 'K)</span></div>';
+			fname.innerHTML = '<div style="width:160px;overflow:hidden;"><span id="attach_' + i + '" onmouseover="oldAtt.view(this);"><span class="s1 b">' + attachs[i][0] + '</span>&nbsp;(' + attachs[i][1] + 'K)</span></div>';
 
 			var li = document.createElement('span');
 			li.id = 'atturl_' + i;
@@ -324,7 +330,7 @@ var flashAtt = {
 			getObj('flash').parentNode.removeChild(getObj('flash'));
 			return;
 		}
-		var flashVar = {url: getObj('headbase').href + 'job.php?' + 'action=mutiupload',mutiupload:(allowmutinum - mutiupload)};
+		var flashVar = {url: getObj('headbase').href + 'job.php?action=mutiupload&random='+Math.floor(Math.random()*100),mutiupload:(allowmutinum - mutiupload)};
 		var params   = {
 				menu: "false",  
 				scale: "noScale",
@@ -351,7 +357,7 @@ var flashAtt = {
 			var tr = document.createElement('tr');
 			tr.id  = 'l_' + i;
 			var td = document.createElement('td');
-			td.innerHTML = list[i].name;
+			td.innerHTML = '<div style="width:200px;overflow:hidden;">' + list[i].name + '</div>';
 			tr.appendChild(td);
 
 			var td = document.createElement('td');
@@ -409,11 +415,10 @@ var flashAtt = {
 						s.getElementsByTagName('select')[0].name = 'flashatt[' + i + '][special]';
 						s.getElementsByTagName('select')[1].name = 'flashatt[' + i + '][ctype]';
 						s.getElementsByTagName('input')[2].name = 'flashatt[' + i + '][needrvrc]';
-
 					}catch(e){}
 					s.getElementsByTagName('input')[1].name = 'flashatt[' + i + '][desc]';
 					var fname = s.getElementsByTagName('td')[0];
-					fname.innerHTML = att[i][0] + '&nbsp;(' + att[i][1] + 'K)';
+					fname.innerHTML = '<div style="width:200px;overflow:hidden;">' + att[i][0] + '&nbsp;(' + att[i][1] + 'K)' + '</div>';
 					fname.title = att[i][0] + '\n上传日期：' + att[i][3];
 					fname.onmouseover = function() {flashAtt.view(this);};
 
@@ -491,6 +496,15 @@ var flashAtt = {
 			if (ajax.request.responseText == 'ok') {
 				var s = o.parentNode.parentNode.parentNode;
 				s.parentNode.removeChild(s);
+				if (typeof WYSIWYD == 'function') {
+					if (editor._editMode == 'textmode') {
+						var delstring = new RegExp('\\[attachment=' + o.saveId + '\\]', 'g');
+						editor._textArea.value = editor._textArea.value.replace(delstring, '');
+					} else {
+						var delstring = new RegExp('<img[^>]*type="attachment\\_' + o.saveId + '"[^>]*>', 'ig');
+						editor._doc.body.innerHTML = editor._doc.body.innerHTML.replace(delstring, '');
+					}
+				}
 			} else {
 				ajax_guide();
 			}

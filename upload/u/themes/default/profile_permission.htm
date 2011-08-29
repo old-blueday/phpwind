@@ -101,17 +101,31 @@ EOT;
 		</div>
 		<div class="content fl">
 			<div class="p_lr_10">
-				<div class="">
 <!--
 EOT;
 if ($fid) {print<<<EOT
 -->
-					<div class="mb10"><span class="f14 mr20">版块权限：<a href="profile.php?action=permission&fid=$fid" class="s2">$per[name]</a></span>查看用户权限：<a href="profile.php?action=permission">{$gp_grouptitle}</a></li>
+					<div class="mb10"><span class="f14 mr20">版块权限：<a href="profile.php?action=permission&fid=$fid" class="s2">$per[name]</a></span>查看用户权限：<a href="profile.php?action=permission">{$gp_grouptitle}</a>
 <!--
 EOT;
 } else {print <<<EOT
 -->
-					<div class="mb10"><span class="mr20 f14">现使用的级别为：<span class="s2">{$gp_grouptitle}</span></span><span>可通过 <a href="profile.php?action=modify">帐号设置</a> 来选择默认头衔</span></div>
+					<div class="mb10"><span class="mr20 f14">现使用的级别为：<span class="s2">{$gp_grouptitle}</span></span>
+					<!--
+EOT;
+if($groupselect){print <<<EOT
+-->
+<form action="profile.php?action=permission" method="post">
+	<input type="hidden" value="2" name="step">
+    <select name="newgroupid" class="select_wa mr10" onchange="this.form.submit()">
+        $groupselect
+    </select>
+</form>
+<!--
+EOT;
+}print <<<EOT
+-->
+</div>
 <!--
 EOT;
 }print <<<EOT

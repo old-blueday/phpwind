@@ -3,12 +3,12 @@
 
 !$winduid && Showmsg('undefined_action');
 require_once (R_P . 'require/forum.php');
-InitGP(array(
+S::gp(array(
 	'ifmsg',
 	'type'
 ));
 
-$rt = $db->get_one('SELECT r.*,t.fid,t.author,t.authorid,t.postdate,t.fid,t.subject,t.ptable,t.special,t.state,f.forumadmin,f.fupadmin FROM pw_reward r LEFT JOIN pw_threads t ON r.tid=t.tid LEFT JOIN pw_forums f ON t.fid=f.fid WHERE r.tid=' . pwEscape($tid));
+$rt = $db->get_one('SELECT r.*,t.fid,t.author,t.authorid,t.postdate,t.fid,t.subject,t.ptable,t.special,t.state,f.forumadmin,f.fupadmin FROM pw_reward r LEFT JOIN pw_threads t ON r.tid=t.tid LEFT JOIN pw_forums f ON t.fid=f.fid WHERE r.tid=' . S::sqlEscape($tid));
 
 if (empty($rt) || $rt['special'] != 3 || $rt['state'] != 0) {
 	Showmsg('illegal_tid');
@@ -31,10 +31,11 @@ if (empty($_POST['step'])) {
 	
 	PostCheck();
 	require_once (R_P . 'require/credit.php');
-	include_once (D_P . 'data/bbscache/forum_cache.php');
+	include_once pwCache::getPath(D_P . 'data/bbscache/forum_cache.php');
 	
 	if ($type == '1') {
-		$db->update("UPDATE pw_threads SET state='2' WHERE tid=" . pwEscape($tid));
+		//$db->update("UPDATE pw_threads SET state='2' WHERE tid=" . S::sqlEscape($tid));
+		pwQuery::update('pw_threads', 'tid=:tid', array($tid), array('state'=>2));
 		$credit->addLog('reward_return', array(
 			$rt['cbtype'] => $rt['cbval'] * 2
 		), array(
@@ -48,7 +49,8 @@ if (empty($_POST['step'])) {
 		if ($timestamp < $rt['timelimit'] && $groupid != '3' && $groupid != '4') {
 			Showmsg('reward_time_limit');
 		}
-		$db->update("UPDATE pw_threads SET state='3' WHERE tid=" . pwEscape($tid));
+		//$db->update("UPDATE pw_threads SET state='3' WHERE tid=" . S::sqlEscape($tid));
+		pwQuery::update('pw_threads', 'tid=:tid', array($tid), array('state'=>3));
 	}
 	return_value($tid, $rt['catype'], $rt['caval']);
 	

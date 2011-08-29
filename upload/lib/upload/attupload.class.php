@@ -17,6 +17,7 @@ class AttUpload extends uploadBehavior {
 	var $thumbsize;
 	var $uploadmoney;
 	var $uploadcredit;
+	var $uploadImgNum;
 
 	var $flashatt = array();
 	var $attachs = array();
@@ -34,19 +35,20 @@ class AttUpload extends uploadBehavior {
 		$this->forum =& $pwforum;
 		$this->post =& $pwpost;
 		$this->ifthumb =& $db_ifathumb;
-		if($pwforum->forumset['ifthumb'] == 0){
+		if ($pwforum->forumset['ifthumb'] == 0) {
 			$this->thumbsize =& $db_athumbsize;
-		}elseif($pwforum->forumset['ifthumb'] == 1){
+		} elseif ($pwforum->forumset['ifthumb'] == 1) {
 			$this->thumbsize =& $pwforum->forumset['thumbsize'];
-		}elseif($pwforum->forumset['ifthumb'] == 2){
+		} elseif ($pwforum->forumset['ifthumb'] == 2) {
 			$this->thumbsize = 0;
 			$this->ifthumb = 0;
-		}else{
+		} else {
 			$this->thumbsize =& $db_athumbsize;
-		}		
+		}
 		$this->uploadmoney =& $uploadmoney;
 		$this->uploadcredit =& $uploadcredit;
 		$this->ftype =& $db_uploadfiletype;
+		$this->uploadImgNum = 0;
 		$this->uptype = 'all';
 		$this->setFlashAtt($flashatt);
 	}
@@ -105,13 +107,13 @@ class AttUpload extends uploadBehavior {
 			$rt['ext'] = strtolower(substr(strrchr($rt['name'],'.'),1));
 			$srcfile = "$attachdir/mutiupload/$rt[attachurl]";
 			$rt['fileuploadurl'] = $filename = $thumbname = preg_replace('/^0_/', "{$this->forum->fid}_", $rt['attachurl']);
-			$thumbdir = 'thumb/';
+			//$thumbdir = 'thumb/';
 			if ($savedir = $this->getSaveDir($rt['ext'])) {
 				$rt['fileuploadurl'] = $savedir . $filename;
-				$thumbdir .= $savedir;
+				//$thumbdir .= $savedir;
 			}
 			$source   = PwUpload::savePath(0, $filename, $savedir);
-			$thumburl = PwUpload::savePath($this->ifftp, $thumbname, $thumbdir, 'thumb_');
+			//$thumburl = PwUpload::savePath($this->ifftp, $thumbname, $thumbdir, 'thumb_');
 
 			if (in_array($rt['ext'], array('gif','jpg','jpeg','png','bmp'))) {
 				require_once(R_P.'require/imgfunc.php');
@@ -119,20 +121,22 @@ class AttUpload extends uploadBehavior {
 					Showmsg('upload_content_error');
 				}
 				if ($this->allowThumb()) {
-					$thumbsize = PwUpload::makeThumb($srcfile, $thumburl, $this->getThumbSize(), $rt['ifthumb']);
+					$thumbInfo = PwUpload::makeThumb($srcfile, $this->getThumbInfo($filename, $savedir), $this->ifftp, $rt['ifthumb']);
 				}
 				if ($this->allowWaterMark()) {
 					PwUpload::waterMark($srcfile, $rt['ext'], $img_size);
-					$rt['ifthumb'] && PwUpload::waterMark($thumburl, $rt['ext']);
+					//$rt['ifthumb'] && PwUpload::waterMark($thumburl, $rt['ext']);
 				}
+				$this->uploadImgNum++;
 			}
 			if ($this->ifftp) {
-				if (!PwUpload::movetoftp($srcfile, $rt['fileuploadurl']))
-					continue;
-				$rt['ifthumb'] && PwUpload::movetoftp($thumburl, "thumb/$rt[fileuploadurl]");
+				if (!PwUpload::movetoftp($srcfile, $rt['fileuploadurl'])) continue;
+				//$rt['ifthumb'] && PwUpload::movetoftp($thumburl, "thumb/$rt[fileuploadurl]");
 			} else {
-				if (!PwUpload::movefile($srcfile, $source))
-					continue;
+				if (!PwUpload::movefile($srcfile, $source)) continue;
+			}
+			if ($rt['ifthumb']) {
+				PwUpload::operateThumb($thumbInfo, $this->allowWaterMark(), $this->ifftp, $rt['ext']);
 			}
 			$this->attachs[$rt['aid']] = array(
 				'aid'       => $rt['aid'],
@@ -184,22 +188,22 @@ class AttUpload extends uploadBehavior {
 			$filename = $this->forum->fid . "_{$this->uid}_$prename." . preg_replace('/(php|asp|jsp|cgi|fcgi|exe|pl|phtml|dll|asa|com|scr|inf)/i', "scp_\\1", $currUpload['ext']);
 			$savedir = $this->getSaveDir($currUpload['ext']);
 		}
-		$thumbdir = 'thumb/';
-		$savedir && $thumbdir .= $savedir;
-
-		return array($filename, $savedir, $filename, $thumbdir);
+		return array($filename, $savedir);
 	}
 
 	function allowThumb() {
 		return $this->ifthumb;
 	}
 
-	function allowWaterMark() {
-		return $this->forum->forumset['watermark'];
+	function getThumbInfo($filename, $dir) {
+		return array(
+			array($filename, 'thumb/' . $dir, $this->thumbsize),
+			array($filename, 'thumb/mini/' . $dir, "120\t120\t1")
+		);
 	}
 
-	function getThumbSize() {
-		return $this->thumbsize;
+	function allowWaterMark() {
+		return $this->forum->forumset['watermark'];
 	}
 
 	function getSaveDir($ext) {
@@ -241,10 +245,10 @@ class AttUpload extends uploadBehavior {
 				$this->replacedb[$aid]['size'] = $value['size'];
 				$this->replacedb[$aid]['ifthumb'] = $value['ifthumb'];
 			} else {
-				$value['descrip']	= Char_cv(GetGP('atc_desc'.$value['id'], 'P'));
-				$value['needrvrc']	= intval(GetGP('atc_needrvrc'.$value['id'], 'P'));
-				$value['special']	= intval(GetGP('att_special'.$value['id'], 'P'));
-				$value['ctype']		= GetGP('att_ctype'.$value['id'], 'P');
+				$value['descrip']	= S::escapeChar(S::getGP('atc_desc'.$value['id'], 'P'));
+				$value['needrvrc']	= intval(S::getGP('atc_needrvrc'.$value['id'], 'P'));
+				$value['special']	= intval(S::getGP('att_special'.$value['id'], 'P'));
+				$value['ctype']		= S::getGP('att_ctype'.$value['id'], 'P');
 				if ($value['needrvrc'] > 0 && ($value['special'] == 1 && $this->post->allowencode && in_array($value['ctype'], $db_enhideset['type']) || $value['special'] == 2 && $this->post->allowsell && in_array($value['ctype'],$db_sellset['type']))) {
 
 				} else {
@@ -277,7 +281,12 @@ class AttUpload extends uploadBehavior {
 				$this->post->user['uploadnum']++;
 				$this->post->user['uploadtime'] = $timestamp;
 			}
-			$this->ifupload = ($value['type'] == 'img' ? 1 : ($value['type'] == 'txt' ? 2 : 3));
+			if ($value['type'] == 'img') {
+				$this->ifupload = 1;
+				$this->uploadImgNum++;
+			} else {
+				$this->ifupload = ($value['type'] == 'txt') ? 2 : 3;
+			}
 			//Start elementupdate
 			if (($db_ifpwcache & 512) && $value['type'] == 'img' && !$value['needrvrc'] && !$this->elementpic) {
 				$this->elementpic = array('aid' => $aid, 'attachurl' => $value['fileuploadurl'], 'ifthumb' => $value['ifthumb']);
@@ -322,6 +331,10 @@ class AttUpload extends uploadBehavior {
 			}
 		}
 		return $imgs;
+	}
+
+	function getUploadImgNum() {
+		return $this->uploadImgNum;
 	}
 
 	function getAids() {

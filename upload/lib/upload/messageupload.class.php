@@ -54,13 +54,13 @@ class messageAtt extends uploadBehavior {
 			$rt['ext'] = strtolower(substr(strrchr($rt['name'],'.'),1));
 			$srcfile = "$attachdir/mutiupload/$rt[attachurl]";
 			$rt['fileuploadurl'] = $filename = $thumbname = preg_replace('/^0_/', "{$this->cid}_", $rt['attachurl']);
-			$thumbdir = 'thumb/';
+			//$thumbdir = 'thumb/';
 			if ($savedir = $this->getSaveDir($rt['ext'])) {
 				$rt['fileuploadurl'] = $savedir . $filename;
-				$thumbdir .= $savedir;
+				//$thumbdir .= $savedir;
 			}
 			$source   = PwUpload::savePath(0, $filename, $savedir);
-			$thumburl = PwUpload::savePath($this->ifftp, $thumbname, $thumbdir, 'thumb_');
+			//$thumburl = PwUpload::savePath($this->ifftp, $thumbname, $thumbdir, 'thumb_');
 			/*
 			if (in_array($rt['ext'], array('gif','jpg','jpeg','png','bmp'))) {
 				require_once(R_P.'require/imgfunc.php');
@@ -77,14 +77,12 @@ class messageAtt extends uploadBehavior {
 			}
 			*/
 			if ($this->ifftp) {
-				if (!PwUpload::movetoftp($srcfile, $rt['fileuploadurl']))
-					continue;
-				$rt['ifthumb'] && PwUpload::movetoftp($thumburl, "thumb/$rt[fileuploadurl]");
+				if (!PwUpload::movetoftp($srcfile, $rt['fileuploadurl'])) continue;
+				//$rt['ifthumb'] && PwUpload::movetoftp($thumburl, "thumb/$rt[fileuploadurl]");
 			} else {
-				if (!PwUpload::movefile($srcfile, $source))
-					continue;
+				if (!PwUpload::movefile($srcfile, $source)) continue;
 			}
-			$this->db->update("INSERT INTO pw_attachs SET " . pwSqlSingle(array(
+			$this->db->update("INSERT INTO pw_attachs SET " . S::sqlSingle(array(
 				'uid'		=> $this->uid,
 				'mid'       => '1',
 				'hits'		=> 0,							'name'		=> $rt['name'],
@@ -131,10 +129,7 @@ class messageAtt extends uploadBehavior {
 			$filename = $this->cid . "_{$this->uid}_$prename." . preg_replace('/(php|asp|jsp|cgi|fcgi|exe|pl|phtml|dll|asa|com|scr|inf)/i', "scp_\\1", $currUpload['ext']);
 			$savedir = $this->getSaveDir($currUpload['ext']);
 		}
-		$thumbdir = 'thumb/';
-		$savedir && $thumbdir .= $savedir;
-
-		return array($filename, $savedir, $filename, $thumbdir);
+		return array($filename, $savedir);
 	}
 
 	function getSaveDir($ext) {
@@ -163,17 +158,13 @@ class messageAtt extends uploadBehavior {
 		//return $this->forum->forumset['watermark'];
 	}
 
-	function getThumbSize() {
-		return $this->thumbsize;
-	}
-
 	function update($uploaddb) {
 		global $timestamp;
 		$this->check(count($_FILES));
 		foreach ($uploaddb as $value) {
 			$value['name'] = addslashes($value['name']);
-			$value['descrip'] = Char_cv(GetGP('atc_desc'.$value['id'], 'P'));
-			$this->db->update("INSERT INTO pw_attachs SET " . pwSqlSingle(array(
+			$value['descrip'] = S::escapeChar(S::getGP('atc_desc'.$value['id'], 'P'));
+			$this->db->update("INSERT INTO pw_attachs SET " . S::sqlSingle(array(
 				'uid'		=> $this->uid,
 				'mid'       => '1',
 				'hits'		=> 0,							'name'		=> $value['name'],

@@ -9,8 +9,8 @@ function Loginout() {
 	$userService->update($winduid, array(), array('thisvisit' => $thisvisit));
 	
 	/*update cache*/
-	$_cache = getDatastore();
-	$_cache->delete("UID_".$winduid);
+	//* $_cache = getDatastore();
+	//* $_cache->delete("UID_".$winduid);
 	
 	list($db_ckpath,$db_ckdomain)=explode("\t",GetCookie('ck_info'));
 	Cookie('winduser','',0);
@@ -102,7 +102,13 @@ function checkpass($username, $password, $safecv, $lgt=0) {
 		$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
 		$userService->update($uc_user['uid'], array(), array('onlineip' => $F_login));
 		//Showmsg('login_pwd_error');
-		return 'login_pwd_error';
+		if ($uc_user['status'] == -2) {
+			return 'login_usernamepwd_error';
+		} elseif ($db_ifsafecv && $men['safecv'] != $safecv) {
+			return 'login_safecv_error';
+		} else {
+			return 'login_pwd_error';
+		}
 	}
 	$diff_sql = array();
 	
@@ -160,7 +166,7 @@ function checkpass1($username,$password,$safecv,$lgt=0) {
 	if (intval($lgt) == 2) {
 		$query = $db->query("SELECT m.uid,m.username,m.password,m.safecv,m.groupid,m.memberid,m.yz,md.onlineip,md.postnum,md.rvrc,md.money,md.credit,md.currency,md.lastpost,md.onlinetime,md.todaypost,md.monthpost,md.monoltime,md.digests "
 				. " FROM pw_members m LEFT JOIN pw_memberdata md ON md.uid=m.uid"
-				. " WHERE m.".$str_logintype."=".pwEscape($username)." LIMIT 2");
+				. " WHERE m.".$str_logintype."=".S::sqlEscape($username)." LIMIT 2");
 		$int_querynum = $db->num_rows($query);
 		if (!$int_querynum) {
 			Showmsg('user_not_exists');
@@ -172,7 +178,7 @@ function checkpass1($username,$password,$safecv,$lgt=0) {
 	} else {
 		$men = $db->get_one("SELECT m.uid,m.username,m.password,m.safecv,m.groupid,m.memberid,m.yz,md.onlineip,md.postnum,md.rvrc,md.money,md.credit,md.currency,md.lastpost,md.onlinetime,md.todaypost,md.monthpost"
 				. " FROM pw_members m LEFT JOIN pw_memberdata md ON md.uid=m.uid"
-				. " WHERE m.".$str_logintype."=".pwEscape($username));
+				. " WHERE m.".$str_logintype."=".S::sqlEscape($username));
 	}
 	if ($men) {
 		$e_login = explode("|",$men['onlineip']);

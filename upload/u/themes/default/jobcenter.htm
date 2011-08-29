@@ -1,10 +1,11 @@
 <!--<?php
 require_once uTemplate::PrintEot('header');
-//require_once uTemplate::PrintEot('profile_left');
+require_once(uTemplate::printEot('user_appleft'));
 print <<<EOT
 -->
 <div class="contUser">
     <div class="p15">
+			<h4 class="site"><img src="u/images/module/jobcenter.png" align="absmiddle" class="mr10" /><span>任务中心</span></h4>           	
         <div class="navC mb10">
             <ul>
                 <li class="$current[1]"><a  href="jobcenter.php?action=applied"  hidefocus="true">我申请的</a></li>
@@ -14,7 +15,7 @@ print <<<EOT
             </ul>
         </div>
         <table width="100%" height="450">
-            <tr><td class="vt">
+            <tr><td valign="top">
                 <div>
 <!--begin-->
 <!--
@@ -268,7 +269,7 @@ EOT;
 foreach($others as $other){
 print <<<EOT
 -->
-                                    <li><a href="u.php?uid=$other[uid]"><img src="$other[face]" /></a><p><a href="u.php?uid=$other[uid]" title="$other[username]">$other[username]</a></p></li>
+                                    <li><a href="{$db_userurl}$other[uid]"><img src="$other[face]" width="48" height="48" /></a><p><a href="{$db_userurl}$other[uid]" title="$other[username]">$other[username]</a></p></li>
 <!--
 EOT;
 }

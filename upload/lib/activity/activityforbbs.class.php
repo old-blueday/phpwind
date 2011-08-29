@@ -44,10 +44,10 @@ function toggleCalendarInputValue(obj, defaultInputValue) {
 			$defaultValueTableName = getActivityValueTableNameByActmid();
 			$userDefinedValueTableName = getActivityValueTableNameByActmid($actmid, 1, 1);
 			$mergedField = array();
-			$mergedField = $this->db->get_one("SELECT actmid,iscancel,starttime,endtime,location,contact,telephone,picture1,picture2,picture3,picture4,picture5,signupstarttime,signupendtime,minparticipant,maxparticipant,userlimit,specificuserlimit,genderlimit,fees,feesdetail,paymethod,ut.* FROM $defaultValueTableName dt LEFT JOIN $userDefinedValueTableName ut USING(tid) WHERE dt.tid=".pwEscape($tid));
+			$mergedField = $this->db->get_one("SELECT actmid,iscancel,starttime,endtime,location,contact,telephone,picture1,picture2,picture3,picture4,picture5,signupstarttime,signupendtime,minparticipant,maxparticipant,userlimit,specificuserlimit,genderlimit,fees,feesdetail,paymethod,ut.* FROM $defaultValueTableName dt LEFT JOIN $userDefinedValueTableName ut USING(tid) WHERE dt.tid=".S::sqlEscape($tid));
 			$mergedField['iscancel'] && Showmsg('act_iscancel_y_modify');//活动取消，无法编辑
 		}
-		$query = $this->db->query("SELECT * FROM pw_activityfield WHERE actmid=".pwEscape($actmid)." AND ifable=1 ORDER BY ifdel ASC, vieworder ASC, fieldid ASC");
+		$query = $this->db->query("SELECT * FROM pw_activityfield WHERE actmid=".S::sqlEscape($actmid)." AND ifable=1 ORDER BY ifdel ASC, vieworder ASC, fieldid ASC");
 		while ($rt = $this->db->fetch_array($query)) {
 			if ($tid) { //编辑情况下保存字段的值
 				$rt['fieldvalue'] = $mergedField[$rt['fieldname']];
@@ -269,7 +269,7 @@ function toggleCalendarInputValue(obj, defaultInputValue) {
 		$ifMust = $ifMust ? 1 : 0;
 		return '<input id="fees_default" class="input mr10" type="text" name="act[' . $fieldname . '][condition][]" value="' . $condition. '" size="5"
 			 /></td><td>
-			 ' . $perPeopleText . ' <input class="input" type="text" onblur="showError(this, getFeesMoneyError(this, 0));" name="act['.$fieldname.'][money][]" value="'. $money. '" size="4" />
+			 ' . $perPeopleText . ' <input class="input" type="text" onblur="showError(this, getMoneyError(this, 1));" name="act['.$fieldname.'][money][]" value="'. $money. '" size="4" />
 			 ' . $RMBText;
 	}
 	/**
@@ -381,9 +381,12 @@ function toggleCalendarInputValue(obj, defaultInputValue) {
 	 * @global int 当前时间戳
 	 */
 	function getCalendarFieldHtml($data, $editable = true) {
-
 		if (!$data['fieldvalue'] && $data['ifmust']) {
-			$data['fieldvalue'] = $this->timestamp;
+			 if ($data['fieldname'] == 'endtime' ||$data['fieldname'] == 'signupendtime') {
+			 	$data['fieldvalue'] = $this->timestamp+2592000;
+			 } else {	
+			 	$data['fieldvalue'] = $this->timestamp;
+			 }
 			$className = 'gray';
 			$isDefaultValue = true;
 		} else {
@@ -558,7 +561,7 @@ function changeFeeValue(value) {
 					$rv_value == $data['fieldvalue'] && $checked = 'checked';
 				} elseif (in_array($data['fieldname'],array('paymethod','userlimit','genderlimit'))) {
 					if ($data['fieldname'] == 'paymethod') {//如果已经绑定并且实名认证通过
-						$tradeinfo = $this->db->get_value("SELECT tradeinfo FROM pw_memberinfo WHERE uid=".pwEscape($this->winduid));
+						$tradeinfo = $this->db->get_value("SELECT tradeinfo FROM pw_memberinfo WHERE uid=".S::sqlEscape($this->winduid));
 						if ($tradeinfo) {
 							$tradeinfo = unserialize($tradeinfo);
 							$iscertified = $tradeinfo['iscertified'];
@@ -588,9 +591,9 @@ function user_authentication(paymethod) {
 		ajax.send('pw_ajax.php?action=activity&job=user_authentication','',function(){
 			var rText = ajax.request.responseText.split('\t');
 			if (rText[0] == 'iscertified_fail') {
-				showDialog('warning','" . getLangInfo('other','act_unauth_alipay') . "');
+				showDialog('warning','" . getLangInfo('other','act_unauth_alipay') . "');return false;
 			} else if (rText[0] == 'isbinded_fail') {
-				showDialog('warning','" . getLangInfo('other','act_unbind_alipay') . "');
+				showDialog('warning','" . getLangInfo('other','act_unbind_alipay') . "');return false;
 			} else {
 				return true;
 			}
@@ -681,7 +684,7 @@ function uploadpicture(actmid) {
 		}
 	}
 	if (total == 0) {
-		showDialog("error","' . getLangInfo('other','act_upload_img_max') . '",2);
+		showDialog("error","' . getLangInfo('other','act_upload_img_max') . '",2);return false;
 	} else {
 		try {ajax.send("pw_ajax.php?action=activity&job=upload&actmid="+actmid,"",ajax.get);} catch(e){}
 	}
@@ -710,7 +713,7 @@ function delpicture(id,actmid,tid,fieldid){
 			$("img_picture_" + id).children[0].src = "";
 			document.getElementsByName("act[picture" + id + "]")[0].value = "";
 		} else {
-			showDialog("error","' . getLangInfo('other','act_delete_fail') . '",2);
+			showDialog("error","' . getLangInfo('other','act_delete_fail') . '",2);return false;
 			return false;
 		}
 	});
@@ -729,10 +732,10 @@ function delimg(actmid,fieldid) {
 ajax.send('pw_ajax.php?action=activity&job=delimg','actmid='+actmid+'&fieldid='+fieldid+'&tid='+'$tid',function(){
     var rText = ajax.request.responseText;
     if (rText == 'success') {
-        showDialog('success','" . getLangInfo('other','act_delete_success') . "',2);
+        showDialog('success','" . getLangInfo('other','act_delete_success') . "',2); return false;
         $('img_'+fieldid).style.display = 'none';
     } else {
-        showDialog('error','" . getLangInfo('other','act_delete_fail') . "',2);
+        showDialog('error','" . getLangInfo('other','act_delete_fail') . "',2);return false;
         return false;
     }
 });
@@ -803,7 +806,7 @@ ajax.send('pw_ajax.php?action=activity&job=delimg','actmid='+actmid+'&fieldid='+
 		$activityValue = array();
 		$defaultValueTableName = getActivityValueTableNameByActmid();
 		if (isset($actdb) && count($actdb) > 0) {
-			$tempdb = $this->db->get_one("SELECT iscertified,iscancel,paymethod,batch_no,fees,feesdetail FROM $defaultValueTableName WHERE tid=".pwEscape($tid));
+			$tempdb = $this->db->get_one("SELECT iscertified,iscancel,paymethod,batch_no,fees,feesdetail FROM $defaultValueTableName WHERE tid=".S::sqlEscape($tid));
 			$activityValue = $actdb;
 			!$activityValue['fees'] && $activityValue['fees']		= $tempdb['fees'];
 			!$activityValue['fees'] && $activityValue['feesdetail'] = $tempdb['feesdetail'];
@@ -813,7 +816,7 @@ ajax.send('pw_ajax.php?action=activity&job=delimg','actmid='+actmid+'&fieldid='+
 			$activityValue['iscancel']		= $tempdb['iscancel'];
 		} else {
 			$userDefinedValueTableName = getActivityValueTableNameByActmid($actmid, 1, 1);
-			$activityValue = $this->db->get_one("SELECT iscertified,iscancel,actmid,out_biz_no,batch_no,recommend,starttime,endtime,location,contact,telephone,picture1,picture2,picture3,picture4,picture5,signupstarttime,signupendtime,minparticipant,maxparticipant,userlimit,specificuserlimit,genderlimit,fees,feesdetail,paymethod,pushtime,updatetime,ut.* FROM $defaultValueTableName dt LEFT JOIN $userDefinedValueTableName ut USING(tid) WHERE dt.tid=".pwEscape($tid));
+			$activityValue = $this->db->get_one("SELECT iscertified,iscancel,actmid,out_biz_no,batch_no,recommend,starttime,endtime,location,contact,telephone,picture1,picture2,picture3,picture4,picture5,signupstarttime,signupendtime,minparticipant,maxparticipant,userlimit,specificuserlimit,genderlimit,fees,feesdetail,paymethod,pushtime,updatetime,ut.* FROM $defaultValueTableName dt LEFT JOIN $userDefinedValueTableName ut USING(tid) WHERE dt.tid=".S::sqlEscape($tid));
 		}
 		/*数据交互*/
 		if ($this->timestamp - $activityValue['pushtime'] > 86400 && $activityValue['updatetime'] > $activityValue['pushtime']) {//每日更新一次\报名列表有所变动
@@ -833,7 +836,7 @@ ajax.send('pw_ajax.php?action=activity&job=delimg','actmid='+actmid+'&fieldid='+
 		$tmpCount = 0;
 		$flash = false;
 		$activityFieldDb = $signupDb = array();
-		$query = $this->db->query("SELECT * FROM pw_activityfield WHERE actmid=".pwEscape($actmid)." AND ifable=1 ORDER BY ifdel ASC, vieworder ASC, fieldid ASC");
+		$query = $this->db->query("SELECT * FROM pw_activityfield WHERE actmid=".S::sqlEscape($actmid)." AND ifable=1 ORDER BY ifdel ASC, vieworder ASC, fieldid ASC");
 		while ($rt = $this->db->fetch_array($query)) {
 			$activityValue && $rt['fieldvalue'] = $activityValue[$rt['fieldname']];
 			$rt['name'] && list($rt['name1'],$rt['name3'], $rt['name2']) = $this->getNamePartsByName($rt['name']);
@@ -889,7 +892,7 @@ ajax.send('pw_ajax.php?action=activity&job=delimg','actmid='+actmid+'&fieldid='+
 		$signupStaus = true;
 		$defaultValueTableName = getActivityValueTableNameByActmid();
 		if (!$data['iscertified'] && $data['paymethod'] == 1) {
-			$tradeinfo	= $this->db->get_value("SELECT tradeinfo FROM pw_memberinfo WHERE uid=".pwEscape($data['authorid']));
+			$tradeinfo	= $this->db->get_value("SELECT tradeinfo FROM pw_memberinfo WHERE uid=".S::sqlEscape($data['authorid']));
 			$tradeinfo	= unserialize($tradeinfo);
 			$alipay		= $tradeinfo['alipay'];
 			$isBinded	= $tradeinfo['isbinded'];
@@ -914,11 +917,11 @@ ajax.send('pw_ajax.php?action=activity&job=delimg','actmid='+actmid+'&fieldid='+
 					}
 				} else {
 					$isCertifiedHtml .= '<p class="aa_err">' . getLangInfo('other','act_err_activity_unNo') . '</p>';
-					$this->db->update("UPDATE $defaultValueTableName SET iscertified=1 WHERE tid=".pwEscape($tid));//活动通过认证
+					$this->db->update("UPDATE $defaultValueTableName SET iscertified=1 WHERE tid=".S::sqlEscape($tid));//活动通过认证
 				}
 			} else {
 				$isCertifiedHtml .= '<p class="aa_err">' . getLangInfo('other','act_err_activity_unNo') . '</p>';
-				$this->db->update("UPDATE $defaultValueTableName SET iscertified=1 WHERE tid=".pwEscape($tid));//活动通过认证
+				$this->db->update("UPDATE $defaultValueTableName SET iscertified=1 WHERE tid=".S::sqlEscape($tid));//活动通过认证
 			}
 			$signupStaus = false;
 
@@ -983,7 +986,7 @@ ajax.send('pw_ajax.php?action=activity&job=delimg','actmid='+actmid+'&fieldid='+
 			$this->UpdatePayLog($tid,0,3);
 			/*活动取消*/
 
-			$this->db->update("UPDATE $defaultValueTableName SET iscancel=1 WHERE tid=".pwEscape($tid));
+			$this->db->update("UPDATE $defaultValueTableName SET iscancel=1 WHERE tid=".S::sqlEscape($tid));
 			/*短消息通知 取消活动 发起人*/		
 			M::sendNotice(
 				array($data['author']),
@@ -1002,7 +1005,7 @@ ajax.send('pw_ajax.php?action=activity&job=delimg','actmid='+actmid+'&fieldid='+
 			);
 			
 			/*短消息通知 取消活动 参与人*/
-			$query = $this->db->query("SELECT uid,username FROM pw_activitymembers WHERE tid=".pwEscape($tid));
+			$query = $this->db->query("SELECT uid,username FROM pw_activitymembers WHERE tid=".S::sqlEscape($tid));
 			while ($rt = $this->db->fetch_array($query)) {
 				M::sendNotice(
 					array($rt['username']),
@@ -1318,13 +1321,13 @@ function signupClose(actuid) {//关闭报名信息
 	var rText = ajax.request.responseText;
 	if (rText == 'success') {		
 		ajaxget('pw_ajax.php?action=activity&job=memberlist&actmid=$actmid&tid=$tid&authorid='+authorid+'&paymethod='+paymethod,'memberlist_show');
-		showDialog('success','" . getLangInfo('other','act_fee_close_success') . "',2);
+		showDialog('success','" . getLangInfo('other','act_fee_close_success') . "',2);return false;
 	} else if (rText == 'payed') {
-		showDialog('error','" . getLangInfo('other','act_fee_close_fail') . "',2);
+		showDialog('error','" . getLangInfo('other','act_fee_close_fail') . "',2);return false;
 	} else if (rText == 'fail') {
-		showDialog('error','" . getLangInfo('other','act_fee_close_fail2') . "',2);
+		showDialog('error','" . getLangInfo('other','act_fee_close_fail2') . "',2);return false;
 	} else {
-		showDialog('error','" . getLangInfo('other','act_fee_op_error') . "',2);
+		showDialog('error','" . getLangInfo('other','act_fee_op_error') . "',2);return false;
 	}
 }
 
@@ -1332,17 +1335,17 @@ function signupModify() {//修改报名信息
 	var rText = ajax.request.responseText;
 	if (rText == 'success') {
 		ajaxget('pw_ajax.php?action=activity&job=memberlist&actmid=$actmid&tid=$tid&authorid='+authorid+'&paymethod='+paymethod,'memberlist_show');
-		showDialog('success','" . getLangInfo('other','act_op_success') . "',2);
+		showDialog('success','" . getLangInfo('other','act_op_success') . "',2);return false;
 	} else if (rText == 'act_signupnums_error') {
-		showDialog('error','" . getLangInfo('other','act_signup_alert') . "',2);
+		showDialog('error','" . getLangInfo('other','act_signup_alert') . "',2);return false;
 	} else if (rText == 'act_signupnums_error_max') {
-		showDialog('error','" . getLangInfo('other','act_signup_alert2') . "',2);
+		showDialog('error','" . getLangInfo('other','act_signup_alert2') . "',2);return false;
 	} else if (rText == 'act_mobile_nickname_error') {
-		showDialog('error','" . getLangInfo('other','act_signup_alert3') . "',2);
+		showDialog('error','" . getLangInfo('other','act_signup_alert3') . "',2);return false;
 	} else if (rText == 'act_num_overflow') {
-		showDialog('error','" . getLangInfo('other','act_signup_alert4') . "',2);
+		showDialog('error','" . getLangInfo('other','act_signup_alert4') . "',2);return false;
 	} else {
-		showDialog('error','" . getLangInfo('other','act_fee_op_error') . "',2);
+		showDialog('error','" . getLangInfo('other','act_fee_op_error') . "',2);return false;
 	}
 }
 
@@ -1355,11 +1358,11 @@ function additional() {//追加费用
 	var rText = ajax.request.responseText;
 	if (rText == 'success') {
 		ajaxget('pw_ajax.php?action=activity&job=memberlist&actmid=$actmid&tid=$tid&authorid='+authorid+'&paymethod='+paymethod,'memberlist_show');
-		showDialog('success','" . getLangInfo('other','act_add_fee_success') . "',2);
+		showDialog('success','" . getLangInfo('other','act_add_fee_success') . "',2);return false;
 	} else if (rText == 'totalcost_error') {
-		showDialog('error','追加的费用格式非法',2);
+		showDialog('error','追加的费用格式非法',2);return false;
 	} else {
-		showDialog('error','非法操作',2);
+		showDialog('error','非法操作',2);return false;
 	}
 }
 </script>";
@@ -1376,7 +1379,7 @@ function additional() {//追加费用
 	function getActRecommendHtml($actmid,$tid,$isRecommend = 0) {
 		global $groupid;
 		$isRecommendOrNot = !$isRecommend ? getLangInfo('other','act_recommend') : getLangInfo('other','act_cancel_recommend');
-		$actRecommendHtml = "┊&nbsp;<a id=\"actrecommend\" onclick=\"actRecommend('$tid', '$actmid', this);\" href=\"javascript:;\" title=\"$isRecommendOrNot\">$isRecommendOrNot</a>
+		$actRecommendHtml = "<a id=\"actrecommend\" onclick=\"actRecommend('$tid', '$actmid', this);\" href=\"javascript:;\" title=\"$isRecommendOrNot\">$isRecommendOrNot</a>
 <script language=\"javascript\">
 function actRecommend(tid, actmid, obj) {
 	ajax.send(\"pw_ajax.php?action=activity&job=recommend&tid=\"+tid+\"&actmid=\"+actmid,\"\",function(){
@@ -1390,13 +1393,13 @@ function actRecommend(tid, actmid, obj) {
 			}
 			obj.title = isRecommendOrNot;
 			obj.innerHTML = isRecommendOrNot;
-			showDialog('success','" . getLangInfo('other','act_op_success') . "',2);
+			showDialog('success','" . getLangInfo('other','act_op_success') . "',2);return false;
 
 		} else if (rText[0] == 'noright') {
-			showDialog('error','" . getLangInfo('other','act_not_right_recommend') . "',2);
+			showDialog('error','" . getLangInfo('other','act_not_right_recommend') . "',2);return false;
 			return false;
 		} else {
-			showDialog('error','" . getLangInfo('other','act_op_fail') . "',2);
+			showDialog('error','" . getLangInfo('other','act_op_fail') . "',2);return false;
 			return false;
 		}
 	});
@@ -1417,7 +1420,7 @@ function actRecommend(tid, actmid, obj) {
 	 */
 	function getAdminRight($authorid) {
 		global $groupid,$manager,$foruminfo,$windid;
-		$isGM = CkInArray($windid,$manager);//是否是创始人
+		$isGM = S::inArray($windid,$manager);//是否是创始人
 		$isBM = admincheck($foruminfo['forumadmin'],$foruminfo['fupadmin'],$windid);//是否有管理权限
 
 		if (!$isGM) {#非创始人权限获取
@@ -1583,16 +1586,10 @@ function actRecommend(tid, actmid, obj) {
 				$fieldname = $rt['fieldname'];
 
 				if ($vieworder_mark != $rt['vieworder']) {
-					if ($vieworder_mark != 0) $searchhtml .= "</td></tr>";
-
-					if ($type == 'checkbox' || $type == 'radio') {
-						$searchhtml .= "<tr><th>";
-					} else {
-						$searchhtml .= "<tr><th>";
-					}
-
-					$searchhtml .= $rt['name'][0] ? $rt['name'][0]."：".$rt['name'][1] : '';
-					$searchhtml .= "</th><td>";
+					if ($vieworder_mark != 0) $searchhtml .= "</th></tr>";
+					$searchhtml .= "<tr><th>";
+					$searchhtml .= $rt['name'][0] ? $rt['name'][0]."：</th><td>".$rt['name'][1] : '';
+					//$searchhtml .= "</td><tr>";
 				} elseif ($vieworder_mark == $rt['vieworder']) {
 					$searchhtml .= $rt['name'][0] ? $rt['name'][0] : '';
 				}
@@ -1726,7 +1723,7 @@ function actRecommend(tid, actmid, obj) {
 		
 		$activityValue = array();
 		$defaultValueTableName = getActivityValueTableNameByActmid();
-		$activityValue = $this->db->get_one("SELECT iscancel,signupstarttime,signupendtime,endtime,starttime,maxparticipant FROM $defaultValueTableName dt WHERE dt.tid=".pwEscape($tid));
+		$activityValue = $this->db->get_one("SELECT iscancel,signupstarttime,signupendtime,endtime,starttime,maxparticipant FROM $defaultValueTableName dt WHERE dt.tid=".S::sqlEscape($tid));
 		$activityStatusKey = $this->getActivityStatusKey($activityValue, $this->timestamp, $this->peopleAlreadySignup($tid));
 		switch ($activityStatusKey){
 			case 'activity_is_cancelled':

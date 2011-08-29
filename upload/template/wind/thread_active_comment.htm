@@ -63,7 +63,7 @@ EOT;
 foreach ($commentdb as $key => $comment) {print <<<EOT
 -->
             <dl class="cc dl" id="comment_{$comment[id]}">
-                <dt class="dt"><a href="u.php?uid=$comment[uid]" target="_blank" class="img_50"><i><img src="$comment[face]" width="48" height="48"/></i></a></dt>
+                <dt class="dt"><a href="{$db_userurl}$comment[uid]" target="_blank" class="img_50"><i><img src="$comment[face]" width="48" height="48"/></i></a></dt>
                 <dd class="dd">
 <!--
 EOT;
@@ -74,7 +74,7 @@ if ($comment[uid]==$winduid || $ifadmin) { print <<<EOT
 EOT;
 } print <<<EOT
 -->
-                    <p class="title"><a href="u.php?uid=$comment[uid]" target="_blank" class="mr5">$comment[username]</a>
+                    <p class="title"><a href="{$db_userurl}$comment[uid]" target="_blank" class="mr5">$comment[username]</a>
                     $comment[title]
                     </p>
                     <cite class="gray">$comment[postdate]</cite> - 
@@ -88,7 +88,7 @@ foreach ($subcommentdb[$comment['id']] as $k => $subcomment) {print <<<EOT
 -->
                         <dl class="cc dl" id="comment_{$subcomment[id]}">
                             
-                            <dt class="dt"><a href="u.php?uid=$subcomment[uid]" target="_blank" class="img_50"><i><img src="$subcomment[face]" width="48" height="48"/></i></a></dt>
+                            <dt class="dt"><a href="{$db_userurl}$subcomment[uid]" target="_blank" class="img_50"><i><img src="$subcomment[face]" width="48" height="48"/></i></a></dt>
                             <dd class="dd">
 <!--
 EOT;
@@ -99,7 +99,7 @@ if ($subcomment[uid]==$winduid || $ifadmin) { print <<<EOT
 EOT;
 } print <<<EOT
 -->
-                            <p class="title"><a href="u.php?uid=$subcomment[uid]" target="_blank" class="mr5">$subcomment[username]</a>
+                            <p class="title"><a href="{$db_userurl}$subcomment[uid]" target="_blank" class="mr5">$subcomment[username]</a>
                                 $subcomment[title]
                             </p>
                             <cite class="gray">$subcomment[postdate]</cite>

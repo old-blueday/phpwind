@@ -71,7 +71,7 @@ class AlipayPush {
 			$userService->update($uid, array(), array(), array('tradeinfo' => $tradeinfo));
 			
 			$defaultValueTableName = getActivityValueTableNameByActmid();
-			$this->db->update("UPDATE $defaultValueTableName SET iscertified=0 WHERE tid=".pwEscape($tid));//更新实名认证状态
+			$this->db->update("UPDATE $defaultValueTableName SET iscertified=0 WHERE tid=".S::sqlEscape($tid));//更新实名认证状态
 		} elseif ($is_success == 'T' && $batch_no) {
 			$defaultValueTableName = getActivityValueTableNameByActmid();
 			$sqlarray = array(
@@ -80,7 +80,7 @@ class AlipayPush {
 				'user_id'		=> $user_id
 			);
 
-			$this->db->update("UPDATE $defaultValueTableName SET " . pwSqlSingle($sqlarray)." WHERE tid=".pwEscape($tid));
+			$this->db->update("UPDATE $defaultValueTableName SET " . S::sqlSingle($sqlarray)." WHERE tid=".S::sqlEscape($tid));
 			return $is_success;
 		}
 		return $error;
@@ -97,7 +97,7 @@ class AlipayPush {
 	function modify_aa_payment($tid,$actmid = 0,$subject) {
 		
 		$defaultValueTableName = getActivityValueTableNameByActmid();
-		$defaultvalue = $this->db->get_one("SELECT batch_no,user_id FROM $defaultValueTableName WHERE tid=".pwEscape($tid));//AA外部活动号
+		$defaultvalue = $this->db->get_one("SELECT batch_no,user_id FROM $defaultValueTableName WHERE tid=".S::sqlEscape($tid));//AA外部活动号
 
 		if ($defaultvalue['batch_no']) {
 			require_once(R_P.'lib/activity/alipay.php');
@@ -131,14 +131,14 @@ class AlipayPush {
 		$this->query_aa_detail_payment($tid,$actuid);
 		/*查询订单状态*/
 
-		$memberdb = $this->db->get_one("SELECT uid,username,totalcash,isadditional,batch_detail_no,ifpay FROM pw_activitymembers WHERE actuid=".pwEscape($actuid));//AA订单号
+		$memberdb = $this->db->get_one("SELECT uid,username,totalcash,isadditional,batch_detail_no,ifpay FROM pw_activitymembers WHERE actuid=".S::sqlEscape($actuid));//AA订单号
 		
 		if (!$memberdb['ifpay']) {//ifpay = 0
 			if ($memberdb['batch_detail_no']) {//batch_detail_no存在
 				require_once(R_P.'lib/activity/alipay.php');
 				$AlipayInterface = new AlipayInterface('close_aa_detail_payment');
 				$defaultValueTableName = getActivityValueTableNameByActmid();
-				$defaultvalue = $this->db->get_one("SELECT user_id FROM $defaultValueTableName WHERE tid=".pwEscape($tid));//AA外部活动号
+				$defaultvalue = $this->db->get_one("SELECT user_id FROM $defaultValueTableName WHERE tid=".S::sqlEscape($tid));//AA外部活动号
 				$param = array(
 					/* 业务参数 */
 					'batch_detail_no'	=> $memberdb['batch_detail_no'],
@@ -162,16 +162,16 @@ class AlipayPush {
 				if ($error) {
 					$is_success = 'fail';
 				} elseif ($is_success == 'T') {
-					$this->db->update("UPDATE pw_activitymembers SET ifpay=3 WHERE actuid=".pwEscape($actuid));//费用关闭
+					$this->db->update("UPDATE pw_activitymembers SET ifpay=3 WHERE actuid=".S::sqlEscape($actuid));//费用关闭
 					$defaultValueTableName = getActivityValueTableNameByActmid();
-					$this->db->update("UPDATE $defaultValueTableName SET updatetime=".pwEscape($timestamp)." WHERE tid=".pwEscape($tid));//报名列表动态时间
+					$this->db->update("UPDATE $defaultValueTableName SET updatetime=".S::sqlEscape($timestamp)." WHERE tid=".S::sqlEscape($tid));//报名列表动态时间
 					$is_success = 'success';
 					$this->close_aa_detail_payment_sendmsg($memberdb,$tid);
 				}
 			} else {
-				$this->db->update("UPDATE pw_activitymembers SET ifpay=3 WHERE actuid=".pwEscape($actuid));//费用关闭
+				$this->db->update("UPDATE pw_activitymembers SET ifpay=3 WHERE actuid=".S::sqlEscape($actuid));//费用关闭
 				$defaultValueTableName = getActivityValueTableNameByActmid();
-				$this->db->update("UPDATE $defaultValueTableName SET updatetime=".pwEscape($timestamp)." WHERE tid=".pwEscape($tid));//报名列表动态时间
+				$this->db->update("UPDATE $defaultValueTableName SET updatetime=".S::sqlEscape($timestamp)." WHERE tid=".S::sqlEscape($tid));//报名列表动态时间
 				$is_success = 'success';
 				$this->close_aa_detail_payment_sendmsg($memberdb,$tid);
 			}
@@ -193,7 +193,7 @@ class AlipayPush {
 	 */
 	function close_aa_detail_payment_sendmsg($memberdb,$tid) {
 		/*短消息通知 关闭报名者 发起人*/
-		$thread = $this->db->get_one("SELECT subject,author,authorid FROM pw_threads WHERE tid=".pwEscape($tid));
+		$thread = $this->db->get_one("SELECT subject,author,authorid FROM pw_threads WHERE tid=".S::sqlEscape($tid));
 		if ($memberdb['isadditional']) {
 			$titleText	= 'activity_close_pay_title';
 			$contentText = 'activity_close_pay_content';
@@ -268,8 +268,8 @@ class AlipayPush {
 		$AlipayInterface = new AlipayInterface('query_aa_detail_payment');
 
 		$defaultValueTableName = getActivityValueTableNameByActmid();
-		$batch_no = $this->db->get_value("SELECT batch_no FROM $defaultValueTableName WHERE tid=".pwEscape($tid));//AA外部活动号
-		$memberdb = $this->db->get_one("SELECT out_trade_no,batch_detail_no FROM pw_activitymembers WHERE actuid=".pwEscape($actuid));//AA订单号
+		$batch_no = $this->db->get_value("SELECT batch_no FROM $defaultValueTableName WHERE tid=".S::sqlEscape($tid));//AA外部活动号
+		$memberdb = $this->db->get_one("SELECT out_trade_no,batch_detail_no FROM pw_activitymembers WHERE actuid=".S::sqlEscape($actuid));//AA订单号
 
 		$param = array(
 			/* 业务参数 */
@@ -308,8 +308,8 @@ class AlipayPush {
 				'C' => '3',//交易关闭
 				'E' => '1',//交易成功
 			);
-			$this->db->update("UPDATE pw_activitymembers SET batch_detail_no=".pwEscape($batch_detail_no).",ifpay=".pwEscape($payStatus[$trade_status])." WHERE actuid=".pwEscape($actuid));
-			$this->db->update("UPDATE $defaultValueTableName SET updatetime=".pwEscape($timestamp)." WHERE tid=".pwEscape($tid));//报名列表动态时间
+			$this->db->update("UPDATE pw_activitymembers SET batch_detail_no=".S::sqlEscape($batch_detail_no).",ifpay=".S::sqlEscape($payStatus[$trade_status])." WHERE actuid=".S::sqlEscape($actuid));
+			$this->db->update("UPDATE $defaultValueTableName SET updatetime=".S::sqlEscape($timestamp)." WHERE tid=".S::sqlEscape($tid));//报名列表动态时间
 
 			return $payStatus[$trade_status];
 		}

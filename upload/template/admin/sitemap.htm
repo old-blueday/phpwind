@@ -2,11 +2,29 @@
 include_once PrintEot('left');
 print <<<EOT
 -->
+<div class="nav3 mb10">
+    <ul class="cc">
+<!--
+EOT;
+empty($mode) && $mode = 'bbs';
+foreach($db_modes as $key => $value){
+if($value['ifopen'] && !in_array($key,$unSeoset)){
+$current_menu = $key == $mode ? 'class="current"' : '';
+print <<<EOT
+-->
+        <li $current_menu><a href="$basename&mode=$key">$value[m_name]</a></li>
+<!--
+EOT;
+}}print <<<EOT
+-->
+	 	<li  class="current"><a href="$basename&mode=sitemap">网站地图</a></li>
+    </ul>
+</div>
 <div class="admin_info mb10">
 	<h3 class="h1"><b>提示信息</b></h3>
 	<div class="legend">网站地图功能(Sitemaps)使您能够告知搜索引擎您网站中可供抓取的网址，以便搜索引擎可以更智能地收录您的网站信息，适用于各种大小的网站</div>
 </div>
-<form action="$basename" method="post">
+<form action="$basename&mode=sitemap" method="post">
 	<input type="hidden" name="action" value="baidu" />
 	<h2 class="h1">网站地图设置</h2>
 	<div class="admin_table mb10">
@@ -23,7 +41,7 @@ print <<<EOT
 	</div>
 	<div class="tac">
 		<span class="btn"><span><button type="submit">提 交</button></span></span>
-		<span class="bt"><span><button type="button" onclick="window.location.href='$basename&action=create'">重新生成网站地图</button></span></span>
+		<span class="bt"><span><button type="button" onclick="window.location.href='$basename&mode=sitemap&action=create'">重新生成网站地图</button></span></span>
 	</div>
 </form>
 <!--

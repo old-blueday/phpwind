@@ -9,35 +9,33 @@ $creditdb = array(
 	'currency'	=> $winddb['currency']
 );
 $creditdb += $credit->get($winduid,'CUSTOM');
-
 /*SEO*/
 bbsSeoSettings();
-
-InitGP(array('action'));
+S::gp(array('action'));
 require_once(R_P . 'require/showimg.php');
 list($faceurl) = showfacedesign($winddb['icon'], 1, 's');
 $pro_tab = 'userpay';
 
 if (empty($action)) {
 	$orderdb = array();
-	$query = $db->query("SELECT * FROM pw_clientorder WHERE uid=" . pwEscape($winduid) . " ORDER BY date DESC LIMIT 5");
+	$query = $db->query("SELECT * FROM pw_clientorder WHERE uid=" . S::sqlEscape($winduid) . " ORDER BY date DESC LIMIT 5");
 	while ($rt = $db->fetch_array($query)) {
 		$rt['date'] = get_date($rt['date']);
 		$orderdb[] = $rt;
 	}
-	
+
 	require_once GetLang('logtype');
-	$query = $db->query("SELECT * FROM pw_creditlog WHERE uid=". pwEscape($winduid) . " ORDER BY id DESC LIMIT 5");
+	$query = $db->query("SELECT * FROM pw_creditlog WHERE uid=". S::sqlEscape($winduid) . " ORDER BY id DESC LIMIT 5");
 	while ($rt = $db->fetch_array($query)) {
 		$rt['adddate'] = get_date($rt['adddate']);
 		$rt['descrip'] = descriplog($rt['descrip']);
 		$logdb[] = $rt;
 	}
-	
+
 	!$db_creditpay && $db_creditpay = array();
 	$paycredit = key($db_creditpay);
 	$pay_link = "<span class=\"btn\"><span><button onClick=\"location.href='userpay.php?action=buy';\">马上充值</button></span></span>";
-	include_once(D_P.'data/bbscache/ol_config.php');
+	include_once pwCache::getPath(D_P.'data/bbscache/ol_config.php');
 	if (!$ol_onlinepay || empty($db_creditpay)) {
 		$pay_link = "<div class=\"blockquote3\">支付功能尚未开启</div>";
 	}
@@ -49,8 +47,8 @@ if (empty($action)) {
 
 } elseif ($action == 'buy') {
 
-	InitGP(array('paycredit'));
-	include_once(D_P.'data/bbscache/ol_config.php');
+	S::gp(array('paycredit'));
+	include_once pwCache::getPath(D_P.'data/bbscache/ol_config.php');
 	if (!$ol_onlinepay) {
 		Showmsg($ol_whycolse);
 	}
@@ -71,11 +69,11 @@ if (empty($action)) {
 
 } elseif ($action == 'pay') {
 
-	include_once(D_P.'data/bbscache/ol_config.php');
+	include_once pwCache::getPath(D_P.'data/bbscache/ol_config.php');
 	if (!$ol_onlinepay) {
 		Showmsg($ol_whycolse);
 	}
-	InitGP(array('number','method','paycredit'));
+	S::gp(array('number','method','paycredit'));
 
 	if (!isset($db_creditpay[$paycredit])) {
 		Showmsg('olpay_errortype');
@@ -88,7 +86,7 @@ if (empty($action)) {
 	$creditName = $credit->cType[$paycredit];
 
 	$order_no = ($method-1).str_pad($winduid,10, "0",STR_PAD_LEFT).get_date($timestamp,'YmdHis').num_rand(5);
-	$db->update("INSERT INTO pw_clientorder SET " . pwSqlSingle(array(
+	$db->update("INSERT INTO pw_clientorder SET " . S::sqlSingle(array(
 		'order_no'	=> $order_no,
 		'type'		=> 0,
 		'uid'		=> $winduid,
@@ -176,7 +174,7 @@ if (empty($action)) {
 		$strBillDate = get_date($timestamp,'Ymd');
 		$strSpBillNo = substr($order_no,-10);
 		$strTransactionId = $ol_tenpay . $strBillDate . $strSpBillNo;
-		$db->update("UPDATE pw_clientorder SET order_no=".pwEscape($strTransactionId)."WHERE order_no=".pwEscape($order_no));
+		$db->update("UPDATE pw_clientorder SET order_no=".S::sqlEscape($strTransactionId)."WHERE order_no=".S::sqlEscape($order_no));
 
 //		$url  = "https://www.tenpay.com/cgi-bin/v1.0/pay_gate.cgi?";
 		$url  = "http://pay.phpwind.net/pay/create_payurl.php?";
@@ -205,15 +203,15 @@ if (empty($action)) {
 	}
 } elseif ($action == 'list') {
 
-	InitGP(array('state'));
-	$sqladd = "WHERE uid=" . pwEscape($winduid) . ' AND type=0';
+	S::gp(array('state'));
+	$sqladd = "WHERE uid=" . S::sqlEscape($winduid) . ' AND type=0';
 	if ($state == 1) {
 		$sqladd .= " AND state<2";
 	} elseif ($state == 2) {
 		$sqladd .= " AND state=2";
 	}
 	(!is_numeric($page) || $page < 1) && $page = 1;
-	$limit = pwLimit(($page-1)*$db_perpage,$db_perpage);
+	$limit = S::sqlLimit(($page-1)*$db_perpage,$db_perpage);
 	$rt    = $db->get_one("SELECT COUNT(*) AS sum FROM pw_clientorder $sqladd");
 	$pages = numofpage($rt['sum'],$page,ceil($rt['sum']/$db_perpage),"userpay.php?action=list&state=$state&");
 
@@ -229,33 +227,34 @@ if (empty($action)) {
 
 } elseif ($action == 'log') {
 
-	InitGP(array('ctype','stime','etime','logtype','page'));
-	$sqladd = " uid=".pwEscape($winduid);
+	S::gp(array('ctype','stime','etime','logtype','page'));
+	$page = (int)$page;
+	$sqladd = " uid=".S::sqlEscape($winduid);
 	$urladd = '';
 	if ($ctype) {
-		$sqladd .= " AND ctype=".pwEscape($ctype);
+		$sqladd .= " AND ctype=".S::sqlEscape($ctype);
 		$urladd .= "ctype=$ctype&";
 	}
 	if ($stime) {
 		!is_numeric($stime) && $stime = PwStrtoTime($stime);
-		$sqladd .= " AND adddate>".pwEscape($stime);
+		$sqladd .= " AND adddate>".S::sqlEscape($stime);
 		$urladd .= "stime=$stime&";
 	}
 	if ($etime) {
 		!is_numeric($etime) && $etime = PwStrtoTime($etime);
 		if ($etime == $stime) $etime = $etime + 86400;
-		$sqladd .= " AND adddate<".pwEscape($etime);
+		$sqladd .= " AND adddate<".S::sqlEscape($etime);
 		$urladd .= "etime=$etime&";
 	}
 	if ($logtype) {
-		$sqladd .= " AND logtype".(strpos($logtype,'_') !== false ? "=".pwEscape($logtype) : " LIKE ".pwEscape("$logtype%"));
+		$sqladd .= " AND logtype".(strpos($logtype,'_') !== false ? "=".S::sqlEscape($logtype) : " LIKE ".S::sqlEscape("$logtype%"));
 		$urladd .= "logtype=$logtype&";
 	}
 	require_once(R_P.'require/forum.php');
 	require_once GetLang('logtype');
 
 	(!is_numeric($page) || $page<1) && $page = 1;
-	$limit = pwLimit(($page-1)*$db_perpage,$db_perpage);
+	$limit = S::sqlLimit(($page-1)*$db_perpage,$db_perpage);
 	$rt	= $db->get_one("SELECT COUNT(*) AS sum FROM pw_creditlog WHERE $sqladd");
 	$pages = numofpage($rt['sum'],$page,ceil($rt['sum']/$db_perpage),"userpay.php?action=log&$urladd");
 
@@ -288,11 +287,11 @@ if (empty($action)) {
 	} else {
 
 		PostCheck();
-		InitGP(array('pwuser','pwpwd','vmcredit','paynum'),'P');
+		S::gp(array('pwuser','pwpwd','vmcredit','paynum'),'P');
 		if (!in_array($vmcredit,$vm_credit)) {
 			Showmsg('undefined_action');
 		}
-		
+
 		$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
 		$touid	= $userService->getUserIdByUserName($pwuser);
 		if (!$touid) {
@@ -385,7 +384,7 @@ if (empty($action)) {
 
 	} else {
 		PostCheck();
-		InitGP(array('type','change'));
+		S::gp(array('type','change'));
 		if (!$jf_A[$type] || !$jf_A[$type][2]) {
 			Showmsg('bk_credit_type_error');
 		}

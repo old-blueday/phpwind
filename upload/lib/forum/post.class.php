@@ -40,7 +40,7 @@ class PwPost {
 		$this->username =& $windid;
 
 		$this->_G =& $_G;
-		$this->isGM = CkInArray($this->username, $manager);
+		$this->isGM = S::inArray($this->username, $manager);
 		$this->isBM = $this->forum->isBM($this->username);
 		$this->admincheck = ($this->isGM || $this->isBM);
 		$this->allowhide = ($this->forum->foruminfo['allowhide'] && $this->_G['allowhidden']);
@@ -166,12 +166,29 @@ class PwPost {
 			}
 			require_once(R_P.'require/functions.php');
 			$memberid = getmemberid(CalculateCredit($usercredit, $upgradeset));
-
 			$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
 			if ($this->user['memberid'] != $memberid) {
 				$userService->update($this->user['uid'], array('memberid' => $memberid));
+				$membername = getMembername($memberid);
+				$upmemberid	= getNextMemberid($memberid);
+				$upmembername = getMembername($upmemberid);
+				$upneedcredit = getmemberNeed($upmemberid);
+				$userneed = $upneedcredit-CalculateCredit($usercredit, $upgradeset);
+				M::sendNotice(
+				array($this->user['username']),
+				array(
+				'title' => getLangInfo('writemsg','user_update_title',array(
+					'username'=>$windid
+				)),
+				'content' => getLangInfo('writemsg','user_update_content',array(
+					'membername' => $membername,
+					'upmembername' => $upmembername,
+					'username' =>$this->user['username'],
+					'userneed' =>$userneed
+				)),
+				)
+			);				
 			}
-
 			$pwSQL = array(
 				'postnum'		=> $this->user['postnum'],
 				'todaypost'		=> $this->user['todaypost'],
@@ -183,10 +200,12 @@ class PwPost {
 			$db_tcheck && $pwSQL['postcheck'] = PwPost::tcheck($content);
 			$userService->update($this->uid, array(), $pwSQL);
 			$credit->runsql();
+			/**
 			if (!array_sum($add)) {
 				$_cache = getDatastore();
 				$_cache->delete('UID_'.$this->uid);
 			}
+			**/
 		} else {
 			Cookie('userlastptime',$timestamp);
 		}
@@ -224,8 +243,8 @@ class postData {
 	var $titlemax;
 	var $postmax;
 	var $postmin;
+	var $threadMinLength;
 	var $posturlnum;
-
 	var $db;
 	var $post;
 	var $forum;
@@ -245,19 +264,21 @@ class postData {
 
 	var $code_htm;
 	var $code_id;
+	var $iscontinue = 1;
 
 	function postData(&$post) {
-		global $db,$db_titlemax,$db_postmax,$db_postmin,$db_posturlnum;
+		global $db,$db_titlemax,$db_postmax,$db_postmin,$db_posturlnum,$_G;
 		$this->titlemax =& $db_titlemax;
 		$this->postmax =& $db_postmax;
 		$this->postmin =& $db_postmin;
-		$this->posturlnum =& $db_posturlnum;
-
+		$this->threadMinLength = $post->forum->foruminfo['forumset']['contentminlen'];
 		$this->db =& $db;
 		$this->post =& $post;
 		$this->forum =& $post->forum;
 		$this->filter = L::loadClass('FilterUtil', 'filter');
-
+		$this->_G =& $_G;
+		$this->posturlnum = $_G['posturlnum'];
+		$this->db_posturlnum =& $db_posturlnum;
 		$this->data = array(
 			'fid' => $this->forum->fid,
 			'author' => $this->post->username,
@@ -301,28 +322,39 @@ class postData {
 		for ($i = 10; $i < 14; $i++) {
 			$check_content = str_replace(Chr($i),'',$check_content);
 		}
-		if (strlen(trim($check_content)) >= $this->postmax || strlen(trim($check_content)) < $this->postmin) {
-			return $this->post->showmsg('postfunc_content_limit');
+		$contentLength = strlen(trim($check_content));
+		$minLength = empty($this->threadMinLength) ? $this->postmin : $this->threadMinLength;
+		if ($contentLength >= $this->postmax || $contentLength < $minLength) {
+			if (empty($this->threadMinLength)) return $this->post->showmsg('postfunc_content_limit');
+			$GLOBALS['contentMinLength'] = $this->threadMinLength;
+			return $this->post->showmsg('postfunc_content_threadlimit');
 		}
 
 		if ($this->forum->foruminfo['allowsell'] && strpos($content,"[sell") !== false && strpos($content,"[/sell]") !== false) {
 			if (preg_match_all('/\[sell=([\d]+?)(,[\w]+)?\]([^\x00]*?)\[\/sell\]/', $content, $sellList)) {
 				$sellMax = max($sellList[1]);
+				if ($GLOBALS['db_sellset']['price'] && (int) $sellMax > $GLOBALS['db_sellset']['price']) return false;
 				$content = preg_replace('/\[sell=([\d]+)/', "[sell=$sellMax", $content);
 			}
 		}
 		/*
-		if (($GLOBALS['banword'] = $this->wordsfb->comprise($content, false)) !== false) {
+		 if (($GLOBALS['banword'] = $this->wordsfb->comprise($content, false)) !== false) {
 			return $this->post->showmsg('content_wordsfb');
-		}
-		*/
+			}
+			*/
 		$this->data['content'] = $content;
+		return true;
 	}
 
 	function setConvert($convert, $autourl = 1) {
 		if ($convert) {
 			$autourl && $this->data['content'] = $this->autourl($this->data['content']);
-			if ($this->posturlnum > 0 && $this->post->user['postnum'] < $this->posturlnum && !$this->post->isGM && $this->urlCheck($this->data['content'])) {
+			//增加前台发链接帖限制@modify panjl@2010-11-3
+			if($this->posturlnum > 0 && $this->post->user['postnum'] < $this->posturlnum && !$this->post->isGM && $this->urlCheck($this->data['content'])){
+				return $this->post->showmsg('postgroup_urlnum_limit');
+			}
+
+			if ($this->posturlnum <= 0 && $this->db_posturlnum > 0 && $this->post->user['postnum'] < $this->db_posturlnum && !$this->post->isGM && $this->urlCheck($this->data['content'])) {
 				return $this->post->showmsg('postfunc_urlnum_limit');
 			}
 		}
@@ -383,7 +415,7 @@ class postData {
 			}
 		}
 	}
-
+	
 	function setData($key, $value) {
 		if (isset($this->data[$key])) {
 			$this->data[$key] = $value;
@@ -397,7 +429,7 @@ class postData {
 	}
 
 	function checkdata() {
-		$this->data['title'] = Char_cv($this->data['title']);
+		$this->data['title'] = S::escapeChar($this->data['title']);
 		//$this->data['ifwordsfb'] = $this->wordsfb->ifwordsfb(stripslashes($this->data['content']));
 
 		if ($this->data['convert']) {
@@ -407,19 +439,18 @@ class postData {
 			$this->data['convert'] = 1;
 		}
 		if ($this->data['ifsign'] < 2) {
-			$this->data['content'] = Char_cv($this->data['content']);
+			$this->data['content'] = S::escapeChar($this->data['content']);
 		} else {
 			$this->data['content'] = preg_replace(
-				array("/<script.*>.*<\/script>/is","/<(([^\"']|\"[^\"]*\"|'[^']*')*?)>/eis","/javascript/i"),
-				array("","\$this->jscv('\\1')","java script"),
-				str_replace('.','&#46;',$this->data['content'])
+			array("/<script.*>.*<\/script>/is","/<(([^\"']|\"[^\"]*\"|'[^']*')*?)>/eis","/javascript/i"),
+			array("","\$this->jscv('\\1')","java script"),
+			str_replace('.','&#46;',$this->data['content'])
 			);
 		}
-		
-		$this->wordFilter();
 		$this->setIfcheck();
-		$this->setAttachs();
 		$this->checkLinks();
+		$this->wordFilter();
+		$this->setAttachs();
 	}
 
 	function checkLinks() {
@@ -432,7 +463,7 @@ class postData {
 					$this->post->showmsg('urlcheck_toomany');
 				}
 			}
-			if ($this->blackListLinkCheckStrategy && $this->linkChecker->haveBlackDomains()) {	
+			if ($this->blackListLinkCheckStrategy && $this->linkChecker->haveBlackDomains()) {
 				$GLOBALS['blackurl'] = implode(", ", $this->linkChecker->getBlackUrls());
 				$this->post->showmsg('urlcheck_inblack');
 			}
@@ -490,7 +521,6 @@ class postData {
 					break;
 				}
 			}
-
 			if ($title_filter_word) {
 				$GLOBALS['banword'] = $title_filter_word;
 				return $this->post->showmsg('title_wordsfb');
@@ -499,8 +529,28 @@ class postData {
 				$GLOBALS['banword'] = implode(',',$this->filter->filter_word);
 				return $this->post->showmsg('content_wordsfb');
 			}
+			if( ! $this->iscontinue &&  $this->filter->filter_weight == 2){
+				$GLOBALS['banword'] = implode(',',$this->filter->filter_word);
+				return $this->showMsg('post_word_check');
+			};
+			if( ! $this->iscontinue && $this->filter->filter_weight == 3){
+				$GLOBALS['banword'] = implode(',',$this->filter->filter_word);
+				return $this->showMsg('enter_words');
+			}
 			$this->data['ifwordsfb'] = 0;
+			return true;
 		}
+		if(! $this->iscontinue && !$this->getIfcheck()){
+				return $this->showMsg('post_check');
+		}
+		return true;
+	}
+
+	function showMsg($msg ){
+		if(defined('AJAX'))
+		return $this->post->showmsg("continue\t" . getLangInfo('refreshto', $msg));
+		else
+		return $this->post->showmsg($msg);
 	}
 
 	function conentCheck() {
@@ -544,30 +594,30 @@ class postData {
 		}
 		if ($db_autoimg == 1) {
 			$message = preg_replace(
-				array("/(?<=[^\]a-z0-9-=\"'\\/])((https?|ftp):\/\/|www\.)([a-z0-9\/\-_+=.~!%@?#%&;:$\\│]+\.(gif|jpg|png))(?![\w\/\-+\.$&?#]{1})/i"),
-				array("[img]\\1\\3[/img]"),
+			array("/(?<=[^\]a-z0-9-=\"'\\/])((https?|ftp):\/\/|www\.)([a-z0-9\/\-_+=.~!%@?#%&;:$\\│]+\.(gif|jpg|png))(?![\w\/\-+\.$&?#]{1})/i"),
+			array("[img]\\1\\3[/img]"),
 				' ' . $message
 			);
 			$message = substr($message,1);
 		}
 		$message = preg_replace(
-			array(
+		array(
 				"/(?<=[^\]a-z0-9-=\"'\\/])((https?|ftp|gopher|news|telnet|mms|rtsp):\/\/|www\.)([a-z0-9\/\-_+=.~!%@?#%&;:$\\│\|]+)/i",
 				"/(?<=[^\]a-z0-9\/\-_.~?=:.])([_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4}))/i"
-			),
-			array(
+				),
+				array(
 				"[url]\\1\\3[/url]",
 				"[email]\\0[/email]"
-			),
+				),
 			' '.$message
-		);
-		if (is_array($this->code_htm)) {
-			foreach($this->code_htm as $key => $value){
-				$message = str_replace("<\twind_phpcode_$key\t>", $value, $message);
-			}
-		}
-		$message = substr($message,1);
-		return $message;
+				);
+				if (is_array($this->code_htm)) {
+					foreach($this->code_htm as $key => $value){
+						$message = str_replace("<\twind_phpcode_$key\t>", $value, $message);
+					}
+				}
+				$message = substr($message,1);
+				return $message;
 	}
 
 	function code_check($code){
@@ -605,10 +655,10 @@ class topicPostData extends postData {
 			return $this->post->showmsg('postfunc_subject_limit');
 		}
 		/*
-		if (($GLOBALS['banword'] = $this->wordsfb->comprise($title)) !== false) {
+		 if (($GLOBALS['banword'] = $this->wordsfb->comprise($title)) !== false) {
 			return $this->post->showmsg('title_wordsfb');
-		}
-		*/
+			}
+			*/
 		$this->data['title'] = $title;
 	}
 
@@ -634,10 +684,10 @@ class topicPostData extends postData {
 		global $db_iftag;
 		if ($db_iftag) {
 			/*
-			if (($GLOBALS['banword'] = $this->wordsfb->comprise($tags)) !== false) {
+			 if (($GLOBALS['banword'] = $this->wordsfb->comprise($tags)) !== false) {
 				return $this->post->showmsg('tag_wordsfb');
-			}
-			*/
+				}
+				*/
 			$this->tag = new BbsTag($this->post);
 			$this->data['tags'] = $this->tag->setTags($tags);
 		}
@@ -704,13 +754,13 @@ class replyPostData extends postData {
 			return $this->post->showmsg('postfunc_subject_limit');
 		}
 		/*
-		if (stripslashes($title) == 'Re:' . $this->tpcArr['subject']) {
+		 if (stripslashes($title) == 'Re:' . $this->tpcArr['subject']) {
 			$title = '';
-		}
-		if (($GLOBALS['banword'] = $this->wordsfb->comprise($title)) !== false) {
+			}
+			if (($GLOBALS['banword'] = $this->wordsfb->comprise($title)) !== false) {
 			return $this->post->showmsg('title_wordsfb');
-		}
-		*/
+			}
+			*/
 		$this->data['title'] = $title;
 	}
 
@@ -742,16 +792,29 @@ class BbsTag {
 		$this->post =& $post;
 	}
 
+	function callback($matches){
+		$this->tags[] = $matches[1];
+		return '';
+	}
 	function setTags($tags) {
 		if (!$tags) {
 			return '';
 		}
-		$this->tags = array_unique(explode(" ",preg_replace('/\s+/is',' ',trim($tags))));
+		$tags = htmlspecialchars_decode($tags);
+		$tags = stripslashes($tags);
+		$tags = str_replace(array('“','”'),'"',$tags);
+		$tags = preg_replace_callback('/("[^"]+")/', array($this,'callback'), $tags);
+		$this->tags = array_merge($this->tags,explode(" ",preg_replace('/\s+/is',' ',trim($tags))));
+		$this->tags = array_unique($this->tags);
 		if (count($this->tags) > 5) {
 			return $this->post->showmsg("tags_num_limit");
 		}
 		foreach ($this->tags as $key => $value) {
-			if (strlen($value)>15 || strlen($value)<3) {
+			$this->tags[$key] = trim(str_replace('&nbsp;',' ',$this->tags[$key]));
+			if (!$this->tags[$key]){
+				unset($this->tags[$key]);continue;
+			}
+			if (strlen($this->tags[$key])>15 || strlen($this->tags[$key])<3) {
 				return $this->post->showmsg('tag_length_limit');
 			}
 		}
@@ -759,27 +822,37 @@ class BbsTag {
 	}
 
 	function insert($tid) {
-		$sql  = array();
+		$sql = $upids = $tagids = array();
 		foreach ($this->tags as $key => $value) {
 			if (!$value)
-				continue;
-			$rt = $this->db->get_one("SELECT tagid FROM pw_tags WHERE tagname=".pwEscape($value));
+			continue;
+			$rt = $this->db->get_one("SELECT tagid FROM pw_tags WHERE tagname=".S::sqlEscape($value));
 			if (!$rt) {
-				$this->db->update("INSERT INTO pw_tags SET ".pwSqlSingle(array('tagname'=>$value,'num'=>1)));
+				$this->db->update("INSERT INTO pw_tags SET ".S::sqlSingle(array('tagname'=>$value,'num'=>1)));
 				$tagid = $this->db->insert_id();
 			} else {
 				$tagid = $rt['tagid'];
-				$this->db->update("UPDATE pw_tags SET num=num+1 WHERE tagid=".pwEscape($tagid));
+				$upids[] = $tagid;
 			}
-			$sql[] = array($tagid,$tid);
+			$sql[] = array($tagid, $tid);
+			$tagids[] = $tagid;
 		}
-		$sql && $this->db->update("INSERT INTO pw_tagdata (tagid,tid) VALUES ".pwSqlMulti($sql));
+		if ($upids) {
+			$this->db->update("UPDATE pw_tags SET num=num+1 WHERE tagid IN(" . S::sqlImplode($upids) . ')');
+		}
+		if ($sql) {
+			$this->db->update("INSERT INTO pw_tagdata (tagid,tid) VALUES " . S::sqlMulti($sql));
+		}
+		if ($tagids) {
+			$statistics = L::loadClass('Statistics', 'datanalyse');
+			$statistics->addtag($tagids);
+		}
 	}
 
 	function update($tid) {
 		$tagids	= array();
 		$tags = array();
-		$query	= $this->db->query("SELECT * FROM pw_tagdata td LEFT JOIN pw_tags t USING(tagid) WHERE td.tid=" . pwEscape($tid));
+		$query	= $this->db->query("SELECT * FROM pw_tagdata td LEFT JOIN pw_tags t USING(tagid) WHERE td.tid=" . S::sqlEscape($tid));
 		while ($rt = $this->db->fetch_array($query)) {
 			if (!in_array($rt['tagname'], $this->tags)) {
 				$tagids[] = $rt['tagid'];
@@ -788,8 +861,11 @@ class BbsTag {
 			}
 		}
 		if ($tagids) {
-			$tagids = pwImplode($tagids);
-			$this->db->update("DELETE FROM pw_tagdata WHERE tid=" . pwEscape($tid) . " AND tagid IN($tagids)");
+			$statistics = L::loadClass('Statistics', 'datanalyse');
+			$statistics->deletetag($tagids);
+
+			$tagids = S::sqlImplode($tagids);
+			$this->db->update("DELETE FROM pw_tagdata WHERE tid=" . S::sqlEscape($tid) . " AND tagid IN($tagids)");
 			$this->db->update("UPDATE pw_tags SET num=num-1 WHERE tagid IN($tagids)");
 		}
 		if ($this->tags = array_diff($this->tags, $tags)) {
@@ -798,7 +874,7 @@ class BbsTag {
 	}
 
 	function relate($subject,$content){
-		@include(D_P.'data/bbscache/tagdb.php');
+		@include pwCache::getPath(D_P.'data/bbscache/tagdb.php');
 		$i    = 0;
 		$tags = '';
 		if(!$tagdb){

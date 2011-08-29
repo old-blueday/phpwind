@@ -18,7 +18,7 @@ class PW_LevelHook {
 
 	function init($db_modes, $group = array(),$system=array()) {
 		foreach ($db_modes as $key => $value) {
-			$levelFile = Pcv(R_P . 'mode/' . $key . '/config/level.php');
+			$levelFile = S::escapePath(R_P . 'mode/' . $key . '/config/level.php');
 			if (!file_exists($levelFile)) continue;
 			$level = include ($levelFile);
 			$this->_cookLevel($key,$level, $group, $system);

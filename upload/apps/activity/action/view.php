@@ -17,14 +17,14 @@ $postActForO = new PW_ActivityForO();
 $seeTitle = $postActForO->getSeeTitleBySee($see);
 
 if (empty($see)) {
-	InitGP(array('actmid'),GP,2);
-	InitGP(array('timerange'),GP);
-	@include_once(D_P."data/bbscache/activity_config.php");
+	S::gp(array('actmid'),GP,2);
+	S::gp(array('timerange'),GP);
+	@include_once pwCache::getPath(D_P."data/bbscache/activity_config.php");
 
 	$where = " WHERE dv.ifrecycle=0";
 
 	if ($actmid) {
-		$where .= " AND dv.actmid=".pwEscape($actmid);
+		$where .= " AND dv.actmid=".S::sqlEscape($actmid);
 		$pageUrl .= 'actmid='.$actmid.'&';
 	}
 	if (!empty($timerange)) {	
@@ -32,7 +32,7 @@ if (empty($see)) {
 			$timerange = (int)$timerange;
 			if ($timerange > 0) {
 				$startTimeBeforeTimestamp = $timerange + $timestamp;
-				$where .= " AND dv.starttime <= ".pwEscape($startTimeBeforeTimestamp);
+				$where .= " AND dv.starttime <= ".S::sqlEscape($startTimeBeforeTimestamp);
 				$pageUrl .= 'timerange=%2B'.$timerange.'&';
 			}
 		}
@@ -42,13 +42,13 @@ if (empty($see)) {
 
 	$authoridTidDb = $myTidDb = $allActivityIdsIHaveParticipated = array();
 	$fids = trim(getSpecialFid() . ",'0'",',');
-	$query = $db->query("SELECT tid FROM pw_threads WHERE authorid=".pwEscape($uid) . " AND special=8 AND fid NOT IN($fids)");
+	$query = $db->query("SELECT tid FROM pw_threads WHERE authorid=".S::sqlEscape($uid) . " AND special=8 AND fid NOT IN($fids)");
 	while ($rt = $db->fetch_array($query)) {
 		$authoridTidDb[] = $rt['tid'];//TA发布的
 	}
 	$allActivityIdsIHaveParticipated = $postActForO->getAllParticipatedActivityIdsByUid($uid);//TA参与的
 	$myTidDb = array_merge($authoridTidDb,$allActivityIdsIHaveParticipated);
-	is_array($myTidDb) && $myTidDb && $where .= " AND dv.tid IN (".pwImplode($myTidDb).")";
+	is_array($myTidDb) && $myTidDb && $where .= " AND dv.tid IN (".S::sqlImplode($myTidDb).")";
 
 	$defaultActivityValueTableName = getActivityValueTableNameByActmid();
 	$count = $db->get_value("SELECT COUNT(*) AS count FROM $defaultActivityValueTableName dv LEFT JOIN pw_threads t USING (tid) $where");
@@ -74,7 +74,7 @@ if (empty($see)) {
 		}
 		
 		//获取活动报名人数
-		$query = $db->query("SELECT tid, SUM(signupnum) AS count FROM pw_activitymembers WHERE fupid=0 AND tid IN (".pwImplode($activityIds).") AND ifpay IN('0','1','2','4') GROUP BY tid");
+		$query = $db->query("SELECT tid, SUM(signupnum) AS count FROM pw_activitymembers WHERE fupid=0 AND tid IN (".S::sqlImplode($activityIds).") AND ifpay IN('0','1','2','4') GROUP BY tid");
 		while ($rt = $db->fetch_array($query)) {
 			if (array_key_exists($rt['tid'], $activities)) {
 				$activities[$rt['tid']]['signup'] = $rt['count'];
@@ -83,14 +83,14 @@ if (empty($see)) {
 	}
 } elseif ('fromgroup' == $see) { //来自群组
 	
-	InitGP(array('type'),GP,2);
-	InitGP(array('timerange'),GP);
+	S::gp(array('type'),GP,2);
+	S::gp(array('timerange'),GP);
 	
 	$where = " WHERE 1";
 	$timeSelectHtml = $postActForO->getTimeSelectHtml($timerange, 1, '');
 
 	if ($type) {
-		$where .= " AND a.type=".pwEscape($type);
+		$where .= " AND a.type=".S::sqlEscape($type);
 		$pageUrl .= 'type='.$type.'&';
 		${'type_'.$type} = 'selected';
 	}
@@ -99,23 +99,23 @@ if (empty($see)) {
 			$timerange = (int)$timerange;
 			if ($timerange > 0) {
 				$startTimeBeforeTimestamp = $timerange + $timestamp;
-				$where .= " AND a.begintime <= ".pwEscape($startTimeBeforeTimestamp);
+				$where .= " AND a.begintime <= ".S::sqlEscape($startTimeBeforeTimestamp);
 				$pageUrl .= 'timerange=%2B'.$timerange.'&';
 			}
 		}
 	}
 
 	$authoridTidDb = $myTidDb = $allActivityIdsIHaveParticipated = array();
-	$query = $db->query("SELECT actid FROM pw_actmembers WHERE uid=" . pwEscape($uid));
+	$query = $db->query("SELECT actid FROM pw_actmembers WHERE uid=" . S::sqlEscape($uid));
 	while ($rt = $db->fetch_array($query)) {			
 		$allActivityIdsIHaveParticipated[] = $rt['actid'];//TA参与的
 	}
-	$query = $db->query("SELECT id FROM pw_active WHERE uid=" . pwEscape($uid));
+	$query = $db->query("SELECT id FROM pw_active WHERE uid=" . S::sqlEscape($uid));
 	while ($rt = $db->fetch_array($query)) {			
 		$authoridTidDb[] = $rt['id'];//TA发布的
 	}
 	$myTidDb = array_merge($authoridTidDb,$allActivityIdsIHaveParticipated);
-	is_array($myTidDb) && $myTidDb && $where .= " AND a.id IN (".pwImplode($myTidDb).")";
+	is_array($myTidDb) && $myTidDb && $where .= " AND a.id IN (".S::sqlImplode($myTidDb).")";
 	
 	
 	$count = $db->get_value("SELECT COUNT(*) AS count FROM pw_active a $where");

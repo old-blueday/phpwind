@@ -1,15 +1,15 @@
 <?php
 !defined('P_W') && exit('Forbidden');
 define('AJAX',1);
-InitGP(array('tid','block_id'));
+S::gp(array('tid','block_id'));
 $tid	= (int) $tid;
 if (!$tid) exit;
-$thread	= $db->get_one("SELECT tid,fid,author,authorid,subject,type,postdate,hits,replies FROM pw_threads WHERE tid=".pwEscape($tid));
+$thread	= $db->get_one("SELECT tid,fid,author,authorid,subject,type,postdate,hits,replies FROM pw_threads WHERE tid=".S::sqlEscape($tid));
 $temp	= array();
 
 if ($thread) {
 	$temp = array();
-	$temp['url'] 	= 'read.php?tid='.$thread['tid'];
+	$temp['url'] 	=  ($db_htmifopen == 0) ? 'read.php?tid='.$thread['tid'] : 'read.php?tid-'.$thread['tid'].'.html';
 	$temp['title'] 	= $thread['subject'];
 	$temp['image']	= '';
 	require_once(R_P.'require/functions.php');

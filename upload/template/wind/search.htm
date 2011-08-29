@@ -1,7 +1,7 @@
 <!--<?php print <<<EOT
 -->
 <div id="breadCrumb">
-		<img src="$imgpath/$stylepath/thread/home-old.gif" align="absmiddle" />&nbsp;<a href="$db_bfn" title="$db_bbsname">$db_bbsname</a><em>&gt;</em><a href="searcher.php">搜索</a>
+<img src="$imgpath/$stylepath/thread/home.gif" class="breadHome" /><em class="breadEm"></em><a href="$db_bfn" title="$db_bbsname">$db_bbsname</a><em>&gt;</em><a href="searcher.php">搜索</a>
 </div>
 <style type="text/css">
 .forum-search{width:580px;margin:20px auto;background:$forumcolortwo;border:1px solid $tdcolor;padding:10px 20px;}
@@ -261,7 +261,7 @@ EOT;
 </th>
 <td class="y-style">
 <a href="thread.php?fid=$sch[fid]">$sch[forumname]</a></td>
-<td class="smalltxt y-style"><a href="u.php?uid=$sch[authorid]">$sch[author]</a><br />$sch[postdate]</td>
+<td class="smalltxt y-style"><a href="{$db_userurl}$sch[authorid]">$sch[author]</a><br />$sch[postdate]</td>
 <td class="y-style">$sch[replies]</td>
 <td class="y-style">$sch[hits]</td>
 <td class="y-style">

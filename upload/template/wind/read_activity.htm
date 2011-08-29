@@ -2,7 +2,7 @@
 print <<<EOT
 -->
 <form action="active.php?action=apply" method="post">
-<div class="t5 f_one" style="margin-bottom:0;">
+<div class="t" style="margin-bottom:0;">
 <table width="100%" align="center" cellspacing="0" cellpadding="0">
 <tr class="tr3"><th>活动标题:</th><td style="text-align:left;padding-left:1em;">$subject
 <!--
@@ -78,7 +78,7 @@ EOT;
 EOT;
 foreach($actuserdb as $key => $value){print<<<EOT
 -->
-	<a href="u.php?uid=$value[winduid]">{$value[username]}</a>&nbsp;
+	<a href="{$db_userurl}$value[winduid]">{$value[username]}</a>&nbsp;
 <!--
 EOT;
 }print<<<EOT

@@ -105,7 +105,7 @@ print <<<EOT
 	<div class="zt_stylebg" style="-moz-user-select:-moz-none;">
     <table width="100%">
         <tr>
-            <td class="b">布局</td>
+            <td class="b" width="45"><span class="fl mr5" style="margin-top:1px;">布局</span><a href="javascipt:;" class="help_b fl"><i>设置页面布局，将布局拖动到专题编辑框。可组合种布局形成丰富的专题页面</i></a></td>
             <td><div class="cc mb10">
 <!--
 EOT;
@@ -121,7 +121,7 @@ print <<<EOT
             </td>
         </tr>
         <tr>
-            <td class="b">模块</td>
+            <td class="b"><span class="fl mr5" style="margin-top:1px;">模块</span><a href="javascipt:;" class="help_b fl"><i>将模块拖动到布局框架中，然后填充内容。不同的模块填充的内容有所不同，可按需选择帖子列表或图片</i></a></td>
             <td>
 <!--
 EOT;
@@ -166,7 +166,7 @@ print <<<EOT
 			</div>
 			<div class="itemContent" style="border: 0pt none; margin: 0pt; padding: 0pt;">
 				<div class="banner">
-					<img src="{$layout_data[bannerurl]}">
+					<img id="stopic_banner_img" src="{$layout_data[bannerurl]}">
 					<h1 style="left:50px;top:50px; font:50px Arial; color:#000000;">我的专题</h1>
 				</div>
 			</div>
@@ -325,6 +325,7 @@ function createNewStopic(stopicTitle, stopicCategory) {
 		} else {
 			getObj('stopicTitle').value = stopicTitle;
 			getObj('stopicId').value = isSuccess[1];
+			getObj('advanceIframe').src = "$stopic_admin_url" + '&job=advance&stopic_id=' + isSuccess[1];
 		}
 	});
 	return true;
@@ -420,6 +421,58 @@ function pickReback(obj,color){
 		obj = getObj(obj);
 	}
 	obj.style.color = color;
+}
+//改变上传图片的name属性
+function changeImguploadName() {
+	var image_upload = getElementsByClassName("image_upload");
+	var i;
+	for (i=0;i<image_upload.length;i++) {
+		image_upload[i].name = "image_upload_"+i;
+	}
+}
+// 图片上传或者链接方式切换
+function stopicImgType(idName_a, idName_b, idName_c, e) {
+	changeImguploadName();
+	if (typeof(e) == "object") {
+		while (e && e.tagName.toLowerCase() != 'tr') {
+			e = e.parentNode;
+		}
+		var aTag = e.getElementsByTagName("a");
+		var inputTag = e.getElementsByTagName("input");
+		var modifImgType = aTag[idName_a];
+		var banner_image = inputTag[idName_b];
+		var banner_image_upload = inputTag[idName_c];
+		var image_type = inputTag[3];
+		
+		if (modifImgType.innerHTML ==  "[上传]") {
+			banner_image.style.display = "none";
+			banner_image_upload.style.display = "";
+			modifImgType.innerHTML = '[取消]';
+			image_type.value = 1;
+		} else {
+			banner_image.style.display = "";
+			banner_image_upload.style.display = "none";
+			modifImgType.innerHTML = '[上传]';
+			image_type.value = 0;
+		}
+	} else {
+		var modifImgType = document.getElementById(idName_a);
+		var banner_image = document.getElementsByName(idName_b);
+		var banner_image_upload = document.getElementsByName(idName_c);
+		var image_type = document.getElementsByName("image_type");
+	
+		if (modifImgType.innerHTML ==  "[上传]") {
+			banner_image[0].style.display = "none";
+			banner_image_upload[0].style.display = "";
+			modifImgType.innerHTML = '[取消]';
+			image_type[0].value = 1;
+		} else {
+			banner_image[0].style.display = "";
+			banner_image_upload[0].style.display = "none";
+			modifImgType.innerHTML = '[上传]';
+			image_type[0].value = 0;
+		}
+	}
 }
 </script>
 <script src="apps/stopic/js/topbar.js"></script>

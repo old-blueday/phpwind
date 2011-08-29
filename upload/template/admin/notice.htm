@@ -2,7 +2,7 @@
 include_once PrintEot('left');
 if(in_array($action,array('add','edit'))){print <<<EOT
 -->
-<form name="FORM" method="post" action="$basename&">
+<form name="FORM" method="post" action="$basename&" onsubmit="return checkpost(document.FORM);">
 	<input type="hidden" name="action" value="$action">
 	<input type="hidden" name="aid" value="$aid">
 	<input type="hidden" name="step" value="2">
@@ -26,7 +26,7 @@ if(in_array($action,array('add','edit'))){print <<<EOT
 		<div class="help_a"> </div></td>
 	</tr>
 	<tr class="tr1 vt">
-		<td class="td1">公告标题</td>
+		<td class="td1">公告标题 <span class="s1">*</span></td>
 		<td class="td2"><input name="atc_title" class="input input_wa" value="$subject" /></td>
 		<td class="td2"><div class="help_a"> </div></td>
 	</tr>
@@ -52,7 +52,7 @@ EOT;
 if(strpos($ckdisplay,",$fid,")!==false){print <<<EOT
 -->
 		<tr class="tr1 vt">
-			<td class="td1">公告链接</td>
+			<td class="td1">公告链接 </td>
 			<td class="td2"><input name="url" value="$url" class="input input_wb"></td>
 			<td class="td2"><div class="help_a">
 将跳转到指定到某一个链接，如:http://www.phpwind.net/。<br />
@@ -100,6 +100,22 @@ function viewdetail(){
 		obj.style.display = '';
 	} else {
 		obj.style.display = 'none';
+	}
+}
+function checkpost(obj) { 
+	if (obj.atc_title.value == "") {
+			obj.atc_title.setAttribute("hasError", 1);
+			showDialog("error","公告标题不能为空",2);
+			obj.atc_title.focus();
+			return false;
+	} 
+	if (ckdisplay.indexOf(','+document.FORM.fid.value+',')!=-1){
+	if (obj.url.value == "" && obj.atc_content.value == "") {
+			obj.url.setAttribute("hasError", 1);
+			showDialog("error","公告链接和公告内容必须要填写一项",2);
+			obj.url.focus();
+			return false;
+	} 
 	}
 }
 </script>

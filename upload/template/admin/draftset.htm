@@ -14,7 +14,7 @@ if(!$action){print <<<EOT
   <table width="100%" cellspacing="0" cellpadding="0">
     <tr class="tr1 vt">
       <td class="td2">用户名:<input type="text" class="input input_wa" name="username" /></td>
-      <td class="td2">关键字:<input type="text" class="inpu input_wat" name="keyword" /></td>
+      <td class="td2">关键字:<input type="text" class="input input_wat" name="keyword" /></td>
       <td class="td2"><span class="bt2"><span><button type="submit" value="提 交">提 交</button></span></span></td>
     </tr>
   </table>
@@ -43,7 +43,7 @@ print <<<EOT
 -->
     <tr class="tr1 vt">
       <td class="td2"><input type="checkbox" name="selid[]" value="$value[did]" onclick="pwJsCheck(this)" /></td>
-      <td class="td2"><a href="u.php?uid=$value[uid]" target="_blank">$value[username]</a></td>
+      <td class="td2"><a href="{$db_userurl}$value[uid]" target="_blank">$value[username]</a></td>
       <td class="td2"><textarea class="textarea">{$value[content]}</textarea></td>
     </tr>
 <!--
@@ -69,6 +69,7 @@ var Draft = {
 </script>
   <div class="cc mb10">$pages</div>
   <div class="tac mb10">
+	<span class="bt"><span><button type="button" onclick="CheckAll(document.form1)">全 选</button></span></span>
     <span class="btn"><span><button type="submit">删除</button></span></span>
  </div>
 </form>

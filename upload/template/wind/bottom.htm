@@ -44,7 +44,7 @@ print <<<EOT
 	<div class="sbar-box-a" style="width:700px;">
 		<div class="sbar-title" style="cursor:pointer" onclick="try{pw_bottom.hiddenTab();read.close();}catch(e){read.close();}">
 				<span class="adel">隐藏</span>
-				<span id="title_forumlist" class="b">快速浏览</span>
+				<span id="title_forumlist" class="b">快速跳转</span>
 		</div>
 		<div class="sbar-box-b">
 			<div class="forum-list-popout">
@@ -170,12 +170,21 @@ EOT;
 <!--
 EOT;
 		}print <<<EOT
--->			  <span>
+-->	
+<!--
+EOT;
+		if($GLOBALS['db_o_weibopost']){print <<<EOT
+-->		
+		  <span>
 					<span style="display:none;float:left;margin-top:-1px;">
-					<a href="javascript:;" class="app-blog app-us-current" title="新鲜事" onclick="pw_bottom.hiddenTab()" >新鲜事</a>
+					<a href="javascript:;" class="app-blog app-us-current" title="新鲜事" onclick="pw_bottom.hiddenTab()" >新鲜事 <br /></a>
 					</span>
 				<span id="pwb_weibo"><a href="javascript:;" onclick="return false;" title="新鲜事" class="app-blog">新鲜事</a></span>
 			</span>
+<!--
+EOT;
+		}print <<<EOT
+-->				
 <!--
 EOT;
 		if($GLOBALS['db_phopen']){print <<<EOT

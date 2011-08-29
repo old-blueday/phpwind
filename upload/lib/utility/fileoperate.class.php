@@ -5,8 +5,8 @@
  */
 class PW_FileOperate{
 	function copyFiles($source,$dest) {
-		$source = Pcv($source);
-		$dest	= Pcv($dest);
+		$source = S::escapePath($source);
+		$dest	= S::escapePath($dest);
 		$folder = opendir($source);
 		while($file = readdir($folder)) {
 			if ($file == '.' || $file == '..' || strpos($file,'.')===0) continue;
@@ -28,7 +28,7 @@ class PW_FileOperate{
 		}
 	}
 	function deleteDir($dir) {
-		$dir=Pcv($dir);
+		$dir=S::escapePath($dir);
 		while(!rmdir($dir)) {
 			if (is_dir($dir)) {
 				if ($dp = opendir($dir)) {
@@ -52,7 +52,7 @@ class PW_FileOperate{
 	function copyFile($source,$dest) {
 		if (@copy($source,$dest)) return true;
 		if (is_readable($source)) {
-			writeover($dest,readover($source));
+			pwCache::setData($dest,readover($source));
 			if (file_exists($dest)) return true;
 		}
 

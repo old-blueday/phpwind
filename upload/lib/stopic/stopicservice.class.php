@@ -164,7 +164,7 @@ class PW_STopicService {
 		if (!isset($styles[$style])) {
 			$stylePath = $this->_getSTopicConfig('stylePath');
 			if (file_exists($stylePath.$style.'/config.php')) {
-				$styles[$style] = include Pcv($stylePath.$style."/config.php");
+				$styles[$style] = include S::escapePath($stylePath.$style."/config.php");
 			} else {
 				$styles[$style] = array();
 			}
@@ -182,7 +182,7 @@ class PW_STopicService {
 	 * @return null
 	 */
 	function creatStopicHtml($stopic_id) {
-		global $db_charset,$wind_version,$db_bbsurl;
+		global $db_charset,$wind_version,$db_bbsurl,$db_htmifopen;
 		$stopic	= $this->getSTopicInfoById($stopic_id);
 		if (!$stopic) return false;
 		$tpl_content	= $this->getStopicContent($stopic_id,0);
@@ -195,8 +195,8 @@ class PW_STopicService {
 		$output = str_replace(array('<!--<!---->','<!---->'),array('',''),ob_get_contents());
 		ob_end_clean();
 		$stopicDir	= $this->getStopicDir($stopic_id, $stopic['file_name']);
-		writeover($stopicDir,$output);
-
+		$output = parseHtmlUrlRewrite($output, $db_htmifopen);
+		pwCache::setData($stopicDir,$output);
 		ObStart();
 	}
 
@@ -397,7 +397,7 @@ class PW_STopicService {
 		$stopic_id = (int) $stopic_id;
 		if (!$stopic_id) return false;
 		if ('' == $file_name) $file_name = $stopic_id;
-		$stopicDir	= Pcv($this->_getSTopicConfig('htmlDir'));
+		$stopicDir	= S::escapePath($this->_getSTopicConfig('htmlDir'));
 		if (!file_exists($stopicDir)) {
 			if (mkdir($stopicDir)) {
 				@chmod($stopicDir,0777);
@@ -858,7 +858,7 @@ class PW_STopicService {
 	 */
 	function getHtmlData($block_data, $block_type, $block_id=null) {
 		$block_job = 'show';
-		include Pcv(A_P."/template/admin/block/$block_type.htm");
+		include S::escapePath(A_P."/template/admin/block/$block_type.htm");
 		$output = ob_get_contents();
 		ob_clean();
 		return $output;

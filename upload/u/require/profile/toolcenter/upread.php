@@ -15,17 +15,21 @@ if($tooldb['type']!=1){
 if($tpcdb['authorid'] != $winduid){
 	Showmsg('tool_authorlimit');
 }
-$db->update("UPDATE pw_threads SET lastpost=".pwEscape($timestamp).",toolinfo=".pwEscape($tooldb['name'],false)."WHERE tid=".pwEscape($tid));
+//$db->update("UPDATE pw_threads SET lastpost=".S::sqlEscape($timestamp).",toolinfo=".S::sqlEscape($tooldb['name'],false)."WHERE tid=".S::sqlEscape($tid));
+pwQuery::update('pw_threads', 'tid=:tid', array($tid), array('lastpost'=>$timestamp, 'toolinfo'=>$tooldb['name']));
 # memcache refresh
-$fid = $db->get_value("SELECT fid FROM pw_threads WHERE tid=".pwEscape($tid));
-$threadList = L::loadClass("threadlist", 'forum');
-$threadList->updateThreadIdsByForumId($fid,$tid);
-$threads = L::loadClass('Threads', 'forum');
-$threads->delThreads($tid);
+$fid = $db->get_value("SELECT fid FROM pw_threads WHERE tid=".S::sqlEscape($tid));
+// $threadList = L::loadClass("threadlist", 'forum');
+// $threadList->updateThreadIdsByForumId($fid,$tid);
+// $threads = L::loadClass('Threads', 'forum');
+// $threads->delThreads($tid);
+
+Perf::gatherInfo('changeThreadWithForumIds', array('fid'=>$fid));
+
 require_once (R_P . 'require/updateforum.php');
 delfcache($fid, $db_fcachenum);
 
-$db->update("UPDATE pw_usertool SET nums=nums-1 WHERE uid=".pwEscape($winduid)."AND toolid=".pwEscape($toolid));
+$db->update("UPDATE pw_usertool SET nums=nums-1 WHERE uid=".S::sqlEscape($winduid)."AND toolid=".S::sqlEscape($toolid));
 $logdata=array(
 	'type'		=>	'use',
 	'nums'		=>	'',

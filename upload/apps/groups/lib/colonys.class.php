@@ -17,17 +17,17 @@ class PW_Colony {
 	}
 
 	function getColonyById($id) {
-		return $this->_db->get_one("SELECT * FROM pw_colonys WHERE id=" . pwEscape($id));
+		return $this->_db->get_one("SELECT * FROM pw_colonys WHERE id=" . S::sqlEscape($id));
 	}
 
 	function getColonyByName($name) {
-		return $this->_db->get_one("SELECT * FROM pw_colonys WHERE cname=" . pwEscape($name));
+		return $this->_db->get_one("SELECT * FROM pw_colonys WHERE cname=" . S::sqlEscape($name));
 	}
 
 	function getColonysInForum($fid) {
 		global $forumset;
 		$array = array();
-		$query = $this->_db->query("SELECT id,cname,members,todaypost,styleid,cnimg,ifshowpic FROM pw_colonys WHERE classid = ".pwEscape($fid) . " AND ifshow=1 ORDER BY vieworder ASC");
+		$query = $this->_db->query("SELECT id,cname,members,todaypost,styleid,cnimg,ifshowpic FROM pw_colonys WHERE classid = ".S::sqlEscape($fid) . " AND ifshow=1 ORDER BY vieworder ASC");
 		while ($rt = $this->_db->fetch_array($query)) {
 			if ($rt['ifshowpic']) {
 				$rt['cnimg'] = $this->getColonyImg($rt['cnimg']);
@@ -45,7 +45,7 @@ class PW_Colony {
 		$sql = $this->_sqlCompound($where);
 		$limit = '';
 		if ($nums) {
-			$limit = pwLimit($start, $nums);
+			$limit = S::sqlLimit($start, $nums);
 		}
 		$array = array();
 		$query = $this->_db->query("SELECT * FROM pw_colonys WHERE 1" . $sql . $limit);
@@ -56,11 +56,11 @@ class PW_Colony {
 	}
 
 	function delColonyById($id) {
-		$this->_db->update("DELETE FROM pw_colonys WHERE id=" . pwEscape($id));
+		$this->_db->update("DELETE FROM pw_colonys WHERE id=" . S::sqlEscape($id));
 	}
 
 	function getSingleMember($id, $uid) {
-		return $this->_db->get_one("SELECT * FROM pw_cmembers WHERE colonyid=" . pwEscape($id) . ' AND uid=' . pwEscape($uid));
+		return $this->_db->get_one("SELECT * FROM pw_cmembers WHERE colonyid=" . S::sqlEscape($id) . ' AND uid=' . S::sqlEscape($uid));
 	}
 
 	/**
@@ -79,28 +79,29 @@ class PW_Colony {
 			SELECT $tocid,p.tid,p.pid,p.floor,p.uptime,p.overtime 
 			FROM pw_poststopped p 
 			LEFT JOIN pw_argument a ON p.tid=a.tid 
-			WHERE p.fid=" . pwEscape($fromcid) . " AND p.pid=0 AND a.cyid=" . pwEscape($cyid)
+			WHERE p.fid=" . S::sqlEscape($fromcid) . " AND p.pid=0 AND a.cyid=" . S::sqlEscape($cyid)
 		);
 		$_sql_Where = ($fromcid > 0) ? ' AND t.fid>0' : " AND t.ifcheck='2'";
-		$this->_db->update("UPDATE pw_argument a LEFT JOIN pw_threads t ON a.tid=t.tid 
-			SET t.fid=" . pwEscape($tocid) . ",t.ifcheck=" . pwEscape($ifcheck) . 
-			" WHERE a.cyid=" . pwEscape($cyid) . $_sql_Where
-		);
-		$this->_db->update("UPDATE pw_argument a LEFT JOIN pw_posts p ON a.tid=p.tid SET p.fid=" . pwEscape($tocid) . " WHERE a.cyid=" . pwEscape($cyid));
+		/*$this->_db->update("UPDATE pw_argument a LEFT JOIN pw_threads t ON a.tid=t.tid 
+			SET t.fid=" . S::sqlEscape($tocid) . ",t.ifcheck=" . S::sqlEscape($ifcheck) . 
+			" WHERE a.cyid=" . S::sqlEscape($cyid) . $_sql_Where
+		);*/
+		$this->_db->update(pwQuery::buildClause("UPDATE :pw_table1 a LEFT JOIN :pw_table2 t ON a.tid=t.tid SET t.fid=:fid,t.ifcheck=:ifcheck WHERE a.cyid=:cyid {$_sql_Where}", array('pw_argument', 'pw_threads', $tocid, $ifcheck, $cyid)));
+		$this->_db->update("UPDATE pw_argument a LEFT JOIN pw_posts p ON a.tid=p.tid SET p.fid=" . S::sqlEscape($tocid) . " WHERE a.cyid=" . S::sqlEscape($cyid));
 		if ($db_plist && count($db_plist) > 1) {
 			foreach ($db_plist as $key => $value) {
 				if ($key == 0) continue;
 				$pw_posts = GetPtable($key);
-				$this->_db->update("UPDATE pw_argument a LEFT JOIN $pw_posts p ON a.tid=p.tid SET p.fid=" . pwEscape($tocid) . " WHERE a.cyid=" . pwEscape($cyid));
+				$this->_db->update("UPDATE pw_argument a LEFT JOIN $pw_posts p ON a.tid=p.tid SET p.fid=" . S::sqlEscape($tocid) . " WHERE a.cyid=" . S::sqlEscape($cyid));
 			}
 		}
 		require_once(R_P . 'require/updateforum.php');
 		if ($tocid > 0) {
-			$this->_db->update("UPDATE pw_cnclass SET cnsum=cnsum+1 WHERE fid=" . pwEscape($tocid));
+			$this->_db->update("UPDATE pw_cnclass SET cnsum=cnsum+1 WHERE fid=" . S::sqlEscape($tocid));
 			updateforum($tocid);
 		}
 		if ($fromcid > 0) {
-			$this->_db->update("UPDATE pw_cnclass SET cnsum=cnsum-1 WHERE fid=" . pwEscape($fromcid) . " AND cnsum>0");
+			$this->_db->update("UPDATE pw_cnclass SET cnsum=cnsum-1 WHERE fid=" . S::sqlEscape($fromcid) . " AND cnsum>0");
 			updateforum($fromcid);
 		}
 		updatetop();
@@ -114,7 +115,8 @@ class PW_Colony {
 	 */
 	function changeTopicShowInForum($cyid, $ifTopicShowInForum, $cid) {
 		$ifcheck = ($cid > 0 && $ifTopicShowInForum) ? 1 : 2;
-		$this->_db->update("UPDATE pw_argument a LEFT JOIN pw_threads t ON a.tid=t.tid SET t.fid=" . pwEscape($cid) . ",t.ifcheck=" . pwEscape($ifcheck) . " WHERE a.cyid=" . pwEscape($cyid) . " AND t.ifcheck>0");
+		//$this->_db->update("UPDATE pw_argument a LEFT JOIN pw_threads t ON a.tid=t.tid SET t.fid=" . S::sqlEscape($cid) . ",t.ifcheck=" . S::sqlEscape($ifcheck) . " WHERE a.cyid=" . S::sqlEscape($cyid) . " AND t.ifcheck>0");
+		$this->_db->update(pwQuery::buildClause("UPDATE :pw_table1 a LEFT JOIN :pw_table2 t ON a.tid=t.tid SET t.fid=:fid,t.ifcheck=:ifcheck WHERE a.cyid=:cyid AND t.ifcheck>:ifcheck", array('pw_argument', 'pw_threads', $cid, $ifcheck, $cyid, 0)));
 		require_once(R_P . 'require/updateforum.php');
 		updateforum($cid);
 	}
@@ -138,29 +140,30 @@ class PW_Colony {
 		$this->_mergeWrites($tmp, $toid, $fromid);
 
 		$this->delColonyById($fromid);
-		$this->_db->update("UPDATE pw_cnclass SET cnsum=cnsum-1 WHERE fid=" . pwEscape($cydb[$fromid]['classid']) . " AND cnsum>0");
-		$this->_db->update("UPDATE pw_cnstyles SET csum=csum-1 WHERE id=" . pwEscape($cydb[$fromid]['styleid']) . " AND csum>0");
+		$this->_db->update("UPDATE pw_cnclass SET cnsum=cnsum-1 WHERE fid=" . S::sqlEscape($cydb[$fromid]['classid']) . " AND cnsum>0");
+		$this->_db->update("UPDATE pw_cnstyles SET csum=csum-1 WHERE id=" . S::sqlEscape($cydb[$fromid]['styleid']) . " AND csum>0");
 		
 		$_sql_update = '';
 		foreach ($tmp as $key => $value) {
-			$_sql_update .= ",$key=$key+" . pwEscape($value);
+			$_sql_update .= ",$key=$key+" . S::sqlEscape($value);
 		}
 		$_sql_update = ltrim($_sql_update, ',');
-		$this->_db->update("UPDATE pw_colonys SET " . $_sql_update . ' WHERE id=' . pwEscape($toid));
+		$this->_db->update("UPDATE pw_colonys SET " . $_sql_update . ' WHERE id=' . S::sqlEscape($toid));
 
 		return true;
 	}
 
 	function _mergeMembers(&$tmp, $toid, $fromid) {
-		$this->_db->update("UPDATE pw_cmembers a LEFT JOIN pw_cmembers b ON a.uid=b.uid AND b.colonyid=" . pwEscape($toid) . ' SET a.colonyid=' . pwEscape($toid) . ' WHERE a.colonyid=' . pwEscape($fromid) . ' AND b.id IS NULL');
+		$this->_db->update("UPDATE pw_cmembers a LEFT JOIN pw_cmembers b ON a.uid=b.uid AND b.colonyid=" . S::sqlEscape($toid) . ' SET a.colonyid=' . S::sqlEscape($toid) . ' WHERE a.colonyid=' . S::sqlEscape($fromid) . ' AND b.id IS NULL');
 		$affect = $this->_db->affected_rows();
-		$this->_db->update("DELETE FROM pw_cmembers WHERE colonyid=" . pwEscape($fromid));
+		$this->_db->update("DELETE FROM pw_cmembers WHERE colonyid=" . S::sqlEscape($fromid));
 		$tmp['members'] = $affect;
 	}
 
 	function _mergeThreads(&$tmp, $toid, $fromid, $cydb) {
 		if ($cydb[$toid]['classid'] == $cydb[$fromid]['classid']) {
-			$this->_db->update("UPDATE pw_argument a LEFT JOIN pw_threads b ON a.tid=b.tid SET a.cyid=" . pwEscape($toid) . " WHERE a.cyid=" . pwEscape($fromid));
+			//$this->_db->update("UPDATE pw_argument a LEFT JOIN pw_threads b ON a.tid=b.tid SET a.cyid=" . S::sqlEscape($toid) . " WHERE a.cyid=" . S::sqlEscape($fromid));
+			$this->_db->update(pwQuery::buildClause("UPDATE :pw_table1 a LEFT JOIN :pw_table2 b ON a.tid=b.tid SET a.cyid=:cyidx WHERE a.cyid=:cyid", array('pw_argument', 'pw_threads', $toid, $fromid)));
 			$tmp['tnum'] = $this->_db->affected_rows();
 			$tmp['pnum'] = $cydb[$fromid]['pnum'];
 		} else {
@@ -173,13 +176,14 @@ class PW_Colony {
 			}
 			$pnum = 0;
 			foreach ($ptable_a as $val) {
-				$this->_db->update("UPDATE pw_argument a LEFT JOIN $val b ON a.tid=b.tid SET b.fid=" . pwEscape($cydb[$toid]['classid']) . " WHERE a.cyid=" . pwEscape($fromid));
+				$this->_db->update("UPDATE pw_argument a LEFT JOIN $val b ON a.tid=b.tid SET b.fid=" . S::sqlEscape($cydb[$toid]['classid']) . " WHERE a.cyid=" . S::sqlEscape($fromid));
 				$pnum += $this->_db->affected_rows();
 			}
 
-			$this->_db->update("UPDATE pw_argument a LEFT JOIN pw_attachs b ON a.tid=b.tid SET b.fid=" . pwEscape($cydb[$toid]['classid']) . " WHERE a.cyid=" . pwEscape($fromid));
+			$this->_db->update("UPDATE pw_argument a LEFT JOIN pw_attachs b ON a.tid=b.tid SET b.fid=" . S::sqlEscape($cydb[$toid]['classid']) . " WHERE a.cyid=" . S::sqlEscape($fromid));
 
-			$this->_db->update("UPDATE pw_argument a LEFT JOIN pw_threads b ON a.tid=b.tid SET a.cyid=" . pwEscape($toid) . ",b.fid=" . pwEscape($cydb[$toid]['classid']) . " WHERE a.cyid=" . pwEscape($fromid));
+			//$this->_db->update("UPDATE pw_argument a LEFT JOIN pw_threads b ON a.tid=b.tid SET a.cyid=" . S::sqlEscape($toid) . ",b.fid=" . S::sqlEscape($cydb[$toid]['classid']) . " WHERE a.cyid=" . S::sqlEscape($fromid));
+			$this->_db->update(pwQuery::buildClause("UPDATE :pw_table1 a LEFT JOIN :pw_table2 b ON a.tid=b.tid SET a.cyid=:cyidx, b.fid=:bid WHERE a.cyid=:cyid", array('pw_argument', 'pw_threads', $toid, $cydb[$toid]['classid'], $fromid)));
 			$tnum = $this->_db->affected_rows();
 
 			$tmp['tnum'] = $tnum;
@@ -192,23 +196,23 @@ class PW_Colony {
 	}
 
 	function _mergeAlbums(&$tmp, $toid, $fromid, $cydb) {
-		$this->_db->update("UPDATE pw_cnalbum SET ownerid=" . pwEscape($toid) . ",owner=" . pwEscape($cydb[$toid]['cname']) . " WHERE atype='1' AND ownerid=" . pwEscape($fromid));
+		$this->_db->update("UPDATE pw_cnalbum SET ownerid=" . S::sqlEscape($toid) . ",owner=" . S::sqlEscape($cydb[$toid]['cname']) . " WHERE atype='1' AND ownerid=" . S::sqlEscape($fromid));
 		$tmp['albumnum'] = $this->_db->affected_rows();
 		$tmp['photonum'] = $cydb[$fromid]['photonum'];
 	}
 
 	function _mergeActives(&$tmp, $toid, $fromid) {
-		$this->_db->update("UPDATE pw_active SET cid=" . pwEscape($toid) . ' WHERE cid=' . pwEscape($fromid));
+		$this->_db->update("UPDATE pw_active SET cid=" . S::sqlEscape($toid) . ' WHERE cid=' . S::sqlEscape($fromid));
 		$tmp['activitynum'] = $this->_db->affected_rows();
 	}
 
 	function _mergeWrites(&$tmp, $toid, $fromid) {
-		$this->_db->update("UPDATE pw_cwritedata SET cyid=" . pwEscape($toid) . ' WHERE cyid=' . pwEscape($fromid));
+		$this->_db->update("UPDATE pw_cwritedata SET cyid=" . S::sqlEscape($toid) . ' WHERE cyid=' . S::sqlEscape($fromid));
 		$tmp['writenum'] = $this->_db->affected_rows();
 	}
 
 	function _sqlIn($ids) {
-		return (is_array($ids) && $ids) ? ' IN (' . pwImplode($ids) . ')' : '=' . pwEscape($ids);
+		return (is_array($ids) && $ids) ? ' IN (' . S::sqlImplode($ids) . ')' : '=' . S::sqlEscape($ids);
 	}
 
 	function _sqlCompound($where) {
@@ -221,7 +225,7 @@ class PW_Colony {
 				case 'id':
 					$_sql_where .= " AND $_sql_field" . $this->_sqlIn($value);break;
 				case 'admin':
-					$_sql_where .= " AND $_sql_field=" . pwEscape($value);break;
+					$_sql_where .= " AND $_sql_field=" . S::sqlEscape($value);break;
 			}
 		}
 		return $_sql_where;
@@ -266,7 +270,7 @@ class PW_Colony {
 	 */
 
 	function getRankByColonyCredit($num) {
-		isset($o_groups_upgrade) || include_once(D_P . 'data/bbscache/o_config.php');
+		isset($o_groups_upgrade) || include_once pwCache::getPath(D_P . 'data/bbscache/o_config.php');
 		$tnum = $o_groups_upgrade['tnum'] ? $o_groups_upgrade['tnum'] : 0;
 		$pnum = $o_groups_upgrade['pnum'] ? $o_groups_upgrade['pnum'] : 0;
 		$members = $o_groups_upgrade['members'] ? $o_groups_upgrade['members'] : 0;

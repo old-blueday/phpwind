@@ -3,13 +3,13 @@
 
 $ret_url = 'index.php';
 
-$f = $db->get_one("SELECT f.fid,f.name,f.forumsell,fe.forumset FROM pw_forums f LEFT JOIN pw_forumsextra fe USING(fid) WHERE f.fid=" . pwEscape($rt['paycredit']));
+$f = $db->get_one("SELECT f.fid,f.name,f.forumsell,fe.forumset FROM pw_forums f LEFT JOIN pw_forumsextra fe USING(fid) WHERE f.fid=" . S::sqlEscape($rt['paycredit']));
 
 if ($f) {
 
 	$date = $rt['extra_1'];
 	$overdate = $timestamp + $date * 86400;
-	$db->update("INSERT INTO pw_forumsell SET " . pwSqlSingle(array(
+	$db->update("INSERT INTO pw_forumsell SET " . S::sqlSingle(array(
 		'fid'		=> $f['fid'],
 		'uid'		=> $rt['uid'],
 		'buydate'	=> $timestamp,

@@ -22,7 +22,7 @@ print <<<EOT
 -->
 			<li><img src="$list[thumb_url]" />
 			<p>$list[select_html]<br /><input name="background_check[$list[id]]"
-				type="checkbox" value="1" style="vertical-align: middle;" />已使用{$list[num]}</p>
+				type="checkbox" value="1" style="vertical-align: middle;" />已使用{$list[num]}次</p>
 			</li>
 <!--
 EOT;
@@ -32,11 +32,10 @@ print <<<EOT
 		</ul>
 	</div>
 	<div class="tac mb10">
-		<span class="btn"><span><button name="background_update" type="submit" onfocus="blur();">确认分类</button></span></span>
-		<span class="bt"><span><button name="background_delete" type="submit" onfocus="blur();">删除所选</button></span></span>
+		<span class="btn"><span><button name="background_update" value="确认分类" type="submit" onfocus="blur();">确认分类</button></span></span>
+		<span class="bt"><span><button name="background_delete" value="删除所选" type="submit" onfocus="blur();">删除所选</button></span></span>
 	</div>
 </form>
-$backgroundpages
 <!--
 EOT;
 }
