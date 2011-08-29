@@ -201,7 +201,8 @@ if ($adminitem == 'basic') {
 			$fp = opendir($smilepath);
 			$picext = array("gif","bmp","jpeg","jpg","png");
 			while ($smilefile = readdir($fp)) {
-				if (in_array(strtolower(end(explode(".",$smilefile))),$picext)) {
+				$smileValue = explode(".",$smilefile);
+				if ($smileValue && in_array(strtolower(end($smileValue)),$picext)) {
 					$db->update("INSERT INTO pw_smiles SET ".S::sqlSingle(array('path'=>$smilefile,'type'=>$id)));
 				}
 			}

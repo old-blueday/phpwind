@@ -1,0 +1,122 @@
+<!--<?php
+require_once(uTemplate::printEot('header'));
+require_once(uTemplate::printEot('user_appleft'));
+print<<<EOT
+-->
+<div class="contUser">
+    <div class="p15">
+			<h4 class="site"><img src="u/images/module/lightbulb.png" align="absmiddle" class="mr10" /><span>孔明灯</span></h4>           	
+        <div class="navC">
+            <ul>
+                <li><a  href="apps.php?q=kmd"  hidefocus="true">我的孔明灯</a></li>
+                <li class="current"><a href="apps.php?q=kmd&a=record" hidefocus="true">购买记录</a></li>
+            </ul>
+			<span class="btn_add fl"><span><button onclick="window.location.href='{$basename}a=buy1';">购买孔明灯</button></span></span>
+        </div>
+        <table width="100%">
+        	 <tr class="tr3">
+							<td width="15">&nbsp;</td>
+							<td>帖子标题</td>
+							<td>版块</td>
+							<td width="100">推广套餐</td>
+							<td width="70">申请时间</td>
+							<td width="70">帖子状态</td>
+							<td width="70">支付状态</td>
+							<td width="60">操作</td>
+						</tr>
+  <!--
+EOT;
+if (!empty($kmd)) {
+foreach ($kmd as $key => $value) {
+	if ($value['spread']&&$kmd_spread[$value['spread']]){
+		$spreadInfo = $kmd_spread[$value['spread']];
+		$discount = $spreadInfo['discount'] ? $spreadInfo['discount'].'折' : '';
+		$price = $spreadInfo['day'].'天/<span class="s2">'.$spreadInfo['rmb'].'元 '.$discount.'</span>' ;
+	}
+	$thread_status = '';
+	switch ($value['thread_status']){
+		case 1:
+			$thread_status = '<span class="s2">审核中</span>';
+			break;
+		case 2:
+			$thread_status = '<span class="s3">推广中</span>';
+			break;
+		case 3:
+			$thread_status = '<span class="gray">未通过</span>';
+			break;
+		case 4:
+			$thread_status = '<span class="gray">已停用</span>';
+			break;	
+	}
+	$pay_status = '';
+	$operation = '';
+	switch ($value['pay_status']){
+		case 1:
+			$pay_status = '<span class="s1">未支付</span>';
+			$operation = '<a href="'.$basename.'a=buy3&kid='.$value['kid'].'">[支付]</a>';
+			
+			break;
+		case 2:
+			$pay_status = '<span class="s3">已支付</span>';
+			if($value['thread_status']==2 || $value['thread_status']==4){
+				$operation = '<a onclick="checkKmd('.$value['tid'].','.$value['spread'].')" href="javascript:;">[续费]</a>';
+			}else{
+				$operation = ' ';
+			}			
+			break;
+		case 3:
+			$pay_status = '<span class="gray">已退款</span>';
+			$operation = '<a href="'.$basename.'a=buy1">[购买]</a>';
+			break;		
+	}
+	if (!$value['forum']) {
+		$value['subject']='<font color="#ff0000">该帖已被删除</font>';
+		$operation = ' ';
+	}
+print <<<EOT
+-->	      
+            		<tr class="tr3">
+							<td><img src="images/wind/thread/topicnew.gif" /></td>
+							<td><a target="_blank" href="read.php?tid={$value['tid']}">{$value['subject']}</a></td>
+							<td><a target="_blank" href="thread.php?fid={$value['fid']}">{$value['forum']}</a></td>
+							<td>{$price}</td>
+							<td>{$value['createdtime']}</td>
+							<td>{$thread_status}</td>
+							<td>{$pay_status}</td>
+							<td>{$operation}</td>
+						</tr>
+<!--
+EOT;
+}
+} else {print <<<EOT
+-->	
+						<tr>
+							<td colspan="8" class="p15 tac f14">暂无主题！</td>
+						</tr>
+<!--
+EOT;
+}print <<<EOT
+-->								
+        </table>
+    </div>
+<div class="p10 cc">$pages</div>  
+</div>
+<script type="text/javascript">
+function checkKmd(tid,sid) {
+	ajax.send("{$basename}a=checkkmd&tid="+tid,'',function(){
+		var rText = ajax.request.responseText;		
+		if (rText.substring(0,7) == 'success'){	
+				window.location.href="{$basename}a=buy1&tid="+tid+"&sid="+sid;	
+				//window.open("{$basename}a=buy1&tid="+tid+"&sid="+sid,"_blank");
+			//	alert("{$basename}a=buy1&tid="+tid+"&sid="+sid);	
+			 } else{				 
+			 	showDialog('error',rText);		
+			 }
+			 return false;
+	});
+}
+</script>
+<!--
+EOT;
+require_once(uTemplate::printEot('footer'));
+?>

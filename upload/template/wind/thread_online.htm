@@ -32,7 +32,7 @@ if($db_online){
 				if($foruminfo[allowvisit] && strpos($foruminfo[allowvisit],",$detail[5],")===false) continue;
 				$img = strpos($db_showgroup,",".$detail[5].",")!==false ? $detail[5] : '6';
 				if($detail[9]=='<>') {$trd_hide++; continue;} else $trd_nothide++;
-				$trd_onlineinfo.="<td style=\"width:12%;padding:0 0 5px 20px;background:url($imgpath/$stylepath/group/$img.gif) no-repeat\"><a href={$db_userurl}$detail[8]>$detail[0]</a></td>";
+				$trd_onlineinfo.="<td style=\"width:12%;padding:0 0 0 20px;background:url($imgpath/$stylepath/group/$img.gif) 0 center no-repeat\"><a href={$db_userurl}$detail[8]>$detail[0]</a></td>";
 				$trd_nothide%8==0 && $trd_onlineinfo.="</tr><tr>";
 			}
 		}
@@ -42,9 +42,9 @@ if($db_online){
 $trd_sumonline = $trd_nothide + $trd_hide;
 print <<<EOT
 -->
-<div class="t" style="margin-bottom:0;">
-	<div class="h">在线用户:共{$trd_sumonline}人在线，{$trd_nothide}位会员({$trd_hide}位隐身)</div>
-	<div class="p10" style="padding-bottom:5px;">
+<div class="t">
+	<div class="f_two" style="padding:5px 10px;border-top:1px solid $tdcolor;border-bottom:1px solid $tdcolor;">在线用户:共{$trd_sumonline}人在线，{$trd_nothide}位会员({$trd_hide}位隐身)</div>
+	<div class="p10">
 <!--
 EOT;
 if($trd_onlineinfo){print <<<EOT

@@ -20,7 +20,7 @@ class weibo_Cms extends baseWeibo {
 		$article 	= $articleDB->get($this->_cid);
 		empty($article) && Showmsg('data_error');
 		$this->_url = $this->_url . "&id=".$this->_cid;
-		$title = $content = '我发现了一篇文章'.sprintf("[url=%s] %s [/url]", $this->_url, $article['subject']).'，特别推荐。';
+		$title = $content = '我发现了一篇文章'.sprintf("[url=%s] %s [/url]", urlRewrite($this->_url), $article['subject']).'，特别推荐。';
 		$descrip = $article['descrip'];
 		$mailSubject =  getLangInfo('app','cms_recommend');
 		$mailContent = getLangInfo('app','ajax_sendweibo_cmsinfo',array('title'	=> $title,'descrip'=>$descrip));

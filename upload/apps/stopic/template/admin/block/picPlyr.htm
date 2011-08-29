@@ -1,12 +1,10 @@
 <!--
 <?php
-
 if ('show' == $block_job) {
 print <<<EOT
 -->
-<table width="100%"><tr><td>
 <div class="pwSlide">
-<div id="pwSlidePlayer_{$block_id}">
+<div id="pwSlidePlayer_{$block_id}" class="pr">
 <!--
 EOT;
 	foreach ($block_data as $v) {
@@ -14,7 +12,7 @@ print <<<EOT
 -->
 	<div style="display: none;">
 		<a href="{$v[url]}" target="_blank">
-			<img class="pwSlideFilter" src="{$v[image]}" title="{$v[title]}" height="240" />
+			<img class="pwSlideFilter" src="{$v[image]}" title="{$v[title]}" width="100%" height="240" />
 			<h4 style="font-size:12px;">{$v[title]}</h4>
 		</a>
 	</div>
@@ -27,9 +25,8 @@ print <<<EOT
 	<div class="bg"></div>
 </div>
 </div>
-<script language="JavaScript" src="js/sliderplayer.js"></script>
-<script language="JavaScript">pwSliderPlayers("pwSlidePlayer_{$block_id}");</script>
-</td></tr></table>
+<script type="text/javascript" src="js/sliderplayer.js"></script>
+<script type="text/javascript">pwSliderPlayers("pwSlidePlayer_{$block_id}");</script>
 <!--
 EOT;
 } else {

@@ -1,0 +1,78 @@
+<!--<?php
+defined('W_P') or exit('Forbidden');print <<<EOT
+-->
+<div class="navigator"><a href="#anch-end"><img alt="$db_bbsname" src="$wapImages/x.gif" /></a><a href="index.php?a=list">$db_bbsname</a>&gt;<a href="index.php?a=forum&fid=$fid">$forumName</a></div>
+<div class="post_title">主题：<a href="index.php?a=read&tid=$tid"><strong>$rt[subject] </strong></a></div>
+<div class="post_reply">
+<!--
+EOT;
+if($order == '')$order = 1;
+if($order == 2){print <<<EOT
+-->
+    <a href="index.php?a=reply_all&tid=$tid&amp;page=1">正序查看</a> | 最新回帖
+<!--
+EOT;
+}else{print <<<EOT
+-->
+    正序查看 | <a href="index.php?a=reply_all&tid=$tid&amp;page=1&amp;order=2">最新回帖</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+</div>
+<!--
+EOT;
+if($postdb){
+	foreach($postdb as $key => $val){
+		$showImg = "";
+		if($val[aid])$showImg = "[图]";
+print <<<EOT
+-->
+	<div class="reply_content">
+	<a href="index.php?a=reply&tid=$tid&amp;pid=$val[pid]">$val[id]楼</a>：$showImg$val[content]<div class="post_author">[<a href="index.php?a=myhome&uid=$val[authorid]">$val[author]</a>&nbsp;$val[postdate]]</div>
+</div>
+<!--
+EOT;
+}}print <<<EOT
+-->
+<div class="post_reply">
+<!--
+EOT;
+include printWAP('quickreply');print <<<EOT
+-->
+<!--
+EOT;
+if($order == '')$order = 1;
+if($order == 2){print <<<EOT
+-->
+    <a href="index.php?a=reply_all&tid=$tid&amp;page=1">正序查看</a> | 最新回帖
+<!--
+EOT;
+}else{print <<<EOT
+-->
+    正序查看 | <a href="index.php?a=reply_all&tid=$tid&amp;page=1&amp;order=2">最新回帖</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+</div>
+<!--
+EOT;
+if($postdb && $total > 1){
+print <<<EOT
+-->
+	<div class="reply_content">
+		<a href="index.php?a=reply_all&tid=$tid&amp;page=$nextp&amp;order=$order">下一页</a> | 
+		<a href="index.php?a=reply_all&tid=$tid&amp;page=$prep&amp;order=$order">上一页</a> | 
+		<a href="index.php?a=reply_all&tid=$tid&amp;page=1&amp;order=$order">首页</a> | 
+		<a href="index.php?a=reply_all&tid=$tid&amp;page=$total&amp;order=$order">末页</a>
+	</div>
+<!--
+EOT;
+}print <<<EOT
+-->	
+</div>
+<div class="return"><a href="index.php?a=read&tid=$tid">&laquo;返回主帖</a></div>
+<!--
+EOT;
+?>-->

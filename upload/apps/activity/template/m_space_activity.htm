@@ -3,7 +3,7 @@ include_once uTemplate::PrintEot('header');
 include_once uTemplate::PrintEot('space_appleft');
 print <<<EOT
 -->
-<link rel="stylesheet" type="text/css" href="apps/activity/images/style.css" media="all" />
+<link rel="stylesheet" href="apps/activity/images/style.css?{$GLOBALS['wind_repair']}" />
 <div class="sideD">
 	<div class="boxA">
 		<h2><span class="mr10">活动</span></h2>
@@ -60,10 +60,10 @@ EOT;
 if (!empty($activities)) {
 print <<<EOT
 -->
-<script language="JavaScript" src="js/global.js"></script>
-<script language="JavaScript" src="js/app_global.js"></script>
-<script language="JavaScript" src="apps/$appdir/js/activitytype.js"></script>
-<script language="javascript">
+<script type="text/javascript" src="js/global.js"></script>
+<script type="text/javascript" src="js/app_global.js"></script>
+<script type="text/javascript" src="apps/$appdir/js/activitytype.js"></script>
+<script type="text/javascript">
 function actRecommend(tid, actmid, obj) {
 	ajax.send("pw_ajax.php?action=activity&job=recommend&tid="+tid+"&actmid="+actmid,"",function(){
 		var rText = ajax.request.responseText.split('\t');
@@ -225,7 +225,7 @@ print <<<EOT
 			</div>
 		</div>
 	</div>
-<script language="javascript">setCurrent('see_$see','see_fromforum','current');</script>
+<script type="text/javascript">setCurrent('see_$see','see_fromforum','current');</script>
 <!--
 EOT;
 require_once(uTemplate::printEot('footer'));

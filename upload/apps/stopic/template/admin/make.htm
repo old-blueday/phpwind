@@ -3,11 +3,14 @@
 
 print <<<EOT
 -->
+<script type="text/javascript">
+var ajaxCheckLogin = '$job';
+</script>
 <style type="text/css">
-.preview{border:1px dashed #eba90b;background:#fffbf0;width:968px;}
-.layoutDraggable {background:#fff; cursor:move;border-top:1px dashed #ffc495;padding-top:5px;margin-bottom:10px;}
+.preview{border:1px dashed #eba90b;background:#fffccc;width:968px;}
+.layoutDraggable {background:#fff; cursor:move;border-top:1px dashed #ffc495;padding:5px 0;margin-bottom:10px;}
 .itemDroppable {padding:0 0 5px;background:#ffecdc;border:1px solid #ffc495;margin:5px 0 0;cursor:default;}
-.itemDraggable {background:#ffffff;overflow:hidden;border:1px solid #c0dbf8; cursor:default;padding:1px;margin-top:5px;}
+.itemDraggable {background:#ffffff;overflow:hidden;border:1px solid #c0dbf8; cursor:default;padding:1px;}
 .itemDraggable .itemHeader{line-height: 28px;background-color: #e2f0fb;border-bottom:1px solid #c0dbf8;color:#333;padding:0 10px;cursor: move;font-weight: bold;height: 28px;position: relative; font-family:Verdana, Geneva, sans-serif; font-size:14px;margin-bottom:1px;}
 .itemDraggable .itemHeader .closeEl{position: absolute;right: 5px;top: 0px;font-weight: normal;font-size: 12px;text-decoration: none;}
 .itemDraggable .itemHeader .editEl{position: absolute;right: 28px;top: 0px;font-weight: normal;font-size: 12px;text-decoration: none;}
@@ -17,6 +20,8 @@ print <<<EOT
 .sortHelper{border:2px dashed #ffc495;width: auto !important;background:#ffecdc;}
 .itemContent{padding:4px 10px;}
 .itemContent li{line-height:24px;border-bottom:0;}
+.itemContent{*zoom:1;}
+.itemContent:after{content:'\20';display:block;height:0;clear:both;visibility: hidden;}
 .itemContent h2{ font-size:14px; font-weight:700; text-align:center;margin:0;margin-top:4px;height:21px;overflow:hidden;line-height:21px;background:none;padding:0;}
 .itemContent p{margin:5px 0;text-indent:2em;}
 .itemContent tr td,.itemContent tr th{padding:4px 0 10px;}
@@ -47,6 +52,17 @@ print <<<EOT
 .pwSlide ul li a {display: block;width: 18px;height: 13px;line-height: 13px;font-size: 10px;font-family: Tahoma;color: #000;background: #f7f7f7;}
 .pwSlide ul li a:hover,.pwSlide ul li a.sel {color: #fff;text-decoration: none;background: #ff6600;color: #fff;}
 .pwSlide img{width:100%;display:block;}
+
+.review .dl_wrap{float:left;width:100%;min-height:1px;border-top:1px dotted #e4e4e4;padding:15px 0;}
+.review .dt_face{float:left;width:60px;padding-top:5px;}
+.review .dd_cm{margin-left:70px;line-height:20px;padding-top:5px;}
+.review .dd_cont{margin-bottom:5px;}
+.review cite{ font-family:Simsun;color:#999;}
+.review .dd_cm p.tar{color:#999;}
+.review .dd_cm p.tar a{margin:0 10px;}
+.reply_comment{padding:5px 0;}
+.review_tips{position:absolute;width:100%;z-index:1;text-align:center;height:70px;line-height:70px;background:#fff;border:1px solid;border-color:#aaa #ddd #ddd #aaa;}
+.reply_num{background:#f7f7f7;line-height:25px;height:25px;padding:0 10px;color:#666; text-align:right;}
 </style>
 <form id="opMakeForm" action="$stopic_admin_url" method="post" enctype="multipart/form-data" onsubmit="return checkSubmit();">
 <h2 class="h1" style="margin-top:10px;">专题制作</h2>
@@ -226,25 +242,14 @@ print <<<EOT
     <span class="bt"><span><button type="button" onclick="previewStopic();return false;">预 览</button></span></span>
 </div>
 </form>
-
-<script language="JavaScript" src="js/global.js"></script>
-<script language="JavaScript" src="js/core/core.js"></script>
-<script language="JavaScript" src="js/pw_ajax.js"></script>
-<script language="JavaScript" src="js/color_picker.js"></script>
-<script language="javascript" src="apps/stopic/js/getelementpos.js"></script>
-<script language="javascript" src="apps/stopic/js/drag.js"></script>
-<script language="javascript" src="apps/stopic/js/selectstyle.js"></script>
-<script language="javascript">
-
+<script type="text/javascript" src="js/color_picker.js"></script>
+<script type="text/javascript" src="apps/stopic/js/getelementpos.js"></script>
+<script type="text/javascript" src="apps/stopic/js/drag.js"></script>
+<script type="text/javascript" src="apps/stopic/js/selectstyle.js"></script>
+<script type="text/javascript" src="apps/stopic/js/topbar.js"></script>
+<script type="text/javascript">
 var AJAXURL = '$ajaxurl';
 var STOPIC_ID = 0;
-
-var dragLayoutImpl = New(externalLayoutDrag,['layoutDroppable','layoutDraggable','layoutHeader','editEl','closeEl','itemContent','preview', ['layoutDraggable', 'itemDraggable']]);
-dragLayoutImpl.externalLayoutDrag('layoutDragElement');
-
-var dragItemImpl = New(externalDrag,['itemDroppable','itemDraggable','itemHeader','editEl','closeEl','itemContent','container', ['layoutDraggable', 'itemDraggable']]);
-dragItemImpl.externalDrag('widget-top');
-
 function createStopic(isCover) {
 	var block_config = dragLayoutImpl.getStopicConfig() + dragItemImpl.getStopicConfig();
 	if (!isStopicInit()) return false;
@@ -281,11 +286,6 @@ function getRadioValue(radioName){
 	}
 	return null;
 }
-
-
-window.onload = function() {
-	initStopic();
-};
 
 //create stopic
 function isStopicInit() {
@@ -332,39 +332,6 @@ function createNewStopic(stopicTitle, stopicCategory) {
 }
 
 
-getObj("opAdvanceDisplayButton").onclick = function() {
-	var isHidden = getObj("opShowAdvanceField").style.display == 'none';
-	getObj("opShowAdvanceField").style.display = isHidden ? '' : 'none';
-	getObj('opAdvanceDisplayButton').innerHTML = isHidden ? '收起细节设置▲' : '更多细节设置▼';
-	zt_topbar.reloadOrigin();
-	
-}
-//getObj("opTipOpen").onclick = tipDisplayCtrl;
-//getObj("opTipClose").onclick = tipDisplayCtrl;
-
-//category
-getObj("category").onchange = function() {
-	getObj("advanceIframe").src = getObj("opMakeForm").action + "&job=advance&stopic_id=" + isStopicInit() + "&category_id=" + getObj("category").value;
-}
-
-//create category
-getObj("opCreateCategoryLink").onclick = function() {
-	getObj("opCreateCategoryShowForm").style.display = '';
-	getObj("opCreateCategoryLink").style.display = 'none';
-	getObj("opCreateCategoryFormInput").value = '';
-	getObj("opCreateCategoryFormInput").focus();
-}
-getObj("opHideCategoryForm").onclick = function() {
-	getObj("opCreateCategoryShowForm").style.display = 'none';
-	getObj("opCreateCategoryLink").style.display = '';
-}
-getObj("opCreateCategoryFormSubmit").onclick = function() {
-	if (!checkCategoryName()) {
-		getObj("opCreateCategoryFormInput").focus();
-		return false;
-	}
-	createCategory();
-}
 function checkForCategorySubmit(event) {
 	if (event.keyCode == 13) {
 		getObj("opCreateCategoryFormSubmit").onclick();
@@ -408,12 +375,7 @@ function ctrlErrorMsg(isDisplay, displayId, msg, msgId) {
 	getObj(displayId).style.display = isDisplay ? '' : 'none';
 }
 
-getObj("opJumpToDirSetting").onclick = function() {
-	if (parent != undefined && parent.PW != undefined) {
-		parent.PW.Dialog({id:'safe',url:'$admin_file?adminjob=settings&admintype=safe',name:'安全与优化'});
-	}
-	return false;
-}
+
 
 //pickcolor
 function pickReback(obj,color){
@@ -474,8 +436,59 @@ function stopicImgType(idName_a, idName_b, idName_c, e) {
 		}
 	}
 }
+var dragLayoutImpl=null;
+var dragItemImpl=null;
+onReady(function(){
+	dragLayoutImpl = New(externalLayoutDrag,['layoutDroppable','layoutDraggable','layoutHeader','editEl','closeEl','itemContent','preview', ['layoutDraggable', 'itemDraggable']]);
+	dragLayoutImpl.externalLayoutDrag('layoutDragElement');
+
+	dragItemImpl = New(externalDrag,['itemDroppable','itemDraggable','itemHeader','editEl','closeEl','itemContent','container', ['layoutDraggable', 'itemDraggable']]);
+	dragItemImpl.externalDrag('widget-top');
+
+	initStopic();
+	
+	getObj("opAdvanceDisplayButton").onclick = function() {
+		var isHidden = getObj("opShowAdvanceField").style.display == 'none';
+		getObj("opShowAdvanceField").style.display = isHidden ? '' : 'none';
+		getObj('opAdvanceDisplayButton').innerHTML = isHidden ? '收起细节设置▲' : '更多细节设置▼';
+		zt_topbar.reloadOrigin();
+		
+	}
+	//getObj("opTipOpen").onclick = tipDisplayCtrl;
+	//getObj("opTipClose").onclick = tipDisplayCtrl;
+
+	//category
+	getObj("category").onchange = function() {
+		getObj("advanceIframe").src = getObj("opMakeForm").action + "&job=advance&stopic_id=" + isStopicInit() + "&category_id=" + getObj("category").value;
+	}
+
+	//create category
+	getObj("opCreateCategoryLink").onclick = function() {
+		getObj("opCreateCategoryShowForm").style.display = '';
+		getObj("opCreateCategoryLink").style.display = 'none';
+		getObj("opCreateCategoryFormInput").value = '';
+		getObj("opCreateCategoryFormInput").focus();
+	}
+	getObj("opHideCategoryForm").onclick = function() {
+		getObj("opCreateCategoryShowForm").style.display = 'none';
+		getObj("opCreateCategoryLink").style.display = '';
+	}
+	getObj("opCreateCategoryFormSubmit").onclick = function() {
+		if (!checkCategoryName()) {
+			getObj("opCreateCategoryFormInput").focus();
+			return false;
+		}
+		createCategory();
+	}
+	getObj("opJumpToDirSetting").onclick = function() {
+		if (parent != undefined && parent.PW != undefined) {
+			parent.PW.Dialog({id:'safe',url:'$admin_file?adminjob=settings&admintype=safe',name:'安全与优化'});
+		}
+		return false;
+	}
+})
 </script>
-<script src="apps/stopic/js/topbar.js"></script>
+
 <!--
 EOT;
 ?>

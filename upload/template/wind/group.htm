@@ -2,7 +2,7 @@
 if (empty($q)) {
 print <<<EOT
 -->
-<link rel="stylesheet" type="text/css" href="images/g/home.css" />
+<link rel="stylesheet" type="text/css" href="images/g/home.css?{$GLOBALS['wind_repair']}" />
 <style type="text/css">
 .ddContimg{padding:5px 0 0;}
 .ddCont{width:500px;}
@@ -34,14 +34,14 @@ print <<<EOT
 	<em class="breadEm"></em>
 	<a href="group.php">群组首页</a>
 </div>
-<script language="JavaScript">
+<script>
 function showRandColonys(){
 	var randColonysHTML = ajax.request.responseText;
 	getObj('randdom').innerHTML = randColonysHTML;
 }
 </script>
-<script type="text/javascript" language="JavaScript" src="apps/weibo/js/post.js"></script>
-<script language="JavaScript" src="js/pw_weibo.js"></script>
+<script type="text/javascript" src="apps/weibo/js/post.js"></script>
+<script type="text/javascript" src="js/pw_weibo.js"></script>
 <div id="pw_content" class="cc">
 	<div class="p10">
 		<div class="content">
@@ -154,8 +154,8 @@ EOT;
 } elseif ($q == 'create') {
 print<<<EOT
 -->
-<link rel="stylesheet" type="text/css" href="images/g/home.css" />
-<link rel="stylesheet" type="text/css" href="images/post/minieitor/minieitor.css" />
+<link rel="stylesheet" type="text/css" href="images/g/home.css?{$GLOBALS['wind_repair']}" />
+<link rel="stylesheet" type="text/css" href="images/post/minieitor/minieitor.css?{$GLOBALS['wind_repair']}" />
 <div id="breadCrumb" class="cc">
 	<ul class="fr">
 		<li class="mr5"><a href="apps.php?q=groups" class="b"><img src="images/g/mygroup.png" align="absmiddle" /> 我的群组</a></li>
@@ -167,8 +167,8 @@ print<<<EOT
 	<em>&gt;</em>
 	<a href="group.php?q=create">创建群组</a>
 </div>
-<script type="text/javascript" language="JavaScript" src="js/color_picker.js"></script>
-<script type="text/javascript" language="JavaScript" src="js/mini_editor.js"></script>
+<script type="text/javascript" src="js/color_picker.js"></script>
+<script type="text/javascript" src="js/mini_editor.js"></script>
 <div id="pw_content" class="cc">
 <div class="h">创建群组</div>
 <div class="homeCont">
@@ -292,7 +292,7 @@ EOT;
 }print<<<EOT
 --></i></a>
 						
-           <script language="JavaScript">
+           <script>
             function show_image(id,pic_url) {
 				getObj('q_' + id).value = 1;
 				getObj('p_' + id).value = "";
@@ -307,21 +307,15 @@ EOT;
 <!--
 EOT;
 if ($o_groups_gdcheck) {
-$gdSize = explode("\t",$db_gdsize);
+$checkCode = L::loadClass('checkcode', 'site');
+$checkCodeString = $checkCode->getCheckCodeTemplate();
 print <<<EOT
 -->
 	<tr>
 		<th class="th">验证码<span class="s1">*</span></th>
 		<td class="td">
-			<div id="ckcode" style="display:none;margin-bottom:1px;">
-<script type="text/javascript" src="js/pw_authcode.js"></script>
-<script>
-var flashWidth = "$gdSize[0]";
-var flashHeight = "$gdSize[1]";
-var gdtype = $db_gdtype;
-showGdCode();
-</script>
-			</div>
+			<div id="ckcode" style="display:none;margin-bottom:1px;"></div>
+$checkCodeString
 			<div><input class="input" onfocus="showgd();" type="text" name="gdcode" id="gdcode" style="width:50px;" tabindex="3"  /></div>
 		</td>
 	</tr>
@@ -333,7 +327,7 @@ if($db_imagequestion){
 }else{
 	$question = $qkey<0 ? getMachineQuestion_1() :  $db_question[$qkey];
 }
-$q_a = $question.($showq && $qkey>0?" 正确答案:".$db_answer[$qkey] : '');
+$q_a = $question.($showq && $qkey>0?" （答案：".$db_answer[$qkey] . '）' : '');
 print <<<EOT
 -->
 	<tr>
@@ -355,7 +349,7 @@ EOT;
 </table>
 </form><div id="divload"></div>
 	</div>
-<script language="JavaScript">
+<script>
 var charset = '$db_charset';
 initCheckTextNum('cname','cname_warn',20);
 initCheckTextNum('mini_descrip','mini_descrip_warn',255);
@@ -399,18 +393,18 @@ function checkpost(obj) {
 	var position =getObj('submit');
 	if (obj.cname.value == "") {
 		obj.cname.focus();
-		showDialog("error","请输入群组<span class='warnFontStyle'>名称</span>",2);
+		showDialog("error","请输入群组<span class='s1'>名称</span>",2);
 		return false;
 	}　else if (strlen(obj.cname.value) > 20) {
 		obj.cname.focus();
-		showDialog("error","群组<span class='warnFontStyle'>名称</span>不能大于<span class='warnFontStyle'>20</span>个字节",2);
+		showDialog("error","群组<span class='s1'>名称</span>不能大于<span class='s1'>20</span>个字节",2);
 		return false;
 	}　else if (strlen(obj.descrip.value) > 255) {
 		obj.descrip.focus();
-		showDialog("error","群组<span class='warnFontStyle'>简介</span>不能大于<span class='warnFontStyle'>255</span>个字节",2);
+		showDialog("error","群组<span class='s1'>简介</span>不能大于<span class='s1'>255</span>个字节",2);
 		return false;
 	}　else if (!obj.firstgradestyle.value) {
-		showDialog("error","请选择群组<span class='warnFontStyle'>分类</span>",2);
+		showDialog("error","请选择群组<span class='s1'>分类</span>",2);
 		return false;
 	} 
 	if (createGroupCredit) {
@@ -472,7 +466,7 @@ EOT;
 } elseif ($q == 'all') {
 print<<<EOT
 -->
-<link rel="stylesheet" type="text/css" href="images/g/home.css" />
+<link rel="stylesheet" type="text/css" href="images/g/home.css?{$GLOBALS['wind_repair']}" />
 <style type="text/css">
 #pw_content{background:#ffffff url(u/themes/default/images/homebg.png) right 0 repeat-y;}
 </style>
@@ -648,7 +642,7 @@ EOT;
 	</div>
 </div>
 </div>
-<script language="JavaScript">
+<script>
 setCurrent('cid_$styleid','cid_all','current');
 </script>
 	<div class="c"></div>

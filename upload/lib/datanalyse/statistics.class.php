@@ -149,6 +149,10 @@ class PW_Statistics {
 		$num = intval($num);
 		$this->_db->update("UPDATE pw_statistics_daily SET value=value-$num,updatetime=" . pwEscape($this->t) . ' WHERE name=' . pwEscape($name) . ' AND typeid=' . pwEscape($typeid) . ' AND date=' . pwEscape($date));
 	}
+	
+	function addByName($name, $num = 1, $typeid = 0) {
+      $this->_add($name, $num, $typeid, $this->day);
+    }
 
 	function _add($name, $num, $typeid, $date) {
 		$num = intval($num);

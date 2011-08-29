@@ -191,7 +191,7 @@ class PostIndexDB {
 			$f_data[] = array($rt ["tid"],$rt ["pid"]);
 		}
 		if (!empty($f_data)) {
-			$this->db->update ("INSERT INTO pw_postsfloor(tid,pid) VALUES " . S::sqlMulti($f_data));
+			$this->db->update ("REPLACE INTO pw_postsfloor(tid,pid) VALUES " . S::sqlMulti($f_data));
 		}
 		$floor = $this->getMaxFloorByTid($tid);
 		if ($count > $floor) {

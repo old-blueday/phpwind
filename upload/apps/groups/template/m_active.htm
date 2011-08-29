@@ -500,7 +500,7 @@ EOT;
 -->
                 </ul>
 			</div>
-			<script language="JavaScript" src="js/app_comment.js"></script>
+			<script type="text/javascript" src="js/app_comment.js"></script>
 			<div>
 <!--
 EOT;
@@ -733,7 +733,13 @@ white-space:nowrap;
 </style>
 <!--
 EOT;
-if ($isGM || ($db_allowupload && $_G['allowupload']) || $attach) {print <<<EOT
+//max attachnum
+if ($_G['allownum'] > 0 && $_G['allownum'] - $winddb['uploadnum']<$db_attachnum){
+	$maxAttachnum = $_G['allownum'] - $winddb['uploadnum'];
+} else {
+	$maxAttachnum = $db_attachnum;
+}
+if ($isGM || ($db_allowupload && $_G['allowupload'] && (!$_G['allownum'] || $winddb['uploadnum'] < $_G['allownum'])) || $attach) {print <<<EOT
 -->
 <table cellPadding="0" cellSpacing="0" style="display:none" width="100%">
 	<tbody id="att_mode"><tr>
@@ -744,14 +750,14 @@ if ($isGM || ($db_allowupload && $_G['allowupload']) || $attach) {print <<<EOT
 		<td></td></tr>
 	</tbody>
 </table>
-<script language="JavaScript">
-var allowmutinum = parseInt('$db_attachnum');
+<script type="text/javascript">
+var allowmutinum = parseInt('$maxAttachnum');
 var allow_ext = '$uploadfiletype';
 var allow_size = '$uploadfilesize';
 var attachnum = parseInt('$db_attachnum');
 </script>
-<script type="text/javascript" language="JavaScript" src="js/swfobject.js"></script>
-<script type="text/javascript" language="JavaScript" src="js/upload.js"></script>
+<script type="text/javascript" src="js/swfobject.js"></script>
+<script type="text/javascript" src="js/upload.js"></script>
 <!--
 EOT;
 }print <<<EOT
@@ -856,7 +862,7 @@ print <<<EOT
         </form>
 		</div>
 	</div>
-<SCRIPT LANGUAGE="JavaScript">
+<script type="text/javascript">
 initCheckTextNum('atc_title','atc_title_warn','$db_titlemax');
 initCheckTextNum('address','address_warn','$db_titlemax');
 initCheckTextNum('introduction','introduction_warn',130);
@@ -940,7 +946,7 @@ function compTime(beginTime, endTime) {
         return 'exception'
     }
 }
-</SCRIPT>
+</script>
 	<div id="menu_face" class="menu" style="display:none;"></div>
 	<div id="menu_generalface" class="menu" style="display:none;"></div>
 <!--

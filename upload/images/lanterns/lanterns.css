@@ -1,0 +1,39 @@
+.lanterns{min-height:710px;background:#f4fafd url(lanterns_bg.jpg) no-repeat;}
+
+.lanterns_nav li,.lanterns_content h2{background:url(lanterns_img_bg.png) no-repeat;}
+.lanterns_steps,.excellent li{background:url(lanterns_big_bg.png) no-repeat;}
+
+.lanterns_nav{padding-top:163px;}
+.lanterns_nav ul{padding-left:8px;}
+.lanterns_nav li{float:left;height:26px;line-height:27px;width:85px; text-align:center; font-size:14px;margin-right:10px;}
+.lanterns_nav li a{float:left;width:85px;height:26px;}
+.lanterns_nav li a:hover{ text-decoration:none;}
+.lanterns_nav li.current{ background-position:0 -30px; font-weight:700;line-height:28px;height:27px;}
+
+.lanterns_content{width:696px;min-height:360px;padding-left:8px;}
+.lanterns_side{width:235px;min-height:200px;padding-right:10px;}
+
+.lanterns_boxA{border:1px solid #d1e7fc;padding:1px;background:#fff;}
+.lanterns_boxA h2{display:block;height:33px;line-height:33px;padding:0 15px;background:#f1f9fc; font-size:14px;color:#1d699f;}
+
+.lanterns_boxB{border:3px solid #d3e5f2;background:#fff;padding:10px;}
+
+.lanterns_contact{padding:10px 15px;line-height:1.8;}
+.lanterns_list{padding:5px 5px 5px 10px;}
+.lanterns_list li{padding:5px 0;}
+
+.lanterns_content h2{display:block;height:23px;line-height:23px; background-position:3px -70px; font-size:14px;padding-left:20px;}
+.lanterns_content .lanterns_boxB h2{ background-position:3px -116px;}
+
+.lanterns_steps{height:45px;margin-bottom:30px;}
+
+.excellent{padding-bottom:10px;}
+.excellent li{height:32px;line-height:32px; background-position:0 -60px;overflow:hidden; font-size:14px;margin-bottom:8px;}
+.excellent li em{display:block;float:left;width:34px;text-align:center;color:#693b00;height:32px;line-height:30px;vertical-align:middle; font-weight:700;color:#fff;margin-right:10px;}
+
+.lanterns_forum{overflow:hidden;}
+.lanterns_forum ul{padding:0 0 0 20px;}
+.lanterns_forum li{float:left;width:20%; font-size:14px;height:30px;line-height:30px;overflow:hidden;border-bottom:1px dotted #ccc;padding:5px 0;}
+
+.lanterns_info{background:#fff url(lanterns_info.png) center bottom no-repeat;width:654px;margin-left:auto;margin-right:auto;border-left:1px solid #d1e7fc;border-right:1px solid #d1e7fc;margin-bottom:20px;}
+.lanterns_info h3{ font-size:14px;display:block;margin-bottom:5px;}

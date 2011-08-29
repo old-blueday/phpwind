@@ -211,7 +211,7 @@ class PW_CustomerFieldData{
 					$provinceid = isset($upperids[$upids[$areaids[$fieldInfo['id']]]]) ? $upperids[$upids[$areaids[$fieldInfo['id']]]] : 0;
 					$customFieldValue = $areaids[$fieldInfo['id']] ? array('province'=>$provinceid, 'city'=>$upids[$areaids[$fieldInfo['id']]], 'area'=>$areaids[$fieldInfo['id']]) : array();
 				} else {
-					$customFieldValue = $fieldInfo['options'] == '' ? $fieldInfo['options'] : array();
+					$customFieldValue = ($fieldInfo['options'] && !$fieldInfo['ifsys']) ? $fieldInfo['options'] : '';
 				}
 				break;
 			case $this->customerField->typeMap['education']:

@@ -6,49 +6,107 @@ print <<<EOT
 <input type="hidden" name="step" value="2" />
 <div><!--切换div-->
 	<div class="pwC_content_a" style="overflow:hidden;">
-		<div class="admin_table">
-			<table width="100%" cellpadding="0" cellspacing="0">
-				<tr class="tr1"><td class="td2">
-				<textarea name="tagcode" style="width:98%;height:350px;line-height:1.4;" >$pieceCode</textarea>
-				</td></tr>
+		<div class="p10">
+			<textarea name="tagcode" style="width:99%;height:150px;line-height:1.4;font-family:'Courier New', Courier, monospace;" >$pieceCode</textarea>
+		</div>
+		<div class="pw_label">
+			<table width="660" class="mb5">
+				<tr class="tr_title">
+					<th>属性名称</th>
+					<td>变量</td>
+					<td>样例</td>
+				</tr>
+				<tr>
+					<th>标题</th>
+					<td>{title}</td>
+					<td>{title,40}</td>
+				</tr>
+				<tr>
+					<th>链接地址</th>
+					<td>{url}</td>
+					<td>{url}</td>
+				</tr>
+				<tr>
+					<th>图片地址</th>
+					<td>{image}</td>
+					<td>{image,100,100}</td>
+				</tr>
+				<tr>
+					<th>描述</th>
+					<td>{descrip}</td>
+					<td>{descrip,200}</td>
+				</tr>
+				<tr>
+					<th>发帖时间</th>
+					<td>{postdate}</td>
+					<td>{postdate,y-m-d}/{postdate,m-d}</td>
+				</tr>
+				<tr>
+					<th>版块名称</th>
+					<td>{forumname}</td>
+					<td>{forumname,10}</td>
+				</tr>
+				<tr>
+					<th>版块地址</th>
+					<td>{forumurl}</td>
+					<td>{forumurl}</td>
+				</tr>
+				<tr>
+					<th>作者</th>
+					<td>{author}</td>
+					<td>{author,10}</td>
+				</tr>
+				<tr>
+					<th>作者ID</th>
+					<td>{authorid}</td>
+					<td>u.php?uid={authorid}</td>
+				</tr>
+				<tr>
+					<th>用户ID</th>
+					<td>{uid}</td>
+					<td>u.php?uid={uid}</td>
+				</tr>
+				<tr>
+					<th>主题分类名称</th>
+					<td>{topictypename}</td>
+					<td>{topictypename,10}</td>
+				</tr>
+				<tr>
+					<th>主题分类链接</th>
+					<td>{topictypeurl}</td>
+					<td>{topictypeurl}</td>
+				</tr>
+				<tr>
+					<th>数值</th>
+					<td>{value}</td>
+					<td>{value}</td>
+				</tr>
+				<tr>
+					<th>头像</th>
+					<td>{icon}</td>
+					<td>{icon,100,100}</td>
+				</tr>
+					<th>帖子数</th>
+					<td>{article}</td>
+					<td>{article}</td>
+				</tr>
+				<tr>
+					<th>主题数</th>
+					<td>{topic}</td>
+					<td>{topic}</td>
+				</tr>
+				<tr>
+				<tr>
+					<td colspan="3">更多变量请进后台 -> 门户模式 -> 模块管理 -> 编辑模板</td>
+				</tr>
 			</table>
 		</div>
 	</div>
-	
 	<div class="tac p10" style="text-align:center;padding-top:0;">
-		<div class="fl"><span class="bt2" style="position:absolute;"><span><button type="button" onclick="consoleMode()">显示所有模块</button></span></span></div><span class="btn2"><span><button type="submit">提交</button></span></span>
+		<span class="btn2"><span><button type="submit">提交</button></span></span>
 	</div>
 </div>
 </form>
-<script>
-function consoleMode(){
-    var panel = parent.document.getElementById('consolePanel'), css = parent.document.getElementById('consoleMode');
-	if(css){
-		css.disabled = false;
-	}else{
-		css = parent.document.createElement('link');
-		css.id = 'consoleMode';
-		css.type = 'text/css';
-		css.href= 'mode/area/images/consolePanel.css?100920';
-		css.rel = 'stylesheet';
-		parent.document.body.appendChild(css);
-	}
-	if(panel){
-		panel.style.display = 'block';
-	}else{
-		panel = parent.document.createElement('div');
-		panel.id = 'consolePanel';
-		panel.innerHTML = '此状态为所有模块显示，便于查找隐藏模块。 <span class="bt2"onclick="endConsoleMode()"><span><button type="button">关闭所有显示模块</button></span></span> 或者刷新本页面即可关闭';
-		parent.document.body.appendChild(panel);
-	}
-}
-parent.endConsoleMode = function(){
-    var panel = parent.document.getElementById('consolePanel'), css = parent.document.getElementById('consoleMode');
-		panel && (panel.style.display = 'none');
-		css && (css.disabled = true);
-}
-</script>
-
 <!--
 EOT;
 ?>

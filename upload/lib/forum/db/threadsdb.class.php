@@ -70,14 +70,20 @@ class PW_ThreadsDB extends BaseDB {
 		}
 		
 		if ($starttime) {
+			$ifpostdate = 1;
 			$_sql_where .= " AND t.postdate > " . S::sqlEscape ( $starttime );
 		}
 		
 		if ($endtime) {
+			$ifpostdate = 1;
 			$_sql_where .= " AND t.postdate < " . S::sqlEscape ( $endtime );
 		}
+
+		if ($ifpostdate == 1) {
+			$forceIndex = 'FORCE INDEX (idx_postdate)';
+		}
 		
-		$total=$this->countSearch("SELECT count(*) as total FROM ".$this->_tableName." t WHERE t.ifcheck = 1 AND t.fid !=0 ".$_sql_where);
+		$total=$this->countSearch("SELECT count(*) as total FROM ".$this->_tableName." t ".$forceIndex." WHERE t.ifcheck = 1 AND t.fid !=0 ".$_sql_where);
 		return ($total<500) ? $total :500;
 	}
 	

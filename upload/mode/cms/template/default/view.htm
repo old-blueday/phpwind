@@ -1,31 +1,41 @@
 <!--<?php print <<<EOT
 -->
-<link rel="stylesheet" type="text/css" href="$pwModeImg/style.css" media="all" />
+<link rel="stylesheet" href="$pwModeImg/style.css?{$GLOBALS['wind_repair']}" />
+<style type="text/css">
+.cmsForumlist{padding:7px;}
+.cmsForumlist li{height:30px;}
+.cmsForumlist li a{display:block;border:1px solid $tdcolor;background:$forumcolorone;margin:3px;line-height:22px;height:22px;overflow:hidden;}
+.cmsForumlist li a:hover,.cmsForumlist .current a{border:1px solid $tablecolor; font-weight:700;background:$forumcolortwo; text-decoration:none;}
+</style>
 <div id="breadCrumb">
 <!--
 EOT;
 if(checkEditPurview($windid,$articleModule->columnId)){
 print <<<EOT
 -->
-	<span class="bts fr pr"><span><button type="button" onClick="location.href='{$cmsBaseUrl}q=post&cid={$articleModule->columnId}';">发表文章</button></span></span>
+	<a href="{$cmsBaseUrl}q=post&cid={$articleModule->columnId}" class="s2 b fr" target="_blank">[发表文章]</a>
+	<!--span class="bts fr pr"><span><button type="button" onClick="location.href='{$cmsBaseUrl}q=post&cid={$articleModule->columnId}';">发表文章</button></span></span-->
 <!--
 EOT;
 } if (!checkEditPurview($windid,$articleModule->columnId) && getPostPurview($windid,$_G)){
 print <<<EOT
 -->
-	<span class="bts fr pr"><span><button type="button" onClick="location.href='{$cmsBaseUrl}q=post&cid={$articleModule->columnId}';">我要投稿</button></span></span>
+	<a href="{$cmsBaseUrl}q=post&cid={$articleModule->columnId}" class="s2 b fr" target="_blank">[我要投稿]</a>
+	<!--span class="bts fr pr"><span><button type="button" onClick="location.href='{$cmsBaseUrl}q=post&cid={$articleModule->columnId}';">我要投稿</button></span></span-->
 <!--
 EOT;
-} print <<<EOT
+} 
+$articleModule->subject  = S::htmlEscape($articleModule->subject);
+print <<<EOT
 -->
 	<img align="absmiddle" src="images/wind/thread/home.gif" alt="forumlist" class="breadHome" /><em class="breadEm"></em>$pagePosition
 </div>
-<div class="cmsBgbor">&nbsp;</div>
-	<div class="cmsBg">
-	<div id="content" class="fl">
-		<div class="cmsBoxA">
-			<table width="100%" style="table-layout:fixed;"><tr><td class="vt" height="600">
-				<h1 class="tac f24 b">{$articleModule->subject}</h1>
+<div class="cms_main cc">
+	<div class="cms_cm">
+		<div class="cms_cw">
+			<div class="t">
+				<table width="100%" style="table-layout:fixed;"><tr><td class="vt" height="400" style="padding:20px;">
+				<div class="mb10"><h1 class="tac f24 b" style="font-family:Arial,Microsoft Yahei,Simsun;">{$articleModule->subject}</h1></div>
 				<div class="cmsTips tac mb20">
 <!--
 EOT;
@@ -75,12 +85,12 @@ EOT;
 				{$articleModule->descrip}
 				</div>
 				<div class="cmsContent" id="cmsContent">
-				<table width="100%"><tr><td>
 					{$content}
-				</td></tr></table>
 				</div>
 				<div class="cc mb20">$pages</div>
 				<!--<div class="mb20">关键词：<a href="#" class="mr10 s2">汽车</a><a href="#" class="mr10 s2">宝马</a><a href="#" class="mr10 s2">北京车展</a></div>-->
+			</td></tr></table>
+			<div class="p20 cc">
 				<div class="cmsTips mb10">
 					<div class="fr">
 						<a href="apps.php?q=collection&a=favor&type=cms&ajax=1&id=$id" class="mr20 allCollect" onclick="return ajaxurl(this);">收藏</a><a href="javascript:;" onclick="sendmsg('operate.php?action=toweibo&ajax=1&type=cms&id=$id','',this.id);" class="allForward">新鲜事</a>
@@ -126,25 +136,166 @@ EOT;
 if ($sourceUrl) {
 print <<<EOT
 -->	
-				<div class="gotoForum tac f14 b">
+				<div class="gotoForum tac f14 b mb10">
 					<a href="$sourceUrl" target="_blank">进入{$articleModule->fromInfo}讨论</a>
 				</div>
 <!--
 EOT;
-}print <<<EOT
+}if (checkReplyPurview()) {
+print <<<EOT
+-->					
+			<form method="post" id="mainForm" name="FORM" onsubmit="return addcmscomment(document.FORM)" action="pw_ajax.php?action=cmsreply&type=addcomment" >
+			<input type="hidden" name="article_id" value="{$id}">
+			<div class="mb10">
+<!--
+EOT;
+require_once PrintEot('wysiwyg_editor_cmsreply');
+print <<<EOT
 -->
-			</td></tr></table>
+			</div>
+			<div class="mb20">
+				<span class="btn" style="margin:0;"><span><button id="cmsSubmit" disabled="disabled" type="submit" >评论</button></span></span>
+			</div>	
+			</form>
+<script type="text/javascript">
+onReady(function(){
+	getObj("cmsSubmit").disabled=false;
+})
+function addcmscomment(form){
+	getObj("cmsSubmit").disabled=true;
+	var atc_content = editor.getUBB();
+	if(atc_content.replace(/\s*/g,'') == ''){
+		showDialog("error","内容不能为空!","","","");
+		getObj("cmsSubmit").disabled=false;
+		return false;
+	}else{
+		ajax.submit(form, function() {
+			getObj("cmsSubmit").disabled=false;
+			var gotText = ajax.request.responseText;
+			if ('success' == gotText) {
+				location.reload();
+			} else {
+				ajax.guide();
+			}
+			
+		})
+		return false;
+	}
+}
+function addReply(form){
+	var content = form.content.value;
+	if(content==''){
+		showDialog("error","内容不能为空!",2);
+		return false;
+	}
+	ajax.submit(form, function() {
+		var gotText = ajax.request.responseText;
+		if ('success' == gotText) {
+			var commentnum = getObj('commentnum_'+form.commentid.value);
+			if(commentnum){
+				var regExp = /\(([0-9]+)\)/;
+				if(regExp.test(commentnum.innerHTML)){
+					var num = RegExp.$1;
+				}
+				if(isNaN(num)){
+					str = '(1)';
+				}else{
+					str = '('+(++num)+')';
+				}
+				commentnum.innerHTML = str;
+			}
+			statusObj = 0;
+			getReplyList(form.commentid.value);
+			form.content.value = '';
+		} else {
+			ajax.guide();
+		}
+	})
+	return false;
+}
+</script>
+<!--
+EOT;
+} if ($cmsReplyList) {
+	require_once PrintEot('cmsreply');
+	}
+print <<<EOT
+-->
+<script>
+function delcmscomment(commentid){
+	ajax.send('pw_ajax.php?action=cmsreply&type=delcomment','commentid='+commentid,function(){
+		var rText = ajax.request.responseText;
+		if (rText=='success') {
+			delElement('comment_'+commentid);
+		} else {
+			ajax.guide();
+		}
+	});
+}
+
+function getCommentList(href){
+	ajax.send(href,'',function(){
+		getObj('listcomments').innerHTML = ajax.runscript(ajax.request.responseText);
+	});
+	scroll(0,0);
+	return false;
+}
+
+if (typeof statusObj == 'undefined') var statusObj = 0;
+function getReplyList(commentid){
+	statusObj = (statusObj == 1) ? 0 : 1;
+	if (statusObj == 1) {
+		ajax.send('pw_ajax.php?action=cmsreply&type=listreply','commentid='+commentid,function(){
+			getObj('listreplys_'+commentid).innerHTML = ajax.runscript(ajax.request.responseText);
+			getObj('getreplys_'+commentid).style.display = 'block';
+		});
+	} else {
+		getObj('getreplys_'+commentid).style.display = 'none';
+	}
+}
+
+function replycomment(username,form){
+	form.content.value = '回复@'+username+' : ';
+}
+
+function delreply(replyid,commentid){
+	ajax.send('pw_ajax.php?action=cmsreply&type=delreply','replyid='+replyid+'&commentid='+commentid,function(){
+		var rText = ajax.request.responseText;
+		if (rText=='success') {
+			var commentnum = getObj('commentnum_'+commentid);
+			if(commentnum){
+				var regExp = /\(([0-9]+)\)/;
+				if(regExp.test(commentnum.innerHTML)){
+					var num = RegExp.$1;
+				}
+				if(isNaN(num) || num<=0){
+					str = '';
+				}else{
+					str = '('+(--num)+')';
+				}
+				commentnum.innerHTML = str;
+			}
+			delElement('reply_'+replyid);
+		} else {
+			ajax.guide();
+		}
+	});
+}
+</script>
+				</div>
+			</div>
 		</div>
 	</div>
-	<div id="sideBar" class="fr">
-		<div class="cmsBoxB">
+	<div class="cms_sd">
+		<div class="t">
+			<div class="cmsBoxB">
 <!--
 EOT;
 $_columnName = $column && $columns['parent'][name] ? $columns['parent'][name] : '栏目';
 print <<<EOT
 -->
-			<h2>$_columnName</h2>
-			<ul class="cmsForumlist cc cmslistB">
+				<h2 class="h" style="border-top:0;">$_columnName</h2>
+				<ul class="cmsForumlist cc cmslistB">
 <!--
 EOT;
 foreach($columns['sub'] as $var){
@@ -152,51 +303,48 @@ $_current = $var['column_id'] == $articleModule->columnId ? 'class="current"' : 
 $url = getColumnUrl($var[column_id]);
 print <<<EOT
 -->
-				<li {$_current}><a href="$url">{$var[name]}</a></li>
-<!--
-EOT;
-}print <<<EOT
--->
-			</ul>
-		</div>
-		<div class="cmsBoxbar">&nbsp;</div>
-		<div class="cmsBoxB">
-			<h2>24小时人气排行</h2>
-			<div class="cmsListA cmsIconB">
-				<ul>
-<!--
-EOT;
-foreach ((array)$hotArticle as $value) {print <<<EOT
--->
-					<li><a href="{$value[url]}" target="_blank">{$value[subject]}</a></li>
+					<li {$_current}><a href="$url">{$var[name]}</a></li>
 <!--
 EOT;
 }print <<<EOT
 -->
 				</ul>
-			</div>
-		</div>
-		<div class="cmsBoxbar">&nbsp;</div>
-		<div class="cmsBoxB">
-			<h2>最新文章</h2>
-			<div class="cmsListA cmsIconA">
-				<ul>		
+				<h2 class="h">24小时人气排行</h2>
+				<div class="cmsListA cmsIconB">
+					<ul>
+<!--
+EOT;
+foreach ((array)$hotArticle as $value) {
+$value[subject]  = S::htmlEscape($value[subject]);
+print <<<EOT
+-->
+						<li><a href="{$value[url]}" target="_blank">{$value[subject]}</a></li>
+<!--
+EOT;
+}print <<<EOT
+-->
+					</ul>
+				</div>
+				<h2 class="h">最新文章</h2>
+				<div class="cmsListA cmsIconA">
+					<ul>		
 <!--
 EOT;
 $i = 0;
 foreach ($pageCache->getData('newArticle') as $value) {
+$value[subject]  = S::htmlEscape($value[subject]);
 $i++;
 print <<<EOT
 -->
 
-					<li><a href="{$value[url]}" target="_blank">{$value[subject]}</a></li>
+						<li><a href="{$value[url]}" target="_blank">{$value[subject]}</a></li>
 <!--
 EOT;
 if ($i==5) {print <<<EOT
 -->
-				</ul>
-				<div class="cmsHr">&nbsp;</div>
-				<ul>
+					</ul>
+					<div class="cmsHr">&nbsp;</div>
+					<ul>
 <!--
 EOT;
 }print <<<EOT
@@ -206,62 +354,27 @@ EOT;
 EOT;
 }print <<<EOT
 -->
-				</ul>
-			</div>
-		</div>
-		<div class="cmsBoxbar">&nbsp;</div>
-		<div class="cmsBoxB">
-			<h2>热门帖子</h2>
-			<div class="cmsListA cmsIconA">
-				<ul>		
+					</ul>
+				</div>
+				<h2 class="h">热门帖子</h2>
+				<div class="cmsListA cmsIconA">
+					<ul>		
 <!--
 EOT;
 $i = 0;
 foreach ($pageCache->getData('hotSubject') as $value) {
+$value[title]  = S::htmlEscape($value[title]);
 $i++;
 print <<<EOT
 -->
 
-					<li><a href="{$value[url]}" target="_blank">{$value[title]}</a></li>
+						<li><a href="{$value[url]}" target="_blank">{$value[title]}</a></li>
 <!--
 EOT;
 if ($i==5) {print <<<EOT
 -->
-				</ul>
-				<div class="cmsHr">&nbsp;</div>
-				<ul>
-<!--
-EOT;
-}print <<<EOT
--->
-
-<!--
-EOT;
-}print <<<EOT
--->
-			</ul>
-			</div>
-		</div>
-		<div class="cmsBoxbar">&nbsp;</div>
-		<div class="cmsBoxB">
-			<h2>最新帖子</h2>
-			<div class="cmsListA cmsIconA">
-				<ul>		
-<!--
-EOT;
-$i = 0;
-foreach ($pageCache->getData('newSubject') as $value) {
-$i++;
-print <<<EOT
--->
-
-					<li><a href="{$value[url]}" target="_blank">{$value[title]}</a></li>
-<!--
-EOT;
-if ($i==5) {print <<<EOT
--->
-				</ul>
-				<div class="cmsHr">&nbsp;</div>
+					</ul>
+					<div class="cmsHr">&nbsp;</div>
 					<ul>
 <!--
 EOT;
@@ -273,13 +386,43 @@ EOT;
 }print <<<EOT
 -->
 				</ul>
+				</div>
+				<h2 class="h">最新帖子</h2>
+				<div class="cmsListA cmsIconA">
+					<ul>		
+<!--
+EOT;
+$i = 0;
+foreach ($pageCache->getData('newSubject') as $value) {
+$value[title]  = S::htmlEscape($value[title]);
+$i++;
+print <<<EOT
+-->
+
+						<li><a href="{$value[url]}" target="_blank">{$value[title]}</a></li>
+<!--
+EOT;
+if ($i==5) {print <<<EOT
+-->
+					</ul>
+					<div class="cmsHr">&nbsp;</div>
+						<ul>
+<!--
+EOT;
+}print <<<EOT
+-->
+
+<!--
+EOT;
+}print <<<EOT
+-->
+					</ul>
+				</div>
 			</div>
 		</div>
 	</div>
-	<div class="c">&nbsp;</div>
-	</div>
-	<div class="cmsBgbor">&nbsp;</div>
-<script type="text/javascript" language="JavaScrip" src="$pwModeJs/cms.js" ></script>
+</div>
+<script type="text/javascript" src="$pwModeJs/cms.js" ></script>
 <script type="text/javascript">
 var images = getObj('cmsContent').getElementsByTagName('img');
 var imgLoader = setTimeout(imgLoad,200);

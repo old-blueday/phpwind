@@ -7,9 +7,9 @@
 <meta http-equiv="expires" content="0">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Cache-Control" content="no-cache">
-<link rel="stylesheet" href="$imgpath/admin/admin_style.css" />
-<script src="js/admin.js"></script>
-<script language="JavaScript">
+<link rel="stylesheet" href="$imgpath/admin/admin_style.css?{$GLOBALS['wind_repair']}" />
+<script type="text/javascript" src="js/core/core.js"></script>
+<script type="text/javascript">
 var agt = navigator.userAgent.toLowerCase();
 var is_ie = ((agt.indexOf("msie") != -1) && (agt.indexOf("opera") == -1));
 var is_gecko = (navigator.product=='Gecko');
@@ -177,6 +177,7 @@ document.onkeydown = function(e){
 		return false;
 	}
 }
+
 Class = function(aBaseClass, aClassDefine) {
 	function class_() {
 		this.Inherit = aBaseClass;

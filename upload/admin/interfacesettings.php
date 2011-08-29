@@ -164,7 +164,7 @@ if ($_POST['step'] != 2) {
 	
 	if($adminFileChanged){
 		/*@fix 更改admin_file后引起的的404错误 */
-		echo '<script language="JavaScript">parent.location.href = "'.$config['adminfile'].'";</script>';
+		echo '<script type="text/javascript">parent.location.href = "'.$config['adminfile'].'";</script>';
 	}else{
 		adminmsg('operate_success');
 	}

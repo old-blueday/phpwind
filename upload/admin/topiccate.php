@@ -558,7 +558,7 @@ if (empty($action)){
 		} elseif ($fieldtype == 'number') {
 			$rule_min != '' && $rule_min = (int) $rule_min;
 			$rule_max != '' && $rule_max = (int) $rule_max;
-			$rule_min > $rule_max && Showmsg('field_number_error');
+			($rule_min > $rule_max || $rule_min < 0 || $rule_max< 0)  && Showmsg('field_number_error');
 			$s_rules = addslashes(serialize(array('minnum' => $rule_min,'maxnum' => $rule_max)));
 		} else {
 			$s_rules = '';
@@ -813,7 +813,7 @@ function getSearchHtml($data) {
 			$searchhtml .= "<input type=\"checkbox\" class=\"input\" name=\"field[$data[fieldid]][]\" value=\"$cv_value\" $checked/> $cv_name ";
 		}
 	} elseif ($data['type'] == 'calendar') {
-		$searchhtml .= "<input id=\"calendar_start_$data[fieldid]\" type=\"text\" class=\"input\" name=\"field[$data[fieldid]][start]\" value=\"{$data[fieldvalue][start]}\" onclick=\"ShowCalendar(this.id,0)\"/> - <input id=\"calendar_end_$data[fieldid]\" type=\"text\" class=\"input\" name=\"field[$data[fieldid]][end]\" value=\"{$data[fieldvalue][end]}\" onclick=\"ShowCalendar(this.id,0)\"/><script language=\"JavaScript\" src=\"js/date.js\"></script>";
+		$searchhtml .= "<input id=\"calendar_start_$data[fieldid]\" type=\"text\" class=\"input\" name=\"field[$data[fieldid]][start]\" value=\"{$data[fieldvalue][start]}\" onclick=\"ShowCalendar(this.id,0)\"/> - <input id=\"calendar_end_$data[fieldid]\" type=\"text\" class=\"input\" name=\"field[$data[fieldid]][end]\" value=\"{$data[fieldvalue][end]}\" onclick=\"ShowCalendar(this.id,0)\"/><script type=\"text/javascript\" src=\"js/date.js\"></script>";
 	} elseif ($data['type'] == 'range') {
 		$searchhtml .= "<input type=\"text\" size=\"5\" class=\"input\" name=\"field[$data[fieldid]][min]\" value=\"{$data[fieldvalue][min]}\"/> - <input type=\"text\" size=\"5\" class=\"input\" name=\"field[$data[fieldid]][max]\" value=\"{$data[fieldvalue][max]}\"/>";
 	} else {

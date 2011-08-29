@@ -1,0 +1,20 @@
+<!--<?php
+defined('W_P') or exit('Forbidden');
+$refer = "index.php?a=post&action=reply&amp;tid=$tid&amp;tmp=$timestamp";print <<<EOT
+-->
+<div class="quick_reply">
+  <form id="reply" method="post" action="$refer">
+  <input type="hidden" value="$fid" name="fid"/>
+    <p>
+      <label>
+        <input name="content" type="text" id="content" value="支持,顶！" size="7" maxlength="2000"/>
+      </label>
+      <label>
+        <input type="submit" name="button" id="button" value="快速回帖" />
+      </label>
+    </p>
+  </form>
+</div>
+<!--
+EOT;
+?>-->

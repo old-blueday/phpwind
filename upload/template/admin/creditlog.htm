@@ -77,6 +77,10 @@ EOT;
           </select>
         </td>
       </tr>
+<!--
+EOT;
+if (!$db_merge_creditlog) {print <<<EOT
+-->
       <tr class="tr1 vt">
         <td class="td1">日志表</td>
         <td class="td2">
@@ -94,6 +98,10 @@ EOT;
           </select>
         </td>
       </tr>
+<!--
+EOT;
+}print <<<EOT
+-->
       <tr class="tr1 vt">
       	<td class="td1">&nbsp;</td>
         <td class="td2"><span class="btn2"><span>
@@ -341,13 +349,9 @@ EOT;
       </tr>
       <tr class="tr1 vt">
         <td class="td1">&nbsp;</td>
-        <td class="td2"><ul class="cc list_80 list_A">
-            <li>
-              <input type="radio" name="step" value="3" checked />
-              清空日志表</li>
-            <li>
-              <input type="radio" name="step" value="5" />
-              备份日志表</li>
+        <td class="td2"><ul class="cc list_A">
+            <li><input type="radio" name="step" value="3" checked />清空日志表</li>
+            <li><input type="radio" name="step" value="5" />备份日志表</li>
           </ul></td>
       </tr>
     </table>

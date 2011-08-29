@@ -2,7 +2,7 @@
 !defined('P_W') && exit('Forbidden');
 
 S::gp(array('cyid', 'floor'), 'GP', 2);
-$linkurl = "read.php?tid=$tid&displayMode=1";
+$linkurl = "read.php?tid=$tid&ds=1";
 $page = 1;
 $tid = intval($tid);
 $floor = intval($floor);

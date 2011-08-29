@@ -307,6 +307,7 @@ class postModify {
 class topicModify extends postModify {
 	
 	var $pw_tmsgs;
+	var $replyReward;
 	
 	function topicModify($tid, $pid, &$post) {
 		parent::postModify($tid, $pid, $post);
@@ -377,6 +378,8 @@ class topicModify extends postModify {
 		//* $this->db->update("UPDATE $this->pw_tmsgs SET " . S::sqlSingle($pwSQL) . " WHERE tid=" . S::sqlEscape($this->tid));
 		pwQuery::update($this->pw_tmsgs, 'tid=:tid', array($this->tid), $pwSQL);
 		
+		$tpcstatus = $this->updateReplyReward();
+		if (is_numeric($tpcstatus)) setstatus($this->data['tpcstatus'], 8, "$tpcstatus");
 		$pwSQL = array(
 			'icon' => $this->data['icon'],
 			'subject' => $this->data['title'],
@@ -387,7 +390,8 @@ class topicModify extends postModify {
 			'ifmagic' => $this->data['ifmagic'],
 			'ifhide' => $this->data['hideatt'],
 			'ifcheck' => $this->data['ifcheck'],
-			'tpcstatus' => $this->data['tpcstatus']
+			'tpcstatus' => $this->data['tpcstatus'],
+			'special' => $this->data['special']
 		);
 		if ($this->data['anonymous'] != $this->atcdb['anonymous'] && $this->atcdb['postdate'] == $this->atcdb['lastpost']) {
 			$pwSQL['lastposter'] = $this->data['lastposter'];
@@ -398,7 +402,7 @@ class topicModify extends postModify {
 	}
 	
 	function afterModify() {
-		global $db_ifpwcache;
+		global $db_ifpwcache, $timestamp, $db_kmd_deducttime;
 		
 		if (($db_ifpwcache & 512) && $this->att && $this->att->elementpic) {
 			$elementpic = $this->att->elementpic;
@@ -408,7 +412,11 @@ class topicModify extends postModify {
 			$elementupdate->updateSQL();
 		}
 		//End elementupdate
-
+		
+		//update at users
+		$threadService = L::loadClass('threads','forum');
+		$threadService->updateAtUsers($this->tid,0,$this->data['atusers']);
+		
 		if ($this->data['ifcheck'] && $this->forum->foruminfo['allowhtm'] && !$this->forum->foruminfo['cms']) {
 			$StaticPage = L::loadClass('StaticPage');
 			$StaticPage->update($this->tid);
@@ -421,6 +429,14 @@ class topicModify extends postModify {
 			}
 		}
 		$this->updateForumsextra();
+		
+		if ($this->data['kmdinfo']) {
+			$kmdService = L::loadClass('KmdService', 'forum');
+			$tmpTime = $this->data['kmdinfo']['endtime'] - $db_kmd_deducttime * 3600;
+			$newKmdEndTime = ($db_kmd_deducttime && $tmpTime > 0) ? $tmpTime : $this->data['kmdinfo']['endtime'];
+			$updateKmdInfo = array('status' => KMD_THREAD_STATUS_CHECK, 'endtime' => $newKmdEndTime);
+			$kmdService->updateKmdInfo($updateKmdInfo, $this->data['kmdinfo']['kid']);
+		}
 		
 		//* $threads = L::loadClass('Threads', 'forum');
 		//* $threads->delThreads($this->tid);	
@@ -462,6 +478,18 @@ class topicModify extends postModify {
 			)));
 			*/
 		}
+	}
+	
+	function setReplyRewardData($replyrewardcredit, $replyreward) {
+		if (!$this->post->_G['allowreplyreward'] || !$replyrewardcredit || !S::isArray($replyreward)) return false;
+		$replyreward['rewardcredit'] = $replyrewardcredit;
+		$this->replyReward = $replyreward;
+	}
+	
+	function updateReplyReward() {
+		if (!getstatus($this->data['tpcstatus'], 8) && !$this->replyReward['replyreward']) return false;
+		$replyRewardService = L::loadClass('ReplyReward', 'forum');/* @var $replyRewardService PW_ReplyReward */
+		return $replyRewardService->updateRewardData($this->tid, $this->atcdb['authorid'], $this->replyReward);
 	}
 }
 
@@ -540,6 +568,9 @@ class replyModify extends postModify {
 			}
 		}
 		$this->data['ifupload'] && $pwSQL['ifupload'] = $this->data['ifupload'];
+		
+		$threadService = L::loadClass('threads','forum');
+		$threadService->updateAtUsers($this->tid,$this->atcdb['pid'],$this->data['atusers']);
 		
 		if ($this->data['ifcheck'] && $this->forum->foruminfo['allowhtm'] && !$this->forum->foruminfo['cms'] && $page == 1) {
 			$StaticPage = L::loadClass('StaticPage');

@@ -1,0 +1,70 @@
+<!--<?php
+defined('W_P') or exit('Forbidden');print <<<EOT
+-->
+<div class="page_title" id="reg"><strong>欢迎注册$db_bbsname!</strong><br />
+</div>
+<div class="page_content">
+  <div class="block">
+    <form id="form1" method="post" action="index.php?a=register">
+   <input type="hidden" value="$forward" name="forward" />
+						<input type="hidden" value="2" name="step" />
+						<input type="hidden" value="$tmpVerify" name="_hexie" />
+
+        请填写以下必填信息完成注册<br />
+        <strong>用户名：</strong>（{$rg_regminname}-{$rg_regmaxname}字节以内）
+        <br />
+        <input class="input" type="text" size="20" maxlength="$rg_regmaxname" name="regname" id="regname" />
+        <br />
+
+<strong>密码:</strong>（{$rg_regminpwd}-{$rg_regmaxpwd}位）<br />
+<input class="input" type="password" size="20" maxlength="$rg_regmaxpwd" name="regpwd" id="regpwd"  />
+<br />
+<strong>再次输入密码:</strong><br />
+<input class="input" type="password" size="20" maxlength="$rg_regmaxpwd" name="regpwdrepeat" id="regpwdrepeat"  />
+<br />
+<strong>email地址：</strong><br />
+	<input class="input" type="text" size="20" maxlength="75" name="regemail" value="" id="regemail"/>
+    <br/>
+<!--
+EOT;
+if($regq && $db_question){
+    $qkey = array_rand($db_question);
+    $db_question[$qkey] = addcslashes($db_question[$qkey], '"');
+    print <<<EOT
+-->
+ <strong>论坛防恶意注册</strong>    <br />
+问题:$db_question[$qkey]<br />
+  &lt;正确答案：$db_answer[$qkey]&gt;<br />
+<input class="input" type="text" name="qanswer" id="qanswer" />
+<input type="hidden" id="regqkey" name="qkey" value="$qkey" />
+      <br />
+<!--
+EOT;
+    }
+if($db_gdcheck & 1){
+    print <<<EOT
+-->
+
+								<img src="../ck.php?nowtime=$timestamp" align="absmiddle"  style="cursor:pointer;" id="ckcode" alt="checkcode" /><br/>
+								<strong>认证码:</strong>	<input class="input" type="text" id="gdcode" name="gdcode" size="6" /><br/>
+
+<!--
+EOT;
+    }
+print <<<EOT
+-->
+
+      <label>
+  <input type="checkbox" name="agreergpermit" id="checkbox" checked />
+    </label>
+    <em>我已阅读并完全同意<a href="index.php?a=items">条款内容</a></em><br />
+    <label>
+        <input type="submit" name="button" id="button" value="　注册　" />
+      </label>
+  </form>
+  </div>
+  <div class="return"><a href="$returnUrl">&laquo;返回</a></div>
+</div>
+<!--
+EOT;
+?>-->

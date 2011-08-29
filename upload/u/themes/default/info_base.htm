@@ -39,7 +39,7 @@ if($_G[allowhonor]){print <<<EOT
                 个性签名
             </th>
             <td class="td">
-                <input class="input input_wb mr10" type="text" name="prohonor" value="$userdb[honor]" />（将在我的首页和帖子页面用户信息处显示）
+                <input class="input input_wb mr10" type="text" name="prohonor" value="$userdb[honor]" />（将在帖子页面用户信息处显示）
             </td>
         </tr>
 <!--
@@ -142,7 +142,7 @@ include(R_P.'template/admin/timezone.htm');print <<<EOT
     <div class="tac" style=" padding:1em">
 
     </div>
-    <script language="JavaScript">
+    <script>
         var charset = '$db_charset';
         var signnum = '$_G[signnum]' * 1;
         initCheckTextNum('prointroduce', 'prointroduce_warn', 500);

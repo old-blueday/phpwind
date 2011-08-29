@@ -1,0 +1,125 @@
+<!--<?php
+defined('W_P') or exit('Forbidden');print <<<EOT
+-->
+<div class="navigator">
+<a href="#anch-end">
+<img alt="$db_bbsname" src="$wapImages/x.gif" /></a>
+<a href="index.php">$db_bbsname</a>&gt;
+<a href="index.php?a=forum&fid=$fid">$forumName</a>
+</div>
+<div class="post_title">主题：<a href="index.php?a=read&tid=$tid"><strong>$rt[subject] </strong></a></div>
+<!--
+EOT;
+if(empty($action)){print <<<EOT
+-->
+<div class="post_content">
+回帖：$ht[content]<br />
+$ht[aidimgs]
+<div class="post_author"><a href="index.php?a=myhome&uid=$ht[authorid]">$ht[author]</a>回帖于$ht[postdate]</div>
+</div>
+<div class="pages">
+$ht[yxqw]
+</div>
+<!--
+EOT;
+if($ht[aidatts]){
+     foreach($ht[aidatts] as $attach){
+         if($attach){
+             if($attach['descrip']){print <<<EOT
+-->
+					描述:$attach[descrip]<br />
+<!--
+EOT;
+                 }
+             $att_id = $db_attfg ? "id=\"fg_$attach[aid]\"" : '';print <<<EOT
+-->
+						附件: <img src="{$imgpath}/wind/file/$attach[type].gif" align="absmiddle" />
+						<a $att_id href="index.php?a=job&action=download&amp;aid=$attach[aid]&amp;tid=$tid" > <font color="red">$attach[name]</font></a>
+						($attach[size] K) 下载次数:$attach[hits]
+<!--
+EOT;
+             if ($attach['needrvrc']){
+                 $at_lang = $attach['special'] == 2 ? '售价' : '需要';
+                print <<<EOT
+-->
+						该附件被加密,需要{$attach[needrvrc]}{$attach[cname]}以上积分才能下载
+<!--
+EOT;
+                 }print <<<EOT
+-->
+			<br/>
+<!--
+EOT;
+            }
+    }
+}
+print <<<EOT
+-->
+<div class="editit">
+<!--
+EOT;
+if($editright){
+print <<<EOT
+-->
+<a href="index.php?a=reply&tid=$tid&pid=$ht[pid]&action=modify">编辑</a>
+<!--
+EOT;
+}
+if($delright){print <<<EOT
+-->
+&middot;<a href="index.php?a=mawhole&fid=$fid&seltid=$tid&selpid=$ht[pid]">删除</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+</div>
+<div class="post_reply">
+<!--
+EOT;
+if($nextr['pid'] != 0){print <<<EOT
+-->
+<a href="index.php?a=reply&tid=$tid&amp;pid=$nextr[pid]">下一楼&#8250;</a>：$nextr[content]<span class="post_author">(<a href="index.php?a=myhome&uid=$nextr[authorid]">$nextr[author]</a>)</span><br />
+<!--
+EOT;
+    }
+if($prer['pid'] != 0){print <<<EOT
+-->
+<a href="index.php?a=reply&tid=$tid&amp;pid=$prer[pid]">&#8249;上一楼</a>：$prer[content]<span class="post_author">(<a href="index.php?a=myhome&uid=$prer[authorid]">$prer[author]</a>)</span>
+<!--
+EOT;
+    }print <<<EOT
+-->
+</div>
+<div class="post_reply">
+<!--
+EOT;
+include printWAP('quickreply');print <<<EOT
+-->
+<a href="index.php?a=reply_all&tid=$tid">查看全部回帖($replies) </a></div>
+<!--
+EOT;
+}elseif($action == 'modify'){print <<<EOT
+-->
+<div class="quick_reply">
+  <form action="index.php?a=reply&action=modify" method="post" id="reply">
+  <input type="hidden" name="tid" value="$tid"/>
+  <input type="hidden" name="step" value="2"/>
+  <input type="hidden" name="pid" value="$pid"/>
+    <p>
+      <label>
+        <input type="text" maxlength="2000" size="30" value="$reply[content]" id="content" name="content">
+      </label>
+      <label>
+        <input type="submit" value="修 改" id="button" name="button">
+      </label>
+    </p>
+  </form>
+</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+<div class="return"><a href="index.php?a=read&tid=$tid">&laquo;返回主帖</a></div>
+<!--
+EOT;
+?>-->

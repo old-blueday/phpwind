@@ -174,7 +174,7 @@ EOT;
 }elseif($action == 'weibo'){
 print <<<EOT
 -->
-<script language="JavaScript" src="js/date.js"></script>
+<script type="text/javascript" src="js/date.js"></script>
 <form method="POST" action="$basename&action=weibo">
   <h2 class="h1">新鲜事搜索</h2>
   <div class="admin_table mb10">
@@ -294,7 +294,7 @@ EOT;
     <span class="btn"><span><button type="submit" onclick="return checkdel();">删除</button></span></span>
    </div>
 </form>
-<script language="JavaScript">
+<script>
 function checkdel(){
 	if(confirm("确定要删除所选记录吗？" )){
 		return true;
@@ -425,7 +425,7 @@ EOT;
 }elseif($action == 'comment'){
 print <<<EOT
 -->
-<script language="JavaScript" src="js/date.js"></script>
+<script type="text/javascript" src="js/date.js"></script>
 <form method="POST" action="$basename&action=comment">
   <h2 class="h1">评论搜索</h2>
   <div class="admin_table mb10">
@@ -517,7 +517,7 @@ EOT;
     <span class="btn"><span><button type="submit" onclick="return checkdel();">删除</button></span></span>
    </div>
 </form>
-<script language="JavaScript">
+<script>
 function checkdel(){
 	if(confirm("确定要删除所选记录吗？" )){
 		return true;

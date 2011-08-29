@@ -60,7 +60,13 @@ if ($job == 'preview') {//帖子预览
 		'3' => getLangInfo('other','act_ifpay_3'),
 		'4' => getLangInfo('other','act_ifpay_4'),
 	);
-
+	
+	if ($db_charset == 'utf-8' || $db_charset == 'big5'){
+			foreach($ifpaydb as $key => $value) {
+				$ifpaydb[$key] = pwConvert($value,'gbk',$db_charset);
+			}
+	}
+	
 	$payMemberNums = $orderMemberNums = 0;
 	$query = $db->query("SELECT signupnum,ifpay FROM pw_activitymembers WHERE fupid=0 AND tid=" . S::sqlEscape($tid));
 	while ($rt = $db->fetch_array($query)) {
@@ -240,7 +246,6 @@ function getCurrentOnlineUser() {
 	global $db_online, $ol_offset, $db;
 	if (empty($db_online)) {
 		$userdb = explode("\t", getuserdb(D_P . "data/bbscache/online.php", $ol_offset));
-		writeover('data/ssss.txt', "\r\n3333".print_r($_COOKIE, true),'ab+');
 		return $userdb ? array('uid' => $userdb[8], 'ip' => $userdb[2]) : array();
 	} else {
 		//* $olid = (int)GetCookie('olid');

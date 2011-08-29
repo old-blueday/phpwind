@@ -12,7 +12,6 @@ function AjaxObj() {
 		if (typeof data == 'string' && data != '') {
 			var f = document.createElement('form');
 			f.name	 = 'ajaxform';
-			//f.target = 'ajaxiframe';
 			f.target = n;
 			f.method = 'post';
 			f.action = url;
@@ -30,6 +29,7 @@ function AjaxObj() {
 			document.body.insertBefore(f,document.body.childNodes[0]);
 			f.submit();
 			document.body.removeChild(f);
+			
 		} else if (typeof data == 'object') {
 			var s = data.getAttribute('action');
 			if (typeof s == 'object') {
@@ -43,12 +43,12 @@ function AjaxObj() {
 			data.target = n;
 			data.submit();
 		} else {
-			self.frames[n].location.replace(url);//让iframe没有浏览历史
+			self.frames&&self.frames[n].location.replace(url);//让iframe没有浏览历史
 			//this.iframe.src=url;
 		}
 	}
 	this.clearhistroy = function() {
-		self.frames[n].location.replace('about:blank');
+		self.frames&&self.frames[n].location.replace('about:blank');
 	}
 }
 function XMLhttp() {
@@ -92,22 +92,30 @@ XMLhttp.prototype = {
 	},
 
 	load : function() {
-		try{
-			ajax.request.responseText = ajax.request.iframe.contentWindow.document.documentElement.textContent;
-			if (typeof ajax.request.responseText == 'undefined'){
-				ajax.request.responseText = (typeof ajax.request.iframe.contentWindow.document.XMLDocument != 'undefined') ? ajax.request.iframe.contentWindow.document.XMLDocument.text : null;
-			}
-			if(!ajax.request.responseText){
-				var txt = ajax.request.iframe.contentWindow.document.documentElement.innerText;
-				var rules = /<!\[CDATA\[([\s\S]+)\]\]>/.exec(txt);
-				if(rules && rules[1]){
-					ajax.request.responseText = rules[1];
-				}
-			}
-		}catch(e){
-			
-			ajax.request.responseText = (typeof ajax.request.iframe.contentWindow.document.XMLDocument != 'undefined') ? ajax.request.iframe.contentWindow.document.XMLDocument.text : null;
+		if(!ajax.request.iframe.contentWindow){
+			return false;
 		}
+		var _innerText=ajax.request.iframe.contentWindow.document.documentElement.innerText;
+		var _textContent=ajax.request.iframe.contentWindow.document.documentElement.textContent;
+		if(_innerText==undefined&&_textContent==undefined){
+			return false;
+		}
+		if(-[1,]){
+				ajax.request.responseText=_textContent;
+		}else{
+				var rules = /<!\[CDATA\[([\s\S]+)\]\]>/.exec(_innerText);
+				if(rules && rules[1]){
+					ajax.request.responseText=rules[1].replace(/^\s+|\s+$/g,'');
+				}else{
+					var xmlDoc=ajax.request.iframe.contentWindow.document.XMLDocument;
+					if(xmlDoc){
+						ajax.request.responseText=xmlDoc.text;
+					}else{
+						ajax.request.responseText=_innerText;
+					}
+				}
+		}
+		
 		if (ajax.request.iframe.detachEvent) {
 			ajax.request.iframe.detachEvent('onload',ajax.load);
 		} else {
@@ -134,16 +142,39 @@ XMLhttp.prototype = {
 		closep();
 	},
 
-	get : function(newread,border) {
+	get : function(newread,border,cb,focus) {
 		var temp = newread ? newread : read;
-		if (ajax.request.responseText != null && ajax.request.responseText.indexOf('<') != -1) {
+		var no_run_script = false;
+		if (ajax.request.responseText.indexOf('NO_RUN_SCRIPT') == 0){
+			ajax.request.responseText = ajax.request.responseText.substring(13);
+			no_run_script = true;
+		}
+		if (ajax.request.responseText != null && ajax.request.responseText.indexOf('<') != -1 && !no_run_script) {
 			temp.setMenu(this.runscript(ajax.request.responseText), '', border);
 			temp.menupz(temp.obj);
-			try{temp.menu.getElementsByTagName("input")[1].focus();}catch(e){}
+			if(cb){
+				cb();
+			}
+			//聚焦
+			if(focus){
+				try{
+				var inputs=temp.menu.getElementsByTagName("input");
+				for(var i=0,len=inputs.length;i<len;i++){
+					var _input=inputs[i];
+					if(_input.type=="text" && !_input.disabled && _input.style.display != 'none'){
+						setTimeout(function(){
+							_input.focus();
+						},100)
+						return;
+					}
+				}
+				}catch(e){}
+			}
 		} else {
 			closep();
 			ajax.guide();
 		}
+		
 	},
 
 	runscript : function (html) {
@@ -237,15 +268,14 @@ XMLhttp.prototype = {
 
 var ajax = new XMLhttp();
 
-function sendmsg(url,data,id) {
-	read.obj = (typeof id == 'undefined' || !id) ? null : getObj(id);
+function sendmsg(url,data,id,callback) {//callback 07-05扩展,用来执行html生成之后的回调,不影响之前代码
+	read.obj = (!!id&&typeof id === 'string') ? getObj(id) :(typeof id=="object")?id:null;
 	read.guide();
-	setTimeout(function(){ajax.send(url,data,ajax.get);},100);
+	setTimeout(function(){ajax.send(url,data,function(){
+		ajax.get();
+		callback && callback();
+	});},100);
 }
-function getObj(id) {
-	return document.getElementById(id);
-}
-$=getObj;
 function objCheck(obj) {
 	if (typeof(obj)=='string') {
 		obj	= getObj(obj);

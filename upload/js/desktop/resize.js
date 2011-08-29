@@ -11,7 +11,7 @@ function()
     var IE = Doc.all;
     var resize_down = false;
 	
-    var $ = function(s)
+    var getObj = function(s)
     {
         return Doc.getElementById(s);
     };
@@ -32,7 +32,7 @@ function()
         minRange = jsonArg.min;
         var max = maxRange ? [maxRange[0], maxRange[1]] : [];
         var min = minRange ? [minRange[0], minRange[1]] : [];
-		if (!$('cover_drag_div'))
+		if (!getObj('cover_drag_div'))
 		{
 			var cover = document.createElement("DIV");
 			with(cover.style)
@@ -49,7 +49,7 @@ function()
 			cover.id = "cover_drag_div";
 			ROOT.appendChild(cover);
 		}
-		var cover = $('cover_drag_div');
+		var cover = getObj('cover_drag_div');
         var ghost = resizeobj.cloneNode("");
         ROOT.appendChild(ghost);
         ghost.style.display = "none";
@@ -177,7 +177,7 @@ function()
                 });
 
             }
-			$('cover_drag_div').style.display = "none";
+			getObj('cover_drag_div').style.display = "none";
             ROOT.style.cursor = "default";
             ghost.style.display = "none";
             resize_down = false;
@@ -208,7 +208,7 @@ function()
                 IE ? filter = "alpha(opacity=50)": opacity = 0.5;
             }
 			setTimeout(function(){window.drag?drag.setTop(ghost)+(cover.style.zIndex = parseInt(ghost.style.zIndex) - 1):0;},50);
-			$('cover_drag_div').style.display = "";
+			getObj('cover_drag_div').style.display = "";
             _wh = {
                 width: ghost.offsetWidth,
                 height: ghost.offsetHeight

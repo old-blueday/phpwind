@@ -222,14 +222,27 @@ if (empty($_POST['step'])) {
 	$htmlpost = $attachHide = ($pwforum->foruminfo['allowhide'] && $_G['allowhidden']) ? '' : 'disabled';
 	$ifanonymous= ($pwpost->isGM || $pwforum->forumset['anonymous'] && $_G['anonymous']) ? '' : 'disabled';
 	$groupid   == 'guest' && $userrvrc = 0;
-	$atc_title  = $atc_content = $ifmailck = $selltype = $enhidetype = $alltype = '';
-	$sellCredit = $enhideCredit = array();
+	$atc_title  = $atc_content = $ifmailck = $selltype = $enhidetype = $alltype = $replyrewardcredit = '';
+	$sellCredit = $enhideCredit = $customCreditValue = $userAllCredits = array();
 
 	$attachAllow = pwJsonEncode($db_uploadfiletype);
 	$imageAllow = pwJsonEncode(getAllowKeysFromArray($db_uploadfiletype, array('jpg','jpeg','gif','png','bmp')));
+	
+	if (S::inArray($action, array('new', 'modify')) && $_G['allowreplyreward'] && S::isArray($_CREDITDB)) {
+		$customCreditValue = $credit->get($winduid, 'CUSTOM');
+	}
 	foreach ($credit->cType as $key => $value) {
+		if (S::inArray($action, array('new', 'modify')) && $_G['allowreplyreward'] && ($winddb[$key] || $customCreditValue[$key])) {
+			$replyrewardcredit .= "<option value=\"$key\">" . $value . "</option>";
+			$userAllCredits['c' . $key] = array(
+				$winddb[$key] ? ($key == 'rvrc' ? $winddb[$key] / 10 : $winddb[$key]) : $customCreditValue[$key],
+				$value,
+				$credit->cUnit[$key]
+			);
+		}
 		$alltype .= "<option value=\"$key\">".$value."</option>";
 	}
+	$userAllCredits && $userAllCredits = pwJsonEncode($userAllCredits);
 	foreach ($db_sellset['type'] as $key => $value) {
 		$selltype .= "<option value=\"$value\">".$credit->cType[$value]."</option>";
 		$sellCredit[$value] = $credit->cType[$value];
@@ -244,19 +257,11 @@ if (empty($_POST['step'])) {
 
 	require_once(R_P.'require/showimg.php');
 	list($postFaceUrl) = showfacedesign($winddb['icon'],1,'m');
-	/**
-	* 标题表情
-	*/
-	/*$icondb = array(
-		'1'=>'1.gif',	'2'=>'2.gif',
-		'3'=>'3.gif',	'4'=>'4.gif',
-		'5'=>'5.gif',	'6'=>'6.gif',
-		'7'=>'7.gif',	'8'=>'8.gif'
-	);*/
+
 	$icondb = array();
 	if ($db_threademotion) {
 		$emotion = @opendir(S::escapeDir("$imgdir/post/emotion"));
-		while ($emotionimg = @readdir($emotion)) {
+		while (($emotionimg = @readdir($emotion)) !== false) {
 			if ($emotionimg != "." && $emotionimg != ".." && $emotionimg != "" && preg_match("/^(\d+)\.(gif|jpg|png|bmp)$/i", $emotionimg, $emotionMatch)) {
 				$icondb[$emotionMatch[1]] = $emotionimg;
 			}
@@ -265,7 +270,15 @@ if (empty($_POST['step'])) {
 		@closedir($emotion);
 	}
 
+	//multiple post types
+	if ($foruminfo['allowtype'] && (($foruminfo['allowtype'] & 1) || ($foruminfo['allowtype'] & 2 && $_G['allownewvote']) || ($foruminfo['allowtype'] & 4 && $_G['allowactive']) || ($foruminfo['allowtype'] & 8 && $_G['allowreward'])|| ($foruminfo['allowtype'] & 16) || $foruminfo['allowtype'] & 32 && $_G['allowdebate'])) {
+		$N_allowtypeopen = true;
+	} else {
+		$N_allowtypeopen = false;
+	}
+	
 } else {
+	if ($db_cloudgdcode && defined('AJAX') && S::inArray($action, array('reply', 'quote'))) $keepCloudCaptchaCode = true;
 	PostCheck(1, ($db_gdcheck & 4) && (!$db_postgd || $winddb['postnum'] < $db_postgd), ($db_ckquestion & 4 && (!$postq || $winddb['postnum'] < $postq) && $db_question));
 	!$windid && $windid = '游客';
 	/*

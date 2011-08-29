@@ -14,7 +14,7 @@ print<<<EOT
     </div>
 </div>
 </td><td class="pobg2"></td></tr><tr><td class="bgcorner4"></td><td class="pobg3"></td><td class="bgcorner3"></td></tr></tbody></table></div>
-<script language="javascript">
+<script>
 function applyUrl(addUrlCallback) {
 	var urlContainerObj = getObj('urlContainer');
 	var sumbitUrl = getObj('sumbitUrl');
@@ -22,9 +22,13 @@ function applyUrl(addUrlCallback) {
 	urlContainerObj.getElementsByTagName('a')[0].onclick = function() {displayElement('urlContainer', false);};
 	sumbitUrl.onclick = function() {
 		var codeText = text.value + ' ';
+		if (codeText.indexOf('http://') == -1) {
+			showDialog('error','链接地址出错，链接地址必须以:http://开头');
+			return false;
+		}
 		var preg = /^http\:\/\/.{4,255}$/;
 		if (!preg.test(codeText)) {
-			showDialog('error','链接地址出错，链接地址必须以:http://开头');
+			showDialog('error','链接地址出错，请输入正确的链接地址');
 			return false;
 		}
 		addUrlCallback(codeText);

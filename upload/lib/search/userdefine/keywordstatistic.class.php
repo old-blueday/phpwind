@@ -33,7 +33,7 @@ class PW_KeywordStatistic {
 	}
 	
 	function _writeover() {
-		$this->_keyword = $this->_filterCheckKeyword($this->_keyword);
+		$this->_keyword = trim($this->_filterCheckKeyword($this->_keyword));
 		if (!$this->_keyword) return false;
 		writeover($this->_filePath, $this->_parsetxt($this->_keyword), 'ab+');
 		return true;
@@ -55,7 +55,7 @@ class PW_KeywordStatistic {
 		$nowtime = PwStrtoTime(get_date($this->_timestamp,'Y-m-d'));
 		$sql = array();
 		foreach ($data as $key => $val) {
-			$key = $this->_filterCheckKeyword($key);
+			$key = trim($this->_filterCheckKeyword($key));
 			if (!$key) continue;
 			$sql[] = array($key,$val,$nowtime);
 			if(++$count>1000) break;
@@ -88,6 +88,6 @@ class PW_KeywordStatistic {
 
 	function _parsetxt($txt) {	
 		$txt = (!$this->_filePath || !$this->_fileSize) ? "<?php die;?>\n".$txt : $txt;
-		return $txt."\t";
+		return trim($txt)."\t";
 	}
 }

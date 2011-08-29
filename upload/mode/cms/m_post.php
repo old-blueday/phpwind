@@ -9,7 +9,7 @@ cmsSeoSettings();
 
 if (!$action) {
 	if (!$step) {
-		$pagePosition = $cms_sitename ? "<a href='index.php?m=cms'>$cms_sitename</a>":'<a href="index.php?m=cms">首页</a>';
+		$pagePosition = $cms_sitename ? "<a href='index.php?m=cms'>$cms_sitename</a>":'<a href="index.php?m=cms">资讯</a>';
 		S::gp(array('sourcetype', 'sourceid'));
 		$columnService = C::loadClass('columnservice');
 		/* @var $columnService PW_columnService */
@@ -74,6 +74,7 @@ if (!$action) {
 			$cname = $columnService->getColumnNameByCIds($cid);
 			$weiboService = L::loadClass('weibo','sns');/* @var $weiboService PW_Weibo */
 			$weiboContent = substrs(stripWindCode($weiboService->escapeStr($articleModule->descrip)), 125);
+		//	print_r ($weiboContent);exit;
 			$weiboExtra = array(
 							'title' => stripslashes($cms_subject),
 							'cid' => $cid,

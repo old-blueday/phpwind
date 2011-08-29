@@ -436,9 +436,8 @@ EOT;
     <span class="btn"><span><button type="submit">提 交</button></span></span>
   </div>
 </form>
-<script language="JavaScript" src="js/pw_ajax.js"></script>
-<script language="JavaScript" src="js/global.js"></script>
-<script language="JavaScript">
+<script type="text/javascript" src="js/pw_ajax.js"></script>
+<script type="text/javascript">
 
 function setSecondstyle(id) {
 	var jsStyle = JSONParse('$jsStyle');
@@ -493,10 +492,8 @@ EOT;
 	<li><a href="$admin_file?adminjob=apps&admintype=groups_manage" onclick="openNewUrl('groups_manage','群组管理',this.href);return false;">内容管理</a></li>
 </ul>
 </div>
-<link rel="stylesheet" type="text/css" href="images/post/minieitor/minieitor.css" />
-<script type="text/javascript" LANGUAGE="JavaScript" src="js/core/core.js"></script>
-<script type="text/javascript" LANGUAGE="JavaScript" src="js/global.js"></script>
-<script type="text/javascript" LANGUAGE="JavaScript" src="js/mini_editor.js"></script>
+<link rel="stylesheet" href="images/post/minieitor/minieitor.css" />
+<script type="text/javascript" src="js/mini_editor.js"></script>
 <form action="$basename&" method="post" enctype="multipart/form-data">
   <input type="hidden" name="action" value="editcolony" />
   <input type="hidden" name="cyid" value="$cyid" />
@@ -570,7 +567,7 @@ EOT;
 	  </td>
 		<td class="td2"></td>
     </tr>
-<script language="javascript">
+<script type="text/javascript">
 	function onchage() {
 		if ( getObj('cid').value != 0) {
 			getObj('showforums').style.display = '';
@@ -740,8 +737,8 @@ EOT;
     <span class="btn"><span><button type="submit">保存设置</button></span></span>
    </div>
 </form>
-<script LANGUAGE="JavaScript" src="js/pw_ajax.js"></script>
-<script language="JavaScript">
+<script type="text/javascript" src="js/pw_ajax.js"></script>
+<script type="text/javascript">
 function addtbody(mode,tbody){
 	if (getObj(mode)) {
 		var s = getObj(mode).firstChild.cloneNode(true);
@@ -910,7 +907,7 @@ EOT;
     <span class="btn"><span><button type="submit">删除</button></span></span>
    </div>
 </form>
-<script language=JavaScript>
+<script type="text/javascript">
 function CheckAll(form,len){
 	for (var i=0;i<form.elements.length-len;i++){
 		var e = form.elements[i];
@@ -946,8 +943,6 @@ if (empty($job)) {print <<<EOT
         <li><a href="$basename&action=level&job=sort">群组等级统计</a></li>
     </ul>
 </div>
-<script type="text/javascript" src="js/pw_ajax.js"></script>
-<script type="text/javascript" src="js/global.js"></script>
 <form action="$basename&action=level&" method="post">
 	<input type="hidden" name="job" value="add" />
 	<input type="hidden" name="ltype" value="common" />
@@ -1544,7 +1539,7 @@ EOT;
 	</ul>
 </div>
 
-<script language="JavaScript" src="js/date.js"></script>
+<script type="text/javascript" src="js/date.js"></script>
 <form action="$basename&action=argument" method="post" name="FORM">
   <h2 class="h1">帖子搜索</h2>
   <div class="admin_table mb10">
@@ -1616,7 +1611,7 @@ EOT;
     <span class="btn"><span><button type="submit">提 交</button></span></span>
   </div>
 </form>
-<script language="JavaScript">
+<script type="text/javascript">
 function seltable(v) {
 	getObj('table_1').style.display = (v == 1) ? '' : 'none';
 	getObj('table_2').style.display = (v == 2) ? '' : 'none';
@@ -1735,7 +1730,7 @@ if ($job == 'edit'){print <<<EOT
 EOT;
 }else{print <<<EOT
 -->
-<script language="JavaScript" src="js/date.js"></script>
+<script type="text/javascript" src="js/date.js"></script>
 <form action="$basename&action=album&" method="post">
   <h2 class="h1">相册搜索</h2>
   <div class="admin_table mb10">
@@ -1804,11 +1799,19 @@ EOT;
 </form>
 <script type="text/javascript">
 getObj('advanceSearchButton').onclick = function() {
-	displayElement('advanceSearchBody','advanceSearchButton');
+	displayElementConflict('advanceSearchBody','advanceSearchButton');
 	if(getObj('searchDisplay')){
 		getObj('searchDisplay').value = getObj('advanceSearchBody').style.display;
 	}
 };
+function displayElementConflict(elementId,buttonId,isDisplay) {
+	if (undefined == isDisplay && typeof buttonId === 'string') {
+		getObj(elementId).style.display = getObj(elementId).style.display == 'none' ? '' : 'none';
+		getObj(buttonId).innerHTML = getObj(elementId).style.display == ''? '简单搜索' : '高级搜索';
+	} else {
+		getObj(elementId).style.display = isDisplay ? '' : 'none';
+	}
+}
 </script>
 
 <form action="$basename&action=album&" method="post" name="FORM">
@@ -1907,7 +1910,7 @@ EOT;
     </ul>
 </div>
 
-<script language="JavaScript" src="js/date.js"></script>
+<script type="text/javascript" src="js/date.js"></script>
 <form action="$basename&action=photos&" method="post">
   <h2 class="h1">照片搜索</h2>
   <div class="admin_table mb10">
@@ -2034,7 +2037,7 @@ EOT;
 EOT;
 } elseif ($action=='style'){print <<<EOT
 -->
-<script language="JavaScript">
+<script type="text/javascript">
 function addSubType(id) {
 	var inputs = getObj('t_sub_mode').getElementsByTagName('input');
 	inputs[0].name = "new_t_sub_view_db\["+id+"\]\[\]";
@@ -2150,7 +2153,7 @@ EOT;
 	</ul>
 </div>
 
-<script language="JavaScript" src="js/date.js"></script>
+<script type="text/javascript" src="js/date.js"></script>
 <form method="POST" action="$basename&action=write">
   <h2 class="h1">记录搜索</h2>
   <div class="admin_table mb10">
@@ -2206,9 +2209,6 @@ EOT;
    </div>
 </form>
 
-<script type="text/javascript" src="js/core/core.js"></script>
-<script type="text/javascript" src="js/pw_ajax.js"></script>
-<script type="text/javascript" src="js/global.js"></script>
 <form action="$basename&action=$action&" method="post" name="FORM">
 <input type="hidden" name="job" value="del" />
 <input type="hidden" name="step" value="3" />
@@ -2289,7 +2289,7 @@ EOT;
 </ul>
 </div>
 
-<script language="JavaScript" src="js/date.js"></script>
+<script type="text/javascript" src="js/date.js"></script>
 <form method="post" action="{$basename}&action=$action">
 <h2 class="h1">活动搜索</h2>
 <div class="admin_table mb10">
@@ -2346,10 +2346,6 @@ EOT;
 	<span class="btn"><span><button type="submit">提 交</button></span></span>
 </div>
 </form>
-
-<script type="text/javascript" src="js/core/core.js"></script>
-<script type="text/javascript" src="js/pw_ajax.js"></script>
-<script type="text/javascript" src="js/global.js"></script>
 <form action="$basename&action=$action&" method="post" name="FORM">
 <input type="hidden" name="job" value="del" />
 <input type="hidden" name="step" value="3" />

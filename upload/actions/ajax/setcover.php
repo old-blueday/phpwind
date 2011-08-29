@@ -11,7 +11,7 @@ if (!S::isArray($attachInfo) || $attachInfo['type'] != 'img' || !$attachInfo['ti
 
 $tucoolService = L::loadClass('tucool','forum');
 
-if ($tucoolService->setCover($attachInfo['tid'],$attachInfo['attachurl'])){
+if ($tucoolService->setCover($attachInfo['tid'],$attachInfo['attachurl'],$attachInfo['ifthumb'])){
 	echo "success";
 	ajax_footer();
 }

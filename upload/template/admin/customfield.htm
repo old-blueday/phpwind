@@ -4,8 +4,6 @@ include_once PrintEot('left');
 ${$adminitem} = 'class="current"';
 print <<<EOT
 -->
-<script type="text/javascript" language="JavaScript" src="js/global.js"></script>
-<script type="text/javascript" language="JavaScript" src="js/pw_ajax.js"></script>
 <div class="nav3 mb10 ta">
     <ul class="cc">
       <li $customfield><a href="$basename&adminitem=customfield">用户资料</a></li>
@@ -62,7 +60,7 @@ if ($value['title'] == '生日') {
 }
 $value['required'] && $checkrequired = 'checked';
 $value['editable'] && $checkeditable = 'checked';
-$managetip = $value['ifsys'] ? '编辑|删除' : "<a href=\"$basename&adminitem=customfield&action=edit&id=$value[id]\" >编辑</a>|<a href=\"$basename&adminitem=customfield&action=del&selid=$value[id]\">删除</a>";
+$managetip = $value['ifsys'] ? '系统默认' : "<a href=\"$basename&adminitem=customfield&action=edit&id=$value[id]\" >编辑</a>|<a href=\"$basename&adminitem=customfield&action=del&selid=$value[id]\">删除</a>";
 print <<<EOT
 -->
         <tr class="tr1">
@@ -310,7 +308,7 @@ function changeType(id) {
 }
 changeType('selecttype');
 </script>
-<script type="text/javascript" language="JavaScript" src="js/pw_areas.js"></script>
+<script type="text/javascript" src="js/pw_areas.js"></script>
 <!--
 EOT;
 }} elseif ($adminitem == 'guide'){
@@ -342,7 +340,7 @@ print <<<EOT
 	<span class="bt"><span><button type="button" onClick="previewContent('preview');">预 览</button></span></span>
 </div>
 </form>
-<script language="javascript">
+<script type="text/javascript">
 var url = "$basename&adminitem=guide";
 function previewContent(type) {
 	if (type == 'preview') {
@@ -400,10 +398,10 @@ $allAreas
 
 </div>
 </form>
-<script type="text/javascript" language="JavaScript" src="js/pw_areas.js"></script>
-<script language="JavaScript" src="js/app_global.js"></script>
-<script language="javascript">
-var ajaxurl = '$ajaxurl';
+<script type="text/javascript" src="js/pw_areas.js"></script>
+<script type="text/javascript" src="js/app_global.js"></script>
+<script type="text/javascript">
+var ajaxurlarea = '$ajaxurl';
 countrySelect('$parentid','');
 </script>
 <!--
@@ -412,9 +410,9 @@ EOT;
 print <<<EOT
 -->
 
-<script language="JavaScript" src="js/app_global.js"></script>
-<script language="javascript">
-var ajaxurl = '$ajaxurl';
+<script type="text/javascript" src="js/app_global.js"></script>
+<script type="text/javascript">
+var ajaxurlarea = '$ajaxurl';
 function areasSelect(parentid,type,hasFirst,createsObj){
 	changeSubArea(parentid,type,hasFirst);
 	getObj('add_'+createsObj).style.display = 'none';
@@ -682,7 +680,7 @@ $allAreas
 </div>
 </div>
 </form>
-<script type="text/javascript" language="JavaScript" src="js/pw_areas.js"></script>
+<script type="text/javascript" src="js/pw_areas.js"></script>
 <script>
 
 </script>
@@ -696,11 +694,11 @@ print <<<EOT
 <!doctype html>
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=$db_charset" />
+<meta charset="$db_charset" />
 <title>phpwind - Powered by phpwind</title>
 <meta name="description" content="" />
 <meta name="keywords" content="" />
-<link rel="stylesheet" type="text/css" href="$imgpath/pw_core.css?101128" media="all" />
+<link rel="stylesheet" href="$imgpath/pw_core.css?{$GLOBALS['wind_repair']}" />
 <!--css-->
 <style type="text/css"> 
 /*Spacing*/

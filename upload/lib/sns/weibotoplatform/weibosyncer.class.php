@@ -23,6 +23,18 @@ class PW_WeiboSyncer {
 		return isset($isSuccess->result) && $isSuccess->result;
 	}
 	
+	
+	function shareContent($userId, $content, $photo = null) {
+		if ($userId < 1 || empty($content)) return false;
+		$sinaWeiboContentTranslator = L::loadClass('SinaWeiboContentTranslator', 'sns/weibotoplatform/');
+		$content = $sinaWeiboContentTranslator->commonTranslate($content);
+		$data = array('siteUserId'=>$userId, 'content'=>$content, 'photo'=>$photo);
+		//return true;
+		$platformApiClient = $this->_getPlatformApiClient();
+		$isSuccess = PlatformApiClientUtility::decodeJson($platformApiClient->post('weibo.sync.share', $data));
+		return isset($isSuccess->result) && $isSuccess->result;
+	}
+	
 	/**
 	 * 同步微博评论
 	 * 
@@ -65,8 +77,9 @@ class PW_WeiboSyncer {
 		$userId = intval($userId);
 		if ($userId <= 0) return null;
 		
-		$bindService = L::loadClass('weibobindservice', 'sns/weibotoplatform'); /* @var $bindService PW_WeiboBindService */
-		$bindUser = $bindService->getLocalBindInfo($userId, PW_WEIBO_BINDTYPE_SINA);
+		$userBindService = $this->_getUserBindService();
+		$bindUser = $userBindService->getABind($userId);
+		
 		$syncSetting = isset($bindUser['info']['syncSetting']) ? $bindUser['info']['syncSetting'] : null;
 		foreach ($this->_getUserWeiboSyncDefaultSetting() as $weiboContentType => $defaultRule) {
 			$syncSetting[$weiboContentType] = isset($syncSetting[$weiboContentType]) ? $syncSetting[$weiboContentType] : $defaultRule;
@@ -82,11 +95,11 @@ class PW_WeiboSyncer {
 	 * @return bool
 	 */
 	function updateUserWeiboSyncSetting($userId, $syncSetting) {
-		$bindService = L::loadClass('weibobindservice', 'sns/weibotoplatform'); /* @var $bindService PW_WeiboBindService */
-		$bindUser = $bindService->getLocalBindInfo($userId, PW_WEIBO_BINDTYPE_SINA);
+		$userBindService = $this->_getUserBindService();
+		$bindUser = $userBindService->getABind($userId);
 		$bindInfo = $bindUser['info'];
 		$bindInfo['syncSetting'] = $this->_checkUserWeiboSyncSettingItems($syncSetting);
-		return $bindService->updateBindInfo($userId, PW_WEIBO_BINDTYPE_SINA, $bindInfo);
+		return $userBindService->updateBindInfo($userId, $bindUser['weibotype'], $bindInfo);
 	}
 
 	
@@ -186,6 +199,13 @@ class PW_WeiboSyncer {
 			$client = new PlatformApiClient($db_sitehash, $db_siteownerid);
 		}
 		return $client;
+	}
+	
+	/**
+	 * @return PW_WeiboUserBindService
+	 */
+	function _getUserBindService() {
+		return L::loadClass('WeiboUserBindService', 'sns/weibotoplatform/service');
 	}
 }
 

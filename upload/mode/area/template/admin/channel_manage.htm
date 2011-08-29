@@ -9,8 +9,6 @@ print <<<EOT
 EOT;
 if(empty($action)) {print <<<EOT
 -->
-<script language="JavaScript" src="js/global.js"></script>
-<script language="JavaScript" src="js/pw_ajax.js"></script>
 <div class="admin_info mb10">
 	<h3 class="h1">提示信息</h3>
     <div class="legend">
@@ -164,7 +162,7 @@ EOT;
 }print <<<EOT
 -->
 </form>
-<SCRIPT LANGUAGE="JavaScript">
+<script>
 <!--
 	function delChannel(id) {
 		if(!confirm('删除频道将同时删除下属模块和历史推送数据，不可恢复，是否确认删除？')) {
@@ -223,7 +221,7 @@ EOT;
 		return true;
 	}
 //-->
-</SCRIPT>
+</script>
 <!--
 EOT;
 if($action !='add' && $action !='edit') {

@@ -399,7 +399,7 @@ class Search_Base {
 		if (!$data || !S::isArray($data)) return array(); 
 		if (!$this->_isBuildAttachs) return $data;
 		foreach ($data as $value) {
-			if (!$value['ifupload']) continue;
+			if (!$value['ifupload'] || $value['ifhide']) continue;
 			$_tids[] = $value['tid'];
 		}
 		if (!$_tids) return $data;

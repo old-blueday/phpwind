@@ -60,78 +60,83 @@ if ($action == 'cp') {
 			$noticeMessage = getLangInfo('cpmsg', 'noenough_condition');
 		} else {
 		
-		$sql = " WHERE 1";
-
-		if ($groupid) {
-			$groups = explode(",",$groupid);
-		}
-		if ($groups) {
-			$groupid = implode(",",$groups);
-			$sql .= " AND m.groupid IN(".S::sqlImplode($groups).")";
-		}
-
-		if ($author) {
-			$authorarray = explode(",",$author);
-			foreach ($authorarray as $value) {
-				$value = str_replace('*','%',$value);
-				$authorwhere .= " OR username LIKE ".S::sqlEscape($value,false);
+			$sql = " WHERE 1";
+	
+			if ($groupid) {
+				$groups = explode(",",$groupid);
 			}
-			$authorwhere = substr_replace($authorwhere,"",0,3);
-			$authorids = array('-99');
-			$query = $db->query("SELECT uid FROM pw_members WHERE $authorwhere");
-			while ($rt = $db->fetch_array($query)) {
-				$authorids[] = $rt['uid'];
+			if ($groups) {
+				$groupid = implode(",",$groups);
+				$sql .= " AND m.groupid IN(".S::sqlImplode($groups).")";
 			}
-			$sql .= " AND d.uid IN(".S::sqlImplode($authorids).")";
-		}
-
-		if ($keyword) {
-			$keyword = trim($keyword);
-			$keywordarray = explode(",",$keyword);
-			foreach ($keywordarray as $value) {
-				$value = str_replace('*','%',$value);
-				$keywhere .= 'OR';
-				$keywhere .= " d.content LIKE ".S::sqlEscape("%$value%")."OR d.subject LIKE ".S::sqlEscape("%$value%");
+	
+			if ($author) {
+				$author = trim($author);
+				if($author == '*'){
+					$sql .= " AND d.uid!=''";
+				} else {
+					$authorarray = explode(",",$author);
+					foreach ($authorarray as $value) {
+						$value = str_replace('*','%',$value);
+						$authorwhere .= " OR username LIKE ".S::sqlEscape($value,false);
+					}
+					$authorwhere = substr_replace($authorwhere,"",0,3);
+					$authorids = array('-99');
+					$query = $db->query("SELECT uid FROM pw_members WHERE $authorwhere");
+					while ($rt = $db->fetch_array($query)) {
+						$authorids[] = $rt['uid'];
+					}
+					$sql .= " AND d.uid IN(".S::sqlImplode($authorids).")";
+				}
 			}
-			$keywhere = substr_replace($keywhere,"",0,3);
-			$sql .= " AND ($keywhere) ";
-		}
+	
+			if ($keyword) {
+				$keyword = trim($keyword);
+				$keywordarray = explode(",",$keyword);
+				foreach ($keywordarray as $value) {
+					$value = str_replace('*','%',$value);
+					$keywhere .= 'OR';
+					$keywhere .= " d.content LIKE ".S::sqlEscape("%$value%")."OR d.subject LIKE ".S::sqlEscape("%$value%");
+				}
+				$keywhere = substr_replace($keywhere,"",0,3);
+				$sql .= " AND ($keywhere) ";
+			}
 
-		if ($postdate_s) {
-			$date1 = PwStrtoTime($postdate_s);
-			$sql.=" AND d.postdate>".S::sqlEscape($date1);
-		}
-		if ($postdate_e) {
-			$date2  = PwStrtoTime($postdate_e);
-			$sql.=" AND d.postdate<".S::sqlEscape($date2);
-		}
+			if ($postdate_s) {
+				$date1 = PwStrtoTime($postdate_s);
+				$sql.=" AND d.postdate>".S::sqlEscape($date1);
+			}
+			if ($postdate_e) {
+				$date2  = PwStrtoTime($postdate_e) + 86400;
+				$sql.=" AND d.postdate<".S::sqlEscape($date2);
+			}
 
-		$hits    && $sql.=" AND d.r_num<".S::sqlEscape($hits);
-		$replies && $sql.=" AND d.c_num<".S::sqlEscape($replies);
-		if ($tcounts) {
-			$sql .= " AND char_length(d.content)>".S::sqlEscape($tcounts);
-		} elseif ($counts) {
-			$sql .= " AND char_length(d.content)<".S::sqlEscape($counts);
-		}
-		
-		$sc != 'asc' && $sc = 'desc';
-		$order = /*$orderby ? " ORDER BY d.$orderby" : */" ORDER BY d.postdate $sc";
-		
-		(int)$page < 1 && $page = 1;
-		$limit = S::sqlLimit(($page-1)*$perpage,$perpage);
-
-		$query = $db->query("SELECT d.* FROM pw_diary d LEFT JOIN pw_members m ON d.uid=m.uid $sql $order $by $limit");
-		while($rt = $db->fetch_array($query)){
-			$rt['postdate'] = $rt['postdate'] ? get_date($rt['postdate']) : '-';
-			$diarydb[] = $rt;
-		}
-
-		$db->free_result($query);
-		@extract($db->get_one("SELECT COUNT(*) AS count FROM pw_diary d LEFT JOIN pw_members m ON d.uid=m.uid $sql"));
-		if ($count > $perpage) {
-			require_once(R_P.'require/forum.php');
-			$pages = numofpage($count,$page,ceil($count/$perpage),"$basename&action=$action&groupid=$groupid&author=$author&keyword=$keyword&postdate_s=$postdate_s&$postdate_e=$postdate_e&hits=$hits&replies=$replies&tcounts=$tcounts&counts=$counts&orderby=$orderby&sc=$sc&perpage=$perpage&searchDisplay=$searchDisplay&");
-		}
+			$hits    && $sql.=" AND d.r_num<".S::sqlEscape($hits);
+			$replies && $sql.=" AND d.c_num<".S::sqlEscape($replies);
+			if ($tcounts) {
+				$sql .= " AND char_length(d.content)>".S::sqlEscape($tcounts);
+			} elseif ($counts) {
+				$sql .= " AND char_length(d.content)<".S::sqlEscape($counts);
+			}
+			
+			$sc != 'asc' && $sc = 'desc';
+			$order = /*$orderby ? " ORDER BY d.$orderby" : */" ORDER BY d.postdate $sc";
+			
+			(int)$page < 1 && $page = 1;
+			$limit = S::sqlLimit(($page-1)*$perpage,$perpage);
+	
+			$query = $db->query("SELECT d.* FROM pw_diary d LEFT JOIN pw_members m ON d.uid=m.uid $sql $order $by $limit");
+			while($rt = $db->fetch_array($query)){
+				$rt['postdate'] = $rt['postdate'] ? get_date($rt['postdate']) : '-';
+				$diarydb[] = $rt;
+			}
+	
+			$db->free_result($query);
+			@extract($db->get_one("SELECT COUNT(*) AS count FROM pw_diary d LEFT JOIN pw_members m ON d.uid=m.uid $sql"));
+			if ($count > $perpage) {
+				require_once(R_P.'require/forum.php');
+				$pages = numofpage($count,$page,ceil($count/$perpage),"$basename&action=$action&groupid=$groupid&author=$author&keyword=$keyword&postdate_s=$postdate_s&postdate_e=$postdate_e&hits=$hits&replies=$replies&tcounts=$tcounts&counts=$counts&orderby=$orderby&sc=$sc&perpage=$perpage&searchDisplay=$searchDisplay&");
+			}
 		
 		}
 		

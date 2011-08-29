@@ -1,182 +1,7 @@
 <!--<?php
 print <<<EOT
---><style type="text/css">
-/*广播台*/
-.radio{height:140px;border:1px solid $tablecolor;background:#fff url($imgpath/bbsradio.png) left center no-repeat;min-width:800px;overflow:hidden;}
-.radioDl{padding:0 0 0 580px;margin:0;}
-.radioDl dt{margin:0 0 0 -540px;padding:0;}
-.radioDl dt .div{float:left;padding:13px 0 0 10px;}
-.radioDl dt .div p{ text-align:center;line-height:25px;}
-.radioUl {padding:7px 5px 0;}
-.radioUl li{line-height:24px;height:24px;font-size:12px;overflow:hidden;}
-.radioBg .view-hover,.radioBg .view-current{min-height:135px;_height:135px;}
-/*名片*/
-.card{border:1px solid #c0d8ea;width:433px;position:absolute;margin:-9px 0 0 -16px;background:#fff;-webkit-box-shadow:4px 4px 0 #e4e4e4;-moz-box-shadow:4px 4px 0 #e4e4e4;box-shadow:4px 4px 0 #e4e4e4;z-index:9;}
-.card a{color:#014c90;}
-.card dl{padding-right:10px;}
-.card dt{width:160px;overflow:hidden;}
-.card dt .face_img{margin:8px 15px;float:left;}
-.card dt p{padding-left:15px;}
-.card dd{width:260px;padding:5px 0;float:right;}
-.card dd li{height:23px;overflow:hidden;line-height:23px;}
-.card dd.ddA{border-bottom:1px dotted #ccc;}
-.card dd.ddA span{display:inline-block;width:60px;}
-.card dd.ddB{padding:10px 0;}
-.card dd.ddB a{padding-left:20px;margin-right:16px;}
-.half li{float:left;width:49.5%;}
-.face_img:hover{text-decoration:none;}
-/*帖子结构*/
-.floot_leftdiv{overflow:hidden;}
-.readCon_right{float:right;clear:right;padding-bottom:10px;margin-left:10px;}
-.tpc_content{/*float:left; clear:left;*/}
-.operTips{line-height:2;background:#fffeed;}
-/*帖子管理*/
-.readAdmin{border-top:1px solid $tablecolor;padding:5px 0;}
-.readAdmin a{float:left;line-height:20px;height:20px;padding:0 10px;border:1px solid $tablecolor;margin-right:5px;background:#fff;color:#666; cursor:pointer;}
-.readAdmin a:hover{ text-decoration:none;border:1px solid #de8a13;background:#fcfae3;color:#000;}
-/*楼层信息*/
-.readNum{overflow:hidden;}
-.readNum ul{padding:7px 0;margin-left:-1px;width:160px;}
-.readNum li{float:left;width:64px;padding-left:15px;border-left:1px solid #d8e5ea;line-height:14px;}
-.readNum li em{display:block; font-weight:700;padding-bottom:3px;}
-/*楼层直达*/
-.readStairs{padding-top:5px;}
-.readStairs span{line-height:22px;}
-.readStairs .input{width:20px;padding:1px;vertical-align:top}
-/*用户信息*/
-.readName{ font:bold 12px/18px Arial;padding:10px 0 0 15px;margin-bottom:-5px;}
-.readHonor{color:#666;margin:0 0 5px;line-height:18px;width:128px;}
-.readFace img{line-height:1;display:block;border:1px solid #e4e4e4;padding:3px;background:#fff;margin-bottom:3px;}
-.readFace p img{border:0; display:inline;}
-.readLevel{line-height:25px;}
-.readLevel img{display:block;}
-.readUser_info .one{padding:0 0 5px;}
-.readUser_info .one a{color:#666;}
-.readUser_info .one a:hover{border-bottom:1px solid #ccc;}
-.readUser_info dt{width:60px;float:left;margin-right:5px;}
-.readUser_info dd{float:left;width:70px;color:#666;}
-.readUser_info ul.two{line-height:18px;}
-.readUser_info ul.two li{float:left;width:49.5%;padding:2px 0;height:18px;}
-.readUser_info ul.two li a{display:block; text-indent:20px;}
-.add_mes{ background:url($imgpath/pwicon/add_mes.png) no-repeat;}
-.add_fol{ background:url($imgpath/pwicon/add_fol.png) no-repeat;}
-.add_adm{ background:url($imgpath/pwicon/add_adm.png) no-repeat;}
-.add_gag{ background:url($imgpath/pwicon/add_gag.png) no-repeat;}
-.add_fri{ background:url($imgpath/pwicon/add_fri.png) no-repeat;}
-.add_pro{ background:url($imgpath/pwicon/add_pro.png) no-repeat;}
-.add_home{ background:url($imgpath/pwicon/add_home.png) no-repeat;}
-/*楼主留言*/
-.louMes{width:300px;background:#f7fbff;border-left:4px solid #e8f0f7;padding:10px;line-height:1.5;margin:20px 0; font-size:12px;}
-/*主楼用户操作*/
-.userOper{ text-align:center;margin:0 0 10px;}
-.userOper a{border:1px solid $tablecolor;background:$forumcolortwo url($imgpath/$stylepath/read/userOper.gif) 8px 4px no-repeat;color:#333;line-height:24px;height:24px;padding:0 8px 0 28px;display:inline-block;color:#0082ca;-moz-border-radius:3px;-webkit-border-radius:3px;margin:0 1px; font-family:Simsun;}
-.userOper a:hover{ text-decoration:none;background-color:#eaf4fc;}
-.userOper a.r_keep{ background-position:7px -25px;}
-.userOper a.r_recommend{ background-position:8px -54px;}
-.userOper a.r_dig{ background-position:8px -85px;}
-/*关联主题*/
-.related h4{display:block;padding:5px 0;border-bottom:1px dashed #e4e4e4;}
-.related ul{padding:10px 0;border-bottom:1px dashed #e4e4e4;}
-/*floot ad*/
-.flootbg div{overflow:hidden;}
-.flootbg div img{float:left;}
-/*图片列表*/
-.imgList{margin:10px 0;}
-.imgList h4{height:25px;padding:0 10px 0 30px;line-height:25px;background:$forumcolortwo url($imgpath/$stylepath/file/img.gif) 10px center no-repeat;;border-top:1px solid $tablecolor;border-bottom:1px solid $tdcolor;}
-.imgList h4 a{color:#014c90;margin:0 3px;}
-.imgList h4 a.current{color:#333; font-weight:700;}
-.imgList ul{padding-top:10px;}
-.imgList li{float:left;width:20%;padding:0 0 10px;height:125px;overflow:hidden;}
-.imgList .tac img{ width:120px;height:120px;}
-.imgList li img{ cursor:pointer;}
-.imgList ul.one li{float:none;width:auto;height:auto;}
-.forbid{padding-left:20px;background:#fff url($imgpath/pwicon/forbid.png) 0 center no-repeat;line-height:20px;height:20px;display:inline-block;height:20px;position:absolute;right:0;_right:20px;top:0;color:#ff0000;}
-/*shareAll*/
-.shareAll{padding:0 12px;border:1px solid $tdcolor;background:$forumcolortwo;}
-.shareAll em{float:left;background:url($imgpath/$stylepath/breadEm.png) right center no-repeat;padding:5px 18px 5px 0;}
-.shareAll a{float:left;margin:6px 0 0 8px;width:16px;height:16px;display:block;overflow:hidden; text-indent:-2000em;background:url($imgpath/pwicon/shareAll.png) no-repeat;filter:alpha(opacity=80);-moz-opacity:0.8;opacity:0.8;}
-.shareAll a:hover{filter:alpha(opacity=100);-moz-opacity:1;opacity:1;}
-/*新幻灯片*/
-.pImg_wrap{position:absolute;z-index:1002;}
-.pImg{background:#ffffff;}
-.pImg_bg{position:absolute;background:#000;width:100%;height:100%;filter:alpha(opacity=50);-moz-opacity:0.5;opacity:0.5;left:0;right:0;top:0;bottom:0;z-index:1001;}
-.bcr1,.bcr2,.bcr3,.bcr4,.pibg1,.pibg2,.pibg3,.pibg4{overflow:hidden;z-index:1005;line-height:0 }
-.bcr1,.bcr2,.bcr3,.bcr4{width:5px;height:5px;background:url($imgpath/search/pImg.png) no-repeat;}
-.pibg1,.pibg2,.pibg3,.pibg4{ background:#ffffff;}
-.pibg1{height:5px;}
-.pibg2{width:5px;}
-.pibg3{height:5px;}
-.pibg4{width:5px;}
-.bcr1{ background-position:0 0;}
-.bcr2{ background-position:-5px 0;}
-.bcr3{ background-position:-5px -5px;}
-.bcr4{ background-position:0 -5px;}
-.pImg_close{background:url($imgpath/search/pImg_close.png);float:right;width:15px;height:15px;text-indent:-2000em;overflow:hidden;-webkit-transition: all 0.2s ease-out;margin:3px 0 0 0;display:inline;}
-.pImg_close:hover{background-position:0 -15px;}
-.imgLoading{overflow:hidden;position:relative;}
-.imgLoading img{display:block;width:100%;height:100%;}
-.aPre,.aNext{position:absolute;background:url($imgpath/blank.gif);width:45%;padding-bottom:5000px;margin-bottom:-5000px;}
-.aPre{cursor:url(u/images/pre.cur),auto;}
-.aNext{cursor:url(u/images/next.cur),auto;right:0;}
-</style><!--ads begin-->
-<!--[if IE]>
-<style type="text/css">
-.readUser_info .one dt{padding-top:1px;}
-</style>
-<![endif]-->
-<!--弹窗遮罩-->
-<!-- //start reply管理弹出 -->
-<div id="postbatch" style="display:none" class="popout">
-	<table cellspacing="0" cellpadding="0" border="0"><tbody><tr><td class="bgcorner1"></td><td class="pobg1"></td><td class="bgcorner2"></td></tr><tr><td class="pobg4"></td><td>
-		<div class="popoutContent">
-			<div>
-				<div class="popTop" style="cursor:move;" onmousedown = "read.move(event);">
-					<a href="javascript:void(0)" class="adel" onclick="closep()">关闭</a>
-					<span class="mr20">选中<span class="b s2" id="select_count">1</span>篇</span>
-				</div>
-				<div class="p10 cc">
-<!--
-EOT;
-if ($admincheck || $pwSystem['modother'] || $_G['markable']) {
-	if ($isGM || $pwSystem['modother']) {
-print <<<EOT
 -->
-					<a href="javascript:;" onclick="formclick(document.delatc,'masingle.php?action=delatc',2);return false;" class="mr5">删除</a><!--
-EOT;
-	}
-	if ($admincheck || $_G['markable']) {print <<<EOT
--->
-					<a href="javascript:;" onclick="formclick(document.delatc,'operate.php?action=showping&page=$page',8);return false;" class="mr5">评分</a><!--
-EOT;
-	}
-}
-if ($isGM || $pwSystem['shield']) {print <<<EOT
--->
-					<a href="javascript:;" onclick="formclick(document.delatc,'operate.php?action=shield&page=$page',9);return false;" title="屏蔽单帖" class="mr5">屏蔽</a><!--
-EOT;
-}
-if ($isGM || $pwSystem['remind']) {//提醒
-print <<<EOT
--->
-					<a href="javascript:;" onclick="formclick(document.delatc,'operate.php?action=remind&page=$page',9);return false;" title="提醒管理" class="mr5">提醒</a><!--
-EOT;
-}
-if ($isGM || $pwSystem['split']) {print <<<EOT
--->
-					<a id="split_$read[pid]"  href="javascript:;" onclick="formclick(document.delatc,'masingle.php?action=split&fid=$fid&tid=$tid&page=$page',2);return false;"  title="拆分" class="mr5">拆分</a><!--
-EOT;
-}
-print <<<EOT
--->
-				</div>
-				<div class="popBottom cc">
-					<label class="fl"><input type="checkbox" onclick="replyManage.checkall(this);" value="" id="ajaxall" name="ajaxall">全选</label>
-				</div>
-			</div>
-		</div>
-	</td><td class="pobg2"></td></tr><tr><td class="bgcorner4"></td><td class="pobg3"></td><td class="bgcorner3"></td></tr></tbody></table>
-</div>
-<!-- //end reply管理弹出 -->
+<!--ads begin-->
 <!--
 EOT;
 list($htmlAdvert,$arrayAdvert) = pwAdvert('Mode.Forum.TextRead',$fid);
@@ -233,47 +58,9 @@ print <<<EOT
 EOT;
 }
 print <<<EOT
---><!--广播台开始-->
-<!--
-EOT;
-if ($db_bbsradioifopen) portalEcho('bbsradio');
-print <<<EOT
 -->
 <!--面包屑-->
 <div id="breadCrumb" class="cc">
-	<ul class="fr">
-<!--
-EOT;
-if ($db_shiftstyle == 1) {
-if ($_COOKIE['widthCfg'] == 1) {print <<<EOT
--->
-		<li><a id="widthCfg" href="javascript:shiftStyle();" class="s2">[切换到窄版]</a></li>
-<!--
-EOT;
-} else {print <<<EOT
--->
-		<li><a id="widthCfg" href="javascript:shiftStyle();" class="s2">[切换到宽版]</a></li>
-<!--
-EOT;
-}}print <<<EOT
--->
-		<li><a href="searcher.php?sch_time=newatc">最新帖子</a></li>
-		<li><a href="searcher.php?digest=1">精华区</a></li>
-<!--
-EOT;
-if (!empty($shortcutforum)) {print <<<EOT
---><li id="id_shortcut" onClick="read.open('menu_shortcut',this.id,0,22);"><a href="javascript:;" class="link_down"><span>书签</span></a></li>
-<!--
-EOT;
-}
-if ($skincount > 1) {print <<<EOT
---><li id="td_skin"><a href="javascript:;"><img src="$imgpath/pwicon/style.gif" align="absmiddle" alt="论坛风格切换" /></a></li>
-<!--
-EOT;
-}
-print<<<EOT
--->
-	</ul>
 	$msg_guide
 <!--
 EOT;
@@ -286,29 +73,41 @@ EOT;
 print <<<EOT
 -->
 </div>
+<!--广播台开始-->
+<!--
+EOT;
+if ($db_bbsradioifopen) portalEcho('bbsradio');
+print <<<EOT
+-->
 <!--发帖 分页-->
 <div class="cc mb10">
 <!--
 EOT;
 if ($N_allowtypeopen) {print <<<EOT
 -->
-	<a href="{$postUrl}" class="post fr" id="td_post" title="发帖">发帖</a>
+	<a href="{$postUrl}#breadCrumb" class="post fr" id="td_post" title="发帖">发帖</a>
 <!--
 EOT;
-}print <<<EOT
+}
+$threadUrl = "thread.php?fid=$fid";
+if (strpos($pwServer['HTTP_REFERER'],'thread') !== false && $refererParams['fid']){
+	$refererParams['page'] && $threadUrl .= '&page=' . $refererParams['page'];
+	$refererParams['type'] && $threadUrl .= '&type=' . $refererParams['type'];
+}
+print <<<EOT
 -->
 	<a href="post.php?action=reply&fid=$fid&tid=$tid" class="replay fr mr10">回复</a>
-	<div style="padding-top:3px;"><span class="pages"><a href="thread.php?fid=$fid" class="w">&laquo;&nbsp;返回列表</a></span><span class="fl">$pages$db_union[5]</span><span class="pages"><a href="link.php?action=previous&fid=$fid&tid=$tid&fpage=$fpage&goto=previous">上一主题</a><a href="link.php?action=previous&fid=$fid&tid=$tid&fpage=$fpage&goto=next">下一主题</a></span></div>
+	<div style="padding-top:3px;"><span class="pages"><a href="$threadUrl" class="w pages_pre">返回列表</a></span><span class="fl">$pages$db_union[5]</span></div>
 </div>
 <!--
 EOT;
-if ($N_allowtypeopen && $foruminfo['allowtype'] != 1) {print <<<EOT
+if ($N_allowtypeopen && ($foruminfo['allowtype'] != 1 || $modelids || $pcids || $_G['allowactivity'] && $firstactmid)) {print <<<EOT
 -->
 <div id="menu_post" class="pw_menu tac" style="display:none;">
 	<ul class="menuList" style="width:70px;" id="post_typeChoose">
 <!--
 EOT;
-	if ($foruminfo['allowtype'] != 1 && $foruminfo['allowtype'] & 1) {print <<<EOT
+	if (($foruminfo['allowtype'] != 1 || $modelids || $pcids || $_G['allowactivity'] && $firstactmid) && $foruminfo['allowtype'] & 1) {print <<<EOT
 -->
 		<li><a href="post.php?fid=$fid" hidefocus="true">新帖</a></li>
 <!--
@@ -343,7 +142,7 @@ EOT;
 		<li><a href="post.php?fid=$fid&special=5" hidefocus="true">辩论</a></li>
 <!--
 EOT;
-	}
+	} 
 	if ($_G['allowmodelid']) {
 		foreach ($modelids as $value) {
 			if (isset($postTopic->topicmodeldb[$value]) && $postTopic->topicmodeldb[$value][ifable] && $postTopic->topiccatedb[$postTopic->topicmodeldb[$value][cateid]][ifable]) {
@@ -393,7 +192,7 @@ function replyManage(){
 		var a = b = 0;
 		var selected = '';
 		var check = document.getElementsByName('selid[]');
-		for (var i=0; i<check.length; i++) {
+		for (var i=0,j=check.length; i < j; i++) {
 			if(!all && check[i].checked) {
 				selected += '&pidarray[' + a + ']=' + check[i].value;
 				a++;
@@ -412,7 +211,7 @@ function replyManage(){
 	this.checkinfo = '';
 	this.setCounter = function(num){
 		var tags = document.getElementsByTagName('span');
-		for(var i=0;i<tags.length;i++){
+		for(var i=0,j = tags.length;i < j;i++){
 			if(tags[i].id == 'select_count')tags[i].innerHTML = num;
 		}
 	}
@@ -441,8 +240,7 @@ if($managecheck && $colonyManageCheck){print<<<EOT
 -->
 <!--
 EOT;
-}if($managecheck){
-if($isGM || $pwSystem['topped']){print <<<EOT
+}if($isGM || $pwSystem['topped']){print <<<EOT
 -->
 	<a id="headtopic" onclick="return sendurl(this,1)" href="mawhole.php?action=headtopic&fid=$fid&seltid=$tid" title="置顶帖子">置顶</a>
 <!--
@@ -450,6 +248,11 @@ EOT;
 }if($isGM || $pwSystem['digestadmin']){print <<<EOT
 -->
 	<a id="rdigest" onclick="return sendurl(this,1)" href="mawhole.php?action=digest&fid=$fid&seltid=$tid" title="精华帖子">精华</a>
+<!--
+EOT;
+}if($isGM || $pwSystem['coloradmin']){print <<<EOT
+-->
+	<a id="edit" href="mawhole.php?action=edit&fid=$fid&seltid=$tid" onclick="return sendurl(this,1)" title="编辑标题颜色">加亮</a><span>|</span>
 <!--
 EOT;
 }if($isGM || $pwSystem['lockadmin']){print <<<EOT
@@ -464,12 +267,7 @@ EOT;
 EOT;
 }if($isGM || $pwSystem['downadmin']){print <<<EOT
 -->
-	<a id="downtopic" href="mawhole.php?action=downtopic&fid=$fid&seltid=$tid" onclick="return sendurl(this,1)" title="将帖子往后压">压帖</a>
-<!--
-EOT;
-}if($isGM || $pwSystem['coloradmin']){print <<<EOT
--->
-	<a id="edit" href="mawhole.php?action=edit&fid=$fid&seltid=$tid" onclick="return sendurl(this,1)" title="编辑标题颜色">加亮</a>
+	<a id="downtopic" href="mawhole.php?action=downtopic&fid=$fid&seltid=$tid" onclick="return sendurl(this,1)" title="将帖子往后压">压帖</a><span>|</span>
 <!--
 EOT;
 }if($isGM || $pwSystem['tpctype']){print <<<EOT
@@ -489,22 +287,17 @@ EOT;
 EOT;
 }if($isGM || $pwSystem['unite']){print <<<EOT
 -->
-	<a id="unit" onclick="return sendurl(this,1)" href="mawhole.php?action=unite&fid=$fid&seltid=$tid" title="合并帖子">合并</a>
-<!--
-EOT;
-}if($isGM || $pwSystem['delatc']){print <<<EOT
--->
-	<a id="del" href="mawhole.php?action=del&fid=$fid&seltid=$tid" onclick="return sendurl(this,1)" title="删除帖子">删除</a>
+	<a id="unit" onclick="return sendurl(this,1)" href="mawhole.php?action=unite&fid=$fid&seltid=$tid" title="合并帖子">合并</a><span>|</span>
 <!--
 EOT;
 }if($ifcheck==0 && ($isGM || $pwSystem['tpccheck'])){print <<<EOT
 -->
-	<a onclick="ajax.send('masingle.php?ajax=1&action=check&fid=$fid&tid=$tid','',ajax.guide)" title="审核未验证主题">审核</a>
+	<a onclick="ajax.send('masingle.php?ajax=1&action=check&fid=$fid&tid=$tid','',ajax.guide)" title="审核未验证主题">审核</a><span>|</span>
 <!--
 EOT;
 }if(($pwSystem['areapush'] || $isGM) && (isset($db_modes['area']['ifopen']) && $db_modes['area']['ifopen'])){print <<<EOT
 -->
-	<script type="text/javascript" src="mode/area/js/adminview.js"></script>
+
 	<a onclick="frontAdmin._sendmsg('mode.php?m=area&q=dialog&action=pushto&fid=$fid&selid=$tid','',this.id)" title="推送自定义信息">推送</a>
 <!--
 EOT;
@@ -529,7 +322,13 @@ EOT;
 	$actRecommendHtml
 <!--
 EOT;
-}print <<<EOT
+if($managecheck){
+if($isGM || $pwSystem['delatc']){print <<<EOT
+-->
+	<span>|</span><a id="del" href="mawhole.php?action=del&fid=$fid&seltid=$tid" onclick="return sendurl(this,1)" title="删除帖子">删除</a>
+<!--
+EOT;
+}}print <<<EOT
 -->
 </div>
 <!--
@@ -606,7 +405,7 @@ EOT;
 <!--帖子楼层开始-->
 <!--
 EOT;
-$special && require_once PrintEot($special);print<<<EOT
+$special && !in_array($readdb[0]['special'],array(1,3,4,5)) && require_once PrintEot($special);print<<<EOT
 -->
 <script type="text/javascript">
 var readFace = {
@@ -636,12 +435,16 @@ print <<<EOT
 					<div class="readNum">
 						<ul class="cc">
 							<li><em>{$hits}</em>阅读</li>
-							<li><em>{$replies}</em>回复</li>
+							<li><em id="topicRepliesNum">{$replies}</em>回复</li>
 						</ul>
 					</div>
 				</td>
-				<td><h1 id="subject_tpc" class="read_h1">{$read_category}{$db_union[2]}{$subject}</h1></td>
-				<td width="125" class="readStairs"><span class="mr10 gray">楼层直达</span><input type="text" class="input mr5" name="floor{$read[pid]}" id="floor{$read[pid]}" onkeypress="if(event.keyCode == 13){getFloorUrl(this);return false;};" /><img src="$imgpath/pwicon/stairs.png" onclick="getFloorUrl(getObj('floor{$read[pid]}'))" class="cp" align="absmiddle" /></td>
+				<td>
+				<h1 id="subject_tpc" class="read_h1">{$read_category}{$db_union[2]}{$subject} <a href="javascript:;" title="$db_bbsurl/read.php?fid=$fid&tid=$tid&u=$winduid" onclick="copyUrl('');" class="gray w" style="color:#999;">[复制链接]</a></h1>
+				</td>
+				<td width="115" class="readStairs">
+				<a href="link.php?action=previous&fid=$fid&tid=$tid&fpage=$fpage&goto=previous" class="read_prev" title="上一主题">上一主题</a>
+				<a href="link.php?action=previous&fid=$fid&tid=$tid&fpage=$fpage&goto=next" class="read_next" title="下一主题">下一主题</a><input type="text" class="input mr5" name="floor{$read[pid]}" id="floor{$read[pid]}" onkeypress="if(event.keyCode == 13){getFloorUrl(this);return false;};" /><img src="$imgpath/pwicon/stairs.png" onclick="getFloorUrl(getObj('floor{$read[pid]}'))" class="cp" align="absmiddle" /></td>
 			</tr>
 		</table>
 	</div>
@@ -671,30 +474,23 @@ $isAuth = $isAuthMobile || $isAuthAlipay || $isAuthCertificate;
 	$read[jupend]
 	<div class="read_t" id="readfloor_{$read['pid']}">
 		<table width="100%" class="floot">
-			<tr class="vt">
+			<tr>
 				<td rowspan="2" class="floot_left">
 					<div class="readName b">
 <!--
 EOT;
 	if ($db_showonline) {
+	$gender = $read['gender'] == 2 ? 'women' : 'man';
 		if (checkOnline($read['thisvisit'])) {print <<<EOT
---><img src="$imgpath/online.png" title="在线" align="absmiddle"><!--
+--><span class="{$gender}_ol mr5" title="在线" alt="在线">在线</span><!--
 EOT;
 		} else {print<<<EOT
---><img src="$imgpath/stealth.png" title="离线" align="absmiddle"><!--
+--><span class="{$gender}_unol mr5" title="离线" alt="离线">离线</span><!--
 EOT;
 		}
 	}
 print <<<EOT
---><a href="{$db_userurl}$read[authorid]">{$read[author]}</a><!--
-EOT;
-if($isAuth){
-	print <<<EOT
--->&nbsp;<a href="profile.php?action=auth"><img src="u/images/attest/certificate.gif" title="实名认证用户" align="absmiddle" /></a><!--
-EOT;
-}
-print <<<EOT
--->
+--><a href="{$db_userurl}$read[authorid]">{$read[author]}</a>
 					</div>
 					<div class="floot_leftdiv">
 <!--
@@ -709,12 +505,21 @@ $topPostId = '';
 $read['istop'] == 'topped' && $topPostId = 'tp_';
 print <<<EOT
 -->
+<!--
+EOT;
+if($isAuth){
+	print <<<EOT
+--><span class="fl"><a href="profile.php?action=auth" class="certificate"><img src="u/images/attest/certificate.gif" title="实名认证用户" align="absmiddle" /></a></span><!--
+EOT;
+}
+print <<<EOT
+-->
 						<div class="readFace">
 							<div class="fl">
 								<div class="card" style="display:none" id="readFace_{$read[lou]}" onmouseover="this.style.display='';" onmouseout="this.style.display='none';">
 									<dl class="cc">
 										<dt class="fl">
-											<div class="cc"><a href="{$db_userurl}$read[authorid]" class="face_img"><img class="pic" src="{$read[face]}" {$read[facesize]} border="0" /></a></div>
+											<div class="cc"><a href="{$db_userurl}$read[authorid]" class="face_img"><img class="pic" src="$imgpath/blank.gif" style="background:$forumcolorone url({$read[face]}) center center no-repeat;" {$read[facesize]} border="0" /></a></div>
 											<p>UID：$read[authorid]</p>
 <!--
 EOT;
@@ -800,18 +605,43 @@ print <<<EOT
 EOT;
 if ($read['authorid'] != 0) {print<<<EOT
 -->
-<img onmouseover="readFace.show('readFace_{$read[lou]}');" onmouseout="readFace.clear()" class="pic" src="{$read[face]}" {$read['facesize']} border="0" />
+<img onmouseover="readFace.show('readFace_{$read[lou]}');" onmouseout="readFace.clear()" class="pic" src="$imgpath/blank.gif" style="background:$forumcolorone url({$read[face]}) center center no-repeat;" {$read['facesize']} border="0" />
 <!--
 EOT;
 } else { print<<<EOT
 -->
-<img  class="pic" src="{$read[face]}" {$read['facesize']} border="0" />
+<img class="pic" src="$imgpath/blank.gif" style="background:$forumcolorone url({$read[face]}) center center no-repeat;" {$read['facesize']} border="0" />
 <!--
 EOT;
 }print<<<EOT
 -->
 						</a>
-						<div class="readLevel mb5"><span>级别: <a href="profile.php?action=permission&gid=$read[groupid]">{$read[level]}</a></span><img src="$imgpath/$stylepath/level/$read[lpic].gif" /></div>
+						<div class="readLevel mb5"><a href="profile.php?action=permission&gid=$read[groupid]">{$read[level]}</a><img src="$imgpath/$stylepath/level/$read[lpic].gif" /></div>
+<!--
+EOT;
+	if ($read['lou'] == 0) {
+print <<<EOT
+-->
+<div class="fl" id="pw_all_tip_medal" style="display:none">
+	<div style="position:absolute;z-index:99;margin-top:-50px;">
+		<table><tr><td>
+		<div class="pw_all_tip">
+			<a href="javascript:void(0)" class="adel">关闭</a>
+			<dl class="cc">
+				<dt>个人中心可以申请新版勋章哦</dt>
+				<dd><a href="apps.php?q=medal&a=all" class="s4 mr10">立即申请</a><a class="bb_close" href="javascript:void(0)">知道了</a></dd>
+			</dl>
+		</div>
+		<div class="pw_all_angle_bot"></div>
+		</td></tr></table>
+	</div>
+</div>
+<div id="pw_all_pos_medal" style="width:0;height:0;font-size:0;line-height:0;overflow:hidden;">&nbsp;</div>
+<!--
+EOT;
+}print<<<EOT
+-->
+						<div class="read_medals">$read[medals]</div>
 						<div class="readUser_info cc mb10">
 <!--
 EOT;
@@ -849,8 +679,8 @@ print<<<EOT
 EOT;
 if ($read['authorid'] != 0 && $read['authorid'] != $winduid) {print<<<EOT
 -->
-								<li><a href="javascript:;" onclick="Attention.add(this,'{$read['authorid']}',0)" class="add_fol">关注Ta</a></li>
-								<li><a href="javascript:;" onclick="sendmsg('pw_ajax.php?action=msg&touid=$read[authorid]');" class="add_mes">发消息</a></li>
+								<li><a href="javascript:;" onclick="Attention.add(this,'{$read['authorid']}',0)" class="add_follow">加关注</a></li>
+								<li><a href="javascript:;" onclick="sendmsg('pw_ajax.php?action=msg&touid=$read[authorid]', '', this);" class="add_mes" id="read_sendmsg$read[lou]">发消息</a></li>
 <!--
 EOT;
 	}if ($isGM && $read['authorid'] != 0) {
@@ -888,7 +718,6 @@ print <<<EOT
 -->
 							</ul>
 						</div>
-						<div>$read[medals]</div>
 					</div>
 				</td>
 				<td class="floot_right" id="td_$read[pid]"><a name="post_$read[pid]"></a>
@@ -912,18 +741,16 @@ print <<<EOT
 -->
 <!--楼层信息及编辑-->
 					<div class="tipTop s6">
-						<span class="fr">
+						<span class="fr">							
 <!--
 EOT;
 if ($isTucool && $read[isAllowViewTucool] && $read[pid] == 'tpc') {
 print<<<EOT
 -->
-								<a href="slide.php?tid={$read[tid]}" class="mr5 s6" title="以图酷模式浏览">图酷模式&nbsp;<img src="$imgpath/pwicon/new.png" align="bottom" /></a><!--
-EOT;
-		}print <<<EOT
--->
+								<a href="slide.php?tid={$read[tid]}#info" class="mr5 s6" title="以图酷模式浏览">图酷模式&nbsp;<img src="$imgpath/pwicon/new.png" align="bottom" /></a>
 <!--
 EOT;
+	}
 	if ($authorid == $winduid && $read['authorid'] != $authorid && $_G['leaveword']) {print <<<EOT
 -->
 							<a onclick="sendmsg('pw_ajax.php?action=leaveword&tid=$tid&pid=$read[pid]','',this.id)" id="word_$read[pid]" title="楼主留言" class="mr5 cp s6">留言</a>
@@ -932,18 +759,18 @@ EOT;
 	}
 	if (isset($uid)) {print <<<EOT
 -->
-							<a href="read.php?tid=$tid&displayMode=1" title="显示全部帖子" class="mr5">全看</a>
+							<a href="read.php?tid=$tid&ds=1" title="显示全部帖子" class="mr5">全看</a>
 <!--
 EOT;
 	} else {
 		if ($read['lou'] == 0) {print <<<EOT
 -->
-							<a href="javascript:;" onclick="window.location=('read.php?tid=$tid&uid=$read[authorid]&displayMode=1');return false;" title="只看楼主的所有帖子" class="mr5 s6">只看楼主</a>
+							<a href="javascript:;" onclick="window.location=('read.php?tid=$tid&uid=$read[authorid]&ds=1');return false;" title="只看楼主的所有帖子" class="mr5 s6">只看楼主</a>
 <!--
 EOT;
 		} else {print <<<EOT
 -->
-							<a href="javascript:;" onclick="window.location=('read.php?tid=$tid&uid=$read[authorid]&displayMode=1');return false;" title="只看该作者的所有回复" class="mr5 s6">只看该作者</a>
+							<a href="javascript:;" onclick="window.location=('read.php?tid=$tid&uid=$read[authorid]&ds=1');return false;" title="只看该作者的所有回复" class="mr5 s6">只看该作者</a>
 <!--
 EOT;
 		}
@@ -952,41 +779,23 @@ print <<<EOT
 -->
 <!--
 EOT;
-	if ($read['lou'] == 0) {print <<<EOT
--->
-							<a href="javascript:;" id="td_More" onclick="read.open('menu_More','td_More');" class="link_down mr5 s6"><span>更多操作</span></a>
-							<div id="menu_More" class="popout" style="display:none;"><table border="0" cellspacing="0" cellpadding="0"><tbody><tr><td class="bgcorner1"></td><td class="pobg1"></td><td class="bgcorner2"></td></tr><tr><td class="pobg4"></td><td><div class="popoutContent">
-								<ul class="menuList" style="width:70px;">
-<!--
-EOT;
+	if ($read['lou'] == 0) {
 		if ($ordertype == 'desc') {print <<<EOT
 -->
-									<li><a href="read.php?tid=$tid&ordertype=asc&displayMode=1" title="正序阅读">正序阅读</a></li>
+									<a href="read.php?tid=$tid&ordertype=asc&ds=1" title="正序阅读" class="mr5 s6">正序阅读</a>
 <!--
 EOT;
 		} else {print <<<EOT
 -->
-									<li><a href="read.php?tid=$tid&ordertype=desc&displayMode=1" title="倒序阅读">倒序阅读</a></li>
+									<a href="read.php?tid=$tid&ordertype=desc&ds=1" title="倒序阅读" class="mr5 s6">倒序阅读</a>
 <!--
 EOT;
-		}print <<<EOT
+		}if (isset($db_hackdb['toolcenter']) && $db_toolifopen) {print <<<EOT
 -->
-									<li><a href="javascript:;" title="$db_bbsurl/read.php?fid=$fid&tid=$tid&u=$winduid" onclick="copyUrl('');">复制链接</a></li>
+									<a href="javascript:;" id="usetool" onclick="sendmsg('pw_ajax.php?action=usetool','','td_More')" class="s6">使用道具</a>								
 <!--
 EOT;
-		if (isset($db_hackdb['toolcenter']) && $db_toolifopen) {print <<<EOT
--->
-									<li><a href="javascript:;" id="usetool" onclick="sendmsg('pw_ajax.php?action=usetool','','td_More')">使用道具</a></li>
-<!--
-EOT;
-		}print <<<EOT
--->
-									
-								</ul>
-							</div></td><td class="pobg2"></td></tr><tr><td class="bgcorner4"></td><td class="pobg3"></td><td class="bgcorner3"></td></tr></tbody></table></div>				
-<!--
-EOT;
-	}print <<<EOT
+	}}print <<<EOT
 -->
 						</span>
 <!--
@@ -994,10 +803,24 @@ EOT;
 	if ($read['istop'] == 'topped') {
 print <<<EOT
 -->
-						<a class="s2 b cp" onclick="copyFloorUrl('$read[pid]')" title="复制此楼地址">置顶</a>&nbsp;&nbsp;来自<a href="$read[jumpurl]" class="mr5">$read[floor]楼</a>
+						<a class="s2 b cp read_topped" onclick="copyFloorUrl('$read[pid]')" title="复制此楼地址">置顶</a>&nbsp;(来自<a href="$read[jumpurl]" class="s6 mr5">$read[floor]楼)</a>
 <!--
 EOT;
-	} elseif (!empty($db_floorname[$read['lou']])) {print <<<EOT
+	} elseif (!empty($read['robfloor'])) {
+		if (!empty($db_floorname[$read['robfloor']])) {
+print <<<EOT
+-->
+						<a class="s2 b cp" onclick="copyFloorUrl('$read[pid]')" title="复制此楼地址">{$db_floorname[$read[lou]]}</a>&nbsp;&nbsp;
+<!--
+EOT;
+		} else {
+print <<<EOT
+-->
+						<a class="s2 b cp" onclick="copyFloorUrl('$read[pid]')" title="复制此楼地址">$read[robfloor]$db_floorunit</a>&nbsp;&nbsp;
+<!--
+EOT;
+		}
+	}  elseif (!empty($db_floorname[$read['lou']])) {print <<<EOT
 -->
 						<a class="s2 b cp" onclick="copyFloorUrl('$read[pid]')" title="复制此楼地址">{$db_floorname[$read[lou]]}</a>&nbsp;&nbsp;<!--
 EOT;
@@ -1034,7 +857,7 @@ EOT;
 <!--
 EOT;
 	}
-	if ($read['authorid']==$winduid || $isGM || $pwSystem['deltpcs'] || $colonyManageCheck) {
+	if (($read['authorid']==$winduid || $isGM || $pwSystem['deltpcs'] || $colonyManageCheck) && $read[pid]) {
 		if ($db_ajax & 4){
 			$edit_title = getLangInfo('other','ajax_edit_way');
 		} else {
@@ -1042,7 +865,7 @@ EOT;
 		}
 print <<<EOT
 -->
- , <a href="post.php?action=modify&fid=$fid&tid=$tid&pid=$read[pid]&article=$read[lou]" id="modify_$read[pid]" onclick="return sendurl(this,4,'',event)" title="{$edit_title}" class="s4">编辑</a>
+ , <a href="post.php?action=modify&fid=$fid&tid=$tid&pid=$read[pid]&article=$read[lou]#breadCrumb" id="modify_$read[pid]" onclick="return sendurl(this,4,'',event)" title="{$edit_title}" class="s4">编辑</a>
 <!--
 EOT;
 	}
@@ -1051,6 +874,67 @@ print <<<EOT
                     </div>
 <!--
 EOT;
+	if ($robbuildData && $read[pid] == 'tpc') {
+	$awardbuild = urlencode($robbuild[awardbuilds]);
+	$viewAwardWord = $award ? '返回原帖' : '查看中奖楼层';
+	$awardUrl = $award ? 'read.php?tid='.$tid : 'read.php?tid='.$tid.'&award=1';
+		if ($robbuildData[showtimetype] == 1) {
+print <<<EOT
+-->
+						<div class="quoteTips mb10"><span class="s2 mr10">本帖为抢楼帖，开始时间未到，暂不可回复！</span>&nbsp;&nbsp;&nbsp;
+<!--
+EOT;
+			if ($robstatus) {
+print <<<EOT
+-->
+						<a class="s4" href="javascript:;" onclick="pwConfirm('确定结束?',this,function(){window.location='job.php?action=endrobbuild&tid={$tid}'});">结束抢楼</a>
+<!--
+EOT;
+			}
+print <<<EOT
+-->
+						<br />抢楼开始：{$robbuildData['strstarttime']}，抢楼结束：{$robbuildData['strendtime']}，截止楼层： {$robbuildData['endbuild']}，奖励楼层：{$robbuildData['awardbuilds']}。<a href="{$awardUrl}#a" class="mr5 s4">[{$viewAwardWord}]</a></div>
+<!--
+EOT;
+		} if ($robbuildData[showtimetype] == 2) {
+print <<<EOT
+-->
+						<div class="quoteTips mb10"><span class="s2 mr10">本帖为抢楼帖，欢迎抢楼！</span>&nbsp;&nbsp;&nbsp;
+<!--
+EOT;
+			if ($robstatus) {
+print <<<EOT
+-->
+						<a class="s4" href="javascript:;" onclick="pwConfirm('确定结束?',this,function(){window.location='job.php?action=endrobbuild&tid={$tid}'});">结束抢楼</a>
+<!--
+EOT;
+			}
+print <<<EOT
+-->
+						<br />抢楼进行中，还剩：{$robbuildData['lefttime']}，截止楼层：{$robbuildData['endbuild']}，奖励楼层：{$robbuildData['awardbuilds']}。<a href="{$awardUrl}#a" class="mr5 s4">[{$viewAwardWord}]</a></div>
+<!--
+EOT;
+		} if ($robbuildData[showtimetype] == 3) {
+		$robEndLang = $robbuildData['status'] == 2 ? '本帖为抢楼帖，抢楼已被手动结束!' : '本帖为抢楼帖，抢楼已结束!';
+print <<<EOT
+-->
+						<div class="quoteTips mb10"><span class="s2 mr10">$robEndLang</span>&nbsp;&nbsp;&nbsp;
+<!--
+EOT;
+			if ($robstatus) {
+print <<<EOT
+-->
+						<a class="s4" href="javascript:;" onclick="pwConfirm('确定结束?',this,function(){window.location='job.php?action=endrobbuild&tid={$tid}'});">结束抢楼</a>
+<!--
+EOT;
+			}
+print <<<EOT
+-->
+						<br />抢楼截止时间：{$robbuildData['strendtime']}，截止楼层：{$robbuildData['endbuild']}，奖励楼层：{$robbuildData['awardbuilds']}。<a href="{$awardUrl}#a" class="mr5 s4">[{$viewAwardWord}]</a></div>
+<!--
+EOT;
+		} 			
+	}
 	if ($read['lou'] != 0) {print <<<EOT
 -->
 					<div class="read_h1" style="margin-bottom:10px;" id="subject_$read[pid]">$db_union[2]$read[icon]$read[subject]</div>
@@ -1063,15 +947,21 @@ EOT;
 EOT;
 	} elseif (!$read['ifcheck']) {print <<<EOT
 -->
-					<div class="blockquote">该帖需要管理员审核通过后才能正常显示！</div>
+					<div class="quoteTips mb10">该帖需要管理员审核通过后才能正常显示！</div>
 <!--
 EOT;
-	}print <<<EOT
+	} elseif ($read['lou'] == 0 && $replyReward) {
+$leftReplyRewardCredit = intval($replyReward['lefttimes'] * $replyReward['creditnum']) . '</em>' . $creditunits[$replyReward['credittype']] . $creditnames[$replyReward['credittype']];
+$replyRewardChance = ' (中奖几率' . $replyReward['chance'] . '%)';
+$replyRewardTip = '<span class="s2">回复本帖可获得<em id="replyrewardnum">' . $replyReward['creditnum'] . '</em>' . $creditunits[$replyReward['credittype']] . $creditnames[$replyReward['credittype']] . '奖励！</span><br>每人限' . $replyReward['repeattimes'] . '次，奖池剩余<em id="leftreplyrewardnum">' . $leftReplyRewardCredit . $replyRewardChance;
+print <<<EOT
 -->
+					<div class="quoteTips mb10">$replyRewardTip</div>
+
 <!--帖子顶部ad-->
 <!--
 EOT;
-	if ($htmlAdvert['TidUp']) {print <<<EOT
+	}if ($htmlAdvert['TidUp']) {print <<<EOT
 -->
 					<div class="cc mb10" id="ads_c_$read[pid]">{$htmlAdvert['TidUp']}</div>
 <!--
@@ -1107,10 +997,35 @@ EOT;
 						</div>
 <!--
 EOT;
-	}print <<<EOT
+}
+if ($read['replyreward']) {
+print<<<EOT
 -->
+						<div class="reply_reward mb15"><span>回帖奖励</span><em>+ {$read['replyreward']['creditnum']}</em></div>
 <!--
 EOT;
+	} 
+	if (in_array($read[lou],(array)$robFloors)) {
+print<<<EOT
+-->
+						<div class="rob_floors_win">恭喜抢中本楼</div>
+<!--
+EOT;
+	}
+if ($specialTips && $read['pid'] == 'tpc'){
+print <<<EOT
+-->
+					<div class="quoteTips mb10">$specialTips</div>
+<!--
+EOT;
+}
+if ($read['reward']){
+print <<<EOT
+-->
+					<div class="quoteTips mb10">{$read['reward']}</div>
+<!--
+EOT;
+}
 if($read['lou']!=0 && $special == 'read_debate'){
 print <<<EOT
 -->
@@ -1119,17 +1034,17 @@ print <<<EOT
 EOT;
 if($read['standpoint']==1){print <<<EOT
 -->
-						<div class="dig3 fl"><span class="fl">正方支持者</span><div class="fl" onClick="dodebate('votepid_$read[pid]',$tid,$read[pid])">支持:<span id="votepid_$read[pid]">$read[vote]</span></div></div>
+						<div class="debate_square_btn fl"><span class="fl">正方支持者</span><div class="fl" onClick="dodebate('votepid_$read[pid]',$tid,$read[pid])">支持:<em id="votepid_$read[pid]">$read[vote]</em></div></div>
 <!--
 EOT;
 }elseif($read['standpoint']==2){print <<<EOT
 -->
-						<div class="dig4 fl"><span class="fl">反方支持者</span><div class="fl" onClick="dodebate('votepid_$read[pid]',$tid,$read[pid])">支持:<span id="votepid_$read[pid]">$read[vote]</span></div></div>
+						<div class="debate_anti_btn fl"><span class="fl">反方支持者</span><div class="fl" onClick="dodebate('votepid_$read[pid]',$tid,$read[pid])">支持:<em id="votepid_$read[pid]">$read[vote]</em></div></div>
 <!--
 EOT;
 }else{print <<<EOT
 -->
-						<div class="dig5 tac fl">我是中立者</div>
+						<span class="debate_neutral_btn">我是中立者</span>
 <!--
 EOT;
 }print <<<EOT
@@ -1176,6 +1091,11 @@ if($read['lou'] == 0 && $topicvalue && (!$read['ifshield'] || $groupid==3) &&!($
 <!--
 EOT;
 }print<<<EOT
+-->		
+<!--
+EOT;
+$special && in_array($readdb[0]['special'],array(1,3,4,5)) && require_once PrintEot($special);
+print <<<EOT
 -->
 <!--帖子右侧（广告/动漫表情）-->
 					<div class="readCon_right tar">
@@ -1204,6 +1124,15 @@ EOT;
 					<div class="tpc_content">
 						<div class="f14 mb10" id="read_$read[pid]">
 						$read[content]
+<!--
+EOT;
+if(getstatus($read[tpcstatus],6)){print<<<EOT
+-->
+						<p class="phone">内容来自[<a href="m/index.php" class="s4">手机版</a>]</p>
+<!--
+EOT;
+}print<<<EOT
+-->
 						</div>
 <!--
 EOT;
@@ -1215,7 +1144,7 @@ EOT;
 }if(($read[lou]==0 && $pcid>0 && $winduid && (!$read['ifshield'] || $groupid==3))){print<<<EOT
 -->
 						<div class="f14 mb10"><a name="pcinfo"></a><div id="pc_show"></div></div>
-<script language="javascript">
+<script type="text/javascript">
 var isadminright = parseInt('$isadminright');
 var payway = parseInt('$payway');
 var ifend = parseInt('$ifend');
@@ -1334,15 +1263,15 @@ print <<<EOT
 EOT;
 				$i=0;
 				foreach ($read['pic'] as $pic) {
-					$db_menuinit .= ",'att_pic_s_sub_$pic[aid]' : 'att_pic_s_$pic[aid]'";
+					//$db_menuinit .= ",'att_pic_s_sub_$pic[aid]' : 'att_pic_s_$pic[aid]'";
 					$picTitle = $pic['descrip'] ? ' title="描述：' . $pic['descrip'] . '"' : '';
 					$pic['descrip'] = substrs($pic['descrip'],80);
 					$pic['name'] = substrs($pic['name'],80);
 					print <<<EOT
 -->
-								<li id="att_small_$pic[aid]"><img id="att_pic_s_sub_$pic[aid]" src="$imgpath/blank.gif" style="background:url($pic[miniUrl]) center center no-repeat" src_data="$pic[url]" onclick="readImg.show('$read[lou]', '$i');"{$picTitle} /></li>
+								<li id="att_small_$pic[aid]" onmouseover="postAttImgHover('att_pic_s_{$pic[aid]}','att_pic_s_sub_{$pic[aid]}');"><img id="att_pic_s_sub_$pic[aid]" src="$imgpath/blank.gif" style="background:url($pic[miniUrl]) center center no-repeat" src_data="$pic[url]" onclick="readImg.show('$read[lou]', '$i');"{$picTitle} />
 								<div class="pw_menu" style="position:absolute;display:none" id="att_pic_s_$pic[aid]">
-								 <div style="border:1px solid $forumcolorone;background:$forumcolortwo;padding:5px 10px;">
+								 <div style="border:1px solid $forumcolorone;background:$forumcolortwo;padding:5px 10px; text-align:left;">
 <!--
 EOT;
 				if ($pic['descrip']) {print <<<EOT
@@ -1375,7 +1304,9 @@ print <<<EOT
 -->
 									</p>
 								 </div>
-								</div>
+								</div>				
+								</li>
+
 <!--
 EOT;
 					$i++;
@@ -1390,14 +1321,14 @@ EOT;
 <!--
 EOT;
 			foreach ($read['pic'] as $pic) {
-			$db_menuinit .= ",'att_pic_sub_$pic[aid]' : 'att_pic_$pic[aid]'";
+			//$db_menuinit .= ",'att_pic_sub_$pic[aid]' : 'att_pic_$pic[aid]'";
 			$pic['descrip'] = substrs($pic['descrip'],80);
 			$pic['name'] = substrs($pic['name'],80);
 print <<<EOT
 -->
 								<li id="att_$pic[aid]">
-								<span id="att_pic_sub_$pic[aid]" style="display:inline-block;">$pic[img]</span>
-								<div class="pw_menu" style="position:absolute;display:none" id="att_pic_$pic[aid]">
+								<span id="att_pic_sub_$pic[aid]" onmouseover="postAttImgHover('att_pic_$pic[aid]','att_pic_sub_$pic[aid]');">$pic[img]</span>
+								<div id="att_pic_$pic[aid]" style="display:none;" class="fl"><div class="pw_menu" style="position:absolute;z-index:1;_margin-top:-13px;">
 								 <div style="border:1px solid $forumcolorone;background:$forumcolortwo;padding:5px 10px;">
 <!--
 EOT;
@@ -1430,7 +1361,7 @@ print <<<EOT
 -->
 									</p>
 								 </div>
-								</div>
+								</div></div>
 								</li>
 <!--
 EOT;
@@ -1538,6 +1469,20 @@ EOT;
 }
 print <<<EOT
 -->
+<!--
+EOT;
+if ($read['atusers']){
+$atusersHtml = '';
+foreach($read['atusers'] as $v){
+	$cardusername = urlencode($v);
+	$atusersHtml .= " <a href=\"u.php?username=$v\" target=\"_blank\" class=\"s4 _cardshow\" data-card-url=\"pw_ajax.php?action=smallcard&type=showcard&username={$cardusername}\" data-card-key=\"{$v}\">@{$v}</a>";
+}print <<<EOT
+-->
+				<div class="at_icon mb10">本帖提到的人: $atusersHtml</div>
+<!--
+EOT;
+}print <<<EOT
+-->
 <!--评分-->
 <!--
 EOT;
@@ -1597,10 +1542,10 @@ print <<<EOT
 -->
 								<tr id="pingLogTr_{$pingdata['id']}" class="vt" onmouseover="showPingDelLink(this, true)" onmouseout="showPingDelLink(this, false)">
 									<th class="p_face">
-                                    	<div id="card_pingUserShow_{$pingdata[id]}_{$pingdata[uid]}" class="userCard"><img src="{$pingdata['icon']}" width="16" height="16" /></div>
+                                    	<div id="card_pingUserShow_{$pingdata[id]}_{$pingdata[uid]}" class="userCard" ><img src="{$pingdata['icon']}" width="16" height="16" /></div>
 										<span id="pingUserShow_{$pingdata['id']}"></span>
 									</th>
-									<td class="p_name"><a target="_blank" href="u.php?uid={$pingdata['uid']}">{$pingdata['pinger']}</a></td>
+									<td class="p_name"><a target="_blank" href="u.php?uid={$pingdata['uid']}" data-card-url="pw_ajax.php?action=smallcard&type=showcard&uid={$pingdata[uid]}" class=" _cardshow" data-card-key="{$pingdata['pinger']}">{$pingdata['pinger']}</a></td>
 									<td width="60">{$pingdata['name']}</td>
 									<td class="s2 b" width="50">{$pingdata['point']}</td>
 									<td width="90">{$pingdata['pingtime']}</td>
@@ -1629,7 +1574,7 @@ print <<<EOT
 							</table>
 						</div>
 <input id="pingPageNum_{$read['pid']}" type="hidden" value="2" />
-<script language="javascript">
+<script>
 getObj('pingPageNum_{$read["pid"]}').value = 2;
 </script>
 						<div class="scoreBottom cc">
@@ -1658,12 +1603,12 @@ if($read[pid] == 'tpc'){print <<<EOT
 EOT;
 if($admincheck || $_G['markable']){print <<<EOT
 -->
-										<a class="r_score" id="showping_$read[pid]" href="operate.php?action=showping&tid=$tid&pid=$read[pid]&page=$page" onclick="return sendurl(this,8)" title="评分">评分</a>
+										<a class="r_score" id="showping_$read[pid]" href="operate.php?action=showping&tid=$tid&pid=$read[pid]&page=$page" onclick="return sendurl(this,8,this)" title="评分">评分</a>
 <!--
 EOT;
 }if($groupid!='guest' && $read['lou']==0){print <<<EOT
 -->
-										<a class="r_keep" href="apps.php?q=collection&a=favor&type=postfavor&ajax=1&id=$tid"  style="cursor:pointer;" onclick="return ajaxurl(this)" id="favor" title="收藏为私有">收藏</a>
+										<a class="r_keep" href="apps.php?q=collection&a=favor&type=postfavor&ajax=1&id=$tid" onclick="return ajaxurl(this)" id="favor" title="收藏为私有">收藏</a>
 <!--
 EOT;
 }
@@ -1696,7 +1641,7 @@ if($read[pid] == 'tpc' && !$forumset[rate] && $rateSets[1] && isset($db_hackdb['
 print <<<EOT
 -->
 						<link rel="stylesheet" type="text/css" href="hack/rate/images/rate.css" media="all" />
-						<script language="JavaScript" src="js/rate_ajax.js"></script>
+						<script type="text/javascript" src="js/rate_ajax.js"></script>
 						<div id="vote_box" class="mb10 cc">
 <!--
 EOT;
@@ -1707,10 +1652,15 @@ print <<<EOT
 <!--
 EOT;
 }
-if($read['reward']){
 print <<<EOT
 -->
-					<div class="cc">$read[reward]</div>
+<!--
+EOT;
+if($read[pid] == 'tpc' && $db_yunsearch_search){
+$guess_read_middle = ($db_yun_expand && $db_yun_expand[guess_read_middle]) ? sprintf(html_entity_decode($db_yun_expand[guess_read_middle]),$read[tid],$read[subject],$read['fid'],$GLOBALS[winduid]) : '';
+print <<<EOT
+-->
+	$guess_read_middle	
 <!--
 EOT;
 }
@@ -1789,7 +1739,27 @@ print <<<EOT
 									<div class="shareAll cc mb10">
 										<em>分享到</em>
 										<a href="javascript:void(0)" onclick="window.open('http://share.jianghu.taobao.com/share/addShare.htm?title='+encodeURIComponent(document.title.substring(0,76))+'&url='+encodeURIComponent(location.href)+'&content=','_blank','scrollbars=no,width=600,height=450,left=75,top=20,status=no,resizable=yes'); void 0" title="淘江湖">淘江湖</a>
+<!-- 分享到新浪 -->
+<!--
+EOT;
+/* platform weibo app --start */
+$weiboLoginService = L::loadClass('WeiboLoginService', 'sns/weibotoplatform/service');
+$isWayAllowLogin = $weiboLoginService->isWayAllowLogin('sinaweibo');
+if (!$windid || !$isWayAllowLogin){
+print <<<EOT
+-->										
 										<a href="javascript:(function(){window.open('http://v.t.sina.com.cn/share/share.php?title='+encodeURIComponent(document.title)+'&url='+encodeURIComponent(location.href)+'&source=bookmark','_blank','width=450,height=400');})()" title="新浪微博" style="background-position:0 -20px;">新浪</a>
+<!--
+EOT;
+}else{
+print <<<EOT
+-->										
+										<a href="javascript:(function(){window.open('connexion/share.php?type=sinaweibo&tid=$tid','_blank','width=600,height=500');})()" title="新浪微博" style="background-position:0 -20px;">新浪</a>
+<!--
+EOT;
+}print <<<EOT
+-->
+<!-- 分享到新浪 -->
 										<a href="javascript:void(0)" onclick="window.open( 'http://v.t.qq.com/share/share.php?url='+encodeURIComponent(document.location)+'&appkey=&site=&title='+encodeURI(document.title),'', 'width=700, height=680, top=0, left=0, toolbar=no, menubar=no, scrollbars=no, location=yes, resizable=no, status=no' );" title="QQ微博" style="background-position:0 -40px;">QQ微博</a>
 										<a href="javascript:void(0);" onclick="window.open('http://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url='+encodeURIComponent(document.location.href));return false;" title="QQ空间" style="background-position:0 -60px;">QQ空间</a>
 										<a href="javascript:d=document;t=d.selection?(d.selection.type!='None'?d.selection.createRange().text:''):(d.getSelection?d.getSelection():'');void(kaixin=window.open('http://www.kaixin001.com/~repaste/repaste.php?&rurl='+escape(d.location.href)+'&rtitle='+escape(d.title)+'&rcontent='+escape(d.title),'kaixin'));kaixin.focus();" title="开心" style="background-position:0 -80px;">开心</a>
@@ -1859,7 +1829,7 @@ print <<<EOT
 EOT;
 if($read['lou']==0){print <<<EOT
 -->
-							<a class="r-reply" title="回复此楼" href="javascript:;" onclick="postreply('回 楼主($read[anonymousname]) 的帖子');">回复</a>
+							<a class="r-reply" title="回复此楼" href="javascript:void(0);" onclick="postreply('回 楼主($read[anonymousname]) 的帖子');">回复</a>
 <!--
 EOT;
 }else{print <<<EOT
@@ -1878,7 +1848,7 @@ if($read[pid] != 'tpc'){print <<<EOT
 EOT;
 	if($admincheck || $_G['markable']){print <<<EOT
 -->
-										<a class="r-score" id="showping_$read[pid]" href="operate.php?action=showping&tid=$tid&pid=$read[pid]&page=$page" onclick="return sendurl(this,8)" title="评分">评分</a>
+										<a class="r-score" id="showping_$read[pid]" href="operate.php?action=showping&tid=$tid&pid=$read[pid]&page=$page" onclick="return sendurl(this,8,this)" title="评分">评分</a>
 <!--
 EOT;
 	}
@@ -1951,13 +1921,13 @@ $db_union[2]='';
 EOT;
 if($N_allowtypeopen){print <<<EOT
 -->
-	<a href="{$postUrl}" class="post fr" id="td_post1" title="发帖">发帖</a>
+	<a href="{$postUrl}#breadCrumb" class="post fr" id="td_post1" title="发帖">发帖</a>
 <!--
 EOT;
 }print <<<EOT
 -->
 	<a href="post.php?action=reply&fid=$fid&tid=$tid" class="replay fr mr10">回复</a>
-	<div style="padding-top:3px;"><span class="pages"><a href="thread.php?fid=$fid" class="w">&laquo;&nbsp;返回列表</a></span><span class="fl">$pages$db_union[5]</span><span class="pages"><a href="link.php?action=previous&fid=$fid&tid=$tid&fpage=$fpage&goto=previous">上一主题</a><a href="link.php?action=previous&fid=$fid&tid=$tid&fpage=$fpage&goto=next">下一主题</a></span></div>
+	<div style="padding-top:3px;"><span class="pages"><a href="thread.php?fid=$fid" class="w pages_pre">返回列表</a></span><span class="fl">$pages$db_union[5]</span></div>
 </div>
 <!--链接提醒-->
 <!--
@@ -1976,19 +1946,19 @@ if($db_windpost['checkurl']){print<<<EOT
 EOT;
 }print<<<EOT
 -->
-<script language="JavaScript">
+<script type="text/javascript">
 var tid = '$tid';
 var fid = '$fid';
 var mt;
 var totalpage = parseInt('$numofpage');
 var db_ajax = '$db_ajax';
 var page = parseInt('$page');
-var jurl = 'read.php?tid=$tid&fpage=$fpage&displayMode=1&toread=$toread{$urladd}&page=';
+var jurl = 'read.php?tid=$tid&fpage=$fpage&ds=1&toread=$toread{$urladd}&page=';
 var db_htmifopen = '$db_htmifopen';
 var db_dir = '$db_dir';
 var db_ext = '$db_ext';
 var db_bbsurl = '$db_bbsurl';
-var copyurl = '$subject|$db_bbsurl/read.php?tid=$tid&displayMode=1' + (page > 1 ? '&page=' + page : '') + '&'+'u=$winduid';
+var copyurl = '$subject|$db_bbsurl/read.php?tid=$tid&ds=1' + (page > 1 ? '&page=' + page : '') + '&'+'u=$winduid';
 <!--
 EOT;
 if($db_windpost['checkurl'] == '1'){print<<<EOT
@@ -2050,8 +2020,8 @@ function delPingLog(fid, tid, pid, pingid) {
 				if (getObj('createpingLogTr_'+pingid)) {
 					getObj('createpingLogTr_'+pingid).style.display = "none";
 				}
-				if ($('pingNum_'+pid)) {
-					var pingNums = $('pingNum_'+pid);
+				if (getObj('pingNum_'+pid)) {
+					var pingNums = getObj('pingNum_'+pid);
 					pingNums.innerHTML  = parseInt(pingNums.innerHTML) - 1;
 				}
 
@@ -2082,7 +2052,7 @@ function pingHideCtrl(pid) {
 	}
 }
 function copyFloorUrl(o) {
-	var floorurl = '$db_bbsurl/read.php?tid=$tid&displayMode=1' + (page > 1 ? '&page=' + page : '') + '#';
+	var floorurl = '$db_bbsurl/read.php?tid=$tid&ds=1' + (page > 1 ? '&page=' + page : '') + '#';
 	if (is_ie) {
 		window.clipboardData.setData("Text",floorurl+o);
 		showDialog('success','已成功复制',1);
@@ -2090,10 +2060,18 @@ function copyFloorUrl(o) {
 		prompt('按下 Ctrl+C 复制到剪贴板', floorurl+o)
 	}
 }
-if(is_webkit)
+if(getObj('bookmarkExplore')) {
 	getObj('bookmarkExplore').parentNode.removeChild(getObj('bookmarkExplore'));
+}
 </script>
-<script type="text/javascript" language="JavaScript" src="js/pw_lwd.js"></script>
+<script type="text/javascript" src="js/pw_lwd.js"></script>
+<script type="text/javascript">
+	window.onReady(function(){
+		//调用气泡
+		var pw_bubble=new Bubble([{"name":"pw_all_tip_medal","id":"pw_all_pos_medal"}]);
+		pw_bubble.init();
+		})
+</script>
 <!--
 EOT;
 $fastpost && require_once PrintEot($fastpost);
@@ -2101,10 +2079,10 @@ if ($ifmagic) {
 	$tmpReferer = urlencode($pwServer['HTTP_REFERER']);
 print <<<EOT
 -->
-<script language="javascript">
+<script>
 var myshow_wink={target:'tipTop',code:'{$magicid}',name:'{$magicname}',refer:'{$tmpReferer}'};
 </script>
-<script language="javascript" src="js/winks.js" type="text/javascript"></script>
+<script src="js/winks.js" type="text/javascript"></script>
 <!--
 EOT;
 }print<<<EOT
@@ -2196,6 +2174,60 @@ EOT;
 	<a href="javascript://" class="pImg_close" onclick="readImg.hidePhoto()">关闭</a>
 </div>
 </div></td><td class="pibg2"></td></tr><tr><td class="bcr4"></td><td class="pibg3"></td><td class="bcr3"></td></tr></tbody></table></div>
+
+<!--弹窗遮罩-->
+<!-- //start reply管理弹出 -->
+<div id="postbatch" style="display:none" class="popout">
+	<table cellspacing="0" cellpadding="0" border="0"><tbody><tr><td class="bgcorner1"></td><td class="pobg1"></td><td class="bgcorner2"></td></tr><tr><td class="pobg4"></td><td>
+		<div class="popoutContent">
+			<div>
+				<div class="popTop" style="cursor:move;" onmousedown = "read.move(event);">
+					<a href="javascript:void(0)" class="adel" onclick="closep()">关闭</a>
+					<span class="mr20">选中<span class="b s2" id="select_count">1</span>篇</span>
+				</div>
+				<div class="p10 cc">
+<!--
+EOT;
+if ($admincheck || $pwSystem['modother'] || $_G['markable']) {
+	if ($isGM || $pwSystem['modother']) {
+print <<<EOT
+-->
+					<a href="javascript:;" onclick="formclick(document.delatc,'masingle.php?action=delatc',2);return false;" class="mr5">删除</a><!--
+EOT;
+	}
+	if ($admincheck || $_G['markable']) {print <<<EOT
+-->
+					<a href="javascript:;" onclick="formclick(document.delatc,'operate.php?action=showping&page=$page',8);return false;" class="mr5">评分</a><!--
+EOT;
+	}
+}
+if ($isGM || $pwSystem['shield']) {print <<<EOT
+-->
+					<a href="javascript:;" onclick="formclick(document.delatc,'operate.php?action=shield&page=$page',9);return false;" title="屏蔽单帖" class="mr5">屏蔽</a><!--
+EOT;
+}
+if ($isGM || $pwSystem['remind']) {//提醒
+print <<<EOT
+-->
+					<a href="javascript:;" onclick="formclick(document.delatc,'operate.php?action=remind&page=$page',9);return false;" title="提醒管理" class="mr5">提醒</a><!--
+EOT;
+}
+if ($isGM || $pwSystem['split']) {print <<<EOT
+-->
+					<a id="split_$read[pid]"  href="javascript:;" onclick="formclick(document.delatc,'masingle.php?action=split&fid=$fid&tid=$tid&page=$page',2);return false;"  title="拆分" class="mr5">拆分</a><!--
+EOT;
+}
+print <<<EOT
+-->
+				</div>
+				<div class="popBottom cc">
+					<label class="fl"><input type="checkbox" onclick="replyManage.checkall(this);" value="" id="ajaxall" name="ajaxall">全选</label>
+				</div>
+			</div>
+		</div>
+	</td><td class="pobg2"></td></tr><tr><td class="bgcorner4"></td><td class="pobg3"></td><td class="bgcorner3"></td></tr></tbody></table>
+</div>
+<!-- //end reply管理弹出 -->
 <!--
 EOT;
 ?>-->

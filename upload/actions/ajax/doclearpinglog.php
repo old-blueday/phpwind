@@ -6,7 +6,8 @@ S::gp(array(
 	'tid',
 	'pid'
 ), null, 2);
-$db->update("UPDATE pw_pinglog SET ifhide=1 WHERE fid=" . S::sqlEscape($fid) . " AND tid=" . S::sqlEscape($tid) . " AND pid=" . S::sqlEscape($pid) . " AND pinger=" . S::sqlEscape($windid));
+//$db->update("UPDATE pw_pinglog SET ifhide=1 WHERE fid=" . S::sqlEscape($fid) . " AND tid=" . S::sqlEscape($tid) . " AND pid=" . S::sqlEscape($pid) . " AND pinger=" . S::sqlEscape($windid));
+pwQuery::update('pw_pinglog', 'fid=:fid  AND tid=:tid AND pid=:pid AND pinger=:pinger', array($fid,$tid,$pid,$windid), array('ifhide'=>1));
 if ($db->affected_rows()) {
 	echo "清空评分动态成功!";
 	$pingService = L::loadClass("ping", 'forum');

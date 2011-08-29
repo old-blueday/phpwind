@@ -24,16 +24,24 @@ class PW_Privacy {
 				'diary'		=> $rt['diary_isfollow'],
 				'photos'	=> $rt['photos_isfollow'],
 				'group'		=> $rt['group_isfollow'],
-				'sinaweibo'	=> $rt['sinaweibo_isfollow'],
 			);
 		} else {
 			$array = array(
 				'self'		=> 1,				'friend'	=> 1,
 				'cnlesp'	=> 1,				'article'	=> 1,
 				'diary'		=> 1,				'photos'	=> 1,
-				'group'		=> 1,				'sinaweibo'	=> 1,
+				'group'		=> 1,				
 			);
 		}
+		
+		/* platform weibo app */
+		$siteBindService = L::loadClass('WeiboSiteBindService', 'sns/weibotoplatform/service'); /* @var $siteBindService PW_WeiboSiteBindService */
+		if ($siteBindService->isOpen()) {
+			foreach ($siteBindService->getBindTypes() as $key => $config) {
+				$array[$key] = 1;
+			}
+		}
+		
 		return $key ? $array[$key] : $array;
 	}
 
@@ -45,7 +53,6 @@ class PW_Privacy {
 				'diary'		=> $rt['diary_isfeed'],
 				'photos'	=> $rt['photos_isfeed'],
 				'group'		=> $rt['group_isfeed'],
-				'sinaweibo'	=> 1,
 			);
 		} else {
 			$array = array(
@@ -53,9 +60,15 @@ class PW_Privacy {
 				'diary'		=> 1,
 				'photos'	=> 1,
 				'group'		=> 1,
-				'sinaweibo'	=> 1,
 			);
 		}
+		
+		/* platform weibo app */
+		$siteBindService = L::loadClass('WeiboSiteBindService', 'sns/weibotoplatform/service'); /* @var $siteBindService PW_WeiboSiteBindService */
+		if ($siteBindService->isOpen()) {
+			if ($key && $siteBindService->isBind($key)) return true;
+		}
+		
 		return $key ? $array[$key] : $array;
 	}
 	
@@ -83,6 +96,29 @@ class PW_Privacy {
 		return $key ? $array[$key] : $array;
 	}
 	
+	function getAtFeedByUserNames($usernames){
+		$data = array();
+		if (!S::isArray($usernames)) return $data;
+		$userService = L::loadClass('userservice','user');
+		$users = $userService->getByUserNames($usernames);
+		if (S::isArray($users)) {
+			$userIds = array();
+			foreach ($users as $k=>$v) {
+				$userIds[$v['uid']] = $v['username'];
+			}
+			$ouserdataDb = $this->_getOuserdataDB();
+			$atFeeds = (array)$ouserdataDb->findUserAtPrivacy(array_keys($userIds));
+			if (S::isArray($atFeeds)) {
+				foreach ($atFeeds as $v) {
+					$data[$v['uid']] = array('at_isfeed' => $v['at_isfeed'] ,'username' => $userIds[$v['uid']] );
+				}
+			}
+			foreach ($userIds as $uid=>$username){
+				$data[$uid] or $data[$uid] = array('at_isfeed' => 0 ,'username' => $username);
+			}
+		}
+		return $data;
+	}
 	/**
 	 * Get PW_OuserdataDB
 	 * 

@@ -72,8 +72,8 @@ class postTopic {
 	width:22px;
 	height:21px;
 }
-</style><script language=\"JavaScript\" src=\"js/pw_pccheck.js\"></script>";
-		$topichtml .= "<script language=\"JavaScript\" src=\"js/date.js\"></script><script language=\"JavaScript\" src=\"js/desktop/Compatibility.js\"></script><table width=\"100%\"><tr class=\"pp f_two\"><td colspan=2>".getLangInfo('other','pc_must')."</td></tr>";
+</style><script type=\"text/javascript\" src=\"js/pw_pccheck.js\"></script>";
+		$topichtml .= "<script type=\"text/javascript\" src=\"js/date.js\"></script><table width=\"100%\"><tr class=\"pp f_two\"><td colspan=2>".getLangInfo('other','pc_must')."</td></tr>";
 
 		if ($tid) {
 			$tablename = GetTopcitable($modelid);
@@ -289,7 +289,7 @@ class postTopic {
 				$vieworder_mark = $rt['vieworder'];
 			}
 		}
-		$flashtopicvalue .= "<ul class=\"b\" id=\"SwitchNav\"></ul><div></div></div></div><script type=\"text/javascript\" src=\"js/sliderplayer.js\"></script><script language=\"JavaScript\">pwSliderPlayers('pwSlidePlayer');</script>";
+		$flashtopicvalue .= "<ul class=\"b\" id=\"SwitchNav\"></ul><div></div></div></div><script type=\"text/javascript\" src=\"js/sliderplayer.js\"></script><script type=\"text/javascript\">pwSliderPlayers('pwSlidePlayer');</script>";
 		$vieworder_mark !=0 && $topicvalue .= "</cite></li>";
 		$topicvalue .= "</ul></div>";
 
@@ -345,7 +345,7 @@ class postTopic {
 				$db_topicname = $rt['name'];
 				Showmsg('topic_field_must');
 			}
-			if ($topic[$rt['fieldid']]) {
+			if (S::isNatualValue($topic[$rt['fieldid']])) {
 				if ($rt['type'] == 'number') {
 					!is_numeric($topic[$rt['fieldid']]) && Showmsg('number_error');
 					$limitnum = unserialize($rt['rules']);
@@ -407,7 +407,7 @@ class postTopic {
 			return null;
 		}
 		$searchhtml = "<form action=\"thread.php?fid=$fid&modelid=$modelid\" method=\"post\">";
-		$searchhtml .= "<input type=\"hidden\" name=\"topicsearch\" value=\"1\"><script language=\"JavaScript\" src=\"js/date.js\"></script><table>";
+		$searchhtml .= "<input type=\"hidden\" name=\"topicsearch\" value=\"1\"><script type=\"text/javascript\" src=\"js/date.js\"></script><table>";
 		$vieworder_mark = $ifsearch = $ifasearch = 0;
 		while ($rt = $this->db->fetch_array($query)) {
 			if($rt['ifasearch'] == 1) {
@@ -555,7 +555,7 @@ class postTopic {
 			}
 			$topicvalues = '';
 			foreach (explode(",",$fieldvalue) as $value) {
-				if ($value) {
+				if (S::isNatualValue($value)) {
 					$topicvalues .= $topicvalues ? ",".$newcheckbox[$value] : $newcheckbox[$value];
 				}
 			}

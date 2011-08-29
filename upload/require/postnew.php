@@ -8,6 +8,9 @@ if (!$theSpecialFlag) {//分类、团购、活动不启用主题分类
 	$tdbJson = array();
 	if ($t_db) {
 		foreach ($t_db as $key => $value) {
+			if ($value['isdefault'] && isset($t_db[$key])) {
+				$defaultKey = $t_db[$key];
+			}
 			if ($value['ifsys'] && $gp_gptype != 'system') {
 				unset($t_db[$key]);
 				continue;
@@ -20,7 +23,6 @@ if (!$theSpecialFlag) {//分类、团购、活动不启用主题分类
 		}
 	}
 	$tdbJson = pwJsonEncode($tdbJson);
-
 	$t_per = $pwforum->foruminfo['t_type'];
 }
 $db_forcetype = 0; // 是否需要强制主题分类
@@ -30,6 +32,11 @@ if ($t_db && $t_per=='2' && !$pwpost->admincheck && !S::inArray($groupid, array(
 	$compareGroups = array_intersect($extraGroups, array(3, 4));
 	empty($compareGroups) && $db_forcetype = 1;
 }
+//实名认证权限
+if ($db_authstate && !$pwpost->admincheck && $pwforum->forumset['auth_allowpost'] && true !== ($authMessage = $pwforum->authStatus($winddb['userstatus'],$pwforum->forumset['auth_logicalmethod']))) {
+	Showmsg($authMessage . '_post');
+}
+
 if (!$pwforum->foruminfo['allowpost'] && !$pwpost->admincheck && $_G['allowpost'] == 0) {
 	Showmsg('postnew_group_right');
 }
@@ -88,13 +95,15 @@ if (empty($_POST['step'])) {
 	require_once(R_P.'require/header.php');
 	$msg_guide = $pwforum->headguide($guidename);
 	$postMinLength = empty($pwpost->forum->foruminfo['forumset']['contentminlen']) ? $db_postmin : $pwpost->forum->foruminfo['forumset']['contentminlen'];
-	require_once PrintEot('post');footer();
+	require_once PrintEot('post');
+	CloudWind::yunSetCookie(SCR);
+	footer();
 
 } elseif ($_POST['step'] == 2) {
 
 	S::gp(array('atc_title','atc_content'), 'P', 0);
-	S::gp(array('replayorder','atc_anonymous','atc_newrp','atc_tags','atc_hideatt','magicid','magicname','atc_enhidetype','atc_credittype','flashatt'),'P');
-	S::gp(array('atc_iconid','atc_email','digest','topped','atc_hide','atc_requireenhide','atc_rvrc','atc_requiresell','atc_money', 'atc_usesign', 'atc_html', 'p_type', 'p_sub_type', 'atc_convert', 'atc_autourl'), 'P', 2);
+	S::gp(array('replayorder','atc_anonymous','atc_newrp','atc_tags','atc_hideatt','magicid','magicname','atc_enhidetype','atc_credittype','flashatt','buildIfcheck','robstarttime','robendtime','robendbuild','robawardbuilds','_usernames', 'replyrewardcredit'),'P');
+	S::gp(array('atc_iconid','atc_email','digest','topped','atc_hide','atc_requireenhide','atc_rvrc','atc_requiresell','atc_money', 'atc_usesign', 'atc_html', 'p_type', 'p_sub_type', 'atc_convert', 'atc_autourl', 'replyreward'), 'P', 2);
 
 	S::gp(array('iscontinue'),'P');//ajax提交时有敏感词时显示是否继续
 	($db_sellset['price'] && (int) $atc_money > $db_sellset['price']) && Showmsg('post_price_limit');
@@ -122,6 +131,9 @@ if (empty($_POST['step'])) {
 	$postdata->setEnhide($atc_requireenhide, $atc_rvrc, $atc_enhidetype);
 	$postdata->setSell($atc_requiresell, $atc_money, $atc_credittype);
 	//$newpost->checkdata();
+	//@
+	$postdata->setAtUsers($_usernames);
+	$postdata->setReplyReward($replyrewardcredit, $replyreward);
 	$postdata->conentCheck();
 
 	if ($postSpecial) {
@@ -140,6 +152,23 @@ if (empty($_POST['step'])) {
 		$postActForBbs->initData();
 		$postdata->setData('special', 8);
 	}
+	if ($buildIfcheck) {//抢楼
+		$robbuildService = L::loadClass("robbuild", 'forum');
+		$fieldsdata = array(
+			'authorid' 		=> $winduid,
+			'starttime' 	=> $robstarttime,
+			'endtime' 		=> $robendtime,
+			'endbuild' 		=> $robendbuild,
+			'awardbuilds' 	=> $robawardbuilds,
+			'postdate' 		=> $timestamp
+		);
+		if ($message = $robbuildService->checkAddData($foruminfo['allowrob'],$fieldsdata)) {
+			Showmsg($message);
+		}
+		$robbuildService->initData($fieldsdata);
+		$postdata->setStatus('2');
+		$postdata->setStatus('7');
+	}
 	L::loadClass('attupload', 'upload', false);
 	/*上传错误检查
 	$return = PwUpload::checkUpload();
@@ -154,6 +183,9 @@ if (empty($_POST['step'])) {
 	$topicpost->execute($postdata);
 	
 	$tid = $topicpost->getNewId();
+	// defend start	
+	CloudWind::yunUserDefend('postthread', $winduid, $windid, $timestamp, ($cloud_information[1] ? $timestamp - $cloud_information[1] : 0), ($tid ? 101 : 102),'',$postdata->data['content'],'','');
+	// defend end
 	defined('AJAX') && $pinfo = $pinfo.$tid;
 
 	if ($postSpecial) {
@@ -168,16 +200,20 @@ if (empty($_POST['step'])) {
 	if ($postActForBbs) {//活动初始化
 		$postActForBbs->insertData($tid,$fid);
 	}
+	if ($buildIfcheck) {//抢楼
+		$robbuildService = L::loadClass("robbuild", 'forum');
+		$robbuildService->insertData($tid);
+	}
 	$isAtcEmail = (int) $atc_email;
 	$isAtcNewrp = (int) $atc_newrp;
 	$userService = L::loadClass('UserService', 'user');
 	$userService->setUserStatus($winduid, PW_USERSTATUS_REPLYEMAIL, $isAtcEmail);
 	$userService->setUserStatus($winduid, PW_USERSTATUS_REPLYSITEEMAIL, $isAtcNewrp);
 
-	$j_p = "read.php?tid=$tid&displayMode=1";
+	$j_p = "read.php?tid=$tid&ds=1";
 	if ($db_htmifopen)
 		$j_p = urlRewrite ( $j_p );
-	if (empty($j_p) || $pwforum->foruminfo['cms']) $j_p = "read.php?tid=$tid&displayMode=1";
+	if (empty($j_p) || $pwforum->foruminfo['cms']) $j_p = "read.php?tid=$tid&ds=1";
 	$pinfo = defined('AJAX') ? "success\t" . $j_p  : "";
 	
 	if (!$iscontinue) {
@@ -189,9 +225,13 @@ if (empty($_POST['step'])) {
 			}
 		}
 	}
+	//defend start
+	CloudWind::YunPostDefend ( $winduid, $windid, $groupid, $tid, $atc_title, $atc_content, 'thread',array('fid'=>$fid,'tid'=>$tid,'forumname'=>$pwforum->foruminfo['name']) );
+	//defend end
 	//job sign
-	require_once(R_P.'require/functions.php');
-	initJob($winduid,"doPost",array('fid'=>$fid));
+	//require_once(R_P.'require/functions.php');
+	//initJob($winduid,"doPost",array('fid'=>$fid));
+	pwHook::runHook('after_post');
 	refreshto($j_p, $pinfo);
 }
 ?>

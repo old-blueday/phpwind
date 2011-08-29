@@ -3,12 +3,12 @@ include_once uTemplate::PrintEot('header');
 include_once uTemplate::PrintEot('space_appleft');
 print <<<EOT
 -->
-<script language="javascript">
+<script>
 var db_urlcheck = "$db_urlcheck";
 var db_bbsurl = '$db_bbsurl';
 </script>
-<script language="javascript" src="js/pw_lwd.js"></script>
-<link rel="stylesheet" type="text/css" href="u/images/usercenter.css" media="all" />
+<script type="text/javascript" src="js/pw_lwd.js"></script>
+<link rel="stylesheet" href="u/images/usercenter.css?{$GLOBALS['wind_repair']}" />
         <div class="sideD">
             <div class="boxA">
                 <h2>
@@ -126,9 +126,9 @@ EOT;
 -->                   
                     </div>
                 	<div id="menu_show" style="display:none;"></div>
-                <script language="javascript">
+                <script type="text/javascript">
 					function resetPos(o){
-						$('pw_box').style.top = o.getBoundingClientRect().top+ietruebody().scrollTop-227+'px'
+						getObj('pw_box').style.top = o.getBoundingClientRect().top+ietruebody().scrollTop-227+'px'
 					}
 					var charset = '$db_charset';
 					var imgpath   = '$imgpath';
@@ -137,14 +137,14 @@ EOT;
 						getObj('board').value += ' [s:'+NewCode+'] ';
 					}
                 </script>
-				<script src="$db_htmdir/js/face.js"></script>
-                <script language="JavaScript" src="js/app_comment.js"></script>
-                <script language="JavaScript" src="u/js/board.js"></script>
+				<script type="text/javascript" src="$db_htmdir/js/face.js"></script>
+                <script type="text/javascript" src="js/app_comment.js"></script>
+                <script type="text/javascript" src="u/js/board.js"></script>
 <!--
 EOT;
 if ($ismyfriend) { print <<<EOT
 -->
-                <script language="JavaScript" src="js/post.js"></script>
+                <script type="text/javascript" src="js/post.js"></script>
 <!--
 EOT;
 }print <<<EOT

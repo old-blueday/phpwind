@@ -20,6 +20,13 @@ class PW_InvokeService {
 		$invokeDB->deleteByName($name);
 		$this->deleteInovkePieceByInvokeName($name);
 	}
+	
+	function getInvokeById($id) {
+		$id = (int) $id;
+		if (!$id) return array();
+		$invokeDB = $this->_getInvokeDB();
+		return $invokeDB->getDataById($id);
+	}
 
 	function getInvokeByName($invokename) {
 		$invokeDB = $this->_getInvokeDB();
@@ -36,19 +43,20 @@ class PW_InvokeService {
 		return $invokeDB->getDatesByNames($names);
 	}
 
-	function addInvoke($name, $tagCode) {
+	function addInvoke($name, $tagCode,$type,$sign) {
 		$invokeDB = $this->_getInvokeDB();
 		$invokePieceDB = $this->_getInvokePieceDB();
 		$parseTagCode = L::loadClass('ParseTagCode', 'area');
 		$parseTagCode->init($name, $tagCode);
 		$parsecode = $parseTagCode->getParseCode();
 		
-		$invokeDB->insertData(array('name' => $name, 'tagcode' => $tagCode, 'parsecode' => $parsecode,'title'=>$name));
-		
 		$invokepiece = $parseTagCode->getConditoin();
 		if ($invokepiece) {
 			$invokePieceDB->insertDatas($invokepiece);
 		}
+		$data = array('name' => $name, 'tagcode' => $tagCode, 'parsecode' => $parsecode,'title'=>$name,'scr'=>$type,'sign'=>$sign);
+		$data['pieces'] = $this->getInvokePieces($name);
+		$invokeDB->insertData($data);
 	}
 
 	function updateInvokeTagCode($name, $tagCode) {
@@ -57,15 +65,103 @@ class PW_InvokeService {
 		$parseTagCode = L::loadClass('ParseTagCode', 'area');
 		$parseTagCode->init($name, $tagCode);
 		$parsecode = $parseTagCode->getParseCode();
-		
 		$newInvokePieces = $parseTagCode->getConditoin();
 		
-		$this->updateInvokeByName($name, array('tagcode' => $tagCode, 'parsecode' => $parsecode));
 		$this->_updateInvokePieceTagCode($name, $newInvokePieces);
+		$data = array('tagcode' => $tagCode, 'parsecode' => $parsecode);
+		$data['pieces'] = $this->getInvokePieces($name);
+		$this->updateInvokeByName($name, $data);
+		P_unlink($this->getInvokeApiFile($temp['id']));
 	}
 	
 	function updateInvokeTitle($name,$title) {
 		$this->updateInvokeByName($name, array('title' => $title));
+	}
+	
+	function invokeApiFileEot($id) {
+		$file = $this->getInvokeApiFile($id);
+		if (!file_exists($file)) {
+			writeover($file, "<?php\r\nprint <<<EOT\r\n".$invokeInfo['parsecode']."\r\nEOT;\r\n?>");
+		}
+	}
+	
+	function getInvokeApiFile($id) {
+		$id = (int) $id;
+		return D_P.'data/tplcache/invoke_name_id_'.$id;
+	}
+
+	function getChannelInvokesForSelect($alias, $ifverify = 0,$ifHTML=0) {
+		return $this->getPageInvokesForSelect('channel', $alias, $ifverify,$ifHTML);
+	}
+	
+	function getPortalInvokesForSelect($alias, $ifverify = 0,$ifHTML=0) {
+		return $this->getPageInvokesForSelect('other', $alias, $ifverify,$ifHTML);
+	}
+
+	function getPageInvokesForSelect($scr, $sign, $ifverify = 0,$ifHTML=0) {
+		$temp = array();
+		$invokes = $this->getEffectPageInvokes($scr, $sign, $ifverify);
+		foreach ($invokes as $invoke) {
+			if (!$invoke['pieces'] && !$ifHTML) continue; 
+			$temp[$invoke['name']] = array('invokename'=>$invoke['name'],'title'=>$invoke['title'],'pieces'=>$invoke['pieces']);
+		}
+		return $temp;
+	}
+	function getEffectPageInvokePieces($scr, $sign) {
+		$pieces = array();
+		$temp = $this->getEffectPageInvokes($scr, $sign);
+		$i = 0;
+		foreach ($temp as $value) {
+			if ($value['pieces'] && is_array($value['pieces'])) {
+				$pieces = array_merge($pieces, array_keys($value['pieces']));
+			}
+		}
+		return $pieces;
+	}
+	
+	function getEffectPageInvokes($scr, $sign, $ifverify = 0) {
+		$invokeDB = $this->_getInvokeDB();
+		return $invokeDB->getEffectPageInvokes($scr, $sign, $ifverify);
+	}
+	
+	function deleteUnuseInvoke($invokename) {
+		$invokeDB = $this->_getInvokeDB();
+		$invokeInfo = $invokeDB->getDataByName($invokename);
+		if ($invokeInfo && $invokeInfo['state']) {
+			$invokeDB->deleteByName($invokename);
+		}
+	}
+	
+	function updatePageInvokesState($scr, $sign, $invokeNames, $state) {
+		$invokeDB = $this->_getInvokeDB();
+		$invokeDB->updatePageInvokesState($scr, $sign, $invokeNames, $state);
+	}
+	
+	function searchPageInvokes($array, $page, $preg = 20) {
+		$invokeDB = $this->_getInvokeDB();
+		return $invokeDB->searchPageInvokes($array, $page, $preg);
+	}
+	function sreachPageInvokesPages($array, $page, $url, $preg = 20) {
+		$invokeDB = $this->_getInvokeDB();
+		$page = (int) $page;
+		if ($page < 1)
+			$page = 1;
+		$total = $invokeDB->searchCount($array);
+		$numofpage = ceil($total / $preg);
+		$numofpage < 1 && $numofpage = 1;
+		$page > $numofpage && $page = $numofpage;
+		
+		return numofpage($total, $page, $numofpage, $url);
+	}
+	
+	function getChannelPageInvokes($sign) {
+		$invokeDB = $this->_getInvokeDB();
+		return $invokeDB->getPageInvokes('channel',$sign);
+	}
+	
+	function getPortalPageInvokes($sign) {
+		$invokeDB = $this->_getInvokeDB();
+		return $invokeDB->getPageInvokes('other',$sign);
 	}
 
 	function _updateInvokePieceTagCode($name, $newInvokePieces) {

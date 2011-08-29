@@ -2,10 +2,8 @@
 include_once PrintEot('left');
 print <<<EOT
 -->
-<script type="text/javascript" language="JavaScript" src="js/global.js"></script>
-<script type="text/javascript" language="JavaScript" src="js/pw_ajax.js"></script>
-<script type="text/javascript" language="JavaScript" src="js/color_picker.js"></script>
-<script type="text/javascript" language="JavaScript">
+<script type="text/javascript" src="js/color_picker.js"></script>
+<script type="text/javascript">
 function toRestore(url) {
 	if (confirm("恢复默认将清空当前导航设置,请确认！")) {
 		window.location=(url);
@@ -47,7 +45,9 @@ print <<<EOT
 <div class="nav3 mb10">
 	<ul class="cc">
 		<li class="current"><a href="$basename&adminitem=navmain">社区主导航</a></li>
+		<!-- 
 		<li><a href="$basename&adminiteme=navside">顶部右侧导航</a></li>
+		 -->
 		<li><a href="$basename&adminitem=navside&type=head_left">顶部左侧导航</a></li>
 		<li><a href="$basename&adminitem=navside&action=footlist&type=$navTypeFoot">底部导航栏</a></li>
 		<li><a href="$basename&adminitem=navmain&action=add">添加导航</a></li>
@@ -181,7 +181,9 @@ print <<<EOT
 <div class="nav3 mb10">
 	<ul class="cc">
 		<li><a href="$basename&adminitem=navmain">社区主导航</a></li>
-		<li><a href="$basename&adminitem=navside">顶部右侧导航</a></li>
+		<!-- 
+		<li><a href="$basename&adminiteme=navside">顶部右侧导航</a></li>
+		 -->
 		<li><a href="$basename&adminitem=navside&type=head_left">顶部左侧导航</a></li>
 		<li><a href="$basename&adminitem=navside&action=footlist&type=$navTypeFoot">底部导航栏</a></li>
 		<li class="current"><a href="$basename&adminitem=navmain&action=edit&nid=$nid">编辑导航</a></li>
@@ -319,7 +321,9 @@ print <<<EOT
 	<ul class="cc">
 		
 		<li class="current"><a href="$basename&adminitem=navmain">社区主导航</a></li>
-		<li><a href="$basename&adminitem=navside">顶部右侧导航</a></li>
+		<!-- 
+		<li><a href="$basename&adminiteme=navside">顶部右侧导航</a></li>
+		 -->
 		<li><a href="$basename&adminitem=navside&type=head_left">顶部左侧导航</a></li>
 		<li><a href="$basename&adminitem=navside&action=footlist&type=$navTypeFoot">底部导航栏</a></li>
 	</ul>
@@ -331,11 +335,11 @@ print <<<EOT
 <div class="admin_table mb10">
 <table width="100%" cellspacing="0" cellpadding="0">
 	<tr class="tr2 td_bgB">
-		<td width="30"><span onclick="CheckAll(document.FORM)" class="cp">启用</span></td>
-		<td width="300">[顺序] 链接名称</td>
+		<td width="25"><span onclick="CheckAll(document.FORM)" class="cp">启用</span></td>
+		<td width="250">[顺序] 链接名称</td>
 		<td>链接地址</td>
-		<td width="190">显示位置</td>
-		<td width="120">操作</td>
+		<td>显示位置</td>
+		<td width="85">操作</td>
 	</tr>
 <!--
 EOT;
@@ -359,7 +363,7 @@ print <<<EOT
 			<input name="view[$n[nid]][view]" type="text" class="input input_wd" value="$n[view]" />
 			<input name="view[$n[nid]][title]" type="text" class="input input_wa" value="$n[title]" />
 		</td>
-		<td class="td2"><p class="lh_18"><a href="$n[link]" target="_blank" title="$n[alt]">$n[link]</a></p></td>
+		<td class="td2"><a href="$n[link]" target="_blank" title="$n[alt]">$n[link]</a></td>
 		<td class="td2">
 <!--
 EOT;
@@ -455,7 +459,7 @@ EOT;
 	if ('add' == $action || 'edit' == $action) {
 print <<<EOT
 -->
-<script type="text/javascript" language="JavaScript">
+<script type="text/javascript">
 function ctrlTopNavOptionsDisplay() {
 	if (getObj('parentNavId').value == '0') {
 		displayElement('topNavOptions', true);
@@ -479,16 +483,30 @@ function ctrlListTypeShow() {
 		displayElement('floatNeedListTypesTr', true);
 		displayElement('crossListTypes', true);
 		displayElement('verticalListTypes', false);
+		changeDftSelectionValue('cross');
 	} else if(currentType == 'vertical') {
 		displayElement('floatNeedListTypesTr', true);
 		displayElement('crossListTypes', false);
 		displayElement('verticalListTypes', true);
+		changeDftSelectionValue('vertical');
 	} else {
 		displayElement('floatNeedListTypesTr', false);
 	}
 }
 getObj('floatTypeSelection').onclick = ctrlListTypeShow;
 ctrlListTypeShow();
+
+function changeDftSelectionValue(type) {
+	var crossTypes = getObj('crossListTypes').getElementsByTagName('input');
+	var verticalTypes = getObj('verticalListTypes').getElementsByTagName('input');
+	if (type == 'cross') {
+		crossTypes[0].checked = 'checked';
+		verticalTypes[0].checked = verticalTypes[1].checked = false;
+	} else {
+		verticalTypes[0].checked = 'checked';
+		crossTypes[0].checked = crossTypes[1].checked = false;
+	}
+}
 </script>
 <!--
 EOT;
@@ -502,7 +520,9 @@ print <<<EOT
 <div class="nav3 mb10">
 	<ul class="cc">
 		<li><a href="$basename&adminitem=navmain">社区主导航</a></li>
-		<li><a href="$basename&adminitem=navside">顶部右侧导航</a></li>
+		<!-- 
+		<li><a href="$basename&adminiteme=navside">顶部右侧导航</a></li>
+		 -->
 		<li><a href="$basename&adminitem=navside&type=head_left">顶部左侧导航</a></li>
 		<li><a href="$basename&adminitem=navside&action=footlist&type=$navTypeFoot">底部导航栏</a></li>
 		<li class="current"><a href="$basename&adminitem=navside&action=add&type=$navType">添加导航</a></li>
@@ -576,15 +596,6 @@ print <<<EOT
 	</tr>
 	
 	<tbody id="topNavOptions">
-	<tr id="topNavOptionsList" class="tr1 vt">
-		<td class="td1">排列方式</td>
-		<td class="td2">
-			<ul class="list_A list_80 cc">
-				<li><input type="radio" name="listtype" value="onecol" checked />单列</li>
-				<li><input type="radio" name="listtype" value="twocol"  />双列</li>
-			</ul>
-		</td> <td class="td2"><div class="help_a"></div></td>
-	</tr>
 	<tr class="tr1 vt">
 		<td class="td1">显示位置</td>
 		<td class="td2">
@@ -626,7 +637,7 @@ print <<<EOT
 </div>
 </form>
 
-<script language="javascript">
+<script type="text/javascript">
 function ctrlParentShow() {
 	var allInputs = objCheck('navTypeSelection').getElementsByTagName("input");
 	var currentType = '';
@@ -659,8 +670,8 @@ getObj('navTypeSelection').onclick = ctrlParentShow;
 ctrlParentShow();
 
 function ctrlTopNavOptionsDisplay(parentNavId) {
-	if (getObj(parentNavId).value == '0') {
-		displayElement('topNavOptionsList', true);
+	if (getObj(parentNavId) && getObj(parentNavId).value == '0') {
+	//	displayElement('topNavOptionsList', true);
 		displayElement('topNavOptions', true);
 	} else {
 		displayElement('topNavOptions', false);
@@ -680,7 +691,9 @@ print <<<EOT
 <div class="nav3 mb10">
 	<ul class="cc">
 		<li><a href="$basename&adminitem=navmain">社区主导航</a></li>
-		<li><a href="$basename&adminitem=navside">顶部右侧导航</a></li>
+		<!-- 
+		<li><a href="$basename&adminiteme=navside">顶部右侧导航</a></li>
+		 -->
 		<li><a href="$basename&adminitem=navside&type=head_left">顶部左侧导航</a></li>
 		<li><a href="$basename&adminitem=navside&action=footlist&type=$navTypeFoot">底部导航栏</a></li>
 		<li class="current"><a href="$basename&adminitem=navside&action=edit&nid=$nid">编辑导航</a></li>
@@ -746,21 +759,6 @@ print <<<EOT
 	<tbody id="topNavOptions">
 <!--
 EOT;
-		if ($navType != $navTypeFoot) {
-print <<<EOT
--->
-	<tr class="tr1 vt">
-		<td class="td1">排列方式</td>
-		<td class="td2">
-			<ul class="list_A list_80 cc">
-				<li><input type="radio" name="listtype" value="onecol" $listOneChecked />单列</li>
-				<li><input type="radio" name="listtype" value="twocol" $listTwoChecked />双列</li>
-			</ul>
-		</td> <td class="td2"><div class="help_a"></div></td>
-	</tr>
-<!--
-EOT;
-		}
 print <<<EOT
 -->
 	<tr class="tr1 vt">
@@ -811,7 +809,7 @@ EOT;
 		if ($navType != $navTypeFoot) {
 print <<<EOT
 -->
-<script type="text/javascript" language="JavaScript">
+<script type="text/javascript">
 function ctrlTopNavOptionsDisplay() {
 	if (getObj('parentNavId').value == '0') {
 		displayElement('topNavOptions', true);
@@ -832,7 +830,9 @@ print <<<EOT
 <div class="nav3 mb10">
 	<ul class="cc">
 		<li><a href="$basename&adminitem=navmain">社区主导航</a></li>
-		<li><a href="$basename&adminitem=navside">顶部右侧导航</a></li>
+		<!-- 
+		<li><a href="$basename&adminiteme=navside">顶部右侧导航</a></li>
+		 -->
 		<li><a href="$basename&adminitem=navside&type=head_left">顶部左侧导航</a></li>
 		<li class="current"><a href="$basename&adminitem=navside&action=footlist&type=$navTypeFoot">底部导航栏</a></li>
 	</ul>
@@ -927,8 +927,10 @@ print <<<EOT
 -->
 <div class="nav3 mb10">
 	<ul class="cc">
-		<li><a href="$basename&adminitem=navmain">社区主导航</a></li>
+		<li><a href="$basename&adminitem=navmain">社区主导航</a></li><li>
+		<!-- 
 		<li $rightClass><a href="$basename&adminitem=navside">顶部右侧导航</a></li>
+		 -->
 		<li $leftClass><a href="$basename&adminitem=navside&type=$navTypeLeft">顶部左侧导航</a></li>
 		<li><a href="$basename&adminitem=navside&action=footlist&type=$navTypeFoot">底部导航栏</a></li>
 	</ul>

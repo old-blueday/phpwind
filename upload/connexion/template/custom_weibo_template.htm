@@ -1,0 +1,52 @@
+<!--<?php print <<<EOT
+--> <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>{$db_bbsname} - powered by phpwind.net</title>
+<meta http-equiv="Content-Type" content="text/html; charset=$db_charset" />
+<meta http-equiv="expires" content="0">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="x-ua-compatible" content="ie=7" />
+<meta http-equiv="Cache-Control" content="no-cache">
+<base />
+<link rel="stylesheet" type="text/css" href="{$db_bbsurl}/images/admin/admin_style.css" />
+</head>
+<body>
+<h2 class="h1">自定义微博格式</h2>
+<form action="$basename" method="post">
+<input type="hidden" name="step" value="edit">
+<div class="admin_table mb10">
+<table width="100%" cellspacing="0" cellpadding="0">
+<!--
+EOT;
+foreach ($templatesConfig as $key => $item) {
+print <<<EOT
+-->
+	<tr class="tr1">
+		<td class="td1" style="width:120px;">{$item[title]}</td>
+		<td class="td2" style="width:390px;"><textarea class="input input_wa" style="width:250px;" name="templates[$key]">{$templatesSet[$key]}</textarea></td>
+		<td class="td2">{$item[description]}</td>
+	</tr>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+</table>
+
+<div class="tac mb10" style="height:25px;"></div>
+<div class="tac mb10"><span id="submit" class="btn"><span><button type="submit" onfocus="blur();">提 交</button></span></span><span style="color:#000000;font-weight:700;padding-left:15px;">{$warningMessage}</span></div>
+</div>
+</form>
+<!--
+EOT;
+print <<<EOT
+-->
+</body>
+</html>
+<!--
+EOT;
+if(!$showafooter){
+afooter(true);
+}
+?>-->

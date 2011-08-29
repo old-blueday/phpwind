@@ -9,7 +9,7 @@
 EOT;
 if($action=='toptopic'){print <<<EOT
 -->
-<script language="JavaScript" src="js/date.js"></script>
+<script src="js/date.js"></script>
 <div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="adel cp" onclick="closep();">关闭</span>置顶操作</div>
 <table width="100%" class="vt z">
 <tr class="tr3">
@@ -98,8 +98,8 @@ EOT;
 </tr>
 <tr class="tr3"><td>有效时间:</td><td><input type="text" name="timelimit" size="4" class="input" /> 天</td></tr>
 </table>
-<script id="ajax_color" language="JavaScript" src="js/color_picker.js"></script>
-<script type="text/javascript" id="ajax_edit">
+<script id="ajax_color" src="js/color_picker.js"></script>
+<script id="ajax_edit">
 function pickReback(color){
 	getObj('color_show').style.backgroundColor = color;
 }
@@ -192,21 +192,18 @@ EOT;
 </tr>
 <tr class="tr3">
 	<td>操作原因:</td>
-	<td>
+	<td><input type="text" name="atc_content" onkeydown="ajax.quickpost(event,this.form)" class="input" style="width:312px;" />
 <!--
 EOT;
 if($db_adminreason){print <<<EOT
 -->
-		<select name="" onchange="this.form.atc_content.value=this.value" style="width:320px" class="mb5">
-			<option value="">自定义</option>
-			<option value="">-------</option>
+		<div><select size="6" onchange="this.form.atc_content.value=this.value" style="width:320px">
 			$reason_sel
-		</select><br>
+		</select></div>
 <!--
 EOT;
 }print <<<EOT
 -->
-		<textarea name="atc_content" onkeydown="ajax.quickpost(event,this.form)" class="textareaA"></textarea>
 	</td>
 </tr>
 </table>

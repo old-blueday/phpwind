@@ -42,7 +42,7 @@ EOT;
 }if($admintype=='article'){
 if(empty($action)){print <<<EOT
 -->
-<script language="JavaScript" src="js/date.js"></script>
+<script type="text/javascript" src="js/date.js"></script>
 <form action="$basename&" method=post>
   <input type=hidden name=action value='deltpc'>
   <h2 class="h1"><b>删除主题</b></h2>
@@ -311,6 +311,7 @@ EOT;
   <input type="hidden" name="hits" value="$hits">
   <input type="hidden" name="replies" value="$replies">
   <input type="hidden" name="author" value="$author">
+  <input type="hidden" name="authorid" value="$authorid">
   <input type="hidden" name="keyword" value="$keyword">
   <input type="hidden" name="userip" value="$userip">
   <input type="hidden" name="lines" value="$lines">
@@ -441,7 +442,7 @@ EOT;
 }}elseif($admintype=='message'){
 if(empty($action)){print <<<EOT
 -->
-<script src="js/date.js" language="JavaScript" type="text/javascript"></script>
+<script src="js/date.js" type="text/javascript"></script>
 <form action="$basename&" method="post">
   <h2 class="h1">按搜索条件删除</h2>
   <div class="admin_table mb10">
@@ -570,7 +571,7 @@ EOT;
 EOT;
 }}include_once PrintEot('adminbottom');
 ?>-->
-<script language="JavaScript">
+<script type="text/javascript">
 function deldirect(form,tar,msg){
 	if (form.direct.checked == true) {
 		document.getElementById(tar).innerHTML = '<b><font color=blue>删除个数</font></b>';

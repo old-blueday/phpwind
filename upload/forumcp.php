@@ -274,7 +274,7 @@ if (!$action) {
 			${'t_type_'.$t_type}='checked';
 
 			//主题分类
-			$query = $db->query("SELECT id,name,vieworder,upid,logo FROM pw_topictype WHERE fid=".S::sqlEscape($fid)." ORDER BY vieworder");
+			$query = $db->query("SELECT id,name,vieworder,upid,logo,isdefault FROM pw_topictype WHERE fid=".S::sqlEscape($fid)." ORDER BY vieworder");
 			while ($rt = $db->fetch_array($query)) {
 				$rt['name'] = str_replace(array('<','>','"',"'"),array("&lt;","&gt;","&quot;","&#39;"),$rt['name']);
 				if($rt['upid'] == 0) {
@@ -289,7 +289,7 @@ if (!$action) {
 		} else {
 			PostCheck();
 			S::slashes($forumset);
-			S::gp(array('t_view_db','t_logo_db','new_t_view_db','new_t_logo_db','new_t_sub_logo_db','new_t_sub_view_db','addtpctype'),'P');
+			S::gp(array('t_view_db','t_logo_db','new_t_view_db','new_t_logo_db','new_t_sub_logo_db','new_t_sub_view_db','addtpctype','t_set_default'),'P');
 			S::gp(array('t_db','new_t_db','new_t_sub_db','f_type','t_type'),'P',0);
 			$temptype = array('t_db','new_t_db','new_t_logo_db','new_t_sub_db');
 			empty($t_db) && $t_db = array();
@@ -306,6 +306,9 @@ if (!$action) {
 			empty($new_t_db) && $new_t_db = array();
 			empty($new_t_sub_db) && $new_t_sub_db = array();
 
+			if ($t_type == 2 && !$t_set_default && $t_db) {
+				list($t_set_default) = array_keys($t_db);
+			}
 			//更新原有的分类
 			foreach ($t_db as $key => $value) {
 
@@ -313,7 +316,8 @@ if (!$action) {
 				$db->update("UPDATE pw_topictype SET " . S::sqlSingle(array(
 					'name'			=> $value,
 					'logo'			=> $t_logo_db[$key],
-					'vieworder'		=> $t_view_db[$key]
+					'vieworder'		=> $t_view_db[$key],
+					'isdefault'		=> $t_set_default == $key ? 1 : 0
 				)) . " WHERE id=".S::sqlEscape($key));
 			}
 
@@ -321,16 +325,21 @@ if (!$action) {
 
 			foreach ($new_t_db as $key => $value) {
 				if(empty($value)) continue;
+				if (!$t_db) {
+					list($t_set_default) = array_keys($new_t_db);
+				}
 				$value = str_replace(array('&#46;&#46;','&#41;','&#60;','&#61;'),array('..',')','<','='),$value);
 				$typedb[] = array (
 					'fid' => $fid,
 					'name' => $value,
 					'logo'=>$new_t_logo_db[$key],
-					'vieworder'=>$new_t_view_db[$key]);
+					'vieworder'=>$new_t_view_db[$key],
+					'isdefault'		=> $t_set_default == $key ? 1 : 0
+				);
 			}
 
 			if ($typedb) {
-				$db->update("REPLACE INTO pw_topictype (fid,name,logo,vieworder) VALUES " . S::sqlMulti($typedb));
+				$db->update("REPLACE INTO pw_topictype (fid,name,logo,vieworder,isdefault) VALUES " . S::sqlMulti($typedb));
 			}
 			//增加二级新分类
 			foreach ($new_t_sub_db as $key => $value) {
@@ -455,8 +464,8 @@ if (!$action) {
 			$rt = $db->get_one('SELECT topic AS sum FROM pw_forumdata WHERE fid='.S::sqlEscape($fid));
 		}
 		$pages = numofpage($rt['sum'],$page,ceil($rt['sum']/$db_perpage), "forumcp.php?action=edit&type=thread&fid=$fid&$url_a");
-		$query = $db->query("SELECT tid,subject,author,authorid,postdate,titlefont,topped,digest FROM pw_threads WHERE fid=".S::sqlEscape($fid)." AND ifcheck='1' $sql ORDER BY topped DESC,lastpost DESC $limit");
-		$threaddb = array();
+		$query = $db->query("SELECT tid,subject,author,authorid,postdate,titlefont,topped,digest,specialsort FROM pw_threads WHERE fid=".S::sqlEscape($fid)." AND ifcheck='1' $sql ORDER BY topped DESC,lastpost DESC $limit");
+		$threaddb = $toppedThread = array();
 		while ($rt = $db->fetch_array($query)) {
 			$rt['subject'] = substrs($rt['subject'],35);
 			if ($rt['titlefont']) {
@@ -467,8 +476,14 @@ if (!$action) {
 				if ($titledetail[3])$rt['subject'] = "<u>$rt[subject]</u>";
 			}
 			$rt['postdate'] = get_date($rt['postdate']);
-			$threaddb[] = $rt;
+			
+			if (!$rt['specialsort']) {
+				$threaddb[] = $rt;
+				continue;
+			}
+			$rt['specialsort'] && $toppedThread[] = $rt;
 		}
+		S::isArray($toppedThread) && $threaddb = array_merge($toppedThread, $threaddb);
 		require_once PrintEot('forumcp');footer();
 
 	} elseif ($type == 'tcheck') {
@@ -600,7 +615,7 @@ if (!$action) {
 			// $threadList = L::loadClass("threadlist", 'forum');
 			// $threadList->refreshThreadIdsByForumId($fid);
 			Perf::gatherInfo('changeThreadWithForumIds', array('fid'=>$fid));
-
+			$todayTopicNum = count((array)$tids);
 			require_once(R_P.'require/updateforum.php');
 			updateforum($fid);
 			refreshto("forumcp.php?action=edit&type=$type&fid=$fid",'operate_success');
@@ -1072,7 +1087,7 @@ if (!$action) {
 			$query = $db->query("SELECT r.*,t.subject,t.author,t.authorid,t.postdate FROM pw_recycle r LEFT JOIN pw_threads t USING(tid) WHERE r.pid='0' AND r.fid=".S::sqlEscape($fid).$sql." ORDER BY deltime DESC $limit");
 			while ($rt = $db->fetch_array($query)) {
 				$rt['deltime'] = get_date($rt['deltime']);
-				$rt['subject'] = substrs($rt['subject'],50);
+				$rt['subject'] = substrs($rt['subject'],40);
 				$rt['fname']   = $forum[$rt['fid']]['name'];
 				$rt['postdate'] = get_date($rt['postdate'], 'Y-m-d H:i:s');
 				$recycledb[$rt['tid']] = $rt;
@@ -1263,11 +1278,13 @@ if (!$action) {
 			$rt    = $db->get_one("SELECT COUNT(*) AS sum FROM pw_recycle r LEFT JOIN $pw_posts p USING(pid) LEFT JOIN pw_threads t ON r.tid=t.tid WHERE r.fid=".S::sqlEscape($fid)." AND r.pid>'0' AND p.fid='0' $sql");
 			$pages = numofpage($rt['sum'],$page,ceil($rt['sum']/$db_perpage), "forumcp.php?action=edit&type=precycle&fid=$fid&$url_a");
 
-			$query = $db->query("SELECT r.*,p.author,p.authorid,p.content,t.subject FROM pw_recycle r LEFT JOIN $pw_posts p ON r.pid=p.pid LEFT JOIN pw_threads t ON r.tid=t.tid WHERE r.fid=".S::sqlEscape($fid)." AND r.pid>'0' AND p.fid='0' $sql ORDER BY r.deltime DESC $limit");
+			$query = $db->query("SELECT r.*,p.author,p.authorid,p.content,p.postdate,t.subject FROM pw_recycle r LEFT JOIN $pw_posts p ON r.pid=p.pid LEFT JOIN pw_threads t ON r.tid=t.tid WHERE r.fid=".S::sqlEscape($fid)." AND r.pid>'0' AND p.fid='0' $sql ORDER BY r.deltime DESC $limit");
 			while ($rt = $db->fetch_array($query)) {
 				$rt['deltime'] = get_date($rt['deltime']);
-				$rt['subject'] = substrs($rt['subject'],50);
+				$rt['postdate'] = get_date($rt['postdate']);
+				$rt['subject'] = substrs($rt['subject'],40);
 				$rt['content'] = str_replace("\n","<br>",$rt['content']);
+				$rt['content'] = convert($rt['content'], $db_windpost);
 				$rt['fname']   = $forum[$rt['fid']]['name'];
 				$recycledb[]   = $rt;
 			}

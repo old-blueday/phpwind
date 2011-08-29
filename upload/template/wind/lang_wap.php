@@ -5,7 +5,7 @@ $lang['wap'] = array (
 
 'wap_closed'		=> '系统没有开启 WAP功能',
 'undefined_action'	=> '非法操作,请返回',
-'not_login'			=> '使用此功能，请先<a href="login.php">登录</a>或<a href="register.php">注册</a>。',
+'not_login'			=> '使用此功能，请先<a href="index.php?a=login">登录</a>或<a href="index.php?a=register">注册</a>。',
 'wap_quit'			=> '退出成功!',
 'forum_right'		=> '该版块为认证版块：您没有权限查看该版块的文章',
 'post_nofid'		=> '没有选择分类',

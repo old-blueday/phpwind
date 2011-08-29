@@ -81,7 +81,6 @@ if ($thelast != 1) {
 		$pcmid = $db->insert_id();
 		$nextto = 'pcjoin';
 		
-		//通知
 		$threadInfo = $db->get_one("SELECT * FROM pw_threads WHERE tid=".S::sqlEscape($tid));
 		$createTime = get_date($threadInfo['postdate']);
 		//* require_once pwCache::getPath(D_P.'data/bbscache/forum_cache.php');

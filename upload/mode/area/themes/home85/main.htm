@@ -3,8 +3,7 @@ print <<<EOT
 -->
 <!--#require modeEot('header');#-->
 
-<script language="javascript" src="mode/area/js/ddsliderplayer.js"></script>	
-<div id="main">
+<script type="text/javascript" src="mode/area/js/ddsliderplayer.js"></script>	
 	<div class="p83_960"><pw id="L9894homeP83@简介首页" /></div>
 	<div class="p83_960">
 		<div class="p83_gridA">
@@ -91,7 +90,7 @@ print <<<EOT
 					<pw id="I7567homeP83@简介首页" /> 
 					<pw id="D7308homeP83@简介首页" /> 
 				</div>
-				<script>ddSliderPlayers('tabswi1_B','tabswi1_A',0,'current');</script>
+				<script>onReady(function(){ddSliderPlayers('tabswi1_B','tabswi1_A',0,'current');})</script>
 			</div>
 			<div class="p83_mdA clB">
 				<h3 class="p83_h3 p83_h3A"><pw id="D9324homeP83@简介首页" /></h3>
@@ -109,7 +108,6 @@ print <<<EOT
 			</div>
 		</div>
 	</div>
-</div>
 
 
 <!--#require modeEot('footer');#-->

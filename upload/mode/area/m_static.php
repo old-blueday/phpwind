@@ -31,6 +31,15 @@ if ($type == 'channel') {
 	if (!$alias || !$area_channels[$alias]) exit; //频道不存在
 	if (!$area_statictime) exit;	//未设置更新时间
 	$channelInfo = $area_channels[$alias];
+	if ($db_distribute) {
+		$file = S::escapePath(AREA_PATH.$alias.'/index.html');
+		if ($channelInfo['statictime'] && pwFilemtime($file)<$channelInfo['statictime']) {
+			require M_P.'index.php';
+			aliasStatic($channelInfo['alias']);
+			touch($file,$channelInfo['statictime']);
+			exit;
+		}
+	}
 
 	if ($channelInfo['statictime'] && $channelInfo['statictime']+$area_statictime*60>$timestamp) exit;
 	

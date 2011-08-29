@@ -84,14 +84,16 @@ class PW_FilterUtil {
 	 * 返回一个经过词语替换的字符串
 	 */
 	function convert($str, $wdstruct = array()) {
-		$this->loadWords();
-		$replacedb = $this->fbwords + $this->replace + $this->alarm;
 		$msg = $str;
-		if ($replacedb) {
-			foreach ($replacedb as $key => $value) {
-				$msg = preg_replace("/$key/i", $value, $msg);
-			}
-		}
+		
+		$file = array(
+			'bin'    => $this->dict_bin_path,
+			'source' => $this->dict_source_path
+		);
+		$trie = new Trie($file);
+		$trie->nodes = $trie->getBinaryDict($trie->default_out_path);
+		$msg = $trie->replaces($str);
+		
 		if ($wdstruct) {
 			if ($msg == $str) {
 				$this->addList('yes', $wdstruct['type'], $wdstruct['id']);
@@ -156,27 +158,15 @@ class PW_FilterUtil {
 		if (empty($str)) {
 			return false;
 		}
-		$this->loadWords();
-		foreach ($this->fbwords as $key => $value) {
-			if (preg_match("/$key/i", $str)) {
-				return $this->getTrueBanword($key);
-			}
+		$this->getFilterResult($str);
+		$titlelen = strlen($str);
+		$arrWords = array_keys($this->filter_word);
+		$title_filter_word = '';
+		foreach ($arrWords as $key) {
+			if ($key > $titlelen) break;
+			$title_filter_word .= $title_filter_word ? ','.$this->filter_word[$key] : $this->filter_word[$key];
 		}
-		if ($replace) {
-			foreach ($this->replace as $key => $value) {
-				if (preg_match("/$key/i", $str)) {
-					return $this->getTrueBanword($key);
-				}
-			}
-		}
-		if ($alarm) {
-			foreach ($this->alarm as $key => $value) {
-				if (preg_match("/$key/i", $str)) {
-					return $this->getTrueBanword($key);
-				}
-			}
-		}
-		return false;
+		return $title_filter_word ? $this->getTrueBanword($title_filter_word) : false;
 	}
 
 	function getTrueBanword($word) {
@@ -639,7 +629,7 @@ class Trie {
 			//preg_match('/^(.*?)\s+(.*)/i', $word, $weight); //提取关键字和权重
 			//$weight = explode("|", $word);
 			//$word = trim($weight[0]);
-			list($word, $weight) = $this->split($word);
+			list($word, $weight, $replace) = $this->split($word);
 			for ($len = strlen($word), $i = 0; $i < $len; $i++) {
 				$c = ord($word[$i]);
 				if (isset($this->nodes[$cur][1][$c])) { //已存在就下移
@@ -653,6 +643,7 @@ class Trie {
 			}
 			$this->nodes[$cur][0] = true; //一个词结束，标记叶子节点
 			$this->nodes[$cur][2] = trim($weight); //将权重放在叶子节点
+			$this->nodes[$cur][3] = trim($replace);
 		}
 		return $this->nodes;
 	}
@@ -661,7 +652,7 @@ class Trie {
 		if (($pos = strrpos($str, '|')) === false) {
 			return array($str, 0);
 		}
-		return array(substr($str, 0, $pos), substr($str, $pos+1));
+		return explode('|',$str);
 	}
 
     /**
@@ -698,6 +689,37 @@ class Trie {
             }
         }
         return $ret;    
+    }
+
+ 	function replaces($s) {
+    	$s = strtolower($s);
+        $isUTF8 = strtoupper(substr($GLOBALS['db_charset'],0,3)) === 'UTF' ? true : false;
+        $ret = array();
+        $cur = 0; //当前节点，初始为根节点
+        $i = 0; //字符串当前偏移
+        $p = 0; //字符串回溯位置
+        $len = strlen($s);
+        while($i < $len) {
+            $c = ord($s[$i]);
+            if (isset($this->nodes[$cur][1][$c])) { //如果存在
+                $cur = $this->nodes[$cur][1][$c]; //下移当前节点
+                if ($this->nodes[$cur][0]) { //是叶子节点，单词匹配！
+                    $s = ($this->nodes[$cur][2] == 0.6 && isset($this->nodes[$cur][3])) ? substr_replace($s, $this->nodes[$cur][3], $p, $i - $p + 1) : $s; //取出匹配位置和匹配的词以及词的权重
+                    $p = $i + 1; //设置下一个回溯位置
+                    $cur = 0; //重置当前节点为根节点
+                }
+				$i++; //下一个字符
+            } else { //不匹配
+				$cur = 0; //重置当前节点为根节点
+                if (!$isUTF8 && ord($s[$p]) > 127 && ord($s[$p+1]) > 127) {
+					$p += 2; //设置下一个回溯位置
+				} else {
+					$p += 1; //设置下一个回溯位置
+				}
+				$i = $p; //把当前偏移设为回溯位置
+            }
+        }
+        return $s;    
     }
 }
 

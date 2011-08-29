@@ -73,7 +73,12 @@ foreach($tiddb as $value){print <<<EOT
 <div style="overflow:hidden;height:18px;line-height:18px;">
 <!--
 EOT;
-if($value['topped']){
+if($value['topped']==4){print <<<EOT
+-->
+<img src="$imgpath/pwicon/headtopic_$value[topped].gif" alt="置顶帖标志" />							
+<!--
+EOT;
+}elseif($value['topped']){
 print <<<EOT
 -->
 <img src="$imgpath/$stylepath/file/headtopic_$value[topped].gif" alt="置顶帖标志" />

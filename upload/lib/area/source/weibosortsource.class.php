@@ -11,7 +11,7 @@ class PW_WeiboSortSource extends SystemData {
 	 */
 	function getSourceData($config,$num) {
 		$config = $this->_initConfig($config);
-		return $this->_getDataBySortType($config['sorttype'],$fid,$num);
+		return $this->_getDataBySortType($config['sorttype'],$num);
 	}
 	
 	/**
@@ -21,7 +21,7 @@ class PW_WeiboSortSource extends SystemData {
 	 * @param array $sortType
 	 * @param int $num
 	 */
-	function _getDataBySortType($sortType,$fid,$num) {
+	function _getDataBySortType($sortType,$num) {
 		$weiboService = $this->_getWeiboService();
 		$topicService = $this->_getTopicService();
 		$attentionService = $this->_getAttentionService();
@@ -74,7 +74,7 @@ class PW_WeiboSortSource extends SystemData {
 				}
 				$v['title']	 	= $v['descrip'] = strip_tags($v['topicname']);
 				$v['url']		= 'apps.php?q=weibo&do=topics&topic='.$v['topicname'];
-				$v['posttime']  = get_date($v['crtime'],'Y-m-d');
+				$v['postdate']  = get_date($v['crtime'],'Y-m-d');
 			}elseif($v['mid']){
 				$v['url'] 	= 'apps.php?q=weibo&do=detail&mid='.$v['mid'].'&uid='.$v['uid'];
 				$v['title']	= $v['extra']['title'] ? strip_tags($v['extra']['title']) : strip_tags($v['content']);
@@ -83,7 +83,7 @@ class PW_WeiboSortSource extends SystemData {
 				$v['author'] = $v['username'];
 				$v['authorid'] = $v['uid'];
 
-				$v['posttime']  = $v['postdate_s'];
+				$v['postdate']  = $v['postdate_s'];
 				if(S::isArray($v['extra']['photos'])){
 					$image = $v['extra']['photos'][0];
 					$temp = geturl($image['path']);

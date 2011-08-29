@@ -14,7 +14,7 @@ if ($db_columns) {
 		require_once PrintEot('columns');exit;
 	} else {
 		Cookie('columns','1');
-		echo "<script language=\"JavaScript\">top.location.href=\"".$url."\"</script>";
+		echo "<script type=\"text/javascript\">top.location.href=\"".$url."\"</script>";
 		exit;
 	}
 } else {

@@ -1,0 +1,219 @@
+<!--<?php
+require_once uTemplate::PrintEot('header');
+require_once uTemplate::PrintEot('profile_left');
+print <<<EOT
+-->
+
+<style>
+.shareWays{}
+.shareWays .item{min-height:75px; _height:75px; margin:25px 0 0;}
+.shareWays .item .item-app{margin:10px 24px 10px 30px; width:220px; overflow:hidden;border-right: 1px solid #dfdfdf;}
+.shareWays .item .hd{font-size:16px; font-family:"黑体"; height:50px; color:#a0a1a2}
+.shareWays .item .bd{padding:6px 0 0;}
+.shareWays .item .bd p{margin-top:10px; text-align:center;}
+.shareWays .item .tips{padding:10px 0 8px 275px}
+.shareWays .item .tips h4{font-size:14px; font-weight:700;}
+.shareWays .item .tips ol{list-style:inside decimal;}
+.shareWays .item .tips li{margin:8px 0;}
+.shareWays .item .connect{float:left; width:90px; height:50px; overflow:hidden; line-height:22px; text-align:center;}
+.shareWays .item .relieve{display:inline-block; margin-top:2px; width:21px; height:21px; overflow:hidden; text-indent:-9em; background:url(u/images/expand/weibo_del.png) no-repeat 0 0}
+.shareWays .item .relieve:hover{background-position:0 -22px}
+.shareWays .item .wayLogo{height:48px; width:48px; overflow:hidden}
+</style>
+
+<div class="contUser">
+	<div class="p15">
+		<h4 class="site"><span>帐号通设置</span></h4>
+<!--
+EOT;
+$tmpResetClass = $isNotResetPassword && $t == 'resetpwd' ? ' class="current"' : '';
+$tmpBindClass = $tmpResetClass ? '' : ' class="current"';
+print <<<EOT
+-->
+		<div class="navC">
+			<ul>
+				<li{$tmpBindClass}><a href="profile.php?action=$action" hidefocus="true">帐号绑定</a></li>
+<!--
+EOT;
+if ($isNotResetPassword) {
+print <<<EOT
+-->
+				<li{$tmpResetClass}><a href="profile.php?action=$action&t=resetpwd" hidefocus="true">创建密码</a></li>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+			</ul>
+		</div>
+
+<!--
+EOT;
+if ($t != 'resetpwd') {
+print <<<EOT
+-->
+		<div class="p15">
+			<div>绑定后，就可以使用以下网站的帐号登录，随时随地同步你的新鲜事等内容，让更多的朋友分享你的生活！</div>
+			
+			<div class="shareWays">
+<!--
+EOT;
+	foreach ($userBindList as $bindType => $userBind) {
+		$descriptions = explode(';', $userBind['config']['description']);
+		if ($userBind['isBind']) {
+print <<<EOT
+-->
+				<div class="item bgA">
+					<div class="fl item-app">
+					<table>
+						<tr>
+							<td class="hd">
+								<div class="fl img_50"><img title="社区帐号：{$windid}" src="$faceurl" width="44" height="44" /></div>
+								<div class="connect">已绑定<br /><a class="relieve" title="解除绑定" href="profile.php?action=$action&t=tounbind&type=$bindType" onclick="return ajaxurl(this);">解除绑定</a></div>
+<!--
+EOT;
+			if ($userBind['config']['uidUrlPrefix'] || $userBind['config']['usernameUrlPrefix']) {
+				$userHomeUrl = $userBind['config']['uidUrlPrefix'] ? $userBind['config']['uidUrlPrefix'] . $userBind['bindInfo']['info']['id'] : $userBind['config']['usernameUrlPrefix'] . $userBind['bindInfo']['info']['name'];
+print <<<EOT
+-->
+								<div class="fl wayLogo"><a target="_blank" title="{$userBind[config][accountTitle]}：{$userBind[bindInfo][info][name]}" href="{$userHomeUrl}"><img src="{$userBind[config][logo48x48]}" width="48" height="48" /></a></div>
+<!--
+EOT;
+			} else {
+print <<<EOT
+-->
+								<div class="fl wayLogo"><img title="{$userBind[config][accountTitle]}：{$userBind[bindInfo][info][name]}" src="{$userBind[config][logo48x48]}" width="48" height="48" /></div>
+<!--
+EOT;
+			}
+print <<<EOT
+-->
+							</td>
+						</tr>
+					</table>
+					</div>
+					<div class="tips">
+						<h4>轻松绑定{$userBind[config][accountTitle]} 实现以下功能：</h4>
+						<ul>
+<!--
+EOT;
+			foreach ($descriptions as $text) {
+print <<<EOT
+-->
+							<li>$text</li>
+<!--
+EOT;
+			}
+print <<<EOT
+-->
+						</ul>
+					</div>
+					
+				</div>
+<!--
+EOT;
+		} else {
+print <<<EOT
+-->
+				<div class="item bgA">
+					<div class="fl item-app">
+						<table>
+							<tr>
+								<td class="hd"><span class="mr10">绑定</span><a title="{$userBind[config][title]}" href="javascript:;" onclick="window.open('{$userBind[bindUrl]}', 'weiboBind', 'height=520, width=850, toolbar=no, menubar=no, scrollbars=no, resizable=no, location=no, status=no');"><img src="{$userBind[config][logoRectangle]}" align="absmiddle" /></a></td>
+							</tr>
+						</table>
+					</div>
+					<div class="tips">
+						<h4>轻松绑定{$userBind[config][accountTitle]} 实现以下功能：</h4>
+						<ul>
+<!--
+EOT;
+			foreach ($descriptions as $text) {
+print <<<EOT
+-->
+							<li>$text</li>
+<!--
+EOT;
+			}
+print <<<EOT
+-->
+						</ul>
+					</div>
+				</div>
+<!--
+EOT;
+		}
+	}
+print <<<EOT
+-->
+			</div>
+
+		</div>
+		
+		<div class="c mb20"></div>
+		
+		<form action="profile.php?action=$action&t=setsync" method="post">
+		<input type="hidden" name="verify" value="$verifyhash" />
+		<div class="p15">
+			
+			<div class="mb5">以下这些新鲜事我愿意同步到选定的微博平台</div>
+			<div class="p15 bgA mb20">
+				<label class="mr20"><input type="checkbox" name="article_issync" value="1" {$article_issync} />帖子</label>
+				<label class="mr20"><input type="checkbox" name="diary_issync" value="1" {$diary_issync} />日志</label>
+				<label class="mr20"><input type="checkbox" name="photos_issync" value="1" {$photos_issync} />相册</label>
+				<label class="mr20"><input type="checkbox" name="group_issync" value="1" {$group_issync} />群组</label>
+				<label class="mr20"><input type="checkbox" name="transmit_issync" value="1" {$transmit_issync} />转发的新鲜事</label>
+				<label class="mr20"><input type="checkbox" name="comment_issync" value="1" {$comment_issync} />新鲜事的回复</label>
+			</div>
+			<div class="tac">
+				<span class="btn"><span><button type="submit">提 交</button></span></span>
+			</div>
+			
+		</div>
+		</form>
+<!--
+EOT;
+} else {
+print <<<EOT
+-->
+
+		<form action="profile.php?action=$action&t=setpassword" method="post">
+		<input type="hidden" name="verify" value="$verifyhash" />
+		<div class="p15">
+
+			<div class="mb15">创建登录密码后，即可使用本站帐号 {$windid} 登录</div>
+			
+			<table width="100%" class="setTable">
+				<tr>
+					<th class="th">用户名</th>
+					<td class="td">{$windid}</td>
+				</tr>
+				<tr>
+					<th class="th">新密码</th>
+					<td class="td"><input class="input" type="password" size="25" name="resetpwd" value="" /></td>
+				</tr>
+				<tr>
+					<th class="th">确认新密码 </th>
+					<td class="td"><input class="input" type="password" size="25" name="resetpwd_repeat" value="" /></td>
+				</tr>
+			</table>
+			
+			<div class="tac mb20">
+				<span class="btn"><span><button type="submit">提 交</button></span></span>
+			</div>
+			
+		</div>
+		</form>
+
+<!--
+EOT;
+}
+print <<<EOT
+-->
+
+	</div>
+</div>
+<!--
+EOT;
+require_once uTemplate::printEot('footer');
+?>-->

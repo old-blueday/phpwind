@@ -166,8 +166,8 @@ EOT;
 </div>
 <div class="mb10 tac"><span class="btn"><span><button type="submit">提 交</button></span></span></div>
 </form>
-<script language="JavaScript" src="js/pw_ajax.js"></script>
-<script language="JavaScript">
+<script type="text/javascript" src="js/pw_ajax.js"></script>
+<script type="text/javascript">
 function cateopen(id) {
 	var o = getObj('cate_' + id);
 	if (o == null) return;
@@ -484,7 +484,7 @@ EOT;
     <span class="btn"><span><button type="submit">提 交</button></span></span>
     <span class="bt"><span><button type="reset">重 置</button></span></span>
 </div>
-<script language="JavaScript">
+<script type="text/javascript">
 function addforum(){
 	var s = getObj('fmode').firstChild.cloneNode(true);
 	getObj('fbody').appendChild(s);
@@ -729,6 +729,7 @@ EOT;
 	$ifcmshideinbbs_checked = $ifcms == 2 ? "checked" : "";
 print<<<EOT
 -->
+<!-- 8.7 注释社区门户模式
 	<tr class="tr1 vt">
 		<td class="td1">版块内容展示方式</td>
 		<td class="td2">
@@ -741,6 +742,7 @@ print<<<EOT
         <td class="td2"><div class="help_a">当选择社区门户模式时，建议开启主题审核功能</div></td>
         <td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[ifcms]" value="1" /></div></td>
 	</tr>
+	 -->
 	<tr class="tr1 vt">
 		<td class="td1">版块类别</td>
 		<td class="td2">
@@ -816,7 +818,7 @@ EOT;
        <td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[forumsetdb][sellprice]" value="1" /></div></td>
     </tr>
 </table>
-<script language="JavaScript">
+<script type="text/javascript">
 function adds() {
 	var s = getObj('smode').firstChild.cloneNode(true);
 	getObj('sbody').appendChild(s);
@@ -1074,7 +1076,7 @@ EOT;
 	</td>
     <td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[allowtype]" value="1" /></div></td>
 </tr>
-<script language="JavaScript">
+<script type="text/javascript">
 function selectcate(id) {
 	if (getObj(id).style.display == 'none') {
 		getObj(id).style.display = '';
@@ -1155,6 +1157,17 @@ function check_viewsub(obj){
         </td>
         <td class="td2"><div class="help_a"></div></td>
         <td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[forumsetdb][ifcolonycate]" value="1" /></div></td>
+    </tr>
+    <tr class="tr1 vt">
+    	<td class="td1">抢楼帖功能</td>
+        <td class="td2">
+            <ul class="cc list_80 fl list_A">
+                <li><input type="radio" value="1" name="allowrob" $allowrob_Y />开启</li>
+                <li><input type="radio" value="0" name="allowrob" $allowrob_N />关闭</li>
+            </ul>
+        </td>
+        <td class="td2"><div class="help_a">此设置同时受用户组权限限制，开启用户组权限中的发表抢楼帖功能方有效</div></td>
+        <td class="td2"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[allowhide]" value="1" /></div></td>
     </tr>
     <tr class="tr1 vt">
     	<td class="td1">隐藏帖功能</td>
@@ -1363,6 +1376,64 @@ function check_viewsub(obj){
         <td class="td2" width="40"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[forumsetdb][tucoolpic]" value="1" /></div></td>
     </tr>
 </table>
+<h2 class="h1">孔明灯设置</h2>
+<!--
+EOT;
+if($forumset['ifkmd']){
+	$ifkmd_N .= " onclick=\"showtips('closetips');\"";
+}print <<<EOT
+-->
+<script>
+function hidetips(obj) {
+	getObj(obj).style.display = 'none';
+}
+function showtips(obj) {
+	getObj(obj).style.display = '';
+}
+</script>
+<table cellspacing="0" cellpadding="0" width="100%" class="mb10">
+	<tr class="tr1 vt">
+    	  <td class="td1">开启孔明灯</td>
+          <td class="td2">
+            <ul class="cc list_80 fl list_A">
+                <li><input autocomplete="off" type="radio" value="1" name="forumsetdb[ifkmd]" $ifkmd_Y />开启</li>
+                <li><input autocomplete="off" type="radio" value="0" name="forumsetdb[ifkmd]" $ifkmd_N />关闭</li>
+				<div class="fl" id="closetips" style="display:none">
+   					<div style="position:absolute;margin-top:22px;">
+						<div class="popout">
+							<table border="0" cellspacing="0" cellpadding="0">
+								<tbody>
+									<tr><td class="bgcorner1"></td>
+										<td class="pobg1"></td>
+										<td class="bgcorner2"></td>
+									</tr>
+									<tr><td class="pobg4"></td>
+									<td>
+									<div class="popoutContent">
+									<div style="width:370px;">
+									<div class="popTop cc"><a href="javascript:;" class="del_img fr" onclick="hidetips('closetips')">关闭</a>友情提示
+									</div>
+									<p class="s4 cc p10">关闭后版块内显示的孔明灯将失效!</p>
+									</div></div></td>
+									<td class="pobg2"></td></tr>
+									<tr><td class="bgcorner4"></td><td class="pobg3"></td><td class="bgcorner3"></td></tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+            </ul>
+        </td>
+		<td class="td2"><div class="help_a">此处可单独设置孔明灯是否开启</div></td>
+		<td class="td2" width="40"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[forumsetdb][ifkmd]" value="1" /></div></td>
+    </tr>
+    <tr class="tr1 vt">
+    	  <td class="td1">版块最多显示</td>
+          <td class="td2"><input type="text" class="input input_wa mr5" name="forumsetdb[kmdnumber]" value="$forumset[kmdnumber]" /></td>
+        <td class="td2"><div class="help_a">默认帖子列表最多能显示多少个孔明灯帖</div></td>
+		 <td class="td2" width="40"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[forumsetdb][kmdnumber]" value="1" /></div></td>
+    </tr>
+</table>
 <h2 class="h1">主题相关</h2>
 <table cellspacing="0" cellpadding="0" width="100%" class="mb10">
     <tr class="tr1 vt">
@@ -1455,7 +1526,7 @@ EOT;
     </tbody>
    <tbody id="relatedbody"></tbody>
 </table>
-<script language="JavaScript">
+<script type="text/javascript">
 function relatedsel(id){
 	if (id == 'custom') {
 		getObj('related').style.display = '';
@@ -1584,21 +1655,24 @@ EOT;
                         <div class="admin_table_c">
             	<table cellpadding="0" cellspacing="0" style="table-layout:auto;">
                 	<tr>
-                    	<td width="60">顺序</td>
-                    	<td width="80">系统组专用</td>
+                    	<td width="40">默认</td>
+                    	<td width="50">系统组</td>
+                    	<td width="40">顺序</td>
                     	<td width="95">名称</td>
-                        <td width="95">图标URL</td>
-                        <td><a class="cp s3" onclick="addtype();">[添加一级分类]</a></td>
+                      <td width="95">图标URL</td>
+                      <td><a class="cp s3" onclick="addtype();">[添加一级分类]</a></td>
                     </tr>
 <!--
 EOT;
 	foreach ($typedb as $key => $value){
 		$ifsystype = $value['ifsys'] ? 'checked' : '';
+		$ifsetdefault = $value['isdefault'] ? 'checked' : '';
 print <<<EOT
 -->
                     <tr id="ttype_$value[id]">
-                    	<td><input type="text" class="input input_wd" value="$value[vieworder]" name="t_view_db[$key]"></td>
-                    	<td><input type="checkbox" value="1" name="t_sys_db[$key]" $ifsystype /></td>
+                        <td><input type="radio" value="$key" name="t_set_default" $ifsetdefault /></td>
+                    		<td><input type="checkbox" value="1" name="t_sys_db[$key]" $ifsystype /></td>
+                    		<td><input type="text" class="input input_wd" value="$value[vieworder]" name="t_view_db[$key]"></td>
                         <td><input type="text" class="input input_wc" value="$value[name]" name="t_db[$key]" /></td>
                         <td><input type="text" class="input input_wc" value="$value[logo]" name="t_logo_db[$key]" /></td>
                         <td><a href="javascript:;" onclick="addSubType($value[id]);" class="mr10">[添加二级分类]</a><a href="javascript:;" onclick="delTtype('$value[id]','top','$fid');">[删除]</a></td>
@@ -1611,8 +1685,9 @@ EOT;
 print <<<EOT
 -->
                     <tr id="ttype_$v[id]">
-                        <td>┠&nbsp;<input type="text" class="input input_wd" name="t_view_db[{$v[id]}]" value="$v[vieworder]"></td>
+                        <td></td>
                         <td><input type="checkbox" value="1" name="t_sys_db[{$v[id]}]" $ifsubsystype /></td>
+                        <td>┠&nbsp;<input type="text" class="input input_wd" name="t_view_db[{$v[id]}]" value="$v[vieworder]"></td>
                         <td><input type="text" class="input input_wc" value="$v[name]" name="t_db[{$v[id]}]" /></td>
                         <td><input type="text" class="input input_wc" value="$v[logo]" name="t_logo_db[{$v[id]}]" /></td>
                         <td><a href="javascript:;" onclick="delTtype('$v[id]','sub','$fid');">[删除]</a></td>
@@ -1622,18 +1697,18 @@ EOT;
 			}
 		}print <<<EOT
 -->
-					<tr><td colspan="4" style="padding:0;"><tbody id="t_sub_body_$value[id]"></tbody></td></tr>
+					<tr><td colspan="6" style="padding:0;"><tbody id="t_sub_body_$value[id]"></tbody></td></tr>
 <!--
 EOT;
 	}print <<<EOT
 -->
 					<tbody id="tbody"></tbody>
-					<tbody id="tmode" style="display:none"><tr><td><input type="text" class="input input_wd mr5" name="new_t_view_db[]"></td><td><input type="checkbox" value="1" name="new_t_sys_db[]" /></td><td><input type="text" class="input input_wc" value="" name="new_t_db[]" /></td><td><input type="text" class="input input_wc" name="new_t_logo_db[]" /></td><td>&nbsp;</td></tr></tbody>
-					<tbody id="t_sub_mode" style="display:none"><tr><td width="60">┠&nbsp;<input type="text" class="input input_wd mr5" name="new_t_sub_view_db"></td><td><input type="checkbox" value="1" name="new_t_sub_sys_db" /></td><td width="95"><input type="text" class="input input_wc" value="" name="new_t_sub_db" /></td><td width="95"><input type="text" class="input input_wc" name="new_t_sub_logo_db" /></td><td>&nbsp;</td></tr></tbody>
+					<tbody id="tmode" style="display:none"><tr><td></td><td><input type="checkbox" value="1" name="new_t_sys_db[]" /></td><td><input type="text" class="input input_wd mr5" name="new_t_view_db[]"></td><td><input type="text" class="input input_wc" value="" name="new_t_db[]" /></td><td><input type="text" class="input input_wc" name="new_t_logo_db[]" /></td><td>&nbsp;</td></tr></tbody>
+					<tbody id="t_sub_mode" style="display:none"><tr><td></td><td><input type="checkbox" value="1" name="new_t_sub_sys_db" /></td><td width="60">┠&nbsp;<input type="text" class="input input_wd mr5" name="new_t_sub_view_db"></td><td width="95"><input type="text" class="input input_wc" value="" name="new_t_sub_db" /></td><td width="95"><input type="text" class="input input_wc" name="new_t_sub_logo_db" /></td><td>&nbsp;</td></tr></tbody>
             	</table>
             </div>
         </td>
-        <td class="td2"><div class="help_a">图标URL支持外链（http://开头），非系统组成员无法使用系统组专用的主题分类</div></td>
+        <td class="td2"><div class="help_a">图标URL支持外链（http://开头），非系统组成员无法使用系统组专用的主题分类<br />设为默认功能只对强制分类有效，设置默认分类后前台发帖时会显示默认分类</div></td>
         <td class="td2" width="40"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[t_typemain]" value="1" /></div></td>
     </tr>
         
@@ -1661,8 +1736,8 @@ EOT;
         <td class="td2" width="40"><div class="none_pw"><input type="checkbox" onclick="pwJsCheck(this)" name="otherforum[forumsetdb][allowtpctype]" value="1" /></div></td>
     </tr>
 </table>
-<script language="JavaScript" src="js/pw_ajax.js"></script>
-<script language="JavaScript">
+<script type="text/javascript" src="js/pw_ajax.js"></script>
+<script type="text/javascript">
 function addtype(){
 	var s = getObj('tmode').firstChild.cloneNode(true);
 	getObj('tbody').appendChild(s);

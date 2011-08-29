@@ -46,9 +46,9 @@ body{background:#fff;}
 EOT;
 }print <<<EOT
 -->
-<SCRIPT type="text/javascript" LANGUAGE="JavaScript" src="js/core/core.js"></SCRIPT>
-<script type="text/javascript" language="JavaScript" src="js/pw_ajax.js"></script>
-<script language="JavaScript">
+<script type="text/javascript" src="js/core/core.js"></script>
+<script type="text/javascript" src="js/pw_ajax.js"></script>
+<script type="text/javascript">
 var imgpath = '$imgpath';
 var verifyhash = '$verifyhash';
 var modeimg = '$pwModeImg';
@@ -71,7 +71,7 @@ include stopic_load_topic_view($special);
 print <<<EOT
 	</div>
 </div>
-<script language="JavaScript" src="js/global.js"></script>
+<script type="text/javascript" src="js/global.js"></script>
 
 </body>
 </html>

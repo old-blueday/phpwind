@@ -1,0 +1,90 @@
+<!--<?php
+include_once PrintEot('left');
+include_once PrintApp('admin_header');
+print<<<EOT
+-->
+<h2 class="h1">勋章审核</h2>
+<div class="admin_table">
+  <table width="100%" cellspacing="0" cellpadding="0"><tr><td class="p15">
+<form action="$basename&action=verify" method="post">
+勋章名称 <select name="searchName" class="mr10">
+<option value="">选择全部勋章</option>
+<!--
+EOT;
+foreach ($openMedal as $v) {
+$selected = ($searchName == $v['medal_id']) ? 'selected="selected"' : '';
+print<<<EOT
+-->
+<option value="{$v[medal_id]}" $selected>{$v[name]}</option>
+<!--
+EOT;
+}
+print<<<EOT
+-->
+</select>用户名 <input name="searchUsername" value="{$searchUsername}" type="text" class="input mr10" maxlength="20" /><span class="btn2"><span><button type="submit">提 交</button></span></span>
+ </form>
+</td></tr></table>
+</div>
+
+
+<form action="$basename&action=verify&type=batch" method="post" name="FORM">
+<input type="hidden" name="passid" id="passid" value="">
+<h2 class="h1"><span class="mr10 fl">勋章申请
+</span></h2>
+<div class="admin_table mb10">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <tr class="tr2 vt td_bgB">
+      <td width="30"><span onclick="CheckAll(document.FORM)" class="cp">全选</span></td>
+      <td style="width:80px;">用户名</td>
+      <td style="width:150px;">勋章名称</td>
+      <td style="width:100px;">勋章图标</td>
+      <td>勋章说明</td>
+      <td style="width:100px;">操作</td>
+    </tr>
+<!--
+EOT;
+if ($medalApplyCount == 0) {
+print<<<EOT
+-->
+    <tr>
+      <td class="p10" colspan="9"><div class="admin_tips">啊哦，没有你要的信息！</div></td>
+    </tr>
+<!--
+EOT;
+} else {
+foreach ($medalApply as $v) {
+print<<<EOT
+-->
+    <tr class="tr1 vt">
+      <td class="td2"><input type="checkbox" name="selid[]" value="{$v[apply_id]}"></td>
+      <td class="td2">{$v[username]}</td>
+      <td class="td2">{$openMedal[$v[medal_id]][name]}</td>
+      <td class="td2"><img src="{$openMedal[$v[medal_id]][smallimage]}" width="24" height="24"  /></td>
+      <td class="td2"  style="width:300px;">{$openMedal[$v[medal_id]][descrip]}</td>
+      <td class="td2"><a href="$basename&action=verify&type=pass&val=1&applyid={$v[apply_id]}">[通过]</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="$basename&action=verify&type=pass&val=0&applyid={$v[apply_id]}">[不通过]</a></td>
+    </tr>
+<!--
+EOT;
+}
+}
+print<<<EOT
+-->
+  </table>
+</div>
+<div class="mt10 cc">$pages</div>
+<div class="mb10 tac">
+	<span class="bt"><span><button type="button" onclick="CheckAll(document.FORM)">全 选</button></span></span>
+	<span class="btn"><span><button type="submit" onclick="return checkPassAll();">通 过</button></span></span>
+	<span class="bt"><span><button type="submit" >不通过</button></span></span>
+</div>
+</form>
+<script type="text/javascript">
+	function checkPassAll() {
+		document.getElementById('passid').value = 1;
+		return true;
+	}
+</script>
+<!--
+EOT;
+include_once PrintEot('adminbottom');
+?>-->

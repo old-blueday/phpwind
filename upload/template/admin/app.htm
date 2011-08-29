@@ -9,7 +9,7 @@ EOT;
 print <<<EOT
 -->
 <script type="text/javascript" src="{$db_server_url}/statics/common/js/global.js"></script>
-<script language="JavaScript">
+<script type="text/javascript">
 var server = new PwJs.Server("pwapp");
 server.start();
 </script>
@@ -150,7 +150,7 @@ EOT;
     <input type="hidden" name="admintype" value="close" />
     <span class="bt2"><span><button type="button" onClick="appcheck();">关闭应用</button></span></span>
     </form>
-<script language="JavaScript">
+<script type="text/javascript">
 function appcheck(){
 	var obj = document.getElementById('close');
 	if(confirm('将关闭整站所有APP应用，“应用中心 > 在线应用”的“随拍随发”应用也将自动关闭，确认操作？')) {
@@ -161,7 +161,7 @@ function appcheck(){
 </div>
 <h2 class="h1">应用列表</h2>
 <script type="text/javascript" src="{$db_server_url}/js/global.js"></script>
-<script language="JavaScript">
+<script type="text/javascript">
 var server = new PwJs.Server("pwapp");
 server.start();
 </script>
@@ -172,7 +172,7 @@ EOT;
 print <<<EOT
 -->
 <script type="text/javascript" src="http://app.phpwind.net/static/js/client.js"></script>
-<script language="JavaScript">
+<script type="text/javascript">
 var server = new PwJs.Server("pwapp");
 server.start();
 </script>
@@ -183,7 +183,7 @@ EOT;
 print <<<EOT
 -->
 <script type="text/javascript" src="http://app.phpwind.net/static/js/client.js"></script>
-<script language="JavaScript">
+<script type="text/javascript">
 var server = new PwJs.Server("pwapp");
 server.start();
 </script>
@@ -212,7 +212,7 @@ EOT;
 } else {print <<<EOT
 -->
 <script type="text/javascript" src="http://app.phpwind.net/static/js/client.js"></script>
-<script language="JavaScript">
+<script type="text/javascript">
 var server = new PwJs.Server("pwapp");
 server.start();
 </script>
@@ -220,11 +220,11 @@ server.start();
 <!--
 EOT;
 }
-}elseif($admintype=='sinaweibo'){
+}elseif($admintype=='platformweiboapp'){
 print <<<EOT
 -->
 <script type="text/javascript" src="http://app.phpwind.net/static/js/client.js"></script>
-<script language="JavaScript">
+<script type="text/javascript">
 var server = new PwJs.Server("pwapp");
 server.start();
 </script>
@@ -234,17 +234,12 @@ EOT;
 }elseif($admintype=='yunstatistics'){
 print <<<EOT
 -->
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<html>
-<head>
-<style>
-body,html{overflow:hidden;}
-body,html,iframe{padding:0;margin:0;width:100%;height:100%;}
-</style>
-</head>
-<body>
-<iframe id="pwapp" scrolling="auto" name="pwapp" frameborder="0" src="$yunStatisticsUrl"></iframe>
-</body></html>
+<script type="text/javascript" src="http://app.phpwind.net/static/js/client.js"></script>
+<script type="text/javascript">
+var server = new PwJs.Server("pwapp");
+server.start();
+</script>
+<iframe id="pwapp" name="pwapp" width="100%" height="600" frameborder="0" scrolling="no" src="$yunStatisticsUrl"></iframe>
 <!--
 EOT;
 }include_once PrintEot('adminbottom');

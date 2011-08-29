@@ -31,7 +31,7 @@ print <<<EOT
 		</td>
 	</tr>
 	<tr class="tr3">
-		<td>禁言范围:</td>
+		<td>禁言范围：</td>
 		<td><label class="mr20"><input type="radio" name="range" value="0" checked />{$forum[$fid][name]}</label>
 <!--
 EOT;
@@ -69,15 +69,25 @@ EOT;
 		<td><input class="input" type="text" name="limit" value="1" size="5" /> 天(最大天数<span class="s1">$pwBanMax</span>天)</td>
 	</tr>
 	<tr class="tr3">
-		<td>消息通知</td>
+		<td>消息通知：</td>
 		<td>
 			<label class="mr20"><input type="radio" name="ifmsg" value="1" checked />开启</label>
 			<label><input type="radio" name="ifmsg" value="0" />关闭</label>
 		</td>
 	</tr>
 	<tr class="tr3">
-		<td>禁言理由：</td>
-		<td><textarea name="atc_content" onkeydown="ajax.quickpost(event,this.form)" class="textareaA"></textarea></td>
+		<td>操作原因:</td>
+		<td><p><input type="text" name="atc_content" onkeydown="ajax.quickpost(event,this.form)" class="input" style="width:312px;" /></p>
+	<!--
+	EOT;
+	if($db_adminreason){print <<<EOT
+	-->
+			<div class="mb5"><select name="" size="6" onchange="this.form.atc_content.value=this.value" style="width:320px">$reason_sel</select></div>
+	<!--
+	EOT;
+	}print <<<EOT
+	-->
+		</td>
 	</tr>
 </table>
 <input type="hidden" name="uid" value="$uid" />
@@ -167,12 +177,10 @@ EOT;
 	<tr class="tr3">
 		<td>操作原因:</td>
 		<td>
-			<div class="mb5"><select style="width:320px;" onchange="this.form.atc_content.value=this.value">
-				<option value="">自定义</option>
-				<option value="">-------</option>
+			<input type="text" name="atc_content" onkeydown="ajax.quickpost(event,this.form)" class="input" style="width:312px;" />
+			<div><select style="width:320px;" size="6" onchange="this.form.atc_content.value=this.value">
 				$reason_sel
 			</select></div>
-			<textarea name="atc_content" onkeydown="ajax.quickpost(event,this.form)" class="textareaA"></textarea>
 		</td>
 	</tr>
 </table>
@@ -231,12 +239,10 @@ EOT;
 	<tr class="tr3">
 		<td>操作原因:</td>
 		<td>
-			<div class="mb5"><select style="width:320px;" onchange="this.form.atc_content.value=this.value">
-				<option value="">自定义</option>
-				<option value="">-------</option>
-				$reason_sel
+		<input type="text" name="atc_content" onkeydown="ajax.quickpost(event,this.form)" class="input" style="width:312px;" />
+			<div><select style="width:320px;" onchange="this.form.atc_content.value=this.value" size="6">
+				{$reason_sel}
 			</select></div>
-			<textarea name="atc_content" onkeydown="ajax.quickpost(event,this.form)" class="textareaA"></textarea>
 		</td>
 	</tr>
 </table>
@@ -285,12 +291,10 @@ EOT;
 	<tr class="tr3">
 		<td>操作原因:</td>
 		<td>
-			<div class="mb5"><select style="width:320px;" onchange="this.form.atc_content.value=this.value">
-				<option value="">自定义</option>
-				<option value="">-------</option>
+		<input type="text" name="atc_content" onkeydown="ajax.quickpost(event,this.form)" class="input" style="width:312px;" />
+			<div><select style="width:320px;" size="6" onchange="this.form.atc_content.value=this.value">
 				$reason_sel
 			</select></div>
-			<textarea name="atc_content" onkeydown="ajax.quickpost(event,this.form)" class="textareaA"></textarea>
 		</td>
 	</tr>
 </table>
@@ -340,12 +344,8 @@ EOT;
 	</tr>
 	<tr class="tr3">
 		<td>操作原因:</td>
-		<td><div class="mb5"><select style="width:320px;" onchange="this.form.atc_content.value=this.value">
-				<option value="">自定义</option>
-				<option value="">-------</option>
-				$reason_sel
-			</select></div>
-			<textarea name="atc_content" onkeydown="ajax.quickpost(event,this.form)" class="textareaA">$remindinfo</textarea>
+		<td><input type="text" name="atc_content" onkeydown="ajax.quickpost(event,this.form)" class="input" style="width:312px;" value="$remindinfo" />
+		<div><select style="width:320px;" size="6" onchange="this.form.atc_content.value=this.value">{$reason_sel}</select></div>
 		</td>
 	</tr>
 </table>
@@ -373,7 +373,7 @@ EOT;
 }print <<<EOT
 -->
 <div class="popTop" style="cursor:move" onmousedown="read.move(event);"><span class="adel cp" onclick="closep();">关闭</span>拆分操作</div>
-<script language="javascript" type="text/javascript">
+<script>
 function splitds() {
 	var val = document.getElementsByName('splittype');
 	var type;
@@ -424,12 +424,11 @@ function splitds() {
 		</td>
 	</tr>
 	<tr class="tr3"><td>操作原因::</td>
-		<td><div class="mb5"><select style="width:320px;" onchange="this.form.atc_content.value=this.value">
-				<option value="">自定义</option>
-				<option value="">-------</option>
+		<td>
+		<input type="text" name="atc_content" onkeydown="ajax.quickpost(event,this.form)" class="input" style="width:312px;" />
+		<div><select style="width:320px;" size="6" onchange="this.form.atc_content.value=this.value">
 				$reason_sel
 			</select></div>
-			<textarea name="atc_content" onkeydown="ajax.quickpost(event,this.form)" class="textareaA"></textarea>
 		</td>
 	</tr>
 </table>
@@ -471,12 +470,11 @@ EOT;
 		</td>
 	</tr>
 	<tr class="tr3"><td>操作原因:</td>
-		<td><div class="mb5"><select style="width:320px;" onchange="this.form.atc_content.value=this.value">
-				<option value="">自定义</option>
-				<option value="">-------</option>
+		<td>
+		<input type="text" name="atc_content" class="input" style="width:312px;" onkeydown="ajax.quickpost(event,this.form)" />
+		<div><select style="width:320px;" size="6" onchange="this.form.atc_content.value=this.value">
 				$reason_sel
 			</select></div>
-			<textarea name="atc_content" onkeydown="ajax.quickpost(event,this.form)" class="textareaA"></textarea>
 		</td>
 	</tr>
 </table>
@@ -503,7 +501,7 @@ EOT;
 		<td width="23%">评分时间</td>
 		<td>评分理由</td>
 	</tr>
-<script language="javascript" type="text/javascript">
+<script>
 function cutStrContent(obj){
 	if(strlen(getObj(obj).value) > 100 ) {
 		getObj(obj).value = substr(getObj(obj).value,100);
@@ -535,7 +533,7 @@ EOT;
 	<span class="btn2"><span><button type="button" name="ajaxsubmit" onclick="ajax.submit(this.form,marked);">删 除</button></span></span>
 </div>
 </form>
-<script language="JavaScript" id="ajax_viewpinglist">
+<script id="ajax_viewpinglist">
 function editrecord(id) {
 	var r = getObj('ping_' + id);
 	if (r.style.display == 'none') {

@@ -65,8 +65,8 @@ class postCate {
 	width:22px;
 	height:21px;
 }
-</style><script language=\"JavaScript\" src=\"js/pw_pccheck.js\"></script>";
-		$postcatehtml .= "<script language=\"JavaScript\" src=\"js/date.js\"></script><script language=\"JavaScript\" src=\"js/desktop/Compatibility.js\"></script><table width=\"100%\"><tr class=\"pp f_two\"><td colspan=2>".getLangInfo('other','pc_must')."</td></tr>";
+</style><script type=\"text/javascript\" src=\"js/pw_pccheck.js\"></script>";
+		$postcatehtml .= "<script type=\"text/javascript\" src=\"js/date.js\"></script><table width=\"100%\"><tr class=\"pp f_two\"><td colspan=2>".getLangInfo('other','pc_must')."</td></tr>";
 
 		if ($tid) {
 			$pcid = (int)$pcid;
@@ -338,7 +338,7 @@ class postCate {
 				$vieworder_mark = $rt['vieworder'];
 			}
 		}
-		$flashcatevalue .= "<ul class=\"b\" id=\"SwitchNav\"></ul><div></div></div></div><script type=\"text/javascript\" src=\"js/sliderplayer.js\"></script><script language=\"JavaScript\">pwSliderPlayers('pwSlidePlayer');</script>";
+		$flashcatevalue .= "<ul class=\"b\" id=\"SwitchNav\"></ul><div></div></div></div><script type=\"text/javascript\" src=\"js/sliderplayer.js\"></script><script type=\"text/javascript\">pwSliderPlayers('pwSlidePlayer');</script>";
 
 		$vieworder_mark != 0 && $postcatevalue .= "</cite></li>";
 		$postcatevalue .= "</ul></div>";
@@ -465,7 +465,7 @@ class postCate {
 		global $fid, $searchname;
 
 		$searchhtml = "<form action=\"thread.php?fid=$fid&pcid=$pcid\" method=\"post\">";
-		$searchhtml .= "<input type=\"hidden\" name=\"topicsearch\" value=\"1\"><script language=\"JavaScript\" src=\"js/date.js\"></script><table>";
+		$searchhtml .= "<input type=\"hidden\" name=\"topicsearch\" value=\"1\"><script type=\"text/javascript\" src=\"js/date.js\"></script><table>";
 
 		$query = $this->db->query("SELECT fieldid,name,type,rules,ifsearch,ifasearch,textsize,vieworder FROM pw_pcfield WHERE pcid = ".S::sqlEscape($pcid)." AND ifable='1' AND (ifsearch='1' OR ifasearch='1') ORDER BY vieworder,fieldid ASC");
 		$vieworder_mark = $ifsearch = $ifasearch = 0;

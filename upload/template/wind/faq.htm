@@ -1,8 +1,8 @@
 <!--<?php print <<<EOT
 -->
 <style type="text/css">
-.faq_menu h4{border-bottom:1px solid $tablecolor;margin-bottom:5px;padding:0 5px;}
-.faq_menu dt{line-height:30px;height:30px; font-size:14px;padding:0 5px;overflow:hidden;}
+.faq_menu h4{border-bottom:1px solid $tablecolor;margin-bottom:5px;padding:0 5px 5px;background:url($imgpath/faq/faq_down.gif) right 8px no-repeat;}
+.faq_menu dt{line-height:30px;height:30px;padding:0 5px;overflow:hidden;}
 .faq_menu dt a{display:block;}
 .faq_menu dt a:hover{ text-decoration:none;}
 .faq_menu dd{display:none; background:url($imgpath/faq/faq_in.gif) 15px center no-repeat;padding-left:25px;}
@@ -71,13 +71,13 @@ function processSearch(obj) {
 		<tr>
 			<td class="floot_left" style="vertical-align:top;">
 				<div class="floot_leftdiv faq_menu" id="faq_menu">
-					<div class="mb20">
 <!--
 EOT;
 foreach($firstLevel as $key => $value){
 print <<<EOT
 -->
-						<h4 class="f16 s4" onclick="whetherDisplay('left_{$value[hid]}')" style="cursor:pointer;background:url($imgpath/faq/faq_down.gif) right 12px no-repeat;">$value[title]</h4>
+					<div class="mb20">
+						<h4 class="b cp s4" onclick="whetherDisplay('left_{$value[hid]}')">$value[title]</h4>
 						<div id="left_$value[hid]">
 						<dl>
 <!--
@@ -95,12 +95,12 @@ print <<<EOT
 -->
 						</dl>
 						</div>
+					</div>
 <!--
 EOT;
 }
 print <<<EOT
 -->
-					</div>
 				</div>
 			</td>
 			<td style="vertical-align:top;height:300px;">
@@ -124,7 +124,7 @@ foreach ($hasChildArray[$result['hid']] as $value) {
 if ($_HELP[$value]['ifchild']){
 print <<<EOT
 -->
-					<h5 class="h b" onclick="whetherDisplay('right_{$value}')" style="cursor:pointer;background:url($imgpath/faq/faq_down.gif) right 12px no-repeat;"><a href="{$_HELP[$value][url]}">{$_HELP[$value][title]}</a></h5>
+					<h5 class="h b" onclick="whetherDisplay('right_{$value}')" style="cursor:pointer;background:#f7f7f7 url($imgpath/faq/faq_down.gif) right 12px no-repeat;"><a href="{$_HELP[$value][url]}">{$_HELP[$value][title]}</a></h5>
 					<br/>
 					<div id="right_{$value}">
 					<ul class="cc faq_list p10" style="margin-top:-15px;">
@@ -147,7 +147,7 @@ EOT;
 print <<<EOT
 -->
 					<!--内容显示部分-->
-					<h5 class="h b" onclick="whetherDisplay('right_{$value}')" style="cursor:pointer;background:url($imgpath/faq/faq_down.gif) right 12px no-repeat;"><a href="{$_HELP[$value][url]}">{$_HELP[$value][title]}</a></h5>
+					<h5 class="h b" onclick="whetherDisplay('right_{$value}')" style="cursor:pointer;background:#f7f7f7 url($imgpath/faq/faq_down.gif) right 12px no-repeat;"><a href="{$_HELP[$value][url]}">{$_HELP[$value][title]}</a></h5>
 					<br/>
 					<div class="tpc_content f14" style="padding:10px;margin-top:-15px;" id="right_{$value}">
 						{$lowerContent[$value][content]}

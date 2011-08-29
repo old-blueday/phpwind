@@ -13,7 +13,7 @@ Breeze.namespace('util.localStorage', function(B){
     *  目前没有考虑到存储javascript对象到本地,故此方法先预留,直接return value;
     */
     function serialize(value) {
-		if(value.replace(/\s+/g,'')!=''){
+		if(value&&value.replace(/\s+/g,'')!=''){
 			return value;
 		}
     }

@@ -13,6 +13,18 @@ class PW_Forums {
 		return $forumsDao->get($forumId);
 	}
 	
+	function getForumsByFids($fids) {
+		if (!S::isArray($fids)) return array();
+		$tmpFids = array(0);
+		foreach ($fids as $fid) {
+			if (!$fid) continue;
+			$tmpFids[] = intval($fid);
+		}
+		if (!S::isArray($tmpFids)) return array();
+		$forumsDao = $this->getForumsDao();
+		return $forumsDao->getFormusByFids($tmpFids);
+	}
+	
 	function getsNotCategory(){
 		$forumsDao = $this->getForumsDao();
 		return $forumsDao->getsNotCategory();

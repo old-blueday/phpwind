@@ -112,6 +112,7 @@ class PW_ArticleSource extends SystemData {
 		$data['title'] = strip_tags($data['subject']);
 		$data['forumname'] = $data['columnname'] = $this->_getColumnName($data['column_id']);
 		$data['forumurl'] = $data['columnurl'] = getColumnUrl($data['column_id']);
+		$data['postdate'] = strtotime($data['postdate']);
 		return $data;
 	}
 	

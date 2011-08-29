@@ -75,6 +75,7 @@ function ImgWaterMark($source, $w_pos = 0, $w_img = '', $w_text = '', $w_font = 
 	return true;
 }
 function MakeThumb($srcFile, &$dstFile, $dstW, $dstH, $cenTer = null, $sameFile = null, $fixWH = null) {
+	global $db_quality;
 	$minitemp = GetThumbInfo($srcFile, $dstW, $dstH, $cenTer);
 	list($imagecreate, $imagecopyre) = GetImagecreate($minitemp['type']);
 	if (empty($minitemp) || !$imagecreate) return false;
@@ -106,7 +107,7 @@ function MakeThumb($srcFile, &$dstFile, $dstW, $dstH, $cenTer = null, $sameFile 
 	}
 
 	$imagecopyre($thumb, $minitemp['source'], $dstX, $dstY, $srcX, $srcY, $minitemp['dstW'], $minitemp['dstH'], $imgwidth, $imgheight);
-	MakeImage($minitemp['type'], $thumb, $dstFile);
+	MakeImage($minitemp['type'], $thumb, $dstFile, $db_quality);
 	imagedestroy($thumb);
 	return array(
 		$minitemp['dstW'],
@@ -116,8 +117,8 @@ function MakeThumb($srcFile, &$dstFile, $dstW, $dstH, $cenTer = null, $sameFile 
 function GetThumbInfo($srcFile, $dstW, $dstH, $cenTer = null) {
 	$imgdata = array();
 	$imgdata = GetImgInfo($srcFile);
-	if (empty($imgdata) || ($imgdata['width'] <= $dstW && $imgdata['height'] <= $dstH)) return false;
-
+	if (empty($imgdata) || (($dstW && $imgdata['width'] <= $dstW) && ($dstH && $imgdata['height'] <= $dstH))) return false;
+	
 	if (empty($dstW) && $dstH > 0 && $imgdata['height'] > $dstH) {
 		if (!empty($cenTer)) {
 			$imgdata['dstW'] = $imgdata['dstH'] = $dstH;
@@ -228,6 +229,7 @@ function GetImagecreate($imagetype) {
 }
 
 function modeImageThumb($srcFile, $dstFile, $dstX, $dstY) {
+	global $db_quality;
 	$imgdata = array();
 	list($imgdata['width'], $imgdata['height'], $imgdata['type']) = @getimagesize($srcFile);
 	switch ($imgdata['type']) {
@@ -278,7 +280,7 @@ function modeImageThumb($srcFile, $dstFile, $dstX, $dstY) {
 	}
 
 	$imagecopyre($thumb, $imgdata['source'], 0, 0, 0, 0, $pW, $pH, $imgdata['width'], $imgdata['height']);
-	MakeImage($imgdata['type'], $thumb, $dstFile);
+	MakeImage($imgdata['type'], $thumb, $dstFile, $db_quality);
 	imagedestroy($thumb);
 	return 1;
 }

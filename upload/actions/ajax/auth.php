@@ -25,6 +25,11 @@ if (empty($_POST['step'])) {
 		$userService = L::loadClass('userservice', 'user');/* @var $register PW_Register */
 		$userService->update($winduid, array('authmobile' => $mobile));
 		$userService->setUserStatus($winduid, PW_USERSTATUS_AUTHMOBILE, true);
+		//颁发勋章
+		if ($db_md_ifopen) {
+			$medalService = L::loadClass('medalservice','medal');
+			$medalService->awardMedalByIdentify($winduid,'shimingrenzheng');
+		}
 		initJob($winduid,'doAuthMobile');
 		echo 0;
 	} else {

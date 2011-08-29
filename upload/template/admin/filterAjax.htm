@@ -1,7 +1,7 @@
 <!--<?php
 print <<<EOT
 -->
-<script language="javascript">
+<script type="text/javascript">
 function closep(){
 	read.menu.style.display = 'none';
 }
@@ -41,7 +41,7 @@ if ($action == 'setting') {
 if ($job == 'add') {
 print <<<EOT
 -->
-<script language="javascript">
+<script type="text/javascript">
 function checkWord(str)
 {
    if(str.match(/\|+/ig)) {
@@ -422,7 +422,7 @@ EOT;
 }elseif($action == 'show') {
 print <<<EOT
 -->
-<script language="javascript">
+<script type="text/javascript">
 function confirmSkip(action, type)
 {
 	if (confirm('您确认要进行此操作吗?')) {

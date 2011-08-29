@@ -46,7 +46,7 @@ EOT;
 	       <div class="mb10">
 	       		<div class="input_img cc fl mr5" onclick="getObj('usernames').focus();">
                     <em class="input_down" onclick="pwSearch.selectInit(event,'popout','message.php?type=ajax','action=friend',0)">选择好友</em>
-                    <div id="get_friend"><input type="text" max="1" issearch="1" id="usernames" name="usernames" onblur="pwSearch.blur()" onfocus="pwSearch.init('message.php?type=ajax','action=friend&actionType=list&uid=$winduid','resultd','searchResult')" onkeydown="pwSearch.move(event)" onkeyup="pwSearch.searchResult(event,200);" autocomplete=off disableautocomplete></div>
+                    <div id="get_friend"><input type="text" max="1" issearch="1" id="usernames" name="usernames" onblur="pwSearch.blur()" onfocus="pwSearch.init('message.php?type=ajax','action=friend&actionType=list&uid=$winduid','resultd')" onkeydown="pwSearch.move(event)" onkeyup="pwSearch.searchResult(event,200);" autocomplete=off disableautocomplete></div>
                 </div>
 	       <form action="$normalUrl" method="post" onsubmit="return MC.submitSearch(document.SEARCH)" name="SEARCH">
                 <div class="search_select">
@@ -85,13 +85,13 @@ print <<<EOT
 -->
 		    <tr class="tr3">
 		        <td class="icon"><img src="u/images/message/{$_img}" /></td>
-		        <td class="face"><a href="{$_url}" class="img_50"><i><img src="{$_icon}" width="48" height="48" /></i></a></td>
+		        <td class="face"><a href="{$_url}" class="img_30"><i><img src="{$_icon}" width="30" height="30" /></i></a></td>
 		        <td class="name">
 		            <p><a href="{$_url}">{$_name}</a></p>
 		            <em>{$value[modified_time_format]}</em>
 		        </td>
 		        <td class="value">
-		            <h4 $_b><a href="{$_link}">{$value[title]}</a></h4><em class="s2">{$_tip}</em>
+		            <h4 $_b><a href="{$_link}" class="mr5">{$value[title]}</a><em class="s2 fn">{$_tip}</em></h4>
 		            <p class="lh_18">{$value[content]}</p>
 		        </td>
 		    </tr>

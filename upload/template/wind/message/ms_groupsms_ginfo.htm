@@ -6,7 +6,7 @@ print <<<EOT
 	<tbody>
 		<tr class="tr3">
 			<td colspan="3">
-			<a class="adel" href="javascript:;" onclick="MC.del('{$message[rid]}','$subtype','','$page','showmessageTip')">删除</a>
+			<a class="adel" href="javascript:;" onclick="pwConfirm('确定要删除该消息?', this, function(){MC.del('{$message[rid]}','$subtype','','$page','showmessageTip')})">删除</a>
 			所在群组：<a href="apps.php?q=group&cyid={$message['colonyid']}">{$message[cname]}</a> 
 <!--
 EOT;

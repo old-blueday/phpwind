@@ -78,7 +78,6 @@ class PW_DataSourceService{
 	function getRelateInfoByKey($sourceType,$key,$param) {
 		$relateData = $this->_getRelateDataBySourceType($sourceType);
 		if (!is_object($relateData)) return array();
-		
 		$temp = $relateData->getRelateDataByKey($key);
 		
 		return $this->_analyseResult($param,$temp);
@@ -104,8 +103,7 @@ class PW_DataSourceService{
 	
 	function _getRelateDataBySourceType($sourceType) {
 		$source = $this->_sourceFactory($sourceType);
-		if (!is_object($source)) false;
-		
+		if (!is_object($source)) return false;
 		$relateType = $source->getRelateType();
 		return $this->_relateDataFactory($relateType);
 	}
@@ -148,6 +146,17 @@ class PW_DataSourceService{
 				$temp_2 = $value[$k];
 			} elseif (isset($value['addition'][$k])) {
 				$temp_2 = $value['addition'][$k];
+			} elseif ($k == 'icon') {
+				if (isset($value['uid'])) {
+					$uid = $value['uid'];
+				} elseif (isset($value['addition']['uid'])) {
+					$uid = $value['addition']['uid'];
+				} elseif (isset($value['authorid'])) {
+					$uid = $value['authorid'];
+				} elseif (isset($value['addition']['authorid'])) {
+					$uid = $value['addition']['authorid'];
+				}
+				$temp_2 = $uid ? $this->_getUserIconByUid($uid) : '';
 			} else {
 				$temp_2 = '';
 			}
@@ -156,17 +165,26 @@ class PW_DataSourceService{
 		return $temp;
 	}
 	
+	function _getUserIconByUid($uid) {
+		$userInfo = getUserByUid($uid);
+		if (!$userInfo) return '';
+		require_once (R_P . 'require/showimg.php');
+		$result = showfacedesign($userInfo['icon'], 1, 's');
+		return $result[0];
+	}
+	
 	function _analyseResultByParameter($result,$param,$addtion=''){
+		if (is_array($result)) return $result;
 		if ($param =='default') {
 			$temp = $result;
 		} elseif (is_numeric($param)) {
-			$result = str_replace('&nbsp;',' ',$result);
+			$result = str_replace(array('&nbsp;','&lt;','&gt;'),' ',$result);
 			$temp = substrs($result,$param,'');
 		} elseif (preg_match('/^\d{1,3},\d{1,3}$/',$param)) {
 			list($width,$height) = explode(',',$param);
 			$temp = minImage($result,$width,$height);
 		} elseif (preg_match('/^\w{1,4}(:|-)\w{1,4}((:|-)\w{1,4})?$/',$param)) {
-			$temp = get_date($result,$param);
+			$temp = $result ? get_date($result,$param) : '';
 		}
 		return $temp;
 	}

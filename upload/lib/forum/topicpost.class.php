@@ -176,6 +176,11 @@ class topicPost {
 			$userService->updateByIncrement($this->data['authorid'], array(), array('digests' => 1));
 			$this->post->user['digests']++;
 		}
+		if ($this->data['replyreward']) {
+			$replyRewardService = L::loadClass('ReplyReward', 'forum');/* @var $replyRewardService PW_ReplyReward */
+			$this->data['replyreward']['tid'] = $this->tid;
+			$replyRewardService->addNewReward($this->data['authorid'], $this->data['replyreward']);
+		}
 		$this->post->updateUserInfo($this->type, $this->userCreidtSet(), $this->data['content']);
 		$this->afterpost();
 
@@ -209,8 +214,11 @@ class topicPost {
 									'title' => stripslashes($this->data['title']),
 									'fid' => $this->forum->fid,
 									'fname' => $this->forum->name,
+									'atusers' =>$this->data['atusers']
 								);
 					$weiboService->send($this->post->uid,$weiboContent,'article',$this->tid,$weiboExtra);
+					$threadService = L::loadClass('threads','forum');
+					$threadService->setAtUsers($this->tid,0,$this->data['atusers']);
 				}
 				//会员资讯缓存
 				$userCache = L::loadClass('Usercache', 'user');

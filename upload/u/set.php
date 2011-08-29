@@ -57,10 +57,10 @@ if (empty($_POST['step'])) {
 
 	S::gp(array('name', 'spaceskin', 'domain','descript'));
 	S::gp(array('spacestyle','spacetype','ifopen','privacy','shownum'), 'GP', 2);
-	if (strlen($name)>80) {
+	if (strlen(pwHtmlspecialchars_decode($title))>80) {
 		Showmsg('space_name_toolong');
 	}
-	if (strlen($descript)>255) {
+	if (strlen(pwHtmlspecialchars_decode($title))>255) {
 		Showmsg('space_descript_toolong');
 	}
 
@@ -69,8 +69,8 @@ if (empty($_POST['step'])) {
 	if(intval($space['spacetype']) == $spacetype){
 		foreach ($spaceModel as $key => $value) {
 			(!$shownum[$value] || $shownum[$value] < 1) && $shownum[$value] = 1;
-			if ($shownum[$value] > 50) {
-				Showmsg($lang_model[$value][0] . '模块展示条目请不要超过50!');
+			if ($shownum[$value] > 30) {
+				Showmsg($lang_model[$value][0] . '模块展示条目请不要超过30!');
 			}
 			$modelset[$value] = array(
 				'ifopen'	=> intval($ifopen[$value]),

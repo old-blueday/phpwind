@@ -13,6 +13,10 @@ wind_forumcheck($foruminfo);
 $foruminfo['topic'] = $db->get_value("SELECT topic FROM pw_forumdata WHERE fid=".S::sqlEscape($fid));
 $forumset  = $foruminfo['forumset'];
 $forumname = strip_tags($foruminfo['name']);
+if ($forumset['link']) {
+	$flink = str_replace("&amp;","&",$forumset['link']);
+	ObHeader($flink);
+}
 
 //SEO setting
 $_seo = array('title'=>$foruminfo['title'],'metaDescription'=>$foruminfo['metadescrip'],'metaKeywords'=>$foruminfo['keywords']);

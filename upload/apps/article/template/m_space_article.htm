@@ -53,12 +53,12 @@ if ($see == 'topic') {print <<<EOT
 						<h3>选择时间：</h3>
 						<ul><li id="post_0"><a href="{$basename}posttime=0">所有</a></li><li id="post_1"><a href="{$basename}posttime=1">一天</a></li><li id="post_2"><a href="{$basename}posttime=2">两天</a></li><li id="post_7"><a href="{$basename}posttime=7">一星期</a></li><li id="post_30"><a href="{$basename}posttime=30">一个月</a></li><li id="post_60"><a href="{$basename}posttime=60">两个月</a></li><li id="post_90"><a href="{$basename}posttime=90">三个月</a></li><li id="post_180"><a href="{$basename}posttime=180">半年</a></li><li id="post_365"><a href="{$basename}posttime=365">一年</a></li><li id="post_366"><a href="{$basename}posttime=366">一年以上</a></li></ul>
 				</div>
-<script language="javascript">setCurrent('post_$posttime','post_0','current');</script>
+<script type="text/javascript">setCurrent('post_$posttime','post_0','current');</script>
 				<div style="border-top:1px solid $uskin_bdA;">
 					<table width="100%" style="table-layout:fixed;">  
 						<tr class="tr3">
 							<td colspan="2">排序方式：<a href="{$basename}ordertype=postdate" id="a_orderpostdate"><span>发帖时间</span></a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="{$basename}ordertype=lastpost" id="a_orderlastpost"><span>回复时间</span></a>
-								<script language="JavaScript">setCurrent('a_order{$ordertype}','a_orderpostdate','link_down s5');</script>
+								<script type="text/javascript">setCurrent('a_order{$ordertype}','a_orderpostdate','link_down s5');</script>
 							</td> 
 							<td width="80">回复/人气</td>
 							<td width="100">最后发表</td>
@@ -68,12 +68,15 @@ if ($see == 'topic') {print <<<EOT
 <!--
 EOT;
 if (!empty($article)) {
-foreach ($article as $key => $value) {print <<<EOT
+foreach ($article as $key => $value) {
+$value['lastposter'] = (!$value['replies'] && $value['authorid'] == $winduid) ? $windid : $value[lastposter] ;
+print <<<EOT
 -->
 						<tr class="tr3">
 							<td width="20" class="tac"><img src="images/wind/thread/topicnew.gif" /></td>
 							<td class="f14">
-								<a href="thread.php?fid=$value[fid]" class="mr5" target="_blank">[{$value[forum]}]</a><a href="read.php?tid=$value[tid]" target="_blank" class="s5">$value[subject]</a>
+								<a href="thread.php?fid=$value[fid]" class="mr5" target="_blank">[{$value[forum]}]</a><a href="job.php?action=topost&tid=$value[tid]&pid=$value[pid]
+" target="_blank" class="s5">$value[subject]</a>
 							</td>
 							<td width="80" class="f10">
 								<span class="s2">{$value[replies]}</span>/<span>{$value[hits]}</span>
@@ -115,7 +118,8 @@ EOT;
 <!--
 EOT;
 if (!empty($article)) {
-foreach ($article as $key => $value) {print <<<EOT
+foreach ($article as $key => $value) {
+print <<<EOT
 -->
 						<tr class="tr3">
 							<td class="tac"><img src="images/wind/thread/topicnew.gif" /></td>
@@ -156,7 +160,7 @@ if ($u == $winduid) {print <<<EOT
 EOT;
 }print <<<EOT
 --><li id="uf_saled"><a href="{$basename}a=goods&job=saled">已卖出的商品</a></li></ul>
-<script language="javascript">setCurrent('uf_$job','uf_buy','current');</script>
+<script type="text/javascript">setCurrent('uf_$job','uf_buy','current');</script>
 					</div>
 					<div style="border-top:1px solid $uskin_bdA;">
 						<table width="100%" class="mb10" style="table-layout:fixed;">
@@ -331,7 +335,7 @@ EOT;
 		</div>
 	</div>
 </div>
-<script language="javascript">setCurrent('a_$see','a_topic','current');</script>
+<script type="text/javascript">setCurrent('a_$see','a_topic','current');</script>
 <!--
 EOT;
 require_once(uTemplate::printEot('footer'));

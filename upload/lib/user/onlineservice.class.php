@@ -21,7 +21,7 @@ class PW_OnlineService{
 	 * @return boolean
 	 */
 	function updateOnlineUser() { 
-		global $fid, $tid, $timestamp, $winduid, $windid, $onlineip, $groupid, $wind_in, $db_onlinetime, $db_ipstates, $db_today, $lastvisit, $tdtime;
+		global $fid, $tid, $timestamp, $winduid, $windid, $onlineip, $groupid, $wind_in, $db_onlinetime, $db_ipstates, $db_today, $lastvisit, $tdtime,$db;
 		if ($winduid < 1) return false;
 		
 		$ifhide = $GLOBALS['_G']['allowhide'] && GetCookie('hideid') ? 1 : 0;
@@ -36,9 +36,9 @@ class PW_OnlineService{
 									'ifhide' => $ifhide));
 		// 间隔一段时间删除过期用户，避免频繁删除导致性能下降
 		if ($timestamp % 20 == 0){
-			$this->db->update('DELETE FROM pw_online_user WHERE lastvisit<' . S::sqlEscape($timestamp - $db_onlinetime));
+			$db->update('DELETE FROM pw_online_user WHERE lastvisit<' . S::sqlEscape($timestamp - $db_onlinetime));
 		}
-		return $this->db->update('REPLACE INTO pw_online_user SET ' . $pwSQL);
+		return $db->update('REPLACE INTO pw_online_user SET ' . $pwSQL);
 	}
 	
 	/**
@@ -47,7 +47,7 @@ class PW_OnlineService{
 	 * @return boolean
 	 */
 	function updateOnlineGuest(){
-		global $fid, $tid, $timestamp, $onlineip,$db_onlinetime,$wind_in;
+		global $fid, $tid, $timestamp, $onlineip,$db_onlinetime,$wind_in,$db;
 		if (!($guestInfo = $this->getGuestInfo())){
 			return false;
 		}
@@ -55,14 +55,14 @@ class PW_OnlineService{
 		$ifhide = $GLOBALS['_G']['allowhide'] && GetCookie('hideid') ? 1 : 0;
 		if ($guestInfo['token'] == 0){
 			// 删除过期的游客或者同IP在60秒内更新过的游客（防止恶意刷人数的行为）
-			$this->db->update('DELETE FROM pw_online_guest WHERE lastvisit<' . S::sqlEscape($timestamp - $db_onlinetime) . 
+			$db->update('DELETE FROM pw_online_guest WHERE lastvisit<' . S::sqlEscape($timestamp - $db_onlinetime) . 
 				' OR (ip = ' . S::sqlEscape($guestInfo['ip']) . ' AND  lastvisit>' . S::sqlEscape($timestamp - $this->tokenTime) . ')');
 			$token = rand(1,255);
 			$this->setGuestToken($token);
 		} else {
 			// 间隔一段时间删除过期用户，避免频繁删除导致性能下降
 			if ($timestamp % 20 == 0){
-				$this->db->update('DELETE FROM pw_online_guest WHERE lastvisit<' . S::sqlEscape($timestamp - $db_onlinetime));
+				$db->update('DELETE FROM pw_online_guest WHERE lastvisit<' . S::sqlEscape($timestamp - $db_onlinetime));
 			}
 			$token = $guestInfo['token'];
 		}
@@ -74,7 +74,7 @@ class PW_OnlineService{
 									'tid' => $tid, 
 									'action' => $this->page_index[$wind_in], 
 									'ifhide' => $ifhide));
-		$this->db->update("REPLACE INTO pw_online_guest SET " . $pwSQL);
+		$db->update("REPLACE INTO pw_online_guest SET " . $pwSQL);
 	}
 	
 	/**
@@ -86,7 +86,8 @@ class PW_OnlineService{
 		if (!$guestInfo  && !($guestInfo = $this->getGuestInfo())){
 			return false;
 		}
-		return $this->db->update('DELETE FROM pw_online_guest WHERE ip=' . S::sqlEscape($guestInfo['ip']) . ' AND token = ' .  S::sqlEscape($guestInfo['token']));
+		global $db;
+		return $db->update('DELETE FROM pw_online_guest WHERE ip=' . S::sqlEscape($guestInfo['ip']) . ' AND token = ' .  S::sqlEscape($guestInfo['token']));
 	}
 	
 	/**
@@ -96,7 +97,8 @@ class PW_OnlineService{
 	 */
 	function deleteOnlineUser($userId){
 		if (($userId = intval($userId)) < 1) return false;
-		return $this->db->update("DELETE FROM pw_online_user WHERE uid=" . S::sqlEscape($userId));
+		global $db;
+		return $db->update("DELETE FROM pw_online_user WHERE uid=" . S::sqlEscape($userId));
 	}
 	
 	/**
@@ -138,8 +140,9 @@ class PW_OnlineService{
 	 * @return array
 	 */
 	function getOnlineUser($start = 0, $perpage = 20){
+		global $db;
 		$limit = $start < 1 ? '' : S::sqlLimit(($start - 1) * $perpage, $perpage);
-		$query = $this->db->query('SELECT * FROM pw_online_user ' . $limit);
+		$query = $db->query('SELECT * FROM pw_online_user ' . $limit);
 		$page_reverse_index = array_flip($this->page_index);
 		$users = array();
 		while ($rt = $this->db->fetch_array($query)){
@@ -158,8 +161,9 @@ class PW_OnlineService{
 	 * @return array
 	 */
 	function getOnlineGuest($start = 0, $perpage = 20){
+		global $db;
 		$limit = $start < 1 ? '' : S::sqlLimit(($start - 1) * $perpage, $perpage);
-		$query = $this->db->query('SELECT * FROM pw_online_guest ' . $limit);
+		$query = $db->query('SELECT * FROM pw_online_guest ' . $limit);
 		$page_reverse_index = array_flip($this->page_index);
 		$guests = array();
 		while ($rt = $this->db->fetch_array($query)){
@@ -176,7 +180,8 @@ class PW_OnlineService{
 	 * @return array
 	 */
 	function getOnlineUserName(){
-		$query = $this->db->query('SELECT uid, username FROM pw_online_user');
+		global $db;
+		$query = $db->query('SELECT uid, username FROM pw_online_user');
 		$users = array();
 		while ($rt = $this->db->fetch_array($query)){
 			$users[$rt['uid']] = $rt['username'];
@@ -191,8 +196,9 @@ class PW_OnlineService{
 	 * @return array
 	 */
 	function getOnlineUserByForumId($forumId){
+		global $db;
 		if (($forumId = intval($forumId)) < 1) return false;
-		$query = $this->db->query('SELECT * FROM pw_online_user WHERE fid=' . S::sqlEscape($forumId));
+		$query = $db->query('SELECT * FROM pw_online_user WHERE fid=' . S::sqlEscape($forumId));
 		$onlineUsers = array();
 		while($rt = $this->db->fetch_array($query)){
 			$onlineUsers[] = $rt;
@@ -207,7 +213,8 @@ class PW_OnlineService{
 	 * @return array
 	 */
 	function getOnlineUserByUserId($userId){
-		return $this->db->get_one('SELECT * FROM pw_online_user WHERE uid=' . S::sqlEscape($userId));
+		global $db;
+		return $db->get_one('SELECT * FROM pw_online_user WHERE uid=' . S::sqlEscape($userId));
 	}
 	
 	/**
@@ -216,7 +223,8 @@ class PW_OnlineService{
 	 * @return integer
 	 */
 	function countOnlineUser(){
-		$rt = $this->db->get_one('SELECT COUNT(*) AS sum FROM pw_online_user');
+		global $db;
+		$rt = $db->get_one('SELECT COUNT(*) AS sum FROM pw_online_user');
 		return $rt ? $rt['sum'] : $rt;
 	}	
 	
@@ -226,7 +234,8 @@ class PW_OnlineService{
 	 * @return integer
 	 */
 	function countOnlineGuest(){
-		$rt = $this->db->get_one("SELECT COUNT(*) AS sum FROM pw_online_guest");
+		global $db;
+		$rt = $db->get_one("SELECT COUNT(*) AS sum FROM pw_online_guest");
 		return $rt ? $rt['sum'] : $rt;		
 	}
 	
@@ -247,7 +256,8 @@ class PW_OnlineService{
 	 */
 	function countOnlineGuestByIp($ip){
 		if (!$ip) return false;
-		$rt = $this->db->get_one('SELECT COUNT(*) AS sum FROM pw_online_guest WHERE ip = ' . S::sqlEscape($ip) );
+		global $db;
+		$rt = $db->get_one('SELECT COUNT(*) AS sum FROM pw_online_guest WHERE ip = ' . S::sqlEscape($ip) );
 		return $rt ? $rt['sum'] : 0;
 	}
 	

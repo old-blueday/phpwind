@@ -142,13 +142,10 @@ class PW_ChannelService {
 		$channelInfo = $this->getChannelByChannelid($id);
 		if (!$channelInfo) return false;
 		$invokeService = L::loadClass('invokeservice', 'area');
-		$pageInvokeService = L::loadClass('pageinvokeservice', 'area');
-		$pageInvokes = $pageInvokeService->getChannelPageInvokes($channelInfo['alias']);
+		$pageInvokes = $invokeService->getChannelPageInvokes($channelInfo['alias']);
 		foreach ($pageInvokes as $invoke) {
-			$invokeService->deleteInvoke($invoke['invokename']);
-			//$invokeService->deleteInovkePieceByInvokeName($invoke['invokename']);
+			$invokeService->deleteInvoke($invoke['name']);
 		}
-		$pageInvokeService->deletePageInvokesForChannel($channelInfo['alias']);
 	}
 	/**
 	 * 获取某个频道的SEO信息

@@ -83,18 +83,50 @@ class PwForum {
 		}
 	}
 
-	function authStatus($userstatus) {
+	/**
+	 * 
+	 * Enter description here ...
+	 * @param int $userstatus
+	 * @param boolean $or
+	 */
+	function authStatus($userstatus,$or = false) {
 		if (!$GLOBALS['db_authstate']) return true;
-		if ($this->forumset['auth_cellphone'] && !getstatus($userstatus, PW_USERSTATUS_AUTHMOBILE)) {
-			return 'forum_auth_cellphone';
+		if (!$or) {
+			//逻辑与
+			if ($this->forumset['auth_cellphone'] && !getstatus($userstatus, PW_USERSTATUS_AUTHMOBILE)) {
+				return 'forum_auth_cellphone';
+			}
+			if ($this->forumset['auth_alipay'] && !getstatus($userstatus, PW_USERSTATUS_AUTHALIPAY)) {
+				return 'forum_auth_alipay';
+			}
+			if ($GLOBALS['db_authcertificate'] && $this->forumset['auth_certificate'] && !getstatus($userstatus, PW_USERSTATUS_AUTHCERTIFICATE)) {
+				return 'forum_auth_certificate';
+			}
+			return true;
+		} else {
+			//逻辑或
+			$messages = array();
+			// auth mobile
+			if ($this->forumset['auth_cellphone'] && getstatus($userstatus, PW_USERSTATUS_AUTHMOBILE)) {
+				return true;
+			} else {
+				$this->forumset['auth_cellphone'] && array_push($messages, 'forum_auth_cellphone');
+			}
+			//auth alipay
+			if ($this->forumset['auth_alipay'] && getstatus($userstatus, PW_USERSTATUS_AUTHALIPAY)) {
+				return true;
+			} else {
+				$this->forumset['auth_alipay'] && array_push($messages, 'forum_auth_alipay');
+			}
+			//auth cetificate
+			if ($GLOBALS['db_authcertificate'] && $this->forumset['auth_certificate'] && getstatus($userstatus, PW_USERSTATUS_AUTHCERTIFICATE)) {
+				return true;
+			} else {
+				$GLOBALS['db_authcertificate'] && $this->forumset['auth_certificate'] && array_push($messages, 'forum_auth_certificate');
+			}
+			if (!$messages) return true;
+			return current($messages);
 		}
-		if ($this->forumset['auth_alipay'] && !getstatus($userstatus, PW_USERSTATUS_AUTHALIPAY)) {
-			return 'forum_auth_alipay';
-		}
-		if ($GLOBALS['db_authcertificate'] && $this->forumset['auth_certificate'] && !getstatus($userstatus, PW_USERSTATUS_AUTHCERTIFICATE)) {
-			return 'forum_auth_certificate';
-		}
-		return true;
 	}
 
 	function authCredit($userstatus) {

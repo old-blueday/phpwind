@@ -108,6 +108,7 @@ if ($_POST['step'] != 2) {
 		ifcheck($db_lp, 'lp');
 		ifcheck($db_online, 'online');
 		ifcheck($db_redundancy, 'redundancy');
+		ifcheck($db_cloudgdcode, 'cloudgdcode');
 		ifcheck($db_classfile_compress, 'classfile_compress');
 		ifcheck($db_cachefile_compress, 'cachefile_compress');
 		ifcheck($db_filecache_to_memcache, 'filecache_to_memcache');
@@ -211,14 +212,14 @@ if ($_POST['step'] != 2) {
 
 		//pathumb
 		$pathumb = S::getGP('pathumb');
-		S::gp(array('athumbsize'), 'G');
+		S::gp(array('athumbsize','athumbtype'), 'G');
 		if ($pathumb == 1) {
 			require_once (R_P . 'require/imgfunc.php');
 			$source = $imgdir . '/water/watermark.jpg';
 			$thumburl = D_P . 'data/bbscache/pathumb_preview.jpg';
 			$source_size = GetImgSize($source);
 			$size1 = filesize($source);
-			if ($thumbsize = MakeThumb($source, $thumburl, $athumbsize['athumbwidth'], $athumbsize['athumbheight'])) {
+			if ($thumbsize = MakeThumb($source, $thumburl, $athumbsize['athumbwidth'], $athumbsize['athumbheight'], $athumbtype)) {
 				$size2 = filesize($thumburl);
 				$sizerate = round($size2 / $size1, 3) * 100;
 				$imageurl = 'data/bbscache/pathumb_preview.jpg';
@@ -283,9 +284,9 @@ if ($_POST['step'] != 2) {
 		$db_waterheight = (int) $db_waterheight;
 		$db_athumbwidth = (int) $db_athumbwidth;
 		$db_athumbheight = (int) $db_athumbheight;
-
+		$db_quality = (int) $db_quality;
 		ifcheck($db_ifathumb, 'ifathumb');
-		ifcheck($db_ifathumbgif, 'ifathumbgif');
+		ifcheck($db_athumbtype, 'athumbtype');
 		$db_watermark == 1 ? $watermark_1 = 'checked' : ($db_watermark == 2 ? $watermark_2 = 'checked' : $watermark_0 = 'checked');
 		//ftp
 		//* @include_once pwCache::getPath(D_P . 'data/bbscache/ftp_config.php');
@@ -607,6 +608,9 @@ if ($_POST['step'] != 2) {
 		$config['ajax'] = intval(array_sum($cajax));
 		$config['onlinetime'] *= 60;
 		substr($config['ckpath'], -1) != '/' && $config['ckpath'] .= '/';
+		if ($config['ckpath'] != $db_ckpath || $config['ckdomain'] != $db_ckdomain) {
+			$config['cookiepre'] = substr(md5($config['ckpath'] . $config['ckdomain'] . $db_sitehash), 0, 5);
+		}
 		unset($postctl, $schctl, $cajax);
 	}
 	if ($admintype == 'safe' || $settingdb['safe']) {
@@ -1044,7 +1048,7 @@ if ($_POST['step'] != 2) {
 	
 	if($adminFileChanged){
 		/*@fix 更改admin_file后引起的的404错误 */
-		echo '<script language="JavaScript">parent.location.href = "'.$config['adminfile'].'";</script>';
+		echo '<script type="text/javascript">parent.location.href = "'.$config['adminfile'].'";</script>';
 	}else{
 		adminmsg('operate_success');
 	}

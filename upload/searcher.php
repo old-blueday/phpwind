@@ -4,12 +4,13 @@ require_once ('global.php');
 $_searchHelper = new PW_SearchHelper ();
 $_searchHelper->checkLevel ();
 S::gp ( array ("keyword", "type", "condition", "fid", "step", "username", "starttime", "endtime", "threadrange", "diaryusername", "diarystarttime", "diaryendtime", "diaryrange", "page", "fid", "sch_time", "digest", 'authorid', "ttable", "ptable", 'sortby' ) );
+$_searchHelper->checkSearchCondition($starttime, $endtime, $diarystarttime, $diaryendtime);
 if ($sch_time == 'newatc' || $digest == 1 || $sch_time == 'today') {
 	list ( $type, $condition ) = $_searchHelper->getSpecialCondition ();
 }
 $searchPassType = $db_search_type ? array_keys ( $db_search_type ) : array_keys($_searchHelper->getDefaultSearcherType());
 if ($type && ! in_array ( $type, array_merge ( array ('special' ), ( array ) $searchPassType ) )) {
-	showMsg ( "抱歉,搜索类型不存在" );
+	Showmsg ( "抱歉,搜索类型不存在" );
 }
 $searcherService = L::loadclass ( 'searcher', 'search' ); /* @var $searcherService PW_Searcher */
 list ( $page, $isSphinx, $threadrange, $diaryrange ) = $_searchHelper->initCondition ( $page, $threadrange, $diaryrange );
@@ -223,8 +224,8 @@ class PW_SearchHelper {
 	}
 	
 	function keywordStatistic($keyword) {
-		L::loadClass ( 'keywordstatistic', 'search/userdefine' );
-		$keywordStatisticServer = new PW_KeywordStatistic ();
+		global $db_distribute;
+		$keywordStatisticServer = $db_distribute ? L::loadClass ( 'keywordstatisticdatabase', 'search/userdefine' ) : L::loadClass ( 'keywordstatistic', 'search/userdefine' );
 		$keywordStatisticServer->init ( $keyword );
 		$keywordStatisticServer->execute ();
 		return true;
@@ -459,6 +460,14 @@ class PW_SearchHelper {
 	
 	function getDefaultSearcherType() {
 		return array ('thread'=>'帖子','diary'=>'日志','user'=>'用户','forum'=>'版块','group'=>'群组');
+	}
+	
+	function checkSearchCondition($starttime, $endtime, $diarystarttime, $diaryendtime) {
+		(($starttime && !strtotime($starttime)) || ($diarystarttime && !strtotime($diarystarttime))) && Showmsg('search_starttime_error');
+		(($endtime && !strtotime($endtime)) || ($diaryendtime && !strtotime($diaryendtime))) && Showmsg('search_endtime_error');
+		($starttime && $endtime && strtotime($starttime) > strtotime($endtime)) && Showmsg('search_time_error');
+		($diarystarttime && $diaryendtime && strtotime($diarystarttime) > strtotime($diaryendtime)) && Showmsg('search_time_error');
+		return true;
 	}
 }
 ?>

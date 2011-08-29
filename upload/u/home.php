@@ -14,12 +14,17 @@ require_once(R_P.'require/functions.php');
 extract(pwCache::getData(D_P.'data/bbscache/level.php', false));
 extract(pwCache::getData(D_P.'data/bbscache/o_config.php', false));
 extract(pwCache::getData(D_P.'data/bbscache/dbreg.php', false));
-require_once(R_P.'require/credit.php');
+require_once(R_P.'require/credit.php'); 
 $newSpace = new PwSpace($winduid);
-$space = $newSpace->getInfo();
+$space = $newSpace->getInfo(); 
 $finishPercentage = getMemberInfoFinishPercentage($winduid);
 
-$winddb['medals'] && $listmedals = getMedalIconsByUid($winduid);
+//$winddb['medals'] && $listmedals = getMedalIconsByUid($winduid);
+//勋章
+if ($db_md_ifopen) { 
+	$medalService = L::loadClass('MedalService', 'medal');
+	$medalList    = $medalService->getUserMedals($winduid,'all',$winddb['medals']); //获取会员已经拥有的勋章
+}
 //升级提示条
 $usercredit = array(                   	
 	'postnum'	=> $winddb['postnum'],
@@ -30,7 +35,7 @@ $usercredit = array(
 	'currency'	=> $winddb['currency'],
 	'onlinetime'=> $winddb['onlinetime']
 );
-foreach ($credit->get($winduid,'CUSTOM') as $key => $value) {  //金钱、积分、威望
+foreach ((array)$credit->get($winduid,'CUSTOM') as $key => $value) {  //金钱、积分、威望
 	$usercredit[$key] = $value;
 }
 $upgradeset  = unserialize($db_upgrade);
@@ -102,6 +107,20 @@ if ($db_job_isopen) {
 	}
 }
 list($isPunch,$showPunch) = isPunchRoutine();//每日打卡
+if ($showPunch) {
+	$behaviorService = L::loadClass('behaviorservice','user');
+	$punchBehavior = $behaviorService->getBehaviorStatistic($winduid,'continue_punch');
+	if ($isPunch) {
+		//未打卡
+		$unPunchDays = $winddb['punch'] > 0 ? ceil(($timestamp - $winddb['punch']) / 86400) : 1;
+		$punchText =  $unPunchDays > 2 ? "{$unPunchDays}天未打卡" : "每日打卡";
+	} else {
+		//已打卡
+		$punchBehavior['num'] or $punchBehavior['num'] = 1; 
+		$punchText = "连续{$punchBehavior['num']}天打卡";
+	}
+		
+}
 
 $modelList = array('recommendUsers' => 3,'visitor' => 6, 'friendsBirthday' => array('num' => 3,'expire' => 21600 ), 'tags' => 8 );
 $o_weibopost == '0' && $modelList['friend'] = 6;
@@ -115,15 +134,14 @@ if (S::isArray($tmpmemberTags)) {
 	$memberTagsService = L::loadClass('memberTagsService', 'user');
 	$memberTags = $memberTagsService->makeClassTags($tmpmemberTags);
 }
-/* sinaweibo bind */
-if (!$db_sinaweibo_status) {
-	$isBindWeibo = false;
-} else {
-	$bindService = L::loadClass('weibobindservice', 'sns/weibotoplatform'); /* @var $bindService PW_WeiboBindService */
-	$isBindWeibo = $bindService->isLocalBind($winduid, PW_WEIBO_BINDTYPE_SINA);
-	if (!$isBindWeibo) {
-		$bindSinaWeiboUrl = $bindService->getBindUrl($winduid);
-	}
+/* platform weibo app */
+$isSiteBindWeibo = false;
+$siteBindService = L::loadClass('WeiboSiteBindService', 'sns/weibotoplatform/service'); /* @var $siteBindService PW_WeiboSiteBindService */
+if ($siteBindService->isOpen()) {
+	$isSiteBindWeibo = true;
+	$userBindService = L::loadClass('WeiboUserBindService', 'sns/weibotoplatform/service'); /* @var $userBindService PW_WeiboUserBindService */
+	$userBindList = $userBindService->getBindList($winduid);
+	$isUserBindOne = $userBindService->isBindOne($winduid);
 }
 
 /*个人中心与消息中心的互动*/

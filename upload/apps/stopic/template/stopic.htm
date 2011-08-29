@@ -9,6 +9,11 @@
 <meta name="keywords" content="$seo_keyword" />
 <base id="headbase" href="$db_bbsurl/" />
 <link rel="stylesheet" type="text/css" href="$db_bbsurl/apps/stopic/image/style.css" />
+<link rel="stylesheet" href="images/pw_core.css?101128" />
+<script>
+var imgpath = '$imgpath' ? '$imgpath' : 'images';
+var db_bbsurl = '$db_bbsurl' ;
+</script>
 <!--
 EOT;
 if ($layout_config['othercss'] == "") { print <<<EOT
@@ -37,7 +42,7 @@ a{color:{$layout_config[fontcolor]}; text-decoration:none;} /*链接字体颜色
 <!--
 EOT;
 }  print <<<EOT
-?>-->
+-->
 
 </head>
 <body>

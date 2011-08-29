@@ -189,7 +189,7 @@ EOT;
 }elseif($action=='cp'){
 print<<<EOT
 -->
-<script language="JavaScript" src="js/date.js"></script>
+<script type="text/javascript" src="js/date.js"></script>
 <form action="$basename&action=$action" method="post">
   <h2 class="h1">日志搜索</h2>
   <div class="admin_table mb10">
@@ -258,16 +258,25 @@ print<<<EOT
   </div>
   <div class="mb10 tac">
     <span class="mr10"><span class="btn"><span><button type="submit">提 交</button></span></span></span>
-    <a href="javascript:;" id="advanceSearchButton">高级搜索<input type="hidden" id="searchDisplay" name="searchDisplay" value="$searchDisplay"></a>
+    <a href="javascript:;" id="advanceSearchButton">高级搜索</a><input type="hidden" id="searchDisplay" name="searchDisplay" value="$searchDisplay">
    </div>
 </form>
 <script type="text/javascript">
 getObj('advanceSearchButton').onclick = function() {
-	displayElement('advanceSearchBody','advanceSearchButton');
+	displayElementConflict('advanceSearchBody','advanceSearchButton');
 	if(getObj('searchDisplay')){
 		getObj('searchDisplay').value = getObj('advanceSearchBody').style.display;
 	}
 };
+
+function displayElementConflict(elementId,buttonId,isDisplay) {
+	if (undefined == isDisplay && typeof buttonId === 'string') {
+		getObj(elementId).style.display = getObj(elementId).style.display == 'none' ? '' : 'none';
+		getObj(buttonId).innerHTML = getObj(elementId).style.display == ''? '简单搜索' : '高级搜索';
+	} else {
+		getObj(elementId).style.display = isDisplay ? '' : 'none';
+	}
+}
 </script>
 
 <form action="$basename&" method="post" name="FORM">
@@ -349,7 +358,7 @@ EOT;
       <span class="btn"><span><button type="submit" onclick="return Checkdel();">删 除</button></span></span>
    </div>
 </form>
-<script language="JavaScript">
+<script type="text/javascript">
 function Checkdel(){
 	if (!confirm("您确定要删除选中项吗?")) {
 		return false;

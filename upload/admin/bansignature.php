@@ -88,6 +88,7 @@ if (empty($action)) {
 			$difference = array_diff($username, $resultUsername);
 			if (!empty($difference) && is_array($difference)) {
 				$diffStr = implode(',', $difference) . '不存在';
+				$diffStr == '不存在' && $diffStr = '请输入用户名';
 				adminmsg($diffStr, $basename.'&action=ban');
 			}
 		}

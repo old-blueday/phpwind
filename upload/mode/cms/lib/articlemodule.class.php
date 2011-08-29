@@ -49,16 +49,16 @@ class PW_ArticleModule extends PW_Module {
 	 */
 	function setSubject($subject) {
 		if (empty($subject)) {
-			$this->addError('文章<span class=\'warnFontStyle\'>标题</span>不能为空');
+			$this->addError('文章<span class=\'s1\'>标题</span>不能为空');
 		}
 		if (strlen($subject) > 80) {
-			$this->addError('文章<span class=\'warnFontStyle\'>标题</span>长度不能大于<span class=\'warnFontStyle\'>80</span>字节');
+			$this->addError('文章<span class=\'s1\'>标题</span>长度不能大于<span class=\'s1\'>80</span>字节');
 		}
 		if( ($bword = $this->_filterUitil->comprise($subject)) &&  $GLOBALS['iscontinue'] != 1 ){ 
-			$this->addError("文章<span class='warnFontStyle'>标题</span>中含有敏感词：<span class='warnFontStyle'>" . $bword . "</span>，禁止发表，请返回修改");
+			$this->addError("文章<span class='s1'>标题</span>中含有敏感词：<span class='s1'>" . $bword . "</span>，禁止发表，请返回修改");
 		}
 		$subject = $this->_filterUitil->convert($subject);
-		$this->subject = $subject;
+		$this->subject = pwHtmlspecialchars_decode($subject);
 	}
 
 	/**
@@ -68,13 +68,13 @@ class PW_ArticleModule extends PW_Module {
 	 */
 	function setContent($content, $page = 0) {
 		if (empty($content)) {
-			$this->addError('文章<span class=\'warnFontStyle\'>内容</span>不能为空');
+			$this->addError('文章<span class=\'s1\'>内容</span>不能为空');
 		}
 		if (strlen($content) > 50000) {
-			$this->addError('文章<span class=\'warnFontStyle\'>内容</span>过大');
+			$this->addError('文章<span class=\'s1\'>内容</span>过大');
 		}
 		if( ($bword = $this->_filterUitil->comprise($content)) &&  $GLOBALS['iscontinue'] != 1) {
-			$this->addError("文章内容中含有敏感词：<span class='warnFontStyle'>" . $bword . "</span>，禁止发表，请返回修改");
+			$this->addError("文章内容中含有敏感词：<span class='s1'>" . $bword . "</span>，禁止发表，请返回修改");
 		}
 		$content = $this->_filterUitil->convert($content);
 		$content = htmlspecialchars($content);
@@ -106,14 +106,14 @@ class PW_ArticleModule extends PW_Module {
 	 */
 	function setDescrip($descrip) {
 		if( ($bword = $this->_filterUitil->comprise( $descrip ))  &&  $GLOBALS['iscontinue'] != 1) {
-			$this->addError("文章<span class='warnFontStyle'>摘要</span>中包含禁用敏感词：<span class='warnFontStyle'>" . $bword. "</span>，禁止发表，请返回修改");
+			$this->addError("文章<span class='s1'>摘要</span>中包含禁用敏感词：<span class='s1'>" . $bword. "</span>，禁止发表，请返回修改");
 		 } 
 		$descrip = $this->_filterUitil->convert( $descrip );
 		if (empty($descrip)) {
 			$descrip = substrs($this->_filterWindCode(), 200);
 		}
 		if (strlen($descrip) > 255) {
-			$this->addError('<span class=\'warnFontStyle\'>描述</span>内容不能大于<span class=\'warnFontStyle\'>255</span>字节');
+			$this->addError('<span class=\'s1\'>描述</span>内容不能大于<span class=\'s1\'>255</span>字节');
 		}
 		$this->descrip = $descrip;
 	}
@@ -129,7 +129,7 @@ class PW_ArticleModule extends PW_Module {
 	function setColumnId($columnId) {
 		$columnId = (int) $columnId;
 		if (!$columnId) {
-			$this->addError('没有选择<span class=\'warnFontStyle\'>栏目<span>');
+			$this->addError('没有选择<span class=\'s1\'>栏目<span>');
 		}
 		$this->columnId = $columnId;
 	}
@@ -180,10 +180,35 @@ class PW_ArticleModule extends PW_Module {
 		$page = (int) $page;
 		$contents = $this->_explodeContent();
 		$key = $page - 1;
-		if (isset($contents[$key])) {return $contents[$key];}
+		if (isset($contents[$key])) {
+			return count($contents) > 1 ? $this->autoCloseTags($contents[$key]) : $contents[$key];
+		}
 		$this->addError('分页数有误');
 	}
 
+	/**
+	 * 自动补全ubb
+	 * @param $content
+	 */
+	function autoCloseTags($content) {
+		$openTags = array('paragraph', 'hr', 'attachment', 's');
+		//$closeTags = array('code', 'payto', 'list', 'u', 'b', 'i', 'li', 'sub', 'sup', 'strike', 'blockquote', 'backcolor', 'color', 'font', 'size', 'align', 'email', 'glow', 'img', 'music', 'url', 'fly', 'move', 'post', 'hide', 'sell', 'quote', 'flash', 'table', 'wmv', 'mp3', 'rm', 'iframe');
+		preg_match_all('/\[([a-z]+)[^\]]*\]/i', $content, $result);
+		$startTags = $result[1];
+		preg_match_all('/\[\/([^\]]+)\]/i', $content, $result);
+		$endTags = $result[1];
+		list($startTagsLength, $startCountNum, $endCountNum) = array(count($startTags), array_count_values($startTags), array_count_values($endTags));
+		if (count($endTags) == $startTagsLength) return $content;
+
+		$startTags = array_reverse($startTags);
+		for ($i = 0; $i < $startTagsLength; $i++) {
+			if (in_array($startTags[$i], $openTags) || $startCountNum[$startTags[$i]] == $endCountNum[$startTags[$i]]) continue;
+			$nextTag = $startTags[$i+1];
+			$content = $nextTag ? preg_replace('/\[\/' . $nextTag . '\]/iU', '[/' . $startTags[$i] . '][/' . $nextTag . ']', $content) : $content . '[/' . $startTags[$i] . ']';
+		}
+		return $content;
+	}
+	
 	/**
 	 * 删除本bean的某个分页
 	 * @param int $page
@@ -218,7 +243,7 @@ class PW_ArticleModule extends PW_Module {
 	function setSourceType($sourceType) {
 		$sourceTypeConfig = $this->getSourceTypeConfig();
 		if ($sourceType && !isset($sourceTypeConfig[$sourceType])) {
-			$this->addError('<span class=\'warnFontStyle\'>文章获取来源</span>有误');
+			$this->addError('<span class=\'s1\'>文章获取来源</span>有误');
 		}
 		$this->sourceType = $sourceType;
 	}
@@ -301,7 +326,7 @@ class PW_ArticleModule extends PW_Module {
 		$mao && $mao = '#' . $mao;
 		$pages = "<div class=\"pages\">";
 		if ($page > 1) {
-			$pages .= "<a href=\"{$url}page=" . ($page - 1) . "$mao\" class=\"b\">上一页</a>";
+			$pages .= "<a href=\"{$url}page=" . ($page - 1) . "$mao\">上一页</a>";
 		}
 
 		for ($i = $page - 3; $i <= $page - 1; $i++) {
@@ -325,7 +350,7 @@ class PW_ArticleModule extends PW_Module {
 			$flag++;
 			if ($flag == 4) break;
 		}
-		$pages .= "<a href=\"{$url}page=" . ($page + 1) . "$mao\" class=\"b\">下一页</a>";
+		$pages .= "<a href=\"{$url}page=" . ($page + 1) . "$mao\">下一页</a>";
 	}
 
 	function _explodeContent() {
@@ -349,7 +374,7 @@ class PW_ArticleModule extends PW_Module {
 
 	function setFromUrl($fromUrl) {
 		if ($fromUrl && !$this->_checkUrl($fromUrl)) {
-			$this->addError('数据来源地址格式有误');
+			$this->addError('来源网址格式有误');
 		}
 		$this->fromUrl = $fromUrl;
 	}

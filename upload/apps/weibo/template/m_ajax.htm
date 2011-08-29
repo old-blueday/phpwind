@@ -17,7 +17,7 @@ if (in_array($do,array('filterweibo','lookround','refer','attention','my','conlo
 EOT;
 if($topicGroup['weibo']){
 	foreach($topicGroup['weibo'] as $key => $value){
-					$method = $weiboService->getType($value['type']);
+					$method = $weiboService->getViewType($value['type']);
 					$weiboModelTemplate->$method($value);
 	}
 }
@@ -29,7 +29,7 @@ EOT;
 			}
 		}else{
 			foreach ($weiboList as $key => $value) {
-				$method = $weiboService->getType($value['type']);
+				$method = $weiboService->getViewType($value['type']);
 				$weiboModelTemplate->$method($value);
 			}
 		}
@@ -75,7 +75,7 @@ EOT;
 				$value['content'] = $value['content'];
 			}
 			$ifmycomment = $value['uid'] == $winduid ? false : true;
-			$method = $weiboService->getType($weibo['type']);
+			$method = $weiboService->getViewType($weibo['type']);
 print <<<EOT
 -->				
 					<dl class="dl cc">
@@ -248,6 +248,7 @@ print <<<EOT
 EOT;
 }elseif($do == 'comment' || $do == 'replay'){
 $iftransmitweibo = $weiboService->groupCheck($groupid);
+$tid && $ifReplyThreadRight = $weiboService->checkReplyRight($tid);
 list($face) = showfacedesign($winddb['icon'],1,m);  
 print <<<EOT
 --><div class="redlB" id="option_{$id}">
@@ -255,31 +256,34 @@ print <<<EOT
 		<form name="FORM_{$id}" id="FORM_{$id}" action="apps.php?q=weibo&do=postcomment&ajax=1" method="post" >
         <input type="hidden" value="$verifyhash" name="verify">
 		<input type="hidden" name="mid" value="$mid" />
+		<input type="hidden" name="tid" value="$tid" />
 		<input type="hidden" name="identify" value="$identify" />
 		<input type="hidden" name="commentpage" value="$page" />
 		<input type="hidden" name="uids" value="$uids" />
 		<input type="hidden" name="subdo" value="$do" />
 		<input type="hidden" name="ifreplay" value="0" />
 		<dl class="cc dlA" style="border:none;">
-			<dt class="dtA"><a href="{$db_userurl}$winduid"><img class="img" src="$face" alt="$windid" width="35" height="35" /></a></dt>
+			<dt class="dtA"><span onclick="showcommentsmile(this, 'writeContent_{$id}', 'counter_{$id}')" class="sk_show cp link_down" id="showSmile" style="padding-left:14px;"><span>&nbsp;</span></span></dt>
 			<dd class="ddA">
-				<p class="mb10"><textarea name="writeContent" id="writeContent_{$id}" onkeyup="wordlength(this, 255, 'counter_{$id}')" onkeydown = "ctrlEnter(event,getObj('FORM_{$id}'),postcomment)">$replayusername</textarea></p>
-				<p class="cc mb10">
-					<span onclick="showcommentsmile(this, 'writeContent_{$id}', 'counter_{$id}')" class="sk_show cp" id="showSmile">表情</span>
-					<span class="btn3 fr"><span><button type="button" onclick="postcomment(this.form)" id="comment_submit" name="comment_submit">评论</button></span></span>
+				<p class="mb10"><textarea name="writeContent" id="writeContent_{$id}" onkeyup="wordlength(this, 255, 'counter_{$id}')" onkeydown = "ctrlEnter(event,getObj('FORM_{$id}'),postcomment)">$replayusername</textarea><span class="btn3"><span><button type="button" onclick="postcomment(this.form)" id="comment_submit" name="comment_submit">评论</button></span></span></p>
 <!--
 EOT;
+if($ifReplyThreadRight){
+print <<<EOT
+-->						
+					<p class="cc"><label class="mr5"><input name="ifReplyThread"  type="checkbox" value="1" checked="checked">&nbsp;同时回复到帖子</label></p>
+<!--
+EOT;
+}
 if($iftransmitweibo && $o_weibopost != '0'){
 print <<<EOT
 -->						
-					<label class="fr mr5"><input name="ifsendweibo"  type="checkbox" value="1">&nbsp;同时转发到新鲜事</label>
+					<p class="cc mb10"><label class="mr5"><input name="ifsendweibo"  type="checkbox" value="1">&nbsp;同时转发到新鲜事</label></p>
 <!--
 EOT;
 }
 print <<<EOT
--->						
-					<span class="fr mr5 gray" id="counter_{$id}"><em>0/255</em></span>
-				</p>
+--><!--span class="fr mr5 gray" id="counter_{$id}"><em>0/255</em></span-->
 			</dd>
 		</dl>
 		</form>
@@ -289,26 +293,26 @@ foreach($commentList as $value){
 print <<<EOT
 -->		
 		<dl class="cc dlA">
-			<dt class="dtA"><a href="{$db_userurl}{$value['uid']}"><img class="img" src="{$value['icon']}" alt="{$value['username']}" width="35" height="35" /></a></dt>
-			<dd class="ddA">
+			<dt class="dtA mr10"><a href="{$db_userurl}{$value['uid']}"><img class="img" src="{$value['icon']}" alt="{$value['username']}" width="30" height="30" /></a></dt>
+			<dd class="ddA">		
+				<p class="titleA"><a href="{$db_userurl}{$value['uid']}">{$value['username']}</a>：<span class="mr5">{$value['content']}</span><span class="w" title="{$value['postdate_s']}">({$value['lastdate']})</span></p>
+				<p class="tar">
 <!--
 EOT;
-if($isGM || $winduid == $value['uid']){
-print <<<EOT
--->	
-				<a href="javascript:void(0)" class="fr s7" onclick="deletecomment({$value['cid']},getObj('FORM_{$id}'))">删除</a>
-<!--
-EOT;
-}if($do == 'comment'){
+if($do == 'comment'){
 print <<<EOT
 -->					
-				<a href="javascript:void(0)" class="fr s7 mr10" onclick="replycomment('{$value['username']}',getObj('FORM_{$id}'))">回复</a>
+				<a href="javascript:void(0)" class="s7" onclick="replycomment('{$value['username']}',getObj('FORM_{$id}'))">回复</a><!--
+EOT;
+}if($isGM || $winduid == $value['uid']){
+print <<<EOT
+-->&nbsp;<span class="gray">|</span>&nbsp;<a href="javascript:void(0)" class="s7" onclick="deletecomment({$value['cid']},getObj('FORM_{$id}'))">删除</a>
 <!--
 EOT;
 }
 print <<<EOT
--->					
-				<p class="titleA"><a href="{$db_userurl}{$value['uid']}">{$value['username']}</a>：<span class="mr20">{$value['content']}</span><span class="w gray" title="{$value['postdate_s']}">{$value['lastdate']}</span></p>
+-->
+				</p>
 			</dd>
 		</dl>
 <!--

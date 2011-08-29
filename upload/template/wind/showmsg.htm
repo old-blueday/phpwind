@@ -8,20 +8,25 @@ print <<<EOT
 <meta name="generator" content="phpwind $wind_version" />
 <meta name="description" content="$metaDescription" />
 <meta name="keywords" content="$metaKeywords" />
-<SCRIPT type="text/javascript" language="JavaScript" src="js/core/core.js"></SCRIPT>
-<script type="text/javascript" language="JavaScript" src="js/pw_ajax.js"></script>
-<link rel="stylesheet" type="text/css" href="$imgpath/pw_core.css?101128" media="all" />
+<base id="headbase" href="$db_bbsurl/" />
+<script type="text/javascript" src="js/core/core.js"></script>
+<script type="text/javascript" src="js/pw_ajax.js"></script>
+<link rel="stylesheet" href="$imgpath/pw_core.css?{$GLOBALS['wind_repair']}" />
 EOT;
 @include Pcv($css_path);
 print <<<EOT
 -->
-<link rel="stylesheet" type="text/css" href="$imgpath/register/register.css?110120" media="all" />
-<base id="headbase" href="$db_bbsurl/" />
+<link rel="stylesheet" href="$imgpath/register/register.css?{$GLOBALS['wind_repair']}" />
+<style type="text/css">
+p,ul,li{padding:0;margin:0;}
+li{list-style:none}
+.cp { cursor: pointer;}
+</style>
 </head>
 <body onKeyDown="try{keyCodes(event);}catch(e){}">
 <div class="wrap">
 	<div id="header">
-		<div style="height:24px;"></div>
+		<div class="head_top"></div>
 			 <div id="head" class="cc">
 					<a href="$db_bbsurl/"><img src="$imgpath/$stylepath/logo.png" class="fl" title="phpwind" /></a>
 			</div>
@@ -38,7 +43,7 @@ EOT;
 if($showlogin){print <<<EOT
 						<div class="regForm-wrap">
 							<div class="regForm">
-<script language="JavaScript">
+<script>
 function showcustomquest(qid){
 	getObj("customquest").style.display = qid==-1 ? '' : 'none';
 }
@@ -127,7 +132,7 @@ EOT;
 list(,$showq) = explode("\t", $db_qcheck);
 if($showq && $qkey>0){print <<<EOT
 -->
-					正确答案:{$db_answer[$qkey]}
+					（答案：{$db_answer[$qkey]}）
 <!--
 EOT;
 }print <<<EOT
@@ -139,22 +144,54 @@ EOT;
 
 EOT;
 }if($db_gdcheck & 2){
-$gdSize = explode("\t",$db_gdsize);
+$checkCode = L::loadClass('checkcode', 'site');
+$checkCodeString = $checkCode->getCheckCodeTemplate();
 print <<<EOT
 
 									<dl class="cc">
 										<dt>验证码</dt>
-										<dd class="ip ck"><div><input class="input" type="text" name="gdcode" size="6" tabindex="17" onFocus="showgd();" alt="请输入验证码" /></div>
-					<span id="ckcode">
-<script type="text/javascript" src="js/pw_authcode.js"></script>
-<script>
-var flashWidth = "$gdSize[0]";
-var flashHeight = "$gdSize[1]";
-var gdtype = $db_gdtype;
-showGdCode();
-</script>
-					</span></dd>
+										<dd class="ip ck"><div><input class="input" type="text" name="gdcode" size="6" tabindex="17" onfocus="showgd();" alt="请输入验证码" /></div>
+											<span id="ckcode" style="display:none;"></span>
+											$checkCodeString
+										</dd>
 									</dl>
+<script>
+function loadjs(path, code, id, callBack) {
+	id = id || '';
+	if (id != '' && IsElement(id)) {
+		try{callBack?callBack():0;}catch(e){}
+		return false;
+	}
+	var header = document.getElementsByTagName("head")[0];
+	var s = document.createElement("script");
+	if (id) s.id = id;
+	if (path) {
+		if(is_webkit && path.indexOf(' ')>-1)
+		{
+			var reg = /src="(.+?)"/ig;
+			var arr = reg.exec(path);
+			if(arr){
+				path = arr[1];
+			}				
+		}
+		s.src = path;
+	} else if (code) {
+		s.text = code;
+	}
+	if (document.all) {
+		s.onreadystatechange = function() {
+			if (s.readyState == "loaded" || s.readyState == "complete") {
+				callBack?callBack():0;
+			}
+		};
+	} else {
+		try{s.onload = callBack?callBack:null;}catch(e){callBack?callBack():0;}
+	}
+	header.appendChild(s);
+	return true;
+}
+</script>
+
 EOT;
 }print <<<EOT
 									<dl class="cc">
@@ -171,9 +208,10 @@ EOT;
 											<span class="btn"><span><button type="submit" tabindex="19">登录</button></span></span><input type="hidden" name="forward" value="" /><input type="hidden" name="jumpurl" value="$jumpurl" /><input type="hidden" name="m" value="$db_mode" /><input type="hidden" name="step" value="2" /><input type="hidden" name="cktime" value="31536000" />
 										</dd>
 									</dl>
+
 								</div>
 </form>									
-<script language="JavaScript">
+<script>
 document.login.pwuser.focus();
 </script>
 							</div>
@@ -185,6 +223,42 @@ document.login.pwuser.focus();
 									<p class="mb5"><a href="javascript:;" class="mr20 s4" onclick="javascript:history.go(-1);return false;" tabindex="20"><u>返回继续操作</u></a></p>
 									<p>或者 <a id="showindex" tabindex="20" class="s4" href="$db_bbsurl"><u>返回首页</u></a></p>
 								</div>
+
+<!--
+EOT;
+/* platform weibo app --start */
+L::loadClass('WeiboLoginViewHelper', 'sns/weibotoplatform/viewhelper', false);
+$weiboLoginService = L::loadClass('WeiboLoginService', 'sns/weibotoplatform/service');
+$loginWays = $weiboLoginService->getLoginWays();
+if ($loginWays) {
+print <<<EOT
+-->
+				<link rel="stylesheet" type="text/css" href="u/images/expand/weibologin.css" media="all" />
+				<div style="padding-left:20px;padding-top:30px;">
+					<p class="f14 mb5">使用合作网站帐号登录：</p>
+					<ul class="waysList cc">
+<!--
+EOT;
+	foreach ($loginWays as $loginWay) {
+			$windowOpenScript = WeiboLoginViewHelper_WindowOpenScript($loginWay['type']);
+print <<<EOT
+-->
+			<li style="float:none;width:140px;"><a class="s4" title="使用{$loginWay['accountTitle']}登录" href="javascript:;" onclick="$windowOpenScript"><img src="{$loginWay['loginLogo']}" />{$loginWay['accountTitle']}</a></li>
+<!--
+EOT;
+	}
+print <<<EOT
+-->
+					</ul>
+				</div>
+<!--
+EOT;
+}
+/* platform weibo app --end */
+
+print <<<EOT
+-->
+
 							</div>
 
 EOT;

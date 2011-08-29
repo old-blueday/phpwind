@@ -1,0 +1,151 @@
+<!--<?php
+include_once PrintEot('left');print <<<EOT
+-->
+<form action="$basename" method="post">
+<input type="hidden" name="step" value="2">
+<h3 class="h1">WAP浏览设置</h3>
+<div class="admin_table mb10">
+    <table width="100%" cellspacing="0" cellpadding="0">
+        <tr class="tr1 vt">
+            <td class="td1"><span class="xia2">WAP功能</td>
+            <td class="td2">
+                <ul class="list_A list_80">
+                    <li><input type="radio" value="1" name="config[wapifopen]" $wapifopen_Y>开启</li>
+                    <li><input type="radio" value="0" name="config[wapifopen]" $wapifopen_N>关闭</li>
+                </ul>
+            </td>
+            <td class="td2"><div class="help_a">开启此功能允许用户通过手机访问站点，实现浏览、发帖、收发消息等功能</div></td>
+        </tr>
+        <tr class="tr1 vt">
+            <td class="td1">WAP字符集</td>
+            <td class="td2">
+                <ul class="list_A list_80">
+                    <li><input type="radio" value="1" name="config[wapcharset]" $wapcharset_Y> UTF-8</li>
+                    <li><input type="radio" value="0" name="config[wapcharset]" $wapcharset_N> UNICODE</li>
+                </ul>
+            </td>
+            <td class="td2"><div class="help_a">UTF-8 编码占用字节较小，但兼容性较差，遇到乱码等情况可能导致页面无法浏览。<br />UNICODE 编码占用字节较大，但兼容性比UTF-8编码好很多，推荐使用</div></td>
+        </tr>
+        <tr>
+        	<td class="td1"><span class="xia2">WAP用户注册</span> </td>
+        	<td class="td2">
+        		<ul class="list_A list_80">
+        			<li><input type="radio" value="1" name="config[wapregist]" $wapregist_Y> 开启</li>
+        			<li><input type="radio" value="0" name="config[wapregist]" $wapregist_N> 关闭</li>
+        		</ul>
+        	</td>
+        	<td class="td2"><div class="help_a"></div></td>
+        </tr>
+        <!--<tr class="tr1 vt">
+			<td class="td1">手机版记录</td>
+			<td class="td2">
+				<input type="radio" value="1" name="config[waprecord]" $waprecord_Y> 开启
+				<input type="radio" value="0" name="config[waprecord]" $waprecord_N> 关闭
+			</td>
+			<td class="td2">开启后可以直接通过WAP发表记录</td>
+		</tr>
+        --><tr class="tr1 vt">
+            <td class="td1">WAP页面长度控制</td>
+            <td class="td2"><input name="config[waplimit]" value="$db_waplimit" class="input input_wa" /></td>
+            <td class="td2"><div class="help_a">为了提高兼容性请设置为大于0的整数，建议设置为:300-2000 之间</div></td>
+        </tr>
+        <tr class="tr1 vt">
+            <td class="td1">WAP推荐版块</td>
+            <td class="td2">$showforums</td>
+            <td class="td2"><div class="help_a">为方便WAP用户查看站点帖子，请设置您想要推荐给WAP用户的版块</div></td>
+        </tr>
+        <tr class="tr1 vt">
+			<td class="td1">本周热帖</td>
+			<td class="td2">
+				<input type="radio" value="1" name="config[waphottopicweek]" $waphottopicweek_Y> 开启
+				<input type="radio" value="0" name="config[waphottopicweek]" $waphottopicweek_N> 关闭
+			</td>
+			<td class="td2">
+				开启后将在WAP首页显示热点话题
+			</td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">24小时热帖</td>
+			<td class="td2">
+				<input type="radio" value="1" name="config[waphottopictoday]" $waphottopictoday_Y> 开启
+				<input type="radio" value="0" name="config[waphottopictoday]" $waphottopictoday_N> 关闭
+			</td>
+			<td class="td2">
+				开启后将在WAP首页显示24小时热帖
+			</td>
+		</tr>
+		<tr class="tr1 vt">
+			<td class="td1">内容推荐</td>
+			<td class="td2">
+				<input type="radio" value="1" name="config[waprecommend]" $waprecommend_Y> 开启
+				<input type="radio" value="0" name="config[waprecommend]" $waprecommend_N> 关闭
+			</td>
+			<td class="td2">
+				开始后将在WAP首页显示推荐内容，推荐内容在【<a onclick="parent.PW.Dialog({id:'wapsettings',name:'内容推荐',url:'$admin_file?adminjob=wapsettings'})" href="javascript:;">内容推荐</a>】中维护
+			</td>
+		</tr>
+    </table>
+</div>
+
+<div class="admin_table mb10">
+	<h3 class="h1">图片缩略</h3>
+	<div class="admin_table mb10">
+		<table width="100%" cellspacing="0" cellpadding="0">
+			<tr class="tr1 vt">
+				<td class="td1">图片缩略功能</td>
+				<td class="td2">
+					<ul class="list_A list_80">
+						<li><input type="radio" value="1" name="config[wapifathumb]" $wapifathumb_Y>开启</li>
+						<li><input type="radio" value="0" name="config[wapifathumb]" $wapifathumb_N>关闭</li>
+					</ul>
+				</td>
+				<td class="td2"><div class="help_a">将站点的图片附件按照一定比例进行缩略</div></td>
+			</tr>
+			<tr class="tr1 vt">
+				<td class="td1">gif图片缩略</td>
+				<td class="td2">
+					<ul class="list_A list_80">
+						<li><input type="radio" value="1" name="config[wapifathumbgif]" $wapifathumbgif_Y>开启</li>
+						<li><input type="radio" value="0" name="config[wapifathumbgif]" $wapifathumbgif_N>关闭</li>
+					</ul>
+				</td><td class="td2"><div class="help_a"></div></td>
+			</tr>
+			<tr class="tr1 vt">
+				<td class="td1">图片缩略宽高控制</td>
+				<td class="td2">
+					<ul class="list_C">
+						<li>宽： <input id="wapathumbsize[wapathumbwidth]" name="wapathumbsize[wapathumbwidth]" value="$db_wapathumbwidth" class="input input_wc" /></li>
+						<li>高： <input id="wapathumbsize[wapathumbheight]" name="wapathumbsize[wapathumbheight]" value="$db_wapathumbheight" class="input input_wc" /></li>
+					</ul>
+				</td>
+				<td class="td2">
+					<div class="help_a">
+					对超过此设定值的图片进行缩略</br>
+					0或留空表示不限制<br/>
+					单位为像素
+					</div>
+				</td>
+			</tr>
+			<tr class="tr1 vt">
+				<td class="td1">缩略图效果预览</td>
+				<td class="td2">
+				<span class="bt2"><span><button type="button" onclick="thumbPreview();">图片缩略预览</button></span></span></td>
+				<td class="td2"><div class="help_a">无需保存即可预览</div></td>
+			</tr>
+		</table>
+	</div>
+</div>
+
+<div class="tac mb10"><span id="submit" class="btn"><span><button type="submit" onfocus="blur();">提 交</button></span></span></div>
+
+<script type="text/javascript">
+function thumbPreview(){
+	var url = 'admin.php?adminjob=settings&admintype=att&pathumb=1&athumbsize[athumbwidth]='+encodeURIComponent(getObj('wapathumbsize[wapathumbwidth]').value)+'&athumbsize[athumbheight]='+encodeURIComponent(getObj('wapathumbsize[wapathumbheight]').value);
+	window.open(url);
+}
+
+</script>
+<!--
+EOT;
+include_once PrintEot('adminbottom');
+?>-->

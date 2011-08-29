@@ -35,6 +35,7 @@ $lang['creditpop'] = array (
 	'topic_sell'		=> '出售帖子阅读权限成功，获得积分 ',
 	'topic_attbuy'		=> '购买附件下载权限，消耗积分 ',
 	'topic_attsell'		=> '出售附件下载权限，获得积分 ',
+	'reply_reward'		=> '回帖奖励，奖励积分 ',
 
 
 	/*
@@ -77,6 +78,9 @@ $lang['creditpop'] = array (
 	'hack_creditget'	=> '领取积分兑换功能赠送的积分，领取积分 ',
 	'hack_creditaward'	=> '使用积分兑换礼品，兑换积分 ',
 
+	//运气卡
+	'hack_creditluckadd' =>'[b]{$L[username]}[/b] 使用运气卡获得积分：[b]{$L[cname]}[/b]，影响：{$L[affect]}。',
+	'hack_creditluckdel' =>'[b]{$L[username]}[/b] 使用运气卡减少积分：[b]{$L[cname]}[/b]，影响：{$L[affect]}。',
 
 	/*
 	* 分享相关

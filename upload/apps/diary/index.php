@@ -13,8 +13,8 @@ if (!$space =& $newSpace->getInfo()) {
 }
 $isGM = S::inArray($windid, $manager);
 !$isGM && $groupid==3 && $isGM=1;
-$indexRight = $newSpace->viewRight('index');
-$indexValue = $newSpace->getPrivacyByKey('index');
+$indexRight = $newSpace->viewRight('diary');
+$indexValue = $newSpace->getPrivacyByKey('diary');
 if ($db_question && $o_diary_qcheck) {
 	$qkey = array_rand($db_question);
 

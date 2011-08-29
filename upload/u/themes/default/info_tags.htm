@@ -27,7 +27,17 @@ EOT;
 if ($hotTags) { print <<<EOT
 -->
 					<div class="tagHave fr">
-						<h3 class="cc mb10"><a onClick="changeOne();" href="javascript:;" class="gray fr cp">换一组</a>你可能感兴趣的标签（点击直接添加）：</h3>
+						<h3 class="cc mb10">
+<!--
+EOT;
+	if ($hotTagsNum > 8) { print <<<EOT
+-->
+						<a onClick="changeOne();" href="javascript:;" class="gray fr cp">换一组</a>
+<!--
+EOT;
+	}print <<<EOT
+-->
+						你可能感兴趣的标签（点击直接添加）：</h3>
 						<ul class="tagSole cc" id="changetags">
 <!--
 EOT;
@@ -78,7 +88,7 @@ print <<<EOT
 		</div></td></tr></table>
 	</div>
 </div>
-<SCRIPT type="text/javascript" LANGUAGE="JavaScript" src="js/tags.js"></SCRIPT>
+<script type="text/javascript" src="js/tags.js"></script>
 <!--
 EOT;
 require_once(uTemplate::printEot('footer'));

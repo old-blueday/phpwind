@@ -45,6 +45,7 @@ class PW_AnnounceSource extends SystemData {
 		}
 		$data['content'] = convert($data['content'], $db_windpost);
 		$data['descrip'] = substrs(strip_tags($data['content']),100);
+		$data['postdate'] = $data['startdate'];
 		return $data;
 	}
 

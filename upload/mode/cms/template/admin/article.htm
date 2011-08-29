@@ -9,8 +9,6 @@ if(!empty($type)) {
 }
 print <<<EOT
 -->
-<script src="js/global.js" language="JavaScript"></script>
-<script src="js/pw_ajax.js" language="JavaScript"></script>
 <div class="nav3 mb10">
     <ul class="cc">
         <li {$_default}><a hidefocus="true" href="$baseurl&">文章管理</a></li>
@@ -53,7 +51,7 @@ EOT;
 <div class="admin_table mb10">
 	<table width="100%">
 		<tr class="tr2">
-			<td><a href="javascript:;" onclick="CheckAll(document.ARTICLEFORM)">全选</a></td>
+			<td><a href="javascript:;" onclick="ChecksAll(document.ARTICLEFORM)">全选</a></td>
 			<td>标题</td>
 			<td>所属栏目</td>
 			<td>发布</td>
@@ -132,6 +130,15 @@ EOT;
 <div class="mb10 tac"><span class="btn"><span><button type="submit" onclick="return confirm('确定要继续该操作？')">提 交</button></span></span></div>
 </form>
 <script type="text/javascript">
+function ChecksAll(form,match) {
+	for (var i = 0,j = form.elements.length; i < j; i++) {
+		var e = form.elements[i];
+		if (e.type == 'checkbox' && (typeof match == 'undefined' || e.name.match(match))) {
+			e.checked = ifcheck;
+		}
+	}
+	ifcheck = ifcheck == true ? false : true;
+}
 function selectedColumn(selectObj,columnId){
 	if(selectObj == null) return false;
 	var l = selectObj.options.length;
@@ -141,8 +148,12 @@ function selectedColumn(selectObj,columnId){
 		}
 	}	
 }
-var selectObj = document.getElementById("columnIds");
-selectedColumn(selectObj,'$cid');
+
+onReady(function(){
+	var selectObj = document.getElementById("columnIds");
+	selectedColumn(selectObj,'$cid');
+})
+
 </script>
 <!--
 EOT;

@@ -18,7 +18,7 @@ if ($filenum > 0 && $filenum <= $db_attachnum) {
 	if ($winddb['uploadtime'] < $tdtime) {
 		$winddb['uploadnum'] = 0;
 	}
-	if (($winddb['uploadnum'] + $filenum) >= $_G['allownum']) {
+	if ($_G['allownum'] > 0 && ($winddb['uploadnum'] + $filenum) >= $_G['allownum']) {
 		Showmsg('upload_num_error');
 	}
 	$uploaddb = UploadDiary($winduid);

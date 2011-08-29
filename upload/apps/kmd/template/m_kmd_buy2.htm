@@ -1,0 +1,74 @@
+<!--<?php
+require_once(uTemplate::printEot('header'));
+require_once(uTemplate::printEot('user_appleft'));
+print<<<EOT
+-->
+<div class="contUser">
+    <div class="p15">
+			<h4 class="site"><img src="u/images/module/lightbulb.png" align="absmiddle" class="mr10" /><span>孔明灯</span></h4>           	
+        <div class="navC">
+            <ul>
+                <li class="current"><a  href="apps.php?q=kmd"  hidefocus="true">我的孔明灯</a></li>
+                <li><a href="apps.php?q=kmd&a=record" hidefocus="true">购买记录</a></li>
+            </ul>
+			<span class="btn_add fl"><span><button onclick="window.location.href='{$basename}a=buy1';">购买孔明灯</button></span></span>
+        </div>
+        
+		<div class="p15 cc">
+					<ol class="steps pr">
+						<li><em>1</em>填写推广信息</li>
+						<li class="current"><em>2</em>填写基本资料</li>
+						<li><em>3</em>支付</li>
+					</ol>
+				</div>
+				<div class="p10">
+				<form action="{$basename}a=buy3" method="post" onSubmit="return checkUserinfo();">
+				<input type="hidden" name="tid" id="tid" value="{$tid}" />
+				<input type="hidden" name="sid" id="sid" value="{$sid}" />
+					<table width="100%">
+						<tr class="tr3">
+							<td width="90" class="tar">真实姓名：</td>
+							<td width="200"><input name="realname" value="{$userInfo['realname']}" id="realname" type="text" class="input mr5 input_wa"/><span class="s1">*</span></td>
+							<td><span class="gray">用于孔明灯审核联系使用，请务必填写正确</span></td>
+						</tr>
+						<tr class="tr3">
+							<td class="tar">手机号码：</td>
+							<td><input name="tel" id="tel" value="{$userInfo['tel']}" type="text" class="input mr5 input_wa"/><span class="s1">*</span></td>
+							<td><span class="gray">用于孔明灯审核联系使用，请务必填写正确</span></td>
+						</tr>
+						<tr class="tr3">
+							<td class="tar">发票抬头：</td>
+							<td><input name="invoice" value="{$userInfo['invoice']}" id="invoice" type="text" class="input mr5 input_wa"/></td>
+							<td><span class="gray">公司填写企业名称，个人填写姓名</span></td>
+						</tr>
+						<tr class="tr3">
+							<td class="tar">联系地址：</td>
+							<td><input name="address" value="{$userInfo['address']}" id="address" type="text" class="input mr5 input_wa"/></td>
+							<td><span class="gray">填写正确的联系地址，用于发票寄送</span></td>
+						</tr>
+					</table>
+					<div class="tac p10"><span class="bt"><span><button  onclick="window.location.href='{$basename}a=buy1&tid={$tid}&sid={$sid}';return false;" >上一步</button></span></span><span class="btn"><span><button type='submit'>下一步</button></span></span></div>
+				</form>
+				</div>
+        
+    </div>
+</div> 
+<script type="text/javascript">
+function checkUserinfo(){
+	var realname = getObj('realname').value;	
+	var tel = getObj('tel').value;		
+	if(realname==""){
+		showDialog('error','请填写真实姓名！');
+		return false;
+	}else if(tel==""){
+		showDialog('error','请填写手机号码！');
+		return false;
+	}else{
+		return true;
+	}
+}
+</script>
+<!--
+EOT;
+require_once(uTemplate::printEot('footer'));
+?>

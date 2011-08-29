@@ -17,8 +17,8 @@ print <<<EOT
 			return false;
 		}
 		var atc_title = MC.$("atc_title").value;
-		var atc_content = editor.textarea.value;
-
+		var atc_content = editor.getUBB();;
+		
 		if("" == atc_title){
 			MC.showFailTips("标题不能为空");
 			return false;
@@ -58,11 +58,19 @@ print <<<EOT
 			editor.reset();
 			totalmsg++;
 			//锚点
+			try{
+				var gdcodes = getObj('changeGdCode');
+				if (typeof gdcodes.onclick == 'function') gdcodes.onclick();
+			}catch(e){}
 		},function(){
 			//清除用户
 			for(var i=newuname.length-1;i>=0;i--){
 				formele.removeChild(newuname[i]);
 			}
+			try{
+				var gdcodes = getObj('changeGdCode');
+				if (typeof gdcodes.onclick == 'function') gdcodes.onclick();
+			}catch(e){}
 		});
 		return false;
 	}
@@ -89,7 +97,7 @@ EOT;
 }
 print <<<EOT
 -->
-                        <input type="text" max="20" id="usernames" name="usernames" value="" onblur="pwSearch.blur()" onfocus="pwSearch.init('message.php?type=ajax','action=friend','resultd','searchResult')" onkeydown="pwSearch.move(event)" onkeyup="pwSearch.searchResult(event,200);" autocomplete=off disableautocomplete></div>
+                        <input type="text" max="20" id="usernames" name="usernames" value="" onblur="pwSearch.blur()" onfocus="pwSearch.init('message.php?type=ajax','action=friend','resultd')" onkeydown="pwSearch.move(event)" onkeyup="pwSearch.searchResult(event,200);" autocomplete=off disableautocomplete></div>
                     </div>
                     <p class="s6">请输入收件人名称（好友名称支持拼音首字母）</p>
                 </td>
@@ -113,21 +121,15 @@ print <<<EOT
 <!--
 EOT;
 if($db_gdcheck & 8){
-$gdSize = explode("\t",$db_gdsize);
+$checkCode = L::loadClass('checkcode', 'site');
+$checkCodeString = $checkCode->getCheckCodeTemplate();
 print <<<EOT
 -->            
             <tr class="tr5 vt">
                 <td>验证码：</td>
-                <td><input class="input" type="text" name="gdcode" id="gdinput" size="5" onfocus="showgd();" /><span class="cp" onclick="this.previousSibling.focus();">&nbsp;点此刷新验证码</span>
-				<span id="ckcode" style="display:none;">
-<script type="text/javascript" src="js/pw_authcode.js"></script>
-<script>
-var flashWidth = "$gdSize[0]";
-var flashHeight = "$gdSize[1]";
-var gdtype = $db_gdtype;
-showGdCode();
-</script>
-					</span>
+                <td><input class="input" type="text" name="gdcode" id="gdinput" size="5" onfocus="showgd();" />
+				<span id="ckcode" style="display:none;"></span>
+$checkCodeString
 				</td>
             </tr>
 <!--
@@ -137,7 +139,7 @@ print <<<EOT
 -->              
             <tr class="tr5 vt">
                 <td>&nbsp;</td>
-                <td><span class="btn"><span><button type="submit" name="Submit">发送</button></span></span>&nbsp;&nbsp;<span class="s3">Ctrl + Enter 快速发布</span></td>
+                <td><span class="btn" style="margin:0 10px 0 0;"><span><button type="submit" name="Submit">发送</button></span></span><span class="s3">Ctrl + Enter 快速发布</span></td>
             </tr></tbody>
         </table>
                 </form>
@@ -175,6 +177,7 @@ function wordlength(target)
 		target.maxLength = maxLength;
 	}
 }
+
 </script>
 <!--
 EOT;

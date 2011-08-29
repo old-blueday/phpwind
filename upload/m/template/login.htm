@@ -1,0 +1,71 @@
+<!--<?php
+defined('W_P') or exit('Forbidden');print <<<EOT
+-->
+<div class="page_title"><strong>欢迎来到$db_bbsname!</strong><br />
+</div>
+<div class="page_content">
+  <div class="block">
+    <form id="form1" method="post" action="index.php?a=login">
+<strong>帐号类型:</strong><br />
+<select name="lgt">
+<option value="0">用户名</option>
+<option value="1">UID</option>
+</select>
+<br />
+  <label><strong>账号</strong><br />
+    <input type="text" name="pwuser" />
+        <br />
+  </label>
+<strong>密码:</strong><br />
+<input type="password" name="pwpwd"  />
+<br />
+<!--
+EOT;
+if($db_ifsafecv){print <<<EOT
+-->
+<strong>安全问题： </strong><br />
+ <label>
+<select name="question">
+<option value="0">无安全问题</option>
+	<option value="1">我爸爸的出生地</option>
+	<option value="2">我妈妈的出生地</option>
+	<option value="3">我的小学校名</option>
+	<option value="4">我的中学校名</option>
+	<option value="5">我最喜欢的运动</option>
+	<option value="6">我最喜欢的歌曲</option>
+	<option value="7">我最喜欢的电影</option>
+	<option value="8" >我最喜欢的颜色</option>
+	<option value="-1">自定义问题</option>
+</select>
+</label>
+<br />
+<strong>自定义问题</strong><br/>
+<label>
+<input type="text" name="customquest" /></label><br />
+<strong>您的答案</strong><br/>
+<label>
+<input type="text" name="answer" /><label><br />
+<em>如果您设置了安全问题，需要填写正确的答案才能登录论坛</em><br />
+<!--
+EOT;
+}print <<<EOT
+-->
+	<label>
+		<input type="submit" name="button"  value="　登录　" />
+	</label>
+  </form>
+  </div>
+<!--
+EOT;
+if($rg_allowregister && $db_wapregist){print <<<EOT
+-->
+  <div class="return"><a href="index.php?a=register">快速注册一个新账号</a><br />
+<!--
+EOT;
+}print <<<EOT
+-->
+  <a href="$returnUrl">&laquo;返回</a></div>
+</div>
+<!--
+EOT;
+?>-->

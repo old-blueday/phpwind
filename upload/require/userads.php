@@ -14,6 +14,7 @@ if (is_numeric($u) || ($a && strlen($a)<16)) {
 		$credit->addLog('other_propaganda', array($inv_linkcredit => $inv_linkscore), array('uid' => $tmpUser['uid'],
 		'username' => $tmpUser['username'], 'ip' => $onlineip));
 		$credit->set($tmpUser['uid'], $inv_linkcredit, $inv_linkscore);
+		$credit->writeLog();
 	}
 }
 Cookie('userads', '', 0);

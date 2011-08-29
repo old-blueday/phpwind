@@ -59,26 +59,40 @@ if ($winduid && !$space['isMe']) {
 	if (!isset($visitors[$winduid]) || $timestamp - $visitors[$winduid] > 900) {
 		$visitors[$winduid] = $timestamp;
 		arsort($visitors);
-		if (count($visitors) > 9) array_pop($visitors);
+		if (count($visitors) > 12) array_pop($visitors);
 		$db->pw_update(
 			"SELECT uid FROM pw_space WHERE uid=" . S::sqlEscape($uid),
+			pwQuery::buildClause("UPDATE :pw_table SET visits=visits+1,visitors=:visitors WHERE uid=:uid", array('pw_space', serialize($visitors),$uid)),
+			pwQuery::insertClause('pw_space', array(
+				'uid'		=> $uid,
+				'visits'	=> 1,
+				'visitors'	=> serialize($visitors)
+			))
+			/*
 			"UPDATE pw_space SET visits=visits+'1',visitors=" . S::sqlEscape(serialize($visitors),false) . " WHERE uid=" . S::sqlEscape($uid),
 			"INSERT INTO pw_space SET " . S::sqlSingle(array(
 				'uid'		=> $uid,
 				'visits'	=> 1,
 				'visitors'	=> serialize($visitors)
-			),false)
+			),false)*/
 		);
 	}
-	$tovisitors = $db->get_value("SELECT tovisitors FROM pw_space WHERE uid=" . S::sqlEscape($winduid));
+	if (perf::checkMemcache()){
+		$_cacheService = Perf::gatherCache('pw_space');
+		$tmp =  $_cacheService->getSpaceByUid($winduid);
+		$tovisitors = $tmp['tovisitors'];
+	} else {
+		$tovisitors = $db->get_value("SELECT tovisitors FROM pw_space WHERE uid=" . S::sqlEscape($winduid));
+	}
 	$tovisitors = unserialize($tovisitors);
 	is_array($tovisitors) || $tovisitors = array();
 	
 	if (!isset($tovisitors[$uid]) || $timestamp - $tovisitors[$uid] > 900) {
 		$tovisitors[$uid] = $timestamp;
 		arsort($tovisitors);
-		if (count($tovisitors) > 9) array_pop($tovisitors);
-		$db->update("UPDATE pw_space SET tovisits=tovisits+'1',tovisitors=" . S::sqlEscape(serialize($tovisitors),false) .  " WHERE uid=" . S::sqlEscape($winduid));
+		if (count($tovisitors) > 12) array_pop($tovisitors);
+		//$db->update("UPDATE pw_space SET tovisits=tovisits+'1',tovisitors=" . S::sqlEscape(serialize($tovisitors),false) .  " WHERE uid=" . S::sqlEscape($winduid));
+		$db->update(pwQuery::buildClause("UPDATE :pw_table SET tovisits=tovisits+1,tovisitors=:tovisitors WHERE uid=:uid", array('pw_space', serialize($tovisitors),$winduid)));
 	}
 	//猪头回收
 	$user_icon = explode('|',$space['icon']);

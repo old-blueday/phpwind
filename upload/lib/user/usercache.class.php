@@ -20,10 +20,12 @@
 class PW_UserCache {
 
 	var $_allowModes;
+	var $_cache;
 
 	function PW_UserCache() {
 		$this->_allowModes = array(
 			'article', 'cardtopic',//帖子缓存
+			'reply', //回复过的帖子
 			'carddiary',//日志缓存
 			'cardphoto',//照片缓存
 			'friend',
@@ -35,6 +37,7 @@ class PW_UserCache {
 			'friendsBirthday',
 			'tags'
 		);
+		$this->_cache = Perf::checkMemcache();
 	}
 	
 	function get($uid, $modes) {
@@ -53,7 +56,7 @@ class PW_UserCache {
 				continue;
 			$method = 'get_' . $key;
 			if (method_exists($userInfoServer, $method)) {
-				$array[$key] = $userInfoServer->$method($uid, $value);
+				$array[$key] = $userInfoServer->$method($uid, is_array($value) ? $value['num'] : $value);
 			}
 		}
 		$userCacheDb->saveModesData($uid, $array, $modes);
@@ -79,6 +82,7 @@ class PW_UserCache {
 	 */
 	function delete($uid, $type = null, $typeid = null) {
 		$userCacheDb = $this->_getUserCacheDB();
+		if ($this->_cache) $userCacheDb->setAllKeys($this->_allowModes);
 		return $userCacheDb->delete($uid, $type);
 	}
 	
@@ -90,7 +94,7 @@ class PW_UserCache {
 	 */
 	
 	function _getUserCacheDB() {
-		return 	L::loadDB('UserCache', 'user');
+		return $this->_cache ? Perf::gatherCache('pw_usercache') : L::loadDB('UserCache', 'user');
 	}
 }
 ?>

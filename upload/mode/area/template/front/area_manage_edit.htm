@@ -3,10 +3,9 @@
 print <<<EOT
 -->
 <script type="text/javascript">
-window.onload = function(){
+onReady(function(){
 	initPortal();
-}
-
+})
 </script>
 <form action="{$baseUrl}action={$action}&" method="post"  enctype="multipart/form-data" >
 <input type="hidden" name="step" value="2" />
@@ -81,7 +80,7 @@ print <<<EOT
 EOT;
 if($k=='descrip'){print <<<EOT
 -->
-						<textarea name="param[$k]" onkeyup="checktitlelength($val,'pushto_info','wordtinfo');" onkeydown="checktitlelength($val,'pushto_info','wordtinfo');" style="width:260px;height:92px" id="pushto_info" >{$value}</textarea>&nbsp;&nbsp;<span id="wordtinfo"></span>
+						<textarea name="param[$k]" onkeyup="checktitlelength('$val','pushto_info','wordtinfo');" onkeydown="checktitlelength('$val','pushto_info','wordtinfo');" style="width:260px;height:92px" id="pushto_info" >{$value}</textarea>&nbsp;&nbsp;<span id="wordtinfo"></span>
 <!--
 EOT;
 } elseif ($k=='title') {
@@ -89,7 +88,7 @@ $value = strip_tags($value);
 $val == 'default' && $val = 50;
 print <<<EOT
 -->
-						<input type="text" onkeyup="checktitlelength($val,'pushto_title','wordtip');" onkeydown="checktitlelength($val,'pushto_title','wordtip');"   class="input" size="40" name="param[$k]"   value="{$value}" id="pushto_title">&nbsp;&nbsp;<span id="wordtip"></span>
+						<input type="text" onkeyup="checktitlelength('$val','pushto_title','wordtip');" onkeydown="checktitlelength('$val','pushto_title','wordtip');"   class="input" size="40" name="param[$k]"   value="{$value}" id="pushto_title">&nbsp;&nbsp;<span id="wordtip"></span>
 						<div class="pwnew tac">
 							<span title="粗体字"><a onclick="styleOnclick(this,'css[b]')" class="{$stylename[b]}">加粗</a></span>
 							<span title="斜体字"><a onclick="styleOnclick(this,'css[i]')" class="{$stylename[i]}">倾斜</a></span>
@@ -159,8 +158,8 @@ print <<<EOT
 						</div>
 
             
-<script language="JavaScript" src="mode/area/js/imagetype.js"></script>
-<script language="javascript">
+<script type="text/javascript" src="mode/area/js/imagetype.js"></script>
+<script>
 var imageTypeImp = New(imageType,['imagetype_ul']);
 </script>
 

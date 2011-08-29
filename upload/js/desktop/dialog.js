@@ -35,7 +35,7 @@
 	 * 左右选择器
 	 */
 	PW.lrSelector = function() {
-		var winButtons = $("taskbar").getElementsByTagName("LI");
+		var winButtons = getObj("taskbar").getElementsByTagName("LI");
 		var totalNum = winButtons.length;
 		for ( var i = 0; i < totalNum; i++) {
 			if (winButtons[i].className == "current") {
@@ -45,7 +45,7 @@
 		// 左选择
 		var leftKey = current - 1;
 		var left = leftKey >= 0 ? winButtons[leftKey] : 0;
-		var navleft = $("navleft");
+		var navleft = getObj("navleft");
 		if (left) {
 			navleft.className = "admin_nav_left";
 			navleft.onclick = function() {
@@ -59,7 +59,7 @@
 		// 右选择
 		var rightKey = current + 1;
 		var right = rightKey > 0 ? winButtons[rightKey] : 0;
-		var navright = $("navright");
+		var navright = getObj("navright");
 		if (right) {
 			navright.className = "admin_nav_right";
 			navright.onclick = function() {
@@ -86,7 +86,7 @@
 		var showNum = Math
 				.ceil((document.documentElement.clientWidth - 170) / 116);
 		var current;
-		var winButtons = $("taskbar").getElementsByTagName("LI");
+		var winButtons = getObj("taskbar").getElementsByTagName("LI");
 		var totalNum = winButtons.length;
 		/* 获取当前菜单的位置 */
 		for ( var i = 0; i < totalNum; i++) {
@@ -108,7 +108,7 @@
 	}
 
 	PW.checkClose = function(){
-		var elements = $("taskbar").getElementsByTagName("li");
+		var elements =getObj("taskbar").getElementsByTagName("li");
 		if(elements.length == 0){
 			PW.openHome();
 		}
@@ -116,10 +116,10 @@
 
 	/*导航功能*/
 	PW.menuNav = function(obj){
-		$("breadCrumb").innerHTML = "";
+		getObj("breadCrumb").innerHTML = "";
 		var defaulMenu = "后台首页";
 		var index = [defaulMenu,"搜索结果","关于phpwind","后台菜单地图"];
-		var obj = $("button_"+obj.id);
+		var obj = getObj("button_"+obj.id);
 		var name = obj.firstChild.firstChild.innerHTML;/*获取当前的菜单名称*/
 		//后台首页单独处理
 		if(index.toString().indexOf(name) != "-1"){
@@ -133,7 +133,7 @@
 				menus.splice(0,1);
 			}
 		}
-		//$("breadCrumb").innerHTML = "当前位置 &raquo; "+menus.join(" &raquo; ");
+		//getObj("breadCrumb").innerHTML = "当前位置 &raquo; "+menus.join(" &raquo; ");
 
 		var menubox = document.createElement("div");
 		menubox.innerHTML = "当前位置: ";
@@ -167,7 +167,7 @@
 			menubox.appendChild(span1);
 			j++;
 		}
-		$("breadCrumb").appendChild(menubox);
+		getObj("breadCrumb").appendChild(menubox);
 	}
 	/*弹出子菜单页面*/
 	PW.ChildDialog = function(obj){
@@ -189,21 +189,21 @@
 
 	PW.Dialog = function(items) {
 		window.MOUSE_OVERED = false;
-		if (!$("iframe_" + items.id)) {
+		if (!getObj("iframe_" + items.id)) {
 			var ifr = document.createElement("iframe");
 			ifr.scrolling = "auto";
 			ifr.width = "100%";
-			ifr.height = $('desktopContainer').offsetHeight + "px";
+			ifr.height = getObj('desktopContainer').offsetHeight + "px";
 			ifr.frameBorder = "no";
 			ifr.style.border = "0";
 			ifr.src = items.url;
 			ifr.id = "iframe_" + items.id;
-			$('desktopContainer').appendChild(ifr);
+			getObj('desktopContainer').appendChild(ifr);
 			//ifr.contentWindow.onkeydown=enterkeycode;
 		} else {
-			$("iframe_" + items.id).src = items.url;
+			getObj("iframe_" + items.id).src = items.url;
 		}
-		var ifr = $("iframe_" + items.id);
+		var ifr = getObj("iframe_" + items.id);
 		var mousedownFn = function(ev, win) {
 
 			for ( var i in PW.Menu.all) {
@@ -286,8 +286,8 @@
 			PW.setCurrent();/*当前*/
 			PW.menuNav(b);/*导航*/
 			adminNavClass.initTips();
-			$('taskbar').scrollTop = IE ? b.element.offsetTop
-					: _getPos(b.element)[1] - _getPos($('taskbar'))[1];
+			getObj('taskbar').scrollTop = IE ? b.element.offsetTop
+					: _getPos(b.element)[1] - _getPos(getObj('taskbar'))[1];
 
 		};
 		/**
@@ -296,7 +296,7 @@
 		b.onblur = function() {
 			ifr.style.display = "none";
 		};
-		b.render($('taskbar'));
+		b.render(getObj('taskbar'));
 		this.button = b;
 		b.element.self = b;
 		/**
@@ -310,7 +310,7 @@
 			e ? e.self.onclick() : 0;
 		};
 
-		$('taskbar').scrollTop = $('taskbar').scrollHeight;
+		getObj('taskbar').scrollTop = getObj('taskbar').scrollHeight;
 		items.onclick ? items.onclick(items) : 0;
 		b.focus();
 		/**

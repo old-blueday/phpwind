@@ -1,0 +1,41 @@
+<!--<?php
+include_once PrintEot('left');
+include_once PrintApp('admin_header');
+print<<<EOT
+-->
+<form action="$basename&action=set" method="post">
+<input value="1" name="step" type="hidden" />
+  <h2 class="h1">勋章设置</h2>
+  <div class="admin_table mb10">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <tr class="tr1 vt">
+      <td class="td1">勋章功能</td>
+      <td class="td2">
+				<ul class="list_A list_80">
+					<li><input type="radio" value="1" name="config[db_md_ifopen]" $ifopen_Y>开启</li>
+					<li><input type="radio" value="0" name="config[db_md_ifopen]" $ifopen_N>关闭</li>
+				</ul>
+	  	</td>
+      <td class="td2">&nbsp;</td>
+    </tr>
+    <tr class="tr1 vt">
+      <td class="td1">勋章申请功能</td>
+      <td class="td2">
+				<ul class="list_A list_80">
+					<li><input type="radio" value="1" name="config[db_md_ifapply]" $ifapply_Y>开启</li>
+					<li><input type="radio" value="0" name="config[db_md_ifapply]" $ifapply_N>关闭</li>
+				</ul>
+	  </td>
+      <td class="td2">&nbsp;</td>
+    </tr>
+
+  </table>
+  </div>
+  <div class="mb10 tac">
+    <span class="mr10"><span class="btn"><span><button type="submit">提 交</button></span></span></span>
+   </div>
+</form>
+<!--
+EOT;
+include_once PrintEot('adminbottom');
+?>-->

@@ -30,6 +30,7 @@ if ($adminitem == 'banuser') {
 		$windid = $admin_name;
 		//end Vars
 		$banUserService = L::loadClass('BanUser', 'user'); /* @var $banUserService PW_BanUser */
+		!$limit && $type = 2;
 		$params = array(
 			'limit' => $limit,
 			'type' => $type,

@@ -1,5 +1,6 @@
 <?php
 !function_exists('readover') && exit('Forbidden');
+/**
 $query = $db->query("SELECT id,awardee,level FROM pw_medalslogs WHERE action='1' AND state='0' AND timelimit>0 AND awardtime+timelimit*2592000<".S::sqlEscape($timestamp));
 $medaldb = $namedb = array();
 while ($rt = $db->fetch_array($query)) {
@@ -7,12 +8,11 @@ while ($rt = $db->fetch_array($query)) {
 	$namedb[] = $rt['awardee'];
 }
 if ($namedb) {
-	//* include_once pwCache::getPath(D_P.'data/bbscache/medaldb.php');
 	pwCache::getData(D_P.'data/bbscache/medaldb.php');
 	$pwSQL = $ids = $medaluser  = array();
 	$reason = S::escapeChar(getLangInfo('other','medal_reason'));
 	
-	$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
+	$userService = L::loadClass('UserService', 'user');
 	foreach ($userService->getByUserNames(array_unique($namedb)) as $rt) {
 		$medals = ",".$rt['medals'].",";
 		$medalname = '';
@@ -45,4 +45,7 @@ function updatemedal_list(){
 	}
 	pwCache::setData(D_P.'data/bbscache/medals_list.php',$medaldb);
 }
+*/
+$medalService = L::loadClass('medalservice','medal');
+$medalService->recoverOverdueMedals();
 ?>

@@ -43,7 +43,7 @@ class PW_DelArticle {
 
 	function getTopicDb($sqlwhere) {
 		$readdb = array();
-		$query = $this->db->query("SELECT tid,fid,postdate,author,authorid,subject,replies,topped,special,ifupload,ptable,ifcheck,tpcstatus,modelid FROM pw_threads WHERE $sqlwhere");
+		$query = $this->db->query("SELECT tid,fid,postdate,author,authorid,subject,replies,topped,special,ifupload,ptable,ifcheck,tpcstatus,modelid,specialsort FROM pw_threads WHERE $sqlwhere");
 		while ($read = $this->db->fetch_array($query)) {
 			$readdb[] = $read;
 		}
@@ -73,7 +73,7 @@ class PW_DelArticle {
 		}
 		require_once (R_P . 'require/credit.php');
 		$updatetop = 0;
-		$specialdb = $tids = $fids = $ttable_a = $ptable_a = $recycledb = $deluids = $delutids = $cydb = $modeldb = $pcdb = $activityDb = array();
+		$kmdTids = $specialdb = $tids = $fids = $ttable_a = $ptable_a = $recycledb = $deluids = $delutids = $cydb = $modeldb = $pcdb = $activityDb = array();
 
 		foreach ($readdb as $key => $read) {
 			$isInRecycle = ($read['fid'] == 0 && $read['ifcheck'] == 1);
@@ -117,6 +117,8 @@ class PW_DelArticle {
 				$activityDb[] = $read['tid'];
 			} elseif ($read['special'] > 20) {
 				$pcdb[$read['special']][] = $read['tid'];
+			} elseif ($read['special'] == 6) {
+				$robbuildTids[] = $read['tid'];
 			}
 			if ($read['special'] > 0 && $read['special'] < 5) {
 				$specialdb[$read['special']][] = $read['tid'];
@@ -134,7 +136,8 @@ class PW_DelArticle {
 			if ($recycle) {
 				$recycledb[] = array('pid' => 0, 'tid' => $read['tid'], 'fid' => $read['fid'], 'deltime' => $GLOBALS['timestamp'], 'admin' => $GLOBALS['windid']);
 			}
-			$read['topped'] > 0 && $updatetop = 1;
+			$read['specialsort'] > 0 && $updatetop = 1;
+			$read['specialsort'] == PW_THREADSPECIALSORT_KMD && $kmdTids[] = $read['tid'];
 			$ttable_a[GetTtable($read['tid'])] = 1;
 			$ptable_a[$read['ptable']] = 1;
 			$fids[$read['fid']]['tids'][] = $read['tid'];
@@ -226,6 +229,10 @@ class PW_DelArticle {
 			if ($pcdb) {
 				$this->_delPcTopic($pcdb);
 			}
+			if ($robbuildTids) {
+				$robbuildService = L::loadClass("robbuild", 'forum');
+				$robbuildService->deleteByTids($robbuildTids);
+			}
 			if ($cydb) {
 				$this->db->update("DELETE FROM pw_argument WHERE tid IN(" . S::sqlImplode($cydb) . ')');
 			}
@@ -270,6 +277,12 @@ class PW_DelArticle {
 			pwFtpClose($GLOBALS['ftp']);
 		}
 		if ($updatetop) {
+			if ($kmdTids){
+				$kmdService = L::loadClass('kmdservice', 'forum');
+				foreach ($kmdTids as $tid){
+					$kmdService->initThreadInfoByTid($tid);
+				}
+			}
 			updatetop();
 		}
 		foreach ($fids as $fid => $value) {
@@ -439,7 +452,7 @@ class PW_DelArticle {
 		$this->delReply($replydb, $recycle, $delCredit);
 	}
 
-	function resetReplayToppedFloor($replydb='', $delpids='', $ptable=''){
+	function resetReplayToppedFloor($replydb='', $delpids='', $ptable='', $tpcstatus){
 		$pids = $tids = array();
 		if ($replydb) {
 			foreach ($replydb as $key => $value) {
@@ -468,7 +481,7 @@ class PW_DelArticle {
 			}
 			$tids = array_unique($tids);
 		}
-		if (!empty($tids)) {
+		if (!empty($tids) && !getstatus($tpcstatus, 2)) {
 			$query = $this->db->query("SELECT * FROM pw_poststopped WHERE tid IN (". S::sqlImplode($tids) .") 
 						AND fid = '0' AND pid != '0' ");
 			while ($tr = $this->db->fetch_array($query)) {
@@ -574,7 +587,7 @@ class PW_DelArticle {
 			}
 		}
 		if ($delpids) {
-			$this->resetReplayToppedFloor($replydb);
+			$this->resetReplayToppedFloor($replydb,'','',$extra['tpcstatus']);
 		}
 		/*前台删主题，默认将其设为屏蔽*/
 		if ($deltpc) {

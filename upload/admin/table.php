@@ -35,12 +35,12 @@ unset($lang['dbtable']['pw_topicvalue'], $lang['dbtable']['pw_pcvalue']);
 $tabledb = array_keys($lang['dbtable']);
 sort($tabledb);
 
-function N_getTabledb($showother=null){//fix bug $PW
-	global $tabledb,$PW;
+function N_getTabledb($showother = null){//fix bug $PW
+	global $tabledb, $PW;
 	$table_a = array();
-	if ($PW!='pw_') {
+	if ($PW != 'pw_') {
 		foreach ($tabledb as $key => $value) {
-			$table_a[0][$key] = str_replace('pw_',$PW,$value);
+			$table_a[0][$key] = str_replace('pw_', $PW, $value);
 		}
 	} else {
 		$table_a[0] = $tabledb;
@@ -48,9 +48,13 @@ function N_getTabledb($showother=null){//fix bug $PW
 	if (!empty($showother)) {
 		global $db;
 		$table_a[1] = array();
+		$postsMergeTable = $PW != 'pw_' ? str_replace('pw_', $PW, 'pw_merge_posts') : 'pw_merge_posts';
+		$tmsgsMergeTable = $PW != 'pw_' ? str_replace('pw_', $PW, 'pw_merge_tmsgs') : 'pw_merge_tmsgs';
+		$creditLogMergeTable = $PW != 'pw_' ? str_replace('pw_', $PW, 'pw_merge_creditlog') : 'pw_merge_creditlog';
 		$query = $db->query('SHOW TABLES');
 		while ($rt = $db->fetch_array($query,MYSQL_NUM)) {
 			$value = trim($rt[0]);
+			if (in_array($value, array($postsMergeTable, $tmsgsMergeTable, $creditLogMergeTable))) continue;
 			!in_array($value,$table_a[0]) && $table_a[1][] = $value;
 		}
 	}

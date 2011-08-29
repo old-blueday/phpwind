@@ -24,7 +24,13 @@ class PwSpace {
 			$this->info = $userdb;
 		}
 		if ($this->info) {
-			if ($space = $this->_db->get_one("SELECT * FROM pw_space WHERE uid=" . S::sqlEscape($this->uid))) {
+			if (perf::checkMemcache()){
+				$_cacheService = Perf::gatherCache('pw_space');
+				$space =  $_cacheService->getSpaceByUid($this->uid);			
+			} else {
+				$space = $this->_db->get_one("SELECT * FROM pw_space WHERE uid=" . S::sqlEscape($this->uid));
+			}
+			if ($space) {
 				$this->info = array_merge($this->info, $space);
 				if ($this->info['banner']) {
 					list($this->info['banner_s']) = geturl($this->info['banner'], 'lf');
@@ -52,7 +58,7 @@ class PwSpace {
 				'friend'		=> array('ifopen' => 1, 'num' => 5),
 				'visitor'		=> array('ifopen' => 1, 'num' => 5),
 				'visit'			=> array('ifopen' => 0, 'num' => 5),
-				'tags'			=> array('ifopen' => 1, 'num' => 10, 'expire' => 7200),
+				'tags'			=> array('ifopen' => 1, 'num' => 10),
 				'messageboard'	=> array('ifopen' => 1, 'num' => 5),
 				'diary'			=> array('ifopen' => 0, 'num' => 10),
 				'photos'		=> array('ifopen' => 0, 'num' => 8),
@@ -63,6 +69,10 @@ class PwSpace {
 				'colony'		=> array('ifopen' => 0, 'num' => 5)
 				//'share'			=> array('ifopen' => 1, 'num' => 5)
 			);
+		}
+		$expireArr = array('tags' => 7200,'article' => 3600,'reply' => 3600);
+		foreach ($expireArr as $key => $value) {
+			if (isset($this->info['modelset'][$key])) $this->info['modelset'][$key]['expire'] = $value;
 		}
 		if ($this->info['layout']) {
 			$this->info['layout'] = unserialize($this->info['layout']);
@@ -114,7 +124,11 @@ class PwSpace {
 		$models = array('info' => 1);
 		foreach ($this->info['modelset'] as $key => $value) {
 			if (in_array($key, $this->models) && $value['ifopen'] && $this->viewRight($key)) {
-				$models[$key] = $value['num'];
+				if (isset($value['expire'])) {
+					$models[$key] = array('num' => $value['num'], 'expire' => $value['expire']);
+				} else {
+					$models[$key] = $value['num'];
+				}
 			}
 		}
 		return $models;
@@ -218,9 +232,10 @@ class PwSpace {
 	function updateInfo($data) {
 		if ($this->default) {
 			$data['uid'] = $this->uid;
-			$this->_db->update("INSERT INTO pw_space SET " . S::sqlSingle($data));
+			pwQuery::replace('pw_space',$data);
 		} else {
-			$this->_db->update("UPDATE pw_space SET " . S::sqlSingle($data) . ' WHERE uid=' . S::sqlEscape($this->uid));
+			pwQuery::update('pw_space', 'uid=:uid', array($this->uid), $data);
+			//$this->_db->update("UPDATE pw_space SET " . S::sqlSingle($data) . ' WHERE uid=' . S::sqlEscape($this->uid));
 		}
 	}
 }

@@ -1,11 +1,7 @@
 <!--<?php print <<<EOT
 -->
-<link rel="stylesheet" type="text/css" href="$pwModeImg/style.css" media="all" />
-<script language="JavaScript" src="js/date.js"></script>
-<style type="text/css" media="screen">
-	@import url(images/post/c_editor/editor.css);
-	@import url(images/post/c_editor/upload.css);
-</style>
+<link rel="stylesheet" href="$pwModeImg/style.css?{$GLOBALS['wind_repair']}" />
+<script type="text/javascript" src="js/date.js"></script>
 <form method="post" id="mainForm" name="FORM" action="{$basename}q=post" enctype = "multipart/form-data" onsubmit="return checkpost(document.FORM);">
 <input type="hidden" name="verify" value="$verifyhash" />
 <input type="hidden" name="step" value="2" />
@@ -30,17 +26,18 @@ $_sourceTip = $action == 'edit' ? '(关联ID后，可以引导用户进入原帖
 print <<<EOT
 -->
 <div id="breadCrumb">
-	<img align="absmiddle" src="images/wind/thread/home.gif" alt="forumlist" class="breadHome" /><em class="breadEm"></em>$pagePosition&gt; {$postTitle}
+	<img align="absmiddle" src="images/wind/thread/home.gif" alt="forumlist" class="breadHome" /><em class="breadEm"></em>$pagePosition<em>&gt;</em>{$postTitle}
 </div>
-<div class="cmsBoxC">
-	<div class="cmsBoxC_bg">
-	<h2>
+<div class="t">
+	<div class="h b" style="border-top:0;">$postTitle</div>
+	<div class="p20">
 <!--
 EOT;
 if ($hasSource) {print <<<EOT
 -->
-			<span class="fr f12 fn">{$_sourceTitle}
-					<select id="sourcetype" name="cms_sourcetype" class="mr5">
+		<div class="mb15">
+			<span class="f12 fn"><!--{$_sourceTitle}：-->
+					<select id="sourcetype" name="cms_sourcetype" class="mr10" style="width:120px;">
 <!--
 EOT;
 foreach ($articleModule->getSourceTypeConfig() as $key=>$value) {
@@ -57,7 +54,7 @@ EOT;
 EOT;
 if (!$action) {print <<<EOT
 -->
-<input name="cms_sourceid" class="input" size="5" type="text" onfocus="resetFormOnSubmit(true)"   onkeydown="getSourceDataByEnter(event,this.value)" onBlur="getSourceData(this.value)" value="{$articleModule->sourceId}">
+<input name="cms_sourceid" class="input" type="text" onfocus="resetFormOnSubmit(true)"   onkeydown="getSourceDataByEnter(event,this.value)" onBlur="getSourceData(this.value)" value="{$articleModule->sourceId}">
 <!--
 EOT;
 }else{print <<<EOT
@@ -67,17 +64,13 @@ EOT;
 EOT;
 }print <<<EOT
 -->
-					<span class="btn2"><span><button type="button">提取</button></span></span></span>
+					<span class="bt2"><span><button type="button">{$_sourceTitle}</button></span></span></span>
+		</div>
 <!--
 EOT;
 }print <<<EOT
 -->
-	$postTitle</h2>
-		<table class="cmsTable mb10" width="100%">
-			<tr>
-				<td class="td" colspan="2">
-					<input name="cms_subject" value="{$articleModule->subject}" class="input input_wb mr10" type="text">
-					<select name="cid">
+		<div class="mb15"><select name="cid" style="width:120px;" class="mr10">
 						<option value="0">请选择栏目</option>
 <!--
 EOT;
@@ -92,45 +85,38 @@ EOT;
 }print <<<EOT
 -->
 					</select>
-				</td>
-			</tr>
+					<input name="cms_subject" value="{$articleModule->subject}" class="input input_wb" type="text">
+		</div>
 <!--
 EOT;
 if ($action=='edit') {print <<<EOT
 -->
-			<tr>
-				<th class="th">分页</th>
-				<td class="td">
-<!--
+			<div class="mb15 cc"><span class="mr20 fl">$pages</span><span class="fl mr10">操作：</span>
+					<a href="{$cmsBaseUrl}q=post&action=edit&id=$id&page=add" class="s4 mr10">添加分页</a>
+					<a href="{$cmsBaseUrl}q=post&action=edit&id=$id&page=all" class="s4 mr10">编辑全部</a><!--
 EOT;
 if ($page && $pages && $page!='add' && $page!='all') {print <<<EOT
--->
-					<a href="#" onclick="showDialog('confirm','删除后不可恢复，是否确认删除','5',deletePage);return false;" class="fr pagedel mr5">删除本页</a>
+--><span class="mr10 gray">|</span><a href="javascript:;" onclick="showDialog('confirm','删除后不可恢复，是否确认删除','5',deletePage);return false;" class="s4 mr5">删除本页</a>
 <!--
 EOT;
 }print <<<EOT
 -->
-					<a href="{$cmsBaseUrl}q=post&action=edit&id=$id&page=all" class="fr pagedel mr5">编辑全部</a>
-					<a href="{$cmsBaseUrl}q=post&action=edit&id=$id&page=add" class="fr pagedel mr5">添加分页</a>
-					$pages
-				</td>
-			</tr>
+			</div>
 <!--
 EOT;
 }print <<<EOT
 -->
-		</table>
-		<div style="padding:0 20px;">
 		<!--编辑器开始-->
+		<div class="mb10">
 <!--
 EOT;
 require cmsTemplate::printEot('wysiwyg_editor_cms');
 print <<<EOT
 -->
-		<!--编辑器结束-->
 		</div>
-		<div style="padding:0 20px;overflow:hidden;">
-			<ul class="postInfo mb10" style="height:76px;">
+		<!--编辑器结束-->
+		<div>
+			<ul class="postInfo mb10 cc">
 				<li><em>原作者</em><input name="cms_author" value="{$articleModule->author}" type="text" class="input input_wb"></li>	
 				<li><em>来源网址</em><input name="cms_fromurl" value="{$articleModule->fromUrl}" type="text" class="input input_wb"></li>
 				<li><em>信息来源</em><input name="cms_frominfo" value="{$articleModule->fromInfo}" type="text" class="input input_wb"></li>
@@ -139,7 +125,7 @@ EOT;
 if(checkEditPurview($windid)){
 print <<<EOT
 -->
-				<li class="cc"><a class="wy_tips" style="float:right;margin:2px 15px 0 0;" href="javascript:;"><img src="u/images/help_a.png" /><i style="margin-left:-230px;">添加后，点击文章标题将跳转到这个链接。</i></a><em title="">跳转链接</em><input name="cms_jumpurl" value="{$articleModule->jumpUrl}" type="text" class="input input_wb"></li>
+				<li class="cc"><em class="fl">跳转链接</em><input name="cms_jumpurl" value="{$articleModule->jumpUrl}" type="text" class="input input_wb fl mr10"><a class="wy_tips" href="javascript:;"><img src="u/images/help_a.png" /><i style="margin-left:-230px;">添加后，点击文章标题将跳转到这个链接。</i></a></li>
 <!--
 EOT;
 }print <<<EOT
@@ -154,24 +140,17 @@ print <<<EOT
 EOT;
 }print <<<EOT
 -->
-			</ul>
-			<div class="c"></div>
-			<div class="postInfo mb10">
-				<div class="f14 mb5 b">摘要</div>
-				<textarea name="cms_descrip" class="textareaA" style="width:99%;">{$articleModule->descrip}</textarea>
-			</div>
-			<div class="c"></div>
-			<div class="postInfo mb10">
-				<div class="f14 mb5 b">相关文章</div>
-				<table width="100%">
+				<li><em>文章摘要</em><textarea name="cms_descrip" class="textareaA">{$articleModule->descrip}</textarea></li>
+				<li class="cc"><em class="fl" style="padding-top:3px;">相关阅读</em>
+				<table width="770" class="fl">
 					<tbody id="mode" style="display:none"><tr>
-						<td><input name="cms_relate[subject][]" type="text" class="input input_wb"></td>
-						<td><input name="cms_relate[url][]" type="text" class="input input_wb"></td>
+						<td><input name="cms_relate[subject][]" type="text" class="input"></td>
+						<td><input name="cms_relate[url][]" type="text" class="input input_wb" value="http://"></td>
 						<td><a href="#" onclick="removecols(this);return false;" class="s4">[删除]</a></td>
 					</tr>
 					</tbody>
 					<tr>
-						<td width="350">标题</td>
+						<td width="140">标题</td>
 						<td width="350">链接</td>
 						<td><a href="javascript:;" onclick="addcols('mode','relate');return false;" class="s2 mr5">[添加]</a></td>
 					</tr>
@@ -181,7 +160,7 @@ EOT;
 foreach ($articleModule->relate as $value) {print <<<EOT
 -->
 					<tr>
-						<td><input name="cms_relate[subject][]" value="$value[subject]" type="text" class="input input_wb"></td>
+						<td><input name="cms_relate[subject][]" value="$value[subject]" type="text" class="input"></td>
 						<td><input name="cms_relate[url][]" value="$value[url]" type="text" class="input input_wb"></td>
 						<td><a href="javascript:;" onclick="removecols(this);return false;" class="s4">[删除]</a></td>
 					</tr>
@@ -190,18 +169,19 @@ EOT;
 }print <<<EOT
 -->
 					<tr>
-						<td><input name="cms_relate[subject][]" type="text" class="input input_wb"></td>
-						<td><input name="cms_relate[url][]" type="text" class="input input_wb"></td>
+						<td><input name="cms_relate[subject][]" type="text" class="input"></td>
+						<td><input name="cms_relate[url][]" type="text" class="input input_wb" value="http://"></td>
 						<td><a href="javascript:;" onclick="removecols(this);return false;" class="s4">[删除]</a></td>
 					</tr>
 					</tbody>
 				</table>
-			</div>
+				</li>
+			</ul>
 		</div>
-		<div class="tac mb20"><span class="mr20"><span class="btn"><span><button name="Submit" type="submit">发布</button></span></span></span><label><input name="addnewpage" type="checkbox" value="1">&nbsp;保存后继续编辑新分页内容</label></div>
+		<div class="mb20"><span class="mr20"><span class="btn"><span><button name="Submit" type="submit">发布</button></span></span></span><label><input name="addnewpage" type="checkbox" value="1">&nbsp;保存后继续编辑新分页内容</label></div>
 		<div class="c" >&nbsp;</div>
 		<div id="divload"></div>
-	</div>
+</div>
 </div>
 </form>
 
@@ -239,27 +219,27 @@ function checkpost(obj) {
 	var subjectTemp = obj.cms_subject.value.replace( /^\s*/, '');
 	var atc_contentTemp = obj.atc_content.value.replace( /^\s*/, '');
 	if (obj.cms_subject.value == "" || subjectTemp == "") {
-		showDialog("error","文章<span class='warnFontStyle'>标题</span>不能为空",2);
+		showDialog("error","文章<span class='s1'>标题</span>不能为空",2);
 		obj.cms_subject.focus();
 		return false;
 	} else if (strlen(obj.cms_subject.value) > 80) {
-		showDialog("error","文章<span class='warnFontStyle'>标题</span>不能大于长度 <span class='warnFontStyle'>80 </span>个字节",2);
+		showDialog("error","文章<span class='s1'>标题</span>不能大于长度 <span class='s1'>80 </span>个字节",2);
 		obj.cms_subject.focus();
 		return false;
 	}
 	if (strlen(obj.atc_content.value) < 0 || atc_contentTemp == "") {
 		showDialog({
 			type: "error",
-			message: "文章<span class='warnFontStyle'>内容</span>不能为空",
+			message: "文章<span class='s1'>内容</span>不能为空",
 			autoHide:2,
 			onClose : function(){
-				editor.focusEditor();
+				editor.focus();
 			}
 		});
 		return false;
 	} else if (strlen(obj.atc_content.value) > 50000) {
-		showDialog("error","文章<span class='warnFontStyle'>内容</span>不能大于 50000 个字节",2);
-		editor.focusEditor();
+		showDialog("error","文章<span class='s1'>内容</span>不能大于 50000 个字节",2);
+		editor.focus();
 		return false;
 	}
 	var pattern = /\[url=(\d+)\]/gmi;

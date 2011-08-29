@@ -48,7 +48,7 @@ $lang['right'] = array (
 		),
 		'allowhide' => array(
 			'title'	=> '隐身登录',
-			'desc'	=> '开启后，用户可以隐身登陆站点',
+			'desc'	=> '开启后，用户可以隐身登录站点',
 			'html'	=> '<ul class="list_A list_80 cc"><li><input type="radio" value="1" name="group[allowhide]" $allowhide_Y />开启</li><li><input type="radio" value="0" name="group[allowhide]" $allowhide_N />关闭</li></ul>'
 		),
 		'userbinding' => array(
@@ -74,6 +74,11 @@ $lang['right'] = array (
 			'title'	=> '查看会员列表',
 			'desc'	=> '开启后，用户可以查看会员列表',
 			'html'	=> '<ul class="list_A list_80 cc"><li><input type="radio" value="1" name="group[allowmember]" $allowmember_Y />开启</li><li><input type="radio" value="0" name="group[allowmember]" $allowmember_N />关闭</li></ul>'
+		),
+		'allowviewonlineread'	=> array(
+			'title'	=> '查看在线会员所在页面',
+			'desc'	=> '允许此用户组用户查看在线会员当前所在的页面',
+			'html'	=> '<ul class="list_A list_80 cc"><li><input type="radio" value="1" name="group[allowviewonlineread]" $allowviewonlineread_Y />开启</li><li><input type="radio" value="0" name="group[allowviewonlineread]" $allowviewonlineread_N />关闭</li></ul>'
 		),
 		/*
 		'allowprofile'	=> array(
@@ -217,12 +222,39 @@ $lang['right'] = array (
 			'desc'	=> '开启后，此用户组的用户可以发表主题',
 			'html'	=> '<ul class="list_A list_80 cc"><li><input type="radio" value="1" name="group[allowpost]" $allowpost_Y />开启</li><li><input type="radio" value="0" name="group[allowpost]" $allowpost_N />关闭</li></ul>'
 		),
+		'specialtopics' => array(
+			'title'	=> '允许发表特殊主题',
+			'desc'	=> '允许修改投票选项：允许用户修改自己已发起的投票的选项<br/>勾选此用户组用户可发表的特殊主题，此权限同时受版块权限中的可发表的帖子类型控制',
+			'html'	=> '
+				<input type="checkbox" name="group[allownewvote]" value="1" $allownewvote_Y /> 投票帖
+				&nbsp; <select class="elect_wa" name="group[modifyvote]">
+					<option value="1" $modifyvote_Y>允许修改投票选项</option>
+					<option value="0" $modifyvote_N>不允许修改投票选项</option>
+				</select>
+				<ul class="list_120 cc">
+					<li><input type="checkbox" name="group[allowreward]" value="1" $allowreward_Y /> 悬赏帖</li>
+					<li><input type="checkbox" name="group[allowgoods]" value="1" $allowgoods_Y /> 商品帖</li>
+					<li><input type="checkbox" name="group[allowdebate]" value="1" $allowdebate_Y /> 辩论帖</li>
+					<li><input type="checkbox" name="group[allowmodelid]" value="1" $allowmodelid_Y /> 分类信息帖</li>
+					<li><input type="checkbox" name="group[allowpcid]" value="1" $allowpcid_Y /> 团购帖</li>
+					<li><input type="checkbox" name="group[allowactivity]" value="1" $allowactivity_Y /> 活动帖</li>
+				</ul>
+				<div style="height:1px;background:#dde9f5;overflow:hidden;margin:5px 0;"></div>
+				<ul class="list_120 cc">
+					<li><input type="checkbox" name="group[robbuild]" value="1" $robbuild_Y /> 抢楼帖</li>
+					<li><input type="checkbox" name="group[htmlcode]" value="1" $htmlcode_Y /> html帖</li>
+					<li><input type="checkbox" name="group[anonymous]" value="1" $anonymous_Y /> 匿名帖</li>
+					<li><input type="checkbox" name="group[allowhidden]" value="1" $allowhidden_Y /> 隐藏帖</li>
+					<li><input type="checkbox" name="group[allowsell]" value="1" $allowsell_Y /> 出售帖</li>
+					<li><input type="checkbox" name="group[allowencode]" value="1" $allowencode_Y /> 加密帖</li>
+				</ul>'
+		),
 		'allowrp'	=> array(
 			'title'	=> '回复主题',
 			'desc'	=> '开启后，此用户组的用户可以回复主题',
 			'html'	=> '<ul class="list_A list_80 cc"><li><input type="radio" value="1" name="group[allowrp]" $allowrp_Y />开启</li><li><input type="radio" value="0" name="group[allowrp]" $allowrp_N />关闭</li></ul>'
 		),
-		'allownewvote'	=> array(
+		/*'allownewvote'	=> array(
 			'title'	=> '发起投票',
 			'desc'	=> '开启后，此用户组的用户可以发起投票',
 			'html'	=> '<ul class="list_A list_80 cc"><li><input type="radio" value="1" name="group[allownewvote]" $allownewvote_Y />开启</li><li><input type="radio" value="0" name="group[allownewvote]" $allownewvote_N />关闭</li></ul>'
@@ -231,7 +263,7 @@ $lang['right'] = array (
 			'title'	=> '修改发起的投票选项',
 			'desc'	=> '开启后，此用户组的用户有权限修改发起的投票选项',
 			'html'	=> '<ul class="list_A list_80 cc"><li><input type="radio" value="1" name="group[modifyvote]" $modifyvote_Y />开启</li><li><input type="radio" value="0" name="group[modifyvote]" $modifyvote_N />关闭</li></ul>'
-		),
+		),*/
 		'allowvote'	=> array(
 			'title' => '参与投票',
 			'desc'	=> '开启后，此用户组的用户可以参与投票',
@@ -242,11 +274,21 @@ $lang['right'] = array (
 			'desc'	=> '开启后，此用户组的用户可以查看投票用户',
 			'html'	=> '<ul class="list_A list_80 cc"><li><input type="radio" value="1" name="group[viewvote]" $viewvote_Y />开启</li><li><input type="radio" value="0" name="group[viewvote]" $viewvote_N />关闭</li></ul>'
 		),
+		'leaveword'	=>	array(
+			'title'	=> '楼主留言',
+			'desc'	=> '开启后，此用户组的用户可使用楼主留言功能',
+			'html'	=> '<ul class="list_A list_80 cc"><li><input type="radio" value="1" name="group[leaveword]" $leaveword_Y />开启</li><li><input type="radio" value="0" name="group[leaveword]" $leaveword_N />关闭</li></ul>'
+		),
+		'dig'	=> array(
+			'title'	=> '推荐帖子',
+			'desc'	=> '开启后，此用户组的用户可以推荐帖子',
+			'html'	=> '<ul class="list_A list_80 cc"><li><input type="radio" value="1" name="group[dig]" $dig_Y />开启</li><li><input type="radio" value="0" name="group[dig]" $dig_N />关闭</li></ul>'
+		),
 		/*'allowactive'	=> array(
 			'title'	=> '发活动帖',
 			'html'	=> '<ul class="list_A list_80 cc"><li><input type="radio" value="1" name="group[allowactive]" $allowactive_Y />开启</li><li><input type="radio" value="0" name="group[allowactive]" $allowactive_N />关闭</li></ul>'
 		),*/
-		'allowreward'	=> array(
+		/*'allowreward'	=> array(
 			'title'	=> '悬赏帖',
 			'desc'	=> '开启后，此用户组的用户可以发表悬赏帖',
 			'html'	=> '<ul class="list_A list_80 cc"><li><input type="radio" value="1" name="group[allowreward]" $allowreward_Y />开启</li><li><input type="radio" value="0" name="group[allowreward]" $allowreward_N />关闭</li></ul>'
@@ -277,17 +319,15 @@ $lang['right'] = array (
 			'desc'	=> '开启后，此用户组的用户可以发表活动帖',
 			'html'	=> '<ul class="list_A list_80 cc"><li><input type="radio" value="1" name="group[allowactivity]" $allowactivity_Y />开启</li><li><input type="radio" value="0" name="group[allowactivity]" $allowactivity_N />关闭</li></ul>'
 		),
+		'robbuild'	=> array(
+			'title'	=> '抢楼帖',
+			'desc'	=> '开启后，此用户组的用户可以发表抢楼帖',
+			'html'	=> '<ul class="list_A list_80 cc"><li><input type="radio" value="1" name="group[robbuild]" $robbuild_Y />开启</li><li><input type="radio" value="0" name="group[robbuild]" $robbuild_N />关闭</li></ul>'
+		),
 		'htmlcode'	=> array(
 			'title'	=> '发表html帖',
 			'desc'	=> '这将使用户拥有直接编辑 html 源代码的权利!',
 			'html'	=> '<ul class="list_A list_80 cc"><li><input type="radio" value="1" name="group[htmlcode]" $htmlcode_Y />开启</li><li><input type="radio" value="0" name="group[htmlcode]" $htmlcode_N />关闭</li></ul>'
-		),
-		'media'	=> array(
-			'title'	=> '多媒体允许自动展开',
-			'html'	=> '<ul class="list_A list_80 cc"><li><input type="checkbox" name="group[media][]" value="flash" $media_sel[flash] />flash</li><li>
-			<input type="checkbox" name="group[media][]" value="wmv" $media_sel[wmv] />wmv</li><li>
-			<input type="checkbox" name="group[media][]" value="rm" $media_sel[rm] />rm</li><li>
-			<input type="checkbox" name="group[media][]" value="mp3" $media_sel[mp3] />mp3</li></ul>'
 		),
 		'allowhidden'	=> array(
 			'title'	=> '隐藏帖',
@@ -308,29 +348,73 @@ $lang['right'] = array (
 			'title'	=> '匿名帖',
 			'desc'	=> '注：此设置同时受版块权限限制，开启版块权限中的发表匿名帖功能方有效',
 			'html'	=> '<ul class="list_A list_80 cc"><li><input type="radio" value="1" name="group[anonymous]" $anonymous_Y />开启</li><li><input type="radio" value="0" name="group[anonymous]" $anonymous_N />关闭</li></ul>'
-		),
-		'dig'	=> array(
-			'title'	=> '推荐帖子',
-			'desc'	=> '开启后，此用户组的用户可以推荐帖子',
-			'html'	=> '<ul class="list_A list_80 cc"><li><input type="radio" value="1" name="group[dig]" $dig_Y />开启</li><li><input type="radio" value="0" name="group[dig]" $dig_N />关闭</li></ul>'
-		),
-		'leaveword'	=>	array(
-			'title'	=> '楼主留言',
-			'desc'	=> '开启后，此用户组的用户可以给楼主留言',
-			'html'	=> '<ul class="list_A list_80 cc"><li><input type="radio" value="1" name="group[leaveword]" $leaveword_Y />开启</li><li><input type="radio" value="0" name="group[leaveword]" $leaveword_N />关闭</li></ul>'
-		),
+		),*/
+		
 		'allowdelatc'	=> array(
 			'title'	=> '删除自己的帖子',
 			'desc'	=> '开启后，此用户组的用户可以删除自己的帖子',
 			'html'	=> '<ul class="list_A list_80 cc"><li><input type="radio" value="1" name="group[allowdelatc]" $allowdelatc_Y />开启</li><li><input type="radio" value="0" name="group[allowdelatc]" $allowdelatc_N />关闭</li></ul>'
 		),
 		'atccheck'	=> array(
-			'title'	=> '该用户组帖子须审核',
-			'desc'	=> '开启版块文章审核时,发表的帖子是否需要管理员审核，此项只有是开启版块文章审核时有效',
+			'title'	=> '帖子需审核',
+			'desc'	=> '开启版块帖子审核时,发表的帖子是否需要管理员审核，此项只有在开启版块帖子审核时有效',
 			'html'	=> '<ul class="list_A list_80 cc"><li><input type="radio" value="1" name="group[atccheck]" $atccheck_Y />开启</li><li><input type="radio" value="0" name="group[atccheck]" $atccheck_N />关闭</li></ul>'
 		),
+		'allowreplyreward' => array(
+			'title'	=> '允许设置回帖奖励',
+			'desc'	=> '允许此用户组用户在发帖时给回复者一定的积分奖励',
+			'html'	=> '<ul class="list_A list_80 cc"><li><input type="radio" value="1" name="group[allowreplyreward]" $allowreplyreward_Y />开启</li><li><input type="radio" value="0" name="group[allowreplyreward]" $allowreplyreward_N />关闭</li></ul>'
+		),
+		'allowremotepic' => array(
+			'title'	=> '允许下载远程图片',
+			'desc'	=> '允许此用户组用户在发帖时将远程图片本地化',
+			'html'	=> '<ul class="list_A list_80 cc"><li><input type="radio" value="1" name="group[allowremotepic]" $allowremotepic_Y />开启</li><li><input type="radio" value="0" name="group[allowremotepic]" $allowremotepic_N />关闭</li></ul>'
+		),
+		'allowat'	=> array(
+			'title'	=> '允许发帖时@其他人',
+			'desc'	=> '开启后，此用户组的用户在发帖时可以@提到他人',
+			'html'	=> '<ul class="list_A list_80 cc"><li><input type="radio" value="1" name="group[allowat]" $allowat_Y />开启</li><li><input type="radio" value="0" name="group[allowat]" $allowat_N />关闭</li></ul>'
+		),
+		'atnum'	=> array(
+			'title'	=> '发帖时可@用户数',
+			'desc'	=> '发帖时@用户数上限，0或留空表示不限制',
+			'html'	=> '<input class="input input_wa" value="$atnum" name="group[atnum]" />'
+		),
+		'postlimit'	=> array(
+			'title'	=> '每日最多发帖数',
+			'desc'	=> '0或留空表示不限制',
+			'html'	=> '<input class="input input_wa" value="$postlimit" name="group[postlimit]" />'
+		),
+		'allowbuykmd' => array(
+			'title'	=> '允许购买孔明灯',
+			'desc'	=> '',
+			'html'	=> '<ul class="list_A list_80 cc"><li><input type="radio" value="1" name="group[allowbuykmd]" $allowbuykmd_Y />开启</li><li><input type="radio" value="0" name="group[allowbuykmd]" $allowbuykmd_N />关闭</li></ul>'
+		),
+		'postpertime'	=> array(
+			'title'	=> '连续发帖时间控制（秒）',
+			'desc'	=> '设定的时间间隔内用户不可连续发帖，0或留空表示不限制，此功能原名为：灌水预防',
+			'html'	=> '<input class="input input_wa" value="$postpertime" name="group[postpertime]" />'
+		),
+		'edittime'	=> array(
+			'title'	=> '可编辑时间控制（分钟）',
+			'desc'	=> '用户发帖成功后，可以在设定的时间段内重新编辑帖子，0或留空表示不限制，此功能原名为：编辑时间约束[分钟]',
+			'html'	=> '<input class="input input_wa" value="$edittime" name="group[edittime]" />'
+		),
+		//增加链接帖发帖限制@modify panjl@2010-11-2
+		'posturlnum'	=> array(
+			'title'	=> '链接帖发帖数控制',
+			'desc'	=> '发帖数达到设定之后才可以发表带链接的帖子，0或留空表示不限制，此设置可防止注册机注册后发布带链接的广告帖',
+			'html'	=> '<input class="input input_wa" value="$posturlnum" name="group[posturlnum]" />'
+		),
+		'media'	=> array(
+			'title'	=> '多媒体自动展开',
+			'html'	=> '<ul class="list_A list_80 cc"><li><input type="checkbox" name="group[media][]" value="flash" $media_sel[flash] />flash</li><li>
+			<input type="checkbox" name="group[media][]" value="wmv" $media_sel[wmv] />wmv</li><li>
+			<input type="checkbox" name="group[media][]" value="rm" $media_sel[rm] />rm</li><li>
+			<input type="checkbox" name="group[media][]" value="mp3" $media_sel[mp3] />mp3</li></ul>'
+		),
 		'markable'	=> array(
-			'title'	=> '评分权限',
+			'title'	=> '帖子评分权限',
 			'desc'	=> '版主在所管理版块始终有评分权限',
 			'html'	=> '<ul class="list_A cc td2_wp"><li><input type="radio" value="0" name="group[markable]" $markable_0 />无</li><li>
 			<input type="radio" value="1" name="group[markable]" $markable_1 />允许评分</li><li>
@@ -345,18 +429,13 @@ $lang['right'] = array (
 			'html'	=> '最小 <input type=text size="3" class="input" value="$minper" name="group[marklimit][0]" /> 最大 <input type=text size="3" class="input" value="$maxper" name="group[marklimit][1]" />'
 		),*/
 		'markset'	=> array(
-			'title'	=> '评分设置',
+			'title'	=> '帖子评分设置',
 			'desc'	=> '复选框不选中或者评分上限、评分限制任何一项留空/设为0，前台将无法使用该评分类型',
 			'html'	=> $credit_type
-		),
+		)
 		/*'markdt'	=> array(
 			'title'	=> '评分是否需要扣除自身相应的积分',
 			'html'	=> '<ul class="list_A list_80 cc"><li><input type="radio" value="1" name="group[markdt]" $markdt_Y />开启</li><li><input type="radio" value="0" name="group[markdt]" $markdt_N />关闭</li></ul>'
-		),*/
-		'postlimit'	=> array(
-			'title'	=> '每天最多发表帖子数',
-			'desc'	=> '0或留空表示不限制',
-			'html'	=> '<input class="input input_wa" value="$postlimit" name="group[postlimit]" />'
 		),
 		'postpertime'	=> array(
 			'title'	=> '灌水预防',
@@ -373,7 +452,7 @@ $lang['right'] = array (
 			'title'	=> '链接帖发帖限制',
 			'desc'	=> '当会员的发表的帖子数量达到设定值以后就可以发表带链接的帖子。此设置为防止注册机注册后发带有链接地址的广告。0或留空表示不限制',
 			'html'	=> '<input class="input input_wa" value="$posturlnum" name="group[posturlnum]" />'
-		)
+		)*/
 	),
 	'group' =>array(
 		'allowcreate'=>array(
@@ -418,7 +497,7 @@ $lang['right'] = array (
 				{$upload_type}
 				<tbody id="ft"></tbody>
 			</table></div>
-			<script language="JavaScript">
+			<script type="text/javascript">
 			addcols(\'mode\',\'ft\');
 			</script>'
 		)

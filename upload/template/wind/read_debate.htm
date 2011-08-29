@@ -1,170 +1,33 @@
 <!--<?php
+if($page==1){
+
 print <<<EOT
 -->
-<style type="text/css">
-.s8,.s8 a,.s8 a:hover{color:#1bb9ea;}
-.p_lr_10{padding:0 10px;}
-.tab2{background:#e4e4e4;margin-top:4px;height:100px;}
-.tab2 .one{background:url($imgpath/post/vote/tab-one.gif) left center repeat-y;width:50px;}
-.tab2 .two{background:url($imgpath/post/vote/tab-two.gif) left center repeat-y;width:50px;}
-.vote{border:1px solid #e4e4e4;background:#f7f7f7;color:#333;padding:10px;overflow:hidden;width:220px;}
-.dig2{height:25px;line-height:25px;display:block;font-size:12px;background:#ffffee;width:80px;cursor: pointer;margin:.5em 0;color:#666;border:1px solid #ffd0a8;}
-.dig2:hover{text-decoration:none;border:1px solid #f5a25c;color:#ff6600;}
-.dig3,.dig4,.dig5{line-height:18px;}
-.dig3 span,.dig3 div,.dig4 span,.dig4 div,.dig5{height:18px;}
-.dig3{border:1px solid #ee6821;}
-.dig3 span{background:#ee6821;color:#fff;padding:0 .5em;}
-.dig3 div,.dig4 div{cursor:pointer;padding:0 .5em;background:#fff;}
-.dig4{border:1px solid #23bceb;}
-.dig4 span{background:#23bceb;color:#fff;padding:0 .5em;}
-.dig5{background:#ffffee;border:1px solid #f5a25c;color:#ff6600;width:80px;}
-.dig3 div span,.dig4 div span{background:#fff;color:#333;}
-.vs-new{background:url($imgpath/post/vote/vs-new.png) no-repeat;width:110px;height:110px;}
-.vs-old{background:url($imgpath/post/vote/vs-old.png) no-repeat;width:110px;height:110px;}
-.bta{line-height:20px;height:20px;}
-</style>
-<div class="t">
-<!--
-EOT;
-if($page==1){print <<<EOT
--->
-<div class="h tac" style="border-top:0;">
-<!--
-EOT;
-if($debate[judge]){print <<<EOT
--->
-此辩论已结束，裁判 <b><a href="u.php?username=$debate[umpire]">$debate[umpire]</a></b> 宣布:
-<!--
-EOT;
-if($debate[judge]==1){print <<<EOT
--->
-<b class="s3">正方胜</b>
-<!--
-EOT;
-}elseif($debate[judge]==3){print <<<EOT
--->
-<b class="s8">反方胜</b>
-<!--
-EOT;
-}else{print <<<EOT
--->
-<b class="s1">平局</b>
-<!--
-EOT;
-}print <<<EOT
--->
-，最佳辩手:<a href="u.php?username=$debate[debater]" target="_blank"><b class="s7">$debate[debater]</b></a>
-<!--
-EOT;
-}elseif($debate['endtime'] < $timestamp){print <<<EOT
--->
-此辩论已结束，等待裁判宣布辩论结果。。。
-<!--
-EOT;
-}else{
-$debate['endtime'] = get_date($debate['endtime'],"Y-m-d H:i");
-print <<<EOT
--->
-辩论结束时间 <b>$debate[endtime]</b> - 裁判:<b><a href="u.php?username=$debate[umpire]">$debate[umpire]</a></b>
-<!--
-EOT;
-}if($windid==$debate[umpire]){print <<<EOT
--->
-<input id="judgedebate" type="button" value="裁判点评" class="bta" onClick="sendmsg('pw_ajax.php?action=debate&do=judge&tid=$tid','','judgedebate')"/>
-<!--
-EOT;
-}
-$tmpVotes = $debate[revote]+$debate[obvote];
-$tmpob = round($debate[obvote]/$tmpVotes,2)*100;
-$tmpre = round($debate[revote]/$tmpVotes,2)*100;
-print <<<EOT
--->
+<!--辩论开始-->
+<div class="debate">
+	<div class="debate_table mb10">
+		<table width="100%">
+			<tr class="vt">
+				<td style="padding-right:20px;"><h4><strong class="f14 s2 mr10">正方观点({$tmpob}%)</strong><span class="mr10">$debate[obvote] 票</span><a href="read.php?tid=$tid&stand=1&ds=1#a" class="s4">(查看正方用户)</a></h4><p>{$debate['obtitle']}</p></td>
+				<td class="de_ratio"><div class="de_ratio_v" style="height:{$tmpob}%;"><span></span></div></td>
+				<th width="80"></th>
+				<td class="de_ratio"><div class="de_ratio_s" style="height:{$tmpre}%;"><span></span></div></td>
+				<td style="padding-left:20px;"><h4><strong class="f14 s4 mr10">反方观点({$tmpre}%)</strong><span class="mr10">$debate[revote] 票</span><a href="read.php?tid=$tid&stand=2&ds=1#a" class="s4">(查看反方用户)</a></h4><p>{$debate['retitle']}</p></td>
+			</tr>
+		</table>
+	</div>
+	<div class="debate_oper">
+		<table width="100%">
+			<tr>
+				<td>&nbsp;</td>
+				<td width="90" class="tar"><span class="bt2"><span><button onClick="dodebate('y',$tid);return false;">支持正方</button></span></span></td>
+				<th width="70"></th>
+				<td width="90" class="tal"><span class="bt2"><span><button onClick="dodebate('n',$tid);return false;">支持反方</button></span></span></td>
+				<td>&nbsp;</td>
+			</tr>
+		</table>
+	</div>
 </div>
-<div style="margin:auto;width:800px;" class="p10">
-	<table width="100%" style="table-layout:fixed;">
-		<tr>
-			<td>
-				<table border="0" cellspacing="0" cellpadding="0" width="100%;">
-					<tr>
-						<td valign="top">
-							<div class="vote">
-								<p class="s2 mb10 b">正方观点:</p>
-								<p class="mb10">$debate[obtitle]</p>
-								<p class="s6">辩手:$debate[obposts] 人</p>
-							</div>
-						</td>
-						<td style="width:100px;" class="tac">
-							<center>
-							<div>- <b><span id="obvote" class="s2">$debate[obvote]</span></b> 票 -</div>
-								<table class="tab2" border="0" cellspacing="0" cellpadding="0" width="50">
-									<tr><td id="obimgre" class="no" height="$tmpre%"></td></tr>
-									<tr><td id="obimgob" class="one tac" height="$tmpob%"></td></tr>
-								</table>
-							<div class="c"></div>
-							<a href="javascript:void(0)" onClick="dodebate('y',$tid)" class="dig2">支持正方</a> </center>
-						</td>
-					</tr>
-				</table>
-			</td>
-			<td width="120">
-<!--
-EOT;
-if($debate[judge]){print <<<EOT
--->
-				<div class="vs-old"></div>
-<!--
-EOT;
-}else{print <<<EOT
--->
-				<div class="vs-new"></div>
-<!--
-EOT;
-}print <<<EOT
--->
-			</td>
-			<td>
-				<table border="0" cellspacing="0" cellpadding="0" width="100%;">
-					<tr>
-						<td style="width:100px;" class="tac">
-							<center>
-							<div>- <b><span id="revote" class="s8">$debate[revote]</span></b> 票 -</div>
-							<table class="tab2" border="0" cellspacing="0" cellpadding="0" width="50">
-							<tr><td id="reimgob" class="no" height="$tmpob%"></td></tr>
-							<tr><td id="reimgre" class="two tac" height="$tmpre%"></td></tr>
-							</table>
-							<div class="c"></div>
-							<a href="javascript:void(0)" onClick="dodebate('n',$tid)" class="dig2">支持反方</a>
-							</center>
-						</td>
-						<td valign="top">
-							<div class="vote">
-								<p class="mb10 s8 b">反方观点:</p>
-								<p class="mb10">$debate[retitle]</p>
-								<p class="s6">辩手:$debate[reposts] 人</p>
-							</div>
-						</td>
-					</tr>
-				</table>
-			</td>
-		</tr>
-	</table>
-<!--
-EOT;
-if($debate[judge] && $debate[umpirepoint]){print <<<EOT
--->
-<div class="vote"><span class="s1">裁判点评 ：</span>$debate[umpirepoint]</div>
-<!--
-EOT;
-}print <<<EOT
--->
-</div>
-<!--
-EOT;
-}print <<<EOT
--->
-<table border="0" cellspacing="0" cellpadding="0" width="100%;">
-<tr class="f_two tac gray"><td style="padding:5px;">
-<a href="read.php?tid=$tid&displayMode=1" id="stand_0">全部参与人员</a><span class="p_lr_10">|</span><a href="read.php?tid=$tid&stand=1&displayMode=1" id="stand_1">正方支持者</a><span class="p_lr_10">|</span><a href="read.php?tid=$tid&stand=3&displayMode=1" id="stand_3">中立者</a><span class="p_lr_10">|</span><a href="read.php?tid=$tid&stand=2&displayMode=1" id="stand_2">反方支持者</a></td></tr></table>
 <script type="text/javascript">
 setCurrent('stand_$stand','stand_0','b s4');
 function dodebate(id,tid,pid) {
@@ -203,10 +66,14 @@ EOT;
 			}
 		}
 		ajax.guide();
+		if (typeof pid == 'undefined' && typeof str[1] != 'undefined') {
+			setTimeout("window.location.reload();",2000);
+		}
 	});
 }
 </script>
-</div>
+<!--辩论结束-->
 <!--
 EOT;
+}
 ?>

@@ -186,7 +186,7 @@ $lang['writemsg'] = array (
 	'friend_agree_content'	=> '[url={$GLOBALS[db_bbsurl]}/{$GLOBALS[db_userurl]}{$L[uid]}]{$L[username]}[/url]'
 								. '通过了您的好友请求\r\n\r\n',
 	'user_update_title'		=> '系统通知',
-	'user_update_content'	=> '亲爱的{$L[username]}，我们非常高兴的告诉你，你刚刚升到了{$L[membername]}级别。你离下一级{$L[upmembername]}级别还有{$L[userneed]}分，要继续努力哦',
+	'user_update_content'	=> '亲爱的{$L[username]}，我们非常高兴的告诉你，你刚刚升到了{$L[membername]}级别。你离下一级{$L[upmembername]}级别还有{$L[userneed]}分，要继续努力哦，<a href="profile.php?action=permission" target="_blank">查看会员组权限</a>',
 	'banuser_title'			=> '系统禁言通知',
 	'banuser_content_1'		=> '你已经被管理员{$L[manager]} 禁言,禁言时间为{$L[limit]} 天\n\n{$L[reason]}',
 	'banuser_content_2'		=> '你已经被管理员{$L[manager]} 禁言\n\n{$L[reason]}',
@@ -221,13 +221,13 @@ $lang['writemsg'] = array (
 	'o_board_success_cotent'	=> '{$L[content]} \n[url={$GLOBALS[db_bbsurl]}/u.php?a=board&uid={$L[touid]}]查看更多留言[/url]',
 
 	'o_share_success_title'		=> '"{$L[sender]}"评论了"{$L[receiver]}"的分享',
-	'o_share_success_cotent'	=> '"{$L[title]}"\n\n[url={$GLOBALS[db_bbsurl]}/apps.php?q=share]去我的分享页面[/url]',
+	'o_share_success_cotent'	=> '{$L[title]}\n\n[url={$GLOBALS[db_bbsurl]}/apps.php?q=share]去我的分享页面[/url]',
 	'o_write_success_title'		=> '"{$L[sender]}"评论了"{$L[receiver]}"的记录',
-	'o_write_success_cotent'	=> '"{$L[title]}"\n\n[url={$GLOBALS[db_bbsurl]}/apps.php?q=write]去我的记录页面[/url]',
+	'o_write_success_cotent'	=> '{$L[title]}\n\n[url={$GLOBALS[db_bbsurl]}/apps.php?q=write]去我的记录页面[/url]',
 	'o_photo_success_title'		=> '"{$L[sender]}"评论了"{$L[receiver]}"的照片',
-	'o_photo_success_cotent'	=> '"{$L[title]}"\n\n[url={$GLOBALS[db_bbsurl]}/apps.php?username={$L[receiver]}&q=photos&a=view&pid={$L[id]}]去此相片页面[/url]',
+	'o_photo_success_cotent'	=> '{$L[title]}\n\n[url={$GLOBALS[db_bbsurl]}/apps.php?username={$L[receiver]}&q=photos&a=view&pid={$L[id]}]去此照片页面[/url]',
 	'o_diary_success_title'		=> '"{$L[sender]}"评论了"{$L[receiver]}"的日志',
-	'o_diary_success_cotent'	=> '"{$L[title]}"\n\n[url={$GLOBALS[db_bbsurl]}/apps.php?username={$L[receiver]}&q=diary&a=detail&did={$L[id]}]查看详细日志[/url]',
+	'o_diary_success_cotent'	=> '{$L[title]}\n\n[url={$GLOBALS[db_bbsurl]}/apps.php?username={$L[receiver]}&q=diary&a=detail&did={$L[id]}]查看详细日志[/url]',
 
 	'inspect_title'				=> '你的主题已被版主阅读',
 	'inspect_content'			=> '您发表的帖子被 [b]{$L[manager]}[/b] 执行 [b]已阅[/b] 操作\r\n[b]帖子标题：[/b]<a target="_blank" href="read.php?tid={$L[tid]}">{$L[subject]}</a>\r\n[b]操作日期：[/b]{$L[postdate]}\r\n[b]操作理由：[/b]{$L[reason]}',
@@ -356,5 +356,35 @@ $lang['writemsg'] = array (
 	'split_content'		    => '您发表的帖子{$L[spiltInfo]}被 [b]{$L[manager]}[/b] 执行 [b]拆分[/b] 操作\n\n'
 								. '操作原因：{$L[msg]}\n\n'
 								. '论坛管理操作通知短消息，对本次管理操作有任何异议，请与我取得联系。',
+								
+	//孔明灯
+	'kmd_manage_pass_title'	=> '您的孔明灯申请已通过审核',
+	'kmd_manage_pass_content'	=> '您好，您于[color=blue]{$L[creadtime]}[/color]申请的孔明灯帖[color=blue]{$L[subject]}[/color]已通过审核，推广到期时间为：[color=blue]{$L[endtime]}[/color]。如有问题，请联系管理员',	
+	'kmd_manage_repulse_title'	=> '您的孔明灯申请未通过审核',
+	'kmd_manage_repulse_content'	=> '您好，您于[color=blue]{$L[creadtime]}[/color] 申请的孔明灯帖 [color=blue]{$L[subject]}[/color]未通过审核。如有问题，请联系管理员',					
+    'kmd_manage_pay_back_title'  => '您的孔明灯申请已退款成功!',
+	'kmd_manage_pay_back_content'  => ' 您好，您于 [color=blue]{$L[creadtime]}[/color]  申请的孔明灯帖  [color=blue]{$L[subject]}[/color]，费用为 [color=blue]{$L[rmb]}[/color]元， 已退款成功，请注意查收。如有问题，请联系管理员。  ',		
+	'kmd_manage_pay_title'  =>  '您的孔明灯申请已支付成功!',
+	'kmd_manage_pay_content'  =>	'您好，您于 [color=blue]{$L[creadtime]}[/color]  申请的孔明灯帖  [color=blue]{$L[subject]}[/color] ，费用为 [color=blue]{$L[rmb]}[/color]元，已成功支付，请等待审核，审核通过后即可正常显示。如有问题，请联系管理员。',
+	'kmd_review_title'	=> '【审核】$L[username]已提交孔明灯申请，请确认是否已支付',
+	'kmd_review_content'	=> '[url=$GLOBALS[db_bbsurl]/u.php?username=$L[username]]$L[username][/url]提交了孔明灯申请，推广版块：[url=$GLOBALS[db_bbsurl]/thread.php?fid=$L[fid]]$L[forumname][/url]，推广费用：[color=orange]$L[money]元[/color]，请查看后进入后台确认支付状态。',
+	'kmd_review_user_title' => '您的孔明灯申请提交成功，请等待审核',
+	'kmd_review_user_content' => '您申请的孔明灯，推广版块：[url=$GLOBALS[db_bbsurl]/thread.php?fid=$L[fid]]$L[forumname][/url]，推广费用：[color=orange]$L[money]元[/color]，已成功提交至后台，支付后请联系管理员审核开通。',
+	'kmd_review_thread_change_title' => '【审核】$L[username]已提交孔明灯帖子更换申请',
+	'kmd_review_thread_add_title' => '【审核】$L[username]已提交孔明灯帖子添加申请',
+	'kmd_review_thread_content' => '[url=$GLOBALS[db_bbsurl]/u.php?username=$L[username]]$L[username][/url]提交了孔明灯推广申请，推广帖子：[url=$GLOBALS[db_bbsurl]/read.php?tid=$L[tid]]$L[threadtitle][/url]，请进入后台进行审核状态。',
+	'kmd_review_user_thread_title' => '您的孔明灯推广申请提交成功，请等待审核',
+	'kmd_review_user_thread_content' => '您申请的孔明灯推广帖子：[url=$GLOBALS[db_bbsurl]/read.php?tid=$L[tid]]$L[threadtitle][/url]，已成功提交至后台，请等待管理员审核开通。',
+
+	'kmd_admin_paylog_checked_title' => '您的孔明灯购买申请已开通成功 ',
+	'kmd_admin_paylog_checked_content' => '您申请的孔明灯，推广版块：[url=$GLOBALS[db_bbsurl]/thread.php?fid=$L[fid]]$L[forumname][/url]，推广费用：$L[price]元，已成功开通，现在可以在[url=$GLOBALS[db_bbsurl]/apps.php?q=kmd]个人中心-孔明灯[/url] 添加推广帖子了。',
+	'kmd_admin_paylog_reject_title' => '您的孔明灯购买申请未被批准',
+	'kmd_admin_paylog_reject_content' => '您申请的孔明灯，推广版块：[url=$GLOBALS[db_bbsurl]/thread.php?fid=$L[fid]]$L[forumname][/url]，推广费用：$L[price]元，未被批准。',
+	'kmd_admin_thread_checked_title' => '您的孔明灯推广帖子已被通过',
+	'kmd_admin_thread_checked_content' => '您申请的孔明灯推广帖子：[url=$GLOBALS[db_bbsurl]/read.php?tid=$L[tid]]$L[subject][/url]，已被通过，请至相应版块查看效果。',
+	'kmd_admin_thread_reject_title' => '您的孔明灯推广帖子已被拒绝',
+	'kmd_admin_thread_reject_content' => '您申请的孔明灯推广帖子：您申请的孔明灯推广帖子：[url=$GLOBALS[db_bbsurl]/read.php?tid=$L[tid]]$L[subject][/url]，已被拒绝，请换个帖子试试。，已被拒绝，请换个帖子试试。',
+	'kmd_admin_kmd_canceled_title' => '因特殊原因，您的孔明灯已被管理员撤消',
+	'kmd_admin_kmd_canceled_content' => '对不起，您的孔明灯涉及不良操作已被管理员撤消，如有疑问请联系站方沟通。',
 );
 ?>

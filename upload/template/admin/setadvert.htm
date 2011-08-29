@@ -3,9 +3,10 @@ include_once PrintEot('left');
 print <<<EOT
 -->
 <script type="text/javascript" src="js/color_picker.js" ></script>
+<script type="text/javascript" src="js/core/core.js" ></script>
 <script type="text/javascript" src="js/global.js" ></script>
-<script  language="JavaScript" src="js/pw_ajax.js"></script>
-<script language="javascript" type="text/javascript">
+<script type="text/javascript" src="js/pw_ajax.js"></script>
+<script type="text/javascript">
 //广告新增 图片链接 和 图片上传 切换js
 function isUploadOrLinkImg(radioObj, type) {
 	var uploadInput = document.getElementById("url_"+type);
@@ -19,41 +20,41 @@ function isUploadOrLinkImg(radioObj, type) {
 	}
 }
 </script>
-<script language="JavaScript">
-function $(id){
+<script type="text/javascript">
+function getObj(id){
 	return document.getElementById(id);
 }
 
 function showSelHtml(d,s) {
 	if(s) {
-		$(d).innerHTML = $(s).innerHTML;
-		if(s == 'adimg' || s == 'adflash') $("descripstyle").style.display = "";
-		else $("descripstyle").style.display = "none";
+		getObj(d).innerHTML = getObj(s).innerHTML;
+		if(s == 'adimg' || s == 'adflash') getObj("descripstyle").style.display = "";
+		else getObj("descripstyle").style.display = "none";
 	}
-	else $(d).innerHTML = '';
+	else getObj(d).innerHTML = '';
 }
 
 function checkpost(obj) { 
-var txt_title = $("txt_title"); 
-var txt_url = $("txt_url");
-var txt_descrip = $("txt_descrip");
-var htmlcode = $("htmlcode");
-	if ($("adstxt").checked && txt_title.value == "") {
+var txt_title = getObj("txt_title"); 
+var txt_url = getObj("txt_url");
+var txt_descrip = getObj("txt_descrip");
+var htmlcode = getObj("htmlcode");
+	if (getObj("adstxt").checked && txt_title.value == "") {
 			obj.txt_title.focus();
 			showDialog("error","文字内容不能为空",2);
 			return false;
 	} 
-	if ($("adstxt").checked && txt_url.value == "") {
+	if (getObj("adstxt").checked && txt_url.value == "") {
 			obj.txt_url.focus();
 			showDialog("error","文字链接不能为空",2);
 			return false;
 	}
-	if (($("adsimg").checked || $("adsflash").checked) && txt_descrip.value == "") {
+	if ((getObj("adsimg").checked || getObj("adsflash").checked) && txt_descrip.value == "") {
 			obj.txt_descrip.focus();
 			showDialog("error","广告描述不能为空",2);
 			return false;
 	}
-	if ($("adscode").checked && htmlcode.value == "") {
+	if (getObj("adscode").checked && htmlcode.value == "") {
 			obj.htmlcode.focus();
 			showDialog("error","广告代码不能为空",2);
 			return false;
@@ -247,7 +248,7 @@ EOT;
 -->
 	</ul>
 </div>
-<script type="text/javascript" language="JavaScript" src="js/date.js"></script>
+<script type="text/javascript" src="js/date.js"></script>
 <form method="post" name="FORM" id="form1"  action="$basename&job=save&" enctype="multipart/form-data" onsubmit="return checkpost(document.FORM);">
 <input type="hidden" name="id" value="$id">
 <h2 class="h1">添加广告</h2>
@@ -840,7 +841,7 @@ EOT;
 	</select>
 </div>
 
-<script language="JavaScript">
+<script type="text/javascript">
 function showSelCate(ckey) {
 	ckey=ckey.toLowerCase();
 	if (ckey.indexOf('.popup') != -1) showSelHtml('winSet','adWin');
@@ -878,9 +879,9 @@ function showSelCate(ckey) {
 function cateDescrip(ckey) {
 	var descrip = JSONParse('$cateDescrip');
 	if (typeof descrip[ckey] != 'undefined')
-		$('cateDescrip').innerHTML = descrip[ckey];
+		getObj('cateDescrip').innerHTML = descrip[ckey];
 	else
-		$('cateDescrip').innerHTML = '';
+		getObj('cateDescrip').innerHTML = '';
 }
 showSelHtml('adSet','ad{$config[type]}');
 showSelCate(getObj('advert_ckey').value);

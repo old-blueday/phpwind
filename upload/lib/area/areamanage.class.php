@@ -127,13 +127,13 @@ class PW_AreaManage {
 	 * @return return array('模块名称1' => array('1'=>'帖子排行1','2'=>'用户排行1'));
 	 */
 	function getInvokes($channelId){
-		$pageInvokeService = L::loadClass('pageinvokeservice', 'area');
+		$invokeService = L::loadClass('invokeservice', 'area');
 		if (is_numeric($channelId)) {
 			$channelService = $this->channelService();
 			$alias = $channelService->getAliasByChannelid($channelId);
-			return ($alias) ? $pageInvokeService->getChannelInvokesForSelect($alias,0,1) : '';
+			return ($alias) ? $invokeService->getChannelInvokesForSelect($alias,0,1) : '';
 		}
-		return $pageInvokeService->getPortalInvokesForSelect($channelId,0,1);
+		return $invokeService->getPortalInvokesForSelect($channelId,0,1);
 	}
 	
 	function buildSelect($arrays,$name,$id,$select='',$isEmpty = false,$tip = ""){

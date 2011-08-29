@@ -76,7 +76,7 @@ $output = str_replace(array('<!--<!---->', "<!---->\r\n", '<!---->'), '', ob_get
 if ($db_htmifopen) {
 	$output = preg_replace("/\<a(\s*[^\>]+\s*)href\=([\"|\']?)((index|cate|thread|read|faq|rss)\.php\?[^\"\'>\s]+\s?)[\"|\']?/ies", "Htm_cv('\\3','<a\\1href=\"')", $output);
 }
-$output .= "<script language=\"JavaScript\" src=\"http://init.phpwind.net/init.php?sitehash=$db_sitehash&v=$wind_version&c=$ceversion\"></script>";
+$output .= "<script type=\"text/javascript\" src=\"http://init.phpwind.net/init.php?sitehash=$db_sitehash&v=$wind_version&c=$ceversion\"></script>";
 ob_end_clean();
 ObStart();
 echo $output;

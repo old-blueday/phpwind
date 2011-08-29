@@ -35,7 +35,7 @@ PW.WPanel.prototype.init = function()
             _this.remove();
 			try
 			{
-				if(er!=$("startMenu")&&er!=$("startPanelImg"))
+				if(er!=getObj("startMenu")&&er!=getObj("startPanelImg"))
 				{
 				STartMenu.remove();
 				}

@@ -12,17 +12,17 @@ if (!Char_cv($_COOKIE['modelguidehide'])) {
 if (!$_COOKIE['modelguidehide']) {print <<<EOT
 --> 
         <div class="spaceTip mb10 cc" id="modelguide">
-					<a href="javascript:;" class="adel" onclick="closeGuide();">关闭</a><label for="ifshow" class="mr10 fr"><input type="checkbox" name="ifshow" id="ifshow" />&nbsp;知道了以后不再显示</label><span class="mr10">鼠标移至每个标题栏处，当鼠标出现十字箭头时即可拖动</span>
+					<a href="javascript:;" class="adel" onclick="closeGuide();">关闭</a><a href="javascript:void(0);" class="mr10 fr" onclick="closeGuide(1);">知道了</a><span class="mr10">鼠标移至每个标题栏处，当鼠标出现十字箭头时即可拖动</span>
        </div>
-<script language="javascript" type="text/javascript">
-	function closeGuide() {
-		if (getObj('ifshow').checked == true) {
-			var date = new Date();
-			date.setTime(date.getTime()+86400000000);
-			document.cookie = "modelguidehide=1;expires=" + date.toGMTString() + " path=/";	
-		}
-		getObj('modelguide').style.display = 'none';	
+<script type="text/javascript">
+	function closeGuide(ck) {
+	if (ck == 1) {
+		var date = new Date();
+		date.setTime(date.getTime()+86400000000);
+		document.cookie = "modelguidehide=1;expires=" + date.toGMTString() + " ;path=/";
 	}
+	getObj('modelguide').style.display = 'none';
+}
 	
 </script>
 <!--

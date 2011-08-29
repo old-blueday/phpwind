@@ -60,8 +60,16 @@ class PW_WeiboSource extends SystemData {
 	}
 	
 	function _getAllWeibo($num) {
+		global $topic;
+		$temp = '';
+		if ($topic) {
+			$temp = $topic;
+			$topic = '';
+		}
 		$weiboService = $this->_getWeiboService();
-		return $weiboService->getWeibos(1, $num);
+		$result = $weiboService->getWeibos(1, $num);
+		$topic = $temp;
+		return $result;
 	}
 	
 	function _getWeibosByType($type, $num) {
@@ -77,11 +85,13 @@ class PW_WeiboSource extends SystemData {
 	function _cookData($data) {
 		global $db_bbsurl;
 		unset($data['password']);
-		$data['url'] = $db_bbsurl . '/'. USER_URL . $data['uid'];
+		$data['url'] = $db_bbsurl . '/apps.php?q=weibo&uid='. $data['uid'];
+		$data['content'] = strip_tags($data['content']);
+		if (!$data['content']) $data['content'] = '链接内容';
 		if (!$data['content'] && $data['transmits']) {
 			$data['content'] = '转发：' . $data['transmits']['content'];
 		}
-		$data['title'] = $data['descrip'] = strip_tags($data['content']);
+		$data['title'] = $data['descrip'] = $data['content'];
 		if (empty($data['title'])) return array();
 		if ($data['extra']['photos'] && is_array($data['extra']['photos'])) {
 			$image = $data['extra']['photos'][0];

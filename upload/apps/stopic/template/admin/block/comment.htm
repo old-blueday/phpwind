@@ -1,0 +1,186 @@
+<!--<?php
+
+if ('show' == $block_job) {
+print <<<EOT
+-->
+<script type="text/javascript" src="js/core/core.js"></script>
+<script type="text/javascript" src="js/global.js"></script>
+<script type="text/javascript" src="js/pw_ajax.js"></script>
+<script type="text/javascript" src="js/app_global.js"></script>
+<div class="cc reply_comment pr">
+	<div id="stopiccommentbox">
+		<form method="post" name="FORM" onsubmit="return addcomment(this);" action="pw_ajax.php?action=stopiccomment&type=addcomment" >
+		<input type="hidden" name="stopic_id" id="comstopic_id" value="{REPLACE_STOPIC_ID}" >
+		<div class="mb10 cc"><div class="fl" style="padding-right:2%;width:98%;"><textarea id="content" name="content" class="homeText" autocomplete="off" style="float:left;width:100%;height:60px;overflow:hidden;"></textarea></div></div>
+		<div class="mb10">
+			<span class="btn" style="margin:0;"><span><button type="submit">评论</button></span></span>
+		</div>	
+		</form>
+		
+	</div>
+	<div class="review" id="listcomments"></div>
+</div>
+<script>
+
+function listcomment(){
+	var stopic_id = getObj('comstopic_id').value;
+	getCommentList(db_bbsurl+'/pw_ajax.php?action=stopiccomment&type=listcomment&stopic_id='+stopic_id);
+}
+
+function addcomment(form){
+	var content = form.content.value;
+	if(content==''){
+		showDialog("error","内容不能为空!",2);
+		return false;
+	}
+	ajax.submit(form, function() {
+		var gotText = ajax.request.responseText;
+		if ('success' == gotText) {
+			form.content.value = '';
+			listcomment();
+		} else {
+			ajax.guide();
+		}
+	});
+	return false;
+}
+function addReply(form){
+	var content = form.content.value;
+	if(content==''){
+		showDialog("error","内容不能为空!",2);
+		return false;
+	}
+	ajax.submit(form, function() {
+		var gotText = ajax.request.responseText;
+		if ('success' == gotText) {
+			var commentnum = getObj('commentnum_'+form.commentid.value);
+			if(commentnum){
+				var regExp = /\(([0-9]+)\)/;
+				if(regExp.test(commentnum.innerHTML)){
+					var num = RegExp.$1;
+				}
+				if(isNaN(num)){
+					str = '(1)';
+				}else{
+					str = '('+(++num)+')';
+				}
+				commentnum.innerHTML = str;
+			}
+			getObj('status_'+form.commentid.value).value = 0;
+			getReplyList(form.commentid.value);
+			form.content.value = '';
+		} else {
+			ajax.guide();
+		}
+	});
+	return false;
+}
+function delcomment(commentid){
+	ajax.send(db_bbsurl+'/pw_ajax.php?action=stopiccomment&type=delcomment','commentid='+commentid,function(){
+		var rText = ajax.request.responseText;
+		if (rText=='success') {
+			var stopiccommentnum = getObj('stopiccommentnum');
+			if(stopiccommentnum){
+				var regExp = /\(([0-9]+)\)/;
+				if(regExp.test(stopiccommentnum.innerHTML)){
+					var num = RegExp.$1;
+				}
+				if(isNaN(num) || num<=0){
+					str = 0;
+				}else{
+					str = '('+(--num)+')';
+				}
+				stopiccommentnum.innerHTML = str;
+			}
+			delElement('comment_'+commentid);
+		} else {
+			ajax.guide();
+		}
+	});
+	return false;
+}
+
+function getCommentList(href){
+	ajax.send(href,'',function(){
+		getObj('listcomments').innerHTML = ajax.runscript(ajax.request.responseText);
+	});
+	scroll(0,0);
+	return false;
+}
+
+function getReplyList(commentid){
+	var statusObj = getObj('status_'+commentid);
+	statusObj.value = (statusObj.value == 1) ? 0 : 1;
+	if (statusObj.value == 1) {
+		ajax.send(db_bbsurl+'/pw_ajax.php?action=stopiccomment&type=listreply','commentid='+commentid,function(){
+			getObj('listreplys_'+commentid).innerHTML = ajax.runscript(ajax.request.responseText);
+			getObj('getreplys_'+commentid).style.display = 'block';
+		});
+		return false;
+	} else {
+		getObj('getreplys_'+commentid).style.display = 'none';
+	}
+}
+
+function replycomment(username,form){
+	form.content.value = '回复@'+username+' : ';
+}
+
+function delreply(replyid,commentid){
+	ajax.send(db_bbsurl+'/pw_ajax.php?action=stopiccomment&type=delreply','replyid='+replyid+'&commentid='+commentid,function(){
+		var rText = ajax.request.responseText;
+		if (rText=='success') {
+			var commentnum = getObj('commentnum_'+commentid);
+			if(commentnum){
+				var regExp = /\(([0-9]+)\)/;
+				if(regExp.test(commentnum.innerHTML)){
+					var num = RegExp.$1;
+				}
+				if(isNaN(num) || num<=0){
+					str = '';
+				}else{
+					str = '('+(--num)+')';
+				}
+				commentnum.innerHTML = str;
+			}
+			delElement('reply_'+replyid);
+		} else {
+			ajax.guide();
+		}
+	});
+	return false;
+}
+
+onReady(function(){
+	listcomment();
+})
+
+if (typeof(ajaxCheckLogin) == "undefined") {
+	var requesturl = location.href;
+	var topic_id = getObj('comstopic_id').value;
+	ajax.send(db_bbsurl+'/apps.php?q=ajax&a=stopiccommentbox&ajax=1','requesturl='+requesturl,function(){
+		var rText = ajax.request.responseText;
+		if (rText != 'have_login') {
+			getObj('stopiccommentbox').innerHTML = ajax.runscript(rText);
+		}
+		
+	});
+}
+</script>
+<!--
+EOT;
+} else {
+print <<<EOT
+-->
+
+<tbody>
+	<tr class="tr1 vt">
+     <td width="80" class="td2">模块名称</td>
+		 <td class="td2"><input type="text" name="block_title" value="$block[title]" class="input input_wa"></td>
+	</tr>
+</tbody>
+
+<!--
+EOT;
+}
+?>-->

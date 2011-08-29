@@ -8,7 +8,7 @@ $lang = array(
 	'chinaz_logo'		=> 'http://www.chinaz.com/images/chinaz.gif',
 	'chinaz_name'		=> '中国站长站',
 	'chinaz_url'		=> 'http://www.chinaz.com',
-	'ckpwd'				=> '确认密码',
+	'ckpwd'				=> '重复密码',
 
 	'dbattachurl'		=> '附件url地址，以http:// 开头的绝对地址，为空使用默认',
 	'dbcharset'			=> "Mysql编码设置(常用编码：gbk、big5、utf8、latin1){$crlf}如果您的论坛出现乱码现象，需要设置此项来修复{$crlf}请不要随意更改此项，否则将可能导致论坛出现乱码现象",
@@ -23,7 +23,7 @@ $lang = array(
 	'database'			=> '数据库类型',
 	'dbpconnect'		=> '是否持久连接',
 	'dbpre'				=> '表区分符',
-	'dbpres'			=> '数据库表前缀<br />非必要请保持默认',
+	'dbpres'			=> '数据库表前缀',
 	'dbpw'				=> '数据库密码',
 	'dbuser'			=> '数据库用户名',
 
@@ -35,7 +35,7 @@ $lang = array(
 	'error_adminpwd'	=> '创始人密码不能为空',
 	'error_ckpwd'		=> '两次输入密码不同',
 	'error_delrecycle'	=> '请登录后台删除回收站版块，在前台版主管理或后台回收站管理进行帖子操作',
-	'error_nodatabase'	=> '<h4><span class="fr h4-zy">您没有该 <b>{#dbname}</b> 数据库的操作权限或指定的数据库 <b>{#dbname}</b> 不存在,且您无权限建立,请联系服务器管理员!</span><span class="fl"><img src="lang/images/jinggao.gif" align="absmiddle"/></span></h4>',
+	'error_nodatabase'	=> '您没有该 <b>{#dbname}</b> 数据库的操作权限或指定的数据库 <b>{#dbname}</b> 不存在,且您无权限建立,请联系服务器管理员!',
 	'error_dbhost'		=> '数据库服务器不能为空',
 	'error_dbname'		=> '数据库名不能为空',
 	'error_dbpw'		=> '你填的数据库密码为空，是否使用空的数据库密码',
@@ -59,9 +59,9 @@ $lang = array(
 	'forumsmsg'			=> '填写分类和版块名称',
 
 	'hacklist'			=> '插件列表',
-	'have_file'			=> '<h4><span class="fr h4-zy">您已经安装过 phpwind，如需重新安装，请删除此文件（{#bbsurl}/data/{#lockfile}）再进行安装</span><span class="fl"><img src="lang/images/jinggao.gif" align="absmiddle"/> </span></h4>',
-	'have_upfile'		=> '<h4><span class="fr h4-zy">您已经升级过 phpwind，如需重新升级，请删除此文件（{#bbsurl}/data/{#lockfile}.lock）再进行后续操作</span><span class="fl"><img src="lang/images/jinggao.gif" align="absmiddle"/> </span></h4>',
-	'have_install'		=> '<h4><span class="fr h4-zy">数据库<span class="r1">{#dbname}</span>中已经安装过phpwind.“继续安装”将清除原来的数据，使用其他数据库请“返回上一步”重新设置</span><span class="fl"><img src="lang/images/jinggao.gif" align="absmiddle"/> </span></h4>',
+	'have_file'			=> '您已经安装过 phpwind，如需重新安装，请删除此文件（{#bbsurl}/data/{#lockfile}）再进行安装',
+	'have_upfile'		=> '您已经升级过 phpwind，如需重新升级，请删除此文件（{#bbsurl}/data/{#lockfile}.lock）再进行后续操作',
+	'have_install'		=> '数据库<span class="s1">{#dbname}</span>中已经安装过phpwind.“继续安装”将清除原来的数据，使用其他数据库请“返回上一步”重新设置',
 
 
 
@@ -128,7 +128,7 @@ $lang = array(
 	'log_upto_t'		=> '升级须知',
 	'log_repair_t'		=> '更新须知',
 
-	'managermsg'		=> '填写创始人信息',
+	'managermsg'		=> '创始人信息',
 
 	'name'				=> '用户名',
 	'nf_reply'			=> '最新回复',
@@ -140,7 +140,7 @@ $lang = array(
 	'pwd'				=> '密码',
 
 	'redirect'			=> '自动跳转不成功请点击这里',
-	'redirect_msg'		=> '<h4><span><img src="lang/images/jinggao.gif" align="absmiddle"/> </span><span>数据正在更新升级，这个过程比较漫长，可能需要花费您几分钟的时间，请耐心等待......</span></h4>',
+	'redirect_msg'		=> '数据正在更新升级，这个过程比较漫长，可能需要花费您几分钟的时间，请耐心等待......',
 
 	'redirect_msgs'		=> ' &nbsp; &nbsp; <font color="red">{#start}</font> TO <font color="red">{#end}</font>',
 
@@ -179,6 +179,8 @@ $lang = array(
 	'step_union'		=> '社区营销',
 	'step_union_right'	=> '下一步',
 	'step_app'		    => 'APP帖子交换成功！',
+	'writable_success'	=> '可写',
+	'writable_error'	=> '不可写',
 	'success'			=> '完 成',
 	'success_1'			=> '同意安装!',
 	'success_2'			=> '{#filename} 777属性检测通过!',
@@ -202,10 +204,35 @@ $lang = array(
 	'title_install'		=> 'phpwind 安装程序',
 	'title_repair'		=> 'phpwind 补丁程序',
 	'title_upto'		=> 'phpwind 升级程序',
+	'env_os'			=> '类UNIX',
+	'unlimited'			=> '不限制',
+	'environment_check' => '检测环境',
+	'insert_data'		=> '创建数据',
+	'install_complete'	=> '完成安装',
+	'check_enrironment'	=> '环境检测',
+	'current_server'	=> '当前服务器',
+	'recommend_env'		=> '推荐配置',
+	'lowest_env'		=> '最低要求',
+	'os'				=> '操作系统',
+	'phpversion'		=> 'PHP版本',
+	'attach_upload'		=> '附件上传',
+	'disk_space'		=> '磁盘空间',
+	'right_check'		=> '目录、文件权限检查',
+	'current_status'	=> '当前状态',
+	'required_status'	=> '所需状态',
+	'recheck'			=> '重新检测',
+	'databaseinfo'		=> '数据库信息',
+	'databasetiop'		=> '数据库服务器地址，一般为localhost',
+	'dbpretip'			=> '建议使用默认，同一数据库安装多个论坛时需修改',
+	'manager'			=> '管理员帐号',
+	'install_completed'	=> '安装完成，点击进入',
+	'complete_tips'		=> '浏览器会自动跳转，无需人工干预',
+	'installing'		=> '正在安装...',
 
 	//7.3 Start
 	'step_pre'			=> '上一步',
 	'step_next'			=> '下一步',
+	'accept'			=> '接 受',
 	'left_info'			=> '<dt style="margin:0;">更新记录</dt>
         <dd style="padding-top:5px;"><a href="http://www.phpwind.net/read-htm-tid-1251662.html" target="_blank">phpwind 8.5介绍帖</a></dd>
         <dd><a href="http://www.phpwind.net/read-htm-tid-1251648.html" target="_blank">phpwind 8.5 bug修复列表</a></dd>
@@ -569,10 +596,10 @@ $lang = array(
 	//7.3.2
 	'diary_o_uploadsize'=> 'a:5:{s:3:"jpg";i:300;s:4:"jpeg";i:300;s:3:"png";i:400;s:3:"gif";i:400;s:3:"bmp";i:400;}',
 
-	'config_noexists'	=> '<h4><span class="fr h4-zy">数据库配置文件不存在,请重新填写配置信息</span><span class="fl"><img src="lang/images/jinggao.gif" align="absmiddle"/> </span></h4>',
-	'install_initdata'	=> "<h4><span class='fr h4-zy'>正在初始化数据,请稍候...$GLOBALS[stepstring]</span><span class='fl'><img src='lang/images/jinggao.gif' align='absmiddle'/> </span></h4>",
-	'undefined_action'	=> '<h4><span class="fr h4-zy">非法操作,请返回</span><span class="fl"><img src="lang/images/jinggao.gif" align="absmiddle"/> </span></h4>',
-	'action_success'	=> '<h4><span class="fr h4-zy">此步操作完成,请进入下一步操作</span><span class="fl"><img src="lang/images/jinggao.gif" align="absmiddle"/> </span></h4>',
+	'config_noexists'	=> '数据库配置文件不存在,请重新填写配置信息',
+	'install_initdata'	=> "正在初始化数据,请稍候...$GLOBALS[stepstring]",
+	'undefined_action'	=> '非法操作,请返回',
+	'action_success'	=> '此步操作完成,请进入下一步操作',
 	'promptmsg_database'=> '继续安装',
 
 	'Site.Header'		=> '头部横幅~	~显示在页面的头部，一般以图片或flash方式显示，多条广告时系统将随机选取一条显示',

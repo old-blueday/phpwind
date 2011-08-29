@@ -1,139 +1,166 @@
 <!--<?php
 if(!$step){print <<<EOT
 -->
-<div class="main fr">
-      <div id="showlist" class="h">
-		<a id="install" style="cursor:pointer;" onClick="showdivlist('install')">$lang[log_upto_t]</a>
-	  </div>
-      <div class="m-content" id="installdiv" style="display:none;">
-		$lang[log_upto]
-      </div>
-      <center>
-		<form action="$basename?" method="post">
-		<input type="hidden" name="step" value="1">
-		<input type="submit" class="btn5" value="" />
-		</form>
-      </center>
-    </div>
-    <div class="sidebar fl link3">
-      <dl class="siderbar_dl">
-        $lang[left_info]
-      </dl>
-    </div>
+<section class="section">
+			<div class="step">
+				<ul id="stepTips">
+					<li class="current"><em>1</em>升级提醒</li>
+					<li><em>2</em>升级数据</li>
+					<li><em>3</em>升级完成</li>
+				</ul>
+			</div>
+			<div style="margin-bottom:30px;" class="success_tip error_tip" id="updateDatabase">
+				<p class="f14 b s4">phpwind v{$from_version}  升级至 $wind_version</p>
+				<p>升级前请确认站点是否关闭。</p>
+				<p>升级前请务必备份好论坛文件和数据库。</p>
+				<p>数据库大小：<span class="s1">{$databaseSize}{$unit}</span>
+<!--
+EOT;
+if (!$showBackup){print <<<EOT
+-->
+				，建议做线下备份
+<!--
+EOT;
+}print <<<EOT
+-->
+				</p>
+			</div>
+			<div class="install" id="updateMessage" style="display:none"><ul id="updateMessageList"></ul></div>
+			<div style="margin-bottom:30px;" class="bottom tac">
+<script src="js/pw_ajax.js"></script>
+<script>
+var getObj = function(id){
+	if(!id){
+		return false;
+	}
+	return document.getElementById(id);
+};
+var updateUrl = "{$_SERVER['SCRIPT_NAME']}?step=1";
 
-<script language="JavaScript">
-showdivlist('install');
-function showdivlist(showid){
-	var obj  = document.getElementById('showlist');
-	var objs = obj.getElementsByTagName('a');
-	
-	for (var i=0;i<objs.length;i++) {
-		if (objs[i].id==showid) {
-			if (document.getElementById(showid + 'div').style.display == 'none') {
-				document.getElementById(showid).className = 'y';
-				document.getElementById(showid + 'div').style.display = '';
-			} else {
-				return false;
-			}
-		} else {
-			document.getElementById(objs[i].id).className = '';
-			document.getElementById(objs[i].id + 'div').style.display = 'none';
+window.onload=function(){
+	var updateUrlCookie = FetchCookie('last_update_url');
+	if (updateUrlCookie && updateUrlCookie != '0'){
+		getObj("continueUpdateObj").style.display='';
+		getObj("continueUpdateObj").onclick = function(){
+			doUpdate(updateUrlCookie,getObj('startUpdateObj'));
 		}
 	}
-	return false;
+}
+function doUpdate(url,obj){
+	getObj("continueUpdateObj").style.display='none';
+	var stepTips = getObj('stepTips').children;
+	stepTips[0].className = 'on';
+	stepTips[1].className = 'current';
+	obj.className = 'btn_old';
+	obj.onclick = function (){return false;}
+	obj.innerHTML = '<img src="lang/images/loading.gif" align="absmiddle" />&nbsp;正在升级';
+	getObj('updateMessage').style.display='';
+	getObj('updateDatabase').style.display='none';
+	if (getObj('databaseBackup')){
+		getObj('databaseBackup').style.display='none';
+	}
+	ajaxUpdate(url,obj);
+}
+
+function ajaxUpdate(url,obj){
+	ajax.send(url,'',function(){
+		var rText = ajax.request.responseText.split("\t");
+		if (rText[2]) {
+			var messages = rText[2].split('|');
+			if (messages.length > 1) {
+				for(var i=1;i<messages.length;i++){
+					var li=document.createElement("li");
+					li.innerHTML='<span class="correct_span">√</span>' + messages[0] + messages[i];
+					getObj('updateMessageList').appendChild(li);
+				} 
+			} else {
+				var li=document.createElement("li");
+				li.innerHTML='<span class="correct_span">√</span>' + rText[2];
+				getObj('updateMessageList').appendChild(li);
+			}
+			getObj('updateMessage').scrollTop = 9999999;
+		}
+		if (rText[0] == 'continue'){
+			SetCookie('last_update_url',rText[1]);
+			setTimeout(function(){
+				ajaxUpdate(rText[1],obj);
+			},1000)
+			
+		} else if(rText[0] == 'success') {
+			SetCookie('last_update_url','0');
+			document.location = rText[1];
+		} else {
+			if (ajax.request.responseText){
+				var li=document.createElement("li");
+				li.innerHTML='<span class="error_span">√</span>' + ajax.request.responseText;
+				getObj('updateMessageList').appendChild(li);
+				getObj('updateMessage').scrollTop = 9999999;
+			}
+			obj.innerHTML = '升级失败';
+		}
+	});
 }
 </script>
 <!--
 EOT;
-}else{
-if($step == 'resources'){print <<<EOT
+if ($showBackup){print <<<EOT
 -->
-<div class="main fr">
-	<div class="h">$lang[update_3]</div>
-        
-	<div class="m-content">
-		<div class="sp-lineheight">$lang[log_resources]</div>
-	</div>
+<script>
 
-	<center>
-		  <form id="install" action="$basename?" method="post">
-			<input type="hidden" name="step" value="finish">
-		 </form>
-		<input type="button" class="btn2" value="$stepright" onClick="document.getElementById('install').submit();"/>
-	</center>
-      </div>  
-      
-        
-	<div class="st-sidebar fl link3">
-		<ul class="step">
-			<li class="step-normal"><span class="step-num">1</span>&nbsp;&nbsp;$lang[update_1]</li>
-			<li class="step-normal"><span class="step-num">2</span>&nbsp;&nbsp;$lang[update_2]</li>
-			<li class="step-on"><span class="step-num_on">3</span>&nbsp;&nbsp;$lang[update_3]</li>
-			<li class="step-sec">$lang[update_finish]</li>
-		</ul>
-		<div class="set-faq">
-			$lang[step_problem]
-		</div>   
-	</div>
-
- 
+var backupUrl = "{$_SERVER['SCRIPT_NAME']}?step=database";
+function databaseBackup(url,obj){
+	obj.className = 'btn_old';
+	obj.onclick = function(){return false;}
+	obj.innerHTML = '备份中...';
+	ajax.send(url,'',function(){
+		var rText = ajax.request.responseText.split("\t");
+		if (rText[0] == 'continue'){
+			databaseBackup(rText[1],obj);
+		} else if(rText[0] == 'success'){
+			obj.innerHTML = '备份完成';
+		} else {
+			obj.innerHTML = '备份失败';
+			setTimeout(function(){
+				obj.className = 'btn';
+				obj.innerHTML = '重新备份';
+				obj.onclick = function(){databaseBackup(backupUrl,obj);}
+			},1500);
+		}
+	});
+}
+</script>
+		<a class="btn" href="javascript:void(0)" onclick="databaseBackup(backupUrl,this);return false;" id="databaseBackup">数据备份</a>
 <!--
 EOT;
-}elseif($step == 'finish'){print <<<EOT
+}print <<<EOT
 -->
-<div class="main fr">
-	<div class="h">$lang[success]</div>
-        
-	<div class="m-content">
-		<div class="finish">
-		<h4><span class="fr h4-zy fi">$lang[success_upto]</span>
-		<p class="fr fi fi-2 ">$lang[link_index]： <a href="index.php" target="_blank">$bbsurl/index.php</a></p>
-		<p class="fr fi fi-2">$lang[link_admin]： <a href="admin.php" target="_blank">$bbsurl/admin.php</a></p>
-		<p class="fr fi fi-2">$lang[link_phpwind]： <a href="http://www.phpwind.net" target="_blank">http://www.phpwind.net</a></p>
-		<span class="fl"><img src="lang/images/wc.gif" align="top" class="fi-img"/> </span></h4>
-		</div>
+				<a class="btn" href="javascript:void(0)" onclick="doUpdate(updateUrl,this,1);return false;" id="startUpdateObj">开始升级</a>
 
-	</div>
-
-	<center>
-		 <input type="button" class="btn2" value="$lang[finish_exit]" onClick="closewindows();"/>
-		 <img src="http://nt.phpwind.net/src/upto_stats.php?url=$bbsurl&version=$wind_version&type=bbs&charsets=$lang[db_charset]&c=$ceversion" width="0" height="0"></div>
-	</center>
-      </div>  
-      
-        
-	<div class="st-sidebar fl link3">
-		<ul class="step">
-			<li class="step-normal"><span class="step-num">1</span>&nbsp;&nbsp;$lang[update_1]</li>
-			<li class="step-normal"><span class="step-num">2</span>&nbsp;&nbsp;$lang[update_2]</li>
-			<li class="step-normal"><span class="step-num">3</span>&nbsp;&nbsp;$lang[update_3]</li>
-			<li class="step-sec-on">$lang[update_finish]</li>
+				<a href="javascript:void(0)" id="continueUpdateObj" style="display:none">上次升级未完成，继续安装?</a>
+			</div>
+		</section>
+<!--
+EOT;
+}else{
+if($step == 'finish'){print <<<EOT
+-->
+<section class="section">
+	<div class="step">
+		<ul>
+			<li><em>1</em>升级提醒</li>
+			<li><em>2</em>升级数据</li>
+			<li class="current"><em>3</em>升级完成</li>
 		</ul>
-		<div class="set-faq">
-			$lang[step_problem]
-		</div>
-		<div class="set-faq" style="text-align:left;">
-			$lang[step_deldir]
-		</div>   
 	</div>
-<script language="JavaScript">
-function closewindows(){
-	var agt = navigator.userAgent.toLowerCase();
-	var is_ie = ((agt.indexOf("msie") != -1) && (agt.indexOf("opera") == -1));
-	if (is_ie) {
-		var ieversion = parseFloat(agt.substring(agt.indexOf("msie")+5,agt.indexOf(';',agt.indexOf("msie"))));
-		if (ieversion < 5.5) {
-			var str  = '<object id="notipclose" classid="clsid:adb880a6-d8ff-11cf-9377-00aa003b7a11"><param name="command" value="close"></object>';
-			document.body.insertadjacenthtml(beforeend,str);
-			document.all.notipclose.click();
-		} else {
-			window.opener = null;
-			window.close();
-		}
-	} else {
-		window.close();
-	}
-}
+	<div class="main cc">
+		<div class="success_tip">
+			<a class="f16 b" href="$bbsurl/index.php">恭喜您，升级完成，点击进入</a>
+			<p>浏览器会自动跳转，无需人工干预</p>
+		</div>
+	</div>
+</section>
+<script type="text/javascript">
+setTimeout(function(){window.location.href="$bbsurl/index.php"}, 2000);
 </script>
 <!--
 EOT;

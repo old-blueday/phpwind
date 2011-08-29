@@ -80,19 +80,45 @@ if ($colony && (!$colony['ifopen'] && !$admincheck && (!$colony['ifcyer'] || $co
 }
 //是否图酷、是否允许浏览
 $isTucool = $forumset['iftucool'] && getstatus($read['tpcstatus'], 5);
+$ptable = $read['ptable'];
 $ifhide = ($read['ifhide'] && !ifpost($tid)) ? 1 : 0;
 $isAllowViewPic = $admincheck || ($read['authorid'] == $winduid) || (!$ifhide && ($winduid || !$forumset['viewpic']));
-(!$isTucool || !$isAllowViewPic) && ObHeader("read.php?tid=$tid&displayMode=1");
+(!$isTucool || !$isAllowViewPic) && ObHeader("read.php?tid=$tid&ds=1");
 
 //禁言、屏蔽
 $userService = L::loadClass('UserService', 'user');
 $userInfo = $userService->get($read['authorid'],true,false,false);
 $ifshieldThread = (($read['ifshield'] || ($userInfo['groupid'] == 6 && $db_shield)) && !$isGM)? 0 : 1;
-!$ifshieldThread && ObHeader("read.php?tid=$tid&displayMode=1");
+!$ifshieldThread && ObHeader("read.php?tid=$tid&ds=1");
 
 $attachsService = L::loadClass('Attachs', 'forum');
 $tucoolAttachs = $attachsService->getSlidesByTidAndUid($tid,$read['authorid']);
-!$tucoolAttachs && ObHeader("read.php?tid=$tid&displayMode=1");
+!$tucoolAttachs && ObHeader("read.php?tid=$tid&ds=1");
+
+if ($read['aid']) {
+	$attachShow = new attachShow(($isGM || $pwSystem['delattach']), $forumset['uploadset'], $forumset['viewpic']);
+	$attachShow->setData($tucoolAttachs);
+	if ($attachShow->isShow($read['ifhide'], $tid)) {
+		$read += $attachShow->parseAttachs($read['pid'], $read['content'], $winduid == $read['authorid']);
+	} else {
+		$read['content'] = $attachShow->clearAttachTags($read['content']);
+	}
+	$contentAids = $attachShow->findPicAids($read['content']);
+	if ($read['ifconvert'] == 2) {
+		$read['content'] = convert($read['content'], $db_windpost);
+		if (strrpos($read['content'],'attachment') !== false) {
+			$haveAids = $attachShow->findPicAids($read['content']);
+		}
+	}
+	$noAids = array_diff((array)$contentAids,(array)$haveAids);
+}
+if (S::isArray($noAids)) {
+	foreach ($tucoolAttachs as $v) {
+		if (S::inArray($v['aid'],$noAids)) unset($tucoolAttachs[$v[aid]]);
+	}
+}
+// 编辑图片信息权限
+$editAttachRight = ($admincheck || $read['authorid'] == $winduid) ? 1 : 0;
 
 //更新帖子点击
 if ($db_hits_store == 0){
@@ -106,7 +132,8 @@ if ($db_hits_store == 0){
 //帖子浏览记录
 $readlog = str_replace(",$tid,",',',GetCookie('readlog'));
 $readlog.= ($readlog ? '' : ',').$tid.',';
-substr_count($readlog,',')>11 && $readlog = preg_replace("/[\d]+\,/i",'',$readlog,3);
+$readlogCount = substr_count($readlog,',');
+$readlogCount>11 && $readlog = preg_replace("/[\d]+\,/i",'',$readlog,$readlogCount-11);
 Cookie('readlog',$readlog);
 
 require_once PrintEot('slide');

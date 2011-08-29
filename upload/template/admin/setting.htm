@@ -278,7 +278,7 @@ EOT;
 			<tr class="tr1 vt">
 				<td class="td1">搜索返回结果数</td>
 				<td class="td2"><input name="config[maxresult]" value="$db_maxresult" class="input input_wa" /></td>
-				<td class="td2"><div class="help_a">搜索一次得到的结果数量</div></td>
+				<td class="td2"><div class="help_a">搜索一次得到的最大数量</div></td>
 			</tr>
 			<tr class="tr1 vt">
 				<td class="td1">搜索间隔时间[秒]</td>
@@ -553,6 +553,16 @@ EOT;
 	<div class="admin_table mb10">
 	<table width="100%" cellspacing="0" cellpadding="0">
 		<tr class="tr1 vt">
+			<td class="td1">云验证码</td>
+			<td class="td2">
+				<ul class="list_A list_80">
+					<li><input type="radio" value="1" name="config[cloudgdcode]" $cloudgdcode_Y>开启</li>
+					<li><input type="radio" value="0" name="config[cloudgdcode]" $cloudgdcode_N>关闭</li>
+				</ul>
+			</td>
+			<td class="td2"><div class="help_a">开启后将使用云验证码，其他的验证码设置项对云验证码无效<br/>关闭则使用系统验证码<br/>云验证码能够有效增强系统的安全性， 并且降低系统资源的消耗</div></td>
+		</tr>
+		<tr class="tr1 vt">
 			<td class="td1">开启验证码</td>
 			<td class="td2">
 				<ul class="list_A list_120">
@@ -826,12 +836,12 @@ print <<<EOT
 		<tr class="tr1 vt">
 			<td class="td1">注册文件名</td>
 			<td class="td2"><input name="config[registerfile]" value="$db_registerfile" class="input input_wa" /></td>
-			<td class="td2"><div class="help_a">默认为register.php。请确保此处与系统注册文件名保存一致</div></td>
+			<td class="td2"><div class="help_a">默认为register.php。请确保此处与系统注册文件名保存一致。如该文件不可写，请到主目录下手动删除</div></td>
 				</tr>
 		<tr class="tr1 vt">
 			<td class="td1">后台登录文件名</td>
 			<td class="td2"><input name="config[adminfile]" value="$db_adminfile" class="input input_wa" /></td>
-			<td class="td2"><div class="help_a">默认为admin.php。请确保此处与后台登录文件名保存一致</div></td>
+			<td class="td2"><div class="help_a">默认为admin.php。请确保此处与后台登录文件名保存一致。如该文件不可写，请到主目录下手动删除</div></td>
 				</tr>
 		<tr class="tr1 vt">
 			<td class="td1">内部网IP匹配</td>
@@ -1054,7 +1064,7 @@ EOT;
 		<tr class="tr1 vt">
 			<td class="td1">附件上传数量限制</td>
 			<td class="td2"><input name="config[attachnum]" value="$db_attachnum" class="input input_wa" /></td>
-			<td class="td2"><div class="help_a">一次最多可上传的附件个数</div></td>
+			<td class="td2"><div class="help_a">一次最多可上传的附件个数。上传数量不能小于1，如果设置数小于1系统会自动设置默认值4</div></td>
 		</tr>
 		<tr class="tr1 vt">
 			<td class="td1">附件类型和尺寸控制[KB]</td>
@@ -1089,7 +1099,7 @@ EOT;
 	</table>
 	</div>
 </div>
-<script type="text/javascript" language="JavaScript">
+<script type="text/javascript">
 var admin_file = '$admin_file';
 function findPosX(obj) {
 	var curleft = 0;
@@ -1147,11 +1157,12 @@ function waterPreview(){
 }
 
 function thumbPreview(){
-	var url = admin_file+'?adminjob=settings&admintype=att&pathumb=1&athumbsize[athumbwidth]='+encodeURIComponent(getObj('athumbsize[athumbwidth]').value)+'&athumbsize[athumbheight]='+encodeURIComponent(getObj('athumbsize[athumbheight]').value)+'&';
+	var athumbtype = (getObj('athumbtype1').checked == true) ? 1 : 0;
+	var url = admin_file+'?adminjob=settings&admintype=att&pathumb=1&athumbsize[athumbwidth]='+encodeURIComponent(getObj('athumbsize[athumbwidth]').value)+'&athumbsize[athumbheight]='+encodeURIComponent(getObj('athumbsize[athumbheight]').value)+'&athumbtype='+encodeURIComponent(athumbtype)+'&';
 	window.open(url);
 }
 </script>
-<script type="text/javascript" language="JavaScript" src="js/color_picker.js"></script>
+<script type="text/javascript" src="js/color_picker.js"></script>
 <div id="stypewatermark" style="display:$display;">
 	<h3 class="h1">水印设置</h3>
 	<div class="admin_table mb10">
@@ -1274,29 +1285,61 @@ EOT;
 				<td class="td2">
 					<ul class="list_A list_80">
 						<li><input type="radio" value="1" name="config[ifathumb]" $ifathumb_Y>开启</li>
-						<li><input type="radio" value="0" name="config[ifathumb]" $ifathumb_N>关闭</li>
+						<li><input type="radio" value="0" name="config[ifathumb]" $ifathumb_N onclick="showtips('thumbtips')">关闭</li>
+						<div class="fl" id="thumbtips" style="display:none">
+	    					<div style="position:absolute;margin-top:22px;">
+								<div class="popout">
+									<table border="0" cellspacing="0" cellpadding="0">
+										<tbody>
+											<tr><td class="bgcorner1"></td>
+												<td class="pobg1"></td>
+												<td class="bgcorner2"></td>
+											</tr>
+											<tr><td class="pobg4"></td>
+											<td>
+											<div class="popoutContent">
+											<div style="width:370px;">
+											<div class="popTop cc"><a href="javascript:;" class="del_img fr" onclick="hidetips('thumbtips')">关闭</a>友情提示
+											</div>
+											<p class="s4 cc p10">关闭图片缩略功能，会影响其他相关的图酷、相册、日志等功能，建议开启！</p>
+											</div></div></td>
+											<td class="pobg2"></td></tr>
+											<tr><td class="bgcorner4"></td><td class="pobg3"></td><td class="bgcorner3"></td></tr>
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</div>
 					</ul>
 				</td>
 				<td class="td2"><div class="help_a">将站点的图片附件按照一定比例进行缩略</div></td>
 			</tr>
 			<tr class="tr1 vt">
-				<td class="td1">gif图片缩略</td>
-				<td class="td2">
-					<ul class="list_A list_80">
-						<li><input type="radio" value="1" name="config[ifathumbgif]" $ifathumbgif_Y>开启</li>
-						<li><input type="radio" value="0" name="config[ifathumbgif]" $ifathumbgif_N>关闭</li>
-					</ul>
-				</td><td class="td2"><div class="help_a"></div></td>
-			</tr>
-			<tr class="tr1 vt">
-				<td class="td1">图片缩略宽高控制[像素]</td>
+				<td class="td1">缩略机制选择</td>
 				<td class="td2">
 					<ul class="list_C">
-						<li>宽:<input id="athumbsize[athumbwidth]" name="athumbsize[athumbwidth]" value="$db_athumbwidth" class="input input_wc" /></li>
-						<li>高:<input id="athumbsize[athumbheight]" name="athumbsize[athumbheight]" value="$db_athumbheight" class="input input_wc" /></li>
+						<li><input type="radio" value="1" id="athumbtype1" name="config[athumbtype]" $athumbtype_Y>等比压缩，多余去除</li>
+						<li><input type="radio" value="0" id="athumbtype0" name="config[athumbtype]" $athumbtype_N>等比压缩，不截多余</li>
+					</ul>
+				</td><td class="td2"><div class="help_a">按设置尺寸等比压缩，截去多余部分，没有空白<br />按设置尺寸等比压缩，图片完整保留，但有空白 </div></td>
+			</tr>
+			<tr class="tr1 vt">
+				<td class="td1">论坛中图缩略控制[像素]</td>
+				<td class="td2">
+					<ul class="list_C">
+						<li><input id="athumbsize[athumbwidth]" name="athumbsize[athumbwidth]" value="$db_athumbwidth" class="input input_wc" /> X <input id="athumbsize[athumbheight]" name="athumbsize[athumbheight]" value="$db_athumbheight" class="input input_wc" /></li>
 					</ul>
 				</td>
-				<td class="td2"><div class="help_a">对超过此设定值的图片进行缩略,宽度不要超过700<br />0或留空表示不限制</div></td>
+				<td class="td2"><div class="help_a">宽×高，高度不建议控制；小于此尺寸的图片不会缩略生成中图，0代表不限制</div></td>
+			</tr>
+			<tr class="tr1 vt">
+				<td class="td1">图片质量</td>
+				<td class="td2">
+					<ul class="list_C">
+						<li><input id="config[quality]" name="config[quality]" value="$db_quality" class="input input_wc" /></li>
+					</ul>
+				</td>
+				<td class="td2"><div class="help_a">决定 jpg 格式图片的质量，其值范围从 0 到 100，数值越大，图片质量越高，图片也越大</div></td>
 			</tr>
 			<tr class="tr1 vt">
 				<td class="td1">缩略图效果预览</td>
@@ -1359,7 +1402,7 @@ EOT;
 		</table>
 	</div>
 </div>
-<script language="JavaScript">
+<script type="text/javascript">
 var watermark_type = '$db_watermark';
 function changeWatermark(type) {
 	if(type == 1) {
@@ -1381,6 +1424,12 @@ function changeWatermark(type) {
 	}
 }
 changeWatermark(watermark_type);
+function hidetips(obj) {
+	getObj(obj).style.display = 'none';
+}
+function showtips(obj) {
+	getObj(obj).style.display = '';
+}
 </script>
 <!--
 EOT;
@@ -1527,7 +1576,7 @@ EOT;
 		</table>
 	</div>
 </div>
-<script language="javascript">
+<script type="text/javascript">
 function creditSelectByType(typeName) {
 	var checkStatus = getCreditCheckAllStatus(typeName) ? false : true;
 	var checkElements = getObj("stypepass").getElementsByTagName("input");
@@ -1878,7 +1927,7 @@ EOT;
 		</tr>
 	</table>
 </div>
-<script language="JavaScript">
+<script type="text/javascript">
 var rg_registertype = '$rg_registertype';
 function registerType(id) {
 	if (id == 1) {
@@ -2462,8 +2511,6 @@ if ($ml_mailifopen == 1) {print <<<EOT
 <div class="tac mb10">
 	<span class="bt2"><span><button type="button" onclick="checkemail();">检测邮件发送设置</button></span></span>
 </div>
-<script src="js/pw_ajax.js"></script>
-<script src="js/global.js"></script>
 <!--
 EOT;
 }print <<<EOT
@@ -2595,7 +2642,7 @@ print <<<EOT
 		<tr class="tr1 vt">
 			<td class="td1">搜索返回结果数</td>
 			<td class="td2"><input name="config[maxresult]" value="$db_maxresult" class="input input_wa" /></td>
-			<td class="td2"><div class="help_a">搜索一次得到的结果数量</div></td>
+			<td class="td2"><div class="help_a">搜索一次得到的最大数量</div></td>
 		</tr>
 		<tr class="tr1 vt">
 			<td class="td1">搜索间隔时间[秒]</td>

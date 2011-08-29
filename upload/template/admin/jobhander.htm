@@ -2,8 +2,8 @@
 include_once PrintEot('left');
 print <<<EOT
 -->
-<script type="text/javascript" language="JavaScript" src="js/desktop/adminjob.js"></script>
-<script type="text/javascript" language="JavaScript" src="js/date.js"></script>
+<script type="text/javascript" src="js/desktop/adminjob.js"></script>
+<script type="text/javascript" src="js/date.js"></script>
 <div class="admin_info mb10">
   <h3 class="h1"><b>提示信息</b></h3>
   <div class="legend">
@@ -183,11 +183,13 @@ print <<<EOT
         <td class="td2">$medalSelect</td>
         <td class="td2"><div class="help_a"></div></td>
       </tr>
+	  <!--
       <tr class="tr1 vt">
         <td class="td1">有效期[天]</td>
         <td class="td2"><input name="reward[medal][day]" type="text" class="input input_wa" value="$r_medal[day]"/></td>
         <td class="td2"><div class="help_a"></div></td>
       </tr>
+	  -->
     </table>
   </div>
   <!-- 用户组 -->

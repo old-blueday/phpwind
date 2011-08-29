@@ -14,7 +14,7 @@ if ($action == 'state') {
 		$authService = L::loadClass('Authentication', 'user');
 		$returnData = $authService->sendData('credit.site.setstatus', array('isopen' => $authstate ? true : false));
 		if ($authstate && !$returnData->status) {
-			adminmsg('由于网络原因，实名认证启用失败，请稍后再试');
+			adminmsg('与app平台通信失败，请到应用中心设置app平台选项 并登陆');
 		}
 		
 		//云统计获取实名认证的安装时间
@@ -58,19 +58,24 @@ if ($action == 'state') {
 		list($catedb, $threaddb) = getAllThreads();
 		$space  = '<i class="lower lower_a"></i>';
 	} elseif ($step == 2) {
-		InitGP(array('auth','changedphone','changedalipay','changedcertificate'));
-		$changedphone = $changedphone ? array_filter(explode(',', $changedphone)) : array();
-		$changedalipay = $changedalipay ? array_filter(explode(',', $changedalipay)) : array();
-		$changedcertificate = $changedcertificate ? array_filter(explode(',', $changedcertificate)) : array();
-		$changedArray = array_merge($changedphone,$changedalipay, $changedcertificate);
+		$items = array('changedcellphone','changedalipay','changedcertificate','changedallowread','changedallowpost','changedallowrp','changedallowupload','changedlogicalmethod');
+		InitGP(array_merge(array('auth') , $items));
+		$tmpArray = $changedArray = $updateArray = array();
+		foreach ($items as $v) {
+			$$v && $changedArray = array_merge(explode(',',$$v), $changedArray);
+		}
 		$changedArray = array_unique($changedArray);
 		empty($changedArray) && adminmsg('operate_error', "$basename&admintype=authentication&action=forumpost");
-		$updateArray = array();
 		foreach ($changedArray as $value) {
 			$updateArray[$value] = array(
 				'auth_cellphone' => ($auth[$value]['cellphone'] ? 1 : 0),
 				'auth_alipay' => ($auth[$value]['alipay'] ? 1 : 0),
-				'auth_certificate' => ($auth[$value]['certificate'] ? 1 : 0)
+				'auth_certificate' => ($auth[$value]['certificate'] ? 1 : 0),
+				'auth_allowread' => ($auth[$value]['allowread'] ? 1 : 0),
+				'auth_allowpost' => ($auth[$value]['allowpost'] ? 1 : 0),
+				'auth_allowrp' => ($auth[$value]['allowrp'] ? 1 : 0),
+				'auth_allowupload' => ($auth[$value]['allowupload'] ? 1 : 0),
+				'auth_logicalmethod' => ($auth[$value]['logicalmethod'] ? 1 : 0)
 			);
 		}
 		updateForumset($updateArray);
@@ -131,8 +136,14 @@ if ($action == 'state') {
 					$v['createtime'] = date('Y-m-d H:i:s',$v['createtime']);
 					$v['state'] = $states[$v['state']];
 					$v['type'] = $types[$v['type']];
-					$v['attach1'] && $v['attach1'] = "attachment/{$v['attach1']}?".$timestamp;
-					$v['attach2'] && $v['attach2'] = "attachment/{$v['attach2']}?".$timestamp;
+					if ($v['attach1']) {
+						list($v['attach1'],) = geturl($v['attach1'], 'lf');
+						$v['attach1'] = $v['attach1'].'?'.$timestamp;
+					}
+					if ($v['attach2']) {
+						list($v['attach2'],) = geturl($v['attach2'], 'lf');
+						$v['attach2'] = $v['attach2'].'?'.$timestamp;
+					}
 					$v['username'] = $userNames[$v['uid']];
 					$certificateInfo[$k] = $v;
 				}

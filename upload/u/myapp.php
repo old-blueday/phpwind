@@ -60,7 +60,9 @@ if (empty($action)) {
 } elseif ($action == 'del') {
 	define('AJAX',1);
 	S::gp(array('id'));
-	$db->update("DELETE FROM pw_userapp WHERE uid=" . S::sqlEscape($winduid) . ' AND appid=' . S::sqlEscape($id));
+	//$db->update("DELETE FROM pw_userapp WHERE uid=" . S::sqlEscape($winduid) . ' AND appid=' . S::sqlEscape($id));
+	$appclient = L::loadClass('appclient');
+	$appclient->deleteUserAppByUidAndAppid($winduid,$id);
 
 	if ($db->affected_rows()) {
 

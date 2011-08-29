@@ -22,7 +22,7 @@ if (empty($check_step)) {
 	
 	if ($db_authcertificate) {//证件认证信息
 		$authService = L::loadClass('Authentication', 'user');
-		$certificateInfo = $authService->getCertificateInfoByUid($userdb['uid']);
+		$certificateInfo = $authService->getCertificateInfoByUid($winduid);
 	}
 
 } elseif ($check_step == 'mobile') {
@@ -90,6 +90,11 @@ if (empty($check_step)) {
 		$trade['iscertified'] = $is_certified;
 		$userService->update($winduid, array(), array(), array('tradeinfo' => serialize($trade)));
 		$userService->setUserStatus($winduid, PW_USERSTATUS_AUTHALIPAY);
+		//颁发勋章
+		if ($db_md_ifopen) {
+			$medalService = L::loadClass('medalservice','medal');
+			$medalService->awardMedalByIdentify($winduid,'shimingrenzheng');
+		}
 		//任务
 		//initJob($winduid,'doAuthAlipay');
 		//if($db_job_isopen){

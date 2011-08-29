@@ -236,7 +236,7 @@ if (!$step) {
 		$db->update(pwQuery::buildClause("UPDATE :pw_table SET ifmark=ifmark+:ifmark  WHERE tid=:tid", array('pw_threads', $addpoint, $tid)));
 		$rpid = 0;
 
-		$pwSQL = S::sqlSingle(array(
+		$pwSQL = array(
 			'fid'	=> $fid,
 			'tid'	=> $tid,
 			'pid'	=> $rpid,
@@ -245,8 +245,9 @@ if (!$step) {
 			'pinger'=> $windid,
 			'record'=> $atc_content,
 			'pingdate'=> $timestamp,
-		));
-		$db->update("INSERT INTO pw_pinglog SET $pwSQL");
+		);
+		//$db->update("INSERT INTO pw_pinglog SET $pwSQL");
+		pwQuery::insert('pw_pinglog', $pwSQL);
 		update_markinfo($fid, $tid, $rpid);
 
 		//* $threadobj = L::loadClass("threads", 'forum');

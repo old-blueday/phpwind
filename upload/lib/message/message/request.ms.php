@@ -22,7 +22,7 @@ class MS_Request extends MS_Base {
 			return false;
 		}
 		$this->_updateStatisticsByUserNames($userIds,false,$this->_request,1);
-		$this->_updateUserMessageNumbers($userIds);
+		$this->_updateUserMessageNumbers($userIds,$this->_request);
 		return $messageId;
 	}
 	function getAllRequests($userId,$page,$perpage){

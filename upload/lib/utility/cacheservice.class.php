@@ -213,7 +213,7 @@ class Cache_Config_Filecache {
 class Cache_Config_Dbcache {
 	
 	function connect() {
-		return $GLOBALS ['db']->sql;
+		return $GLOBALS ['db']->getMastdb()->sql;
 	}
 	/**
 	 * 键值创建表,可自定义hash扩展数据表

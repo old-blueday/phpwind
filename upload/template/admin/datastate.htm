@@ -8,7 +8,7 @@ print <<<EOT
     <li $cls_reply><a href="$baseurl&type=reply">回复统计</a></li>
     <li $cls_regmen><a href="$baseurl&type=regmen">注册统计</a></li>
     <li $cls_postmenc><a href="$baseurl&type=postmen">发帖人数统计</a></li>
-	<li><a href="$admin_file?adminjob=yunstatistics" onclick="openNewUrl('yunstatistics','云统计',this.href);return false;"><span class="beta">云统计</span></a></li>
+	<li><a href="$admin_file?adminjob=app&admintype=yunstatistics" onclick="openNewUrl('yunstatistics','云统计',this.href);return false;"><span class="beta">云统计</span></a></li>
   </ul>
 </div>
 <div class="admin_info mb10">
@@ -45,7 +45,7 @@ EOT;
   </table>
 </div>
 <div style="padding:13px 30px;display:none;position:absolute;background:#fff;border:1px solid $tablecolor;" id="s_loading"><img src="$imgpath/loading.gif" align="absbottom" /> 正在统计数据...</div>
-<script language="JavaScript">
+<script type="text/javascript">
 function sort(o) {
 	var s = getObj('s_loading');
 	s.style.display = '';
@@ -98,7 +98,7 @@ EOT;
   </table>
 </div>
 <div style="padding:13px 30px;display:none;position:absolute;background:#fff;border:1px solid $tablecolor;" id="s_loading"><img src="$imgpath/loading.gif" align="absbottom" /> 正在统计数据...</div>
-<script language="JavaScript">
+<script type="text/javascript">
 function sort(o) {
 	var s = getObj('s_loading');
 	s.style.display = '';

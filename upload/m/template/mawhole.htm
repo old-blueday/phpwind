@@ -1,0 +1,59 @@
+<!--<?php 
+defined('W_P') or exit('Forbidden');
+print <<<EOT
+-->
+<div class="navigator"><a href="#anch-end"><img alt="$db_bbsname" src="$wapImages/x.gif" /></a>
+	<a href="index.php?a=list">$db_bbsname</a>&gt;<a href="index.php?a=forum&fid=$fid">$foruminfo[name]</a></div> 
+<div class="post_title">
+	主题：<strong>$threadb[subject] </strong>
+	<div class="post_author"><a href="index.php?a=u&username=$threadb[author]&amp;tid=$tid">
+		$threadb[author]</a> 发表于 $threadb[postdate]
+	</div>
+</div>
+<form action="index.php?a=mawhole&action=del" method="post" name="form1">
+<input type="hidden" value=$fid name="fid"/>
+<input type="hidden" value=$seltid name="seltid"/>
+<input type="hidden" value=$selpid name="selpid"/>
+<div>
+	<table>
+<!--
+EOT;
+if($replydb){
+print <<<EOT
+-->
+		<tr>
+			<td>删除回复：</td>
+			<td>$replydb[content]</td>
+		</tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+		<tr>
+			<td colspan="2">管理选项：</td>
+		</tr>
+		<tr>
+			<td>扣除积分：</td>
+			<td><input type="radio" checked="" value="1" name="ifdel"/>是
+			    <input type="radio" value="0" name="ifdel"/>否</td>
+		</tr>
+		<tr>
+			<td>短消息通知：</td>
+			<td><input type="radio" checked="" value="1" name="ifmsg"/>是
+				<input type="radio" value="0" name="ifmsg"/>否</td>
+		</tr>
+		<tr>
+			<td colspan="2">操作原因：</td>
+		</tr>
+		<tr>
+			<td colspan="2"><textarea maxlength="420" rows="3" name="atc_content"></textarea></td>
+		</tr>
+		<tr>
+			<td colspan="2"><input type="submit" value="提交" name="submit"/> </td>
+		</tr>
+	</table>
+</div>
+</form>
+<!--
+EOT;
+?>-->

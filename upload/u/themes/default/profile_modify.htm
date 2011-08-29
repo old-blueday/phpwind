@@ -130,7 +130,7 @@ if($_G[allowhonor]){print <<<EOT
 							<tr>
 								<th class="th">个性签名</th>
 								<td class="td">
-									<input class="input input_wb mr10" type="text" name="prohonor" value="$userdb[honor]" />（将在我的首页和帖子页面用户信息处显示）
+									<input class="input input_wb mr10" type="text" name="prohonor" value="$userdb[honor]" />（将在帖子页面用户信息处显示）
 								</td>
 							</tr>
 <!--
@@ -186,7 +186,7 @@ include(R_P.'template/admin/timezone.htm');print <<<EOT
 						<div class="tac" style=" padding:1em">
 							<span class="btn"><span><button type="submit">保存资料</button></span></span>
 						</div>
-<script language="JavaScript">
+<script>
 var charset = '$db_charset';
 var signnum = '$_G[signnum]' * 1;
 initCheckTextNum('prointroduce', 'prointroduce_warn', 500);
@@ -276,7 +276,7 @@ EOT;
 						<div class="tac" style=" padding:1em">
 							<span class="btn"><span><button type="submit">保存资料</button></span></span>
 						</div>
-<script language="JavaScript">
+<script>
 function addtrade() {
 	var s = getObj('trade_mode').firstChild.cloneNode(true);
 	getObj('trade_c').appendChild(s);
@@ -655,7 +655,7 @@ print <<<EOT
 				</div></td></tr></table>
             </div>
         </div>
-<script language="JavaScript">
+<script>
 var display = '$display';
 function CkFaceType(value) {
 	var facetype = document.getElementsByName('facetype');
@@ -730,12 +730,12 @@ function setFaceLen() {
 }
 function selectTab(tab) {
 	showTabs('infolist', tab, 'li', 'current');
-	$('userbinding-node').style.display = (tab == 'binding') ? '' : 'none';
+	getObj('userbinding-node').style.display = (tab == 'binding') ? '' : 'none';
 }
 
 function checkMobile() {
 	var url = 'profile.php?action=auth&check_step=mobile';
-	var mobile = $('td_input_mobile').value;
+	var mobile = getObj('td_input_mobile').value;
 
 	if (mobile != '' && typeof (mobile) != 'undefined') {
 		url += '&check_mobile='+mobile;

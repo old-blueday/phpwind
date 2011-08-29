@@ -1,19 +1,25 @@
 <!--<?php
 $imageConfigTabs = array();
-($db_allowupload && $_G['allowupload']) && $imageConfigTabs[] = 'local';
+($db_allowupload && $_G['allowupload'] && (!$_G['allownum'] || $winddb['uploadnum'] < $_G['allownum'])) && $imageConfigTabs[] = 'local';
 ($db_phopen && $winduid) && $imageConfigTabs[] = 'album';
 $imageConfigTabs[] = 'network';
 $imageConfigTabs = "'" . implode("','", $imageConfigTabs) . "'";
+//max attachnum
+if ($_G['allownum'] > 0 && $_G['allownum'] - $winddb['uploadnum']<$db_attachnum){
+	$maxAttachnum = $_G['allownum'] - $winddb['uploadnum'];
+} else {
+	$maxAttachnum = $db_attachnum;
+}
 print <<<EOT
 -->
-<link rel="stylesheet" type="text/css" href="js/breeze/editor/style/style.css" />
+<link rel="stylesheet" href="js/breeze/editor/style/style.css?{$GLOBALS['wind_repair']}" />
 <textarea id="textarea" name="atc_content" class="B_textarea" tabindex="200">{$atc_content}</textarea>
 <script src="$db_htmdir/js/face.js"></script>
 <script>var BREEZE_BASE_PATH = getBaseUrl() + 'js/breeze/';</script>
 <script src="js/breeze/core/base.js"></script>
 <script type="text/javascript">
 var attachConfig = {
-		'attachnum' : parseInt('$db_attachnum'),
+		'attachnum' : parseInt('$maxAttachnum'),
 		'type' : 'diary',
 		'list' : {{$attach}}
 	},

@@ -7,6 +7,8 @@ S::gp ( array ('q') );
 
 selectMode($m,$q);
 
+if ($m == 'bbs') ObHeader($_mainUrl);
+
 /*APP 应用跳转*/
 if ($m == 'o' && $q) {
 	if ($q == 'user') {

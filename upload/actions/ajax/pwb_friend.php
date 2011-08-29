@@ -9,6 +9,7 @@ $str = '';
 if ($friends) {
 	$friend_online = array();
 	foreach ($friends as $key => $value) {
+		if ($value['uid'] == $winduid) continue;
 		if ($value['thisvisit'] + $db_onlinetime * 1.5 > $timestamp) {
 			$friend_online[] = array(
 				'uid' => $value['uid'],

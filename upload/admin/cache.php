@@ -19,7 +19,6 @@ function updatecache($array='') {
 		updatecache_ml();
 
 		updatecache_f(1);
-		updatecache_md(1);
 		updatecache_l(1);
 		updatecache_gr(1);
 
@@ -324,9 +323,9 @@ function updatecache_i($return=0) {
 	$query = $db->query("SELECT threadorder,name,url,descrip,logo FROM pw_sharelinks WHERE ifcheck=1 ORDER BY threadorder");
 	while ($rt = $db->fetch_array($query)) {
 		if ($rt['threadorder']<0) {
-			$sharelink[0][] = ($rt['logo'] ? "<dl class=\"sharelink cc\"><dt class=\"fl mr10\"><a href=\"$rt[url]\"><img src=\"$rt[logo]\" width=\"88\" height=\"31\" alt=\"$rt[name]\" /></a></dt>" : '')."<dd><p><a href=\"$rt[url]\" target=\"_blank\">$rt[name]</a></p>$rt[descrip]</dd></dl>";
+			$sharelink[0][] = ($rt['logo'] ? "<dl class=\"sharelink cc\"><dt class=\"fl mr10\"><a href=\"$rt[url]\"><img src=\"$rt[logo]\" width=\"88\" height=\"31\" alt=\"$rt[name]\" title=\"$rt[name]\" /></a></dt>" : '')."<dd><p><a href=\"$rt[url]\" target=\"_blank\">$rt[name]</a></p>$rt[descrip]</dd></dl>";
 		} elseif ($rt['logo']) {
-			$sharelogo .= "<a href=\"$rt[url]\" target=\"_blank\"><img src=\"$rt[logo]\" alt=\"$rt[descrip]\" width=\"88\" height=\"31\"></a>";
+			$sharelogo .= "<a href=\"$rt[url]\" target=\"_blank\"><img src=\"$rt[logo]\" alt=\"$rt[descrip]\" title=\"$rt[descrip]\" width=\"88\" height=\"31\"></a>";
 		} else {
 			$sharetext .= "<a href=\"$rt[url]\" target=\"_blank\" title=\"$rt[name] $rt[descrip]\">$rt[name]</a>";
 		}
@@ -570,10 +569,11 @@ function updatecache_ad() {
 * 更新核心设置组缓冲
 */
 function updatecache_c() {
-	global $db,$db_bbsurl,$db_mode;
+	global $db,$db_bbsurl,$db_mode, $updateCookiePre;
 	$query = $db->query("SELECT db_name,vtype,db_value FROM pw_config");
 	$configdb = $regdb = "<?php\r\n";
 	$sitehash = '';
+	$cookiepre = false;
 	while (@extract($db->fetch_array($query))) {
 		$db_name = key_cv($db_name);
 		if ($vtype == 'array' && !is_array($db_value = unserialize($db_value))) {
@@ -584,13 +584,14 @@ function updatecache_c() {
 		} elseif (strpos($db_name,'rg_') !== false) {
 			$regdb .= "\$$db_name=".pw_var_export($db_value).";\r\n";
 		}
+		$db_name == 'db_cookiepre' && $cookiepre = true;
 		$db_name == 'db_sitehash' && $sitehash = $db_value;
 	}
 	$advertdb = updatecache_ad();
 	$configdb .= "\$db_advertdb=".pw_var_export($advertdb).";\r\n";
 	$configdb .= "\$db_windcode=".pw_var_export(updatecache_wcode()).";\r\n";
-	$configdb .= "\$db_cookiepre='".substr(md5($sitehash),0,5)."';\r\n";
-
+	!$cookiepre && $configdb .= "\$db_cookiepre='" . substr(md5($sitehash), 0, 5) . "';\r\n";
+	
 	$creditdb = array();
 	$query = $db->query("SELECT * FROM pw_credits");
 	//$query = $db->query("SELECT * FROM pw_credits WHERE type='main'");
@@ -911,35 +912,13 @@ function updatecache_ol() {
 	$onlinedb .= "?>";
 	pwCache::setData(D_P.'data/bbscache/ol_config.php',$onlinedb);
 }
-function updatecache_md($return=0) {
-	global $db;
-	$medaldb='';
-	$query = $db->query("SELECT * FROM pw_hack WHERE hk_name LIKE 'md\_%'");
-	while (@extract($db->fetch_array($query))) {
-		$hk_name = key_cv($hk_name);
-		$medaldb.="\$$hk_name=".pw_var_export($hk_value).";\r\n";
-	}
-	pwCache::setData(D_P.'data/bbscache/md_config.php',"<?php\r\n".$medaldb."\r\n?>");
-	$cache = $medaldb;
-	$db->pw_update(
-		"SELECT * FROM pw_cache WHERE name='md_config'",
-		"UPDATE pw_cache SET cache=".S::sqlEscape($cache,false)."WHERE name='md_config'",
-		"INSERT INTO pw_cache SET name='md_config',cache=".S::sqlEscape($cache,false)
-	);
-	if (empty($return)) {
-		cache_read();
-	}
-}
+
 function updatecache_mddb($return=0) {
 	global $db;
-	$medaldb = array();
-	$query = $db->query("SELECT * FROM pw_medalinfo ORDER BY id");
-	while ($rt = $db->fetch_array($query)) {
-		$medaldb[$rt['id']] = $rt;
-	}
-	$medaldb = "\$_MEDALDB=".pw_var_export($medaldb).";";
-	pwCache::setData(D_P.'data/bbscache/medaldb.php',"<?php\r\n".$medaldb."\r\n?>");
-	$cache = $medaldb;
+	$medalService = L::loadClass('medalservice','medal');
+	$medalInfos = $medalService->getAllOpenMedals();
+	
+	$cache.="\$_MEDALDB=".pw_var_export($medalInfos).";\r\n";
 	$db->pw_update(
 		"SELECT * FROM pw_cache WHERE name='medaldb'",
 		"UPDATE pw_cache SET cache=".S::sqlEscape($cache,false)."WHERE name='medaldb'",
@@ -1172,14 +1151,14 @@ function get_subhelp($subdb,$hid,$lv = 0,$fathers = null) {
 }
 function cache_read() {
 	global $db;
-	$query = $db->query("SELECT * FROM pw_cache WHERE name IN('forum_cache','md_config','level','gp_right','customfield','medaldb','postcache','index_cache','thread_announce')");
+	$query = $db->query("SELECT * FROM pw_cache WHERE name IN('forum_cache','level','gp_right','customfield','medaldb','postcache','index_cache','thread_announce')");
 	$c = array();
 	while ($rt = $db->fetch_array($query)) {
 		$c[$rt['name']] = $rt['cache']."\r\n\r\n";
 	}
 	pwCache::setData(D_P.'data/bbscache/cache_index.php',"<?php\r\n{$c[level]}{$c[index_cache]}?>");
 	pwCache::setData(D_P.'data/bbscache/cache_thread.php',"<?php\r\n{$c[forum_cache]}{$c[thread_announce]}?>");
-	pwCache::setData(D_P.'data/bbscache/cache_read.php',"<?php\r\n{$c[forum_cache]}{$c[md_config]}{$c[level]}{$c[gp_right]}{$c[customfield]}{$c[medaldb]}?>");
+	pwCache::setData(D_P.'data/bbscache/cache_read.php',"<?php\r\n{$c[forum_cache]}{$c[level]}{$c[gp_right]}{$c[customfield]}{$c[medaldb]}?>");
 	pwCache::setData(D_P.'data/bbscache/cache_post.php',"<?php\r\n{$c[forum_cache]}{$c[level]}{$c[postcache]}?>");
 }
 function db_cv($array) {

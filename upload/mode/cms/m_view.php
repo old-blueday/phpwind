@@ -3,7 +3,7 @@
 
 require_once (R_P . 'require/bbscode.php');
 require_once (R_P . 'require/functions.php');
-S::gp(array('id', 'page'), '', 2);
+S::gp(array('id', 'page', 'replypage'), '', 2);
 !$page && $page = 1;
 $stylepath = L::style('stylepath');
 $articleService = C::loadClass('articleservice'); /* @var $articleService PW_ArticleService */
@@ -36,6 +36,21 @@ $definedSeo = array('title'=>$column['seotitle'],
 					'metaKeywords'=>$column['seokeywords']);
 */
 cmsSeoSettings('read',null,$column['name'],$articleModule->subject,'',$articleModule->descrip);
+if (checkReplyPurview()) {
+	// 编辑器
+	$uploadfiletype = ($db_uploadfiletype) ? unserialize($db_uploadfiletype) : array();
+	$attachAllow = pwJsonEncode($uploadfiletype);
+	$imageAllow = pwJsonEncode(getAllowKeysFromArray($uploadfiletype, array('jpg','jpeg','gif','png','bmp')));
+}
+// 评论列表
+$reply_perpage = 10;
+!$replypage && $replypage = 1;
+$cmscomment = C::loadClass('cmscommentservice');
+$replyCount = $cmscomment->getCommentsCountByArticleId($id);
+$cmsReplyList = $cmscomment->getCommentsByArticleId($id,$replypage,$reply_perpage);
+$replynumofpage=ceil($replyCount/$reply_perpage);
+$replyPages = numofpage($replyCount,1,$replynumofpage,"pw_ajax.php?action=cmsreply&type=listcomment&id=$id&",10,'getCommentList');
+
 require_once (M_P . 'require/header.php');
 require cmsTemplate::printEot('view');
 footer();

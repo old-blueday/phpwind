@@ -108,6 +108,7 @@ class PW_CacheDistribute_File extends PW_CacheDistribute_Base {
 			foreach ( $data as $key => $value ) {
 				if (! preg_match ( '/^\w+$/', $key ))
 					continue;
+				if (is_numeric($key)) $key = '_'.$key;
 				$_tmp .= "\$" . $key . " = " . pw_var_export ( $value ) . ";\r\n";
 			}
 			$data = "<?php\r\n" . $_tmp . "\r\n?>";
@@ -152,13 +153,15 @@ class PW_CacheDistribute_DataBase extends PW_CacheDistribute_Base {
 	}
 	
 	function _initConnection() {
-		if (! $this->_db) {
+		global $db;
+		if (!$db) {
 			list ( $database, $dbhost, $dbuser, $dbpw, $dbname, $PW, $charset, $pconnect ) = $this->_loadConfig ();
 			if (!class_exists('DB')){
 				require_once S::escapePath ( R_P . "require/db_$database.php" );
 			}
-			$this->_db = new DB ( $dbhost, $dbuser, $dbpw, $dbname, $PW, $charset, $pconnect );
+			$db = new DB ( $dbhost, $dbuser, $dbpw, $dbname, $PW, $charset, $pconnect );
 		}
+		$this->_db = $db;
 	}
 	
 	function getData($filePath, $isRegister = true, $isReadOver = false) {
@@ -258,7 +261,7 @@ class PW_CacheDistribute_DataBase extends PW_CacheDistribute_Base {
 	}
 	
 	function _formatToDatabase($data) {
-		return base64_encode ( (S::isArray ( $data )) ? serialize ( $data ) : $data );
+		return base64_encode ( (is_array ( $data )) ? serialize ( $data ) : $data );
 	}
 	
 	function _formatFromDataBase($data) {
@@ -317,7 +320,9 @@ class PW_CacheDistribute_Base {
 		include S::escapePath ( $filePath );
 		unset ( $filePath );
 		unset ( $this );
-		return get_defined_vars ();
+		$temp = get_defined_vars ();
+		if (isset($temp['php_errormsg'])) unset($temp['php_errormsg']); //fix php5.3.5 bug
+		return $temp;
 	}
 	
 	function _getFileKey($string) {

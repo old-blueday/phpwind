@@ -74,7 +74,7 @@ EOT;
 if ($searchForumPart1 || $searchForumPart2) {
 print <<<EOT
 -->
-<script language="JavaScript">
+<script>
 setCurrent('fid_{$fid}','','current');
 function showmore() {
 	var morefids = getObj('morefids');
@@ -116,7 +116,7 @@ EOT;
 print <<<EOT
 -->
 		</ul>
-        <script language="JavaScript">setCurrent('posttime_{$starttime}','','current');</script>
+        <script>setCurrent('posttime_{$starttime}','','current');</script>
 	</div>
 
 <!--
@@ -134,7 +134,7 @@ print <<<EOT
         <li id="sortby_postdate"><a href="{$filterSortbyUrl}sortby=postdate&">按发帖时间</a></li>
 		<li id="sortby_lastpost"><a href="{$filterSortbyUrl}sortby=lastpost&">按回复时间</a></li>
 		</ul>
-        <script language="JavaScript">setCurrent('sortby_{$sortby}','sortby_relation','current');</script>
+        <script>setCurrent('sortby_{$sortby}','sortby_relation','current');</script>
 	</div>
 <!--
 EOT;

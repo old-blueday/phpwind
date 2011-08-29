@@ -3,7 +3,6 @@
 
 S::gp(array('action'));
 $invokeService = L::loadClass('invokeservice', 'area');
-$pageInvokeService = L::loadClass('pageinvokeservice', 'area');
 $pushdataService = L::loadClass('pushdataservice', 'area');
 S::gp(array('keyword','page','alias','invoke','invokepiece'));
 
@@ -16,7 +15,6 @@ if (!$action || $action =='viewverify') {
 	$portalPages = $portalPageService->getPortalPages();
 
 	$ifverify = $action ? 1 : 0;
-	//$invokes = $pageInvokeService->getChannelInvokesForSelect($alias,$ifverify);
 	$invokes = $portalPageService->getPageInvokesForSelect($alias,$ifverify);
 
 	if ($invokes && $invoke && $invokes[$invoke]) {
@@ -48,7 +46,8 @@ if (!$action || $action =='viewverify') {
 		
 		$invokepieceid = $invokepiece['id'];
 		$invokename = $invokepiece['invokename'];
-		$channelAlias = $pageInvokeService->getSignByInvokeName($invokename);
+		$invokeInfo = $invokeService->getInvokeByName($invokename);
+		$channelAlias = $invokeInfo['sign'];
 		
 		$portalPageService = L::loadClass('portalpageservice', 'area');
 		$portalPages = $portalPageService->getPortalPages();

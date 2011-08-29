@@ -75,6 +75,7 @@ class postSpecial {
 		$mailfee	= S::escapeChar(S::getGP('mailfee'));
 		$expressfee	= S::escapeChar(S::getGP('expressfee'));
 		$emsfee		= S::escapeChar(S::getGP('emsfee'));
+		$icon		= S::escapeChar(S::getGP('attachment_1'));
 
 		$degree = intval(S::getGP('degree'));
 		$ptype = intval(S::getGP('ptype'));
@@ -115,6 +116,7 @@ class postSpecial {
 		$this->data['num'] = $goodsnum;
 		$this->data['paymethod'] = $paymethod;
 		$this->data['transport'] = $transport;
+		$icon && $this->data['icon'] = $icon;
 	}
 
 	function _setIcon() {
@@ -134,7 +136,7 @@ class postSpecial {
 
 	function insertData($tid) {
 		$this->data['tid'] = $tid;
-		$this->_setIcon();
+		//$this->_setIcon();
 		$this->db->update("INSERT INTO pw_trade SET " . S::sqlSingle($this->data));
 	}
 
@@ -143,7 +145,7 @@ class postSpecial {
 	}
 
 	function updateData($tid) {
-		$this->_setIcon();
+		//$this->_setIcon();
 		$pwSQL = array(
 			'tid'		=> $tid,						'name'		=> $this->data['name'],
 			'degree'	=> $this->data['degree'],		'type'		=> $this->data['type'],

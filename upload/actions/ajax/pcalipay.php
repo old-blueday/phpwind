@@ -15,7 +15,7 @@ if (empty($_POST['step'])) {
 	$fieldvalue['ifpay'] && Showmsg('pcjoin_payed');
 	$fieldvalue['endtime'] < $timestamp && Showmsg('pcjoin_end');
 	$nums = $fieldvalue['nums'];
-	$deposit = !$fieldvalue['deposit'] ? $fieldvalue['price'] : $fieldvalue['deposit'];
+	$deposit = !intval($fieldvalue['deposit']) ? $fieldvalue['price'] : $fieldvalue['deposit'];
 	$totalcash = $fieldvalue['totalcash'];
 	$alipayurl = "trade.php?action=pcalipay&tid=$tid&pcmid=$pcmid&pcid=$pcid";
 }

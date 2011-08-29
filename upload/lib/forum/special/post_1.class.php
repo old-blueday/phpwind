@@ -80,14 +80,17 @@ class postSpecial {
 	function setUp($vtcount) {
 		global $timestamp;
 		$regdatelimit = S::getGP('regdatelimit', 'P');
-		$multiplevote = intval(S::getGP('multiplevote', 'P'));
+		//$multiplevote = intval(S::getGP('multiplevote', 'P'));
+		$multiplevote = 1;
 		$mostvotes = intval(S::getGP('mostvotes', 'P'));
 		$timelimit = intval(S::getGP('timelimit', 'P'));
 		$modifiable = intval(S::getGP('modifiable', 'P'));
 		$previewable = intval(S::getGP('previewable', 'P'));
 		$leastvotes = intval(S::getGP('leastvotes', 'P'));
 		$postnumlimit = intval(S::getGP('postnumlimit', 'P'));
-		$creditlimit = S::getGP('creditlimit', 'P');
+		//$creditlimit = S::getGP('creditlimit', 'P');
+		$creditlimitname = S::getGP('creditlimitname', 'P');
+		$creditlimitvalue = intval(S::getGP('creditlimitvalue', 'P'));
 
 		if (empty($multiplevote)) {
 			$mostvotes = 1;
@@ -102,12 +105,15 @@ class postSpecial {
 		$regdatelimit = strtotime($regdatelimit);
 		//$regdatelimit = $regdatelimit > $timestamp ? $timestamp : $regdatelimit;
 
+		/*
 		$creditlimit_temp = array();
 		foreach ($creditlimit as $key => $value) {
 			if (!empty($value)) {
 				$creditlimit_temp[$key] = (int)$value;
 			}
 		}
+		*/
+		$creditlimitvalue && $creditlimit_temp = array($creditlimitname => $creditlimitvalue);
 		$this->data['modifiable'] = $modifiable;
 		$this->data['previewable'] = $previewable;
 		$this->data['multiple'] = $multiplevote;

@@ -24,7 +24,7 @@ $purview = array(
 	//'jsinvoke' => array('JS调用设置', "$admin_file?adminjob=settings&admintype=jsinvoke"),
 	//'popinfo' => array('信息提示设置', "$admin_file?adminjob=settings&admintype=popinfo"),
 	'email' => array('电子邮件', "$admin_file?adminjob=settings&admintype=email"),
-	'wap' => array('WAP设置', "$admin_file?adminjob=settings&admintype=wap"),
+	//'wap' => array('WAP设置', "$admin_file?adminjob=settings&admintype=wap"),
 	'urlcheck' => array('外链提醒', "$admin_file?adminjob=urlcheck"),
 	'help' => array('帮助中心', "$admin_file?adminjob=help"),
 	'sethtm' => array('伪静态', "$admin_file?adminjob=sethtm"),
@@ -39,8 +39,8 @@ $purview = array(
 	'draftset' => array('草稿箱', "$admin_file?adminjob=draftset"),
 	'tpccheck' => array('帖子审核', "$admin_file?adminjob=tpccheck"),
 	'report' => array('举报管理', "$admin_file?adminjob=report"),//注意后面的空格
-	'reportcontent' => array('举报管理', "$admin_file?adminjob=report&adminitem=content"),
-	'reportremind' => array('举报提醒', "$admin_file?adminjob=report&adminitem=remind"),
+	'reportcontent' => array('举报管理', "$admin_file?adminjob=report&admintype=reportcontent"),
+	'reportremind' => array('举报提醒', "$admin_file?adminjob=report&admintype=reportremind"),
 	'tagset' => array('标签管理', "$admin_file?adminjob=tagset"),
 	//'pwcode' => array('自定义代码格式', "$admin_file?adminjob=pwcode"),
 	//'setform' => array('预设帖子格式', "$admin_file?adminjob=setform"),
@@ -97,6 +97,10 @@ $purview = array(
 	'rebang' => array('内容推送', "$admin_file?adminjob=rebang"),
 	'plantodo' => array('计划任务', "$admin_file?adminjob=plantodo"),
 	'team' => array('团队考核', "$admin_file?adminjob=team"),
+//	'products' => array('phpwind产品库',"$admin_file?adminjob=admincollege&admintype=products"),
+	'hacksource' => array('插件大全',"$admin_file?adminjob=admincollege&admintype=hacksource"),
+	'stylesource' => array('风格大全',"$admin_file?adminjob=admincollege&admintype=stylesource"),
+	'kmd_set' => array('孔明灯', "$admin_file?adminjob=apps&admintype=kmd_set"),
 	'modeset' => array('模式设置', "$admin_file?adminjob=modeset"),
 	//'area_pushdata'	=> array('内容推送',"$admin_file?adminjob=mode&admintype=area_pushdata"),
 	//'cms_article' => array('内容管理',"$admin_file?adminjob=mode&admintype=cms_article"),	
@@ -115,6 +119,11 @@ $purview = array(
 	'o_commend' => array('内容推送',"$admin_file?adminjob=mode&admintype=o_commend"),
 	'o_skin' => array('风格设置', "$admin_file?adminjob=mode&admintype=o_skin"),
 	'rightset' => array('权限管理', "$admin_file?adminjob=rightset"),
+
+	'wapconfig' => array('浏览设置 ',"$admin_file?adminjob=wapconfig"),
+	'wapsettings' => array('内容推荐',"$admin_file?adminjob=wapsettings"),
+	'wapadvert' => array('wap广告管理',"$admin_file?adminjob=wapadvert"),
+
 	'manager' => array('创始人管理', "$admin_file?adminjob=manager"),
 	'ystats' => array('量子统计', "$admin_file?adminjob=ystats&action=config"),
 	'diyoption' => array('常用定制', "$admin_file?adminjob=diyoption"),
@@ -136,6 +145,7 @@ $purview = array(
 	'taolianjie' => array('淘链接',"$admin_file?adminjob=app&admintype=taolianjie"),
 	'sinaweibo' => array('新浪微博',"$admin_file?adminjob=app&admintype=sinaweibo"),
 	'authentication' => array('实名认证',"$admin_file?adminjob=authentication"),
+	'cloudcaptcha' => array('云验证码',"$admin_file?adminjob=cloudcaptcha"),
 	'yunstatistics' => array('云统计<i class="beta">&nbsp;</i>',"$admin_file?adminjob=app&admintype=yunstatistics"),
 	//'appslist' => array('基本设置', "$admin_file?adminjob=app&admintype=appslist"),
 	'appset' => array('应用首页', "$admin_file?adminjob=app&admintype=appset"),
@@ -157,9 +167,17 @@ $purview = array(
 	//'app_share' => array('分享管理', "$admin_file?adminjob=apps&admintype=app_share&action=share"),
 	'weibo_set' => array('新鲜事', "$admin_file?adminjob=apps&admintype=weibo_set"),
 	'weibo_manage' => array('新鲜事管理', "$admin_file?adminjob=apps&admintype=weibo_manage"),
+	
+	'medal_manage' => array('勋章', "$admin_file?adminjob=apps&admintype=medal_manage"),
 
 	'hot' => array('热榜', "$admin_file?adminjob=apps&admintype=hot"),
 	'stopic' => array('专题制作', "$admin_file?adminjob=apps&admintype=stopic"),
+	'hookcenter' => array('扩展中心', "$admin_file?adminjob=hookcenter"),
+
+	'yunbasic'       => array('概况',"$admin_file?adminjob=yunbasic"),
+	'yuncheckserver' => array('服务检测',"$admin_file?adminjob=yuncheckserver"),
+	'yunsearch'      => array('云搜索',"$admin_file?adminjob=yunsearch"),
+	'yundefend'      => array('云盾',"$admin_file?adminjob=yundefend"),
 );
 
 //模式菜单加载

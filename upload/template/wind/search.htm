@@ -55,7 +55,7 @@ if($_G[allowsearch]==2 && ($p_table || $t_table)){print <<<EOT
 								<span id="ttable" style="display:none;">$t_table</span>
 								<span><input type="radio" name="sch_area" value="2" onclick="gettable(this.value);" $checked_2/>回复标题与回复内容</span>
 								<span id="ptable" style="display:none;">$p_table</span>
-<script language="JavaScript">
+<script>
 var sch_area = '$sch_area';
 function gettable(value){
 	var ttable = document.getElementById("ttable");
@@ -165,7 +165,7 @@ EOT;
 	</table>
 </div>
 </form>
-<script language="JavaScript">
+<script>
 window.onunload = function(){document.sF.submit?document.sF.submit.disabled = false:0;};
 function showAdvancedSearch(){
 	if (getObj('advanced_search').style.display == 'none'){
@@ -230,7 +230,13 @@ EOT;
 
 <!--
 EOT;
-}if($sch['topped']){print <<<EOT
+}
+if($sch['topped']==4){print <<<EOT
+-->
+<img src="$imgpath/pwicon/headtopic_$sch[topped].gif" alt="置顶帖标志" />						
+<!--
+EOT;
+}elseif($sch['topped']){print <<<EOT
 -->
 <img src="$imgpath/$stylepath/file/headtopic_$sch[topped].gif" alt="置顶帖标志" />
 <!--
@@ -361,7 +367,7 @@ if(!$admincheck && $superRight ){print <<<EOT
 EOT;
 }print <<<EOT
 -->
-<script language="JavaScript">
+<script>
 function CheckAll(form){
 	var len = {$admincheck} ? form.elements.length-12 : form.elements.length;
 	for (var i=0;i<len;i++){

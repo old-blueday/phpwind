@@ -12,22 +12,21 @@ if (!defined('AJAX')) {print <<<EOT
 <meta name="generator" content="phpwind v{$metaVersion}" />
 <meta name="description" content="$metaDescription" />
 <meta name="keywords" content="$metaKeywords" />
-<SCRIPT type="text/javascript" language="JavaScript" src="js/core/core.js"></SCRIPT>
-<script type="text/javascript" language="JavaScript" src="js/pw_ajax.js"></script>
-<!--css-->
-<link rel="stylesheet" href="$imgpath/pw_core.css?101128" />
+<base id="headbase" href="$db_bbsurl/" />
+<link rel="stylesheet" href="$imgpath/pw_core.css?{$GLOBALS['wind_repair']}" />
 <!--
 EOT;
 @include Pcv($css_path);
-}
 print <<<EOT
 -->
-<link rel="stylesheet" href="$imgpath/register/register.css?110120" />
+<link rel="stylesheet" href="$imgpath/register/register.css?{$GLOBALS['wind_repair']}" />
+<script type="text/javascript" src="js/core/core.js"></script>
+<script type="text/javascript" src="js/pw_ajax.js"></script>
 </head>
-<body onKeyDown="try{keyCodes(event);}catch(e){}">
+<body>
 <!--
 EOT;
-if($step=='permit'){print <<<EOT
+}if($step=='permit'){print <<<EOT
 -->
 <div style="width:480px;height:296px;">
 	<iframe frameborder='0' style='position:absolute;top:0;width:100%;height:306px;filter:Alpha(opacity=0);_filter:Alpha(opacity=0);opacity:.0;'></iframe>
@@ -36,21 +35,25 @@ if($step=='permit'){print <<<EOT
 		<table width="100%">
 			<tr>
 				<td>
-					<div style="width:460px; height:220px;overflow-x:hidden; overflow-y:scroll; border:1px solid #eee" contenteditable="true">$rg_config[rg_rgpermit]</div>
+					<div style="width:460px; height:220px;overflow-x:hidden; overflow-y:scroll; border:1px solid #eee">$rg_config[rg_rgpermit]</div>
 				</td>
 			</tr>
 		</table>
 		<div class="popBottom"><span class="btn2"><span><button type="button" id="regbutton" onClick="unpermit();">同 意</button></span></span></div>
 	</div>
 </div>
-<script language="JavaScript">
-getObj('regbutton').focus();
+<script type="text/javascript">
+
 
 function unpermit() {
 	getObj("registerclause").disabled = '';
 	getObj("registerclause").checked = 'checked';
 	closep();
+	getObj("regname").focus();
 }
+onReady(function(){
+	getObj('regbutton').focus();
+})
 </script>
 <!--
 EOT;
@@ -58,7 +61,7 @@ EOT;
 -->
 <div class="wrap">
 <div id="header">
-		<div style="height:24px;"></div>
+		<div class="head_top"></div>
 		<div id="head" class="cc">
 				<a href="$db_bbsurl/"><img src="$imgpath/$stylepath/logo.png" class="fl" title="phpwind" /></a>
 		</div>
@@ -101,12 +104,12 @@ EOT;
 -->
 			<dl class="cc">
 				<dt><label for="regname">用户名<span class="s1">*</span></label></dt>
-				<dd class="ip"><div><input type="text" name="regname" id="regname" value="" maxlength="$regmaxname" class="input" /></div></dd>
+				<dd class="ip"><div><input type="text" required="required" name="regname" id="regname" value="" maxlength="$regmaxname" class="input" /></div></dd>
 				<dd class="tp"><div id="regname_info"></div></dd>
 			</dl>
 			<dl class="cc">
 				<dt><label for="regpwd">密&#160;&#160;码<span class="s1">*</span></label></dt>
-				<dd class="ip"><div><input type="password" maxlength="$regmaxpwd" name="regpwd" id="regpwd" class="input" onKeyUp="CreateRatePasswdReq(this,'$regminname');" /></div></dd>
+				<dd class="ip"><div><input type="password" maxlength="$regmaxpwd" name="regpwd" id="regpwd" class="input" onKeyUp="CreateRatePasswdReq(this,'$regminname');" required="required" /></div></dd>
 				<dd class="tp"><div id="pwd_info"></div></dd>
 			</dl>
 			<div style="margin:-10px 0 5px 145px;height:20px;" class="cc">
@@ -120,7 +123,7 @@ EOT;
 			</div>
 			<dl class="cc">
 				<dt><label for="regpwdrepeat">确认密码<span class="s1">*</span></label></dt>
-				<dd class="ip"><div><input type="password" maxlength="75" class="input" name="regpwdrepeat" id="regpwdrepeat" /></div></dd>
+				<dd class="ip"><div><input type="password" maxlength="75" class="input" name="regpwdrepeat" id="regpwdrepeat" required="required" /></div></dd>
 				<dd class="tp"><div id="pwdrepeat_info"></div></dd>
 			</dl>
 <!-- 
@@ -171,7 +174,7 @@ EOT;
 -->
 			<dl class="cc">
 				<dt><label for="regemail">电子邮箱<span class="s1">*</span></label></dt>
-				<dd class="ip"><div class=""><input type="text"  maxlength="75" name="regemail" value="" class="input" id="regemail"/></div>
+				<dd class="ip"><div class=""><input type="email"  maxlength="75" name="regemail" value="" class="input" id="regemail" required="required" /></div>
 				<!--p class="cc"><label><input type="checkbox" name="regemailtoall" value="1" style="width:auto;padding:0;margin:0;" /> 公开电子邮箱</label></p-->
 				</dd>
 				<dd class="tp"><div id="email_info">
@@ -203,7 +206,7 @@ if($rg_config['rg_allowregister']==2){print <<<EOT
 <!--
 EOT;
 if($inv_config['inv_onlinesell']){print <<<EOT
---><span id="buy_invitecode"><p class="p5"><a href="javascript:;" class="s4" onClick="insertOnlineSell();">购买邀请码</a></p></span>
+--><span id="buy_invitecode"><p class="p5"><a href="javascript:;" class="s4" onMouseDown="insertOnlineSell();">购买邀请码</a></p></span>
 <!--
 EOT;
 }print <<<EOT
@@ -299,7 +302,8 @@ if(substr($val[3],0,1)=='1'){print <<<EOT
 <!--
 EOT;
 }}}if($db_gdcheck & 1){
-$gdSize = explode("\t",$db_gdsize);
+$checkCode = L::loadClass('checkcode', 'site');
+$checkCodeString = $checkCode->getCheckCodeTemplate();
 print <<<EOT
 -->
 
@@ -307,14 +311,8 @@ print <<<EOT
 						<dt><label for="gdcode">验证码<span class="s1">*</span></label></dt>
 						<dd class="ip ck">
 							<div><input id="gdcode" class="input" name="gdcode" value="" /></div>
-							<span id="menu_gd"></span>
-<script type="text/javascript" src="js/pw_authcode.js"></script>
-<script>
-var flashWidth = "$gdSize[0]";
-var flashHeight = "$gdSize[1]";
-var gdtype = $db_gdtype;
-showGdCode();
-</script>
+							<span id="menu_gd" style="display:none;"></span>
+$checkCodeString
 						</dd>
 						<dd class="tp"><div id="gdcode_info"></div></dd>
 				</dl>
@@ -330,7 +328,7 @@ EOT;
 				<dl>
 					<dt>&nbsp;</dt>
 					<dd>
-						<span class="btn"><span><button type="button" onClick="checkAll();">提交注册</button></span></span>
+						<span class="btn"><span><button type="submit" onClick="checkAll(event);">提交注册</button></span></span>
 					</dd>
 					<dd class="regTips">
 					</dd>
@@ -343,14 +341,48 @@ EOT;
 					<p style="padding-bottom:50px;"><span class="bt"><span><button type="button" onClick="location.href='login.php#breadCrumb';">马上登录</button></span></span>
 					<!--p>使用合作网站帐号登录：</p-->
 				</div>
+<!--
+EOT;
+/* platform weibo app --start */
+L::loadClass('WeiboLoginViewHelper', 'sns/weibotoplatform/viewhelper', false);
+$weiboLoginService = L::loadClass('WeiboLoginService', 'sns/weibotoplatform/service');
+$loginWays = $weiboLoginService->getLoginWays();
+if ($loginWays) {
+print <<<EOT
+-->
+				<link rel="stylesheet" href="u/images/expand/weibologin.css" />
+				<div style="padding-left:20px;">
+					<p class="f14 mb5">使用合作网站帐号登录：</p>
+					<ul class="waysList cc">
+<!--
+EOT;
+	foreach ($loginWays as $loginWay) {
+			$windowOpenScript = WeiboLoginViewHelper_WindowOpenScript($loginWay['type']);
+print <<<EOT
+-->
+			<li style="float:none;width:140px;"><a class="s4" title="使用{$loginWay['accountTitle']}登录" href="javascript:;" onClick="$windowOpenScript"><img src="{$loginWay['loginLogo']}" />{$loginWay['accountTitle']}</a></li>
+<!--
+EOT;
+	}
+print <<<EOT
+-->
+					</ul>
+				</div>
+<!--
+EOT;
+}
+/* platform weibo app --end */
+
+print <<<EOT
+-->
 			</div>
 		</form>
 		</div>
 	</div>
 </div>
-<script type="text/javascript" language="JavaScript" src="js/pw_register.js"></script>
-<script type="text/javascript" language="JavaScript" src="js/passwordstrength.js"></script>
-<script language="JavaScript">
+<script type="text/javascript" src="js/pw_register.js"></script>
+<script type="text/javascript" src="js/passwordstrength.js"></script>
+<script type="text/javascript">
 var charset = '$db_charset';
 var retminname	= parseInt('$regminname');
 var regmaxname	= parseInt('$regmaxname');
@@ -423,7 +455,7 @@ if(getObj('regqkey')){
 		regInfo[5] 	= new Array(
 						" ",
 						"验证答案错误",
-						"问题:$question 请输入答案:$db_answer[$qkey]");
+						"问题:$question （答案：$db_answer[$qkey]）");
 	}
 	else{
 		regInfo[5] 	= new Array(
@@ -462,12 +494,7 @@ function permit() {
 	//getObj("registerclause").disabled = 'disabled';//b445
 	try {ajax.send('$db_registerfile?ajax=1&step=permit','',ajax.get);} catch(e){}
 }
-if (regdetail) {
-	setTimeout('permit();',1000);
-} else {
-	setTimeout("getObj('regname').focus();", 500);
-	getObj('registerclause').checked="checked";
-}
+
 function getPwdRule(){
 	var intiString 	= "";
 	if(regminpwd){
@@ -521,6 +548,16 @@ function insertOnlineSell() {
 	//menu_editor.innerHTML = '';
 	read.open('menu_editor','','2');
 }
+onReady(function(){
+	if (regdetail) {
+		setTimeout('permit();',1000);
+	} else {
+		getObj('registerclause').checked="checked";
+		setTimeout(function(){
+			getObj('regname').focus();
+		}, 500);
+	}
+});
 </script>
 <!-- 
 EOT;
@@ -537,7 +574,8 @@ var authInfo = new Array("",
 	"你今天获取验证码次数已达到上限",
 	"验证码输入有误",
 	"您的帐户尚未绑定手机认证",
-	"手机验证码不能为空"
+	"手机验证码不能为空",
+	"您的手机号码已被列入黑名单"
 );
 
 /*手机实名认证*/
@@ -876,7 +914,7 @@ EOT;
 	</div>
 </div>
 <iframe id="hideframe" name="hideframe" width="0" height="0" marginwidth="0" frameborder="0" src="about:blank"></iframe>
-<script language="JavaScript">
+<script>
 var display = '$display';
 var imgpath = '$imgpath';
 var defaultCheckType = '$defaultCheckFirst';
@@ -1016,7 +1054,7 @@ print<<<EOT
 				<dl style="padding-top:10px;_padding-top:0;">
 					<dt>&nbsp;</dt>
 					<dd>
-						<span class="btn"><span><button type="button" onClick="checkAll();">提交</button></span></span>
+						<span class="btn"><span><button type="button" onClick="checkAll(event);">提交</button></span></span>
 						<span class="bt"><span><button onClick="javascript:location.replace('$skipUrl')" type="button">跳过</button></span></span>
 					</dd>
 				</dl>
@@ -1026,8 +1064,8 @@ print<<<EOT
 		</div>
 	</div>
 </div>
-<script type="text/javascript" language="JavaScript" src="js/pw_register.js"></script>
-<script language="JavaScript">
+<script type="text/javascript" src="js/pw_register.js"></script>
+<script type="text/javascript">
 var imgpath = '$imgpath';
 var extracheck	= new Array();
 var checkboxArray = new Array();
@@ -1079,9 +1117,10 @@ print<<<EOT
 <!--
 EOT;
 if(checkOnline($user['thisvisit'])){
+$gender = $user['gender'] == 2 ? 'women' : 'man';
 print <<<EOT
 -->
-						<img src="$imgpath/online.png" alt="在线" title="在线" style="vertical-align:middle" />
+						<span class="{$gender}_ol mr5" title="在线" alt="在线">在线</span>
 <!--
 EOT;
 }print <<<EOT
@@ -1107,9 +1146,10 @@ print<<<EOT
 <!--
 EOT;
 if(checkOnline($user['thisvisit'])){
+$gender = $user['gender'] == 2 ? 'women' : 'man';
 print <<<EOT
 -->
-						<img src="$imgpath/online.png" alt="在线" title="在线" style="vertical-align:middle" />
+						<span class="{$gender}_ol mr5" title="在线" alt="在线">在线</span>
 <!--
 EOT;
 }print <<<EOT
@@ -1131,7 +1171,7 @@ if (!$rg_config['rg_recommendnames'] && !$mayKnownUsers) {
 print<<<EOT
 -->
 					<div class="regIgnore">
-						<p class="f14 mb10">对不起，还没有可能您感兴趣的人，请联系站长通过后台配置！</p>
+						<p class="f14 mb10">对不起，还没有您可能感兴趣的人，请联系站长通过后台配置！</p>
 					</div>
 <!--
 EOT;
@@ -1144,7 +1184,7 @@ EOT;
 		</div>
 	</div>
 </div>
-<script language="javascript">
+<script type="text/javascript">
 window.history.forward();
 </script>
 <!--
@@ -1198,7 +1238,7 @@ print<<<EOT
 		</div>
 	</div>
 </div>
-<script language="javascript">
+<script type="text/javascript">
 window.history.forward();
 </script>
 <!--
@@ -1231,7 +1271,7 @@ EOT;
 </body></html>
 <!--
 EOT;
-}print <<<EOT
+} if ($step != 'permit') {print <<<EOT
 -->
 <div id="menu_editor" style="display:none;">
 <div class="popout"><table border="0" cellspacing="0" cellpadding="0"><tbody><tr><td class="bgcorner1"></td><td class="pobg1"></td><td class="bgcorner2"></td></tr><tr><td class="pobg4"></td><td>
@@ -1267,6 +1307,10 @@ EOT;
 </div>
 </td><td class="pobg2"></td></tr><tr><td class="bgcorner4"></td><td class="pobg3"></td><td class="bgcorner3"></td></tr></tbody></table></div>
 </div>
+<!--
+EOT;
+}print <<<EOT
+-->
 <!--
 EOT;
 ?>-->

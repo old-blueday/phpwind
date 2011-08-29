@@ -127,7 +127,7 @@ print <<<EOT
       <td class="td2"><select name="ipoption_$id" onchange="ip_jump('ipoption_$id');">
           <option></option>
           <option value="$basename&action=byname&username=$value[username]&type=1">查看该用户使用过IP</option>
-          <option value="$admin_file?adminjob=setuser&action=edit&uid=$value[uid]">查看用户资料</option>
+          <option value="$admin_file?adminjob=usermanage&adminitem=edit&action=edit&uid=$value[uid]">查看用户资料</option>
           <option value="$admin_file?adminjob=superdel&admintype=article&action=deltpc&fid=-1&author=$value[username]"> 查看该用户的主题</option>
           <option value="$admin_file?adminjob=superdel&admintype=article&action=delrpl&fid=-1&author=$value[username]"> 查看该用户的回复</option>
         </select>

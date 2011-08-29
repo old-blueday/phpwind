@@ -12,10 +12,10 @@
 <base id="headbase" href="$db_bbsurl/" />
 <link rel="stylesheet" type="text/css" href="$imgpath/set/set-style.css" />
 <link rel="stylesheet" type="text/css" href="$imgpath/set/wind-reset.css" />
-<script type="text/javascript" language="JavaScript" src="js/pw_ajax.js"></script>
-<SCRIPT type="text/javascript" LANGUAGE="JavaScript" src="js/core/core.js"></SCRIPT>
-<SCRIPT type="text/javascript" LANGUAGE="JavaScript" src="js/core/tab.js"></SCRIPT>
-<script language="JavaScript">
+<script type="text/javascript" src="js/pw_ajax.js"></script>
+<script type="text/javascript" src="js/core/core.js"></script>
+<script type="text/javascript" src="js/core/tab.js"></script>
+<script>
 var imgpath = '$imgpath';
 var verifyhash = '$verifyhash';
 var winduid = '$winduid';
@@ -110,7 +110,7 @@ EOT;
 -->
       </ul>
     </div>
-<script language="javascript">
+<script>
 setCurrent('pro_$action','','current');
 </script>
 <!--
@@ -233,7 +233,7 @@ if($_G[allowhonor]){print <<<EOT
 							<tr>
 								<td>个性签名</td>
 								<td>
-									<input class="input" type="text" size="40" name="prohonor" value="$userdb[honor]" />（将在我的首页和帖子页面用户信息处显示）
+									<input class="input" type="text" size="40" name="prohonor" value="$userdb[honor]" />（将在帖子页面用户信息处显示）
 								</td>
 							</tr>
 <!--
@@ -249,7 +249,7 @@ EOT;
 								<td><textarea name="prosign" id="prosign" rows="4" cols="50">$userdb[signature]</textarea><br />（将在每个帖子下方显示，<span id="prosign_warn">限{$_G[signnum]}字节</span>）</td>
 							</tr>
 						</table>
-<script language="JavaScript">
+<script>
 var charset = '$db_charset';
 var signnum = '$_G[signnum]';
 initCheckTextNum('prointroduce','prointroduce_warn',500);
@@ -301,7 +301,7 @@ EOT;
 							<span class="button"><span><button type="submit">保存资料</button></span></span>
 							<input type="hidden" value="2" name="step" />
 						</div>
-<script language="JavaScript">
+<script>
 function addtrade() {
 	var s = getObj('trade_mode').firstChild.cloneNode(true);
 	getObj('trade_c').appendChild(s);
@@ -524,7 +524,7 @@ EOT;
 		</form>
 		</div>
 <!-- <iframe id="hideframe" name="hideframe" width="0" height="0" marginwidth="0" frameborder="0" src="about:blank"></iframe> -->
-<script language="JavaScript">
+<script>
 var display = '$display';
 function CkFaceType(value){
 	var facetype = document.getElementsByName('facetype');
@@ -831,7 +831,7 @@ EOT;
 				</form>
 			</div>
 		</div>
-<script language="JavaScript">
+<script>
 setTimeout(function(){showTabs('infolist','$info_type','li','current');},500);
 </script>
 <!--
@@ -1241,7 +1241,7 @@ EOT;
 							</table>
 		</div>
 		<div class="mt10 cc">$pages</div>
-<script language="JavaScript">
+<script>
 function Bjump(value){
 	if(value!= '') {
 		window.location=('$basename&action=log&type='+value);
@@ -1361,7 +1361,7 @@ EOT;
 						<span class="button"><span><button type="submit">提 交</button></span></span>
 						</div>
 					</form>
-<script language="JavaScript">
+<script>
 function checkradio() {
 	var radio = getObj('checkradio').getElementsByTagName('input');
 	if (radio.length > 0) {
@@ -1503,7 +1503,7 @@ EOT;
 						<span class="button"><span><button type="submit">提 交</button></span></span>
 						</div>
 					</form>
-<script language="JavaScript">
+<script>
 function checkradio() {
 	var radio = getObj('checkradio').getElementsByTagName('input');
 	if (radio.length > 0) {
@@ -1654,7 +1654,7 @@ EOT;
 .color_input{float:left;border:1px solid #fff;height:19px;width:105px;}
 .color_image{float:left;padding-right:1px;padding-top:1px}
 </style>
-<script type="text/javascript" language="JavaScript">
+<script>
 function pickReback(obj,color){
 	if (typeof obj == 'string') {
 		obj = getObj(obj);
@@ -1662,7 +1662,7 @@ function pickReback(obj,color){
 	obj.style.color = color;
 }
 </script>
-<script type="text/javascript" language="JavaScript" src="js/color_picker.js"></script>
+<script type="text/javascript" src="js/color_picker.js"></script>
 <form name="FORM" method="post" action="profile.php?">
 <input type="hidden" name="verify" value="$verifyhash" />
 <input type="hidden" name="action" value="style" />
@@ -1773,7 +1773,7 @@ EOT;
 }print<<<EOT
 -->
 </div></div>
-<script language="JavaScript">
+<script>
 function checkset(chars){
 	if (!confirm("还原该风格，该风格设置的内容将不能还原，确定要还原吗？")) {
 		return false;

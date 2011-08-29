@@ -22,7 +22,7 @@ print <<<EOT
 		<li><a href="$basename&action=replylist">回复管理</a></li>
 	</ul>
 </div>
-<script language="JavaScript" src="js/date.js"></script>
+<script type="text/javascript" src="js/date.js"></script>
 
 <form action="$basename&" method=post>
   <h2 class="h1">帖子搜索</h2>
@@ -69,7 +69,7 @@ print <<<EOT
     </tr>
 <!--
 EOT;
-	if($threadTableSelections){
+if(!$db_merge_tmsgs && $threadTableSelections){
 print <<<EOT
 -->
     <tr class="tr1 vt">
@@ -78,8 +78,7 @@ print <<<EOT
     </tr>
 <!--
 EOT;
-	}
-print <<<EOT
+}print <<<EOT
 -->
     <tr class="tr1 vt">
       <td class="td1">主题作者</td>
@@ -143,18 +142,26 @@ print <<<EOT
     </tr>
   </table>
   </div>
-<div class="mb10 tac">
-    <span class="mr10"><span class="btn"><span><button type="submit">提 交</button></span></span></span>
-	<a href="javascript:;" id="advanceSearchButton">高级搜索<input type="hidden" id="searchDisplay" name="searchDisplay" value="$searchDisplay"></a>
-</div>
+	<div class="mb10 tac">
+		<span class="mr10"><span class="btn"><span><button type="submit">提 交</button></span></span></span>
+		<a href="javascript:;" id="advanceSearchButton">高级搜索<input type="hidden" id="searchDisplay" name="searchDisplay" value="$searchDisplay"></a>
+	</div>
 </form>
 <script type="text/javascript">
 getObj('advanceSearchButton').onclick = function() {
-	displayElement('advanceSearchBody','advanceSearchButton');
+	displayElementConflict('advanceSearchBody','advanceSearchButton');
 	if(getObj('searchDisplay')){
 		getObj('searchDisplay').value = getObj('advanceSearchBody').style.display;
 	}
 };
+function displayElementConflict(elementId,buttonId,isDisplay) {
+	if (undefined == isDisplay && typeof buttonId === 'string') {
+		getObj(elementId).style.display = getObj(elementId).style.display == 'none' ? '' : 'none';
+		getObj(buttonId).innerHTML = getObj(elementId).style.display == ''? '简单搜索' : '高级搜索';
+	} else {
+		getObj(elementId).style.display = isDisplay ? '' : 'none';
+	}
+}
 if (null != getObj('sphinxopen')) {
 	getObj('sphinxopen').onclick = function() {
 		var isSphinxOpen = getObj('sphinxopen').checked == 1;
@@ -278,7 +285,7 @@ print <<<EOT
 		<li class="current"><a href="$basename&action=replylist">回复管理</a></li>
 	</ul>
 </div>
-<script language="JavaScript" src="js/date.js"></script>
+<script type="text/javascript" src="js/date.js"></script>
 
 <form action="$basename&action=replylist" method=post>
   <h2 class="h1">搜索回复</h2>
@@ -310,7 +317,7 @@ print <<<EOT
     </tr>
 <!--
 EOT;
-	if($postTableSelections){
+if(!$db_merge_posts && $postTableSelections){
 print <<<EOT
 -->
     <tr class="tr1 vt">
@@ -319,8 +326,7 @@ print <<<EOT
     </tr>
 <!--
 EOT;
-	}
-print <<<EOT
+}print <<<EOT
 -->
     <tr class="tr1 vt">
       <td class="td1">回复作者</td>
@@ -379,6 +385,21 @@ print <<<EOT
     </div>
 </form>
 <script type="text/javascript">
+
+getObj('advanceSearchButton').onclick = function() {
+	displayElementConflict('advanceSearchBody','advanceSearchButton');
+	if(getObj('searchDisplay')){
+		getObj('searchDisplay').value = getObj('advanceSearchBody').style.display;
+	}
+};
+function displayElementConflict(elementId,buttonId,isDisplay) {
+	if (undefined == isDisplay && typeof buttonId === 'string') {
+		getObj(elementId).style.display = getObj(elementId).style.display == 'none' ? '' : 'none';
+		getObj(buttonId).innerHTML = getObj(elementId).style.display == ''? '简单搜索' : '高级搜索';
+	} else {
+		getObj(elementId).style.display = isDisplay ? '' : 'none';
+	}
+}
 function displayElement(elementId, isDisplay) {
 	if (undefined == isDisplay) {
 		getObj(elementId).style.display = getObj(elementId).style.display == 'none' ? '' : 'none';
@@ -388,12 +409,6 @@ function displayElement(elementId, isDisplay) {
 	}
 }
 
-getObj('advanceSearchButton').onclick = function() {
-	displayElement('advanceSearchBody');
-	if(getObj('searchDisplay')){
-		getObj('searchDisplay').value = getObj('advanceSearchBody').style.display;
-	}
-};
 if (null != getObj('sphinxpostopen')) {
 	getObj('sphinxpostopen').onclick = function() {
 		var isSphinxOpen = getObj('sphinxpostopen').checked == 1;
@@ -496,7 +511,7 @@ EOT;
 }
 include_once PrintEot('adminbottom');
 ?>-->
-<script language="JavaScript">
+<script type="text/javascript">
 function deldirect(form,tar,msg){
 	if (form.direct.checked == true) {
 		document.getElementById(tar).innerHTML = '<b><font color=blue>删除个数</font></b>';

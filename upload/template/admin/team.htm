@@ -276,7 +276,7 @@ print <<<EOT
       <td class="td2">
 <div class="fl" id="tips_$value[uid]" style="display:none">
 	    <div style="position:absolute;margin-top:22px;">
-			<div class="popout"><table border="0" cellspacing="0" cellpadding="0"><tbody><tr><td class="bgcorner1"></td><td class="pobg1"></td><td class="bgcorner2"></td></tr><tr><td class="pobg4"></td><td><div class="popoutContent"><div style="width:170px;"><div class="popTop"><a href="javascript:;" class="del_img fr" onclick="closep('tips_$value[uid]')">关闭</a>更多版块</div><p class="s4 cc p10">$value[forumNames]</p></div>
+			<div class="popout"><table border="0" cellspacing="0" cellpadding="0"><tbody><tr><td class="bgcorner1"></td><td class="pobg1"></td><td class="bgcorner2"></td></tr><tr><td class="pobg4"></td><td><div class="popoutContent"><div style="width:170px;"><div class="popTop"><a href="javascript:;" class="del_img fr" onclick="closeteam('tips_$value[uid]')">关闭</a>更多版块</div><p class="s4 cc p10">$value[forumNames]</p></div>
 </div></td><td class="pobg2"></td></tr><tr><td class="bgcorner4"></td><td class="pobg3"></td><td class="bgcorner3"></td></tr></tbody></table></div>
 		</div>
 		</div>
@@ -302,8 +302,8 @@ EOT;
     <span class="btn"><span><button type="submit" onfocus="blur();">导出</button></span></span>
   </div>
     </form>
-<script language="JavaScript">
-function closep(obj) {
+<script type="text/javascript">
+function closeteam(obj) {
 	getObj(obj).style.display = 'none';
 }
 </script>
@@ -313,7 +313,7 @@ EOT;
 
 print <<<EOT
 -->
-<script type="text/javascript" language="JavaScript" src="js/date.js"></script>
+<script type="text/javascript" src="js/date.js"></script>
 <div class="nav3 mb10 ta">
    <ul class="cc">
     <li><a href="$basename">基本设置</a></li>
@@ -525,7 +525,7 @@ EOT;
   </div>
 </form>
 
-<script language="JavaScript">
+<script type="text/javascript">
 var ifopen = parseInt('$rt[ifopen]');
 function checkForm(obj) {
 	if (ifopen==1 && !confirm('您已经开启自动发放奖励的程序了，您确定继续吗?')) {

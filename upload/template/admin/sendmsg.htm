@@ -2,7 +2,6 @@
 include_once PrintEot('left');
 if(empty($action)){print <<<EOT
 -->
-<script type="text/javascript" LANGUAGE="JavaScript" src="js/core/core.js"></script>
 <form name='FORM' action="$basename" method="post" onreset="mreset()" onsubmit="return checkpost(document.FORM);">
 <h2 class="h1">消息群发</h2>
 <div class="admin_table mb10">
@@ -36,12 +35,12 @@ EOT;
 -->
 				<li><input type='checkbox' name='sendto[]' value='-1'>普通会员</li>
 			</ul>
-			<span class="bt2"><span><button onclick="CheckAll(this.form)" value="全 选" name="chkall" onfocus="blur();" type="button">全 选</button></span></span>
+			<span class="bt2"><span><button onclick="ChecksAll(this.form)" value="全 选" name="chkall" onfocus="blur();" type="button">全 选</button></span></span>
 		</td>
 	</tr>
     <tr class="tr1 vt" id="users" style="display:none" >
 				<td class="td1">用户名 <span class="s1">*</span></td>
-				<td class="td2"><input type="text" name="touser" class="input input_wb fl mr10" /><span class="help_a">多个用户名用，分开</span></td>
+				<td class="td2"><input type="text" name="touser" class="input input_wb fl mr10" /><span class="help_a">多个用户名用,分开</span></td>
 	</tr>
 	<tr class="tr1 vt">
 		<td class="td1">主题 <span class="s1">*</span></td>
@@ -59,9 +58,8 @@ print <<<EOT
 </table>
 </div>
 
-<script type="text/javascript" language="JavaScript" src="js/pw_ajax.js"></script>
-<script language="JavaScript" src="js/post.js"></script>
-<script language="JavaScript" src="js/global.js"></script>
+<script type="text/javascript" src="js/pw_ajax.js"></script>
+<script type="text/javascript" src="js/global.js"></script>
 
 <div id="menu_face" class="menu" style="display:none;"></div>
 <div id="menu_generalface" class="menu" style="display:none;"></div>
@@ -72,7 +70,16 @@ print <<<EOT
 	<span class="bt"><span><button type="reset">重 置</button></span></span>
 </div>
 </form>
-<SCRIPT LANGUAGE="JavaScript">
+<script type="text/javascript">
+function ChecksAll(form,match) {
+	for (var i = 0,j = form.elements.length; i < j; i++) {
+		var e = form.elements[i];
+		if (e.type == 'checkbox' && (typeof match == 'undefined' || e.name.match(match))) {
+			e.checked = ifcheck;
+		}
+	}
+	ifcheck = ifcheck == true ? false : true;
+}
 function sendtype(ID){
 	var group = document.getElementById("group");
 	var users = document.getElementById("users");
@@ -98,7 +105,7 @@ function checkpost(obj) {
 	} 
 	if (check == 0 && obj.touser.value == "" && online.checked == false) {
 			obj.touser.setAttribute("hasError", 1);
-			showDialog("error","接受用户不能为空",2);
+			showDialog("error","接收用户不能为空",2);
 			obj.subject.focus();
 			return false;
 	} 
@@ -120,7 +127,7 @@ function mreset(){
 	editor.doc.body.innerHTML='';
 	return true;
 }
-</SCRIPT>
+</script>
 <!--
 EOT;
 }include_once PrintEot('adminbottom');

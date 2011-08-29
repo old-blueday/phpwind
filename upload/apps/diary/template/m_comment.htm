@@ -1,6 +1,6 @@
 <!--<?php print <<<EOT
 -->
-<script language="javascript">
+<script type="text/javascript">
 	var charset = '$db_charset';
 	var imgpath   = '$imgpath';
 	var stylepath = '$stylepath';
@@ -10,17 +10,15 @@
 	    document.FORM.atc_content.value += ' [s:'+NewCode+'] ';
 	}
 	
-	var version = navigator.appVersion.split(";");
-	version = version[1].replace(/[ ]/g,"");
-	if (navigator.appName == "Microsoft Internet Explorer" && version=="MSIE6.0") {
+	if (is_ie6) {
 		window.onerror = function () {return true;}
 	}
 </script>
-<script language="javascript" src="js/pw_lwd.js"></script>
+<script type="text/javascript" src="js/pw_lwd.js"></script>
 <script src="$db_htmdir/js/face.js"></script>
 <div id="menu_show" style="display:none;"></div>
 <div id="menu_face" class="menu" style="display:none;"></div>
-<script language="JavaScript" src="js/post.js"></script>
+<script type="text/javascript" src="js/post.js"></script>
 <div id="comment_container">
 <form method="POST" name="FORM" action="" onsubmit="return false;">
     <div class="minieitor_pw cc">

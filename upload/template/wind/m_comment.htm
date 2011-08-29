@@ -1,6 +1,6 @@
 <!--<?php print <<<EOT
 -->
-<script language="javascript">
+<script>
 	var charset = '$db_charset';
 	var imgpath   = '$imgpath';
 	var stylepath = '$stylepath';
@@ -8,16 +8,14 @@
 	    document.FORM.atc_content.value += ' [s:'+NewCode+'] ';
 	}
 	
-	var version = navigator.appVersion.split(";");
-	version = version[1].replace(/[ ]/g,"");
-	if (navigator.appName == "Microsoft Internet Explorer" && version=="MSIE6.0") {
+	if (is_ie6) {
 		window.onerror = function () {return true;}
 	}
 </script>
-<script src="$db_htmdir/js/face.js"></script>
+<script type="text/javascript" src="$db_htmdir/js/face.js"></script>
 <div id="menu_show" style="display:none;"></div>
 <div id="menu_face" class="menu" style="display:none;"></div>
-<script language="JavaScript" src="js/post.js"></script>
+<script type="text/javascript" src="js/post.js"></script>
 <div id="comment_container">
 <style type="text/css" media="screen">
 	@import url($imgpath/post/minieitor/minieitor.css);
@@ -110,7 +108,7 @@ EOT;
 	</div>
 <div class="mt10 cc">$pages</div>
 </div>
-<SCRIPT LANGUAGE="JavaScript">
+<script>
 function delload(){
 	var commentdls = getElementsByClassName('cc dl',getObj('dlA'));
 	for (var i=0;i<commentdls.length ; i++ ){
@@ -132,7 +130,7 @@ function delload(){
 	}
 }
 window.onReady(delload);
-</SCRIPT>
+</script>
 <!--
 EOT;
 ?>

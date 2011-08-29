@@ -1,0 +1,98 @@
+<!--<?php
+$actionTitle = $action == 'changethread' ? '更换帖子' : '添加帖子';
+print<<<EOT
+-->
+<div style="width:400px;">
+	<div class="popTop" style="cursor:move" onmousedown="read.move(event);"><a href="javascript:;" onclick="closep();" class="adel">关闭</a><strong>$actionTitle</strong></div>
+	<form name="getthreadform" action="{$basename}a=addthread&action=save&ajax=1" onsubmit="return submitThread(this);" method="post">
+	<div class="mb10">
+		<div id="getThreadTip" class="wrongTip" style="display:none;"></div>
+		<table width="100%">
+			<tr class="tr3">
+				<td width="60">帖子链接</td>
+				<td><input name="tpcurl" id="tpcurl" value="$threadUrl" class="input" type="text" style="width:290px;" /></td>
+			</tr>
+			<tr class="tr3">
+				<td>&nbsp;</td>
+				<td><span class="bt2" style="margin-left:0;"><span><button type="button" onclick="getThread();">提取信息</button></span></span></td>
+			</tr>
+		</table>
+<!--
+EOT;
+$contentDisplay = $action == 'changethread' ? '' : 'display:none;';
+print<<<EOT
+-->
+		<div id="kmdthreadcontent" class="p10" style="background:#edffcc;border:1px solid #e5e5cd;margin:10px;line-height:1.5; $contentDisplay">
+			<table width="100%">
+				<tr>
+					<td width="45">标题：</td>
+					<td class="s5"><span id="threadtitle">$title</span></td>
+				</tr>
+				<tr>
+					<td style="vertical-align:top;">内容：</td>
+					<td class="s5"><span id="threadcontent">$content</span></td>
+				</tr>
+			</table>
+		</div>
+<!--
+EOT;
+if ($action == 'changethread' && $db_kmd_deducttime) {
+print<<<EOT
+-->
+		<div class="spaceTip s5" style="margin:0 10px;">友情提醒: 更换一次帖子将扣除 <span class="s1">$db_kmd_deducttime 小时</span> 的推广时间</div>
+<!--
+EOT;
+}print<<<EOT
+-->
+	</div>
+		<input type="hidden" name="threadid" id="threadid" value="" />
+		<input type="hidden" name="kid" value="$kid" />
+		<input type="hidden" name="originaltid" value="$tid" />
+		<input type="hidden" name="originalaction" value="$action" />
+	<div class="popBottom"><span class="btn2"><span><button type="submit">提交审核</button></span></span><span class="bt2"><span><button type="button" onclick="closep();">取消</button></span></span></div>
+	</form>
+</div>
+<script type="text/javascript">
+var getThreadUrl = '$getThreadUrl';
+function getThread() {
+	var link = getObj('tpcurl').value;
+	var tip = getObj('getThreadTip');
+	if (!link) {
+		tip.innerHTML = '请输入帖子链接';
+		tip.style.display = '';
+		return false;
+	}
+	var tpcurl = encodeURIComponent(link);
+	ajax.send(getThreadUrl, 'tpcurl=' + tpcurl, function(){
+		var rText = ajax.request.responseText.split('\t');
+		if (rText[0] == 'error') {
+			tip.innerHTML = rText[1];
+			tip.style.display = '';
+		} else if (rText[0] == 'success') {
+			tip.style.display = 'none';
+			var threadJsonInfo = JSONParse(rText[1]);
+			getObj('threadid').value = threadJsonInfo.tid;
+			getObj('threadtitle').innerHTML = threadJsonInfo.title;
+			getObj('threadcontent').innerHTML = threadJsonInfo.content;
+			getObj('kmdthreadcontent').style.display = '';
+		}
+	});
+}
+
+function submitThread(obj) {
+	if (!obj) return false;
+	ajax.send(obj.action, obj, function(){
+		var rText = ajax.request.responseText.split('\t');
+		if (rText[0] == 'error') {
+			showDialog('error', rText[1], 2);
+		} else if (rText[0] == 'success') {
+			showDialog('success', rText[1], 2);
+			setTimeout(function(){location.reload()}, 2000);
+		}
+	});
+	return false;
+}
+</script>
+<!--
+EOT;
+?>-->

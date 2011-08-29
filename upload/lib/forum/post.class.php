@@ -61,9 +61,11 @@ class PwPost {
 		if (!$this->isGM && !$this->forum->allowtime($this->hours) && !pwRights($this->isBM, 'allowtime')) {
 			return $this->showmsg('forum_allowtime');
 		}
-		if (!$this->isGM && ($return = $this->forum->authStatus($this->user['userstatus'])) !== true) {
+		/*
+		if (!$this->isGM && ($return = $this->forum->authStatus($this->user['userstatus'],$this->forum->forumset['auth_logicalmethod'])) !== true) {
 			return $this->showmsg($return);
 		}
+		*/
 	}
 
 	function checkSpecial($special) {
@@ -343,13 +345,16 @@ class postData {
 			$GLOBALS['contentMinLength'] = $this->threadMinLength;
 			return $this->post->showmsg('postfunc_content_threadlimit');
 		}
-
-		if ($this->forum->foruminfo['allowsell'] && strpos($content,"[sell") !== false && strpos($content,"[/sell]") !== false) {
-			if (preg_match_all('/\[sell=([\d]+?)(,[\w]+)?\]([^\x00]*?)\[\/sell\]/', $content, $sellList)) {
-				$sellMax = max($sellList[1]);
-				if ($GLOBALS['db_sellset']['price'] && (int) $sellMax > $GLOBALS['db_sellset']['price']) return false;
-				$content = preg_replace('/\[sell=([\d]+)/', "[sell=$sellMax", $content);
-			}
+		if (!$this->post->isGM && (!$this->forum->foruminfo['allowhide'] || !$this->post->_G['allowhidden']) && strpos($content,"[post") !== false && strpos($content,"[/post]") !== false) {
+			Showmsg('post_limit_hide');
+		}
+		if (!$this->post->isGM && (!$this->forum->foruminfo['allowsell'] || !$this->post->_G['allowsell']) && strpos($content, '[sell') !== false && strpos($content, '[/sell]') !== false) {
+			Showmsg('post_limit_sell');
+		}
+        if (preg_match_all('/\[sell=([\d]+?)(,[\w]+)?\]([^\x00]*?)\[\/sell\]/', $content, $sellList)) {
+			$sellMax = max($sellList[1]);
+			if ($GLOBALS['db_sellset']['price'] && (int) $sellMax > $GLOBALS['db_sellset']['price']) return false;
+			$content = preg_replace('/\[sell=([\d]+)/', "[sell=$sellMax", $content);
 		}
 		/*
 		 if (($GLOBALS['banword'] = $this->wordsfb->comprise($content, false)) !== false) {
@@ -430,6 +435,11 @@ class postData {
 		}
 	}
 	
+	function setAtUsers($users = array()){
+		if (!is_array($users) || !$this->_G['allowat']) return false;
+		count($users) > $this->_G['atnum'] && $users = array_slice($users, 0 ,$this->_G['atnum']);
+		$this->data['atusers'] = $users;
+	}
 	function setData($key, $value) {
 		if (isset($this->data[$key])) {
 			$this->data[$key] = $value;
@@ -456,8 +466,8 @@ class postData {
 			$this->data['content'] = S::escapeChar($this->data['content']);
 		} else {
 			$this->data['content'] = preg_replace(
-				array("/<script.*>.*<\/script>/is","/<(([^\"']|\"[^\"]*\"|'[^']*')*?)>/eis","/javascript/i"),
-				array("","\$this->jscv('\\1')","java script"),
+				array("/<script.*>.*<\/script>/is","/<(([^\"']|\"[^\"]*\"|'[^']*')*?)>/eis","/javascript/i","/<iframe[^>]*>.*<\/iframe>/is"),
+				array("","\$this->jscv('\\1')","java script",''),
 				str_replace('.','&#46;',$this->data['content'])
 			);
 		}
@@ -556,7 +566,7 @@ class postData {
 			return true;
 		}
 		if (!$this->iscontinue && !$this->getIfcheck()) {
-			return $this->showMsg('post_check');
+			if (!$this->data['golastpage']) return $this->showMsg('post_check'); // 当需要审核并且是快速回复跳转到最后一页时，不提示，直接发表成功
 		}
 		return true;
 	}
@@ -663,6 +673,7 @@ class topicPostData extends postData {
 			'ifmagic' => 0,
 			'magic' => '',
 			'modelid' => 0,
+			'replyreward' => ''
 		));
 	}
 
@@ -752,6 +763,24 @@ class topicPostData extends postData {
 		$this->data['ifcheck'] = $ifcheck;
 
 	}
+	
+	function setReplyReward($rewardCredit, $reward) {
+		if (!$this->post->_G['allowreplyreward'] || !$rewardCredit || !S::isArray($reward)) return false;
+		$replyRewardService = L::loadClass('ReplyReward', 'forum');/* @var $replyRewardService PW_ReplyReward */
+		$reward['rewardcredit'] = $rewardCredit;
+		$replyReward = $replyRewardService->setReplyRewardData($this->post->uid, $reward);
+		if (!$replyReward) return false;
+		$this->data['replyreward'] = $replyReward;
+		$this->setStatus(8);
+	}
+	
+	function setKmdInfo($kmdInfo) {
+		global $timestamp, $db_kmd_deducttime;
+		if ($db_kmd_deducttime) {
+			($timestamp + $db_kmd_deducttime * 3600 >= $kmdInfo['endtime']) && Showmsg("您帖子的推广时间剩余不足 {$db_kmd_deducttime}小时，无法编辑！");
+		}
+		$this->data['kmdinfo'] = $kmdInfo;
+	}
 }
 
 /**
@@ -789,6 +818,10 @@ class replyPostData extends postData {
 		}
 		$this->data['ifcheck'] = $ifcheck;
 	}
+	
+	function setIfGoLastPage($lastPage) {
+		$this->data['golastpage'] = intval($lastPage);
+	}
 }
 
 /**
@@ -819,7 +852,7 @@ class BbsTag {
 		}
 		$tags = pwHtmlspecialchars_decode($tags);
 		$tags = stripslashes($tags);
-		$tags = str_replace(array('“','”'),'"',$tags);
+		$tags = function_exists('mb_eregi_replace') ? mb_eregi_replace('/[“|”]/', '"', $tags) : str_replace(array('“','”'),'"',$tags);
 		$tags = preg_replace_callback('/("[^"]+")/', array($this,'callback'), $tags);
 		$this->tags = array_merge($this->tags,explode(" ",str_replace('/\s+/is',' ',trim($tags))));
 		$this->tags = array_unique($this->tags);

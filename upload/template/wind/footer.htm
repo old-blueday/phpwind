@@ -1,51 +1,44 @@
 <!--<?php print <<<EOT
 --></div></div><!--.main-wrap,#main End-->
 <div class="footer-wrap">
-<div class="c"></div>
 <div id="bottom"></div>
 <!--
 EOT;
 list($htmlAdvert,$arrayAdvert) = pwAdvert('Site.Footer',$fid);
 if($htmlAdvert){print<<<EOT
 -->
-<div class="mb5 tac">$htmlAdvert</div>
+<div class="mb5 tac cc">$htmlAdvert</div>
 <!--
 EOT;
 }print <<<EOT
 -->
-<div class="c"></div>
 <div id="footer">
-<div id="mode-footer" class="mt">
-	<div class="bottom cc tac">
+	<div class="mb5">
+		<div class="bottom tac">
 <!--
 EOT;
 if(count($_Navbar['foot'])){
 	print <<<EOT
 -->
-		<ul>
 <!--
 EOT;
-
 foreach($_Navbar['foot'] as $key => $value){
 	$html = buildNavLinkHtml($value['data']);
 print <<<EOT
--->
-			<li>$html</li>
+--><span class="mr10">$html</span><span class="gray mr10">|</span><!--
+EOT;
+};
+print <<<EOT
+--><a href="job.php?action=erasecookie&verify=$GLOBALS[loginhash]">清除Cookies</a>
 <!--
 EOT;
 };
 print <<<EOT
 -->
-			<li><a href="job.php?action=erasecookie&verify=$GLOBALS[loginhash]">清除Cookies</a></li>
-		</ul>
-<!--
-EOT;
-};
-print <<<EOT
--->
+		</div>
 	</div>
-	<div class="f9 gray tac"><span id="windspend">$wind_spend Time now is:$ft_time, $ft_gzip $db_icp</span><br />
-	Powered by <a href="http://www.phpwind.net/" target="_blank">phpwind</a> <a href="http://www.phpwind.net/" target="_blank"><span class="b s2">v$wind_version</span></a> <a href="http://www.phpwind.com/certificate.php?host={$pwServer['HTTP_HOST']}">Certificate</a> Code &copy;2003-2011 <a href="http://www.phpwind.com/" target="_blank">phpwind.com</a> Corporation <span id="stats"></span>$db_statscode
+	<div class="f10 s6 tac">
+		<p class="mb5">Powered by <a href="http://www.phpwind.net/" target="_blank" class="s4">phpwind v{$wind_version}</a>&nbsp;<a href="http://www.phpwind.com/certificate.php?host={$pwServer['HTTP_HOST']}" target="_blank">Certificate</a> Copyright Time now is:$ft_time <br />&copy;2003-2011 <a href="$db_bbsurl/" target="_blank">{$GLOBALS['db_bbsname']}</a> 版权所有 $ft_gzip $db_icp $db_statscode <span id="stats"></span>
 <!--
 EOT;
 if($db_ystats_ifopen=='0'){print <<<EOT
@@ -57,8 +50,10 @@ if($db_ystats_ifopen=='0'){print <<<EOT
 <!--
 EOT;
 }print <<<EOT
--->
-	</div></div></div></div>
+--><span id="windspend">$wind_spend</span></p>
+	</div>
+</div>
+</div>
 </div>
 <!--
 EOT;
@@ -66,22 +61,25 @@ if($GLOBALS['groupid'] != 'guest' && $GLOBALS['groupid'] != '' && $GLOBALS['db_t
 include_once PrintEot('bottom');
 }print <<<EOT
 -->
-<script language="JavaScript" src="js/global.js"></script>
+<script type="text/javascript" src="js/global.js"></script>
 <!--
 EOT;
 $db_ifcredit && $credit_pop && require PrintEot('credit_pop');print <<<EOT
 -->
+<script type="text/javascript" src="mode/area/js/adminview.js"></script>
 <!--
 EOT;
 if ($GLOBALS['__pwPortalEot'] && checkPortalRight()) {
 print <<<EOT
 -->
-<script language="JavaScript" src="js/date.js"></script>
-<script language="JavaScript" src="mode/area/js/adminview.js"></script>
-<script language="javascript" src="mode/area/js/tagrelate.js"></script>
-<script language="JavaScript" src="js/color_picker.js"></script>
-<script language="JavaScript">
+<script type="text/javascript" src="js/date.js"></script>
+<script type="text/javascript" src="mode/area/js/tagrelate.js"></script>
+<script type="text/javascript" src="js/color_picker.js"></script>
+<script>
 window.onReady(function(){
+	//门户模块管理
+	var console=new ChannelManage(0,'','',0);
+	console.init();
 	frontadmin = New(frontAdmin,['main','view-hover']);
 });
 </script>
@@ -96,12 +94,12 @@ EOT;
 if(defined('A_P')){
 print <<<EOT
 -->
-<script language="JavaScript" src="js/app_global.js"></script>
+<script type="text/javascript" src="js/app_global.js"></script>
 <!--
 EOT;
 }if($db_job_isopen && $winduid){print <<<EOT
 -->
-<script type="text/javascript" language="JavaScript" src="js/pw_jobcenter.js"></script>
+<script type="text/javascript" src="js/pw_jobcenter.js"></script>
 <!--
 EOT;
 if($winddb['jobnum'] > 0 && $_G['allowvisit'] && $db_job_ispop && !GetCookie('jobpop') && !in_array(SCR,array("jobcenter","searcher","register"))){
@@ -116,11 +114,40 @@ window.onReady(function() {
 EOT;
 }}print <<<EOT
 -->
-<script language="JavaScript">
+<script>
 var openmenu = {{$GLOBALS['db_menuinit']}};
-window.onReady(function(){read.InitMenu();});
+var messagetip=null;
+window.onReady(function(){
+	read.InitMenu();
+	//消息提示
+	messagetip=new messageTip(90);
+	messagetip.init();
+});
 WINDOW_LOADED=1;
 </script>
+<!--
+EOT;
+if(CloudWind::checkSync() ){
+print <<<EOT
+-->
+<script>
+ajax.send("y.php?action=sync", "");
+</script>
+<!--
+EOT;
+}print <<<EOT
+-->
+<!--
+EOT;
+if($GLOBALS[db_yunsearch_search] && $GLOBALS[db_yun_expand][guess_pop_setting] && in_array(SCR,explode("|",$GLOBALS[db_yun_expand][guess_pop_setting])) ){
+$guess_pop_bottom = ($GLOBALS[db_yun_expand] && $GLOBALS[db_yun_expand][guess_pop_bottom]) ? sprintf(html_entity_decode($GLOBALS[db_yun_expand][guess_pop_bottom]),$GLOBALS[fid],$GLOBALS[winduid],$GLOBALS[tid],$GLOBALS[subject]) : '';
+print <<<EOT
+-->
+$guess_pop_bottom
+<!--
+EOT;
+}print <<<EOT
+-->
 <!--
 EOT;
 ?>-->

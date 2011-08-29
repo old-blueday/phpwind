@@ -116,7 +116,7 @@ EOT;
 EOT;
 if($key=='descrip'){print <<<EOT
 -->
-				<textarea name="param[$key]" onkeyup="checktitlelength($value,'pushto_info','wordtinfo');" onkeydown="checktitlelength($value,'pushto_info','wordtinfo');" id="pushto_info" style="width:260px;height:92px"  >$default[$key]</textarea>&nbsp;&nbsp;<span id="wordtinfo"></span>
+				<textarea name="param[$key]" onkeyup="checktitlelength('$value','pushto_info','wordtinfo');" onkeydown="checktitlelength('$value','pushto_info','wordtinfo');" id="pushto_info" style="width:260px;height:92px"  >$default[$key]</textarea>&nbsp;&nbsp;<span id="wordtinfo"></span>
 <!--
 EOT;
 } elseif ($key=='title') {
@@ -124,7 +124,7 @@ print <<<EOT
 -->
 
 
-			<div class="mb5"><input type="text" id="pushto_title" onkeyup="checktitlelength($value,'pushto_title','wordtip');" onkeydown="checktitlelength($value,'pushto_title','wordtip');"  class="input" size="40" name="param[$key]" value="$default[$key]" >&nbsp;&nbsp;<span id="wordtip"></span></div>
+			<div class="mb5"><input type="text" id="pushto_title" onkeyup="checktitlelength('$value','pushto_title','wordtip');" onkeydown="checktitlelength('$value','pushto_title','wordtip');"  class="input" size="40" name="param[$key]" value="$default[$key]" >&nbsp;&nbsp;<span id="wordtip"></span></div>
 			<div class="pwnew tac">
           <span title="粗体字"><a onclick="styleOnclick(this,'css[b]')" class="$stylename[b]">加粗</a></span>
 					<span title="斜体字"><a onclick="styleOnclick(this,'css[i]')" class="$stylename[i]">倾斜</a></span>
@@ -253,16 +253,14 @@ print <<<EOT
 -->
 		<tr class="tr1 vt"><td class="td1">短消息通知</td>
 		<td class="td2">
-		<input type="radio" name="ifmsg" value="1" checked />是
-		<input type="radio" name="ifmsg" value="0" />否</td></tr>
+		<label class="mr20"><input type="radio" name="ifmsg" value="1" checked />是</label>
+		<label class="mr20"><input type="radio" name="ifmsg" value="0" />否</label></td></tr>
 		<tr class="tr3 vt"><td class="td1">评分理由:</td>
 		<td>
-		<select class="mb5" onchange="this.form.atc_content.value=this.value" style="width:334px;">
-			<option value="">自定义</option>
-			<option value="">-------</option>
+		<p><input type="text" class="input" style="width:312px;" name="atc_content" id="atc_content" value="$atc_content" /></p>
+		<select size="6" onchange="this.form.atc_content.value=this.value" style="width:320px;">
 			$reason_sel
 		</select>
-		<p><textarea name="atc_content" id="atc_content" rows="8" class="textareaA mb5">$atc_content</textarea></p>
 		<div id="atc_content_warn" class="gray">限100字节</div>
 		</td></tr>
 </table>

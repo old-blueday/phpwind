@@ -1,0 +1,62 @@
+<!--<?php
+include_once PrintEot('left');
+print <<<EOT
+-->
+<!--
+EOT;
+if(empty($action)) {print <<<EOT
+-->
+<h2 class="h1"><span class="mr5 fl">可视化页面管理</span></h2>
+<div class="admin_table mb10">
+	<table width="100%">
+    	<tr class="tr2">
+    		<td>id</td>
+        	<td>唯一标识</td>
+            <td>页面名称</td>
+            <td><span>操作</span></td>
+        </tr>
+<!--
+EOT;
+foreach($portalPages as $val){
+print <<<EOT
+-->
+        <tr class="tr1">
+        	<td class="td2">$val[id]</td>
+        	<td class="td2">$val[sign]</td>
+            <td class="td2">$val[title]</td>
+            <td class="td2">
+				<a href="javascript:;" onclick="parent.PW.Dialog({'id': 'area_module','name': '模块管理','url': '$admin_file?adminjob=mode&admintype=area_module&alias=$val[sign]','max': false});return false;" class="mr10">[模块管理]</a>
+				<a href="javascript:;" class="mr10" onclick="updateCache('$val[sign]');return false;" title="更新页面缓存">[更新静态]</a>
+				<a href="javascript:;" onclick="clearPage('$val[sign]');" class="mr10">[清除]</a>
+			</td>
+        </tr>
+<!--
+EOT;
+}print <<<EOT
+-->
+    </table>
+</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+<script>
+//更新静态
+function updateCache(sign) {
+	var url = '$ajaxActionUrl';
+	ajax.send(url,'action=update&sign='+sign,ajax.get);
+}
+
+function clearPage(sign) {
+	if(!confirm('清理页面将同时清理下属模块和历史推送数据，不可恢复，是否确认清理？')) {
+		return false;
+	}
+	setTimeout(function(){
+		window.location.href = '{$actionUrl}&action=clear&sign='+sign;
+	},0);
+}
+</script>
+<!--
+EOT;
+include_once PrintEot('adminbottom');
+?>-->

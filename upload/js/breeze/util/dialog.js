@@ -132,7 +132,7 @@ Breeze.namespace('util.dialog', function(B){
 			}
 			if (!popwin || !self.reuse){//如果弹窗没建立
 				//生成弹窗
-				popwin = B.$query(B.createElement(self.data))(B.attr, 'id', self.id)(B.css,{position:'absolute',visibility:'hidden'})();
+				popwin = B.$query(B.createElement(self.data))(B.attr, 'id', self.id)(B.css,{position:'absolute',display:'none','z-index':'99999'})();
 				
 				//设定高宽
 				self.width && B.css(popwin, 'width', self.width);
@@ -146,12 +146,12 @@ Breeze.namespace('util.dialog', function(B){
 					});
 				});
 			}else{
-				B.css(popwin, {display:'block', visibility:'hidden'});
+				B.css(popwin, {display:'none'});
 			}
 			//显示
 			B.query(popwin)
 				.layerOut(self.pos, self.posrel, self.outWin)
-				.css({visibility:'visible', backgroundColor:'#ffffff'});
+				.css({display:'block', backgroundColor:'#ffffff'});
 			self.win = popwin;
 			self.callback && self.callback(self);
 			//绑定事件

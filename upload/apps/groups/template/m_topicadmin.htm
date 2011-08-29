@@ -25,7 +25,7 @@ require_once PrintEot('m_header');print <<<EOT
 EOT;
 if($threaddb){print <<<EOT
 -->
-<script language="JavaScript" src="js/pcdate.js"></script>
+<script type="text/javascript" src="js/pcdate.js"></script>
 <table width="100%" cellspacing="0" cellpadding="0" border="0" class="tA mb10">
 	<tr class="tr">
 	  <td width="15">&nbsp;</td>
@@ -88,7 +88,7 @@ if($action=='toptopic'){print <<<EOT
 -->
 	<tr>
 		<th class="th">管理选项:</th>
-		<td class="td"><script language="JavaScript" src="js/desktop/Compatibility.js"></script>
+		<td class="td">
 			<label for="topped0" class="mr20"><input type="radio" id="topped0" name="topped" value="0" $topped_0 /> 取消置顶</label>
 			<label for="topped1"><input type="radio" id="topped1" name="topped" value="1" $topped_1 /> 置顶</label>
 		</td>
@@ -150,8 +150,8 @@ EOT;
 EOT;
 }elseif($action=='highlight'){print <<<EOT
 -->
-<script type="text/javascript" language="JavaScript" src="js/color_picker.js"></script>
-<script type="text/javascript">
+<script type="text/javascript" src="js/color_picker.js"></script>
+<script>
 function pickReback(color){
 	getObj('color_show').style.backgroundColor = color;
 }
@@ -220,24 +220,22 @@ EOT;
 	<tr>
         <th class="th">操作原因:</th>
 		<td class="td">
+			<input type="text" class="input" style="width:312px;" name="atc_content" />
 <!--
 EOT;
 if($db_adminreason){print <<<EOT
 -->
-			<p class="mb5"><select onchange="this.form.atc_content.value=this.value">
-				<option value="">自定义</option>
-				<option value="">-------</option>
+			<p><select onchange="this.form.atc_content.value=this.value" size="6" style="width:320px;">
 				$reason_sel
 			</select></p>
 <!--
 EOT;
 }print <<<EOT
 -->
-        <textarea name="atc_content" class="textareaA"></textarea>
 		</td>
 	</tr>
 	<tr><td class="td"></td><td class="td">
-	<span class="btn"><span><button type="submit" name="Submit">提 交</button></span></span>&nbsp;<a class="cp" type="button" onclick="javascript:history.go(-1)" />返 回</a>
+	<span class="btn"><span><button type="submit" name="Submit">提 交</button></span></span>&nbsp;&nbsp;&nbsp;<a class="cp" type="button" onclick="javascript:history.go(-1)" />返 回</a>
 	</td></tr>
 </table></div>
 </form>

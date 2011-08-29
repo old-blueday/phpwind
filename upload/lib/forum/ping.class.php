@@ -155,8 +155,9 @@ class PW_Ping {
 				);
 				$affect .= ($affect ? ',' : '') . $credit->cType[$key] . ':' . $value;
 				
-				$this->db->update("INSERT INTO pw_pinglog SET " . S::sqlSingle($pwSQL));
-				$pingLogId = $this->db->insert_id();
+				//$this->db->update("INSERT INTO pw_pinglog SET " . S::sqlSingle($pwSQL));
+				//$pingLogId = $this->db->insert_id();
+				$pingLogId = pwQuery::insert('pw_pinglog',  $pwSQL);
 				
 				$pingLog[$pid][$key] = array(
 					'fid'	=> $this->fid,
@@ -256,7 +257,8 @@ class PW_Ping {
 		foreach ($this->postData as $pid => $atc) {
 			$rpid = $pid == 'tpc' ? '0' : $pid; // delete pinglog
 			$pingdata = $this->db->get_one('SELECT * FROM pw_pinglog WHERE tid=' . S::sqlEscape($this->tid) . ' AND pid=' . S::sqlEscape($rpid) . ' AND pinger=' . S::sqlEscape($windid) . ' ORDER BY pingdate DESC LIMIT 1');
-			$this->db->update('DELETE FROM pw_pinglog WHERE id=' . S::sqlEscape($pingdata['id']));
+			//$this->db->update('DELETE FROM pw_pinglog WHERE id=' . S::sqlEscape($pingdata['id']));
+			pwQuery::delete('pw_pinglog', 'id=:id', array($pingdata['id']));	
 			$this->update_markinfo($this->tid, $rpid);
 			//* $threadService->clearTmsgsByThreadId($this->tid);
 			Perf::gatherInfo('changeTmsgWithThreadIds', array('tid'=>$this->tid));
@@ -505,10 +507,11 @@ class PW_Ping {
 	 */
 	function addPost($tid,$content){
 		global $timestamp;
-		$tpcarray = $this->db->get_one("SELECT tid,fid,locked,subject,ifcheck,postdate,lastpost,ptable,author FROM pw_threads WHERE tid=" .S::sqlEscape($tid));
+		$tpcarray = $this->db->get_one("SELECT tid,fid,locked,subject,ifcheck,postdate,lastpost,ptable,author,replies,type,ifshield,anonymous,tpcstatus FROM pw_threads WHERE tid=" .S::sqlEscape($tid));
 		L::loadClass('forum', 'forum', false);
 		L::loadClass('post', 'forum', false);
-		if($tpcarray['tid'] != $tid)return false;
+		if($tpcarray['tid'] != $tid) return false;
+		$tpcarray['openIndex'] = getstatus($tpcarray['tpcstatus'], 2);
 		$pwforum = new PwForum($tpcarray['fid']);
 		$pwpost  = new PwPost($pwforum);
 		if(!$pwforum->foruminfo['allowrp'] && !$pwpost->admincheck && $GLOBALS['_G']['allowrp'] == 0){
@@ -544,6 +547,26 @@ class PW_Ping {
 		}
 	}
 	
+	 function checkReplyRight($tid) {
+	 	global $isGM,$winddb,$isBM,$timestamp;
+	 	$threadService = L::loadClass('threads', 'forum');
+	 	L::loadClass('forum', 'forum', false);
+	 	$read = $threadService->getByThreadId($tid);
+	 	$pwforum = new PwForum($read['fid']);	
+	 	$forumset =& $pwforum->forumset;
+	 	$tpc_locked = $read['locked']%3<>0 ? 1 : 0;
+	 	$admincheck = ($isGM || $isBM) ? 1 : 0;
+	 	if (getstatus($read['tpcstatus'], 7)) {
+			$robbuildService = L::loadClass('RobBuild', 'forum'); /* @var $robbuildService PW_RobBuild */
+			$robbuild = $robbuildService->getByTid($tid);
+			if ($robbuild['starttime'] > $timestamp) return false;
+		}
+	 	$isAuthStatus = $admincheck || (!$forumset['auth_allowrp'] || $pwforum->authStatus($winddb['userstatus'],$forumset['auth_logicalmethod']) === true);
+	 	if ($isAuthStatus && (!$tpc_locked || $SYSTEM['replylock']) && ($admincheck || $pwforum->allowreply($winddb, $groupid))) {
+	 		return true;
+	 	}
+	 	return false;
+	 }
 	/**
 	 * 
 	 * @param $tid
@@ -551,7 +574,7 @@ class PW_Ping {
 	function checkReply($tid) {
 		global $timestamp,$groupid,$winddb,$winduid,$_time;
 		$this->hours =& $_time['hours'];
-		$tpcarray = $this->db->get_one("SELECT tid,fid,locked,ifcheck,postdate,ptable FROM pw_threads WHERE tid=" . S::sqlEscape($tid));
+		$tpcarray = $this->db->get_one("SELECT tid,fid,locked,ifcheck,postdate,ptable,tpcstatus FROM pw_threads WHERE tid=" . S::sqlEscape($tid));
 		if (empty($tpcarray)) {
 			return false;
 		}
@@ -559,6 +582,11 @@ class PW_Ping {
 		L::loadClass('post', 'forum', false);
 		$pwforum = new PwForum($tpcarray['fid']);
 		$pwpost  = new PwPost($pwforum);
+		if (getstatus($tpcarray['tpcstatus'], 7)) {
+			$robbuildService = L::loadClass('RobBuild', 'forum'); /* @var $robbuildService PW_RobBuild */
+			$robbuild = $robbuildService->getByTid($tid);
+			if ($robbuild['starttime'] > $timestamp) return false;
+		}
 		if(!$pwforum->foruminfo['allowrp'] && !$pwpost->admincheck && $GLOBALS['_G']['allowrp'] == 0){
 			return 'reply_group_right';
 		}elseif ($pwforum->forumset['lock']&& !$pwpost->isGM && $timestamp - $tpcarray['postdate'] > $pwforum->forumset['lock'] * 86400 && !pwRights($pwpost->isBM,'replylock')) {

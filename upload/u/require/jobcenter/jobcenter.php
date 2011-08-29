@@ -33,6 +33,7 @@ if($action == "list"){
 		}
 	}
 }elseif( empty($action) || $action == "applied"){	
+	runJob();
 	$joblists = $jobService->getAppliedJobs($winduid); 
 	$jobs = $jobService->buildLists($joblists,$action,$winduid,$groupid);
 	$jobsNum = (int)count($jobs);
@@ -151,12 +152,12 @@ if($action == "list"){
 		}
 		if(procLock('punch_save', $winduid)){
 			if(pwQuery::update('pw_memberdata','uid=:uid',array($winduid),array('punch'=>$timestamp))){
-				list($bool,$information) = getPunchReward($o_punch_reward);
+				list($bool,$information,$continues) = getPunchReward($o_punch_reward);
 			}
 		}
 		procUnLock('punch_save', $winduid);
 		if($bool){
-			ajaxResponse($information,true);
+			ajaxResponse("$information\t$continues",true);
 		}else{
 			ajaxResponse('打卡失败,请明天继续!',false);
 		}
@@ -178,15 +179,20 @@ function getPunchReward($reward){
 		return array(false,'');
 	}
 	(!S::isObj($credit)) && require_once R_P . "require/credit.php";
+	$behaviorService = L::loadClass('behaviorservice','user');
+	list($continues) = $behaviorService->doBehavior($winduid,'continue_punch',0,true);
+	$reward['step'] < 1 && $reward['step'] = 1;
+	$steps = $continues > 0 ? $continues - 1: 0;
+	$awardNum = $reward['min'] + $steps * $reward['step'] > $reward['max'] ? $reward['max'] : $reward['min'] + $steps * $reward['step'];
 	$credit->addLog('other_finishpunch', array(
-		$reward['type'] => $reward['num']
+		$reward['type'] => $awardNum
 	), array(
 		'uid' => $winduid,
 		'username' => $windid,
 		'ip' => $GLOBALS['onlineip']
 	));
-	$credit->set($winduid, $reward['type'], $reward['num']);
+	$credit->set($winduid, $reward['type'], $awardNum);
 	$unit = (isset($credit->cUnit[$reward['type']])) ? $credit->cUnit[$reward['type']] : '';
-	return array(true,pwCreditNames($reward['type']).'+'.$reward['num']);
+	return array(true,pwCreditNames($reward['type']).'+'.$awardNum,$continues);
 }
 ?>

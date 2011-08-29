@@ -28,7 +28,10 @@ Cookie("winduser", StrCode($winduid . "\t" . $windpwd . "\t" . $user['safecv']),
 Cookie("ck_info", $db_ckpath . "\t" . $db_ckdomain);
 //Cookie("ucuser",'cc',$cktime);
 Cookie('lastvisit', '', 0);
-
+//鑷偗姩鑾峰彇鍕嬬珷_start
+require_once(R_P.'require/functions.php');
+doMedalBehavior($winduid,'continue_login');
+//鑷偗姩鑾峰彇鍕嬬珷_end
 echo "ok\t$showmsginfo";
 
 ajax_footer();

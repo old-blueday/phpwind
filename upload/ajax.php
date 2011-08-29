@@ -83,7 +83,7 @@ S::gp(array('action'));
 
 if ($action == 'modify') {
 
-	S::gp(array('pid','article'));
+	S::gp(array('pid','article', 'checkkmd', 'objid'));
 	L::loadClass('postmodify', 'forum', false);
 	if ($pid && is_numeric($pid)) {
 		$postmodify = new replyModify($tid, $pid, $pwpost);
@@ -127,8 +127,20 @@ if ($action == 'modify') {
 		Showmsg('modify_timelimit');
 	}
 
-	if (empty($_POST['step'])) {
+	if ($atcdb['specialsort'] == PW_THREADSPECIALSORT_KMD && $postmodify->type == 'topic' && $winduid == $atcdb['authorid']) {
+		$kmdService = L::loadClass('KmdService', 'forum');
+		$kmdInfo = $kmdService->getKmdInfoByTid($tid);
+		$isKmd = 1;
+	}
 
+	if (empty($_POST['step'])) {
+		if ($isKmd == 1) {
+			if (!$checkkmd && $db_kmd_deducttime) {
+				require_once PrintEot('ajax');ajax_footer();
+			}
+			($db_kmd_deducttime && ($timestamp + $db_kmd_deducttime * 3600 >= $kmdInfo['endtime'])) && Showmsg("您帖子的推广时间剩余不足 {$db_kmd_deducttime}小时，无法编辑！");
+		}
+		
 		$atcdb['anonymous'] && $atcdb['author'] = $db_anonymousname;
 		$atc_content = str_replace(array('<','>','&nbsp;'),array('&lt;','&gt;',' '),$atcdb['content']);
 		if (strpos($atc_content,$db_bbsurl) !== false) {
@@ -154,6 +166,7 @@ if ($action == 'modify') {
 		$postdata->initData($postmodify);
 		$postdata->setTitle($atc_title);
 		$postdata->setContent($atc_content);
+		$isKmd && $postdata->setKmdInfo($kmdInfo);
 		$postdata->setConvert(1);
 		$postdata->setIfcheck();
 		$postmodify->execute($postdata);
@@ -197,7 +210,11 @@ if ($action == 'modify') {
 		ajax_footer();
 	}
 } elseif ($action == 'quote') {
-
+	//实名认证权限
+	if ($db_authstate && !$pwpost->admincheck && $pwforum->forumset['auth_allowrp'] && true !== ($authMessage = $pwforum->authStatus($winddb['userstatus'],$pwforum->forumset['auth_logicalmethod']))) {
+		$message = getLangInfo('msg', $authMessage . '_rp');
+		Showmsg('NO_RUN_SCRIPT'.$message);
+	}
 	if (!$pwpost->admincheck && !$pwforum->allowreply($pwpost->user, $pwpost->groupid)) {
 		Showmsg('reply_forum_right');
 	}
@@ -267,7 +284,7 @@ if ($action == 'modify') {
 	}
 	$old_content = preg_replace("/\<(.+?)\>/is","",$old_content);
 	$atc_content = "[quote]".($article==0 ? getLangInfo('post','info_post_1') : getLangInfo('post','info_post_2'))."\n{$old_content} [url={$db_bbsurl}/job.php?action=topost&tid=$tid&pid=$pid][img]{$imgpath}/back.gif[/img][/url]\n[/quote]\n";
-
+	$replytitle && $replytitle = substrs(str_replace('&nbsp;',' ',$tpcarray['subject']), $db_titlemax - 5);
 	$replytitle =='' ? $atc_title = 'Re:'.$tpcarray['subject'] : $atc_title = 'Re:'.$replytitle;
 	require_once PrintEot('ajax');ajax_footer();
 

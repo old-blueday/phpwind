@@ -18,7 +18,7 @@ class PW_PollsDB extends BaseDB {
 		$sqlAdd = $this->buildConditions($fid);
 		$order = strtoupper($order);
 		$order !== 'DESC' && $order = 'ASC';
-		$query = $this->_db->query("SELECT t.tid,t.fid,t.author,t.authorid,t.subject,t.type,t.postdate,t.hits,t.replies FROM $this->_tableName p LEFT JOIN pw_threads t USING(tid) $sqlAdd AND t.ifshield != 1 AND t.locked != 2  ORDER BY t.postdate $order " . S::sqlLimit($num));
+		$query = $this->_db->query("SELECT t.tid,t.fid,t.author,t.authorid,t.subject,t.type,t.postdate,t.hits,t.replies,t.anonymous FROM $this->_tableName p LEFT JOIN pw_threads t USING(tid) $sqlAdd AND t.ifshield != 1 AND t.locked != 2  ORDER BY t.postdate $order " . S::sqlLimit($num));
 		return $this->_getAllResultFromQuery ( $query );
 	}
 	
@@ -34,13 +34,13 @@ class PW_PollsDB extends BaseDB {
 		$num = intval($num);
 		$sqlAdd = $this->buildConditions($fid);
 		//设定截止时间 的
-		$query = $this->_db->query("SELECT (t.postdate+p.timelimit*86400) AS endtime,p.timelimit,t.tid,t.fid,t.author,t.authorid,t.subject,t.type,t.postdate,t.hits,t.replies FROM $this->_tableName p LEFT JOIN pw_threads t USING(tid) $sqlAdd AND t.ifshield != 1 AND t.locked != 2 AND p.timelimit>0 ORDER BY endtime".S::sqlLimit($num));
+		$query = $this->_db->query("SELECT (t.postdate+p.timelimit*86400) AS endtime,p.timelimit,t.tid,t.fid,t.author,t.authorid,t.subject,t.type,t.postdate,t.hits,t.replies,t.anonymous FROM $this->_tableName p LEFT JOIN pw_threads t USING(tid) $sqlAdd AND t.ifshield != 1 AND t.locked != 2 AND p.timelimit>0 ORDER BY endtime".S::sqlLimit($num));
 		$data = $this->_getAllResultFromQuery ( $query );
 		$count = count($data);
 		if ($count < $num) {
 			//未设定截止时间的
 			$limit = $num - $count;
-			$query = $this->_db->query("SELECT p.timelimit,t.tid,t.fid,t.author,t.authorid,t.subject,t.type,t.postdate,t.hits,t.replies FROM $this->_tableName p LEFT JOIN pw_threads t USING(tid) $sqlAdd AND t.ifshield != 1 AND t.locked != 2 AND p.timelimit=0 ORDER BY pollid ASC ".S::sqlLimit($limit));
+			$query = $this->_db->query("SELECT p.timelimit,t.tid,t.fid,t.author,t.authorid,t.subject,t.type,t.postdate,t.hits,t.replies,t.anonymous FROM $this->_tableName p LEFT JOIN pw_threads t USING(tid) $sqlAdd AND t.ifshield != 1 AND t.locked != 2 AND p.timelimit=0 ORDER BY pollid ASC ".S::sqlLimit($limit));
 			$data2 = $this->_getAllResultFromQuery ( $query );
 			$data2 && $data = array_merge($data,$data2);
 		} 
@@ -60,7 +60,7 @@ class PW_PollsDB extends BaseDB {
 		$sqlAdd = $this->buildConditions($fid);
 		$order = strtoupper($order);
 		$order !== 'DESC' && $order = 'ASC';
-		$query = $this->_db->query("SELECT p.timelimit,t.tid,t.fid,t.author,t.authorid,t.subject,t.type,t.postdate,t.hits,t.replies FROM $this->_tableName p LEFT JOIN pw_threads t USING(tid) $sqlAdd AND t.ifshield != 1 AND t.locked != 2  ORDER BY p.voters $order" . S::sqlLimit($num));
+		$query = $this->_db->query("SELECT p.timelimit,t.tid,t.fid,t.author,t.authorid,t.subject,t.type,t.postdate,t.hits,t.replies,t.anonymous FROM $this->_tableName p LEFT JOIN pw_threads t USING(tid) $sqlAdd AND t.ifshield != 1 AND t.locked != 2  ORDER BY p.voters $order" . S::sqlLimit($num));
 		return $this->_getAllResultFromQuery ( $query );
 	}
 
@@ -77,7 +77,7 @@ class PW_PollsDB extends BaseDB {
 		$sqlAdd = $this->buildConditions($fid);
 		$order = strtoupper($order);
 		$order !== 'DESC' && $order = 'ASC';
-		$query = $this->_db->query("SELECT p.timelimit,t.tid,t.fid,t.author,t.authorid,t.subject,t.type,t.postdate,t.hits,t.replies FROM $this->_tableName p LEFT JOIN pw_threads t USING(tid) $sqlAdd AND t.ifshield != 1 AND t.locked != 2  ORDER BY t.replies $order " . S::sqlLimit($num));
+		$query = $this->_db->query("SELECT p.timelimit,t.tid,t.fid,t.author,t.authorid,t.subject,t.type,t.postdate,t.hits,t.replies,t.anonymous FROM $this->_tableName p LEFT JOIN pw_threads t USING(tid) $sqlAdd AND t.ifshield != 1 AND t.locked != 2  ORDER BY t.replies $order " . S::sqlLimit($num));
 		return $this->_getAllResultFromQuery ( $query );
 	}
 
@@ -94,7 +94,7 @@ class PW_PollsDB extends BaseDB {
 		$sqlAdd = $this->buildConditions($fid);
 		$order = strtoupper($order);
 		$order !== 'DESC' && $order = 'ASC';
-		$query = $this->_db->query("SELECT p.timelimit,t.tid,t.fid,t.author,t.authorid,t.subject,t.type,t.postdate,t.hits,t.replies FROM $this->_tableName p LEFT JOIN pw_threads t USING(tid) $sqlAdd AND t.ifshield != 1 AND t.locked != 2  ORDER BY t.hits $order " . S::sqlLimit($num));
+		$query = $this->_db->query("SELECT p.timelimit,t.tid,t.fid,t.author,t.authorid,t.subject,t.type,t.postdate,t.hits,t.replies,t.anonymous FROM $this->_tableName p LEFT JOIN pw_threads t USING(tid) $sqlAdd AND t.ifshield != 1 AND t.locked != 2  ORDER BY t.hits $order " . S::sqlLimit($num));
 		return $this->_getAllResultFromQuery ( $query );
 	}
 	

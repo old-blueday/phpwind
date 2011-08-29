@@ -1,0 +1,24 @@
+<!--<?php
+defined('W_P') or exit('Forbidden');print <<<EOT
+-->
+<div id="footer">
+<div class="gotop"><a href="#top" id="anch-end" class="gototop">top</a></div>
+<div class="hline"></div>
+<div class="search">
+<a href="index.php">首页</a>
+ | 
+ <a href="index.php?a=myhome">个人空间</a>
+</div>
+<div id="poweredby">
+<!--
+EOT;
+include printWAP('loginbanner');print <<<EOT
+-->
+<br />
+在线人数:<a href="index.php?a=bbsinfo">{$usertotal}</a>({$userinbbs}会员)
+<br/>$ft_time<br/>
+Powered By phpwind</div></div>
+</div></body></html>
+<!--
+EOT;
+?>-->

@@ -127,28 +127,6 @@ EOT;
 							</tr>
 <!--
 EOT;
-if($_G[allowhonor]){print <<<EOT
--->
-							<tr class="user-tr">
-								<td>个性签名</td>
-								<td>
-									<input class="input" type="text" size="40" name="prohonor" value="$userdb[honor]" />（将在我的首页和帖子页面用户信息处显示）
-								</td>
-							</tr>
-<!--
-EOT;
-}print <<<EOT
--->
-							<tr class="user-tr">
-								<td>自我简介</td>
-								<td><textarea name="prointroduce" id="prointroduce" rows="4" cols="50">$userdb[introduce]</textarea><br /><span id="prointroduce_warn">限500字节</span> </td>
-							</tr>
-							<tr class="user-tr">
-								<td>帖子签名</td>
-								<td><textarea name="prosign" id="prosign" rows="4" cols="50">$userdb[signature]</textarea><br />（将在每个帖子下方显示，<span id="prosign_warn">限{$_G[signnum]}字节</span>）</td>
-							</tr>
-<!--
-EOT;
 if($db_signmoney && false!==strpos($db_signgroup,",$groupid,")){print <<<EOT
 -->
 							<tr class="user-tr">
@@ -165,6 +143,28 @@ if($db_signmoney && false!==strpos($db_signgroup,",$groupid,")){print <<<EOT
 EOT;
 }print <<<EOT
 -->
+							<tr class="user-tr">
+								<td>自我简介</td>
+								<td><textarea name="prointroduce" id="prointroduce" rows="4" cols="50">$userdb[introduce]</textarea><br /><span id="prointroduce_warn">限500字节</span> </td>
+							</tr>
+							<tr class="user-tr">
+								<td>帖子签名</td>
+								<td><textarea name="prosign" id="prosign" rows="4" cols="50">$userdb[signature]</textarea><br />（将在每个帖子下方显示，<span id="prosign_warn">限{$_G[signnum]}字节</span>）</td>
+							</tr>
+<!--
+EOT;
+if($_G[allowhonor]){print <<<EOT
+-->
+							<tr class="user-tr">
+								<td>个性签名</td>
+								<td>
+									<input class="input" type="text" size="40" name="prohonor" value="$userdb[honor]" />（将在帖子页面用户信息处显示）
+								</td>
+							</tr>
+<!--
+EOT;
+}print <<<EOT
+-->							
 							<tr class="user-tr">
 								<td>选择您所在的时区<br />将时间显示为您当地时间</td>
 								<td>
@@ -188,7 +188,7 @@ include(R_P.'template/admin/timezone.htm');print <<<EOT
 						<div class="tac" style=" padding:1em">
 							<span class="button"><span><button type="submit">保存资料</button></span></span>
 						</div>
-<script language="JavaScript">
+<script>
 var charset = '$db_charset';
 var signnum = '$_G[signnum]' * 1;
 initCheckTextNum('prointroduce', 'prointroduce_warn', 500);
@@ -239,7 +239,7 @@ EOT;
 						<div class="tac" style=" padding:1em">
 							<span class="button"><span><button type="submit">保存资料</button></span></span>
 						</div>
-<script language="JavaScript">
+<script>
 function addtrade() {
 	var s = getObj('trade_mode').firstChild.cloneNode(true);
 	getObj('trade_c').appendChild(s);
@@ -608,7 +608,7 @@ print <<<EOT
 	</div>
 	<div class="u-m-bg"></div>
 </div>
-<script language="JavaScript">
+<script>
 var display = '$display';
 function CkFaceType(value) {
 	var facetype = document.getElementsByName('facetype');
@@ -683,7 +683,7 @@ function setFaceLen() {
 }
 function selectTab(tab) {
 	showTabs('infolist', tab, 'li', 'current');
-	$('userbinding-node').style.display = (tab == 'binding') ? '' : 'none';
+	getObj('userbinding-node').style.display = (tab == 'binding') ? '' : 'none';
 }
 
 ~function() {

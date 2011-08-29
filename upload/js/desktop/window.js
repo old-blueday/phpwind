@@ -9,7 +9,7 @@ function()
     var windowIndex = 1;
 	var csn='windoo-sizer windoo-';
     var IE = document.all;
-    var $ = function(s)
+    var getObj = function(s)
     {
         return document.getElementById(s);
     };
@@ -68,15 +68,15 @@ function()
         var _this = this;
         jsonArg.onResize = function()
         {
-			if(!$('shadow_body' + _this.id)) return;
+			if(!getObj('shadow_body' + _this.id)) return;
             _this.self.shadow.style.width = _this.self.win.offsetWidth + 26 + 'px';
             _this.self.shadow.style.height = _this.self.win.offsetHeight + 31 + 'px';
             _this.self.shadow.style.left = Number(_this.self.win.style.left.replace("px", "")) - 13;
             _this.self.shadow.style.top = Number(_this.self.win.style.top.replace("px", "")) - 7;
-            $('shadow_body' + _this.id).style.height = _this.self.win.offsetHeight - 23 + 'px';
-            $('main_body' + _this.id).style.width = _this.self.shadow.offsetWidth - 63 + 'px';
+            getObj('shadow_body' + _this.id).style.height = _this.self.win.offsetHeight - 23 + 'px';
+            getObj('main_body' + _this.id).style.width = _this.self.shadow.offsetWidth - 63 + 'px';
 
-            $('main_body' + _this.id).style.height = _this.self.shadow.offsetHeight - 23 + 'px';
+            getObj('main_body' + _this.id).style.height = _this.self.shadow.offsetHeight - 23 + 'px';
             _this.onresize ? _this.onresize(_this.self.win) : 0;
 
         };
@@ -199,13 +199,13 @@ function()
     };
     _WP._removeDragEvent = function()
     {
-        this.self.win.mouse_down?$('drag-' + this.id).detachEvent("onmousedown", this.self.win.mouse_down):0;
-        $('drag-' + this.id).style.cursor = "default";
+        this.self.win.mouse_down?getObj('drag-' + this.id).detachEvent("onmousedown", this.self.win.mouse_down):0;
+        getObj('drag-' + this.id).style.cursor = "default";
     };
     _WP._addDragEvent = function()
     {
-        this.self.win.mouse_down?$('drag-' + this.id).attachEvent("onmousedown", this.self.win.mouse_down):0;
-        $('drag-' + this.id).style.cursor = "move";
+        this.self.win.mouse_down?getObj('drag-' + this.id).attachEvent("onmousedown", this.self.win.mouse_down):0;
+        getObj('drag-' + this.id).style.cursor = "move";
     };
     _WP._addResizeEvent = function()
     {
@@ -279,8 +279,8 @@ function()
         this.maximized = true;
         this._removeDragEvent();
         this._removeResizeEvent();
-        $('restore_' + this.id).style.display = '';
-        $('max_' + this.id).style.display = 'none';
+        getObj('restore_' + this.id).style.display = '';
+        getObj('max_' + this.id).style.display = 'none';
         this.setSize({
             width: this._body.offsetWidth,
             height: this._body.offsetHeight-3,
@@ -314,8 +314,8 @@ function()
         this._addResizeEvent();
 		this.self.shadow.style.display = "";
         this.self.win.style.display = "";
-        $('restore_' + this.id).style.display = 'none';
-        $('max_' + this.id).style.display = '';
+        getObj('restore_' + this.id).style.display = 'none';
+        getObj('max_' + this.id).style.display = '';
         this.setSize(this._winSize);
 		this.maximized = false;
 		this.minimized=false;
@@ -385,13 +385,13 @@ function()
 
 		}
         var _container = container || "client";
-        if ($('win-' + this.uniqueID))
+        if (getObj('win-' + this.uniqueID))
         {
             this.self = {
-                shadow: $('wins-' + this.uniqueID),
-				title:$('top-title-'+this.uniqueID),
-				drag:$('drag-'+this.uniqueID),
-                win: $('win-' + this.uniqueID)
+                shadow: getObj('wins-' + this.uniqueID),
+				title:getObj('top-title-'+this.uniqueID),
+				drag:getObj('drag-'+this.uniqueID),
+                win: getObj('win-' + this.uniqueID)
             };
             return this.toFront();
         }
@@ -515,8 +515,8 @@ function()
                             </DIV>';
 		 this.self = {
             shadow: div_shadow,
-			title:$('top-title-'+this.id),
-			drag:$('drag-'+this.id),
+			title:getObj('top-title-'+this.id),
+			drag:getObj('drag-'+this.id),
             win: win
         };
         FOCUSWINDOW ? FOCUSWINDOW._blur() : 0;
@@ -535,7 +535,7 @@ function()
         {
             _this._focus(_this.self)
         };
-        var allIframes = $(win.id + '-body').getElementsByTagName("iframe");
+        var allIframes = getObj(win.id + '-body').getElementsByTagName("iframe");
         var cwin;
 		var mousedownFn=function(ev,win)
                 {
@@ -588,9 +588,9 @@ function()
 
                 PW.Window._lastModifiedSize=_this._winSize = _this._getWinSize();
             },
-            drag_obj: $('drag-' + this.id),
+            drag_obj: getObj('drag-' + this.id),
             move_obj: win,
-            body_obj: $(win.id + '-body'),
+            body_obj: getObj(win.id + '-body'),
             onfocus: function()
             {
 				_this._focus(_this.self) ;
@@ -609,10 +609,10 @@ function()
             div_shadow.style.height = win.offsetHeight + fixedParam.height + 'px';
             div_shadow.style.left = Number(win.style.left.replace("px", "")) - 13+"px";
             div_shadow.style.top = Number(win.style.top.replace("px", "")) - 7+"px";
-            $('shadow_body' + _this.id).style.height = win.offsetHeight - 23 + 'px';
-            $('main_body' + _this.id).style.width = div_shadow.offsetWidth - 63 + 'px';
+            getObj('shadow_body' + _this.id).style.height = win.offsetHeight - 23 + 'px';
+            getObj('main_body' + _this.id).style.width = div_shadow.offsetWidth - 63 + 'px';
 
-            $('main_body' + _this.id).style.height = div_shadow.offsetHeight - 23 + 'px';
+            getObj('main_body' + _this.id).style.height = div_shadow.offsetHeight - 23 + 'px';
             _this.onresize ? _this.onresize(win) : 0;
             _this._winSize = _this._getWinSize();
         };
@@ -624,7 +624,7 @@ function()
 		{
 			PW.Resize({
 				direct: direct[i].length>2?direct[i].substr(0,1):direct[i],
-				body_obj: $(win.id + '-body'),
+				body_obj: getObj(win.id + '-body'),
 				onResize: onResize,
 				dragObj: this.findNode({
 					className: csn+direct[i]

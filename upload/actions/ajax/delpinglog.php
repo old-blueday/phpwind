@@ -22,7 +22,8 @@ $pingdata = $db->get_one("SELECT * FROM pw_pinglog WHERE id=" . S::sqlEscape($pi
 !$pingdata && Showmsg('data_error');
 !($admincheck || ($_G['markable'] && $pingdata['pinger'] == $windid)) && Showmsg('data_error');
 
-$db->update("UPDATE pw_pinglog SET ifhide=1 WHERE id=" . S::sqlEscape($pingid) . " LIMIT 1");
+//$db->update("UPDATE pw_pinglog SET ifhide=1 WHERE id=" . S::sqlEscape($pingid) . " LIMIT 1");
+pwQuery::update('pw_pinglog', 'id=:id  LIMIT 1', array($pingid), array('ifhide'=>1));	
 if ($db->affected_rows()) {
 	echo "success";
 	$pingService = L::loadClass("ping", 'forum');
@@ -31,7 +32,7 @@ if ($db->affected_rows()) {
 	if ($db_memcache) {
 		//* $threads = L::loadClass('Threads', 'forum');
 		//* $threads->delThreads($tid);
-		Perf::gatherInfo('changeThreadWithThreadIds', array('tid'=>$tid));	
+		Perf::gatherInfo('changeThreadWithThreadIds', array('tid'=>$tid));		
 	}
 } else {
 	echo "data_error";

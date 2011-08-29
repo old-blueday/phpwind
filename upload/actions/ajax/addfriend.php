@@ -58,7 +58,12 @@ if (empty($_POST['step'])) {
 
 		$friendService = L::loadClass('Friend', 'friend'); /* @var $friendService PW_Friend */
 		$friendService->addFriend($winduid, $friend['uid'], '', $friendtype);
-		$friendService->addFriend($friend['uid'], $winduid);
+		$result = $friendService->addFriend($friend['uid'], $winduid);
+		
+	// defend start	
+		CloudWind::yunUserDefend('addfriend', $winduid, $windid, $timestamp, 0, ($result === true ? 101 : 102),(!S::IsBool($result) ? $reason : ''),'','',array('uniqueid'=>$winduid.'-'.$friend['uid']));
+	// defend end
+
 		$userCacheService = L::loadClass('UserCache', 'user'); /* @var $userCacheService PW_UserCache */
 		$userCacheService->delete($winduid, 'recommendUsers');
 		M::sendNotice(

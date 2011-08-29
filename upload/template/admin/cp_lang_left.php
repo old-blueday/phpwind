@@ -36,7 +36,6 @@ $nav_left = array(
 					'propagateset'
 				),
 			),
-			'authentication',
 			'credit',
 			'member',
 			'editer',
@@ -66,7 +65,7 @@ $nav_left = array(
 			'email',
 			'userpay',
 			'help',
-			'wap',
+			//'wap',
 			'sethtm',
 			//'pcache',
 		),
@@ -160,7 +159,16 @@ $nav_left = array(
 					'yunstatistics'
 				),
 			),
+			'admincollege' => array(
+				'name'	=> '站长魔盒',
+				'items' => array(
+				//	'products',    beta版先隐藏目录
+					'hacksource',
+					'stylesource',
+				),
+			),
 			'hackcenter',
+			'hookcenter',
 			//'appslist',
 			'photos_set',
 			'diary_set',
@@ -168,6 +176,7 @@ $nav_left = array(
 			//'app_share',
 			'hot',
 			'weibo_set',
+			'medal_manage',
 			'postcate',
 			'activity',
 			'topiccate',
@@ -193,9 +202,21 @@ $nav_left = array(
 			'present',
 			'share',
 			'plantodo',
-			'team'
+			'team',
+			'kmd_set',
 //			'setads',
 			//'sitemap',
+		),
+	),
+	'cloudcomputing' => array(
+		'name'  => '云工具',
+		'items'  => array(
+			'yunbasic',
+			'yuncheckserver',
+			'yunsearch',
+			'yundefend',
+			'cloudcaptcha',
+			'authentication',
 		),
 	),
 	
@@ -238,6 +259,14 @@ $nav_left = array(
 			'o_commend',
 		)
 	),
+	'wap'		=> array(
+			'name'  => 'WAP设置', 
+			'items' => array(
+				'wapconfig',
+				'wapsettings',
+				'wapadvert',
+			)
+		),
 );
 
 /*动态加载模式菜单*/

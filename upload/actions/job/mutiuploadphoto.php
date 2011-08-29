@@ -107,7 +107,11 @@ if (empty($_POST['step'])) {
 		//会员资讯缓存
 		$userCache = L::loadClass('Usercache', 'user');
 		$userCache->delete($uid, 'cardphoto');
-		updateDatanalyse($pid,'picNew',$timestamp);
+		$ouserDataService = L::loadClass('Ouserdata', 'sns');
+		$myAppsData = $ouserDataService->get($winduid);
+		if (!$myAppsData['photos_privacy']) {
+			updateDatanalyse($pid,'picNew',$timestamp);
+		}
 	}
 	
 	if (!$rt['lastphoto']) {

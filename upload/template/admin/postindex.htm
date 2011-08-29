@@ -99,16 +99,16 @@ print <<< EOT
     <li><a href="$basename&sub=y">添加帖子索引</a></li>
   </ul>
 </div>
-<form action="{$basename}&action=delete" method="post" name="postIndex" onsubmit="if(!confirm('真的要删除吗？')){return false;}">
+<form action="{$basename}&action=delete" method="post" name="postIndex" id="postIndex" onsubmit="if(!confirm('真的要删除吗？')){return false;}">
   <h2 class="h1">帖子列表</h2>
   <div class="admin_table mb10">
     <table width="100%" cellspacing="0" cellpadding="0">
       <tr class="tr2 vt td_bgB">
+      	<td width="24"><span onclick="CheckAll(document.postIndex)" class="cp">全选</span></td>
         <td>ID</td>
         <td>主题</td>
         <td>回复数</td>
         <td>发帖日期</td>
-        <td>&nbsp;</td>
         <td>&nbsp;</td>
       </tr>
 <!--

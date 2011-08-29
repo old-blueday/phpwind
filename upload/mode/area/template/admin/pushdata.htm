@@ -6,8 +6,7 @@ print <<<EOT
 EOT;
 if(empty($action) || $action =='viewverify') {print <<<EOT
 -->
-<script language="JavaScript" src="js/global.js"></script>
-<script language="JavaScript" src="js/pw_ajax.js"></script>
+<script type="text/javascript" src="mode/area/js/invokechange.js"></script>
 <div class="nav3 mb10">
 	<ul class="cc">
 <!--
@@ -92,12 +91,10 @@ EOT;
     </table>
 </form>
 </div>
-<script language="JavaScript" src="js/global.js"></script>
-<script language="JavaScript" src="js/pw_ajax.js"></script>
-<script language="JavaScript" src="js/core/core.js"></script>
-<script language="JavaScript" src="mode/area/js/invokechange.js"></script>
-<script language="javascript">
-var changeItem = New(change,['alias','invoke','invokepiece','$ajax_basename','$invokesForJs']);
+<script type="text/javascript">
+onReady(function(){
+	var changeItem = New(change,['alias','invoke','invokepiece','$ajax_basename','$invokesForJs']);
+})
 </script>
 <h2 class="h1"><span class="mr5 fl">推送内容管理</span></h2>
 <form action="$basename" method="post" name="FORM">
@@ -192,9 +189,7 @@ EOT;
 	<span class="btn"><span><button type="submit" onclick="if (getObj('delaction').checked==true) {return confirm('您确认要进行此操作吗?');}">提 交</button></span></span></p>
 </div>
 </form>
-<script src="js/pw_ajax.js" language="JavaScript"></script>
-<script src="js/global.js" language="JavaScript"></script>
-<script>
+<script type="text/javascript">
 
 function delPushdata(id){
 	if (!confirm("确定要删除此数据吗？")){
@@ -213,11 +208,10 @@ function verifyPushdata(id) {
 EOT;
 }elseif($action =='edit') {print <<<EOT
 -->
-<script type="text/javascript" src="js/core/core.js"></script>
-<script type="text/javascript" src="js/global.js"></script>
-<script type="text/javascript" src="js/pw_ajax.js"></script>
-<script src="js/date.js" language="JavaScript"></script>
-<script language="JavaScript" src="mode/area/js/invokechange.js"></script>
+<script type="text/javascript" src="js/color_picker.js"></script>
+<script type="text/javascript" src="mode/area/js/invokechange.js"></script>
+<script type="text/javascript" src="js/date.js"></script>
+
 <div class="nav3 mb10">
 	<ul class="cc">
         <li><a href="$basename">推送内容管理</a></li>
@@ -331,50 +325,53 @@ print <<<EOT
 EOT;
 if($k=='descrip'){print <<<EOT
 -->
-				<textarea name="param[$k]" style="width:260px;height:92px" id="pushto_info"  onkeyup="checktitlelength($len,'pushto_info','wordinfo');" onkeydown="checktitlelength($len,'pushto_info','wordinfo');" >$val</textarea>&nbsp;&nbsp;<span id="wordinfo"></span>
+				<textarea name="param[$k]" style="width:260px;height:92px" id="pushto_info"  onkeyup="checktitlelength('$len','pushto_info','wordinfo');" onkeydown="checktitlelength('$len','pushto_info','wordinfo');" >$val</textarea>&nbsp;&nbsp;<span id="wordinfo"></span>
 <!--
 EOT;
 } elseif ($k=='title') {
 $val = strip_tags($val);
 print <<<EOT
 -->
-<script language="javascript" type="text/javascript">
+<script type="text/javascript">
 	//判断字数
 	function checktitlelength(num,titleid,wordid){
  		var titleLength = num;
 		setTimeout(function(){
-		var l = strlen($(titleid).value);
+		var l = strlen(getObj(titleid).value);
 		if(l<titleLength)
 		{
-			$(wordid).innerHTML='剩余'+(titleLength-l)+'个字节';
-			$(wordid).style.backgroundColor='#fffeed';
-			$(wordid).style.display='inline';
+			getObj(wordid).innerHTML='剩余'+(titleLength-l)+'个字节';
+			getObj(wordid).style.backgroundColor='#fffeed';
+			getObj(wordid).style.display='inline';
 		}
 		else if(l==titleLength)
 		{
-			$(wordid).innerHTML='已经达到最大字数限制';
-			$(wordid).style.backgroundColor='#ffd9d9';
-			$(wordid).style.display='inline';
+			getObj(wordid).innerHTML='已经达到最大字数限制';
+			getObj(wordid).style.backgroundColor='#ffd9d9';
+			getObj(wordid).style.display='inline';
 		}
 		else if(l>=titleLength)
 		{
-			$(wordid).innerHTML='已超出最大长度限制！';
-			$(wordid).style.backgroundColor='#ff9999';
-			$(wordid).style.display='inline';
-			$(titleid).value = substr($(titleid).value,titleLength);
+			getObj(wordid).innerHTML='已超出最大长度限制！';
+			getObj(wordid).style.backgroundColor='#ff9999';
+			getObj(wordid).style.display='inline';
+			getObj(titleid).value = substr(getObj(titleid).value,titleLength);
 		}
 		else
-			$(wordid).style.display='none';
+			getObj(wordid).style.display='none';
 		},100);
 	}
+	function _showColor(obj){
+		showColorPicker(obj,'css[color]',function(){pickReback('',color_picker)})
+	}
 </script>
-				<input type="text" class="input" size="40" id="pushto_title" name="param[$k]" value="$val" onkeyup="checktitlelength($len,'pushto_title','wordttitle');" onkeydown="checktitlelength($len,'pushto_title','wordttitle');">&nbsp;&nbsp;<span id="wordttitle"></span>
+				<input type="text" class="input" size="40" id="pushto_title" name="param[$k]" value="$val" onkeyup="checktitlelength('$len','pushto_title','wordttitle');" onkeydown="checktitlelength('$len','pushto_title','wordttitle');">&nbsp;&nbsp;<span id="wordttitle"></span>
 			<div class="pwnew tac">
                     <span title="粗体字"><a onclick="styleOnclick(this,'css[b]')" class="{$stylename[b]}">加粗</a></span>
 					<span title="斜体字"><a onclick="styleOnclick(this,'css[i]')" class="{$stylename[i]}">倾斜</a></span>
 					<span title="下划线"><a onclick="styleOnclick(this,'css[u]')" class="{$stylename[u]}">下划线</a></span>
 					<span id="color_show" style="background:{$stylename[color]};" title="点击取消颜色" onclick="colorCancel()"></span>
-					<span title="颜色选择"><a class="two tal" onclick="showColorPicker(this,'css[color]',function(){pickReback(color_picker)})"><img src="$imgpath/pickcolor.gif"  /></a></span>
+					<span title="颜色选择"><a class="two tal" onclick="_showColor(this)"><img src="$imgpath/pickcolor.gif"  /></a></span>
 					<span>时间:<input name="css[endtime]" id="css[endtime]" size="15" class="input" type="input" value="{$stylename[endtime]}" onclick="ShowCalendar(this.id,1);" /></span>
 					<input id="css[color]" name="css[color]" type="hidden" value="$stylename[color]" />
 					<input id="css[b]" name="css[b]" type="hidden" value="{$push['titlecss']['b']}" />
@@ -416,8 +413,8 @@ print <<<EOT
 			</div>
 
             
-<script language="JavaScript" src="mode/area/js/imagetype.js"></script>
-<script language="javascript">
+<script type="text/javascript" src="mode/area/js/imagetype.js"></script>
+<script type="text/javascript">
 var imageTypeImp = New(imageType,['imagetype_ul']);
 </script>
 <!--
@@ -512,11 +509,13 @@ print<<<EOT
     </div>
 </div>
 </form>
-<script language="javascript">
-var pushdataid = '$pushdataid';
-var changeItem = New(editChange,['select_alias','select_invoke','select_invokepiece','$ajax_basename','$invokesForJs','portalbox']);
+<script type="text/javascript">
+onReady(function(){
+	var pushdataid = '$pushdataid';
+	var changeItem = New(editChange,['select_alias','select_invoke','select_invokepiece','$ajax_basename','$invokesForJs','portalbox']);
+})
 </script>
-<script language="JavaScript" src="js/color_picker.js"></script>
+
 <!--
 EOT;
 } elseif ($action=='fetch') {print<<<EOT

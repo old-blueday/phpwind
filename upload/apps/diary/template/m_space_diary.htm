@@ -67,7 +67,12 @@ print <<<EOT
 								<span class="mr5">{$value[postdate]}</span>
 <!--
 EOT;
-if ($space['uid'] == $winduid || $SYSTEM['deldiary']) {print <<<EOT
+if ($space['uid'] == $winduid) {print <<<EOT
+-->
+								<a class="s7" href="apps.php?q=diary&a=edit&did={$value['did']}" >编辑</a>&nbsp;
+<!--
+EOT;
+}if ($space['uid'] == $winduid || $SYSTEM['deldiary']) {print <<<EOT
 -->
 							<a class="s7" href="javascript:;" onclick="pwConfirm('是否确认删除？',this,function(){delDiary('$value[did]','$value[uid]')})">删除</a>
 <!--
@@ -143,7 +148,7 @@ EOT;
 -->
 					</ul>
 				</div>
-<script language="javascript">
+<script type="text/javascript">
 setCurrent('dt_$dtype','dt_all','current');
 </script>	        
 			</div>
@@ -235,7 +240,7 @@ if ($_G['allowreport']) {print <<<EOT
 EOT;
 }if($diary[ifcopy] && $space['uid'] != $winduid){print <<<EOT
 --><span class="p_lr_10">|</span><a class="mr10 s7" href="{$basename}a=copydiary&did=$diary[did]" onclick="return ajaxurl(this);">转载</a>
-<script language="JavaScript">
+<script type="text/javascript">
 function ajaxurl(o) {
 read.obj = o;
 ajax.send(o.href,'',ajax.get);
@@ -255,8 +260,8 @@ if($rateSets[2] && isset($db_hackdb['rate'])){
 print <<<EOT
 -->	 
 				<link rel="stylesheet" type="text/css" href="hack/rate/images/rate.css" />
-				<script language="JavaScript" src="js/rate_ajax.js"></script>
-				<script language="javascript">
+				<script type="text/javascript" src="js/rate_ajax.js"></script>
+				<script type="text/javascript">
 				window.onload = function() {
 					rate.getVote("vote_box","{$db_bbsurl}/hack.php?H_name=rate&action=ajax","elementid=vote_box&typeid=2&objectid={$did}&authorid={$uid}");
 				};
@@ -306,7 +311,7 @@ EOT;
 EOT;
 require_once PrintEot('m_comment');print <<<EOT
 -->
-<script type="text/javascript" language="JavaScript" src="js/pw_lwd.js"></script>
+<script type="text/javascript" src="js/pw_lwd.js"></script>
 	</div>
 <!--
 EOT;
@@ -315,8 +320,8 @@ EOT;
 		</div>
 	</div>
 </div>	
-<script language="JavaScript" src="apps/$appdir/js/diarytype.js"></script>
-<script language="JavaScript" src="js/app_comment.js"></script>
+<script type="text/javascript" src="apps/$appdir/js/diarytype.js"></script>
+<script type="text/javascript" src="js/app_comment.js"></script>
 <!--
 EOT;
 require_once uTemplate::printEot('footer');

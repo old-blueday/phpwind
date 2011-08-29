@@ -15,15 +15,15 @@ class PW_ForumSource extends SystemData {
 	function getRelateType() {
 		return false;
 	}
-	//topic：帖子总数，article：主题数，tpost：今日发帖数
+	//article：帖子总数，topic：主题数，tpost：今日发帖数
 	function getSourceConfig() {
 		return array(
 			'forumsort' 	=> array(
 				'name' 	=> '版块排行',
 				'type'	=> 'select',
 				'value'	=> array(
-					'topic'		=> '帖子排行',
-					'article'	=> '主题排行',
+					'article'	=> '帖子排行',
+					'topic'		=> '主题排行',
 					'tpost'		=> '今日排行',
 				),
 			),

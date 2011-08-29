@@ -78,6 +78,94 @@ class PW_Threads {
 	}
 	
 	/**
+	 * 设置帖子@信息
+	 * @param int $tid
+	 * @param int $pid
+	 * @param array $usernames
+	 */
+	function setAtUsers($tid,$pid,$usernames){
+		$tid = intval($tid);
+		$pid = intval($pid);
+		if (!$tid || !S::isArray($usernames)) {
+			return false;
+		}
+		$userService = L::loadClass('userservice','user');
+		$users = $userService->getByUserNames($usernames);
+		if ($users) {
+			$userids = array();
+			foreach ($users as $v) {
+				$userids[] = $v['uid'];
+			}
+			$threadsAtDb = $this->_getThreadsAtDB();
+			$threadsAtDb->adds($tid,$pid,$userids);
+			return true;
+		}
+		return false;
+	}
+	
+	function updateAtUsers($tid,$pid,$usernames){
+		$tid = intval($tid);
+		$pid = intval($pid);
+		if (!$tid) return false;
+		if (!S::isArray($usernames)){
+			return $this->deleteAtUsers($tid,array($pid));
+		} else {
+			$userService = L::loadClass('userservice','user');
+			$users = $userService->getByUserNames($usernames);
+			if ($users) {
+				$deleteUserIds = $userids = array();
+				foreach ($users as $v) {
+					$userids[] = $v['uid'];
+				}
+				$threadsAtDb = $this->_getThreadsAtDB();
+				$threadAt = $threadsAtDb->gets($tid,array($pid));
+				foreach ($threadAt as $v) {
+					$k = array_search($v['uid'], $userids);
+					if ($k !== false){
+						unset($userids[$k]);
+						continue;
+					} else {
+						$deleteUserIds[] = $v['uid'];
+					}
+				}
+				$userids && $threadsAtDb->adds($tid,$pid,$userids);
+				$deleteUserIds && $threadsAtDb->deleteByUids($tid,$pid,$deleteUserIds);
+				return true;
+			}
+		}
+	}
+	
+	function getAtUsers($tid,$pids) {
+		$tid = intval($tid);
+		if (!$tid || !S::isArray($pids)) {
+			return false;
+		}
+		$data = $tmpData = $uids = array();
+		$threadsAtDb = $this->_getThreadsAtDB();
+		$threadAt = $threadsAtDb->gets($tid,$pids);
+		if (!$threadAt) return $data;
+		foreach ($threadAt as $v){
+			$uids[] = $v['uid'];
+			$tmpData[] = $v;
+		}
+		$uids = array_unique($uids);
+		if ($uids) {
+			$userService = L::loadClass('userservice','user');
+			$userNames = $userService->getUserNamesByUserIds($uids);
+		}
+		if($userNames && $tmpData){
+			foreach ($tmpData as $v) {
+				$data[$v['pid']][] = $userNames[$v['uid']];
+			}
+		}
+		return $data;
+	}
+	
+	function deleteAtUsers($tid,$pids){
+		$threadsAtDb = $this->_getThreadsAtDB();
+		return $threadsAtDb->delete($tid,$pids);
+	}
+	/**
 	 * 根据板块id删除帖子
 	 *
 	 * @param int $forumId 板块id
@@ -131,6 +219,20 @@ class PW_Threads {
 		$_dbService = L::loadDB('threads', 'forum');
 		$_dbService->deleteTucoolThreadsByTids($tids);
 	}
+	
+	/**
+	 * 获取单条帖子的tmsgs表信息  by chenyun 2011-07-13
+	 * 
+	 * @param int $tid
+	 * @return array
+	 */
+	function getTmsgByTid($tid) {
+		$tid = intval($tid);
+		if ($tid < 1) return array(); 
+		$_dbService = L::loadDB('threads', 'forum');
+		return $_dbService->getTmsgByThreadId($tid);
+	}
+	
 	/**
 	 * 获取单条帖子信息
 	 * 
@@ -149,6 +251,10 @@ class PW_Threads {
 	 */
 	function _getThreadsDB() {
 		return L::loadDB('threads', 'forum');
+	}
+	
+	function _getThreadsAtDB() {
+		return L::loadDB('threadsat', 'forum');
 	}
 }
 

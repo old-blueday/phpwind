@@ -1,0 +1,84 @@
+<!--<?php
+print <<<EOT
+-->
+			<div class="review" id="listcomments">
+<!--
+EOT;
+	foreach($cmsReplyList as $value) {
+print <<<EOT
+-->	
+				<dl class="dl_wrap cc" id="comment_$value[commentid]">
+					<dt class="dt_face"><a href="u.php?uid=$value[uid]" class=" _cardshow" target="_blank" data-card-url="pw_ajax.php?action=smallcard&type=showcard&uid={$value[uid]}" data-card-key="{$value['username']}"><img src="{$value[icon]}" width="48" height="48" /></a></dt>
+					<dd class="dd_text">
+						<div class="dd_cm">
+							<p class="dd_cont"><a href="u.php?uid=$value[uid]" class="s4 _cardshow" target="_blank" data-card-url="pw_ajax.php?action=smallcard&type=showcard&uid={$value[uid]}" data-card-key="{$value['username']}">$value[username]：</a>$value[content]<cite class="gray w">($value[postdate])</cite></p>
+<!--
+EOT;
+if (checkReplyPurview()) {
+print <<<EOT
+-->
+							<p class="tar"><a href="javascript:" class="s7" onclick="getReplyList($value[commentid])">回复<span id="commentnum_{$value[commentid]}">({$value['replynum']})</span></a>
+
+<!--
+EOT;
+} if (checkEditPurview($windid,$articleModule->columnId) || $value[uid] == $winduid) {
+print <<<EOT
+-->
+							|<a href="javascript:" onclick="pwConfirm('是否删除？',this,function(){delcmscomment($value[commentid])});" class="s7">删除</a>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+							</p>
+							<div class="dl_reply" id="getreplys_$value[commentid]" style="display:none">
+								<ul class="cc mb10">
+									<li>
+									<form method="post" id="addreply_$value[commentid]" name="addreply_$value[commentid]" action="pw_ajax.php?action=cmsreply&type=addreply" >
+									<input type="hidden" name="commentid" value="{$value[commentid]}">
+									<input name="content" id="content_$value[commentid]" type="text" class="input" /><span class="bt2"><span><button type="button" onclick="addReply(this.form)">回复</button></span></span>
+									</form>
+									</li>
+								</ul>
+									<div id="listreplys_$value[commentid]" ></div>
+							</div>
+						</div>
+					</dd>
+				</dl>
+<!--
+EOT;
+	}
+print <<<EOT
+-->
+				<div class="cc">$replyPages</div>
+			</div>
+<!--
+EOT;
+ if ($type == 'listreply') {
+if ($replyList) {
+	foreach($replyList as $v) {
+print <<<EOT
+-->	
+									<li id="reply_$v[replyid]"><a href="u.php?uid=$v[uid]" class="mr10 fl" target="_blank"><img src="{$v[icon]}" width="35" height="35" /></a><p class="reply_content"><a href="u.php?uid=$v[uid]" target="_blank" class="s4">$v[username]：</a>$v[content]<cite class="gray w">($v[postdate])</cite></p><p class="tar"><a href="javascript:" onclick="replycomment('{$v[username]}',getObj('addreply_{$v[commentid]}'))" class="s7">回复</a> 
+<!--
+EOT;
+if (checkEditPurview($windid,$articleModule->columnId) || $v[uid] == $winduid) {
+print <<<EOT
+-->	
+							 | <a href="javascript:" class="s7" onclick="pwConfirm('是否删除？',this,function(){delreply($v[replyid],$v[commentid])});">删除</a>
+<!--
+EOT;
+}
+print <<<EOT
+-->
+									</p></li>
+<!--
+EOT;
+}}
+	}
+print <<<EOT
+-->
+
+<!--
+EOT;
+?>-->

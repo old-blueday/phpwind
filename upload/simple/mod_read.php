@@ -32,6 +32,9 @@ $forumname = strip_tags($foruminfo['name']);
 $forumset  = $foruminfo['forumset'];
 $pw_posts = GetPtable($read['ptable']);
 $openIndex 	= getstatus($read['tpcstatus'], 2);	#是否开启高楼索引
+if ($forumset['link']) {
+	ObHeader(str_replace("&amp;","&",$forumset['link']));
+}
 
 //SEO setting
 $_summary = strip_tags(stripWindCode($read['content']));

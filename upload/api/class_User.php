@@ -77,26 +77,4 @@ class User {
 		Cookie("ucuser",StrCode($winduid."\t".md5($uc_key.$windpwd)),$cktime);
 		Cookie('lastvisit','',0);
 
-		return '';
-	}
-
-	function synlogout() {
-		header('P3P: CP="CURa ADMa DEVa PSAo PSDo OUR BUS UNI PUR INT DEM STA PRE COM NAV OTC NOI DSP COR"');
-		Cookie('winduser',' ',0);
-		Cookie('hideid','',0);
-		Cookie('lastvisit','',0);
-		Cookie('ck_info','',0);
-		Cookie('msghide','',0,false);
-		Cookie("ucuser",'',0);
-		return '';
-	}
-    function getusergroup() {
-        $usergroup = array();
-        $query = $this->db->query("SELECT gid,gptype,grouptitle FROM pw_usergroups ");
-        while($rt= $this->db->fetch_array($query)) {
-            $usergroup[$rt['gid']] = $rt;
-        }
-        return new ApiResponse($usergroup);
-    }
-}
-?>
+		//鑷

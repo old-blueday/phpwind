@@ -155,7 +155,7 @@ function createHTML($applist){
 	                		'name' => '活动通知','value' => 1
 	                	),
 	                	'website' => array(
-	                		'name' => '站长通知','value' => 1
+	                		'name' => '系统通知','value' => 1
 	                	),
 	                	'apps' => array(
 	                		'name' => '应用通知','value' => 1

@@ -1,7 +1,7 @@
 <?php
 define('SCR', 'index');
 require_once ('global.php');
-
+if (checkFromWap() && $db_wapifopen) ObHeader("m/index.php");
 $cateid = (int) S::getGP('cateid');
 $m = S::getGP('m');
 if ($db_channeldomain && $secdomain = array_search($pwServer['HTTP_HOST'], $db_channeldomain)) {
@@ -12,7 +12,6 @@ if ($db_channeldomain && $secdomain = array_search($pwServer['HTTP_HOST'], $db_c
 }
 selectMode($m);
 if (defined('M_P') && file_exists(M_P . 'index.php')) {
-	//* @include_once pwCache::getPath(S::escapePath(D_P . 'data/bbscache/' . $db_mode . '_config.php'));
 	pwCache::getData(S::escapePath(D_P . 'data/bbscache/' . $db_mode . '_config.php'));
 	if (file_exists(M_P . 'require/core.php')) {
 		require_once (M_P . 'require/core.php');
@@ -22,8 +21,6 @@ if (defined('M_P') && file_exists(M_P . 'index.php')) {
 	exit();
 }
 
-//* include_once pwCache::getPath(D_P . 'data/bbscache/cache_index.php',true);
-//* include_once pwCache::getPath(D_P . 'data/bbscache/forum_cache.php',true);
 pwCache::getData(D_P . 'data/bbscache/cache_index.php');
 pwCache::getData(D_P . 'data/bbscache/forum_cache.php');
 
@@ -136,7 +133,7 @@ foreach ($_tmpForums as $forums) {
 			foreach ($forumadmin as $value) {
 				if ($value) {
 					if (!$db_adminshow) {
-						$forums['admin'] .= '<a href="u.php?username=' . rawurlencode($value) . "\">$value</a> ";
+						$forums['admin'] .= '<a href="u.php?username=' . rawurlencode($value) . '" class=" _cardshow" target="_blank" data-card-url="pw_ajax.php?action=smallcard&type=showcard&username='.rawurlencode($value).'" data-card-key='.$value.'>'.$value.'</a> ';
 					} else {
 						$forums['admin'] .= "<option value=\"$value\">$value</option>";
 					}
@@ -168,7 +165,7 @@ foreach ($_tmpForums as $forums) {
 						$forums['admin'] .= '...';
 						break;
 					}
-					$forums['admin'] .= '<a href="u.php?username=' . rawurlencode($value) . '" class="cfont">' . $value . '</a> ';
+					$forums['admin'] .= '<a href="u.php?username=' . rawurlencode($value) . '" class="cfont _cardshow" target="_blank" data-card-url="pw_ajax.php?action=smallcard&type=showcard&username='.rawurlencode($value).'" data-card-key='.$value.'>' . $value . '</a> ';
 				}
 			}
 		}
@@ -210,7 +207,7 @@ if(Perf::checkMemcache()){
 }else{
 	extract($db->get_one("SELECT * FROM pw_bbsinfo WHERE id=1"));
 }
-$newmember = '<a href="u.php?username=' . rawurlencode($newmember) . '" target="_blank">' . $newmember . '</a>';
+$newmember = '<a href="u.php?username=' . rawurlencode($newmember) . '" target="_blank" class=" _cardshow" data-card-url="pw_ajax.php?action=smallcard&type=showcard&username='.rawurlencode($newmember).'" data-card-key='.$newmember.'>' . $newmember . '</a>';
 
 $article += $o_post;
 $topics  += $o_post;
@@ -221,17 +218,7 @@ Update_ol();
 if (empty($db_online)) {
 	include_once (D_P . 'data/bbscache/olcache.php');
 } else {
-	$userinbbs = $guestinbbs = 0;
-	/**
-	$query = $db->query("SELECT uid!=0 as ifuser,COUNT(*) AS count FROM pw_online GROUP BY uid!='0'");
-	while ($rt = $db->fetch_array($query)) {
-		if ($rt['ifuser']) {
-			$userinbbs = $rt['count'];
-		} else {
-			$guestinbbs = $rt['count'];
-		}
-	}**/
-	
+	$userinbbs = $guestinbbs = 0;	
 	if (count($online_info =  explode("\t", GetCookie('online_info'))) == 3 && $timestamp - $online_info[0] < 60){
 		list(, $userinbbs, $guestinbbs) = $online_info;
 	}else {
@@ -265,7 +252,6 @@ if ($db_indexonline) {
 	if ($online == 'no') Cookie('online', 'no');
 }
 $showgroup = $db_showgroup ? explode(',', $db_showgroup) : array();
-
 // Share union
 if ($db_indexmqshare && $sharelink[1]) {
 	$sharelink[1] = "<marquee scrolldelay=\"100\" scrollamount=\"4\" onmouseout=\"if (document.all!=null){this.start()}\" onmouseover=\"if (document.all!=null){this.stop()}\" behavior=\"alternate\">$sharelink[1]</marquee>";
@@ -275,7 +261,6 @@ if ($db_hostweb == 1 && $updateDaily && $tdtcontrol < $tdtime && !defined('M_P')
 	require_once (R_P . 'require/updateforum.php');
 	updateshortcut();
 	pwQuery::update('pw_bbsinfo', 'id=:id', array(1), array('yposts' => $tposts, 'tdtcontrol' => $tdtime, 'o_tpost' => 0));
-	//* $db->update("UPDATE pw_forumdata SET tpost=0 WHERE tpost<>'0'");
 	pwQuery::update('pw_forumdata', 'tpost<>:tpost', array(0), array('tpost'=>0));
 }
 
@@ -308,7 +293,7 @@ if ($plantime && $timestamp > $plantime && procLock('task')) {
 	require_once (R_P . 'require/task.php');
 	procUnLock('task');
 }
-
 require_once PrintEot('index');
+CloudWind::yunSetCookie(SCR);
 footer();
 ?>

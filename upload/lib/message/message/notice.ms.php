@@ -28,7 +28,7 @@ class MS_Notice extends MS_Base {
 			return false;
 		}
 		$this->_updateStatisticsByUserNames($userIds,false,$this->_notice,1);
-		$this->_updateUserMessageNumbers($userIds);
+		$this->_updateUserMessageNumbers($userIds,$this->_notice);
 		return $messageId;
 	}
 
@@ -90,7 +90,7 @@ class MS_Notice extends MS_Base {
 		if( 1 > $userId ){
 			return false;
 		}
-		return $this->_countByStatus($userId,$this->_notice,$this->_s_not_read,$page,$perpage);
+		return $this->_countByStatus($userId,$this->_notice,$this->_s_not_read);
 	}
 	function countNotice($userId,$typeId){
 		$userId   = intval($userId);
@@ -274,7 +274,7 @@ class MS_Notice extends MS_Base {
 			return false;
 		}
 		$this->_updateStatisticsByUserNames($onlineUserIds,false,$this->_notice,1);
-		$this->_updateUserMessageNumbers($onlineUserIds);
+		$this->_updateUserMessageNumbers($onlineUserIds,$this->_notice);
 		return true;
 	}
 	

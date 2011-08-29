@@ -50,7 +50,7 @@ print <<<EOT
             <option value="recycle" $type_sel[recycle]>{$lang[logtype][recycle]}</option>
             <option value="unite" $type_sel[unite]>{$lang[logtype][unite]}</option>
             <option value="banuser" $type_sel[banuser]>{$lang[logtype][banuser]}</option>
-            <option value="manageip" $type_sel[manageip]>{$lang[logtype][manageip]}</option>
+            <option value="banuserip" $type_sel[banuserip]>{$lang[logtype][banuserip]}</option>
             <option value="signature" $type_sel[signature]>{$lang[logtype][signature]}</option>
             </select></td>
 			</tr>
@@ -122,7 +122,7 @@ print <<<EOT
     <span class="bt"><span><button type="button" onclick="delRecord();">删除多余管理日志</button></span></span>
 </div>
 </form>
-<script language="JavaScript">
+<script type="text/javascript">
 var j_url = '$j_url';
 function delRecord(){
 	if(!confirm("是否要删除多余日志？"))

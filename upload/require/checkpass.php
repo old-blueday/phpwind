@@ -49,7 +49,7 @@ function checkLgt($lgt) {
 
 function getLoginUser($uid) {
 	$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
-	$user = $userService->get($uid, true, true);
+	$user = $userService->get($uid, true, true,true);
 	if ($user['groupid'] == 0) return null;
 	return $user;
 }
@@ -67,7 +67,7 @@ function getRegEmail($userName){
 	return $user['email'];
 }
 
-function checkpass($username, $password, $safecv, $lgt=0) {
+function checkpass($username, $password, $safecv, $lgt=0, $checkQuestion = true) {
 	global $db_ifsafecv,$db_ifpwcache,$db,$timestamp,$onlineip;
 	if (!checkLgt($lgt)) {
 		//Showmsg('login_errortype');
@@ -97,7 +97,7 @@ function checkpass($username, $password, $safecv, $lgt=0) {
 	}
 	$e_login = explode("|", $men['onlineip']);
 
-	if ($e_login[0] == $onlineip.' *' && ($timestamp - $e_login[1]) < 600 && $e_login[2] < 2) {
+	if ($e_login[0] == $onlineip.' *' && ($timestamp - $e_login[1]) < 600 && $e_login[2] < 1) {
 		$GLOBALS['L_T'] = 600 - ($timestamp - $e_login[1]);
 		//Showmsg('login_forbid');
 		return 'login_forbid';
@@ -113,12 +113,12 @@ function checkpass($username, $password, $safecv, $lgt=0) {
 		$L_T--;
 		$F_login = "$onlineip *|$timestamp|$L_T";
 		$userService = L::loadClass('UserService', 'user'); /* @var $userService PW_UserService */
-		$userService->update($uc_user['uid'], array(), array('onlineip' => $F_login));
+		$checkQuestion && $userService->update($uc_user['uid'], array(), array('onlineip' => $F_login));
 		//Showmsg('login_pwd_error');
 		if ($uc_user['status'] == -2) {
 			return 'login_usernamepwd_error';
 		} elseif ($db_ifsafecv && $men['safecv'] != $safecv) {
-			return 'login_safecv_error';
+			if ($checkQuestion) return 'login_safecv_error';
 		} else {
 			return 'login_pwd_error';
 		}
@@ -146,7 +146,15 @@ function checkpass($username, $password, $safecv, $lgt=0) {
 		$elementupdate->userSortUpdate($men);
 	}
 	//End Here
-	return array($winduid, $groupid, $windpwd , $uc_user['synlogin']);
+	//pig-head recycle
+	$user_icon = explode('|',$men['icon']);
+	if($user_icon[4] && $men['tooltime'] < $timestamp-86400){
+		$user_icon[4] = 0;
+		$men['icon'] = implode('|', $user_icon);
+		pwQuery::update('pw_members', 'uid =:uid', array($winduid), array('icon'=>$men['icon']));
+	}
+	//end
+	return array($winduid, $groupid, $windpwd , $uc_user['synlogin'], $men['safecv']);
 }
 
 function checkpass1($username,$password,$safecv,$lgt=0) {
@@ -242,5 +250,11 @@ function checkpass1($username,$password,$safecv,$lgt=0) {
 function questcode($question,$customquest,$answer) {
 	$question = $question=='-1' ? $customquest : $question;
 	return $question ? substr(md5(md5($question).md5($answer)),8,10) : '';
+}
+
+function showLoginAjaxMessage($message, $type = 'error') {
+	$message = getLangInfo('msg', $message);
+	echo $type . "\t" . $message;
+	ajax_footer();
 }
 ?>

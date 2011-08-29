@@ -20,13 +20,16 @@ $newString
 EOT;
 if($SYSTEM['areapush'] || $isGM){print <<<EOT
 -->
-<script language="JavaScript" src="js/date.js"></script>
-<script language="JavaScript" src="mode/area/js/adminview.js"></script>
-<script language="javascript" src="mode/area/js/tagrelate.js"></script>
-<script language="JavaScript" src="js/color_picker.js"></script>
-<script language="JavaScript">
+<script type="text/javascript" src="js/date.js"></script>
+<script type="text/javascript" src="mode/area/js/adminview.js"></script>
+<script type="text/javascript" src="mode/area/js/tagrelate.js"></script>
+<script type="text/javascript" src="js/color_picker.js"></script>
+<script>
 window.onReady(function(){
 	frontadmin = New(frontAdmin,['main','view-hover']);
+	//门户模块管理
+	var console=new ChannelManage(0,'','',0);
+	console.init();
 });
 
 function pickReback(color){

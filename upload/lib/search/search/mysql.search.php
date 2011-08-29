@@ -88,7 +88,7 @@ class Search_Mysql extends Search_Base {
 		foreach ( $searchs as $search ) {
 			$ids .= ($ids) ? "," . $search [$this->_primaryKey] : $search [$this->_primaryKey];
 		}
-//		$total = ($total > $this->_mysqlLimit) ? $this->_mysqlLimit : $total;
+		$total = ($total > $this->_mysqlLimit) ? $this->_mysqlLimit : $total;
 		$searchs = ($range == 3) ? $this->_getPosts ( $ids, $keywords, $this->_getPostsTable () ) : $this->_getThreads ( $ids, $keywords );
 		return array ($total, $searchs );
 	}
@@ -114,6 +114,7 @@ class Search_Mysql extends Search_Base {
 			case 3 :
 				list ( $total, $result ) = $this->_searchPosts ( $keywords, $users, $starttime, $endtime, $forumIds, $offset, $perpage );
 		}
+		$total = ($total > $this->_mysqlLimit) ? $this->_mysqlLimit : $total;
 		//是否开启结果组装
 		//return ($total) ? array($total,$this->_buildThreads($result,$keywords)) : array(false,false);
 		return ($total) ? array ($total, $result, $keywords ) : array (false, false, false );
@@ -556,6 +557,7 @@ class Search_Mysql extends Search_Base {
 		if (! ($total = $membersDao->countSearch ( $keywords ))) {
 			return array (false, false );
 		}
+		$total = ($total > $this->_mysqlLimit) ? $this->_mysqlLimit : $total;
 		$result = $membersDao->getSearch ( $keywords, $offset, $perpage );
 		
 		return array ($total, $this->_buildUsers ( $result ) );
@@ -597,6 +599,7 @@ class Search_Mysql extends Search_Base {
 				list ( $total, $result ) = $this->_searchDiarysWithSubjectAndContent ( $keywords, $users, $starttime, $endtime, $offset, $perpage );
 				break;
 		}
+		$total = ($total > $this->_mysqlLimit) ? $this->_mysqlLimit : $total;
 		return ($total) ? array ($total, $this->_buildDiarys ( $result, $keywords ) ) : array (false, false );
 	}
 	/**

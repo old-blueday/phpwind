@@ -11,7 +11,8 @@ if (isset($db_modes['area'])) {
 			//'area_selecttpl',
 			'area_level_manage',
 			'area_static_manage',
-			'area_pushdata'
+			'area_pushdata',
+			'area_page_manage'
 		)
 	);
 }

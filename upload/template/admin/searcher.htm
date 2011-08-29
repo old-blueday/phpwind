@@ -2,16 +2,15 @@
 include_once PrintEot('left');
 print <<<EOT
 -->
-<script type="text/javascript" src="js/global.js" ></script>
 <script type="text/javascript" src="js/color_picker.js" ></script>
-<script language="JavaScript">
-function $(id){
+<script type="text/javascript">
+function getObj(id){
 	return document.getElementById(id);
 }
 
 function showSelHtml(d,s) {
-	if(s) $(d).innerHTML = $(s).innerHTML;
-	else $(d).innerHTML = '';
+	if(s) getObj(d).innerHTML = getObj(s).innerHTML;
+	else getObj(d).innerHTML = '';
 }
 </script>
 <!--
@@ -51,7 +50,7 @@ print <<<EOT
 		<tr class="tr1 vt">
 			<td class="td1">搜索返回结果数</td>
 			<td class="td2"><input name="config[maxresult]" value="$db_maxresult" class="input input_wa" /></td>
-			<td class="td2"><div class="help_a">搜索一次得到的结果数量</div></td>
+			<td class="td2"><div class="help_a">搜索一次得到的最大数量</div></td>
 		</tr>
 		<tr class="tr1 vt" style="display:none">
 			<td class="td1">搜索间隔时间[秒]</td>
@@ -335,7 +334,7 @@ EOT;
 -->
 	</ul>
 </div>
-<script type="text/javascript" language="JavaScript" src="js/date.js"></script>
+<script type="text/javascript" src="js/date.js"></script>
 <form method="post" name="FORM" action="$basename&job=save&" onsubmit="checkData();return false;">
 <input type="hidden" name="action" value="cp">
 <input type="hidden" name="id" value="$id">
@@ -758,8 +757,8 @@ EOT;
 <div class="mb10 tac"><span class="btn"><span><button type="submit">提 交</button></span></span></div>
 </form>
 
-<script language="JavaScript" src="js/pw_ajax.js"></script>
-<script language="JavaScript">
+<script type="text/javascript" src="js/pw_ajax.js"></script>
+<script type="text/javascript">
 function cateopen(id) {
 	var o = getObj('cate_' + id);
 	if (o == null) return;
@@ -864,7 +863,7 @@ EOT;
 	<li class="current"><a href="$basename&action=statistic">搜索统计</a></li>
 </ul>
 </div>
-<script language="JavaScript" src="js/date.js"></script>
+<script type="text/javascript" src="js/date.js"></script>
 <form method="post" action="{$basename}&action=$action">
 <h2 class="h1">搜索统计</h2>
 <div class="admin_table mb10">

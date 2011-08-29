@@ -17,7 +17,7 @@ if ((!file_exists($cachefile) || pwFilemtime($cachefile) <= $tdtime) && procLock
 		}
 		$rt['username'] = S::escapeChar($rt['username']);
 		$rt['age'] = $nyear - substr($rt['bday'],0,strpos($rt['bday'],'-'));
-		$brithcache .= ' <span><a href="u.php?username='.rawurlencode($rt['username'])."\" title=\"$rt[username]$rt[gender]".getLangInfo('other','indexbirth',array('age'=>$rt['age']))."\">$rt[username]</a></span>";
+		$brithcache .= ' <span><a  target="_blank" class=" _cardshow" data-card-url="pw_ajax.php?action=smallcard&type=showcard&username='.rawurlencode($rt[username]).'" data-card-key='.$rt[username].' href="u.php?username='.rawurlencode($rt['username'])."\" title=\"$rt[username]$rt[gender]".getLangInfo('other','indexbirth',array('age'=>$rt['age']))."\">$rt[username]</a></span>";
 	}
 	pwCache::writeover($cachefile,"<?php\r\n\$birthnum=".pw_var_export($birthnum).";\r\n\$brithcache=".pw_var_export($brithcache).";\r\n?>");
 	procUnLock('birth');

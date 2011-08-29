@@ -47,14 +47,13 @@ _MP.init=function()
 {
 	this.vir = document.createElement('span');
 	this.vir.className="dropselectbox";
-	this.vir.innerHTML='<div class="fl"><ul><li></li></ul></div><button type="button" onfocus="blur();"></button>';
-	this.vir.getElementsByTagName('button')[0].innerHTML = this.getSelectedText();
+	this.vir.innerHTML='<div class="fl"><ul><li></li></ul></div><a href="javascript:;" hidefocus="true"></a>';
+	this.vir.getElementsByTagName('a')[0].innerHTML = this.getSelectedText();
 	var opts='';
 	this.sel.parentNode.insertBefore(this.vir,this.sel);
-	this.vir.getElementsByTagName('button')[0].style.width = this.vir.style.width = this.sel.clientWidth+20+'px';
+	this.vir.getElementsByTagName('a')[0].style.width = this.vir.style.width = this.sel.clientWidth+20+'px';
 	this.sel.style.display='none';
-	this.getSelectedText();
-	this.vir.getElementsByTagName('button')[0].onclick=this.showOptions.bind(this);
+	this.vir.getElementsByTagName('a')[0].onclick=this.showOptions.bind(this);
 	this.vir.style.display='';
 };
 _MP.getSelectedText=function(){
@@ -96,7 +95,7 @@ _MP.select=function(evt)
 		return false;
 	this.sel.value = this.findValue(target.innerHTML);
 	this.sel.onchange && this.sel.onchange();
-	this.vir.getElementsByTagName('button')[0].innerHTML=target.innerHTML;
+	this.vir.getElementsByTagName('a')[0].innerHTML=target.innerHTML;
 	this.cancel(evt);
 }
 _MP.mouseOver=function(evt)

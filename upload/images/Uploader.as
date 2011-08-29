@@ -27,6 +27,7 @@
 		private var browser:FileReferenceList = new FileReferenceList();
 		private var maxFilesize:Object={};
 		private var fileTypes:Array;
+		private var fileTypeStr:String;
 		private var postData:URLVariables = new URLVariables();
 		private var currentId:uint=0;
 		private var albumId:uint=0;
@@ -35,7 +36,7 @@
 		public function Uploader() {
 			//Security.loadPolicyFile();
 			btn.useHandCursor = true;
-			upto.useHandCursor = true;
+			//upto.useHandCursor = true;
 			url = this.loaderInfo.parameters["url"];
 			jsobject = this.loaderInfo.parameters["jsobject"];
 			ExternalInterface.addCallback("remove", removeUpload);
@@ -43,11 +44,12 @@
 			ExternalInterface.addCallback("setDesc", setDesc);
 			ExternalInterface.addCallback('setFileType', setFileType);
 			ExternalInterface.addCallback('setPostData', setPostData);
+			ExternalInterface.addCallback('beginUpload', beginUpload);
 			/**
 			 * 绑定点击事件
 			 */
 			btn.addEventListener(MouseEvent.CLICK,selectFiles);
-			upto.addEventListener(MouseEvent.CLICK,beginUpload);
+			//upto.addEventListener(MouseEvent.CLICK,beginUpload);
 			
 			browser.addEventListener(Event.SELECT, selectHandler);
 			browser.addEventListener(Event.CANCEL, cancelHandler);
@@ -72,7 +74,8 @@
 				_types.push('*.'+p);
 				maxFilesize[p] = parseInt(cfg[p]) * 1024;
 			}
-			fileTypes = [new FileFilter("所有支持的格式("+_types.join(',')+")", _types.join(';'))];
+			fileTypeStr=_types.join(',');
+			fileTypes = [new FileFilter("所有支持的格式("+fileTypeStr+")", _types.join(';'))];
 		}
 		/**
 		 * 转换列表给js调用
@@ -110,7 +113,7 @@
 			{
 				var ext:String = filelist[i].name.substr((filelist[i].name.lastIndexOf(".") + 1)).toLowerCase();
 				var status:String='';
-				if (typeof(maxFilesize[ext]) == undefined)
+				if (typeof(maxFilesize[ext]) == undefined||fileTypeStr.indexOf(ext)<0)
 				{
 					status = "exterror";
 				}
@@ -191,7 +194,7 @@
 		/**
 		 * 开始上传
 		 */
-		private function beginUpload(event:MouseEvent):void
+		public function beginUpload():void
 		{
 			var str:String = ExternalInterface.call(jsobject + ".getRestCount") as String;
 			restCount = (str=='Infinity')?Number.POSITIVE_INFINITY:ExternalInterface.call(jsobject + ".getRestCount");
