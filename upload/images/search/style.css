@@ -58,6 +58,7 @@ a:hover{ text-decoration:underline;}
 .dlA dl{padding-bottom:23px;width:550px;}
 .dlA dt input{padding:0;margin:-4px 0 0;}
 .dlA dt .tlink{ font-size:16px;text-decoration:underline;}
+.dlA dt .tlink em{text-decoration:underline;color:#ff0000;}
 .dlA dd .num{color:#666666;padding:3px 0;}
 .dlA dd cite{color:#008000;padding-right:5px; font-style:normal;}
 .dlA dd .author{padding-top:3px;color:#666;}

@@ -19,7 +19,7 @@ $adds = 0;
 $view = 20;
 $vieworder = array('area' => '1', 'bbs' => '2' ,'cms' => '5');
 foreach ($db_modes as $key => $value) {
-	if ($key == 'cloudcomputing') continue;
+	if ($key == 'cloudcomputing' || $key == 'wap') continue;
 	$pos = array();
 	$value['ifopen'] = 1;
 	if (isset($db_modedomain[$key]) && $db_modedomain[$key]) {
@@ -59,7 +59,7 @@ $adds += (bool)$navConfigService->add(PW_NAV_TYPE_MAIN, array('nkey' => 'area_de
 $adds += (bool)$navConfigService->add(PW_NAV_TYPE_MAIN, array('nkey' => 'area_tucool', 'pos' => array('bbs,area,cms,o,srch,group'), 'title' => '图酷', 'style' => '', 'link' => 'html/channel/tucool', 'alt' => '', 'target' => 0, 'view' => 4, 'upid' => 0, 'isshow' => 1));
 
 $adds += (bool)$navConfigService->add(PW_NAV_TYPE_MAIN, array('nkey' => 'group', 'pos' => array('bbs,area,cms,srch,group'), 'title' => '群组', 'style' => '', 'link' => 'group.php', 'alt' => '', 'target' => 0, 'view' => 6, 'upid' => 0, 'isshow' => 1));
-$adds += (bool)$navConfigService->add(PW_NAV_TYPE_MAIN, array('nkey' => '', 'pos' => array('bbs,area,cms,srch,group'), 'title' => '广场', 'style' => '', 'link' => 'index.php?m=o', 'alt' => '', 'target' => 0, 'view' => 7, 'upid' => 0, 'isshow' => 1));
+$adds += (bool)$navConfigService->add(PW_NAV_TYPE_MAIN, array('nkey' => '', 'pos' => array('bbs,area,cms,srch,group'), 'title' => '广场', 'style' => '', 'link' => 'index.php?m=o', 'alt' => '', 'target' => 0, 'view' => 7, 'upid' => 0, 'isshow' => 0));
 
 
 //FOOT

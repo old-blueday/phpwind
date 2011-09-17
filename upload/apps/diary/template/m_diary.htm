@@ -851,6 +851,13 @@ var ld=window.onload;
 window.onReady(function(){
 	new sSelect(getObj('dtid_add'));
 	new sSelect(getObj('dtid_pvc'));
+	//控制多媒体播放
+	var videos=getElementsByClassName("video");
+	for(var i=0,len=videos.length;i<len;i++){
+(function(elem){
+toggleVideo(elem);
+})(videos[i])
+	}
 });
 </script>
 </div>

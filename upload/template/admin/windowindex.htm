@@ -174,7 +174,7 @@ EOT;
 				SUB_BLOCK_ITEM[SUB_BLOCK[i].id]=SUB_BLOCK[i];
 			}
 			(function(){
-				var module = '<li class="{id}" id="{id}-shortcut" text="{name}" value="{url}"><a href="javascript:;" hidefocus="true" aid={id} name={name} onclick="PW.ChildDialog(this);" ><span class="fl"><img src="mode/{id}/images/admin_icon.png" /></span>{name}</a></li>';/*左侧菜单模板*/
+				var module = '<li class="{id}" id="{id}-shortcut" text="{name}" value="{url}"><a href="javascript:;" hidefocus="true" aid={id} name={name} onclick="PW.ChildDialog(this);" ><span class="fl"><img src="images/blank.gif" style="background:url(mode/{id}/images/admin_icon.png) center center no-repeat;" /></span>{name}</a></li>';/*左侧菜单模板*/
 				var moduleDown = '<li down="1" id="{id}-shortcut" text="{name}" value="{url}"><a class="none" href="javascript:;" hidefocus="true">{name}</a></li>';/*模式部分html代码*/
 				document.write(desk.list.simple(MAIN_BLOCK, module, ''));/*生成左侧菜单*/
 				//document.write("<li id='admin_hr'></li>");/*中间的分隔线*/
@@ -228,20 +228,31 @@ EOT;
 						}
 						c.body = getObj('x-desktop');
 						c.left = this.offsetWidth - c.body.offsetLeft + c.ROOT.scrollLeft-146;/*左边宽度*/
-						c.top = ev.clientY-ev.offsetY + c.ROOT.scrollTop-71;/*顶部高度 100=60(头高度)+40(箭头高度)*/
+						var st=el.getBoundingClientRect().top;
+						c.top =st-71;/*顶部高度 100=60(头高度)+40(箭头高度)*/
 						c.render();
 						PW.setCurrent(el);
 						startPanelShow ? startPanelShow.remove() : 0; /*删除常用功能*/
-						ev.returnValue = false;
+						if(ev.preventDefault){
+							ev.preventDefault();
+						}else{
+							ev.returnValue = false;
+						}
 						return false;
 					}
 				};
 				/* 左侧菜单绑定事件 */
 				for (var i=0,len=leftMenu.length; i<len; i++){
-				   leftMenu[i].onmousedown=function(){
-						mouseover(event);
-						event.cancelBubble=true;
-						event.returnValue=false;
+				   leftMenu[i].onmousedown=function(evt){
+					   var e=evt||window.event;
+						mouseover(e);
+						if(e.preventDefault){
+							e.preventDefault();
+							e.stopPropagation();
+						}else{
+							e.cancelBubble=true;
+							e.returnValue=false;
+						}
 						return false;
 					};
 

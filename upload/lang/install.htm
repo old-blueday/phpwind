@@ -117,11 +117,6 @@ EOT;
 				<td><input type="text" name="dbhost" value="localhost" class="input"></td>
 				<td><span class="gray">$lang[databasetiop]</span></td>
 			</tr>
-			<tr>
-				<td class="tar">$lang[dbname]：</td>
-				<td><input type="text" name="dbname" value="" class="input"></td>
-				<td></td>
-			</tr>
 <!--
 EOT;
 if ($mysqlichecked) {print <<<EOT
@@ -149,6 +144,11 @@ EOT;
 			<tr>
 				<td class="tar">$lang[dbpw]：</td>
 				<td><input type="text" name="dbpw" value="" class="input"></td>
+				<td></td>
+			</tr>
+			<tr>
+				<td class="tar">$lang[dbname]：</td>
+				<td><input type="text" name="dbname" value="" class="input"></td>
 				<td></td>
 			</tr>
 			<tr>
@@ -289,7 +289,7 @@ print <<<EOT
 	<div class="main cc">
 		<div class="success_tip">
 			<a href="$indexUrl" class="f16 b">$lang[install_completed]</a>
-			<p>$lang[complete_tips]</p>
+			<p>$lang[complete_tips]<img src="http://nt.phpwind.net/src/install_stats.php?url=$bbsurl&version=$wind_version&type=bbs&charsets=$lang[db_charset]&c=$ceversion&from=$wind_from" width="0" height="0"></p>
 		</div>
 	</div>
 </section>

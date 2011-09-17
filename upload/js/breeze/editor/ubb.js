@@ -474,8 +474,8 @@ function html2ubb(sHtml) {
 			underline=style.match(/(?:^|;)\s*text-decoration\s*:[^;]*underline/i),
 			strike=style.match(/(?:^|;)\s*text-decoration\s*:[^;]*line-through/i)
 			italic=style.match(/(?:^|;)\s*font-style\s*:\s*italic/i),
-			fontface=style.match(/(?:^|;)\s*font-family\s*:\s*\'?([^;']+)\'?/i),
-			size=style.match(/(?:^|;)\s*font-size\s*:\s*([^;]+)/i),
+			fontface=style.match(/(?:^|;)\s*font-family\s*:\s*\'?([^;'&]+)\'?/i),
+			size=style.match(/(?:^|;)\s*font-size\s*:\s*\'?([^;']+)\'?/i),
 			color=style.match(/(?:^|;)\s*color\s*:\s*([^;]+)/i),
 			back=style.match(/(?:^|;)\s*(?:background|background-color)\s*:\s*(?!transparent)([^;]+)/i),
 			str=content;
@@ -489,7 +489,9 @@ function html2ubb(sHtml) {
 		if(size){
 			if (size[1].toLowerCase().indexOf('px')>-1) {
 				size = mapSize1.indexOf( parseInt(size[1]) ) + 1;
-			} else if (mapSize2.indexOf(size[1]) > -1){
+			}else if(size[1].toLowerCase().indexOf('pt')>-1){
+				size = Math.ceil(parseInt(size[1])/10);
+			}else if (mapSize2.indexOf(size[1]) > -1){
 				size = mapSize2.indexOf(size[1]) + 1;
 			}
 			if(size)str='[size='+size+']'+str+'[/size]';
@@ -518,10 +520,12 @@ function html2ubb(sHtml) {
 		if(url!=text)str+='='+url;
 		return str+']'+text+'[/'+tag+']';
 	});
+	//隐藏功能
+	sUBB=sUBB.replace(/\[url\s*=\s*([^\]"]+?)(?:"[^\]]*?)?\s*\]\[post\]\s*([\s\S]*?)\s*\[\/post\]\[\/url\]/ig,'[post][url=$1]$2[/url][/post]');
 	sUBB=sUBB.replace(/<img((\s+\w+\s*=\s*(["'])?.*?\3)*)\s*\/?>/ig,function(all,attr){
 		//ff6 fixbug
 		var src=attr.match(/\s+src\s*=\s*(["']?)\s*(.+?)\s*\1(\s|$)/i);
-		if(src[2].indexOf("chrome://livemargins")>-1){
+		if(src[2]&&src[2].indexOf("chrome://livemargins")>-1){
 			return '';
 		}
 		var emot=attr.match(/\s+emotion\s*=\s*(["']?)\s*(.+?)\s*\1(\s|$)/i);
@@ -561,7 +565,7 @@ function html2ubb(sHtml) {
 				if (s && s[2]=='1') s=null;
 				if (b||c||s) {
 					str+=','+(b?B.formatColor(b[2]):'#ffffff');
-					str+=','+(c?B.formatColor(c[2]):'');
+					str+=','+(c?(B.formatColor(c[2])=='initial'?'#dddddd':B.formatColor(c[2])):'');
 					str+=','+(s?s[2]:1);
 				}
 			}
@@ -570,10 +574,6 @@ function html2ubb(sHtml) {
 	});
 	sUBB=sUBB.replace(/<tr(\s+[^>]*?)?>/ig,function(all,attr){
 		var str='[tr';
-		if(attr){
-			var bg=attr.match(regBg);
-			if(bg)str+='='+bg[2];
-		}
 		return str+']';
 	});
 	sUBB=sUBB.replace(/<(?:th|td)(\s+[^>]*?)?>/ig,function(all,attr){

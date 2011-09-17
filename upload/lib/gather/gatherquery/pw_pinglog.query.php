@@ -9,7 +9,9 @@ class GatherQuery_UserDefine_PW_PingLog {
 	}
 	
 	function insert($tableName, $fields, $expand = array()) {
-	
+		if (perf::checkMemcache ()) {
+			$this->_service->clearPingLogsCacheByTid ( $fields );
+		}
 	}
 	
 	function update($tableName, $fields, $expand = array()) {

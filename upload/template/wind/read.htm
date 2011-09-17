@@ -97,7 +97,7 @@ if (strpos($pwServer['HTTP_REFERER'],'thread') !== false && $refererParams['fid'
 print <<<EOT
 -->
 	<a href="post.php?action=reply&fid=$fid&tid=$tid" class="replay fr mr10">回复</a>
-	<div style="padding-top:3px;"><span class="pages"><a href="$threadUrl" class="w pages_pre">返回列表</a></span><span class="fl">$pages$db_union[5]</span></div>
+	<div style="padding-top:3px;"><span class="pages"><a href="{$threadUrl}#tabA" class="w pages_pre">返回列表</a></span><span class="fl">$pages$db_union[5]</span></div>
 </div>
 <!--
 EOT;
@@ -109,7 +109,7 @@ if ($N_allowtypeopen && ($foruminfo['allowtype'] != 1 || $modelids || $pcids || 
 EOT;
 	if (($foruminfo['allowtype'] != 1 || $modelids || $pcids || $_G['allowactivity'] && $firstactmid) && $foruminfo['allowtype'] & 1) {print <<<EOT
 -->
-		<li><a href="post.php?fid=$fid" hidefocus="true">新帖</a></li>
+		<!-- li><a href="post.php?fid=$fid" hidefocus="true">新帖</a></li -->
 <!--
 EOT;
 	}
@@ -415,6 +415,17 @@ var readFace = {
 	clear : function() {clearTimeout(this.t1);},
 	close : function(id) {getObj(id).style.display = 'none';}
 }
+
+function ajaxPingcp(href) {
+	ajax.send(href,'',function(){
+	//	console.log(ajax.runscript(ajax.request.responseText));
+		/pid=(\d+)/.exec(href);
+		var pid = RegExp.$1;
+		if(pid == 0) pid = 'tpc';
+		 getObj('pingtable' + pid).innerHTML = ajax.runscript(ajax.request.responseText);
+	});
+	return false;
+}
 </script>
 <div id="pw_content" class="mb10">
 <!--
@@ -444,7 +455,7 @@ print <<<EOT
 				</td>
 				<td width="115" class="readStairs">
 				<a href="link.php?action=previous&fid=$fid&tid=$tid&fpage=$fpage&goto=previous" class="read_prev" title="上一主题">上一主题</a>
-				<a href="link.php?action=previous&fid=$fid&tid=$tid&fpage=$fpage&goto=next" class="read_next" title="下一主题">下一主题</a><input type="text" class="input mr5" name="floor{$read[pid]}" id="floor{$read[pid]}" onkeypress="if(event.keyCode == 13){getFloorUrl(this);return false;};" /><img src="$imgpath/pwicon/stairs.png" onclick="getFloorUrl(getObj('floor{$read[pid]}'))" class="cp" align="absmiddle" /></td>
+				<a href="link.php?action=previous&fid=$fid&tid=$tid&fpage=$fpage&goto=next" class="read_next" title="下一主题">下一主题</a><input type="text" class="input mr5" name="floor{$read[pid]}" id="floor{$read[pid]}" onkeypress="if(event.keyCode == 13){getFloorUrl(this);return false;};" /><img src="$imgpath/pwicon/stairs.png" onclick="getFloorUrl(getObj('floor{$read[pid]}'))" class="cp" align="absmiddle" title="查看指定楼层" /></td>
 			</tr>
 		</table>
 	</div>
@@ -480,7 +491,7 @@ $isAuth = $isAuthMobile || $isAuthAlipay || $isAuthCertificate;
 <!--
 EOT;
 	if ($db_showonline) {
-	$gender = $read['gender'] == 2 ? 'women' : 'man';
+	$gender = getDefaultGender($read['gender']);
 		if (checkOnline($read['thisvisit'])) {print <<<EOT
 --><span class="{$gender}_ol mr5" title="在线" alt="在线">在线</span><!--
 EOT;
@@ -509,7 +520,7 @@ print <<<EOT
 EOT;
 if($isAuth){
 	print <<<EOT
---><span class="fl"><a href="profile.php?action=auth" class="certificate"><img src="u/images/attest/certificate.gif" title="实名认证用户" align="absmiddle" /></a></span><!--
+--><span class="fl"><a href="profile.php?action=auth" class="certificate"><img src="u/images/attest/certificate.gif" width="33" height="22" title="实名认证用户" align="absmiddle" /></a></span><!--
 EOT;
 }
 print <<<EOT
@@ -519,7 +530,7 @@ print <<<EOT
 								<div class="card" style="display:none" id="readFace_{$read[lou]}" onmouseover="this.style.display='';" onmouseout="this.style.display='none';">
 									<dl class="cc">
 										<dt class="fl">
-											<div class="cc"><a href="{$db_userurl}$read[authorid]" class="face_img"><img class="pic" src="$imgpath/blank.gif" style="background:$forumcolorone url({$read[face]}) center center no-repeat;" {$read[facesize]} border="0" /></a></div>
+											<div class="cc"><a href="{$db_userurl}$read[authorid]" class="face_img"><img class="pic" src="{$read[face]}" {$read[facesize]} border="0" /></a></div>
 											<p>UID：$read[authorid]</p>
 <!--
 EOT;
@@ -594,7 +605,7 @@ print <<<EOT
 											</ul>
 										</dd>
 										<dd class="ddB">
-											<a href="{$db_userurl}$read[authorid]" class="add_home">访问TA的空间</a><a href="javascript:;" onclick="sendmsg('pw_ajax.php?action=addfriend&touid=$read[authorid]')" class="add_fri">加好友</a><a href="javascript:;" onclick="sendmsg('pw_ajax.php?action=usertool&uid=$read[authorid]')" class="add_pro">用道具</a>
+											<a href="{$db_userurl}$read[authorid]" class="add_home">访问TA的空间</a><a href="javascript:;" onclick="sendmsg('pw_ajax.php?action=addfriend&touid=$read[authorid]')" class="add_fri">加好友</a><a href="javascript:;" onclick="sendmsg('pw_ajax.php?action=usertool&uid=$read[authorid]','',this.id)" class="add_pro">用道具</a>
 										</dd>
 									</dl>
 								</div>
@@ -605,12 +616,12 @@ print <<<EOT
 EOT;
 if ($read['authorid'] != 0) {print<<<EOT
 -->
-<img onmouseover="readFace.show('readFace_{$read[lou]}');" onmouseout="readFace.clear()" class="pic" src="$imgpath/blank.gif" style="background:$forumcolorone url({$read[face]}) center center no-repeat;" {$read['facesize']} border="0" />
+<img onmouseover="readFace.show('readFace_{$read[lou]}');" onmouseout="readFace.clear()" class="pic" src="{$read[face]}" {$read['facesize']} border="0" />
 <!--
 EOT;
 } else { print<<<EOT
 -->
-<img class="pic" src="$imgpath/blank.gif" style="background:$forumcolorone url({$read[face]}) center center no-repeat;" {$read['facesize']} border="0" />
+<img class="pic" src="{$read[face]}" {$read['facesize']} border="0" />
 <!--
 EOT;
 }print<<<EOT
@@ -792,7 +803,7 @@ EOT;
 EOT;
 		}if (isset($db_hackdb['toolcenter']) && $db_toolifopen) {print <<<EOT
 -->
-									<a href="javascript:;" id="usetool" onclick="sendmsg('pw_ajax.php?action=usetool','','td_More')" class="s6">使用道具</a>								
+									<a href="javascript:;" id="usetool" onclick="sendmsg('pw_ajax.php?action=usetool','',this.id)" class="s6">使用道具</a>								
 <!--
 EOT;
 	}}print <<<EOT
@@ -1122,10 +1133,29 @@ EOT;
 					</div>
 <!--content_read-->
 					<div class="tpc_content">
+<!--
+EOT;
+if($db_iftag && $read['tag']){print <<<EOT
+-->
+					<div class="mb10 read_tags">关键词： {$read[tag]}</div>
+<!--
+EOT;
+}
+print <<<EOT
+-->
 						<div class="f14 mb10" id="read_$read[pid]">
 						$read[content]
 <!--
 EOT;
+
+if($read[frommob]){
+$phoneSystem = $read[frommob] == 1 ? 'Android' : ($read[frommob] == 2 ? 'iPhone' : '');
+print<<<EOT
+-->
+						<p class="phone"><a href=”javascript:void(0);” target=”_blank”>内容来自{$phoneSystem}手机客户端</a></p>
+<!--
+EOT;
+}
 if(getstatus($read[tpcstatus],6)){print<<<EOT
 -->
 						<p class="phone">内容来自[<a href="m/index.php" class="s4">手机版</a>]</p>
@@ -1227,7 +1257,14 @@ EOT;
                 <td class="floot_bottom">
 <!--
 EOT;
-if ($read['aid']) {print <<<EOT
+if ($read['aid']) {
+	if ($read['ifhide']) {
+print <<<EOT
+-->
+					<h6 class="f12 quoteTips" style="border-bottom:0;">附件设置隐藏，需要回复后才能看到!</h6>
+<!--
+EOT;
+	} print <<<EOT
 -->
 					<div id="read_Att_{$read['pid']}" class="mb10">
 <!--
@@ -1264,12 +1301,12 @@ EOT;
 				$i=0;
 				foreach ($read['pic'] as $pic) {
 					//$db_menuinit .= ",'att_pic_s_sub_$pic[aid]' : 'att_pic_s_$pic[aid]'";
-					$picTitle = $pic['descrip'] ? ' title="描述：' . $pic['descrip'] . '"' : '';
+					$picTitle = $pic['descrip'] ? ' title="'.strip_tags($pic['descrip']).'" alt="'.strip_tags($pic['descrip']).'"' : ' title="'.strip_tags($webPageTitle).'" alt="'.strip_tags($webPageTitle).'"';
 					$pic['descrip'] = substrs($pic['descrip'],80);
 					$pic['name'] = substrs($pic['name'],80);
 					print <<<EOT
 -->
-								<li id="att_small_$pic[aid]" onmouseover="postAttImgHover('att_pic_s_{$pic[aid]}','att_pic_s_sub_{$pic[aid]}');"><img id="att_pic_s_sub_$pic[aid]" src="$imgpath/blank.gif" style="background:url($pic[miniUrl]) center center no-repeat" src_data="$pic[url]" onclick="readImg.show('$read[lou]', '$i');"{$picTitle} />
+								<li id="att_small_$pic[aid]" onmouseover="postAttImgHover('att_pic_s_{$pic[aid]}','att_pic_s_sub_{$pic[aid]}');"><img id="att_pic_s_sub_$pic[aid]" src="$imgpath/blank.gif" style="background:url($pic[miniUrl]) center center no-repeat" src_data="$pic[url]" onclick="readImg.show('$read[lou]', '$i');" {$picTitle} />
 								<div class="pw_menu" style="position:absolute;display:none" id="att_pic_s_$pic[aid]">
 								 <div style="border:1px solid $forumcolorone;background:$forumcolortwo;padding:5px 10px; text-align:left;">
 <!--
@@ -1487,112 +1524,90 @@ EOT;
 <!--
 EOT;
 $stylePingMarkShow = isset($ping_logs[$read['pid']]) ? 'display:' : 'display:none';
-if ($_COOKIE['read_hidepinglog']) {
-	$stylePingPageShow = 'display:none';
-	$pingButton = '显示';
-} else {
-	$pingButton = '隐藏';
-}
 print <<<EOT
 -->
-					<div id="mark_$read[pid]" class="score cc mb10" style="$stylePingMarkShow">
-						<div class="scoreTop">
+<div class="read_score mb20" style="$stylePingMarkShow" id="mark_$read[pid]">
+	<div class="read_score_head">
 <!--
 EOT;
 if ($isGM || $pwSystem['pingcp']) {print <<<EOT
 -->
-							<a href="masingle.php?action=pingcp&fid=$fid&tid=$tid&pid=$read[pid]&rpage=$page" onclick="return sendurl(this,2)" title="管理评分记录" class="fr">评分管理</a>
+		<a href="masingle.php?action=pingcp&fid=$fid&tid=$tid&pid=$read[pid]&rpage=$page" onclick="sendmsg('masingle.php?ajax=1&action=pingcp&fid=$fid&tid=$tid&pid=$read[pid]&rpage=$page')" title="管理评分记录" class="fr s4">评分管理</a>
 <!--
 EOT;
 }print <<<EOT
 -->
-							<span class="b">本帖最近评分记录：</span>
-							<span class="mr10">
-								共 <span class="s2" id="pingNum_{$read['pid']}">{$ping_logs[$read['pid']]['count']}</span> 条评分
+    共<span class="s2 b"  id="pingNum_{$read['pid']}">{$ping_logs[$read['pid']]['count']}</span>条评分<span id="pingTotal_{$read['pid']}">
 <!--
 EOT;
 if ($ping_logs[$read['pid']]['creditCount']) {print <<<EOT
 -->
-								<span class="s2 pd15">
 <!--
 EOT;
 foreach ($ping_logs[$read['pid']]['creditCount'] as $k => $v) {print <<<EOT
 -->
-									{$creditnames[$k]} {$v} 
+		，<span>{$creditnames[$k]}<span class="s2 b">{$v}</span></span>
 <!--
 EOT;
 }print <<<EOT
 -->
-								</span>
 <!--
 EOT;
 }print <<<EOT
 -->
-							</span>
-						</div>
-						<div class="scoreContent">
-              <div id="createpingbox_{$read['pid']}"></div>
-							<table width="100%" style="table-layout:fixed;">
-								<tbody id="pingPage_{$read['pid']}" style="$stylePingPageShow">
+			</span>
+		</div>   
+    <div id="pingtable{$read['pid']}">
+		<div id="createpingbox_{$read['pid']}"></div>
+	<table width="100%">
+    	
 <!--
 EOT;
 if (isset($ping_logs[$read['pid']]['count']) && $ping_logs[$read['pid']]['count']) {
-	foreach ($ping_logs[$read['pid']]['data'] as $pingdata) {
+foreach ($ping_logs[$read['pid']]['data'] as $pingdata) {
 print <<<EOT
 -->
-								<tr id="pingLogTr_{$pingdata['id']}" class="vt" onmouseover="showPingDelLink(this, true)" onmouseout="showPingDelLink(this, false)">
-									<th class="p_face">
-                                    	<div id="card_pingUserShow_{$pingdata[id]}_{$pingdata[uid]}" class="userCard" ><img src="{$pingdata['icon']}" width="16" height="16" /></div>
-										<span id="pingUserShow_{$pingdata['id']}"></span>
-									</th>
-									<td class="p_name"><a target="_blank" href="u.php?uid={$pingdata['uid']}" data-card-url="pw_ajax.php?action=smallcard&type=showcard&uid={$pingdata[uid]}" class=" _cardshow" data-card-key="{$pingdata['pinger']}">{$pingdata['pinger']}</a></td>
-									<td width="60">{$pingdata['name']}</td>
-									<td class="s2 b" width="50">{$pingdata['point']}</td>
-									<td width="90">{$pingdata['pingtime']}</td>
-									<td>{$pingdata['record']}</td>
-									<td width="20">
+		   
+		<tr id="pingLogTr_{$pingdata['id']}" onmouseover="showPingDelLink(this, true)" onmouseout="showPingDelLink(this, false)">
+			<td width="30" class="read_score_face">
+			<div id="card_pingUserShow_{$pingdata[id]}_{$pingdata[uid]}" class="userCard" ><a href="u.php?uid={$pingdata['uid']}"><img src="{$pingdata['icon']}" width="20" height="20" /></a>
+            <span id="pingUserShow_{$pingdata['id']}"></span>
+            </div>
+			</td>
+			<td width="45"><a target="_blank" href="u.php?uid={$pingdata['uid']}" data-card-url="pw_ajax.php?action=smallcard&type=showcard&uid={$pingdata[uid]}" class=" _cardshow s4 w mr10" data-card-key="{$pingdata['pinger']}">{$pingdata['pinger']}</a></td>
+			<td width="60"><span class="mr10 w">{$pingdata['name']}&nbsp;<span class="s2 b">{$pingdata['point']}</span></span></td>
+			<td>{$pingdata['record']}</td>
+			<td class="gray read_score_time" width="100">
 <!--
 EOT;
-		if ($admincheck || ($_G['markable'] && $pingdata['pinger'] == $windid)) {
+	if ($admincheck || ($_G['markable'] && $pingdata['pinger'] == $windid)) {
 print <<<EOT
 -->
-										<a class="adel" style="display:none;" id="pingDel_{$pingdata['id']}" href="javascript:void(0);" onclick="delPingLog('$fid', '$tid', '{$read['pid']}', '{$pingdata['id']}')">删除</a>
+      <a style="display:none;" class="s4" id="pingDel_{$pingdata['id']}" href="javascript:void(0);" onclick="delPingLog('$fid', '$tid', '{$read['pid']}', '{$pingdata['id']}')">删除</a>
 <!--
 EOT;
 		}
 print <<<EOT
 -->
-									</td>
-								</tr>
+			{$pingdata['pingtime']}</td>
+			</tr>
 <!--
 EOT;
 	}
-}
-print <<<EOT
+}print <<<EOT
 -->
-								</tbody>
-							</table>
-						</div>
+		
+	</table>
+	<div class="p10 cc">
+		{$ping_logs[$read['pid']]['pages']}
 <input id="pingPageNum_{$read['pid']}" type="hidden" value="2" />
 <script>
 getObj('pingPageNum_{$read["pid"]}').value = 2;
 </script>
-						<div class="scoreBottom cc">
-<!--
-EOT;
-	if ($ping_logs[$read['pid']]['count'] > 10) {
-print <<<EOT
--->
-             <a class="fr" id="pingMore_{$read['pid']}" href="javascript:void(0);" onclick="setTimeout(function(){showPingPage('$fid', '$tid', '{$read['pid']}');}, 200);">查看更多</a>
-<!--
-EOT;
-	}
-print <<<EOT
--->
-							<a id="pingHide_{$read['pid']}" href="javascript:void(0);" onclick="pingHideCtrl('{$read['pid']}');">$pingButton</a>
-						</div>
-					</div>
+		</div>
+</div>
 					<div id="w_$read[pid]" class="c"></div>
+</div>
 <!--评分结束-->
 <!--
 EOT;
@@ -1603,7 +1618,7 @@ if($read[pid] == 'tpc'){print <<<EOT
 EOT;
 if($admincheck || $_G['markable']){print <<<EOT
 -->
-										<a class="r_score" id="showping_$read[pid]" href="operate.php?action=showping&tid=$tid&pid=$read[pid]&page=$page" onclick="return sendurl(this,8,this)" title="评分">评分</a>
+										<a class="r_score" id="showping_$read[pid]" href="operate.php?action=showping&tid=$tid&pid=$read[pid]&page=$page" onclick="sendmsg('operate.php?ajax=1&action=showping&tid=$tid&pid=$read[pid]&page=$page');" title="评分">评分</a>
 <!--
 EOT;
 }if($groupid!='guest' && $read['lou']==0){print <<<EOT
@@ -1656,8 +1671,8 @@ print <<<EOT
 -->
 <!--
 EOT;
-if($read[pid] == 'tpc' && $db_yunsearch_search){
-$guess_read_middle = ($db_yun_expand && $db_yun_expand[guess_read_middle]) ? sprintf(html_entity_decode($db_yun_expand[guess_read_middle]),$read[tid],$read[subject],$read['fid'],$GLOBALS[winduid]) : '';
+if($read[pid] == 'tpc' && $GLOBALS['db_yunsearch_search']){
+$guess_read_middle = cloudwind::getSearchGuessTemplateForRead($read [tid], $read [subject], $read ['fid'], $GLOBALS [winduid]);
 print <<<EOT
 -->
 	$guess_read_middle	
@@ -1713,17 +1728,7 @@ EOT;
 					<div class="c"></div>
 <!--
 EOT;
-}if($db_iftag && $read['tag']){print <<<EOT
--->
-					<div class="tal mb10">关键词: {$read[tag]}</div>
-<!--
-EOT;
-}
-print <<<EOT
--->
-<!--
-EOT;
-if ($htmlAdvert['TidDown']) {print <<<EOT
+}if ($htmlAdvert['TidDown']) {print <<<EOT
 -->
 					<span class="mb10 tips" id="ads_c_$read[pid]">{$htmlAdvert['TidDown']}</span>
 					<div class="c">&nbsp;</div>
@@ -1829,26 +1834,22 @@ print <<<EOT
 EOT;
 if($read['lou']==0){print <<<EOT
 -->
-							<a class="r-reply" title="回复此楼" href="javascript:void(0);" onclick="postreply('回 楼主($read[anonymousname]) 的帖子');">回复</a>
+							<a class="r-reply" title="回复此楼" href="javascript:void(0);" onclick="postreply('回 楼主($read[anonymousname]) 的帖子','pw_ajax.php?action=quickpost&fid=$fid&tid=$tid&pid=$read[pid]&article=$read[lou]&page=$page');">回复</a>
 <!--
 EOT;
 }else{print <<<EOT
 -->
-							<a class="r-reply" title="回复此楼" href="javascript:;" onclick="postreply('回 $read[lou]楼($read[author]) 的帖子');">回复</a>
+							<a class="r-reply" title="回复此楼" href="javascript:;" onclick="postreply('回 $read[lou]楼($read[author]) 的帖子','pw_ajax.php?action=quickpost&fid=$fid&tid=$tid&pid=$read[pid]&article=$read[lou]&page=$page');">回复</a>
 <!--
 EOT;
-}print <<<EOT
--->
-							<a class="r-quote" href="post.php?action=quote&fid=$fid&tid=$tid&pid=$read[pid]&article=$read[lou]&page=$page" onclick="return sendurl(this,4,'',event)" id="quote_$read[pid]" title="{$quote_title}">引用</a>
-<!--
-EOT;
+}
 if($read[pid] != 'tpc'){print <<<EOT
 -->
 <!--
 EOT;
 	if($admincheck || $_G['markable']){print <<<EOT
 -->
-										<a class="r-score" id="showping_$read[pid]" href="operate.php?action=showping&tid=$tid&pid=$read[pid]&page=$page" onclick="return sendurl(this,8,this)" title="评分">评分</a>
+										<a class="r-score" id="showping_$read[pid]" href="operate.php?action=showping&tid=$tid&pid=$read[pid]&page=$page" onclick="sendmsg('operate.php?action=showping&tid=$tid&pid=$read[pid]&page=$page&ajax=1')" title="评分">评分</a>
 <!--
 EOT;
 	}
@@ -1927,7 +1928,7 @@ EOT;
 }print <<<EOT
 -->
 	<a href="post.php?action=reply&fid=$fid&tid=$tid" class="replay fr mr10">回复</a>
-	<div style="padding-top:3px;"><span class="pages"><a href="thread.php?fid=$fid" class="w pages_pre">返回列表</a></span><span class="fl">$pages$db_union[5]</span></div>
+	<div style="padding-top:3px;"><span class="pages"><a href="{$threadUrl}#tabA" class="w pages_pre">返回列表</a></span><span class="fl">$pages$db_union[5]</span></div>
 </div>
 <!--链接提醒-->
 <!--
@@ -1958,7 +1959,7 @@ var db_htmifopen = '$db_htmifopen';
 var db_dir = '$db_dir';
 var db_ext = '$db_ext';
 var db_bbsurl = '$db_bbsurl';
-var copyurl = '$subject|$db_bbsurl/read.php?tid=$tid&ds=1' + (page > 1 ? '&page=' + page : '') + '&'+'u=$winduid';
+var copyurl = '$subject|' + location.href;
 <!--
 EOT;
 if($db_windpost['checkurl'] == '1'){print<<<EOT
@@ -1970,59 +1971,35 @@ EOT;
 -->
 //window.onReady(userCard.init);
 
-/*pingpage*/
-function showPingPage(fid, tid, pid) {
-	if (getObj('pingPage_'+pid).style.display == "none") {
-		pingHideCtrl(pid);
-	}
-	var pingPageNum = getObj('pingPageNum_'+pid).value * 1;
-	ajax.send("pw_ajax.php?action=pingpage", "page="+pingPageNum+"&fid="+fid+"&tid="+tid+"&pid="+pid, function(){
-		var gotText = ajax.request.responseText;
-
-		var trs=gotText.split("<!-- splitTr -->");
-		var tr, td, trData, pingId, pingIdMatch;
-		for(var i=1,len=trs.length;i<len;i++) {
-			pingIdMatch = trs[i].match(/<\!\-\- pingId\:(\d+) \-\->/i);
-			pingId = pingIdMatch[1];
-			trData = trs[i].split("<!-- split -->");
-
-			tr = document.createElement("tr");
-			tr.id = 'pingLogTr_' + pingId;
-			tr.onmouseover = function() {showPingDelLink(this, true)};
-			tr.onmouseout = function() {showPingDelLink(this, false)};
-			td = document.createElement("th");
-			td.innerHTML = trData[0];
-			tr.appendChild(td);
-
-			for(var j=1; j<=6; j++) {
-				td = document.createElement("td");
-				td.innerHTML = trData[j];
-				tr.appendChild(td);
-			}
-			getObj('pingPage_'+pid).appendChild(tr);
-		}
-		if (gotText.indexOf('__pingPageOver__') != -1) { getObj('pingMore_'+pid).style.display='none';return ;}
-	});
-	getObj('pingPageNum_'+pid).value = pingPageNum + 1;
-}
 function delPingLog(fid, tid, pid, pingid) {
 	showDialog({type:'confirm',message:"你确定要删除这条评分动态么？",okText:'确认',onOk:function(){
-		read.obj = getObj("pingDel_"+pingid);
 		read.guide();
 		ajax.send("pw_ajax.php?action=delpinglog", "fid="+fid+"&tid="+tid+"&pid="+pid+"&pingid="+pingid, function(){
-			if (ajax.request.responseText == 'success') {
+			var rText = ajax.request.responseText.split('\t');
+			if (rText[0] == 'success') {
+				read.close();
 				showDialog('success','删除评分动态成功！');
-
+				var totalStr='',total=JSONParse(rText[1]);
+				for(var k in total){
+					totalStr+='，<span>'+k+'<span class="s2 b">'+total[k]+'</span></span>';
+				}
+				getObj('pingTotal_'+pid).innerHTML = totalStr;
+				
 				if (getObj('pingLogTr_'+pingid)) {
-					getObj('pingLogTr_'+pingid).style.display = "none";
+					getObj('pingLogTr_'+pingid).parentNode.removeChild(getObj('pingLogTr_'+pingid))
 				}
 
 				if (getObj('createpingLogTr_'+pingid)) {
-					getObj('createpingLogTr_'+pingid).style.display = "none";
+					getObj('createpingLogTr_'+pingid).parentNode.removeChild(getObj('createpingLogTr_'+pingid))
 				}
 				if (getObj('pingNum_'+pid)) {
 					var pingNums = getObj('pingNum_'+pid);
 					pingNums.innerHTML  = parseInt(pingNums.innerHTML) - 1;
+				}
+				var pingtable=getObj("pingtable"+pid);
+				var tr=pingtable.getElementsByTagName("tr");
+				if(tr.length<1&&getObj("mark_"+pid)){
+					getObj("mark_"+pid).style.display="none";
 				}
 
 			} else {
@@ -2038,19 +2015,7 @@ function showPingDelLink(trObj, isShow) {
 		linkObj.style.display = isShow ? '' : 'none';
 	}
 }
-function pingHideCtrl(pid) {
-	if (getObj('pingPage_'+pid).style.display == "") {
-		getObj('pingPage_'+pid).style.display = "none";
-		getObj('createpingbox_'+pid).style.display = "none";
-		getObj('pingHide_'+pid).innerHTML = "显示";
-		SetCookie('read_hidepinglog', 1);
-	} else {
-		getObj('pingPage_'+pid).style.display = "";
-		getObj('createpingbox_'+pid).style.display = "";
-		getObj('pingHide_'+pid).innerHTML = "隐藏";
-		SetCookie('read_hidepinglog', 0);
-	}
-}
+
 function copyFloorUrl(o) {
 	var floorurl = '$db_bbsurl/read.php?tid=$tid&ds=1' + (page > 1 ? '&page=' + page : '') + '#';
 	if (is_ie) {
@@ -2070,6 +2035,13 @@ if(getObj('bookmarkExplore')) {
 		//调用气泡
 		var pw_bubble=new Bubble([{"name":"pw_all_tip_medal","id":"pw_all_pos_medal"}]);
 		pw_bubble.init();
+		//控制多媒体播放
+		var videos=getElementsByClassName("video");
+		for(var i=0,len=videos.length;i<len;i++){
+			(function(elem){
+				toggleVideo(elem);
+			})(videos[i])
+		}
 		})
 </script>
 <!--
@@ -2162,7 +2134,7 @@ EOT;
 EOT;
 }print <<<EOT
 -->
-<div id="photo_pop_mask" onclick="readImg.hidePhoto()" class="pImg_bg" style="display:none"></div></div>
+<div id="photo_pop_mask" onclick="readImg.hidePhoto()" class="pImg_bg" style="display:none"></div>
 <div id="photo_pop" class="pImg_wrap" style="display:none"><table border="0" cellspacing="0" cellpadding="0"><tbody><tr><td class="bcr1"></td><td class="pibg1"></td><td class="bcr2"></td></tr><tr><td class="pibg4"></td><td><div class="pImg tac">
 <div id="imgLoading" class="imgLoading" style="margin:auto;">
 <div class="aPre" id="prephoto" onclick="readImg.prevPhoto()" title="上一张"></div>

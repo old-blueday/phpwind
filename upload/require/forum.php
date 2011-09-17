@@ -199,7 +199,7 @@ function updatecommend($fid,$forumset) {
 			default  : $orderby = 'digest';break;
 		}
 		$sql   = $forumset['commendlist'] ? " AND tid NOT IN($commendlist)" : '';
-		$query = $db->query("SELECT tid,authorid,author,subject FROM pw_threads WHERE fid=".S::sqlEscape($fid)." AND topped='0' $sql ORDER BY $orderby DESC $limit");
+		$query = $db->query("SELECT tid,authorid,author,subject FROM pw_threads WHERE fid=".S::sqlEscape($fid)." AND specialsort='0' $sql ORDER BY $orderby DESC $limit");
 		while ($rt = $db->fetch_array($query)) {
 			if ($forumset['commendlength'] && strlen($rt['subject'])>$forumset['commendlength']) {
 				$rt['subject'] = substrs($rt['subject'],$forumset['commendlength']);

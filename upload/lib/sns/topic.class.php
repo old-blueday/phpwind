@@ -169,8 +169,8 @@ class PW_Topic{
 		$weiboRelations = array();
 		if(!$topicIds) return 0;
 		if (!is_array($topicIds)) {
-			$topicsIds = intval($topicsIds);
-			$topicsIds = array($topicsIds);
+			$topicIds = intval($topicIds);
+			$topicIds = array($topicIds);
 		} else {
 			foreach ($topicIds as $k=>$v)
 				$topicIds[$k] = intval($v);

@@ -241,7 +241,7 @@ Breeze.namespace('global.uploader', function(B){
 				if (str == 'ok') {
 					B.query('#editor-insertTattach .B_tips').remove();		
 				} else {
-					ajax_guide();
+					B.util.alert("删除失败");
 				}
 			});
 			window.event && (event.returnValue = false);
@@ -297,7 +297,7 @@ Breeze.namespace('global.uploader', function(B){
 						B.query("#tmpRemoteHidden"+id).remove();
 					}
 				} else {
-					ajax_guide();
+					B.util.alert("删除失败");
 				}
 			});
 			e.preventDefault();

@@ -369,9 +369,8 @@ if ($action == 'setting') {
 			$id = explode(',', $id);
 
 			foreach ($id as $value){
-				if($value==""){
-					continue;
-				}
+				$value = intval($value);
+				if($value < 1) continue;
 				$str .= $str ? ', '.S::sqlEscape($value).'' : S::sqlEscape($value);
 				$wid .= $wid ? ', '.$value : $value;
 			}
@@ -399,7 +398,6 @@ if ($action == 'setting') {
 		if ($step == 2) {
 			S::gp(array('id'));
 			if (!$id) adminmsg('operate_error');
-
 			$sql = "SELECT word, custom FROM pw_wordfb WHERE id IN (".$id.")";
 			$query = $db->query($sql);
 			$word = array();
@@ -436,12 +434,10 @@ if ($action == 'setting') {
 			S::gp(array('id'));
 			if (!$id) adminmsg('operate_error');
 			$id = explode(',', $id);
-
 			$count = 0;
 			foreach ($id as $value){
-				if($value==""){
-					continue;
-				}
+				$value = intval($value);
+				if($value < 1) continue;
 				$str .= $str ? ', '.S::sqlEscape($value).'' : S::sqlEscape($value);
 				$wid .= $wid ? ', '.$value : $value;
 				$count++;

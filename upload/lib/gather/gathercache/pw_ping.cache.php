@@ -15,7 +15,7 @@ class GatherCache_PW_Ping_Cache extends GatherCache_Base_Cache {
 	 * @param array $ping_logs 积分日志数组
 	 * @return array
 	 */
-	function getPingsByThreadId($threadId,$ping_logs){
+	function getPingsByThreadId($threadId,$ping_logs,$pingpage=null){
 		$threadId = S::int($threadId);
 		if($threadId < 1 || ! $this->checkMemcache()){
 			return false;	
@@ -25,8 +25,7 @@ class GatherCache_PW_Ping_Cache extends GatherCache_Base_Cache {
 		$result = $this->_cacheService->get($pinglogKey);
 		if ($result === false || $this->_cacheService->get($pinglogSourceKey) != $ping_logs) {
 			$pingService = L::loadClass("ping", 'forum');
-			$result = $pingService->getPingLogs($threadId, $ping_logs);
-			
+			$result = $pingService->getPingLogs($threadId, $ping_logs,$pingpage);
 			$this->_cacheService->set($pinglogSourceKey, $ping_logs);
 			$this->_cacheService->set($pinglogKey, $result);
 		}

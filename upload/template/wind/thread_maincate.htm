@@ -35,14 +35,14 @@ EOT;
 if($thread[topped]==4){print <<<EOT
 -->
 	<a href="read.php?tid={$thread[tid]}" target="_blank">
-		<img src="$imgpath/pwicon/headtopic_$thread[topped].gif" align="absmiddle" alt="置顶帖标志" title="置顶帖标志"/>
+		<img src="$imgpath/pwicon/headtopic_$thread[topped].gif" align="absmiddle" alt="置顶帖" title="置顶帖"/>
 	</a>		
 <!--
 EOT;
 }elseif($thread[topped]){print <<<EOT
 -->
 	<a href="read.php?tid={$thread[tid]}" target="_blank">
-		<img src="$imgpath/$stylepath/file/headtopic_$thread[topped].gif" align="absmiddle" alt="置顶帖标志" title="置顶帖标志"/>
+		<img src="$imgpath/$stylepath/file/headtopic_$thread[topped].gif" align="absmiddle" alt="置顶帖" title="置顶帖"/>
 	</a>
 <!--
 EOT;
@@ -59,7 +59,7 @@ EOT;
 EOT;
 if($thread[digest]){print <<<EOT
 -->
-			<img class="fr" src="$imgpath/$stylepath/file/digest_$thread[digest].gif" align="absmiddle" style="margin-top:4px;" title="精华帖标志" />
+			<img class="fr" src="$imgpath/$stylepath/file/digest_$thread[digest].gif" align="absmiddle" style="margin-top:4px;" title="精华帖" />
 <!--
 EOT;
 }if($managecheck){
@@ -111,7 +111,7 @@ if(isset($thread['colony'])){print <<<EOT
 EOT;
 }if($timestamp-$thread[lastpost]<=$db_newtime){print <<<EOT
 -->
-			<img src="$imgpath/$stylepath/file/new.gif" align="absmiddle" title="新帖标志" />
+			<img src="$imgpath/$stylepath/file/new.gif" align="absmiddle" title="新帖" />
 <!--
 EOT;
 }if($forumset['inspect'] && $thread['inspect']){print <<<EOT

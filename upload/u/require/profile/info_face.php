@@ -15,6 +15,7 @@ if (!$step){
 				$next_page = 2;
 				break;
 			} 
+			if ($imgname == 'none.gif') continue;
 			$imgname_array[] = $imgname;
 		}
 	}

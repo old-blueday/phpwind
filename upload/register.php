@@ -144,7 +144,7 @@ if (S::getGP('action','P') == 'regcheck') {
 		}
 		require_once(R_P.'require/onlinepay.php');
 		$olpay = new OnlinePay($ol_payto);
-		ObHeader($olpay->alipayurl($order_no, $invnum * $inv_price, 4));				
+		ObHeader($olpay->alipayurl($order_no, $invnum * $inv_price, 4,$db_registerfile));				
 	}
 } elseif (GetGP('action','P') == 'auth') {
 

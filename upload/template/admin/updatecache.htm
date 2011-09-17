@@ -84,7 +84,17 @@ if(!$isMemcachOpen){print <<<EOT
 EOT;
 }print <<<EOT
 -->
-    <form action="$basename&" method=post>
+     <form action="$basename&" method=post>
+      <input type="hidden" name=action value='flushDataSquare'>
+      <tr class="tr1 vt">
+        <td class="td1">广场数据缓存</td>
+        <td class="td2"><span class="bt2"><span>
+          <button type="submit">更 新</button>
+          </span></span></td>
+        <td class="td2"><div class="help_a">更新广场数据</div></td>
+      </tr>
+    </form>
+	<form action="$basename&" method=post>
       <input type="hidden" name=action value='digest'>
       <tr class="tr1 vt">
         <td class="td1">修复精华帖统计</td>

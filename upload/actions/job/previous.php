@@ -8,9 +8,9 @@ $fid = (int) $rt['fid'];
 $goto = S::escapeChar(S::getGP('goto'));
 
 if ($goto == "next") {
-	$tid = $db->get_value("SELECT tid FROM pw_threads WHERE fid=" . S::sqlEscape($fid, false) . "AND ifcheck='1' AND topped='0' AND lastpost<" . S::sqlEscape($rt['lastpost'], false) . "ORDER BY lastpost DESC LIMIT 1");
+	$tid = $db->get_value("SELECT tid FROM pw_threads WHERE fid=" . S::sqlEscape($fid, false) . "AND ifcheck='1' AND specialsort='0' AND lastpost<" . S::sqlEscape($rt['lastpost'], false) . "ORDER BY lastpost DESC LIMIT 1");
 } else {
-	$tid = $db->get_value("SELECT tid FROM pw_threads WHERE fid=" . S::sqlEscape($fid, false) . "AND ifcheck='1' AND topped='0' AND lastpost>" . S::sqlEscape($rt['lastpost'], false) . "ORDER BY lastpost ASC LIMIT 1");
+	$tid = $db->get_value("SELECT tid FROM pw_threads WHERE fid=" . S::sqlEscape($fid, false) . "AND ifcheck='1' AND specialsort='0' AND lastpost>" . S::sqlEscape($rt['lastpost'], false) . "ORDER BY lastpost ASC LIMIT 1");
 }
 if ($tid) {
 	ObHeader("read.php?tid=$tid&ds=1");

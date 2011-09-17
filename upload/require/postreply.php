@@ -145,7 +145,7 @@ if (empty($_POST['step'])) {
 
 } elseif ($_POST['step'] == 2) {
 
-	S::gp(array('atc_title','atc_content'), 'P', 0);
+	S::gp(array('atc_title','atc_content','quote_content'), 'P', 0);
 	S::gp(array('atc_anonymous','atc_hideatt','atc_enhidetype','atc_credittype','flashatt','replytouser','_usernames'), 'P');
 	S::gp(array('atc_iconid','atc_convert','atc_autourl','atc_usesign','atc_html','atc_hide','atc_requireenhide','atc_rvrc','atc_requiresell', 'atc_money', 'go_lastpage'), 'P', 2);
 	
@@ -153,6 +153,9 @@ if (empty($_POST['step'])) {
 	($db_sellset['price'] && (int) $atc_money > $db_sellset['price']) && Showmsg('post_price_limit');
 	require_once(R_P . 'require/bbscode.php');
 
+	if ($action == 'quote' && $quote_content) {
+		$atc_content = $quote_content . $atc_content;
+	}
 	$postdata = new replyPostData($pwpost);
 	$postdata->setTitle($atc_title);
 	!$postdata->setContent($atc_content) && Showmsg('post_price_limit');

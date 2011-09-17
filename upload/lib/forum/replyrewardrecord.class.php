@@ -12,6 +12,10 @@ class PW_ReplyRewardRecord {
 	function rewardReplyUser($uid, $tid, $pid) {
 		list($uid, $tid, $pid) = array(intval($uid), intval($tid), intval($pid));
 		if ($uid < 1 || $tid < 1 || $pid < 1) return false;
+		$threadsService = L::loadClass('Threads', 'forum');
+		$threadData = $threadsService->getByThreadId($tid);
+		if (!$threadData || $threadData['authorid'] == $uid) return false;
+		
 		$replyRewardService = L::loadClass('ReplyReward', 'forum');/* @var $replyRewardService PW_ReplyReward */
 		$rewardInfo = $replyRewardService->getRewardByTid($tid);
 		if (!$this->_checkRewardCondition($rewardInfo, $uid, $tid) || !$this->_checkIfReward($rewardInfo['chance'])) return false;

@@ -1201,7 +1201,7 @@ if ($adminitem == 'setforum'){
 		$j_url = "$basename&action=$action&percount=$percount&creatfid=$fids&forumnum=$forumnum";
 		$goon  = 0;
 	
-		$query = $db->query("SELECT tid FROM pw_threads WHERE fid='$thisfid' AND ifcheck=1 AND special='0' ORDER BY topped DESC,lastpost DESC" . S::sqlLimit($start, $percount));
+		$query = $db->query("SELECT tid FROM pw_threads WHERE fid='$thisfid' AND ifcheck=1 AND special='0' ORDER BY specialsort DESC,lastpost DESC" . S::sqlLimit($start, $percount));
 		while ($topic = $db->fetch_array($query)) {
 			$goon = 1;
 			$staticPage->update($topic['tid']);

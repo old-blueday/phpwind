@@ -423,6 +423,13 @@ class postCate {
 					}
 					$postcate[$rt['fieldname']] = $checkboxs;
 				} elseif ($rt['type'] == 'calendar') {
+					//日期值检查
+					$checkTime = strtotime($postcate[$rt['fieldname']]);
+					if (!$checkTime || -1 == $checkTime){
+						$GLOBALS['db_actname'] = $rt['name'];
+						Showmsg('calendar_wrong_format');
+					}
+					//end
 					$postcate[$rt['fieldname']] = PwStrtoTime($postcate[$rt['fieldname']]);
 				}
 			}
@@ -432,10 +439,12 @@ class postCate {
 			Showmsg('pclimitnum_error');
 		}
 		$postcate['begintime'] > $postcate['endtime'] && Showmsg('begin_endtime');
+		$postcate['endtime'] < $timestamp && Showmsg ('截止时间必须大于当前时间');
 		$this->data['postcate'] = serialize($postcate);
 	}
 
 	function insertData($tid,$fid) {/*操作数据库*/
+		global $timestamp;
 		$this->data['tid'] = $tid;
 		$this->data['fid'] = $fid;
 		$pcdb = unserialize($this->data['postcate']);
@@ -444,7 +453,6 @@ class postCate {
 		foreach ($pcdb as $key => $value) {
 			$this->data[$key] = $value;
 		}
-
 		$pcvaluetable = GetPcatetable($this->pcid);
 
 		$this->db->pw_update(

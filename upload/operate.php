@@ -19,7 +19,6 @@ if ($action == 'showping') {
 	//require_once(R_P . 'require/bbscode.php');
 	//require_once R_P . 'require/pingfunc.php';
 	S::gp(array('tid','selid','pid','page'));
-
 	if (empty($selid) && empty($pid)) {
 		Showmsg('selid_illegal');
 	}
@@ -42,19 +41,15 @@ if ($action == 'showping') {
 		$showReply = $pingService->checkReply($tid) === true ? true : false;
 		//新会员 发帖时间限制
 		if ($db_postallowtime && ($timestamp - $winddb['regdate']) < $db_postallowtime*60) $showReply = false;
-
-	
+		$creditselect = array();
 		foreach ($pingService->markset as $cid => $value) {
-			$creditselect .= '<option value="'.$cid.'">' . $credit->cType[$cid] . '</option>';
+			$creditselect[$cid] = $credit->cType[$cid];
 			$raterange[$cid] = array('min'=>$value['minper'],'max'=>$value['maxper'],'mrpd'=>$value['leavepoint']);
 		}
 		$creditselect == '' && showmsg('markright_set_error');
 		$noneJsonList = getratelist($raterange, $pingService->markset);
 		$ratelist = pwJsonEncode($noneJsonList);
 		$jscredit = pwJsonEncode($pingService->markset);
-
-		//$reason_sel = getAdminReasonOptions();
-		
 		$reason_sel = '';
 		$reason_a = explode("\n",$db_admingradereason);
 		foreach ($reason_a as $k => $v) {
@@ -98,28 +93,19 @@ if ($action == 'showping') {
 		));
 		if ($return === true) {
 			if (defined('AJAX')) {
+				if (is_array($pingLog)){
+					//获取评分总信息
+					foreach ($pingLog as $k=>$log){
+						$pid = is_numeric($k)? $k : 0;
+						$pingTotal = $pingService->getPingLogAll($tid,$pid);
+						$pingLog[$k] = array(
+							'detail' => $log,
+							'total'	=> (array)$pingTotal
+						);
+					}
+				}
 				$pingLog = pwJsonEncode($pingLog);
 				echo "success\t{$pingLog}";
-				ajax_footer();
-			} else {
-				refreshto("read.php?tid=$tid&ds=1&page=$page#$jump_pid",'operate_success');
-			}
-		} else {
-			showmsg($return);
-		}
-	} elseif ($_POST['step'] == 2) {
-
-		//取消评分
-		InitGP(array('ifmsg','atc_content'), 'P');
-		$return = $pingService->deletePing(array(
-			'ifmsg'			=> $ifmsg,
-			'atc_content'	=> $atc_content
-		));
-
-		if ($return === true) {
-			if (defined('AJAX')) {
-				$pingLog = pwJsonEncode($pingLog);
-				echo "success\t{$pingLog}\tcancel";
 				ajax_footer();
 			} else {
 				refreshto("read.php?tid=$tid&ds=1&page=$page#$jump_pid",'operate_success');
@@ -231,7 +217,7 @@ if ($action == 'showping') {
 				$StaticPage->update($tid);
 			}
 		}
-		refreshto("read.php?tid=$tid&ds=1&page=$page#$jump_pid",'operate_success');
+		refreshto("read.php?tid=$tid&ds=1&page=$page#$jump_pid",'operate_success_reload');
 	}
 } elseif ($action == 'remind') {
 
@@ -340,7 +326,7 @@ if ($action == 'showping') {
 				}
 			}
 		}
-		refreshto("read.php?tid=$tid&ds=1&page=$page#$jump_pid",'operate_success');
+		refreshto("read.php?tid=$tid&ds=1&page=$page#$jump_pid",'operate_success_reload');
 	}
 } elseif ($action == 'toweibo') {
 
@@ -476,23 +462,52 @@ function getratelist($raterange, $markset) {
 	$ratelist = $result = array();
 	foreach($raterange as $id => $rating) {
 		if(isset($markset[$id])) {
-			$rating['max'] = $rating['max'] < $rating['mrpd'] ? $rating['max'] : $rating['mrpd'];
-			$rating['min'] = -$rating['min'] < $rating['mrpd'] ? $rating['min'] : -$rating['mrpd'];
-			$offset = abs(ceil(($rating['max'] - $rating['min']) / 10));
+			$increaseOffset = floor((abs($rating['max'])+1) /4);
+			$decreaseOffset = floor((abs($rating['min'])+1)/ 4);
+			if($rating['min'] >= 0){							//如果最小值大于0
+				$rating['min'] == 0 && $rating['min'] = 1;
+				$min[$id] = $rating['min'];						//加上$min[$id]标记
+				$increaseOffset = floor(($rating['max'] - $rating['min'])/4);   //增加的步长改变
+			}
+			if($rating['max'] < 0){								//如果最大值小于0
+				$rating['max'] == 0 && $rating['max'] = 1;
+				$max[$id] = $rating['max'];						//加上$max[$id]标记
+				$decreaseOffset = floor(abs($rating['min'] - $rating['max'])/4);
+			}
+
+			if($increaseOffset == 0) $increaseOffset = 1;
+			if($decreaseOffset == 0) $decreaseOffset = 1;
 			if($rating['max'] > $rating['min']) {
 				$ratelist[$id][$rating['max']] = $rating['max'];
-				for($vote = $rating['max']; $vote >= $rating['min']; $vote -= $offset) {
-					if ($vote == 0) continue;
-					$ratelist[$id][$vote] = $vote > 0 ? '+'.$vote : strval($vote);
+				for($i=1; $i<5; $i++){			//首和尾的数值固定，只需循环4次
+					if($min[$id]){	//如果最小值大于0
+						$ratelist[$id]['max'][$i] = $i > 1 ? '+'.(strval($ratelist[$id]['max'][$i-1])+$increaseOffset) : '+'.$min[$id];
+						$ratelist[$id]['min'] = array();
+						if($ratelist[$id]['max'][$i] >= $rating['max']) $ratelist[$id]['max'][$i] = '+'.$rating['max']; 
+					}elseif($max[$id]){	////如果最大值小于0
+						$ratelist[$id]['max'] = array();
+						$ratelist[$id]['min'][$i] = $i > 1 ? (strval($ratelist[$id]['min'][$i-1])-$decreaseOffset) : $max[$id];
+						if($ratelist[$id]['min'][$i] && ($ratelist[$id]['min'][$i] <= $rating['min'])) $ratelist[$id]['min'][$i] = $rating['min'];
+					}else{
+						$ratelist[$id]['max'][$i] = $i > 1 ? '+'.(strval($ratelist[$id]['max'][$i-1])+$increaseOffset) : '+1';
+						$ratelist[$id]['min'][$i] = $i > 1 ? (strval($ratelist[$id]['min'][$i-1])-$decreaseOffset) : '-1';
+						if($ratelist[$id]['min'][$i] && ($ratelist[$id]['min'][$i] <= $rating['min'])) $ratelist[$id]['min'][$i] = $rating['min'];
+						if($ratelist[$id]['max'][$i] >= $rating['max']) $ratelist[$id]['max'][$i] = '+'.$rating['max']; 
+					}
 				}
-				$ratelist[$id][$rating['min']] = $rating['min'] >0 ? '+'.$rating['min']:strval($rating['min']);
+				array_push($ratelist[$id]['max'], '+'.$rating['max']);	//在末尾加上最大值
+				array_push($ratelist[$id]['min'], $rating['min']);		//在末尾加上最小值
+				$ratelist[$id]['max'] = array_unique($ratelist[$id]['max']);
+				$ratelist[$id]['min'] = array_unique($ratelist[$id]['min']);
+				if($min[$id]) $ratelist[$id]['min'] = array();		//最小值大于0，最大值小于0，则该行不显示
+				if($max[$id]) $ratelist[$id]['max'] = array();
 			}
 		}
 	}
 	foreach ($ratelist as $key =>$v) {
 		$result[$key] = array_values($v);
 	}
-	return $result;
+	return $ratelist;
 }
 
 function getWeiboFactory($type) {

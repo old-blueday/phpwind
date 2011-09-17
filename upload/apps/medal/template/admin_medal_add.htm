@@ -213,7 +213,7 @@ EOT;
 			})(medalIconList[i],i)
 		}
 		document.onmousedown=function(e){
-			var ele = window.event?window.event.srcElement:e.srcElement;
+			var ele = window.event?window.event.srcElement:e.target;
 			if(!contains(box_container,ele)){
 				read&&read.close();
 			}

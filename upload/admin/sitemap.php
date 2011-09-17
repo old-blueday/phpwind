@@ -7,7 +7,7 @@ if(!$action){
 	pwCache::getData(D_P.'data/bbscache/sm_config.php');
 	include PrintEot('sitemap');exit;
 } elseif($action == 'create'){
-	p_unlink(D_P.'data/bbscache/sitemap.xml');
+	p_unlink(D_P.'sitemap.xml');
 	adminmsg('operate_success');
 } elseif($_POST['action'] == 'baidu'){
 	S::gp(array('config'));

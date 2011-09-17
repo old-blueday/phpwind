@@ -1,22 +1,22 @@
 <?php
 ! defined ( 'P_W' ) && exit ( 'Forbidden' );
 /*
- * ½á¹¹»¯²éÑ¯Óï¾ä×é×°Æ÷
+ * ç»“æ„åŒ–æŸ¥è¯¢è¯­å¥ç»„è£…å™¨
  * @author L.IuHu.I@2010/10/19 developer.liuhui@gmail.com
  */
-! defined ( 'PW_COLUMN' ) && define ( 'PW_COLUMN', 'column' ); //²éÑ¯×Ö¶Î
-! defined ( 'PW_EXPR' ) && define ( 'PW_EXPR', 'expr' ); //²éÑ¯±í´ïÊ½
-! defined ( 'PW_ORDERBY' ) && define ( 'PW_ORDERBY', 'orderby' ); //ÅÅĞò
-! defined ( 'PW_GROUPBY' ) && define ( 'PW_GROUPBY', 'groupby' ); //·Ö×é
-! defined ( 'PW_LIMIT' ) && define ( 'PW_LIMIT', 'limit' ); //·ÖÒ³
-! defined ( 'PW_ASC' ) && define ( 'PW_ASC', 'asc' ); //ÉıĞò
-! defined ( 'PW_DESC' ) && define ( 'PW_DESC', 'desc' ); //½µĞò
-define ( 'PW_DEBUG', 0 ); //ÊÇ·ñ¿ªÆôµ÷ÊÔ´òÓ¡
+! defined ( 'PW_COLUMN' ) && define ( 'PW_COLUMN', 'column' ); //æŸ¥è¯¢å­—æ®µ
+! defined ( 'PW_EXPR' ) && define ( 'PW_EXPR', 'expr' ); //æŸ¥è¯¢è¡¨è¾¾å¼
+! defined ( 'PW_ORDERBY' ) && define ( 'PW_ORDERBY', 'orderby' ); //æ’åº
+! defined ( 'PW_GROUPBY' ) && define ( 'PW_GROUPBY', 'groupby' ); //åˆ†ç»„
+! defined ( 'PW_LIMIT' ) && define ( 'PW_LIMIT', 'limit' ); //åˆ†é¡µ
+! defined ( 'PW_ASC' ) && define ( 'PW_ASC', 'asc' ); //å‡åº
+! defined ( 'PW_DESC' ) && define ( 'PW_DESC', 'desc' ); //é™åº
+define ( 'PW_DEBUG', 0 ); //æ˜¯å¦å¼€å¯è°ƒè¯•æ‰“å°
 class PW_QueryBuilder {
 	/**
-	 * Éú³ÉĞÂÔöÓï¾ä
-	 * @param $tableName   Êı¾İ±íÃû³Æ,Èç:pw_threads
-	 * @param $col_names   ×Ö¶ÎÃû³ÆÊı×é,Èç:array('tid'=>1,'fid'=>2)
+	 * ç”Ÿæˆæ–°å¢è¯­å¥
+	 * @param $tableName   æ•°æ®è¡¨åç§°,å¦‚:pw_threads
+	 * @param $col_names   å­—æ®µåç§°æ•°ç»„,å¦‚:array('tid'=>1,'fid'=>2)
 	 */
 	function insertClause($tableName, $col_names) {
 		if (! $tableName || ! is_array ( $col_names ))
@@ -27,9 +27,9 @@ class PW_QueryBuilder {
 		return $sql;
 	}
 	/**
-	 * Éú³ÉÌæ»»Óï¾ä
-	 * @param $tableName   Êı¾İ±íÃû³Æ,Èç:pw_threads
-	 * @param $col_names   ×Ö¶ÎÃû³ÆÊı×é,Èç:array('tid'=>1,'fid'=>2)
+	 * ç”Ÿæˆæ›¿æ¢è¯­å¥
+	 * @param $tableName   æ•°æ®è¡¨åç§°,å¦‚:pw_threads
+	 * @param $col_names   å­—æ®µåç§°æ•°ç»„,å¦‚:array('tid'=>1,'fid'=>2)
 	 */
 	function replaceClause($tableName, $col_names) {
 		if (! $tableName || ! is_array ( $col_names ))
@@ -40,17 +40,17 @@ class PW_QueryBuilder {
 		return $sql;
 	}
 	/**
-	 * Éú³É²éÑ¯Óï¾ä
-	 * @param $tableName         Êı¾İ±íÃû³Æ,Èç:pw_threads
-	 * @param $where_statement   ²éÑ¯Ìõ¼şÓï¾ä,Èç:fid=:fid and ifcheck=:ifcheck,×¢ÒâºóÃæ²¿·ÖÓë×Ö¶ÎÒ»ÖÂ
-	 * @param $where_conditions  ²éÑ¯Ìõ¼ş²ÎÊı,Èçarray(1,2),ÓëÉÏÔÚµÄÌõ¼şÓï¾äË³Ğò±£³ÖÒ»ÖÂ
-	 * @param $expand            À©Õ¹Ìõ¼ş,¿ÉÑ¡,ËµÃ÷ÈçÏÂ
+	 * ç”ŸæˆæŸ¥è¯¢è¯­å¥
+	 * @param $tableName         æ•°æ®è¡¨åç§°,å¦‚:pw_threads
+	 * @param $where_statement   æŸ¥è¯¢æ¡ä»¶è¯­å¥,å¦‚:fid=:fid and ifcheck=:ifcheck,æ³¨æ„åé¢éƒ¨åˆ†ä¸å­—æ®µä¸€è‡´
+	 * @param $where_conditions  æŸ¥è¯¢æ¡ä»¶å‚æ•°,å¦‚array(1,2),ä¸ä¸Šåœ¨çš„æ¡ä»¶è¯­å¥é¡ºåºä¿æŒä¸€è‡´
+	 * @param $expand            æ‰©å±•æ¡ä»¶,å¯é€‰,è¯´æ˜å¦‚ä¸‹
 	 * $expand = array(
-	 * PW_COLUMN  = array('fid','tid'),//ĞèÒª²éÑ¯µÄ×Ö¶Î,Ä¬ÈÏÎª*,²ÎÊıÎªÊı×é
-	 * PW_EXPR    = array('count(*) as c','max(tid)'),//ÌØÊâµÄ²éÑ¯,ÈçÍ³¼Æ,×î´ó/Ğ¡Öµ,²ÎÊıÎªÊı×é
-	 * PW_ORDERBY = array('postdate'=> PW_ASC,'tid'=>PW_DESC),//ÅÅĞòÌõ¼ş,×Ö¶Î=>Éı/½µĞÎÊ½,²ÎÊıÎªÊı×é
-	 * PW_GROUPBY = array('tid'),//·Ö×éÌõ¼ş,Êı×é
-	 * PW_LIMIT   = array(offset,limit),²éÑ¯ÆğµãÊıÓë²éÑ¯¸öÊı
+	 * PW_COLUMN  = array('fid','tid'),//éœ€è¦æŸ¥è¯¢çš„å­—æ®µ,é»˜è®¤ä¸º*,å‚æ•°ä¸ºæ•°ç»„
+	 * PW_EXPR    = array('count(*) as c','max(tid)'),//ç‰¹æ®Šçš„æŸ¥è¯¢,å¦‚ç»Ÿè®¡,æœ€å¤§/å°å€¼,å‚æ•°ä¸ºæ•°ç»„
+	 * PW_ORDERBY = array('postdate'=> PW_ASC,'tid'=>PW_DESC),//æ’åºæ¡ä»¶,å­—æ®µ=>å‡/é™å½¢å¼,å‚æ•°ä¸ºæ•°ç»„
+	 * PW_GROUPBY = array('tid'),//åˆ†ç»„æ¡ä»¶,æ•°ç»„
+	 * PW_LIMIT   = array(offset,limit),æŸ¥è¯¢èµ·ç‚¹æ•°ä¸æŸ¥è¯¢ä¸ªæ•°
 	 * );
 	 */
 	function selectClause($tableName, $where_statement = null, $where_conditions = null, $expand = null) {
@@ -68,12 +68,12 @@ class PW_QueryBuilder {
 		return $sql;
 	}
 	/**
-	 * Éú³É¸üĞÂÓï¾ä
-	 * @param $tableName        Êı¾İ±íÃû³Æ,Èçpw_threads
-	 * @param $where_statement  Í¬ÉÏ selectClause()²ÎÊı
-	 * @param $where_conditions Í¬ÉÏ selectClause()²ÎÊı
-	 * @param $col_names        ×Ö¶ÎÃû³ÆÊı×é,Èç:array('tid'=>1,'fid'=>2)
-	 * @param $expand           Í¬ÉÏ selectClause()²ÎÊıËµÃ÷,µ«Ö»ÓĞÅÅĞò²¿·Ö
+	 * ç”Ÿæˆæ›´æ–°è¯­å¥
+	 * @param $tableName        æ•°æ®è¡¨åç§°,å¦‚pw_threads
+	 * @param $where_statement  åŒä¸Š selectClause()å‚æ•°
+	 * @param $where_conditions åŒä¸Š selectClause()å‚æ•°
+	 * @param $col_names        å­—æ®µåç§°æ•°ç»„,å¦‚:array('tid'=>1,'fid'=>2)
+	 * @param $expand           åŒä¸Š selectClause()å‚æ•°è¯´æ˜,ä½†åªæœ‰æ’åºéƒ¨åˆ†
 	 */
 	function updateClause($tableName, $where_statement = null, $where_conditions = null, $col_names, $expand = null) {
 		if (! $tableName || (! is_array ( $col_names ) && ! isset ( $expand [PW_EXPR] )))
@@ -88,12 +88,12 @@ class PW_QueryBuilder {
 		return $sql;
 	}
 	/**
-	 * Éú³ÉÉ¾³ıÓï¾ä
-	 * @param $tableName        Êı¾İ±íÃû³Æ,Èçpw_threads
-	 * @param $where_statement  Í¬ÉÏ selectClause()²ÎÊı
-	 * @param $where_conditions Í¬ÉÏ selectClause()²ÎÊı
-	 * @param $col_names        ×Ö¶ÎÃû³ÆÊı×é,Èç:array('tid'=>1,'fid'=>2)
-	 * @param $expand           Í¬ÉÏ selectClause()²ÎÊıËµÃ÷,µ«Ö»ÓĞÅÅĞò²¿·Ö
+	 * ç”Ÿæˆåˆ é™¤è¯­å¥
+	 * @param $tableName        æ•°æ®è¡¨åç§°,å¦‚pw_threads
+	 * @param $where_statement  åŒä¸Š selectClause()å‚æ•°
+	 * @param $where_conditions åŒä¸Š selectClause()å‚æ•°
+	 * @param $col_names        å­—æ®µåç§°æ•°ç»„,å¦‚:array('tid'=>1,'fid'=>2)
+	 * @param $expand           åŒä¸Š selectClause()å‚æ•°è¯´æ˜,ä½†åªæœ‰æ’åºéƒ¨åˆ†
 	 */
 	function deleteClause($tableName, $where_statement = null, $where_conditions = null, $expand = null) {
 		if (! $tableName)
@@ -107,9 +107,9 @@ class PW_QueryBuilder {
 		return $sql;
 	}
 	/**
-	 * Í¨ÓÃ²éÑ¯Óï¾ä×é×°
-	 * @param $format      ²éÑ¯Óï¾ä¸ñÊ½,×¢ÒâÊı¾İ±íÃû²ÉÓÃ:pw_tableµÄĞÎÊ½,¶à¸ö±íÃûpw_table1,pw_table2
-	 * @param $parameters  ²éÑ¯Óï¾ä±äÁ¿
+	 * é€šç”¨æŸ¥è¯¢è¯­å¥ç»„è£…
+	 * @param $format      æŸ¥è¯¢è¯­å¥æ ¼å¼,æ³¨æ„æ•°æ®è¡¨åé‡‡ç”¨:pw_tableçš„å½¢å¼,å¤šä¸ªè¡¨åpw_table1,pw_table2
+	 * @param $parameters  æŸ¥è¯¢è¯­å¥å˜é‡
 	 */
 	function buildClause($format, $parameters, $clauses = array()) {
 		if (! $format || ! is_array ( $parameters ))
@@ -120,8 +120,8 @@ class PW_QueryBuilder {
 		return $sql;
 	}
 	/**
-	 * Ë½ÓĞ½âÎöÆ¥Åä½á¹û£¬»ñÈ¡Êı¾İ±íÃû³ÆºÍÌõ¼ş×Ö¶Î
-	 * @param $matchInfo  Æ¥Åä½á¹ûÊı×é 
+	 * ç§æœ‰è§£æåŒ¹é…ç»“æœï¼Œè·å–æ•°æ®è¡¨åç§°å’Œæ¡ä»¶å­—æ®µ
+	 * @param $matchInfo  åŒ¹é…ç»“æœæ•°ç»„ 
 	 */
 	function _parseMatchs($matchInfo) {
 		if (! $matchInfo) {
@@ -137,7 +137,7 @@ class PW_QueryBuilder {
 	}
 	
 	/**
-	 * Ë½ÓĞ½âÎöSET²¿·Ö½á¹¹º¯Êı
+	 * ç§æœ‰è§£æSETéƒ¨åˆ†ç»“æ„å‡½æ•°
 	 * @param $arrays
 	 */
 	function _parseSetSQL($arrays, $expr = null) {
@@ -159,7 +159,7 @@ class PW_QueryBuilder {
 		return ($sets) ? $sets : '';
 	}
 	/**
-	 * Ë½ÓĞ½âÎö¸ñÊ½Ä£°å£¬²¢ÊµÏÖ¸ñÊ½Óë²ÎÊıÆ¥Åä
+	 * ç§æœ‰è§£ææ ¼å¼æ¨¡æ¿ï¼Œå¹¶å®ç°æ ¼å¼ä¸å‚æ•°åŒ¹é…
 	 * @param $statement
 	 * @param $conditions
 	 */
@@ -170,7 +170,7 @@ class PW_QueryBuilder {
 		if (! $matchs [0])
 			return array ('', array () );
 		$fields = array ();
-		//fix WooYun-2011-02720.¸ĞĞ»RayÔÚ http://www.wooyun.org/bugs/wooyun-2010-02720 ÉÏµÄ·´À¡
+		//fix WooYun-2011-02720.æ„Ÿè°¢Rayåœ¨ http://www.wooyun.org/bugs/wooyun-2010-02720 ä¸Šçš„åé¦ˆ
 		$seg = randstr(4);
 		$statement = preg_replace ('/(:\w+)/', $seg . '${1}' . $seg, $statement );
 		foreach ( $matchs [0] as $k => $field ) {
@@ -182,9 +182,9 @@ class PW_QueryBuilder {
 	}
 	
 	/**
-	 * Ë½ÓĞ½âÎö²éÑ¯×Ö¶Î²¿·Ö
-	 * @param $columns    ×Ö¶ÎÊı×é
-	 * @param $statements ÌØÊâ²éÑ¯Óï¾ä
+	 * ç§æœ‰è§£ææŸ¥è¯¢å­—æ®µéƒ¨åˆ†
+	 * @param $columns    å­—æ®µæ•°ç»„
+	 * @param $statements ç‰¹æ®ŠæŸ¥è¯¢è¯­å¥
 	 */
 	function _parseColumns($columns, $statements) {
 		$sql = '';
@@ -201,7 +201,7 @@ class PW_QueryBuilder {
 		return ($sql) ? rtrim ( $sql, ',' ) : '*';
 	}
 	/**
-	 * Ë½ÓĞ½âÎö·Ö×éÓï¾ä
+	 * ç§æœ‰è§£æåˆ†ç»„è¯­å¥
 	 * @param $groupBy
 	 */
 	function _parseGroupBy($groupBys) {
@@ -215,7 +215,7 @@ class PW_QueryBuilder {
 		return $sql;
 	}
 	/**
-	 * Ë½ÓÃ½âÎöÅÅĞòÓï¾ä
+	 * ç§ç”¨è§£ææ’åºè¯­å¥
 	 * @param $orderBy
 	 */
 	function _parseOrderBy($orderBy) {
@@ -232,7 +232,7 @@ class PW_QueryBuilder {
 		return $sql;
 	}
 	/**
-	 * Ë½ÓĞ½âÎö·ÖÒ³Óï¾ä
+	 * ç§æœ‰è§£æåˆ†é¡µè¯­å¥
 	 * @param $offset
 	 * @param $row_count
 	 */
@@ -242,7 +242,7 @@ class PW_QueryBuilder {
 		return ($offset >= 0 && $row_count > 0) ? " LIMIT " . $offset . "," . $row_count : '';
 	}
 	/**
-	 * µ÷ÊÔSQLÓï¾ä
+	 * è°ƒè¯•SQLè¯­å¥
 	 * @param $sql
 	 */
 	function _debug($sql) {
@@ -251,10 +251,10 @@ class PW_QueryBuilder {
 		}
 	}
 	/**
-	 * Ğ¡¹³×Ó½Ó¿Ú,ÓÃÓÚÊµÏÖ¿ÉÀ©Õ¹
-	 * @param $operate    ²Ù×÷ĞĞÎª,¿ÉÑ¡insert/replace/update/select
-	 * @param $tableName  Êı¾İ±íÃû³Æ
-	 * @param $fields     Êı¾İÌõ¼ş×Ö¶Î
+	 * å°é’©å­æ¥å£,ç”¨äºå®ç°å¯æ‰©å±•
+	 * @param $operate    æ“ä½œè¡Œä¸º,å¯é€‰insert/replace/update/select
+	 * @param $tableName  æ•°æ®è¡¨åç§°
+	 * @param $fields     æ•°æ®æ¡ä»¶å­—æ®µ
 	 */
 	function _smallHook($operate, $sql, $tableNames = array(), $fields = array(), $expand = array()) {
 		$this->_debug ( $sql );

@@ -9,8 +9,6 @@ print <<<EOT
 <meta name="description" content="$metaDescription" />
 <meta name="keywords" content="$metaKeywords" />
 <base id="headbase" href="$db_bbsurl/" />
-<script type="text/javascript" src="js/core/core.js"></script>
-<script type="text/javascript" src="js/pw_ajax.js"></script>
 <link rel="stylesheet" href="$imgpath/pw_core.css?{$GLOBALS['wind_repair']}" />
 EOT;
 @include Pcv($css_path);
@@ -22,6 +20,8 @@ p,ul,li{padding:0;margin:0;}
 li{list-style:none}
 .cp { cursor: pointer;}
 </style>
+<script type="text/javascript" src="js/core/core.js"></script>
+<script type="text/javascript" src="js/pw_ajax.js"></script>
 </head>
 <body onKeyDown="try{keyCodes(event);}catch(e){}">
 <div class="wrap">
@@ -58,7 +58,7 @@ function showcustomquest(qid){
 <form action="login.php?" method="post" name="login">
 								<div style="padding-left:15px;">
 									<dl>
-										<dt><div style="height:26px;">
+										<dt style="height:26px;">
 EOT;
 $arr_logintypename = array('用户名','UID','电子邮箱');
 $value = 0;
@@ -92,7 +92,7 @@ EOT;
 
 EOT;
 }print <<<EOT
-										</div></dt>
+										</dt>
 										<dd class="ip"><div class=""><input class="input" type="text" tabindex="11" name="pwuser" /></div></dd>
 									</dl>
 									<dl class="cc">
@@ -278,6 +278,7 @@ print <<<EOT
 EOT;
 }print <<<EOT
 
+					</div>
 				</div>
 			</div>
 		</div>

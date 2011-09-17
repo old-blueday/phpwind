@@ -82,9 +82,9 @@ function showtips(obj) {
 				<option value="3" $deducttime_3  >3小时</option>
 				<option value="6" $deducttime_6  >6小时</option>
 				<option value="12" $deducttime_12 >12小时</option>
-				<option value="24" $deducttime_24 >24小时</option>
-				<option value="48" $deducttime_48 >48小时</option>
-				<option value="72" $deducttime_72 >72小时</option>
+				<option value="24" $deducttime_24 >1天</option>
+				<option value="48" $deducttime_48 >2天</option>
+				<option value="72" $deducttime_72 >3天</option>
 			</select>
 		</td>
 		<td class="td2"><div class="help_a">更换孔明灯中的帖子扣除的推广时间</div></td>
@@ -154,35 +154,23 @@ EOT;
 if($ol_payto){
 print <<<EOT
 -->
-<p class="mb10"><span class="b">支付宝：</span><span class="mr10">$ol_payto</span><a href="admin.php?adminjob=userpay&adminitem=userpay" onClick="parent.PW.Dialog({id:'userpay',url:'$admin_file?adminjob=userpay&adminitem=userpay',name:'网上支付'});return false;">[修改]</a></p>
+<p class="b s5">支付宝</p><p class="mb10"><span class="mr10">$ol_payto</span><a href="admin.php?adminjob=userpay&adminitem=userpay" onClick="parent.PW.Dialog({id:'userpay',url:'$admin_file?adminjob=userpay&adminitem=userpay',name:'网上支付'});return false;">[修改]</a></p>
 <!--
 EOT;
 }else{
 print <<<EOT
 -->
-<p class="mb10"><span class="b">支付宝：</span><span class="mr10">您还没有添加支付宝帐号</span><a href="admin.php?adminjob=userpay&adminitem=userpay" onClick="parent.PW.Dialog({id:'userpay',url:'$admin_file?adminjob=userpay&adminitem=userpay',name:'网上支付'});return false;">[添加]</a></p>
+<p class="b s5">支付宝</p><p class="mb10"><span class="mr10">您还没有添加支付宝帐号</span><a href="admin.php?adminjob=userpay&adminitem=userpay" onClick="parent.PW.Dialog({id:'userpay',url:'$admin_file?adminjob=userpay&adminitem=userpay',name:'网上支付'});return false;">[添加]</a></p>
 <!--
 EOT;
 }print <<<EOT
 -->
-			<div class="admin_tableB">
-				<table>
-					<tr class="vt" height="100">
-						<td class="b" width="80">银行转账：</td>
-						<td>
-							<p class="mb5">公司名称：<input name="config[kmd_company]" value="$db_kmd_company" type="text" class="input input_wa" /></p>
-							<p class="mb5">　　账户：<input name="config[kmd_account]" value="$db_kmd_account" type="text" class="input input_wa" /></p>
-							<p>　开户行：<input name="config[kmd_bank]" value="$db_kmd_bank" type="text" class="input input_wa" /></p>
-						</td>
-					</tr>
-					<tr class="vt">
-						<td class="b" width="80">现金：</td>
-						<td>
-							<p class="mb5">办理地址：<input name="config[kmd_address]" value="$db_kmd_address" type="text" class="input input_wb" /></p>
-						</td>
-					</tr>
-				</table>
-			</div>
+<p class="b s5">银行转账</p>
+<p class="mb5">公司名称：<input name="config[kmd_company]" value="$db_kmd_company" type="text" class="input input_wa" /></p>
+<p class="mb5">银行账户：<input name="config[kmd_account]" value="$db_kmd_account" type="text" class="input input_wa" /></p>
+<p class="mb10">开&nbsp;户&nbsp;行：<input name="config[kmd_bank]" value="$db_kmd_bank" type="text" class="input input_wa" /></p>
+<p class="b s5">现金</p>
+<p class="mb5">办理地址：<input name="config[kmd_address]" value="$db_kmd_address" type="text" class="input input_wb" /></p>
 		</td>
 		<td class="td2"><div class="help_a"></div></td>
 	</tr>
@@ -226,13 +214,37 @@ print <<<EOT
 	<p class="mb10">
 		<span class="mr20">版块：<select name="fid"  class="select_wa"><option value='0'>所有版块</option>$forumcache</select></span>
 		<span class="mr20">购买者：<input name="username" type="text" class="input input_wa"  value="$username"/></span>
+		<span class="mr20">状态：
+			<select name="status" class="select_wa"><option value='0'>所有状态</option>
+<!--
+EOT;
+for($i=1;$i<4;$i++){
+$tmpSelected = $status == $i?' selected="selected"' : '';
+print <<<EOT
+-->
+<option value="$i"$tmpSelected>{$kmdService->payStatus[$i]}</option>
+<!--
+EOT;
+}print <<<EOT
+-->			</select>
+		</span>
 		<span class="mr20">
 			购买时间：<input name="starttime" id="startTime"  title="开始时间" onClick="javascript:ShowCalendar(this.id)" type="text" class="input input_wc" value="$starttime" />
 			<span class="p_lr_10">至</span><input name="endtime" id="endTime" title="结束时间" onClick="javascript:ShowCalendar(this.id)" type="text" class="input input_wc" value="$endtime" />
 		</span>
 		<span class="btn2"><span><button type="submit">查找</button></span></span>
 		<p class="b" style="border-top:1px dashed #ccc;padding-top:10px;">
-			共购买孔明灯 <span class="s2">$count</span> 次，收入 <span class="s2">$income</span> 元
+			共购买孔明灯 <span class="s2">$count</span> 次
+<!--
+EOT;
+	if(!$status || $status==KMD_PAY_STATUS_PAYED){print <<<EOT
+-->
+			，收入 <span class="s2">$income</span> 元
+<!--
+EOT;
+	}
+	print <<<EOT
+-->
 		</p>
 	</p>
 </div>
@@ -268,8 +280,8 @@ $actionHtml = '';
 if ($v['status'] == KMD_PAY_STATUS_NOTPAY){
 	$actionHtml = "<a onclick=\"javascript:return confirm('确认已收到货款，并将状态设置为已支付？')\" href=\"$basename&step=2&operater=1&payid={$v['id']}\">[确认支付]</a>&nbsp;
 					<a onclick=\"javascript:return confirm('确认删除付款记录？')\" href=\"$basename&step=2&operater=2&payid={$v['id']}\">[删除]</a>";
-} else if($v['status'] == KMD_PAY_STATUS_PAYED){
-	$actionHtml = "已支付";
+} else {
+	$actionHtml = $kmdService->payStatus[$v['status']];
 }
 print <<<EOT
 -->
@@ -298,7 +310,7 @@ print <<<EOT
 -->
 <h2 class="h1">帖子审核</h2>
 <form action="$basename" method="post">
-<div class="p10 mb10">
+<div class="p10">
 	<p class="mb10">
 		<span class="mr20">版块：<select name="fid"  class="select_wa"><option value='0'>所有版块</option>$forumcache</select></span>
 		<span class="mr20">购买者：<input name="username" type="text" class="input input_wa"  value="$username"/></span>
@@ -412,7 +424,7 @@ if(S::isArray($kmdInfos)){
 foreach($kmdInfos as $v){
 	$v['starttime'] = get_date($v['starttime'],'Y-m-d H:i:s');
 	$v['endtime'] = get_date($v['endtime'],'Y-m-d H:i:s');
-	$actionHtml = "<a onclick=\"javascript:return confirm('确认回收该孔明灯？')\" href=\"$basename&step=2&operater=1&kid={$v['kid']}\">[撤销]</a>";
+	$actionHtml = "<a onclick=\"javascript:return confirm('确认回收该孔明灯？')\" href=\"$basename&step=2&operater=1&kid={$v['kid']}\">[删除]</a>";
 	$v['tid'] && $actionHtml .= "&nbsp;<a href=\"read.php?tid={$v['tid']}\" target=\"_blank\">[查看]</a>";
 print <<<EOT
 -->

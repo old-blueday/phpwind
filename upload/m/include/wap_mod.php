@@ -76,15 +76,19 @@ function wap_header($refreshurl = '') {
 }
 
 function wap_footer() {
-	global $wind_version, $db_obstart, $windid, $db_charset, $db_wapcharset, $chs, $timestamp, $db_online, $db,$db_wapregist,$rg_allowregister;;
+	global $wind_version, $db_obstart, $windid, $db_charset, $db_wapcharset, $chs, $timestamp, $db_online, $db,$db_wapregist,$rg_allowregister,$online_info;
 	Update_ol();
 	$userinbbs = $guestinbbs = 0;
 	if (empty($db_online)) {
-		include (D_P . 'data/bbscache/olcache.php');
+		extract(pwCache::getData(D_P . 'data/bbscache/olcache.php', false));
 	} else {
-		$query = $db->query("SELECT uid!=0 as ifuser,COUNT(*) AS count FROM pw_online GROUP BY uid!='0'");
-		while ($rt = $db->fetch_array($query)) {
-			$rt['ifuser'] ? ($userinbbs = $rt['count']) : ($guestinbbs = $rt['count']);
+		if (count($online_info =  explode("\t", GetCookie('online_info'))) == 3 && $timestamp - $online_info[0] < 60){
+			list(, $userinbbs, $guestinbbs) = $online_info;
+		}else {
+			$onlineService = L::loadClass('OnlineService', 'user');
+			$userinbbs = $onlineService->countOnlineUser();
+			$guestinbbs = $onlineService->countOnlineGuest();
+			Cookie('online_info', $timestamp . "\t" . $userinbbs . "\t" . $guestinbbs);
 		}
 	}
 	$usertotal = $guestinbbs + $userinbbs;
@@ -112,7 +116,7 @@ function wap_output($output) {
 
 function getWapLang($T, $I, $L = false) {
 	global $lang;
-	require_once D_P . 'lang/lang_wap.php';
+	require_once (GetLang('wap'));
 	if (isset($lang[$T][$I])) {
 		eval('$I="' . addcslashes($lang[$T][$I], '"') . '";');
 	}

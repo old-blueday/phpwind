@@ -139,11 +139,6 @@ function showLoginType(){
 		getObj('nav_logintab').style.display = 'none';
 	}
 }
-
-function showcustomquest_h(qid){
-	getObj('othercustomquest').style.display = qid==-1 ? '' : 'none';
-}
-
 function navCheckinput(obj){
 	if (obj.className.indexOf('gray')!=-1) {
 		obj.value = '';
@@ -267,6 +262,18 @@ var headerAjaxLogin = {
 </script>
 <!--
 EOT;
+$bubble=GetCookie('bubble')?GetCookie('bubble'):array();
+if ($bubble){
+$bubble=stripslashes($bubble);
+$bubble=pwJsonEncode(unserialize($bubble));
+print <<<EOT
+-->
+<script>
+var userBubbleInfo =$bubble
+</script>
+<!--
+EOT;
+}
 }} else {
 $db_menuinit .= ",'td_userinfomore' : 'menu_userinfomore','td_profile' : 'menu_profile'";
 if ($winddb['bubble']) {
@@ -278,7 +285,8 @@ var userBubbleInfo = $userBubbleInfo;
 </script>
 <!--
 EOT;
-}print <<<EOT
+}
+print <<<EOT
 -->
 <dl class="login">
 	<dt class="fr"><a href="u.php" hidefocus="true" class="img_50"><img src="$_LoginInfo[faceurl]" alt="$windid" /></a></dt>
@@ -296,7 +304,7 @@ var td_userinfomore = {
 		getObj('td_userinfomore').className = '';
 	}
 };
-</script><a href="message.php" class="mr5">消息</a><span id="td_profile" class="pd5"><a href="profile.php?action=modify" target="_blank" class="link_down"><span>设置</span></a></span><!--
+</script><a href="message.php" class="mr5">消息{$tmpMsgNums}</a><span id="td_profile" class="pd5"><a href="profile.php?action=modify" target="_blank" class="link_down"><span>设置</span></a></span><!--
 EOT;
 if(CkInArray($windid,$manager) || $SYSTEM['allowadmincp']){print <<<EOT
 --><span class="gray mr5">|</span><a href="$db_adminfile" target="_blank">系统设置</a><!--

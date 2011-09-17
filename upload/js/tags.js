@@ -11,6 +11,15 @@ function addBlur(e){
 		e.className = 'input gray';
 	}
 }
+function keyUpTag(e,ele){
+		var e=e||window.event;
+		var key=e.keyCode||e.which;
+		if(key==13){
+			var name=ele.value;
+			ele.blur();
+			addTag(name);	
+		}
+}
 function addTag(name){
 	var tagname = name ? name : getObj('tagname').value;
 	var regExp = /[<>$^&\\'"]+/;

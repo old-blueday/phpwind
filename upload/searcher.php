@@ -1,6 +1,8 @@
 <?php
 define ( 'SCR', 'searcher' );
 require_once ('global.php');
+require_once(R_P.'lib/cloudwind/cloudwind.class.php');
+CloudWind::yunSearchEntry();
 $_searchHelper = new PW_SearchHelper ();
 $_searchHelper->checkLevel ();
 S::gp ( array ("keyword", "type", "condition", "fid", "step", "username", "starttime", "endtime", "threadrange", "diaryusername", "diarystarttime", "diaryendtime", "diaryrange", "page", "fid", "sch_time", "digest", 'authorid', "ttable", "ptable", 'sortby' ) );
@@ -444,7 +446,7 @@ class PW_SearchHelper {
 			if ($value ['starttime'] > $timestamp || $value ['endtime'] < $timestamp || ($value ['dtime'] && strpos ( ",{$value['dtime']},", ",{$hours}," ) === false))
 				continue;
 			if ((! $value ['ddate'] && ! $value ['dweek']) || ($value ['ddate'] && strpos ( ",{$value['ddate']},", ",{$_time['day']}," ) !== false) || ($value ['dweek'] && strpos ( ",{$value['dweek']},", ",{$_time['week']}," ) !== false)) {
-				$result [] = str_replace ( $keyword, '<font color="red"><u>' . $keyword . '</u></font>', $value ['code'] );
+				$result [] = str_replace ( $keyword, '<em class="s1">' . $keyword . '</em>', $value ['code'] );
 			}
 		}
 		return $result;

@@ -78,7 +78,7 @@ if (empty($_POST['step'])) {
 	}
 	
 	//* $db->update("UPDATE $pw_posts SET leaveword=" . S::sqlEscape($atc_content) . " $sqladd WHERE pid=" . S::sqlEscape($pid) . ' AND tid=' . S::sqlEscape($tid));
-	$db->update(pwQuery::buildClause("UPDATE :pw_table SET leaveword=:leaveword $sqladd WHERE pid=:pid AND tid=:tid", array($pw_posts,$atc_content, $pid, $tid)));
+	$db->update(pwQuery::buildClause("UPDATE :pw_table SET leaveword=:leaveword WHERE pid=:pid AND tid=:tid", array($pw_posts,$atc_content, intval($pid), $tid)));
 	
 	echo "success\t" . str_replace(array(
 		"\n",

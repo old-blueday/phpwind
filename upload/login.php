@@ -87,7 +87,7 @@ if ($action == 'login') {
 			list(,$_LoginInfo) = pwNavBar();
 			list(,,,,$hasSafeCv) = $loginInfo;
 			if (($db_ifsafecv && $hasSafeCv) || ($db_gdcheck & 2) || $_LoginInfo['qcheck']) {
-				require_once PrintEot('headerlogin');ajax_footer();
+				require_once PrintEot('header_login_pop');ajax_footer();
 			}
 		}
 		
@@ -203,7 +203,7 @@ if ($action == 'login') {
 	}
 	//passport
 	Cookie("jobpop",0);/*jobpop*/
-
+	Cookie('clearm_'.$winduid,'',0);
 	if (preg_match('/u.php$/i', $pre_url)) {
 		$pre_url = $db_bfn;
 	}

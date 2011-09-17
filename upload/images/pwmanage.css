@@ -86,8 +86,9 @@ textarea{border: 1px solid; border-color: #c0c0c0 #ededed #ededed #c0c0c0;}
 .s6{color:#666;}
 .f14{ font-size:14px;}
 .mb10{margin-bottom:10px;}
-.regCorrect,.regIgnore{padding:40px 0 60px 160px;background:#fff url(register/regright_big.png) 60px 40px no-repeat;border:1px solid #bfccd8;width:320px;margin:0 auto;-moz-border-radius:5px;-webkit-border-radius:5px;}
-.regIgnore{ background:#fff url(register/ignore.png) 60px 0 no-repeat;padding-top:5px;}
+.regCorrect,.regIgnore{padding:40px 40px 60px 160px;border:1px solid #bfccd8;width:320px;margin:0 auto;-moz-border-radius:5px;-webkit-border-radius:5px;}
+.regCorrect{ background:#fff url(register/regright_big.png) 60px 40px no-repeat;}
+.regIgnore{ background:#fff url(register/ignore.png) 60px 40px no-repeat;}
 
 /**/
 .pw_label{margin:0 10px 10px;height:205px;overflow-y:scroll;}

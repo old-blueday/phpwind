@@ -156,7 +156,7 @@ class creditmodel {
 			if ($rt) {
 				if ($isAdd) {
 					//* $this->db->update("UPDATE pw_membercredit SET value=value+" . UC::escape($value) .  ' WHERE uid=' . UC::escape($uid) . ' AND cid=' . UC::escape($cid));
-					$this->db->update(pwQuery::buildClause('UPDATE :pw_table SET value=value+:value WHERE uid=:uid AND cid=:cid', array('pw_membercredit', $value, $uid, $cid)));
+					$this->db->update(pwQuery::buildClause('UPDATE :pw_table SET value=value+:value WHERE uid=:uid AND cid=:cid', array('pw_membercredit', $value, intval($uid), $cid)));
 					return $rt['value'] + $value;
 				} else {
 					//* $this->db->update("UPDATE pw_membercredit SET value=" . UC::escape($value) .  ' WHERE uid=' . UC::escape($uid) . ' AND cid=' . UC::escape($cid));
@@ -171,12 +171,12 @@ class creditmodel {
 		} elseif ($this->isAllow($cid)) {
 			if ($isAdd) {
 				//* $this->db->update("UPDATE pw_memberdata SET $cid=$cid+" . UC::escape($value) . ' WHERE uid=' . UC::escape($uid));
-				$this->db->update(pwQuery::buildClause("UPDATE :pw_table SET $cid=$cid+" . UC::escape($value) . ' WHERE uid=:uid', array('pw_memberdata', $uid)));
+				$this->db->update(pwQuery::buildClause("UPDATE :pw_table SET $cid=$cid+" . UC::escape($value) . ' WHERE uid=:uid', array('pw_memberdata', intval($uid))));
 				$cid == 'rvrc' && $cid = "FLOOR(rvrc/10)";
 				return $this->db->get_value("SELECT $cid FROM pw_memberdata WHERE uid=" . UC::escape($uid));
 			} else {
 				//* $this->db->update("UPDATE pw_memberdata SET $cid=" . UC::escape($value) . ' WHERE uid=' . UC::escape($uid));
-				$this->db->update(pwQuery::buildClause("UPDATE :pw_table SET $cid=" . UC::escape($value) . ' WHERE uid=:uid', array('pw_memberdata', $uid)));
+				$this->db->update(pwQuery::buildClause("UPDATE :pw_table SET $cid=" . UC::escape($value) . ' WHERE uid=:uid', array('pw_memberdata', intval($uid))));
 				$cid == 'rvrc' && $value /= 10;
 				return $value;
 			}

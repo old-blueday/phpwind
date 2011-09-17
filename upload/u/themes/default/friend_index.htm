@@ -141,7 +141,7 @@ print <<<EOT
 							<p class="mb5">
 <!--
 EOT;
-$gender = $value['gender'] == 2 ? 'women' : 'man';
+$gender = getDefaultGender($value['gender']);
 if(checkOnline($value['thisvisit'])){
 print <<<EOT
 -->
@@ -297,7 +297,7 @@ print <<<EOT
 							<p class="mb5">
 <!--
 EOT;
-$gender = $value['gender'] == 2 ? 'women' : 'man';
+$gender = getDefaultGender($value['gender']);
 if(checkOnline($value['thisvisit'])){
 print <<<EOT
 -->
@@ -505,7 +505,7 @@ EOT;
 -->
 <!--
 EOT;
-$gender = $member['gender'] == 2 ? 'women' : 'man';
+$gender = getDefaultGender($member['gender']);
 if (checkOnline($member['thisvisit'])) {
 print <<<EOT
 --><span class="{$gender}_ol mr5" title="在线" alt="在线">在线</span><!--
@@ -513,8 +513,21 @@ EOT;
 }print <<<EOT
 -->
 <a href="{$db_userurl}$member[uid]" class="b _cardshow" data-card-url="pw_ajax.php?action=smallcard&type=showcard&uid={$member[uid]}" data-card-key="{$member['username']}">$member[username]</a></div>
-					<div>被关注：<span id="att_recommend_{$member[uid]}">{$member['fans']}</span></div>
-					<a href="javascript:;" class="adown s6 fr" id="td_recommendUsers{$member[uid]}" onclick="read.open('menu_recommendUsers{$member[uid]}','td_recommendUsers{$member[uid]}');">更多操作</a>
+<!--
+EOT;
+if ($member['honor'] && $groupRight['allowhonor']) {print <<<EOT
+-->
+					<div class="lh_18">{$member['honor']}</div>
+<!--
+EOT;
+} else {print <<<EOT
+-->
+					<div>该用户暂无签名</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+					<a href="javascript:;" class="adown s6 fr" id="td_recommendUsers{$member[uid]}" onmouseover="read.open('menu_recommendUsers{$member[uid]}','td_recommendUsers{$member[uid]}');">更多操作</a>
 					<div class="pw_menu" style="display:none;" id="menu_recommendUsers{$member[uid]}">
 						<ul class="menuList" style="width:70px;">
 <!--
@@ -543,20 +556,7 @@ EOT;
 -->
 						</ul>
 					</div>
-<!--
-EOT;
-if ($member['honor'] && $groupRight['allowhonor']) {print <<<EOT
--->
-					<div class="lh_18">{$member['honor']}</div>
-<!--
-EOT;
-} else {print <<<EOT
--->
-					<div>该用户暂无签名</div>
-<!--
-EOT;
-}print <<<EOT
--->
+					被关注：<span id="att_recommend_{$member[uid]}">{$member['fans']}</span>
 				</dd>
 			</dl>
 		</li>
@@ -605,7 +605,7 @@ EOT;
 -->
 <!--
 EOT;
-$gender = $member['gender'] == 2 ? 'women' : 'man';
+$gender = getDefaultGender($member['gender']);
 if (checkOnline($member['thisvisit'])) {
 print <<<EOT
 --><span class="{$gender}_ol mr5" title="在线" alt="在线">在线</span><!--
@@ -613,8 +613,21 @@ EOT;
 }print <<<EOT
 -->
 <a href="{$db_userurl}$member[uid]" class="b _cardshow" data-card-url="pw_ajax.php?action=smallcard&type=showcard&uid={$member[uid]}" data-card-key="{$member['username']}">$member[username]</a></div>
-					<div>被关注：<span id="att_friends_{$member[uid]}">{$member['fans']}</span></div>
-					<a href="javascript:;" class="adown s6 fr" id="td_mostFriends{$member[uid]}" onclick="read.open('menu_mostFriends{$member[uid]}','td_mostFriends{$member[uid]}');">更多操作</a>
+<!--
+EOT;
+if ($member['honor'] && $groupRight['allowhonor']) {print <<<EOT
+-->
+					<div class="lh_18">{$member['honor']}</div>
+<!--
+EOT;
+} else {print <<<EOT
+-->
+					<div>该用户暂无签名</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+					<a href="javascript:;" class="adown s6 fr" id="td_mostFriends{$member[uid]}" onmouseover="read.open('menu_mostFriends{$member[uid]}','td_mostFriends{$member[uid]}');">更多操作</a>
 					<div class="pw_menu" style="display:none;" id="menu_mostFriends{$member[uid]}">
 						<ul class="menuList" style="width:70px;">
 <!--
@@ -643,20 +656,7 @@ EOT;
 -->
 						</ul>
 					</div>
-<!--
-EOT;
-if ($member['honor'] && $groupRight['allowhonor']) {print <<<EOT
--->
-					<div class="lh_18">{$member['honor']}</div>
-<!--
-EOT;
-} else {print <<<EOT
--->
-					<div>该用户暂无签名</div>
-<!--
-EOT;
-}print <<<EOT
--->
+					被关注：<span id="att_friends_{$member[uid]}">{$member['fans']}</span>
 				</dd>
 			</dl>
 		</li>
@@ -705,15 +705,28 @@ EOT;
 -->
 <!--
 EOT;
-$gender = $member['gender'] == 2 ? 'women' : 'man';
+$gender = getDefaultGender($member['gender']);
 if (checkOnline($member['thisvisit'])) {
 print <<<EOT
 --><span class="{$gender}_ol mr5" title="在线" alt="在线">在线</span><!--
 EOT;
 }print <<<EOT
 --><a href="{$db_userurl}$member[uid]" target="_blank" class="b _cardshow" data-card-url="pw_ajax.php?action=smallcard&type=showcard&uid={$member[uid]}" data-card-key="{$member['username']}" >$member[username]</a></div>
-					<div>被关注：<span id="att_online_{$member[uid]}">{$member['fans']}</span></div>
-					<a href="javascript:;" class="adown s6 fr" id="td_onlineMembers{$member[uid]}" onclick="read.open('menu_onlineMembers{$member[uid]}','td_onlineMembers{$member[uid]}');">更多操作</a>
+<!--
+EOT;
+if ($member['honor'] && $groupRight['allowhonor']) {print <<<EOT
+-->
+					<div class="lh_18">{$member['honor']}</div>
+<!--
+EOT;
+} else {print <<<EOT
+-->
+					<div>该用户暂无签名</div>
+<!--
+EOT;
+}print <<<EOT
+-->
+					<a href="javascript:;" class="adown s6 fr" id="td_onlineMembers{$member[uid]}" onmouseover="read.open('menu_onlineMembers{$member[uid]}','td_onlineMembers{$member[uid]}');">更多操作</a>
 					<div class="pw_menu" style="display:none;" id="menu_onlineMembers{$member[uid]}">
 						<ul class="menuList" style="width:70px;">
 <!--
@@ -742,20 +755,7 @@ EOT;
 -->
 						</ul>
 					</div>
-<!--
-EOT;
-if ($member['honor'] && $groupRight['allowhonor']) {print <<<EOT
--->
-					<div class="lh_18">{$member['honor']}</div>
-<!--
-EOT;
-} else {print <<<EOT
--->
-					<div>该用户暂无签名</div>
-<!--
-EOT;
-}print <<<EOT
--->
+					被关注：<span id="att_online_{$member[uid]}">{$member['fans']}</span>
 				</dd>
 			</dl>
 		</li>
@@ -786,7 +786,7 @@ print <<<EOT
 					<div class="lh_18">
 <!--
 EOT;
-$gender = $member['gender'] == 2 ? 'women' : 'man';
+$gender = getDefaultGender($member['gender']);
 if (checkOnline($member['thisvisit'])) {
 print <<<EOT
 --><span class="{$gender}_ol mr5" title="在线" alt="在线">在线</span><!--

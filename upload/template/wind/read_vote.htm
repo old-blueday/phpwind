@@ -11,7 +11,7 @@ if($viewvoter){print <<<EOT
 								<a href="javascript:void(0)" id="viewVoters" class="fn s4">查看参与人员</a>
 <!--
 EOT;
-}if($readvote['modifiable'] && $action != 'modify'){print <<<EOT
+}if($readvote['modifiable'] && $action != 'modify' && $readvote['havevote'] && !$vote_close){print <<<EOT
 -->
 								<a href="read.php?fid=$fid&tid=$tid&displayMode=1&action=modify" class="fn s4">修改投票</a>
 <!--
@@ -98,14 +98,23 @@ foreach ($votedb as $key => $vote) {print <<<EOT
 		<ul class="cc" id="voterList_$key" style="display:none">
 <!--
 EOT;
-	foreach((array)$vote['voter'] as $v){
+	if ($vote['voter']) {
+		foreach((array)$vote['voter'] as $v){
+		$urltmpname = urlencode($v);
 print <<<EOT
 -->
 
-			<li><a href="u.php?username=$v" class="s4" target="_blank">$v</a></li>
+			<li><a href="u.php?username=$urltmpname" class="s4" target="_blank">$v</a></li>
 <!--
 EOT;
-}print <<<EOT
+		}
+	} else {
+print <<<EOT
+-->
+		暂时没有人员投该选项
+<!--
+EOT;
+	}print <<<EOT
 -->
 		</ul>
 <!--

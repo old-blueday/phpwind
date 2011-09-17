@@ -37,7 +37,7 @@ EOT;
 -->
 <!--
 EOT;
-$gender = $value['gender'] == 2 ? 'women' : 'man';
+$gender = getDefaultGender($value['gender']);
 if(checkOnline($value['thisvisit'])){
 print <<<EOT
 -->

@@ -1,11 +1,18 @@
 <!--<?php 
 $hasNewMessage = $winddb['newpm'] || $winddb['newreferto'] || $winddb['newnotice'] || $winddb['newrequest'] || $winddb['newfans'];
-if($winduid && $hasNewMessage){print <<<EOT
+$tmpMsgNum = 0;
+($winddb['newpm']>0 && $_G['maxmsg']>=0) && $tmpMsgNum += $winddb['newpm'];
+$winddb['newreferto']>0 && $tmpMsgNum += $winddb['newreferto'];
+$winddb['newnotice']>0 && $tmpMsgNum += $winddb['newnotice'];
+$winddb['newcomment']>0 && $tmpMsgNum += $winddb['newcomment'];
+$winddb['newfans']>0 && $tmpMsgNum += $winddb['newfans'];
+$tmpMsgNums = $tmpMsgNum > 0 ? '('.$tmpMsgNum.')' : '';
+if($winduid && $hasNewMessage && (!GetCookie('clearm_'.$winduid) || GetCookie('clearm_'.$winduid) < $tmpMsgNum)){print <<<EOT
 -->
 <div id="pw_all_tip" style="display:none;">
 <table><tr><td>
 <div class="pw_all_tip">
-	<a href="javascript:void(0)" class="adel" id="pw_all_tclose">关闭</a>
+	<a href="javascript:void(0)" class="adel" id="pw_all_tclose" data-num="{$tmpMsgNum}">关闭</a>
 <!--
 EOT;
 	if($winddb['newpm']){print <<<EOT
@@ -348,7 +355,6 @@ print <<<EOT
   	 <dt class="fr"><a href="u.php" hidefocus="true" class="img_50"><img alt="$windid" src="$_LoginInfo[faceurl]" /></a></dt>
        	<dd class="fr">
          	<p class="l_info mb5"><span id="td_userinfomore" style="padding:0 5px;"><a href="u.php" class="b link_down"><span>$windid</span></a></span><span class="mr5"></span><a href="$loginouturl" class="mr5">退出</a><span class="gray mr5">|</span>
-<base id="headbase" href="$db_bbsurl/" />
 <script type="text/javascript">
 var td_userinfomore = {
 	pz : 21,
@@ -363,7 +369,7 @@ var td_userinfomore = {
 	}
 }
 </script>
-<a href="message.php" class="mr5">消息</a><span id="td_profile" class="pd5"><a id="td_profile" class="link_down" href="profile.php?action=modify" target="_blank"><span>设置</span></a></span><!--
+<a href="message.php" class="mr5">消息{$tmpMsgNums}</a><span id="td_profile" class="pd5"><a id="td_profile" class="link_down" href="profile.php?action=modify" target="_blank"><span>设置</span></a></span><!--
 EOT;
 if(CkInArray($windid,$manager) || $SYSTEM['allowadmincp']){
 print <<<EOT

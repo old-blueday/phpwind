@@ -874,8 +874,8 @@ function viewread($read,$start_limit) {
 		}
 	}
 	list($read['face'],,$httpWidth,$httpHeight,,,,$read['facesize']) = showfacedesign($read['micon'], true, 'm');
-	if ($httpWidth > $GLOBALS['db_imgwidth'] || $httpHeight > $GLOBALS['db_imgheight']) {
-		$read['facesize'] = ' width="' . $GLOBALS['db_imgwidth'] . '" height="' . $GLOBALS['db_imgheight'] . '"';
+	if ($httpWidth > 120 || $httpHeight > 120 || $read['facesize'] == '') {
+		$read['facesize'] = ' width="120" height="120"';
 	}
 	list($read['posttime'],$read['postdate']) = getLastDate($read['postdate']);
 	$read['mark'] = $read['reward'] = $read['tag'] = NULL;

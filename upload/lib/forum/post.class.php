@@ -189,17 +189,20 @@ class PwPost {
 				M::sendNotice(
 				array($this->user['username']),
 				array(
-				'title' => getLangInfo('writemsg','user_update_title',array(
-					'username'=>$windid
-				)),
-				'content' => getLangInfo('writemsg','user_update_content',array(
-					'membername' => $membername,
-					'upmembername' => $upmembername,
-					'username' =>$this->user['username'],
-					'userneed' =>$userneed
-				)),
-				)
-			);				
+					'title' => getLangInfo('writemsg','user_update_title',array(
+						'username'=>$windid
+					)),
+					'content' => getLangInfo('writemsg','user_update_content',array(
+						'membername' => $membername,
+						'upmembername' => $upmembername,
+						'username' =>$this->user['username'],
+						'userneed' =>$userneed
+					)),
+					)
+				);
+				//$data=array('uid'=>$this->user['uid'],'behavior'=>5,'lastday'=>$GLOBALS['tdtime'],'num'=>$memberid);
+				//$data=array('uid'=>1,'behavior'=>5,'lastday'=>123,'num'=>1);
+				$this->elementUpdate($this->user['uid']);/*升级记录排行*/
 			}
 			$pwSQL = array(
 				'postnum'		=> $this->user['postnum'],
@@ -226,7 +229,18 @@ class PwPost {
 			Cookie('userlastptime',$timestamp);
 		}
 	}
-
+	/**
+	*
+	*记录升级排行记录
+	*
+	*/
+	function elementUpdate($uid){
+		global  $db_ifpwcache;
+		L::loadClass('elementupdate', '', false);
+		$elementupdate = new ElementUpdate('gradeuser');
+		$elementupdate->ugradeUserUpdate($uid);
+		$elementupdate->updateSQL();	
+	}
 	function showmsg($msg) {
 		if ($this->errMode) {
 			$this->errMsg[] = $msg;
@@ -243,7 +257,7 @@ class PwPost {
 	//static function
 	function tcheck($content) {
 		$content = trim($content);
-		$content = strlen($content)>100 ? substr($content,0,100) : $content;
+		$content = strlen($content)>100 ? substr($content,-100) : $content;
 		return substr(md5($content),5,16);
 	}
 }
@@ -482,6 +496,7 @@ class postData {
 			$this->linkChecker->checkContent($this->data['content']);
 			if ($this->linkCheckStrategy && $this->linkChecker->isReachLimit()) {
 				if ('verify' == $this->linkCheckStrategy) {
+					$this->iscontinue or $this->showmsg('post_link_check');
 					$this->data['ifcheck'] = 0;
 				} elseif ('exception' == $this->linkCheckStrategy) {
 					$this->post->showmsg('urlcheck_toomany');
@@ -593,7 +608,13 @@ class postData {
 	}
 
 	function urlCheck($str) {
-		return (strpos($str,'[/URL]') !== false || strpos($str,'[/url]') !== false);
+		global $db_bbsurl;
+		if (preg_match_all('/\[url=([^\]]+)]/is', $str ,$matches)){
+			foreach ($matches[1] as $v) {
+				if (strpos($v, $db_bbsurl) !== 0) return true; 
+			}
+		}
+		return false;
 	}
 
 	function html_check($souce) {
@@ -651,6 +672,27 @@ class postData {
 		$this->code_id++;
 		$this->code_htm[$this->code_id] = '[code]' . str_replace('\\"','"',$code) . '[/code]';
 		return "<\twind_phpcode_{$this->code_id}\t>";
+	}
+	
+	function setPostFromMob(){
+		$phoneSystem = $this->_getHeaderInfoByType('SYS');
+		$this->data['frommob'] = $phoneSystem;
+	}
+
+	function _getHeaderInfoByType($type){
+		$headerInfo = S::getServer('HTTP_INFO');
+		$headerInfo = explode(';',$headerInfo);
+		foreach ($headerInfo as $key => $value) {
+			list($k,$v) = explode('=',$value);
+			$result[$k] = $v;
+		}
+		return $this->_getPhoneSystemType($result[$type]);
+	}
+
+	function _getPhoneSystemType($name) {
+		$name = strtolower($name);
+		$phone = array('android' => 1, 'iphone' => 2);
+		return $phone[$name];
 	}
 }
 

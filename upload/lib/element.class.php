@@ -64,7 +64,7 @@ class PW_Element{
 		$posts 	= array();
 		$fid = $this->_cookFid($round);
 		if ($this->ifpwcache & 128) {
-			$sqladd .= ' AND e.special='.S::sqlEscape($special);
+			$special && $sqladd .= ' AND e.special='.S::sqlEscape($special);
 			$sqladd .= $this->_getBlackList('e.id', $GLOBALS['db_tidblacklist']);
 			$fid && $sqladd .= " AND e.mark IN ($fid) ";
 			$query = $this->db->query("SELECT t.tid,t.fid,t.author,t.authorid,t.subject,t.type,t.postdate,t.hits,t.replies,t.lastpost FROM pw_elements e LEFT JOIN pw_threads t ON e.id=t.tid WHERE e.type='newsubject' $sqladd AND t.ifshield <> 1 AND t.locked <> 2 ORDER BY e.value DESC ".S::sqlLimit($num));
@@ -874,6 +874,23 @@ class PW_Element{
 		}
 		array_multisort($countNum, SORT_DESC, $userData);
 		return $userData;
+	}
+	/**
+	 * 
+	 * 取得某类型的数据列表
+	 * @param string $type
+	 * @param int $limit
+	 * @return array
+	 */
+	function getElementList($type,$limit=10,$isid=false) {
+		$rts=array();
+		$limit 	= intval($limit) ? intval($limit) : $this->defaultnum;
+		if (empty($type))return $rts;
+		$query = $this->db->query("SELECT id ,value,  addition  FROM pw_elements WHERE type = " . S::sqlEscape($type) . " ORDER BY type,value DESC " . S::sqlLimit($limit));
+		while ($rt = $this->db->fetch_array($query)) {
+			 $rts[]=$isid ? $rt['id'] : $rt;
+		}
+		return $rts;
 	}
 }
 

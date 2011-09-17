@@ -363,7 +363,7 @@ pw_search.prototype = {
 				}else{
 					select.style.styleFloat="right";
 				}
-				title.innerHTML="请选择你要@的人(已选<span id='pwSearchPercent'>0</span>人)";
+				title.innerHTML="已选<span id='pwSearchPercent'>0</span>人";
 				select.parentNode.insertBefore(title,select);
 			}
 			//end

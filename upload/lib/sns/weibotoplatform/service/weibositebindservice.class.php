@@ -17,12 +17,14 @@ class PW_WeiboSiteBindService extends PW_WeiboBindBaseService {
 	}
 	
 	function close() {
-		$this->_saveBindConfig($this->_getBindConfig()->setStatus(false));
+		$tmp = $this->_getBindConfig();
+		$this->_saveBindConfig($tmp->setStatus(false));
 		return true;
 	}
 	
 	function isOpen() {
-		return $this->_getBindConfig()->isOpen();
+		$tmp = $this->_getBindConfig();
+		return $tmp->isOpen();
 	}
 	
 	function isBind($bindType) {
@@ -33,7 +35,8 @@ class PW_WeiboSiteBindService extends PW_WeiboBindBaseService {
 	
 	function getBindTypes() {
 		if (!$this->isOpen()) return array();
-		return $this->_getBindConfig()->getBindTypes();
+		$tmp = $this->_getBindConfig();
+		return $tmp->getBindTypes();
 	}
 	
 	function getBindType($bindType) {

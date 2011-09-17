@@ -1,18 +1,13 @@
 <?php
-/**
- * 云盾后台管理
- * @author L.IuHu.I@2011 developer.liuhui@gmail.com
- */
-require_once R_P . 'lib/cloudwind/yunextendfactory.class.php';
-$factory = new PW_YunExtendFactory ();
-$_service = $factory->getYunCheckServerService ();
+require_once (R_P . 'lib/cloudwind/cloudwind.class.php');
+$_service = CloudWind::getPlatformCheckServerService ();
 if ($_service->checkCloudWind () < 9) {
 	ObHeader ( $admin_file . '?adminjob=yunbasic' );
 }
-S::gp ( array ('action' ) );
+CLOUDWIND_SECURITY_SERVICE::gp ( array ('action' ) );
 if (empty ( $action )) {
 	if ($_POST ['step'] == 2) {
-		S::gp ( array ('db_yundefend_shield', 'db_yundefend_shieldpost', 'db_yundefend_shielduser' ), 'P', 2 );
+		CLOUDWIND_SECURITY_SERVICE::gp ( array ('db_yundefend_shield', 'db_yundefend_shieldpost', 'db_yundefend_shielduser' ), 'P', 2 );
 		setConfig ( 'db_yundefend_shield', $db_yundefend_shield );
 		setConfig ( 'db_yundefend_shieldpost', $db_yundefend_shieldpost );
 		setConfig ( 'db_yundefend_shielduser', $db_yundefend_shielduser );
@@ -25,12 +20,11 @@ if (empty ( $action )) {
 	$dundescribe = $_service->getDunDescribe ();
 	$current ['config'] = 'current';
 } elseif ($action == 'verify') {
-	S::gp ( array ('page' ) );
+	CLOUDWIND_SECURITY_SERVICE::gp ( array ('page' ) );
 	$page = ($page > 1) ? intval ( $page ) : 1;
-	require_once R_P . 'lib/cloudwind/defend/yunpostverify.class.php';
-	$postVerifyService = new PW_YunPostVerify ();
+	$postVerifyService = CloudWind::getDefendPostVerifyService ();
 	if ($_POST ['step'] == 2) {
-		S::gp ( array ('ids' ) );
+		CLOUDWIND_SECURITY_SERVICE::gp ( array ('ids' ) );
 		foreach ( $ids as $key => $operate ) {
 			list ( $tid, $pid ) = explode ( "_", $key );
 			$postVerifyService->verify ( $operate, $tid, $pid );
@@ -38,8 +32,7 @@ if (empty ( $action )) {
 		Showmsg ( '云盾审核成功 ', $basename . "&action=verify&page=" . $page );
 	}
 	$total = $postVerifyService->countPostVerify ();
-	$lists = ($total) ? $postVerifyService->getPostVerify ( $page ) : array ();
-	$pages = numofpage ( $total, $page, ceil ( $total / 20 ), $basename . "&action=verify&" );
+	$lists = ($total) ? $postVerifyService->getPostVerify ( $page, 100 ) : array ();
 	$current ['verify'] = 'current';
 }
 include PrintEot ( 'yundefend' );

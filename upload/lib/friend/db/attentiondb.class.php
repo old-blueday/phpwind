@@ -53,7 +53,7 @@ class PW_AttentionDB extends BaseDB {
 	}
 		
 	function findAttentions($uid, $offset, $perpage) {//fixed
-		$sql = "SELECT m.uid,m.username,m.icon as face,m.honor,m.groupid,m.memberid,md.thisvisit,md.lastvisit,md.fans" .
+		$sql = "SELECT m.uid,m.username,m.icon as face,m.honor,m.groupid,m.memberid,m.gender,md.thisvisit,md.lastvisit,md.fans" .
 			" FROM " . $this->_tableName . " f ".
 			" LEFT JOIN pw_members m ON f.friendid = m.uid".
 			" LEFT JOIN pw_memberdata md ON f.friendid = md.uid".
@@ -64,7 +64,7 @@ class PW_AttentionDB extends BaseDB {
 	}
 	
 	function findFans($uid, $offset, $perpage) {//fixed
-		$sql = "SELECT m.uid,m.username,m.icon as face,m.honor,m.groupid,m.memberid,md.thisvisit,md.lastvisit,md.fans FROM ".$this->_tableName. " f ".
+		$sql = "SELECT m.uid,m.username,m.icon as face,m.honor,m.groupid,m.memberid,m.gender,md.thisvisit,md.lastvisit,md.fans FROM ".$this->_tableName. " f ".
 			" LEFT JOIN pw_members m ON f.uid = m.uid".
 			" LEFT JOIN pw_memberdata md ON f.uid = md.uid".
 			" WHERE f.friendid=".$this->_addSlashes($uid)." ORDER BY joindate DESC".

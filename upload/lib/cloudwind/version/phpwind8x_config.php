@@ -1,0 +1,25 @@
+<?php
+! defined ( 'P_W' ) && exit ( 'Forbidden' );
+return array(
+	'g_charset'            => isset($GLOBALS['db_charset']) ? $GLOBALS['db_charset'] : '',
+	'g_bbsname'            => isset($GLOBALS['db_bbsname']) ? $GLOBALS['db_bbsname'] : '',
+	'g_bbsurl'             => isset($GLOBALS['db_bbsurl'])  ? $GLOBALS['db_bbsurl']  : '',
+	'g_timestamp'          => isset($GLOBALS['timestamp'])  ? $GLOBALS['timestamp']  : time(),
+	'g_onlineip'           => isset($GLOBALS['onlineip'])   ? $GLOBALS['onlineip']  : CloudWind_getIp(),
+	'g_cvtime'             => isset($GLOBALS['db_cvtime'])  ? $GLOBALS['db_cvtime']  : '0',
+	'g_windversion'        => WIND_VERSION,
+	'g_cachedir'   	       => D_P . 'data/bbscache/',
+	'g_whiteips'           => array(''),
+	'yunsearch_search'     => isset($GLOBALS['db_yunsearch_search'])  ? $GLOBALS['db_yunsearch_search']  : '',
+	'yunsearch_hook'       => isset($GLOBALS['db_yunsearch_hook'])  ? $GLOBALS['db_yunsearch_hook']  : '',
+	'yunsearch_domain'     => isset($GLOBALS['db_yunsearch_domain'])  ? $GLOBALS['db_yunsearch_domain']  : '',
+	'yunsearch_isopen'     => isset($GLOBALS['db_yunsearch_isopen'])  ? $GLOBALS['db_yunsearch_isopen']  : '',
+	'yunsearch_unique'     => isset($GLOBALS['db_yunsearch_unique'])  ? $GLOBALS['db_yunsearch_unique']  : '',
+	'yundefend_shield'     => isset($GLOBALS['db_yundefend_shield'])  ? $GLOBALS['db_yundefend_shield']  : '',
+	'yundefend_shielduser' => isset($GLOBALS['db_yundefend_shielduser'])  ? $GLOBALS['db_yundefend_shielduser']  : '',
+	'yundefend_shieldpost' => isset($GLOBALS['db_yundefend_shieldpost'])  ? $GLOBALS['db_yundefend_shieldpost']  : '',
+	'yun_hash'             => isset($GLOBALS['db_yun_hash'])  ? $GLOBALS['db_yun_hash']  : '',
+	'yun_model'            => isset($GLOBALS['db_yun_model'])  ? $GLOBALS['db_yun_model']  : array (),
+	'yun_expand'           => isset($GLOBALS['db_yun_expand'])  ? $GLOBALS['db_yun_expand']  : array (),
+	'search_types'         => array ('thread', 'member', 'diary', 'forum', 'colony', 'post', 'attach', 'weibo' ),
+);

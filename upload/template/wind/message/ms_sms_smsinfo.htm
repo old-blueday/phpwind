@@ -44,7 +44,7 @@ print <<<EOT
 <!--
 EOT;
 if(checkOnline($value['thisvisit']) && $value[create_uid] != $winduid){
-$gender = $value['gender'] == 2 ? 'women' : 'man';
+$gender = getDefaultGender($value['gender']);
 print <<<EOT
 -->
 							<span class="{$gender}_ol mr5" title="在线" alt="在线">在线</span>
@@ -99,6 +99,7 @@ EOT;
 						 </div>
                          </div>
                      </td>
+										 <td width="60">&nbsp;</td>
                  </tr>
 <!--
 EOT;

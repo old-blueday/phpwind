@@ -68,10 +68,11 @@ class ArticleUpload extends uploadBehavior {
 	}
 
 	function update($uploaddb) {
+		global $db_charset;
 		$this->transfer();
 		foreach ($uploaddb as $value) {
 			$value['descrip']	= S::escapeChar(S::getGP('atc_desc'.$value['id'], 'P'));
-			$value['name']      = stripslashes($value['name']);
+			$value['name']      = stripslashes(pwConvert($value['name'], $db_charset, 'utf-8'));
 			$this->attachs[] = $value;
 		}
 		return $uploaddb;
@@ -182,7 +183,7 @@ class articleMutiUpload extends uploadBehavior {
 	}
 
 	function update($uploaddb) {
-		global $timestamp;
+		global $timestamp,$db_charset;
 		foreach ($uploaddb as $value) {
 			$value['name'] = pwConvert($value['name'], $db_charset, 'utf-8');
 			$this->db->update("INSERT INTO pw_attachs SET " . S::sqlSingle(array(

@@ -12,9 +12,11 @@ class customerFieldProfileTemplate extends PW_CustomerFieldTemplate {
 		$this->requriedHtml = $this->fieldInfo['required'] ? '<span class="s1">*</span>' : '';
 	}
 	function formatDescripHtml(){
+	/*
 		if (!$this->fieldInfo['descrip'] && $this->fieldInfo['type'] == $this->pwCustomerField->typeMap['input']){
 			$this->fieldInfo['descrip'] = $this->fieldInfo['maxlen'] ? '限'.$this->fieldInfo['maxlen'].'字节' : '';
 		}
+	*/
 		$this->descripHtml = $this->fieldInfo['descrip'] ? '':' style="display:none"';
 	}
 
@@ -232,7 +234,7 @@ $template . <<<EOT
 EOT;
 } else {$template .= <<<EOT
 -->
-			<input class="input input_wa" type="text" name="alipay" value="{$this->defaultValueHtml}" {$this->disabledHtml} />
+			<input class="input input_wa" autocomplete="off" type="text" name="alipay" value="{$this->defaultValueHtml}" {$this->disabledHtml} />
 <!--
 EOT;
 	if ($db_authstate) {$template .=  <<<EOT

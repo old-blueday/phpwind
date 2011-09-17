@@ -10,15 +10,9 @@
 <link rel="stylesheet" href="$imgpath/admin/admin_style.css?{$GLOBALS['wind_repair']}" />
 <script type="text/javascript" src="js/core/core.js"></script>
 <script type="text/javascript">
-var agt = navigator.userAgent.toLowerCase();
-var is_ie = ((agt.indexOf("msie") != -1) && (agt.indexOf("opera") == -1));
-var is_gecko = (navigator.product=='Gecko');
 var imgpath = '$imgpath';
-
+var db_bbsurl = '$db_bbsurl' ;
 //check used
-function getObj(id){
-	return document.getElementById(id);
-}
 function showselect(type){
 	var selects = get_tags(document,'select');
 	for (i=0; i<selects.length; i++) {
@@ -38,28 +32,7 @@ function get_tags(parentobj,tag){
 		return null;
 	}
 }
-function ietruebody(){
-	return (document.compatMode && document.compatMode!="BackCompat")? document.documentElement : document.body;
-}
-function getTop() {
-	return typeof window.pageYOffset != 'undefined' ? window.pageYOffset:ietruebody().scrollTop;
-}
-function getLeft() {
-	return (typeof window.pageXOffset != 'undefined' ? window.pageXOffset:ietruebody().scrollLeft)
-}
 //other function
-function CheckAll(form){
-	var ifcheck = null;
-	for (var i=0;i<form.elements.length-1;i++){
-		var e = form.elements[i];
-		if(e.type=='checkbox'){
-			if (ifcheck === null) ifcheck = !e.checked;
-			e.checked = ifcheck;
-			if (typeof e.onclick == 'function') e.onclick();
-		}
-	}
-	return ifcheck;
-}
 function atccheck(){
 	if(document.FORM.atc_title.value==''){
 		alert('标题为空');
@@ -133,9 +106,7 @@ function setCookie(name, value, expires, path, domain, secure) {
         ( (domain)  ? ';domain=' + domain : '') +
         ( (secure)  ? ';secure' : '');
 }
-function IsElement(id) {
-	return document.getElementById(id) != null ? true : false;
-}
+
 function elementBind(type,id,stylename,csstext){
 	var element = document.createElement(type);
 	if (id) {
@@ -178,26 +149,6 @@ document.onkeydown = function(e){
 	}
 }
 
-Class = function(aBaseClass, aClassDefine) {
-	function class_() {
-		this.Inherit = aBaseClass;
-		for (var member in aClassDefine) {
-			try{this[member] = aClassDefine[member];}catch(e){}		//针对opera,safri浏览器的只读属性的过滤
-		}
-	}
-	class_.prototype = aBaseClass;
-	return  new class_();
-};
-New = function(aClass, aParams) {
-	function new_()	{
-		this.Inherit = aClass;
-		if (aClass.Create) {
-			aClass.Create.apply(this, aParams);
-		}
-	}
-	new_.prototype = aClass;
-	return  new new_();
-};
 function openNewUrl(id,name,url){
 	parent.PW.Dialog({
 		'id': id,

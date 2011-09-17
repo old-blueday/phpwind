@@ -41,7 +41,11 @@ class PW_ForumsDB extends BaseDB {
 		$query = $this->_db->query ( "SELECT fid,allowvisit,password,name,f_type FROM " . $this->_tableName . " WHERE type<>'category'" );
 		return $this->_getAllResultFromQuery ( $query );
 	}
-	
+
+	function getsNotCategoryAllInfo(){
+		$query = $this->_db->query ( "SELECT * FROM " . $this->_tableName . " WHERE type<>'category'" );
+		return $this->_getAllResultFromQuery ( $query );
+	}
 	/**
 	 * 注意只提供搜索服务
 	 */

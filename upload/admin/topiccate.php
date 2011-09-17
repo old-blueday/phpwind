@@ -558,7 +558,8 @@ if (empty($action)){
 		} elseif ($fieldtype == 'number') {
 			$rule_min != '' && $rule_min = (int) $rule_min;
 			$rule_max != '' && $rule_max = (int) $rule_max;
-			($rule_min > $rule_max || $rule_min < 0 || $rule_max< 0)  && Showmsg('field_number_error');
+			($rule_min < 0 || $rule_max< 0)  && Showmsg('数值范围不能是负数');
+			($rule_min > $rule_max)  && Showmsg('field_number_error');
 			$s_rules = addslashes(serialize(array('minnum' => $rule_min,'maxnum' => $rule_max)));
 		} else {
 			$s_rules = '';
@@ -616,6 +617,7 @@ if (empty($action)){
 		} elseif ($fieldtype == 'number') {
 			$rule_min != '' && $rule_min = (int) $rule_min;
 			$rule_max != '' && $rule_max = (int) $rule_max;
+			($rule_min < 0 || $rule_max< 0)  && Showmsg('数值范围不能是负数');
 			$rule_min > $rule_max && Showmsg('field_number_error');
 			$s_rules = addslashes(serialize(array('minnum' => $rule_min,'maxnum' => $rule_max)));
 		} else {

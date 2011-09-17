@@ -10,7 +10,7 @@ S::gp(array(
 !$page && $page = 1;
 $maxPage = ceil($count/$perpage);
 
-if ($page<$maxPage) {
+if ($page<=$maxPage) {
 	$pageInvokes = $pageInvokeDB->searchPageInvokes(array(),$page,$perpage);
 	foreach ($pageInvokes as $value) {
 		$invokeName = $value['invokename'];

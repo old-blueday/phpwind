@@ -108,9 +108,9 @@ if ($read['aid']) {
 		$read['content'] = convert($read['content'], $db_windpost);
 		if (strrpos($read['content'],'attachment') !== false) {
 			$haveAids = $attachShow->findPicAids($read['content']);
+			$noAids = array_diff((array)$contentAids,(array)$haveAids);
 		}
 	}
-	$noAids = array_diff((array)$contentAids,(array)$haveAids);
 }
 if (S::isArray($noAids)) {
 	foreach ($tucoolAttachs as $v) {

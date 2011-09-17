@@ -60,6 +60,7 @@ class PwSpaceModel {
 		$array['systitle'] = $this->spaceinfo['groupid'] == '-1' ? '' : $ltitle[$this->spaceinfo['groupid']];
 		$array['memtitle'] = $ltitle[$this->spaceinfo['memberid']];
 		$array['thisvisit'] = $this->spaceinfo['thisvisit'];
+		$array['regdate'] = $this->spaceinfo['regdate'];
 		$array['lastvisit_s'] = get_date($this->spaceinfo['lastvisit'], 'Y-m-d');
 		$array['totalcredit'] = $this->_getUserTotalCredit();
 		$array = array_merge($array, $this->_getDetailInfo($uid));

@@ -47,7 +47,7 @@ if ($numofpage && $page > $numofpage) {
 $pages = PageDiv($count,$page,$numofpage,"{$DIR}f$fid",$db_maxpage);
 
 $threaddb = array();
-$query = $db->query("SELECT * FROM pw_threads WHERE fid=".S::sqlEscape($fid)." AND topped<=3 AND ifcheck='1' ORDER BY topped DESC, lastpost DESC".S::sqlLimit($start_limit,$db_perpage));
+$query = $db->query("SELECT * FROM pw_threads WHERE fid=".S::sqlEscape($fid)." AND topped<=3 AND ifcheck='1' ORDER BY specialsort DESC, lastpost DESC".S::sqlLimit($start_limit,$db_perpage));
 while ($thread = $db->fetch_array($query)) {
 	$threaddb[] = $thread;
 }

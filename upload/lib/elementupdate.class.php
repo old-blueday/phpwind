@@ -387,6 +387,129 @@ class ElementUpdate {
 		$this->updatetype['newsubject'] = 1;
 		return true;
 	}
+	
+	/**
+	 * open post
+	 *
+	 * @param int $fid
+	 * @param int $tid
+	 * @return
+	 */
+	function openThreadUpdate($fid, $tid) {
+		global $timestamp;
+		if (!($this->ifcache & 16384) || $this->_inTidBlackList($tid)) {
+			return false;
+		}
+		$this->updatelist[] = array(
+			'openthread',
+			$fid,
+			$tid,
+			$timestamp,
+			'',
+			'0'
+		);
+		$this->updatetype['openthread'] = 1;
+		return true;
+	}
+	/**
+	 * last post user
+	 *
+	 * @param int $rid
+	 * @param int $tid
+	 * @param string $postdate
+	 * @return
+	 */
+	function lastPostUpdate($uid, $tid) {
+		global $timestamp;
+		$this->updatelist[] = array(
+			'lastpostuser',
+			'tid',
+			$uid,
+			$timestamp,
+			'',
+			'0'
+		);
+		$this->updatetype['lastpostuser'] = 1;
+		return true;
+	}
+	/**
+	 * total fans user
+	 *
+	 * @param int $uid
+	 * @return
+	 */
+	function totalFansUpdate($uid){
+		if (!$uid) {
+			return false;
+		}
+
+		$eid = $this->db->get_value("SELECT eid FROM pw_elements WHERE type='totalfans'  AND id=" . S::int($uid));
+
+		if ($eid) {
+			$this->db->update("UPDATE pw_elements SET value=value+1 WHERE eid=" . S::int($eid));
+		} else {
+			$fannum = $this->db->get_one("SELECT fans FROM pw_memberdata WHERE uid=" .S::int($uid));
+			$this->updatelist[] = array(
+				'totalfans',
+				'fans',
+				$uid,
+				$fannum['fans'],
+				'',
+				'0'
+			);
+			$this->updatetype['totalfans'] =1;
+		}
+		return true;
+	}
+	/**
+	 * today fans order
+	 *
+	 * @param int $uid
+	 * @return
+	 */
+	function todayFansUpdate($uid){
+		global $tdtime,$timestamp;
+		if (!$uid) {
+			return false;
+		}
+
+		$eid = $this->db->get_value("SELECT eid FROM pw_elements WHERE type='todayfans'  AND id=" . S::int($uid));
+		if ($eid) {
+			$this->db->update("UPDATE pw_elements SET value=value+1 WHERE eid=" . S::int($eid));
+		} else {
+			$count = $this->db->get_value("SELECT COUNT(*) AS count FROM pw_attention  WHERE friendid=" .S::int($uid)." AND joindate>".S::int($tdtime));
+			$this->updatelist[] = array(
+				'todayfans',
+				'fans',
+				$uid,
+				$count,
+				$timestamp,
+				'0'
+			);
+			$this->updatetype['todayfans'] = 1;
+		}
+		return true;
+	}
+	/**
+	 * user ugrade  
+	 *
+	 * @param int $uid
+	 * @return
+	 */
+	function ugradeUserUpdate($uid){
+		global $timestamp;
+
+		$this->updatelist[] = array(
+			'gradeuser',
+			'time',
+			$uid,
+			$timestamp,
+			'',
+			'0'
+		);
+		$this->updatetype['gradeuser'] = 1;
+		return true;
+	}
 	/**
 	 * new reply update
 	 *
@@ -444,7 +567,9 @@ class ElementUpdate {
 	function setMark($mark) {
 		$this->mark = $mark;
 	}
-
+	function setCacheNum($num) {
+		$this->cachenum = $num;
+	}
 	function setUpdateList($updatelist) {
 		$this->updatelist = $updatelist;
 	}
@@ -491,7 +616,8 @@ class ElementUpdate {
 		$this->db->update("REPLACE INTO pw_elements (type,mark,id,value,addition,special) VALUES " . S::sqlMulti($this->updatelist, false));
 		$sortlist = array();
 		$dellis = array();
-		$query = $this->db->query("SELECT eid,type,value,addition FROM pw_elements WHERE type IN (" . S::sqlImplode(array_keys($this->updatetype)) . ") AND mark=" . S::sqlEscape($this->mark) . " AND special=" . S::sqlEscape($special) . " ORDER BY type,value DESC");
+		$orderIds=array();
+		$query = $this->db->query("SELECT eid,type,id,value,addition FROM pw_elements WHERE type IN (" . S::sqlImplode(array_keys($this->updatetype)) . ") AND mark=" . S::sqlEscape($this->mark) . " AND special=" . S::sqlEscape($special) . " ORDER BY type,value DESC");
 		while ($rt = $this->db->fetch_array($query)) {
 			if (strpos($rt['type'], 'day') && $rt['addition'] && $rt['addition'] < $todaytime) {
 				$dellist[] = $rt['eid'];
@@ -499,6 +625,9 @@ class ElementUpdate {
 				$dellist[] = $rt['eid'];
 			} else {
 				$sortlist[$rt['type']][] = $rt;
+			}
+			if ($rt['type']=='todayfans'){/*记录删除前的排序*/
+				$orderIds[]=$rt['id'];
 			}
 		}
 
@@ -534,6 +663,9 @@ class ElementUpdate {
 			}
 		}
 		if ($dellist) {
+			if (in_array('todayfans',array_keys($this->updatetype))){
+				pwCache::setData(D_P . 'data/bbscache/yesterday_fans_brand.php', "<?php\r\n\$yesterdayfansbrand=" . pw_var_export($orderIds) . ";\r\n?>");
+			}
 			$this->db->update("DELETE FROM pw_elements WHERE eid IN (" . S::sqlImplode($dellist) . ")");
 		}
 		if ($judges) {

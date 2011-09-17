@@ -119,7 +119,7 @@ function setSort(sort){
 		keyword = '';
 	}
 	window.location.href='{$basename}&action=setting&type='+type+'&class='+classid+'&keyword='+keyword+'&sort='+sort+'&show='+show;
-	window.event.returnValue = false;
+	return false;
 }
 
 function importShow(){
@@ -258,7 +258,7 @@ function scanState(fid, state, restart)
 		scanSwitch = 0;
 		var time = new Date().getTime();
 		window.location.href = "{$basename}&action=scan&skip="+fid;
-		window.event.returnValue = false;
+		return false;
 	}
 }
 </script>

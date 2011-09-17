@@ -2,6 +2,7 @@
 !defined('P_W') && exit('Forbidden');
 S::gp(array('alias','ifactive'),'G');
 header('Content-type: application/javascript;charset='.$db_charset);
+header('Cache-Control: no-cache');
 extract(L::style('',$skinco));
 //* include_once pwCache::getPath(D_P.'data/bbscache/area_config.php');
 pwCache::getData(D_P.'data/bbscache/area_config.php');

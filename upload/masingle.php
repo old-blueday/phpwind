@@ -1007,7 +1007,7 @@ if ($action == "topped") {
     //* $threadList->refreshThreadIdsByForumId($fid);
 	//* Perf::gatherInfo('changeThreadWithForumIds', array('fid'=>$fid));
 	if ($db->affected_rows() > 0) {
-		$rt = $db->get_one("SELECT tid,author,postdate,subject FROM pw_threads WHERE fid=".S::sqlEscape($fid)."AND ifcheck='1' AND topped='0' ORDER BY lastpost DESC LIMIT 1");
+		$rt = $db->get_one("SELECT tid,author,postdate,subject FROM pw_threads WHERE fid=".S::sqlEscape($fid)."AND ifcheck='1' AND specialsort='0' ORDER BY lastpost DESC LIMIT 1");
 		$lastpost = $rt['subject']."\t".$rt['author']."\t".$rt['postdate']."\t"."read.php?tid=$rt[tid]&ds=1&page=e#a";
 		//* $db->update("UPDATE pw_forumdata SET topic=topic+'1',article=article+'1',tpost=tpost+'1',lastpost=".S::sqlEscape($lastpost,false)." WHERE fid='$fid'");
 		$db->update(pwQuery::buildClause("UPDATE :pw_table SET topic=topic+'1',article=article+'1',tpost=tpost+'1',lastpost=:lastpost WHERE fid=:fid", array('pw_forumdata', $lastpost, $fid)));

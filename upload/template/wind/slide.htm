@@ -11,15 +11,15 @@ print <<<EOT
 <base id="headbase" href="$db_bbsurl/" /> 
 <link href="$imgpath/pw_core.css?{$GLOBALS['wind_repair']}" rel="stylesheet" />
 <link href="$imgpath/slide/slide.css?{$GLOBALS['wind_repair']}" rel="stylesheet"/>
-<script type="text/javascript" src="js/pw_ajax.js"></script>
-<script type="text/javascript" src="js/core/core.js"></script>
-<script>
-var imgpath = '$imgpath';
-</script> 
 <style type="text/css">
 .preA{cursor:url(u/images/pre.cur),auto;}
 .nextA{cursor:url(u/images/next.cur),auto;right:0;}
 </style>
+<script type="text/javascript" src="js/core/core.js"></script>
+<script type="text/javascript" src="js/pw_ajax.js"></script>
+<script>
+var imgpath = '$imgpath';
+</script> 
 </head>
 <body>
 	<div class="header">
@@ -224,6 +224,9 @@ function changeImg(aid,position,url,descrip){
 	getObj('viewbigpic').href = url;
 	getObj('img_descrip').innerHTML = descrip ? descrip : getObj('img_nonedescrip').innerHTML;
 	getObj('add_descrip').value = descrip ? descrip : '';
+	getObj('descrip').style.display = 'none';
+	getObj('img_descrip').style.display = '';
+	if (getObj('showadd')) getObj('showadd').style.display = '';
 }
 function collectionImg(){
 	var aid = getObj('attachId').value;
@@ -239,13 +242,13 @@ function commentsPic(id){
 var picsubject = {
 	showadd : function(){
 		getObj('img_descrip').style.display = 'none';
-		getObj('showadd').style.display = 'none';
+		if (getObj('showadd')) getObj('showadd').style.display = 'none';
 		getObj('descrip').style.display = '';
 	},
 
 	cancle : function(){
 		getObj('descrip').style.display = 'none';
-		getObj('showadd').style.display = '';
+		if (getObj('showadd')) getObj('showadd').style.display = '';
 		getObj('img_descrip').style.display = '';
 	},
 

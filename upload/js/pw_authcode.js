@@ -13,15 +13,14 @@ function newGdCode(obj) {
 	}
 	return false;
 }
-
 function showGdCode(isreturn) {
 	var str;
 	var nowTimeString = 'nowtime=' + new Date().getTime();
 	if (cloudgdcode) {
-		str = '<img id="changeGdCode" src="' + cloudcaptchaurl + '&' + nowTimeString + '&" align="top" class="cp sitegdcheck" onclick="changeCkImage(this)" alt="看不清楚，换一张" title="看不清楚，换一张" align="absmiddle" /><span onclick="changeCkImage(this.previousSibling);" style="margin-left:10px;" class="s4 cp" id="changeGdCode_a">换一个</span>';
+		str = '<img id="changeGdCode" src="' + cloudcaptchaurl + '&' + nowTimeString + '&" align="top" class="cp sitegdcheck" onclick="changeCkImage(this)" alt="看不清楚，换一张" title="看不清楚，换一张" /><span onclick="changeCkImage(this.previousSibling);" style="margin-left:3px;" class="s4 cp" id="changeGdCode_a">换一个</span>';
 	} else {
 		if (gdtype == 1 || !gdtype) {
-			str = '<img id="changeGdCode" src="ck.php?' + nowTimeString + '" align="top" class="cp sitegdcheck" onclick="changeCkImage(this)" alt="看不清楚，换一张" title="看不清楚，换一张" align="absmiddle" /><span onclick="changeCkImage(this.previousSibling);" style="margin-left:10px;" class="s4 cp" id="changeGdCode_a">换一个</span>';
+			str = '<img id="changeGdCode" src="ck.php?' + nowTimeString + '" align="top" class="cp sitegdcheck" onclick="changeCkImage(this)" alt="看不清楚，换一张" title="看不清楚，换一张" /><span onclick="changeCkImage(this.previousSibling);" style="margin-left:3px;" class="s4 cp" id="changeGdCode_a">换一个</span>';
 		} else {
 			//flash & voice
 			str = '<object align="top" classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=7,0,19,0"';

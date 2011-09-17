@@ -467,7 +467,7 @@ var flashAtt = {
 				getObj('flashAtt_clear').style.display = 'none';
 				//getObj('mutiinfo').parentNode.removeChild(getObj('mutiinfo'));
 			} else {
-				ajax_guide();
+				showDlg('error','删除失败')
 			}
 		});
 	},
@@ -509,7 +509,7 @@ var flashAtt = {
 					}
 				}
 			} else {
-				ajax_guide();
+				showDlg('error','删除失败')
 			}
 		});
 	},

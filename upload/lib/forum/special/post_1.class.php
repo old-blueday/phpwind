@@ -69,6 +69,8 @@ class postSpecial {
 		$vtcount = count($array);
 		if ($vtcount < 1) {
 			Showmsg('postfunc_noempty');
+		} elseif ($vtcount == 1){
+			Showmsg('postfunc_limit');
 		} elseif ($vtcount > $this->maxselect) {
 			Showmsg('vote_num_limit');
 		}

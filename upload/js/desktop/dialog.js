@@ -240,8 +240,8 @@
 				};
 			};
 			onloadFn = onloadFn.call(cwin);
-			allIframes[i].detachEvent("onload", onloadFn);
-			allIframes[i].attachEvent("onload", onloadFn);
+			removeEvent(allIframes[i],"load",onloadFn);
+			addEvent(allIframes[i],"load",onloadFn)
 
 		}
 		if (PW.Window.all[items.id]) {

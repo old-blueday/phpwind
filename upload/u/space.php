@@ -62,7 +62,7 @@ if ($winduid && !$space['isMe']) {
 		if (count($visitors) > 12) array_pop($visitors);
 		$db->pw_update(
 			"SELECT uid FROM pw_space WHERE uid=" . S::sqlEscape($uid),
-			pwQuery::buildClause("UPDATE :pw_table SET visits=visits+1,visitors=:visitors WHERE uid=:uid", array('pw_space', serialize($visitors),$uid)),
+			pwQuery::buildClause("UPDATE :pw_table SET visits=visits+1,visitors=:visitors WHERE uid=:uid", array('pw_space', serialize($visitors),intval($uid))),
 			pwQuery::insertClause('pw_space', array(
 				'uid'		=> $uid,
 				'visits'	=> 1,

@@ -1,48 +1,160 @@
 <!--<?php
 print <<<EOT
 -->
-<div class="p15 cc">
+<div class="square_wrap cc">
+	<div class="square_cont fl">
+		<div class="square_hd cc"><a href="javascript:;" onclick="oAjaxhtml('postlast')" class="fr">换一组</a><h2 class="sgmv">帅哥美女</h2></div>
+		<div class="square_list_user mb20" id="postlast">
 <!--
 EOT;
-portalEcho('oindex');
-print<<<EOT
--->
-	<div class="w710 fl" style="clear:left;">
-<script type="text/javascript" src="apps/weibo/js/post.js"></script>
-<script type="text/javascript" src="js/pw_weibo.js"></script>
-<script>
-var transmitAction = 'lookround';
-</script>
-		<div class="conFeed" id="weiboFeed0" style="padding-left:22px; display:block">
-<!--
-EOT;
-include printEot('writesmile');
-require_once uTemplate::printEot('weibo_model');
-//$weiboModelTemplate->photoPop();
-$weiboModelTemplate->setWeiboDiv('_0');
-foreach ($weiboHotTransmit as $key => $value) {
-	$method = $weiboService->getViewType($value['type']);
-	$weiboModelTemplate->$method($value);
-}
-
+$act='postlast';
+require PrintEot('m_browse_ajax');
 print <<<EOT
--->
+-->	
 		</div>
-		<div class="conFeed" id="weiboFeed1" style="padding-left:22px; display:none">
+		<div class="square_hd cc"><a href="javascript:;"  onclick="oAjaxhtml('maxfans')" class="fr">换一组</a><h2 class="sqhr">社区红人</h2></div>
+		<div class="square_list_user mb20" id="maxfans">
 <!--
 EOT;
-$weiboModelTemplate->setWeiboDiv('_1');
-foreach ($weiboHotComment as $key => $value) {
-	$method = $weiboService->getViewType($value['type']);
-	$weiboModelTemplate->$method($value);
-}
-
+$act='maxfans';
+require PrintEot('m_browse_ajax');
+print <<<EOT
+-->			
+		</div>
+		<div class="square_hd cc"><a href="javascript:;"  onclick="oAjaxhtml('thread')" class="fr">刷新看看</a><h2 class="zzfs">正在发生</h2></div>
+		<div class="square_list_news" id="thread">
+<!--
+EOT;
+$act='thread';
+require PrintEot('m_browse_ajax');
+print <<<EOT
+-->			
+		</div>
+	</div>
+	<div class="square_side fr">
+		<div class="square_box_a mb15">
+			<h2>今日粉丝排行榜</h2>
+			<ul class="square_list_num">
+<!--
+EOT;
+$i=1;
+foreach($brandlist as $key => $value){
+print <<<EOT
+-->	
+				
+<!--
+EOT;
+if ($i<=3){
+print <<<EOT
+-->	
+				<li class="top"><span class="icon_$value[brand]"></span><span class="fr">$value[fans]</span><em>$i</em>
+				<a href="{$GLOBALS[db_userurl]}$value[uid]" class="user_img _cardshow" data-card-url="pw_ajax.php?action=smallcard&type=showcard&uid={$value[uid]}" data-card-key="{$value['username']}"><img src="{$value['icon']}" width="22" height="22" /></a>
+				<a href="{$GLOBALS[db_userurl]}$value[uid]" class="user_name _cardshow" data-card-url="pw_ajax.php?action=smallcard&type=showcard&uid={$value[uid]}" data-card-key="{$value['username']}">$value[username]</a>
+				</li>
+<!--
+EOT;
+}else{
 print <<<EOT
 -->
-		<script>switchDiv(location.hash ? location.hash.substr(location.hash.length-1, 1) : 0 );</script>
+				<li><span class="icon_$value[brand]"></span><span class="fr">$value[fans]</span><em>$i</em>
+				<a href="{$GLOBALS[db_userurl]}$value[uid]" class="user_name _cardshow" data-card-url="pw_ajax.php?action=smallcard&type=showcard&uid={$value[uid]}" data-card-key="{$value['username']}">$value[username]</a>
+				</li>
+<!--
+EOT;
+}
+$i++;
+}
+print<<<EOT
+-->				
+			</ul>
+		</div>
+		<div class="square_box_a mb15">
+			<h2>最新升级用户</h2>
+			<ul class="square_list_num">
+<!--
+EOT;
+$i=1;
+foreach($upgradelist as $key => $value){
+print <<<EOT
+-->	
+				
+<!--
+EOT;
+if ($i<=3){
+print <<<EOT
+-->				
+				<li class="top">
+				<!--
+					EOT;
+					$gender = getDefaultGender($value['gender']);
+					if ($GLOBALS['db_showonline'] && $value['thisvisit'] + $GLOBALS['db_onlinetime']*1.5 > $GLOBALS['timestamp']) {
+					print <<<EOT
+					-->
+					<div class="fr"><span class="{$gender}_ol" title="在线" alt="在线">在线</span></div>
+					<!--
+					EOT;
+					} else {
+					print <<<EOT
+					-->
+					<div class="fr"><span class="{$gender}_unol" title="离线" alt="离线">离线</span></div>
+					<!--
+					EOT;
+					}
+					print <<<EOT
+				-->
+				<em>$i</em>
+				<a href="{$GLOBALS[db_userurl]}$value[uid]" class="user_img _cardshow" data-card-url="pw_ajax.php?action=smallcard&type=showcard&uid={$value[uid]}" data-card-key="{$value['username']}"><img src="{$value['icon']}" width="22" height="22" /></a>
+				<a href="{$GLOBALS[db_userurl]}$value[uid]" class="user_name _cardshow" data-card-url="pw_ajax.php?action=smallcard&type=showcard&uid={$value[uid]}" data-card-key="{$value['username']}">$value[username]</a></li>
+<!--
+EOT;
+}else{
+print <<<EOT
+-->
+				<li>
+				<!--
+					EOT;
+					$gender = getDefaultGender($value['gender']);
+					if ($GLOBALS['db_showonline'] && $value['thisvisit'] + $GLOBALS['db_onlinetime']*1.5 > $GLOBALS['timestamp']) {
+					print <<<EOT
+					-->
+					<div class="fr"><span class="{$gender}_ol" title="在线" alt="在线">在线</span></div>
+					<!--
+					EOT;
+					} else {
+					print <<<EOT
+					-->
+					<div class="fr"><span class="{$gender}_unol" title="离线" alt="离线">离线</span></div>
+					<!--
+					EOT;
+					}
+					print <<<EOT
+				-->
+				<em>$i</em>
+				<a href="{$GLOBALS[db_userurl]}$value[uid]" class="user_name _cardshow" data-card-url="pw_ajax.php?action=smallcard&type=showcard&uid={$value[uid]}" data-card-key="{$value['username']}">$value[username]</a></li>			
+<!--
+EOT;
+}
+$i++;
+}
+print<<<EOT
+-->	
+			</ul>
 		</div>
 	</div>
 </div>
+<script type="text/javascript">
+function oAjaxhtml(t){
+	var url="mode.php?m=o&act="+t+"&ajax=1";
+	var obj=getObj(t);
+	ajax.send(url, '', function() {
+		obj.innerHTML=ajax.runscript(ajax.request.responseText);
+		if(typeof usercard!="undefined"){
+			new usercard().init();
+		}
+	});	
+}
+
+</script>
 
 <!--
 EOT;
