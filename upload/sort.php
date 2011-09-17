@@ -233,6 +233,7 @@ if (empty($action)) {
 	foreach ($_CREDITDB as $key => $value) {
 		array_push($array,$key);
 	}
+
 	if ($db_ifpwcache & 1) {
 		$element = L::loadClass('element');
 		$element->setDefaultNum($cachenum);

@@ -130,6 +130,7 @@ EOT;
 			$template = new customerFieldProfileTemplate();
 			foreach ($customFields as $value) {
 				$customFieldValue = $this->customerFieldData->getCustomerData($value,$winduid);
+				if ($value['fieldname'] == 'bday' && $customFieldValue == '0000-00-00') $customFieldValue = date('Y-m-d',$GLOBALS['winddb']['regdate']);
 				$templateString .= $template->buildHtml($value,$customFieldValue);;
 			}
 		}

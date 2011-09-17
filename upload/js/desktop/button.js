@@ -40,7 +40,7 @@ function()
 			(this.body||obj).appendChild(btn);
 		}
 		var _this=this;
-		btn.onselectstart=function(){event.returnValue=false;return false;};
+		btn.onselectstart=function(){return false;};
 		btn.onmouseover=function()
 		{	
 			if(_this.actived)

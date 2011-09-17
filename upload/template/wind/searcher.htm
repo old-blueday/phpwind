@@ -4,7 +4,7 @@
 <form action="searcher.php" method="post" id="searchform">
 <input type="hidden" value="$verifyhash" name="verify">
 <input value="2" class="s_input" type="hidden" name="step">
-<input value="thread" class="s_input" type="hidden" name="type" id="hiddenType">
+<input value="$type" class="s_input" type="hidden" name="type" id="hiddenType">
 	<table width="100%"><tr>
 		<td width="176" class="vt"><h2 class="logo"><a href="$db_bbsurl/"><img src="images/wind/logo.png" title="$db_bbsname" /></a></h2></td>
 		<td>
@@ -32,6 +32,10 @@ print <<<EOT
 EOT;
 }
 $keyword = stripslashes($keyword);
+$advancedStyle = '';
+if(!in_array($type,array('thread','diary'))){
+	$advancedStyle = 'display:none';
+}
 print <<<EOT
 -->
 				</ul>
@@ -43,7 +47,7 @@ print <<<EOT
 				<span><button type="submit">搜 索</button></span>
 				</div>
 			</div>
-			<a href="javascript:;" style="margin-top:8px;" class="fl" id="searchAdvanced">高级搜索</a>
+			<a href="javascript:;" style="margin-top:8px;$advancedStyle" class="fl" id="searchAdvanced">高级搜索</a>
 		</td>
 	</tr>
 	<tr>

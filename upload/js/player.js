@@ -2,7 +2,7 @@ function player(id,url,width,height,type) {
 	if (!IsElement('p_' + id)) {
 		var player = document.createElement('div');
 		player.id  = 'p_' + id;
-		player.style.cssText = 'display:block;margin:5px 0 0 2px';
+		player.style.cssText = 'display:block;';
 		player.innerHTML = eval('player_' + type)(url.replace('"',''),width,height,'swf_' + id);
 		setTimeout(function(){getObj(id).appendChild(player)},200);
 	} else {
@@ -12,6 +12,41 @@ function player(id,url,width,height,type) {
 		var p = getObj(id);
 		p.removeChild(p.lastChild);
 	}
+}
+/*
+*多媒体播放点击切换
+*/
+function toggleVideo(elem){
+	addEvent(elem,"click",function(e){
+		var e=e||window.event;
+		if(e.preventDefault){
+			e.preventDefault();
+		}else{
+			e.returnValue=false;
+		}
+		var id=elem.getAttribute("data-pid");
+		var url=elem.getAttribute("data-url");
+		var w=elem.getAttribute("data-width");
+		var h=elem.getAttribute("data-height");
+		var type=elem.getAttribute("data-type");
+		if(!url){
+			return false;
+		}
+		if(!elem.open){
+			player('player_'+id,url,w,h,type);
+			elem.open=true;
+			elem.className="video_u";
+			elem.innerHTML="收起";
+		}else{
+			elem.open=false;
+			elem.className="video";
+			elem.innerHTML="点击播放";
+			if(getObj("p_player_"+id)){
+				getObj("player_"+id).removeChild(getObj("p_player_"+id));
+			}
+		}
+	})
+	
 }
 function player_rm(url,width,height,id){
 	if (is_ie) {
@@ -26,9 +61,9 @@ function player_rm(url,width,height,id){
 }
 function player_flash(url,width,height,id){
 	if (is_ie) {
-		return "<object classid=\"CLSID:D27CDB6E-AE6D-11cf-96B8-444553540000\" id=\""+id+"\" width=\""+width+"\" height=\""+height+"\"><param name=\"src\" value=\""+url+"\" /><param name=\"autostart\" value=\"true\" /><param name=\"loop\" value=\"true\" /><param name=\"quality\" value=\"high\" /><param name=\"wmode\" value=\"transparent\"></object>";
+		return "<object classid='CLSID:D27CDB6E-AE6D-11cf-96B8-444553540000' id='"+id+"' width='"+width+"' height='"+height+"'><param name='src' value='"+url+"' /><param name='autostart' value='true' /><param name='loop' value='true' /><param name='allownetworking' value='internal' /><param name='allowscriptaccess' value='never' /><param name='allowfullscreen' value='true' /><param name='quality' value='high' /><param name='wmode' value='transparent'></object>";
 	} else {
-		return "<object data=\""+url+"\" type=\"application/x-shockwave-flash\" id=\""+id+"\" width=\""+width+"\" height=\""+height+"\"><param name=\"autostart\" value=\"true\" /><param name=\"loop\" value=\"true\" /><param name=\"wmode\" value=\"transparent\" /><param name=\"quality\" value=\"high\" /><EMBED src=\""+url+"\" quality=\"high\" wmode=\"transparent\" width=\""+width+"\" height=\""+height+"\" TYPE=\"application/x-shockwave-flash\" PLUGINSPAGE=\"http://www.macromedia.com/go/getflashplayer\"></EMBED></object>";
+		return "<embed id='"+id+"' src='"+url+"' allownetworking='internal' allowscriptaccess='never' allowfullscreen='true' quality='high' wmode='transparent' width='"+width+"' height='"+height+"' type='application/x-shockwave-flash'/>";
 	}
 }
 function player_wmv(url,width,height,id) {

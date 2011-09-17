@@ -476,10 +476,10 @@ class Search_Base {
 			return false;
 		$data = array ();
 		require_once (R_P . 'require/showimg.php');
-		$genders = array (0 => "保密", 1 => "男", 2 => "女" );
+		// $genders = array (0 => "保密", 1 => "男", 2 => "女" );
 		foreach ( $users as $t ) {
 			list ( $t ['face'] ) = showfacedesign ( $t ['icon'], 1 );
-			$t ['gender'] = $genders [$t ['gender']];
+			//$t ['gender'] = $genders [$t ['gender']];
 			$t ['constellation'] = $this->_getConstellation ( $t ['bday'] );
 			$t ['introduce'] = ($t ['introduce']) ? substrs ( $t ['introduce'], 25, 'N' ) : '暂无';
 			$data [] = $t;
@@ -610,9 +610,9 @@ class Search_Base {
 	function _highlighting($pattern, $subject) {
 		//return preg_replace('/(?<=[^\w=]|^)('.preg_quote($pattern,'/').')(?=[^\w=]|$)/si','<font color="red"><u>\\1</u></font>',$subject);
 		if ($this->_version) {
-			return function_exists('mb_eregi_replace') ? mb_eregi_replace($pattern, '<font color="red"><u>' . $pattern . '</u></font>', $subject) : str_ireplace ( $pattern, '<font color="red"><u>' . $pattern . '</u></font>', $subject );
+			return function_exists('mb_eregi_replace') ? mb_eregi_replace($pattern, '<em class="s1">' . $pattern . '</em>', $subject) : str_ireplace ( $pattern, '<em class="s1">' . $pattern . '</em>', $subject );
 		} else {
-			return function_exists('mb_eregi_replace') ? mb_eregi_replace($pattern, '<font color="red"><u>' . $pattern . '</u></font>', $subject) : str_replace ( $pattern, '<font color="red"><u>' . $pattern . '</u></font>', $subject );
+			return function_exists('mb_eregi_replace') ? mb_eregi_replace($pattern, '<em class="s1">' . $pattern . '</em>', $subject) : str_replace ( $pattern, '<em class="s1">' . $pattern . '</em>', $subject );
 		}
 	}
 	

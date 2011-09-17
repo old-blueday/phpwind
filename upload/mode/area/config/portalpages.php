@@ -2,5 +2,5 @@
 !function_exists('readover') && exit('Forbidden');
 
 return array(
-	'oindex'  =>'广场',
+	//'oindex'  =>'广场',
 );

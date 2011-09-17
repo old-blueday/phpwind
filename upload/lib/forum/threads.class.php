@@ -219,7 +219,13 @@ class PW_Threads {
 		$_dbService = L::loadDB('threads', 'forum');
 		$_dbService->deleteTucoolThreadsByTids($tids);
 	}
-	
+	function getLatestThreads($forumIds, $starttime, $endtime, $offset, $limit){
+		$limit = intval($limit);
+		if ($limit<=0) return array();
+		if (!is_array($forumIds) || !count($forumIds)) return array();
+		$_dbService = L::loadDB('threads', 'forum');
+		return $_dbService->getLatestThreads($forumIds, $starttime, $endtime, $offset, $limit);
+	}
 	/**
 	 * 获取单条帖子的tmsgs表信息  by chenyun 2011-07-13
 	 * 

@@ -25,6 +25,10 @@ var transmitAction = '{$do}';
 <!--
 EOT;
 require_once uTemplate::printEot('weibo_model');
+print <<<EOT
+-->
+<!-- 
+EOT;
 if($do == 'topics'){
 if($topic){
 //有关键字
@@ -63,7 +67,7 @@ EOT;
 }else{
 print <<<EOT
 -->
-		<div class="weiboBg" style="padding-left:5px;">
+		<div class="weiboBg cc" style="padding-left:5px;">
 <!--
 EOT;
 $weiboModelTemplate->photoPop();
@@ -71,7 +75,133 @@ $db_o_weibopost != '0' && $weiboModelTemplate->post($do,$faceurl);
 print <<<EOT
 -->
 		</div>
-		<div class="bdA" style="margin:5px 15px 0;"></div>
+<!-- 
+EOT;
+if($do == 'lookround'){
+print <<<EOT
+-->
+	<div style="padding:0 20px;">
+			<h5 class="h5 cc">
+				<ul class="tab">
+					<li {$nav['all']} class="current" onclick="filterWeibo(this,'all');"><a href="javascript:;" hidefocus="true">全部</a></li>
+					<li {$nav[string]} onclick="filterWeibo(this,'strings');"><a href="javascript:;" hidefocus="true">文字</a></li>
+					<li {$nav[img]} onclick="filterWeibo(this,'imgs');"><a href="javascript:;" hidefocus="true">图片</a></li>
+					<li {$nav[none]}><a href="javascript:;" class="link_down s4"  hidefocus="true" id="morechoose"><span>更多筛选</span></a></li>
+				</ul>
+<!--
+EOT;
+$db_menuinit .= ",'td_setMenu' : 'menu_setMenu'";
+print <<<EOT
+-->
+				<div class="aset fr" id="td_setMenu"><img src="u/images/tedit.png" width="16" height="16" alt="设置" /></div>
+				<div class="fr" id="menu_setMenu" style="display:none;">
+					<div class="feedDown" style="margin-left:-79px;margin-top:-7px;">
+						<em class="fr" style=""><img src="u/images/tedit.png" alt="设置" width="16" height="16" /></em>
+						<div class="c"></div>
+						<a href="profile.php?action=privacy">隐私设置</a>
+						<a href="profile.php?action=privacy&t=weibo">新鲜事设置</a>
+					</div>
+				</div>
+				<a href="apps.php?q=weibo&do=attention&page=1" onclick="return weiboList.filterWeibo(this.href);" class="fr mr10 refresh" style="margin-top:4px;"><img title="刷新一下可能有新鲜事" src="u/images/refresh.png" width="16" height="16" /></a>
+			</h5>
+			<div class="feedAdmin p10" id="feedAdmin" style="display:none">
+				<table width="100%">
+                <form id="filterWeiboForm" name="filterWeiboForm" method="post" action="apps.php?q=weibo&ajax=1"><input type="hidden" name="do" value="filterweibo"/><input type="hidden" name="page" value="1" id="page"/>
+					<tr>
+						<td width="50">关系：</td>
+						<td>
+							<label class="mr20"><input name="filter[relation][self]" type="checkbox" value="1" checked/>&nbsp;自己</label>
+							<label class="mr20"><input name="filter[relation][friend]" type="checkbox" value="1" / checked>&nbsp;好友</label>
+							<label class="mr20"><input name="filter[relation][attention]" type="checkbox" value="1" / checked>&nbsp;关注的人</label>
+
+						</td>
+					</tr>
+					<tr>
+						<td>来源：</td>
+						<td>
+							<label class="mr20"><input name="filter[source][article]" type="checkbox" value="1"  checked/>&nbsp;帖子</label>
+<!--
+EOT;
+if($GLOBALS['db_dopen']){print <<<EOT
+-->	
+							<label class="mr20"><input name="filter[source][diary]" type="checkbox" value="1"checked />&nbsp;日志</label>
+<!-- 
+EOT;
+}if($GLOBALS['db_phopen']){print <<<EOT
+-->
+							<label class="mr20"><input name="filter[source][photos]" type="checkbox" value="1" checked />&nbsp;相册</label>
+<!-- 
+EOT;
+}if($GLOBALS['db_groups_open']){print <<<EOT
+-->
+                            <label class="mr20"><input name="filter[source][group]" type="checkbox" value="1" checked />&nbsp;群组</label>
+<!-- 
+EOT;
+}
+/* platform weibo app */
+if($isSiteBindWeibo){
+	foreach ($userBindList as $bindType => $userBind) {
+		if (!$userBind['config']['allowSync']['weibo']) {continue;}
+print <<<EOT
+-->
+                            <label class="mr20"><input name="filter[source][$bindType]" type="checkbox" value="1" checked />&nbsp;{$userBind['config']['title']}</label>
+                     
+<!-- 
+EOT;
+	}
+}print <<<EOT
+-->
+						</td>
+					</tr>
+					<tr>
+						<td>类型：</td>
+						<td>
+							<label class="mr10"><input id="strings" name="filter[contenttype][string]" type="checkbox" value="1" checked />&nbsp;纯文字</label>
+							<label class="mr20"><input id="imgs" name="filter[contenttype][img]" type="checkbox" value="1" checked />&nbsp;含图片</label>
+						</td>
+					</tr>
+					<tr>
+						<td></td>
+						<td>
+							<span class="btn4"><span><button type="button" onclick="getWeiboList('filterweibo', 1, 'weiboFeed');">筛选</button></span></span><span class="bt2"><span><button type="button" onclick="displayElement('feedAdmin',false);">关闭</button></span></span>
+						</td>
+					</tr>
+                </form>
+				</table>
+			</div>
+<script>
+function filterWeibo(obj,type){//切换新鲜事类别
+	var lis = obj.parentNode.childNodes;
+	for(var i = 0,j=lis.length;i<j;i++){
+		lis[i].className = '';
+	}
+	obj.className = 'current';
+	window.setTimeout(function(){
+	getWeiboList('filterweibo', 1, 'weiboFeed', 1, type);	
+	},300);
+	getObj('feedAdmin').style.display = 'none';
+	getObj("morechoose").innerHTML="<span>更多筛选</span>";
+	getObj("morechoose").className="link_down s4";
+}
+window.onReady(function(){
+	var morechoose=getObj("morechoose") || getObj("morechoose") || getObj("morechoose");
+	var feedAdmin=getObj("feedAdmin")
+	toggleDisplay(morechoose,feedAdmin,function(){
+		if(morechoose.arrow&&morechoose.arrow=="up"){
+			morechoose.className="link_up s4";
+			morechoose.innerHTML="<span>收起选项</span>";
+		}else{
+			morechoose.className="link_down s4";
+			morechoose.innerHTML="<span>更多筛选</span>";
+		}
+	})	
+})
+</script>
+		</div>
+<!--
+EOT;
+}print <<<EOT
+-->
 <!-- 
 EOT;
 }print <<<EOT

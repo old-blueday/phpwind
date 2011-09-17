@@ -218,9 +218,6 @@ function delPush(element,pushid,channelid) {
 	});
 }
 
-function pickReback(color){
-	getObj('color_show').style.backgroundColor = color;
-}
 function styleOnclick(e,obj){
 	var objclass = e.className;
 	var temp = objclass.split(' ');

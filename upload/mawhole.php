@@ -254,7 +254,7 @@ if ($action == 'type') {
 		// $threads = L::loadClass('Threads', 'forum');
 		// $threads->delThreads($tids);
 		//* Perf::gatherInfo('changeThreadWithForumIds', array('fid'=>$fid));
-		$rt = $db->get_one("SELECT tid,author,postdate,subject,lastpost,lastposter FROM pw_threads WHERE fid='$fid' AND ifcheck='1' AND topped='0' AND lastpost>0 ORDER BY lastpost DESC LIMIT 0,1");
+		$rt = $db->get_one("SELECT tid,author,postdate,subject,lastpost,lastposter FROM pw_threads WHERE fid='$fid' AND ifcheck='1' AND specialsort='0' AND lastpost>0 ORDER BY lastpost DESC LIMIT 0,1");
 		if ($rt['postdate'] == $rt['lastpost']) {
 			$subject = substrs($rt['subject'], 21);
 			$author = $rt['author'];
@@ -1806,7 +1806,7 @@ if ($action == 'type') {
 			$oldPid = $fromdb['pid'] == 'tpc' ? 0 : $fromdb['pid'];
 			//$db->update(pwQuery::buildClause('UPDATE :pw_table SET tid=:tid1,pid=:pid WHERE tid=:tid AND pid=0', array('pw_pinglog', $totid, $pid, $fromdb['tid'])));
 			//$db->update(pwQuery::buildClause('UPDATE :pw_table SET tid=:tid1 WHERE tid=:tid AND pid>0', array('pw_pinglog', $totid, $fromdb['tid'])));
-			pwQuery::update('pw_pinglog', 'tid=:tid AND pid>0', array($fromdb['tid']), array('tid'=>$totid,'pid'=>$pid));
+			pwQuery::update('pw_pinglog', 'tid=:tid', array($fromdb['tid']), array('tid'=>$totid,'pid'=>$pid));
 			//pwQuery::update('pw_pinglog', 'tid=:tid AND pid>0', array($fromdb['tid']), array('tid'=>$totid));
 			//更新elements
 			pwQuery::delete('pw_elements', 'id=:id AND type IN (:type)', array($fromdb['tid'], array('newpic','hitsort','hitsortday','hitsortweek','replysort','replysortday','replysortweek')));

@@ -44,7 +44,7 @@ Breeze.namespace('app.insertImage', function(B) {
 			</div>\
 			<div class="B_mb5">\
 				<div class="B_file_imgTip B_cc">\
-					图片列表&nbsp;<span>(总共可以添加<span class="restCount s4"></span>个)</span>\
+					图片列表&nbsp;<span>(您还可以上传<span class="restCount s4"></span>张图片)</span>\
 				</div>\
 				<div class="B_file_img">\
 					<ul id="B_image_tile" class="B_cc"><li style="width:0;overflow:hidden;height:0px;padding:0;margin:0;"></li></ul>\

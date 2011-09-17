@@ -7,7 +7,7 @@ function convert($message,$allow,$type="post"){
 	$code_num = $sell_num = 0;
 	$code_htm = array();
 	if (strpos($message,"[code]") !== false && strpos($message,"[/code]") !== false) {
-		$message = preg_replace("/\[code\](.+?)\[\/code\]/eis","phpcode('\\1')",$message,$db_cvtimes);
+		$message = preg_replace("/\[code\](.+)?\[\/code\]/eisU","phpcode('\\1')",$message,$db_cvtimes);
 	}
 	if (strpos($message,"[payto]") !== false && strpos($message,"[/payto]") !== false) {
 		require_once(R_P.'require/paytofunc.php');
@@ -112,6 +112,20 @@ function convert($message,$allow,$type="post"){
 			}
 		}
 	}
+
+	/* 去除quote中链接 */
+	$quoteCode = "<blockquote class=\"blockquote3\"><div class=\"text\" style=\"padding:15px;\">";
+	$quotePos =strpos($message, $quoteCode);/*fix 20110916*/
+	if ($quotePos!== false){
+		$endQuotePos = strpos($message, "</div></blockquote>",$quotePos);
+		$startQuotePos = $quotePos + strlen($quoteCode) - 1;
+		$quoteContent = substr($message,$startQuotePos ,$endQuotePos-$startQuotePos);
+
+		$quoteContent = preg_replace('/<br\s*\/?>/', '', $quoteContent);
+		$quoteContent = preg_replace_callback('/<a\s+href=(\'|")([^\'"]+)(\'|")[^>]*>([^<]+)<\/a>/is', 'stripQuoteLinks', $quoteContent);
+		$message = substr_replace($message,$quoteContent,$startQuotePos ,$endQuotePos-$startQuotePos);
+	}
+	
 	if ($allow['flash']) {
 		$message = preg_replace("/\[flash=(\d+?)\,(\d+?)(\,(0|1))?\]([^\[\<\r\n\"']+?)\[\/flash\]/eis", "wplayer('\\5','\\1','\\2','\\4','flash')",$message,$db_cvtimes);
 	} else {
@@ -260,8 +274,8 @@ function nopic($url) {
 	return "<\twind_code_$code_num\t>";
 }
 
-function cvpic($url,$type='',$picwidth='',$picheight='',$ifthumb='') {
-	global $db_bbsurl,$db_picpath,$attachpath,$db_ftpweb,$code_num,$code_htm;
+function cvpic($url,$type='',$picwidth='',$picheight='',$ifthumb='',$attDescrip='') {
+	global $db_bbsurl,$db_picpath,$attachpath,$db_ftpweb,$code_num,$code_htm,$webPageTitle;
 	$lower_url = strtolower($url);
 	strncmp($lower_url,'http',4)!=0 && $url = "$db_bbsurl/$url";
 	if (strpos($lower_url,'login')!==false && (strpos($lower_url,'action=quit')!==false || strpos($lower_url,'action-quit')!==false)) {
@@ -279,19 +293,20 @@ function cvpic($url,$type='',$picwidth='',$picheight='',$ifthumb='') {
 		}
 		if (strpos($url,$picurlpath) !== false) {
 			$wopen = 1;
-			$alt = 'title="点击查看原图"';
 			$turl = str_replace($picurlpath, "$picurlpath/thumb", $url);
 		}
 	}
+//	$attDescrip = $attDescrip ? $attDescrip : $webPageTitle;
+//	$alt = "title=\"$attDescrip\" alt=\"$attDescrip\"";
 	if ($picwidth || $picheight) {
 		$wopen = !$wopen ? "if(this.parentNode.tagName!='A'&&this.width>=$picwidth)" : '';
 		$onload = $styleCss = '';
 		if ($picwidth) {
-			$onload .= "if(this.offsetWidth>'$picwidth')this.width='$picwidth';";
+			$onload .= "if(is_ie6&&this.offsetWidth>$picwidth)this.width=$picwidth;";
 			$styleCss .= "max-width:{$picwidth}px;";
 		}
 		if ($picheight) {
-			$onload .= "if(this.offsetHeight>'$picheight')this.height='$picheight';";
+			//$onload .= "if(this.offsetHeight>'$picheight')this.height='$picheight';";
 			$styleCss .= "max-height:{$picheight}px;";
 		}
 		$code = "<img src=\"$turl\" border=\"0\" onclick=\"$wopen window.open('$url');\" style=\"$styleCss\" onload=\"$onload\" $alt>";
@@ -311,17 +326,28 @@ function phpcode($code){
 	global $phpcode_htm,$codeid;
 	$code = str_replace(array("[attachment=",'\\"'),array("&#91;attachment=",'"'),trim($code));
 	$codeid ++;
-	$code = preg_replace('/^(<br \/>)?(.+?)(<br \/>)$/','\\2',$code);
+	$code = preg_replace('/^(<br \/>)?(.+)?(<br \/>)?$/','\\2',$code);
 	$code = str_replace("<br />", "</li><li>", $code);
 	$phpcode_htm[$codeid] = "<div class=\"f12\"><a href=\"javascript:\"  onclick=\"CopyCode(document.getElementById('code$codeid'));\">".getLangInfo('bbscode','copycode')."</a></div><div class=\"blockquote2\" id=\"code$codeid\"><ol><li>".preg_replace("/^(\<br \/\>)?(.*)/is","\\2",$code)."</li></ol></div>";
 	return "<\twind_phpcode_$codeid\t>";
 }
 
 function qoute($code) {
-	global $code_num,$code_htm,$i_table;
+	global $code_num,$code_htm,$i_table,$imgpath;
 	$code_num++;
+	$code = preg_replace('/(\[s:[^]]+\])+/', '[表情]', $code); //face
+	$code = preg_replace('/(\[attachment=\d+\])+/', "<img src='{$imgpath}/wind/file/img.gif' />", $code); //face
 	$code_htm[6][$code_num]="<blockquote class=\"blockquote3\"><div class=\"text\" style=\"padding:15px;\">".str_replace('\\"','"',$code)."</div></blockquote>";
 	return "<\twind_code_$code_num\t>";
+}
+function stripQuoteLinks($matches){
+	global $db_bbsurl;
+	$url = trim($matches[2]);
+	if (strpos($url,"$db_bbsurl/u.php?username") === 0) {
+		return "<a href=\"$url\" target=\"_blank\">{$matches[4]}</a>";
+	} else {
+		return $matches[4];
+	}
 }
 function ifpost($tid) {
 	global $admincheck,$tpc_author,$winduid,$windid,$db,$pwPostHide,$ifColonyAdmin;
@@ -460,7 +486,7 @@ function wplayer($wmvurl,$width='',$height='',$auto='',$type='wmv'){
 	static $player_id = 0;
 	!$width && $width = 314;
 	!$height && $height = 256;
-    return (++$player_id == 1 ? "<script id=\"js_player\" src=\"js/player.js\"></script>" : '')."<div id=\"player_$player_id\"><span class=\"bt2\" style=\"margin-left:0;\"><span><button onclick=\"player('player_$player_id','$wmvurl','$width','$height','$type');\" type=\"button\">".getLangInfo('bbscode','player_'.$type)."</button></span></span></div>".($auto == '1' ? "<script type=\"text/javascript\">player('player_{$player_id}','$wmvurl','$width','$height','$type');</script>" : '');
+    return (++$player_id == 1 ? "<script id=\"js_player\" src=\"js/player.js\"></script>" : '')."<div id=\"player_$player_id\">".($auto == '1' ? "<script type=\"text/javascript\">player('player_{$player_id}','$wmvurl','$width','$height','$type');</script>":"<a href=\"$wmvurl\" class=\"video\" data-pid=\"$player_id\" data-url=\"$wmvurl\" data-width=\"$width\" data-height=\"$height\" data-type=\"$type\">视频播放</a>")."</div>";
 }
 function showface($message) {
 	global $face,$db_cvtimes;
@@ -505,7 +531,7 @@ function getReadTag($tags) {
 	$list = array();
 	$tagdb = $tagdb ? parseReadTag($tagdb) : array();
 	foreach ($tagdb as $key => $tag) {
-		$tag && $html .= "<a href=\"link.php?action=tag&tagname=".rawurlencode($tag)."\"><span class=\"s2\">$tag</span></a> ";
+		$tag && $html .= "<a href=\"link.php?action=tag&tagname=".rawurlencode($tag)."\" class=\"mr10\">$tag</a>";
 	}
 	$GLOBALS['db_readtag'] && $list = array_merge($tagdb, $relatetag ? parseReadTag($relatetag) : array());
 	return array($html, $list);
@@ -716,7 +742,7 @@ class attachShow {
 				$atype = 'pic';
 				$attach += array(
 					'url' => $a_url[0],
-					'img' => cvpic($a_url[0].'?'.$attach['size'], 1, $db_windpost['picwidth'], $db_windpost['picheight'], $attach['ifthumb'] & 1),
+					'img' => cvpic($a_url[0].'?'.$attach['size'], 1, $db_windpost['picwidth'], $db_windpost['picheight'], $attach['ifthumb'] & 1, $attach['descrip']),
 					'miniUrl' => attachShow::getMiniUrl($attach['attachurl'], $attach['ifthumb'], $a_url[1])
 				);
 			} elseif ($a_url == 'imgurl') {
@@ -731,7 +757,7 @@ class attachShow {
 				!$attach['ctype'] && $attach['ctype'] = ($attach['special'] == 2) ? 'money' : 'rvrc';
 				if ($attach['type'] == 'img') {
 					$a_url = geturl($attach['attachurl'], 'show');
-					$attach['img'] = cvpic($a_url[0].'?'.$attach['size'], 1, $db_windpost['picwidth'], $db_windpost['picheight'], $attach['ifthumb'] & 1);
+					$attach['img'] = cvpic($a_url[0].'?'.$attach['size'], 1, $db_windpost['picwidth'], $db_windpost['picheight'], $attach['ifthumb'] & 1, $attach['descrip']);
 				}
 				if ($attach['special'] == 2) {
 					$db_sellset['price'] > 0 && $attach['needrvrc'] = min($attach['needrvrc'], $db_sellset['price']);

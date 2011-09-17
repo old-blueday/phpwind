@@ -29,7 +29,8 @@ if (!$windid && !in_array($action, array(
 	'stopiccommentbox',
 	'stopiclogin',
 	'clearmessage',
-	'bubble'
+	'bubble',
+	'pingpage'
 ))) {
 	Showmsg('not_login');
 }
@@ -131,7 +132,8 @@ $whiteActions = array(
 	'quickpost',
 	'stopiclogin',
 	'clearmessage',
-	'bubble'
+	'bubble',
+	'pingpage'
 );
 if (in_array($action, $whiteActions)) {
 	require S::escapePath(R_P . 'actions/ajax/' . $action . '.php');

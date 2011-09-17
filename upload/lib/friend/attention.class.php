@@ -25,6 +25,7 @@ class PW_Attention {
 	 * @param $limit	新鲜事数量
 	 */
 	function addFollow($uid, $friendid, $limit = 20, $from = '') {//fixed
+		global $timestamp;
 		if (!$uid || !$friendid) return false;
 		if ($this->isFollow($uid, $friendid)) return 'user_attention_exists';
 	
@@ -46,9 +47,18 @@ class PW_Attention {
 		if (!$friendService->isFriend($uid,$friendid) || $from == 'addFriend') {
 			$this->addUserWeiboRelationsByFriendid($friendid, $uid, $limit);
 		}
+		/*更新粉丝排行记录*/
+		L::loadClass('elementupdate', '', false);
+		$elementupdate = new ElementUpdate('fans');
+		$elementupdate->setCacheNum(100);
+		$elementupdate->totalFansUpdate($friendid);
+		$elementupdate->updateSQL();
+		$elementupdate->setCacheNum(20);
+		$elementupdate->todayFansUpdate($friendid);
+		$elementupdate->updateSQL();	
 		return true;
 	}
-
+	
 	/**
 	 * 添加关注时,增加这个人的最新新鲜事（20条）
 	 * 

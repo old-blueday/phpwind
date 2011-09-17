@@ -75,7 +75,7 @@ $topTids = explode(',',$topTids);
 if ($topTids && $start < count ( $topTids )) {
 	$L = ( int ) min ( count ( $topTids ) - $start, $per );
 	$limit = pwLimit ( $start, $L );
-	$query = $db->query ( "SELECT * FROM pw_threads WHERE  fid!=0 AND tid IN(". pwImplode($topTids) .") ORDER BY topped DESC,lastpost DESC $limit" );
+	$query = $db->query ( "SELECT * FROM pw_threads WHERE  fid!=0 AND tid IN(". pwImplode($topTids) .") ORDER BY specialsort DESC,lastpost DESC $limit" );
 	while ( $rt = $db->fetch_array ( $query ) ) {
 		$id ++;
 		if ($rt ['anonymous'] && $rt ['authorid'] != $winduid && ! $pwAnonyHide) {
@@ -101,7 +101,7 @@ if (empty ( $fid )) {
 	$_filename = Pcv($_filedir . "wap_" . $fid . "_cache.php");
 }
 empty ( $type ) && $type = 'all';
-if (count($tids) != 0 && count ( $tids ) < $per) {
+if (count($tids) != 0 && count ( $tids ) <= $per) {
 	$tidsCatche = getTidsCache ( $type, 0, ($per - count ( $tids )) );
 } else {
 	$tidsCatche = getTidsCache ( $type, $start, $per );
@@ -109,13 +109,13 @@ if (count($tids) != 0 && count ( $tids ) < $per) {
 if (! empty ( $tidsCatche )) {
 	$orderby = '';
 	if ($type == 'digest') {
-		$orderby = "ORDER BY topped DESC,lastpost DESC";
+		$orderby = "ORDER BY specialsort DESC,lastpost DESC";
 	} elseif ($type == 'hot') {
 		$orderby = "ORDER BY replies DESC";
 	} elseif ($type == 'new') {
 		$orderby = "ORDER BY postdate DESC";
 	} else {
-		$orderby = "ORDER BY topped DESC,lastpost DESC, postdate DESC";
+		$orderby = "ORDER BY specialsort DESC,lastpost DESC, postdate DESC";
 	}
 	$result = $db->query ( "SELECT * FROM pw_threads WHERE fid != 0 and tid IN (" . pwImplode ( $tidsCatche ) . ") $orderby" );
 	while ( $rt = $db->fetch_array ( $result ) ) {
@@ -177,7 +177,7 @@ function setTidsCache($type) {
 	global $db, $fid, $timestamp, $_filename, $t;
 	$useIndex = "";
 	$orderby = '';
-	$where = "WHERE " . ($fid ? " fid= ".pwEscape($fid) : "fid IN (" . getFidsForWap () . ")") . " AND topped=0 AND ifcheck=1";
+	$where = "WHERE " . ($fid ? " fid= ".pwEscape($fid) : "fid IN (" . getFidsForWap () . ")") . " AND specialsort=0 AND ifcheck=1";
 	if ($type == 'digest') {
 		$where .= " AND digest>0";
 		$orderby = "ORDER BY topped DESC,lastpost DESC";
@@ -199,7 +199,7 @@ function setTidsCache($type) {
 		$useIndex =  'USE INDEX ('.getForceIndex('idx_postdate').')';
 		$orderby = "ORDER BY postdate DESC";
 	} else {
-		$orderby = "ORDER BY topped DESC,lastpost DESC";
+		$orderby = "ORDER BY specialsort DESC,lastpost DESC";
 	}
 	$limit = "LIMIT 0,500";
 	$query = $db->query ( "SELECT tid FROM pw_threads $useIndex $where $orderby $limit" );

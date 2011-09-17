@@ -184,6 +184,7 @@ class PW_BanUser {
 				'affect'	=> '',
 				'reason'	=> stripslashes($reason)
 			);
+			require_once(R_P.'require/writelog.php');
 			writelog($log);
 			if($foruminfo && $foruminfo['allowhtm']){
 					$StaticPage = L::loadClass('StaticPage');

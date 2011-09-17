@@ -74,5 +74,5 @@ if ("wind" != $tplpath && file_exists(D_P.'data/style/'.$tplpath.'_css.htm')) {
 $jobnum = ($db_job_isopen && $winddb['jobnum']>0) ? "(".$winddb['jobnum'].")" : "";
 
 require PrintEot('header');
-unset($css_path,$s_url,$pwModeCss,$type);
+unset($css_path,$s_url,$pwModeCss);
 ?>

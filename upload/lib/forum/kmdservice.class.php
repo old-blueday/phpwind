@@ -18,10 +18,12 @@ class PW_KmdService {
 
 	var $threadStatus;
 	var $payTypes;
+	var $payStatus;
 	
 	function PW_KmdService(){
 		$this->_initThreadStatus();
 		$this->_initPayTypes();
+		$this->_initPayStatus();
 	}
 	
 	function _initThreadStatus(){
@@ -38,6 +40,14 @@ class PW_KmdService {
 			KMD_PAY_TYPE_ALIPAY => '支付宝',
 			KMD_PAY_TYPE_BANK => '银行汇款',
 			KMD_PAY_TYPE_CASH => '现金'
+		);
+	}
+	
+	function _initPayStatus(){
+		$this->payStatus = array(
+			KMD_PAY_STATUS_NOTPAY => '未支付',
+			KMD_PAY_STATUS_PAYED => '已支付',
+			KMD_PAY_STATUS_INVALID => '无效'
 		);
 	}
 	

@@ -275,7 +275,8 @@ class PW_UserService {
 		$membersDb = $this->_getMembersDB();
 		return $membersDb->findNotBannedUsersOrderByUserId($number);
 	}
-
+	
+	
 	/**
 	 * 获得Members全部数据的个数
 	 */

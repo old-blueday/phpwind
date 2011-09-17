@@ -631,7 +631,7 @@ a.help_a:hover i{display:block;}
 .dropdown ul{border:1px solid #aaa; background:#fff;margin-top:18px;position:absolute;}
 .dropdown ul li{background:#fff;height:19px;display:block;cursor:default;font:400 12px/19px Arial;}
 .dropdown ul li.over{background:#0e6caa; color:#fff;}
-
+.dropdown ul li:hover{background:#4BA5E0; color:#fff;}
 /*conFeed*/
 .homeBg{float:left;width:875px;}
 .homeSide{width:250px;overflow:hidden;padding-bottom:50px;}
@@ -885,3 +885,6 @@ div.card_old span{ background-position:0 -32px; cursor:default;color:#999; font-
 /*im*/
 .im_icon{margin-left:13px;float:left;padding-top:5px;line-height:25px;}
 .im_icon .openim_small{margin-top:-5px;}
+
+.a_start,.a_shrink{padding-left:16px;background:url(a_shrink.png) no-repeat;}
+.a_shrink{ background-position:0 -19px;}

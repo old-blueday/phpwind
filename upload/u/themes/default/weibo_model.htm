@@ -74,7 +74,7 @@ print <<<EOT
 					</span>
 					<span id="uploadPicLoadding" class="fl" style="display:none;width:60px;position:relative;line-height:20px;">上传中...</span>
 				</span>
-				<img src="javascript://" id="imgPreview" style="position:absolute;display:none;left:-10000px;z-index:1;" />
+				<img src="" id="imgPreview" style="position:absolute;display:none;left:-10000px;z-index:1;" />
 				<div class="limit fr mr15 s6" id="weibo_contentlimit"><em>0/255</em></div>
 			</div>
 		</div>
@@ -104,7 +104,7 @@ var content = getObj('weibo_content'),
 	}
 	content.onblur = function(){
 		if(this.value === '') {
-	//		this.value = dvalue;
+			this.value = dvalue;
 			this.style.color = color;
 		}
 	}
@@ -702,7 +702,7 @@ print <<<EOT
 					<div class="fl" id="nextphoto">
 						<span onclick="weibo.nextPhoto()" class="aNext" title="下一张" style="zoom:1"></span>
 					</div>
-					<img src="javascript://" id="photo_path" style="display: block;line-height:1;" /></td>
+					<img src="" id="photo_path" style="display: block;line-height:1;" /></td>
 			</tr>
 		</table>
 	</div>
@@ -719,7 +719,7 @@ print <<<EOT
 	<div class="tac pr cc" style="overflow:hidden;" id="photo_small_{$num}">
 			<div id="prephoto_{$num}" onclick="weibo.prevPhoto($num)" class="aPre" title="上一张" style="zoom:1;left:0;_padding-bottom:5000px;_margin-bottom:-5000px;"></div>
 			<div id="nextphoto_{$num}" onclick="weibo.nextPhoto($num)" class="aNext" title="下一张" style="zoom:1;bottom:0;top:0;_padding-bottom:5000px;_margin-bottom:-5000px;"></div>
-			<img src="javascript://" id="photo_path_{$num}" style="display:block;margin:0 auto;" />
+			<img src="" id="photo_path_{$num}" style="display:block;margin:0 auto;" />
 	</div>
 </div>
 <!--

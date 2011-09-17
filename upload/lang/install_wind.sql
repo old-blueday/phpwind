@@ -2218,7 +2218,7 @@ INSERT INTO pw_hack (hk_name, vtype, hk_value, decrip) VALUES('o_share_qcheck', 
 INSERT INTO pw_hack (hk_name, vtype, hk_value, decrip) VALUES('o_photos_gdcheck', 'string', '0', '');
 INSERT INTO pw_hack (hk_name, vtype, hk_value, decrip) VALUES('o_photos_qcheck', 'string', '0', '');
 INSERT INTO pw_hack (hk_name, vtype, hk_value, decrip) VALUES('o_photos_groups', 'string', '', '');
-INSERT INTO pw_hack (hk_name, vtype, hk_value, decrip) VALUES('o_browseopen', 'string', '1', '');
+INSERT INTO pw_hack (hk_name, vtype, hk_value, decrip) VALUES('o_browseopen', 'string', '0', '');
 INSERT INTO pw_hack (hk_name, vtype, hk_value, decrip) VALUES('o_browse', 'string', '511', '');
 INSERT INTO pw_hack (hk_name, vtype, hk_value, decrip) VALUES('o_invite', 'string', '1', '');
 INSERT INTO pw_hack (hk_name, vtype, hk_value, decrip) VALUES('o_indexset', 'string', '1023', '');
@@ -4261,6 +4261,7 @@ CREATE TABLE pw_posts (
   ifshield tinyint(3) unsigned NOT NULL default '0',
   anonymous tinyint(3) NOT NULL default '0',
   ifhide tinyint(3) NOT NULL default '0',
+  frommob TINYINT(3) UNSIGNED NOT NULL DEFAULT 0,
   PRIMARY KEY  (pid),
   KEY idx_fid (fid),
   KEY idx_postdate (postdate),
@@ -4507,7 +4508,8 @@ CREATE TABLE IF NOT EXISTS `pw_searchstatistic` (
   `keyword` varchar(32) not null default '',
   `num` mediumint(8) not null default '0',
   `created_time` int(10) not null default '0',
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `idx_created_time` (`created_time`)
 ) ENGINE=MyISAM;
 
 DROP TABLE IF EXISTS pw_setform;
@@ -4844,6 +4846,7 @@ CREATE TABLE pw_threads (
   ifmagic tinyint(3) NOT NULL default '0',
   ifhide tinyint(3) NOT NULL default '0',
   inspect varchar(30) NOT NULL default '',
+  frommob TINYINT(3) UNSIGNED NOT NULL DEFAULT 0,
   tpcstatus int(10) unsigned NOT NULL default '0',
   specialsort TINYINT(3) UNSIGNED NOT NULL DEFAULT '0',
   PRIMARY KEY  (tid),
@@ -5453,7 +5456,7 @@ CREATE TABLE IF NOT EXISTS `pw_robbuild` (
   `endtime` int(10) unsigned NOT NULL DEFAULT '0',
   `endbuild` smallint(6) unsigned NOT NULL DEFAULT '0',
   `awardbuilds` varchar(255) NOT NULL DEFAULT '',
-  `pids` text NOT NULL,
+  `status` tinyint(3) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`tid`)
 ) ENGINE=MyISAM ;
 

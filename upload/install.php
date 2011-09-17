@@ -669,6 +669,7 @@ if ($action == 'finish') {
 
 	$db_htmdir = 'html';
 	$db_bbsurl = $bbsurl;
+	
 	ob_start();
 	define('A_P', R_P . "apps/stopic/");
 	$stopic_service = L::loadClass('stopicservice', 'stopic');
@@ -684,6 +685,9 @@ if ($action == 'finish') {
 	@unlink(D_P . 'data/install.log');
 	@unlink($basename);
 
+	list($db_bbsname, $db_charset) = array('phpwind', $lang['db_charset']);
+	applyCloudWind($db_bbsname, $db_bbsurl);
+	
 	pwViewHtml($action);exit;
 }
 ########################## FUNCTION ##########################
@@ -1080,5 +1084,19 @@ function getCurrentEnvironment() {
 		'upload' => $upload,
 		'space' => $space
 	);
+}
+
+function applyCloudWind($siteName, $siteUrl) {
+	unset($GLOBALS['CloudWind_Configs']);
+	require_once R_P . 'lib/cloudwind/cloudwind.class.php';
+	$checkService = CloudWind::getPlatformCheckServerService ();
+	if (!$checkService->checkHost() || !$checkService->getServerStatus() || !($marksite = $checkService->markSite())) return false;
+	list($adminName, $adminPhone) = array('siteAdmin', '13888888888');
+	$applyStatus = CloudWind::yunApplyPlatform($siteUrl, $siteName, $adminName, $adminPhone, $marksite);
+	if (!$applyStatus) {
+		$checkService->markSite(false);
+		return false;
+	}
+	return true;
 }
 ?>

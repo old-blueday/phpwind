@@ -113,10 +113,8 @@ Class DBdriver {
 			$this->totaltime += $usetime;
 		}
 		!$query && $error && $this->halt('Query Error: ' . $SQL);
-		//sql hook start
-		require_once R_P."lib/cloudwind/yunhook.php";
-		yun_hook_sqlhook($originalSQL);
-		//sql hook end
+		require_once(R_P.'lib/cloudwind/cloudwind.class.php');
+		CloudWind::yunCollectSQL($originalSQL);
 		return $query;
 	}
 	

@@ -777,7 +777,7 @@ foreach ($readdb as $key => $read) {print <<<EOT
 <!--
 EOT;
 if($db_showonline){
-$gender = $read['gender'] == 2 ? 'women' : 'man';
+$gender = getDefaultGender($read['gender']);
 if(checkOnline($read['thisvisit'])){print <<<EOT
 -->
 					<span class="{$gender}_ol mr5" title="在线" alt="在线">在线</span>
@@ -1069,6 +1069,15 @@ function grouppostreply(txt) {
 		window.location = 'post.php?action=reply&fid='+fid+'&tid='+tid;
 	}
 }
+window.onReady(function(){
+	//控制多媒体播放
+	var videos=getElementsByClassName("video");
+	for(var i=0,len=videos.length;i<len;i++){
+(function(elem){
+toggleVideo(elem);
+})(videos[i])
+	}
+});
 </script>
 <script src="$db_htmdir/js/face.js"></script>
 <script type="text/javascript" src="js/pw_lwd.js"></script>
@@ -1125,8 +1134,9 @@ EOT;
 EOT;
 }
 //max attachnum
-if ($_G['allownum'] > 0 && $_G['allownum'] - $winddb['uploadnum']<$db_attachnum){
-	$maxAttachnum = $_G['allownum'] - $winddb['uploadnum'];
+$uploadedNum = $winddb['uploadtime'] < $tdtime ? 0 : $winddb['uploadnum'];
+if ($_G['allownum'] > 0 && $_G['allownum'] - $uploadedNum<$db_attachnum){
+	$maxAttachnum = $_G['allownum'] - $uploadedNum;
 } else {
 	$maxAttachnum = $db_attachnum;
 }
@@ -1469,7 +1479,7 @@ EOT;
 <!--
 EOT;
 if($db_showonline){
-$gender = $read['gender'] == 2 ? 'women' : 'man';
+$gender = getDefaultGender($read['gender']);
 if(checkOnline($read['thisvisit'])){print <<<EOT
 -->
 					<span class="{$gender}_ol mr5" title="在线" alt="在线">在线</span>

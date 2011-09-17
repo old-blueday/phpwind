@@ -1,6 +1,6 @@
 <?php
 defined('P_W') || exit('Forbidden');
-define('WIND_VERSION', '8.7beta,20110817');
+define('WIND_VERSION', '8.7,20110913');
 define('PW_USERSTATUS_BANUSER', 1); //是否禁言位 (版块禁言)
 define('PW_USERSTATUS_CFGFRIEND', 3); //设置朋友位
 //define('PW_USERSTATUS_NEWPM', 5); //是否有新短消息
@@ -1011,7 +1011,7 @@ function getUserByUid($uid) {
 			$sqladd = (SCR == 'post') ? ',md.postcheck,sr.visit,sr.post,sr.reply' : (SCR == 'read' ? ',sr.visit,sr.reply' : ',sr.visit');
 			$sqltab = "LEFT JOIN pw_singleright sr ON m.uid=sr.uid";
 		}
-		$detail = $db->get_one("SELECT m.uid,m.username,m.password,m.safecv,m.email,m.bday,m.oicq,m.groupid,m.memberid,m.groups,m.icon,m.regdate,m.honor,m.timedf,m.style,m.datefm,m.t_num,m.p_num,m.yz,m.newpm,m.userstatus,m.shortcut,m.medals,md.lastmsg,md.postnum,md.rvrc,md.money,md.credit,md.currency,md.lastvisit,md.thisvisit,md.onlinetime,md.lastpost,md.todaypost,md.monthpost,md.onlineip,md.uploadtime,md.uploadnum,md.starttime,md.pwdctime,md.monoltime,md.digests,md.f_num,md.creditpop,md.jobnum,md.lastgrab,md.follows,md.fans,md.newfans,md.newreferto,md.newcomment,md.punch,md.bubble,md.newnotice,md.newrequest,md.shafa $sqladd FROM pw_members m LEFT JOIN pw_memberdata md ON m.uid=md.uid $sqltab WHERE m.uid=" . S::sqlEscape($uid) . " AND m.groupid<>'0' AND md.uid IS NOT NULL");
+		$detail = $db->get_one("SELECT m.uid,m.username,m.password,m.safecv,m.email,m.bday,m.oicq,m.groupid,m.memberid,m.groups,m.icon,m.regdate,m.honor,m.timedf,m.style,m.datefm,m.t_num,m.p_num,m.yz,m.newpm,m.userstatus,m.shortcut,m.medals,m.gender,md.lastmsg,md.postnum,md.rvrc,md.money,md.credit,md.currency,md.lastvisit,md.thisvisit,md.onlinetime,md.lastpost,md.todaypost,md.monthpost,md.onlineip,md.uploadtime,md.uploadnum,md.starttime,md.pwdctime,md.monoltime,md.digests,md.f_num,md.creditpop,md.jobnum,md.lastgrab,md.follows,md.fans,md.newfans,md.newreferto,md.newcomment,md.punch,md.bubble,md.newnotice,md.newrequest,md.shafa $sqladd FROM pw_members m LEFT JOIN pw_memberdata md ON m.uid=md.uid $sqltab WHERE m.uid=" . S::sqlEscape($uid) . " AND m.groupid<>'0' AND md.uid IS NOT NULL");
 		return $detail;
 	}
 }
@@ -1910,6 +1910,14 @@ function pwHtmlspecialchars_decode ($string,$decodeTags = true) {
 	return $string;
 }
 
+/**
+ * 只解析一部分htmlspecialchars功能
+ * @param $string
+ */
+function pwHtmlspecialchars($string,$decodeTags = false) {
+	return str_replace(array('&', '"', "'", '='), array('&amp;', '&quot;', '&#039;', '&#61;'), $string);
+}
+
 /*
  * 获取强制索引名称
  */
@@ -1941,6 +1949,22 @@ function checkFromWap() {
 	return false;
 }
 
+/**
+ * 新建文件夹
+ */
+function pwCreateFolder($path) {
+	if (!is_dir($path)) {
+		pwCreateFolder(dirname($path));
+		@mkdir($path);
+		@chmod($path,0777);
+		@fclose(@fopen($path.'/index.html','w'));
+		@chmod($path.'/index.html',0777);
+	}
+}
+
+function getDefaultGender($gender) {
+	return ($gender == 1) ? 'man' : 'women';
+}
 //LOADER
 
 class PW_BaseLoader {
@@ -2477,76 +2501,4 @@ class pwHook{
 	}
 }
 
-class CloudWind{
-	
-	function yunPostDefend($authorid, $author, $groupid, $id, $title, $content, $type = 'thread', $expand = array()) {
-		require_once R_P . 'lib/cloudwind/yundefend.php';
-		return yunPostDefend( $authorid, $author, $groupid, $id, $title, $content, $type, $expand );
-	}
-	
-	function yunUserDefend($operate, $uid, $username, $accesstime, $viewtime, $status = 0, $reason = "", $content = "", $behavior = array(), $expand = array()) {
-		require_once R_P . 'lib/cloudwind/yundefend.php';
-		YunUserDefend ( $operate, $uid, $username, $accesstime, $viewtime, $status, $reason, $content, $behavior, $expand  );
-		Cookie("ci",'');
-		return true;
-	}
-	function yunSetCookie($name,$tid='',$fid='') {
-		global $timestamp;
-		if (!$name) return false;
-		Cookie("ci",$name."\t".$timestamp."\t".$tid."\t".$fid);
-	}
-	
-	function checkSync(){
-		if(!isset($GLOBALS['db_yunsearch_search']) && !isset($GLOBALS['db_yundefend_shield'])){
-			return false;
-		}
-		if($GLOBALS ['db_yun_model'] ['search_model'] != 100 || $GLOBALS ['db_yun_model'] ['userdefend_model'] == 100){
-			return true;
-		}
-		if($GLOBALS ['db_yun_model'] ['postdefend_model'] == 100 && SCR == 'read'){
-			return true;
-		}
-		return false;
-	}
-
-	function getUserInfo() {
-		$getCookie = GetCookie('ci');
-		if (!$getCookie) return array();
-		return explode("\t",$getCookie);
-	}
-
-	function sendUserInfo($cloud_information) {
-		if (!S::isArray($cloud_information)) return false;
-		list($operate,$leaveTime,$tid,$fid) = $cloud_information ? $cloud_information : array('','');
-
-		if (!in_array($operate, array('index','read', 'thread')) || $operate == SCR) return false;
-		$user = CloudWind::getOnlineUserInfo();
-		$viewTime = $GLOBALS['timestamp'] - $leaveTime ? $GLOBALS['timestamp'] - $leaveTime : '';
-		CloudWind::yunUserDefend('view'.$operate, $user['uid'], $user['username'], $leaveTime, $viewTime, 101,'','','',array('uniqueid'=>$tid.'-'.$fid));
-		return true;
-	}
-	
-	function getOnlineUserInfo() {
-		if (!$GLOBALS['winduid'] && !GetCookie('cloudClientUid')) {
-			Cookie("cloudClientUid",CloudWind::getNotLoginUid());
-		}
-		$cloudClientUid = GetCookie('cloudClientUid') ? GetCookie('cloudClientUid') : CloudWind::getNotLoginUid();
-		return array(
-			'uid'		=>	$GLOBALS['winduid'] ? $GLOBALS['winduid'] : $cloudClientUid,
-			'username'	=> 	$GLOBALS['windid'] ? $GLOBALS['windid'] : '游客'
-		);
-	}
-	
-	function getNotLoginUid() {
-		global $loginhash;
-		$length = strlen($loginhash);
-		for ($i=0;$i<$length;$i++) {
-			if ($i%2 == 0) $odd .= ord($loginhash[$i]);
-			if ($i%2 != 0) $even .= ord($loginhash[$i]);
-		}
-		return substrs("$odd+$even" , 8, 'N');
-	}
-	
-	
-}
 ?>

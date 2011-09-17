@@ -125,7 +125,9 @@ class topicPost {
 			'ifmagic' => $this->data['ifmagic'],
 			'ifhide' => $this->data['hideatt'],
 			'tpcstatus' => $this->data['tpcstatus'],
-			'modelid' => $this->data['modelid']
+			'modelid' => $this->data['modelid'],
+			'frommob' => $this->data['frommob']
+			
 		);
 		$this->tid = pwQuery::insert('pw_threads', $pwSQL);
 		//* $this->tid = $this->db->insert_id();
@@ -235,7 +237,8 @@ class topicPost {
 				*/
 			}
 			//Start elementupdate
-			if ($db_ifpwcache & 128 || (($db_ifpwcache & 512) && $this->att && $this->att->elementpic)) {
+			require_once (D_P . 'data/bbscache/o_config.php');
+			if ($db_ifpwcache & 128 || $o_browseopen ||(($db_ifpwcache & 512) && $this->att && $this->att->elementpic)) {
 				L::loadClass('elementupdate', '', false);
 				$elementupdate = new ElementUpdate($this->forum->fid);
 				if ($db_ifpwcache & 128) {
@@ -243,6 +246,10 @@ class topicPost {
 				}
 				if (($db_ifpwcache & 512) && $this->att && $this->att->elementpic && $this->_checkIfHidden()) {
 					$elementupdate->newPicUpdate($this->att->elementpic['aid'], $this->forum->fid, $this->tid, $this->att->elementpic['attachurl'], $this->att->elementpic['ifthumb'], $this->data['content']);
+				}
+				if ($o_browseopen){
+					$elementupdate->setCacheNum(100);/*设置缓存100个*/
+					$elementupdate->lastPostUpdate($this->data['authorid'], $this->tid, $timestamp);
 				}
 				$elementupdate->updateSQL();
 			}

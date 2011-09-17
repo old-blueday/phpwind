@@ -5,7 +5,7 @@ $for_google = S::getGP('g');
 if ($for_google) {
 	$cachefile = D_P."data/bbscache/sitemap_google.xml";
 } else {
-	$cachefile = D_P."data/bbscache/sitemap.xml";
+	$cachefile = D_P."sitemap.xml";
 }
 //* @include_once pwCache::getPath(D_P.'data/bbscache/sm_config.php');
 pwCache::getData(D_P.'data/bbscache/sm_config.php');

@@ -17,5 +17,5 @@ $cbgborder = '#eaeaea';
 $cbgfont = '#666';
 $forumcolorone	= '#ffffff';
 $forumcolortwo	= '#f3f9fb';
-$extcss = ' ';
+$extcss = '';
 ?>

@@ -134,6 +134,12 @@ print <<<EOT
 <!--
 EOT;
 }}elseif ($adminitem =='orderlist'){
+$stateClass = $stateClass1 = $stateClass2 = '';
+if ($state) {
+	${"stateClass$state"} = ' style="text-decoration:underline"';
+} else {
+	$stateClass = ' style="text-decoration:underline"';
+}
 if(!$action){print <<<EOT
 -->
 <div class="nav3 mb10">
@@ -156,7 +162,7 @@ if(!$action){print <<<EOT
 </form>
 <form action="$basename&" method="post" id="oderList">
   <input type="hidden" name="action" value="del">
-  <h2 class="h1"><span class="mr20">订单管理</span><span class="linka"><a href="$basename">所有订单</a>&nbsp;|&nbsp; <a href="$basename&state=2">已完成订单</a>&nbsp;|&nbsp; <a href="$basename&state=1">未完成订单</a></span></h2>
+  <h2 class="h1"><span class="mr20">订单管理</span><span class="linka"><a href="$basename"$stateClass>所有订单</a>&nbsp;|&nbsp; <a href="$basename&state=2"$stateClass2>已完成订单</a>&nbsp;|&nbsp; <a href="$basename&state=1"$stateClass1>未完成订单</a></span></h2>
   <div class="admin_table mb10">
   <table width="100%" cellspacing="0" cellpadding="0">
     <tr class="tr2 vt td_bgB">

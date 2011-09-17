@@ -37,7 +37,7 @@ if ($adminitem == 'basic') {
 					'displayorder' => $spreads['displayorder'][$key], 
 					'name' => $spreads['name'][$key], 
 					'day' => $spreads['day'][$key], 
-					'price' => number_format($spreads['price'][$key],2), 
+					'price' => number_format($spreads['price'][$key],2,'.',''), 
 					'discount' => round($spreads['discount'][$key],1)
 				);
 			}
@@ -57,7 +57,7 @@ if ($adminitem == 'basic') {
 					'displayorder' => $newspreads['displayorder'][$key], 
 					'name' => $newspreads['name'][$key], 
 					'day' => $newspreads['day'][$key], 
-					'price' => number_format($newspreads['price'][$key],2), 
+					'price' => number_format($newspreads['price'][$key],2,'.',''), 
 					'discount' => round($newspreads['discount'][$key],1)
 				);
 			}
@@ -163,12 +163,15 @@ if ($adminitem == 'basic') {
 				);
 			}
 		} elseif ($operater == 2) {
-			//删除记录
+			//未到帐
 			foreach ($payids as $v) {
 				$payLog = $kmdService->getPayLogById($v);
 				if (!S::isArray($payLog)) continue;
-				$kmdService->deletePayLogById($v);
-				
+				//$kmdService->deletePayLogById($v);
+				$fieldData = array(
+					'status' => KMD_PAY_STATUS_INVALID
+				);
+				$kmdService->updatePayLog($fieldData,$v);
 				//send message
 				$forum = L::forum($payLog['fid']);
 				sendKmdMessages(
@@ -184,7 +187,7 @@ if ($adminitem == 'basic') {
 	} else {
 		//购买记录列表
 		S::gp(array('username','starttime','endtime'));
-		S::gp(array('fid'),'gp',2);
+		S::gp(array('fid','status'),'gp',2);
 		$forumcache = getSelectedForumCache($fid);
 		$params = array();
 		if ($username) {
@@ -197,13 +200,14 @@ if ($adminitem == 'basic') {
 			$params['endtime'] = PwStrtoTime($endtime) + 86400;
 		}
 		$fid > 0 && $params['fid'] = $fid;
+		$status > 0 && $params['status'] = $status;
 		$count = $income = 0;
 		$count = (int)$kmdService->countPayLogs($params);
 		if ($count) {
 			$payLogs = $kmdService->searchPayLogs($params,$offset,$pagesize);
-			$income = (int)$kmdService->getKmdIncome($params);
+			$income = (float)$kmdService->getKmdIncome($params);
 		}
-		$pages = numofpage($count, $page, ceil($count/$pagesize), "$basename&username=$username&fid=$fid&starttime=$starttime&endtime=$endtime&");
+		$pages = numofpage($count, $page, ceil($count/$pagesize), "$basename&username=$username&fid=$fid&status=$status&starttime=$starttime&endtime=$endtime&");
 		require_once PrintApp('set');
 	}
 } else if ($adminitem == 'check') {

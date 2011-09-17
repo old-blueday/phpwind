@@ -30,6 +30,7 @@ function updatecache($array='') {
 		updatecache_help();
 		cache_read();
 		updatecache_hotforum();
+		updatecache_openforum();
 		updatecache_topic();
 		updatecache_postcate();
 		updateCacheActivity();
@@ -1042,6 +1043,18 @@ function updatecache_hotforum() {
 	pwCache::setData(D_P.'data/bbscache/shortcutforum_cache.php',"<?php\r\n$shortcutforum?>");
 }
 
+function updatecache_openforum() {
+	global $db;
+	$forumIds=array();
+	$query	= $db->query("SELECT * FROM pw_forums WHERE type<>'category'");
+	while ($foruminfo = $db->fetch_array($query)) {
+		if (!$foruminfo['allowvisit'] && $foruminfo['f_type'] != 'hidden' && !$foruminfo['password'] && !$foruminfo['forumsell']){
+			$forumIds[]=$foruminfo['fid'];
+		}
+	}
+	$openforum = "\$openforum=".pw_var_export($forumIds).";";
+	pwCache::setData(D_P.'data/bbscache/forum_cache_openforum.php',"<?php\r\n$openforum?>");
+}
 /*更新分类主题缓存*/
 function updatecache_topic() {
 	global $db;

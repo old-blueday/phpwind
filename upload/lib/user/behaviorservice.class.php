@@ -35,6 +35,7 @@ class PW_BehaviorService {
 			return array($newNum,$change);
 		}
 	}
+	
 	/**
 	 * 获取统计信息
 	 * @param int $uid
@@ -89,9 +90,27 @@ class PW_BehaviorService {
 			2=>'continue_post',			//'连续发贴天数'
 			3=>'continue_thread_post',	//'连续发主题天数'
 			4=>'continue_punch',		//'连续打卡天数'
+			5=>'continue_user_upgrade',	//'用户升级记录'
+			6=>'today_add_follow',		//'记录今日关注'
+			
 		);
 	}
-	
+	/**
+	 * 根据条件获得一组记录
+	 * @return array
+	 */
+	function getBehaviorList($behavior,$num=10){
+		$behavior=$this->_initBehavior($behavior);
+		$behaviorStatisticDb = $this->_getBehaviorStatisticDb();
+		return $behaviorStatisticDb->gets($behavior,$num);
+	}
+	function getFansOrder($behavior,$lastday,$num){
+		if (empty($behavior) && empty($lastday)){
+			return false;
+		}
+		$behaviorStatisticDb = $this->_getBehaviorStatisticDb();
+		return $behaviorStatisticDb->getFansList($behavior,$lastday,$num);
+	}
 	function _checkBehavior($behavior) {
 		$behavior = $this->_initBehavior($behavior);
 		$behaviors = $this->getBehaviorTypes();

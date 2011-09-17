@@ -62,6 +62,8 @@ class PW_KeywordStatistic {
 		}
 		if (!$sql) return false;
 		$db->query("INSERT INTO pw_searchstatistic(keyword,num,created_time) VALUES " . S::sqlMulti($sql));
+		$deleteTime = $this->_timestamp - 86400*90;
+		$db->query("DELETE FROM pw_searchstatistic WHERE created_time < $deleteTime");
 		return true;
 	}
 	

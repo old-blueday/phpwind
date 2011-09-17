@@ -12,22 +12,6 @@ if(is_ie6){
 //comatibility.js
 (function () {
 if(!window.opera && !is_ie){
-	if (window.Event) {
-		var ep = Event.prototype;
-		ep.__defineSetter__("returnValue", function(b) {
-			if (!b) this.preventDefault();
-			return b
-		});
-		ep.__defineSetter__("cancelBubble", function(b) {
-			if (b) this.stopPropagation();
-			return b
-		});
-		ep.__defineGetter__("srcElement", function() {
-			var node=this.target;
-			while(node && node.nodeType != 1) node = node.parentNode;
-			return node
-		})
-	}
 	if (window.HTMLElement) {
 		var hp = HTMLElement.prototype;
 		function _attachEvent(o,e,h) {
@@ -775,6 +759,28 @@ function getStyle(ele,style){
 	}else{
 		return ele.currentStyle[style];
 	}
+}
+//获取事件对象
+function getEvent(){
+   if(document.all)
+   {
+		return window.event;//如果是ie
+   }
+   var func=getEvent.caller;
+   while(func!=null)
+   {
+	   var arg0=func.arguments[0];
+	   if(arg0)
+	   {
+		   if((arg0.constructor==Event || arg0.constructor ==MouseEvent)
+		   ||(typeof(arg0)=="object" && arg0.preventDefault && arg0.stopPropagation))
+		   {
+		   return arg0;
+		   }
+	   }
+		   func=func.caller;
+	   }
+	   return null;
 }
 //操作元素样式
 function hasClass(obj,className){

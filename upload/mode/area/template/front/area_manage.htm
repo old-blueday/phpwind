@@ -5,7 +5,6 @@ print <<<EOT
 <head>
 <meta charset="$db_charset" />
 <base id="headbase" href="$db_bbsurl/" />
-<script type="text/javascript" src="js/core/core.js"></script>
 <link rel="stylesheet" href="images/pw_core.css?{$GLOBALS['wind_repair']}" />
 <link rel="stylesheet" href="images/pwmanage.css?{$GLOBALS['wind_repair']}" />
 <style>
@@ -16,6 +15,7 @@ body {line-height: 1.5;}
 a{color:#336699;text-decoration:none}
 a:hover{color:#ff5500;text-decoration:none}
 </style>
+<script type="text/javascript" src="js/core/core.js"></script>
 </head>
 <body>
 <!--
@@ -142,7 +142,7 @@ print <<<EOT
 	})
 	function addPingFen() {
 		if (getObj('pingfen').getElementsByTagName('tr').length>4) {
-			alert('评分类型超过操过');
+			alert('积分奖励类型不能超过5种');
 			return false;
 		}
 		var nodes = getObj('clonetr').getElementsByTagName('tr');

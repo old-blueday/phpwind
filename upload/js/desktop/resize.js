@@ -62,7 +62,11 @@ function()
                 jsonArg.body_obj ? jsonArg.body_obj.style.visibility = "hidden": 0;
 				
 				var evt=evt||event;
-                evt.cancelBubble = true;
+				if(evt.stopPropagation){
+					evt.stopPropagation();
+				}else{
+					evt.cancelBubble = true;
+				}
                 if (ROOT.setCapture)
                 {
                     ROOT.setCapture();

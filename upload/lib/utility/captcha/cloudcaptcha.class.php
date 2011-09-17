@@ -11,7 +11,8 @@ class PW_CloudCaptcha {
 	var $identity = '';
 	
 	function PW_CloudCaptcha() {
-		$this->identity = $GLOBALS['db_siteid'] ? md5($GLOBALS['db_siteid']) : 'default';
+		//$this->identity = $GLOBALS['db_siteid'] ? md5($GLOBALS['db_siteid']) : 'default';
+		$this->identity = $this->getIdentity();
 	}
 	
 	/**
@@ -24,6 +25,11 @@ class PW_CloudCaptcha {
 	function getCaptchaUrl($kjtype = 'default') {
 		$interface = $this->captchaGetInterface . 'identity=' . $this->identity . '&kjtype=' . $kjtype;
 		return $interface;
+	}
+	
+	function getIdentity(){
+		$ps = parse_url($GLOBALS['db_bbsurl']);
+		$this->identity = $ps['host'] ? $ps['host'] : 'default'; 
 	}
 	
 	/**

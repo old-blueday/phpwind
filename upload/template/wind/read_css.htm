@@ -13,7 +13,7 @@ print <<<EOT
 .radioBg .view-hover,.radioBg .view-current{min-height:135px;_height:135px;}
 
 /*实名认证*/
-.certificate{ position:absolute;margin-left:91px;margin-top:-2px;z-index:10;}
+.certificate{ position:absolute;margin-left:0;margin-top:-2px;z-index:10;}
 
 /*名片*/
 .card{border:1px solid $tablecolor;width:433px;position:absolute;margin:-9px 0 0 -16px;background:#fff;-webkit-box-shadow:4px 4px 0 #e4e4e4;-moz-box-shadow:4px 4px 0 #e4e4e4;box-shadow:4px 4px 0 #e4e4e4;z-index:9;}
@@ -99,9 +99,9 @@ h1 a.gray{ font-size:12px; font-weight:100;font-family:Simsun;}
 .imgList h4 a{color:#014c90;margin:0 3px;}
 .imgList h4 a.current{color:#333; font-weight:700;}
 .imgList ul{padding-top:10px;}
-.imgList li{float:left;width:20%;padding:0 0 10px;height:125px;overflow:hidden;}
+.imgList li{float:left;width:20%;padding:0 0 10px;height:125px;}
 .imgList .tac img{ width:120px;height:120px;}
-.imgList li img{ cursor:pointer;}
+.imgList li img{ cursor:pointer;display:block}
 .imgList ul.one li{float:none;width:auto;height:auto;}
 .forbid{padding-left:20px;background:#fff url($imgpath/pwicon/forbid.png) 0 center no-repeat;line-height:20px;height:20px;display:inline-block;height:20px;position:absolute;right:0;_right:20px;top:0;color:#ff0000;}
 
@@ -216,6 +216,34 @@ h1 a.gray{ font-size:12px; font-weight:100;font-family:Simsun;}
 
 /*帖内置顶*/
 .read_topped{background:url(u/images/up.png) 0 center no-repeat;padding-left:14px;}
+
+/*标签*/
+.read_tags{background:url($imgpath/pwicon/tags.png) 0 center no-repeat;padding-left:20px;}
+
+/*引用回复*/
+.quote_left{padding-left:16px;background:url(u/images/quoteA.png) 0 center no-repeat;}
+.quote_right{background:url(u/images/quoteB.png) 0 center no-repeat;padding:0 8px;}
+
+/*87新评分*/
+.read_score td{border-bottom:1px dashed #e4e4e4;padding:6px 0;}
+.read_score tr:hover td{background:$forumcolortwo;}
+.read_score td.read_score_face{padding-left:10px;}
+.read_score td.read_score_face a{display:block;height:20px;width:20px;overflow:hidden;}
+.read_score td.read_score_time{padding-left:10px;padding-right:10px;}
+.read_score td.read_score_time .s4{ text-align:right;float:right;}
+.read_score_head{border:1px solid #e4e4e4;padding:8px 10px;background:#fff;background: -webkit-gradient(linear, 0 0, 0 100%, from(#ffffff), to(#f7f7f7));background: -moz-linear-gradient(top, #ffffff, #f7f7f7);filter:  progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffff', endColorstr='#f7f7f7');}
+
+/*87新评分弹窗*/
+.read_score_pop{padding:10px 0;}
+.read_score_pop td,.read_score_pop th{padding:5px 0 5px 10px; font-size:12px;}
+.read_score_pop th{width:45px;line-height:24px; text-align:right; font-weight:100;}
+.rating_pop{padding:2px 0;}
+.rating_pop a{width:35px;display:inline-block;text-align:center;border:1px solid #c7d8e1;color:#425b79;background:#f3fafc;background: -webkit-gradient(linear, 0 0, 0 100%, from(#f8fdfe), to(#edf6f9));background: -moz-linear-gradient(top, #f8fdfe, #edf6f9);filter:  progid:DXImageTransform.Microsoft.gradient(startColorstr='#f8fdfe', endColorstr='#edf6f9');}
+.rating_pop a:hover{border-color:#4f8eb0;text-decoration:none;}
+.rating_pop a.less{border-color:#ecd8cf;color:#8d5230;background:#fffaf2;background: -webkit-gradient(linear, 0 0, 0 100%, from(#fffaf2), to(#fff0e6));background: -moz-linear-gradient(top, #fffaf2, #fff0e6);filter:  progid:DXImageTransform.Microsoft.gradient(startColorstr='#fffaf2', endColorstr='#fff0e6');}
+.rating_pop a.less:hover{ border-color:#c58b69;}
+.rating_pop a.old{background:#f7f7f7;color:#999;border:1px solid #ccc; cursor:default; filter:none;}
+.rating_pop_surplus{color:#666;}
 </style>
 <!--[if IE]>
 <style>

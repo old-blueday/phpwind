@@ -25,8 +25,10 @@ $pingdata = $db->get_one("SELECT * FROM pw_pinglog WHERE id=" . S::sqlEscape($pi
 //$db->update("UPDATE pw_pinglog SET ifhide=1 WHERE id=" . S::sqlEscape($pingid) . " LIMIT 1");
 pwQuery::update('pw_pinglog', 'id=:id  LIMIT 1', array($pingid), array('ifhide'=>1));	
 if ($db->affected_rows()) {
-	echo "success";
 	$pingService = L::loadClass("ping", 'forum');
+	$pingTotal = $pingService->getPingLogAll($tid,$pid);
+	$pingTotal = pwJsonEncode($pingTotal);
+	echo "success\t$pingTotal";
 	$pingService->update_markinfo($tid, $pid);
 	# memcache reflesh
 	if ($db_memcache) {

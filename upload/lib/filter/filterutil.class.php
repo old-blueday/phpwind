@@ -691,8 +691,8 @@ class Trie {
         return $ret;    
     }
 
- 	function replaces($s) {
-    	$s = strtolower($s);
+ 	function replaces($s,$ifUppCase = 0) {
+    	$ifUppCase && $s = strtolower($s);
         $isUTF8 = strtoupper(substr($GLOBALS['db_charset'],0,3)) === 'UTF' ? true : false;
         $ret = array();
         $cur = 0; //当前节点，初始为根节点

@@ -57,7 +57,7 @@ print<<<EOT
 <!--
 EOT;
 		if ($db_showonline) {
-			$gender = $value['gender'] == 2 ? 'women' : 'man';
+			$gender = getDefaultGender($value['gender']);
 			if (checkOnline($value['thisvisit'])){print <<<EOT
 --><span class="{$gender}_ol mr5" title="在线" alt="在线" style="display:inline-block; text-indent:0; float:none;"></span><!--
 EOT;
@@ -206,8 +206,11 @@ EOT;
 			} else {
 				$genderText = '保密';
 
-			}print <<<EOT
--->{$genderText}，{$value['bday']}
+			}
+			$regdate = is_numeric($value['regdate']) ? date('Y-m-d',$value['regdate']) : $value['regdate'];
+			$bdayText = $value['bday'] == '0000-00-00' ? $regdate : $value['bday'];
+			print <<<EOT
+-->{$genderText}，{$bdayText}
 		</li>
 <!--
 EOT;
@@ -249,10 +252,14 @@ print <<<EOT
 				<li><a href="{$db_adminfile}?adminjob=usermanage&adminitem=delete&action=del&schuid={$tmpUid}&groupid={$this->space['groupid']}&regdate=all&schlastvisit=all&item=14" target="_blank">清除用户</a></li>
 			</ul>
 		</div>
-	</p>
 <!--
 EOT;
 			}
+print <<<EOT
+-->
+	</p>
+<!--
+EOT;
 		}print <<<EOT
 -->
 </div>
@@ -343,7 +350,7 @@ EOT;
 					<p class="mb10">
 <!--
 EOT;
-$gender = $v['gender'] == 2 ? 'women' : 'man';
+$gender = getDefaultGender($v['gender']);
 				if ($GLOBALS['db_showonline'] && $v['thisvisit'] + $GLOBALS['db_onlinetime']*1.5 > $GLOBALS['timestamp']) {print <<<EOT
 --><span class="{$gender}_ol mr5" title="在线" alt="在线">在线</span>
 <!--

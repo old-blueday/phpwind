@@ -29,39 +29,58 @@ app_bottom.prototype = {
 
 		if (IsElement(j.diary))
 		{
-			getObj(j.diary).onclick=function()
+			getObj(j.diary).onclick=function(e)
 			{
-				_.showDiary();event.returnValue=false;
+				_.halt(e);
+				_.showDiary();
 			};
 		}
 		if(IsElement(j.weibo)){
-			getObj(j.weibo).onclick=function()
+			getObj(j.weibo).onclick=function(e)
 			{
-				_.showWeibo();event.returnValue=false;
+				_.halt(e);
+				_.showWeibo();
 			};
 		}
 		if(IsElement(j.photo)){
-			getObj(j.photo).onclick=function()
+			getObj(j.photo).onclick=function(e)
 			{
-				_.showPhoto();event.returnValue=false;
+				_.halt(e);
+				_.showPhoto();
 			};
 		}
 
-		getObj(j.app).onclick = function () {
+		getObj(j.app).onclick = function (e) {
+			_.halt(e);
 			_.showAPP();
 		};
-		getObj(j.friend).onclick = function () {
+		getObj(j.friend).onclick = function (e) {
+			_.halt(e);
 			_.showFriend();
 		};
-		getObj(j.message).onclick = function () {
+		getObj(j.message).onclick = function (e) {
+			_.halt(e);
 			_.showMessage();
 		};
-		getObj(j.postlist).onclick = function () {
+		getObj(j.postlist).onclick = function (e) {
+			_.halt(e);
 			_.showPostlist(this);
 		};
-		getObj(j.forumlist).onclick = function () {
+		getObj(j.forumlist).onclick = function (e) {
+			_.halt(e);
 			_.showForumlist(this);
 		};
+	},
+	/*
+	*阻止浏览器默认行为
+	*/
+	halt:function(evt){
+			var e=evt||window.event;
+			if(e.preventDefault){
+				e.preventDefault();
+			}else{
+				e.returnValue=false;	
+			}
 	},
 		/**
 		 * 显示相册

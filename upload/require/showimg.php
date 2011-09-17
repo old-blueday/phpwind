@@ -61,7 +61,17 @@ function showfacedesign($usericon,$show_a = null,$imgtype = null) {
 		if ($user_a[2]) $imglen .= ($user_a[2] > 120) ? " width=120" : " width=\"$user_a[2]\"";
 		if ($user_a[3]) $imglen .= ($user_a[3] > 120) ? " height=120" : " height=\"$user_a[3]\"";
 	}
+
+	if ($user_a[1] == 1&&$user_a[6]){
+		$faceurl.="?".$user_a[6];
+	}else if ($user_a[1] == 2&&$user_a[6]){
+		$faceurl.="?".$user_a[6];
+	}else if ($user_a[1] == 3&&$user_a[7]){
+		$faceurl.="?".$user_a[7];
+	}
+	
 	if (empty($show_a)) {
+		
 		return "<img class=\"pic\" src=\"$faceurl\"$imglen border=\"0\" />";
 	} else {
 		!$user_a[2] && $user_a[2] = '80';
@@ -149,6 +159,7 @@ function DelIcon($filename) {
 }
 
 function setIcon($proicon, $facetype, $oldface) {
+	global $timestamp;
 	if (empty($proicon))
 		return '';
 	if ($facetype == 1) {
@@ -175,6 +186,7 @@ function setIcon($proicon, $facetype, $oldface) {
 		$oldface[1] == 3 && DelIcon($oldface[0]);
 	}
 	$usericon .= '|1';
+	$usericon .= "|$timestamp";
 	strlen($usericon) > 255 && Showmsg('illegal_customimg');
 	return $usericon;
 }

@@ -46,7 +46,7 @@
 .dl_reply ul{overflow:hidden;}
 .dl_reply li{border-top:1px dotted #e4e4e4;margin-top:-1px;padding:10px 0 10px 5px;}
 .dl_reply .img_35 img{ vertical-align:middle;padding:2px;background:#fff;border:1px solid #e4e4e4;float:left;}
-.dl_reply li .input{width:425px;float:left;margin:0 5px 0 50px;}
+.dl_reply li .input{width:400px;float:left;margin:0 5px 0 50px;}
 .dl_reply li .bt2{float:left;}
 div.B_editor_buttom{display:none;}
 /*帖子内容区域*/

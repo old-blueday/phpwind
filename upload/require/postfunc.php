@@ -104,7 +104,7 @@ function lastinfo($fid,$allowhtm=0,$type='',$sys_type='') {
 		$topicadd = ",tpost=tpost+1,article=article+1 ";
 		$fupadd   = "tpost=tpost+1,article=article+1 ";
 	} else {
-		$rt = $db->get_one("SELECT tid,author,postdate,subject,lastpost,lastposter FROM pw_threads WHERE fid=".S::sqlEscape($fid)." AND topped=0 AND ifcheck=1 AND lastpost>0 ORDER BY lastpost DESC LIMIT 0,1");
+		$rt = $db->get_one("SELECT tid,author,postdate,subject,lastpost,lastposter FROM pw_threads WHERE fid=".S::sqlEscape($fid)." AND specialsort=0 AND ifcheck=1 AND lastpost>0 ORDER BY lastpost DESC LIMIT 0,1");
 
 		if ($rt['postdate'] == $rt['lastpost']) {
 			$subject = addslashes(substrs($rt['subject'],26));
@@ -349,7 +349,7 @@ function jscv($code) {
 }
 function tcheck($content) {
 	$content = trim($content);
-	$content = strlen($content)>100 ? substr($content,0,100) : $content;
+	$content = strlen($content)>100 ? substr($content,-100) : $content;
 	return substr(md5($content),5,16);
 }
 function check_tag($tags) {

@@ -129,7 +129,7 @@ if ($adminitem == 'updatecache') {
 			} elseif($type=='category'){
 				$topic=$article=0;
 			}
-			$lt = $db->get_one("SELECT tid,author,postdate,lastpost,lastposter,subject FROM pw_threads WHERE fid=".S::sqlEscape($fid)."AND topped=0 AND ifcheck=1 AND lastpost>0 ORDER BY lastpost DESC LIMIT 0,1");
+			$lt = $db->get_one("SELECT tid,author,postdate,lastpost,lastposter,subject FROM pw_threads WHERE fid=".S::sqlEscape($fid)."AND specialsort=0 AND ifcheck=1 AND lastpost>0 ORDER BY lastpost DESC LIMIT 0,1");
 			if($lt['tid']){
 				$lt['subject'] = substrs($lt['subject'],21);
 				if($lt['postdate']!=$lt['lastpost']){
@@ -395,6 +395,10 @@ if ($adminitem == 'updatecache') {
 			$_cacheService->flush(PW_CACHE_MEMCACHE);			
 		}		
 		adminmsg('operate_success');
+	} elseif ($action == 'flushDataSquare') {
+		updateLastPostUser();
+		updateFansSort();
+		adminmsg('operate_success');
 	}
 		
 } elseif ($adminitem == 'pwcache' || $adminitem == 'blacklist'){
@@ -423,6 +427,8 @@ if ($adminitem == 'updatecache') {
 			$ifpwcache_256 = $db_ifpwcache&256 ? 'checked' : '';
 			$ifpwcache_512 = $db_ifpwcache&512 ? 'checked' : '';
 			$ifpwcache_1024 = $db_ifpwcache&1024 ? 'checked' : '';
+
+
 			!$db_cachenum && $db_cachenum = 20;
 			include PrintEot('pwcache');exit;
 		}
@@ -1037,3 +1043,44 @@ function PwDir($path) {
 	closedir($fp);
 }
 //end class & functions for guestdir
+
+function updateLastPostUser(){
+	global $db,$timestamp;
+	L::loadClass('getinfo', '', false);
+	$getinfo =& GetInfo::getInstance();
+	$userId=$userIds=array();
+	$db->update("DELETE FROM pw_elements WHERE type='lastpostuser' ");
+	$userIds = $getinfo->getLastPostUser(100);
+	if (!S::isArray($userIds))return false;
+	foreach ($userIds as $key => $value) {
+		$userId[$key]['id'] = $value;
+		$userId[$key]['value'] =$timestamp;
+		$userId[$key]['type'] ="lastpostuser";
+		$userId[$key]['mark'] ="tid";
+	}
+	if ($userId) {
+		$sql = "REPLACE INTO pw_elements(id,value,type,mark) VALUES ".S::sqlMulti($userId,true);
+		$db->update($sql);
+	}
+	return true;
+}
+function updateFansSort(){
+	global $db;
+	L::loadClass('getinfo', '', false);
+	$getinfo =& GetInfo::getInstance();
+	$userId=$userIds=array();
+	$db->update("DELETE FROM pw_elements WHERE type='totalfans' ");
+	$userIds = $getinfo->getTotalFansSort(100);
+	if (!S::isArray($userIds))return false;
+	foreach ($userIds as $key => $value) {
+		$userId[$key]['id'] = $value['uid'];
+		$userId[$key]['value'] =$value['fans'];
+		$userId[$key]['type'] ="totalfans";
+		$userId[$key]['mark'] ="fans";
+	}
+	if ($userId) {
+		$sql = "REPLACE INTO pw_elements(id,value,type,mark) VALUES ".S::sqlMulti($userId,true);
+		$db->update($sql);
+	}
+	return true;
+}

@@ -1024,10 +1024,11 @@ function br() {
 	}
 };
 function getSellValue(e){
-	e = e || event;
-	if(e.srcElement.tagName=='A')
+	var e = e || event;
+	var elem=e.target||e.srcElement;
+	if(elem.tagName=='A')
 	{
-		getObj('pw_box').getElementsByTagName('input')[0].value = e.srcElement.innerHTML;
+		getObj('pw_box').getElementsByTagName('input')[0].value = elem.innerHTML;
 	}
 };
 function showsale(cmdID) {

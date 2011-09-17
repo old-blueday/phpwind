@@ -146,6 +146,17 @@ EOT;
 </div>
 <!--
 EOT;
+$yunsearchKeywordList = CloudWind::getSearchKeywordsForList($GLOBALS['fid'],$GLOBALS['winduid']);
+if($yunsearchKeywordList){
+print <<<EOT
+-->
+$yunsearchKeywordList
+<!--
+EOT;
+}print <<<EOT
+-->
+<!--
+EOT;
 if($db_iftag && $db_tagindex && $tagdb = L::config('tagdb','tagdb')){print <<<EOT
 -->
 <div class="t">
@@ -276,11 +287,14 @@ for($i=$a;$i<$cate['across'];$i++){print <<<EOT
 			<td>&nbsp;</td>
 <!--
 EOT;
-}print <<<EOT
+}
+if ($a < $cate['across']){
+print <<<EOT
 -->
-
+	 </tr>
 <!--
 EOT;
+}
 }print <<<EOT
 -->
 			</tbody>
@@ -375,8 +389,12 @@ EOT;
 				$forums[admin]
 <!--
 EOT;
-}}print <<<EOT
+}print <<<EOT
 --></p>
+<!--
+EOT;
+}print <<<EOT
+-->
 							</th>
 							<td class="num tac" style="width:120px;"><em>$forums[topics]</em>/$forums[article]</td>
 							<td class="re">

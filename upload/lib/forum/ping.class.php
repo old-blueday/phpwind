@@ -57,7 +57,6 @@ class PW_Ping {
 	
 	function doPing($cid, $addpoint, $params = array()) {
 		global $credit,$winddb,$winduid,$windid,$timestamp,$onlineip,$gp_gptype;
-		
 		require_once(R_P.'require/credit.php');
 		$add_c = $tmp = $pingLog = array();
 		if (is_array($cid)) {
@@ -139,7 +138,7 @@ class PW_Ping {
 			}
 			$pwSQL = $ping = array();
 			$affect = '';
-			list($ping['pingtime'],$ping['pingdate']) = getLastDate($timestamp);
+			list($ping['pingtime'],$ping['pingdate']) = getLastDate($timestamp-1);
 			list($face) = showfacedesign($winddb['icon'],1,'m');
 			foreach ($add_c as $key => $value) {
 				/*记录评分日志*/
@@ -242,6 +241,21 @@ class PW_Ping {
 			return '评分已完成！回复失败，可能的原因是:'.$replyReturn;
 		}
 		return true;
+	}
+	
+	function getPingLogAll($tid,$pid){
+		static $creditnames;
+		is_array($creditnames) or $creditnames = pwCreditNames();
+		$tid = intval($tid);
+		$pid = intval($pid);
+		if ($tid < 1 && $pid < 1) return false;
+		$query = $this->db->query("SELECT tid,pid,name,SUM(point) AS total FROM pw_pinglog WHERE tid=$tid AND pid=$pid AND ifhide<>1 GROUP BY `name`");
+		$logs = array();
+		while ($rt = $this->db->fetch_array($query)) {
+			isset($creditnames[$rt['name']]) && $rt['name'] = $creditnames[$rt['name']];
+			$logs[$rt['name']] += $rt['total'];
+		}
+		return $logs;
 	}
 	
 	/**
@@ -709,26 +723,32 @@ class PW_Ping {
 			//* $this->db->update("UPDATE $pw_tmsgs SET ifmark=" . S::sqlEscape($markInfo) . " WHERE tid=" . S::sqlEscape($tid));
 			pwQuery::update($pw_tmsgs, 'tid=:tid', array($tid), array('ifmark'=>$markInfo));
 		} else {
-			$this->db->update("UPDATE ".GetPtable("N",$tid)." SET ifmark=".S::sqlEscape($markInfo)." WHERE pid=".S::sqlEscape($pid));
+			//$this->db->update("UPDATE ".GetPtable("N",$tid)." SET ifmark=".S::sqlEscape($markInfo)." WHERE pid=".S::sqlEscape($pid));
+			pwQuery::update(GetPtable("N",$tid),'pid=:pid',array($pid),array('ifmark'=>$markInfo));
 		}
 		return $markInfo;
 	}
 	
-
-	function getPingLogs($tid, $pingIdArr) {
+	function getPingLogs($tid, $pingIdArr,$page=null) {
 		if (empty($pingIdArr)) return array();
 		global $db,$fid;
 		static $creditnames;
 		is_array($creditnames) or $creditnames = pwCreditNames();
 		$pingIds = array();
 		$pingLogs = array();
+		if($page){
+			$page = intval($page);
+			if($page < 1) $page = 1;
+		}
 		foreach ($pingIdArr as $pid => $markInfo) {
 			list($count, $ids, $creditCount) = explode(":", $markInfo);
 			$pingLogs[$pid]['count'] = $count;
 			$pingLogs[$pid]['creditCount'] = $this->parseCreditCount($creditCount);
 			$pingIds = array_merge($pingIds, explode(",", $ids));
+			$page && $pingLogs[$pid]['pages'] = numofpage($count, $page, ceil($count/10), "apps.php?q=ajax&a=pingpage&tid=$tid&count=$count&pid=$pid&", null, 'ajaxPingcp');
 		}
-		if (!count($pingIds)) return array();
+
+		if (!count($pingIds) && !$page) return array();
 		$query = $this->db->query("SELECT a.*,b.uid,b.icon FROM pw_pinglog a LEFT JOIN pw_members b ON a.pinger=b.username WHERE a.id IN (" . S::sqlImplode($pingIds) . ")");
 		while ($rt = $this->db->fetch_array($query)) {
 			$rt['pid'] = $rt['pid'] ? $rt['pid'] : 'tpc';

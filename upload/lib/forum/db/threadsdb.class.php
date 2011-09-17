@@ -247,7 +247,7 @@ class PW_ThreadsDB extends BaseDB {
 		if($forumId < 1){
 			return false;
 		}
-		$query = $this->_db->query("SELECT * FROM " . $this->_tableName . " WHERE fid=" . S::sqlEscape($forumId) . "AND ifcheck=1 AND topped=0 ORDER BY lastpost DESC LIMIT $offset,$limit");
+		$query = $this->_db->query("SELECT * FROM " . $this->_tableName . " WHERE fid=" . S::sqlEscape($forumId) . "AND ifcheck=1 AND specialsort=0 ORDER BY lastpost DESC LIMIT $offset,$limit");
 		return $this->_getAllResultFromQuery($query, $this->_primaryKey);
 	}
 

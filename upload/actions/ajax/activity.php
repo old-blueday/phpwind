@@ -134,7 +134,7 @@ if ($job == 'user_authentication') {//用户身份验证
 	$data = array();
 
 	$defaultValueTableName = getActivityValueTableNameByActmid();
-		$defaultValue = $db->get_one("SELECT iscertified,iscancel,signupstarttime,signupendtime,endtime,minparticipant,maxparticipant,userlimit,fees,paymethod,batch_no,t.subject,t.authorid FROM $defaultValueTableName dv LEFT JOIN pw_threads t USING(tid) WHERE dv.tid=".S::sqlEscape($tid));
+		$defaultValue = $db->get_one("SELECT iscertified,iscancel,signupstarttime,signupendtime,endtime,minparticipant,maxparticipant,userlimit,fees,paymethod,batch_no,genderlimit,t.subject,t.authorid FROM $defaultValueTableName dv LEFT JOIN pw_threads t USING(tid) WHERE dv.tid=".S::sqlEscape($tid));
 
 	if ($defaultValue['iscancel']) {//判断是否活动取消
 		Showmsg('act_signup_iscancel_error');
@@ -143,7 +143,10 @@ if ($job == 'user_authentication') {//用户身份验证
 		Showmsg('act_signup_time_error');
 	}
 	$defaultValue['authorid'] == $winduid && Showmsg('act_signup_owner_error');//发起人无法参与报名
-
+	
+	$signRulesGener = array (1,2,3);
+	$defaultValue['genderlimit'] != $signRulesGener[$winddb[gender]] && Showmsg('亲该活动限制了性别,您无法报名哦');//性别限制
+	
 	$feesdb = unserialize($defaultValue['fees']);//费用
 	$isFree = count($feesdb) > 0 ? false : true;//判断该活动是否免费
 	$paymethod = $defaultValue['paymethod'];//支付方式

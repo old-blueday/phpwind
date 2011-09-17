@@ -6,6 +6,7 @@ if (!$winduid) {
 	Showmsg('not_login');
 }
 $USCR = 'user_home';
+define('WEIBO_RELATION_NUM', 200); //微博保留关系数
 $perpage = 20;
 require_once(R_P . 'u/lib/space.class.php');
 require_once(R_P.'require/functions.php');
@@ -67,9 +68,9 @@ list($faceurl) = showfacedesign($winddb['icon'],1,'m'); //头像
 $weiboService = L::loadClass('weibo','sns'); /* @var $weiboService PW_Weibo */
 $weiboList = $weiboService->getUserAttentionWeibos($winduid, array(), 1, 20);
 $weiboCount = $weiboService->getUserAttentionWeibosCount($winduid, array());
-$weiboCount > 250 && $weiboService->deleteAttentionRelation($winduid, $weiboCount);
+$weiboCount > WEIBO_RELATION_NUM && $weiboService->deleteAttentionRelation($winduid, $weiboCount);
 $o_weibopost == '0' && $weiboLiveList = $weiboService->getWeiboLives(21);//新鲜事直播
-$weiboCount > 200 && $weiboCount = 200;
+$weiboCount > WEIBO_RELATION_NUM && $weiboCount = WEIBO_RELATION_NUM;
 $pages = numofpage($weiboCount, 1, ceil($weiboCount/20), 'apps.php?q=weibo&do=attention&', 10, 'weiboList.filterWeibo');
 if (!$db_toolbar) {
 	$pwForumList = array();

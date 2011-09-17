@@ -12,8 +12,6 @@ if (!defined('AJAX')) {print <<<EOT
 <meta name="generator" content="phpwind v{$metaVersion}" />
 <meta name="description" content="$metaDescription" />
 <meta name="keywords" content="$metaKeywords" />
-<script type="text/javascript" src="js/core/core.js"></script>
-<script type="text/javascript" src="js/pw_ajax.js"></script>
 <!--css-->
 <link rel="stylesheet" href="$imgpath/pw_core.css?{$GLOBALS['wind_repair']}" />
 <!--
@@ -23,6 +21,8 @@ EOT;
 print <<<EOT
 -->
 <link rel="stylesheet" href="$imgpath/register/register.css?{$GLOBALS['wind_repair']}" />
+<script type="text/javascript" src="js/core/core.js"></script>
+<script type="text/javascript" src="js/pw_ajax.js"></script>
 </head>
 <body onKeyDown="try{keyCodes(event);}catch(e){}">
 
@@ -111,7 +111,7 @@ EOT;
 				</p>
 			</div>
 			<dl class="cc mb10" style="height:auto;min-height:inherit;">
-				<dt><label for="authverify">验证码<span class="s1">*</span></label></dt>
+				<dt><label for="authverify">手机验证码<span class="s1">*</span></label></dt>
 				<dd class="ip"><div style="background:#fff;"><input type="text" maxlength="75" name="authverify" id="authverify" class="input" /></div></dd>
 				<dd class="tp"><div class="correct" id="authTips" style="display:none"></div></dd>
 			</dl>
@@ -336,7 +336,7 @@ var rightclass	= "correct";
 var falseclass	= "wrong";
 
 var pwdcomplex	= '$rg_config[rg_pwdcomplex]';
-var extracheck	= new Array();
+//var extracheck	= new Array();
 var checkboxArray = new Array();
 var radioArray = new Array();
 var regInfo 	= new Array();

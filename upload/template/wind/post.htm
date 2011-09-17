@@ -223,11 +223,18 @@ getObj('menu_p_type').onmouseout = function() {t1 = setTimeout(closePtypeSelect,
 getObj('menu_p_type').onmouseover = function() {clearTimeout(t1);}
 getObj('menu_p_sub_type').onmouseout = function() {t2 = setTimeout(closePsubtypeSelect,100);}
 getObj('menu_p_sub_type').onmouseover = function() {clearTimeout(t2);}
+var vH=getObj('p_type_v').offsetWidth;
+var mH=getObj('menu_p_type').offsetWidth;
+//alert(vH+":"+mH)
+if(vH<=mH){
+	getObj('p_type_v').style.width = getObj('menu_p_type').offsetWidth - 27 + 'px';
+}
+
+
 showPtypeSelect = function() {
 	var ulDefaultWidth=getObj('menu_p_type').offsetWidth-2;
 	delPtypeSelectLi();
     if (getObj('menu_p_type').className != 'hover') {
-			getObj('p_type_v').style.width = getObj('menu_p_type').offsetWidth - 27 + 'px';
 			getObj('menu_p_type').style.width=ulDefaultWidth+'px';
         	getObj('menu_p_type').className = 'hover';
     } else {
@@ -235,10 +242,14 @@ showPtypeSelect = function() {
     }
 }
 showPsubtypeSelect = function() {
+	var vH_sub=getObj('p_sub_type_v').offsetWidth;
+	var mH_sub=getObj('menu_p_sub_type').offsetWidth;
+	if(vH_sub<=mH_sub){
+		getObj('p_sub_type_v').style.width = getObj('menu_p_sub_type').offsetWidth - 27 + 'px';
+	}
 	var ulsubDefaultWidth=getObj('menu_p_sub_type').offsetWidth-2;
 	delPsubtypeSelectLi();
     if (getObj('menu_p_sub_type').className != 'hover') {
-        getObj('p_sub_type_v').style.width = getObj('menu_p_sub_type').offsetWidth - 27 + 'px';
 		getObj('menu_p_sub_type').style.width =ulsubDefaultWidth+'px';
         getObj('menu_p_sub_type').className = 'hover';
     } else {
@@ -611,8 +622,8 @@ EOT;
 -->
 							<div class="post_tab_edit_cont">
 								<p>
-									<span class="mr20"><label for="atc_requiresell"><input type="checkbox" name="atc_requiresell" id="atc_requiresell" value="1" $htmlsell />出售：</label><input name="atc_money" type="text" value="0" maxlength="6" size="3" class="input" />&nbsp;<select name="atc_credittype" id="attmode_2">$selltype</select>&nbsp;<span class="gray">（不能大于：<span class="s2">{$db_sellset[price]}</span>）</span></span>
-									<span class="mr20"><label for="atc_requireenhide"><input type="checkbox" name="atc_requireenhide" id="atc_requireenhide" value="1" $htmlhide />加密：</label><input name="atc_rvrc" type="text" value="0" class="input" maxlength="6" size="3" />&nbsp;<select name="atc_enhidetype" id="attmode_1" class="mr5">$enhidetype</select>&nbsp;以上才能浏览</span>
+									<span class="mr20"><label for="atc_requiresell"><input type="checkbox" name="atc_requiresell" id="atc_requiresell" value="1" $htmlsell />出售：</label><input name="atc_money" type="text" value="0" maxlength="6" size="3" class="input" $htmlsell />&nbsp;<select name="atc_credittype" id="attmode_2" $htmlsell>$selltype</select>&nbsp;<span class="gray">（不能大于：<span class="s2">{$db_sellset[price]}</span>）</span></span>
+									<span class="mr20"><label for="atc_requireenhide"><input type="checkbox" name="atc_requireenhide" id="atc_requireenhide" value="1" $htmlhide />加密：</label><input name="atc_rvrc" type="text" value="0" class="input" maxlength="6" size="3" $htmlhide />&nbsp;<select name="atc_enhidetype" id="attmode_1" class="mr5" $htmlhide>$enhidetype</select>&nbsp;以上才能浏览</span>
 								</p>
 							</div>
 <!--
@@ -986,7 +997,7 @@ window.onReady(function(){
 	}
 	/*发帖切换结束*/
 	//Tab切换，使用js/desktop/plugin.js PW.Tab
-	var postTabCfg={"tabs":document.getElementById("tabEditorHead").getElementsByTagName("li"),"container":getElementsByClassName('post_tab_edit_cont',getObj('tabEditorBodys')),"callback":function(tab,bd,i){		
+	var postTabCfg={"tabs":document.getElementById("tabEditorHead").getElementsByTagName("li"),"container":getElementsByClassName('post_tab_edit_cont',getObj('tabEditorBodys')),"callback":function(tab,bd,i){
 		if(getObj("atc_tags")){
 			var tagVal=getObj("atc_tags").value;
 			if(tagVal.replace(/\s*/,"")==""){
@@ -999,20 +1010,17 @@ window.onReady(function(){
 				var inps=getCheckboxElems(body);
 				for(var i=0,len=inps.length;i<len;i++){
 					var item=inps[i];
-					//某些默认值为O的情况
-					if(item.type=="text"&&item.value==0){
-						continue;
-					}
-					//回帖奖励和抢楼帖
-					if(item.id=="atc_replyReward"||item.id=="atc_buildIfcheck"){
-						if(item.checked){
+					//回帖奖励和抢楼帖+密售
+					if(item.id=="atc_replyReward"||item.id=="atc_buildIfcheck"||item.id=="atc_requiresell"||item.id=="atc_requireenhide"){
+						if(item.checked!=item.defaultChecked){
 							tab.firstChild.className="have";
+							return;
 						}else{
 							tab.firstChild.className="";
-							return false;
+							return;
 						}
 					}
-					if((item.type=="checkbox"&&item.checked)||(item.type=="text"&&item.value!="")){
+					if((item.type=="checkbox"&&item.checked!=item.defaultChecked)||(item.type=="text"&&item.value!=item.defaultValue)){
 						checkNum++;
 					}
 				}
@@ -1082,7 +1090,7 @@ function checktitlelength(){
 	}
 	else if(l>=$db_titlemax)
 	{
-		getObj('wordtip').innerHTML='已经超过最大字数限制！';
+		getObj('wordtip').innerHTML='已经超过最大字数限制';
 		getObj('wordtip').style.backgroundColor='#ff9999';
 		getObj('wordtip').style.display='inline';
 	}
@@ -1118,8 +1126,8 @@ print <<<EOT
 		if (action != 'reply'){
 			obj.atc_title.setAttribute("hasError", 1);
 			showDialog({
-				type: "error",
-				message: "<span class='s1'>标题</span> 不能为空。",
+				type: "warning",
+				message: "标题不能为空",
 				onClose: function(){
 					obj.atc_title.focus();
 				}
@@ -1129,8 +1137,8 @@ print <<<EOT
 	} else if (strlen(obj.atc_title.value) > $db_titlemax) {
 		obj.atc_title.setAttribute("hasError", 1);
 		showDialog({
-			type: "error",
-			message: "标题超过最大长度  <span class='s1'>$db_titlemax</span> 个字节",
+			type: "warning",
+			message: "标题超过最大长度{$db_titlemax}个字节",
 			onClose: function(){
 				obj.atc_title.focus();
 			}
@@ -1139,8 +1147,8 @@ print <<<EOT
 	} else if (showGdCode == '1' && obj.gdcode.value == ''){
 		obj.gdcode.setAttribute("hasError", 1);
         showDialog({
-            type: "error",
-            message: "<span class='s1'>验证码</span> 不能为空",
+            type: "warning",
+            message: "验证码不能为空",
             onClose: function(){
             	obj.gdcode.focus();
             }
@@ -1149,7 +1157,7 @@ print <<<EOT
 	} else if (showQAnswer == '1' && obj.qanswer.value == ''){
 		obj.qanswer.setAttribute("hasError", 1);
 		showDialog({
-			type: "error",
+			type: "warning",
 			message: "请输入正确的验证问题答案",
 			onClose : function(){
 				obj.qanswer.focus();
@@ -1160,8 +1168,8 @@ print <<<EOT
 	if (strlen(obj.atc_content.value) < $postMinLength) {
 		obj.atc_content.setAttribute("hasError", 1);
 		showDialog({
-			type: "error",
-			message: "内容少于  <span class=\'s1\'>$postMinLength</span> 个字节。",
+			type: "warning",
+			message: "内容少于{$postMinLength}个字节",
 			onClose : function(){
 				editor.focus();
 			}
@@ -1170,8 +1178,8 @@ print <<<EOT
 	} else if (strlen(obj.atc_content.value) > $db_postmax) {
 		obj.atc_content.setAttribute("hasError", 1);
 		showDialog({
-			type: "error",
-			message: "内容大于  <span class=\'s1\'>$db_postmax</span> 个字节",
+			type: "warning",
+			message: "内容大于{$db_postmax}个字节",
 			onClose: function(){
 				editor.focus();
 			}
@@ -1195,21 +1203,21 @@ print <<<EOT
 			leftcredits = eval('replyReward.userAllCredits.c' + credittype);
 		if (typeof leftcredits == 'undefined') {
 			showDialog({
-				type: "error",
+				type: "warning",
 				message: "回帖奖励积分类型不存在",
 				onClose: function(){}
 			});
 			return false;
 		}else if (totalcredits > leftcredits[0]) {
 			showDialog({
-				type: "error",
-				message: "回帖奖励积分设置超限，请重新设置。",
+				type: "warning",
+				message: "回帖奖励积分设置超限，请重新设置",
 				onClose: function(){}
 			});
 			return false;
 		} else if (totalcredits <= 0) {
 			showDialog({
-				type: "error",
+				type: "warning",
 				message: "回帖奖励积分设置需为大于0的整数",
 				onClose: function(){}
 			});
@@ -1221,7 +1229,7 @@ print <<<EOT
 		for(var i=0,len=B_file_desc.length;i<len;i++){
 			var qlist_li=B_file_desc[i];
 			var qlist_inp=qlist_li.getElementsByTagName("input")[0];
-			if(qlist_inp.value=="请输入描述"){
+			if(qlist_inp!=undefined&&qlist_inp.value=="请输入描述"){
 				qlist_inp.value="";
 			}
 		}
@@ -1231,7 +1239,7 @@ print <<<EOT
 		for(var i=0,len=B_file_ip.length;i<len;i++){
 			var B_image=B_file_ip[i];
 			var B_image_inp=B_image.getElementsByTagName("input")[0];
-			if(B_image_inp.value=="请输入描述"){
+			if(B_image_inp!=undefined&&B_image_inp.value=="请输入描述"){
 				B_image_inp.value="";
 			}
 		}
@@ -1253,8 +1261,8 @@ function ajaxSubmit(obj){
 	ajax.send("post.php?fid=$fid", obj, function(){
 		if (undefined == ajax.request.responseText) {
 			showDialog({
-				type: 'error',
-				message: "<span class=\'s1\'>附件</span> 太大或网络原因，请求超时，请稍后再试!"
+				type: 'warning',
+				message: "<span class=\'s1\'>附件</span>太大或网络原因，请求超时，请稍后再试"
 			});
 			document.FORM.Submit.disabled = false;
 			getObj('divload').innerHTML = '';
@@ -1334,7 +1342,8 @@ var dataStorage = {
 		document.FORM.atc_title.value = PwStorage.load('title') || '';
 		setEditorContent(PwStorage.load('msg'));
 		//初始化@用户
-		if(PwStorage.load('atUserList')){
+		var storageLoad=PwStorage.load('atUserList');
+		if(storageLoad&&storageLoad!=' '){
 			var list=PwStorage.load('atUserList').split(",");
 			if(typeof pwSearch!="undefined"){
 				pwSearch.init('message.php?type=ajax','action=friend','resultd',"",function(obj){
@@ -1345,6 +1354,7 @@ var dataStorage = {
 			}
 		}
 		PwStorage.save('atUserList', ' ');
+		PwStorage.save('msg', ' ');
 		SetCookie('ds', 0);
 	}
 }

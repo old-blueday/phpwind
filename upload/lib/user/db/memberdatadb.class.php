@@ -67,7 +67,12 @@ class PW_MemberdataDB extends BaseDB {
 		foreach ($increments as $field => $offset) {
 			$offset = intval($offset);
 			if (!$offset) continue;
-			$incrementStatement[] = $field . "=" . $field . "+" . $offset;
+			if ($offset<0){
+				$incrementStatement[] = $field . "=" . $field   . $offset;
+			}else{
+				$incrementStatement[] = $field . "=" . $field . "+" . $offset;
+			}
+			
 		}
 		if (empty($incrementStatement)) return 0;
 		//* $this->_db->update("UPDATE " . $this->_tableName . " SET " . implode(", ", $incrementStatement) . " WHERE uid=" . $this->_addSlashes($userId));

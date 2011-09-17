@@ -288,7 +288,7 @@ Breeze.namespace('util.dialog', function(B){
 		Dialog({
 			pos: p ? p : ['center', 'center'],
 			id:'dialog-alert',
-			data:'<div class="B_menu B_dialog_alert B_p10B"><div style="width:200px;"><h4 class="B_h B_drag_handle">警告</h4><p class="B_mb10">'+str+'</p><div class="tac"><span class="B_btn2"><span><button type="button" class="B_close">关闭</button></span></span></div></div></div>',
+			data:'<div class="B_menu B_dialog_alert B_p10B"><div style="width:200px;"><h4 class="B_h B_drag_handle">提示</h4><p class="B_mb10">'+str+'</p><div class="tac"><span class="B_btn2"><span><button type="button" class="B_close">关闭</button></span></span></div></div></div>',
 			reuse: true/*,
 			//mask:true*/
 		},elem);

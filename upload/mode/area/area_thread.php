@@ -307,7 +307,7 @@ if ($fcache < 2) {
 			$limit  = S::sqlLimit($start_limit,$L);
 			$limit2 = $L == $db_perpage ? '' : S::sqlLimit(0,$db_perpage-$L);
 			if ($toptids) {
-				$query = $db->query("SELECT * FROM pw_threads WHERE tid IN($toptids) AND topped>0 ORDER BY topped DESC,$orderway DESC $limit");
+				$query = $db->query("SELECT * FROM pw_threads WHERE tid IN($toptids) AND topped>0 ORDER BY specialsort DESC,$orderway DESC $limit");
 				while ($rt = $db->fetch_array($query)) {
 					$tpcdb[] = $rt;
 				}

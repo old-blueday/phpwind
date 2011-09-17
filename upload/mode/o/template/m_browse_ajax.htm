@@ -1,0 +1,198 @@
+<!--<?php
+if ($act=='postlast'){
+print <<<EOT
+-->
+		<ul class="cc">
+<!--
+EOT;
+foreach($postlast as $key => $value){
+print <<<EOT
+-->			
+				<li>
+					<a href="{$GLOBALS[db_userurl]}$value[uid]" class="user_img _cardshow" data-card-url="pw_ajax.php?action=smallcard&type=showcard&uid={$value[uid]}" data-card-key="{$value['username']}"><img src="{$value['icon']}" width="48" height="48" /></a>
+					<p class="mb10">
+					<!--
+					EOT;
+					$gender = getDefaultGender($value['gender']);
+					if ($GLOBALS['db_showonline'] && $value['thisvisit'] + $GLOBALS['db_onlinetime']*1.5 > $GLOBALS['timestamp']) {
+					print <<<EOT
+					-->
+					<span class="{$gender}_ol mr5" title="在线" alt="在线">在线</span>
+					<!--
+					EOT;
+					} else {
+					print <<<EOT
+					-->
+					<span class="{$gender}_unol mr5" title="离线" alt="离线">离线</span>
+					<!--
+					EOT;
+					}
+					print <<<EOT
+					-->
+
+					<a href="{$GLOBALS[db_userurl]}$value[uid]" class="user_name">$value[username]</a>
+					</p>
+					<span class="fans">粉丝 $value[fans]</span>
+					<!--
+					EOT;
+					if ($value['isAttention']){
+					print <<<EOT
+					-->
+					<a href="javascript:;"  class="add_following">关注中</a>
+					<!--
+					EOT;
+					}else{
+					print <<<EOT
+					-->
+					<a href="javascript:;" onclick="Attention.add(this,'{$value['uid']}',1)" class="add_follow">加关注</a>
+					<!--
+					EOT;
+					}
+					print <<<EOT
+					-->
+				</li>
+<!--
+EOT;
+}
+print<<<EOT
+-->
+			</ul>
+<!--
+EOT;
+}else if ($act=='maxfans'){
+print<<<EOT
+-->
+		<ul class="cc">
+<!--
+EOT;
+foreach($maxfans as $key => $value){
+list($icon) = showfacedesign($value['icon'], 1, 's');
+print <<<EOT
+-->			
+				<li>
+					<a href="{$GLOBALS[db_userurl]}$value[uid]" class="user_img _cardshow" data-card-url="pw_ajax.php?action=smallcard&type=showcard&uid={$value[uid]}" data-card-key="{$value['username']}"><img src="{$value['icon']}" width="48" height="48" /></a>
+					<p class="mb10">
+					<!--
+					EOT;
+					$gender = getDefaultGender($value['gender']);
+					if ($GLOBALS['db_showonline'] && $value['thisvisit'] + $GLOBALS['db_onlinetime']*1.5 > $GLOBALS['timestamp']) {
+					print <<<EOT
+					-->
+					<span class="{$gender}_ol mr5" title="在线" alt="在线">在线</span>
+					<!--
+					EOT;
+					} else {
+					print <<<EOT
+					-->
+					<span class="{$gender}_unol mr5" title="离线" alt="离线">离线</span>
+					<!--
+					EOT;
+					}
+					print <<<EOT
+					-->
+
+					<a href="{$GLOBALS[db_userurl]}$value[uid]" class="user_name">$value[username]</a>
+					</p>
+					<span class="fans">粉丝 $value[fans]</span>
+					<!--
+					EOT;
+					if ($value['isAttention']){
+					print <<<EOT
+					-->
+					<a href="javascript:;"  class="add_following">关注中</a>
+					<!--
+					EOT;
+					}else{
+					print <<<EOT
+					-->
+					<a href="javascript:;" onclick="Attention.add(this,'{$value['uid']}',1)" class="add_follow">加关注</a>
+					<!--
+					EOT;
+					}
+					print <<<EOT
+					-->
+				</li>
+<!--
+EOT;
+}
+print<<<EOT
+-->
+			</ul>
+<!--
+EOT;
+}else if ($act=='weibo'){
+print <<<EOT
+-->		
+<script type="text/javascript" language="JavaScript" src="apps/weibo/js/post.js"></script>
+<script type="text/javascript" language="JavaScript" src="js/pw_weibo.js"></script>
+<script language="javascript">
+var transmitAction = 'lookround';
+</script>
+		<div class="conFeed" id="weiboFeed0" style="padding-left:22px;display:block">
+<!--
+EOT;
+include printEot('writesmile');
+require_once uTemplate::printEot('weibo_model');
+$weiboModelTemplate->setWeiboDiv('_0');
+foreach ($weiboList as $key => $value) {
+	$method = $weiboService->getType($value['type']);
+	$weiboModelTemplate->$method($value);
+}
+
+print <<<EOT
+-->
+		</div>
+		<div class="conFeed" id="weiboFeed1" style="padding-left:22px; display:none">
+<!--
+EOT;
+$weiboModelTemplate->setWeiboDiv('_1');
+foreach ($weiboHotComment as $key => $value) {
+	$method = $weiboService->getType($value['type']);
+	$weiboModelTemplate->$method($value);
+}
+
+print <<<EOT
+-->
+		<!-- <script language="javascript">switchDiv(location.hash ? location.hash.substr(location.hash.length-1, 1) : 0 );</script> -->
+		</div>
+<!--
+EOT;
+}else if ($act=='thread'){
+foreach($threadList as $key => $value){
+print <<<EOT
+-->		
+				
+<!--
+EOT;
+if ($value['anonymous']){
+print <<<EOT
+-->			<dl class="cc">
+			<dt>	
+				<a href="#" class="user_img"><img src="$imgpath/face/none.gif" width="48" height="48" />	</a>
+			</dt>
+					<dd>
+						<p class="mb5">$value[author]:&nbsp;<a href="$value[url]">{$value[subject]}</a>&nbsp;&nbsp;<span class="time">$value[postdate]</span></p>
+						<p class="text">$value[content]</p>
+					</dd>
+			</dl>
+<!--
+EOT;
+}else{
+print <<<EOT
+-->					
+			<dl class="cc">
+			<dt>		
+					<a href="{$GLOBALS[db_userurl]}$value[authorid]" class="user_img _cardshow" data-card-url="pw_ajax.php?action=smallcard&type=showcard&uid={$value[authorid]}" data-card-key="{$value['author']}"><img src="{$value['icon']}" width="48" height="48" /></a>
+			</dt>
+					<dd>
+						<p class="mb5"><a href="{$GLOBALS[db_userurl]}$value[authorid]" class="user_name">$value[author]</a>:&nbsp;<a href="$value[url]">{$value[subject]}</a>&nbsp;&nbsp;<span class="time">($value[postdate])</span></p>
+						<p class="text">$value[content]</p>
+					</dd>
+			</dl>
+<!--
+EOT;
+}
+
+}
+}
+?>

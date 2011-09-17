@@ -63,7 +63,7 @@ class GetInfo {
 		$sqladd = '';
 		if ($type == 'replysort' || $type == 'newsubject') {
 			$forceindex = '';
-			$sqladd .= 'AND t.special=' . S::sqlEscape($special);
+			$special && $sqladd .= 'AND t.special=' . S::sqlEscape($special);
 			$sqladd .= $time ? ' AND t.postdate>' . S::sqlEscape($time) : '';
 			if ($fid) {
 				if (strpos($fid, ',') === false) {
@@ -300,7 +300,9 @@ class GetInfo {
 		$sqladd = '';
 		$sqladd .= $time ? ' AND postdate>' . S::sqlEscape($time) : '';
 		$fid && $sqladd .= " AND fid IN ($fid) ";
-		$sqladd .= $type ? ' AND topped=' . S::sqlEscape($type) : ' AND topped IN(1,2,3)';
+		$sqlTopped = implode(',',array(PW_THREADSPECIALSORT_TOP1,PW_THREADSPECIALSORT_TOP2,PW_THREADSPECIALSORT_TOP3));
+		eval("\$specialSort = PW_THREADSPECIALSORT_TOP$type;");
+		$sqladd .= $type ? ' AND topped=' . S::sqlEscape($specialSort) : " AND topped IN($sqlTopped)";
 		if ($this->reality == false) {
 			$sql = "SELECT tid AS id,lastpost AS value FROM pw_threads WHERE ifcheck='1' $sqladd ORDER BY lastpost DESC " . S::sqlLimit($num);
 		} else {
@@ -637,6 +639,26 @@ class GetInfo {
 			$favors[] = $favor;
 		}
 		return $favors;
+	}
+	function getLastPostUser($limit=10){
+		$userIds=array();
+		$limit = intval($limit) ? intval($limit) : $this->cachenum;
+		$query = $this->db->query("SELECT uid FROM pw_memberdata WHERE lastpost>0  ORDER BY lastpost DESC " . S::sqlLimit($limit));
+		while ($rt = $this->db->fetch_array($query)) {
+			$userIds[]=$rt['uid'];
+		}
+		return $userIds;
+	}
+	function getTotalFansSort($limit=10){
+		$userId=$userIds=array();
+		$limit = intval($limit) ? intval($limit) : $this->cachenum;
+		$query = $this->db->query("SELECT uid,fans FROM pw_memberdata WHERE fans>0  ORDER BY fans DESC " . S::sqlLimit($limit));
+		while ($rt = $this->db->fetch_array($query)) {
+			$userId['uid']=$rt['uid'];
+			$userId['fans']=$rt['fans'];
+			$userIds[]=$userId;
+		}
+		return $userIds;
 	}
 }
 ?>

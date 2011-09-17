@@ -35,9 +35,21 @@ SCR == 'post' && require PrintEot('post_css');
 SCR == 'read' && require PrintEot('read_css');
 print <<<EOT
 -->
+<link rel="icon" href="favicon.ico?v=3" type="image/x-icon" />
 <script type="text/javascript" src="js/core/core.js"></script>
 <script type="text/javascript" src="js/pw_ajax.js"></script>
-<script>var imgpath = '$imgpath';var verifyhash = '$verifyhash';var modeimg = '$pwModeImg';var modeBase = '$baseUrl';var winduid = '$winduid';var windid	= '$windid';var groupid	= '$groupid';var basename = '$basename';var temp_basename = '$temp_basename';var db_shiftstyle = '$db_shiftstyle';var pw_baseurl = "$db_bbsurl";
+<script>
+var imgpath = '$imgpath';
+var verifyhash = '$verifyhash';
+var modeimg = '$pwModeImg';
+var modeBase = '$baseUrl';
+var winduid = '$winduid';
+var windid	= '$windid';
+var groupid	= '$groupid';
+var basename = '$basename';
+var temp_basename = '$temp_basename';
+var db_shiftstyle = '$db_shiftstyle';
+var pw_baseurl = "$db_bbsurl";
 function shiftStyle(){
 	if(db_shiftstyle == 1){
 		if (getObj('widthCfg').innerHTML=='切换到宽版') {
@@ -98,13 +110,19 @@ EOT;
 <body>
 <!--
 EOT;
+$tmpMsgNum = 0;
+($winddb['newpm']>0 && $_G['maxmsg']>=0) && $tmpMsgNum += $winddb['newpm'];
+$winddb['newnotice']>0 && $tmpMsgNum += $winddb['newnotice'];
+$winddb['newrequest']>0 && $tmpMsgNum += $winddb['newrequest'];
+$tmpMsgNums = $tmpMsgNum > 0 ? '('.$tmpMsgNum.')' : '';
+
 $hasNewMessage = $winddb['newpm'] || $winddb['newreferto'] || $winddb['newnotice'] || $winddb['newrequest'] || $winddb['newfans'];
-if($winduid && $hasNewMessage){print <<<EOT
+if($winduid && $hasNewMessage && (!GetCookie('clearm_'.$winduid) || GetCookie('clearm_'.$winduid) < $tmpMsgNum)){print <<<EOT
 -->
 <div id="pw_all_tip" style="display:none;">
 <table><tr><td>
 <div class="pw_all_tip">
-	<a href="javascript:void(0)" class="adel" id="pw_all_tclose">关闭</a>
+	<a href="javascript:void(0)" class="adel" id="pw_all_tclose" data-num="{$tmpMsgNum}">关闭</a>
 <!--
 EOT;
 	if($winddb['newpm']){print <<<EOT
@@ -187,7 +205,6 @@ foreach($_Navbar['head_left'] as $key => $value){
 print <<<EOT
 -->
             <li>$html</li>
-        </ul>
 <!--
 EOT;
 	if (is_array($value['subs'])) {
@@ -214,6 +231,11 @@ print <<<EOT
 EOT;
 		}
 	}
+print <<<EOT
+-->
+        </ul>
+<!--
+EOT;
 }
 print <<<EOT
 -->
@@ -232,7 +254,7 @@ EOT;
 <div class="wrap">
 <div id="header">
      <div id="head" class="cc">
-        <a href="$db_bbsurl/"><img src="$imgpath/$stylepath/logo.png" class="fl" title="$db_bbsname" /></a></td>
+        <a href="$db_bbsurl/"><img src="$imgpath/$stylepath/logo.png" class="fl" title="$db_bbsname" /></a>
 <!--
 EOT;
 require PrintEot('header_login');
@@ -504,6 +526,37 @@ function ctrlSubMenu(parentId, subMenuId) {
     <div id="searchA">
     	<div class="searchA_right fr">&nbsp;</div>
         <div class="searchA cc">
+<!--
+EOT;
+/* platform weibo app --start */
+$weiboSiteBindInfoService = L::loadClass('WeiboSiteBindInfoService', 'sns/weibotoplatform/service'); /* @var $weiboSiteBindInfoService PW_WeiboSiteBindInfoService */
+$accounts = $weiboSiteBindInfoService->getOfficalAccounts();
+if ($accounts) {
+print <<<EOT
+-->
+<style type="text/css">
+.weibos{height:22px;overflow:hidden;padding-left:10px; float:right;*width:250px;}
+.weibos iframe{float:right;}
+</style>
+	<span class="weibos">
+<!--
+EOT;
+	foreach ($accounts as $key => $account) {
+print <<<EOT
+-->
+		$account[followButton]
+<!--
+EOT;
+	}
+print <<<EOT
+-->
+	</span>
+<!--
+EOT;
+}
+/* platform weibo app --end */
+print <<<EOT
+-->
 <script>
 var ins_method = 'AND';
 var ins_sch_area = '1';
@@ -579,37 +632,6 @@ EOT;
 print <<<EOT
 -->
             </div>
-<!--
-EOT;
-/* platform weibo app --start */
-$weiboSiteBindInfoService = L::loadClass('WeiboSiteBindInfoService', 'sns/weibotoplatform/service'); /* @var $weiboSiteBindInfoService PW_WeiboSiteBindInfoService */
-$accounts = $weiboSiteBindInfoService->getOfficalAccounts();
-if ($accounts) {
-print <<<EOT
--->
-<style type="text/css">
-.weibos{float:right;clear:right;height:22px;overflow:hidden;margin-top:-32px;*margin-top:-21px;padding-left:10px;}
-.weibos iframe{float:right;}
-</style>
-	<div class="weibos">
-<!--
-EOT;
-	foreach ($accounts as $type => $account) {
-print <<<EOT
--->
-		$account[followButton]
-<!--
-EOT;
-	}
-print <<<EOT
--->
-	</div>
-<!--
-EOT;
-}
-/* platform weibo app --end */
-print <<<EOT
--->
         </div>
     </div>
 <!--

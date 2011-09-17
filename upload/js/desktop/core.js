@@ -15,78 +15,122 @@ $removeNode=function(htmlElement)
  *根据ID获取节点对象
  *@param String id 节点id
  */
-getObj = function(id) 
+var getObj = function(id) 
 {
     return document.getElementById(id);
 };
 
-~function()
-{
-	/*
-	 *将readyBound加入到闭包环境，避免使用全局变量
+//通用domready
+(function(win,doc){
+	var dom = [];
+	dom.isReady  = false;
+	win.onReady = function(fn){
+		if ( dom.isReady ) {
+			fn()
+		} else {
+			dom.push( fn );
+		}
+	}
+	dom.fireReady = function() {
+		if ( !dom.isReady ) {
+			if ( !doc.body ) {
+				return setTimeout( dom.fireReady, 16 );
+			}
+			dom.isReady = 1;
+			if ( dom.length ) {
+				for(var i = 0, fn;fn = dom[i];i++)
+					fn()
+			}
+		}
+	}
+	if ( doc.readyState === "complete" ) {
+		dom.fireReady();
+	}else if(-[1,] ){
+		doc.addEventListener( "DOMContentLoaded", function() {
+	  		doc.removeEventListener( "DOMContentLoaded",  arguments.callee , false );
+	  		dom.fireReady();
+		}, false );
+	}else {
+		doc.attachEvent("onreadystatechange", function() {
+		  if ( doc.readyState == "complete" ) {
+			doc.detachEvent("onreadystatechange", arguments.callee );
+			dom.fireReady();
+		  }
+	});
+	(function(){
+		if ( dom.isReady ) {
+			return;
+		}
+		var node = new Image();
+		try {
+			node.doScroll();
+			node = null;
+		} catch( e ) {
+			setTimeout( arguments.callee, 64 );
+			return;
+		}
+	  	dom.fireReady();
+	})();
+  }
+})(window,document);
+
+(function(win){
+	/**
+	 *通用事件处理函数
 	 */
-	var readyBound=false;
-	/*
-	 *页面代码加载完毕时执行，比onload要早执行。
-	 */
-	window.onReady = function(fallBackFunction)
-	{
-		if (window.readyBound) return;
-		readyBound = true;
-		var ready = 0;
-		// Mozilla, Opera and webkit nightlies currently support this event
-		if (document.addEventListener)
-		{
-			// Use the handy event callback
-			document.addEventListener("DOMContentLoaded",
-			function()
-			{
-				document.removeEventListener("DOMContentLoaded", arguments.callee, false);
-				if (ready) return;
-				ready = 1;
-				fallBackFunction?fallBackFunction():0;
-			},
-			false);
-
-			// If IE event model is used
-		} else if (document.attachEvent)
-		{
-			// ensure firing before onload,
-			// maybe late but safe also for iframes
-			document.attachEvent("onreadystatechange",
-			function()
-			{
-				if (document.readyState === "complete")
-				{
-					document.detachEvent("onreadystatechange", arguments.callee);
-					if (ready) return;
-					ready = 1;
-					fallBackFunction?fallBackFunction():0;
+	// http://dean.edwards.name/weblog/2005/10/add-event/
+	win.addEvent = function(element, type, handler) {
+		if (element.addEventListener) {
+			element.addEventListener(type, handler, false);
+		} else {
+			if (!handler.$$guid) handler.$$guid = addEvent.guid++;
+			if (!element.events) element.events = {};
+			var handlers = element.events[type];
+			if (!handlers) {
+				handlers = element.events[type] = {};
+				if (element["on" + type]) {
+					handlers[0] = element["on" + type];
 				}
-			});
-
-			// If IE and not an iframe
-			// continually check to see if the document is ready
-			if (document.documentElement.doScroll && window == window.top)(function()
-			{
-				if (ready) return;
-				try
-				{
-					// If IE is used, use the trick by Diego Perini
-					// http://javascript.nwbox.com/IEContentLoaded/
-					document.documentElement.doScroll("left");
-				} catch(error)
-				{
-					setTimeout(arguments.callee, 0);
-					return;
-				}
-				ready = 1;
-				fallBackFunction?fallBackFunction():0;
-
-			})();
+			}
+			handlers[handler.$$guid] = handler;
+			element["on" + type] = handleEvent;
 		}
 	};
-}();
+	addEvent.guid = 1;
+	function removeEvent(element, type, handler) {
+		if (element.removeEventListener) {
+			element.removeEventListener(type, handler, false);
+		} else {
+			if (element.events && element.events[type]) {
+				delete element.events[type][handler.$$guid];
+			}
+		}
+	};
+	win.removeEvent=removeEvent;
+	function handleEvent(event) {
+		var returnValue = true;
+		event = event || fixEvent(((this.ownerDocument || this.document || this).parentWindow || window).event);
+		var handlers = this.events[event.type];
+		for (var i in handlers) {
+			this.$$handleEvent = handlers[i];
+			if (this.$$handleEvent(event) === false) {
+				returnValue = false;
+			}
+		}
+		return returnValue;
+	};
+	function fixEvent(event) {
+		event.preventDefault = fixEvent.preventDefault;
+		event.stopPropagation = fixEvent.stopPropagation;
+		return event;
+	};
+	fixEvent.preventDefault = function() {
+		this.returnValue = false;
+	};
+	fixEvent.stopPropagation = function() {
+		this.cancelBubble = true;
+	};
+})(window);
 /**
  *创建函数的代理，并将作用域(this)指向首个参数
  * @param Object b 当前作用域对象，将b替换函数内的this对象

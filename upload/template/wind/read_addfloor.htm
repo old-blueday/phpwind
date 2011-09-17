@@ -18,7 +18,7 @@ print <<<EOT
 <!--
 EOT;
 	if ($db_showonline) {
-	$gender = $read['gender'] == 2 ? 'women' : 'man';
+	$gender = getDefaultGender($read['gender']);
 		if (checkOnline($read['thisvisit'])) {print <<<EOT
 -->
 							<span class="{$gender}_ol mr5" title="在线" alt="在线">在线</span>
@@ -62,7 +62,7 @@ print <<<EOT
 								<div class="card" style="display:none" id="readFace_{$read[lou]}" onmouseover="this.style.display='';" onmouseout="this.style.display='none';">
 									<dl class="cc">
 										<dt class="fl">
-											<div class="cc"><a href="{$db_userurl}$read[authorid]" class="face_img"><img class="pic" src="$imgpath/blank.gif" style="background:$forumcolorone url({$read[face]}) center center no-repeat;" {$read[facesize]} border="0" title="$read[author]" /></a></div>
+											<div class="cc"><a href="{$db_userurl}$read[authorid]" class="face_img"><img class="pic" src="{$read[face]}" {$read[facesize]} border="0" title="$read[author]" /></a></div>
 											<p>UID：$read[authorid]</p>
 <!--
 EOT;
@@ -136,7 +136,7 @@ print <<<EOT
 											</ul>
 										</dd>
 										<dd class="ddB">
-											<a href="{$db_userurl}$read[authorid]" class="add_home">访问TA的空间</a><a href="javascript:;" onclick="sendmsg('pw_ajax.php?action=addfriend&touid=$read[authorid]')" class="add_fri">加好友</a><a href="javascript:;" onclick="sendmsg('pw_ajax.php?action=usertool&uid=$read[authorid]')" class="add_pro">用道具</a>
+											<a href="{$db_userurl}$read[authorid]" class="add_home">访问TA的空间</a><a href="javascript:;" onclick="sendmsg('pw_ajax.php?action=addfriend&touid=$read[authorid]')" class="add_fri">加好友</a><a href="javascript:;" onclick="sendmsg('pw_ajax.php?action=usertool&uid=$read[authorid]','',this.id)" class="add_pro">用道具</a>
 										</dd>
 									</dl>
 								</div>
@@ -310,7 +310,7 @@ EOT;
 EOT;
 		if (isset($db_hackdb['toolcenter']) && $db_toolifopen) {print <<<EOT
 -->
-									<li><a href="javascript:;" id="usetool" onclick="sendmsg('pw_ajax.php?action=usetool','','td_More')">使用道具</a></li>
+									<li><a href="javascript:;" id="usetool" onclick="sendmsg('pw_ajax.php?action=usetool','',this.id)">使用道具</a></li>
 <!--
 EOT;
 		}print <<<EOT
@@ -318,7 +318,7 @@ EOT;
 									
 								</ul>
 							</div></td><td class="pobg2"></td></tr><tr><td class="bgcorner4"></td><td class="pobg3"></td><td class="bgcorner3"></td></tr></tbody></table></div>				
-							<input type="text" class="input mr5" style="width:20px;padding:1px;" name="floor{$read[pid]}" id="floor{$read[pid]}" onkeypress="if(event.keyCode == 13){getFloorUrl(this);return false;};" /><img src="$imgpath/pwicon/stairs.png" onclick="getFloorUrl(getObj('floor{$read[pid]}'))" title="楼层直达" class="cp" align="absmiddle" />
+							<input type="text" class="input mr5" style="width:20px;padding:1px;" name="floor{$read[pid]}" id="floor{$read[pid]}" onkeypress="if(event.keyCode == 13){getFloorUrl(this);return false;};" /><img src="$imgpath/pwicon/stairs.png" onclick="getFloorUrl(getObj('floor{$read[pid]}'))" title="楼层直达" class="cp" align="absmiddle" title="查看指定楼层" />
 <!--
 EOT;
 	}print <<<EOT
@@ -899,110 +899,88 @@ print <<<EOT
 <!--
 EOT;
 $stylePingMarkShow = isset($ping_logs[$read['pid']]) ? 'display:' : 'display:none';
-if ($_COOKIE['read_hidepinglog']) {
-	$stylePingPageShow = 'display:none';
-	$pingButton = '显示';
-} else {
-	$pingButton = '隐藏';
-}
 print <<<EOT
 -->
-					<div id="mark_$read[pid]" class="score cc mb10" style="$stylePingMarkShow">
-						<div class="scoreTop">
+<div class="read_score mb20" style="$stylePingMarkShow" id="mark_$read[pid]">
+	<div class="read_score_head">
 <!--
 EOT;
 if ($isGM || $pwSystem['pingcp']) {print <<<EOT
 -->
-							<a href="masingle.php?action=pingcp&fid=$fid&tid=$tid&pid=$read[pid]&rpage=$page" onclick="return sendurl(this,2)" title="管理评分记录" class="fr">评分管理</a>
+		<a href="masingle.php?action=pingcp&fid=$fid&tid=$tid&pid=$read[pid]&rpage=$page" onclick="sendmsg('masingle.php?ajax=1&action=pingcp&fid=$fid&tid=$tid&pid=$read[pid]&rpage=$page')" title="管理评分记录" class="fr s4">评分管理</a>
 <!--
 EOT;
 }print <<<EOT
 -->
-							<span class="b">本帖最近评分记录：</span>
-							<span class="mr10">
-								共 <span class="s2" id="pingNum_{$read['pid']}">{$ping_logs[$read['pid']]['count']}</span> 条评分
+    共<span class="s2"  id="pingNum_{$read['pid']}">{$ping_logs[$read['pid']]['count']}</span>条评分<span id="pingTotal_{$read['pid']}">
 <!--
 EOT;
 if ($ping_logs[$read['pid']]['creditCount']) {print <<<EOT
 -->
-								<span class="s2 pd15">
 <!--
 EOT;
 foreach ($ping_logs[$read['pid']]['creditCount'] as $k => $v) {print <<<EOT
 -->
-									{$creditnames[$k]} {$v} 
+		，<span>{$creditnames[$k]}<span class="s2 b">{$v}</span></span>
 <!--
 EOT;
 }print <<<EOT
 -->
-								</span>
 <!--
 EOT;
 }print <<<EOT
 -->
-							</span>
-							<a id="pingHide_{$read['pid']}" href="javascript:void(0);" onclick="pingHideCtrl('{$read['pid']}');">$pingButton</a>
-						</div>
-						<div class="scoreContent">
-              <div id="createpingbox_{$read['pid']}"></div>
-							<table width="100%" style="table-layout:fixed;">
-								<tbody id="pingPage_{$read['pid']}" style="$stylePingPageShow">
+			</span>
+		</div>
+		<div id="pingtable{$read['pid']}"> 
+    <div id="createpingbox_{$read['pid']}"></div>                      
+	<table width="100%">
 <!--
 EOT;
 if (isset($ping_logs[$read['pid']]['count']) && $ping_logs[$read['pid']]['count']) {
-	foreach ($ping_logs[$read['pid']]['data'] as $pingdata) {
+foreach ($ping_logs[$read['pid']]['data'] as $pingdata) {
 print <<<EOT
 -->
-								<tr id="pingLogTr_{$pingdata['id']}" class="vt" onmouseover="showPingDelLink(this, true)" onmouseout="showPingDelLink(this, false)">
-									<th class="p_face">
-                                    	<div id="card_pingUserShow_{$pingdata[id]}_{$pingdata[uid]}" class="userCard"><img src="{$pingdata['icon']}" width="16" height="16" /></div>
-										<span id="pingUserShow_{$pingdata['id']}"></span>
-									</th>
-									<td class="p_name"><a target="_blank" href="u.php?uid={$pingdata['uid']}">{$pingdata['pinger']}</a></td>
-									<td width="60">{$pingdata['name']}</td>
-									<td class="s2 b" width="40">{$pingdata['point']}</td>
-									<td width="90">{$pingdata['pingtime']}</td>
-									<td>{$pingdata['record']}</td>
-									<td width="20">
+		<tr id="pingLogTr_{$pingdata['id']}" class="vt" onmouseover="showPingDelLink(this, true)" onmouseout="showPingDelLink(this, false)">
+			<td width="34" class="read_score_face">
+			<div id="card_pingUserShow_{$pingdata[id]}_{$pingdata[uid]}" class="userCard" ><a href="u.php?uid={$pingdata['uid']}"><img src="{$pingdata['icon']}" width="24" height="24" /></a>
+            <span id="pingUserShow_{$pingdata['id']}"></span>
+            </div>
+			</td>
+			<td width="45"><a target="_blank" href="u.php?uid={$pingdata['uid']}" data-card-url="pw_ajax.php?action=smallcard&type=showcard&uid={$pingdata[uid]}" class=" _cardshow s4 w mr10" data-card-key="{$pingdata['pinger']}">{$pingdata['pinger']}</a></td>
+			<td width="60"><span class="mr10 w">{$pingdata['name']}<span class="s2 b">{$pingdata['point']}</span></span></td>
+			<td>{$pingdata['record']}</td>
+			<td class="gray read_score_time" width="80">{$pingdata['pingtime']}
+			</td>
 <!--
 EOT;
-		if ($admincheck || ($_G['markable'] && $pingdata['pinger'] == $windid)) {
+	if ($admincheck || ($_G['markable'] && $pingdata['pinger'] == $windid)) {
 print <<<EOT
 -->
-										<a class="adel" style="display:none;" id="pingDel_{$pingdata['id']}" href="javascript:void(0);" onclick="delPingLog('$fid', '$tid', '{$read['pid']}', '{$pingdata['id']}')">删除</a>
+      <td width="30"><a style="display:none;" class="s4" id="pingDel_{$pingdata['id']}" href="javascript:void(0);" onclick="delPingLog('$fid', '$tid', '{$read['pid']}', '{$pingdata['id']}')">删除</a></td>
 <!--
 EOT;
 		}
 print <<<EOT
 -->
-									</td>
-								</tr>
+			</tr>
 <!--
 EOT;
 	}
-}
-print <<<EOT
+}print <<<EOT
 -->
-								</tbody>
-							</table>
-						</div>
-<!--
-EOT;
-	if ($ping_logs[$read['pid']]['count'] > 10) {
-print <<<EOT
--->
-                            <!--a id="pingMore_{$read['pid']}" href="javascript:void(0);" onclick="setTimeout(function(){showPingPage('$fid', '$tid', '{$read['pid']}');}, 200);">查看更多</a-->
-<!--
-EOT;
-	}
-print <<<EOT
--->
+		
+	</table>
+	<div class="p10 cc">
+		{$ping_logs[$read['pid']]['pages']}
 <input id="pingPageNum_{$read['pid']}" type="hidden" value="2" />
 <script>
 getObj('pingPageNum_{$read["pid"]}').value = 2;
 </script>
-					</div>
+		</div>
+</div>
 					<div id="w_$read[pid]" class="c"></div>
+</div>
 <!--评分结束-->
 <!--
 EOT;
@@ -1150,7 +1128,7 @@ EOT;
 EOT;
 }if($db_iftag && $read['tag']){print <<<EOT
 -->
-					<div class="tal mb10">关键词: {$read[tag]}</div>
+					<div class="tal mb10">关键词： {$read[tag]}</div>
 <!--
 EOT;
 }
@@ -1211,26 +1189,21 @@ print <<<EOT
 EOT;
 if($read['lou']==0){print <<<EOT
 -->
-							<a class="r-reply" title="回复此楼" href="javascript:;" onclick="postreply('回 楼主($read[anonymousname]) 的帖子');">回复</a>
+							<a class="r-reply" title="回复此楼" href="javascript:;" onclick="postreply('回 楼主($read[anonymousname]) 的帖子','pw_ajax.php?action=quickpost&fid=$fid&tid=$tid&pid=$read[pid]&article=$read[lou]&page=$page');">回复</a>
 <!--
 EOT;
 }else{print <<<EOT
 -->
-							<a class="r-reply" title="回复此楼" href="javascript:;" onclick="postreply('回 $read[lou]楼($read[author]) 的帖子');">回复</a>
+							<a class="r-reply" title="回复此楼" href="javascript:;" onclick="postreply('回 $read[lou]楼($read[author]) 的帖子','pw_ajax.php?action=quickpost&fid=$fid&tid=$tid&pid=$read[pid]&article=$read[lou]&page=$page');">回复</a>
 <!--
 EOT;
-}print <<<EOT
--->
-							<a class="r-quote" href="post.php?action=quote&fid=$fid&tid=$tid&pid=$read[pid]&article=$read[lou]&page=$page" onclick="return sendurl(this,4,'',event)" id="quote_$read[pid]" title="{$quote_title}">引用</a>
-<!--
-EOT;
-if($read[pid] != 'tpc'){print <<<EOT
+} if($read[pid] != 'tpc'){print <<<EOT
 -->
 <!--
 EOT;
 	if($admincheck || $_G['markable']){print <<<EOT
 -->
-										<a class="r-score" id="showping_$read[pid]" href="operate.php?action=showping&tid=$tid&pid=$read[pid]&page=$page" onclick="return sendurl(this,8)" title="评分">评分</a>
+										<a class="r-score" id="showping_$read[pid]" href="operate.php?action=showping&tid=$tid&pid=$read[pid]&page=$page" onclick="sendmsg('operate.php?action=showping&tid=$tid&pid=$read[pid]&page=$page&ajax=1')" title="评分">评分</a>
 <!--
 EOT;
 	}

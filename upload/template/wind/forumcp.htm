@@ -575,7 +575,7 @@ if($thread[specialsort]==PW_THREADSPECIALSORT_KMD){print <<<EOT
 EOT;
 }elseif($thread[topped]){print <<<EOT
 -->
-<img src="$imgpath/$stylepath/file/headtopic_$thread[topped].gif" alt="置顶帖标志" align="absmiddle" />
+<img src="$imgpath/$stylepath/file/headtopic_$thread[topped].gif" alt="置顶帖" align="absmiddle" />
 <!--
 EOT;
 }print <<<EOT
@@ -585,7 +585,7 @@ EOT;
 EOT;
 if($thread[digest]){ print <<<EOT
 -->
-<img src="$imgpath/$stylepath/file/digest_$thread[digest].gif" alt="精华帖标志" align="absmiddle" />
+<img src="$imgpath/$stylepath/file/digest_$thread[digest].gif" alt="精华帖" align="absmiddle" />
 <!--
 EOT;
 }print <<<EOT
@@ -650,12 +650,10 @@ EOT;
 <input type="hidden" name="type" value="$type" />
 <input type="hidden" name="fid" value="$fid" />
 <div class="p10 f_two">
-	<span>
 		短消息通知：
 		<label class="mr10"><input type="radio" name="ifmsg" value="1" checked />是</label>
-		<label class="mr20"><input type="radio" name="ifmsg" value="0"/>否</label>
-	</span>
-	<label class="mr10"><input type="radio" name="step" value="3" checked /> 审核通过</label>
+		<label class="mr20"><input type="radio" name="ifmsg" value="0"/>否</label><span class="mr20 gray">|</span>审核：
+	<label class="mr10"><input type="radio" name="step" value="3" checked /> 通过</label>
 	<label class="mr10"><input type="radio" name="step" value="5" /> 删除</label>
 	<span class="bt2"><span><button type="button" onclick="CheckAll(this.form)" name="chkall">全 选</button></span></span>
 	<span class="btn2"><span><button type="submit" name="hello">提 交</button></span></span>
@@ -714,12 +712,10 @@ EOT;
 <input type="hidden" name="type" value="$type" />
 <input type="hidden" name="fid" value="$fid" />
 <div class="p10 f_two">
-	<span>
 		短消息通知：
 		<label class="mr10"><input type="radio" name="ifmsg" value="1" checked />是</label>
-		<label class="mr20"><input type="radio" name="ifmsg" value="0"/>否</label>
-	</span>
-	<label class="mr10"><input type="radio" name="step" value="3" checked /> 审核通过</label>
+		<label class="mr20"><input type="radio" name="ifmsg" value="0"/>否</label><span class="mr20 gray">|</span>审核：
+	<label class="mr10"><input type="radio" name="step" value="3" checked /> 通过</label>
 	<label class="mr10"><input type="radio" name="step" value="5" /> 删除</label>
 	<span class="bt2"><span><button type="button" onclick="CheckAll(this.form)" name="chkall">全 选</button></span></span>
 	<span class="btn2"><span><button type="submit" name="hello">提 交</button></span></span>
@@ -734,11 +730,11 @@ EOT;
 <div class="h">版主推荐列表</div>
 <table width="100%" align="center" cellspacing="0" cellpadding="0">
 <tr class="tr2">
-	<td width="35">ID</td>
+	<td width="30">选项</td>
+	<!--td width="35">ID</td-->
 	<td>标题</td>
 	<td width="100px">作者</td>
 	<td width="120px">发表日期</td>
-	<td width="40">选项</td>
 </tr>
 <!--
 EOT;
@@ -748,11 +744,11 @@ $i++;
 print <<<EOT
 -->
 <tr class="tr3">
-	<td>$i</td>
+	<td><input type="checkbox" name="selid[]" value="$thread[tid]" /></td>
+	<!--td>$i</td-->
 	<th><a href="read.php?tid=$thread[tid]" target="_blank">$thread[subject]</a></th>
 	<td><a href="{$db_userurl}$thread[authorid]">$thread[author]</a></td>
 	<td>$thread[postdate]</td>
-	<td><input type="checkbox" name="selid[]" value="$thread[tid]" /></td>
 </tr>
 <!--
 EOT;

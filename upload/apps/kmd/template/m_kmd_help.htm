@@ -97,10 +97,10 @@ print <<<EOT
 <!--
 EOT;
 foreach($spreads as $spread){
-	$discount = (0 < $spread['discount'] && $spread['discount'] < 10) ? $spread['discount'] .'折' : '无折扣';
+	$discount = (0 < $spread['discount'] && $spread['discount'] < 10) ? '<span class="s2">'.$spread['discount'] .'</span>折' : '无折扣';
 print <<<EOT
 -->	
-					<li><a href="javascript:;" class="mr10">{$spread['name']}</a><span class="mr10">{$spread['day']}天</span><span class="mr10">{$spread['price']}元</span><span class="w">{$discount}</span></li>
+					<li><span class="mr10">{$spread['name']}</span><span class="s2">{$spread['price']}</span>元/<span class="s2">{$spread['day']}</span>天&nbsp;&nbsp;{$discount}</li>
 <!--
 EOT;
 }print <<<EOT

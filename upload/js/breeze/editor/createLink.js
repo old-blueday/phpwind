@@ -71,7 +71,7 @@ Breeze.namespace('editor.createLink', function (B) {
                         B.remove(this.parentNode.parentNode);
                     });*/
                     //点击确认按钮产生需要的html
-                    B.$('#btn_submit_url').onclick = function () {
+                    B.$('#btn_submit_url').onmousedown = function (e) {
                         var rows = table.rows,
                             isdownload = B.$('#url-isdownload').checked,
                             html = '';
@@ -83,6 +83,7 @@ Breeze.namespace('editor.createLink', function (B) {
                             html += '<a href="' + url + (isdownload ? ',1' : '') + '" target="_self">' + text + '</a> ';
                         callback(html);
                         popup.closep();
+						return false;
                     }
                 }
             }, elem);

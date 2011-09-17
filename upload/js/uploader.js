@@ -165,7 +165,7 @@ var uploader = {
 						tfoot.style.display='';
 					uploader.countFile();
 				} else {
-					ajax_guide();
+					showDlg("error","删除失败")
 				}
 			});
 		}else{
@@ -332,7 +332,7 @@ var uploader = {
 				}
 				document.getElementById('uploadFileInfo').style.display = document.getElementById('qlist').rows.length?'':'none';
 			} else {
-				ajax_guide();
+				showDlg("error","删除失败")
 			}
 		});
 	},

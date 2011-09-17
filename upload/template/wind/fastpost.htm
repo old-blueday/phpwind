@@ -9,8 +9,9 @@ $imageConfigTabs = array();
 $imageConfigTabs[] = 'network';
 $imageConfigTabs = "'" . implode("','", $imageConfigTabs) . "'";
 //max attachnum
-if ($_G['allownum'] > 0 && $_G['allownum'] - $winddb['uploadnum']<$db_attachnum){
-	$maxAttachnum = $_G['allownum'] - $winddb['uploadnum'];
+$uploadedNum = $winddb['uploadtime'] < $tdtime ? 0 : $winddb['uploadnum'];
+if ($_G['allownum'] > 0 && $_G['allownum'] - $uploadedNum<$db_attachnum){
+	$maxAttachnum = $_G['allownum'] - $uploadedNum;
 } else {
 	$maxAttachnum = $db_attachnum;
 }
@@ -61,7 +62,7 @@ print <<<EOT
 -->
 				</div>
 				<div class="floot_leftdiv">
-					<div class="face_img"><img class="pic" src="$imgpath/blank.gif" style="background:$forumcolorone url({$fp_face}) center center no-repeat;" width="120" height="120" {$fp_size} border="0" /></div>
+					<div class="face_img"><img class="pic" src="{$fp_face}" width="120" height="120" {$fp_size} border="0" /></div>
 				</div>
 			</td>
 			<td class="p10">
@@ -320,7 +321,7 @@ print <<<EOT
 			<tr>
 				<td class="tar" width="75">验证问题：</td>
 				<td>
-					<input name="qanswer" id="input_qanswer" type="text" style="width:50px;" class="input mr5">{$q_a}
+					<input name="qanswer" id="input_qanswer" type="text" style="width:50px;" onKeyUp="checkGDkey(event);" class="input mr5">{$q_a}
 					<input type="hidden" name="qkey" value="$qkey" />
 				</td>
 			</tr>
@@ -414,9 +415,10 @@ function loadEditor(e) {
 
 var dataStorage = {
 	save : function(quick) {
+		SetCookie('ds', 1);
 		var title=quick?document.quickpostForm.atc_title.value:document.FORM.atc_title.value;
-		var cont=quick?document.quickpostForm.atc_content.value:document.FORM.atc_content.value
-		if (PwStorage.save('msg',cont)) {
+		var cont=quick?document.quickpostForm.atc_content.value:document.FORM.atc_content.value;
+			PwStorage.save('msg',cont);
 			PwStorage.save('title',title, 1);
 			//如果有@权限
 			if(getObj("get_friend")!=null){
@@ -434,10 +436,6 @@ var dataStorage = {
 					PwStorage.save('atUserList',atUserList)
 				}
 			}
-			SetCookie('ds', 1);
-			return true;
-		}
-		return false;
 	},
 	load : function() {
 		document.FORM.atc_title.value = PwStorage.load('title') || '';
@@ -471,23 +469,24 @@ var cnt = 0;
 {$facedb}
 window.onReady(function(){PwFace.init('face_tab', 'face_main', 3, 16)});
 function checkpost(obj){
+	try{clearEditorDialog();}catch(e){}//关闭编辑器相关弹窗 pw_lwd.js
 	//过滤描述
 	if(getObj("B_qlist")){
 		var B_file_desc=getElementsByClassName("B_file_desc",getObj("B_qlist"));
 		for(var i=0,len=B_file_desc.length;i<len;i++){
 			var qlist_li=B_file_desc[i];
 			var qlist_inp=qlist_li.getElementsByTagName("input")[0];
-			if(qlist_inp.value=="请输入描述"){
+			if(qlist_inp!=undefined&&qlist_inp.value=="请输入描述"){
 				qlist_inp.value="";
 			}
-		}
+		}	
 	}
 	if(getObj("B_image_tile")){
 		var B_file_ip=getElementsByClassName("B_file_ip",getObj("B_image_tile"));
 		for(var i=0,len=B_file_ip.length;i<len;i++){
 			var B_image=B_file_ip[i];
 			var B_image_inp=B_image.getElementsByTagName("input")[0];
-			if(B_image_inp.value=="请输入描述"){
+			if(B_image_inp!=undefined&&B_image_inp.value=="请输入描述"){
 				B_image_inp.value="";
 			}
 		}
@@ -602,6 +601,9 @@ function ajaxSubmit(obj){
 }
 function postfloor(obj){
 	var url = 'post.php?fid=$fid';
+	if (obj.name == 'quickpostForm' && obj.pid.value > 0) {
+		obj.action.value = 'quote';
+	}
 	ajax.send(url, obj, function() {
 		var changeCheck = true;
 		var rText = ajax.runscript(ajax.request.responseText);
@@ -631,7 +633,9 @@ function postfloor(obj){
 				run();
 			}
 			//end
-			document.forms['delatc'].innerHTML += rText;
+			var div=document.createElement("div");
+			div.innerHTML=rText;
+			document.forms['delatc'].appendChild(div);
 			obj.reset();
 			if(editor) editor.reset();
 			if(pwSearch) pwSearch.clear();//清除@的人
@@ -642,7 +646,6 @@ function postfloor(obj){
 			if(typeof uploader!="undefined"){
 				uploader.data={};
 			}
-			clearEditorDialog();//关闭编辑器相关弹窗 pw_lwd.js
 			//end
 			loadFloor.showHidden(tid);
 			obj.iscontinue.value = 0;
@@ -691,7 +694,7 @@ function postfloor(obj){
 		if (getObj('creditlocation')) {
 			setTimeout(function() {
 				getObj('creditlocation').parentNode.removeChild(getObj('creditlocation'));;
-			},1000);
+			},3000);
 		};
 	});
 }

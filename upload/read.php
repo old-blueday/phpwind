@@ -14,6 +14,7 @@ $fieldadd = $tablaadd = $sqladd = $fastpost = $special = $ifmagic = $urladd = $f
 $_uids    = $_pids = $colony = array();
 $page = S::getGP('page');
 $page < 1 && $page != 'e' && $page = 1;
+
 if (Perf::checkMemcache()) {
 	$_cacheService = Perf::getCacheService();
 	$_thread = $_cacheService->get('thread_tid_' . $tid);
@@ -222,6 +223,7 @@ if ($read['ifmagic'] && $db_windmagic) {
 	$ifmagic = 1;
 	list($magicid,$magicname) = explode("\t",$read['magic']);
 }
+$topped_count = $read['topreplays'];
 if (isset($uid) && $read['replies'] > 0) {#只看作者回复数统计
 	$uid = intval($uid);
 	$rt = $db->get_one("SELECT COUNT(*) AS n FROM $pw_posts WHERE tid=" . S::sqlEscape($tid) . " AND authorid=" . S::sqlEscape($uid) . " AND anonymous='0' AND ifcheck='1'");
@@ -229,13 +231,14 @@ if (isset($uid) && $read['replies'] > 0) {#只看作者回复数统计
 	$sqladd = 'AND t.authorid=' . S::sqlEscape($uid) . " AND t.anonymous='0'";
 	$urladd = "&uid=$uid";
 	$openIndex = false;
+	unset($topped_count);
 }
 if ($openIndex) {#高楼帖子索引
 	$count = 1 + $db->get_value("SELECT max(floor) FROM pw_postsfloor WHERE tid =". S::sqlEscape($tid));
 } else {
 	$count = $read['replies']+1;
 }
-$topped_count = $read['topreplays'];
+
 //抢楼贴 start
 if (getstatus($read['tpcstatus'], 7)) {
 	$robbuildService = L::loadClass("robbuild", 'forum');
@@ -793,13 +796,15 @@ if (!$forumset['rate'] && $rateSets[1] && isset($db_hackdb['rate'])) {
 	require_once R_P . 'hack/rate/index.php';
 }
 
+s::gp(array('pingpage'));
+!$pingpage && $pingpage = 1;
 if(Perf::checkMemcache()){
       $_cacheService = Perf::gatherCache('pw_ping');
-      $ping_logs = $_cacheService->getPingsByThreadId($tid,$ping_logs);
+      $ping_logs = $_cacheService->getPingsByThreadId($tid,$ping_logs,$pingpage);
 }else{
 	if($ping_logs) {
-	  $pingService = L::loadClass("ping", 'forum');
-	  $ping_logs = $pingService->getPingLogs($tid, $ping_logs);
+	  $pingService = L::loadClass('ping', 'forum');
+	  $ping_logs = $pingService->getPingLogs($tid,$ping_logs,$pingpage);
 	}else{
 	  $ping_logs = array();	
 	}
@@ -848,7 +853,6 @@ function viewread($read,$start_limit) {
 	$tpc_pid = $read['pid'];
 	$tpc_tag = array();
 	$tpc_shield = 0;
-
 	$read['ifsign']<2 && $read['content'] = str_replace("\n","<br />",$read['content']);
 
 	if ($read['anonymous']) {
@@ -911,7 +915,7 @@ function viewread($read,$start_limit) {
 			$read['signature'] = '';
 		}
 	} else {
-		$read['lpic']   = '8';
+		$read['lpic']   = $lpic['2'];
 		$read['level']  = $read['digests']   = $read['postnum'] = $read['money'] = $read['currency'] = '*';
 		$read['rvrc']	= $read['lastlogin'] = $read['credit']  = $read['regdate'] = '*';
 		$read['honor']  = $read['signature'] = $read['micon']   = $read['aliww']   = '';

@@ -4,7 +4,17 @@
 S::gp(array('uid', 'sign'));
 
 $uid = intval($uid);
-if ($uid < 1 || !$sign) Showmsg('error');
+if (!$sign){
+	Showmsg('error');
+}
+if ($uid<1){
+	$bubble=GetCookie('bubble')?GetCookie('bubble'):array();
+	$bubble=unserialize(stripslashes($bubble));
+	$bubble[$sign]=1;
+	Cookie("bubble",serialize($bubble));
+	Showmsg('error');
+}
+
 
 $cache = perf::gatherCache('pw_members');
 $userData = $cache->getMemberDataByUserId($uid);
